@@ -77,13 +77,28 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/61/fragment61_code/func_86B08B74.s")
 
+void func_86B08CEC(void) {
+}
+
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/61/fragment61_code/func_86B08CF4.s")
+
+void func_86B08E08(void) {
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/61/fragment61_code/func_86B08E10.s")
 
+void func_86B08F18(void) {
+}
+
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/61/fragment61_code/func_86B08F20.s")
 
+void func_86B09378(void) {
+}
+
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/61/fragment61_code/func_86B09380.s")
+
+void func_86B09478(void) {
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/61/fragment61_code/func_86B09480.s")
 

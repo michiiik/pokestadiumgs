@@ -96,6 +96,9 @@ void func_86A004AC(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/60/fragment60_code/func_86A06D88.s")
 
+void func_86A06E0C(void) {
+}
+
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/60/fragment60_code/func_86A06E14.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/60/fragment60_code/func_86A07124.s")

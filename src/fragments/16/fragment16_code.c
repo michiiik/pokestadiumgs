@@ -29,6 +29,9 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/16/fragment16_code/func_82000D80.s")
 
+void func_82000DE0(void) {
+}
+
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/16/fragment16_code/func_82000DE8.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/16/fragment16_code/func_82000FB0.s")
