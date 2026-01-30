@@ -21,6 +21,9 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_80004FA4.s")
 
+void func_80004FF4(void) {
+}
+
 #pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_80004FFC.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_800050A0.s")

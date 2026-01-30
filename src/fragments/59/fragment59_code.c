@@ -40,9 +40,15 @@ void func_869004A4(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/59/fragment59_code/func_869053B4.s")
 
+void func_869054CC(void) {
+}
+
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/59/fragment59_code/func_869054D4.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/59/fragment59_code/func_86905630.s")
+
+void func_86905804(void) {
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/59/fragment59_code/func_8690580C.s")
 
