@@ -62,6 +62,7 @@ SECTIONS
         build/asm/us/entry.o(.text);
         build/asm/us/pre_main.o(.text);
         build/src/main.o(.text);
+        . += 0x10;
         build/src/dp_intro.o(.text);
         build/src/2CA0.o(.text);
         build/src/3280.o(.text);
@@ -81,7 +82,7 @@ SECTIONS
         build/src/BF50.o(.text);
         build/src/C180.o(.text);
         build/src/C290.o(.text);
-        build/src/C2A0.o(.text);
+        build/asm/us/exception_set.o(.text);
         build/src/C2C0.o(.text);
         build/src/C380.o(.text);
         build/src/C890.o(.text);
@@ -370,8 +371,8 @@ SECTIONS
         build/src/C180.o(.data);
         C290 = .;
         build/src/C290.o(.data);
-        C2A0 = .;
-        build/src/C2A0.o(.data);
+        exception_set = .;
+        build/asm/us/exception_set.o(.data);
         C2C0 = .;
         build/src/C2C0.o(.data);
         C380 = .;
@@ -551,7 +552,7 @@ SECTIONS
         build/src/BF50.o(.rodata);
         build/src/C180.o(.rodata);
         build/src/C290.o(.rodata);
-        build/src/C2A0.o(.rodata);
+        build/asm/us/exception_set.o(.rodata);
         build/src/C2C0.o(.rodata);
         build/src/C380.o(.rodata);
         build/src/C890.o(.rodata);
@@ -660,7 +661,7 @@ SECTIONS
         build/src/BF50.o(.bss);
         build/src/C180.o(.bss);
         build/src/C290.o(.bss);
-        build/src/C2A0.o(.bss);
+        build/asm/us/exception_set.o(.bss);
         build/src/C2C0.o(.bss);
         build/src/C380.o(.bss);
         build/src/C890.o(.bss);
@@ -721,6 +722,7 @@ SECTIONS
         build/src/73C80.o(.bss);
         build/src/74020.o(.bss);
         build/asm/us/data/unk_bss.bss.o(.bss);
+        build/asm/us/data/unk_bss2.bss.o(.bss);
         build/lib/libultra.a:sptask.o(.bss);
         build/lib/libultra.a:controller.o(.bss);
         build/lib/libultra.a:siacs.o(.bss);

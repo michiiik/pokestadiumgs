@@ -27,10 +27,10 @@ for i in range(i, 0x440000, 8):
         print("  - name:", fragname)
         print("    type: code")
         print("    bss_size: 0x0")
-        print("    start: ", hex(i - 8), sep='')
+        print("    start: ", f"0x{(i - 8):X}", sep='')
         print("    vram: 0x00000000 # unk vram")
         print("    subsegments:")
-        print("    - [", hex((i - 8)), ", hasm, fragments/", frag_num, "/", fragname, "_header]", sep='')
-        print("    - [", hex((i - 8) + 0x20), ", asm,  fragments/", frag_num, "/", fragname, "_code]", sep='')
+        print("    - [", f"0x{(i - 8):X}", ", textbin, jp/fragments/", frag_num, "/", fragname, "_header]", sep='')
+        print("    - [", f"0x{((i - 8) + 0x20):X}", ", asm,  jp/fragments/", frag_num, "/", fragname, "_code]", sep='')
         print("")
         frag_num = frag_num + 1

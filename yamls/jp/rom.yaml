@@ -1,0 +1,1095 @@
+  - name: header
+    type: header
+    start: 0x00
+    vram: 0
+    subsegments:
+    - [0x0000, header, header]
+  - name: boot
+    type: code
+    start: 0x0040
+    vram: 0xA4000040
+    subsegments:
+    - [0x0040, asm, boot]
+    - [0x0B70, bin, bootcode_font]
+  - name: text
+    type: code
+    bss_size: 0x8C5F0
+    start: 0x1000
+    vram: 0x80000400
+    subsegments:
+    - [0x1000, hasm, entry] # bootloader
+    - [0x1060, asm, pre_main] # what is this? this isnt code?
+    - [0x2060, c, main]
+    - [0x21B0, pad]
+    - [0x21C0, c]
+    - [0xC1C0, asm, exception_set]
+    - [0xC1E0, c]
+    - [0x75FA0, lib, libultra, sendmesg]
+    - [0x760F0, lib, libultra, stopthread]
+    - [0x761B0, lib, libultra, recvmesg]
+    - [0x762F0, lib, libultra, setintmask]
+    - [0x76390, pad]
+    - [0x763A0, lib, libultra, scale]
+    - [0x76450, lib, libultra, sinf]
+    - [0x76610, lib, libultra, sptask]
+    - [0x768D0, lib, libultra, destroythread]
+    - [0x769E0, lib, libultra, ll]
+    - [0x76CA0, lib, libultra, exceptasm]
+    - [0x77A70, lib, libultra, thread]
+    - [0x77AB0, pad]
+    - [0x77AC0, lib, libultra, scalef]
+    - [0x77B10, lib, libultra, bzero]
+    - [0x77BB0, lib, libultra, gbpakcheckconnector]
+    - [0x78040, lib, libultra, gbpakpower]
+    - [0x78150, lib, libultra, controller]
+    - [0x78430, lib, libultra, siacs]
+    - [0x784F0, lib, libultra, flashsectorerase]
+    - [0x78640, lib, libultra, initialize]
+    - [0x78A00, lib, libultra, initialize_emu]
+    - [0x78A90, lib, libultra, initialize_msp]
+    - [0x78F50, lib, libultra, initialize_isv]
+    - [0x79500, lib, libultra, piread]
+    - [0x79540, lib, libultra, piacs]
+    - [0x79600, pad]
+    - [0x79660, lib, libultra, createthread]
+    - [0x797F0, lib, libultra, initrdb]
+    - [0x79880, lib, libultra, contreaddata]
+    - [0x79A60, lib, libultra, conteeplongread]
+    - [0x79AF0, lib, libultra, virtualtophysical]
+    - [0x79B70, lib, libultra, setsr]
+    - [0x79B80, lib, libultra, getsr]
+    - [0x79B90, lib, libultra, writebackdcache]
+    - [0x79C10, lib, libultra, gbpakinit]
+    - [0x79E40, lib, libultra, pfsgetstatus]
+    - [0x7A070, lib, libultra, perspective]
+    - [0x7A300, lib, libultra, sprawdma]
+    - [0x7A390, lib, libultra, sirawdma]
+    - [0x7A440, lib, libultra, epilinkhandle]
+    - [0x7A490, lib, libultra, kdebugserver]
+    - [0x7A7A0, lib, libultra, viblack]
+    - [0x7A810, lib, libultra, sirawread]
+    - [0x7A860, lib, libultra, pirawread]
+    - [0x7A8B0, lib, libultra, sptaskyield]
+    - [0x7A8D0, lib, libultra, lookatref]
+    - [0x7ADA0, lib, libultra, mtxidentf]
+    - [0x7ADF0, lib, libultra, readhost]
+    - [0x7AEC0, lib, libultra, visetmode]
+    - [0x7AF20, lib, libultra, virepeatline]
+    - [0x7AF90, lib, libultra, threadprofile]
+    - [0x7B030, lib, libultra, monutil]
+    - [0x7B1B0, lib, libultra, flashinit]
+    - [0x7B2A0, lib, libultra, flashreadid]
+    - [0x7B370, lib, libultra, pfsisplug]
+    - [0x7B660, lib, libultra, probetlb]
+    - [0x7B720, lib, libultra, pimgr]
+    - [0x7B9C0, lib, libultra, devmgr]
+    - [0x7BDD0, lib, libultra, pirawdma]
+    - [0x7BEA0, lib, libultra, getcount]
+    - [0x7BEB0, lib, libultra, conteepprobe]
+    - [0x7BF30, lib, libultra, conteepwrite]
+    - [0x7C350, lib, libultra, conteepread]
+    - [0x7C5B0, lib, libultra, flashreadstatus]
+    - [0x7C640, lib, libultra, getmemsize]
+    - [0x7C760, lib, libultra, contpfs]
+    - [0x7D2E0, lib, libultra, seteventmesg]
+    - [0x7D3A0, lib, libultra, sqrtf]
+    - [0x7D3B0, lib, libultra, afterprenmi]
+    - [0x7D3D0, lib, libultra, mtxxfmf]
+    - [0x7D480, lib, libultra, random]
+    - [0x7D4B0, lib, libultra, xprintf]
+    - [0x7E190, lib, libultra, gbpakgetstatus]
+    - [0x7E310, lib, libultra, sprintf]
+    - [0x7E390, lib, libultra, unmaptlball]
+    - [0x7E3E0, lib, libultra, epidma]
+    - [0x7E480, lib, libultra, syncprintf]
+    - [0x7E540, lib, libultra, string]
+    - [0x7E5E0, lib, libultra, createmesgqueue]
+    - [0x7E610, lib, libultra, invaldcache]
+    - [0x7E6C0, lib, libultra, invalicache]
+    - [0x7E740, lib, libultra, rmonsio]
+    - [0x7E940, lib, libultra, initialize_kmc]
+    - [0x7EE00, lib, libultra, conteeplongwrite]
+    - [0x7EF10, lib, libultra, sp]
+    - [0x7EF40, lib, libultra, si]
+    - [0x7EF70, pad]
+    - [0x7EF80, lib, libultra, translatef]
+    - [0x7EFD0, lib, libultra, jammesg]
+    - [0x7F120, lib, libultra, setthreadpri]
+    - [0x7F200, lib, libultra, getthreadpri]
+    - [0x7F220, lib, libultra, epirawread]
+    - [0x7F380, lib, libultra, viswapbuf]
+    - [0x7F3D0, pad]
+    - [0x7F3E0, lib, libultra, mtxcatf]
+    - [0x7F4D0, lib, libultra, mtxcatl]
+    - [0x7F530, pad]
+    - [0x7F540, lib, libultra, mtxl2f]
+    - [0x7F5B0, lib, libultra, epirawdma]
+    - [0x7F790, lib, libultra, sptaskyielded]
+    - [0x7F7F0, lib, libultra, rotaterpy]
+    - [0x7F980, lib, libultra, bcmp]
+    - [0x7FAA0, lib, libultra, gettime]
+    - [0x7FB30, lib, libultra, timerintr]
+    - [0x80030, lib, libultra, rotate]
+    - [0x80200, lib, libultra, setglobalintmask]
+    - [0x80250, lib, libultra, aisetfreq]
+    - [0x803A0, lib, libultra, dpctr]
+    - [0x803E0, lib, libultra, getactivequeue]
+    - [0x803F0, pad]
+    - [0x80400, lib, libultra, normalize]
+    - [0x80460, lib, libultra, setcompare]
+    - [0x80470, lib, libultra, aigetstat]
+    - [0x80480, lib, libultra, dpsetstat]
+    - [0x80490, lib, libultra, bcopy]
+    - [0x807A0, lib, libultra, resetglobalintmask]
+    - [0x80800, lib, libultra, ortho]
+    - [0x809C0, lib, libultra, interrupt]
+    - [0x80A50, lib, libultra, vi]
+    - [0x80B70, lib, libultra, viswapcontext]
+    - [0x80E70, lib, libultra, pigetcmdq]
+    - [0x80EA0, lib, libultra, cosf]
+    - [0x81010, lib, libultra, epiread]
+    - [0x81060, lib, libultra, visetspecial]
+    - [0x811C0, lib, libultra, flashwritearray]
+    - [0x81320, lib, libultra, settime]
+    - [0x81350, lib, libultra, flashclearstatus]
+    - [0x813A0, lib, libultra, visetevent]
+    - [0x81400, lib, libultra, rdbsend]
+    - [0x816C0, lib, libultra, flashwritebuffer]
+    - [0x81750, lib, libultra, cartrominit]
+    - [0x818B0, lib, libultra, gbpakreadid]
+    - [0x81B60, lib, libultra, rmoncmds]
+    - [0x81C00, lib, libultra, rmonmem]
+    - [0x82510, pad]
+    - [0x82520, lib, libultra, rmonmain]
+    - [0x82920, lib, libultra, rmontask]
+    - [0x83390, pad]
+    - [0x833A0, lib, libultra, rmonmisc]
+    - [0x83530, lib, libultra, rmonrcp]
+    - [0x835D0, lib, libultra, rmonbrk]
+    - [0x840B0, lib, libultra, sprawread]
+    - [0x84100, lib, libultra, rmonregs]
+    - [0x84D00, lib, libultra, pfsselectbank]
+    - [0x84D80, lib, libultra, setfpccsr]
+    - [0x84D90, lib, libultra, aigetlen]
+    - [0x84DA0, lib, libultra, epiwrite]
+    - [0x84DF0, lib, libultra, piwrite]
+    - [0x84E30, lib, libultra, maptlbrdb]
+    - [0x84E90, lib, libultra, yieldthread]
+    - [0x84EE0, lib, libultra, translate]
+    - [0x84FB0, lib, libultra, contramwrite]
+    - [0x85200, lib, libultra, contramread]
+    - [0x85430, lib, libultra, crc]
+    - [0x855A0, lib, libultra, getcause]
+    - [0x855B0, lib, libultra, epirawwrite]
+    - [0x85710, lib, libultra, settimer]
+    - [0x858A0, lib, libultra, xldtob]
+    - [0x863B0, lib, libultra, ldiv]
+    - [0x86540, lib, libultra, xlitob]
+    - [0x867E0, lib, libultra, sirawwrite]
+    - [0x86830, lib, libultra, pirawwrite]
+    - [0x86880, lib, libultra, sprawwrite]
+    - [0x868D0, lib, libultra, spsetstat]
+    - [0x868E0, lib, libultra, spgetstat]
+    - [0x868F0, pad]
+    - [0x86900, lib, libultra, vimgr]
+    - [0x86C10, lib, libultra, vigetcurrcontext]
+    - [0x86C20, lib, libultra, writebackdcacheall]
+    - [0x86C50, pad]
+    - [0x86C60, lib, libultra, mtxf2l]
+    - [0x86CD0, lib, libultra, startthread]
+    - [0x86E20, lib, libultra, visetxscale]
+    - [0x86F30, lib, libultra, visetyscale]
+    - [0x86F80, lib, libultra, llcvt]
+    - [0x87190, lib, libultra, gbpakreadwrite]
+    - [0x87360, lib, libultra, gbpaksetbank]
+    - [0x87430, lib, libultra, vigetcurrframebuf]
+    - [0x87470, lib, libultra, spsetpc]
+    - [0x874A0, lib, libultra, flashreadarray]
+    - [0x87640, lib, libultra, flashgetaddr]
+    - [0x87670, lib, libultra, setwatchlo]
+
+    - [0x87680, data]
+    - [0xA2510, lib, libultra, exceptasm, .data]
+    - [0xA2550, lib, libultra, thread, .data]
+    - [0xA2570, lib, libultra, controller, .data]
+    - [0xA2580, lib, libultra, siacs, .data]
+    - [0xA2590, lib, libultra, initialize, .data]
+    - [0xA25B0, lib, libultra, initialize_msp, .data]
+    - [0xA25C0, lib, libultra, piacs, .data]
+    - [0xA25D0, lib, libultra, vitbl, .data]
+    - [0xA3750, lib, libultra, kdebugserver, .data]
+    - [0xA3760, lib, libultra, readhost, .data]
+    - [0xA3770, lib, libultra, threadprofile, .data]
+    - [0xA3780, lib, libultra, pimgr, .data]
+    - [0xA37B0, lib, libultra, vimodentsclpn1, .data]
+    - [0xA3800, lib, libultra, vimodempallpn1, .data]
+    - [0xA3850, lib, libultra, contpfs, .data]
+    - [0xA3860, lib, libultra, seteventmesg, .data]
+    - [0xA3870, lib, libultra, random, .data]
+    - [0xA3880, lib, libultra, xprintf, .data]
+    - [0xA38D0, lib, libultra, initialize_kmc, .data]
+    - [0xA38E0, lib, libultra, rotaterpy, .data]
+    - [0xA38F0, lib, libultra, timerintr, .data]
+    - [0xA3900, lib, libultra, rotate, .data]
+    - [0xA3910, lib, libultra, vi, .data]
+    - [0xA3980, lib, libultra, vimodepallan1, .data]
+    - [0xA39D0, lib, libultra, vimodentsclan1, .data]
+    - [0xA3A20, lib, libultra, vimodempallan1, .data]
+    - [0xA3A70, lib, libultra, rdbsend, .data]
+    - [0xA3A80, lib, libultra, cartrominit, .data]
+    - [0xA3A90, lib, libultra, gbpakreadid, .data]
+    - [0xA3AE0, lib, libultra, rmoncmds, .data]
+    - [0xA3BC0, lib, libultra, rmonmain, .data]
+    - [0xA3BC0, lib, libultra, contramread, .data]
+    - [0xA3BE0, lib, libultra, xlitob, .data]
+    - [0xA3C10, lib, libultra, vimgr, .data]
+
+    - [0xA3C30, rodata]
+    - [0xA7FC0, lib, libultra, setintmask, .rodata]
+    - [0xA8068, lib, libultra, sinf, .rodata]
+    - [0xA8090, lib, libultra, exceptasm, .rodata]
+    - [0xA8100, lib, libultra, perspective, .rodata]
+    - [0xA8110, lib, libultra, devmgr, .rodata]
+    - [0xA8130, lib, libultra, xprintf, .rodata]
+    - [0xA8230, lib, libultra, cosf, .rodata]
+    - [0xA8280, lib, libultra, rmonmem, .rodata]
+    - [0xA8350, lib, libultra, rmonmain, .rodata]
+    - [0xA8390, lib, libultra, rmontask, .rodata]
+    - [0xA8430, lib, libultra, rmonmisc, .rodata]
+    - [0xA8460, lib, libultra, rmonbrk, .rodata]
+    - [0xA8630, lib, libultra, rmonregs, .rodata]
+    - [0xA86B0, lib, libultra, libm_vals, .rodata]
+    - [0xA86C0, lib, libultra, xldtob, .rodata]
+    - [0xA8720, lib, libultra, llcvt, .rodata]
+    - [0xA8730, rodata] # F3DEX bin + ???
+    - [0xAA1E0]
+
+    - {vram: 0x800A95E0, type:  .bss, name: main}
+    - {vram: 0x800AC160, type:  bss, name: unk_bss}
+    - {vram: 0x800ACB20, type:  bss, name: unk_bss2}
+
+    # ultralib
+    - {type: lib, vram: 0x8012C9F0, name: libultra, object: sptask, section: .bss}
+    - {type: lib, vram: 0x8012CA30, name: libultra, object: controller, section: .bss}
+    - {type: lib, vram: 0x8012CAC0, name: libultra, object: siacs, section: .bss}
+    - {type: lib, vram: 0x8012CAE0, name: libultra, object: initialize, section: .bss}
+    - {type: lib, vram: 0x8012CAF0, name: libultra, object: initialize_isv, section: .bss}
+    - {type: lib, vram: 0x8012CB20, name: libultra, object: piacs, section: .bss}
+    - {type: lib, vram: 0x8012CB40, name: libultra, object: initrdb, section: .bss}
+    - {type: lib, vram: 0x8012CB60, name: libultra, object: gbpakinit, section: .bss}
+    - {type: lib, vram: 0x8012CBA0, name: libultra, object: kdebugserver, section: .bss}
+    - {type: lib, vram: 0x8012CD60, name: libultra, object: readhost, section: .bss}
+    - {type: lib, vram: 0x8012CD90, name: libultra, object: threadprofile, section: .bss}
+    - {type: lib, vram: 0x8012D9A0, name: libultra, object: flashinit, section: .bss}
+    - {type: lib, vram: 0x8012DA60, name: libultra, object: pfsisplug, section: .bss}
+    - {type: lib, vram: 0x8012DAA0, name: libultra, object: pimgr, section: .bss}
+    - {type: lib, vram: 0x8012F350, name: libultra, object: conteepread, section: .bss}
+    - {type: lib, vram: 0x8012F3A0, name: libultra, object: contpfs, section: .bss}
+    - {type: lib, vram: 0x8012F4A0, name: libultra, object: seteventmesg, section: .bss}
+    - {type: lib, vram: 0x8012F560, name: libultra, object: rmonsio, section: .bss}
+    - {type: lib, vram: 0x8012FD80, name: libultra, object: timerintr, section: .bss}
+    - {type: lib, vram: 0x8012FDE0, name: libultra, object: cartrominit, section: .bss}
+    - {type: lib, vram: 0x8012FE60, name: libultra, object: rmonmem, section: .bss}
+    - {type: lib, vram: 0x8012FF60, name: libultra, object: rmonmain, section: .bss}
+    - {type: lib, vram: 0x801303E0, name: libultra, object: rmonmisc, section: .bss}
+    - {type: lib, vram: 0x80134600, name: libultra, object: rmonbrk, section: .bss}
+    - {type: lib, vram: 0x80134710, name: libultra, object: rmonregs, section: .bss}
+    - {type: lib, vram: 0x80134730, name: libultra, object: vimgr, section: .bss}
+    - {vram: 0x80135950, type: bss, name: unk_bss3}
+  - [0xAA1E0]
+
+  - name: fragment1
+    type: code
+    bss_size: 0x0
+    start: 0xAA1E0
+    vram: 0x83500000 # unk vram
+    subsegments:
+    - [0xAA1E0, textbin, fragments/1/fragment1_header]
+    - [0xAA200, asm,  fragments/1/fragment1_code]
+  
+  - name: fragment2
+    type: code
+    bss_size: 0x0
+    start: 0xAE9C0
+    vram: 0x81900000 # unk vram
+    subsegments:
+    - [0xAE9C0, textbin, fragments/2/fragment2_header]
+    - [0xAE9E0, asm,  fragments/2/fragment2_code]
+
+  - name: fragment3
+    type: code
+    bss_size: 0x0
+    start: 0xAF400
+    vram: 0x81A00000 # unk vram
+    subsegments:
+    - [0xAF400, textbin, fragments/3/fragment3_header]
+    - [0xAF420, bin,  fragments/3/fragment3_code]
+
+  - name: fragment4
+    type: code
+    bss_size: 0x0
+    start: 0xAFD10
+    vram: 0x81800000 # unk vram
+    subsegments:
+    - [0xAFD10, textbin, fragments/4/fragment4_header]
+    - [0xAFD30, asm,  fragments/4/fragment4_code]
+
+  - name: fragment5
+    type: code
+    bss_size: 0x0
+    start: 0xB64C0
+    vram: 0x83200000 # unk vram
+    subsegments:
+    - [0xB64C0, textbin, fragments/5/fragment5_header]
+    - [0xB64E0, asm,  fragments/5/fragment5_code]
+
+  - name: fragment6
+    type: code
+    bss_size: 0x0
+    start: 0xB74D0
+    vram: 0x83100000 # unk vram
+    subsegments:
+    - [0xB74D0, textbin, fragments/6/fragment6_header]
+    - [0xB74F0, asm,  fragments/6/fragment6_code]
+
+  - name: fragment7
+    type: code
+    bss_size: 0x0
+    start: 0xBB960
+    vram: 0x83000000 # unk vram
+    subsegments:
+    - [0xBB960, textbin, fragments/7/fragment7_header]
+    - [0xBB980, asm,  fragments/7/fragment7_code]
+
+  - name: fragment8
+    type: code
+    bss_size: 0x0
+    start: 0xCDC00
+    vram: 0x82F00000 # unk vram
+    subsegments:
+    - [0xCDC00, textbin, fragments/8/fragment8_header]
+    - [0xCDC20, asm,  fragments/8/fragment8_code]
+
+  - name: fragment9
+    type: code
+    bss_size: 0x0
+    start: 0xD19D0
+    vram: 0x8FB00000 # unk vram
+    subsegments:
+    - [0xD19D0, textbin, fragments/9/fragment9_header]
+    - [0xD19F0, asm,  fragments/9/fragment9_code]
+
+  - name: fragment10
+    type: code
+    bss_size: 0x0
+    start: 0xD6180
+    vram: 0x82800000 # unk vram
+    subsegments:
+    - [0xD6180, textbin, fragments/10/fragment10_header]
+    - [0xD61A0, asm,  fragments/10/fragment10_code]
+
+  - name: fragment11
+    type: code
+    bss_size: 0x0
+    start: 0xD90F0
+    vram: 0x81600000 # unk vram
+    subsegments:
+    - [0xD90F0, textbin, fragments/11/fragment11_header]
+    - [0xD9110, asm,  fragments/11/fragment11_code]
+
+  - name: fragment12
+    type: code
+    bss_size: 0x0
+    start: 0xE6810
+    vram: 0x81400000 # unk vram
+    subsegments:
+    - [0xE6810, textbin, fragments/12/fragment12_header]
+    - [0xE6830, asm,  fragments/12/fragment12_code]
+
+  - name: fragment13
+    type: code
+    bss_size: 0x0
+    start: 0xEF4F0
+    vram: 0x82400000 # unk vram
+    subsegments:
+    - [0xEF4F0, textbin, fragments/13/fragment13_header]
+    - [0xEF510, asm,  fragments/13/fragment13_code]
+
+  - name: fragment14
+    type: code
+    bss_size: 0x0
+    start: 0xF9590
+    vram: 0x81300000 # unk vram
+    subsegments:
+    - [0xF9590, textbin, fragments/14/fragment14_header]
+    - [0xF95B0, asm,  fragments/14/fragment14_code]
+
+  - name: fragment15
+    type: code
+    bss_size: 0x0
+    start: 0x10E2C0
+    vram: 0x83F00000 # unk vram
+    subsegments:
+    - [0x10E2C0, textbin, fragments/15/fragment15_header]
+    - [0x10E2E0, bin,  fragments/15/fragment15_code]
+
+  - name: fragment16
+    type: code
+    bss_size: 0x0
+    start: 0x10E7C0
+    vram: 0x82000000 # unk vram
+    subsegments:
+    - [0x10E7C0, textbin, fragments/16/fragment16_header]
+    - [0x10E7E0, bin,  fragments/16/fragment16_code]
+
+  - name: fragment17
+    type: code
+    bss_size: 0x0
+    start: 0x110C50
+    vram: 0x82200000 # unk vram
+    subsegments:
+    - [0x110C50, textbin, fragments/17/fragment17_header]
+    - [0x110C70, bin,  fragments/17/fragment17_code]
+
+  - name: fragment18
+    type: code
+    bss_size: 0x0
+    start: 0x1213C0
+    vram: 0x81700000 # unk vram
+    subsegments:
+    - [0x1213C0, textbin, fragments/18/fragment18_header]
+    - [0x1213E0, bin,  fragments/18/fragment18_code]
+
+  - name: fragment19
+    type: code
+    bss_size: 0x0
+    start: 0x122240
+    vram: 0x82300000 # unk vram
+    subsegments:
+    - [0x122240, textbin, fragments/19/fragment19_header]
+    - [0x122260, bin,  fragments/19/fragment19_code]
+
+  - name: fragment20
+    type: code
+    bss_size: 0x0
+    start: 0x129230
+    vram: 0x82600000 # unk vram
+    subsegments:
+    - [0x129230, textbin, fragments/20/fragment20_header]
+    - [0x129250, asm,  fragments/20/fragment20_code]
+
+  - name: fragment21
+    type: code
+    bss_size: 0x0
+    start: 0x141080
+    vram: 0x82500000 # unk vram
+    subsegments:
+    - [0x141080, textbin, fragments/21/fragment21_header]
+    - [0x1410A0, bin,  fragments/21/fragment21_code]
+
+  - name: fragment22
+    type: code
+    bss_size: 0x0
+    start: 0x14B3C0
+    vram: 0x82700000 # unk vram
+    subsegments:
+    - [0x14B3C0, textbin, fragments/22/fragment22_header]
+    - [0x14B3E0, bin,  fragments/22/fragment22_code]
+
+  - name: fragment23
+    type: code
+    bss_size: 0x0
+    start: 0x14F030
+    vram: 0x82A00000 # unk vram
+    subsegments:
+    - [0x14F030, textbin, fragments/23/fragment23_header]
+    - [0x14F050, asm,  fragments/23/fragment23_code]
+
+  - name: fragment24
+    type: code
+    bss_size: 0x0
+    start: 0x150E20
+    vram: 0x82B00000 # unk vram
+    subsegments:
+    - [0x150E20, textbin, fragments/24/fragment24_header]
+    - [0x150E40, asm,  fragments/24/fragment24_code]
+
+  - name: fragment25
+    type: code
+    bss_size: 0x0
+    start: 0x15B040
+    vram: 0x82100000 # unk vram
+    subsegments:
+    - [0x15B040, textbin, fragments/25/fragment25_header]
+    - [0x15B060, asm,  fragments/25/fragment25_code]
+
+  - name: fragment26
+    type: code
+    bss_size: 0x0
+    start: 0x15F8B0
+    vram: 0x81000000 # unk vram
+    subsegments:
+    - [0x15F8B0, textbin, fragments/26/fragment26_header]
+    - [0x15F8D0, bin,  fragments/26/fragment26_code]
+
+  - name: fragment27
+    type: code
+    bss_size: 0x0
+    start: 0x166C50
+    vram: 0x81100000 # unk vram
+    subsegments:
+    - [0x166C50, textbin, fragments/27/fragment27_header]
+    - [0x166C70, asm,  fragments/27/fragment27_code]
+
+  - name: fragment28
+    type: code
+    bss_size: 0x0
+    start: 0x166EC0
+    vram: 0x80000000 # unk vram
+    subsegments:
+    - [0x166EC0, textbin, fragments/28/fragment28_header]
+    - [0x166EE0, bin,  fragments/28/fragment28_code]
+
+  - name: fragment29
+    type: code
+    bss_size: 0x0
+    start: 0x167040
+    vram: 0x88000000 # unk vram
+    subsegments:
+    - [0x167040, textbin, fragments/29/fragment29_header]
+    - [0x167060, asm,  fragments/29/fragment29_code]
+
+  - name: fragment30
+    type: code
+    bss_size: 0x0
+    start: 0x16E4D0
+    vram: 0x88100000 # unk vram
+    subsegments:
+    - [0x16E4D0, textbin, fragments/30/fragment30_header]
+    - [0x16E4F0, asm,  fragments/30/fragment30_code]
+
+  - name: fragment31
+    type: code
+    bss_size: 0x0
+    start: 0x174240
+    vram: 0x88200000 # unk vram
+    subsegments:
+    - [0x174240, textbin, fragments/31/fragment31_header]
+    - [0x174260, bin,  fragments/31/fragment31_code]
+
+  - name: fragment32
+    type: code
+    bss_size: 0x0
+    start: 0x1B2190
+    vram: 0x88300000 # unk vram
+    subsegments:
+    - [0x1B2190, textbin, fragments/32/fragment32_header]
+    - [0x1B21B0, bin,  fragments/32/fragment32_code]
+
+  - name: fragment33
+    type: code
+    bss_size: 0x0
+    start: 0x1BCA20
+    vram: 0x88400000 # unk vram
+    subsegments:
+    - [0x1BCA20, textbin, fragments/33/fragment33_header]
+    - [0x1BCA40, asm,  fragments/33/fragment33_code]
+
+  - name: fragment34
+    type: code
+    bss_size: 0x0
+    start: 0x1BE470
+    vram: 0x88500000 # unk vram
+    subsegments:
+    - [0x1BE470, textbin, fragments/34/fragment34_header]
+    - [0x1BE490, bin,  fragments/34/fragment34_code]
+
+  - name: fragment35
+    type: code
+    bss_size: 0x0
+    start: 0x1CD9C0
+    vram: 0x88600000 # unk vram
+    subsegments:
+    - [0x1CD9C0, textbin, fragments/35/fragment35_header]
+    - [0x1CD9E0, bin,  fragments/35/fragment35_code]
+
+  - name: fragment36
+    type: code
+    bss_size: 0x0
+    start: 0x1CF7B0
+    vram: 0x88700000 # unk vram
+    subsegments:
+    - [0x1CF7B0, textbin, fragments/36/fragment36_header]
+    - [0x1CF7D0, asm,  fragments/36/fragment36_code]
+
+  - name: fragment37
+    type: code
+    bss_size: 0x0
+    start: 0x1D1500
+    vram: 0x88800000 # unk vram
+    subsegments:
+    - [0x1D1500, textbin, fragments/37/fragment37_header]
+    - [0x1D1520, asm,  fragments/37/fragment37_code]
+
+  - name: fragment38
+    type: code
+    bss_size: 0x0
+    start: 0x1D6190
+    vram: 0x88900000 # unk vram
+    subsegments:
+    - [0x1D6190, textbin, fragments/38/fragment38_header]
+    - [0x1D61B0, asm,  fragments/38/fragment38_code]
+
+  - name: fragment39
+    type: code
+    bss_size: 0x0
+    start: 0x1DAE70
+    vram: 0x88A00000 # unk vram
+    subsegments:
+    - [0x1DAE70, textbin, fragments/39/fragment39_header]
+    - [0x1DAE90, asm,  fragments/39/fragment39_code]
+
+  - name: fragment40
+    type: code
+    bss_size: 0x0
+    start: 0x1DCD60
+    vram: 0x88B00000 # unk vram
+    subsegments:
+    - [0x1DCD60, textbin, fragments/40/fragment40_header]
+    - [0x1DCD80, asm,  fragments/40/fragment40_code]
+
+  - name: fragment41
+    type: code
+    bss_size: 0x0
+    start: 0x1E39E0
+    vram: 0x88C00000 # unk vram
+    subsegments:
+    - [0x1E39E0, textbin, fragments/41/fragment41_header]
+    - [0x1E3A00, asm,  fragments/41/fragment41_code]
+
+  - name: fragment42
+    type: code
+    bss_size: 0x0
+    start: 0x1E58E0
+    vram: 0x88D00000 # unk vram
+    subsegments:
+    - [0x1E58E0, textbin, fragments/42/fragment42_header]
+    - [0x1E5900, asm,  fragments/42/fragment42_code]
+
+  - name: fragment43
+    type: code
+    bss_size: 0x0
+    start: 0x1E6570
+    vram: 0x8AC00000 # unk vram
+    subsegments:
+    - [0x1E6570, textbin, fragments/43/fragment43_header]
+    - [0x1E6590, asm,  fragments/43/fragment43_code]
+
+  - name: fragment44
+    type: code
+    bss_size: 0x0
+    start: 0x1EEDF0
+    vram: 0x8AF00000 # unk vram
+    subsegments:
+    - [0x1EEDF0, textbin, fragments/44/fragment44_header]
+    - [0x1EEE10, bin,  fragments/44/fragment44_code]
+
+  - name: fragment45
+    type: code
+    bss_size: 0x0
+    start: 0x225660
+    vram: 0x8AB00000 # unk vram
+    subsegments:
+    - [0x225660, textbin, fragments/45/fragment45_header]
+    - [0x225680, bin,  fragments/45/fragment45_code]
+
+  - name: fragment46
+    type: code
+    bss_size: 0x0
+    start: 0x23C410
+    vram: 0x8AE00000 # unk vram
+    subsegments:
+    - [0x23C410, textbin, fragments/46/fragment46_header]
+    - [0x23C430, bin,  fragments/46/fragment46_code]
+
+  - name: fragment47
+    type: code
+    bss_size: 0x0
+    start: 0x246750
+    vram: 0x86000000 # unk vram
+    subsegments:
+    - [0x246750, textbin, fragments/47/fragment47_header]
+    - [0x246770, asm,  fragments/47/fragment47_code]
+
+  - name: fragment48
+    type: code
+    bss_size: 0x0
+    start: 0x256130
+    vram: 0x87C00000 # unk vram
+    subsegments:
+    - [0x256130, textbin, fragments/48/fragment48_header]
+    - [0x256150, bin,  fragments/48/fragment48_code]
+
+  - name: fragment49
+    type: code
+    bss_size: 0x0
+    start: 0x25A7A0
+    vram: 0x86100000 # unk vram
+    subsegments:
+    - [0x25A7A0, textbin, fragments/49/fragment49_header]
+    - [0x25A7C0, asm,  fragments/49/fragment49_code]
+
+  - name: fragment50
+    type: code
+    bss_size: 0x0
+    start: 0x266B70
+    vram: 0x86200000 # unk vram
+    subsegments:
+    - [0x266B70, textbin, fragments/50/fragment50_header]
+    - [0x266B90, asm,  fragments/50/fragment50_code]
+
+  - name: fragment51
+    type: code
+    bss_size: 0x0
+    start: 0x275F60
+    vram: 0x86300000 # unk vram
+    subsegments:
+    - [0x275F60, textbin, fragments/51/fragment51_header]
+    - [0x275F80, asm,  fragments/51/fragment51_code]
+
+  - name: fragment52
+    type: code
+    bss_size: 0x0
+    start: 0x27E600
+    vram: 0x86400000 # unk vram
+    subsegments:
+    - [0x27E600, textbin, fragments/52/fragment52_header]
+    - [0x27E620, asm,  fragments/52/fragment52_code]
+
+  - name: fragment53
+    type: code
+    bss_size: 0x0
+    start: 0x2895F0
+    vram: 0x86500000 # unk vram
+    subsegments:
+    - [0x2895F0, textbin, fragments/53/fragment53_header]
+    - [0x289610, asm,  fragments/53/fragment53_code]
+
+  - name: fragment54
+    type: code
+    bss_size: 0x0
+    start: 0x299A70
+    vram: 0x86600000 # unk vram
+    subsegments:
+    - [0x299A70, textbin, fragments/54/fragment54_header]
+    - [0x299A90, asm,  fragments/54/fragment54_code]
+
+  - name: fragment55
+    type: code
+    bss_size: 0x0
+    start: 0x2A2630
+    vram: 0x86700000 # unk vram
+    subsegments:
+    - [0x2A2630, textbin, fragments/55/fragment55_header]
+    - [0x2A2650, asm,  fragments/55/fragment55_code]
+
+  - name: fragment56
+    type: code
+    bss_size: 0x0
+    start: 0x2B1690
+    vram: 0x86800000 # unk vram
+    subsegments:
+    - [0x2B1690, textbin, fragments/56/fragment56_header]
+    - [0x2B16B0, asm,  fragments/56/fragment56_code]
+
+  - name: fragment57
+    type: code
+    bss_size: 0x0
+    start: 0x2BB980
+    vram: 0x83300000 # unk vram
+    subsegments:
+    - [0x2BB980, textbin, fragments/57/fragment57_header]
+    - [0x2BB9A0, bin,  fragments/57/fragment57_code]
+
+  - name: fragment58
+    type: code
+    bss_size: 0x0
+    start: 0x2C8560
+    vram: 0x83400000 # unk vram
+    subsegments:
+    - [0x2C8560, textbin, fragments/58/fragment58_header]
+    - [0x2C8580, bin,  fragments/58/fragment58_code]
+
+  - name: fragment59
+    type: code
+    bss_size: 0x0
+    start: 0x2CD5F0
+    vram: 0x86900000 # unk vram
+    subsegments:
+    - [0x2CD5F0, textbin, fragments/59/fragment59_header]
+    - [0x2CD610, asm,  fragments/59/fragment59_code]
+
+  - name: fragment60
+    type: code
+    bss_size: 0x0
+    start: 0x2E12C0
+    vram: 0x86A00000 # unk vram
+    subsegments:
+    - [0x2E12C0, textbin, fragments/60/fragment60_header]
+    - [0x2E12E0, asm,  fragments/60/fragment60_code]
+
+  - name: fragment61
+    type: code
+    bss_size: 0x0
+    start: 0x2F3190
+    vram: 0x86B00000 # unk vram
+    subsegments:
+    - [0x2F3190, textbin, fragments/61/fragment61_header]
+    - [0x2F31B0, asm,  fragments/61/fragment61_code]
+
+  - name: fragment62
+    type: code
+    bss_size: 0x0
+    start: 0x303750
+    vram: 0x86C00000 # unk vram
+    subsegments:
+    - [0x303750, textbin, fragments/62/fragment62_header]
+    - [0x303770, asm,  fragments/62/fragment62_code]
+
+  - name: fragment63
+    type: code
+    bss_size: 0x0
+    start: 0x303BB0
+    vram: 0x87E00000 # unk vram
+    subsegments:
+    - [0x303BB0, textbin, fragments/63/fragment63_header]
+    - [0x303BD0, asm,  fragments/63/fragment63_code]
+
+  - name: fragment64
+    type: code
+    bss_size: 0x0
+    start: 0x322C20
+    vram: 0x87F00000 # unk vram
+    subsegments:
+    - [0x322C20, textbin, fragments/64/fragment64_header]
+    - [0x322C40, asm,  fragments/64/fragment64_code]
+
+  - name: fragment65
+    type: code
+    bss_size: 0x0
+    start: 0x335B70
+    vram: 0x87D00000 # unk vram
+    subsegments:
+    - [0x335B70, textbin, fragments/65/fragment65_header]
+    - [0x335B90, asm,  fragments/65/fragment65_code]
+
+  - name: fragment66
+    type: code
+    bss_size: 0x0
+    start: 0x3363A0
+    vram: 0x82E00000 # unk vram
+    subsegments:
+    - [0x3363A0, textbin, fragments/66/fragment66_header]
+    - [0x3363C0, asm,  fragments/66/fragment66_code]
+
+  - name: fragment67
+    type: code
+    bss_size: 0x0
+    start: 0x33C6F0
+    vram: 0x82900000 # unk vram
+    subsegments:
+    - [0x33C6F0, textbin, fragments/67/fragment67_header]
+    - [0x33C710, bin,  fragments/67/fragment67_code]
+
+  - name: fragment68
+    type: code
+    bss_size: 0x0
+    start: 0x3570F0
+    vram: 0x8F000000 # unk vram
+    subsegments:
+    - [0x3570F0, textbin, fragments/68/fragment68_header]
+    - [0x357110, asm,  fragments/68/fragment68_code]
+
+  - name: fragment69
+    type: code
+    bss_size: 0x0
+    start: 0x357C00
+    vram: 0x8F100000 # unk vram
+    subsegments:
+    - [0x357C00, textbin, fragments/69/fragment69_header]
+    - [0x357C20, asm,  fragments/69/fragment69_code]
+
+  - name: fragment70
+    type: code
+    bss_size: 0x0
+    start: 0x35CAB0
+    vram: 0x8F200000 # unk vram
+    subsegments:
+    - [0x35CAB0, textbin, fragments/70/fragment70_header]
+    - [0x35CAD0, asm,  fragments/70/fragment70_code]
+
+  - name: fragment71
+    type: code
+    bss_size: 0x0
+    start: 0x35D510
+    vram: 0x8F300000 # unk vram
+    subsegments:
+    - [0x35D510, textbin, fragments/71/fragment71_header]
+    - [0x35D530, asm,  fragments/71/fragment71_code]
+
+  - name: fragment72
+    type: code
+    bss_size: 0x0
+    start: 0x35E8A0
+    vram: 0x8F400000 # unk vram
+    subsegments:
+    - [0x35E8A0, textbin, fragments/72/fragment72_header]
+    - [0x35E8C0, asm,  fragments/72/fragment72_code]
+
+  - name: fragment73
+    type: code
+    bss_size: 0x0
+    start: 0x3614A0
+    vram: 0x8F500000 # unk vram
+    subsegments:
+    - [0x3614A0, textbin, fragments/73/fragment73_header]
+    - [0x3614C0, bin,  fragments/73/fragment73_code]
+
+  - name: fragment74
+    type: code
+    bss_size: 0x0
+    start: 0x3621A0
+    vram: 0x8F600000 # unk vram
+    subsegments:
+    - [0x3621A0, textbin, fragments/74/fragment74_header]
+    - [0x3621C0, bin,  fragments/74/fragment74_code]
+
+  - name: fragment75
+    type: code
+    bss_size: 0x0
+    start: 0x363110
+    vram: 0x8FA00000 # unk vram
+    subsegments:
+    - [0x363110, textbin, fragments/75/fragment75_header]
+    - [0x363130, bin,  fragments/75/fragment75_code]
+
+  - name: fragment76
+    type: code
+    bss_size: 0x0
+    start: 0x365400
+    vram: 0x8F700000 # unk vram
+    subsegments:
+    - [0x365400, textbin, fragments/76/fragment76_header]
+    - [0x365420, asm,  fragments/76/fragment76_code]
+
+  - name: fragment77
+    type: code
+    bss_size: 0x0
+    start: 0x367CD0
+    vram: 0x8F800000 # unk vram
+    subsegments:
+    - [0x367CD0, textbin, fragments/77/fragment77_header]
+    - [0x367CF0, asm,  fragments/77/fragment77_code]
+
+  - name: fragment78
+    type: code
+    bss_size: 0x0
+    start: 0x36D110
+    vram: 0x8F900000 # unk vram
+    subsegments:
+    - [0x36D110, textbin, fragments/78/fragment78_header]
+    - [0x36D130, asm,  fragments/78/fragment78_code]
+
+  - name: fragment79
+    type: code
+    bss_size: 0x0
+    start: 0x36EC10
+    vram: 0x84100000 # unk vram
+    subsegments:
+    - [0x36EC10, textbin, fragments/79/fragment79_header]
+    - [0x36EC30, asm,  fragments/79/fragment79_code]
+    - [0x3D89A0, data,  fragments/79/fragment79_data]
+
+  - name: fragment80
+    type: code
+    bss_size: 0x0
+    start: 0x4182C0
+    vram: 0x84200000 # unk vram
+    subsegments:
+    - [0x4182C0, textbin, fragments/80/fragment80_header]
+    - [0x4182E0, asm,  fragments/80/fragment80_code]
+
+  - name: fragment81
+    type: code
+    bss_size: 0x0
+    start: 0x41C610
+    vram: 0x84300000 # unk vram
+    subsegments:
+    - [0x41C610, textbin, fragments/81/fragment81_header]
+    - [0x41C630, asm,  fragments/81/fragment81_code]
+
+  - name: fragment82
+    type: code
+    bss_size: 0x0
+    start: 0x41FD40
+    vram: 0x82D00000 # unk vram
+    subsegments:
+    - [0x41FD40, textbin, fragments/82/fragment82_header]
+    - [0x41FD60, asm,  fragments/82/fragment82_code]
+
+  - name: fragment83
+    type: code
+    bss_size: 0x0
+    start: 0x428720
+    vram: 0x82C00000 # unk vram
+    subsegments:
+    - [0x428720, textbin, fragments/83/fragment83_header]
+    - [0x428740, bin,  fragments/83/fragment83_code]
+
+  - name: fragment84
+    type: code
+    bss_size: 0x0
+    start: 0x42DFE0
+    vram: 0x8FC00000 # unk vram
+    subsegments:
+    - [0x42DFE0, textbin, fragments/84/fragment84_header]
+    - [0x42E000, asm,  fragments/84/fragment84_code]
+
+  - name: fragment85
+    type: code
+    bss_size: 0x0
+    start: 0x430F40
+    vram: 0x8FD00000 # unk vram
+    subsegments:
+    - [0x430F40, textbin, fragments/85/fragment85_header]
+    - [0x430F60, asm,  fragments/85/fragment85_code]
+
+  - name: fragment86
+    type: code
+    bss_size: 0x0
+    start: 0x4335A0
+    vram: 0x84400000 # unk vram
+    subsegments:
+    - [0x4335A0, textbin, fragments/86/fragment86_header]
+    - [0x4335C0, asm,  fragments/86/fragment86_code]
+
+  - name: fragment87
+    type: code
+    bss_size: 0x0
+    start: 0x4348F0
+    vram: 0x81B00000 # unk vram
+    subsegments:
+    - [0x4348F0, textbin, fragments/87/fragment87_header]
+    - [0x434910, asm,  fragments/87/fragment87_code]
+
+  - name: fragment88
+    type: code
+    bss_size: 0x0
+    start: 0x435A70
+    vram: 0x81C00000 # unk vram
+    subsegments:
+    - [0x435A70, textbin, fragments/88/fragment88_header]
+    - [0x435A90, bin,  fragments/88/fragment88_code]
+    
+  # - [0x440000, bin] # rest of ROM
+  - [0x4000000] # end of ROM

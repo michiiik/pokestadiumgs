@@ -20,6 +20,7 @@
     - [0x1000, hasm, entry] # bootloader
     - [0x1060, asm, pre_main] # what is this? this isnt code?
     - [0x2060, c, main]
+    - [0x21B0, pad]
     - [0x21C0, c, dp_intro]
     - [0x2CA0, c]
     - [0x3280, c]
@@ -39,7 +40,7 @@
     - [0xBF50, c]
     - [0xC180, c]
     - [0xC290, c]
-    - [0xC2A0, c]
+    - [0xC2A0, asm, exception_set]
     - [0xC2C0, c]
     - [0xC380, c]
     - [0xC890, c]
@@ -345,7 +346,9 @@
     - [0xA8A80]
     
     # .bss
-    - {vram: 0x800A7E80, type:  bss, name: unk_bss}
+    - {vram: 0x800A7E80, type:  .bss, name: main}
+    - {vram: 0x800AAA00, type:  bss, name: unk_bss}
+    - {vram: 0x800AB3C0, type:  bss, name: unk_bss2}
 
     # ultralib
     - {type: lib, vram: 0x8012B510, name: libultra, object: sptask, section: .bss}

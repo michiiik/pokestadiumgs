@@ -1,6 +1,7 @@
 #include "global.h"
 
 
+#ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_80044270.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_80044424.s")
@@ -44,3 +45,4 @@
 #pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_800468C8.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_80046930.s")
+#endif

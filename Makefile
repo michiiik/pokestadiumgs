@@ -111,8 +111,10 @@ BUILD_DEFINES ?=
 
 ifeq ($(VERSION),us)
   BUILD_DEFINES   += -DVERSION_US=1
+else ifeq ($(VERSION),jp)
+  BUILD_DEFINES   += -DVERSION_JP=1  
 else
-$(error Invalid VERSION variable detected. Please use 'us')
+$(error Invalid VERSION variable detected. Please use 'us' or jp')
 endif
 
 
@@ -211,15 +213,6 @@ else
   OBJDUMP_CMD = @:
   OBJCOPY_BIN = @:
   LIBDUMP_CMD = @:
-endif
-
-SPLAT_FLAGS ?=
-ifneq ($(WARNINGS_CHECK), 0)
-  SPLAT_FLAGS += --stdout-only
-endif
-
-ifneq ($(FULL_DISASM), 0)
-  SPLAT_FLAGS += --disassemble-all
 endif
 
 SPLAT_FLAGS ?=

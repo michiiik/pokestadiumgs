@@ -1,3 +1,7 @@
+entry_bss = 0x800A7E80; // size:0x400
+gIdleThread = 0x800A8280; // size:0x1B0
+pThreads = 0x800A8830; // size:0x1B0
+leoDiskID = 0x800AA9E0; // size:0x20
 D_83503E80 = 0x83503E80;
 D_83503E84 = 0x83503E84;
 D_83503E88 = 0x83503E88;

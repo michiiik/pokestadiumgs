@@ -1,9 +1,10 @@
 # Pokemon Stadium 2 (US)
-A WIP decomp of Pokemon Stadium 2 (US).
+A WIP decomp of Pokemon Stadium 2 (US/JP).
 
 It builds the following ROMs:
 
-* pokestadiumgs.z64: `md5: 1561c75d11cedf356a8ddb1a4a5f9d5d`
+* pokestadiumgs-us.z64: `md5: 1561c75d11cedf356a8ddb1a4a5f9d5d`
+* pokestadiumgs-jp.z64: `md5: a17aadcc962393d476edc321e59c504b`
 
 Note: To use this repository, you must already have a rom for the game.
 
@@ -27,8 +28,8 @@ python3 -m pip install -r requirements.txt
 ```
 
 # To use
-1. Place the US Pokemon Stadium 2 (US) rom into the repository's "/baseroms/us/" folder as "baserom.z64".
-2. Set up tools and extract the rom: `make init`
+1. Place the US Pokemon Stadium 2 (US/JP) rom into the repository's "/baseroms/VERSION/" folder as "baserom.z64". `VERSION` can be `us` or `jp`
+2. Set up tools and extract the rom: `VERSION=us make init`
 3. Re-assemble the rom: `make`
 
 For contacts and other pret projects, see [pret.github.io](https://pret.github.io/).
