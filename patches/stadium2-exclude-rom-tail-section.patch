@@ -1,0 +1,9 @@
+diff --git a/generated/recomp_overlays.inl b/generated/recomp_overlays.inl
+--- a/generated/recomp_overlays.inl
++++ b/generated/recomp_overlays.inl
+@@ -197256,5 +197256,4 @@ static SectionTableEntry section_table[] = {
+     { .rom_addr = 0x00434720, .ram_addr = 0x84400000, .size = 0x00001350, .funcs = section_263_fragment86_funcs, .num_funcs = ARRLEN(section_263_fragment86_funcs), .relocs = section_263_fragment86_relocs, .num_relocs = ARRLEN(section_263_fragment86_relocs), .index = 263, .content_hash = 0x0000000000000000ull, .original_pattern_id = 0xFFFFFFFFu },
+     { .rom_addr = 0x00435A70, .ram_addr = 0x81B00000, .size = 0x000011B0, .funcs = section_266_fragment87_funcs, .num_funcs = ARRLEN(section_266_fragment87_funcs), .relocs = section_266_fragment87_relocs, .num_relocs = ARRLEN(section_266_fragment87_relocs), .index = 266, .content_hash = 0x0000000000000000ull, .original_pattern_id = 0xFFFFFFFFu },
+     { .rom_addr = 0x00436C20, .ram_addr = 0x81C00000, .size = 0x000009F0, .funcs = section_269_fragment88_funcs, .num_funcs = ARRLEN(section_269_fragment88_funcs), .relocs = section_269_fragment88_relocs, .num_relocs = ARRLEN(section_269_fragment88_relocs), .index = 269, .content_hash = 0x0000000000000000ull, .original_pattern_id = 0xFFFFFFFFu },
+-    { .rom_addr = 0x00437610, .ram_addr = 0x81C009F0, .size = 0x03BC89F0, .funcs = section_272__437610_funcs, .num_funcs = ARRLEN(section_272__437610_funcs), .relocs = nullptr, .num_relocs = 0, .index = 272, .content_hash = 0x0000000000000000ull, .original_pattern_id = 0xFFFFFFFFu },
+ };

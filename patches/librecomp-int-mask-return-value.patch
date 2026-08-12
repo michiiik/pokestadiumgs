@@ -1,0 +1,41 @@
+--- /Users/michaegg/psr-recomp-build/work/lib/N64ModernRuntime/librecomp/src/ultra_translation.cpp.intmask.orig	2026-08-04 21:03:32
++++ /Users/michaegg/psr-recomp-build/work/lib/N64ModernRuntime/librecomp/src/ultra_translation.cpp	2026-08-07 04:30:23
+@@ -176,19 +176,35 @@
+     ;
+ }
+ 
++// Interrupts are not simulated (guest execution is cooperative), so the mask
++// itself has no effect. The RETURN VALUE does matter: osSetIntMask and
++// __osDisableInt are documented to return the previous mask, and guest code
++// stores that value and passes it back to restore a critical section. Leaving
++// v0 untouched returned whatever the previous call left there, which the game
++// can then use as a pointer or a count. Track the mask per guest thread
++// (each guest thread owns a host thread, so thread_local is per-OSThread) and
++// return the real previous value.
++static constexpr uint32_t OS_IM_NONE_VALUE = 0x00000001u;
++static constexpr uint32_t OS_IM_ALL_VALUE = 0x003FFF01u;
++static thread_local uint32_t guest_int_mask = OS_IM_ALL_VALUE;
++
+ extern "C" void osSetIntMask_recomp(uint8_t * rdram, recomp_context * ctx) {
+     LIBRECOMP_ULTRA_TRACE(ctx);
+-    ;
++    const uint32_t previous = guest_int_mask;
++    guest_int_mask = (uint32_t)ctx->r4;
++    ctx->r2 = (int32_t)previous;
+ }
+ 
+ extern "C" void __osDisableInt_recomp(uint8_t * rdram, recomp_context * ctx) {
+     LIBRECOMP_ULTRA_TRACE(ctx);
+-    ;
++    const uint32_t previous = guest_int_mask;
++    guest_int_mask = OS_IM_NONE_VALUE;
++    ctx->r2 = (int32_t)previous;
+ }
+ 
+ extern "C" void __osRestoreInt_recomp(uint8_t * rdram, recomp_context * ctx) {
+     LIBRECOMP_ULTRA_TRACE(ctx);
+-    ;
++    guest_int_mask = (uint32_t)ctx->r4;
+ }
+ 
+ extern "C" void __osSetFpcCsr_recomp(uint8_t * rdram, recomp_context * ctx) {

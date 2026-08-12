@@ -1,0 +1,26 @@
+diff --git a/generated/funcs_69.c b/generated/funcs_69.c
+--- a/generated/funcs_69.c
++++ b/generated/funcs_69.c
+@@ -15206,7 +15206,10 @@ RECOMP_FUNC void func_80015A40(uint8_t* rdram, recomp_context* ctx) {
+     {
+     gpr jr_target_80015A44 = ctx->r31;
+     // 0x80015A48: sw          $a0, -0x590($at)
+-    MEM_W(-0X590, ctx->r1) = ctx->r4;
++    if (U32(ctx->r4) == 0 ||
++        (U32(ctx->r4) >= 0x80000000u && U32(ctx->r4) < 0x90000000u)) {
++        MEM_W(-0X590, ctx->r1) = ctx->r4;
++    }
+     uint32_t jr_target_vram_80015A44 = U32(jr_target_80015A44);
+     {
+     uint32_t jr_section_base = (uint32_t)section_addresses[5];
+@@ -15222,7 +15226,10 @@ RECOMP_FUNC void func_80015A40(uint8_t* rdram, recomp_context* ctx) {
+     return;
+     }
+     // 0x80015A48: sw          $a0, -0x590($at)
+-    MEM_W(-0X590, ctx->r1) = ctx->r4;
++    if (U32(ctx->r4) == 0 ||
++        (U32(ctx->r4) >= 0x80000000u && U32(ctx->r4) < 0x90000000u)) {
++        MEM_W(-0X590, ctx->r1) = ctx->r4;
++    }
+ ;}
+ RECOMP_FUNC void func_8413C2C0(uint8_t* rdram, recomp_context* ctx) {

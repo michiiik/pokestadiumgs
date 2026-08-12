@@ -1,0 +1,13 @@
+diff --git a/src/recompilation.cpp b/src/recompilation.cpp
+--- a/src/recompilation.cpp
++++ b/src/recompilation.cpp
+@@ -131,4 +131 @@
+-            if (std::getenv("N64RECOMP_SKIP_AGGRESSIVE_STATIC_SEEDS") != nullptr) {
+-                return JalResolutionResult::Ambiguous;
+-            }
+             return JalResolutionResult::CreateStatic;
+@@ -180,4 +177 @@
+-                if (std::getenv("N64RECOMP_SKIP_AGGRESSIVE_STATIC_SEEDS") != nullptr) {
+-                    return JalResolutionResult::Ambiguous;
+-                }
+                 return JalResolutionResult::CreateStatic;

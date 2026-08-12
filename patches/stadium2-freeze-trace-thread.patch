@@ -1,0 +1,24 @@
+diff --git a/src/main/main.cpp b/src/main/main.cpp
+--- a/src/main/main.cpp
++++ b/src/main/main.cpp
+@@ -2563,9 +2563,7 @@
+     // (update_vi would otherwise deref a null mode pointer on the first tick).
+     std::thread([game_id = game.game_id]() {
+         std::this_thread::sleep_for(std::chrono::milliseconds(100));
+-        recomp::start_game(game_id);
+-        std::fprintf(stderr, "[PSR] start_game fired\n"); std::fflush(stderr);
+-
++        std::thread([]() {
+         // Temporary Android boot-stall diagnostic. The framework already
+         // records this ring continuously; persist one bounded snapshot so it
+         // can be read through run-as on devices where debuggerd needs root.
+@@ -2592,6 +2590,9 @@
+             }
+             std::fclose(trace);
+         }
++        }).detach();
++        recomp::start_game(game_id);
++        std::fprintf(stderr, "[PSR] start_game fired\n"); std::fflush(stderr);
+     }).detach();
+     std::fprintf(stderr, "[PSR] booting game (launcher committed its config pre-boot)\n");
+     std::fflush(stderr);

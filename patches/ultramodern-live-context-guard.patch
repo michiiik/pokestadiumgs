@@ -1,0 +1,167 @@
+--- /Users/michaegg/psr-recomp-build/work/lib/N64ModernRuntime/ultramodern/src/threads.cpp.ctxguard.orig	2026-08-07 07:09:42
++++ /Users/michaegg/psr-recomp-build/work/lib/N64ModernRuntime/ultramodern/src/threads.cpp	2026-08-07 07:24:10
+@@ -2,6 +2,8 @@
+ #include <thread>
+ #include <cassert>
+ #include <string>
++#include <mutex>
++#include <unordered_set>
+ 
+ #include "ultramodern/ultra64.h"
+ #include "ultramodern/ultramodern.hpp"
+@@ -110,6 +112,31 @@
+ void ultramodern::set_native_thread_priority(ThreadPriority pri) {}
+ #endif
+ 
++// Live-context registry. A thread's UltraThreadContext* is stored in its
++// OSThread, which is guest RDRAM, so a guest write over that struct can leave a
++// stale-but-plausible pointer behind. Membership here is the only trustworthy
++// answer to "may I dereference this context?".
++static std::mutex live_contexts_mutex;
++static std::unordered_set<UltraThreadContext*> live_contexts;
++
++void ultramodern_context_register(UltraThreadContext* ctx) {
++    std::lock_guard<std::mutex> guard{live_contexts_mutex};
++    live_contexts.insert(ctx);
++}
++
++void ultramodern_context_unregister(UltraThreadContext* ctx) {
++    std::lock_guard<std::mutex> guard{live_contexts_mutex};
++    live_contexts.erase(ctx);
++}
++
++bool ultramodern_context_is_live(UltraThreadContext* ctx) {
++    if (ctx == nullptr) {
++        return false;
++    }
++    std::lock_guard<std::mutex> guard{live_contexts_mutex};
++    return live_contexts.find(ctx) != live_contexts.end();
++}
++
+ void wait_for_resumed(RDRAM_ARG UltraThreadContext* thread_context) {
+     ultramodern::scheduler_trace_mark(PASS_RDRAM 120, NULLPTR, ultramodern::this_thread());
+ #ifdef N64_COSIM
+@@ -135,10 +162,26 @@
+     ultramodern::record_context_switch();
+ }
+ 
+-void resume_thread(RDRAM_ARG OSThread* t) {
++bool resume_thread(RDRAM_ARG OSThread* t) {
+     debug_printf("[Thread] Waking thread %d\n", t->id);
+     ultramodern::scheduler_trace_mark(PASS_RDRAM 122, NULLPTR, NULLPTR);
+-    t->context->running.signal();
++    UltraThreadContext* ctx = t->context;
++    if (!ultramodern_context_is_live(ctx)) {
++        // The OSThread was overwritten by the guest (or the context was already
++        // retired). Signalling it would fault; report once and let the caller
++        // pick another thread.
++        static std::atomic_flag reported = ATOMIC_FLAG_INIT;
++        if (!reported.test_and_set()) {
++            fprintf(stderr,
++                "[thread] REFUSING to resume thread id=%d: context %p is not live "
++                "(OSThread at guest memory was likely overwritten)\n",
++                t->id, (void*)ctx);
++            fflush(stderr);
++        }
++        return false;
++    }
++    ctx->running.signal();
++    return true;
+ }
+ 
+ void run_next_thread(RDRAM_ARG1) {
+@@ -166,7 +209,11 @@
+ void ultramodern::resume_thread_and_wait(RDRAM_ARG OSThread *t) {
+     UltraThreadContext* caller_ctx = TO_PTR(OSThread, thread_self)->context;
+     ultramodern::scheduler_trace_mark(PASS_RDRAM 112, ultramodern::running_queue, ultramodern::this_thread());
+-    resume_thread(PASS_RDRAM t);
++    if (!resume_thread(PASS_RDRAM t)) {
++        // Nothing was woken, so nothing will ever wake us: keep running rather
++        // than blocking forever on our own context.
++        return;
++    }
+     wait_for_resumed(PASS_RDRAM caller_ctx);
+     ultramodern::scheduler_trace_mark(PASS_RDRAM 113, ultramodern::running_queue, ultramodern::this_thread());
+ }
+@@ -240,7 +287,27 @@
+         resume_thread(PASS_RDRAM t);
+         //throw ultramodern::thread_terminated{};
+     }
++}
++
++#if defined(__ANDROID__)
++// pthread entry shim: std::thread cannot take a stack-size attribute, so the
++// arguments run_game_thread needs are boxed and handed through a void*.
++struct GuestThreadStart {
++    uint8_t* rdram;
++    PTR(OSThread) self;
++    PTR(thread_func_t) entrypoint;
++    PTR(void) arg;
++    UltraThreadContext* ctx;
++};
++
++static void* guest_thread_trampoline(void* raw) {
++    GuestThreadStart* start = static_cast<GuestThreadStart*>(raw);
++    GuestThreadStart local = *start;
++    delete start;
++    run_game_thread(local.rdram, local.self, local.entrypoint, local.arg, local.ctx);
++    return nullptr;
+ }
++#endif
+ 
+ extern "C" void osCreateThread(RDRAM_ARG PTR(OSThread) t_, OSId id, PTR(thread_func_t) entrypoint, PTR(void) arg, PTR(void) sp, OSPri pri) {
+     debug_printf("[os] Create Thread %d\n", id);
+@@ -262,8 +329,37 @@
+     // to be started. The context is passed in as an argument so a later clear of t->context
+     // can't race the thread reading its own context.
+     UltraThreadContext* ctx = new UltraThreadContext{};
++    ultramodern_context_register(ctx);
+     t->context = ctx;
++#if defined(__ANDROID__)
++    {
++        // 64 MB: the deepest chain measured (Stadium 2's PC-relative dispatch
++        // helper) passes depth 1000, and each level costs two recompiled
++        // frames. Virtual reservation only — pages are committed on use.
++        static constexpr size_t ultramodern_guest_stack_bytes = 64u * 1024u * 1024u;
++        GuestThreadStart* start = new GuestThreadStart{rdram, t_, entrypoint, arg, t->context};
++        pthread_attr_t attr;
++        pthread_attr_init(&attr);
++        pthread_attr_setstacksize(&attr, ultramodern_guest_stack_bytes);
++        int rc = pthread_create(&ctx->host_thread, &attr, guest_thread_trampoline, start);
++        pthread_attr_destroy(&attr);
++        if (rc != 0) {
++            // Fall back to the default stack rather than losing the thread.
++            delete start;
++            start = new GuestThreadStart{rdram, t_, entrypoint, arg, t->context};
++            rc = pthread_create(&ctx->host_thread, nullptr, guest_thread_trampoline, start);
++        }
++        if (rc != 0) {
++            delete start;
++            fprintf(stderr, "[os] FATAL: could not create host thread for guest thread %d\n", t->id);
++            fflush(stderr);
++            std::abort();
++        }
++        ctx->host_thread_valid = true;
++    }
++#else
+     ctx->host_thread = std::thread{run_game_thread, PASS_RDRAM t_, entrypoint, arg, t->context};
++#endif
+ 
+     // Block until the host thread reports it has initialized.
+     ctx->initialized.wait();
+@@ -361,7 +457,15 @@
+         if (deleted_threads.wait_dequeue_timed(to_delete, 10ms)) {
+             debug_printf("[Cleanup] Deleting thread context %p\n", to_delete);
+ 
++#if defined(__ANDROID__)
++            if (to_delete->host_thread_valid) {
++                pthread_join(to_delete->host_thread, nullptr);
++                to_delete->host_thread_valid = false;
++            }
++#else
+             to_delete->host_thread.join();
++#endif
++            ultramodern_context_unregister(to_delete);
+             delete to_delete;
+         }
+     }

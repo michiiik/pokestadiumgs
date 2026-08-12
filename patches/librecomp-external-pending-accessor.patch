@@ -1,0 +1,16 @@
+--- /Users/michaegg/psr-recomp-build/work/lib/N64ModernRuntime/ultramodern/src/mesgqueue.cpp.freezestate.orig	2026-08-07 03:14:43
++++ /Users/michaegg/psr-recomp-build/work/lib/N64ModernRuntime/ultramodern/src/mesgqueue.cpp	2026-08-07 04:16:44
+@@ -367,6 +367,13 @@
+     return g_external_requeues.load(std::memory_order_relaxed);
+ }
+ 
++// Depth of the host->guest external message queue. Pairs with the requeue
++// counter when diagnosing a lost wakeup: a nonzero pending count while the
++// target guest thread is parked means delivery is stuck, not production.
++extern "C" uint32_t ultramodern_external_pending(void) {
++    return g_external_pending.load(std::memory_order_relaxed);
++}
++
+ #ifdef N64_COSIM
+ extern "C" uint32_t ultramodern_cosim_checkpoint_external_pending(void) {
+     if (g_external_pending.load(std::memory_order_relaxed) != 0) {

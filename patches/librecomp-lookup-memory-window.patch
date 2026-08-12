@@ -1,0 +1,13 @@
+diff --git a/lib/N64ModernRuntime/librecomp/src/overlays.cpp b/lib/N64ModernRuntime/librecomp/src/overlays.cpp
+--- a/lib/N64ModernRuntime/librecomp/src/overlays.cpp
++++ b/lib/N64ModernRuntime/librecomp/src/overlays.cpp
+@@ -3839,2 +3839,9 @@
+ static void unhandled_lookup_trampoline(uint8_t* rdram, recomp_context* ctx) {
++    {
++        FILE* f = open_last_error_log("a");
++        if (f != nullptr) {
++            dump_lookup_memory_window(f, rdram, "lookup target", g_self_heal_addr);
++            fclose(f);
++        }
++    }
+     // ── Interior-return self-heal (tier 2 before the loud abort) ─────────

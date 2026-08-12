@@ -1,0 +1,73 @@
+--- /Users/michaegg/psr-recomp-build/work/lib/N64ModernRuntime/ultramodern/src/mesgqueue.cpp.freezestate.orig	2026-08-07 03:14:43
++++ /Users/michaegg/psr-recomp-build/work/lib/N64ModernRuntime/ultramodern/src/mesgqueue.cpp	2026-08-07 14:36:24
+@@ -32,6 +32,11 @@
+ // corrupted OSMesgQueue ptr arrives.
+ extern "C" void psr_post_mortem_dump(const char* reason, void* fault_info);
+ 
++#include <cstring>
++extern "C" void psr_dump_rdram_snapshot(const char* name);
++extern "C" void recomp_ultra_trace_record(const char* name, uint32_t pc, uint32_t a0,
++                                         uint32_t a1, uint32_t a2, uint32_t a3);
++
+ // ── Queue-event ring buffer ───────────────────────────────────────────
+ //
+ // Always-on ring of recent osSendMesg/osRecvMesg/external-enqueue
+@@ -139,6 +144,36 @@
+         thread_id = static_cast<uint16_t>(t->id);
+     }
+ 
++    // ── Temporary Stadium 2 tripwire ─────────────────────────────────
++    // The reply queue at 0x800CDA10 is overwritten with fragment-67 code
++    // some time before the boot stall. Message-queue events happen
++    // thousands of times a second, so checking here pins the moment to a
++    // narrow slice of the always-on trace. Fires once. Remove with the
++    // other freeze diagnostics.
++    static std::atomic<uint32_t> ps2_watch_reported{0};
++
++    inline void ps2_watch_clobber(uint8_t* rdram) {
++        if (rdram == nullptr) return;
++        if (ps2_watch_reported.load(std::memory_order_relaxed)) return;
++        // A live OSMesgQueue here has a small non-negative validCount and
++        // msgCount; fragment code in those slots reads as huge/negative.
++        uint32_t valid, count;
++        std::memcpy(&valid, rdram + 0x000CDA10 + 8, 4);
++        std::memcpy(&count, rdram + 0x000CDA10 + 16, 4);
++        if ((int32_t)valid >= 0 && (int32_t)valid < 0x100 &&
++            (int32_t)count >= 0 && (int32_t)count < 0x100) {
++            return;
++        }
++        uint32_t expected = 0;
++        if (!ps2_watch_reported.compare_exchange_strong(expected, 1)) return;
++        uint32_t w0, w1;
++        std::memcpy(&w0, rdram + 0x000CDA10, 4);
++        std::memcpy(&w1, rdram + 0x000CDA10 + 4, 4);
++        psr_dump_rdram_snapshot("rdram_clobber.bin");
++        recomp_ultra_trace_record("~ps2_mq_clobber", 0,
++                                  (uint32_t)ultramodern::this_thread(), w0, w1, valid);
++    }
++
+     inline void record(uint8_t* rdram, uint8_t op, uint32_t mq, uint32_t msg,
+                        uint16_t vb, uint16_t va,
+                        bool block, bool game_thread) {
+@@ -161,6 +196,7 @@
+         e.pad = 0;
+         e.reserved = 0;
+         qstate_push(mq, e);
++        ps2_watch_clobber(rdram);
+     }
+ }
+ 
+@@ -365,6 +401,13 @@
+ // Public accessor surfaced via the runner's debug_server status cmd.
+ extern "C" uint64_t ultramodern_external_requeues(void) {
+     return g_external_requeues.load(std::memory_order_relaxed);
++}
++
++// Depth of the host->guest external message queue. Pairs with the requeue
++// counter when diagnosing a lost wakeup: a nonzero pending count while the
++// target guest thread is parked means delivery is stuck, not production.
++extern "C" uint32_t ultramodern_external_pending(void) {
++    return g_external_pending.load(std::memory_order_relaxed);
+ }
+ 
+ #ifdef N64_COSIM

@@ -1,0 +1,49 @@
+--- /Users/michaegg/ps2-recomp-build/n64recomp-2b/src/elf.cpp.absbss.orig	2026-08-06 23:35:13
++++ /Users/michaegg/ps2-recomp-build/n64recomp-2b/src/elf.cpp	2026-08-10 20:29:40
+@@ -139,9 +139,44 @@
+             }
+         }
+         else if (rel_symbol_section_index == ELFIO::SHN_ABS) {
++            // A fragment's bss can be absent from the linker script (splat
++            // yamls that declare bss_size: 0x0 while the fragment header's
++            // sizeInRam - fileSize says otherwise). Symbols living there fall
++            // outside every section and arrive as SHN_ABS, which would drop
++            // the relocation and bake the link-time literal - fatal when the
++            // symbol is a loop bound compared against a relocated pointer.
++            // If the value sits in a relocatable section's 1 MB fragment slot,
++            // relocate against that section instead. Genuine absolutes (RSP/DP
++            // hardware registers and the like) never share a slot with a
++            // fragment's link address, and non-relocatable sections are left
++            // alone.
++            size_t abs_owner_section = (size_t)-1;
++            uint32_t abs_value = (uint32_t)rel_symbol_value;
++            for (size_t abs_i = 0; abs_i < context.sections.size(); abs_i++) {
++                const auto& abs_sec = context.sections[abs_i];
++                if (!abs_sec.relocatable) {
++                    continue;
++                }
++                uint32_t abs_sec_vram = (uint32_t)abs_sec.ram_addr;
++                if (abs_sec_vram == 0) {
++                    continue;
++                }
++                if ((abs_sec_vram & 0xFFF00000u) == (abs_value & 0xFFF00000u) &&
++                    abs_value >= abs_sec_vram) {
++                    abs_owner_section = abs_i;
++                    break;
++                }
++            }
++
+             reloc_out.reference_symbol = false;
+-            reloc_out.target_section = N64Recomp::SectionAbsolute;
+-            rel_section_vram = 0;
++            if (abs_owner_section != (size_t)-1) {
++                reloc_out.target_section = (uint16_t)abs_owner_section;
++                rel_section_vram = context.sections[abs_owner_section].ram_addr;
++            }
++            else {
++                reloc_out.target_section = N64Recomp::SectionAbsolute;
++                rel_section_vram = 0;
++            }
+         }
+         else {
+             reloc_out.reference_symbol = false;

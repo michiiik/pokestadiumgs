@@ -1,0 +1,45 @@
+diff --git a/src/main/register_overlays.cpp b/src/main/register_overlays.cpp
+--- a/src/main/register_overlays.cpp
++++ b/src/main/register_overlays.cpp
+@@ -35,6 +35,7 @@ static void ps2_dynamic_fragment_helper(uint8_t* rdram, recomp_context* ctx) {
+ 
+ namespace pokestadium {
+     void register_overlays();
++    void register_runtime_trampolines();
+ }
+ 
+ void pokestadium::register_overlays() {
+@@ -57,3 +58,8 @@ void pokestadium::register_overlays() {
+     recomp::overlays::add_loaded_function(0x801451A0, func_83F002F4);
+     recomp::overlays::add_loaded_function(0x806788E0, ps2_dynamic_fragment_helper);
+ }
++
++void pokestadium::register_runtime_trampolines() {
++    recomp::overlays::add_loaded_function(0x801451A0, func_83F002F4);
++    recomp::overlays::add_loaded_function(0x806788E0, ps2_dynamic_fragment_helper);
++}
+diff --git a/src/main/main.cpp b/src/main/main.cpp
+--- a/src/main/main.cpp
++++ b/src/main/main.cpp
+@@ -155,6 +155,9 @@
+ extern "C" void recomp_entrypoint(uint8_t* rdram, recomp_context* ctx);
+ 
+-namespace pokestadium { void register_overlays(); }
++namespace pokestadium {
++    void register_overlays();
++    void register_runtime_trampolines();
++}
+ namespace pokestadium::rsp { void register_pre_task_hooks(); }
+ 
+ // RSP microcode entry points provided by RSPRecomp output (the prebuilt
+@@ -2327,6 +2330,10 @@
+     };
+ #endif
+ 
++    game.on_init_callback = [](uint8_t* /*rdram*/, recomp_context* /*ctx*/) {
++        pokestadium::register_runtime_trampolines();
++    };
++
+     recomp::register_game(game);
+     std::fprintf(stderr, "[PSR] game registered\n"); std::fflush(stderr);
+ 

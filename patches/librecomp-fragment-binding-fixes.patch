@@ -1,0 +1,160 @@
+--- /Users/michaegg/psr-recomp-build/work/lib/N64ModernRuntime/librecomp/src/overlays.cpp.pool.orig	2026-08-07 01:23:31
++++ /Users/michaegg/psr-recomp-build/work/lib/N64ModernRuntime/librecomp/src/overlays.cpp	2026-08-12 12:37:20
+@@ -62,6 +62,10 @@
+ #include <sstream>
+ #include <thread>
+ #include <chrono>
++
++extern "C" uint8_t* recomp_runtime_get_rdram(void);
++extern "C" void psr_dump_rdram_snapshot(const char* name);
++extern "C" void psr_dump_trace_snapshot(const char* name);
+ 
+ // B3 runtime-JIT tier dependencies. discover_function_bounds lives in
+ // N64Recomp's private src/analysis.h (not on librecomp's include path) but
+@@ -934,7 +938,13 @@
+ // fitting Stadium's ~279 unique pattern variants with headroom for
+ // future games.
+ static constexpr uint32_t kSyntheticPoolBase  = 0xC0000000u;
+-static constexpr uint32_t kSyntheticPoolEnd   = 0xE0000000u;
++// Pool end raised from 0xE0000000 (512 buckets) to 0xF0000000 (768) for
++// Pokemon Stadium 2, whose 0x8FF00000 stream synthesizes 651 variants
++// against Stadium 1's ~279. Variants past the end are invisible to
++// is_synthetic_addr, so their sections never become registration
++// candidates and the fragment is left unregistered. Widening is backward
++// compatible: existing synthetic addresses keep their slot index.
++static constexpr uint32_t kSyntheticPoolEnd   = 0xF0000000u;
+ static constexpr uint32_t kSyntheticPoolStride = 0x00100000u;
+ static constexpr size_t   kSyntheticBucketCount =
+     (kSyntheticPoolEnd - kSyntheticPoolBase) / kSyntheticPoolStride; // 512
+@@ -1072,7 +1082,18 @@
+             // +0x08/+0x0C) is present. Otherwise leave it 0 so extent filtering is a
+             // no-op and we never reject a section against a garbage size field.
+             if (rd_be32_h(0x08) == 0x46524147u && rd_be32_h(0x0C) == 0x4D454E54u) {
+-                frag_size_in_ram = rd_be32_h(0x1C);
++                // Bound by the LARGER of the header's size (+0x18) and
++                // sizeInRam (+0x1C). +0x1C is not reliably the total extent:
++                // Pokemon Stadium 2's id=0 fragment has +0x18=0x73A0 (which
++                // matches its recompiled section exactly) but +0x1C=0x6790,
++                // tracking relocOffset instead. Bounding by +0x1C alone
++                // rejected the correct variant as 'oversized' and left the
++                // fragment unregistered. Taking the max keeps the guard's
++                // intent - reject sections bigger than the loaded fragment -
++                // while using the field that actually states the extent.
++                const uint32_t hdr_size  = rd_be32_h(0x18);
++                const uint32_t hdr_inram = rd_be32_h(0x1C);
++                frag_size_in_ram = hdr_size > hdr_inram ? hdr_size : hdr_inram;
+             }
+         }
+     }
+@@ -1539,6 +1560,25 @@
+                         id, prev->second.first, prev->second.second, erased, (uint32_t)fragment_ptr);
+                 fflush(stderr);
+             }
++        }
++    }
++
++    // Any func_map entry inside [fragment_ptr, fragment_ptr + size) belongs to a
++    // fragment that used to live here: the range now belongs to the incoming
++    // fragment. evict_prior_at_base only clears sections loaded at this EXACT
++    // base and the supersede path only clears the same id, so a different id
++    // overlapping this range would otherwise keep dispatching its stale code,
++    // which then resolves its RELOC_HI16 literals against the wrong section base
++    // and writes wild values into whatever it computes.
++    if (section.size != 0) {
++        uint32_t stale = frag_range_erase((uint32_t)fragment_ptr, (uint32_t)section.size);
++        if (stale != 0) {
++            fprintf(stderr,
++                "[reg-frag] id=0x%X claimed 0x%08X..0x%08X: erased %u stale "
++                "func_map entries from overlapping fragments\n",
++                id, (uint32_t)fragment_ptr,
++                (uint32_t)fragment_ptr + (uint32_t)section.size, stale);
++            fflush(stderr);
+         }
+     }
+ 
+@@ -1673,6 +1713,37 @@
+ }
+ 
+ // Forward declaration — definition is below alongside unload_overlay_by_id.
++
++// A fragment's ROM image ends with its relocation table, which is not kept in
++// RAM, so the ELF section size overstates the loaded footprint; conversely a
++// fragment with bss occupies more than its image. The header's sizeInRam
++// (+0x1C) is the figure the game itself uses, and overlap tests must use it or
++// they evict live fragments (and, with bss, miss real collisions).
++static uint32_t loaded_fragment_extent(int32_t loaded_ram_addr, uint32_t section_size) {
++    uint8_t* rd = recomp_runtime_get_rdram();
++    if (rd == nullptr) {
++        return section_size;
++    }
++    const uint32_t paddr = (uint32_t)loaded_ram_addr & 0x1FFFFFFFu;
++    if (paddr + 0x20u > 0x800000u) {
++        return section_size;
++    }
++    auto rd_be32 = [&](uint32_t off) -> uint32_t {
++        return ((uint32_t)rd[(paddr + off + 0) ^ 3] << 24) |
++               ((uint32_t)rd[(paddr + off + 1) ^ 3] << 16) |
++               ((uint32_t)rd[(paddr + off + 2) ^ 3] << 8)  |
++                (uint32_t)rd[(paddr + off + 3) ^ 3];
++    };
++    if (rd_be32(0x08) != 0x46524147u || rd_be32(0x0C) != 0x4D454E54u) {
++        return section_size;  // no FRAGMENT magic: trust the section table
++    }
++    const uint32_t size_in_ram = rd_be32(0x1C);
++    if (size_in_ram == 0 || size_in_ram > 0x800000u) {
++        return section_size;
++    }
++    return size_in_ram;
++}
++
+ static void unload_overlay_by_section_index(uint32_t section_table_index);
+ 
+ extern "C" void load_overlays(uint32_t rom, int32_t ram_addr, uint32_t size) {
+@@ -1719,8 +1790,10 @@
+ 
+                 const SectionTableEntry& old_section =
+                     sections_info.code_sections[loaded.section_table_index];
++                const uint32_t old_extent =
++                    loaded_fragment_extent(loaded.loaded_ram_addr, old_section.size);
+                 if (!runtime_ranges_overlap(implied_base, new_section.size,
+-                                            loaded.loaded_ram_addr, old_section.size)) {
++                                            loaded.loaded_ram_addr, old_extent)) {
+                     continue;
+                 }
+ 
+@@ -4201,6 +4274,35 @@
+             : "[recomp] lookup-miss trampoline reached — aborting\n"
+               "  bad function pointer: 0x%08X\n",
+         g_last_lookup_miss_addr);
++    // Diagnostic: capture RDRAM and the section base table at the abort. The
++    // periodic dump runs on its own timer and has already proved too stale to
++    // interpret (its snapshot predated the fragment loads under investigation).
++    {
++        static bool psr_lookup_abort_dump = false;
++        if (!psr_lookup_abort_dump) {
++            psr_lookup_abort_dump = true;
++            FILE* sf = open_last_error_log("a");
++            if (sf != nullptr) {
++                fprintf(sf, "\n=== section bases at abort ===\n");
++                if (sections_info.code_sections != nullptr && section_addresses != nullptr) {
++                    for (size_t si = 0; si < sections_info.num_code_sections; si++) {
++                        const SectionTableEntry& se = sections_info.code_sections[si];
++                        uint32_t base = (uint32_t)section_addresses[se.index];
++                        // Only the relocatable fragments can be mis-bound.
++                        if (se.relocs == nullptr || se.num_relocs == 0) continue;
++                        if (base == (uint32_t)se.ram_addr) continue;  // not loaded
++                        fprintf(sf, "  section %zu index=%u link=0x%08X size=0x%X base=0x%08X\n",
++                                si, (unsigned)se.index, (uint32_t)se.ram_addr,
++                                (unsigned)se.size, base);
++                    }
++                }
++                fclose(sf);
++            }
++            psr_dump_trace_snapshot("trace_abort.log");
++            psr_dump_rdram_snapshot("rdram_abort.bin");
++        }
++    }
++
+     FILE* f = open_last_error_log("a");
+     if (f) {
+         fprintf(f,

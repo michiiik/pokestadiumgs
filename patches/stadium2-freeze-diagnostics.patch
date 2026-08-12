@@ -1,0 +1,304 @@
+--- /Users/michaegg/ps2-recomp-build/runtime/src/main/main.cpp.freezestate.orig	2026-08-07 03:01:54
++++ /Users/michaegg/ps2-recomp-build/runtime/src/main/main.cpp	2026-08-07 04:58:45
+@@ -100,6 +100,226 @@
+ }
+ } // namespace pkmnstadium
+ 
++// ── Temporary Android freeze-state dump (diagnostic) ─────────────────
++//
++// Serializes the always-on ultramodern rings plus the live guest queue
++// and thread structs into freeze_trace.log. Answers, for the boot stall
++// at ~5.65s: is the final SP completion sitting in the scheduler's reply
++// queue, is the scheduler thread parked on it, and did the scheduler ever
++// re-queue that thread to run afterwards? Remove with the other
++// freeze-trace diagnostics.
++#include <cstring>
++
++extern "C" uint8_t* recomp_runtime_get_rdram(void);
++extern "C" int64_t  recomp_pi_fill_dump(const char* path);
++extern "C" uint64_t ultramodern_external_requeues(void);
++extern "C" uint32_t ultramodern_external_pending(void);
++extern "C" uint32_t ultramodern_running_queue_head(void);
++extern "C" size_t   ultramodern_mesg_event_size(void);
++extern "C" size_t   ultramodern_mesg_qstate_size(void);
++extern "C" void     ultramodern_mesg_qstates_copy(void* out, size_t cap, size_t* n_written);
++extern "C" size_t   ultramodern_sched_event_size(void);
++extern "C" void     ultramodern_sched_recent_copy(void* out, size_t cap, size_t* n_written,
++                                                  uint64_t* next_seq_out);
++extern "C" size_t   ultramodern_sched_thread_state_size(void);
++extern "C" void     ultramodern_sched_thread_states_copy(void* out, size_t cap, size_t* n_written);
++
++namespace psr_freeze_state {
++
++// These four must match the ring layouts in ultramodern; the size guards
++// below reject drift loudly rather than mis-parsing.
++struct MesgEvent {
++    uint64_t seq; uint64_t ms; uint32_t mq; uint32_t msg;
++    uint32_t thread; uint16_t thread_id; uint16_t valid_before;
++    uint16_t valid_after; uint8_t op; uint8_t block; uint8_t game_thread;
++    uint8_t pad; uint16_t reserved;
++};
++struct QState { uint32_t queue; uint32_t count; MesgEvent last[64]; };
++struct SchedEvent {
++    uint64_t seq; uint64_t ms; uint32_t op; uint32_t queue;
++    uint32_t thread; uint32_t current_thread; uint32_t head_after;
++    uint32_t next_after; uint16_t thread_id; uint16_t current_thread_id;
++    int16_t priority; uint16_t pad;
++};
++struct SchedThreadState {
++    uint32_t valid; uint32_t id; uint32_t thread; int32_t priority;
++    uint32_t last_op; uint32_t last_queue; uint32_t last_head_after;
++    uint64_t last_ms; uint32_t last_mq; uint64_t last_mq_ms; uint64_t count;
++};
++
++inline const char* mesg_op_name(uint8_t op) {
++    static const char* const names[11] = {
++        "?", "send_game", "send_external", "recv_enter", "recv_block",
++        "recv_return_ok", "ext_deq_ok", "ext_deq_full", "do_send_block",
++        "ext_deq_drop", "do_send_drop"};
++    return op < 11 ? names[op] : "?";
++}
++
++inline const char* guest_state_name(uint32_t state) {
++    switch (state) {
++        case 0: return "STOPPED";
++        case 1: return "QUEUED";
++        case 2: return "RUNNING";
++        case 3: return "BLOCKED";
++        default: return "?";
++    }
++}
++
++// Guest words are stored byteswapped, so an aligned host u32 load at the
++// masked physical offset yields the value the game sees. Same convention
++// as debug_server's rdram_peek.
++inline bool read_u32(uint8_t* rdram, uint32_t vaddr, uint32_t* out) {
++    if (rdram == nullptr || (vaddr & 3u) != 0u) return false;
++    const uint32_t paddr = vaddr & 0x1FFFFFFFu;
++    if (paddr + 4u > 0x800000u) return false;
++    std::memcpy(out, rdram + paddr, 4);
++    return true;
++}
++
++inline void dump_guest_thread(FILE* f, uint8_t* rdram, const char* label, uint32_t thread) {
++    uint32_t next = 0, pri = 0, queue = 0, flags_state = 0, id = 0;
++    if (thread == 0 ||
++        !read_u32(rdram, thread + 0u,  &next) ||
++        !read_u32(rdram, thread + 4u,  &pri) ||
++        !read_u32(rdram, thread + 8u,  &queue) ||
++        !read_u32(rdram, thread + 16u, &flags_state) ||
++        !read_u32(rdram, thread + 20u, &id)) {
++        std::fprintf(f, "%s thread=%08X <unreadable>\n", label, thread);
++        return;
++    }
++    // OSThread declares flags before state, so the byteswapped word at +16
++    // carries flags in its low half and state in its high half.
++    std::fprintf(f, "%s thread=%08X id=%d pri=%d state=%s flags=%04X queue=%08X next=%08X\n",
++                 label, thread, (int)id, (int)pri,
++                 guest_state_name(flags_state >> 16),
++                 (unsigned)(flags_state & 0xFFFFu), queue, next);
++}
++
++inline void dump(FILE* f, const char* tag, uint32_t watch_mq) {
++    uint8_t* rdram = recomp_runtime_get_rdram();
++    std::fprintf(f, "\n=== freeze_state %s watch_mq=%08X rdram=%s ===\n",
++                 tag, watch_mq, rdram ? "ok" : "null");
++    std::fprintf(f, "external_requeues=%llu external_pending=%u running_queue_head=%08X\n",
++                 (unsigned long long)ultramodern_external_requeues(),
++                 ultramodern_external_pending(),
++                 ultramodern_running_queue_head());
++
++    uint32_t recv = 0, send = 0, valid = 0, first = 0, msg_count = 0, msgbuf = 0;
++    if (read_u32(rdram, watch_mq + 0u,  &recv) &&
++        read_u32(rdram, watch_mq + 4u,  &send) &&
++        read_u32(rdram, watch_mq + 8u,  &valid) &&
++        read_u32(rdram, watch_mq + 12u, &first) &&
++        read_u32(rdram, watch_mq + 16u, &msg_count) &&
++        read_u32(rdram, watch_mq + 20u, &msgbuf)) {
++        std::fprintf(f, "mq %08X validCount=%d first=%d msgCount=%d msgbuf=%08X "
++                        "blocked_recv=%08X blocked_send=%08X\n",
++                     watch_mq, (int)valid, (int)first, (int)msg_count, msgbuf, recv, send);
++        for (uint32_t i = 0; i < msg_count && i < 16u; i++) {
++            uint32_t slot = 0;
++            if (read_u32(rdram, msgbuf + i * 4u, &slot)) {
++                std::fprintf(f, "  slot[%u]=%08X\n", i, slot);
++            }
++        }
++        uint32_t chain = recv;
++        for (int i = 0; i < 8 && chain != 0; i++) {
++            dump_guest_thread(f, rdram, "  recv_blocked", chain);
++            uint32_t next = 0;
++            if (!read_u32(rdram, chain, &next)) break;
++            chain = next;
++        }
++        chain = send;
++        for (int i = 0; i < 8 && chain != 0; i++) {
++            dump_guest_thread(f, rdram, "  send_blocked", chain);
++            uint32_t next = 0;
++            if (!read_u32(rdram, chain, &next)) break;
++            chain = next;
++        }
++    } else {
++        std::fprintf(f, "mq %08X <unreadable>\n", watch_mq);
++    }
++
++    if (ultramodern_sched_thread_state_size() != sizeof(SchedThreadState)) {
++        std::fprintf(f, "--- sched thread states: size mismatch (runtime=%u local=%u) ---\n",
++                     (unsigned)ultramodern_sched_thread_state_size(),
++                     (unsigned)sizeof(SchedThreadState));
++    } else {
++        std::vector<SchedThreadState> states(256);
++        size_t got = 0;
++        ultramodern_sched_thread_states_copy(states.data(), states.size(), &got);
++        std::fprintf(f, "--- sched thread states (%u) ---\n", (unsigned)got);
++        for (size_t i = 0; i < got; i++) {
++            const SchedThreadState& t = states[i];
++            std::fprintf(f, "tid=%u thread=%08X pri=%d last_op=%u last_queue=%08X "
++                            "last_head=%08X last_ms=%llu last_mq=%08X last_mq_ms=%llu events=%llu\n",
++                         t.id, t.thread, (int)t.priority, t.last_op, t.last_queue,
++                         t.last_head_after, (unsigned long long)t.last_ms, t.last_mq,
++                         (unsigned long long)t.last_mq_ms, (unsigned long long)t.count);
++            dump_guest_thread(f, rdram, "  guest", t.thread);
++        }
++    }
++
++    if (ultramodern_mesg_qstate_size() != sizeof(QState) ||
++        ultramodern_mesg_event_size() != sizeof(MesgEvent)) {
++        std::fprintf(f, "--- mesg qstates: size mismatch (qstate %u/%u event %u/%u) ---\n",
++                     (unsigned)ultramodern_mesg_qstate_size(), (unsigned)sizeof(QState),
++                     (unsigned)ultramodern_mesg_event_size(), (unsigned)sizeof(MesgEvent));
++    } else {
++        std::vector<QState> qs(1024);
++        size_t got = 0;
++        ultramodern_mesg_qstates_copy(qs.data(), qs.size(), &got);
++        std::fprintf(f, "--- mesg queues (%u) ---\n", (unsigned)got);
++        for (size_t i = 0; i < got; i++) {
++            const QState& q = qs[i];
++            if (q.queue == 0 || q.count == 0) continue;
++            const MesgEvent& last = q.last[(q.count - 1u) & 63u];
++            std::fprintf(f, "mq=%08X events=%u last: seq=%llu ms=%llu op=%s msg=%08X tid=%u "
++                            "vb=%u va=%u block=%u gt=%u\n",
++                         q.queue, q.count, (unsigned long long)last.seq,
++                         (unsigned long long)last.ms, mesg_op_name(last.op), last.msg,
++                         last.thread_id, last.valid_before, last.valid_after,
++                         last.block, last.game_thread);
++        }
++        for (size_t i = 0; i < got; i++) {
++            const QState& q = qs[i];
++            if (q.queue != watch_mq) continue;
++            const uint32_t n = q.count < 64u ? q.count : 64u;
++            const uint32_t start = q.count - n;
++            std::fprintf(f, "--- mq %08X tail (%u of %u) ---\n", q.queue, n, q.count);
++            for (uint32_t k = 0; k < n; k++) {
++                const MesgEvent& e = q.last[(start + k) & 63u];
++                std::fprintf(f, "seq=%llu ms=%llu op=%-14s msg=%08X thread=%08X tid=%u "
++                                "vb=%u va=%u block=%u gt=%u\n",
++                             (unsigned long long)e.seq, (unsigned long long)e.ms,
++                             mesg_op_name(e.op), e.msg, e.thread, e.thread_id,
++                             e.valid_before, e.valid_after, e.block, e.game_thread);
++            }
++        }
++    }
++
++    if (ultramodern_sched_event_size() != sizeof(SchedEvent)) {
++        std::fprintf(f, "--- sched ring: size mismatch (runtime=%u local=%u) ---\n",
++                     (unsigned)ultramodern_sched_event_size(), (unsigned)sizeof(SchedEvent));
++    } else {
++        std::vector<SchedEvent> events(512);
++        size_t got = 0;
++        uint64_t widx = 0;
++        ultramodern_sched_recent_copy(events.data(), events.size(), &got, &widx);
++        std::fprintf(f, "--- sched ring tail (write_idx=%llu, %u shown) ---\n",
++                     (unsigned long long)widx, (unsigned)got);
++        for (size_t i = 0; i < got; i++) {
++            const SchedEvent& e = events[i];
++            std::fprintf(f, "seq=%llu ms=%llu op=%u queue=%08X thread=%08X tid=%u pri=%d "
++                            "cur=%08X cur_tid=%u head_after=%08X next_after=%08X\n",
++                         (unsigned long long)e.seq, (unsigned long long)e.ms, e.op,
++                         e.queue, e.thread, e.thread_id, (int)e.priority,
++                         e.current_thread, e.current_thread_id, e.head_after, e.next_after);
++        }
++    }
++    std::fflush(f);
++}
++
++} // namespace psr_freeze_state
++
+ // C-callable variant for extras.c (see app_paths.h).
+ extern "C" const char* psr_app_file_c(const char* name, char* out, unsigned long out_size) {
+     if (out == nullptr || out_size == 0) return "";
+@@ -509,6 +729,20 @@
+     }
+     fclose(f);
+     return written;
++}
++
++// Stadium 2 does not ship Stadium 1's audio microcode: its ucode text lives at
++// ROM 0x1060 and its ucode_data header (0000 0001 0002 FFFF 0020 0800 7FFF
++// 4000 ...) does not match Stadium 1's aspMain dispatch table, which appears
++// nowhere in the Stadium 2 ROM. Running Stadium 1's recompiled aspMain against
++// Stadium 2 command lists makes its handlers compute RDRAM addresses from the
++// wrong ABI and write over unrelated memory. Skipping the task leaves audio
++// silent but stops the corruption; replace with a real recompilation of the
++// Stadium 2 microcode.
++static RspExitReason aspMain_skip(uint8_t* rdram, uint32_t ucode_addr) {
++    (void)rdram;
++    (void)ucode_addr;
++    return RspExitReason::Broke;
+ }
+ 
+ static RspExitReason aspMain_capture(uint8_t* rdram, uint32_t ucode_addr) {
+@@ -659,7 +893,7 @@
+         case M_AUDTASK:
+             // Always-on: snapshot the CPU-built Acmd list before it runs.
+             audcmd_record(rdram, task);
+-            return aspMain_capture;   /* passthrough unless capture armed */
++            return aspMain_skip;
+         case M_NJPEGTASK: return njpgdspMain;
+         default:
+             fprintf(stderr, "[Pokemon Stadium] Unknown RSP task type: %u\n", task->t.type);
+@@ -2567,7 +2801,7 @@
+         // Temporary Android boot-stall diagnostic. The framework already
+         // records this ring continuously; persist one bounded snapshot so it
+         // can be read through run-as on devices where debuggerd needs root.
+-        std::this_thread::sleep_for(std::chrono::seconds(12));
++        std::this_thread::sleep_for(std::chrono::seconds(6));
+         const auto trace_path = pkmnstadium::exe_dir() / "freeze_trace.log";
+         if (FILE* trace = std::fopen(trace_path.string().c_str(), "w")) {
+             const uint64_t write_idx = recomp_ultra_trace_write_idx();
+@@ -2588,6 +2822,35 @@
+                         event.thread_id, event.thread, event.name, event.pc,
+                         event.a0, event.a1, event.a2, event.a3);
+             }
++            // Every ROM->RDRAM PI DMA with its destination, so the
++            // fragment-67 overwrite can be attributed to a real transfer
++            // rather than inferred from the resulting bytes.
++            const auto pi_path = pkmnstadium::exe_dir() / "pi_fills.bin";
++            const int64_t pi_fills = recomp_pi_fill_dump(pi_path.string().c_str());
++            std::fprintf(trace, "pi_fill_dump=%lld\n", (long long)pi_fills);
++
++            // Whole-RDRAM snapshot so the extent and source of the overwrite
++            // can be established offline against the ROM. XOR-3 byte access
++            // matches the recompiler's swap convention.
++            if (uint8_t* snap_rdram = recomp_runtime_get_rdram()) {
++                const auto rdram_path = pkmnstadium::exe_dir() / "rdram.bin";
++                if (FILE* rf = std::fopen(rdram_path.string().c_str(), "wb")) {
++                    constexpr uint32_t kRdramSize = 0x800000u;
++                    constexpr uint32_t kChunk = 0x10000u;
++                    std::vector<uint8_t> buf(kChunk);
++                    for (uint32_t base = 0; base < kRdramSize; base += kChunk) {
++                        for (uint32_t i = 0; i < kChunk; i++) {
++                            buf[i] = snap_rdram[(base + i) ^ 3];
++                        }
++                        std::fwrite(buf.data(), 1, kChunk, rf);
++                    }
++                    std::fclose(rf);
++                    std::fprintf(trace, "rdram_snapshot=ok\n");
++                }
++            }
++            psr_freeze_state::dump(trace, "t=6s", 0x800CDA10u);
++            std::this_thread::sleep_for(std::chrono::milliseconds(1500));
++            psr_freeze_state::dump(trace, "t=7.5s", 0x800CDA10u);
+             std::fclose(trace);
+         }
+         }).detach();

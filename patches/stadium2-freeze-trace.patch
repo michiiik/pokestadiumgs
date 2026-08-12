@@ -1,0 +1,38 @@
+diff --git a/src/main/main.cpp b/src/main/main.cpp
+--- a/src/main/main.cpp
++++ b/src/main/main.cpp
+@@ -2561,7 +2561,34 @@
+     std::thread([game_id = game.game_id]() {
+         std::this_thread::sleep_for(std::chrono::milliseconds(100));
+         recomp::start_game(game_id);
+         std::fprintf(stderr, "[PSR] start_game fired\n"); std::fflush(stderr);
++
++        // Temporary Android boot-stall diagnostic. The framework already
++        // records this ring continuously; persist one bounded snapshot so it
++        // can be read through run-as on devices where debuggerd needs root.
++        std::this_thread::sleep_for(std::chrono::seconds(12));
++        const auto trace_path = pkmnstadium::exe_dir() / "freeze_trace.log";
++        if (FILE* trace = std::fopen(trace_path.string().c_str(), "w")) {
++            const uint64_t write_idx = recomp_ultra_trace_write_idx();
++            const uint32_t capacity = recomp_ultra_trace_capacity();
++            const uint64_t count = std::min<uint64_t>(write_idx, capacity);
++            const uint64_t start = write_idx - count;
++            std::fprintf(trace, "write_idx=%llu capacity=%u start=%llu\n",
++                    static_cast<unsigned long long>(write_idx), capacity,
++                    static_cast<unsigned long long>(start));
++            for (uint64_t index = start; index < write_idx; ++index) {
++                recomp_ultra_trace_event event{};
++                if (!recomp_ultra_trace_get(index, &event)) continue;
++                std::fprintf(trace,
++                        "%llu %llu tid=%u thread=%08X %-39s pc=%08X "
++                        "a0=%08X a1=%08X a2=%08X a3=%08X\n",
++                        static_cast<unsigned long long>(event.seq),
++                        static_cast<unsigned long long>(event.ms),
++                        event.thread_id, event.thread, event.name, event.pc,
++                        event.a0, event.a1, event.a2, event.a3);
++            }
++            std::fclose(trace);
++        }
+     }).detach();
+     std::fprintf(stderr, "[PSR] booting game (launcher committed its config pre-boot)\n");
+     std::fflush(stderr);

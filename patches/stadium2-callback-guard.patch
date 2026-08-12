@@ -1,0 +1,23 @@
+diff --git a/src/main/register_overlays.cpp b/src/main/register_overlays.cpp
+--- a/src/main/register_overlays.cpp
++++ b/src/main/register_overlays.cpp
+@@ -31,6 +31,14 @@ static void ps2_dynamic_fragment_helper(uint8_t* rdram, recomp_context* ctx) {
+     ctx->r2 = (ctx->r4 == 0) ? 0x80685C80u : 0u;
+ }
+ 
++static void ps2_set_callback_guard(uint8_t* rdram, recomp_context* ctx) {
++    const uint32_t callback = static_cast<uint32_t>(ctx->r4);
++    if (callback == 0 ||
++        (callback >= 0x80000000u && callback < 0x90000000u)) {
++        MEM_W(-0x590, 0x80090000u) = callback;
++    }
++}
++
+ namespace pokestadium {
+     void register_overlays();
+     void register_runtime_trampolines();
+@@ -63,3 +71,4 @@ void pokestadium::register_runtime_trampolines() {
+     recomp::overlays::add_loaded_function(0x801451A0, func_83F002F4);
+     recomp::overlays::add_loaded_function(0x806788E0, ps2_dynamic_fragment_helper);
++    recomp::overlays::add_loaded_function(0x80015A40, ps2_set_callback_guard);
+ }

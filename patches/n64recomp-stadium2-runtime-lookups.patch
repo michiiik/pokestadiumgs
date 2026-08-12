@@ -1,0 +1,15 @@
+diff --git a/src/recompilation.cpp b/src/recompilation.cpp
+--- a/src/recompilation.cpp
++++ b/src/recompilation.cpp
+@@ -130,2 +130,5 @@ JalResolutionResult resolve_jal(
+         else {
++            if (std::getenv("N64RECOMP_SKIP_AGGRESSIVE_STATIC_SEEDS") != nullptr) {
++                return JalResolutionResult::Ambiguous;
++            }
+             return JalResolutionResult::CreateStatic;
+@@ -176,2 +179,5 @@ JalResolutionResult resolve_jal(
+                 static_section_index = containing_section;
++                if (std::getenv("N64RECOMP_SKIP_AGGRESSIVE_STATIC_SEEDS") != nullptr) {
++                    return JalResolutionResult::Ambiguous;
++                }
+                 return JalResolutionResult::CreateStatic;

@@ -1,0 +1,23 @@
+--- /Users/michaegg/ps2-recomp-build/runtime/src/main/main.cpp.pifill.orig	2026-08-07 04:23:55
++++ /Users/michaegg/ps2-recomp-build/runtime/src/main/main.cpp	2026-08-07 04:30:23
+@@ -111,6 +111,7 @@
+ #include <cstring>
+ 
+ extern "C" uint8_t* recomp_runtime_get_rdram(void);
++extern "C" int64_t  recomp_pi_fill_dump(const char* path);
+ extern "C" uint64_t ultramodern_external_requeues(void);
+ extern "C" uint32_t ultramodern_external_pending(void);
+ extern "C" uint32_t ultramodern_running_queue_head(void);
+@@ -2807,6 +2808,12 @@
+                         event.thread_id, event.thread, event.name, event.pc,
+                         event.a0, event.a1, event.a2, event.a3);
+             }
++            // Every ROM->RDRAM PI DMA with its destination, so the
++            // fragment-67 overwrite can be attributed to a real transfer
++            // rather than inferred from the resulting bytes.
++            const auto pi_path = pkmnstadium::exe_dir() / "pi_fills.bin";
++            const int64_t pi_fills = recomp_pi_fill_dump(pi_path.string().c_str());
++            std::fprintf(trace, "pi_fill_dump=%lld\n", (long long)pi_fills);
+             psr_freeze_state::dump(trace, "t=12s", 0x800CDA10u);
+             std::this_thread::sleep_for(std::chrono::seconds(3));
+             psr_freeze_state::dump(trace, "t=15s", 0x800CDA10u);

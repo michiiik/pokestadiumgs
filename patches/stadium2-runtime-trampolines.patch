@@ -1,0 +1,33 @@
+diff --git a/src/main/register_overlays.cpp b/src/main/register_overlays.cpp
+--- a/src/main/register_overlays.cpp
++++ b/src/main/register_overlays.cpp
+@@ -17,10 +17,18 @@
+ #include <cstddef>
+ 
+ #include "librecomp/overlays.hpp"
++#include "recomp.h"
+ 
+ #define ARRLEN(x) (sizeof(x) / sizeof((x)[0]))
+ 
+ #include "../../generated/recomp_overlays.inl"
++#include "../../generated/funcs.h"
++
++static void ps2_dynamic_fragment_helper(uint8_t* rdram, recomp_context* ctx) {
++    MEM_W(0x4, ctx->r29) = ctx->r5;
++    ctx->r3 = 0;
++    ctx->r2 = (ctx->r4 == 0) ? 0x80685C80u : 0u;
++}
+ 
+ namespace pokestadium {
+     void register_overlays();
+@@ -41,4 +50,10 @@ void pokestadium::register_overlays() {
+     };
+ 
+     recomp::overlays::register_overlays(sections, overlays);
++
++    // Stadium 2 emits these two runtime trampolines outside normal function
++    // entries. Register their native destinations so they never fall through
++    // to the interpreter and lose the guest return address.
++    recomp::overlays::add_loaded_function(0x801451A0, func_83F002F4);
++    recomp::overlays::add_loaded_function(0x806788E0, ps2_dynamic_fragment_helper);
+ }

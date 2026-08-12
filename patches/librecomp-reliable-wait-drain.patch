@@ -1,0 +1,84 @@
+diff --git a/lib/N64ModernRuntime/ultramodern/src/mesgqueue.cpp b/lib/N64ModernRuntime/ultramodern/src/mesgqueue.cpp
+--- a/lib/N64ModernRuntime/ultramodern/src/mesgqueue.cpp
++++ b/lib/N64ModernRuntime/ultramodern/src/mesgqueue.cpp
+@@ -260,6 +260,38 @@ s32 ultramodern::post_rcp_event(RDRAM_ARG PTR(OSMesgQueue) mq, OSMesg msg, bool
+ // queue is being overrun (receiver thread starved).
+ static std::atomic<uint64_t> g_external_requeues{0};
+ 
++static bool deliver_waited_external(RDRAM_ARG const QueuedMessage& to_send) {
++    OSMesgQueue* mq_pre = TO_PTR(OSMesgQueue, to_send.mq);
++    const uint16_t vb = uint16_t(mq_pre ? mq_pre->validCount : 0);
++    const bool ok = do_send(PASS_RDRAM to_send.mq, to_send.mesg, to_send.jam, false);
++    if (ok) {
++        OSMesgQueue* mq_post = TO_PTR(OSMesgQueue, to_send.mq);
++        const uint16_t va = uint16_t(mq_post ? mq_post->validCount : 0);
++        mesg_log::record(rdram, mesg_log::OP_EXT_DEQ_OK,
++                         uint32_t(to_send.mq),
++                         uint32_t(uintptr_t(to_send.mesg)),
++                         vb, va, false, true);
++        return true;
++    }
++
++    if (to_send.coalescible) {
++        mesg_log::record(rdram, mesg_log::OP_EXT_DEQ_DROP,
++                         uint32_t(to_send.mq),
++                         uint32_t(uintptr_t(to_send.mesg)),
++                         vb, vb, false, true);
++        return false;
++    }
++
++    mesg_log::record(rdram, mesg_log::OP_EXT_DEQ_FULL,
++                     uint32_t(to_send.mq),
++                     uint32_t(uintptr_t(to_send.mesg)),
++                     vb, vb, false, true);
++    external_messages.enqueue(to_send);
++    g_external_pending.fetch_add(1, std::memory_order_relaxed);
++    g_external_requeues.fetch_add(1, std::memory_order_relaxed);
++    return false;
++}
++
+ void dequeue_external_messages(RDRAM_ARG1) {
+     QueuedMessage to_send;
+     while (external_messages.try_dequeue(to_send)) {
+@@ -350,15 +382,15 @@ void ultramodern::wait_for_external_message(RDRAM_ARG1) {
+     while (true) {
+         if (external_messages.try_dequeue(to_send)) {
+             g_external_pending.fetch_sub(1, std::memory_order_relaxed);
+-            do_send(PASS_RDRAM to_send.mq, to_send.mesg, to_send.jam, false);
++            deliver_waited_external(PASS_RDRAM to_send);
+             return;
+         }
+         if (ultramodern_cosim_advance_to_next_rcp_event(rdram) != 0) {
+             return;
+         }
+         if (external_messages.wait_dequeue_timed(to_send, std::chrono::milliseconds{1})) {
+             g_external_pending.fetch_sub(1, std::memory_order_relaxed);
+-            do_send(PASS_RDRAM to_send.mq, to_send.mesg, to_send.jam, false);
++            deliver_waited_external(PASS_RDRAM to_send);
+             return;
+         }
+     }
+@@ -365,12 +397,12 @@ void ultramodern::wait_for_external_message(RDRAM_ARG1) {
+ #else
+     if (external_messages.try_dequeue(to_send)) {
+         g_external_pending.fetch_sub(1, std::memory_order_relaxed);
+-        do_send(PASS_RDRAM to_send.mq, to_send.mesg, to_send.jam, false);
++        deliver_waited_external(PASS_RDRAM to_send);
+         return;
+     }
+     external_messages.wait_dequeue(to_send);
+     g_external_pending.fetch_sub(1, std::memory_order_relaxed);
+-    do_send(PASS_RDRAM to_send.mq, to_send.mesg, to_send.jam, false);
++    deliver_waited_external(PASS_RDRAM to_send);
+ #endif
+ }
+ 
+@@ -383,7 +415,7 @@ void ultramodern::wait_for_external_message_timed(RDRAM_ARG1, u32 millis) {
+ #endif
+     if (external_messages.wait_dequeue_timed(to_send, std::chrono::milliseconds{millis})) {
+         g_external_pending.fetch_sub(1, std::memory_order_relaxed);
+-        do_send(PASS_RDRAM to_send.mq, to_send.mesg, to_send.jam, false);
++        deliver_waited_external(PASS_RDRAM to_send);
+     }
+ }
+ 

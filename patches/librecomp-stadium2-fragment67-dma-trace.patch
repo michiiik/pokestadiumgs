@@ -1,0 +1,19 @@
+diff --git a/lib/N64ModernRuntime/librecomp/src/pi.cpp b/lib/N64ModernRuntime/librecomp/src/pi.cpp
+--- a/lib/N64ModernRuntime/librecomp/src/pi.cpp
++++ b/lib/N64ModernRuntime/librecomp/src/pi.cpp
+@@ -722,6 +722,15 @@ extern "C" void osEPiStartDma_recomp(RDRAM_ARG recomp_context* ctx) {
+     PTR(OSMesgQueue) mq = mb->hdr.retQueue;
+     uint32_t physical_addr = k1_to_phys(devAddr);
+ 
++    constexpr uint32_t fragment67_start = recomp::rom_base + 0x0033CB00u;
++    constexpr uint32_t fragment67_end = recomp::rom_base + 0x00357D20u;
++    if (physical_addr >= fragment67_start && physical_addr < fragment67_end) {
++        std::fprintf(stderr,
++            "[PS2-PI] fragment67 rom=0x%08X dram=0x%08X size=0x%08X mq=0x%08X\n",
++            physical_addr, uint32_t(dramAddr), size, uint32_t(mq));
++        std::fflush(stderr);
++    }
++
+     debug_printf("[pi] DMA from 0x%08X into 0x%08X of size 0x%08X\n", devAddr, dramAddr, size);
+ 
+     do_dma(PASS_RDRAM mq, dramAddr, physical_addr, size, direction);

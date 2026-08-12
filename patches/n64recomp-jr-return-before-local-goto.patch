@@ -1,0 +1,44 @@
+--- /Users/michaegg/ps2-recomp-build/n64recomp-2b/src/recompilation.cpp.jrreturn.orig	2026-08-07 00:45:00
++++ /Users/michaegg/ps2-recomp-build/n64recomp-2b/src/recompilation.cpp	2026-08-07 06:44:57
+@@ -642,22 +642,34 @@
+         fmt::print(output_file, "}}\n");
+         indent_line();
+         fmt::print(output_file, "}}\n");
++        std::vector<uint32_t> jr_local_labels;
+         for (uint32_t label_vram : branch_labels) {
+             if (label_vram >= func.vram && label_vram < func_vram_end) {
+-                if (!emitted_local_dispatch) {
+-                    indent_line();
+-                    fmt::print(output_file, "switch ({}) {{\n", jr_target_vram_var);
+-                    emitted_local_dispatch = true;
+-                }
+-                indent_line();
+-                fmt::print(output_file, "case 0x{:08X}u: goto L_{:08X};\n", label_vram, label_vram);
++                jr_local_labels.push_back(label_vram);
+             }
+         }
++        emitted_local_dispatch = !jr_local_labels.empty();
+         if (emitted_local_dispatch) {
++            // Only branch locally when the target is NOT where our caller
++            // expects us to resume. Taking the local goto for the caller's
++            // continuation makes this frame absorb the caller's remaining
++            // work, so the caller never unwinds; a guest routine that calls a
++            // PC-relative local helper inside a loop then grows the host stack
++            // once per iteration until it overflows.
++            indent_line();
++            fmt::print(output_file, "if ({} != ctx->host_return_target) {{\n", jr_target_vram_var);
++            indent_line();
++            fmt::print(output_file, "switch ({}) {{\n", jr_target_vram_var);
++            for (uint32_t label_vram : jr_local_labels) {
++                indent_line();
++                fmt::print(output_file, "case 0x{:08X}u: goto L_{:08X};\n", label_vram, label_vram);
++            }
+             indent_line();
+             fmt::print(output_file, "default: break;\n");
+             indent_line();
+             fmt::print(output_file, "}}\n");
++            indent_line();
++            fmt::print(output_file, "}}\n");
+         }
+         indent_line();
+         fmt::print(output_file, "if ({} != ctx->host_return_target) {{\n", jr_target_vram_var);

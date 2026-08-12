@@ -1,0 +1,121 @@
+=== freeze_state t=12s watch_mq=800CDA10 rdram=ok ===
+external_requeues=6596890 external_pending=1 running_queue_head=00000000
+mq 800CDA10 validCount=-1391591424 first=1007672832 msgCount=-1402011648 msgbuf=AC780004 blocked_recv=27184E78 blocked_send=246E0008
+  recv_blocked thread=27184E78 <unreadable>
+  send_blocked thread=246E0008 <unreadable>
+--- sched thread states (9) ---
+tid=1 thread=800A8280 pri=0 last_op=113 last_queue=FFFFFFFF last_head=00000000 last_ms=6720 last_mq=800CD000 last_mq_ms=1084 events=14708
+  guest thread=800A8280 id=1 pri=0 state=STOPPED flags=0002 queue=00000000 next=00000000
+tid=2 thread=800D05B0 pri=128 last_op=113 last_queue=FFFFFFFF last_head=00000000 last_ms=1083 last_mq=800D0F60 last_mq_ms=1083 events=13
+  guest thread=800D05B0 id=2 pri=128 state=STOPPED flags=0003 queue=800D0F60 next=00000000
+tid=3 thread=800CD020 pri=100 last_op=113 last_queue=FFFFFFFF last_head=00000000 last_ms=6720 last_mq=800CDA10 last_mq_ms=6716 events=12250
+  guest thread=800CD020 id=3 pri=100 state=STOPPED flags=0003 queue=800CDA10 next=00000000
+tid=4 thread=80122B20 pri=80 last_op=120 last_queue=00000000 last_head=00000000 last_ms=6719 last_mq=80122CE0 last_mq_ms=6719 events=5367
+  guest thread=80122B20 id=4 pri=80 state=STOPPED flags=0003 queue=80122CE0 next=00000000
+tid=5 thread=800AA9E0 pri=40 last_op=113 last_queue=FFFFFFFF last_head=800A8280 last_ms=6719 last_mq=800AB404 last_mq_ms=6719 events=8355
+  guest thread=800AA9E0 id=1174537216 pri=1174537216 state=STOPPED flags=0000 queue=3C01BF00 next=10000005
+tid=6 thread=800A8830 pri=20 last_op=120 last_queue=00000000 last_head=00000000 last_ms=6719 last_mq=800AB3E4 last_mq_ms=6719 events=16159
+  guest thread=800A8830 id=6 pri=20 state=STOPPED flags=0003 queue=800AB3E4 next=00000000
+tid=7 thread=80126530 pri=10 last_op=120 last_queue=00000000 last_head=00000000 last_ms=5885 last_mq=80126F00 last_mq_ms=5885 events=803
+  guest thread=80126530 id=7 pri=10 state=STOPPED flags=0003 queue=80126F00 next=00000000
+tid=20 thread=800CE170 pri=90 last_op=113 last_queue=FFFFFFFF last_head=800A8280 last_ms=5884 last_mq=800D045C last_mq_ms=5884 events=9169
+  guest thread=800CE170 id=20 pri=90 state=STOPPED flags=0003 queue=800D045C next=00000000
+tid=21 thread=800CDA60 pri=30 last_op=120 last_queue=00000000 last_head=00000000 last_ms=1101 last_mq=800CDC20 last_mq_ms=1101 events=9
+  guest thread=800CDA60 id=21 pri=30 state=STOPPED flags=0003 queue=800CDC20 next=00000000
+--- mesg queues (27) ---
+mq=8011E0F0 events=364 last: seq=23000 ms=6719 op=send_game msg=00000000 tid=4 vb=0 va=1 block=0 gt=1
+mq=800CE100 events=200 last: seq=23011 ms=6719 op=recv_return_ok msg=00000000 tid=6 vb=1 va=0 block=1 gt=1
+mq=800CE150 events=301 last: seq=23012 ms=6719 op=send_game msg=00000000 tid=6 vb=0 va=1 block=0 gt=1
+mq=801221C0 events=677 last: seq=22988 ms=6718 op=send_game msg=00000152 tid=4 vb=1 va=1 block=0 gt=1
+mq=801221D8 events=675 last: seq=23013 ms=6719 op=send_game msg=00001D1D tid=6 vb=0 va=1 block=0 gt=1
+mq=800D045C events=2609 last: seq=20774 ms=5884 op=recv_block msg=00000000 tid=20 vb=0 va=0 block=1 gt=1
+mq=800D0474 events=1956 last: seq=20768 ms=5884 op=recv_return_ok msg=00000000 tid=20 vb=1 va=0 block=1 gt=1
+mq=80134484 events=3943 last: seq=20784 ms=5885 op=send_game msg=00000000 tid=6 vb=0 va=1 block=0 gt=1
+mq=8011E808 events=75 last: seq=1147 ms=1134 op=recv_return_ok msg=00000000 tid=4 vb=1 va=0 block=1 gt=1
+mq=806C4940 events=4 last: seq=18567 ms=5067 op=recv_return_ok msg=801344B0 tid=6 vb=0 va=0 block=1 gt=1
+mq=806C4980 events=8 last: seq=20781 ms=5885 op=recv_return_ok msg=801344B0 tid=6 vb=0 va=0 block=1 gt=1
+mq=80122A4C events=337 last: seq=22923 ms=6685 op=send_game msg=444F4E45 tid=3 vb=1 va=1 block=0 gt=1
+mq=80122AB4 events=337 last: seq=22967 ms=6700 op=send_game msg=444F4E45 tid=3 vb=1 va=1 block=0 gt=1
+mq=800AABA0 events=1129 last: seq=23003 ms=6719 op=recv_return_ok msg=56545245 tid=5 vb=0 va=0 block=1 gt=1
+mq=80122CE0 events=1353 last: seq=23002 ms=6719 op=recv_block msg=00000000 tid=4 vb=0 va=0 block=1 gt=1
+mq=800D2D60 events=3 last: seq=41 ms=1100 op=recv_return_ok msg=00000000 tid=4 vb=1 va=0 block=1 gt=1
+mq=800CCDB4 events=583 last: seq=20779 ms=5885 op=send_game msg=00000000 tid=7 vb=0 va=1 block=0 gt=1
+mq=80126F00 events=13 last: seq=20793 ms=5885 op=recv_block msg=00000000 tid=7 vb=0 va=0 block=1 gt=1
+mq=800D0F60 events=2 last: seq=6 ms=1083 op=recv_block msg=00000000 tid=2 vb=0 va=0 block=1 gt=1
+mq=800CD000 events=1957 last: seq=20776 ms=5884 op=recv_return_ok msg=00000000 tid=7 vb=1 va=0 block=1 gt=1
+mq=800D1320 events=338 last: seq=22998 ms=6718 op=recv_enter msg=00000000 tid=4 vb=0 va=0 block=0 gt=1
+mq=800AB3CC events=460 last: seq=23015 ms=6719 op=recv_return_ok msg=800D0540 tid=5 vb=0 va=0 block=1 gt=1
+mq=800AB3E4 events=458 last: seq=23019 ms=6719 op=recv_block msg=00000000 tid=6 vb=0 va=0 block=1 gt=1
+mq=800AB404 events=436 last: seq=23017 ms=6719 op=recv_block msg=00000000 tid=5 vb=0 va=0 block=1 gt=1
+mq=800CDA10 events=6603157 last: seq=6621735 ms=12832 op=ext_deq_full msg=00000064 tid=1 vb=0 va=0 block=0 gt=1
+mq=800CDC20 events=2 last: seq=54 ms=1101 op=recv_block msg=00000000 tid=21 vb=0 va=0 block=1 gt=1
+mq=8011DE50 events=338 last: seq=22997 ms=6718 op=recv_enter msg=00000000 tid=4 vb=0 va=0 block=0 gt=1
+--- mq 800CDA10 tail (64 of 6603157) ---
+seq=6621672 ms=12832 op=ext_deq_full   msg=00000064 thread=800A8280 tid=1 vb=0 va=0 block=0 gt=1
+    ... [63 more identical extfull lines elided] ...
+--- sched ring tail (write_idx=6669491, 512 shown) ---
+seq=6668979 ms=12832 op=101 queue=FFFFFFFF thread=00000000 tid=0 pri=0 cur=800A8280 cur_tid=1 head_after=00000000 next_after=00000000
+    ... [511 more identical op101 lines elided] ...
+
+=== freeze_state t=15s watch_mq=800CDA10 rdram=ok ===
+external_requeues=9837862 external_pending=1 running_queue_head=00000000
+mq 800CDA10 validCount=-1391591424 first=1007672832 msgCount=-1402011648 msgbuf=AC780004 blocked_recv=27184E78 blocked_send=246E0008
+  recv_blocked thread=27184E78 <unreadable>
+  send_blocked thread=246E0008 <unreadable>
+--- sched thread states (9) ---
+tid=1 thread=800A8280 pri=0 last_op=113 last_queue=FFFFFFFF last_head=00000000 last_ms=6720 last_mq=800CD000 last_mq_ms=1084 events=14708
+  guest thread=800A8280 id=1 pri=0 state=STOPPED flags=0002 queue=00000000 next=00000000
+tid=2 thread=800D05B0 pri=128 last_op=113 last_queue=FFFFFFFF last_head=00000000 last_ms=1083 last_mq=800D0F60 last_mq_ms=1083 events=13
+  guest thread=800D05B0 id=2 pri=128 state=STOPPED flags=0003 queue=800D0F60 next=00000000
+tid=3 thread=800CD020 pri=100 last_op=113 last_queue=FFFFFFFF last_head=00000000 last_ms=6720 last_mq=800CDA10 last_mq_ms=6716 events=12250
+  guest thread=800CD020 id=3 pri=100 state=STOPPED flags=0003 queue=800CDA10 next=00000000
+tid=4 thread=80122B20 pri=80 last_op=120 last_queue=00000000 last_head=00000000 last_ms=6719 last_mq=80122CE0 last_mq_ms=6719 events=5367
+  guest thread=80122B20 id=4 pri=80 state=STOPPED flags=0003 queue=80122CE0 next=00000000
+tid=5 thread=800AA9E0 pri=40 last_op=113 last_queue=FFFFFFFF last_head=800A8280 last_ms=6719 last_mq=800AB404 last_mq_ms=6719 events=8355
+  guest thread=800AA9E0 id=1174537216 pri=1174537216 state=STOPPED flags=0000 queue=3C01BF00 next=10000005
+tid=6 thread=800A8830 pri=20 last_op=120 last_queue=00000000 last_head=00000000 last_ms=6719 last_mq=800AB3E4 last_mq_ms=6719 events=16159
+  guest thread=800A8830 id=6 pri=20 state=STOPPED flags=0003 queue=800AB3E4 next=00000000
+tid=7 thread=80126530 pri=10 last_op=120 last_queue=00000000 last_head=00000000 last_ms=5885 last_mq=80126F00 last_mq_ms=5885 events=803
+  guest thread=80126530 id=7 pri=10 state=STOPPED flags=0003 queue=80126F00 next=00000000
+tid=20 thread=800CE170 pri=90 last_op=113 last_queue=FFFFFFFF last_head=800A8280 last_ms=5884 last_mq=800D045C last_mq_ms=5884 events=9169
+  guest thread=800CE170 id=20 pri=90 state=STOPPED flags=0003 queue=800D045C next=00000000
+tid=21 thread=800CDA60 pri=30 last_op=120 last_queue=00000000 last_head=00000000 last_ms=1101 last_mq=800CDC20 last_mq_ms=1101 events=9
+  guest thread=800CDA60 id=21 pri=30 state=STOPPED flags=0003 queue=800CDC20 next=00000000
+--- mesg queues (27) ---
+mq=8011E0F0 events=364 last: seq=23000 ms=6719 op=send_game msg=00000000 tid=4 vb=0 va=1 block=0 gt=1
+mq=800CE100 events=200 last: seq=23011 ms=6719 op=recv_return_ok msg=00000000 tid=6 vb=1 va=0 block=1 gt=1
+mq=800CE150 events=301 last: seq=23012 ms=6719 op=send_game msg=00000000 tid=6 vb=0 va=1 block=0 gt=1
+mq=801221C0 events=677 last: seq=22988 ms=6718 op=send_game msg=00000152 tid=4 vb=1 va=1 block=0 gt=1
+mq=801221D8 events=675 last: seq=23013 ms=6719 op=send_game msg=00001D1D tid=6 vb=0 va=1 block=0 gt=1
+mq=800D045C events=2609 last: seq=20774 ms=5884 op=recv_block msg=00000000 tid=20 vb=0 va=0 block=1 gt=1
+mq=800D0474 events=1956 last: seq=20768 ms=5884 op=recv_return_ok msg=00000000 tid=20 vb=1 va=0 block=1 gt=1
+mq=80134484 events=3943 last: seq=20784 ms=5885 op=send_game msg=00000000 tid=6 vb=0 va=1 block=0 gt=1
+mq=8011E808 events=75 last: seq=1147 ms=1134 op=recv_return_ok msg=00000000 tid=4 vb=1 va=0 block=1 gt=1
+mq=806C4940 events=4 last: seq=18567 ms=5067 op=recv_return_ok msg=801344B0 tid=6 vb=0 va=0 block=1 gt=1
+mq=806C4980 events=8 last: seq=20781 ms=5885 op=recv_return_ok msg=801344B0 tid=6 vb=0 va=0 block=1 gt=1
+mq=80122A4C events=337 last: seq=22923 ms=6685 op=send_game msg=444F4E45 tid=3 vb=1 va=1 block=0 gt=1
+mq=80122AB4 events=337 last: seq=22967 ms=6700 op=send_game msg=444F4E45 tid=3 vb=1 va=1 block=0 gt=1
+mq=800AABA0 events=1129 last: seq=23003 ms=6719 op=recv_return_ok msg=56545245 tid=5 vb=0 va=0 block=1 gt=1
+mq=80122CE0 events=1353 last: seq=23002 ms=6719 op=recv_block msg=00000000 tid=4 vb=0 va=0 block=1 gt=1
+mq=800D2D60 events=3 last: seq=41 ms=1100 op=recv_return_ok msg=00000000 tid=4 vb=1 va=0 block=1 gt=1
+mq=800CCDB4 events=583 last: seq=20779 ms=5885 op=send_game msg=00000000 tid=7 vb=0 va=1 block=0 gt=1
+mq=80126F00 events=13 last: seq=20793 ms=5885 op=recv_block msg=00000000 tid=7 vb=0 va=0 block=1 gt=1
+mq=800D0F60 events=2 last: seq=6 ms=1083 op=recv_block msg=00000000 tid=2 vb=0 va=0 block=1 gt=1
+mq=800CD000 events=1957 last: seq=20776 ms=5884 op=recv_return_ok msg=00000000 tid=7 vb=1 va=0 block=1 gt=1
+mq=800D1320 events=338 last: seq=22998 ms=6718 op=recv_enter msg=00000000 tid=4 vb=0 va=0 block=0 gt=1
+mq=800AB3CC events=460 last: seq=23015 ms=6719 op=recv_return_ok msg=800D0540 tid=5 vb=0 va=0 block=1 gt=1
+mq=800AB3E4 events=458 last: seq=23019 ms=6719 op=recv_block msg=00000000 tid=6 vb=0 va=0 block=1 gt=1
+mq=800AB404 events=436 last: seq=23017 ms=6719 op=recv_block msg=00000000 tid=5 vb=0 va=0 block=1 gt=1
+mq=800CDA10 events=9843481 last: seq=9862064 ms=15833 op=ext_deq_full msg=00000064 tid=1 vb=0 va=0 block=0 gt=1
+mq=800CDC20 events=2 last: seq=54 ms=1101 op=recv_block msg=00000000 tid=21 vb=0 va=0 block=1 gt=1
+mq=8011DE50 events=338 last: seq=22997 ms=6718 op=recv_enter msg=00000000 tid=4 vb=0 va=0 block=0 gt=1
+--- mq 800CDA10 tail (64 of 9843481) ---
+seq=9862000 ms=15833 op=ext_deq_full   msg=00000064 thread=800A8280 tid=1 vb=0 va=0 block=0 gt=1
+    ... [59 more identical extfull lines elided] ...
+seq=9862060 ms=15833 op=send_external  msg=00000066 thread=00000000 tid=0 vb=0 va=0 block=0 gt=0
+seq=9862062 ms=15833 op=ext_deq_drop   msg=00000066 thread=800A8280 tid=1 vb=0 va=0 block=0 gt=1
+seq=9862063 ms=15833 op=ext_deq_full   msg=00000064 thread=800A8280 tid=1 vb=0 va=0 block=0 gt=1
+    ... [1 more identical extfull lines elided] ...
+--- sched ring tail (write_idx=9909496, 512 shown) ---
+seq=9908984 ms=15833 op=101 queue=FFFFFFFF thread=00000000 tid=0 pri=0 cur=800A8280 cur_tid=1 head_after=00000000 next_after=00000000
+    ... [511 more identical op101 lines elided] ...

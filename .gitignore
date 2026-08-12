@@ -1,0 +1,27 @@
+# User-provided ROMs
+*.n64
+*.v64
+*.z64
+
+# Decompilation outputs
+disasm/baseroms/
+disasm/build/
+generated/
+
+# Android/Gradle outputs and machine-local configuration
+.gradle/
+android/.gradle/
+android/local.properties
+android/**/build/
+
+# Native build outputs
+build*/
+*.apk
+*.so
+*.log
+*.tgz
+function_sizes.toml
+
+# IDE files
+.idea/
+*.iml
