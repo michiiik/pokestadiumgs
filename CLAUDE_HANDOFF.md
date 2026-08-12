@@ -1049,11 +1049,12 @@ Stadium 2's decompression wrapper format and slots; regenerate with
 recompile the audio microcode and remove `aspMain_skip`. (That last item is done
 — see "Audio: WORKING".)
 
-Next todo after the renderer/FPS work: review and test the uncommitted rental
-roster change in `C:\Users\laptop\Documents\lg\pokemonStadiumGSRecomp-worktree`.
-It adds additional Pokemon to the initial rental roster through `game.toml`
-hooks. Preserve that worktree's changes, verify the table relocation and the
-in-game roster behavior, then integrate the change deliberately.
+Next todo after the renderer/FPS work: generate/build and validate the rental
+roster patch integrated from
+`C:\Users\laptop\Documents\lg\pokemonStadiumGSRecomp-worktree`. It adds
+additional Pokemon to the initial rental roster through `game.toml` hooks.
+Verify the table relocation and the in-game roster behavior before treating it
+as complete. The source worktree's original changes were preserved.
 
 Also fixed along the way: `osSetIntMask_recomp` and `__osDisableInt_recomp` were
 empty and never set `v0`, so they returned whatever the previous call left there
