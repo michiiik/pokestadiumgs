@@ -22,6 +22,9 @@ build*/
 *.tgz
 function_sizes.toml
 
+# Local runtime and FPS screenshots
+screenshots/
+
 # IDE files
 .idea/
 *.iml
