@@ -145,7 +145,7 @@ text = "recomp_register_runtime_fragment(rdram, ctx->r4, ctx->r5);"
 # RDRAM uses host XOR-3
 # byte order, so update the big-endian halfword at physical address 0x9F7DC.
 [[patches.hook]]
-func = "func_80000400"
+func = "recomp_entrypoint"
 before_vram = 0x80000400
 text = "rdram[(0x9F7DCu + 0u) ^ 3u] = 0x00; rdram[(0x9F7DCu + 1u) ^ 3u] = 0x02;"
 

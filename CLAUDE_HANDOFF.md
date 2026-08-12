@@ -1056,6 +1056,11 @@ additional Pokemon to the initial rental roster through `game.toml` hooks.
 Verify the table relocation and the in-game roster behavior before treating it
 as complete. The source worktree's original changes were preserved.
 
+For fast Android iteration, the installed test build applied the equivalent
+logic directly to the preserved generated sources in `funcs_119.c` and
+`funcs_128.c`; this avoids regenerating the oversized full source tree. The
+`game.toml` hooks remain the canonical regeneration path.
+
 Also fixed along the way: `osSetIntMask_recomp` and `__osDisableInt_recomp` were
 empty and never set `v0`, so they returned whatever the previous call left there
 (`patches/librecomp-int-mask-return-value.patch` now tracks the mask per guest
