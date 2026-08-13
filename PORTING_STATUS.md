@@ -1,49 +1,44 @@
 # Porting status
 
-Last updated: 2026-08-06
-
-## Completed
-
-- Verified the supplied 64 MiB US ROM after converting its V64 byte order to
-  canonical Z64.
-- Confirmed MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`, matching
-  `pret/pokestadiumgs`.
-- Added `pret/pokestadiumgs` as the game-specific decompilation source.
-- Added a distinct Android ARM64 probe package,
-  `com.pokemonstadium2recomp.probe`.
-- Built `pokestadiumgs-us.elf` from a clean Unix-native decomp checkout on the
-  Mac Mini. The rebuilt ROM is byte-identical to the verified input.
-- Added an N64Recomp config for all 88 relocatable fragment sections.
-- Generated 33,529 functions with pinned engine revision
-  `2b949c5c3f1c41dd76023e7626a6302a4a262a8a`.
-- Built, installed, and launched the ARM64 probe on the AYN Thor. Logcat
-  confirmed the native JNI call returned success.
-- Kept ROMs, generated recompilation output, APKs, and machine-local Android
-  configuration out of version control.
+Last updated: 2026-08-13
 
 ## Current boundary
 
-The Android probe is not the game. The decompilation and first recompilation
-passes are complete, but a bootable port still requires game-specific engine
-and runtime work:
+The Stadium 2 recompilation has booted on the AYN Thor in earlier builds with
+working audio, Vulkan/Turnip rendering, input, and much better menu
+performance. The current build contains a source-side expanded Prime Cup
+rental roster, but it has not yet been installed and runtime-verified because
+the device was disconnected from ADB.
 
-1. Resolve the pinned engine diagnostics that currently emit runtime-abort
-   paths: the jump table at `0x800A5318`, `scd`, `movz`, the static entry at
-   `0x8416CA04`, and two failed analysis regions.
-2. Reduce or restructure the aggressive static-entry generation. The current
-   pass emits about 5.3 GiB across 1,451 generated files because interior
-   static entries duplicate large function bodies; compiling that output is
-   not a practical runtime baseline.
-3. Validate the fragment relocation-pair warnings rather than assuming the
-   generated addresses are safe.
-4. Port only reusable runtime/RT64/SDL Android changes from Pokemon Stadium 1;
-   do not copy its Stadium 1 symbol addresses, battle companion offsets, boot
-   patches, or generated code.
-5. Install and launch the resulting APK on a real device, then collect logcat
-   and frame evidence. APK installation alone is not renderer validation.
+## Completed
 
-## Verified build hosts
+- Verified the 64 MiB US ROM and canonical Z64 byte order.
+- Confirmed MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`.
+- Added the `pret/pokestadiumgs` decompilation source and generated metadata.
+- Generated the relocatable recompilation with the pinned engine revision in
+  `n64recomp.pin`.
+- Built and launched ARM64 Android versions on the AYN Thor.
+- Enabled the Android runtime path with audio and Turnip/Vulkan rendering.
+- Analyzed the supplied Mord rental BPS and confirmed it replaces records
+  rather than expanding the roster.
+- Added a source-side expansion that preserves all original records, appends
+  five special rentals to both Prime Cup tables, and fixes the shifted table
+  directory offsets.
+- Rebuilt the native library and assembled a debug APK from that change.
+- Kept ROMs, generated output, APKs, native libraries, logs, screenshots, and
+  local Android configuration out of version control.
 
-`pret/pokestadiumgs` rejects native Windows builds. The existing Mac Mini build
-host successfully ran the containerized decompilation and pinned N64Recomp
-passes. Windows successfully built the standalone Android ARM64 probe.
+## Immediate next step
+
+Reconnect the Thor, install the APK, and validate the rental selection screen.
+Check original rentals, all five added Pokémon, icons, audio, flicker, and
+frame-rate stability. The detailed command sequence and remote build paths are
+in [CLAUDE_HANDOFF.md](CLAUDE_HANDOFF.md).
+
+## Important implementation note
+
+The source helper lives in the sibling checkout
+`C:\Users\laptop\Documents\lg\PokemonStadiumRecomp\extras.c`; this repository
+contains the `game.toml` hook that calls it. That sibling checkout is dirty and
+must not be overwritten wholesale. The current remote source and generated
+function have backups ending in `.pre-gs-expansion`.

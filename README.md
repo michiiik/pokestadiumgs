@@ -4,9 +4,10 @@ Work-in-progress static recompilation of **Pokemon Stadium 2 (US)** for
 Android, using [N64Recomp](https://github.com/N64Recomp/N64Recomp) and the
 [pret/pokestadiumgs](https://github.com/pret/pokestadiumgs) decompilation.
 
-This repository currently establishes the verified Stadium 2 ROM/decomp base,
-a successful first N64Recomp generation pass, and an ARM64 Android build probe.
-It does not yet contain a bootable recompiled game runtime. See
+This repository establishes the verified Stadium 2 ROM/decomp base, the N64Recomp
+generation configuration, and the Android runtime path. Earlier builds booted
+on the AYN Thor; the current rental-roster build still needs device validation.
+See
 [PORTING_STATUS.md](PORTING_STATUS.md) for the exact boundary.
 
 ## ROM
@@ -35,6 +36,9 @@ The APK is written to:
 
 `android/app/build/outputs/apk/debug/app-debug.apk`
 
+The latest rental-roster build handoff is in
+[CLAUDE_HANDOFF.md](CLAUDE_HANDOFF.md).
+
 ## Decompilation
 
 The `disasm` submodule is `pret/pokestadiumgs`. Its build currently requires a
@@ -59,5 +63,5 @@ python tools\derive_recomp_metadata.py `
 The engine revision is recorded in `n64recomp.pin`. In the Mac Mini container,
 mount this repository at `/work`, the pinned engine build at `/n64recomp`, and
 run `tools/mac_generate_recomp.sh`. The first verified pass emitted 33,529
-functions. Its current engine/runtime blockers are recorded in
-`PORTING_STATUS.md`.
+functions. Current Android runtime and rental-roster status is recorded in
+`PORTING_STATUS.md` and `CLAUDE_HANDOFF.md`.

@@ -139,90 +139,13 @@ func = "func_80002210"
 before_vram = 0x80002210  # first instr of Memmap_RelocateFragment ⇒ entry hook
 text = "recomp_register_runtime_fragment(rdram, ctx->r4, ctx->r5);"
 
-# Make Mew and Celebi available in the initial rental roster. The Prime Cup
-# Round 1 rules record at 0x8009F7A0 selects rental table 1; table 2 is the
-# corresponding roster with Mew, Celebi, Mewtwo, Ho-Oh, and Lugia included.
-# RDRAM uses host XOR-3
-# byte order, so update the big-endian halfword at physical address 0x9F7DC.
-[[patches.hook]]
-func = "recomp_entrypoint"
-before_vram = 0x80000400
-text = "rdram[(0x9F7DCu + 0u) ^ 3u] = 0x00; rdram[(0x9F7DCu + 1u) ^ 3u] = 0x02;"
-
-# The roster is loaded synchronously through func_80006ACC. Once the full
-# roster DMA completes, expand the Prime Cup Round 2 table in RDRAM from 248
-# to 251 entries. The extra records are Mewtwo, Ho-Oh, and Lugia. There is
-# enough unused space at the end of the roster segment for the 0x40-byte
-# aligned expansion, so the following tables are shifted in memory and their
-# table offsets are adjusted without modifying the source ROM.
+# Expand both Prime Cup rental tables in the Stadium 2 source-side blob.
+# The helper preserves all original 246/248 records, appends five 0x18-byte
+# special-rental records to each table, and fixes the shared table offsets.
 [[patches.hook]]
 func = "func_80006ACC"
 before_vram = 0x80006B38
-text = """
-{
-    uint32_t stack = ctx->r29 & 0x1FFFFFFFu;
-    uint32_t dma_dst = ((uint32_t)rdram[(stack + 0x00u) ^ 3u] << 24) |
-                       ((uint32_t)rdram[(stack + 0x01u) ^ 3u] << 16) |
-                       ((uint32_t)rdram[(stack + 0x02u) ^ 3u] << 8) |
-                       (uint32_t)rdram[(stack + 0x03u) ^ 3u];
-    uint32_t dma_len = ((uint32_t)rdram[(stack + 0x08u) ^ 3u] << 24) |
-                       ((uint32_t)rdram[(stack + 0x09u) ^ 3u] << 16) |
-                       ((uint32_t)rdram[(stack + 0x0Au) ^ 3u] << 8) |
-                       (uint32_t)rdram[(stack + 0x0Bu) ^ 3u];
-
-    if (dma_dst == 0x802492B0u && dma_len >= 0xFE90u &&
-        rdram[(0x2492B0u + 0x23D0u) ^ 3u] == 0xF8u) {
-        const uint32_t roster = 0x2492B0u;
-        const uint32_t shift_start = 0x3B20u;
-        const uint32_t shift_end = 0xFE90u;
-        const uint32_t shift = 0x40u;
-
-        for (int32_t i = (int32_t)shift_end - 1; i >= (int32_t)shift_start; --i) {
-            rdram[(roster + (uint32_t)i + shift) ^ 3u] =
-                rdram[(roster + (uint32_t)i) ^ 3u];
-        }
-
-        rdram[(roster + 0x23D0u) ^ 3u] = 0xFBu;
-        rdram[(roster + 0x34u) ^ 3u] = 0x00u;
-        rdram[(roster + 0x35u) ^ 3u] = 0x00u;
-        rdram[(roster + 0x36u) ^ 3u] = 0x17u;
-        rdram[(roster + 0x37u) ^ 3u] = 0x90u;
-
-        const uint8_t added_rentals[3][24] = {
-            {0x64, 0x96, 0x00, 0x00, 0x5E, 0x09, 0xED, 0xDB, 0x00, 0x7F,
-             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-             0x00, 0x00, 0x00, 0x00},
-            {0x64, 0xFA, 0x00, 0x00, 0xDD, 0xD3, 0x59, 0xDB, 0x00, 0x7F,
-             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-             0x00, 0x00, 0x00, 0x00},
-            {0x64, 0xF9, 0x00, 0x00, 0xB1, 0x5E, 0x39, 0xDB, 0x00, 0x7F,
-             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-             0x00, 0x00, 0x00, 0x00}
-        };
-        const uint32_t added_start = roster + 0x23D0u + 0x04u + (248u * 24u);
-        for (uint32_t mon = 0; mon < 3u; ++mon) {
-            for (uint32_t byte = 0; byte < 24u; ++byte) {
-                rdram[(added_start + mon * 24u + byte) ^ 3u] = added_rentals[mon][byte];
-            }
-        }
-
-        for (uint32_t table = 3u; table < 72u; ++table) {
-            const uint32_t info = roster + 0x10u + table * 0x10u;
-            uint32_t offset = ((uint32_t)rdram[(info + 0x00u) ^ 3u] << 24) |
-                              ((uint32_t)rdram[(info + 0x01u) ^ 3u] << 16) |
-                              ((uint32_t)rdram[(info + 0x02u) ^ 3u] << 8) |
-                              (uint32_t)rdram[(info + 0x03u) ^ 3u];
-            if (offset >= shift_start) {
-                offset += shift;
-                rdram[(info + 0x00u) ^ 3u] = (uint8_t)(offset >> 24);
-                rdram[(info + 0x01u) ^ 3u] = (uint8_t)(offset >> 16);
-                rdram[(info + 0x02u) ^ 3u] = (uint8_t)(offset >> 8);
-                rdram[(info + 0x03u) ^ 3u] = (uint8_t)offset;
-            }
-        }
-    }
-}
-"""
+text = "pkmnstadium_expand_gs_rental_blob(rdram, ctx);"
 
 # ── CPU-decompressed dynamic fragment slot ────────────────────────────────
 #
