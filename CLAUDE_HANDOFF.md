@@ -4,14 +4,20 @@ Last updated: 2026-08-13
 
 ## Current state
 
-The game has previously booted on the AYN Thor with audio, Vulkan/Turnip, and
-substantially improved performance. The latest rental-roster build has been
-rebuilt and packaged, but has not yet been installed or runtime-tested because
-the Thor was disconnected from ADB. Do not treat the latest build as device
-validated until the rental screen has been checked.
+The current known-good Stadium 2 fallback has been installed and validated on
+the AYN Thor. It uses package `com.pokemonstadium2recomp`, has working audio,
+active Mesa Turnip Vulkan, and good menu rendering/performance. The preserved
+APK and restore instructions are in
+[`fallback/README.md`](fallback/README.md).
 
-The working tree is intentionally limited to the source configuration change.
-The generated native library and APK are ignored build artifacts.
+The fallback is the non-rental-expansion build. Treat it as the recovery point
+before testing further source or generated-code changes. Its APK includes the
+Turnip interception companions alongside `libmain.so`; packaging only
+`libmain.so` causes the device to fall back to the system Adreno driver.
+
+The generated native library and APK are ignored build artifacts. The fallback
+APK is intentionally retained locally rather than committed as a large binary;
+the tracked handoff records its exact checksum and restore procedure.
 
 ## Rental-roster investigation
 
