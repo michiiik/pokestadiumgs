@@ -1,8 +1,8 @@
 param(
-    [string]$AndroidSdk = "C:\projects\ddd-dl\.android-sdk",
-    [string]$AndroidNdk = "C:\tmp\psr-android-deps\ndk\android-ndk-r27c",
-    [string]$JavaHome = "C:\Users\laptop\.jdks\ms-17.0.17",
-    [string]$Gradle = "C:\Users\laptop\.gradle\wrapper\dists\gradle-8.9-bin\90cnw93cvbtalezasaz0blq0a\gradle-8.9\bin\gradle.bat"
+    [string]$AndroidSdk = "C:\Users\Michael\AppData\Local\Android\Sdk",
+    [string]$AndroidNdk = "C:\Users\Michael\AppData\Local\Android\Sdk\ndk\27.2.12479018",
+    [string]$JavaHome = "C:\Program Files\Java\jdk-17.0.2",
+    [string]$Gradle = "C:\Users\Michael\.gradle\wrapper\dists\gradle-8.9-bin\90cnw93cvbtalezasaz0blq0a\gradle-8.9\bin\gradle.bat"
 )
 
 $requiredPaths = @($AndroidSdk, $AndroidNdk, $JavaHome, $Gradle)

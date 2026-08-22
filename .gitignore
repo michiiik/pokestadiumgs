@@ -28,3 +28,7 @@ screenshots/
 # IDE files
 .idea/
 *.iml
+
+# Local debug/dev artifacts (screenshots, signed APKs, RAM dumps, staged APK contents)
+artifacts/
+$stage/

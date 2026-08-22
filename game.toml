@@ -137,7 +137,26 @@ force_function_vrams = [0x80021A2C]
 [[patches.hook]]
 func = "func_80002210"
 before_vram = 0x80002210  # first instr of Memmap_RelocateFragment ⇒ entry hook
-text = "recomp_register_runtime_fragment(rdram, ctx->r4, ctx->r5);"
+text = "{ ctx->fragment_runtime_base = (uint32_t)ctx->r5; recomp_register_runtime_fragment(rdram, ctx->r4, ctx->r5); }"
+
+[[patches.hook]]
+func = "func_80002210"
+before_vram = 0x80002468  # jr $ra after the relocation walk
+text = "ctx->fragment_runtime_base = 0;"
+
+# Stadium 2's fragment-vaddr resolver is func_800024A0. Its native table has
+# one pointer per fragment id, but the recompiler can keep multiple pattern
+# variants resident at once. Save the lookup literal at entry and resolve it
+# against the active fragment instance at the resolver's return point.
+[[patches.hook]]
+func = "func_800024A0"
+before_vram = 0x800024A0
+text = "librecomp_fragment_input_push((uint32_t)ctx->r4);"
+
+[[patches.hook]]
+func = "func_800024A0"
+before_vram = 0x800024FC
+text = "ctx->r4 = librecomp_fragment_resolve_exit((uint32_t)ctx->r4, (uint32_t)ctx->fragment_runtime_base);"
 
 # Expand both Prime Cup rental tables in the Stadium 2 source-side blob.
 # The helper preserves all original 246/248 records, appends five 0x18-byte
@@ -145,7 +164,99 @@ text = "recomp_register_runtime_fragment(rdram, ctx->r4, ctx->r5);"
 [[patches.hook]]
 func = "func_80006ACC"
 before_vram = 0x80006B38
-text = "pkmnstadium_expand_gs_rental_blob(rdram, ctx);"
+text = """
+{
+    const uint32_t base = 0x2492B0u;
+    const uint32_t table1 = base + 0xCB0u;
+    const uint32_t table2 = base + 0x23D0u;
+    const uint32_t table3 = base + 0x3B20u;
+    const uint32_t tail_end = base + 0xFE90u;
+    const uint32_t record_size = 0x18u;
+    const uint32_t shift = 5u * record_size;
+    const uint8_t added[5][24] = {
+        {0x64, 0x96, 0x00, 0x00, 0x5E, 0xDB, 0x42, 0x55, 0x00, 0x7F,
+         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+         0x00, 0x00, 0x00, 0x00},
+        {0x64, 0x97, 0x00, 0x00, 0x5E, 0xF6, 0x76, 0x94, 0x00, 0x7F,
+         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+         0x00, 0x00, 0x00, 0x00},
+        {0x64, 0xF9, 0x00, 0x00, 0x5E, 0xDB, 0x59, 0xB1, 0x00, 0x7F,
+         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+         0x00, 0x00, 0x00, 0x00},
+        {0x64, 0xFA, 0x00, 0x00, 0x57, 0xCA, 0x59, 0xDD, 0x00, 0x7F,
+         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+         0x00, 0x00, 0x00, 0x00},
+        {0x64, 0xFB, 0x00, 0x00, 0xCA, 0xF6, 0xF8, 0xD7, 0x00, 0x7F,
+         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+         0x00, 0x00, 0x00, 0x00}
+    };
+
+    if (rdram[table1 ^ 3u] == 246u && rdram[table2 ^ 3u] == 248u) {
+        uint32_t i;
+        for (i = tail_end; i != table2; ) {
+            --i;
+            rdram[(i + shift) ^ 3u] = rdram[i ^ 3u];
+        }
+
+        for (i = 0; i < shift; ++i) {
+            rdram[(table1 + 4u + 246u * record_size + i) ^ 3u] =
+                added[i / record_size][i % record_size];
+        }
+        rdram[table1 ^ 3u] = 251u;
+
+        {
+            const uint32_t table2_shifted = table2 + shift;
+            const uint32_t table3_shifted = table3 + shift;
+            const uint32_t table2_end = table2_shifted + 4u +
+                248u * record_size;
+
+            for (i = tail_end + shift; i != table3_shifted; ) {
+                --i;
+                rdram[(i + shift) ^ 3u] = rdram[i ^ 3u];
+            }
+            for (i = 0; i < shift; ++i) {
+                rdram[(table2_end + i) ^ 3u] =
+                    added[i / record_size][i % record_size];
+            }
+            for (i = 0; i < 5u; ++i) {
+                uint32_t j;
+                for (j = 0; j < record_size; ++j) {
+                    rdram[(table1 + 4u + 246u * record_size +
+                           i * record_size + j) ^ 3u] = added[i][j];
+                    rdram[(table2_shifted + 4u + 248u * record_size +
+                           i * record_size + j) ^ 3u] = added[i][j];
+                }
+            }
+            rdram[table2_shifted ^ 3u] = 253u;
+        }
+
+        for (i = 2u; i < 72u; ++i) {
+            const uint32_t info = base + 0x10u + i * 0x10u;
+            uint32_t value = ((uint32_t)rdram[(info + 0u) ^ 3u] << 24) |
+                             ((uint32_t)rdram[(info + 1u) ^ 3u] << 16) |
+                             ((uint32_t)rdram[(info + 2u) ^ 3u] << 8) |
+                             (uint32_t)rdram[(info + 3u) ^ 3u];
+            value += shift;
+            rdram[(info + 0u) ^ 3u] = (uint8_t)(value >> 24);
+            rdram[(info + 1u) ^ 3u] = (uint8_t)(value >> 16);
+            rdram[(info + 2u) ^ 3u] = (uint8_t)(value >> 8);
+            rdram[(info + 3u) ^ 3u] = (uint8_t)value;
+        }
+        for (i = 3u; i < 72u; ++i) {
+            const uint32_t info = base + 0x10u + i * 0x10u;
+            uint32_t value = ((uint32_t)rdram[(info + 0u) ^ 3u] << 24) |
+                             ((uint32_t)rdram[(info + 1u) ^ 3u] << 16) |
+                             ((uint32_t)rdram[(info + 2u) ^ 3u] << 8) |
+                             (uint32_t)rdram[(info + 3u) ^ 3u];
+            value += shift;
+            rdram[(info + 0u) ^ 3u] = (uint8_t)(value >> 24);
+            rdram[(info + 1u) ^ 3u] = (uint8_t)(value >> 16);
+            rdram[(info + 2u) ^ 3u] = (uint8_t)(value >> 8);
+            rdram[(info + 3u) ^ 3u] = (uint8_t)value;
+        }
+    }
+}
+"""
 
 # ── CPU-decompressed dynamic fragment slot ────────────────────────────────
 #
