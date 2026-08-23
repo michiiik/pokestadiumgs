@@ -42,15 +42,15 @@ void func_84200614(u8 *arg0) {}
 
 void func_8420061C(u8 *arg0) {}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_4194A0/func_84200624.s")
+void func_84200624(u8 *arg0) { u32 value = func_842034A0(); *(u8 **)(arg0 + 0x10) += (*(u8 **)(arg0 + 0x14))[0x26] * value; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_4194A0/func_84200664.s")
+void func_84200664(u8 *arg0) { u32 value = func_842034A0(); *(u8 **)(arg0 + 0x10) += (*(u8 **)(arg0 + 0x14))[0x27] * value; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_4194A0/func_842006A4.s")
 
 void func_84200710(u8 *arg0) {}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_4194A0/func_84200718.s")
+void func_84200718(u8 *arg0) { u32 value = func_842034A0(); *(u8 **)(arg0 + 0x10) += (*(u8 **)(arg0 + 0x14))[0x28] * value; }
 
 void func_84200758(u8 *arg0) {}
 
@@ -61,7 +61,7 @@ s32 func_84200768(u8 *arg0) {
     return func_84200038(*(u8 **)(arg0 + 0x1C), 0x16);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_4194A0/func_8420078C.s")
+void func_8420078C(u8 *arg0) { u32 value = func_842034A0(); *(u8 **)(arg0 + 0x10) += (*(u8 **)(arg0 + 0x14))[0x29] * value; }
 
 void func_842007CC(u8 *arg0) {}
 
