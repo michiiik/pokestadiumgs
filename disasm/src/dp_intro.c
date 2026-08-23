@@ -40,7 +40,7 @@ void func_80001CD4(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_80001CDC.s")
+void func_80001CDC(void) { func_80001CB0(); }
 #endif
 
 #ifdef VERSION_US
