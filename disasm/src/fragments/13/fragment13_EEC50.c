@@ -70,7 +70,10 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_824043D8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82404430.s")
+s32 func_82404430(u8 *arg0) {
+    *(f32 *)(arg0 + 0x1C) = 0.0f;
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82404440.s")
 
