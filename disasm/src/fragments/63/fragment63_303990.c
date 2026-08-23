@@ -2,7 +2,10 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_303990/func_87E00020.s")
+extern u8 *D_87E1BA20;
+void func_87E00020(void) {
+    *(s32 *)(D_87E1BA20 + 0x2E04) = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_303990/func_87E00030.s")
 
