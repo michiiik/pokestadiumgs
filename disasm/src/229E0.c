@@ -1928,7 +1928,7 @@ void func_8003EAEC(u8 *arg0) { *(s16 *)(arg0 + 0x40) = -1; *(s32 *)(arg0 + 0x44)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003EB84.s")
+void func_8003EB84(u8 *arg0, s16 value) { *(s32 *)(arg0 + 0x48) = ((s32)value << 16) - *(s32 *)(arg0 + 0x4C); }
 #endif
 
 #ifdef VERSION_US
