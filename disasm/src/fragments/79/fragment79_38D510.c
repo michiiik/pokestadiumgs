@@ -76,7 +76,9 @@ s32 func_8411EE6C(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411EE74.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411EF08.s")
+void func_8411EF08(u8 *arg0) {
+    arg0[1] |= 1;
+}
 
 void func_8411EF18(u8 *arg0) {
     *(s16 *)(arg0 + 0x18) = 0;
