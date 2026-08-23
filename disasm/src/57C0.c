@@ -2,7 +2,13 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_80004BC0.s")
+extern void osWritebackDCacheAll(void);
+
+void func_80004BC0(u8 *arg0) {
+    osWritebackDCacheAll();
+    *(u16 *)(arg0 + 0x1C) = 0;
+    *(u16 *)(arg0 + 0x1E) = 0;
+}
 #endif
 
 #ifdef VERSION_US
