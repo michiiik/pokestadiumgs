@@ -310,7 +310,72 @@ s32 func_80051A8C(s32 type, s32 record, s32 mask) {
     return data != NULL ? ((*(u8 *)data & mask) != 0) : 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051BF0.s")
+/**
+ * Set bits in the header byte of a typed save record.
+ *
+ * The record type is the same 0x10..0x1E selector used by the typed address
+ * accessors above.  Type 0x10 additionally uses the current save slot and
+ * the caller-provided record index; all other types use the record argument
+ * only where their accessor requires it.
+ */
+s32 func_80051BF0(s32 type, s32 record, s32 mask) {
+    u8 *data = NULL;
+
+    switch (type) {
+        case 0x10:
+            data = func_80050E88(0, D_800972C0, record);
+            break;
+        case 0x11:
+            data = func_80050F60(0, record);
+            break;
+        case 0x12:
+            data = func_80051028(0, record);
+            break;
+        case 0x13:
+            data = func_800510CC(0);
+            break;
+        case 0x14:
+            data = func_80051138(0);
+            break;
+        case 0x15:
+            data = func_800511A4(0);
+            break;
+        case 0x16:
+            data = func_80051208(0);
+            break;
+        case 0x17:
+            data = func_80051274(0);
+            break;
+        case 0x18:
+            data = func_800512E0(0);
+            break;
+        case 0x19:
+            data = func_8005134C(0);
+            break;
+        case 0x1A:
+            data = func_800513B8(0);
+            break;
+        case 0x1B:
+            data = func_80051424(0);
+            break;
+        case 0x1C:
+            data = func_80051490(0);
+            break;
+        case 0x1D:
+            data = func_800514FC(0);
+            break;
+        case 0x1E:
+            data = func_80051568(0);
+            break;
+    }
+
+    if (data == NULL) {
+        return 0;
+    }
+
+    *data |= (u8)mask;
+    return 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051D64.s")
 
