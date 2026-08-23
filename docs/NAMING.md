@@ -184,6 +184,14 @@ its body maps those ids through the audio state tables and updates command
 flags. The mixer/task internals below that dispatcher remain separate audit
 targets.
 
+The lifecycle edges are now named as well: `Audio_StopProcessing` is called by
+both the scheduler pre-NMI path and `Game_ShutdownAndLoadFragment`, invokes the
+audio stop primitive, and clears the Thread4 processing flag;
+`Audio_WaitForPendingTasks` is called by the state-4 shutdown path and polls the
+completion primitive until the pending audio work drains. These names describe
+control-flow roles only; they do not claim ownership of the lower-level RSP
+mixer implementation.
+
 ## Phase 3.6: remaining dispatch-table boundaries
 
 The dispatch-table survey was rerun after the subsystem slices. The two largest

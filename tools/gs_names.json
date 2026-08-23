@@ -66,6 +66,14 @@
    "Audio_DispatchCommand",
    "resident audio command dispatcher: maps request ids through the audio state tables, updates command flags, and is the consumer called by Audio_RequestEvent"
   ],
+  "func_800353BC": [
+   "Audio_StopProcessing",
+   "called from pre-NMI and fragment-shutdown paths; stops the resident audio service and clears the Thread4 processing flag"
+  ],
+  "func_800353E4": [
+   "Audio_WaitForPendingTasks",
+   "polls the scheduler completion primitive until no audio tasks remain and returns the number of completions observed; called by the state-4 shutdown path"
+  ],
   "func_83503918": [
    "fragment1_main",
    "fragment 1 entry: target of the J at offset 0 of the fragment header trampoline (rom 0xa8a80, vram 0x83500000)"

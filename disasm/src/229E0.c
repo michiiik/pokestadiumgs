@@ -988,11 +988,11 @@ void func_80033ED0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800353BC.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Audio_StopProcessing.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800353E4.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Audio_WaitForPendingTasks.s")
 #endif
 
 #ifdef VERSION_US
