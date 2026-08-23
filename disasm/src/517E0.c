@@ -11,6 +11,7 @@ typedef struct SaveRecordEntry {
 extern SaveRecordEntry D_801281C0[];
 extern u8 *D_801281C4[];
 extern u8 *D_801281C8[];
+extern s32 D_800972C0;
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80050BE0.s")
 
@@ -206,15 +207,108 @@ void Save_ClearRecord(u8 *data, s32 length, s32 index) {
     D_801281C0[index].flags |= 2;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051830.s")
+void func_80051830(void *arg) {
+    func_80061248(arg);
+    func_800619E8(arg);
+    *(u16 *)((u8 *)arg + 0x26) = *(u16 *)((u8 *)arg + 0x28);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051864.s")
+void func_80051864(void *arg, void *data) {
+    func_800615D0(data);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051890.s")
+void func_80051890(void *arg, u8 *src) {
+    u8 *dst = arg;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800519AC.s")
+    bzero(dst, 0x44);
+    dst[0x36] = src[0];
+    dst[0x37] = src[1];
+    *(u16 *)(dst + 0x38) = *(u16 *)(src + 2);
+    *(s16 *)(dst + 0x3A) = 0x17;
+    *(s16 *)(dst + 0x3C) = -1;
+    *(s16 *)(dst + 0x3E) = -1;
+    dst[0x40] = (dst[0x40] & 0x7F) | (((s8)src[4] << 7) & 0x80);
+    dst[0x40] = (dst[0x40] & 0xBF) | (((s8)src[5] << 6) & 0x40);
+    dst[0x40] = (dst[0x40] & 0xDF) | (((s8)src[6] << 5) & 0x20);
+    dst[0x40] = (dst[0x40] & 0xEF) | (((s8)src[7] << 4) & 0x10);
+    dst[0x40] = (dst[0x40] & 0xF7) | (((s8)src[8] << 3) & 8);
+    dst[0x40] = (dst[0x40] & 0xFB) | (((s8)src[9] << 2) & 4);
+    *(s16 *)(dst + 0x34) = (s8)src[0xB];
+    bcopy(src + 0x14, dst + 0x14, 0x20);
+    bcopy(src + 0x34, dst, 0x14);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051A8C.s")
+void func_800519AC(u8 *src, void *arg) {
+    u8 *dst = arg;
+
+    bzero(dst, 0x48);
+    dst[0] = src[0x36];
+    dst[1] = src[0x37];
+    *(u16 *)(dst + 2) = *(u16 *)(src + 0x38);
+    dst[4] = (src[0x40] >> 7) & 1;
+    dst[5] = (src[0x40] >> 6) & 1;
+    dst[6] = (src[0x40] >> 5) & 1;
+    dst[7] = (src[0x40] >> 4) & 1;
+    dst[8] = (src[0x40] >> 3) & 1;
+    dst[9] = (src[0x40] >> 2) & 1;
+    dst[0xB] = src[0x34];
+    bcopy(src + 0x14, dst + 0x14, 0x20);
+    bcopy(src, dst + 0x34, 0x14);
+}
+
+s32 func_80051A8C(s32 type, s32 record, s32 mask) {
+    u8 *data = NULL;
+
+    switch (type) {
+        case 0x10:
+            data = func_80050E88(0, D_800972C0, record);
+            break;
+        case 0x11:
+            data = func_80050F60(0, record);
+            break;
+        case 0x12:
+            data = func_80051028(0, record);
+            break;
+        case 0x13:
+            data = func_800510CC(0);
+            break;
+        case 0x14:
+            data = func_80051138(0);
+            break;
+        case 0x15:
+            data = func_800511A4(0);
+            break;
+        case 0x16:
+            data = func_80051208(0);
+            break;
+        case 0x17:
+            data = func_80051274(0);
+            break;
+        case 0x18:
+            data = func_800512E0(0);
+            break;
+        case 0x19:
+            data = func_8005134C(0);
+            break;
+        case 0x1A:
+            data = func_800513B8(0);
+            break;
+        case 0x1B:
+            data = func_80051424(0);
+            break;
+        case 0x1C:
+            data = func_80051490(0);
+            break;
+        case 0x1D:
+            data = func_800514FC(0);
+            break;
+        case 0x1E:
+            data = func_80051568(0);
+            break;
+    }
+
+    return data != NULL ? ((*(u8 *)data & mask) != 0) : 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051BF0.s")
 

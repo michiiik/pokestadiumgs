@@ -201,17 +201,23 @@ s32 func_80023A10(s32 group, s32 index) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025C50.s")
 #endif
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025C9C.s")
-#endif
+/* Audio task-control wrappers.  The US bodies are single tail-preserving
+ * calls at 0x80025C9C and 0x80025D44; keeping the return values exposes the
+ * completion predicates used by Audio_StopProcessing/Audio_WaitForPendingTasks. */
+extern s32 func_80018C14(void);
+extern s32 func_80019378(void);
+
+s32 func_80025C9C(void) {
+    return func_80018C14();
+}
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025CBC.s")
 #endif
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025D44.s")
-#endif
+s32 func_80025D44(void) {
+    return func_80019378();
+}
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025D64.s")
@@ -233,17 +239,29 @@ s32 func_80023A10(s32 group, s32 index) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025F84.s")
 #endif
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002602C.s")
-#endif
+extern u8 D_80090B8C;
+extern u32 osSetIntMask(u32 mask);
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80026068.s")
-#endif
+void func_8002602C(void) {
+    u32 old_mask;
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80026098.s")
-#endif
+    func_80018728(0x83030000, 0);
+    old_mask = osSetIntMask(1);
+    D_80090B8C = 0;
+    osSetIntMask(old_mask);
+}
+
+void func_80026068(s32 command) {
+    if (command != 0 && (u32)command < 0xFC) {
+        func_80034E5C((command - 1) & 0xFFFF);
+    }
+}
+
+extern void func_80034F30(void);
+
+void func_80026098(void) {
+    func_80034F30();
+}
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800260C0.s")
@@ -1821,7 +1839,11 @@ s32 Audio_RequestEvent(s32 eventId) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_ResetCurveContext.s")
+extern s32 D_801263E0;
+
+void ModelAnim_ResetCurveContext(void) {
+    D_801263E0 = -1;
+}
 #endif
 
 #ifdef VERSION_US
@@ -1829,7 +1851,11 @@ s32 Audio_RequestEvent(s32 eventId) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_EndCurveContext.s")
+void ModelAnim_EndCurveContext(void) {
+    if (D_801263E0 >= 0) {
+        D_801263E0--;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1837,7 +1863,10 @@ s32 Audio_RequestEvent(s32 eventId) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_ClearTransformChannel.s")
+void ModelAnim_ClearTransformChannel(void *anim) {
+    *(s16 *)((u8 *)anim + 0x40) = -1;
+    *(void **)((u8 *)anim + 0x44) = NULL;
+}
 #endif
 
 #ifdef VERSION_US
