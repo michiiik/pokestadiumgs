@@ -10,7 +10,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/9E00/func_8000948C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/9E00/func_80009750.s")
+extern void *memcpy(void *, const void *, s32); void *func_80009750(void *dest, const void *src, s32 size) { return (u8 *)memcpy(dest, src, size) + size; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/9E00/func_80009774.s")
 

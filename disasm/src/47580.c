@@ -40,7 +40,7 @@ void func_80046F2C(u8 *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047158.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800471B4.s")
+extern void *memcpy(void *, const void *, s32); void *func_800471B4(void *dest, const void *src, s32 size) { return (u8 *)memcpy(dest, src, size) + size; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800471D8.s")
 

@@ -78,7 +78,7 @@ void func_8004D40C(s32 arg0) {
     D_80128082 = (s16)arg0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D418.s")
+extern void *memcpy(void *, const void *, s32); void *func_8004D418(void *dest, const void *src, s32 size) { return (u8 *)memcpy(dest, src, size) + size; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D43C.s")
 
