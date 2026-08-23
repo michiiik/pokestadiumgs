@@ -36,7 +36,18 @@ void func_81303230(u8 *arg0) {
 
 void func_81303240(u8 *arg0) {}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FAD40/func_81303248.s")
+extern s32 func_8160A920(void);
+extern s32 func_8130A708(u8 *arg0);
+extern void func_8160B9A0(u8 *arg0, s32 arg1, s32 arg2);
+void func_81303248(u8 *arg0) {
+    s32 value = func_8160A920();
+    if (func_8130A708(*(u8 **)(arg0 + 0x4DA0) + 0xDA8)) {
+        s32 valid = func_81302BB0(arg0);
+        func_8160B9A0(arg0, value, valid);
+        arg0[0x4DBD] = 0xD;
+        *(s32 *)(arg0 + 0x4DAC) = 1;
+    }
+}
 
 extern void func_81303248(u8 *arg0);
 void func_813032B0(u8 *arg0) {
