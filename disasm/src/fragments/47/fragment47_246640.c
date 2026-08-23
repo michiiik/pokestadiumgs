@@ -191,7 +191,7 @@ void func_86001A58(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_246640/func_86003754.s")
+void func_86003754(u8 *arg0) {}
 #endif
 
 #ifdef VERSION_US
