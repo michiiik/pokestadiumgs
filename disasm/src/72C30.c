@@ -259,7 +259,40 @@ void Minigame_AdvanceResultHandshake(s32 callbackResult, s32 *outResult,
     *outResult = -1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/Minigame_UpdateResultState.s")
+void Minigame_UpdateResultState(u8 *state) {
+    u8 *result = D_8012B3E8;
+    s32 resultState;
+
+    switch (*(s32 *)(state + 0x2184)) {
+    case 3:
+    case 5:
+        *(s16 *)result = 6;
+        resultState = *(s32 *)(state + 0x2200);
+        break;
+    case 4:
+        *(s16 *)result = 4;
+        resultState = *(s32 *)(state + 0x2204);
+        Minigame_MapControllerButtons(state, result);
+        break;
+    default:
+        *(s16 *)result = 6;
+        resultState = *(s32 *)(state + 0x2200);
+        break;
+    }
+
+    switch (resultState) {
+    case 0:
+        result[2] = 1;
+        break;
+    case 1:
+        result[2] = 2;
+        break;
+    case 2:
+    case 3:
+        result[2] = 3;
+        break;
+    }
+}
 
 void Minigame_ProcessInput(void) {
     void (*handler)(void *);
