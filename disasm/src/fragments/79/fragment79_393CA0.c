@@ -786,15 +786,15 @@ void func_8412DC08(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412F5A4.s")
+void func_8412F5A4(void) { func_8412F49C(); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412F5C4.s")
+void func_8412F5C4(void) { func_8412F49C(); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412F5E4.s")
+void func_8412F5E4(void) { func_8412F49C(); }
 #endif
 
 #ifdef VERSION_US
