@@ -197,6 +197,17 @@ with both boolean values, and `Audio_ThreadEntry` reads the same flag before
 submitting work. The name is intentionally limited to the flag transition;
 the event IDs and mixer command meanings remain separate.
 
+## Phase 3.8: fragment-79 species dispatch handlers
+
+The 253-entry table at `0x84183D50` is now resolved at the handler level. It
+contains one repeated default target plus 99 non-default targets; those targets
+are named `BattleAnim_Dispatch_NNN` from their table slots, with repeated slots
+recorded in each entry's evidence. This is deliberately a positional naming
+batch: the table cardinality and slot selection establish a per-species-style
+dispatch surface, but do not by themselves prove the semantic animation for a
+handler. The neighboring 225-entry table remains unassigned pending the same
+cross-check.
+
 ## Phase 3.6: remaining dispatch-table boundaries
 
 The dispatch-table survey was rerun after the subsystem slices. The two largest
