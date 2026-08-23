@@ -86,7 +86,7 @@ void func_80015570(s32 a0, s32 a1, s32 a2, s32 a3) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80015684.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80015A10.s")
+void func_80015A10(s32 arg0) { func_80016148(arg0); func_80017070(arg0); func_80016624(arg0); }
 
 extern s32 D_8008FA70; void func_80015A40(s32 value) { D_8008FA70 = value; }
 
@@ -191,7 +191,7 @@ void func_80018810(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80018A10.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80018A74.s")
+void func_80018A74(void) { func_8001480C(); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80018A94.s")
 
