@@ -2099,7 +2099,7 @@ void func_8003F84C(u8 *arg0, u32 value1, u32 value2) { arg0[4] |= 0x80; *(u32 *)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003F864.s")
+void func_8003F864(u8 *arg0) { arg0[4] = (u8)(arg0[4] & ~0x10); }
 #endif
 
 #ifdef VERSION_US
