@@ -173,6 +173,15 @@ Tower poll mask. The unresolved `Minigame` callback at `func_80072030` is left
 address-named because its three-argument fragment callback still needs a
 caller-level semantic cross-check.
 
+The supporting record helpers are covered as well: `Minigame_ResetPlayerRecord`
+clears one embedded player record, `Minigame_ResetPlayerSubstate` initializes
+its four-word substate, `Minigame_SetPlayerMask` writes the active-player bit,
+and `Minigame_MapControllerButtons` translates the four controller bits into
+the destination input flags. `Minigame_ProcessPlayerEvents` is the wrapper for
+the fragment callback that scans the four player records and their 18 event
+slots. These names remain structural and data-flow based; they do not assign
+individual minigame titles to the records.
+
 ## Phase 3.5: GB-save format and checksum helpers
 
 The save/Controller Pak pass adds two names in the GB-save translation unit.

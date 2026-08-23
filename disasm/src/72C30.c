@@ -2,21 +2,21 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_80072030.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/Minigame_ProcessPlayerEvents.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/Minigame_UpdateControllerState.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_800720A8.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/Minigame_ResetPlayerRecord.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_8007214C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/Minigame_SetPlayerMask.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_8007216C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/Minigame_ResetPlayerSubstate.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/Minigame_StateInit.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/Minigame_SetModeDefaults.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_800721EC.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/Minigame_MapControllerButtons.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_80072264.s")
 

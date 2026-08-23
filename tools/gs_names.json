@@ -25,7 +25,27 @@
   "Thread4_CreateThread": "matches Stadium 1 Audio_StartThread (normalised). Same situation: if S1 is right that thread 4 is the audio thread, this is worth renaming once corroborated from the thread's entry point.",
   "Vi_SelectMode": "matches Stadium 1 Video_SetMode (callgraph). Same function, two spellings of the same idea. Upstream name kept."
  },
- "functions": {
+  "functions": {
+  "func_80072030": [
+   "Minigame_ProcessPlayerEvents",
+   "Game_State10_Minigame calls this for the active input branch; its fragment callback scans four player records and processes 18 per-player event slots"
+  ],
+  "func_800720A8": [
+   "Minigame_ResetPlayerRecord",
+   "Minigame_StateInit calls this on each embedded player record; the body resets record flags, counters, pointers, and status fields"
+  ],
+  "func_8007214C": [
+   "Minigame_SetPlayerMask",
+   "The helper converts a signed player index into a single-bit mask and stores it in D_8012B3F6, which the minigame state uses for player selection"
+  ],
+  "func_8007216C": [
+   "Minigame_ResetPlayerSubstate",
+   "Minigame_StateInit calls this on the per-player substate block; the body clears its first two words and sets the two active flags"
+  ],
+  "func_800721EC": [
+   "Minigame_MapControllerButtons",
+   "The helper maps the four low bits of D_801291E0+0x2182 into the destination input flags at offset 0x0E"
+  ],
   "func_80072070": [
    "Minigame_UpdateControllerState",
    "Game_State10_Minigame calls this every loop with the minigame state and a controller slot byte; its resolved fragment callback normalizes controller input and updates per-pad state"
