@@ -42,15 +42,15 @@ extern s32 D_80097120; s32 func_8004C4A4(void) { return D_80097120; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C990.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004CA10.s")
+u16 func_8004CA10(u16 *arg0) { u16 value = 0; if (arg0 != NULL) { value = *arg0; } return value; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004CA24.s")
+u16 func_8004CA24(u16 *arg0) { u16 value = 0; if (arg0 != NULL) { value = arg0[1]; } return value; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004CA38.s")
+s32 func_8004CA38(u8 *arg0) { s32 value = -1; if (arg0 != NULL) { value = arg0[4]; } return value; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004CA4C.s")
+s32 func_8004CA4C(u8 *arg0) { s32 value = -1; if (arg0 != NULL) { value = arg0[5]; } return value; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004CA60.s")
+u8 *func_8004CA60(u8 *arg0) { u8 *value = NULL; if (arg0 != NULL) { value = arg0 + 8; } return value; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004CA74.s")
 
