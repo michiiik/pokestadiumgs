@@ -173,6 +173,17 @@ embedded names against seven resident format strings, and returns the matching
 format index. The lower-level Pak presence and port-availability functions
 were already transferred and remain separately named.
 
+## Phase 3.7: audio thread and command dispatcher
+
+`Thread4_CreateThread` passes `func_80035174` directly to `osCreateThread`; its
+body initializes a scheduler client, creates the completion queues, and loops
+on `Sched_WaitClientQueue` before submitting audio tasks. It is therefore named
+`Audio_ThreadEntry`. The resident `0x80021ED8` function is named
+`Audio_DispatchCommand`: `Audio_RequestEvent` calls it for changed ids, while
+its body maps those ids through the audio state tables and updates command
+flags. The mixer/task internals below that dispatcher remain separate audit
+targets.
+
 ## Phase 3.6: remaining dispatch-table boundaries
 
 The dispatch-table survey was rerun after the subsystem slices. The two largest
