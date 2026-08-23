@@ -608,7 +608,7 @@ void func_8002809C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800331B8.s")
+extern u8 D_800D2B41; void func_800331B8(void) { D_800D2B41 = 1; }
 #endif
 
 #ifdef VERSION_US
