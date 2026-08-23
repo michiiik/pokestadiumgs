@@ -16,6 +16,9 @@
 #define D_8012B410 ((u8 *)0x8012B410)
 
 #ifdef VERSION_US
+extern s32 func_80073638(const u8 *input, u8 *output, s32 maxGlyphs);
+extern void _bzero(void *dst, s32 size);
+
 u8 func_80073420(s32 code) {
     u8 index = (u8)code;
     if (index == 0 || index >= 0xFE) {
@@ -110,7 +113,61 @@ u8 func_80073600(s32 code) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/74020/func_80073638.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/74020/func_80073828.s")
+/* Compare two packed text strings after expanding their glyph pairs. */
+s32 func_80073828(const u8 *left, const u8 *right) {
+    u8 leftExpanded[0x100];
+    u8 rightExpanded[0x100];
+    s32 count = 0;
+    s32 i;
+
+    _bzero(leftExpanded, sizeof(leftExpanded));
+    func_80073638(left, leftExpanded, 0x80);
+    _bzero(rightExpanded, sizeof(rightExpanded));
+    func_80073638(right, rightExpanded, 0x80);
+
+    while (count < 0x80 && leftExpanded[count * 2] != 0) {
+        u8 leftGlyph = leftExpanded[count * 2];
+        u8 rightGlyph = rightExpanded[count * 2];
+
+        if (rightGlyph < leftGlyph) {
+            return 1;
+        }
+        if (leftGlyph < rightGlyph) {
+            return -1;
+        }
+        count++;
+    }
+
+    if (count < 0x80 && rightExpanded[count * 2] != 0) {
+        return 1;
+    }
+
+    for (i = 0; i < count; i++) {
+        u8 leftAttr = leftExpanded[i * 2 + 1];
+        u8 rightAttr = rightExpanded[i * 2 + 1];
+        u8 leftWidth = leftAttr >> 1;
+        u8 rightWidth = rightAttr >> 1;
+
+        if (rightWidth < leftWidth) {
+            return 1;
+        }
+        if (leftWidth < rightWidth) {
+            return -1;
+        }
+    }
+    for (i = 0; i < count; i++) {
+        u8 leftFlag = leftExpanded[i * 2 + 1] & 1;
+        u8 rightFlag = rightExpanded[i * 2 + 1] & 1;
+
+        if (rightFlag < leftFlag) {
+            return 1;
+        }
+        if (leftFlag < rightFlag) {
+            return -1;
+        }
+    }
+    return 0;
+}
 
 /* Expand the game's packed text stream into the two-byte-per-glyph format
  * consumed by the renderer.  Bytes below 0x80 are literal glyphs; high-bit
