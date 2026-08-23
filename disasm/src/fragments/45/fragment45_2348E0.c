@@ -57,7 +57,9 @@ void func_8AB0FE08(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2348E0/func_8AB10D28.s")
+s32 func_8AB10D28(void) {
+    return 0x45;
+}
 #endif
 
 #ifdef VERSION_US

@@ -10,7 +10,9 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/86/fragment86_code/func_84400090.s")
+void func_84400090(u8 *arg0) {
+    *arg0 = 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -26,7 +28,9 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/86/fragment86_code/func_84400338.s")
+u8 func_84400338(u8 *arg0) {
+    return *arg0;
+}
 #endif
 
 void func_84400340(void) {
