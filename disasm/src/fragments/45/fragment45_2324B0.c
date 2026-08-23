@@ -30,7 +30,10 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2324B0/func_8AB0E8B4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2324B0/func_8AB0E9D8.s")
+void func_8AB0E9D8(u8 *arg0) {
+    *(s32 *)(arg0 + 0xC) = 1;
+    *(s16 *)(arg0 + 0x10) = 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2324B0/func_8AB0E9E8.s")
 
