@@ -1,0 +1,9 @@
+# Repository-local MCP tools.
+[mcp_servers.pokemon-stadium-pragma-runner]
+command = "/opt/homebrew/bin/python3"
+args = ["tools/try_pragma_compare_mcp.py"]
+cwd = "/Users/michaegg/projects/pokemonStadiumGSRecomp"
+startup_timeout_sec = 10
+tool_timeout_sec = 1800
+enabled = true
+default_tools_approval_mode = "prompt"
