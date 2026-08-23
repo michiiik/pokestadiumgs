@@ -208,6 +208,12 @@ dispatch surface, but do not by themselves prove the semantic animation for a
 handler. The neighboring 225-entry table remains unassigned pending the same
 cross-check.
 
+The neighboring 225-entry table at `0x84184148` has now received the same
+positional treatment: one dominant default target and 51 non-default targets
+are named `BattleAnim_ModelDispatch_NNN`, with repeated slots retained in the
+evidence. These names identify the dispatch surface only; they do not assert
+that every slot is a distinct model or animation.
+
 ## Phase 3.6: remaining dispatch-table boundaries
 
 The dispatch-table survey was rerun after the subsystem slices. The two largest
