@@ -1190,7 +1190,11 @@ Vec3f358F0 *func_800358F0(Vec3f358F0 *arg0, Vec3f358F0 *arg1, Vec3f358F0 *arg2, 
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035A10.s")
+typedef struct { f32 x, y, z; } Vec3f35A10;
+Vec3f35A10 *func_80035A10(Vec3f35A10 *arg0) {
+    f32 scale = 1.0f / sqrtf((arg0->x * arg0->x) + (arg0->y * arg0->y) + (arg0->z * arg0->z));
+    arg0->x *= scale; arg0->y *= scale; arg0->z *= scale; return arg0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -1226,7 +1230,12 @@ Vec3s35B48 *func_80035B48(Vec3s35B48 *arg0, Vec3s35B48 *arg1, Vec3s35B48 *arg2) 
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035B80.s")
+#define ROUND_MAX(x) ((x) + ((x) > 0.0f ? 0.5f : -0.5f))
+typedef struct { s16 x, y, z; } Vec3s35B80;
+typedef struct { f32 x, y, z; } Vec3f35B80;
+Vec3s35B80 *func_80035B80(Vec3s35B80 *arg0, Vec3f35B80 *arg1) {
+    arg0->x = ROUND_MAX(arg1->x); arg0->y = ROUND_MAX(arg1->y); arg0->z = ROUND_MAX(arg1->z); return arg0;
+}
 #endif
 
 #ifdef VERSION_US
