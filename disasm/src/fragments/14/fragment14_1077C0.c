@@ -13,7 +13,11 @@ void func_8130F69C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_1077C0/func_8130F794.s")
+extern u8 D_81312924[];
+extern f32 func_8130F6A4(u8 *arg0, u8 *arg1, u8 *arg2);
+f32 func_8130F794(u8 *arg0, u8 *arg1) {
+    return func_8130F6A4(arg0, arg1, D_81312924);
+}
 #endif
 
 #ifdef VERSION_US
