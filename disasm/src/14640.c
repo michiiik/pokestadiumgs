@@ -82,7 +82,7 @@ void func_80015570(s32 a0, s32 a1, s32 a2, s32 a3) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80015584.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80015664.s")
+void func_80015664(s32 arg0, s32 arg1) { s32 value; func_80014E68(arg0, arg1, &value); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80015684.s")
 
