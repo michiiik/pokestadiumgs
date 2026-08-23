@@ -221,14 +221,22 @@ named `BattleAnim_Fragment67Dispatch_NNN`. The regular stride is recorded as
 structural evidence, while the exact effect semantics remain a body-level
 follow-up.
 
+Three auxiliary fragment-79 tables are now covered without semantic guesses:
+the 50-entry table at `0x84185F10`, the 83-entry table at `0x84186004`, and the
+9-entry table at `0x84185FDC`. Every entry in these tables points to a distinct
+handler, so each target is named `BattleAnim_Table_<table>_<slot>` using the
+table address and zero-padded slot. This records stable positional evidence;
+the handlers still need body-level analysis before receiving effect-specific
+names.
+
 ## Phase 3.6: remaining dispatch-table boundaries
 
 The dispatch-table survey was rerun after the subsystem slices. The two largest
-unresolved tables are in fragment 79 at `0x84183D50` (253 entries) and
-`0x84184148` (225 entries), with additional tables of 83, 50, and 23 entries
-nearby. Their entries are all address-named and no table-level caller evidence
-currently distinguishes battle move dispatch from animation/effect dispatch;
-they are therefore recorded as audit targets rather than given guessed names.
+resolved tables are in fragment 79 at `0x84183D50` (253 entries) and
+`0x84184148` (225 entries); the 83-, 50-, and 9-entry neighbors are now also
+covered positionally above. No table-level caller evidence currently
+distinguishes the remaining 23-entry and smaller tables from animation/effect
+dispatch, so they remain audit targets rather than receiving guessed names.
 This preserves the issue #3 rule that table structure is evidence, but not proof
 of each callee's behavior.
 

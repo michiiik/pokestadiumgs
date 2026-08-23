@@ -26,6 +26,574 @@
   "Vi_SelectMode": "matches Stadium 1 Video_SetMode (callgraph). Same function, two spellings of the same idea. Upstream name kept."
  },
   "functions": {
+  "func_84129D8C": [
+   "BattleAnim_Table_84185F10_000",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 0; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84129E84": [
+   "BattleAnim_Table_84185F10_001",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 1; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412A028": [
+   "BattleAnim_Table_84185F10_002",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 2; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412A17C": [
+   "BattleAnim_Table_84185F10_003",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 3; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412A300": [
+   "BattleAnim_Table_84185F10_004",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 4; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412A454": [
+   "BattleAnim_Table_84185F10_005",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 5; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412A73C": [
+   "BattleAnim_Table_84185F10_006",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 6; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412A804": [
+   "BattleAnim_Table_84185F10_007",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 7; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412A934": [
+   "BattleAnim_Table_84185F10_008",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 8; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412A9F4": [
+   "BattleAnim_Table_84185F10_009",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 9; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412AA68": [
+   "BattleAnim_Table_84185F10_010",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 10; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412AAE8": [
+   "BattleAnim_Table_84185F10_011",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 11; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412ADF8": [
+   "BattleAnim_Table_84185F10_012",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 12; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412AFE0": [
+   "BattleAnim_Table_84185F10_013",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 13; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412B1D4": [
+   "BattleAnim_Table_84185F10_014",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 14; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412B51C": [
+   "BattleAnim_Table_84185F10_015",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 15; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412B65C": [
+   "BattleAnim_Table_84185F10_016",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 16; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412B958": [
+   "BattleAnim_Table_84185F10_017",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 17; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412BB9C": [
+   "BattleAnim_Table_84185F10_018",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 18; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412BD14": [
+   "BattleAnim_Table_84185F10_019",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 19; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412BDF0": [
+   "BattleAnim_Table_84185F10_020",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 20; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412BFEC": [
+   "BattleAnim_Table_84185F10_021",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 21; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412C0AC": [
+   "BattleAnim_Table_84185F10_022",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 22; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412C240": [
+   "BattleAnim_Table_84185F10_023",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 23; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412C294": [
+   "BattleAnim_Table_84185F10_024",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 24; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412C47C": [
+   "BattleAnim_Table_84185F10_025",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 25; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412C700": [
+   "BattleAnim_Table_84185F10_026",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 26; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412C74C": [
+   "BattleAnim_Table_84185F10_027",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 27; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412C7F0": [
+   "BattleAnim_Table_84185F10_028",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 28; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412C870": [
+   "BattleAnim_Table_84185F10_029",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 29; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412C95C": [
+   "BattleAnim_Table_84185F10_030",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 30; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412CB00": [
+   "BattleAnim_Table_84185F10_031",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 31; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412CBE8": [
+   "BattleAnim_Table_84185F10_032",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 32; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412CDA4": [
+   "BattleAnim_Table_84185F10_033",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 33; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412CF84": [
+   "BattleAnim_Table_84185F10_034",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 34; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412D06C": [
+   "BattleAnim_Table_84185F10_035",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 35; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412D20C": [
+   "BattleAnim_Table_84185F10_036",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 36; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412D2D4": [
+   "BattleAnim_Table_84185F10_037",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 37; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412D35C": [
+   "BattleAnim_Table_84185F10_038",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 38; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412D53C": [
+   "BattleAnim_Table_84185F10_039",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 39; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412D644": [
+   "BattleAnim_Table_84185F10_040",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 40; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412D6C0": [
+   "BattleAnim_Table_84185F10_041",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 41; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412D8C8": [
+   "BattleAnim_Table_84185F10_042",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 42; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412D950": [
+   "BattleAnim_Table_84185F10_043",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 43; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412DAF4": [
+   "BattleAnim_Table_84185F10_044",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 44; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412DBC0": [
+   "BattleAnim_Table_84185F10_045",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 45; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412DC08": [
+   "BattleAnim_Table_84185F10_046",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 46; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412DC20": [
+   "BattleAnim_Table_84185F10_047",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 47; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412DD0C": [
+   "BattleAnim_Table_84185F10_048",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 48; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412DDC0": [
+   "BattleAnim_Table_84185F10_049",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 49; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412E94C": [
+   "BattleAnim_Table_84186004_000",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 0; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412EB10": [
+   "BattleAnim_Table_84186004_001",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 1; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412EC30": [
+   "BattleAnim_Table_84186004_002",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 2; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412EC70": [
+   "BattleAnim_Table_84186004_003",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 3; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412EE5C": [
+   "BattleAnim_Table_84186004_004",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 4; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412EFFC": [
+   "BattleAnim_Table_84186004_005",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 5; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F044": [
+   "BattleAnim_Table_84186004_006",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 6; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F0F0": [
+   "BattleAnim_Table_84186004_007",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 7; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F170": [
+   "BattleAnim_Table_84186004_008",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 8; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F208": [
+   "BattleAnim_Table_84186004_009",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 9; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F348": [
+   "BattleAnim_Table_84186004_010",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 10; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F39C": [
+   "BattleAnim_Table_84186004_011",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 11; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F5A4": [
+   "BattleAnim_Table_84186004_012",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 12; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F5C4": [
+   "BattleAnim_Table_84186004_013",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 13; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F5E4": [
+   "BattleAnim_Table_84186004_014",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 14; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F604": [
+   "BattleAnim_Table_84186004_015",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 15; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F65C": [
+   "BattleAnim_Table_84186004_016",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 16; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F6DC": [
+   "BattleAnim_Table_84186004_017",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 17; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F75C": [
+   "BattleAnim_Table_84186004_018",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 18; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F78C": [
+   "BattleAnim_Table_84186004_019",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 19; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F7BC": [
+   "BattleAnim_Table_84186004_020",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 20; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F7EC": [
+   "BattleAnim_Table_84186004_021",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 21; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F81C": [
+   "BattleAnim_Table_84186004_022",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 22; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F84C": [
+   "BattleAnim_Table_84186004_023",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 23; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F87C": [
+   "BattleAnim_Table_84186004_024",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 24; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F8AC": [
+   "BattleAnim_Table_84186004_025",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 25; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F8DC": [
+   "BattleAnim_Table_84186004_026",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 26; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F90C": [
+   "BattleAnim_Table_84186004_027",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 27; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F93C": [
+   "BattleAnim_Table_84186004_028",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 28; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F96C": [
+   "BattleAnim_Table_84186004_029",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 29; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F99C": [
+   "BattleAnim_Table_84186004_030",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 30; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F9CC": [
+   "BattleAnim_Table_84186004_031",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 31; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F9FC": [
+   "BattleAnim_Table_84186004_032",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 32; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412FA2C": [
+   "BattleAnim_Table_84186004_033",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 33; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412FA5C": [
+   "BattleAnim_Table_84186004_034",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 34; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412FA8C": [
+   "BattleAnim_Table_84186004_035",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 35; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412FABC": [
+   "BattleAnim_Table_84186004_036",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 36; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412FAEC": [
+   "BattleAnim_Table_84186004_037",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 37; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412FB1C": [
+   "BattleAnim_Table_84186004_038",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 38; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412FB4C": [
+   "BattleAnim_Table_84186004_039",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 39; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412FB7C": [
+   "BattleAnim_Table_84186004_040",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 40; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412FBAC": [
+   "BattleAnim_Table_84186004_041",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 41; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412FBDC": [
+   "BattleAnim_Table_84186004_042",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 42; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412FC0C": [
+   "BattleAnim_Table_84186004_043",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 43; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412FC3C": [
+   "BattleAnim_Table_84186004_044",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 44; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412FC6C": [
+   "BattleAnim_Table_84186004_045",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 45; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412FC9C": [
+   "BattleAnim_Table_84186004_046",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 46; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412FD24": [
+   "BattleAnim_Table_84186004_047",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 47; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412FF04": [
+   "BattleAnim_Table_84186004_048",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 48; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412FF80": [
+   "BattleAnim_Table_84186004_049",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 49; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8413005C": [
+   "BattleAnim_Table_84186004_050",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 50; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_841300D0": [
+   "BattleAnim_Table_84186004_051",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 51; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_841301B0": [
+   "BattleAnim_Table_84186004_052",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 52; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130284": [
+   "BattleAnim_Table_84186004_053",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 53; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130380": [
+   "BattleAnim_Table_84186004_054",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 54; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130480": [
+   "BattleAnim_Table_84186004_055",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 55; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_841304A8": [
+   "BattleAnim_Table_84186004_056",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 56; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130500": [
+   "BattleAnim_Table_84186004_057",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 57; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130558": [
+   "BattleAnim_Table_84186004_058",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 58; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8413063C": [
+   "BattleAnim_Table_84186004_059",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 59; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_841306AC": [
+   "BattleAnim_Table_84186004_060",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 60; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130798": [
+   "BattleAnim_Table_84186004_061",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 61; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_841307EC": [
+   "BattleAnim_Table_84186004_062",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 62; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130824": [
+   "BattleAnim_Table_84186004_063",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 63; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130864": [
+   "BattleAnim_Table_84186004_064",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 64; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_841308A8": [
+   "BattleAnim_Table_84186004_065",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 65; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130A74": [
+   "BattleAnim_Table_84186004_066",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 66; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130AC8": [
+   "BattleAnim_Table_84186004_067",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 67; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130B40": [
+   "BattleAnim_Table_84186004_068",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 68; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130C08": [
+   "BattleAnim_Table_84186004_069",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 69; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130C98": [
+   "BattleAnim_Table_84186004_070",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 70; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130CC8": [
+   "BattleAnim_Table_84186004_071",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 71; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130CE8": [
+   "BattleAnim_Table_84186004_072",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 72; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130D74": [
+   "BattleAnim_Table_84186004_073",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 73; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130DBC": [
+   "BattleAnim_Table_84186004_074",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 74; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130DDC": [
+   "BattleAnim_Table_84186004_075",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 75; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130E04": [
+   "BattleAnim_Table_84186004_076",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 76; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130EA8": [
+   "BattleAnim_Table_84186004_077",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 77; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_841310E4": [
+   "BattleAnim_Table_84186004_078",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 78; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84131174": [
+   "BattleAnim_Table_84186004_079",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 79; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_841312E8": [
+   "BattleAnim_Table_84186004_080",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 80; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8413146C": [
+   "BattleAnim_Table_84186004_081",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 81; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84131538": [
+   "BattleAnim_Table_84186004_082",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 82; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412DE98": [
+   "BattleAnim_Table_84185FDC_000",
+   "fragment79 function-pointer table at 0x84185FDC selects this handler at slot 0; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412E308": [
+   "BattleAnim_Table_84185FDC_001",
+   "fragment79 function-pointer table at 0x84185FDC selects this handler at slot 1; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412E38C": [
+   "BattleAnim_Table_84185FDC_002",
+   "fragment79 function-pointer table at 0x84185FDC selects this handler at slot 2; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412E420": [
+   "BattleAnim_Table_84185FDC_003",
+   "fragment79 function-pointer table at 0x84185FDC selects this handler at slot 3; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412E510": [
+   "BattleAnim_Table_84185FDC_004",
+   "fragment79 function-pointer table at 0x84185FDC selects this handler at slot 4; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412E680": [
+   "BattleAnim_Table_84185FDC_005",
+   "fragment79 function-pointer table at 0x84185FDC selects this handler at slot 5; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412E754": [
+   "BattleAnim_Table_84185FDC_006",
+   "fragment79 function-pointer table at 0x84185FDC selects this handler at slot 6; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412E7D8": [
+   "BattleAnim_Table_84185FDC_007",
+   "fragment79 function-pointer table at 0x84185FDC selects this handler at slot 7; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412E82C": [
+   "BattleAnim_Table_84185FDC_008",
+   "fragment79 function-pointer table at 0x84185FDC selects this handler at slot 8; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
   "func_8290D738": [
    "BattleAnim_Fragment67Dispatch_045",
    "fragment67 53-entry dispatch table at 0x829130A4 selects this handler at slot 45; the table has one repeated default handler and this isolated non-default slot"
