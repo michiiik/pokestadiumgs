@@ -343,7 +343,14 @@ void func_8005A8E4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/GbSave_RequirePakPresent.s")
+extern s32 GbTower_CheckPakRemoved(void *arg, s32 mode);
+extern void Game_ShutdownAndLoadFragment(void *arg, s32 fragment);
+
+void GbSave_RequirePakPresent(void *arg) {
+    if (GbTower_CheckPakRemoved(arg, 0) == 0) {
+        Game_ShutdownAndLoadFragment(arg, 2);
+    }
+}
 #endif
 
 #ifdef VERSION_US
