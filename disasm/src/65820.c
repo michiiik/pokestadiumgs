@@ -44,13 +44,24 @@
 void func_80064DF4(void) {
 }
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/Game_SetState.s")
-#endif
+extern s32 D_8009DE94;
+extern s32 D_80128BE4;
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/Game_GetState.s")
-#endif
+s32 Game_SetState(s32 state) {
+    s32 previous = D_8009DE94;
+
+    if (state != previous) {
+        D_80128BE4 = previous;
+        D_8009DE94 = state;
+        return 1;
+    }
+
+    return 0;
+}
+
+s32 Game_GetState(void) {
+    return D_8009DE94;
+}
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/65820/func_80064E38.s")
