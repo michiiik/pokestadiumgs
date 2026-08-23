@@ -54,7 +54,11 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8410B578.s")
+extern u8 *D_841911E0;
+void func_8410B578(f32 arg0) {
+    *(f32 *)(D_841911E0 + 0x8C) = arg0;
+    *(u16 *)(D_841911E0 + 0x96) = 0;
+}
 #endif
 
 #ifdef VERSION_US

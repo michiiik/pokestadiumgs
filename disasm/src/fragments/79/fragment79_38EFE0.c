@@ -2,7 +2,14 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_8411F750.s")
+extern s32 D_84191208;
+extern s32 D_8419120C;
+s32 func_8411F750(s32 arg0) {
+    if (arg0 == 0) {
+        return D_84191208;
+    }
+    return D_8419120C;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_8411F770.s")
 
