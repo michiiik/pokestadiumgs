@@ -5,17 +5,7 @@ extern void *Fragment_Load(u32 pool, u32 source, u32 end);
 extern void main_pool_try_free(void *ptr);
 
 #ifdef VERSION_US
-u32 Game_PollState(u32 mask) {
-    u32 previous = osSetIntMask(1);
-    volatile u32 *piStatus = (volatile u32 *)0xA4600010;
-    volatile u32 *dmaStatus = (volatile u32 *)0xB0000E38;
-
-    if ((*piStatus & 3) == 0 && ((*dmaStatus & 0xFFFF) != 0x828A)) {
-        mask = (u32)-16;
-    }
-    osSetIntMask(previous);
-    return mask;
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/Game_PollState.s")
 #endif
 
 #ifdef VERSION_US
@@ -43,15 +33,7 @@ u32 Game_PollState(u32 mask) {
 #endif
 
 #ifdef VERSION_US
-s32 Fragment_LoadAndCall(u32 pool, u32 source, u32 end, s32 arg3,
-                         void *arg4) {
-    void *fragment = Fragment_Load(pool, source, end);
-    s32 (*entry)(s32, void *) = (s32 (*)(s32, void *))fragment;
-    s32 result = entry(arg3, arg4);
-
-    main_pool_try_free(fragment);
-    return result;
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/Fragment_LoadAndCall.s")
 #endif
 
 #ifdef VERSION_US
@@ -68,21 +50,9 @@ void func_80064DF4(void) {
 extern s32 D_8009DE94;
 extern s32 D_80128BE4;
 
-s32 Game_SetState(s32 state) {
-    s32 previous = D_8009DE94;
+#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/Game_SetState.s")
 
-    if (state != previous) {
-        D_80128BE4 = previous;
-        D_8009DE94 = state;
-        return 1;
-    }
-
-    return 0;
-}
-
-s32 Game_GetState(void) {
-    return D_8009DE94;
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/Game_GetState.s")
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/65820/func_80064E38.s")
@@ -92,6 +62,8 @@ extern u8 D_82700000[];
 extern u8 fragment22_ROM_START[];
 extern u8 fragment23_ROM_START[];
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/Game_State11_Options.s")
+#if 0
 void Game_State11_Options(void) {
     s32 result;
 
@@ -108,9 +80,13 @@ void Game_State11_Options(void) {
     }
 }
 
+#endif
+
 extern s32 D_80128BE0;
 extern s32 D_8009DE90;
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/Game_ThreadInit.s")
+#if 0
 void Game_ThreadInit(void) {
     __osSetFpcCsr(0x1000C01);
     func_8000644C();
@@ -125,6 +101,8 @@ void Game_ThreadInit(void) {
     D_8009DE90 = 0;
     main_pool_push_state(0x47414D45);
 }
+
+#endif
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/65820/func_80064F54.s")

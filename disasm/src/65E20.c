@@ -25,6 +25,8 @@ extern u8 fragment68_ROM_START[];
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/65E20/func_80065974.s")
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/65E20/Game_State01_Loop.s")
+#if 0
 void Game_State01_Loop(void) {
     u32 packed;
     u16 cycle;
@@ -58,6 +60,10 @@ void Game_State01_Loop(void) {
     }
 }
 
+#endif
+
+#pragma GLOBAL_ASM("asm/us/nonmatchings/65E20/Game_State17_Boot.s")
+#if 0
 void Game_State17_Boot(void) {
     u32 pool83F = (((u32)D_83F00000 & 0x0FF00000) >> 20) - 0x10;
     u32 pool829 = (((u32)D_82900000 & 0x0FF00000) >> 20) - 0x10;
@@ -68,4 +74,5 @@ void Game_State17_Boot(void) {
                          (u32)fragment68_ROM_START, 0, NULL);
     Game_SetState(1);
 }
+#endif
 #endif

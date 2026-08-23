@@ -251,6 +251,8 @@ void Game_State05_Run(void) {
 }
 #endif
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/6DEC0/Game_State19_Run.s")
+#if 0
 void Game_State19_Run(void) {
     s32 result;
     u32 pool816 = (((u32)D_81600000 & 0x0FF00000) >> 20) - 0x10;
@@ -285,4 +287,5 @@ void Game_State19_Run(void) {
         (u32)fragment40_ROM_START, (u32)fragment41_ROM_START, result, NULL);
     main_pool_pop_state(0x4C414243);
 }
+#endif
 #endif

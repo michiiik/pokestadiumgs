@@ -62,7 +62,6 @@ SECTIONS
         build/asm/us/entry.o(.text);
         build/asm/us/pre_main.o(.text);
         build/src/main.o(.text);
-        build/src/legacy_link_aliases.o(.text);
         . += 0x10;
         build/src/dp_intro.o(.text);
         build/src/2CA0.o(.text);
@@ -325,6 +324,9 @@ SECTIONS
         build/lib/libultra.a:flashreadarray.o(.text);
         build/lib/libultra.a:flashgetaddr.o(.text);
         build/lib/libultra.a:setwatchlo.o(.text);
+        /* Compatibility entrypoints are appended so they cannot shift the
+         * address-locked game text preceding them. */
+        build/src/legacy_link_aliases.o(.text);
         text_TEXT_END = .;
         text_TEXT_SIZE = ABSOLUTE(text_TEXT_END - text_TEXT_START);
         text_DATA_START = .;
