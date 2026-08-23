@@ -181,6 +181,9 @@ the destination input flags. `Minigame_ProcessPlayerEvents` is the wrapper for
 the fragment callback that scans the four player records and their 18 event
 slots. These names remain structural and data-flow based; they do not assign
 individual minigame titles to the records.
+`Minigame_UpdatePlayerCounters` wraps the callback that increments the selected
+18-slot counter for each player, while `Minigame_ResetRoundPlayers` restores
+the GB Tower poll mask and resets all four player records before a new round.
 
 ## Phase 3.5: GB-save format and checksum helpers
 

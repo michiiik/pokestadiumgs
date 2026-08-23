@@ -46,6 +46,14 @@
    "Minigame_MapControllerButtons",
    "The helper maps the four low bits of D_801291E0+0x2182 into the destination input flags at offset 0x0E"
   ],
+  "func_800723C4": [
+   "Minigame_UpdatePlayerCounters",
+   "The wrapper resolves the fragment callback that scans four player records and increments the matching 18-slot counter selected by D_8012B363"
+  ],
+  "func_800727A4": [
+   "Minigame_ResetRoundPlayers",
+   "The wrapper resolves a callback that restores the current GB Tower poll mask and resets all four player records before a new minigame round"
+  ],
   "func_80072070": [
    "Minigame_UpdateControllerState",
    "Game_State10_Minigame calls this every loop with the minigame state and a controller slot byte; its resolved fragment callback normalizes controller input and updates per-pad state"

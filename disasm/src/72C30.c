@@ -20,7 +20,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_80072264.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_800723C4.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/Minigame_UpdatePlayerCounters.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_800723FC.s")
 
@@ -30,7 +30,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/Minigame_ResetControllerPoll.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_800727A4.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/Minigame_ResetRoundPlayers.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/Game_State10_Minigame.s")
 #endif
