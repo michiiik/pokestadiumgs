@@ -230,11 +230,11 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8410F9E4.s")
+void func_8410F9E4(u8 *arg0, s32 arg1) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8410F9F0.s")
+void func_8410F9F0(u8 *arg0, s32 arg1) {}
 #endif
 
 #ifdef VERSION_US
@@ -386,7 +386,7 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8411123C.s")
+void func_8411123C(u8 *arg0, s32 arg1) {}
 #endif
 
 #ifdef VERSION_US
