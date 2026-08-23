@@ -2015,7 +2015,7 @@ void func_8003EF70(u8 *arg0) { *(u16 *)(arg0 + 0x56) &= (u16)~1; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003EFA0.s")
+s32 func_8003EFA0(u8 *arg0) { return *(u16 *)(*(s32 *)(arg0 + 0x58) + 0xA) == *(s16 *)(arg0 + 0x5C) + 2; }
 #endif
 
 #ifdef VERSION_US
@@ -2226,7 +2226,7 @@ void func_800401CC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800403B0.s")
+extern s32 D_80126520; void func_800403B0(void) { D_80126520 += 0xC; }
 #endif
 
 #ifdef VERSION_US
