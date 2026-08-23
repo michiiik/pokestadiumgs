@@ -36,7 +36,9 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_128B10/func_826026E8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_128B10/func_82602708.s")
+void func_82602708(u8 *arg0) {
+    *(u16 *)(arg0 + 0xA0) = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_128B10/func_82602710.s")
 
