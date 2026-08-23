@@ -90,7 +90,70 @@ void Minigame_MapControllerButtons(u8 *state, u8 *input) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_80072264.s")
+/*
+ * Build the controller/result flags consumed by the loaded minigame code.
+ * The four halfwords at 0x21A6 in the player records are signed status
+ * values.  A negative status (or a zero third argument) selects the live
+ * controller mask; otherwise the corresponding player is left untouched.
+ */
+void Minigame_BuildControllerResult(u8 *state, u8 *result, s32 useAllPlayers) {
+    s32 i;
+
+    *(s16 *)result = 8;
+
+    if ((s16)*(u16 *)(state + 0x21A6) < 0 &&
+        (s16)*(u16 *)(state + 0x21BE) < 0 &&
+        (s16)*(u16 *)(state + 0x21D6) < 0 &&
+        (s16)*(u16 *)(state + 0x21EE) < 0) {
+        result[2] = 2;
+    } else {
+        switch ((s8)state[0x2181]) {
+        case 0:
+            result[2] = 1;
+            break;
+        case 1:
+            result[2] = 2;
+            break;
+        case 2:
+        case 3:
+            result[2] = 3;
+            break;
+        default:
+            result[0xE] = 0;
+            break;
+        }
+    }
+
+    result[0xE] = 0;
+    for (i = 0; i != 4; i += 2) {
+        u8 controllerMask = state[0x2182];
+        u8 sourceBit = (u8)(1 << i);
+        s16 firstStatus = *(s16 *)(state + 0x21A6 + (i * 0x18));
+
+        if (firstStatus < 0 || useAllPlayers == 0) {
+            if (controllerMask & sourceBit) {
+                result[0xE] |= sourceBit;
+            } else {
+                result[0xE] |= (u8)(1 << (i + 4));
+            }
+        }
+
+        {
+            u8 secondBit = (u8)(1 << (i + 1));
+            s16 secondStatus = *(s16 *)(state + 0x21A6 + (i * 0x18) + 0x18);
+
+            if (secondStatus < 0 || useAllPlayers == 0) {
+                if (controllerMask & secondBit) {
+                    result[0xE] |= secondBit;
+                } else {
+                    result[0xE] |= (u8)(1 << (i + 5));
+                }
+            }
+        }
+    }
+
+    result[0x14] = state[0x2183];
+}
 
 void Minigame_UpdatePlayerCounters(void) {
     void (*handler)(void *, s8);
