@@ -12,7 +12,9 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/10/fragment10_D5250/func_82800B94.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/10/fragment10_D5250/func_82800BB4.s")
+s32 func_82800BB4(u8 *arg0) {
+    return (*(u32 *)(arg0 + 0) & 0x100000) != 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/10/fragment10_D5250/func_82800BC8.s")
 
