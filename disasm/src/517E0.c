@@ -177,6 +177,14 @@ u8 *func_80051568(s32 active) {
     return Save_GetTypedBase(active, 0x1E, -1) + 0x3E64;
 }
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/Save_Checksum.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/Save_WriteFooter.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/Save_WriteRecord.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/Save_CommitRecord.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/Save_InvalidateRecord.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/Save_RestoreRecord.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/Save_ClearRecord.s")
+#if 0
 u16 Save_Checksum(u8 *data, s32 length) {
     u32 sum = 0;
     s32 count = length - 3;
@@ -235,6 +243,7 @@ void Save_ClearRecord(u8 *data, s32 length, s32 index) {
     data[0] |= 2;
     D_801281C0[index].flags |= 2;
 }
+#endif
 
 void func_80051830(void *arg) {
     func_80061248(arg);
@@ -633,6 +642,9 @@ u32 func_80055028(void) {
     return mask;
 }
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/Save_ResetBank.s")
+
+#if 0
 void Save_ResetBank(void *unused, u32 bankId) {
     SaveRecordEntry *entry;
     u32 index;
@@ -647,6 +659,9 @@ void Save_ResetBank(void *unused, u32 bankId) {
     entry->backup = NULL;
     entry->active = NULL;
 }
+#endif
+
+extern void Save_ResetBank(void *unused, u32 bankId);
 
 extern void *main_pool_alloc_with_func(u32 size, u32 align,
                                        void (*freeFunc)(void *, u32),

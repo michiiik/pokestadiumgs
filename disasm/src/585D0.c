@@ -72,14 +72,9 @@ u32 func_80057A80(s32 index) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80057F58.s")
 #endif
 
-void GbSave_ComputeChecksum(const u8 *start, u8 *end) {
-    u32 sum = 0;
-
-    while (start < end) {
-        sum += *start++;
-    }
-    *end = (u8)(0xFF - sum);
-}
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/GbSave_ComputeChecksum.s")
+#endif
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/GbSave_ComputeChecksumRange.s")
@@ -348,11 +343,7 @@ void func_8005A8E4(void) {
 extern s32 GbTower_CheckPakRemoved(void *arg, s32 mode);
 extern void Game_ShutdownAndLoadFragment(void *arg, s32 fragment);
 
-void GbSave_RequirePakPresent(void *arg) {
-    if (GbTower_CheckPakRemoved(arg, 0) == 0) {
-        Game_ShutdownAndLoadFragment(arg, 2);
-    }
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/GbSave_RequirePakPresent.s")
 #endif
 
 #ifdef VERSION_US
@@ -611,6 +602,9 @@ u8 func_8005D8CC(s32 index) {
     return GbSave_Record(index)[5];
 }
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/GbSave_GetPortAvailability.s")
+
+#if 0
 u32 GbSave_GetPortAvailability(s32 port) {
     u32 mask = 1u << port;
 
@@ -622,6 +616,7 @@ u32 GbSave_GetPortAvailability(s32 port) {
     }
     return 0;
 }
+#endif
 
 u8 func_8005D92C(s32 index) {
     return GbSave_Record(index)[4];
