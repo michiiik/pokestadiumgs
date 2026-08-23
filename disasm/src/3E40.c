@@ -4,13 +4,21 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/3E40/func_80003240.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3E40/Util_Memcpy.s")
+void Util_Memcpy(u32 *dst, const u32 *src, s32 wordCount) {
+    while (wordCount-- > 0) {
+        *dst++ = *src++;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/3E40/Util_InitMainPools.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3E40/func_8000339C.s")
+u32 func_8000339C(void) {
+    return *(u32 *)0x800871F4;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3E40/func_800033A8.s")
+u32 func_800033A8(void) {
+    return *(u32 *)0x800871F0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/3E40/Util_Malloc.s")
 
@@ -20,7 +28,20 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/3E40/func_800034E4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3E40/Util_Memclear.s")
+void Util_Memclear(u32 *dst, u32 count) {
+    while (count-- != 0) {
+        *dst++ = 0xFFFFFFFF;
+        *dst++ = 0xFFFFFFFF;
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3E40/Util_CheckStubMemArea.s")
+s32 Util_CheckStubMemArea(const u32 *pairs) {
+    s32 count = 0;
+
+    while (pairs[0] == 0x80400000 && pairs[1] == 0x80400000) {
+        pairs += 2;
+        count++;
+    }
+    return count * 8;
+}
 #endif
