@@ -150,7 +150,9 @@ u8 *func_800739EC(u8 *input, u8 *output) {
                 glyph = 0x7E;
             }
             base = index < 0x5F ? 0x71 : 0xB1;
-            *dst++ = (u8)(base + (index == 0 ? -1 : (index - 1) / 2));
+            /* The MIPS sequence performs an arithmetic shift of index - 1;
+             * keep the signed conversion so the index-zero case yields 0. */
+            *dst++ = (u8)(base + (((s32)index - 1) / 2));
             *dst++ = (u8)(glyph + next);
         }
     }
