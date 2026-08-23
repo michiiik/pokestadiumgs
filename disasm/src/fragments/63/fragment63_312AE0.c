@@ -14,7 +14,10 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E0F664.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E0F740.s")
+void func_87E0F740(u8 *arg0, s32 arg1) {
+    *(s32 *)(arg0 + 4) = arg1;
+    *(s32 *)arg0 = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E0F74C.s")
 
