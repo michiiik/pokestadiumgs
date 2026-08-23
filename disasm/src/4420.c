@@ -234,7 +234,48 @@ void *Fragment_Load(u32 pool, u32 source, u32 end) {
     return fragment;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/BinArchive_Open.s")
+void *BinArchive_Open(u32 source, u32 destination, s32 mode, s32 flags) {
+    void *archive = NULL;
+
+    if (mode == 0) {
+        archive = func_800042C0(source, destination, 0, 0);
+        if (archive != NULL) {
+            *(u16 *)archive |= 1;
+        }
+    } else if (mode == 1) {
+        void *header = func_800042C0(source, source + 0x20, 0, 0);
+
+        if (header != NULL) {
+            u32 size = (*(u32 *)((u8 *)header + 0xC) << 4) + 0x10;
+
+            main_pool_try_free(header);
+            archive = func_800042C0(source, source + size, 0, 0);
+            if (archive != NULL) {
+                *(u16 *)archive |= 2;
+                if (flags == 1) {
+                    *(u16 *)archive |= 4;
+                }
+            }
+        }
+    } else if (mode == 2) {
+        void *header = func_800042C0(source, source + 0x20, 1, 0);
+
+        if (header != NULL) {
+            u32 size = (*(u32 *)((u8 *)header + 0xC) << 4) + 0x10;
+
+            main_pool_try_free(header);
+            archive = func_800042C0(source, source + size, 1, 0);
+            if (archive != NULL && flags == 1) {
+                *(u16 *)archive |= 4;
+            }
+        }
+    }
+
+    if (archive != NULL) {
+        *(u32 *)((u8 *)archive + 4) = source;
+    }
+    return archive;
+}
 
 void func_800049B8(void *ptr) {
     main_pool_try_free(ptr);
@@ -252,7 +293,41 @@ void *func_800049D8(s32 pool, const u32 *header, const u32 *range) {
     return func_80004458(pool, source, end, 0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80004A40.s")
+void *func_80004A40(s32 pool, void *archive, s32 index) {
+    u8 *base = archive;
+    u8 *entry;
+    void *file = NULL;
+    u16 archive_flags;
+
+    if ((u32)index >= *(u32 *)(base + 0xC)) {
+        return NULL;
+    }
+
+    archive_flags = *(u16 *)base;
+    entry = base + (index * 0x10) + 0x10;
+    if (archive_flags & 1) {
+        file = base + *(u32 *)(entry + 0x0);
+    } else if (!(archive_flags & 4)) {
+        file = *(void **)(entry + 0x8);
+    }
+
+    if (file == NULL) {
+        file = func_800049D8(pool, base, (const u32 *)entry);
+        if (file != NULL && *(u32 *)((u8 *)file + 8) == 0x46524147 &&
+            *(u32 *)((u8 *)file + 0xC) == 0x4D454E54) {
+            u32 fragment = *(u16 *)(base + 2);
+
+            if (pool == 0) {
+                Fragment_Register(fragment, file);
+            } else {
+                Fragment_RelocateAndReset((void *)pool, (void *)fragment,
+                                           file);
+            }
+        }
+        *(void **)(entry + 0x8) = file;
+    }
+    return file;
+}
 
 extern void *func_80004A40(s32 pool, void *archive, s32 index);
 
