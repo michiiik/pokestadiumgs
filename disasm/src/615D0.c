@@ -112,7 +112,9 @@ s32 func_80062030(s32 value) { if (value > 0 && value < 0xFC) return value; retu
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_8006229C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80062304.s")
+extern s32 func_80051D64(s32, s32);
+extern void func_800033DC(void *);
+s32 func_80062304(u8 *arg0) { s32 result = 0; if ((arg0[1] & 0x10) && (arg0[4] & 1)) { func_80051D64(arg0[1], arg0[3]); result = 1; } func_800033DC(arg0); return result; }
 
 s32 func_8006236C(u8 *arg0, s32 arg1) { s32 result = 0; if (arg0[5] >= arg1) { *(u16 *)(arg0 + 10) = arg1; result = 1; } return result; }
 
