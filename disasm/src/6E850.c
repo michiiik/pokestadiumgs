@@ -6,7 +6,7 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_8006DC78.s")
+s32 func_8006DC78(s32 arg0) { u8 local[1]; return (local + (arg0 << 4)) - local; }
 #endif
 
 #ifdef VERSION_US
