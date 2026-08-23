@@ -16,7 +16,15 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/3280/func_80002A40.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3280/func_80002B24.s")
+extern s32 D_800CCDCC;
+s32 func_80002B24(void) {
+    s32 value = D_800CCDCC - 0x10;
+
+    if (value < 0) {
+        value = 0;
+    }
+    return value;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/3280/main_pool_push_state.s")
 
