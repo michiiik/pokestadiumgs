@@ -92,6 +92,8 @@ extern s32 func_8006456C(s32 arg0);
 extern s32 func_800427B8(void *arg0);
 extern u16 D_841849B6[];
 extern void func_84108A10(void *arg0);
+extern void func_84116604(void *arg0);
+extern void func_841166C4(void *arg0);
 extern u8 D_8418393C[];
 extern u8 D_84183944[];
 extern u8 D_84183960[];
@@ -1465,19 +1467,22 @@ void BattleAnim_Dispatch_059(void *arg0) {
 #ifdef VERSION_US
 void BattleAnim_Dispatch_155(void *arg0) {
     u8 *state = arg0;
-    u8 index;
+    u8 index0;
+    u8 index1;
     s32 slot;
     *(s16 *)(state + 0x7E8) = 0;
     *(u8 *)(state + 0x7F6) = 0;
     *(u8 *)(state + 0x618) = *((u8 *)D_84193DD0 + 8);
     func_8411FEE8(0x258);
-    index = func_8411E1F8(state);
-    *(u16 *)(state + 0x65C) = *(u16 *)((u8 *)D_84193DD0 + index * 0x10 + 0xC);
-    index = func_8411E1F8(state);
-    func_8006456C(*(u16 *)((u8 *)D_84193DD0 + index * 0x10 + 0x14));
-    func_84112FD0(*(void **)(state + 0x5C0), *(u16 *)(state + 0x65C),
-                  *(u32 *)((u8 *)D_84193DD0 + index * 0x10 + 0x18),
-                  func_8006456C(*(u16 *)((u8 *)D_84193DD0 + index * 0x10 + 0x14)));
+    index0 = func_8411E1F8(state);
+    *(u16 *)(state + 0x65C) = *(u16 *)((u8 *)D_84193DD0 + index0 * 0x10 + 0xC);
+    index1 = func_8411E1F8(state);
+    {
+        u32 arg2 = *(u32 *)((u8 *)D_84193DD0 + index0 * 0x10 + 0x18);
+        s32 result = func_8006456C(*(u16 *)((u8 *)D_84193DD0 + index1 * 0x10 + 0x14));
+        func_84112FD0(*(void **)(state + 0x5C0), *(u16 *)(state + 0x65C),
+                      arg2, result, arg2);
+    }
     func_84108A10(state);
     func_841126C8(state);
     slot = D_841911F4;
