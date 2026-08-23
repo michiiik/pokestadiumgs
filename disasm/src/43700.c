@@ -58,7 +58,8 @@ s32 func_80043444(u8 *arg0) { return 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_80043678.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_800436CC.s")
+extern s32 D_80094C60;
+void func_800436CC(s32 value) { if (value >= 0 && value < 7) D_80094C60 = value; }
 
 extern s32 D_80094C60;
 

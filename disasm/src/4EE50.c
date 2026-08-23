@@ -36,7 +36,7 @@ extern s32 D_80128098; void func_8004E7AC(void) { D_80128098 = 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4EE50/func_8004EA60.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4EE50/func_8004EB1C.s")
+s32 func_8004EB1C(s32 value) { s32 result = value; if (value > 0) result = 1 << (value + 31); return result; }
 
 u16 func_8004EB38(u16 *arg0) { return *arg0; }
 
