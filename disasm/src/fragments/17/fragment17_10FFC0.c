@@ -98,7 +98,12 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_822039C8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82203A84.s")
+extern s32 D_8220E4B8, D_8220D784;
+
+void func_82203A84(void) {
+    D_8220E4B8 = 0;
+    D_8220D784 = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82203A98.s")
 

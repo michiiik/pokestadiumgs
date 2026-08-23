@@ -20,7 +20,10 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_11B210/func_8220BDAC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_11B210/func_8220BE84.s")
+void func_8220BE84(s16 *arg0) {
+    arg0[1] = 3;
+    arg0[2] = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_11B210/func_8220BE94.s")
 

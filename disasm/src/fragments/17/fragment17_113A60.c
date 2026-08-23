@@ -194,5 +194,9 @@ void func_8220AD1C(s16 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_8220ADE0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_8220AE10.s")
+extern s16 D_822106B2;
+
+s32 func_8220AE10(void) {
+    return D_822106B2 == 3;
+}
 #endif
