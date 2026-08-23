@@ -1203,17 +1203,9 @@ extern s32 D_80094850;
 extern s32 D_80094870[];
 extern s32 D_80122A40;
 
-void func_80035140(s32 channel) {
-    D_80094850 = channel;
-}
-
-s32 func_8003514C(void) {
-    return D_80094850;
-}
-
-s32 func_80035160(s32 channel) {
-    return D_80094870[channel];
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035140.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003514C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035160.s")
 
 /* Audio's scheduler thread owns the two one-entry completion queues and
  * submits the small audio task descriptors produced by the command builder.
@@ -1367,6 +1359,8 @@ s32 Audio_RequestEvent(s32 eventId) {
 extern void *func_800042C0(u32 source, u32 end, u32 decompress,
                            u32 relocate);
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035620.s")
+#if 0
 void func_80035620(void) {
     u32 *source;
     u32 *destination;
@@ -1386,22 +1380,32 @@ void func_80035620(void) {
 
     main_pool_pop_state(0x524F4D54);
 }
+#endif
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800356CC.s")
+#if 0
 s32 func_800356CC(s32 index) {
     if (index >= 0 && index < 19) {
         return D_80124D00[index];
     }
     return 0;
 }
+#endif
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035700.s")
+#if 0
 void func_80035700(u32 seed) {
     D_80124D50 = seed;
 }
+#endif
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003570C.s")
+#if 0
 u32 func_8003570C(void) {
     D_80124D50 = D_80124D50 * 0x0019660D + 0x3C6EF35F;
     return D_80124D50;
 }
+#endif
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Color_SetRGB.s")

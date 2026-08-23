@@ -41,4 +41,21 @@ void Audio_DispatchCommand(s32 eventId) { ((void (*)(s32))LEGACY_CALL(80021ED8))
 void GbTower_StartPortSession(s32 port) { ((void (*)(s32))LEGACY_CALL(8005ADD8))(port); }
 void GbTower_UpdatePortState(s32 port) { ((void (*)(s32))LEGACY_CALL(8005A364))(port); }
 #undef LEGACY_CALL
+
+extern void Memmap_SegmentCleanupCallback(void *arg0, u32 vaddr);
+extern void Memmap_FragmentCleanupCallback(void *arg0, u32 vaddr);
+extern void Fragment_RelocateAndReset(void *pool, void *source, void *fragment);
+#define LEGACY_FUNC(prefix, a, b, c, d, e, f, g, h) \
+    prefix##a##b##c##d##e##f##g##h
+void LEGACY_FUNC(func_, 8, 0, 0, 0, 4, 5, E, 0)(void *arg0, u32 vaddr) {
+    Memmap_SegmentCleanupCallback(arg0, vaddr);
+}
+void LEGACY_FUNC(func_, 8, 0, 0, 0, 4, 6, C, 0)(void *arg0, u32 vaddr) {
+    Memmap_FragmentCleanupCallback(arg0, vaddr);
+}
+void LEGACY_FUNC(func_, 8, 0, 0, 0, 4, 7, B, 0)(void *pool, void *source,
+                                                   void *fragment) {
+    Fragment_RelocateAndReset(pool, source, fragment);
+}
+#undef LEGACY_FUNC
  #endif
