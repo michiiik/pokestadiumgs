@@ -1257,7 +1257,7 @@ s32 func_84134968(void) { extern OSMesgQueue D_84195164; return osRecvMesg(&D_84
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841349C0.s")
+s32 func_841349C0(f32 arg0) { s32 value = (s32)arg0; f64 fraction = (f64)(arg0 - (f32)value); return fraction >= 0.5 ? value + 1 : value; }
 #endif
 
 #ifdef VERSION_US
