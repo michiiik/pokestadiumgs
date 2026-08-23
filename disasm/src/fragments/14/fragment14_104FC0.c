@@ -2,7 +2,9 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_104FC0/func_8130CE30.s")
+s32 func_8130CE30(u8 *arg0) {
+    return *(s32 *)(arg0 + 0x5C) != 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_104FC0/func_8130CE3C.s")
 
