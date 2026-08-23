@@ -1249,7 +1249,7 @@ void func_84134944(void) { extern OSThread D_84193FB0; osDestroyThread(&D_84193F
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84134968.s")
+s32 func_84134968(void) { extern OSMesgQueue D_84195164; return osRecvMesg(&D_84195164, NULL, 1); }
 #endif
 
 #ifdef VERSION_US
