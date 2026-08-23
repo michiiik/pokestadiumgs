@@ -161,6 +161,18 @@ the ROM-start operands, not an inference from fragment names. Individual
 fragment init/update/draw roles remain open until their callback targets and
 per-minigame state tables are audited.
 
+## Phase 3.5: GB-save format and checksum helpers
+
+The save/Controller Pak pass adds two names in the GB-save translation unit.
+`GbSave_ComputeChecksumRange` is called by four save-block writers; its body
+sums the requested byte range, truncates to 16 bits, and stores the result via
+the existing little-endian helper. `GbSave_IdentifyFormat` is called by the
+main GB-save flows and is more specific than a generic parser label: it checks
+the `0x3031` header marker, requires a non-empty version field, compares the
+embedded names against seven resident format strings, and returns the matching
+format index. The lower-level Pak presence and port-availability functions
+were already transferred and remain separately named.
+
 ## Phase 1: the Stadium 1 transfer
 the 676 is a machine-verified correspondence between the two ROMs' machine code.
 

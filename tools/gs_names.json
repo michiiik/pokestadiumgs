@@ -50,6 +50,14 @@
    "Audio_RequestEvent",
    "deduplicates an audio event id against the shared request slot, forwards changed ids to the large audio dispatcher at 0x80021ED8, and records the new id"
   ],
+  "func_80058018": [
+   "GbSave_ComputeChecksumRange",
+   "sums an inclusive byte range, truncates the result to 16 bits, and writes it through the GB-save little-endian helper; called by four save-block writers"
+  ],
+  "func_8005805C": [
+   "GbSave_IdentifyFormat",
+   "validates the GB save header/version marker and compares the embedded names against seven known format strings, returning a format index used by multiple save flows"
+  ],
   "func_83503918": [
    "fragment1_main",
    "fragment 1 entry: target of the J at offset 0 of the fragment header trampoline (rom 0xa8a80, vram 0x83500000)"

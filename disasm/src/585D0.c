@@ -58,11 +58,11 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80058018.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/GbSave_ComputeChecksumRange.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005805C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/GbSave_IdentifyFormat.s")
 #endif
 
 #ifdef VERSION_US
