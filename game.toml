@@ -160,9 +160,9 @@ func = "Memmap_GetFragmentVaddr"
 before_vram = 0x800024FC
 text = "ctx->r4 = librecomp_fragment_resolve_exit((uint32_t)ctx->r4, (uint32_t)ctx->fragment_runtime_base);"
 
-# Expand both Prime Cup rental tables in the Stadium 2 source-side blob.
-# The helper preserves all original 246/248 records, appends five 0x18-byte
-# special-rental records to each table, and fixes the shared table offsets.
+# Expand the Prime Cup and Poké Cup rental tables in the Stadium 2 source-side
+# blob. The helper inserts only missing species in sorted order, preserves the
+# table-3/table-4 shared offset, and repairs directory sizes and total_size.
 [[patches.hook]]
 func = "func_80006ACC"
 before_vram = 0x80006B38
@@ -174,7 +174,11 @@ text = """
     const uint32_t table3 = base + 0x3B20u;
     const uint32_t tail_end = base + 0xFE90u;
     const uint32_t record_size = 0x18u;
-    const uint32_t shift = 5u * record_size;
+    /* Each expanded table gains records but loses eight bytes of old pad. */
+    const uint32_t shift1 = 0x70u;
+    const uint32_t shift2 = 0x40u;
+    const uint32_t shift3 = 0x70u;
+    const uint32_t total_shift = shift1 + shift2 + shift3;
     const uint8_t added[5][24] = {
         {0x64, 0x96, 0x00, 0x00, 0x5E, 0xDB, 0x42, 0x55, 0x00, 0x7F,
          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -193,69 +197,78 @@ text = """
          0x00, 0x00, 0x00, 0x00}
     };
 
-    if (rdram[table1 ^ 3u] == 246u && rdram[table2 ^ 3u] == 248u) {
+    if (rdram[table1 ^ 3u] == 246u && rdram[table2 ^ 3u] == 248u &&
+        rdram[table3 ^ 3u] == 246u) {
+        const uint32_t insert[13] = {
+            table1 + 4u + 246u * record_size,
+            table1 + 4u + 246u * record_size,
+            table1 + 4u + 246u * record_size,
+            table1 + 4u + 149u * record_size,
+            table1 + 4u + 149u * record_size,
+            table2 + shift1 + 4u + 247u * record_size,
+            table2 + shift1 + 4u + 247u * record_size,
+            table2 + shift1 + 4u + 149u * record_size,
+            table3 + shift1 + shift2 + 4u + 246u * record_size,
+            table3 + shift1 + shift2 + 4u + 246u * record_size,
+            table3 + shift1 + shift2 + 4u + 246u * record_size,
+            table3 + shift1 + shift2 + 4u + 149u * record_size,
+            table3 + shift1 + shift2 + 4u + 149u * record_size
+        };
+        const uint8_t record[13] = {4u, 3u, 2u, 1u, 0u, 3u, 2u, 0u,
+                                    4u, 3u, 2u, 1u, 0u};
+        uint32_t end = tail_end;
         uint32_t i;
-        for (i = tail_end; i != table2; ) {
-            --i;
-            rdram[(i + shift) ^ 3u] = rdram[i ^ 3u];
-        }
-
-        for (i = 0; i < shift; ++i) {
-            rdram[(table1 + 4u + 246u * record_size + i) ^ 3u] =
-                added[i / record_size][i % record_size];
+        uint32_t k;
+        for (k = 0; k < 13u; ++k) {
+            uint32_t j;
+            for (i = end; i != insert[k]; ) {
+                --i;
+                rdram[(i + record_size) ^ 3u] = rdram[i ^ 3u];
+            }
+            for (j = 0; j < record_size; ++j) {
+                rdram[(insert[k] + j) ^ 3u] = added[record[k]][j];
+            }
+            end += record_size;
+            if (k == 4u || k == 7u || k == 12u) {
+                const uint32_t compact = (k == 4u) ? table1 + 0x1790u :
+                    ((k == 7u) ? table2 + shift1 + 0x1790u :
+                                 table3 + shift1 + shift2 + 0x1790u);
+                for (i = compact; i < end; ++i) {
+                    rdram[(i - 8u) ^ 3u] = rdram[i ^ 3u];
+                }
+                end -= 8u;
+            }
         }
         rdram[table1 ^ 3u] = 251u;
-
-        {
-            const uint32_t table2_shifted = table2 + shift;
-            const uint32_t table3_shifted = table3 + shift;
-            const uint32_t table2_end = table2_shifted + 4u +
-                248u * record_size;
-
-            for (i = tail_end + shift; i != table3_shifted; ) {
-                --i;
-                rdram[(i + shift) ^ 3u] = rdram[i ^ 3u];
-            }
-            for (i = 0; i < shift; ++i) {
-                rdram[(table2_end + i) ^ 3u] =
-                    added[i / record_size][i % record_size];
-            }
-            for (i = 0; i < 5u; ++i) {
-                uint32_t j;
-                for (j = 0; j < record_size; ++j) {
-                    rdram[(table1 + 4u + 246u * record_size +
-                           i * record_size + j) ^ 3u] = added[i][j];
-                    rdram[(table2_shifted + 4u + 248u * record_size +
-                           i * record_size + j) ^ 3u] = added[i][j];
-                }
-            }
-            rdram[table2_shifted ^ 3u] = 253u;
-        }
+        rdram[(table2 + shift1) ^ 3u] = 251u;
+        rdram[(table3 + shift1 + shift2) ^ 3u] = 251u;
 
         for (i = 2u; i < 72u; ++i) {
             const uint32_t info = base + 0x10u + i * 0x10u;
+            const uint32_t offset_shift = (i == 2u) ? shift1 :
+                ((i < 5u) ? (shift1 + shift2) : total_shift);
             uint32_t value = ((uint32_t)rdram[(info + 0u) ^ 3u] << 24) |
                              ((uint32_t)rdram[(info + 1u) ^ 3u] << 16) |
                              ((uint32_t)rdram[(info + 2u) ^ 3u] << 8) |
                              (uint32_t)rdram[(info + 3u) ^ 3u];
-            value += shift;
+            value += offset_shift;
             rdram[(info + 0u) ^ 3u] = (uint8_t)(value >> 24);
             rdram[(info + 1u) ^ 3u] = (uint8_t)(value >> 16);
             rdram[(info + 2u) ^ 3u] = (uint8_t)(value >> 8);
             rdram[(info + 3u) ^ 3u] = (uint8_t)value;
         }
-        for (i = 3u; i < 72u; ++i) {
+        /* table sizes and blob total_size are part of the verified format. */
+        for (i = 1u; i <= 4u; ++i) {
             const uint32_t info = base + 0x10u + i * 0x10u;
-            uint32_t value = ((uint32_t)rdram[(info + 0u) ^ 3u] << 24) |
-                             ((uint32_t)rdram[(info + 1u) ^ 3u] << 16) |
-                             ((uint32_t)rdram[(info + 2u) ^ 3u] << 8) |
-                             (uint32_t)rdram[(info + 3u) ^ 3u];
-            value += shift;
-            rdram[(info + 0u) ^ 3u] = (uint8_t)(value >> 24);
-            rdram[(info + 1u) ^ 3u] = (uint8_t)(value >> 16);
-            rdram[(info + 2u) ^ 3u] = (uint8_t)(value >> 8);
-            rdram[(info + 3u) ^ 3u] = (uint8_t)value;
+            rdram[(info + 4u) ^ 3u] = 0x00u;
+            rdram[(info + 5u) ^ 3u] = 0x00u;
+            rdram[(info + 6u) ^ 3u] = 0x17u;
+            rdram[(info + 7u) ^ 3u] = 0x90u;
         }
+        rdram[(base + 8u) ^ 3u] = 0x00u;
+        rdram[(base + 9u) ^ 3u] = 0x00u;
+        rdram[(base + 10u) ^ 3u] = 0xFFu;
+        rdram[(base + 11u) ^ 3u] = 0xB0u;
     }
 }
 """
