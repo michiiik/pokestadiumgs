@@ -1234,11 +1234,22 @@ Vec3s35B48 *func_80035B48(Vec3s35B48 *arg0, Vec3s35B48 *arg1, Vec3s35B48 *arg2) 
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035C90.s")
+void func_80035C90(f32 *arg0) {
+    s32 i;
+    f32 *dest;
+    for (dest = arg0 + 1, i = 0; i < 14; dest++, i++) { *dest = 0.0f; }
+    for (dest = arg0, i = 0; i < 4; dest += 5, i++) { *dest = 1.0f; }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035CD0.s")
+extern void func_80035C90(f32 *arg0);
+void func_80035CD0(f32 *dest, f32 *source) {
+    func_80035C90(dest);
+    dest[12] = source[0];
+    dest[13] = source[1];
+    dest[14] = source[2];
+}
 #endif
 
 #ifdef VERSION_US
