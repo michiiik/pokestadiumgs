@@ -16,11 +16,17 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_375110/func_84105B20.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_375110/func_84105B44.s")
+extern u8 *D_84190114;
+void func_84105B44(u8 *arg0) {
+    *(s16 *)arg0 = *(s16 *)(D_84190114 + 0x78);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_375110/func_84105B58.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_375110/func_84105B7C.s")
+extern u8 *D_84190114;
+void func_84105B7C(u8 *arg0) {
+    *(s16 *)arg0 = *(s16 *)(D_84190114 + 0x72);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_375110/func_84105B90.s")
 #endif

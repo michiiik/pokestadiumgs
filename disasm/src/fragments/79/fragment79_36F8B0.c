@@ -4,7 +4,9 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_84100020.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_84100030.s")
+void func_84100030(u8 *arg0, u32 arg1) {
+    *(u32 *)(arg0 + 0x14) &= ~arg1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_84100044.s")
 
