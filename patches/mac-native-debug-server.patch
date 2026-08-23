@@ -1,0 +1,7 @@
+--- CMakeLists.txt
++++ CMakeLists.txt
+@@ -166,3 +166,4 @@
+ set(PSR_RECOMPUI_SOURCE src/main/recompui_launcher.cpp)
+ set(PSR_DEBUG_SERVER_SOURCE src/main/debug_server.cpp)
++set(PSR_DEBUG_SERVER_SOURCE ${CMAKE_SOURCE_DIR}/debug_server_macos.cpp)
+ set(PSR_POST_MORTEM_SOURCE src/main/post_mortem.cpp)

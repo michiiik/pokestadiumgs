@@ -1,0 +1,5 @@
+--- CMakeLists.txt
++++ CMakeLists.txt
+@@ -193,1 +193,1 @@
+-    extras.c
++    extras_macos.c

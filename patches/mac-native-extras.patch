@@ -1,0 +1,19 @@
+--- extras.c
++++ extras.c
+@@ -35,14 +35,16 @@
+ /* Pull in the real recomp_context layout (gpr/fpr/cop0 fields) for
+  * hand-written recomp wrappers below. recomp.h is C-compatible. */
+ #include "recomp.h"
+ 
++#ifndef __APPLE__
+ /* Stadium 2's symbol table names this libultra entry osPiReadIo, while
+  * librecomp exposes the equivalent implementation as osEPiReadIo. Keep the
+  * generated overlay table linkable without changing generated files. */
+ extern void osEPiReadIo_recomp(uint8_t *rdram, recomp_context *ctx);
+ 
+ void osPiReadIo_recomp(uint8_t *rdram, recomp_context *ctx) {
+     osEPiReadIo_recomp(rdram, ctx);
+ }
++#endif
+ 
+ /* librecomp overlay-table maintenance. Releases the recompiler's

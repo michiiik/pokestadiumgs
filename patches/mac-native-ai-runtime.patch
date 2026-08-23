@@ -1,0 +1,21 @@
+--- mac_ai.cpp
++++ mac_ai.cpp
+@@ -69,4 +69,18 @@
+ 
+ extern "C" void osAiSetFrequency_recomp(uint8_t* rdram, recomp_context* ctx) {
+     LIBRECOMP_ULTRA_TRACE(ctx);
++
++    // Stadium 2's startup path can reach audio setup before its video-mode
++    // initializer. This field is the selected VI rate (50 or 60); the US ROM
++    // is NTSC, so the hardware-consistent fallback is 60 Hz.
++    constexpr uint32_t kStadium2ViRate = 0x8011EB94;
++    if (MEM_W(0, kStadium2ViRate) == 0) {
++        MEM_W(0, kStadium2ViRate) = 60;
++    }
++    // The audio frame scheduler divides by this halfword immediately after
++    // osAiSetFrequency. A missing producer leaves it zero during early boot.
++    if (MEM_H(0, 0x8011EA6C) == 0) {
++        MEM_H(0, 0x8011EA6C) = 1;
++    }
++
+     uint32_t freq = ctx->r4;

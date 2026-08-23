@@ -1,0 +1,44 @@
+--- mac_mesgqueue.cpp
++++ mac_mesgqueue.cpp
+@@ -663,6 +663,13 @@
+ }
+ 
+ extern "C" s32 osSendMesg(RDRAM_ARG PTR(OSMesgQueue) mq_, OSMesg msg, s32 flags) {
++    // Do not form a host pointer until the guest queue address is validated.
++    // do_send performs the deeper queue-state validation below.
++    if (uint32_t(mq_) < 0x80000000u || uint32_t(mq_) >= 0x80800000u) {
++        fprintf(stderr, "[osSendMesg] invalid guest queue 0x%08X; dropping message\\n", uint32_t(mq_));
++        return -1;
++    }
++
+     OSMesgQueue *mq = TO_PTR(OSMesgQueue, mq_);
+     bool jam = false;
+ 
+@@ -691,6 +698,13 @@
+ }
+ 
+ extern "C" s32 osJamMesg(RDRAM_ARG PTR(OSMesgQueue) mq_, OSMesg msg, s32 flags) {
++    // Do not form a host pointer until the guest queue address is validated.
++    // do_send performs the deeper queue-state validation below.
++    if (uint32_t(mq_) < 0x80000000u || uint32_t(mq_) >= 0x80800000u) {
++        fprintf(stderr, "[osJamMesg] invalid guest queue 0x%08X; dropping message\\n", uint32_t(mq_));
++        return -1;
++    }
++
+     OSMesgQueue *mq = TO_PTR(OSMesgQueue, mq_);
+     bool jam = true;
+ 
+@@ -714,6 +728,13 @@
+ }
+ 
+ extern "C" s32 osRecvMesg(RDRAM_ARG PTR(OSMesgQueue) mq_, PTR(OSMesg) msg_, s32 flags) {
++    // Do not form a host pointer until the guest queue address is validated.
++    // do_recv performs the deeper queue-state validation below.
++    if (uint32_t(mq_) < 0x80000000u || uint32_t(mq_) >= 0x80800000u) {
++        fprintf(stderr, "[osRecvMesg] invalid guest queue 0x%08X; dropping receive\\n", uint32_t(mq_));
++        return -1;
++    }
++
+     OSMesgQueue *mq = TO_PTR(OSMesgQueue, mq_);
+ 
+     assert(ultramodern::is_game_thread() && "RecvMesg not allowed outside of game threads.");

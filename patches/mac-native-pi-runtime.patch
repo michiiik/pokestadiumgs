@@ -1,0 +1,43 @@
+--- mac_pi.cpp
++++ mac_pi.cpp
+@@ -294,7 +294,12 @@
+ 
+ extern "C" void osCreatePiManager_recomp(uint8_t* rdram, recomp_context* ctx) {
+     LIBRECOMP_ULTRA_TRACE(ctx);
+-    ;
++    osCreateMesgQueue(rdram, (int32_t)ctx->r5, (int32_t)ctx->r6, (s32)ctx->r7);
++
++    // Stadium 2's streamed-ROM loader uses this private PI completion queue.
++    // The shared runtime intentionally leaves the PI manager unimplemented,
++    // so establish the queue here as part of the manager initialization.
++    osCreateMesgQueue(rdram, 0x800CD000, 0x800CD018, 1);
+ }
+ 
+ void recomp::do_rom_read(uint8_t* rdram, gpr ram_address, uint32_t physical_addr, size_t num_bytes) {
+@@ -703,6 +708,26 @@
+     ctx->r2 = 0;
+ }
+ 
++extern "C" void osPiReadIo_recomp(RDRAM_ARG recomp_context* ctx) {
++    LIBRECOMP_ULTRA_TRACE(ctx);
++    // s32 osPiReadIo(u32 devAddr, u32* data). Unlike osEPiReadIo, this
++    // interface implicitly targets the cartridge ROM PI handle.
++    uint32_t devAddr = ctx->r4 | recomp::rom_base;
++    gpr dramAddr = ctx->r5;
++    uint32_t physical_addr = k1_to_phys(devAddr);
++
++    if (physical_addr >= recomp::rom_base) {
++        recomp::do_rom_pio(PASS_RDRAM dramAddr, physical_addr);
++    } else {
++        fprintf(stderr,
++            "[pi] osPiReadIo from unknown phys 0x%08X -- returning 0\n",
++            physical_addr);
++        MEM_W(0, dramAddr) = 0;
++    }
++
++    ctx->r2 = 0;
++}
++
+ extern "C" void osEPiStartDma_recomp(RDRAM_ARG recomp_context* ctx) {
+     LIBRECOMP_ULTRA_TRACE(ctx);
+     OSPiHandle* handle = TO_PTR(OSPiHandle, ctx->r4);

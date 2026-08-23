@@ -1,0 +1,12 @@
+--- CMakeLists.txt
++++ CMakeLists.txt
+@@ -112,5 +112,9 @@
+ target_sources(librecomp PRIVATE
+     ${CMAKE_SOURCE_DIR}/mac_pi.cpp
+     ${CMAKE_SOURCE_DIR}/mac_ai.cpp)
++get_target_property(ULTRAMODERN_SOURCES ultramodern SOURCES)
++list(FILTER ULTRAMODERN_SOURCES EXCLUDE REGEX "/mesgqueue\\.cpp$")
++set_property(TARGET ultramodern PROPERTY SOURCES "${ULTRAMODERN_SOURCES}")
++target_sources(ultramodern PRIVATE ${CMAKE_SOURCE_DIR}/mac_mesgqueue.cpp)
+ 
+ target_include_directories(rt64 PRIVATE ${CMAKE_BINARY_DIR}/rt64/src)

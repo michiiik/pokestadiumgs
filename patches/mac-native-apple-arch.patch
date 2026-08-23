@@ -1,0 +1,9 @@
+--- CMakeLists.txt
++++ CMakeLists.txt
+@@ -243,5 +243,5 @@
+     -fno-strict-aliasing
+     -fms-extensions
+ )
+-if (NOT ANDROID)
++if (NOT APPLE AND NOT ANDROID)
+     target_compile_options(PokemonStadiumRecomp PRIVATE
