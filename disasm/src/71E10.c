@@ -22,7 +22,7 @@ s32 func_80071250(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/71E10/func_80071890.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/71E10/func_800718B8.s")
+s32 func_800718B8(s32 arg0) { extern s32 D_8009F828[]; if (arg0 < 0 || arg0 >= 0xF) return 0; return D_8009F828[arg0]; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/71E10/func_800718E4.s")
 
