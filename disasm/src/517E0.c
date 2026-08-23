@@ -12,6 +12,8 @@ extern SaveRecordEntry D_801281C0[];
 extern u8 *D_801281C4[];
 extern u8 *D_801281C8[];
 extern s32 D_800972C0;
+extern void Save_ResetAndCommitTypedRecord(s32 type, s32 record);
+extern void func_80055260(s32 type, s32 record);
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80050BE0.s")
 
@@ -519,7 +521,40 @@ void Save_ResetBank(void *unused, u32 bankId) {
     entry->active = NULL;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800550E8.s")
+extern void *main_pool_alloc_with_func(u32 size, u32 align,
+                                       void (*freeFunc)(void *, u32),
+                                       u32 arg);
+extern void func_80003E84(void *ptr, u32 offset, u32 size, u32 arg);
+
+s32 func_800550E8(s32 bank) {
+    SaveRecordEntry *entry = &D_801281C0[bank * 5];
+    extern u32 D_800972B0[];
+    u32 bankSize = D_800972B0[bank];
+    u32 allocationSize;
+    u8 *allocation;
+    u8 *end;
+
+    if (entry->backup != NULL) {
+        return 0;
+    }
+
+    allocationSize = bankSize * 2;
+    allocation = main_pool_alloc_with_func(bankSize * 2,
+                                            0,
+                                            Save_ResetBank,
+                                            0x424E4B30 + bank);
+    if (allocation == NULL) {
+        return 0;
+    }
+
+    bzero(allocation, allocationSize);
+    end = allocation + bankSize;
+    entry->backup = allocation;
+    entry->active = end;
+    func_80003E84(allocation, bank * 0x80, bankSize >> 7, 0);
+    func_80003E84(end, bank * 0x80 + 0x200, bankSize >> 7, 0);
+    return 1;
+}
 
 s32 func_800551EC(u8 *data, s32 length) {
     u8 *footer = data + length - 6;
@@ -531,9 +566,128 @@ s32 func_800551EC(u8 *data, s32 length) {
     return *(u16 *)(footer + 4) == Save_Checksum(data, length);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055260.s")
+void func_80055260(s32 type, s32 record) {
+    u8 *backup = NULL;
+    u8 *active = NULL;
+    s32 length = -1;
+    s32 validity;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800555B4.s")
+    switch (type) {
+        case 0x10:
+            length = 0x180;
+            backup = func_80050E88(0, D_800972C0, record);
+            active = func_80050E88(1, D_800972C0, record);
+            break;
+        case 0x11:
+            length = 0x4D8;
+            backup = func_80050F60(0, record);
+            active = func_80050F60(1, record);
+            break;
+        case 0x12:
+            length = 0x20C;
+            backup = func_80051028(0, record);
+            active = func_80051028(1, record);
+            break;
+        case 0x13:
+            length = 0x54;
+            backup = func_800510CC(0);
+            active = func_800510CC(1);
+            break;
+        case 0x14:
+            length = 0x60;
+            backup = func_80051138(0);
+            active = func_80051138(1);
+            break;
+        case 0x15:
+            length = 0x1A0;
+            backup = func_800511A4(0);
+            active = func_800511A4(1);
+            break;
+        case 0x16:
+            length = 0x936;
+            backup = func_80051208(0);
+            active = func_80051208(1);
+            break;
+        case 0x17:
+            length = 0x58A;
+            backup = func_80051274(0);
+            active = func_80051274(1);
+            break;
+        case 0x18:
+            length = 0x250;
+            backup = func_800512E0(0);
+            active = func_800512E0(1);
+            break;
+        case 0x19:
+            length = 0x1B10;
+            backup = func_8005134C(0);
+            active = func_8005134C(1);
+            break;
+        case 0x1A:
+            length = 0x490;
+            backup = func_800513B8(0);
+            active = func_800513B8(1);
+            break;
+        case 0x1B:
+            length = 0xBD0;
+            backup = func_80051424(0);
+            active = func_80051424(1);
+            break;
+        case 0x1C:
+            length = 0x3F0;
+            backup = func_80051490(0);
+            active = func_80051490(1);
+            break;
+        case 0x1D:
+            length = 0x648;
+            backup = func_800514FC(0);
+            active = func_800514FC(1);
+            break;
+        case 0x1E:
+            length = 0x50;
+            backup = func_80051568(0);
+            active = func_80051568(1);
+            break;
+        default:
+            return;
+    }
+
+    if (backup == NULL || active == NULL) {
+        return;
+    }
+
+    validity = func_800551EC(backup, length) |
+               (func_800551EC(active, length) << 1);
+    if (validity == 0) {
+        return;
+    }
+    if (validity == 1) {
+        Save_ResetAndCommitTypedRecord(type, record);
+    } else if (validity == 2) {
+        Save_WriteRecord(active, backup, length, func_80050D20(type, record));
+    } else {
+        Save_WriteRecord(backup, active, length, func_80050D20(type, record));
+    }
+}
+
+void func_800555B4(s32 commit) {
+    s32 savedBank = D_800972C0;
+    s32 bank;
+    s32 record;
+
+    D_800972C0 = 0;
+    for (bank = 0; bank < 4; bank++) {
+        for (record = 0; record < 10; record++) {
+            if (commit == 0) {
+                func_80055260(0x10, record);
+            } else {
+                Save_ResetAndCommitTypedRecord(0x10, record);
+            }
+        }
+        D_800972C0 = bank + 1;
+    }
+    D_800972C0 = savedBank;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_8005565C.s")
 
