@@ -43,7 +43,27 @@ void Dma_ReadChunks(u32 destination, u32 source, s32 length, u32 staging) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80003E84.s")
+extern s32 Storage_QueueFlashTransfer(u32 staging, u32 destination,
+                                      s32 sourceSector, OSMesgQueue *queue,
+                                      s32 mode);
+
+s32 func_80003E84(u32 destination, u32 sourceSector, s32 count,
+                  u32 staging) {
+    OSMesgQueue *queue = (OSMesgQueue *)D_800CD000;
+
+    while (count > 0) {
+        Storage_QueueFlashTransfer(staging, destination,
+                                   (s16)sourceSector, queue, 0);
+        osRecvMesg(queue, NULL, 1);
+        if (staging == 1 && osFlashWriteArray((s16)sourceSector) != 0) {
+            return -1;
+        }
+        destination += 0x80;
+        sourceSector++;
+        count--;
+    }
+    return 0;
+}
 
 extern s32 Dma_QueueRomRead(u32 destination, u32 source, u32 end,
                          u32 length, u32 staging, s32 mode);
