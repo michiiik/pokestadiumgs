@@ -150,9 +150,15 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_8220ACF4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_8220AD04.s")
+extern s16 D_822106BA;
+s32 func_8220AD04(void) {
+    return D_822106BA;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_8220AD10.s")
+extern s16 D_822106B8;
+s32 func_8220AD10(void) {
+    return D_822106B8;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_8220AD1C.s")
 
