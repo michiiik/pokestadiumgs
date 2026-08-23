@@ -11,7 +11,10 @@ void func_8AF07CB0(u8 *arg0, s32 arg1, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F5F20/func_8AF07EBC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F5F20/func_8AF07FF0.s")
+extern s16 D_8AF2C960;
+void func_8AF07FF0(void) {
+    D_8AF2C960 = 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F5F20/func_8AF08000.s")
 
