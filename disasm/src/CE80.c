@@ -136,7 +136,7 @@ void func_8000D9F0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/CE80/func_8000DB0C.s")
+void func_8000DB0C(u8 *arg0, s32 arg1, s32 arg2) { *(u32 *)(arg0 + 0) = 0x07020000 | ((u32)arg1 & 0xFFFF); *(u32 *)(arg0 + 4) = arg2; }
 #endif
 
 #ifdef VERSION_US
