@@ -22,7 +22,9 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E35C0/func_8160BBCC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E35C0/func_8160BC1C.s")
+s32 func_8160BC1C(u8 *arg0) {
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E35C0/func_8160BC28.s")
 #endif
