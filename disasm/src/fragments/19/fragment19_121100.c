@@ -48,7 +48,10 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_8230125C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82301428.s")
+extern s16 D_82305E6E;
+s32 func_82301428(void) {
+    return D_82305E6E;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82301434.s")
 
