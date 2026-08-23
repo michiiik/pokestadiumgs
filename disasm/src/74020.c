@@ -13,6 +13,8 @@
 #define D_8009FE6F ((u8 *)0x8009FE6F)
 #define D_8009FF6B ((u8 *)0x8009FF6B)
 
+#define D_8012B410 ((u8 *)0x8012B410)
+
 #ifdef VERSION_US
 u8 func_80073420(s32 code) {
     u8 index = (u8)code;
@@ -110,5 +112,47 @@ u8 func_80073600(s32 code) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/74020/func_80073828.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/74020/func_800739EC.s")
+/* Expand the game's packed text stream into the two-byte-per-glyph format
+ * consumed by the renderer.  Bytes below 0x80 are literal glyphs; high-bit
+ * bytes introduce a pair whose low seven bits select one of the compact
+ * character ranges. */
+u8 *func_800739EC(u8 *input, u8 *output) {
+    u8 *dst = output != NULL ? output : D_8012B410;
+    u8 code;
+
+    for (;;) {
+        code = *input++;
+        if (code == 0) {
+            *dst = 0;
+            return output != NULL ? output : D_8012B410;
+        }
+
+        if (code < 0x80) {
+            *dst++ = code;
+            continue;
+        }
+
+        {
+            u8 next = *input++;
+            u8 index = code & 0x7F;
+            u8 glyph;
+            u8 base;
+
+            if (next == 0) {
+                *dst = 0;
+                return output != NULL ? output : D_8012B410;
+            }
+
+            next &= 0x7F;
+            if (index & 1) {
+                glyph = next < 0x60 ? 0x1F : 0x20;
+            } else {
+                glyph = 0x7E;
+            }
+            base = index < 0x5F ? 0x71 : 0xB1;
+            *dst++ = (u8)(base + (index == 0 ? -1 : (index - 1) / 2));
+            *dst++ = (u8)(glyph + next);
+        }
+    }
+}
 #endif
