@@ -104,7 +104,7 @@ void func_84200868(u8 *arg0) {}
 
 void func_842008F8(u8 *arg0) {}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_4194A0/func_84200900.s")
+void func_84200900(u8 *arg0) { u32 value = func_842034A0(); *(u8 **)(arg0 + 0x10) += (*(u8 **)(arg0 + 0x14))[0x2E] * value; }
 
 void func_84200940(u8 *arg0) {}
 
