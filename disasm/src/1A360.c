@@ -24,9 +24,14 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1A360/func_8001A6F8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/1A360/func_8001A994.s")
+extern void func_8001A6F8(void *arg0, s32 arg1);
+void func_8001A994(void *arg0) {
+    func_8001A6F8(arg0, 6);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/1A360/func_8001A9B4.s")
+void func_8001A9B4(void *arg0) {
+    func_8001A6F8(arg0, 7);
+}
 
 void func_8001A9D4(u32 *arg0) {
     arg0[0] = (u32)arg0;
