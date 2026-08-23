@@ -41,7 +41,9 @@ The latest rental-roster build handoff is in
 
 ## Decompilation
 
-The `disasm` submodule is `pret/pokestadiumgs`. Its build currently requires a
+The `disasm` directory is a vendored copy of `pret/pokestadiumgs` (forked at
+`michiiik/pokestadiumgs`, imported at `stadium2-names` commit `ccae2a1`). Its
+build currently requires a
 Linux/macOS environment with GNU Make, Python, and `mips-linux-gnu` binutils;
 native Windows is explicitly unsupported upstream.
 
@@ -81,7 +83,7 @@ python3 tools/apply_names.py && python3 tools/apply_names.py --qa
 ```
 
 Coverage, method and caveats are in [docs/NAMING.md](docs/NAMING.md). The renamed
-tree lives on the `stadium2-names` branch of the `disasm` submodule.
+tree (the `stadium2-names` branch of the disasm fork) is vendored in `disasm/`.
 
 ## Native macOS build
 

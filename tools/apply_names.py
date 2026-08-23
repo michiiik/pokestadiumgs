@@ -204,7 +204,7 @@ def main():
         sys.exit("no renames in mapping")
     files = list(iter_files())
     if not files:
-        sys.exit(f"no source files under {DISASM} -- is the submodule checked out?")
+        sys.exit(f"no source files under {DISASM} -- is disasm/ present?")
 
     if a.qa:
         sys.exit(run_qa(mapping))

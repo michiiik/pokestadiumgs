@@ -6,7 +6,7 @@ Turning `func_800015C0` into `DisplayTask_Initialize`.
 - Transferred mapping: **`tools/s1_transfer.json`** — machine-generated, never hand-edited.
 - Generator: **`tools/xmatch_stadium1.py`** — matches this ROM against Stadium 1's.
 - Applier: **`tools/apply_names.py`** — `--dry-run`, `--check`, `--qa`, or bare to apply.
-- Scope: the `disasm/` submodule, US tables only, on branch `stadium2-names`.
+- Scope: `disasm/` (a vendored copy of the fork's `stadium2-names` branch), US tables only.
 
 ## Why this is not the Stadium 1 pass
 
