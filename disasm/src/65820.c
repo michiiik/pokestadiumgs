@@ -1,8 +1,21 @@
 #include "global.h"
 
+extern u32 osSetIntMask(u32 mask);
+extern void *Fragment_Load(u32 pool, u32 source, u32 end);
+extern void main_pool_try_free(void *ptr);
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/Game_PollState.s")
+u32 Game_PollState(u32 mask) {
+    u32 previous = osSetIntMask(1);
+    volatile u32 *piStatus = (volatile u32 *)0xA4600010;
+    volatile u32 *dmaStatus = (volatile u32 *)0xB0000E38;
+
+    if ((*piStatus & 3) == 0 && ((*dmaStatus & 0xFFFF) != 0x828A)) {
+        mask = (u32)-16;
+    }
+    osSetIntMask(previous);
+    return mask;
+}
 #endif
 
 #ifdef VERSION_US
@@ -30,7 +43,15 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/Fragment_LoadAndCall.s")
+s32 Fragment_LoadAndCall(u32 pool, u32 source, u32 end, s32 arg3,
+                         void *arg4) {
+    void *fragment = Fragment_Load(pool, source, end);
+    s32 (*entry)(s32, void *) = (s32 (*)(s32, void *))fragment;
+    s32 result = entry(arg3, arg4);
+
+    main_pool_try_free(fragment);
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
