@@ -2,22 +2,22 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_375530/func_84105CA0.s")
+void func_84105CA0(u8 *arg0) {}
 #endif
 
 void func_84105CA8(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_375530/func_84105CB0.s")
+void func_84105CB0(u8 *arg0) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_375530/func_84105CB8.s")
+void func_84105CB8(u8 *arg0) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_375530/func_84105CC0.s")
+void func_84105CC0(u8 *arg0) {}
 #endif
 
 #ifdef VERSION_US
@@ -31,7 +31,7 @@ void func_84105CF0(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_375530/func_84105CF8.s")
+void func_84105CF8(u8 *arg0) {}
 #endif
 
 #ifdef VERSION_US
