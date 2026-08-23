@@ -169,9 +169,9 @@ mode block. The controller-facing wrappers are `Minigame_ProcessInput`,
 `Minigame_UpdateControllerState`, and `Minigame_ResetControllerPoll`; their
 fragment callbacks respectively scan four controller records, normalize the
 per-loop controller state, and clear those records while resetting the GB
-Tower poll mask. The unresolved `Minigame` callback at `func_80072030` is left
-address-named because its three-argument fragment callback still needs a
-caller-level semantic cross-check.
+Tower poll mask. `Minigame_ProcessPlayerEvents` covers the three-argument
+fragment callback as well: its body scans four player records and their
+18-slot event tables. The callback's individual event meanings remain open.
 
 The supporting record helpers are covered as well: `Minigame_ResetPlayerRecord`
 clears one embedded player record, `Minigame_ResetPlayerSubstate` initializes
