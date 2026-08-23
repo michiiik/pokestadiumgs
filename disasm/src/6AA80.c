@@ -76,7 +76,11 @@ extern s32 D_8009DF70; void func_8006A2EC(void) { D_8009DF70 = 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006AF28.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006AF84.s")
+extern s32 D_8009DF70;
+
+s32 func_8006AF84(void) {
+    return *(s32 *)((u8 *)(u32)D_8009DF70 + 0x1C);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006AF94.s")
 
