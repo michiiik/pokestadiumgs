@@ -6,7 +6,7 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80021ED8.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Audio_DispatchCommand.s")
 #endif
 
 #ifdef VERSION_US
@@ -976,7 +976,7 @@ void func_80033ED0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035174.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Audio_ThreadEntry.s")
 #endif
 
 #ifdef VERSION_US
@@ -988,11 +988,11 @@ void func_80033ED0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800353BC.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Audio_StopProcessing.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800353E4.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Audio_WaitForPendingTasks.s")
 #endif
 
 #ifdef VERSION_US
@@ -1000,15 +1000,15 @@ void func_80033ED0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035470.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Audio_SetProcessingEnabled.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035494.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Audio_ResetModeSelector.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800354A4.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Audio_EnableModeFlag.s")
 #endif
 
 #ifdef VERSION_US
@@ -1016,11 +1016,11 @@ void func_80033ED0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800355D4.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Audio_ResetRequestId.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800355E4.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Audio_RequestEvent.s")
 #endif
 
 #ifdef VERSION_US

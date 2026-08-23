@@ -6,15 +6,15 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_800564BC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_8005655C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/GbPak_ReadWriteBytes.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/GbPak_VerifyPattern.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/GbPak_DetectRam.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056870.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/GbPak_ProbeAndDetectRam.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056960.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/GbPak_ValidateAndRefresh.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/GbTower_CheckPakRemoved.s")
 
@@ -28,13 +28,13 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/GbPak_IsCartOn.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056F7C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/GbPak_Initialize.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/GbTower_VerifyPakStillInserted.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_800570CC.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/GbPak_ReadCommand.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_8005712C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/GbPak_WriteCommand.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_8005718C.s")
 

@@ -109,12 +109,251 @@ roles.
 every unnamed function with its named callers and callees -- the partition that
 makes a manual pass tractable (`229E0` alone has 208 anchors around 331
 unnamed functions). `tools/find_dispatch_tables.py` found the 180 candidate
-tables (1,560 entries); after this pass 102 + the 9 geo entries resolve to
-named functions, and the remaining large tables (lengths 253, 225, 83, 53,
-50, 48) are the next audit targets.
+tables (1,560 entries); the historical Phase 2 batch resolved 102 + the 9 geo
+entries, while later Phase 3 batches resolve the 253-, 225-, 83-, 53-, 50-,
+and 9-entry tables positionally.
 
 Phase 2 is assembly-verified: the renamed tree builds the byte-identical US
 ROM (md5 `1561c75d11cedf356a8ddb1a4a5f9d5d`) in the linux/amd64 container.
+
+## Phase 3.2: fragment and main-pool eviction hooks
+
+The loader's callback edges provide stronger evidence than the generic function
+shapes around them. `Asset_LoadToSegment` installs
+`Memmap_SegmentCleanupCallback` for allocations in the `0x82000000` segment
+range; the callback checks the owning segment base and clears the segment map
+when the allocation is evicted. `Fragment_Register` installs the parallel
+`Memmap_FragmentCleanupCallback` for the `0x81000000` fragment range. The
+shared header helper is `MainPool_GetAllocationSize`: it reads the main-pool
+block size stored at `user_pointer - 0xC`, and both registration paths use it
+before deciding whether to reallocate.
+
+The archive path's post-registration helper is now
+`Fragment_RelocateAndReset`. Its body calls `Memmap_RelocateFragment`, computes
+the fragment end from the loaded header, and calls
+`MainPool_ResetStateToOffset`; that call relationship fixes the role without
+assuming a particular archive format. The actual file/decompression worker at
+`func_800042C0` remains address-named because it handles multiple `PERS`/`PRES`
+and fallback payload forms and its format-specific consumers are not yet
+settled. Fragment-to-state assignments remain hypotheses until each state's
+loader call site is audited.
+
+The fragment-role inventory now covers all 88 entries in
+`fragments_relocatable.txt`. Direct state-dispatch evidence assigns fragment
+16 to state 1, 17 to state 2, 25 to state 3, 11/4/10/26 to state 4, 29 to state
+5, 43/44/64/12/27/79/80 to state 6, 3/13/87 to state 7, 22 to state 11,
+15/67 to state 17, and 88/40 to state 19. State 10's minigame setup and
+dispatch band covers 2/3/4/26/27/43-57/59-66; these are shared minigame
+residents rather than individual title assignments. The remaining entries —
+1, 5-9, 14, 18-21, 23-24, 28, 30-39, 41-42, 58, 68-78, and 81-86 — are
+explicitly hypothesised as optional or mode-selected overlays whose direct
+caller has not yet been recovered. This is an unresolved-role hypothesis, not
+a semantic name, so no fragment is silently omitted from the loader audit.
+
+## Phase 3.3: audio request-id edge
+
+The small audio helpers at `0x800355D4` and `0x800355E4` are now named from
+their shared global and call sites. `Audio_RequestEvent` suppresses duplicate
+ids, forwards a changed id to the resident dispatcher at `0x80021ED8`, and
+stores it as the current request. `Audio_ResetRequestId` writes the sentinel
+`-1`; the game thread calls it when leaving the minigame state. This establishes
+the request/reset edge without claiming that the larger `0x800354B4` orchestration
+function is a music-only API; its mode and task transitions remain for the
+audio-thread pass.
+
+## Phase 3.4: minigame fragment inventory
+
+`Game_State10_Minigame` now has a call-site inventory in the ledger: its
+`Fragment_Load`/`Fragment_LoadAndCall` operands name the complete resident set
+`{2, 3, 4, 26, 27, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55,
+56, 57, 59, 60, 61, 62, 63, 64, 65, 66}`. The first five are loaded during
+minigame setup; the remaining entries are selected by the minigame dispatch
+branches and paired as loader/callback operations. This is direct evidence from
+the ROM-start operands, not an inference from fragment names. Individual
+fragment init/update/draw roles remain open until their callback targets and
+per-minigame state tables are audited.
+
+The first minigame state helpers are now named from direct body and caller
+evidence. `Minigame_StateInit` initializes the `D_801291E0` state block,
+`Minigame_SetModeDefaults` seeds `D_8012B3E8`, and
+`Minigame_UpdateResultState` maps the loaded fragment result back into that
+mode block. The controller-facing wrappers are `Minigame_ProcessInput`,
+`Minigame_UpdateControllerState`, and `Minigame_ResetControllerPoll`; their
+fragment callbacks respectively scan four controller records, normalize the
+per-loop controller state, and clear those records while resetting the GB
+Tower poll mask. `Minigame_ProcessPlayerEvents` covers the three-argument
+fragment callback as well: its body scans four player records and their
+18-slot event tables. The callback's individual event meanings remain open.
+
+The supporting record helpers are covered as well: `Minigame_ResetPlayerRecord`
+clears one embedded player record, `Minigame_ResetPlayerSubstate` initializes
+its four-word substate, `Minigame_SetPlayerMask` writes the active-player bit,
+and `Minigame_MapControllerButtons` translates the four controller bits into
+the destination input flags. `Minigame_ProcessPlayerEvents` is the wrapper for
+the fragment callback that scans the four player records and their 18 event
+slots. These names remain structural and data-flow based; they do not assign
+individual minigame titles to the records.
+`Minigame_UpdatePlayerCounters` wraps the callback that increments the selected
+18-slot counter for each player, while `Minigame_ResetRoundPlayers` restores
+the GB Tower poll mask and resets all four player records before a new round.
+
+## Phase 3.5: rental/roster blob transport
+
+`RENTAL_REVERSE_ENGINEERING.md` provides the byte-verified consumer layout: the
+uncompressed blob is copied from ROM `0x1708000` to RDRAM `0x802492B0`, has a
+72-entry directory, and stores 24-byte records (`count` at table header plus
+`count * 0x18` bytes). The code-side transport boundary is now explicit:
+`Dma_ReadChunks` splits the asset transfer into bounded requests and
+`Dma_QueueRomRead` allocates the storage request carrying the ROM source,
+RDRAM destination, length, and completion queue; `Dma_QueueRequestMessage`
+performs the queue send/jam. This is the path used when the asset loader brings
+the rental blob into RAM. No second, rental-specific parser is present in the
+US text segment: table selection and 24-byte record interpretation occur in
+the loaded game fragments, while `tools/gs_rental_dump.py` independently
+validates all 72 directory entries and record boundaries. The names therefore
+stop at the proven transport/parser boundary instead of inventing a parser
+role for an address-only fragment consumer.
+
+## Phase 3.5: GB-save format and checksum helpers
+
+The save/Controller Pak pass adds two names in the GB-save translation unit.
+`GbSave_ComputeChecksumRange` is called by four save-block writers; its body
+sums the requested byte range, truncates to 16 bits, and stores the result via
+the existing little-endian helper. `GbSave_IdentifyFormat` is called by the
+main GB-save flows and is more specific than a generic parser label: it checks
+the `0x3031` header marker, requires a non-empty version field, compares the
+embedded names against seven resident format strings, and returns the matching
+format index. The lower-level Pak presence and port-availability functions
+were already transferred and remain separately named.
+
+The Controller Pak gate is `GbSave_RequirePakPresent`: it checks
+`GbTower_CheckPakRemoved` and routes a missing Pak through
+`Game_ShutdownAndLoadFragment`. The record path is explicit in the save
+translation unit: `Save_WriteRecord` copies a 24-byte record and sets its
+pending bit, `Save_CommitRecord` writes the footer and commits that bit, and
+the paired `Save_InvalidateRecord`, `Save_RestoreRecord`, and
+`Save_ClearRecord` helpers implement the invalidation/restore/clear states.
+`Save_Checksum`, `Save_WriteFooter`, and `Save_ResetBank` complete the checksum,
+footer, and bank transitions; `GbPak_VerifyPattern`, `GbPak_DetectRam`, and the
+`GbTower_*Pak*` anchors cover Pak detection and removal handling. The remaining
+address-named routines in these translation units lack a distinct read/write
+or Pak edge and remain explicitly outside this naming claim.
+
+## Phase 3.9: GB Tower and Transfer Pak paths
+
+The transfer path is now named from the hardware calls themselves:
+`GbPak_Initialize` performs `osGbpakInit`/id/connector setup,
+`GbPak_ProbeAndDetectRam` repeats the id/connector probe and detects RAM,
+`GbPak_ReadCommand` and `GbPak_WriteCommand` gate the shared
+`GbPak_ReadWriteBytes` helper, and that helper performs chunked
+`osGbpakReadWrite` transfers across 0x2000-byte bank boundaries. The Tower
+wrappers `GbTower_PollPortState`, `GbTower_UpdatePortState`,
+`GbTower_StartPortSession`, and `GbTower_InitializePorts` cover the four-port
+state machine, insertion checks, save-format validation, and poll-mask setup.
+These names establish the hardware access and emulation entry edges; trade/Lab
+UI callers remain separate from the Pak transport layer.
+
+## Phase 3.7: audio thread and command dispatcher
+
+`Thread4_CreateThread` passes `func_80035174` directly to `osCreateThread`; its
+body initializes a scheduler client, creates the completion queues, and loops
+on `Sched_WaitClientQueue` before submitting audio tasks. It is therefore named
+`Audio_ThreadEntry`. The resident `0x80021ED8` function is named
+`Audio_DispatchCommand`: `Audio_RequestEvent` calls it for changed ids, while
+its body maps those ids through the audio state tables and updates command
+flags. The mixer/task internals below that dispatcher remain separate audit
+targets.
+
+The lifecycle edges are now named as well: `Audio_StopProcessing` is called by
+both the scheduler pre-NMI path and `Game_ShutdownAndLoadFragment`, invokes the
+audio stop primitive, and clears the Thread4 processing flag;
+`Audio_WaitForPendingTasks` is called by the state-4 shutdown path and polls the
+completion primitive until the pending audio work drains. These names describe
+control-flow roles only; they do not claim ownership of the lower-level RSP
+mixer implementation.
+
+`Audio_SetProcessingEnabled` completes the control surface: state 4 calls it
+with both boolean values, and `Audio_ThreadEntry` reads the same flag before
+submitting work. The name is intentionally limited to the flag transition;
+the event IDs and mixer command meanings remain separate.
+
+The thread's task side is now named through its producer as well:
+`Audio_InitializeTaskState` is the one-time RSP/task setup, and each scheduler
+wake calls `Audio_BuildSchedulerTask`, which obtains the next task from
+`Audio_MixerStep` and submits it through `Sched_SubmitTask`. The mixer-step
+body advances the audio scheduler, services AI/GB audio buffers, drains task
+completion messages, and constructs the resident 0x68-byte task record. This
+establishes the mixer entry from the thread's direct call edge without naming
+individual command IDs beyond the separately documented request dispatcher.
+
+Two adjacent audio controls are now named from their direct global writes:
+`Audio_ResetModeSelector` stores `-1` in `D_80094860`, while
+`Audio_EnableModeFlag` stores `1` in `D_80094868`. Their names describe only
+those state transitions; the mode values consumed by the larger command
+routine remain unresolved.
+
+## Phase 3.8: fragment-79 species dispatch handlers
+
+The 253-entry table at `0x84183D50` is now resolved at the handler level. It
+contains one repeated default target plus 99 non-default targets; those targets
+are named `BattleAnim_Dispatch_NNN` from their table slots, with repeated slots
+recorded in each entry's evidence. This is deliberately a positional naming
+batch: the table cardinality and slot selection establish a per-species-style
+dispatch surface, but do not by themselves prove the semantic animation for a
+handler. The neighboring table is audited separately below.
+
+The neighboring 225-entry table at `0x84184148` has now received the same
+positional treatment: one dominant default target and 51 non-default targets
+are named `BattleAnim_ModelDispatch_NNN`, with repeated slots retained in the
+evidence. These names identify the dispatch surface only; they do not assert
+that every slot is a distinct model or animation.
+
+The fragment-67 table at `0x829130A4` is also resolved positionally. Its 53
+entries consist of one repeated default handler and 13 non-default handlers at
+slots `1, 5, 9, 13, 17, 21, 25, 29, 33, 37, 41, 45, 49`; those handlers are
+named `BattleAnim_Fragment67Dispatch_NNN`. The regular stride is recorded as
+structural evidence, while the exact effect semantics remain a body-level
+follow-up.
+
+Three auxiliary fragment-79 tables are now covered without semantic guesses:
+the 50-entry table at `0x84185F10`, the 83-entry table at `0x84186004`, and the
+9-entry table at `0x84185FDC`. Every entry in these tables points to a distinct
+handler, so each target is named `BattleAnim_Table_<table>_<slot>` using the
+table address and zero-padded slot. This records stable positional evidence;
+the handlers still need body-level analysis before receiving effect-specific
+names.
+
+## Phase 3.6: remaining dispatch-table boundaries
+
+The dispatch-table survey was rerun after the subsystem slices. The two largest
+resolved tables are in fragment 79 at `0x84183D50` (253 entries) and
+`0x84184148` (225 entries); the 83-, 50-, and 9-entry neighbors are now also
+covered positionally above. No table-level caller evidence currently
+distinguishes the remaining 23-entry and smaller tables from animation/effect
+dispatch, so they remain audit targets rather than receiving guessed names.
+This preserves the issue #3 rule that table structure is evidence, but not proof
+of each callee's behavior.
+
+## Phase 3 subsystem completion audit
+
+The remaining epic scopes were audited against the same evidence boundary. The
+battle scene entry is `Game_State06_Run`, whose direct fragment set is
+`43/44/64/12/27/79/80`; the battle-animation and model dispatch surfaces are
+the table-addressed handlers above. No US text-segment body or caller proves a
+separate damage/stat routine name, so the unresolved 23-entry and smaller
+tables remain explicitly recorded audit targets rather than guessed battle
+names. The text/UI transfer set is likewise bounded to the proven
+`TextRenderer_*`, `Ui_*`, display-list, and state handlers; format-specific
+string tables live in loaded fragments and are not exposed as resident symbols.
+
+For minigames, `Game_State10_Minigame` has 13 state slots in `jtbl_800A5B18`.
+Each slot's direct `Fragment_Load`/`Fragment_LoadAndCall` operand is recorded
+in the minigame ledger, covering the shared resident set 2/3/4/26/27/43-57 and
+59-66. The shared init, input, controller-reset, player-record, round, and
+result callbacks are named; per-game draw/update semantics are fragment-local
+and are explicitly left unplaceable until their callback bodies are recovered.
+This closes the naming audit without converting positional evidence into
+unsupported game titles.
 
 ## Phase 1: the Stadium 1 transfer
 the 676 is a machine-verified correspondence between the two ROMs' machine code.

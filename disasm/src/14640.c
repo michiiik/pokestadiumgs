@@ -158,7 +158,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80017AC0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80017B00.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/Audio_MixerStep.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80018078.s")
 

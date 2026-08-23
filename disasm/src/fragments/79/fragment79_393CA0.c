@@ -442,19 +442,19 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84129D8C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_000.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84129E84.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_001.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412A028.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_002.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412A17C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_003.s")
 #endif
 
 #ifdef VERSION_US
@@ -466,67 +466,67 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412A300.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_004.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412A454.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_005.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412A73C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_006.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412A804.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_007.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412A934.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_008.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412A9F4.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_009.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412AA68.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_010.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412AAE8.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_011.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412ADF8.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_012.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412AFE0.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_013.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412B1D4.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_014.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412B51C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_015.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412B65C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_016.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412B958.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_017.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412BB9C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_018.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412BD14.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_019.s")
 #endif
 
 #ifdef VERSION_US
@@ -534,7 +534,7 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412BDF0.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_020.s")
 #endif
 
 #ifdef VERSION_US
@@ -542,59 +542,59 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412BFEC.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_021.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412C0AC.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_022.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412C240.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_023.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412C294.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_024.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412C47C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_025.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412C700.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_026.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412C74C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_027.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412C7F0.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_028.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412C870.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_029.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412C95C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_030.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412CB00.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_031.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412CBE8.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_032.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412CDA4.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_033.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412CF84.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_034.s")
 #endif
 
 #ifdef VERSION_US
@@ -602,19 +602,19 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412D06C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_035.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412D20C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_036.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412D2D4.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_037.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412D35C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_038.s")
 #endif
 
 #ifdef VERSION_US
@@ -626,51 +626,51 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412D53C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_039.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412D644.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_040.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412D6C0.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_041.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412D8C8.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_042.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412D950.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_043.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412DAF4.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_044.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412DBC0.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_045.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412DC08.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_046.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412DC20.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_047.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412DD0C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_048.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412DDC0.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185F10_049.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412DE98.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185FDC_000.s")
 #endif
 
 #ifdef VERSION_US
@@ -678,39 +678,39 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412E308.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185FDC_001.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412E38C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185FDC_002.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412E420.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185FDC_003.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412E510.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185FDC_004.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412E680.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185FDC_005.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412E754.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185FDC_006.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412E7D8.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185FDC_007.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412E82C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84185FDC_008.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412E94C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_000.s")
 #endif
 
 #ifdef VERSION_US
@@ -718,47 +718,47 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412EB10.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_001.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412EC30.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_002.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412EC70.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_003.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412EE5C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_004.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412EFFC.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_005.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412F044.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_006.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412F0F0.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_007.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412F170.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_008.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412F208.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_009.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412F348.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_010.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412F39C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_011.s")
 #endif
 
 #ifdef VERSION_US
@@ -766,287 +766,287 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412F5A4.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_012.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412F5C4.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_013.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412F5E4.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_014.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412F604.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_015.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412F65C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_016.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412F6DC.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_017.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412F75C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_018.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412F78C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_019.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412F7BC.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_020.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412F7EC.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_021.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412F81C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_022.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412F84C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_023.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412F87C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_024.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412F8AC.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_025.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412F8DC.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_026.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412F90C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_027.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412F93C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_028.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412F96C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_029.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412F99C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_030.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412F9CC.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_031.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412F9FC.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_032.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412FA2C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_033.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412FA5C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_034.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412FA8C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_035.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412FABC.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_036.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412FAEC.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_037.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412FB1C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_038.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412FB4C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_039.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412FB7C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_040.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412FBAC.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_041.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412FBDC.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_042.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412FC0C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_043.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412FC3C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_044.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412FC6C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_045.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412FC9C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_046.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412FD24.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_047.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412FF04.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_048.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412FF80.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_049.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8413005C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_050.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841300D0.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_051.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841301B0.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_052.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84130284.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_053.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84130380.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_054.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84130480.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_055.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841304A8.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_056.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84130500.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_057.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84130558.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_058.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8413063C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_059.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841306AC.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_060.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84130798.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_061.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841307EC.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_062.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84130824.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_063.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84130864.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_064.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841308A8.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_065.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84130A74.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_066.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84130AC8.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_067.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84130B40.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_068.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84130C08.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_069.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84130C98.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_070.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84130CC8.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_071.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84130CE8.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_072.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84130D74.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_073.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84130DBC.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_074.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84130DDC.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_075.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84130E04.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_076.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84130EA8.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_077.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841310E4.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_078.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84131174.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_079.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841312E8.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_080.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8413146C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_081.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84131538.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/BattleAnim_Table_84186004_082.s")
 #endif
 
 #ifdef VERSION_US

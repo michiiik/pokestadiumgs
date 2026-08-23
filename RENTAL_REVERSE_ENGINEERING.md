@@ -15,9 +15,9 @@ The rental blob is **uncompressed in ROM at `0x1708000`**, 0xFE90 bytes, copied
 verbatim to RAM `0x802492B0`. It is a directory of 72 tables; tables 0–4 are the
 flat rental lists, 5+ are trainer rosters. Records are 24 bytes.
 
-Three things about the **existing expansion patch in `game.toml` need fixing** —
-see §5. The most serious: table 2 already contains Mew and Celebi, so appending
-all five specials duplicates them.
+The expansion hook in `game.toml` now inserts missing records in sorted order and
+updates directory metadata. The remaining record-authoring risk is the
+statistical quality of the five special-rental records; see §5.
 
 ---
 
@@ -192,43 +192,49 @@ complete and traceable — that is the right place to find the blob consumer, no
 
 ---
 
-## 5. Review of the existing expansion patch (`game.toml`, hook on `func_80006ACC`)
+## 5. Review of the expansion patch (`game.toml`, hook on `func_80006ACC`)
 
-The patch appends five 24-byte records (Mewtwo, Mew, Lugia, Ho-Oh, Celebi) to tables
-1 and 2, shifts the tail, and re-adds `shift` to directory offsets for indices ≥2 and
-again for ≥3.
+The hook inserts five records into table 1, three into table 2, and five into the
+shared table 3/4 data. It shifts the tail in record-sized steps, removes the
+obsolete eight-byte pad after each expanded table, and updates directory
+offsets, sizes, and header `total_size`. A count check makes the operation
+idempotent.
 
-**What it gets right:** the offset arithmetic. Index 1 unshifted, index 2 shifted once,
-indices ≥3 shifted twice — correct for two insertions. Tables 3 and 4 sharing one
-offset is handled correctly by consequence.
+**Verified invariants:** each expanded table has 251 sorted, unique species;
+table 3 and table 4 retain one shared offset; and every later directory offset
+tracks the physical shift.
 
-**Defects found:**
+**Remaining risk:**
 
-1. **Table 2 gets duplicate Mew and Celebi.** Table 2 already contains species 151 and
+1. **Record quality is still provisional.** The five special records use DVs
+   `0x0000` and zero stat-exp fields, whereas real table records use stronger
+   values. This is mechanically valid but likely not game-design-correct.
+
+2. **The previous hook duplicated Mew and Celebi.** Table 2 already contains species 151 and
    251; it is missing only Mewtwo, Lugia and Ho-Oh. Appending all five produces two
    duplicate entries and `count = 253`, which exceeds the 251 species in Gen 2.
    Table 2 should receive **3** records → count 251.
-2. **The directory `size` field is never updated.** The fix-up loops rewrite only bytes
+3. **The previous hook left the directory `size` field stale.** The fix-up loops rewrite only bytes
    `info+0..3` (offset). Table 1's `size` stays `0x1720` while its data now needs
    `0x1790`; same for table 2. This breaks the `offset + size == next offset`
    invariant that holds for all 72 entries in the original blob. Whether it is fatal
    depends on whether the consumer bounds on `size` or on the count byte — unresolved,
    see §6 — but the invariant should be maintained regardless.
-3. **The header `total_size` at blob+0x08 is never updated.** It stays `0xFE90` after
-   the blob grows by `0xF0`.
-4. **Sort order is broken.** Every rental table is strictly species-sorted; appending
+4. **The previous hook left the header `total_size` stale.** It stayed `0xFE90` after
+   the old blob grew by `0xF0` without recording the new total.
+5. **The previous hook broke sort order.** Every rental table is strictly species-sorted; appending
    150/151/249/250/251 *after* species 248 leaves the list unsorted. If the selection
    screen or any lookup assumes dex order (plausible given the data is sorted, but
    **not verified**), the new entries will be misplaced or unreachable. This is a
    strong candidate for the "appended entries still missing" symptom recorded in
    `CLAUDE_HANDOFF.md`.
-5. **The appended records are statistically empty**: DVs `0x0000` and all five
+6. **The appended records are statistically empty**: DVs `0x0000` and all five
    stat-exp fields `0`, whereas real table-1 records use DVs up to `0xFEEF` and
    stat-exp up to 45000. The five legendaries would be markedly weaker than every
    other rental. Probably not intended.
-6. Minor: table 1's five records are written twice (once by the `i < shift` loop, then
+7. Minor: the previous hook wrote table 1's five records twice (once by the `i < shift` loop, then
    again by the nested `i<5 / j` loop). Harmless, but dead work.
-7. The patch also shifts table 3 (lv50 Poké Cup) without adding records to it, so the
+8. The previous patch also shifted table 3 (lv50 Poké Cup) without adding records to it, so the
    Poké Cup roster keeps its 5 gaps. Consistent with "Prime Cup only", but worth
    confirming that is the intent.
 

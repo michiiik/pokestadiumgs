@@ -25,7 +25,1395 @@
   "Thread4_CreateThread": "matches Stadium 1 Audio_StartThread (normalised). Same situation: if S1 is right that thread 4 is the audio thread, this is worth renaming once corroborated from the thread's entry point.",
   "Vi_SelectMode": "matches Stadium 1 Video_SetMode (callgraph). Same function, two spellings of the same idea. Upstream name kept."
  },
- "functions": {
+  "functions": {
+  "func_8005655C": [
+   "GbPak_ReadWriteBytes",
+   "The helper performs chunked osGbpakReadWrite transfers, handles 0x2000-byte bank boundaries, refreshes the Pak status, and reports connector errors"
+  ],
+  "func_80056870": [
+   "GbPak_ProbeAndDetectRam",
+   "The port helper reads the Pak id, checks the connector, and calls GbPak_DetectRam before marking the port initialized"
+  ],
+  "func_80056960": [
+   "GbPak_ValidateAndRefresh",
+   "The port helper validates the current cartridge state and save format, verifies insertion, and refreshes detected RAM or routes failure through shutdown"
+  ],
+  "func_80056F7C": [
+   "GbPak_Initialize",
+   "The helper initializes one Pak port, reads its id and connector status, and records the initialized-port bit"
+  ],
+  "func_800570CC": [
+   "GbPak_ReadCommand",
+   "The wrapper gates a port read on the active-port mask and calls the shared Pak transfer helper with read mode"
+  ],
+  "func_8005712C": [
+   "GbPak_WriteCommand",
+   "The wrapper gates a port write on the active-port mask and calls the shared Pak transfer helper with write mode"
+  ],
+  "func_8005A228": [
+   "GbTower_PollPortState",
+   "The state helper polls Pak removal, cartridge power, insertion, and save-format state and returns a compact port status"
+  ],
+  "func_8005A364": [
+   "GbTower_UpdatePortState",
+   "The helper validates an active port, updates the active mask, handles removal, and shuts down to the fallback fragment on failure"
+  ],
+  "func_8005ADD8": [
+   "GbTower_StartPortSession",
+   "The helper probes a selected port, records its active state, verifies insertion, and starts the port session"
+  ],
+  "func_8005AEA0": [
+   "GbTower_InitializePorts",
+   "The initializer probes all four ports, identifies save formats and Pak RAM, records availability, and installs the poll mask"
+  ],
+  "func_80017B00": [
+   "Audio_MixerStep",
+   "Audio_ThreadEntry calls this through Audio_BuildSchedulerTask; the body advances the audio scheduler, services AI/GB audio buffers, drains completion messages, and constructs the next 0x68-byte scheduler task"
+  ],
+  "func_80021B00": [
+   "Audio_InitializeTaskState",
+   "Audio_ThreadEntry calls this once before its wait/submit loop; the body resets the audio task state and initializes the RSP/audio command setup"
+  ],
+  "func_80021B74": [
+   "Audio_BuildSchedulerTask",
+   "Audio_ThreadEntry calls this after each scheduler wake; it obtains the next task from Audio_MixerStep, stores it in the resident task slot, and returns it for Sched_SubmitTask"
+  ],
+  "func_80035494": [
+   "Audio_ResetModeSelector",
+   "The helper writes -1 to D_80094860, the audio mode selector consumed by the command-transition routine"
+  ],
+  "func_800354A4": [
+   "Audio_EnableModeFlag",
+   "The helper writes 1 to D_80094868, the audio processing flag checked by the command-transition routine"
+  ],
+  "func_80072030": [
+   "Minigame_ProcessPlayerEvents",
+   "Game_State10_Minigame calls this for the active input branch; its fragment callback scans four player records and processes 18 per-player event slots"
+  ],
+  "func_800720A8": [
+   "Minigame_ResetPlayerRecord",
+   "Minigame_StateInit calls this on each embedded player record; the body resets record flags, counters, pointers, and status fields"
+  ],
+  "func_8007214C": [
+   "Minigame_SetPlayerMask",
+   "The helper converts a signed player index into a single-bit mask and stores it in D_8012B3F6, which the minigame state uses for player selection"
+  ],
+  "func_8007216C": [
+   "Minigame_ResetPlayerSubstate",
+   "Minigame_StateInit calls this on the per-player substate block; the body clears its first two words and sets the two active flags"
+  ],
+  "func_800721EC": [
+   "Minigame_MapControllerButtons",
+   "The helper maps the four low bits of D_801291E0+0x2182 into the destination input flags at offset 0x0E"
+  ],
+  "func_800723C4": [
+   "Minigame_UpdatePlayerCounters",
+   "The wrapper resolves the fragment callback that scans four player records and increments the matching 18-slot counter selected by D_8012B363"
+  ],
+  "func_800727A4": [
+   "Minigame_ResetRoundPlayers",
+   "The wrapper resolves a callback that restores the current GB Tower poll mask and resets all four player records before a new minigame round"
+  ],
+  "func_80072070": [
+   "Minigame_UpdateControllerState",
+   "Game_State10_Minigame calls this every loop with the minigame state and a controller slot byte; its resolved fragment callback normalizes controller input and updates per-pad state"
+  ],
+  "func_80072184": [
+   "Minigame_StateInit",
+   "Game_State10_Minigame calls this once on D_801291E0; the body initializes the minigame state fields at offsets 0x2180-0x2184 and its embedded queue structures"
+  ],
+  "func_800721D8": [
+   "Minigame_SetModeDefaults",
+   "Game_State10_Minigame calls this once on D_8012B3E8; the body writes the initial mode value 4 and enables the adjacent flag"
+  ],
+  "func_80072650": [
+   "Minigame_UpdateResultState",
+   "Game_State10_Minigame calls this after loading a minigame fragment; the body maps state field 0x2184 and the fragment result into D_8012B3E8"
+  ],
+  "func_80072740": [
+   "Minigame_ProcessInput",
+   "Game_State10_Minigame calls this once after state initialization; its resolved fragment callback scans four controller records and updates their input flags"
+  ],
+  "func_80072774": [
+   "Minigame_ResetControllerPoll",
+   "Game_State10_Minigame calls this before each loop dispatch; its resolved callback clears four controller records and resets the GB Tower poll mask"
+  ],
+  "func_84129D8C": [
+   "BattleAnim_Table_84185F10_000",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 0; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84129E84": [
+   "BattleAnim_Table_84185F10_001",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 1; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412A028": [
+   "BattleAnim_Table_84185F10_002",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 2; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412A17C": [
+   "BattleAnim_Table_84185F10_003",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 3; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412A300": [
+   "BattleAnim_Table_84185F10_004",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 4; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412A454": [
+   "BattleAnim_Table_84185F10_005",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 5; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412A73C": [
+   "BattleAnim_Table_84185F10_006",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 6; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412A804": [
+   "BattleAnim_Table_84185F10_007",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 7; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412A934": [
+   "BattleAnim_Table_84185F10_008",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 8; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412A9F4": [
+   "BattleAnim_Table_84185F10_009",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 9; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412AA68": [
+   "BattleAnim_Table_84185F10_010",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 10; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412AAE8": [
+   "BattleAnim_Table_84185F10_011",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 11; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412ADF8": [
+   "BattleAnim_Table_84185F10_012",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 12; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412AFE0": [
+   "BattleAnim_Table_84185F10_013",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 13; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412B1D4": [
+   "BattleAnim_Table_84185F10_014",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 14; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412B51C": [
+   "BattleAnim_Table_84185F10_015",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 15; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412B65C": [
+   "BattleAnim_Table_84185F10_016",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 16; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412B958": [
+   "BattleAnim_Table_84185F10_017",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 17; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412BB9C": [
+   "BattleAnim_Table_84185F10_018",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 18; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412BD14": [
+   "BattleAnim_Table_84185F10_019",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 19; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412BDF0": [
+   "BattleAnim_Table_84185F10_020",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 20; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412BFEC": [
+   "BattleAnim_Table_84185F10_021",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 21; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412C0AC": [
+   "BattleAnim_Table_84185F10_022",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 22; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412C240": [
+   "BattleAnim_Table_84185F10_023",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 23; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412C294": [
+   "BattleAnim_Table_84185F10_024",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 24; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412C47C": [
+   "BattleAnim_Table_84185F10_025",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 25; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412C700": [
+   "BattleAnim_Table_84185F10_026",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 26; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412C74C": [
+   "BattleAnim_Table_84185F10_027",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 27; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412C7F0": [
+   "BattleAnim_Table_84185F10_028",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 28; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412C870": [
+   "BattleAnim_Table_84185F10_029",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 29; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412C95C": [
+   "BattleAnim_Table_84185F10_030",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 30; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412CB00": [
+   "BattleAnim_Table_84185F10_031",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 31; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412CBE8": [
+   "BattleAnim_Table_84185F10_032",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 32; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412CDA4": [
+   "BattleAnim_Table_84185F10_033",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 33; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412CF84": [
+   "BattleAnim_Table_84185F10_034",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 34; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412D06C": [
+   "BattleAnim_Table_84185F10_035",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 35; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412D20C": [
+   "BattleAnim_Table_84185F10_036",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 36; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412D2D4": [
+   "BattleAnim_Table_84185F10_037",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 37; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412D35C": [
+   "BattleAnim_Table_84185F10_038",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 38; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412D53C": [
+   "BattleAnim_Table_84185F10_039",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 39; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412D644": [
+   "BattleAnim_Table_84185F10_040",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 40; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412D6C0": [
+   "BattleAnim_Table_84185F10_041",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 41; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412D8C8": [
+   "BattleAnim_Table_84185F10_042",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 42; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412D950": [
+   "BattleAnim_Table_84185F10_043",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 43; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412DAF4": [
+   "BattleAnim_Table_84185F10_044",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 44; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412DBC0": [
+   "BattleAnim_Table_84185F10_045",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 45; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412DC08": [
+   "BattleAnim_Table_84185F10_046",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 46; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412DC20": [
+   "BattleAnim_Table_84185F10_047",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 47; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412DD0C": [
+   "BattleAnim_Table_84185F10_048",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 48; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412DDC0": [
+   "BattleAnim_Table_84185F10_049",
+   "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 49; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412E94C": [
+   "BattleAnim_Table_84186004_000",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 0; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412EB10": [
+   "BattleAnim_Table_84186004_001",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 1; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412EC30": [
+   "BattleAnim_Table_84186004_002",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 2; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412EC70": [
+   "BattleAnim_Table_84186004_003",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 3; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412EE5C": [
+   "BattleAnim_Table_84186004_004",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 4; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412EFFC": [
+   "BattleAnim_Table_84186004_005",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 5; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F044": [
+   "BattleAnim_Table_84186004_006",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 6; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F0F0": [
+   "BattleAnim_Table_84186004_007",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 7; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F170": [
+   "BattleAnim_Table_84186004_008",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 8; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F208": [
+   "BattleAnim_Table_84186004_009",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 9; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F348": [
+   "BattleAnim_Table_84186004_010",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 10; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F39C": [
+   "BattleAnim_Table_84186004_011",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 11; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F5A4": [
+   "BattleAnim_Table_84186004_012",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 12; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F5C4": [
+   "BattleAnim_Table_84186004_013",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 13; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F5E4": [
+   "BattleAnim_Table_84186004_014",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 14; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F604": [
+   "BattleAnim_Table_84186004_015",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 15; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F65C": [
+   "BattleAnim_Table_84186004_016",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 16; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F6DC": [
+   "BattleAnim_Table_84186004_017",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 17; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F75C": [
+   "BattleAnim_Table_84186004_018",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 18; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F78C": [
+   "BattleAnim_Table_84186004_019",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 19; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F7BC": [
+   "BattleAnim_Table_84186004_020",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 20; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F7EC": [
+   "BattleAnim_Table_84186004_021",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 21; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F81C": [
+   "BattleAnim_Table_84186004_022",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 22; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F84C": [
+   "BattleAnim_Table_84186004_023",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 23; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F87C": [
+   "BattleAnim_Table_84186004_024",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 24; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F8AC": [
+   "BattleAnim_Table_84186004_025",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 25; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F8DC": [
+   "BattleAnim_Table_84186004_026",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 26; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F90C": [
+   "BattleAnim_Table_84186004_027",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 27; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F93C": [
+   "BattleAnim_Table_84186004_028",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 28; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F96C": [
+   "BattleAnim_Table_84186004_029",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 29; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F99C": [
+   "BattleAnim_Table_84186004_030",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 30; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F9CC": [
+   "BattleAnim_Table_84186004_031",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 31; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412F9FC": [
+   "BattleAnim_Table_84186004_032",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 32; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412FA2C": [
+   "BattleAnim_Table_84186004_033",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 33; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412FA5C": [
+   "BattleAnim_Table_84186004_034",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 34; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412FA8C": [
+   "BattleAnim_Table_84186004_035",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 35; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412FABC": [
+   "BattleAnim_Table_84186004_036",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 36; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412FAEC": [
+   "BattleAnim_Table_84186004_037",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 37; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412FB1C": [
+   "BattleAnim_Table_84186004_038",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 38; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412FB4C": [
+   "BattleAnim_Table_84186004_039",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 39; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412FB7C": [
+   "BattleAnim_Table_84186004_040",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 40; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412FBAC": [
+   "BattleAnim_Table_84186004_041",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 41; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412FBDC": [
+   "BattleAnim_Table_84186004_042",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 42; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412FC0C": [
+   "BattleAnim_Table_84186004_043",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 43; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412FC3C": [
+   "BattleAnim_Table_84186004_044",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 44; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412FC6C": [
+   "BattleAnim_Table_84186004_045",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 45; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412FC9C": [
+   "BattleAnim_Table_84186004_046",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 46; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412FD24": [
+   "BattleAnim_Table_84186004_047",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 47; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412FF04": [
+   "BattleAnim_Table_84186004_048",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 48; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412FF80": [
+   "BattleAnim_Table_84186004_049",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 49; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8413005C": [
+   "BattleAnim_Table_84186004_050",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 50; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_841300D0": [
+   "BattleAnim_Table_84186004_051",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 51; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_841301B0": [
+   "BattleAnim_Table_84186004_052",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 52; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130284": [
+   "BattleAnim_Table_84186004_053",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 53; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130380": [
+   "BattleAnim_Table_84186004_054",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 54; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130480": [
+   "BattleAnim_Table_84186004_055",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 55; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_841304A8": [
+   "BattleAnim_Table_84186004_056",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 56; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130500": [
+   "BattleAnim_Table_84186004_057",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 57; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130558": [
+   "BattleAnim_Table_84186004_058",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 58; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8413063C": [
+   "BattleAnim_Table_84186004_059",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 59; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_841306AC": [
+   "BattleAnim_Table_84186004_060",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 60; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130798": [
+   "BattleAnim_Table_84186004_061",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 61; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_841307EC": [
+   "BattleAnim_Table_84186004_062",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 62; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130824": [
+   "BattleAnim_Table_84186004_063",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 63; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130864": [
+   "BattleAnim_Table_84186004_064",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 64; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_841308A8": [
+   "BattleAnim_Table_84186004_065",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 65; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130A74": [
+   "BattleAnim_Table_84186004_066",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 66; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130AC8": [
+   "BattleAnim_Table_84186004_067",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 67; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130B40": [
+   "BattleAnim_Table_84186004_068",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 68; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130C08": [
+   "BattleAnim_Table_84186004_069",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 69; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130C98": [
+   "BattleAnim_Table_84186004_070",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 70; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130CC8": [
+   "BattleAnim_Table_84186004_071",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 71; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130CE8": [
+   "BattleAnim_Table_84186004_072",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 72; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130D74": [
+   "BattleAnim_Table_84186004_073",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 73; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130DBC": [
+   "BattleAnim_Table_84186004_074",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 74; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130DDC": [
+   "BattleAnim_Table_84186004_075",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 75; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130E04": [
+   "BattleAnim_Table_84186004_076",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 76; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84130EA8": [
+   "BattleAnim_Table_84186004_077",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 77; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_841310E4": [
+   "BattleAnim_Table_84186004_078",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 78; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84131174": [
+   "BattleAnim_Table_84186004_079",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 79; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_841312E8": [
+   "BattleAnim_Table_84186004_080",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 80; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8413146C": [
+   "BattleAnim_Table_84186004_081",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 81; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_84131538": [
+   "BattleAnim_Table_84186004_082",
+   "fragment79 function-pointer table at 0x84186004 selects this handler at slot 82; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412DE98": [
+   "BattleAnim_Table_84185FDC_000",
+   "fragment79 function-pointer table at 0x84185FDC selects this handler at slot 0; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412E308": [
+   "BattleAnim_Table_84185FDC_001",
+   "fragment79 function-pointer table at 0x84185FDC selects this handler at slot 1; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412E38C": [
+   "BattleAnim_Table_84185FDC_002",
+   "fragment79 function-pointer table at 0x84185FDC selects this handler at slot 2; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412E420": [
+   "BattleAnim_Table_84185FDC_003",
+   "fragment79 function-pointer table at 0x84185FDC selects this handler at slot 3; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412E510": [
+   "BattleAnim_Table_84185FDC_004",
+   "fragment79 function-pointer table at 0x84185FDC selects this handler at slot 4; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412E680": [
+   "BattleAnim_Table_84185FDC_005",
+   "fragment79 function-pointer table at 0x84185FDC selects this handler at slot 5; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412E754": [
+   "BattleAnim_Table_84185FDC_006",
+   "fragment79 function-pointer table at 0x84185FDC selects this handler at slot 6; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412E7D8": [
+   "BattleAnim_Table_84185FDC_007",
+   "fragment79 function-pointer table at 0x84185FDC selects this handler at slot 7; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8412E82C": [
+   "BattleAnim_Table_84185FDC_008",
+   "fragment79 function-pointer table at 0x84185FDC selects this handler at slot 8; table-level evidence fixes its dispatch position while body semantics remain separate"
+  ],
+  "func_8290D738": [
+   "BattleAnim_Fragment67Dispatch_045",
+   "fragment67 53-entry dispatch table at 0x829130A4 selects this handler at slot 45; the table has one repeated default handler and this isolated non-default slot"
+  ],
+  "func_8290D7C8": [
+   "BattleAnim_Fragment67Dispatch_001",
+   "fragment67 53-entry dispatch table at 0x829130A4 selects this handler at slot 1; the table has one repeated default handler and this isolated non-default slot"
+  ],
+  "func_8290D858": [
+   "BattleAnim_Fragment67Dispatch_005",
+   "fragment67 53-entry dispatch table at 0x829130A4 selects this handler at slot 5; the table has one repeated default handler and this isolated non-default slot"
+  ],
+  "func_8290D8EC": [
+   "BattleAnim_Fragment67Dispatch_009",
+   "fragment67 53-entry dispatch table at 0x829130A4 selects this handler at slot 9; the table has one repeated default handler and this isolated non-default slot"
+  ],
+  "func_8290D980": [
+   "BattleAnim_Fragment67Dispatch_013",
+   "fragment67 53-entry dispatch table at 0x829130A4 selects this handler at slot 13; the table has one repeated default handler and this isolated non-default slot"
+  ],
+  "func_8290DA10": [
+   "BattleAnim_Fragment67Dispatch_017",
+   "fragment67 53-entry dispatch table at 0x829130A4 selects this handler at slot 17; the table has one repeated default handler and this isolated non-default slot"
+  ],
+  "func_8290DAA4": [
+   "BattleAnim_Fragment67Dispatch_021",
+   "fragment67 53-entry dispatch table at 0x829130A4 selects this handler at slot 21; the table has one repeated default handler and this isolated non-default slot"
+  ],
+  "func_8290DB3C": [
+   "BattleAnim_Fragment67Dispatch_025",
+   "fragment67 53-entry dispatch table at 0x829130A4 selects this handler at slot 25; the table has one repeated default handler and this isolated non-default slot"
+  ],
+  "func_8290DBD0": [
+   "BattleAnim_Fragment67Dispatch_029",
+   "fragment67 53-entry dispatch table at 0x829130A4 selects this handler at slot 29; the table has one repeated default handler and this isolated non-default slot"
+  ],
+  "func_8290DC60": [
+   "BattleAnim_Fragment67Dispatch_033",
+   "fragment67 53-entry dispatch table at 0x829130A4 selects this handler at slot 33; the table has one repeated default handler and this isolated non-default slot"
+  ],
+  "func_8290DCF0": [
+   "BattleAnim_Fragment67Dispatch_037",
+   "fragment67 53-entry dispatch table at 0x829130A4 selects this handler at slot 37; the table has one repeated default handler and this isolated non-default slot"
+  ],
+  "func_8290DD80": [
+   "BattleAnim_Fragment67Dispatch_041",
+   "fragment67 53-entry dispatch table at 0x829130A4 selects this handler at slot 41; the table has one repeated default handler and this isolated non-default slot"
+  ],
+  "func_8290DED4": [
+   "BattleAnim_Fragment67Dispatch_049",
+   "fragment67 53-entry dispatch table at 0x829130A4 selects this handler at slot 49; the table has one repeated default handler and this isolated non-default slot"
+  ],
+  "func_8410CF80": [
+   "BattleAnim_ModelDispatch_121",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 121; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_8410D040": [
+   "BattleAnim_ModelDispatch_024",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 24; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_8410E8E4": [
+   "BattleAnim_ModelDispatch_050",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 50; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_8410ED30": [
+   "BattleAnim_ModelDispatch_072",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 72; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_8410F0D0": [
+   "BattleAnim_ModelDispatch_100",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 100; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_8410F1A8": [
+   "BattleAnim_ModelDispatch_127",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 127; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_8410F3E8": [
+   "BattleAnim_ModelDispatch_128",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 128; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_8410F6AC": [
+   "BattleAnim_ModelDispatch_148",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 148; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_8410F724": [
+   "BattleAnim_ModelDispatch_149",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 149; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_8410F78C": [
+   "BattleAnim_ModelDispatch_155",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 155; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_8410F844": [
+   "BattleAnim_ModelDispatch_156",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 156; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_8410F8AC": [
+   "BattleAnim_ModelDispatch_134",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 134; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_8410F92C": [
+   "BattleAnim_ModelDispatch_135",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 135; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_8410F9E4": [
+   "BattleAnim_ModelDispatch_162",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 162; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_8410F9F0": [
+   "BattleAnim_ModelDispatch_163",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 163; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_8410F9FC": [
+   "BattleAnim_ModelDispatch_169",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 169; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_8410FABC": [
+   "BattleAnim_ModelDispatch_170",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 170; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_8410FB0C": [
+   "BattleAnim_ModelDispatch_204",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 204; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_8410FC28": [
+   "BattleAnim_ModelDispatch_029",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 29; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_8410FD54": [
+   "BattleAnim_ModelDispatch_030",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 30; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_8410FDEC": [
+   "BattleAnim_ModelDispatch_057",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 57; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_8410FF0C": [
+   "BattleAnim_ModelDispatch_058",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 58; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_8410FF6C": [
+   "BattleAnim_ModelDispatch_064",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 64; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_84110098": [
+   "BattleAnim_ModelDispatch_065",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 65; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_84110118": [
+   "BattleAnim_ModelDispatch_197",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 197; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_84110264": [
+   "BattleAnim_ModelDispatch_183",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 183; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_84110320": [
+   "BattleAnim_ModelDispatch_190",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 190; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_84110394": [
+   "BattleAnim_ModelDispatch_001",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 1 (also selected by slots 008, 092, 120, 211); the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_84110408": [
+   "BattleAnim_ModelDispatch_078",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 78; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_8411047C": [
+   "BattleAnim_ModelDispatch_099",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 99; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_841104E4": [
+   "BattleAnim_ModelDispatch_085",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 85; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_84110558": [
+   "BattleAnim_ModelDispatch_106",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 106; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_841105CC": [
+   "BattleAnim_ModelDispatch_036",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 36; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_84110640": [
+   "BattleAnim_ModelDispatch_043",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 43; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_841106B4": [
+   "BattleAnim_ModelDispatch_218",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 218; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_84110718": [
+   "BattleAnim_ModelDispatch_002",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 2 (also selected by slots 037, 086, 114, 142, 219); the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_841107D8": [
+   "BattleAnim_ModelDispatch_079",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 79; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_84110860": [
+   "BattleAnim_ModelDispatch_191",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 191; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_84110910": [
+   "BattleAnim_ModelDispatch_184",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 184; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_84110980": [
+   "BattleAnim_ModelDispatch_093",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 93; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_841109FC": [
+   "BattleAnim_ModelDispatch_113",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 113; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_84110A98": [
+   "BattleAnim_ModelDispatch_141",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 141; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_84110C6C": [
+   "BattleAnim_ModelDispatch_212",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 212; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_84110F64": [
+   "BattleAnim_ModelDispatch_009",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 9; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_8411100C": [
+   "BattleAnim_ModelDispatch_176",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 176; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_84111048": [
+   "BattleAnim_ModelDispatch_022",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 22; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_841110C4": [
+   "BattleAnim_ModelDispatch_023",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 23; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_841110EC": [
+   "BattleAnim_ModelDispatch_015",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 15; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_84111170": [
+   "BattleAnim_ModelDispatch_016",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 16; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_841111B0": [
+   "BattleAnim_ModelDispatch_044",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 44; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_841111D8": [
+   "BattleAnim_ModelDispatch_071",
+   "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 71; the table has one dominant default handler and this is a non-default slot"
+  ],
+  "func_84113BE8": [
+   "BattleAnim_Dispatch_001",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 1; the table has one default handler and this is a non-default slot"
+  ],
+  "func_84113C54": [
+   "BattleAnim_Dispatch_190",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 190; the table has one default handler and this is a non-default slot"
+  ],
+  "func_84113D08": [
+   "BattleAnim_Dispatch_002",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 2 (also selected by slots 191); the table has one default handler and this is a non-default slot"
+  ],
+  "func_84113D7C": [
+   "BattleAnim_Dispatch_218",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 218; the table has one default handler and this is a non-default slot"
+  ],
+  "func_84113E7C": [
+   "BattleAnim_Dispatch_219",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 219; the table has one default handler and this is a non-default slot"
+  ],
+  "func_841149A0": [
+   "BattleAnim_Dispatch_015",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 15; the table has one default handler and this is a non-default slot"
+  ],
+  "func_84114A04": [
+   "BattleAnim_Dispatch_016",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 16; the table has one default handler and this is a non-default slot"
+  ],
+  "func_841154F8": [
+   "BattleAnim_Dispatch_017",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 17; the table has one default handler and this is a non-default slot"
+  ],
+  "func_84115554": [
+   "BattleAnim_Dispatch_043",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 43; the table has one default handler and this is a non-default slot"
+  ],
+  "func_841155E8": [
+   "BattleAnim_Dispatch_044",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 44; the table has one default handler and this is a non-default slot"
+  ],
+  "func_84115850": [
+   "BattleAnim_Dispatch_045",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 45; the table has one default handler and this is a non-default slot"
+  ],
+  "func_841158D8": [
+   "BattleAnim_Dispatch_050",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 50; the table has one default handler and this is a non-default slot"
+  ],
+  "func_84115A64": [
+   "BattleAnim_Dispatch_051",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 51; the table has one default handler and this is a non-default slot"
+  ],
+  "func_84115B34": [
+   "BattleAnim_Dispatch_052",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 52; the table has one default handler and this is a non-default slot"
+  ],
+  "func_84115CF0": [
+   "BattleAnim_Dispatch_106",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 106; the table has one default handler and this is a non-default slot"
+  ],
+  "func_84115E28": [
+   "BattleAnim_Dispatch_107",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 107; the table has one default handler and this is a non-default slot"
+  ],
+  "func_84115F04": [
+   "BattleAnim_Dispatch_108",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 108; the table has one default handler and this is a non-default slot"
+  ],
+  "func_84115FAC": [
+   "BattleAnim_Dispatch_057",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 57; the table has one default handler and this is a non-default slot"
+  ],
+  "func_84116138": [
+   "BattleAnim_Dispatch_058",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 58; the table has one default handler and this is a non-default slot"
+  ],
+  "func_841163A0": [
+   "BattleAnim_Dispatch_059",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 59; the table has one default handler and this is a non-default slot"
+  ],
+  "func_84116460": [
+   "BattleAnim_Dispatch_155",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 155; the table has one default handler and this is a non-default slot"
+  ],
+  "func_84116548": [
+   "BattleAnim_Dispatch_156",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 156; the table has one default handler and this is a non-default slot"
+  ],
+  "func_84116808": [
+   "BattleAnim_Dispatch_157",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 157; the table has one default handler and this is a non-default slot"
+  ],
+  "func_84116918": [
+   "BattleAnim_Dispatch_113",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 113; the table has one default handler and this is a non-default slot"
+  ],
+  "func_84116980": [
+   "BattleAnim_Dispatch_114",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 114; the table has one default handler and this is a non-default slot"
+  ],
+  "func_84116AC4": [
+   "BattleAnim_Dispatch_115",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 115; the table has one default handler and this is a non-default slot"
+  ],
+  "func_84116F7C": [
+   "BattleAnim_Dispatch_029",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 29; the table has one default handler and this is a non-default slot"
+  ],
+  "func_841170A0": [
+   "BattleAnim_Dispatch_030",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 30; the table has one default handler and this is a non-default slot"
+  ],
+  "func_841187E4": [
+   "BattleAnim_Dispatch_031",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 31; the table has one default handler and this is a non-default slot"
+  ],
+  "func_84118990": [
+   "BattleAnim_Dispatch_064",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 64; the table has one default handler and this is a non-default slot"
+  ],
+  "func_841189EC": [
+   "BattleAnim_Dispatch_065",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 65; the table has one default handler and this is a non-default slot"
+  ],
+  "func_84118C08": [
+   "BattleAnim_Dispatch_066",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 66; the table has one default handler and this is a non-default slot"
+  ],
+  "func_84118DD4": [
+   "BattleAnim_Dispatch_067",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 67; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411938C": [
+   "BattleAnim_Dispatch_197",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 197; the table has one default handler and this is a non-default slot"
+  ],
+  "func_841193E0": [
+   "BattleAnim_Dispatch_198",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 198; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411957C": [
+   "BattleAnim_Dispatch_199",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 199; the table has one default handler and this is a non-default slot"
+  ],
+  "func_84119630": [
+   "BattleAnim_Dispatch_200",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 200; the table has one default handler and this is a non-default slot"
+  ],
+  "func_84119908": [
+   "BattleAnim_Dispatch_134",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 134; the table has one default handler and this is a non-default slot"
+  ],
+  "func_84119AB4": [
+   "BattleAnim_Dispatch_135",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 135; the table has one default handler and this is a non-default slot"
+  ],
+  "func_84119C9C": [
+   "BattleAnim_Dispatch_120",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 120; the table has one default handler and this is a non-default slot"
+  ],
+  "func_84119CF0": [
+   "BattleAnim_Dispatch_121",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 121; the table has one default handler and this is a non-default slot"
+  ],
+  "func_84119F24": [
+   "BattleAnim_Dispatch_122",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 122; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411A150": [
+   "BattleAnim_Dispatch_141",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 141; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411A19C": [
+   "BattleAnim_Dispatch_142",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 142; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411A258": [
+   "BattleAnim_Dispatch_143",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 143; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411A44C": [
+   "BattleAnim_Dispatch_036",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 36; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411A4AC": [
+   "BattleAnim_Dispatch_037",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 37; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411A544": [
+   "BattleAnim_Dispatch_038",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 38; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411A620": [
+   "BattleAnim_Dispatch_039",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 39; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411A728": [
+   "BattleAnim_Dispatch_225",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 225; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411A76C": [
+   "BattleAnim_Dispatch_226",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 226; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411A7D8": [
+   "BattleAnim_Dispatch_022",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 22; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411A880": [
+   "BattleAnim_Dispatch_023",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 23; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411A8FC": [
+   "BattleAnim_Dispatch_024",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 24; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411A964": [
+   "BattleAnim_Dispatch_162",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 162; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411AA3C": [
+   "BattleAnim_Dispatch_163",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 163; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411AAE0": [
+   "BattleAnim_Dispatch_164",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 164; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411AB5C": [
+   "BattleAnim_Dispatch_127",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 127; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411ABAC": [
+   "BattleAnim_Dispatch_128",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 128; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411ACE8": [
+   "BattleAnim_Dispatch_129",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 129; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411AD6C": [
+   "BattleAnim_Dispatch_101",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 101; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411AE08": [
+   "BattleAnim_Dispatch_099",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 99; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411AEA8": [
+   "BattleAnim_Dispatch_100",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 100; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411B014": [
+   "BattleAnim_Dispatch_092",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 92; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411B070": [
+   "BattleAnim_Dispatch_093",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 93; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411B1F4": [
+   "BattleAnim_Dispatch_094",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 94; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411B2A0": [
+   "BattleAnim_Dispatch_078",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 78; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411B304": [
+   "BattleAnim_Dispatch_079",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 79; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411B3B8": [
+   "BattleAnim_Dispatch_080",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 80; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411B4A4": [
+   "BattleAnim_Dispatch_148",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 148; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411B518": [
+   "BattleAnim_Dispatch_149",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 149; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411B5A8": [
+   "BattleAnim_Dispatch_150",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 150; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411B75C": [
+   "BattleAnim_Dispatch_176",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 176; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411B808": [
+   "BattleAnim_Dispatch_177",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 177; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411B898": [
+   "BattleAnim_Dispatch_178",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 178; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411BB04": [
+   "BattleAnim_Dispatch_085",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 85; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411BC28": [
+   "BattleAnim_Dispatch_086",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 86; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411BCC8": [
+   "BattleAnim_Dispatch_087",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 87; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411C2B4": [
+   "BattleAnim_Dispatch_169",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 169; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411C310": [
+   "BattleAnim_Dispatch_170",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 170; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411C418": [
+   "BattleAnim_Dispatch_171",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 171; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411C8A0": [
+   "BattleAnim_Dispatch_183",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 183; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411C97C": [
+   "BattleAnim_Dispatch_184",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 184; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411C9DC": [
+   "BattleAnim_Dispatch_185",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 185; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411CBD0": [
+   "BattleAnim_Dispatch_239",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 239; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411CC2C": [
+   "BattleAnim_Dispatch_240",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 240; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411CD38": [
+   "BattleAnim_Dispatch_241",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 241; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411D0A0": [
+   "BattleAnim_Dispatch_232",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 232; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411D158": [
+   "BattleAnim_Dispatch_233",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 233; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411D1A8": [
+   "BattleAnim_Dispatch_234",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 234; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411D2D4": [
+   "BattleAnim_Dispatch_204",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 204; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411D2DC": [
+   "BattleAnim_Dispatch_205",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 205; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411D2E4": [
+   "BattleAnim_Dispatch_211",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 211; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411D388": [
+   "BattleAnim_Dispatch_212",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 212; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411D474": [
+   "BattleAnim_Dispatch_008",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 8; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411D4E0": [
+   "BattleAnim_Dispatch_009",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 9; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411D594": [
+   "BattleAnim_Dispatch_246",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 246; the table has one default handler and this is a non-default slot"
+  ],
+  "func_8411D60C": [
+   "BattleAnim_Dispatch_247",
+   "fragment79 253-entry dispatch table at 0x84183D50 selects this handler at slot 247; the table has one default handler and this is a non-default slot"
+  ],
+  "func_80002DE4": [
+   "MainPool_GetAllocationSize",
+   "main-pool header helper: returns the allocation size by subtracting the user pointer from the block header at -0xC; called by both segment and fragment registration"
+  ],
+  "func_80006A78": [
+    "Dma_QueueRequestMessage",
+    "storage-thread enqueue helper: sends or jams a prepared DMA request to the resident storage queue based on the caller's mode"
+  ],
+  "func_80006ACC": [
+    "Dma_QueueRomRead",
+    "allocates the 0x2C-byte storage request used by Asset_LoadToSegment/Dma_ReadChunks; records ROM source, RDRAM destination, byte length and staging queue before enqueueing"
+  ],
+  "func_800045E0": [
+   "Memmap_SegmentCleanupCallback",
+   "installed by Asset_LoadToSegment for 0x82000000 segment allocations; validates the owning segment base and clears its segment map on eviction"
+  ],
+  "func_800046C0": [
+   "Memmap_FragmentCleanupCallback",
+   "installed by Fragment_Register for 0x81000000 fragment allocations; validates the owning fragment base and clears its fragment map on eviction"
+  ],
+  "func_800047B0": [
+   "Fragment_RelocateAndReset",
+   "called by the archive loader after Fragment_Register; relocates the fragment then resets the main-pool state to the fragment end offset"
+  ],
+  "func_800355D4": [
+   "Audio_ResetRequestId",
+   "writes -1 to the shared audio request-id slot; called after the minigame state returns to the game-state loop"
+  ],
+  "func_800355E4": [
+   "Audio_RequestEvent",
+   "deduplicates an audio event id against the shared request slot, forwards changed ids to the large audio dispatcher at 0x80021ED8, and records the new id"
+  ],
+  "func_80058018": [
+   "GbSave_ComputeChecksumRange",
+   "sums an inclusive byte range, truncates the result to 16 bits, and writes it through the GB-save little-endian helper; called by four save-block writers"
+  ],
+  "func_8005805C": [
+   "GbSave_IdentifyFormat",
+   "validates the GB save header/version marker and compares the embedded names against seven known format strings, returning a format index used by multiple save flows"
+  ],
+  "func_80035174": [
+   "Audio_ThreadEntry",
+   "the entry passed as osCreateThread's thread function by Thread4_CreateThread; initializes the scheduler client and loops waiting for audio tasks before submitting them"
+  ],
+  "func_80021ED8": [
+   "Audio_DispatchCommand",
+   "resident audio command dispatcher: maps request ids through the audio state tables, updates command flags, and is the consumer called by Audio_RequestEvent"
+  ],
+  "func_800353BC": [
+   "Audio_StopProcessing",
+   "called from pre-NMI and fragment-shutdown paths; stops the resident audio service and clears the Thread4 processing flag"
+  ],
+  "func_800353E4": [
+   "Audio_WaitForPendingTasks",
+   "polls the scheduler completion primitive until no audio tasks remain and returns the number of completions observed; called by the state-4 shutdown path"
+  ],
+  "func_80035470": [
+   "Audio_SetProcessingEnabled",
+   "called by both state-4 audio transitions; stores the boolean enable value in the Thread4 processing flag consumed by Audio_ThreadEntry"
+  ],
   "func_83503918": [
    "fragment1_main",
    "fragment 1 entry: target of the J at offset 0 of the fragment header trampoline (rom 0xa8a80, vram 0x83500000)"
