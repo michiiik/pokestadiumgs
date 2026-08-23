@@ -61,7 +61,8 @@ s32 func_80001EB8(void) { u8 *ptr = *(u8 **)(D_800AB3C0 + 8); return *(u16 *)ptr
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_80001ECC.s")
+extern u8 *D_800AB3C0; extern void *osViGetCurrentFramebuffer(void);
+s32 func_80001ECC(void) { s32 result = 0; if (osViGetCurrentFramebuffer() == *(void **)(D_800AB3C0 + 8)) result = 1; return result; }
 #endif
 
 #ifdef VERSION_US
