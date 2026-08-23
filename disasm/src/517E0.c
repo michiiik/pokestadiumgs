@@ -205,7 +205,7 @@ void Save_WriteRecord(void *src, void *dst, s32 length, s32 index) {
     D_801281C0[index].flags |= 2;
 }
 
-void Save_CommitRecord(u8 *data, s32 length, s32 unused, s32 index) {
+void Save_CommitRecord(u8 *data, s32 length, s32 index) {
     if ((data[0] & 2) != 0) {
         data[0] &= 0xFD;
         Save_WriteFooter(data, length, 1);
@@ -213,7 +213,7 @@ void Save_CommitRecord(u8 *data, s32 length, s32 unused, s32 index) {
     }
 }
 
-void Save_InvalidateRecord(u8 *data, s32 length, s32 unused, s32 index) {
+void Save_InvalidateRecord(u8 *data, s32 length, s32 index) {
     if ((data[0] & 2) != 0) {
         Save_WriteFooter(data, length, 0);
         D_801281C0[index].flags |= 2;
@@ -401,11 +401,91 @@ s32 func_80051BF0(s32 type, s32 record, s32 mask) {
     return 1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051D64.s")
+static u8 *Save_GetTypedRecord(s32 type, s32 record) {
+    switch (type) {
+        case 0x10:
+            return func_80050E88(0, D_800972C0, record);
+        case 0x11:
+            return func_80050F60(0, record);
+        case 0x12:
+            return func_80051028(0, record);
+        case 0x13:
+            return func_800510CC(0);
+        case 0x14:
+            return func_80051138(0);
+        case 0x15:
+            return func_800511A4(0);
+        case 0x16:
+            return func_80051208(0);
+        case 0x17:
+            return func_80051274(0);
+        case 0x18:
+            return func_800512E0(0);
+        case 0x19:
+            return func_8005134C(0);
+        case 0x1A:
+            return func_800513B8(0);
+        case 0x1B:
+            return func_80051424(0);
+        case 0x1C:
+            return func_80051490(0);
+        case 0x1D:
+            return func_800514FC(0);
+        case 0x1E:
+            return func_80051568(0);
+        default:
+            return NULL;
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80052150.s")
+static s32 Save_GetTypedBank(s32 type, s32 record) {
+    s32 value;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_8005253C.s")
+    if (type == 0x10) {
+        value = D_800972C0;
+    } else if (type == 0x11) {
+        value = record;
+    } else {
+        value = -1;
+    }
+    return func_80050D20(type, value);
+}
+
+void func_80051D64(s32 type, s32 record) {
+    u8 *data;
+    s32 length;
+
+    if (type < 0x10 || type > 0x1E) {
+        return;
+    }
+    data = Save_GetTypedRecord(type, record);
+    length = func_80050DE4(type);
+    Save_CommitRecord(data, length, Save_GetTypedBank(type, record));
+}
+
+void func_80052150(s32 type, s32 record) {
+    u8 *data;
+    s32 length;
+
+    if (type < 0x10 || type > 0x1E) {
+        return;
+    }
+    data = Save_GetTypedRecord(type, record);
+    length = func_80050DE4(type);
+    Save_InvalidateRecord(data, length, Save_GetTypedBank(type, record));
+}
+
+void func_8005253C(s32 type, s32 record) {
+    u8 *data;
+    s32 length;
+
+    if (type < 0x10 || type > 0x1E) {
+        return;
+    }
+    data = Save_GetTypedRecord(type, record);
+    length = func_80050DE4(type);
+    Save_RestoreRecord(data, length, Save_GetTypedBank(type, record));
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80052928.s")
 

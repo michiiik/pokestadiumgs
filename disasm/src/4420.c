@@ -156,9 +156,81 @@ void *func_80004254(void *pool, void *arg1, void *arg2, void *arg3,
     return destination;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800042C0.s")
+extern void *func_800040D0(void *pool, void *old, void *header, u32 tag);
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80004458.s")
+void *func_800042C0(u32 source, u32 end, u32 decompress, u32 staging) {
+    u32 tag = decompress == 0 ? 1 : 0;
+    u32 size;
+    void *header = main_pool_alloc(0x18, tag);
+    void *result = NULL;
+
+    if (header == NULL) {
+        return result;
+    }
+
+    func_80003F74((u32)header, source, source + 0x18, staging);
+
+    if (((u32 *)header)[0] == 0x50455253 &&
+        ((u32 *)header)[1] == 0x2D535A50) {
+        size = (end - source + 0xF) & ~0xF;
+        result = main_pool_alloc(size, tag);
+        if (result != NULL) {
+            func_80003F74((u32)result, source, end, staging);
+            result = func_800041E4(NULL, result, result, decompress);
+        }
+    } else if (((u32 *)header)[0] == 0x50524553 &&
+               ((u32 *)header)[1] == 0x4A504547) {
+        size = (end - source + 0xF) & ~0xF;
+        result = main_pool_alloc(size, tag);
+        if (result != NULL) {
+            func_80003F74((u32)result, source, end, staging);
+            result = func_800040D0(NULL, result, result, decompress);
+        }
+    } else {
+        size = (end - source + 0xF) & ~0xF;
+        result = func_80004254(NULL, source, end, staging, size,
+                               decompress);
+    }
+
+    main_pool_try_free(header);
+    return result;
+}
+
+void *func_80004458(s32 pool, u32 source, u32 end, s32 flags) {
+    u32 size;
+    void *header = main_pool_alloc(0x18, 1);
+    void *result = NULL;
+
+    if (header == NULL) {
+        return result;
+    }
+
+    func_80003F74((u32)header, source, source + 0x18, 0);
+
+    if (((u32 *)header)[0] == 0x50455253 &&
+        ((u32 *)header)[1] == 0x2D535A50) {
+        size = (end - source + 0xF) & ~0xF;
+        result = main_pool_alloc(size, 1);
+        if (result != NULL) {
+            func_80003F74((u32)result, source, end, 0);
+            result = func_800041E4((void *)pool, result, result, -1);
+        }
+    } else if (((u32 *)header)[0] == 0x50524553 &&
+               ((u32 *)header)[1] == 0x4A504547) {
+        size = (end - source + 0xF) & ~0xF;
+        result = main_pool_alloc(size, 1);
+        if (result != NULL) {
+            func_80003F74((u32)result, source, end, 0);
+            result = func_800040D0((void *)pool, result, result, -1);
+        }
+    } else {
+        size = (end - source + 0xF) & ~0xF;
+        result = func_80004254((void *)pool, source, end, 0, size, -1);
+    }
+
+    main_pool_try_free(header);
+    return result;
+}
 
 extern u32 Memmap_GetSegmentBaseVaddr(u32 segment);
 extern void Memmap_ClearSegmentMemmap(u32 segment);
