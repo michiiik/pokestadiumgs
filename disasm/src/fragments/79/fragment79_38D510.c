@@ -40,9 +40,13 @@ s32 func_8411E224(u8 *arg0) {
     return *(u8 *)(arg0 + 0x61D);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411E22C.s")
+s32 func_8411E22C(u8 *arg0) {
+    return *(u8 *)(*(u8 **)(arg0 + 0x2D4) + 0x13DA);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411E238.s")
+s32 func_8411E238(u8 *arg0) {
+    return *(u8 *)(*(u8 **)(arg0 + 0x2D4) + 0x13DB);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411E244.s")
 
@@ -78,7 +82,9 @@ void func_8411EF18(u8 *arg0) {
     *(s16 *)(arg0 + 0x18) = 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411EF20.s")
+void func_8411EF20(u8 *arg0) {
+    *(s16 *)(arg0 + 0x18) = 3;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411EF2C.s")
 
