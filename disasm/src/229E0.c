@@ -1190,21 +1190,48 @@ s32 Audio_RequestEvent(s32 eventId) {
     return 0;
 }
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035620.s")
-#endif
+#define D_437620 ((u8 *)0x00437620)
+#define D_437670 ((u8 *)0x00437670)
+#define D_80124D00 ((u32 *)0x80124D00)
+#define D_80124D50 (*(u32 *)0x80124D50)
+extern void *func_800042C0(u32 source, u32 end, u32 decompress,
+                           u32 relocate);
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800356CC.s")
-#endif
+void func_80035620(void) {
+    u32 *source;
+    u32 *destination;
+    s32 i;
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035700.s")
-#endif
+    main_pool_push_state(0x524F4D54);
+    source = (u32 *)func_800042C0((u32)D_437620, (u32)D_437670, 0, 0);
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003570C.s")
-#endif
+    D_80124D00[0] = source[0];
+    D_80124D00[1] = source[1];
+    D_80124D00[2] = source[2];
+    destination = &D_80124D00[3];
+    source += 3;
+    for (i = 0; i < 16; i++) {
+        destination[i] = source[i];
+    }
+
+    main_pool_pop_state(0x524F4D54);
+}
+
+s32 func_800356CC(s32 index) {
+    if (index >= 0 && index < 19) {
+        return D_80124D00[index];
+    }
+    return 0;
+}
+
+void func_80035700(u32 seed) {
+    D_80124D50 = seed;
+}
+
+u32 func_8003570C(void) {
+    D_80124D50 = D_80124D50 * 0x0019660D + 0x3C6EF35F;
+    return D_80124D50;
+}
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Color_SetRGB.s")
