@@ -21,5 +21,5 @@ void func_87F0E390(u8 *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_331000/func_87F0E630.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_331000/func_87F0E650.s")
+s8 func_87F0E650(u8 *arg0) { return *(s8 *)(arg0 + 8); }
 #endif
