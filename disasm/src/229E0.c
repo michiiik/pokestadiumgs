@@ -1076,7 +1076,11 @@ void func_80035700(u32 seed) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003570C.s")
+extern u32 D_80124D50;
+u32 func_8003570C(void) {
+    D_80124D50 = D_80124D50 * 0x0019660D + 0x3C6EF35F;
+    return D_80124D50;
+}
 #endif
 
 #ifdef VERSION_US
