@@ -933,7 +933,7 @@ u8 func_80034D98(const u8 *arg0) { return arg0[0]; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80034DA0.s")
+extern u8 D_80092520; extern u8 D_800925E4[]; extern u8 D_800925E8[]; u8 *func_80034DA0(void) { if (D_80092520 & 0x20) return D_800925E8; return D_800925E4; }
 #endif
 
 #ifdef VERSION_US
