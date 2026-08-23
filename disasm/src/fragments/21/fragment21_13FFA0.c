@@ -106,7 +106,11 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_13FFA0/func_82502104.s")
+extern s16 D_82508F8C;
+
+s32 func_82502104(void) {
+    return D_82508F8C == 0;
+}
 #endif
 
 #ifdef VERSION_US
