@@ -573,7 +573,11 @@ void func_8005A8E4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005D8C0.s")
+extern s32 D_80128748;
+
+s32 func_8005D8C0(void) {
+    return D_80128748;
+}
 #endif
 
 #ifdef VERSION_US
