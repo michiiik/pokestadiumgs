@@ -207,7 +207,7 @@ void func_80053A30(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055A34.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055A74.s")
+s32 func_80055A74(s32 arg0) { extern s32 D_800972C0; s32 old = D_800972C0; if (arg0 >= 0 && arg0 < 6) D_800972C0 = arg0; return old; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055A9C.s")
 
