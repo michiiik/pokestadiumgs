@@ -78,7 +78,10 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB00B98.s")
+void func_8AB00B98(u8 *arg0, u32 arg1) {
+    *(u32 *)(arg0 + 0x28) = arg1;
+    *(u32 *)(arg0 + 0x2C) = arg1;
+}
 #endif
 
 #ifdef VERSION_US
@@ -166,7 +169,11 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB01FBC.s")
+extern s16 D_8AB126A0;
+
+void func_8AB01FBC(void) {
+    D_8AB126A0 = 0;
+}
 #endif
 
 #ifdef VERSION_US
