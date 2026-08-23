@@ -48,15 +48,27 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_84109460.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_841094A4.s")
+extern u32 D_84190090;
+u32 func_841094A4(void) {
+    return D_84190090;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_841094B0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_841094D4.s")
+extern u32 D_841901B0;
+void func_841094D4(u32 arg0) {
+    D_841901B0 = arg0;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_841094E0.s")
+extern u32 D_841901B0;
+u32 func_841094E0(void) {
+    return D_841901B0;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_841094EC.s")
+extern u32 D_841901B8;
+u32 func_841094EC(void) {
+    return D_841901B8;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_841094F8.s")
 
