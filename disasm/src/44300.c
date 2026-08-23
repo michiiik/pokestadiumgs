@@ -10,9 +10,9 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/44300/func_80043950.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/44300/func_80043A0C.s")
+void func_80043A0C(void *arg0, void *arg1, s32 arg2) { func_80043950(arg0, arg1, 0, arg2); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/44300/func_80043A30.s")
+void func_80043A30(void *arg0, void *arg1, s32 arg2) { func_80043950(arg0, arg1, 1, arg2); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/44300/func_80043A54.s")
 
