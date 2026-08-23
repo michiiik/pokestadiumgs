@@ -625,7 +625,7 @@ extern u8 D_801285B8[]; u8 func_8005D948(s32 index) { return D_801285B8[index * 
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005DDD4.s")
+extern u8 D_80128570[]; s32 func_8005DDD4(s32 index) { return (*(u32 *)(D_80128570 + index * 112) & 0x100) != 0; }
 #endif
 
 #ifdef VERSION_US
@@ -645,7 +645,7 @@ extern u8 D_80128570[]; s32 func_8005DE68(s32 index) { return (*(u32 *)(D_801285
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005DE8C.s")
+extern u8 D_80128570[]; s32 func_8005DE8C(s32 index) { return !((*(u32 *)(D_80128570 + index * 112) & 0x2000) != 0); }
 #endif
 
 #ifdef VERSION_US
