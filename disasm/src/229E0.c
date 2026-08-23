@@ -18,7 +18,9 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002263C.s")
+s32 func_8002263C(void) {
+    return 0x61;
+}
 #endif
 
 #ifdef VERSION_US
