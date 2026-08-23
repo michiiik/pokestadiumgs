@@ -94,9 +94,11 @@ extern s32 _bcmp(const void *, const void *, s32); s32 func_80061FAC(const void 
 
 extern u8 D_800976A0[]; u8 func_80061FD0(s32 index) { return D_800976A0[index]; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80061FE0.s")
+extern u8 D_800976D7[];
+s32 func_80061FE0(s32 index) { if (index <= 0 || index >= 0x98) return 0; return D_800976D7[index]; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80062008.s")
+extern u8 D_8009776F[];
+s32 func_80062008(s32 index) { if (index <= 0 || index >= 0xBF) return 0xFC; return D_8009776F[index]; }
 
 s32 func_80062030(s32 value) { if (value > 0 && value < 0xFC) return value; return 0xFC; }
 
@@ -112,7 +114,7 @@ s32 func_80062030(s32 value) { if (value > 0 && value < 0xFC) return value; retu
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80062304.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_8006236C.s")
+s32 func_8006236C(u8 *arg0, s32 arg1) { s32 result = 0; if (arg0[5] >= arg1) { *(u16 *)(arg0 + 10) = arg1; result = 1; } return result; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80062390.s")
 
