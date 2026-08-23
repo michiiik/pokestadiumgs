@@ -999,17 +999,21 @@ void func_80033ED0(void) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035424.s")
 #endif
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Audio_SetProcessingEnabled.s")
-#endif
+extern s32 D_80122A40;
+extern s32 D_80094860;
+extern s32 D_80094868;
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Audio_ResetModeSelector.s")
-#endif
+void Audio_SetProcessingEnabled(s32 enabled) {
+    D_80122A40 = enabled ? 1 : 0;
+}
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Audio_EnableModeFlag.s")
-#endif
+void Audio_ResetModeSelector(void) {
+    D_80094860 = -1;
+}
+
+void Audio_EnableModeFlag(void) {
+    D_80094868 = 1;
+}
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800354B4.s")
