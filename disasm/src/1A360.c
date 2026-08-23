@@ -28,7 +28,11 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1A360/func_8001A9B4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/1A360/func_8001A9D4.s")
+void func_8001A9D4(u32 *arg0) {
+    arg0[0] = (u32)arg0;
+    arg0[1] = (u32)arg0;
+    arg0[2] = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1A360/func_8001A9E4.s")
 
