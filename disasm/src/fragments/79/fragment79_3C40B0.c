@@ -8,7 +8,12 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C40B0/func_84154948.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C40B0/func_84154AD4.s")
+extern u8 D_8419E780[];
+extern u8 D_8419E920[];
+void func_84154AD4(void) {
+    _bzero(D_8419E780, 0x19C);
+    _bzero(D_8419E920, 0x4D8);
+}
 
 extern u8 D_8419E780[];
 u8 *func_84154B0C(void) {
