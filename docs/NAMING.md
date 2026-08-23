@@ -334,6 +334,27 @@ dispatch, so they remain audit targets rather than receiving guessed names.
 This preserves the issue #3 rule that table structure is evidence, but not proof
 of each callee's behavior.
 
+## Phase 3 subsystem completion audit
+
+The remaining epic scopes were audited against the same evidence boundary. The
+battle scene entry is `Game_State06_Run`, whose direct fragment set is
+`43/44/64/12/27/79/80`; the battle-animation and model dispatch surfaces are
+the table-addressed handlers above. No US text-segment body or caller proves a
+separate damage/stat routine name, so the unresolved 23-entry and smaller
+tables remain explicitly recorded audit targets rather than guessed battle
+names. The text/UI transfer set is likewise bounded to the proven
+`TextRenderer_*`, `Ui_*`, display-list, and state handlers; format-specific
+string tables live in loaded fragments and are not exposed as resident symbols.
+
+For minigames, `Game_State10_Minigame` has 13 state slots in `jtbl_800A5B18`.
+Each slot's direct `Fragment_Load`/`Fragment_LoadAndCall` operand is recorded
+in the minigame ledger, covering the shared resident set 2/3/4/26/27/43-57 and
+59-66. The shared init, input, controller-reset, player-record, round, and
+result callbacks are named; per-game draw/update semantics are fragment-local
+and are explicitly left unplaceable until their callback bodies are recovered.
+This closes the naming audit without converting positional evidence into
+unsupported game titles.
+
 ## Phase 1: the Stadium 1 transfer
 the 676 is a machine-verified correspondence between the two ROMs' machine code.
 
