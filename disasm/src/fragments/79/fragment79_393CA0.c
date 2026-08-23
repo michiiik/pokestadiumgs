@@ -82,7 +82,10 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84125158.s")
+extern u8 D_84195188[];
+u8 func_84125158(u8 arg0) {
+    return D_84195188[arg0];
+}
 #endif
 
 #ifdef VERSION_US
@@ -226,7 +229,12 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841265D4.s")
+extern u8 D_841951D6;
+extern s32 D_841951C8;
+void func_841265D4(void) {
+    D_841951D6 = 1;
+    D_841951C8 = 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -654,7 +662,10 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412DC08.s")
+extern u8 D_841951D7;
+void func_8412DC08(void) {
+    D_841951D7 += 1;
+}
 #endif
 
 #ifdef VERSION_US
