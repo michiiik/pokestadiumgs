@@ -64,7 +64,7 @@ void func_80001CDC(void) { func_80001CB0(); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_80001F08.s")
+void func_80001F08(void) { extern OSMesgQueue D_800AB3E4; osRecvMesg(&D_800AB3E4, NULL, OS_MESG_BLOCK); }
 #endif
 
 #ifdef VERSION_US
@@ -87,7 +87,7 @@ s32 func_80001FE4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_80001FF0.s")
+s32 func_80001FF0(void) { extern s32 osTvType; return osTvType == 0 ? 0x32 : 0x3C; }
 #endif
 
 #ifdef VERSION_US
