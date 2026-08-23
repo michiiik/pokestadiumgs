@@ -53,6 +53,12 @@ def rebuild_source_object(source_path: Path) -> int:
     return result.returncode
 
 
+def invalidate_link_outputs(repo_root: Path) -> None:
+    build = repo_root / "disasm" / "build"
+    for name in ("pokestadiumgs-us.elf", "pokestadiumgs-us.z64", "pokestadiumgs-us.map"):
+        (build / name).unlink(missing_ok=True)
+
+
 def try_candidate(source_path: Path, function: str, candidate: str) -> int:
     source = source_path.read_text()
     candidate = candidate.rstrip() + "\n"
@@ -78,6 +84,7 @@ def try_candidate(source_path: Path, function: str, candidate: str) -> int:
         rebuild_source_object(source_path)
         backup_path.unlink(missing_ok=True)
         return 2
+    invalidate_link_outputs(Path(__file__).resolve().parent.parent)
     env = os.environ.copy()
     env.setdefault("MIPS_BINUTILS_PREFIX", "/Users/michaegg/homebrew/bin/mips-linux-gnu-")
     result = subprocess.run(
@@ -106,6 +113,7 @@ def try_candidate(source_path: Path, function: str, candidate: str) -> int:
 
 
 def compare_current_tree(repo_root: Path) -> int:
+    invalidate_link_outputs(repo_root)
     env = os.environ.copy()
     env.setdefault("MIPS_BINUTILS_PREFIX", "/Users/michaegg/homebrew/bin/mips-linux-gnu-")
     result = subprocess.run(
