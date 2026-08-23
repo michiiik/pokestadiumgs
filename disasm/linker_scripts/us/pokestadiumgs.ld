@@ -327,7 +327,7 @@ SECTIONS
         /* Compatibility entrypoints are appended so they cannot shift the
          * address-locked game text preceding them. */
         build/src/legacy_link_aliases.o(.text);
-        Audio_InitializeTaskState = func_80021B00;
+        func_80021B00 = Audio_InitializeTaskState;
         Audio_BuildSchedulerTask = func_80021B74;
         Audio_ThreadEntry = func_80035174;
         func_800353BC = Audio_StopProcessing;
