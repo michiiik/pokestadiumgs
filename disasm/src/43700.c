@@ -48,7 +48,7 @@ void func_80042BB0(u16 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_8004335C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_80043444.s")
+s32 func_80043444(u8 *arg0) { return 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_80043450.s")
 
