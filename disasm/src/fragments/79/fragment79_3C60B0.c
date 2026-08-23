@@ -6,11 +6,15 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84156860.s")
+s32 func_84156860(void) {
+    return -1;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84156868.s")
+s32 func_84156868(void) {
+    return -1;
+}
 #endif
 
 #ifdef VERSION_US
@@ -89,7 +93,9 @@ void func_84156CB4(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84156CBC.s")
+s32 func_84156CBC(void) {
+    return -1;
+}
 #endif
 
 void func_84156CC4(void) {
