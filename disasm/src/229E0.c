@@ -902,7 +902,7 @@ void func_80033ED0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80034CF8.s")
+u8 func_80034CF8(const u8 *arg0) { return arg0[0]; }
 #endif
 
 #ifdef VERSION_US
@@ -910,7 +910,7 @@ void func_80033ED0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80034D98.s")
+u8 func_80034D98(const u8 *arg0) { return arg0[0]; }
 #endif
 
 #ifdef VERSION_US
@@ -926,7 +926,7 @@ void func_80033ED0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80034E10.s")
+u8 func_80034E10(const u8 *arg0, s32 unused) { return arg0[0]; }
 #endif
 
 #ifdef VERSION_US
@@ -938,11 +938,13 @@ void func_80033ED0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80034EA4.s")
+extern u8 D_800D2B49;
+void func_80034EA4(void) { D_800D2B49 = 0x77; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80034EB4.s")
+extern u8 D_800D2B49;
+void func_80034EB4(void) { D_800D2B49 = 0x33; }
 #endif
 
 #ifdef VERSION_US
@@ -950,11 +952,13 @@ void func_80033ED0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80034ED0.s")
+extern u8 D_800D2B59;
+void func_80034ED0(void) { D_800D2B59 = 4; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80034EE0.s")
+extern u8 D_800D2B59;
+void func_80034EE0(void) { D_800D2B59 = 0x84; }
 #endif
 
 #ifdef VERSION_US
