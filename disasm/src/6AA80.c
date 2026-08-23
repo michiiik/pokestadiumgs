@@ -31,12 +31,15 @@ extern s32 D_8009DF70; void func_8006A2EC(void) { D_8009DF70 = 0; }
 extern s32 D_8009DF70;
 s32 func_8006A3E0(void) { s32 result = 0xFFFF; if (D_8009DF70 != 0) result = *(u16 *)((u8 *)(u32)D_8009DF70); return result; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006A400.s")
+extern s32 D_8009DF70;
+s32 func_8006A400(s32 value) { s32 result = 0; if (D_8009DF70 != 0) { *(s16 *)((u8 *)(u32)D_8009DF70 + 2) = value; result = 1; } return result; }
 
 extern s32 D_8009DF70;
 s32 func_8006A424(void) { s32 result = 0; s32 ptr = D_8009DF70; if (ptr != 0) result = *(s16 *)((u8 *)(u32)ptr + 2); return result; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006A444.s")
+extern s32 D_8009DF70;
+extern void _bzero(void *, s32);
+s32 func_8006A444(s32 value) { s32 result = 0; if (D_8009DF70 != 0) { *(s16 *)((u8 *)(u32)D_8009DF70 + 6) = value; _bzero((u8 *)(u32)D_8009DF70 + 0x3C, 0x44); result = 1; } return result; }
 
 extern s32 D_8009DF70;
 s32 func_8006A48C(void) { s32 result = -1; s32 ptr = D_8009DF70; if (ptr != 0) result = *(s16 *)((u8 *)(u32)ptr + 6); return result; }
@@ -64,9 +67,12 @@ s32 func_8006A48C(void) { s32 result = -1; s32 ptr = D_8009DF70; if (ptr != 0) r
 extern s32 D_8009DF70;
 s32 func_8006AC70(void) { s32 result = -1; s32 ptr = D_8009DF70; if (ptr != 0) result = *(s16 *)((u8 *)(u32)ptr + 0x12); return result; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006AC90.s")
+extern s32 D_8009DF70;
+extern s32 func_8006CBA0(s32, s32);
+s32 func_8006AC90(void) { s32 result = 0; s32 ptr = D_8009DF70; if (ptr != 0) result = func_8006CBA0(*(s16 *)((u8 *)(u32)ptr + 0x12), *(s16 *)((u8 *)(u32)ptr + 0x16)); return result; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006ACCC.s")
+extern s32 D_8009DF70;
+s32 func_8006ACCC(s32 value) { s32 result = 0; if (D_8009DF70 != 0) { *(s16 *)((u8 *)(u32)D_8009DF70 + 0x16) = value; result = 1; } return result; }
 
 extern s32 D_8009DF70;
 s32 func_8006ACF0(void) { s32 result = 0; s32 ptr = D_8009DF70; if (ptr != 0) result = *(s16 *)((u8 *)(u32)ptr + 0x16); return result; }
