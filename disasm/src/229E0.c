@@ -1963,7 +1963,8 @@ void func_8003EB84(u8 *arg0, s16 value) { *(s32 *)(arg0 + 0x48) = ((s32)value <<
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003EC54.s")
+typedef struct { u8 pad[0x48]; s32 value48; s32 value4C; } Func3EC54;
+s32 func_8003EC54(Func3EC54 *arg0) { s32 value = arg0->value48 + arg0->value4C; return (s16)(value >> 16); }
 #endif
 
 #ifdef VERSION_US
