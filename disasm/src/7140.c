@@ -56,9 +56,51 @@ s32 Dma_QueueRomRead(u32 unused, u32 source, u32 destination, u32 length,
     return request == NULL;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/7140/Storage_QueueRomWrite.s")
+s32 Storage_QueueRomWrite(u32 destination, u32 source, u32 length,
+                          OSMesgQueue *queue, s32 mode) {
+    DmaRequest *request = Util_Malloc(0x2C);
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/7140/Storage_QueueSramTransfer.s")
+    if (request != NULL) {
+        request->type = 0xF4;
+        request->field_1C = source;
+        request->field_20 = destination;
+        request->field_24 = length;
+        request->field_28 = (u32)queue;
+        Dma_QueueRequestMessage(request, mode);
+    }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/7140/Storage_QueueFlashTransfer.s")
+    return request == NULL;
+}
+
+s32 Storage_QueueSramTransfer(u32 staging, u32 destination, u32 source,
+                               u32 length, OSMesgQueue *queue, s32 mode) {
+    DmaRequest *request = Util_Malloc(0x2C);
+
+    if (request != NULL) {
+        request->type = staging == 0 ? 0xF2 : 0xF3;
+        request->field_1C = source;
+        request->field_20 = destination;
+        request->field_24 = length;
+        request->field_28 = (u32)queue;
+        Dma_QueueRequestMessage(request, mode);
+    }
+
+    return request == NULL;
+}
+
+s32 Storage_QueueFlashTransfer(u32 type, u32 destination, u32 page,
+                                u32 unused, OSMesgQueue *queue, s32 mode) {
+    DmaRequest *request = Util_Malloc(0x2C);
+
+    if (request != NULL) {
+        request->type = type == 0 ? 0xF5 : 0xF6;
+        request->field_1C = (u16)page;
+        request->field_20 = destination;
+        request->field_24 = 1;
+        request->field_28 = unused;
+        Dma_QueueRequestMessage(request, mode);
+    }
+
+    return request == NULL;
+}
 #endif

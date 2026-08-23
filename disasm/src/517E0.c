@@ -235,13 +235,45 @@ void Save_ClearRecord(u8 *data, s32 length, s32 index) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80054E48.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055028.s")
+u32 func_80055028(void) {
+    u32 mask = 0;
+    s32 bank;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/Save_ResetBank.s")
+    for (bank = 0; bank < 4; bank++) {
+        if (func_80054E48(bank) != 0) {
+            mask |= 1u << bank;
+        }
+    }
+
+    return mask;
+}
+
+void Save_ResetBank(void *unused, u32 bankId) {
+    SaveRecordEntry *entry;
+    u32 index;
+
+    if (bankId < 0x424E4B30 || bankId >= 0x424E4B34) {
+        return;
+    }
+
+    index = (bankId - 0x424E4B30) * 5;
+    entry = &D_801281C0[index];
+    entry->flags &= ~3u;
+    entry->backup = NULL;
+    entry->active = NULL;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800550E8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800551EC.s")
+s32 func_800551EC(u8 *data, s32 length) {
+    u8 *footer = data + length - 6;
+
+    if (*(u16 *)(footer + 0) != 0x5033 || *(u16 *)(footer + 2) != 0x7630) {
+        return 0;
+    }
+
+    return *(u16 *)(footer + 4) == Save_Checksum(data, length);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055260.s")
 

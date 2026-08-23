@@ -963,17 +963,21 @@ void func_80033ED0(void) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Rom_DmaRead.s")
 #endif
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035140.s")
-#endif
+extern s32 D_80094850;
+extern s32 D_80094870[];
+extern s32 D_80122A40;
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003514C.s")
-#endif
+void func_80035140(s32 channel) {
+    D_80094850 = channel;
+}
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035160.s")
-#endif
+s32 func_8003514C(void) {
+    return D_80094850;
+}
+
+s32 func_80035160(s32 channel) {
+    return D_80094870[channel];
+}
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Audio_ThreadEntry.s")
@@ -987,19 +991,28 @@ void func_80033ED0(void) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003539C.s")
 #endif
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Audio_StopProcessing.s")
-#endif
+extern s32 func_80025C9C(void);
+extern s32 func_80025D44(void);
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Audio_WaitForPendingTasks.s")
-#endif
+s32 Audio_StopProcessing(void) {
+    func_80025C9C();
+    D_80122A40 = 0;
+    return 0;
+}
+
+s32 Audio_WaitForPendingTasks(void) {
+    s32 completed = 0;
+
+    while (func_80025D44() != 0) {
+        completed++;
+    }
+    return completed;
+}
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035424.s")
 #endif
 
-extern s32 D_80122A40;
 extern s32 D_80094860;
 extern s32 D_80094868;
 
