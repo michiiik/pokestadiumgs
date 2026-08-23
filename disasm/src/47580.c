@@ -154,7 +154,7 @@ extern u8 *D_80126F50; void func_800497C0(void) { func_80046C18(D_80126F50); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80049828.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80049878.s")
+extern u8 *D_80126F50; void func_80049878(void) { func_80046DD4(D_80126F50); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_8004989C.s")
 
