@@ -98,11 +98,11 @@ u8 func_80002014(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_80002020.s")
+void func_80002020(void) { extern u8 leoDiskID[]; Vi_SelectMode(*(s8 *)(leoDiskID + 0xAB1), *(s8 *)(leoDiskID + 0xAB2)); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_8000204C.s")
+s32 func_8000204C(void) { extern u8 leoDiskID[]; s32 ready = 1; if (*(s32 *)(leoDiskID + 0xAA4) != 0) ready = *(s32 *)(leoDiskID + 0xA2C) > 0; return ready; }
 #endif
 
 #ifdef VERSION_US
