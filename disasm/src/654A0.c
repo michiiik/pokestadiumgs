@@ -10,7 +10,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/654A0/func_80064980.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/654A0/func_800649CC.s")
+s32 func_800649CC(void) { return 2; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/654A0/func_800649D4.s")
 
