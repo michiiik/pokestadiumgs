@@ -334,6 +334,7 @@ SECTIONS
         Audio_ResetModeSelector = func_80035494;
         Audio_ResetRequestId = func_800355D4;
         Audio_RequestEvent = func_800355E4;
+        func_80006A78 = Dma_QueueRequestMessage;
         Minigame_SetPlayerMask = func_8007214C;
         GbTower_StartPortSession = func_8005ADD8;
         GbTower_UpdatePortState = func_8005A364;
