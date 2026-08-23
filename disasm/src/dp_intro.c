@@ -80,7 +80,10 @@ void func_80001CD4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_80001FE4.s")
+extern s32 D_800AB49C;
+s32 func_80001FE4(void) {
+    return D_800AB49C;
+}
 #endif
 
 #ifdef VERSION_US
@@ -88,7 +91,10 @@ void func_80001CD4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_80002014.s")
+extern u8 D_800AB46B;
+u8 func_80002014(void) {
+    return D_800AB46B;
+}
 #endif
 
 #ifdef VERSION_US
@@ -100,13 +106,22 @@ void func_80001CD4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_80002074.s")
+extern s32 D_800871D0;
+void func_80002074(void) {
+    D_800871D0 = 1;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_80002084.s")
+extern s32 D_800871D0;
+void func_80002084(void) {
+    D_800871D0 = 0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_80002090.s")
+extern f32 D_800AB46C;
+f32 func_80002090(void) {
+    return D_800AB46C;
+}
 #endif
