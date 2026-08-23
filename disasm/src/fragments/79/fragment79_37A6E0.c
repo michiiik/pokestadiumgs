@@ -74,9 +74,18 @@ extern void func_8410AFD4(void);
 extern void func_8410D088(void *arg0, ...);
 extern void func_8410E688(void *arg0, void *arg1);
 extern void func_84110B2C(void *arg0, void *arg1);
+extern void func_84116248(void *arg0);
+extern s32 ModelAnim_IsFinished(void *arg0);
+extern void func_84115D4C(void *arg0);
+extern void func_84116010(void *arg0);
+extern void func_841168A0(void *arg0);
+extern void func_84116A3C(void *arg0);
+extern void func_84111C6C(void);
+extern void func_841134D8(void *arg0);
 extern u8 D_8418393C[];
 extern u8 D_84183944[];
 extern u8 D_84183960[];
+extern u8 D_841839E0[];
 extern u8 *D_8419120C;
 extern u8 *D_84193FA0;
 extern u8 *D_80087200;
@@ -1287,7 +1296,17 @@ void BattleAnim_Dispatch_051(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_Dispatch_106.s")
+void BattleAnim_Dispatch_106(void *arg0) {
+    u8 *state = arg0;
+    s32 slot;
+    *(s16 *)(state + 0x7E8) = 0;
+    *(u8 *)(state + 0x7F6) = 5;
+    *(u8 *)(state + 0x618) = 0x5B;
+    func_84111C44(state);
+    func_841134A0(state);
+    slot = D_841911F4;
+    *(u32 *)(state + 0x5C8 + slot * 4) = D_84183D50;
+}
 #endif
 
 #ifdef VERSION_US
@@ -1299,15 +1318,59 @@ void BattleAnim_Dispatch_051(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_Dispatch_107.s")
+void BattleAnim_Dispatch_107(void *arg0) {
+    u8 *state = arg0;
+    s32 slot;
+    if (func_84113430(state) == 0)
+        return;
+    func_84115D4C(state);
+    func_841126C8(state);
+    *(s16 *)(state + 0x7E8) = 0;
+    func_8411FEE8(0x258);
+    if (*(s16 *)(D_841911E0 + 0x98) != 0x21)
+        func_84111348(state, 6);
+    func_84111E50(state, *(u8 *)(state + 0x617));
+    func_84111D64(state, *(s8 *)(state + 0x616));
+    func_84111DB4(state, *(u8 *)(state + 0x61B));
+    func_84111E80(state, 0);
+    func_80030420(func_8411E1F8(state) & 0xFF, 0x5B,
+                  *(s16 *)(state + 0x1A), 0);
+    *(u8 *)(state + 0x7F6) = 0;
+    slot = D_841911F4;
+    *(u32 *)(state + 0x5C8 + slot * 4) = D_84183D50;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_Dispatch_108.s")
+void BattleAnim_Dispatch_108(void *arg0) {
+    u8 *state = arg0;
+    if (func_841133EC(state) != 0 || *(s8 *)(state + 0x7F6) != 0)
+        return;
+    if (*(s16 *)(state + 0x7E8) == 2) {
+        s16 value = *(s16 *)(state + 0x1A);
+        if (value != 0x32 && value != 0x33)
+            func_84108728(*(u8 *)(state + 0x618), state,
+                          func_8411E164(state));
+        func_800231A0(*(u8 *)(state + 0x618), *(s16 *)(state + 0x658), 0);
+        func_84112564(state);
+        *(u16 *)(state + 0x7F4) &= ~0x10;
+    }
+    func_84115D98(state);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_Dispatch_057.s")
+void BattleAnim_Dispatch_057(void *arg0) {
+    u8 *state = arg0;
+    s32 slot;
+    *(s16 *)(state + 0x7E8) = 0;
+    *(u8 *)(state + 0x7F6) = 5;
+    *(u8 *)(state + 0x618) = *(u8 *)(D_84193DD0 + 2);
+    func_84111C44(state);
+    func_841134A0(state);
+    slot = D_841911F4;
+    *(u32 *)(state + 0x5C8 + slot * 4) = D_84183D50;
+}
 #endif
 
 #ifdef VERSION_US
@@ -1315,7 +1378,30 @@ void BattleAnim_Dispatch_051(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_Dispatch_058.s")
+void BattleAnim_Dispatch_058(void *arg0) {
+    u8 *state = arg0;
+    s32 slot;
+    if (func_84113430(state) == 0)
+        return;
+    func_84112EAC(state);
+    func_841126C8(state);
+    func_84116010(state);
+    if (*(s16 *)(D_841911E0 + 0x98) != 0x21)
+        func_84111348(state, 0);
+    func_84111E50(state, *(s8 *)(state + 0x617));
+    func_84111D64(state, *(s8 *)(state + 0x616));
+    func_84111DB4(state, *(u8 *)(state + 0x61B));
+    func_84111E80(state, 0);
+    if (*(u8 *)(state + 0x61A) == 0)
+        func_8411FEE8(0x258), *(s16 *)(state + 0x7E8) = *(u8 *)(state + 0x61B) - 1;
+    else
+        func_8411FEE8(0x258), *(s16 *)(state + 0x7E8) = *(u8 *)(state + 0x61B);
+    func_80030420(func_8411E1F8(state) & 0xFF,
+                  *(u8 *)(state + 0x618), *(s16 *)(state + 0x1A), 4);
+    *(u8 *)(state + 0x7F6) = 0;
+    slot = D_841911F4;
+    *(u32 *)(state + 0x5C8 + slot * 4) = D_84183D50;
+}
 #endif
 
 #ifdef VERSION_US
@@ -1323,7 +1409,17 @@ void BattleAnim_Dispatch_051(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_Dispatch_059.s")
+void BattleAnim_Dispatch_059(void *arg0) {
+    u8 *state = arg0;
+    s8 mode;
+    if (func_841133EC(state) != 0)
+        return;
+    mode = *(s8 *)(state + 0x7F6);
+    if (mode == 0)
+        func_84116248(state);
+    else if (mode == 1 && ModelAnim_IsFinished(state))
+        func_84112158(state, 0xFB);
+}
 #endif
 
 #ifdef VERSION_US
@@ -1355,11 +1451,41 @@ void BattleAnim_Dispatch_051(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_Dispatch_113.s")
+void BattleAnim_Dispatch_113(void *arg0) {
+    u8 *state = arg0;
+    s32 slot;
+    *(s16 *)(state + 0x7E8) = 0;
+    *(u8 *)(state + 0x7F6) = 5;
+    *(u8 *)(state + 0x618) = 1;
+    func_841136E8(state);
+    func_84111C44(state);
+    func_841134A0(state);
+    slot = D_841911F4;
+    *(u32 *)(state + 0x5C8 + slot * 4) = D_84183D50;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_Dispatch_114.s")
+void BattleAnim_Dispatch_114(void *arg0) {
+    u8 *state = arg0;
+    s32 slot;
+    if (func_84113430(state) == 0)
+        return;
+    func_84112EAC(state);
+    *(u8 *)(state + 0x7F6) = 0;
+    func_841168A0(state);
+    func_841126C8(state);
+    func_84111348(state, 0);
+    func_84111E50(state, *(s8 *)(state + 0x617));
+    func_84111D64(state, *(s8 *)(state + 0x616));
+    func_84111E80(state, 0);
+    func_84111DB4(state, *(u8 *)(state + 0x61B));
+    func_8411FEE8(0x258);
+    func_84112564(state);
+    *(s16 *)(state + 0x7E8) = *(u8 *)(state + 0x61B);
+    slot = D_841911F4;
+    *(u32 *)(state + 0x5C8 + slot * 4) = D_84183D50;
+}
 #endif
 
 #ifdef VERSION_US
@@ -1367,7 +1493,17 @@ void BattleAnim_Dispatch_051(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_Dispatch_115.s")
+void BattleAnim_Dispatch_115(void *arg0) {
+    u8 *state = arg0;
+    if (func_841133EC(state) != 0 || *(s8 *)(state + 0x7F6) != 0)
+        return;
+    if (*(u8 *)(state + 0x619) == *(s16 *)(state + 0x7E8)) {
+        func_84108728(*(u8 *)(state + 0x618), state,
+                      func_8411E164(state));
+        func_800231A0(*(u8 *)(state + 0x618), *(s16 *)(state + 0x658), 0);
+    }
+    func_84116A3C(state);
+}
 #endif
 
 #ifdef VERSION_US
@@ -1383,7 +1519,31 @@ void BattleAnim_Dispatch_051(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_Dispatch_029.s")
+void BattleAnim_Dispatch_029(void *arg0) {
+    u8 *state = arg0;
+    s32 slot;
+    u16 value;
+    func_8411FEE8(0x12C);
+    value = *(u16 *)((u8 *)D_84193DD0 + 4);
+    if (value == 0x10 || value == 0x14 || value == 0x4B)
+        *(u8 *)(state + 0x618) = 1;
+    else
+        *(u8 *)(state + 0x618) = *((u8 *)D_84193DD0 + 8);
+    value = *(u16 *)((u8 *)D_84193DD0 + 4);
+    if (value != 0x12 && value != 0x13 && value != 0x11 &&
+        (*((u8 *)D_84193DD0 + 8) == 0x12 ||
+         *((u8 *)D_84193DD0 + 8) == 0x2E))
+        func_84108A10(state);
+    func_84111C6C();
+    if (*(u16 *)(state + 0x7EC) & 1)
+        func_841134A0(state);
+    else
+        func_841134D8(state);
+    if (func_8411DC80(*(u8 *)(state + 0x618), D_841839E0, 0xA))
+        *(u8 *)(state + 2) |= 2;
+    slot = D_841911F4;
+    *(u32 *)(state + 0x5C8 + slot * 4) = D_84183D50;
+}
 #endif
 
 #ifdef VERSION_US
