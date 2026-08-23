@@ -331,8 +331,8 @@ SECTIONS
         Audio_BuildSchedulerTask = func_80021B74;
         Audio_ThreadEntry = func_80035174;
         func_800353BC = Audio_StopProcessing;
-        Audio_ResetModeSelector = func_80035494;
-        Audio_ResetRequestId = func_800355D4;
+        func_80035494 = Audio_ResetModeSelector;
+        func_800355D4 = Audio_ResetRequestId;
         Audio_RequestEvent = func_800355E4;
         func_80006A78 = Dma_QueueRequestMessage;
         Minigame_SetPlayerMask = func_8007214C;

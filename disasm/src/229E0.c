@@ -1327,7 +1327,9 @@ void Audio_SetProcessingEnabled(s32 enabled) {
     D_80122A40 = enabled ? 1 : 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/LinkAlias_func_80035494.s")
+void Audio_ResetModeSelector(void) {
+    D_80094860 = -1;
+}
 
 void Audio_EnableModeFlag(void) {
     D_80094868 = 1;
@@ -1339,7 +1341,9 @@ void Audio_EnableModeFlag(void) {
 
 extern s32 D_80094864;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/LinkAlias_func_800355D4.s")
+void Audio_ResetRequestId(void) {
+    D_80094864 = -1;
+}
 
 extern void Audio_DispatchCommand(s32 eventId);
 
