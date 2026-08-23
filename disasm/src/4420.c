@@ -113,11 +113,50 @@ u32 func_800040C4(void *asset) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/Memmap_FragmentCleanupCallback.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/Fragment_Register.s")
+typedef struct {
+    u8 pad_00[0x1C];
+    u32 end_offset;
+} FragmentHeader;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/Fragment_RelocateAndReset.s")
+extern void *func_800042C0(u32 source, u32 end, u32 decompress,
+                           u32 relocate);
+extern u32 MainPool_GetAllocationSize(void *fragment);
+extern void main_pool_set_func(void *fragment, u32 vaddr, void *callback);
+extern void main_pool_realloc(void *fragment, ...);
+extern void Memmap_RelocateFragment(void *source, void *fragment);
+extern void MainPool_ResetStateToOffset(void *pool, u32 offset);
+extern void Memmap_FragmentCleanupCallback(void *arg0, u32 vaddr);
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/Fragment_Load.s")
+void Fragment_Register(u32 pool, FragmentHeader *fragment) {
+    u32 allocation_size = MainPool_GetAllocationSize(fragment);
+
+    main_pool_set_func(fragment, (u32)pool + 0x81000000,
+                       Memmap_FragmentCleanupCallback);
+    if (allocation_size < fragment->end_offset) {
+        main_pool_realloc(fragment);
+        Memmap_RelocateFragment(pool, fragment);
+    } else {
+        Memmap_RelocateFragment(pool, fragment);
+        main_pool_realloc(fragment, fragment->end_offset);
+    }
+}
+
+void Fragment_RelocateAndReset(void *pool, void *source,
+                               FragmentHeader *fragment) {
+    Memmap_RelocateFragment(source, fragment);
+    MainPool_ResetStateToOffset(
+        pool, (u32)((u8 *)fragment + fragment->end_offset) -
+                 *(u32 *)((u8 *)pool + 8));
+}
+
+void *Fragment_Load(u32 pool, u32 source, u32 end) {
+    void *fragment = func_800042C0(source, end, 0, 0);
+
+    if (fragment != NULL) {
+        Fragment_Register(pool, fragment);
+    }
+    return fragment;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/BinArchive_Open.s")
 

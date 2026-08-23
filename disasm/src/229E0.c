@@ -1,5 +1,31 @@
 #include "global.h"
 
+/* Audio command setup helpers.  These small routines are kept here with the
+ * surrounding audio command code; their constants and stores are taken
+ * directly from the US implementations at 0x800225C4--0x80022640. */
+extern void func_80018728(u32 address, s32 offset);
+extern void func_800187AC(void);
+extern u8 D_8009019C;
+extern u8 D_800901A0;
+extern u8 D_800901A4;
+
+void func_800225C4(s32 channel) {
+    func_80018728(0x83000000, channel * 3);
+    func_800187AC();
+    D_8009019C = 0;
+    D_800901A0 = 0;
+    D_800901A4 = 0;
+}
+
+void func_8002260C(void* unused0, void* unused1) {
+    (void)unused0;
+    (void)unused1;
+    func_80018728(0x82000100, 0);
+}
+
+s32 func_8002263C(void) {
+    return 0x61;
+}
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80021DE0.s")
@@ -10,18 +36,6 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800225C4.s")
-#endif
-
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002260C.s")
-#endif
-
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002263C.s")
-#endif
-
-#ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80022644.s")
 #endif
 
@@ -29,9 +43,19 @@
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800226C0.s")
 #endif
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80023110.s")
-#endif
+extern void func_80025294(s32 command, ...);
+extern s8 D_800901BC[];
+
+void func_80023110(s32 mode, s32 index) {
+    if (mode == 0) {
+        func_80025294(0x66);
+    } else if (mode == 1) {
+        func_80025294(0x65);
+    } else if (mode == 0x154 && index >= 0 && index < 0x3E &&
+               D_800901BC[index] >= 0) {
+        func_80025294((u32)(D_800901BC[index] + 0x1000D), 0, 0);
+    }
+}
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800231A0.s")

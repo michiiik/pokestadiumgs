@@ -12,13 +12,63 @@ extern SaveRecordEntry D_801281C0[];
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80050BE0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80050CAC.s")
+void *func_80050CAC(s32 index, s32 active) {
+    SaveRecordEntry *entry = &D_801281C0[index];
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80050CF8.s")
+    if ((entry->flags & 1) != 0) {
+        return active != 0 ? entry->active : entry->backup;
+    }
+    return NULL;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80050D20.s")
+void *func_80050CF8(s32 index) {
+    if (index >= 0 && index < 4) {
+        extern void *D_800972B0[];
+        return D_800972B0[index];
+    }
+    return NULL;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80050DE4.s")
+s32 func_80050D20(s32 type, s32 value) {
+    switch (type) {
+        case 0x10:
+            if (value >= 0) {
+                return value >> 2;
+            }
+            return (value + 3) >> 2;
+        case 0x11:
+            return value > 0 ? 2 : 1;
+        case 0x16:
+        case 0x17:
+            return 1;
+        case 0x12:
+        case 0x13:
+        case 0x14:
+        case 0x15:
+        case 0x18:
+        case 0x19:
+        case 0x1A:
+        case 0x1B:
+        case 0x1C:
+        case 0x1D:
+        case 0x1E:
+            return 3;
+        default:
+            return -1;
+    }
+}
+
+s32 func_80050DE4(s32 type) {
+    static const s32 sizes[] = {
+        0x180, 0x4D8, 0x20C, 0x54, 0x60, 0x1A0, 0x936, 0x58A,
+        0x250, 0x1B10, 0x490, 0xBD0, 0x3F0, 0x648, 0x50,
+    };
+
+    if (type >= 0x10 && type <= 0x1E) {
+        return sizes[type - 0x10];
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80050E88.s")
 
