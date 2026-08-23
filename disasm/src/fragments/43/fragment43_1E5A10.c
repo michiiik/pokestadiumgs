@@ -468,7 +468,10 @@ void func_8AC00FEC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC06F28.s")
+extern void func_8AC06EC0(void);
+void func_8AC06F28(void) {
+    func_8AC06EC0();
+}
 #endif
 
 #ifdef VERSION_US
