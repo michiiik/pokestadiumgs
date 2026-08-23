@@ -110,7 +110,10 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80053908.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80053A30.s")
+extern void func_80062614(void);
+void func_80053A30(void) {
+    func_80062614();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80053A50.s")
 
