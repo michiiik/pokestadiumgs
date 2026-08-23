@@ -18,7 +18,10 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/7A50/func_800072E0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/7A50/func_8000731C.s")
+extern s32 D_80087220;
+s32 func_8000731C(void) {
+    return D_80087220;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/7A50/func_80007328.s")
 
