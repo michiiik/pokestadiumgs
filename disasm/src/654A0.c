@@ -2,7 +2,7 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/654A0/func_800648A0.s")
+extern u8 D_8009DE50[]; u8 func_800648A0(u8 index) { return D_8009DE50[index]; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/654A0/func_800648B8.s")
 
