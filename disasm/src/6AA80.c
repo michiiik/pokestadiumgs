@@ -1,12 +1,15 @@
 #include "global.h"
 
+extern void* func_80069F20(s32 preserveState, s32 unused1, s32 unused2);
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_80069E80.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_80069F20.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/BattleScene_ResetParticipantModelFlags.s")
+void* BattleScene_ResetParticipantModelFlags(s32 preserveState) {
+    return func_80069F20(preserveState, 0, 0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006A160.s")
 
