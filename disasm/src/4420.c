@@ -240,13 +240,36 @@ void func_800049B8(void *ptr) {
     main_pool_try_free(ptr);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800049D8.s")
+extern void *func_80004458(s32 pool, u32 source, u32 end, s32 flags);
+
+void *func_800049D8(s32 pool, const u32 *header, const u32 *range) {
+    u32 source = header[1] + range[0];
+    u32 end = source + range[1];
+
+    if (pool == 0) {
+        return func_800042C0(source, end, 0, 0);
+    }
+    return func_80004458(pool, source, end, 0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80004A40.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80004B4C.s")
+extern void *func_80004A40(s32 pool, void *archive, s32 index);
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80004B78.s")
+void *func_80004B4C(void *archive, s32 index) {
+    return func_80004A40(0, archive, index);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/BinArchive_GetCachedFile.s")
+void *func_80004B78(s32 pool, void *archive, s32 index) {
+    return func_80004A40(pool, archive, index);
+}
+
+void *BinArchive_GetCachedFile(void *archive, s32 index) {
+    u8 *base = archive;
+
+    if ((u32)index >= *(u32 *)(base + 0xC)) {
+        return NULL;
+    }
+    return *(void **)(base + (index * 0x10) + 0x18);
+}
 #endif
