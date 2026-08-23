@@ -36,5 +36,5 @@ void func_80043A30(void *arg0, void *arg1, s32 arg2) { func_80043950(arg0, arg1,
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/44300/func_8004418C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/44300/func_80044250.s")
+extern s8 D_80094CF4; void func_80044250(s8 value) { D_80094CF4 = value; }
 #endif

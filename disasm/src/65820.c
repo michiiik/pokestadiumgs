@@ -101,5 +101,5 @@ s32 func_80064E38(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/func_80065210.s")
+void func_80065210(s32 arg0) { }
 #endif
