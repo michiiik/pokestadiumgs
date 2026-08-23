@@ -192,6 +192,11 @@ completion primitive until the pending audio work drains. These names describe
 control-flow roles only; they do not claim ownership of the lower-level RSP
 mixer implementation.
 
+`Audio_SetProcessingEnabled` completes the control surface: state 4 calls it
+with both boolean values, and `Audio_ThreadEntry` reads the same flag before
+submitting work. The name is intentionally limited to the flag transition;
+the event IDs and mixer command meanings remain separate.
+
 ## Phase 3.6: remaining dispatch-table boundaries
 
 The dispatch-table survey was rerun after the subsystem slices. The two largest

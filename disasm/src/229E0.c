@@ -1000,7 +1000,7 @@ void func_80033ED0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035470.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Audio_SetProcessingEnabled.s")
 #endif
 
 #ifdef VERSION_US

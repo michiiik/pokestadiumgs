@@ -74,6 +74,10 @@
    "Audio_WaitForPendingTasks",
    "polls the scheduler completion primitive until no audio tasks remain and returns the number of completions observed; called by the state-4 shutdown path"
   ],
+  "func_80035470": [
+   "Audio_SetProcessingEnabled",
+   "called by both state-4 audio transitions; stores the boolean enable value in the Thread4 processing flag consumed by Audio_ThreadEntry"
+  ],
   "func_83503918": [
    "fragment1_main",
    "fragment 1 entry: target of the J at offset 0 of the fragment header trampoline (rom 0xa8a80, vram 0x83500000)"
