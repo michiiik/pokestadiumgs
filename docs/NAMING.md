@@ -221,6 +221,12 @@ with both boolean values, and `Audio_ThreadEntry` reads the same flag before
 submitting work. The name is intentionally limited to the flag transition;
 the event IDs and mixer command meanings remain separate.
 
+Two adjacent audio controls are now named from their direct global writes:
+`Audio_ResetModeSelector` stores `-1` in `D_80094860`, while
+`Audio_EnableModeFlag` stores `1` in `D_80094868`. Their names describe only
+those state transitions; the mode values consumed by the larger command
+routine remain unresolved.
+
 ## Phase 3.8: fragment-79 species dispatch handlers
 
 The 253-entry table at `0x84183D50` is now resolved at the handler level. It

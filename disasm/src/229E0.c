@@ -1004,11 +1004,11 @@ void func_80033ED0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035494.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Audio_ResetModeSelector.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800354A4.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Audio_EnableModeFlag.s")
 #endif
 
 #ifdef VERSION_US

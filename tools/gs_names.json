@@ -26,6 +26,14 @@
   "Vi_SelectMode": "matches Stadium 1 Video_SetMode (callgraph). Same function, two spellings of the same idea. Upstream name kept."
  },
   "functions": {
+  "func_80035494": [
+   "Audio_ResetModeSelector",
+   "The helper writes -1 to D_80094860, the audio mode selector consumed by the command-transition routine"
+  ],
+  "func_800354A4": [
+   "Audio_EnableModeFlag",
+   "The helper writes 1 to D_80094868, the audio processing flag checked by the command-transition routine"
+  ],
   "func_80072030": [
    "Minigame_ProcessPlayerEvents",
    "Game_State10_Minigame calls this for the active input branch; its fragment callback scans four player records and processes 18 per-player event slots"
