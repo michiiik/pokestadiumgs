@@ -10,5 +10,5 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/674D0/func_800669C4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/674D0/func_80066D24.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/674D0/Game_State08_Run.s")
 #endif

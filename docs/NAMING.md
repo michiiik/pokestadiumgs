@@ -36,7 +36,28 @@ upstream libultra and thread setup.
 **676 evidence-backed function names transferred from Stadium 1**, taking the
 tree to **973 of 10,901 (8.9%)**.
 
-Nothing here was named by reading a body and forming an opinion. Every one of
+Nothing here was named by reading a body and forming an opinion.
+
+## Phase 3.1: boot and scene dispatch
+
+The first original reverse-engineering batch adds **23 names**, taking the tree
+to **1,093 of 10,901 functions (10.0%)**. It maps the always-resident game state
+machine that `Game_Thread` enters on boot: the state reader and sole writer, the
+thread initializer, and all 19 jump-table handlers.
+
+`Game_ThreadInit` establishes state 17. `Game_State17_Boot` loads fragments 15
+and 67 before selecting state 1; `Game_State01_Loop` drives fragment 16 under
+the game's `loop` pool tag and normally advances to state 2;
+`Game_State02_Run` loads fragment 17 under `gbch` and dispatches its result into
+the rest of the scene states. The exact jump-table positions, fragment loads,
+pool tags, and outgoing transitions are recorded with each name in
+`tools/gs_names.json`.
+
+Only roles established by dispatch position or strong in-game tags are in the
+names. Broader readings such as title/attract, main menu, and battle-mode roles
+remain hypotheses in the evidence text. Probable audio helpers, the `dbug`
+scene selector, and menu-result accessors remain unnamed for their own subsystem
+passes.
 
 ## Phase 2: structure around the anchors
 

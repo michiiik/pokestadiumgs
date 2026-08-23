@@ -32,5 +32,5 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_800727A4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_800727D4.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/Game_State10_Minigame.s")
 #endif

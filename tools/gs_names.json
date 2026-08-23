@@ -413,6 +413,98 @@
   "func_80000400": [
    "entrypoint",
    "ROM entrypoint: game.toml entrypoint = 0x80000400, the standard N64 boot address; first symbol of the text segment"
+  ],
+  "func_80064ED0": [
+   "Game_ThreadInit",
+   "called exactly once at the top of Game_Thread (0x80064FB0) before the dispatch loop: sets the FPU control word (__osSetFpcCsr 0x01000C01), runs subsystem inits, sets the initial game state to 0x11 via Game_SetState, and pushes the 'GAME' (0x47414D45) main-pool state"
+  ],
+  "func_80064DFC": [
+   "Game_SetState",
+   "sole writer of the game-state word at 0x8009DE94 (verified by scanning the entire text segment for lui 0x800A + sw/addiu -0x216C patterns: only this function stores there); keeps the previous state at 0x80138BE4 and returns 1 iff the value changed; called from every Game_Thread dispatch arm to request the next state"
+  ],
+  "func_80064E2C": [
+   "Game_GetState",
+   "plain two-instruction reader of the game-state word at 0x8009DE94 (lui 0x800A; lw -0x216C); used e.g. by Game_State01_Loop to test whether the state is still 1"
+  ],
+  "func_80064C20": [
+   "Game_PollState",
+   "guarded state read used by the Game_Thread dispatch loop on every iteration: under osSetIntMask it checks PI status (0xA4600010) and a sentinel word at 0xB0000E38 against 0x828A, substituting 0xFFFFFFF0 (which fails the loop's id-1 < 0x13 bounds check and is retried) while a PI transfer is in flight with the sentinel absent; otherwise returns the state id unchanged"
+  ],
+  "func_80065B20": [
+   "Game_State17_Boot",
+   "handler for game state 17 (jump table 0x800A53D0 entry 16 -> arm 0x80064FF4), the initial state set by Game_ThreadInit: Fragment_LoadAndCall of fragment15 (vram 0x83F00000, rom 0x10CF70-0x10D470) and fragment67 (vram 0x82900000, rom 0x33CB00-0x357D20), then Game_SetState(1); also re-invoked from the state-1 attract loop (via func_80065974) to reload these two fragments"
+  ],
+  "func_80065A18": [
+   "Game_State01_Loop",
+   "handler for game state 1 (jump table entry 0 -> arm 0x80065014): loops while Game_GetState()==1 under main-pool tag 'loop' (0x6C6F6F70); each iteration runs fragment16 (vram 0x82000000, rom 0x10D470-0x10F9C0) via func_800657B0 and dispatches its packed result -- type 1: func_80065974(count) (demo cycle: even->func_80065814(count/2), odd->runs the state-10 minigame handler directly, every third->Game_State17_Boot reload), type 2: func_80065220(x,y) (pool 'dbug' scene dispatcher), otherwise Game_SetState(2); attract/title sequence driver (fragment16's on-screen role not independently confirmed)"
+  ],
+  "func_80065BB0": [
+   "Game_State02_Run",
+   "handler for game state 2 (jump table entry 1 -> arm 0x80065024): under main-pool tag 'gbch' (0x67626368) loads fragment11 (rom 0xD7BA0-0xE5310) and runs fragment17 (vram 0x82200000, rom 0x10F9C0-0x120260), then selects the next state from its return value via the 7-entry table at 0x800A5470 (1->14, 2->3, 3->13, 4->11, 5->19, 6->8 or 9 depending on a u16 result word, 7->3; default->1)"
+  ],
+  "func_80065D9C": [
+   "Game_State03_Run",
+   "handler for game state 3 (jump table entry 2 -> arm 0x8006504C): under main-pool tag 'psld' (0x70736C64) loads fragment11 and fragment4 (rom 0xAE5E0-0xB4D90) and runs fragment25 (vram 0x82100000, rom 0x15A040-0x15E8B0), then selects the next state from its return value via the 10-entry table at 0x800A5490 (0->2,1->9,2->8,3->16,4->15,5->5,6->10,7->6,8->7,9->4; default->1)"
+  ],
+  "func_80065F50": [
+   "Game_State04_Run",
+   "handler for game state 4 (jump table entry 3 -> arm 0x80065074): main-pool tags 'emul'/'embk'/'emsl' (0x656D75/626B/736C -- 'emul' = emulation); loads fragment11, fragment4, fragment10 (rom 0xD4C30-0xD7BA0) and the fragment at vram 0x826E0000 (Game Boy emulation -- fragment26, whose Stadium 1 counterpart fragment31 supplies most of the fragment26 S1 transfers); transitions to state 3"
+  ],
+  "func_8006D440": [
+   "Game_State05_Run",
+   "handler for game state 5 (jump table entry 4 -> arm 0x80065084): main-pool tags 'CSEL' (0x4353454C), 'LA' and 'GB'; loads fragment11, fragment4, fragment10 and fragment29 (vram 0x88000000, rom 0x166040-0x16D4D0) among others; the dispatch arm then transitions to state 3"
+  ],
+  "func_800661F0": [
+   "Game_State06_Run",
+   "handler for game state 6 (jump table entry 5 -> arm 0x800650B4): main-pool tags 'pmpc'/'pmlp' (0x706D70/6C70); calls BattleScene_ResetParticipantModelFlags and loads battle-side fragments (fragment43, fragment44, fragment64, fragment12, fragment27, fragment79, fragment80); transitions to state 3"
+  ],
+  "func_800666F0": [
+   "Game_State07_Run",
+   "handler for game state 7 (jump table entry 6 -> arm 0x800650C4): main-pool tag 'myrm' (0x6D79726D); loads fragment11, fragment4, fragment10, fragment3 (rom 0xADCA0-0xAE5E0), fragment87 (rom 0x435A70-0x436C20, vram 0x81B00000) and runs fragment13 (vram 0x82400000); transitions to state 3"
+  ],
+  "func_80066D24": [
+   "Game_State08_Run",
+   "handler for game state 8 (jump table entry 7 -> arm 0x800650EC): main-pool tags 'btlp'/'btpc' (0x62746C/7063 -- battle); calls the battle bookkeeping cluster (func_8006A160/AC28/ABD8/A35C/CDA0...) and loads battle fragments (incl. fragment81 at vram 0x84300000); transitions to state 1 or 3"
+  ],
+  "func_80067B8C": [
+   "Game_State09_Run",
+   "handler for game state 9 (jump table entry 8 -> arm 0x800650FC): main-pool tags 'btlp'/'btpc'; same battle bookkeeping cluster as state 8 plus fragment18 (vram 0x81700000), fragment21 (0x82500000), fragment11; transitions to state 1 or 3"
+  ],
+  "func_800727D4": [
+   "Game_State10_Minigame",
+   "handler for game state 10 (jump table entry 9 -> arm 0x8006510C): main-pool tags 'mini' (0x6D696E69) and 'zmgm'; loads the minigame fragment band at vram 0x86000000-0x86B00000 (fragments 47-62 area) plus fragment2 (rom 0xAD260-0xADCA0), fragment3, fragment64/65/63/48; also invoked directly from the state-1 attract loop's odd-count demo arm"
+  ],
+  "func_80064E44": [
+   "Game_State11_Options",
+   "handler for game state 11 (jump table entry 10 -> arm 0x8006513C): under main-pool tag 'optn' (0x6F70746E) runs fragment22 (vram 0x82700000, rom 0x14A2C0-0x14DF30) via Fragment_LoadAndCall; on success Game_SetState(1), on failure Game_SetState(2)"
+  ],
+  "func_800668C0": [
+   "Game_State12_Nop",
+   "handler for game state 12 (jump table entry 11 -> arm 0x80065164): body is jr $ra; nop -- an intentionally empty state (the arm only applies func_800354B4(0x1E,0,0) beforehand); named by table position and empty body"
+  ],
+  "func_800684F0": [
+   "Game_State13_Run",
+   "handler for game state 13 (jump table entry 12 -> arm 0x80065184): main-pool tags 'btlp'/'btpc'; battle bookkeeping cluster plus fragment18, fragment24 (vram 0x82B00000), fragment11, fragment81; transitions to state 2"
+  ],
+  "func_80069370": [
+   "Game_State14_Run",
+   "handler for game state 14 (jump table entry 13 -> arm 0x80065194): main-pool tags 'btlp'/'btpc'; battle bookkeeping cluster plus fragment20 (vram 0x82600000), fragment27 (0x81100000), fragment12, fragment79/80; transitions to state 2"
+  ],
+  "func_80069900": [
+   "Game_State15_Run",
+   "handler for game state 15 (jump table entry 14 -> arm 0x800651A4): main-pool tags 'btlp'/'btpc'; battle bookkeeping cluster plus fragment67, fragment12, fragment14 (vram 0x81300000), fragment18, fragment20, fragment79/80; transitions to state 0x11 or 3"
+  ],
+  "func_80068E14": [
+   "Game_State16_Run",
+   "handler for game state 16 (jump table entry 15 -> arm 0x800651B4): main-pool tags 'btlp'/'btpc'; battle bookkeeping cluster plus fragment14, fragment18, fragment11, fragment12, fragment20, fragment81; transitions to state 3"
+  ],
+  "func_80069E38": [
+   "Game_State18_Run",
+   "handler for game state 18 (jump table entry 17 -> arm 0x800651C4): zeroes a 0x1F-byte struct under main-pool tag 'btpc', then Game_SetState(2); a minimal cleanup/transition state"
+  ],
+  "func_8006DACC": [
+   "Game_State19_Run",
+   "handler for game state 19 (jump table entry 18 -> arm 0x800651D4): main-pool tags 'CSEL' and 'LA'; loads fragment11, fragment4, fragment10, fragment88 (vram 0x81C00000), fragment29, fragment40 (vram 0x88B00000); the dispatch arm then transitions to state 2"
   ]
  },
  "data": {},

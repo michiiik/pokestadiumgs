@@ -10,7 +10,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/65E20/func_80065974.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/65E20/func_80065A18.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/65E20/Game_State01_Loop.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/65E20/func_80065B20.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/65E20/Game_State17_Boot.s")
 #endif

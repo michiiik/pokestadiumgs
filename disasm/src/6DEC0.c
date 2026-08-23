@@ -10,7 +10,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6DEC0/func_8006D438.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6DEC0/func_8006D440.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/6DEC0/Game_State05_Run.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6DEC0/func_8006DACC.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/6DEC0/Game_State19_Run.s")
 #endif
