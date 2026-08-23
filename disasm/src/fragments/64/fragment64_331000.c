@@ -2,7 +2,10 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_331000/func_87F0E390.s")
+void func_87F0E390(u8 *arg0, s32 arg1) {
+    *(s32 *)arg0 = 0;
+    *(s32 *)(arg0 + 4) = arg1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_331000/func_87F0E39C.s")
 

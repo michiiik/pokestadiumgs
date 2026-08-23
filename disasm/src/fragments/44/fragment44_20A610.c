@@ -12,7 +12,10 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20A610/func_8AF1C5F0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20A610/func_8AF1C66C.s")
+void func_8AF1C66C(u8 *arg0, s32 arg1, s32 arg2) {
+    *(s32 *)(arg0 + 0x28) = arg1;
+    *(s32 *)(arg0 + 0x2C) = arg2;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20A610/func_8AF1C678.s")
 
