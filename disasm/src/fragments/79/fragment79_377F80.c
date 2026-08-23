@@ -53,7 +53,11 @@ u32 func_841094A4(void) {
     return D_84190090;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_841094B0.s")
+extern u8 *D_84190198;
+extern s32 func_8411EF5C(u8 *arg0);
+s32 func_841094B0(void) {
+    return func_8411EF5C(D_84190198);
+}
 
 extern u32 D_841901B0;
 void func_841094D4(u32 arg0) {
