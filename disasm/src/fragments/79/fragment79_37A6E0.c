@@ -482,7 +482,7 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_841120A4.s")
+void func_841120A4(u8 *arg0) {}
 #endif
 
 #ifdef VERSION_US
@@ -671,7 +671,7 @@ void func_8411300C(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_841137F0.s")
+void func_841137F0(u8 *arg0) {}
 #endif
 
 #ifdef VERSION_US
@@ -1271,11 +1271,11 @@ void func_8411300C(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8411D2D4.s")
+void func_8411D2D4(u8 *arg0) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8411D2DC.s")
+void func_8411D2DC(u8 *arg0) {}
 #endif
 
 #ifdef VERSION_US
