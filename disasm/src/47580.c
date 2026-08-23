@@ -6,7 +6,11 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80046AC0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80046B14.s")
+void func_80046B14(u8 *arg0) {
+    if (arg0[0x7B] > 0) {
+        arg0[0x7B]--;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80046B2C.s")
 
@@ -66,7 +70,11 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047650.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047670.s")
+extern u8 *D_80126F50;
+
+void func_80047670(void) {
+    D_80126F50[0x7A] |= 4;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047688.s")
 
