@@ -28,15 +28,18 @@ extern s32 D_8009DF70; void func_8006A2EC(void) { D_8009DF70 = 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006A3B8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006A3E0.s")
+extern s32 D_8009DF70;
+s32 func_8006A3E0(void) { s32 result = 0xFFFF; if (D_8009DF70 != 0) result = *(u16 *)((u8 *)(u32)D_8009DF70); return result; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006A400.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006A424.s")
+extern s32 D_8009DF70;
+s32 func_8006A424(void) { s32 result = 0; s32 ptr = D_8009DF70; if (ptr != 0) result = *(s16 *)((u8 *)(u32)ptr + 2); return result; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006A444.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006A48C.s")
+extern s32 D_8009DF70;
+s32 func_8006A48C(void) { s32 result = -1; s32 ptr = D_8009DF70; if (ptr != 0) result = *(s16 *)((u8 *)(u32)ptr + 6); return result; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006A4AC.s")
 
@@ -58,19 +61,22 @@ extern s32 D_8009DF70; void func_8006A2EC(void) { D_8009DF70 = 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006AC4C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006AC70.s")
+extern s32 D_8009DF70;
+s32 func_8006AC70(void) { s32 result = -1; s32 ptr = D_8009DF70; if (ptr != 0) result = *(s16 *)((u8 *)(u32)ptr + 0x12); return result; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006AC90.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006ACCC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006ACF0.s")
+extern s32 D_8009DF70;
+s32 func_8006ACF0(void) { s32 result = 0; s32 ptr = D_8009DF70; if (ptr != 0) result = *(s16 *)((u8 *)(u32)ptr + 0x16); return result; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006AD10.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006AE90.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006AEB4.s")
+extern s32 D_8009DF70;
+s32 func_8006AEB4(void) { s32 result = -1; s32 ptr = D_8009DF70; if (ptr != 0) result = *(s16 *)((u8 *)(u32)ptr + 0x14); return result; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006AED4.s")
 
@@ -82,7 +88,8 @@ s32 func_8006AF84(void) {
     return *(s32 *)((u8 *)(u32)D_8009DF70 + 0x1C);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006AF94.s")
+extern s32 D_8009DF70;
+s32 func_8006AF94(void) { s32 result = -1; s32 ptr = D_8009DF70; if (ptr != 0) result = *(s16 *)((u8 *)(u32)ptr + 0x10); return result; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006AFB4.s")
 
