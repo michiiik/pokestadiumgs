@@ -66,6 +66,23 @@ run `tools/mac_generate_recomp.sh`. The first verified pass emitted 33,529
 functions. Current Android runtime and rental-roster status is recorded in
 `PORTING_STATUS.md` and `CLAUDE_HANDOFF.md`.
 
+## Symbol naming
+
+The decompilation ships almost entirely as `#pragma GLOBAL_ASM` stubs, so a
+function's name lives in `disasm/linker_scripts/us/symbol_addrs_code.txt` and in
+the pragma path that references it -- not in a C identifier. `tools/apply_names.py`
+keeps the two in step; `tools/xmatch_stadium1.py` derives names by matching this
+ROM's machine code against the Stadium 1 decomp, which shares much of the engine.
+
+```sh
+python3 tools/xmatch_stadium1.py --report   # what would transfer, and why
+python3 tools/apply_names.py --dry-run
+python3 tools/apply_names.py && python3 tools/apply_names.py --qa
+```
+
+Coverage, method and caveats are in [docs/NAMING.md](docs/NAMING.md). The renamed
+tree lives on the `stadium2-names` branch of the `disasm` submodule.
+
 ## Native macOS build
 
 The desktop runner is supplied by the local runtime checkout used for the
