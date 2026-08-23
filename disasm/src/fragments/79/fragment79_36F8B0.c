@@ -14,9 +14,21 @@ void func_84100044(u8 *arg0, s32 arg1) {
     *(s32 *)(arg0 + 0x14) ^= arg1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_84100054.s")
+s32 func_84100054(u8 *arg0, s32 arg1) {
+    s32 result = 0;
+    if (*(s32 *)(arg0 + 0x14) & arg1) {
+        result = 1;
+    }
+    return result;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_84100074.s")
+s32 func_84100074(u8 *arg0, s32 arg1) {
+    s32 result = 0;
+    if ((*(s32 *)(arg0 + 0x14) & arg1) == 0) {
+        result = 1;
+    }
+    return result;
+}
 
 void func_84100094(u8 *arg0) {
     arg0[0x92] = 0;
