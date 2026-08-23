@@ -99,9 +99,42 @@ u32 func_800040C4(void *asset) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800040D0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800041E4.s")
+extern void *main_pool_alloc(u32 size, u32 tag);
+extern void *MainPool_AllocAligned(void *pool, u32 size, u32 align);
+extern void Yay0_DecompressAndRelocate(void *source, void *destination);
+extern void main_pool_try_free(void *ptr);
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80004254.s")
+void *func_800041E4(void *pool, void *old, void *header, u32 tag) {
+    void *destination;
+
+    if (pool == NULL) {
+        destination = main_pool_alloc(*(u32 *)((u8 *)header + 0x10), tag);
+    } else {
+        destination = MainPool_AllocAligned(
+            pool, *(u32 *)((u8 *)header + 0x10), 0x10);
+    }
+
+    if (destination != NULL) {
+        Yay0_DecompressAndRelocate(header, destination);
+    }
+    main_pool_try_free(old);
+    return destination;
+}
+
+void *func_80004254(void *pool, void *arg1, void *arg2, void *arg3,
+                    u32 size, u32 tag) {
+    void *destination;
+
+    if (pool == NULL) {
+        destination = main_pool_alloc(size, tag);
+    } else {
+        destination = MainPool_AllocAligned(pool, size, 0x10);
+    }
+    if (destination != NULL) {
+        func_80003F74((u32)destination, (u32)arg1, (u32)arg2, (u32)arg3);
+    }
+    return destination;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800042C0.s")
 
@@ -203,7 +236,9 @@ void *Fragment_Load(u32 pool, u32 source, u32 end) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/BinArchive_Open.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800049B8.s")
+void func_800049B8(void *ptr) {
+    main_pool_try_free(ptr);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800049D8.s")
 
