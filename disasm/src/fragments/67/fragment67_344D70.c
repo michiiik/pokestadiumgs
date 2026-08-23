@@ -330,50 +330,30 @@ void func_829086F0(void) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290D72C.s")
 #endif
 
-void BattleAnim_Fragment67Dispatch_045(void) {
-    Fragment67_SetCamera(30.0f, 0x00BE, 0, 0);
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290D738.s")
 
-void BattleAnim_Fragment67Dispatch_001(void) {
-    Fragment67_SetCamera(15.0f, 0x0096, 0, 0);
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290D7C8.s")
 
-void BattleAnim_Fragment67Dispatch_005(void) {
-    Fragment67_SetCamera(15.0f, 0x005A, 0, 0x1A00);
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290D858.s")
 
-void BattleAnim_Fragment67Dispatch_009(void) {
-    Fragment67_SetCamera(15.0f, 0x005A, 0, -0x1A00);
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290D8EC.s")
 
-void BattleAnim_Fragment67Dispatch_013(void) {
-    Fragment67_SetCamera(15.0f, 0x008C, 0, 0);
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290D980.s")
 
-void BattleAnim_Fragment67Dispatch_017(void) {
-    Fragment67_SetCamera(15.0f, 0x0082, 0x1900, 0x1900);
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290DA10.s")
 
-void BattleAnim_Fragment67Dispatch_021(void) {
-    Fragment67_SetCamera(15.0f, 0x0096, -0x1700, -0x1400);
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290DAA4.s")
 
-void BattleAnim_Fragment67Dispatch_025(void) {
-    Fragment67_SetCamera(15.0f, 0x008C, 0x1900, 0);
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290DB3C.s")
 
-void BattleAnim_Fragment67Dispatch_029(void) {
-    Fragment67_SetCamera(15.0f, 0x0096, 0, 0);
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290DBD0.s")
 
-void BattleAnim_Fragment67Dispatch_033(void) {
-    Fragment67_SetCamera(15.0f, 0x00B4, 0, 0);
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290DC60.s")
 
-void BattleAnim_Fragment67Dispatch_037(void) {
-    Fragment67_SetCamera(15.0f, 0x0078, 0, 0);
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290DCF0.s")
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290DD80.s")
+#if 0
 void BattleAnim_Fragment67Dispatch_041(void) {
     switch (D_8291B828) {
         case 0x24:
@@ -401,10 +381,9 @@ void BattleAnim_Fragment67Dispatch_041(void) {
                                 (f32 *)(D_8291A380 + 0xA8),
                                 (f32)D_8291B860, D_8291B85C, D_8291B85E);
 }
+#endif
 
-void BattleAnim_Fragment67Dispatch_049(void) {
-    Fragment67_SetCamera(0.0f, 0x010E, 0, 0);
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290DED4.s")
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290DF6C.s")

@@ -10,19 +10,6 @@
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/LinkAlias_func_800355E4.s")
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/LinkAlias_func_800561E4.s")
 #pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/LinkAlias_func_8007214C.s")
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290D738.s")
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290D7C8.s")
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290D858.s")
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290D8EC.s")
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290D980.s")
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290DA10.s")
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290DAA4.s")
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290DB3C.s")
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290DBD0.s")
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290DC60.s")
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290DCF0.s")
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290DD80.s")
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290DED4.s")
 
 extern u32 MainPool_GetAllocationSize(void *fragment);
 extern void Audio_DispatchCommand(s32 eventId);
