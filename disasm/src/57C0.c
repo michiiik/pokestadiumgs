@@ -12,7 +12,10 @@ void func_80004BC0(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_80004BEC.s")
+s32 func_80004BEC(u8 *arg0) {
+    OSMesg msg;
+    return osRecvMesg((OSMesgQueue *)(arg0 + 4), &msg, 1);
+}
 #endif
 
 #ifdef VERSION_US
@@ -44,7 +47,11 @@ void func_80004EA8(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_80004F34.s")
+OSMesg func_80004F34(u8 *arg0) {
+    OSMesg msg;
+    osRecvMesg((OSMesgQueue *)(arg0 + 0x1C0), &msg, 1);
+    return msg;
+}
 #endif
 
 #ifdef VERSION_US
