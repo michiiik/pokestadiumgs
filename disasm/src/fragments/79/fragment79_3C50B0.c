@@ -97,12 +97,14 @@ u8 *func_84156550(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C50B0/func_84156800.s")
+s32 func_84156800(s32 arg0, s32 arg1) {
+    return arg0;
+}
 #endif
 
 void func_8415680C(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C50B0/func_84156814.s")
+void func_84156814(void) {}
 #endif
