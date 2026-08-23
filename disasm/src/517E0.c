@@ -42,7 +42,16 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051568.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/Save_Checksum.s")
+u16 Save_Checksum(u8 *data, s32 length) {
+    u32 sum = 0;
+    s32 count = length - 3;
+
+    while (count-- > 0) {
+        sum = (sum + *data++) & 0xFFFF;
+    }
+
+    return (u16)sum;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/Save_WriteFooter.s")
 
