@@ -1069,7 +1069,10 @@ void func_800355D4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035700.s")
+extern u32 D_80124D50;
+void func_80035700(u32 seed) {
+    D_80124D50 = seed;
+}
 #endif
 
 #ifdef VERSION_US
