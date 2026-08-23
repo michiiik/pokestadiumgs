@@ -6,7 +6,25 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3E40/func_80003240.s")
+extern u32 Memmap_GetSegmentVaddr(u32 vaddr);
+extern u32 Memmap_GetFragmentVaddr(u32 vaddr);
+extern u32 func_8000339C(void);
+
+void *func_80003240(void *ptr) {
+    u32 address = (u32)ptr;
+    u32 result = 0;
+
+    if (address < func_8000339C()) {
+        result = address | 0x80000000;
+    } else if (address < 0x10000000) {
+        result = Memmap_GetSegmentVaddr(address);
+    } else if (address >= 0x81000000 && address < 0x90000000) {
+        result = Memmap_GetFragmentVaddr(address);
+    } else if (address >= 0x80000000 && address < (func_8000339C() | 0x80000000)) {
+        result = address;
+    }
+    return (void *)result;
+}
 
 void Util_Memcpy(u32 *dst, const u32 *src, s32 wordCount) {
     while (wordCount-- > 0) {
