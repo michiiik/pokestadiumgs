@@ -909,11 +909,17 @@ s32 func_80060358(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_800606D8.s")
+extern u8 D_800A4A40[];
+
+u8 *func_800606D8(u8 *arg0) {
+    return D_800A4A40;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_800606E8.s")
+s32 func_800606E8(s32 arg0) {
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
