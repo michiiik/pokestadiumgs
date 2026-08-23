@@ -8,9 +8,18 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/Minigame_ResetPlayerRecord.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/Minigame_SetPlayerMask.s")
+extern u8 D_8012B3F6;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/Minigame_ResetPlayerSubstate.s")
+void Minigame_SetPlayerMask(s8 player) {
+    D_8012B3F6 = (u8)(1 << player);
+}
+
+void Minigame_ResetPlayerSubstate(s32 *substate) {
+    substate[0] = 0;
+    substate[1] = 0;
+    substate[2] = 1;
+    substate[3] = 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/Minigame_StateInit.s")
 
