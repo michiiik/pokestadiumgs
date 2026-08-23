@@ -64,7 +64,6 @@ extern void func_8410C840(void *arg0, void *arg1, void *arg2, void *arg3);
 extern void func_8411EF08(void *arg0);
 extern void func_8411EF20(void *arg0);
 extern void func_8410E7D0(void *arg0, void *arg1);
-extern void func_8410CF80(void *arg0);
 extern void func_8410E878(void *arg0, void *arg1);
 extern void func_8411EFE4(void *arg0);
 extern void func_8410EA58(void *arg0, void *arg1, s16 arg2);
@@ -764,9 +763,8 @@ void BattleAnim_ModelDispatch_022(u8 *model, void *arg1) {
 
 #ifdef VERSION_US
 void BattleAnim_ModelDispatch_023(u8 *model, void *arg1) {
-    (void)arg1;
     *(f32 *)(model + 0x2C) = 45.0f;
-    func_8410CF80(model);
+    BattleAnim_ModelDispatch_121(model, arg1);
 }
 #endif
 
