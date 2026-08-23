@@ -59,7 +59,18 @@ OSMesg func_80004F34(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_80004FA4.s")
+extern u32 D_800CD020[];
+
+void func_80004FA4(void) {
+    if (D_800CD020[0xA18 / 4] == 0 && D_800CD020[0xA20 / 4] != 0) {
+        D_800CD020[0xA18 / 4] = D_800CD020[0xA20 / 4];
+        D_800CD020[0xA20 / 4] = 0;
+    }
+    if (D_800CD020[0xA1C / 4] == 0 && D_800CD020[0xA24 / 4] != 0) {
+        D_800CD020[0xA1C / 4] = D_800CD020[0xA24 / 4];
+        D_800CD020[0xA24 / 4] = 0;
+    }
+}
 #endif
 
 void func_80004FF4(void) {
