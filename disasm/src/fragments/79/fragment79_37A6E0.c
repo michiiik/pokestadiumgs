@@ -609,15 +609,21 @@ void func_8411259C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_84112FFC.s")
+void func_84112FFC(u8 *arg0, s32 arg1) {
+    *(s32 *)(arg0 + 0x678) = arg1;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_84113004.s")
+void func_84113004(u8 *arg0, s32 arg1) {
+    *(s32 *)(arg0 + 0x664) = arg1;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8411300C.s")
+void func_8411300C(u8 *arg0, s32 arg1) {
+    *(s32 *)(arg0 + 0x668) = arg1;
+}
 #endif
 
 #ifdef VERSION_US
