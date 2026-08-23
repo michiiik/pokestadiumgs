@@ -242,11 +242,11 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005A228.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/GbTower_PollPortState.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005A364.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/GbTower_UpdatePortState.s")
 #endif
 
 #ifdef VERSION_US
@@ -285,11 +285,11 @@ void func_8005A8E4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005ADD8.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/GbTower_StartPortSession.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005AEA0.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/GbTower_InitializePorts.s")
 #endif
 
 #ifdef VERSION_US

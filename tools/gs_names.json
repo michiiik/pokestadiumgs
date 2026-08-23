@@ -26,6 +26,46 @@
   "Vi_SelectMode": "matches Stadium 1 Video_SetMode (callgraph). Same function, two spellings of the same idea. Upstream name kept."
  },
   "functions": {
+  "func_8005655C": [
+   "GbPak_ReadWriteBytes",
+   "The helper performs chunked osGbpakReadWrite transfers, handles 0x2000-byte bank boundaries, refreshes the Pak status, and reports connector errors"
+  ],
+  "func_80056870": [
+   "GbPak_ProbeAndDetectRam",
+   "The port helper reads the Pak id, checks the connector, and calls GbPak_DetectRam before marking the port initialized"
+  ],
+  "func_80056960": [
+   "GbPak_ValidateAndRefresh",
+   "The port helper validates the current cartridge state and save format, verifies insertion, and refreshes detected RAM or routes failure through shutdown"
+  ],
+  "func_80056F7C": [
+   "GbPak_Initialize",
+   "The helper initializes one Pak port, reads its id and connector status, and records the initialized-port bit"
+  ],
+  "func_800570CC": [
+   "GbPak_ReadCommand",
+   "The wrapper gates a port read on the active-port mask and calls the shared Pak transfer helper with read mode"
+  ],
+  "func_8005712C": [
+   "GbPak_WriteCommand",
+   "The wrapper gates a port write on the active-port mask and calls the shared Pak transfer helper with write mode"
+  ],
+  "func_8005A228": [
+   "GbTower_PollPortState",
+   "The state helper polls Pak removal, cartridge power, insertion, and save-format state and returns a compact port status"
+  ],
+  "func_8005A364": [
+   "GbTower_UpdatePortState",
+   "The helper validates an active port, updates the active mask, handles removal, and shuts down to the fallback fragment on failure"
+  ],
+  "func_8005ADD8": [
+   "GbTower_StartPortSession",
+   "The helper probes a selected port, records its active state, verifies insertion, and starts the port session"
+  ],
+  "func_8005AEA0": [
+   "GbTower_InitializePorts",
+   "The initializer probes all four ports, identifies save formats and Pak RAM, records availability, and installs the poll mask"
+  ],
   "func_80017B00": [
    "Audio_MixerStep",
    "Audio_ThreadEntry calls this through Audio_BuildSchedulerTask; the body advances the audio scheduler, services AI/GB audio buffers, drains completion messages, and constructs the next 0x68-byte scheduler task"

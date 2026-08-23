@@ -222,6 +222,20 @@ footer, and bank transitions; `GbPak_VerifyPattern`, `GbPak_DetectRam`, and the
 address-named routines in these translation units lack a distinct read/write
 or Pak edge and remain explicitly outside this naming claim.
 
+## Phase 3.9: GB Tower and Transfer Pak paths
+
+The transfer path is now named from the hardware calls themselves:
+`GbPak_Initialize` performs `osGbpakInit`/id/connector setup,
+`GbPak_ProbeAndDetectRam` repeats the id/connector probe and detects RAM,
+`GbPak_ReadCommand` and `GbPak_WriteCommand` gate the shared
+`GbPak_ReadWriteBytes` helper, and that helper performs chunked
+`osGbpakReadWrite` transfers across 0x2000-byte bank boundaries. The Tower
+wrappers `GbTower_PollPortState`, `GbTower_UpdatePortState`,
+`GbTower_StartPortSession`, and `GbTower_InitializePorts` cover the four-port
+state machine, insertion checks, save-format validation, and poll-mask setup.
+These names establish the hardware access and emulation entry edges; trade/Lab
+UI callers remain separate from the Pak transport layer.
+
 ## Phase 3.7: audio thread and command dispatcher
 
 `Thread4_CreateThread` passes `func_80035174` directly to `osCreateThread`; its
