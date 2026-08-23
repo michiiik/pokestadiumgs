@@ -4,7 +4,6 @@
 *.z64
 
 # Decompilation outputs
-disasm/baseroms/
 disasm/build/
 generated/
 
