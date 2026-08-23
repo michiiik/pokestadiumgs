@@ -6,7 +6,7 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4F800/func_8004EC5C.s")
+extern s32 D_80128120; void func_8004EC5C(void) { if (D_80128120 > 0) { D_80128120--; } }
 #endif
 
 #ifdef VERSION_US
@@ -77,7 +77,7 @@ void func_8004EE94(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4F800/func_8005049C.s")
+void func_8005049C(void) { func_80050428(); }
 #endif
 
 #ifdef VERSION_US
@@ -103,7 +103,7 @@ void func_80050528(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4F800/func_80050578.s")
+void func_80050578(u8 *arg0, s32 arg1) { if (arg0 != NULL) { u8 *value = *(u8 **)(arg0 + 0x34); if (value != NULL) { *(s16 *)(value + 0) = -1; *(s16 *)(value + 2) = 0; *(s32 *)(value + 8) = arg1; } } }
 #endif
 
 #ifdef VERSION_US
