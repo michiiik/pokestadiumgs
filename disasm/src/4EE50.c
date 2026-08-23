@@ -20,7 +20,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4EE50/func_8004E748.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4EE50/func_8004E7AC.s")
+extern s32 D_80128098; void func_8004E7AC(void) { D_80128098 = 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4EE50/func_8004E7B8.s")
 
@@ -38,7 +38,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4EE50/func_8004EB1C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4EE50/func_8004EB38.s")
+u16 func_8004EB38(u16 *arg0) { return *arg0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4EE50/func_8004EB40.s")
 
