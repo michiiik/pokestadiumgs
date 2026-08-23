@@ -32,3 +32,6 @@ screenshots/
 # Local debug/dev artifacts (screenshots, signed APKs, RAM dumps, staged APK contents)
 artifacts/
 $stage/
+
+# macOS Finder metadata
+.DS_Store
