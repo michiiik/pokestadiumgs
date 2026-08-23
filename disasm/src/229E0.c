@@ -395,7 +395,7 @@ void func_8002809C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002890C.s")
+void func_8002890C(u8 *arg0, u8 *arg1) { if (*arg0 != *arg1) { u8 temp = *arg0; *arg0 = *arg1; *arg1 = temp; } }
 #endif
 
 #ifdef VERSION_US
@@ -2028,7 +2028,9 @@ s32 func_8003EFA0(u8 *arg0) { return *(u16 *)(*(s32 *)(arg0 + 0x58) + 0xA) == *(
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003F018.s")
+extern void func_8003F03C(s32, void *);
+extern u8 D_80126420[];
+void func_8003F018(s32 arg0) { func_8003F03C(arg0, D_80126420); }
 #endif
 
 #ifdef VERSION_US
