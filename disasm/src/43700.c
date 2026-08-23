@@ -34,11 +34,11 @@ void func_80042BB0(u16 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_80042EB8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_80042F94.s")
+void func_80042F94(void *arg0, void *arg1) { func_80042EB8(arg0, 1, arg1, 1); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_80042FBC.s")
+void func_80042FBC(void *arg0, void *arg1) { func_80042EB8(arg0, 0, arg1, 1); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_80042FE4.s")
+void func_80042FE4(void *arg0, void *arg1) { func_80042EB8(arg0, 0, arg1, 0); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_8004300C.s")
 
