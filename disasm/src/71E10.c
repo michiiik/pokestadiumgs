@@ -6,7 +6,11 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/71E10/func_80071230.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/71E10/func_80071250.s")
+s32 func_80071250(u8 *arg0) {
+    s16 value = *(s16 *)(arg0 + 0x34);
+
+    return value > 0 && value < 5;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/71E10/func_8007126C.s")
 
