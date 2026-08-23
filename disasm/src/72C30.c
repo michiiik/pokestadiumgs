@@ -18,18 +18,63 @@ extern u8 D_8012B39E;
 extern u8 D_8012B3B6;
 extern u8 D_8012B3CE;
 extern u8 D_8012B3E8[];
+extern u32 D_8012B3F8;
 
 extern void *Fragment_Load(u32 pool, u32 source, u32 end);
 extern s32 Fragment_LoadAndCall(u32 pool, u32 source, u32 end, s32 arg3,
                                 void *arg4);
-extern void Minigame_BuildControllerResult(void *state, void *result,
-                                           s32 useAllPlayers);
 extern u8 D_8AC00000[];
 extern u8 D_8AB00000[];
 extern u8 fragment43_ROM_START[];
 extern u8 fragment44_ROM_START[];
 extern u8 fragment45_ROM_START[];
 extern u8 fragment46_ROM_START[];
+extern u8 fragment2_ROM_START[];
+extern u8 fragment3_ROM_START[];
+extern u8 fragment4_ROM_START[];
+extern u8 fragment26_ROM_START[];
+extern u8 fragment27_ROM_START[];
+extern u8 fragment47_ROM_START[];
+extern u8 fragment48_ROM_START[];
+extern u8 fragment49_ROM_START[];
+extern u8 fragment50_ROM_START[];
+extern u8 fragment51_ROM_START[];
+extern u8 fragment52_ROM_START[];
+extern u8 fragment53_ROM_START[];
+extern u8 fragment54_ROM_START[];
+extern u8 fragment55_ROM_START[];
+extern u8 fragment56_ROM_START[];
+extern u8 fragment57_ROM_START[];
+extern u8 fragment59_ROM_START[];
+extern u8 fragment60_ROM_START[];
+extern u8 fragment61_ROM_START[];
+extern u8 fragment62_ROM_START[];
+extern u8 fragment63_ROM_START[];
+extern u8 fragment64_ROM_START[];
+extern u8 fragment65_ROM_START[];
+extern u8 fragment66_ROM_START[];
+
+#define MINIGAME_POOL(addr) ((((u32)(addr) & 0x0FF00000) >> 20) - 0x10)
+#define D_81A00000 ((u8 *)0x81A00000)
+#define D_8009F870 ((u8 *)0x8009F870)
+#define D_800A5B00 ((s16 *)0x800A5B00)
+#define D_87C00000 ((u8 *)0x87C00000)
+#define D_87D00000 ((u8 *)0x87D00000)
+#define D_87E00000 ((u8 *)0x87E00000)
+#define D_86000000 ((u8 *)0x86000000)
+#define D_86100000 ((u8 *)0x86100000)
+#define D_86200000 ((u8 *)0x86200000)
+#define D_86300000 ((u8 *)0x86300000)
+#define D_86400000 ((u8 *)0x86400000)
+#define D_86500000 ((u8 *)0x86500000)
+#define D_86600000 ((u8 *)0x86600000)
+#define D_86700000 ((u8 *)0x86700000)
+#define D_86800000 ((u8 *)0x86800000)
+#define D_86900000 ((u8 *)0x86900000)
+#define D_86A00000 ((u8 *)0x86A00000)
+#define D_86B00000 ((u8 *)0x86B00000)
+#define D_8AC00000 ((u8 *)0x8AC00000)
+#define D_8AB00000 ((u8 *)0x8AB00000)
 
 void Minigame_ProcessPlayerEvents(void *player, s32 event, void *context) {
     void (*handler)(void *, u8, void *);
@@ -315,5 +360,193 @@ void Minigame_ResetRoundPlayers(void *state) {
     handler(state);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/Game_State10_Minigame.s")
+static void Minigame_RunRoundCase(s32 round, u8 *state, s32 *result) {
+    u32 pool;
+    s32 loadedResult;
+
+    switch (round) {
+    case -1:
+    case 0xFE:
+        pool = MINIGAME_POOL(D_8AC00000);
+        Minigame_UpdateResultState(state);
+        Fragment_Load(pool, (u32)fragment43_ROM_START,
+                      (u32)fragment44_ROM_START);
+        loadedResult = Fragment_LoadAndCall(
+            MINIGAME_POOL(D_8AB00000), (u32)fragment45_ROM_START,
+            (u32)fragment46_ROM_START, 0, D_8012B3E8);
+        (void)loadedResult;
+        if (D_8012B3F8 != 0) {
+            *(s32 *)(state + 0x2184) = 6;
+        }
+        *result = -1;
+        return;
+    case 1:
+        Fragment_Load(MINIGAME_POOL(D_87C00000),
+                      (u32)fragment48_ROM_START,
+                      (u32)fragment49_ROM_START);
+        *result = Fragment_LoadAndCall(
+            MINIGAME_POOL(D_86000000), (u32)fragment47_ROM_START,
+            (u32)fragment48_ROM_START, 0, state);
+        Minigame_AdvanceResultHandshake(*result, result, 0);
+        return;
+    case 2:
+        Minigame_UpdateControllerState(state, state[0x2182]);
+        *result = Fragment_LoadAndCall(
+            MINIGAME_POOL(D_86500000), (u32)fragment53_ROM_START,
+            (u32)fragment54_ROM_START, 0, state);
+        Minigame_AdvanceResultHandshake(*result, result, 0);
+        return;
+    case 5:
+        Minigame_UpdateControllerState(state, state[0x2182]);
+        *result = Fragment_LoadAndCall(
+            MINIGAME_POOL(D_86600000), (u32)fragment54_ROM_START,
+            (u32)fragment55_ROM_START, 0, state);
+        Minigame_AdvanceResultHandshake(*result, result, 0);
+        return;
+    case 0:
+        Fragment_Load(MINIGAME_POOL(D_87D00000),
+                      (u32)fragment65_ROM_START,
+                      (u32)fragment66_ROM_START);
+        Fragment_Load(MINIGAME_POOL(D_86100000),
+                      (u32)fragment49_ROM_START,
+                      (u32)fragment50_ROM_START);
+        *result = Fragment_LoadAndCall(
+            MINIGAME_POOL(D_86100000), (u32)fragment49_ROM_START,
+            (u32)fragment50_ROM_START, 0, state);
+        Minigame_AdvanceResultHandshake(*result, result, 0);
+        return;
+    case 3:
+        Fragment_Load(MINIGAME_POOL(D_87D00000),
+                      (u32)fragment65_ROM_START,
+                      (u32)fragment66_ROM_START);
+        Fragment_Load(MINIGAME_POOL(D_87C00000),
+                      (u32)fragment49_ROM_START,
+                      (u32)fragment50_ROM_START);
+        Minigame_UpdateControllerState(state, state[0x2182]);
+        *result = Fragment_LoadAndCall(
+            MINIGAME_POOL(D_86200000), (u32)fragment50_ROM_START,
+            (u32)fragment51_ROM_START, 0, state);
+        Minigame_AdvanceResultHandshake(*result, result, 0);
+        return;
+    case 4:
+        Fragment_Load(MINIGAME_POOL(D_87D00000),
+                      (u32)fragment65_ROM_START,
+                      (u32)fragment66_ROM_START);
+        Fragment_Load(MINIGAME_POOL(D_87C00000),
+                      (u32)fragment49_ROM_START,
+                      (u32)fragment50_ROM_START);
+        *result = Fragment_LoadAndCall(
+            MINIGAME_POOL(D_86300000), (u32)fragment51_ROM_START,
+            (u32)fragment52_ROM_START, 0, state);
+        Minigame_AdvanceResultHandshake(*result, result, 0);
+        return;
+    case 6:
+        Fragment_Load(MINIGAME_POOL(D_87D00000),
+                      (u32)fragment65_ROM_START,
+                      (u32)fragment66_ROM_START);
+        Fragment_Load(MINIGAME_POOL(D_87C00000),
+                      (u32)fragment49_ROM_START,
+                      (u32)fragment50_ROM_START);
+        *result = Fragment_LoadAndCall(
+            MINIGAME_POOL(D_86400000), (u32)fragment52_ROM_START,
+            (u32)fragment53_ROM_START, 0, state);
+        Minigame_AdvanceResultHandshake(*result, result, 0);
+        return;
+    case 7:
+        Fragment_Load(MINIGAME_POOL(D_87C00000),
+                      (u32)fragment48_ROM_START,
+                      (u32)fragment49_ROM_START);
+        Minigame_UpdateControllerState(state, state[0x2182]);
+        *result = Fragment_LoadAndCall(
+            MINIGAME_POOL(D_86900000), (u32)fragment59_ROM_START,
+            (u32)fragment60_ROM_START, 0, state);
+        Minigame_AdvanceResultHandshake(*result, result, 0);
+        return;
+    case 8:
+        Minigame_UpdateControllerState(state, state[0x2182]);
+        *result = Fragment_LoadAndCall(
+            MINIGAME_POOL(D_86700000), (u32)fragment55_ROM_START,
+            (u32)fragment56_ROM_START, 0, state);
+        Minigame_AdvanceResultHandshake(*result, result, 0);
+        return;
+    case 9:
+        Fragment_Load(MINIGAME_POOL(D_87C00000),
+                      (u32)fragment48_ROM_START,
+                      (u32)fragment49_ROM_START);
+        *result = Fragment_LoadAndCall(
+            MINIGAME_POOL(D_86A00000), (u32)fragment60_ROM_START,
+            (u32)fragment61_ROM_START, 0, state);
+        Minigame_AdvanceResultHandshake(*result, result, 0);
+        return;
+    case 10:
+        *result = Fragment_LoadAndCall(
+            MINIGAME_POOL(D_86800000), (u32)fragment56_ROM_START,
+            (u32)fragment57_ROM_START, 0, state);
+        Minigame_AdvanceResultHandshake(*result, result, 0);
+        return;
+    case 11:
+        Fragment_Load(MINIGAME_POOL(D_87C00000),
+                      (u32)fragment48_ROM_START,
+                      (u32)fragment49_ROM_START);
+        *result = Fragment_LoadAndCall(
+            MINIGAME_POOL(D_86B00000), (u32)fragment61_ROM_START,
+            (u32)fragment62_ROM_START, 0, state);
+        Minigame_AdvanceResultHandshake(*result, result, 0);
+        return;
+    default:
+        return;
+    }
+}
+
+void Game_State10_Minigame(s32 initialize) {
+    u8 *state = D_801291E0;
+    s32 round;
+
+    main_pool_push_state(0x6D696E69);
+    Fragment_Load(MINIGAME_POOL(D_81A00000),
+                  (u32)fragment3_ROM_START, (u32)fragment4_ROM_START);
+    Fragment_Load(MINIGAME_POOL((u8 *)0x87F00000),
+                  (u32)fragment64_ROM_START, (u32)fragment65_ROM_START);
+    Fragment_Load(MINIGAME_POOL((u8 *)0x81000000),
+                  (u32)fragment26_ROM_START, (u32)fragment27_ROM_START);
+    Fragment_Load(MINIGAME_POOL((u8 *)0x81900000),
+                  (u32)fragment2_ROM_START, (u32)fragment3_ROM_START);
+
+    Minigame_StateInit(state);
+    Minigame_ProcessInput();
+    Minigame_SetModeDefaults(D_8012B3E8);
+
+    if (initialize == 0) {
+        round = -1;
+    } else if (initialize == 1) {
+        u8 old = D_8009F870[0];
+        u8 next = (u8)(old + 1);
+        if (next >= 12) {
+            next = 0;
+        }
+        D_8009F870[0] = next;
+        state[0x2181] = 1;
+        state[0x2180] = 4;
+        state[0x2182] = 0xF;
+        Minigame_ProcessPlayerEvents(state, 0xF, NULL);
+        round = D_800A5B00[next];
+    } else {
+        round = -1;
+    }
+
+    for (;;) {
+        main_pool_push_state(0x7A6D676D);
+        Minigame_UpdateControllerState(state, state[0x2182]);
+        Minigame_ResetControllerPoll(state);
+        Minigame_RunRoundCase(round, state, &round);
+        main_pool_pop_state(0x7A6D676D);
+        if (round == -1) {
+            break;
+        }
+    }
+
+    Minigame_ResetRoundPlayers(state);
+    func_80035424(2);
+    main_pool_pop_state(0x6D696E69);
+}
 #endif
