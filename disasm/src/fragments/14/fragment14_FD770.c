@@ -52,7 +52,9 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FD770/func_81306954.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FD770/func_813069B0.s")
+void func_813069B0(u8 *arg0) {
+    *(f32 *)(arg0 + 0x78) = 0.0f;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FD770/func_813069BC.s")
 

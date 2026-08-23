@@ -16,9 +16,14 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_109280/func_81311A3C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_109280/func_81311A90.s")
+void func_81311A90(u8 *arg0) {
+    *(f32 *)(arg0 + 4) = 0.0f;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_109280/func_81311A9C.s")
+void func_81311A9C(u8 *arg0) {
+    *(s32 *)(arg0 + 0) = 0;
+    *(f32 *)(arg0 + 4) = 0.0f;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_109280/func_81311AAC.s")
 
