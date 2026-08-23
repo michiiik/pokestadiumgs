@@ -90,7 +90,14 @@ void *func_800050A0(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_800050D4.s")
+extern u32 D_800CD020[];
+extern u32 D_800CDA34;
+
+void func_800050D4(void) {
+    if (D_800CD020[0xA14 / 4] == 0) {
+        D_800CDA34 = (u32)func_800050A0((void *)D_800CD020[0xA1C / 4]);
+    }
+}
 #endif
 
 #ifdef VERSION_US
