@@ -324,6 +324,17 @@ SECTIONS
         build/lib/libultra.a:flashreadarray.o(.text);
         build/lib/libultra.a:flashgetaddr.o(.text);
         build/lib/libultra.a:setwatchlo.o(.text);
+        /* Descriptive compatibility names are aliases only; owners remain
+         * address-stable until their C implementations are byte-matched. */
+        Audio_InitializeTaskState = func_80021B00;
+        Audio_BuildSchedulerTask = func_80021B74;
+        Audio_ThreadEntry = func_80035174;
+        Audio_StopProcessing = func_800353BC;
+        Audio_ResetModeSelector = func_80035494;
+        Audio_ResetRequestId = func_800355D4;
+        Audio_RequestEvent = func_800355E4;
+        Dma_QueueRequestMessage = func_80006A78;
+        Minigame_SetPlayerMask = func_8007214C;
         text_TEXT_END = .;
         text_TEXT_SIZE = ABSOLUTE(text_TEXT_END - text_TEXT_START);
         text_DATA_START = .;
