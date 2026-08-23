@@ -56,7 +56,8 @@ void func_80001CDC(void) { func_80001CB0(); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_80001EB8.s")
+extern u8 *D_800AB3C0;
+s32 func_80001EB8(void) { u8 *ptr = *(u8 **)(D_800AB3C0 + 8); return *(u16 *)ptr; }
 #endif
 
 #ifdef VERSION_US
