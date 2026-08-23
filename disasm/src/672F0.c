@@ -9,6 +9,7 @@ extern u8 D_81000000[];
 extern u8 D_82400000[];
 extern u8 fragment3_ROM_START[];
 extern u8 fragment4_ROM_START[];
+extern u8 fragment5_ROM_START[];
 extern u8 fragment10_ROM_START[];
 extern u8 fragment11_ROM_START[];
 extern u8 fragment12_ROM_START[];

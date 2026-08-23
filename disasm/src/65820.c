@@ -98,7 +98,7 @@ void Game_State11_Options(void) {
     main_pool_push_state(0x6F70746E);
     result = Fragment_LoadAndCall(
         ((((u32)D_82700000 & 0x0FF00000) >> 20) - 0x10),
-        fragment22_ROM_START, fragment23_ROM_START, 0, 0);
+        (u32)fragment22_ROM_START, (u32)fragment23_ROM_START, 0, 0);
     main_pool_pop_state(0x6F70746E);
 
     if (result == 0) {

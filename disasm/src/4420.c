@@ -188,7 +188,8 @@ void *func_800042C0(u32 source, u32 end, u32 decompress, u32 staging) {
         }
     } else {
         size = (end - source + 0xF) & ~0xF;
-        result = func_80004254(NULL, source, end, staging, size,
+        result = func_80004254(NULL, (void *)source, (void *)end,
+                               (void *)staging, size,
                                decompress);
     }
 
@@ -225,7 +226,8 @@ void *func_80004458(s32 pool, u32 source, u32 end, s32 flags) {
         }
     } else {
         size = (end - source + 0xF) & ~0xF;
-        result = func_80004254((void *)pool, source, end, 0, size, -1);
+        result = func_80004254((void *)pool, (void *)source, (void *)end,
+                               NULL, size, -1);
     }
 
     main_pool_try_free(header);
@@ -302,9 +304,9 @@ void Fragment_Register(u32 pool, FragmentHeader *fragment) {
                        Memmap_FragmentCleanupCallback);
     if (allocation_size < fragment->end_offset) {
         main_pool_realloc(fragment);
-        Memmap_RelocateFragment(pool, fragment);
+        Memmap_RelocateFragment((void *)pool, fragment);
     } else {
-        Memmap_RelocateFragment(pool, fragment);
+        Memmap_RelocateFragment((void *)pool, fragment);
         main_pool_realloc(fragment, fragment->end_offset);
     }
 }
@@ -404,7 +406,7 @@ void *func_80004A40(s32 pool, void *archive, s32 index) {
     }
 
     if (file == NULL) {
-        file = func_800049D8(pool, base, (const u32 *)entry);
+        file = func_800049D8(pool, (const u32 *)base, (const u32 *)entry);
         if (file != NULL && *(u32 *)((u8 *)file + 8) == 0x46524147 &&
             *(u32 *)((u8 *)file + 0xC) == 0x4D454E54) {
             u32 fragment = *(u16 *)(base + 2);

@@ -68,8 +68,9 @@ u8 func_80060AC8(s32 value, s32 table) {
 
 s32 func_80060B28(s32 value) {
     u8 target = (u8)value;
+    s32 index;
 
-    for (s32 index = 0; index < 0x100; index++) {
+    for (index = 0; index < 0x100; index++) {
         if (D_80097680[index] == target) {
             return index;
         }
@@ -79,6 +80,7 @@ s32 func_80060B28(s32 value) {
 
 s32 func_80060B74(s32 value, s32 table) {
     u8 *data = D_80097680;
+    s32 index;
 
     switch (table) {
     case 1:
@@ -94,7 +96,7 @@ s32 func_80060B74(s32 value, s32 table) {
         break;
     }
 
-    for (s32 index = 0; index < 0x100; index++) {
+    for (index = 0; index < 0x100; index++) {
         if (data[index] == (u8)value) {
             return index;
         }

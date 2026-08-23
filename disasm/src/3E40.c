@@ -98,6 +98,7 @@ void Util_DrawRect(u32 **displayList, u32 ulx, u32 uly, u32 lrx, u32 lry,
     gfx[4] = 0xF6000000 | ((edgeA & 0x3FF) << 14) | ((lowA & 0x3FF) << 2);
     gfx[5] = ((edgeB & 0x3FF) << 14) | ((lowB & 0x3FF) << 2);
     *displayList = gfx + 6;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/3E40/func_800034E4.s")
 

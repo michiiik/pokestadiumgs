@@ -33,4 +33,5 @@ void func_80073394(void *destBase, void *srcBase, s32 destIndex, s32 srcIndex) {
     *(u32 *)(dest + 0x49C) = *(u32 *)(src + 0x190);
     *(u32 *)(dest + 0x4A0) = *(u32 *)(src + 0x194);
     *(u8 *)((u8 *)destBase + ((u8)destIndex * 0x4E0) + 0x49A) = 0xFF;
+}
 #endif

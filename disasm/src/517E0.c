@@ -12,6 +12,7 @@ extern SaveRecordEntry D_801281C0[];
 extern u8 *D_801281C4[];
 extern u8 *D_801281C8[];
 extern s32 D_800972C0;
+extern u32 D_800972B0[];
 extern void Save_ResetAndCommitTypedRecord(s32 type, s32 record);
 extern void func_80055260(s32 type, s32 record);
 
@@ -50,8 +51,7 @@ void *func_80050CAC(s32 index, s32 active) {
 
 void *func_80050CF8(s32 index) {
     if (index >= 0 && index < 4) {
-        extern void *D_800972B0[];
-        return D_800972B0[index];
+        return (void *)D_800972B0[index];
     }
     return NULL;
 }
@@ -630,7 +630,6 @@ extern void func_80003E84(void *ptr, u32 offset, u32 size, u32 arg);
 
 s32 func_800550E8(s32 bank) {
     SaveRecordEntry *entry = &D_801281C0[bank * 5];
-    extern u32 D_800972B0[];
     u32 bankSize = D_800972B0[bank];
     u32 allocationSize;
     u8 *allocation;

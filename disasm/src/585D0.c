@@ -5,6 +5,8 @@
 #define D_8012874D (*(u8 *)0x8012874D)
 #define D_80128748 (*(u32 *)0x80128748)
 
+extern u8 func_8005D92C(s32 index);
+
 static u8 *GbSave_Record(s32 index) {
     return D_80128570 + (index * 0x70);
 }
