@@ -8,7 +8,7 @@ extern u8 D_843023A8[]; u8 func_8430009C(void) { return D_843023A8[(func_8003570
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_843000C8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_843001CC.s")
+extern u8 D_843023AC[]; u8 func_843001CC(void) { u32 value = func_8003570C(); u32 remainder = value % 10; return D_843023AC[remainder]; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_84300200.s")
 
