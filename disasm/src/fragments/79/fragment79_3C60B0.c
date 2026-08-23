@@ -54,15 +54,15 @@ void func_84156960(void) { func_8410971C(); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84156980.s")
+void func_84156980(void) { func_84109848(); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_841569A0.s")
+void func_841569A0(void) { func_841095DC(); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_841569C0.s")
+void func_841569C0(void) { func_84109B1C(); }
 #endif
 
 #ifdef VERSION_US
