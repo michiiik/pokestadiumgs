@@ -107,11 +107,54 @@ u32 func_800040C4(void *asset) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80004458.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/Memmap_SegmentCleanupCallback.s")
+extern u32 Memmap_GetSegmentBaseVaddr(u32 segment);
+extern void Memmap_ClearSegmentMemmap(u32 segment);
+extern u32 Memmap_GetFragmentBaseVaddr(u32 fragment);
+extern void Memmap_ClearFragmentMemmap(u32 fragment);
+extern void *func_800042C0(u32 source, u32 end, u32 decompress,
+                           u32 relocate);
+extern u32 MainPool_GetAllocationSize(void *fragment);
+extern void main_pool_set_func(void *fragment, u32 vaddr, void *callback);
+extern void Memmap_SetSegmentMap(u32 segment, void *asset, u32 size);
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/Asset_LoadToSegment.s")
+void Memmap_SegmentCleanupCallback(void *arg0, u32 vaddr) {
+    u32 segment;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/Memmap_FragmentCleanupCallback.s")
+    if ((vaddr & 0xFF000000) != 0x82000000) {
+        return;
+    }
+
+    segment = vaddr & 0x00FFFFFF;
+    if (Memmap_GetSegmentBaseVaddr(segment) == (u32)arg0) {
+        Memmap_ClearSegmentMemmap(segment);
+    }
+}
+
+void *Asset_LoadToSegment(u32 segment, u32 source, u32 end, u32 decompress) {
+    void *asset = func_800042C0(source, end, decompress, 0);
+
+    if (asset != NULL && segment > 0) {
+        u32 size = MainPool_GetAllocationSize(asset);
+
+        Memmap_SetSegmentMap(segment, asset, size);
+        main_pool_set_func(asset, segment + 0x82000000,
+                           Memmap_SegmentCleanupCallback);
+    }
+    return asset;
+}
+
+void Memmap_FragmentCleanupCallback(void *arg0, u32 vaddr) {
+    u32 fragment;
+
+    if ((vaddr & 0xFF000000) != 0x81000000) {
+        return;
+    }
+
+    fragment = vaddr & 0x00FFFFFF;
+    if (Memmap_GetFragmentBaseVaddr(fragment) == (u32)arg0) {
+        Memmap_ClearFragmentMemmap(fragment);
+    }
+}
 
 typedef struct {
     u8 pad_00[0x1C];

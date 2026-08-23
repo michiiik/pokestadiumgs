@@ -2,9 +2,23 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/Minigame_ProcessPlayerEvents.s")
+extern void *func_80003240(void *table);
+extern void func_87F0EFA0(void);
+extern void func_87F0EDDC(void);
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/Minigame_UpdateControllerState.s")
+void Minigame_ProcessPlayerEvents(void *player, s32 event, void *context) {
+    void (*handler)(void *, u8, void *);
+
+    handler = (void (*)(void *, u8, void *))func_80003240((void *)func_87F0EFA0);
+    handler(player, (u8)event, context);
+}
+
+void Minigame_UpdateControllerState(void *player, s32 event) {
+    void (*handler)(void *, u8);
+
+    handler = (void (*)(void *, u8))func_80003240((void *)func_87F0EDDC);
+    handler(player, (u8)event);
+}
 
 void Minigame_ResetPlayerRecord(u8 *record) {
     record[0x1E] &= 0x1F;
