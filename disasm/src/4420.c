@@ -22,7 +22,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80003E84.s")
 
-extern s32 func_80006ACC(u32 destination, u32 source, u32 end,
+extern s32 Dma_QueueRomRead(u32 destination, u32 source, u32 end,
                          u32 length, u32 staging, s32 mode);
 extern u8 D_800CD000[];
 
@@ -42,7 +42,7 @@ void func_80003F74(u32 destination, u32 source, u32 end, u32 staging) {
             chunk = remaining;
         }
 
-        func_80006ACC(staging, destination, source, chunk, (u32)queue, 0);
+        Dma_QueueRomRead(staging, destination, source, chunk, (u32)queue, 0);
         osRecvMesg(queue, NULL, 1);
 
         remaining -= chunk;

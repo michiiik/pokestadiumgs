@@ -1358,6 +1358,14 @@
    "MainPool_GetAllocationSize",
    "main-pool header helper: returns the allocation size by subtracting the user pointer from the block header at -0xC; called by both segment and fragment registration"
   ],
+  "func_80006A78": [
+    "Dma_QueueRequestMessage",
+    "storage-thread enqueue helper: sends or jams a prepared DMA request to the resident storage queue based on the caller's mode"
+  ],
+  "func_80006ACC": [
+    "Dma_QueueRomRead",
+    "allocates the 0x2C-byte storage request used by Asset_LoadToSegment/Dma_ReadChunks; records ROM source, RDRAM destination, byte length and staging queue before enqueueing"
+  ],
   "func_800045E0": [
    "Memmap_SegmentCleanupCallback",
    "installed by Asset_LoadToSegment for 0x82000000 segment allocations; validates the owning segment base and clears its segment map on eviction"

@@ -197,6 +197,23 @@ individual minigame titles to the records.
 18-slot counter for each player, while `Minigame_ResetRoundPlayers` restores
 the GB Tower poll mask and resets all four player records before a new round.
 
+## Phase 3.5: rental/roster blob transport
+
+`RENTAL_REVERSE_ENGINEERING.md` provides the byte-verified consumer layout: the
+uncompressed blob is copied from ROM `0x1708000` to RDRAM `0x802492B0`, has a
+72-entry directory, and stores 24-byte records (`count` at table header plus
+`count * 0x18` bytes). The code-side transport boundary is now explicit:
+`Dma_ReadChunks` splits the asset transfer into bounded requests and
+`Dma_QueueRomRead` allocates the storage request carrying the ROM source,
+RDRAM destination, length, and completion queue; `Dma_QueueRequestMessage`
+performs the queue send/jam. This is the path used when the asset loader brings
+the rental blob into RAM. No second, rental-specific parser is present in the
+US text segment: table selection and 24-byte record interpretation occur in
+the loaded game fragments, while `tools/gs_rental_dump.py` independently
+validates all 72 directory entries and record boundaries. The names therefore
+stop at the proven transport/parser boundary instead of inventing a parser
+role for an address-only fragment consumer.
+
 ## Phase 3.5: GB-save format and checksum helpers
 
 The save/Controller Pak pass adds two names in the GB-save translation unit.

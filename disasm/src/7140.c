@@ -32,7 +32,7 @@ typedef struct {
 extern u8 D_800D045C[];
 extern void *Util_Malloc(s32 size);
 
-void func_80006A78(DmaRequest *request, s32 mode) {
+void Dma_QueueRequestMessage(DmaRequest *request, s32 mode) {
     if (mode == 1) {
         osJamMesg((OSMesgQueue *)D_800D045C, (OSMesg)request, 1);
     } else {
@@ -40,7 +40,7 @@ void func_80006A78(DmaRequest *request, s32 mode) {
     }
 }
 
-s32 func_80006ACC(u32 unused, u32 source, u32 destination, u32 length,
+s32 Dma_QueueRomRead(u32 unused, u32 source, u32 destination, u32 length,
                  u32 staging, s32 mode) {
     DmaRequest *request = Util_Malloc(0x2C);
 
@@ -50,7 +50,7 @@ s32 func_80006ACC(u32 unused, u32 source, u32 destination, u32 length,
         request->field_24 = length;
         request->field_20 = source;
         request->field_28 = staging;
-        func_80006A78(request, mode);
+        Dma_QueueRequestMessage(request, mode);
     }
 
     return request == NULL;
