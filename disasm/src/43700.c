@@ -2,9 +2,19 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_80042B00.s")
+extern s32 D_80126F40;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_80042B14.s")
+s32 func_80042B00(s32 arg0, s32 arg1) {
+    if (!arg0) {
+        D_80126F40 = arg1;
+    }
+    return 0;
+}
+
+void func_80042B14(u8 *arg0) {
+    *(u16 *)(arg0 + 0) = 0;
+    *(u32 *)(arg0 + 4) = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_80042B20.s")
 
