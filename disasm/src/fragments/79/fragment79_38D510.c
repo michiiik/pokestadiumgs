@@ -18,19 +18,27 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411E188.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411E1B4.s")
+f32 func_8411E1B4(u8 *arg0) {
+    return *(f32 *)(arg0 + 0x648);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411E1BC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411E1CC.s")
+f32 func_8411E1CC(u8 *arg0) {
+    return *(f32 *)(arg0 + 0x64C);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411E1D4.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411E1F8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411E21C.s")
+s32 func_8411E21C(u8 *arg0) {
+    return *(u8 *)(arg0 + 0x61C);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411E224.s")
+s32 func_8411E224(u8 *arg0) {
+    return *(u8 *)(arg0 + 0x61D);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411E22C.s")
 
@@ -46,25 +54,37 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411ED40.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411EE54.s")
+s32 func_8411EE54(u8 *arg0) {
+    return *(u8 *)(arg0 + 0x661);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411EE5C.s")
+s32 func_8411EE5C(u8 *arg0) {
+    return *(u8 *)(arg0 + 0x629);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411EE64.s")
+s32 func_8411EE64(u8 *arg0) {
+    return *(u8 *)(arg0 + 0x62B);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411EE6C.s")
+s32 func_8411EE6C(u8 *arg0) {
+    return *(u8 *)(arg0 + 0x62D);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411EE74.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411EF08.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411EF18.s")
+void func_8411EF18(u8 *arg0) {
+    *(s16 *)(arg0 + 0x18) = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411EF20.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411EF2C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411EF5C.s")
+s32 func_8411EF5C(u8 *arg0) {
+    return *(u16 *)(arg0 + 0x1A);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411EF64.s")
 
