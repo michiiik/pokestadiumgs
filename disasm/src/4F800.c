@@ -81,7 +81,9 @@ void func_8004EE94(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4F800/func_80050518.s")
+u8 func_80050518(u8 arg0) {
+    return arg0 & 0xF;
+}
 #endif
 
 #ifdef VERSION_US
