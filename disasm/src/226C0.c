@@ -7,7 +7,7 @@
 extern void func_80028140(void);
 extern void func_80035020(s32 mode);
 extern void func_800248A0(void);
-extern void func_80018728(u32 command, void (*callback)(s32, s32, s32, s32));
+extern void func_80018728(u32 command, ...);
 extern void func_80025EB0(s32, s32, s32, s32);
 
 void Audio_InitializeTaskState(void) {
@@ -18,7 +18,9 @@ void Audio_InitializeTaskState(void) {
     func_80018728(0xE40000FF, func_80025EB0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/226C0/func_80021B50.s")
+void func_80021B50(void) {
+    func_80018728(0x82010000, 0);
+}
 
 extern void *func_80017AC0(void);
 extern void func_80034FE0(void);

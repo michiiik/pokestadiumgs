@@ -67,7 +67,37 @@ void Util_Free(void *ptr) {
     mem_pool_free(D_800CCDF0, ptr);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3E40/Util_DrawRect.s")
+extern s32 StageContext_IsHighResolution(void);
+
+/* Emit the RDP fill-rectangle sequence used by the UI. */
+void Util_DrawRect(u32 **displayList, u32 ulx, u32 uly, u32 lrx, u32 lry,
+                   u16 color) {
+    u32 *gfx = *displayList;
+    u32 edgeA = uly;
+    u32 edgeB = lrx;
+    u32 lowA;
+    u32 lowB;
+
+    (void)ulx;
+    (void)lry;
+
+    if (StageContext_IsHighResolution()) {
+        edgeA <<= 1;
+        edgeB <<= 1;
+        lowA = 0x22;
+        lowB = 0x1E;
+    } else {
+        lowA = 0x11;
+        lowB = 0x0F;
+    }
+
+    gfx[0] = 0xE7000000;
+    gfx[1] = 0;
+    gfx[2] = 0xF7000000;
+    gfx[3] = ((u32)color << 16) | color;
+    gfx[4] = 0xF6000000 | ((edgeA & 0x3FF) << 14) | ((lowA & 0x3FF) << 2);
+    gfx[5] = ((edgeB & 0x3FF) << 14) | ((lowB & 0x3FF) << 2);
+    *displayList = gfx + 6;
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/3E40/func_800034E4.s")
 
