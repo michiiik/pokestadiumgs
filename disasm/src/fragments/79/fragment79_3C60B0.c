@@ -22,23 +22,23 @@ s32 func_84156868(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84156880.s")
+void func_84156880(void) { func_841098C0(); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_841568A0.s")
+void func_841568A0(void) { func_84109780(); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_841568C0.s")
+void func_841568C0(void) { func_841098C0(); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_841568E0.s")
+void func_841568E0(void) { func_84109884(); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84156900.s")
+void func_84156900(void) { func_84109590(); }
 #endif
 
 #ifdef VERSION_US
