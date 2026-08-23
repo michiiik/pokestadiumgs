@@ -173,6 +173,17 @@ embedded names against seven resident format strings, and returns the matching
 format index. The lower-level Pak presence and port-availability functions
 were already transferred and remain separately named.
 
+## Phase 3.6: remaining dispatch-table boundaries
+
+The dispatch-table survey was rerun after the subsystem slices. The two largest
+unresolved tables are in fragment 79 at `0x84183D50` (253 entries) and
+`0x84184148` (225 entries), with additional tables of 83, 50, and 23 entries
+nearby. Their entries are all address-named and no table-level caller evidence
+currently distinguishes battle move dispatch from animation/effect dispatch;
+they are therefore recorded as audit targets rather than given guessed names.
+This preserves the issue #3 rule that table structure is evidence, but not proof
+of each callee's behavior.
+
 ## Phase 1: the Stadium 1 transfer
 the 676 is a machine-verified correspondence between the two ROMs' machine code.
 
