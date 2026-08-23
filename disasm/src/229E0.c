@@ -1084,43 +1084,105 @@ u32 func_8003570C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003573C.s")
+typedef struct { u8 r, g, b, a; } Color3573C;
+Color3573C *func_8003573C(Color3573C *arg0, u8 r, u8 g, u8 b) {
+    arg0->r = r;
+    arg0->g = g;
+    arg0->b = b;
+    return arg0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003575C.s")
+typedef struct { u8 r, g, b, a; } Color3575C;
+Color3575C *func_8003575C(Color3575C *arg0, u8 r, u8 g, u8 b, u8 a) {
+    arg0->r = r;
+    arg0->g = g;
+    arg0->b = b;
+    arg0->a = a;
+    return arg0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035784.s")
+typedef struct { f32 x, y, z; } Vec3f35784;
+Vec3f35784 *func_80035784(Vec3f35784 *arg0, f32 x, f32 y, f32 z) {
+    arg0->x = x;
+    arg0->y = y;
+    arg0->z = z;
+    return arg0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800357A8.s")
+typedef struct { f32 x, y, z; } Vec3f357A8;
+Vec3f357A8 *func_800357A8(Vec3f357A8 *arg0, f32 x, f32 y, f32 z) {
+    arg0->x = x;
+    arg0->y = y;
+    arg0->z = z;
+    return arg0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800357CC.s")
+typedef struct { f32 x, y, z; } Vec3f357CC;
+Vec3f357CC *func_800357CC(Vec3f357CC *arg0, Vec3f357CC *arg1) {
+    arg0->x += arg1->x;
+    arg0->y += arg1->y;
+    arg0->z += arg1->z;
+    return arg0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035804.s")
+typedef struct { f32 x, y, z; } Vec3f35804;
+Vec3f35804 *func_80035804(Vec3f35804 *arg0, Vec3f35804 *arg1, Vec3f35804 *arg2) {
+    arg0->x = arg1->x + arg2->x;
+    arg0->y = arg1->y + arg2->y;
+    arg0->z = arg1->z + arg2->z;
+    return arg0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003583C.s")
+typedef struct { f32 x, y, z; } Vec3f3583C;
+Vec3f3583C *func_8003583C(Vec3f3583C *arg0, Vec3f3583C *arg1) {
+    arg0->x -= arg1->x;
+    arg0->y -= arg1->y;
+    arg0->z -= arg1->z;
+    return arg0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035874.s")
+typedef struct { f32 x, y, z; } Vec3f35874;
+Vec3f35874 *func_80035874(Vec3f35874 *arg0, Vec3f35874 *arg1, Vec3f35874 *arg2) {
+    arg0->x = arg1->x - arg2->x;
+    arg0->y = arg1->y - arg2->y;
+    arg0->z = arg1->z - arg2->z;
+    return arg0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800358AC.s")
+typedef struct { f32 x, y, z; } Vec3f358AC;
+typedef struct { s16 x, y, z; } Vec3s358AC;
+Vec3f358AC *func_800358AC(Vec3f358AC *arg0, Vec3s358AC *arg1) {
+    arg0->x = arg1->x;
+    arg0->y = arg1->y;
+    arg0->z = arg1->z;
+    return arg0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800358F0.s")
+typedef struct { f32 x, y, z; } Vec3f358F0;
+Vec3f358F0 *func_800358F0(Vec3f358F0 *arg0, Vec3f358F0 *arg1, Vec3f358F0 *arg2, Vec3f358F0 *arg3) {
+    arg0->x = ((arg2->y - arg1->y) * (arg3->z - arg2->z)) - ((arg3->y - arg2->y) * (arg2->z - arg1->z));
+    arg0->y = ((arg2->z - arg1->z) * (arg3->x - arg2->x)) - ((arg3->z - arg2->z) * (arg2->x - arg1->x));
+    arg0->z = ((arg2->x - arg1->x) * (arg3->y - arg2->y)) - ((arg3->x - arg2->x) * (arg2->y - arg1->y));
+    return arg0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -1136,19 +1198,31 @@ u32 func_8003570C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035AA0.s")
+typedef struct { s16 x, y, z; } Vec3s35AA0;
+Vec3s35AA0 *func_80035AA0(Vec3s35AA0 *arg0, Vec3s35AA0 *arg1) {
+    arg0->x += arg1->x; arg0->y += arg1->y; arg0->z += arg1->z; return arg0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035AD8.s")
+typedef struct { s16 x, y, z; } Vec3s35AD8;
+Vec3s35AD8 *func_80035AD8(Vec3s35AD8 *arg0, Vec3s35AD8 *arg1, Vec3s35AD8 *arg2) {
+    arg0->x = arg1->x + arg2->x; arg0->y = arg1->y + arg2->y; arg0->z = arg1->z + arg2->z; return arg0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035B10.s")
+typedef struct { s16 x, y, z; } Vec3s35B10;
+Vec3s35B10 *func_80035B10(Vec3s35B10 *arg0, Vec3s35B10 *arg1) {
+    arg0->x -= arg1->x; arg0->y -= arg1->y; arg0->z -= arg1->z; return arg0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035B48.s")
+typedef struct { s16 x, y, z; } Vec3s35B48;
+Vec3s35B48 *func_80035B48(Vec3s35B48 *arg0, Vec3s35B48 *arg1, Vec3s35B48 *arg2) {
+    arg0->x = arg1->x - arg2->x; arg0->y = arg1->y - arg2->y; arg0->z = arg1->z - arg2->z; return arg0;
+}
 #endif
 
 #ifdef VERSION_US
