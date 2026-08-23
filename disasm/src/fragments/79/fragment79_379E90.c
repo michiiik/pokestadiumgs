@@ -17,7 +17,10 @@ void func_8410A600(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_379E90/func_8410A9B4.s")
+extern void func_8411DBF4(s32 arg0);
+void func_8410A9B4(void) {
+    func_8411DBF4(5);
+}
 #endif
 
 #ifdef VERSION_US
@@ -29,5 +32,7 @@ void func_8410A600(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_379E90/func_8410AE34.s")
+s32 func_8410AE34(s32 arg0, s32 arg1) {
+    return 0;
+}
 #endif
