@@ -165,7 +165,10 @@ void func_8F100218(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/69/fragment69_code/func_8F102F94.s")
+extern void func_8F100220(s32 arg0);
+void func_8F102F94(void) {
+    func_8F100220(2);
+}
 #endif
 
 #ifdef VERSION_US
