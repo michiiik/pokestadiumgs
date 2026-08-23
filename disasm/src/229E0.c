@@ -154,7 +154,10 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025C9C.s")
+extern s32 func_80018C14(void);
+s32 func_80025C9C(void) {
+    return func_80018C14();
+}
 #endif
 
 #ifdef VERSION_US
@@ -998,7 +1001,15 @@ s32 func_800353BC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800353E4.s")
+extern s32 func_80025D44(void);
+s32 func_800353E4(void) {
+    s32 completed = 0;
+
+    while (func_80025D44() != 0) {
+        completed++;
+    }
+    return completed;
+}
 #endif
 
 #ifdef VERSION_US
