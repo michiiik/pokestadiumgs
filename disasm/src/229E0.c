@@ -48,7 +48,7 @@ s32 func_8002263C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80023954.s")
+void func_80023954(void) { func_8001874C(0x06010005, 1); }
 #endif
 
 #ifdef VERSION_US
