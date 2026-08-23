@@ -3,7 +3,7 @@
 /* Audio command setup helpers.  These small routines are kept here with the
  * surrounding audio command code; their constants and stores are taken
  * directly from the US implementations at 0x800225C4--0x80022640. */
-extern void func_80018728(u32 address, s32 offset);
+extern void func_80018728(u32 address, ...);
 extern void func_800187AC(void);
 extern u8 D_8009019C;
 extern u8 D_800901A0;
@@ -199,7 +199,6 @@ s32 func_80023A10(s32 group, s32 index) {
 
 #ifdef VERSION_US
 /* Select the audio command mode and refresh the resident audio subsystem. */
-extern void func_80018728(u32 mode, s32 arg);
 
 void func_80025C50(s32 mode) {
     u8 *modeFlag = (u8 *)0x80090B90;
@@ -252,8 +251,6 @@ s32 func_80025D44(void) {
 }
 
 #ifdef VERSION_US
-extern void func_80018728(u32 command, u32 arg);
-
 void func_80025D64(s32 value) {
     if ((u8)value != 0) {
         func_80018728(0xF1FF0000, 0);
