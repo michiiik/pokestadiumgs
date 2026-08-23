@@ -97,7 +97,10 @@ u8 func_8414A264(void) {
     return D_84187040;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B7EA0/func_8414A270.s")
+extern u8 D_84187044[];
+u8 func_8414A270(u8 arg0) {
+    return D_84187044[arg0];
+}
 
 extern u8 D_8418704C;
 u8 func_8414A288(void) {
@@ -134,5 +137,8 @@ u8 func_8414A2D0(void) {
     return D_84187060;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B7EA0/func_8414A2DC.s")
+extern u8 D_84187064;
+u8 func_8414A2DC(void) {
+    return D_84187064;
+}
 #endif
