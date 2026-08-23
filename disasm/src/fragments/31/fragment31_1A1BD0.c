@@ -6,9 +6,17 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A1BD0/func_8822EA80.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A1BD0/func_8822EAB0.s")
+extern u8 **D_88234970;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A1BD0/func_8822EAC4.s")
+void func_8822EAB0(void) {
+    *(u32 *)(*D_88234970 + 0x30) = 0;
+}
+
+extern u8 **D_88234970;
+
+void func_8822EAC4(void) {
+    *(u32 *)(*D_88234970 + 0x30) = 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A1BD0/func_8822EADC.s")
 
