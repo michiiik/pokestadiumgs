@@ -1,11 +1,24 @@
 #!/usr/bin/env python3
-"""Try one C replacement for a GLOBAL_ASM pragma.
+"""Try C replacements for GLOBAL_ASM pragmas.
 
 Usage:
     tools/try_pragma_compare.py disasm/src/229E0.c func_80025CBC candidate.c
+    tools/try_pragma_compare.py --bundle disasm/src/229E0.c candidates.txt
 
-The candidate file replaces exactly one pragma line.  A failed COMPARE=1
-restores the source file byte-for-byte; a successful comparison keeps it.
+The single-candidate form replaces exactly one pragma line.  A failed
+COMPARE=1 restores the source file byte-for-byte; a successful comparison
+keeps it.  The candidate file is deleted after the attempt unless
+--keep-candidate is passed.
+
+Bundle files contain blocks of this form, which are tested independently:
+
+    /* candidate: func_80025D44 */
+    extern s32 func_80019378(void);
+    s32 func_80025D44(void) { return func_80019378(); }
+    /* end candidate */
+
+Bundle candidates are deliberately tested sequentially in the live checkout;
+parallel testing requires isolated build trees and is a separate mode.
 """
 
 from __future__ import annotations
@@ -19,16 +32,9 @@ import tempfile
 from pathlib import Path
 
 
-def main() -> int:
-    if len(sys.argv) != 4:
-        print(__doc__.strip(), file=sys.stderr)
-        return 2
-
-    source_path = Path(sys.argv[1])
-    function = sys.argv[2]
-    candidate_path = Path(sys.argv[3])
+def try_candidate(source_path: Path, function: str, candidate: str) -> int:
     source = source_path.read_text()
-    candidate = candidate_path.read_text().rstrip() + "\n"
+    candidate = candidate.rstrip() + "\n"
 
     pragma = re.compile(
         rf'^#pragma GLOBAL_ASM\("asm/us/nonmatchings/[^\"]+/{re.escape(function)}\.s"\)$',
@@ -60,12 +66,52 @@ def main() -> int:
 
     if result.returncode != 0:
         shutil.copyfile(backup_path, source_path)
+        # The candidate compile can finish within the same filesystem
+        # timestamp tick as the restore.  Force make to rebuild the restored
+        # object instead of reusing the rejected candidate object.
+        os.utime(source_path, None)
         print(f"REJECTED {function}: restored GLOBAL_ASM")
     else:
         print(f"ACCEPTED {function}: source replacement kept")
 
     backup_path.unlink(missing_ok=True)
     return result.returncode
+
+
+def main() -> int:
+    keep_candidate = "--keep-candidate" in sys.argv
+    args = [arg for arg in sys.argv[1:] if arg != "--keep-candidate"]
+
+    if len(args) == 3 and args[0] == "--bundle":
+        source_path = Path(args[1])
+        bundle_path = Path(args[2])
+        bundle = bundle_path.read_text()
+        blocks = re.findall(
+            r"/\*\s*candidate:\s*([A-Za-z_]\w*)\s*\*/(.*?)/\*\s*end candidate\s*\*/",
+            bundle,
+            flags=re.DOTALL,
+        )
+        if not blocks:
+            print("candidate bundle contains no candidate blocks", file=sys.stderr)
+            return 2
+        result = 0
+        for function, candidate in blocks:
+            result |= try_candidate(source_path, function, candidate)
+        if not keep_candidate:
+            bundle_path.unlink(missing_ok=True)
+        return result
+
+    if len(args) == 3:
+        source_path = Path(args[0])
+        function = args[1]
+        candidate_path = Path(args[2])
+        result = try_candidate(source_path, function, candidate_path.read_text())
+        if not keep_candidate:
+            candidate_path.unlink(missing_ok=True)
+        return result
+
+    print(__doc__.strip(), file=sys.stderr)
+    return 2
 
 
 if __name__ == "__main__":

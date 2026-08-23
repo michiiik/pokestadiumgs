@@ -165,7 +165,11 @@ s32 func_80025C9C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025D44.s")
+extern s32 func_80019378(void);
+
+s32 func_80025D44(void) {
+    return func_80019378();
+}
 #endif
 
 #ifdef VERSION_US
