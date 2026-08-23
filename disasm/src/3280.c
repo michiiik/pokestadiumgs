@@ -32,7 +32,12 @@ s32 func_80002B24(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/3280/func_80002D20.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3280/func_80002DD4.s")
+u8 *func_80002DD4(u8 *arg0, s32 arg1, s32 arg2) {
+    arg0 -= 0x10;
+    *(s32 *)(arg0 + 8) = arg2;
+    *(s32 *)(arg0 + 0xC) = arg1;
+    return arg0;
+}
 
 s32 func_80002DE4(u8 *arg0) { return *(s32 *)(arg0 - 0xC) - (s32)arg0; }
 
