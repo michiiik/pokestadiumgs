@@ -12,7 +12,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80007B78.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80007BA8.s")
+void func_80007BA8(s32 arg0, s32 arg1) { extern s32 D_80087230; extern s32 D_80087234; if ((u32)arg0 < 3) D_80087230 = arg0; if ((u32)arg1 < 2) D_80087234 = arg1; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80007BD0.s")
 
@@ -68,5 +68,5 @@ extern u8 D_800D0510[]; void func_80008624(void) { func_80002178(D_800D0510); }
 
 s32 func_80008970(void) { s32 value = 0; if (D_800D0554 != 0) { value = *(s8 *)((u8 *)(u32)D_800D0554 + 0x17); } return value; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80008990.s")
+s32 func_80008990(void) { extern s32 D_800D0554; s32 value = 0; if (D_800D0554 != 0) { value = ((s8 *)((u8 *)(u32)D_800D0554))[0xC] == 1; } return value; }
 #endif
