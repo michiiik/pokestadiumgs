@@ -10,9 +10,15 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/52/fragment52_2871C0/func_8640912C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/52/fragment52_2871C0/func_86409240.s")
+extern void func_87F02684(void);
+void func_86409240(void) {
+    func_87F02684();
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/52/fragment52_2871C0/func_86409260.s")
+extern void func_87F0277C(void);
+void func_86409260(void) {
+    func_87F0277C();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/52/fragment52_2871C0/func_86409280.s")
 
