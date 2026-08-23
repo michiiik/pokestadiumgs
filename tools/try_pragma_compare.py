@@ -125,6 +125,60 @@ def compare_current_tree(repo_root: Path) -> int:
     return result.returncode
 
 
+def try_candidates(source_path: Path, blocks: list[tuple[str, str]]) -> tuple[int, list[str]]:
+    """Try in-memory candidates and retain the first winner per function."""
+    repo_root = Path(__file__).resolve().parent.parent
+    baseline = source_path.read_text()
+    accepted: dict[str, str] = {}
+    for function, candidate in blocks:
+        if function in accepted:
+            print(f"SKIPPED {function}: earlier candidate accepted")
+            continue
+        source_path.write_text(baseline)
+        os.utime(source_path, None)
+        rebuild_source_object(source_path)
+        result = try_candidate(source_path, function, candidate)
+        if result == 0:
+            accepted[function] = candidate
+
+    combined = baseline
+    for function, candidate in accepted.items():
+        pragma = re.compile(
+            rf'^#pragma GLOBAL_ASM\("asm/us/nonmatchings/[^"]+/{re.escape(function)}\.s"\)$',
+            re.MULTILINE,
+        )
+        combined, count = pragma.subn(candidate.rstrip("\n"), combined, count=1)
+        if count != 1:
+            source_path.write_text(baseline)
+            os.utime(source_path, None)
+            rebuild_source_object(source_path)
+            return 2, []
+    source_path.write_text(combined)
+    os.utime(source_path, None)
+    if rebuild_source_object(source_path) != 0:
+        source_path.write_text(baseline)
+        os.utime(source_path, None)
+        rebuild_source_object(source_path)
+        return 2, []
+    if accepted:
+        print(f"checking {len(accepted)} accepted candidate(s) together")
+        result = compare_current_tree(repo_root)
+        if result != 0:
+            source_path.write_text(baseline)
+            os.utime(source_path, None)
+            rebuild_source_object(source_path)
+            print("combined candidate batch rejected: restored baseline")
+            return result, []
+    else:
+        source_path.write_text(baseline)
+        os.utime(source_path, None)
+        rebuild_source_object(source_path)
+        compare_current_tree(repo_root)
+        print("no candidate accepted")
+        return 1, []
+    return 0, list(accepted)
+
+
 def main() -> int:
     keep_candidate = "--keep-candidate" in sys.argv
     args = [arg for arg in sys.argv[1:] if arg != "--keep-candidate"]
@@ -141,69 +195,10 @@ def main() -> int:
         if not blocks:
             print("candidate bundle contains no candidate blocks", file=sys.stderr)
             return 2
-        repo_root = Path(__file__).resolve().parent.parent
-        baseline = source_path.read_text()
-        accepted: dict[str, str] = {}
-        for function, candidate in blocks:
-            if function in accepted:
-                print(f"SKIPPED {function}: earlier candidate accepted")
-                continue
-            source_path.write_text(baseline)
-            os.utime(source_path, None)
-            rebuild_source_object(source_path)
-            result = try_candidate(source_path, function, candidate)
-            if result == 0:
-                accepted[function] = candidate
-
-        # Evaluate all first-success candidates together from the original
-        # baseline.  This is the only state left in the live checkout.
-        combined = baseline
-        for function, candidate in accepted.items():
-            pragma = re.compile(
-                rf'^#pragma GLOBAL_ASM\("asm/us/nonmatchings/[^"]+/{re.escape(function)}\.s"\)$',
-                re.MULTILINE,
-            )
-            combined, count = pragma.subn(candidate.rstrip("\n"), combined, count=1)
-            if count != 1:
-                print(f"could not apply accepted candidate {function}", file=sys.stderr)
-                source_path.write_text(baseline)
-                os.utime(source_path, None)
-                rebuild_source_object(source_path)
-                if not keep_candidate:
-                    bundle_path.unlink(missing_ok=True)
-                return 2
-        source_path.write_text(combined)
-        os.utime(source_path, None)
-        if rebuild_source_object(source_path) != 0:
-            source_path.write_text(baseline)
-            os.utime(source_path, None)
-            rebuild_source_object(source_path)
-            if not keep_candidate:
-                bundle_path.unlink(missing_ok=True)
-            return 2
-        if accepted:
-            print(f"checking {len(accepted)} accepted candidate(s) together")
-            result = compare_current_tree(repo_root)
-            if result != 0:
-                source_path.write_text(baseline)
-                os.utime(source_path, None)
-                rebuild_source_object(source_path)
-                print("combined candidate batch rejected: restored baseline")
-                if not keep_candidate:
-                    bundle_path.unlink(missing_ok=True)
-                return result
-        else:
-            source_path.write_text(baseline)
-            os.utime(source_path, None)
-            rebuild_source_object(source_path)
-            compare_current_tree(repo_root)
-            print("no candidate accepted")
-            if not keep_candidate:
-                bundle_path.unlink(missing_ok=True)
-            return 1
+        result, _ = try_candidates(source_path, blocks)
         if not keep_candidate:
             bundle_path.unlink(missing_ok=True)
-        return 0
+        return result
 
     if len(args) == 3:
         source_path = Path(args[0])
