@@ -65,3 +65,26 @@ mount this repository at `/work`, the pinned engine build at `/n64recomp`, and
 run `tools/mac_generate_recomp.sh`. The first verified pass emitted 33,529
 functions. Current Android runtime and rental-roster status is recorded in
 `PORTING_STATUS.md` and `CLAUDE_HANDOFF.md`.
+
+## Native macOS build
+
+The desktop runner is supplied by the local runtime checkout used for the
+Android build. With the Stadium 1 checkout available at its usual path, build
+the macOS executable from this repository with:
+
+```sh
+tools/mac_build_native.sh
+```
+
+The script stages the shared RT64/N64ModernRuntime/recomp-ui dependencies
+without modifying either sibling checkout. It also carries the AppleClang fmt
+workaround used by Stadium 1 and uses unoptimized generated C for a practical
+first boot. The executable is written to `build-mac/ninja/PokemonStadiumGSRecomp`.
+
+To boot it directly after building, run it from the staged runtime directory so
+the ROM and runtime assets are next to the executable:
+
+```sh
+cd build-mac/source
+PSR_AUTOBOOT=1 ../ninja/PokemonStadiumGSRecomp
+```
