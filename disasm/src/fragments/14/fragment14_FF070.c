@@ -106,7 +106,9 @@ void func_8130A5D0(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130A98C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130A9C8.s")
+s32 func_8130A9C8(u8 *arg0) {
+    return arg0[0xE912] == 7;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130A9DC.s")
 
