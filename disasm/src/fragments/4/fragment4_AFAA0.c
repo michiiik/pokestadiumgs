@@ -12,7 +12,10 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_818017A8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81801810.s")
+void func_81801810(u8 *arg0, s32 arg1, s32 arg2) {
+    *(u16 *)arg0 = (u16)arg1;
+    *(u16 *)(arg0 + 2) = (u16)arg2;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_8180181C.s")
 
