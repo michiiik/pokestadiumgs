@@ -36,7 +36,7 @@ void func_84200550(u8 *arg0) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_4194A0/func_84200558.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_4194A0/func_842005D4.s")
+void func_842005D4(u8 *arg0) { u32 value = func_842034A0(); *(u8 **)(arg0 + 0x10) += (*(u8 **)(arg0 + 0x14))[0x25] * value; }
 
 void func_84200614(u8 *arg0) {}
 
