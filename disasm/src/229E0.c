@@ -317,12 +317,41 @@ void func_80025E7C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025EB0.s")
+extern void func_80031A6C(s32 size, ...);
+extern s32 func_80031C84(u32 destination, void *source);
+
+/* Submit one audio buffer and advance the rotating DMA destination. */
+s32 func_80025EB0(void *unused0, void *source, s32 reload, void *unused3) {
+    u32 *dmaIndex = (u32 *)0x80090AC0;
+    u32 *destinations = (u32 *)0x800D1990;
+    u32 destination;
+    s32 result;
+
+    (void)unused0;
+    (void)unused3;
+    if (*(s8 *)0x80090B8C == 0) {
+        return 0;
+    }
+
+    destination = destinations[*dmaIndex];
+    if (reload == 1) {
+        func_80031A6C(0x7D00, *(u32 *)0x800D198C);
+    }
+    result = func_80031C84(destination, source);
+    *dmaIndex = (*dmaIndex + 1) % 3;
+
+    if (*(s8 *)0x80090B8C == 0) {
+        return 0;
+    }
+    if (result != -1) {
+        return destination;
+    }
+    return result;
+}
 #endif
 
 #define D_800D1990 ((u32 *)0x800D1990)
 #define D_800D198C (*(u32 *)0x800D198C)
-extern void func_80031A6C(s32 size);
 extern void func_80034DD0(void);
 #define D_80090B8C (*(u8 *)0x80090B8C)
 extern u32 osSetIntMask(u32 mask);
