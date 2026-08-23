@@ -70,7 +70,7 @@ s32 func_80060F90(void) { return 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_800616BC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_8006175C.s")
+u16 func_8006175C(u16 arg0) { u16 i; for (i = 1; i < 255; i++) { if ((i * i) >= arg0) break; } return i; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_8006179C.s")
 
