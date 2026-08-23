@@ -63,7 +63,12 @@ void func_80004FF4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_800050A0.s")
+void *func_800050A0(void *arg0) {
+    if (arg0 && !func_80004C14(arg0)) {
+        arg0 = 0;
+    }
+    return arg0;
+}
 #endif
 
 #ifdef VERSION_US
