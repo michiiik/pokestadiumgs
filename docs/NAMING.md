@@ -149,6 +149,18 @@ the request/reset edge without claiming that the larger `0x800354B4` orchestrati
 function is a music-only API; its mode and task transitions remain for the
 audio-thread pass.
 
+## Phase 3.4: minigame fragment inventory
+
+`Game_State10_Minigame` now has a call-site inventory in the ledger: its
+`Fragment_Load`/`Fragment_LoadAndCall` operands name the complete resident set
+`{2, 3, 4, 26, 27, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55,
+56, 57, 59, 60, 61, 62, 63, 64, 65, 66}`. The first five are loaded during
+minigame setup; the remaining entries are selected by the minigame dispatch
+branches and paired as loader/callback operations. This is direct evidence from
+the ROM-start operands, not an inference from fragment names. Individual
+fragment init/update/draw roles remain open until their callback targets and
+per-minigame state tables are audited.
+
 ## Phase 1: the Stadium 1 transfer
 the 676 is a machine-verified correspondence between the two ROMs' machine code.
 
