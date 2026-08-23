@@ -26,6 +26,58 @@
   "Vi_SelectMode": "matches Stadium 1 Video_SetMode (callgraph). Same function, two spellings of the same idea. Upstream name kept."
  },
   "functions": {
+  "func_8290D738": [
+   "BattleAnim_Fragment67Dispatch_045",
+   "fragment67 53-entry dispatch table at 0x829130A4 selects this handler at slot 45; the table has one repeated default handler and this isolated non-default slot"
+  ],
+  "func_8290D7C8": [
+   "BattleAnim_Fragment67Dispatch_001",
+   "fragment67 53-entry dispatch table at 0x829130A4 selects this handler at slot 1; the table has one repeated default handler and this isolated non-default slot"
+  ],
+  "func_8290D858": [
+   "BattleAnim_Fragment67Dispatch_005",
+   "fragment67 53-entry dispatch table at 0x829130A4 selects this handler at slot 5; the table has one repeated default handler and this isolated non-default slot"
+  ],
+  "func_8290D8EC": [
+   "BattleAnim_Fragment67Dispatch_009",
+   "fragment67 53-entry dispatch table at 0x829130A4 selects this handler at slot 9; the table has one repeated default handler and this isolated non-default slot"
+  ],
+  "func_8290D980": [
+   "BattleAnim_Fragment67Dispatch_013",
+   "fragment67 53-entry dispatch table at 0x829130A4 selects this handler at slot 13; the table has one repeated default handler and this isolated non-default slot"
+  ],
+  "func_8290DA10": [
+   "BattleAnim_Fragment67Dispatch_017",
+   "fragment67 53-entry dispatch table at 0x829130A4 selects this handler at slot 17; the table has one repeated default handler and this isolated non-default slot"
+  ],
+  "func_8290DAA4": [
+   "BattleAnim_Fragment67Dispatch_021",
+   "fragment67 53-entry dispatch table at 0x829130A4 selects this handler at slot 21; the table has one repeated default handler and this isolated non-default slot"
+  ],
+  "func_8290DB3C": [
+   "BattleAnim_Fragment67Dispatch_025",
+   "fragment67 53-entry dispatch table at 0x829130A4 selects this handler at slot 25; the table has one repeated default handler and this isolated non-default slot"
+  ],
+  "func_8290DBD0": [
+   "BattleAnim_Fragment67Dispatch_029",
+   "fragment67 53-entry dispatch table at 0x829130A4 selects this handler at slot 29; the table has one repeated default handler and this isolated non-default slot"
+  ],
+  "func_8290DC60": [
+   "BattleAnim_Fragment67Dispatch_033",
+   "fragment67 53-entry dispatch table at 0x829130A4 selects this handler at slot 33; the table has one repeated default handler and this isolated non-default slot"
+  ],
+  "func_8290DCF0": [
+   "BattleAnim_Fragment67Dispatch_037",
+   "fragment67 53-entry dispatch table at 0x829130A4 selects this handler at slot 37; the table has one repeated default handler and this isolated non-default slot"
+  ],
+  "func_8290DD80": [
+   "BattleAnim_Fragment67Dispatch_041",
+   "fragment67 53-entry dispatch table at 0x829130A4 selects this handler at slot 41; the table has one repeated default handler and this isolated non-default slot"
+  ],
+  "func_8290DED4": [
+   "BattleAnim_Fragment67Dispatch_049",
+   "fragment67 53-entry dispatch table at 0x829130A4 selects this handler at slot 49; the table has one repeated default handler and this isolated non-default slot"
+  ],
   "func_8410CF80": [
    "BattleAnim_ModelDispatch_121",
    "fragment79 225-entry dispatch table at 0x84184148 selects this handler at slot 121; the table has one dominant default handler and this is a non-default slot"

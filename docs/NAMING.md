@@ -214,6 +214,13 @@ are named `BattleAnim_ModelDispatch_NNN`, with repeated slots retained in the
 evidence. These names identify the dispatch surface only; they do not assert
 that every slot is a distinct model or animation.
 
+The fragment-67 table at `0x829130A4` is also resolved positionally. Its 53
+entries consist of one repeated default handler and 13 non-default handlers at
+slots `1, 5, 9, 13, 17, 21, 25, 29, 33, 37, 41, 45, 49`; those handlers are
+named `BattleAnim_Fragment67Dispatch_NNN`. The regular stride is recorded as
+structural evidence, while the exact effect semantics remain a body-level
+follow-up.
+
 ## Phase 3.6: remaining dispatch-table boundaries
 
 The dispatch-table survey was rerun after the subsystem slices. The two largest

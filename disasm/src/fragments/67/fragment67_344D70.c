@@ -311,55 +311,55 @@ void func_829086F0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290D738.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/BattleAnim_Fragment67Dispatch_045.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290D7C8.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/BattleAnim_Fragment67Dispatch_001.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290D858.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/BattleAnim_Fragment67Dispatch_005.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290D8EC.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/BattleAnim_Fragment67Dispatch_009.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290D980.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/BattleAnim_Fragment67Dispatch_013.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290DA10.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/BattleAnim_Fragment67Dispatch_017.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290DAA4.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/BattleAnim_Fragment67Dispatch_021.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290DB3C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/BattleAnim_Fragment67Dispatch_025.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290DBD0.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/BattleAnim_Fragment67Dispatch_029.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290DC60.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/BattleAnim_Fragment67Dispatch_033.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290DCF0.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/BattleAnim_Fragment67Dispatch_037.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290DD80.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/BattleAnim_Fragment67Dispatch_041.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290DED4.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/BattleAnim_Fragment67Dispatch_049.s")
 #endif
 
 #ifdef VERSION_US
