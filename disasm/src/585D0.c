@@ -18,7 +18,7 @@ u16 func_800579D0(const u8 *arg0) { return (u16)((arg0[1] << 8) | arg0[0]); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80057A5C.s")
+extern u8 D_80128574[]; s32 func_80057A5C(s32 index) { return D_80128574[index * 112] == 7; }
 #endif
 
 #ifdef VERSION_US
@@ -581,7 +581,7 @@ s32 func_8005D8C0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005D8CC.s")
+extern u8 D_80128575[]; u8 func_8005D8CC(s32 index) { return D_80128575[index * 112]; }
 #endif
 
 #ifdef VERSION_US
@@ -589,11 +589,11 @@ s32 func_8005D8C0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005D92C.s")
+extern u8 D_80128574[]; u8 func_8005D92C(s32 index) { return D_80128574[index * 112]; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005D948.s")
+extern u8 D_801285B8[]; u8 func_8005D948(s32 index) { return D_801285B8[index * 112]; }
 #endif
 
 #ifdef VERSION_US
