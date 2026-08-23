@@ -2,9 +2,9 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_164860/func_81005FB0.s")
+void func_81005FB0(u8 *arg0, s32 arg1) {}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_164860/func_81005FBC.s")
+void func_81005FBC(u8 *arg0, s32 arg1) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_164860/func_81005FC8.s")
 
