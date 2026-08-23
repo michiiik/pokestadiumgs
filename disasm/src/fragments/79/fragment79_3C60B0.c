@@ -42,15 +42,15 @@ void func_84156900(void) { func_84109590(); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84156920.s")
+void func_84156920(void) { func_84109544(); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84156940.s")
+void func_84156940(void) { func_841094F8(); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84156960.s")
+void func_84156960(void) { func_8410971C(); }
 #endif
 
 #ifdef VERSION_US
