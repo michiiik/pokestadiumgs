@@ -28,7 +28,9 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80004024.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800040C4.s")
+s32 func_800040C4(u8 *arg0) {
+    return *(s32 *)(arg0 + 0xC) + 0x100;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800040D0.s")
 
