@@ -1239,7 +1239,12 @@ Vec3s35B80 *func_80035B80(Vec3s35B80 *arg0, Vec3f35B80 *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035C44.s")
+void func_80035C44(u32 *dest, u32 *src) {
+    if (dest != src) {
+        s32 i; u32 *d = dest; u32 *s = src;
+        for (i = 0; i < 16; i++) { *d++ = *s++; }
+    }
+}
 #endif
 
 #ifdef VERSION_US
