@@ -4,7 +4,10 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_177430/func_882041B0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_177430/func_882041E0.s")
+extern s32 D_882346AC;
+void func_882041E0(void) {
+    D_882346AC = 2;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_177430/func_882041F0.s")
 
