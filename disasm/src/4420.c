@@ -16,7 +16,7 @@ u16 func_80003820(const u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80003AF0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80003CD0.s")
+void func_80003CD0(void) { extern OSMesgQueue D_800CD000; extern OSMesg D_800CD018[]; osCreateMesgQueue(&D_800CD000, D_800CD018, 1); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80003D00.s")
 
