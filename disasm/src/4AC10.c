@@ -2,6 +2,12 @@
 
 
 #ifdef VERSION_US
+extern void *D_80095110;
+extern void *D_80095114;
+extern void func_8004B09C(s32 x, s32 y, s32 width, s32 height,
+                          void *texture, s32 red, s32 green, s32 blue,
+                          s32 advance);
+
 extern s16 D_800950D0;
 extern void func_8004AF18(s32 x, s32 y);
 
@@ -45,9 +51,17 @@ void Ui_DrawAnimatedTextureMarker(s32 x, s32 y) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4AC10/func_8004B09C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4AC10/func_8004B2CC.s")
+void func_8004B2CC(s32 x, s32 y, s32 width, s32 height,
+                   s32 red, s32 green, s32 blue, s32 advance) {
+    func_8004B09C(x, y, width, height, D_80095110,
+                  (red >> 24) & 0xFF, (green >> 24) & 0xFF,
+                  (blue >> 24) & 0xFF, advance);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4AC10/func_8004B314.s")
+void func_8004B314(s32 x, s32 y, s32 width, s32 height) {
+    func_8004B09C(x, y, width, height, D_80095114,
+                  0xF0, 0xD4, 0x68, 1);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4AC10/func_8004B35C.s")
 #endif

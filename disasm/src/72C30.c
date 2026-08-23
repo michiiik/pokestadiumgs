@@ -5,6 +5,12 @@
 extern void *func_80003240(void *table);
 extern void func_87F0EFA0(void);
 extern void func_87F0EDDC(void);
+extern void func_87F097B0(void);
+extern void func_87F0EE0C(void);
+extern void func_87F0F390(void);
+extern void func_87F0F3E4(void);
+extern u8 D_801291E0[];
+extern s8 D_8012B363;
 
 void Minigame_ProcessPlayerEvents(void *player, s32 event, void *context) {
     void (*handler)(void *, u8, void *);
@@ -86,17 +92,37 @@ void Minigame_MapControllerButtons(u8 *state, u8 *input) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_80072264.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/Minigame_UpdatePlayerCounters.s")
+void Minigame_UpdatePlayerCounters(void) {
+    void (*handler)(void *, s8);
+
+    handler = (void (*)(void *, s8))func_80003240((void *)func_87F097B0);
+    handler((void *)D_801291E0, D_8012B363);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_800723FC.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/Minigame_UpdateResultState.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/Minigame_ProcessInput.s")
+void Minigame_ProcessInput(void) {
+    void (*handler)(void *);
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/Minigame_ResetControllerPoll.s")
+    handler = (void (*)(void *))func_80003240((void *)func_87F0EE0C);
+    handler((void *)D_801291E0);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/Minigame_ResetRoundPlayers.s")
+void Minigame_ResetControllerPoll(void *input) {
+    void (*handler)(void *);
+
+    handler = (void (*)(void *))func_80003240((void *)func_87F0F390);
+    handler(input);
+}
+
+void Minigame_ResetRoundPlayers(void *state) {
+    void (*handler)(void *);
+
+    handler = (void (*)(void *))func_80003240((void *)func_87F0F3E4);
+    handler(state);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/Game_State10_Minigame.s")
 #endif

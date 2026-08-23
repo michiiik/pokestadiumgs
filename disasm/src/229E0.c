@@ -1821,23 +1821,54 @@ s32 Audio_RequestEvent(s32 eventId) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_SetSpeed.s")
+s32 ModelAnim_SetSpeed(void *anim, s32 speed) {
+    s32 frame = *(s32 *)((u8 *)anim + 0x48);
+    *(s32 *)((u8 *)anim + 0x4C) = speed;
+    return frame >> 16;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_SetFrame.s")
+void ModelAnim_SetFrame(void *anim, s32 frame) {
+    s32 target = (s16)frame << 16;
+    s32 current = *(s32 *)((u8 *)anim + 0x4C);
+    *(s32 *)((u8 *)anim + 0x48) = target - current;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_HasCrossedFrame.s")
+s32 ModelAnim_HasCrossedFrame(void *anim, s32 frame) {
+    s32 speed = *(s32 *)((u8 *)anim + 0x4C);
+    s32 current = *(s32 *)((u8 *)anim + 0x48);
+    s32 target = (s16)frame << 16;
+    s32 next = current + speed;
+
+    if (speed >= 0) {
+        if (current < target) {
+            return next >= target;
+        }
+    } else if (current > target) {
+        return next <= target;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_IsAnimationDone.s")
+s32 ModelAnim_IsAnimationDone(void *anim) {
+    void *record = *(void **)((u8 *)anim + 0x44);
+    s32 lastFrame = ((s32)(*(u16 *)((u8 *)record + 0xA) - 1)) << 16;
+    return ModelAnim_HasCrossedFrame(anim, lastFrame >> 16);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_IsFinished.s")
+s32 ModelAnim_IsFinished(void *anim) {
+    void *record = *(void **)((u8 *)anim + 0x44);
+    s32 current = *(s32 *)((u8 *)anim + 0x48);
+    s32 lastFrame = ((s32)(*(u16 *)((u8 *)record + 0xA) - 1)) << 16;
+    return current >= lastFrame;
+}
 #endif
 
 #ifdef VERSION_US
