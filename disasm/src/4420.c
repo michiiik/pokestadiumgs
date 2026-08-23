@@ -221,7 +221,6 @@ void Memmap_SegmentCleanupCallback(void *arg0, u32 vaddr) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800045E0.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/Asset_LoadToSegment.s")
 #if 0
@@ -252,7 +251,6 @@ void Memmap_FragmentCleanupCallback(void *arg0, u32 vaddr) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800046C0.s")
 
 typedef struct {
     u8 pad_00[0x1C];
@@ -293,7 +291,6 @@ void Fragment_RelocateAndReset(void *pool, void *source,
                  *(u32 *)((u8 *)pool + 8));
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800047B0.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/Fragment_Load.s")
 #if 0
