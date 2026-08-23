@@ -1984,11 +1984,11 @@ void func_8003C970(void) { D_80094904++; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003EF60.s")
+void func_8003EF60(u8 *arg0) { *(u16 *)(arg0 + 0x56) |= 1; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003EF70.s")
+void func_8003EF70(u8 *arg0) { *(u16 *)(arg0 + 0x56) &= (u16)~1; }
 #endif
 
 #ifdef VERSION_US
@@ -2076,7 +2076,7 @@ void func_8003F4E8(u8 *arg0, u8 value) { arg0[0x1C] = value; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003F84C.s")
+void func_8003F84C(u8 *arg0, u32 value1, u32 value2) { arg0[4] |= 0x80; *(u32 *)(arg0 + 8) = value1; *(u32 *)(arg0 + 0xC) = value2; }
 #endif
 
 #ifdef VERSION_US
