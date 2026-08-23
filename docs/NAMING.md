@@ -246,6 +246,15 @@ with both boolean values, and `Audio_ThreadEntry` reads the same flag before
 submitting work. The name is intentionally limited to the flag transition;
 the event IDs and mixer command meanings remain separate.
 
+The thread's task side is now named through its producer as well:
+`Audio_InitializeTaskState` is the one-time RSP/task setup, and each scheduler
+wake calls `Audio_BuildSchedulerTask`, which obtains the next task from
+`Audio_MixerStep` and submits it through `Sched_SubmitTask`. The mixer-step
+body advances the audio scheduler, services AI/GB audio buffers, drains task
+completion messages, and constructs the resident 0x68-byte task record. This
+establishes the mixer entry from the thread's direct call edge without naming
+individual command IDs beyond the separately documented request dispatcher.
+
 Two adjacent audio controls are now named from their direct global writes:
 `Audio_ResetModeSelector` stores `-1` in `D_80094860`, while
 `Audio_EnableModeFlag` stores `1` in `D_80094868`. Their names describe only

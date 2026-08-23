@@ -26,6 +26,18 @@
   "Vi_SelectMode": "matches Stadium 1 Video_SetMode (callgraph). Same function, two spellings of the same idea. Upstream name kept."
  },
   "functions": {
+  "func_80017B00": [
+   "Audio_MixerStep",
+   "Audio_ThreadEntry calls this through Audio_BuildSchedulerTask; the body advances the audio scheduler, services AI/GB audio buffers, drains completion messages, and constructs the next 0x68-byte scheduler task"
+  ],
+  "func_80021B00": [
+   "Audio_InitializeTaskState",
+   "Audio_ThreadEntry calls this once before its wait/submit loop; the body resets the audio task state and initializes the RSP/audio command setup"
+  ],
+  "func_80021B74": [
+   "Audio_BuildSchedulerTask",
+   "Audio_ThreadEntry calls this after each scheduler wake; it obtains the next task from Audio_MixerStep, stores it in the resident task slot, and returns it for Sched_SubmitTask"
+  ],
   "func_80035494": [
    "Audio_ResetModeSelector",
    "The helper writes -1 to D_80094860, the audio mode selector consumed by the command-transition routine"
