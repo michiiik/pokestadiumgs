@@ -10,7 +10,11 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/37/fragment37_code/func_88800354.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/37/fragment37_code/func_888003CC.s")
+extern u8 *D_88804050;
+void func_888003CC(void) {
+    *(s32 *)D_88804050 = 0;
+    D_88804050[0x11] = 2;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/37/fragment37_code/func_888003EC.s")
 
