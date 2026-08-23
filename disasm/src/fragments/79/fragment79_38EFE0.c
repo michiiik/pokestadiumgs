@@ -93,7 +93,12 @@ void func_8411FEFC(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_8411FF1C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_841202D0.s")
+f32 *func_841202D0(f32 *arg0, f32 *arg1) {
+    arg0[0] = arg1[0];
+    arg0[1] = arg1[1];
+    arg0[2] = arg1[2];
+    return arg0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_841202F0.s")
 
