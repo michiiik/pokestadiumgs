@@ -37,6 +37,28 @@ extern void func_8410E73C(void *arg0, ...);
 extern void func_8410ED98(void *arg0, ...);
 extern u32 D_841911EC;
 extern u32 D_84184148;
+extern void func_8410D174(void *arg0, void *arg1);
+extern void func_8410B60C(void *arg0, void *arg1, void *arg2, void *arg3);
+extern void func_8410C840(void *arg0, void *arg1, void *arg2, void *arg3);
+extern void func_8411EF08(void *arg0);
+extern void func_8411EF20(void *arg0);
+extern void func_8410E7D0(void *arg0, void *arg1);
+extern void func_8410CF80(void *arg0);
+extern void func_8410E878(void *arg0, void *arg1);
+extern void func_8411EFE4(void *arg0);
+extern void func_8410EA58(void *arg0, void *arg1, s16 arg2);
+extern void func_84108940(void *arg0, s32 arg1);
+extern s32 func_8411DC80(s32 arg0, void *arg1, s32 arg2);
+extern void func_8410DFC4(void *arg0, void *arg1);
+extern void func_8410AFD4(void);
+extern void func_8410D088(void *arg0, ...);
+extern void func_8410E688(void *arg0, void *arg1);
+extern void func_84110B2C(void *arg0, void *arg1);
+extern u8 D_8418393C[];
+extern u8 D_84183944[];
+extern u8 D_84183960[];
+extern u8 *D_8419120C;
+extern u8 *D_84193FA0;
 
 static void BattleAnim_ModelDispatchFinish(void) {
     if (D_841911E8 != NULL) {
@@ -527,31 +549,91 @@ void BattleAnim_ModelDispatch_218(u8 *model, void *arg1) { D_841911E8 = func_841
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_ModelDispatch_002.s")
+void BattleAnim_ModelDispatch_002(u8 *model, void *arg1) {
+    u8 *state = func_8410B330(model, arg1);
+    D_841911E8 = state;
+    func_841203B4(model + 0x2C, (void *)*(u32 *)(state + 0x88), 0.3f);
+    if (!func_8411DC80(*(u8 *)(arg1 + 0x61F), (void *)D_8418393C, 8))
+        func_8410DFC4(model, arg1);
+    if (func_8411DC80(*(s16 *)(state + 0x98), (void *)D_84183944, 0x1C))
+        func_8410E688(model, arg1);
+    else
+        func_8410E73C(model, arg1);
+    func_84110B2C(model, arg1);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_ModelDispatch_079.s")
+void BattleAnim_ModelDispatch_079(u8 *model, void *arg1) {
+    u8 *state = func_8410B330(model, arg1);
+    D_841911E8 = state;
+    func_841203B4(model + 0x2C, (void *)*(u32 *)(state + 0x88), 0.3f);
+    func_8410D174(model, arg1);
+    func_8410B884(model, arg1, state, (void *)(s32)*(s16 *)(arg1 + 0x20));
+    func_8410B60C(model, arg1, state, model + 0xB4);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_ModelDispatch_191.s")
+void BattleAnim_ModelDispatch_191(u8 *model, void *arg1) {
+    u8 *state = func_8410B330(model, arg1);
+    D_841911E8 = state;
+    func_841203B4(model + 0x2C, (void *)*(u32 *)(state + 0x88), 0.3f);
+    if (*(f32 *)(model + 0xB8) > 10.0f) {
+        *(f32 *)(model + 0xB8) = 10.0f;
+        func_8410DFC4(model, arg1);
+    }
+    func_8410B884(model, arg1, state, (void *)(s32)*(s16 *)(arg1 + 0x20));
+    func_8410B60C(model, arg1, state, model + 0xB4);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_ModelDispatch_184.s")
+void BattleAnim_ModelDispatch_184(u8 *model, void *arg1) {
+    u8 *state = func_8410B330(model, arg1);
+    D_841911E8 = state;
+    func_841203B4(model + 0x2C, (void *)*(u32 *)(state + 0x88), 0.3f);
+    func_8410DFC4(model, arg1);
+    func_8410C840(model, arg1, state, model + 0xB4);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_ModelDispatch_093.s")
+void BattleAnim_ModelDispatch_093(u8 *model, void *arg1) {
+    u8 *state = func_8410B330(model, arg1);
+    D_841911E8 = state;
+    func_841203B4(model + 0x2C, (void *)*(u32 *)(state + 0x88), 0.3f);
+    if (!func_8411DC80(*(u8 *)(arg1 + 0x61F), (void *)D_8418393C, 8)) {
+        func_8410DFC4(model, arg1);
+        func_8410E688(model, arg1);
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_ModelDispatch_113.s")
+void BattleAnim_ModelDispatch_113(u8 *model, void *arg1) {
+    u8 *state = func_8410B330(model, arg1);
+    D_841911E8 = state;
+    if (D_841911E0 == state) {
+        func_8410AFD4();
+        func_8411EF08(arg1);
+    } else {
+        func_8411EF20(arg1);
+    }
+    func_8410C934(model, arg1, *(s16 *)(state + 0x98));
+    BattleAnim_ModelDispatchFinish();
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_ModelDispatch_141.s")
+void BattleAnim_ModelDispatch_141(u8 *model, void *arg1) {
+    u8 *state = func_8410B330(model, arg1);
+    D_841911E8 = state;
+    if (D_841911E0 == state) func_8411EF08(arg1);
+    else func_8411EF20(arg1);
+    func_8410C934(model, arg1, *(s16 *)(state + 0x98));
+    BattleAnim_ModelDispatchFinish();
+}
 #endif
 
 #ifdef VERSION_US
@@ -563,35 +645,76 @@ void BattleAnim_ModelDispatch_218(u8 *model, void *arg1) { D_841911E8 = func_841
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_ModelDispatch_009.s")
+void BattleAnim_ModelDispatch_009(u8 *model, void *arg1) {
+    s32 index = func_8411E1F8(arg1);
+    u8 *state;
+    D_841911E8 = func_8410B330(model, arg1);
+    state = D_841911E8;
+    if (!(*(u16 *)(D_84193DD0 + index * 0x10 + 0x12) & 2))
+        func_8410DFC4(model, arg1);
+    if (func_8411DC80(*(u16 *)(state + 0x98), (void *)D_84183960, 0x10))
+        func_8410E688(model, arg1);
+    else
+        func_8410E7D0(model, arg1);
+    func_84110B2C(model, arg1);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_ModelDispatch_176.s")
+void BattleAnim_ModelDispatch_176(u8 *model, void *arg1) {
+    D_841911E8 = func_8410B330(model, arg1);
+    func_84108940(model + 0xB4, 0);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_ModelDispatch_022.s")
+void BattleAnim_ModelDispatch_022(u8 *model, void *arg1) {
+    u8 *state = func_8410B330(model, arg1);
+    D_841911E8 = state;
+    func_84120BB4(model, arg1);
+    func_8411EFE4(arg1);
+    func_8410C934(model, arg1, *(s16 *)(state + 0x98));
+    BattleAnim_ModelDispatchFinish();
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_ModelDispatch_023.s")
+void BattleAnim_ModelDispatch_023(u8 *model, void *arg1) {
+    (void)arg1;
+    *(f32 *)(model + 0x2C) = 45.0f;
+    func_8410CF80(model);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_ModelDispatch_015.s")
+void BattleAnim_ModelDispatch_015(u8 *model, void *arg1) {
+    *(f32 *)(model + 0x2C) = 45.0f;
+    func_8410D088(model, arg1);
+    func_8410E878(model, arg1);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_ModelDispatch_016.s")
+void BattleAnim_ModelDispatch_016(u8 *model, void *arg1) {
+    *(f32 *)(model + 0x2C) = 45.0f;
+    func_8410E73C(model, arg1);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_ModelDispatch_044.s")
+void BattleAnim_ModelDispatch_044(u8 *model, void *arg1) {
+    *(f32 *)(model + 0x2C) = 45.0f;
+    func_8410E73C(model, arg1);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_ModelDispatch_071.s")
+void BattleAnim_ModelDispatch_071(u8 *model, void *arg1) {
+    u8 *state = func_8410B330(model, arg1);
+    D_841911E8 = state;
+    func_8410EA58(model, arg1, *(s16 *)(state + 0x98));
+    BattleAnim_ModelDispatchFinish();
+}
 #endif
 
 #ifdef VERSION_US
