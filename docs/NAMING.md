@@ -138,6 +138,17 @@ and fallback payload forms and its format-specific consumers are not yet
 settled. Fragment-to-state assignments remain hypotheses until each state's
 loader call site is audited.
 
+## Phase 3.3: audio request-id edge
+
+The small audio helpers at `0x800355D4` and `0x800355E4` are now named from
+their shared global and call sites. `Audio_RequestEvent` suppresses duplicate
+ids, forwards a changed id to the resident dispatcher at `0x80021ED8`, and
+stores it as the current request. `Audio_ResetRequestId` writes the sentinel
+`-1`; the game thread calls it when leaving the minigame state. This establishes
+the request/reset edge without claiming that the larger `0x800354B4` orchestration
+function is a music-only API; its mode and task transitions remain for the
+audio-thread pass.
+
 ## Phase 1: the Stadium 1 transfer
 the 676 is a machine-verified correspondence between the two ROMs' machine code.
 

@@ -1016,11 +1016,11 @@ void func_80033ED0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800355D4.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Audio_ResetRequestId.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800355E4.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Audio_RequestEvent.s")
 #endif
 
 #ifdef VERSION_US

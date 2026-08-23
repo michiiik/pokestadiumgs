@@ -42,6 +42,14 @@
    "Fragment_RelocateAndReset",
    "called by the archive loader after Fragment_Register; relocates the fragment then resets the main-pool state to the fragment end offset"
   ],
+  "func_800355D4": [
+   "Audio_ResetRequestId",
+   "writes -1 to the shared audio request-id slot; called after the minigame state returns to the game-state loop"
+  ],
+  "func_800355E4": [
+   "Audio_RequestEvent",
+   "deduplicates an audio event id against the shared request slot, forwards changed ids to the large audio dispatcher at 0x80021ED8, and records the new id"
+  ],
   "func_83503918": [
    "fragment1_main",
    "fragment 1 entry: target of the J at offset 0 of the fragment header trampoline (rom 0xa8a80, vram 0x83500000)"
