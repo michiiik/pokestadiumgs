@@ -206,23 +206,23 @@ extern u8 D_80128574[]; s32 func_80057A5C(s32 index) { return D_80128574[index *
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005A014.s")
+void func_8005A014(s32 arg0) { func_80059EF8(arg0, 1); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005A034.s")
+void func_8005A034(s32 arg0) { func_80059EF8(arg0, 2); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005A054.s")
+void func_8005A054(s32 arg0) { func_80059EF8(arg0, 5); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005A074.s")
+void func_8005A074(s32 arg0) { func_80059EF8(arg0, 8); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005A094.s")
+void func_8005A094(s32 arg0) { func_80059EF8(arg0, 16); }
 #endif
 
 #ifdef VERSION_US
