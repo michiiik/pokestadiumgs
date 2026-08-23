@@ -126,9 +126,9 @@ void func_8004DCFC(void) { func_8004DB5C(); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004DE84.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004DEF8.s")
+void func_8004DEF8(s32 arg0) { func_8004DE84(arg0, 0); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004DF18.s")
+void func_8004DF18(s32 arg0, s32 arg1) { func_8004DF38(arg0, arg1, 0); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004DF38.s")
 
