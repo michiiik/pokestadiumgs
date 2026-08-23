@@ -18,7 +18,9 @@ void func_80042B14(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_80042B20.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_80042BB0.s")
+void func_80042BB0(u16 *arg0) {
+    *arg0 &= (u16)~2;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_80042BC0.s")
 
@@ -58,5 +60,9 @@ void func_80042B14(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_800436CC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_800436E8.s")
+extern s32 D_80094C60;
+
+s32 func_800436E8(void) {
+    return D_80094C60;
+}
 #endif
