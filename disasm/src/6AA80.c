@@ -2,6 +2,28 @@
 
 extern void* func_80069F20(s32 preserveState, s32 unused1, s32 unused2);
 
+/* Battle scene bookkeeping record.  The assembly helpers below access only
+ * these fields; keeping the intervening bytes opaque preserves the original
+ * ABI without guessing at the rest of the structure. */
+typedef struct BattleSceneRecord {
+    u16 field00;
+    u16 field02;
+    u8 padding04[2];
+    s16 field06;
+    u8 padding08[8];
+    s16 field10;
+    s16 field12;
+    s16 field14;
+    s16 field16;
+    u16 field18;
+    u8 field1A;
+    u8 field1B;
+    u32 field1C;
+} BattleSceneRecord;
+
+#define D_8009DF70 (*(BattleSceneRecord **)0x8009DF70)
+#define D_8009DF74 (*(u16 *)0x8009DF74)
+
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_80069E80.s")
 
@@ -19,7 +41,9 @@ void* BattleScene_ResetParticipantModelFlags(s32 preserveState) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006A278.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006A2EC.s")
+void func_8006A2EC(void) {
+    D_8009DF70 = NULL;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006A2F8.s")
 
@@ -31,15 +55,36 @@ void* BattleScene_ResetParticipantModelFlags(s32 preserveState) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006A3B8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006A3E0.s")
+u16 func_8006A3E0(void) {
+    if (D_8009DF70 == NULL) {
+        return 0xFFFF;
+    }
+    return D_8009DF70->field00;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006A400.s")
+s32 func_8006A400(u16 value) {
+    if (D_8009DF70 == NULL) {
+        return 0;
+    }
+    D_8009DF70->field02 = value;
+    return 1;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006A424.s")
+s32 func_8006A424(void) {
+    if (D_8009DF70 == NULL) {
+        return 0;
+    }
+    return D_8009DF70->field02;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006A444.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006A48C.s")
+s32 func_8006A48C(void) {
+    if (D_8009DF70 == NULL) {
+        return -1;
+    }
+    return D_8009DF70->field06;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006A4AC.s")
 
@@ -61,27 +106,49 @@ void* BattleScene_ResetParticipantModelFlags(s32 preserveState) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006AC4C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006AC70.s")
+s32 func_8006AC70(void) {
+    if (D_8009DF70 == NULL) {
+        return -1;
+    }
+    return D_8009DF70->field12;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006AC90.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006ACCC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006ACF0.s")
+s32 func_8006ACF0(void) {
+    if (D_8009DF70 == NULL) {
+        return 0;
+    }
+    return D_8009DF70->field16;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006AD10.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006AE90.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006AEB4.s")
+s32 func_8006AEB4(void) {
+    if (D_8009DF70 == NULL) {
+        return -1;
+    }
+    return D_8009DF70->field14;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006AED4.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006AF28.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006AF84.s")
+u32 func_8006AF84(void) {
+    return D_8009DF70->field1C;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006AF94.s")
+s32 func_8006AF94(void) {
+    if (D_8009DF70 == NULL) {
+        return -1;
+    }
+    return D_8009DF70->field10;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006AFB4.s")
 
@@ -93,11 +160,29 @@ void* BattleScene_ResetParticipantModelFlags(s32 preserveState) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006B428.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006B790.s")
+s32 func_8006B790(u8 value) {
+    if (D_8009DF70 == NULL) {
+        return 0;
+    }
+    D_8009DF70->field1A = value;
+    return 1;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006B7B4.s")
+s32 func_8006B7B4(u8 value) {
+    if (D_8009DF70 == NULL) {
+        return 0;
+    }
+    D_8009DF70->field1B = value;
+    return 1;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006B7D8.s")
+s32 func_8006B7D8(u16 value) {
+    if (D_8009DF70 == NULL) {
+        return 0;
+    }
+    D_8009DF70->field18 = value;
+    return 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006B7FC.s")
 
@@ -139,9 +224,13 @@ void* BattleScene_ResetParticipantModelFlags(s32 preserveState) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006CBB8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006CBFC.s")
+void func_8006CBFC(void) {
+    D_8009DF74 = 1;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006CC0C.s")
+void func_8006CC0C(void) {
+    D_8009DF74 = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006CC18.s")
 

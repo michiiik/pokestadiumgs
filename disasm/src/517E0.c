@@ -711,21 +711,160 @@ void func_800555B4(s32 commit) {
     D_800972C0 = savedBank;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_8005565C.s")
+void func_8005565C(s32 commit) {
+    s32 savedBank = D_800972C0;
+    s32 bank;
+    s32 record;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_8005577C.s")
+    D_800972C0 = 4;
+    for (bank = 4; bank < 6; bank++) {
+        for (record = 0; record < 10; record++) {
+            if (commit == 0) {
+                func_80055260(0x10, record);
+            } else {
+                Save_ResetAndCommitTypedRecord(0x10, record);
+            }
+        }
+        D_800972C0 = bank + 1;
+    }
+    D_800972C0 = savedBank;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800557E4.s")
+    for (record = 0; record < 1; record++) {
+        if (commit == 0) {
+            func_80055260(0x11, record);
+        } else {
+            Save_ResetAndCommitTypedRecord(0x11, record);
+        }
+    }
+    if (commit == 0) {
+        func_80055260(0x16, 0);
+        func_80055260(0x17, 0);
+    } else {
+        Save_ResetAndCommitTypedRecord(0x16, 0);
+        Save_ResetAndCommitTypedRecord(0x17, 0);
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055948.s")
+void func_8005577C(s32 commit) {
+    s32 record;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055A34.s")
+    for (record = 1; record < 14; record++) {
+        if (commit == 0) {
+            func_80055260(0x11, record);
+        } else {
+            Save_ResetAndCommitTypedRecord(0x11, record);
+        }
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055A74.s")
+void func_800557E4(s32 commit) {
+    s32 record;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055A9C.s")
+    if (commit == 0) {
+        func_80055260(0x14, 0);
+        func_80055260(0x15, 0);
+        func_80055260(0x13, 0);
+        func_80055260(0x18, 0);
+        func_80055260(0x19, 0);
+        func_80055260(0x1A, 0);
+        func_80055260(0x1B, 0);
+        func_80055260(0x1C, 0);
+        func_80055260(0x1D, 0);
+        func_80055260(0x1E, 0);
+    } else {
+        Save_ResetAndCommitTypedRecord(0x14, 0);
+        Save_ResetAndCommitTypedRecord(0x15, 0);
+        Save_ResetAndCommitTypedRecord(0x13, 0);
+        Save_ResetAndCommitTypedRecord(0x18, 0);
+        Save_ResetAndCommitTypedRecord(0x19, 0);
+        Save_ResetAndCommitTypedRecord(0x1A, 0);
+        Save_ResetAndCommitTypedRecord(0x1B, 0);
+        Save_ResetAndCommitTypedRecord(0x1C, 0);
+        Save_ResetAndCommitTypedRecord(0x1D, 0);
+        Save_ResetAndCommitTypedRecord(0x1E, 0);
+    }
+    for (record = 0; record < 2; record++) {
+        if (commit == 0) {
+            func_80055260(0x12, record);
+        } else {
+            Save_ResetAndCommitTypedRecord(0x12, record);
+        }
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055B14.s")
+void func_80055948(s32 bank) {
+    SaveRecordEntry *entry;
+
+    if (bank < 0 || bank >= 4) {
+        return;
+    }
+    entry = &D_801281C0[bank * 5];
+    if ((entry->flags & 1) != 0) {
+        return;
+    }
+    if (func_800550E8(bank) == 0) {
+        return;
+    }
+    switch (bank) {
+        case 0:
+            func_800555B4(0);
+            break;
+        case 1:
+            func_8005565C(0);
+            break;
+        case 2:
+            func_8005577C(0);
+            break;
+        case 3:
+            func_800557E4(0);
+            break;
+    }
+    entry->flags |= 1;
+}
+
+void func_80055A34(void) {
+    s32 bank;
+
+    for (bank = 0; bank < 4; bank++) {
+        func_80055948(bank);
+    }
+}
+
+s32 func_80055A74(s32 bank) {
+    s32 previous = D_800972C0;
+
+    if (bank >= 0 && bank < 6) {
+        D_800972C0 = bank;
+    }
+    return previous;
+}
+
+extern void func_80053B38(s32 type, s32 record, s32 offset, u8 *result);
+extern void func_80053F04(s32 type, s32 record, s32 offset, u8 *result);
+
+s32 func_80055A9C(u8 *dst, s32 record) {
+    u8 *src;
+
+    if (record < 0 || record >= 10) {
+        return 0;
+    }
+    src = func_80050E88(0, D_800972C0, record);
+    bcopy(src, dst, 0x180);
+    func_80051BF0(0x10, record, 2);
+    return 1;
+}
+
+s32 func_80055B14(u8 *dst, s32 record) {
+    u8 *src;
+
+    if (record < 0 || record >= 10) {
+        return 0;
+    }
+    src = func_80050E88(0, D_800972C0, record);
+    bcopy(dst, src, 0x180);
+    func_80051BF0(0x10, record, 2);
+    return 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/Deck_FindFirstFreeTeamSlot.s")
 
@@ -743,15 +882,51 @@ void func_800555B4(s32 commit) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055F6C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80056024.s")
+u32 func_80056024(s32 type) {
+    static const u32 masks[] = {
+        1, 2, 4, 8, 0x10, 0x20, 0x40, 0x80, 0x100,
+        1, 2, 1, 2, 4, 8, 0x10, 0x20, 0x40, 0x80, 0x100,
+    };
+
+    if (type < 5 || type >= 25) {
+        return 0;
+    }
+    return masks[type - 5];
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800560F0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80056184.s")
+s32 func_80056184(u8 *data) {
+    s32 result = 1;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800561E4.s")
+    if ((data[6] & 1) == 0 || (data[9] & 1) == 0 ||
+        (data[7] & 0xF) != 0xF || (data[8] & 0xF) != 0xF) {
+        result = 0;
+    }
+    return result;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800562B8.s")
+s32 func_800562B8(s32 active) {
+    u8 state[0x38];
+    u8 *entry;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_8005633C.s")
+    entry = func_80050CAC(func_80050D20(0x14, -1), active);
+    if (entry == NULL) {
+        return 0;
+    }
+    func_80055EF0(state, active);
+    return state[0x26] != 0;
+}
+
+s32 func_8005633C(void) {
+    s32 result = 0;
+
+    if (func_800562B8(0) != 0) {
+        result = 1;
+    }
+    if (func_800562B8(1) != 0) {
+        result = 2;
+    }
+    return result;
+}
 #endif
