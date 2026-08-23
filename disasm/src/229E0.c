@@ -234,7 +234,15 @@ s32 func_80025D44(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025D64.s")
+extern void func_80018728(u32 command, u32 arg);
+
+void func_80025D64(s32 value) {
+    if ((u8)value != 0) {
+        func_80018728(0xF1FF0000, 0);
+    } else {
+        func_80018728(0xF2FF0000, 0);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -242,7 +250,12 @@ s32 func_80025D44(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025E7C.s")
+extern void func_80025DB0(void);
+
+void func_80025E7C(void) {
+    func_80025DB0();
+    func_80018728(0xE2000700, (u32)0x800D1910);
+}
 #endif
 
 #ifdef VERSION_US
