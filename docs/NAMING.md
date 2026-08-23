@@ -161,6 +161,18 @@ the ROM-start operands, not an inference from fragment names. Individual
 fragment init/update/draw roles remain open until their callback targets and
 per-minigame state tables are audited.
 
+The first minigame state helpers are now named from direct body and caller
+evidence. `Minigame_StateInit` initializes the `D_801291E0` state block,
+`Minigame_SetModeDefaults` seeds `D_8012B3E8`, and
+`Minigame_UpdateResultState` maps the loaded fragment result back into that
+mode block. The controller-facing wrappers are `Minigame_ProcessInput`,
+`Minigame_UpdateControllerState`, and `Minigame_ResetControllerPoll`; their
+fragment callbacks respectively scan four controller records, normalize the
+per-loop controller state, and clear those records while resetting the GB
+Tower poll mask. The unresolved `Minigame` callback at `func_80072030` is left
+address-named because its three-argument fragment callback still needs a
+caller-level semantic cross-check.
+
 ## Phase 3.5: GB-save format and checksum helpers
 
 The save/Controller Pak pass adds two names in the GB-save translation unit.

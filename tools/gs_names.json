@@ -25,7 +25,31 @@
   "Thread4_CreateThread": "matches Stadium 1 Audio_StartThread (normalised). Same situation: if S1 is right that thread 4 is the audio thread, this is worth renaming once corroborated from the thread's entry point.",
   "Vi_SelectMode": "matches Stadium 1 Video_SetMode (callgraph). Same function, two spellings of the same idea. Upstream name kept."
  },
-  "functions": {
+ "functions": {
+  "func_80072070": [
+   "Minigame_UpdateControllerState",
+   "Game_State10_Minigame calls this every loop with the minigame state and a controller slot byte; its resolved fragment callback normalizes controller input and updates per-pad state"
+  ],
+  "func_80072184": [
+   "Minigame_StateInit",
+   "Game_State10_Minigame calls this once on D_801291E0; the body initializes the minigame state fields at offsets 0x2180-0x2184 and its embedded queue structures"
+  ],
+  "func_800721D8": [
+   "Minigame_SetModeDefaults",
+   "Game_State10_Minigame calls this once on D_8012B3E8; the body writes the initial mode value 4 and enables the adjacent flag"
+  ],
+  "func_80072650": [
+   "Minigame_UpdateResultState",
+   "Game_State10_Minigame calls this after loading a minigame fragment; the body maps state field 0x2184 and the fragment result into D_8012B3E8"
+  ],
+  "func_80072740": [
+   "Minigame_ProcessInput",
+   "Game_State10_Minigame calls this once after state initialization; its resolved fragment callback scans four controller records and updates their input flags"
+  ],
+  "func_80072774": [
+   "Minigame_ResetControllerPoll",
+   "Game_State10_Minigame calls this before each loop dispatch; its resolved callback clears four controller records and resets the GB Tower poll mask"
+  ],
   "func_84129D8C": [
    "BattleAnim_Table_84185F10_000",
    "fragment79 function-pointer table at 0x84185F10 selects this handler at slot 0; table-level evidence fixes its dispatch position while body semantics remain separate"
