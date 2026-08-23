@@ -62,7 +62,10 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE00CBC.s")
+extern f32 D_80128C54[];
+void func_8AE00CBC(f32 arg0) {
+    D_80128C54[1] = arg0;
+}
 #endif
 
 #ifdef VERSION_US
