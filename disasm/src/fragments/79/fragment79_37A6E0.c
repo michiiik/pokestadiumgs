@@ -15,6 +15,15 @@ extern void Camera_ComputeEyeFromAngles(void *arg0, void *arg1, f32 arg2, s16 ar
 extern f32 func_8410EB50(void);
 extern void func_8411FEE8(s32 arg0);
 extern u32 D_84193DD0[];
+extern u32 D_841911F4;
+extern u32 D_84183D50;
+extern f32 D_84188FEC;
+extern s32 func_841139D0(void *arg0);
+extern void func_841136E8(void *arg0);
+extern void func_84112158(void *arg0, s32 arg1);
+extern void func_841137F8(void *arg0);
+extern void func_84111C1C(void);
+extern void func_84113560(s32 arg0);
 extern s32 func_8411E1F8(void *arg0);
 extern void func_8410B8FC(void *arg0, void *arg1, s16 arg2);
 extern void BattleAnim_StepToS16(s16 *value, s16 target, s16 step);
@@ -59,6 +68,7 @@ extern u8 D_84183944[];
 extern u8 D_84183960[];
 extern u8 *D_8419120C;
 extern u8 *D_84193FA0;
+extern u8 *D_80087200;
 
 static void BattleAnim_ModelDispatchFinish(void) {
     if (D_841911E8 != NULL) {
@@ -641,7 +651,49 @@ void BattleAnim_ModelDispatch_141(u8 *model, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_ModelDispatch_212.s")
+void BattleAnim_ModelDispatch_212(u8 *model, void *arg1) {
+    u8 *state = func_8410B330(model, arg1);
+    u8 *engine = D_80087200;
+    u8 *object;
+
+    D_841911E8 = state;
+    *(f32 *)(model + 0x2C) = 45.0f;
+
+    if ((u16)(*(u16 *)(D_84193DD0 + 1) - 0x30) < 6) {
+        object = (u8 *)*(u32 *)state;
+        Vec3f_SetComponentsDuplicate(object + 0xB4, 0.0f, 0.0f, 40.0f);
+        if (*(u16 *)(engine + 6) & 0x400)
+            *(f32 *)(state + 0x74) -= 8.0f;
+        if (*(u16 *)(engine + 6) & 0x800)
+            *(f32 *)(state + 0x74) += 8.0f;
+        D_8419120C[1] |= 1;
+    } else if (*(s16 *)(D_84193FA0 + 0x90) != 0) {
+        object = (u8 *)*(u32 *)D_841911E8;
+        if (*(u16 *)(engine + 6) & 4)
+            *(f32 *)(object + 0xB8) -= 4.0f;
+        if (*(u16 *)(engine + 6) & 8)
+            *(f32 *)(object + 0xB8) += 4.0f;
+        if (*(u16 *)(engine + 6) & 1)
+            *(f32 *)(object + 0xB4) -= 4.0f;
+        if (*(u16 *)(engine + 6) & 2)
+            *(f32 *)(object + 0xB4) += 4.0f;
+        if (*(u16 *)(engine + 6) & 0x400)
+            *(f32 *)(state + 0x74) -= 8.0f;
+        if (*(u16 *)(engine + 6) & 0x800)
+            *(f32 *)(state + 0x74) += 8.0f;
+    }
+
+    engine = D_80087200;
+    object = (u8 *)*(u32 *)D_841911E8;
+    if (*(f32 *)(engine + 0x18) != 0.0f)
+        *(s16 *)(state + 0x92) += (s16)(*(f32 *)(engine + 0x18) * 8.0f);
+    if (*(f32 *)(engine + 0x1C) != 0.0f)
+        *(s16 *)(state + 0x90) += (s16)(*(f32 *)(engine + 0x1C) * 8.0f);
+    Camera_ComputeEyeFromAngles(object + 0xB4, object + 0xA8,
+                                *(f32 *)(state + 0x74),
+                                *(s16 *)(state + 0x90),
+                                *(s16 *)(state + 0x92));
+}
 #endif
 
 #ifdef VERSION_US
@@ -1017,15 +1069,47 @@ void func_8411259C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_Dispatch_001.s")
+void BattleAnim_Dispatch_001(void *arg0) {
+    u8 *state = arg0;
+    s32 slot;
+
+    if (func_841139D0(state) == 0 && *(s16 *)(state + 0x40) != 0) {
+        func_84112158(state, 0xFB);
+    }
+    func_841136E8(state);
+    slot = D_841911F4;
+    *(u32 *)(state + 0x5C8 + slot * 4) = D_84183D50;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_Dispatch_190.s")
+void BattleAnim_Dispatch_190(void *arg0) {
+    u8 *state = arg0;
+    s32 slot;
+    s32 index;
+
+    if (func_841139D0(state) == 0 && *(s16 *)(state + 0x40) != 0) {
+        func_84112158(state, 0xFB);
+    }
+    func_841136E8(state);
+    index = func_8411E1F8(state);
+    if (*(u16 *)((u8 *)D_84193DD0 + index * 0x10 + 0x12) & 8) {
+        Vec3f_SetComponentsDuplicate(state + 0x30, D_84188FEC,
+                                      D_84188FEC, D_84188FEC);
+    }
+    slot = D_841911F4;
+    *(u32 *)(state + 0x5C8 + slot * 4) = D_84183D50;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_Dispatch_002.s")
+void BattleAnim_Dispatch_002(void *arg0) {
+    u8 *state = arg0;
+
+    if (func_841139D0(state) == 0) {
+        func_841137F8(state);
+    }
+}
 #endif
 
 #ifdef VERSION_US
