@@ -4,9 +4,9 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_800609D0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060A4C.s")
+u16 func_80060A4C(const u8 *arg0) { return (u16)((arg0[0] << 8) | arg0[1]); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060A64.s")
+u32 func_80060A64(const u8 *arg0) { return ((u32)arg0[0] << 16) | ((u32)arg0[1] << 8) | arg0[2]; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060A84.s")
 
@@ -98,7 +98,7 @@ extern u8 D_800976A0[]; u8 func_80061FD0(s32 index) { return D_800976A0[index]; 
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80062008.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80062030.s")
+s32 func_80062030(s32 value) { if (value > 0 && value < 0xFC) return value; return 0xFC; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80062054.s")
 
