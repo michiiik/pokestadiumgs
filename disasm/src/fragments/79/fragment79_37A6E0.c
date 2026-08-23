@@ -631,7 +631,10 @@ void func_8411300C(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_841133EC.s")
+s32 func_841133EC(s32 arg0) {
+    extern u8 D_84193DDC;
+    return D_84193DDC & 0xD0;
+}
 #endif
 
 #ifdef VERSION_US
