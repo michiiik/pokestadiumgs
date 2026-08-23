@@ -12,5 +12,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/78D0/func_80006DEC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/78D0/func_80006E2C.s")
+extern s32 D_800D0520;
+extern s32 D_800D0510;
+s32 func_80006E2C(void) { return D_800D0520 - D_800D0510; }
 #endif

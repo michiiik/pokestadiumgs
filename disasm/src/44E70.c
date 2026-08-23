@@ -40,7 +40,9 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_80046634.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_800468A0.s")
+extern void func_8004657C(void);
+extern void func_80046634(s32);
+void func_800468A0(s32 arg0) { func_8004657C(); func_80046634(arg0); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_800468C8.s")
 
