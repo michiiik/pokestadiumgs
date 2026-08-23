@@ -524,15 +524,30 @@ void func_84145B24(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84146AB8.s")
+extern u16 D_84186ED8, D_84186EDC;
+
+void func_84146AB8(u8 *arg0) {
+    *(u16 *)(arg0 + 0xA) = D_84186ED8;
+    *(u16 *)(arg0 + 0xC) = D_84186EDC;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84146AD4.s")
+extern u16 D_84186EE0, D_84186EE4;
+
+void func_84146AD4(u8 *arg0) {
+    *(u16 *)(arg0 + 0xA) = D_84186EE0;
+    *(u16 *)(arg0 + 0xC) = D_84186EE4;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84146AF0.s")
+extern u16 D_84186EE8, D_84186EEC;
+
+void func_84146AF0(u8 *arg0) {
+    *(u16 *)(arg0 + 0xA) = D_84186EE8;
+    *(u16 *)(arg0 + 0xC) = D_84186EEC;
+}
 #endif
 
 #ifdef VERSION_US
