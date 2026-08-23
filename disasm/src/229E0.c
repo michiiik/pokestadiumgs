@@ -1787,7 +1787,9 @@ void func_8003C970(void) { D_80094904++; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003C988.s")
+typedef struct { char pad[0x1A]; u16 unk_1A; } ModelFrame;
+extern ModelFrame *D_80094910; extern u16 D_80094904;
+s32 func_8003C988(void) { s32 var_v1 = 1; if (D_80094910 != NULL) { var_v1 = D_80094910->unk_1A == D_80094904; } return var_v1; }
 #endif
 
 #ifdef VERSION_US
