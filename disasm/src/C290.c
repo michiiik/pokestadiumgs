@@ -2,5 +2,7 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/C290/func_8000B690.s")
+s32 func_8000B690(void) {
+    return 0;
+}
 #endif
