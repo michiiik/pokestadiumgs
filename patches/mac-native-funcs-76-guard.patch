@@ -1,0 +1,16 @@
+--- mac_funcs_76.c
++++ mac_funcs_76.c
+@@ -10264,6 +10264,13 @@
+     ctx->r14 = MEM_W(ctx->r18, 0X2C30);
+     // 0x80017B24: lh          $v1, 0x2BDC($s2)
+     ctx->r3 = MEM_H(ctx->r18, 0X2BDC);
++    // PSR macOS overlay: the audio rate field at s2+0x2BDC is still zero on
++    // this port (the whole audio config block is never populated), and this
++    // value is used as a divisor below. Match the hardware-safe minimum
++    // rather than dividing by zero.
++    if (ctx->r3 == 0) {
++        ctx->r3 = 1;
++    }
+     // 0x80017B28: sw          $ra, 0x24($sp)
+     MEM_W(0X24, ctx->r29) = ctx->r31;
+     // 0x80017B2C: addiu       $t7, $t6, 0x1

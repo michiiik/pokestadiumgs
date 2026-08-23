@@ -1,0 +1,37 @@
+--- mac_funcs_189.c
++++ mac_funcs_189.c
+@@ -4165,6 +4165,34 @@
+ RECOMP_FUNC void func_80021AC0(uint8_t* rdram, recomp_context* ctx) {
+     uint64_t hi = 0, lo = 0, result = 0;
+     int c1cs = 0;
++
++    // PSR macOS overlay: skip Stadium 2's audio subsystem initialization.
++    //
++    // Every audio configuration global this init path consumes reads back as
++    // zero or garbage on this port, because the data that should populate the
++    // audio block at 0x8011BEA0 is never delivered (nothing in the recompiled
++    // game writes it, and func_80015AB8 zero-fills the whole block first).
++    // Concretely, measured live:
++    //   * ALHeap at 0x8011EBD0: base = 0, len = *(0x8011EBD8) - used, and the
++    //     global is 0, so len underflows to 0xFEE7C2DE.
++    //   * voice/channel count at 0x8011E850 = 0x17B83 (96,643) instead of ~32,
++    //     so func_80013EF8's per-voice init loop runs ~96k iterations and
++    //     writes bytes far past the audio block.
++    // Both of those scribble over live RDRAM (the first one wiped the
++    // OSThread structs and OSMesgQueues at 0x800CD000-0x800CE000 and killed
++    // the scheduler outright).
++    //
++    // Running this init with garbage inputs cannot produce working audio -- it
++    // can only corrupt memory -- so the port skips it entirely. The cost is no
++    // sound; the benefit is that boot can proceed. Remove this once the audio
++    // configuration data is actually being loaded.
++    //
++    // func_80021AC0 is a thin wrapper whose whole body is `jal 0x80015AC8`
++    // (the audio init) plus stack frame setup, so returning here skips exactly
++    // that call and nothing else.
++    ctx->r2 = 0;
++    return;
++
+ L_80021AD0:
+     // 0x80021AD0: addiu       $sp, $sp, -0x18
+     ctx->r29 = ADD32(ctx->r29, -0X18);

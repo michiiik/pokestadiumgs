@@ -1,0 +1,61 @@
+--- mac_funcs_21.c
++++ mac_funcs_21.c
+@@ -19844,6 +19844,58 @@
+     ctx->r14 = MEM_W(ctx->r4, 0X0);
+     // 0x800105D0: lw          $t7, 0x8($a0)
+     ctx->r15 = MEM_W(ctx->r4, 0X8);
++
++    // PSR macOS overlay: lazily seed an uninitialized ALHeap.
++    //
++    // Stadium 2 calls its audio init deliberately with (a0=0, a1=0) (see
++    // func_80021B00), so each ALHeap's base/cur/len must be filled in by the
++    // init path. On this port they are never populated: base reads 0 and
++    // len reads back as an underflowed value (observed 0xFEE7C2DE, from
++    // `len = *(0x8011EBD8) - used` where the global is 0). With base+len
++    // enormous the bounds check below never fails, so this function hands
++    // out ever-increasing offsets from 0 -- raw physical addresses, not
++    // KSEG0 pointers -- and func_80010510 then zero-fills from the returned
++    // "pointer" up to hp->cur, wiping ~1 MB of low RDRAM including the
++    // OSThread structs and OSMesgQueues at 0x800CD000-0x800CE000.
++    //
++    // Simply failing the allocation avoids the corruption but leaves the
++    // audio subsystem with no memory, and boot then waits forever on an
++    // audio handshake that never completes. So instead give each distinct
++    // heap a private slice of a reserved region at the top of RDRAM. This
++    // has to happen HERE rather than at init time because func_80015AB8
++    // zero-fills the whole audio block (0x8011BEA0 + 0x6B91), which covers
++    // the heap structs, before any allocation happens.
++    if ((uint32_t)ctx->r14 < 0x80000000u || (uint32_t)ctx->r14 >= 0x80800000u) {
++        static uint32_t psr_heap_hp[8];
++        static uint32_t psr_heap_base[8];
++        static int      psr_heap_n = 0;
++        static uint32_t psr_heap_next = 0x80700000u;   /* top 1 MiB of RDRAM */
++        const uint32_t  psr_hp = (uint32_t)ctx->r4;
++        const uint32_t  psr_slice = 0x00040000u;       /* 256 KiB per heap */
++        uint32_t psr_base = 0;
++        int psr_i;
++        for (psr_i = 0; psr_i < psr_heap_n; psr_i++) {
++            if (psr_heap_hp[psr_i] == psr_hp) { psr_base = psr_heap_base[psr_i]; break; }
++        }
++        if (psr_base == 0 && psr_heap_n < 8 &&
++            psr_heap_next + psr_slice <= 0x80800000u) {
++            psr_base = psr_heap_next;
++            psr_heap_next += psr_slice;
++            psr_heap_hp[psr_heap_n] = psr_hp;
++            psr_heap_base[psr_heap_n] = psr_base;
++            psr_heap_n++;
++        }
++        if (psr_base != 0) {
++            MEM_W(0X0, ctx->r4) = (int32_t)psr_base;              /* base */
++            MEM_W(0X4, ctx->r4) = (int32_t)psr_base;              /* cur  */
++            MEM_W(0X8, ctx->r4) = (int32_t)psr_slice;             /* len  */
++            ctx->r6  = (int32_t)psr_base;   /* a2 = cur  */
++            ctx->r14 = (int32_t)psr_base;   /* t6 = base */
++            ctx->r15 = (int32_t)psr_slice;  /* t7 = len  */
++        } else {
++            ctx->r15 = 0;  /* out of reserved space: fail via the normal path */
++        }
++    }
+     // 0x800105D4: addiu       $v0, $a1, 0xF
+     ctx->r2 = ADD32(ctx->r5, 0XF);
+     // 0x800105D8: addiu       $at, $zero, -0x10

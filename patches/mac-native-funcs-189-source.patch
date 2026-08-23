@@ -1,0 +1,7 @@
+--- CMakeLists.txt
++++ CMakeLists.txt
+@@ -134,3 +134,5 @@
+ file(GLOB FUNC_C_SOURCES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/generated/*.c)
++list(FILTER FUNC_C_SOURCES EXCLUDE REGEX "/funcs_189\\.c$")
+ target_sources(RecompiledFuncs PRIVATE ${FUNC_C_SOURCES})
++target_sources(RecompiledFuncs PRIVATE ${CMAKE_SOURCE_DIR}/mac_funcs_189.c)

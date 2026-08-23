@@ -1,0 +1,6 @@
+--- mac_funcs_76.c
++++ mac_funcs_76.c
+@@ -1,2 +1,2 @@
+#include "recomp.h"
+-#include "funcs.h"
++#include "generated/funcs.h"

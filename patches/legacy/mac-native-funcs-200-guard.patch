@@ -1,0 +1,33 @@
+--- mac_funcs_200.c
++++ mac_funcs_200.c
+@@ -6512,6 +6512,30 @@
+     ctx->r17 = 0 | 0;
+     // 0x80013F7C: mflo        $s3
+     ctx->r19 = lo;
++
++    // PSR macOS overlay: clamp the audio voice-allocation count.
++    //
++    // s3 here is the number of voices to allocate, computed as
++    // (*(s2+0x2C28) << 6) * *(s2+0x2BDC) -- both audio buffer parameters that
++    // this port never receives real values for (the whole audio config block
++    // at 0x8011BEA0 is zero-filled by func_80015AB8 and nothing repopulates
++    // it). Measured live it comes out as 0x17B83 = 96,643 voices instead of a
++    // console-plausible count.
++    //
++    // That is not merely slow: the per-voice loop below writes bytes through
++    // an incrementing pointer, so 96k iterations scribble ~96 KB past the end
++    // of the audio block, and the owning thread (func_80035174) never leaves
++    // audio init. That thread is also the one that ticks the counter at
++    // 0x8009487C which Game_Thread spin-waits on in func_800354B4, so the
++    // whole game stalls before it ever submits a display list.
++    //
++    // libultra's synthesizer tops out well under 64 voices, so clamping here
++    // keeps init bounded and lets the thread reach its main loop. Remove once
++    // the audio configuration data is actually being delivered.
++    if ((uint32_t)ctx->r19 > 64u) {
++        ctx->r19 = 64;
++    }
++
+     // 0x80013F80: blezl       $s3, L_80013FF4
+     if (SIGNED(ctx->r19) <= 0) {
+         // 0x80013F84: lw          $a0, 0x29B0($s2)

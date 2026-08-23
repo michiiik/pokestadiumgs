@@ -1,0 +1,8 @@
+--- CMakeLists.txt
++++ CMakeLists.txt
+@@ -130,3 +130,6 @@
+ file(GLOB FUNC_C_SOURCES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/generated/*.c)
+ target_sources(RecompiledFuncs PRIVATE ${FUNC_C_SOURCES})
++target_sources(RecompiledFuncs PRIVATE ${CMAKE_SOURCE_DIR}/mac_pi_helpers.c)
++set_source_files_properties(${CMAKE_SOURCE_DIR}/mac_pi_helpers.c PROPERTIES
++    COMPILE_DEFINITIONS "func_8FF00020__rom_FF86F5D0=mac_unused_func_8FF00020__rom_FF86F5D0;func_8007BE88=mac_unused_func_8007BE88")

@@ -1,0 +1,13 @@
+--- mac_pi_helpers.c
++++ mac_pi_helpers.c
+@@ -1,6 +1,9 @@
+ #include "recomp.h"
+-#include "funcs.h"
++#include "generated/funcs.h"
++
++RECOMP_FUNC void static_5_8004166C(uint8_t* rdram, recomp_context* ctx);
++RECOMP_FUNC void static_5_80021670(uint8_t* rdram, recomp_context* ctx);
+ 
+ RECOMP_FUNC void func_8FF00020__rom_FF86F5D0(uint8_t* rdram, recomp_context* ctx) {
+     uint64_t hi = 0, lo = 0, result = 0;
+     int c1cs = 0;

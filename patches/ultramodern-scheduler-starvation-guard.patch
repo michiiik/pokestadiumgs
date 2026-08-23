@@ -1,0 +1,65 @@
+Not a literal unified diff (scheduler_tick.cpp is a runtime-authored file with
+no pristine baseline to diff against). This documents, for the record, the
+starvation-detection addition made directly to
+lib/N64ModernRuntime/ultramodern/src/scheduler_tick.cpp during the 2026-08-22
+macOS boot investigation (see MACOS_BOOT_HANDOFF.md).
+
+Problem: the existing voluntary-preemption monitor only detects "no context
+switch into any game thread for kStuckThresholdMs (200ms)". That misses the
+starvation case actually hit during Stadium 2 boot: several higher-priority
+threads (100/90/80) keep trading control among *themselves*, so
+g_last_switch_ms keeps advancing and the monitor never fires, while a lower
+-priority thread ("Thread5", priority 40) sits at the head of running_queue
+the entire time and never gets a turn. ~150ms after being queued, unrelated
+code running on one of the higher-priority threads happens to write into
+memory that is still Thread5's un-run OSThread struct (a real, ROM-accurate
+hardcoded guest address — not a recompiler bug), corrupting it before it ever
+ran.
+
+Fix: track how long the SAME thread has sat at the head of running_queue
+(via the already-exported `ultramodern_running_queue_head()`), independent of
+whether switches are happening elsewhere, and fold that into the same
+g_should_yield flag / yield_to_any_queued() delivery path the existing
+"stuck thread" check already uses. Uses a much tighter threshold
+(kStarvationThresholdMs = 40ms vs. the 200ms stuck threshold) and a faster
+monitor poll (10ms vs. 50ms), since a queued-but-never-run thread is abnormal
+much sooner than a genuinely-stuck busy loop, and the corrupting write in
+this case has been observed within ~150ms of the thread being queued.
+
+Status: this DID NOT fully resolve the Stadium 2 boot stall — the corrupting
+write happens essentially immediately (same/adjacent instruction stream)
+after Thread5 is queued, faster than any host-thread monitor polling
+interval can reliably win the race. It is left in place as a genuine,
+low-risk improvement to general scheduler fairness (any other starvation
+scenario with a >40ms gap will now self-correct), but the Stadium 2 stall
+itself needs a different fix — see MACOS_BOOT_HANDOFF.md's "Current
+blocker" section for the precise call chain and next-step guidance.
+
+Changes made to scheduler_tick.cpp:
+
+1. Added `extern "C" uint32_t ultramodern_running_queue_head(void);` forward
+   declaration (already defined in threadqueue.cpp).
+
+2. Added two new atomics next to g_last_switch_ms:
+     std::atomic<uint32_t> g_run_queue_head_seen{0};
+     std::atomic<uint64_t> g_run_queue_head_since_ms{0};
+
+3. Added `constexpr uint64_t kStarvationThresholdMs = 40;` next to
+   kStuckThresholdMs, and reduced kMonitorIntervalMs from 50 to 10.
+
+4. In monitor_func(), before the existing "is anything stuck" check, added:
+     uint32_t head = ultramodern_running_queue_head();
+     if (head == 0) {
+         g_run_queue_head_seen.store(0, std::memory_order_relaxed);
+         g_run_queue_head_since_ms.store(0, std::memory_order_relaxed);
+     } else if (head != g_run_queue_head_seen.load(std::memory_order_relaxed)) {
+         g_run_queue_head_seen.store(head, std::memory_order_relaxed);
+         g_run_queue_head_since_ms.store(now, std::memory_order_relaxed);
+     } else {
+         uint64_t since = g_run_queue_head_since_ms.load(std::memory_order_relaxed);
+         if (since != 0 && now - since > kStarvationThresholdMs) {
+             g_should_yield.store(1, std::memory_order_relaxed);
+             continue;
+         }
+     }
+   (the existing last-switch check follows unchanged after this block)
