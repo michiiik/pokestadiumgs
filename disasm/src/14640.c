@@ -185,6 +185,8 @@ extern void *func_8000CDB8(void *oldTask, void *audioLength,
 #define AUDIO_MIXER_TASK_END ((void *)0x800871D0)
 #define AUDIO_MIXER_TASK_DRAM ((void *)0x8008FC90)
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/LinkAlias_func_80017B00.s")
+#if 0
 void *Audio_MixerStep(void) {
     u8 *state = AUDIO_MIXER_STATE;
     s32 divisor = *(s16 *)(state + 0x2BDC);
@@ -345,11 +347,12 @@ void *Audio_MixerStep(void) {
 
     task = *(void **)(state + 0x2C4C);
     if (*(s16 *)(state + 0x2BDC) == 1) {
-        return task;
-    }
+    return task;
+}
     AUDIO_MIXER_RESIDENT_TASK = task;
     return NULL;
 }
+#endif
 #endif
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80018078.s")
