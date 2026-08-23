@@ -1019,13 +1019,21 @@ void Audio_EnableModeFlag(void) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800354B4.s")
 #endif
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Audio_ResetRequestId.s")
-#endif
+extern s32 D_80094864;
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Audio_RequestEvent.s")
-#endif
+void Audio_ResetRequestId(void) {
+    D_80094864 = -1;
+}
+
+extern void Audio_DispatchCommand(s32 eventId);
+
+s32 Audio_RequestEvent(s32 eventId) {
+    if (eventId != D_80094864) {
+        D_80094864 = eventId;
+        Audio_DispatchCommand(eventId);
+    }
+    return 0;
+}
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035620.s")
