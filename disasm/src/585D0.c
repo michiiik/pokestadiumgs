@@ -629,19 +629,19 @@ extern u8 D_801285B8[]; u8 func_8005D948(s32 index) { return D_801285B8[index * 
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005DDF8.s")
+extern u8 D_80128570[]; s32 func_8005DDF8(s32 index) { return (*(u32 *)(D_80128570 + index * 112) & 0x200) != 0; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005DE1C.s")
+extern u8 D_80128570[]; s32 func_8005DE1C(s32 index) { return (*(u32 *)(D_80128570 + index * 112) & 0x200000) != 0; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005DE44.s")
+extern u8 D_80128570[]; s32 func_8005DE44(s32 index) { return (*(u32 *)(D_80128570 + index * 112) & 0x400) != 0; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005DE68.s")
+extern u8 D_80128570[]; s32 func_8005DE68(s32 index) { return (*(u32 *)(D_80128570 + index * 112) & 0x1000) != 0; }
 #endif
 
 #ifdef VERSION_US
@@ -649,11 +649,11 @@ extern u8 D_801285B8[]; u8 func_8005D948(s32 index) { return D_801285B8[index * 
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005DEB4.s")
+extern u8 D_80128570[]; s32 func_8005DEB4(s32 index) { return (*(u32 *)(D_80128570 + index * 112) & 0x800) != 0; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005DED8.s")
+extern u8 D_80128570[]; s32 func_8005DED8(s32 index) { return (*(u32 *)(D_80128570 + index * 112) & 0x4000) != 0; }
 #endif
 
 #ifdef VERSION_US
