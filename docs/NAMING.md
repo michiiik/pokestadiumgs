@@ -11,8 +11,9 @@ Turning `func_800015C0` into `DisplayTask_Initialize`.
 ## Why this is not the Stadium 1 pass
 
 The Stadium 1 decomp is decompiled: 7,200-odd C bodies, 193 assembly stubs. You
-read a function and name it. This one is the mirror image — **10,532 of its
-10,243 functions are `#pragma GLOBAL_ASM` stubs and only 99 have C bodies.**
+read a function and name it. This one is the mirror image. Of its **10,901 US
+function symbols, 10,532 are `#pragma GLOBAL_ASM` stubs** and 64 have C bodies;
+the rest are libultra, linked from `lib/` rather than stubbed.
 
 That moves where a name lives. In Stadium 1 a name is an identifier in a `.c`
 file. Here it is an entry in `disasm/linker_scripts/us/symbol_addrs_code.txt`,
@@ -25,13 +26,13 @@ the pragma points at a path splat no longer emits.
 `apply_names.py` keeps them in step. Whole-word replacement covers both sites,
 because the symbol appears as a word inside the pragma's path string too.
 
-Starting point: **269 of 10,243 functions named (2.6%)**, all of it upstream
-libultra and thread setup.
+Starting point: **297 of 10,901 function symbols named (2.7%)**, all of it
+upstream libultra and thread setup.
 
 ## What was done
 
 **676 evidence-backed function names transferred from Stadium 1**, taking the
-tree to **945 of 10,243 (9.2%)**.
+tree to **973 of 10,901 (8.9%)**.
 
 Nothing here was named by reading a body and forming an opinion. Every one of
 the 676 is a machine-verified correspondence between the two ROMs' machine code.
@@ -75,7 +76,7 @@ used once.
 
 **~7% is the ceiling for this technique**, and it has been reached. Stadium 2
 shares Stadium 1's core engine and rewrote nearly everything above it; the
-remaining ~9,300 functions are original reverse engineering.
+remaining ~9,900 functions are original reverse engineering.
 
 ## Two traps, and what caught them
 
