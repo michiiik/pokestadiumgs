@@ -2,7 +2,7 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/44300/func_80043700.s")
+extern s32 D_80094CF0; s32 func_80043700(s32 arg0, s32 arg1) { if (!arg0) { D_80094CF0 = arg1; } return 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/44300/func_80043714.s")
 
