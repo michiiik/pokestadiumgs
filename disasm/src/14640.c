@@ -237,5 +237,5 @@ void func_80019398(void) { func_800193B8(2); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_800194A0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_8001951C.s")
+void func_8001951C(void) { func_80018620(); }
 #endif
