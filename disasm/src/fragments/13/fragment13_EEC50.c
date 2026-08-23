@@ -146,7 +146,9 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82406A78.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82406CCC.s")
+s32 func_82406CCC(u8 *arg0) {
+    return *(s32 *)(arg0 + 0x1E4) == 4;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82406CDC.s")
 
