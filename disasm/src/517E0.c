@@ -2,6 +2,14 @@
 
 
 #ifdef VERSION_US
+typedef struct SaveRecordEntry {
+    u32 flags;
+    u8 *backup;
+    u8 *active;
+} SaveRecordEntry;
+
+extern SaveRecordEntry D_801281C0[];
+
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80050BE0.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80050CAC.s")
@@ -53,17 +61,53 @@ u16 Save_Checksum(u8 *data, s32 length) {
     return (u16)sum;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/Save_WriteFooter.s")
+void Save_WriteFooter(u8 *data, s32 length, s32 valid) {
+    u8 *footer = data + length - 6;
+    u16 checksum;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/Save_WriteRecord.s")
+    if (valid != 0) {
+        *(u16 *)(footer + 0) = 0x5033;
+        *(u16 *)(footer + 2) = 0x7630;
+        checksum = Save_Checksum(footer, length);
+    } else {
+        *(u16 *)(footer + 0) = 0x5858;
+        *(u16 *)(footer + 2) = 0x5858;
+        checksum = Save_Checksum(footer, length) ^ 0xFF;
+    }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/Save_CommitRecord.s")
+    *(u16 *)(footer + 4) = checksum;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/Save_InvalidateRecord.s")
+void Save_WriteRecord(void *src, void *dst, s32 length, s32 index) {
+    bcopy(src, dst, length);
+    D_801281C0[index].flags |= 2;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/Save_RestoreRecord.s")
+void Save_CommitRecord(u8 *data, s32 length, s32 unused, s32 index) {
+    if ((data[0] & 2) != 0) {
+        data[0] &= 0xFD;
+        Save_WriteFooter(data, length, 1);
+        D_801281C0[index].flags |= 2;
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/Save_ClearRecord.s")
+void Save_InvalidateRecord(u8 *data, s32 length, s32 unused, s32 index) {
+    if ((data[0] & 2) != 0) {
+        Save_WriteFooter(data, length, 0);
+        D_801281C0[index].flags |= 2;
+    }
+}
+
+void Save_RestoreRecord(u8 *data, s32 length, s32 index) {
+    SaveRecordEntry *entry = &D_801281C0[index];
+    bcopy(entry->active + (data - entry->backup), data, length);
+}
+
+void Save_ClearRecord(u8 *data, s32 length, s32 index) {
+    bzero(data, length);
+    data[0] |= 2;
+    D_801281C0[index].flags |= 2;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051830.s")
 

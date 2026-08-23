@@ -14,11 +14,34 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/Jpeg_DecodeImage.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/Dma_InitializeCompletionQueue.s")
+extern u8 D_800CD000[];
+extern u8 D_800CD018[];
+
+void Dma_InitializeCompletionQueue(void) {
+    osCreateMesgQueue((OSMesgQueue *)D_800CD000, (OSMesg *)D_800CD018, 1);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/Yay0_DecompressAndRelocate.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/Dma_ReadChunks.s")
+extern s32 Storage_QueueSramTransfer(u32 staging, u32 destination,
+                                     u32 source, u32 length,
+                                     OSMesgQueue *queue, s32 mode);
+
+void Dma_ReadChunks(u32 destination, u32 source, s32 length, u32 staging) {
+    OSMesgQueue *queue = (OSMesgQueue *)D_800CD000;
+
+    while (length > 0) {
+        u32 chunk = length >= 0x1000 ? 0x1000 : (u32)length;
+
+        Storage_QueueSramTransfer(staging, destination, source, chunk, queue,
+                                  0);
+        osRecvMesg(queue, NULL, 1);
+
+        length -= chunk;
+        destination += chunk;
+        source += chunk;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80003E84.s")
 
@@ -51,9 +74,28 @@ void func_80003F74(u32 destination, u32 source, u32 end, u32 staging) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/Dma_CopyChunks.s")
+extern s32 Storage_QueueRomWrite(u32 destination, u32 source, u32 length,
+                                  OSMesgQueue *queue, s32 mode);
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800040C4.s")
+void Dma_CopyChunks(u32 destination, u32 source, u32 end) {
+    OSMesgQueue *queue = (OSMesgQueue *)D_800CD000;
+    s32 remaining = end - source;
+
+    while (remaining > 0) {
+        u32 chunk = remaining >= 0x1000 ? 0x1000 : (u32)remaining;
+
+        Storage_QueueRomWrite(destination, source, chunk, queue, 0);
+        osRecvMesg(queue, NULL, 1);
+
+        remaining -= chunk;
+        destination += chunk;
+        source += chunk;
+    }
+}
+
+u32 func_800040C4(void *asset) {
+    return *(u32 *)((u8 *)asset + 0xC) + 0x100;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800040D0.s")
 

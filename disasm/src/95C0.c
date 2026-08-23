@@ -14,9 +14,25 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/95C0/TextRenderer_FlushQueuedStrings.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/95C0/TextRenderer_ClearQueuedStrings.s")
+extern void *D_80087314;
+extern void Util_Free(void *ptr);
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/95C0/TextRenderer_FormatCopy.s")
+void TextRenderer_ClearQueuedStrings(void) {
+    void *entry = D_80087314;
+
+    while (entry != NULL) {
+        void *next = *(void **)entry;
+        Util_Free(entry);
+        entry = next;
+    }
+
+    D_80087314 = NULL;
+}
+
+void *TextRenderer_FormatCopy(void *dst, const void *src, s32 size) {
+    memcpy(dst, src, size);
+    return (u8 *)dst + size;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/95C0/HAL_Printf.s")
 
