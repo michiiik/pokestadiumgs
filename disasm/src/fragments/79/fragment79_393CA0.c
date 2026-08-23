@@ -1034,7 +1034,7 @@ void func_8412F5E4(void) { func_8412F49C(); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84130DBC.s")
+extern u8 D_841951BC; extern u8 *D_84195208[]; void func_84130DBC(void) { D_84195208[D_841951BC][0x12] = 0; }
 #endif
 
 #ifdef VERSION_US
