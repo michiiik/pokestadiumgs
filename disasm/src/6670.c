@@ -14,7 +14,7 @@
 
 extern u8 D_800CE118; u8 func_800060E8(void) { return D_800CE118; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6670/func_800060F4.s")
+void func_800060F4(s16 arg0, s16 arg1) { extern s16 D_80087210; extern s16 D_80087214; if (arg0 > 0) D_80087210 = arg0; if (arg1 > 0) D_80087214 = arg1; }
 
 extern s16 D_80087210; extern s16 D_80087214; void func_8000612C(void) { D_80087210 = 10; D_80087214 = 2; }
 
