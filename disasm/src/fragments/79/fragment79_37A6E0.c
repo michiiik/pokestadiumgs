@@ -1,5 +1,18 @@
 #include "global.h"
 
+extern u8 *D_841911E8;
+extern f32 D_80088E50[];
+extern f32 D_80087E50[];
+
+extern u8 *func_8410B330(void *arg0, void *arg1);
+extern void func_8411E0A4(void *arg0, void *arg1, void *arg2);
+extern void func_80037120(void *arg0, void *arg1, void *arg2, void *arg3, void *arg4);
+extern s32 func_841203B4(void *arg0, void *arg1, f32 arg2);
+extern s32 func_84120BB4(void *arg0);
+extern s32 func_8411E1D4(void *arg0);
+extern void Vec3f_SetComponentsDuplicate(void *arg0, f32 arg1, f32 arg2, f32 arg3);
+extern void Camera_ComputeEyeFromAngles(void *arg0, void *arg1, f32 arg2, s16 arg3, s32 arg4);
+
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8410AE50.s")
@@ -122,11 +135,34 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_ModelDispatch_121.s")
+void BattleAnim_ModelDispatch_121(u8 *model, void *arg1) {
+    u8 *state;
+    u8 vector[0x10];
+    f32 value;
+    u16 outAngle;
+    u8 *out;
+
+    state = func_8410B330(model, arg1);
+    D_841911E8 = state;
+    func_8411E0A4(arg1, vector, state);
+    func_80037120(vector, state + 0x50, &value, &outAngle, &out);
+    if (*(f32 *)(state + 0x80) * 0.5 < value) {
+        func_841203B4(state + 0x60, arg1, 0.3f);
+    }
+    *(f32 *)(model + 0xB8) = *(f32 *)(state + 0x60);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_ModelDispatch_024.s")
+void BattleAnim_ModelDispatch_024(u8 *model, void *arg1) {
+    f32 current = *(f32 *)(model + 0xB8);
+    f32 limit = *(f32 *)(model + 0xAC);
+
+    (void)arg1;
+    if (current > limit) {
+        func_841203B4(model + 0xAC, (void *)*(u32 *)&current, 0.02f);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -174,7 +210,34 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_ModelDispatch_050.s")
+void BattleAnim_ModelDispatch_050(u8 *model, u8 *entity) {
+    u8 *transform;
+    s32 angle;
+    s32 index;
+    f32 x;
+    f32 y;
+    f32 z;
+    f32 tilt;
+
+    func_84120BB4(entity);
+    *(f32 *)(model + 0x2C) = 80.0f;
+    transform = *(u8 **)(entity + 0x678);
+    angle = func_8411E1D4(entity);
+    index = (*(u16 *)(entity + 0x20) >> 4) & 0xFFF;
+    x = *(f32 *)(entity + 0x24) +
+        *(f32 *)(transform + 0x0) * (f32)angle * D_80088E50[index] -
+        *(f32 *)(transform + 0x8) * D_80087E50[index];
+    y = *(f32 *)(entity + 0x28) + *(f32 *)(transform + 0x4);
+    angle = func_8411E1D4(entity);
+    z = *(f32 *)(entity + 0x2C) +
+        *(f32 *)(transform + 0x0) * (f32)angle * D_80087E50[index] +
+        *(f32 *)(transform + 0x8) * D_80088E50[index];
+    Vec3f_SetComponentsDuplicate(model + 0xB4, x, y, z);
+    tilt = *(f32 *)(transform + 0xC);
+    angle = func_8411E1D4(entity);
+    Camera_ComputeEyeFromAngles(model + 0xB4, model + 0xA8, tilt,
+                                *(s16 *)(transform + 0x10), angle * *(s16 *)(transform + 0x12));
+}
 #endif
 
 #ifdef VERSION_US
