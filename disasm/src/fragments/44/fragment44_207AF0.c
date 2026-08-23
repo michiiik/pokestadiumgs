@@ -53,7 +53,10 @@ void func_8AF1B4D0(u8 *arg0, s32 arg1, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_207AF0/func_8AF1B4DC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_207AF0/func_8AF1B5D4.s")
+extern s16 D_8AF3720C;
+void func_8AF1B5D4(void) {
+    D_8AF3720C = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_207AF0/func_8AF1B5E0.s")
 
