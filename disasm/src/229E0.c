@@ -1999,7 +1999,7 @@ void func_8003EECC(u8 *arg0) { *(s16 *)(arg0 + 0x54) = -1; *(s32 *)(arg0 + 0x58)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003EF48.s")
+void func_8003EF48(u8 *arg0, s16 value) { *(s16 *)(arg0 + 0x5C) = value - 1; }
 #endif
 
 #ifdef VERSION_US
@@ -2011,7 +2011,7 @@ void func_8003EF70(u8 *arg0) { *(u16 *)(arg0 + 0x56) &= (u16)~1; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003EF80.s")
+s32 func_8003EF80(u8 *arg0, s16 value) { return value == *(s16 *)(arg0 + 0x5C) + 1; }
 #endif
 
 #ifdef VERSION_US
@@ -2111,7 +2111,7 @@ void func_8003F864(u8 *arg0) { arg0[4] = (u8)(arg0[4] & ~0x10); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003F954.s")
+s32 func_8003F954(u16 value) { return value % 9; }
 #endif
 
 #ifdef VERSION_US
@@ -2462,5 +2462,5 @@ s32 func_80042A64(s32 arg0) { return 0; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80042ADC.s")
+s32 func_80042ADC(u8 *arg0) { s32 result = -1; if (arg0 != NULL) result = arg0[2] & 0xF; return result; }
 #endif
