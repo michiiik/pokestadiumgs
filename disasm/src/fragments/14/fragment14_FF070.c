@@ -86,7 +86,9 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130A570.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130A5D0.s")
+void func_8130A5D0(u8 *arg0) {
+    *(s32 *)(arg0 + 0x137E4) = 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130A5E4.s")
 
