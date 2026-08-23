@@ -363,13 +363,22 @@ s32 func_82B084CC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B084FC.s")
+extern s16 D_82B12452;
+s32 func_82B084FC(void) {
+    return D_82B12452;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B08508.s")
+extern s16 D_82B1246C;
+s32 func_82B08508(void) {
+    return D_82B1246C;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B08514.s")
+extern s16 D_82B1246E;
+s32 func_82B08514(void) {
+    return D_82B1246E;
+}
 #endif
