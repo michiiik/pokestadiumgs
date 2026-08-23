@@ -90,7 +90,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800532F0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80053384.s")
+void func_80053384(void *arg0, void *arg1) { func_80051A8C(arg0, arg1, 1); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800533A4.s")
 
