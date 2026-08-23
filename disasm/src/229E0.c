@@ -890,11 +890,11 @@ void func_800347DC(s32 arg0, s32 arg1) { }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80034C48.s")
+void func_80034C48(s32 arg0) { }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80034C50.s")
+void func_80034C50(s32 arg0) { }
 #endif
 
 #ifdef VERSION_US
@@ -2435,7 +2435,7 @@ void func_800401CC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80042A64.s")
+s32 func_80042A64(s32 arg0) { return 0; }
 #endif
 
 #ifdef VERSION_US
