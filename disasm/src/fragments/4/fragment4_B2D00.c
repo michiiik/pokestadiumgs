@@ -38,7 +38,7 @@ s32 func_81804A20(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_B2D00/func_81805524.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_B2D00/func_81805594.s")
+s32 func_81805594(u8 *arg0, u8 *arg1) { return 1; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_B2D00/func_818055A4.s")
 
