@@ -68,11 +68,17 @@ void func_8AC007FC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC00824.s")
+extern s16 D_8AC0851E;
+void func_8AC00824(void) {
+    D_8AC0851E = 0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC00830.s")
+extern s16 D_8AC0851C;
+void func_8AC00830(void) {
+    D_8AC0851C = 2;
+}
 #endif
 
 #ifdef VERSION_US
@@ -88,7 +94,10 @@ void func_8AC007FC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC00DE8.s")
+extern s32 D_8AC08524;
+void func_8AC00DE8(void) {
+    D_8AC08524 = 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -104,7 +113,10 @@ void func_8AC007FC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC00FEC.s")
+extern s16 D_8AC086B8;
+void func_8AC00FEC(void) {
+    D_8AC086B8 = 1;
+}
 #endif
 
 #ifdef VERSION_US
