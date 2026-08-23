@@ -32,7 +32,10 @@ s32 func_82800BB4(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/10/fragment10_D5250/func_82801510.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/10/fragment10_D5250/func_828016AC.s")
+s32 func_828016AC(u8 *arg0) {
+    *(f32 *)(arg0 + 4) = 0.0f;
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/10/fragment10_D5250/func_828016BC.s")
 

@@ -53,7 +53,10 @@ void func_8130F69C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_1077C0/func_8130FE8C.s")
+s32 func_8130FE8C(u8 *arg0) {
+    *(f32 *)(arg0 + 0x30) = 0.0f;
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
