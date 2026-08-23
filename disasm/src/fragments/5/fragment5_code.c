@@ -41,5 +41,5 @@ void func_83200020(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/5/fragment5_code/func_83200AC0.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/5/fragment5_code/fragment5_main.s")
 #endif

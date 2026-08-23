@@ -257,5 +257,5 @@ void func_82C003B4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C04880.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/fragment83_main.s")
 #endif

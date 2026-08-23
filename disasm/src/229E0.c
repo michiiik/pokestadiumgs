@@ -1956,7 +1956,7 @@ void func_80033ED0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FA94.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_2A.s")
 #endif
 
 #ifdef VERSION_US
@@ -1972,7 +1972,7 @@ void func_80033ED0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FC34.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_27.s")
 #endif
 
 #ifdef VERSION_US
@@ -2035,7 +2035,7 @@ void func_80033ED0(void) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_create_clear_depth.s")
 #endif
 
-void func_800401CC(void) {
+void geo_layout_cmd_noop(void) {
 }
 
 #ifdef VERSION_US
@@ -2047,23 +2047,23 @@ void func_800401CC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8004032C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_28.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80040370.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_29.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800403B0.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_skip.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800403C8.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_create_ambient_light.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80040420.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_17.s")
 #endif
 
 #ifdef VERSION_US
@@ -2119,7 +2119,7 @@ void func_800401CC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80040D9C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_set_node_flag4.s")
 #endif
 
 #ifdef VERSION_US

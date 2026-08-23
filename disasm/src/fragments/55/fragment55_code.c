@@ -216,5 +216,5 @@ void func_86709128(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/55/fragment55_code/func_8670A96C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/55/fragment55_code/fragment55_main.s")
 #endif

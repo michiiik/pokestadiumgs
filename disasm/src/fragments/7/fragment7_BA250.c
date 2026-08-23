@@ -401,5 +401,5 @@ void func_83000E38(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_8300A898.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/fragment7_main.s")
 #endif

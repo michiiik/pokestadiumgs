@@ -2,7 +2,7 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D5610/func_88900020.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D5610/fragment38_main.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D5610/func_88900030.s")
 

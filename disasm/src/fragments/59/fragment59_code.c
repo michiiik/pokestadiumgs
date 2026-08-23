@@ -57,7 +57,7 @@ void func_869004A4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/59/fragment59_code/func_86902134.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/59/fragment59_code/fragment59_main.s")
 #endif
 
 #ifdef VERSION_US

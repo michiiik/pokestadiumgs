@@ -173,5 +173,5 @@ void func_86603100(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/54/fragment54_code/func_86606388.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/54/fragment54_code/fragment54_main.s")
 #endif

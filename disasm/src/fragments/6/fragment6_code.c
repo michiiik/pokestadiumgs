@@ -78,5 +78,5 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/6/fragment6_code/func_831021E8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/6/fragment6_code/func_83102224.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/6/fragment6_code/fragment6_main.s")
 #endif

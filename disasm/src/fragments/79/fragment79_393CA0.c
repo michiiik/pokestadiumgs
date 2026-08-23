@@ -1845,5 +1845,5 @@ void func_841330B4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8413E2EC.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/fragment79_main.s")
 #endif

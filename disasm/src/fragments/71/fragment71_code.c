@@ -14,5 +14,5 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/71/fragment71_code/func_8F300CAC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/71/fragment71_code/func_8F300D08.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/71/fragment71_code/fragment71_main.s")
 #endif

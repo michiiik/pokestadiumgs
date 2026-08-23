@@ -6,6 +6,8 @@ Turning `func_800015C0` into `DisplayTask_Initialize`.
 - Transferred mapping: **`tools/s1_transfer.json`** — machine-generated, never hand-edited.
 - Generator: **`tools/xmatch_stadium1.py`** — matches this ROM against Stadium 1's.
 - Applier: **`tools/apply_names.py`** — `--dry-run`, `--check`, `--qa`, or bare to apply.
+- Triage aid: **`tools/subsystem_map.py`** — for each unnamed function, the named functions it calls and is called by, bucketed by translation unit.
+- Dispatch tables: **`tools/find_dispatch_tables.py`** — finds function-pointer tables whose per-index entries are naming evidence.
 - Scope: `disasm/` (a vendored copy of the fork's `stadium2-names` branch), US tables only.
 
 ## Why this is not the Stadium 1 pass
@@ -35,6 +37,65 @@ upstream libultra and thread setup.
 tree to **973 of 10,901 (8.9%)**.
 
 Nothing here was named by reading a body and forming an opinion. Every one of
+
+## Phase 2: structure around the anchors
+
+Phase 1 hit the transfer technique's ceiling, so phase 2 extracts names from
+the structure around the 676 anchors rather than from Stadium 1. **97 further
+names, taking the tree to 1,070 of 10,901 (9.8%)**, plus two survey tools.
+
+**Fragment entry points (87 names).** Every fragment begins with an 8-byte
+header trampoline -- a `J` to the fragment's real entry plus its delay slot --
+which `game.toml` already relies on. The header is a `textbin` subsegment so
+splat emits no symbol for it, but the J target is a real function.
+`tools/name_fragment_entries.py` decodes the J at each fragment's offset 0 and
+names the target `fragmentN_main`. Two fragments needed more than the plain
+decode: fragment26's header jumps into a table of further J trampolines whose
+first entry lands on the already-named `DisplayList_InitIndexedTextureSegment`,
+and fragment28 is linked at `0x80000000` but loaded at `0x8FE00000`, so its
+target resolves through the linked base. fragment43's entry turned out to have
+a C body, which is why QA flags `fragment43_main` as symbol-table-only -- that
+flag means "no GLOBAL_ASM pragma", and is expected there.
+
+**The geo layout command table (9 names).** `find_dispatch_tables.py` found
+180 candidate function-pointer tables; the one at `0x80094BB4` is the geo
+layout command dispatch table, 43 entries, 34 of them already named by the
+phase 1 transfer and in exact command order against Stadium 1's
+`GeoLayoutJumpTable`. The 9 gaps were audited against Stadium 1 individually
+before naming, which mattered: `skip`, `create_ambient_light` and
+`set_node_flag4` are instruction-identical to their Stadium 1 counterparts at
+the same indices, index 0x12 is a two-instruction `jr $ra; nop` and Stadium
+1's index 0x12 is `geo_layout_cmd_noop` -- but index 0x17's body agrees with
+Stadium 1's `geo_layout_cmd_create_shadow_context` on only 14% of
+instructions, so the Stadium 1 name was deliberately **not** transferred; it
+and the four indices past the end of Stadium 1's 39-entry table are named by
+position alone (`geo_layout_cmd_17`, `geo_layout_cmd_27` ... `geo_layout_cmd_2A`).
+That is rule 1 working as intended: the table index is the primary evidence,
+the body is corroboration, and here the body vetoed.
+
+**The libultra remainder (1 name).** A direct pass over the `lib` subsegments
+found all 282 of their symbols already named upstream, and the 112 libultra
+names Stadium 1 has that we lack are functions this ROM does not link
+(libaudio, LEO/64DD) or already carries under a different spelling (`_bzero`,
+`guMtxIdentF`). Nothing was left to recover there. The one genuinely unnamed
+asm helper with solid evidence is the ROM's first instruction:
+`func_80000400` is now `entrypoint` (`game.toml` already pins it as the
+entrypoint). The IPL3 `func_A400*` labels and the three handwritten
+`func_80021xxx` helpers were left alone -- no independent evidence for their
+roles.
+
+**The survey tools.** `tools/subsystem_map.py` prints, per translation unit,
+every unnamed function with its named callers and callees -- the partition that
+makes a manual pass tractable (`229E0` alone has 208 anchors around 331
+unnamed functions). `tools/find_dispatch_tables.py` found the 180 candidate
+tables (1,560 entries); after this pass 102 + the 9 geo entries resolve to
+named functions, and the remaining large tables (lengths 253, 225, 83, 53,
+50, 48) are the next audit targets.
+
+Phase 2 is assembly-verified: the renamed tree builds the byte-identical US
+ROM (md5 `1561c75d11cedf356a8ddb1a4a5f9d5d`) in the linux/amd64 container.
+
+## Phase 1: the Stadium 1 transfer
 the 676 is a machine-verified correspondence between the two ROMs' machine code.
 
 ## How the transfer works
@@ -167,10 +228,12 @@ exactly one symbol table entry, none is defined twice, no pragma points at a
 symbol that does not exist, none clashes with a C keyword, all are valid C
 identifiers, and none is symbol-table-only.
 
-**Still not assembly-verified.** There is no `mips-linux-gnu` toolchain on this
-host, so the renamed tree has not been assembled or linked. Extraction passing
-makes that very likely to be fine — the names are labels — but run
-`tools/mac_build_disasm.sh` in the build container before trusting it.
+**Assembly-verified.** The renamed tree assembles, links and produces the
+byte-identical US ROM (md5 `1561c75d11cedf356a8ddb1a4a5f9d5d`) under
+`tools/mac_build_disasm.sh` in the linux/amd64 build container -- verified
+after the phase 1 rename (which also caught two pre-existing bugs in the
+`a404a06` DMA-helper C translations, fixed in disasm commit `ccae2a1`) and
+again after phase 2.
 
 ## Deliberately not done
 
