@@ -22,7 +22,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80007E6C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_800080B8.s")
+void func_800080B8(void) { func_80006D6C(); func_80007E18(); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_800080E0.s")
 
@@ -50,7 +50,7 @@ u8 func_800084A0(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_800085EC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80008624.s")
+extern u8 D_800D0510[]; void func_80008624(void) { func_80002178(D_800D0510); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80008648.s")
 
@@ -66,7 +66,7 @@ u8 func_800084A0(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80008944.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80008970.s")
+s32 func_80008970(void) { s32 value = 0; if (D_800D0554 != 0) { value = *(s8 *)((u8 *)(u32)D_800D0554 + 0x17); } return value; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80008990.s")
 #endif
