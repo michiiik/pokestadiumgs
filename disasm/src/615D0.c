@@ -8,7 +8,7 @@ u16 func_80060A4C(const u8 *arg0) { return (u16)((arg0[0] << 8) | arg0[1]); }
 
 u32 func_80060A64(const u8 *arg0) { return ((u32)arg0[0] << 16) | ((u32)arg0[1] << 8) | arg0[2]; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060A84.s")
+void func_80060A84(u8* arg0, s32 arg1) { arg0[0] = (arg1 >> 8) & 0xFF; arg0[1] = arg1 & 0xFF; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060A94.s")
 
