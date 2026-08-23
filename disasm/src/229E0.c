@@ -431,7 +431,7 @@ void func_8002809C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80028EA8.s")
+void func_80028EA8(void) { extern u8 D_80091B90[]; func_80028D9C(D_80091B90); }
 #endif
 
 #ifdef VERSION_US
