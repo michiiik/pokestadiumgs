@@ -17,9 +17,7 @@
 extern u8 D_800CD000[];
 extern u8 D_800CD018[];
 
-void Dma_InitializeCompletionQueue(void) {
-    osCreateMesgQueue((OSMesgQueue *)D_800CD000, (OSMesg *)D_800CD018, 1);
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/Dma_InitializeCompletionQueue.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/Yay0_DecompressAndRelocate.s")
 
@@ -27,43 +25,13 @@ extern s32 Storage_QueueSramTransfer(u32 staging, u32 destination,
                                      u32 source, u32 length,
                                      OSMesgQueue *queue, s32 mode);
 
-void Dma_ReadChunks(u32 destination, u32 source, s32 length, u32 staging) {
-    OSMesgQueue *queue = (OSMesgQueue *)D_800CD000;
-
-    while (length > 0) {
-        u32 chunk = length >= 0x1000 ? 0x1000 : (u32)length;
-
-        Storage_QueueSramTransfer(staging, destination, source, chunk, queue,
-                                  0);
-        osRecvMesg(queue, NULL, 1);
-
-        length -= chunk;
-        destination += chunk;
-        source += chunk;
-    }
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/Dma_ReadChunks.s")
 
 extern s32 Storage_QueueFlashTransfer(u32 staging, u32 destination,
                                       s32 sourceSector, OSMesgQueue *queue,
                                       s32 mode);
 
-s32 func_80003E84(u32 destination, u32 sourceSector, s32 count,
-                  u32 staging) {
-    OSMesgQueue *queue = (OSMesgQueue *)D_800CD000;
-
-    while (count > 0) {
-        Storage_QueueFlashTransfer(staging, destination,
-                                   (s16)sourceSector, queue, 0);
-        osRecvMesg(queue, NULL, 1);
-        if (staging == 1 && osFlashWriteArray((s16)sourceSector) != 0) {
-            return -1;
-        }
-        destination += 0x80;
-        sourceSector++;
-        count--;
-    }
-    return 0;
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80003E84.s")
 
 extern s32 Dma_QueueRomRead(u32 destination, u32 source, u32 end,
                          u32 length, u32 staging, s32 mode);
@@ -97,25 +65,9 @@ void func_80003F74(u32 destination, u32 source, u32 end, u32 staging) {
 extern s32 Storage_QueueRomWrite(u32 destination, u32 source, u32 length,
                                   OSMesgQueue *queue, s32 mode);
 
-void Dma_CopyChunks(u32 destination, u32 source, u32 end) {
-    OSMesgQueue *queue = (OSMesgQueue *)D_800CD000;
-    s32 remaining = end - source;
+#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/Dma_CopyChunks.s")
 
-    while (remaining > 0) {
-        u32 chunk = remaining >= 0x1000 ? 0x1000 : (u32)remaining;
-
-        Storage_QueueRomWrite(destination, source, chunk, queue, 0);
-        osRecvMesg(queue, NULL, 1);
-
-        remaining -= chunk;
-        destination += chunk;
-        source += chunk;
-    }
-}
-
-u32 func_800040C4(void *asset) {
-    return *(u32 *)((u8 *)asset + 0xC) + 0x100;
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800040C4.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800040D0.s")
 
@@ -124,6 +76,8 @@ extern void *MainPool_AllocAligned(void *pool, u32 size, u32 align);
 extern void Yay0_DecompressAndRelocate(void *source, void *destination);
 extern void main_pool_try_free(void *ptr);
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800041E4.s")
+#if 0
 void *func_800041E4(void *pool, void *old, void *header, u32 tag) {
     void *destination;
 
@@ -140,7 +94,10 @@ void *func_800041E4(void *pool, void *old, void *header, u32 tag) {
     main_pool_try_free(old);
     return destination;
 }
+#endif
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80004254.s")
+#if 0
 void *func_80004254(void *pool, void *arg1, void *arg2, void *arg3,
                     u32 size, u32 tag) {
     void *destination;
@@ -155,9 +112,12 @@ void *func_80004254(void *pool, void *arg1, void *arg2, void *arg3,
     }
     return destination;
 }
+#endif
 
 extern void *func_800040D0(void *pool, void *old, void *header, u32 tag);
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800042C0.s")
+#if 0
 void *func_800042C0(u32 source, u32 end, u32 decompress, u32 staging) {
     u32 tag = decompress == 0 ? 1 : 0;
     u32 size;
@@ -196,7 +156,10 @@ void *func_800042C0(u32 source, u32 end, u32 decompress, u32 staging) {
     main_pool_try_free(header);
     return result;
 }
+#endif
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80004458.s")
+#if 0
 void *func_80004458(s32 pool, u32 source, u32 end, s32 flags) {
     u32 size;
     void *header = main_pool_alloc(0x18, 1);
@@ -233,6 +196,7 @@ void *func_80004458(s32 pool, u32 source, u32 end, s32 flags) {
     main_pool_try_free(header);
     return result;
 }
+#endif
 
 extern u32 Memmap_GetSegmentBaseVaddr(u32 segment);
 extern void Memmap_ClearSegmentMemmap(u32 segment);
@@ -257,6 +221,10 @@ void Memmap_SegmentCleanupCallback(void *arg0, u32 vaddr) {
     }
 }
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800045E0.s")
+
+#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/Asset_LoadToSegment.s")
+#if 0
 void *Asset_LoadToSegment(u32 segment, u32 source, u32 end, u32 decompress) {
     void *asset = func_800042C0(source, end, decompress, 0);
 
@@ -269,6 +237,7 @@ void *Asset_LoadToSegment(u32 segment, u32 source, u32 end, u32 decompress) {
     }
     return asset;
 }
+#endif
 
 void Memmap_FragmentCleanupCallback(void *arg0, u32 vaddr) {
     u32 fragment;
@@ -282,6 +251,8 @@ void Memmap_FragmentCleanupCallback(void *arg0, u32 vaddr) {
         Memmap_ClearFragmentMemmap(fragment);
     }
 }
+
+#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800046C0.s")
 
 typedef struct {
     u8 pad_00[0x1C];
@@ -297,6 +268,8 @@ extern void Memmap_RelocateFragment(void *source, void *fragment);
 extern void MainPool_ResetStateToOffset(void *pool, u32 offset);
 extern void Memmap_FragmentCleanupCallback(void *arg0, u32 vaddr);
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/Fragment_Register.s")
+#if 0
 void Fragment_Register(u32 pool, FragmentHeader *fragment) {
     u32 allocation_size = MainPool_GetAllocationSize(fragment);
 
@@ -310,6 +283,7 @@ void Fragment_Register(u32 pool, FragmentHeader *fragment) {
         main_pool_realloc(fragment, fragment->end_offset);
     }
 }
+#endif
 
 void Fragment_RelocateAndReset(void *pool, void *source,
                                FragmentHeader *fragment) {
@@ -319,6 +293,10 @@ void Fragment_RelocateAndReset(void *pool, void *source,
                  *(u32 *)((u8 *)pool + 8));
 }
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800047B0.s")
+
+#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/Fragment_Load.s")
+#if 0
 void *Fragment_Load(u32 pool, u32 source, u32 end) {
     void *fragment = func_800042C0(source, end, 0, 0);
 
@@ -327,7 +305,10 @@ void *Fragment_Load(u32 pool, u32 source, u32 end) {
     }
     return fragment;
 }
+#endif
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/BinArchive_Open.s")
+#if 0
 void *BinArchive_Open(u32 source, u32 destination, s32 mode, s32 flags) {
     void *archive = NULL;
 
@@ -370,13 +351,19 @@ void *BinArchive_Open(u32 source, u32 destination, s32 mode, s32 flags) {
     }
     return archive;
 }
+#endif
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800049B8.s")
+#if 0
 void func_800049B8(void *ptr) {
     main_pool_try_free(ptr);
 }
+#endif
 
 extern void *func_80004458(s32 pool, u32 source, u32 end, s32 flags);
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800049D8.s")
+#if 0
 void *func_800049D8(s32 pool, const u32 *header, const u32 *range) {
     u32 source = header[1] + range[0];
     u32 end = source + range[1];
@@ -386,7 +373,10 @@ void *func_800049D8(s32 pool, const u32 *header, const u32 *range) {
     }
     return func_80004458(pool, source, end, 0);
 }
+#endif
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80004A40.s")
+#if 0
 void *func_80004A40(s32 pool, void *archive, s32 index) {
     u8 *base = archive;
     u8 *entry;
@@ -422,17 +412,26 @@ void *func_80004A40(s32 pool, void *archive, s32 index) {
     }
     return file;
 }
+#endif
 
 extern void *func_80004A40(s32 pool, void *archive, s32 index);
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80004B4C.s")
+#if 0
 void *func_80004B4C(void *archive, s32 index) {
     return func_80004A40(0, archive, index);
 }
+#endif
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80004B78.s")
+#if 0
 void *func_80004B78(s32 pool, void *archive, s32 index) {
     return func_80004A40(pool, archive, index);
 }
+#endif
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/BinArchive_GetCachedFile.s")
+#if 0
 void *BinArchive_GetCachedFile(void *archive, s32 index) {
     u8 *base = archive;
 
@@ -441,4 +440,6 @@ void *BinArchive_GetCachedFile(void *archive, s32 index) {
     }
     return *(void **)(base + (index * 0x10) + 0x18);
 }
+#endif
+
 #endif
