@@ -2,17 +2,60 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C020.s")
+extern s32 func_800356CC(s32 index);
+extern void *BinArchive_Open(u32 source, u32 destination, s32 mode,
+                             s32 flags);
+extern void *func_80004B4C(void *archive, s32 index);
+extern void func_800049B8(void *archive);
+#define D_80097120 (*(s32 *)0x80097120)
+#define D_80097124 (*(void **)0x80097124)
+#define D_80097128 (*(void **)0x80097128)
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C088.s")
+void func_8004C020(void) {
+    void *archive = BinArchive_Open((u32)func_800356CC(2), 0, 2, 1);
+
+    D_80097124 = func_80004B4C(archive, 0x41);
+    D_80097128 = func_80004B4C(archive, 0);
+    func_800049B8(archive);
+}
+
+void func_8004C088(void *arg0, void *arg1) {
+    (void)arg0;
+    (void)arg1;
+    D_80097120 = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C09C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C398.s")
+void func_8004C398(void) {
+    D_80097120 = 0;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C3A4.s")
+void func_8004C3A4(void *arg, s32 *value) {
+    (void)arg;
+    *value = 0;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C3B0.s")
+void *func_8004C3B0(void *table, s32 index) {
+    u32 count;
+    void *entry;
+
+    if (table == NULL || index < 0) {
+        return NULL;
+    }
+
+    count = *(u32 *)((u8 *)table + 0xC);
+    if ((u32)index >= count) {
+        return NULL;
+    }
+
+    entry = (u8 *)table + ((u32)index << 4) + 0x10;
+    if (entry == NULL) {
+        return NULL;
+    }
+
+    return *(void **)((u8 *)entry + 0x8);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C3EC.s")
 
