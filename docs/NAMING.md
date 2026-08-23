@@ -209,6 +209,19 @@ embedded names against seven resident format strings, and returns the matching
 format index. The lower-level Pak presence and port-availability functions
 were already transferred and remain separately named.
 
+The Controller Pak gate is `GbSave_RequirePakPresent`: it checks
+`GbTower_CheckPakRemoved` and routes a missing Pak through
+`Game_ShutdownAndLoadFragment`. The record path is explicit in the save
+translation unit: `Save_WriteRecord` copies a 24-byte record and sets its
+pending bit, `Save_CommitRecord` writes the footer and commits that bit, and
+the paired `Save_InvalidateRecord`, `Save_RestoreRecord`, and
+`Save_ClearRecord` helpers implement the invalidation/restore/clear states.
+`Save_Checksum`, `Save_WriteFooter`, and `Save_ResetBank` complete the checksum,
+footer, and bank transitions; `GbPak_VerifyPattern`, `GbPak_DetectRam`, and the
+`GbTower_*Pak*` anchors cover Pak detection and removal handling. The remaining
+address-named routines in these translation units lack a distinct read/write
+or Pak edge and remain explicitly outside this naming claim.
+
 ## Phase 3.7: audio thread and command dispatcher
 
 `Thread4_CreateThread` passes `func_80035174` directly to `osCreateThread`; its
