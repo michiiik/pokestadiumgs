@@ -2,7 +2,7 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/func_80064C20.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/Game_PollState.s")
 #endif
 
 #ifdef VERSION_US
@@ -45,11 +45,11 @@ void func_80064DF4(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/func_80064DFC.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/Game_SetState.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/func_80064E2C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/Game_GetState.s")
 #endif
 
 #ifdef VERSION_US
@@ -57,11 +57,11 @@ void func_80064DF4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/func_80064E44.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/Game_State11_Options.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/func_80064ED0.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/Game_ThreadInit.s")
 #endif
 
 #ifdef VERSION_US
