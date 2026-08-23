@@ -42,7 +42,7 @@ u32 func_80060A64(const u8 *arg0) { return ((u32)arg0[0] << 16) | ((u32)arg0[1] 
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060F38.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060F68.s")
+extern void func_8000B580(void); void func_80060F68(void) { func_8000B580(); }
 
 s32 func_80060F88(void) { return 0x46; }
 
@@ -90,7 +90,7 @@ s32 func_80060F90(void) { return 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80061F44.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80061FAC.s")
+extern s32 _bcmp(const void *, const void *, s32); s32 func_80061FAC(const void *a, const void *b) { return _bcmp(a, b, 0xD) == 0; }
 
 extern u8 D_800976A0[]; u8 func_80061FD0(s32 index) { return D_800976A0[index]; }
 
