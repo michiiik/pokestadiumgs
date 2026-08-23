@@ -221,7 +221,7 @@ tracks the physical shift.
    depends on whether the consumer bounds on `size` or on the count byte — unresolved,
    see §6 — but the invariant should be maintained regardless.
 4. **The previous hook left the header `total_size` stale.** It stayed `0xFE90` after
-   the blob grows by `0xF0`.
+   the old blob grew by `0xF0` without recording the new total.
 5. **The previous hook broke sort order.** Every rental table is strictly species-sorted; appending
    150/151/249/250/251 *after* species 248 leaves the list unsorted. If the selection
    screen or any lookup assumes dex order (plausible given the data is sorted, but
