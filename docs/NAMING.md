@@ -138,6 +138,18 @@ and fallback payload forms and its format-specific consumers are not yet
 settled. Fragment-to-state assignments remain hypotheses until each state's
 loader call site is audited.
 
+The fragment-role inventory now covers all 88 entries in
+`fragments_relocatable.txt`. Direct state-dispatch evidence assigns fragment
+16 to state 1, 17 to state 2, 25 to state 3, 11/4/10/26 to state 4, 29 to state
+5, 43/44/64/12/27/79/80 to state 6, 3/13/87 to state 7, 22 to state 11,
+15/67 to state 17, and 88/40 to state 19. State 10's minigame setup and
+dispatch band covers 2/3/4/26/27/43-57/59-66; these are shared minigame
+residents rather than individual title assignments. The remaining entries —
+1, 5-9, 14, 18-21, 23-24, 28, 30-39, 41-42, 58, 68-78, and 81-86 — are
+explicitly hypothesised as optional or mode-selected overlays whose direct
+caller has not yet been recovered. This is an unresolved-role hypothesis, not
+a semantic name, so no fragment is silently omitted from the loader audit.
+
 ## Phase 3.3: audio request-id edge
 
 The small audio helpers at `0x800355D4` and `0x800355E4` are now named from
