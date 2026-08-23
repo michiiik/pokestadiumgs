@@ -225,9 +225,27 @@ s32 func_80025C9C(void) {
     return func_80018C14();
 }
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025CBC.s")
-#endif
+/* Reset the per-channel audio command queues before changing the command
+ * mode.  The five command writes and the final flag clear are the complete
+ * body of the US routine at 0x80025CBC. */
+extern void func_8002B1A0(s32 channel);
+extern void func_800315E8(void);
+extern void func_80028140(void);
+#define D_80090B9C (*(u8 *)0x80090B9C)
+
+void func_80025CBC(s32 channel) {
+    s32 offset = channel * 3;
+
+    func_8002B1A0(channel);
+    func_800315E8();
+    func_80028140();
+    func_80018728(0x83000000, offset);
+    func_80018728(0x83010000, offset);
+    func_80018728(0x83020000, offset);
+    func_80018728(0x83030000, offset);
+    func_80018728(0x83040000, offset);
+    D_80090B9C = 0;
+}
 
 s32 func_80025D44(void) {
     return func_80019378();
@@ -245,9 +263,49 @@ void func_80025D64(s32 value) {
 }
 #endif
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025DB0.s")
-#endif
+#define D_800D1930 ((u8 *)0x800D1930)
+#define D_800D1940 ((u8 *)0x800D1940)
+#define D_800D1980 ((u8 *)0x800D1980)
+#define D_800D1910 ((u8 *)0x800D1910)
+
+/* Initialize the small resident audio state block used by the scheduler. */
+void func_80025DB0(void) {
+    u8 *state = D_800D1930;
+    u8 *channel = D_800D1980;
+    u8 *config = D_800D1940;
+    u8 *command = D_800D1910;
+    u8 flags = state[0];
+    u32 stateWord;
+
+    *(s16 *)(channel + 4) = -1;
+    *(u32 *)(config + 4) = 0x10000;
+    flags = (u8)((flags & 0x8F) | 0x40);
+    state[0] = flags;
+    flags = (u8)(flags & 0xF3);
+    state[0] = flags;
+    flags = (u8)(flags | 2);
+    state[0] = flags;
+    flags = (u8)(flags | 1);
+    state[0] = flags;
+    stateWord = *(u32 *)state;
+
+    *(u16 *)channel = 1;
+    *(u16 *)(channel + 2) = 0x7D00;
+    *(u16 *)(channel + 6) = 0;
+    command[0] = 1;
+    command[1] = 0;
+    command[2] = 0x7F;
+    command[3] = 0xF0;
+    *(u32 *)(command + 4) = (u32)(channel);
+    *(u32 *)(command + 0x10) = (u32)(state);
+    *(u32 *)config = 0;
+    *(u32 *)(config + 8) = 1;
+    *(u32 *)state = ((stateWord ^ 0x200) << 8) >> 8 ^ stateWord;
+    *(u32 *)(state + 4) = 0;
+    *(u32 *)(state + 8) = (u32)config;
+    *(u32 *)(state + 0xC) = 0;
+    *(float *)(command + 0x14) = 0.5f;
+}
 
 #ifdef VERSION_US
 extern void func_80025DB0(void);
@@ -262,11 +320,33 @@ void func_80025E7C(void) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025EB0.s")
 #endif
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025F84.s")
-#endif
+#define D_800D1990 ((u32 *)0x800D1990)
+#define D_800D198C (*(u32 *)0x800D198C)
+extern void func_80031A6C(s32 size);
+extern void func_80034DD0(void);
+#define D_80090B8C (*(u8 *)0x80090B8C)
+extern u32 osSetIntMask(u32 mask);
 
-extern u8 D_80090B8C;
+void func_80025F84(s32 size) {
+    u32 aligned = (u32)(size + 0xF) & ~0xF;
+    u32 oldMask;
+
+    D_800D198C = aligned;
+    D_800D1990[0] = aligned + 0x2380;
+    D_800D1990[1] = aligned + 0x4380;
+    D_800D1990[2] = aligned + 0x6380;
+    func_80031A6C(0x7D00);
+    func_80018728(0x82030300, 0);
+    func_800187AC();
+    func_80025E7C();
+    func_8001874C(0x06030000, 0);
+    func_80034DD0();
+    oldMask = osSetIntMask(1);
+    D_80090B8C = 1;
+    osSetIntMask(oldMask);
+}
+
+#define D_80090B8C (*(u8 *)0x80090B8C)
 extern u32 osSetIntMask(u32 mask);
 
 void func_8002602C(void) {
@@ -325,9 +405,24 @@ s32 func_80026298(void) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800266F8.s")
 #endif
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80026938.s")
-#endif
+#define D_80090B3C ((u8 *)0x80090B3C)
+#define D_80090AD0 ((u8 *)0x80090AD0)
+#define D_80090B6C (*(s16 *)0x80090B6C)
+#define D_80090B70 (*(s16 *)0x80090B70)
+
+void func_80026938(s32 index) {
+    u32 clamped = (u16)index;
+    u8 sound;
+    u8 *entry;
+
+    if (clamped >= 0x1E) {
+        clamped = 0x0E;
+    }
+    sound = D_80090B3C[clamped];
+    entry = D_80090AD0 + sound * 5;
+    D_80090B6C = entry[1];
+    D_80090B70 = entry[0];
+}
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80026990.s")

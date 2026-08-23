@@ -14,29 +14,33 @@ static u32 GbSave_Flags(s32 index) {
 }
 
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_800579D0.s")
-#endif
+u16 func_800579D0(const u8 *value) {
+    return (u16)(value[0] | (value[1] << 8));
+}
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_800579E8.s")
-#endif
+void func_800579E8(u8 *value, s32 data) {
+    value[0] = (u8)data;
+    value[1] = (u8)(data >> 8);
+}
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_800579FC.s")
-#endif
+void func_800579FC(void) {
+}
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80057A1C.s")
-#endif
+u32 func_80057A1C(s32 index) {
+    u8 state = func_8005D92C(index);
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80057A5C.s")
-#endif
+    return state == 5 || state == 6;
+}
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80057A80.s")
-#endif
+u32 func_80057A5C(s32 index) {
+    return func_8005D92C(index) == 7;
+}
+
+u32 func_80057A80(s32 index) {
+    u8 state = func_8005D92C(index);
+
+    return state >= 1 && state <= 4;
+}
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80057ACC.s")
@@ -66,9 +70,14 @@ static u32 GbSave_Flags(s32 index) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80057F58.s")
 #endif
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/GbSave_ComputeChecksum.s")
-#endif
+void GbSave_ComputeChecksum(const u8 *start, u8 *end) {
+    u32 sum = 0;
+
+    while (start < end) {
+        sum += *start++;
+    }
+    *end = (u8)(0xFF - sum);
+}
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/GbSave_ComputeChecksumRange.s")
