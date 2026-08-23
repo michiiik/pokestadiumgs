@@ -76,7 +76,10 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E1366C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E13688.s")
+extern u8 *D_87E1EBD8;
+s32 func_87E13688(void) {
+    return *(s32 *)(D_87E1EBD8 + 0x250) == 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E1369C.s")
 #endif
