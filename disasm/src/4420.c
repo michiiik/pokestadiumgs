@@ -2,7 +2,9 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80003820.s")
+u16 func_80003820(const u8 *arg0) {
+    return (u16)((arg0[0] << 8) | arg0[1]);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80003838.s")
 

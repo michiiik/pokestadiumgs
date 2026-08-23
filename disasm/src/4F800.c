@@ -22,7 +22,11 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4F800/func_8004EE30.s")
+void func_8004EE30(u8 *arg0, const u8 *arg1) {
+    arg0[0] = arg1[0];
+    arg0[1] = arg1[1];
+    arg0[2] = arg1[2];
+}
 #endif
 
 #ifdef VERSION_US
