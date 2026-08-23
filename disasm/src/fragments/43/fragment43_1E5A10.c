@@ -1,7 +1,7 @@
 #include "global.h"
 
 
-void func_8AC00020(void) {
+void fragment43_main(void) {
 }
 
 #ifdef VERSION_US

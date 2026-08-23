@@ -50,7 +50,7 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/61/fragment61_code/func_86B021E8.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/61/fragment61_code/fragment61_main.s")
 #endif
 
 #ifdef VERSION_US

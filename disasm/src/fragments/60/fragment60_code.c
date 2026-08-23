@@ -49,7 +49,7 @@ void func_86A004AC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/60/fragment60_code/func_86A01CC4.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/60/fragment60_code/fragment60_main.s")
 #endif
 
 #ifdef VERSION_US
