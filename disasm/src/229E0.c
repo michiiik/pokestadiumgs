@@ -1045,9 +1045,85 @@ s32 func_80035160(s32 channel) {
     return D_80094870[channel];
 }
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Audio_ThreadEntry.s")
-#endif
+/* Audio's scheduler thread owns the two one-entry completion queues and
+ * submits the small audio task descriptors produced by the command builder.
+ * The scheduler/client objects are intentionally opaque here; their layout is
+ * private to the scheduler implementation.  The task copy below follows the
+ * 0x68-byte slot layout used by the original thread. */
+extern u8 D_80122B20[];
+extern u8 D_80122B18[];
+extern u8 D_80122A4C[];
+extern u8 D_80122A48[];
+extern u8 D_80122AB4[];
+extern u8 D_80122AB0[];
+extern u8 D_800CD020[];
+extern s32 D_8009486C;
+
+extern void __osSetFpcCsr(u32 value);
+extern void Sched_InitClientQueue(void *client, s32 taskType, s32 priority);
+extern void Sched_AddClient(void *client);
+extern void Sched_WaitClientQueue(void *client);
+extern void Sched_SubmitTask(void *task, s32 flags);
+extern void profiler_log_thread4_time(void);
+extern void Audio_InitializeTaskState(void);
+extern void *Audio_BuildSchedulerTask(void);
+extern void func_80025C50(s32 mode);
+
+void Audio_ThreadEntry(void *arg) {
+    u8 *client = D_80122B20;
+    u8 *taskQueue = D_80122A4C;
+    u8 *taskMessages = D_80122A48;
+    u8 *doneQueue = D_80122AB4;
+    u8 *doneMessages = D_80122AB0;
+    s32 *running = &D_80122A40;
+    s32 *toggle = (s32 *)D_80122B18;
+    s32 *taskIndex = (s32 *)D_8009486C;
+    u8 *audioState = D_800CD020;
+
+    (void)arg;
+    __osSetFpcCsr(0x1000C01);
+    Sched_InitClientQueue(client, 1, 1);
+    Sched_AddClient(client);
+
+    *running = 1;
+    *toggle = 0;
+    osCreateMesgQueue((OSMesgQueue *)taskQueue, (OSMesg *)taskMessages, 1);
+    osCreateMesgQueue((OSMesgQueue *)doneQueue, (OSMesg *)doneMessages, 1);
+    osSendMesg((OSMesgQueue *)taskQueue, (OSMesg)(u32)0x444F4E45, 0);
+    osSendMesg((OSMesgQueue *)doneQueue, (OSMesg)(u32)0x444F4E45, 0);
+    Audio_InitializeTaskState();
+    func_80025C50(2);
+
+    for (;;) {
+        Sched_WaitClientQueue(client);
+        profiler_log_thread4_time();
+
+        if (*running != 0 && *(s16 *)(audioState + 0xA38) < 0x15) {
+            void *builtTask = Audio_BuildSchedulerTask();
+
+            if (builtTask != NULL) {
+                u8 *source = (u8 *)builtTask;
+                u8 *destination = taskMessages + (*toggle * 0x68);
+                s32 i;
+
+                for (i = 0; i < 5; i++) {
+                    *(u32 *)(destination + 0x14 + i * 0xC) =
+                        *(u32 *)(source + i * 0xC);
+                    *(u32 *)(destination + 0x18 + i * 0xC) =
+                        *(u32 *)(source + 4 + i * 0xC);
+                    *(u32 *)(destination + 0x1C + i * 0xC) =
+                        *(u32 *)(source + 8 + i * 0xC);
+                }
+                *(u32 *)(destination + 0x5C) = *(u32 *)(source + 0x3C);
+                Sched_SubmitTask(destination, 0);
+            }
+        }
+
+        *toggle ^= 1;
+        profiler_log_thread4_time();
+        *taskIndex += 1;
+    }
+}
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Thread4_CreateThread.s")

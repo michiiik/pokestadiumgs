@@ -11,6 +11,25 @@ extern void func_87F0F390(void);
 extern void func_87F0F3E4(void);
 extern u8 D_801291E0[];
 extern s8 D_8012B363;
+extern s32 D_8012B364;
+extern u8 D_8012B368[];
+extern u8 D_8012B386;
+extern u8 D_8012B39E;
+extern u8 D_8012B3B6;
+extern u8 D_8012B3CE;
+extern u8 D_8012B3E8[];
+
+extern void *Fragment_Load(u32 pool, u32 source, u32 end);
+extern s32 Fragment_LoadAndCall(u32 pool, u32 source, u32 end, s32 arg3,
+                                void *arg4);
+extern void Minigame_BuildControllerResult(void *state, void *result,
+                                           s32 useAllPlayers);
+extern u8 D_8AC00000[];
+extern u8 D_8AB00000[];
+extern u8 fragment43_ROM_START[];
+extern u8 fragment44_ROM_START[];
+extern u8 fragment45_ROM_START[];
+extern u8 fragment46_ROM_START[];
 
 void Minigame_ProcessPlayerEvents(void *player, s32 event, void *context) {
     void (*handler)(void *, u8, void *);
@@ -162,7 +181,83 @@ void Minigame_UpdatePlayerCounters(void) {
     handler((void *)D_801291E0, D_8012B363);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_800723FC.s")
+/* Advance the minigame result handshake after a loaded game callback.
+ *
+ * D_8012B364 is the pending result state: values 1 and 2 are acknowledged
+ * only by the corresponding callback result.  Any other result clears the
+ * handshake and resets the shared player record.  When all four player
+ * statuses are not simultaneously resolved, the common result fragment is
+ * loaded and its per-player completion bit is reflected in the four status
+ * bytes at D_8012B386..D_8012B3CE.
+ */
+void Minigame_AdvanceResultHandshake(s32 callbackResult, s32 *outResult,
+                                     s32 useAllPlayers) {
+    u8 *state = D_801291E0;
+    u8 *result = D_8012B3E8;
+    s32 negativeStatusCount;
+    s32 i;
+
+    if (state[0x2180] == 4) {
+        *outResult = 0xFF;
+        return;
+    }
+
+    if (D_8012B364 == 1) {
+        if (callbackResult == 1) {
+            D_8012B364 = 0;
+        }
+    } else if (D_8012B364 == 2) {
+        if (callbackResult == 2) {
+            negativeStatusCount = 0;
+            for (i = 0; i < 4; i++) {
+                if (*(s16 *)(state + 0x21A6 + i * 0x18) < 0) {
+                    negativeStatusCount++;
+                }
+            }
+            if (negativeStatusCount != 1) {
+                Minigame_BuildControllerResult(state, result, useAllPlayers);
+                Fragment_Load(
+                    (((u32)D_8AC00000 & 0x0FF00000) >> 20) - 0x10,
+                    (u32)fragment43_ROM_START, (u32)fragment44_ROM_START);
+                Fragment_LoadAndCall(
+                    (((u32)D_8AB00000 & 0x0FF00000) >> 20) - 0x10,
+                    (u32)fragment45_ROM_START, (u32)fragment46_ROM_START,
+                    0, result);
+
+                if (result[0x0F] == 0) {
+                    D_8012B386 |= 0x80;
+                } else {
+                    D_8012B386 &= 0x7F;
+                }
+                if (result[0x0F] == 1) {
+                    D_8012B39E |= 0x80;
+                } else {
+                    D_8012B39E &= 0x7F;
+                }
+                if (result[0x0F] == 2) {
+                    D_8012B3B6 |= 0x80;
+                } else {
+                    D_8012B3B6 &= 0x7F;
+                }
+                if (result[0x0F] == 3) {
+                    D_8012B3CE |= 0x80;
+                } else {
+                    D_8012B3CE &= 0x7F;
+                }
+                Minigame_UpdatePlayerCounters();
+            }
+        } else {
+            D_8012B364 = 0;
+        }
+    } else {
+        D_8012B364 = 0;
+    }
+
+    if (D_8012B364 == 0) {
+        Minigame_ResetPlayerRecord(D_8012B368);
+    }
+    *outResult = -1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/Minigame_UpdateResultState.s")
 

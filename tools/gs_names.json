@@ -26,6 +26,10 @@
   "Vi_SelectMode": "matches Stadium 1 Video_SetMode (callgraph). Same function, two spellings of the same idea. Upstream name kept."
  },
   "functions": {
+    "func_800723FC": [
+      "Minigame_AdvanceResultHandshake",
+      "advances the shared minigame result handshake, loads the common result fragments, and updates per-player completion flags"
+    ],
   "func_8005655C": [
    "GbPak_ReadWriteBytes",
    "The helper performs chunked osGbpakReadWrite transfers, handles 0x2000-byte bank boundaries, refreshes the Pak status, and reports connector errors"
