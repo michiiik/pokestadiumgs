@@ -221,7 +221,7 @@ void func_80019164(void) { func_80018728(0xFA000000, 0); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80019188.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_800191BC.s")
+extern OSMesgQueue *D_801221B8; void func_800191BC(void) { osRecvMesg(D_801221B8, NULL, 0); osRecvMesg(D_801221B8, NULL, 1); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_800191FC.s")
 
