@@ -2,23 +2,105 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_800609D0.s")
+extern s32 func_8003514C(void);
+#define D_80097380 ((u8 *)0x80097380)
+#define D_80097480 ((u8 *)0x80097480)
+#define D_80097580 ((u8 *)0x80097580)
+#define D_80097680 (*(u8 **)0x80097680)
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060A4C.s")
+void func_800609D0(void) {
+    switch (func_8003514C()) {
+    case 1:
+        D_80097680 = D_80097380;
+        break;
+    case 2:
+        D_80097680 = D_80097480;
+        break;
+    case 3:
+    case 4:
+    case 5:
+        D_80097680 = D_80097580;
+        break;
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/GbData_ReadU24BE.s")
+u16 func_80060A4C(const u8 *data) {
+    return ((u16)data[0] << 8) | data[1];
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060A84.s")
+u32 GbData_ReadU24BE(const u8 *data) {
+    return ((u32)data[0] << 16) | ((u32)data[1] << 8) | data[2];
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/GbData_WriteU24BE.s")
+void func_80060A84(u8 *data, s32 value) {
+    data[0] = (u8)(value >> 8);
+    data[1] = (u8)value;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060AAC.s")
+void GbData_WriteU24BE(u8 *data, s32 value) {
+    data[0] = (u8)(value >> 16);
+    data[1] = (u8)(value >> 8);
+    data[2] = (u8)value;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060AC8.s")
+u8 func_80060AAC(s32 value) {
+    return D_80097680[(u8)value];
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060B28.s")
+u8 func_80060AC8(s32 value, s32 table) {
+    u8 *data = D_80097680;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060B74.s")
+    switch (table) {
+    case 1:
+        data = D_80097380;
+        break;
+    case 2:
+        data = D_80097480;
+        break;
+    case 3:
+    case 4:
+    case 5:
+        data = D_80097580;
+        break;
+    }
+    return data[(u8)value];
+}
+
+s32 func_80060B28(s32 value) {
+    u8 target = (u8)value;
+
+    for (s32 index = 0; index < 0x100; index++) {
+        if (D_80097680[index] == target) {
+            return index;
+        }
+    }
+    return 0;
+}
+
+s32 func_80060B74(s32 value, s32 table) {
+    u8 *data = D_80097680;
+
+    switch (table) {
+    case 1:
+        data = D_80097380;
+        break;
+    case 2:
+        data = D_80097480;
+        break;
+    case 3:
+    case 4:
+    case 5:
+        data = D_80097580;
+        break;
+    }
+
+    for (s32 index = 0; index < 0x100; index++) {
+        if (data[index] == (u8)value) {
+            return index;
+        }
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060C08.s")
 

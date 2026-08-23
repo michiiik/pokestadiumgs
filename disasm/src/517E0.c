@@ -15,7 +15,29 @@ extern s32 D_800972C0;
 extern void Save_ResetAndCommitTypedRecord(s32 type, s32 record);
 extern void func_80055260(s32 type, s32 record);
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80050BE0.s")
+extern s32 func_8004C594(s32 kind, s32 index);
+extern void func_8004C8A0(void *dst, s32 size, s32 fill, s32 flags);
+extern void func_80055948(s32 mode);
+extern void func_8005487C(u8 *outState);
+extern void func_8002A7E8(s32 enabled);
+
+void func_80050BE0(void) {
+    u8 *table = (u8 *)0x801281F0;
+    u8 state[2];
+    s32 index;
+
+    main_pool_push_state(0x424B5550);
+    for (index = 1; index <= 14; index++) {
+        func_8004C594(2, index);
+        func_8004C8A0(table, 0x20, 0x41, 1);
+        table += 0x20;
+    }
+    func_80055948(3);
+    func_8005487C(state);
+    func_80025C50(func_80035160(state[0]));
+    func_8002A7E8((state[1] & 1) != 0);
+    main_pool_pop_state(0x424B5550);
+}
 
 void *func_80050CAC(s32 index, s32 active) {
     SaveRecordEntry *entry = &D_801281C0[index];
