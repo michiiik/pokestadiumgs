@@ -40,6 +40,9 @@ void func_80068A50(void *descriptor, const void *source) {
 }
 
 /* Select the scene command and participant slot associated with a state. */
+#pragma GLOBAL_ASM("asm/us/nonmatchings/69650/func_80068AB0.s")
+
+#if 0
 s32 func_80068AB0(u32 state) {
     u16 command = 0xFFFF;
     u16 slot = 4;
@@ -94,6 +97,7 @@ s32 func_80068AB0(u32 state) {
     func_8006A3B8(command);
     return func_8006A400(slot);
 }
+#endif
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/69650/func_80068B78.s")
 

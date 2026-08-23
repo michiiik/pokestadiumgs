@@ -56,6 +56,10 @@ void *func_80050CF8(s32 index) {
     return NULL;
 }
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80050D20.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80050DE4.s")
+
+#if 0
 s32 func_80050D20(s32 type, s32 value) {
     switch (type) {
         case 0x10:
@@ -96,6 +100,7 @@ s32 func_80050DE4(s32 type) {
     }
     return 0;
 }
+#endif
 
 static u8 *Save_GetTypedBase(s32 active, s32 type, s32 value) {
     s32 bank = func_80050D20(type, value);
@@ -280,6 +285,8 @@ void func_800519AC(u8 *src, void *arg) {
     bcopy(src, dst + 0x34, 0x14);
 }
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051A8C.s")
+#if 0
 s32 func_80051A8C(s32 type, s32 record, s32 mask) {
     u8 *data = NULL;
 
@@ -334,6 +341,8 @@ s32 func_80051A8C(s32 type, s32 record, s32 mask) {
     return data != NULL ? ((*(u8 *)data & mask) != 0) : 0;
 }
 
+#endif
+
 /**
  * Set bits in the header byte of a typed save record.
  *
@@ -342,6 +351,8 @@ s32 func_80051A8C(s32 type, s32 record, s32 mask) {
  * the caller-provided record index; all other types use the record argument
  * only where their accessor requires it.
  */
+#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051BF0.s")
+#if 0
 s32 func_80051BF0(s32 type, s32 record, s32 mask) {
     u8 *data = NULL;
 
@@ -401,6 +412,8 @@ s32 func_80051BF0(s32 type, s32 record, s32 mask) {
     return 1;
 }
 
+#endif
+
 static u8 *Save_GetTypedRecord(s32 type, s32 record) {
     switch (type) {
         case 0x10:
@@ -451,6 +464,8 @@ static s32 Save_GetTypedBank(s32 type, s32 record) {
     return func_80050D20(type, value);
 }
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051D64.s")
+#if 0
 void func_80051D64(s32 type, s32 record) {
     u8 *data;
     s32 length;
@@ -463,6 +478,10 @@ void func_80051D64(s32 type, s32 record) {
     Save_CommitRecord(data, length, Save_GetTypedBank(type, record));
 }
 
+#endif
+
+#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80052150.s")
+#if 0
 void func_80052150(s32 type, s32 record) {
     u8 *data;
     s32 length;
@@ -475,6 +494,10 @@ void func_80052150(s32 type, s32 record) {
     Save_InvalidateRecord(data, length, Save_GetTypedBank(type, record));
 }
 
+#endif
+
+#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_8005253C.s")
+#if 0
 void func_8005253C(s32 type, s32 record) {
     u8 *data;
     s32 length;
@@ -486,6 +509,8 @@ void func_8005253C(s32 type, s32 record) {
     length = func_80050DE4(type);
     Save_RestoreRecord(data, length, Save_GetTypedBank(type, record));
 }
+
+#endif
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80052928.s")
 
@@ -667,6 +692,8 @@ s32 func_800551EC(u8 *data, s32 length) {
     return *(u16 *)(footer + 4) == Save_Checksum(data, length);
 }
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055260.s")
+#if 0
 void func_80055260(s32 type, s32 record) {
     u8 *backup = NULL;
     u8 *active = NULL;
@@ -770,6 +797,8 @@ void func_80055260(s32 type, s32 record) {
         Save_WriteRecord(backup, active, length, func_80050D20(type, record));
     }
 }
+
+#endif
 
 void func_800555B4(s32 commit) {
     s32 savedBank = D_800972C0;
@@ -961,6 +990,8 @@ s32 func_80055B14(u8 *dst, s32 record) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055F6C.s")
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80056024.s")
+#if 0
 u32 func_80056024(s32 type) {
     static const u32 masks[] = {
         1, 2, 4, 8, 0x10, 0x20, 0x40, 0x80, 0x100,
@@ -972,6 +1003,8 @@ u32 func_80056024(s32 type) {
     }
     return masks[type - 5];
 }
+
+#endif
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800560F0.s")
 

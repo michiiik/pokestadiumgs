@@ -74,7 +74,9 @@ void func_8006D438(s32 arg0) {
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6DEC0/func_8006D2C0.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/6DEC0/Game_State05_Run.s")
 
+#if 0
 void Game_State05_Run(void) {
     s32 result;
     s32 callbackResult;
@@ -247,6 +249,7 @@ void Game_State05_Run(void) {
     main_pool_pop_state(0x47424D4F);
     main_pool_pop_state(0x4C414243);
 }
+#endif
 
 void Game_State19_Run(void) {
     s32 result;

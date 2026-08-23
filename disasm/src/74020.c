@@ -119,6 +119,9 @@ u8 func_80073600(s32 code) {
  * The input byte is deliberately sign-extended: the original routine uses
  * `lb`, and its unsigned jump-table bounds check is consequently preserved
  * here rather than silently changing the handling of high-bit bytes. */
+#pragma GLOBAL_ASM("asm/us/nonmatchings/74020/func_80073638.s")
+
+#if 0
 s32 func_80073638(const u8 *input, u8 *output, s32 maxGlyphs) {
     u8 *dst = output;
     s32 count = 0;
@@ -216,6 +219,7 @@ s32 func_80073638(const u8 *input, u8 *output, s32 maxGlyphs) {
     }
     return count;
 }
+#endif
 
 /* Compare two packed text strings after expanding their glyph pairs. */
 s32 func_80073828(const u8 *left, const u8 *right) {

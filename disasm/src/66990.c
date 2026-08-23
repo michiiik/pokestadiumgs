@@ -15,6 +15,8 @@ extern void *Fragment_Load(u32 pool, u32 source, u32 end);
 extern s32 Fragment_LoadAndCall(u32 pool, u32 source, u32 end, s32 arg3,
                                 void *arg4);
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/66990/Game_State03_Run.s")
+#if 0
 void Game_State03_Run(void) {
     s32 result;
     s32 i;
@@ -71,6 +73,7 @@ void Game_State03_Run(void) {
     }
     main_pool_pop_state(0x70736C64);
 }
+#endif
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/66990/func_80065D90.s")

@@ -61,9 +61,6 @@ SECTIONS
         text_TEXT_START = .;
         build/asm/us/entry.o(.text);
         build/asm/us/pre_main.o(.text);
-        /* Keep jump-table targets referenced by data objects globally linkable
-         * while their containing routines are represented in C. */
-        build/asm/us/legacy_local_label_aliases.o(.text);
         build/src/main.o(.text);
         build/src/legacy_link_aliases.o(.text);
         . += 0x10;

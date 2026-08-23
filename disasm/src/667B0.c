@@ -13,6 +13,8 @@ extern s32 Fragment_LoadAndCall(u32 pool, u32 source, u32 end, s32 arg3,
                                 void *arg4);
 
 #ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/667B0/Game_State02_Run.s")
+#if 0
 void Game_State02_Run(void) {
     s32 result;
     s32 i;
@@ -76,4 +78,5 @@ void Game_State02_Run(void) {
             break;
     }
 }
+#endif
 #endif

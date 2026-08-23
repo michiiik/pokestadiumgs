@@ -8,6 +8,8 @@ extern s32 func_8003514C(void);
 #define D_80097580 ((u8 *)0x80097580)
 #define D_80097680 (*(u8 **)0x80097680)
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_800609D0.s")
+#if 0
 void func_800609D0(void) {
     switch (func_8003514C()) {
     case 1:
@@ -23,6 +25,8 @@ void func_800609D0(void) {
         break;
     }
 }
+
+#endif
 
 u16 func_80060A4C(const u8 *data) {
     return ((u16)data[0] << 8) | data[1];
@@ -47,6 +51,8 @@ u8 func_80060AAC(s32 value) {
     return D_80097680[(u8)value];
 }
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060AC8.s")
+#if 0
 u8 func_80060AC8(s32 value, s32 table) {
     u8 *data = D_80097680;
 
@@ -66,6 +72,8 @@ u8 func_80060AC8(s32 value, s32 table) {
     return data[(u8)value];
 }
 
+#endif
+
 s32 func_80060B28(s32 value) {
     u8 target = (u8)value;
     s32 index;
@@ -78,6 +86,8 @@ s32 func_80060B28(s32 value) {
     return 0;
 }
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060B74.s")
+#if 0
 s32 func_80060B74(s32 value, s32 table) {
     u8 *data = D_80097680;
     s32 index;
@@ -103,6 +113,8 @@ s32 func_80060B74(s32 value, s32 table) {
     }
     return 0;
 }
+
+#endif
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060C08.s")
 

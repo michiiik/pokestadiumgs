@@ -46,6 +46,8 @@ extern void Game_SetState(s32);
 #define D_8009DED0 ((u32 *)0x8009DED0)
 
 #ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/66DF0/Game_State06_Run.s")
+#if 0
 void Game_State06_Run(void) {
     u32 descriptor[4];
     u8 stateData[0x24];
@@ -150,4 +152,5 @@ void Game_State06_Run(void) {
     }
     main_pool_pop_state(0x706D7063); Game_SetState(3);
 }
+#endif
 #endif

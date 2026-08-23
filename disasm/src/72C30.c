@@ -2,6 +2,20 @@
 
 
 #ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/LinkAlias_func_80072030.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/LinkAlias_func_800720A8.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/LinkAlias_func_80072070.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/LinkAlias_func_80072184.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/LinkAlias_func_8007216C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/LinkAlias_func_800721EC.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/LinkAlias_func_800721D8.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/LinkAlias_func_80072264.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/LinkAlias_func_800723C4.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/LinkAlias_func_800723FC.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/LinkAlias_func_80072650.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/LinkAlias_func_80072740.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/LinkAlias_func_80072774.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/LinkAlias_func_800727A4.s")
 extern void *func_80003240(void *table);
 extern void func_87F0EFA0(void);
 extern void func_87F0EDDC(void);
@@ -498,6 +512,9 @@ static void Minigame_RunRoundCase(s32 round, u8 *state, s32 *result) {
     }
 }
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/Game_State10_Minigame.s")
+
+#if 0
 void Game_State10_Minigame(s32 initialize) {
     u8 *state = D_801291E0;
     s32 round;
@@ -549,4 +566,5 @@ void Game_State10_Minigame(s32 initialize) {
     func_80035424(2);
     main_pool_pop_state(0x6D696E69);
 }
+#endif
 #endif
