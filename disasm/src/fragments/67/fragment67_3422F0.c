@@ -18,7 +18,11 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_3422F0/func_829060BC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_3422F0/func_82906164.s")
+extern f32 D_80128C54[];
+
+void func_82906164(f32 arg0) {
+    D_80128C54[1] = arg0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_3422F0/func_82906170.s")
 
