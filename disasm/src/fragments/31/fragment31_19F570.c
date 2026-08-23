@@ -2,9 +2,14 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_19F570/func_8822C2F0.s")
+extern s32 D_880068B8;
+void func_8822C2F0(void) {
+    D_880068B8 = 0;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_19F570/func_8822C2FC.s")
+void func_8822C2FC(void) {
+    D_880068B8 = 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_19F570/func_8822C30C.s")
 
