@@ -79,7 +79,8 @@ s32 func_8006ACF0(void) { s32 result = 0; s32 ptr = D_8009DF70; if (ptr != 0) re
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006AD10.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006AE90.s")
+extern s32 D_8009DF70;
+s32 func_8006AE90(s32 value) { s32 result = 0; if (D_8009DF70 != 0) { *(s16 *)((u8 *)(u32)D_8009DF70 + 0x14) = value; result = 1; } return result; }
 
 extern s32 D_8009DF70;
 s32 func_8006AEB4(void) { s32 result = -1; s32 ptr = D_8009DF70; if (ptr != 0) result = *(s16 *)((u8 *)(u32)ptr + 0x14); return result; }
