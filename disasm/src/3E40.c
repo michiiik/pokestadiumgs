@@ -34,7 +34,18 @@ void Util_Memcpy(u32 *dst, const u32 *src, s32 wordCount) {
 
 extern u32 osGetMemSize(void);
 extern void main_pool_init(void *start, u32 end);
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3E40/Util_InitMainPools.s")
+extern void Dma_InitializeCompletionQueue(void);
+extern void *mem_pool_try_init(u32 size, s32 flags);
+
+void Util_InitMainPools(void) {
+    u32 memorySize = osGetMemSize();
+
+    D_800871F0 = memorySize - 0x400000;
+    D_800871F4 = memorySize;
+    main_pool_init((void *)0x80134470, memorySize | 0x80000000);
+    Dma_InitializeCompletionQueue();
+    D_800CCDF0 = mem_pool_try_init(0x10000, 0);
+}
 
 u32 func_8000339C(void) {
     return *(u32 *)0x800871F4;
@@ -56,11 +67,55 @@ void Util_Free(void *ptr) {
     mem_pool_free(D_800CCDF0, ptr);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3E40/Util_DrawRect.s")
+extern s32 StageContext_IsHighResolution(void);
+
+/* Emit the RDP fill-rectangle sequence used by the UI. */
+void Util_DrawRect(u32 **displayList, u32 ulx, u32 uly, u32 lrx, u32 lry,
+                   u16 color) {
+    u32 *gfx = *displayList;
+    u32 edgeA = uly;
+    u32 edgeB = lrx;
+    u32 lowA;
+    u32 lowB;
+
+    (void)ulx;
+    (void)lry;
+
+    if (StageContext_IsHighResolution()) {
+        edgeA <<= 1;
+        edgeB <<= 1;
+        lowA = 0x22;
+        lowB = 0x1E;
+    } else {
+        lowA = 0x11;
+        lowB = 0x0F;
+    }
+
+    gfx[0] = 0xE7000000;
+    gfx[1] = 0;
+    gfx[2] = 0xF7000000;
+    gfx[3] = ((u32)color << 16) | color;
+    gfx[4] = 0xF6000000 | ((edgeA & 0x3FF) << 14) | ((lowA & 0x3FF) << 2);
+    gfx[5] = ((edgeB & 0x3FF) << 14) | ((lowB & 0x3FF) << 2);
+    *displayList = gfx + 6;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/3E40/func_800034E4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3E40/Util_Memclear.s")
+void Util_Memclear(u32 *dst, u32 count) {
+    while (count-- != 0) {
+        *dst++ = 0xFFFFFFFF;
+        *dst++ = 0xFFFFFFFF;
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3E40/Util_CheckStubMemArea.s")
+s32 Util_CheckStubMemArea(const u32 *pairs) {
+    s32 count = 0;
+
+    while (pairs[0] == 0x80400000 && pairs[1] == 0x80400000) {
+        pairs += 2;
+        count++;
+    }
+    return count * 8;
+}
 #endif
