@@ -126,9 +126,13 @@ s32 func_87E15698(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E17DAC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E17EA8.s")
+s32 func_87E17EA8(u8 *arg0) {
+    return *(s8 *)(arg0 + 1) == 5;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E17EB8.s")
+s32 func_87E17EB8(u8 *arg0) {
+    return *(s8 *)(arg0 + 3) == 1;
+}
 
 s32 func_87E17EC8(u8 *arg0) {
     return *(s8 *)(arg0 + 1);
