@@ -986,7 +986,8 @@ void func_80033ED0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035160.s")
+extern s32 D_80094870[];
+s32 func_80035160(s32 index) { return D_80094870[index]; }
 #endif
 
 #ifdef VERSION_US
@@ -998,7 +999,8 @@ void func_80033ED0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003539C.s")
+extern void func_80021BBC(void);
+void func_8003539C(void) { func_80021BBC(); }
 #endif
 
 #ifdef VERSION_US
@@ -1028,7 +1030,8 @@ s32 func_800353E4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035470.s")
+extern s32 D_80122A40;
+void func_80035470(s32 enabled) { D_80122A40 = enabled ? 0 : 1; }
 #endif
 
 #ifdef VERSION_US
