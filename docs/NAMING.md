@@ -109,9 +109,9 @@ roles.
 every unnamed function with its named callers and callees -- the partition that
 makes a manual pass tractable (`229E0` alone has 208 anchors around 331
 unnamed functions). `tools/find_dispatch_tables.py` found the 180 candidate
-tables (1,560 entries); after this pass 102 + the 9 geo entries resolve to
-named functions, and the remaining large tables (lengths 253, 225, 83, 53,
-50, 48) are the next audit targets.
+tables (1,560 entries); the historical Phase 2 batch resolved 102 + the 9 geo
+entries, while later Phase 3 batches resolve the 253-, 225-, 83-, 53-, 50-,
+and 9-entry tables positionally.
 
 Phase 2 is assembly-verified: the renamed tree builds the byte-identical US
 ROM (md5 `1561c75d11cedf356a8ddb1a4a5f9d5d`) in the linux/amd64 container.
@@ -235,8 +235,7 @@ are named `BattleAnim_Dispatch_NNN` from their table slots, with repeated slots
 recorded in each entry's evidence. This is deliberately a positional naming
 batch: the table cardinality and slot selection establish a per-species-style
 dispatch surface, but do not by themselves prove the semantic animation for a
-handler. The neighboring 225-entry table remains unassigned pending the same
-cross-check.
+handler. The neighboring table is audited separately below.
 
 The neighboring 225-entry table at `0x84184148` has now received the same
 positional treatment: one dominant default target and 51 non-default targets
