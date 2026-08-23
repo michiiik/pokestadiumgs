@@ -260,7 +260,7 @@ void func_86A06E0C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/60/fragment60_code/func_86A0C9AC.s")
+void func_86A0C9AC(u8 *arg0) {}
 #endif
 
 #ifdef VERSION_US

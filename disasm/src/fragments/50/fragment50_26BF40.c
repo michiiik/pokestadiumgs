@@ -13,7 +13,7 @@ void func_862055E8(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_26BF40/func_86205724.s")
+void func_86205724(u8 *arg0) {}
 #endif
 
 #ifdef VERSION_US
