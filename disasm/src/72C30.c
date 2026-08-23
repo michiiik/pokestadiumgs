@@ -10,7 +10,12 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_8007214C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_8007216C.s")
+void func_8007216C(s32 *arg0) {
+    arg0[0] = 0;
+    arg0[1] = 0;
+    arg0[2] = 1;
+    arg0[3] = 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_80072184.s")
 
