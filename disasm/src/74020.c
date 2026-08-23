@@ -14,9 +14,13 @@
 #define D_8009FF6B ((u8 *)0x8009FF6B)
 
 #define D_8012B410 ((u8 *)0x8012B410)
+#define D_800A0068 ((u8 *)0x800A0068)
+#define D_800A006C ((u8 *)0x800A006C)
+#define D_800A0070 ((u8 *)0x800A0070)
+#define D_800A0074 ((u8 *)0x800A0074)
+#define D_800A0078 ((u8 *)0x800A0078)
 
 #ifdef VERSION_US
-extern s32 func_80073638(const u8 *input, u8 *output, s32 maxGlyphs);
 extern void _bzero(void *dst, s32 size);
 
 u8 func_80073420(s32 code) {
@@ -111,7 +115,107 @@ u8 func_80073600(s32 code) {
     return D_8009FF6B[index];
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/74020/func_80073638.s")
+/* Expand the renderer's compact control codes into glyph/attribute pairs.
+ * The input byte is deliberately sign-extended: the original routine uses
+ * `lb`, and its unsigned jump-table bounds check is consequently preserved
+ * here rather than silently changing the handling of high-bit bytes. */
+s32 func_80073638(const u8 *input, u8 *output, s32 maxGlyphs) {
+    u8 *dst = output;
+    s32 count = 0;
+    s32 code;
+
+    if ((code = (s32)(s8)*input) == 0 || maxGlyphs <= 0) {
+        return 0;
+    }
+
+    while (code != 0 && count < maxGlyphs) {
+        u8 attr;
+
+        if ((u32)(code - 0xBC) < 0x41) {
+            switch (code - 0xBC) {
+            case 0:
+                dst[0] = D_800A0068[0];
+                dst[1] = D_800A0068[1];
+                dst[2] = D_800A006C[0];
+                dst[3] = D_800A006C[1];
+                dst += 4;
+                count += 2;
+                goto next;
+            case 1:
+                dst[0] = D_800A0070[0];
+                dst[1] = D_800A0070[1];
+                dst[2] = D_800A0074[0];
+                dst[3] = D_800A0074[1];
+                dst += 4;
+                count += 2;
+                goto next;
+            case 8:
+                dst[0] = 0x41;
+                attr = dst[1];
+                dst[1] = (u8)((attr & 1) | 0xA);
+                dst += 2;
+                count++;
+                goto next;
+            case 0x1A:
+                dst[0] = 0x4F;
+                attr = dst[1];
+                dst[1] = (u8)((attr & 1) | 0xA);
+                dst += 2;
+                count++;
+                goto next;
+            case 0x20:
+                dst[0] = 0x55;
+                attr = dst[1];
+                dst[1] = (u8)((attr & 1) | 0xA);
+                dst += 2;
+                count++;
+                goto next;
+            case 0x23:
+                dst[0] = D_800A0078[0];
+                dst[1] = D_800A0078[1];
+                dst[2] = D_800A0078[2];
+                dst[3] = D_800A0078[3];
+                dst += 4;
+                count += 2;
+                goto next;
+            case 0x28:
+                dst[0] = 0x41;
+                dst[1] = 0xB;
+                dst += 2;
+                count++;
+                goto next;
+            case 0x3A:
+                dst[0] = 0x4F;
+                dst[1] = 0xB;
+                dst += 2;
+                count++;
+                goto next;
+            case 0x40:
+                dst[0] = 0x55;
+                dst[1] = 0xB;
+                dst += 2;
+                count++;
+                goto next;
+            default:
+                break;
+            }
+        }
+
+        if (code >= 0x61 && code < 0x7B) {
+            dst[0] = (u8)(code - 0x20);
+        } else {
+            dst[0] = (u8)code;
+        }
+        attr = dst[1];
+        dst[1] = (u8)((attr & 1) | 1);
+        dst += 2;
+        count++;
+
+    next:
+        code = (s32)(s8)*++input;
+    }
+    return count;
+}
 
 /* Compare two packed text strings after expanding their glyph pairs. */
 s32 func_80073828(const u8 *left, const u8 *right) {
