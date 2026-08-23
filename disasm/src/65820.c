@@ -6,7 +6,11 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/func_80064C88.s")
+extern s32 D_80128BE0;
+
+s32 func_80064C88(void) {
+    return D_80128BE0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -14,19 +18,35 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/func_80064CB8.s")
+extern s16 D_80128BE8;
+
+void func_80064CB8(s32 arg0) {
+    D_80128BE8 = arg0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/func_80064CC4.s")
+extern s16 D_80128BE8;
+
+s16 func_80064CC4(void) {
+    return D_80128BE8;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/func_80064CD0.s")
+extern s16 D_80128BEA;
+
+void func_80064CD0(s32 arg0) {
+    D_80128BEA = arg0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/func_80064CDC.s")
+extern s16 D_80128BEA;
+
+s16 func_80064CDC(void) {
+    return D_80128BEA;
+}
 #endif
 
 #ifdef VERSION_US
@@ -49,11 +69,19 @@ void func_80064DF4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/func_80064E2C.s")
+extern s32 D_8009DE94;
+
+s32 func_80064E2C(void) {
+    return D_8009DE94;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/func_80064E38.s")
+extern s32 D_80128BE4;
+
+s32 func_80064E38(void) {
+    return D_80128BE4;
+}
 #endif
 
 #ifdef VERSION_US
