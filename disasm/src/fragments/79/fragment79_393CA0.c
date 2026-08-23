@@ -97,7 +97,9 @@ u8 func_84125158(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841251B0.s")
+u8 func_841251B0(u8 arg0) {
+    return (arg0 << 4) | (arg0 >> 4);
+}
 #endif
 
 #ifdef VERSION_US
@@ -201,7 +203,11 @@ u8 func_84125158(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84126374.s")
+extern u8 D_841951BC;
+extern u8 D_841951BE;
+s32 func_84126374(void) {
+    return D_841951BC == D_841951BE;
+}
 #endif
 
 #ifdef VERSION_US
