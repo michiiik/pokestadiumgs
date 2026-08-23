@@ -6,7 +6,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/BF50/func_8000B3B0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/BF50/func_8000B524.s")
+s32 func_8000B524(void) { return guRandom() & 0xFFFF; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/BF50/func_8000B548.s")
+f32 func_8000B548(void) { return (f32)func_8000B524() / 65536.0f; }
 #endif
