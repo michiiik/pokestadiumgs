@@ -1953,11 +1953,13 @@ void func_8003EB84(u8 *arg0, s16 value) { *(s32 *)(arg0 + 0x48) = ((s32)value <<
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003EBA4.s")
+typedef struct { char pad[0x40]; struct { s16 pad0; void *data; s32 frame; s32 speed; } curve; } ModelAnim;
+s32 func_8003EBA4(ModelAnim *arg0, s16 arg1) { struct { s16 pad0; void *data; s32 frame; s32 speed; } *ptr = &arg0->curve; s32 temp_v0 = ptr->frame + ptr->speed; s32 arg = arg1 << 16; s32 var_a2; s32 v = ptr->speed; if (v >= 0) { var_a2 = ptr->frame < arg; if (var_a2 != 0) var_a2 = temp_v0 >= arg; } else { var_a2 = arg < ptr->frame; if (var_a2 != 0) var_a2 = arg >= temp_v0; } return var_a2; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003EC04.s")
+typedef struct { s16 flags; char pad2[4]; s16 fallback; char pad8[2]; u16 frameCount; } EventData;
+s32 func_8003EC04(ModelAnim *arg0) { return func_8003EBA4(arg0, ((EventData *)arg0->curve.data)->frameCount - 1); }
 #endif
 
 #ifdef VERSION_US
