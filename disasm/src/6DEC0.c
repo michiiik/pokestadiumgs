@@ -80,7 +80,7 @@ void Game_State05_Run(void) {
     s32 callbackResult;
     s32 state;
     s32 loopState;
-    s32 arg3;
+    s32 callbackArg = 8;
     s32 mode;
     u8 gameMode;
 
@@ -109,23 +109,62 @@ void Game_State05_Run(void) {
     func_80057908(gameMode);
     func_8005A0F4(gameMode);
 
+    mode = 0;
     if (D_80128C60 != 8) {
         loopState = 1;
         do {
             main_pool_push_state(0x4C414250);
             state = D_80128C60;
             switch (state) {
+                /* jtbl_800A58E0 maps state 1 to the controller loop. */
                 case 1:
-                    Fragment_Load(STATE05_POOL(D_88A00000),
-                                  (u32)fragment39_ROM_START,
-                                  (u32)fragment40_ROM_START);
-                    result = Fragment_LoadAndCall(
-                        STATE05_POOL(D_88100000), (u32)fragment30_ROM_START,
-                        (u32)fragment31_ROM_START, 8, NULL);
-                    D_80128C60 = result;
+                    callbackArg = state;
+                    mode = 0;
+                    main_pool_push_state(0x424F434F);
+                    Fragment_Load(STATE05_POOL(D_88600000),
+                                  (u32)fragment35_ROM_START,
+                                  (u32)fragment36_ROM_START);
+                    D_80128C64 = func_80041C98(5);
+                    do {
+                        result = Fragment_LoadAndCall(
+                            STATE05_POOL(D_88300000),
+                            (u32)fragment32_ROM_START,
+                            (u32)fragment33_ROM_START, mode,
+                            (void *)0x98);
+                        mode = (u16)result;
+                        state = D_80128C60;
+                        if (state == 2) {
+                            Fragment_LoadAndCall(
+                                STATE05_POOL(D_88400000),
+                                (u32)fragment33_ROM_START,
+                                (u32)fragment34_ROM_START, 0,
+                                (void *)mode);
+                            mode = 1;
+                            D_80128C60 = loopState;
+                            state = loopState;
+                        } else if (state == 3) {
+                            Fragment_Load(STATE05_POOL(D_8AC00000),
+                                          (u32)fragment43_ROM_START,
+                                          (u32)fragment44_ROM_START);
+                            result = func_8005D92C(gameMode);
+                            Fragment_LoadAndCall(
+                                STATE05_POOL(D_8AE00000),
+                                (u32)fragment46_ROM_START,
+                                (u32)fragment47_ROM_START, result,
+                                (void *)mode);
+                            mode = 2;
+                            D_80128C60 = loopState;
+                            state = loopState;
+                        }
+                    } while (state == loopState);
+                    main_pool_pop_state(0x4F474157);
+                    main_pool_pop_state(0x424F434F);
                     break;
 
-                case 2:
+                /* state 0 and state 7 share .L8006D670. */
+                case 0:
+                case 7:
+                    callbackArg = state;
                     Fragment_Load(STATE05_POOL(D_88A00000),
                                   (u32)fragment39_ROM_START,
                                   (u32)fragment40_ROM_START);
@@ -144,51 +183,19 @@ void Game_State05_Run(void) {
                     D_80128C60 = result;
                     break;
 
-                case 3:
-                    main_pool_push_state(0x424F434F);
-                    Fragment_Load(STATE05_POOL(D_88600000),
-                                  (u32)fragment35_ROM_START,
-                                  (u32)fragment36_ROM_START);
-                    D_80128C64 = func_80041C98(5);
-                    arg3 = 0;
-                    mode = 0;
-                    if (loopState == state) {
-                        do {
-                            result = Fragment_LoadAndCall(
-                                STATE05_POOL(D_88300000),
-                                (u32)fragment32_ROM_START,
-                                (u32)fragment33_ROM_START, mode,
-                                (void *)0x98);
-                            mode = (u16)result;
-                            state = D_80128C60;
-                            if (state == 2) {
-                                result = Fragment_LoadAndCall(
-                                    STATE05_POOL(D_88400000),
-                                    (u32)fragment33_ROM_START,
-                                    (u32)fragment34_ROM_START, 0, (void *)mode);
-                                arg3 = 1;
-                                D_80128C60 = loopState;
-                                state = loopState;
-                            } else if (state == 3) {
-                                Fragment_Load(STATE05_POOL(D_8AC00000),
-                                              (u32)fragment43_ROM_START,
-                                              (u32)fragment44_ROM_START);
-                                result = func_8005D92C(gameMode);
-                                Fragment_LoadAndCall(
-                                    STATE05_POOL(D_8AE00000),
-                                    (u32)fragment46_ROM_START,
-                                    (u32)fragment47_ROM_START, result,
-                                    (void *)mode);
-                                D_80128C60 = loopState;
-                                state = loopState;
-                            }
-                        } while (state == loopState);
-                    }
-                    main_pool_pop_state(0x4F474157);
-                    main_pool_pop_state(0x424F434F);
+                /* state 6 selects the single loaded callback. */
+                case 6:
+                    Fragment_Load(STATE05_POOL(D_88A00000),
+                                  (u32)fragment39_ROM_START,
+                                  (u32)fragment40_ROM_START);
+                    result = Fragment_LoadAndCall(
+                        STATE05_POOL(D_88100000), (u32)fragment30_ROM_START,
+                        (u32)fragment31_ROM_START, callbackArg, NULL);
+                    D_80128C60 = result;
                     break;
 
                 case 4:
+                    callbackArg = state;
                     Fragment_Load(STATE05_POOL(D_88800000),
                                   (u32)fragment37_ROM_START,
                                   (u32)fragment38_ROM_START);
@@ -201,7 +208,9 @@ void Game_State05_Run(void) {
                     D_80128C60 = result;
                     break;
 
-                case 7:
+                /* state 5 selects the GB-mode callback. */
+                case 5:
+                    callbackArg = state;
                     Fragment_Load(STATE05_POOL(D_81600000),
                                   (u32)fragment11_ROM_START,
                                   (u32)fragment12_ROM_START);
@@ -223,7 +232,7 @@ void Game_State05_Run(void) {
 
             main_pool_pop_state(0x4C414250);
             callbackResult = func_80064C88();
-            if ((u8)callbackResult != gameMode) {
+            if (callbackResult != gameMode) {
                 func_80057944(gameMode);
                 main_pool_pop_state(0x47424D4F);
                 gameMode = (u8)func_80064C88();
