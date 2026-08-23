@@ -2,7 +2,10 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_1286C0/func_826005F0.s")
+extern s32 D_82615330;
+void func_826005F0(s32 arg0) {
+    D_82615330 = arg0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_1286C0/func_826005FC.s")
 

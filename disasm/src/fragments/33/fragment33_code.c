@@ -2,7 +2,13 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/33/fragment33_code/func_88400020.s")
+extern s32 D_884017E4;
+s32 func_88400020(s32 arg0, s32 arg1) {
+    if (arg0 == 0) {
+        D_884017E4 = arg1;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/33/fragment33_code/func_88400034.s")
 

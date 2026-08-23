@@ -42,7 +42,12 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/16/fragment16_code/func_82000D10.s")
+s32 func_82000D10(s32 arg0, u8 *arg1) {
+    if (arg0 == 0) {
+        arg1[0x28] = 0x21;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
