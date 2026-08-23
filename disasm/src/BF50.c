@@ -2,11 +2,11 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/BF50/MathUtil_Atan2Lookup.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/BF50/func_8000B350.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/BF50/MathUtil_Atan2s.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/BF50/func_8000B3B0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/BF50/MathUtil_Random16.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/BF50/func_8000B524.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/BF50/MathUtil_Random_ZeroOne.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/BF50/func_8000B548.s")
 #endif

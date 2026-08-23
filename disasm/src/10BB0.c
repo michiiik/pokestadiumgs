@@ -28,9 +28,9 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_8001056C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/GbApu_Alloc.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_800105B8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/GbApu_InitAllocator.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_80010610.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_80010638.s")
 

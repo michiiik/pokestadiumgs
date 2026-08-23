@@ -10,7 +10,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/41/fragment41_code/func_88C00AB0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/41/fragment41_code/MathUtil_BuildTransformMtx_fragment41.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/41/fragment41_code/func_88C00BFC.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/41/fragment41_code/func_88C00CE4.s")
 
@@ -24,5 +24,5 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/41/fragment41_code/func_88C015DC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/41/fragment41_code/fragment41_main.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/41/fragment41_code/func_88C01750.s")
 #endif

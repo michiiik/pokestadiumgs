@@ -2,23 +2,23 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3A00/mem_pool_try_init.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/3A00/func_80002E00.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3A00/mem_pool_init.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/3A00/func_80002E48.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3A00/mem_pool_alloc.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/3A00/func_80002EB8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3A00/mem_pool_free.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/3A00/func_80002F90.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3A00/MainPool_AllocState.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/3A00/func_800030D0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3A00/MainPool_FinalizeAllocation.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/3A00/func_80003120.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3A00/MainPool_InitState.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/3A00/func_80003164.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3A00/MainPool_AllocAligned.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/3A00/func_8000318C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3A00/MainPool_ResetStateToOffset.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/3A00/func_800031FC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3A00/MainPool_ResetState.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/3A00/func_80003224.s")
 #endif

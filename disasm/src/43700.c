@@ -38,7 +38,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_80043444.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/43700/PokeIcon_AdvancePreviewMotion.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_80043450.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_80043500.s")
 

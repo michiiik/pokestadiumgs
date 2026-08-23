@@ -105,7 +105,7 @@ void func_82904554(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33FAE0/Intro_StepRotationOvershoot.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33FAE0/func_8290455C.s")
 #endif
 
 #ifdef VERSION_US

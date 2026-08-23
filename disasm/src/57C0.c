@@ -2,82 +2,82 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/Sched_ResetTaskState.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_80004BC0.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/Sched_WaitForTaskMessage.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_80004BEC.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/Sched_StartTask.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_80004C14.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/Sched_RequestTaskYield.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_80004CF4.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/Sched_HandleRspCompletion.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_80004D4C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/Sched_HandleRdpCompletion.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_80004EA8.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/Sched_InitClientQueue.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_80004F00.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/Sched_WaitClientQueue.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_80004F34.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/Sched_TryReceiveClientQueue.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_80004F60.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/Sched_PromotePendingTasks.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_80004FA4.s")
 #endif
 
 void func_80004FF4(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/Sched_NotifyClients.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_80004FFC.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/Sched_TryStartTask.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_800050A0.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/Sched_StartPendingTask.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_800050D4.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/Sched_TryYieldActiveTask.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_80005110.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/Sched_HandlePreNMI.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_80005148.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/Sched_HandleRetrace.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_800051B0.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/Sched_HandleRspEvent.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_800052C4.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/Sched_HandleRdpEvent.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_80005388.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/Sched_ThreadEntry.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_800053D4.s")
 #endif
 
 #ifdef VERSION_US
@@ -85,13 +85,13 @@ void func_80004FF4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/Sched_AddClient.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_80005568.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/Sched_RemoveClient.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_800055B0.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/Sched_SubmitTask.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_800055F4.s")
 #endif

@@ -8,5 +8,5 @@ void func_8411F718(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFA0/n_alResampleParam.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFA0/func_8411F720.s")
 #endif

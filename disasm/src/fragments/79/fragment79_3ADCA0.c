@@ -14,7 +14,7 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/ParticleGfx_SetPrimColor_fragment79.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_8413E5E4.s")
 #endif
 
 #ifdef VERSION_US

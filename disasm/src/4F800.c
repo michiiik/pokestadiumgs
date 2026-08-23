@@ -109,11 +109,11 @@ void func_8004EE94(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4F800/GbTower_AudioThread.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/4F800/func_80050700.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4F800/GbTower_EmuThread.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/4F800/func_800507B8.s")
 #endif
 
 #ifdef VERSION_US
@@ -125,7 +125,7 @@ void func_8004EE94(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4F800/GbTower_RecvExitMesg.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/4F800/func_80050B0C.s")
 #endif
 
 #ifdef VERSION_US

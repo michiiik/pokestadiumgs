@@ -12,7 +12,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_331000/func_87F0E524.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_331000/WidgetTree_RunMessagePanelSilent_fragment64.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_331000/func_87F0E5F0.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_331000/func_87F0E610.s")
 

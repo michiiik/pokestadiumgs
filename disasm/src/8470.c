@@ -2,45 +2,45 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/StageFade_Update.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80007870.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/StageFade_Start.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80007A84.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/StageFade_StartFromOpaque.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80007AEC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/StageFade_StartFromTransparent.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80007B34.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/StageFade_SetMode.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80007B78.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/Profiler_SetDisplayModes.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80007BA8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/Gfx_SetDefaultRenderState.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80007BD0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/Gfx_SetDefaultGeometryState.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80007DB4.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80007E18.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/StageLoader_SetupFrame.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80007E6C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/StageLoader_SwapDisplayListAndReset.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_800080B8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/StageLoader_BeginFrame.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_800080E0.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80008188.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/StageContext_Allocate.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_800082E0.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80008494.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/StageContext_GetFadeMode.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_800084A0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/StageContext_SaveAndSwitch.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_800084B0.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80008514.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80008574.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/StageLoader_WaitForRetrace.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_800085EC.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80008624.s")
 
@@ -48,17 +48,17 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_800086A4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/BgStage_RunUntilCondition.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80008734.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/BgStage_WaitForCondition.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_800087E8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/StageContext_SetClearColor.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_800088A4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/BgStage_DrawFrame.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_800088DC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/StageContext_GetCurrentImage.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80008944.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80008970.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/StageContext_IsHighResolution.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80008990.s")
 #endif

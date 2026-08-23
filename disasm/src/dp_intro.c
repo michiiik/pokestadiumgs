@@ -2,11 +2,11 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/DisplayTask_Initialize.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_800015C0.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/DisplayTask_Submit.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_80001684.s")
 #endif
 
 #ifdef VERSION_US
@@ -14,7 +14,7 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/DisplayWorker_SetBufferConfig.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_8000177C.s")
 #endif
 
 #ifdef VERSION_US
@@ -22,7 +22,7 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/DisplayWorker_DrainEvents.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_80001AC8.s")
 #endif
 
 #ifdef VERSION_US
@@ -48,7 +48,7 @@ void func_80001CD4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/Display_ClearFramebufferLine.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_80001E18.s")
 #endif
 
 #ifdef VERSION_US
@@ -56,27 +56,27 @@ void func_80001CD4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/Display_GetFramebufferClearColor.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_80001EB8.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/Display_IsCurrentFramebuffer.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_80001ECC.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/Display_WaitForCompletion.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_80001F08.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/Display_QueueFramebufferRequest.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_80001F34.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/Display_WaitForFrames.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_80001F60.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/Display_SetBufferConfig.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_80001FA8.s")
 #endif
 
 #ifdef VERSION_US
@@ -92,15 +92,15 @@ void func_80001CD4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/Display_ApplyPendingVideoMode.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_80002020.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/Display_IsFrameReady.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_8000204C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/Display_EnableBlackout.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_80002074.s")
 #endif
 
 #ifdef VERSION_US

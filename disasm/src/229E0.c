@@ -1,25 +1,25 @@
 #include "global.h"
 
-/* Audio command setup helpers.  These small routines are kept here with the
- * surrounding audio command code; their constants and stores are taken
- * directly from the US implementations at 0x800225C4--0x80022640. */
-extern void func_80018728(u32 address, ...);
-extern void func_800187AC(void);
-extern u8 D_8009019C;
-extern u8 D_800901A0;
-extern u8 D_800901A4;
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80021DE0.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Audio_DispatchCommand.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80021ED8.s")
 #endif
 
+#ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800225C4.s")
+#endif
+
+#ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002260C.s")
+#endif
+
+#ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002263C.s")
+#endif
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80022644.s")
@@ -29,31 +29,41 @@ extern u8 D_800901A4;
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800226C0.s")
 #endif
 
-extern void func_80025294(s32 command, ...);
-extern void func_8001874C(u32 command, s32 value);
-extern s8 D_800901BC[];
-extern s8 D_80090B80;
-extern u8 D_80090200[];
-extern u8 D_80090220;
-extern s32 D_80090224;
-extern s32 D_80090228;
-extern s32 D_8009022C;
-extern s32 D_8009061C[];
-
+#ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80023110.s")
+#endif
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800231A0.s")
 #endif
 
+#ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800238C4.s")
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002390C.s")
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80023954.s")
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002397C.s")
+#endif
 
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002390C.s")
+#endif
+
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80023954.s")
+#endif
+
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002397C.s")
+#endif
+
+#ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800239B4.s")
+#endif
+
+#ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800239C8.s")
+#endif
+
+#ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80023A10.s")
+#endif
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80023A3C.s")
@@ -139,60 +149,60 @@ extern s32 D_8009061C[];
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025B54.s")
 #endif
 
+#ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025C50.s")
+#endif
 
-/* Audio task-control wrappers.  The US bodies are single tail-preserving
- * calls at 0x80025C9C and 0x80025D44; keeping the return values exposes the
- * completion predicates used by Audio_StopProcessing/Audio_WaitForPendingTasks. */
-extern s32 func_80018C14(void);
-extern s32 func_80019378(void);
-
+#ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025C9C.s")
+#endif
 
+#ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025CBC.s")
+#endif
 
+#ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025D44.s")
+#endif
 
+#ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025D64.s")
+#endif
 
+#ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025DB0.s")
+#endif
 
+#ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025E7C.s")
+#endif
 
+#ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025EB0.s")
+#endif
 
-#define D_800D1990 ((u32 *)0x800D1990)
-#define D_800D198C (*(u32 *)0x800D198C)
-extern void func_80034DD0(void);
-#define D_80090B8C (*(u8 *)0x80090B8C)
-extern u32 osSetIntMask(u32 mask);
-
+#ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025F84.s")
+#endif
+
+#ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002602C.s")
+#endif
+
+#ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80026068.s")
+#endif
+
+#ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80026098.s")
+#endif
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800260C0.s")
 #endif
 
 #ifdef VERSION_US
-extern void func_80018810(void);
-extern s32 func_80018ACC(void);
-#define D_80090B64 (*(u8 *)0x80090B64)
-
-/* Poll the audio command engine's pending transition. */
-s32 func_80026298(void) {
-    func_80018810();
-    if (D_80090B64 == 0) {
-        return 1;
-    }
-    if (func_80018ACC() == 0) {
-        return 0;
-    }
-    D_80090B64 = 0;
-    return 1;
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80026298.s")
 #endif
 
 #ifdef VERSION_US
@@ -207,7 +217,9 @@ s32 func_80026298(void) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800266F8.s")
 #endif
 
+#ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80026938.s")
+#endif
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80026990.s")
@@ -269,8 +281,13 @@ s32 func_80026298(void) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80027774.s")
 #endif
 
+#ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800277C4.s")
+#endif
+
+#ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800277F0.s")
+#endif
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002781C.s")
@@ -316,9 +333,9 @@ s32 func_80026298(void) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002806C.s")
 #endif
 
-void func_8002809C(void) {
-    func_80018728(0xF2000000, 0);
-}
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002809C.s")
+#endif
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800280C0.s")
@@ -328,7 +345,9 @@ void func_8002809C(void) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800280EC.s")
 #endif
 
+#ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80028118.s")
+#endif
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80028140.s")
@@ -355,11 +374,11 @@ void func_8002809C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Audio_SwapSoundCandidates.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002890C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Audio_FilterRecentSoundId.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002892C.s")
 #endif
 
 #ifdef VERSION_US
@@ -367,7 +386,7 @@ void func_8002809C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Audio_RemoveRecentSoundAt.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80028A28.s")
 #endif
 
 #ifdef VERSION_US
@@ -535,7 +554,7 @@ void func_8002809C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GbAudio_GetRegisterValue.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80031A54.s")
 #endif
 
 #ifdef VERSION_US
@@ -555,7 +574,7 @@ void func_8002809C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GbAudio_SampleSquare2.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80032600.s")
 #endif
 
 #ifdef VERSION_US
@@ -941,98 +960,23 @@ void func_80033ED0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Rom_DmaRead.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035068.s")
 #endif
 
-extern s32 D_80094850;
-extern s32 D_80094870[];
-extern s32 D_80122A40;
-
+#ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035140.s")
+#endif
+
+#ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003514C.s")
+#endif
+
+#ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035160.s")
+#endif
 
-/* Audio's scheduler thread owns the two one-entry completion queues and
- * submits the small audio task descriptors produced by the command builder.
- * The scheduler/client objects are intentionally opaque here; their layout is
- * private to the scheduler implementation.  The task copy below follows the
- * 0x68-byte slot layout used by the original thread. */
-extern u8 D_80122B20[];
-extern u8 D_80122B18[];
-extern u8 D_80122A4C[];
-extern u8 D_80122A48[];
-extern u8 D_80122AB4[];
-extern u8 D_80122AB0[];
-extern u8 D_800CD020[];
-extern s32 D_8009486C;
-
-extern void __osSetFpcCsr(u32 value);
-extern void Sched_InitClientQueue(void *client, s32 taskType, s32 priority);
-extern void Sched_AddClient(void *client);
-extern void Sched_WaitClientQueue(void *client);
-extern void Sched_SubmitTask(void *task, s32 flags);
-extern void profiler_log_thread4_time(void);
-extern void Audio_InitializeTaskState(void);
-extern void *Audio_BuildSchedulerTask(void);
-extern void func_80025C50(s32 mode);
-
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/LinkAlias_func_80035174.s")
-#if 0
-void Audio_ThreadEntry(void *arg) {
-    u8 *client = D_80122B20;
-    u8 *taskQueue = D_80122A4C;
-    u8 *taskMessages = D_80122A48;
-    u8 *doneQueue = D_80122AB4;
-    u8 *doneMessages = D_80122AB0;
-    s32 *running = &D_80122A40;
-    s32 *toggle = (s32 *)D_80122B18;
-    s32 *taskIndex = (s32 *)D_8009486C;
-    u8 *audioState = D_800CD020;
-
-    (void)arg;
-    __osSetFpcCsr(0x1000C01);
-    Sched_InitClientQueue(client, 1, 1);
-    Sched_AddClient(client);
-
-    *running = 1;
-    *toggle = 0;
-    osCreateMesgQueue((OSMesgQueue *)taskQueue, (OSMesg *)taskMessages, 1);
-    osCreateMesgQueue((OSMesgQueue *)doneQueue, (OSMesg *)doneMessages, 1);
-    osSendMesg((OSMesgQueue *)taskQueue, (OSMesg)(u32)0x444F4E45, 0);
-    osSendMesg((OSMesgQueue *)doneQueue, (OSMesg)(u32)0x444F4E45, 0);
-    Audio_InitializeTaskState();
-    func_80025C50(2);
-
-    for (;;) {
-        Sched_WaitClientQueue(client);
-        profiler_log_thread4_time();
-
-        if (*running != 0 && *(s16 *)(audioState + 0xA38) < 0x15) {
-            void *builtTask = Audio_BuildSchedulerTask();
-
-            if (builtTask != NULL) {
-                u8 *source = (u8 *)builtTask;
-                u8 *destination = taskMessages + (*toggle * 0x68);
-                s32 i;
-
-                for (i = 0; i < 5; i++) {
-                    *(u32 *)(destination + 0x14 + i * 0xC) =
-                        *(u32 *)(source + i * 0xC);
-                    *(u32 *)(destination + 0x18 + i * 0xC) =
-                        *(u32 *)(source + 4 + i * 0xC);
-                    *(u32 *)(destination + 0x1C + i * 0xC) =
-                        *(u32 *)(source + 8 + i * 0xC);
-                }
-                *(u32 *)(destination + 0x5C) = *(u32 *)(source + 0x3C);
-                Sched_SubmitTask(destination, 0);
-            }
-        }
-
-        *toggle ^= 1;
-        profiler_log_thread4_time();
-        *taskIndex += 1;
-    }
-}
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035174.s")
 #endif
 
 #ifdef VERSION_US
@@ -1043,154 +987,100 @@ void Audio_ThreadEntry(void *arg) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003539C.s")
 #endif
 
-extern s32 func_80025C9C(void);
-extern s32 func_80025D44(void);
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800353BC.s")
+#endif
 
-s32 Audio_StopProcessing(void) {
-    func_80025C9C();
-    D_80122A40 = 0;
-    return 0;
-}
-
-s32 Audio_WaitForPendingTasks(void) {
-    s32 completed = 0;
-
-    while (func_80025D44() != 0) {
-        completed++;
-    }
-    return completed;
-}
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800353E4.s")
+#endif
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035424.s")
 #endif
 
-extern s32 D_80094860;
-extern s32 D_80094868;
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035470.s")
+#endif
 
-void Audio_SetProcessingEnabled(s32 enabled) {
-    D_80122A40 = enabled ? 1 : 0;
-}
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035494.s")
+#endif
 
-void Audio_ResetModeSelector(void) {
-    D_80094860 = -1;
-}
-
-void Audio_EnableModeFlag(void) {
-    D_80094868 = 1;
-}
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800354A4.s")
+#endif
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800354B4.s")
 #endif
 
-extern s32 D_80094864;
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800355D4.s")
+#endif
 
-void Audio_ResetRequestId(void) {
-    D_80094864 = -1;
-}
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800355E4.s")
+#endif
 
-extern void Audio_DispatchCommand(s32 eventId);
-
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/LinkAlias_func_800355E4.s")
-
-#define D_437620 ((u8 *)0x00437620)
-#define D_437670 ((u8 *)0x00437670)
-#define D_80124D00 ((u32 *)0x80124D00)
-#define D_80124D50 (*(u32 *)0x80124D50)
-extern void *func_800042C0(u32 source, u32 end, u32 decompress,
-                           u32 relocate);
-
+#ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035620.s")
-#if 0
-void func_80035620(void) {
-    u32 *source;
-    u32 *destination;
-    s32 i;
-
-    main_pool_push_state(0x524F4D54);
-    source = (u32 *)func_800042C0((u32)D_437620, (u32)D_437670, 0, 0);
-
-    D_80124D00[0] = source[0];
-    D_80124D00[1] = source[1];
-    D_80124D00[2] = source[2];
-    destination = &D_80124D00[3];
-    source += 3;
-    for (i = 0; i < 16; i++) {
-        destination[i] = source[i];
-    }
-
-    main_pool_pop_state(0x524F4D54);
-}
 #endif
 
+#ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800356CC.s")
-#if 0
-s32 func_800356CC(s32 index) {
-    if (index >= 0 && index < 19) {
-        return D_80124D00[index];
-    }
-    return 0;
-}
 #endif
 
+#ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035700.s")
-#if 0
-void func_80035700(u32 seed) {
-    D_80124D50 = seed;
-}
 #endif
 
+#ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003570C.s")
-#if 0
-u32 func_8003570C(void) {
-    D_80124D50 = D_80124D50 * 0x0019660D + 0x3C6EF35F;
-    return D_80124D50;
-}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Color_SetRGB.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003573C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Color_SetRGBA.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003575C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Vec3f_SetComponents.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035784.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Vec3f_SetComponentsDuplicate.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800357A8.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Vec3f_AddInPlace.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800357CC.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Vec3f_Add.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035804.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Vec3f_SubtractInPlace.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003583C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Vec3f_Subtract.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035874.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Vec3f_FromVec3s.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800358AC.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Vec3f_CrossProductFromPoints.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800358F0.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Vec3f_CrossProduct.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800359A0.s")
 #endif
 
 #ifdef VERSION_US
@@ -1198,39 +1088,39 @@ u32 func_8003570C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Vec3s_SetComponents.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035A68.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Vec3s_AddInPlace.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035AA0.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Vec3s_Add.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035AD8.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Vec3s_SubtractInPlace.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035B10.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Vec3s_Subtract.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035B48.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Vec3s_FromVec3f.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035B80.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/MtxF_Copy.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035C44.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/MtxF_Identity.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035C90.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/MtxF_SetTranslation.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035CD0.s")
 #endif
 
 #ifdef VERSION_US
@@ -1238,23 +1128,23 @@ u32 func_8003570C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/MtxF_SetRotationTranslation.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035FFC.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/MtxF_SetRotationTranslationF.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003614C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/MtxF_SetRotationAndTransformTranslation.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80036284.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/MtxF_SetRotationScaleTranslation.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80036430.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/MtxF_SetRotationAndScaledTranslation.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800365B8.s")
 #endif
 
 #ifdef VERSION_US
@@ -1262,15 +1152,15 @@ u32 func_8003570C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/MtxF_SetOrthonormalBasis.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003691C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/MtxF_Multiply.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80036A38.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/MtxF_ScaleRows.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80036C6C.s")
 #endif
 
 #ifdef VERSION_US
@@ -1278,15 +1168,15 @@ u32 func_8003570C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/MtxF_TransformVec3s.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80036E34.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/MtxF_ToFixed.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80036F0C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/MtxF_BuildTransform.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800370A4.s")
 #endif
 
 #ifdef VERSION_US
@@ -1294,63 +1184,63 @@ u32 func_8003570C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Camera_ComputeEyeFromAngles.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800371B4.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Math_StepToS.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80037250.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Math_StepToS32.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800372CC.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Math_StepToF.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003730C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/PackedBits_ReadSigned.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80037360.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Color_RGBToHSV.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800373D0.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Color_RGBA8ToHSV.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80037580.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Color_RGB5551ToHSV.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800375E0.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Color_HSVInterpolate.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80037650.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Color_HSVToRGB.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80037790.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Color_HSVToRGB5551.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80037980.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Color_HSVToRGBA8.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80037A34.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Color_AdjustRGB5551.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80037B08.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Color_AdjustRGBA8.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80037C80.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoNode_Init.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80037E00.s")
 #endif
 
 #ifdef VERSION_US
@@ -1358,35 +1248,35 @@ u32 func_8003570C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoNode_CreateContainer.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80037E9C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoNode_CreateWithReference.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80037EE8.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoNode_CreateCamera.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80037F40.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoNode_CreateType3.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80038004.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoNode_CreateType4.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003805C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoNode_CreateOrtho.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800380B8.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoNode_CreatePerspective.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003811C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoNode_CreateBackground.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80038180.s")
 #endif
 
 #ifdef VERSION_US
@@ -1394,7 +1284,7 @@ u32 func_8003570C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoNode_CreateFog.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80038258.s")
 #endif
 
 #ifdef VERSION_US
@@ -1410,7 +1300,7 @@ u32 func_8003570C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoNode_CreateAmbientLight.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003840C.s")
 #endif
 
 #ifdef VERSION_US
@@ -1422,71 +1312,71 @@ u32 func_8003570C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoNode_CreateShadow.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003854C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoNode_CreateCullDistance.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800385BC.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoNode_CreateSwitchCase.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003861C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoNode_CreateTranslateRotate.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003867C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoNode_CreateTranslate.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80038704.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoNode_CreateAnimatedPart.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80038770.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoNode_CreateDisplayListPart.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003882C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoNode_CreateModelPart.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80038894.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoNode_CreateDisplayListMatrix.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003899C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoNode_CreateDisplayListMatrixFromTransform.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80038A1C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoNode_CreateScale.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80038A70.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoNode_CreateDisplayList.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80038AF4.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoNode_CreateShadowTexture.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80038B54.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoNode_CreateAnchor.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80038BF8.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoNode_CreateGroup.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80038C50.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoCamera_SetViewport.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80038D0C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoCamera_SetPerspective.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80038DC8.s")
 #endif
 
 #ifdef VERSION_US
@@ -1494,7 +1384,7 @@ u32 func_8003570C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoCamera_SetBackground.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80038F10.s")
 #endif
 
 #ifdef VERSION_US
@@ -1502,11 +1392,11 @@ u32 func_8003570C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GraphNode_RemoveChild.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80038FD4.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GraphNode_GetChildAtIndex.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80039018.s")
 #endif
 
 #ifdef VERSION_US
@@ -1530,47 +1420,47 @@ u32 func_8003570C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoRender_GetRelativeMatrix.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003936C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoRender_GetMatrix.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80039398.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoRender_ResetTransformStack.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800393C0.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoRender_PushScale.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800393F0.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoOverlay_BuildFadeQuad.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003946C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoOverlay_DrawFadeQuad.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80039700.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoOverlay_SetRotatedVertex.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80039808.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoOverlay_BuildRotatingQuad.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800398F8.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoOverlay_DrawRotatingQuad.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80039D20.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoOverlay_Draw.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003A14C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Geo_ProcessNodeChildren.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003A2C8.s")
 #endif
 
 #ifdef VERSION_US
@@ -1578,15 +1468,15 @@ u32 func_8003570C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Geo_NodeReference.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003A440.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Geo_NodeCamera.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003A4CC.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Geo_NodeType3Pass.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003A7CC.s")
 #endif
 
 #ifdef VERSION_US
@@ -1594,23 +1484,23 @@ u32 func_8003570C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Geo_NodeModelPartRoot.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003A960.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Geo_NodeOrtho.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003A9CC.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Geo_NodePerspective.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003AA58.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Geo_NodeBackground.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003AB68.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Geo_NodeClearDepth.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003ABFC.s")
 #endif
 
 #ifdef VERSION_US
@@ -1618,7 +1508,7 @@ u32 func_8003570C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Geo_NodeFog.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003AC8C.s")
 #endif
 
 #ifdef VERSION_US
@@ -1642,11 +1532,11 @@ u32 func_8003570C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Geo_NodeCullDistance.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003B48C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Geo_NodeSwitchCase.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003B534.s")
 #endif
 
 #ifdef VERSION_US
@@ -1670,7 +1560,7 @@ u32 func_8003570C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Geo_NodeDisplayListPart.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003BC48.s")
 #endif
 
 #ifdef VERSION_US
@@ -1686,35 +1576,35 @@ u32 func_8003570C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Geo_NodeDisplayList.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003C080.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Geo_NodeShadowTexture.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003C10C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoRender_RecordAnchorPosition.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003C2D8.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Geo_NodeAnchor.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003C344.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Geo_NodeGroup.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003C370.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Geo_NodeShadow.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003C390.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Geo_RenderRootNode.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003C6B8.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Geo_ProcessCallbacks.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003C848.s")
 #endif
 
 #ifdef VERSION_US
@@ -1722,15 +1612,15 @@ u32 func_8003570C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoRender_AdvanceFrameCounter.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003C970.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoRender_IsModelFrameCurrent.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003C988.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoRender_FindAnchorPosition.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003C9B8.s")
 #endif
 
 #ifdef VERSION_US
@@ -1742,7 +1632,7 @@ u32 func_8003570C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoRender_SyncMaterialState.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003CBD4.s")
 #endif
 
 #ifdef VERSION_US
@@ -1762,11 +1652,11 @@ u32 func_8003570C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoRender_RestoreRenderMode.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003D08C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoRender_SetPrimitiveColor.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003D0C8.s")
 #endif
 
 #ifdef VERSION_US
@@ -1786,7 +1676,7 @@ u32 func_8003570C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoRender_SelectMaterialSlot.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003D70C.s")
 #endif
 
 #ifdef VERSION_US
@@ -1798,19 +1688,19 @@ u32 func_8003570C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoRender_SubmitMaterial.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003D888.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoRender_SubmitDisplayList.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003DA20.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoRender_SetMaterialParams.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003DAF0.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoRender_SetMaterialTexture.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003DB10.s")
 #endif
 
 #ifdef VERSION_US
@@ -1818,107 +1708,87 @@ u32 func_8003570C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/GeoRender_FlushMaterialSlots.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003DD2C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_EvaluateTranslationChannel.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003DE20.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_EvaluateRotationChannel.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003DED4.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_EvaluateScaleChannel.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003DF68.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_InterpolateKeyframe.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003E054.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_InterpolateKeyframeTangent.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003E250.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_EvaluateTranslationCurve.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003E440.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_EvaluateRotationCurve.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003E500.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_EvaluateScaleCurve.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003E640.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_AdvanceCurveFrame.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003E6DC.s")
 #endif
 
 #ifdef VERSION_US
-extern s32 D_801263E0;
-
-void ModelAnim_ResetCurveContext(void) {
-    D_801263E0 = -1;
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003E7A0.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_BeginCurveContext.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003E7B0.s")
 #endif
 
 #ifdef VERSION_US
-void ModelAnim_EndCurveContext(void) {
-    if (D_801263E0 >= 0) {
-        D_801263E0--;
-    }
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003E8A8.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_EvaluateJointTransform.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003E8C8.s")
 #endif
 
 #ifdef VERSION_US
-void ModelAnim_ClearTransformChannel(void *anim) {
-    *(s16 *)((u8 *)anim + 0x40) = -1;
-    *(void **)((u8 *)anim + 0x44) = NULL;
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003EAEC.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_BindTransformCurve.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003EAFC.s")
 #endif
 
 #ifdef VERSION_US
-s32 ModelAnim_SetSpeed(void *anim, s32 speed) {
-    s32 frame = *(s32 *)((u8 *)anim + 0x48);
-    *(s32 *)((u8 *)anim + 0x4C) = speed;
-    return frame >> 16;
-}
-#endif
-
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_SetFrame.s")
-
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_HasCrossedFrame.s")
-
-#ifdef VERSION_US
-s32 ModelAnim_IsAnimationDone(void *anim) {
-    void *record = *(void **)((u8 *)anim + 0x44);
-    s32 lastFrame = ((s32)(*(u16 *)((u8 *)record + 0xA) - 1)) << 16;
-    return ModelAnim_HasCrossedFrame(anim, lastFrame >> 16);
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003EB74.s")
 #endif
 
 #ifdef VERSION_US
-s32 ModelAnim_IsFinished(void *anim) {
-    void *record = *(void **)((u8 *)anim + 0x44);
-    s32 current = *(s32 *)((u8 *)anim + 0x48);
-    s32 lastFrame = ((s32)(*(u16 *)((u8 *)record + 0xA) - 1)) << 16;
-    return current >= lastFrame;
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003EB84.s")
+#endif
+
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003EBA4.s")
+#endif
+
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003EC04.s")
+#endif
+
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003EC34.s")
 #endif
 
 #ifdef VERSION_US
@@ -1926,15 +1796,15 @@ s32 ModelAnim_IsFinished(void *anim) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_ResolveEventIndex.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003EC70.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_AdvanceEventFrame.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003ECA8.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_ResetEventContext.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003ED08.s")
 #endif
 
 #ifdef VERSION_US
@@ -1942,23 +1812,23 @@ s32 ModelAnim_IsFinished(void *anim) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_EndEventContext.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003EE00.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_GetEventAtFrame.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003EE20.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_ClearEventTrack.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003EECC.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_BindEventTrack.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003EEDC.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_SetEventFrame.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003EF48.s")
 #endif
 
 #ifdef VERSION_US
@@ -1970,19 +1840,19 @@ s32 ModelAnim_IsFinished(void *anim) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_IsEventFrame.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003EF80.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_IsEventTrackNearEnd.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003EFA0.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_IsEventTrackDone.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003EFBC.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelRenderer_InitDisplayRoots.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003EFE0.s")
 #endif
 
 #ifdef VERSION_US
@@ -1994,7 +1864,7 @@ s32 ModelAnim_IsFinished(void *anim) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelRenderer_AttachSecondaryDisplayObject.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003F0A8.s")
 #endif
 
 #ifdef VERSION_US
@@ -2014,7 +1884,7 @@ s32 ModelAnim_IsFinished(void *anim) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_SetEventTrack.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003F3BC.s")
 #endif
 
 #ifdef VERSION_US
@@ -2034,7 +1904,7 @@ s32 ModelAnim_IsFinished(void *anim) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_GetAnimationRecord.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003F4F4.s")
 #endif
 
 #ifdef VERSION_US
@@ -2062,7 +1932,7 @@ s32 ModelAnim_IsFinished(void *anim) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/PokeIcon_RequestBackgroundForObject.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003F874.s")
 #endif
 
 #ifdef VERSION_US
@@ -2082,178 +1952,178 @@ s32 ModelAnim_IsFinished(void *anim) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_branch_and_link.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FA00.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_2A.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FA94.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_end.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FB2C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_jump.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FBB4.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_branch.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FBE0.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_27.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FC34.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_return.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FC8C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_open_node.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FCC4.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_close_node.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FD08.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/register_graph_node.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FD34.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_attach_node.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FD98.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_set_callback.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FDD0.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_create_container.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FE2C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_create_reference.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FE6C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_create_camera.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FEB8.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_create_type3.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80040004.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_create_type4.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80040050.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_create_ortho.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8004009C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_create_perspective.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800400E8.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_create_background.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80040134.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_create_clear_depth.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8004018C.s")
 #endif
 
-void geo_layout_cmd_noop(void) {
+void func_800401CC(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_create_fog.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800401D4.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_create_light.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80040244.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_28.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8004032C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_29.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80040370.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_skip.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800403B0.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_create_ambient_light.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800403C8.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_17.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80040420.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_create_shadow.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800404AC.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_create_cull_distance.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8004050C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_create_switch_case.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8004055C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_create_translate_rotate.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800405AC.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_create_translate.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800406D4.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_create_animated_part.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800407A0.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_create_display_list_part.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800408B8.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_create_model_part.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80040910.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_create_display_list_matrix.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80040A9C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_create_scale.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80040BD8.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_create_display_list.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80040C78.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_create_shadow_texture.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80040CC8.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_create_anchor.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80040D50.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_set_node_flag4.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80040D9C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/geo_layout_cmd_create_group.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80040DE0.s")
 #endif
 
 #ifdef VERSION_US
@@ -2297,7 +2167,7 @@ void geo_layout_cmd_noop(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Fragment_ProcessGeoLayoutList.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80041664.s")
 #endif
 
 #ifdef VERSION_US
@@ -2397,7 +2267,7 @@ void geo_layout_cmd_noop(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/PokeIcon_WaitBackgroundLoad.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80042930.s")
 #endif
 
 #ifdef VERSION_US
@@ -2417,7 +2287,7 @@ void geo_layout_cmd_noop(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/BattleAnim_LoadResourceTable.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80042A70.s")
 #endif
 
 #ifdef VERSION_US

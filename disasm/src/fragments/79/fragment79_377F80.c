@@ -38,9 +38,9 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_8410922C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/BattleAnim_UpdateEffectCallbacks.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_841092B8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/BattleAnim_DrawEffectCallbacks.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_8410933C.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_84109394.s")
 
@@ -50,7 +50,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_841094A4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/BattleAnim_GetSecondaryOwnerSpecies.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_841094B0.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_841094D4.s")
 

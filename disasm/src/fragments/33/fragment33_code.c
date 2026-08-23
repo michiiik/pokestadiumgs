@@ -6,7 +6,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/33/fragment33_code/func_88400034.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/33/fragment33_code/PokeIcon_AdvancePreviewMotion_fragment33.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/33/fragment33_code/func_8840011C.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/33/fragment33_code/func_884001CC.s")
 
@@ -24,5 +24,5 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/33/fragment33_code/func_88401364.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/33/fragment33_code/fragment33_main.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/33/fragment33_code/func_88401658.s")
 #endif

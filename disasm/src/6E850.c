@@ -10,7 +10,7 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/Math_FAbs.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_8006DC94.s")
 #endif
 
 #ifdef VERSION_US
@@ -18,11 +18,11 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/Model_GetVertexClass.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_8006DCD0.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/Model_GetVertexThreshold.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_8006DDB0.s")
 #endif
 
 #ifdef VERSION_US
@@ -85,7 +85,7 @@ void func_8006DE94(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/Model_CopyPositionBuffer.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_8006EB14.s")
 #endif
 
 #ifdef VERSION_US
@@ -101,11 +101,11 @@ void func_8006DE94(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/Model_ExtrapolateVertexPosition.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_8006EFF0.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/Model_SpringBlendPosition.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_8006F0A8.s")
 #endif
 
 #ifdef VERSION_US
@@ -125,7 +125,7 @@ void func_8006DE94(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/Model_OffsetVertexHeightsByClass.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_8006F720.s")
 #endif
 
 #ifdef VERSION_US
@@ -145,11 +145,11 @@ void func_8006DE94(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/Model_Draw.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_8007065C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/ModelRenderer_GetObjectType.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_80070720.s")
 #endif
 
 #ifdef VERSION_US
@@ -177,11 +177,11 @@ void func_8006DE94(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/Math_AbsF32.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_80070B7C.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/Vec3f_CrossProductComponents.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_80070BA4.s")
 #endif
 
 #ifdef VERSION_US
@@ -209,7 +209,7 @@ void func_8006DE94(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/Gfx_SetCombineMode.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_800710A8.s")
 #endif
 
 void func_800711A8(void) {

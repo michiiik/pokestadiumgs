@@ -1,5 +1,6 @@
 #include "global.h"
 
 
-void Game_State12_Nop(void) {
-}
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/674C0/func_800668C0.s")
+#endif

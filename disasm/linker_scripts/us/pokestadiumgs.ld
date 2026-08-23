@@ -324,20 +324,6 @@ SECTIONS
         build/lib/libultra.a:flashreadarray.o(.text);
         build/lib/libultra.a:flashgetaddr.o(.text);
         build/lib/libultra.a:setwatchlo.o(.text);
-        /* Compatibility entrypoints are appended so they cannot shift the
-         * address-locked game text preceding them. */
-        build/src/legacy_link_aliases.o(.text);
-        func_80021B00 = Audio_InitializeTaskState;
-        Audio_BuildSchedulerTask = func_80021B74;
-        Audio_ThreadEntry = func_80035174;
-        func_800353BC = Audio_StopProcessing;
-        func_80035494 = Audio_ResetModeSelector;
-        func_800355D4 = Audio_ResetRequestId;
-        Audio_RequestEvent = func_800355E4;
-        func_80006A78 = Dma_QueueRequestMessage;
-        Minigame_SetPlayerMask = func_8007214C;
-        GbTower_StartPortSession = func_8005ADD8;
-        GbTower_UpdatePortState = func_8005A364;
         text_TEXT_END = .;
         text_TEXT_SIZE = ABSOLUTE(text_TEXT_END - text_TEXT_START);
         text_DATA_START = .;

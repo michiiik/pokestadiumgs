@@ -40,7 +40,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/1/fragment1_code/func_83503548.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/1/fragment1_code/Gallery_CameraCheckExit.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/1/fragment1_code/func_835035F0.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/1/fragment1_code/func_83503678.s")
 
@@ -48,5 +48,5 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/1/fragment1_code/func_835038BC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/1/fragment1_code/fragment1_main.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/1/fragment1_code/func_83503918.s")
 #endif

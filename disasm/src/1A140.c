@@ -6,7 +6,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1A140/func_80019580.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/1A140/osGbSetNextBuffer.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/1A140/func_800195C0.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1A140/func_80019634.s")
 

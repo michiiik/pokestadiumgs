@@ -2,29 +2,29 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/Gfx_DrawTexturedRectClipped.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_80044270.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_80044424.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/Gfx_FillRectRgb.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_800445E8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/Gfx_FillRectRgba.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_8004468C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/Gfx_DrawTextureRgba16.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_80044734.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/Gfx_DrawTextureRgba32.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_8004494C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/Gfx_DrawTextureIa8.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_80044B64.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/Gfx_DrawTextureIa16.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_80044D80.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/Gfx_DrawTextureI4.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_80044F98.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/Gfx_DrawTextureI8.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_800451B4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/Gfx_DrawTextureI16.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_800453D0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/Gfx_DrawTextureRgba16Ia8.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_800455E8.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_800459AC.s")
 
@@ -42,7 +42,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_800468A0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/Gfx_SetVertexAttributes.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_800468C8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/Gfx_SetViewportDimensions.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_80046930.s")
 #endif

@@ -1,48 +1,29 @@
 #include "global.h"
 
-#define D_80128570 ((u8 *)0x80128570)
-#define D_8012874C (*(u8 *)0x8012874C)
-#define D_8012874D (*(u8 *)0x8012874D)
-#define D_80128748 (*(u32 *)0x80128748)
 
-extern u8 func_8005D92C(s32 index);
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_800579D0.s")
+#endif
 
-static u8 *GbSave_Record(s32 index) {
-    return D_80128570 + (index * 0x70);
-}
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_800579E8.s")
+#endif
 
-static u32 GbSave_Flags(s32 index) {
-    return *(u32 *)GbSave_Record(index);
-}
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_800579FC.s")
+#endif
 
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80057A1C.s")
+#endif
 
-u16 func_800579D0(const u8 *value) {
-    return (u16)(value[0] | (value[1] << 8));
-}
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80057A5C.s")
+#endif
 
-void func_800579E8(u8 *value, s32 data) {
-    value[0] = (u8)data;
-    value[1] = (u8)(data >> 8);
-}
-
-void func_800579FC(void) {
-}
-
-u32 func_80057A1C(s32 index) {
-    u8 state = func_8005D92C(index);
-
-    return state == 5 || state == 6;
-}
-
-u32 func_80057A5C(s32 index) {
-    return func_8005D92C(index) == 7;
-}
-
-u32 func_80057A80(s32 index) {
-    u8 state = func_8005D92C(index);
-
-    return state >= 1 && state <= 4;
-}
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80057A80.s")
+#endif
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80057ACC.s")
@@ -73,15 +54,15 @@ u32 func_80057A80(s32 index) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/GbSave_ComputeChecksum.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80057FE8.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/GbSave_ComputeChecksumRange.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80058018.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/GbSave_IdentifyFormat.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005805C.s")
 #endif
 
 #ifdef VERSION_US
@@ -261,11 +242,11 @@ u32 func_80057A80(s32 index) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/GbTower_PollPortState.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005A228.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/GbTower_UpdatePortState.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005A364.s")
 #endif
 
 #ifdef VERSION_US
@@ -304,11 +285,11 @@ void func_8005A8E4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/GbTower_StartPortSession.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005ADD8.s")
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/GbTower_InitializePorts.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005AEA0.s")
 #endif
 
 #ifdef VERSION_US
@@ -340,10 +321,7 @@ void func_8005A8E4(void) {
 #endif
 
 #ifdef VERSION_US
-extern s32 GbTower_CheckPakRemoved(void *arg, s32 mode);
-extern void Game_ShutdownAndLoadFragment(void *arg, s32 fragment);
-
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/GbSave_RequirePakPresent.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005B190.s")
 #endif
 
 #ifdef VERSION_US
@@ -594,37 +572,25 @@ extern void Game_ShutdownAndLoadFragment(void *arg, s32 fragment);
 #pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005D778.s")
 #endif
 
-u32 func_8005D8C0(void) {
-    return D_80128748;
-}
-
-u8 func_8005D8CC(s32 index) {
-    return GbSave_Record(index)[5];
-}
-
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/GbSave_GetPortAvailability.s")
-
-#if 0
-u32 GbSave_GetPortAvailability(s32 port) {
-    u32 mask = 1u << port;
-
-    if ((D_8012874C & mask) == 0) {
-        return 1;
-    }
-    if ((D_8012874D & mask) == 0) {
-        return 2;
-    }
-    return 0;
-}
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005D8C0.s")
 #endif
 
-u8 func_8005D92C(s32 index) {
-    return GbSave_Record(index)[4];
-}
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005D8CC.s")
+#endif
 
-u8 func_8005D948(s32 index) {
-    return GbSave_Record(index)[0x48];
-}
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005D8E8.s")
+#endif
+
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005D92C.s")
+#endif
+
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005D948.s")
+#endif
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005D964.s")
@@ -654,62 +620,57 @@ u8 func_8005D948(s32 index) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005DD14.s")
 #endif
 
-u32 func_8005DDD4(s32 index) {
-    return (GbSave_Flags(index) & 0x100) != 0;
-}
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005DDD4.s")
+#endif
 
-u32 func_8005DDF8(s32 index) {
-    return (GbSave_Flags(index) & 0x200) != 0;
-}
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005DDF8.s")
+#endif
 
-u32 func_8005DE1C(s32 index) {
-    return (GbSave_Flags(index) & 0x00200000) != 0;
-}
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005DE1C.s")
+#endif
 
-u32 func_8005DE44(s32 index) {
-    return (GbSave_Flags(index) & 0x400) != 0;
-}
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005DE44.s")
+#endif
 
-u32 func_8005DE68(s32 index) {
-    return (GbSave_Flags(index) & 0x1000) != 0;
-}
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005DE68.s")
+#endif
 
-u32 func_8005DE8C(s32 index) {
-    return (GbSave_Flags(index) & 0x2000) == 0;
-}
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005DE8C.s")
+#endif
 
-u32 func_8005DEB4(s32 index) {
-    return (GbSave_Flags(index) & 0x800) != 0;
-}
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005DEB4.s")
+#endif
 
-u32 func_8005DED8(s32 index) {
-    return (GbSave_Flags(index) & 0x4000) != 0;
-}
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005DED8.s")
+#endif
 
-u32 func_8005DEFC(s32 index) {
-    return (GbSave_Flags(index) & 0x8000) != 0;
-}
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005DEFC.s")
+#endif
 
-u32 func_8005DF20(s32 index) {
-    return (*(u32 *)GbSave_Record(index) & 0x00040000) != 0;
-}
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005DF20.s")
+#endif
 
-u32 func_8005DF48(s32 index) {
-    return (*(u32 *)GbSave_Record(index) & 0x00080000) != 0;
-}
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005DF48.s")
+#endif
 
-u32 func_8005DF70(s32 index) {
-    return (*(u32 *)GbSave_Record(index) & 0x00100000) != 0;
-}
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005DF70.s")
+#endif
 
-u32 func_8005DF98(s32 index) {
-    u8 *record = GbSave_Record(index);
-
-    if ((*(u32 *)record & 2) == 0) {
-        return 0;
-    }
-    return (*(u8 **)(record + 0x68))[0x5E4];
-}
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005DF98.s")
+#endif
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005DFD4.s")

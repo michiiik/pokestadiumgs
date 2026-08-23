@@ -18,11 +18,11 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D0D70/func_84162798.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D0D70/TexturedRibbonSheet_Update.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D0D70/func_84162A40.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D0D70/TexturedRibbonSheet_UpdateRecord.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D0D70/func_84162AC8.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D0D70/func_84162C88.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D0D70/TexturedRibbonSheet_Draw.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D0D70/func_84162DE8.s")
 #endif

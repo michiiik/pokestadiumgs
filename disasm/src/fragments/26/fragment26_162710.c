@@ -14,7 +14,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_162710/func_81004818.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_162710/Particle31_BuildDisplayList.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_162710/func_81005480.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_162710/func_81005524.s")
 

@@ -6,35 +6,35 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_800564BC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/GbPak_ReadWriteBytes.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_8005655C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/GbPak_VerifyPattern.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056708.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/GbPak_DetectRam.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_800567B0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/GbPak_ProbeAndDetectRam.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056870.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/GbPak_ValidateAndRefresh.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056960.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/GbTower_CheckPakRemoved.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056A5C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/GbTower_PowerOffAllPaks.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056AF8.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056BA4.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056C98.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/GbPak_IsCartOff.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056E90.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/GbPak_IsCartOn.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056F08.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/GbPak_Initialize.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056F7C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/GbTower_VerifyPakStillInserted.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80057038.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/GbPak_ReadCommand.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_800570CC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/GbPak_WriteCommand.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_8005712C.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_8005718C.s")
 
@@ -54,7 +54,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80057640.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/GbTower_SetPollMask.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80057764.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_8005777C.s")
 

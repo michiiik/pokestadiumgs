@@ -2,11 +2,11 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/C890/Jpeg_DecodeMcus.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/C890/func_8000BC90.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/C890/Jpeg_DecodeBlock.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/C890/func_8000BEB8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/C890/Jpeg_DecodeHuffmanSymbol.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/C890/func_8000C054.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/C890/Jpeg_ReadBits.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/C890/func_8000C190.s")
 #endif

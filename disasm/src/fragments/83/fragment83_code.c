@@ -2,7 +2,7 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/ParticleGfx_SetPrimColor_fragment83.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C00020.s")
 #endif
 
 #ifdef VERSION_US
@@ -257,5 +257,5 @@ void func_82C003B4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/fragment83_main.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C04880.s")
 #endif

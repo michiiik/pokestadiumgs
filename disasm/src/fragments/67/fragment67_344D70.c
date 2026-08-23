@@ -1,25 +1,5 @@
 #include "global.h"
 
-extern u8 *D_8291A380;
-extern s16 D_8291B828;
-extern s16 D_8291B85C;
-extern s16 D_8291B85E;
-extern s16 D_8291B860;
-
-extern void Vec3f_SetComponentsDuplicate(f32 *vector, f32 x, f32 y, f32 z);
-extern void Camera_ComputeEyeFromAngles(f32 *eye, f32 *target, f32 distance,
-                                        s16 pitch, s16 yaw);
-
-static void Fragment67_SetCamera(f32 distance, s16 angle, s16 pitch, s16 yaw) {
-    Vec3f_SetComponentsDuplicate((f32 *)(D_8291A380 + 0xB4), 0.0f, distance, 0.0f);
-    D_8291B860 = angle;
-    D_8291B85C = pitch;
-    D_8291B85E = yaw;
-    Camera_ComputeEyeFromAngles((f32 *)(D_8291A380 + 0xB4),
-                                (f32 *)(D_8291A380 + 0xA8),
-                                (f32)D_8291B860, D_8291B85C, D_8291B85E);
-}
-
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_82908270.s")
@@ -330,60 +310,57 @@ void func_829086F0(void) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290D72C.s")
 #endif
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290D738.s")
-
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290D7C8.s")
-
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290D858.s")
-
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290D8EC.s")
-
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290D980.s")
-
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290DA10.s")
-
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290DAA4.s")
-
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290DB3C.s")
-
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290DBD0.s")
-
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290DC60.s")
-
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290DCF0.s")
-
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290DD80.s")
-#if 0
-void BattleAnim_Fragment67Dispatch_041(void) {
-    switch (D_8291B828) {
-        case 0x24:
-            Vec3f_SetComponentsDuplicate((f32 *)(D_8291A380 + 0xB4), 0.0f, 30.0f, 0.0f);
-            D_8291B85C = -0x0400;
-            D_8291B85E = 0x3A00;
-            D_8291B860 = 0x0078;
-            break;
-        case 0x25:
-            Vec3f_SetComponentsDuplicate((f32 *)(D_8291A380 + 0xB4), 0.0f, 30.0f, 0.0f);
-            D_8291B85C = -0x0800;
-            D_8291B85E = 0x4500;
-            D_8291B860 = 0x0096;
-            break;
-        case 0x26:
-            Vec3f_SetComponentsDuplicate((f32 *)(D_8291A380 + 0xB4), 0.0f, 30.0f, 0.0f);
-            D_8291B85C = -0x0400;
-            D_8291B85E = 0x3700;
-            D_8291B860 = 0x0096;
-            break;
-        default:
-            break;
-    }
-    Camera_ComputeEyeFromAngles((f32 *)(D_8291A380 + 0xB4),
-                                (f32 *)(D_8291A380 + 0xA8),
-                                (f32)D_8291B860, D_8291B85C, D_8291B85E);
-}
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290D738.s")
 #endif
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/LinkAlias_func_8290DED4.s")
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290D7C8.s")
+#endif
+
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290D858.s")
+#endif
+
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290D8EC.s")
+#endif
+
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290D980.s")
+#endif
+
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290DA10.s")
+#endif
+
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290DAA4.s")
+#endif
+
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290DB3C.s")
+#endif
+
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290DBD0.s")
+#endif
+
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290DC60.s")
+#endif
+
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290DCF0.s")
+#endif
+
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290DD80.s")
+#endif
+
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290DED4.s")
+#endif
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290DF6C.s")

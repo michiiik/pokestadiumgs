@@ -48,7 +48,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047348.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/Font_FreeSetAsset.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_8004735C.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047398.s")
 
@@ -68,7 +68,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047670.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/Font_EnableLineBreak.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047688.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800476A0.s")
 
@@ -152,13 +152,13 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800499EC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/Font_EnableTwoCycleTexturing.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80049B48.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/Font_DisableTwoCycleTexturing.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80049B9C.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80049BDC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/Font_EndTexturedTextRendering.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80049C44.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80049C70.s")
 

@@ -4,7 +4,7 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_375110/func_84105880.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_375110/BattleAnim_GetPointAlongCameraRay.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_375110/func_84105930.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_375110/func_84105988.s")
 
@@ -22,5 +22,5 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_375110/func_84105B7C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_375110/BattleAnim_UpdateCamera.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_375110/func_84105B90.s")
 #endif

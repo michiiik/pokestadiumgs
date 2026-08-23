@@ -128,7 +128,7 @@ void func_8000D9F0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/CE80/ParticleGfx_NoopStub2.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/CE80/func_8000DAA8.s")
 #endif
 
 #ifdef VERSION_US

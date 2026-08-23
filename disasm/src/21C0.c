@@ -1,17 +1,17 @@
 #include "global.h"
 
 #ifdef VERSION_JP
-#pragma GLOBAL_ASM("asm/jp/nonmatchings/21C0/DisplayTask_Initialize.s")
+#pragma GLOBAL_ASM("asm/jp/nonmatchings/21C0/func_800015C0.s")
 
-#pragma GLOBAL_ASM("asm/jp/nonmatchings/21C0/DisplayTask_Submit.s")
+#pragma GLOBAL_ASM("asm/jp/nonmatchings/21C0/func_80001684.s")
 
 #pragma GLOBAL_ASM("asm/jp/nonmatchings/21C0/Vi_SelectMode.s")
 
-#pragma GLOBAL_ASM("asm/jp/nonmatchings/21C0/DisplayWorker_SetBufferConfig.s")
+#pragma GLOBAL_ASM("asm/jp/nonmatchings/21C0/func_8000177C.s")
 
 #pragma GLOBAL_ASM("asm/jp/nonmatchings/21C0/func_800017F8.s")
 
-#pragma GLOBAL_ASM("asm/jp/nonmatchings/21C0/DisplayWorker_DrainEvents.s")
+#pragma GLOBAL_ASM("asm/jp/nonmatchings/21C0/func_80001AC8.s")
 
 #pragma GLOBAL_ASM("asm/jp/nonmatchings/21C0/func_80001B20.s")
 
@@ -105,7 +105,7 @@
 
 #pragma GLOBAL_ASM("asm/jp/nonmatchings/21C0/func_80002DC4.s")
 
-#pragma GLOBAL_ASM("asm/jp/nonmatchings/21C0/main_pool_set_func.s")
+#pragma GLOBAL_ASM("asm/jp/nonmatchings/21C0/func_80002DD4.s")
 
 #pragma GLOBAL_ASM("asm/jp/nonmatchings/21C0/func_80002DE0.s")
 
@@ -464,7 +464,7 @@ void func_80004FD4(void) {
 
 #pragma GLOBAL_ASM("asm/jp/nonmatchings/21C0/func_80009694.s")
 
-#pragma GLOBAL_ASM("asm/jp/nonmatchings/21C0/crash_screen_copy_to_buf.s")
+#pragma GLOBAL_ASM("asm/jp/nonmatchings/21C0/func_80009750.s")
 
 #pragma GLOBAL_ASM("asm/jp/nonmatchings/21C0/func_800097D4.s")
 
