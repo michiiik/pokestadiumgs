@@ -198,7 +198,21 @@ s32 func_80023A10(s32 group, s32 index) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025C50.s")
+/* Select the audio command mode and refresh the resident audio subsystem. */
+extern void func_80018728(u32 mode, s32 arg);
+
+void func_80025C50(s32 mode) {
+    u8 *modeFlag = (u8 *)0x80090B90;
+
+    if ((u32)mode < 5) {
+        if (mode == 4) {
+            *modeFlag = 1;
+        } else {
+            *modeFlag = 0;
+        }
+        func_80018728(0xF0000000, 0);
+    }
+}
 #endif
 
 /* Audio task-control wrappers.  The US bodies are single tail-preserving
