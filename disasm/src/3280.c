@@ -26,7 +26,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/3280/func_80002DD4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3280/func_80002DE4.s")
+s32 func_80002DE4(u8 *arg0) { return *(s32 *)(arg0 - 0xC) - (s32)arg0; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3280/func_80002DF0.s")
+extern u8 D_800CCDB0[]; u8 *func_80002DF0(void) { return D_800CCDB0; }
 #endif
