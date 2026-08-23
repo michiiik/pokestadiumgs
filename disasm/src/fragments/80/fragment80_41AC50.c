@@ -40,7 +40,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_84202EE4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_84202FE4.s")
+void func_84202FE4(void *arg0) { func_84202BD0(arg0); func_84202EE4(arg0); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_8420300C.s")
 

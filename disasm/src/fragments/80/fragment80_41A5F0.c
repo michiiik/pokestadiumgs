@@ -14,7 +14,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41A5F0/func_84201620.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41A5F0/func_8420168C.s")
+void func_8420168C(void *arg0) { func_84201408(arg0); func_8420151C(arg0); func_84201620(arg0); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41A5F0/func_842016BC.s")
 
