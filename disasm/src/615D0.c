@@ -12,7 +12,7 @@ u32 func_80060A64(const u8 *arg0) { return ((u32)arg0[0] << 16) | ((u32)arg0[1] 
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060A94.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060AAC.s")
+u8 func_80060AAC(u8 arg0) { extern u8 *D_80097680; return D_80097680[arg0]; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060AC8.s")
 
