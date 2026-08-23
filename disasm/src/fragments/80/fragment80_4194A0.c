@@ -2,7 +2,9 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_4194A0/func_84200020.s")
+s32 func_84200020(const u8 *arg0) {
+    return *(u16 *)(*(u8 **)(arg0 + 0x1C) + 0x2E) < *(u16 *)(*(u8 **)(arg0 + 0x18) + 0x2E);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_4194A0/func_84200038.s")
 
