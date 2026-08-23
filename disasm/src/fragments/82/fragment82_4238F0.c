@@ -10,7 +10,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D02C98.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D02D00.s")
+void func_82D02D00(void) { func_8004C4B0(0x43); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D02D20.s")
 
