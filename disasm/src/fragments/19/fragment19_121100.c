@@ -6,9 +6,17 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_8230009C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_823000E8.s")
+extern s16 D_82305EE4;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_823000F8.s")
+s32 func_823000E8(void) {
+    return D_82305EE4 == 0;
+}
+
+extern s16 D_82305EE4;
+
+s32 func_823000F8(void) {
+    return D_82305EE4 == 2;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_8230010C.s")
 
@@ -30,9 +38,19 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82300F00.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82300F1C.s")
+extern s16 D_82305E68[];
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82300F34.s")
+void func_82300F1C(void) {
+    D_82305E68[0x74 / 2] = 1;
+    D_82305E68[0x76 / 2] = 0;
+}
+
+extern s16 D_82305E68[];
+
+void func_82300F34(void) {
+    D_82305E68[0x74 / 2] = 3;
+    D_82305E68[0x76 / 2] = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82300F4C.s")
 
