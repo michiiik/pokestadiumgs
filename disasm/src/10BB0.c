@@ -2,7 +2,7 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_8000FFB0.s")
+extern f32 D_8011EA8C; f32 func_8000FFB0(f32 arg0) { return 256.0f * D_8011EA8C / arg0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_8000FFCC.s")
 
@@ -32,7 +32,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_80010610.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_80010638.s")
+void func_80010638(u8 *arg0) { *(s32 *)(arg0 + 0x10) = 0; *(s32 *)arg0 = 0; *(s32 *)(arg0 + 8) = *(s32 *)(arg0 + 4); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_8001064C.s")
 
