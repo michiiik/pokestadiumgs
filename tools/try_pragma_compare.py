@@ -33,6 +33,26 @@ import tempfile
 from pathlib import Path
 
 
+def source_object_path(source_path: Path) -> tuple[Path, Path]:
+    repo_root = Path(__file__).resolve().parent.parent
+    relative = source_path.resolve().relative_to(repo_root / "disasm")
+    return repo_root, repo_root / "disasm" / "build" / relative.with_suffix(".o")
+
+
+def rebuild_source_object(source_path: Path) -> int:
+    repo_root, object_path = source_object_path(source_path)
+    object_path.unlink(missing_ok=True)
+    result = subprocess.run(
+        ["make", "-C", "disasm", str(object_path.relative_to(repo_root / "disasm"))],
+        cwd=repo_root,
+        env={**os.environ, "MIPS_BINUTILS_PREFIX": os.environ.get(
+            "MIPS_BINUTILS_PREFIX", "/Users/michaegg/homebrew/bin/mips-linux-gnu-"
+        )},
+        text=True,
+    )
+    return result.returncode
+
+
 def try_candidate(source_path: Path, function: str, candidate: str) -> int:
     source = source_path.read_text()
     candidate = candidate.rstrip() + "\n"
@@ -53,6 +73,11 @@ def try_candidate(source_path: Path, function: str, candidate: str) -> int:
         backup_path = Path(tmp.name)
 
     source_path.write_text(source_after)
+    if rebuild_source_object(source_path) != 0:
+        source_path.write_text(source)
+        rebuild_source_object(source_path)
+        backup_path.unlink(missing_ok=True)
+        return 2
     env = os.environ.copy()
     env.setdefault("MIPS_BINUTILS_PREFIX", "/Users/michaegg/homebrew/bin/mips-linux-gnu-")
     result = subprocess.run(
@@ -67,10 +92,11 @@ def try_candidate(source_path: Path, function: str, candidate: str) -> int:
 
     if result.returncode != 0:
         shutil.copyfile(backup_path, source_path)
-        # The candidate compile can finish within the same filesystem
-        # timestamp tick as the restore.  Force make to rebuild the restored
-        # object instead of reusing the rejected candidate object.
+        # Force make to rebuild the restored object instead of reusing the
+        # rejected candidate object, regardless of filesystem timestamp
+        # resolution.
         os.utime(source_path, None)
+        rebuild_source_object(source_path)
         print(f"REJECTED {function}: restored GLOBAL_ASM")
     else:
         print(f"ACCEPTED {function}: source replacement kept")
@@ -116,6 +142,7 @@ def main() -> int:
                 continue
             source_path.write_text(baseline)
             os.utime(source_path, None)
+            rebuild_source_object(source_path)
             result = try_candidate(source_path, function, candidate)
             if result == 0:
                 accepted[function] = candidate
@@ -133,17 +160,26 @@ def main() -> int:
                 print(f"could not apply accepted candidate {function}", file=sys.stderr)
                 source_path.write_text(baseline)
                 os.utime(source_path, None)
+                rebuild_source_object(source_path)
                 if not keep_candidate:
                     bundle_path.unlink(missing_ok=True)
                 return 2
         source_path.write_text(combined)
         os.utime(source_path, None)
+        if rebuild_source_object(source_path) != 0:
+            source_path.write_text(baseline)
+            os.utime(source_path, None)
+            rebuild_source_object(source_path)
+            if not keep_candidate:
+                bundle_path.unlink(missing_ok=True)
+            return 2
         if accepted:
             print(f"checking {len(accepted)} accepted candidate(s) together")
             result = compare_current_tree(repo_root)
             if result != 0:
                 source_path.write_text(baseline)
                 os.utime(source_path, None)
+                rebuild_source_object(source_path)
                 print("combined candidate batch rejected: restored baseline")
                 if not keep_candidate:
                     bundle_path.unlink(missing_ok=True)
@@ -151,6 +187,7 @@ def main() -> int:
         else:
             source_path.write_text(baseline)
             os.utime(source_path, None)
+            rebuild_source_object(source_path)
             compare_current_tree(repo_root)
             print("no candidate accepted")
             if not keep_candidate:
