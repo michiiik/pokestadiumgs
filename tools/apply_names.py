@@ -148,6 +148,10 @@ def run_qa(mapping):
                 continue
             base = os.path.basename(p)[:-2]
             pragma_names.add(base)
+            # Compatibility pragmas intentionally point at descriptive alias
+            # files whose assembly label remains address-derived.
+            if base.startswith("LinkAlias_"):
+                continue
             if base not in syms:
                 orphan_pragmas.append((os.path.relpath(path, ROOT), base))
 
