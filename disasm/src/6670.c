@@ -32,11 +32,11 @@ extern u8 D_800CE119; s32 func_80006230(void) { return D_800CE119 != 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6670/func_800062F8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6670/func_800063B0.s")
+void func_800063B0(void) { extern OSMesgQueue D_800CE150; osRecvMesg(&D_800CE150, NULL, OS_MESG_BLOCK); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6670/func_800063DC.s")
+void func_800063DC(void) { extern OSMesgQueue D_800CE150; osSendMesg(&D_800CE150, NULL, OS_MESG_NOBLOCK); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6670/func_80006408.s")
+void func_80006408(void) { extern OSMesgQueue D_800CE150; extern OSMesg D_800CE14C; osCreateMesgQueue(&D_800CE150, &D_800CE14C, 1); osSendMesg(&D_800CE150, NULL, OS_MESG_NOBLOCK); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6670/func_8000644C.s")
 #endif
