@@ -74,7 +74,10 @@ s32 func_8AB072E4(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22AB80/func_8AB092F4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22AB80/func_8AB09418.s")
+void func_8AB09418(u8 *arg0) {
+    *(s32 *)(arg0 + 0xC) = 1;
+    *(s16 *)(arg0 + 0x10) = 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22AB80/func_8AB09428.s")
 
