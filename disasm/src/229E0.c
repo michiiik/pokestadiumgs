@@ -850,11 +850,11 @@ void func_80033ED0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800347D0.s")
+void func_800347D0(s32 arg0, s32 arg1) { }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800347DC.s")
+void func_800347DC(s32 arg0, s32 arg1) { }
 #endif
 
 #ifdef VERSION_US
