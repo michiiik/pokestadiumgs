@@ -177,7 +177,7 @@ extern s16 D_80129078; void func_80070860(s32 arg0) { D_80129078++; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_80070B7C.s")
+f32 func_80070B7C(f32 arg0) { if ((f64)arg0 < 0.0) { arg0 = -arg0; } return arg0; }
 #endif
 
 #ifdef VERSION_US
