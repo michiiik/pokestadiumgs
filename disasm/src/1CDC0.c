@@ -32,7 +32,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1CDC0/func_8001CB9C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/1CDC0/func_8001CC3C.s")
+u8 func_8001CC3C(u8 **arg0) { u8 result = **arg0; (*arg0)++; return result; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1CDC0/func_8001CC50.s")
 
