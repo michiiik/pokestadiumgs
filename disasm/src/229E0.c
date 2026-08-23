@@ -295,7 +295,22 @@ void func_80026098(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80026298.s")
+extern void func_80018810(void);
+extern s32 func_80018ACC(void);
+#define D_80090B64 (*(u8 *)0x80090B64)
+
+/* Poll the audio command engine's pending transition. */
+s32 func_80026298(void) {
+    func_80018810();
+    if (D_80090B64 == 0) {
+        return 1;
+    }
+    if (func_80018ACC() == 0) {
+        return 0;
+    }
+    D_80090B64 = 0;
+    return 1;
+}
 #endif
 
 #ifdef VERSION_US
