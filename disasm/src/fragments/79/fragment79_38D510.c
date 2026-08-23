@@ -22,7 +22,9 @@ f32 func_8411E1B4(u8 *arg0) {
     return *(f32 *)(arg0 + 0x648);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411E1BC.s")
+f32 func_8411E1BC(u8 *arg0) {
+    return *(f32 *)(arg0 + 0x648) - *(f32 *)(arg0 + 0x650);
+}
 
 f32 func_8411E1CC(u8 *arg0) {
     return *(f32 *)(arg0 + 0x64C);
