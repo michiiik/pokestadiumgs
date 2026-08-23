@@ -32,7 +32,10 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B9B80/func_8414BEB0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B9B80/func_8414BEE8.s")
+extern u8 D_8419D7C0[];
+void func_8414BEE8(void) {
+    _bzero(D_8419D7C0, 0xFC0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B9B80/func_8414BF10.s")
 
