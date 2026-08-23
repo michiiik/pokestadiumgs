@@ -208,6 +208,7 @@ extern u32 MainPool_GetAllocationSize(void *fragment);
 extern void main_pool_set_func(void *fragment, u32 vaddr, void *callback);
 extern void Memmap_SetSegmentMap(u32 segment, void *asset, u32 size);
 
+#if 0
 void Memmap_SegmentCleanupCallback(void *arg0, u32 vaddr) {
     u32 segment;
 
@@ -220,6 +221,9 @@ void Memmap_SegmentCleanupCallback(void *arg0, u32 vaddr) {
         Memmap_ClearSegmentMemmap(segment);
     }
 }
+#endif
+
+#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/LinkAlias_func_800045E0.s")
 
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/Asset_LoadToSegment.s")
@@ -238,6 +242,7 @@ void *Asset_LoadToSegment(u32 segment, u32 source, u32 end, u32 decompress) {
 }
 #endif
 
+#if 0
 void Memmap_FragmentCleanupCallback(void *arg0, u32 vaddr) {
     u32 fragment;
 
@@ -250,6 +255,9 @@ void Memmap_FragmentCleanupCallback(void *arg0, u32 vaddr) {
         Memmap_ClearFragmentMemmap(fragment);
     }
 }
+#endif
+
+#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/LinkAlias_func_800046C0.s")
 
 
 typedef struct {
@@ -283,6 +291,7 @@ void Fragment_Register(u32 pool, FragmentHeader *fragment) {
 }
 #endif
 
+#if 0
 void Fragment_RelocateAndReset(void *pool, void *source,
                                FragmentHeader *fragment) {
     Memmap_RelocateFragment(source, fragment);
@@ -290,6 +299,9 @@ void Fragment_RelocateAndReset(void *pool, void *source,
         pool, (u32)((u8 *)fragment + fragment->end_offset) -
                  *(u32 *)((u8 *)pool + 8));
 }
+#endif
+
+#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/LinkAlias_func_800047B0.s")
 
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/Fragment_Load.s")

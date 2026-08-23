@@ -124,9 +124,7 @@ void Minigame_ResetPlayerRecord(u8 *record) {
 
 extern u8 D_8012B3F6;
 
-void Minigame_SetPlayerMask(s8 player) {
-    D_8012B3F6 = (u8)(1 << player);
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/LinkAlias_func_8007214C.s")
 
 void Minigame_ResetPlayerSubstate(s32 *substate) {
     substate[0] = 0;

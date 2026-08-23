@@ -1033,6 +1033,8 @@ s32 func_80056184(u8 *data) {
     return result;
 }
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/LinkAlias_func_800561E4.s")
+
 s32 func_800562B8(s32 active) {
     u8 state[0x38];
     u8 *entry;
