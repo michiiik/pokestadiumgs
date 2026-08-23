@@ -1754,11 +1754,13 @@ void func_80035CD0(f32 *dest, f32 *source) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003C964.s")
+extern s32 D_80094900;
+void func_8003C964(s32 value) { D_80094900 = value; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003C970.s")
+extern u16 D_80094904;
+void func_8003C970(void) { D_80094904++; }
 #endif
 
 #ifdef VERSION_US
@@ -2042,11 +2044,11 @@ void func_80035CD0(f32 *dest, f32 *source) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003F4DC.s")
+void func_8003F4DC(u8 *arg0, u8 value) { arg0[0x1D] = value; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003F4E8.s")
+void func_8003F4E8(u8 *arg0, u8 value) { arg0[0x1C] = value; }
 #endif
 
 #ifdef VERSION_US
