@@ -1673,7 +1673,7 @@ void func_80035CD0(f32 *dest, f32 *source) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003AC84.s")
+void func_8003AC84(s32 arg0) {}
 #endif
 
 #ifdef VERSION_US
@@ -1685,7 +1685,7 @@ void func_80035CD0(f32 *dest, f32 *source) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003B03C.s")
+void func_8003B03C(s32 arg0) {}
 #endif
 
 #ifdef VERSION_US
