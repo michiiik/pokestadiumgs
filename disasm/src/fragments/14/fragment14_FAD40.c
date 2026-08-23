@@ -24,13 +24,13 @@ s32 func_81302CA4(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FAD40/func_813031D8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FAD40/func_81303228.s")
+void func_81303228(u8 *arg0) {}
 
 void func_81303230(u8 *arg0) {
     arg0[0x4DC4] += 1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FAD40/func_81303240.s")
+void func_81303240(u8 *arg0) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FAD40/func_81303248.s")
 
