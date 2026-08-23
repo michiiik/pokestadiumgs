@@ -78,7 +78,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_8001544C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80015570.s")
+void func_80015570(s32 a0, s32 a1, s32 a2, s32 a3) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80015584.s")
 
@@ -88,15 +88,15 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80015A10.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80015A40.s")
+extern s32 D_8008FA70; void func_80015A40(s32 value) { D_8008FA70 = value; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80015A4C.s")
+extern s32 D_8008FA74; void func_80015A4C(s32 value) { D_8008FA74 = value; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80015A58.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80015AB8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80015E58.s")
+extern u8 D_8011BE90[]; void func_80015E58(void) { *(s32 *)(D_8011BE90 + 0x2074) = 0; *(s32 *)(D_8011BE90 + 0x20D8) = 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80015E6C.s")
 
@@ -108,7 +108,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_800162D0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80016354.s")
+void func_80016354(s32 a0, s32 a1, s32 a2, s32 a3) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80016368.s")
 
@@ -120,7 +120,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80016624.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80016748.s")
+void func_80016748(s32 arg0, s32 arg1) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80016754.s")
 
@@ -130,7 +130,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80016AB4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80016B24.s")
+void func_80016B24(s32 a0, s32 a1, s32 a2, s32 a3) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80016B38.s")
 
@@ -206,7 +206,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80018CC0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80018CF0.s")
+extern s32 D_8011EBD0; void func_80018CF0(void) { D_8011EBD0 = 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80018CFC.s")
 
