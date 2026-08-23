@@ -2,11 +2,15 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FAD40/func_81302BB0.s")
+s32 func_81302BB0(const u8 *arg0) {
+    return *(const s8 *)(arg0 + 0x4DBC) >= 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FAD40/func_81302BC0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FAD40/func_81302C40.s")
+s32 func_81302C40(const u8 *arg0) {
+    return arg0[0x4DBD] == 0 && arg0[0x4DC4] >= 3;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FAD40/func_81302C64.s")
 
