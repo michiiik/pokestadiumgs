@@ -1301,7 +1301,11 @@ void Audio_ThreadEntry(void *arg) {
 extern s32 func_80025C9C(void);
 extern s32 func_80025D44(void);
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/LinkAlias_func_800353BC.s")
+s32 Audio_StopProcessing(void) {
+    func_80025C9C();
+    D_80122A40 = 0;
+    return 0;
+}
 
 s32 Audio_WaitForPendingTasks(void) {
     s32 completed = 0;
