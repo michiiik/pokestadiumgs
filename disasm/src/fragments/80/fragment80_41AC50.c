@@ -92,5 +92,8 @@ u8 func_84203494(void) {
     return D_842034F0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_842034A0.s")
+extern u8 D_842034E8;
+u8 func_842034A0(void) {
+    return D_842034E8;
+}
 #endif
