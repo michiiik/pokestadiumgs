@@ -136,7 +136,11 @@ s32 func_8130A9C8(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130B12C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130B1F4.s")
+extern s32 func_8160A33C(s32 arg0, u8 arg1);
+s32 func_8130B1F4(u8 *arg0) {
+    u8 *base = arg0 + 0x8000;
+    return func_8160A33C(*(s32 *)(base + 0x68E8), base[0x6914]);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130B220.s")
 
