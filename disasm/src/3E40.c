@@ -4,7 +4,12 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/3E40/func_80003240.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3E40/func_80003308.s")
+
+void func_80003308(u32 *dst, const u32 *src, s32 wordCount) {
+    while (wordCount-- > 0) {
+        *dst++ = *src++;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/3E40/Util_InitMainPools.s")
 
