@@ -18,6 +18,7 @@ extern u32 D_84193DD0[];
 extern u32 D_841911F4;
 extern u32 D_84183D50;
 extern f32 D_84188FEC;
+extern u8 D_841911FA;
 extern s32 func_841139D0(void *arg0);
 extern void func_841136E8(void *arg0);
 extern void func_84112158(void *arg0, s32 arg1);
@@ -82,6 +83,15 @@ extern void func_841168A0(void *arg0);
 extern void func_84116A3C(void *arg0);
 extern void func_84111C6C(void);
 extern void func_841134D8(void *arg0);
+extern void func_84112EDC(void *arg0);
+extern void func_84116410(void *arg0);
+extern void func_841119CC(void *arg0, s32 arg1);
+extern void func_841121CC(void *arg0, s32 arg1, s32 arg2, s32 arg3);
+extern void func_84112FD0(void *arg0, ...);
+extern s32 func_8006456C(s32 arg0);
+extern s32 func_800427B8(void *arg0);
+extern u16 D_841849B6[];
+extern void func_84108A10(void *arg0);
 extern u8 D_8418393C[];
 extern u8 D_84183944[];
 extern u8 D_84183960[];
@@ -1137,7 +1147,33 @@ void BattleAnim_Dispatch_002(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_Dispatch_218.s")
+void BattleAnim_Dispatch_218(void *arg0) {
+    u8 *state = arg0;
+    s32 index;
+    s32 slot;
+
+    if (D_841911FA == 0) {
+        func_84111C1C();
+    }
+    if (D_841911FA == 0) {
+        index = func_8411E1F8(state);
+        if (*(u16 *)((u8 *)D_84193DD0 + index * 0x10 + 0x12) & 0x10) {
+            func_84113560(0x11C);
+        } else {
+            index = func_8411E1F8(state);
+            if (*(u16 *)((u8 *)D_84193DD0 + index * 0x10 + 0x12) & 0x20) {
+                func_84113560(0x11E);
+            } else {
+                index = func_8411E1F8(state);
+                if (*(u16 *)((u8 *)D_84193DD0 + index * 0x10 + 0x12) & 0x40) {
+                    func_84113560(0x11D);
+                }
+            }
+        }
+    }
+    slot = D_841911F4;
+    *(u32 *)(state + 0x5C8 + slot * 4) = D_84183D50;
+}
 #endif
 
 #ifdef VERSION_US
@@ -1427,11 +1463,48 @@ void BattleAnim_Dispatch_059(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_Dispatch_155.s")
+void BattleAnim_Dispatch_155(void *arg0) {
+    u8 *state = arg0;
+    u8 index;
+    s32 slot;
+    *(s16 *)(state + 0x7E8) = 0;
+    *(u8 *)(state + 0x7F6) = 0;
+    *(u8 *)(state + 0x618) = *((u8 *)D_84193DD0 + 8);
+    func_8411FEE8(0x258);
+    index = func_8411E1F8(state);
+    *(u16 *)(state + 0x65C) = *(u16 *)((u8 *)D_84193DD0 + index * 0x10 + 0xC);
+    index = func_8411E1F8(state);
+    func_8006456C(*(u16 *)((u8 *)D_84193DD0 + index * 0x10 + 0x14));
+    func_84112FD0(*(void **)(state + 0x5C0), *(u16 *)(state + 0x65C),
+                  *(u32 *)((u8 *)D_84193DD0 + index * 0x10 + 0x18),
+                  func_8006456C(*(u16 *)((u8 *)D_84193DD0 + index * 0x10 + 0x14)));
+    func_84108A10(state);
+    func_841126C8(state);
+    slot = D_841911F4;
+    *(u32 *)(state + 0x5C8 + slot * 4) = D_84183D50;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_Dispatch_156.s")
+void BattleAnim_Dispatch_156(void *arg0) {
+    u8 *state = arg0;
+    s32 slot;
+    void *result = func_8411E164(state);
+    if (func_841139D0(result) == 0)
+        return;
+    func_841126C8(state);
+    func_84111C44(state);
+    func_84112EAC(state);
+    func_84112EDC(state);
+    func_84116410(state);
+    *(u8 *)(state + 0x7F6) = 1;
+    *(s16 *)(state + 0x7E8) = 0;
+    func_841119CC(D_841911E0,
+                  D_841849B6[*(u8 *)(state + 0x618)]);
+    func_84111348(state, 0);
+    slot = D_841911F4;
+    *(u32 *)(state + 0x5C8 + slot * 4) = D_84183D50;
+}
 #endif
 
 #ifdef VERSION_US
@@ -1443,7 +1516,22 @@ void BattleAnim_Dispatch_059(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/BattleAnim_Dispatch_157.s")
+void BattleAnim_Dispatch_157(void *arg0) {
+    u8 *state = arg0;
+    s8 mode = *(s8 *)(state + 0x7F6);
+    if (mode == 1) {
+        *(s16 *)(state + 0x7EA) = 0;
+        *(u8 *)(state + 0x7F6) = 2;
+        *(u8 *)(state + 0x618) = *((u8 *)D_84193DD0 + 8);
+    } else if (mode == 2) {
+        func_84116604(state);
+    } else if (mode == 3) {
+        func_841166C4(state);
+    } else if (mode == 4) {
+        func_841121CC(state, *(s8 *)(state + 0x616),
+                      *(s8 *)(state + 0x617), *(u8 *)(state + 0x61A));
+    }
+}
 #endif
 
 #ifdef VERSION_US
