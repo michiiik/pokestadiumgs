@@ -68,7 +68,7 @@ u8 *func_8004CA60(u8 *arg0) { u8 *value = NULL; if (arg0 != NULL) { value = arg0
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D27C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D314.s")
+s32 func_8004D314(s32 arg0, s32 arg1) { s32 result = -1; if (arg0 == 0xEF && arg1 == 0) result = 0; return result; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D334.s")
 
