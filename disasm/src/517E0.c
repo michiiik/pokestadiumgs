@@ -9,6 +9,8 @@ typedef struct SaveRecordEntry {
 } SaveRecordEntry;
 
 extern SaveRecordEntry D_801281C0[];
+extern u8 *D_801281C4[];
+extern u8 *D_801281C8[];
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80050BE0.s")
 
@@ -70,35 +72,80 @@ s32 func_80050DE4(s32 type) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80050E88.s")
+static u8 *Save_GetTypedBase(s32 active, s32 type, s32 value) {
+    s32 bank = func_80050D20(type, value);
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80050F60.s")
+    return active != 0 ? D_801281C8[bank] : D_801281C4[bank];
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051028.s")
+u8 *func_80050E88(s32 active, s32 record, s32 field) {
+    s32 group = record % 4;
+    u8 *base = Save_GetTypedBase(active, 0x10, record);
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800510CC.s")
+    return base + group * 0xF00 + field * 0x180;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051138.s")
+u8 *func_80050F60(s32 active, s32 record) {
+    s32 bank = func_80050D20(0x11, record);
+    s32 entry = record > 0 ? record - 1 : record;
+    u8 *base = active != 0 ? D_801281C8[bank] : D_801281C4[bank];
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800511A4.s")
+    return base + entry * 0x4D8 + (bank == 2 ? 0 : 0x1E00);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051208.s")
+u8 *func_80051028(s32 active, s32 record) {
+    u8 *base = Save_GetTypedBase(active, 0x12, -1);
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051274.s")
+    return base + record * 0x20C + 0x200;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800512E0.s")
+u8 *func_800510CC(s32 active) {
+    return Save_GetTypedBase(active, 0x13, -1) + 0x618;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_8005134C.s")
+u8 *func_80051138(s32 active) {
+    return Save_GetTypedBase(active, 0x14, -1) + 0x1A0;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800513B8.s")
+u8 *func_800511A4(s32 active) {
+    return Save_GetTypedBase(active, 0x15, -1);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051424.s")
+u8 *func_80051208(s32 active) {
+    return Save_GetTypedBase(active, 0x16, -1) + 0x22D8;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051490.s")
+u8 *func_80051274(s32 active) {
+    return Save_GetTypedBase(active, 0x17, -1) + 0x2C0E;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800514FC.s")
+u8 *func_800512E0(s32 active) {
+    return Save_GetTypedBase(active, 0x18, -1) + 0x66C;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051568.s")
+u8 *func_8005134C(s32 active) {
+    return Save_GetTypedBase(active, 0x19, -1) + 0x8BC;
+}
+
+u8 *func_800513B8(s32 active) {
+    return Save_GetTypedBase(active, 0x1A, -1) + 0x23CC;
+}
+
+u8 *func_80051424(s32 active) {
+    return Save_GetTypedBase(active, 0x1B, -1) + 0x285C;
+}
+
+u8 *func_80051490(s32 active) {
+    return Save_GetTypedBase(active, 0x1C, -1) + 0x342C;
+}
+
+u8 *func_800514FC(s32 active) {
+    return Save_GetTypedBase(active, 0x1D, -1) + 0x381C;
+}
+
+u8 *func_80051568(s32 active) {
+    return Save_GetTypedBase(active, 0x1E, -1) + 0x3E64;
+}
 
 u16 Save_Checksum(u8 *data, s32 length) {
     u32 sum = 0;

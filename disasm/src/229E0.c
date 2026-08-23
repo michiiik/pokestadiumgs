@@ -44,7 +44,15 @@ s32 func_8002263C(void) {
 #endif
 
 extern void func_80025294(s32 command, ...);
+extern void func_8001874C(u32 command, s32 value);
 extern s8 D_800901BC[];
+extern s8 D_80090B80;
+extern u8 D_80090200[];
+extern u8 D_80090220;
+extern s32 D_80090224;
+extern s32 D_80090228;
+extern s32 D_8009022C;
+extern s32 D_8009061C[];
 
 void func_80023110(s32 mode, s32 index) {
     if (mode == 0) {
@@ -61,33 +69,49 @@ void func_80023110(s32 mode, s32 index) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800231A0.s")
 #endif
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800238C4.s")
-#endif
+void func_800238C4(void) {
+    if (D_80090B80 == 2) {
+        D_80090220 = 0;
+        func_80018728(0x83010000, 0xB4);
+        D_8009022C = -1;
+    }
+}
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002390C.s")
-#endif
+void func_8002390C(s32 offset) {
+    if (D_80090B80 == 2) {
+        D_80090220 = 0;
+        func_80018728(0x83010000, offset);
+        D_8009022C = -1;
+    }
+}
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80023954.s")
-#endif
+void func_80023954(void) {
+    func_8001874C(0x06010005, 1);
+}
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002397C.s")
-#endif
+s32 func_8002397C(s32 index) {
+    u32 bit = (u32)(index - 1);
+    return (D_80090200[bit >> 3] & (1 << (7 - (bit & 7)))) != 0;
+}
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800239B4.s")
-#endif
+void func_800239B4(s32 delay, s32 offset) {
+    D_80090224 = delay;
+    D_80090228 = offset;
+}
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800239C8.s")
-#endif
+void func_800239C8(void) {
+    if (D_80090224 >= 0) {
+        D_80090224--;
+        if (D_80090224 < 0) {
+            func_8002390C(D_80090228);
+            D_80090228 = 0;
+        }
+    }
+}
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80023A10.s")
-#endif
+s32 func_80023A10(s32 group, s32 index) {
+    return D_8009061C[((group & 0xFF) * 4) + (index & 0xFF)];
+}
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80023A3C.s")

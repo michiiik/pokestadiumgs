@@ -67,13 +67,43 @@ s32 Game_GetState(void) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/65820/func_80064E38.s")
 #endif
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/Game_State11_Options.s")
-#endif
+extern u8 D_82700000[];
+extern u8 fragment22_ROM_START[];
+extern u8 fragment23_ROM_START[];
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/Game_ThreadInit.s")
-#endif
+void Game_State11_Options(void) {
+    s32 result;
+
+    main_pool_push_state(0x6F70746E);
+    result = Fragment_LoadAndCall(
+        ((((u32)D_82700000 & 0x0FF00000) >> 20) - 0x10),
+        fragment22_ROM_START, fragment23_ROM_START, 0, 0);
+    main_pool_pop_state(0x6F70746E);
+
+    if (result == 0) {
+        Game_SetState(2);
+    } else {
+        Game_SetState(1);
+    }
+}
+
+extern s32 D_80128BE0;
+extern s32 D_8009DE90;
+
+void Game_ThreadInit(void) {
+    __osSetFpcCsr(0x1000C01);
+    func_8000644C();
+    func_80035140(1);
+    func_80035620();
+    func_8004C020();
+    func_80046980();
+    func_80041B84();
+    func_8006D240();
+    Game_SetState(17);
+    D_80128BE0 = -1;
+    D_8009DE90 = 0;
+    main_pool_push_state(0x47414D45);
+}
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/65820/func_80064F54.s")
