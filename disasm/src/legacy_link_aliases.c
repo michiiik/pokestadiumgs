@@ -45,6 +45,7 @@ void GbTower_UpdatePortState(s32 port) { ((void (*)(s32))LEGACY_CALL(8005A364))(
 extern void Memmap_SegmentCleanupCallback(void *arg0, u32 vaddr);
 extern void Memmap_FragmentCleanupCallback(void *arg0, u32 vaddr);
 extern void Fragment_RelocateAndReset(void *pool, void *source, void *fragment);
+extern unsigned char D_800D045C[];
 #define LEGACY_FUNC(prefix, a, b, c, d, e, f, g, h) \
     prefix##a##b##c##d##e##f##g##h
 void LEGACY_FUNC(func_, 8, 0, 0, 0, 4, 5, E, 0)(void *arg0, u32 vaddr) {
@@ -56,6 +57,13 @@ void LEGACY_FUNC(func_, 8, 0, 0, 0, 4, 6, C, 0)(void *arg0, u32 vaddr) {
 void LEGACY_FUNC(func_, 8, 0, 0, 0, 4, 7, B, 0)(void *pool, void *source,
                                                    void *fragment) {
     Fragment_RelocateAndReset(pool, source, fragment);
+}
+void LEGACY_FUNC(func_, 8, 0, 0, 0, 6, A, 7, 8)(void *request, s32 mode) {
+    if (mode == 1) {
+        osJamMesg((OSMesgQueue *)D_800D045C, (OSMesg)request, 1);
+    } else {
+        osSendMesg((OSMesgQueue *)D_800D045C, (OSMesg)request, 1);
+    }
 }
 #undef LEGACY_FUNC
  #endif
