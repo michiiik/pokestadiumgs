@@ -1,11 +1,6 @@
 #include "global.h"
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/LinkAlias_func_80035174.s")
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/LinkAlias_func_800353BC.s")
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/LinkAlias_func_80035494.s")
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/LinkAlias_func_800355D4.s")
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/LinkAlias_func_800355E4.s")
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/LinkAlias_func_800561E4.s")
 #pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/LinkAlias_func_8007214C.s")
 

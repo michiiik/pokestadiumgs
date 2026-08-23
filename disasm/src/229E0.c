@@ -1231,6 +1231,8 @@ extern void Audio_InitializeTaskState(void);
 extern void *Audio_BuildSchedulerTask(void);
 extern void func_80025C50(s32 mode);
 
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/LinkAlias_func_80035174.s")
+#if 0
 void Audio_ThreadEntry(void *arg) {
     u8 *client = D_80122B20;
     u8 *taskQueue = D_80122A4C;
@@ -1286,6 +1288,7 @@ void Audio_ThreadEntry(void *arg) {
         *taskIndex += 1;
     }
 }
+#endif
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Thread4_CreateThread.s")
@@ -1298,11 +1301,7 @@ void Audio_ThreadEntry(void *arg) {
 extern s32 func_80025C9C(void);
 extern s32 func_80025D44(void);
 
-s32 Audio_StopProcessing(void) {
-    func_80025C9C();
-    D_80122A40 = 0;
-    return 0;
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/LinkAlias_func_800353BC.s")
 
 s32 Audio_WaitForPendingTasks(void) {
     s32 completed = 0;
@@ -1324,9 +1323,7 @@ void Audio_SetProcessingEnabled(s32 enabled) {
     D_80122A40 = enabled ? 1 : 0;
 }
 
-void Audio_ResetModeSelector(void) {
-    D_80094860 = -1;
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/LinkAlias_func_80035494.s")
 
 void Audio_EnableModeFlag(void) {
     D_80094868 = 1;
@@ -1338,19 +1335,11 @@ void Audio_EnableModeFlag(void) {
 
 extern s32 D_80094864;
 
-void Audio_ResetRequestId(void) {
-    D_80094864 = -1;
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/LinkAlias_func_800355D4.s")
 
 extern void Audio_DispatchCommand(s32 eventId);
 
-s32 Audio_RequestEvent(s32 eventId) {
-    if (eventId != D_80094864) {
-        D_80094864 = eventId;
-        Audio_DispatchCommand(eventId);
-    }
-    return 0;
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/LinkAlias_func_800355E4.s")
 
 #define D_437620 ((u8 *)0x00437620)
 #define D_437670 ((u8 *)0x00437670)

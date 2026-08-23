@@ -223,6 +223,11 @@ def main():
     existing = collections.defaultdict(list)
     for path in files:
         text = read(path)
+        # Linker-only compatibility assignments intentionally retain the
+        # address-derived RHS symbol; they do not represent a source owner or
+        # GLOBAL_ASM path that still needs renaming.
+        if path.endswith(".ld"):
+            text = re.sub(r"=\s*func_[A-Za-z0-9_]+\s*;", "= 0;", text)
         for m in pattern.finditer(text):
             counts[m.group(1)] += 1
         # One identifier scan per file intersected with the target set, rather
