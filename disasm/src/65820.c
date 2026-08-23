@@ -14,7 +14,8 @@ s32 func_80064C88(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/func_80064C94.s")
+extern s32 D_80128BE0;
+s32 func_80064C94(s32 value) { s32 result = 0; if (value >= 0 && value < 4) { D_80128BE0 = value; result = 1; } return result; }
 #endif
 
 #ifdef VERSION_US
@@ -65,7 +66,9 @@ void func_80064DF4(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/func_80064DFC.s")
+extern s32 D_8009DE94;
+extern s32 D_80128BE4;
+s32 func_80064DFC(s32 value) { s32 result = 0; if (value != D_8009DE94) { D_80128BE4 = D_8009DE94; D_8009DE94 = value; result = 1; } return result; }
 #endif
 
 #ifdef VERSION_US
