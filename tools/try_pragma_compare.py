@@ -17,8 +17,9 @@ Bundle files contain blocks of this form, which are tested independently:
     s32 func_80025D44(void) { return func_80019378(); }
     /* end candidate */
 
-Bundle candidates are deliberately tested sequentially in the live checkout;
-parallel testing requires isolated build trees and is a separate mode.
+Bundle candidates are tested sequentially in the live checkout.  Every test
+starts from the same baseline, and only the first successful candidate for a
+function is retained; later variants for that function are skipped.
 """
 
 from __future__ import annotations
@@ -78,6 +79,18 @@ def try_candidate(source_path: Path, function: str, candidate: str) -> int:
     return result.returncode
 
 
+def compare_current_tree(repo_root: Path) -> int:
+    env = os.environ.copy()
+    env.setdefault("MIPS_BINUTILS_PREFIX", "/Users/michaegg/homebrew/bin/mips-linux-gnu-")
+    result = subprocess.run(
+        ["make", "-C", "disasm", "COMPARE=1", "-j2"],
+        cwd=repo_root,
+        env=env,
+        text=True,
+    )
+    return result.returncode
+
+
 def main() -> int:
     keep_candidate = "--keep-candidate" in sys.argv
     args = [arg for arg in sys.argv[1:] if arg != "--keep-candidate"]
@@ -94,12 +107,58 @@ def main() -> int:
         if not blocks:
             print("candidate bundle contains no candidate blocks", file=sys.stderr)
             return 2
-        result = 0
+        repo_root = Path(__file__).resolve().parent.parent
+        baseline = source_path.read_text()
+        accepted: dict[str, str] = {}
         for function, candidate in blocks:
-            result |= try_candidate(source_path, function, candidate)
+            if function in accepted:
+                print(f"SKIPPED {function}: earlier candidate accepted")
+                continue
+            source_path.write_text(baseline)
+            os.utime(source_path, None)
+            result = try_candidate(source_path, function, candidate)
+            if result == 0:
+                accepted[function] = candidate
+
+        # Evaluate all first-success candidates together from the original
+        # baseline.  This is the only state left in the live checkout.
+        combined = baseline
+        for function, candidate in accepted.items():
+            pragma = re.compile(
+                rf'^#pragma GLOBAL_ASM\("asm/us/nonmatchings/[^"]+/{re.escape(function)}\.s"\)$',
+                re.MULTILINE,
+            )
+            combined, count = pragma.subn(candidate.rstrip("\n"), combined, count=1)
+            if count != 1:
+                print(f"could not apply accepted candidate {function}", file=sys.stderr)
+                source_path.write_text(baseline)
+                os.utime(source_path, None)
+                if not keep_candidate:
+                    bundle_path.unlink(missing_ok=True)
+                return 2
+        source_path.write_text(combined)
+        os.utime(source_path, None)
+        if accepted:
+            print(f"checking {len(accepted)} accepted candidate(s) together")
+            result = compare_current_tree(repo_root)
+            if result != 0:
+                source_path.write_text(baseline)
+                os.utime(source_path, None)
+                print("combined candidate batch rejected: restored baseline")
+                if not keep_candidate:
+                    bundle_path.unlink(missing_ok=True)
+                return result
+        else:
+            source_path.write_text(baseline)
+            os.utime(source_path, None)
+            compare_current_tree(repo_root)
+            print("no candidate accepted")
+            if not keep_candidate:
+                bundle_path.unlink(missing_ok=True)
+            return 1
         if not keep_candidate:
             bundle_path.unlink(missing_ok=True)
-        return result
+        return 0
 
     if len(args) == 3:
         source_path = Path(args[0])
