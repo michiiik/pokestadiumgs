@@ -205,7 +205,7 @@ void func_80018A74(void) { func_8001480C(); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80018C60.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80018CA4.s")
+extern u8 *D_80121EDC[]; s8 func_80018CA4(s32 arg0, s32 arg1) { return *(s8 *)(D_80121EDC[arg0] + arg1 + 0x158); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80018CC0.s")
 
