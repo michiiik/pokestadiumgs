@@ -8,9 +8,9 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C09C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C398.s")
+extern s32 D_80097120; void func_8004C398(void) { D_80097120 = 0; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C3A4.s")
+void func_8004C3A4(s32 unused, u8 *arg1) { *(s32 *)arg1 = 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C3B0.s")
 
@@ -18,7 +18,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C468.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C4A4.s")
+extern s32 D_80097120; s32 func_8004C4A4(void) { return D_80097120; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C4B0.s")
 
