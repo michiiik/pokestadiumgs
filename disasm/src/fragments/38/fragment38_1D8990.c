@@ -18,7 +18,11 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D8990/func_88903BB4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D8990/func_88903C28.s")
+extern u8 *D_889041B0;
+extern void func_889033A0(void *arg0);
+void func_88903C28(void) {
+    func_889033A0(D_889041B0 + 4);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D8990/func_88903C50.s")
 #endif
