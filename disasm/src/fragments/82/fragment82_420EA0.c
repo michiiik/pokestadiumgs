@@ -62,7 +62,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_420EA0/func_82D022D0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_420EA0/func_82D02380.s")
+extern u16 D_82D23D88; extern u8 D_82D2382A; extern u8 D_82D23D84; void func_82D02380(void) { if (D_82D23D88 != 0) { D_82D2382A = 0x17; D_82D23D84 = 1; } }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_420EA0/func_82D023AC.s")
 
