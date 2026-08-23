@@ -289,7 +289,11 @@ s32 func_80025D44(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800277C4.s")
+
+extern void func_8002781C(u16 resource_id, u8 mode);
+void func_800277C4(u16 resource_id, u8 mode) {
+    func_8002781C(resource_id, mode);
+}
 #endif
 
 #ifdef VERSION_US
