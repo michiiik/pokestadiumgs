@@ -889,11 +889,15 @@ s32 func_8005D8C0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80060348.s")
+s32 func_80060348(s32 arg0, s32 arg1) {
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80060358.s")
+s32 func_80060358(s32 arg0, s32 arg1) {
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
