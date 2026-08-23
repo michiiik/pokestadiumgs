@@ -161,7 +161,7 @@ void func_8006DE94(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_80070860.s")
+extern s16 D_80129078; void func_80070860(s32 arg0) { D_80129078++; }
 #endif
 
 #ifdef VERSION_US
@@ -216,7 +216,7 @@ void func_800711A8(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_800711B0.s")
+s32 func_800711B0(void) { return 0; }
 #endif
 
 #ifdef VERSION_US
