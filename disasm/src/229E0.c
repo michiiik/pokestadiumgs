@@ -918,11 +918,11 @@ u8 func_80034D98(const u8 *arg0) { return arg0[0]; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80034DD0.s")
+extern void func_80032F0C(void); void func_80034DD0(void) { func_80032F0C(); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80034DF0.s")
+extern void func_800331D4(void); void func_80034DF0(void) { func_800331D4(); }
 #endif
 
 #ifdef VERSION_US
@@ -1742,7 +1742,7 @@ void func_80035CD0(f32 *dest, f32 *source) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003C370.s")
+extern void func_8003A2C8(void); void func_8003C370(void) { func_8003A2C8(); }
 #endif
 
 #ifdef VERSION_US
@@ -1908,7 +1908,7 @@ extern s32 D_801263E0; void func_8003E7A0(void) { D_801263E0 = -1; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003E8A8.s")
+extern s32 D_801263E0; void func_8003E8A8(void) { if (D_801263E0 >= 0) { D_801263E0--; } }
 #endif
 
 #ifdef VERSION_US
@@ -1964,7 +1964,7 @@ extern s32 D_80126410; void func_8003ED08(void) { D_80126410 = -1; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003EE00.s")
+extern s32 D_80126410; void func_8003EE00(void) { if (D_80126410 >= 0) { D_80126410--; } }
 #endif
 
 #ifdef VERSION_US
