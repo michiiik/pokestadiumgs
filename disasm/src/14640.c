@@ -180,7 +180,10 @@ void func_80016B24(s32 a0, s32 a1, s32 a2, s32 a3) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_800187AC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80018810.s")
+void func_80018810(void) {
+    D_8011BE90[0x6315] = D_8011BE90[0x6314];
+    D_8011BE90[0x6316] = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80018828.s")
 
