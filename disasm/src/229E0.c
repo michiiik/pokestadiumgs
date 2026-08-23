@@ -56,7 +56,12 @@ s32 func_8002263C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800239B4.s")
+extern s32 D_80090224, D_80090228;
+
+void func_800239B4(s32 arg0, s32 arg1) {
+    D_80090224 = arg0;
+    D_80090228 = arg1;
+}
 #endif
 
 #ifdef VERSION_US
@@ -458,11 +463,19 @@ void func_8002809C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002A9C0.s")
+extern s32 D_800D2630;
+
+void func_8002A9C0(s32 arg0) {
+    D_800D2630 = arg0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002A9CC.s")
+extern s32 D_800D2634;
+
+void func_8002A9CC(s32 arg0) {
+    D_800D2634 = arg0;
+}
 #endif
 
 #ifdef VERSION_US
