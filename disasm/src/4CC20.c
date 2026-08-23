@@ -72,7 +72,11 @@ extern s32 D_80097120; s32 func_8004C4A4(void) { return D_80097120; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D334.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D40C.s")
+extern s16 D_80128082;
+
+void func_8004D40C(s32 arg0) {
+    D_80128082 = (s16)arg0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D418.s")
 

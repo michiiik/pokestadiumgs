@@ -34,7 +34,9 @@ s16 func_87C01E28(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_257730/func_87C01E98.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_257730/func_87C01F6C.s")
+void func_87C01F6C(u8 *arg0, f32 arg1) {
+    *(f32 *)(arg0 + 0xC) = arg1;
+}
 
 f32 func_87C01F78(u8 *arg0) {
     return *(f32 *)(arg0 + 0xC);
