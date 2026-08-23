@@ -65,15 +65,15 @@ void func_80003F74(u32 destination, u32 source, u32 end, u32 staging) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80004458.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800045E0.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/Memmap_SegmentCleanupCallback.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/Asset_LoadToSegment.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800046C0.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/Memmap_FragmentCleanupCallback.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/Fragment_Register.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800047B0.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/Fragment_RelocateAndReset.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/Fragment_Load.s")
 

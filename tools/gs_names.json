@@ -26,6 +26,22 @@
   "Vi_SelectMode": "matches Stadium 1 Video_SetMode (callgraph). Same function, two spellings of the same idea. Upstream name kept."
  },
  "functions": {
+  "func_80002DE4": [
+   "MainPool_GetAllocationSize",
+   "main-pool header helper: returns the allocation size by subtracting the user pointer from the block header at -0xC; called by both segment and fragment registration"
+  ],
+  "func_800045E0": [
+   "Memmap_SegmentCleanupCallback",
+   "installed by Asset_LoadToSegment for 0x82000000 segment allocations; validates the owning segment base and clears its segment map on eviction"
+  ],
+  "func_800046C0": [
+   "Memmap_FragmentCleanupCallback",
+   "installed by Fragment_Register for 0x81000000 fragment allocations; validates the owning fragment base and clears its fragment map on eviction"
+  ],
+  "func_800047B0": [
+   "Fragment_RelocateAndReset",
+   "called by the archive loader after Fragment_Register; relocates the fragment then resets the main-pool state to the fragment end offset"
+  ],
   "func_83503918": [
    "fragment1_main",
    "fragment 1 entry: target of the J at offset 0 of the fragment header trampoline (rom 0xa8a80, vram 0x83500000)"

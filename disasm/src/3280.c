@@ -26,7 +26,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/3280/main_pool_set_func.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3280/func_80002DE4.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/3280/MainPool_GetAllocationSize.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/3280/func_80002DF0.s")
 #endif

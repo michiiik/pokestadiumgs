@@ -116,6 +116,28 @@ named functions, and the remaining large tables (lengths 253, 225, 83, 53,
 Phase 2 is assembly-verified: the renamed tree builds the byte-identical US
 ROM (md5 `1561c75d11cedf356a8ddb1a4a5f9d5d`) in the linux/amd64 container.
 
+## Phase 3.2: fragment and main-pool eviction hooks
+
+The loader's callback edges provide stronger evidence than the generic function
+shapes around them. `Asset_LoadToSegment` installs
+`Memmap_SegmentCleanupCallback` for allocations in the `0x82000000` segment
+range; the callback checks the owning segment base and clears the segment map
+when the allocation is evicted. `Fragment_Register` installs the parallel
+`Memmap_FragmentCleanupCallback` for the `0x81000000` fragment range. The
+shared header helper is `MainPool_GetAllocationSize`: it reads the main-pool
+block size stored at `user_pointer - 0xC`, and both registration paths use it
+before deciding whether to reallocate.
+
+The archive path's post-registration helper is now
+`Fragment_RelocateAndReset`. Its body calls `Memmap_RelocateFragment`, computes
+the fragment end from the loaded header, and calls
+`MainPool_ResetStateToOffset`; that call relationship fixes the role without
+assuming a particular archive format. The actual file/decompression worker at
+`func_800042C0` remains address-named because it handles multiple `PERS`/`PRES`
+and fallback payload forms and its format-specific consumers are not yet
+settled. Fragment-to-state assignments remain hypotheses until each state's
+loader call site is audited.
+
 ## Phase 1: the Stadium 1 transfer
 the 676 is a machine-verified correspondence between the two ROMs' machine code.
 
