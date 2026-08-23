@@ -22,5 +22,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_258D80/func_87C03574.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_258D80/func_87C0379C.s")
+s32 func_87C0379C(u8 *arg0) {
+    return *(s32 *)(arg0 + 0x548);
+}
 #endif

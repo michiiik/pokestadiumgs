@@ -683,5 +683,7 @@ void func_84146AF0(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84148510.s")
+s32 func_84148510(u8 *arg0) {
+    return 0;
+}
 #endif
