@@ -9,24 +9,6 @@ extern u8 D_8009019C;
 extern u8 D_800901A0;
 extern u8 D_800901A4;
 
-void func_800225C4(s32 channel) {
-    func_80018728(0x83000000, channel * 3);
-    func_800187AC();
-    D_8009019C = 0;
-    D_800901A0 = 0;
-    D_800901A4 = 0;
-}
-
-void func_8002260C(void* unused0, void* unused1) {
-    (void)unused0;
-    (void)unused1;
-    func_80018728(0x82000100, 0);
-}
-
-s32 func_8002263C(void) {
-    return 0x61;
-}
-
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80021DE0.s")
 #endif
@@ -34,6 +16,10 @@ s32 func_8002263C(void) {
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Audio_DispatchCommand.s")
 #endif
+
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800225C4.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002260C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002263C.s")
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80022644.s")
@@ -54,64 +40,20 @@ extern s32 D_80090228;
 extern s32 D_8009022C;
 extern s32 D_8009061C[];
 
-void func_80023110(s32 mode, s32 index) {
-    if (mode == 0) {
-        func_80025294(0x66);
-    } else if (mode == 1) {
-        func_80025294(0x65);
-    } else if (mode == 0x154 && index >= 0 && index < 0x3E &&
-               D_800901BC[index] >= 0) {
-        func_80025294((u32)(D_800901BC[index] + 0x1000D), 0, 0);
-    }
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80023110.s")
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800231A0.s")
 #endif
 
-void func_800238C4(void) {
-    if (D_80090B80 == 2) {
-        D_80090220 = 0;
-        func_80018728(0x83010000, 0xB4);
-        D_8009022C = -1;
-    }
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800238C4.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002390C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80023954.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002397C.s")
 
-void func_8002390C(s32 offset) {
-    if (D_80090B80 == 2) {
-        D_80090220 = 0;
-        func_80018728(0x83010000, offset);
-        D_8009022C = -1;
-    }
-}
-
-void func_80023954(void) {
-    func_8001874C(0x06010005, 1);
-}
-
-s32 func_8002397C(s32 index) {
-    u32 bit = (u32)(index - 1);
-    return (D_80090200[bit >> 3] & (1 << (7 - (bit & 7)))) != 0;
-}
-
-void func_800239B4(s32 delay, s32 offset) {
-    D_80090224 = delay;
-    D_80090228 = offset;
-}
-
-void func_800239C8(void) {
-    if (D_80090224 >= 0) {
-        D_80090224--;
-        if (D_80090224 < 0) {
-            func_8002390C(D_80090228);
-            D_80090228 = 0;
-        }
-    }
-}
-
-s32 func_80023A10(s32 group, s32 index) {
-    return D_8009061C[((group & 0xFF) * 4) + (index & 0xFF)];
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800239B4.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800239C8.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80023A10.s")
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80023A3C.s")
@@ -197,22 +139,7 @@ s32 func_80023A10(s32 group, s32 index) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025B54.s")
 #endif
 
-#ifdef VERSION_US
-/* Select the audio command mode and refresh the resident audio subsystem. */
-
-void func_80025C50(s32 mode) {
-    u8 *modeFlag = (u8 *)0x80090B90;
-
-    if ((u32)mode < 5) {
-        if (mode == 4) {
-            *modeFlag = 1;
-        } else {
-            *modeFlag = 0;
-        }
-        func_80018728(0xF0000000, 0);
-    }
-}
-#endif
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025C50.s")
 
 /* Audio task-control wrappers.  The US bodies are single tail-preserving
  * calls at 0x80025C9C and 0x80025D44; keeping the return values exposes the
@@ -220,132 +147,19 @@ void func_80025C50(s32 mode) {
 extern s32 func_80018C14(void);
 extern s32 func_80019378(void);
 
-s32 func_80025C9C(void) {
-    return func_80018C14();
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025C9C.s")
 
-/* Reset the per-channel audio command queues before changing the command
- * mode.  The five command writes and the final flag clear are the complete
- * body of the US routine at 0x80025CBC. */
-extern void func_8002B1A0(s32 channel);
-extern void func_800315E8(void);
-extern void func_80028140(void);
-#define D_80090B9C (*(u8 *)0x80090B9C)
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025CBC.s")
 
-void func_80025CBC(s32 channel) {
-    s32 offset = channel * 3;
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025D44.s")
 
-    func_8002B1A0(channel);
-    func_800315E8();
-    func_80028140();
-    func_80018728(0x83000000, offset);
-    func_80018728(0x83010000, offset);
-    func_80018728(0x83020000, offset);
-    func_80018728(0x83030000, offset);
-    func_80018728(0x83040000, offset);
-    D_80090B9C = 0;
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025D64.s")
 
-s32 func_80025D44(void) {
-    return func_80019378();
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025DB0.s")
 
-#ifdef VERSION_US
-void func_80025D64(s32 value) {
-    if ((u8)value != 0) {
-        func_80018728(0xF1FF0000, 0);
-    } else {
-        func_80018728(0xF2FF0000, 0);
-    }
-}
-#endif
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025E7C.s")
 
-#define D_800D1930 ((u8 *)0x800D1930)
-#define D_800D1940 ((u8 *)0x800D1940)
-#define D_800D1980 ((u8 *)0x800D1980)
-#define D_800D1910 ((u8 *)0x800D1910)
-
-/* Initialize the small resident audio state block used by the scheduler. */
-void func_80025DB0(void) {
-    u8 *state = D_800D1930;
-    u8 *channel = D_800D1980;
-    u8 *config = D_800D1940;
-    u8 *command = D_800D1910;
-    u8 flags = state[0];
-    u32 stateWord;
-
-    *(s16 *)(channel + 4) = -1;
-    *(u32 *)(config + 4) = 0x10000;
-    flags = (u8)((flags & 0x8F) | 0x40);
-    state[0] = flags;
-    flags = (u8)(flags & 0xF3);
-    state[0] = flags;
-    flags = (u8)(flags | 2);
-    state[0] = flags;
-    flags = (u8)(flags | 1);
-    state[0] = flags;
-    stateWord = *(u32 *)state;
-
-    *(u16 *)channel = 1;
-    *(u16 *)(channel + 2) = 0x7D00;
-    *(u16 *)(channel + 6) = 0;
-    command[0] = 1;
-    command[1] = 0;
-    command[2] = 0x7F;
-    command[3] = 0xF0;
-    *(u32 *)(command + 4) = (u32)(channel);
-    *(u32 *)(command + 0x10) = (u32)(state);
-    *(u32 *)config = 0;
-    *(u32 *)(config + 8) = 1;
-    *(u32 *)state = ((stateWord ^ 0x200) << 8) >> 8 ^ stateWord;
-    *(u32 *)(state + 4) = 0;
-    *(u32 *)(state + 8) = (u32)config;
-    *(u32 *)(state + 0xC) = 0;
-    *(float *)(command + 0x14) = 0.5f;
-}
-
-#ifdef VERSION_US
-extern void func_80025DB0(void);
-
-void func_80025E7C(void) {
-    func_80025DB0();
-    func_80018728(0xE2000700, (u32)0x800D1910);
-}
-#endif
-
-#ifdef VERSION_US
-extern void func_80031A6C(s32 size, ...);
-extern s32 func_80031C84(u32 destination, void *source);
-
-/* Submit one audio buffer and advance the rotating DMA destination. */
-s32 func_80025EB0(void *unused0, void *source, s32 reload, void *unused3) {
-    u32 *dmaIndex = (u32 *)0x80090AC0;
-    u32 *destinations = (u32 *)0x800D1990;
-    u32 destination;
-    s32 result;
-
-    (void)unused0;
-    (void)unused3;
-    if (*(s8 *)0x80090B8C == 0) {
-        return 0;
-    }
-
-    destination = destinations[*dmaIndex];
-    if (reload == 1) {
-        func_80031A6C(0x7D00, *(u32 *)0x800D198C);
-    }
-    result = func_80031C84(destination, source);
-    *dmaIndex = (*dmaIndex + 1) % 3;
-
-    if (*(s8 *)0x80090B8C == 0) {
-        return 0;
-    }
-    if (result != -1) {
-        return destination;
-    }
-    return result;
-}
-#endif
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025EB0.s")
 
 #define D_800D1990 ((u32 *)0x800D1990)
 #define D_800D198C (*(u32 *)0x800D198C)
@@ -353,48 +167,10 @@ extern void func_80034DD0(void);
 #define D_80090B8C (*(u8 *)0x80090B8C)
 extern u32 osSetIntMask(u32 mask);
 
-void func_80025F84(s32 size) {
-    u32 aligned = (u32)(size + 0xF) & ~0xF;
-    u32 oldMask;
-
-    D_800D198C = aligned;
-    D_800D1990[0] = aligned + 0x2380;
-    D_800D1990[1] = aligned + 0x4380;
-    D_800D1990[2] = aligned + 0x6380;
-    func_80031A6C(0x7D00);
-    func_80018728(0x82030300, 0);
-    func_800187AC();
-    func_80025E7C();
-    func_8001874C(0x06030000, 0);
-    func_80034DD0();
-    oldMask = osSetIntMask(1);
-    D_80090B8C = 1;
-    osSetIntMask(oldMask);
-}
-
-#define D_80090B8C (*(u8 *)0x80090B8C)
-extern u32 osSetIntMask(u32 mask);
-
-void func_8002602C(void) {
-    u32 old_mask;
-
-    func_80018728(0x83030000, 0);
-    old_mask = osSetIntMask(1);
-    D_80090B8C = 0;
-    osSetIntMask(old_mask);
-}
-
-void func_80026068(s32 command) {
-    if (command != 0 && (u32)command < 0xFC) {
-        func_80034E5C((command - 1) & 0xFFFF);
-    }
-}
-
-extern void func_80034F30(void);
-
-void func_80026098(void) {
-    func_80034F30();
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025F84.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002602C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80026068.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80026098.s")
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800260C0.s")
@@ -431,24 +207,7 @@ s32 func_80026298(void) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800266F8.s")
 #endif
 
-#define D_80090B3C ((u8 *)0x80090B3C)
-#define D_80090AD0 ((u8 *)0x80090AD0)
-#define D_80090B6C (*(s16 *)0x80090B6C)
-#define D_80090B70 (*(s16 *)0x80090B70)
-
-void func_80026938(s32 index) {
-    u32 clamped = (u16)index;
-    u8 sound;
-    u8 *entry;
-
-    if (clamped >= 0x1E) {
-        clamped = 0x0E;
-    }
-    sound = D_80090B3C[clamped];
-    entry = D_80090AD0 + sound * 5;
-    D_80090B6C = entry[1];
-    D_80090B70 = entry[0];
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80026938.s")
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80026990.s")
@@ -510,18 +269,8 @@ void func_80026938(s32 index) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80027774.s")
 #endif
 
-/* Small sound-resource dispatch wrappers.  The US bodies mask the resource
- * id to 16 bits and pass either the low byte or a cleared variant through to
- * func_8002781C (0x800277C4/0x800277F0). */
-extern void func_8002781C(s32 resource_id, s32 mode, ...);
-
-void func_800277C4(s32 resource_id, s32 mode) {
-    func_8002781C((u16)resource_id, (u8)mode);
-}
-
-void func_800277F0(s32 resource_id, s32 variant) {
-    func_8002781C((u16)resource_id, 0, variant);
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800277C4.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800277F0.s")
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002781C.s")
@@ -579,11 +328,7 @@ void func_8002809C(void) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800280EC.s")
 #endif
 
-extern u8 D_80090BB4;
-
-void func_80028118(s32 value) {
-    D_80090BB4 = (u8)(value + 1);
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80028118.s")
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80028140.s")
@@ -2155,31 +1900,9 @@ s32 ModelAnim_SetSpeed(void *anim, s32 speed) {
 }
 #endif
 
-#ifdef VERSION_US
-void ModelAnim_SetFrame(void *anim, s32 frame) {
-    s32 target = (s16)frame << 16;
-    s32 current = *(s32 *)((u8 *)anim + 0x4C);
-    *(s32 *)((u8 *)anim + 0x48) = target - current;
-}
-#endif
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_SetFrame.s")
 
-#ifdef VERSION_US
-s32 ModelAnim_HasCrossedFrame(void *anim, s32 frame) {
-    s32 speed = *(s32 *)((u8 *)anim + 0x4C);
-    s32 current = *(s32 *)((u8 *)anim + 0x48);
-    s32 target = (s16)frame << 16;
-    s32 next = current + speed;
-
-    if (speed >= 0) {
-        if (current < target) {
-            return next >= target;
-        }
-    } else if (current > target) {
-        return next <= target;
-    }
-    return 0;
-}
-#endif
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/ModelAnim_HasCrossedFrame.s")
 
 #ifdef VERSION_US
 s32 ModelAnim_IsAnimationDone(void *anim) {
