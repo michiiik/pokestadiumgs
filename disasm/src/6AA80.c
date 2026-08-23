@@ -122,15 +122,15 @@ extern void func_8006BF78(s32); void func_8006C644(void) { func_8006BF78(1); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006C9F4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006CA34.s")
+extern void func_800029E0(void); void func_8006CA34(void) { func_800029E0(); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006CA54.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006CAC0.s")
+extern void func_800029E0(void); void func_8006CAC0(void) { func_800029E0(); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006CAE0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006CB80.s")
+extern void func_800029E0(void); void func_8006CB80(void) { func_800029E0(); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006CBA0.s")
 
