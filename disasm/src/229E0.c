@@ -513,13 +513,18 @@ void func_80026938(s32 index) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80027774.s")
 #endif
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800277C4.s")
-#endif
+/* Small sound-resource dispatch wrappers.  The US bodies mask the resource
+ * id to 16 bits and pass either the low byte or a cleared variant through to
+ * func_8002781C (0x800277C4/0x800277F0). */
+extern void func_8002781C(s32 resource_id, s32 mode, ...);
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800277F0.s")
-#endif
+void func_800277C4(s32 resource_id, s32 mode) {
+    func_8002781C((u16)resource_id, (u8)mode);
+}
+
+void func_800277F0(s32 resource_id, s32 variant) {
+    func_8002781C((u16)resource_id, 0, variant);
+}
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002781C.s")
@@ -565,9 +570,9 @@ void func_80026938(s32 index) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002806C.s")
 #endif
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002809C.s")
-#endif
+void func_8002809C(void) {
+    func_80018728(0xF2000000, 0);
+}
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800280C0.s")
@@ -577,9 +582,11 @@ void func_80026938(s32 index) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800280EC.s")
 #endif
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80028118.s")
-#endif
+extern u8 D_80090BB4;
+
+void func_80028118(s32 value) {
+    D_80090BB4 = (u8)(value + 1);
+}
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80028140.s")
