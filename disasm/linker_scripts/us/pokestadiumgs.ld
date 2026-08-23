@@ -327,6 +327,8 @@ SECTIONS
         /* Compatibility entrypoints are appended so they cannot shift the
          * address-locked game text preceding them. */
         build/src/legacy_link_aliases.o(.text);
+        Audio_InitializeTaskState = func_80021B00;
+        Audio_BuildSchedulerTask = func_80021B74;
         text_TEXT_END = .;
         text_TEXT_SIZE = ABSOLUTE(text_TEXT_END - text_TEXT_START);
         text_DATA_START = .;
