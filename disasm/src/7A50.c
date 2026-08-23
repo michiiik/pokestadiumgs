@@ -10,7 +10,8 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/7A50/func_80007090.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/7A50/func_80007174.s")
+typedef struct { u16 fmt; u16 size; u16 width; u16 height; u8 *img_p; void *depth_p; } GfxImage;
+void func_80007174(GfxImage *arg0, s32 fmt, s32 size, s32 width, s32 height, u32 img_p) { arg0->fmt = fmt; arg0->size = size; arg0->width = width; arg0->height = height; arg0->img_p = (u8 *)((img_p + 0x3F) & ~0x3F); arg0->depth_p = NULL; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/7A50/func_800071A4.s")
 
