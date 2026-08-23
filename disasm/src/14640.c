@@ -217,7 +217,7 @@ extern s32 D_8011EBD0; void func_80018CF0(void) { D_8011EBD0 = 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_8001911C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80019164.s")
+void func_80019164(void) { func_80018728(0xFA000000, 0); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80019188.s")
 
@@ -229,9 +229,9 @@ extern s32 D_8011EBD0; void func_80018CF0(void) { D_8011EBD0 = 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_8001926C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80019378.s")
+void func_80019378(void) { func_800193B8(0); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80019398.s")
+void func_80019398(void) { func_800193B8(2); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_800193B8.s")
 
