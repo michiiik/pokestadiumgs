@@ -95,5 +95,19 @@ void Memmap_ClearFragmentMemmap(s32 fragment) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/2CA0/Memmap_RelocateFragment.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/2CA0/Memmap_GetLoadedFragmentVaddr.s")
+u32 Memmap_GetLoadedFragmentVaddr(u32 vaddr) {
+    for (s32 fragment = 0; fragment < 0x3C; fragment++) {
+        u32 *entry = &D_800CC630[fragment * 2];
+        u32 offset;
+
+        if (vaddr < entry[0]) {
+            continue;
+        }
+        offset = vaddr - entry[0];
+        if (offset < entry[1]) {
+            return 0x80000000 | ((u32)(fragment + 0x10) << 20) | offset;
+        }
+    }
+    return 0;
+}
 #endif
