@@ -38,7 +38,10 @@ void func_81303240(u8 *arg0) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FAD40/func_81303248.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FAD40/func_813032B0.s")
+extern void func_81303248(u8 *arg0);
+void func_813032B0(u8 *arg0) {
+    func_81303248(arg0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FAD40/func_813032D0.s")
 
