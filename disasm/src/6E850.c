@@ -61,7 +61,7 @@ void func_8006DE94(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_8006E2D0.s")
+extern void func_8006DEBC(void *); extern void func_8006F23C(void *); void func_8006E2D0(void *arg0) { func_8006DEBC(arg0); func_8006F23C(arg0); }
 #endif
 
 #ifdef VERSION_US

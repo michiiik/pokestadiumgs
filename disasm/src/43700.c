@@ -26,7 +26,7 @@ void func_80042BB0(u16 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_80042C68.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_80042D54.s")
+s32 func_80042D54(u8 *arg0, u16 arg1) { s32 result = 0; if (arg0 != NULL) { *(u16 *)(arg0 + 2) = arg1; result = 1; } return result; }
 
 s32 func_80042D74(u8 *arg0, s32 arg1) { s32 result = 0; if (arg0 != NULL) { *(s32 *)(arg0 + 8) = arg1; result = 1; } return result; }
 
