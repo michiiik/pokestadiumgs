@@ -6,7 +6,13 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_80001684.s")
+
+extern void func_800055F4(void *, s32);
+void func_80001684(void *arg0, void *arg1, s32 arg2) {
+    *(u32 *)((u8 *)arg0 + 0x50) = *(u32 *)((u8 *)arg1 + 4);
+    *(u32 *)((u8 *)arg0 + 0x54) = *(u32 *)((u8 *)arg1 + 8);
+    func_800055F4(arg0, arg2);
+}
 #endif
 
 #ifdef VERSION_US
@@ -22,7 +28,20 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_80001AC8.s")
+
+extern u8 leoDiskID[];
+extern void func_80004F34(void *);
+extern void func_80004F60(void *);
+
+void func_80001AC8(void) {
+    func_80004F34(leoDiskID);
+    if (*(s32 *)(leoDiskID + 0x1C8) > 0) {
+        do {
+            func_80004F60(leoDiskID);
+        } while (*(s32 *)(leoDiskID + 0x1C8) > 0);
+    }
+    func_80004F34(leoDiskID);
+}
 #endif
 
 #ifdef VERSION_US
@@ -67,7 +86,21 @@ void func_80001CDC(void) { func_80001CB0(); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_80001E70.s")
+
+extern u8 *D_800AB3C0;
+s32 func_80001E70(void) {
+    s32 result = 1;
+    u16 *ptr = *(u16 **)(D_800AB3C0 + 8);
+    u16 expected = *ptr;
+    s32 count = 0x27F;
+
+    do {
+        if (expected != *ptr++) {
+            result = 0;
+        }
+    } while (count-- > 0);
+    return result;
+}
 #endif
 
 #ifdef VERSION_US

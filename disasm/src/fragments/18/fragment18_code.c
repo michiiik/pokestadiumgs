@@ -39,5 +39,7 @@ s32 func_81700C70(s32 arg0) { s32 result = 0; if (arg0 < 4) { u8 *ptr = D_81700D
 extern u8 D_81700DB0[];
 s32 func_81700CDC(s32 arg0) { s32 result=0; if(arg0<4) { u8 *ptr=D_81700DB0+arg0*36; if((*(u16 *)(ptr+12)&1)!=0 && *(s16 *)(ptr+4)==2) { result=1; *(s16 *)(ptr+4)=1; *(s16 *)(ptr+14)=0; *(s16 *)(ptr+28)=0; *(s16 *)(ptr+22)=*(s16 *)(ptr+16); } } return result; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/18/fragment18_code/func_81700D44.s")
+extern u8 D_81700DB0[];
+s32 func_81700D44(s32 arg0) { s32 result=0; if(arg0<4) { u8 *ptr=&D_81700DB0[arg0*36]; if((*(u16 *)(ptr+12)&1)!=0 && *(s16 *)(ptr+4)==2) { result=1; *(s16 *)(ptr+4)=3; *(s16 *)(ptr+14)=0; } } return result; }
+#pragma C_FUNCTION_PADDING(16)
 #endif
