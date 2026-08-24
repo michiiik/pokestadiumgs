@@ -61,5 +61,9 @@ void func_81800E30(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AE600/func_818014A8.s")
+extern f32 D_81805920;
+f32 func_818014A8(void) {
+    return D_81805920;
+}
+#pragma C_FUNCTION_PADDING(12)
 #endif

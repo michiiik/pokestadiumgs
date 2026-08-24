@@ -54,7 +54,12 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80057640.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80057764.s")
+extern u8 D_80128557;
+u8 func_80057764(u8 arg0) {
+    u8 old = D_80128557;
+    D_80128557 = arg0;
+    return old;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_8005777C.s")
 

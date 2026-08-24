@@ -10,7 +10,9 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_166060/func_88000288.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_166060/func_880002F4.s")
+void func_880002F4(u8 *arg0, s16 arg1) {
+    *(s16 *)arg0 = arg1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_166060/func_88000308.s")
 

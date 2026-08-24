@@ -2,7 +2,9 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/58/fragment58_code/func_83400020.s")
+s32 func_83400020(s32 arg0, s32 arg1) {
+    return arg0 + arg1 / 2;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/58/fragment58_code/func_83400038.s")
 
