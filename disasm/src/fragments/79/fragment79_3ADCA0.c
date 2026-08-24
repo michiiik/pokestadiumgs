@@ -247,11 +247,19 @@ void func_8413FAE4(s16 arg0, s16 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_8413FB3C.s")
+extern void func_8004D19C(s32,s32,s32,s32,s32);
+void func_8413FB3C(s16 arg0, s16 arg1) {
+    void *value = func_8004C990(0x22, 0);
+    func_8004D19C(arg0, arg1, (s32)value, 0, 0);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_8413FB80.s")
+extern void func_8004D19C(s32,s32,s32,s32,s32);
+void func_8413FB80(s16 arg0, s16 arg1) {
+    void *value = func_8004C990(0x22, 1);
+    func_8004D19C(arg0, arg1, (s32)value, 0, 0);
+}
 #endif
 
 #ifdef VERSION_US
