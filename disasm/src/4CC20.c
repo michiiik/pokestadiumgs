@@ -90,9 +90,13 @@ extern void *memcpy(void *, const void *, s32); void *func_8004D418(void *dest, 
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D5B8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D690.s")
+extern s32 D_80097120;
+extern s32 func_8004C3EC(s32, s32, s32);
+s32 func_8004D690(s32 value) { s32 result = 0; s32 ptr = D_80097120; if (ptr != 0 && *(s32 *)((u8 *)(u32)ptr + 0xC) != 0) result = func_8004C3EC(*(s32 *)((u8 *)(u32)ptr + 0xC), value, 1); return result; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D6D8.s")
+extern s32 D_80097120;
+extern s32 func_8004C468(s32, s32);
+s32 func_8004D6D8(s32 value) { s32 result = 0; s32 ptr = D_80097120; if (ptr != 0 && *(s32 *)((u8 *)(u32)ptr + 0xC) != 0) result = func_8004C468(*(s32 *)((u8 *)(u32)ptr + 0xC), value); return result; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D720.s")
 
