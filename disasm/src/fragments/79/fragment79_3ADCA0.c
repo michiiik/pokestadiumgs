@@ -563,7 +563,12 @@ void func_84146AF0(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84146D98.s")
+void func_84146D98(u8 *arg0, u8 *arg1) {
+    arg0[0x22] = arg1[0];
+    arg0[0x23] = arg1[1];
+    arg0[0x24] = arg1[2];
+    arg0[0x25] = 0xFF;
+}
 #endif
 
 #ifdef VERSION_US
