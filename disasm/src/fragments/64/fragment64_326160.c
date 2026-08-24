@@ -12,5 +12,8 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_326160/func_87F039F0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_326160/func_87F03B8C.s")
+extern void func_87F02684(void);
+void func_87F03B8C(void) {
+    func_87F02684();
+}
 #endif

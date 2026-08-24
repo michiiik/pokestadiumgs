@@ -128,5 +128,7 @@ void func_87E1142C(void) { func_8004C4B0(50); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E12070.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E120F8.s")
+extern void func_87F0277C(void);
+void func_87E120F8(void) { func_87F0277C(); }
+#pragma C_FUNCTION_PADDING(8)
 #endif

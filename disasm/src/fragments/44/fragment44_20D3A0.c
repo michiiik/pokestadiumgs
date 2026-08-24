@@ -26,7 +26,10 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20D3A0/func_8AF1F978.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20D3A0/func_8AF1FC80.s")
+extern void func_8AC01064(s32);
+void func_8AF1FC80(void) {
+    func_8AC01064(0x4649434E);
+  }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20D3A0/func_8AF1FCA4.s")
 

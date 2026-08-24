@@ -18,7 +18,12 @@ extern s32 D_80128120; void func_8004EC5C(void) { if (D_80128120 > 0) { D_801281
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4F800/func_8004EE04.s")
+extern void func_8004ECD4(void *, s32, s32);
+void func_8004EE04(u8 *arg0, s32 arg1, s32 arg2) {
+    arg1 += *(s16 *)(arg0 + 8);
+    arg2 += *(s16 *)(arg0 + 10);
+    func_8004ECD4(arg0, arg1, arg2);
+}
 #endif
 
 #ifdef VERSION_US

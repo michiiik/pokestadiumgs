@@ -57,7 +57,11 @@ void func_83000E38(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_8300136C.s")
+extern void func_81801FE8(void *, s32, s32, s32);
+extern u8 D_8300F84C[];
+void func_8300136C(s32 arg0, s32 arg1, s32 arg2) {
+    func_81801FE8(D_8300F84C, 0x6E, 0x8C, 0xD2);
+  }
 #endif
 
 #ifdef VERSION_US

@@ -127,9 +127,20 @@ extern void func_8006276C(s32,s32); void func_80053DDC(s32 a0,s32 a1){func_80062
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80053E08.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80053E8C.s")
+extern void func_80060D70(u8 *, u8 *);
+void func_80053E8C(u8 *arg0, u8 *arg1) {
+    *(u16 *)(arg1 + 0) = *(u16 *)(arg0 + 0);
+    *(u16 *)(arg1 + 2) = *(u16 *)(arg0 + 2);
+    *(u16 *)(arg1 + 4) = *(u16 *)(arg0 + 4);
+    func_80060D70(arg1 + 8, arg0 + 8);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80053ECC.s")
+extern void func_80060D70(u8 *, u8 *);
+void func_80053ECC(u8 *arg0, u8 *arg1) {
+    *(u16 *)(arg1 + 0) = *(u16 *)(arg0 + 0);
+    *(u16 *)(arg1 + 2) = *(u16 *)(arg0 + 2);
+    func_80060D70(arg1 + 4, arg0 + 4);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80053F04.s")
 

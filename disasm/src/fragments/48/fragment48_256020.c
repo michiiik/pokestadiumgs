@@ -40,21 +40,39 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C00664.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C0068C.s")
+extern f64 func_87C00664(void);
+f64 func_87C0068C(void) {
+    return sqrtf((f32)func_87C00664());
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C006B4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C006F0.s")
+extern f64 func_87C006B4(void);
+f64 func_87C006F0(void) {
+    return sqrtf((f32)func_87C006B4());
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C00718.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C007B0.s")
+f32 *func_87C007B0(f32 *arg0, f64 *arg1) {
+    arg0[0] = (f32)arg1[0];
+    arg0[1] = (f32)arg1[1];
+    arg0[2] = (f32)arg1[2];
+    return arg0;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C007DC.s")
+f64 func_87C007DC(const f64 *arg0, const f64 *arg1) {
+    return arg0[0] * arg1[0] + arg0[1] * arg1[1] + arg0[2] * arg1[2] - arg0[3];
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C00814.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C00884.s")
+void func_87C00884(f64 *arg0, f64 arg1, f64 arg2, f64 arg3, f64 arg4) {
+    arg0[0] = arg1;
+    arg0[1] = arg2;
+    arg0[2] = arg3;
+    arg0[3] = arg4;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C008B0.s")
 

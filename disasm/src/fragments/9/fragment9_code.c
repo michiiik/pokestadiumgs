@@ -46,7 +46,11 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/9/fragment9_code/func_8FB02454.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/9/fragment9_code/func_8FB02494.s")
+struct MsgState { u8 pad[0x40]; u32 flags; };
+extern struct MsgState *func_8FB02418(void);
+s32 func_8FB02494(void) {
+    return (func_8FB02418()->flags >> 31) == 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/9/fragment9_code/func_8FB024BC.s")
 

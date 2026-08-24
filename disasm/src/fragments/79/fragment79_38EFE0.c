@@ -179,7 +179,15 @@ void func_841217C8(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_841217E4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_841218EC.s")
+extern void func_84120E7C(u8 *);
+void func_841218EC(u8 *arg0) {
+    *(s16 *)(arg0 + 0x5FE) = 0;
+    *(s16 *)(arg0 + 0x5FC) = 0;
+    arg0[0x623] = 0;
+    arg0[0x624] = 0;
+    *(f32 *)(arg0 + 0x60C) = 0.0f;
+    func_84120E7C(arg0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84121920.s")
 

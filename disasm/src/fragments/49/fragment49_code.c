@@ -230,7 +230,10 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86109EAC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86109F58.s")
+extern void func_87F02684(void);
+void func_86109F58(void) {
+    func_87F02684();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86109F78.s")
 #endif

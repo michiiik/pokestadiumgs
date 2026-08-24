@@ -64,7 +64,10 @@ void func_8AC007FC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC0080C.s")
+extern s16 D_8AC08522;
+void func_8AC0080C(s16 arg0) {
+    D_8AC08522 = arg0;
+}
 #endif
 
 #ifdef VERSION_US
