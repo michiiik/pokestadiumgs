@@ -1382,7 +1382,20 @@ void func_80035CD0(f32 *dest, f32 *source) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800372CC.s")
+s32 func_800372CC(s32 current, s32 target, s32 inc, s32 dec) {
+    if (current < target) {
+        current += inc;
+        if (current > target) {
+            current = target;
+        }
+    } else {
+        current -= dec;
+        if (current < target) {
+            current = target;
+        }
+    }
+    return current;
+}
 #endif
 
 #ifdef VERSION_US
