@@ -69,7 +69,10 @@ void func_862012F8(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_266A60/func_8620148C.s")
+extern void *D_87F119D8;
+extern void *D_87F119DC;
+extern void func_87F026E8(void *, void *);
+void func_8620148C(void) { func_87F026E8(D_87F119D8, D_87F119DC); }
 #endif
 
 #ifdef VERSION_US
