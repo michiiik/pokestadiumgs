@@ -36,7 +36,16 @@ s32 func_8414A3C0(u8 arg0, u32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B9B80/func_8414BDA0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B9B80/func_8414BEB0.s")
+extern void func_8414B574(void);
+extern void func_8414B73C(void);
+extern void func_8414B9D0(void);
+extern void func_8414BDA0(void);
+void func_8414BEB0(void) {
+    func_8414B574();
+    func_8414B73C();
+    func_8414B9D0();
+    func_8414BDA0();
+}
 
 extern u8 D_8419D7C0[];
 void func_8414BEE8(void) {
