@@ -109,9 +109,9 @@ extern u16 D_88234758; extern u8 D_882347B8[]; s32 func_8821B884(u8 arg0) { s32 
 
 extern u16 D_88234758; s32 func_8821B8C8(void) { s32 result = 0; if (D_88234758 & 0x80) { result = 1; } return result; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_8821B8EC.s")
+extern u16 D_88234758; typedef struct { u16 flags; u8 pad[14]; u32 value; } State_8821B8EC_rev; s32 func_8821B8EC(u8 arg0) { s32 result = 0; if (D_88234758 & 0x100) { if (arg0 == ((State_8821B8EC_rev *)&D_88234758)->value) result = 1; } return result; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_8821B924.s")
+extern u16 D_88234758; typedef struct { u16 flags; u8 pad[18]; u32 value; } State_8821B924_rev; s32 func_8821B924(u8 arg0) { s32 result = 0; if (D_88234758 & 0x200) { if (arg0 == ((State_8821B924_rev *)&D_88234758)->value) result = 1; } return result; }
 
 extern u16 D_88234758; s32 func_8821B95C(void) { s32 result = 0; if (D_88234758 & 0x400) { result = 1; } return result; }
 
