@@ -414,7 +414,12 @@ u16 func_8002892C(u16 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80028A28.s")
+extern u32 D_800D1AD8[24];
+void func_80028A28(u16 arg0) {
+    u32 i;
+    for (i = arg0; i > 0; i--) D_800D1AD8[i] = D_800D1AD8[i - 1];
+    D_800D1AD8[0] = 0;
+}
 #endif
 
 #ifdef VERSION_US
