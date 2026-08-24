@@ -91,9 +91,9 @@ void func_88216520(void) { func_88200134(0, 2); }
 
 extern s32 D_88234778; extern s32 D_8823477C; void func_8821B700(s32 arg0, s32 arg1) { D_88234778 = arg0; D_8823477C = arg1; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_8821B714.s")
+extern u16 D_88234744; extern void func_8821B700(s32, s32); extern void func_8821CCE8(s32, s32); void func_8821B714(s32 arg0, s32 arg1) { func_8821B700(arg0, arg1); if (D_88234744 >= 2) func_8821CCE8(arg0, arg1); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_8821B758.s")
+extern u8 D_88234765; extern u8 D_882347B8[]; void func_8821B758(u8 arg0) { D_88234765 = D_882347B8[arg0]; }
 
 extern u16 D_88234758; s32 func_8821B778(void) { s32 result = 0; if (D_88234758 & 1) { result = 1; } return result; }
 
@@ -101,11 +101,11 @@ extern u16 D_88234758; s32 func_8821B79C(void) { s32 result = 0; if (D_88234758 
 
 extern u16 D_88234758; s32 func_8821B7C0(void) { s32 result = 0; if (D_88234758 & 4) { result = 1; } return result; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_8821B7E4.s")
+extern u16 D_88234758; s32 func_8821B7E4(u8 arg0) { s32 result = 0; if (D_88234758 & 0x10) { if (((u8 *)&D_88234758)[4] == arg0) result = 1; } return result; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_8821B81C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_8821B884.s")
+extern u16 D_88234758; extern u8 D_882347B8[]; s32 func_8821B884(u8 arg0) { s32 result = 0; if (D_88234758 & 0x40) { if (((u8 *)&D_88234758)[0xD] == D_882347B8[arg0]) result = 1; } return result; }
 
 extern u16 D_88234758; s32 func_8821B8C8(void) { s32 result = 0; if (D_88234758 & 0x80) { result = 1; } return result; }
 
@@ -113,7 +113,7 @@ extern u16 D_88234758; s32 func_8821B8C8(void) { s32 result = 0; if (D_88234758 
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_8821B924.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_8821B95C.s")
+extern u16 D_88234758; s32 func_8821B95C(void) { s32 result = 0; if (D_88234758 & 0x400) { result = 1; } return result; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_8821B980.s")
 
