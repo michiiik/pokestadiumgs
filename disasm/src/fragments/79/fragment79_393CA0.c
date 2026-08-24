@@ -1022,7 +1022,11 @@ extern u8 D_841951BC; extern u8 *D_84195208[]; void func_84130480(void) { D_8419
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84130CC8.s")
+extern u8 D_841951D2;
+extern s32 D_841951C8;
+void func_84130CC8(void) {
+    if (D_841951D2 != 0) D_841951C8 = 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -1468,7 +1472,10 @@ s32 func_841349C0(f32 arg0) { s32 value = (s32)arg0; f64 fraction = (f64)(arg0 -
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841362C8.s")
+extern u8 D_8419A024[];
+void func_841362C8(u8 arg0) {
+    *(u32 *)(D_8419A024 + ((u32)arg0 << 6)) = 0;
+}
 #endif
 
 #ifdef VERSION_US

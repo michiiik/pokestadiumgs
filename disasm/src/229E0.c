@@ -371,7 +371,11 @@ void func_8002809C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80028118.s")
+extern u8 D_80090BB4;
+void func_80028118(u8 arg0) {
+    D_80090BB4 = arg0 + 1;
+}
+#pragma C_FUNCTION_PADDING(20)
 #endif
 
 #ifdef VERSION_US

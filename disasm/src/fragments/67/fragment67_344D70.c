@@ -105,7 +105,12 @@ void func_82908E50(f32 *arg0, f32 *arg1) { arg0[0] = arg1[0]; arg0[1] = arg1[1];
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_82908E6C.s")
+void func_82908E6C(f32 *arg0, const f32 *arg1) {
+    arg0[0] = arg1[0];
+    arg0[1] = arg1[1];
+    arg0[2] = arg1[2];
+    arg0[3] = arg1[3];
+}
 #endif
 
 #ifdef VERSION_US
