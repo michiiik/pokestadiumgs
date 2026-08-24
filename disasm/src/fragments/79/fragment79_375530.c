@@ -35,7 +35,14 @@ void func_84105CF8(u8 *arg0) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_375530/func_84105D00.s")
+extern u8 *D_84190150;
+extern s32 D_84190154;
+extern u8 *func_80002984(s32, s32);
+void func_84105D00(void) {
+    D_84190150 = func_80002984(0x300, 0);
+    _bzero(D_84190150, 0x300);
+    D_84190154 = 0;
+}
 #endif
 
 #ifdef VERSION_US
