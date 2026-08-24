@@ -162,7 +162,7 @@ extern void func_800029E0(void); void func_8006CAC0(void) { func_800029E0(); }
 
 extern void func_800029E0(void); void func_8006CB80(void) { func_800029E0(); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006CBA0.s")
+s32 func_8006CBA0(s32 a,s32 b){s32 result=0; s32 next=a+1; if(b==next)result=1; return result;}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006CBB8.s")
 
