@@ -250,6 +250,13 @@ def source_owners(source_root: Path, asm_root: Path) -> list[tuple[str, Path, Pa
     """Return only pragma-backed owners, avoiding alias .s duplicates."""
     owners: list[tuple[str, Path, Path]] = []
     for source_path in sorted(source_root.rglob("*.c")):
+        # The MCP runner creates hidden sibling source trees while compiling
+        # isolated candidates.  They intentionally contain copied pragmas,
+        # but are not tracked owners and may disappear during a scan.  Ignore
+        # them so a concurrent probe cannot make this read-only inventory fail
+        # or report duplicate candidates.
+        if any(part.startswith(".pragma_probe_") for part in source_path.parts):
+            continue
         text = source_path.read_text(encoding="utf-8")
         source_rel = source_path.as_posix()
         for match in PRAGMA_RE.finditer(text):

@@ -20,6 +20,25 @@ import asm_processor  # noqa: E402
 
 
 class ScannerTests(unittest.TestCase):
+    def test_source_owners_ignores_isolated_pragma_probe_trees(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source_root = root / "src"
+            asm_root = root / "asm"
+            source_root.mkdir()
+            (asm_root / "test").mkdir(parents=True)
+            pragma = '#pragma GLOBAL_ASM("asm/us/nonmatchings/test/func_a.s")\n'
+            (source_root / "tracked.c").write_text(pragma)
+            probe = source_root / ".pragma_probe_race" / "tracked.c"
+            probe.parent.mkdir()
+            probe.write_text(pragma)
+            (asm_root / "test" / "func_a.s").write_text("glabel func_a\n")
+
+            owners = scanner.source_owners(source_root, asm_root)
+
+        self.assertEqual(len(owners), 1)
+        self.assertEqual(owners[0][1], source_root / "tracked.c")
+
     def test_stadium1_near_matches_are_ranked_without_being_transfers(self) -> None:
         gs = {
             "func_gs": {
