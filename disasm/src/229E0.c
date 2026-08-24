@@ -1224,7 +1224,16 @@ Vec3f358F0 *func_800358F0(Vec3f358F0 *arg0, Vec3f358F0 *arg1, Vec3f358F0 *arg2, 
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800359A0.s")
+typedef struct {
+    f32 x, y, z;
+} Vec3f359A0;
+
+Vec3f359A0 *func_800359A0(Vec3f359A0 *out, Vec3f359A0 *a, Vec3f359A0 *b) {
+    out->x = (a->y * b->z) - (b->y * a->z);
+    out->y = (a->z * b->x) - (b->z * a->x);
+    out->z = (a->x * b->y) - (b->x * a->y);
+    return out;
+}
 #endif
 
 #ifdef VERSION_US
