@@ -46,7 +46,11 @@ extern void *memcpy(void *, const void *, s32); void *func_800471B4(void *dest, 
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047244.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800472B8.s")
+extern u8 *D_80126F50;
+extern void func_80047244(u8 *, s32);
+void func_800472B8(s32 arg0) {
+    func_80047244(D_80126F50, arg0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800472E0.s")
 
@@ -173,7 +177,10 @@ extern u8 *D_80126F50; void func_800497C0(void) { func_80046C18(D_80126F50); }
 
 extern u8 *D_80126F50; void func_80049878(void) { func_80046DD4(D_80126F50); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_8004989C.s")
+extern u8 *D_80126F50;
+void func_8004989C(s32 arg0) {
+    func_80046F2C(D_80126F50, arg0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800498C4.s")
 

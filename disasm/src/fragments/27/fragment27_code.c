@@ -14,17 +14,37 @@ void func_81100044(u32 *arg0, u32 arg1) {
     *arg0 ^= arg1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/27/fragment27_code/func_81100054.s")
+s32 func_81100054(s32 *arg0, s32 arg1) { s32 result = 0; if (*arg0 & arg1) { result = 1; } return result; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/27/fragment27_code/func_81100074.s")
+s32 func_81100074(u32 *arg0, u32 arg1) { s32 result = 0; if (!(*arg0 & arg1)) { result = 1; } return result; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/27/fragment27_code/func_81100094.s")
+extern u32 D_80128C00;
+s32 func_81100094(s32 arg0) {
+    u32 temp_a0 = guRandom() + D_80128C00;
+    s32 var_v1;
+    if (arg0 == 0) {
+        var_v1 = 0;
+    } else {
+        var_v1 = (temp_a0 / 10) % arg0;
+    }
+    return var_v1;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/27/fragment27_code/func_811000F8.s")
+extern s32 func_81100094(s32 arg0);
+s32 func_811000F8(s32 arg0) {
+    return func_81100094(arg0 * 2) - arg0;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/27/fragment27_code/func_81100120.s")
+extern s32 func_81100094(s32 arg0);
+s32 func_81100120(s32 arg0, s32 arg1) {
+    return func_81100094(arg0) + arg1;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/27/fragment27_code/func_81100144.s")
+
+extern s32 func_811000F8(s32 arg0);
+s32 func_81100144(s32 arg0, s32 arg1) {
+    return func_811000F8(arg0) + arg1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/27/fragment27_code/func_81100168.s")
 

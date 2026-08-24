@@ -43,7 +43,17 @@ void func_810004FC(Gfx *gfx, u8 *texture, s32 width, s32 height) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_15EA30/func_81000550.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_15EA30/func_810006C4.s")
+
+typedef struct { u8 pad_00[4]; s16 count; u8 pad_06[2]; s16 *values; } Func810006C4Table;
+s16 func_810006C4(Func810006C4Table *arg0, u32 arg1) {
+    s32 i;
+    for (i = 0; i < arg0->count - 1; i++) {
+        if (arg1 >= arg0->values[i] && arg1 < arg0->values[i + 1]) {
+            return (s16)i;
+        }
+    }
+    return arg0->count - 2;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_15EA30/func_8100072C.s")
 
@@ -132,7 +142,7 @@ void func_810034C0(s32 arg0, Func810034C0StateD *state) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_15EA30/func_81003510.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_15EA30/func_81003524.s")
+void func_81003524(s32 arg0, s32 arg1) { if (arg0 == 5) { arg1 = arg1; } }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_15EA30/func_8100352C.s")
 

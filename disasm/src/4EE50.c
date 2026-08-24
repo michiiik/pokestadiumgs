@@ -24,7 +24,12 @@ extern s32 D_80128098; void func_8004E7AC(void) { D_80128098 = 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4EE50/func_8004E7B8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4EE50/func_8004E7FC.s")
+extern s32 D_80128098;
+extern s32 D_8012809C;
+void func_8004E7FC(void) {
+    D_8012809C -= 1;
+    D_80128098 += 4;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4EE50/func_8004E828.s")
 
