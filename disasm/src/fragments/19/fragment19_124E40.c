@@ -2,7 +2,7 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_124E40/func_82303D60.s")
+typedef struct { s16 x; s16 y; } Vec2s; void func_82303D60(Vec2s *arg0, Vec2s *arg1, Vec2s *arg2) { arg0->x = arg1->x + arg2->x; arg0->y = arg1->y + arg2->y; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_124E40/func_82303D84.s")
 

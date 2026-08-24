@@ -21,7 +21,7 @@ void func_81801810(u8 *arg0, s32 arg1, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81801854.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81801878.s")
+void func_81801878(u8 *arg0, u8 *arg1, u8 *arg2) { *(s16 *)(arg0 + 0) = *(s16 *)(arg1 + 0) - *(s16 *)(arg2 + 0); *(s16 *)(arg0 + 2) = *(s16 *)(arg1 + 2) - *(s16 *)(arg2 + 2); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_8180189C.s")
 
