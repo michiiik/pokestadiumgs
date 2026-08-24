@@ -676,7 +676,10 @@ void func_84146D98(u8 *arg0, u8 *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84148470.s")
+extern u8 D_841865EA[];
+u8 func_84148470(u8 arg0) {
+    return D_841865EA[arg0 * 40];
+}
 #endif
 
 #ifdef VERSION_US

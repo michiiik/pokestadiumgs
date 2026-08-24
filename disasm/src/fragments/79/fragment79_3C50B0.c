@@ -6,7 +6,11 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C50B0/func_84155A1C.s")
+extern void func_84155820(s32);
+void func_84155A1C(void) {
+    func_84155820(0);
+    func_84155820(1);
+}
 #endif
 
 #ifdef VERSION_US

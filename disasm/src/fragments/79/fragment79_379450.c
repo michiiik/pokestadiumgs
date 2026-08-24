@@ -12,9 +12,23 @@ s32 func_8410A274(u8 *arg0, s32 arg1) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_379450/func_8410A284.s")
+extern u8 *D_80094910;
+s32 func_8410A284(s32 arg0, s32 arg1) {
+    u8 *ptr = D_80094910;
+    if (arg0 == 2) {
+        *(s16 *)(ptr + 0x18) = 3;
+    }
+    return 0;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_379450/func_8410A2A8.s")
+extern u8 *D_80094910;
+s32 func_8410A2A8(s32 arg0, s32 arg1) {
+    u8 *ptr = D_80094910;
+    if (arg0 == 2) {
+        *(s16 *)(ptr + 0x18) = 0;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_379450/func_8410A2C8.s")
 

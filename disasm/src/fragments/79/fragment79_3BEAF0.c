@@ -25,7 +25,12 @@ void func_8414F260(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BEAF0/func_8414F5F0.s")
+extern void func_8414F268(void *);
+extern void func_8414F2F4(void *);
+void func_8414F5F0(void *arg0) {
+    func_8414F268(arg0);
+    func_8414F2F4(arg0);
+}
 #endif
 
 #ifdef VERSION_US

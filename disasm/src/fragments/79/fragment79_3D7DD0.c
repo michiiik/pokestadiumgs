@@ -20,7 +20,16 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D7DD0/func_84169618.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D7DD0/func_84169B80.s")
+extern u8 *D_84187E40;
+void func_84169B80(void) {
+    u8 *ptr = *(u8 **)&D_84187E40;
+    s32 i = 0;
+    while (i != 2) {
+        i += 1;
+        *(u16 *)ptr = 0;
+        ptr += 0x1E4;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D7DD0/func_84169BA8.s")
 
