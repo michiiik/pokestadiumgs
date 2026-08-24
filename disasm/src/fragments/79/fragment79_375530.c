@@ -58,7 +58,19 @@ void func_84105D00(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_375530/func_84105E3C.s")
+extern u8 *D_84190150;
+extern void func_84105E20(u8 *);
+void func_84105E3C(void) {
+    u8 *ptr = D_84190150;
+    s32 i = 0;
+    while (i != 0x40) {
+        if (ptr[8] & 1) {
+            func_84105E20(ptr);
+        }
+        i++;
+        ptr += 0xC;
+    }
+}
 #endif
 
 #ifdef VERSION_US
