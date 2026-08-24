@@ -4,11 +4,17 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E35C0/func_8160BA20.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E35C0/func_8160BA44.s")
+void func_8160BA44(s32 arg0, s32 arg1, s32 arg2) {}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E35C0/func_8160BA54.s")
+void func_8160BA54(s16 *arg0, s16 *arg1) {
+    arg0[0] += arg1[0];
+    arg0[1] += arg1[1];
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E35C0/func_8160BA78.s")
+void func_8160BA78(s16 *arg0, s16 *arg1) {
+    arg0[0] -= arg1[0];
+    arg0[1] -= arg1[1];
+}
 
 typedef struct { s16 x; s16 y; } Vec2s_8160BA9C; void func_8160BA9C(Vec2s_8160BA9C *arg0, Vec2s_8160BA9C *arg1, Vec2s_8160BA9C *arg2) { arg0->x = arg1->x + arg2->x; arg0->y = arg1->y + arg2->y; }
 
