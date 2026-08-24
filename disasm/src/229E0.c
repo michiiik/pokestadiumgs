@@ -200,7 +200,7 @@ s32 func_80025D44(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002602C.s")
+extern void func_80018728(u32, ...); extern u8 D_80090B8C; void func_8002602C(void) { s32 mask; func_80018728(0x83030000, 0); mask = osSetIntMask(1); D_80090B8C = 0; osSetIntMask(mask); }
 #endif
 
 #ifdef VERSION_US
@@ -208,7 +208,8 @@ s32 func_80025D44(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80026098.s")
+extern void func_80034F30(void); void func_80026098(void) { func_80034F30(); }
+#pragma C_FUNCTION_PADDING(8)
 #endif
 
 #ifdef VERSION_US
