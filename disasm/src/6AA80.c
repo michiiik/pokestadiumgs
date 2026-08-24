@@ -18,9 +18,9 @@ extern void func_80069F20(void); void func_8006A160(void) { func_80069F20(); }
 
 extern s32 D_8009DF70; void func_8006A2EC(void) { D_8009DF70 = 0; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006A2F8.s")
+extern s32 D_8009DF70; s32 func_8006A2F8(u16 value){s32 result=0; s32 ptr=D_8009DF70; if(ptr!=0){*(u16 *)((u8 *)(u32)ptr+4)|=value; result=1;} return result;}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006A328.s")
+extern s32 D_8009DF70; s32 func_8006A328(u16 value){s32 result=0; s32 ptr=D_8009DF70; if(ptr!=0){*(u16 *)((u8 *)(u32)ptr+4)&=~value; result=1;} return result;}
 
 extern s32 D_8009DF70;
 s32 func_8006A35C(u16 value) { s32 result = 0; if (D_8009DF70 != 0) result = ((*(u16 *)((u8 *)(u32)D_8009DF70 + 4) & value) != 0); return result; }
