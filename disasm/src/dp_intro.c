@@ -123,7 +123,7 @@ void func_80001CDC(void) { func_80001CB0(); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_80001E18.s")
+void func_80001E18(u16 color) { s32 width = 640; u16 *buf = *(u16 **)(*(u8 **)(leoDiskID + 0x9E0) + 8); while (width-- > 0) { *buf++ = color; } osWritebackDCache(*(void **)(*(u8 **)(leoDiskID + 0x9E0) + 8), 0x500); }
 #endif
 
 #ifdef VERSION_US

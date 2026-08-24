@@ -1017,7 +1017,8 @@ extern s32 D_80094850; void func_80035140(s32 value) { D_80094850 = value; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003514C.s")
+s32 func_8003514C(void) { return (s32)D_80094850; }
+#pragma C_FUNCTION_PADDING(8)
 #endif
 
 #ifdef VERSION_US
