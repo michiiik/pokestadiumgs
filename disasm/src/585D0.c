@@ -328,7 +328,7 @@ void func_8005B120(s32 arg0) { func_80059320(arg0, 0xFF); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005B190.s")
+void func_8005B190(s32 arg0) { if (func_80056A5C(arg0, 0) == 0) func_80064D58(arg0, 2); }
 #endif
 
 #ifdef VERSION_US
