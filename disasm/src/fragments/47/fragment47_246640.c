@@ -94,7 +94,7 @@ void func_86001AFC(s32 arg0) { func_87C01A90(arg0 + 364); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_246640/func_86001DBC.s")
+void func_86001DBC(u8 *arg0) { arg0[0x1639] &= 0xFFFE; }
 #endif
 
 #ifdef VERSION_US

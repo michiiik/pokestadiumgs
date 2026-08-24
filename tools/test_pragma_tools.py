@@ -227,6 +227,42 @@ class RunnerTests(unittest.TestCase):
             self.assertEqual(result["attempts"][0]["probe_status"], "probe_match")
             full_compare.assert_called_once()
 
+    def test_probe_variants_after_winner_are_reported_skipped(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.c"
+            source.write_text(
+                '#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_a.s")\n'
+            )
+            with mock.patch.object(
+                runner,
+                "probe_candidates",
+                return_value=[
+                    {"index": 0, "function": "func_a", "status": "probe_match"},
+                    {"index": 1, "function": "func_a", "status": "probe_rejected"},
+                ],
+            ), mock.patch.object(
+                runner,
+                "rebuild_source_object",
+                return_value=0,
+            ), mock.patch.object(
+                runner,
+                "_try_candidate_detailed",
+                return_value=(0, "accepted"),
+            ), mock.patch.object(
+                runner,
+                "compare_current_tree",
+                return_value=0,
+            ):
+                result = runner.try_candidates_detailed(
+                    source,
+                    [
+                        ("func_a", "void func_a(void) {}"),
+                        ("func_a", "void func_a(void) { return; }"),
+                    ],
+                )
+        self.assertEqual([item["status"] for item in result["attempts"]], ["accepted", "skipped"])
+        self.assertEqual(result["attempts"][1]["probe_status"], "probe_rejected")
+
     def test_diagnostics_mark_later_variants_skipped(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             source = Path(directory) / "synthetic.c"

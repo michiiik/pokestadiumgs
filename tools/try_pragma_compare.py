@@ -365,6 +365,7 @@ def try_candidates_detailed(
     repo_root = Path(__file__).resolve().parent.parent
     baseline = source_path.read_text()
     accepted: dict[str, str] = {}
+    accepted_indices: dict[str, int] = {}
     attempts = probe_candidates(source_path, blocks, workers=probe_workers)
     probe_unavailable = any(
         attempt["status"] == "probe_unavailable" for attempt in attempts
@@ -398,16 +399,12 @@ def try_candidates_detailed(
         })
         if result == 0:
             accepted[function] = candidate
+            accepted_indices[function] = index
 
     # Probes are intentionally parallel, so variants after a winner may have
     # already compiled.  Report them as skipped for the same user-facing
     # semantics as the old sequential runner while retaining their probe
     # outcome in ``probe_status``.
-    accepted_indices = {
-        function: index
-        for index, (function, _) in enumerate(blocks)
-        if function in accepted
-    }
     for index, (function, _) in enumerate(blocks):
         winner_index = accepted_indices.get(function)
         if winner_index is not None and index > winner_index:
