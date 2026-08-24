@@ -30,7 +30,10 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E0664C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E067F0.s")
+u32 func_87E067F0(s32 arg0, s32 arg1) {
+    extern u32 D_87E19B4C[];
+    return D_87E19B4C[arg0];
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E06808.s")
 

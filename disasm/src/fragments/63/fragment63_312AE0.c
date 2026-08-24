@@ -2,7 +2,13 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E0F170.s")
+void func_87E0F170(void) {
+    extern u32 D_87E1EBB8;
+    u8 *base = (u8 *)(u32)D_87E1EBB8;
+    *(s32 *)base = 0;
+    *(u16 *)(base + 6) = 0;
+    base[4] = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E0F188.s")
 
