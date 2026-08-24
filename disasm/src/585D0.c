@@ -54,7 +54,14 @@ extern u8 D_80128574[]; s32 func_80057A5C(s32 index) { return D_80128574[index *
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80057FE8.s")
+void func_80057FE8(u8 *start, u8 *end) {
+    s32 sum = 0;
+
+    while (start < end) {
+        sum += *start++;
+    }
+    *end = 0xFF - (sum & 0xFF);
+}
 #endif
 
 #ifdef VERSION_US
