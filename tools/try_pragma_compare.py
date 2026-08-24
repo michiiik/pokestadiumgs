@@ -204,12 +204,17 @@ def _object_symbol(object_path: Path, function: str) -> tuple[int, int] | None:
     return None
 
 
-def _function_bytes(object_path: Path, function: str) -> bytes | None:
+def _function_bytes(
+    object_path: Path,
+    function: str,
+    span: int | None = None,
+) -> bytes | None:
     symbol = _object_symbol(object_path, function)
     text = _object_text(object_path) if symbol is not None else None
     if symbol is None or text is None:
         return None
-    offset, size = symbol
+    offset, symbol_size = symbol
+    size = symbol_size if span is None else span
     if size <= 0 or offset < 0 or offset + size > len(text):
         return None
     return text[offset : offset + size]
@@ -300,7 +305,12 @@ def _probe_one(
                     "exit_code": result,
                     "diagnostic": output[-2000:],
                 }
-            actual = _function_bytes(object_path, function)
+            # The assembler symbol size can include alignment nops while the
+            # compiler's relocatable symbol size often stops at the delay
+            # slot. Compare the candidate over the baseline owner's span so
+            # alignment padding is validated instead of causing a false
+            # probe rejection. The full ROM gate remains authoritative.
+            actual = _function_bytes(object_path, function, len(expected))
             if expected is None or actual is None:
                 return {
                     "status": "probe_unavailable",
