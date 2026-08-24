@@ -126,7 +126,14 @@ void func_882180C4(s32 arg0, s32 arg1, s32 *arg2, s32 *arg3) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_8821B3E0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_8821B438.s")
+extern void func_8821B3E0(void);
+extern s32 D_88234778;
+extern s32 D_8823477C;
+void func_8821B438(void) {
+    func_8821B3E0();
+    D_88234778 = 0;
+    D_8823477C = 1;
+}
 
 extern u16 D_88234758; extern s32 D_88234778; s32 func_8821B468(void) { s32 result = 0; if (D_88234758 == 0) { if (D_88234778 == 0) result = 1; } return result; }
 
@@ -148,7 +155,14 @@ extern u16 D_88234758; s32 func_8821B7C0(void) { s32 result = 0; if (D_88234758 
 
 extern u16 D_88234758; s32 func_8821B7E4(u8 arg0) { s32 result = 0; if (D_88234758 & 0x10) { if (((u8 *)&D_88234758)[4] == arg0) result = 1; } return result; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_8821B81C.s")
+extern u16 D_88234758;
+s32 func_8821B81C(s8 arg0, s8 arg1) {
+    s32 result = 0;
+    if ((D_88234758 & 8) &&
+        (((arg0 == ((s8 *)&D_88234758)[5]) && (arg1 == ((s8 *)&D_88234758)[6])) ||
+         ((arg1 == ((s8 *)&D_88234758)[5]) && (arg0 == ((s8 *)&D_88234758)[6])))) result = 1;
+    return result;
+}
 
 extern u16 D_88234758; extern u8 D_882347B8[]; s32 func_8821B884(u8 arg0) { s32 result = 0; if (D_88234758 & 0x40) { if (((u8 *)&D_88234758)[0xD] == D_882347B8[arg0]) result = 1; } return result; }
 
