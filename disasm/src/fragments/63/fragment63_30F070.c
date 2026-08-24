@@ -45,7 +45,10 @@ void func_87E0C5C4(s32 arg0, s32 arg1) { func_87E0BFFC(arg0, arg1, 0); }
 extern void func_87E0BFFC(s32, s32, s32);
 void func_87E0C5E4(s32 arg0) { func_87E0BFFC(arg0, -1, 0); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30F070/func_87E0C608.s")
+extern void func_87E0C290(void);
+void func_87E0C608(void) {
+    func_87E0C290();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30F070/func_87E0C628.s")
 
