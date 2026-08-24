@@ -4,7 +4,9 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_3290A0/func_87F06430.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_3290A0/func_87F064DC.s")
+s32 func_87F064DC(s32 arg0, s32 arg1) {
+    return 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_3290A0/func_87F064EC.s")
 
