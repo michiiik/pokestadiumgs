@@ -1360,7 +1360,9 @@ void func_84134E00(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84134F50.s")
+void func_84134F50(u8 *arg0, u8 arg1, u8 arg2) {
+    *(u16 *)((u8 *)arg0 + ((u32)arg1 << 4) + 0x12) |= (u16)(u8)arg2;
+}
 #endif
 
 #ifdef VERSION_US
@@ -1368,7 +1370,9 @@ void func_84134E00(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84134FC0.s")
+void func_84134FC0(u8 *arg0, u8 arg1, u8 arg2) {
+    *(u16 *)((u8 *)arg0 + (arg1 << 4) + 0x12) = *(u16 *)((u8 *)arg0 + (arg1 << 4) + 0x12) & ~(u16)(u8)arg2;
+}
 #endif
 
 #ifdef VERSION_US
