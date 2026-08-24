@@ -20,9 +20,9 @@ void func_8004C3A4(s32 unused, u8 *arg1) { *(s32 *)arg1 = 0; }
 
 extern s32 D_80097120; s32 func_8004C4A4(void) { return D_80097120; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C4B0.s")
+extern s32 D_80097120; extern s32 func_8004C3EC(s32,s32,s32); s32 func_8004C4B0(s32 value){s32 result=0; s32 ptr=D_80097120; if(ptr!=0&&*(s32*)((u8*)(u32)ptr+8)!=0&&func_8004C3EC(*(s32*)((u8*)(u32)ptr+8),value,1)!=0)result=1; return result;}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C504.s")
+extern s32 D_80097120; extern s32 func_8004C468(s32,s32); s32 func_8004C504(s32 value){s32 result=0; s32 ptr=D_80097120; if(ptr!=0&&*(s32*)((u8*)(u32)ptr+8)!=0)result=func_8004C468(*(s32*)((u8*)(u32)ptr+8),value); return result;}
 
 extern s32 D_80097120; s32 func_8004C54C(s32 index,s32 value){s32 result=0; s32 ptr=D_80097120; if(ptr!=0&&*(s32*)((u8*)(u32)ptr+8)!=0&&index>=0xA&&index<0x80){*(s32*)((u8*)(u32)ptr+index*4+0x2C)=value; result=1;} return result;}
 
