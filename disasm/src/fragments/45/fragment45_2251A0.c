@@ -34,11 +34,11 @@ extern void func_8004C4B0(void); void func_8AB003C4(void) { func_8004C4B0(); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB003E4.s")
+extern u8 D_8AB14680[]; extern u8 D_8AB148B0[]; extern u8 D_8AB12F00[]; extern u16 D_8AB13F2E; extern void _bzero(void *, s32); void func_8AB003E4(void) { _bzero(D_8AB14680, 0x22C); _bzero(D_8AB148B0, 0x458); _bzero(D_8AB12F00, 0x1000); D_8AB13F2E = 0; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB00430.s")
+extern u8 D_8AB14D08[]; extern u8 D_8AB154D8[]; extern u8 D_8AB15CA8[]; extern void _bzero(void *, s32); void func_8AB00430(void) { _bzero(D_8AB14D08, 0x7D0); _bzero(D_8AB154D8, 0x7D0); _bzero(D_8AB15CA8, 0x7D0); }
 #endif
 
 #ifdef VERSION_US
