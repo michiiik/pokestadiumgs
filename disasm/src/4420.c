@@ -70,7 +70,19 @@ s32 func_800040C4(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800045E0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80004638.s")
+extern u8 *func_800042C0(u8 *, u8 *, s32, s32);
+extern s32 func_80002DE4(u8 *);
+extern void func_800020A0(s32, u8 *, s32);
+extern void func_80002DD4(u8 *, s32, void *);
+extern void func_800045E0(void *, u32);
+u8 *func_80004638(s32 id, u8 *rom_start, u8 *rom_end, s32 arg3) {
+    u8 *vaddr = func_800042C0(rom_start, rom_end, arg3, 0);
+    if (vaddr != NULL && id > 0) {
+        func_800020A0(id, vaddr, func_80002DE4(vaddr));
+        func_80002DD4(vaddr, id + 0x82000000, (void *)func_800045E0);
+    }
+    return vaddr;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800046C0.s")
 
