@@ -111,11 +111,14 @@ s32 func_8006AF94(void) { s32 result = -1; s32 ptr = D_8009DF70; if (ptr != 0) r
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006B428.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006B790.s")
+extern s32 D_8009DF70;
+s32 func_8006B790(s32 value) { s32 result = 0; if (D_8009DF70 != 0) { *(u8 *)((u8 *)(u32)D_8009DF70 + 0x1A) = value; result = 1; } return result; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006B7B4.s")
+extern s32 D_8009DF70;
+s32 func_8006B7B4(s32 value) { s32 result = 0; if (D_8009DF70 != 0) { *(u8 *)((u8 *)(u32)D_8009DF70 + 0x1B) = value; result = 1; } return result; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006B7D8.s")
+extern s32 D_8009DF70;
+s32 func_8006B7D8(s32 value) { s32 result = 0; if (D_8009DF70 != 0) { *(s16 *)((u8 *)(u32)D_8009DF70 + 0x18) = value; result = 1; } return result; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006B7FC.s")
 
