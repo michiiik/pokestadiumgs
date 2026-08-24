@@ -14,7 +14,7 @@ extern f32 D_8011EA8C; f32 func_8000FFB0(f32 arg0) { return 256.0f * D_8011EA8C 
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_80010334.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_800103C8.s")
+extern void func_80019580(s32); s32 func_800103C8(s32 arg0) { func_80019580(arg0); arg0 += 0x20000000; return arg0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_800103F0.s")
 
