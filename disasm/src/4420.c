@@ -104,5 +104,11 @@ void func_800049B8(void) { func_800029E0(); }
 
 void func_80004B78(void) { func_80004A40(); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80004B98.s")
+typedef struct { u32 offset; u32 size; s32 cachedPtr; u32 pad; } BinFile;
+typedef struct { u32 raw0; u32 romStart; u32 total_size; u32 num_files; BinFile files[1]; } BinArchive;
+s32 func_80004B98(BinArchive *archive, s32 file_number) {
+    s32 result = 0;
+    if ((u32)file_number < archive->num_files) result = archive->files[file_number].cachedPtr;
+    return result;
+}
 #endif
