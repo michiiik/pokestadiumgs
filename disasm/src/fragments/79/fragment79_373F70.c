@@ -14,9 +14,16 @@ s32 func_841047A4(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_373F70/func_84104818.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_373F70/func_8410488C.s")
+extern void func_84104818(u8 *);
+void func_8410488C(u8 *arg0) {
+    u8 *ptr = *(u8 **)(arg0 + 0xC);
+    if (ptr != NULL) func_84104818(ptr);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_373F70/func_841048B8.s")
+extern void func_8003EB84(u8 *, s16);
+void func_841048B8(u8 *arg0, s16 arg1) {
+    func_8003EB84(arg0, arg1);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_373F70/func_841048E0.s")
 
