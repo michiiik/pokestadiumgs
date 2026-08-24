@@ -58,11 +58,42 @@ void func_84100348(u8 *arg0) {
     arg0[0x92] = 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_84100350.s")
+void func_84100350(u8 *arg0) {
+    u8 *next;
+    u8 *prev;
+    *(u32 *)(arg0 + 0x14) = 0;
+    func_84100348(arg0);
+    next = *(u8 **)(arg0 + 0x4);
+    if (next != NULL) {
+        *(u8 **)(next + 0x0) = *(u8 **)(arg0 + 0x0);
+    }
+    prev = *(u8 **)(arg0 + 0x0);
+    if (prev != NULL) {
+        *(u8 **)(prev + 0x4) = *(u8 **)(arg0 + 0x4);
+    }
+    *(u32 *)(arg0 + 0x4) = 0;
+    *(u32 *)(arg0 + 0x0) = 0;
+    arg0[0x98] = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_841003AC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_8410056C.s")
+typedef struct Func8410056CParticleS8 {
+    u8 pad[0x98];
+    s8 active;
+    u8 tail[3];
+} Func8410056CParticleS8;
+s32 func_8410056C(void) {
+    s32 i;
+    s32 var_v1 = 0;
+    Func8410056CParticleS8 *ptr = (Func8410056CParticleS8 *)D_8418C950;
+    for (i = 0; i < 0x12C; i++, ptr++) {
+        if (ptr->active != 0) {
+            var_v1++;
+        }
+    }
+    return var_v1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_841005E0.s")
 

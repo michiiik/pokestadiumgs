@@ -72,7 +72,8 @@ void func_8413E7A8(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_8413E890.s")
+extern f32 D_8418B1CC;
+s32 func_8413E890(f32 arg0) { s32 low = ((s32)arg0) & 0x1F; return ((low << 10) + (s32)((arg0 - (f32)low + D_8418B1CC) * 1024.0f)) & 0xFFFF; }
 #endif
 
 void func_8413E8DC(void) {

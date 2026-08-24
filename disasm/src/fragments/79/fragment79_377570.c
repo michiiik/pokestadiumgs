@@ -26,7 +26,12 @@ void func_84107D24(void) {
     D_84190170 += 4;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377570/func_84107D4C.s")
+extern s32 D_84190170;
+void func_84107D4C(void) {
+    u8 *ptr = (u8 *)(u32)D_84190170;
+    (*(void (**)(s32, s32))(ptr + 4))(*(s32 *)(ptr + 8), *(s32 *)(ptr + 0xC));
+    D_84190170 += 0x10;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377570/func_84107D90.s")
 

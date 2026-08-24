@@ -12,7 +12,14 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414CD18.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414CDB8.s")
+extern u8 *func_84154B64(u8);
+extern u16 func_84148560(u16, u16, u8);
+void func_8414CDB8(u8 *arg0, u8 arg1, u8 arg2) {
+    u8 *value;
+    value = func_84154B64(arg1);
+    *(u16 *)(arg0 + arg1 * 2 + 0x16) =
+        func_84148560(*(u16 *)(value + 0x28), *(u16 *)(value + 0x2A), arg2);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414CE08.s")
 
