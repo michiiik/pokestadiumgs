@@ -93,9 +93,34 @@ void func_88216520(void) { func_88200134(0, 2); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_88217F70.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_88218064.s")
+extern s32 D_889041B4;
+s32 func_88218064(s32 arg0, s32 arg1, s32 *arg2, s32 *arg3) {
+    s32 result = 1;
+    *arg2 = arg0;
+    *arg3 = arg0 + arg1 - 1;
+    if (D_889041B4 == 3) {
+        if (*arg2 >= 0xFD) {
+            result = 0;
+        } else if (*arg3 >= 0xFD) {
+            *arg3 = 0xFC;
+        }
+    }
+    return result;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_882180C4.s")
+void func_882180C4(s32 arg0, s32 arg1, s32 *arg2, s32 *arg3) {
+    *arg2 = arg1;
+    *arg3 = arg1 + 0x13;
+    if (arg0 == 0) {
+        if (*arg2 < 0x93) {
+            *arg2 = 0x93;
+        }
+    } else if (arg0 == 0xE) {
+        if (*arg3 >= 0x1AB) {
+            *arg3 = 0x1AA;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_8821811C.s")
 
