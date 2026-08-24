@@ -20,5 +20,10 @@
 
 void func_800031FC(u8 *arg0, s32 arg1) { if (*(s32 *)(arg0 + 0) >= arg1) { *(s32 *)(arg0 + 4) = arg1; *(s32 *)(arg0 + 0xC) = *(s32 *)(arg0 + 8) + arg1; } }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3A00/func_80003224.s")
+void func_80003224(u8 *arg0) {
+    u8 *ptr = arg0 + 0x10;
+    *(s32 *)(arg0 + 4) = 0;
+    *(u8 **)(arg0 + 8) = ptr;
+    *(u8 **)(arg0 + 0xC) = ptr;
+}
 #endif
