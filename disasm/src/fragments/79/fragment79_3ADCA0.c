@@ -565,7 +565,29 @@ void func_841464D8(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84146540.s")
+extern u16 D_84186C2C[];
+extern u16 D_84186C30[];
+extern s16 D_84186C34;
+extern s16 D_84186C36;
+extern s16 D_84186C38;
+extern s16 D_84186C3A;
+extern s16 D_84186C3C;
+extern s16 D_84186C3E;
+extern s16 D_84186C40;
+extern s16 D_84186C42;
+void func_84146540(u8 *arg0) {
+    u8 index = arg0[1];
+    *(u16 *)(arg0 + 0xA) = D_84186C2C[index];
+    *(u16 *)(arg0 + 0xC) = D_84186C30[index];
+    *(u16 *)(arg0 + 0x12) = D_84186C34;
+    *(u16 *)(arg0 + 0x14) = D_84186C3C;
+    *(u16 *)(arg0 + 0x16) = D_84186C36;
+    *(u16 *)(arg0 + 0x18) = D_84186C3E;
+    *(u16 *)(arg0 + 0x1A) = D_84186C38;
+    *(u16 *)(arg0 + 0x1C) = D_84186C40;
+    *(u16 *)(arg0 + 0x1E) = D_84186C3A;
+    *(u16 *)(arg0 + 0x20) = D_84186C42;
+}
 #endif
 
 #ifdef VERSION_US
@@ -605,7 +627,24 @@ void func_84146704(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84146748.s")
+extern u16 D_84186DD8[];
+extern u16 D_84186DDC[];
+extern u16 D_84186DE0;
+extern u16 D_84186DE4;
+extern u16 D_84186DEC;
+extern s16 D_84186DF8;
+extern s16 D_8419D7A4[];
+void func_84146748(u8 *arg0) {
+    u8 index = arg0[1];
+    *(u16 *)(arg0 + 0xA) = D_84186DD8[index];
+    *(u16 *)(arg0 + 0xC) = D_84186DDC[index];
+    *(u16 *)(arg0 + 0xE) = D_84186DE0;
+    *(u16 *)(arg0 + 0x10) = D_84186DE4;
+    *(u16 *)(arg0 + 0x12) = D_8419D7A4[0] - D_84186DEC;
+    *(u16 *)(arg0 + 0x14) = D_84186DF8;
+    *(u16 *)(arg0 + 0x16) = D_8419D7A4[1] - D_84186DEC;
+    *(u16 *)(arg0 + 0x18) = D_84186DF8;
+}
 #endif
 
 #ifdef VERSION_US
@@ -851,7 +890,19 @@ void func_84146D98(u8 *arg0, u8 *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84148410.s")
+extern void func_8004C948(s32);
+extern void func_8004C8C0(s32);
+void func_84148410(void) {
+    func_8004C948(0x7A);
+    func_8004C948(0x22);
+    func_8004C948(0x1F);
+    func_8004C948(0x21);
+    func_8004C948(0x20);
+    func_8004C948(0x23);
+    func_8004C948(0x1E);
+    func_8004C948(0x24);
+    func_8004C8C0(0x131);
+}
 #endif
 
 #ifdef VERSION_US
