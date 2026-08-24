@@ -20,7 +20,18 @@ void func_80003CD0(void) { extern OSMesgQueue D_800CD000; extern OSMesg D_800CD0
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80003D00.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80003DD4.s")
+extern OSMesgQueue D_800CD000;
+extern void func_80006BB4(s32, u8 *, s32, s32, OSMesgQueue *, s32);
+void func_80003DD4(u8 *arg0, s32 arg1, s32 arg2, s32 arg3) {
+    s32 var_s0;
+    for (; arg2 > 0; arg2 -= var_s0) {
+        if (arg2 >= 0x1000) var_s0 = 0x1000; else var_s0 = arg2;
+        func_80006BB4(arg3, arg0, arg1, var_s0, &D_800CD000, 0);
+        osRecvMesg(&D_800CD000, NULL, 1);
+        arg0 += var_s0;
+        arg1 += var_s0;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80003E84.s")
 
