@@ -59,5 +59,9 @@ s32 func_8160BC1C(u8 *arg0) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E35C0/func_8160BC28.s")
+void func_8160BC28(Vec2s_8160BA9C *arg0, Vec2s_8160BA9C *arg1, f32 arg2) {
+    f32 inv = 1.0f - arg2;
+    arg0->x = (arg0->x * arg2) + (inv * arg1->x);
+    arg0->y = (arg0->y * arg2) + (inv * arg1->y);
+}
 #endif
