@@ -1582,7 +1582,27 @@ void func_80035CD0(f32 *dest, f32 *source) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80038FD4.s")
+typedef struct GraphNodeLink {
+    char pad0[4];
+    struct GraphNodeLink *prev;
+    struct GraphNodeLink *next;
+} GraphNodeLink;
+typedef struct {
+    char pad[0xC];
+    GraphNodeLink *child;
+} GraphNode38FD4;
+
+void func_80038FD4(GraphNode38FD4 *root, GraphNodeLink *node) {
+    node->prev->next = node->next;
+    node->next->prev = node->prev;
+    if (node == root->child) {
+        if (node == node->next) {
+            root->child = NULL;
+        } else {
+            root->child = node->next;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
