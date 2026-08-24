@@ -399,7 +399,14 @@ void func_8002890C(u8 *arg0, u8 *arg1) { if (*arg0 != *arg1) { u8 temp = *arg0; 
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002892C.s")
+extern u32 D_800D1AD8[24];
+u16 func_8002892C(u16 arg0) {
+    s32 i;
+    for (i = 0; i < 24; i++) {
+        if (arg0 == D_800D1AD8[i]) return 0;
+    }
+    return arg0;
+}
 #endif
 
 #ifdef VERSION_US
