@@ -99,7 +99,20 @@ s32 func_8411EE6C(u8 *arg0) {
     return *(u8 *)(arg0 + 0x62D);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411EE74.s")
+extern u8 *D_84193DD0;
+extern void func_84108E00(u8 *, s32);
+void func_8411EE74(u8 *arg0) {
+    s32 index;
+    arg0[1] &= 0xFFFE;
+    index = func_8411E1F8(arg0);
+    if ((*(u16 *)((u8 *)(u32)D_84193DD0 + (index << 4) + 0x10) & 7) != 0) {
+        func_84108E00(arg0, 2);
+    }
+    index = func_8411E1F8(arg0);
+    if (*(u16 *)((u8 *)(u32)D_84193DD0 + (index << 4) + 0x10) == 0x20) {
+        func_84108E00(arg0, 1);
+    }
+}
 
 void func_8411EF08(u8 *arg0) {
     arg0[1] |= 1;

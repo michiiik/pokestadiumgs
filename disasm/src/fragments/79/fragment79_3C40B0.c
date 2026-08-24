@@ -95,7 +95,14 @@ void func_841554B4(u8 *arg0, u8 arg1, u8 arg2) {
     *(u16 *)(arg0 + 0x12) = *(u16 *)(value + 0x16);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C40B0/func_84155544.s")
+s32 func_84155544(u8 *arg0, u8 arg1) {
+    s32 result;
+    result = (arg1 == arg0[2]);
+    if (result == 0) {
+        result = (arg1 == arg0[3]);
+    }
+    return result;
+}
 
 extern void func_80063454(u8, u8, u8, s32);
 void func_84155574(u8 *arg0, u8 arg1) {
