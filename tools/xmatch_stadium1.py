@@ -22,6 +22,7 @@ Four match classes, in descending confidence:
 
     python3 tools/xmatch_stadium1.py --report          # summary, write nothing
     python3 tools/xmatch_stadium1.py --out tools/s1_transfer.json
+    python3 tools/xmatch_stadium1.py --near-source disasm/src/fragments/26/fragment26_1646B0.c
 """
 import argparse
 import bisect
@@ -276,6 +277,34 @@ def similarity(a, b):
     return same / max(len(a), len(b))
 
 
+def near_matches(function, gs, s1, *, minimum=0.60, limit=10):
+    """Rank Stadium 1 bodies that share substantial instruction shape.
+
+    This is deliberately separate from ``match``.  A near match is useful for
+    finding a Stadium 1 source pattern after Stadium 2 added fields or control
+    flow, but it is not safe evidence for a name transfer or C replacement.
+    """
+    target = gs.get(function)
+    if target is None:
+        return []
+    rows = []
+    for name, candidate in s1.items():
+        score = similarity(target["w"], candidate["w"])
+        if score < minimum:
+            continue
+        rows.append(
+            {
+                "function": name,
+                "similarity": score,
+                "instructions": len(candidate["w"]),
+                "segment": candidate["seg"],
+                "vram": candidate["vram"],
+            }
+        )
+    rows.sort(key=lambda row: (-row["similarity"], abs(row["instructions"] - len(target["w"])), row["function"]))
+    return rows[:limit]
+
+
 def is_identical(a, b):
     return len(a) == len(b) and all(norm(x) == norm(y) for x, y in zip(a, b))
 
@@ -443,6 +472,28 @@ def main():
     ap.add_argument("--s1-root", default=DEFAULT_S1)
     ap.add_argument("--out", default=os.path.join(ROOT, "tools", "s1_transfer.json"))
     ap.add_argument("--report", action="store_true", help="summarise, write nothing")
+    ap.add_argument(
+        "--near-function",
+        action="append",
+        default=[],
+        help="rank Stadium 1 near-matches for this GS function (repeatable)",
+    )
+    ap.add_argument(
+        "--near-source",
+        help="rank near-matches for every GLOBAL_ASM owner in this C source",
+    )
+    ap.add_argument(
+        "--near-min",
+        type=float,
+        default=0.60,
+        help="minimum normalized instruction similarity for --near-* (default: 0.60)",
+    )
+    ap.add_argument(
+        "--near-top",
+        type=int,
+        default=5,
+        help="maximum Stadium 1 references per near-match target (default: 5)",
+    )
     ap.add_argument("--force", action="store_true",
                     help="overwrite the output even if it shrinks sharply")
     ap.add_argument("--classes", default="identical,normalised,callgraph",
@@ -469,6 +520,42 @@ def main():
                         [os.path.join(s1d, "linker_scripts", "us", f)
                          for f in ("symbol_addrs_code.txt", "symbol_addrs_ultralib.txt")],
                         "S1")
+
+    near_targets = list(a.near_function)
+    if a.near_source:
+        source_path = a.near_source
+        if not os.path.isabs(source_path):
+            source_path = os.path.join(ROOT, source_path)
+        if not os.path.exists(source_path):
+            sys.exit(f"near-match source does not exist: {a.near_source}")
+        text = open(source_path, encoding="utf-8", errors="replace").read()
+        near_targets.extend(
+            re.findall(r'GLOBAL_ASM\("asm/us/[^\"]+/([^/\"]+)\.s"\)', text)
+        )
+    if near_targets:
+        seen = set()
+        for function in near_targets:
+            if function in seen:
+                continue
+            seen.add(function)
+            rows = near_matches(
+                function,
+                gs,
+                s1,
+                minimum=max(0.0, min(a.near_min, 1.0)),
+                limit=max(1, a.near_top),
+            )
+            print(f"{function}:")
+            if not rows:
+                print("  (no Stadium 1 body above threshold)")
+                continue
+            for row in rows:
+                print(
+                    f"  {row['similarity']:.1%} {row['function']} "
+                    f"({row['instructions']} instructions, {row['segment']}, "
+                    f"0x{row['vram']:08X})"
+                )
+        return
 
     matches = match(gs, s1)
     segmap = segment_map(matches, gs, s1)

@@ -12,6 +12,7 @@ from unittest import mock
 
 import scan_asm_families as scanner
 import try_pragma_compare as runner
+import xmatch_stadium1 as stadium1
 
 ASM_PROCESSOR_DIR = Path(__file__).resolve().parent.parent / "disasm" / "tools" / "asm-processor"
 sys.path.insert(0, str(ASM_PROCESSOR_DIR))
@@ -19,6 +20,28 @@ import asm_processor  # noqa: E402
 
 
 class ScannerTests(unittest.TestCase):
+    def test_stadium1_near_matches_are_ranked_without_being_transfers(self) -> None:
+        gs = {
+            "func_gs": {
+                "w": [0x24010005, 0x10200001, 0x03E00008, 0x00000000],
+            }
+        }
+        s1 = {
+            "func_s1_best": {
+                "w": [0x24010007, 0x10200001, 0x03E00008, 0x00000000],
+                "seg": "fragment31",
+                "vram": 0x81000000,
+            },
+            "func_s1_other": {
+                "w": [0x03E00008, 0x00000000, 0x00000000, 0x00000000],
+                "seg": "fragment31",
+                "vram": 0x81000010,
+            },
+        }
+        rows = stadium1.near_matches("func_gs", gs, s1, minimum=0.2, limit=2)
+        self.assertEqual(rows[0]["function"], "func_s1_best")
+        self.assertGreater(rows[0]["similarity"], rows[1]["similarity"])
+
     def test_wrapper_unknown_loaded_global_prefers_pointer_hypothesis(self) -> None:
         asm = """
         glabel func_wrap
