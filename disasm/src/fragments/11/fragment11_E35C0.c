@@ -31,7 +31,15 @@ s32 func_8160BB30(s16 *arg0) {
     return (s16)(x * x + y * y);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E35C0/func_8160BB60.s")
+s32 func_8160BB60(s16 *arg0, s16 *arg1) {
+    s16 dx;
+    s16 dy;
+    s32 result;
+    dx = arg0[0] - arg1[0];
+    dy = arg0[1] - arg1[1];
+    result = sqrtf((f32)(dx * dx + dy * dy));
+    return (s16)result;
+}
 
 s32 func_8160BBCC(s16 *arg0, s16 *arg1) {
     s16 dx = arg0[0] - arg1[0];
