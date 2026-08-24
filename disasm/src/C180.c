@@ -8,5 +8,9 @@
 
 s32 func_8000B60C(const s8 *a, const s8 *b) { s8 ca = *a; s8 cb = *b; while (ca == cb) { if (ca == 0) return 0; ca = *++a; cb = *++b; } return ca - cb; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/C180/func_8000B650.s")
+char *func_8000B650(char *dest, s32 c, u32 nsize) {
+    char *newDest = dest;
+    while (nsize-- > 0) *newDest++ = c;
+    return dest;
+}
 #endif
