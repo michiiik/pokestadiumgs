@@ -30,9 +30,15 @@ u8 func_84154B24(void) {
     return D_8419E91A;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C40B0/func_84154B30.s")
+extern u8 D_8419E780[];
+u8 *func_84154B30(u8 arg0) {
+    return D_8419E780 + arg0 * 0xCC;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C40B0/func_84154B64.s")
+extern u8 D_8419E780[];
+u8 *func_84154B64(u8 arg0) {
+    return D_8419E780 + arg0 * 0xCC + 8;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C40B0/func_84154B9C.s")
 
