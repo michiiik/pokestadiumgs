@@ -51,11 +51,17 @@ void func_829086F0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_829087C0.s")
+extern void func_8290867C(void);
+void func_829087C0(void) {
+    func_8290867C();
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_829087E0.s")
+extern void func_8290E014(void);
+void func_829087E0(void) {
+    func_8290E014();
+}
 #endif
 
 #ifdef VERSION_US
@@ -127,7 +133,10 @@ void func_82908E50(f32 *arg0, f32 *arg1) { arg0[0] = arg1[0]; arg0[1] = arg1[1];
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290A0B0.s")
+extern void func_8004B7E0(void);
+void func_8290A0B0(void) {
+    func_8004B7E0();
+}
 #endif
 
 #ifdef VERSION_US

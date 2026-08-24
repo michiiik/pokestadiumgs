@@ -58,7 +58,12 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33D6A0/func_829014F4.s")
+extern u8 D_82918868[];
+void func_829014F4(void) {
+    D_82918868[0x32] = 0;
+    D_82918868[0x30] = 0;
+    D_82918868[0x31] = 3;
+}
 #endif
 
 #ifdef VERSION_US

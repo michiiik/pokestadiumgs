@@ -10,7 +10,12 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_3422F0/func_82905CE4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_3422F0/func_82905EE4.s")
+s32 func_82905EE4(s32 arg0, u8 *arg1) {
+    arg1[0x18] = 100;
+    arg1[0x19] = 100;
+    arg1[0x1A] = 100;
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_3422F0/func_82905F00.s")
 
