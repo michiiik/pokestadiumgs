@@ -50,13 +50,47 @@ u8 *func_84154B64(u8 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C40B0/func_841551D4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C40B0/func_8415541C.s")
+extern u8 *D_841951F8[];
+void func_8415541C(u8 *arg0, u8 arg1, u8 arg2) {
+    u8 *value;
+    value = D_841951F8[arg1] + arg2 * 0x58;
+    arg0[0] = value[0x1A];
+    value += 0x18;
+    arg0[1] = value[3];
+    arg0[2] = value[4];
+    arg0[3] = value[5];
+    arg0[8] = value[1];
+    arg0[9] = value[0x1C];
+    *(u16 *)(arg0 + 0xA) = *(u16 *)(value + 0x2A);
+    *(u16 *)(arg0 + 0xC) = *(u16 *)(value + 0x2C);
+    *(u16 *)(arg0 + 0xE) = *(u16 *)(value + 0x2E);
+    *(u16 *)(arg0 + 0x10) = *(u16 *)(value + 0x30);
+    *(u16 *)(arg0 + 0x12) = *(u16 *)(value + 0x32);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C40B0/func_841554B4.s")
+extern u8 *func_84156590(u8, u8);
+void func_841554B4(u8 *arg0, u8 arg1, u8 arg2) {
+    u8 *value;
+    value = func_84156590(arg1, arg2);
+    arg0[0] = value[1];
+    arg0[1] = value[2];
+    arg0[2] = value[3];
+    arg0[3] = value[4];
+    arg0[8] = value[0xB];
+    arg0[9] = value[0xC];
+    *(u16 *)(arg0 + 0xA) = *(u16 *)(value + 0xE);
+    *(u16 *)(arg0 + 0xC) = *(u16 *)(value + 0x10);
+    *(u16 *)(arg0 + 0xE) = *(u16 *)(value + 0x12);
+    *(u16 *)(arg0 + 0x10) = *(u16 *)(value + 0x14);
+    *(u16 *)(arg0 + 0x12) = *(u16 *)(value + 0x16);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C40B0/func_84155544.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C40B0/func_84155574.s")
+extern void func_80063454(u8, u8, u8, s32);
+void func_84155574(u8 *arg0, u8 arg1) {
+    func_80063454(arg1, arg0[2], arg0[3], (arg0[0x15] & 8) != 0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C40B0/func_841555B4.s")
 
