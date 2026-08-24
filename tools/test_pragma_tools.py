@@ -146,6 +146,87 @@ class ScannerTests(unittest.TestCase):
 
 
 class RunnerTests(unittest.TestCase):
+    def test_probe_one_keeps_live_source_unchanged(self) -> None:
+        repo_root = Path(__file__).resolve().parent.parent
+        source_parent = repo_root / "disasm" / "src"
+        with tempfile.TemporaryDirectory(dir=source_parent) as directory:
+            source = Path(directory) / "synthetic.c"
+            original = '#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_a.s")\n'
+            source.write_text(original)
+            with mock.patch.object(
+                runner,
+                "_make_object",
+                return_value=(0, Path(directory) / "probe.o", ""),
+            ), mock.patch.object(
+                runner,
+                "_function_bytes",
+                return_value=b"matching-bytes",
+            ):
+                result = runner._probe_one(
+                    source,
+                    "func_a",
+                    "void func_a(void) {}",
+                    b"matching-bytes",
+                )
+            self.assertEqual(result["status"], "probe_match")
+            self.assertEqual(source.read_text(), original)
+
+    def test_probe_rejection_skips_full_compare(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.c"
+            source.write_text(
+                '#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_a.s")\n'
+                '#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_b.s")\n'
+            )
+            with mock.patch.object(
+                runner,
+                "probe_candidates",
+                return_value=[
+                    {"index": 0, "function": "func_a", "status": "probe_rejected"},
+                    {"index": 1, "function": "func_b", "status": "probe_rejected"},
+                ],
+            ), mock.patch.object(runner, "_try_candidate_detailed") as full_gate:
+                result = runner.try_candidates_detailed(
+                    source,
+                    [("func_a", "void func_a(void) {}"), ("func_b", "void func_b(void) {}")],
+                )
+            self.assertEqual(result["batch_status"], "no_candidate_accepted")
+            full_gate.assert_not_called()
+            self.assertTrue(all(item["status"] == "probe_rejected" for item in result["attempts"]))
+
+    def test_probe_hit_is_sent_to_sequential_full_gate(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.c"
+            source.write_text(
+                '#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_a.s")\n'
+            )
+            with mock.patch.object(
+                runner,
+                "probe_candidates",
+                return_value=[
+                    {"index": 0, "function": "func_a", "status": "probe_match"},
+                ],
+            ), mock.patch.object(
+                runner,
+                "rebuild_source_object",
+                return_value=0,
+            ), mock.patch.object(
+                runner,
+                "_try_candidate_detailed",
+                return_value=(0, "accepted"),
+            ), mock.patch.object(
+                runner,
+                "compare_current_tree",
+                return_value=0,
+            ) as full_compare:
+                result = runner.try_candidates_detailed(
+                    source,
+                    [("func_a", "void func_a(void) {}")],
+                )
+            self.assertEqual(result["accepted"], ["func_a"])
+            self.assertEqual(result["attempts"][0]["probe_status"], "probe_match")
+            full_compare.assert_called_once()
+
     def test_diagnostics_mark_later_variants_skipped(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             source = Path(directory) / "synthetic.c"

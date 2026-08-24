@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Minimal stdio MCP server for in-memory pragma candidate attempts."""
+"""Minimal stdio MCP server for isolated pragma candidate probes."""
 
 import json
 import contextlib
@@ -35,12 +35,13 @@ def main():
         elif method == "tools/list":
             reply(request_id, {"tools": [{
                 "name": "try_pragma_candidates",
-                "description": "Try in-memory C replacements sequentially and keep only exact ROM matches. The result includes per-candidate compile/compare diagnostics.",
+                "description": "Compile candidates in isolated temporary objects, then sequentially full-compare byte-level hits and keep only exact ROM matches.",
                 "inputSchema": {"type": "object", "required": ["source", "candidates"], "properties": {
                     "source": {"type": "string", "description": "Source path relative to the repository root."},
                     "candidates": {"type": "array", "items": {"type": "object", "required": ["function", "code"], "properties": {
                         "function": {"type": "string"}, "code": {"type": "string"},
                     }}, "description": "Ordered candidates; later variants for a solved function are skipped."},
+                    "workers": {"type": "integer", "minimum": 1, "description": "Maximum parallel isolated compile probes (default: PRAGMA_PROBE_WORKERS or 4)."},
                 }},
             }]})
         elif method == "tools/call" and request.get("params", {}).get("name") == "try_pragma_candidates":
@@ -48,6 +49,9 @@ def main():
             root = Path(__file__).resolve().parent.parent
             source = (root / args["source"]).resolve()
             blocks = [(item["function"], item["code"]) for item in args["candidates"]]
+            workers = args.get("workers")
+            if workers is not None:
+                workers = int(workers)
             # The comparison helper prints build logs to stdout.  MCP stdio
             # must contain JSON-RPC messages only, so capture those logs
             # instead of corrupting the transport stream.
@@ -60,7 +64,9 @@ def main():
             try:
                 os.dup2(devnull_fd, sys.stdout.fileno())
                 with contextlib.redirect_stdout(captured):
-                    result = runner.try_candidates_detailed(source, blocks)
+                    result = runner.try_candidates_detailed(
+                        source, blocks, probe_workers=workers
+                    )
             finally:
                 sys.stdout.flush()
                 os.dup2(saved_fd, sys.stdout.fileno())
