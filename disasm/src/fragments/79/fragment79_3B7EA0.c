@@ -208,7 +208,19 @@ void func_84149F74(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B7EA0/func_84149FB8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B7EA0/func_8414A0C8.s")
+extern u8 func_80062D98(u8);
+extern s32 func_84155574(u8 *, u8);
+void func_8414A0C8(u8 *arg0) {
+    s32 difference;
+    s32 result;
+    difference = (*(u8 **)(arg0 + 4))[0xC] - (*(u8 **)(arg0 + 8))[0xC];
+    result = func_84155574(*(u8 **)(arg0 + 8), func_80062D98(arg0[0]));
+    if (result != 0 && difference >= 0) {
+        arg0[2] += difference * 2;
+    } else {
+        arg0[2] = 0;
+    }
+}
 
 extern void func_8414A0C8(u8 *);
 extern void func_84149FB8(u8 *);

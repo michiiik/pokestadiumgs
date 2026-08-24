@@ -32,7 +32,24 @@ s32 func_8410A2A8(s32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_379450/func_8410A2C8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_379450/func_8410A444.s")
+extern s32 D_84190204;
+extern u8 D_800D0510[];
+extern void func_8000766C(u8 *, s32, s32, s32, s32);
+extern void func_80007820(u8 *, s32);
+extern s32 func_8410A2C8(s32);
+void func_8410A444(void) {
+    s32 value = D_84190204;
+    if (value == 0) {
+        func_8000766C(D_800D0510, 0, 0, 0x140, 0xF0);
+    } else if (value == -1) {
+        func_80007820(D_800D0510, 1);
+    } else if ((u32)value < 0x10000) {
+        s32 converted = func_8410A2C8(value & 0xFFFF);
+        func_80007820(D_800D0510, converted & 0xFFFF);
+    } else {
+        func_80007820(D_800D0510, 1);
+    }
+}
 
 extern f32 D_80128C54[];
 void func_8410A4EC(f32 arg0) {

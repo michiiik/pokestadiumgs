@@ -6,7 +6,18 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D3260/func_84163B4C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D3260/func_84163DA0.s")
+extern f64 D_8418C818;
+extern f64 D_8418C820;
+void func_84163DA0(f32 arg0, f32 *arg1, f32 arg2, f32 arg3) {
+    f32 spB0[4][4];
+    f32 sp70[4][4];
+    f32 sp30[4][4];
+    UNUSED s32 pad2[2];
+    guScaleF(sp30, arg3, arg3, arg3);
+    guRotateF(sp70, (arg0 * D_8418C818) / D_8418C820, 1.0f, 0.0f, 0.0f);
+    guMtxCatF(sp30, sp70, spB0);
+    guMtxXFMF(spB0, 0.0f, 0.0f, arg2, &arg1[0], &arg1[1], &arg1[2]);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D3260/func_84163E60.s")
 

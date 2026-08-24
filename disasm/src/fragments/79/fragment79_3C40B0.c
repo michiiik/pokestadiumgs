@@ -52,7 +52,70 @@ u8 *func_84154B64(u8 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C40B0/func_84154B9C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C40B0/func_84154C10.s")
+
+extern u8 *D_84195208[];
+extern u8 *D_84195200[];
+void func_84154C10(u8 *arg0, u8 arg1) {
+    u8 *value = D_84195208[arg1];
+    u8 *aux = D_84195200[arg1];
+    arg0[0] = value[0];
+    arg0[1] = aux[1];
+    *(u16 *)(arg0 + 0x26) = aux[0x24];
+    arg0[2] = value[1];
+    arg0[3] = value[2];
+    arg0[4] = value[5];
+    arg0[5] = value[6];
+    arg0[6] = value[7];
+    arg0[7] = value[8];
+    arg0[8] = value[9];
+    arg0[9] = value[0xA];
+    arg0[0xA] = value[0xB];
+    arg0[0xB] = value[0xC];
+    arg0[0xC] = aux[0x1D];
+    *(u16 *)(arg0 + 0x28) = *(u16 *)(aux + 0x26);
+    *(u16 *)(arg0 + 0x2A) = *(u16 *)(aux + 0x28);
+    *(u16 *)(arg0 + 0x2C) = *(u16 *)(value + 0x32);
+    *(u16 *)(arg0 + 0x2E) = *(u16 *)(value + 0x34);
+    *(u16 *)(arg0 + 0x30) = *(u16 *)(value + 0x36);
+    *(u16 *)(arg0 + 0x32) = *(u16 *)(value + 0x38);
+    *(u16 *)(arg0 + 0x34) = *(u16 *)(value + 0x3A);
+    *(u16 *)(arg0 + 0x36) = *(u16 *)(value + 0x3C);
+    *(u16 *)(arg0 + 0x38) = *(u16 *)(value + 0x3E);
+    *(u16 *)(arg0 + 0x3A) = *(u16 *)(value + 0x40);
+    *(u16 *)(arg0 + 0x3C) = *(u16 *)(value + 0x42);
+    *(u16 *)(arg0 + 0x3E) = *(u16 *)(value + 0x44);
+    arg0[0xD] = value[0x1E];
+    arg0[0xE] = value[0x1F];
+    arg0[0xF] = value[0x20];
+    arg0[0x10] = value[0x21];
+    arg0[0x11] = value[0x22];
+    arg0[0x12] = value[0x23];
+    arg0[0x13] = value[0x24];
+    arg0[0x14] = aux[0x1C];
+    *(u16 *)(arg0 + 0x40) = *(u16 *)(value + 0x2E);
+    *(u16 *)(arg0 + 0x42) = *(u16 *)(value + 0x46);
+    arg0[0x15] = value[0xD];
+    arg0[0x16] = value[0xE];
+    arg0[0x17] = value[0xF];
+    arg0[0x18] = value[0x10];
+    arg0[0x19] = value[0x11];
+    arg0[0x1A] = value[0x12];
+    arg0[0x1B] = value[0x13];
+    arg0[0x1C] = value[0x14];
+    arg0[0x1D] = value[0x15];
+    arg0[0x1E] = value[0x16];
+    arg0[0x1F] = value[0x17];
+    arg0[0x20] = value[0x18];
+    arg0[0x21] = value[0x19];
+    arg0[0x23] = value[0x1B];
+    arg0[0x24] = value[0x26];
+    arg0[0x25] = value[0x27];
+    *(u16 *)(arg0 + 0x44) = *(u32 *)(value + 0x4C);
+
+    arg0[0x22] = value[0x1A];
+    *(u16 *)(arg0 + 0x46) = *(u16 *)(value + 0x30);
+    *(u32 *)(arg0 + 0x48) = value[0x2A];
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C40B0/func_84154DF8.s")
 
