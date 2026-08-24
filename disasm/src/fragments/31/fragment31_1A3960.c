@@ -8,7 +8,9 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A3960/func_88230770.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A3960/func_88230878.s")
+extern u32 D_882349A0;
+extern void func_8821D930(s32);
+void func_88230878(void) { func_8821D930(D_882349A0 + 4); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A3960/func_882308A0.s")
 
