@@ -14,7 +14,20 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D7DD0/func_84169040.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D7DD0/func_84169214.s")
+typedef struct {
+    u8 pad[0x88];
+    Vtx *vertices;
+} Func84169214State;
+Gfx *func_84169214(Gfx *arg0, Func84169214State *arg1) {
+    s32 i;
+    Vtx *temp_v0 = arg1->vertices;
+    for (i = 0; i < 19; i++) {
+        gSPVertex(arg0++, temp_v0, 4, 0);
+        gSP2Triangles(arg0++, 0, 2, 1, 0, 1, 2, 3, 0);
+        temp_v0 += 2;
+    }
+    return arg0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D7DD0/func_84169344.s")
 
