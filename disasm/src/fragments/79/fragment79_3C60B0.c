@@ -93,7 +93,13 @@ void func_84156C40(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84156C60.s")
+extern s32 D_800D0510;
+extern u8 D_841A4D08[];
+extern s32 func_8415ADE0();
+void func_84156C60(void) {
+    #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
+    s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp) D_800D0510 = func_8415ADE0(D_800D0510);
+}
 #endif
 
 void func_84156CB4(void) {
@@ -168,7 +174,13 @@ void func_841570B4(void) { func_8415BD48(1); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_841570D4.s")
+extern s32 D_800D0510;
+extern u8 D_841A4D08[];
+extern s32 func_8415C2E0();
+void func_841570D4(void) {
+    #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
+    s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp) D_800D0510 = func_8415C2E0(D_800D0510);
+}
 #endif
 
 #ifdef VERSION_US
@@ -193,7 +205,13 @@ void func_841572A0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84157344.s")
+extern s32 D_800D0510;
+extern u8 D_841A4D08[];
+extern s32 func_84162DE8();
+void func_84157344(void) {
+    #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
+    s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp) D_800D0510 = func_84162DE8(D_800D0510);
+}
 #endif
 
 #ifdef VERSION_US
@@ -218,7 +236,13 @@ void func_84157558(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_841575FC.s")
+extern s32 D_800D0510;
+extern u8 D_841A4D08[];
+extern s32 func_8415DBBC();
+void func_841575FC(void) {
+    #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
+    s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp) D_800D0510 = func_8415DBBC(D_800D0510);
+}
 #endif
 
 #ifdef VERSION_US
@@ -231,7 +255,13 @@ void func_841576CC(void) { func_8415BD48(0); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_841576EC.s")
+extern s32 D_800D0510;
+extern u8 D_841A4D08[];
+extern s32 func_8415C2E0();
+void func_841576EC(void) {
+    #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
+    s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp) D_800D0510 = func_8415C2E0(D_800D0510);
+}
 #endif
 
 #ifdef VERSION_US
@@ -244,7 +274,13 @@ void func_841577B8(void) { func_8415BD48(0); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_841577D8.s")
+extern s32 D_800D0510;
+extern u8 D_841A4D08[];
+extern s32 func_8415C2E0();
+void func_841577D8(void) {
+    #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
+    s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp) D_800D0510 = func_8415C2E0(D_800D0510);
+}
 #endif
 
 #ifdef VERSION_US
@@ -269,7 +305,13 @@ void func_841579B8(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84157A5C.s")
+extern s32 D_800D0510;
+extern u8 D_841A4D08[];
+extern s32 func_8415DBBC();
+void func_84157A5C(void) {
+    #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
+    s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp) D_800D0510 = func_8415DBBC(D_800D0510);
+}
 #endif
 
 #ifdef VERSION_US
@@ -322,7 +364,13 @@ void func_84157EE0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84157F00.s")
+extern s32 D_800D0510;
+extern u8 D_841A4D08[];
+extern s32 func_8415FD8C();
+void func_84157F00(void) {
+    #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
+    s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp) D_800D0510 = func_8415FD8C(D_800D0510);
+}
 #endif
 
 #ifdef VERSION_US
@@ -337,7 +385,13 @@ void func_84157F84(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84157FA4.s")
+extern s32 D_800D0510;
+extern u8 D_841A4D08[];
+extern s32 func_84161018();
+void func_84157FA4(void) {
+    #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
+    s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp) D_800D0510 = func_84161018(D_800D0510);
+}
 #endif
 
 #ifdef VERSION_US
@@ -352,7 +406,13 @@ void func_84158028(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84158048.s")
+extern s32 D_800D0510;
+extern u8 D_841A4D08[];
+extern s32 func_841621A4();
+void func_84158048(void) {
+    #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
+    s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp) D_800D0510 = func_841621A4(D_800D0510);
+}
 #endif
 
 #ifdef VERSION_US
@@ -398,11 +458,25 @@ void func_84158370(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_841586C8.s")
+extern u16 D_841A4D04;
+extern s32 func_84165C2C(void);
+s32 func_841586C8(void) {
+    (*(s16 *)&D_841A4D04) = (*(s16 *)&D_841A4D04) + 1;
+    if (*(s16 *)&D_841A4D04 >= 0x32) {
+        return -1;
+    }
+    return func_84165C2C();
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84158714.s")
+extern s32 D_800D0510;
+extern u8 D_841A4D08[];
+extern s32 func_84165CC0();
+void func_84158714(void) {
+    #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
+    s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp) D_800D0510 = func_84165CC0(D_800D0510);
+}
 #endif
 
 #ifdef VERSION_US
@@ -423,11 +497,25 @@ void func_84158840(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84158874.s")
+extern u16 D_841A4D06;
+extern s32 func_8415DAE4(void);
+s32 func_84158874(void) {
+    (*(s16 *)&D_841A4D06) = (*(s16 *)&D_841A4D06) + 1;
+    if (*(s16 *)&D_841A4D06 >= 0xB5) {
+        return -1;
+    }
+    return func_8415DAE4();
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_841588C0.s")
+extern s32 D_800D0510;
+extern u8 D_841A4D08[];
+extern s32 func_8415DBBC();
+void func_841588C0(void) {
+    #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
+    s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp) D_800D0510 = func_8415DBBC(D_800D0510);
+}
 #endif
 
 #ifdef VERSION_US
@@ -453,7 +541,13 @@ void func_84158BD8(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84158BF8.s")
+extern s32 D_800D0510;
+extern u8 D_841A4D08[];
+extern s32 func_84168000();
+void func_84158BF8(void) {
+    #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
+    s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp) D_800D0510 = func_84168000(D_800D0510);
+}
 #endif
 
 #ifdef VERSION_US
@@ -474,11 +568,26 @@ void func_84158E24(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84158E58.s")
+extern u16 D_841A4D48;
+extern void func_84158C4C(void);
+extern s32 func_84169040(void);
+s32 func_84158E58(void) {
+    (*(s16 *)&D_841A4D48) = (*(s16 *)&D_841A4D48) + 1;
+    if ((*(s16 *)&D_841A4D48 % 10) == 0) {
+        func_84158C4C();
+    }
+    return func_84169040();
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84158EAC.s")
+extern s32 D_800D0510;
+extern u8 D_841A4D08[];
+extern s32 func_84169618();
+void func_84158EAC(void) {
+    #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
+    s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp) D_800D0510 = func_84169618(D_800D0510);
+}
 #endif
 
 #ifdef VERSION_US
@@ -504,7 +613,13 @@ void func_841591C8(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_841591E8.s")
+extern s32 D_800D0510;
+extern u8 D_841A4D08[];
+extern s32 func_84168000();
+void func_841591E8(void) {
+    #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
+    s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp) D_800D0510 = func_84168000(D_800D0510);
+}
 #endif
 
 #ifdef VERSION_US
@@ -530,7 +645,13 @@ void func_84159510(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84159530.s")
+extern s32 D_800D0510;
+extern u8 D_841A4D08[];
+extern s32 func_84168000();
+void func_84159530(void) {
+    #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
+    s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp) D_800D0510 = func_84168000(D_800D0510);
+}
 #endif
 
 #ifdef VERSION_US
@@ -556,7 +677,13 @@ void func_84159738(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84159758.s")
+extern s32 D_800D0510;
+extern u8 D_841A4D08[];
+extern s32 func_84168000();
+void func_84159758(void) {
+    #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
+    s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp) D_800D0510 = func_84168000(D_800D0510);
+}
 #endif
 
 #ifdef VERSION_US
@@ -583,11 +710,31 @@ void func_84159C2C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84159C6C.s")
+extern u16 D_841A4D50;
+extern void func_84159A50(void);
+extern s32 func_84169040(void);
+extern void func_841677C4(void);
+void func_84159C6C(void) {
+    (*(s16 *)&D_841A4D50) = (*(s16 *)&D_841A4D50) + 1;
+    if ((*(s16 *)&D_841A4D50 % 10) == 0) {
+        func_84159A50();
+    }
+    func_84169040();
+    func_841677C4();
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84159CC8.s")
+extern s32 D_800D0510;
+extern u8 D_841A4D08[];
+extern s32 func_84168000();
+extern s32 func_84169618();
+void func_84159CC8(void) {
+    #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
+    s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp)
+    D_800D0510 = func_84168000(D_800D0510);
+    D_800D0510 = func_84169618(D_800D0510);
+}
 #endif
 
 #ifdef VERSION_US
