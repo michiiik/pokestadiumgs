@@ -57,5 +57,22 @@ void func_841055D8(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3749B0/func_84105630.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3749B0/func_8410580C.s")
+extern void func_84105120(void);
+extern void func_841055D8(u8 *);
+extern void func_84105630(u8 *, s32);
+s32 func_8410580C(s32 arg0, u8 *arg1, s32 arg2) {
+    switch (arg0) {
+    case 0:
+        func_84105120();
+        break;
+    case 2:
+        func_841055D8(arg1);
+        break;
+    case 5:
+        func_84105630(arg1, arg2);
+        break;
+    }
+    return 0;
+}
+#pragma C_FUNCTION_PADDING(12)
 #endif
