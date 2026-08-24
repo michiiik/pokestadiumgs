@@ -16,7 +16,12 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_11B210/func_8220BD00.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_11B210/func_8220BD90.s")
+extern s16 D_82210C36;
+void func_8220BD90(s16 *arg0) {
+    arg0[1] = 1;
+    arg0[2] = 0;
+    D_82210C36 = arg0[0];
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_11B210/func_8220BDAC.s")
 
