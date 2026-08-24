@@ -291,6 +291,8 @@ def wrapper_candidates(owner: Owner, instructions: list[Instruction]) -> list[st
         return []
 
     state = {f"$a{i}": f"arg{i}" for i in range(4)}
+    state["$zero"] = "0"
+    stack_args: dict[int, str] = {}
     touched_args = {
         int(value)
         for value in re.findall(
@@ -305,10 +307,17 @@ def wrapper_candidates(owner: Owner, instructions: list[Instruction]) -> list[st
         tokens = operand_tokens(instruction.operands)
         if len(tokens) < 2:
             continue
+        if instruction.op == "sw":
+            stack_match = re.match(r"(-?(?:0x[0-9A-Fa-f]+|\d+))\(\$sp\)", tokens[1])
+            if stack_match and tokens[0] in state:
+                offset = parse_int(stack_match.group(1))
+                if offset is not None and offset >= 0x10 and offset % 4 == 0:
+                    expression = state[tokens[0]]
+                    if expression != "UNSUPPORTED":
+                        stack_args[offset] = expression
+            continue
         dest, source = tokens[0], tokens[1]
         third = tokens[2] if len(tokens) >= 3 else ""
-        if dest not in state:
-            continue
         if instruction.op == "move" and source in state:
             state[dest] = state[source]
         elif instruction.op in {"or", "addu"} and len(tokens) >= 3 and third == "$zero" and source in state:
@@ -320,8 +329,12 @@ def wrapper_candidates(owner: Owner, instructions: list[Instruction]) -> list[st
             else:
                 state[dest] = "UNSUPPORTED"
         elif instruction.op == "addiu" and source in state:
-            value = instruction_immediate(instruction)
-            state[dest] = f"({state[source]} + {value})" if value is not None else "UNSUPPORTED"
+            global_match = re.search(r"%lo\((D_[0-9A-Fa-f]+)\)", instruction.operands)
+            if global_match and state[source].startswith("&"):
+                state[dest] = state[source]
+            else:
+                value = instruction_immediate(instruction)
+                state[dest] = f"({state[source]} + {value})" if value is not None else "UNSUPPORTED"
         elif instruction.op == "lui":
             match = re.search(r"%hi\((D_[0-9A-Fa-f]+)\)", instruction.operands)
             state[dest] = f"&{match.group(1)}" if match else "UNSUPPORTED"
@@ -338,7 +351,13 @@ def wrapper_candidates(owner: Owner, instructions: list[Instruction]) -> list[st
     call_arg_count = max(touched_args, default=-1) + 1
     if call_arg_count == 0 or call_arg_count > 4:
         return []
+    if stack_args:
+        expected_offsets = list(range(0x10, max(stack_args) + 4, 4))
+        if any(offset not in stack_args for offset in expected_offsets):
+            owner.notes.append("stack argument layout has a gap; manual wrapper review needed")
+            return []
     expressions = [state[f"$a{i}"] for i in range(call_arg_count)]
+    expressions.extend(stack_args[offset] for offset in sorted(stack_args))
     if any(expression == "UNSUPPORTED" for expression in expressions):
         return []
 

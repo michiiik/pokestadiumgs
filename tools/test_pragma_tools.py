@@ -13,6 +13,35 @@ import try_pragma_compare as runner
 
 
 class ScannerTests(unittest.TestCase):
+    def test_wrapper_preserves_outgoing_stack_argument(self) -> None:
+        asm = """
+        glabel func_wrap
+            /* 000000 80000000 */ addiu $sp, $sp, -0x20
+            /* 000004 80000004 */ lui $t6, %hi(D_80000040)
+            /* 000008 80000008 */ addiu $t6, $t6, %lo(D_80000040)
+            /* 00000C 8000000C */ sw $t6, 0x10($sp)
+            /* 000010 80000010 */ addiu $a1, $zero, 4
+            /* 000014 80000014 */ addiu $a2, $zero, 4
+            /* 000018 80000018 */ jal func_worker
+            /* 00001C 8000001C */ addiu $a3, $zero, 422
+            /* 000020 80000020 */ jr $ra
+            /* 000024 80000024 */ nop
+        """
+        label, instructions, _ = scanner.parse_instructions(asm)
+        owner = scanner.Owner(
+            function=label,
+            source="synthetic.c",
+            asm="synthetic.s",
+            label=label,
+            family="direct_wrapper",
+            confidence=1.0,
+            instruction_count=len(instructions),
+            calls=["func_worker"],
+        )
+        candidates = scanner.wrapper_candidates(owner, instructions)
+        self.assertIn("&D_80000040", candidates[0])
+        self.assertIn("func_worker(arg0, 4, 4, 422, &D_80000040)", candidates[0])
+
     def test_lookup_emits_multiple_labeled_variants(self) -> None:
         asm = """
         glabel func_80000000
