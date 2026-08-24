@@ -6,5 +6,11 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A5E10/func_88232C68.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A5E10/func_88232E30.s")
+extern void func_88005B60(s32, void (*)(void), void (*)(void), void (*)(void));
+extern void func_88232B90(void);
+extern void func_88232C68(void);
+extern void func_88213E9C(void);
+void func_88232E30(s32 arg0) {
+    func_88005B60(arg0, func_88232B90, func_88232C68, func_88213E9C);
+}
 #endif
