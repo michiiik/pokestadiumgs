@@ -115,7 +115,6 @@ typedef struct {
     s32 (*callback)(s32, s32);
 } Func81003DACGlobalAlt;
 extern Func81003DACGlobalAlt *D_80094920;
-extern void func_81003D50();
 void func_81003DAC(s32 arg0, Func81003DACStateAlt *arg1) {
     Func81003DACStateAlt *state = arg1;
     s32 frame;
@@ -123,7 +122,7 @@ void func_81003DAC(s32 arg0, Func81003DACStateAlt *arg1) {
 
     switch (arg0) {
         case 0:
-            state->unk_14 = state->unk_20;
+            state->unk_14 = (void *)(s32)state->unk_20;
             break;
         case 2:
             if ((D_8009491C != NULL) && (D_80094920 != NULL)) {
