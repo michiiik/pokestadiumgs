@@ -13,6 +13,58 @@ import try_pragma_compare as runner
 
 
 class ScannerTests(unittest.TestCase):
+    def test_wrapper_unknown_loaded_global_prefers_pointer_hypothesis(self) -> None:
+        asm = """
+        glabel func_wrap
+            /* 000000 80000000 */ addiu $sp, $sp, -0x18
+            /* 000004 80000004 */ or $a1, $a0, $zero
+            /* 000008 80000008 */ lui $a0, %hi(D_80000040)
+            /* 00000C 8000000C */ jal func_worker
+            /* 000010 80000010 */ lw $a0, %lo(D_80000040)($a0)
+            /* 000014 80000014 */ jr $ra
+            /* 000018 80000018 */ nop
+        """
+        label, instructions, _ = scanner.parse_instructions(asm)
+        owner = scanner.Owner(
+            function=label,
+            source="synthetic.c",
+            asm="synthetic.s",
+            label=label,
+            family="direct_wrapper",
+            confidence=1.0,
+            instruction_count=len(instructions),
+            calls=["func_worker"],
+        )
+        candidates = scanner.wrapper_candidates(owner, instructions)
+        self.assertIn("extern void * D_80000040;", candidates[0])
+        self.assertTrue(any("extern u32 D_80000040;" in candidate for candidate in candidates))
+
+    def test_wrapper_uses_old_style_decl_when_target_is_called_elsewhere(self) -> None:
+        asm = """
+        glabel func_wrap
+            /* 000000 80000000 */ addiu $sp, $sp, -0x18
+            /* 000004 80000004 */ or $a1, $a0, $zero
+            /* 000008 80000008 */ jal func_worker
+            /* 00000C 8000000C */ nop
+            /* 000010 80000010 */ jr $ra
+            /* 000014 80000014 */ nop
+        """
+        label, instructions, _ = scanner.parse_instructions(asm)
+        owner = scanner.Owner(
+            function=label,
+            source="synthetic.c",
+            asm="synthetic.s",
+            label=label,
+            family="direct_wrapper",
+            confidence=1.0,
+            instruction_count=len(instructions),
+            calls=["func_worker"],
+            function_declarations={"func_worker": "extern void func_worker(void);"},
+            function_uses={"func_worker"},
+        )
+        candidates = scanner.wrapper_candidates(owner, instructions)
+        self.assertIn("extern void func_worker();", candidates[0])
+
     def test_wrapper_preserves_outgoing_stack_argument(self) -> None:
         asm = """
         glabel func_wrap

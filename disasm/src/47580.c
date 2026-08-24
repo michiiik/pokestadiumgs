@@ -60,7 +60,10 @@ extern void *memcpy(void *, const void *, s32); void *func_800471B4(void *dest, 
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047444.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047524.s")
+extern u32 D_437750;
+extern u32 D_446E30;
+extern void func_8000484C(void *, void *, s32, s32);
+void func_80047524(void) { func_8000484C(&D_437750, &D_446E30, 1, 1); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047558.s")
 

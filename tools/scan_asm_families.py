@@ -88,6 +88,8 @@ class Owner:
     calls: list[str] = field(default_factory=list)
     globals: list[str] = field(default_factory=list)
     global_declarations: dict[str, str] = field(default_factory=dict)
+    function_declarations: dict[str, str] = field(default_factory=dict)
+    function_uses: set[str] = field(default_factory=set)
     jump_tables: list[str] = field(default_factory=list)
     memory_accesses: list[MemoryAccess] = field(default_factory=list)
     bounds: list[int] = field(default_factory=list)
@@ -283,6 +285,25 @@ def extract_global_declarations(text: str) -> dict[str, str]:
     return declarations
 
 
+def extract_function_declarations(text: str) -> dict[str, str]:
+    """Find source-level prototypes/definitions usable by wrapper candidates."""
+    declarations: dict[str, str] = {}
+    pattern = re.compile(
+        r"(?m)^\s*(?:extern\s+)?(?P<return>(?:const\s+)?(?:void|[us](?:8|16|32|64))(?:\s*\*)?)\s+"
+        r"(?P<name>func_[0-9A-Fa-f]+)\s*\((?P<params>[^)]*)\)\s*(?:;|\{)"
+    )
+    for match in pattern.finditer(text):
+        declarations[match.group("name")] = (
+            f"extern {match.group('return').strip()} {match.group('name')}"
+            f"({match.group('params').strip()});"
+        )
+    return declarations
+
+
+def extract_function_uses(text: str) -> set[str]:
+    return set(re.findall(r"\b(func_[0-9A-Fa-f]+)\s*\(", text))
+
+
 def wrapper_candidates(owner: Owner, instructions: list[Instruction]) -> list[str]:
     if len(owner.calls) != 1:
         return []
@@ -385,39 +406,81 @@ def wrapper_candidates(owner: Owner, instructions: list[Instruction]) -> list[st
         )
 
     args = ", ".join(expressions)
-    declarations = [owner.global_declarations[name] for name in sorted(global_exprs) if name in owner.global_declarations]
-    for name in sorted(global_exprs):
-        if name not in owner.global_declarations:
-            declarations.append(f"extern u32 {name};")
-    prefix = "\n".join(declarations)
-
     candidates: list[str] = []
     labels: list[str] = []
     type_variants = [("void", "s32"), ("s32", "s32"), ("u32", "s32"),
                      ("void", "u32"), ("s32", "u32"), ("u32", "u32")]
     if global_exprs:
         type_variants.extend([("void", "void *"), ("s32", "void *")])
-    for return_type, parameter_type in type_variants:
-        # The wrapper's own parameters are still ordinary register-sized
-        # values.  A loaded global, however, is commonly a pointer; declaring
-        # that callee argument as ``s32`` makes the generated candidate fail
-        # before comparison.  Keep those types independent in the matrix.
-        parameters = ", ".join(
-            f"{parameter_type} arg{i}" for i in range(arg_count)
-        ) or "void"
-        callee_types = []
-        for expression in expressions:
-            if expression.startswith("&") or expression.startswith("D_"):
-                declaration = owner.global_declarations.get(expression.lstrip("&"), "")
-                callee_types.append("void *" if ("*" in declaration or "[" in declaration or not declaration) else parameter_type)
-            else:
-                callee_types.append(parameter_type)
-        prototype = ", ".join(callee_types)
-        body = f"{owner.calls[0]}({args});" if return_type == "void" else f"return {owner.calls[0]}({args});"
-        declaration = f"extern {return_type} {owner.calls[0]}({prototype});"
-        code = f"{prefix + chr(10) if prefix else ''}{declaration}\n{return_type} {owner.function}({parameters}) {{ {body} }}"
-        candidates.append(code)
-        labels.append(f"wrapper-{return_type.replace(' ', '_')}-{parameter_type.replace(' ', '_')}")
+    # A loaded global is usually a pointer, while an address-form global is a
+    # scalar whose address is passed onward.  The old fallback declared every
+    # unknown global as ``u32`` even for the former, which made all generated
+    # pointer wrappers fail at compile time.  Keep both ABI hypotheses in the
+    # matrix: pointer first (the common case), then the scalar fallback.
+    loaded_globals = {
+        expression for expression in expressions
+        if expression.startswith("D_") and expression not in owner.global_declarations
+    }
+    global_decl_variants: list[tuple[str, str]] = []
+    loaded_kinds = ("pointer", "scalar") if loaded_globals else ("known",)
+    for loaded_kind in loaded_kinds:
+        declarations = [
+            owner.global_declarations[name]
+            for name in sorted(global_exprs)
+            if name in owner.global_declarations
+        ]
+        for name in sorted(global_exprs):
+            if name not in owner.global_declarations:
+                declaration_type = "void *" if loaded_kind == "pointer" and name in loaded_globals else "u32"
+                declarations.append(f"extern {declaration_type} {name};")
+        global_decl_variants.append((loaded_kind, "\n".join(declarations)))
+
+    for loaded_kind, prefix in global_decl_variants:
+        for return_type, parameter_type in type_variants:
+            # The wrapper's own parameters are still ordinary register-sized
+            # values.  A loaded global, however, is commonly a pointer;
+            # declaring that callee argument as ``s32`` makes the generated
+            # candidate fail before comparison.  Keep those types independent
+            # in the matrix and retain a scalar fallback for ambiguous data.
+            parameters = ", ".join(
+                f"{parameter_type} arg{i}" for i in range(arg_count)
+            ) or "void"
+            callee_types = []
+            for expression in expressions:
+                if expression.startswith("&") or expression.startswith("D_"):
+                    declaration = owner.global_declarations.get(expression.lstrip("&"), "")
+                    if expression in loaded_globals:
+                        callee_types.append("void *" if loaded_kind == "pointer" else parameter_type)
+                    else:
+                        callee_types.append("void *" if ("*" in declaration or "[" in declaration or not declaration) else parameter_type)
+                else:
+                    callee_types.append(parameter_type)
+            prototype = ", ".join(callee_types)
+            body = f"{owner.calls[0]}({args});" if return_type == "void" else f"return {owner.calls[0]}({args});"
+            declaration = owner.function_declarations.get(owner.calls[0], "")
+            if declaration:
+                params_match = re.search(r"\(([^)]*)\)", declaration)
+                declared_params = params_match.group(1).strip() if params_match else ""
+                declared_arity = (
+                    0 if not declared_params or declared_params == "void"
+                    else declared_params.count(",") + 1
+                )
+                if declared_arity != len(expressions):
+                    declaration = ""
+            if not declaration:
+                # If the source already calls this target elsewhere without a
+                # visible prototype (for example a zero-argument convenience
+                # wrapper), an old-style declaration avoids imposing a
+                # conflicting prototype on that call site.  The candidate's
+                # own call still carries the ABI-shaped argument expressions.
+                if owner.calls[0] in owner.function_uses:
+                    declaration = f"extern {return_type} {owner.calls[0]}();"
+                else:
+                    declaration = f"extern {return_type} {owner.calls[0]}({prototype});"
+            code = f"{prefix + chr(10) if prefix else ''}{declaration}\n{return_type} {owner.function}({parameters}) {{ {body} }}"
+            candidates.append(code)
+            suffix = f"-{loaded_kind}" if loaded_globals else ""
+            labels.append(f"wrapper-{return_type.replace(' ', '_')}-{parameter_type.replace(' ', '_')}{suffix}")
     owner.candidate_labels = labels
     return candidates
 
@@ -574,6 +637,8 @@ def build_owner(function: str, source_path: Path, asm_path: Path, asm_root: Path
         calls=calls,
         globals=globals_,
         global_declarations=extract_global_declarations(source_text),
+        function_declarations=extract_function_declarations(source_text),
+        function_uses=extract_function_uses(source_text),
         jump_tables=jump_tables,
         memory_accesses=accesses,
         bounds=bounds,
@@ -591,6 +656,8 @@ def json_owner(owner: Owner) -> dict:
     # already records the referenced globals and should not repeat every
     # declaration in a large source file for every owner.
     value.pop("global_declarations", None)
+    value.pop("function_declarations", None)
+    value.pop("function_uses", None)
     value["memory_accesses"] = [asdict(item) for item in owner.memory_accesses]
     return value
 
