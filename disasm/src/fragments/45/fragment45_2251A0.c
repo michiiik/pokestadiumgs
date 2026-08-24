@@ -101,7 +101,7 @@ extern void func_80024F20(void); void func_8AB00BA4(void) { func_80024F20(); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB01288.s")
+void func_8AB01288(void) { extern u16 D_8AB12692; extern u16 D_8AB12694; extern u16 D_8AB12698; D_8AB12692 = 0; D_8AB12694 = 0; D_8AB12698 = 0; }
 #endif
 
 #ifdef VERSION_US
@@ -268,7 +268,7 @@ void func_8AB0318C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB03CE8.s")
+extern void func_8AB01288(void); extern void func_8AB02D14(void); void func_8AB03CE8(void) { func_8AB01288(); func_8AB02D14(); }
 #endif
 
 #ifdef VERSION_US
