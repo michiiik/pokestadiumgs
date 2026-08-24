@@ -29,7 +29,11 @@ void func_8160BAC0(u8 *arg0, u8 *arg1, u8 *arg2) { *(s16 *)(arg0 + 0) = *(s16 *)
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E35C0/func_8160BB60.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E35C0/func_8160BBCC.s")
+s32 func_8160BBCC(s16 *arg0, s16 *arg1) {
+    s16 dx = arg0[0] - arg1[0];
+    s16 dy = arg0[1] - arg1[1];
+    return (s16)(dx * dx + dy * dy);
+}
 
 s32 func_8160BC1C(u8 *arg0) {
     return 0;
