@@ -22,7 +22,14 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_34C8B0/func_829115E0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_34C8B0/func_82911850.s")
+extern void func_800088DC(void);
+extern void func_829115E0(void);
+extern void func_80008648(void);
+void func_82911850(void) {
+    func_800088DC();
+    func_829115E0();
+    func_80008648();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_34C8B0/func_82911880.s")
 

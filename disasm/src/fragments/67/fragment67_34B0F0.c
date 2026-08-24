@@ -41,7 +41,14 @@ void func_8290F36C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_34B0F0/func_8290FA00.s")
+extern void func_800088DC(void);
+extern void func_8290F42C(void);
+extern void func_80008648(void);
+void func_8290FA00(void) {
+    func_800088DC();
+    func_8290F42C();
+    func_80008648();
+}
 #endif
 
 #ifdef VERSION_US
@@ -49,7 +56,14 @@ void func_8290F36C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_34B0F0/func_8290FA9C.s")
+extern void func_80064D28(void);
+extern void func_8290E8D8(void);
+extern void func_8290FA00(void);
+void func_8290FA9C(void) {
+    func_80064D28();
+    func_8290E8D8();
+    func_8290FA00();
+}
 #endif
 
 #ifdef VERSION_US

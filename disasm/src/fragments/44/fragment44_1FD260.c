@@ -53,7 +53,12 @@ void func_8AF10938(u8 *arg0, s32 arg1, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF113D8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF12398.s")
+extern void func_800498C4(void);
+extern void func_800499EC(void);
+void func_8AF12398(void) {
+    func_800498C4();
+    func_800499EC();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF123C0.s")
 

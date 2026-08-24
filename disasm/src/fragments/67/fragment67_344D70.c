@@ -385,5 +385,10 @@ void func_8290D72C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290E014.s")
+extern void func_8290DF6C(void);
+extern void func_8290954C(void);
+void func_8290E014(void) {
+    func_8290DF6C();
+    func_8290954C();
+}
 #endif

@@ -34,5 +34,11 @@ void func_8AF07FF0(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F5F20/func_8AF087D4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F5F20/func_8AF0894C.s")
+extern void func_800498C4(void);
+extern void func_800499EC(void);
+void func_8AF0894C(void) {
+    func_800498C4();
+    func_800499EC();
+}
+#pragma C_FUNCTION_PADDING(12)
 #endif

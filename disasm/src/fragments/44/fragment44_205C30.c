@@ -31,5 +31,11 @@ void func_8AF17F0C(u8 *arg0, s32 arg1, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_205C30/func_8AF18888.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_205C30/func_8AF19850.s")
+extern void func_800498C4(void);
+extern void func_800499EC(void);
+void func_8AF19850(void) {
+    func_800498C4();
+    func_800499EC();
+}
+#pragma C_FUNCTION_PADDING(8)
 #endif

@@ -90,7 +90,12 @@ void func_87E07CB0(void) { func_87E07C20(1); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E0A724.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E0A7A0.s")
+extern void func_87E079FC(s32);
+extern void func_87E00590(void);
+void func_87E0A7A0(s32 arg0) {
+    func_87E079FC(arg0 + 0x498);
+    func_87E00590();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E0A7C8.s")
 

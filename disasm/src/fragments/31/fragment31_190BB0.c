@@ -50,7 +50,12 @@ void func_8821EAD8(void) { func_889035FC((D_882347F0 + 88)); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_190BB0/func_8821EB00.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_190BB0/func_8821EC10.s")
+extern void func_88001900(void);
+extern s32 D_880068B8;
+void func_8821EC10(void) {
+    func_88001900();
+    D_880068B8 = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_190BB0/func_8821EC34.s")
 
