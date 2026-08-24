@@ -79,5 +79,10 @@ u8 *func_8414C960(u8 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B9B80/func_8414C98C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B9B80/func_8414C9AC.s")
+extern u8 *func_84154B30(u8);
+void func_8414C9AC(u8 *arg0, u8 arg1) {
+    arg0[0] = arg1;
+    arg0[2] = func_84154B30(0)[1];
+    arg0[3] = func_84154B30(1)[1];
+}
 #endif

@@ -4,7 +4,17 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C40B0/func_84154820.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C40B0/func_841548CC.s")
+extern u8 *D_841951F8[];
+extern u8 D_8419E780[];
+void func_841548CC(u8 arg0) {
+    D_8419E780[arg0 * 0xCC] = D_841951F8[arg0][8];
+    D_8419E780[arg0 * 0xCC + 1] = D_841951F8[arg0][0xA];
+    D_8419E780[arg0 * 0xCC + 2] = D_841951F8[arg0][9];
+    D_8419E780[arg0 * 0xCC + 3] = D_841951F8[arg0][0xB];
+    D_8419E780[arg0 * 0xCC + 4] = D_841951F8[arg0][0xC];
+    D_8419E780[arg0 * 0xCC + 5] = D_841951F8[arg0][0xD];
+    D_8419E780[arg0 * 0xCC + 6] = D_841951F8[arg0][0xE];
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C40B0/func_84154948.s")
 
