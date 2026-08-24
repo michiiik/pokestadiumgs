@@ -30,7 +30,13 @@ extern f32 D_8011EA8C; f32 func_8000FFB0(f32 arg0) { return 256.0f * D_8011EA8C 
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_800105B8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_80010610.s")
+void func_80010610(u8 *arg0, s32 arg1, s32 arg2) {
+    s32 aligned = (arg1 + 0xF) & ~0xF;
+    *(s32 *)(arg0 + 0) = aligned;
+    *(s32 *)(arg0 + 4) = aligned;
+    *(s32 *)(arg0 + 8) = arg2 - (arg1 & 0xF);
+    *(s32 *)(arg0 + 0xC) = 0;
+}
 
 void func_80010638(u8 *arg0) { *(s32 *)(arg0 + 0x10) = 0; *(s32 *)arg0 = 0; *(s32 *)(arg0 + 8) = *(s32 *)(arg0 + 4); }
 
