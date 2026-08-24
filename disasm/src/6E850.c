@@ -22,7 +22,7 @@ f32 func_8006DC94(f32 arg0) { if (arg0 < 0.0f) { arg0 = -arg0; } return arg0; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_8006DDB0.s")
+extern u8 D_8009E1C4[]; s32 func_8006DDB0(s16 *arg0,s32 arg1){s16 v=arg0[arg1]; s16 r=*(s16*)(D_8009E1C4+(v<<1)); if(r>0)return r; return 0;}
 #endif
 
 #ifdef VERSION_US
