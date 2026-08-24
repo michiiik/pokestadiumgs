@@ -69,11 +69,11 @@ void func_8411FDA4(s32 arg0, s32 arg1) { func_841125F4(func_8411F750(arg0), 9); 
 
 void func_8411FDD0(s32 arg0, s32 arg1) { func_841125F4(func_8411F750(arg0), 0xB); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_8411FDFC.s")
+void func_8411FDFC(s32 arg0, s32 arg1) { func_841125F4(func_8411F750(arg0), 0xD); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_8411FE28.s")
+void func_8411FE28(s32 arg0, s32 arg1) { func_841125F4(func_8411F750(arg0), 0x15); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_8411FE54.s")
+void func_8411FE54(s32 arg0, s32 arg1) { func_841125F4(func_8411F750(arg0), 0x1C); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_8411FE80.s")
 
