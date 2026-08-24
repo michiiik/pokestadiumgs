@@ -181,7 +181,12 @@ f32 func_80070B7C(f32 arg0) { if ((f64)arg0 < 0.0) { arg0 = -arg0; } return arg0
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_80070BA4.s")
+void func_80070BA4(f32 a0, f32 a1, f32 a2, f32 a3, f32 a4, f32 a5,
+                   f32 *o0, f32 *o1, f32 *o2) {
+    *o0 = (a1 * a5) - (a2 * a4);
+    *o1 = (a2 * a3) - (a0 * a5);
+    *o2 = (a0 * a4) - (a1 * a3);
+}
 #endif
 
 #ifdef VERSION_US
