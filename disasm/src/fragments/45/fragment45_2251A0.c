@@ -26,11 +26,11 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB003A4.s")
+extern void func_8004C8C0(void); void func_8AB003A4(void) { func_8004C8C0(); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB003C4.s")
+extern void func_8004C4B0(void); void func_8AB003C4(void) { func_8004C4B0(); }
 #endif
 
 #ifdef VERSION_US
@@ -74,7 +74,7 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB00B78.s")
+extern s32 func_800226C0(void); void func_8AB00B78(void) { func_800226C0(); }
 #endif
 
 #ifdef VERSION_US
@@ -85,7 +85,7 @@ void func_8AB00B98(u8 *arg0, u32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB00BA4.s")
+extern void func_80024F20(void); void func_8AB00BA4(void) { func_80024F20(); }
 #endif
 
 #ifdef VERSION_US

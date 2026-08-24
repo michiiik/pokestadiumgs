@@ -4,7 +4,7 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2324B0/func_8AB0D330.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2324B0/func_8AB0D4A4.s")
+extern s16 D_8AB17238; void func_8AB0D4A4(void) { D_8AB17238 += 1; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2324B0/func_8AB0D4BC.s")
 
