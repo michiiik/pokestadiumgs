@@ -65,7 +65,10 @@ u8 *func_84156550(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C50B0/func_8415655C.s")
+extern u8 D_8419EE00[];
+u8 *func_8415655C(u8 arg0) {
+    return D_8419EE00 + arg0 * 0x132;
+}
 #endif
 
 #ifdef VERSION_US
@@ -73,11 +76,17 @@ u8 *func_84156550(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C50B0/func_841565E0.s")
+extern u8 D_8419EE00[];
+u8 *func_841565E0(u8 arg0) {
+    return D_8419EE00 + arg0 * 0x132 + 2;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C50B0/func_84156618.s")
+extern u8 D_8419EE12[];
+s32 func_84156618(u8 arg0, u8 arg1, u8 arg2) {
+    return (D_8419EE12[arg0 * 0x132 + arg1 * 0x18] & arg2) != 0;
+}
 #endif
 
 #ifdef VERSION_US
