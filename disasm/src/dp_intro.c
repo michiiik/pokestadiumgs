@@ -74,7 +74,12 @@ void func_80001F08(void) { extern OSMesgQueue D_800AB3E4; osRecvMesg(&D_800AB3E4
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_80001F60.s")
+void func_80001F60(s32 arg0) {
+    while (arg0-- > 0) {
+        func_80001F34(0);
+        func_80001F08();
+    }
+}
 #endif
 
 #ifdef VERSION_US
