@@ -963,6 +963,24 @@ def parse_source(f, opts, out_dependencies, print_source=None):
         elif line in ("GLOBAL_ASM(", "#pragma GLOBAL_ASM("):
             global_asm = GlobalAsmBlock("GLOBAL_ASM block at line " + str(line_no))
             start_index = len(output_lines)
+        elif line.startswith('#pragma C_FUNCTION_PADDING(') and line.endswith(')'):
+            # CFE does not emit the alignment nops that are present at the
+            # end of some original assembly owners.  Keep those bytes as a
+            # declarative layout marker rather than a second assembly owner.
+            value = line[len('#pragma C_FUNCTION_PADDING('):-1].strip()
+            try:
+                padding = int(value, 0)
+            except ValueError:
+                raise Failure("C_FUNCTION_PADDING argument must be an integer: " + raw_line)
+            if padding <= 0 or padding % 4 != 0:
+                raise Failure("C_FUNCTION_PADDING argument must be a positive multiple of 4: " + raw_line)
+            block = GlobalAsmBlock("C_FUNCTION_PADDING at line " + str(line_no))
+            block.process_line('glabel ' + state.make_name('padding'), output_enc)
+            for _ in range(padding // 4):
+                block.process_line('nop', output_enc)
+            src, fn = block.finish(state)
+            output_lines[-1] = '\n'.join(src)
+            asm_functions.append(fn)
         elif (
             (line.startswith('GLOBAL_ASM("') or line.startswith('#pragma GLOBAL_ASM("'))
             and line.endswith('")')

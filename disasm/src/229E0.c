@@ -1105,7 +1105,7 @@ void func_800355D4(void) {
 #ifdef VERSION_US
 extern u8 D_80124D00[];
 s32 func_800356CC(s32 arg0) { s32 result = 0; if (arg0 >= 0 && arg0 < 19) result = *((s32 *)((u8 *)D_80124D00 + arg0 * 4)); return result; }
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800356CC_alignment_tail.s")
+#pragma C_FUNCTION_PADDING(12)
 #endif
 
 #ifdef VERSION_US

@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+import io
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -10,6 +12,10 @@ from unittest import mock
 
 import scan_asm_families as scanner
 import try_pragma_compare as runner
+
+ASM_PROCESSOR_DIR = Path(__file__).resolve().parent.parent / "disasm" / "tools" / "asm-processor"
+sys.path.insert(0, str(ASM_PROCESSOR_DIR))
+import asm_processor  # noqa: E402
 
 
 class ScannerTests(unittest.TestCase):
@@ -143,6 +149,29 @@ class ScannerTests(unittest.TestCase):
         )
         self.assertEqual(scanner.bounded_lookup_candidates(owner, instructions), [])
         self.assertTrue(any("suppressed" in note for note in owner.notes))
+
+
+class AsmProcessorPaddingTests(unittest.TestCase):
+    def test_c_function_padding_generates_exact_text_block(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "padding.c"
+            source.write_text("void func(void) {}\n#pragma C_FUNCTION_PADDING(12)\n")
+            output = io.BytesIO()
+            functions, dependencies = asm_processor.run(
+                ["-O2", str(source)], outfile=output
+            )
+
+        self.assertEqual(dependencies, [])
+        self.assertEqual(len(functions), 1)
+        self.assertEqual(functions[0].data[".text"][1], 12)
+        self.assertIn(b"_asmpp_func", output.getvalue())
+
+    def test_c_function_padding_rejects_non_word_size(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "padding.c"
+            source.write_text("#pragma C_FUNCTION_PADDING(10)\n")
+            with self.assertRaises(SystemExit):
+                asm_processor.run(["-O2", str(source)], outfile=io.BytesIO())
 
 
 class RunnerTests(unittest.TestCase):
