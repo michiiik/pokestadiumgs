@@ -7,3 +7,6 @@ startup_timeout_sec = 10
 tool_timeout_sec = 1800
 enabled = true
 default_tools_approval_mode = "prompt"
+
+[mcp_servers.pokemon-stadium-pragma-runner.tools.try_pragma_candidates]
+approval_mode = "auto"
