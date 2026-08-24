@@ -184,7 +184,20 @@ u8 func_84149E58(u8 *arg0) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B7EA0/func_84149EC8.s")
+s32 func_84149EC8(u8 *arg0) {
+    u8 *value;
+    value = *(u8 **)(arg0 + 8);
+    if (value[0x19] & 0x20) {
+        if (value[0x17] & 0x40) {
+            if (arg0[0] == 0x59 || arg0[0] == 0x5A || arg0[0] == 0xDE) {
+                return 0;
+            }
+        }
+        return 1;
+    }
+    return 0;
+}
+void func_84149EC8_padding(void) {}
 
 u8 func_84149F30(u8 *arg0) {
     if (arg0[0] == 0x57) {
