@@ -28,5 +28,5 @@ u8 func_80063014(u8 arg0) { extern u8 D_80097E4F[]; if (arg0 > 0 && arg0 < 0x38)
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/638E0/func_80063044.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/638E0/func_800630C0.s")
+extern u8 func_80062D98(u8);s32 func_800630C0(u8 arg0){return func_80062D98(arg0)<0x14;}
 #endif
