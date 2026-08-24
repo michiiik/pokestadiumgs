@@ -60,6 +60,12 @@ def invalidate_link_outputs(repo_root: Path) -> None:
 
 
 def try_candidate(source_path: Path, function: str, candidate: str) -> int:
+    result, _ = _try_candidate_detailed(source_path, function, candidate)
+    return result
+
+
+def _try_candidate_detailed(source_path: Path, function: str, candidate: str) -> tuple[int, str]:
+    """Run one candidate and identify the phase that accepted or rejected it."""
     source = source_path.read_text()
     candidate = candidate.rstrip() + "\n"
 
@@ -70,7 +76,7 @@ def try_candidate(source_path: Path, function: str, candidate: str) -> int:
     source_after, count = pragma.subn(candidate.rstrip("\n"), source, count=1)
     if count != 1:
         print(f"could not find exactly one pragma for {function}", file=sys.stderr)
-        return 2
+        return 2, "invalid_pragma"
 
     with tempfile.NamedTemporaryFile(
         mode="w", encoding="utf-8", dir=source_path.parent, delete=False
@@ -83,7 +89,7 @@ def try_candidate(source_path: Path, function: str, candidate: str) -> int:
         source_path.write_text(source)
         rebuild_source_object(source_path)
         backup_path.unlink(missing_ok=True)
-        return 2
+        return 2, "compile_failed"
     invalidate_link_outputs(Path(__file__).resolve().parent.parent)
     env = os.environ.copy()
     env.setdefault("MIPS_BINUTILS_PREFIX", "/Users/michaegg/homebrew/bin/mips-linux-gnu-")
@@ -105,11 +111,13 @@ def try_candidate(source_path: Path, function: str, candidate: str) -> int:
         os.utime(source_path, None)
         rebuild_source_object(source_path)
         print(f"REJECTED {function}: restored GLOBAL_ASM")
+        outcome = "compare_rejected"
     else:
         print(f"ACCEPTED {function}: source replacement kept")
+        outcome = "accepted"
 
     backup_path.unlink(missing_ok=True)
-    return result.returncode
+    return result.returncode, outcome
 
 
 def compare_current_tree(repo_root: Path) -> int:
@@ -125,19 +133,37 @@ def compare_current_tree(repo_root: Path) -> int:
     return result.returncode
 
 
-def try_candidates(source_path: Path, blocks: list[tuple[str, str]]) -> tuple[int, list[str]]:
-    """Try in-memory candidates and retain the first winner per function."""
+def try_candidates_detailed(source_path: Path, blocks: list[tuple[str, str]]) -> dict[str, object]:
+    """Try candidates and retain the first winner per function.
+
+    ``attempts`` records whether each hypothesis compiled, compared, or was
+    skipped.  ``accepted`` is only populated when the final combined compare
+    also keeps the batch in the source tree.
+    """
     repo_root = Path(__file__).resolve().parent.parent
     baseline = source_path.read_text()
     accepted: dict[str, str] = {}
-    for function, candidate in blocks:
+    attempts: list[dict[str, object]] = []
+    for index, (function, candidate) in enumerate(blocks):
         if function in accepted:
             print(f"SKIPPED {function}: earlier candidate accepted")
+            attempts.append({
+                "index": index,
+                "function": function,
+                "status": "skipped",
+                "reason": "earlier candidate accepted",
+            })
             continue
         source_path.write_text(baseline)
         os.utime(source_path, None)
         rebuild_source_object(source_path)
-        result = try_candidate(source_path, function, candidate)
+        result, outcome = _try_candidate_detailed(source_path, function, candidate)
+        attempts.append({
+            "index": index,
+            "function": function,
+            "status": outcome,
+            "exit_code": result,
+        })
         if result == 0:
             accepted[function] = candidate
 
@@ -152,14 +178,24 @@ def try_candidates(source_path: Path, blocks: list[tuple[str, str]]) -> tuple[in
             source_path.write_text(baseline)
             os.utime(source_path, None)
             rebuild_source_object(source_path)
-            return 2, []
+            return {
+                "status": 2,
+                "accepted": [],
+                "attempts": attempts,
+                "batch_status": "invalid_pragma",
+            }
     source_path.write_text(combined)
     os.utime(source_path, None)
     if rebuild_source_object(source_path) != 0:
         source_path.write_text(baseline)
         os.utime(source_path, None)
         rebuild_source_object(source_path)
-        return 2, []
+        return {
+            "status": 2,
+            "accepted": [],
+            "attempts": attempts,
+            "batch_status": "combined_compile_failed",
+        }
     if accepted:
         print(f"checking {len(accepted)} accepted candidate(s) together")
         result = compare_current_tree(repo_root)
@@ -168,15 +204,36 @@ def try_candidates(source_path: Path, blocks: list[tuple[str, str]]) -> tuple[in
             os.utime(source_path, None)
             rebuild_source_object(source_path)
             print("combined candidate batch rejected: restored baseline")
-            return result, []
+            return {
+                "status": result,
+                "accepted": [],
+                "attempts": attempts,
+                "batch_status": "combined_compare_rejected",
+            }
     else:
         source_path.write_text(baseline)
         os.utime(source_path, None)
         rebuild_source_object(source_path)
         compare_current_tree(repo_root)
         print("no candidate accepted")
-        return 1, []
-    return 0, list(accepted)
+        return {
+            "status": 1,
+            "accepted": [],
+            "attempts": attempts,
+            "batch_status": "no_candidate_accepted",
+        }
+    return {
+        "status": 0,
+        "accepted": list(accepted),
+        "attempts": attempts,
+        "batch_status": "accepted",
+    }
+
+
+def try_candidates(source_path: Path, blocks: list[tuple[str, str]]) -> tuple[int, list[str]]:
+    """Compatibility wrapper returning the historical two-tuple."""
+    result = try_candidates_detailed(source_path, blocks)
+    return int(result["status"]), list(result["accepted"])
 
 
 def main() -> int:

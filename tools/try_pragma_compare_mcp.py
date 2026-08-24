@@ -35,7 +35,7 @@ def main():
         elif method == "tools/list":
             reply(request_id, {"tools": [{
                 "name": "try_pragma_candidates",
-                "description": "Try in-memory C replacements sequentially and keep only exact ROM matches.",
+                "description": "Try in-memory C replacements sequentially and keep only exact ROM matches. The result includes per-candidate compile/compare diagnostics.",
                 "inputSchema": {"type": "object", "required": ["source", "candidates"], "properties": {
                     "source": {"type": "string", "description": "Source path relative to the repository root."},
                     "candidates": {"type": "array", "items": {"type": "object", "required": ["function", "code"], "properties": {
@@ -60,13 +60,14 @@ def main():
             try:
                 os.dup2(devnull_fd, sys.stdout.fileno())
                 with contextlib.redirect_stdout(captured):
-                    code, accepted = runner.try_candidates(source, blocks)
+                    result = runner.try_candidates_detailed(source, blocks)
             finally:
                 sys.stdout.flush()
                 os.dup2(saved_fd, sys.stdout.fileno())
                 os.close(devnull_fd)
                 os.close(saved_fd)
-            reply(request_id, {"content": [{"type": "text", "text": json.dumps({"status": code, "accepted": accepted})}], "isError": code not in (0, 1)})
+            code = int(result["status"])
+            reply(request_id, {"content": [{"type": "text", "text": json.dumps(result)}], "isError": code not in (0, 1)})
         elif request_id is not None:
             reply(request_id, error={"code": -32601, "message": f"Unknown method: {method}"})
 

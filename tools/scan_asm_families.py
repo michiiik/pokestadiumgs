@@ -39,7 +39,7 @@ LABEL_RE = re.compile(r"(?:glabel|jlabel)\s+([.A-Za-z_][A-Za-z0-9_.]*)")
 GLOBAL_RE = re.compile(r"%(?:hi|lo)\(([^)]+)\)|\b(D_[0-9A-Fa-f]+)\b")
 JUMP_TABLE_RE = re.compile(r"\b(jtbl_[0-9A-Fa-f]+)\b")
 MEMORY_RE = re.compile(
-    r"\b(lbu|lb|lhu|lh|lw|sb|sh|sw)\s+\$[^,]+,\s*(-?(?:0x[0-9A-Fa-f]+|\d+))\(\$([A-Za-z0-9]+)\)"
+    r"\b(lbu|lb|lhu|lh|lw|sb|sh|sw)\s+\$[^,]+,\s*((?:-?(?:0x[0-9A-Fa-f]+|\d+))|%lo\(([^)]+)\))\(\$([A-Za-z0-9]+)\)"
 )
 IMMEDIATE_RE = re.compile(r"(?<![A-Za-z0-9_])(-?(?:0x[0-9A-Fa-f]+|\d+))(?![A-Za-z0-9_])")
 
@@ -53,6 +53,11 @@ SIMPLE_WRAPPER_OPS = {
     "addiu", "addu", "lui", "lw", "move", "nop", "ori", "or", "sw",
     "jal", "jr",
 }
+SIMPLE_LOOKUP_OPS = {
+    "addiu", "addu", "andi", "lbu", "lb", "lhu", "lh", "lw", "lui",
+    "move", "nop", "or", "sll", "sra", "srl", "slti", "sltiu", "slt",
+    "beq", "beqz", "bne", "bnez", "bltz", "bgez", "beql", "bnel", "jr",
+}
 
 
 @dataclass
@@ -65,9 +70,10 @@ class Instruction:
 @dataclass
 class MemoryAccess:
     op: str
-    offset: int
+    offset: int | None
     base: str
     line: int
+    symbol: str | None = None
 
 
 @dataclass
@@ -81,12 +87,14 @@ class Owner:
     instruction_count: int
     calls: list[str] = field(default_factory=list)
     globals: list[str] = field(default_factory=list)
+    global_declarations: dict[str, str] = field(default_factory=dict)
     jump_tables: list[str] = field(default_factory=list)
     memory_accesses: list[MemoryAccess] = field(default_factory=list)
     bounds: list[int] = field(default_factory=list)
     branches: int = 0
     loops: bool = False
     candidate_codes: list[str] = field(default_factory=list)
+    candidate_labels: list[str] = field(default_factory=list)
     notes: list[str] = field(default_factory=list)
 
 
@@ -143,14 +151,13 @@ def extract_memory_accesses(instructions: Iterable[Instruction]) -> list[MemoryA
         if not match:
             continue
         offset = parse_int(match.group(2))
-        if offset is None:
-            continue
         accesses.append(
             MemoryAccess(
                 op=match.group(1),
                 offset=offset,
-                base=match.group(3),
+                base=match.group(4),
                 line=instruction.line,
+                symbol=match.group(3),
             )
         )
     return accesses
@@ -205,13 +212,16 @@ def classify(
     stores = sum(access.op in STORE_OPS for access in accesses)
     notes: list[str] = []
     simple_wrapper_shape = all(instruction.op in SIMPLE_WRAPPER_OPS for instruction in instructions)
-    non_stack_access = any(access.base != "sp" for access in accesses)
+    non_stack_access = any(
+        access.base != "sp" and access.symbol is None for access in accesses
+    )
+    global_stores = any(access.symbol is not None and access.op in STORE_OPS for access in accesses)
 
     if calls and loops and any(call in {"osRecvMesg", "osSendMesg"} for call in calls):
         return "queue_dma_loop", 0.92, ["queue call plus backward branch"]
     if calls and len(calls) >= 2 and not branches and len(instructions) <= 40 and simple_wrapper_shape and not non_stack_access:
         return "multi_call_wrapper", 0.90, ["short call sequence without control-flow branches"]
-    if calls and len(calls) == 1 and not branches and len(instructions) <= 28 and simple_wrapper_shape and not non_stack_access:
+    if calls and len(calls) == 1 and not branches and len(instructions) <= 28 and simple_wrapper_shape and not non_stack_access and not global_stores:
         if narrow_copy >= 2 and stores:
             return "copy_worker", 0.88, ["narrow loads/stores surrounding one worker call"]
         return "direct_wrapper", 0.90, ["single call with epilogue-only control flow"]
@@ -259,6 +269,20 @@ def instruction_immediate(instruction: Instruction) -> int | None:
     return parse_int(tokens[2])
 
 
+def extract_global_declarations(text: str) -> dict[str, str]:
+    declarations: dict[str, str] = {}
+    pattern = re.compile(
+        r"(?m)(?:^|;)\s*(?:extern\s+)?(?P<type>(?:const\s+)?(?:u|s)(?:8|16|32|64)(?:\s*\*)?)\s*"
+        r"(?P<name>D_[0-9A-Fa-f]+)\s*(?P<array>\[[^\]]*\])?\s*;"
+    )
+    for match in pattern.finditer(text):
+        suffix = match.group("array") or ""
+        declarations[match.group("name")] = (
+            f"extern {match.group('type').strip()} {match.group('name')}{suffix};"
+        )
+    return declarations
+
+
 def wrapper_candidates(owner: Owner, instructions: list[Instruction]) -> list[str]:
     if len(owner.calls) != 1:
         return []
@@ -267,31 +291,51 @@ def wrapper_candidates(owner: Owner, instructions: list[Instruction]) -> list[st
         return []
 
     state = {f"$a{i}": f"arg{i}" for i in range(4)}
-    constant_destinations: list[int] = []
+    touched_args = {
+        int(value)
+        for value in re.findall(
+            r"\$a([0-3])", " ".join(i.operands for i in instructions[: call_index + 2])
+        )
+    }
+    global_exprs: set[str] = set()
     # Include the branch-delay instruction: wrappers commonly prepare the
     # final $a0 value there (for example ``jal ...`` / ``addu $a0, ...``).
     setup_instructions = instructions[: call_index + 2]
     for instruction in setup_instructions:
         tokens = operand_tokens(instruction.operands)
-        if len(tokens) < 3:
+        if len(tokens) < 2:
             continue
-        dest, source, third = tokens[0], tokens[1], tokens[2]
+        dest, source = tokens[0], tokens[1]
+        third = tokens[2] if len(tokens) >= 3 else ""
         if dest not in state:
             continue
-        if instruction.op in {"or", "addu"} and third == "$zero" and source in state:
+        if instruction.op == "move" and source in state:
+            state[dest] = state[source]
+        elif instruction.op in {"or", "addu"} and len(tokens) >= 3 and third == "$zero" and source in state:
             state[dest] = state[source]
         elif instruction.op in {"addiu", "ori"} and source == "$zero":
             value = instruction_immediate(instruction)
             if value is not None:
                 state[dest] = str(value)
-                constant_destinations.append(int(dest[-1]) + 1)
+            else:
+                state[dest] = "UNSUPPORTED"
+        elif instruction.op == "addiu" and source in state:
+            value = instruction_immediate(instruction)
+            state[dest] = f"({state[source]} + {value})" if value is not None else "UNSUPPORTED"
+        elif instruction.op == "lui":
+            match = re.search(r"%hi\((D_[0-9A-Fa-f]+)\)", instruction.operands)
+            state[dest] = f"&{match.group(1)}" if match else "UNSUPPORTED"
+        elif instruction.op in {"lw", "lbu", "lb", "lhu", "lh"}:
+            match = re.search(r"%lo\((D_[0-9A-Fa-f]+)\)", instruction.operands)
+            if match:
+                state[dest] = match.group(1)
+                global_exprs.add(match.group(1))
             else:
                 state[dest] = "UNSUPPORTED"
         else:
             state[dest] = "UNSUPPORTED"
 
-    arg_count = find_arg_count(setup_instructions, len(setup_instructions))
-    call_arg_count = max([arg_count, *constant_destinations], default=0)
+    call_arg_count = max(touched_args, default=-1) + 1
     if call_arg_count == 0 or call_arg_count > 4:
         return []
     expressions = [state[f"$a{i}"] for i in range(call_arg_count)]
@@ -305,24 +349,116 @@ def wrapper_candidates(owner: Owner, instructions: list[Instruction]) -> list[st
         owner.notes.append("return value is consumed; manual return-type review needed")
         return []
 
-    parameters = ", ".join(f"s32 arg{i}" for i in range(arg_count))
-    prototype = ", ".join("s32" for _ in range(call_arg_count))
-    args = ", ".join(expressions)
-    return [
-        f"extern void {owner.calls[0]}({prototype});\n"
-        f"void {owner.function}({parameters}) {{ {owner.calls[0]}({args}); }}"
+    arg_indices = [
+        int(value)
+        for expression in expressions
+        for value in re.findall(r"\barg([0-3])\b", expression)
     ]
+    arg_count = max(arg_indices, default=-1) + 1
+    if any(
+        expression.startswith("&") or expression.startswith("D_")
+        for expression in expressions
+    ):
+        global_exprs.update(
+            expression.lstrip("&")
+            for expression in expressions
+            if expression.lstrip("&").startswith("D_")
+        )
+
+    args = ", ".join(expressions)
+    declarations = [owner.global_declarations[name] for name in sorted(global_exprs) if name in owner.global_declarations]
+    for name in sorted(global_exprs):
+        if name not in owner.global_declarations:
+            declarations.append(f"extern u32 {name};")
+    prefix = "\n".join(declarations)
+
+    candidates: list[str] = []
+    labels: list[str] = []
+    type_variants = [("void", "s32"), ("s32", "s32"), ("u32", "s32"),
+                     ("void", "u32"), ("s32", "u32"), ("u32", "u32")]
+    if global_exprs:
+        type_variants.extend([("void", "void *"), ("s32", "void *")])
+    for return_type, parameter_type in type_variants:
+        # The wrapper's own parameters are still ordinary register-sized
+        # values.  A loaded global, however, is commonly a pointer; declaring
+        # that callee argument as ``s32`` makes the generated candidate fail
+        # before comparison.  Keep those types independent in the matrix.
+        parameters = ", ".join(
+            f"{parameter_type} arg{i}" for i in range(arg_count)
+        ) or "void"
+        callee_types = []
+        for expression in expressions:
+            if expression.startswith("&") or expression.startswith("D_"):
+                declaration = owner.global_declarations.get(expression.lstrip("&"), "")
+                callee_types.append("void *" if ("*" in declaration or "[" in declaration or not declaration) else parameter_type)
+            else:
+                callee_types.append(parameter_type)
+        prototype = ", ".join(callee_types)
+        body = f"{owner.calls[0]}({args});" if return_type == "void" else f"return {owner.calls[0]}({args});"
+        declaration = f"extern {return_type} {owner.calls[0]}({prototype});"
+        code = f"{prefix + chr(10) if prefix else ''}{declaration}\n{return_type} {owner.function}({parameters}) {{ {body} }}"
+        candidates.append(code)
+        labels.append(f"wrapper-{return_type.replace(' ', '_')}-{parameter_type.replace(' ', '_')}")
+    owner.candidate_labels = labels
+    return candidates
 
 
 def bounded_lookup_candidates(owner: Owner, instructions: list[Instruction]) -> list[str]:
     if not owner.bounds or not owner.globals:
+        owner.notes.append("auto lookup translation suppressed: missing bound or global evidence")
         return []
-    global_name = next((value for value in owner.globals if value.startswith("D_")), None)
+    global_name = next(
+        (
+            access.symbol
+            for access in owner.memory_accesses
+            if access.op in LOAD_OPS and access.symbol and access.symbol.startswith("D_")
+        ),
+        next((value for value in owner.globals if value.startswith("D_")), None),
+    )
     if global_name is None:
+        owner.notes.append("auto lookup translation suppressed: no direct D_ global")
+        return []
+
+    # A family label is intentionally broad, but generated C is limited to a
+    # short single-table lookup.  This prevents a long state machine that
+    # happens to contain a bound and a global from producing misleading code.
+    if (
+        owner.instruction_count > 32
+        or owner.branches > 4
+        or any(instruction.op not in SIMPLE_LOOKUP_OPS for instruction in instructions)
+        or any(access.op in STORE_OPS for access in owner.memory_accesses)
+    ):
+        owner.notes.append(
+            "auto lookup translation suppressed: control flow or side effects exceed the simple-table shape"
+        )
+        return []
+    bound_instruction = next(
+        (
+            instruction
+            for instruction in instructions
+            if instruction.op in {"slti", "sltiu"}
+            and len(operand_tokens(instruction.operands)) >= 3
+            and operand_tokens(instruction.operands)[1] == "$a0"
+        ),
+        None,
+    )
+    global_loads = [
+        access for access in owner.memory_accesses
+        if access.op in LOAD_OPS and access.symbol == global_name
+    ]
+    if bound_instruction is None or len(global_loads) != 1:
+        owner.notes.append(
+            "auto lookup translation suppressed: index register or one-table-load evidence is incomplete"
+        )
         return []
     bound = owner.bounds[0]
-    signed = any(instruction.op.startswith("bltz") for instruction in instructions)
-    condition = f"arg0 >= 0 && arg0 < {bound}" if signed else f"(u32)arg0 < {bound}"
+    has_negative_check = any(instruction.op.startswith("bltz") for instruction in instructions)
+    if bound_instruction.op == "sltiu":
+        conditions = [f"(u32)arg0 < {bound}"]
+    elif has_negative_check:
+        conditions = [f"arg0 >= 0 && arg0 < {bound}"]
+    else:
+        conditions = [f"arg0 < {bound}", f"arg0 >= 0 && arg0 < {bound}"]
 
     shift = 0
     stride = 1
@@ -335,35 +471,55 @@ def bounded_lookup_candidates(owner: Owner, instructions: list[Instruction]) -> 
                 stride = 1 << parsed
                 break
 
-    load = next((access for access in owner.memory_accesses if access.op in LOAD_OPS), None)
-    if load is not None:
-        type_info = {
-            "lw": ("s32", "s32"),
-            "lbu": ("u8", "u8"),
-            "lb": ("s8", "s8"),
-            "lhu": ("u16", "u16"),
-            "lh": ("s16", "s16"),
-        }
-        result_type, element_type = type_info[load.op]
-        if stride == 1:
-            expression = f"{global_name}[arg0]"
-            declaration = f"extern {element_type} {global_name}[];"
-        else:
-            expression = f"*(({element_type} *)((u8 *){global_name} + arg0 * {stride}))"
-            declaration = f"extern u8 {global_name}[];"
-        return [
-            f"{declaration}\n{result_type} {owner.function}(s32 arg0) {{ "
-            f"{result_type} result = 0; if ({condition}) result = {expression}; return result; }}"
-        ]
+    load = global_loads[0]
+    type_info = {
+        "lw": ("s32", "s32"),
+        "lbu": ("u8", "u8"),
+        "lb": ("s8", "s8"),
+        "lhu": ("u16", "u16"),
+        "lh": ("s16", "s16"),
+    }
+    result_type, element_type = type_info[load.op]
+    known_declaration = owner.global_declarations.get(global_name)
+    if known_declaration:
+        base = global_name if ("*" in known_declaration or "[" in known_declaration) else f"&{global_name}"
+        declarations = [known_declaration]
+    else:
+        base = global_name
+        declarations = []
 
-    # A bounded address calculation with no load is the pointer-return form.
-    if stride <= 0:
-        return []
-    return [
-        f"extern u8 {global_name}[];\n"
-        f"u8 *{owner.function}(s32 arg0) {{ u8 *result = NULL; "
-        f"if ({condition}) result = {global_name} + arg0 * {stride}; return result; }}"
-    ]
+    candidates: list[str] = []
+    labels: list[str] = []
+    index_forms = ["arg0", "(u32)arg0"] if not has_negative_check else ["arg0"]
+    expression_forms: list[tuple[str, str]] = []
+    if stride == 1 and not known_declaration:
+        expression_forms.append((f"{global_name}[INDEX]", f"extern {element_type} {global_name}[];"))
+    elif stride == 1:
+        expression_forms.append((f"*((({element_type} *){base}) + INDEX)", ""))
+    expression_forms.append(
+        (
+            f"*(({element_type} *)((u8 *){base} + INDEX * {stride}))",
+            "" if known_declaration else f"extern u8 {global_name}[];",
+        )
+    )
+    for condition in conditions:
+        for index in index_forms:
+            for expression_template, declaration in expression_forms:
+                expression = expression_template.replace("INDEX", index)
+                declaration_lines = declarations + ([declaration] if declaration else [])
+                prefix = "\n".join(dict.fromkeys(declaration_lines))
+                body = (
+                    f"{result_type} result = 0; if ({condition}) result = {expression}; return result;"
+                )
+                code = f"{prefix + chr(10) if prefix else ''}{result_type} {owner.function}(s32 arg0) {{ {body} }}"
+                candidates.append(code)
+                labels.append(f"lookup-init-{condition.replace(' ', '_')}-{index.replace('(', '').replace(')', '')}-{len(candidates)}")
+                ternary = f"return ({condition}) ? {expression} : 0;"
+                code = f"{prefix + chr(10) if prefix else ''}{result_type} {owner.function}(s32 arg0) {{ {ternary} }}"
+                candidates.append(code)
+                labels.append(f"lookup-ternary-{condition.replace(' ', '_')}-{index.replace('(', '').replace(')', '')}-{len(candidates)}")
+    owner.candidate_labels = labels[:10]
+    return candidates[:10]
 
 
 def generate_candidates(owner: Owner, instructions: list[Instruction]) -> list[str]:
@@ -377,6 +533,7 @@ def generate_candidates(owner: Owner, instructions: list[Instruction]) -> list[s
 
 def build_owner(function: str, source_path: Path, asm_path: Path, asm_root: Path) -> Owner:
     text = asm_path.read_text(encoding="utf-8")
+    source_text = source_path.read_text(encoding="utf-8")
     label, instructions, labels = parse_instructions(text)
     calls = extract_calls(instructions)
     globals_ = extract_globals(text)
@@ -397,6 +554,7 @@ def build_owner(function: str, source_path: Path, asm_path: Path, asm_root: Path
         instruction_count=len(instructions),
         calls=calls,
         globals=globals_,
+        global_declarations=extract_global_declarations(source_text),
         jump_tables=jump_tables,
         memory_accesses=accesses,
         bounds=bounds,
@@ -410,6 +568,10 @@ def build_owner(function: str, source_path: Path, asm_path: Path, asm_root: Path
 
 def json_owner(owner: Owner) -> dict:
     value = asdict(owner)
+    # Declarations are an internal candidate-generation aid; the manifest
+    # already records the referenced globals and should not repeat every
+    # declaration in a large source file for every owner.
+    value.pop("global_declarations", None)
     value["memory_accesses"] = [asdict(item) for item in owner.memory_accesses]
     return value
 
@@ -421,10 +583,12 @@ def render_bundle(owners: list[Owner]) -> str:
         "",
     ]
     for owner in owners:
-        for candidate in owner.candidate_codes:
+        labels = owner.candidate_labels or [f"variant-{i + 1}" for i in range(len(owner.candidate_codes))]
+        for candidate_index, candidate in enumerate(owner.candidate_codes):
+            label = labels[candidate_index] if candidate_index < len(labels) else f"variant-{candidate_index + 1}"
             lines.extend(
                 [
-                    f"/* family: {owner.family}; asm: {owner.asm}; calls: {','.join(owner.calls)} */",
+                    f"/* family: {owner.family}; variant: {label}; asm: {owner.asm}; calls: {','.join(owner.calls)} */",
                     f"/* candidate: {owner.function} */",
                     candidate,
                     "/* end candidate */",
@@ -494,7 +658,7 @@ def main() -> int:
         )
 
     manifest = {
-        "schema": 1,
+        "schema": 2,
         "tool": "scan_asm_families.py",
         "owners": [json_owner(owner) for owner in owners],
         "bundles": bundles,
