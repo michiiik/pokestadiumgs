@@ -100,7 +100,7 @@ void func_800049B8(void) { func_800029E0(); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80004A40.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80004B4C.s")
+void func_80004B4C(s32 arg0,s32 arg1){func_80004A40(0,arg0,arg1);}
 
 void func_80004B78(void) { func_80004A40(); }
 
