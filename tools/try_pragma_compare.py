@@ -215,6 +215,32 @@ def _function_bytes(object_path: Path, function: str) -> bytes | None:
     return text[offset : offset + size]
 
 
+def _function_mismatch_details(
+    object_path: Path,
+    function: str,
+    expected: bytes,
+    actual: bytes | None,
+) -> dict[str, object]:
+    """Summarize a rejected probe without dumping the candidate object."""
+    details: dict[str, object] = {"expected_size": len(expected)}
+    symbol = _object_symbol(object_path, function)
+    if symbol is not None:
+        details["actual_size"] = symbol[1]
+    if actual is None:
+        details["first_diff_offset"] = None
+        return details
+    first_diff = next(
+        (index for index, (left, right) in enumerate(zip(expected, actual)) if left != right),
+        min(len(expected), len(actual)),
+    )
+    details["first_diff_offset"] = first_diff
+    if first_diff < len(expected):
+        details["expected_byte"] = f"{expected[first_diff]:02x}"
+    if first_diff < len(actual):
+        details["actual_byte"] = f"{actual[first_diff]:02x}"
+    return details
+
+
 def _replace_candidate_text(source: str, function: str, candidate: str) -> str | None:
     pragma = re.compile(
         rf'^#pragma GLOBAL_ASM\("asm/us/nonmatchings/[^\"]+/{re.escape(function)}\.s"\)$',
@@ -281,10 +307,14 @@ def _probe_one(
                     "probe_reason": "missing_function_bytes",
                 }
             if actual != expected:
-                return {
+                diagnostic = {
                     "status": "probe_rejected",
                     "probe_reason": "function_bytes_differ",
                 }
+                diagnostic.update(
+                    _function_mismatch_details(object_path, function, expected, actual)
+                )
+                return diagnostic
             return {"status": "probe_match"}
         finally:
             _remove_probe_outputs(object_path)
