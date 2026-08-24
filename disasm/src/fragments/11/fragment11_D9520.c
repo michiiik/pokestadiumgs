@@ -60,7 +60,9 @@ void func_8160335C(u8 *arg0, s32 arg1) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81603598.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81603984.s")
+extern void *D_8160BDB8;
+extern void func_8004D19C(s32, s32, void *, s32, s32);
+void func_81603984(s32 arg0, s32 arg1) { func_8004D19C(arg0, arg1, D_8160BDB8, 0, 0); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_816039B0.s")
 
@@ -134,7 +136,9 @@ void func_8160335C(u8 *arg0, s32 arg1) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_816073A0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81607408.s")
+extern u32 D_800D0510;
+extern void func_816028E4(void *, s32, s32, s32, s32);
+void func_81607408(void) { func_816028E4(&D_800D0510, 0, 0, 640, 480); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81607440.s")
 
@@ -158,7 +162,9 @@ void func_8160335C(u8 *arg0, s32 arg1) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_816083A4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_8160852C.s")
+extern void *D_8160BDB4;
+extern void func_8004D1FC(void *);
+void func_8160852C(void) { func_8004D1FC(D_8160BDB4); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81608550.s")
 
