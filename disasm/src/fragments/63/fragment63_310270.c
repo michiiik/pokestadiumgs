@@ -85,7 +85,13 @@ void func_87E0D73C(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_310270/func_87E0DB40.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_310270/func_87E0DC78.s")
+s32 func_87E0DC78(u8 *arg0) {
+    s32 result = 0;
+    if (*(s32 *)(arg0 + 0x3FC) >= 0x29) {
+        result = 1;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_310270/func_87E0DC98.s")
 

@@ -90,7 +90,10 @@ void func_87E13654(void) {
     *(u32 *)D_87E1EBD8 |= 4;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E1366C.s")
+void func_87E1366C(void) {
+    extern u8 *D_87E1EBD8;
+    *(u32 *)D_87E1EBD8 &= 0xFFFFFFFB;
+}
 
 extern u8 *D_87E1EBD8;
 s32 func_87E13688(void) {
