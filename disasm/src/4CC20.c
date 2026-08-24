@@ -4,7 +4,10 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C020.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C088.s")
+void func_8004C088(s32 arg0, s32 arg1) {
+    extern s32 D_80097120;
+    D_80097120 = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C09C.s")
 

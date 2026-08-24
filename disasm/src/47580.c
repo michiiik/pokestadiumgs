@@ -56,7 +56,9 @@ void func_800472B8(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047318.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047348.s")
+void func_80047348(s32 arg0, s32 arg1) {
+    D_80126F50 = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_8004735C.s")
 
