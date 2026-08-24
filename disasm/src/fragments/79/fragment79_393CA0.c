@@ -1315,7 +1315,10 @@ s32 func_841349C0(f32 arg0) { s32 value = (s32)arg0; f64 fraction = (f64)(arg0 -
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84134D04.s")
+extern u8 D_84195280[];
+s32 func_84134D04(void) {
+    return *(u16 *)(&D_84195280[D_84195280[0x4D81] * 0x280 + 4]);
+}
 #endif
 
 #ifdef VERSION_US
@@ -1327,11 +1330,17 @@ s32 func_841349C0(f32 arg0) { s32 value = (s32)arg0; f64 fraction = (f64)(arg0 -
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84134DD8.s")
+extern u8 D_84195280[];
+void func_84134DD8(u8 arg0) {
+    D_84195280[D_84195280[0x4D81] * 0x280 + 8] = arg0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84134E00.s")
+extern u8 D_84195280[];
+void func_84134E00(u8 arg0) {
+    D_84195280[D_84195280[0x4D81] * 0x280 + 9] |= arg0;
+}
 #endif
 
 #ifdef VERSION_US
