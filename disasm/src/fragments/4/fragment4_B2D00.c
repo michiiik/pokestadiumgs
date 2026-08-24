@@ -12,7 +12,10 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_B2D00/func_81804954.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_B2D00/func_81804A00.s")
+extern void func_81804858(s32);
+void func_81804A00(u8 *arg0) {
+    func_81804858(*(s32 *)arg0);
+}
 
 s32 func_81804A20(u8 *arg0) {
     return *(u16 *)(arg0 + 0x1A) == 0;

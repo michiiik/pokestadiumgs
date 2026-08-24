@@ -84,7 +84,10 @@ void func_81603984(s32 arg0, s32 arg1) { func_8004D19C(arg0, arg1, D_8160BDB8, 0
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_816054D8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_816054FC.s")
+extern void func_81604A44(s32, s32, s32, s32, s32);
+void func_816054FC(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    func_81604A44(arg0, arg1, arg2, arg3, 0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_8160551C.s")
 

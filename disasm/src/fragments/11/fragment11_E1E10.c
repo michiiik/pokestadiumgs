@@ -6,7 +6,10 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E1E10/func_8160A2E8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E1E10/func_8160A31C.s")
+s32 func_8160A31C(s32 arg0) {
+    s32 quotient = arg0 / 3;
+    return quotient * 65 + 9;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E1E10/func_8160A33C.s")
 
