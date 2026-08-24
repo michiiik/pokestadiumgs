@@ -130,7 +130,13 @@ void func_84156E58(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84156EFC.s")
+extern s32 D_800D0510;
+extern u8 D_841A4D08[];
+extern s32 func_8415DBBC();
+void func_84156EFC(void) {
+    #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
+    s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp) D_800D0510 = func_8415DBBC(D_800D0510);
+}
 #endif
 
 #ifdef VERSION_US
@@ -143,7 +149,13 @@ void func_84156FC8(void) { func_8415BD48(0); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84156FE8.s")
+extern s32 D_800D0510;
+extern u8 D_841A4D08[];
+extern s32 func_8415C2E0();
+void func_84156FE8(void) {
+    #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
+    s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp) D_800D0510 = func_8415C2E0(D_800D0510);
+}
 #endif
 
 #ifdef VERSION_US

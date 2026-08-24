@@ -1543,15 +1543,15 @@ void func_841362C8(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84136D00.s")
+extern u8 D_84195280[]; u8 *func_84136D00(void) { return &D_84195280[D_84195280[0x4D80] * 0x280]; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84136D20.s")
+extern u8 D_84195280[]; u8 *func_84136D20(void) { return &D_84195280[D_84195280[0x4D81] * 0x280]; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84136D40.s")
+extern u8 D_84195280[]; extern u8 *D_84186160[]; void func_84136D40(u8 arg0) { if (arg0 < 4) { D_84186160[arg0] = &D_84195280[D_84195280[0x4D81] * 0x280]; } }
 #endif
 
 #ifdef VERSION_US
