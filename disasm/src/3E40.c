@@ -25,7 +25,17 @@ extern u32 D_800871F0; u32 func_800033A8(void) { return D_800871F0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/3E40/func_800034E4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3E40/func_8000377C.s")
+void func_8000377C(u64 *dest, u32 size) {
+    while (size-- > 0) {
+        *(dest++) = -1;
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3E40/func_800037B8.s")
+s32 func_800037B8(u64 *ptr) {
+    s32 ret = 0;
+    while (*(ptr++) == 0x8040000080400000ULL) {
+        ret++;
+    }
+    return ret * sizeof(*ptr);
+}
 #endif
