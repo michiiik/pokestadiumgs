@@ -22,5 +22,6 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_31BD80/func_87E18F08.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_31BD80/func_87E1918C.s")
+extern void func_87F0AF4C(s32);
+void func_87E1918C(s32 arg0) { func_87F0AF4C(arg0 + 12); }
 #endif
