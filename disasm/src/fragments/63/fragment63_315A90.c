@@ -19,7 +19,9 @@ void func_87E126B4(s32 arg0) { func_87F0277C((arg0 + 4)); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E127B8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E127FC.s")
+extern u32 D_87E1ABC4;
+extern void func_87E126D4(s32, void *, s32, s32, s32);
+void func_87E127FC(s32 arg0) { func_87E126D4(arg0, &D_87E1ABC4, 0, 30, 4096); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E12830.s")
 
@@ -31,13 +33,21 @@ void func_87E126B4(s32 arg0) { func_87F0277C((arg0 + 4)); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E12B34.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E12BE8.s")
+extern u32 D_87E1AB64;
+extern void func_87E126D4(s32, void *, s32, s32, s32);
+void func_87E12BE8(s32 arg0) { func_87E126D4(arg0, &D_87E1AB64, 0, 15, 8192); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E12C1C.s")
+extern u32 D_87E1AB64;
+extern void func_87E126D4(s32, void *, s32, s32, s32);
+void func_87E12C1C(s32 arg0) { func_87E126D4(arg0, &D_87E1AB64, 2, 15, 8192); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E12C50.s")
+extern u32 D_87E1AB64;
+extern void func_87E126D4(s32, void *, s32, s32, s32);
+void func_87E12C50(s32 arg0) { func_87E126D4(arg0, &D_87E1AB64, 1, 15, 8192); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E12C84.s")
+extern u32 D_87E1AB64;
+extern void func_87E126D4(s32, void *, s32, s32, s32);
+void func_87E12C84(s32 arg0) { func_87E126D4(arg0, &D_87E1AB64, 3, 15, 8192); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E12CB8.s")
 
