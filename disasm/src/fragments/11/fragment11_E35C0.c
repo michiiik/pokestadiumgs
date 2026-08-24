@@ -2,7 +2,10 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E35C0/func_8160BA20.s")
+void func_8160BA20(s16 *arg0, s16 arg1, s16 arg2) {
+    arg0[0] = arg1;
+    arg0[1] = arg2;
+}
 
 void func_8160BA44(s32 arg0, s32 arg1, s32 arg2) {}
 
