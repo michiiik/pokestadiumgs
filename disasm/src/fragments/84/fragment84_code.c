@@ -78,7 +78,9 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/84/fragment84_code/func_8FC00FD0.s")
+extern u32 D_8FC0C2D8;
+extern void func_80060358(s32, void *);
+void func_8FC00FD0(void) { func_80060358(0, &D_8FC0C2D8); }
 #endif
 
 #ifdef VERSION_US

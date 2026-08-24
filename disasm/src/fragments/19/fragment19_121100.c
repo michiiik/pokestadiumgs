@@ -56,7 +56,9 @@ void func_82300F34(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82300F6C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82301088.s")
+extern void _bzero(void *, s32);
+extern u32 D_82305D88;
+void func_82301088(void) { _bzero(&D_82305D88, 224); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_823010B0.s")
 
