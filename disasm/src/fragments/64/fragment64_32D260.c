@@ -6,7 +6,11 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_32D260/func_87F0A61C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_32D260/func_87F0A66C.s")
+void func_87F0A66C(u8 *arg0, u32 *arg1, u32 *arg2) {
+    arg0[0x28] = 2;
+    *(u32 *)(arg0 + 0x2C) = *arg1;
+    *(u32 *)(arg0 + 0x30) = *arg2;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_32D260/func_87F0A688.s")
 
