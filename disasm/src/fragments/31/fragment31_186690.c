@@ -95,9 +95,9 @@ void func_88216520(void) { func_88200134(0, 2); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_8821B758.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_8821B778.s")
+extern u16 D_88234758; s32 func_8821B778(void) { s32 result = 0; if (D_88234758 & 1) { result = 1; } return result; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_8821B79C.s")
+extern u16 D_88234758; s32 func_8821B79C(void) { s32 result = 0; if (D_88234758 & 2) { result = 1; } return result; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_8821B7C0.s")
 
