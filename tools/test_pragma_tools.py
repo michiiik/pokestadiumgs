@@ -150,6 +150,22 @@ class ScannerTests(unittest.TestCase):
         self.assertEqual(scanner.bounded_lookup_candidates(owner, instructions), [])
         self.assertTrue(any("suppressed" in note for note in owner.notes))
 
+    def test_bundle_exposes_stadium1_reference_without_claiming_a_match(self) -> None:
+        owner = scanner.Owner(
+            function="func_wrap",
+            source="synthetic.c",
+            asm="synthetic.s",
+            label="func_wrap",
+            family="direct_wrapper",
+            confidence=1.0,
+            instruction_count=2,
+            stadium1_match=["DisplayList_SetFlagInRange", "normalised evidence"],
+            candidate_codes=["void func_wrap(void) {}"],
+            candidate_labels=["wrapper-void"],
+        )
+        bundle = scanner.render_bundle([owner])
+        self.assertIn("stadium1: DisplayList_SetFlagInRange", bundle)
+
 
 class AsmProcessorPaddingTests(unittest.TestCase):
     def test_c_function_padding_generates_exact_text_block(self) -> None:
@@ -175,6 +191,28 @@ class AsmProcessorPaddingTests(unittest.TestCase):
 
 
 class RunnerTests(unittest.TestCase):
+    def test_mismatch_diagnostics_decode_instruction_and_classify_drift(self) -> None:
+        expected = bytes.fromhex("24040001 03e00008")
+        actual = bytes.fromhex("24050001 03e00008")
+        with mock.patch.object(runner, "_object_symbol", return_value=(0, len(actual))):
+            details = runner._function_mismatch_details(
+                Path("synthetic.o"), "func_a", expected, actual
+            )
+        self.assertEqual(details["first_diff_instruction"], 0)
+        self.assertEqual(details["mismatch_kind"], "operand_or_scheduling_drift")
+        self.assertEqual(details["expected_instruction_text"], "addiu $a0, $zero, 1")
+        self.assertEqual(details["actual_instruction_text"], "addiu $a1, $zero, 1")
+
+    def test_mismatch_diagnostics_identify_symbol_size_drift(self) -> None:
+        expected = bytes.fromhex("03e00008 00000000")
+        actual = bytes.fromhex("03e00008")
+        with mock.patch.object(runner, "_object_symbol", return_value=(0, len(actual))):
+            details = runner._function_mismatch_details(
+                Path("synthetic.o"), "func_a", expected, actual
+            )
+        self.assertEqual(details["mismatch_kind"], "symbol_size_drift")
+        self.assertEqual(details["first_diff_offset"], len(actual))
+
     def test_probe_one_keeps_live_source_unchanged(self) -> None:
         repo_root = Path(__file__).resolve().parent.parent
         source_parent = repo_root / "disasm" / "src"

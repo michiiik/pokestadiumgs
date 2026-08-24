@@ -27,13 +27,73 @@ is retained; later variants for that function are skipped.
 from __future__ import annotations
 
 import os
+import hashlib
 import re
 import shutil
 import subprocess
 import sys
 import tempfile
+from contextlib import contextmanager
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
+
+try:
+    import fcntl
+except ImportError:  # pragma: no cover - the supported host is POSIX/macOS
+    fcntl = None
+
+
+MIPS_REGISTERS = (
+    "zero", "at", "v0", "v1", "a0", "a1", "a2", "a3",
+    "t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7",
+    "s0", "s1", "s2", "s3", "s4", "s5", "s6", "s7",
+    "t8", "t9", "k0", "k1", "gp", "sp", "fp", "ra",
+)
+
+
+def _mips_instruction_description(word: int) -> str:
+    """Return a compact description useful for source-shape debugging.
+
+    This intentionally decodes only the fields needed to distinguish the
+    common candidate failure modes (different register allocation, immediate,
+    or opcode).  It is diagnostic text, not a replacement for objdump.
+    """
+    opcode = (word >> 26) & 0x3F
+    rs = MIPS_REGISTERS[(word >> 21) & 0x1F]
+    rt = MIPS_REGISTERS[(word >> 16) & 0x1F]
+    rd = MIPS_REGISTERS[(word >> 11) & 0x1F]
+    funct = word & 0x3F
+    if opcode == 0:
+        names = {
+            0x00: "sll", 0x02: "srl", 0x03: "sra", 0x08: "jr",
+            0x09: "jalr", 0x21: "addu", 0x23: "subu", 0x24: "and",
+            0x25: "or", 0x26: "xor", 0x27: "nor", 0x2A: "slt",
+            0x2B: "sltu",
+        }
+        name = names.get(funct, f"special/{funct:#x}")
+        if funct in {0x08, 0x09}:
+            return f"{name} ${rs}"
+        if funct in {0x00, 0x02, 0x03}:
+            return f"{name} ${rd}, ${rt}, {(word >> 6) & 0x1F}"
+        return f"{name} ${rd}, ${rs}, ${rt}"
+    names = {
+        0x04: "beq", 0x05: "bne", 0x06: "blez", 0x07: "bgtz",
+        0x08: "addiu", 0x09: "addiu", 0x0A: "slti", 0x0B: "sltiu",
+        0x0C: "andi", 0x0D: "ori", 0x0E: "xori", 0x0F: "lui",
+        0x20: "lb", 0x21: "lh", 0x23: "lw", 0x24: "lbu",
+        0x25: "lhu", 0x28: "sb", 0x29: "sh", 0x2B: "sw",
+    }
+    name = names.get(opcode, f"op/{opcode:#x}")
+    immediate = word & 0xFFFF
+    if immediate & 0x8000:
+        immediate -= 0x10000
+    if opcode == 0x0F:
+        return f"{name} ${rt}, 0x{word & 0xFFFF:04x}"
+    if opcode in {0x04, 0x05}:
+        return f"{name} ${rs}, ${rt}, {immediate}"
+    if opcode in {0x06, 0x07}:
+        return f"{name} ${rs}, {immediate}"
+    return f"{name} ${rt}, ${rs}, {immediate}"
 
 
 def source_object_path(source_path: Path) -> tuple[Path, Path]:
@@ -234,15 +294,45 @@ def _function_mismatch_details(
     if actual is None:
         details["first_diff_offset"] = None
         return details
-    first_diff = next(
-        (index for index, (left, right) in enumerate(zip(expected, actual)) if left != right),
-        min(len(expected), len(actual)),
-    )
+    diff_offsets = [
+        index
+        for index, (left, right) in enumerate(zip(expected, actual))
+        if left != right
+    ]
+    first_diff = diff_offsets[0] if diff_offsets else min(len(expected), len(actual))
     details["first_diff_offset"] = first_diff
+    details["diff_offsets"] = diff_offsets[:8]
+    details["first_diff_instruction"] = first_diff // 4
+    if not diff_offsets and len(expected) != len(actual):
+        details["mismatch_kind"] = "symbol_size_drift"
+    elif first_diff % 4:
+        details["mismatch_kind"] = "unaligned_data_drift"
+    else:
+        details["mismatch_kind"] = "instruction_drift"
     if first_diff < len(expected):
         details["expected_byte"] = f"{expected[first_diff]:02x}"
     if first_diff < len(actual):
         details["actual_byte"] = f"{actual[first_diff]:02x}"
+    instruction_start = first_diff - (first_diff % 4)
+    if instruction_start + 4 <= len(expected):
+        expected_word = int.from_bytes(
+            expected[instruction_start:instruction_start + 4], "big"
+        )
+        details["expected_instruction"] = f"0x{expected_word:08x}"
+        details["expected_instruction_text"] = _mips_instruction_description(expected_word)
+    if instruction_start + 4 <= len(actual):
+        actual_word = int.from_bytes(
+            actual[instruction_start:instruction_start + 4], "big"
+        )
+        details["actual_instruction"] = f"0x{actual_word:08x}"
+        details["actual_instruction_text"] = _mips_instruction_description(actual_word)
+    if (
+        "expected_instruction_text" in details
+        and "actual_instruction_text" in details
+        and str(details["expected_instruction_text"]).split(" ", 1)[0]
+        == str(details["actual_instruction_text"]).split(" ", 1)[0]
+    ):
+        details["mismatch_kind"] = "operand_or_scheduling_drift"
     return details
 
 
@@ -389,7 +479,44 @@ def probe_candidates(
     return results
 
 
+@contextmanager
+def _candidate_transaction_lock():
+    """Serialize live-source/full-ROM transactions across MCP processes.
+
+    Isolated object probes are still parallel within one request, but the
+    source rewrite, link, compare, and restore phases must not overlap with a
+    request from another agent.  Without this process-wide lock, one agent can
+    restore a rejected candidate while another agent is running its full gate,
+    producing a false combined-compare rejection.
+    """
+    repo_root = Path(__file__).resolve().parent.parent
+    repo_key = hashlib.sha256(str(repo_root).encode()).hexdigest()[:16]
+    lock_name = f"pokemon_stadium_pragma_runner_{repo_key}.lock"
+    lock_path = Path(tempfile.gettempdir()) / lock_name
+    with lock_path.open("a+") as handle:
+        if fcntl is not None:
+            fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            if fcntl is not None:
+                fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+
+
 def try_candidates_detailed(
+    source_path: Path,
+    blocks: list[tuple[str, str]],
+    *,
+    probe_workers: int | None = None,
+) -> dict[str, object]:
+    """Run one candidate transaction while excluding other MCP processes."""
+    with _candidate_transaction_lock():
+        return _try_candidates_detailed_unlocked(
+            source_path, blocks, probe_workers=probe_workers
+        )
+
+
+def _try_candidates_detailed_unlocked(
     source_path: Path,
     blocks: list[tuple[str, str]],
     *,

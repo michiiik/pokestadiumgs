@@ -40,6 +40,7 @@ def main():
                     "source": {"type": "string", "description": "Source path relative to the repository root."},
                     "candidates": {"type": "array", "items": {"type": "object", "required": ["function", "code"], "properties": {
                         "function": {"type": "string"}, "code": {"type": "string"},
+                        "label": {"type": "string", "description": "Optional family/source-shape label echoed in the attempt diagnostics."},
                     }}, "description": "Ordered candidates; later variants for a solved function are skipped."},
                     "workers": {"type": "integer", "minimum": 1, "description": "Maximum parallel isolated compile probes (default: PRAGMA_PROBE_WORKERS or 4)."},
                 }},
@@ -49,6 +50,7 @@ def main():
             root = Path(__file__).resolve().parent.parent
             source = (root / args["source"]).resolve()
             blocks = [(item["function"], item["code"]) for item in args["candidates"]]
+            labels = [item.get("label") for item in args["candidates"]]
             workers = args.get("workers")
             if workers is not None:
                 workers = int(workers)
@@ -73,6 +75,10 @@ def main():
                 os.close(devnull_fd)
                 os.close(saved_fd)
             code = int(result["status"])
+            for attempt in result.get("attempts", []):
+                index = attempt.get("index")
+                if isinstance(index, int) and index < len(labels) and labels[index]:
+                    attempt["label"] = labels[index]
             reply(request_id, {"content": [{"type": "text", "text": json.dumps(result)}], "isError": code not in (0, 1)})
         elif request_id is not None:
             reply(request_id, error={"code": -32601, "message": f"Unknown method: {method}"})

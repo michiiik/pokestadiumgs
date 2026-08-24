@@ -97,6 +97,7 @@ class Owner:
     loops: bool = False
     candidate_codes: list[str] = field(default_factory=list)
     candidate_labels: list[str] = field(default_factory=list)
+    stadium1_match: list[str] = field(default_factory=list)
     notes: list[str] = field(default_factory=list)
 
 
@@ -619,7 +620,13 @@ def generate_candidates(owner: Owner, instructions: list[Instruction]) -> list[s
     return []
 
 
-def build_owner(function: str, source_path: Path, asm_path: Path, asm_root: Path) -> Owner:
+def build_owner(
+    function: str,
+    source_path: Path,
+    asm_path: Path,
+    asm_root: Path,
+    stadium1_matches: dict[str, list[str]] | None = None,
+) -> Owner:
     text = asm_path.read_text(encoding="utf-8")
     source_text = source_path.read_text(encoding="utf-8")
     label, instructions, labels = parse_instructions(text)
@@ -650,8 +657,13 @@ def build_owner(function: str, source_path: Path, asm_path: Path, asm_root: Path
         bounds=bounds,
         branches=sum(instruction.op in BRANCH_OPS for instruction in instructions),
         loops=loops,
+        stadium1_match=list((stadium1_matches or {}).get(function, [])),
         notes=notes,
     )
+    if owner.stadium1_match:
+        owner.notes.append(
+            "Stadium 1 cross-match available; inspect its source before generating new shapes"
+        )
     owner.candidate_codes = generate_candidates(owner, instructions)
     return owner
 
@@ -681,6 +693,11 @@ def render_bundle(owners: list[Owner]) -> str:
             lines.extend(
                 [
                     f"/* family: {owner.family}; variant: {label}; asm: {owner.asm}; calls: {','.join(owner.calls)} */",
+                    *(
+                        [f"/* stadium1: {owner.stadium1_match[0]} */"]
+                        if owner.stadium1_match
+                        else []
+                    ),
                     f"/* candidate: {owner.function} */",
                     candidate,
                     "/* end candidate */",
@@ -698,6 +715,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--family", help="Only emit this detected family")
     parser.add_argument("--source", help="Only scan owners from this source path")
     parser.add_argument("--limit", type=int, default=0, help="Limit scanned owners after filtering")
+    parser.add_argument(
+        "--s1-transfer",
+        type=Path,
+        default=Path("tools/s1_transfer.json"),
+        help="Optional Stadium 1 transfer JSON used to annotate matching owners",
+    )
     return parser.parse_args()
 
 
@@ -715,12 +738,30 @@ def main() -> int:
     out_dir = args.out_dir.resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
 
+    stadium1_matches: dict[str, list[str]] = {}
+    if args.s1_transfer.exists():
+        try:
+            transfer = json.loads(args.s1_transfer.read_text(encoding="utf-8"))
+            values = transfer.get("functions", {})
+            if isinstance(values, dict):
+                stadium1_matches = {
+                    str(function): [str(item) for item in value]
+                    for function, value in values.items()
+                    if isinstance(value, list)
+                }
+        except (OSError, json.JSONDecodeError, TypeError, ValueError):
+            # A missing or stale transfer report must not make the assembly
+            # family scan unusable; the manifest simply omits annotations.
+            stadium1_matches = {}
+
     owners: list[Owner] = []
     for function, source_path, asm_path in source_owners(source_root, asm_root):
         source_rel = source_path.relative_to(Path.cwd()).as_posix()
         if args.source and source_rel != args.source:
             continue
-        owner = build_owner(function, source_path, asm_path, asm_root)
+        owner = build_owner(
+            function, source_path, asm_path, asm_root, stadium1_matches
+        )
         owners.append(owner)
 
     if args.family:
