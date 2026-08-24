@@ -37,7 +37,13 @@ void func_8410491C(u8 *arg0, s16 arg1) {
     func_8003EAFC(arg0, 0, D_8418CA20[arg1], 0x10000);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_373F70/func_84104958.s")
+extern s32 D_8418CA20[];
+extern void func_8003EAFC(u8 *, s32, s32, s32);
+extern void func_8003EB84(u8 *, s16);
+void func_84104958(u8 *arg0, s16 arg1) {
+    func_8003EAFC(arg0, 0, D_8418CA20[arg1], 0xFFFF0000);
+    func_8003EB84(arg0, (s16)(*(u16 *)(*(u8 **)(arg0 + 0x44) + 0xA) - 1));
+}
 
 void func_841049B4(u8 *arg0) { func_8003EB84(arg0, (s16)(*(u16 *)(*(u8 **)(arg0 + 0x44) + 0xA) - 1)); }
 
