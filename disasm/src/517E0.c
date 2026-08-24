@@ -58,7 +58,7 @@ extern s32 D_800972B0[]; s32 func_80050CF8(s32 arg0){s32 result=0;if(arg0>=0&&ar
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051830.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051864.s")
+extern void func_800615D0(s32,s32); void func_80051864(s32 a0,s32 a1){func_800615D0(a1,a0);}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051890.s")
 
@@ -123,7 +123,7 @@ void func_80053A30(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80053B38.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80053DDC.s")
+extern void func_8006276C(s32,s32); void func_80053DDC(s32 a0,s32 a1){func_8006276C(a1,a0);}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80053E08.s")
 
