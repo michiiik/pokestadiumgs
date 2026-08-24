@@ -113,7 +113,13 @@ void func_8411EF20(u8 *arg0) {
     *(s16 *)(arg0 + 0x18) = 3;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411EF2C.s")
+extern void func_8411EF08(u8 *);
+extern s32 func_8411E164(s32);
+extern void func_8411EE74(u8 *);
+void func_8411EF2C(s32 arg0) {
+    func_8411EF08((u8 *)arg0);
+    func_8411EE74((u8 *)func_8411E164(arg0));
+}
 
 s32 func_8411EF5C(u8 *arg0) {
     return *(u16 *)(arg0 + 0x1A);
