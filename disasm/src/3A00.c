@@ -14,7 +14,15 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/3A00/func_80003120.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3A00/func_80003164.s")
+u8 *func_80003164(u8 *arg0, s32 arg1) {
+    s32 value = (arg1 & ~3) - 0x10;
+    u8 *ptr = arg0 + 0x10;
+    *(s32 *)(arg0 + 4) = 0;
+    *(s32 *)(arg0 + 0) = value;
+    *(u8 **)(arg0 + 8) = ptr;
+    *(u8 **)(arg0 + 0xC) = ptr;
+    return arg0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/3A00/func_8000318C.s")
 
