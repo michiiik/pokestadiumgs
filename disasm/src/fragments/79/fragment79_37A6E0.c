@@ -442,7 +442,8 @@ void func_8411123C(u8 *arg0, s32 arg1) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_84111C6C.s")
+extern void func_841089D8(s32);
+void func_84111C6C(void) { func_841089D8(0); }
 #endif
 
 #ifdef VERSION_US
