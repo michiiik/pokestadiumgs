@@ -54,7 +54,12 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_826065B0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260675C.s")
+void func_8260675C(u8 *arg0) {
+    if (arg0 != NULL && *(s16 *)(arg0 + 6) == 0) {
+        *(s16 *)(arg0 + 6) = 1;
+        *(s16 *)(arg0 + 8) = 0;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82606784.s")
 

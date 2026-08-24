@@ -52,5 +52,10 @@ s32 func_81100144(s32 arg0, s32 arg1) {
 
 void func_8110020C(f32 *arg0, f32 *arg1) { arg0[0] = arg1[0]; arg0[1] = arg1[1]; arg0[2] = arg1[2]; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/27/fragment27_code/func_81100228.s")
+void func_81100228(s16 *arg0, const s16 *arg1) {
+    arg0[0] = arg1[0];
+    arg0[1] = arg1[1];
+    arg0[2] = arg1[2];
+}
+#pragma C_FUNCTION_PADDING(12)
 #endif

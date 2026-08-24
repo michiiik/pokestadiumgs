@@ -106,7 +106,12 @@ void func_82000DE0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/16/fragment16_code/func_8200180C.s")
+extern s16 D_82001D58;
+s32 func_8200180C(void) {
+    s32 result = 0;
+    if (D_82001D58 == 0) result = 1;
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
