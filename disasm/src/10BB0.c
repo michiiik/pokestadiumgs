@@ -108,7 +108,7 @@ void func_80011A40(u8 *arg0) {}
 
 extern s32 D_800D12F0;extern void func_80012F08(s32,s32);void func_80012EAC(s32 arg0){D_800D12F0=0;func_80012F08(0,arg0);}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_80012ED8.s")
+void func_80012ED8(s32 arg0){D_800D12F0=1;func_80012F08(1,arg0);}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_80012F08.s")
 
