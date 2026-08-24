@@ -55,9 +55,18 @@ void func_8220BE84(s16 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_11B210/func_8220D630.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_11B210/func_8220D670.s")
+extern s16 D_82210C38;
+s32 func_8220D670(void) { s32 result = D_82210C38; return result; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_11B210/func_8220D67C.s")
+extern s16 D_82210C30;
+extern s16 D_82210C32;
+s32 func_8220D67C(void) {
+    s32 result = 0;
+    if (D_82210C30 != 0) {
+        if (D_82210C32 != 0) result = 1;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_11B210/func_8220D6AC.s")
 #endif
