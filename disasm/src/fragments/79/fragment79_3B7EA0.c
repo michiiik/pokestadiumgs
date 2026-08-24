@@ -122,11 +122,35 @@ u8 func_84149424(void) { return D_8419D7B2; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B7EA0/func_84149928.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B7EA0/func_84149A50.s")
+extern void func_8414978C(u8 *);
+extern void func_841496C0(u8 *);
+void func_84149A50(void *arg0) {
+    u8 *value;
+    value = arg0;
+    if (value[0] & 1) {
+        return;
+    }
+    if (value[2] == 0x26 || value[2] == 0x28 || value[2] == 0x29 || value[2] == 0x57 || value[2] == 0x58 || value[2] == 0x94) {
+        func_8414978C(value);
+    } else {
+        func_841496C0(value);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B7EA0/func_84149AC8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B7EA0/func_84149C70.s")
+extern f64 D_8418B9A0;
+void func_84149C70(void *arg0) {
+    u8 *value;
+    value = arg0;
+    if (value[2] == 0x26 || value[2] == 0x28 || value[2] == 0x29 || value[2] == 0x57 || value[2] == 0x58) {
+        return;
+    }
+    if (value[1] == 2 || value[1] == 0xD || value[1] == 0x4B || value[1] == 0x98 || value[1] == 0xA3 || value[1] == 0xB1 || value[1] == 0xEE) {
+        return;
+    }
+    *(s32 *)(value + 0xC) = (s32)((f64)*(s32 *)(value + 0xC) * D_8418B9A0);
+}
 
 extern void func_841497E8(void *);
 extern void func_84149928(void *);

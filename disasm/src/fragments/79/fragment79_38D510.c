@@ -4,7 +4,24 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411DC80.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411DCCC.s")
+extern u8 *D_84193DD0;
+extern s32 func_8411E1F8(s32);
+void func_8411DCCC(u8 *arg0, f32 *arg1) {
+    s32 index;
+    arg1[0] = *(f32 *)(arg0 + 0x24);
+    arg1[2] = *(f32 *)(arg0 + 0x2C);
+    index = func_8411E1F8((s32)arg0);
+    if ((*(u16 *)((u8 *)(u32)D_84193DD0 + (index << 4) + 0x12) & 2) != 0) {
+        arg1[1] = *(f32 *)(arg0 + 0x638) + 200.0f;
+    } else {
+        index = func_8411E1F8((s32)arg0);
+        if ((*(u16 *)((u8 *)(u32)D_84193DD0 + (index << 4) + 0x12) & 4) != 0) {
+            arg1[1] = 0.0f;
+        } else {
+            arg1[1] = *(f32 *)(arg0 + 0x638);
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411DD8C.s")
 
