@@ -22,5 +22,6 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/35/fragment35_1CCE70/func_886013BC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/35/fragment35_1CCE70/func_886014D8.s")
+extern void func_886013BC(s32, s32);
+void func_886014D8(s32 arg0) { func_886013BC(arg0, 0); }
 #endif

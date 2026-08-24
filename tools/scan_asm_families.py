@@ -473,7 +473,13 @@ def wrapper_candidates(owner: Owner, instructions: list[Instruction]) -> list[st
                 # wrapper), an old-style declaration avoids imposing a
                 # conflicting prototype on that call site.  The candidate's
                 # own call still carries the ABI-shaped argument expressions.
-                if owner.calls[0] in owner.function_uses:
+                # Non-``func_*`` targets are normally SDK/libc entry points
+                # declared by global.h; redeclaring them with guessed scalar
+                # types is more likely to create a false compile failure than
+                # useful ABI evidence.
+                if not owner.calls[0].startswith("func_"):
+                    declaration = ""
+                elif owner.calls[0] in owner.function_uses:
                     declaration = f"extern {return_type} {owner.calls[0]}();"
                 else:
                     declaration = f"extern {return_type} {owner.calls[0]}({prototype});"
