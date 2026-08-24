@@ -1253,7 +1253,10 @@ s32 func_84134968(void) { extern OSMesgQueue D_84195164; return osRecvMesg(&D_84
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84134994.s")
+extern OSMesgQueue D_84195164;
+void func_84134994(OSMesg arg0) {
+    osSendMesg(&D_84195164, arg0, 0);
+}
 #endif
 
 #ifdef VERSION_US

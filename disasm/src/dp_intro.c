@@ -33,7 +33,22 @@ void func_80001CA8(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_80001CB0.s")
+
+s32 func_80001CB0(arg0)
+s32 arg0;
+{
+    s32 result = 0;
+    if (arg0 == 1) {
+        goto set_result;
+    }
+    if (arg0 != 2) {
+        goto done;
+    }
+set_result:
+    result = 1;
+done:
+    return result;
+}
 #endif
 
 void func_80001CD4(void) {
@@ -70,7 +85,11 @@ void func_80001F08(void) { extern OSMesgQueue D_800AB3E4; osRecvMesg(&D_800AB3E4
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_80001F34.s")
+
+extern OSMesgQueue D_800AB3CC;
+void func_80001F34(s32 arg0) {
+    osSendMesg(&D_800AB3CC, (OSMesg)arg0, NULL);
+}
 #endif
 
 #ifdef VERSION_US
