@@ -34,7 +34,20 @@ void func_8414F5F0(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BEAF0/func_8414F618.s")
+extern void func_8414F5F0(void *);
+extern u8 func_84154B24(void);
+extern u8 *func_84154B64(u8);
+extern void func_8414F3FC(void *);
+void func_8414F618(void *arg0) {
+    u8 value;
+    u8 *ptr;
+    func_8414F5F0(arg0);
+    value = func_84154B24();
+    ptr = func_84154B64(1 - value);
+    if (*(u16 *)(ptr + 0x26) & 0x20) {
+        func_8414F3FC(arg0);
+    }
+}
 #endif
 
 #ifdef VERSION_US
