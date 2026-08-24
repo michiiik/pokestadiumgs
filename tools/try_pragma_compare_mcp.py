@@ -2,6 +2,9 @@
 """Minimal stdio MCP server for in-memory pragma candidate attempts."""
 
 import json
+import contextlib
+import io
+import os
 import sys
 from pathlib import Path
 
@@ -45,7 +48,24 @@ def main():
             root = Path(__file__).resolve().parent.parent
             source = (root / args["source"]).resolve()
             blocks = [(item["function"], item["code"]) for item in args["candidates"]]
-            code, accepted = runner.try_candidates(source, blocks)
+            # The comparison helper prints build logs to stdout.  MCP stdio
+            # must contain JSON-RPC messages only, so capture those logs
+            # instead of corrupting the transport stream.
+            # Also redirect the underlying file descriptor: the helper
+            # invokes make, whose child process inherits stdout directly.
+            captured = io.StringIO()
+            sys.stdout.flush()
+            saved_fd = os.dup(sys.stdout.fileno())
+            devnull_fd = os.open(os.devnull, os.O_WRONLY)
+            try:
+                os.dup2(devnull_fd, sys.stdout.fileno())
+                with contextlib.redirect_stdout(captured):
+                    code, accepted = runner.try_candidates(source, blocks)
+            finally:
+                sys.stdout.flush()
+                os.dup2(saved_fd, sys.stdout.fileno())
+                os.close(devnull_fd)
+                os.close(saved_fd)
             reply(request_id, {"content": [{"type": "text", "text": json.dumps({"status": code, "accepted": accepted})}], "isError": code not in (0, 1)})
         elif request_id is not None:
             reply(request_id, error={"code": -32601, "message": f"Unknown method: {method}"})
