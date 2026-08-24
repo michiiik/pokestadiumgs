@@ -86,7 +86,7 @@ extern void func_80052928(s32,s32); extern void func_80051D64(s32,s32); void fun
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80053230.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800532C4.s")
+s32 func_800532C4(s32 arg0){s32 result=0;switch(arg0){case 0x10:result=1;break;case 0x11:result=0xE;break;}return result;}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800532F0.s")
 
@@ -117,9 +117,9 @@ void func_80053A30(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80053A50.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80053AC8.s")
+extern void func_80060C08(u16 *,u16 *); void func_80053AC8(u16 *a0,u16 *a1){a0[0]=a1[0];a0[1]=a1[1];a0[2]=a1[2];func_80060C08(a0+4,a1+4);}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80053B04.s")
+extern void func_80060C08(u16 *,u16 *); void func_80053B04(u16 *a0,u16 *a1){a0[0]=a1[0];a0[1]=a1[1];func_80060C08(a0+2,a1+2);}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80053B38.s")
 
