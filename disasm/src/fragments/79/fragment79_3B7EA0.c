@@ -15,7 +15,14 @@ void func_84148610(void) {
     func_8414C4AC();
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B7EA0/func_84148650.s")
+extern void func_84155A1C(void);
+extern void func_84154948(u8);
+extern void func_84148610(void);
+void func_84148650(u8 arg0) {
+    func_84155A1C();
+    func_84154948(arg0);
+    func_84148610();
+}
 
 extern void func_84154AD4(void);
 extern void func_84156510(void);
