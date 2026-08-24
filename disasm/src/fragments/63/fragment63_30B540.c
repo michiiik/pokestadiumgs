@@ -6,9 +6,11 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E07C20.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E07C90.s")
+extern void func_87E07C20(s32);
+void func_87E07C90(void) { func_87E07C20(2); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E07CB0.s")
+extern void func_87E07C20(s32);
+void func_87E07CB0(void) { func_87E07C20(1); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E07CD0.s")
 
