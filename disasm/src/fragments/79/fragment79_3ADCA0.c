@@ -510,15 +510,44 @@ void func_84145B24(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_8414640C.s")
+extern u16 D_84186BAC[];
+extern u16 D_84186BB0[];
+extern u16 D_84186BB4;
+extern u16 D_84186BB8;
+void func_8414640C(u8 *arg0) {
+    u8 index = arg0[1];
+    *(u16 *)(arg0 + 0xA) = D_84186BAC[index];
+    *(u16 *)(arg0 + 0xC) = D_84186BB0[index];
+    *(u16 *)(arg0 + 0xE) = D_84186BB4;
+    *(u16 *)(arg0 + 0x10) = D_84186BB8;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84146450.s")
+extern u16 D_84186BAC[];
+extern u16 D_84186BC4[];
+extern u16 D_84186BB4;
+extern u16 D_84186BC8;
+void func_84146450(u8 *arg0) {
+    u8 index = arg0[1];
+    *(u16 *)(arg0 + 0xA) = D_84186BAC[index];
+    *(u16 *)(arg0 + 0xC) = D_84186BC4[index];
+    *(u16 *)(arg0 + 0xE) = D_84186BB4;
+    *(u16 *)(arg0 + 0x10) = D_84186BC8;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84146494.s")
+extern u16 D_84186BA0[];
+extern u16 D_84186BA4[];
+extern u16 D_84186BA8;
+void func_84146494(u8 *arg0) {
+    u8 index = arg0[1];
+    *(u16 *)(arg0 + 0xA) = D_84186BA0[index];
+    *(u16 *)(arg0 + 0xC) = D_84186BA4[index];
+    *(u16 *)(arg0 + 0xE) = D_84186BA8;
+    *(u16 *)(arg0 + 0x10) = D_84186BA8;
+}
 #endif
 
 #ifdef VERSION_US
@@ -540,7 +569,17 @@ void func_841464D8(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_841465CC.s")
+extern u16 D_84186C8C[];
+extern u16 D_84186C90[];
+extern u16 D_84186C94;
+extern u16 D_84186C98;
+void func_841465CC(u8 *arg0) {
+    u8 index = arg0[1];
+    *(u16 *)(arg0 + 0xA) = D_84186C8C[index];
+    *(u16 *)(arg0 + 0xC) = D_84186C90[index];
+    *(u16 *)(arg0 + 0xE) = D_84186C94;
+    *(u16 *)(arg0 + 0x10) = D_84186C98;
+}
 #endif
 
 #ifdef VERSION_US
@@ -552,7 +591,17 @@ void func_841464D8(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84146704.s")
+extern u16 D_84186D3C[];
+extern u16 D_84186D40[];
+extern u16 D_84186D44;
+extern u16 D_84186D48;
+void func_84146704(u8 *arg0) {
+    u8 index = arg0[1];
+    *(u16 *)(arg0 + 0xA) = D_84186D3C[index];
+    *(u16 *)(arg0 + 0xC) = D_84186D40[index];
+    *(u16 *)(arg0 + 0xE) = D_84186D44;
+    *(u16 *)(arg0 + 0x10) = D_84186D48;
+}
 #endif
 
 #ifdef VERSION_US
@@ -573,7 +622,25 @@ void func_841467D4(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84146808.s")
+extern u16 D_84186E2C[];
+extern u16 D_84186E30[];
+extern u16 D_84186E34;
+extern u16 D_84186E38;
+extern s16 D_84186E3C;
+extern s16 D_84186E40[];
+extern s16 D_84186E44;
+extern s16 D_84186E48[];
+void func_84146808(u8 *arg0) {
+    u8 index = arg0[1];
+    *(u16 *)(arg0 + 0xA) = D_84186E2C[index];
+    *(u16 *)(arg0 + 0xC) = D_84186E30[index];
+    *(u16 *)(arg0 + 0xE) = D_84186E34;
+    *(u16 *)(arg0 + 0x10) = D_84186E38;
+    *(u16 *)(arg0 + 0x12) = D_84186E3C;
+    *(u16 *)(arg0 + 0x14) = D_84186E40[index];
+    *(u16 *)(arg0 + 0x16) = D_84186E44;
+    *(u16 *)(arg0 + 0x18) = D_84186E48[index];
+}
 #endif
 
 #ifdef VERSION_US
@@ -581,7 +648,17 @@ void func_841467D4(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_841469BC.s")
+extern u16 D_84186E8C[];
+extern u16 D_84186E90[];
+extern u16 D_84186E94;
+extern u16 D_84186E98;
+void func_841469BC(u8 *arg0) {
+    u8 index = arg0[1];
+    *(u16 *)(arg0 + 0xA) = D_84186E8C[index];
+    *(u16 *)(arg0 + 0xC) = D_84186E90[index];
+    *(u16 *)(arg0 + 0xE) = D_84186E94;
+    *(u16 *)(arg0 + 0x10) = D_84186E98;
+}
 #endif
 
 #ifdef VERSION_US
@@ -612,7 +689,17 @@ void func_84146A34(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84146A74.s")
+extern u16 D_84186EF0[];
+extern u16 D_84186EF4[];
+extern u16 D_84186EF8;
+extern u16 D_84186EFC;
+void func_84146A74(u8 *arg0) {
+    u8 index = arg0[1];
+    *(u16 *)(arg0 + 0xA) = D_84186EF0[index];
+    *(u16 *)(arg0 + 0xC) = D_84186EF4[index];
+    *(u16 *)(arg0 + 0xE) = D_84186EF8;
+    *(u16 *)(arg0 + 0x10) = D_84186EFC;
+}
 #endif
 
 #ifdef VERSION_US
