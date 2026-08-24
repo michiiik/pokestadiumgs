@@ -16,11 +16,52 @@ void func_80001684(void *arg0, void *arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/Vi_SelectMode.s")
+
+extern s32 osTvType;
+extern u8 D_800871D4[];
+extern OSViMode osViModeTable[];
+extern f32 D_800A17F0;
+extern u8 leoDiskID[];
+
+void Vi_SelectMode(s8 arg0, s8 arg1) {
+    s32 index;
+    if (osTvType == 2) {
+        index = (arg0 << 1) + arg1 + 8;
+    } else {
+        index = (arg0 << 1) + arg1 + 4;
+    }
+    osViSetMode(&osViModeTable[D_800871D4[index]]);
+    osViSetSpecialFeatures(0x40);
+    osViSetSpecialFeatures(2);
+    osViSetSpecialFeatures(0x10);
+    if (osTvType == 0) {
+        *(f32 *)(leoDiskID + 0xA8C) = D_800A17F0;
+        osViSetYScale(*(f32 *)(leoDiskID + 0xA8C));
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_8000177C.s")
+
+extern u8 leoDiskID[];
+void func_8000177C(u8 *arg0) {
+    if (arg0 == NULL) {
+        *(s32 *)(leoDiskID + 0xA94) = 0;
+        *(s32 *)(leoDiskID + 0xA98) = 0;
+        *(s32 *)(leoDiskID + 0xA9C) = 0;
+        leoDiskID[0xA91] = leoDiskID[0xAA1];
+        leoDiskID[0xA92] = leoDiskID[0xAA2];
+        leoDiskID[0xA90] = leoDiskID[0xAA0];
+    } else {
+        leoDiskID[0xA91] = arg0[1];
+        leoDiskID[0xA92] = arg0[2];
+        leoDiskID[0xA90] = arg0[0];
+        *(s32 *)(leoDiskID + 0xA94) = *(s32 *)(arg0 + 4);
+        *(s32 *)(leoDiskID + 0xA98) = *(s32 *)(arg0 + 8);
+        *(s32 *)(leoDiskID + 0xA9C) = *(s32 *)(arg0 + 0xC);
+        leoDiskID[0xA93] = arg0[3];
+    }
+}
 #endif
 
 #ifdef VERSION_US
