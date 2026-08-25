@@ -163,7 +163,17 @@ u8 *func_80004638(s32 id, u8 *rom_start, u8 *rom_end, s32 arg3) {
     return vaddr;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800046C0.s")
+void func_800046C0(u32 base_addr, u32 addr) {
+    u32 sp1C;
+    u32 temp_a0;
+
+    if ((addr & 0xFF000000) == 0x81000000) {
+        sp1C = addr & 0xFFFFFF;
+        if (func_8000248C(sp1C) == base_addr) {
+            func_8000254C(sp1C);
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80004718.s")
 
