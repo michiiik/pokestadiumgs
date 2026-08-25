@@ -10,7 +10,27 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056708.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_800567B0.s")
+#define ARRAY_COUNT(arr) (s32)(sizeof(arr) / sizeof(arr[0]))
+s32 func_800567B0(s32 arg0, u8* arg1) {
+    s32 var_s0 = 0;
+    u8 sp34[0x20];
+
+    if (arg1 == NULL) {
+        arg1 = sp34;
+    }
+    func_8000B650((char*)arg1, 0x55, 0x20);
+    if (func_80056708(arg0, arg1) != 0) {
+        func_8000B650((char*)arg1, 0xAA, 0x20);
+        if (func_80056708(arg0, arg1) != 0) {
+            s32 i;
+            for (i = 0; i < ARRAY_COUNT(sp34); i++) {
+                arg1[i] = osGetCount();
+            }
+            var_s0 = func_80056708(arg0, arg1);
+        }
+    }
+    return var_s0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056870.s")
 

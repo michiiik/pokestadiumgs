@@ -28,7 +28,28 @@ extern void func_80019580(s32); s32 func_800103C8(s32 arg0) { func_80019580(arg0
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_8001056C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_800105B8.s")
+#define ALIGN16(val) (((val) + 0xFu) & ~0xFu)
+typedef struct S1_unk_func_81206FA0 S1_unk_func_81206FA0;
+struct S1_unk_func_81206FA0 {
+    s32 unk_00;
+    s32 unk_04;
+    s32 unk_08;
+    s32 unk_0C;
+};
+s32 func_800105B8(S1_unk_func_81206FA0* arg0, s32 arg1) {
+  s32 temp_a2;
+  u32 temp_v0;
+
+  temp_v0 = ALIGN16(arg1);
+  temp_a2 = arg0->unk_04;
+  if ((arg0->unk_00 + arg0->unk_08) >= (arg0->unk_04 + temp_v0)) {
+      arg0->unk_04 = temp_v0 + temp_a2;
+  } else {
+      return 0;
+  }
+  arg0->unk_0C++;
+  return temp_a2;
+}
 
 void func_80010610(u8 *arg0, s32 arg1, s32 arg2) {
     s32 aligned = (arg1 + 0xF) & ~0xF;
