@@ -6,7 +6,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/35/fragment35_1CCE70/func_8860043C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/35/fragment35_1CCE70/func_8860047C.s")
+void func_8860047C(void) { extern u8 D_88601914[]; extern f32 D_886018D0[]; extern f32 D_886018E0[]; extern u8 D_88601918[]; D_886018D0[0] = D_88601914[0]; D_886018D0[1] = D_88601914[1]; D_886018D0[2] = D_88601914[2]; D_886018E0[0] = D_88601918[0]; D_886018E0[1] = D_88601918[1]; D_886018E0[2] = D_88601918[2]; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/35/fragment35_1CCE70/func_88600578.s")
 
