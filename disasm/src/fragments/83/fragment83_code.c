@@ -14,7 +14,13 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C0012C.s")
+extern void func_82C000B0(s32, s32, s32, s32);
+void func_82C0012C(s32 arg0) {
+    if (arg0 != 0) {
+        u8 *value = (u8 *)(u32)arg0;
+        func_82C000B0(value[0], value[1], value[2], 1);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -22,7 +28,10 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C002B8.s")
+extern void func_82C00164(s32, s32, s32, s32);
+void func_82C002B8(u8 *arg0) {
+    func_82C00164(*(s16 *)(arg0 + 0), *(s16 *)(arg0 + 2), *(u16 *)(arg0 + 4), *(u16 *)(arg0 + 6));
+}
 #endif
 
 #ifdef VERSION_US
@@ -33,11 +42,21 @@ void func_82C003B4(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C003BC.s")
+extern void *func_8004C990(s32, s32);
+extern void func_8004D1FC(void *);
+void func_82C003BC(u16 arg0, u16 arg1) {
+    void *value = func_8004C990(arg0, arg1);
+    func_8004D1FC(value);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C003F8.s")
+extern void *func_8004C990(s32, s32);
+extern void func_8004D19C(s32, s32, void *, s32, s32);
+void func_82C003F8(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
+    void *value = func_8004C990(arg2, arg3);
+    func_8004D19C(arg0, arg1, value, 0, 0);
+}
 #endif
 
 #ifdef VERSION_US
