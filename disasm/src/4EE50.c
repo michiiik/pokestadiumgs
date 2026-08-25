@@ -24,7 +24,26 @@ void func_8004E250(void *arg0, void *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4EE50/func_8004E298.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4EE50/func_8004E308.s")
+typedef struct TargetGraphNode TargetGraphNode;
+typedef s32 (*TargetGraphCallback)(s32, struct TargetGraphNode*);
+struct TargetGraphNode {
+    u8 pad_00[0x1C];
+    TargetGraphCallback unk_1C;
+    void* unk_20;
+};
+void func_8004E308(TargetGraphNode* arg0, TargetGraphCallback arg1, void* arg2) {
+    if (arg1 != NULL) {
+        arg1 = func_80003240(arg1);
+    }
+
+    if (arg0 != NULL) {
+        arg0->unk_20 = arg2;
+        arg0->unk_1C = arg1;
+        if (arg1 != NULL) {
+            arg1(0, arg0);
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4EE50/func_8004E368.s")
 
