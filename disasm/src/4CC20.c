@@ -42,7 +42,19 @@ void func_8004C8A0(void) { func_8004C7A0(); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C8C0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C948.s")
+s32 func_8004C948(s32 arg0) {
+    s32 temp_a0;
+    s32 var_v1;
+
+    var_v1 = 0;
+    if (D_80097120 != 0) {
+        temp_a0 = (*(s32 *)((u8 *)(D_80097120) + (4)));
+        if (temp_a0 != 0) {
+            var_v1 = func_8004C468(temp_a0, arg0);
+        }
+    }
+    return var_v1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C990.s")
 
@@ -136,19 +148,93 @@ s32 func_8004D6D8(s32 value) { s32 result = 0; s32 ptr = D_80097120; if (ptr != 
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004DB5C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004DC6C.s")
+s32 func_8004DC6C(s32 arg0) {
+    s32 temp_a0;
+    s32 var_v1;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004DCB4.s")
+    var_v1 = 0;
+    if (D_80097120 != 0) {
+        temp_a0 = (*(s32 *)((u8 *)(D_80097120) + (0x1C)));
+        if (temp_a0 != 0) {
+            var_v1 = func_8004C3EC(temp_a0, arg0, 1);
+        }
+    }
+    return var_v1;
+}
+
+s32 func_8004DCB4(s32 arg0) {
+    s32 temp_a0;
+    s32 var_v1;
+
+    var_v1 = 0;
+    if (D_80097120 != 0) {
+        temp_a0 = (*(s32 *)((u8 *)(D_80097120) + (0x1C)));
+        if (temp_a0 != 0) {
+            var_v1 = func_8004C468(temp_a0, arg0);
+        }
+    }
+    return var_v1;
+}
 
 void func_8004DCFC(void) { func_8004DB5C(); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004DD1C.s")
+s32 func_8004DD1C(s32 arg0) {
+    s32 temp_a0;
+    s32 var_v1;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004DD64.s")
+    var_v1 = 0;
+    if (D_80097120 != 0) {
+        temp_a0 = (*(s32 *)((u8 *)(D_80097120) + (0x20)));
+        if (temp_a0 != 0) {
+            var_v1 = func_8004C3EC(temp_a0, arg0, 1);
+        }
+    }
+    return var_v1;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004DDAC.s")
+s32 func_8004DD64(s32 arg0) {
+    s32 temp_a0;
+    s32 var_v1;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004DDF4.s")
+    var_v1 = 0;
+    if (D_80097120 != 0) {
+        temp_a0 = (*(s32 *)((u8 *)(D_80097120) + (0x20)));
+        if (temp_a0 != 0) {
+            var_v1 = func_8004C468(temp_a0, arg0);
+        }
+    }
+    return var_v1;
+}
+
+s32 func_8004C3B0(s32, s32);
+
+s32 func_8004DDAC(s32 arg0) {
+    s32 temp_a0;
+    s32 var_v1;
+
+    var_v1 = 0;
+    if (D_80097120 != 0) {
+        temp_a0 = (*(s32 *)((u8 *)(D_80097120) + (0x20)));
+        if (temp_a0 != 0) {
+            var_v1 = func_8004C3B0(temp_a0, arg0);
+        }
+    }
+    return var_v1;
+}
+
+s32 func_8004DDF4(s32 arg0) {
+    s32 temp_a0;
+    s32 var_v1;
+
+    var_v1 = 0;
+    if (D_80097120 != 0) {
+        temp_a0 = (*(s32 *)((u8 *)(D_80097120) + (0x24)));
+        if (temp_a0 != 0) {
+            var_v1 = func_8004C3EC(temp_a0, arg0, 0);
+        }
+    }
+    return var_v1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004DE3C.s")
 

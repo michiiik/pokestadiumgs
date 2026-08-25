@@ -237,7 +237,15 @@ void func_8160852C(void) { func_8004D1FC(D_8160BDB4); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81609170.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_816092FC.s")
+s32 func_80001FF0();
+s32 func_80008970();
+
+f32 func_816092FC(void) {
+    s32 sp1C;
+
+    sp1C = func_80008970();
+    return ((f32) sp1C * 60.0f) / (f32) func_80001FF0();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81609344.s")
 

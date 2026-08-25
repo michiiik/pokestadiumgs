@@ -64,7 +64,15 @@ s32 func_824029E4(s32 arg0, s16 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82403C84.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82403F10.s")
+s32 func_80001FF0();
+s32 func_80008970();
+
+f32 func_82403F10(void) {
+    s32 sp1C;
+
+    sp1C = func_80008970();
+    return ((f32) sp1C * 60.0f) / (f32) func_80001FF0();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82403F58.s")
 

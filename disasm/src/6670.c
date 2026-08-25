@@ -33,7 +33,16 @@ s32 func_800061C4(void *arg0) {
     return var_v1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6670/func_800061EC.s")
+extern void *D_80087200;
+s32 func_800061EC(void) {
+    s32 var_a0;
+
+    var_a0 = (func_800060E8() & 1) != 0;
+    if (var_a0 != 0) {
+        var_a0 = func_800061C4(D_80087200) != 0;
+    }
+    return var_a0;
+}
 
 extern u8 D_800CE119; s32 func_80006230(void) { return D_800CE119 != 0; }
 

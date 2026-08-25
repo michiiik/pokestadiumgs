@@ -22,7 +22,20 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/53/fragment53_code/func_8650123C.s")
+extern s32 D_8650C4DC;
+extern s32 D_8650D9D4;
+s32 func_8650123C(s32 arg0, s32 arg1) {
+    s32 var_v1;
+
+    var_v1 = (D_8650D9D4 + D_8650C4DC) - arg0;
+    if (D_8650D9D4 >= arg0) {
+        var_v1 = -0xA;
+    }
+    if (arg0 >= (D_8650D9D4 + 0xA)) {
+        var_v1 = -0xA;
+    }
+    return var_v1;
+}
 #endif
 
 #ifdef VERSION_US

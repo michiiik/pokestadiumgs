@@ -1128,7 +1128,12 @@ void func_841307EC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84130864.s")
+void func_84130864(void) {
+    func_84136678(D_841951BC, -1);
+    func_84135B00(0xB5U);
+    func_84124594(D_841951BC);
+    func_84136CA8();
+}
 #endif
 
 #ifdef VERSION_US

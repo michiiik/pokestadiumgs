@@ -49,7 +49,17 @@ extern void func_87E03A08(void *);
 extern void func_87E03B70(void *);
 void func_87E03CBC(void *arg0) { func_87E03850(arg0); func_87E03A08(arg0); func_87E03B70(arg0); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_306150/func_87E03CEC.s")
+extern void func_87E13480(s32);
+extern void func_87E13490();
+extern void func_87E134C0();
+void func_87E03CEC(void *arg0) {
+    (*(s32 *)((u8 *)(arg0) + (4))) = 0;
+    (*(s32 *)((u8 *)(arg0) + (0))) = 0;
+    func_87E03CBC(arg0);
+    func_87E134C0();
+    func_87E13490();
+    func_87E13480(0);
+}
 
 extern void func_87F02684(s32);
 void func_87E03D28(s32 arg0) { func_87F02684(arg0 + 8); }

@@ -2,7 +2,25 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4EE50/func_8004E250.s")
+void func_8004E250(void *arg0, void *arg1) {
+    void *temp_v0;
+    void *temp_v1;
+
+    if ((arg0 != NULL) && (arg1 != NULL)) {
+        temp_v0 = (*(void **)((u8 *)(arg0) + (0x18)));
+        if (temp_v0 == NULL) {
+            (*(void **)((u8 *)(arg0) + (0x18))) = arg1;
+            (*(void **)((u8 *)(arg1) + (0x10))) = arg1;
+            (*(void **)((u8 *)(arg1) + (0x14))) = arg1;
+            return;
+        }
+        temp_v1 = (*(void **)((u8 *)(temp_v0) + (0x10)));
+        (*(void **)((u8 *)(arg1) + (0x14))) = temp_v0;
+        (*(void **)((u8 *)(arg1) + (0x10))) = temp_v1;
+        (*(void **)((u8 *)(temp_v0) + (0x10))) = arg1;
+        (*(void **)((u8 *)(temp_v1) + (0x14))) = arg1;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4EE50/func_8004E298.s")
 

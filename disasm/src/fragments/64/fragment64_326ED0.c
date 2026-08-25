@@ -4,7 +4,12 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_326ED0/func_87F04260.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_326ED0/func_87F042D0.s")
+s32 func_87F042D0(s32 arg0, s32 arg1) {
+    if ((arg0 < 0) || (arg0 >= 0x26) || (arg1 < 0) || (arg1 >= 0x13)) {
+        return -1;
+    }
+    return (arg1 * 0x26) + arg0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_326ED0/func_87F04314.s")
 

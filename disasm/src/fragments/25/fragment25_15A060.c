@@ -28,7 +28,18 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15A060/func_82100C50.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15A060/func_82100CD8.s")
+s32 func_82100CD8(void *arg0) {
+    if ((*(s32 *)((u8 *)(arg0) + (0x24))) == 0) {
+        return 0;
+    }
+    if ((*(s32 *)((u8 *)(arg0) + (0x38))) != 0) {
+        return 0;
+    }
+    if ((*(u8 *)((u8 *)(arg0) + (0x3C))) != 0) {
+        return 0;
+    }
+    return 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15A060/func_82100D20.s")
 

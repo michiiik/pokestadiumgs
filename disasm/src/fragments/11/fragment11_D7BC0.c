@@ -31,7 +31,20 @@ void func_816003C8(u8 *arg0) {
     func_816003B0(arg0, 0, 0, 0, 0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D7BC0/func_81600408.s")
+void func_81600408(u8 *arg0) {
+    void *temp_v0;
+    void *temp_v0_2;
+
+    temp_v0 = (*(void **)((u8 *)(arg0) + (0x10)));
+    if (temp_v0 != NULL) {
+        (*(void **)((u8 *)(temp_v0) + (0x14))) = (void *) (*(void **)((u8 *)(arg0) + (0x14)));
+    }
+    temp_v0_2 = (*(void **)((u8 *)(arg0) + (0x14)));
+    if (temp_v0_2 != NULL) {
+        (*(void **)((u8 *)(temp_v0_2) + (0x10))) = (void *) (*(void **)((u8 *)(arg0) + (0x10)));
+    }
+    func_816003C8(arg0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D7BC0/func_81600450.s")
 

@@ -32,7 +32,17 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_80046204.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_800464F8.s")
+s32 func_800464F8(s32 arg0, s32 arg1) {
+    s32 temp_lo;
+    s32 var_v1;
+
+    temp_lo = arg0 / arg1;
+    var_v1 = temp_lo;
+    if ((arg0 % arg1) > 0) {
+        var_v1 = temp_lo + 1;
+    }
+    return var_v1;
+}
 
 s32 func_80046540(s32 arg0, s32 arg1) {
     return (arg1 / arg0) & ~1;

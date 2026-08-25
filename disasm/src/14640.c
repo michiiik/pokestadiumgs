@@ -243,7 +243,9 @@ extern s32 D_8011EBD0; void func_80018CF0(void) { D_8011EBD0 = 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80018ED4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_8001911C.s")
+void func_8001911C(s32 arg0, s32 arg1, s32 arg2) {
+    func_80018728(((arg0 & 0xFF) << 0x10) | 0xFA000000 | ((arg1 & 0xFF) << 8) | (arg2 & 0xFF), 1);
+}
 
 void func_80019164(void) { func_80018728(0xFA000000, 0); }
 

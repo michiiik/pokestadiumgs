@@ -131,7 +131,16 @@ void func_82E02CA4(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/66/fragment66_code/func_82E04AE4.s")
+extern void func_8003CD84();
+extern void func_82E047C4(s32);
+extern void *D_82E07600;
+s32 func_82E04AE4(s32 arg0, s32 arg1) {
+    if ((arg0 != 0) && (arg0 == 5)) {
+        func_82E047C4((*(s32 *)((u8 *)(D_82E07600) + (8))));
+        func_8003CD84();
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US

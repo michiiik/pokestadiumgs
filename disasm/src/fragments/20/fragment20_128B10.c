@@ -6,7 +6,14 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_128B10/func_82600BA0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_128B10/func_82600CF4.s")
+extern void func_800619E8(void *);
+s32 func_80061B88(u8, u8, void *);
+
+void func_82600CF4(void *arg0) {
+    (*(s32 *)((u8 *)(arg0) + (8))) = func_80061B88((*(u8 *)((u8 *)(arg0) + (0))), (*(u8 *)((u8 *)(arg0) + (0x1D))), arg0);
+    func_800619E8(arg0);
+    (*(u16 *)((u8 *)(arg0) + (0x26))) = (u16) (*(u16 *)((u8 *)(arg0) + (0x28)));
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_128B10/func_82600D38.s")
 

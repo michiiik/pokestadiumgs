@@ -35,7 +35,17 @@ void func_82911850(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_34C8B0/func_829118D4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_34C8B0/func_8291192C.s")
+extern void func_80007B34(s32);
+void func_8291192C(void) {
+    s32 var_s0;
+
+    func_80007B34(0x10);
+    var_s0 = 0;
+    do {
+        func_82911850();
+        var_s0 += 1;
+    } while (var_s0 != 0x10);
+}
 
 extern void func_8290FE04(s16);
 

@@ -71,7 +71,12 @@ void func_87E1078C(void) { func_87F02684(D_87E1EBB8 + 712); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E10B30.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E10E64.s")
+void func_87E10E64(s32 arg0) {
+    if ((arg0 >= -1) && (arg0 < 2) && (arg0 != (*(s32 *)((u8 *)(D_87E1EBB8) + (8))))) {
+        (*(s32 *)((u8 *)(D_87E1EBB8) + (8))) = arg0;
+        func_87E0F170();
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E10EA8.s")
 

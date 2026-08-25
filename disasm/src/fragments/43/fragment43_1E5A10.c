@@ -41,11 +41,28 @@ void func_8AC00020(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC006F4.s")
+extern void func_8AC005D8();
+extern s16 D_8AC08514;
+extern s16 D_8AC08516;
+extern s16 D_8AC08518;
+extern s16 D_8AC0851A;
+void func_8AC006F4(void) {
+    D_8AC08514 = 0;
+    D_8AC08516 = 0;
+    D_8AC08518 = 0x280;
+    D_8AC0851A = 0x1E0;
+    func_8AC005D8();
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC00738.s")
+void func_8AC00738(void) {
+    D_8AC08514 = 0;
+    D_8AC08516 = 0;
+    D_8AC08518 = 0x280;
+    D_8AC0851A = 0x1E0;
+    func_8AC005D8();
+}
 #endif
 
 #ifdef VERSION_US

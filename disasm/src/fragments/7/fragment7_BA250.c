@@ -277,7 +277,12 @@ void func_83007D10(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83008070.s")
+void func_83008070(void *arg0, s32 arg1) {
+    if ((arg1 == -1) || (arg1 == 1)) {
+        (*(s8 *)((u8 *)(arg0) + (0x1E))) = 0x1E;
+        func_800226C0(2);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -285,7 +290,12 @@ void func_83007D10(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_8300814C.s")
+void func_8300814C(void *arg0, s32 arg1) {
+    if ((arg1 == -1) || (arg1 == 1)) {
+        (*(s8 *)((u8 *)(arg0) + (0x1E))) = 0x16;
+        func_800226C0(2);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -301,7 +311,12 @@ void func_83007D10(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83008700.s")
+void func_83008700(void *arg0, s32 arg1) {
+    if ((arg1 == -1) || (arg1 == 1)) {
+        (*(u8 *)((u8 *)(arg0) + (0x1E))) = (u8) (*(u8 *)((u8 *)(arg0) + (0x21)));
+        func_800226C0(2);
+    }
+}
 #endif
 
 #ifdef VERSION_US

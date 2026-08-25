@@ -6,7 +6,15 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AE600/func_818006B4.s")
+s32 func_80001FF0();
+s32 func_80008970();
+
+f32 func_818006B4(void) {
+    s32 sp1C;
+
+    sp1C = func_80008970();
+    return ((f32) sp1C * 60.0f) / (f32) func_80001FF0();
+}
 #endif
 
 #ifdef VERSION_US
