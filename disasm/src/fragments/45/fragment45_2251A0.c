@@ -342,7 +342,8 @@ extern void func_8AB01288(void); extern void func_8AB02D14(void); void func_8AB0
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB04ED8.s")
+void func_8AB04ED8(void) {}
+void func_8AB04ED8_padding(void) {}
 #endif
 
 #ifdef VERSION_US

@@ -138,7 +138,8 @@ void func_84169B80(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D7DD0/func_8416A050.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D7DD0/func_8416A140.s")
+void func_8416A140(void) {}
+void func_8416A140_padding(void) {}
 
 void *func_8416A150(void *arg0) { return arg0; }
 #endif

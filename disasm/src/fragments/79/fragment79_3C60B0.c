@@ -18,7 +18,8 @@ s32 func_84156868(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84156870.s")
+void func_84156870(void) {}
+void func_84156870_padding(void) {}
 #endif
 
 #ifdef VERSION_US
