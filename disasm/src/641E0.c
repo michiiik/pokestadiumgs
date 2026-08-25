@@ -12,7 +12,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_800636C0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80063754.s")
+s32 func_80063754(s32 arg0) { s32 *value = &arg0; arg0 &= 0xFF; if (arg0 == 0x9E || (arg0 >= 0xB5 && arg0 < 0xBE)) return 1; return 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_8006378C.s")
 
@@ -90,11 +90,11 @@ void func_8006443C(s32 arg0, s32 arg1, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80064520.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_8006456C.s")
+s32 func_8006456C(s32 arg0) { s32 *value = &arg0; if (((*value) & 0x2FFF) == 0x2AAA) return 1; return 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80064590.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_8006461C.s")
+s32 func_8006461C(s32 arg0) { s32 temp_v0 = arg0 & 0xFF; s32 *value = &arg0; if (temp_v0 & 0xF) return 1; if (temp_v0 & 0xF0) return 2; return 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80064650.s")
 

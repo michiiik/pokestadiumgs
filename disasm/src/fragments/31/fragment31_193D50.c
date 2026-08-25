@@ -6,7 +6,12 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_193D50/func_88220B80.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_193D50/func_88220BB8.s")
+extern void func_8000612C(void);
+extern s32 D_880068B8;
+void func_88220BB8(void) {
+    func_8000612C();
+    D_880068B8 = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_193D50/func_88220BDC.s")
 
