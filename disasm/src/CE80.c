@@ -83,7 +83,8 @@ void func_8000D8D8(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/CE80/func_8000D90C.s")
+void func_8000D90C(void) {}
+void func_8000D90C_padding(void) {}
 #endif
 
 #ifdef VERSION_US
