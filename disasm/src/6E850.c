@@ -210,7 +210,13 @@ void func_80070C14(f32 *arg0, f32 *arg1, f32 *arg2) { f32 x = *arg0; f32 y = *ar
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_80071068.s")
+extern u8 *D_80094908;
+extern void func_80070DEC(float [4][4], void *);
+void func_80071068(float arg0[4][4]) {
+    float temp[18];
+    func_80070DEC((float (*)[4])(temp + 1), D_80094908 + 0x64);
+    guMtxCatF((float (*)[4])(temp + 1), arg0, arg0);
+}
 #endif
 
 #ifdef VERSION_US

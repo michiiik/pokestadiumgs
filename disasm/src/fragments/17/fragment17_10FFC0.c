@@ -148,7 +148,17 @@ void func_82203A84(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82203B3C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82203B98.s")
+extern s32 D_8220D784;
+extern s32 D_8220E4BC;
+extern u8 D_8220E468[];
+extern u8 D_8220E490[];
+extern s32 func_82201D08(void *);
+void func_82203B98(void) {
+    D_8220E4BC = 0;
+    func_82201D08(D_8220E468);
+    func_82201D08(D_8220E490);
+    D_8220D784 = 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82203BD8.s")
 

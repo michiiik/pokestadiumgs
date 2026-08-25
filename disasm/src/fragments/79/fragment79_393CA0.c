@@ -1310,7 +1310,36 @@ void func_841330B4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84133440.s")
+extern void func_84132300(void);
+extern void func_84132350(void);
+extern void func_841324EC(void);
+extern void func_84132778(void);
+extern void func_8413293C(void);
+extern void func_84132A94(void);
+extern void func_84132B9C(void);
+extern void func_84132D44(void);
+extern void func_84132E40(void);
+extern void func_84132F34(void);
+extern void func_841330BC(void);
+extern void func_841331F8(void);
+void func_84133440(void) {
+    func_84132300();
+    func_84132350();
+    func_84132300();
+    func_841324EC();
+    func_84132300();
+    func_84132778();
+    func_84132300();
+    func_8413293C();
+    func_84132300();
+    func_84132A94();
+    func_84132B9C();
+    func_84132D44();
+    func_84132E40();
+    func_84132F34();
+    func_841330BC();
+    func_841331F8();
+}
 #endif
 
 #ifdef VERSION_US
@@ -1378,7 +1407,14 @@ void func_841330B4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841348C0.s")
+extern void func_841347A0(void *);
+extern OSThread D_84193FB0;
+extern OSMesgQueue D_84195164;
+extern OSMesg D_84195160;
+void func_841348C0(void) {
+    osCreateMesgQueue(&D_84195164, &D_84195160, 1);
+    osCreateThread(&D_84193FB0, 0xC, func_841347A0, NULL, &D_84195160, 0x19);
+}
 #endif
 
 #ifdef VERSION_US

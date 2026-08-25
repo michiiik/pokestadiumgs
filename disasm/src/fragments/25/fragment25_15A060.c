@@ -50,7 +50,18 @@ void func_82101420(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15A060/func_8210144C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15A060/func_82101648.s")
+extern void func_80008574(void);
+extern void func_80047610(void);
+extern void func_80006D3C(void);
+extern void func_82100A40(void *);
+extern u8 D_82104170[];
+void func_82101648(s32 arg0) {
+    func_82101420(arg0);
+    func_80008574();
+    func_80047610();
+    func_80006D3C();
+    func_82100A40(D_82104170);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15A060/func_8210168C.s")
 

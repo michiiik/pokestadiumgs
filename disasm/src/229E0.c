@@ -2069,7 +2069,14 @@ void func_8003D08C(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003D7B8.s")
+extern u8 D_801261B0[];
+void func_8003D7B8(s16 arg0) {
+    if (((arg0 > 0) && (arg0 < 4)) || (arg0 == 0x84) || (arg0 == 7)) {
+        D_801261B0[3] = D_801261B0[2];
+        return;
+    }
+    D_801261B0[3] = 0;
+}
 #endif
 
 #ifdef VERSION_US
