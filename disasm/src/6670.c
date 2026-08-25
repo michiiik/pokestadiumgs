@@ -8,7 +8,8 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6670/func_80005CA4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6670/func_80005EE0.s")
+extern void func_800063B0(void); extern OSMesgQueue D_800CE100;
+void func_80005EE0(void) { func_800063B0(); osContStartReadData(&D_800CE100); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6670/func_80005F0C.s")
 
