@@ -163,7 +163,9 @@ void func_80016B24(s32 a0, s32 a1, s32 a2, s32 a3) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80017874.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_800179B4.s")
+void func_800179B4(void) {}
+void func_800179B4_padding(void) {}
+void func_800179B4_padding2(void) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_800179CC.s")
 

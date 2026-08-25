@@ -14,7 +14,9 @@ f32 func_8006DC94(f32 arg0) { if (arg0 < 0.0f) { arg0 = -arg0; } return arg0; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_8006DCB8.s")
+void func_8006DCB8(void) {}
+void func_8006DCB8_padding(void) {}
+void func_8006DCB8_padding2(void) {}
 #endif
 
 #ifdef VERSION_US
