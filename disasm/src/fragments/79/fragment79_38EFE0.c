@@ -38,7 +38,15 @@ s32 func_8411F878(s32 arg0) {
 extern u8 *D_84193DD0; extern void func_8411FEE8(u16);
 s32 func_8411F8C4(s32 arg0) { if ((*(u16 *)((u8 *)(u32)D_84193DD0 + (arg0 << 4) + 0xE)) == 0) { func_8411FEE8(0); return 1; } return 0; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_8411F90C.s")
+extern void func_8410B104();
+extern void func_800238C4(void);
+extern s32 func_8411F750(s32);
+extern void func_841125F4(s32, s32);
+void func_8411F90C(s32 arg0, s32 arg1) {
+    func_8410B104();
+    func_800238C4();
+    func_841125F4(func_8411F750(arg0), 0x1F);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_8411F94C.s")
 

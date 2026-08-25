@@ -111,7 +111,15 @@ u8 func_8130A880(u8 arg0) {
     return arg0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130A88C.s")
+extern void func_8130A778(u8 *, s32, u8 (*)(u8));
+extern u8 func_800637C0(u8);
+extern u8 func_80073450(u8);
+extern u8 func_8130A880(u8);
+void func_8130A88C(u8 *arg0) {
+    func_8130A778(arg0, 2, func_8130A880);
+    func_8130A778(arg0, 3, func_800637C0);
+    func_8130A778(arg0, 4, func_80073450);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130A8E0.s")
 

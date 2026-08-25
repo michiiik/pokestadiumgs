@@ -434,7 +434,12 @@ void func_80028118(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80028300.s")
+extern void func_80028140(void);
+void func_80028300(void) {
+    func_8001874C(0x06040003, 1);
+    func_8001874C(0x06040103, 1);
+    func_80028140();
+}
 #endif
 
 #ifdef VERSION_US
