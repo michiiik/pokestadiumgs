@@ -572,6 +572,19 @@ def _normalize_ws(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
+def _normalize_type_definition(definition: str) -> str:
+    """Normalize aggregate typedefs to their installed struct spelling.
+
+    Transferred declarations are initially collected from Stadium 1 as
+    ``typedef struct Name { ... } Name;`` units, while accepted candidates
+    are installed in GS sources with the forward typedef followed by a
+    stripped ``struct Name { ... };`` definition.  Those forms describe the
+    same aggregate and must compare equal when deciding whether a definition
+    is already present in the owner source.
+    """
+    return _normalize_ws(_strip_named_aggregate_typedef(definition))
+
+
 # --------------------------------------------------------------------------
 # extern declarations for mapped data globals
 # --------------------------------------------------------------------------
@@ -932,13 +945,13 @@ def generate_candidate(
     kept_type_defs: dict[str, str] = {}
     for name, type_def in type_defs.items():
         gs_def = owner_type_index.get(name) or ctx.gs_type_index.get(name)
-        if gs_def is not None and _normalize_ws(gs_def) == _normalize_ws(type_def):
+        if gs_def is not None and _normalize_type_definition(gs_def) == _normalize_type_definition(type_def):
             continue
         renamed_name = provisional_type_rename[name]
         prefixed_gs_def = owner_type_index.get(renamed_name) or ctx.gs_type_index.get(renamed_name)
         if prefixed_gs_def is not None:
             renamed_definition = apply_rename(type_def, provisional_type_rename)
-            if _normalize_ws(prefixed_gs_def) == _normalize_ws(renamed_definition):
+            if _normalize_type_definition(prefixed_gs_def) == _normalize_type_definition(renamed_definition):
                 type_rename[name] = renamed_name
                 continue
         type_rename[name] = renamed_name

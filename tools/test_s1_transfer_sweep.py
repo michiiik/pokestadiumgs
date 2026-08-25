@@ -453,6 +453,66 @@ class GenerateCandidateAlignmentTest(unittest.TestCase):
         self.assertEqual(result.outcome, "s1_body_missing")
 
 
+class GenerateCandidateTypeDedupTest(unittest.TestCase):
+    def test_prefixed_typedef_matches_installed_stripped_struct(self):
+        """Do not emit a second S1 type when the owner has its stripped form."""
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            asm_path = tmp_path / "func_TEST.s"
+            asm_path.write_text(
+                "glabel func_TEST\n"
+                "    /* 000000 80000000 00000000 */  nop\n"
+            )
+            owner_source = tmp_path / "source.c"
+            owner_source.write_text(
+                "struct S1_Foo {\n"
+                "    s32 value;\n"
+                "};\n"
+            )
+            s1_source = tmp_path / "s1.c"
+            s1_source.write_text(
+                "void FooFunc(void) {\n"
+                "    Foo value;\n"
+                "    (void)value.value;\n"
+                "}\n"
+            )
+            owner = mock.Mock(
+                function="func_TEST",
+                asm_path=asm_path,
+                asm=str(asm_path),
+                source_path=owner_source,
+            )
+            ctx = mock.Mock()
+            ctx.s1_functions = {"FooFunc": {"w": [0]}}
+            ctx.func_file_index = {"FooFunc": s1_source}
+            ctx.gs_asm_fallback = None
+            ctx.symtab = sweep.S1SymbolTable(
+                all_by_addr={}, func_by_addr={}, sorted_addrs=[],
+                names=set(), func_names=set(),
+            )
+            ctx.extern_index = {}
+            ctx.type_index = sweep.index_type_definitions([
+                "typedef struct Foo {\n"
+                "    s32 value;\n"
+                "} Foo;\n"
+            ])
+            ctx.gs_type_index = {}
+
+            result = sweep.generate_candidate(
+                "func_TEST",
+                owner,
+                ctx,
+                {"func_TEST": ("FooFunc", "Stadium 1 FooFunc @ 0x80100000 (text); match class identical; 1 instructions")},
+                {},
+            )
+
+        self.assertEqual(result.outcome, "candidate")
+        self.assertEqual(result.declaration_units, [])
+        self.assertNotIn("S1_Foo", result.declarations)
+
+
 class SelectFunctionsTest(unittest.TestCase):
     def test_skips_dirty_and_missing_owner(self):
         transfer_map = {"func_A": ("A", "..."), "func_B": ("B", "...")}
