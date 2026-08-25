@@ -139,7 +139,16 @@ void func_82404DD8(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_824059E4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82405A58.s")
+void func_82405A58(s32 arg0, void *arg1) {
+    void *temp_v0;
+
+    temp_v0 = (*(void **)((u8 *)(arg1) + (0x14)));
+    if (arg0 == 2) {
+        (*(u8 *)((u8 *)(arg1) + (0x18))) = (u8) (*(u8 *)((u8 *)(temp_v0) + (0x44)));
+        (*(u8 *)((u8 *)(arg1) + (0x19))) = (u8) (*(u8 *)((u8 *)(temp_v0) + (0x45)));
+        (*(u8 *)((u8 *)(arg1) + (0x1A))) = (u8) (*(u8 *)((u8 *)(temp_v0) + (0x46)));
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82405A84.s")
 

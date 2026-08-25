@@ -4,7 +4,14 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_11B210/func_8220B850.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_11B210/func_8220B900.s")
+extern void _bzero(s32 *, s32);
+extern void func_8004C8C0(s32);
+extern u8 D_82210B60;
+
+void func_8220B900(void) {
+    func_8004C8C0(0x9F);
+    _bzero(&D_82210B60, 0xC4);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_11B210/func_8220B930.s")
 

@@ -20,7 +20,12 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E1425C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E14458.s")
+extern void func_87E13924(void *, s32);
+extern void *D_87F119DC;
+
+void func_87E14458(void) {
+    func_87E13924(D_87F119DC, (*(s32 *)((u8 *)(D_87F119DC) + (0x20))));
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E14480.s")
 
@@ -146,9 +151,23 @@ s32 func_87E17EC8(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E17ED0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E17F14.s")
+extern void func_87E01628();
+extern void func_87E03D28(s32);
+extern void main_pool_pop_state(s32);
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E17F48.s")
+void func_87E17F14(s32 arg0) {
+    func_87E03D28(arg0 + 0x30);
+    func_87E01628();
+    main_pool_pop_state(0x4D51454A);
+}
+
+extern void func_87E01628();
+extern void main_pool_pop_state(s32);
+
+void func_87E17F48(void) {
+    func_87E01628();
+    main_pool_pop_state(0x4D514D53);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E17F74.s")
 

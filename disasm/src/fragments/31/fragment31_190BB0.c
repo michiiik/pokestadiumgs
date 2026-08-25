@@ -16,7 +16,17 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_190BB0/func_8821E0BC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_190BB0/func_8821E13C.s")
+extern void func_88216EFC(s32);
+extern s32 D_880068B4;
+extern s8 D_889041B8;
+
+void func_8821E13C(s32 arg0) {
+    D_880068B4 = 0;
+    D_889041B8 = 2;
+    if (arg0 == 0) {
+        func_88216EFC(0);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_190BB0/func_8821E174.s")
 
