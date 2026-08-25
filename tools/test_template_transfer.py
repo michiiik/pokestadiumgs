@@ -247,6 +247,7 @@ class GenerateTemplateCandidatesTest(unittest.TestCase):
             row = {
                 "function": "func_winner", "similarity": 0.95, "same_length": True,
                 "label": "m2c:s32-s32", "code": WINNER_CODE,
+                "declarations": "extern s32 D_SEPARATE;\n",
             }
             with mock.patch.object(
                 targets, "require_owner", return_value=self._owner()
@@ -263,7 +264,8 @@ class GenerateTemplateCandidatesTest(unittest.TestCase):
         candidate = candidates[0]
         self.assertEqual(candidate.outcome, "candidate")
         self.assertEqual(candidate.label, "template:func_winner:0.95")
-        self.assertEqual(candidate.declarations, "extern s32 NewGlobal;\n")
+        self.assertIn("extern s32 D_SEPARATE;", candidate.declarations)
+        self.assertIn("extern s32 NewGlobal;", candidate.declarations)
         self.assertIn("func_target", candidate.code)
         self.assertIn("NewCallee(&NewGlobal, 0x20)", candidate.code)
         self.assertNotIn("OldGlobal", candidate.code)

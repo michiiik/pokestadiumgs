@@ -2204,12 +2204,13 @@ class SimilarSolvedTests(unittest.TestCase):
             )
             stats = root / "stats.jsonl"
             stats.write_text(json.dumps({"source": "s.c", "counts": {}, "attempts": [
-                {"function": "func_done", "status": "accepted", "candidate": "s32 func_done(s32 *a) { return a[0]; }", "label": "load"},
+                {"function": "func_done", "status": "accepted", "candidate": "s32 func_done(s32 *a) { return a[0]; }", "declarations": "extern s32 D_DONE;", "label": "load"},
                 {"function": "func_lost", "status": "probe_rejected", "candidate": "void func_lost(void) {}"},
             ]}) + "\n")
             with mock.patch.object(targets, "ASM_ROOT", asm_root), mock.patch.object(targets, "_SOLVED_CACHE", None):
                 rows = targets.solved_shapes(stats)
                 self.assertEqual([row["function"] for row in rows], ["func_done"])
+                self.assertEqual(rows[0]["declarations"], "extern s32 D_DONE;")
                 owner = targets.Owner("func_new", "disasm/src/s.c", "x/func_new.s")
                 with mock.patch.object(targets, "require_owner", return_value=owner), mock.patch.object(
                     targets.Owner, "asm_path", property(lambda self: asm_root / "x" / "func_new.s")

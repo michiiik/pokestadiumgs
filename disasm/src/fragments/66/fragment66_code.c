@@ -74,7 +74,9 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/66/fragment66_code/func_82E02A70.s")
+extern Gfx *D_800D0510;
+extern u8 D_82E05450[];
+void func_82E02A70(void) { Gfx *temp_v1 = D_800D0510++; temp_v1->words.w0 = 0xDE000000; temp_v1->words.w1 = (u32)D_82E05450; }
 #endif
 
 void func_82E02A9C(void) {

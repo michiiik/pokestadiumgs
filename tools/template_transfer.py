@@ -459,6 +459,9 @@ def generate_template_candidates(
 
         winner_code = str(row["code"])
         decl_text, body_text = sweep_targets.split_candidate_declarations(winner_code)
+        stored_declarations = row.get("declarations")
+        if isinstance(stored_declarations, str) and stored_declarations.strip():
+            decl_text = transfer_sweep.merge_declarations([stored_declarations, decl_text]) or ""
         rename_map, immediates, alignment_ok, inconsistent, notes = align_and_map(
             parsed_target, parsed_winner, winner_function, function, body_text,
         )

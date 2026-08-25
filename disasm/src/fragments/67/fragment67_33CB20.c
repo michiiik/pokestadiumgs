@@ -6,11 +6,14 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33CB20/func_829000A0.s")
+extern Gfx *D_800D0510;
+extern u8 D_82911B00[];
+extern u8 D_82911B40[];
+void func_829000A0(void) { Gfx *temp_v1 = D_800D0510++; temp_v1->words.w0 = 0xDE000000; temp_v1->words.w1 = (u32)D_82911B00; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33CB20/func_829000CC.s")
+void func_829000CC(void) { Gfx *temp_v1 = D_800D0510++; temp_v1->words.w0 = 0xDE000000; temp_v1->words.w1 = (u32)D_82911B40; }
 #endif
 
 #ifdef VERSION_US

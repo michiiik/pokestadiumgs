@@ -337,6 +337,12 @@ def solved_shapes(
                 "function": function,
                 "label": attempt.get("label"),
                 "code": attempt["candidate"],
+                # Candidate declarations are stored separately by the
+                # runner so they can be hoisted once per source group. Keep
+                # them with the accepted winner when it is reused by the
+                # template-transfer path; dropping them turns otherwise
+                # valid templates into undefined-global compile failures.
+                "declarations": attempt.get("declarations") or "",
                 "ops": _opcode_sequence(asm_path.read_text(encoding="utf-8")),
             }
     rows = list(solved.values())
@@ -379,6 +385,7 @@ def similar_solved(
                 "same_length": len(other) == len(ops),
                 "label": row["label"],
                 "code": row["code"],
+                "declarations": row.get("declarations", ""),
             })
     ranked.sort(key=lambda row: (-float(row["similarity"]), not row["same_length"], str(row["function"])))
     return ranked[:limit]
