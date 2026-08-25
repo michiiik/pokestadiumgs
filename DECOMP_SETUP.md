@@ -128,3 +128,19 @@ separately DMA'd overlays with their own `vram:`/`start:` pairs in
    `grep -rn "0x8025\|%hi(0x802492B0)" asm/us/nonmatchings/ | ...`
    That was impossible before this extraction.
 3. Decompile that consumer to C and rename its symbols in the same change.
+
+
+## Optional candidate helpers (m2c, decomp-permuter)
+
+`tools/setup_decomp_tools.sh` clones [m2c](https://github.com/matt-kempster/m2c)
+and [decomp-permuter](https://github.com/simonlindholm/decomp-permuter) into
+`disasm/tools/` (gitignored) and creates `disasm/tools/decomp-venv` with the
+permuter's Python dependencies. With them installed the MCP runner's
+`draft_candidates` and `permute_candidate` tools work; the CLI equivalents are
+`tools/pragma_targets.py draft <function>` and
+`tools/permute_candidate.py <function> candidate.c --seconds 60`.
+
+m2c contexts are host-preprocessed copies of the owner source, cached under
+`disasm/build/m2c-context/`; permuter work directories live under
+`disasm/build/permuter/` and are removed after each run unless `--keep` is
+given.

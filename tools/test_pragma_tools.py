@@ -695,5 +695,163 @@ class RunnerTests(unittest.TestCase):
         self.assertEqual(result["attempts"][0]["status"], "compare_rejected")
 
 
+
+
+import dedupe_externs  # noqa: E402
+import permute_candidate  # noqa: E402
+import pragma_targets as targets  # noqa: E402
+import try_pragma_compare_mcp as mcp  # noqa: E402
+
+
+class TargetDiscoveryTests(unittest.TestCase):
+    def test_owner_index_maps_functions_to_sources(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source_root = root / "disasm" / "src"
+            source_root.mkdir(parents=True)
+            (source_root / "a.c").write_text(
+                '#pragma GLOBAL_ASM("asm/us/nonmatchings/a/func_a.s")\n'
+                'void done(void) {}\n'
+                '#pragma GLOBAL_ASM("asm/us/nonmatchings/a/func_b.s")\n'
+            )
+            probe = source_root / ".pragma_probe_x"
+            probe.mkdir()
+            (probe / "a.c").write_text('#pragma GLOBAL_ASM("asm/us/nonmatchings/a/func_z.s")\n')
+            index = targets.owner_index(source_root, repo_root=root)
+        self.assertEqual(sorted(index), ["func_a", "func_b"])
+        self.assertEqual(index["func_a"].source, "disasm/src/a.c")
+        self.assertEqual(index["func_a"].asm, "disasm/asm/us/nonmatchings/a/func_a.s")
+
+    def test_host_preprocess_command_strips_check_only_flags(self) -> None:
+        check = [
+            "gcc", "-MMD", "-MP", "-fsyntax-only", "-Iinclude", "-I", runner._RECIPE_DIRECTORY,
+            "-o", runner._RECIPE_OBJECT, runner._RECIPE_SOURCE,
+        ]
+        command = runner.host_preprocess_command(check, "src/fragments/79/")
+        self.assertEqual(
+            command,
+            ["gcc", "-Iinclude", "-I", "src/fragments/79/", "-E", "-P", "-D__attribute__(x)="],
+        )
+
+    def test_parse_check_recipe_finds_syntax_check_line(self) -> None:
+        output = "\n".join([
+            f"gcc -fsyntax-only -o {runner._RECIPE_OBJECT} {runner._RECIPE_SOURCE}",
+            f"cc -c -o {runner._RECIPE_OBJECT} {runner._RECIPE_SOURCE}",
+        ])
+        self.assertEqual(runner._parse_check_recipe(output)[0], "gcc")
+        self.assertEqual(runner._parse_probe_recipe(output)[0], "cc")
+
+
+class DeclarationTests(unittest.TestCase):
+    def test_declarations_probe_every_candidate_and_install_once(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.c"
+            source.write_text(
+                '#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_a.s")\n'
+                '#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_b.s")\n'
+            )
+            probed: list[tuple[str, str]] = []
+
+            def fake_probe(source_path, blocks, workers=None):
+                probed.extend(blocks)
+                return [
+                    {"index": index, "function": function, "status": "probe_match"}
+                    for index, (function, _) in enumerate(blocks)
+                ]
+
+            with mock.patch.object(runner, "probe_candidates", side_effect=fake_probe), mock.patch.object(
+                runner, "rebuild_source_object", return_value=0
+            ), mock.patch.object(
+                runner, "_try_candidate_detailed", return_value=(0, "accepted")
+            ), mock.patch.object(runner, "compare_current_tree", return_value=0):
+                result = runner.try_candidates_detailed(
+                    source,
+                    [("func_a", "void func_a(void) {}"), ("func_b", "void func_b(void) {}")],
+                    declarations="extern s32 D_1;\n",
+                )
+            self.assertEqual(result["accepted"], ["func_a", "func_b"])
+            self.assertTrue(all(code.startswith("extern s32 D_1;\n") for _, code in probed))
+            installed = source.read_text()
+            self.assertEqual(installed.count("extern s32 D_1;"), 1)
+            self.assertLess(installed.index("extern s32 D_1;"), installed.index("void func_a"))
+
+
+class DedupeExternTests(unittest.TestCase):
+    def test_duplicate_top_level_externs_are_removed_once(self) -> None:
+        text = (
+            "extern u8 D_1;\n"
+            "void f(void) {\n    extern u8 D_1;\n}\n"
+            "/* extern u8 D_1; */\n"
+            "extern u8  D_1;\n"
+            "extern void g(u8, u8);\n"
+            "extern void g(u8, u8);\n"
+        )
+        result, removed = dedupe_externs.dedupe_text(text)
+        self.assertEqual(removed, ["extern u8 D_1;", "extern void g(u8, u8);"])
+        lines = result.splitlines()
+        self.assertEqual(lines.count("extern u8 D_1;"), 1)
+        self.assertIn("    extern u8 D_1;", lines)  # function-local declaration untouched
+        self.assertIn("/* extern u8 D_1; */", lines)  # commented text untouched
+        self.assertEqual(lines.count("extern void g(u8, u8);"), 1)
+
+
+class PermuterWrapperTests(unittest.TestCase):
+    def test_extract_function_returns_only_the_target_body(self) -> None:
+        code = (
+            "extern u8 D_1;\nvoid other(void) { if (D_1) { D_1 = 0; } }\n"
+            "void target(u8 *arg0, s16 a1)\n{\n  *((s16 *) (arg0 + 0x9A)) = a1;\n}\n"
+            "void later(void);\n"
+        )
+        body = permute_candidate.extract_function(code, "target")
+        self.assertTrue(body.startswith("void target("))
+        self.assertTrue(body.rstrip().endswith("}"))
+        self.assertNotIn("later", body)
+        self.assertNotIn("other", body)
+
+    def test_compile_script_substitutes_include_directory(self) -> None:
+        compiler, flags = permute_candidate._split_recipe([
+            "python3", "build.py", "--flag", "/ido/cc", "--", "as", "-32", "--",
+            "-c", "-I", runner._RECIPE_DIRECTORY, "-O2", "-o", runner._RECIPE_OBJECT, runner._RECIPE_SOURCE,
+        ])
+        self.assertEqual(compiler, "/ido/cc")
+        self.assertEqual(flags, ["-c", "-I", runner._RECIPE_DIRECTORY, "-O2"])
+        script = permute_candidate.compile_script_text(compiler, flags, "src/x/")
+        self.assertIn("-I src/x/ -O2 \"$@\"", script)
+        self.assertIn("exec /ido/cc", script)
+
+
+class McpDispatchTests(unittest.TestCase):
+    def test_tool_list_covers_every_handler(self) -> None:
+        self.assertEqual({tool["name"] for tool in mcp.TOOLS}, set(mcp.HANDLERS))
+
+    def test_unknown_owner_is_a_tool_error_not_a_crash(self) -> None:
+        with mock.patch.object(targets, "find_owner", return_value=None):
+            response = mcp.call_tool("find_owner", {"function": "func_nope"})
+        self.assertTrue(response["isError"])
+        self.assertIn("func_nope", response["content"][0]["text"])
+
+    def test_source_is_resolved_from_function_owner(self) -> None:
+        owner = targets.Owner("func_a", "disasm/src/synthetic.c", "disasm/asm/us/nonmatchings/s/func_a.s")
+        captured = {}
+
+        def fake_try(source, blocks, **kwargs):
+            captured["source"] = source
+            captured["declarations"] = kwargs.get("declarations")
+            return {"status": 1, "accepted": [], "attempts": [], "batch_status": "probe_only"}
+
+        with mock.patch.object(targets, "find_owner", return_value=owner), mock.patch.object(
+            runner, "try_candidates_detailed", side_effect=fake_try
+        ):
+            response = mcp.call_tool("try_pragma_candidates", {
+                "candidates": [{"function": "func_a", "code": "void func_a(void) {}"}],
+                "declarations": "extern u8 D_1;",
+                "gate": False,
+            })
+        self.assertFalse(response["isError"])
+        self.assertEqual(captured["source"], owner.source_path)
+        self.assertEqual(captured["declarations"], "extern u8 D_1;")
+        self.assertEqual(json.loads(response["content"][0]["text"])["source"], "disasm/src/synthetic.c")
+
+
 if __name__ == "__main__":
     unittest.main()
