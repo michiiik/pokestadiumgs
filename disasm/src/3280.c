@@ -10,7 +10,16 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/3280/func_8000290C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3280/func_80002984.s")
+extern s32 func_80002740(s32, s32);
+extern OSMesgQueue D_800CCDB4;
+s32 func_80002984(s32 arg0, s32 arg1) {
+    s32 result;
+
+    osRecvMesg(&D_800CCDB4, NULL, 1);
+    result = func_80002740(arg0, arg1);
+    osSendMesg(&D_800CCDB4, NULL, 0);
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/3280/func_800029E0.s")
 
