@@ -536,6 +536,9 @@ class ApplyRenameTest(unittest.TestCase):
     def test_empty_map_is_noop(self):
         self.assertEqual(sweep.apply_rename("abc", {}), "abc")
 
+    def test_sanitize_candidate_text_replaces_unencodable_punctuation(self):
+        self.assertEqual(sweep.sanitize_candidate_text("/* CPU \u2014 player */\n"), "/* CPU ? player */\n")
+
 
 class TypeIndexTest(unittest.TestCase):
     def test_struct_typedef_indexed(self):
@@ -598,6 +601,26 @@ class TypeIndexTest(unittest.TestCase):
         self.assertIn("D", collected)
         self.assertNotIn("C", collected)
 
+    def test_default_depth_covers_deep_transfer_dependencies(self):
+        header = (
+            "typedef struct A { B b; } A;\n"
+            "typedef struct B { C c; } B;\n"
+            "typedef struct C { D d; } C;\n"
+            "typedef struct D { E e; } D;\n"
+            "typedef struct E { F f; } E;\n"
+            "typedef struct F { s32 value; } F;\n"
+        )
+        index = sweep.index_type_definitions([header])
+        collected = sweep._collect_referenced_types({"A"}, index)
+        self.assertIn("F", collected)
+
+    def test_referenced_types_include_extern_only_state_types(self):
+        index = sweep.index_type_definitions([
+            "typedef struct SchedulerState { s32 shutdownCounter; } SchedulerState;\n"
+        ])
+        declarations = ["extern SchedulerState D_800CD020;"]
+        self.assertEqual(sweep.referenced_type_names(declarations, index), {"SchedulerState"})
+
     def test_order_types_dependency_first(self):
         defs = {
             "Outer": "typedef struct Outer { Inner inner; } Outer;",
@@ -605,6 +628,32 @@ class TypeIndexTest(unittest.TestCase):
         }
         order = sweep.order_types(defs)
         self.assertLess(order.index("Inner"), order.index("Outer"))
+
+    def test_order_types_ignores_pointer_back_edges(self):
+        defs = {
+            "Outer": "typedef struct Outer { Node node; } Outer;",
+            "Node": "typedef struct Node { Outer *owner; } Node;",
+        }
+        order = sweep.order_types(defs)
+        self.assertLess(order.index("Node"), order.index("Outer"))
+
+    def test_forward_type_declarations_cover_named_aggregates(self):
+        defs = {
+            "Outer": "typedef struct Outer { Node *node; } Outer;",
+            "Node": "typedef struct Node { s32 value; } Node;",
+            "Anonymous": "typedef struct { s32 value; } Anonymous;",
+        }
+        forwards = sweep.forward_type_declarations(defs, {name: f"S1_{name}" for name in defs})
+        self.assertIn("typedef struct S1_Outer S1_Outer;", forwards)
+        self.assertIn("typedef struct S1_Node S1_Node;", forwards)
+        self.assertNotIn("S1_Anonymous", "\n".join(forwards))
+
+    def test_named_aggregate_definition_uses_existing_forward_typedef(self):
+        definition = "typedef struct S1_Node {\n    s32 value;\n} S1_Node;"
+        self.assertEqual(
+            sweep._strip_named_aggregate_typedef(definition),
+            "struct S1_Node {\n    s32 value;\n};",
+        )
 
     def test_s1_prefix_rename_applied_to_definition(self):
         defs = {"Foo": "typedef struct Foo { s32 x; } Foo;"}
@@ -640,6 +689,59 @@ class PublicCollectTypeDefinitionsTest(unittest.TestCase):
         index = sweep.index_type_definitions(["typedef struct Foo { s32 x; } Foo;\n"])
         result = sweep.collect_type_definitions("void Bar(void) { return; }", index, "S1_")
         self.assertEqual(result, [])
+
+
+class MergeDeclarationsTest(unittest.TestCase):
+    def test_deduplicates_complete_multiline_units(self):
+        first = "typedef struct {\n    s32 x;\n} S1_First;"
+        second = "typedef struct {\n    s32 y;\n} S1_Second;"
+
+        merged = sweep.merge_declarations([first, second, first])
+
+        self.assertEqual(merged, first + "\n" + second + "\n")
+        self.assertEqual(merged.count("typedef struct {"), 2)
+        self.assertIn("s32 x;", merged)
+        self.assertIn("s32 y;", merged)
+
+    def test_partitions_conflicting_complete_declarations(self):
+        first = sweep.TransferResult(
+            function="func_A", outcome="candidate",
+            declaration_units=["typedef struct S1_State { s32 x; } S1_State;"],
+        )
+        second = sweep.TransferResult(
+            function="func_B", outcome="candidate",
+            declaration_units=["typedef struct S1_State { s16 x; } S1_State;"],
+        )
+        compatible = sweep.TransferResult(
+            function="func_C", outcome="candidate",
+            declaration_units=["typedef struct S1_State { s32 x; } S1_State;"],
+        )
+
+        groups = sweep.partition_transfer_results([first, second, compatible])
+
+        self.assertEqual(
+            [[result.function for result in group] for group in groups],
+            [["func_A", "func_C"], ["func_B"]],
+        )
+
+    def test_partitions_disjoint_declarations_to_avoid_cross_contamination(self):
+        first = sweep.TransferResult(
+            function="func_A", outcome="candidate",
+            declaration_units=["typedef struct S1_A { s32 x; } S1_A;"],
+        )
+        second = sweep.TransferResult(
+            function="func_B", outcome="candidate",
+            declaration_units=["typedef struct S1_B { s32 y; } S1_B;"],
+        )
+        no_declarations = sweep.TransferResult(function="func_C", outcome="candidate")
+        another_no_declarations = sweep.TransferResult(function="func_D", outcome="candidate")
+
+        groups = sweep.partition_transfer_results([first, second, no_declarations, another_no_declarations])
+
+        self.assertEqual(
+            [[result.function for result in group] for group in groups],
+            [["func_A"], ["func_B"], ["func_C", "func_D"]],
+        )
 
 
 class GenerateCandidateAlignmentTest(unittest.TestCase):
@@ -902,6 +1004,82 @@ class AsciiGuardTest(_FullContextTestCase):
             result = sweep.generate_candidate("func_TEST", owner, ctx, transfer_map, {})
         self.assertEqual(result.outcome, "candidate")
         self.assertTrue(all(ord(c) < 128 for c in result.variants[0][1]))
+
+
+class GenerateCandidateTypeDedupTest(unittest.TestCase):
+    def test_prefixed_typedef_matches_installed_stripped_struct(self):
+        """Do not emit a second S1 type when the owner has its stripped form."""
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            asm_path = tmp_path / "func_TEST.s"
+            asm_path.write_text(
+                "glabel func_TEST\n"
+                "    /* 000000 80000000 00000000 */  nop\n"
+            )
+            owner_source = tmp_path / "source.c"
+            owner_source.write_text(
+                "struct S1_Foo {\n"
+                "    s32 value;\n"
+                "};\n"
+            )
+            s1_source = tmp_path / "s1.c"
+            s1_source.write_text(
+                "void FooFunc(void) {\n"
+                "    Foo value;\n"
+                "    (void)value.value;\n"
+                "}\n"
+            )
+            owner = mock.Mock(
+                function="func_TEST",
+                asm_path=asm_path,
+                asm=str(asm_path),
+                source_path=owner_source,
+            )
+            ctx = mock.Mock()
+            ctx.s1_functions = {"FooFunc": {"w": [0]}}
+            ctx.func_file_index = {"FooFunc": s1_source}
+            ctx.gs_asm_fallback = None
+            ctx.symtab = sweep.S1SymbolTable(
+                all_by_addr={}, func_by_addr={}, sorted_addrs=[],
+                names=set(), func_names=set(),
+            )
+            ctx.extern_index = {}
+            ctx.type_index = sweep.index_type_definitions([
+                "typedef struct Foo {\n"
+                "    s32 value;\n"
+                "} Foo;\n"
+            ])
+            ctx.gs_type_index = {}
+            ctx.macro_index = {}
+            ctx.gs_macro_index = {}
+
+            result = sweep.generate_candidate(
+                "func_TEST",
+                owner,
+                ctx,
+                {"func_TEST": ("FooFunc", "Stadium 1 FooFunc @ 0x80100000 (text); match class identical; 1 instructions")},
+                {},
+            )
+
+        self.assertEqual(result.outcome, "candidate")
+        self.assertEqual(result.declaration_units, [])
+        self.assertNotIn("S1_Foo", result.declarations)
+
+    def test_prefixed_typedef_matches_installed_struct_ignoring_comments(self):
+        installed = """struct S1_Foo {
+            /* GS comment */
+            s32 value; // owner spelling
+        };"""
+        transferred = """typedef struct Foo {
+            /* S1 comment */
+            s32 value; // source spelling
+        } Foo;"""
+        self.assertEqual(
+            sweep._normalize_type_definition(installed),
+            sweep._normalize_type_definition(sweep.apply_rename(transferred, {"Foo": "S1_Foo"})),
+        )
 
 
 class SelectFunctionsTest(unittest.TestCase):

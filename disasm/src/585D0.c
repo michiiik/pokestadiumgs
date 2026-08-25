@@ -907,7 +907,12 @@ void func_8005F9CC(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005F9F4.s")
+extern void func_8005F808(s32, s32, s32);
+
+void func_8005F9F4(s32 arg0, s32 arg1) {
+    s32 *p = &arg1;
+    func_8005F808(arg0, arg1 & 0xFFFF, 2);
+}
 #endif
 
 #ifdef VERSION_US

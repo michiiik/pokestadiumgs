@@ -161,7 +161,35 @@ s16 *func_841202F0(s16 *arg0, s16 *arg1) {
     return arg0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84120310.s")
+s32 func_84120310(s16* arg0, s16 arg1, s16 arg2) {
+    s16 temp_v0 = arg1 - *arg0;
+
+    if (arg2 < 0) {
+        arg2 *= -1;
+    }
+
+    if (temp_v0 > 0) {
+        temp_v0 -= arg2;
+        if (temp_v0 >= 0) {
+            *arg0 = arg1 - temp_v0;
+        } else {
+            *arg0 = arg1;
+        }
+    } else {
+        temp_v0 += arg2;
+        if (temp_v0 <= 0) {
+            *arg0 = arg1 - temp_v0;
+        } else {
+            *arg0 = arg1;
+        }
+    }
+
+    if (arg1 == *arg0) {
+        return 0;
+    }
+
+    return 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_841203B4.s")
 
@@ -297,7 +325,31 @@ void func_84122C94(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84122DD8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84122E70.s")
+typedef struct S1_Vec3f S1_Vec3f;
+struct S1_Vec3f {
+    /* 0x0 */ f32 x;
+    /* 0x4 */ f32 y;
+    /* 0x8 */ f32 z;
+};
+typedef float S1_MtxF_t[4][4];
+typedef union {
+    S1_MtxF_t mf;
+    struct {
+        float xx, yx, zx, wx,
+              xy, yy, zy, wy,
+              xz, yz, zz, wz,
+              xw, yw, zw, ww;
+    };
+} S1_MtxF;
+void func_84122E70(S1_Vec3f* arg0, S1_MtxF* arg1) {
+    f32 x = (arg1->mf[0][0] * arg0->x) + (arg1->mf[0][1] * arg0->y) + (arg1->mf[0][2] * arg0->z);
+    f32 y = (arg1->mf[1][0] * arg0->x) + (arg1->mf[1][1] * arg0->y) + (arg1->mf[1][2] * arg0->z);
+    f32 z = (arg1->mf[2][0] * arg0->x) + (arg1->mf[2][1] * arg0->y) + (arg1->mf[2][2] * arg0->z);
+
+    arg0->x = x;
+    arg0->y = y;
+    arg0->z = z;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84122EEC.s")
 

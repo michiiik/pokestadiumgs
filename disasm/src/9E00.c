@@ -2,7 +2,12 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/9E00/func_80009200.s")
+void func_80009200(s32 ms) {
+    u64 cycles = OS_USEC_TO_CYCLES(ms * 1000LL); // why not just do OS_NSEC_TO_CYCLES and not multiply by 1000LL?
+
+    osSetTime(0);
+    while (osGetTime() < cycles) {}
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/9E00/func_800092C8.s")
 
@@ -20,7 +25,19 @@ extern void *memcpy(void *, const void *, s32); void *func_80009750(void *dest, 
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/9E00/func_80009940.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/9E00/func_80009D98.s")
+OSThread* func_80009D98(void) {
+    OSThread* thread = __osGetActiveQueue();
+
+    while (thread->priority != -1) {
+        if (thread->priority > 0 && thread->priority < 0x7F && (thread->flags & 3)) {
+            return thread;
+        }
+
+        thread = thread->tlnext;
+    }
+
+    return NULL;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/9E00/func_80009E04.s")
 

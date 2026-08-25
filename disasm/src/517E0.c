@@ -42,7 +42,14 @@ extern s32 D_800972B0[]; s32 func_80050CF8(s32 arg0){s32 result=0;if(arg0>=0&&ar
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051568.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800515D4.s")
+u16 func_800515D4(u8* arg0, s32 arg1) {
+    u16 var_v1 = 0;
+
+    while (arg1-- > 2) {
+        var_v1 += *arg0++;
+    }
+    return var_v1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051610.s")
 
