@@ -89,7 +89,9 @@ void func_87E13248(void) { func_8004C8C0(361); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E133F0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E13458.s")
+extern u8 *D_87E1EBD8;
+extern void func_8003C6B8(s32);
+void func_87E13458(void) { func_8003C6B8(*(s32 *)(D_87E1EBD8 + 0x28)); }
 
 void func_87E13480(u8 *arg0) { extern u8 *D_87E1EBD8; *(u8 **)(D_87E1EBD8 + 4) = arg0; }
 
