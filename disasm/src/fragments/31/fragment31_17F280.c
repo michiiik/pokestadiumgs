@@ -52,7 +52,8 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820FC78.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820FD58.s")
+extern void func_8820FC78();
+void func_8820FD58(void) { func_8820FC78(0); func_8820FC78(1); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820FD80.s")
 

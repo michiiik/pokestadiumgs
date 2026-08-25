@@ -511,7 +511,9 @@ void func_8002A9CC(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002B1A0.s")
+extern void func_8002A25C();
+extern void func_80024180();
+void func_8002B1A0(void) { func_8002A25C(); func_80024180(0, 0); }
 #endif
 
 #ifdef VERSION_US

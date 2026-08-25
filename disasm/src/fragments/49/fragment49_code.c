@@ -164,7 +164,10 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86106784.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86106C28.s")
+extern void *D_87F119DC;
+extern void func_86106688();
+extern void func_86106504();
+void func_86106C28(void) { func_86106688(); func_86106504(D_87F119DC); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86106C54.s")
 

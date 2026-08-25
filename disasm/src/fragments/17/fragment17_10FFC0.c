@@ -120,7 +120,10 @@ void func_82203A84(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82203BD8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82203E40.s")
+extern void func_822014D8();
+extern void func_80007B34();
+extern void func_80035424();
+void func_82203E40(void) { func_822014D8(); func_80007B34(5); func_80035424(15); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82203E70.s")
 

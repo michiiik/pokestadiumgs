@@ -55,7 +55,10 @@ s16 func_80064CDC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/func_80064D28.s")
+extern void func_80005EE0();
+extern void func_80005F0C();
+extern void func_80049ED0();
+void func_80064D28(void) { func_80005EE0(); func_80005F0C(); func_80049ED0(); }
 #endif
 
 #ifdef VERSION_US

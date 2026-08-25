@@ -12,7 +12,8 @@ void func_87E00030(void) {
     *(s32 *)(D_87E1BA20 + 0x2E04) = 1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_303990/func_87E00044.s")
+extern void func_8004C8C0();
+void func_87E00044(void) { func_8004C8C0(260); func_8004C8C0(424); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_303990/func_87E0006C.s")
 

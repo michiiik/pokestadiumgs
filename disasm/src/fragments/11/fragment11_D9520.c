@@ -44,7 +44,9 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81602DD8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_8160317C.s")
+extern void func_8004C8C0();
+extern void func_81602DD8();
+void func_8160317C(void) { func_8004C8C0(66); func_8004C8C0(65); func_81602DD8(); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_816031AC.s")
 
