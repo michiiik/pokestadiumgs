@@ -84,7 +84,6 @@ s32 func_82507B58(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_144790/func_82507B6C.s")
 
-extern s16 D_82508FF0;
 
 s32 func_82507BBC(void) {
     return D_82508FF0 == 4;
@@ -98,7 +97,6 @@ s32 func_82507BBC(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_144790/func_82507C98.s")
 
-extern s16 D_82508FF0;
 
 s32 func_82507CF4(void) {
     return D_82508FF0 == 0;

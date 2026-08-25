@@ -7,7 +7,6 @@ void func_8822E870(void) {
     D_880068B8 = 0;
 }
 
-extern s32 D_880068B8;
 void func_8822E87C(void) {
     D_880068B8 = 1;
 }

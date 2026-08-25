@@ -42,7 +42,6 @@ void func_87E0BE28(s32 arg0) { func_87F02684(arg0 + 12); }
 extern void func_87E0BFFC(s32, s32, s32);
 void func_87E0C5C4(s32 arg0, s32 arg1) { func_87E0BFFC(arg0, arg1, 0); }
 
-extern void func_87E0BFFC(s32, s32, s32);
 void func_87E0C5E4(s32 arg0) { func_87E0BFFC(arg0, -1, 0); }
 
 extern void func_87E0C290(void);

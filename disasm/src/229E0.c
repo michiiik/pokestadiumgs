@@ -356,7 +356,6 @@ void func_800277C4(u16 resource_id, u8 mode) {
 #endif
 
 #ifdef VERSION_US
-extern void func_80018728(u32, ...);
 void func_8002809C(void) {
     func_80018728(0xF2000000, 0);
 }
@@ -422,7 +421,6 @@ u16 func_8002892C(u16 arg0) {
 #endif
 
 #ifdef VERSION_US
-extern u32 D_800D1AD8[24];
 void func_80028A28(u16 arg0) {
     u32 i;
     for (i = arg0; i > 0; i--) D_800D1AD8[i] = D_800D1AD8[i - 1];
@@ -893,7 +891,6 @@ void func_800347A4(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern u8 D_800D2B6A;
 void func_800347BC(s32 arg0, s32 arg1) {
     D_800D2B6A = 0;
 }
@@ -993,7 +990,6 @@ void func_80034EA4(void) { D_800D2B49 = 0x77; }
 #endif
 
 #ifdef VERSION_US
-extern u8 D_800D2B49;
 void func_80034EB4(void) { D_800D2B49 = 0x33; }
 #endif
 
@@ -1007,7 +1003,6 @@ void func_80034ED0(void) { D_800D2B59 = 4; }
 #endif
 
 #ifdef VERSION_US
-extern u8 D_800D2B59;
 void func_80034EE0(void) { D_800D2B59 = 0x84; }
 #endif
 
@@ -1085,7 +1080,6 @@ s32 func_800353E4(void) {
 #endif
 
 #ifdef VERSION_US
-extern s32 D_80122A40;
 void func_80035470(s32 enabled) { D_80122A40 = enabled ? 0 : 1; }
 #endif
 
@@ -1136,7 +1130,6 @@ void func_80035700(u32 seed) {
 #endif
 
 #ifdef VERSION_US
-extern u32 D_80124D50;
 u32 func_8003570C(void) {
     D_80124D50 = D_80124D50 * 0x0019660D + 0x3C6EF35F;
     return D_80124D50;

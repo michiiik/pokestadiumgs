@@ -16,8 +16,6 @@ void func_88103B90(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/30/fragment30_170D70/func_88103BB8.s")
 
-extern void *D_80087200;
-extern void func_80049ED8(void *);
 extern void func_88103BB8(void);
 extern s32 D_880068B4;
 void func_88103CAC(void) {
@@ -28,7 +26,6 @@ void func_88103CAC(void) {
 
 extern void *D_88104EA0;
 extern void func_88004990(s32, s32);
-extern s32 D_880068B8;
 void func_88103CE0(void) {
     func_88004990(**(u8 **)((u8 *)D_88104EA0 + 0), 0);
     func_88004990(**(u8 **)((u8 *)D_88104EA0 + 4), 0);

@@ -18,7 +18,6 @@ void func_88231AE8(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A4B70/func_88231C04.s")
 
-extern void func_88005B60(s32, void (*)(void), void (*)(void), void (*)(void));
 extern void func_88231B20(void);
 extern void func_88231C04(void);
 extern void func_8820908C(void);

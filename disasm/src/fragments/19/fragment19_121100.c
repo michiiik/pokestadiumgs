@@ -12,7 +12,6 @@ s32 func_823000E8(void) {
     return D_82305EE4 == 0;
 }
 
-extern s16 D_82305EE4;
 
 s32 func_823000F8(void) {
     return D_82305EE4 == 2;
@@ -37,7 +36,6 @@ s32 func_82300AB4(void) {
     return result;
 }
 
-extern s16 D_82305EB4;
 s32 func_82300AD4(void) {
     s32 result = 0;
     if (D_82305EB4 == 2) result = 1;
@@ -55,7 +53,6 @@ void func_82300F1C(void) {
     D_82305E68[0x76 / 2] = 0;
 }
 
-extern s16 D_82305E68[];
 
 void func_82300F34(void) {
     D_82305E68[0x74 / 2] = 3;

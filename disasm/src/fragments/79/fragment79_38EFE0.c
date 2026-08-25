@@ -65,7 +65,6 @@ extern void func_841125F4(s32, s32); void func_8411FAD4(s32 arg0, s32 arg1) { fu
 
 extern void func_841125F4(s32, s32); void func_8411FB00(s32 arg0, s32 arg1) { func_841125F4(func_8411F750(arg0), 7); }
 
-extern void func_841125F4(s32, s32);
 void func_8411FB2C(s32 arg0, s32 arg1) {
     func_841125F4(func_8411F750(arg0), 0xF);
 }
@@ -86,7 +85,6 @@ void func_8411FC3C(s32 arg0, s32 arg1) { func_841125F4(func_8411F750(arg0), 0x17
 void func_8411FC68(s32 arg0, s32 arg1) { func_841125F4(func_8411F750(arg0), 3); }
 
 extern u8 D_841911F9;
-extern void func_841125F4(s32, s32);
 void func_8411FC94(s32 arg0, s32 arg1) {
     if (D_841911F9 == 5) {
         func_841125F4(func_8411F750(0), 0x22);
@@ -127,7 +125,6 @@ void func_8411FEE8(u16 arg0) {
     *(u16 *)(D_84193DD0 + 6) = arg0;
 }
 
-extern u8 *D_84193DD0;
 void func_8411FEFC(void) {
     if (*(u16 *)(D_84193DD0 + 6) != 0) {
         *(u16 *)(D_84193DD0 + 6) -= 1;

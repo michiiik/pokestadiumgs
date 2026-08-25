@@ -22,7 +22,6 @@ u8 *func_88A00710(s32 arg0, s16 arg1) {
     return result;
 }
 
-extern u8 *D_88A01C64;
 u8 func_88A007BC(s32 arg0) {
     u8 result;
     switch (arg0) {

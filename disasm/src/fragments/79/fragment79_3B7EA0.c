@@ -102,7 +102,6 @@ u8 func_841493E8(void) {
 
 u8 func_841493F4(void) { return D_8419D7B1; }
 
-extern u8 D_8419D7B2;
 extern u32 func_8003570C(void);
 void func_84149400(void) {
     D_8419D7B2 = func_8003570C();

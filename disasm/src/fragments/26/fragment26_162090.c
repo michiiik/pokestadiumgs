@@ -47,7 +47,6 @@ void func_81003910(Gfx* gfx, u32* addresses) {
     gSPEndDisplayList(gfx++);
 }
 
-extern void* func_80006DEC();
 extern void func_81003910();
 
 void func_81003948(s32 arg0, Func810038BCState* state) {
@@ -70,7 +69,6 @@ void func_81003990(Gfx* gfx, u32* addresses) {
     gSPEndDisplayList(gfx++);
 }
 
-extern void* func_80006DEC();
 extern void func_81003990();
 
 void func_810039CC(s32 arg0, Func810038BCState* state) {

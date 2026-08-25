@@ -9,7 +9,6 @@ u8 *func_88900020(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D5610/func_88900030.s")
 
-extern u8 *D_88904190;
 extern void func_800033DC(void *arg0);
 extern void main_pool_pop_state(s32 arg0);
 void func_88900494(void) {
@@ -25,7 +24,6 @@ void func_88900494(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D5610/func_88900638.s")
 
-extern u8 *D_88904190;
 void func_88900754(void) {
     u8 *ptr = D_88904190;
     if (*(u32 *)(ptr + 0x44) != 0) {
@@ -41,7 +39,6 @@ void func_8890077C(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D5610/func_889007A0.s")
 
-extern u8 *D_88904190;
 extern void func_889033FC(void *arg0, void *arg1);
 void func_88900ADC(void) {
     func_889033FC(*(void **)(D_88904190 + 4), D_88904190 + 8);
@@ -55,7 +52,6 @@ void func_88900C54(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D5610/func_88900C78.s")
 
-extern u8 *D_88904190;
 extern void func_889035FC(void *arg0);
 void func_88900D8C(void) {
     func_889035FC(D_88904190 + 0x48);

@@ -89,7 +89,6 @@ void func_816054D8(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     func_81604A44(arg0, arg1, arg2, arg3, 1);
 }
 
-extern void func_81604A44(s32, s32, s32, s32, s32);
 void func_816054FC(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     func_81604A44(arg0, arg1, arg2, arg3, 0);
 }

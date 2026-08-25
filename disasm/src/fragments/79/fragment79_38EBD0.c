@@ -32,13 +32,9 @@ void func_8411F598(void) {
     D_84193F8C = D_84193F80[1];
 }
 
-extern u8 *D_84193F88;
-extern u8 *D_84193F8C;
 extern s32 D_84191208;
 extern s32 D_8419120C;
 extern void func_8003F018(u8 *);
-extern void func_8411F400();
-extern void func_8411F4F4();
 void func_8411F5F4(s32 arg0, s32 arg1) {
     *(s32 *)(D_84193F88 + 0x168) = arg0;
     func_8003F018(D_84193F88);

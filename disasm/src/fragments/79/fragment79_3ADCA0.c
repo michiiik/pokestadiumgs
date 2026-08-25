@@ -105,8 +105,6 @@ void func_8413EDCC(void) {
 #endif
 
 #ifdef VERSION_US
-extern void *func_8004C990(s32, s32);
-extern void func_8004D1FC(void *);
 void func_8413F034(void) {
     void *value = func_8004C990(0x1F, 0);
     func_8004D1FC(value);
@@ -122,8 +120,6 @@ void func_8413F034(void) {
 #endif
 
 #ifdef VERSION_US
-extern void *func_8004C990(s32, s32);
-extern void func_8004D1FC(void *);
 void func_8413F1F8(void) {
     void *value = func_8004C990(0x21, 0);
     func_8004D1FC(value);
@@ -138,8 +134,6 @@ void func_8413F224(s16 arg0, s16 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void *func_8004C990(s32, s32);
-extern void func_8004D1FC(void *);
 void func_8413F27C(void) {
     void *value = func_8004C990(0x21, 1);
     func_8004D1FC(value);
@@ -147,15 +141,12 @@ void func_8413F27C(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_80044270(s32,s32,s32,s32,s32,s32,s32,s32,s32);
 void func_8413F2A8(s16 arg0, s16 arg1) {
     func_80044270(arg0, arg1, 0x5E, 0x11, 0, 0, 0x400, 0x400, 0);
 }
 #endif
 
 #ifdef VERSION_US
-extern void *func_8004C990(s32, s32);
-extern void func_8004D1FC(void *);
 void func_8413F300(void) {
     void *value = func_8004C990(0x20, 7);
     func_8004D1FC(value);
@@ -198,43 +189,36 @@ void func_8413F6C0(s16 arg0, s16 arg1, u16 arg3) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8413F5A8(s32, s32, s32, s32);
 void func_8413F700(s16 arg0, s16 arg1) {
     func_8413F5A8(arg0, arg1, 0x20, 2);
 }
 #endif
 
 #ifdef VERSION_US
-extern void func_8413F5A8(s32, s32, s32, s32);
 void func_8413F73C(s16 arg0, s16 arg1) {
     func_8413F5A8(arg0, arg1, 0x20, 3);
 }
 #endif
 
 #ifdef VERSION_US
-extern void func_8413F5A8(s32, s32, s32, s32);
 void func_8413F778(s16 arg0, s16 arg1) {
     func_8413F5A8(arg0, arg1, 0x20, 4);
 }
 #endif
 
 #ifdef VERSION_US
-extern void func_8413F5A8(s32, s32, s32, s32);
 void func_8413F7B4(s16 arg0, s16 arg1) {
     func_8413F5A8(arg0, arg1, 0x20, 9);
 }
 #endif
 
 #ifdef VERSION_US
-extern void func_8413F5A8(s32, s32, s32, s32);
 void func_8413F7F0(s16 arg0, s16 arg1) {
     func_8413F5A8(arg0, arg1, 0x20, 1);
 }
 #endif
 
 #ifdef VERSION_US
-extern void *func_8004C990(s32, s32);
-extern void func_8004D1FC(void *);
 void func_8413F82C(void) {
     void *value = func_8004C990(0x20, 5);
     func_8004D1FC(value);
@@ -250,8 +234,6 @@ void func_8413F82C(void) {
 #endif
 
 #ifdef VERSION_US
-extern void *func_8004C990(s32, s32);
-extern void func_8004D1FC(void *);
 void func_8413FA34(void) {
     void *value = func_8004C990(0x20, 6);
     func_8004D1FC(value);
@@ -259,15 +241,12 @@ void func_8413FA34(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_80044270(s32,s32,s32,s32,s32,s32,s32,s32,s32);
 void func_8413FA60(s16 arg0, s16 arg1) {
     func_80044270(arg0, arg1, 0x10, 7, 0, 0, 0x400, 0x400, 0);
 }
 #endif
 
 #ifdef VERSION_US
-extern void *func_8004C990(s32, s32);
-extern void func_8004D1FC(void *);
 void func_8413FAB8(void) {
     void *value = func_8004C990(0x7A, 0);
     func_8004D1FC(value);
@@ -275,7 +254,6 @@ void func_8413FAB8(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_80044270(s32,s32,s32,s32,s32,s32,s32,s32,s32);
 void func_8413FAE4(s16 arg0, s16 arg1) {
     func_80044270(arg0, arg1, 0x18, 0xE, 0, 0, 0x400, 0x400, 0);
 }
@@ -290,7 +268,6 @@ void func_8413FB3C(s16 arg0, s16 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8004D19C(s32,s32,s32,s32,s32);
 void func_8413FB80(s16 arg0, s16 arg1) {
     void *value = func_8004C990(0x22, 1);
     func_8004D19C(arg0, arg1, (s32)value, 0, 0);
@@ -583,9 +560,7 @@ void func_8414640C(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-extern u16 D_84186BAC[];
 extern u16 D_84186BC4[];
-extern u16 D_84186BB4;
 extern u16 D_84186BC8;
 void func_84146450(u8 *arg0) {
     u8 index = arg0[1];
@@ -838,7 +813,6 @@ void func_84146AF0(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-extern u16 D_84186BC8;
 void func_84146CF8(u8 *arg0) {
     u8 index = arg0[1];
     *(u16 *)(arg0 + 0xA) = D_84186BAC[index];
@@ -979,7 +953,6 @@ void func_84146D98(u8 *arg0, u8 *arg1) {
 
 #ifdef VERSION_US
 extern void func_8004C948(s32);
-extern void func_8004C8C0(s32);
 void func_84148410(void) {
     func_8004C948(0x7A);
     func_8004C948(0x22);

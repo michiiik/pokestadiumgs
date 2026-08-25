@@ -54,7 +54,6 @@ s32 func_87C01F80(void) {
     return result;
 }
 
-extern u8 *func_87C01730(void);
 s32 func_87C01FB0(void) {
     u8 *state = func_87C01730();
     s32 result;
@@ -90,7 +89,6 @@ s32 func_87C02010(void) {
     return result;
 }
 
-extern u8 *func_87C017D0(void);
 s32 func_87C02040(void) {
     u8 *state = func_87C017D0();
     return state ? ((*(s16 *)state) & 1) : 0;

@@ -78,7 +78,6 @@ u8 *func_84105D40(void) {
 #endif
 
 #ifdef VERSION_US
-extern u8 *D_84190150;
 extern void func_84105E20(u8 *);
 void func_84105E3C(void) {
     u8 *ptr = D_84190150;

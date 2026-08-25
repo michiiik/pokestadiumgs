@@ -54,7 +54,6 @@ s32 func_828016BC(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/10/fragment10_D5250/func_82801774.s")
 
-extern f32 func_816092FC(void);
 s32 func_828019B4(u8 *arg0) {
     f32 step = func_816092FC();
     *(f32 *)(arg0 + 4) -= step;

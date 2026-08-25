@@ -12,7 +12,6 @@ void func_8822EAB0(void) {
     *(u32 *)(*D_88234970 + 0x30) = 0;
 }
 
-extern u8 **D_88234970;
 
 void func_8822EAC4(void) {
     *(u32 *)(*D_88234970 + 0x30) = 1;

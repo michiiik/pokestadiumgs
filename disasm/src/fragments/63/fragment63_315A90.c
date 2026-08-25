@@ -42,23 +42,14 @@ void func_87E127FC(s32 arg0) { func_87E126D4(arg0, &D_87E1ABC4, 0, 30, 4096); }
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E12B34.s")
 
 extern u32 D_87E1AB64;
-extern void func_87E126D4(s32, void *, s32, s32, s32);
 void func_87E12BE8(s32 arg0) { func_87E126D4(arg0, &D_87E1AB64, 0, 15, 8192); }
 
-extern u32 D_87E1AB64;
-extern void func_87E126D4(s32, void *, s32, s32, s32);
 void func_87E12C1C(s32 arg0) { func_87E126D4(arg0, &D_87E1AB64, 2, 15, 8192); }
 
-extern u32 D_87E1AB64;
-extern void func_87E126D4(s32, void *, s32, s32, s32);
 void func_87E12C50(s32 arg0) { func_87E126D4(arg0, &D_87E1AB64, 1, 15, 8192); }
 
-extern u32 D_87E1AB64;
-extern void func_87E126D4(s32, void *, s32, s32, s32);
 void func_87E12C84(s32 arg0) { func_87E126D4(arg0, &D_87E1AB64, 3, 15, 8192); }
 
-extern u32 D_87E1AB64;
-extern void func_87E126D4(s32, void *, s32, s32, s32);
 void func_87E12CB8(s32 arg0) {
     s32 i;
     for (i = 0; i != 8; ++i) {
@@ -88,7 +79,6 @@ s32 func_87E12D48(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E131D8.s")
 
-extern void func_8004C8C0(s32);
 void func_87E13248(void) { func_8004C8C0(361); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E13268.s")
@@ -109,7 +99,6 @@ void func_87E13490(void) {
     *(u32 *)D_87E1EBD8 &= 0xFFFFFFFD;
 }
 
-extern u8 *D_87E1EBD8;
 void func_87E134C0(void) {
     *(u32 *)D_87E1EBD8 &= 0xFFFFFFFE;
     *(u32 *)(D_87E1EBD8 + 0xC) = 0;
@@ -129,7 +118,6 @@ void func_87E1366C(void) {
     *(u32 *)D_87E1EBD8 &= 0xFFFFFFFB;
 }
 
-extern u8 *D_87E1EBD8;
 s32 func_87E13688(void) {
     return *(s32 *)(D_87E1EBD8 + 0x250) == 0;
 }

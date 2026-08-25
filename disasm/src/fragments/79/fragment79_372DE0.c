@@ -19,22 +19,12 @@ void func_84103640(s32 arg0, s16 arg1) {
     func_8003F874(arg0);
 }
 
-extern s16 D_8418D240[];
-extern u8 D_8418D260[];
-extern s32 func_841035DC(s16);
-extern void func_8003F84C(s32, s16 *, u8 *);
-extern void func_8003F874(s32);
 void func_84103694(s32 arg0, s16 arg1) {
     func_841035DC(arg1);
     func_8003F84C(arg0, D_8418D240, D_8418D260);
     func_8003F874(arg0);
 }
 
-extern s16 D_8418D240[];
-extern u8 D_8418D260[];
-extern s32 func_841035DC(s16);
-extern void func_8003F84C(s32, s16 *, u8 *);
-extern void func_8003F874(s32);
 void func_841036E8(s32 arg0, s16 arg1) {
     func_841035DC(arg1);
     func_8003F84C(arg0, D_8418D240, D_8418D260);

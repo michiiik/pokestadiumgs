@@ -51,7 +51,6 @@ void func_82C003BC(u16 arg0, u16 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void *func_8004C990(s32, s32);
 extern void func_8004D19C(s32, s32, void *, s32, s32);
 void func_82C003F8(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
     void *value = func_8004C990(arg2, arg3);

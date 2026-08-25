@@ -36,7 +36,6 @@ extern u32 D_87F119C0;
 extern void func_80037E9C(s32, void *);
 void func_87F024CC(void) { func_80037E9C(0, &D_87F119C0); }
 
-extern u8 D_80126420[];
 extern void func_87F0252C(void *, void *, s32, s32);
 
 void func_87F024F4(void *arg0, s32 arg1, s32 arg2) {

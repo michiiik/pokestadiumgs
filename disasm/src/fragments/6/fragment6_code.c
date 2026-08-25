@@ -33,7 +33,6 @@ s32 func_83100AE8(void *arg0, u8 *arg1) {
 }
 
 extern s32 func_81600DA8(void *, void *);
-extern void func_81600F0C(void *, s32, s32, s32, s32);
 extern void func_81700908(void);
 extern u8 D_83102290[];
 void func_83100B2C(void *arg0, u8 *arg1, void *arg2) {

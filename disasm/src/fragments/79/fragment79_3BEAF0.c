@@ -23,7 +23,6 @@ void func_8414F3FC(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-extern u8 func_84154B24(void);
 extern u8 *func_84154B64(u8);
 extern s32 func_841556C4(u8 *, u8);
 void func_8414F444(u8 *arg0, u8 arg1) {
@@ -49,8 +48,6 @@ void func_8414F5F0(void *arg0) {
 
 #ifdef VERSION_US
 extern void func_8414F5F0(void *);
-extern u8 func_84154B24(void);
-extern u8 *func_84154B64(u8);
 extern void func_8414F3FC(void *);
 void func_8414F618(void *arg0) {
     u8 value;
@@ -65,7 +62,6 @@ void func_8414F618(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-extern u8 func_84154B24(void);
 extern u8 *func_8414A3A0(u8);
 extern void func_8414F444(u8 *, u8);
 void func_8414F668(u8 *arg0) {
@@ -81,10 +77,6 @@ void func_8414F668(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8414F2F4(void *);
-extern u8 func_84154B24(void);
-extern u8 *func_8414A3A0(u8);
-extern void func_8414F444(u8 *, u8);
 void func_8414F6D0(void *arg0) {
     u8 value;
     u8 *ptr;

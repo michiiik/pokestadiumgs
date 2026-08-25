@@ -11,19 +11,16 @@ void func_87E01798(s32 arg0) {
 }
 
 extern u8 D_87E19724[];
-extern void func_87E01720(s32, s32, s32, s32, void *);
 void func_87E017CC(s32 arg0) {
     func_87E01720(arg0, 3, 8, 0x1A7, D_87E19724);
 }
 
 extern u8 D_87E1972C[];
-extern void func_87E01720(s32, s32, s32, s32, void *);
 void func_87E01800(s32 arg0) {
     func_87E01720(arg0, 3, 6, 0x1A4, D_87E1972C);
 }
 
 extern u8 D_87E19734[];
-extern void func_87E01720(s32, s32, s32, s32, void *);
 void func_87E01834(s32 arg0) {
     func_87E01720(arg0, 3, 8, 0x1A5, D_87E19734);
 }
@@ -96,7 +93,6 @@ void func_87E0276C(void) {
     func_800088DC();
 }
 
-extern void func_87E01E24();
 extern void func_87E02438();
 extern void func_87E02470();
 extern void func_87E01DB4();

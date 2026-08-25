@@ -26,7 +26,6 @@ s32 func_8250865C(void) {
     return D_82509680 == 3;
 }
 
-extern s16 D_82509680;
 
 s32 func_82508670(void) {
     return D_82509680 == 0;

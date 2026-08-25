@@ -22,7 +22,6 @@ void func_87F00688(void) {
     func_87F005F0(0.0f, 0.0f);
 }
 
-extern u8 **D_87F11768;
 u32 func_87F006AC(void) {
     return *(u32 *)((u8 *)D_87F11768 + 0xC);
 }

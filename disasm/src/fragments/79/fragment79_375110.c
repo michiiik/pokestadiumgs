@@ -35,16 +35,12 @@ void func_84105988(u8 *arg0, u8 *arg1) {
     *(s16 *)arg1 = func_8000B3B0(z, x);
 }
 
-extern u8 *D_84190090;
-extern s32 func_8000B3B0(f32, f32);
 void func_84105A0C(u8 *arg0) {
     f32 x = *(f32 *)(D_84190090 + 0xA8) - *(f32 *)(D_84190090 + 0xB4);
     f32 z = *(f32 *)(D_84190090 + 0xB0) - *(f32 *)(D_84190090 + 0xBC);
     *(s16 *)arg0 = func_8000B3B0(z, x);
 }
 
-extern u8 *D_84190090;
-extern s32 func_8000B3B0(f32, f32);
 void func_84105A54(u8 *arg0, u8 *arg1) {
     f32 x = *(f32 *)(D_84190090 + 0xB4) - *(f32 *)(D_84190090 + 0xA8);
     f32 y = *(f32 *)(D_84190090 + 0xB8) - *(f32 *)(D_84190090 + 0xAC);
@@ -53,21 +49,17 @@ void func_84105A54(u8 *arg0, u8 *arg1) {
     *(s16 *)arg1 = func_8000B3B0(z, x);
 }
 
-extern u8 *D_84190090;
-extern s32 func_8000B3B0(f32, f32);
 void func_84105AD8(u8 *arg0) {
     f32 x = *(f32 *)(D_84190090 + 0xB4) - *(f32 *)(D_84190090 + 0xA8);
     f32 z = *(f32 *)(D_84190090 + 0xBC) - *(f32 *)(D_84190090 + 0xB0);
     *(s16 *)arg0 = func_8000B3B0(z, x);
 }
 
-extern u8 *D_84190114;
 void func_84105B20(u8 *arg0, u8 *arg1) {
     *(s16 *)arg0 = *(s16 *)(D_84190114 + 0x76);
     *(s16 *)arg1 = *(s16 *)(D_84190114 + 0x78);
 }
 
-extern u8 *D_84190114;
 void func_84105B44(u8 *arg0) {
     *(s16 *)arg0 = *(s16 *)(D_84190114 + 0x78);
 }
@@ -77,7 +69,6 @@ void func_84105B58(u8 *arg0, u8 *arg1) {
     *(s16 *)arg1 = *(s16 *)(*(u8 **)&D_84190114 + 0x72);
 }
 
-extern u8 *D_84190114;
 void func_84105B7C(u8 *arg0) {
     *(s16 *)arg0 = *(s16 *)(D_84190114 + 0x72);
 }

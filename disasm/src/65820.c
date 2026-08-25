@@ -14,7 +14,6 @@ s32 func_80064C88(void) {
 #endif
 
 #ifdef VERSION_US
-extern s32 D_80128BE0;
 s32 func_80064C94(s32 value) { s32 result = 0; if (value >= 0 && value < 4) { D_80128BE0 = value; result = 1; } return result; }
 #endif
 
@@ -27,7 +26,6 @@ void func_80064CB8(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-extern s16 D_80128BE8;
 
 s16 func_80064CC4(void) {
     return D_80128BE8;
@@ -43,7 +41,6 @@ void func_80064CD0(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-extern s16 D_80128BEA;
 
 s16 func_80064CDC(void) {
     return D_80128BEA;
@@ -75,7 +72,6 @@ s32 func_80064DFC(s32 value) { s32 result = 0; if (value != D_8009DE94) { D_8012
 #endif
 
 #ifdef VERSION_US
-extern s32 D_8009DE94;
 
 s32 func_80064E2C(void) {
     return D_8009DE94;
@@ -83,7 +79,6 @@ s32 func_80064E2C(void) {
 #endif
 
 #ifdef VERSION_US
-extern s32 D_80128BE4;
 
 s32 func_80064E38(void) {
     return D_80128BE4;

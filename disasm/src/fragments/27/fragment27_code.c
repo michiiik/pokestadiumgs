@@ -35,7 +35,6 @@ s32 func_811000F8(s32 arg0) {
     return func_81100094(arg0 * 2) - arg0;
 }
 
-extern s32 func_81100094(s32 arg0);
 s32 func_81100120(s32 arg0, s32 arg1) {
     return func_81100094(arg0) + arg1;
 }

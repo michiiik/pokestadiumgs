@@ -36,7 +36,6 @@ s32 func_80008494(void) {
     return D_800D0554;
 }
 
-extern s32 D_800D0554;
 
 u8 func_800084A0(void) {
     return ((u8 *)(u32)D_800D0554)[0x11];

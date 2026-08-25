@@ -18,14 +18,12 @@ void func_841548CC(u8 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C40B0/func_84154948.s")
 
-extern u8 D_8419E780[];
 extern u8 D_8419E920[];
 void func_84154AD4(void) {
     _bzero(D_8419E780, 0x19C);
     _bzero(D_8419E920, 0x4D8);
 }
 
-extern u8 D_8419E780[];
 u8 *func_84154B0C(void) {
     return D_8419E780;
 }
@@ -40,12 +38,10 @@ u8 func_84154B24(void) {
     return D_8419E91A;
 }
 
-extern u8 D_8419E780[];
 u8 *func_84154B30(u8 arg0) {
     return D_8419E780 + arg0 * 0xCC;
 }
 
-extern u8 D_8419E780[];
 u8 *func_84154B64(u8 arg0) {
     return D_8419E780 + arg0 * 0xCC + 8;
 }
@@ -123,7 +119,6 @@ void func_84154C10(u8 *arg0, u8 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C40B0/func_841551D4.s")
 
-extern u8 *D_841951F8[];
 void func_8415541C(u8 *arg0, u8 arg1, u8 arg2) {
     u8 *value;
     value = D_841951F8[arg1] + arg2 * 0x58;

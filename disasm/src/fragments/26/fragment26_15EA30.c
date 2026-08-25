@@ -115,8 +115,6 @@ void func_8100338C(s32 arg0, Func8100338CStateK *state) {
 typedef struct { unsigned char pad_00[3]; u8 unk_03; unsigned char pad_04[0x10]; void *unk_14; } Func810033DCStateG2;
 typedef struct { unsigned char pad_00[0x1C]; u8 unk_1C; } Func810033DCGlobalG2;
 extern Func810033DCGlobalG2 *D_8009491C;
-extern s32 D_800D0510;
-extern s32 func_810024E0();
 void func_810033DC(s32 arg0, Func810033DCStateG2 *state) {
     if (arg0 == 5) {
         Func810033DCGlobalG2 *global = D_8009491C;
@@ -134,16 +132,12 @@ typedef struct {
     unsigned char pad_04[0x10];
     void *unk_14;
 } Func8100343CState;
-extern s32 D_800D0510;
-extern s32 func_810024E0();
 void func_8100343C(s32 arg0, Func8100343CState *state) {
     if (arg0 == 5) {
         D_800D0510 = func_810024E0(D_800D0510, state->unk_14, 2, 0, state->unk_03);
     }
 }
 
-extern s32 D_800D0510;
-extern s32 func_810024E0();
 void func_8100348C(s32 arg0, s32 arg1) {
     s32 value = 0;
     D_800D0510 = func_810024E0(D_800D0510, arg1, 0, arg0, value);
@@ -155,8 +149,6 @@ typedef struct {
     unsigned char pad_04[0x10];
     void *unk_14;
 } Func810034C0StateD;
-extern s32 D_800D0510;
-extern s32 func_810024E0();
 void func_810034C0(s32 arg0, Func810034C0StateD *state) {
     if (arg0 == 5) {
         D_800D0510 = func_810024E0(D_800D0510, state->unk_14, 4, 0, state->unk_03);

@@ -56,11 +56,6 @@ void func_88213410(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_882160F8.s")
 
-extern u8 *D_88234564;
-extern void func_800033DC(void *);
-extern void main_pool_pop_state(s32);
-extern void func_8821CE40(s32);
-extern s32 D_88234560;
 void func_882164E0(void) {
     func_800033DC(D_88234564);
     main_pool_pop_state(0x4C495354);

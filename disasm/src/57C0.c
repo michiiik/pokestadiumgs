@@ -90,7 +90,6 @@ void *func_800050A0(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-extern u32 D_800CD020[];
 extern u32 D_800CDA34;
 
 void func_800050D4(void) {

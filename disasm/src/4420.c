@@ -37,7 +37,6 @@ void func_80003DD4(u8 *arg0, s32 arg1, s32 arg2, s32 arg3) {
 
 s32 func_80003F54(s32 arg0) { return osFlashSectorErase(arg0 << 7); }
 
-extern OSMesgQueue D_800CD000;
 extern void func_80006ACC(s32, u8 *, u8 *, s32, OSMesgQueue *, s32);
 void func_80003F74(u8 *arg0, u8 *arg1, u8 *arg2, s32 arg3) {
     s32 remaining = arg2 - arg1;
@@ -52,7 +51,6 @@ void func_80003F74(u8 *arg0, u8 *arg1, u8 *arg2, s32 arg3) {
     }
 }
 
-extern OSMesgQueue D_800CD000;
 extern void func_80006B40(u8 *, u8 *, s32, OSMesgQueue *, s32);
 void func_80004024(u8 *arg0, u8 *arg1, u8 *arg2) {
     s32 remaining = arg2 - arg1;

@@ -135,7 +135,6 @@ void func_80053E8C(u8 *arg0, u8 *arg1) {
     func_80060D70(arg1 + 8, arg0 + 8);
 }
 
-extern void func_80060D70(u8 *, u8 *);
 void func_80053ECC(u8 *arg0, u8 *arg1) {
     *(u16 *)(arg1 + 0) = *(u16 *)(arg0 + 0);
     *(u16 *)(arg1 + 2) = *(u16 *)(arg0 + 2);

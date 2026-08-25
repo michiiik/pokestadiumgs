@@ -10,7 +10,6 @@ void func_8620736C(void) {
     func_87F02684(D_8620E198 + 0x728C8);
 }
 
-extern u8 *D_8620E198;
 extern void func_87F0277C(void *);
 void func_8620739C(void) {
     func_87F0277C(D_8620E198 + 0x728C8);
@@ -18,7 +17,6 @@ void func_8620739C(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_26DCC0/func_862073CC.s")
 
-extern u8 *D_8620E198;
 extern u8 D_87F15B70[];
 extern s32 func_8004DDF4(s32);
 extern s32 func_80002B24(void);

@@ -69,7 +69,6 @@ void func_841094D4(u32 arg0) {
     D_841901B0 = arg0;
 }
 
-extern u32 D_841901B0;
 u32 func_841094E0(void) {
     return D_841901B0;
 }

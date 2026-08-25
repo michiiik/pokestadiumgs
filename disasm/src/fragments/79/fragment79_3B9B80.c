@@ -9,7 +9,6 @@ u8 *func_8414A3A0(u8 arg0) {
     return D_841951F8[arg0] + 0x49C;
 }
 
-extern u8 *D_841951F8[];
 s32 func_8414A3C0(u8 arg0, u32 arg1) {
     return (*(u32 *)(D_841951F8[arg0] + 0x49C) & arg1) != 0;
 }
@@ -72,7 +71,6 @@ s32 func_8414C924(u8 arg0, u8 arg1) {
     return (D_8419D7C0[arg0 * 0xA8] & arg1) != 0;
 }
 
-extern u8 D_8419D7C0[];
 u8 *func_8414C960(u8 arg0) {
     return D_8419D7C0 + arg0 * 0xA8;
 }

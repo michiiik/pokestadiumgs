@@ -71,7 +71,6 @@ void func_8AC0080C(s16 arg0) {
 #endif
 
 #ifdef VERSION_US
-extern s16 D_8AC0851E;
 void func_8AC00824(void) {
     D_8AC0851E = 0;
 }

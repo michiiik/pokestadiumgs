@@ -42,7 +42,6 @@ void func_87E0D3A0(void) {
     func_87E0D18C();
 }
 
-extern void func_87E0D18C(void);
 void func_87E0D3C0(u8 *arg0) {
     *(s32 *)(arg0 + 0x3F4) = 3;
     *(s32 *)(arg0 + 0x3FC) = 0;
@@ -50,14 +49,12 @@ void func_87E0D3C0(u8 *arg0) {
     func_87E0D18C();
 }
 
-extern void func_87E0D18C(void);
 void func_87E0D3F4(u8 *arg0) {
     *(s32 *)(arg0 + 0x3F4) = 4;
     *(s32 *)(arg0 + 0x3FC) = 0;
     func_87E0D18C();
 }
 
-extern void func_87E0D18C(void);
 void func_87E0D41C(void) {
     func_87E0D18C();
 }
@@ -73,7 +70,6 @@ void func_87E0D500(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_310270/func_87E0D6BC.s")
 
-extern void func_87E0D278(void);
 void func_87E0D73C(void) {
     func_87E0D278();
 }

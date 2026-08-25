@@ -42,13 +42,11 @@ void func_823059D4(void) {
     *(s16 *)(D_82306AF8 + 6) = -1;
 }
 
-extern u8 D_82306AF8[];
 void func_823059F0(void) {
     *(s16 *)(D_82306AF8 + 2) = 3;
     *(s16 *)(D_82306AF8 + 6) = -1;
 }
 
-extern u8 D_82306AF8[];
 void func_82305A0C(void) {
     *(s16 *)(D_82306AF8 + 2) = 4;
     *(s16 *)(D_82306AF8 + 6) = -1;
@@ -61,7 +59,6 @@ s32 func_82305A28(void) {
     return result;
 }
 
-extern s16 D_82306AFA;
 s32 func_82305A4C(void) {
     s32 result = 0;
     if (D_82306AFA == 0) result = 1;

@@ -88,9 +88,7 @@ void func_88C01398(void) {
     }
 }
 
-extern void func_80064D28(void);
 extern s32 func_88C00084(void);
-extern void func_88C0107C(s32);
 
 void func_88C01494(void) {
     s32 done;
@@ -102,11 +100,8 @@ void func_88C01494(void) {
     } while (done == 0);
 }
 
-extern s32 func_80001FF0(void);
 extern void func_800225C4(s32);
 extern void func_80007B34(s32);
-extern void func_80064D28(void);
-extern void func_88C0107C(s32);
 extern f32 D_88C01A54;
 void func_88C014D8(void) {
     u16 count;

@@ -43,7 +43,6 @@ void Vi_SelectMode(s8 arg0, s8 arg1) {
 
 #ifdef VERSION_US
 
-extern u8 leoDiskID[];
 void func_8000177C(u8 *arg0) {
     if (arg0 == NULL) {
         *(s32 *)(leoDiskID + 0xA94) = 0;
@@ -70,7 +69,6 @@ void func_8000177C(u8 *arg0) {
 
 #ifdef VERSION_US
 
-extern u8 leoDiskID[];
 extern void func_80004F34(void *);
 extern void func_80004F60(void *);
 
@@ -145,7 +143,6 @@ s32 func_80001E70(void) {
 #endif
 
 #ifdef VERSION_US
-extern u8 *D_800AB3C0;
 s32 func_80001EB8(void) { u8 *ptr = *(u8 **)(D_800AB3C0 + 8); return *(u16 *)ptr; }
 #endif
 
@@ -221,7 +218,6 @@ void func_80002074(void) {
 #endif
 
 #ifdef VERSION_US
-extern s32 D_800871D0;
 void func_80002084(void) {
     D_800871D0 = 0;
 }

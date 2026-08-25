@@ -82,18 +82,15 @@ void func_80047634(u16 arg0) { D_80094FB4 |= arg0; }
 
 extern u16 D_80094FB4; void func_80047650(u16 arg0) { D_80094FB4 &= ~arg0; }
 
-extern u8 *D_80126F50;
 
 void func_80047670(void) {
     D_80126F50[0x7A] |= 4;
 }
 
-extern u8 *D_80126F50;
 void func_80047688(void) { D_80126F50[0x7A] = (u8)(D_80126F50[0x7A] & ~4); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800476A0.s")
 
-extern u8 *D_80126F50;
 s32 func_800476FC(s32 arg0, s32 arg1) { s32 result = 0; if (arg1 > 0 && arg1 < 0x100 && D_80126F50 != NULL) { *(s32 *)(D_80126F50 + 0x50) = arg0; D_80126F50[0x7F] = arg1; result = 1; } return result; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047738.s")
@@ -124,8 +121,6 @@ void func_80048188(u8 *arg0) { u8 temp[0x20]; func_800477C4(temp); func_80046F2C
 extern s32 func_8003514C(void);
 s32 func_800481C0(u8 *arg0, s32 value) { if (func_8003514C() != 0) value = 0; arg0[0x78] = value; return 1; }
 
-extern void func_800477C4(void *);
-extern s32 func_80047BD4(void *);
 extern s32 func_800481C0(u8 *, s32);
 s32 func_800481FC(u8 *arg0) { u8 temp[0x20]; func_800477C4(temp); return func_800481C0(arg0, func_80047BD4(temp)); }
 
@@ -155,8 +150,6 @@ s32 func_800481FC(u8 *arg0) { u8 temp[0x20]; func_800477C4(temp); return func_80
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80049628.s")
 
-extern u8 *D_80126F50;
-extern s32 func_800481C0(u8 *, s32);
 s32 func_80049668(s32 value) { s32 result=0; if (D_80126F50 != NULL) result=func_800481C0(D_80126F50,value); return result; }
 
 extern void func_800496D8(s32, s32);
@@ -179,7 +172,6 @@ extern u8 *D_80126F50; void func_800497C0(void) { func_80046C18(D_80126F50); }
 
 extern u8 *D_80126F50; void func_80049878(void) { func_80046DD4(D_80126F50); }
 
-extern u8 *D_80126F50;
 void func_8004989C(s32 arg0) {
     func_80046F2C(D_80126F50, arg0);
 }

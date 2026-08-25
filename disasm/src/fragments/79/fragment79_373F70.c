@@ -41,15 +41,11 @@ void func_841048E0(u8 *arg0, s16 arg1) {
     func_8003F114(arg0, 0, -1, D_8418CA20[arg1]);
 }
 
-extern s32 D_8418CA20[];
 extern void func_8003EAFC(u8 *, s32, s32, s32);
 void func_8410491C(u8 *arg0, s16 arg1) {
     func_8003EAFC(arg0, 0, D_8418CA20[arg1], 0x10000);
 }
 
-extern s32 D_8418CA20[];
-extern void func_8003EAFC(u8 *, s32, s32, s32);
-extern void func_8003EB84(u8 *, s16);
 void func_84104958(u8 *arg0, s16 arg1) {
     func_8003EAFC(arg0, 0, D_8418CA20[arg1], 0xFFFF0000);
     func_8003EB84(arg0, (s16)(*(u16 *)(*(u8 **)(arg0 + 0x44) + 0xA) - 1));

@@ -169,7 +169,6 @@ void func_8220ACF4(void) {
     D_822106BA = -1;
 }
 
-extern s16 D_822106BA;
 s32 func_8220AD04(void) {
     return D_822106BA;
 }

@@ -25,7 +25,6 @@ void func_800033B4(s32 arg0) {
 }
 
 
-extern void * D_800CCDF0;
 extern void func_80002F90(void *, s32);
 void func_800033DC(s32 arg0) {
     func_80002F90(D_800CCDF0, arg0);

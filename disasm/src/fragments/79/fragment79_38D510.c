@@ -44,7 +44,6 @@ s32 func_8411E164(s32 arg0) {
     return D_84191208;
 }
 
-extern s32 D_84191208, D_8419120C;
 s32 func_8411E188(s8 arg0) {
     if (arg0 == 0) return D_84191208;
     return D_8419120C;
@@ -62,13 +61,11 @@ f32 func_8411E1CC(u8 *arg0) {
     return *(f32 *)(arg0 + 0x64C);
 }
 
-extern s32 D_84191208;
 s32 func_8411E1D4(s32 arg0) {
     if (arg0 == D_84191208) return 1;
     return -1;
 }
 
-extern s32 D_84191208;
 s32 func_8411E1F8(s32 arg0) {
     if (arg0 == D_84191208) return 0;
     return 1;
@@ -116,7 +113,6 @@ s32 func_8411EE6C(u8 *arg0) {
     return *(u8 *)(arg0 + 0x62D);
 }
 
-extern u8 *D_84193DD0;
 extern void func_84108E00(u8 *, s32);
 void func_8411EE74(u8 *arg0) {
     s32 index;

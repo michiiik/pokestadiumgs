@@ -11,12 +11,10 @@ void func_81005FC8(u8 *arg0, s32 arg1) {
     D_81100254 = 0x7B;
 }
 
-extern u32 D_81100254;
 void func_81005FE0(u8 *arg0, s32 arg1) {
     D_81100254 = 0x1C8;
 }
 
-extern u32 D_81100254;
 void func_81005FF8(u8 *arg0, s32 arg1) {
     D_81100254 = 0;
 }
