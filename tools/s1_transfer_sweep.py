@@ -984,6 +984,7 @@ def select_functions(
     functions: list[str] | None,
     source: str | None,
     limit: int | None,
+    allow_dirty: bool = False,
 ) -> list[str]:
     owners = targets.owner_index()
     dirty = dedupe_externs.dirty_sources()
@@ -998,7 +999,7 @@ def select_functions(
             continue
         if wanted_source and owner.source != wanted_source and not owner.source.endswith("/" + wanted_source):
             continue
-        if owner.source_path.resolve() in dirty:
+        if not allow_dirty and owner.source_path.resolve() in dirty:
             continue
         selected.append(function)
     if limit is not None:
@@ -1274,6 +1275,11 @@ def main() -> int:
     parser.add_argument("--no-gate", action="store_true", help="probe only; never edit tracked sources")
     parser.add_argument("--dry-run", action="store_true", help="generate and print candidates; call no runner")
     parser.add_argument("--strict", action="store_true", help="do not emit a candidate when any symbol is unmapped")
+    parser.add_argument(
+        "--allow-dirty",
+        action="store_true",
+        help="include explicitly selected dirty sources (for same-session validation; default skips them)",
+    )
     parser.add_argument("--workers", type=int)
     parser.add_argument("--json", type=Path, help="write the summary to this file")
     parser.add_argument("--s1-root", type=Path, default=Path(xmatch.DEFAULT_S1))
@@ -1285,7 +1291,13 @@ def main() -> int:
 
     transfer_map = load_transfer_map(args.transfer_map)
     s1_reverse_index = build_s1_reverse_index(transfer_map)
-    functions = select_functions(transfer_map, functions=args.functions, source=args.source, limit=args.limit)
+    functions = select_functions(
+        transfer_map,
+        functions=args.functions,
+        source=args.source,
+        limit=args.limit,
+        allow_dirty=args.allow_dirty,
+    )
 
     if args.no_gs_asm_fallback:
         gs_asm_fallback = None
