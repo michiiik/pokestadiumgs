@@ -588,7 +588,14 @@ void func_8002A9CC(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002AAD0.s")
+extern s8 D_80091A18;
+void func_8002AAD0(u8 arg0) {
+    if (arg0) {
+        D_80091A18 = 1;
+        return;
+    }
+    D_80091A18 = 0;
+}
 #endif
 
 #ifdef VERSION_US
