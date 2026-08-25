@@ -17,7 +17,32 @@ void func_80009200(s32 ms) {
 
 extern void *memcpy(void *, const void *, s32); void *func_80009750(void *dest, const void *src, s32 size) { return (u8 *)memcpy(dest, src, size) + size; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/9E00/func_80009774.s")
+#include <stdarg.h>
+extern u8 D_80087C20[];
+extern s32 _Printf();
+extern void func_8000948C(s32, s32, s32);
+void func_80009774(s32 x, s32 y, const char *fmt, ...) {
+    signed char *ptr;
+    s32 glyph;
+    s32 size;
+    signed char buf[0x100];
+    va_list args;
+    va_start(args, fmt);
+    size = _Printf(func_80009750, (char *)buf, fmt, args);
+    if (size > 0) {
+        ptr = buf;
+        while (size > 0) {
+            glyph = D_80087C20[*ptr & 0x7F];
+            if (glyph != 0xFF) {
+                func_8000948C(x, y, glyph);
+            }
+            size--;
+            ptr++;
+            x += 6;
+        }
+    }
+    va_end(args);
+}
 
 extern char D_800A1B14[];
 extern char D_800A1B20[];
