@@ -83,7 +83,29 @@ void func_8260675C(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82607AA0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82607B74.s")
+extern void func_826067D4();
+extern void func_82607528();
+extern void func_82607790();
+extern void func_82607AA0();
+void func_82607B74(void *arg0) {
+    s16 temp_v0;
+
+    temp_v0 = (*(s16 *)((u8 *)(arg0) + (6)));
+    switch (temp_v0) {                              /* irregular */
+    case 1:
+        func_826067D4();
+        return;
+    case 2:
+        func_82607528();
+        return;
+    case 3:
+        func_82607790();
+        return;
+    case 4:
+        func_82607AA0();
+        return;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82607BF4.s")
 
@@ -147,7 +169,18 @@ void func_8260675C(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260CF84.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260D3F4.s")
+s32 func_8004C990(s32, s32);
+
+s32 func_8260D3F4(s32 arg0, s32 arg1, s32 arg2) {
+    s32 var_v0;
+
+    if (arg0 != 0) {
+        var_v0 = func_8004C990(0x6D, 1);
+    } else {
+        var_v0 = func_8004C990(0x6D, 0);
+    }
+    return var_v0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260D440.s")
 
@@ -255,7 +288,18 @@ s32 func_8260F7C4(s32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_826134DC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82613764.s")
+s32 func_82610D14();
+
+void func_82613764(void *arg0) {
+    if (func_82610D14() != 0) {
+        (*(s16 *)((u8 *)(arg0) + (6))) = (s16) ((*(s16 *)((u8 *)(arg0) + (6))) + 1);
+        if ((*(s16 *)((u8 *)(arg0) + (6))) >= 8) {
+            (*(s16 *)((u8 *)(arg0) + (2))) = 0x13;
+            (*(s16 *)((u8 *)(arg0) + (6))) = 0;
+            (*(s16 *)((u8 *)(arg0) + (0x18))) = 0;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_826137B8.s")
 

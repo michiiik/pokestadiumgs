@@ -187,7 +187,27 @@ void func_82503748(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_13FFA0/func_82503840.s")
+extern void func_80008648();
+extern void func_800088DC();
+extern void func_800503A4(s32);
+extern void func_81700908();
+extern void func_825020A8();
+extern void func_82503750();
+extern void func_8250771C();
+s32 func_8250865C();
+extern s32 D_82508D04;
+
+void func_82503840(void) {
+    func_800088DC();
+    if (func_8250865C() == 0) {
+        func_82503750();
+        func_800503A4(D_82508D04);
+        func_8250771C();
+        func_81700908();
+    }
+    func_825020A8();
+    func_80008648();
+}
 #endif
 
 #ifdef VERSION_US
@@ -259,7 +279,15 @@ s32 func_82503EF8(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_13FFA0/func_825044D0.s")
+extern void func_80064CE8(s32, s32 *, s32 *, s32, s32);
+s32 func_800718B8(s32);
+extern u8 D_82C00000;
+extern u8 fragment83_ROM_START;
+extern u8 fragment84_ROM_START;
+
+void func_825044D0(void) {
+    func_80064CE8(((u32) ((s32) &D_82C00000 & 0x0FF00000) >> 0x14) - 0x10, &fragment83_ROM_START, &fragment84_ROM_START, 0x300, func_800718B8(6));
+}
 #endif
 
 #ifdef VERSION_US

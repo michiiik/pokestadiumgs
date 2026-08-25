@@ -303,7 +303,22 @@ void func_82B03934(s32 arg0, s32 arg1) { s32 temp = func_8004C990(0x156, 0); fun
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B05EF0.s")
+void *func_82B02800(s32, s32);
+
+void func_82B05EF0(s32 arg0, s32 arg1, u16 arg2, s32 arg3, s32 arg4, s32 arg5) {
+    void *temp_v0;
+
+    if ((arg0 >= 0) && (arg0 < 2)) {
+        temp_v0 = func_82B02800(8, arg0);
+        if (temp_v0 != NULL) {
+            (*(s32 *)((u8 *)(temp_v0) + (0x50))) = arg1;
+            (*(u16 *)((u8 *)(temp_v0) + (0x54))) = arg2;
+            (*(s16 *)((u8 *)(temp_v0) + (0x56))) = (s16) arg3;
+            (*(s32 *)((u8 *)(temp_v0) + (0x58))) = arg4;
+            (*(s32 *)((u8 *)(temp_v0) + (0x5C))) = arg5;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US

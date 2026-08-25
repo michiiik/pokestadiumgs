@@ -11,7 +11,21 @@ void func_82504810(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_144790/func_8250483C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_144790/func_8250498C.s")
+extern void func_80008648();
+extern void func_800088DC();
+extern void func_800468A0(s32);
+extern void func_800503A4(s32);
+extern void func_8250483C();
+void func_8250498C(void) {
+    s32 *sp1C;
+
+    sp1C = D_825087F0;
+    func_800088DC();
+    func_800468A0((*(s32 *)((u8 *)(sp1C) + (0))));
+    func_800503A4((*(s32 *)((u8 *)(sp1C) + (4))));
+    func_8250483C();
+    func_80008648();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_144790/func_825049DC.s")
 
@@ -65,7 +79,25 @@ void func_82504810(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_144790/func_82506FB8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_144790/func_82507000.s")
+extern void func_82504C50(void *, s32);
+void *func_825068C4(s32, s32);
+
+void func_82507000(s16 *arg0) {
+    s16 temp_v1;
+    void *temp_v0;
+
+    temp_v0 = func_825068C4(1, 0);
+    temp_v1 = (*(s16 *)((u8 *)(temp_v0) + (8)));
+    switch (temp_v1) {                              /* irregular */
+    case 0:
+        func_82504C50(temp_v0, 0);
+        func_82504C50(func_825068C4(1, 1), 0);
+        return;
+    case 2:
+        *arg0 = 2;
+        return;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_144790/func_82507078.s")
 
