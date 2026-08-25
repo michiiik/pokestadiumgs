@@ -2,7 +2,17 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F1850/func_8AF035E0.s")
+extern u8 D_8AF2C4F8[];
+extern u32 D_8AF2C548;
+void func_8AF035E0(void *arg0) {
+    u32 count = D_8AF2C548;
+    if (count < 0xA) {
+        u8 *dest = D_8AF2C4F8 + count * 8;
+        *(s32 *)dest = *(s32 *)((u8 *)arg0 + 0x4E4);
+        *(s32 *)(dest + 4) = *(s32 *)((u8 *)arg0 + 0x4E8);
+        D_8AF2C548 = count + 1;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F1850/func_8AF03624.s")
 

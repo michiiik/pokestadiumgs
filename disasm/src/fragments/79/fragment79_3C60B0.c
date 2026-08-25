@@ -372,7 +372,14 @@ void func_84157FA4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84157FF8.s")
+void func_84157FF8(void) {
+    s32 temp[3];
+    extern void func_841568A0();
+    extern void func_841614E0(s32);
+    func_84156BA0();
+    func_841568A0(temp);
+    func_841614E0(0x708);
+}
 #endif
 
 #ifdef VERSION_US

@@ -37,7 +37,25 @@ u32 func_87E067F0(s32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E06808.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E06908.s")
+extern void func_8004C8C0(s32);
+void func_87E06908(s32 arg0) {
+    func_8004C8C0(0x18B);
+    func_8004C8C0(0x177);
+    func_8004C8C0(0x176);
+    func_8004C8C0(0x17F);
+    func_8004C8C0(0x184);
+    func_8004C8C0(0x193);
+    func_8004C8C0(0x18C);
+    func_8004C8C0(0x190);
+    func_8004C8C0(0x195);
+    func_8004C8C0(0x198);
+    func_8004C8C0(0x19B);
+    func_8004C8C0(0x1A1);
+    func_8004C8C0(0x172);
+    func_8004C8C0(0x1BF);
+    func_8004C8C0(0x169);
+    func_8004C8C0(0x1B2);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E069A4.s")
 
@@ -100,5 +118,14 @@ void func_87E079FC(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E07AC4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E07B74.s")
+extern void func_87F02684(s32);
+extern void func_87E01628(void);
+extern void main_pool_pop_state(s32);
+void func_87E07B74(s32 arg0) {
+    func_87F02684(arg0 + 0x18);
+    func_87F02684(arg0 + 0x2C);
+    func_87F02684(arg0 + 0x40);
+    func_87E01628();
+    main_pool_pop_state(0x4D474753);
+}
 #endif
