@@ -72,7 +72,8 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_860075E4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_86007614.s")
+extern void func_800088A4(s32); extern void func_80007B34(s32);
+void func_86007614(void *arg0) { func_800088A4(1); func_80007B34(0xA); }
 
 void func_86007640(u8 *arg0) {}
 
