@@ -4,6 +4,8 @@
 from __future__ import annotations
 
 import io
+import json
+import os
 import sys
 import tempfile
 import unittest
@@ -208,6 +210,35 @@ class ScannerTests(unittest.TestCase):
         bundle = scanner.render_bundle([owner])
         self.assertIn("stadium1: DisplayList_SetFlagInRange", bundle)
 
+    def test_multi_call_wrapper_emits_ordered_void_calls(self) -> None:
+        asm = """
+        glabel func_wrap
+            /* 000000 80000000 */ addiu $sp, $sp, -0x18
+            /* 000004 80000004 */ addiu $a0, $zero, 1
+            /* 000008 80000008 */ jal func_first
+            /* 00000C 8000000C */ nop
+            /* 000010 80000010 */ addiu $a0, $zero, 2
+            /* 000014 80000014 */ jal func_second
+            /* 000018 80000018 */ nop
+            /* 00001C 8000001C */ jr $ra
+            /* 000020 80000020 */ nop
+        """
+        label, instructions, _ = scanner.parse_instructions(asm)
+        owner = scanner.Owner(
+            function=label,
+            source="synthetic.c",
+            asm="synthetic.s",
+            label=label,
+            family="multi_call_wrapper",
+            confidence=1.0,
+            instruction_count=len(instructions),
+            calls=["func_first", "func_second"],
+        )
+        candidates = scanner.multi_call_wrapper_candidates(owner, instructions)
+        self.assertEqual(len(candidates), 3)
+        self.assertIn("func_first(1);", candidates[0])
+        self.assertIn("func_second(2);", candidates[0])
+
 
 class AsmProcessorPaddingTests(unittest.TestCase):
     def test_c_function_padding_generates_exact_text_block(self) -> None:
@@ -233,9 +264,15 @@ class AsmProcessorPaddingTests(unittest.TestCase):
 
 
 class RunnerTests(unittest.TestCase):
+    def test_tail_diagnostics_distinguish_duplicate_return_and_padding(self) -> None:
+        duplicate = bytes.fromhex("03e00008 00000000 03e00008 00000000")
+        padding = bytes.fromhex("03e00008 00000000 00000000 00000000")
+        self.assertEqual(runner._classify_tail_bytes(duplicate), "duplicate_jr_nop_tail")
+        self.assertEqual(runner._classify_tail_bytes(padding), "jr_nop_plus_alignment")
+
     def test_mismatch_diagnostics_decode_instruction_and_classify_drift(self) -> None:
-        expected = bytes.fromhex("24040001 03e00008")
-        actual = bytes.fromhex("24050001 03e00008")
+        expected = bytes.fromhex("24040001 03e00008 00000000")
+        actual = bytes.fromhex("24050001 03e00008 00000000")
         with mock.patch.object(runner, "_object_symbol", return_value=(0, len(actual))):
             details = runner._function_mismatch_details(
                 Path("synthetic.o"), "func_a", expected, actual
@@ -244,6 +281,7 @@ class RunnerTests(unittest.TestCase):
         self.assertEqual(details["mismatch_kind"], "operand_or_scheduling_drift")
         self.assertEqual(details["expected_instruction_text"], "addiu $a0, $zero, 1")
         self.assertEqual(details["actual_instruction_text"], "addiu $a1, $zero, 1")
+        self.assertEqual(details["expected_tail_kind"], "normal_return")
 
     def test_mismatch_diagnostics_identify_symbol_size_drift(self) -> None:
         expected = bytes.fromhex("03e00008 00000000")
@@ -302,6 +340,77 @@ class RunnerTests(unittest.TestCase):
             self.assertEqual(result["batch_status"], "no_candidate_accepted")
             full_gate.assert_not_called()
             self.assertTrue(all(item["status"] == "probe_rejected" for item in result["attempts"]))
+
+    def test_probe_fallback_is_limited_to_unavailable_function(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.c"
+            source.write_text(
+                '#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_a.s")\n'
+                '#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_b.s")\n'
+            )
+            with mock.patch.object(
+                runner,
+                "probe_candidates",
+                return_value=[
+                    {"index": 0, "function": "func_a", "status": "probe_rejected"},
+                    {
+                        "index": 1,
+                        "function": "func_b",
+                        "status": "probe_unavailable",
+                        "probe_reason": "missing_function_bytes",
+                    },
+                ],
+            ), mock.patch.object(
+                runner, "rebuild_source_object", return_value=0
+            ), mock.patch.object(
+                runner,
+                "_try_candidate_detailed",
+                return_value=(0, "accepted"),
+            ) as full_gate, mock.patch.object(
+                runner, "compare_current_tree", return_value=0
+            ):
+                result = runner.try_candidates_detailed(
+                    source,
+                    [
+                        ("func_a", "void func_a(void) {}"),
+                        ("func_b", "void func_b(void) {}"),
+                    ],
+                )
+            self.assertEqual(result["accepted"], ["func_b"])
+            full_gate.assert_called_once()
+            self.assertEqual(full_gate.call_args.args[1], "func_b")
+
+    def test_compile_timeout_is_reported_and_cleaned(self) -> None:
+        repo_root = Path(__file__).resolve().parent.parent
+        source_parent = repo_root / "disasm" / "src"
+        with tempfile.TemporaryDirectory(dir=source_parent) as directory:
+            source = Path(directory) / "synthetic.c"
+            source.write_text("void synthetic(void) {}\n")
+            with mock.patch.object(
+                runner.subprocess,
+                "run",
+                side_effect=runner.subprocess.TimeoutExpired("make", 1),
+            ):
+                result, object_path, output = runner._make_object(source, capture=True)
+            self.assertEqual(result, 124)
+            self.assertIn("compile timed out", output)
+            self.assertFalse(object_path.exists())
+
+    def test_probe_stats_are_opt_in_jsonl(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            stats_path = Path(directory) / "probe-stats.jsonl"
+            attempts = [{
+                "index": 0,
+                "function": "func_a",
+                "status": "compare_rejected",
+                "probe_status": "probe_match",
+                "mismatch_kind": "operand_or_scheduling_drift",
+            }]
+            with mock.patch.dict(os.environ, {"PRAGMA_PROBE_STATS": str(stats_path)}):
+                runner._record_probe_stats(Path("synthetic.c"), attempts, ["wrapper-void"])
+            row = json.loads(stats_path.read_text())
+            self.assertEqual(row["counts"], {"wrapper-void:compare_rejected": 1})
+            self.assertEqual(row["attempts"][0]["label"], "wrapper-void")
 
     def test_probe_hit_is_sent_to_sequential_full_gate(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

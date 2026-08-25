@@ -499,6 +499,207 @@ def wrapper_candidates(owner: Owner, instructions: list[Instruction]) -> list[st
     return candidates
 
 
+def multi_call_wrapper_candidates(owner: Owner, instructions: list[Instruction]) -> list[str]:
+    """Emit conservative straight-line bodies for short void call sequences.
+
+    This intentionally handles only register moves, constants, address/global
+    loads, and outgoing stack arguments.  A call whose return value is used,
+    whose control flow branches, or whose memory access is not a stack setup
+    remains a review-only classification.  The generated bodies are still
+    hypotheses for the MCP runner, never decompilation proof.
+    """
+    if not 2 <= len(owner.calls) <= 3:
+        return []
+    if owner.branches or owner.instruction_count > 40:
+        owner.notes.append("multi-call wrapper suppressed: too many instructions or branches")
+        return []
+    if any(
+        access.base != "sp" and access.symbol is None
+        for access in owner.memory_accesses
+    ):
+        owner.notes.append("multi-call wrapper suppressed: non-stack memory access")
+        return []
+
+    call_indices = [
+        index for index, instruction in enumerate(instructions)
+        if instruction.op == "jal"
+    ]
+    if len(call_indices) != len(owner.calls):
+        owner.notes.append("multi-call wrapper suppressed: call inventory changed")
+        return []
+
+    state = {f"$a{i}": f"arg{i}" for i in range(4)}
+    state["$zero"] = "0"
+    stack_slots: dict[int, str] = {}
+    call_arguments: list[list[str]] = []
+    global_exprs: set[str] = set()
+    start = 0
+    for call_index in call_indices:
+        # Include the current call's delay slot, but not the jal itself.  The
+        # delay slot is often where the last outgoing argument is prepared.
+        segment = instructions[start:call_index]
+        if call_index + 1 < len(instructions):
+            segment.append(instructions[call_index + 1])
+        stack_args: dict[int, str] = {}
+        loaded_stack_offsets: set[int] = set()
+        for instruction in segment:
+            tokens = operand_tokens(instruction.operands)
+            if not tokens:
+                continue
+            if instruction.op == "nop":
+                continue
+            if instruction.op == "sw":
+                if len(tokens) < 2 or tokens[0] not in state:
+                    continue
+                stack_match = re.match(
+                    r"(-?(?:0x[0-9A-Fa-f]+|\d+))\(\$sp\)", tokens[1]
+                )
+                if stack_match:
+                    offset = parse_int(stack_match.group(1))
+                    if offset is not None and offset >= 0x10 and offset % 4 == 0:
+                        expression = state[tokens[0]]
+                        if expression != "UNSUPPORTED":
+                            stack_slots[offset] = expression
+                            stack_args[offset] = expression
+                continue
+            if len(tokens) < 2:
+                continue
+            dest, source = tokens[0], tokens[1]
+            third = tokens[2] if len(tokens) >= 3 else ""
+            if instruction.op == "move" and source in state:
+                state[dest] = state[source]
+            elif (
+                instruction.op in {"or", "addu"}
+                and len(tokens) >= 3
+                and third == "$zero"
+                and source in state
+            ):
+                state[dest] = state[source]
+            elif instruction.op in {"addiu", "ori"} and source == "$zero":
+                value = instruction_immediate(instruction)
+                state[dest] = str(value) if value is not None else "UNSUPPORTED"
+            elif instruction.op == "addiu" and source in state:
+                value = instruction_immediate(instruction)
+                state[dest] = (
+                    f"({state[source]} + {value})"
+                    if value is not None
+                    else "UNSUPPORTED"
+                )
+            elif instruction.op == "lui":
+                match = re.search(r"%hi\((D_[0-9A-Fa-f]+)\)", instruction.operands)
+                state[dest] = f"&{match.group(1)}" if match else "UNSUPPORTED"
+            elif instruction.op in {"lw", "lbu", "lb", "lhu", "lh"}:
+                match = re.search(r"%lo\((D_[0-9A-Fa-f]+)\)", instruction.operands)
+                if match:
+                    state[dest] = match.group(1)
+                    global_exprs.add(match.group(1))
+                elif instruction.op == "lw":
+                    stack_match = re.match(
+                        r"(-?(?:0x[0-9A-Fa-f]+|\d+))\(\$sp\)", tokens[1]
+                    )
+                    offset = parse_int(stack_match.group(1)) if stack_match else None
+                    if offset is not None:
+                        loaded_stack_offsets.add(offset)
+                    state[dest] = stack_slots.get(offset, "UNSUPPORTED")
+                else:
+                    state[dest] = "UNSUPPORTED"
+            elif dest == "$sp":
+                # Ignore stack-frame bookkeeping, which has no C expression.
+                continue
+            else:
+                state[dest] = "UNSUPPORTED"
+
+        touched_args = {
+            int(value)
+            for value in re.findall(r"\$a([0-3])", " ".join(
+                instruction.operands for instruction in segment
+            ))
+        }
+        call_arg_count = max(touched_args, default=-1) + 1
+        if call_arg_count > 4:
+            owner.notes.append("multi-call wrapper suppressed: more than four register arguments")
+            return []
+        outgoing_stack_args = {
+            offset: expression
+            for offset, expression in stack_args.items()
+            if offset not in loaded_stack_offsets
+        }
+        if outgoing_stack_args:
+            expected_offsets = list(range(0x10, max(outgoing_stack_args) + 4, 4))
+            if any(offset not in outgoing_stack_args for offset in expected_offsets):
+                owner.notes.append("multi-call wrapper suppressed: stack argument gap")
+                return []
+        expressions = [state[f"$a{i}"] for i in range(call_arg_count)]
+        expressions.extend(
+            outgoing_stack_args[offset] for offset in sorted(outgoing_stack_args)
+        )
+        if any(expression == "UNSUPPORTED" for expression in expressions):
+            owner.notes.append("multi-call wrapper suppressed: unsupported register expression")
+            return []
+        call_arguments.append(expressions)
+        global_exprs.update(
+            expression.lstrip("&")
+            for expression in expressions
+            if expression.lstrip("&").startswith("D_")
+        )
+        if any("$v0" in instruction.operands for instruction in instructions[call_index + 2:]):
+            owner.notes.append("multi-call wrapper suppressed: call return value is consumed")
+            return []
+        start = call_index + 2
+
+    arg_indices = [
+        int(value)
+        for expressions in call_arguments
+        for expression in expressions
+        for value in re.findall(r"\barg([0-3])\b", expression)
+    ]
+    arg_count = max(arg_indices, default=-1) + 1
+    if arg_count > 4:
+        owner.notes.append("multi-call wrapper suppressed: more than four source arguments")
+        return []
+
+    declarations: list[str] = []
+    for name in sorted(global_exprs):
+        declaration = owner.global_declarations.get(name)
+        if declaration:
+            declarations.append(declaration)
+        else:
+            loaded = any(
+                expression == name
+                for call in call_arguments
+                for expression in call
+            )
+            declarations.append(f"extern {'void *' if loaded else 'u32'} {name};")
+    for call in owner.calls:
+        existing = owner.function_declarations.get(call)
+        if existing:
+            declarations.append(existing)
+        elif call.startswith("func_"):
+            # Old-style declarations avoid making an ABI guess that can
+            # conflict with a later source call using a different arity.
+            declarations.append(f"extern void {call}();")
+
+    prefix = "\n".join(dict.fromkeys(declarations))
+    candidates: list[str] = []
+    labels: list[str] = []
+    for parameter_type in ("s32", "u32", "void *"):
+        parameters = ", ".join(
+            f"{parameter_type} arg{i}" for i in range(arg_count)
+        ) or "void"
+        calls = " ".join(
+            f"{target}({', '.join(expressions)});"
+            for target, expressions in zip(owner.calls, call_arguments)
+        )
+        code = (
+            f"{prefix + chr(10) if prefix else ''}"
+            f"void {owner.function}({parameters}) {{ {calls} }}"
+        )
+        candidates.append(code)
+        labels.append(f"multi-wrapper-void-{parameter_type.replace(' ', '_')}")
+    owner.candidate_labels = labels
+    return candidates
+
+
 def bounded_lookup_candidates(owner: Owner, instructions: list[Instruction]) -> list[str]:
     if not owner.bounds or not owner.globals:
         owner.notes.append("auto lookup translation suppressed: missing bound or global evidence")
@@ -619,8 +820,10 @@ def bounded_lookup_candidates(owner: Owner, instructions: list[Instruction]) -> 
 
 
 def generate_candidates(owner: Owner, instructions: list[Instruction]) -> list[str]:
-    if owner.family in {"direct_wrapper", "multi_call_wrapper"}:
+    if owner.family == "direct_wrapper":
         return wrapper_candidates(owner, instructions)
+    if owner.family == "multi_call_wrapper":
+        return multi_call_wrapper_candidates(owner, instructions)
     if owner.family == "bounded_lookup":
         return bounded_lookup_candidates(owner, instructions)
     owner.notes.append("family detected; no automatic C translation emitted")

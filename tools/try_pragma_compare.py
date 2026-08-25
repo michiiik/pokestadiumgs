@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import os
 import hashlib
+import json
 import re
 import shutil
 import subprocess
@@ -109,6 +110,25 @@ def _binutils_tool(name: str) -> str:
     return f"{prefix}{name}"
 
 
+def _command_timeout(environment_name: str, default: float) -> float:
+    """Read a positive subprocess timeout without making it mandatory."""
+    value = os.environ.get(environment_name)
+    if value is None:
+        return default
+    try:
+        timeout = float(value)
+    except ValueError:
+        return default
+    return timeout if timeout > 0 else default
+
+
+def _timeout_output(error: subprocess.TimeoutExpired) -> str:
+    output = error.stdout if error.stdout is not None else error.output
+    if isinstance(output, bytes):
+        output = output.decode(errors="replace")
+    return str(output or "")
+
+
 def _make_object(source_path: Path, *, capture: bool = False) -> tuple[int, Path, str]:
     """Compile one source file through the repository's normal object rule.
 
@@ -135,10 +155,17 @@ def _make_object(source_path: Path, *, capture: bool = False) -> tuple[int, Path
     if capture:
         kwargs["stdout"] = subprocess.PIPE
         kwargs["stderr"] = subprocess.STDOUT
-    result = subprocess.run(
-        ["make", "-C", "disasm", str(object_path.relative_to(repo_root / "disasm"))],
-        **kwargs,
-    )
+    try:
+        result = subprocess.run(
+            ["make", "-C", "disasm", str(object_path.relative_to(repo_root / "disasm"))],
+            timeout=_command_timeout("PRAGMA_COMPILE_TIMEOUT", 120.0),
+            **kwargs,
+        )
+    except subprocess.TimeoutExpired as error:
+        _remove_probe_outputs(object_path)
+        return 124, object_path, (
+            f"compile timed out after {error.timeout}s\n{_timeout_output(error)}"
+        )
     output = result.stdout if capture and isinstance(result.stdout, str) else ""
     return result.returncode, object_path, output
 
@@ -186,19 +213,10 @@ def _try_candidate_detailed(source_path: Path, function: str, candidate: str) ->
         backup_path.unlink(missing_ok=True)
         return 2, "compile_failed"
     invalidate_link_outputs(Path(__file__).resolve().parent.parent)
-    env = os.environ.copy()
-    env.setdefault("MIPS_BINUTILS_PREFIX", "/Users/michaegg/homebrew/bin/mips-linux-gnu-")
-    result = subprocess.run(
-        ["make", "-C", "disasm", "COMPARE=1", "-j2"],
-        cwd=Path(__file__).resolve().parent.parent,
-        env=env,
-        text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-    )
-    print(result.stdout, end="")
+    result, output = _run_compare(Path(__file__).resolve().parent.parent)
+    print(output, end="")
 
-    if result.returncode != 0:
+    if result != 0:
         shutil.copyfile(backup_path, source_path)
         # Force make to rebuild the restored object instead of reusing the
         # rejected candidate object, regardless of filesystem timestamp
@@ -212,20 +230,36 @@ def _try_candidate_detailed(source_path: Path, function: str, candidate: str) ->
         outcome = "accepted"
 
     backup_path.unlink(missing_ok=True)
-    return result.returncode, outcome
+    return result, outcome
+
+
+def _run_compare(repo_root: Path) -> tuple[int, str]:
+    """Run the full compare with a bounded lifetime and captured diagnostics."""
+    env = os.environ.copy()
+    env.setdefault("MIPS_BINUTILS_PREFIX", "/Users/michaegg/homebrew/bin/mips-linux-gnu-")
+    try:
+        result = subprocess.run(
+            ["make", "-C", "disasm", "COMPARE=1", "-j2"],
+            cwd=repo_root,
+            env=env,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            timeout=_command_timeout("PRAGMA_COMPARE_TIMEOUT", 300.0),
+        )
+    except subprocess.TimeoutExpired as error:
+        return 124, (
+            f"compare timed out after {error.timeout}s\n{_timeout_output(error)}"
+        )
+    return result.returncode, result.stdout or ""
 
 
 def compare_current_tree(repo_root: Path) -> int:
     invalidate_link_outputs(repo_root)
-    env = os.environ.copy()
-    env.setdefault("MIPS_BINUTILS_PREFIX", "/Users/michaegg/homebrew/bin/mips-linux-gnu-")
-    result = subprocess.run(
-        ["make", "-C", "disasm", "COMPARE=1", "-j2"],
-        cwd=repo_root,
-        env=env,
-        text=True,
-    )
-    return result.returncode
+    result, output = _run_compare(repo_root)
+    if output:
+        print(output, end="")
+    return result
 
 
 def _object_text(object_path: Path) -> bytes | None:
@@ -280,6 +314,47 @@ def _function_bytes(
     return text[offset : offset + size]
 
 
+def _is_nop(word: int) -> bool:
+    return word == 0
+
+
+def _is_jr_ra(word: int) -> bool:
+    return word == 0x03E00008
+
+
+def _classify_tail_bytes(data: bytes) -> str:
+    """Classify post-return words to separate padding from real tail code.
+
+    The first ``jr $ra`` and its delay slot are the normal function return.
+    Words after that pair are the useful part of this diagnostic: extra
+    ``jr/nop`` pairs usually mean an assembly owner contains a real tail,
+    while all-zero words are alignment padding.  This never changes matching
+    eligibility; it only makes a size/layout mismatch actionable.
+    """
+    if len(data) < 4:
+        return "none"
+    words = [
+        int.from_bytes(data[offset:offset + 4], "big")
+        for offset in range(0, len(data) - 3, 4)
+    ]
+    for index, word in enumerate(words):
+        if not _is_jr_ra(word):
+            continue
+        if index + 1 >= len(words):
+            return "unterminated_return"
+        tail = words[index + 2:]
+        if not tail:
+            return "normal_return"
+        if all(_is_nop(value) for value in tail):
+            return "jr_nop_plus_alignment"
+        if any(_is_jr_ra(value) for value in tail):
+            return "duplicate_jr_nop_tail"
+        return "mixed_post_return_tail"
+    if all(_is_nop(value) for value in words[-2:]):
+        return "nop_only_tail"
+    return "no_return_found"
+
+
 def _function_mismatch_details(
     object_path: Path,
     function: str,
@@ -287,13 +362,17 @@ def _function_mismatch_details(
     actual: bytes | None,
 ) -> dict[str, object]:
     """Summarize a rejected probe without dumping the candidate object."""
-    details: dict[str, object] = {"expected_size": len(expected)}
+    details: dict[str, object] = {
+        "expected_size": len(expected),
+        "expected_tail_kind": _classify_tail_bytes(expected),
+    }
     symbol = _object_symbol(object_path, function)
     if symbol is not None:
         details["actual_size"] = symbol[1]
     if actual is None:
         details["first_diff_offset"] = None
         return details
+    details["actual_tail_kind"] = _classify_tail_bytes(actual)
     diff_offsets = [
         index
         for index, (left, right) in enumerate(zip(expected, actual))
@@ -439,16 +518,21 @@ def probe_candidates(
     try:
         _, baseline_object = source_object_path(source_path)
     except ValueError:
+        for result in results:
+            result["probe_reason"] = "baseline_object_unavailable"
         return results
 
     if rebuild_source_object(source_path) != 0:
+        for result in results:
+            result["probe_reason"] = "baseline_object_unavailable"
         return results
     expected = {
         function: _function_bytes(baseline_object, function)
         for function in {function for function, _ in blocks}
     }
-    if any(value is None for value in expected.values()):
-        return results
+    for index, (function, _) in enumerate(blocks):
+        if expected[function] is None:
+            results[index]["probe_reason"] = "missing_function_bytes"
 
     if workers is None:
         try:
@@ -462,6 +546,7 @@ def probe_candidates(
                 _probe_one, source_path, function, candidate, expected[function]
             ): index
             for index, (function, candidate) in enumerate(blocks)
+            if expected[function] is not None
         }
         for future in as_completed(futures):
             index = futures[future]
@@ -477,6 +562,67 @@ def probe_candidates(
             results[index]["index"] = index
             results[index]["function"] = blocks[index][0]
     return results
+
+
+def _full_gate_eligible(attempt: dict[str, object]) -> bool:
+    """Return whether this specific attempt may use the sequential fallback."""
+    if attempt.get("status") == "probe_match":
+        return True
+    return (
+        attempt.get("status") == "probe_unavailable"
+        and attempt.get("probe_reason")
+        in {"baseline_object_unavailable", "missing_function_bytes"}
+    )
+
+
+def _record_probe_stats(
+    source_path: Path,
+    attempts: list[dict[str, object]],
+    labels: list[str | None] | None,
+) -> None:
+    """Append optional JSONL probe outcomes for family-level tuning.
+
+    Statistics are opt-in so normal MCP calls remain as lightweight as before.
+    The transaction lock surrounds this call, making one JSON object append
+    atomic with respect to other runner processes in this repository.
+    """
+    stats_path_value = os.environ.get("PRAGMA_PROBE_STATS")
+    if not stats_path_value:
+        return
+    stats_path = Path(stats_path_value).expanduser()
+    try:
+        stats_path.parent.mkdir(parents=True, exist_ok=True)
+        counts: dict[str, int] = {}
+        rows: list[dict[str, object]] = []
+        for index, attempt in enumerate(attempts):
+            label = (
+                labels[index]
+                if labels is not None and index < len(labels)
+                else attempt.get("label")
+            )
+            row = {
+                "index": index,
+                "function": attempt.get("function"),
+                "label": label,
+                "status": attempt.get("status"),
+                "probe_status": attempt.get("probe_status"),
+                "probe_reason": attempt.get("probe_reason"),
+                "mismatch_kind": attempt.get("mismatch_kind"),
+                "expected_size": attempt.get("expected_size"),
+                "actual_size": attempt.get("actual_size"),
+            }
+            rows.append(row)
+            key = f"{label or 'unlabeled'}:{attempt.get('status', 'unknown')}"
+            counts[key] = counts.get(key, 0) + 1
+        with stats_path.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps({
+                "source": source_path.as_posix(),
+                "counts": counts,
+                "attempts": rows,
+            }, sort_keys=True) + "\n")
+    except OSError:
+        # Metrics must never turn a valid source transaction into a failure.
+        return
 
 
 @contextmanager
@@ -508,12 +654,15 @@ def try_candidates_detailed(
     blocks: list[tuple[str, str]],
     *,
     probe_workers: int | None = None,
+    labels: list[str | None] | None = None,
 ) -> dict[str, object]:
     """Run one candidate transaction while excluding other MCP processes."""
     with _candidate_transaction_lock():
-        return _try_candidates_detailed_unlocked(
-            source_path, blocks, probe_workers=probe_workers
+        result = _try_candidates_detailed_unlocked(
+            source_path, blocks, probe_workers=probe_workers, labels=labels
         )
+        _record_probe_stats(source_path, result.get("attempts", []), labels)
+        return result
 
 
 def _try_candidates_detailed_unlocked(
@@ -521,6 +670,7 @@ def _try_candidates_detailed_unlocked(
     blocks: list[tuple[str, str]],
     *,
     probe_workers: int | None = None,
+    labels: list[str | None] | None = None,
 ) -> dict[str, object]:
     """Try candidates and retain the first winner per function.
 
@@ -534,17 +684,15 @@ def _try_candidates_detailed_unlocked(
     accepted: dict[str, str] = {}
     accepted_indices: dict[str, int] = {}
     attempts = probe_candidates(source_path, blocks, workers=probe_workers)
-    probe_unavailable = any(
-        attempt["status"] == "probe_unavailable" for attempt in attempts
-    )
+    if labels is not None:
+        for index, attempt in enumerate(attempts):
+            if index < len(labels) and labels[index]:
+                attempt["label"] = labels[index]
 
-    # If object-level probing is unavailable (for example in a synthetic unit
-    # test or a missing toolchain), preserve the old conservative behavior and
-    # send every candidate through the sequential full gate.
-    eligible = [
-        index for index, attempt in enumerate(attempts)
-        if probe_unavailable or attempt["status"] == "probe_match"
-    ]
+    # Fall back only for the affected function when its baseline bytes cannot
+    # be inspected.  A missing symbol in one owner must not send every other
+    # function's rejected variants through the expensive full gate.
+    eligible = [index for index, attempt in enumerate(attempts) if _full_gate_eligible(attempt)]
     for index in eligible:
         function, candidate = blocks[index]
         attempt = attempts[index]
@@ -585,7 +733,13 @@ def _try_candidates_detailed_unlocked(
 
     # No probe hit means no source edit was made and no linker invocation is
     # necessary.  This is the main speedup for large rejected candidate sets.
-    if not accepted and not probe_unavailable:
+    fallback_eligible = any(
+        attempt.get("status") == "probe_unavailable"
+        and attempt.get("probe_reason")
+        in {"baseline_object_unavailable", "missing_function_bytes"}
+        for attempt in attempts
+    )
+    if not accepted and not fallback_eligible:
         return {
             "status": 1,
             "accepted": [],

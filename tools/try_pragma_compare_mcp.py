@@ -67,7 +67,7 @@ def main():
                 os.dup2(devnull_fd, sys.stdout.fileno())
                 with contextlib.redirect_stdout(captured):
                     result = runner.try_candidates_detailed(
-                        source, blocks, probe_workers=workers
+                        source, blocks, probe_workers=workers, labels=labels
                     )
             finally:
                 sys.stdout.flush()
