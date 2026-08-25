@@ -22,7 +22,11 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1CDC0/func_8001C97C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/1CDC0/func_8001CA14.s")
+extern void func_8001CA3C(void);
+void func_8001CA14(u8 *arg0) {
+    *arg0 = ((*arg0) & 0xFF) | 0x40;
+    func_8001CA3C();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1CDC0/func_8001CA3C.s")
 
