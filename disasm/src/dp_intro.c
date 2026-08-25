@@ -2,7 +2,41 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_800015C0.s")
+#define ALIGN16(val) (((val) + 0xFu) & ~0xFu)
+typedef struct S1_UnkStruct80001380 S1_UnkStruct80001380;
+struct S1_UnkStruct80001380 {
+    OSMesg mesg;
+    OSMesgQueue queue;
+    u16 state;
+    u16 notifyFlag;
+    OSTask task;
+    char unk60[0x8];
+};
+typedef unsigned int S1_uintptr_t;
+extern u64 D_800AB4A0[0x100 / sizeof(u64)];
+extern u64 D_800A63D0[];
+extern u64 D_800A7A00[];
+extern u64 D_800AB5A0[0x1];
+extern u64 D_800AB9A8[0x1];
+extern u64 D_800AC5B0[0x1];
+extern u64 D_800CC5B0[];
+void func_800015C0(S1_UnkStruct80001380* arg0) {
+    arg0->task.t.type = M_GFXTASK;
+    arg0->task.t.flags = 0;
+    arg0->task.t.ucode_boot = D_800AB4A0;
+    arg0->task.t.ucode_boot_size = 0x100;
+    arg0->task.t.ucode = D_800A63D0;
+    arg0->task.t.ucode_data = D_800A7A00;
+    arg0->task.t.ucode_size = 0x1000;
+    arg0->task.t.ucode_data_size = 0x800;
+    arg0->task.t.dram_stack = (void*)ALIGN16((S1_uintptr_t)D_800AB5A0);
+    arg0->task.t.dram_stack_size = 0x400;
+    arg0->task.t.yield_data_ptr = (void*)ALIGN16((S1_uintptr_t)D_800AB9A8);
+    arg0->task.t.yield_data_size = 0xC00;
+    arg0->task.t.output_buff = (D_800AC5B0);
+    arg0->task.t.output_buff_size = D_800CC5B0;
+    osCreateMesgQueue(&arg0->queue, &arg0->mesg, 1);
+}
 #endif
 
 #ifdef VERSION_US
