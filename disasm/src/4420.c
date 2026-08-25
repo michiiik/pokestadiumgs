@@ -177,7 +177,36 @@ void func_800046C0(u32 base_addr, u32 addr) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80004718.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800047B0.s")
+#define RELOCATIONS_SIZE 1
+typedef struct S1_Fragment S1_Fragment;
+typedef struct S1_MainPoolState S1_MainPoolState;
+typedef struct S1_MainPoolBlock S1_MainPoolBlock;
+struct S1_Fragment {
+      u32 inst[2];      
+      char magic[8];    
+      u32 headerSize;   
+      u32 relocOffset;  
+      u32 sizeInRom;
+      u32 sizeInRam;
+      char data[RELOCATIONS_SIZE];  
+};
+struct S1_MainPoolState {
+      s32 freeSpace;
+      S1_MainPoolBlock *listHeadL;
+      S1_MainPoolBlock *listHeadR;
+      struct S1_MainPoolState *prev;
+};
+typedef void (*S1_AllocateFunc)(struct S1_MainPoolBlock*, u32);
+struct S1_MainPoolBlock {
+      struct S1_MainPoolBlock *prev;
+      struct S1_MainPoolBlock *next;
+      S1_AllocateFunc func;
+      s32 arg;  
+};
+void func_800047B0(S1_MainPoolState* arg0, u32 arg1, S1_Fragment* arg2) {
+    func_80002210(arg1, arg2);
+    func_800031FC(arg0, ((u32)arg2 + arg2->sizeInRam) - (u32)arg0->listHeadR);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800047F8.s")
 
