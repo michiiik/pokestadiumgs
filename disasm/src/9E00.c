@@ -34,7 +34,21 @@ void func_80009830(s32 x, s32 y, s32 regNum, void* addr) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/9E00/func_800098B4.s")
+extern char D_800A1B30[];
+extern char D_800A1B3C[];
+extern s32 D_80087DE8[];
+void func_800098B4(u32 fpcsr) {
+    s32 i;
+    u32 bit = 1 << 17;
+    func_80009774(30, 155, D_800A1B30, fpcsr);
+    for (i = 0; i < 6; i++) {
+        if (fpcsr & bit) {
+            func_80009774(132, 155, D_800A1B3C, D_80087DE8[i]);
+            break;
+        }
+        bit >>= 1;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/9E00/func_80009940.s")
 
