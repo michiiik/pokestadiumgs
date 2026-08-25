@@ -100,7 +100,16 @@ s32 func_8006461C(s32 arg0) { s32 temp_v0 = arg0 & 0xFF; s32 *value = &arg0; if 
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_800646C8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80064700.s")
+s32 func_80064700(s32 arg0) {
+    s32 *ptr = &arg0;
+    s32 value = *ptr & 0xFF;
+    if (value == 1) {
+        value = 0xC9;
+    } else {
+        value = value + 0xFC;
+    }
+    return value & 0xFFFF;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80064728.s")
 

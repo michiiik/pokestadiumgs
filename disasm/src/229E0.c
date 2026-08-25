@@ -762,7 +762,10 @@ extern u8 D_800D2B41; void func_800331C8(void) { D_800D2B41 = 0; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003364C.s")
+extern void func_80033670(s32);
+extern void func_80033864(s32);
+extern void func_80033890(s32);
+void func_8003364C(s32 arg0) { s32 *p = &arg0; func_80033670(arg0 & 0xFF); }
 #endif
 
 #ifdef VERSION_US
@@ -770,7 +773,7 @@ extern u8 D_800D2B41; void func_800331C8(void) { D_800D2B41 = 0; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800337D8.s")
+void func_800337D8(s32 arg0) { s32 *p = &arg0; func_80033864(arg0 & 0xFF); }
 #endif
 
 #ifdef VERSION_US
@@ -782,7 +785,7 @@ void func_80033864(s32 arg0) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003386C.s")
+void func_8003386C(s32 arg0) { s32 *p = &arg0; func_80033890(arg0 & 0xFF); }
 #endif
 
 #ifdef VERSION_US

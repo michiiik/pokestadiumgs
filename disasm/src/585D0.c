@@ -833,15 +833,26 @@ void func_8005EE4C(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005F790.s")
+extern void func_8005F668(s32, s32, s32);
+extern void func_8005F808(s32, s32, s32);
+void func_8005F790(s32 arg0, s32 arg1) {
+    s32 *p = &arg1;
+    func_8005F668(arg0, arg1 & 0xFF, 0);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005F7B8.s")
+void func_8005F7B8(s32 arg0, s32 arg1) {
+    s32 *p = &arg1;
+    func_8005F668(arg0, arg1 & 0xFF, 1);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005F7E0.s")
+void func_8005F7E0(s32 arg0, s32 arg1) {
+    s32 *p = &arg1;
+    func_8005F668(arg0, arg1 & 0xFF, 2);
+}
 #endif
 
 #ifdef VERSION_US
@@ -849,11 +860,17 @@ void func_8005EE4C(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005F9A4.s")
+void func_8005F9A4(s32 arg0, s32 arg1) {
+    s32 *p = &arg1;
+    func_8005F808(arg0, arg1 & 0xFFFF, 0);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005F9CC.s")
+void func_8005F9CC(s32 arg0, s32 arg1) {
+    s32 *p = &arg1;
+    func_8005F808(arg0, arg1 & 0xFFFF, 1);
+}
 #endif
 
 #ifdef VERSION_US

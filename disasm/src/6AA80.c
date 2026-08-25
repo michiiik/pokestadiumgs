@@ -51,7 +51,8 @@ s32 func_8006A48C(void) { s32 result = -1; s32 ptr = D_8009DF70; if (ptr != 0) r
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006A73C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006AB68.s")
+extern void func_8006A73C(s32);
+void func_8006AB68(s32 arg0) { s32 *p = &arg0; func_8006A73C(arg0 & 0xFFFF); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006AB8C.s")
 

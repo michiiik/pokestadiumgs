@@ -65,7 +65,15 @@ extern void func_8004C8C0();
 extern void func_81602DD8();
 void func_8160317C(void) { func_8004C8C0(66); func_8004C8C0(65); func_81602DD8(); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_816031AC.s")
+extern void func_8004C4B0(s32); extern void func_8004C8C0(s32); extern void func_81602DD8(void);
+void func_816031AC(void) {
+    func_8004C4B0(0x19);
+    func_8004C4B0(0x17);
+    func_8004C8C0(0x39);
+    func_8004C8C0(0x42);
+    func_8004C8C0(0x41);
+    func_81602DD8();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_816031F4.s")
 
