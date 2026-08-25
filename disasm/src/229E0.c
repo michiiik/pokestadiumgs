@@ -2460,11 +2460,15 @@ void func_800373D0(f32 arg0, f32 arg1, f32 arg2, S1_Vec3f* arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80037580.s")
+void func_80037580(S1_Color_RGBA8_u32 arg0, S1_Vec3f* arg1) {
+    func_800373D0((s32)arg0.r / 255.0f, (s32)arg0.g / 255.0f, (s32)arg0.b / 255.0f, arg1);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800375E0.s")
+void func_800375E0(u16 arg0, S1_Vec3f* arg1) {
+    func_800373D0(((arg0 & 0xF800) >> 0xB) / 31.0f, ((arg0 & 0x7C0) >> 6) / 31.0f, ((arg0 & 0x3E) >> 1) / 31.0f, arg1);
+}
 #endif
 
 #ifdef VERSION_US
@@ -2494,7 +2498,48 @@ f32 func_80037650(f32 arg0, f32 arg1, f32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80037790.s")
+void func_80037790(f32* arg0, f32* arg1, f32* arg2, S1_Vec3f* arg3) {
+    f32 sp24;
+    f32 sp20;
+    f32 temp_ft4;
+
+    if (arg3->z < -1.0f) {
+        arg3->z = -1.0f;
+    } else if (arg3->z > 1.0f) {
+        arg3->z = 1.0f;
+    }
+
+    if (arg3->y < 0.0f) {
+        arg3->y = 0.0f;
+    } else {
+        sp24 = 1.0f;
+        if (arg3->y > 1.0f) {
+            arg3->y = 1.0f;
+        }
+    }
+
+    if (arg3->x < 0.0f) {
+        arg3->x += 360.0f;
+    } else {
+        while (arg3->x >= 360.0f) {
+            arg3->x -= 360.0f;
+        }
+    }
+
+    if (arg3->z <= 0.0f) {
+        temp_ft4 = arg3->z + 1.0f;
+        sp24 = temp_ft4 * 0.5f * (1.0f - arg3->y);
+        sp20 = temp_ft4 - sp24;
+    } else {
+        temp_ft4 = arg3->z + 1.0f;
+        sp20 = (temp_ft4 * 0.5 * (1.0f - arg3->y)) + arg3->y;
+        sp24 = temp_ft4 - sp20;
+    }
+
+    *arg0 = func_80037650(arg3->x + 120.0f, sp24, sp20);
+    *arg1 = func_80037650(arg3->x, sp24, sp20);
+    *arg2 = func_80037650(arg3->x - 120.0f, sp24, sp20);
+}
 #endif
 
 #ifdef VERSION_US
