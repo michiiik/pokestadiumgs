@@ -320,5 +320,16 @@ s32 func_860047AC(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_246640/func_860047E8.s")
+s32 func_860047E8(u8 *arg0) {
+    s32 var_v1;
+
+    var_v1 = 0;
+    if ((*(f64 *)((u8 *)(arg0) + (0x17E8))) > 0.0) {
+        var_v1 = 1;
+    }
+    if (var_v1 != 0) {
+        var_v1 = func_860047AC(arg0) != 0;
+    }
+    return var_v1;
+}
 #endif

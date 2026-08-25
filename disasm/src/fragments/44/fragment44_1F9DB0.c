@@ -32,11 +32,52 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F9DB0/func_8AF0D7C8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F9DB0/func_8AF0E084.s")
+extern void func_8AF00130(s32);
+extern s16 D_8AF2E894;
+extern s16 D_8AF2E896;
+extern s16 D_8AF2E89A;
+extern void *D_8AF2E8A4;
+extern s16 D_8AF2ECF8;
+extern s16 D_8AF2ECFA;
+void func_8AF0E084(void) {
+    func_8AF00130(1);
+    D_8AF2ECF8 = 0;
+    D_8AF2E894 = (*(s16 *)((u8 *)(D_8AF2E8A4) + (8)));
+    D_8AF2E896 = (*(s16 *)((u8 *)(D_8AF2E8A4) + (0xA)));
+    D_8AF2E89A = D_8AF2ECFA;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F9DB0/func_8AF0E0D8.s")
+extern void func_8AF00130(s32);
+extern s16 D_8AF2E894;
+extern s16 D_8AF2E896;
+extern s16 D_8AF2E89A;
+extern void *D_8AF2E8A8;
+extern s16 D_8AF2ECF8;
+extern s16 D_8AF2ECFC;
+void func_8AF0E0D8(void) {
+    func_8AF00130(1);
+    D_8AF2ECF8 = 1;
+    D_8AF2E894 = (*(s16 *)((u8 *)(D_8AF2E8A8) + (8)));
+    D_8AF2E896 = (*(s16 *)((u8 *)(D_8AF2E8A8) + (0xA)));
+    D_8AF2E89A = D_8AF2ECFC;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F9DB0/func_8AF0E130.s")
+extern void func_8AF00130(s32);
+extern s16 D_8AF2E894;
+extern s16 D_8AF2E896;
+extern s16 D_8AF2E898;
+extern s16 D_8AF2E89A;
+extern void *D_8AF2E8AC;
+extern s16 D_8AF2ECF8;
+extern s16 D_8AF2ECFE;
+void func_8AF0E130(void) {
+    func_8AF00130(1);
+    D_8AF2ECF8 = 2;
+    D_8AF2E894 = (*(s16 *)((u8 *)(D_8AF2E8AC) + (8)));
+    D_8AF2E896 = (*(s16 *)((u8 *)(D_8AF2E8AC) + (0xA)));
+    D_8AF2E898 = 0;
+    D_8AF2E89A = D_8AF2ECFE;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F9DB0/func_8AF0E190.s")
 

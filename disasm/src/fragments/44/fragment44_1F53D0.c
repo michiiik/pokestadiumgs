@@ -17,5 +17,17 @@ s32 func_8AF07180(void) {
     return var_v1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F53D0/func_8AF071A8.s")
+extern void func_800495BC(s32, s32, s32 *);
+extern void func_800496A4(s32, s32);
+extern void func_8004972C(s32, s32, s32, s32);
+extern void func_800498C4();
+extern void func_800499EC();
+extern u8 D_8AF28ED0;
+void func_8AF071A8(void) {
+    func_800498C4();
+    func_800496A4(0x10, 0);
+    func_8004972C(0xFF, 0xFF, 0xFF, 0xFF);
+    func_800495BC(0xFA, 0x32, &D_8AF28ED0);
+    func_800499EC();
+}
 #endif

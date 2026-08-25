@@ -19,7 +19,30 @@ void func_8AB0B52C(void) { func_8AB0B67C(0); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22FAD0/func_8AB0B6E0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22FAD0/func_8AB0B74C.s")
+extern void func_80007B34(s32);
+s32 func_800084A0();
+extern void func_800225C4(s32);
+s32 func_8002806C();
+
+s32 func_8AB0B74C(s32 arg0) {
+    s32 sp1C;
+
+    sp1C = 0x2F;
+    switch (arg0) {                                 /* irregular */
+    case 0:
+        func_80007B34(5);
+        if (func_8002806C() != 0x48) {
+            func_800225C4(5);
+        }
+        break;
+    case 1:
+        if (func_800084A0() == 1) {
+            sp1C = 0;
+        }
+        break;
+    }
+    return sp1C;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22FAD0/func_8AB0B7CC.s")
 

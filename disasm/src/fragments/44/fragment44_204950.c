@@ -20,7 +20,15 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_204950/func_8AF16EF0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_204950/func_8AF171D8.s")
+extern void func_8004C594(s32, s16);
+extern void *D_8AF342E0;
+extern s16 D_8AF34800;
+extern s16 D_8AF34D64;
+void func_8AF171D8(s32 arg0) {
+    (*(s16 *)((u8 *)(D_8AF342E0) + (0x30))) = 0x3B;
+    (*(s16 *)((u8 *)(D_8AF342E0) + (0x32))) = (s16) (D_8AF34D64 + 0xDB);
+    func_8004C594(2, D_8AF34800);
+}
 
 extern void _bzero(s32 *, s32);
 extern s16 D_8AF347F4;

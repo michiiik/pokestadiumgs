@@ -10,7 +10,20 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20A610/func_8AF1C574.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20A610/func_8AF1C5F0.s")
+extern void *D_8AF37778;
+extern void *D_8AF3777C;
+extern void *D_8AF37780;
+extern void *D_8AF37784;
+extern void *D_8AF37788;
+extern void *D_8AF3778C;
+void func_8AF1C5F0(void) {
+    (*(u16 *)((u8 *)(D_8AF37778) + (2))) = (u16) ((*(u16 *)((u8 *)(D_8AF37778) + (2))) | 2);
+    (*(u16 *)((u8 *)(D_8AF37784) + (2))) = (u16) ((*(u16 *)((u8 *)(D_8AF37784) + (2))) | 2);
+    (*(u16 *)((u8 *)(D_8AF3777C) + (2))) = (u16) ((*(u16 *)((u8 *)(D_8AF3777C) + (2))) | 2);
+    (*(u16 *)((u8 *)(D_8AF37788) + (2))) = (u16) ((*(u16 *)((u8 *)(D_8AF37788) + (2))) | 2);
+    (*(u16 *)((u8 *)(D_8AF37780) + (2))) = (u16) ((*(u16 *)((u8 *)(D_8AF37780) + (2))) | 2);
+    (*(u16 *)((u8 *)(D_8AF3778C) + (2))) = (u16) ((*(u16 *)((u8 *)(D_8AF3778C) + (2))) | 2);
+}
 
 void func_8AF1C66C(u8 *arg0, s32 arg1, s32 arg2) {
     *(s32 *)(arg0 + 0x28) = arg1;

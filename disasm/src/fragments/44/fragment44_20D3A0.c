@@ -16,7 +16,15 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20D3A0/func_8AF1F514.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20D3A0/func_8AF1F590.s")
+s32 func_8AF1F590(s16 arg0) {
+    s32 var_v1;
+
+    var_v1 = 0;
+    if ((arg0 == 0x20) || (arg0 == 0x21) || (arg0 == 0x22) || (arg0 == 0x6A) || (arg0 == 0x6B) || (arg0 == 0x80) || (arg0 == 0xEC) || (arg0 == 0xED)) {
+        var_v1 = 1;
+    }
+    return var_v1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20D3A0/func_8AF1F5F0.s")
 

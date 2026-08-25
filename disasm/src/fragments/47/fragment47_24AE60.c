@@ -47,7 +47,19 @@ s32 func_86004E84(Func86004E84State *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_860062E0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_86006318.s")
+extern void func_86001AFC(s32);
+void func_86006318(s32 arg0) {
+    s32 var_s0;
+    s32 var_s1;
+
+    var_s0 = 0;
+    var_s1 = arg0 + 0x75C8;
+    do {
+        func_86001AFC(var_s1);
+        var_s0 += 0x2D8;
+        var_s1 += 0x2D8;
+    } while (var_s0 != 0xB60);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_86006364.s")
 
@@ -82,7 +94,19 @@ void func_86006D24(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_86006F20.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_86007300.s")
+extern void func_86001B1C(s32);
+void func_86007300(s32 arg0) {
+    s32 var_s0;
+    s32 var_s1;
+
+    var_s0 = 0;
+    var_s1 = arg0 + 0x75C8;
+    do {
+        func_86001B1C(var_s1);
+        var_s0 += 0x2D8;
+        var_s1 += 0x2D8;
+    } while (var_s0 != 0xB60);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_8600734C.s")
 

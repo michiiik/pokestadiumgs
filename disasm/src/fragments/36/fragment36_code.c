@@ -30,7 +30,9 @@ void func_887009F0(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/36/fragment36_code/func_88700CE4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/36/fragment36_code/func_8870118C.s")
+s16 func_8870118C(s16 arg0) {
+    return (s16) ((*(s16 *)((u8 *)(D_88701E00) + (0xC))) + (arg0 * 0x16) + ((arg0 / 13) * 0xC) + 0x17);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/36/fragment36_code/func_887011E8.s")
 

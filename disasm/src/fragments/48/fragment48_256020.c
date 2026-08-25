@@ -4,7 +4,15 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C00020.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C00090.s")
+f64 func_87C00090(f64 arg0, f64 arg1, f64 arg4) {
+    if (arg0 < (arg1 - arg4)) {
+        return arg0 + arg4;
+    }
+    if ((arg1 + arg4) < arg0) {
+        return arg0 - arg4;
+    }
+    return arg1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C000E4.s")
 

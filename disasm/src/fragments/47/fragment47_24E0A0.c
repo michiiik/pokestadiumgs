@@ -106,7 +106,13 @@ s32 func_86009BE0(s32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_8600A144.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_8600A1C0.s")
+extern f32 D_8600D9DC;
+s32 func_8600A1C0(f32 arg0) {
+    s32 temp_v1;
+
+    temp_v1 = (s32) arg0 & 0x1F;
+    return ((temp_v1 << 0xA) + (s32) (((arg0 - (f32) temp_v1) + D_8600D9DC) * 1024.0f)) & 0xFFFF;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_8600A20C.s")
 
