@@ -77,6 +77,24 @@ class FindFunctionDefinitionTest(unittest.TestCase):
         _, is_static = result
         self.assertTrue(is_static)
 
+    def test_block_comment_before_definition_is_not_part_of_signature(self):
+        text = (
+            "/*\n"
+            "  0x02: Jump to address\n"
+            "    cmd+0x04: void *jumpTarget\n"
+            "*/\n"
+            "void Jump(void) {\n"
+            "    return;\n"
+            "}\n"
+        )
+        with mock.patch.object(Path, "read_text", return_value=text):
+            result = sweep.find_function_definition("Jump", Path("dummy.c"))
+        self.assertIsNotNone(result)
+        full, is_static = result
+        self.assertFalse(is_static)
+        self.assertTrue(full.startswith("void Jump(void) {"))
+        self.assertNotIn("jumpTarget", full)
+
     def test_missing_function_returns_none(self):
         text = "void SomethingElse(void) { return; }\n"
         with mock.patch.object(Path, "read_text", return_value=text):

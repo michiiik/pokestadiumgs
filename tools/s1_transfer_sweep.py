@@ -612,7 +612,14 @@ def find_function_definition(name: str, path: Path) -> tuple[str, bool] | None:
     except OSError:
         return None
     pattern = re.compile(
-        r"(?m)^[ \t]*((?:static\s+)?[A-Za-z_][^;{}]*?\b" + re.escape(name) + r"\s*\([^;{}]*\))\s*\{"
+        # A documented S1 function can have a block comment immediately
+        # before its definition.  Do not let the permissive return-type
+        # portion consume comment text (for example ``cmd+0x04: ... */``)
+        # and turn it into a bogus signature.  The lookahead is deliberately
+        # limited to the pre-brace span, where C comments cannot be part of a
+        # valid function declaration in this source tree.
+        r"(?m)^[ \t]*(?![^;{}]*(?:/\*|\*/|//))"
+        r"((?:static\s+)?[A-Za-z_][^;{}]*?\b" + re.escape(name) + r"\s*\([^;{}]*\))\s*\{"
     )
     for match in pattern.finditer(text):
         brace_index = match.end() - 1
