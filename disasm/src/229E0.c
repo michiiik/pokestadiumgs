@@ -4512,7 +4512,15 @@ void func_80041664(S1_MemoryBlock* arg0, S1_arg1_func_80019420* arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80041B84.s")
+void func_80041A78(void *);
+extern OSThread D_80126530;
+extern void *D_80126EE0;
+extern OSMesgQueue D_80126F00;
+void func_80041B84(void) {
+    osCreateMesgQueue(&D_80126F00, &D_80126EE0, 8);
+    osCreateThread(&D_80126530, 7, func_80041A78, NULL, &D_80126EE0, 0xA);
+    osStartThread(&D_80126530);
+}
 #endif
 
 #ifdef VERSION_US

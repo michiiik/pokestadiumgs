@@ -122,7 +122,28 @@ void func_82C003F8(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C02328.s")
+extern void func_80008648();
+extern void func_800088DC();
+extern void func_82C00C78();
+extern void func_82C00F20();
+extern void func_82C019B4();
+extern void func_82C01C38();
+extern void func_82C01E24();
+extern void func_82C01E98();
+extern void func_82C01FE4();
+extern void func_82C02078();
+void func_82C02328(void) {
+    func_800088DC();
+    func_82C00C78();
+    func_82C00F20();
+    func_82C019B4();
+    func_82C01E24();
+    func_82C01E98();
+    func_82C01FE4();
+    func_82C02078();
+    func_82C01C38();
+    func_80008648();
+}
 #endif
 
 #ifdef VERSION_US
