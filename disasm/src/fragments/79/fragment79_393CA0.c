@@ -1510,7 +1510,14 @@ void func_84134E00(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84134F0C.s")
+extern u8 *D_84186160[];
+void func_84134F0C(u8 arg0, u8 arg1) {
+    if (arg0 < 4) {
+        u8 *ptr = D_84186160[arg0];
+        u8 *base = ptr + 8;
+        if (ptr != NULL) base[1] |= arg1;
+    }
+}
 #endif
 
 #ifdef VERSION_US
