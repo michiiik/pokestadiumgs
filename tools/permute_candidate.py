@@ -166,7 +166,34 @@ def build_work_directory(
     return work_dir
 
 
-def _collect_outputs(work_dir: Path, limit: int) -> list[dict[str, object]]:
+def extract_function(code: str, function: str) -> str:
+    """Return only ``function``'s definition from a permuter output file.
+
+    ``--no-context-output`` drops declarations above the function, but the
+    stripped base still carries prototypes for later owners below it.  A
+    candidate for the runner should be the body alone.
+    """
+    header = re.compile(rf"^[^\n;{{}}]*\b{re.escape(function)}\s*\([^;]*?\)\s*\{{", re.M | re.S)
+    match = header.search(code)
+    if match is None:
+        return code
+    depth = 0
+    index = match.end() - 1
+    while index < len(code):
+        if code[index] == "{":
+            depth += 1
+        elif code[index] == "}":
+            depth -= 1
+            if depth == 0:
+                return code[match.start():index + 1].strip() + "\n"
+        index += 1
+    return code
+
+
+NOISE_RE = re.compile(r"resource_tracker|warnings\.warn|leaked semaphore")
+
+
+def _collect_outputs(work_dir: Path, function: str, limit: int) -> list[dict[str, object]]:
     outputs: list[dict[str, object]] = []
     for entry in work_dir.iterdir():
         match = OUTPUT_DIR_RE.match(entry.name)
@@ -177,7 +204,7 @@ def _collect_outputs(work_dir: Path, limit: int) -> list[dict[str, object]]:
             continue
         outputs.append({
             "score": int(match.group(1)),
-            "code": source.read_text(),
+            "code": extract_function(source.read_text(), function),
             "diff": (entry / "diff.txt").read_text()[-4000:] if (entry / "diff.txt").exists() else None,
         })
     outputs.sort(key=lambda item: (int(item["score"]), len(str(item["code"]))))
@@ -253,7 +280,8 @@ def permute(
                     pass
     process.wait()
     killer.join(timeout=1.0)
-    outputs = _collect_outputs(work_dir, limit)
+    outputs = _collect_outputs(work_dir, owner.function, limit)
+    log_lines = [line for line in log_lines if line.strip() and not NOISE_RE.search(line)]
     result: dict[str, object] = {
         **owner.as_dict(),
         "base_score": base_score,
