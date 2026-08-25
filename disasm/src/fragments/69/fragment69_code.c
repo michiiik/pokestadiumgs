@@ -18,7 +18,19 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/69/fragment69_code/func_8F10018C.s")
+extern u8 D_8F1DF270[];
+s32 func_8F10018C(s32 arg0)
+{
+  s16 *entry = (s16 *) (D_8F1DF270 + (arg0 * 6));
+  s16 value;
+  s32 result = 0;
+  if (((*entry) == 0) || ((*entry) == 6))
+  {
+    *entry = 1;
+    result = 1;
+  }
+  return result;
+}
 #endif
 
 #ifdef VERSION_US
