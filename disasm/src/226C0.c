@@ -2,7 +2,14 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/226C0/func_80021AC0.s")
+void func_80021AC0(s32 arg0, s32 arg1) {
+    if (arg0 || arg1) {
+        /* intentionally empty */
+    }
+    func_80015AB8();
+    func_80018704(0x41010000, 0x3F2147AE);
+    func_80018704(0x41000000, 0x3F4F5C29);
+}
 
 extern void func_80021AC0(s32, s32);
 extern void func_80028140(void);
