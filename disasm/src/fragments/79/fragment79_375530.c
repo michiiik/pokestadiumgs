@@ -46,7 +46,27 @@ void func_84105D00(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_375530/func_84105D40.s")
+u8 *func_84105D40(void) {
+    s32 i;
+    s32 index;
+    u8 *ptr;
+    index = D_84190154;
+    ptr = D_84190150 + index * 0xC;
+    for (i = 0; i < 0x40; i++) {
+        if ((ptr[8] & 1) == 0) break;
+        index++;
+        if (index >= 0x40) {
+            index = 0;
+            ptr = D_84190150;
+        } else ptr += 0xC;
+    }
+    if (i >= 0x40) ptr = NULL;
+    else {
+        D_84190154 = index + 1;
+        if (D_84190154 >= 0x40) D_84190154 = 0;
+    }
+    return ptr;
+}
 #endif
 
 #ifdef VERSION_US

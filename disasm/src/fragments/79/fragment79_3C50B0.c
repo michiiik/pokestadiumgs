@@ -53,7 +53,20 @@ u8 func_84155D5C(u8 arg0, u8 arg1, u8 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C50B0/func_84156464.s")
+extern u8 D_8419EE01[];
+extern u8 *D_841951F8[];
+extern void func_84155F28(u8, u8);
+extern void func_8415623C(u8);
+void func_84156464(u8 arg0) {
+    s32 i;
+    D_8419EE01[arg0 * 0x132] = 1;
+    i = 0;
+    while (i < D_841951F8[arg0][7]) {
+        func_84155F28(arg0, i);
+        i++;
+    }
+    func_8415623C(arg0);
+}
 #endif
 
 #ifdef VERSION_US
