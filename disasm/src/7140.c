@@ -4,7 +4,24 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/7140/func_80006540.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/7140/func_800065DC.s")
+s32 func_800065DC(void *arg0) {
+    struct Func800065DCState { u8 pad[0x1C]; s32 unk1C; void *vaddr; s32 size; s32 unk28; };
+    extern OSMesgQueue D_800D0474;
+    extern OSMesg D_800D0440;
+    OSIoMesg msg;
+    OSPiHandle *handle;
+    struct Func800065DCState *p = (struct Func800065DCState *)arg0;
+    handle = (OSPiHandle *)(u32)func_80006540();
+    msg.hdr.pri = 0;
+    msg.hdr.retQueue = &D_800D0474;
+    msg.dramAddr = p->vaddr;
+    msg.devAddr = p->unk1C;
+    msg.size = p->size;
+    osInvalDCache(p->vaddr, p->size);
+    osEPiStartDma(handle, &msg, 0);
+    osRecvMesg(&D_800D0474, &D_800D0440, OS_MESG_BLOCK);
+    return 0;
+}
 
 s32 func_80006664(void *arg0) {
     struct Func80006664State { u8 pad[0x1C]; s32 unk1C; void *vaddr; s32 size; s32 unk28; };
@@ -25,7 +42,24 @@ s32 func_80006664(void *arg0) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/7140/func_800066EC.s")
+s32 func_800066EC(void *arg0, s32 arg1) {
+    struct Func800066ECState { u8 pad[0x1C]; s32 unk1C; void *vaddr; s32 size; s32 unk28; };
+    extern OSMesgQueue D_800D0474;
+    extern OSMesg D_800D0440;
+    OSIoMesg msg;
+    OSPiHandle *handle;
+    struct Func800066ECState *p = (struct Func800066ECState *)arg0;
+    handle = (OSPiHandle *)(u32)osCartRomInit();
+    msg.hdr.pri = 0;
+    msg.hdr.retQueue = &D_800D0474;
+    msg.dramAddr = p->vaddr;
+    msg.devAddr = p->unk1C;
+    msg.size = p->size;
+    osInvalDCache(p->vaddr, p->size);
+    osEPiStartDma(handle, &msg, 0);
+    osRecvMesg(&D_800D0474, &D_800D0440, OS_MESG_BLOCK);
+    return 0;
+}
 
 s32 func_80006778(void *arg0) {
     struct Func80006778State { u8 pad[0x1C]; s32 unk1C; void *vaddr; s32 size; s32 unk28; };
