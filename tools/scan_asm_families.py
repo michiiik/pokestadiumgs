@@ -53,6 +53,14 @@ SIMPLE_WRAPPER_OPS = {
     "addiu", "addu", "lui", "lw", "move", "nop", "ori", "or", "sw",
     "jal", "jr",
 }
+
+# Straight-line call families are common beyond the original two/three-call
+# sample.  Keep this cap conservative so the generated source remains a
+# reviewable hypothesis, while still covering the five-to-seven-call setup
+# sequences that have matched through the MCP (global init, pool setup, and
+# ordered resource setup).
+MULTI_CALL_MAX_CALLS = 8
+MULTI_CALL_PARAMETER_TYPES = ("s32", "u32", "u8 *", "s8 *", "void *")
 SIMPLE_LOOKUP_OPS = {
     "addiu", "addu", "andi", "lbu", "lb", "lhu", "lh", "lw", "lui",
     "move", "nop", "or", "sll", "sra", "srl", "slti", "sltiu", "slt",
@@ -222,7 +230,7 @@ def classify(
 
     if calls and loops and any(call in {"osRecvMesg", "osSendMesg"} for call in calls):
         return "queue_dma_loop", 0.92, ["queue call plus backward branch"]
-    if calls and len(calls) >= 2 and not branches and len(instructions) <= 40 and simple_wrapper_shape and not non_stack_access:
+    if calls and len(calls) >= 2 and not branches and len(instructions) <= 64 and simple_wrapper_shape and not non_stack_access:
         return "multi_call_wrapper", 0.90, ["short call sequence without control-flow branches"]
     if calls and len(calls) == 1 and not branches and len(instructions) <= 28 and simple_wrapper_shape and not non_stack_access and not global_stores:
         if narrow_copy >= 2 and stores:
@@ -508,10 +516,13 @@ def multi_call_wrapper_candidates(owner: Owner, instructions: list[Instruction])
     remains a review-only classification.  The generated bodies are still
     hypotheses for the MCP runner, never decompilation proof.
     """
-    if not 2 <= len(owner.calls) <= 3:
+    if not 2 <= len(owner.calls) <= MULTI_CALL_MAX_CALLS:
         return []
-    if owner.branches or owner.instruction_count > 40:
+    if owner.branches or owner.instruction_count > 64:
         owner.notes.append("multi-call wrapper suppressed: too many instructions or branches")
+        return []
+    if any(instruction.op not in SIMPLE_WRAPPER_OPS for instruction in instructions):
+        owner.notes.append("multi-call wrapper suppressed: unsupported instruction shape")
         return []
     if any(
         access.base != "sp" and access.symbol is None
@@ -579,12 +590,16 @@ def multi_call_wrapper_candidates(owner: Owner, instructions: list[Instruction])
                 value = instruction_immediate(instruction)
                 state[dest] = str(value) if value is not None else "UNSUPPORTED"
             elif instruction.op == "addiu" and source in state:
-                value = instruction_immediate(instruction)
-                state[dest] = (
-                    f"({state[source]} + {value})"
-                    if value is not None
-                    else "UNSUPPORTED"
-                )
+                global_match = re.search(r"%lo\((D_[0-9A-Fa-f]+)\)", instruction.operands)
+                if global_match and state[source].startswith("&"):
+                    state[dest] = state[source]
+                else:
+                    value = instruction_immediate(instruction)
+                    state[dest] = (
+                        f"({state[source]} + {value})"
+                        if value is not None
+                        else "UNSUPPORTED"
+                    )
             elif instruction.op == "lui":
                 match = re.search(r"%hi\((D_[0-9A-Fa-f]+)\)", instruction.operands)
                 state[dest] = f"&{match.group(1)}" if match else "UNSUPPORTED"
@@ -669,7 +684,19 @@ def multi_call_wrapper_candidates(owner: Owner, instructions: list[Instruction])
                 for call in call_arguments
                 for expression in call
             )
-            declarations.append(f"extern {'void *' if loaded else 'u32'} {name};")
+            # An address-form global (``&D_x``) is a symbol-backed array, not
+            # a pointer variable.  Keeping that distinction lets IDO emit the
+            # direct ``lui/addiu`` address form used by the accepted setup
+            # sequences.  Bare globals remain pointer/scalar hypotheses.
+            address_form = any(
+                expression == f"&{name}"
+                for call in call_arguments
+                for expression in call
+            )
+            if address_form:
+                declarations.append(f"extern u8 {name}[];")
+            else:
+                declarations.append(f"extern {'void *' if loaded else 'u32'} {name};")
     for call in owner.calls:
         existing = owner.function_declarations.get(call)
         if existing:
@@ -682,7 +709,7 @@ def multi_call_wrapper_candidates(owner: Owner, instructions: list[Instruction])
     prefix = "\n".join(dict.fromkeys(declarations))
     candidates: list[str] = []
     labels: list[str] = []
-    for parameter_type in ("s32", "u32", "void *"):
+    for parameter_type in MULTI_CALL_PARAMETER_TYPES:
         parameters = ", ".join(
             f"{parameter_type} arg{i}" for i in range(arg_count)
         ) or "void"
@@ -822,7 +849,7 @@ def bounded_lookup_candidates(owner: Owner, instructions: list[Instruction]) -> 
 def generate_candidates(owner: Owner, instructions: list[Instruction]) -> list[str]:
     if owner.family == "direct_wrapper":
         return wrapper_candidates(owner, instructions)
-    if owner.family == "multi_call_wrapper":
+    if owner.family in {"multi_call_wrapper", "call_sequence"}:
         return multi_call_wrapper_candidates(owner, instructions)
     if owner.family == "bounded_lookup":
         return bounded_lookup_candidates(owner, instructions)

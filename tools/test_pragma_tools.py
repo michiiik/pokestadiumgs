@@ -248,9 +248,43 @@ class ScannerTests(unittest.TestCase):
             calls=["func_first", "func_second"],
         )
         candidates = scanner.multi_call_wrapper_candidates(owner, instructions)
-        self.assertEqual(len(candidates), 3)
+        self.assertEqual(len(candidates), len(scanner.MULTI_CALL_PARAMETER_TYPES))
         self.assertIn("func_first(1);", candidates[0])
         self.assertIn("func_second(2);", candidates[0])
+
+    def test_multi_call_wrapper_emits_long_setup_and_address_global_variant(self) -> None:
+        asm = """
+        glabel func_setup
+            /* 000000 80000000 */ addiu $sp, $sp, -0x18
+            /* 000004 80000004 */ lui $a0, %hi(D_80000040)
+            /* 000008 80000008 */ addiu $a0, $a0, %lo(D_80000040)
+            /* 00000C 8000000C */ jal func_first
+            /* 000010 80000010 */ nop
+            /* 000014 80000014 */ jal func_second
+            /* 000018 80000018 */ nop
+            /* 00001C 8000001C */ jal func_third
+            /* 000020 80000020 */ nop
+            /* 000024 80000024 */ jal func_fourth
+            /* 000028 80000028 */ nop
+            /* 00002C 8000002C */ jr $ra
+            /* 000030 80000030 */ nop
+        """
+        label, instructions, _ = scanner.parse_instructions(asm)
+        owner = scanner.Owner(
+            function=label,
+            source="synthetic.c",
+            asm="synthetic.s",
+            label=label,
+            family="multi_call_wrapper",
+            confidence=1.0,
+            instruction_count=len(instructions),
+            calls=["func_first", "func_second", "func_third", "func_fourth"],
+        )
+        candidates = scanner.multi_call_wrapper_candidates(owner, instructions)
+        self.assertEqual(len(candidates), len(scanner.MULTI_CALL_PARAMETER_TYPES))
+        self.assertIn("extern u8 D_80000040[];", candidates[0])
+        self.assertIn("func_first(&D_80000040);", candidates[0])
+        self.assertIn("func_fourth();", candidates[0])
 
 
 class AsmProcessorPaddingTests(unittest.TestCase):
@@ -894,6 +928,33 @@ class SweepTests(unittest.TestCase):
         self.assertIn("ptr-void", names)
         self.assertIn("ptr-s32", names)
 
+    def test_family_variant_order_keeps_narrow_call_spellings_available(self) -> None:
+        call_variants = sweep_targets.FAMILY_VARIANTS["multi_call_wrapper"]
+        self.assertEqual(call_variants[0], "u8-void")
+        self.assertIn("u8-narrow-void", call_variants)
+        self.assertIn("u8-narrow-void", sweep_targets.FAMILY_VARIANTS["call_sequence"])
+        narrow = sweep_targets.rewrite_draft(
+            "M2C_UNK func_a(M2C_UNK arg0);\n",
+            sweep_targets.VARIANTS["s16-narrow-void"],
+        )
+        self.assertIn("s16 arg0", narrow)
+
+    def test_compile_failure_candidates_rewrite_and_deduplicate_diagnostics(self) -> None:
+        draft = (
+            "extern M2C_UNK D_1;\n"
+            "void func_a(void) { M2C_FIELD(D_1, s16 *, 0x4) = 1; }\n"
+        )
+        candidates = sweep_targets.compile_failure_candidates(draft, [
+            "incompatible pointer conversion",
+            "incompatible pointer conversion",
+            "unknown type M2C_UNK",
+        ])
+        labels = [label for label, _ in candidates]
+        self.assertEqual(len(labels), len(set(labels)))
+        self.assertIn("m2c:ptr-void:compile-retry", labels)
+        self.assertIn("m2c:s32-s32:compile-retry", labels)
+        self.assertTrue(all("M2C_" not in code for _, code in candidates))
+
     def test_split_candidate_declarations_deduplicates_m2c_prefix(self) -> None:
         declarations, body = sweep_targets.split_candidate_declarations(
             "extern s32 helper(s32);\nextern s32 helper(s32);\n\nvoid func_a(void) {}\n"
@@ -906,20 +967,37 @@ class SweepTests(unittest.TestCase):
             stats = Path(directory) / "stats.jsonl"
             stats.write_text(json.dumps({
                 "source": "disasm/src/synthetic.c",
-                "attempts": [{
-                    "function": "func_a",
-                    "label": "m2c:s32-s32",
-                    "status": "compare_rejected",
-                    "similarity_score": 0.95,
-                    "candidate": "void func_a(void) {}",
-                    "declarations": "extern void helper(void);",
-                }],
+                "attempts": [
+                    {
+                        "function": "func_a",
+                        "label": "m2c:s32-s32",
+                        "status": "compare_rejected",
+                        "similarity_score": 0.91,
+                        "candidate": "void func_a(void) { int low; }",
+                        "declarations": "extern void helper(void);",
+                    },
+                    {
+                        "function": "func_a",
+                        "label": "m2c:ptr-void",
+                        "status": "compare_rejected",
+                        "similarity_score": 0.95,
+                        "candidate": "void func_a(void) { int best; }",
+                        "declarations": "extern void helper(void);",
+                    },
+                    {
+                        "function": "func_a",
+                        "label": "manual:unrelated",
+                        "status": "compare_rejected",
+                        "similarity_score": 0.99,
+                        "candidate": "void func_a(void) { int wrong; }",
+                    },
+                ],
             }) + "\n")
             owner = targets.Owner("func_a", "disasm/src/synthetic.c", "asm/us/nonmatchings/synthetic/func_a.s")
             with mock.patch.object(targets, "require_owner", return_value=owner), mock.patch.object(
                 sweep_targets.permute_candidate,
                 "permute",
-                return_value={"outputs": [{"score": 0, "code": "void func_a(void) {}"}]},
+                return_value={"outputs": [{"score": "0", "code": "void func_a(void) {}"}]},
             ) as permute, mock.patch.object(
                 sweep_targets.runner,
                 "try_candidates_detailed",
@@ -928,6 +1006,8 @@ class SweepTests(unittest.TestCase):
                 result = sweep_targets.near_miss(stats_path=stats, seconds=45.0)
             self.assertEqual(result["accepted"], ["func_a"])
             permute.assert_called_once()
+            self.assertEqual(permute.call_args.args[:2], ("func_a", "void func_a(void) { int best; }"))
+            self.assertEqual(permute.call_args.kwargs["seconds"], 45.0)
             gate.assert_called_once()
 
     def test_near_miss_skips_function_after_full_gate_acceptance(self) -> None:

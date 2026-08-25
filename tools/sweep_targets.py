@@ -29,6 +29,7 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+from collections.abc import Iterable
 
 import dedupe_externs
 import permute_candidate
@@ -54,6 +55,11 @@ VARIANTS: dict[str, dict[str, str]] = {
     "s16-void": {"global": "s16", "call": "void", "type": "s32"},
     "u32-void": {"global": "u32", "call": "void", "type": "s32"},
     "ptr-s32": {"global": "u8 *", "call": "s32", "type": "s32"},
+    # Narrow temporary/argument spellings are useful for the byte-flag and
+    # halfword families.  Keep them separate from the global-width guesses so
+    # a retry can change one ABI hypothesis at a time.
+    "u8-narrow-void": {"global": "u8", "call": "void", "type": "u8"},
+    "s16-narrow-void": {"global": "u8", "call": "void", "type": "s16"},
 }
 
 # These orders encode the narrow IDO spellings learned from accepted owners.
@@ -61,11 +67,15 @@ VARIANTS: dict[str, dict[str, str]] = {
 # through an isolated probe and the sequential ROM gate.
 FAMILY_VARIANTS: dict[str, tuple[str, ...]] = {
     "bounded_lookup": ("u8-void", "u16-s32", "s32-s32", "ptr-void"),
-    "state_field_access": ("u8-void", "s16-void", "u16-s32", "s32-s32", "ptr-void"),
+    "state_field_access": ("u8-void", "u8-narrow-void", "s16-narrow-void", "s16-void", "u16-s32", "s32-s32", "ptr-void"),
     "constant_map": ("s32-s32", "u8-void", "u16-s32"),
     "direct_wrapper": ("s32-s32", "ptr-void", "u8-void", "ptr-s32"),
-    "multi_call_wrapper": ("s32-s32", "ptr-void", "u8-void", "ptr-s32"),
-    "call_sequence": ("s32-s32", "ptr-void", "u8-void", "ptr-s32"),
+    # Accepted setup sequences most often use byte-backed globals and void
+    # callees; try that spelling before the register-sized fallback.  The
+    # narrow variant stays last because it is valuable when the draft exposes
+    # a byte flag, but is too disruptive as a first hypothesis.
+    "multi_call_wrapper": ("u8-void", "s32-s32", "ptr-void", "ptr-s32", "u8-narrow-void"),
+    "call_sequence": ("u8-void", "s32-s32", "ptr-void", "ptr-s32", "u8-narrow-void"),
 }
 
 
@@ -94,6 +104,32 @@ def rewrite_draft(draft: str, variant: dict[str, str]) -> str | None:
     if "M2C_" in text:
         return None
     return text.strip() + "\n"
+
+
+def compile_failure_candidates(
+    draft: str,
+    diagnostics: Iterable[str | None],
+) -> list[tuple[str, str]]:
+    """Rewrite a draft using type spellings suggested by compile diagnostics.
+
+    A source can produce several compile failures for the same m2c draft
+    (one per first-pass variant).  Collecting the diagnostics first lets us
+    union their targeted retry spellings while deduplicating identical C
+    bodies.  This keeps the retry pass small, but still lets a later,
+    more-specific diagnostic add a useful ``s16``/pointer rewrite.
+    """
+    candidates: list[tuple[str, str]] = []
+    seen: set[str] = set()
+    for diagnostic in diagnostics:
+        for name in compile_failure_variant_names(diagnostic):
+            code = rewrite_draft(draft, VARIANTS[name])
+            if code is None:
+                continue
+            if code in seen:
+                continue
+            seen.add(code)
+            candidates.append((f"m2c:{name}:compile-retry", code))
+    return candidates
 
 
 def split_candidate_declarations(code: str) -> tuple[str, str]:
@@ -195,6 +231,55 @@ def _fragment_number(source: str) -> int | None:
     return int(match.group(1)) if match else None
 
 
+def _sweep_listing(
+    *,
+    max_instructions: int | None,
+    min_instructions: int | None,
+    family: str | None,
+    source: str | None,
+    limit: int,
+    fragment_range: tuple[int, int] | None,
+) -> dict[str, object]:
+    """Select sweep rows without truncating a fragment band prematurely.
+
+    ``pragma_targets.list_targets`` applies ``limit`` after its global sort.
+    Applying a fragment filter to that already-truncated list silently drops
+    owners in the requested band when the repository has more than ``limit``
+    remaining owners.  Fetch the complete owner index for a band selection,
+    then apply the user's limit after filtering.
+    """
+    listing_limit = limit
+    if fragment_range is not None:
+        listing_limit = max(limit, len(targets.owner_index()))
+    listing = targets.list_targets(
+        source=source,
+        family=family,
+        max_instructions=max_instructions,
+        min_instructions=min_instructions,
+        limit=listing_limit,
+    )
+    rows = list(listing["targets"])
+    if fragment_range is None:
+        return listing
+
+    start, end = fragment_range
+    band_rows = [
+        row
+        for row in rows
+        if isinstance(row, dict)
+        and (fragment := _fragment_number(str(row["source"]))) is not None
+        and start <= fragment <= end
+    ]
+    selected = band_rows[:max(0, limit)]
+    return {
+        **listing,
+        "matched": len(selected),
+        "available_in_range": len(band_rows),
+        "targets": selected,
+        "truncated": len(band_rows) > max(0, limit),
+    }
+
+
 def _stats_records(stats_path: Path = targets.STATS_PATH) -> list[dict[str, object]]:
     records: list[dict[str, object]] = []
     if not stats_path.exists():
@@ -220,7 +305,6 @@ def near_miss(
 ) -> dict[str, object]:
     """Permute high-scoring m2c rejects, then gate only score-0 outputs."""
     grouped: dict[str, dict[str, object]] = {}
-    solved: set[str] = set()
     for record in _stats_records(stats_path):
         source = record.get("source")
         for attempt in record.get("attempts", []):
@@ -234,11 +318,9 @@ def near_miss(
             if not isinstance(function, str) or not label.startswith("m2c:"):
                 continue
             # A full-gate acceptance solves the owner for this pass.  An
-            # isolated probe_match is deliberately not considered solved:
+            # isolated probe_match is deliberately not considered accepted:
             # it still needs the sequential gate and may be a useful near
             # miss if its score is recorded.
-            if status == "accepted":
-                solved.add(function)
             if not isinstance(score, (int, float)):
                 continue
             if float(score) < minimum_similarity or not isinstance(candidate, str) or not candidate.strip():
@@ -250,21 +332,35 @@ def near_miss(
                 "declarations": attempt.get("declarations"),
                 "label": label,
                 "similarity_score": float(score),
+                "best_status": status,
                 "statuses": set(),
             })
             statuses = row["statuses"]
             assert isinstance(statuses, set)
             statuses.add(status)
-            if float(score) > float(row["similarity_score"]):
+            current_score = float(row["similarity_score"])
+            current_status = str(row.get("best_status"))
+            if (
+                float(score) > current_score
+                or (
+                    float(score) == current_score
+                    and status == "accepted"
+                    and current_status != "accepted"
+                )
+            ):
                 row.update({
                     "source": source,
                     "candidate": candidate,
                     "declarations": attempt.get("declarations"),
                     "label": label,
                     "similarity_score": float(score),
+                    "best_status": status,
                 })
 
-    candidates = [row for row in grouped.values() if str(row["function"]) not in solved]
+    candidates = [
+        row for row in grouped.values()
+        if str(row.get("best_status")) != "accepted"
+    ]
     candidates.sort(key=lambda row: (-float(row["similarity_score"]), str(row["function"])))
     if limit is not None:
         candidates = candidates[:max(0, limit)]
@@ -286,7 +382,16 @@ def near_miss(
             attempts.append({"function": function, "status": "permute_failed", "error": str(error)})
             continue
         outputs = permutation.get("outputs") or []
-        score_zero = [item for item in outputs if isinstance(item, dict) and item.get("score") == 0]
+        score_zero = []
+        for item in outputs:
+            if not isinstance(item, dict):
+                continue
+            try:
+                is_zero = float(item.get("score")) == 0.0
+            except (TypeError, ValueError):
+                is_zero = False
+            if is_zero:
+                score_zero.append(item)
         if permutation.get("already_matching") and not score_zero:
             score_zero = [{"score": 0, "code": candidate}]
         gate_results: list[dict[str, object]] = []
@@ -336,29 +441,24 @@ def sweep(
     skip_functions: set[str] | None = None,
     fragment_range: tuple[int, int] | None = None,
 ) -> dict[str, object]:
-    listing = targets.list_targets(
+    listing = _sweep_listing(
         source=source,
         family=family,
         max_instructions=max_instructions,
         min_instructions=min_instructions,
         limit=limit,
+        fragment_range=fragment_range,
     )
     rows = listing["targets"]
-    if fragment_range is not None:
-        start, end = fragment_range
-        rows = [
-            row for row in rows
-            if isinstance(row, dict)
-            and (fragment := _fragment_number(str(row["source"]))) is not None
-            and start <= fragment <= end
-        ]
-        listing = {**listing, "matched": len(rows), "targets": rows}
     dirty = dedupe_externs.dirty_sources()
     by_source: dict[str, list[dict[str, object]]] = collections.defaultdict(list)
-    skipped_dirty = 0
+    skipped_dirty_targets = 0
+    skipped_dirty_paths: set[Path] = set()
     for row in rows:
-        if (targets.REPO_ROOT / str(row["source"])).resolve() in dirty:
-            skipped_dirty += 1
+        row_path = (targets.REPO_ROOT / str(row["source"])).resolve()
+        if row_path in dirty:
+            skipped_dirty_targets += 1
+            skipped_dirty_paths.add(row_path)
             continue
         by_source[str(row["source"])].append(row)
 
@@ -420,20 +520,21 @@ def sweep(
         extra_blocks: list[tuple[str, str]] = []
         extra_labels: list[str] = []
         extra_seen: set[tuple[str, str]] = set()
+        diagnostics_by_function: dict[str, list[str | None]] = collections.defaultdict(list)
         for attempt in probe["attempts"]:
-            if attempt.get("status") != "compile_failed":
-                continue
-            function = str(attempt["function"])
+            if attempt.get("status") == "compile_failed":
+                diagnostics_by_function[str(attempt["function"])].append(
+                    attempt.get("diagnostic") if isinstance(attempt.get("diagnostic"), str) else None
+                )
+        for function, diagnostics in diagnostics_by_function.items():
             draft = draft_of.get(function)
             if draft is None:
                 continue
-            for name in compile_failure_variant_names(str(attempt.get("diagnostic") or "")):
-                label = f"m2c:{name}:compile-retry"
+            for label, code in compile_failure_candidates(draft, diagnostics):
                 if label in labels_of[function]:
                     continue
-                code = rewrite_draft(draft, VARIANTS[name])
-                key = (function, code or "")
-                if code is None or key in extra_seen:
+                key = (function, code)
+                if key in extra_seen:
                     continue
                 extra_seen.add(key)
                 extra_blocks.append((function, code))
@@ -547,7 +648,9 @@ def sweep(
         )
     return {
         "matched": listing["matched"],
-        "skipped_dirty_sources": skipped_dirty,
+        "available_in_range": listing.get("available_in_range"),
+        "skipped_dirty_sources": len(skipped_dirty_paths),
+        "skipped_dirty_targets": skipped_dirty_targets,
         "sources": len(by_source),
         "accepted": accepted_functions,
         "touched_sources": sorted(set(touched_sources)),
