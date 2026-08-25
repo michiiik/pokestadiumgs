@@ -51,7 +51,100 @@ void func_80003AB8(S1_unk_func_80003680_sp90* arg0, u8(arg1)[2][0x80], S1_unk_fu
     arg0->outputBufferC = (u32)&arg1[1] & 0x1FFFFFFF;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80003AF0.s")
+typedef struct S1_UnkStruct80001380 S1_UnkStruct80001380;
+typedef struct S1_unk_func_80003680_sp60 S1_unk_func_80003680_sp60;
+typedef struct S1_unk_func_80003680_sp27 S1_unk_func_80003680_sp27;
+typedef struct S1_JpegHuffmanTable S1_JpegHuffmanTable;
+struct S1_UnkStruct80001380 {
+      OSMesg mesg;
+      OSMesgQueue queue;
+      u16 state;  
+      u16 notifyFlag;  
+      OSTask task;
+      char unk60[0x8];
+};
+struct S1_unk_func_80003680_sp60 {
+      s32 readOffset;  
+      u8 bitCount;  
+      u8 lastByteWasFF;  
+      s32 bitAccumulator;
+      s16 lumaDcPred;  
+      s16 chromaDcPred1;  
+      s16 chromaDcPred2;  
+};
+struct S1_unk_func_80003680_sp27 {
+      s32 unk_00;  
+      u8 chromaSubsamplingMode;  
+      u8 subsamplingVariant;  
+      S1_JpegHuffmanTable* dcLumaTable;
+      S1_JpegHuffmanTable* acLumaTable;
+      S1_JpegHuffmanTable* dcChromaTable;
+      S1_JpegHuffmanTable* acChromaTable;
+      s8 unk_18;
+};
+struct S1_JpegHuffmanTable {
+      u8 codeOffs[16];
+      u16 codesA[16];
+      u16 codesB[16];
+      u8* symbols;
+};
+s32 func_80003AF0(u32 addr, s32 arg1, u8 *arg2)
+{
+  S1_UnkStruct80001380 sp318;
+  S1_unk_func_80003680_sp300 sp300;
+  u8 sp200[2][0x80];
+  S1_JpegHuffmanTable spB0[4];
+  u16 *temp_s0;
+  u8 *temp_s3;
+  S1_unk_func_80003680_sp90 sp90;
+  S1_unk_func_80003680_sp27 sp74;
+  S1_unk_func_80003680_sp60 sp60;
+  u32 var_s1;
+  s32 i;
+  s32 j;
+  u8 var_s4 = 0;
+  s32 var_s2 = 0;
+  temp_s3 = func_800033B4(0x110);
+  temp_s0 = func_800033B4(0x210);
+  func_80003838(&sp300, arg2);
+  func_8000B780(sp300.quantization_table, sp200, 2);
+  func_8000BA3C(sp300.huffman_table, spB0, temp_s3, temp_s0, 4);
+  func_800033DC(temp_s0);
+  func_800033DC(temp_s3);
+  func_80003A78(&sp74, &spB0, &sp300);
+  func_80003AB8(&sp90, &sp200, &sp300);
+  func_800039C8(&sp318, &sp90);
+  while (func_8000204C() == 0)
+  {
+  }
+
+  for (i = 0; i < sp300.height; i += 16)
+  {
+    for (j = 0; j < sp300.width; j += 16)
+    {
+      if (arg1 < ((var_s2 ^ 0) + 0x300))
+      {
+        return 0;
+      }
+      if (func_8000BC90(&sp74, addr, 1, var_s4 & 0xFF, &sp60) != 0)
+      {
+        return 0;
+      }
+      sp90.unk_00 = addr & 0x1FFFFFFF;
+      func_800055F4(&sp318, 1);
+      var_s4 = 1;
+      func_80004BEC(&sp318);
+      addr += 0x200;
+      if (1)
+      {
+      }
+      var_s2 += 0x200;
+    }
+
+  }
+
+  return var_s2;
+}
 
 void func_80003CD0(void) { extern OSMesgQueue D_800CD000; extern OSMesg D_800CD018[]; osCreateMesgQueue(&D_800CD000, D_800CD018, 1); }
 
