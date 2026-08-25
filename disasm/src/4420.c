@@ -147,7 +147,19 @@ s32 func_800040C4(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80004458.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800045E0.s")
+extern u32 func_800020BC(u32);
+extern void func_8000215C(u32);
+void func_800045E0(void *base_addr, u32 addr) {
+    u32 sp1C;
+    s32 temp_a0;
+    if ((addr & 0xFF000000) == 0x82000000) {
+        sp1C = addr & 0xFFFFFF;
+        temp_a0 = func_800020BC(sp1C);
+        if (temp_a0 == (u32)base_addr) {
+            func_8000215C(sp1C);
+        }
+    }
+}
 
 extern u8 *func_800042C0(u8 *, u8 *, s32, s32);
 extern s32 func_80002DE4(u8 *);
