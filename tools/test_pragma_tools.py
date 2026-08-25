@@ -8,6 +8,7 @@ import json
 import os
 import sys
 import tempfile
+import time
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -618,7 +619,12 @@ class RunnerTests(unittest.TestCase):
             self.assertEqual(row["attempts"][0]["diagnostic"], "incompatible pointer conversion")
             self.assertEqual(row["attempts"][0]["declarations"], "extern void helper(void);")
 
-    def test_probe_hit_is_sent_to_sequential_full_gate(self) -> None:
+    def test_unverified_probe_hit_uses_sequential_gate_without_duplicate_compare(self) -> None:
+        # An unverified probe hit (no ``link_verified`` key, e.g. baseline
+        # shape unavailable) still uses the historical sequential gate.  That
+        # gate already verified exactly this source text, so a single
+        # sequential winner does not get a second, redundant combined
+        # ``compare_current_tree`` run.
         with tempfile.TemporaryDirectory() as directory:
             source = Path(directory) / "synthetic.c"
             source.write_text(
@@ -638,7 +644,7 @@ class RunnerTests(unittest.TestCase):
                 runner,
                 "_try_candidate_detailed",
                 return_value=(0, "accepted"),
-            ), mock.patch.object(
+            ) as sequential_gate, mock.patch.object(
                 runner,
                 "compare_current_tree",
                 return_value=0,
@@ -649,7 +655,9 @@ class RunnerTests(unittest.TestCase):
                 )
             self.assertEqual(result["accepted"], ["func_a"])
             self.assertEqual(result["attempts"][0]["probe_status"], "probe_match")
-            full_compare.assert_called_once()
+            sequential_gate.assert_called_once()
+            full_compare.assert_not_called()
+            self.assertEqual(result["timing"]["gate_mode"], "sequential")
 
     def test_probe_variants_after_winner_are_reported_skipped(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -733,6 +741,513 @@ class RunnerTests(unittest.TestCase):
         self.assertEqual(result["attempts"][0]["status"], "compare_rejected")
 
 
+def _section_entry(name: str, size: int, *, flags: str = "AX", type_: str = "PROGBITS") -> dict[str, object]:
+    return {"name": name, "type": type_, "size": size, "flags": flags}
+
+
+def _symbol_entry(value: int, size: int, type_: str, ndx: str, name: str) -> dict[str, object]:
+    return {"value": value, "size": size, "type": type_, "ndx": ndx, "name": name}
+
+
+class LinkShapeTests(unittest.TestCase):
+    """Synthetic, mock-based coverage for the link-shape verification helpers."""
+
+    def test_parse_readelf_sections_reads_size_type_and_flags(self) -> None:
+        text = "\n".join([
+            "  [ 1] .text             PROGBITS        00000000 000034 020d20 01  AX  0   0 16",
+            "  [ 3] .rodata           PROGBITS        00000000 000100 000020 00   A  0   0 16",
+            "  [ 4] .bss              NOBITS          00000000 000120 000010 00  WA  0   0 8",
+        ])
+        sections = runner._parse_readelf_sections(text)
+        self.assertEqual(sections[1]["name"], ".text")
+        self.assertEqual(sections[1]["size"], 0x020d20)
+        self.assertEqual(sections[1]["flags"], "AX")
+        self.assertEqual(sections[3]["name"], ".rodata")
+        self.assertEqual(sections[3]["size"], 0x20)
+        self.assertEqual(sections[4]["type"], "NOBITS")
+        self.assertIn("A", sections[4]["flags"])
+
+    def test_parse_readelf_symbols_reads_hex_and_decimal_sizes(self) -> None:
+        text = "\n".join([
+            "     2: 0000082c    48 FUNC    GLOBAL DEFAULT    1 func_8002260C",
+            "    13: 00000000     0 NOTYPE  GLOBAL DEFAULT  UND jtbl_829173B0",
+            "     1: 00000000 0x20d20 SECTION LOCAL  DEFAULT    1 .text",
+        ])
+        symbols = runner._parse_readelf_symbols(text)
+        self.assertEqual(
+            symbols[2],
+            {"value": 0x82c, "size": 48, "type": "FUNC", "ndx": "1", "name": "func_8002260C"},
+        )
+        self.assertEqual(symbols[13]["ndx"], "UND")
+        self.assertEqual(symbols[13]["name"], "jtbl_829173B0")
+        self.assertEqual(symbols[1]["size"], 0x20d20)
+        self.assertEqual(symbols[1]["type"], "SECTION")
+        self.assertEqual(symbols[1]["name"], ".text")
+
+    def test_parse_readelf_relocations_extracts_symbol_index_from_info(self) -> None:
+        text = "\n".join([
+            "Relocation section '.rel.text' at offset 0x4cc80 contains 3 entries:",
+            " Offset     Info    Type            Sym.Value  Sym. Name",
+            "00000844  0004ff04 R_MIPS_26              00000000   func_80018728",
+        ])
+        relocations = runner._parse_readelf_relocations(text)
+        self.assertIn(".rel.text", relocations)
+        self.assertEqual(relocations[".rel.text"], [(0x844, "R_MIPS_26", 0x4ff)])
+
+    def test_identical_shapes_are_verified(self) -> None:
+        text = b"\x00" * 8
+        shape = {
+            "sections": {".text": _section_entry(".text", len(text))},
+            "section_names": {1: ".text"},
+            "symbols": {2: _symbol_entry(0, 8, "FUNC", "1", "func_a")},
+            "relocations": {},
+            "text": text,
+        }
+        symbol = runner._shape_symbol(shape, "func_a")
+        verdict = runner._compare_link_shape(shape, shape, symbol, symbol)
+        self.assertEqual(verdict["link_verified"], True)
+
+    def test_extra_section_in_candidate_is_layout_drift(self) -> None:
+        text = b"\x00" * 8
+        baseline = {
+            "sections": {".text": _section_entry(".text", len(text))},
+            "section_names": {1: ".text"},
+            "symbols": {2: _symbol_entry(0, 8, "FUNC", "1", "func_a")},
+            "relocations": {},
+            "text": text,
+        }
+        candidate = {
+            "sections": {
+                ".text": _section_entry(".text", len(text)),
+                ".rodata": _section_entry(".rodata", 0x20, flags="A"),
+            },
+            "section_names": {1: ".text", 2: ".rodata"},
+            "symbols": {2: _symbol_entry(0, 8, "FUNC", "1", "func_a")},
+            "relocations": {},
+            "text": text,
+        }
+        expected_symbol = runner._shape_symbol(baseline, "func_a")
+        actual_symbol = runner._shape_symbol(candidate, "func_a")
+        verdict = runner._compare_link_shape(baseline, candidate, expected_symbol, actual_symbol)
+        self.assertFalse(verdict["link_verified"])
+        self.assertEqual(verdict["link_mismatch"], "section_layout_drift")
+
+    def test_text_size_difference_is_layout_drift(self) -> None:
+        baseline = {
+            "sections": {".text": _section_entry(".text", 8)},
+            "section_names": {1: ".text"},
+            "symbols": {2: _symbol_entry(0, 8, "FUNC", "1", "func_a")},
+            "relocations": {},
+            "text": b"\x00" * 8,
+        }
+        candidate = {
+            "sections": {".text": _section_entry(".text", 12)},
+            "section_names": {1: ".text"},
+            "symbols": {2: _symbol_entry(0, 12, "FUNC", "1", "func_a")},
+            "relocations": {},
+            "text": b"\x00" * 12,
+        }
+        verdict = runner._compare_link_shape(baseline, candidate, (0, 8), (0, 12))
+        self.assertEqual(verdict["link_mismatch"], "section_layout_drift")
+
+    def test_relocation_target_mismatch_is_relocation_drift(self) -> None:
+        text = bytes.fromhex("0c000000 00000000")  # jal (addend 0); nop delay slot
+
+        def shape(reloc_symbol_name: str) -> dict[str, object]:
+            return {
+                "sections": {".text": _section_entry(".text", len(text))},
+                "section_names": {1: ".text"},
+                "symbols": {
+                    2: _symbol_entry(0, 8, "FUNC", "1", "func_a"),
+                    5: _symbol_entry(0, 0, "NOTYPE", "UND", reloc_symbol_name),
+                },
+                "relocations": {".rel.text": [(0, "R_MIPS_26", 5)]},
+                "text": text,
+            }
+
+        baseline = shape("func_target_a")
+        candidate = shape("func_target_b")
+        expected_symbol = runner._shape_symbol(baseline, "func_a")
+        actual_symbol = runner._shape_symbol(candidate, "func_a")
+        verdict = runner._compare_link_shape(baseline, candidate, expected_symbol, actual_symbol)
+        self.assertEqual(verdict["link_mismatch"], "relocation_drift")
+
+    def test_section_symbol_addend_normalizes_like_local_func_symbol(self) -> None:
+        # Baseline references the function via the ``.text`` SECTION symbol
+        # with an in-place addend of 0x20; candidate references a local FUNC
+        # symbol whose value is 0x20 with an in-place addend of 0.  Both
+        # resolve to the same ``.text``+0x20 target.
+        baseline_text = bytes.fromhex("0c000008 00000000")  # jal +0x20; nop
+        candidate_text = bytes.fromhex("0c000000 00000000")  # jal +0; nop
+        baseline = {
+            "sections": {".text": _section_entry(".text", len(baseline_text))},
+            "section_names": {1: ".text"},
+            "symbols": {
+                2: _symbol_entry(0, 8, "FUNC", "1", "func_a"),
+                3: _symbol_entry(0, 0, "SECTION", "1", ".text"),
+            },
+            "relocations": {".rel.text": [(0, "R_MIPS_26", 3)]},
+            "text": baseline_text,
+        }
+        candidate = {
+            "sections": {".text": _section_entry(".text", len(candidate_text))},
+            "section_names": {1: ".text"},
+            "symbols": {
+                2: _symbol_entry(0, 8, "FUNC", "1", "func_a"),
+                4: _symbol_entry(0x20, 4, "FUNC", "1", "func_target"),
+            },
+            "relocations": {".rel.text": [(0, "R_MIPS_26", 4)]},
+            "text": candidate_text,
+        }
+        expected_symbol = runner._shape_symbol(baseline, "func_a")
+        actual_symbol = runner._shape_symbol(candidate, "func_a")
+        verdict = runner._compare_link_shape(baseline, candidate, expected_symbol, actual_symbol)
+        self.assertEqual(verdict["link_verified"], True)
+
+    def test_intra_text_branch_relocation_is_ignored(self) -> None:
+        text = bytes.fromhex("10200001 00000000")  # beq $at, $zero, +1; nop
+        baseline = {
+            "sections": {".text": _section_entry(".text", len(text))},
+            "section_names": {1: ".text"},
+            "symbols": {
+                2: _symbol_entry(0, 8, "FUNC", "1", "func_a"),
+                3: _symbol_entry(0, 0, "SECTION", "1", ".text"),
+            },
+            "relocations": {".rel.text": [(0, "R_MIPS_PC16", 3)]},
+            "text": text,
+        }
+        candidate = {
+            "sections": {".text": _section_entry(".text", len(text))},
+            "section_names": {1: ".text"},
+            "symbols": {2: _symbol_entry(0, 8, "FUNC", "1", "func_a")},
+            "relocations": {},
+            "text": text,
+        }
+        expected_symbol = runner._shape_symbol(baseline, "func_a")
+        actual_symbol = runner._shape_symbol(candidate, "func_a")
+        verdict = runner._compare_link_shape(baseline, candidate, expected_symbol, actual_symbol)
+        self.assertEqual(verdict["link_verified"], True)
+
+    def test_missing_shape_is_unverified(self) -> None:
+        verdict = runner._compare_link_shape(None, None, None, None)
+        self.assertIsNone(verdict["link_verified"])
+        self.assertEqual(verdict["link_mismatch"], "shape_unavailable")
+
+    def test_probe_one_reports_link_verified_with_expected_shape(self) -> None:
+        expected_bytes = b"\x00" * 8
+        baseline_shape = {
+            "sections": {}, "section_names": {}, "symbols": {}, "relocations": {}, "text": expected_bytes,
+        }
+        candidate_shape = {
+            "sections": {}, "section_names": {}, "symbols": {}, "relocations": {}, "text": expected_bytes,
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.c"
+            source.write_text('#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_a.s")\n')
+            with mock.patch.object(
+                runner, "_make_object", return_value=(0, Path(directory) / "probe.o", ""),
+            ), mock.patch.object(
+                runner, "_function_byte_views",
+                return_value=(len(expected_bytes), expected_bytes, expected_bytes),
+            ), mock.patch.object(
+                runner, "_object_link_shape", return_value=candidate_shape,
+            ) as shape_call, mock.patch.object(
+                runner, "_shape_symbol", return_value=(0, 8),
+            ):
+                result = runner._probe_one(
+                    source, "func_a", "void func_a(void) {}", expected_bytes,
+                    expected_shape=baseline_shape,
+                )
+        self.assertEqual(result["status"], "probe_match")
+        self.assertTrue(result["link_verified"])
+        self.assertIsInstance(result["probe_seconds"], float)
+        shape_call.assert_called_once()
+
+    def test_probe_one_rejects_section_layout_drift(self) -> None:
+        expected_bytes = b"\x00" * 8
+        baseline_shape = {
+            "sections": {".text": _section_entry(".text", 8)},
+            "section_names": {1: ".text"},
+            "symbols": {2: _symbol_entry(0, 8, "FUNC", "1", "func_a")},
+            "relocations": {},
+            "text": expected_bytes,
+        }
+        candidate_shape = {
+            "sections": {
+                ".text": _section_entry(".text", 8),
+                ".rodata": _section_entry(".rodata", 0x10, flags="A"),
+            },
+            "section_names": {1: ".text", 2: ".rodata"},
+            "symbols": {2: _symbol_entry(0, 8, "FUNC", "1", "func_a")},
+            "relocations": {},
+            "text": expected_bytes,
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.c"
+            source.write_text('#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_a.s")\n')
+            with mock.patch.object(
+                runner, "_make_object", return_value=(0, Path(directory) / "probe.o", ""),
+            ), mock.patch.object(
+                runner, "_function_byte_views",
+                return_value=(len(expected_bytes), expected_bytes, expected_bytes),
+            ), mock.patch.object(
+                runner, "_object_link_shape", return_value=candidate_shape,
+            ), mock.patch.object(
+                runner, "_shape_symbol", return_value=(0, 8),
+            ), mock.patch.object(
+                runner, "_function_mismatch_details", return_value={},
+            ):
+                result = runner._probe_one(
+                    source, "func_a", "void func_a(void) {}", expected_bytes,
+                    expected_shape=baseline_shape,
+                )
+        self.assertEqual(result["status"], "probe_rejected")
+        self.assertEqual(result["probe_reason"], "section_layout_drift")
+        self.assertEqual(result["mismatch_kind"], "section_layout_drift")
+
+    def test_probe_one_without_expected_shape_leaves_link_verified_none(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.c"
+            source.write_text('#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_a.s")\n')
+            with mock.patch.object(
+                runner, "_make_object", return_value=(0, Path(directory) / "probe.o", ""),
+            ), mock.patch.object(
+                runner, "_function_byte_views", return_value=(8, b"\x00" * 8, b"\x00" * 8),
+            ), mock.patch.object(runner, "_object_link_shape") as shape_call:
+                result = runner._probe_one(source, "func_a", "void func_a(void) {}", b"\x00" * 8)
+        self.assertIsNone(result["link_verified"])
+        shape_call.assert_not_called()
+
+    def test_probe_stats_records_timing_and_link_verified(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            stats_path = Path(directory) / "probe-stats.jsonl"
+            attempts = [{
+                "index": 0,
+                "function": "func_a",
+                "status": "accepted",
+                "probe_status": "probe_match",
+                "link_verified": True,
+                "link_mismatch": None,
+                "probe_seconds": 0.01,
+            }]
+            with mock.patch.dict(os.environ, {"PRAGMA_PROBE_STATS": str(stats_path)}):
+                runner._record_probe_stats(
+                    Path("synthetic.c"),
+                    attempts,
+                    ["m2c:s32-s32"],
+                    [("func_a", "void func_a(void) {}")],
+                    timing={"probe_seconds": 1.5, "gate_runs": 1},
+                )
+            row = json.loads(stats_path.read_text())
+            self.assertEqual(row["timing"], {"probe_seconds": 1.5, "gate_runs": 1})
+            self.assertTrue(row["attempts"][0]["link_verified"])
+
+    def test_ensure_baseline_object_caches_and_rebuilds_on_mtime_change(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.c"
+            object_path = Path(directory) / "synthetic.o"
+            source.write_text("void synthetic(void) {}\n")
+            object_path.write_bytes(b"stub")
+            key = source.resolve()
+            runner._BASELINE_OBJECT_STATE.pop(key, None)
+            try:
+                with mock.patch.object(runner, "rebuild_source_object", return_value=0) as rebuild:
+                    self.assertTrue(runner._ensure_baseline_object(source, object_path))
+                    self.assertEqual(rebuild.call_count, 1)
+                    self.assertTrue(runner._ensure_baseline_object(source, object_path))
+                    self.assertEqual(rebuild.call_count, 1)
+                    later = time.time() + 5
+                    later_ns = int(later * 1_000_000_000)
+                    os.utime(source, ns=(later_ns, later_ns))
+                    self.assertTrue(runner._ensure_baseline_object(source, object_path))
+                    self.assertEqual(rebuild.call_count, 2)
+            finally:
+                runner._BASELINE_OBJECT_STATE.pop(key, None)
+
+    def test_ensure_baseline_object_failed_rebuild_is_not_cached(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.c"
+            object_path = Path(directory) / "synthetic.o"
+            source.write_text("void synthetic(void) {}\n")
+            object_path.write_bytes(b"stub")
+            key = source.resolve()
+            runner._BASELINE_OBJECT_STATE.pop(key, None)
+            try:
+                with mock.patch.object(runner, "rebuild_source_object", return_value=1):
+                    self.assertFalse(runner._ensure_baseline_object(source, object_path))
+                self.assertNotIn(key, runner._BASELINE_OBJECT_STATE)
+            finally:
+                runner._BASELINE_OBJECT_STATE.pop(key, None)
+
+
+class GateFlowTests(unittest.TestCase):
+    """Combined-gate-with-sequential-fallback coverage for ``try_candidates_detailed``."""
+
+    def test_single_link_verified_hit_uses_combined_gate_once(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.c"
+            source.write_text('#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_a.s")\n')
+            with mock.patch.object(
+                runner, "probe_candidates",
+                return_value=[
+                    {"index": 0, "function": "func_a", "status": "probe_match", "link_verified": True},
+                ],
+            ), mock.patch.object(
+                runner, "rebuild_source_object", return_value=0,
+            ), mock.patch.object(
+                runner, "_try_candidate_detailed",
+            ) as sequential_gate, mock.patch.object(
+                runner, "compare_current_tree", return_value=0,
+            ) as full_compare:
+                result = runner.try_candidates_detailed(
+                    source, [("func_a", "void func_a(void) { return; }")],
+                )
+            sequential_gate.assert_not_called()
+            full_compare.assert_called_once()
+            self.assertEqual(result["accepted"], ["func_a"])
+            self.assertEqual(result["attempts"][0]["probe_status"], "probe_match")
+            self.assertEqual(result["attempts"][0]["status"], "accepted")
+            self.assertEqual(result["timing"]["gate_runs"], 1)
+            self.assertEqual(result["timing"]["gate_mode"], "combined")
+            text = source.read_text()
+            self.assertIn("void func_a(void) { return; }", text)
+            self.assertNotIn("GLOBAL_ASM", text)
+
+    def test_two_link_verified_hits_share_one_combined_gate(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.c"
+            source.write_text(
+                '#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_a.s")\n'
+                '#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_b.s")\n'
+            )
+            with mock.patch.object(
+                runner, "probe_candidates",
+                return_value=[
+                    {"index": 0, "function": "func_a", "status": "probe_match", "link_verified": True},
+                    {"index": 1, "function": "func_b", "status": "probe_match", "link_verified": True},
+                ],
+            ), mock.patch.object(
+                runner, "rebuild_source_object", return_value=0,
+            ), mock.patch.object(
+                runner, "_try_candidate_detailed",
+            ) as sequential_gate, mock.patch.object(
+                runner, "compare_current_tree", return_value=0,
+            ) as full_compare:
+                result = runner.try_candidates_detailed(
+                    source,
+                    [
+                        ("func_a", "void func_a(void) { return; }"),
+                        ("func_b", "void func_b(void) { return; }"),
+                    ],
+                )
+            sequential_gate.assert_not_called()
+            full_compare.assert_called_once()
+            self.assertEqual(sorted(result["accepted"]), ["func_a", "func_b"])
+
+    def test_combined_gate_failure_falls_back_to_sequential_per_function(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.c"
+            source.write_text(
+                '#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_a.s")\n'
+                '#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_b.s")\n'
+            )
+
+            def fake_sequential(source_path: Path, function: str, candidate: str) -> tuple[int, str]:
+                if function == "func_a":
+                    return 0, "accepted"
+                return 2, "compare_rejected"
+
+            with mock.patch.object(
+                runner, "probe_candidates",
+                return_value=[
+                    {"index": 0, "function": "func_a", "status": "probe_match", "link_verified": True},
+                    {"index": 1, "function": "func_b", "status": "probe_match", "link_verified": True},
+                ],
+            ), mock.patch.object(
+                runner, "rebuild_source_object", return_value=0,
+            ), mock.patch.object(
+                runner, "_try_candidate_detailed", side_effect=fake_sequential,
+            ) as sequential_gate, mock.patch.object(
+                runner, "compare_current_tree", return_value=1,
+            ) as full_compare:
+                result = runner.try_candidates_detailed(
+                    source,
+                    [
+                        ("func_a", "void func_a(void) { return; }"),
+                        ("func_b", "void func_b(void) { return; }"),
+                    ],
+                )
+            self.assertEqual(sequential_gate.call_count, 2)
+            self.assertEqual(full_compare.call_count, 1)
+            self.assertEqual(result["timing"]["gate_mode"], "combined_then_sequential")
+            self.assertIn("func_a", result["accepted"])
+            func_b_attempt = next(item for item in result["attempts"] if item["function"] == "func_b")
+            self.assertEqual(func_b_attempt["status"], "compare_rejected")
+            self.assertIn("void func_a(void) { return; }", source.read_text())
+
+    def test_deferred_variant_is_tried_after_earlier_variant_rejected_sequentially(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.c"
+            source.write_text('#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_a.s")\n')
+            candidate0 = "void func_a(void) { int variant0; }"
+            candidate1 = "void func_a(void) { int variant1; }"
+
+            def fake_sequential(source_path: Path, function: str, candidate: str) -> tuple[int, str]:
+                if "variant0" in candidate:
+                    return 2, "compare_rejected"
+                return 0, "accepted"
+
+            with mock.patch.object(
+                runner, "probe_candidates",
+                return_value=[
+                    {"index": 0, "function": "func_a", "status": "probe_match", "link_verified": True},
+                    {"index": 1, "function": "func_a", "status": "probe_match", "link_verified": True},
+                ],
+            ), mock.patch.object(
+                runner, "rebuild_source_object", return_value=0,
+            ), mock.patch.object(
+                runner, "_try_candidate_detailed", side_effect=fake_sequential,
+            ) as sequential_gate, mock.patch.object(
+                runner, "compare_current_tree", return_value=1,
+            ):
+                result = runner.try_candidates_detailed(
+                    source, [("func_a", candidate0), ("func_a", candidate1)],
+                )
+            self.assertEqual(sequential_gate.call_count, 2)
+            called_candidates = [call.args[2] for call in sequential_gate.call_args_list]
+            self.assertEqual(called_candidates, [candidate0, candidate1])
+            self.assertIn("func_a", result["accepted"])
+
+    def test_mixed_unverified_and_verified_hits_share_combined_gate(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.c"
+            source.write_text(
+                '#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_a.s")\n'
+                '#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_b.s")\n'
+            )
+            with mock.patch.object(
+                runner, "probe_candidates",
+                return_value=[
+                    {"index": 0, "function": "func_a", "status": "probe_match"},
+                    {"index": 1, "function": "func_b", "status": "probe_match", "link_verified": True},
+                ],
+            ), mock.patch.object(
+                runner, "rebuild_source_object", return_value=0,
+            ), mock.patch.object(
+                runner, "_try_candidate_detailed", return_value=(0, "accepted"),
+            ) as sequential_gate, mock.patch.object(
+                runner, "compare_current_tree", return_value=0,
+            ) as full_compare:
+                result = runner.try_candidates_detailed(
+                    source,
+                    [
+                        ("func_a", "void func_a(void) { return; }"),
+                        ("func_b", "void func_b(void) { return; }"),
+                    ],
+                )
+            sequential_gate.assert_called_once()
+            full_compare.assert_called_once()
+            self.assertEqual(sorted(result["accepted"]), ["func_a", "func_b"])
 
 
 import dedupe_externs  # noqa: E402
@@ -962,7 +1477,120 @@ class SweepTests(unittest.TestCase):
         self.assertEqual(declarations, "extern s32 helper(s32);\n")
         self.assertEqual(body, "void func_a(void) {}\n")
 
+    def test_previously_attempted_labels_returns_function_label_pairs(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            stats = Path(directory) / "stats.jsonl"
+            stats.write_text("\n".join([
+                json.dumps({"attempts": [
+                    {"function": "func_a", "label": "m2c:u8-void", "status": "compare_rejected"},
+                    {"function": "func_a", "label": "manual:x", "status": "compare_rejected"},
+                ]}),
+                json.dumps({"attempts": [
+                    {"function": "func_b", "label": "m2c:s32-s32", "status": "accepted"},
+                ]}),
+            ]) + "\n")
+            pairs = sweep_targets.previously_attempted_labels(stats_path=stats)
+        self.assertEqual(pairs, {("func_a", "m2c:u8-void"), ("func_b", "m2c:s32-s32")})
+
+    def test_sweep_skips_draft_when_every_variant_label_already_attempted(self) -> None:
+        rows = [
+            {"function": "func_a", "source": "disasm/src/fragments/1/a.c", "family": "call_sequence"},
+        ]
+        skip_attempts = {
+            ("func_a", f"m2c:{name}") for name in sweep_targets.FAMILY_VARIANTS["call_sequence"]
+        }
+        with mock.patch.object(
+            sweep_targets.targets, "list_targets",
+            return_value={"matched": 1, "targets": rows, "truncated": False},
+        ), mock.patch.object(
+            sweep_targets.dedupe_externs, "dirty_sources", return_value=set(),
+        ), mock.patch.object(
+            sweep_targets, "draft_variants",
+        ) as draft:
+            result = sweep_targets.sweep(
+                max_instructions=None, min_instructions=None, family=None, source=None,
+                limit=10, gate=False, workers=1, skip_attempts=skip_attempts,
+            )
+        draft.assert_not_called()
+        self.assertEqual(result["summary"]["call_sequence"]["skipped_attempted"], 1)
+        self.assertIsInstance(result["draft_seconds"], (int, float))
+
+    def test_sweep_drafts_only_remaining_variant_labels(self) -> None:
+        rows = [
+            {"function": "func_a", "source": "disasm/src/fragments/1/a.c", "family": "call_sequence"},
+        ]
+        all_names = sweep_targets.FAMILY_VARIANTS["call_sequence"]
+        skip_attempts = {("func_a", f"m2c:{all_names[0]}")}
+        with mock.patch.object(
+            sweep_targets.targets, "list_targets",
+            return_value={"matched": 1, "targets": rows, "truncated": False},
+        ), mock.patch.object(
+            sweep_targets.dedupe_externs, "dirty_sources", return_value=set(),
+        ), mock.patch.object(
+            sweep_targets, "draft_variants", return_value=([], None),
+        ) as draft:
+            sweep_targets.sweep(
+                max_instructions=None, min_instructions=None, family=None, source=None,
+                limit=10, gate=False, workers=1, skip_attempts=skip_attempts,
+            )
+        draft.assert_called_once()
+        self.assertEqual(draft.call_args.args[0], "func_a")
+        self.assertEqual(draft.call_args.kwargs["variant_names"], tuple(all_names[1:]))
+
     def test_near_miss_permutes_and_gates_score_zero(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            stats = Path(directory) / "stats.jsonl"
+            stats.write_text(json.dumps({
+                "source": "disasm/src/synthetic.c",
+                "attempts": [
+                    {
+                        "function": "func_a",
+                        "label": "m2c:s32-s32",
+                        "status": "compare_rejected",
+                        "similarity_score": 0.91,
+                        "candidate": "void func_a(void) { int low; }",
+                        "declarations": "extern void helper(void);",
+                    },
+                    {
+                        "function": "func_a",
+                        "label": "m2c:ptr-void",
+                        "status": "compare_rejected",
+                        "similarity_score": 0.95,
+                        "candidate": "void func_a(void) { int best; }",
+                        "declarations": "extern void helper(void);",
+                    },
+                    {
+                        "function": "func_a",
+                        "label": "manual:unrelated",
+                        "status": "compare_rejected",
+                        "similarity_score": 0.99,
+                        "candidate": "void func_a(void) { int wrong; }",
+                    },
+                ],
+            }) + "\n")
+            owner = targets.Owner("func_a", "disasm/src/synthetic.c", "asm/us/nonmatchings/synthetic/func_a.s")
+            with mock.patch.object(targets, "require_owner", return_value=owner), mock.patch.object(
+                sweep_targets.permute_candidate,
+                "permute",
+                return_value={"outputs": [{"score": "0", "code": "void func_a(void) {}"}]},
+            ) as permute, mock.patch.object(
+                sweep_targets.runner,
+                "try_candidates_detailed",
+                return_value={"accepted": ["func_a"], "batch_status": "accepted"},
+            ) as gate:
+                result = sweep_targets.near_miss(
+                    stats_path=stats, seconds=45.0, label_prefixes=("m2c:",)
+                )
+            self.assertEqual(result["accepted"], ["func_a"])
+            permute.assert_called_once()
+            self.assertEqual(permute.call_args.args[:2], ("func_a", "void func_a(void) { int best; }"))
+            self.assertEqual(permute.call_args.kwargs["seconds"], 45.0)
+            gate.assert_called_once()
+
+    def test_near_miss_default_considers_every_label(self) -> None:
+        # Without a label restriction, the highest-scoring attempt across
+        # every label (including a non-``m2c:`` one) is the candidate: the
+        # ``manual:unrelated`` row at 0.99 outranks both ``m2c:`` rows.
         with tempfile.TemporaryDirectory() as directory:
             stats = Path(directory) / "stats.jsonl"
             stats.write_text(json.dumps({
@@ -1006,9 +1634,76 @@ class SweepTests(unittest.TestCase):
                 result = sweep_targets.near_miss(stats_path=stats, seconds=45.0)
             self.assertEqual(result["accepted"], ["func_a"])
             permute.assert_called_once()
-            self.assertEqual(permute.call_args.args[:2], ("func_a", "void func_a(void) { int best; }"))
-            self.assertEqual(permute.call_args.kwargs["seconds"], 45.0)
+            self.assertEqual(permute.call_args.args[:2], ("func_a", "void func_a(void) { int wrong; }"))
             gate.assert_called_once()
+
+    def test_near_miss_parallel_permutes_and_gates_each_output(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            stats = Path(directory) / "stats.jsonl"
+            stats.write_text(json.dumps({
+                "source": "disasm/src/synthetic.c",
+                "attempts": [
+                    {
+                        "function": "func_a", "label": "m2c:s32-s32", "status": "compare_rejected",
+                        "similarity_score": 0.95, "candidate": "void func_a(void) { int a; }",
+                    },
+                    {
+                        "function": "func_b", "label": "m2c:u8-void", "status": "compare_rejected",
+                        "similarity_score": 0.93, "candidate": "void func_b(void) { int b; }",
+                    },
+                ],
+            }) + "\n")
+            owner_a = targets.Owner("func_a", "disasm/src/synthetic.c", "asm/us/nonmatchings/synthetic/func_a.s")
+            owner_b = targets.Owner("func_b", "disasm/src/synthetic.c", "asm/us/nonmatchings/synthetic/func_b.s")
+            owners = {"func_a": owner_a, "func_b": owner_b}
+            with mock.patch.object(
+                targets, "require_owner", side_effect=lambda function: owners[function]
+            ), mock.patch.object(
+                sweep_targets.permute_candidate,
+                "permute",
+                return_value={"outputs": [{"score": "0", "code": "void func(void) {}"}]},
+            ) as permute, mock.patch.object(
+                sweep_targets.runner,
+                "try_candidates_detailed",
+                return_value={"accepted": ["func_x"], "batch_status": "accepted"},
+            ) as gate:
+                result = sweep_targets.near_miss(
+                    stats_path=stats, seconds=10.0, parallel=2, label_prefixes=("m2c:",)
+                )
+            self.assertEqual(permute.call_count, 2)
+            self.assertEqual(gate.call_count, 2)
+            self.assertEqual(sorted(result["accepted"]), ["func_x", "func_x"])
+            self.assertEqual(result["candidates"], 2)
+
+    def test_near_miss_skip_permuted_excludes_prior_permute_attempts(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            stats = Path(directory) / "stats.jsonl"
+            stats.write_text("\n".join([
+                json.dumps({"attempts": [
+                    {
+                        "function": "func_a", "label": "m2c:s32-s32", "status": "compare_rejected",
+                        "similarity_score": 0.95, "candidate": "void func_a(void) {}",
+                    },
+                    {
+                        "function": "func_a", "label": "permute:m2c:s32-s32", "status": "compare_rejected",
+                        "similarity_score": 0.5, "candidate": "void func_a(void) {}",
+                    },
+                ]}),
+                json.dumps({"attempts": [
+                    {
+                        "function": "func_b", "label": "m2c:u8-void", "status": "compare_rejected",
+                        "similarity_score": 0.92, "candidate": "void func_b(void) {}",
+                    },
+                ]}),
+            ]) + "\n")
+            with mock.patch.object(
+                sweep_targets.permute_candidate, "permute", return_value={"outputs": []}
+            ) as permute:
+                result = sweep_targets.near_miss(stats_path=stats, label_prefixes=("m2c:",))
+            self.assertEqual(result["skipped_permuted"], 1)
+            self.assertEqual(result["candidates"], 1)
+            permute.assert_called_once()
+            self.assertEqual(permute.call_args.args[0], "func_b")
 
     def test_near_miss_skips_function_after_full_gate_acceptance(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
