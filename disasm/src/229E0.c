@@ -2685,7 +2685,19 @@ void func_80037E00(S1_GraphNode* arg0, u8 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80037E3C.s")
+void func_80037E3C(S1_GraphNode* arg0, S1_func_D_86002F34_000_010 arg1, void* arg2) {
+    if (arg1 != NULL) {
+        arg1 = func_80003240(arg1);
+    }
+
+    if (arg0 != NULL) {
+        arg0->unk_14 = arg2;
+        arg0->unk_10 = arg1;
+        if (arg1 != NULL) {
+            arg1(0, arg0);
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -3503,7 +3515,32 @@ s32 func_8003C988(void) { s32 var_v1 = 1; if (D_80094910 != NULL) { var_v1 = D_8
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003CA30.s")
+typedef struct S1_arg1_func_81407874_014_000_010 S1_arg1_func_81407874_014_000_010;
+struct S1_arg1_func_81407874_014_000_010 {
+      u8 unk_00;
+      u8 unk_01;
+      u8 unk_02;
+      u8 unk_03;
+      u8 unk_04;
+      u8 unk_05;
+      u8 unk_06;
+      u8 unk_07;
+      u8 unk_08;
+      u8 unk_09;
+      u8 unk_0A;
+      u8 unk_0B;
+      u8 unk_0C;
+      u8 unk_0D;
+      u8 unk_0E;
+      u8 unk_0F;
+};
+void func_8003CA30(Gfx* arg0, S1_arg1_func_81407874_014_000_010* arg1) {
+    gDPSetCombine(arg0++,
+                  GCCc0w0(arg1->unk_00, arg1->unk_02, arg1->unk_04, arg1->unk_06) | GCCc1w0(arg1->unk_08, arg1->unk_0A),
+
+                  GCCc0w1(arg1->unk_01, arg1->unk_03, arg1->unk_05, arg1->unk_07) |
+                      GCCc1w1(arg1->unk_09, arg1->unk_0C, arg1->unk_0E, arg1->unk_0B, arg1->unk_0D, arg1->unk_0F));
+}
 #endif
 
 #ifdef VERSION_US
@@ -4252,7 +4289,20 @@ extern s32 D_80126520; void func_800403B0(void) { D_80126520 += 0xC; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800403C8.s")
+typedef struct S1_unk_D_800ABE00_cmd16 S1_unk_D_800ABE00_cmd16;
+struct S1_unk_D_800ABE00_cmd16 {
+      u8 cmd;
+      u8 r;
+      u8 g;
+      u8 b;
+};
+void func_800403C8(void) {
+    S1_unk_D_800ABE00_cmd16* cmd = (S1_unk_D_800ABE00_cmd16*)D_80126520;
+
+    func_8003FD34(func_8003840C(D_80126450, NULL, cmd->r, cmd->g, cmd->b));
+
+    D_80126520 += sizeof(S1_unk_D_800ABE00_cmd16);
+}
 #endif
 
 #ifdef VERSION_US
@@ -4464,7 +4514,21 @@ void func_80040DE0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800413A0.s")
+#define RELOCATIONS_SIZE 1
+typedef struct S1_Fragment S1_Fragment;
+struct S1_Fragment {
+      u32 inst[2];
+      char magic[8];
+      u32 headerSize;
+      u32 relocOffset;
+      u32 sizeInRom;
+      u32 sizeInRam;
+      char data[RELOCATIONS_SIZE];
+};
+void func_800413A0(S1_MainPoolState* arg0, u32 arg1, S1_Fragment* arg2) {
+    func_80002210(arg1, arg2);
+    func_800031FC(arg0, ((u32)arg2 + arg2->sizeInRam) - (u32)arg0->listHeadR);
+}
 #endif
 
 #ifdef VERSION_US

@@ -437,11 +437,31 @@ u8 func_8005BF78(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005BFF0.s")
+typedef struct S1_GbSaveBoxEntry S1_GbSaveBoxEntry;
+struct S1_GbSaveBoxEntry {
+      u8 count;
+      u8 speciesIndices[1];
+      char unk002[0x12];
+};
+void func_8005BFF0(s32 arg0, s32 arg1, s32 arg2) {
+    S1_GbSaveBoxEntry* temp_v0 = func_8005B1C4(arg0, arg1);
+
+    if (temp_v0 != NULL) {
+        temp_v0->count = arg2;
+        temp_v0->speciesIndices[arg2] = 0xFF;
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005C028.s")
+void func_8005C028(s32 arg0, s32 arg1, s32 arg2) {
+    S1_GbSaveBoxEntry* temp_v0 = func_8005B280(arg0, arg1);
+
+    if (temp_v0 != NULL) {
+        temp_v0->count = arg2;
+        temp_v0->speciesIndices[arg2] = 0xFF;
+    }
+}
 #endif
 
 #ifdef VERSION_US
