@@ -18,7 +18,29 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1CDC0/func_8001C804.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/1CDC0/func_8001C8FC.s")
+extern u8 D_80121DDC[];
+extern void func_8001C794(s32);
+void func_8001C8FC(void *arg0, s32 arg1)
+{
+  s32 i;
+  u8 *entry;
+  s32 value;
+  s32 different;
+  i = ((s32) ((u32) (&D_80121DDC))) * 0;
+  entry = (u8 *) arg0;
+  do
+  {
+    value = *((s32 *) (entry + 0x38));
+    different = value != ((s32) ((u32) (&D_80121DDC)));
+    if (different == 1)
+    {
+      func_8001C794(value);
+    }
+    i += 4;
+    entry += 4;
+  }
+  while (i != 0x40);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1CDC0/func_8001C97C.s")
 
