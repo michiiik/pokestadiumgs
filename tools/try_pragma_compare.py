@@ -187,7 +187,7 @@ def _object_build_environment() -> dict[str, str]:
 _RECIPE_DIRECTORY = "probes/.pragma_probe_recipe/"
 _RECIPE_SOURCE = _RECIPE_DIRECTORY + "__pragma_recipe__.c"
 _RECIPE_OBJECT = "build/" + _RECIPE_SOURCE[:-2] + ".o"
-_RECIPE_CACHE: dict[tuple[object, ...], list[str]] = {}
+_RECIPE_CACHE: dict[tuple[object, ...], dict[str, list[str] | None]] = {}
 _RECIPE_CACHE_LOCK = threading.Lock()
 
 
@@ -201,6 +201,26 @@ def _parse_probe_recipe(make_output: str) -> list[str] | None:
     be mistaken for it.
     """
     recipe: list[str] | None = None
+    for tokens in _recipe_lines(make_output):
+        if tokens[-1] == _RECIPE_SOURCE and "-o" in tokens and _RECIPE_OBJECT in tokens:
+            recipe = tokens
+    return recipe
+
+
+def _parse_check_recipe(make_output: str) -> list[str] | None:
+    """Extract the host ``cc`` syntax-check command for the placeholder probe.
+
+    The check command carries the repository's include paths and defines in a
+    form a host compiler understands, which makes it the right base for
+    producing preprocessed C for m2c contexts and permuter inputs.
+    """
+    for tokens in _recipe_lines(make_output):
+        if tokens[-1] == _RECIPE_SOURCE and "-fsyntax-only" in tokens:
+            return tokens
+    return None
+
+
+def _recipe_lines(make_output: str):
     for line in make_output.splitlines():
         try:
             tokens = shlex.split(line)
@@ -208,9 +228,31 @@ def _parse_probe_recipe(make_output: str) -> list[str] | None:
             continue
         if not tokens or tokens[0] in {":", "printf", "echo"}:
             continue
-        if tokens[-1] == _RECIPE_SOURCE and "-o" in tokens and _RECIPE_OBJECT in tokens:
-            recipe = tokens
-    return recipe
+        yield tokens
+
+
+def host_preprocess_command(check_recipe: list[str], include_directory: str) -> list[str]:
+    """Turn the captured host syntax check into a ``-E -P`` preprocess command.
+
+    ``include_directory`` (relative to ``disasm/``, trailing slash) replaces
+    the probe placeholder so ``-I <owner dir>`` resolves sibling headers.  The
+    caller appends the input file; output goes to stdout.  ``__attribute__``
+    is erased because pycparser-based consumers cannot parse it.
+    """
+    command: list[str] = []
+    skip_next = False
+    for token in check_recipe[:-1]:
+        if skip_next:
+            skip_next = False
+            continue
+        if token == "-o":
+            skip_next = True
+            continue
+        if token in {"-fsyntax-only", "-MMD", "-MP", "-fdiagnostics-color"}:
+            continue
+        command.append(token.replace(_RECIPE_DIRECTORY, include_directory))
+    command += ["-E", "-P", "-D__attribute__(x)="]
+    return command
 
 
 def _substitute_probe_recipe(recipe: list[str], source_rel: str, object_rel: str) -> list[str]:
@@ -228,14 +270,15 @@ def _substitute_probe_recipe(recipe: list[str], source_rel: str, object_rel: str
     ]
 
 
-def _probe_compile_recipe(repo_root: Path) -> list[str] | None:
-    """Return the cached direct compile command for isolated probes.
+def _probe_recipes(repo_root: Path) -> dict[str, list[str] | None]:
+    """Capture the Makefile's probe recipes once per Makefile revision.
 
     ``make`` spends most of a probe's wall time discovering sources and
     grepping every tracked file for ``GLOBAL_ASM`` before it even starts the
-    compiler.  Capturing the recipe with ``make -n`` once per Makefile
-    revision keeps the Makefile authoritative for flags while letting probes
-    invoke asm-processor/IDO directly.  ``None`` falls back to ``make``.
+    compiler.  Capturing the recipe with ``make -n`` keeps the Makefile
+    authoritative for flags while letting probes invoke asm-processor/IDO
+    directly.  The host syntax check is captured in the same pass (with
+    ``RUN_CC_CHECK=1``) for preprocessing consumers.
     """
     makefile = repo_root / "disasm" / "Makefile"
     try:
@@ -244,7 +287,7 @@ def _probe_compile_recipe(repo_root: Path) -> list[str] | None:
             os.environ.get("MIPS_BINUTILS_PREFIX"),
         )
     except OSError:
-        return None
+        return {"compile": None, "check": None}
     with _RECIPE_CACHE_LOCK:
         cached = _RECIPE_CACHE.get(key)
         if cached is not None:
@@ -254,7 +297,7 @@ def _probe_compile_recipe(repo_root: Path) -> list[str] | None:
             placeholder.parent.mkdir(parents=True, exist_ok=True)
             placeholder.write_text("")
             result = subprocess.run(
-                ["make", "-C", "disasm", "-n", "PRAGMA_PROBE=1", _RECIPE_OBJECT],
+                ["make", "-C", "disasm", "-n", "PRAGMA_PROBE=1", "RUN_CC_CHECK=1", _RECIPE_OBJECT],
                 cwd=repo_root,
                 env=_object_build_environment(),
                 text=True,
@@ -263,15 +306,29 @@ def _probe_compile_recipe(repo_root: Path) -> list[str] | None:
                 timeout=_command_timeout("PRAGMA_COMPILE_TIMEOUT", 120.0),
             )
         except (OSError, subprocess.TimeoutExpired):
-            return None
+            return {"compile": None, "check": None}
         finally:
             shutil.rmtree(placeholder.parent, ignore_errors=True)
         if result.returncode != 0:
-            return None
-        recipe = _parse_probe_recipe(result.stdout or "")
-        if recipe is not None:
-            _RECIPE_CACHE[key] = recipe
-        return recipe
+            return {"compile": None, "check": None}
+        output = result.stdout or ""
+        recipes = {
+            "compile": _parse_probe_recipe(output),
+            "check": _parse_check_recipe(output),
+        }
+        if recipes["compile"] is not None:
+            _RECIPE_CACHE[key] = recipes
+        return recipes
+
+
+def _probe_compile_recipe(repo_root: Path) -> list[str] | None:
+    """Return the cached direct compile command for isolated probes (or ``None``)."""
+    return _probe_recipes(repo_root)["compile"]
+
+
+def host_check_recipe(repo_root: Path) -> list[str] | None:
+    """Return the cached host ``cc`` syntax-check command for probes (or ``None``)."""
+    return _probe_recipes(repo_root)["check"]
 
 
 def _make_object(source_path: Path, *, capture: bool = False) -> tuple[int, Path, str]:
@@ -764,6 +821,14 @@ def _function_mismatch_details(
     return details
 
 
+def _declaration_prefix(declarations: str | None) -> str:
+    """Normalize a shared declarations block into a candidate prefix."""
+    if declarations is None:
+        return ""
+    body = declarations.strip()
+    return body + "\n" if body else ""
+
+
 def _replace_candidate_text(source: str, function: str, candidate: str) -> str | None:
     pragma = re.compile(
         rf'^#pragma GLOBAL_ASM\("asm/us/nonmatchings/[^\"]+/{re.escape(function)}\.s"\)$',
@@ -1092,8 +1157,14 @@ def try_candidates_detailed(
     probe_workers: int | None = None,
     labels: list[str | None] | None = None,
     gate: bool = True,
+    declarations: str | None = None,
 ) -> dict[str, object]:
-    """Run one candidate transaction while excluding other MCP processes."""
+    """Run one candidate transaction while excluding other MCP processes.
+
+    ``declarations`` is a block of shared ``extern``/prototype lines that is
+    prepended to every candidate for probing and installed once, ahead of the
+    first accepted replacement, so variants need not repeat their externs.
+    """
     with _candidate_transaction_lock():
         result = _try_candidates_detailed_unlocked(
             source_path,
@@ -1101,6 +1172,7 @@ def try_candidates_detailed(
             probe_workers=probe_workers,
             labels=labels,
             gate=gate,
+            declarations=declarations,
         )
         _record_probe_stats(
             source_path,
@@ -1118,6 +1190,7 @@ def _try_candidates_detailed_unlocked(
     probe_workers: int | None = None,
     labels: list[str | None] | None = None,
     gate: bool = True,
+    declarations: str | None = None,
 ) -> dict[str, object]:
     """Try candidates and retain the first winner per function.
 
@@ -1128,6 +1201,9 @@ def _try_candidates_detailed_unlocked(
     """
     repo_root = Path(__file__).resolve().parent.parent
     baseline = source_path.read_text()
+    prefix = _declaration_prefix(declarations)
+    if prefix:
+        blocks = [(function, prefix + candidate) for function, candidate in blocks]
     accepted: dict[str, str] = {}
     accepted_indices: dict[str, int] = {}
     _cleanup_stale_probe_dirs(repo_root)
@@ -1219,7 +1295,11 @@ def _try_candidates_detailed_unlocked(
         }
 
     combined = baseline
-    for function, candidate in accepted.items():
+    for install_index, (function, candidate) in enumerate(accepted.items()):
+        # Shared declarations are installed once, ahead of the first accepted
+        # replacement; later winners in the same batch drop the prefix.
+        if prefix and install_index and candidate.startswith(prefix):
+            candidate = candidate[len(prefix):]
         pragma = re.compile(
             rf'^#pragma GLOBAL_ASM\("asm/us/nonmatchings/[^"]+/{re.escape(function)}\.s"\)$',
             re.MULTILINE,

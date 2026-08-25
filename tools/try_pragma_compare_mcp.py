@@ -44,6 +44,7 @@ def main():
                     }}, "description": "Ordered candidates; later variants for a solved function are skipped."},
                     "workers": {"type": "integer", "minimum": 1, "description": "Maximum parallel isolated compile probes (default: PRAGMA_PROBE_WORKERS or 10)."},
                     "gate": {"type": "boolean", "default": True, "description": "Run the sequential full COMPARE=1 gate and update source (default true). Set false for isolated probe-only results."},
+                    "declarations": {"type": "string", "description": "Optional shared extern/prototype block prepended once to all candidate probes and installed once with the first accepted replacement."},
                 }},
             }]})
         elif method == "tools/call" and request.get("params", {}).get("name") == "try_pragma_candidates":
@@ -76,6 +77,16 @@ def main():
             if workers is not None:
                 workers = int(workers)
             gate = bool(args.get("gate", True))
+            declarations = args.get("declarations")
+            if declarations is not None and not isinstance(declarations, str):
+                reply(
+                    request_id,
+                    error={
+                        "code": -32602,
+                        "message": "declarations must be a string when provided",
+                    },
+                )
+                continue
             # The comparison helper prints build logs to stdout.  MCP stdio
             # must contain JSON-RPC messages only, so capture those logs
             # instead of corrupting the transport stream.
@@ -94,6 +105,7 @@ def main():
                         probe_workers=workers,
                         labels=labels,
                         gate=gate,
+                        declarations=declarations,
                     )
             finally:
                 sys.stdout.flush()

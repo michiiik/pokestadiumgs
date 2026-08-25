@@ -39,3 +39,8 @@ $stage/
 __pycache__/
 
 .worktrees/
+
+# Cloned decompilation helpers (see tools/setup_decomp_tools.sh)
+disasm/tools/m2c/
+disasm/tools/decomp-permuter/
+disasm/tools/decomp-venv/
