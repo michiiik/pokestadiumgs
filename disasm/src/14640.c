@@ -157,7 +157,18 @@ void func_80016B24(s32 a0, s32 a1, s32 a2, s32 a3) {}
 
 extern OSMesgQueue D_800D1320; extern OSMesg D_800D1338[]; void func_80017A90(void){osCreateMesgQueue(&D_800D1320,D_800D1338,0x10);}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80017AC0.s")
+extern s32 func_80017B00(void);
+extern void func_80013A8C(void);
+extern u32 osSetIntMask(u32);
+s32 func_80017AC0(void) {
+    u32 sp1C;
+    s32 temp_v0;
+    temp_v0 = func_80017B00();
+    sp1C = osSetIntMask(1U);
+    func_80013A8C();
+    osSetIntMask(sp1C);
+    return temp_v0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80017B00.s")
 

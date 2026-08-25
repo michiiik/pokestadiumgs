@@ -229,5 +229,15 @@ s32 func_800711B0(void) { return 0; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_800711EC.s")
+void func_800711EC(s32 arg0) {
+    s32 var_v0;
+
+    var_v0 = 0;
+loop_1:
+    var_v0 += 1;
+    if (var_v0 != 4) {
+        goto loop_1;
+    }
+    return;
+}
 #endif

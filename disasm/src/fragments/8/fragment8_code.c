@@ -56,7 +56,11 @@ void func_82F006C8(void *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/8/fragment8_code/func_82F007C0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/8/fragment8_code/func_82F00818.s")
+extern u8 D_800D0510[];
+extern void func_80007444(void *, s32, s32, s32, s32, s32);
+void func_82F00818(s32 arg0, s32 arg1, s32 arg2) {
+    func_80007444(D_800D0510, 0, 0, 0x280, 0x1E0, 0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/8/fragment8_code/func_82F00860.s")
 

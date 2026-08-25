@@ -122,5 +122,11 @@ s32 func_87E13688(void) {
     return *(s32 *)(D_87E1EBD8 + 0x250) == 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E1369C.s")
+s32 func_87E1369C(void) {
+    s32 result = *(s32 *)(D_87E1EBD8 + 0x250) == 0;
+    if ((result == 0) && (*(s32 *)(D_87E1EBD8 + 0x23C) / 2 < *(s32 *)(D_87E1EBD8 + 0x238))) {
+        result = 1;
+    }
+    return result;
+}
 #endif

@@ -22,7 +22,14 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/87/fragment87_code/func_81B00728.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/87/fragment87_code/func_81B00764.s")
+s32 func_81B00764(u8 arg0) {
+    switch (arg0) {
+    case 0x1B:
+        return 3;
+    default:
+        return 1;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/87/fragment87_code/func_81B00788.s")
 
