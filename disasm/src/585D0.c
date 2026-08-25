@@ -15,7 +15,10 @@ void func_800579E8(u8 *arg0, u16 arg1)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_800579FC.s")
+void func_800579FC(void) {}
+void func_800579FC_padding(void) {}
+void func_800579FC_padding2(void) {}
+void func_800579FC_padding3(void) {}
 #endif
 
 #ifdef VERSION_US

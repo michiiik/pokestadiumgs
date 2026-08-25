@@ -21,7 +21,10 @@ void func_84105CC0(u8 *arg0) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_375530/func_84105CC8.s")
+void func_84105CC8(void) {}
+void func_84105CC8_padding(void) {}
+void func_84105CC8_padding2(void) {}
+void func_84105CC8_padding3(void) {}
 #endif
 
 void func_84105CE8(void) {
