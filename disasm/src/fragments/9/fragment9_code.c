@@ -91,5 +91,16 @@ void func_8FB033F0(s32 arg0, s32 arg1) {
     func_80006D3C();
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/9/fragment9_code/func_8FB0342C.s")
+extern void func_8FB032C4(s32, s32);
+extern void func_8FB03328(s32, s32);
+extern void main_pool_pop_state(s32);
+extern void main_pool_push_state(s32);
+s32 func_8FB0342C(s32 arg0, s32 arg1) {
+    main_pool_push_state(0x52504D45);
+    func_8FB03328(arg0, arg1);
+    func_8FB032C4(arg0, arg1);
+    func_8FB033F0(arg0, arg1);
+    main_pool_pop_state(0x52504D45);
+    return 0;
+}
 #endif

@@ -83,7 +83,17 @@ void func_82101648(s32 arg0) {
     func_82100A40(D_82104170);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15A060/func_8210168C.s")
+extern void func_8210144C(u8 *, s32);
+extern void main_pool_push_state(s32);
+extern s32 D_82104174;
+s32 func_8210168C(s32 arg0, s32 arg1) {
+    main_pool_push_state(0x50534C44);
+    func_8210144C(D_82104170, arg0);
+    func_82101040(D_82104170);
+    func_82101648((s32) D_82104170);
+    main_pool_pop_state(0x50534C44);
+    return D_82104174;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15A060/func_821016F0.s")
 
