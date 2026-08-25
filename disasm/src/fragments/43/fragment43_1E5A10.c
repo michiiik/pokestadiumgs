@@ -608,7 +608,13 @@ void func_8AC06A2C(void *arg0, s32 arg1, s16 arg2, s16 arg3, s16 arg4, s16 arg5,
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC06D70.s")
+void func_8AC06D70(void *arg0, s32 arg1, s32 arg2, u16 arg3) {
+    u8 *ptr = (u8 *)arg0;
+    *(s16 *)(ptr + 0x12) = 0xA;
+    *(s32 *)(ptr + 0x14) = arg1;
+    *(s32 *)(ptr + 0x18) = arg2;
+    *(s16 *)(ptr + 0x20) = arg3;
+}
 #endif
 
 #ifdef VERSION_US
