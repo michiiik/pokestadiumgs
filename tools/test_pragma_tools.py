@@ -1697,6 +1697,18 @@ class SweepTests(unittest.TestCase):
         )
         self.assertIn("s16 arg0", narrow)
 
+    def test_bounded_lookup_u8_argument_variant_rewrites_only_function_parameter(self) -> None:
+        draft = (
+            "u8 func_80073600(s32 arg0) {\n"
+            "    s32 temp_a0;\n"
+            "    temp_a0 = arg0 & 0xFF;\n"
+            "    return temp_a0;\n"
+            "}\n"
+        )
+        code = sweep_targets.rewrite_draft(draft, sweep_targets.VARIANTS["u8-arg"])
+        self.assertIn("u8 func_80073600(u8 arg0)", code)
+        self.assertNotIn("temp_a0", code)
+
     def test_compile_failure_candidates_rewrite_and_deduplicate_diagnostics(self) -> None:
         draft = (
             "extern M2C_UNK D_1;\n"

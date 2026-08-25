@@ -128,7 +128,15 @@ OSMesg func_80004F34(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_80004F60.s")
+s32 func_80004F60(S1_UnkStruct80083CA0_2* arg0) {
+    u32 sp1C = 'NULL';
+
+    if (arg0->unk_1C0.validCount != 0) {
+        osRecvMesg(&arg0->unk_1C0, &sp1C, 1);
+    }
+
+    return sp1C;
+}
 #endif
 
 #ifdef VERSION_US

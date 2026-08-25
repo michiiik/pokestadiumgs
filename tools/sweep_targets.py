@@ -82,6 +82,10 @@ UNK_FUNCTION_RE = re.compile(r"^M2C_UNK (\w+)\(([^)]*)\);(\s*/\* extern \*/)?", 
 UNK_TYPE_RE = re.compile(r"\bM2C_UNK\b")
 EMPTY_BLOCK_RE = re.compile(r"\{\s*\}")
 EXTERN_LINE_RE = re.compile(r"^\s*extern\b.*;\s*$")
+FIRST_S32_ARG_RE = re.compile(
+    r"(^\s*[\w\s*]+\bfunc_[0-9A-Fa-f]+\s*\(\s*)s32(?=\s+arg\d+\s*[,)])",
+    re.M,
+)
 
 VARIANTS: dict[str, dict[str, str]] = {
     # unknown globals, unknown call returns, other unknown types
@@ -100,13 +104,24 @@ VARIANTS: dict[str, dict[str, str]] = {
     # a retry can change one ABI hypothesis at a time.
     "u8-narrow-void": {"global": "u8", "call": "void", "type": "u8"},
     "s16-narrow-void": {"global": "u8", "call": "void", "type": "s16"},
+    # Some range-checked byte lookups take a register-sized value in the
+    # recovered draft even though the ABI masks it with ``andi 0xFF`` before
+    # the bounds checks.  Rewriting just that first parameter to ``u8`` lets
+    # IDO preserve the original argument home-store and register schedule.
+    "u8-arg": {
+        "global": "u8",
+        "call": "void",
+        "type": "s32",
+        "arg": "u8",
+        "drop_mask_temp": "1",
+    },
 }
 
 # These orders encode the narrow IDO spellings learned from accepted owners.
 # They are candidate priorities, not ABI proof; every spelling still goes
 # through an isolated probe and the sequential ROM gate.
 FAMILY_VARIANTS: dict[str, tuple[str, ...]] = {
-    "bounded_lookup": ("u8-void", "u16-s32", "s32-s32", "ptr-void"),
+    "bounded_lookup": ("u8-arg", "u8-void", "u16-s32", "s32-s32", "ptr-void"),
     "state_field_access": ("u8-void", "u8-narrow-void", "s16-narrow-void", "s16-void", "u16-s32", "s32-s32", "ptr-void"),
     "constant_map": ("s32-s32", "u8-void", "u16-s32"),
     "direct_wrapper": ("s32-s32", "ptr-void", "u8-void", "ptr-s32"),
@@ -140,6 +155,12 @@ def rewrite_draft(draft: str, variant: dict[str, str]) -> str | None:
     text = UNK_GLOBAL_RE.sub(lambda m: f"extern {variant['global']} {m.group(1)};", text)
     text = UNK_FUNCTION_RE.sub(lambda m: f"extern {variant['call']} {m.group(1)}({m.group(2)});", text)
     text = UNK_TYPE_RE.sub(variant["type"], text)
+    if variant.get("arg") == "u8":
+        text = FIRST_S32_ARG_RE.sub(r"\1u8", text, count=1)
+        if variant.get("drop_mask_temp") == "1":
+            text = re.sub(r"\n\s*s32\s+temp_a0;\n", "\n", text, count=1)
+            text = re.sub(r"\n\s*temp_a0\s*=\s*arg0\s*&\s*0xFF;\n", "\n", text, count=1)
+            text = re.sub(r"\btemp_a0\b", "arg0", text)
     text = re.sub(r"\s*/\* extern \*/", "", text)
     if "M2C_" in text:
         return None

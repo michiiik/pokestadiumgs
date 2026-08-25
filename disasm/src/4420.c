@@ -208,7 +208,16 @@ void func_800047B0(S1_MainPoolState* arg0, u32 arg1, S1_Fragment* arg2) {
     func_800031FC(arg0, ((u32)arg2 + arg2->sizeInRam) - (u32)arg0->listHeadR);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800047F8.s")
+#define RELOCATIONS_SIZE 1
+typedef void (*S1_ret_func_80004454)(void);
+S1_ret_func_80004454 func_800047F8(s32 arg0, u8* romStart, u8* romEnd) {
+    void* addr = func_800042C0(romStart, romEnd, 0, 0);
+
+    if (addr != NULL) {
+        func_80004718(arg0, (S1_Fragment*)addr);
+    }
+    return addr;
+}
 
 typedef struct S1_BinArchive S1_BinArchive;
 struct S1_BinArchive {

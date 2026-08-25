@@ -65,7 +65,13 @@ void func_80002F90(S1_MemoryPool* pool, void* addr) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/3A00/func_800030D0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3A00/func_80003120.s")
+#define ALIGN16(val) (((val) + 0xFu) & ~0xFu)
+void func_80003120(struct S1_MemoryBlock* block) {
+    s32 size = ALIGN16(block->size + 0x10);
+
+    func_80002A40(block, size);
+    block->next = (void*)(size - 0x10);
+}
 
 u8 *func_80003164(u8 *arg0, s32 arg1) {
     s32 value = (arg1 & ~3) - 0x10;
