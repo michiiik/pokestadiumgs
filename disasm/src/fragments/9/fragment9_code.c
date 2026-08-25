@@ -74,7 +74,17 @@ s32 func_8FB02494(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/9/fragment9_code/func_8FB03328.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/9/fragment9_code/func_8FB033F0.s")
+extern void func_80006D3C();
+extern void func_80008574();
+extern void func_80047610();
+extern void func_8004C398();
+
+void func_8FB033F0(s32 arg0, s32 arg1) {
+    func_80008574();
+    func_80047610();
+    func_8004C398();
+    func_80006D3C();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/9/fragment9_code/func_8FB0342C.s")
 #endif

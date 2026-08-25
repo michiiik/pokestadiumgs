@@ -17,7 +17,21 @@ void func_8AF17F0C(u8 *arg0, s32 arg1, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_205C30/func_8AF17F18.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_205C30/func_8AF180F4.s")
+extern s16 D_8AF34FAC;
+extern s16 D_8AF34FAE;
+extern s16 D_8AF34FFC;
+extern s16 D_8AF35008;
+extern s16 D_8AF3500A;
+extern s16 D_8AF3500C;
+
+void func_8AF180F4(void) {
+    D_8AF3500C = 0;
+    D_8AF34FAC = 2;
+    D_8AF34FAE = 0;
+    D_8AF34FFC = 0;
+    D_8AF35008 = 0;
+    D_8AF3500A = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_205C30/func_8AF1812C.s")
 
