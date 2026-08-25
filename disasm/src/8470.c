@@ -47,7 +47,15 @@ u8 func_800084A0(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80008574.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_800085EC.s")
+s32 func_8000204C();
+
+void func_800085EC(void) {
+    if (func_8000204C() == 0) {
+        do {
+
+        } while (func_8000204C() == 0);
+    }
+}
 
 extern u8 D_800D0510[]; void func_80008624(void) { func_80002178(D_800D0510); }
 
