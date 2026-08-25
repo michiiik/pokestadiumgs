@@ -99,7 +99,21 @@ void func_86B01720(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/61/fragment61_code/func_86B05428.s")
+extern void func_87F026E8(s32, void *);
+extern s32 D_87F119D8;
+extern void *D_87F119DC;
+void func_86B05428(void) {
+    s32 var_v0;
+
+    var_v0 = 0;
+    (*(s8 *)((u8 *)(D_87F119DC) + (0x41))) = (s8) (*(s32 *)((u8 *)(D_87F119DC) + (0x20)));
+    if ((*(s32 *)((u8 *)(D_87F119DC) + (0x1C))) >= 0x18) {
+        var_v0 = 1;
+    }
+    if (var_v0 != 0) {
+        func_87F026E8(D_87F119D8, D_87F119DC);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -139,7 +153,21 @@ void func_86B01720(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/61/fragment61_code/func_86B080D4.s")
+extern f32 D_86B0DFA8;
+extern f64 D_86B0DFB0;
+f32 func_86B080D4(f32 arg0, f32 arg1) {
+    f32 var_fv1;
+
+    if (arg1 <= arg0) {
+        var_fv1 = arg0 - arg1;
+    } else {
+        var_fv1 = arg1 - arg0;
+    }
+    if (D_86B0DFA8 < var_fv1) {
+        var_fv1 = (f32) (D_86B0DFB0 - (f64) var_fv1);
+    }
+    return var_fv1;
+}
 #endif
 
 #ifdef VERSION_US

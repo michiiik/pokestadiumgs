@@ -23,7 +23,24 @@ void func_8F300770(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/71/fragment71_code/func_8F300AD0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/71/fragment71_code/func_8F300CAC.s")
+extern void func_80007AEC(s32);
+extern void func_800086A4(s32);
+extern void func_80064D28();
+s32 func_8F300AD0(s32);
+void func_8F300CAC(void) {
+    s32 temp_v0;
+    s32 var_s0;
+
+    var_s0 = 0;
+    func_800086A4(2);
+    func_80007AEC(5);
+    do {
+        func_80064D28();
+        func_8F300770();
+        temp_v0 = func_8F300AD0(var_s0);
+        var_s0 = temp_v0;
+    } while (temp_v0 != 4);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/71/fragment71_code/func_8F300D08.s")
 #endif

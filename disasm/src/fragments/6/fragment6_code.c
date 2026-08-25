@@ -108,7 +108,19 @@ void func_83100E98(u8 *arg0, s32 arg1)
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/6/fragment6_code/func_83101FFC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/6/fragment6_code/func_83102080.s")
+s32 func_83101F5C(s32);
+extern void func_83101FFC(s32);
+void func_83102080(s32 arg0, s32 arg1) {
+    s32 temp_v0;
+    s32 var_s0;
+
+    var_s0 = 0;
+    do {
+        temp_v0 = func_83101F5C(var_s0);
+        var_s0 = temp_v0;
+        func_83101FFC(temp_v0);
+    } while (var_s0 != 1);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/6/fragment6_code/func_831020D0.s")
 

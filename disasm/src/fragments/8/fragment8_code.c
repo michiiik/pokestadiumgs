@@ -101,7 +101,18 @@ void func_82F01D38(s32 arg0) {
     func_80008648();
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/8/fragment8_code/func_82F01D74.s")
+s32 func_82F01C34(s32);
+void func_82F01D74(s32 arg0, s32 arg1) {
+    s32 temp_v0;
+    s32 var_s0;
+
+    var_s0 = 0;
+    do {
+        temp_v0 = func_82F01C34(var_s0);
+        var_s0 = temp_v0;
+        func_82F01D38(temp_v0);
+    } while (var_s0 != 1);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/8/fragment8_code/func_82F01DC4.s")
 

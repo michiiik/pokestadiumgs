@@ -89,7 +89,21 @@ void func_8F70104C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/76/fragment76_code/func_8F7011C8.s")
+extern void func_80008648();
+extern void func_800088DC();
+extern void func_80064D28();
+extern void func_8F700420();
+extern void func_8F70107C();
+extern s32 D_8F7023B8;
+void func_8F7011C8(void) {
+    do {
+        func_80064D28();
+        func_800088DC();
+        func_8F70107C();
+        func_8F700420();
+        func_80008648();
+    } while (D_8F7023B8 != 0);
+}
 #endif
 
 #ifdef VERSION_US

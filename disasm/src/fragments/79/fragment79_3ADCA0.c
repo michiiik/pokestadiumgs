@@ -398,7 +398,12 @@ void func_8413FB80(s16 arg0, s16 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84142EB0.s")
+void func_84142EB0(void *arg0) {
+    if ((*(u8 *)((u8 *)(arg0) + (0))) == 0x1A) {
+        func_8413E5E4((*(u8 *)((u8 *)(arg0) + (0x22))), (*(u8 *)((u8 *)(arg0) + (0x23))), (*(u8 *)((u8 *)(arg0) + (0x24))), (*(u8 *)((u8 *)(arg0) + (0x25))));
+        func_8413F5A8((s32) (*(s16 *)((u8 *)(arg0) + (0xA))), (s32) (*(s16 *)((u8 *)(arg0) + (0xC))), 0x139, 0);
+    }
+}
 #endif
 
 #ifdef VERSION_US

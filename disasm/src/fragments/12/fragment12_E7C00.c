@@ -45,7 +45,22 @@ void func_81403918(s32 arg0) { func_81403244((arg0 + 8)); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81403938.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81403A18.s")
+void func_81403A18(void *arg0) {
+    u8 temp_v0;
+
+    temp_v0 = (*(u8 *)((u8 *)(arg0) + (0xCC0)));
+    switch (temp_v0) {                              /* irregular */
+    case 0:
+        (*(f32 *)((u8 *)(arg0) + (0xCBC))) = 0.0f;
+        /* fallthrough */
+    case 1:
+    case 3:
+        (*(u8 *)((u8 *)(arg0) + (0xCC0))) = 1U;
+        /* fallthrough */
+    case 2:
+        return;
+    }
+}
 
 s32 func_81403A64(u8 *arg0) {
     *(f32 *)(arg0 + 0xCBC) = 0.0f;
@@ -62,7 +77,22 @@ s32 func_81403A64(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81403CD0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81403E2C.s")
+void func_81403E2C(void *arg0) {
+    u8 temp_v0;
+
+    temp_v0 = (*(u8 *)((u8 *)(arg0) + (0xCC0)));
+    switch (temp_v0) {                              /* irregular */
+    case 2:
+        (*(f32 *)((u8 *)(arg0) + (0xCBC))) = 16.0f;
+        /* fallthrough */
+    case 1:
+    case 3:
+        (*(u8 *)((u8 *)(arg0) + (0xCC0))) = 3U;
+        /* fallthrough */
+    case 0:
+        return;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81403E7C.s")
 

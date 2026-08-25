@@ -400,7 +400,19 @@ void func_83008700(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_8300A4BC.s")
+s32 func_8300A2CC(s32);
+extern void func_8300A45C(s32);
+void func_8300A4BC(s32 arg0, s32 arg1) {
+    s32 temp_v0;
+    s32 var_s0;
+
+    var_s0 = 0;
+    do {
+        temp_v0 = func_8300A2CC(var_s0);
+        var_s0 = temp_v0;
+        func_8300A45C(temp_v0);
+    } while (var_s0 != 1);
+}
 #endif
 
 #ifdef VERSION_US

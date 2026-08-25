@@ -48,7 +48,21 @@ void func_8FA00AC0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/75/fragment75_code/func_8FA010B0.s")
+s32 func_800542B0(s16);
+extern void func_800542E4(s16, s32);
+void func_8FA010B0(s16 arg0, s16 arg1, u8 arg2) {
+    s32 temp_a0;
+    s32 temp_v1;
+    s32 var_a1;
+
+    temp_v1 = (1 << arg0) & 0xFF;
+    temp_a0 = func_800542B0(arg1) & ~temp_v1;
+    var_a1 = temp_a0 & 0xFF;
+    if (arg2 != 0) {
+        var_a1 = (temp_a0 | temp_v1) & 0xFF;
+    }
+    func_800542E4(arg1, var_a1);
+}
 #endif
 
 #ifdef VERSION_US

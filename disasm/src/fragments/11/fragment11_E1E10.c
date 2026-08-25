@@ -37,7 +37,19 @@ void *func_8160A360(void *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E1E10/func_8160A6D0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E1E10/func_8160A72C.s")
+extern void func_8004D878(s32, s32, s32);
+void func_8160A72C(s32 arg0) {
+    s32 var_s0;
+    s32 var_s1;
+
+    var_s0 = 0;
+    var_s1 = arg0 + 0x80;
+    do {
+        func_8004D878(var_s1, 0x84, 0);
+        var_s0 += 0xCE8;
+        var_s1 += 0xCE8;
+    } while (var_s0 != 0x4D70);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E1E10/func_8160A780.s")
 

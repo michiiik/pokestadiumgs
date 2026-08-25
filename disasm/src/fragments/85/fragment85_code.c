@@ -2,7 +2,13 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/85/fragment85_code/func_8FD00020.s")
+extern f32 D_8FD02120;
+s32 func_8FD00020(f32 arg0) {
+    s32 temp_v1;
+
+    temp_v1 = (s32) arg0 & 0x1F;
+    return ((temp_v1 << 0xA) + (s32) (((arg0 - (f32) temp_v1) + D_8FD02120) * 1024.0f)) & 0xFFFF;
+}
 #endif
 
 void func_8FD0006C(void) {
@@ -151,7 +157,17 @@ void func_8FD014D8(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/85/fragment85_code/func_8FD019DC.s")
+extern void func_8FD016E4();
+extern void func_8FD01794();
+extern void func_8FD01964();
+void func_8FD019DC(void) {
+    do {
+        func_8FD01964();
+        func_8FD016E4();
+        func_8FD01794();
+        func_8FD01120();
+    } while (D_8FD02188 != 5);
+}
 #endif
 
 #ifdef VERSION_US

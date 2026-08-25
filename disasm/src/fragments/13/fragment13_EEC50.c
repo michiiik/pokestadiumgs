@@ -114,13 +114,40 @@ s32 func_82404430(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82404440.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82404564.s")
+extern void func_800226C0(s32, void *);
+s8 func_82404564(void *arg0) {
+    u8 temp_v0;
+
+    temp_v0 = (*(u8 *)((u8 *)(arg0) + (0x21)));
+    if (temp_v0 != 0) {
+        if (temp_v0 == 4) {
+            (*(u8 *)((u8 *)(arg0) + (0x21))) = 0U;
+            return (*(s8 *)((u8 *)(arg0) + (0x20)));
+        }
+        goto block_4;
+    }
+    (*(u8 *)((u8 *)(arg0) + (0x21))) = 1U;
+    func_800226C0(0xA9, arg0);
+block_4:
+    return -1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_824045B4.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_824046A4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_824048A0.s")
+s32 func_824048A0(void *arg0, s32 arg1) {
+    s32 temp_v0;
+
+    temp_v0 = (*(s32 *)((u8 *)(arg0) + (0x1DC)));
+    if ((temp_v0 == 4) && (arg1 == (*(s32 *)((u8 *)(arg0) + (0x1A8))))) {
+        return 1;
+    }
+    if ((temp_v0 == 5) && (arg1 == (*(s32 *)((u8 *)(arg0) + (0x1A4))))) {
+        return 1;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_824048F0.s")
 

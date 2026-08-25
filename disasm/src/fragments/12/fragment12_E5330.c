@@ -69,5 +69,7 @@ void func_81400124(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E5330/func_814025E8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E5330/func_814028A0.s")
+s32 func_814028A0(s32 arg0) {
+    return (s32) (((((f32) arg0 + 0.5f) * 22.0f) + 17.0f) - 6.0f);
+}
 #endif

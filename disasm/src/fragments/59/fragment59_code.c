@@ -140,7 +140,19 @@ void func_86905804(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/59/fragment59_code/func_8690B848.s")
+extern void func_8690AD3C(s32);
+extern u8 D_8691A448;
+void func_8690B848(void) {
+    s32 var_s0;
+
+    var_s0 = 0;
+    if ((*(s32 *)((u8 *)(&D_8691A448) + (0x320))) > 0) {
+        do {
+            func_8690AD3C(var_s0);
+            var_s0 += 1;
+        } while (var_s0 < (*(s32 *)((u8 *)(&D_8691A448) + (0x320))));
+    }
+}
 #endif
 
 #ifdef VERSION_US

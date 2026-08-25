@@ -234,7 +234,13 @@ void func_8160852C(void) { func_8004D1FC(D_8160BDB4); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81608550.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_8160877C.s")
+extern void func_81608550(s32, s32, s32, s32, f32);
+void func_8160877C(s32 arg0, s32 arg1, s32 arg2, s32 arg3, f32 arg4) {
+    if (arg2 != 0) {
+        func_8160852C();
+        func_81608550(arg0, arg1, arg2, arg3, arg4);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_816087C8.s")
 

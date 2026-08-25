@@ -30,7 +30,12 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_266A60/func_86200738.s")
+extern void func_80038E14(s32, s32, s32, s32, f32, f32, f32, s32);
+extern void *D_8620E198;
+s32 func_86200738(s32 arg0, s32 arg1) {
+    func_80038E14(arg1, (*(s32 *)((u8 *)(D_8620E198) + (0x70))), (*(s32 *)((u8 *)(D_8620E198) + (0x74))), (*(s32 *)((u8 *)(D_8620E198) + (0x78))), (*(f32 *)((u8 *)(D_8620E198) + (0x7C))), (*(f32 *)((u8 *)(D_8620E198) + (0x80))), (*(f32 *)((u8 *)(D_8620E198) + (0x84))), 0);
+    return 1;
+}
 #endif
 
 #ifdef VERSION_US

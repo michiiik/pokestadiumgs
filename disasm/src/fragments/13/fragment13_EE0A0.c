@@ -4,7 +4,19 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EE0A0/func_82400020.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EE0A0/func_82400108.s")
+extern void func_8003F018(s32);
+void func_82400108(s32 arg0) {
+    s32 var_s0;
+    s32 var_s1;
+
+    var_s0 = 0;
+    var_s1 = arg0;
+    do {
+        func_8003F018(var_s1);
+        var_s0 += 0x168;
+        var_s1 += 0x168;
+    } while (var_s0 != 0xB40);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EE0A0/func_82400154.s")
 

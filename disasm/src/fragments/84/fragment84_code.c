@@ -45,7 +45,15 @@ void func_8FC00020(u8 r, u8 g, u8 b, u8 a) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/84/fragment84_code/func_8FC007E0.s")
+extern void func_80049064(s32, s32, s32, s32);
+s32 func_8004C874(s32, u8);
+extern u8 D_8FC0242F;
+extern u8 D_8FC02831;
+void func_8FC007E0(void) {
+    if (D_8FC02831 != 0) {
+        func_80049064(0xDC, 0x64, 0, func_8004C874(0x4B, *(&D_8FC0242F + D_8FC02831)));
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -124,7 +132,17 @@ void func_8FC00FD0(void) { func_80060358(0, &D_8FC0C2D8); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/84/fragment84_code/func_8FC015AC.s")
+extern void func_8FC01480();
+extern u8 D_8FC0C768;
+void func_8FC015AC(void) {
+    (*(s16 *)((u8 *)(&D_8FC0C768) + (0))) = 0xB4;
+    (*(s16 *)((u8 *)(&D_8FC0C768) + (2))) = 0x6E;
+    (*(s16 *)((u8 *)(&D_8FC0C768) + (4))) = 0x12C;
+    (*(s16 *)((u8 *)(&D_8FC0C768) + (6))) = 0xD2;
+    (*(s16 *)((u8 *)(&D_8FC0C768) + (8))) = 0;
+    (*(s16 *)((u8 *)(&D_8FC0C768) + (0xA))) = 0;
+    func_8FC01480();
+}
 #endif
 
 #ifdef VERSION_US
@@ -163,7 +181,17 @@ void func_8FC01FBC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/84/fragment84_code/func_8FC02248.s")
+extern void func_8FC00E90();
+extern void func_8FC02168();
+extern void func_8FC021D0();
+extern u8 D_8FC02830;
+void func_8FC02248(void) {
+    do {
+        func_8FC021D0();
+        func_8FC02168();
+        func_8FC00E90();
+    } while (D_8FC02830 != 3);
+}
 #endif
 
 #ifdef VERSION_US
@@ -186,7 +214,17 @@ void func_8FC022F4(void) { func_8004C4B0(6); func_8004C4B0(75); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/84/fragment84_code/func_8FC0231C.s")
+extern void _bzero(s32 *, s32);
+extern void func_8FC0135C();
+extern u8 D_8FC02830;
+void func_8FC0231C(s32 arg0) {
+    func_8FC0229C();
+    func_8FC022F4();
+    _bzero(&D_8FC02830, 0x9AA8);
+    (*(s8 *)((u8 *)(&D_8FC02830) + (0))) = 0;
+    (*(s8 *)((u8 *)(&D_8FC02830) + (2))) = 0;
+    func_8FC0135C();
+}
 #endif
 
 #ifdef VERSION_US

@@ -34,5 +34,10 @@ void func_82906164(f32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_3422F0/func_829061CC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_3422F0/func_82906264.s")
+extern s32 D_82919DC0;
+extern s32 D_82919DC8;
+void func_82906264(s32 (*arg0)(s32, s32)) {
+    D_82919DC0 = arg0(0, 0);
+    D_82919DC8 = arg0(1, 0);
+}
 #endif

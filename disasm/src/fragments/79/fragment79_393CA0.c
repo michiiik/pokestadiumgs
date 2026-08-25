@@ -398,7 +398,13 @@ void func_84126A64(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84126BA8.s")
+extern void func_841246AC(s32, u8);
+void func_84126BA8(u8 arg0) {
+    func_84136678(arg0, -1);
+    func_84135B00(0xB5U);
+    func_841246AC((1 - arg0) & 0xFF, D_841951BF);
+    func_84136CA8();
+}
 #endif
 
 #ifdef VERSION_US
@@ -693,7 +699,13 @@ extern u8 D_841951BC; extern u8 *D_84195208[]; void func_8412BD14(void) { D_8419
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412C240.s")
+void func_8412C240(void) {
+    func_84136678(D_841951BC, -1);
+    func_84135B00(0x87U);
+    func_84134CBC(D_841951BC, 0U);
+    func_84134DD8(D_841951BF);
+    func_84136CA8();
+}
 #endif
 
 #ifdef VERSION_US
@@ -737,7 +749,15 @@ extern u8 D_841951BC; extern u8 *D_84195208[]; void func_8412BD14(void) { D_8419
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412CF84.s")
+extern void func_84126C3C(u8);
+void func_8412CF84(void) {
+    if (!((*(u8 *)((u8 *)(D_84195200[D_841951BC]) + (0x24))) & 7)) {
+        D_841951C8 = 0;
+        D_841951D2 = 1;
+        func_84126C3C(D_841951BC);
+        func_841254E0();
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1189,7 +1209,12 @@ void func_84130CC8(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84130D74.s")
+extern void func_84128B30();
+void func_84130D74(void) {
+    if (!((*(u8 *)((u8 *)(D_84195208[D_841951BC]) + (0xF))) & 4)) {
+        func_84128B30();
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1273,7 +1298,16 @@ void func_84130DDC(void) { D_84195208[D_841951BC][0xE] |= 1; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84132300.s")
+extern void func_84133C10(s32);
+extern void *D_84195204;
+void func_84132300(void) {
+    if ((*(u16 *)((u8 *)(*D_84195200) + (0x26))) == 0) {
+        func_84133C10(1);
+    }
+    if ((*(u16 *)((u8 *)(D_84195204) + (0x26))) == 0) {
+        func_84133C10(0);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1373,7 +1407,17 @@ void func_84133440(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84133984.s")
+extern void func_8412693C(u8);
+extern void func_84126994(u8);
+extern void func_841318C0(u8, u8);
+extern void func_84133924(u8);
+void func_84133984(u8 arg0, u8 arg1) {
+    func_84133924(arg0);
+    func_841318C0(arg0, arg1);
+    func_84126994(arg0);
+    func_8412693C(arg0);
+    func_84126A64();
+}
 #endif
 
 #ifdef VERSION_US
@@ -1648,7 +1692,19 @@ void func_84135998(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841359D0.s")
+extern void func_8413543C();
+extern u8 D_84195278;
+void func_841359D0(void) {
+    switch (D_84195278) {                           /* irregular */
+    case 1:
+        func_8413543C();
+        return;
+    case 2:
+    case 6:
+        func_84135998();
+        return;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1868,7 +1924,11 @@ void func_84136D40(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84138364.s")
+extern void func_84147228(s32, u8, s32, s32, s32);
+void func_84138364(u8 arg0) {
+    func_84147228(1, arg0, 0, 0xB, 0);
+    func_84147228(1, arg0, 0, 4, 4);
+}
 #endif
 
 #ifdef VERSION_US
@@ -2060,7 +2120,19 @@ void func_84136D40(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8413C7C0.s")
+extern void func_80007820(s32 *, s32);
+extern u8 D_800D0510;
+void func_8413C7C0(void) {
+    func_80007820(&D_800D0510, 1);
+    if ((*(u8 *)((u8 *)(D_84195280) + (0x4B02))) != 0) {
+        (*(u16 *)((u8 *)(D_84195280) + (0x4B06))) = 0x2DU;
+        (*(u8 *)((u8 *)(D_84195280) + (0x4B02))) = 0U;
+        (*(s8 *)((u8 *)(D_84195280) + (0x4B01))) = 5;
+    }
+    if ((s32) (*(u16 *)((u8 *)(D_84195280) + (0x4B06))) > 0) {
+        (*(u16 *)((u8 *)(D_84195280) + (0x4B06))) = (u16) ((*(u16 *)((u8 *)(D_84195280) + (0x4B06))) - 1);
+    }
+}
 #endif
 
 #ifdef VERSION_US

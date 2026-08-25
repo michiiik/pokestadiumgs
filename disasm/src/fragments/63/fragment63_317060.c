@@ -103,7 +103,11 @@ s32 func_87E15698(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E15A08.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E15A78.s")
+void func_87E15A78(void *arg0) {
+    if (((*(f32 *)((u8 *)(arg0) + (0))) == 0.0f) && ((*(f32 *)((u8 *)(arg0) + (4))) == 0.0f) && ((*(f32 *)((u8 *)(arg0) + (8))) == 0.0f)) {
+        (*(f32 *)((u8 *)(arg0) + (0))) = 1.0f;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E15AD0.s")
 
@@ -113,7 +117,17 @@ s32 func_87E15698(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E16200.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E1643C.s")
+void func_87E1643C(void *arg0, void *arg1, void *arg2, void *arg3) {
+    (*(f32 *)((u8 *)(arg0) + (0))) = (f32) (*(f32 *)((u8 *)(arg1) + (0)));
+    (*(f32 *)((u8 *)(arg0) + (4))) = (f32) (*(f32 *)((u8 *)(arg1) + (4)));
+    (*(f32 *)((u8 *)(arg0) + (8))) = (f32) (*(f32 *)((u8 *)(arg1) + (8)));
+    (*(f32 *)((u8 *)(arg0) + (0x10))) = (f32) (*(f32 *)((u8 *)(arg2) + (0)));
+    (*(f32 *)((u8 *)(arg0) + (0x14))) = (f32) (*(f32 *)((u8 *)(arg2) + (4)));
+    (*(f32 *)((u8 *)(arg0) + (0x18))) = (f32) (*(f32 *)((u8 *)(arg2) + (8)));
+    (*(f32 *)((u8 *)(arg0) + (0x20))) = (f32) (*(f32 *)((u8 *)(arg3) + (0)));
+    (*(f32 *)((u8 *)(arg0) + (0x24))) = (f32) (*(f32 *)((u8 *)(arg3) + (4)));
+    (*(f32 *)((u8 *)(arg0) + (0x28))) = (f32) (*(f32 *)((u8 *)(arg3) + (8)));
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E16488.s")
 
@@ -135,7 +149,12 @@ s32 func_87E15698(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E17484.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E176A0.s")
+extern void func_80038E14(s32, s32, s32, s32, f32, f32, f32, s32);
+extern void *D_87E1EC88;
+s32 func_87E176A0(s32 arg0, s32 arg1) {
+    func_80038E14(arg1, (*(s32 *)((u8 *)(D_87E1EC88) + (0x1158))), (*(s32 *)((u8 *)(D_87E1EC88) + (0x115C))), (*(s32 *)((u8 *)(D_87E1EC88) + (0x1160))), (*(f32 *)((u8 *)(D_87E1EC88) + (0x1164))), (*(f32 *)((u8 *)(D_87E1EC88) + (0x1168))), (*(f32 *)((u8 *)(D_87E1EC88) + (0x116C))), 0);
+    return 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E176FC.s")
 

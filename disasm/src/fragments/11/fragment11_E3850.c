@@ -2,5 +2,10 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E3850/func_8160BCB0.s")
+f32 func_8160BCB0(f32 arg0, f32 arg1) {
+    if (arg1 == 0.0f) {
+        return 0.0f;
+    }
+    return arg0 - ((f32) (s32) (arg0 / arg1) * arg1);
+}
 #endif

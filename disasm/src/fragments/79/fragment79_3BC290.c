@@ -77,7 +77,23 @@ void func_8414CDB8(u8 *arg0, u8 arg1, u8 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414ECE0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414ED5C.s")
+extern void func_8414D720(s32, u8);
+extern void func_8414E880(s32);
+extern void func_8414EC18(s32);
+u8 func_84154B24();
+void func_8414ED5C(s32 arg0) {
+    u8 sp1F;
+    u8 sp1E;
+    u8 temp_v0;
+
+    temp_v0 = func_84154B24();
+    sp1F = temp_v0;
+    sp1E = 1 - temp_v0;
+    func_8414E880(arg0);
+    func_8414EC18(arg0);
+    func_8414D720(arg0, sp1F);
+    func_8414D720(arg0, sp1E);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414EDB4.s")
 #endif

@@ -31,9 +31,32 @@ void func_82911850(void) {
     func_80008648();
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_34C8B0/func_82911880.s")
+extern void func_80007AEC(s32);
+extern s32 D_8291BE70;
+void func_82911880(void) {
+    s32 var_s0;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_34C8B0/func_829118D4.s")
+    func_80007AEC(0xC);
+    var_s0 = 0;
+    do {
+        func_82911850();
+        var_s0 += 1;
+    } while (var_s0 != 0xC);
+    D_8291BE70 = 1;
+}
+
+extern void func_80064D28();
+extern void func_82910258();
+extern s32 D_8291BE70;
+void func_829118D4(void) {
+    if (D_8291BE70 != 0) {
+        do {
+            func_80064D28();
+            func_82910258();
+            func_82911850();
+        } while (D_8291BE70 != 0);
+    }
+}
 
 extern void func_80007B34(s32);
 void func_8291192C(void) {

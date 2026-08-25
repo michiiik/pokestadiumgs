@@ -67,7 +67,19 @@ void func_8290FA9C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_34B0F0/func_8290FACC.s")
+extern void func_80007B34(s32);
+extern void func_800225C4(s32);
+void func_8290FACC(void) {
+    s32 var_s0;
+
+    func_800225C4(0x10);
+    func_80007B34(0x10);
+    var_s0 = 0;
+    do {
+        func_8290FA00();
+        var_s0 += 1;
+    } while (var_s0 != 0x10);
+}
 #endif
 
 #ifdef VERSION_US
