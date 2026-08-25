@@ -10,7 +10,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/23/fragment23_code/func_82A005D8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/23/fragment23_code/func_82A00784.s")
+s32 func_82A00784(s32 arg0, u8 *arg1) { if (arg0 == 0) { (*(u16 *)((u8 *)arg1 + 2)) &= 0xFFFD; } return 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/23/fragment23_code/func_82A007A0.s")
 
