@@ -10,7 +10,8 @@ void func_87E0F170(void) {
     base[4] = 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E0F188.s")
+extern u32 D_87E1EBB8;
+void func_87E0F188(s32 arg0) { u8 *base = (u8 *)(u32)D_87E1EBB8; if ((*(s32 *)base != arg0) && ((*(s8 *)(base + 4) & 1) == 0)) { *(s32 *)base = arg0; *(s16 *)(base + 6) = 0; *(u8 *)(base + 4) = 1; } }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E0F1C4.s")
 

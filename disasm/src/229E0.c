@@ -564,7 +564,9 @@ void func_80028EA8(void) { extern u8 D_80091B90[]; func_80028D9C(D_80091B90); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002A7A8.s")
+extern u16 D_80090BA0;
+extern u8 D_800D2650[];
+void func_8002A7A8(s32 arg0, s32 arg1) { D_800D2650[0] = arg0; D_800D2650[1] = arg1; D_800D2650[3] = D_80090BA0; if (D_80090BA0 == 1) D_800D2650[2] = 1; else D_800D2650[2] = 0; D_800D2650[4] = 0; *(u32 *)(D_800D2650 + 8) = 0; }
 #endif
 
 #ifdef VERSION_US

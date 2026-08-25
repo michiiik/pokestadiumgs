@@ -1554,7 +1554,16 @@ void func_84135034(u8 arg0, u8 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841350AC.s")
+void func_841350AC(u8 arg0, u8 arg1, u8 arg2) {
+    if (arg0 < 4) {
+        u8 *ptr = D_84186160[arg0];
+        u8 *base = ptr + 8;
+        if (ptr != NULL) {
+            base[2] = arg1;
+            base[3] = arg2;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
