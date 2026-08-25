@@ -472,7 +472,20 @@ void func_80028118(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80028140.s")
+extern u8 D_800D1A70;
+extern u8 D_800D1A78;
+extern u8 D_800D1A80;
+extern u8 D_800D1A82;
+void func_80028140(void) {
+    (*(s32 *)((u8 *)(&D_800D1A70) + (0))) = -1;
+    (*(s32 *)((u8 *)(&D_800D1A70) + (4))) = -1;
+    (*(s32 *)((u8 *)(&D_800D1A78) + (0))) = -1;
+    (*(s32 *)((u8 *)(&D_800D1A78) + (4))) = -1;
+    (*(s8 *)((u8 *)(&D_800D1A80) + (0))) = 0x7F;
+    (*(s8 *)((u8 *)(&D_800D1A80) + (1))) = 0x7F;
+    (*(s8 *)((u8 *)(&D_800D1A82) + (0))) = 0;
+    (*(s8 *)((u8 *)(&D_800D1A82) + (1))) = 0;
+}
 #endif
 
 #ifdef VERSION_US

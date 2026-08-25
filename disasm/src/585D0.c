@@ -780,7 +780,19 @@ void func_8005E07C(s32 arg0, u8 arg1) { u8 *entry = D_80128570 + arg0 * 0x70; if
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005E304.s")
+s32 func_8005E304(s32 arg0, void *arg1) {
+    s32 temp_v1;
+    void *temp_v0;
+
+    temp_v0 = (arg0 * 0x70) + D_80128570;
+    temp_v1 = ((*(s32 *)((u8 *)(temp_v0) + (0))) & 1) != 0;
+    if (temp_v1 != 0) {
+        (*(u8 *)((u8 *)(arg1) + (0))) = (u8) (*(u8 *)((u8 *)(temp_v0) + (4)));
+        (*(s8 *)((u8 *)(arg1) + (1))) = (s8) (*(u16 *)((u8 *)(temp_v0) + (6)));
+        (*(u16 *)((u8 *)(arg1) + (2))) = (u16) (*(u16 *)((u8 *)(temp_v0) + (0x50)));
+    }
+    return temp_v1;
+}
 #endif
 
 #ifdef VERSION_US
