@@ -2,7 +2,45 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_372DE0/func_84103550.s")
+typedef struct S1_arg1_func_80019420 {
+    /* 0x00 */ s8 unk_00;
+    /* 0x02 */ s16 unk_02;
+    /* 0x04 */ void* unk_04;
+} S1_arg1_func_80019420;
+extern u8* D_8418CA20[256];
+typedef float S1_MtxF_t[4][4];
+typedef union {
+    S1_MtxF_t mf;
+    struct {
+        float xx, yx, zx, wx,
+              xy, yy, zy, wy,
+              xz, yz, zz, wz,
+              xw, yw, zw, ww;
+    };
+} S1_MtxF;
+extern Gfx* D_800D0510;
+extern f32 D_80087E50[];
+extern f32 D_80088E50[0x1000];
+typedef struct S1_Vec3f {
+    /* 0x0 */ f32 x;
+    /* 0x4 */ f32 y;
+    /* 0x8 */ f32 z;
+} S1_Vec3f;
+typedef struct S1_Vec3s {
+    /* 0x0 */ s16 x;
+    /* 0x2 */ s16 y;
+    /* 0x4 */ s16 z;
+} S1_Vec3s;
+void func_84103550(S1_arg1_func_80019420* arg0) {
+    if (arg0 != NULL) {
+        do {
+            if (arg0->unk_02 != 0) {
+                D_8418CA20[arg0->unk_02] = arg0->unk_04;
+                arg0++;
+            }
+        } while (arg0->unk_00 != 0);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_372DE0/func_8410358C.s")
 
@@ -49,9 +87,49 @@ void func_841036E8(s32 arg0, s16 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_372DE0/func_84103D2C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_372DE0/func_84103EA8.s")
+void func_84103EA8(S1_MtxF* arg0, S1_MtxF* arg1, S1_Vec3f arg2, f32 arg3) {
+    arg0->mf[0][0] = arg1->mf[0][0] * arg3;
+    arg0->mf[0][1] = arg1->mf[1][0] * arg3;
+    arg0->mf[0][2] = arg1->mf[2][0] * arg3;
+    arg0->mf[0][3] = 0.0f;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_372DE0/func_84103F58.s")
+    arg0->mf[1][0] = arg1->mf[0][1] * arg3;
+    arg0->mf[1][1] = arg1->mf[1][1] * arg3;
+    arg0->mf[1][2] = arg1->mf[2][1] * arg3;
+    arg0->mf[1][3] = 0.0f;
+
+    arg0->mf[2][0] = arg1->mf[0][2] * arg3;
+    arg0->mf[2][1] = arg1->mf[1][2] * arg3;
+    arg0->mf[2][2] = arg1->mf[2][2] * arg3;
+    arg0->mf[2][3] = 0.0f;
+
+    arg0->mf[3][0] = arg2.x;
+    arg0->mf[3][1] = arg2.y;
+    arg0->mf[3][2] = arg2.z;
+    arg0->mf[3][3] = 1.0f;
+}
+
+void func_84103F58(S1_MtxF* arg0, S1_MtxF* arg1, S1_Vec3f arg2, f32 arg3) {
+    arg0->mf[0][0] = arg1->mf[0][0];
+    arg0->mf[0][1] = arg1->mf[1][0];
+    arg0->mf[0][2] = arg1->mf[2][0];
+    arg0->mf[0][3] = 0.0f;
+
+    arg0->mf[1][0] = arg1->mf[0][1] * arg3;
+    arg0->mf[1][1] = arg1->mf[1][1] * arg3;
+    arg0->mf[1][2] = arg1->mf[2][1] * arg3;
+    arg0->mf[1][3] = 0.0f;
+
+    arg0->mf[2][0] = arg1->mf[0][2];
+    arg0->mf[2][1] = arg1->mf[1][2];
+    arg0->mf[2][2] = arg1->mf[2][2];
+    arg0->mf[2][3] = 0.0f;
+
+    arg0->mf[3][0] = arg2.x;
+    arg0->mf[3][1] = arg2.y;
+    arg0->mf[3][2] = arg2.z;
+    arg0->mf[3][3] = 1.0f;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_372DE0/func_84103FF0.s")
 

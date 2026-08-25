@@ -259,7 +259,99 @@ void func_80071068(float arg0[4][4]) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_800710A8.s")
+typedef struct S1_SomeStruct {
+    u32 padding[0x0C];
+} S1_SomeStruct;
+typedef struct S1_Vec3f {
+    /* 0x0 */ f32 x;
+    /* 0x4 */ f32 y;
+    /* 0x8 */ f32 z;
+} S1_Vec3f;
+typedef struct S1_PosBlend {
+    /* 0x00 */ S1_Vec3f base;
+    /* 0x0C */ S1_Vec3f offset;
+} S1_PosBlend;
+typedef struct S1_ModelSegment {
+    /* 0x00 */ u16 type;
+    /* 0x02 */ u16 nodeCount;
+    /* 0x04 */ u16 vertexCount;
+    /* 0x06 */ u16 triangleCount;
+    /* 0x08 */ u32 indexSegment;
+    /* 0x0C */ u32 childIndexSegment; // Model_BuildVertexRuntimeData: -1-terminated per-vertex child-index lists
+    /* 0x10 */ u32 tableSegment;
+    /* 0x14 */ u32 remapSegment;
+    /* 0x18 */ u32 vertexSegment;
+    /* 0x1C */ Gfx* displayList;
+} S1_ModelSegment;
+typedef float S1_MtxF_t[4][4];
+typedef union {
+    S1_MtxF_t mf;
+    struct {
+        float xx, yx, zx, wx,
+              xy, yy, zy, wy,
+              xz, yz, zz, wz,
+              xw, yw, zw, ww;
+    };
+} S1_MtxF;
+typedef struct S1_StadiumTransform {
+    /* 0x00 */ s32  unk_00;
+    /* 0x04 */ f32  maxDist;
+    /* 0x08 */ f32  x0;
+    /* 0x0C */ f32  y0;
+    /* 0x10 */ f32  z0;
+    /* 0x14 */ f32  x1;
+    /* 0x18 */ f32  y1;
+    /* 0x1C */ f32  z1;
+    /* 0x20 */ f32  x2;
+    /* 0x24 */ f32  y2;
+    /* 0x28 */ f32  z2;
+    /* 0x2C */ f32  x3;
+    /* 0x30 */ f32  y3;
+    /* 0x34 */ f32  z3;
+    /* 0x38 */ S1_MtxF* mtx;
+} S1_StadiumTransform;
+typedef struct S1_ModelTransformCmd {
+    /* 0x00 */ s16 targetIndex;
+    /* 0x02 */ s16 sourceIndex;
+    /* 0x04 */ s16 enableFrom;
+    /* 0x06 */ s16 enableTo;
+    /* 0x08 */ f32 blendWeight;
+} S1_ModelTransformCmd;
+typedef struct S1_ModelVertex {
+    /* 0x00 */ s16 jointIndex;      // bone / transform index
+    /* 0x02 */ s16 parentIndex;     // parent bone index
+    /* 0x04 */ s16 childIndex;      // child / next transform
+    /* 0x06 */ u16  pad06;
+    /* 0x08 */ S1_ModelTransformCmd cmd;
+    /* 0x14 */ u8   pad14[0xC];
+    /* 0x20 */ f32 linkDistance; // Model_LinkNearestVertices: compared against a distance threshold to find nextIndex
+    /* 0x24 */ u8  pad24[0x40];
+    /* 0x64 */ S1_PosBlend position;   // base + animated offset
+    /* 0x7C */ f32 colorR;          // vertex color (float)
+    /* 0x80 */ f32 colorG;
+    /* 0x84 */ f32 colorB;
+    /* 0x88 */ s16 texS;            // texture coordinate S
+    /* 0x8A */ s16 texT;            // texture coordinate T
+    /* 0x8C */ u8  alpha;           // vertex alpha
+    /* 0x8D */ u8  pad8D;
+    /* 0x8E */ u16 disabled;      // enable / visibility / animation flags
+    /* 0x90 */ s16 drawGroup;       // render group / material group
+    /* 0x92 */ s16 nextIndex;       // linked-list / chain index
+} S1_ModelVertex;
+typedef struct S1_StadiumModel {
+    /* 0x00 */  s16 unk_00;
+    /* 0x02 */  s16 transformCount; // Model_ApplyVertexTransforms/LinkNearestVertices loop bound
+    /* 0x04 */  S1_StadiumTransform transforms[5];
+    /* 0x130 */ u32 modelSegment;
+    /* 0x134 */ s8 pad134[0x24];
+    /* 0x158 */ S1_Vec3f position;
+    /* 0x164 */ s8 pad164[0xC];
+    /* 0x170 */ S1_ModelVertex mvtx;
+} S1_StadiumModel;
+extern Mtx D_80129038;
+void func_800710A8(Gfx* arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6, s32 arg7, s32 arg8, s32 arg9, s32 arg10, s32 arg11, s32 arg12, s32 arg13, s32 arg14, s32 arg15, s32 arg16) {
+    gDPSetCombine(arg0++, GCCc0w0(arg1, arg3, arg5, arg7) | GCCc1w0(arg9, arg11), GCCc0w1(arg2, arg4, arg6, arg8) | GCCc1w1(arg10, arg13, arg15, arg12, arg14, arg16));
+}
 #endif
 
 void func_800711A8(void) {

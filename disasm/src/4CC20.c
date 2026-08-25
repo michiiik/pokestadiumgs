@@ -134,7 +134,32 @@ s32 func_8004D6D8(s32 value) { s32 result = 0; s32 ptr = D_80097120; if (ptr != 
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D720.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D7F8.s")
+typedef union S1_arg1_func_80010CA8 {
+    struct {
+        /* 0x00 */ s16 unk_00;
+        /* 0x02 */ s8 unk_02;
+        /* 0x03 */ s8 unk_03;
+    };
+    u32 raw;
+} S1_arg1_func_80010CA8;
+void func_8004D7F8(u16* arg0, s32 a1, S1_arg1_func_80010CA8 arg2) {
+    s32 cond;
+    s32 arg1 = a1;
+
+    if (!arg0) {}
+
+    arg1 *= 2;
+    osInvalDCache(arg0, arg1);
+
+    cond = arg1 >= 2;
+    arg1 -= 2;
+    // clang-format off
+    while (cond != 0) {
+        *arg0 = func_80037B08(*arg0, arg2);        cond = arg1 >= 2;        arg1 -= 2;
+        arg0++;
+    }
+    // clang-format on
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D878.s")
 

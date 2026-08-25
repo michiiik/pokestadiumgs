@@ -2,7 +2,39 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/7A50/func_80006E50.s")
+typedef struct S1_unk_D_800A7440 {
+	/* 0x00 */ s16 x1;
+	/* 0x02 */ s16 y1;
+	/* 0x04 */ s16 x2;
+	/* 0x06 */ s16 y2;
+} S1_unk_D_800A7440;
+typedef struct S1_unk_D_80068BB0 {
+	/* 0x00 */ u16 fmt;
+	/* 0x02 */ u16 size;
+	/* 0x04 */ u16 width;
+	/* 0x06 */ u16 height;
+	/* 0x08 */ u8* img_p;
+	/* 0x0C */ struct S1_unk_D_80068BB0* depth_p;
+} S1_unk_D_80068BB0;
+S1_unk_D_800A7440* func_80006E50(S1_unk_D_800A7440* arg0, s16 x1, s16 y1, s16 x2, s16 y2) {
+    if (x2 >= x1) {
+        arg0->x1 = x1;
+        arg0->y1 = x2;
+    } else {
+        arg0->x1 = x2;
+        arg0->y1 = x1;
+    }
+
+    if (y2 >= y1) {
+        arg0->x2 = y2;
+        arg0->y2 = y1;
+    } else {
+        arg0->y2 = y2;
+        arg0->x2 = y1;
+    }
+
+    return arg0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/7A50/func_80006EC0.s")
 

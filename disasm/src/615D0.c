@@ -139,7 +139,28 @@ s32 func_80062030(s32 value) { if (value > 0 && value < 0xFC) return value; retu
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_8006218C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80062238.s")
+typedef struct S1_DeckHandle {
+    /* 0x00 */ u8 mode; // func_8006218C's arg3; ==1 selected by Deck_Initialize*Backend to reset the entry count
+    /* 0x01 */ u8 deckType; // func_8006218C's arg0; high nibble dispatches Deck_InitializeSaveBackend(0x10)/InitializeBoxBackend(0x20)
+    /* 0x02 */ u8 port; // func_8006218C's arg1
+    /* 0x03 */ u8 slot; // func_8006218C's arg2 (box/save-record index)
+    /* 0x04 */ u8 dirty; // bit 0 set when the deck was modified; checked by Deck_CloseAndFlush/CloseAndFlushBox to decide whether to commit
+    /* 0x05 */ u8 recordSize; // Deck_GetSaveRecordSize/Deck_GetEntrySize
+    /* 0x06 */ s16 capacity; // Deck_GetSaveRecordCapacity/Deck_GetCapacity
+    /* 0x08 */ s16 count; // Deck_GetSaveEntryCount/Deck_GetCount
+    /* 0x0A */ s16 cursor; // Deck_SetCursor
+} S1_DeckHandle;
+S1_DeckHandle* func_80062238(s32 arg0, s32 arg1, s32 arg2, s32 arg3, char* arg4, u16 arg5) {
+    S1_DeckHandle* sp24;
+    S1_DeckHandle* temp_v0;
+    S1_DeckHandle* var_v1;
+
+    sp24 = func_8006218C(arg0, arg1, arg2, 1);
+    if ((sp24 != NULL) && (arg0 & 0xF0)) {
+        func_800535D4(arg0, arg2, arg3, arg4, arg5);
+    }
+    return sp24;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_8006229C.s")
 

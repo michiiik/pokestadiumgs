@@ -48,7 +48,21 @@ s16 func_80064CDC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/func_80064CE8.s")
+typedef s32 (*S1_FragmentEntry)(s32, s32);
+extern u8 fragment24_ROM_START[];
+extern u8 fragment23_ROM_START[];
+s32 func_80064CE8(s32 arg0, u8* romStart, u8* romEnd, u32 arg3, u32 arg4) {
+    s32 result;
+    S1_FragmentEntry func;
+
+    func = func_800047F8(arg0, romStart, romEnd);
+
+    result = func(arg3, arg4);
+
+    func_800029E0(func);
+
+    return result;
+}
 #endif
 
 #ifdef VERSION_US

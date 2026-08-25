@@ -2,7 +2,10 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C00020.s")
+extern Gfx* D_800D0510;
+void func_82C00020(u8 r, u8 g, u8 b, u8 a) {
+    gDPSetPrimColor(D_800D0510++, 0, 0, r, g, b, a);
+}
 #endif
 
 #ifdef VERSION_US
