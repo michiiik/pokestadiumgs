@@ -31,7 +31,13 @@ drafts); pass ``--near-miss-labels`` to restrict it to one or more prefixes.
 It skips owners that already have a ``permute:`` attempt on file (a previous
 near-miss run), unless ``--near-miss-retry`` is given, and
 ``--near-miss-parallel`` runs multiple ``decomp-permuter`` budgets
-concurrently while still gating each result sequentially.
+concurrently while still gating each result sequentially.  It also skips a
+stats row whose function no longer owns a pragma (a later run already
+accepted it) before spending a permuter budget on it.  Owners whose best
+recorded attempt is ``register_allocation_only`` or ``immediate_drift`` tend
+to need more search time than a real semantic gap; give them a longer
+``--near-miss-seconds``, or pass ``--near-miss-kind-seconds`` to give only
+those two mismatch kinds a separate, longer budget.
 """
 
 from __future__ import annotations
@@ -149,13 +155,57 @@ def compile_failure_candidates(
     return candidates
 
 
+def _is_prototype_line(line: str) -> bool:
+    """Whether a leading declaration-block line is a bare function prototype.
+
+    Matches ``<type> (*name(args))(args);`` (a function-pointer-returning
+    prototype) and plain ``<ret> name(args);`` -- both without the
+    ``extern`` keyword (handled separately by ``EXTERN_LINE_RE``) but
+    structurally a declaration rather than the start of a definition, which
+    opens a ``{`` body instead of ending in ``;``.
+    """
+    text = line.strip()
+    if not text or "{" in text or "}" in text:
+        return False
+    return text.endswith(";") and "(" in text and not text.startswith("extern")
+
+
+def _declaration_symbol(line: str) -> str | None:
+    """Return the symbol name one extern/prototype declaration line declares."""
+    text = line.strip().rstrip(";").strip()
+    if not text:
+        return None
+    match = re.search(r"\(\*\s*(\w+)\s*\(", text)
+    if match:
+        return match.group(1)
+    paren = text.find("(")
+    head = text[:paren] if paren != -1 else text
+    tokens = re.findall(r"\w+", head)
+    return tokens[-1] if tokens else None
+
+
+def _declaration_symbols(declarations: str) -> dict[str, str]:
+    """Map each symbol declared in a declarations block to its exact line."""
+    symbols: dict[str, str] = {}
+    for line in declarations.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        name = _declaration_symbol(line)
+        if name:
+            symbols[name] = line
+    return symbols
+
+
 def split_candidate_declarations(code: str) -> tuple[str, str]:
-    """Separate leading m2c externs so compatible gate batches can share them."""
+    """Separate leading m2c externs/prototypes so compatible gate batches can share them."""
     declarations: list[str] = []
     body: list[str] = []
     in_prefix = True
     for line in code.splitlines():
-        if in_prefix and (not line.strip() or EXTERN_LINE_RE.match(line)):
+        if in_prefix and (
+            not line.strip() or EXTERN_LINE_RE.match(line) or _is_prototype_line(line)
+        ):
             if line.strip():
                 declarations.append(line.strip())
             continue
@@ -165,6 +215,60 @@ def split_candidate_declarations(code: str) -> tuple[str, str]:
     declaration_text = "\n".join(unique) + ("\n" if unique else "")
     body_text = "\n".join(body).strip() + "\n"
     return declaration_text, body_text
+
+
+def partition_gate_batches(
+    gate_batches: dict[str, list[tuple[str, str, str]]],
+    *,
+    source_rel: str,
+    family_of: dict[str, str],
+    summary: dict[str, collections.Counter],
+) -> list[tuple[str, list[tuple[str, str, str]]]]:
+    """Order gate batches by size, deferring any whose declarations conflict.
+
+    Two declaration blocks that declare the same symbol with different text
+    cannot both be installed in the same source: m2c commonly infers a
+    different prototype for the same callee across different owners'
+    drafts (see the runner's incremental installer, which otherwise has to
+    discover this the hard way per batch).  The larger group (ties: first
+    seen) gates first; a smaller group that conflicts with an
+    already-committed prototype is deferred instead of being sent through a
+    combined install that is doomed to fail to compile.
+    """
+    batch_order = sorted(gate_batches.items(), key=lambda item: -len(item[1]))
+    committed_symbols: dict[str, str] = {}
+    active: list[tuple[str, list[tuple[str, str, str]]]] = []
+    for declarations, batch in batch_order:
+        symbols = _declaration_symbols(declarations)
+        conflicts = {
+            name: text
+            for name, text in symbols.items()
+            if name in committed_symbols and committed_symbols[name] != text
+        }
+        if conflicts:
+            functions = [function for function, _, _ in batch]
+            print(
+                f"{source_rel}: prototype conflict on {', '.join(sorted(conflicts))}; "
+                f"deferring {', '.join(functions)}",
+                file=sys.stderr,
+            )
+            for function in functions:
+                summary[family_of[function]]["deferred_conflicting_prototype"] += 1
+            continue
+        committed_symbols.update(symbols)
+        active.append((declarations, batch))
+    return active
+
+
+def _accumulate_timing(total: dict[str, float], result: dict[str, object]) -> None:
+    """Add one runner result's ``timing`` into a sweep-wide running total."""
+    timing = result.get("timing")
+    if not isinstance(timing, dict):
+        return
+    for key in ("probe_seconds", "gate_seconds", "gate_runs", "install_compiles"):
+        value = timing.get(key)
+        if isinstance(value, (int, float)):
+            total[key] = total.get(key, 0) + value
 
 
 def padding_retry(attempt: dict[str, object]) -> int | None:
@@ -184,6 +288,34 @@ def padding_retry(attempt: dict[str, object]) -> int | None:
         return None
     padding = expected - actual
     return padding if padding % 4 == 0 else None
+
+
+FUNCPTR_PROTOTYPE_RE = re.compile(r"\(\*\s*(\w+)\s*\([^)]*\)\)\s*\(([^)]*)\)\s*;")
+
+
+def callee_unprototyped_variant(code: str) -> str | None:
+    """Erase a function-pointer-returning prototype's callee parameter list.
+
+    m2c infers a different parameter list for the same shared callee from
+    each owner's usage -- for example ``s32 (*func_80003240(s32 *))(s32);``
+    in one owner versus ``...)(s32 *);`` in another -- which makes a
+    combined install across those owners fail to compile even though each
+    compiles alone.  Rewriting the callee's parameter list to ``()``
+    sidesteps the conflict; this is only a hypothesis, so whether the body
+    still matches is left entirely to the probe like every other type
+    guess.  Returns ``None`` when ``code`` has no such prototype.
+    """
+    if not FUNCPTR_PROTOTYPE_RE.search(code):
+        return None
+
+    def erase_callee_params(match: re.Match[str]) -> str:
+        text = match.group(0)
+        params = match.group(2)
+        offset = match.start(2) - match.start(0)
+        return text[:offset] + text[offset + len(params):]
+
+    rewritten = FUNCPTR_PROTOTYPE_RE.sub(erase_callee_params, code)
+    return rewritten if rewritten != code else None
 
 
 def draft_variants(
@@ -212,6 +344,10 @@ def draft_variants(
             continue
         seen.add(code)
         variants.append((f"m2c:{name}", code))
+        unprototyped = callee_unprototyped_variant(code)
+        if unprototyped is not None and unprototyped not in seen:
+            seen.add(unprototyped)
+            variants.append((f"m2c:{name}:callee-unprototyped", unprototyped))
     return variants, draft
 
 
@@ -350,6 +486,7 @@ def near_miss(
     stats_path: Path = targets.STATS_PATH,
     minimum_similarity: float = 0.9,
     seconds: float = 45.0,
+    kind_seconds: float | None = None,
     threads: int = 4,
     workers: int | None = None,
     limit: int | None = None,
@@ -367,6 +504,15 @@ def near_miss(
     many ``decomp-permuter`` budgets concurrently; gating a score-0 output
     still happens on the main thread as each permute job completes, since it
     holds the runner's cross-process transaction lock.
+
+    A candidate whose owner no longer holds a ``GLOBAL_ASM`` pragma (a later
+    full-gate acceptance from a different run solved it since these stats
+    were recorded) is skipped before it ever reaches the permuter and is
+    counted in the result's ``skipped_solved``.  ``kind_seconds`` gives a
+    longer budget than ``seconds`` to owners whose recorded best attempt is
+    ``register_allocation_only`` or ``immediate_drift`` -- these are cases
+    where the permuter is reordering declarations/temporaries rather than
+    searching a real semantic gap, so a longer budget tends to pay off.
     """
     grouped: dict[str, dict[str, object]] = {}
     permuted_functions: set[str] = set()
@@ -405,6 +551,7 @@ def near_miss(
                 "label": label,
                 "similarity_score": float(score),
                 "best_status": status,
+                "mismatch_kind": attempt.get("mismatch_kind"),
                 "statuses": set(),
             })
             statuses = row["statuses"]
@@ -427,6 +574,7 @@ def near_miss(
                     "label": label,
                     "similarity_score": float(score),
                     "best_status": status,
+                    "mismatch_kind": attempt.get("mismatch_kind"),
                 })
 
     candidates = [
@@ -439,18 +587,40 @@ def near_miss(
         candidates = [row for row in candidates if str(row["function"]) not in permuted_functions]
         skipped_permuted = before - len(candidates)
     candidates.sort(key=lambda row: (-float(row["similarity_score"]), str(row["function"])))
+
+    # A stats row can outlive the pragma it was recorded against: a later
+    # run (this one's own earlier source, or a different session) may have
+    # already installed a full-gate winner for the same function.  Check
+    # ownership before spending a permuter budget on it, not after --
+    # ``require_owner`` is cheap, ``decomp-permuter`` is not.
+    owned_candidates: list[dict[str, object]] = []
+    skipped_solved = 0
+    for row in candidates:
+        try:
+            targets.require_owner(str(row["function"]))
+        except KeyError:
+            skipped_solved += 1
+            continue
+        owned_candidates.append(row)
+    candidates = owned_candidates
+
     if limit is not None:
         candidates = candidates[:max(0, limit)]
+
+    _LONGER_BUDGET_KINDS = {"register_allocation_only", "immediate_drift"}
 
     def permute_job(row: dict[str, object]) -> tuple[dict[str, object], dict[str, object] | None, str | None]:
         function = str(row["function"])
         candidate = str(row["candidate"])
+        budget = seconds
+        if kind_seconds is not None and row.get("mismatch_kind") in _LONGER_BUDGET_KINDS:
+            budget = kind_seconds
         try:
             permutation = permute_candidate.permute(
                 function,
                 candidate,
                 declarations=row.get("declarations") if isinstance(row.get("declarations"), str) else None,
-                seconds=seconds,
+                seconds=budget,
                 threads=threads,
                 stop_on_zero=True,
             )
@@ -515,6 +685,7 @@ def near_miss(
         "accepted": accepted,
         "attempts": attempts,
         "skipped_permuted": skipped_permuted,
+        "skipped_solved": skipped_solved,
     }
 
 
@@ -555,6 +726,9 @@ def sweep(
     summary: dict[str, collections.Counter] = collections.defaultdict(collections.Counter)
     accepted_functions: list[str] = []
     touched_sources: list[str] = []
+    sweep_timing: dict[str, float] = {
+        "probe_seconds": 0.0, "gate_seconds": 0.0, "gate_runs": 0, "install_compiles": 0,
+    }
     started = time.monotonic()
 
     # Phase 1: draft every remaining owner's m2c candidates through a pool.
@@ -653,6 +827,7 @@ def sweep(
             print(f"{source_rel}: probe pass failed: {error}", file=sys.stderr)
             summary["_errors"]["probe_pass_failed"] += 1
             continue
+        _accumulate_timing(sweep_timing, probe)
         # Compile failures are useful diagnostics, not dead ends.  Feed a
         # small, diagnostic-selected family of extra type spellings through a
         # second isolated pass before deciding which bodies reach the gate.
@@ -690,6 +865,7 @@ def sweep(
                     gate=False,
                     probe_workers=workers,
                 )
+                _accumulate_timing(sweep_timing, extra_probe)
                 offset = len(blocks)
                 for attempt in extra_probe["attempts"]:
                     attempt["index"] = int(attempt["index"]) + offset
@@ -726,7 +902,9 @@ def sweep(
             gate_attempts: list[dict[str, object]] = []
             gate_accepted: list[str] = []
             gate_statuses: list[str] = []
-            for declarations, batch in gate_batches.items():
+            for declarations, batch in partition_gate_batches(
+                gate_batches, source_rel=source_rel, family_of=family_of, summary=summary
+            ):
                 try:
                     gate_result = runner.try_candidates_detailed(
                         source_path,
@@ -741,6 +919,7 @@ def sweep(
                     summary["_errors"]["gate_pass_failed"] += 1
                     gate_statuses.append("gate_pass_failed")
                     continue
+                _accumulate_timing(sweep_timing, gate_result)
                 gate_statuses.append(str(gate_result.get("batch_status")))
                 gate_attempts.extend(gate_result.get("attempts", []))
                 gate_accepted.extend(str(name) for name in gate_result.get("accepted", []))
@@ -797,6 +976,12 @@ def sweep(
         "touched_sources": sorted(set(touched_sources)),
         "elapsed_seconds": round(time.monotonic() - started, 1),
         "draft_seconds": draft_seconds,
+        "timing": {
+            "probe_seconds": round(sweep_timing["probe_seconds"], 3),
+            "gate_seconds": round(sweep_timing["gate_seconds"], 3),
+            "gate_runs": int(sweep_timing["gate_runs"]),
+            "install_compiles": int(sweep_timing["install_compiles"]),
+        },
         "summary": {family: dict(sorted(counter.items())) for family, counter in sorted(summary.items())},
     }
 
@@ -813,9 +998,22 @@ def main() -> int:
     parser.add_argument("--json", type=Path, help="write the summary to this file")
     parser.add_argument("--skip-attempted", action="store_true", help="skip (function, variant label) pairs that already have m2c sweep attempts in the stats file")
     parser.add_argument("--fragment-range", type=str, help="inclusive fragment band, e.g. 17-32")
-    parser.add_argument("--near-miss", action="store_true", help="permute rejects at similarity >= 0.9")
+    parser.add_argument("--near-miss", action="store_true", help="permute rejects at similarity >= --near-miss-min-similarity")
     parser.add_argument("--stats", type=Path, default=targets.STATS_PATH, help="probe stats JSONL for --near-miss")
     parser.add_argument("--near-miss-seconds", type=float, default=45.0)
+    parser.add_argument(
+        "--near-miss-min-similarity", type=float, default=0.9,
+        help="minimum recorded similarity score to consider a candidate",
+    )
+    parser.add_argument(
+        "--near-miss-kind-seconds", type=float, default=None,
+        help=(
+            "permuter budget for owners whose best recorded attempt is "
+            "register_allocation_only or immediate_drift, instead of "
+            "--near-miss-seconds; these mismatch kinds tend to need more search "
+            "time than a real semantic gap"
+        ),
+    )
     parser.add_argument("--near-miss-threads", type=int, default=4)
     parser.add_argument("--near-miss-limit", type=int)
     parser.add_argument("--near-miss-parallel", type=int, default=1, help="concurrent decomp-permuter budgets")
@@ -828,7 +1026,9 @@ def main() -> int:
         ) or None
         result = near_miss(
             stats_path=args.stats,
+            minimum_similarity=args.near_miss_min_similarity,
             seconds=args.near_miss_seconds,
+            kind_seconds=args.near_miss_kind_seconds,
             threads=args.near_miss_threads,
             workers=args.workers,
             limit=args.near_miss_limit,
