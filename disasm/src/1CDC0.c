@@ -43,7 +43,15 @@ void func_8001CB1C(void *arg0, void *arg1)
   }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/1CDC0/func_8001CB5C.s")
+s32 func_8001CB5C(void *arg0) {
+    void *node = *(void **)arg0;
+    if (node == arg0) return 0;
+    *(void **)((u8 *)*(void **)node + 4) = arg0;
+    *(void **)arg0 = *(void **)node;
+    *(void **)node = NULL;
+    *(s32 *)((u8 *)arg0 + 8) = *(s32 *)((u8 *)arg0 + 8) - 1;
+    return *(s32 *)((u8 *)node + 8);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1CDC0/func_8001CB9C.s")
 
