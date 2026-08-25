@@ -34,7 +34,21 @@ s32 func_8F10018C(s32 arg0)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/69/fragment69_code/func_8F1001D0.s")
+s32 func_8F1001D0(s32 arg0)
+{
+  s16 *temp_v0;
+  s16 temp_a1;
+  s32 var_v1;
+  temp_v0 = (arg0 * 6) + D_8F1DF270;
+  ;
+  var_v1 = 0;
+  if (((*temp_v0) == 3) || ((*temp_v0) == 4))
+  {
+    *temp_v0 = 5;
+    var_v1 = 1;
+  }
+  return var_v1;
+}
 #endif
 
 void func_8F100218(void) {

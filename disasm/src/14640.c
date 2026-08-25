@@ -227,7 +227,21 @@ void func_80018A74(void) { func_8001480C(); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80018C14.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80018C60.s")
+extern u8 *D_80121EDC[];
+s8 func_80018C60(s32 arg0, s32 arg1, s32 arg2)
+{
+  u8 *temp_v1;
+  u8 *new_var2;
+  int new_var;
+  new_var = arg1 * 4;
+  temp_v1 = D_80121EDC[arg0];
+  if (((u32) (*((u32 *) temp_v1))) >> 31)
+  {
+    new_var2 = *((u8 **) ((temp_v1 + new_var) + 0x38));
+    return *((s8 *) ((new_var2 + arg2) + 0xD0));
+  }
+  return -1;
+}
 
 extern u8 *D_80121EDC[]; s8 func_80018CA4(s32 arg0, s32 arg1) { return *(s8 *)(D_80121EDC[arg0] + arg1 + 0x158); }
 

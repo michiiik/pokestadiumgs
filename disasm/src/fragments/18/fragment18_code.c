@@ -21,7 +21,27 @@ void func_81700190(void *arg0) {
     (*(s16 *)((u8 *)(arg0) + (0x1C))) = 0xFF;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/18/fragment18_code/func_817001E0.s")
+void func_817001E0(void *arg0)
+{
+  s16 temp_v0;
+  s16 temp_v1;
+  *((s16 *) (((u8 *) arg0) + 0xE)) = (s16) ((*((s16 *) (((u8 *) arg0) + 0xE))) + 1);
+  temp_v0 = *((s16 *) (((u8 *) arg0) + 0xE));
+  if (temp_v0 < 5)
+  {
+    temp_v1 = 0xFF - (((s32) (temp_v0 * 0xFF)) / 5);
+    if (1)
+    {
+      *((s16 *) (((u8 *) arg0) + 0x1C)) = temp_v1;
+      *((s16 *) (((u8 *) arg0) + 0x1A)) = temp_v1;
+    }
+    return;
+  }
+  *((s16 *) (((u8 *) arg0) + 4)) = 0;
+  *((s16 *) (((u8 *) arg0) + 0xE)) = 0;
+  *((s16 *) (((u8 *) arg0) + 0x1A)) = 0;
+  *((s16 *) (((u8 *) arg0) + 0x1C)) = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/18/fragment18_code/func_8170024C.s")
 

@@ -301,7 +301,17 @@ s32 func_84126374(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84126390.s")
+extern u8 *D_84195208[];
+s32 func_84126390(u8 arg0, u8 arg1)
+{
+  s32 result = arg1 == D_84195208[arg0][1];
+  u8 *ptr = D_84195208[arg0];
+  if (result == 0)
+  {
+    result = arg1 == ptr[2];
+  }
+  return result;
+}
 #endif
 
 #ifdef VERSION_US

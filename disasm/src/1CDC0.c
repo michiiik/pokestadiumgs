@@ -26,7 +26,18 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1CDC0/func_8001CA3C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/1CDC0/func_8001CB1C.s")
+void func_8001CB1C(void *arg0, void *arg1)
+{
+  if ((*((void **) (((u8 *) arg1) + 0))) == 0)
+  {
+    *((void **) (((u8 *) (*((void **) (((u8 *) arg0) + 0)))) + 4)) = arg1;
+    *((void **) (((u8 *) arg1) + 0)) = *((void **) (((u8 *) arg0) + 0));
+    *((void **) (((u8 *) arg1) + 4)) = arg0;
+    *((void **) (((u8 *) arg0) + 0)) = arg1;
+    *((s32 *) (((u8 *) arg0) + 8)) = (*((s32 *) (((u8 *) arg0) + 8))) + 1;
+    *((s32 *) (((u8 *) arg1) + 0xC)) = *((s32 *) (((u8 *) arg0) + 0xC));
+  }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1CDC0/func_8001CB5C.s")
 

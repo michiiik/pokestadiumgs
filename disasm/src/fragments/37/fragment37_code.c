@@ -34,7 +34,23 @@ s32 func_8880030C(void)
   return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/37/fragment37_code/func_88800354.s")
+void func_88800354(void)
+{
+  unsigned int temp_a0;
+  *((s32 *) (((u8 *) D_88804050) + 0)) = (s32) (*((s32 *) (((u8 *) D_88804050) + 4)));
+  *((s8 *) (((u8 *) D_88804050) + 0x11)) = 2;
+  *((s32 *) (((u8 *) D_88804050) + 0x14)) = 0;
+  temp_a0 = *((s32 *) (((u8 *) D_88804050) + 0));
+  if (temp_a0 == 1)
+  {
+    *((s8 *) (((u8 *) D_88804050) + 0x50)) = (s8) (((s32) (*((u8 *) (((u8 *) D_88804050) + 0x51)))) >> 1);
+    return;
+  }
+  if (temp_a0 == 2)
+  {
+    func_80049ED8(D_80087200);
+  }
+}
 
 extern u8 *D_88804050;
 void func_888003CC(void) {

@@ -161,5 +161,28 @@ u8 *func_87E016C8(void) {
     return D_87E1BA20 + 0x3108;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_303990/func_87E016D8.s")
+s32 func_87E016D8(void *arg0)
+{
+  s32 var_v1;
+  u8 temp_v0;
+  ;
+  var_v1 = 0;
+  if ((*((u8 *) (((u8 *) arg0) + 0x2182))) & 1)
+  {
+    var_v1 = 1;
+  }
+  if ((*((u8 *) (((u8 *) arg0) + 0x2182))) & 2)
+  {
+    var_v1 += 1;
+  }
+  if ((*((u8 *) (((u8 *) arg0) + 0x2182))) & 4)
+  {
+    var_v1 += 1;
+  }
+  if ((*((u8 *) (((u8 *) arg0) + 0x2182))) & 8)
+  {
+    var_v1 += 1;
+  }
+  return var_v1;
+}
 #endif

@@ -55,7 +55,17 @@ void func_88505514(void *arg0) {
     (*(s16 *)((u8 *)(arg0) + (0x1A))) = (s16) ((s32) ((*(s16 *)((u8 *)(arg0) + (0x16))) * 0xFF) / 8);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C1BC0/func_88505544.s")
+void func_88505544(void *arg0)
+{
+  s16 temp_v0;
+  func_88505264();
+ *((s16 *) (((u8 *) arg0) + 0x16)) = (s16) ((*((s16 *) (((u8 *) arg0) + 0x16))) - 1); temp_v0 = *((s16 *) (((u8 *) arg0) + 0x16));
+  *((f32 *) (((u8 *) arg0) + 0x1C)) = (f32) (((f32) temp_v0) / 8);
+  if (temp_v0 <= 0)
+  {
+    func_88505038(arg0, 0);
+  }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C1BC0/func_885055A0.s")
 

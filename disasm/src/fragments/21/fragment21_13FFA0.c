@@ -152,7 +152,20 @@ s32 func_82502114(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_13FFA0/func_825028E8.s")
+s16 func_825028E8(u8 *arg0)
+{
+  s16 var_v1;
+  u8 new_var;
+  int new_var2;
+  var_v1 = -1;
+  if (arg0 != (0 & 0xFFFFFFFFFFFFFFFF))
+  {
+    new_var = *arg0;
+    new_var2 = new_var * 0x98;
+    var_v1 = (*((u8 *) (((u8 *) (arg0 + new_var2)) + (-0x94)))) - 1;
+  }
+  return var_v1;
+}
 #endif
 
 #ifdef VERSION_US
@@ -230,7 +243,29 @@ s32 func_82503954(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_13FFA0/func_82503DDC.s")
+s32 func_82503DDC(void)
+{
+  s32 sp1C;
+  u16 temp_v0;
+  sp1C = 0;
+  if (func_82507BBC() == 0)
+  {
+    return 0;
+  }
+  ;
+  if ((*((u16 *) (((u8 *) D_80087200) + 8))) & 0x8000)
+  {
+    sp1C = 1;
+  }
+  else
+    if ((*((u16 *) (((u8 *) D_80087200) + 8))) & 0x4000)
+  {
+    func_82507BD0();
+    sp1C = -1;
+    func_800226C0(3);
+  }
+  return sp1C;
+}
 #endif
 
 #ifdef VERSION_US

@@ -17,7 +17,17 @@ void func_8AC00020(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC002D8.s")
+void func_8AC002D8(s16 arg0, s16 arg1, u8 arg2)
+{
+  s32 temp_a2;
+  s32 temp_v1;
+  temp_v1 = 1 << arg0;
+  temp_a2 = ((func_800542B0(arg1) & 0xFFFF) & (~temp_v1)) & 0xFF;
+  if (arg2 != 0)
+  {
+    func_800542E4(arg1, (temp_v1 | temp_a2) & 0xFF, temp_a2);
+  }
+}
 #endif
 
 #ifdef VERSION_US
@@ -190,7 +200,15 @@ void func_8AC01634(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC01664.s")
+void func_8AC01664(void *arg0)
+{
+  void *temp_v0;
+  void *temp_v1;
+  temp_v0 = *((void **) (((u8 *) arg0) + 0));
+  temp_v1 = *((void **) (((u8 *) arg0) + 0x14));
+  *((s16 *) (((u8 *) temp_v0) + 8)) = (s16) (((*((s16 *) (((u8 *) temp_v1) + 0xE))) + (*((s16 *) (((u8 *) arg0) + 0x18)))) - (*((s16 *) (((u8 *) (&D_8AC099BC)) + 0))));
+  *((s16 *) (((u8 *) temp_v0) + 0xA)) = (s16) (((*((s16 *) (((u8 *) temp_v1) + 0x10))) + (*((s16 *) (((u8 *) arg0) + 0x1A)))) - (*((s16 *) (((u8 *) (&D_8AC099BC)) + 2))));
+}
 #endif
 
 #ifdef VERSION_US

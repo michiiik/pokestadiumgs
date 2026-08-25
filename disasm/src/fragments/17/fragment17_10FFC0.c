@@ -27,7 +27,19 @@ void func_82200CB4(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82200CEC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82200D28.s")
+void func_82200D28(void *arg0, s32 arg1)
+{
+  if (func_82200CEC(arg1 & 0xFF) != 0)
+  {
+    *((s16 *) (((u8 *) arg0) + 0)) = 1;
+    *((s16 *) (((u8 *) arg0) + 2)) = (s16) (guRandom() % 24U);
+    *((s16 *) (((u8 *) arg0) + 0xA)) = 0x80;
+    *((f32 *) (((u8 *) arg0) + 0x10)) = 1.5f;
+  }
+  if (!arg1)
+  {
+  }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82200D8C.s")
 

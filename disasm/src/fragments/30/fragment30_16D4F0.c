@@ -2,7 +2,29 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/30/fragment30_16D4F0/func_88100020.s")
+s32 func_88100020(void)
+{
+  unsigned int new_var2;
+  s32 temp_v0;
+  unsigned int new_var;
+  s32 var_s0;
+  s32 var_s1;
+  var_s1 = 0;
+  var_s0 = 0;
+  do
+  {
+    new_var = 1;
+    temp_v0 = func_8005D8CC(var_s0);
+    new_var2 = 4;
+    var_s0 += new_var;
+    if ((temp_v0 != new_var) && (temp_v0 != new_var2))
+    {
+      var_s1 = (var_s1 + new_var) & 0xFF;
+    }
+  }
+  while (var_s0 != 4);
+  return var_s1;
+}
 
 extern u8 *D_88104E80;
 void func_8810009C(s32 arg0, s32 arg1) {

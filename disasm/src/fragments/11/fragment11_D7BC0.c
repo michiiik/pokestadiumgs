@@ -104,7 +104,22 @@ void func_81600AF0(s32 arg0, s32 arg1, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D7BC0/func_81600DA8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D7BC0/func_81600E04.s")
+void func_81600E04(void *arg0)
+{
+  void *var_v0;
+  void **new_var;
+  var_v0 = *(*((void ***) (((u8 *) arg0) + 0x28)));
+  new_var = *((void ***) (((u8 *) arg0) + 0x28));
+  if (var_v0 != 0)
+  {
+    do
+    {
+      var_v0 = *((void **) (((u8 *) var_v0) + 0x14));
+    }
+    while (var_v0 != 0);
+    var_v0 = *new_var;
+  }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D7BC0/func_81600E28.s")
 

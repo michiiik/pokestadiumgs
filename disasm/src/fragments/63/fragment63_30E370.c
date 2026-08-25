@@ -31,7 +31,33 @@ void func_87E0AC6C(s32 arg0) { func_87F02684((arg0 + 28)); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30E370/func_87E0ADA8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30E370/func_87E0AE28.s")
+s32 func_87E0AE28(void *arg0)
+{
+  void *new_var;
+  void *node;
+  void *container;
+  void *state;
+  s32 result;
+  result = 1;
+  node = *((void **) (((u8 *) arg0) + 0x28));
+  if (node != 0)
+  {
+    do
+    {
+      ;
+ if (1) { } if (1) { } if (1) { } if (1) { }
+      ;
+      new_var = *((void **) (((u8 *) (*((void **) (((u8 *) node) + 0x38)))) + 0xC));
+      if ((*((s32 *) (((u8 *) new_var) + 0x84))) != 0)
+      {
+        result = 0;
+      }
+      node = *((void **) (((u8 *) node) + 4));
+    }
+    while (node != 0);
+  }
+  return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30E370/func_87E0AE64.s")
 
