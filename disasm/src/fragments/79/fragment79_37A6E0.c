@@ -256,7 +256,15 @@ void func_8410F9F0(u8 *arg0, s32 arg1) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8410FABC.s")
+extern u8 *D_841911E8;
+extern u8 *func_8410B330(u8 *);
+extern void func_841203B4(u8 *, f32, f32);
+extern void func_8410E73C();
+void func_8410FABC(u8 *arg0, s32 arg1) {
+    D_841911E8 = func_8410B330(arg0);
+    func_841203B4(arg0 + 0x2C, 45.0f, 0.02f);
+    func_8410E73C(arg0, arg1);
+}
 #endif
 
 #ifdef VERSION_US

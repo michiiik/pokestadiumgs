@@ -2,7 +2,18 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/62/fragment62_code/func_86C00020.s")
+extern u8 D_86C00350[];
+extern void func_81A00020(void *);
+extern void func_81A005F0(void *);
+extern void func_8005A0B4(s32);
+void func_86C00020(void) {
+    func_81A00020(D_86C00350);
+    func_81A005F0(D_86C00350);
+    func_8005A0B4(0);
+    func_8005A0B4(1);
+    func_8005A0B4(2);
+    func_8005A0B4(3);
+}
 
 extern u8 D_800D0510[];
 extern u8 D_86C00350[];

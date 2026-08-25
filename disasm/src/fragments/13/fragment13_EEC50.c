@@ -14,7 +14,18 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82401A28.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82401DD4.s")
+extern void func_800496A4(s32, s32);
+extern void func_8004C54C(s32, s32);
+extern s32 func_8004C8A0(void *, s32, s32, s32);
+extern void func_800495F8(s32, s32, s32, s32);
+void func_82401DD4(s32 arg0) {
+    s32 temp[32];
+    s32 value;
+    func_800496A4(4, 1);
+    func_8004C54C(0x14, arg0);
+    value = func_8004C8A0(temp, 0x40, 0x3C, 0);
+    func_800495F8(0xA0, 0x12, 1, value);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82401E30.s")
 

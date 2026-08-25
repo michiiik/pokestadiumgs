@@ -10,7 +10,14 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80007B34.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80007B78.s")
+extern s32 D_800D0554;
+void func_80007B78(s32 arg0) {
+    if (D_800D0554 != 0) {
+        ((u8 *)(u32)D_800D0554)[0x11] = arg0;
+        ((u8 *)(u32)D_800D0554)[0x13] = 0;
+        ((u8 *)(u32)D_800D0554)[0x12] = 0;
+    }
+}
 
 void func_80007BA8(s32 arg0, s32 arg1) { extern s32 D_80087230; extern s32 D_80087234; if ((u32)arg0 < 3) D_80087230 = arg0; if ((u32)arg1 < 2) D_80087234 = arg1; }
 

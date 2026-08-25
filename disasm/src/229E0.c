@@ -1690,7 +1690,13 @@ void func_800383DC(void *arg0, s16 arg1, s16 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80038A1C.s")
+extern void func_8003614C(void *, s32, s32);
+extern void func_8003899C(s32, s32, s32, s32, void *);
+void func_80038A1C(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
+    s32 temp[16];
+    func_8003614C(temp, arg4, arg5);
+    func_8003899C(arg0, arg1, arg2, arg3, temp);
+}
 #endif
 
 #ifdef VERSION_US

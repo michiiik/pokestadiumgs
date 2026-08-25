@@ -2,7 +2,19 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17B150/func_88207ED0.s")
+extern void func_800033DC(s32);
+extern void func_888002DC(void);
+extern void main_pool_pop_state(s32);
+extern void func_8821CE40(s32);
+extern s32 D_88234560;
+extern s32 D_88234564;
+void func_88207ED0(void) {
+    func_800033DC(D_88234564);
+    func_888002DC();
+    main_pool_pop_state(0x4152524D);
+    func_8821CE40(1);
+    D_88234560 = 5;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17B150/func_88207F18.s")
 
