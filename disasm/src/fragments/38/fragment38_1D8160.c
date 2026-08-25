@@ -2,7 +2,19 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D8160/func_88902B70.s")
+s32 func_88902B70(u8 *arg0) {
+    s32 var_v1;
+
+    var_v1 = 0;
+loop_1:
+    if ((*(u8 *)((u8 *)(&arg0[var_v1]) + (2))) != 0) {
+        var_v1 = (var_v1 + 1) & 0xFF;
+        if (var_v1 < 4) {
+            goto loop_1;
+        }
+    }
+    return var_v1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D8160/func_88902BA0.s")
 

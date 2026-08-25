@@ -26,7 +26,17 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_3312D0/func_87F0EFA0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_3312D0/func_87F0F118.s")
+extern void func_8005777C();
+
+void func_87F0F118(void) {
+    s32 var_s0;
+
+    var_s0 = 0;
+    do {
+        func_8005777C();
+        var_s0 += 1;
+    } while (var_s0 != 0x10);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_3312D0/func_87F0F158.s")
 

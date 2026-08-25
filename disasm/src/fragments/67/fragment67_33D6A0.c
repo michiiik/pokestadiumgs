@@ -2,11 +2,29 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33D6A0/func_82900BA0.s")
+extern s16 D_829188A8;
+extern s16 D_829188AA;
+
+s32 func_82900BA0(s32 arg0, void *arg1) {
+    if (arg0 == 2) {
+        (*(s16 *)((u8 *)(arg1) + (0x1C))) = (s16) (D_829188A8 + 0x2000);
+        (*(s16 *)((u8 *)(arg1) + (0x1E))) = (s16) (D_829188AA - 0x2000);
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33D6A0/func_82900BD0.s")
+extern s16 D_829188A8;
+extern s16 D_829188AA;
+
+s32 func_82900BD0(s32 arg0, void *arg1) {
+    if (arg0 == 2) {
+        (*(s16 *)((u8 *)(arg1) + (0x1C))) = (s16) (-0x2000 - D_829188A8);
+        (*(s16 *)((u8 *)(arg1) + (0x1E))) = (s16) (D_829188AA + 0x6000);
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
