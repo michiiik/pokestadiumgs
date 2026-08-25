@@ -10,9 +10,21 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/78/fragment78_code/func_8F900284.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/78/fragment78_code/func_8F900574.s")
+extern u8 D_8F901630;
+extern s32 D_8F91163C;
+extern s32 D_8F911664;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/78/fragment78_code/func_8F900594.s")
+void func_8F900574(void) {
+    D_8F911664 = (s32) *(&D_8F901630 + D_8F91163C);
+}
+
+extern u8 D_8F901630;
+extern s32 D_8F91163C;
+extern s32 D_8F911664;
+
+void func_8F900594(void) {
+    *(&D_8F901630 + D_8F91163C) = (s8) D_8F911664;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/78/fragment78_code/func_8F9005B4.s")
 
