@@ -57,7 +57,13 @@ s32 func_8001CB5C(void *arg0) {
 
 u8 func_8001CC3C(u8 **arg0) { u8 result = **arg0; (*arg0)++; return result; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/1CDC0/func_8001CC50.s")
+s16 func_8001CC50(u8 **arg0) {
+    s16 value;
+    value = (*(*arg0)) << 8;
+    (*arg0)++;
+    value = (0, (*(*arg0)) | value); (*arg0)++;
+    return value;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1CDC0/func_8001CC88.s")
 
