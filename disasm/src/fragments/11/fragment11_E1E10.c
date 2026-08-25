@@ -20,7 +20,12 @@ void *func_8160A33C(void *arg0, s32 arg1) {
     return arg0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E1E10/func_8160A360.s")
+void *func_8160A360(void *arg0, s32 arg1) {
+    while (arg1-- > 0) {
+        arg0 = *(void **)((u8 *)arg0 + 0x4D94);
+    }
+    return arg0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E1E10/func_8160A384.s")
 

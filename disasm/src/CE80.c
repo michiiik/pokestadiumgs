@@ -74,7 +74,12 @@ void func_8000D880(u8 *arg0, s32 arg1, s32 arg2) { *(u32 *)(arg0 + 0) = ((u32)ar
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/CE80/func_8000D8D8.s")
+void func_8000D8D8(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4)
+{
+  *((s32 *) (((u8 *) arg0) + 0)) = (s32) ((((arg1 & 0xFF) << 0x10) | 0x08000000) | (arg2 & 0xFFFF));
+  *((s32 *) (((u8 *) arg0) + 4)) = (s32) ((arg3 << 0x10) | (arg4 & 0xFFFF));
+  *((s32 *) (((u8 *) arg0) + 4)) = (s32) (((arg3 << 3) << 13) | (arg4 & 0xFFFF));
+}
 #endif
 
 #ifdef VERSION_US
@@ -82,7 +87,11 @@ void func_8000D880(u8 *arg0, s32 arg1, s32 arg2) { *(u32 *)(arg0 + 0) = ((u32)ar
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/CE80/func_8000D91C.s")
+void func_8000D91C(void *arg0, s32 arg1, s32 arg2, s32 arg3)
+{
+  *((s32 *) (((u8 *) arg0) + 0)) = (s32) ((arg1 & 0xFFFFFF) | 0x0A000000);
+  *((s32 *) (((u8 *) arg0) + 4)) = (s32) (((arg2 << 4) << 12) | (arg3 & 0xFFFF));
+}
 #endif
 
 #ifdef VERSION_US
@@ -90,11 +99,19 @@ void func_8000D880(u8 *arg0, s32 arg1, s32 arg2) { *(u32 *)(arg0 + 0) = ((u32)ar
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/CE80/func_8000D968.s")
+void func_8000D968(void *arg0, s32 arg1, s32 arg2, s32 arg3)
+{
+  *((s32 *) (((u8 *) arg0) + 0)) = (arg3 & 0xFFFF) | 0x11000000;
+  *((s32 *) (((u8 *) arg0) + 4)) = (s32) (((arg1 << 8) << 8) | (arg2 & 0xFFFF));
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/CE80/func_8000D98C.s")
+void func_8000D98C(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4)
+{
+  *((s32 *) (((u8 *) arg0) + 0)) = (s32) ((((arg1 & 0xFF) << 0x10) | 0x12000000) | (arg2 & 0xFFFF));
+  *((s32 *) (((u8 *) arg0) + 4)) = (s32) (((arg3 << 4) << 12) | (arg4 & 0xFFFF));
+}
 #endif
 
 void func_8000D9C0(void) {
@@ -111,7 +128,13 @@ void func_8000D9F0(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/CE80/func_8000D9F8.s")
+void func_8000D9F8(void *arg0, s32 arg1, s32 arg2)
+{
+  u8 *new_var;
+  new_var = (u8 *) arg0;
+  *((s32 *) (new_var + 0)) = 0x16000000;
+ do { *((s32 *) (((u8 *) arg0) + 4)) = (s32) (((arg1 << 7) << 9) | (arg2 & 0xFFFF)); } while (0);
+}
 #endif
 
 #ifdef VERSION_US

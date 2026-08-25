@@ -97,7 +97,16 @@ void func_829087E0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_82908854.s")
+extern void func_800086A4(s32);
+extern void func_800355E4(s32);
+extern void func_80007AEC(s32);
+extern s32 D_8291B864;
+void func_82908854(void) {
+    func_800086A4(0x14);
+    func_800355E4(0x51);
+    func_80007AEC(0x10);
+    D_8291B864 = 1;
+}
 #endif
 
 #ifdef VERSION_US

@@ -930,6 +930,30 @@ class SweepTests(unittest.TestCase):
             permute.assert_called_once()
             gate.assert_called_once()
 
+    def test_near_miss_skips_function_after_full_gate_acceptance(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            stats = Path(directory) / "stats.jsonl"
+            stats.write_text("\n".join([
+                json.dumps({"attempts": [{
+                    "function": "func_done",
+                    "label": "m2c:s32-s32",
+                    "status": "accepted",
+                    "similarity_score": 1.0,
+                    "candidate": "void func_done(void) {}",
+                }]}),
+                json.dumps({"attempts": [{
+                    "function": "func_done",
+                    "label": "m2c:ptr-void",
+                    "status": "compare_rejected",
+                    "similarity_score": 0.99,
+                    "candidate": "void func_done(void) {}",
+                }]}),
+            ]) + "\n")
+            with mock.patch.object(sweep_targets.permute_candidate, "permute") as permute:
+                result = sweep_targets.near_miss(stats_path=stats, limit=10)
+            self.assertEqual(result["candidates"], 0)
+            permute.assert_not_called()
+
 
 class SimilarSolvedTests(unittest.TestCase):
     def test_solved_shapes_rank_by_opcode_similarity(self) -> None:

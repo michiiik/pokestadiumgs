@@ -94,7 +94,13 @@ u32 func_841094EC(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_841097E4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_84109848.s")
+extern void func_8411DCCC(s32, s32);
+extern void func_84109630(s32, s32);
+extern s32 D_84190194;
+void func_84109848(s32 arg0) {
+    func_8411DCCC(D_84190194, arg0);
+    func_84109630(D_84190194, arg0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_84109884.s")
 

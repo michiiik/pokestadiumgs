@@ -220,6 +220,7 @@ def near_miss(
 ) -> dict[str, object]:
     """Permute high-scoring m2c rejects, then gate only score-0 outputs."""
     grouped: dict[str, dict[str, object]] = {}
+    solved: set[str] = set()
     for record in _stats_records(stats_path):
         source = record.get("source")
         for attempt in record.get("attempts", []):
@@ -232,7 +233,13 @@ def near_miss(
             candidate = attempt.get("candidate")
             if not isinstance(function, str) or not label.startswith("m2c:"):
                 continue
-            if status in {"accepted", "probe_match"} or not isinstance(score, (int, float)):
+            # A full-gate acceptance solves the owner for this pass.  An
+            # isolated probe_match is deliberately not considered solved:
+            # it still needs the sequential gate and may be a useful near
+            # miss if its score is recorded.
+            if status == "accepted":
+                solved.add(function)
+            if not isinstance(score, (int, float)):
                 continue
             if float(score) < minimum_similarity or not isinstance(candidate, str) or not candidate.strip():
                 continue
@@ -257,7 +264,7 @@ def near_miss(
                     "similarity_score": float(score),
                 })
 
-    candidates = [row for row in grouped.values() if "accepted" not in row["statuses"]]
+    candidates = [row for row in grouped.values() if str(row["function"]) not in solved]
     candidates.sort(key=lambda row: (-float(row["similarity_score"]), str(row["function"])))
     if limit is not None:
         candidates = candidates[:max(0, limit)]
@@ -575,7 +582,10 @@ def main() -> int:
             workers=args.workers,
             limit=args.near_miss_limit,
         )
-        print(json.dumps(result, indent=2, default=list))
+        text = json.dumps(result, indent=2, default=list)
+        if args.json:
+            args.json.write_text(text + "\n")
+        print(text)
         return 0 if result["accepted"] else 1
     try:
         fragment_range = parse_fragment_range(args.fragment_range) if args.fragment_range else None

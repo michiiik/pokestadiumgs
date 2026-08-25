@@ -36,7 +36,13 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C004C4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C00628.s")
+extern void func_87C00BC8();
+extern void func_87C004C4();
+void func_87C00628(s32 arg0, s32 arg1, s32 arg2) {
+    s32 sp18[8];
+    func_87C00BC8(sp18, arg2);
+    func_87C004C4(arg0, arg1, sp18);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C00664.s")
 
