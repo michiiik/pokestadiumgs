@@ -118,7 +118,20 @@ void func_87E00590(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_303990/func_87E01424.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_303990/func_87E015C0.s")
+void func_87E015C0(s32 arg0)
+{
+  s32 temp_v1;
+  if (((!D_87E1BA20) && (!D_87E1BA20)) && (!D_87E1BA20))
+  {
+  }
+  temp_v1 = *((s32 *) (((u8 *) D_87E1BA20) + 0x10));
+  if (arg0 != temp_v1)
+  {
+    *((s32 *) (((u8 *) D_87E1BA20) + 0x14)) = temp_v1;
+    *((s32 *) (((u8 *) D_87E1BA20) + 0x10)) = arg0;
+    *((s32 *) (((u8 *) D_87E1BA20) + 0x18)) = 0;
+  }
+}
 
 extern void func_87C03B60(u8 *, s32, s32);
 

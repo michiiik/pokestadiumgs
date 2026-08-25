@@ -6,7 +6,12 @@ u16 func_800579D0(const u8 *arg0) { return (u16)((arg0[1] << 8) | arg0[0]); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_800579E8.s")
+void func_800579E8(u8 *arg0, u16 arg1)
+{
+  u16 new_var;
+  arg0[0] = arg1 & 0xFFFF;
+  arg0[1] = (new_var = arg1 >> 8);
+}
 #endif
 
 #ifdef VERSION_US

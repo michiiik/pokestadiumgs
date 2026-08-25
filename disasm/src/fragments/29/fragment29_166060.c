@@ -42,7 +42,29 @@ void func_880006BC(u8 *arg0) { struct S { u8 a,b,c; }; *(struct S *)&D_8800ED28 
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_166060/func_880006E0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_166060/func_88000770.s")
+s32 func_88000770(u8 *arg0)
+{
+  s32 result = 0;
+  s32 count = 0;
+  u8 *ptr = arg0;
+  while (count != 4)
+  {
+    u8 value = ptr[2];
+    count++;
+    if (!value)
+    {
+      break;
+    }
+    if (value >= 0xA6)
+    {
+      result = 1;
+      break;
+    }
+    ptr++;
+  }
+
+  return result;
+}
 
 extern s32 func_88000770(u8 *);
 s32 func_880007B0(u8 *arg0) {

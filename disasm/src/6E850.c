@@ -50,18 +50,45 @@ s16 func_8006DE34(s16 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_8006DE54.s")
+extern s16 D_8009E9D4[];
+extern s16 D_8009EBD8[];
+extern s16 D_8009EFE0[];
+s16 func_8006DE54(s16 *arg0, s32 arg1)
+{
+  s16 value = arg0[arg1];
+  s16 new_var;
+  new_var = D_8009E9D4[value];
+  return new_var;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_8006DE74.s")
+extern s16 D_8009E9D4[];
+extern s16 D_8009EBD8[];
+extern s16 D_8009EFE0[];
+s16 func_8006DE74(s16 *arg0, s32 arg1)
+{
+  s16 new_var;
+  s16 value = arg0[arg1];
+  new_var = D_8009EBD8[value];
+  return new_var;
+}
 #endif
 
 void func_8006DE94(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_8006DE9C.s")
+extern s16 D_8009E9D4[];
+extern s16 D_8009EBD8[];
+extern s16 D_8009EFE0[];
+s16 func_8006DE9C(s16 *arg0, s32 arg1)
+{
+  s16 new_var;
+  s16 value = arg0[arg1];
+  new_var = D_8009EFE0[value];
+  return new_var;
+}
 #endif
 
 #ifdef VERSION_US
@@ -243,7 +270,12 @@ s32 func_800711B0(void) { return 0; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_800711B8.s")
+void func_800711B8(s32 arg0)
+{
+  s32 var_v0;
+  s32 var_v1;
+ do { var_v0 = 0; do { var_v1 = 8 * 0; loop_2: var_v1 += 1; if (var_v1 != 2) { goto loop_2; } var_v0 += 1; } while (var_v0 != 8); } while (0);
+}
 #endif
 
 #ifdef VERSION_US

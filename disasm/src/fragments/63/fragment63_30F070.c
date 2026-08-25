@@ -48,7 +48,28 @@ void func_87E0BE48(void *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30F070/func_87E0BE78.s")
+s32 func_87E0BE78(void *arg0)
+{
+  s32 var_v1;
+  void *new_var;
+  void *var_v0;
+  var_v0 = *((void **) (((u8 *) arg0) + 0x18));
+  var_v1 = 1;
+  if (var_v0 != 0)
+  {
+    do
+    {
+      new_var = *((void **) (((u8 *) (*((void **) (((u8 *) var_v0) + 0x38)))) + 0xC));
+      if ((*((s32 *) (((u8 *) new_var) + 0x98))) != 0)
+      {
+        var_v1 = 0;
+      }
+      var_v0 = *((void **) (((u8 *) var_v0) + 4));
+    }
+    while (var_v0 != 0);
+  }
+  return var_v1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30F070/func_87E0BEB4.s")
 

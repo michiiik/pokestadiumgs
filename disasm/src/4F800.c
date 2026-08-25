@@ -35,7 +35,16 @@ void func_8004EE30(u8 *arg0, const u8 *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4F800/func_8004EE4C.s")
+void func_8004EE4C(u16 *arg0, u8 *arg1)
+{
+  u8 r = arg1[0];
+  u8 g = arg1[1];
+  u8 b = arg1[2];
+  g = (g >> 3) & 0x1F;
+  b = (b >> 3) & 0x1F;
+  r = r >> 3;
+  *arg0 = (((r << 11) | (g << 6)) | (b << 1)) | 1;
+}
 #endif
 
 void func_8004EE94(void) {

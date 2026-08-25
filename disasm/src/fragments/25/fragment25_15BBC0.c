@@ -2,7 +2,10 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15BBC0/func_82101B80.s")
+u8 *func_82101B80(u8 *arg0)
+{
+  return (arg0 + ((*((u32 *) (arg0 + 0x24))) * 8)) + ((0, 4));
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15BBC0/func_82101B94.s")
 

@@ -223,7 +223,13 @@ void func_800542E4(s32 arg0, u8 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80054CC4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80054E10.s")
+s32 func_80054E10(u16 *arg0)
+{
+  int new_var;
+  func_80050D20(0x15, -1);
+  new_var = (*arg0) != 0xFFFF;
+  return new_var;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80054E48.s")
 

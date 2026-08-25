@@ -74,7 +74,14 @@ u8 *func_84105D40(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_375530/func_84105E20.s")
+void func_84105E20(u8 *arg0)
+{
+  *((s8 *) (((u8 *) arg0) + 7)) = 0;
+  *((s8 *) (((u8 *) arg0) + 8)) = 0;
+  *((s8 *) (((u8 *) arg0) + 5)) = 0;
+  *((s8 *) (((u8 *) arg0) + 4)) = 0;
+  *((s8 *) (((u8 *) arg0) + 6)) = ((s8) (*((s8 *) (((u8 *) arg0) + 7)))) & 0xFF;
+}
 #endif
 
 #ifdef VERSION_US

@@ -626,7 +626,17 @@ void func_8002B47C(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002C2A0.s")
+extern u32 D_80091A2C;
+extern s16 D_800D1AB8[];
+void func_8002C2A0(unsigned short arg0)
+{
+  D_800D1AB8[D_80091A2C] = arg0;
+  D_80091A2C = D_80091A2C + 1;
+  if (((u32) D_80091A2C) >= 10U)
+  {
+    D_80091A2C = D_80091A2C - 1;
+  }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1126,7 +1136,23 @@ void func_80034EE0(void) { D_800D2B59 = 0x84; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80034EF0.s")
+void func_80034EF0(s32 arg0)
+{
+  s32 var_s0;
+  var_s0 = arg0 & 0xFF;
+  if (var_s0 != 0)
+  {
+    do
+    {
+      var_s0 = ((unsigned long) (var_s0 - 1)) & 0xFF;
+      func_80034DF0();
+    }
+    while (var_s0 != 0);
+    if (arg0)
+    {
+    }
+  }
+}
 #endif
 
 #ifdef VERSION_US

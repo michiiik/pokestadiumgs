@@ -929,7 +929,18 @@ void func_841155B0(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_84115A24.s")
+void func_84115A24(void *arg0)
+{
+  if (func_8003EC34() != 0)
+  {
+    *((u8 *) (((u8 *) arg0) + 2)) = (u8) ((*((u8 *) (((u8 *) arg0) + 2))) & 0xFFFD);
+    *((s8 *) (((u8 *) arg0) + 0x7F6)) = 3;
+    *((s16 *) (((u8 *) arg0) + 0x7E8)) = 0;
+  }
+  if (arg0)
+  {
+  }
+}
 #endif
 
 #ifdef VERSION_US

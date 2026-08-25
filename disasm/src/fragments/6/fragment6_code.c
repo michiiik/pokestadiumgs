@@ -52,7 +52,21 @@ void func_83100B2C(void *arg0, u8 *arg1, void *arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/6/fragment6_code/func_83100DBC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/6/fragment6_code/func_83100E98.s")
+void func_83100E98(u8 *arg0, s32 arg1)
+{
+  s32 result = arg1 - 4;
+  s32 limit = arg0[0xCB] - 9;
+  if (limit < result)
+  {
+    result = limit;
+  }
+  if (limit = result < 0)
+  {
+    result = 0;
+  }
+  arg0[0x43] = result;
+  arg0[0x40] = ((arg1 - result) & 0xFFu) + 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/6/fragment6_code/func_83100ED4.s")
 

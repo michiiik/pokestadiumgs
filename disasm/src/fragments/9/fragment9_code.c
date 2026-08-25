@@ -42,7 +42,12 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/9/fragment9_code/func_8FB021F8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/9/fragment9_code/func_8FB02418.s")
+struct MsgState *func_8FB02418(void)
+{
+  s32 temp_v0;
+  temp_v0 = func_8006B7FC();
+  return func_800718B8(func_8006A600(temp_v0 & 0xFFFF, (temp_v0 & 0xFF) & 0xFFu, 0));
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/9/fragment9_code/func_8FB02454.s")
 

@@ -12,7 +12,27 @@ void func_888002DC(void) {
     main_pool_pop_state(0x504D494E);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/37/fragment37_code/func_8880030C.s")
+extern void *D_80087200;
+s32 func_8880030C(void)
+{
+  u16 flags;
+  s32 result = 0 * 0;
+  if (((*((u16 *) (((u8 *) D_80087200) + 0x8))) & 1) != 0)
+  {
+    result = 1;
+  }
+  else
+    if (((*((u16 *) (((u8 *) D_80087200) + 0x8))) & 4) != 0)
+  {
+    result = 2;
+  }
+  else
+    if (((*((u16 *) (((u8 *) D_80087200) + 0x8))) & 2) != 0)
+  {
+    result = 3;
+  }
+  return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/37/fragment37_code/func_88800354.s")
 

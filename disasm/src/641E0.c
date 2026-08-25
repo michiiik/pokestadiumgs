@@ -46,15 +46,38 @@ s32 func_80063BB8(u8 arg0) { s32 index = arg0; if ((arg0 > 0) && (arg0 < 0xFC)) 
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80063BF4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80063C90.s")
+void func_80063C90(u8 arg0, unsigned short arg1)
+{
+  u8 *new_var2;
+  int new_var4;
+  u8 *new_var3;
+  int new_var;
+  new_var = func_80062F98(arg1 & 0xFF) & 0xFF;
+  new_var3 = &arg0;
+  new_var2 = new_var3;
+  new_var4 = new_var;
+  func_80063BF4(*new_var2, new_var4);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80063CC4.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80063D54.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80063EE4.s")
+void func_80063EE4(u8 arg0, s32 arg1)
+{
+  s32 *new_var2;
+  s32 new_var;
+  new_var2 = &arg1;
+  new_var = *new_var2;
+  func_80063CC4(arg0, func_80063044(new_var & 0xFF) & 0xFF);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80063F18.s")
+void func_80063F18(u8 arg0, s32 arg1)
+{
+  s32 *new_var;
+  new_var = &arg1;
+  func_80063D54(arg0, func_80063044((*new_var) & 0xFF) & (0xFF & 0xFFFFu));
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80063F4C.s")
 

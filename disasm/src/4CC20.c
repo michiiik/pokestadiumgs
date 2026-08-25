@@ -86,7 +86,26 @@ void func_8004D40C(s32 arg0) {
 
 extern void *memcpy(void *, const void *, s32); void *func_8004D418(void *dest, const void *src, s32 size) { return (u8 *)memcpy(dest, src, size) + size; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D43C.s")
+extern s8 *D_80097140[];
+s32 func_8004D43C(s32 arg0, s32 arg1)
+{
+  s8 *base = D_80097140[arg0];
+  s32 result = -1;
+  s8 *p = base;
+  if ((*p) != 0)
+  {
+    do
+    {
+      if (arg1 == (*p))
+      {
+        result = p - base;
+      }
+      p++;
+    }
+    while ((*p) != 0);
+  }
+  return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D488.s")
 

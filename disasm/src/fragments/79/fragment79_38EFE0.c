@@ -175,7 +175,12 @@ s16 *func_841202F0(s16 *arg0, s16 *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_8412063C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_841206D0.s")
+void func_841206D0(void *arg0)
+{
+  *((u8 *) (((u8 *) arg0) + 2)) = (u8) ((*((u8 *) (((u8 *) arg0) + 2))) & 0xFFFD);
+  *(((u8 *) arg0) + 0x61F) = 0xFF;
+  func_8412060C();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84120700.s")
 

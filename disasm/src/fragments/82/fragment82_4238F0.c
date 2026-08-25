@@ -24,7 +24,16 @@ void func_82D02C98(void) {
 
 void func_82D02D00(void) { func_8004C4B0(0x43); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D02D20.s")
+void func_82D02D20(s32 arg0, s32 arg1)
+{
+  s32 temp_a2;
+  s32 temp_a3;
+  unsigned long long new_var;
+  new_var = 0xFFFF;
+  temp_a2 = arg0 & new_var;
+  temp_a3 = arg1 & new_var;
+  func_8004D1FC(func_8004C990(temp_a2, temp_a3, temp_a2, temp_a3));
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D02D5C.s")
 
@@ -114,13 +123,45 @@ extern u8 D_82D0717C[]; extern u8 D_82D07174[]; extern u8 D_82D07190; void func_
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D0697C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D06A54.s")
+void func_82D06A54(void *arg0, s32 arg1)
+{
+  if ((*((u8 *) (((u8 *) arg0) + 0))) == 4)
+  {
+    *((s8 *) (((u8 *) arg0) + 0xC)) = (s8) (D_82D07190 + arg1);
+  }
+  *((u8 *) (((u8 *) arg0) + 0xA)) = (u8) ((*((u8 *) (((u8 *) arg0) + 0xA))) | 2);
+  *((s8 *) (((u8 *) arg0) + 0xB)) = 3;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D06A8C.s")
+void func_82D06A8C(void *arg0, s32 arg1)
+{
+  if (((unsigned long) (*((u8 *) (((u8 *) arg0) + 0)))) == 4)
+  {
+    *((s8 *) (((u8 *) arg0) + 0xC)) = (s8) (D_82D07190 + arg1);
+  }
+  *((u8 *) (((u8 *) arg0) + 0xA)) = (u8) ((*((u8 *) (((u8 *) arg0) + 0xA))) | 2);
+  *((s8 *) (((u8 *) arg0) + 0xB)) = 4;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D06AC4.s")
+void func_82D06AC4(void *arg0, s32 arg1)
+{
+  if ((*((u8 *) (((u8 *) arg0) + 0))) == 4)
+  {
+    *((s8 *) (((u8 *) arg0) + 0xC)) = (s8) (D_82D07190 + arg1);
+  }
+  *((u8 *) (((u8 *) arg0) + 0xA)) = (u8) ((*((u8 *) (((u8 *) arg0) + 0xA))) | 2);
+  *((s8 *) (((u8 *) arg0) + 0xB)) = 5;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D06AFC.s")
+void func_82D06AFC(void *arg0, s32 arg1)
+{
+  if ((*((u8 *) (((u8 *) arg0) + 0))) == 4)
+  {
+    *((s8 *) (((u8 *) arg0) + 0xC)) = (s8) (D_82D07190 + arg1);
+  }
+  *((u8 *) (((u8 *) arg0) + 0xA)) = (u8) ((*((u8 *) (((u8 *) arg0) + 0xA))) | 2);
+  *((s8 *) (((u8 *) arg0) + 0xB)) = 6;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D06B34.s")
 
