@@ -10,7 +10,15 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E12568.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E12674.s")
+extern void func_8004C8C0(s32);
+extern void func_87E12568(s32);
+void func_87E12674(s32 arg0, s32 arg1) {
+    *(s32 *)arg0 = arg1;
+    func_8004C8C0(0x167);
+    func_8004C8C0(0x1BB);
+    func_8004C8C0(0x175);
+    func_87E12568(arg0);
+}
 
 extern void func_87F0277C(s32);
 void func_87E126B4(s32 arg0) { func_87F0277C((arg0 + 4)); }
@@ -49,12 +57,30 @@ extern u32 D_87E1AB64;
 extern void func_87E126D4(s32, void *, s32, s32, s32);
 void func_87E12C84(s32 arg0) { func_87E126D4(arg0, &D_87E1AB64, 3, 15, 8192); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E12CB8.s")
+extern u32 D_87E1AB64;
+extern void func_87E126D4(s32, void *, s32, s32, s32);
+void func_87E12CB8(s32 arg0) {
+    s32 i;
+    for (i = 0; i != 8; ++i) {
+        func_87E126D4(arg0, &D_87E1AB64, i, 30, 8192);
+    }
+}
 
 extern void func_87F02684(s32);
 void func_87E12D28(s32 arg0) { func_87F02684((arg0 + 4)); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E12D48.s")
+s32 func_87E12D48(u8 *arg0) {
+    s32 result = 1;
+    u8 *node = *(u8 **)(arg0 + 0x10);
+    while (node != 0) {
+        u8 *entry = *(u8 **)(node + 0x38);
+        if (*(u8 **)(entry + 0x90) != 0) {
+            result = 0;
+        }
+        node = *(u8 **)(node + 4);
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E12D80.s")
 
@@ -77,9 +103,17 @@ void func_87E13248(void) { func_8004C8C0(361); }
 
 void func_87E13480(u8 *arg0) { extern u8 *D_87E1EBD8; *(u8 **)(D_87E1EBD8 + 4) = arg0; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E13490.s")
+extern u8 *D_87E1EBD8;
+void func_87E13490(void) {
+    *(u32 *)D_87E1EBD8 |= 1;
+    *(u32 *)D_87E1EBD8 &= 0xFFFFFFFD;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E134C0.s")
+extern u8 *D_87E1EBD8;
+void func_87E134C0(void) {
+    *(u32 *)D_87E1EBD8 &= 0xFFFFFFFE;
+    *(u32 *)(D_87E1EBD8 + 0xC) = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E134E8.s")
 
