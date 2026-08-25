@@ -33,7 +33,23 @@ s32 func_8001C1C0(u8 **arg0, u8 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1CDC0/func_8001C744.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/1CDC0/func_8001C794.s")
+void func_8001C744();
+void func_8001AAD8();
+void func_8001C794(s32 arg0)
+{
+  u32 new_var;
+  s32 i;
+  i = 0;
+  *((u8 *) ((u32) arg0)) = (u8) (((*((u8 *) (new_var = (u32) arg0))) & 0xFFFFu) | 0x40);
+  do
+  {
+    func_8001C744((void *) ((u32) arg0), i);
+    i++;
+  }
+  while (i != 6);
+  func_8001AAD8((void *) ((u32) (arg0 + 0x90)));
+  *((u8 *) ((u32) ((arg0 & 0xFFFFFFFFFFFFFFFFu) & 0xFFFFFFFFFFFFFFFFu))) = (u8) ((*((u8 *) ((u32) arg0))) & 0xFF7F);
+}
 
 void func_8001C804(void *arg0, u16 arg1) {
     s32 i;
