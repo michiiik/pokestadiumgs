@@ -5,7 +5,11 @@
 extern void _bcopy(void *, void *, s32);
 void func_87F0A5F0(s32 arg0) { s32 sp18[2]; _bcopy(&arg0, &sp18[0], 4); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_32D260/func_87F0A61C.s")
+extern s32 func_80002B24(void);
+extern s32 func_800030D0(s32, s32);
+extern s32 func_8000318C(s32, s32, s32);
+extern void func_80003120(s32);
+s32 func_87F0A61C(void) { s32 ptr = func_800030D0(func_80002B24(), 0); s32 result = func_8000318C(ptr, 0xC, 4); func_80003120(ptr); return result; }
 
 void func_87F0A66C(u8 *arg0, u32 *arg1, u32 *arg2) {
     arg0[0x28] = 2;

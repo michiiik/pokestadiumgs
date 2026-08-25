@@ -44,7 +44,10 @@ void func_81300B48(u8 *arg0) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_81300B50.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_81300BA0.s")
+extern void func_8130A570(s32, s32);
+extern void func_81304208(s32);
+extern void func_81311C18(s32);
+void func_81300BA0(s32 arg0) { func_8130A570(arg0 + 0xDA8, 0); func_81304208(arg0 + 0x15370); func_81311C18(arg0 + 0x74); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_81300BE8.s")
 

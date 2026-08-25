@@ -36,13 +36,36 @@ u8 func_80060AAC(u8 arg0) { extern u8 *D_80097680; return D_80097680[arg0]; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060DDC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060E48.s")
+extern void _bcopy(const void *, void *, s32);
+extern void func_80060C08(void *, void *);
+extern void func_80060D1C(void *, void *);
+extern void func_80060EC8(void *, void *);
+extern s32 func_8004B7A4(s32);
+extern void func_80062808(void *, s32);
+extern void func_80062884(void *, s32);
+extern void func_80062978(void *, s32);
+void func_80060E48(void *arg0, void *arg1) {
+    u8 sp1C[11];
+    _bcopy(arg1, sp1C, 0xA);
+    sp1C[0xA] = 0x50;
+    func_80060C08(arg0, sp1C);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060E88.s")
+void func_80060E88(void *arg0, void *arg1) {
+    u8 sp1C[11];
+    _bcopy(arg1, sp1C, 0xA);
+    sp1C[0xA] = 0x50;
+    func_80060D1C(arg0, sp1C);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060EC8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060EF8.s")
+void func_80060EF8(void *arg0, void *arg1) {
+    u8 sp1C[9];
+    _bcopy(arg1, sp1C, 8);
+    sp1C[8] = 0x50;
+    func_80060C08(arg0, sp1C);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060F38.s")
 
@@ -68,7 +91,11 @@ s32 func_80060F90(void) { return 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_800614EC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_800615D0.s")
+void func_800615D0(void *arg0, void *arg1) {
+    _bcopy(arg1, arg0, 0x24);
+    _bcopy((u8 *)arg1 + 0x4C, (u8 *)arg0 + 0x30, 0xB);
+    func_80060EC8((u8 *)arg0 + 0x24, (u8 *)arg1 + 0x34);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_8006162C.s")
 
