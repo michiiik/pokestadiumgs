@@ -698,6 +698,7 @@ class RunnerTests(unittest.TestCase):
 
 
 import dedupe_externs  # noqa: E402
+import sweep_targets  # noqa: E402
 import permute_candidate  # noqa: E402
 import pragma_targets as targets  # noqa: E402
 import try_pragma_compare_mcp as mcp  # noqa: E402
@@ -851,6 +852,71 @@ class McpDispatchTests(unittest.TestCase):
         self.assertEqual(captured["source"], owner.source_path)
         self.assertEqual(captured["declarations"], "extern u8 D_1;")
         self.assertEqual(json.loads(response["content"][0]["text"])["source"], "disasm/src/synthetic.c")
+
+
+class SweepTests(unittest.TestCase):
+    def test_rewrite_draft_inlines_fields_and_resolves_unknown_types(self) -> None:
+        draft = (
+            "extern M2C_UNK D_1;\n"
+            "M2C_UNK func_b(s32);                         /* extern */\n"
+            "void func_a(void *arg0) {\n"
+            "    M2C_FIELD(arg0, s16 *, 0x9A) = 1;\n"
+            "    func_b(D_1);\n"
+            "}\n"
+        )
+        code = sweep_targets.rewrite_draft(draft, sweep_targets.VARIANTS["u8-void"])
+        self.assertIn("extern u8 D_1;", code)
+        self.assertIn("extern void func_b(s32);", code)
+        self.assertIn("(*(s16 *)((u8 *)(arg0) + (0x9A))) = 1;", code)
+        self.assertNotIn("M2C_", code)
+        self.assertNotIn("/* extern */", code)
+        self.assertIsNone(sweep_targets.rewrite_draft("M2C_ERROR(x)", sweep_targets.VARIANTS["u8-void"]))
+
+    def test_padding_retry_only_for_clean_prefix_matches(self) -> None:
+        clean = {
+            "mismatch_kind": "symbol_size_drift", "diff_offsets": [],
+            "expected_size": 24, "actual_size": 16, "expected_tail_kind": "jr_nop_plus_alignment",
+        }
+        self.assertEqual(sweep_targets.padding_retry(clean), 8)
+        self.assertIsNone(sweep_targets.padding_retry({**clean, "diff_offsets": [4]}))
+        self.assertIsNone(sweep_targets.padding_retry({**clean, "expected_tail_kind": "normal_return"}))
+        self.assertIsNone(sweep_targets.padding_retry({**clean, "mismatch_kind": "instruction_drift"}))
+
+
+class SimilarSolvedTests(unittest.TestCase):
+    def test_solved_shapes_rank_by_opcode_similarity(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            asm_root = root / "asm"
+            (asm_root / "x").mkdir(parents=True)
+            (asm_root / "x" / "func_done.s").write_text(
+                "glabel func_done\n"
+                "    /* 0 0 0 */  lw $v0, 0($a0)\n"
+                "    /* 0 0 0 */  jr $ra\n"
+                "    /* 0 0 0 */  nop\n"
+            )
+            (asm_root / "x" / "func_new.s").write_text(
+                "glabel func_new\n"
+                "    /* 0 0 0 */  lw $v0, 4($a0)\n"
+                "    /* 0 0 0 */  jr $ra\n"
+                "    /* 0 0 0 */  nop\n"
+            )
+            stats = root / "stats.jsonl"
+            stats.write_text(json.dumps({"source": "s.c", "counts": {}, "attempts": [
+                {"function": "func_done", "status": "accepted", "candidate": "s32 func_done(s32 *a) { return a[0]; }", "label": "load"},
+                {"function": "func_lost", "status": "probe_rejected", "candidate": "void func_lost(void) {}"},
+            ]}) + "\n")
+            with mock.patch.object(targets, "ASM_ROOT", asm_root), mock.patch.object(targets, "_SOLVED_CACHE", None):
+                rows = targets.solved_shapes(stats)
+                self.assertEqual([row["function"] for row in rows], ["func_done"])
+                owner = targets.Owner("func_new", "disasm/src/s.c", "x/func_new.s")
+                with mock.patch.object(targets, "require_owner", return_value=owner), mock.patch.object(
+                    targets.Owner, "asm_path", property(lambda self: asm_root / "x" / "func_new.s")
+                ), mock.patch.object(targets, "STATS_PATH", stats):
+                    ranked = targets.similar_solved("func_new")
+            self.assertEqual(ranked[0]["function"], "func_done")
+            self.assertEqual(ranked[0]["similarity"], 1.0)
+            self.assertTrue(ranked[0]["same_length"])
 
 
 if __name__ == "__main__":

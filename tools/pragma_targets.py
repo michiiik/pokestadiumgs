@@ -23,6 +23,7 @@ candidate.
 from __future__ import annotations
 
 import argparse
+import difflib
 import json
 import os
 import re
@@ -255,6 +256,79 @@ def preprocessed_context(owner: Owner, *, refresh: bool = False) -> Path | None:
     return cache_path
 
 
+STATS_PATH = DISASM_ROOT / "build" / "probe-stats.jsonl"
+_SOLVED_CACHE: tuple[int, list[dict[str, object]]] | None = None
+
+
+def _opcode_sequence(asm_text: str) -> list[str]:
+    _, instructions, _ = scanner.parse_instructions(asm_text)
+    return [instruction.op for instruction in instructions]
+
+
+def solved_shapes(stats_path: Path | None = None) -> list[dict[str, object]]:
+    """Return accepted candidates from the stats file with their target opcode shape.
+
+    Winners are the best available evidence of which C spelling IDO turns
+    into a given instruction shape.  The ``.s`` files stay in the tree after
+    a pragma is replaced, so each winner's shape can still be computed.
+    """
+    global _SOLVED_CACHE
+    stats_path = stats_path or STATS_PATH
+    try:
+        stamp = stats_path.stat().st_mtime_ns
+    except OSError:
+        return []
+    if _SOLVED_CACHE is not None and _SOLVED_CACHE[0] == stamp:
+        return _SOLVED_CACHE[1]
+    solved: dict[str, dict[str, object]] = {}
+    asm_by_function = {
+        path.stem: path for path in ASM_ROOT.rglob("*.s")
+    } if stats_path.exists() else {}
+    for line in stats_path.read_text(encoding="utf-8").splitlines():
+        try:
+            record = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        for attempt in record.get("attempts", []):
+            if attempt.get("status") != "accepted" or not attempt.get("candidate"):
+                continue
+            function = str(attempt.get("function"))
+            asm_path = asm_by_function.get(function)
+            if asm_path is None or function in solved:
+                continue
+            solved[function] = {
+                "function": function,
+                "label": attempt.get("label"),
+                "code": attempt["candidate"],
+                "ops": _opcode_sequence(asm_path.read_text(encoding="utf-8")),
+            }
+    rows = list(solved.values())
+    _SOLVED_CACHE = (stamp, rows)
+    return rows
+
+
+def similar_solved(function: str, *, limit: int = 3, minimum: float = 0.6) -> list[dict[str, object]]:
+    """Rank previously accepted candidates by opcode-sequence similarity to ``function``."""
+    owner = require_owner(function)
+    ops = _opcode_sequence(owner.asm_path.read_text(encoding="utf-8"))
+    ranked: list[dict[str, object]] = []
+    for row in solved_shapes():
+        other = row["ops"]
+        if not isinstance(other, list) or not other:
+            continue
+        ratio = difflib.SequenceMatcher(None, ops, other, autojunk=False).ratio()
+        if ratio >= minimum:
+            ranked.append({
+                "function": row["function"],
+                "similarity": round(ratio, 3),
+                "same_length": len(other) == len(ops),
+                "label": row["label"],
+                "code": row["code"],
+            })
+    ranked.sort(key=lambda row: (-float(row["similarity"]), not row["same_length"], str(row["function"])))
+    return ranked[:limit]
+
+
 def _m2c_python() -> str:
     return os.environ.get("M2C_PYTHON") or sys.executable
 
@@ -312,6 +386,7 @@ def draft_candidates(
         "instruction_count": asm["instruction_count"],
         "context": str(context_path.relative_to(REPO_ROOT)) if context_path else None,
         "drafts": drafts,
+        "similar_solved": similar_solved(function),
     }
 
 
@@ -332,6 +407,9 @@ def main() -> int:
     draft.add_argument("function")
     draft.add_argument("--variant", action="append", dest="variants")
     draft.add_argument("--no-context", action="store_true")
+    similar = commands.add_parser("similar", help="rank accepted candidates by opcode-shape similarity")
+    similar.add_argument("function")
+    similar.add_argument("--limit", type=int, default=3)
     args = parser.parse_args()
 
     if args.command == "owner":
@@ -350,6 +428,8 @@ def main() -> int:
             min_instructions=args.min_instructions,
             limit=args.limit,
         ), indent=2))
+    elif args.command == "similar":
+        print(json.dumps(similar_solved(args.function, limit=args.limit), indent=2))
     elif args.command == "draft":
         result = draft_candidates(args.function, variants=args.variants, context=not args.no_context)
         for item in result["drafts"]:
