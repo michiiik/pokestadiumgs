@@ -394,6 +394,13 @@ $(BUILD_DIR)/%.o: %.c
 	$(V)$(OBJDUMP_CMD)
 	$(V)$(RM_MDEBUG)
 
+# Isolated pragma probes live outside src/ so normal source discovery cannot
+# link them. They still need asm-processor to expand GLOBAL_ASM pragmas just
+# like tracked decompilation sources do.
+ifeq ($(PRAGMA_PROBE),1)
+$(BUILD_DIR)/probes/%.o: CC := $(ASM_PROC) $(ASM_PROC_FLAGS) $(CC) -- $(AS) $(ASFLAGS) --
+endif
+
 # Add these as a dependency for .o files
 asset_files: $(ASSET_INC_C)
 $(O_FILES): | asset_files

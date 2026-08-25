@@ -42,18 +42,40 @@ def main():
                         "function": {"type": "string"}, "code": {"type": "string"},
                         "label": {"type": "string", "description": "Optional family/source-shape label echoed in the attempt diagnostics."},
                     }}, "description": "Ordered candidates; later variants for a solved function are skipped."},
-                    "workers": {"type": "integer", "minimum": 1, "description": "Maximum parallel isolated compile probes (default: PRAGMA_PROBE_WORKERS or 4)."},
+                    "workers": {"type": "integer", "minimum": 1, "description": "Maximum parallel isolated compile probes (default: PRAGMA_PROBE_WORKERS or 10)."},
+                    "gate": {"type": "boolean", "default": True, "description": "Run the sequential full COMPARE=1 gate and update source (default true). Set false for isolated probe-only results."},
                 }},
             }]})
         elif method == "tools/call" and request.get("params", {}).get("name") == "try_pragma_candidates":
             args = request["params"].get("arguments", {})
             root = Path(__file__).resolve().parent.parent
-            source = (root / args["source"]).resolve()
+            try:
+                source = (root / args["source"]).resolve()
+                source.relative_to(root / "disasm")
+            except (KeyError, ValueError):
+                reply(
+                    request_id,
+                    error={
+                        "code": -32602,
+                        "message": "source must resolve under the repository disasm directory",
+                    },
+                )
+                continue
+            if not source.is_file():
+                reply(
+                    request_id,
+                    error={
+                        "code": -32602,
+                        "message": f"source file does not exist: {source}",
+                    },
+                )
+                continue
             blocks = [(item["function"], item["code"]) for item in args["candidates"]]
             labels = [item.get("label") for item in args["candidates"]]
             workers = args.get("workers")
             if workers is not None:
                 workers = int(workers)
+            gate = bool(args.get("gate", True))
             # The comparison helper prints build logs to stdout.  MCP stdio
             # must contain JSON-RPC messages only, so capture those logs
             # instead of corrupting the transport stream.
@@ -67,7 +89,11 @@ def main():
                 os.dup2(devnull_fd, sys.stdout.fileno())
                 with contextlib.redirect_stdout(captured):
                     result = runner.try_candidates_detailed(
-                        source, blocks, probe_workers=workers, labels=labels
+                        source,
+                        blocks,
+                        probe_workers=workers,
+                        labels=labels,
+                        gate=gate,
                     )
             finally:
                 sys.stdout.flush()

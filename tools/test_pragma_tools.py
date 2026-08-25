@@ -282,6 +282,47 @@ class RunnerTests(unittest.TestCase):
         self.assertEqual(details["expected_instruction_text"], "addiu $a0, $zero, 1")
         self.assertEqual(details["actual_instruction_text"], "addiu $a1, $zero, 1")
         self.assertEqual(details["expected_tail_kind"], "normal_return")
+        self.assertEqual(details["total_instructions"], 3)
+        self.assertEqual(details["matched_instructions"], 3)
+        self.assertEqual(details["exact_instruction_matches"], 2)
+        self.assertEqual(details["similarity_score"], 1.0)
+        self.assertEqual(details["exact_similarity_score"], 0.6667)
+        self.assertEqual(details["assembly_diff"][0]["expected_offset"], 0)
+        self.assertTrue(details["assembly_diff"][0]["normalized_match"])
+
+    def test_instruction_normalization_preserves_shape(self) -> None:
+        self.assertEqual(
+            runner._normalise_instruction_text("lw v0,4(a1)"),
+            runner._normalise_instruction_text("lw t7,12(a0)"),
+        )
+        self.assertEqual(
+            runner._normalise_instruction_text("lwc1 f0,4(a0)"),
+            runner._normalise_instruction_text("lwc1 f31,12(a1)"),
+        )
+        self.assertNotEqual(
+            runner._normalise_instruction_text("lw v0,4(a1)"),
+            runner._normalise_instruction_text("sw t7,12(a0)"),
+        )
+
+    def test_probe_rejections_are_ranked_without_reordering_attempts(self) -> None:
+        attempts = [
+            {"index": 0, "function": "func_a", "status": "probe_rejected", "similarity_score": 0.5},
+            {"index": 1, "function": "func_a", "status": "probe_rejected", "similarity_score": 0.9},
+            {"index": 2, "function": "func_a", "status": "probe_rejected", "similarity_score": 0.7},
+        ]
+        ranking = runner._rank_probe_rejections(
+            attempts,
+            [("func_a", "first"), ("func_a", "second"), ("func_a", "third")],
+        )
+        self.assertEqual([item["index"] for item in ranking["func_a"]], [1, 2, 0])
+        self.assertEqual([item["similarity_rank"] for item in attempts], [3, 1, 2])
+
+    def test_probe_worker_default_and_clamping(self) -> None:
+        with mock.patch.dict(os.environ, {}, clear=True):
+            self.assertEqual(runner._resolve_probe_workers(None, 50), 10)
+        with mock.patch.dict(os.environ, {"PRAGMA_PROBE_WORKERS": "3"}):
+            self.assertEqual(runner._resolve_probe_workers(None, 50), 3)
+            self.assertEqual(runner._resolve_probe_workers(20, 2), 2)
 
     def test_mismatch_diagnostics_identify_symbol_size_drift(self) -> None:
         expected = bytes.fromhex("03e00008 00000000")
@@ -296,6 +337,8 @@ class RunnerTests(unittest.TestCase):
     def test_probe_one_keeps_live_source_unchanged(self) -> None:
         repo_root = Path(__file__).resolve().parent.parent
         source_parent = repo_root / "disasm" / "src"
+        probe_root = runner._probe_root(repo_root)
+        before = set(probe_root.glob(".pragma_probe_*"))
         with tempfile.TemporaryDirectory(dir=source_parent) as directory:
             source = Path(directory) / "synthetic.c"
             original = '#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_a.s")\n'
@@ -317,6 +360,38 @@ class RunnerTests(unittest.TestCase):
                 )
             self.assertEqual(result["status"], "probe_match")
             self.assertEqual(source.read_text(), original)
+            self.assertEqual(set(probe_root.glob(".pragma_probe_*")), before)
+
+    def test_probe_only_never_runs_full_gate_or_writes_source(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.c"
+            original = '#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_a.s")\n'
+            source.write_text(original)
+            with mock.patch.object(
+                runner,
+                "probe_candidates",
+                return_value=[
+                    {
+                        "index": 0,
+                        "function": "func_a",
+                        "status": "probe_match",
+                    }
+                ],
+            ), mock.patch.object(runner, "_try_candidate_detailed") as full_gate, mock.patch.object(
+                runner, "compare_current_tree"
+            ) as full_compare:
+                result = runner.try_candidates_detailed(
+                    source,
+                    [("func_a", "void func_a(void) {}")],
+                    gate=False,
+                )
+            self.assertEqual(result["batch_status"], "probe_only")
+            self.assertEqual(result["probe_matches"], ["func_a"])
+            self.assertEqual(result["accepted"], [])
+            self.assertFalse(result["gate"])
+            self.assertEqual(source.read_text(), original)
+            full_gate.assert_not_called()
+            full_compare.assert_not_called()
 
     def test_probe_rejection_skips_full_compare(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -396,7 +471,7 @@ class RunnerTests(unittest.TestCase):
             self.assertIn("compile timed out", output)
             self.assertFalse(object_path.exists())
 
-    def test_probe_stats_are_opt_in_jsonl(self) -> None:
+    def test_probe_stats_jsonl_records_candidate_text(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             stats_path = Path(directory) / "probe-stats.jsonl"
             attempts = [{
@@ -407,10 +482,16 @@ class RunnerTests(unittest.TestCase):
                 "mismatch_kind": "operand_or_scheduling_drift",
             }]
             with mock.patch.dict(os.environ, {"PRAGMA_PROBE_STATS": str(stats_path)}):
-                runner._record_probe_stats(Path("synthetic.c"), attempts, ["wrapper-void"])
+                runner._record_probe_stats(
+                    Path("synthetic.c"),
+                    attempts,
+                    ["wrapper-void"],
+                    [("func_a", "void func_a(void) {}")],
+                )
             row = json.loads(stats_path.read_text())
             self.assertEqual(row["counts"], {"wrapper-void:compare_rejected": 1})
             self.assertEqual(row["attempts"][0]["label"], "wrapper-void")
+            self.assertEqual(row["attempts"][0]["candidate"], "void func_a(void) {}")
 
     def test_probe_hit_is_sent_to_sequential_full_gate(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

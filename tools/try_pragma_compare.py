@@ -27,6 +27,7 @@ is retained; later variants for that function are skipped.
 from __future__ import annotations
 
 import os
+import difflib
 import hashlib
 import json
 import re
@@ -34,6 +35,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 from contextlib import contextmanager
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
@@ -50,6 +52,8 @@ MIPS_REGISTERS = (
     "s0", "s1", "s2", "s3", "s4", "s5", "s6", "s7",
     "t8", "t9", "k0", "k1", "gp", "sp", "fp", "ra",
 )
+MIPS_FLOAT_REGISTERS = tuple(f"f{index}" for index in range(32))
+NORMALISABLE_REGISTERS = MIPS_REGISTERS + ("s8",) + MIPS_FLOAT_REGISTERS
 
 
 def _mips_instruction_description(word: int) -> str:
@@ -110,6 +114,38 @@ def _binutils_tool(name: str) -> str:
     return f"{prefix}{name}"
 
 
+def _probe_root(repo_root: Path) -> Path:
+    """Return the dedicated source root used by isolated probe candidates."""
+    root = repo_root / "disasm" / "probes"
+    root.mkdir(parents=True, exist_ok=True)
+    return root
+
+
+def _cleanup_stale_probe_dirs(repo_root: Path) -> None:
+    """Remove abandoned probe source trees without touching tracked sources.
+
+    Probe transactions are process-serialized by ``_candidate_transaction_lock``.
+    A one-hour age threshold keeps a live/debugging probe safe while cleaning
+    directories left behind by an interrupted runner process.
+    """
+    stale_after = _command_timeout("PRAGMA_PROBE_STALE_SECONDS", 3600.0)
+    now = time.time()
+    roots = (
+        _probe_root(repo_root),
+        repo_root / "disasm" / "src",
+        repo_root / "disasm" / "build" / "src",
+        repo_root / "disasm" / "build" / "probes",
+    )
+    for root in roots:
+        for directory in root.rglob(".pragma_probe_*"):
+            try:
+                if not directory.is_dir() or now - directory.stat().st_mtime < stale_after:
+                    continue
+                shutil.rmtree(directory)
+            except OSError:
+                continue
+
+
 def _command_timeout(environment_name: str, default: float) -> float:
     """Read a positive subprocess timeout without making it mandatory."""
     value = os.environ.get(environment_name)
@@ -157,7 +193,13 @@ def _make_object(source_path: Path, *, capture: bool = False) -> tuple[int, Path
         kwargs["stderr"] = subprocess.STDOUT
     try:
         result = subprocess.run(
-            ["make", "-C", "disasm", str(object_path.relative_to(repo_root / "disasm"))],
+            [
+                "make",
+                "-C",
+                "disasm",
+                "PRAGMA_PROBE=1",
+                str(object_path.relative_to(repo_root / "disasm")),
+            ],
             timeout=_command_timeout("PRAGMA_COMPILE_TIMEOUT", 120.0),
             **kwargs,
         )
@@ -182,7 +224,8 @@ def invalidate_link_outputs(repo_root: Path) -> None:
 
 
 def try_candidate(source_path: Path, function: str, candidate: str) -> int:
-    result, _ = _try_candidate_detailed(source_path, function, candidate)
+    with _candidate_transaction_lock():
+        result, _ = _try_candidate_detailed(source_path, function, candidate)
     return result
 
 
@@ -200,37 +243,36 @@ def _try_candidate_detailed(source_path: Path, function: str, candidate: str) ->
         print(f"could not find exactly one pragma for {function}", file=sys.stderr)
         return 2, "invalid_pragma"
 
-    with tempfile.NamedTemporaryFile(
-        mode="w", encoding="utf-8", dir=source_path.parent, delete=False
-    ) as tmp:
-        tmp.write(source)
-        backup_path = Path(tmp.name)
-
+    accepted = False
     source_path.write_text(source_after)
-    if rebuild_source_object(source_path) != 0:
-        source_path.write_text(source)
-        rebuild_source_object(source_path)
-        backup_path.unlink(missing_ok=True)
-        return 2, "compile_failed"
-    invalidate_link_outputs(Path(__file__).resolve().parent.parent)
-    result, output = _run_compare(Path(__file__).resolve().parent.parent)
-    print(output, end="")
+    try:
+        if rebuild_source_object(source_path) != 0:
+            return 2, "compile_failed"
+        invalidate_link_outputs(Path(__file__).resolve().parent.parent)
+        result, output = _run_compare(Path(__file__).resolve().parent.parent)
+        print(output, end="")
 
-    if result != 0:
-        shutil.copyfile(backup_path, source_path)
-        # Force make to rebuild the restored object instead of reusing the
-        # rejected candidate object, regardless of filesystem timestamp
-        # resolution.
-        os.utime(source_path, None)
-        rebuild_source_object(source_path)
-        print(f"REJECTED {function}: restored GLOBAL_ASM")
-        outcome = "compare_rejected"
-    else:
+        if result != 0:
+            print(f"REJECTED {function}: restored GLOBAL_ASM")
+            return result, "compare_rejected"
+
+        accepted = True
         print(f"ACCEPTED {function}: source replacement kept")
-        outcome = "accepted"
-
-    backup_path.unlink(missing_ok=True)
-    return result, outcome
+        return result, "accepted"
+    finally:
+        if not accepted:
+            try:
+                source_path.write_text(source)
+                # Force make to rebuild the restored object instead of reusing
+                # the rejected candidate object, regardless of timestamp
+                # resolution.
+                os.utime(source_path, None)
+                rebuild_source_object(source_path)
+            except (OSError, RuntimeError):
+                # Preserve the original candidate failure; the next guarded
+                # transaction will repair the object if the compiler was
+                # interrupted while restoring it.
+                pass
 
 
 def _run_compare(repo_root: Path) -> tuple[int, str]:
@@ -355,6 +397,72 @@ def _classify_tail_bytes(data: bytes) -> str:
     return "no_return_found"
 
 
+def _disassemble_bytes(data: bytes) -> list[str]:
+    """Disassemble raw big-endian MIPS words with the configured binutils."""
+    words = len(data) // 4
+    if words == 0:
+        return []
+    data = data[: words * 4]
+    with tempfile.TemporaryDirectory(prefix=".pragma_disasm_") as directory:
+        binary = Path(directory) / "function.bin"
+        binary.write_bytes(data)
+        try:
+            result = subprocess.run(
+                [
+                    _binutils_tool("objdump"),
+                    "-D",
+                    "-EB",
+                    "-b",
+                    "binary",
+                    "-m",
+                    "mips:isa32",
+                    str(binary),
+                ],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+                timeout=_command_timeout("PRAGMA_OBJDUMP_TIMEOUT", 5.0),
+            )
+        except (OSError, subprocess.TimeoutExpired):
+            return []
+    if result.returncode != 0:
+        return []
+    instruction_re = re.compile(r"^\s*[0-9a-fA-F]+:\s+[0-9a-fA-F]{8}\s+(.+?)\s*$")
+    instructions = []
+    for line in result.stdout.splitlines():
+        match = instruction_re.match(line)
+        if match:
+            instructions.append(match.group(1))
+    return instructions
+
+
+def _instruction_texts(data: bytes) -> list[str]:
+    """Return objdump text, falling back to the local compact decoder."""
+    instructions = _disassemble_bytes(data)
+    if instructions:
+        return instructions
+    return [
+        _mips_instruction_description(
+            int.from_bytes(data[offset:offset + 4], "big")
+        )
+        for offset in range(0, len(data) - 3, 4)
+    ]
+
+
+def _normalise_instruction_text(text: str) -> str:
+    """Erase register/immediate allocation while retaining opcode shape."""
+    registers = "|".join(
+        re.escape(register) for register in NORMALISABLE_REGISTERS
+    )
+    text = re.sub(
+        rf"(?<![A-Za-z0-9_])\$?(?:{registers})(?![A-Za-z0-9_])",
+        "REG",
+        text.lower(),
+    )
+    text = re.sub(r"(?<![A-Za-z0-9_])-?(?:0x[0-9a-f]+|[0-9]+)(?![A-Za-z0-9_])", "IMM", text)
+    return re.sub(r"\s+", " ", text).strip()
+
+
 def _function_mismatch_details(
     object_path: Path,
     function: str,
@@ -373,6 +481,76 @@ def _function_mismatch_details(
         details["first_diff_offset"] = None
         return details
     details["actual_tail_kind"] = _classify_tail_bytes(actual)
+    expected_texts = _instruction_texts(expected)
+    actual_texts = _instruction_texts(actual)
+    expected_words = [
+        int.from_bytes(expected[offset:offset + 4], "big")
+        for offset in range(0, len(expected) - 3, 4)
+    ]
+    actual_words = [
+        int.from_bytes(actual[offset:offset + 4], "big")
+        for offset in range(0, len(actual) - 3, 4)
+    ]
+    instruction_count = max(len(expected_texts), len(actual_texts))
+    normalized_expected = [_normalise_instruction_text(text) for text in expected_texts]
+    normalized_actual = [_normalise_instruction_text(text) for text in actual_texts]
+    normalized_matcher = difflib.SequenceMatcher(
+        None, normalized_expected, normalized_actual, autojunk=False
+    )
+    raw_matcher = difflib.SequenceMatcher(None, expected_words, actual_words, autojunk=False)
+    normalized_matches = sum(block.size for block in normalized_matcher.get_matching_blocks())
+    raw_matches = sum(block.size for block in raw_matcher.get_matching_blocks())
+    details["expected_instruction_count"] = len(expected_texts)
+    details["actual_instruction_count"] = len(actual_texts)
+    details["total_instructions"] = instruction_count
+    details["matched_instructions"] = normalized_matches
+    details["exact_instruction_matches"] = raw_matches
+    details["normalized_matched_instructions"] = normalized_matches
+    details["raw_similarity_score"] = round(raw_matches / instruction_count, 4) if instruction_count else 1.0
+    details["exact_similarity_score"] = details["raw_similarity_score"]
+    details["similarity_score"] = round(normalized_matches / instruction_count, 4) if instruction_count else 1.0
+    assembly_diff: list[dict[str, object]] = []
+    for tag, expected_start, expected_end, actual_start, actual_end in raw_matcher.get_opcodes():
+        if tag == "equal":
+            continue
+        width = max(expected_end - expected_start, actual_end - actual_start)
+        for delta in range(width):
+            expected_index = expected_start + delta
+            actual_index = actual_start + delta
+            expected_text = (
+                expected_texts[expected_index]
+                if expected_index < expected_end
+                else "<missing>"
+            )
+            actual_text = (
+                actual_texts[actual_index]
+                if actual_index < actual_end
+                else "<missing>"
+            )
+            expected_normalized = (
+                normalized_expected[expected_index]
+                if expected_index < expected_end
+                else "<missing>"
+            )
+            actual_normalized = (
+                normalized_actual[actual_index]
+                if actual_index < actual_end
+                else "<missing>"
+            )
+            assembly_diff.append({
+                "expected_instruction": expected_index,
+                "actual_instruction": actual_index,
+                "expected_offset": expected_index * 4,
+                "actual_offset": actual_index * 4,
+                "expected": expected_text,
+                "actual": actual_text,
+                "expected_normalized": expected_normalized,
+                "actual_normalized": actual_normalized,
+                "normalized_match": expected_normalized == actual_normalized,
+                "exact_match": expected_text == actual_text,
+            })
+    details["assembly_diff"] = assembly_diff[:32]
+    details["assembly_diff_truncated"] = len(assembly_diff) > 32
     diff_offsets = [
         index
         for index, (left, right) in enumerate(zip(expected, actual))
@@ -459,8 +637,9 @@ def _probe_one(
             "probe_reason": "invalid_pragma",
         }
 
+    repo_root = Path(__file__).resolve().parent.parent
     temporary_directory = tempfile.TemporaryDirectory(
-        prefix=".pragma_probe_", dir=source_path.parent
+        prefix=".pragma_probe_", dir=_probe_root(repo_root)
     )
     try:
         directory = Path(temporary_directory.name)
@@ -479,19 +658,27 @@ def _probe_one(
             # slot. Compare the candidate over the baseline owner's span so
             # alignment padding is validated instead of causing a false
             # probe rejection. The full ROM gate remains authoritative.
-            actual = _function_bytes(object_path, function, len(expected))
-            if expected is None or actual is None:
+            actual_symbol = _function_bytes(object_path, function)
+            if expected is None or actual_symbol is None:
                 return {
                     "status": "probe_unavailable",
                     "probe_reason": "missing_function_bytes",
                 }
-            if actual != expected:
+            actual = _function_bytes(object_path, function, len(expected))
+            comparison_span_complete = actual is not None
+            if actual is None:
+                actual = actual_symbol
+            if not comparison_span_complete or actual != expected:
                 diagnostic = {
                     "status": "probe_rejected",
                     "probe_reason": "function_bytes_differ",
+                    "comparison_span_size": len(actual),
+                    "comparison_span_complete": comparison_span_complete,
                 }
                 diagnostic.update(
-                    _function_mismatch_details(object_path, function, expected, actual)
+                    _function_mismatch_details(
+                        object_path, function, expected, actual_symbol
+                    )
                 )
                 return diagnostic
             return {"status": "probe_match"}
@@ -534,12 +721,7 @@ def probe_candidates(
         if expected[function] is None:
             results[index]["probe_reason"] = "missing_function_bytes"
 
-    if workers is None:
-        try:
-            workers = int(os.environ.get("PRAGMA_PROBE_WORKERS", "4"))
-        except ValueError:
-            workers = 4
-    workers = max(1, min(workers, len(blocks) or 1))
+    workers = _resolve_probe_workers(workers, len(blocks))
     with ThreadPoolExecutor(max_workers=workers) as executor:
         futures = {
             executor.submit(
@@ -564,6 +746,62 @@ def probe_candidates(
     return results
 
 
+def _resolve_probe_workers(workers: int | None, candidate_count: int) -> int:
+    if workers is None:
+        try:
+            workers = int(os.environ.get("PRAGMA_PROBE_WORKERS", "10"))
+        except ValueError:
+            workers = 10
+    return max(1, min(workers, candidate_count or 1))
+
+
+def _rank_probe_rejections(
+    attempts: list[dict[str, object]],
+    blocks: list[tuple[str, str]],
+) -> dict[str, list[dict[str, object]]]:
+    """Rank rejected variants by normalized instruction similarity.
+
+    Candidate order is preserved in ``attempts`` because it controls which
+    probe hit reaches the sequential gate first.  Rankings are an additional
+    diagnostic view for hill-climbing difficult functions.
+    """
+    grouped: dict[str, list[tuple[int, dict[str, object]]]] = {}
+    for index, attempt in enumerate(attempts):
+        if attempt.get("status") != "probe_rejected":
+            continue
+        score = attempt.get("similarity_score")
+        if not isinstance(score, (int, float)):
+            continue
+        function = blocks[index][0]
+        grouped.setdefault(function, []).append((index, attempt))
+
+    rankings: dict[str, list[dict[str, object]]] = {}
+    for function, rows in grouped.items():
+        rows.sort(
+            key=lambda row: (
+                float(row[1].get("similarity_score", 0.0)),
+                float(row[1].get("raw_similarity_score", 0.0)),
+            ),
+            reverse=True,
+        )
+        ranked: list[dict[str, object]] = []
+        for rank, (index, attempt) in enumerate(rows, 1):
+            attempt["similarity_rank"] = rank
+            attempt["similarity_total"] = len(rows)
+            ranked.append({
+                "index": index,
+                "label": attempt.get("label"),
+                "similarity_score": attempt.get("similarity_score"),
+                "matched_instructions": attempt.get("matched_instructions"),
+                "total_instructions": attempt.get("total_instructions"),
+                "raw_similarity_score": attempt.get("raw_similarity_score"),
+                "first_diff_instruction": attempt.get("first_diff_instruction"),
+                "mismatch_kind": attempt.get("mismatch_kind"),
+            })
+        rankings[function] = ranked
+    return rankings
+
+
 def _full_gate_eligible(attempt: dict[str, object]) -> bool:
     """Return whether this specific attempt may use the sequential fallback."""
     if attempt.get("status") == "probe_match":
@@ -579,17 +817,26 @@ def _record_probe_stats(
     source_path: Path,
     attempts: list[dict[str, object]],
     labels: list[str | None] | None,
+    blocks: list[tuple[str, str]] | None = None,
 ) -> None:
-    """Append optional JSONL probe outcomes for family-level tuning.
+    """Append JSONL probe outcomes for family-level tuning.
 
-    Statistics are opt-in so normal MCP calls remain as lightweight as before.
-    The transaction lock surrounds this call, making one JSON object append
-    atomic with respect to other runner processes in this repository.
+    The default file is ignored build output; set ``PRAGMA_PROBE_STATS`` to
+    override it, or to an empty string to disable metrics. The transaction lock
+    surrounds this call, making one JSON object append atomic across runners.
     """
     stats_path_value = os.environ.get("PRAGMA_PROBE_STATS")
-    if not stats_path_value:
+    if stats_path_value == "":
         return
-    stats_path = Path(stats_path_value).expanduser()
+    if stats_path_value is None:
+        stats_path = (
+            Path(__file__).resolve().parent.parent
+            / "disasm"
+            / "build"
+            / "probe-stats.jsonl"
+        )
+    else:
+        stats_path = Path(stats_path_value).expanduser()
     try:
         stats_path.parent.mkdir(parents=True, exist_ok=True)
         counts: dict[str, int] = {}
@@ -610,6 +857,14 @@ def _record_probe_stats(
                 "mismatch_kind": attempt.get("mismatch_kind"),
                 "expected_size": attempt.get("expected_size"),
                 "actual_size": attempt.get("actual_size"),
+                "similarity_score": attempt.get("similarity_score"),
+                "exact_similarity_score": attempt.get("exact_similarity_score"),
+                "similarity_rank": attempt.get("similarity_rank"),
+                "candidate": (
+                    blocks[index][1]
+                    if blocks is not None and index < len(blocks)
+                    else None
+                ),
             }
             rows.append(row)
             key = f"{label or 'unlabeled'}:{attempt.get('status', 'unknown')}"
@@ -655,13 +910,23 @@ def try_candidates_detailed(
     *,
     probe_workers: int | None = None,
     labels: list[str | None] | None = None,
+    gate: bool = True,
 ) -> dict[str, object]:
     """Run one candidate transaction while excluding other MCP processes."""
     with _candidate_transaction_lock():
         result = _try_candidates_detailed_unlocked(
-            source_path, blocks, probe_workers=probe_workers, labels=labels
+            source_path,
+            blocks,
+            probe_workers=probe_workers,
+            labels=labels,
+            gate=gate,
         )
-        _record_probe_stats(source_path, result.get("attempts", []), labels)
+        _record_probe_stats(
+            source_path,
+            result.get("attempts", []),
+            labels,
+            blocks,
+        )
         return result
 
 
@@ -671,6 +936,7 @@ def _try_candidates_detailed_unlocked(
     *,
     probe_workers: int | None = None,
     labels: list[str | None] | None = None,
+    gate: bool = True,
 ) -> dict[str, object]:
     """Try candidates and retain the first winner per function.
 
@@ -683,11 +949,32 @@ def _try_candidates_detailed_unlocked(
     baseline = source_path.read_text()
     accepted: dict[str, str] = {}
     accepted_indices: dict[str, int] = {}
+    _cleanup_stale_probe_dirs(repo_root)
+    probe_workers = _resolve_probe_workers(probe_workers, len(blocks))
     attempts = probe_candidates(source_path, blocks, workers=probe_workers)
     if labels is not None:
         for index, attempt in enumerate(attempts):
             if index < len(labels) and labels[index]:
                 attempt["label"] = labels[index]
+
+    rejection_rankings = _rank_probe_rejections(attempts, blocks)
+
+    if not gate:
+        probe_matches = [
+            attempt["function"]
+            for attempt in attempts
+            if attempt.get("status") == "probe_match"
+        ]
+        return {
+            "status": 0 if probe_matches else 1,
+            "accepted": [],
+            "probe_matches": probe_matches,
+            "attempts": attempts,
+            "rejected_ranking": rejection_rankings,
+            "batch_status": "probe_only",
+            "probe_workers": probe_workers,
+            "gate": False,
+        }
 
     # Fall back only for the affected function when its baseline bytes cannot
     # be inspected.  A missing symbol in one owner must not send every other
@@ -744,8 +1031,10 @@ def _try_candidates_detailed_unlocked(
             "status": 1,
             "accepted": [],
             "attempts": attempts,
+            "rejected_ranking": rejection_rankings,
             "batch_status": "no_candidate_accepted",
             "probe_workers": probe_workers,
+            "gate": True,
         }
 
     combined = baseline
@@ -763,8 +1052,10 @@ def _try_candidates_detailed_unlocked(
                 "status": 2,
                 "accepted": [],
                 "attempts": attempts,
+                "rejected_ranking": rejection_rankings,
                 "batch_status": "invalid_pragma",
                 "probe_workers": probe_workers,
+                "gate": True,
             }
     source_path.write_text(combined)
     os.utime(source_path, None)
@@ -776,8 +1067,10 @@ def _try_candidates_detailed_unlocked(
             "status": 2,
             "accepted": [],
             "attempts": attempts,
+            "rejected_ranking": rejection_rankings,
             "batch_status": "combined_compile_failed",
             "probe_workers": probe_workers,
+            "gate": True,
         }
     if accepted:
         print(f"checking {len(accepted)} accepted candidate(s) together")
@@ -791,8 +1084,10 @@ def _try_candidates_detailed_unlocked(
                 "status": result,
                 "accepted": [],
                 "attempts": attempts,
+                "rejected_ranking": rejection_rankings,
                 "batch_status": "combined_compare_rejected",
                 "probe_workers": probe_workers,
+                "gate": True,
             }
     else:
         source_path.write_text(baseline)
@@ -804,15 +1099,19 @@ def _try_candidates_detailed_unlocked(
             "status": 1,
             "accepted": [],
             "attempts": attempts,
+            "rejected_ranking": rejection_rankings,
             "batch_status": "no_candidate_accepted",
             "probe_workers": probe_workers,
+            "gate": True,
         }
     return {
         "status": 0,
         "accepted": list(accepted),
         "attempts": attempts,
+        "rejected_ranking": rejection_rankings,
         "batch_status": "accepted",
         "probe_workers": probe_workers,
+        "gate": True,
     }
 
 

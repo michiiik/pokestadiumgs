@@ -5,6 +5,7 @@
 
 # Decompilation outputs
 disasm/build/
+disasm/probes/
 generated/
 
 # Android/Gradle outputs and machine-local configuration
