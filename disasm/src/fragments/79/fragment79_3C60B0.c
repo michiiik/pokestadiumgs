@@ -320,7 +320,15 @@ void func_84157CB0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84157EB0.s")
+extern void func_8415F0D0(s32);
+extern void func_841603A0(s32);
+void func_84157EB0(void) {
+    s32 temp[3];
+    extern void func_841568A0();
+    func_84156BA0();
+    func_841568A0(temp);
+    func_8415F0D0(0x708);
+}
 #endif
 
 #ifdef VERSION_US
@@ -339,7 +347,13 @@ void func_84157F00(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84157F54.s")
+void func_84157F54(void) {
+    s32 temp[3];
+    extern void func_841568A0();
+    func_84156BA0();
+    func_841568A0(temp);
+    func_841603A0(0x708);
+}
 #endif
 
 #ifdef VERSION_US

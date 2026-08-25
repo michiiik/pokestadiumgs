@@ -235,7 +235,14 @@ void func_8220ADA8(s32 arg0, void *arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_8220ADE0.s")
+extern u8 D_8220DEF8[];
+s32 func_8220ADE0(s32 arg0) {
+    s32 result = 0;
+    if ((arg0 >= 0) && (arg0 < 6)) {
+        result = *(s32 *)(D_8220DEF8 + (arg0 * 0x1C));
+    }
+    return result;
+}
 
 extern s16 D_822106B2;
 

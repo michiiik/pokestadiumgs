@@ -118,11 +118,26 @@ void func_81301DD8(s32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_81301E14.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_81301E80.s")
+extern void func_8130CB5C(s32);
+extern void func_81311650(s32, s32);
+extern void func_8130DEB8(s32, s32);
+void func_81301E80(s32 arg0, s32 arg1) {
+    func_8130CB5C(arg0 + 0xD18);
+    func_81311650(arg0 + 0x74, arg1);
+    func_8130DEB8(arg0, arg1);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_81301EC4.s")
+void func_81301EC4(s32 arg0, s32 arg1) {
+    func_8130CB5C(arg0 + 0xD18);
+    func_81311650(arg0 + 0x74, arg1);
+    func_8130DEB8(arg0, arg1);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_81301F08.s")
+void func_81301F08(s32 arg0, s32 arg1) {
+    func_8130CB5C(arg0 + 0xD18);
+    func_81311650(arg0 + 0x74, arg1);
+    func_8130DEB8(arg0, arg1);
+}
 
 void func_81301F4C(u8 *arg0, s32 arg1) {}
 
