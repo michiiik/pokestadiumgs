@@ -37,7 +37,12 @@ s32 func_82300AB4(void) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82300AD4.s")
+extern s16 D_82305EB4;
+s32 func_82300AD4(void) {
+    s32 result = 0;
+    if (D_82305EB4 == 2) result = 1;
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82300AF8.s")
 
@@ -117,7 +122,16 @@ s32 func_82301428(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82302320.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82302B44.s")
+extern void func_800498C4(void);
+extern void func_800496A4(s32, s32);
+extern void func_8004972C(s32, s32, s32, s32);
+extern void func_800499EC(void);
+void func_82302B44(void) {
+    func_800498C4();
+    func_800496A4(8, 0);
+    func_8004972C(0, 0xFF, 0xFF, 0xFF);
+    func_800499EC();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82302B8C.s")
 

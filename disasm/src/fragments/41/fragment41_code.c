@@ -2,7 +2,26 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/41/fragment41_code/func_88C00020.s")
+typedef struct { u16 unk00; u8 unk02; u8 unk03; u8 unk04; } Frag41_Input;
+typedef struct {
+    u8 pad00[0x20];
+    u16 unk20;
+    u8 unk22;
+    u8 unk23;
+    u8 unk24;
+    u16 unk26;
+} Frag41_State;
+extern void *D_80087200;
+extern void func_80049ED8(void *);
+extern Frag41_State *D_88C01A60;
+void func_88C00020(Frag41_Input *arg0) {
+    D_88C01A60->unk20 = arg0->unk00;
+    D_88C01A60->unk22 = arg0->unk02;
+    D_88C01A60->unk23 = arg0->unk03;
+    D_88C01A60->unk24 = arg0->unk04;
+    D_88C01A60->unk26 = 0;
+    func_80049ED8(D_80087200);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/41/fragment41_code/func_88C00084.s")
 
@@ -10,17 +29,100 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/41/fragment41_code/func_88C00AB0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/41/fragment41_code/func_88C00BFC.s")
+typedef float Frag41_MtxF_t[4][4];
+typedef union {
+    Frag41_MtxF_t mf;
+    struct {
+        f32 xx, yx, zx, wx;
+        f32 xy, yy, zy, wy;
+        f32 xz, yz, zz, wz;
+        f32 xw, yw, zw, ww;
+    };
+} Frag41_MtxF;
+
+void func_88C00BFC(Mtx* arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6, f32 arg7, f32 arg8, f32 arg9, f32 argA) {
+    Frag41_MtxF sp20;
+
+    guRotateF(sp20.mf, arg4, arg5, arg6, arg7);
+
+    sp20.xx *= arg1;
+    sp20.yx *= arg1;
+    sp20.zx *= arg1;
+
+    sp20.xy *= arg2;
+    sp20.yy *= arg2;
+    sp20.zy *= arg2;
+
+    sp20.xz *= arg3;
+    sp20.yz *= arg3;
+    sp20.zz *= arg3;
+
+    sp20.xw = arg8;
+    sp20.yw = arg9;
+    sp20.zw = argA;
+
+    guMtxF2L(sp20.mf, arg0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/41/fragment41_code/func_88C00CE4.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/41/fragment41_code/func_88C0107C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/41/fragment41_code/func_88C01398.s")
+extern s32 func_80001FF0(void);
+extern void func_80007AEC(s32);
+extern void func_80064D28(void);
+extern void func_88C0107C(s32);
+extern f32 D_88C01A50;
+void func_88C01398(void) {
+    u16 count;
+    s32 i;
+    count = (u16)((f32)func_80001FF0() * D_88C01A50 / 2);
+    func_80007AEC(count);
+    if (count != 0) {
+        i = 0;
+        do {
+            func_80064D28();
+            func_88C0107C(0);
+            i++;
+        } while (i != count);
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/41/fragment41_code/func_88C01494.s")
+extern void func_80064D28(void);
+extern s32 func_88C00084(void);
+extern void func_88C0107C(s32);
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/41/fragment41_code/func_88C014D8.s")
+void func_88C01494(void) {
+    s32 done;
+
+    do {
+        func_80064D28();
+        done = func_88C00084();
+        func_88C0107C(1);
+    } while (done == 0);
+}
+
+extern s32 func_80001FF0(void);
+extern void func_800225C4(s32);
+extern void func_80007B34(s32);
+extern void func_80064D28(void);
+extern void func_88C0107C(s32);
+extern f32 D_88C01A54;
+void func_88C014D8(void) {
+    u16 count;
+    s32 i;
+    count = (u16)((f32)func_80001FF0() * D_88C01A54 / 2);
+    func_800225C4(count * 2);
+    func_80007B34(count);
+    if (count != 0) {
+        i = 0;
+        do {
+            func_80064D28();
+            func_88C0107C(2);
+            i++;
+        } while (i != count);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/41/fragment41_code/func_88C015DC.s")
 

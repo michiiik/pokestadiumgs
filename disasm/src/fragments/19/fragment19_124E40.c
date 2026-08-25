@@ -54,7 +54,17 @@ void func_82305A0C(void) {
     *(s16 *)(D_82306AF8 + 6) = -1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_124E40/func_82305A28.s")
+extern s16 D_82306AFA;
+s32 func_82305A28(void) {
+    s32 result = 0;
+    if (D_82306AFA == 2) result = 1;
+    return result;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_124E40/func_82305A4C.s")
+extern s16 D_82306AFA;
+s32 func_82305A4C(void) {
+    s32 result = 0;
+    if (D_82306AFA == 0) result = 1;
+    return result;
+}
 #endif

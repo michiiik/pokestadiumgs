@@ -141,7 +141,9 @@ s32 func_81404C94(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81406A30.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81406A74.s")
+s32 func_81406A74(u8 *arg0) {
+    return arg0[6] == 5 && arg0[0x30] == 2;
+}
 
 s32 func_81406A9C(u8 *arg0) {
     return arg0[6] == 7;
