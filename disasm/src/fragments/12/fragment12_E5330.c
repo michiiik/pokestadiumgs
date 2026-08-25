@@ -6,7 +6,26 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E5330/func_81400098.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E5330/func_81400124.s")
+s32 func_80002B24();
+s32 func_800030D0(s32, s32);
+extern void func_80003120(s32);
+extern void func_81406AAC(s32 *, s32);
+extern void func_81406EA8(s32 *);
+s32 func_81600E28(s32, s32, s32);
+extern s32 D_814077A0;
+extern s32 D_814077AC;
+extern u8 D_81407BB8;
+void func_81400124(void) {
+    s32 sp1C;
+    s32 temp_v0;
+
+    temp_v0 = func_800030D0(func_80002B24(), 0);
+    sp1C = temp_v0;
+    D_814077A0 = func_81600E28(temp_v0, 1, 0x12);
+    func_80003120(sp1C);
+    func_81406AAC(&D_81407BB8, D_814077AC);
+    func_81406EA8(&D_81407BB8);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E5330/func_81400194.s")
 

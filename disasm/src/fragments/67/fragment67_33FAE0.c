@@ -26,7 +26,26 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33FAE0/func_82903444.s")
+s32 func_80002B24();
+s32 func_800030D0(s32, s32);
+extern void func_80003120(s32);
+s32 func_80004B4C(s32, s32);
+extern void func_829061CC(s32, s32, s32);
+extern void main_pool_push_state(s32);
+extern s32 D_82919D14;
+extern s32 D_82919D24;
+void func_82903444(void) {
+    s32 sp1C;
+    s32 sp18;
+    s32 temp_v0;
+
+    main_pool_push_state(0x53544144);
+    sp18 = func_80004B4C(D_82919D14, D_82919D24);
+    temp_v0 = func_800030D0(func_80002B24(), 0);
+    sp1C = temp_v0;
+    func_829061CC(D_82919D24, temp_v0, sp18);
+    func_80003120(sp1C);
+}
 #endif
 
 #ifdef VERSION_US
