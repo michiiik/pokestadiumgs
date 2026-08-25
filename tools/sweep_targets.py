@@ -40,6 +40,7 @@ UNK_GLOBAL_RE = re.compile(r"^extern M2C_UNK (\w+);", re.M)
 UNK_FUNCTION_RE = re.compile(r"^M2C_UNK (\w+)\(([^)]*)\);(\s*/\* extern \*/)?", re.M)
 UNK_TYPE_RE = re.compile(r"\bM2C_UNK\b")
 EMPTY_BLOCK_RE = re.compile(r"\{\s*\}")
+EXTERN_LINE_RE = re.compile(r"^\s*extern\b.*;\s*$")
 
 VARIANTS: dict[str, dict[str, str]] = {
     # unknown globals, unknown call returns, other unknown types
@@ -93,6 +94,24 @@ def rewrite_draft(draft: str, variant: dict[str, str]) -> str | None:
     if "M2C_" in text:
         return None
     return text.strip() + "\n"
+
+
+def split_candidate_declarations(code: str) -> tuple[str, str]:
+    """Separate leading m2c externs so compatible gate batches can share them."""
+    declarations: list[str] = []
+    body: list[str] = []
+    in_prefix = True
+    for line in code.splitlines():
+        if in_prefix and (not line.strip() or EXTERN_LINE_RE.match(line)):
+            if line.strip():
+                declarations.append(line.strip())
+            continue
+        in_prefix = False
+        body.append(line)
+    unique = list(dict.fromkeys(declarations))
+    declaration_text = "\n".join(unique) + ("\n" if unique else "")
+    body_text = "\n".join(body).strip() + "\n"
+    return declaration_text, body_text
 
 
 def padding_retry(attempt: dict[str, object]) -> int | None:
@@ -445,14 +464,47 @@ def sweep(
                 gate_labels.append(labels[index] + "+padding")
         result = probe
         if gate_blocks:
-            try:
-                result = runner.try_candidates_detailed(
-                    source_path, gate_blocks, labels=gate_labels, gate=gate, probe_workers=workers
-                )
-            except Exception as error:
-                print(f"{source_rel}: gate pass failed: {error}", file=sys.stderr)
-                summary["_errors"]["gate_pass_failed"] += 1
-                continue
+            # m2c puts an extern block in every draft.  Different owners may
+            # infer different types for the same shared symbol, so a single
+            # combined source can fail before the actual candidates are
+            # compared.  Strip the local boilerplate and gate compatible
+            # declaration blocks separately; each call still uses the MCP
+            # transaction lock and the full ROM compare.
+            gate_batches: dict[str, list[tuple[str, str, str]]] = collections.defaultdict(list)
+            for (function, code), label in zip(gate_blocks, gate_labels):
+                declarations, body = split_candidate_declarations(code)
+                gate_batches[declarations].append((function, body, label))
+            gate_attempts: list[dict[str, object]] = []
+            gate_accepted: list[str] = []
+            gate_statuses: list[str] = []
+            for declarations, batch in gate_batches.items():
+                try:
+                    gate_result = runner.try_candidates_detailed(
+                        source_path,
+                        [(function, body) for function, body, _ in batch],
+                        labels=[label for _, _, label in batch],
+                        declarations=declarations or None,
+                        gate=gate,
+                        probe_workers=workers,
+                    )
+                except Exception as error:
+                    print(f"{source_rel}: gate pass failed: {error}", file=sys.stderr)
+                    summary["_errors"]["gate_pass_failed"] += 1
+                    gate_statuses.append("gate_pass_failed")
+                    continue
+                gate_statuses.append(str(gate_result.get("batch_status")))
+                gate_attempts.extend(gate_result.get("attempts", []))
+                gate_accepted.extend(str(name) for name in gate_result.get("accepted", []))
+            batch_status = "accepted" if gate_accepted else (gate_statuses[0] if len(set(gate_statuses)) == 1 and gate_statuses else "no_candidate_accepted")
+            result = {
+                "status": 0 if gate_accepted else 1,
+                "accepted": gate_accepted,
+                "attempts": gate_attempts,
+                "rejected_ranking": probe.get("rejected_ranking", {}),
+                "batch_status": batch_status,
+                "probe_workers": workers,
+                "gate": gate,
+            }
             # Keep the diagnostics of pass 1 for functions that had nothing to gate.
             gated_functions = {function for function, _ in gate_blocks}
             result["attempts"] = list(result["attempts"]) + [

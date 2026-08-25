@@ -894,6 +894,13 @@ class SweepTests(unittest.TestCase):
         self.assertIn("ptr-void", names)
         self.assertIn("ptr-s32", names)
 
+    def test_split_candidate_declarations_deduplicates_m2c_prefix(self) -> None:
+        declarations, body = sweep_targets.split_candidate_declarations(
+            "extern s32 helper(s32);\nextern s32 helper(s32);\n\nvoid func_a(void) {}\n"
+        )
+        self.assertEqual(declarations, "extern s32 helper(s32);\n")
+        self.assertEqual(body, "void func_a(void) {}\n")
+
     def test_near_miss_permutes_and_gates_score_zero(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             stats = Path(directory) / "stats.jsonl"
