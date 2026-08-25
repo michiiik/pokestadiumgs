@@ -2649,7 +2649,18 @@ extern s32 D_80126520; void func_800403B0(void) { D_80126520 += 0xC; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80041F60.s")
+extern s16 D_8009F428[];
+s32 func_80041F60(s16 *arg0) {
+    s16 *ptr = D_8009F428;
+    s32 result = 0;
+    while (*ptr != -1) {
+        if (ptr == arg0) {
+            result = 1;
+        }
+        ptr++;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
@@ -2702,7 +2713,7 @@ extern void func_800425C0(s32, void *);
 void func_800428F8(s32 arg0) {
     void *sp1C;
 
-    osRecvMesg(arg0 + 0x50, &sp1C, 1);
+    osRecvMesg((OSMesgQueue *)(u32)(arg0 + 0x50), &sp1C, 1);
     func_800425C0(arg0, sp1C);
 }
 #endif
@@ -2713,7 +2724,7 @@ extern void func_800425C0(s32, void *);
 void func_80042930(s32 arg0) {
     void *sp1C;
 
-    osRecvMesg(arg0 + 0x70, &sp1C, 1);
+    osRecvMesg((OSMesgQueue *)(u32)(arg0 + 0x70), &sp1C, 1);
     func_800425C0(arg0, sp1C);
 }
 #endif
@@ -2724,7 +2735,7 @@ extern void func_800425C0(s32, void *);
 void func_80042968(s32 arg0) {
     void *sp1C;
 
-    osRecvMesg(arg0 + 0x90, &sp1C, 1);
+    osRecvMesg((OSMesgQueue *)(u32)(arg0 + 0x90), &sp1C, 1);
     func_800425C0(arg0, sp1C);
 }
 #endif
@@ -2735,7 +2746,7 @@ extern void func_800425C0(s32, void *);
 void func_800429A0(s32 arg0) {
     void *sp1C;
 
-    osRecvMesg(arg0 + 0xB0, &sp1C, 1);
+    osRecvMesg((OSMesgQueue *)(u32)(arg0 + 0xB0), &sp1C, 1);
     func_800425C0(arg0, sp1C);
 }
 #endif

@@ -14,7 +14,14 @@ u16 func_800579D0(const u8 *arg0) { return (u16)((arg0[1] << 8) | arg0[0]); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80057A1C.s")
+extern u8 D_80128574[];
+s32 func_80057A1C(s32 arg0) {
+    u8 value = D_80128574[arg0 * 0x70];
+    if ((value == 5) || (value == 6)) {
+        return 1;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -701,7 +708,14 @@ extern u8 D_80128570[]; s32 func_8005DF70(s32 index) { return (*(u32 *)(D_801285
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005E03C.s")
+extern u8 D_80128570[];
+u8 func_8005E03C(s32 arg0) {
+    u8 *entry = D_80128570 + (arg0 * 0x70);
+    if (*(u32 *)entry & 2) {
+        return *(u8 *)(*(u8 **)(entry + 0x68) + 0x5E5);
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US

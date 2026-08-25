@@ -10,7 +10,16 @@ u16 func_80003820(const u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800039C8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80003A78.s")
+void func_80003A78(u8 *arg0, u8 *arg1, u8 *arg2) {
+    *(u32 *)(arg0 + 0x00) = *(u32 *)(arg2 + 0x14);
+    *(u8 *)(arg0 + 0x04) = *(u8 *)(arg2 + 0x00);
+    *(u8 *)(arg0 + 0x05) = 2;
+    *(u32 *)(arg0 + 0x08) = (u32)arg1;
+    *(u32 *)(arg0 + 0x0C) = (u32)(arg1 + 0xA8);
+    *(u32 *)(arg0 + 0x10) = (u32)(arg1 + 0x54);
+    *(u32 *)(arg0 + 0x14) = (u32)(arg1 + 0xFC);
+    *(u8 *)(arg0 + 0x18) = *(u8 *)(arg2 + 0x01);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80003AB8.s")
 

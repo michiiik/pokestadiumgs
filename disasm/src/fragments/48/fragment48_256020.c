@@ -126,7 +126,13 @@ void *func_87C008DC(void *arg0, f64 arg1, f64 arg2, f64 arg3, f64 arg4) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C00AE4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C00B58.s")
+f64 func_87C00B58(u8 *arg0) {
+    f64 temp_fv1 = *(f64 *)(arg0 + 0);
+    f64 temp_fa0 = *(f64 *)(arg0 + 8);
+    f64 temp_fa1 = *(f64 *)(arg0 + 0x10);
+    f64 temp_ft4 = *(f64 *)(arg0 + 0x18);
+    return (f64) sqrtf((f32) ((temp_fv1 * temp_fv1) + (temp_fa0 * temp_fa0) + (temp_fa1 * temp_fa1) + (temp_ft4 * temp_ft4)));
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C00B94.s")
 

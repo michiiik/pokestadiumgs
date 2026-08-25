@@ -68,9 +68,23 @@ void func_8AF10CD4(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF10D08.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF11358.s")
+void func_8AF11358(f32 *arg0, f32 arg1, f32 arg2) {
+    f32 value = *arg0;
+    if (arg1 < value) {
+        value -= arg2;
+        if (value < arg1) value = arg1;
+        *arg0 = value;
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF11398.s")
+void func_8AF11398(f32 *arg0, f32 arg1, f32 arg2) {
+    f32 value = *arg0;
+    if (value < arg1) {
+        value += arg2;
+        if (arg1 < value) value = arg1;
+        *arg0 = value;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF113D8.s")
 
