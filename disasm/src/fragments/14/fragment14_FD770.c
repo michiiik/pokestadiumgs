@@ -2,7 +2,10 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FD770/func_813055E0.s")
+s32 func_813055E0(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    s32 result = (((arg3 + arg1) * 2) + arg2) - 1;
+    return result >= 0 ? result : 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FD770/func_8130560C.s")
 

@@ -567,6 +567,7 @@ class RunnerTests(unittest.TestCase):
                 "status": "compare_rejected",
                 "probe_status": "probe_match",
                 "mismatch_kind": "operand_or_scheduling_drift",
+                "diagnostic": "incompatible pointer conversion",
             }]
             with mock.patch.dict(os.environ, {"PRAGMA_PROBE_STATS": str(stats_path)}):
                 runner._record_probe_stats(
@@ -574,11 +575,14 @@ class RunnerTests(unittest.TestCase):
                     attempts,
                     ["wrapper-void"],
                     [("func_a", "void func_a(void) {}")],
+                    "extern void helper(void);",
                 )
             row = json.loads(stats_path.read_text())
             self.assertEqual(row["counts"], {"wrapper-void:compare_rejected": 1})
             self.assertEqual(row["attempts"][0]["label"], "wrapper-void")
             self.assertEqual(row["attempts"][0]["candidate"], "void func_a(void) {}")
+            self.assertEqual(row["attempts"][0]["diagnostic"], "incompatible pointer conversion")
+            self.assertEqual(row["attempts"][0]["declarations"], "extern void helper(void);")
 
     def test_probe_hit_is_sent_to_sequential_full_gate(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -881,6 +885,43 @@ class SweepTests(unittest.TestCase):
         self.assertIsNone(sweep_targets.padding_retry({**clean, "diff_offsets": [4]}))
         self.assertIsNone(sweep_targets.padding_retry({**clean, "expected_tail_kind": "normal_return"}))
         self.assertIsNone(sweep_targets.padding_retry({**clean, "mismatch_kind": "instruction_drift"}))
+
+    def test_fragment_range_and_compile_failure_variant_selection(self) -> None:
+        self.assertEqual(sweep_targets.parse_fragment_range("17-32"), (17, 32))
+        with self.assertRaises(ValueError):
+            sweep_targets.parse_fragment_range("32-17")
+        names = sweep_targets.compile_failure_variant_names("incompatible pointer conversion")
+        self.assertIn("ptr-void", names)
+        self.assertIn("ptr-s32", names)
+
+    def test_near_miss_permutes_and_gates_score_zero(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            stats = Path(directory) / "stats.jsonl"
+            stats.write_text(json.dumps({
+                "source": "disasm/src/synthetic.c",
+                "attempts": [{
+                    "function": "func_a",
+                    "label": "m2c:s32-s32",
+                    "status": "compare_rejected",
+                    "similarity_score": 0.95,
+                    "candidate": "void func_a(void) {}",
+                    "declarations": "extern void helper(void);",
+                }],
+            }) + "\n")
+            owner = targets.Owner("func_a", "disasm/src/synthetic.c", "asm/us/nonmatchings/synthetic/func_a.s")
+            with mock.patch.object(targets, "require_owner", return_value=owner), mock.patch.object(
+                sweep_targets.permute_candidate,
+                "permute",
+                return_value={"outputs": [{"score": 0, "code": "void func_a(void) {}"}]},
+            ) as permute, mock.patch.object(
+                sweep_targets.runner,
+                "try_candidates_detailed",
+                return_value={"accepted": ["func_a"], "batch_status": "accepted"},
+            ) as gate:
+                result = sweep_targets.near_miss(stats_path=stats, seconds=45.0)
+            self.assertEqual(result["accepted"], ["func_a"])
+            permute.assert_called_once()
+            gate.assert_called_once()
 
 
 class SimilarSolvedTests(unittest.TestCase):

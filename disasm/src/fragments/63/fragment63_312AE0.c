@@ -43,7 +43,8 @@ void func_87E0F740(u8 *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E102D4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E10500.s")
+extern u32 D_87E1EBB8;
+void func_87E10500(s32 arg0, u8 *arg1) { if ((arg0 != 0) && (arg0 == 1)) { *(s16 *)(arg1 + 0x26) = *(s8 *)((u8 *)(u32)D_87E1EBB8 + 0x938); } }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E10524.s")
 

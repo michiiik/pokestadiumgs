@@ -13,7 +13,12 @@ s32 func_8160A31C(s32 arg0) {
     return quotient * 65 + 9;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E1E10/func_8160A33C.s")
+void *func_8160A33C(void *arg0, s32 arg1) {
+    while (arg1-- > 0) {
+        arg0 = *(void **)((u8 *)arg0 + 0x4D98);
+    }
+    return arg0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E1E10/func_8160A360.s")
 

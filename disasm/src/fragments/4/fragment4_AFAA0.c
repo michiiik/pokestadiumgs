@@ -118,7 +118,8 @@ void func_81801CB8(u8 *arg0, u8 *arg1, u8 *arg2, f32 arg3) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81801D04.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81801E3C.s")
+extern void func_81801D04(u8 *);
+void func_81801E3C(u8 *arg0, u8 *arg1) { u8 sp18[8]; func_81801A28(sp18, arg0, arg1); func_81801D04(sp18); }
 
 s32 func_81801E70(u8 *arg0, u8 *arg1) {
     return func_818019B8(arg0, arg1) && func_818019B8(arg0 + 4, arg1 + 4);
@@ -164,7 +165,14 @@ void func_81801F80(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81802BAC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81802BF0.s")
+s32 func_81802BF0(s32 arg0) {
+    s32 count = 0;
+    while (arg0 >= 2) {
+        arg0 >>= 1;
+        count++;
+    }
+    return count;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81802C14.s")
 

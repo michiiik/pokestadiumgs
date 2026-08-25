@@ -6,7 +6,8 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_13FFA0/func_82500064.s")
+extern s32 D_82508F80;
+s32 func_82500064(s32 arg0, s32 arg1) { switch (arg0) { case 0: D_82508F80 = arg1; break; case 1: break; default: break; } return 0; }
 #endif
 
 #ifdef VERSION_US

@@ -20,7 +20,10 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_3312D0/func_87F0EE0C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_3312D0/func_87F0EECC.s")
+extern u32 D_87F15BB0;
+extern void func_81A00020(void *);
+extern void func_81A005F0(void *);
+void func_87F0EECC(void) { func_81A00020(&D_87F15BB0); func_81A005F0(&D_87F15BB0); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_3312D0/func_87F0EEFC.s")
 

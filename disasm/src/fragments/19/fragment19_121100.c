@@ -108,7 +108,19 @@ s32 func_82301428(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82301C80.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82301D78.s")
+extern s32 D_82305EA4;
+s32 func_82301D78(s32 arg0, s32 arg1) {
+    switch (arg0) {
+        case 0:
+            D_82305EA4 = arg1;
+            break;
+        case 1:
+            break;
+        default:
+            break;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82301DA0.s")
 

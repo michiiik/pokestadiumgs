@@ -12,9 +12,11 @@ Usage:
     tools/sweep_targets.py --max-instructions 16                # everything small
     tools/sweep_targets.py --family call_sequence --limit 50    # a sample
     tools/sweep_targets.py --no-gate --source disasm/src/229E0.c
+    tools/sweep_targets.py --fragment-range 17-32 --max-instructions 16
 
 Sources with uncommitted changes are skipped: another session may be
-mid-transaction in them.
+mid-transaction in them.  A fragment-range sweep is exclusive: do not hand
+decompile or probe owners in that band until the sweep has finished.
 """
 
 from __future__ import annotations
@@ -29,6 +31,7 @@ import time
 from pathlib import Path
 
 import dedupe_externs
+import permute_candidate
 import pragma_targets as targets
 import try_pragma_compare as runner
 
@@ -44,7 +47,38 @@ VARIANTS: dict[str, dict[str, str]] = {
     "s32-s32": {"global": "s32", "call": "s32", "type": "s32"},
     "ptr-void": {"global": "u8 *", "call": "void", "type": "s32"},
     "u16-s32": {"global": "u16", "call": "s32", "type": "s32"},
+    # Extra spellings are kept behind family/compile-failure selection.  They
+    # are deliberately not part of the first pass for every owner: narrow
+    # globals and pointer-returning calls can change IDO scheduling.
+    "s16-void": {"global": "s16", "call": "void", "type": "s32"},
+    "u32-void": {"global": "u32", "call": "void", "type": "s32"},
+    "ptr-s32": {"global": "u8 *", "call": "s32", "type": "s32"},
 }
+
+# These orders encode the narrow IDO spellings learned from accepted owners.
+# They are candidate priorities, not ABI proof; every spelling still goes
+# through an isolated probe and the sequential ROM gate.
+FAMILY_VARIANTS: dict[str, tuple[str, ...]] = {
+    "bounded_lookup": ("u8-void", "u16-s32", "s32-s32", "ptr-void"),
+    "state_field_access": ("u8-void", "s16-void", "u16-s32", "s32-s32", "ptr-void"),
+    "constant_map": ("s32-s32", "u8-void", "u16-s32"),
+    "direct_wrapper": ("s32-s32", "ptr-void", "u8-void", "ptr-s32"),
+    "multi_call_wrapper": ("s32-s32", "ptr-void", "u8-void", "ptr-s32"),
+    "call_sequence": ("s32-s32", "ptr-void", "u8-void", "ptr-s32"),
+}
+
+
+def compile_failure_variant_names(diagnostic: str | None) -> tuple[str, ...]:
+    """Choose extra type spellings from a compiler diagnostic sample."""
+    text = (diagnostic or "").lower()
+    names: list[str] = []
+    if any(token in text for token in ("pointer", "incompatible", "conversion", "dereference")):
+        names.extend(("ptr-void", "ptr-s32", "u32-void"))
+    if any(token in text for token in ("short", "16", "halfword", "s16")):
+        names.append("s16-void")
+    if any(token in text for token in ("unknown type", "undeclared", "m2c_unk")):
+        names.extend(("s32-s32", "u16-s32"))
+    return tuple(dict.fromkeys(name for name in names if name in VARIANTS))
 
 
 def rewrite_draft(draft: str, variant: dict[str, str]) -> str | None:
@@ -80,7 +114,12 @@ def padding_retry(attempt: dict[str, object]) -> int | None:
     return padding if padding % 4 == 0 else None
 
 
-def draft_variants(function: str, context: bool = True) -> tuple[list[tuple[str, str]], str | None]:
+def draft_variants(
+    function: str,
+    context: bool = True,
+    family: str | None = None,
+    variant_names: tuple[str, ...] | None = None,
+) -> tuple[list[tuple[str, str]], str | None]:
     """Return ``[(label, code)]`` variants for one function and the raw draft."""
     owner = targets.require_owner(function)
     context_path = targets.preprocessed_context(owner) if context else None
@@ -93,7 +132,9 @@ def draft_variants(function: str, context: bool = True) -> tuple[list[tuple[str,
     draft = result.stdout
     seen: set[str] = set()
     variants: list[tuple[str, str]] = []
-    for name, variant in VARIANTS.items():
+    names = variant_names or FAMILY_VARIANTS.get(family or "", tuple(VARIANTS))
+    for name in names:
+        variant = VARIANTS[name]
         code = rewrite_draft(draft, variant)
         if code is None or code in seen:
             continue
@@ -119,6 +160,144 @@ def previously_attempted(stats_path: Path = targets.STATS_PATH, label_prefix: st
     return attempted
 
 
+def parse_fragment_range(value: str) -> tuple[int, int]:
+    """Parse the inclusive ``START-END`` fragment selector used by sweeps."""
+    match = re.fullmatch(r"(\d+)-(\d+)", value.strip())
+    if match is None:
+        raise ValueError("fragment range must be START-END")
+    start, end = (int(match.group(1)), int(match.group(2)))
+    if start > end:
+        raise ValueError("fragment range start must not exceed end")
+    return start, end
+
+
+def _fragment_number(source: str) -> int | None:
+    match = re.search(r"(?:^|/)fragments/(\d+)(?:/|$)", source.replace("\\", "/"))
+    return int(match.group(1)) if match else None
+
+
+def _stats_records(stats_path: Path = targets.STATS_PATH) -> list[dict[str, object]]:
+    records: list[dict[str, object]] = []
+    if not stats_path.exists():
+        return records
+    for line in stats_path.read_text(encoding="utf-8").splitlines():
+        try:
+            value = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(value, dict):
+            records.append(value)
+    return records
+
+
+def near_miss(
+    *,
+    stats_path: Path = targets.STATS_PATH,
+    minimum_similarity: float = 0.9,
+    seconds: float = 45.0,
+    threads: int = 4,
+    workers: int | None = None,
+    limit: int | None = None,
+) -> dict[str, object]:
+    """Permute high-scoring m2c rejects, then gate only score-0 outputs."""
+    grouped: dict[str, dict[str, object]] = {}
+    for record in _stats_records(stats_path):
+        source = record.get("source")
+        for attempt in record.get("attempts", []):
+            if not isinstance(attempt, dict):
+                continue
+            function = attempt.get("function")
+            label = str(attempt.get("label") or "")
+            status = str(attempt.get("status") or "")
+            score = attempt.get("similarity_score")
+            candidate = attempt.get("candidate")
+            if not isinstance(function, str) or not label.startswith("m2c:"):
+                continue
+            if status in {"accepted", "probe_match"} or not isinstance(score, (int, float)):
+                continue
+            if float(score) < minimum_similarity or not isinstance(candidate, str) or not candidate.strip():
+                continue
+            row = grouped.setdefault(function, {
+                "function": function,
+                "source": source,
+                "candidate": candidate,
+                "declarations": attempt.get("declarations"),
+                "label": label,
+                "similarity_score": float(score),
+                "statuses": set(),
+            })
+            statuses = row["statuses"]
+            assert isinstance(statuses, set)
+            statuses.add(status)
+            if float(score) > float(row["similarity_score"]):
+                row.update({
+                    "source": source,
+                    "candidate": candidate,
+                    "declarations": attempt.get("declarations"),
+                    "label": label,
+                    "similarity_score": float(score),
+                })
+
+    candidates = [row for row in grouped.values() if "accepted" not in row["statuses"]]
+    candidates.sort(key=lambda row: (-float(row["similarity_score"]), str(row["function"])))
+    if limit is not None:
+        candidates = candidates[:max(0, limit)]
+    accepted: list[str] = []
+    attempts: list[dict[str, object]] = []
+    for row in candidates:
+        function = str(row["function"])
+        candidate = str(row["candidate"])
+        try:
+            permutation = permute_candidate.permute(
+                function,
+                candidate,
+                declarations=row.get("declarations") if isinstance(row.get("declarations"), str) else None,
+                seconds=seconds,
+                threads=threads,
+                stop_on_zero=True,
+            )
+        except (FileNotFoundError, KeyError, RuntimeError, ValueError) as error:
+            attempts.append({"function": function, "status": "permute_failed", "error": str(error)})
+            continue
+        outputs = permutation.get("outputs") or []
+        score_zero = [item for item in outputs if isinstance(item, dict) and item.get("score") == 0]
+        if permutation.get("already_matching") and not score_zero:
+            score_zero = [{"score": 0, "code": candidate}]
+        gate_results: list[dict[str, object]] = []
+        for output in score_zero:
+            code = output.get("code") if isinstance(output, dict) else None
+            if not isinstance(code, str):
+                continue
+            try:
+                gated = runner.try_candidates_detailed(
+                    targets.require_owner(function).source_path,
+                    [(function, code)],
+                    labels=[f"permute:{row['label']}"],
+                    declarations=row.get("declarations") if isinstance(row.get("declarations"), str) else None,
+                    gate=True,
+                    probe_workers=workers,
+                )
+            except (KeyError, OSError, RuntimeError) as error:
+                gate_results.append({"status": "gate_failed", "error": str(error)})
+                continue
+            gate_results.append(gated)
+            accepted.extend(str(name) for name in gated.get("accepted", []))
+            if gated.get("accepted"):
+                break
+        attempts.append({
+            "function": function,
+            "label": row["label"],
+            "similarity_score": row["similarity_score"],
+            "permute": permutation,
+            "gate": gate_results,
+        })
+    return {
+        "candidates": len(candidates),
+        "accepted": accepted,
+        "attempts": attempts,
+    }
+
+
 def sweep(
     *,
     max_instructions: int | None,
@@ -129,6 +308,7 @@ def sweep(
     gate: bool,
     workers: int | None,
     skip_functions: set[str] | None = None,
+    fragment_range: tuple[int, int] | None = None,
 ) -> dict[str, object]:
     listing = targets.list_targets(
         source=source,
@@ -137,10 +317,20 @@ def sweep(
         min_instructions=min_instructions,
         limit=limit,
     )
+    rows = listing["targets"]
+    if fragment_range is not None:
+        start, end = fragment_range
+        rows = [
+            row for row in rows
+            if isinstance(row, dict)
+            and (fragment := _fragment_number(str(row["source"]))) is not None
+            and start <= fragment <= end
+        ]
+        listing = {**listing, "matched": len(rows), "targets": rows}
     dirty = dedupe_externs.dirty_sources()
     by_source: dict[str, list[dict[str, object]]] = collections.defaultdict(list)
     skipped_dirty = 0
-    for row in listing["targets"]:
+    for row in rows:
         if (targets.REPO_ROOT / str(row["source"])).resolve() in dirty:
             skipped_dirty += 1
             continue
@@ -154,6 +344,8 @@ def sweep(
         blocks: list[tuple[str, str]] = []
         labels: list[str] = []
         family_of: dict[str, str] = {}
+        draft_of: dict[str, str] = {}
+        labels_of: dict[str, set[str]] = collections.defaultdict(set)
         for row in rows:
             function = str(row["function"])
             family_of[function] = str(row["family"])
@@ -161,7 +353,7 @@ def sweep(
                 summary[family_of[function]]["skipped_attempted"] += 1
                 continue
             try:
-                variants, draft = draft_variants(function)
+                variants, draft = draft_variants(function, family=family_of[function])
             except KeyError:
                 # Another session replaced this pragma since the target list
                 # was captured; it is no longer ours to attempt.
@@ -177,9 +369,11 @@ def sweep(
             if not variants:
                 summary[family_of[function]]["draft_unusable"] += 1
                 continue
+            draft_of[function] = draft
             for label, code in variants:
                 blocks.append((function, code))
                 labels.append(label)
+                labels_of[function].add(label)
         if not blocks:
             continue
         source_path = targets.REPO_ROOT / source_rel
@@ -194,6 +388,49 @@ def sweep(
             print(f"{source_rel}: probe pass failed: {error}", file=sys.stderr)
             summary["_errors"]["probe_pass_failed"] += 1
             continue
+        # Compile failures are useful diagnostics, not dead ends.  Feed a
+        # small, diagnostic-selected family of extra type spellings through a
+        # second isolated pass before deciding which bodies reach the gate.
+        extra_blocks: list[tuple[str, str]] = []
+        extra_labels: list[str] = []
+        extra_seen: set[tuple[str, str]] = set()
+        for attempt in probe["attempts"]:
+            if attempt.get("status") != "compile_failed":
+                continue
+            function = str(attempt["function"])
+            draft = draft_of.get(function)
+            if draft is None:
+                continue
+            for name in compile_failure_variant_names(str(attempt.get("diagnostic") or "")):
+                label = f"m2c:{name}:compile-retry"
+                if label in labels_of[function]:
+                    continue
+                code = rewrite_draft(draft, VARIANTS[name])
+                key = (function, code or "")
+                if code is None or key in extra_seen:
+                    continue
+                extra_seen.add(key)
+                extra_blocks.append((function, code))
+                extra_labels.append(label)
+                labels_of[function].add(label)
+        if extra_blocks:
+            try:
+                extra_probe = runner.try_candidates_detailed(
+                    source_path,
+                    extra_blocks,
+                    labels=extra_labels,
+                    gate=False,
+                    probe_workers=workers,
+                )
+                offset = len(blocks)
+                for attempt in extra_probe["attempts"]:
+                    attempt["index"] = int(attempt["index"]) + offset
+                probe["attempts"].extend(extra_probe["attempts"])
+                blocks.extend(extra_blocks)
+                labels.extend(extra_labels)
+            except Exception as error:
+                print(f"{source_rel}: compile-retry probe failed: {error}", file=sys.stderr)
+                summary["_errors"]["compile_retry_failed"] += 1
         gate_blocks: list[tuple[str, str]] = []
         gate_labels: list[str] = []
         for attempt in probe["attempts"]:
@@ -271,7 +508,27 @@ def main() -> int:
     parser.add_argument("--workers", type=int)
     parser.add_argument("--json", type=Path, help="write the summary to this file")
     parser.add_argument("--skip-attempted", action="store_true", help="skip functions that already have m2c sweep attempts in the stats file")
+    parser.add_argument("--fragment-range", type=str, help="inclusive fragment band, e.g. 17-32")
+    parser.add_argument("--near-miss", action="store_true", help="permute m2c rejects at similarity >= 0.9")
+    parser.add_argument("--stats", type=Path, default=targets.STATS_PATH, help="probe stats JSONL for --near-miss")
+    parser.add_argument("--near-miss-seconds", type=float, default=45.0)
+    parser.add_argument("--near-miss-threads", type=int, default=4)
+    parser.add_argument("--near-miss-limit", type=int)
     args = parser.parse_args()
+    if args.near_miss:
+        result = near_miss(
+            stats_path=args.stats,
+            seconds=args.near_miss_seconds,
+            threads=args.near_miss_threads,
+            workers=args.workers,
+            limit=args.near_miss_limit,
+        )
+        print(json.dumps(result, indent=2, default=list))
+        return 0 if result["accepted"] else 1
+    try:
+        fragment_range = parse_fragment_range(args.fragment_range) if args.fragment_range else None
+    except ValueError as error:
+        parser.error(str(error))
     result = sweep(
         max_instructions=args.max_instructions,
         min_instructions=args.min_instructions,
@@ -281,6 +538,7 @@ def main() -> int:
         gate=not args.no_gate,
         workers=args.workers,
         skip_functions=previously_attempted() if args.skip_attempted else None,
+        fragment_range=fragment_range,
     )
     text = json.dumps(result, indent=2)
     if args.json:

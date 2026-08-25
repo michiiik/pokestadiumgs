@@ -4,7 +4,13 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/37/fragment37_code/func_88800020.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/37/fragment37_code/func_888002DC.s")
+extern void func_800033DC(void *);
+extern void main_pool_pop_state(s32);
+extern u8 *D_88804050;
+void func_888002DC(void) {
+    func_800033DC(D_88804050);
+    main_pool_pop_state(0x504D494E);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/37/fragment37_code/func_8880030C.s")
 

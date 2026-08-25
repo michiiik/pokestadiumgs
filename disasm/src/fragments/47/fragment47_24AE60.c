@@ -12,7 +12,18 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_86004BD4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_86004E84.s")
+typedef struct {
+    u8 pad[0x7518];
+    s32 value;
+} Func86004E84State;
+s32 func_86004E84(Func86004E84State *arg0) {
+    s32 result;
+    result = arg0->value == 2;
+    if (result == 0) {
+        result = arg0->value == 3;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_86004EA8.s")
 

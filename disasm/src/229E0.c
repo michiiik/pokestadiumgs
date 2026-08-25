@@ -2011,7 +2011,7 @@ s32 func_8003C988(void) { s32 var_v1 = 1; if (D_80094910 != NULL) { var_v1 = D_8
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003CD58.s")
+s32 func_8003CD58(s32 arg0) { s32 var_v1; if ((arg0 != 0) && (arg0 != 5) && (arg0 != 0xA)) { var_v1 = 0; } else { var_v1 = 1; } return var_v1; }
 #endif
 
 #ifdef VERSION_US
@@ -2375,7 +2375,12 @@ s32 func_8003F954(u16 value) { return value % 9; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FD08.s")
+extern s16 D_80126518;
+extern s32 D_80126520;
+void func_8003FD08(void) {
+    D_80126518--;
+    D_80126520 += 4;
+}
 #endif
 
 #ifdef VERSION_US

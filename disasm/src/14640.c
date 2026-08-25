@@ -38,11 +38,12 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80014708.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80014740.s")
+extern void func_80014708(s32, s32, s32, s32, s32);
+void func_80014740(s32 arg0, s32 arg1, s32 arg2, s32 arg3) { func_80014708(0, arg0, 0, arg2, arg3); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80014784.s")
+void func_80014784(s32 arg0, s32 arg1, s32 arg2, s32 arg3) { func_80014708(2, arg0, 0, arg2, arg3); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_800147C8.s")
+void func_800147C8(s32 arg0, s32 arg1, s32 arg2, s32 arg3) { func_80014708(1, arg0, 0, arg2, arg3); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_8001480C.s")
 

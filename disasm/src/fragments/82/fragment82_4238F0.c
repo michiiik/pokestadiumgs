@@ -112,7 +112,8 @@ extern u8 D_82D0717C[]; extern u8 D_82D07174[]; extern u8 D_82D07190; void func_
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D06B34.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D06C9C.s")
+extern u8 D_82D06FC4[];
+void func_82D06C9C(u8 arg0, s32 arg1) { *(s32 *)(D_82D06FC4 + (arg0 * 0x28)) = arg1; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D06CC0.s")
 

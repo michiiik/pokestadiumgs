@@ -64,7 +64,7 @@ void func_8001067C(u8 *arg0) { *(s32 *)(arg0 + 0xC) = 0; *(s32 *)(arg0 + 4) = *(
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_800113B4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_80011788.s")
+void func_80011788(void *arg0) { s32 var_v0 = 0; u8 *var_v1 = (u8 *)arg0; do { var_v0 += 4; *(s16 *)(var_v1 + 2) = 0; *(s16 *)(var_v1 + 4) = 0; *(s16 *)(var_v1 + 6) = 0; var_v1 += 8; *(s16 *)(var_v1 - 8) = 0; } while (var_v0 != 8); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_800117B8.s")
 

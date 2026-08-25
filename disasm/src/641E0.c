@@ -16,25 +16,33 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_8006378C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_800637C0.s")
+extern u8 D_8009830A[];
+u8 func_800637C0(u8 arg0) { s32 index = arg0; if ((arg0 > 0) && (arg0 < 0xFC)) return D_8009830A[index * 22]; return 0; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80063804.s")
+extern u8 D_80099E03[];
+u8 func_80063804(u8 arg0) { s32 index = arg0; if ((arg0 > 0) || (arg0 < 0xFC)) return D_80099E03[index]; return 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80063838.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_8006397C.s")
+extern u8 D_80098311[];
+u8 func_8006397C(u8 arg0) { s32 index = arg0; if ((arg0 > 0) && (arg0 < 0xFC)) return D_80098311[index * 22]; return 0; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_800639C0.s")
+extern u8 D_80098312[];
+u8 func_800639C0(u8 arg0) { s32 index = arg0; if ((arg0 > 0) && (arg0 < 0xFC)) return D_80098312[index * 22]; return 0; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80063A04.s")
+extern u8 D_80098316[];
+u8 func_80063A04(u8 arg0) { s32 index = arg0; if ((arg0 > 0) && (arg0 < 0xFC)) return D_80098316[index * 22]; return 0; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80063A48.s")
+extern u8 D_80098317[];
+u8 func_80063A48(u8 arg0) { s32 index = arg0; if ((arg0 > 0) && (arg0 < 0xFC)) return D_80098317[index * 22]; return 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80063A8C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80063B7C.s")
+extern u8 D_8009D278[];
+u8 func_80063B7C(u8 arg0) { s32 index = arg0; if ((arg0 > 0) && (arg0 < 0xFC)) return D_8009D278[index * 12]; return 0; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80063BB8.s")
+extern u8 D_8009D27C[];
+s32 func_80063BB8(u8 arg0) { s32 index = arg0; if ((arg0 > 0) && (arg0 < 0xFC)) return *(s32 *)(D_8009D27C + index * 12); return 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80063BF4.s")
 
@@ -98,7 +106,8 @@ void func_8006443C(s32 arg0, s32 arg1, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_800647C8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80064800.s")
+extern u8 D_8009D280[];
+s32 func_80064800(u8 arg0) { s32 index = arg0; if ((arg0 > 0) && (arg0 < 0xFC)) return *(s32 *)(D_8009D280 + index * 12); return 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_8006483C.s")
 #endif

@@ -4,7 +4,16 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_197640/func_882243C0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_197640/func_882243E8.s")
+extern void *D_80087200;
+extern void func_80049ED8(void *);
+extern void func_800033DC(s32);
+extern s32 D_880068B4;
+extern u32 D_88234860;
+void func_882243E8(void) {
+    func_80049ED8(D_80087200);
+    D_880068B4 = 1;
+    func_800033DC(D_88234860);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_197640/func_88224424.s")
 

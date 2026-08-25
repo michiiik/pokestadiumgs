@@ -31,7 +31,13 @@ void func_82200C3C(u8 *arg0) { _bzero(arg0 + 36, 360); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82201460.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_822014D8.s")
+extern u8 D_8220E4C8[];
+void func_822014D8(void) {
+    *(u16 *)(D_8220E4C8 + 0) = 0;
+    *(u16 *)(D_8220E4C8 + 2) = 0;
+    *(u16 *)(D_8220E4C8 + 4) = 0x280;
+    *(u16 *)(D_8220E4C8 + 6) = 0x1E0;
+}
 
 extern u8 D_8220E4C8[];
 void func_822014FC(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {

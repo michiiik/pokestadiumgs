@@ -43,7 +43,10 @@ void func_87E03448(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_306150/func_87E03B70.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_306150/func_87E03CBC.s")
+extern void func_87E03850(void *);
+extern void func_87E03A08(void *);
+extern void func_87E03B70(void *);
+void func_87E03CBC(void *arg0) { func_87E03850(arg0); func_87E03A08(arg0); func_87E03B70(arg0); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_306150/func_87E03CEC.s")
 

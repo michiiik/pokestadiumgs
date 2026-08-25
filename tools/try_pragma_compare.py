@@ -1064,6 +1064,7 @@ def _record_probe_stats(
     attempts: list[dict[str, object]],
     labels: list[str | None] | None,
     blocks: list[tuple[str, str]] | None = None,
+    declarations: str | None = None,
 ) -> None:
     """Append JSONL probe outcomes for family-level tuning.
 
@@ -1106,6 +1107,8 @@ def _record_probe_stats(
                 "similarity_score": attempt.get("similarity_score"),
                 "exact_similarity_score": attempt.get("exact_similarity_score"),
                 "similarity_rank": attempt.get("similarity_rank"),
+                "diagnostic": attempt.get("diagnostic"),
+                "declarations": declarations,
                 "candidate": (
                     blocks[index][1]
                     if blocks is not None and index < len(blocks)
@@ -1179,6 +1182,7 @@ def try_candidates_detailed(
             result.get("attempts", []),
             labels,
             blocks,
+            declarations,
         )
         return result
 

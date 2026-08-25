@@ -12,7 +12,12 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_81307128.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_81307204.s")
+void *func_81307204(void *arg0, s32 arg1) {
+    while (arg1-- > 0) {
+        arg0 = *(void **)((u8 *)arg0 + 0x33A0);
+    }
+    return arg0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_81307228.s")
 

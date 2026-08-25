@@ -33,7 +33,8 @@ void func_8F100218(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/69/fragment69_code/func_8F100274.s")
+extern u8 D_8F1DF274[];
+void func_8F100274(s32 arg0) { struct Rec { s16 value[3]; }; ((struct Rec *)D_8F1DF274)[arg0].value[0] = 0; }
 #endif
 
 #ifdef VERSION_US
