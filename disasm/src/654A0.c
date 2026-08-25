@@ -14,7 +14,14 @@ s32 func_800649CC(void) { return 2; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/654A0/func_800649D4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/654A0/func_800649E0.s")
+extern void _bzero(s32 *, s32);
+extern s8 D_80128B50;
+extern u8 D_80128B58;
+
+void func_800649E0(void) {
+    D_80128B50 = 0;
+    _bzero(&D_80128B58, 0x80);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/654A0/func_80064A10.s")
 

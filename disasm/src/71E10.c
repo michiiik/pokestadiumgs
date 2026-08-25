@@ -20,7 +20,14 @@ s32 func_80071250(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/71E10/func_800714E8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/71E10/func_80071890.s")
+s32 func_80071890(void *arg0, s32 arg1) {
+    u16 temp_v1;
+
+    if ((arg0 == NULL) || (temp_v1 = (*(u16 *)((u8 *)(arg0) + (0x38))), (temp_v1 == 0))) {
+        return 1;
+    }
+    return (s32) temp_v1 >= arg1;
+}
 
 s32 func_800718B8(s32 arg0) { extern s32 D_8009F828[]; if (arg0 < 0 || arg0 >= 0xF) return 0; return D_8009F828[arg0]; }
 
