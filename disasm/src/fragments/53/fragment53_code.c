@@ -149,7 +149,14 @@ void func_86501F98(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/53/fragment53_code/func_86508294.s")
+s32 func_87F00930();
+extern void func_87F01D44();
+
+void func_86508294(void) {
+    if (func_87F00930() == 1) {
+        func_87F01D44();
+    }
+}
 #endif
 
 #ifdef VERSION_US

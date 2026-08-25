@@ -23,7 +23,16 @@ void func_8822B240(void) {
     D_880068B8 = 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_19DFC0/func_8822B24C.s")
+extern void func_800033DC(s32);
+extern void func_88001900();
+extern s32 D_880068B4;
+extern s32 D_88234900;
+
+void func_8822B24C(void) {
+    func_88001900();
+    D_880068B4 = 1;
+    func_800033DC(D_88234900);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_19DFC0/func_8822B284.s")
 

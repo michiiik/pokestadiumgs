@@ -147,7 +147,16 @@ void func_82C003F8(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C02950.s")
+extern void func_82C02834(s32);
+extern u8 D_82C04C38;
+
+void func_82C02950(void) {
+    (*(s8 *)((u8 *)(&D_82C04C38) + (0x124A))) = 0;
+    (*(s8 *)((u8 *)(&D_82C04C38) + (0x124B))) = 0;
+    (*(s16 *)((u8 *)(&D_82C04C38) + (0x1250))) = 0;
+    (*(s8 *)((u8 *)(&D_82C04C38) + (0x1249))) = 1;
+    func_82C02834(1);
+}
 #endif
 
 #ifdef VERSION_US

@@ -16,7 +16,15 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/32/fragment32_1B6E40/func_8830639C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/32/fragment32_1B6E40/func_88306404.s")
+extern u8 D_88308E38;
+
+void func_88306404(s32 arg0) {
+    void *temp_v0;
+
+    temp_v0 = (arg0 * 0x18) + &D_88308E38;
+    (*(s32 *)((u8 *)(temp_v0) + (0))) = 2;
+    (*(s8 *)((u8 *)(temp_v0) + (4))) = 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/32/fragment32_1B6E40/func_88306430.s")
 

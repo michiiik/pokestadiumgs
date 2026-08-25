@@ -31,7 +31,14 @@ void func_8004E7FC(void) {
     D_80128098 += 4;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4EE50/func_8004E828.s")
+s32 func_8004E368(s32, s32);
+extern void func_8004E748(s32);
+extern s32 D_80128090;
+
+void func_8004E828(void) {
+    func_8004E748(func_8004E368(D_80128090, 0));
+    D_80128098 += 0x10;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4EE50/func_8004E868.s")
 

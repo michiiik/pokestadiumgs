@@ -34,7 +34,9 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_800464F8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_80046540.s")
+s32 func_80046540(s32 arg0, s32 arg1) {
+    return (arg1 / arg0) & ~1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_8004657C.s")
 

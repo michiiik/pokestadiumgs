@@ -8,7 +8,17 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/68/fragment68_code/func_8F000284.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/68/fragment68_code/func_8F0004EC.s")
+extern void func_80008648();
+extern void func_800088DC();
+extern void func_8F000098();
+extern void func_8F000284();
+
+void func_8F0004EC(void) {
+    func_800088DC();
+    func_8F000284();
+    func_8F000098();
+    func_80008648();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/68/fragment68_code/func_8F000524.s")
 

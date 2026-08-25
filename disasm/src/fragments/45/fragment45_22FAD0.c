@@ -40,7 +40,15 @@ void func_8AB0BF70(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22FAD0/func_8AB0C5CC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22FAD0/func_8AB0C7C0.s")
+void func_8AB0C7C0(void *arg0, s32 arg1) {
+    if ((*(s32 *)((u8 *)(arg0) + (0xC))) == 1) {
+        (*(s16 *)((u8 *)(arg0) + (0x10))) = (s16) ((*(s16 *)((u8 *)(arg0) + (0x10))) - 1);
+        if ((*(s16 *)((u8 *)(arg0) + (0x10))) <= 0) {
+            (*(s16 *)((u8 *)(arg0) + (0x10))) = 0;
+            (*(s32 *)((u8 *)(arg0) + (0xC))) = 0;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22FAD0/func_8AB0C7FC.s")
 

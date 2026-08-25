@@ -85,7 +85,13 @@ void func_82E02A9C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/66/fragment66_code/func_82E02CA4.s")
+extern void func_82E02A70();
+extern void func_82E02AA4(s32);
+
+void func_82E02CA4(s32 arg0) {
+    func_82E02A70();
+    func_82E02AA4(arg0);
+}
 #endif
 
 #ifdef VERSION_US

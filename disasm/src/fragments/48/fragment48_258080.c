@@ -14,7 +14,12 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_258080/func_87C02488.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_258080/func_87C02508.s")
+extern void func_87C00144(s32);
+
+void func_87C02508(s32 arg0) {
+    func_87C00144(arg0 + 0x70);
+    func_87C00144(arg0 + 0x88);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_258080/func_87C02538.s")
 

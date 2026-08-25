@@ -100,7 +100,17 @@ void func_800050D4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_80005110.s")
+s32 func_80004CF4(u32);
+
+s32 func_80005110(void) {
+    s32 var_v1;
+
+    var_v1 = 0;
+    if (D_800CDA34 != 0) {
+        var_v1 = func_80004CF4(D_800CDA34);
+    }
+    return var_v1;
+}
 #endif
 
 #ifdef VERSION_US

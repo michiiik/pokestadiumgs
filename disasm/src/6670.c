@@ -22,7 +22,15 @@ void func_80006148(u8 *arg0) { *(u16 *)(arg0 + 0x10) |= 1; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6670/func_80006158.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6670/func_800061C4.s")
+s32 func_800061C4(void *arg0) {
+    s32 var_v1;
+
+    var_v1 = 0;
+    if ((*(*(u16 **)((u8 *)(arg0) + (0x20))) & 0x1F07) == 5) {
+        var_v1 = 1;
+    }
+    return var_v1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6670/func_800061EC.s")
 

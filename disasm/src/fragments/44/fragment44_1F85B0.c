@@ -32,5 +32,12 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F85B0/func_8AF0B850.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F85B0/func_8AF0BB04.s")
+extern void func_80043E70(s32, s32);
+extern s32 D_8AF2694C;
+
+void func_8AF0BB04(void) {
+    if (D_8AF2694C != 0) {
+        func_80043E70(D_8AF2694C, 0);
+    }
+}
 #endif

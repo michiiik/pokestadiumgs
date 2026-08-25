@@ -30,7 +30,11 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33FAE0/func_829034B0.s")
+void func_829034B0(void *arg0) {
+    (*(f32 *)((u8 *)(arg0) + (0x34))) = 20.0f;
+    (*(f32 *)((u8 *)(arg0) + (0x38))) = 6400.0f;
+    (*(f32 *)((u8 *)(arg0) + (0x2C))) = 45.0f;
+}
 #endif
 
 #ifdef VERSION_US

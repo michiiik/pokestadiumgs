@@ -24,7 +24,19 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_2030B0/func_8AF15E80.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_2030B0/func_8AF15EF0.s")
+extern s16 D_8AF33C72;
+extern s16 D_8AF33C74;
+extern s16 D_8AF33C76;
+extern s16 D_8AF33C78;
+extern s16 D_8AF33C7C;
+
+void func_8AF15EF0(void) {
+    D_8AF33C72 = 0;
+    D_8AF33C74 = 8;
+    D_8AF33C76 = 8;
+    D_8AF33C78 = 0;
+    D_8AF33C7C = D_8AF33C74;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_2030B0/func_8AF15F28.s")
 

@@ -2,7 +2,14 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_19C390/func_88229110.s")
+extern void func_80049ED8(s32);
+extern s32 D_80087200;
+extern s32 D_880068B8;
+
+void func_88229110(void) {
+    func_80049ED8(D_80087200);
+    D_880068B8 = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_19C390/func_88229138.s")
 

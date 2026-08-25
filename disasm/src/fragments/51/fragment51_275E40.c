@@ -89,7 +89,17 @@ void func_863004E8(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/51/fragment51_275E40/func_86301E14.s")
+extern void func_86301B3C(s32);
+
+void func_86301E14(void) {
+    s32 var_s0;
+
+    var_s0 = 0;
+    do {
+        func_86301B3C(var_s0);
+        var_s0 += 1;
+    } while (var_s0 != 4);
+}
 #endif
 
 #ifdef VERSION_US

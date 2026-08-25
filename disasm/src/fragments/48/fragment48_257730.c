@@ -10,7 +10,19 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_257730/func_87C0182C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_257730/func_87C01888.s")
+void func_87C01888(void *arg0, s32 arg1, s32 arg2) {
+    (*(s32 *)((u8 *)(arg0) + (0))) = arg1;
+    (*(s32 *)((u8 *)(arg0) + (4))) = 0;
+    (*(s16 *)((u8 *)(arg0) + (0x14))) = -1;
+    (*(s16 *)((u8 *)(arg0) + (0x16))) = 0;
+    (*(s32 *)((u8 *)(arg0) + (0x18))) = 0;
+    (*(s32 *)((u8 *)(arg0) + (0x1C))) = 0;
+    (*(s32 *)((u8 *)(arg0) + (0x20))) = 0;
+    (*(s32 *)((u8 *)(arg0) + (0x24))) = arg2;
+    (*(f32 *)((u8 *)(arg0) + (8))) = 0.0f;
+    (*(f32 *)((u8 *)(arg0) + (0x10))) = 0.0f;
+    (*(f32 *)((u8 *)(arg0) + (0xC))) = 1.0f;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_257730/func_87C018C8.s")
 

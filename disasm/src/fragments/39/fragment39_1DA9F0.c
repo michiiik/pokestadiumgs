@@ -45,7 +45,17 @@ s32 func_88A0083C(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/39/fragment39_1DA9F0/func_88A008CC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/39/fragment39_1DA9F0/func_88A00938.s")
+extern void func_800635E0(u8, u8 *);
+extern void func_80063620(u8, u8 *);
+s32 func_88A008CC();
+
+void func_88A00938(u8 *arg0) {
+    if (func_88A008CC() != 0) {
+        func_80063620(*arg0, arg0);
+        return;
+    }
+    func_800635E0(*arg0, arg0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/39/fragment39_1DA9F0/func_88A00978.s")
 

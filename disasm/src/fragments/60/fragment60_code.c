@@ -117,7 +117,12 @@ void func_86A004AC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/60/fragment60_code/func_86A0585C.s")
+s32 func_86A0585C(f32 arg0, f32 arg1) {
+    if (arg1 < -140.0f) {
+        return 1;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US

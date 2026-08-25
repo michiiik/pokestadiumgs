@@ -37,7 +37,11 @@ void func_82911850(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_34C8B0/func_8291192C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_34C8B0/func_82911974.s")
+extern void func_8290FE04(s16);
+
+void func_82911974(s16 arg0) {
+    func_8290FE04(arg0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_34C8B0/func_8291199C.s")
 #endif

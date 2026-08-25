@@ -10,7 +10,21 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/70/fragment70_code/func_8F200214.s")
+extern s16 D_8F200870;
+extern s32 D_8F200874;
+extern s32 D_8F200904;
+extern s32 D_8F200908;
+extern s32 D_8F20090C;
+extern s32 D_8F200910;
+
+void func_8F200214(void) {
+    D_8F200904 = 0;
+    D_8F200908 = -1;
+    D_8F20090C = 0;
+    D_8F200910 = 1;
+    D_8F200870 = 1;
+    D_8F200874 = 1;
+}
 #endif
 
 void func_8F200250(void) {

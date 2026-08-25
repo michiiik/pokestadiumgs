@@ -48,5 +48,16 @@ void func_81311A9C(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_109280/func_81311C70.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_109280/func_81311CFC.s")
+void func_81311CFC(void *arg0) {
+    (*(s32 *)((u8 *)(arg0) + (0))) = 0;
+    (*(s8 *)((u8 *)(arg0) + (0x19))) = -1;
+    (*(s8 *)((u8 *)(arg0) + (0x1A))) = 0;
+    (*(s8 *)((u8 *)(arg0) + (0x18))) = 0;
+    (*(s16 *)((u8 *)(arg0) + (0x10))) = 0;
+    (*(s16 *)((u8 *)(arg0) + (0x12))) = 0;
+    (*(s16 *)((u8 *)(arg0) + (0x14))) = 0;
+    (*(s16 *)((u8 *)(arg0) + (0x16))) = 0;
+    (*(f32 *)((u8 *)(arg0) + (4))) = 0.0f;
+    (*(f32 *)((u8 *)(arg0) + (8))) = 0.0f;
+}
 #endif

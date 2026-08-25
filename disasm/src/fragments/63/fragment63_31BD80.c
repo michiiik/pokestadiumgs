@@ -10,7 +10,13 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_31BD80/func_87E18828.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_31BD80/func_87E189E8.s")
+extern void func_87E01628();
+extern void main_pool_pop_state(s32);
+
+void func_87E189E8(s32 arg0) {
+    func_87E01628();
+    main_pool_pop_state(0x4D51414C);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_31BD80/func_87E18A14.s")
 

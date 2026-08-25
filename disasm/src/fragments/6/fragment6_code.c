@@ -98,7 +98,17 @@ void func_83100B2C(void *arg0, u8 *arg1, void *arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/6/fragment6_code/func_831020D0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/6/fragment6_code/func_831021E8.s")
+extern void func_80006D3C();
+extern void func_80008574();
+extern void func_80047610();
+extern void func_8004C398();
+
+void func_831021E8(s32 arg0, s32 arg1) {
+    func_80008574();
+    func_8004C398();
+    func_80047610();
+    func_80006D3C();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/6/fragment6_code/func_83102224.s")
 #endif

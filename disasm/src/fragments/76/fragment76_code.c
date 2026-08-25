@@ -73,7 +73,15 @@ void func_8F700020(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/76/fragment76_code/func_8F70104C.s")
+extern void func_800226C0(s32);
+extern s32 D_8F7023B0;
+extern s32 D_8F7023B4;
+
+void func_8F70104C(void) {
+    func_800226C0(3);
+    D_8F7023B0 = 0;
+    D_8F7023B4 = 2;
+}
 #endif
 
 #ifdef VERSION_US

@@ -67,7 +67,14 @@ void func_82D00020(u8 arg0) {
 
 extern u16 D_82D23D88; extern u8 D_82D2382A; extern u8 D_82D23D84; void func_82D02380(void) { if (D_82D23D88 != 0) { D_82D2382A = 0x17; D_82D23D84 = 1; } }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_420EA0/func_82D023AC.s")
+extern void func_82D06B34(s32, s32, s32);
+
+void func_82D023AC(void) {
+    if (D_82D23D88 != 0) {
+        D_82D23D84 = 4;
+        func_82D06B34(0xA, 7, 0);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_420EA0/func_82D023EC.s")
 

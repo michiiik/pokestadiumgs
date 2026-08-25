@@ -104,7 +104,12 @@ void func_80050528(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4F800/func_8005053C.s")
+void func_8005053C(void *arg0, u8 *arg1) {
+    if (arg0 != NULL) {
+        func_80050528(arg1);
+        (*(u8 **)((u8 *)(arg0) + (0x34))) = arg1;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -140,7 +145,14 @@ void func_80050578(u8 *arg0, s32 arg1) { if (arg0 != NULL) { u8 *value = *(u8 **
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4F800/func_80050B0C.s")
+extern s32 D_801281B0;
+
+void *func_80050B0C(void) {
+    void *sp1C;
+
+    osRecvMesg(D_801281B0 + 0x21E4, &sp1C, 1);
+    return sp1C;
+}
 #endif
 
 #ifdef VERSION_US

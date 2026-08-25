@@ -22,7 +22,16 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_204950/func_8AF171D8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_204950/func_8AF1722C.s")
+extern void _bzero(s32 *, s32);
+extern s16 D_8AF347F4;
+extern s16 D_8AF347F6;
+extern u8 D_8AF34808;
+
+void func_8AF1722C(void) {
+    D_8AF347F4 = 0;
+    D_8AF347F6 = 0;
+    _bzero(&D_8AF34808, 0xE);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_204950/func_8AF17264.s")
 
