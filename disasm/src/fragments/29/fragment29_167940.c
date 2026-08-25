@@ -2,7 +2,8 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_167940/func_88001900.s")
+extern s8 D_8800ED30; extern s8 D_8800ED31;
+void func_88001900(void) { D_8800ED30 = 10; D_8800ED31 = 1; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_167940/func_8800191C.s")
 
