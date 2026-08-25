@@ -8,7 +8,60 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/3A00/func_80002EB8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3A00/func_80002F90.s")
+typedef struct S1_MemoryBlock {
+    /* 0x00 */ struct S1_MemoryBlock *next;
+    /* 0x04 */ u32 size;
+} S1_MemoryBlock;
+typedef unsigned int	S1_size_t;
+typedef struct S1_MemoryPool {
+    /* 0x00 */ OSMesg msgs[1];
+    /* 0x04 */ OSMesgQueue queue;
+    /* 0x1C */ S1_size_t available;
+    /* 0x20 */ struct S1_MemoryBlock *firstBlock;
+    /* 0x24 */ struct S1_MemoryBlock freeList;
+} S1_MemoryPool;
+void func_80002F90(S1_MemoryPool* pool, void* addr) {
+    struct S1_MemoryBlock* block;
+    struct S1_MemoryBlock* freeList;
+
+    if (addr != NULL) {
+        osRecvMesg(&pool->queue, NULL, 1);
+        block = (struct S1_MemoryBlock*)((u8*)addr - sizeof(struct S1_MemoryBlock));
+        freeList = pool->freeList.next;
+        if (pool->freeList.next == NULL) {
+            pool->freeList.next = block;
+            block->next = NULL;
+        } else if (block < pool->freeList.next) {
+            if ((u32)pool->freeList.next == ((u32)block + (u32)block->size)) {
+                block->size += ((u32)freeList->size);
+                block->next = freeList->next;
+                pool->freeList.next = block;
+            } else {
+                block->next = pool->freeList.next;
+                pool->freeList.next = block;
+            }
+        } else {
+            while (freeList->next != NULL) {
+                if (freeList < block && block < freeList->next) {
+                    break;
+                }
+                freeList = freeList->next;
+            }
+            if (((u32)freeList + (u32)freeList->size) == (u32)block) {
+                freeList->size += block->size;
+                block = freeList;
+            } else {
+                block->next = freeList->next;
+                freeList->next = block;
+            }
+            if (block->next != NULL && (u32)block->next == ((u32)block + (u32)block->size)) {
+                block->size = (u32)block->size + (u32)block->next->size;
+                block->next = block->next->next;
+            }
+        }
+        osSendMesg(&pool->queue, NULL, 0);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/3A00/func_800030D0.s")
 

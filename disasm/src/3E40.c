@@ -30,7 +30,23 @@ void func_800033DC(s32 arg0) {
     func_80002F90(D_800CCDF0, arg0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3E40/func_80003404.s")
+void func_80003404(Gfx** dlist, s32 ulx, s32 lrx, u16 color) {
+    s32 uly = 15;
+    s32 lry = 17;
+    Gfx* gfx = *dlist;
+
+    if (func_80008990() != 0) {
+        ulx <<= 1;
+        lrx <<= 1;
+        uly <<= 1;
+        lry <<= 1;
+    }
+
+    gDPPipeSync(gfx++);
+    gDPSetFillColor(gfx++, color << 16 | color);
+    gDPFillRectangle(gfx++, ulx, uly, lrx, lry);
+    *dlist = gfx;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/3E40/func_800034E4.s")
 
