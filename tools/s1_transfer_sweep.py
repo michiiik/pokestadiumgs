@@ -582,7 +582,14 @@ def _normalize_type_definition(definition: str) -> str:
     same aggregate and must compare equal when deciding whether a definition
     is already present in the owner source.
     """
-    return _normalize_ws(_strip_named_aggregate_typedef(definition))
+    rendered = _strip_named_aggregate_typedef(definition)
+    # S1 declarations often carry explanatory field comments that are not
+    # part of the type.  Ignore them when comparing against a definition
+    # already installed in the GS owner, while retaining the original text
+    # for any definition that still needs to be emitted.
+    rendered = re.sub(r"/\*.*?\*/", "", rendered, flags=re.S)
+    rendered = re.sub(r"//[^\n]*", "", rendered)
+    return _normalize_ws(rendered)
 
 
 # --------------------------------------------------------------------------

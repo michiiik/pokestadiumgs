@@ -512,6 +512,20 @@ class GenerateCandidateTypeDedupTest(unittest.TestCase):
         self.assertEqual(result.declaration_units, [])
         self.assertNotIn("S1_Foo", result.declarations)
 
+    def test_prefixed_typedef_matches_installed_struct_ignoring_comments(self):
+        installed = """struct S1_Foo {
+            /* GS comment */
+            s32 value; // owner spelling
+        };"""
+        transferred = """typedef struct Foo {
+            /* S1 comment */
+            s32 value; // source spelling
+        } Foo;"""
+        self.assertEqual(
+            sweep._normalize_type_definition(installed),
+            sweep._normalize_type_definition(sweep.apply_rename(transferred, {"Foo": "S1_Foo"})),
+        )
+
 
 class SelectFunctionsTest(unittest.TestCase):
     def test_skips_dirty_and_missing_owner(self):
