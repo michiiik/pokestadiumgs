@@ -16,6 +16,8 @@ Usage:
     tools/sweep_targets.py --skip-attempted --max-instructions 16
     tools/sweep_targets.py --near-miss --near-miss-parallel 4
     tools/sweep_targets.py --near-miss --near-miss-labels m2c:,manual: --near-miss-retry
+    tools/sweep_targets.py --exclude-family multi_call_wrapper --min-family-remaining 5
+    tools/sweep_targets.py --large --large-seconds 240
 
 Sources with uncommitted changes are skipped: another session may be
 mid-transaction in them.  A fragment-range sweep is exclusive: do not hand
@@ -30,14 +32,29 @@ recorded in the stats file is skipped.
 drafts); pass ``--near-miss-labels`` to restrict it to one or more prefixes.
 It skips owners that already have a ``permute:`` attempt on file (a previous
 near-miss run), unless ``--near-miss-retry`` is given, and
-``--near-miss-parallel`` runs multiple ``decomp-permuter`` budgets
-concurrently while still gating each result sequentially.  It also skips a
-stats row whose function no longer owns a pragma (a later run already
-accepted it) before spending a permuter budget on it.  Owners whose best
-recorded attempt is ``register_allocation_only`` or ``immediate_drift`` tend
-to need more search time than a real semantic gap; give them a longer
-``--near-miss-seconds``, or pass ``--near-miss-kind-seconds`` to give only
-those two mismatch kinds a separate, longer budget.
+``--near-miss-parallel`` (default 2) runs multiple ``decomp-permuter``
+budgets concurrently while still gating each result sequentially.  It also
+skips a stats row whose function no longer owns a pragma (a later run
+already accepted it) before spending a permuter budget on it.  The default
+``--near-miss-min-similarity`` is 0.8.  Owners whose best recorded attempt is
+``register_allocation_only`` or ``immediate_drift`` tend to need more search
+time than a real semantic gap; ``--near-miss-kind-seconds`` (default 120,
+versus the plain ``--near-miss-seconds`` default of 45) gives only those two
+mismatch kinds that longer budget.
+
+``--exclude-family`` (repeatable) drops one or more families from a sweep
+entirely; ``--min-family-remaining`` drops any family whose remaining-owner
+count in the listing is below the threshold (default 0, meaning off).  Use
+these once a family's accepted rate saturates -- the per-family summary's
+new ``remaining`` counter is the number to watch.
+
+``--large`` switches to owners with more than ``--min-instructions``
+(default 64) instructions, which m2c's ordinary ``--valid-syntax`` draft
+usually cannot even compile.  It drafts with ``--gotos-only`` instead, tries
+only the ``s32-s32``/``u8-void`` type spellings, and sends every
+``probe_rejected`` result at similarity >= 0.7 straight into the near-miss
+permuter machinery with a ``--large-seconds`` budget (default 180) instead
+of gating the probe hits the way the ordinary sweep does.
 """
 
 from __future__ import annotations
@@ -323,11 +340,19 @@ def draft_variants(
     context: bool = True,
     family: str | None = None,
     variant_names: tuple[str, ...] | None = None,
+    extra_m2c_args: tuple[str, ...] = (),
+    label_prefix: str = "m2c",
 ) -> tuple[list[tuple[str, str]], str | None]:
-    """Return ``[(label, code)]`` variants for one function and the raw draft."""
+    """Return ``[(label, code)]`` variants for one function and the raw draft.
+
+    ``extra_m2c_args``/``label_prefix`` let ``--large`` mode reuse this same
+    command-building and rewrite logic with ``--gotos-only`` and an
+    ``m2c-gotos:`` label instead of duplicating it; see ``draft_large_variants``.
+    """
     owner = targets.require_owner(function)
     context_path = targets.preprocessed_context(owner) if context else None
     command = [sys.executable, str(targets.M2C_SCRIPT), "--target", "mips-ido-c", "--valid-syntax", "--globals", "used"]
+    command += list(extra_m2c_args)
     if context_path is not None:
         command += ["--context", str(context_path)]
     result = subprocess.run(command + [str(owner.asm_path)], text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=60)
@@ -343,12 +368,66 @@ def draft_variants(
         if code is None or code in seen:
             continue
         seen.add(code)
-        variants.append((f"m2c:{name}", code))
+        variants.append((f"{label_prefix}:{name}", code))
         unprototyped = callee_unprototyped_variant(code)
         if unprototyped is not None and unprototyped not in seen:
             seen.add(unprototyped)
-            variants.append((f"m2c:{name}:callee-unprototyped", unprototyped))
+            variants.append((f"{label_prefix}:{name}:callee-unprototyped", unprototyped))
     return variants, draft
+
+
+# ``--large`` only tries the two narrowest, most broadly useful type
+# spellings: a wide draft matrix is not worth the m2c/compile cost for an
+# owner this large, and the near-miss permuter is what actually closes the
+# gap, not the draft's exact type guess.
+LARGE_VARIANT_NAMES: tuple[str, ...] = ("s32-s32", "u8-void")
+
+
+def draft_large_variants(function: str, context: bool = True) -> tuple[list[tuple[str, str]], str | None]:
+    """Draft an owner too large for the ordinary sweep with m2c ``--gotos-only``.
+
+    Past roughly 64 instructions, m2c's ``--valid-syntax`` structured
+    control-flow recovery commonly fails to produce a draft at all;
+    ``--gotos-only`` (``pragma_targets.DRAFT_VARIANTS["m2c-gotos"]``) keeps
+    the draft close to the assembly's real branches instead.
+    """
+    return draft_variants(
+        function,
+        context=context,
+        variant_names=LARGE_VARIANT_NAMES,
+        extra_m2c_args=tuple(targets.DRAFT_VARIANTS["m2c-gotos"]),
+        label_prefix="m2c-gotos",
+    )
+
+
+def template_variants_for(
+    function: str, skip_attempts: set[tuple[str, str]] | None,
+) -> list[tuple[str, str]]:
+    """``template:...`` candidates for ``function`` (``template_transfer.py``), self-contained like an m2c block.
+
+    ``template_transfer`` is imported lazily here, not at module scope: it
+    imports ``split_candidate_declarations`` from this module, and a
+    top-level import in both directions would be circular.  A template
+    candidate's declarations and body are concatenated into one self-
+    contained text -- the same shape an m2c draft already has for this
+    module's own probe pass -- so it needs no special handling downstream;
+    ``split_candidate_declarations`` recovers the two pieces again for the
+    gate pass exactly as it does for any other candidate.
+    """
+    import template_transfer
+    try:
+        candidates = template_transfer.generate_template_candidates(function)
+    except (KeyError, OSError) as error:
+        print(f"{function}: template variant error: {error}", file=sys.stderr)
+        return []
+    variants: list[tuple[str, str]] = []
+    for candidate in candidates:
+        if candidate.outcome != "candidate":
+            continue
+        if skip_attempts is not None and (function, candidate.label) in skip_attempts:
+            continue
+        variants.append((candidate.label, candidate.declarations + candidate.code))
+    return variants
 
 
 def previously_attempted(stats_path: Path = targets.STATS_PATH, label_prefix: str = "m2c:") -> set[str]:
@@ -484,15 +563,15 @@ def _near_miss_sort_key(attempt: dict[str, object]) -> tuple[float, str]:
 def near_miss(
     *,
     stats_path: Path = targets.STATS_PATH,
-    minimum_similarity: float = 0.9,
+    minimum_similarity: float = 0.8,
     seconds: float = 45.0,
-    kind_seconds: float | None = None,
+    kind_seconds: float | None = 120.0,
     threads: int = 4,
     workers: int | None = None,
     limit: int | None = None,
     label_prefixes: tuple[str, ...] | None = None,
     skip_permuted: bool = True,
-    parallel: int = 1,
+    parallel: int = 2,
 ) -> dict[str, object]:
     """Permute high-scoring rejects, then gate only score-0 outputs.
 
@@ -500,19 +579,22 @@ def near_miss(
     (the default) considers any label with a recorded candidate and
     similarity score, not only ``m2c:`` drafts.  ``skip_permuted`` excludes
     owners that already have a ``permute:``-labeled attempt on file (a
-    previous near-miss run over the same candidate).  ``parallel`` runs that
-    many ``decomp-permuter`` budgets concurrently; gating a score-0 output
-    still happens on the main thread as each permute job completes, since it
-    holds the runner's cross-process transaction lock.
+    previous near-miss run over the same candidate).  ``parallel`` (default
+    2) runs that many ``decomp-permuter`` budgets concurrently; gating a
+    score-0 output still happens on the main thread as each permute job
+    completes, since it holds the runner's cross-process transaction lock.
 
     A candidate whose owner no longer holds a ``GLOBAL_ASM`` pragma (a later
     full-gate acceptance from a different run solved it since these stats
     were recorded) is skipped before it ever reaches the permuter and is
-    counted in the result's ``skipped_solved``.  ``kind_seconds`` gives a
-    longer budget than ``seconds`` to owners whose recorded best attempt is
+    counted in the result's ``skipped_solved``.  ``kind_seconds`` (default
+    120, versus the plain ``seconds`` default of 45) gives a longer budget
+    than ``seconds`` to owners whose recorded best attempt is
     ``register_allocation_only`` or ``immediate_drift`` -- these are cases
     where the permuter is reordering declarations/temporaries rather than
     searching a real semantic gap, so a longer budget tends to pay off.
+    ``minimum_similarity`` defaults to 0.8.  The permute-then-gate loop
+    itself is ``permute_and_gate``, shared with ``--large`` mode.
     """
     grouped: dict[str, dict[str, object]] = {}
     permuted_functions: set[str] = set()
@@ -607,7 +689,44 @@ def near_miss(
     if limit is not None:
         candidates = candidates[:max(0, limit)]
 
-    _LONGER_BUDGET_KINDS = {"register_allocation_only", "immediate_drift"}
+    result = permute_and_gate(
+        candidates, seconds=seconds, kind_seconds=kind_seconds, threads=threads, workers=workers, parallel=parallel,
+    )
+    return {
+        "candidates": len(candidates),
+        "accepted": result["accepted"],
+        "attempts": result["attempts"],
+        "skipped_permuted": skipped_permuted,
+        "skipped_solved": skipped_solved,
+    }
+
+
+_LONGER_BUDGET_KINDS = {"register_allocation_only", "immediate_drift"}
+
+
+def permute_and_gate(
+    rows: list[dict[str, object]],
+    *,
+    seconds: float,
+    threads: int,
+    workers: int | None,
+    parallel: int,
+    kind_seconds: float | None = None,
+) -> dict[str, object]:
+    """Permute each row's candidate, then gate any score-0 output.
+
+    Shared by ``near_miss`` and ``--large`` mode.  Each row needs
+    ``function``, ``candidate``, and ``label`` keys, plus the optional
+    ``declarations``/``similarity_score``/``mismatch_kind`` keys ``near_miss``
+    already carries from stats rows.  ``parallel`` runs that many
+    ``decomp-permuter`` budgets concurrently; gating a score-0 output still
+    happens on the main thread as each permute job completes, since it holds
+    the runner's cross-process transaction lock.  ``kind_seconds``, when
+    given, is the budget for a row whose ``mismatch_kind`` is
+    ``register_allocation_only`` or ``immediate_drift`` instead of
+    ``seconds`` -- the permuter tends to need more search time there than
+    for a real semantic gap.
+    """
 
     def permute_job(row: dict[str, object]) -> tuple[dict[str, object], dict[str, object] | None, str | None]:
         function = str(row["function"])
@@ -631,7 +750,7 @@ def near_miss(
     accepted: list[str] = []
     attempts: list[dict[str, object]] = []
     with ThreadPoolExecutor(max_workers=max(1, parallel)) as executor:
-        futures = [executor.submit(permute_job, row) for row in candidates]
+        futures = [executor.submit(permute_job, row) for row in rows]
         for future in as_completed(futures):
             row, permutation, error = future.result()
             function = str(row["function"])
@@ -675,18 +794,12 @@ def near_miss(
             attempts.append({
                 "function": function,
                 "label": row["label"],
-                "similarity_score": row["similarity_score"],
+                "similarity_score": row.get("similarity_score"),
                 "permute": permutation,
                 "gate": gate_results,
             })
     attempts.sort(key=_near_miss_sort_key)
-    return {
-        "candidates": len(candidates),
-        "accepted": accepted,
-        "attempts": attempts,
-        "skipped_permuted": skipped_permuted,
-        "skipped_solved": skipped_solved,
-    }
+    return {"accepted": accepted, "attempts": attempts}
 
 
 def sweep(
@@ -701,6 +814,9 @@ def sweep(
     skip_functions: set[str] | None = None,
     skip_attempts: set[tuple[str, str]] | None = None,
     fragment_range: tuple[int, int] | None = None,
+    exclude_families: set[str] | None = None,
+    min_family_remaining: int = 0,
+    templates: bool = False,
 ) -> dict[str, object]:
     listing = _sweep_listing(
         source=source,
@@ -711,6 +827,28 @@ def sweep(
         fragment_range=fragment_range,
     )
     rows = listing["targets"]
+    family_counts: dict[str, int] = dict(listing.get("family_counts") or {})
+    summary: dict[str, collections.Counter] = collections.defaultdict(collections.Counter)
+
+    # A family stops being worth probing once its accepted rate saturates
+    # (see the ``multi_call_wrapper``/``multi_call`` evidence in AGENTS.md).
+    # ``min_family_remaining`` reads that signal straight from the listing's
+    # per-family counts, so a caller does not have to track it by hand.
+    saturated_families = {
+        fam for fam, remaining in family_counts.items()
+        if min_family_remaining > 0 and remaining < min_family_remaining
+    }
+    skip_family_names = (exclude_families or set()) | saturated_families
+    if skip_family_names:
+        kept_rows = []
+        for row in rows:
+            fam = str(row["family"])
+            if fam in skip_family_names:
+                summary[fam]["excluded_family"] += 1
+                continue
+            kept_rows.append(row)
+        rows = kept_rows
+
     dirty = dedupe_externs.dirty_sources()
     by_source: dict[str, list[dict[str, object]]] = collections.defaultdict(list)
     skipped_dirty_targets = 0
@@ -723,7 +861,6 @@ def sweep(
             continue
         by_source[str(row["source"])].append(row)
 
-    summary: dict[str, collections.Counter] = collections.defaultdict(collections.Counter)
     accepted_functions: list[str] = []
     touched_sources: list[str] = []
     sweep_timing: dict[str, float] = {
@@ -809,6 +946,14 @@ def sweep(
                 summary[family_of[function]]["draft_unusable"] += 1
                 continue
             draft_of[function] = draft
+            if templates:
+                # Prepended so a template candidate probes before this
+                # function's m2c variants: once it probe_matches, the m2c
+                # variants after it are reported skipped rather than reprobed.
+                for label, code in template_variants_for(function, skip_attempts):
+                    blocks.append((function, code))
+                    labels.append(label)
+                    labels_of[function].add(label)
             for label, code in variants:
                 blocks.append((function, code))
                 labels.append(label)
@@ -966,6 +1111,12 @@ def sweep(
             f"accepted {len(result.get('accepted', []))} ({result['batch_status']})",
             file=sys.stderr,
         )
+    # Surface the listing's per-family remaining-owner count next to the
+    # counters this run actually produced, so a saturated family (a good
+    # ``--exclude-family``/``--min-family-remaining`` candidate) is visible
+    # even when this run gave it zero attempts.
+    for fam, remaining in family_counts.items():
+        summary[fam]["remaining"] = remaining
     return {
         "matched": listing["matched"],
         "available_in_range": listing.get("available_in_range"),
@@ -986,6 +1137,119 @@ def sweep(
     }
 
 
+LARGE_MINIMUM_INSTRUCTIONS = 64
+LARGE_SECONDS_DEFAULT = 180.0
+LARGE_MINIMUM_SIMILARITY = 0.7
+
+
+def large_sweep(
+    *,
+    min_instructions: int = LARGE_MINIMUM_INSTRUCTIONS,
+    family: str | None = None,
+    source: str | None = None,
+    limit: int = 2000,
+    workers: int | None = None,
+    large_seconds: float = LARGE_SECONDS_DEFAULT,
+    permute_threads: int = 4,
+    permute_parallel: int = 1,
+    minimum_similarity: float = LARGE_MINIMUM_SIMILARITY,
+) -> dict[str, object]:
+    """Draft, probe, and permute owners too large for the ordinary sweep.
+
+    Owners with more than ``min_instructions`` instructions rarely produce a
+    usable m2c ``--valid-syntax`` draft at all -- past that size its
+    structured control-flow recovery tends to give up.  This drafts with
+    ``draft_large_variants`` (``--gotos-only``, only the ``s32-s32``/
+    ``u8-void`` type spellings) instead, probes every variant in isolation
+    like the ordinary sweep, and then -- instead of gating the probe hits --
+    feeds every ``probe_rejected`` result whose ``similarity_score`` is at
+    least ``minimum_similarity`` straight into ``permute_and_gate`` with a
+    flat ``large_seconds`` budget.  decomp-permuter's search is what
+    actually closes the gap for a function this size, not another draft
+    variant, so there is no gate-the-probe-hits pass here at all.
+    """
+    listing = targets.list_targets(
+        source=source,
+        family=family,
+        min_instructions=min_instructions + 1,
+        limit=limit,
+    )
+    rows = list(listing["targets"])
+    dirty = dedupe_externs.dirty_sources()
+    by_source: dict[str, list[dict[str, object]]] = collections.defaultdict(list)
+    skipped_dirty_targets = 0
+    for row in rows:
+        row_path = (targets.REPO_ROOT / str(row["source"])).resolve()
+        if row_path in dirty:
+            skipped_dirty_targets += 1
+            continue
+        by_source[str(row["source"])].append(row)
+
+    drafted = 0
+    probed = 0
+    permute_rows: list[dict[str, object]] = []
+    for source_rel, source_rows in by_source.items():
+        source_path = targets.REPO_ROOT / source_rel
+        blocks: list[tuple[str, str]] = []
+        labels: list[str] = []
+        for row in source_rows:
+            function = str(row["function"])
+            try:
+                variants, draft = draft_large_variants(function)
+            except (KeyError, OSError, subprocess.SubprocessError) as error:
+                print(f"{function}: large draft error: {error}", file=sys.stderr)
+                continue
+            if draft is None or not variants:
+                continue
+            drafted += 1
+            for label, code in variants:
+                blocks.append((function, code))
+                labels.append(label)
+        if not blocks:
+            continue
+        try:
+            probe = runner.try_candidates_detailed(
+                source_path, blocks, labels=labels, gate=False, probe_workers=workers
+            )
+        except Exception as error:  # one broken source must not end the sweep
+            print(f"{source_rel}: large probe pass failed: {error}", file=sys.stderr)
+            continue
+        probed += len(blocks)
+        for attempt in probe.get("attempts", []):
+            if attempt.get("status") != "probe_rejected":
+                continue
+            score = attempt.get("similarity_score")
+            if not isinstance(score, (int, float)) or float(score) < minimum_similarity:
+                continue
+            index = int(attempt["index"])
+            function, code = blocks[index]
+            permute_rows.append({
+                "function": function,
+                "candidate": code,
+                "label": labels[index],
+                "similarity_score": float(score),
+                "mismatch_kind": attempt.get("mismatch_kind"),
+            })
+
+    permute_result = permute_and_gate(
+        permute_rows,
+        seconds=large_seconds,
+        threads=permute_threads,
+        workers=workers,
+        parallel=permute_parallel,
+    )
+    return {
+        "matched": listing["matched"],
+        "skipped_dirty_targets": skipped_dirty_targets,
+        "sources": len(by_source),
+        "drafted": drafted,
+        "probed": probed,
+        "permuted": len(permute_rows),
+        "accepted": permute_result["accepted"],
+        "attempts": permute_result["attempts"],
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--max-instructions", type=int)
@@ -998,28 +1262,65 @@ def main() -> int:
     parser.add_argument("--json", type=Path, help="write the summary to this file")
     parser.add_argument("--skip-attempted", action="store_true", help="skip (function, variant label) pairs that already have m2c sweep attempts in the stats file")
     parser.add_argument("--fragment-range", type=str, help="inclusive fragment band, e.g. 17-32")
+    parser.add_argument(
+        "--exclude-family", action="append", dest="exclude_families", metavar="NAME",
+        help="drop this family from the sweep entirely (repeatable)",
+    )
+    parser.add_argument(
+        "--min-family-remaining", type=int, default=0,
+        help="skip a family whose remaining owner count in the listing is below N (default 0: off)",
+    )
+    parser.add_argument(
+        "--templates", action="store_true",
+        help="prepend template-transfer candidates (tools/template_transfer.py) ahead of the m2c "
+             "variants for each function, so they probe first (default: off)",
+    )
     parser.add_argument("--near-miss", action="store_true", help="permute rejects at similarity >= --near-miss-min-similarity")
     parser.add_argument("--stats", type=Path, default=targets.STATS_PATH, help="probe stats JSONL for --near-miss")
     parser.add_argument("--near-miss-seconds", type=float, default=45.0)
     parser.add_argument(
-        "--near-miss-min-similarity", type=float, default=0.9,
-        help="minimum recorded similarity score to consider a candidate",
+        "--near-miss-min-similarity", type=float, default=0.8,
+        help="minimum recorded similarity score to consider a candidate (default 0.8)",
     )
     parser.add_argument(
-        "--near-miss-kind-seconds", type=float, default=None,
+        "--near-miss-kind-seconds", type=float, default=120.0,
         help=(
             "permuter budget for owners whose best recorded attempt is "
             "register_allocation_only or immediate_drift, instead of "
             "--near-miss-seconds; these mismatch kinds tend to need more search "
-            "time than a real semantic gap"
+            "time than a real semantic gap (default 120)"
         ),
     )
     parser.add_argument("--near-miss-threads", type=int, default=4)
     parser.add_argument("--near-miss-limit", type=int)
-    parser.add_argument("--near-miss-parallel", type=int, default=1, help="concurrent decomp-permuter budgets")
+    parser.add_argument("--near-miss-parallel", type=int, default=2, help="concurrent decomp-permuter budgets (default 2)")
     parser.add_argument("--near-miss-labels", type=str, help="comma-separated label prefixes to consider (default: any)")
     parser.add_argument("--near-miss-retry", action="store_true", help="do not skip owners with an existing permute: attempt")
+    parser.add_argument(
+        "--large", action="store_true",
+        help="sweep owners with more than --min-instructions (default 64) instructions via --gotos-only drafts and the near-miss permuter",
+    )
+    parser.add_argument(
+        "--large-seconds", type=float, default=LARGE_SECONDS_DEFAULT,
+        help="decomp-permuter budget per owner in --large mode (default 180)",
+    )
     args = parser.parse_args()
+    if args.large:
+        result = large_sweep(
+            min_instructions=args.min_instructions if args.min_instructions is not None else LARGE_MINIMUM_INSTRUCTIONS,
+            family=args.family,
+            source=args.source,
+            limit=args.limit,
+            workers=args.workers,
+            large_seconds=args.large_seconds,
+            permute_threads=args.near_miss_threads,
+            permute_parallel=args.near_miss_parallel,
+        )
+        text = json.dumps(result, indent=2, default=list)
+        if args.json:
+            args.json.write_text(text + "\n")
+        print(text)
+        return 0 if result["accepted"] else 1
     if args.near_miss:
         label_prefixes = tuple(
             prefix for prefix in (args.near_miss_labels or "").split(",") if prefix
@@ -1055,6 +1356,9 @@ def main() -> int:
         workers=args.workers,
         skip_attempts=previously_attempted_labels() if args.skip_attempted else None,
         fragment_range=fragment_range,
+        exclude_families=set(args.exclude_families) if args.exclude_families else None,
+        min_family_remaining=args.min_family_remaining,
+        templates=args.templates,
     )
     text = json.dumps(result, indent=2)
     if args.json:

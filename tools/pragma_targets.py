@@ -287,25 +287,40 @@ def _opcode_sequence(asm_text: str) -> list[str]:
     return [instruction.op for instruction in instructions]
 
 
-def solved_shapes(stats_path: Path | None = None) -> list[dict[str, object]]:
+def solved_shapes(
+    stats_path: Path | None = None, *, asm_roots: list[Path] | None = None
+) -> list[dict[str, object]]:
     """Return accepted candidates from the stats file with their target opcode shape.
 
     Winners are the best available evidence of which C spelling IDO turns
     into a given instruction shape.  The ``.s`` files stay in the tree after
     a pragma is replaced, so each winner's shape can still be computed.
+
+    ``asm_roots`` overrides the single ``ASM_ROOT`` scan for where a
+    winner's own ``.s`` might live, tried in order -- a caller whose local
+    ``nonmatchings`` tree is only partially extracted passes its own root
+    followed by a read-only fallback root (see
+    ``s1_transfer_sweep.gs_asm_text``), so a winner extracted only in the
+    fallback tree is still found.
     """
     global _SOLVED_CACHE
     stats_path = stats_path or STATS_PATH
+    roots = asm_roots or [ASM_ROOT]
     try:
         stamp = stats_path.stat().st_mtime_ns
     except OSError:
         return []
-    if _SOLVED_CACHE is not None and _SOLVED_CACHE[0] == stamp:
+    cache_key = (stamp, tuple(str(root) for root in roots))
+    if _SOLVED_CACHE is not None and _SOLVED_CACHE[0] == cache_key:
         return _SOLVED_CACHE[1]
     solved: dict[str, dict[str, object]] = {}
-    asm_by_function = {
-        path.stem: path for path in ASM_ROOT.rglob("*.s")
-    } if stats_path.exists() else {}
+    asm_by_function: dict[str, Path] = {}
+    if stats_path.exists():
+        for root in roots:
+            if not root.is_dir():
+                continue
+            for path in root.rglob("*.s"):
+                asm_by_function.setdefault(path.stem, path)
     for line in stats_path.read_text(encoding="utf-8").splitlines():
         try:
             record = json.loads(line)
@@ -325,16 +340,34 @@ def solved_shapes(stats_path: Path | None = None) -> list[dict[str, object]]:
                 "ops": _opcode_sequence(asm_path.read_text(encoding="utf-8")),
             }
     rows = list(solved.values())
-    _SOLVED_CACHE = (stamp, rows)
+    _SOLVED_CACHE = (cache_key, rows)
     return rows
 
 
-def similar_solved(function: str, *, limit: int = 3, minimum: float = 0.6) -> list[dict[str, object]]:
-    """Rank previously accepted candidates by opcode-sequence similarity to ``function``."""
-    owner = require_owner(function)
-    ops = _opcode_sequence(owner.asm_path.read_text(encoding="utf-8"))
+def similar_solved(
+    function: str,
+    *,
+    limit: int = 3,
+    minimum: float = 0.6,
+    stats_path: Path | None = None,
+    asm_roots: list[Path] | None = None,
+    asm_text: str | None = None,
+) -> list[dict[str, object]]:
+    """Rank previously accepted candidates by opcode-sequence similarity to ``function``.
+
+    ``asm_text`` overrides reading ``owner.asm_path`` directly for the
+    target itself -- a caller with its own fallback for a ``.s`` not present
+    in this checkout (``s1_transfer_sweep.gs_asm_text``) passes the text it
+    already resolved, skipping ``require_owner`` too (its ``owner_index``
+    revalidates by rescanning every tracked source's mtime on every call,
+    not cheap across a sweep of thousands of targets).  ``stats_path``/
+    ``asm_roots`` are threaded straight to ``solved_shapes`` for the same
+    reason on the winners' side.
+    """
+    text = asm_text if asm_text is not None else require_owner(function).asm_path.read_text(encoding="utf-8")
+    ops = _opcode_sequence(text)
     ranked: list[dict[str, object]] = []
-    for row in solved_shapes():
+    for row in solved_shapes(stats_path, asm_roots=asm_roots):
         other = row["ops"]
         if not isinstance(other, list) or not other:
             continue
