@@ -16,7 +16,11 @@ s32 func_814028F0(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81402A64.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81402CD8.s")
+void func_81402CD8(void *arg0, f32 arg1) {
+    arg1 *= 100.0f;
+    if (*(f32 *)((u8 *)arg0 + 0xCA8) < arg1)
+        *(f32 *)((u8 *)arg0 + 0xCA8) = arg1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81402D08.s")
 
