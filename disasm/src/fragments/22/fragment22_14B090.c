@@ -80,5 +80,13 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14B090/func_827030D0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14B090/func_82703188.s")
+extern u16 D_827034EC;
+extern s16 D_827034EA;
+s32 func_82703188(void) {
+    s32 result = -2;
+    if (D_827034EC & 1) {
+        result = D_827034EA;
+    }
+    return result;
+}
 #endif
