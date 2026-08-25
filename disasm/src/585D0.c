@@ -612,7 +612,18 @@ extern u8 D_80128575[]; u8 func_8005D8CC(s32 index) { return D_80128575[index * 
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005D8E8.s")
+extern u8 D_8012874C;
+extern u8 D_8012874D;
+s32 func_8005D8E8(s32 arg0) {
+    s32 mask = 1 << arg0;
+    if (!(D_8012874C & mask)) {
+        return 1;
+    }
+    if (!(D_8012874D & mask)) {
+        return 2;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US

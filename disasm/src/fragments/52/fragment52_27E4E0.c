@@ -142,7 +142,14 @@ void func_86403CB4(void) { void *node; node = *(void **)(D_86416C00 + 0xE0C); wh
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/52/fragment52_27E4E0/func_86404D48.s")
+void func_86404D48(u8 *arg0, u8 *arg1) {
+    *(f32 *)(arg0 + 0x48) += *(f32 *)(arg1 + 0x2C);
+    *(f32 *)(arg0 + 0x4C) += *(f32 *)(arg1 + 0x30);
+    *(f32 *)(arg0 + 0x50) += *(f32 *)(arg1 + 0x34);
+    *(f32 *)(arg1 + 0x2C) = 0.0f;
+    *(f32 *)(arg1 + 0x30) = 0.0f;
+    *(f32 *)(arg1 + 0x34) = 0.0f;
+}
 #endif
 
 #ifdef VERSION_US

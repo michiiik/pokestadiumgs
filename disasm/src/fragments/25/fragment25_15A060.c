@@ -73,9 +73,18 @@ void func_82101648(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15A060/func_82101A30.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15A060/func_82101AB4.s")
+f32 func_82101AB4(u8 *arg0) {
+    return ((f32)*(s16 *)(*(u8 **)(arg0 + 0) + 0x0C) *
+            (*(f32 *)(*(u8 **)(arg0 + 8) + 0x2C) + 1.0f) * 0.5f) +
+           (f32)*(s16 *)(*(u8 **)(arg0 + 0) + 0x08);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15A060/func_82101AFC.s")
+typedef struct { u8 padA[0xA]; s16 a; u8 padC[2]; s16 b; } S82101p;
+typedef struct { u8 pad30[0x30]; f32 c; } T82101p;
+typedef struct { S82101p *p; u8 pad4[4]; T82101p *q; } U82101p;
+f32 func_82101AFC(U82101p *arg0) {
+    return (f32)arg0->p->a + ((f32)arg0->p->b * (arg0->q->c + 1.0f) * 0.5f);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15A060/func_82101B44.s")
 #endif

@@ -301,7 +301,13 @@ void func_8AE01394(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE05964.s")
+extern f32 D_8AE084F0;
+void func_8AE05964(void) {
+    D_8AE084F0 -= 0.25f;
+    if (D_8AE084F0 < 1.0f) {
+        D_8AE084F0 = 1.0f;
+    }
+}
 #endif
 
 #ifdef VERSION_US

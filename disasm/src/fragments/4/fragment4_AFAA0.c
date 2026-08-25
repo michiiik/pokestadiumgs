@@ -131,7 +131,12 @@ void func_81801EB8(u8 *arg0) {}
 
 void func_81801F04(u8 *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) { *(u16 *)(arg0 + 0) = arg1; *(u16 *)(arg0 + 2) = arg2; *(u16 *)(arg0 + 4) = arg3; *(u16 *)(arg0 + 6) = arg4; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81801F1C.s")
+void func_81801F1C(u8 *arg0, u8 *arg1, u8 *arg2) {
+    *(s16 *)(arg0 + 0) = *(s16 *)(arg2 + 0) + *(s16 *)(arg1 + 0);
+    *(s16 *)(arg0 + 2) = *(s16 *)(arg2 + 2) + *(s16 *)(arg1 + 2);
+    *(s16 *)(arg0 + 4) = *(s16 *)(arg2 + 4) + *(s16 *)(arg1 + 4);
+    *(s16 *)(arg0 + 6) = *(s16 *)(arg2 + 6) + *(s16 *)(arg1 + 6);
+}
 
 extern void func_8004C8C0(s32);
 void func_81801F60(u8 *arg0) {

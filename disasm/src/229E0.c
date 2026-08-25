@@ -985,7 +985,12 @@ void func_80034614(u8 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800346F8.s")
+extern u8 D_800D2B59;
+extern u8 D_800D2B49;
+void func_800346F8(u8 arg0, s32 arg1) {
+    s8 result = func_800347E8(arg0);
+    if (D_800D2B59 == 0) D_800D2B49 = result;
+}
 #endif
 
 #ifdef VERSION_US
@@ -2466,7 +2471,13 @@ void func_8003FD08(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8004018C.s")
+extern s32 D_80126450;
+extern s32 func_8003820C(s32, s32);
+extern void func_8003FD34(s32);
+void func_8004018C(void) {
+    func_8003FD34(func_8003820C(D_80126450, 0));
+    D_80126520 += 4;
+}
 #endif
 
 void func_800401CC(void) {

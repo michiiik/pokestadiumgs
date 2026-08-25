@@ -80,5 +80,11 @@ s32 func_8220D67C(void) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_11B210/func_8220D6AC.s")
+s32 func_8220D6AC(void) {
+    s32 result = 0;
+    if ((D_82210C30 != 0) && ((D_82210C32 == 2) || (D_82210C32 == 3))) {
+        result = 1;
+    }
+    return result;
+}
 #endif

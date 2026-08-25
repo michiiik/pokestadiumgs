@@ -55,5 +55,10 @@ void func_82102D10(f32 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15CBC0/func_82102D34.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15CBC0/func_82102DB8.s")
+typedef struct { f32 x; f32 y; } V82102;
+void func_82102DB8(V82102 *arg0, V82102 *arg1, f32 arg2) {
+    f32 t = 1.0f - arg2;
+    arg0->x = arg0->x * arg2 + t * arg1->x;
+    arg0->y = arg0->y * arg2 + t * arg1->y;
+}
 #endif

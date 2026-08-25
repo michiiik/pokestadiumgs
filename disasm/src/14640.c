@@ -73,7 +73,19 @@ void func_80014C28(s32 arg0, s32 arg1) { func_80014C48(arg0, arg1, 1); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80015148.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_8001519C.s")
+extern s32 D_8011EA50;
+extern s32 D_8011EA54;
+extern s32 D_8011EA58;
+s32 func_8001519C(s32 arg0) {
+    s32 result = 0;
+    switch (arg0) {
+    case 0: result = D_8011EA50; break;
+    case 1: result = D_8011EA54; break;
+    case 2: result = D_8011EA58; break;
+    default: break;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_800151E0.s")
 
