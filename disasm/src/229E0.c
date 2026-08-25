@@ -4038,7 +4038,8 @@ s32 func_8003EFA0(u8 *arg0) { return *(u16 *)(*(s32 *)(arg0 + 0x58) + 0xA) == *(
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003EFBC.s")
+s32 func_8003EFBC(u8 *arg0) { return *(u16 *)(*(s32 *)(arg0 + 0x58) + 0xA) == *(s16 *)(arg0 + 0x5C) + 1; }
+#pragma C_FUNCTION_PADDING(8)
 #endif
 
 #ifdef VERSION_US
@@ -4241,7 +4242,14 @@ void func_8003FD08(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80040134.s")
+extern s32 D_80126450;
+extern void func_8003FD34(s32);
+void func_80040134(void) {
+    struct TargetCmd16 { u8 cmd; u8 r; u8 g; u8 b; } *cmd;
+    cmd = (struct TargetCmd16 *)(u32)D_80126520;
+    func_8003FD34(func_80038180((S1_MainPoolState *)(u32)D_80126450, NULL, cmd->r, cmd->g, cmd->b));
+    D_80126520 += sizeof(struct TargetCmd16);
+}
 #endif
 
 #ifdef VERSION_US

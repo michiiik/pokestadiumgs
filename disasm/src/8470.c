@@ -25,7 +25,20 @@ void func_80007BA8(s32 arg0, s32 arg1) { extern s32 D_80087230; extern s32 D_800
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80007DB4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80007E18.s")
+extern void func_800072E0(void);
+extern s32 func_8000339C(void);
+extern void func_800020A0(s32, s32, s32);
+extern void func_80002178(void *);
+extern void func_80007BD0(void);
+extern void func_80007DB4(void);
+extern u8 D_800D0510[];
+void func_80007E18(void) {
+    func_800072E0();
+    func_800020A0(0, 0x80000000, func_8000339C());
+    func_80002178(D_800D0510);
+    func_80007BD0();
+    func_80007DB4();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80007E6C.s")
 

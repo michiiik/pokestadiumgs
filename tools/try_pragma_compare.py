@@ -1167,6 +1167,39 @@ def _probe_one(
     return result
 
 
+def _compile_diagnostic(
+    output: str,
+    tail_chars: int = 2000,
+    focus: str | None = None,
+) -> str:
+    """Keep the actionable compiler error as well as the output tail.
+
+    IDO often emits hundreds of warnings for the rest of a large fragment
+    after a candidate has already failed.  Returning only the tail hides the
+    first syntax/type error, which is the part needed to choose the next
+    candidate spelling.  Preserve a small context window around every early
+    error and append the tail, de-duplicating when they overlap.
+    """
+    if len(output) <= tail_chars:
+        return output
+    lines = output.splitlines()
+    error_lines: set[int] = set()
+    for index, line in enumerate(lines):
+        if re.search(
+            r"\b(?:error|fatal|undefined reference|failed to compile|syntax error)\b",
+            line,
+            re.IGNORECASE,
+        ):
+            error_lines.update(range(max(0, index - 2), min(len(lines), index + 3)))
+        if focus and focus in line:
+            error_lines.update(range(max(0, index - 3), min(len(lines), index + 4)))
+    head = "\n".join(lines[index] for index in sorted(error_lines))
+    tail = output[-tail_chars:]
+    if not head or head in tail:
+        return tail
+    return f"{head}\n...\n{tail}"
+
+
 def _probe_one_uncounted(
     source_path: Path,
     function: str,
@@ -1196,7 +1229,7 @@ def _probe_one_uncounted(
                 return {
                     "status": "compile_failed",
                     "exit_code": result,
-                    "diagnostic": output[-2000:],
+                    "diagnostic": _compile_diagnostic(output, focus=function),
                 }
             # The assembler symbol size can include alignment nops while the
             # compiler's relocatable symbol size often stops at the delay

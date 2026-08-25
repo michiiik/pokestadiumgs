@@ -11,7 +11,21 @@ void func_80003308(u32 *dst, const u32 *src, s32 wordCount) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3E40/Util_InitMainPools.s")
+extern void func_80002680(void *, s32);
+extern void func_80003CD0(void);
+extern void *func_80002E00(s32, s32);
+extern u32 D_800871F0;
+extern u32 D_800871F4;
+extern u8 D_80134470[];
+extern void *D_800CCDF0;
+void Util_InitMainPools(void) {
+    s32 size = osGetMemSize();
+    D_800871F0 = size - 0x400000;
+    D_800871F4 = size;
+    func_80002680(D_80134470, size | 0x80000000);
+    func_80003CD0();
+    D_800CCDF0 = func_80002E00(0x10000, 0);
+}
 
 extern u32 D_800871F4; u32 func_8000339C(void) { return D_800871F4; }
 

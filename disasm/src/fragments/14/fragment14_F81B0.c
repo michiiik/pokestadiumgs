@@ -18,7 +18,7 @@ void func_813000DC(u8 *arg0) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_813002D0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_81300314.s")
+s32 func_81300314(void *arg0, s32 arg1, s32 arg2) { u8 *base = (u8 *)arg0 + 0x18000; do { arg1 += arg2; if (arg1 < 0 || arg1 >= 4) break; if (*(s8 *)(*(u8 **)(base + 0x2148) + arg1 + 0x900) >= -1) break; } while (1); return arg1; }
 
 extern void func_80057944(s32);
 

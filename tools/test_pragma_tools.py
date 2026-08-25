@@ -666,6 +666,19 @@ class RunnerTests(unittest.TestCase):
             self.assertIn("compile timed out", output)
             self.assertFalse(object_path.exists())
 
+    def test_compile_diagnostic_keeps_first_error_and_tail(self) -> None:
+        output = (
+            "warning before\n"
+            "cfe: Error 123: bad candidate type\n"
+            "  offending expression\n"
+            "cfe: Warning 709: func_focus has an incompatible argument\n"
+            + ("warning after\n" * 500)
+        )
+        diagnostic = runner._compile_diagnostic(output, tail_chars=120, focus="func_focus")
+        self.assertIn("Error 123: bad candidate type", diagnostic)
+        self.assertIn("func_focus has an incompatible argument", diagnostic)
+        self.assertIn("warning after", diagnostic)
+
     def test_probe_stats_jsonl_records_candidate_text(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             stats_path = Path(directory) / "probe-stats.jsonl"
