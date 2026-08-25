@@ -301,6 +301,19 @@ class TypeIndexTest(unittest.TestCase):
         self.assertEqual(renamed, "typedef struct S1_Foo { s32 x; } S1_Foo;")
 
 
+class MergeDeclarationsTest(unittest.TestCase):
+    def test_deduplicates_complete_multiline_units(self):
+        first = "typedef struct {\n    s32 x;\n} S1_First;"
+        second = "typedef struct {\n    s32 y;\n} S1_Second;"
+
+        merged = sweep.merge_declarations([first, second, first])
+
+        self.assertEqual(merged, first + "\n" + second + "\n")
+        self.assertEqual(merged.count("typedef struct {"), 2)
+        self.assertIn("s32 x;", merged)
+        self.assertIn("s32 y;", merged)
+
+
 class GenerateCandidateAlignmentTest(unittest.TestCase):
     """``generate_candidate`` reports an alignment failure without a full S1Context."""
 

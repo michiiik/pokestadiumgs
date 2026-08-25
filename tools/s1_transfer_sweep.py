@@ -700,6 +700,9 @@ class TransferResult:
     symbol_map: dict[str, str] = field(default_factory=dict)
     unmapped_symbols: list[str] = field(default_factory=list)
     declarations: str = ""
+    # Complete declaration units, kept separate so source groups can merge
+    # multiline typedefs atomically instead of deduplicating their lines.
+    declaration_units: list[str] = field(default_factory=list)
     variants: list[tuple[str, str]] = field(default_factory=list)
 
 
@@ -848,7 +851,8 @@ def generate_candidate(
 
     return TransferResult(
         function, "candidate", s1_name=s1_name, symbol_map=symbol_map,
-        unmapped_symbols=unmapped, declarations=declarations, variants=variants,
+        unmapped_symbols=unmapped, declarations=declarations,
+        declaration_units=ordered_type_defs + extra_externs, variants=variants,
     )
 
 
@@ -884,15 +888,17 @@ def select_functions(
     return selected
 
 
-def merge_declarations(blocks: list[str]) -> str:
+def merge_declarations(units: list[str]) -> str:
+    """Merge complete declarations without splitting multiline definitions."""
     seen: set[str] = set()
-    lines: list[str] = []
-    for block in blocks:
-        for line in block.splitlines():
-            if line.strip() and line not in seen:
-                seen.add(line)
-                lines.append(line)
-    return "\n".join(lines) + ("\n" if lines else "")
+    merged: list[str] = []
+    for unit in units:
+        normalized = unit.strip()
+        if not normalized or normalized in seen:
+            continue
+        seen.add(normalized)
+        merged.append(normalized)
+    return "\n".join(merged) + ("\n" if merged else "")
 
 
 # --------------------------------------------------------------------------
@@ -914,7 +920,15 @@ def run_source_group(
             labels.append(label)
     if not blocks:
         return {"attempts": [], "accepted": []}
-    declarations = merge_declarations([r.declarations for r in results if r.declarations]) or None
+    declaration_units: list[str] = []
+    for result in results:
+        if result.declaration_units:
+            declaration_units.extend(result.declaration_units)
+        elif result.declarations:
+            # Keep compatibility with callers/tests that construct a result
+            # using only the legacy rendered declaration block.
+            declaration_units.append(result.declarations)
+    declarations = merge_declarations(declaration_units) or None
     probe = runner.try_candidates_detailed(
         source_path, blocks, labels=labels, declarations=declarations, gate=False, probe_workers=workers
     )
