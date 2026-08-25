@@ -1253,7 +1253,13 @@ s32 func_80035160(s32 index) { return D_80094870[index]; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/Thread4_CreateThread.s")
+extern void func_80035174(void *);
+extern OSThread D_80122B20;
+extern u8 D_80124D00[];
+void Thread4_CreateThread(void) {
+    osCreateThread(&D_80122B20, 4, func_80035174, NULL, D_80124D00, 0x50);
+    osStartThread(&D_80122B20);
+}
 #endif
 
 #ifdef VERSION_US
