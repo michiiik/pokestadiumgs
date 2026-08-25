@@ -248,7 +248,9 @@ void func_8004989C(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80049BDC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80049C44.s")
+extern Gfx *D_800D0510;
+extern u8 D_80095098[];
+void func_80049C44(void) { Gfx *temp_v1 = D_800D0510++; temp_v1->words.w0 = 0xDE000000; temp_v1->words.w1 = (u32)D_80095098; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80049C70.s")
 

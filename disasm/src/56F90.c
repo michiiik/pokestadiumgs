@@ -85,7 +85,8 @@ u8 func_80057764(u8 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80057908.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80057944.s")
+extern u8 D_80128558;
+void func_80057944(u8 arg0) { D_80128558 &= ~(1 << arg0); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80057970.s")
 #endif
