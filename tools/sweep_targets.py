@@ -102,6 +102,23 @@ def draft_variants(function: str, context: bool = True) -> tuple[list[tuple[str,
     return variants, draft
 
 
+def previously_attempted(stats_path: Path = targets.STATS_PATH, label_prefix: str = "m2c:") -> set[str]:
+    """Functions that already have sweep attempts recorded in the stats file."""
+    attempted: set[str] = set()
+    if not stats_path.exists():
+        return attempted
+    for line in stats_path.read_text(encoding="utf-8").splitlines():
+        try:
+            record = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        for attempt in record.get("attempts", []):
+            label = attempt.get("label") or ""
+            if label.startswith(label_prefix) and attempt.get("function"):
+                attempted.add(str(attempt["function"]))
+    return attempted
+
+
 def sweep(
     *,
     max_instructions: int | None,
@@ -111,6 +128,7 @@ def sweep(
     limit: int,
     gate: bool,
     workers: int | None,
+    skip_functions: set[str] | None = None,
 ) -> dict[str, object]:
     listing = targets.list_targets(
         source=source,
@@ -139,7 +157,20 @@ def sweep(
         for row in rows:
             function = str(row["function"])
             family_of[function] = str(row["family"])
-            variants, draft = draft_variants(function)
+            if skip_functions and function in skip_functions:
+                summary[family_of[function]]["skipped_attempted"] += 1
+                continue
+            try:
+                variants, draft = draft_variants(function)
+            except KeyError:
+                # Another session replaced this pragma since the target list
+                # was captured; it is no longer ours to attempt.
+                summary[family_of[function]]["vanished"] += 1
+                continue
+            except (OSError, subprocess.SubprocessError) as error:
+                summary[family_of[function]]["draft_failed"] += 1
+                print(f"{function}: draft error: {error}", file=sys.stderr)
+                continue
             if draft is None:
                 summary[family_of[function]]["draft_failed"] += 1
                 continue
@@ -155,9 +186,14 @@ def sweep(
         # Pass 1: probe every variant in isolation.  Pass 2 gates only the
         # hits, plus padding retries for bodies that matched the baseline
         # prefix but stopped short of its trailing alignment nops.
-        probe = runner.try_candidates_detailed(
-            source_path, blocks, labels=labels, gate=False, probe_workers=workers
-        )
+        try:
+            probe = runner.try_candidates_detailed(
+                source_path, blocks, labels=labels, gate=False, probe_workers=workers
+            )
+        except Exception as error:  # one broken source must not end the sweep
+            print(f"{source_rel}: probe pass failed: {error}", file=sys.stderr)
+            summary["_errors"]["probe_pass_failed"] += 1
+            continue
         gate_blocks: list[tuple[str, str]] = []
         gate_labels: list[str] = []
         for attempt in probe["attempts"]:
@@ -172,9 +208,14 @@ def sweep(
                 gate_labels.append(labels[index] + "+padding")
         result = probe
         if gate_blocks:
-            result = runner.try_candidates_detailed(
-                source_path, gate_blocks, labels=gate_labels, gate=gate, probe_workers=workers
-            )
+            try:
+                result = runner.try_candidates_detailed(
+                    source_path, gate_blocks, labels=gate_labels, gate=gate, probe_workers=workers
+                )
+            except Exception as error:
+                print(f"{source_rel}: gate pass failed: {error}", file=sys.stderr)
+                summary["_errors"]["gate_pass_failed"] += 1
+                continue
             # Keep the diagnostics of pass 1 for functions that had nothing to gate.
             gated_functions = {function for function, _ in gate_blocks}
             result["attempts"] = list(result["attempts"]) + [
@@ -229,6 +270,7 @@ def main() -> int:
     parser.add_argument("--no-gate", action="store_true", help="probe only; never edit tracked sources")
     parser.add_argument("--workers", type=int)
     parser.add_argument("--json", type=Path, help="write the summary to this file")
+    parser.add_argument("--skip-attempted", action="store_true", help="skip functions that already have m2c sweep attempts in the stats file")
     args = parser.parse_args()
     result = sweep(
         max_instructions=args.max_instructions,
@@ -238,6 +280,7 @@ def main() -> int:
         limit=args.limit,
         gate=not args.no_gate,
         workers=args.workers,
+        skip_functions=previously_attempted() if args.skip_attempted else None,
     )
     text = json.dumps(result, indent=2)
     if args.json:
