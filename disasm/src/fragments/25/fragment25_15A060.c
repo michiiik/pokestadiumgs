@@ -40,7 +40,13 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15A060/func_82101094.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15A060/func_82101420.s")
+extern void func_8004C398();
+extern void main_pool_pop_state(s32);
+
+void func_82101420(s32 arg0) {
+    func_8004C398();
+    main_pool_pop_state(0x50535253);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15A060/func_8210144C.s")
 

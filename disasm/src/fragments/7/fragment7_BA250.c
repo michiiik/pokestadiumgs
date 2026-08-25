@@ -253,7 +253,14 @@ void func_8300136C(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83007D10.s")
+extern void func_800226C0(s32);
+
+void func_83007D10(void *arg0, s32 arg1) {
+    if (arg1 == -1) {
+        (*(s8 *)((u8 *)(arg0) + (0x1E))) = 5;
+        func_800226C0(3);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -389,7 +396,15 @@ void func_8300136C(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_8300A71C.s")
+extern void func_80006D3C();
+extern void func_80008574();
+extern void main_pool_pop_state(s32);
+
+void func_8300A71C(s32 arg0, s32 arg1) {
+    func_80008574();
+    func_80006D3C();
+    main_pool_pop_state(0x4D535F31);
+}
 #endif
 
 #ifdef VERSION_US
@@ -397,11 +412,29 @@ void func_8300136C(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_8300A81C.s")
+extern void func_8300A4BC(s32, s32);
+extern void func_8300A50C();
+extern void func_8300A5B4(s32, s32);
+
+void func_8300A81C(s32 arg0, s32 arg1) {
+    func_8300A50C();
+    func_8300A4BC(arg0, arg1);
+    func_8300A5B4(arg0, arg1);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_8300A858.s")
+extern void func_80057944(s32);
+
+void func_8300A858(void) {
+    s32 var_s0;
+
+    var_s0 = 0;
+    do {
+        func_80057944(var_s0 & 0xFF);
+        var_s0 += 1;
+    } while (var_s0 != 4);
+}
 #endif
 
 #ifdef VERSION_US

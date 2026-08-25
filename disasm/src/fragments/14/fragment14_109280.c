@@ -12,9 +12,24 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_109280/func_81311894.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_109280/func_813119E4.s")
+extern f32 func_816092FC(void);
+void func_813119E4(u8 *arg0) {
+    f32 step = func_816092FC();
+    *(f32 *)(arg0 + 4) += step;
+    if (*(f32 *)(arg0 + 4) >= 16.0f) {
+        *(f32 *)(arg0 + 4) = 16.0f;
+        arg0[0x18] = 2;
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_109280/func_81311A3C.s")
+void func_81311A3C(u8 *arg0) {
+    f32 step = func_816092FC();
+    *(f32 *)(arg0 + 4) -= step;
+    if (*(f32 *)(arg0 + 4) <= 0.0f) {
+        *(f32 *)(arg0 + 4) = 0.0f;
+        arg0[0x18] = 4;
+    }
+}
 
 void func_81311A90(u8 *arg0) {
     *(f32 *)(arg0 + 4) = 0.0f;

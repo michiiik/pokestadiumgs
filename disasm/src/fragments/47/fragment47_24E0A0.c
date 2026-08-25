@@ -18,7 +18,12 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_86007EB4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_86007F50.s")
+f64 func_86007F50(void *arg0, s32 arg1, s32 arg2) {
+    f64 temp_fv1;
+
+    temp_fv1 = (*(f64 *)((u8 *)(arg0) + (0xC8)));
+    return (temp_fv1 * temp_fv1) / (*(f64 *)((u8 *)(arg0) + (0x60)));
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_86007F6C.s")
 

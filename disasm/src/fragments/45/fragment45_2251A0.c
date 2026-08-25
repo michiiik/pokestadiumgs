@@ -10,7 +10,17 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB0019C.s")
+extern u16 D_8AB1269E;
+
+s32 func_8AB0019C(void) {
+    s32 var_v1;
+
+    var_v1 = 0;
+    if ((D_8AB1269E == 0) || (D_8AB1269E == 1) || (D_8AB1269E == 2) || (D_8AB1269E == 3)) {
+        var_v1 = 1;
+    }
+    return var_v1;
+}
 #endif
 
 #ifdef VERSION_US
@@ -125,7 +135,15 @@ void func_8AB01288(void) { extern u16 D_8AB12692; extern u16 D_8AB12694; extern 
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB01454.s")
+extern u8 D_8AB16548;
+
+void func_8AB01454(s16 arg0) {
+    void *temp_v0;
+
+    temp_v0 = (arg0 * 0x90) + &D_8AB16548;
+    (*(s16 *)((u8 *)(temp_v0) + (8))) = 2;
+    (*(s16 *)((u8 *)(temp_v0) + (0x16))) = 0x1E;
+}
 #endif
 
 #ifdef VERSION_US

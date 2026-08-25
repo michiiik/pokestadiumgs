@@ -205,7 +205,18 @@ void func_86400020(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/52/fragment52_27E4E0/func_864066B4.s")
+extern u8 *D_86416C00;
+extern void func_86405778(void);
+extern void func_87F0277C(u8 *);
+extern void func_86409260(u8 *);
+extern void func_86401550(void);
+void func_864066B4(void) {
+    func_86405778();
+    func_87F0277C(D_86416C00 + 0xE00);
+    func_87F0277C(D_86416C00 + 0x3334);
+    func_86409260(D_86416C00 + 0xB554);
+    func_86401550();
+}
 #endif
 
 #ifdef VERSION_US

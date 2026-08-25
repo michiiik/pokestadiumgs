@@ -38,9 +38,25 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81602C68.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81602D70.s")
+extern u8 D_8160BE40;
+extern u8 D_8160BE4C;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81602DA4.s")
+s32 *func_81602D70(s32 arg0) {
+    if ((arg0 >= 0) && (arg0 < 4)) {
+        return (arg0 * 3) + &D_8160BE40;
+    }
+    return &D_8160BE4C;
+}
+
+extern void func_8004972C(u8, u8, u8, s32);
+void *func_81602C68();
+
+void func_81602DA4(void) {
+    void *temp_v0;
+
+    temp_v0 = func_81602C68();
+    func_8004972C((*(u8 *)((u8 *)(temp_v0) + (0))), (*(u8 *)((u8 *)(temp_v0) + (1))), (*(u8 *)((u8 *)(temp_v0) + (2))), 0xFF);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81602DD8.s")
 
@@ -135,9 +151,21 @@ void func_816054FC(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_8160724C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_816072FC.s")
+void func_816072FC(void *arg0) {
+    if ((*(s16 *)((u8 *)(arg0) + (4))) < 0x10) {
+        (*(s16 *)((u8 *)(arg0) + (4))) = 0;
+    }
+    if ((*(s16 *)((u8 *)(arg0) + (6))) < 0x10) {
+        (*(s16 *)((u8 *)(arg0) + (6))) = 0;
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_8160732C.s")
+void func_8160732C(void *arg0, void *arg1) {
+    (*(s16 *)((u8 *)(arg0) + (0))) = (s16) ((*(s16 *)((u8 *)(arg1) + (0))) + 8);
+    (*(s16 *)((u8 *)(arg0) + (2))) = (s16) ((*(s16 *)((u8 *)(arg1) + (2))) + 8);
+    (*(s16 *)((u8 *)(arg0) + (4))) = (s16) ((*(s16 *)((u8 *)(arg1) + (4))) - 0x13);
+    (*(s16 *)((u8 *)(arg0) + (6))) = (s16) ((*(s16 *)((u8 *)(arg1) + (6))) - 0x13);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81607360.s")
 
@@ -195,7 +223,14 @@ void func_8160852C(void) { func_8004D1FC(D_8160BDB4); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_8160945C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81609530.s")
+extern u8 D_8160C128;
+
+void *func_81609530(s32 arg0) {
+    if ((arg0 < 0) || (arg0 >= 0xB)) {
+        return NULL;
+    }
+    return (arg0 * 8) + &D_8160C128;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_8160955C.s")
 

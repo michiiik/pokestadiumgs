@@ -4,7 +4,11 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_818014C0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81801748.s")
+f64 func_818014C0(f64, f64);
+
+f32 func_81801748(void *arg0) {
+    return (f32) func_818014C0((f64) (*(s16 *)((u8 *)(arg0) + (2))), (f64) (*(s16 *)((u8 *)(arg0) + (0))));
+}
 
 extern u8 *D_81805930;
 extern u8 D_81805CE8[];
@@ -24,7 +28,14 @@ void func_81801810(u8 *arg0, s32 arg1, s32 arg2) {
     *(u16 *)(arg0 + 2) = (u16)arg2;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_8180181C.s")
+f32 func_8180181C(void *arg0) {
+    s16 temp_v0;
+    s16 temp_v1;
+
+    temp_v0 = (*(s16 *)((u8 *)(arg0) + (0)));
+    temp_v1 = (*(s16 *)((u8 *)(arg0) + (2)));
+    return sqrtf((f32) ((temp_v0 * temp_v0) + (temp_v1 * temp_v1)));
+}
 
 void func_81801854(u8 *arg0, u8 *arg1, u8 *arg2) {
     *(s16 *)(arg0 + 0) = *(s16 *)(arg2 + 0) + *(s16 *)(arg1 + 0);
@@ -159,7 +170,10 @@ void func_81801F80(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81802CA8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81802D98.s")
+void func_81802D98(void *arg0) {
+    func_8004C8C0((s32) (*(s16 *)((u8 *)(arg0) + (0x30))));
+    func_8004C8C0((s32) (*(s16 *)((u8 *)(arg0) + (0))));
+}
 
 void func_81802DC8(u8 *arg0) {
     func_8004C8C0(*(s16 *)arg0);

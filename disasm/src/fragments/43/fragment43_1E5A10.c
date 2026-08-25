@@ -88,7 +88,14 @@ void func_8AC00830(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC008E4.s")
+extern s16 D_8AC08520;
+
+s32 func_8AC008E4(void) {
+    if (D_8AC08520 == 0) {
+        return 1;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -154,7 +161,15 @@ void func_8AC00FEC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC01634.s")
+extern u8 D_8AC099BC;
+
+void func_8AC01634(void *arg0) {
+    void *temp_v0;
+
+    temp_v0 = (*(void **)((u8 *)(arg0) + (0)));
+    (*(s16 *)((u8 *)(temp_v0) + (8))) = (s16) ((*(s16 *)((u8 *)(arg0) + (0x14))) - (*(s16 *)((u8 *)(&D_8AC099BC) + (0))));
+    (*(s16 *)((u8 *)(temp_v0) + (0xA))) = (s16) ((*(s16 *)((u8 *)(arg0) + (0x16))) - (*(s16 *)((u8 *)(&D_8AC099BC) + (2))));
+}
 #endif
 
 #ifdef VERSION_US
@@ -374,7 +389,12 @@ void func_8AC00FEC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC06464.s")
+s32 func_8AC06464(s16 arg0, void *arg1) {
+    if (arg0 < (*(s16 *)((u8 *)(arg1) + (2)))) {
+        return 1;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -382,11 +402,21 @@ void func_8AC00FEC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC064C4.s")
+s32 func_8AC064C4(s16 arg0, s16 *arg1) {
+    if (arg0 < *arg1) {
+        return 1;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC064F0.s")
+s32 func_8AC064F0(s16 arg0, s16 *arg1) {
+    if (*arg1 < arg0) {
+        return 1;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -398,11 +428,21 @@ void func_8AC00FEC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC0660C.s")
+s32 func_8AC0660C(s16 arg0) {
+    if (arg0 > 0) {
+        return 1;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC06630.s")
+s32 func_8AC06630(s16 arg0, void *arg1) {
+    if (arg0 < (*(s16 *)((u8 *)(arg1) + (6)))) {
+        return 1;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -414,7 +454,15 @@ void func_8AC00FEC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC06800.s")
+s32 func_8AC06800(void *arg0, s16 arg1) {
+    s32 var_v1;
+
+    var_v1 = 0;
+    if (((*(s16 *)((u8 *)(arg0) + (0xA))) < (*(s16 *)((u8 *)(arg0) + (6)))) && (arg1 > 0)) {
+        var_v1 = 1;
+    }
+    return var_v1;
+}
 #endif
 
 #ifdef VERSION_US
@@ -482,5 +530,7 @@ void func_8AC06F28(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC06F48.s")
+void func_8AC06F48(s32 arg0, s32 arg1) {
+
+}
 #endif

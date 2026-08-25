@@ -51,11 +51,30 @@ s32 func_82000D10(s32 arg0, u8 *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/16/fragment16_code/func_82000D24.s")
+extern u8 D_82001EB8;
+extern s16 D_82001EBC;
+extern s16 D_82001EBE;
+
+s32 func_82000D24(s32 arg0, void *arg1) {
+    if (arg0 == 0) {
+        (*(s16 *)((u8 *)(&D_82001EB8) + (0))) = (s16) (*(s16 *)((u8 *)(arg1) + (8)));
+        (*(s16 *)((u8 *)(&D_82001EB8) + (2))) = (s16) (*(s16 *)((u8 *)(arg1) + (0xA)));
+        D_82001EBC = (*(s16 *)((u8 *)(arg1) + (0xC)));
+        D_82001EBE = (*(s16 *)((u8 *)(arg1) + (0xE)));
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/16/fragment16_code/func_82000D64.s")
+extern s16 D_82001EC0;
+
+s32 func_82000D64(s32 arg0, void *arg1) {
+    if (arg0 == 0) {
+        D_82001EC0 = (*(s16 *)((u8 *)(arg1) + (0xA)));
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -82,7 +101,18 @@ void func_82000DE0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/16/fragment16_code/func_82001304.s")
+extern void func_800498C4();
+extern void func_800499EC();
+extern void func_82000FB0();
+extern s32 D_82001CD4;
+
+void func_82001304(void) {
+    func_800498C4();
+    if (D_82001CD4 != 0) {
+        func_82000FB0();
+    }
+    func_800499EC();
+}
 #endif
 
 #ifdef VERSION_US

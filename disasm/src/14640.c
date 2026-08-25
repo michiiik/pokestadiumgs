@@ -219,7 +219,9 @@ extern s32 D_8011EBD0; void func_80018CF0(void) { D_8011EBD0 = 0; }
 
 void func_80019164(void) { func_80018728(0xFA000000, 0); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80019188.s")
+void func_80019188(s32 arg0, s32 arg1) {
+    func_80018728((arg1 & 0xFF) | 0xFD000000, arg0);
+}
 
 extern OSMesgQueue *D_801221B8; void func_800191BC(void) { osRecvMesg(D_801221B8, NULL, 0); osRecvMesg(D_801221B8, NULL, 1); }
 

@@ -199,7 +199,13 @@ void func_86106C28(void) { func_86106688(); func_86106504(D_87F119DC); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86108A50.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86108B14.s")
+void func_86108B14(s32 *arg0, s32 *arg1) {
+    s32 temp_v0;
+
+    temp_v0 = *arg0;
+    *arg0 = *arg1;
+    *arg1 = temp_v0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86108B28.s")
 

@@ -192,7 +192,20 @@ void func_8260F0DC(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260F6C8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260F7C4.s")
+s32 func_8260F7C4(s32 arg0, s32 arg1) {
+    s32 temp_v0;
+    s32 var_v1;
+
+    var_v1 = 0;
+    if (arg0 == -1) {
+        temp_v0 = (s32) (arg1 + 3) / 4;
+        var_v1 = temp_v0;
+        if (temp_v0 >= 3) {
+            var_v1 = 2;
+        }
+    }
+    return var_v1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260F7FC.s")
 
@@ -298,7 +311,18 @@ void func_8260F0DC(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82614CE0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82614F0C.s")
+extern s16 D_8261A492;
+extern u16 D_8261A494;
+
+s32 func_82614F0C(void) {
+    s32 var_v1;
+
+    var_v1 = 0;
+    if ((D_8261A494 & 1) && (D_8261A492 == 0)) {
+        var_v1 = 1;
+    }
+    return var_v1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82614F40.s")
 

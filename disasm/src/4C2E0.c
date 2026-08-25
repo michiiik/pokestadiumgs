@@ -42,7 +42,16 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4C2E0/func_8004BE18.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4C2E0/func_8004BE50.s")
+extern void func_80004024(s32 *, s32, s32);
+s32 func_800356CC(s32);
+extern u8 D_801270B0;
+
+void func_8004BE50(void) {
+    s32 temp_v0;
+
+    temp_v0 = func_800356CC(0xA);
+    func_80004024(&D_801270B0, temp_v0, temp_v0 + 0xFD0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4C2E0/func_8004BE84.s")
 

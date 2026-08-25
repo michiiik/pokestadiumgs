@@ -37,11 +37,23 @@ void func_8F100218(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/69/fragment69_code/func_8F100290.s")
+void func_8F100290(void *arg0) {
+    (*(s16 *)((u8 *)(arg0) + (2))) = (s16) ((*(s16 *)((u8 *)(arg0) + (2))) + 1);
+    if ((*(s16 *)((u8 *)(arg0) + (2))) >= 8) {
+        (*(s16 *)((u8 *)(arg0) + (0))) = 2;
+        (*(s16 *)((u8 *)(arg0) + (2))) = 8;
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/69/fragment69_code/func_8F1002C4.s")
+void func_8F1002C4(void *arg0) {
+    (*(s16 *)((u8 *)(arg0) + (2))) = (s16) ((*(s16 *)((u8 *)(arg0) + (2))) - 1);
+    if ((*(s16 *)((u8 *)(arg0) + (2))) <= 0) {
+        (*(s16 *)((u8 *)(arg0) + (0))) = 6;
+        (*(s16 *)((u8 *)(arg0) + (2))) = 0;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -129,7 +141,16 @@ void func_8F100218(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/69/fragment69_code/func_8F1027F8.s")
+extern void func_80004024(s32 *, s32, s32);
+s32 func_800356CC(s32);
+extern u8 D_8F1DEE68;
+
+void func_8F1027F8(void) {
+    s32 temp_v0;
+
+    temp_v0 = func_800356CC(9);
+    func_80004024(&D_8F1DEE68, temp_v0, temp_v0 + 0x408);
+}
 #endif
 
 #ifdef VERSION_US

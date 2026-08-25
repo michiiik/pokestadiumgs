@@ -2,9 +2,24 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_166060/func_88000020.s")
+extern u8 D_8800686C;
+extern s32 func_88000020(u8);
+s32 func_88000020(u8 arg0) {
+    s32 result = 0;
+    switch (arg0) {
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+        result = 1;
+        break;
+    }
+    return result;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_166060/func_8800005C.s")
+void func_8800005C(void) {
+    func_88000020(D_8800686C);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_166060/func_88000080.s")
 
@@ -28,7 +43,18 @@ void func_880002F4(u8 *arg0, s16 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_166060/func_88000770.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_166060/func_880007B0.s")
+extern s32 func_88000770(u8 *);
+s32 func_880007B0(u8 *arg0) {
+    s32 result = 0;
+    if ((arg0[0] > 0) && (arg0[0] < 0x98) && ((arg0[0x1E] & 1) == 0)) {
+        s32 temp = 0;
+        result = temp;
+        if (func_88000770(arg0) == 0) {
+            result = 1;
+        }
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_166060/func_88000808.s")
 

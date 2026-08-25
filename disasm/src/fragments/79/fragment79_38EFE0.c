@@ -111,7 +111,13 @@ void func_8411FE28(s32 arg0, s32 arg1) { func_841125F4(func_8411F750(arg0), 0x15
 
 void func_8411FE54(s32 arg0, s32 arg1) { func_841125F4(func_8411F750(arg0), 0x1C); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_8411FE80.s")
+s32 func_8411FE80(void) {
+    if ((*(u8 *)((u8 *)(D_84193DD0) + (2))) == 0) {
+        return 1;
+    }
+    (*(u8 *)((u8 *)(D_84193DD0) + (2))) = 0U;
+    return 0;
+}
 
 void func_8411FEAC(u8 arg0, u16 arg1, u8 arg2) {
     D_84193DD0[0] = arg0;
@@ -257,7 +263,20 @@ void func_84122A04(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84122AB8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84122C94.s")
+extern f32 D_84189CC4;
+
+void func_84122C94(void *arg0) {
+    f32 temp_fv0;
+
+    (*(s16 *)((u8 *)(arg0) + (0x5FE))) = 0;
+    (*(s16 *)((u8 *)(arg0) + (0x600))) = 0xAAA;
+    temp_fv0 = (*(f32 *)((u8 *)(arg0) + (0x30)));
+    (*(f32 *)((u8 *)(arg0) + (0x60C))) = (f32) D_84189CC4;
+    (*(f32 *)((u8 *)(arg0) + (0x5F0))) = temp_fv0;
+    (*(f32 *)((u8 *)(arg0) + (0x5E4))) = temp_fv0;
+    (*(f32 *)((u8 *)(arg0) + (0x5F4))) = (f32) (*(f32 *)((u8 *)(arg0) + (0x34)));
+    (*(f32 *)((u8 *)(arg0) + (0x5F8))) = (f32) (*(f32 *)((u8 *)(arg0) + (0x38)));
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84122CCC.s")
 
@@ -279,7 +298,15 @@ void func_84122A04(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84123664.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84123828.s")
+extern f32 D_84189D0C;
+
+void func_84123828(void *arg0) {
+    (*(s16 *)((u8 *)(arg0) + (0x600))) = 0x71C;
+    (*(f32 *)((u8 *)(arg0) + (0x60C))) = (f32) D_84189D0C;
+    (*(f32 *)((u8 *)(arg0) + (0x5F0))) = (f32) (*(f32 *)((u8 *)(arg0) + (0x30)));
+    (*(f32 *)((u8 *)(arg0) + (0x5F4))) = (f32) (*(f32 *)((u8 *)(arg0) + (0x34)));
+    (*(f32 *)((u8 *)(arg0) + (0x5F8))) = (f32) (*(f32 *)((u8 *)(arg0) + (0x38)));
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84123858.s")
 

@@ -33,7 +33,12 @@ void func_8FD0006C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/85/fragment85_code/func_8FD00654.s")
+s32 func_8004C990(s32, s32);
+extern void func_8004D1FC(s32);
+
+void func_8FD00654(void) {
+    func_8004D1FC(func_8004C990(0x21, 3));
+}
 #endif
 
 #ifdef VERSION_US
@@ -41,7 +46,12 @@ void func_8FD0006C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/85/fragment85_code/func_8FD008BC.s")
+s32 func_8004C990(s32, s32);
+extern void func_8004D1FC(s32);
+
+void func_8FD008BC(void) {
+    func_8004D1FC(func_8004C990(0x1F, 0));
+}
 #endif
 
 #ifdef VERSION_US
@@ -81,11 +91,25 @@ void func_8FD0006C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/85/fragment85_code/func_8FD014A0.s")
+extern u8 D_8FD02188;
+
+void func_8FD014A0(void) {
+    if ((*(u8 *)((u8 *)(&D_8FD02188) + (0))) == 2) {
+        (*(s16 *)((u8 *)(&D_8FD02188) + (2))) = (s16) ((*(s16 *)((u8 *)(&D_8FD02188) + (2))) + 1);
+        (*(s16 *)((u8 *)(&D_8FD02188) + (2))) = (s16) ((*(s16 *)((u8 *)(&D_8FD02188) + (2))) & 1);
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/85/fragment85_code/func_8FD014D8.s")
+extern u8 D_8FD02188;
+
+void func_8FD014D8(void) {
+    if ((*(u8 *)((u8 *)(&D_8FD02188) + (0))) == 2) {
+        (*(s16 *)((u8 *)(&D_8FD02188) + (2))) = (s16) ((*(s16 *)((u8 *)(&D_8FD02188) + (2))) + 1);
+        (*(s16 *)((u8 *)(&D_8FD02188) + (2))) = (s16) ((*(s16 *)((u8 *)(&D_8FD02188) + (2))) & 1);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -113,11 +137,27 @@ void func_8FD0006C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/85/fragment85_code/func_8FD01A38.s")
+extern void func_8004C8C0(s32);
+
+void func_8FD01A38(void) {
+    func_8004C8C0(0x20);
+    func_8004C8C0(0x21);
+    func_8004C8C0(0x1F);
+    func_8004C8C0(0x164);
+    func_8004C8C0(0x7A);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/85/fragment85_code/func_8FD01A78.s")
+extern void func_8004C4B0(s32);
+
+void func_8FD01A78(void) {
+    func_8004C4B0(0x4A);
+    func_8004C4B0(0x10);
+    func_8004C4B0(6);
+    func_8004C4B0(8);
+    func_8004C4B0(0xC);
+}
 #endif
 
 #ifdef VERSION_US

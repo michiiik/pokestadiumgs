@@ -12,13 +12,41 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/8/fragment8_code/func_82F005F8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/8/fragment8_code/func_82F00644.s")
+extern void func_800226C0(s32);
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/8/fragment8_code/func_82F00670.s")
+void func_82F00644(void *arg0, s32 arg1) {
+    if (arg1 != 0) {
+        (*(s8 *)((u8 *)(arg0) + (0x1E))) = 1;
+        func_800226C0(3);
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/8/fragment8_code/func_82F0069C.s")
+extern void func_800226C0(s32);
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/8/fragment8_code/func_82F006C8.s")
+void func_82F00670(void *arg0, s32 arg1) {
+    if (arg1 != 0) {
+        (*(s8 *)((u8 *)(arg0) + (0x1E))) = 1;
+        func_800226C0(3);
+    }
+}
+
+extern void func_800226C0(s32);
+
+void func_82F0069C(void *arg0, s32 arg1) {
+    if (arg1 != 0) {
+        (*(s8 *)((u8 *)(arg0) + (0x1E))) = 1;
+        func_800226C0(3);
+    }
+}
+
+extern void func_800226C0(s32);
+
+void func_82F006C8(void *arg0, s32 arg1) {
+    if (arg1 != 0) {
+        (*(s8 *)((u8 *)(arg0) + (0x1E))) = 6;
+        func_800226C0(3);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/8/fragment8_code/func_82F006F4.s")
 
@@ -56,13 +84,34 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/8/fragment8_code/func_82F01C34.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/8/fragment8_code/func_82F01D38.s")
+extern void func_80008648();
+extern void func_800088DC();
+extern void func_818017A8();
+extern void func_81805308(s32 *);
+extern u8 D_82F032C0;
+
+void func_82F01D38(s32 arg0) {
+    func_800088DC();
+    func_818017A8();
+    func_81805308(&D_82F032C0);
+    func_80008648();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/8/fragment8_code/func_82F01D74.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/8/fragment8_code/func_82F01DC4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/8/fragment8_code/func_82F01EC8.s")
+extern void func_80006D3C();
+extern void func_80008574();
+extern void func_80047610();
+extern void func_8004C398();
+
+void func_82F01EC8(s32 arg0, s32 arg1) {
+    func_80008574();
+    func_80047610();
+    func_8004C398();
+    func_80006D3C();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/8/fragment8_code/func_82F01F04.s")
 #endif

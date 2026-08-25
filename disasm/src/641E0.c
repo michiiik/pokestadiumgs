@@ -60,11 +60,23 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80064248.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_800643CC.s")
+extern void func_80064248(s32, s32, s32, s32);
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80064404.s")
+void func_800643CC(s32 arg0, s32 arg1, s32 arg2) {
+    func_80064248(arg0 & 0xFF, arg1 & 0xFF, arg2 & 0xFF, 0xFF);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_8006443C.s")
+extern void func_80064248(s32, s32, s32, s32);
+
+void func_80064404(s32 arg0, s32 arg1, s32 arg2) {
+    func_80064248(arg0 & 0xFF, arg1 & 0xFF, arg2 & 0xFF, 4);
+}
+
+extern void func_80064248(s32, s32, s32, s32);
+
+void func_8006443C(s32 arg0, s32 arg1, s32 arg2) {
+    func_80064248(arg0 & 0xFF, arg1 & 0xFF, arg2 & 0xFF, 0x7F);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80064474.s")
 

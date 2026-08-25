@@ -47,15 +47,36 @@ void func_8001A9D4(u32 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1A360/func_8001AC38.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/1A360/func_8001AD74.s")
+void func_8001AD74(s32 *arg0, s32 *arg1) {
+    if ((*(s32 **)((u8 *)(arg1) + (0))) == NULL) {
+        (*(s32 **)((u8 *)(arg1) + (0))) = arg0;
+        (*(s32 **)((u8 *)(arg1) + (4))) = (s32 *) (*(s32 **)((u8 *)(arg0) + (4)));
+        *(*(s32 **)((u8 *)(arg0) + (4))) = arg1;
+        (*(s32 **)((u8 *)(arg0) + (4))) = arg1;
+        (*(s32 *)((u8 *)(arg0) + (8))) = (s32) ((*(s32 *)((u8 *)(arg0) + (8))) + 1);
+        (*(s32 *)((u8 *)(arg1) + (0xC))) = (s32) (*(s32 *)((u8 *)(arg0) + (0xC)));
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/1A360/func_8001ADB4.s")
+void func_8001ADB4(void *arg0) {
+    void *temp_v0;
+
+    temp_v0 = (*(void **)((u8 *)(arg0) + (0)));
+    if (temp_v0 != NULL) {
+        (*(void ***)((u8 *)(temp_v0) + (4))) = (void **) (*(void ***)((u8 *)(arg0) + (4)));
+        *(*(void ***)((u8 *)(arg0) + (4))) = (*(void **)((u8 *)(arg0) + (0)));
+        (*(void **)((u8 *)(arg0) + (0))) = NULL;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1A360/func_8001ADE0.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1A360/func_8001AE60.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/1A360/func_8001AFAC.s")
+void func_8001AFAC(void *arg0, s32 arg1) {
+    func_8001A9B4((*(void **)((u8 *)(arg0) + (0x44))));
+    (*(s32 *)((u8 *)(arg0) + (0x48))) = arg1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1A360/func_8001AFE0.s")
 

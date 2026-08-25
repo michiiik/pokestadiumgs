@@ -45,9 +45,32 @@ s32 func_81100144(s32 arg0, s32 arg1) {
     return func_811000F8(arg0) + arg1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/27/fragment27_code/func_81100168.s")
+s32 func_81100168(s32 arg0, s32 arg1) {
+    s32 temp_v0;
+    s32 var_v1;
+    temp_v0 = func_811000F8(arg0);
+    if (temp_v0 >= 0) {
+        var_v1 = temp_v0 + arg1;
+    } else {
+        var_v1 = temp_v0 - arg1;
+    }
+    return var_v1;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/27/fragment27_code/func_811001A0.s")
+extern f32 D_80087E50[];
+extern f32 D_80088E50[];
+typedef union { u32 bits; f32 value; } Frag27FloatBits;
+f32 *func_811001A0(f32 *arg0, Frag27FloatBits arg1, Frag27FloatBits arg2, Frag27FloatBits arg3, u16 arg4) {
+    s32 index = arg4 >> 4;
+    f32 temp_fv0 = D_80087E50[index];
+    f32 fa0 = arg1.value;
+    f32 temp_fv1 = D_80088E50[index];
+    f32 fa1 = arg3.value;
+    arg0[0] = fa0 * temp_fv1 + fa1 * temp_fv0;
+    arg0[1] = arg2.value;
+    arg0[2] = -fa0 * temp_fv0 + fa1 * temp_fv1;
+    return arg0;
+}
 
 void func_8110020C(f32 *arg0, f32 *arg1) { arg0[0] = arg1[0]; arg0[1] = arg1[1]; arg0[2] = arg1[2]; }
 

@@ -17,7 +17,18 @@ void func_829084DC(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_829084E4.s")
+extern u8 D_82912F84;
+extern u8 D_8291B838;
+
+void func_829084E4(s32 arg0) {
+    void *temp_v0;
+
+    temp_v0 = (arg0 * 0x10) + &D_82912F84;
+    (*(s32 *)((u8 *)(&D_8291B838) + (0))) = (s32) (*(s32 *)((u8 *)(temp_v0) + (0)));
+    (*(s32 *)((u8 *)(&D_8291B838) + (4))) = (s32) (*(s32 *)((u8 *)(temp_v0) + (4)));
+    (*(s32 *)((u8 *)(&D_8291B838) + (8))) = (s32) (*(s32 *)((u8 *)(temp_v0) + (8)));
+    (*(s32 *)((u8 *)(&D_8291B838) + (0xC))) = (s32) (*(s32 *)((u8 *)(temp_v0) + (0xC)));
+}
 #endif
 
 #ifdef VERSION_US
@@ -29,14 +40,31 @@ void func_829084DC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_82908608.s")
+extern void func_82908520();
+extern s16 D_8291B862;
+
+void func_82908608(void) {
+    func_82908520();
+    D_8291B862 += 1;
+}
 #endif
 
 void func_82908638(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_82908640.s")
+extern u8 D_829130A8;
+extern u8 D_8291B848;
+
+void func_82908640(s32 arg0) {
+    void *temp_v0;
+
+    temp_v0 = (arg0 * 0x10) + &D_829130A8;
+    (*(s32 *)((u8 *)(&D_8291B848) + (0))) = (s32) (*(s32 *)((u8 *)(temp_v0) + (0)));
+    (*(s32 *)((u8 *)(&D_8291B848) + (4))) = (s32) (*(s32 *)((u8 *)(temp_v0) + (4)));
+    (*(s32 *)((u8 *)(&D_8291B848) + (8))) = (s32) (*(s32 *)((u8 *)(temp_v0) + (8)));
+    (*(s32 *)((u8 *)(&D_8291B848) + (0xC))) = (s32) (*(s32 *)((u8 *)(temp_v0) + (0xC)));
+}
 #endif
 
 #ifdef VERSION_US
@@ -237,11 +265,25 @@ void func_8290A0B0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290B3BC.s")
+extern u8 D_8291B831;
+
+s32 func_8290B3BC(void) {
+    if (D_8291B831 == 0xE) {
+        return 1;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290B3E4.s")
+extern u8 D_8291B831;
+
+s32 func_8290B3E4(void) {
+    if (D_8291B831 == 0x1A) {
+        return 1;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US

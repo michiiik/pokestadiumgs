@@ -4,7 +4,9 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E1E10/func_8160A270.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E1E10/func_8160A2E8.s")
+s32 func_8160A2E8(s32 arg0) {
+    return ((arg0 % 3) * 0x9A) + 0xC;
+}
 
 s32 func_8160A31C(s32 arg0) {
     s32 quotient = arg0 / 3;
@@ -43,7 +45,11 @@ s32 func_8160A920(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E1E10/func_8160A994.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E1E10/func_8160A9CC.s")
+s32 func_8160A8DC();
+
+s32 func_8160A9CC(void) {
+    return func_8160A8DC() >= 6;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E1E10/func_8160A9F0.s")
 

@@ -7,7 +7,10 @@ void func_82102B80(u8 *arg0, f32 arg1, f32 arg2) {
     *(f32 *)(arg0 + 4) = arg2;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15CBC0/func_82102B94.s")
+void func_82102B94(u8 *arg0, f32 arg1, f32 arg2) {
+    *(f32 *)(arg0 + 0) = sinf(arg2) * arg1;
+    *(f32 *)(arg0 + 4) = cosf(arg2) * arg1;
+}
 
 void func_82102BE8(u8 *arg0, u8 *arg1) {
     *(f32 *)(arg0 + 0) += *(f32 *)(arg1 + 0);

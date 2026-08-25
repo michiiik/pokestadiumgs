@@ -2,7 +2,11 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE00020.s")
+extern void func_800226C0();
+
+void func_8AE00020(void) {
+    func_800226C0();
+}
 #endif
 
 #ifdef VERSION_US
@@ -109,7 +113,15 @@ void func_8AE00CBC(f32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE01394.s")
+extern s32 D_8AE09B5C;
+extern s32 D_8AE09E60;
+extern s32 D_8AE09E64;
+
+void func_8AE01394(void) {
+    D_8AE09B5C = 0x1E;
+    D_8AE09E60 = 0x1E;
+    D_8AE09E64 = 0;
+}
 #endif
 
 #ifdef VERSION_US

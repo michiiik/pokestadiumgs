@@ -75,11 +75,29 @@ void func_8130FEB8(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_1077C0/func_8130FEC0.s")
+extern f32 func_816092FC(void);
+extern void func_8130FEC0(u8 *arg0, f32 arg1);
+extern f32 func_8130FF70(f32 arg0);
+void func_8130FEC0(u8 *arg0, f32 arg1) {
+    *(f32 *)(arg0 + 0x30) += arg1;
+    if (*(f32 *)(arg0 + 0x30) >= 16.0f) {
+        *(f32 *)(arg0 + 0x30) = 16.0f;
+        return;
+    }
+    if (*(f32 *)(arg0 + 0x30) <= 0.0f) {
+        *(f32 *)(arg0 + 0x30) = 0.0f;
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_1077C0/func_8130FF18.s")
+s32 func_8130FF18(u8 *arg0) {
+    func_8130FEC0(arg0, func_816092FC());
+    if (*(f32 *)(arg0 + 0x30) >= 16.0f) {
+        arg0[0x38] = 3;
+    }
+    return 1;
+}
 #endif
 
 #ifdef VERSION_US
@@ -87,7 +105,12 @@ void func_8130FEB8(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_1077C0/func_8130FFE0.s")
+extern f32 func_8130FF70(f32 arg0);
+void func_8130FFE0(f32 arg0, f32 arg1) {
+    f32 temp[2];
+    temp[0] = func_8130FF70(arg1);
+    func_8130FF70(temp[0] - func_8130FF70(arg0));
+}
 #endif
 
 #ifdef VERSION_US
@@ -103,7 +126,14 @@ void func_8130FEB8(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_1077C0/func_813107A0.s")
+s32 func_813107A0(u8 *arg0) {
+    func_8130FEC0(arg0, -func_816092FC());
+    if (*(f32 *)(arg0 + 0x30) <= 0.0f) {
+        arg0[0x38] = 5;
+        arg0[0x3A] = 0;
+    }
+    return 1;
+}
 #endif
 
 #ifdef VERSION_US

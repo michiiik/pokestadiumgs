@@ -84,5 +84,20 @@ s32 func_8280276C(u8 *arg0) {
     return *(s32 *)(arg0 + 0x10);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/10/fragment10_D5250/func_828027C0.s")
+extern void func_80054248(void *);
+extern void func_80051D64(s32, s32);
+extern void func_80054E48(s32);
+void func_828027C0(u8 *arg0) {
+    if ((*(s32 *)arg0 << 14) >= 0) {
+        return;
+    }
+    if (*(u32 *)(arg0 + 0x84) != 0) {
+        arg0[0x4E] |= 1;
+    } else {
+        arg0[0x4E] &= 0xFFFE;
+    }
+    func_80054248(arg0 + 0x4C);
+    func_80051D64(0x14, 0);
+    func_80054E48(3);
+}
 #endif

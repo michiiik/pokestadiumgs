@@ -404,7 +404,20 @@ void func_8005B190(s32 arg0) { if (func_80056A5C(arg0, 0) == 0) func_80064D58(ar
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005BF78.s")
+u8 *func_8005B280();
+
+u8 func_8005BF78(void) {
+    u8 *temp_v0;
+    u8 var_v1;
+
+    temp_v0 = func_8005B280();
+    if (temp_v0 != NULL) {
+        var_v1 = *temp_v0;
+    } else {
+        var_v1 = 0;
+    }
+    return var_v1;
+}
 #endif
 
 #ifdef VERSION_US
@@ -764,7 +777,11 @@ extern u8 D_80128570[]; s32 func_8005DF70(s32 index) { return (*(u32 *)(D_801285
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005EE4C.s")
+extern void func_8005EB3C(void *, s32);
+
+void func_8005EE4C(s32 arg0) {
+    func_8005EB3C((arg0 * 0x70) + 8 + D_80128570, 0xFB);
+}
 #endif
 
 #ifdef VERSION_US
@@ -930,7 +947,17 @@ s32 func_800606E8(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_800606F4.s")
+u8 func_800606F4(s32 arg0) {
+    u8 var_v1;
+    void *temp_v0;
+
+    temp_v0 = (arg0 * 0x70) + D_80128570;
+    var_v1 = 0;
+    if ((*(u8 *)((u8 *)(temp_v0) + (4))) == 7) {
+        var_v1 = (*(u8 *)((u8 *)(temp_v0) + (0x49)));
+    }
+    return var_v1;
+}
 #endif
 
 #ifdef VERSION_US

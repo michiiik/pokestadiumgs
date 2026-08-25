@@ -56,7 +56,14 @@ extern s32 D_800972B0[]; s32 func_80050CF8(s32 arg0){s32 result=0;if(arg0>=0&&ar
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800517D8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051830.s")
+extern void func_80061248();
+extern void func_800619E8(void *);
+
+void func_80051830(void *arg0) {
+    func_80061248();
+    func_800619E8(arg0);
+    (*(u16 *)((u8 *)(arg0) + (0x26))) = (u16) (*(u16 *)((u8 *)(arg0) + (0x28)));
+}
 
 extern void func_800615D0(s32,s32); void func_80051864(s32 a0,s32 a1){func_800615D0(a1,a0);}
 
@@ -78,7 +85,17 @@ extern void func_800615D0(s32,s32); void func_80051864(s32 a0,s32 a1){func_80061
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80052ECC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800530DC.s")
+extern void func_80052ECC(s32);
+
+void func_800530DC(void) {
+    s32 var_s0;
+
+    var_s0 = 0;
+    do {
+        func_80052ECC(var_s0);
+        var_s0 += 1;
+    } while (var_s0 != 4);
+}
 
 extern void func_80052928(s32,s32); extern void func_80051D64(s32,s32); void func_8005311C(s32 a0,s32 a1){func_80052928(a0,a1);func_80051D64(a0,a1);}
 
@@ -147,9 +164,24 @@ void func_80053ECC(u8 *arg0, u8 *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80054248.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800542B0.s")
+extern void func_80053B38(s32, s32, s32, u8 *);
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800542E4.s")
+u8 func_800542B0(s32 arg0) {
+    u8 sp1F;
+
+    sp1F = 0;
+    func_80053B38(0x13, 0, arg0, &sp1F);
+    return sp1F;
+}
+
+extern void func_80053F04(s32, s32, s32, u8 *);
+
+void func_800542E4(s32 arg0, u8 arg1) {
+    u8 sp1F;
+
+    sp1F = arg1;
+    func_80053F04(0x13, 0, arg0, &sp1F);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_8005431C.s")
 
@@ -215,7 +247,17 @@ void func_80053ECC(u8 *arg0, u8 *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055948.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055A34.s")
+extern void func_80055948(s32);
+
+void func_80055A34(void) {
+    s32 var_s0;
+
+    var_s0 = 0;
+    do {
+        func_80055948(var_s0);
+        var_s0 += 1;
+    } while (var_s0 != 4);
+}
 
 s32 func_80055A74(s32 arg0) { extern s32 D_800972C0; s32 old = D_800972C0; if (arg0 >= 0 && arg0 < 6) D_800972C0 = arg0; return old; }
 
