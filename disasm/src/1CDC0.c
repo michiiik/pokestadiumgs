@@ -35,7 +35,43 @@ s32 func_8001C1C0(u8 **arg0, u8 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1CDC0/func_8001C794.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/1CDC0/func_8001C804.s")
+void func_8001C804(void *arg0, u16 arg1) {
+    s32 i;
+    u8 *dst;
+
+    i = 0;
+    do {
+        if (arg1 & 1) {
+            dst = *(u8 **)((u8 *)arg0 + (i * 4) + 0x38);
+            dst[7] = *((u8 *)arg0 + 5);
+            dst[3] = *((u8 *)arg0 + 3);
+            dst[2] = *((u8 *)arg0 + 2);
+        }
+        arg1 = (arg1 >> 1) & 0xFFFF;
+        if (arg1 & 1) {
+            dst = *(u8 **)((u8 *)arg0 + (i * 4) + 0x3C);
+            dst[7] = *((u8 *)arg0 + 5);
+            dst[3] = *((u8 *)arg0 + 3);
+            dst[2] = *((u8 *)arg0 + 2);
+        }
+        arg1 = (arg1 >> 1) & 0xFFFF;
+        if (arg1 & 1) {
+            dst = *(u8 **)((u8 *)arg0 + (i * 4) + 0x40);
+            dst[7] = *((u8 *)arg0 + 5);
+            dst[3] = *((u8 *)arg0 + 3);
+            dst[2] = *((u8 *)arg0 + 2);
+        }
+        arg1 = (arg1 >> 1) & 0xFFFF;
+        if (arg1 & 1) {
+            dst = *(u8 **)((u8 *)arg0 + (i * 4) + 0x44);
+            dst[7] = *((u8 *)arg0 + 5);
+            dst[3] = *((u8 *)arg0 + 3);
+            dst[2] = *((u8 *)arg0 + 2);
+        }
+        i += 4;
+        arg1 = (arg1 >> 1) & 0xFFFF;
+    } while (i != 0x10);
+}
 
 extern u8 D_80121DDC[];
 extern void func_8001C794(s32);
