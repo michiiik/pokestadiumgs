@@ -41,7 +41,28 @@ void func_8000575C(u16* buf) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/62E0/func_800057DC.s")
+extern u32 D_800CE040;
+extern s32 D_800CE048;
+extern s32 D_800CE04C;
+extern s32 D_800CE050;
+void func_800057DC(void) {
+    if (D_800CE040 <= 15) {
+        if (D_800CE040 == 0) {
+            u16 color = func_80001EB8();
+             
+            D_800CE048 = (color >> 11) & 31;   
+            D_800CE04C = (color >> 6) & 31;  
+            D_800CE050 = (color >> 1) & 31;   
+        }
+         
+         
+        func_80001E18(((((D_800CE048 * (15 - D_800CE040)) >> 4) << 11) |
+                       (((D_800CE04C * (15 - D_800CE040)) >> 4) << 6) |
+                       (((D_800CE050 * (15 - D_800CE040)) >> 4) << 1) | 1) &
+                          0xFFFF,
+                      D_800CE040);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/62E0/func_800058B4.s")
 
