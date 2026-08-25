@@ -152,7 +152,26 @@ void func_80024D44(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80024E30.s")
+s32 func_80024E30(u32 arg0) {
+    s32 var_v1;
+    u8 *var_v0;
+
+    if (((arg0 == 0) || (arg0 >= 0xFCU)) && (arg0 != 0x12C)) {
+        return -1;
+    }
+    var_v0 = &D_80090A74;
+    var_v1 = 0;
+loop_5:
+    if (arg0 == *var_v0) {
+        return var_v1;
+    }
+    var_v1 += 1;
+    var_v0 += 1;
+    if (var_v1 == 2) {
+        return -2;
+    }
+    goto loop_5;
+}
 #endif
 
 #ifdef VERSION_US

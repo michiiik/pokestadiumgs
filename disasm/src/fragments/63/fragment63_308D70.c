@@ -2,7 +2,18 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E05400.s")
+extern void *D_87E1EB90;
+s32 func_87E05400(u32 arg0) {
+    s32 var_v1;
+    void *temp_v0;
+
+    temp_v0 = (*(void **)((u8 *)(D_87E1EB90) + (0x158)));
+    var_v1 = (*(s32 *)((u8 *)(temp_v0) + (0x98))) == 0;
+    if ((arg0 >= 2U) && (var_v1 == 0) && ((u32) (*(u32 *)((u8 *)(temp_v0) + (0x80))) >= (u32) ((u32) (*(u32 *)((u8 *)(temp_v0) + (0x84))) / arg0))) {
+        var_v1 = 1;
+    }
+    return var_v1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E05458.s")
 
