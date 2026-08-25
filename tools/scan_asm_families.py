@@ -61,11 +61,26 @@ SIMPLE_WRAPPER_OPS = {
 # ordered resource setup).
 MULTI_CALL_MAX_CALLS = 8
 MULTI_CALL_PARAMETER_TYPES = ("s32", "u32", "u8 *", "s8 *", "void *")
+# ``subu``/``blez``/``bgtz`` are not exotic here: IDO builds small constant
+# record strides (12, 22 bytes -- record sizes that are not a power of two)
+# out of ``sll``/``subu`` chains instead of one ``sll`` shift, and a
+# two-sided range check commonly rejects with ``blez``/``bgtz`` rather than
+# ``bltz``.  Without these three ops the allowlist silently drops the
+# majority proven bounded-lookup shape before candidate generation ever
+# runs (see the ``bounded_lookup`` evidence note in AGENTS.md).
 SIMPLE_LOOKUP_OPS = {
-    "addiu", "addu", "andi", "lbu", "lb", "lhu", "lh", "lw", "lui",
-    "move", "nop", "or", "sll", "sra", "srl", "slti", "sltiu", "slt",
-    "beq", "beqz", "bne", "bnez", "bltz", "bgez", "beql", "bnel", "jr",
+    "addiu", "addu", "subu", "andi", "lbu", "lb", "lhu", "lh", "lw", "lui",
+    "sw", "move", "nop", "or", "sll", "sra", "srl", "slti", "sltiu", "slt",
+    "beq", "beqz", "bne", "bnez", "bltz", "bgez", "blez", "bgtz",
+    "beql", "bnel", "blezl", "bgtzl", "jr",
 }
+
+# ``bounded_lookup_candidates`` tries one condition, up to two index-cast
+# forms, and up to two table-expression forms; the primary guard-return body
+# shape plus the two proven-but-secondary body shapes (see below) make at
+# most 1 * 2 * 2 * 3 = 12 candidates.  The cap is a safety net against a
+# larger matrix, not a tuned truncation point.
+BOUNDED_LOOKUP_CANDIDATE_LIMIT = 12
 
 
 @dataclass
@@ -727,6 +742,93 @@ def multi_call_wrapper_candidates(owner: Owner, instructions: list[Instruction])
     return candidates
 
 
+def _byte_argument_truncated(instructions: list[Instruction], bound_instruction: Instruction) -> bool:
+    """Whether the entry block masks ``$a0`` to a byte before the range check.
+
+    IDO emits ``andi $a0, $a0, 0xff`` right after spilling an incoming
+    argument declared with an 8-bit type; a plain ``s32`` parameter never
+    produces that mask.  Several verified byte-indexed lookups only matched
+    with a ``u8`` parameter for exactly this reason.
+    """
+    try:
+        bound_index = instructions.index(bound_instruction)
+    except ValueError:
+        return False
+    for instruction in instructions[:bound_index]:
+        if instruction.op != "andi":
+            continue
+        tokens = operand_tokens(instruction.operands)
+        if len(tokens) >= 3 and tokens[0] == "$a0" and tokens[1] == "$a0" and parse_int(tokens[2]) == 0xFF:
+            return True
+    return False
+
+
+_LOWER_BOUND_BRANCH_CONDITIONS = {"bltz": "arg0 >= 0", "blez": "arg0 > 0"}
+
+
+def _lower_bound_condition(instructions: list[Instruction]) -> str | None:
+    """Return the C form of a genuine second range-check branch, if any.
+
+    Guessing an unconditional ``arg0 >= 0 &&`` prefix whenever a negative
+    check is merely absent adds an instruction the baseline never emits.
+    Every verified two-check lookup instead has its own explicit lower-bound
+    branch: ``bltz`` rejects a negative index, ``blez`` rejects an index
+    <= 0.  Basing the condition on that branch, instead of guessing, both
+    matches the baseline and halves the candidate matrix.
+    """
+    for instruction in instructions:
+        condition = _LOWER_BOUND_BRANCH_CONDITIONS.get(instruction.op)
+        if condition:
+            return condition
+    return None
+
+
+def _table_index_multiplier(instructions: list[Instruction], global_name: str, load: MemoryAccess) -> int:
+    """Recover a non-power-of-two record stride from the ``sll``/``subu`` idiom.
+
+    IDO builds small constant multiplies (record sizes such as 12 or 22
+    bytes, which are not a single shift) out of a ``sll``/``subu``/``addu``
+    chain rather than one ``sll``.  This walks that chain symbolically from
+    ``$a0`` (multiplier 1) to find whichever register ends up added to the
+    table's ``%hi`` address right before the load, and returns its
+    multiplier.  Returns 1 when no such chain feeds the table address --
+    the caller's single-``sll`` fast path already covers power-of-two
+    strides on its own.
+    """
+    multiplier: dict[str, int] = {"$a0": 1}
+    for instruction in instructions:
+        tokens = operand_tokens(instruction.operands)
+        if instruction.op == "sll" and len(tokens) >= 3:
+            dest, source = tokens[0], tokens[1]
+            shift = parse_int(tokens[2])
+            if source in multiplier and shift is not None:
+                multiplier[dest] = multiplier[source] << shift
+        elif instruction.op in {"subu", "addu"} and len(tokens) >= 3:
+            dest, lhs, rhs = tokens[0], tokens[1], tokens[2]
+            if lhs in multiplier and rhs in multiplier:
+                multiplier[dest] = (
+                    multiplier[lhs] - multiplier[rhs]
+                    if instruction.op == "subu"
+                    else multiplier[lhs] + multiplier[rhs]
+                )
+
+    hi_register: str | None = None
+    index_register: str | None = None
+    for instruction in instructions:
+        tokens = operand_tokens(instruction.operands)
+        if instruction.op == "lui" and f"%hi({global_name})" in instruction.operands and tokens:
+            hi_register = tokens[0]
+        elif hi_register and instruction.op in {"addu", "add"} and len(tokens) >= 3:
+            dest, lhs, rhs = tokens[0], tokens[1], tokens[2]
+            # ``MemoryAccess.base`` is recorded without the leading ``$``.
+            if dest == f"${load.base}" and hi_register in (lhs, rhs):
+                index_register = rhs if lhs == hi_register else lhs
+                break
+    if index_register is None:
+        return 1
+    return multiplier.get(index_register, 1)
+
+
 def bounded_lookup_candidates(owner: Owner, instructions: list[Instruction]) -> list[str]:
     if not owner.bounds or not owner.globals:
         owner.notes.append("auto lookup translation suppressed: missing bound or global evidence")
@@ -750,7 +852,12 @@ def bounded_lookup_candidates(owner: Owner, instructions: list[Instruction]) -> 
         owner.instruction_count > 32
         or owner.branches > 4
         or any(instruction.op not in SIMPLE_LOOKUP_OPS for instruction in instructions)
-        or any(access.op in STORE_OPS for access in owner.memory_accesses)
+        # A stack-homed argument spill (``sw $a0, N($sp)``) is not an
+        # observable side effect; only a store to non-stack memory means
+        # this is not a pure lookup.  The un-filtered check previously
+        # suppressed every owner whose entry block spills its argument,
+        # which is the common case.
+        or any(access.op in STORE_OPS and access.base != "sp" for access in owner.memory_accesses)
     ):
         owner.notes.append(
             "auto lookup translation suppressed: control flow or side effects exceed the simple-table shape"
@@ -776,26 +883,26 @@ def bounded_lookup_candidates(owner: Owner, instructions: list[Instruction]) -> 
         )
         return []
     bound = owner.bounds[0]
-    has_negative_check = any(instruction.op.startswith("bltz") for instruction in instructions)
+    # A genuine second range-check branch (not merely the absence of one)
+    # gives the real lower-bound condition; see ``_lower_bound_condition``.
+    lower_bound = _lower_bound_condition(instructions)
     if bound_instruction.op == "sltiu":
         conditions = [f"(u32)arg0 < {bound}"]
-    elif has_negative_check:
-        conditions = [f"arg0 >= 0 && arg0 < {bound}"]
+    elif lower_bound is not None:
+        conditions = [f"{lower_bound} && arg0 < {bound}"]
     else:
-        conditions = [f"arg0 < {bound}", f"arg0 >= 0 && arg0 < {bound}"]
-
-    shift = 0
-    stride = 1
-    for instruction in instructions:
-        tokens = operand_tokens(instruction.operands)
-        if instruction.op == "sll" and len(tokens) >= 3 and tokens[1] == "$a0":
-            parsed = parse_int(tokens[2])
-            if parsed is not None:
-                shift = parsed
-                stride = 1 << parsed
-                break
+        conditions = [f"arg0 < {bound}"]
+    param_type = "u8" if _byte_argument_truncated(instructions, bound_instruction) else "s32"
 
     load = global_loads[0]
+    # A single ``sll $reg, $a0, N`` on its own is a power-of-two stride, but
+    # is also the *first* step of a ``sll``/``subu`` chain building a small
+    # non-power-of-two record size (12, 22 bytes): taking just that first
+    # shift would silently produce the wrong, truncated multiplier.  Walk
+    # the whole chain symbolically instead of special-casing the one-``sll``
+    # case; it recovers both shapes from the same evidence.
+    stride = _table_index_multiplier(instructions, global_name, load)
+
     type_info = {
         "lw": ("s32", "s32"),
         "lbu": ("u8", "u8"),
@@ -814,12 +921,24 @@ def bounded_lookup_candidates(owner: Owner, instructions: list[Instruction]) -> 
 
     candidates: list[str] = []
     labels: list[str] = []
-    index_forms = ["arg0", "(u32)arg0"] if not has_negative_check else ["arg0"]
+    # A branch already proven non-negative (an explicit second check, or an
+    # unsigned bound) makes the unsigned-index-cast hedge redundant.
+    index_forms = ["arg0"] if lower_bound is not None or bound_instruction.op == "sltiu" else ["arg0", "(u32)arg0"]
+    element_size = {"s32": 4, "u8": 1, "s8": 1, "u16": 2, "s16": 2}[element_type]
+    # ``stride`` is a byte count; a C array subscript on a typed array
+    # already multiplies by ``sizeof(element)``, so only every ``stride``
+    # that is an exact multiple of the element size has an equivalent array
+    # index (``stride // element_size``).  Applying the byte stride directly
+    # as the subscript would silently address ``element_size`` times too
+    # far for anything wider than a byte table.
+    element_stride = stride // element_size if stride % element_size == 0 else None
     expression_forms: list[tuple[str, str]] = []
-    if stride == 1 and not known_declaration:
-        expression_forms.append((f"{global_name}[INDEX]", f"extern {element_type} {global_name}[];"))
-    elif stride == 1:
-        expression_forms.append((f"*((({element_type} *){base}) + INDEX)", ""))
+    if element_stride is not None:
+        array_index = "INDEX" if element_stride == 1 else f"INDEX * {element_stride}"
+        if not known_declaration:
+            expression_forms.append((f"{global_name}[{array_index}]", f"extern {element_type} {global_name}[];"))
+        else:
+            expression_forms.append((f"*((({element_type} *){base}) + {array_index})", ""))
     expression_forms.append(
         (
             f"*(({element_type} *)((u8 *){base} + INDEX * {stride}))",
@@ -832,18 +951,35 @@ def bounded_lookup_candidates(owner: Owner, instructions: list[Instruction]) -> 
                 expression = expression_template.replace("INDEX", index)
                 declaration_lines = declarations + ([declaration] if declaration else [])
                 prefix = "\n".join(dict.fromkeys(declaration_lines))
-                body = (
-                    f"{result_type} result = 0; if ({condition}) result = {expression}; return result;"
-                )
-                code = f"{prefix + chr(10) if prefix else ''}{result_type} {owner.function}(s32 arg0) {{ {body} }}"
+                condition_tag = condition.replace(" ", "_")
+                index_tag = index.replace("(", "").replace(")", "")
+                signature = f"{result_type} {owner.function}({param_type} arg0)"
+
+                # Primary: the dominant proven shape is a guard clause that
+                # returns the table value directly, falling through to a
+                # bare ``return 0;`` -- most verified value-returning
+                # lookups use this, not an assign-then-return or a ternary.
+                guard = f"if ({condition}) return {expression}; return 0;"
+                code = f"{prefix + chr(10) if prefix else ''}{signature} {{ {guard} }}"
                 candidates.append(code)
-                labels.append(f"lookup-init-{condition.replace(' ', '_')}-{index.replace('(', '').replace(')', '')}-{len(candidates)}")
+                labels.append(f"lookup-guard-{condition_tag}-{index_tag}-{len(candidates)}")
+
+                # Secondary: the assign-then-return shape, proven on a
+                # smaller share of verified owners.
+                body = f"{result_type} result = 0; if ({condition}) result = {expression}; return result;"
+                code = f"{prefix + chr(10) if prefix else ''}{signature} {{ {body} }}"
+                candidates.append(code)
+                labels.append(f"lookup-init-{condition_tag}-{index_tag}-{len(candidates)}")
+
+                # Tertiary: no verified owner has matched a ternary return,
+                # but it is cheap to keep as a last hypothesis; the probe
+                # decides.
                 ternary = f"return ({condition}) ? {expression} : 0;"
-                code = f"{prefix + chr(10) if prefix else ''}{result_type} {owner.function}(s32 arg0) {{ {ternary} }}"
+                code = f"{prefix + chr(10) if prefix else ''}{signature} {{ {ternary} }}"
                 candidates.append(code)
-                labels.append(f"lookup-ternary-{condition.replace(' ', '_')}-{index.replace('(', '').replace(')', '')}-{len(candidates)}")
-    owner.candidate_labels = labels[:10]
-    return candidates[:10]
+                labels.append(f"lookup-ternary-{condition_tag}-{index_tag}-{len(candidates)}")
+    owner.candidate_labels = labels[:BOUNDED_LOOKUP_CANDIDATE_LIMIT]
+    return candidates[:BOUNDED_LOOKUP_CANDIDATE_LIMIT]
 
 
 def generate_candidates(owner: Owner, instructions: list[Instruction]) -> list[str]:

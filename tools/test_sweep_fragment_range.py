@@ -108,6 +108,61 @@ class SweepBandTests(unittest.TestCase):
         self.assertEqual(result["skipped_dirty_sources"], 1)
         self.assertEqual(result["skipped_dirty_targets"], 2)
 
+    def test_exclude_family_and_min_family_remaining_drop_rows_before_drafting(self) -> None:
+        rows = [
+            {"function": "func_wrapper_a", "source": "disasm/src/fragments/1/a.c", "family": "multi_call_wrapper"},
+            {"function": "func_wrapper_b", "source": "disasm/src/fragments/1/a.c", "family": "multi_call_wrapper"},
+            {"function": "func_map_a", "source": "disasm/src/fragments/2/b.c", "family": "constant_map"},
+            {"function": "func_call_a", "source": "disasm/src/fragments/3/c.c", "family": "call_sequence"},
+        ]
+        # ``multi_call_wrapper`` is excluded explicitly; ``constant_map`` is
+        # dropped because its listing-wide remaining count (1) is below the
+        # threshold.  ``call_sequence`` (remaining 5) survives both filters.
+        family_counts = {"multi_call_wrapper": 2, "constant_map": 1, "call_sequence": 5}
+        drafted: list[str] = []
+
+        def fake_draft_variants(function, family=None, variant_names=None):
+            drafted.append(function)
+            return [], None
+
+        with mock.patch.object(
+            sweep_targets.targets,
+            "list_targets",
+            return_value={
+                "matched": len(rows),
+                "targets": rows,
+                "truncated": False,
+                "family_counts": family_counts,
+            },
+        ), mock.patch.object(
+            sweep_targets.dedupe_externs,
+            "dirty_sources",
+            return_value=set(),
+        ), mock.patch.object(
+            sweep_targets,
+            "draft_variants",
+            side_effect=fake_draft_variants,
+        ):
+            result = sweep_targets.sweep(
+                max_instructions=None,
+                min_instructions=None,
+                family=None,
+                source=None,
+                limit=10,
+                gate=False,
+                workers=1,
+                exclude_families={"multi_call_wrapper"},
+                min_family_remaining=2,
+            )
+
+        self.assertEqual(drafted, ["func_call_a"])
+        self.assertEqual(result["summary"]["multi_call_wrapper"]["excluded_family"], 2)
+        self.assertEqual(result["summary"]["constant_map"]["excluded_family"], 1)
+        self.assertNotIn("excluded_family", result["summary"].get("call_sequence", {}))
+        self.assertEqual(result["summary"]["multi_call_wrapper"]["remaining"], 2)
+        self.assertEqual(result["summary"]["constant_map"]["remaining"], 1)
+        self.assertEqual(result["summary"]["call_sequence"]["remaining"], 5)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -21,11 +21,18 @@ pragma.  This tool:
   5. renames the S1 body (word-boundary substitution) and hands it to the
      existing candidate runner -- never writes tracked sources itself.
 
+``--near-matches`` runs a looser variant of the same pipeline for pragmas
+that have no exact S1 transfer entry: it ranks Stadium 1 bodies of the
+identical instruction count by normalised similarity and, above
+``--near-min-similarity``, transfers the best one the same way (labelled
+``s1-near:<S1 name>:<score>`` rather than ``s1:transfer``).
+
 Usage:
     tools/s1_transfer_sweep.py --dry-run --limit 15
     tools/s1_transfer_sweep.py --dry-run --function func_800015C0
     tools/s1_transfer_sweep.py --limit 50 --json build/s1_transfer.json
     tools/s1_transfer_sweep.py --no-gate --source disasm/src/229E0.c
+    tools/s1_transfer_sweep.py --near-matches --dry-run --limit 50
 
 Sources with uncommitted changes are skipped, mirroring ``sweep_targets``:
 another session may be mid-transaction in them.
@@ -45,11 +52,13 @@ import argparse
 import bisect
 import collections
 import json
+import os
 import re
 import sys
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Callable, Iterable
 
 import dedupe_externs
 import pragma_targets as targets
@@ -59,6 +68,10 @@ import xmatch_stadium1 as xmatch
 REPO_ROOT = targets.REPO_ROOT
 S1_TRANSFER_PATH = REPO_ROOT / "tools" / "s1_transfer.json"
 GS_INCLUDE_ROOT = REPO_ROOT / "disasm" / "include"
+GS_ULTRALIB_INCLUDE_ROOT = REPO_ROOT / "disasm" / "lib" / "ultralib" / "include"
+GS_YAML_PATH = REPO_ROOT / "disasm" / "yamls" / "us" / "rom.yaml"
+GS_SRC_ROOT = REPO_ROOT / "disasm" / "src"
+GS_LINKER_SCRIPTS_ROOT = REPO_ROOT / "disasm" / "linker_scripts" / "us"
 
 EVIDENCE_RE = re.compile(r"Stadium 1 (\S+) @ 0x([0-9A-Fa-f]+)")
 
@@ -67,12 +80,15 @@ CONTROL_KEYWORDS = {
     "goto", "case", "default", "break", "continue",
 }
 
-# Opcodes that carry a %lo() immediate (the low half of a lui/lo pair): every
-# I-type op other than lui itself.  We do not need the exact mnemonic set --
-# any instruction whose GS operand text spells %lo(sym) qualifies -- but the
-# register that holds the paired hi value always sits in the ``rs`` field
-# (bits 25:21), whether the instruction is an arithmetic op consuming it as
-# a source register or a load/store consuming it as a base register.
+# Type names IDO's own C89 front end (and libultra's own headers) already
+# know without any declaration of ours -- an extern naming anything outside
+# this set (plus whatever a GS header defines, plus whatever S1_-prefixed
+# type this run itself emits) cannot possibly compile.
+_BUILTIN_C_TYPES = {
+    "u8", "s8", "u16", "s16", "u32", "s32", "u64", "s64", "f32", "f64",
+    "void", "char", "int", "short", "long", "float", "double",
+    "unsigned", "signed", "size_t", "ssize_t", "uintptr_t", "intptr_t",
+}
 
 
 # --------------------------------------------------------------------------
@@ -98,12 +114,25 @@ class SourceInstr:
     jal_sym: str | None = None
 
 
-def parse_gs_asm(text: str) -> list[SourceInstr]:
+@dataclass(frozen=True)
+class ParsedAsm:
+    """A splat ``.s`` disassembly, one entry per instruction plus the raw words.
+
+    ``words`` is exactly ``[i.word for i in instructions]``, kept alongside
+    for the many call sites (alignment, address decoding) that only care
+    about the machine words and not the per-instruction symbol operands.
+    """
+    instructions: list[SourceInstr]
+    words: list[int]
+
+
+def parse_gs_asm(text: str) -> ParsedAsm:
     """Parse a splat ``.s`` disassembly into one entry per instruction.
 
     Only lines carrying the ``/* offset vram word */`` comment are
     instructions; ``glabel``/``.L...:`` lines are skipped, which is exactly
-    what distinguishes a label from code here.
+    what distinguishes a label from code here.  Generic over any splat
+    ``.s`` file -- nothing here is specific to GS or to a transfer source.
     """
     out: list[SourceInstr] = []
     index = 0
@@ -130,11 +159,11 @@ def parse_gs_asm(text: str) -> list[SourceInstr]:
             jal_sym=jal_sym,
         ))
         index += 1
-    return out
+    return ParsedAsm(instructions=out, words=[instr.word for instr in out])
 
 
 # --------------------------------------------------------------------------
-# S1 address decoding from aligned machine words
+# Address decoding from aligned machine words
 # --------------------------------------------------------------------------
 
 def decode_jal_target(word: int) -> int:
@@ -151,51 +180,143 @@ def decode_hilo_address(hi_word: int, lo_word: int) -> int:
     return ((hi16 << 16) + lo16) & 0xFFFFFFFF
 
 
-def _rt(word: int) -> int:
-    return (word >> 16) & 0x1F
+def decode_targets(
+    words: list[int],
+    *,
+    jal_indices: Iterable[int] = (),
+    hilo_pairs: Iterable[tuple[int, int]] = (),
+) -> dict[int, int]:
+    """Decode call targets and ``%hi``/``%lo`` pairs out of ``words``.
 
-
-def _rs(word: int) -> int:
-    return (word >> 21) & 0x1F
+    ``jal_indices`` are indices of ``jal``/``j`` words, decoded directly.
+    ``hilo_pairs`` are ``(hi_index, lo_index)`` -- the index of the word
+    carrying the ``%hi`` half and the index of the word carrying its paired
+    ``%lo`` half -- combined into one address.  Returns ``{index ->
+    address}``, keyed by the ``%lo`` index for a hi/lo pair so the result
+    lines up with the operand that actually names the symbol.  Generic over
+    whose words these are: pass a GS instruction's own words to decode what
+    it targets, or another program's words at the same indices (as
+    ``decode_s1_addresses`` does) to decode what that instruction encodes
+    over there.
+    """
+    out: dict[int, int] = {}
+    for i in jal_indices:
+        if 0 <= i < len(words):
+            out[i] = decode_jal_target(words[i])
+    for hi_index, lo_index in hilo_pairs:
+        if 0 <= hi_index < len(words) and 0 <= lo_index < len(words):
+            out[lo_index] = decode_hilo_address(words[hi_index], words[lo_index])
+    return out
 
 
 @dataclass
 class AddressDecodeResult:
-    addresses: dict[int, int]          # gs instruction index -> decoded S1 address
+    addresses: dict[int, int]          # gs instruction index -> decoded address
     unresolved: list[int]              # indices with a symbol operand we could not decode
 
 
 def decode_s1_addresses(gs_instrs: list[SourceInstr], s1_words: list[int]) -> AddressDecodeResult:
     """Decode, per GS instruction with a symbol operand, the S1 address it targets.
 
-    ``jal``/``j`` decode directly.  ``%hi``/``%lo`` decode by pairing: a
-    ``lui`` records the register it wrote; the next instruction whose ``rs``
-    field is that register (an ``addiu``/... consuming it as a source, or a
-    load/store using it as a base) is its ``%lo`` partner.  The register
-    stays live across several ``%lo`` consumers (a base reused for more than
-    one field access), so a hi is not consumed on first use.
+    ``jal``/``j`` decode directly.  ``%hi``/``%lo`` decode by pairing on the
+    GS operand's *symbol name*, not on which register holds it: the GS
+    ``.s`` already spells the same symbol on both the ``%hi`` and the
+    ``%lo`` line, so the nearest preceding ``%hi`` naming the same symbol as
+    a given ``%lo`` is its partner, however many registers the value moved
+    through in between (a ``move``/``addu $reg, $reg, $zero`` copy of the
+    base no longer breaks the pairing, since the copy's destination
+    register is never consulted).  The pairing stays live across several
+    ``%lo`` consumers of the same symbol, so a ``%hi`` is not used up on
+    first use.
     """
-    addresses: dict[int, int] = {}
     unresolved: list[int] = []
-    pending_hi: dict[int, int] = {}  # register -> gs index of the lui that wrote it
+    jal_indices: list[int] = []
+    hilo_pairs: list[tuple[int, int]] = []
+    pending_hi: dict[str, int] = {}  # symbol name -> gs index of the %hi instruction
     for instr in gs_instrs:
         if instr.index >= len(s1_words):
             continue
-        s1_word = s1_words[instr.index]
         if instr.jal_sym is not None:
-            addresses[instr.index] = decode_jal_target(s1_word)
+            jal_indices.append(instr.index)
             continue
         if instr.hi_sym is not None:
-            pending_hi[_rt(instr.word)] = instr.index
-            # A %hi operand can, rarely, also be consumed the same
-            # instruction has no %lo, so nothing else to do here.
+            pending_hi[instr.hi_sym] = instr.index
         if instr.lo_sym is not None:
-            hi_index = pending_hi.get(_rs(instr.word))
+            hi_index = pending_hi.get(instr.lo_sym)
             if hi_index is None:
                 unresolved.append(instr.index)
                 continue
-            addresses[instr.index] = decode_hilo_address(s1_words[hi_index], s1_word)
+            hilo_pairs.append((hi_index, instr.index))
+    addresses = decode_targets(s1_words, jal_indices=jal_indices, hilo_pairs=hilo_pairs)
     return AddressDecodeResult(addresses=addresses, unresolved=unresolved)
+
+
+# --------------------------------------------------------------------------
+# Loose alignment (for a near-match transfer, where bodies are not byte-identical)
+# --------------------------------------------------------------------------
+
+def _opcode_class(word: int) -> tuple[int, ...]:
+    """Coarse instruction classification for a loose alignment check.
+
+    The raw 6-bit opcode, further split by the function field for SPECIAL
+    (opcode 0) so unrelated register-only ops (``add`` vs ``sub``, say) are
+    not treated as interchangeable just because neither carries a
+    relocation.
+    """
+    op = word >> 26
+    if op == 0:
+        return (0, word & 0x3F)
+    return (op,)
+
+
+def _is_reloc_bearing(word: int) -> bool:
+    """True for any opcode class that is not a register-only SPECIAL/COPz op.
+
+    Mirrors ``xmatch.norm``'s own classification: everything else either
+    carries a jump/branch target, a ``lui`` high half, or an immediate that
+    might encode part of an address.
+    """
+    op = word >> 26
+    return op not in (0, 0x10, 0x11)
+
+
+@dataclass(frozen=True)
+class Alignment:
+    """Result of positionally aligning two equal-length instruction-word lists."""
+    length: int
+    strict: bool
+    ok: bool
+    first_mismatch: int | None = None
+
+
+def align_words(gs_words: list[int], other_words: list[int], *, strict: bool) -> Alignment | None:
+    """Positionally align two same-length instruction-word lists.
+
+    Returns ``None`` only when the lengths differ -- there is no
+    position-by-position alignment to report in that case.  Otherwise
+    always returns an ``Alignment``; check ``.ok`` (and, on failure,
+    ``.first_mismatch``) rather than treating a non-``None`` result as
+    success.
+
+    ``strict=True`` requires every masked (relocation-normalised) word to
+    agree -- the verbatim-transfer comparison ``xmatch`` calls "identical".
+    ``strict=False`` (a near-match transfer, where the two bodies come from
+    independently compiled, merely similar sources) instead requires only
+    that every instruction carrying a relocatable operand land on an
+    instruction of the same opcode class in the other list, so a rename map
+    built from the pairing is still trustworthy even though the bodies are
+    not byte-identical.
+    """
+    if len(gs_words) != len(other_words):
+        return None
+    for i, (g, o) in enumerate(zip(gs_words, other_words)):
+        if strict:
+            if xmatch.norm(g) != xmatch.norm(o):
+                return Alignment(length=len(gs_words), strict=True, ok=False, first_mismatch=i)
+            continue
+        if (_is_reloc_bearing(g) or _is_reloc_bearing(o)) and _opcode_class(g) != _opcode_class(o):
+            return Alignment(length=len(gs_words), strict=False, ok=False, first_mismatch=i)
+    return Alignment(length=len(gs_words), strict=strict, ok=True)
 
 
 # --------------------------------------------------------------------------
@@ -290,6 +411,81 @@ def resolve_s1_symbol(
     return None
 
 
+def make_symbol_lookup(
+    symtab: S1SymbolTable, body_identifiers: set[str]
+) -> Callable[[int], str | None]:
+    """Bind ``resolve_s1_symbol`` into the single-argument shape ``build_rename_map`` wants.
+
+    Tries an exact-address match first (valid whether the address came from
+    a call or a data reference), then the ``func_<ADDR>``/``D_<ADDR>``
+    synthesized spellings splat would have used, in that order.  Returns a
+    name only when it is safe to substitute at offset 0; a containment
+    match at a nonzero offset is deliberately not returned, since renaming
+    the base symbol there would be wrong.
+    """
+    def lookup(addr: int) -> str | None:
+        for is_call in (True, False):
+            resolved = resolve_s1_symbol(symtab, addr, is_call=is_call, body_identifiers=body_identifiers)
+            if resolved is not None and resolved[1] == 0:
+                return resolved[0]
+        return None
+    return lookup
+
+
+# --------------------------------------------------------------------------
+# Comment stripping
+# --------------------------------------------------------------------------
+
+def strip_comments(text: str) -> str:
+    """Remove ``//`` and ``/* */`` comments, honoring string/char literals.
+
+    Each comment is replaced by a single space so the tokens on either side
+    of it never fuse together (``int/*x*/y`` must not become ``inty``); a
+    block comment's internal newlines are collapsed away with it, which a C
+    compiler does not care about.  Used to keep comment text -- which can
+    carry non-ASCII bytes, or an identifier that happens to collide with a
+    rename map, or per-caller wording that makes two occurrences of the
+    same struct fail to look identical to each other -- out of every piece
+    of C this tool emits.
+    """
+    out: list[str] = []
+    index = 0
+    length = len(text)
+    in_string: str | None = None
+    while index < length:
+        char = text[index]
+        if in_string:
+            out.append(char)
+            if char == "\\" and index + 1 < length:
+                out.append(text[index + 1])
+                index += 2
+                continue
+            if char == in_string:
+                in_string = None
+            index += 1
+            continue
+        two = text[index:index + 2]
+        if two == "//":
+            index += 2
+            while index < length and text[index] != "\n":
+                index += 1
+            out.append(" ")
+            continue
+        if two == "/*":
+            end = text.find("*/", index + 2)
+            index = end + 2 if end != -1 else length
+            out.append(" ")
+            continue
+        if char in "\"'":
+            in_string = char
+            out.append(char)
+            index += 1
+            continue
+        out.append(char)
+        index += 1
+    return "".join(out)
+
+
 # --------------------------------------------------------------------------
 # Brace-matched extraction (S1 function bodies, struct/typedef definitions)
 # --------------------------------------------------------------------------
@@ -348,6 +544,44 @@ def extract_braced_block(text: str, open_brace_index: int) -> str:
                 return text[open_brace_index:index + 1]
         index += 1
     raise ValueError("unterminated brace block")
+
+
+_NESTED_STRUCT_RE = re.compile(r"\b(struct|union)\b\s*\{")
+
+
+def find_anonymous_members(type_def: str) -> list[str]:
+    """Names (``struct``/``union``) of any anonymous nested struct/union member.
+
+    A C11 anonymous struct/union member -- a nested ``struct { ... };`` or
+    ``union { ... };`` with no declarator between the closing brace and the
+    ``;`` -- is not accepted by IDO's C89 front end.  Synthesizing a
+    declarator would silently change every access site's syntax (``x.xx``
+    would have to become ``x.s.xx``), so this only detects the case; the
+    caller decides what to do (mark the type unsupported rather than emit
+    invalid C).  Only scans *nested* struct/union members: the type's own
+    outer brace (which may itself be anonymous, as in ``typedef union {
+    ... } Name;``) is excluded since that shape is handled elsewhere.
+    """
+    stripped = strip_comments(type_def)
+    open_brace = stripped.find("{")
+    if open_brace < 0:
+        return []
+    try:
+        outer = extract_braced_block(stripped, open_brace)
+    except ValueError:
+        return []
+    interior = outer[1:-1]
+    found: list[str] = []
+    for match in _NESTED_STRUCT_RE.finditer(interior):
+        try:
+            block = extract_braced_block(interior, match.end() - 1)
+        except ValueError:
+            continue
+        end = match.end() - 1 + len(block)
+        rest = interior[end:end + 40]
+        if re.match(r"\s*;", rest):
+            found.append(match.group(1))
+    return found
 
 
 _GENERIC_FUNC_DEF_RE = re.compile(
@@ -422,7 +656,7 @@ def _simple_typedef_name(decl: str) -> str | None:
 
 
 def index_type_definitions(texts: list[str]) -> dict[str, str]:
-    """name -> full definition text, across every header/source given."""
+    """name -> full definition text (comments stripped), across every text given."""
     index: dict[str, str] = {}
     for text in texts:
         for match in _TYPEDEF_OPEN_RE.finditer(text):
@@ -436,7 +670,7 @@ def index_type_definitions(texts: list[str]) -> dict[str, str]:
                 continue
             trailer = text[end:semi]
             names = [part.strip().lstrip("*").strip() for part in trailer.split(",")]
-            full = text[match.start():semi + 1]
+            full = strip_comments(text[match.start():semi + 1]).strip()
             for name in names:
                 if name and re.fullmatch(r"[A-Za-z_]\w*", name) and name not in index:
                     index[name] = full
@@ -451,9 +685,9 @@ def index_type_definitions(texts: list[str]) -> dict[str, str]:
             end = match.end() - 1 + len(block)
             semi = text.find(";", end)
             full_end = semi + 1 if 0 <= semi <= end + 2 else end
-            index[name] = text[match.start():full_end]
+            index[name] = strip_comments(text[match.start():full_end]).strip()
         for match in _SIMPLE_TYPEDEF_RE.finditer(text):
-            line = match.group(0)
+            line = strip_comments(match.group(0))
             inner = re.match(r"[ \t]*typedef\s+(.*?)\s*;[ \t]*$", line)
             if not inner:
                 continue
@@ -463,7 +697,7 @@ def index_type_definitions(texts: list[str]) -> dict[str, str]:
     return index
 
 
-def collect_type_definitions(
+def _collect_referenced_types(
     seed_names: set[str], type_index: dict[str, str], *, max_depth: int = 4
 ) -> dict[str, str]:
     """Transitively pull in types referenced by the seed types, bounded by depth.
@@ -514,6 +748,32 @@ def order_types(type_defs: dict[str, str]) -> list[str]:
     return order
 
 
+def collect_type_definitions(
+    body: str, header_index: dict[str, str], prefix: str, *, max_depth: int = 4
+) -> list[str]:
+    """Pull in, prefix, and dependency-order every type ``body`` references.
+
+    Scans ``body`` (comment-stripped) for identifiers that name a type in
+    ``header_index``, transitively follows those types' own referenced
+    types up to ``max_depth`` hops, renames every collected type
+    (definition text and cross-references between them alike) by
+    prepending ``prefix`` to its name so it can never collide with a
+    same-named type in the destination tree, and returns the definitions in
+    dependency order (a type's dependents come after it, so pasting the
+    list top to bottom always compiles).  Generic over the source of
+    ``header_index`` -- nothing here is specific to Stadium 1, and a caller
+    that also wants to skip re-emitting a type the destination tree already
+    defines identically should filter ``header_index`` (or the result)
+    itself before/after calling this.
+    """
+    stripped = strip_comments(body)
+    seed_names = {ident for ident in re.findall(r"\b[A-Za-z_]\w*\b", stripped) if ident in header_index}
+    type_defs = _collect_referenced_types(seed_names, header_index, max_depth=max_depth)
+    rename_map = {name: f"{prefix}{name}" for name in type_defs}
+    ordered = order_types(type_defs)
+    return [apply_rename(type_defs[name], rename_map) for name in ordered]
+
+
 def _normalize_ws(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
@@ -530,13 +790,81 @@ def index_extern_declarations(texts: list[str]) -> dict[str, str]:
     index: dict[str, str] = {}
     for text in texts:
         for match in _EXTERN_LINE_RE.finditer(text):
-            line = match.group(0)
+            line = strip_comments(match.group(0)).strip()
             trail = _EXTERN_TRAILING_NAME_RE.search(line)
             if not trail:
                 continue
             name = trail.group(1)
             if name not in index:
-                index[name] = line.strip()
+                index[name] = line
+    return index
+
+
+def _extern_type_token(decl: str) -> str | None:
+    """The base type name of an ``extern <type> <name>[...];`` declaration.
+
+    A best-effort heuristic (multi-word types like ``unsigned char`` yield
+    just the last word), deliberately conservative: getting it wrong only
+    ever means treating a fine type as unknown and falling back to a safer
+    spelling, never the other way around.
+    """
+    body = re.sub(r"^\s*extern\s+", "", decl).strip()
+    body = body.rstrip(";").strip()
+    body = re.sub(r"\[[^\]]*\]\s*$", "", body).strip()
+    tokens = body.split()
+    if len(tokens) < 2:
+        return None
+    type_tokens = tokens[:-1]
+    if not type_tokens:
+        return None
+    return type_tokens[-1].strip("*")
+
+
+def _is_known_extern_type(type_token: str, gs_type_index: dict[str, str], emitted_type_names: set[str]) -> bool:
+    if type_token in _BUILTIN_C_TYPES:
+        return True
+    if type_token in gs_type_index:
+        return True
+    if type_token.startswith("S1_") and type_token[len("S1_"):] in emitted_type_names:
+        return True
+    return False
+
+
+def _fallback_extern_decl(decl: str, name: str) -> str:
+    """Widest safe spelling for a symbol whose S1 type could not be carried over."""
+    trail = _EXTERN_TRAILING_NAME_RE.search(decl)
+    array_suffix = trail.group(2) if trail and trail.group(2) else None
+    if array_suffix:
+        return f"extern u8 {name}{array_suffix};"
+    return f"extern s32 {name};"
+
+
+# --------------------------------------------------------------------------
+# Macro indexing
+# --------------------------------------------------------------------------
+
+_DEFINE_RE = re.compile(r"(?m)^[ \t]*#[ \t]*define[ \t]+([A-Za-z_]\w*)(\([^)]*\))?[ \t]*(.*?)[ \t]*$")
+
+
+def index_macro_definitions(texts: list[str]) -> dict[str, tuple[str, str, bool]]:
+    """name -> (params_text_or_empty, expansion, is_multiline).
+
+    ``params_text_or_empty`` is the parenthesised parameter list verbatim
+    (including the parens) for a function-like macro, or ``""`` for an
+    object-like one.  A trailing ``\\`` continuation on the captured line
+    marks ``is_multiline``, so a caller can refuse to carry a multi-line
+    expansion across rather than emit a truncated one.
+    """
+    index: dict[str, tuple[str, str, bool]] = {}
+    for text in texts:
+        stripped = strip_comments(text)
+        for match in _DEFINE_RE.finditer(stripped):
+            name = match.group(1)
+            if name in index:
+                continue
+            params = match.group(2) or ""
+            value = match.group(3)
+            index[name] = (params, value, value.endswith("\\"))
     return index
 
 
@@ -544,13 +872,78 @@ def index_extern_declarations(texts: list[str]) -> dict[str, str]:
 # Renaming
 # --------------------------------------------------------------------------
 
-def apply_rename(text: str, rename_map: dict[str, str]) -> str:
-    if not rename_map:
+def rename_identifiers(text: str, mapping: dict[str, str]) -> str:
+    """Word-boundary substitution of every key in ``mapping`` within ``text``.
+
+    Longer names are substituted first so renaming ``Foo`` to ``A`` cannot
+    accidentally create a substring that then matches a separate ``Foobar``
+    -> ``B`` rule (or vice versa).  Generic string rewriting -- callers
+    build ``mapping`` however suits them (a symbol rename table, a type
+    prefix table, or both merged together).
+    """
+    if not mapping:
         return text
     pattern = re.compile(
-        r"\b(" + "|".join(re.escape(name) for name in sorted(rename_map, key=len, reverse=True)) + r")\b"
+        r"\b(" + "|".join(re.escape(name) for name in sorted(mapping, key=len, reverse=True)) + r")\b"
     )
-    return pattern.sub(lambda m: rename_map[m.group(0)], text)
+    return pattern.sub(lambda m: mapping[m.group(0)], text)
+
+
+apply_rename = rename_identifiers
+
+
+# --------------------------------------------------------------------------
+# Rename-map construction from aligned machine words
+# --------------------------------------------------------------------------
+
+@dataclass(frozen=True)
+class RenameMap:
+    mapping: dict[str, str]
+    unmapped: list[str]
+
+
+def build_rename_map(
+    parsed_gs: ParsedAsm,
+    other_words: list[int],
+    symbol_lookup: Callable[[int], str | None],
+    extra: dict[str, str],
+) -> RenameMap:
+    """Build an other-name -> GS-name rename table from aligned machine words.
+
+    For each GS instruction carrying a ``jal``/``%hi``/``%lo`` symbol
+    operand, decode (via the same symbol-name %hi/%lo pairing
+    ``decode_s1_addresses`` uses) the address the *other* program's word at
+    the same index encodes, resolve it to a name with
+    ``symbol_lookup(address)``, and pair that name with the GS operand's
+    own symbol text.  ``extra`` seeds the map (typically the transferred
+    function's own name) and is never overridden.  An address
+    ``symbol_lookup`` cannot name, or one that would map to two different
+    GS names, is recorded in ``unmapped`` instead of the mapping.  Generic
+    over what ``other_words`` came from and how ``symbol_lookup`` resolves
+    an address -- nothing here is specific to Stadium 1.
+    """
+    mapping = dict(extra)
+    unmapped: list[str] = []
+    decode = decode_s1_addresses(parsed_gs.instructions, other_words)
+    for index in decode.unresolved:
+        unmapped.append(f"index {index}: unpaired %lo (no preceding %hi naming the same symbol)")
+    for instr in parsed_gs.instructions:
+        if instr.jal_sym is None and instr.hi_sym is None and instr.lo_sym is None:
+            continue
+        addr = decode.addresses.get(instr.index)
+        gs_operand_name = instr.jal_sym or instr.hi_sym or instr.lo_sym
+        if addr is None:
+            continue  # already recorded via decode.unresolved
+        name = symbol_lookup(addr)
+        if name is None:
+            unmapped.append(f"{gs_operand_name} (address 0x{addr:08X} unresolved)")
+            continue
+        existing = mapping.get(name)
+        if existing is not None and existing != gs_operand_name:
+            unmapped.append(f"{name} maps to both {existing} and {gs_operand_name}")
+            continue
+        mapping[name] = gs_operand_name
+    return RenameMap(mapping=mapping, unmapped=unmapped)
 
 
 # --------------------------------------------------------------------------
@@ -602,7 +995,9 @@ class S1Context:
     symtab: S1SymbolTable
     type_index: dict[str, str]
     extern_index: dict[str, str]
+    macro_index: dict[str, tuple[str, str, bool]]
     gs_type_index: dict[str, str]
+    gs_macro_index: dict[str, tuple[str, str, bool]]
     func_file_index: dict[str, Path]
     gs_asm_fallback: Path | None
 
@@ -646,11 +1041,16 @@ def build_s1_context(s1_root: Path, *, gs_asm_fallback: Path | None, verbose: bo
     c_texts = _read_texts(c_paths)
     type_index = index_type_definitions(header_texts + c_texts)
     extern_index = index_extern_declarations(header_texts + c_texts)
+    macro_index = index_macro_definitions(header_texts + c_texts)
     func_file_index = index_function_files(c_paths)
     symtab.func_names.update(func_file_index)
 
-    gs_header_texts = _read_texts(list(GS_INCLUDE_ROOT.rglob("*.h"))) if GS_INCLUDE_ROOT.is_dir() else []
+    gs_header_paths = list(GS_INCLUDE_ROOT.rglob("*.h")) if GS_INCLUDE_ROOT.is_dir() else []
+    if GS_ULTRALIB_INCLUDE_ROOT.is_dir():
+        gs_header_paths += list(GS_ULTRALIB_INCLUDE_ROOT.rglob("*.h"))
+    gs_header_texts = _read_texts(gs_header_paths)
     gs_type_index = index_type_definitions(gs_header_texts)
+    gs_macro_index = index_macro_definitions(gs_header_texts)
 
     return S1Context(
         root=s1_root,
@@ -658,9 +1058,37 @@ def build_s1_context(s1_root: Path, *, gs_asm_fallback: Path | None, verbose: bo
         symtab=symtab,
         type_index=type_index,
         extern_index=extern_index,
+        macro_index=macro_index,
         gs_type_index=gs_type_index,
+        gs_macro_index=gs_macro_index,
         func_file_index=func_file_index,
         gs_asm_fallback=gs_asm_fallback,
+    )
+
+
+def build_gs_context() -> dict[str, dict]:
+    """Load every GS ROM function's decoded machine words.
+
+    Mirrors what ``xmatch_stadium1.main()`` does for the GS side of its own
+    match: same ROM search order (``xmatch.GS_ROM_CANDIDATES``), same yaml
+    and symbol tables.  Only needed for ``--near-matches`` (the transfer-map
+    path never needs the GS ROM, only the GS ``.s`` files).  Raises
+    ``FileNotFoundError`` with a clear message when no GS ROM is available
+    -- there is no sensible fallback for it.
+    """
+    gs_rom = next((path for path in xmatch.GS_ROM_CANDIDATES if os.path.exists(path)), None)
+    if gs_rom is None:
+        raise FileNotFoundError(
+            f"no Stadium 2 ROM found for --near-matches (checked {xmatch.GS_ROM_CANDIDATES}); "
+            f"build one or point tools/xmatch_stadium1.py's GS_ROM_CANDIDATES at it"
+        )
+    return xmatch.load_functions(
+        gs_rom,
+        [str(GS_YAML_PATH)],
+        [str(GS_LINKER_SCRIPTS_ROOT / name) for name in
+         ("symbol_addrs_code.txt", "symbol_addrs_ultralib.txt")],
+        "GS",
+        src_dir=str(GS_SRC_ROOT),
     )
 
 
@@ -701,6 +1129,10 @@ class TransferResult:
     unmapped_symbols: list[str] = field(default_factory=list)
     declarations: str = ""
     variants: list[tuple[str, str]] = field(default_factory=list)
+    unsupported_types: list[str] = field(default_factory=list)
+    unresolved_extern_types: list[str] = field(default_factory=list)
+    unresolved_macros: list[str] = field(default_factory=list)
+    similarity: float | None = None
 
 
 def generate_candidate(
@@ -720,71 +1152,100 @@ def generate_candidate(
     if not match:
         return TransferResult(function, "evidence_unparseable", detail=evidence)
     s1_name = match.group(1)
+    return _build_transfer_result(
+        function, owner, ctx, s1_name, s1_reverse_index,
+        strict=strict, align_strict=True, label="s1:transfer",
+    )
 
+
+def generate_near_match_candidate(
+    function: str,
+    owner: targets.Owner,
+    ctx: S1Context,
+    s1_name: str,
+    similarity: float,
+    s1_reverse_index: dict[str, str],
+    *,
+    strict: bool = False,
+) -> TransferResult:
+    """Same pipeline as ``generate_candidate``, for a near (not exact) S1 body.
+
+    Alignment is loose (``align_strict=False``): only instructions carrying
+    a relocatable operand need to land on the same opcode class in ``s1_name``'s
+    body, since the two bodies come from independently compiled, merely
+    similar sources rather than the same one.
+    """
+    return _build_transfer_result(
+        function, owner, ctx, s1_name, s1_reverse_index,
+        strict=strict, align_strict=False, label=f"s1-near:{s1_name}:{similarity:.2f}",
+        similarity=similarity,
+    )
+
+
+def _build_transfer_result(
+    function: str,
+    owner: targets.Owner,
+    ctx: S1Context,
+    s1_name: str,
+    s1_reverse_index: dict[str, str],
+    *,
+    strict: bool,
+    align_strict: bool,
+    label: str,
+    similarity: float | None = None,
+) -> TransferResult:
     s1_func = ctx.s1_functions.get(s1_name)
     if s1_func is None:
         return TransferResult(function, "s1_function_missing", s1_name=s1_name,
-                               detail=f"{s1_name} not found among S1 ROM functions")
+                               detail=f"{s1_name} not found among S1 ROM functions", similarity=similarity)
 
     home = ctx.func_file_index.get(s1_name)
     definition = find_function_definition(s1_name, home) if home is not None else None
     if definition is None:
         return TransferResult(function, "s1_body_missing", s1_name=s1_name,
-                               detail=f"no C definition found for {s1_name} under S1 disasm/src")
+                               detail=f"no C definition found for {s1_name} under S1 disasm/src",
+                               similarity=similarity)
     full_definition, is_static = definition
+    # Comments never travel: they can carry a rename-map identifier or a
+    # non-ASCII byte that would otherwise leak into the candidate, and are
+    # the reason two occurrences of the same struct (pulled in by two
+    # different transferred functions, each with a per-caller comment) used
+    # to look different enough to defeat cross-candidate deduplication.
+    full_definition = strip_comments(full_definition)
 
     asm = gs_asm_text(owner, ctx.gs_asm_fallback)
     if asm is None:
         return TransferResult(function, "gs_asm_missing", s1_name=s1_name,
-                               detail=str(owner.asm_path))
+                               detail=str(owner.asm_path), similarity=similarity)
     asm_text, asm_source = asm
-    gs_instrs = parse_gs_asm(asm_text)
-    if not gs_instrs:
-        return TransferResult(function, "gs_asm_unparseable", s1_name=s1_name)
+    parsed_gs = parse_gs_asm(asm_text)
+    if not parsed_gs.instructions:
+        return TransferResult(function, "gs_asm_unparseable", s1_name=s1_name, similarity=similarity)
 
-    gs_words = [instr.word for instr in gs_instrs]
+    gs_words = parsed_gs.words
     s1_words = list(s1_func["w"])
-    if len(gs_words) != len(s1_words):
+    alignment = align_words(gs_words, s1_words, strict=align_strict)
+    if alignment is None:
         return TransferResult(
             function, "alignment_failed", s1_name=s1_name,
             detail=f"instruction count differs: gs={len(gs_words)} s1={len(s1_words)} (asm from {asm_source})",
+            similarity=similarity,
         )
-    for i, (g, s) in enumerate(zip(gs_words, s1_words)):
-        if xmatch.norm(g) != xmatch.norm(s):
-            return TransferResult(
-                function, "alignment_failed", s1_name=s1_name,
-                detail=f"instruction {i} differs: gs=0x{g:08X} s1=0x{s:08X}",
-            )
+    if not alignment.ok:
+        g, o = gs_words[alignment.first_mismatch], s1_words[alignment.first_mismatch]
+        kind = "differs" if align_strict else "opcode class differs"
+        return TransferResult(
+            function, "alignment_failed", s1_name=s1_name,
+            detail=f"instruction {alignment.first_mismatch} {kind}: gs=0x{g:08X} s1=0x{o:08X}",
+            similarity=similarity,
+        )
 
     body_identifiers = set(re.findall(r"\b[A-Za-z_]\w*\b", full_definition))
 
-    symbol_map: dict[str, str] = {s1_name: owner.function}
-    unmapped: list[str] = []
-    decode = decode_s1_addresses(gs_instrs, s1_words)
-    for index in decode.unresolved:
-        unmapped.append(f"index {index}: unpaired %lo (no preceding %hi to the same register)")
-    for instr in gs_instrs:
-        if instr.jal_sym is None and instr.hi_sym is None and instr.lo_sym is None:
-            continue
-        addr = decode.addresses.get(instr.index)
-        gs_operand_name = instr.jal_sym or instr.hi_sym or instr.lo_sym
-        if addr is None:
-            continue  # already recorded via decode.unresolved
-        resolved = resolve_s1_symbol(
-            ctx.symtab, addr, is_call=instr.jal_sym is not None, body_identifiers=body_identifiers
-        )
-        if resolved is None:
-            unmapped.append(f"{gs_operand_name} (S1 address 0x{addr:08X} unresolved)")
-            continue
-        s1_sym_name, offset = resolved
-        if offset != 0:
-            unmapped.append(f"{gs_operand_name} (S1 {s1_sym_name}+0x{offset:X}, not renamed)")
-            continue
-        existing = symbol_map.get(s1_sym_name)
-        if existing is not None and existing != gs_operand_name:
-            unmapped.append(f"{s1_sym_name} maps to both {existing} and {gs_operand_name}")
-            continue
-        symbol_map[s1_sym_name] = gs_operand_name
+    lookup = make_symbol_lookup(ctx.symtab, body_identifiers)
+    renamed = build_rename_map(parsed_gs, s1_words, lookup, {s1_name: owner.function})
+    symbol_map = renamed.mapping
+    unmapped = list(renamed.unmapped)
 
     # Cross-reference: an S1 global used in the body but not resolved above
     # (e.g. inside a struct-literal initializer with no matching instruction)
@@ -802,53 +1263,113 @@ def generate_candidate(
         return TransferResult(
             function, "unmapped_symbols_strict", s1_name=s1_name,
             detail="; ".join(unmapped[:5]), symbol_map=symbol_map, unmapped_symbols=unmapped,
+            similarity=similarity,
         )
 
     # Types the body needs, S1_-prefixed unless GS already has an identical
-    # definition under the same name.
-    candidate_type_names = {
-        ident for ident in body_identifiers if ident in ctx.type_index
-    }
-    type_defs = collect_type_definitions(candidate_type_names, ctx.type_index)
+    # definition under the same name.  A genuine C11 anonymous struct/union
+    # member (IDO's C89 front end rejects it, and synthesizing a declarator
+    # would change every access site's syntax) is excluded from what gets
+    # emitted and reported instead, so the resulting compile failure -- the
+    # type is still referenced, just never defined -- is explainable.
+    candidate_type_names = {ident for ident in body_identifiers if ident in ctx.type_index}
+    type_defs = _collect_referenced_types(candidate_type_names, ctx.type_index)
     type_rename: dict[str, str] = {}
     kept_type_defs: dict[str, str] = {}
+    unsupported_types: list[str] = []
     for name, type_def in type_defs.items():
+        if find_anonymous_members(type_def):
+            unsupported_types.append(name)
+            continue
         gs_def = ctx.gs_type_index.get(name)
         if gs_def is not None and _normalize_ws(gs_def) == _normalize_ws(type_def):
             continue
         type_rename[name] = f"S1_{name}"
         kept_type_defs[name] = type_def
 
+    # Object-like S1 macros the body -- or a type definition the body pulled
+    # in, such as an array bound inside a struct field (S1_Fragment's
+    # ``data[RELOCATIONS_SIZE]``) -- needs, carried along verbatim unless GS
+    # defines the same name to something else, in which case the S1
+    # spelling is prefixed like a type.  A macro whose expansion is not a
+    # single physical line is left unresolved rather than risk emitting a
+    # truncated definition.
+    macro_seed_identifiers = set(body_identifiers)
+    for type_def in type_defs.values():
+        macro_seed_identifiers.update(re.findall(r"\b[A-Za-z_]\w*\b", type_def))
+    macro_decls: list[str] = []
+    macro_rename: dict[str, str] = {}
+    unresolved_macros: list[str] = []
+    for ident in sorted(macro_seed_identifiers):
+        macro = ctx.macro_index.get(ident)
+        if macro is None:
+            continue
+        params, value, multiline = macro
+        gs_macro = ctx.gs_macro_index.get(ident)
+        if gs_macro is not None and _normalize_ws(gs_macro[1]) == _normalize_ws(value):
+            continue  # GS already defines it identically
+        if multiline:
+            unresolved_macros.append(ident)
+            continue
+        if gs_macro is not None:
+            new_name = f"S1_{ident}"
+            macro_rename[ident] = new_name
+            macro_decls.append(f"#define {new_name}{params} {value}".rstrip())
+        else:
+            macro_decls.append(f"#define {ident}{params} {value}".rstrip())
+
     rename_map = dict(symbol_map)
     rename_map.update(type_rename)
+    rename_map.update(macro_rename)
 
-    ordered_type_defs = [apply_rename(kept_type_defs[name], rename_map) for name in order_types(kept_type_defs)]
+    ordered_type_defs = [
+        apply_rename(kept_type_defs[name], rename_map) for name in order_types(kept_type_defs)
+    ]
 
     extra_externs: list[str] = []
     seen_externs: set[str] = set()
+    unresolved_extern_types: list[str] = []
+    emitted_type_names = set(kept_type_defs)
     for s1_sym, gs_sym in symbol_map.items():
         if s1_sym == s1_name or s1_sym in ctx.symtab.func_names:
             continue
         decl = ctx.extern_index.get(s1_sym)
-        if decl is None or decl in seen_externs:
+        if decl is None:
             continue
-        seen_externs.add(decl)
-        extra_externs.append(apply_rename(decl, rename_map))
+        renamed_decl = apply_rename(decl, rename_map)
+        if renamed_decl in seen_externs:
+            continue
+        seen_externs.add(renamed_decl)
+        type_token = _extern_type_token(renamed_decl)
+        if type_token is not None and not _is_known_extern_type(type_token, ctx.gs_type_index, emitted_type_names):
+            unresolved_extern_types.append(f"{gs_sym}: {type_token}")
+            renamed_decl = _fallback_extern_decl(renamed_decl, gs_sym)
+        extra_externs.append(renamed_decl)
 
-    declarations = "\n".join(ordered_type_defs + extra_externs)
+    declarations = "\n".join(macro_decls + ordered_type_defs + extra_externs)
     if declarations:
         declarations += "\n"
 
     renamed_definition = apply_rename(full_definition, rename_map)
 
-    variants: list[tuple[str, str]] = [("s1:transfer", renamed_definition.strip() + "\n")]
+    combined = declarations + renamed_definition
+    if any(ord(char) > 0x7F for char in combined):
+        return TransferResult(
+            function, "non_ascii", s1_name=s1_name,
+            detail="non-ASCII byte remains in the candidate text outside comments",
+            symbol_map=symbol_map, unmapped_symbols=unmapped, similarity=similarity,
+        )
+
+    variants: list[tuple[str, str]] = [(label, renamed_definition.strip() + "\n")]
     if is_static:
         nostatic = re.sub(r"^\s*static\s+", "", renamed_definition, count=1)
-        variants.append(("s1:transfer-nostatic", nostatic.strip() + "\n"))
+        variants.append((f"{label}-nostatic", nostatic.strip() + "\n"))
 
     return TransferResult(
         function, "candidate", s1_name=s1_name, symbol_map=symbol_map,
         unmapped_symbols=unmapped, declarations=declarations, variants=variants,
+        unsupported_types=unsupported_types, unresolved_extern_types=unresolved_extern_types,
+        unresolved_macros=unresolved_macros, similarity=similarity,
     )
 
 
@@ -884,6 +1405,35 @@ def select_functions(
     return selected
 
 
+def select_near_match_functions(
+    transfer_map: dict[str, tuple[str, str]],
+    *,
+    functions: list[str] | None,
+    source: str | None,
+    limit: int | None,
+) -> list[str]:
+    """Pragma owners not already covered by an exact S1 transfer entry."""
+    owners = targets.owner_index()
+    dirty = dedupe_externs.dirty_sources()
+    pool = functions if functions else sorted(owners)
+    wanted_source = source.replace("\\", "/").removeprefix("./") if source else None
+    selected: list[str] = []
+    for function in pool:
+        if function in transfer_map:
+            continue
+        owner = owners.get(function)
+        if owner is None:
+            continue
+        if wanted_source and owner.source != wanted_source and not owner.source.endswith("/" + wanted_source):
+            continue
+        if owner.source_path.resolve() in dirty:
+            continue
+        selected.append(function)
+    if limit is not None:
+        selected = selected[:limit]
+    return selected
+
+
 def merge_declarations(blocks: list[str]) -> str:
     seen: set[str] = set()
     lines: list[str] = []
@@ -893,6 +1443,47 @@ def merge_declarations(blocks: list[str]) -> str:
                 seen.add(line)
                 lines.append(line)
     return "\n".join(lines) + ("\n" if lines else "")
+
+
+# --------------------------------------------------------------------------
+# Near-match selection
+# --------------------------------------------------------------------------
+
+def bucket_s1_by_length(ctx: S1Context) -> dict[int, list[str]]:
+    """S1 functions with a finished C body, grouped by instruction count.
+
+    Only bodies ``generate_near_match_candidate`` could actually use -- an
+    S1 function still a ``GLOBAL_ASM`` stub in its own tree contributes
+    nothing.  Bucketing by exact length up front is what keeps ranking a
+    whole tree of remaining GS pragmas against several thousand S1 bodies
+    affordable: only same-length bodies are ever scored against each other.
+    """
+    buckets: dict[int, list[str]] = collections.defaultdict(list)
+    for name in ctx.func_file_index:
+        func = ctx.s1_functions.get(name)
+        if func is not None:
+            buckets[len(func["w"])].append(name)
+    return buckets
+
+
+def find_near_match(
+    gs_words: list[int], s1_length_buckets: dict[int, list[str]], ctx: S1Context, *, minimum: float
+) -> tuple[str, float] | None:
+    """Best identical-length, decompiled S1 body for ``gs_words``, or ``None``.
+
+    Ties break on name for determinism.  Returns ``None`` when there is no
+    same-length candidate with a C body, or the best one scores below
+    ``minimum``.
+    """
+    candidates = s1_length_buckets.get(len(gs_words), [])
+    best: tuple[str, float] | None = None
+    for name in candidates:
+        score = xmatch.similarity(gs_words, ctx.s1_functions[name]["w"])
+        if best is None or score > best[1] or (score == best[1] and name < best[0]):
+            best = (name, score)
+    if best is None or best[1] < minimum:
+        return None
+    return best
 
 
 # --------------------------------------------------------------------------
@@ -982,6 +1573,67 @@ def sweep(
     }
 
 
+def sweep_near_matches(
+    functions: list[str],
+    *,
+    ctx: S1Context,
+    gs_functions: dict[str, dict],
+    s1_reverse_index: dict[str, str],
+    minimum: float,
+    gate: bool,
+    workers: int | None,
+    strict: bool,
+) -> dict[str, object]:
+    started = time.monotonic()
+    owners = targets.owner_index()
+    buckets = bucket_s1_by_length(ctx)
+    by_source: dict[Path, list[TransferResult]] = collections.defaultdict(list)
+    outcome_counts: collections.Counter = collections.Counter()
+    vanished = 0
+    for function in functions:
+        owner = owners.get(function)
+        if owner is None:
+            vanished += 1
+            continue
+        gs_func = gs_functions.get(function)
+        if gs_func is None:
+            outcome_counts["gs_function_missing"] += 1
+            continue
+        found = find_near_match(list(gs_func["w"]), buckets, ctx, minimum=minimum)
+        if found is None:
+            outcome_counts["near_no_candidate"] += 1
+            continue
+        s1_name, score = found
+        result = generate_near_match_candidate(function, owner, ctx, s1_name, score, s1_reverse_index, strict=strict)
+        outcome_counts[result.outcome] += 1
+        if result.outcome == "candidate":
+            by_source[owner.source_path].append(result)
+
+    accepted: list[str] = []
+    touched_sources: list[str] = []
+    attempts: list[dict[str, object]] = []
+    for source_path, results in by_source.items():
+        try:
+            result = run_source_group(source_path, results, gate=gate, workers=workers)
+        except Exception as error:
+            print(f"{source_path}: sweep failed: {error}", file=sys.stderr)
+            continue
+        attempts.extend(result.get("attempts", []))
+        if result.get("accepted"):
+            accepted.extend(str(name) for name in result["accepted"])
+            touched_sources.append(str(source_path.relative_to(REPO_ROOT)))
+
+    return {
+        "requested": len(functions),
+        "vanished": vanished,
+        "outcome_counts": dict(sorted(outcome_counts.items())),
+        "accepted": accepted,
+        "touched_sources": sorted(set(touched_sources)),
+        "attempts": attempts,
+        "elapsed_seconds": round(time.monotonic() - started, 1),
+    }
+
+
 def dry_run(
     functions: list[str],
     *,
@@ -1008,6 +1660,59 @@ def dry_run(
             "detail": result.detail,
             "symbol_map": result.symbol_map,
             "unmapped_symbols": result.unmapped_symbols,
+            "unsupported_types": result.unsupported_types,
+            "unresolved_extern_types": result.unresolved_extern_types,
+            "unresolved_macros": result.unresolved_macros,
+            "labels": [label for label, _ in result.variants],
+        }
+        if show_text:
+            row["declarations"] = result.declarations
+            row["variants"] = result.variants
+        rows.append(row)
+    return {"outcome_counts": dict(sorted(outcome_counts.items())), "rows": rows}
+
+
+def dry_run_near_matches(
+    functions: list[str],
+    *,
+    ctx: S1Context,
+    gs_functions: dict[str, dict],
+    s1_reverse_index: dict[str, str],
+    minimum: float,
+    strict: bool,
+    show_text: bool,
+) -> dict[str, object]:
+    owners = targets.owner_index()
+    buckets = bucket_s1_by_length(ctx)
+    outcome_counts: collections.Counter = collections.Counter()
+    rows: list[dict[str, object]] = []
+    for function in functions:
+        owner = owners.get(function)
+        if owner is None:
+            outcome_counts["owner_missing"] += 1
+            continue
+        gs_func = gs_functions.get(function)
+        if gs_func is None:
+            outcome_counts["gs_function_missing"] += 1
+            continue
+        found = find_near_match(list(gs_func["w"]), buckets, ctx, minimum=minimum)
+        if found is None:
+            outcome_counts["near_no_candidate"] += 1
+            continue
+        s1_name, score = found
+        result = generate_near_match_candidate(function, owner, ctx, s1_name, score, s1_reverse_index, strict=strict)
+        outcome_counts[result.outcome] += 1
+        row: dict[str, object] = {
+            "function": function,
+            "s1_name": result.s1_name,
+            "similarity": result.similarity,
+            "outcome": result.outcome,
+            "detail": result.detail,
+            "symbol_map": result.symbol_map,
+            "unmapped_symbols": result.unmapped_symbols,
+            "unsupported_types": result.unsupported_types,
+            "unresolved_extern_types": result.unresolved_extern_types,
+            "unresolved_macros": result.unresolved_macros,
             "labels": [label for label, _ in result.variants],
         }
         if show_text:
@@ -1032,11 +1737,19 @@ def main() -> int:
     parser.add_argument("--no-gs-asm-fallback", action="store_true", help="disable the GS .s fallback lookup")
     parser.add_argument("--show-text", action="store_true", help="(--dry-run) also print declarations/candidate text")
     parser.add_argument("--transfer-map", type=Path, default=S1_TRANSFER_PATH)
+    parser.add_argument(
+        "--near-matches", action="store_true",
+        help="for pragmas with no exact S1 transfer entry, transfer the best same-length, "
+             "similar S1 body instead",
+    )
+    parser.add_argument(
+        "--near-min-similarity", type=float, default=0.85,
+        help="minimum normalised instruction similarity for --near-matches (default: 0.85)",
+    )
     args = parser.parse_args()
 
     transfer_map = load_transfer_map(args.transfer_map)
     s1_reverse_index = build_s1_reverse_index(transfer_map)
-    functions = select_functions(transfer_map, functions=args.functions, source=args.source, limit=args.limit)
 
     if args.no_gs_asm_fallback:
         gs_asm_fallback = None
@@ -1050,6 +1763,33 @@ def main() -> int:
     except FileNotFoundError as error:
         print(f"error: {error}", file=sys.stderr)
         return 1
+
+    if args.near_matches:
+        try:
+            gs_functions = build_gs_context()
+        except FileNotFoundError as error:
+            print(f"error: {error}", file=sys.stderr)
+            return 1
+        functions = select_near_match_functions(
+            transfer_map, functions=args.functions, source=args.source, limit=args.limit
+        )
+        if args.dry_run:
+            result = dry_run_near_matches(
+                functions, ctx=ctx, gs_functions=gs_functions, s1_reverse_index=s1_reverse_index,
+                minimum=args.near_min_similarity, strict=args.strict, show_text=args.show_text,
+            )
+        else:
+            result = sweep_near_matches(
+                functions, ctx=ctx, gs_functions=gs_functions, s1_reverse_index=s1_reverse_index,
+                minimum=args.near_min_similarity, gate=not args.no_gate, workers=args.workers, strict=args.strict,
+            )
+        text = json.dumps(result, indent=2)
+        if args.json:
+            args.json.write_text(text + "\n")
+        print(text)
+        return 0
+
+    functions = select_functions(transfer_map, functions=args.functions, source=args.source, limit=args.limit)
 
     if args.dry_run:
         result = dry_run(

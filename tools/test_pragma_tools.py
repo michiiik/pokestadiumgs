@@ -208,6 +208,79 @@ class ScannerTests(unittest.TestCase):
         self.assertEqual(scanner.bounded_lookup_candidates(owner, instructions), [])
         self.assertTrue(any("suppressed" in note for note in owner.notes))
 
+    def _bounded_lookup_multiplier_stride_owner(self) -> tuple[scanner.Owner, list[scanner.Instruction]]:
+        """A synthetic manifest matching the proven ``blez``/``sll``-``subu`` shape.
+
+        This mirrors the verified ``func_800637C0``-family owners: a byte
+        argument masked at entry, a compound ``arg0 > 0 && arg0 < N`` range
+        check built from two branches, and a 22-byte record stride built
+        from a ``sll``/``subu`` chain rather than a single shift.
+        """
+        asm = """
+        glabel func_80000100
+            /* 000000 80000000 AFA40000 */ sw $a0, 0x0($sp)
+            /* 000004 80000004 308400FF */ andi $a0, $a0, 0xff
+            /* 000008 80000008 1880000B */ blez $a0, .Ldone
+            /* 00000C 8000000C 288100FC */  slti $at, $a0, 0xfc
+            /* 000010 80000010 10200009 */ beqz $at, .Ldone
+            /* 000014 80000014 00047080 */  sll $t6, $a0, 2
+            /* 000018 80000018 01C47023 */ subu $t6, $t6, $a0
+            /* 00001C 8000001C 000E7080 */ sll $t6, $t6, 2
+            /* 000020 80000020 01C47023 */ subu $t6, $t6, $a0
+            /* 000024 80000024 000E7040 */ sll $t6, $t6, 1
+            /* 000028 80000028 3C028000 */ lui $v0, %hi(D_80000200)
+            /* 00002C 8000002C 004E1021 */ addu $v0, $v0, $t6
+            /* 000030 80000030 03E00008 */ jr $ra
+            /* 000034 80000034 90420200 */  lbu $v0, %lo(D_80000200)($v0)
+        .Ldone:
+            /* 000038 80000038 00001025 */ or $v0, $zero, $zero
+            /* 00003C 8000003C 03E00008 */ jr $ra
+            /* 000040 80000040 00000000 */  nop
+        """
+        label, instructions, labels = scanner.parse_instructions(asm)
+        accesses = scanner.extract_memory_accesses(instructions)
+        owner = scanner.Owner(
+            function=label,
+            source="synthetic.c",
+            asm="synthetic.s",
+            label=label,
+            family="bounded_lookup",
+            confidence=1.0,
+            instruction_count=len(instructions),
+            globals=["D_80000200"],
+            memory_accesses=accesses,
+            bounds=[252],
+            branches=2,
+        )
+        return owner, instructions
+
+    def test_lookup_primary_variant_is_guard_return_with_recovered_stride(self) -> None:
+        owner, instructions = self._bounded_lookup_multiplier_stride_owner()
+        owner.candidate_codes = scanner.bounded_lookup_candidates(owner, instructions)
+        self.assertTrue(owner.candidate_codes)
+        self.assertTrue(owner.candidate_labels[0].startswith("lookup-guard-"))
+        primary = owner.candidate_codes[0]
+        # A byte argument (the entry `andi $a0, $a0, 0xff`), a compound
+        # `arg0 > 0` (from `blez`) plus upper-bound condition, and the
+        # 22-byte stride recovered from the sll/subu chain (not the naive
+        # single-`sll` shift, which would silently truncate it to 4).
+        self.assertIn("u8 func_80000100(u8 arg0)", primary)
+        self.assertIn(
+            "if (arg0 > 0 && arg0 < 252) return D_80000200[arg0 * 22]; return 0;",
+            primary,
+        )
+
+    def test_lookup_secondary_variant_is_the_assign_then_return_shape(self) -> None:
+        owner, instructions = self._bounded_lookup_multiplier_stride_owner()
+        owner.candidate_codes = scanner.bounded_lookup_candidates(owner, instructions)
+        self.assertGreater(len(owner.candidate_codes), 1)
+        self.assertTrue(owner.candidate_labels[1].startswith("lookup-init-"))
+        secondary = owner.candidate_codes[1]
+        self.assertIn(
+            "u8 result = 0; if (arg0 > 0 && arg0 < 252) result = D_80000200[arg0 * 22]; return result;",
+            secondary,
+        )
+
     def test_bundle_exposes_stadium1_reference_without_claiming_a_match(self) -> None:
         owner = scanner.Owner(
             function="func_wrap",
@@ -1846,6 +1919,48 @@ class SweepTests(unittest.TestCase):
             self.assertEqual(permute.call_args.kwargs["seconds"], 45.0)
             gate.assert_called_once()
 
+    def test_large_sweep_only_permutes_rejects_at_or_above_similarity_threshold(self) -> None:
+        # ``func_high`` (0.75) is above the 0.7 large-mode floor and should
+        # reach the permuter with the flat --large-seconds budget; ``func_low``
+        # (0.5) should never reach ``permute_candidate.permute`` at all.
+        rows = [
+            {"function": "func_high", "source": "disasm/src/fragments/9/big.c", "family": "loop_or_state_machine"},
+            {"function": "func_low", "source": "disasm/src/fragments/9/big.c", "family": "loop_or_state_machine"},
+        ]
+
+        def fake_draft_variants(function, context=True, family=None, variant_names=None, extra_m2c_args=(), label_prefix="m2c"):
+            return [(f"{label_prefix}:s32-s32", f"s32 {function}(void) {{ return 0; }}\n")], "draft\n"
+
+        probe_result = {
+            "attempts": [
+                {"index": 0, "function": "func_high", "status": "probe_rejected", "similarity_score": 0.75},
+                {"index": 1, "function": "func_low", "status": "probe_rejected", "similarity_score": 0.5},
+            ],
+        }
+
+        with mock.patch.object(
+            sweep_targets.targets, "list_targets",
+            return_value={"matched": len(rows), "targets": rows, "truncated": False},
+        ), mock.patch.object(
+            sweep_targets.dedupe_externs, "dirty_sources", return_value=set(),
+        ), mock.patch.object(
+            sweep_targets, "draft_variants", side_effect=fake_draft_variants,
+        ), mock.patch.object(
+            sweep_targets.runner, "try_candidates_detailed", return_value=probe_result,
+        ) as probe, mock.patch.object(
+            sweep_targets.permute_candidate, "permute",
+            return_value={"outputs": [], "already_matching": False},
+        ) as permute:
+            result = sweep_targets.large_sweep(large_seconds=180.0)
+
+        probe.assert_called_once()
+        permute.assert_called_once()
+        self.assertEqual(permute.call_args.args[0], "func_high")
+        self.assertEqual(permute.call_args.kwargs["seconds"], 180.0)
+        self.assertEqual(result["drafted"], 2)
+        self.assertEqual(result["probed"], 2)
+        self.assertEqual(result["permuted"], 1)
+
     def test_near_miss_default_considers_every_label(self) -> None:
         # Without a label restriction, the highest-scoring attempt across
         # every label (including a non-``m2c:`` one) is the candidate: the
@@ -2091,6 +2206,38 @@ class SimilarSolvedTests(unittest.TestCase):
             self.assertEqual(ranked[0]["function"], "func_done")
             self.assertEqual(ranked[0]["similarity"], 1.0)
             self.assertTrue(ranked[0]["same_length"])
+
+    def test_solved_shapes_falls_back_to_a_second_asm_root(self) -> None:
+        # A winner missing from the primary (local) asm root -- as in a
+        # worktree with only a partial extraction -- is still found via a
+        # second, fallback root, without shadowing a winner the primary root
+        # already has.
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            primary = root / "primary"
+            fallback = root / "fallback"
+            (primary / "x").mkdir(parents=True)
+            (fallback / "x").mkdir(parents=True)
+            (primary / "x" / "func_local.s").write_text(
+                "glabel func_local\n"
+                "    /* 0 0 0 */  lw $v0, 0($a0)\n"
+                "    /* 0 0 0 */  jr $ra\n"
+                "    /* 0 0 0 */  nop\n"
+            )
+            (fallback / "x" / "func_remote.s").write_text(
+                "glabel func_remote\n"
+                "    /* 0 0 0 */  sw $v0, 0($a0)\n"
+                "    /* 0 0 0 */  jr $ra\n"
+                "    /* 0 0 0 */  nop\n"
+            )
+            stats = root / "stats.jsonl"
+            stats.write_text(json.dumps({"source": "s.c", "counts": {}, "attempts": [
+                {"function": "func_local", "status": "accepted", "candidate": "s32 func_local(s32 *a) { return a[0]; }", "label": "load"},
+                {"function": "func_remote", "status": "accepted", "candidate": "void func_remote(s32 *a) { a[0] = 1; }", "label": "store"},
+            ]}) + "\n")
+            with mock.patch.object(targets, "_SOLVED_CACHE", None):
+                rows = targets.solved_shapes(stats, asm_roots=[primary, fallback])
+        self.assertEqual({row["function"] for row in rows}, {"func_local", "func_remote"})
 
 
 if __name__ == "__main__":
