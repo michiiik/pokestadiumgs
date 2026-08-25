@@ -22,7 +22,20 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/7140/func_80006A78.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/7140/func_80006ACC.s")
+s32 func_80006ACC(s32 arg0, void *arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
+    struct Func80006ACCState { u8 unk0; u8 filler[0x18]; s32 unk1C; void *unk20; s32 unk24; s32 unk28; };
+    struct Func80006ACCState *p;
+    p = (struct Func80006ACCState *)(u32)func_800033B4(0x2C);
+    if (p != NULL) {
+        p->unk0 = 0xF0;
+        p->unk1C = arg2;
+        p->unk24 = arg3;
+        p->unk20 = arg1;
+        p->unk28 = arg4;
+        func_80006A78(p, arg5);
+    }
+    return p == NULL;
+}
 
 struct S1_UnkStruct80000E80 {
     char unk0;
