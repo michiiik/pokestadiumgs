@@ -3539,7 +3539,14 @@ void func_8003D7B8(s16 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003DAF0.s")
+extern u8 D_801261B0[];
+void func_8003DAF0(s32 arg0, s32 arg1, s32 arg2) {
+    s32 *p0 = &arg0;
+    s32 *p1 = &arg1;
+    *(s32 *)(D_801261B0 + 8) = *p0;
+    D_801261B0[1] = (u8)*p1;
+    D_801261B0[2] = (u8)arg2;
+}
 #endif
 
 #ifdef VERSION_US

@@ -441,6 +441,13 @@ def _run_compare(repo_root: Path) -> tuple[int, str]:
     """Run the full compare with a bounded lifetime and captured diagnostics."""
     env = os.environ.copy()
     env.setdefault("MIPS_BINUTILS_PREFIX", "/Users/michaegg/homebrew/bin/mips-linux-gnu-")
+    # The host-side syntax checker is useful for portable C, but this tree
+    # intentionally contains IDO-specific declarations and expressions that
+    # GCC/Clang reject even when the authoritative IDO build is valid.  The
+    # full gate must compare the ROM produced by IDO, just like the isolated
+    # probe path, rather than turning those pre-existing CC_CHECK diagnostics
+    # into a false candidate rejection.
+    env["RUN_CC_CHECK"] = "0"
     try:
         result = subprocess.run(
             ["make", "-C", "disasm", "COMPARE=1", "-j2"],
