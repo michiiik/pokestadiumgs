@@ -30,7 +30,13 @@ void func_8822EADC(void) {
     (*(s32 *)((u8 *)(*D_88234970) + (0x2C))) = 1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A1BD0/func_8822EB10.s")
+s32 func_88802DCC(s32, s32, void (*)(), void (*)(), void (*)(), s32 *, s32, s32);
+extern u8 func_882313A4;
+
+void func_8822EB10(s32 arg0) {
+    func_88802DCC(0, arg0, func_8822EAB0, func_8822EADC, func_8822EAC4, &func_882313A4, 0, 1);
+    (*(s32 *)((u8 *)(*D_88234970) + (0x2C))) = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A1BD0/func_8822EB78.s")
 

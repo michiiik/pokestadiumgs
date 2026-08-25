@@ -47,7 +47,22 @@ void func_880022F0(void) { D_8800ED40 = 10; D_8800ED41 = 1; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88003A00.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88003FBC.s")
+extern void func_88003A00();
+extern s8 D_8800EF18;
+void func_88003FBC(void *arg0) {
+    s8 var_v0;
+
+    if ((*(s32 *)((u8 *)(arg0) + (0x1C))) == 3) {
+        if ((*(s32 *)((u8 *)(arg0) + (0x14))) == 3) {
+            var_v0 = 4;
+        } else {
+            var_v0 = D_8800EF18;
+        }
+        if (var_v0 == (*(s8 *)((u8 *)(arg0) + (0x20)))) {
+            func_88003A00();
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88004014.s")
 

@@ -66,7 +66,17 @@ void func_8820C000(void) {
 extern void func_8820FC78();
 void func_8820FD58(void) { func_8820FC78(0); func_8820FC78(1); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820FD80.s")
+extern void func_80049064(s32, s32, s32, s32);
+extern void func_800496A4(s32, s32);
+s32 func_8004C874(s32, s16);
+extern void *D_88234710;
+
+void func_8820FD80(void) {
+    func_800496A4(4, 2);
+    func_80049064(0x140, 0x1A4, 1, func_8004C874(0x21, 0x1F));
+    func_800496A4(0x10, 2);
+    func_80049064(0x140, 0x183, 1, func_8004C874(0x21, (*(s16 *)((u8 *)(D_88234710) + (8)))));
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820FDF8.s")
 #endif

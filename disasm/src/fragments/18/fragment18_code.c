@@ -8,7 +8,18 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/18/fragment18_code/func_81700120.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/18/fragment18_code/func_81700190.s")
+void func_81700190(void *arg0) {
+    s16 temp_v0;
+
+    (*(s16 *)((u8 *)(arg0) + (0xE))) = (s16) ((*(s16 *)((u8 *)(arg0) + (0xE))) + 1);
+    temp_v0 = (*(s16 *)((u8 *)(arg0) + (0xE)));
+    if (temp_v0 < 0xA) {
+        (*(s16 *)((u8 *)(arg0) + (0x1C))) = (s16) ((s32) (temp_v0 * 0xFF) / 10);
+        return;
+    }
+    (*(s16 *)((u8 *)(arg0) + (0xE))) = 0xA;
+    (*(s16 *)((u8 *)(arg0) + (0x1C))) = 0xFF;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/18/fragment18_code/func_817001E0.s")
 

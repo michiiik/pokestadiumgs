@@ -16,7 +16,19 @@ void func_82507D90(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_147D10/func_82508014.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_147D10/func_82508268.s")
+extern void func_82507DC0(s16 *);
+extern void func_82508014(s16 *);
+void func_82508268(void) {
+    switch (D_82509680) {                           /* irregular */
+    case 1:
+        func_82507DC0(&D_82509680);
+        return;
+    case 2:
+    case 4:
+        func_82508014(&D_82509680);
+        return;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_147D10/func_825082C8.s")
 

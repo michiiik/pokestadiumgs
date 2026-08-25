@@ -47,7 +47,16 @@ s32 func_82100CD8(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15A060/func_82100F68.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15A060/func_82101040.s")
+extern void func_82100D9C(void *);
+extern void func_82100F68(void *);
+void func_82101040(void *arg0) {
+    if ((*(s32 *)((u8 *)(arg0) + (0x24))) != 3) {
+        do {
+            func_82100D9C(arg0);
+            func_82100F68(arg0);
+        } while ((*(s32 *)((u8 *)(arg0) + (0x24))) != 3);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15A060/func_82101094.s")
 

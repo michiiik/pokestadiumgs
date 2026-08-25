@@ -8,7 +8,28 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/32/fragment32_1B8010/func_88306DAC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/32/fragment32_1B8010/func_88306E18.s")
+extern void func_88004B60(s32, u8, s32 *);
+extern u8 D_88601896;
+extern s32 D_88601898;
+extern u8 func_88306D00;
+extern u8 func_88306D6C;
+extern u8 func_88306DAC;
+void func_88306E18(s32 arg0) {
+    s32 *sp1C;
+
+    switch (arg0) {                                 /* irregular */
+    case 0:
+        sp1C = &func_88306D00;
+        break;
+    case 1:
+        sp1C = &func_88306D6C;
+        break;
+    case 2:
+        sp1C = &func_88306DAC;
+        break;
+    }
+    func_88004B60(D_88601898, D_88601896, sp1C);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/32/fragment32_1B8010/func_88306E90.s")
 

@@ -89,7 +89,15 @@ s32 func_880007B0(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_166060/func_88000C2C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_166060/func_88000E54.s")
+u32 func_88000E54(u32 arg0) {
+    s32 sp1C;
+
+    if (arg0 == 0) {
+        return 0U;
+    }
+    sp1C = guRandom();
+    return (u32) ((u32) (osGetCount() + sp1C) / 10U) % arg0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_166060/func_88000EC0.s")
 

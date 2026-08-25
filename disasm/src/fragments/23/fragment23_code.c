@@ -46,7 +46,26 @@ s32 func_82A00A90(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/23/fragment23_code/func_82A01654.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/23/fragment23_code/func_82A016C4.s")
+extern void func_80007AEC(s32);
+extern void func_800086A4(s32);
+extern void func_82A00020();
+extern void func_82A015C0();
+s32 func_82A01654(s32);
+
+void func_82A016C4(void) {
+    s32 temp_v0;
+    s32 var_s0;
+
+    var_s0 = 0;
+    func_800086A4(2);
+    func_80007AEC(5);
+    do {
+        func_82A00020();
+        func_82A015C0();
+        temp_v0 = func_82A01654(var_s0);
+        var_s0 = temp_v0;
+    } while (temp_v0 != 3);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/23/fragment23_code/func_82A01720.s")
 #endif
