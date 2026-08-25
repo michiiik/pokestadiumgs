@@ -16,7 +16,13 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/AC80/func_8000A590.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/AC80/func_8000A6C8.s")
+extern void func_8000A304(s32, s32, s32, s32);
+void func_8000A6C8(void) {
+    func_8000A304(0x1E, 0x4F, 0xDC, 0x2ABF);
+    func_8000A304(0x4F, 0x80, 0xDC, 0xFFCB);
+    func_8000A304(0x80, 0xB1, 0xDC, 0xFBCB);
+    func_8000A304(0xB1, 0xE2, 0xDC, 0xF94B);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/AC80/func_8000A730.s")
 

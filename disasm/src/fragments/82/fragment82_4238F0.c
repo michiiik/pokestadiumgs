@@ -8,7 +8,19 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D02B44.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D02C98.s")
+extern void func_8004C8C0(s32);
+void func_82D02C98(void) {
+    func_8004C8C0(0x153);
+    func_8004C8C0(0xF7);
+    func_8004C8C0(0x7C);
+    func_8004C8C0(0x101);
+    func_8004C8C0(0x102);
+    func_8004C8C0(0x33);
+    func_8004C8C0(0x79);
+    func_8004C8C0(0x1B);
+    func_8004C8C0(0x1C);
+    func_8004C8C0(0xAF);
+}
 
 void func_82D02D00(void) { func_8004C4B0(0x43); }
 

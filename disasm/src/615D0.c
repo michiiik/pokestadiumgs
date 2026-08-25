@@ -153,7 +153,11 @@ s32 func_8006236C(u8 *arg0, s32 arg1) { s32 result = 0; if (arg0[5] >= arg1) { *
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_8006249C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_800625E0.s")
+s32 func_800625E0(s32 arg0, s32 arg1) {
+    extern void func_80060F68();
+    func_80060F68(arg0, func_8004B7A4(arg1));
+    return arg0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80062614.s")
 

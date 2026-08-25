@@ -242,7 +242,13 @@ void func_82C03574(void) { func_8004C4B0(21); func_8004C4B0(19); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C03EE0.s")
+extern s8 *func_8004C874(s32, s32);
+extern s8 *func_8000B580(s8 *, s8 *);
+s32 func_82C03EE0(s8 *arg0, s32 arg1, s32 arg2) {
+    func_8000B580(arg0 + 4, func_8004C874(0x15, 7));
+    func_8000B580(arg0 + 0x54, func_8004C874(0x15, 0x20));
+    return 1;
+}
 #endif
 
 #ifdef VERSION_US
