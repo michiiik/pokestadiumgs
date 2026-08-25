@@ -2,7 +2,12 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8410AE50.s")
+void func_8410AE50(u8 *arg0, s16 a1, s16 a2, s16 a3, s16 a4) {
+    *(s16 *)(arg0 + 0x9A) = a1;
+    *(s16 *)(arg0 + 0x9C) = a2;
+    *(s16 *)(arg0 + 0x9E) = a3;
+    *(s16 *)(arg0 + 0xA0) = a4;
+}
 #endif
 
 #ifdef VERSION_US
