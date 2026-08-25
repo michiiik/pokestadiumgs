@@ -37,11 +37,22 @@ void func_800721D8(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_80072650.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_80072740.s")
+s32 (*func_80003240(s32 *))(s32 *);
+extern u8 D_801291E0;
+extern u8 func_87F0EE0C;
+void func_80072740(s32 arg0) {
+    func_80003240(&func_87F0EE0C)(&D_801291E0);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_80072774.s")
+extern u8 func_87F0F390;
+void func_80072774(s32 arg0) {
+    func_80003240(&func_87F0F390)(arg0);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_800727A4.s")
+extern u8 func_87F0F3E4;
+void func_800727A4(s32 arg0) {
+    func_80003240(&func_87F0F3E4)(arg0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_800727D4.s")
 #endif
