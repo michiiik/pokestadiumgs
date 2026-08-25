@@ -1042,6 +1042,27 @@ class LinkShapeTests(unittest.TestCase):
             self.assertEqual(row["timing"], {"probe_seconds": 1.5, "gate_runs": 1})
             self.assertTrue(row["attempts"][0]["link_verified"])
 
+    def test_probe_stats_records_batch_status(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            stats_path = Path(directory) / "probe-stats.jsonl"
+            attempts = [{
+                "index": 0,
+                "function": "func_a",
+                "status": "combined_compile_failed",
+                "probe_status": "probe_match",
+            }]
+            with mock.patch.dict(os.environ, {"PRAGMA_PROBE_STATS": str(stats_path)}):
+                runner._record_probe_stats(
+                    Path("synthetic.c"),
+                    attempts,
+                    ["m2c:s32-s32"],
+                    [("func_a", "void func_a(void) {}")],
+                    timing={"probe_seconds": 0.5},
+                    batch_status="combined_compile_failed",
+                )
+            row = json.loads(stats_path.read_text())
+            self.assertEqual(row["batch_status"], "combined_compile_failed")
+
     def test_ensure_baseline_object_caches_and_rebuilds_on_mtime_change(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             source = Path(directory) / "synthetic.c"
@@ -1248,6 +1269,155 @@ class GateFlowTests(unittest.TestCase):
             sequential_gate.assert_called_once()
             full_compare.assert_called_once()
             self.assertEqual(sorted(result["accepted"]), ["func_a", "func_b"])
+
+    def test_incremental_install_drops_conflicting_winner(self) -> None:
+        # Three link-verified hits for three different functions: the
+        # second candidate's declaration only conflicts with the first once
+        # both are installed together, mirroring the real m2c prototype
+        # conflict (fragment 60: six verified winners, one shared-callee
+        # prototype mismatch, ``combined_compile_failed`` lost all six).
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.c"
+            source.write_text(
+                '#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_a.s")\n'
+                '#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_b.s")\n'
+                '#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_c.s")\n'
+            )
+            candidate_a = "void func_a(void) { int a; }"
+            candidate_b = "void func_b(void) { int b; }"
+            candidate_c = "void func_c(void) { int c; }"
+
+            def fake_rebuild(path: Path) -> int:
+                text = Path(path).read_text()
+                return 1 if candidate_a in text and candidate_b in text else 0
+
+            with mock.patch.object(
+                runner, "probe_candidates",
+                return_value=[
+                    {"index": 0, "function": "func_a", "status": "probe_match", "link_verified": True},
+                    {"index": 1, "function": "func_b", "status": "probe_match", "link_verified": True},
+                    {"index": 2, "function": "func_c", "status": "probe_match", "link_verified": True},
+                ],
+            ), mock.patch.object(
+                runner, "rebuild_source_object", side_effect=fake_rebuild,
+            ), mock.patch.object(
+                runner, "_try_candidate_detailed",
+            ) as sequential_gate, mock.patch.object(
+                runner, "compare_current_tree", return_value=0,
+            ) as full_compare:
+                result = runner.try_candidates_detailed(
+                    source,
+                    [
+                        ("func_a", candidate_a),
+                        ("func_b", candidate_b),
+                        ("func_c", candidate_c),
+                    ],
+                )
+            sequential_gate.assert_not_called()
+            full_compare.assert_called_once()
+            self.assertEqual(sorted(result["accepted"]), ["func_a", "func_c"])
+            dropped = next(item for item in result["attempts"] if item["function"] == "func_b")
+            self.assertEqual(dropped["status"], "combined_compile_failed")
+            self.assertEqual(dropped["probe_status"], "probe_match")
+            self.assertEqual(dropped["reason"], "conflicts with an earlier winner in this batch")
+            text = source.read_text()
+            self.assertIn(candidate_a, text)
+            self.assertIn(candidate_c, text)
+            self.assertIn('GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_b.s")', text)
+            self.assertGreaterEqual(result["timing"]["install_compiles"], 3)
+
+    def test_final_install_drops_conflicting_sequential_winner(self) -> None:
+        # Two link-verified hits: the combined compare rejects, so both are
+        # gated individually and each passes alone.  The final incremental
+        # install then discovers they conflict when combined and drops the
+        # second rather than reverting the whole batch.
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.c"
+            source.write_text(
+                '#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_a.s")\n'
+                '#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_b.s")\n'
+            )
+            candidate_a = "void func_a(void) { int a; }"
+            candidate_b = "void func_b(void) { int b; }"
+            both_seen = {"count": 0}
+
+            def fake_rebuild(path: Path) -> int:
+                text = Path(path).read_text()
+                if candidate_a in text and candidate_b in text:
+                    both_seen["count"] += 1
+                    return 0 if both_seen["count"] == 1 else 1
+                return 0
+
+            def fake_sequential(source_path: Path, function: str, candidate: str) -> tuple[int, str]:
+                return 0, "accepted"
+
+            with mock.patch.object(
+                runner, "probe_candidates",
+                return_value=[
+                    {"index": 0, "function": "func_a", "status": "probe_match", "link_verified": True},
+                    {"index": 1, "function": "func_b", "status": "probe_match", "link_verified": True},
+                ],
+            ), mock.patch.object(
+                runner, "rebuild_source_object", side_effect=fake_rebuild,
+            ), mock.patch.object(
+                runner, "_try_candidate_detailed", side_effect=fake_sequential,
+            ), mock.patch.object(
+                runner, "compare_current_tree", return_value=1,
+            ):
+                result = runner.try_candidates_detailed(
+                    source,
+                    [("func_a", candidate_a), ("func_b", candidate_b)],
+                )
+            self.assertEqual(result["accepted"], ["func_a"])
+            dropped = next(item for item in result["attempts"] if item["function"] == "func_b")
+            self.assertEqual(dropped["status"], "combined_compile_failed")
+            accepted_statuses = [
+                item["function"] for item in result["attempts"]
+                if item["status"] == "accepted"
+            ]
+            self.assertEqual(sorted(accepted_statuses), sorted(result["accepted"]))
+
+    def test_final_combined_compare_rejection_reverts_accepted_statuses(self) -> None:
+        # Two unverified hits are each individually gated and accepted, but
+        # the final combined ROM compare (needed because they were never
+        # tested together) rejects the pair.  Every attempt still marked
+        # ``accepted`` afterward must be rewritten so stats never claim a
+        # function that no longer owns its replacement in the file.
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.c"
+            source.write_text(
+                '#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_a.s")\n'
+                '#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_b.s")\n'
+            )
+
+            def fake_sequential(source_path: Path, function: str, candidate: str) -> tuple[int, str]:
+                return 0, "accepted"
+
+            with mock.patch.object(
+                runner, "probe_candidates",
+                return_value=[
+                    {"index": 0, "function": "func_a", "status": "probe_match"},
+                    {"index": 1, "function": "func_b", "status": "probe_match"},
+                ],
+            ), mock.patch.object(
+                runner, "rebuild_source_object", return_value=0,
+            ), mock.patch.object(
+                runner, "_try_candidate_detailed", side_effect=fake_sequential,
+            ), mock.patch.object(
+                runner, "compare_current_tree", return_value=1,
+            ) as full_compare:
+                result = runner.try_candidates_detailed(
+                    source,
+                    [
+                        ("func_a", "void func_a(void) { return; }"),
+                        ("func_b", "void func_b(void) { return; }"),
+                    ],
+                )
+            full_compare.assert_called_once()
+            self.assertEqual(result["accepted"], [])
+            self.assertEqual(result["batch_status"], "combined_compare_rejected")
+            for attempt in result["attempts"]:
+                self.assertEqual(attempt["status"], "combined_compare_rejected")
 
 
 import dedupe_externs  # noqa: E402
@@ -1477,6 +1647,49 @@ class SweepTests(unittest.TestCase):
         self.assertEqual(declarations, "extern s32 helper(s32);\n")
         self.assertEqual(body, "void func_a(void) {}\n")
 
+    def test_split_candidate_declarations_hoists_prototype_line(self) -> None:
+        declarations, body = sweep_targets.split_candidate_declarations(
+            "s32 (*func_80003240(s32 *))(s32);\n"
+            "s32 func_b(s32);\n"
+            "void func_a(void) { func_b(1); }\n"
+        )
+        self.assertIn("s32 (*func_80003240(s32 *))(s32);", declarations)
+        self.assertIn("s32 func_b(s32);", declarations)
+        self.assertEqual(body, "void func_a(void) { func_b(1); }\n")
+
+    def test_partition_gate_batches_defers_conflicting_smaller_group(self) -> None:
+        # Two functions share declarations that agree on ``helper``'s
+        # prototype (the larger group); a third function's declarations
+        # disagree, so it must be deferred rather than gated -- gating it
+        # would install a prototype that conflicts with the one the larger
+        # group already committed and fail to compile.
+        gate_batches = {
+            "extern s32 helper(s32);": [
+                ("func_a", "void func_a(void) {}", "m2c:x"),
+                ("func_b", "void func_b(void) {}", "m2c:x"),
+            ],
+            "extern u8 helper(s32);": [
+                ("func_c", "void func_c(void) {}", "m2c:x"),
+            ],
+        }
+        family_of = {"func_a": "fam", "func_b": "fam", "func_c": "fam"}
+        summary = sweep_targets.collections.defaultdict(sweep_targets.collections.Counter)
+        active = sweep_targets.partition_gate_batches(
+            gate_batches, source_rel="disasm/src/a.c", family_of=family_of, summary=summary
+        )
+        self.assertEqual(len(active), 1)
+        declarations, batch = active[0]
+        self.assertEqual(declarations, "extern s32 helper(s32);")
+        self.assertEqual(sorted(function for function, _, _ in batch), ["func_a", "func_b"])
+        self.assertEqual(summary["fam"]["deferred_conflicting_prototype"], 1)
+
+    def test_callee_unprototyped_variant_rewrites_returned_function_params(self) -> None:
+        code = "s32 (*func_80003240(s32 *))(s32);\nvoid func_a(void) {}\n"
+        rewritten = sweep_targets.callee_unprototyped_variant(code)
+        self.assertIsNotNone(rewritten)
+        self.assertIn("s32 (*func_80003240(s32 *))();", rewritten)
+        self.assertIsNone(sweep_targets.callee_unprototyped_variant("void func_a(void) {}\n"))
+
     def test_previously_attempted_labels_returns_function_label_pairs(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             stats = Path(directory) / "stats.jsonl"
@@ -1536,6 +1749,52 @@ class SweepTests(unittest.TestCase):
         draft.assert_called_once()
         self.assertEqual(draft.call_args.args[0], "func_a")
         self.assertEqual(draft.call_args.kwargs["variant_names"], tuple(all_names[1:]))
+
+    def test_sweep_summary_includes_timing_rollup(self) -> None:
+        rows = [
+            {"function": "func_a", "source": "disasm/src/fragments/1/a.c", "family": "call_sequence"},
+        ]
+
+        def fake_try_candidates(source_path, blocks, *, labels=None, declarations=None, gate=True, probe_workers=None):
+            if not gate:
+                return {
+                    "status": 0,
+                    "accepted": [],
+                    "attempts": [{"index": 0, "function": "func_a", "status": "probe_match"}],
+                    "batch_status": "probe_only",
+                    "timing": {
+                        "probe_seconds": 0.02, "gate_seconds": 0.0, "gate_runs": 0, "install_compiles": 0,
+                    },
+                }
+            return {
+                "status": 0,
+                "accepted": ["func_a"],
+                "attempts": [{"index": 0, "function": "func_a", "status": "accepted"}],
+                "batch_status": "accepted",
+                "timing": {
+                    "probe_seconds": 0.0, "gate_seconds": 0.3, "gate_runs": 1, "install_compiles": 2,
+                },
+            }
+
+        with mock.patch.object(
+            sweep_targets.targets, "list_targets",
+            return_value={"matched": 1, "targets": rows, "truncated": False},
+        ), mock.patch.object(
+            sweep_targets.dedupe_externs, "dirty_sources", return_value=set(),
+        ), mock.patch.object(
+            sweep_targets, "draft_variants",
+            return_value=([("m2c:u8-void", "void func_a(void) {}")], "draft"),
+        ), mock.patch.object(
+            sweep_targets.runner, "try_candidates_detailed", side_effect=fake_try_candidates,
+        ):
+            result = sweep_targets.sweep(
+                max_instructions=None, min_instructions=None, family=None, source=None,
+                limit=10, gate=True, workers=1,
+            )
+        self.assertEqual(result["timing"]["gate_runs"], 1)
+        self.assertEqual(result["timing"]["install_compiles"], 2)
+        self.assertAlmostEqual(result["timing"]["probe_seconds"], 0.02)
+        self.assertAlmostEqual(result["timing"]["gate_seconds"], 0.3)
 
     def test_near_miss_permutes_and_gates_score_zero(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -1697,11 +1956,14 @@ class SweepTests(unittest.TestCase):
                 ]}),
             ]) + "\n")
             with mock.patch.object(
+                targets, "require_owner", return_value=mock.MagicMock()
+            ), mock.patch.object(
                 sweep_targets.permute_candidate, "permute", return_value={"outputs": []}
             ) as permute:
                 result = sweep_targets.near_miss(stats_path=stats, label_prefixes=("m2c:",))
             self.assertEqual(result["skipped_permuted"], 1)
             self.assertEqual(result["candidates"], 1)
+            self.assertEqual(result["skipped_solved"], 0)
             permute.assert_called_once()
             self.assertEqual(permute.call_args.args[0], "func_b")
 
@@ -1728,6 +1990,71 @@ class SweepTests(unittest.TestCase):
                 result = sweep_targets.near_miss(stats_path=stats, limit=10)
             self.assertEqual(result["candidates"], 0)
             permute.assert_not_called()
+
+    def test_near_miss_skips_owner_no_longer_holding_pragma(self) -> None:
+        # A later run may already have installed a full-gate winner for a
+        # function since these stats were recorded; the owner check must
+        # reject it before a permuter budget is spent, not after.
+        with tempfile.TemporaryDirectory() as directory:
+            stats = Path(directory) / "stats.jsonl"
+            stats.write_text(json.dumps({
+                "source": "disasm/src/synthetic.c",
+                "attempts": [{
+                    "function": "func_a",
+                    "label": "m2c:s32-s32",
+                    "status": "compare_rejected",
+                    "similarity_score": 0.95,
+                    "candidate": "void func_a(void) {}",
+                }],
+            }) + "\n")
+            with mock.patch.object(
+                targets, "require_owner",
+                side_effect=KeyError("no GLOBAL_ASM pragma owns func_a"),
+            ), mock.patch.object(
+                sweep_targets.permute_candidate, "permute",
+            ) as permute:
+                result = sweep_targets.near_miss(stats_path=stats, label_prefixes=("m2c:",))
+            self.assertEqual(result["skipped_solved"], 1)
+            self.assertEqual(result["candidates"], 0)
+            permute.assert_not_called()
+
+    def test_near_miss_kind_seconds_gives_longer_budget(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            stats = Path(directory) / "stats.jsonl"
+            stats.write_text(json.dumps({
+                "source": "disasm/src/synthetic.c",
+                "attempts": [
+                    {
+                        "function": "func_a", "label": "m2c:s32-s32", "status": "compare_rejected",
+                        "similarity_score": 0.95, "candidate": "void func_a(void) {}",
+                        "mismatch_kind": "register_allocation_only",
+                    },
+                    {
+                        "function": "func_b", "label": "m2c:u8-void", "status": "compare_rejected",
+                        "similarity_score": 0.93, "candidate": "void func_b(void) {}",
+                        "mismatch_kind": "instruction_drift",
+                    },
+                ],
+            }) + "\n")
+            owner_a = targets.Owner("func_a", "disasm/src/synthetic.c", "asm/us/nonmatchings/synthetic/func_a.s")
+            owner_b = targets.Owner("func_b", "disasm/src/synthetic.c", "asm/us/nonmatchings/synthetic/func_b.s")
+            owners = {"func_a": owner_a, "func_b": owner_b}
+            calls: dict[str, float] = {}
+
+            def fake_permute(function: str, candidate: str, **kwargs: object) -> dict[str, object]:
+                calls[function] = kwargs["seconds"]
+                return {"outputs": []}
+
+            with mock.patch.object(
+                targets, "require_owner", side_effect=lambda function: owners[function]
+            ), mock.patch.object(
+                sweep_targets.permute_candidate, "permute", side_effect=fake_permute,
+            ):
+                sweep_targets.near_miss(
+                    stats_path=stats, seconds=10.0, kind_seconds=90.0, label_prefixes=("m2c:",)
+                )
+            self.assertEqual(calls["func_a"], 90.0)
+            self.assertEqual(calls["func_b"], 10.0)
 
 
 class SimilarSolvedTests(unittest.TestCase):

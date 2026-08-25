@@ -1452,6 +1452,70 @@ def _full_gate_eligible(attempt: dict[str, object]) -> bool:
     )
 
 
+def _install_incrementally(
+    source_path: Path,
+    baseline: str,
+    prefix: str,
+    winners: dict[str, str],
+    attempts: list[dict[str, object]],
+    winner_indices: dict[str, int],
+    timing: dict[str, object],
+) -> tuple[dict[str, str], bool]:
+    """Install winners cumulatively, dropping any that conflict with an earlier one.
+
+    Each winner is layered on top of the previously *kept* text and the
+    object is rebuilt; a winner whose addition breaks the compile (for
+    example a duplicate helper prototype two m2c drafts disagree on) is
+    dropped and the source is restored to the last good state instead of
+    aborting the whole batch.  A dropped winner's attempt is finalized here
+    as ``combined_compile_failed`` and is never retried alone by the
+    caller: it already compiles in isolation (that is how it became a
+    winner), so re-gating it separately would just re-accept and lose it
+    again on the next combined install.
+
+    Returns ``(kept, invalid_pragma)``.  ``kept`` preserves ``winners``
+    order and always matches what ``source_path`` holds when this
+    returns.  ``invalid_pragma`` means a winner's pragma no longer exists
+    in the tree -- a structural problem no amount of dropping other
+    winners can repair; ``source_path`` is left at the last good state and
+    the caller must revert the whole batch.
+    """
+    combined = baseline
+    kept: dict[str, str] = {}
+    for install_index, (function, candidate) in enumerate(winners.items()):
+        text = candidate
+        if prefix and install_index and text.startswith(prefix):
+            text = text[len(prefix):]
+        pragma = re.compile(
+            rf'^#pragma GLOBAL_ASM\("asm/us/nonmatchings/[^"]+/{re.escape(function)}\.s"\)$',
+            re.MULTILINE,
+        )
+        candidate_text, count = pragma.subn(text.rstrip("\n"), combined, count=1)
+        if count != 1:
+            source_path.write_text(combined)
+            os.utime(source_path, None)
+            return kept, True
+        source_path.write_text(candidate_text)
+        os.utime(source_path, None)
+        timing["install_compiles"] = int(timing.get("install_compiles", 0)) + 1
+        if rebuild_source_object(source_path) == 0:
+            combined = candidate_text
+            kept[function] = candidate
+            continue
+        print(f"DROPPED {function}: conflicts with an earlier winner in this batch")
+        index = winner_indices.get(function)
+        if index is not None:
+            attempt = attempts[index]
+            attempt.update({
+                "probe_status": attempt.get("probe_status", attempt.get("status")),
+                "status": "combined_compile_failed",
+                "reason": "conflicts with an earlier winner in this batch",
+            })
+        source_path.write_text(combined)
+        os.utime(source_path, None)
+    return kept, False
+
+
 def _record_probe_stats(
     source_path: Path,
     attempts: list[dict[str, object]],
@@ -1459,6 +1523,7 @@ def _record_probe_stats(
     blocks: list[tuple[str, str]] | None = None,
     declarations: str | None = None,
     timing: dict[str, object] | None = None,
+    batch_status: str | None = None,
 ) -> None:
     """Append JSONL probe outcomes for family-level tuning.
 
@@ -1520,6 +1585,7 @@ def _record_probe_stats(
                 "source": source_path.as_posix(),
                 "counts": counts,
                 "timing": timing,
+                "batch_status": batch_status,
                 "attempts": rows,
             }, sort_keys=True) + "\n")
     except OSError:
@@ -1575,6 +1641,7 @@ def try_candidates_detailed(
             gate=gate,
             declarations=declarations,
         )
+        batch_status = result.get("batch_status")
         _record_probe_stats(
             source_path,
             result.get("attempts", []),
@@ -1582,6 +1649,7 @@ def try_candidates_detailed(
             blocks,
             declarations,
             timing=result.get("timing") if isinstance(result.get("timing"), dict) else None,
+            batch_status=batch_status if isinstance(batch_status, str) else None,
         )
         return result
 
@@ -1625,6 +1693,7 @@ def _try_candidates_detailed_unlocked(
         "gate_seconds": 0.0,
         "gate_runs": 0,
         "gate_mode": None,
+        "install_compiles": 0,
     }
 
     def finish(payload: dict[str, object]) -> dict[str, object]:
@@ -1709,42 +1778,18 @@ def _try_candidates_detailed_unlocked(
             continue
         sequential_attempt(index)
 
-    def install_combined(winners: dict[str, str]) -> str | None:
-        combined = baseline
-        for install_index, (function, candidate) in enumerate(winners.items()):
-            # Shared declarations are installed once, ahead of the first
-            # accepted replacement; later winners in the same batch drop the
-            # prefix.
-            if prefix and install_index and candidate.startswith(prefix):
-                candidate = candidate[len(prefix):]
-            pragma = re.compile(
-                rf'^#pragma GLOBAL_ASM\("asm/us/nonmatchings/[^"]+/{re.escape(function)}\.s"\)$',
-                re.MULTILINE,
-            )
-            combined, count = pragma.subn(candidate.rstrip("\n"), combined, count=1)
-            if count != 1:
-                return None
-        return combined
-
-    def mark_pending(status: str, exit_code: int) -> None:
-        for function, index in pending.items():
-            attempt = attempts[index]
-            attempt.update({
-                "probe_status": attempt.get("status"),
-                "status": status,
-                "exit_code": exit_code,
-            })
-            if exit_code == 0:
-                accepted[function] = blocks[index][1]
-                accepted_indices[function] = index
-
     gate_mode = "sequential"
+    verified_combined_text: str | None = None
     if pending:
         gate_mode = "combined"
         winners = dict(accepted)
         winners.update({function: blocks[index][1] for function, index in pending.items()})
-        combined = install_combined(winners)
-        if combined is None:
+        winner_indices = dict(accepted_indices)
+        winner_indices.update(pending)
+        kept, invalid_pragma = _install_incrementally(
+            source_path, baseline, prefix, winners, attempts, winner_indices, timing
+        )
+        if invalid_pragma:
             restore_baseline()
             timing["gate_seconds"] = round(time.monotonic() - gate_started, 3)
             timing["gate_mode"] = gate_mode
@@ -1755,30 +1800,49 @@ def _try_candidates_detailed_unlocked(
                 "batch_status": "invalid_pragma",
                 "gate": True,
             })
-        source_path.write_text(combined)
-        os.utime(source_path, None)
-        compiled = rebuild_source_object(source_path) == 0
-        if compiled:
-            print(f"checking {len(winners)} candidate(s) together ({len(pending)} link-verified)")
+        kept_pending = {function: index for function, index in pending.items() if function in kept}
+        # A sequential winner dropped for a conflict is no longer installed;
+        # it must not survive in ``accepted`` or the result would claim it.
+        for function in list(accepted):
+            if function not in kept:
+                accepted.pop(function)
+                accepted_indices.pop(function, None)
+        if kept:
+            print(
+                f"checking {len(kept)} candidate(s) together "
+                f"({len(kept_pending)} link-verified)"
+            )
             result = run_full_gate()
-        else:
-            result = 2
-        if result == 0:
-            mark_pending("accepted", 0)
-        else:
-            # The combined tree failed: fall back to the historical per-function
-            # gate for the verified hits so one bad candidate cannot sink the
-            # rest of the batch.  ``link_verified`` stays recorded so the stats
-            # show when the shape check disagreed with the linker.
-            gate_mode = "combined_then_sequential"
-            print("combined candidate batch rejected: gating link-verified hits individually")
-            for function, index in list(pending.items()):
-                sequential_attempt(index)
-                for later_index in deferred.get(function, []):
-                    if function in accepted:
-                        break
-                    sequential_attempt(later_index)
-            pending.clear()
+            if result == 0:
+                verified_combined_text = source_path.read_text()
+                for function, index in kept_pending.items():
+                    attempt = attempts[index]
+                    attempt.update({
+                        "probe_status": attempt.get("probe_status", attempt.get("status")),
+                        "status": "accepted",
+                        "exit_code": 0,
+                    })
+                    accepted[function] = blocks[index][1]
+                    accepted_indices[function] = index
+            else:
+                # The combined tree compiled but did not link byte-identically:
+                # fall back to the historical per-function gate for the
+                # surviving (non-conflicting) verified hits so one bad
+                # candidate cannot sink the rest of the batch.  Winners
+                # already dropped as ``combined_compile_failed`` above are
+                # never retried alone here -- they would just be re-accepted
+                # and lost again on the next combined install.
+                gate_mode = "combined_then_sequential"
+                print("combined candidate batch rejected: gating link-verified hits individually")
+                for function, index in list(pending.items()):
+                    if function not in kept_pending:
+                        continue
+                    sequential_attempt(index)
+                    for later_index in deferred.get(function, []):
+                        if function in accepted:
+                            break
+                        sequential_attempt(later_index)
+        pending.clear()
 
     # Probes are intentionally parallel, so variants after a winner may have
     # already compiled.  Report them as skipped for the same user-facing
@@ -1798,6 +1862,17 @@ def _try_candidates_detailed_unlocked(
     timing["gate_mode"] = gate_mode
 
     def gated_payload(status: int, batch_status: str, names: list[str]) -> dict[str, object]:
+        if not names and batch_status in {
+            "combined_compile_failed", "combined_compare_rejected", "invalid_pragma",
+        }:
+            # The batch ends with nothing installed: any attempt still
+            # marked ``accepted`` (an individually-gated sequential winner
+            # whose replacement was just reverted from the tree) must not
+            # keep claiming that status, or the stats would record
+            # ``accepted`` for a function that no longer owns a pragma.
+            for attempt in attempts:
+                if attempt.get("status") == "accepted":
+                    attempt["status"] = batch_status
         timing["gate_seconds"] = round(time.monotonic() - gate_started, 3)
         return finish({
             "status": status,
@@ -1817,30 +1892,32 @@ def _try_candidates_detailed_unlocked(
             print("no candidate accepted")
         return gated_payload(1, "no_candidate_accepted", [])
 
-    combined = install_combined(accepted)
-    if combined is None:
+    if verified_combined_text is not None and source_path.read_text() == verified_combined_text:
+        # The combined tree is exactly what the ROM gate just verified.
+        return gated_payload(0, "accepted", list(kept))
+
+    final_indices = dict(accepted_indices)
+    final_kept, invalid_pragma = _install_incrementally(
+        source_path, baseline, prefix, accepted, attempts, final_indices, timing
+    )
+    if invalid_pragma:
         restore_baseline()
         return gated_payload(2, "invalid_pragma", [])
-    if source_path.read_text() == combined and gate_mode == "combined" and pending:
-        # The combined tree is exactly what the ROM gate just verified.
-        return gated_payload(0, "accepted", list(accepted))
-    source_path.write_text(combined)
-    os.utime(source_path, None)
-    if rebuild_source_object(source_path) != 0:
+    if not final_kept:
         restore_baseline()
         return gated_payload(2, "combined_compile_failed", [])
-    sequential_winners = len(accepted) - len(pending)
-    if sequential_winners >= 2 or (pending and gate_mode != "combined"):
-        # Sequential winners were each verified against the baseline alone;
-        # only their union still needs one combined ROM gate.  A single
-        # sequential winner was already gated in exactly this source text.
-        print(f"checking {len(accepted)} accepted candidate(s) together")
+    if len(final_kept) >= 2:
+        # Each surviving winner was verified against the baseline alone (or,
+        # for a link-verified hit, in the combined gate above); only their
+        # union still needs one fresh combined ROM gate.  A single surviving
+        # winner was already gated in exactly this source text.
+        print(f"checking {len(final_kept)} accepted candidate(s) together")
         result = run_full_gate()
         if result != 0:
             restore_baseline()
             print("combined candidate batch rejected: restored baseline")
             return gated_payload(result, "combined_compare_rejected", [])
-    return gated_payload(0, "accepted", list(accepted))
+    return gated_payload(0, "accepted", list(final_kept))
 
 
 def try_candidates(source_path: Path, blocks: list[tuple[str, str]]) -> tuple[int, list[str]]:
