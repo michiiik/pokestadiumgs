@@ -325,7 +325,16 @@ extern void func_80034F30(void); void func_80026098(void) { func_80034F30(); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002738C.s")
+s32 func_8002738C(s32 arg0) {
+    s32 *ptr = &arg0;
+    arg0 = *ptr & 0xFF;
+    if (arg0 < 0xF) {
+        arg0 = (arg0 + 1) & 0xFF;
+    } else {
+        arg0 = 0;
+    }
+    return arg0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -999,7 +1008,13 @@ void func_8003455C(u8 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800345E8.s")
+extern u8 D_800D2B93[];
+void func_800345E8(s32 arg0, s32 arg1) {
+    s32 *p0 = &arg0;
+    s32 *p1 = &arg1;
+    arg0 = *p0 & 0xFF;
+    *(u8 *)(D_800D2B93 + (arg0 * 0x3C)) = *p1 & 7;
+}
 #endif
 
 #ifdef VERSION_US
