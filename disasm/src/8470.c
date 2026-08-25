@@ -78,7 +78,19 @@ extern u8 D_800D0510[]; void func_80008624(void) { func_80002178(D_800D0510); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_800088DC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80008944.s")
+extern s32 D_800D0554;
+typedef struct {
+    u8 pad16[0x16];
+    s8 index16;
+} Func80008944State;
+s32 func_80008944(void) {
+    s32 result = 0;
+    if (D_800D0554 != 0) {
+        Func80008944State *p = (Func80008944State *)(u32)D_800D0554;
+        result = *(s32 *)((u8 *)p + (p->index16 << 2) + 0x18);
+    }
+    return result;
+}
 
 s32 func_80008970(void) { s32 value = 0; if (D_800D0554 != 0) { value = *(s8 *)((u8 *)(u32)D_800D0554 + 0x17); } return value; }
 

@@ -8,7 +8,12 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C000E4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C00120.s")
+void *func_87C00120(void *arg0, f64 arg1, f64 arg2, f64 arg3) {
+    *(f64 *)((u8 *)arg0 + 0) = arg1;
+    *(f64 *)((u8 *)arg0 + 8) = arg2;
+    *(f64 *)((u8 *)arg0 + 0x10) = arg3;
+    return arg0;
+}
 
 void *func_87C00144(void *arg0) {
     (*(f64 *)((u8 *)arg0 + 0x10)) = 0.0;
@@ -27,9 +32,19 @@ void *func_87C00144(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C00238.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C002A8.s")
+void *func_87C002A8(void *arg0, void *arg1, f64 arg2) {
+    *(f64 *)((u8 *)arg0 + 0x00) = *(f64 *)((u8 *)arg1 + 0x00) * arg2;
+    *(f64 *)((u8 *)arg0 + 0x08) = *(f64 *)((u8 *)arg1 + 0x08) * arg2;
+    *(f64 *)((u8 *)arg0 + 0x10) = *(f64 *)((u8 *)arg1 + 0x10) * arg2;
+    return arg0;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C002DC.s")
+void *func_87C002DC(void *arg0, void *arg1) {
+    *(f64 *)((u8 *)arg0 + 0x00) = -*(f64 *)((u8 *)arg1 + 0x00);
+    *(f64 *)((u8 *)arg0 + 0x08) = -*(f64 *)((u8 *)arg1 + 0x08);
+    *(f64 *)((u8 *)arg0 + 0x10) = -*(f64 *)((u8 *)arg1 + 0x10);
+    return arg0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C00308.s")
 
@@ -85,9 +100,21 @@ void func_87C00884(f64 *arg0, f64 arg1, f64 arg2, f64 arg3, f64 arg4) {
     arg0[3] = arg4;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C008B0.s")
+void *func_87C008B0(void *arg0) {
+    *(f64 *)((u8 *)arg0 + 0x08) = 0.0;
+    *(f64 *)((u8 *)arg0 + 0x10) = 0.0;
+    *(f64 *)((u8 *)arg0 + 0x18) = 0.0;
+    *(f64 *)((u8 *)arg0 + 0x00) = 1.0;
+    return arg0;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C008DC.s")
+void *func_87C008DC(void *arg0, f64 arg1, f64 arg2, f64 arg3, f64 arg4) {
+    *(f64 *)((u8 *)arg0 + 0x00) = arg1;
+    *(f64 *)((u8 *)arg0 + 0x08) = arg2;
+    *(f64 *)((u8 *)arg0 + 0x10) = arg3;
+    *(f64 *)((u8 *)arg0 + 0x18) = arg4;
+    return arg0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C00908.s")
 

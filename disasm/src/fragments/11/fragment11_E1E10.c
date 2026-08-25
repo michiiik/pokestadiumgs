@@ -49,7 +49,13 @@ s32 func_8160A920(u8 *arg0) {
     return *(s8 *)(arg0 + 8);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E1E10/func_8160A928.s")
+void func_8160A928(u8 *arg0, s32 arg1) {
+    arg1 += 6;
+    arg1 %= 6;
+    arg0[9] = arg1;
+    arg0[8] = arg1;
+    *(f32 *)(arg0 + 4) = 0.0f;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E1E10/func_8160A94C.s")
 

@@ -114,7 +114,17 @@ s32 func_86009BE0(s32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_8600A650.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_8600AAA4.s")
+extern u8 D_8600D3F0[];
+extern u8 D_8600D400;
+u8 *func_8600AAA4(s32 arg0) {
+    u8 *result;
+    if (arg0 >= 0 && arg0 < 4) {
+        result = D_8600D3F0 + (arg0 * 4);
+    } else {
+        result = &D_8600D400;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_8600AAD4.s")
 

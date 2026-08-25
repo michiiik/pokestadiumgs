@@ -40,7 +40,19 @@ void func_80010610(u8 *arg0, s32 arg1, s32 arg2) {
 
 void func_80010638(u8 *arg0) { *(s32 *)(arg0 + 0x10) = 0; *(s32 *)arg0 = 0; *(s32 *)(arg0 + 8) = *(s32 *)(arg0 + 4); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_8001064C.s")
+void func_8001064C(void *arg0)
+{
+  u8 *p = arg0;
+  s32 value = *((s32 *) (p + 4));
+  *((s32 *) (p + 0x10)) = 0;
+  *((s32 *) (p + 0x00)) = 0;
+  *((s32 *) (p + 0x20)) = value;
+  *((s32 *) (p + 0x20)) += *((s32 *) (p + 0x0C));
+  *((s16 *) (p + 0x1E)) = -1;
+  *((s16 *) (p + 0x2A)) = -1;
+  *((s32 *) (p + 0x08)) = value;
+  *((s32 *) (p + 0x14)) = value;
+}
 
 void func_8001067C(u8 *arg0) { *(s32 *)(arg0 + 0xC) = 0; *(s32 *)(arg0 + 4) = *(s32 *)arg0; }
 

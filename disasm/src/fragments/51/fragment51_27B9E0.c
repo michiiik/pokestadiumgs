@@ -4,7 +4,10 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/51/fragment51_27B9E0/func_86305BC0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/51/fragment51_27B9E0/func_86305C48.s")
+void func_86305C48(void *arg0, void *arg1, f32 arg2) {
+    *(f32 *)((u8 *)arg0 + 0x48) += *(f32 *)((u8 *)arg1 + 0) * arg2;
+    *(f32 *)((u8 *)arg0 + 0x4C) += *(f32 *)((u8 *)arg1 + 4) * arg2;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/51/fragment51_27B9E0/func_86305C78.s")
 

@@ -117,7 +117,8 @@ void func_86400020(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/52/fragment52_27E4E0/func_86403CB4.s")
+extern u8 *D_86416C00;
+void func_86403CB4(void) { void *node; node = *(void **)(D_86416C00 + 0xE0C); while (node != NULL) { node = *(void **)((u8 *)node + 4); } }
 #endif
 
 #ifdef VERSION_US

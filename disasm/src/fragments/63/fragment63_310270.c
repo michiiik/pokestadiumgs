@@ -144,5 +144,9 @@ s32 func_87E0DC78(u8 *arg0) {
 extern void func_87F0AF4C(s32);
 void func_87E0F124(s32 arg0) { func_87F0AF4C(arg0 + 16); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_310270/func_87E0F144.s")
+s32 func_87E0F144(void *arg0, s32 arg1) {
+    s32 new_var;
+    new_var = *((s32 *) (((u8 *) arg0) + 0x18));
+    return (arg1 * 0x18C) + new_var;
+}
 #endif

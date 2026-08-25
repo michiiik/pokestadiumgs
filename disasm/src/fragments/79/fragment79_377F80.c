@@ -21,7 +21,13 @@ extern u32 D_84190188; extern u32 D_841901A8; extern void func_841086F0(void); v
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_8410890C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_84108940.s")
+extern u8 D_8418C958;
+void func_84108940(void *arg0, s32 arg1) {
+    u8 *p = (u8 *)&D_8418C958 + arg1 * 0xC;
+    *(f32 *)((u8 *)arg0 + 0x0) = *(f32 *)(p + 0x0);
+    *(f32 *)((u8 *)arg0 + 0x4) = *(f32 *)(p + 0x4);
+    *(f32 *)((u8 *)arg0 + 0x8) = *(f32 *)(p + 0x8);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_84108974.s")
 

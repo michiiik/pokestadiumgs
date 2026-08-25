@@ -146,11 +146,19 @@ void func_8000DA2C(u8 *arg0, s32 arg1, s32 arg2) { *(u32 *)(arg0 + 0) = 0x170000
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/CE80/func_8000DA48.s")
+void func_8000DA48(u32 *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+    arg0[0] = ((arg1 & 0xFF) << 16) | 0x0E000000 | (arg4 & 0xFFFF);
+    arg0[1] = ((arg2 & 0xFFFF) << 16) | (arg3 & 0xFFFF);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/CE80/func_8000DA7C.s")
+void func_8000DA7C(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4)
+{
+  u8 *p = arg0;
+  *((u32 *) (p + 0x00)) = ((arg4 & 0xFF) << 16) | (arg3 & 0xFFFF);
+  *((u32 *) (p + 0x04)) = ((arg1 << 14) << 2) | (arg2 & 0xFFFF);
+}
 #endif
 
 #ifdef VERSION_US
