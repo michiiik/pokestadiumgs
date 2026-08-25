@@ -177,7 +177,12 @@ void func_8260675C(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260F084.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260F0DC.s")
+extern void func_800226C0(s32);
+void func_8260F0DC(u8 *arg0) {
+    *(s16 *)(arg0 + 0) = 1;
+    *(s16 *)(arg0 + 4) = 0;
+    func_800226C0(0x78);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260F108.s")
 
