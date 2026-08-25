@@ -14,7 +14,18 @@ s32 func_80071250(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/71E10/func_8007126C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/71E10/func_800712DC.s")
+extern s32 func_8007126C(s32, s32, u8, void *);
+s32 func_800712DC(s32 arg0, void *arg1) {
+    u8 value = *(u8 *)arg1;
+    s32 result = 0;
+    if (value <= 0) goto empty;
+    result = func_8007126C(arg0, value - 1, *(u8 *)((u8 *)arg1 + 0x1D), arg1);
+    goto finish;
+empty:
+    result = 0;
+finish:
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/71E10/func_8007131C.s")
 
