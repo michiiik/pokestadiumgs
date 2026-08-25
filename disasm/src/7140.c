@@ -6,7 +6,24 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/7140/func_800065DC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/7140/func_80006664.s")
+s32 func_80006664(void *arg0) {
+    struct Func80006664State { u8 pad[0x1C]; s32 unk1C; void *vaddr; s32 size; s32 unk28; };
+    extern OSMesgQueue D_800D0474;
+    extern OSMesg D_800D0440;
+    OSIoMesg msg;
+    OSPiHandle *handle;
+    struct Func80006664State *p = (struct Func80006664State *)arg0;
+    handle = (OSPiHandle *)(u32)func_80006540();
+    msg.hdr.pri = 0;
+    msg.hdr.retQueue = &D_800D0474;
+    msg.dramAddr = p->vaddr;
+    msg.devAddr = p->unk1C;
+    msg.size = p->size;
+    osWritebackDCache(p->vaddr, p->size);
+    osEPiStartDma(handle, &msg, 1);
+    osRecvMesg(&D_800D0474, &D_800D0440, OS_MESG_BLOCK);
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/7140/func_800066EC.s")
 
@@ -29,9 +46,26 @@ s32 func_80006778(void *arg0) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/7140/func_80006800.s")
+s32 func_80006800(u8 *arg0) {
+    extern OSMesgQueue D_800D0474;
+    extern OSMesg D_800D0440;
+    OSIoMesg msg;
+    osInvalDCache(*(void **)(arg0 + 0x20), 0x80);
+    osFlashReadArray(&msg, 0, *(s32 *)(arg0 + 0x1C), *(void **)(arg0 + 0x20), 1, &D_800D0474);
+    osRecvMesg(&D_800D0474, &D_800D0440, 1);
+    return 0;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/7140/func_80006870.s")
+s32 func_80006870(void *arg0) {
+    struct Func80006870State { u8 pad[0x1C]; s32 unk1C; void *vaddr; s32 size; s32 unk28; };
+    extern OSMesgQueue D_800D0474;
+    extern OSMesg D_800D0440;
+    OSIoMesg msg;
+    struct Func80006870State *p = (struct Func80006870State *)arg0;
+    osFlashWriteBuffer(&msg, 0, p->vaddr, &D_800D0474);
+    osRecvMesg(&D_800D0474, &D_800D0440, OS_MESG_BLOCK);
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/7140/func_800068C4.s")
 
