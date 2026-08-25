@@ -234,6 +234,9 @@ class ApplyRenameTest(unittest.TestCase):
     def test_empty_map_is_noop(self):
         self.assertEqual(sweep.apply_rename("abc", {}), "abc")
 
+    def test_sanitize_candidate_text_replaces_unencodable_punctuation(self):
+        self.assertEqual(sweep.sanitize_candidate_text("/* CPU \u2014 player */\n"), "/* CPU ? player */\n")
+
 
 class TypeIndexTest(unittest.TestCase):
     def test_struct_typedef_indexed(self):
@@ -298,6 +301,13 @@ class TypeIndexTest(unittest.TestCase):
         index = sweep.index_type_definitions([header])
         collected = sweep.collect_type_definitions({"A"}, index)
         self.assertIn("F", collected)
+
+    def test_referenced_types_include_extern_only_state_types(self):
+        index = sweep.index_type_definitions([
+            "typedef struct SchedulerState { s32 shutdownCounter; } SchedulerState;\n"
+        ])
+        declarations = ["extern SchedulerState D_800CD020;"]
+        self.assertEqual(sweep.referenced_type_names(declarations, index), {"SchedulerState"})
 
     def test_order_types_dependency_first(self):
         defs = {
@@ -371,6 +381,25 @@ class MergeDeclarationsTest(unittest.TestCase):
         self.assertEqual(
             [[result.function for result in group] for group in groups],
             [["func_A", "func_C"], ["func_B"]],
+        )
+
+    def test_partitions_disjoint_declarations_to_avoid_cross_contamination(self):
+        first = sweep.TransferResult(
+            function="func_A", outcome="candidate",
+            declaration_units=["typedef struct S1_A { s32 x; } S1_A;"],
+        )
+        second = sweep.TransferResult(
+            function="func_B", outcome="candidate",
+            declaration_units=["typedef struct S1_B { s32 y; } S1_B;"],
+        )
+        no_declarations = sweep.TransferResult(function="func_C", outcome="candidate")
+        another_no_declarations = sweep.TransferResult(function="func_D", outcome="candidate")
+
+        groups = sweep.partition_transfer_results([first, second, no_declarations, another_no_declarations])
+
+        self.assertEqual(
+            [[result.function for result in group] for group in groups],
+            [["func_A"], ["func_B"], ["func_C", "func_D"]],
         )
 
 

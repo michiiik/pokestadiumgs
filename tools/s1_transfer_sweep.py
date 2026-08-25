@@ -607,6 +607,35 @@ def apply_rename(text: str, rename_map: dict[str, str]) -> str:
     return pattern.sub(lambda m: rename_map[m.group(0)], text)
 
 
+def sanitize_candidate_text(text: str) -> str:
+    """Make transferred text encodable by asm-processor's EUC-JP writer.
+
+    Stadium 1 comments occasionally contain Unicode punctuation (for example
+    an em dash).  IDO receives the generated candidate through
+    asm-processor, whose EUC-JP output encoding rejects those code points
+    before the compiler can inspect the body.  Replacement is lossless for
+    code and only changes otherwise-irrelevant source text; the generated
+    candidate still goes through the normal isolated probe and full gate.
+    """
+    return text.encode("euc_jp", errors="replace").decode("euc_jp")
+
+
+def referenced_type_names(declarations: list[str], type_index: dict[str, str]) -> set[str]:
+    """Return indexed type names mentioned by declaration units.
+
+    A transferred body can use a mapped global without mentioning the global's
+    S1 type itself.  In that case the type only appears in the generated
+    ``extern`` declaration (for example ``extern unk_D_800A62E0 D_800CD020``)
+    and must still be pulled into the candidate's declaration block.
+    """
+    names: set[str] = set()
+    for declaration in declarations:
+        for ident in re.findall(r"\b[A-Za-z_]\w*\b", declaration):
+            if ident in type_index:
+                names.add(ident)
+    return names
+
+
 # --------------------------------------------------------------------------
 # S1 context: everything built once per run
 # --------------------------------------------------------------------------
@@ -861,23 +890,58 @@ def generate_candidate(
             detail="; ".join(unmapped[:5]), symbol_map=symbol_map, unmapped_symbols=unmapped,
         )
 
-    # Types the body needs, S1_-prefixed unless GS already has an identical
-    # definition under the same name.
+    # Gather mapped extern declarations before collecting types.  A body can
+    # use a global without spelling its S1 type, so the extern itself may be
+    # the only seed for a required declaration (notably the scheduler state).
+    extern_declarations: list[str] = []
+    seen_externs: set[str] = set()
+    for s1_sym, gs_sym in symbol_map.items():
+        if s1_sym == s1_name or s1_sym in ctx.symtab.func_names:
+            continue
+        decl = ctx.extern_index.get(s1_sym)
+        if decl is None or decl in seen_externs:
+            continue
+        seen_externs.add(decl)
+        extern_declarations.append(decl)
+
+    # Types the body or its mapped extern declarations need, S1_-prefixed
+    # unless GS already has an identical definition under the same name.
     candidate_type_names = {
         ident for ident in body_identifiers if ident in ctx.type_index
     }
+    candidate_type_names.update(referenced_type_names(extern_declarations, ctx.type_index))
     # Stadium 1 display/geo records commonly reach vector and matrix typedefs
     # through five or more nested record layers. Keep the bound finite, but
     # include those real dependencies instead of emitting fields with unknown
     # unprefixed types.
     type_defs = collect_type_definitions(candidate_type_names, ctx.type_index, max_depth=8)
+    try:
+        owner_text = owner.source_path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        owner_text = ""
+    owner_type_index = index_type_definitions([owner_text]) if owner_text else {}
+
+    # The owner may already carry an S1-prefixed definition copied by an
+    # earlier transfer (or a hand-written equivalent in the same C file).
+    # Compare against both the repository headers and the owner source after
+    # applying the complete provisional S1 rename map.  Otherwise a perfectly
+    # compatible definition is emitted a second time and IDO rejects the
+    # candidate before it can reach the byte probe.
+    provisional_type_rename = {name: f"S1_{name}" for name in type_defs}
     type_rename: dict[str, str] = {}
     kept_type_defs: dict[str, str] = {}
     for name, type_def in type_defs.items():
-        gs_def = ctx.gs_type_index.get(name)
+        gs_def = owner_type_index.get(name) or ctx.gs_type_index.get(name)
         if gs_def is not None and _normalize_ws(gs_def) == _normalize_ws(type_def):
             continue
-        type_rename[name] = f"S1_{name}"
+        renamed_name = provisional_type_rename[name]
+        prefixed_gs_def = owner_type_index.get(renamed_name) or ctx.gs_type_index.get(renamed_name)
+        if prefixed_gs_def is not None:
+            renamed_definition = apply_rename(type_def, provisional_type_rename)
+            if _normalize_ws(prefixed_gs_def) == _normalize_ws(renamed_definition):
+                type_rename[name] = renamed_name
+                continue
+        type_rename[name] = renamed_name
         kept_type_defs[name] = type_def
 
     rename_map = dict(symbol_map)
@@ -889,23 +953,14 @@ def generate_candidate(
     ]
     forward_type_defs = forward_type_declarations(kept_type_defs, rename_map)
 
-    extra_externs: list[str] = []
-    seen_externs: set[str] = set()
-    for s1_sym, gs_sym in symbol_map.items():
-        if s1_sym == s1_name or s1_sym in ctx.symtab.func_names:
-            continue
-        decl = ctx.extern_index.get(s1_sym)
-        if decl is None or decl in seen_externs:
-            continue
-        seen_externs.add(decl)
-        extra_externs.append(apply_rename(decl, rename_map))
+    extra_externs = [apply_rename(decl, rename_map) for decl in extern_declarations]
 
     declaration_units = forward_type_defs + ordered_type_defs + extra_externs
-    declarations = "\n".join(declaration_units)
+    declarations = "\n".join(sanitize_candidate_text(unit) for unit in declaration_units)
     if declarations:
         declarations += "\n"
 
-    renamed_definition = apply_rename(full_definition, rename_map)
+    renamed_definition = sanitize_candidate_text(apply_rename(full_definition, rename_map))
 
     variants: list[tuple[str, str]] = [("s1:transfer", renamed_definition.strip() + "\n")]
     if is_static:
@@ -1010,13 +1065,36 @@ def _declaration_conflicts(existing: dict[str, str], incoming: dict[str, str]) -
 
 
 def partition_transfer_results(results: list[TransferResult]) -> list[list[TransferResult]]:
-    """Partition candidates whose shared declarations disagree by symbol."""
+    """Partition candidates into declaration-compatible connected groups.
+
+    The runner accepts one shared declaration block for a source group.  It is
+    tempting to merge every non-conflicting result, but unrelated declarations
+    can still break an otherwise valid candidate (for example a bad function
+    pointer typedef or a source-local type defined later in the file).  Keep
+    candidates together when they share declaration symbols, and keep the
+    declaration-free candidates together; disjoint declaration sets are
+    independent probe groups and should not contaminate one another.
+    """
     groups: list[list[TransferResult]] = []
     group_symbols: list[dict[str, str]] = []
     for result in results:
         units = result.declaration_units or ([result.declarations] if result.declarations else [])
         symbols = _declaration_unit_symbols(units)
         for index, existing in enumerate(group_symbols):
+            existing_results = groups[index]
+            existing_units = [
+                unit
+                for prior in existing_results
+                for unit in (prior.declaration_units or ([prior.declarations] if prior.declarations else []))
+            ]
+            shares_declarations = bool(set(existing) & set(symbols))
+            both_empty = not existing_units and not units
+            same_unparsed_units = (
+                not existing and not symbols and bool(existing_units) and bool(units)
+                and {unit.strip() for unit in existing_units} == {unit.strip() for unit in units}
+            )
+            if not (shares_declarations or both_empty or same_unparsed_units):
+                continue
             if _declaration_conflicts(existing, symbols):
                 continue
             groups[index].append(result)
@@ -1052,11 +1130,11 @@ def _run_source_group_once(
     declaration_units: list[str] = []
     for result in results:
         if result.declaration_units:
-            declaration_units.extend(result.declaration_units)
+            declaration_units.extend(sanitize_candidate_text(unit) for unit in result.declaration_units)
         elif result.declarations:
             # Keep compatibility with callers/tests that construct a result
             # using only the legacy rendered declaration block.
-            declaration_units.append(result.declarations)
+            declaration_units.append(sanitize_candidate_text(result.declarations))
     declarations = merge_declarations(declaration_units) or None
     probe = runner.try_candidates_detailed(
         source_path, blocks, labels=labels, declarations=declarations, gate=False, probe_workers=workers

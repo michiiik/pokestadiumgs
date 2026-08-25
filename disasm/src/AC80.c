@@ -28,7 +28,39 @@ void func_8000A6C8(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/AC80/func_8000AA2C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/AC80/func_8000AF80.s")
+extern Gfx* D_800D0510;
+void func_8000AF80(s32 profiler_mode) {
+    s32 ulx;
+    s32 uly;
+    s32 ulx_off;
+    s32 uly_off;
+
+    gDPPipeSync(D_800D0510++);
+    gDPSetCycleType(D_800D0510++, G_CYC_FILL);
+    gDPSetRenderMode(D_800D0510++, G_RM_NOOP, G_RM_NOOP2);
+
+    ulx = 30;
+    uly = 211;
+    ulx_off = 196;
+    uly_off = 9;
+
+    if (func_80008990() != 0) {
+        ulx <<= 1;
+        uly <<= 1;
+        ulx_off <<= 1;
+        uly_off <<= 1;
+    }
+
+    gDPPipeSync(D_800D0510++);
+    gDPSetFillColor(D_800D0510++, 0x00010001);
+    gDPFillRectangle(D_800D0510++, ulx, uly, ulx + ulx_off, uly + uly_off);
+
+    if (profiler_mode == 0) {
+        func_8000AA2C();
+    } else {
+        func_8000A730();
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/AC80/func_8000B0F0.s")
 
