@@ -33,5 +33,7 @@ s32 func_800718B8(s32 arg0) { extern s32 D_8009F828[]; if (arg0 < 0 || arg0 >= 0
 
 s32 func_800718E4(u8 *arg0) { return func_8004D690(arg0 != NULL ? *(u16 *)(arg0 + 0x3A) : 8); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/71E10/func_80071914.s")
+s16 func_80071914(void *arg0) {
+    return arg0 ? *(s16 *)((u8 *)arg0 + 0x3C) : -1;
+}
 #endif
