@@ -22,7 +22,15 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/23/fragment23_code/func_82A00A04.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/23/fragment23_code/func_82A00A90.s")
+s32 func_82A00A90(void *arg0) {
+    s32 var_v1;
+
+    var_v1 = 1;
+    if (((*(u8 *)((u8 *)(arg0) + (1))) == 0) && ((*(u8 *)((u8 *)(arg0) + (0))) != 2)) {
+        var_v1 = 0;
+    }
+    return var_v1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/23/fragment23_code/func_82A00ABC.s")
 

@@ -18,5 +18,11 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_167940/func_8800225C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_167940/func_880022B4.s")
+void func_880022B4(void *arg0, s16 arg1, s32 arg2) {
+    if (arg2 == 0) {
+        (*(s16 *)((u8 *)(arg0) + (0x24))) = (s16) ((*(s16 *)((u8 *)(arg0) + (0x24))) & ~arg1);
+        return;
+    }
+    (*(s16 *)((u8 *)(arg0) + (0x24))) = (s16) ((*(s16 *)((u8 *)(arg0) + (0x24))) | arg1);
+}
 #endif

@@ -26,7 +26,14 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/AC80/func_8000B0F0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/AC80/func_8000B254.s")
+extern void _bzero(s32 *, s32);
+extern u8 D_800D0F90;
+
+void func_8000B254(void) {
+    _bzero(&D_800D0F90, 0xC8);
+    (*(s16 *)((u8 *)(&D_800D0F90) + (0x25A))) = 1;
+    (*(s16 *)((u8 *)(&D_800D0F90) + (0x25C))) = 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/AC80/func_8000B28C.s")
 
