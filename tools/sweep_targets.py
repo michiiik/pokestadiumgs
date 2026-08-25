@@ -13,10 +13,25 @@ Usage:
     tools/sweep_targets.py --family call_sequence --limit 50    # a sample
     tools/sweep_targets.py --no-gate --source disasm/src/229E0.c
     tools/sweep_targets.py --fragment-range 17-32 --max-instructions 16
+    tools/sweep_targets.py --skip-attempted --max-instructions 16
+    tools/sweep_targets.py --near-miss --near-miss-parallel 4
+    tools/sweep_targets.py --near-miss --near-miss-labels m2c:,manual: --near-miss-retry
 
 Sources with uncommitted changes are skipped: another session may be
 mid-transaction in them.  A fragment-range sweep is exclusive: do not hand
 decompile or probe owners in that band until the sweep has finished.
+
+``--skip-attempted`` tracks skip state per ``(function, variant label)`` pair,
+not per function: a variant spelling added to ``FAMILY_VARIANTS`` after an
+owner's earlier reject is still swept, since only the exact label already
+recorded in the stats file is skipped.
+
+``--near-miss`` considers every recorded label by default (not only ``m2c:``
+drafts); pass ``--near-miss-labels`` to restrict it to one or more prefixes.
+It skips owners that already have a ``permute:`` attempt on file (a previous
+near-miss run), unless ``--near-miss-retry`` is given, and
+``--near-miss-parallel`` runs multiple ``decomp-permuter`` budgets
+concurrently while still gating each result sequentially.
 """
 
 from __future__ import annotations
@@ -24,10 +39,12 @@ from __future__ import annotations
 import argparse
 import collections
 import json
+import os
 import re
 import subprocess
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from collections.abc import Iterable
 
@@ -215,6 +232,32 @@ def previously_attempted(stats_path: Path = targets.STATS_PATH, label_prefix: st
     return attempted
 
 
+def previously_attempted_labels(
+    stats_path: Path = targets.STATS_PATH, label_prefix: str = "m2c:"
+) -> set[tuple[str, str]]:
+    """``(function, label)`` pairs that already have a sweep attempt on file.
+
+    Unlike ``previously_attempted``, this is keyed per variant spelling: a
+    function that only has an old-label reject on file is still swept for a
+    new label added later to ``FAMILY_VARIANTS``, because only the exact
+    ``(function, label)`` pair already attempted is skipped.
+    """
+    attempted: set[tuple[str, str]] = set()
+    if not stats_path.exists():
+        return attempted
+    for line in stats_path.read_text(encoding="utf-8").splitlines():
+        try:
+            record = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        for attempt in record.get("attempts", []):
+            label = attempt.get("label") or ""
+            function = attempt.get("function")
+            if label.startswith(label_prefix) and function:
+                attempted.add((str(function), label))
+    return attempted
+
+
 def parse_fragment_range(value: str) -> tuple[int, int]:
     """Parse the inclusive ``START-END`` fragment selector used by sweeps."""
     match = re.fullmatch(r"(\d+)-(\d+)", value.strip())
@@ -294,6 +337,14 @@ def _stats_records(stats_path: Path = targets.STATS_PATH) -> list[dict[str, obje
     return records
 
 
+def _near_miss_sort_key(attempt: dict[str, object]) -> tuple[float, str]:
+    score = attempt.get("similarity_score")
+    return (
+        -float(score) if isinstance(score, (int, float)) else 0.0,
+        str(attempt.get("function") or ""),
+    )
+
+
 def near_miss(
     *,
     stats_path: Path = targets.STATS_PATH,
@@ -302,9 +353,23 @@ def near_miss(
     threads: int = 4,
     workers: int | None = None,
     limit: int | None = None,
+    label_prefixes: tuple[str, ...] | None = None,
+    skip_permuted: bool = True,
+    parallel: int = 1,
 ) -> dict[str, object]:
-    """Permute high-scoring m2c rejects, then gate only score-0 outputs."""
+    """Permute high-scoring rejects, then gate only score-0 outputs.
+
+    ``label_prefixes`` selects which recorded labels are eligible; ``None``
+    (the default) considers any label with a recorded candidate and
+    similarity score, not only ``m2c:`` drafts.  ``skip_permuted`` excludes
+    owners that already have a ``permute:``-labeled attempt on file (a
+    previous near-miss run over the same candidate).  ``parallel`` runs that
+    many ``decomp-permuter`` budgets concurrently; gating a score-0 output
+    still happens on the main thread as each permute job completes, since it
+    holds the runner's cross-process transaction lock.
+    """
     grouped: dict[str, dict[str, object]] = {}
+    permuted_functions: set[str] = set()
     for record in _stats_records(stats_path):
         source = record.get("source")
         for attempt in record.get("attempts", []):
@@ -315,7 +380,14 @@ def near_miss(
             status = str(attempt.get("status") or "")
             score = attempt.get("similarity_score")
             candidate = attempt.get("candidate")
-            if not isinstance(function, str) or not label.startswith("m2c:"):
+            if isinstance(function, str) and label.startswith("permute:"):
+                permuted_functions.add(function)
+            if not isinstance(function, str):
+                continue
+            if label_prefixes is not None:
+                if not any(label.startswith(prefix) for prefix in label_prefixes):
+                    continue
+            elif not label:
                 continue
             # A full-gate acceptance solves the owner for this pass.  An
             # isolated probe_match is deliberately not considered accepted:
@@ -361,12 +433,16 @@ def near_miss(
         row for row in grouped.values()
         if str(row.get("best_status")) != "accepted"
     ]
+    skipped_permuted = 0
+    if skip_permuted:
+        before = len(candidates)
+        candidates = [row for row in candidates if str(row["function"]) not in permuted_functions]
+        skipped_permuted = before - len(candidates)
     candidates.sort(key=lambda row: (-float(row["similarity_score"]), str(row["function"])))
     if limit is not None:
         candidates = candidates[:max(0, limit)]
-    accepted: list[str] = []
-    attempts: list[dict[str, object]] = []
-    for row in candidates:
+
+    def permute_job(row: dict[str, object]) -> tuple[dict[str, object], dict[str, object] | None, str | None]:
         function = str(row["function"])
         candidate = str(row["candidate"])
         try:
@@ -379,53 +455,66 @@ def near_miss(
                 stop_on_zero=True,
             )
         except (FileNotFoundError, KeyError, RuntimeError, ValueError) as error:
-            attempts.append({"function": function, "status": "permute_failed", "error": str(error)})
-            continue
-        outputs = permutation.get("outputs") or []
-        score_zero = []
-        for item in outputs:
-            if not isinstance(item, dict):
+            return row, None, str(error)
+        return row, permutation, None
+
+    accepted: list[str] = []
+    attempts: list[dict[str, object]] = []
+    with ThreadPoolExecutor(max_workers=max(1, parallel)) as executor:
+        futures = [executor.submit(permute_job, row) for row in candidates]
+        for future in as_completed(futures):
+            row, permutation, error = future.result()
+            function = str(row["function"])
+            if permutation is None:
+                attempts.append({"function": function, "status": "permute_failed", "error": error})
                 continue
-            try:
-                is_zero = float(item.get("score")) == 0.0
-            except (TypeError, ValueError):
-                is_zero = False
-            if is_zero:
-                score_zero.append(item)
-        if permutation.get("already_matching") and not score_zero:
-            score_zero = [{"score": 0, "code": candidate}]
-        gate_results: list[dict[str, object]] = []
-        for output in score_zero:
-            code = output.get("code") if isinstance(output, dict) else None
-            if not isinstance(code, str):
-                continue
-            try:
-                gated = runner.try_candidates_detailed(
-                    targets.require_owner(function).source_path,
-                    [(function, code)],
-                    labels=[f"permute:{row['label']}"],
-                    declarations=row.get("declarations") if isinstance(row.get("declarations"), str) else None,
-                    gate=True,
-                    probe_workers=workers,
-                )
-            except (KeyError, OSError, RuntimeError) as error:
-                gate_results.append({"status": "gate_failed", "error": str(error)})
-                continue
-            gate_results.append(gated)
-            accepted.extend(str(name) for name in gated.get("accepted", []))
-            if gated.get("accepted"):
-                break
-        attempts.append({
-            "function": function,
-            "label": row["label"],
-            "similarity_score": row["similarity_score"],
-            "permute": permutation,
-            "gate": gate_results,
-        })
+            outputs = permutation.get("outputs") or []
+            score_zero = []
+            for item in outputs:
+                if not isinstance(item, dict):
+                    continue
+                try:
+                    is_zero = float(item.get("score")) == 0.0
+                except (TypeError, ValueError):
+                    is_zero = False
+                if is_zero:
+                    score_zero.append(item)
+            if permutation.get("already_matching") and not score_zero:
+                score_zero = [{"score": 0, "code": str(row["candidate"])}]
+            gate_results: list[dict[str, object]] = []
+            for output in score_zero:
+                code = output.get("code") if isinstance(output, dict) else None
+                if not isinstance(code, str):
+                    continue
+                try:
+                    gated = runner.try_candidates_detailed(
+                        targets.require_owner(function).source_path,
+                        [(function, code)],
+                        labels=[f"permute:{row['label']}"],
+                        declarations=row.get("declarations") if isinstance(row.get("declarations"), str) else None,
+                        gate=True,
+                        probe_workers=workers,
+                    )
+                except (KeyError, OSError, RuntimeError) as error:
+                    gate_results.append({"status": "gate_failed", "error": str(error)})
+                    continue
+                gate_results.append(gated)
+                accepted.extend(str(name) for name in gated.get("accepted", []))
+                if gated.get("accepted"):
+                    break
+            attempts.append({
+                "function": function,
+                "label": row["label"],
+                "similarity_score": row["similarity_score"],
+                "permute": permutation,
+                "gate": gate_results,
+            })
+    attempts.sort(key=_near_miss_sort_key)
     return {
         "candidates": len(candidates),
         "accepted": accepted,
         "attempts": attempts,
+        "skipped_permuted": skipped_permuted,
     }
 
 
@@ -439,6 +528,7 @@ def sweep(
     gate: bool,
     workers: int | None,
     skip_functions: set[str] | None = None,
+    skip_attempts: set[tuple[str, str]] | None = None,
     fragment_range: tuple[int, int] | None = None,
 ) -> dict[str, object]:
     listing = _sweep_listing(
@@ -466,6 +556,54 @@ def sweep(
     accepted_functions: list[str] = []
     touched_sources: list[str] = []
     started = time.monotonic()
+
+    # Phase 1: draft every remaining owner's m2c candidates through a pool.
+    # One m2c subprocess per function used to run sequentially inside the
+    # per-source loop below; independent functions draft concurrently here
+    # regardless of which source owns them.  ``skip_attempts`` is applied per
+    # (function, variant label) pair, not per function, so a variant spelling
+    # added to ``FAMILY_VARIANTS`` after an earlier reject is still drafted.
+    jobs: list[tuple[str, str, str, tuple[str, ...] | None]] = []
+    family_of_all: dict[str, str] = {}
+    for source_rel, source_rows in by_source.items():
+        for row in source_rows:
+            function = str(row["function"])
+            fam = str(row["family"])
+            family_of_all[function] = fam
+            if skip_functions and function in skip_functions:
+                summary[fam]["skipped_attempted"] += 1
+                continue
+            variant_names: tuple[str, ...] | None = None
+            if skip_attempts is not None:
+                planned = FAMILY_VARIANTS.get(fam, tuple(VARIANTS))
+                remaining = tuple(
+                    name for name in planned if (function, f"m2c:{name}") not in skip_attempts
+                )
+                if not remaining:
+                    summary[fam]["skipped_attempted"] += 1
+                    continue
+                variant_names = remaining
+            jobs.append((source_rel, function, fam, variant_names))
+
+    draft_workers = max(1, workers if workers else int(os.environ.get("PRAGMA_PROBE_WORKERS", "10")))
+    draft_results: dict[str, object] = {}
+    draft_started = time.monotonic()
+    if jobs:
+        with ThreadPoolExecutor(max_workers=draft_workers) as executor:
+            futures = {
+                executor.submit(draft_variants, function, family=fam, variant_names=variant_names): function
+                for _, function, fam, variant_names in jobs
+            }
+            for future in as_completed(futures):
+                function = futures[future]
+                try:
+                    draft_results[function] = future.result()
+                except KeyError as error:
+                    draft_results[function] = error
+                except (OSError, subprocess.SubprocessError) as error:
+                    draft_results[function] = error
+    draft_seconds = round(time.monotonic() - draft_started, 1)
+
     for source_rel, rows in sorted(by_source.items(), key=lambda item: -len(item[1])):
         blocks: list[tuple[str, str]] = []
         labels: list[str] = []
@@ -474,21 +612,22 @@ def sweep(
         labels_of: dict[str, set[str]] = collections.defaultdict(set)
         for row in rows:
             function = str(row["function"])
-            family_of[function] = str(row["family"])
-            if skip_functions and function in skip_functions:
-                summary[family_of[function]]["skipped_attempted"] += 1
+            family_of[function] = family_of_all[function]
+            if function not in draft_results:
+                # Already accounted for (skipped_attempted) in the drafting
+                # phase above.
                 continue
-            try:
-                variants, draft = draft_variants(function, family=family_of[function])
-            except KeyError:
+            outcome = draft_results[function]
+            if isinstance(outcome, KeyError):
                 # Another session replaced this pragma since the target list
                 # was captured; it is no longer ours to attempt.
                 summary[family_of[function]]["vanished"] += 1
                 continue
-            except (OSError, subprocess.SubprocessError) as error:
+            if isinstance(outcome, (OSError, subprocess.SubprocessError)):
                 summary[family_of[function]]["draft_failed"] += 1
-                print(f"{function}: draft error: {error}", file=sys.stderr)
+                print(f"{function}: draft error: {outcome}", file=sys.stderr)
                 continue
+            variants, draft = outcome
             if draft is None:
                 summary[family_of[function]]["draft_failed"] += 1
                 continue
@@ -532,6 +671,8 @@ def sweep(
                 continue
             for label, code in compile_failure_candidates(draft, diagnostics):
                 if label in labels_of[function]:
+                    continue
+                if skip_attempts is not None and (function, label) in skip_attempts:
                     continue
                 key = (function, code)
                 if key in extra_seen:
@@ -655,6 +796,7 @@ def sweep(
         "accepted": accepted_functions,
         "touched_sources": sorted(set(touched_sources)),
         "elapsed_seconds": round(time.monotonic() - started, 1),
+        "draft_seconds": draft_seconds,
         "summary": {family: dict(sorted(counter.items())) for family, counter in sorted(summary.items())},
     }
 
@@ -669,21 +811,30 @@ def main() -> int:
     parser.add_argument("--no-gate", action="store_true", help="probe only; never edit tracked sources")
     parser.add_argument("--workers", type=int)
     parser.add_argument("--json", type=Path, help="write the summary to this file")
-    parser.add_argument("--skip-attempted", action="store_true", help="skip functions that already have m2c sweep attempts in the stats file")
+    parser.add_argument("--skip-attempted", action="store_true", help="skip (function, variant label) pairs that already have m2c sweep attempts in the stats file")
     parser.add_argument("--fragment-range", type=str, help="inclusive fragment band, e.g. 17-32")
-    parser.add_argument("--near-miss", action="store_true", help="permute m2c rejects at similarity >= 0.9")
+    parser.add_argument("--near-miss", action="store_true", help="permute rejects at similarity >= 0.9")
     parser.add_argument("--stats", type=Path, default=targets.STATS_PATH, help="probe stats JSONL for --near-miss")
     parser.add_argument("--near-miss-seconds", type=float, default=45.0)
     parser.add_argument("--near-miss-threads", type=int, default=4)
     parser.add_argument("--near-miss-limit", type=int)
+    parser.add_argument("--near-miss-parallel", type=int, default=1, help="concurrent decomp-permuter budgets")
+    parser.add_argument("--near-miss-labels", type=str, help="comma-separated label prefixes to consider (default: any)")
+    parser.add_argument("--near-miss-retry", action="store_true", help="do not skip owners with an existing permute: attempt")
     args = parser.parse_args()
     if args.near_miss:
+        label_prefixes = tuple(
+            prefix for prefix in (args.near_miss_labels or "").split(",") if prefix
+        ) or None
         result = near_miss(
             stats_path=args.stats,
             seconds=args.near_miss_seconds,
             threads=args.near_miss_threads,
             workers=args.workers,
             limit=args.near_miss_limit,
+            label_prefixes=label_prefixes,
+            skip_permuted=not args.near_miss_retry,
+            parallel=args.near_miss_parallel,
         )
         text = json.dumps(result, indent=2, default=list)
         if args.json:
@@ -702,7 +853,7 @@ def main() -> int:
         limit=args.limit,
         gate=not args.no_gate,
         workers=args.workers,
-        skip_functions=previously_attempted() if args.skip_attempted else None,
+        skip_attempts=previously_attempted_labels() if args.skip_attempted else None,
         fragment_range=fragment_range,
     )
     text = json.dumps(result, indent=2)

@@ -546,6 +546,288 @@ def _function_byte_views(
     return symbol_size, view(symbol_size), view(span)
 
 
+# --- link-shape verification -------------------------------------------------
+#
+# A ``.text`` byte match proves the instruction stream, but not the linked
+# ROM: a C ``switch`` emits a jump table into a new ``.rodata`` section (the
+# baseline keeps its tables in separate data segments, so ``jtbl_*`` symbols
+# are *undefined* in the owner object), and a candidate may reference a
+# different symbol behind identical relocatable bytes.  These helpers compare
+# the allocatable section layout and the function's relocations so that a
+# verified probe hit can skip the per-function ROM gate.
+
+_LINK_SHAPE_SKIP_SECTION_PREFIXES = (
+    ".rel", ".rela", ".mdebug", ".symtab", ".strtab", ".shstrtab", ".options",
+    ".reginfo", ".pdr", ".comment", ".gnu", ".MIPS", ".note", ".debug", ".line",
+)
+_READELF_SECTION_RE = re.compile(
+    r"^\s*\[\s*(\d+)\]\s+(\S+)\s+(\S+)\s+([0-9a-fA-F]{8})\s+([0-9a-fA-F]{6})\s+"
+    r"([0-9a-fA-F]{6})\s+([0-9a-fA-F]{2})\s*([A-Za-z]*)"
+)
+_READELF_SYMBOL_RE = re.compile(
+    r"^\s*(\d+):\s+([0-9a-fA-F]+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s*(.*)$"
+)
+_READELF_RELOC_SECTION_RE = re.compile(r"^Relocation section '([^']+)'")
+_READELF_RELOC_RE = re.compile(r"^([0-9a-fA-F]+)\s+([0-9a-fA-F]+)\s+(R_\w+)")
+
+
+def _readelf(object_path: Path, *flags: str) -> str | None:
+    try:
+        result = subprocess.run(
+            [_binutils_tool("readelf"), *flags, "-W", str(object_path)],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            timeout=_command_timeout("PRAGMA_OBJDUMP_TIMEOUT", 5.0),
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    if result.returncode != 0:
+        return None
+    return result.stdout
+
+
+def _parse_readelf_sections(text: str) -> dict[int, dict[str, object]]:
+    sections: dict[int, dict[str, object]] = {}
+    for line in text.splitlines():
+        match = _READELF_SECTION_RE.match(line)
+        if not match:
+            continue
+        sections[int(match.group(1))] = {
+            "name": match.group(2),
+            "type": match.group(3),
+            "size": int(match.group(6), 16),
+            "flags": match.group(8),
+        }
+    return sections
+
+
+def _parse_readelf_symbols(text: str) -> dict[int, dict[str, object]]:
+    symbols: dict[int, dict[str, object]] = {}
+    for line in text.splitlines():
+        match = _READELF_SYMBOL_RE.match(line)
+        if not match:
+            continue
+        size_text = match.group(3)
+        try:
+            size = int(size_text, 16) if size_text.lower().startswith("0x") else int(size_text)
+        except ValueError:
+            size = 0
+        symbols[int(match.group(1))] = {
+            "value": int(match.group(2), 16),
+            "size": size,
+            "type": match.group(4),
+            "ndx": match.group(7),
+            "name": match.group(8).strip(),
+        }
+    return symbols
+
+
+def _parse_readelf_relocations(text: str) -> dict[str, list[tuple[int, str, int]]]:
+    """Return ``{section: [(offset, type, symbol_index)]}`` from ``readelf -r``."""
+    relocations: dict[str, list[tuple[int, str, int]]] = {}
+    current: str | None = None
+    for line in text.splitlines():
+        header = _READELF_RELOC_SECTION_RE.match(line)
+        if header:
+            current = header.group(1)
+            relocations.setdefault(current, [])
+            continue
+        if current is None:
+            continue
+        match = _READELF_RELOC_RE.match(line)
+        if not match:
+            continue
+        info = int(match.group(2), 16)
+        relocations[current].append((int(match.group(1), 16), match.group(3), info >> 8))
+    return relocations
+
+
+def _object_section_bytes(object_path: Path, section: str) -> bytes | None:
+    with tempfile.TemporaryDirectory(prefix=".pragma_section_") as directory:
+        output = Path(directory) / "section.bin"
+        result = subprocess.run(
+            [_binutils_tool("objcopy"), "--dump-section", f"{section}={output}", str(object_path)],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+        )
+        if result.returncode != 0 or not output.exists():
+            return None
+        return output.read_bytes()
+
+
+def _object_link_shape(object_path: Path) -> dict[str, object] | None:
+    """Return the allocatable sections, symbols, and ``.text`` relocations of an object.
+
+    ``None`` means the view could not be read; callers must then treat the
+    candidate as *unverified* (eligible for the sequential gate), never as a
+    match.
+    """
+    section_text = _readelf(object_path, "-S")
+    symbol_text = _readelf(object_path, "-s")
+    relocation_text = _readelf(object_path, "-r")
+    if section_text is None or symbol_text is None or relocation_text is None:
+        return None
+    sections = _parse_readelf_sections(section_text)
+    allocatable: dict[str, dict[str, object]] = {}
+    for section in sections.values():
+        name = str(section["name"])
+        if "A" not in str(section["flags"]) or name.startswith(_LINK_SHAPE_SKIP_SECTION_PREFIXES):
+            continue
+        entry = dict(section)
+        if name != ".text" and section["type"] == "PROGBITS" and int(section["size"]) > 0:
+            entry["bytes"] = _object_section_bytes(object_path, name)
+        allocatable[name] = entry
+    text = _object_text(object_path)
+    if text is None:
+        return None
+    return {
+        "sections": allocatable,
+        "section_names": {index: str(section["name"]) for index, section in sections.items()},
+        "symbols": _parse_readelf_symbols(symbol_text),
+        "relocations": _parse_readelf_relocations(relocation_text),
+        "text": text,
+    }
+
+
+def _sign_extend_16(value: int) -> int:
+    value &= 0xFFFF
+    return value - 0x10000 if value & 0x8000 else value
+
+
+def _normalized_function_relocations(
+    shape: dict[str, object],
+    start: int,
+    size: int,
+) -> list[tuple[int, str, str, int]]:
+    """Return ``(relative_offset, type, target, addend)`` for ``.text`` relocations in a span.
+
+    Targets are resolved to ``section+value`` so a reference through a local
+    symbol and one through the section symbol compare equal.  In-place (REL)
+    addends are decoded per relocation type; ``HI16`` pairs with the next
+    ``LO16`` against the same symbol.  Intra-``.text`` ``PC16`` branches are
+    dropped: their bytes are already covered by the function-byte compare.
+    """
+    text = shape["text"]
+    assert isinstance(text, bytes)
+    symbols = shape["symbols"]
+    section_names = shape["section_names"]
+    assert isinstance(symbols, dict) and isinstance(section_names, dict)
+    relocations = shape["relocations"]
+    assert isinstance(relocations, dict)
+    entries = [
+        entry for entry in relocations.get(".rel.text", []) + relocations.get(".rela.text", [])
+        if start <= entry[0] < start + size
+    ]
+    entries.sort()
+
+    def word_at(offset: int) -> int:
+        if offset + 4 > len(text):
+            return 0
+        return int.from_bytes(text[offset:offset + 4], "big")
+
+    def target_of(symbol_index: int) -> tuple[str, int]:
+        symbol = symbols.get(symbol_index)
+        if symbol is None:
+            return (f"SYM:{symbol_index}", 0)
+        ndx = str(symbol["ndx"])
+        value = int(symbol["value"])
+        if ndx == "UND":
+            return (f"UND:{symbol['name']}", 0)
+        if ndx.isdigit():
+            return (str(section_names.get(int(ndx), ndx)), value)
+        return (ndx, value)
+
+    normalized: list[tuple[int, str, str, int]] = []
+    for position, (offset, kind, symbol_index) in enumerate(entries):
+        word = word_at(offset)
+        if kind == "R_MIPS_26":
+            addend = (word & 0x3FFFFFF) << 2
+        elif kind == "R_MIPS_32":
+            addend = word
+        elif kind == "R_MIPS_HI16":
+            addend = (word & 0xFFFF) << 16
+            for later_offset, later_kind, later_symbol in entries[position + 1:]:
+                if later_kind == "R_MIPS_LO16" and later_symbol == symbol_index:
+                    addend += _sign_extend_16(word_at(later_offset))
+                    break
+        elif kind in {"R_MIPS_LO16", "R_MIPS_GPREL16", "R_MIPS_LITERAL"}:
+            addend = _sign_extend_16(word)
+        elif kind == "R_MIPS_PC16":
+            addend = _sign_extend_16(word) << 2
+        else:
+            addend = 0
+        section, value = target_of(symbol_index)
+        if kind == "R_MIPS_PC16" and section == ".text":
+            continue
+        normalized.append((offset - start, kind, section, value + addend))
+    return normalized
+
+
+def _compare_link_shape(
+    expected_shape: dict[str, object] | None,
+    actual_shape: dict[str, object] | None,
+    expected_symbol: tuple[int, int] | None,
+    actual_symbol: tuple[int, int] | None,
+) -> dict[str, object]:
+    """Decide whether a ``.text`` match will also link byte-identically.
+
+    Returns ``link_verified`` (``True``/``False``/``None`` for unknown) with a
+    ``link_mismatch`` reason.  ``section_layout_drift`` is *definitive*: an
+    added or resized allocatable section changes the ROM regardless of the
+    instruction bytes.  ``relocation_drift`` is advisory only, so the caller
+    keeps the candidate eligible for the sequential ROM gate.
+    """
+    if expected_shape is None or actual_shape is None or expected_symbol is None or actual_symbol is None:
+        return {"link_verified": None, "link_mismatch": "shape_unavailable"}
+    expected_sections = expected_shape["sections"]
+    actual_sections = actual_shape["sections"]
+    assert isinstance(expected_sections, dict) and isinstance(actual_sections, dict)
+    for name in sorted(set(expected_sections) | set(actual_sections)):
+        expected = expected_sections.get(name)
+        actual = actual_sections.get(name)
+        if expected is None or actual is None:
+            side = "candidate" if expected is None else "baseline"
+            return {
+                "link_verified": False,
+                "link_mismatch": "section_layout_drift",
+                "link_detail": f"section {name} exists only in the {side} object",
+            }
+        if int(expected["size"]) != int(actual["size"]):
+            return {
+                "link_verified": False,
+                "link_mismatch": "section_layout_drift",
+                "link_detail": (
+                    f"section {name} size 0x{int(expected['size']):x} -> 0x{int(actual['size']):x}"
+                ),
+            }
+        if name != ".text" and expected.get("bytes") != actual.get("bytes"):
+            return {
+                "link_verified": False,
+                "link_mismatch": "section_content_drift",
+                "link_detail": f"section {name} bytes differ",
+            }
+    expected_relocations = _normalized_function_relocations(expected_shape, *expected_symbol)
+    actual_relocations = _normalized_function_relocations(actual_shape, *actual_symbol)
+    if expected_relocations != actual_relocations:
+        detail = None
+        for left, right in zip(expected_relocations, actual_relocations):
+            if left != right:
+                detail = f"expected {left} candidate {right}"
+                break
+        if detail is None:
+            detail = (
+                f"relocation count {len(expected_relocations)} -> {len(actual_relocations)}"
+            )
+        return {
+            "link_verified": False,
+            "link_mismatch": "relocation_drift",
+            "link_detail": detail,
+        }
+    return {"link_verified": True, "link_mismatch": None}
+
+
 def _is_nop(word: int) -> bool:
     return word == 0
 
@@ -863,8 +1145,28 @@ def _probe_one(
     function: str,
     candidate: str,
     expected: bytes | None,
+    expected_shape: dict[str, object] | None = None,
 ) -> dict[str, object]:
-    """Compile one candidate in an isolated temporary source/object pair."""
+    """Compile one candidate in an isolated temporary source/object pair.
+
+    ``expected_shape`` is the baseline object's link shape; when given, a
+    ``.text`` match is additionally checked for section-layout and relocation
+    drift and reports ``link_verified``.  Without it the result carries
+    ``link_verified: None`` and stays on the sequential-gate path.
+    """
+    started = time.monotonic()
+    result = _probe_one_uncounted(source_path, function, candidate, expected, expected_shape)
+    result["probe_seconds"] = round(time.monotonic() - started, 3)
+    return result
+
+
+def _probe_one_uncounted(
+    source_path: Path,
+    function: str,
+    candidate: str,
+    expected: bytes | None,
+    expected_shape: dict[str, object] | None,
+) -> dict[str, object]:
     baseline = source_path.read_text()
     replacement = _replace_candidate_text(baseline, function, candidate)
     if replacement is None:
@@ -927,11 +1229,60 @@ def _probe_one(
                     )
                 )
                 return diagnostic
-            return {"status": "probe_match"}
+            match: dict[str, object] = {"status": "probe_match", "link_verified": None}
+            if expected_shape is not None:
+                actual_shape = _object_link_shape(object_path)
+                expected_span = _shape_symbol(expected_shape, function)
+                actual_span = (
+                    _shape_symbol(actual_shape, function) if actual_shape is not None else None
+                )
+                verdict = _compare_link_shape(
+                    expected_shape, actual_shape, expected_span, actual_span
+                )
+                if verdict.get("link_mismatch") == "section_layout_drift":
+                    # Definitive: the candidate adds or resizes an allocatable
+                    # section, so the linked ROM cannot be byte-identical even
+                    # though the instruction bytes are.
+                    diagnostic = {
+                        "status": "probe_rejected",
+                        "probe_reason": "section_layout_drift",
+                        "comparison_span_size": len(actual),
+                        "comparison_span_complete": comparison_span_complete,
+                    }
+                    diagnostic.update(
+                        _function_mismatch_details(
+                            object_path,
+                            function,
+                            expected,
+                            actual_symbol,
+                            actual_symbol_size=actual_symbol_size,
+                        )
+                    )
+                    diagnostic["mismatch_kind"] = "section_layout_drift"
+                    diagnostic.update(verdict)
+                    return diagnostic
+                match.update(verdict)
+            return match
         finally:
             _remove_probe_outputs(object_path)
     finally:
         temporary_directory.cleanup()
+
+
+def _shape_symbol(shape: dict[str, object] | None, function: str) -> tuple[int, int] | None:
+    """Return ``(offset, size)`` of a defined ``.text`` function from a link shape."""
+    if shape is None:
+        return None
+    symbols = shape["symbols"]
+    section_names = shape["section_names"]
+    assert isinstance(symbols, dict) and isinstance(section_names, dict)
+    for symbol in symbols.values():
+        if symbol["name"] != function or symbol["type"] != "FUNC":
+            continue
+        ndx = str(symbol["ndx"])
+        if ndx.isdigit() and section_names.get(int(ndx)) == ".text":
+            return int(symbol["value"]), max(int(symbol.get("size") or 0), 4)
+    return None
 
 
 def probe_candidates(
@@ -955,7 +1306,7 @@ def probe_candidates(
             result["probe_reason"] = "baseline_object_unavailable"
         return results
 
-    if rebuild_source_object(source_path) != 0:
+    if not _ensure_baseline_object(source_path, baseline_object):
         for result in results:
             result["probe_reason"] = "baseline_object_unavailable"
         return results
@@ -966,12 +1317,19 @@ def probe_candidates(
     for index, (function, _) in enumerate(blocks):
         if expected[function] is None:
             results[index]["probe_reason"] = "missing_function_bytes"
+    # Read the baseline link shape once per batch; every probe hit compares
+    # against it so verified matches can share one combined ROM gate.
+    expected_shape = (
+        _object_link_shape(baseline_object)
+        if any(value is not None for value in expected.values())
+        else None
+    )
 
     workers = _resolve_probe_workers(workers, len(blocks))
     with ThreadPoolExecutor(max_workers=workers) as executor:
         futures = {
             executor.submit(
-                _probe_one, source_path, function, candidate, expected[function]
+                _probe_one, source_path, function, candidate, expected[function], expected_shape
             ): index
             for index, (function, candidate) in enumerate(blocks)
             if expected[function] is not None
@@ -990,6 +1348,41 @@ def probe_candidates(
             results[index]["index"] = index
             results[index]["function"] = blocks[index][0]
     return results
+
+
+_BASELINE_OBJECT_STATE: dict[Path, tuple[int, int]] = {}
+_BASELINE_OBJECT_LOCK = threading.Lock()
+
+
+def _ensure_baseline_object(source_path: Path, object_path: Path) -> bool:
+    """Rebuild the tracked baseline object unless this process already did so.
+
+    Every probe pass used to pay a full ``make`` for the baseline object even
+    when nothing had changed since the previous pass (a sweep runs two probe
+    passes per source).  The object is considered fresh only when both the
+    source and object mtimes still equal the values recorded after the last
+    successful rebuild in this process, so any live-source edit (ours or
+    another process's) invalidates the entry.
+    """
+    key = source_path.resolve()
+    try:
+        current = (source_path.stat().st_mtime_ns, object_path.stat().st_mtime_ns)
+    except OSError:
+        current = None
+    with _BASELINE_OBJECT_LOCK:
+        if current is not None and _BASELINE_OBJECT_STATE.get(key) == current:
+            return True
+    if rebuild_source_object(source_path) != 0:
+        with _BASELINE_OBJECT_LOCK:
+            _BASELINE_OBJECT_STATE.pop(key, None)
+        return False
+    try:
+        fresh = (source_path.stat().st_mtime_ns, object_path.stat().st_mtime_ns)
+    except OSError:
+        return True
+    with _BASELINE_OBJECT_LOCK:
+        _BASELINE_OBJECT_STATE[key] = fresh
+    return True
 
 
 def _resolve_probe_workers(workers: int | None, candidate_count: int) -> int:
@@ -1065,6 +1458,7 @@ def _record_probe_stats(
     labels: list[str | None] | None,
     blocks: list[tuple[str, str]] | None = None,
     declarations: str | None = None,
+    timing: dict[str, object] | None = None,
 ) -> None:
     """Append JSONL probe outcomes for family-level tuning.
 
@@ -1107,6 +1501,9 @@ def _record_probe_stats(
                 "similarity_score": attempt.get("similarity_score"),
                 "exact_similarity_score": attempt.get("exact_similarity_score"),
                 "similarity_rank": attempt.get("similarity_rank"),
+                "link_verified": attempt.get("link_verified"),
+                "link_mismatch": attempt.get("link_mismatch"),
+                "probe_seconds": attempt.get("probe_seconds"),
                 "diagnostic": attempt.get("diagnostic"),
                 "declarations": declarations,
                 "candidate": (
@@ -1122,6 +1519,7 @@ def _record_probe_stats(
             handle.write(json.dumps({
                 "source": source_path.as_posix(),
                 "counts": counts,
+                "timing": timing,
                 "attempts": rows,
             }, sort_keys=True) + "\n")
     except OSError:
@@ -1183,6 +1581,7 @@ def try_candidates_detailed(
             labels,
             blocks,
             declarations,
+            timing=result.get("timing") if isinstance(result.get("timing"), dict) else None,
         )
         return result
 
@@ -1212,13 +1611,28 @@ def _try_candidates_detailed_unlocked(
     accepted_indices: dict[str, int] = {}
     _cleanup_stale_probe_dirs(repo_root)
     probe_workers = _resolve_probe_workers(probe_workers, len(blocks))
+    started = time.monotonic()
     attempts = probe_candidates(source_path, blocks, workers=probe_workers)
+    probe_seconds = time.monotonic() - started
     if labels is not None:
         for index, attempt in enumerate(attempts):
             if index < len(labels) and labels[index]:
                 attempt["label"] = labels[index]
 
     rejection_rankings = _rank_probe_rejections(attempts, blocks)
+    timing: dict[str, object] = {
+        "probe_seconds": round(probe_seconds, 3),
+        "gate_seconds": 0.0,
+        "gate_runs": 0,
+        "gate_mode": None,
+    }
+
+    def finish(payload: dict[str, object]) -> dict[str, object]:
+        timing["total_seconds"] = round(time.monotonic() - started, 3)
+        payload["timing"] = dict(timing)
+        payload.setdefault("rejected_ranking", rejection_rankings)
+        payload.setdefault("probe_workers", probe_workers)
+        return payload
 
     if not gate:
         probe_matches = [
@@ -1226,43 +1640,145 @@ def _try_candidates_detailed_unlocked(
             for attempt in attempts
             if attempt.get("status") == "probe_match"
         ]
-        return {
+        return finish({
             "status": 0 if probe_matches else 1,
             "accepted": [],
             "probe_matches": probe_matches,
             "attempts": attempts,
-            "rejected_ranking": rejection_rankings,
             "batch_status": "probe_only",
-            "probe_workers": probe_workers,
             "gate": False,
-        }
+        })
 
-    # Fall back only for the affected function when its baseline bytes cannot
-    # be inspected.  A missing symbol in one owner must not send every other
-    # function's rejected variants through the expensive full gate.
-    eligible = [index for index, attempt in enumerate(attempts) if _full_gate_eligible(attempt)]
-    for index in eligible:
-        function, candidate = blocks[index]
-        attempt = attempts[index]
-        if function in accepted:
-            print(f"SKIPPED {function}: earlier candidate accepted")
-            attempt.update({
-                "status": "skipped",
-                "reason": "earlier candidate accepted",
-            })
-            continue
+    gate_started = time.monotonic()
+
+    def run_full_gate() -> int:
+        timing["gate_runs"] = int(timing["gate_runs"]) + 1
+        return compare_current_tree(repo_root)
+
+    def restore_baseline() -> None:
         source_path.write_text(baseline)
         os.utime(source_path, None)
         rebuild_source_object(source_path)
+
+    def sequential_attempt(index: int) -> None:
+        """Gate one candidate alone against the baseline tree (historical path)."""
+        function, candidate = blocks[index]
+        attempt = attempts[index]
+        source_path.write_text(baseline)
+        os.utime(source_path, None)
+        rebuild_source_object(source_path)
+        timing["gate_runs"] = int(timing["gate_runs"]) + 1
         result, outcome = _try_candidate_detailed(source_path, function, candidate)
         attempt.update({
             "status": outcome,
             "exit_code": result,
-            "probe_status": attempt.get("status"),
+            "probe_status": attempt.get("probe_status", attempt.get("status")),
         })
         if result == 0:
             accepted[function] = candidate
             accepted_indices[function] = index
+
+    # Candidate order still decides the first winner per function.  A
+    # link-verified probe hit (identical function bytes, section layout, and
+    # relocations) is deferred to one combined ROM gate; an unverified hit or
+    # a baseline-unavailable fallback keeps the historical sequential gate.
+    # A missing symbol in one owner must not send every other function's
+    # rejected variants through the expensive full gate.
+    pending: dict[str, int] = {}
+    deferred: dict[str, list[int]] = {}
+    for index, attempt in enumerate(attempts):
+        if not _full_gate_eligible(attempt):
+            continue
+        function = blocks[index][0]
+        if function in accepted:
+            print(f"SKIPPED {function}: earlier candidate accepted")
+            attempt.update({
+                "probe_status": attempt.get("status"),
+                "status": "skipped",
+                "reason": "earlier candidate accepted",
+            })
+            continue
+        if function in pending:
+            # Later eligible variants stay untried until the combined gate
+            # has judged the earlier hit; they are only skipped once a
+            # winner exists, exactly as in the sequential runner.
+            deferred.setdefault(function, []).append(index)
+            continue
+        if attempt.get("status") == "probe_match" and attempt.get("link_verified") is True:
+            pending[function] = index
+            continue
+        sequential_attempt(index)
+
+    def install_combined(winners: dict[str, str]) -> str | None:
+        combined = baseline
+        for install_index, (function, candidate) in enumerate(winners.items()):
+            # Shared declarations are installed once, ahead of the first
+            # accepted replacement; later winners in the same batch drop the
+            # prefix.
+            if prefix and install_index and candidate.startswith(prefix):
+                candidate = candidate[len(prefix):]
+            pragma = re.compile(
+                rf'^#pragma GLOBAL_ASM\("asm/us/nonmatchings/[^"]+/{re.escape(function)}\.s"\)$',
+                re.MULTILINE,
+            )
+            combined, count = pragma.subn(candidate.rstrip("\n"), combined, count=1)
+            if count != 1:
+                return None
+        return combined
+
+    def mark_pending(status: str, exit_code: int) -> None:
+        for function, index in pending.items():
+            attempt = attempts[index]
+            attempt.update({
+                "probe_status": attempt.get("status"),
+                "status": status,
+                "exit_code": exit_code,
+            })
+            if exit_code == 0:
+                accepted[function] = blocks[index][1]
+                accepted_indices[function] = index
+
+    gate_mode = "sequential"
+    if pending:
+        gate_mode = "combined"
+        winners = dict(accepted)
+        winners.update({function: blocks[index][1] for function, index in pending.items()})
+        combined = install_combined(winners)
+        if combined is None:
+            restore_baseline()
+            timing["gate_seconds"] = round(time.monotonic() - gate_started, 3)
+            timing["gate_mode"] = gate_mode
+            return finish({
+                "status": 2,
+                "accepted": [],
+                "attempts": attempts,
+                "batch_status": "invalid_pragma",
+                "gate": True,
+            })
+        source_path.write_text(combined)
+        os.utime(source_path, None)
+        compiled = rebuild_source_object(source_path) == 0
+        if compiled:
+            print(f"checking {len(winners)} candidate(s) together ({len(pending)} link-verified)")
+            result = run_full_gate()
+        else:
+            result = 2
+        if result == 0:
+            mark_pending("accepted", 0)
+        else:
+            # The combined tree failed: fall back to the historical per-function
+            # gate for the verified hits so one bad candidate cannot sink the
+            # rest of the batch.  ``link_verified`` stays recorded so the stats
+            # show when the shape check disagreed with the linker.
+            gate_mode = "combined_then_sequential"
+            print("combined candidate batch rejected: gating link-verified hits individually")
+            for function, index in list(pending.items()):
+                sequential_attempt(index)
+                for later_index in deferred.get(function, []):
+                    if function in accepted:
+                        break
+                    sequential_attempt(later_index)
+            pending.clear()
 
     # Probes are intentionally parallel, so variants after a winner may have
     # already compiled.  Report them as skipped for the same user-facing
@@ -1279,105 +1795,52 @@ def _try_candidates_detailed_unlocked(
                     "reason": "earlier candidate accepted",
                 })
 
+    timing["gate_mode"] = gate_mode
+
+    def gated_payload(status: int, batch_status: str, names: list[str]) -> dict[str, object]:
+        timing["gate_seconds"] = round(time.monotonic() - gate_started, 3)
+        return finish({
+            "status": status,
+            "accepted": names,
+            "attempts": attempts,
+            "batch_status": batch_status,
+            "gate": True,
+        })
+
     # No probe hit means no source edit was made and no linker invocation is
     # necessary.  This is the main speedup for large rejected candidate sets.
-    fallback_eligible = any(
-        attempt.get("status") == "probe_unavailable"
-        and attempt.get("probe_reason")
-        in {"baseline_object_unavailable", "missing_function_bytes"}
-        for attempt in attempts
-    )
-    if not accepted and not fallback_eligible:
-        return {
-            "status": 1,
-            "accepted": [],
-            "attempts": attempts,
-            "rejected_ranking": rejection_rankings,
-            "batch_status": "no_candidate_accepted",
-            "probe_workers": probe_workers,
-            "gate": True,
-        }
+    if not accepted:
+        if int(timing["gate_runs"]) > 0:
+            # A sequential attempt left the live source at the baseline, but
+            # its restore path may have been interrupted; make it explicit.
+            restore_baseline()
+            print("no candidate accepted")
+        return gated_payload(1, "no_candidate_accepted", [])
 
-    combined = baseline
-    for install_index, (function, candidate) in enumerate(accepted.items()):
-        # Shared declarations are installed once, ahead of the first accepted
-        # replacement; later winners in the same batch drop the prefix.
-        if prefix and install_index and candidate.startswith(prefix):
-            candidate = candidate[len(prefix):]
-        pragma = re.compile(
-            rf'^#pragma GLOBAL_ASM\("asm/us/nonmatchings/[^"]+/{re.escape(function)}\.s"\)$',
-            re.MULTILINE,
-        )
-        combined, count = pragma.subn(candidate.rstrip("\n"), combined, count=1)
-        if count != 1:
-            source_path.write_text(baseline)
-            os.utime(source_path, None)
-            rebuild_source_object(source_path)
-            return {
-                "status": 2,
-                "accepted": [],
-                "attempts": attempts,
-                "rejected_ranking": rejection_rankings,
-                "batch_status": "invalid_pragma",
-                "probe_workers": probe_workers,
-                "gate": True,
-            }
+    combined = install_combined(accepted)
+    if combined is None:
+        restore_baseline()
+        return gated_payload(2, "invalid_pragma", [])
+    if source_path.read_text() == combined and gate_mode == "combined" and pending:
+        # The combined tree is exactly what the ROM gate just verified.
+        return gated_payload(0, "accepted", list(accepted))
     source_path.write_text(combined)
     os.utime(source_path, None)
     if rebuild_source_object(source_path) != 0:
-        source_path.write_text(baseline)
-        os.utime(source_path, None)
-        rebuild_source_object(source_path)
-        return {
-            "status": 2,
-            "accepted": [],
-            "attempts": attempts,
-            "rejected_ranking": rejection_rankings,
-            "batch_status": "combined_compile_failed",
-            "probe_workers": probe_workers,
-            "gate": True,
-        }
-    if accepted:
+        restore_baseline()
+        return gated_payload(2, "combined_compile_failed", [])
+    sequential_winners = len(accepted) - len(pending)
+    if sequential_winners >= 2 or (pending and gate_mode != "combined"):
+        # Sequential winners were each verified against the baseline alone;
+        # only their union still needs one combined ROM gate.  A single
+        # sequential winner was already gated in exactly this source text.
         print(f"checking {len(accepted)} accepted candidate(s) together")
-        result = compare_current_tree(repo_root)
+        result = run_full_gate()
         if result != 0:
-            source_path.write_text(baseline)
-            os.utime(source_path, None)
-            rebuild_source_object(source_path)
+            restore_baseline()
             print("combined candidate batch rejected: restored baseline")
-            return {
-                "status": result,
-                "accepted": [],
-                "attempts": attempts,
-                "rejected_ranking": rejection_rankings,
-                "batch_status": "combined_compare_rejected",
-                "probe_workers": probe_workers,
-                "gate": True,
-            }
-    else:
-        source_path.write_text(baseline)
-        os.utime(source_path, None)
-        rebuild_source_object(source_path)
-        compare_current_tree(repo_root)
-        print("no candidate accepted")
-        return {
-            "status": 1,
-            "accepted": [],
-            "attempts": attempts,
-            "rejected_ranking": rejection_rankings,
-            "batch_status": "no_candidate_accepted",
-            "probe_workers": probe_workers,
-            "gate": True,
-        }
-    return {
-        "status": 0,
-        "accepted": list(accepted),
-        "attempts": attempts,
-        "rejected_ranking": rejection_rankings,
-        "batch_status": "accepted",
-        "probe_workers": probe_workers,
-        "gate": True,
-    }
+            return gated_payload(result, "combined_compare_rejected", [])
+    return gated_payload(0, "accepted", list(accepted))
 
 
 def try_candidates(source_path: Path, blocks: list[tuple[str, str]]) -> tuple[int, list[str]]:

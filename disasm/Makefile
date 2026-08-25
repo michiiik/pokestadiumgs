@@ -272,7 +272,7 @@ define print
 endef
 
 DECOMP_POKESTADIUMGS := $(filter-out src/libleo/%,$(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.c)))
-DECOMP_POKESTADIUMGS_FILTERED := $(patsubst %.c,%.o,$(addprefix build/,$(shell find $(DECOMP_POKESTADIUMGS) -type f -exec grep -l "GLOBAL_ASM" {} \;)))
+DECOMP_POKESTADIUMGS_FILTERED := $(patsubst %.c,%.o,$(addprefix build/,$(shell grep -l "GLOBAL_ASM" $(DECOMP_POKESTADIUMGS))))
 
 # only run asm processor on files that need it.
 $(DECOMP_POKESTADIUMGS_FILTERED): CC := $(ASM_PROC) $(ASM_PROC_FLAGS) $(CC) -- $(AS) $(ASFLAGS) --

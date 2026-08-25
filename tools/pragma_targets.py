@@ -28,6 +28,7 @@ import json
 import os
 import re
 import subprocess
+import threading
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -214,6 +215,16 @@ def list_targets(
     }
 
 
+_CONTEXT_CACHE_LOCK = threading.Lock()
+_CONTEXT_CACHE_PATH_LOCKS: dict[Path, threading.Lock] = {}
+
+
+def _context_cache_lock(cache_path: Path) -> threading.Lock:
+    """One lock per cache file: pooled drafts of the same source must not race."""
+    with _CONTEXT_CACHE_LOCK:
+        return _CONTEXT_CACHE_PATH_LOCKS.setdefault(cache_path, threading.Lock())
+
+
 def preprocessed_context(owner: Owner, *, refresh: bool = False) -> Path | None:
     """Return a cached, host-preprocessed copy of the owner's source.
 
@@ -227,6 +238,13 @@ def preprocessed_context(owner: Owner, *, refresh: bool = False) -> Path | None:
         return None
     source_rel = owner.source_path.relative_to(DISASM_ROOT)
     cache_path = CONTEXT_CACHE_ROOT / source_rel.with_suffix(".ctx.c")
+    with _context_cache_lock(cache_path):
+        return _refresh_preprocessed_context(owner, check, source_rel, cache_path, refresh)
+
+
+def _refresh_preprocessed_context(
+    owner: Owner, check: list[str], source_rel: Path, cache_path: Path, refresh: bool
+) -> Path | None:
     try:
         if (
             not refresh
@@ -252,7 +270,11 @@ def preprocessed_context(owner: Owner, *, refresh: bool = False) -> Path | None:
     if result.returncode != 0:
         return None
     cache_path.parent.mkdir(parents=True, exist_ok=True)
-    cache_path.write_text(result.stdout, encoding="utf-8")
+    # Write atomically: another thread's m2c may already be reading the
+    # previous context for this source.
+    temporary = cache_path.with_name(cache_path.name + f".{os.getpid()}.{threading.get_ident()}.tmp")
+    temporary.write_text(result.stdout, encoding="utf-8")
+    os.replace(temporary, cache_path)
     return cache_path
 
 
