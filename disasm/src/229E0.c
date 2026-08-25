@@ -2748,7 +2748,14 @@ extern s32 D_80126520; void func_800403B0(void) { D_80126520 += 0xC; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80041F14.s")
+s32 func_80002984(s32, s32);
+s32 func_8000484C(s32, s32, s32, s32);
+extern s32 D_80126F28;
+extern s32 D_80126F2C;
+void func_80041F14(void) {
+    D_80126F28 = func_8000484C(func_800356CC(8), 0, 1, 1);
+    D_80126F2C = func_80002984(0xF000, 1);
+}
 #endif
 
 #ifdef VERSION_US

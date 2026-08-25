@@ -34,5 +34,19 @@ void func_86C00070(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/62/fragment62_code/func_86C001CC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/62/fragment62_code/func_86C002C4.s")
+s32 func_81A00074(u8 *, s32);
+extern s8 D_86C00320;
+extern s8 D_86C00330;
+extern s8 D_86C00340;
+s32 func_86C002C4(void) {
+    s32 sp18;
+    s32 temp_v0;
+
+    osSyncPrintf(&D_86C00320);
+    temp_v0 = func_81A00074(D_86C00350, 0);
+    sp18 = temp_v0;
+    osSyncPrintf(&D_86C00330, temp_v0);
+    osSyncPrintf(&D_86C00340);
+    return temp_v0;
+}
 #endif

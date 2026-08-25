@@ -145,7 +145,19 @@ void func_87E015F4(s32 arg0, s32 arg1) {
     func_87C03B60(D_87E1BA20 + 0x3074, arg0, arg1);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_303990/func_87E01628.s")
+extern void func_87F02340(s32 *);
+extern u8 D_80126420;
+extern u8 D_87E1B9C0;
+extern u8 D_87E1B9D8;
+extern u8 D_87E1B9F0;
+extern u8 D_87E1BA08;
+void func_87E01628(void) {
+    func_87F02340(&D_80126420);
+    func_87F02340(&D_87E1B9C0);
+    func_87F02340(&D_87E1B9D8);
+    func_87F02340(&D_87E1B9F0);
+    func_87F02340(&D_87E1BA08);
+}
 
 u8 *func_87E0167C(void) {
     return D_87E1BA20 + 0x2234;

@@ -147,7 +147,21 @@ void func_86B01720(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/61/fragment61_code/func_86B081B4.s")
+extern void func_87F0277C(s32 *);
+extern u8 D_86B0E1A8;
+extern u8 D_86B0E7F8;
+extern u8 D_86B0E9A0;
+extern u8 D_86B0EE60;
+extern u8 D_86B12AD0;
+extern u8 D_86B13A68;
+void func_86B081B4(void) {
+    func_87F0277C(&D_86B0E9A0);
+    func_87F0277C(&D_86B0EE60);
+    func_87F0277C(&D_86B12AD0);
+    func_87F0277C(&D_86B13A68);
+    func_87F0277C(&D_86B0E1A8);
+    func_87F0277C(&D_86B0E7F8);
+}
 #endif
 
 #ifdef VERSION_US

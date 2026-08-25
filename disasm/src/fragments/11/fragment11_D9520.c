@@ -75,7 +75,16 @@ void func_816031AC(void) {
     func_81602DD8();
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_816031F4.s")
+void func_816031F4(void) {
+    func_8004C4B0(0xF);
+    func_8004C4B0(7);
+    func_8004C4B0(0x17);
+    func_8004C8C0(0x30);
+    func_8004C8C0(0x39);
+    func_8004C8C0(0x11B);
+    func_8004C8C0(0x9F);
+    func_81602DD8();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_8160324C.s")
 
