@@ -2,7 +2,11 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA10/func_80069E10.s")
+void func_80069E10(void) {}
+void func_80069E10_padding(void) {}
+void func_80069E10_padding2(void) {}
+void func_80069E10_padding3(void) {}
+void func_80069E10_padding4(void) {}
 
 extern void _bzero(void *, s32);
 extern void main_pool_push_state(s32);

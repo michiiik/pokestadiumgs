@@ -70,7 +70,13 @@ void func_8000D880(u8 *arg0, s32 arg1, s32 arg2) { *(u32 *)(arg0 + 0) = ((u32)ar
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/CE80/func_8000D8A0.s")
+void func_8000D8A0(void) {}
+void func_8000D8A0_padding(void) {}
+void func_8000D8A0_padding2(void) {}
+void func_8000D8A0_padding3(void) {}
+void func_8000D8A0_padding4(void) {}
+void func_8000D8A0_padding5(void) {}
+void func_8000D8A0_padding6(void) {}
 #endif
 
 #ifdef VERSION_US
@@ -168,7 +174,14 @@ void func_8000DA7C(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/CE80/func_8000DAA8.s")
+void func_8000DAA8(void) {}
+void func_8000DAA8_padding(void) {}
+void func_8000DAA8_padding2(void) {}
+void func_8000DAA8_padding3(void) {}
+void func_8000DAA8_padding4(void) {}
+void func_8000DAA8_padding5(void) {}
+void func_8000DAA8_padding6(void) {}
+void func_8000DAA8_padding7(void) {}
 #endif
 
 #ifdef VERSION_US

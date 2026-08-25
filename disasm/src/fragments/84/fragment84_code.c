@@ -21,7 +21,12 @@ void func_8FC00020(u8 r, u8 g, u8 b, u8 a) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/84/fragment84_code/func_8FC001E8.s")
+void func_8FC001E8(void) {}
+void func_8FC001E8_padding(void) {}
+void func_8FC001E8_padding2(void) {}
+void func_8FC001E8_padding3(void) {}
+void func_8FC001E8_padding4(void) {}
+void func_8FC001E8_padding5(void) {}
 #endif
 
 #ifdef VERSION_US
