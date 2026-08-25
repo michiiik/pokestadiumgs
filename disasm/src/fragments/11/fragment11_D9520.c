@@ -114,13 +114,17 @@ void func_816054FC(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81605598.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81605908.s")
+extern void func_8160551C(s32, s32, s32, s32);
+extern void func_81605598(s32, s32, s32, s32, s32);
+void func_81605908(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) { func_8160551C(arg0, arg1, arg2, arg3); func_81605598(arg0, arg1, arg2, arg3, arg4); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81605950.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_816059CC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81605CDC.s")
+extern void func_81605950(s32, s32, s32, s32);
+extern void func_816059CC(s32, s32, s32, s32, s32);
+void func_81605CDC(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) { func_81605950(arg0, arg1, arg2, arg3); func_816059CC(arg0, arg1, arg2, arg3, arg4); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81605D24.s")
 

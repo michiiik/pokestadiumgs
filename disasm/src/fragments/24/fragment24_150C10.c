@@ -217,7 +217,9 @@ void func_82B0284C(u8 *arg0, u8 *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B03934.s")
+extern s32 func_8004C990(s32, s32);
+extern void func_8004B35C(s32, s32, s32, s32, s32);
+void func_82B03934(s32 arg0, s32 arg1) { s32 temp = func_8004C990(0x156, 0); func_8004B35C(arg0, arg1, 0x78, 0x20, temp); }
 #endif
 
 #ifdef VERSION_US

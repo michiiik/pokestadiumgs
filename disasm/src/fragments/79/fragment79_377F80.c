@@ -102,9 +102,16 @@ void func_84109848(s32 arg0) {
     func_84109630(D_84190194, arg0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_84109884.s")
+void func_84109884(s32 arg0) {
+    func_8411DCCC(D_84190198, arg0);
+    func_84109630(D_84190198, arg0);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_841098C0.s")
+extern u8 *D_8419019C;
+void func_841098C0(s32 arg0) {
+    func_8411DCCC(D_8419019C, arg0);
+    func_84109630(D_8419019C, arg0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_841098FC.s")
 
