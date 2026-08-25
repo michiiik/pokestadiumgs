@@ -66,7 +66,12 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/84/fragment84_code/func_8FC00F34.s")
+void func_8FC00F34(u8 *arg0, s32 arg1) {
+    s32 *ptr = &arg1;
+    s32 high = arg1 >> 8;
+    arg0[0] = (u8)arg1;
+    arg0[1] = (u8)((high & 0xFFFF) & 0xFFFF);
+}
 #endif
 
 #ifdef VERSION_US

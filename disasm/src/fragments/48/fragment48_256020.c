@@ -10,7 +10,12 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C00120.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C00144.s")
+void *func_87C00144(void *arg0) {
+    (*(f64 *)((u8 *)arg0 + 0x10)) = 0.0;
+    (*(f64 *)((u8 *)arg0 + 8)) = 0.0;
+    (*(f64 *)((u8 *)arg0 + 0)) = 0.0;
+    return arg0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C00160.s")
 

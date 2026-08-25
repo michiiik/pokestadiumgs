@@ -26,7 +26,13 @@ extern u8 D_8009E1C4[]; s32 func_8006DDB0(s16 *arg0,s32 arg1){s16 v=arg0[arg1]; 
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_8006DDE8.s")
+extern s16 D_8009DFC0[];
+s16 func_8006DDE8(s16 *arg0, s32 arg1) {
+    s16 *table = D_8009DFC0;
+    s16 value = arg0[arg1];
+    s16 result = table[value];
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
@@ -34,7 +40,13 @@ extern u8 D_8009E1C4[]; s32 func_8006DDB0(s16 *arg0,s32 arg1){s16 v=arg0[arg1]; 
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_8006DE34.s")
+extern s16 D_8009E7D0[];
+s16 func_8006DE34(s16 *arg0, s32 arg1) {
+    s16 *table = D_8009E7D0;
+    s16 value = arg0[arg1];
+    s16 result = table[value];
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
