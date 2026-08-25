@@ -843,7 +843,9 @@ void func_8005EE4C(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005F3B0.s")
+void func_8005F3B0(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+    func_8005F190(arg0 & 0xFF, arg1, arg2, arg3, arg4, 0);
+}
 #endif
 
 #ifdef VERSION_US
