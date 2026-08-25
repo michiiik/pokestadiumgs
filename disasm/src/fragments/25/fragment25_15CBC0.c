@@ -41,9 +41,9 @@ f32 func_82102C98(u8 *arg0) {
     return x * x + y * y;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15CBC0/func_82102CB4.s")
+f32 func_82102CB4(u8 *arg0, u8 *arg1) { f32 x = *(f32 *)(arg0 + 0) - *(f32 *)(arg1 + 0); f32 y = *(f32 *)(arg0 + 4) - *(f32 *)(arg1 + 4); return sqrtf(x * x + y * y); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15CBC0/func_82102CE4.s")
+f32 func_82102CE4(u8 *arg0, u8 *arg1) { f32 x = *(f32 *)(arg0 + 0) - *(f32 *)(arg1 + 0); f32 y = *(f32 *)(arg0 + 4) - *(f32 *)(arg1 + 4); return x * x + y * y; }
 
 extern void func_821028E0(f32, f32);
 void func_82102D10(f32 *arg0) {

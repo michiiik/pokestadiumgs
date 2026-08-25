@@ -71,7 +71,30 @@ s16 func_810006C4(Func810006C4Table *arg0, u32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_15EA30/func_810020E0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_15EA30/func_810023AC.s")
+typedef struct { s16 first; s16 second; } Func810023ACRangeA;
+typedef struct { u8 pad[0x44]; void *flag; s32 value; } Func810023ACContextA;
+typedef struct { u8 pad[0x7F]; u8 value; } Func810023ACInputA;
+extern s32 func_84100054(u8 *, s32);
+s32 func_810023AC(Func810023ACRangeA *arg0, u8 *arg1, Func810023ACContextA *arg2) {
+    s32 result = 0;
+    Func810023ACRangeA *range = *(Func810023ACRangeA **)((u8 *)arg0 + 4);
+    if (range != NULL) {
+        s16 denominator = range->second;
+        s16 selector = range->first;
+        if (denominator == 0) {
+            if (arg1 != NULL && func_84100054(arg1, 0x100) != 0) {
+                result = ((Func810023ACInputA *)arg1)->value / selector;
+            } else {
+                result = func_81000180(selector);
+            }
+        } else if (arg2 != NULL && arg2->flag != NULL) {
+            result = (arg2->value >> 16) / selector;
+        } else if (arg1 != NULL) {
+            result = ((Func810023ACInputA *)arg1)->value / selector;
+        }
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_15EA30/func_810024E0.s")
 
