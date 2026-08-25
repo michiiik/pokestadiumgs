@@ -31,10 +31,12 @@ import difflib
 import hashlib
 import json
 import re
+import shlex
 import shutil
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 from contextlib import contextmanager
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -165,19 +167,9 @@ def _timeout_output(error: subprocess.TimeoutExpired) -> str:
     return str(output or "")
 
 
-def _make_object(source_path: Path, *, capture: bool = False) -> tuple[int, Path, str]:
-    """Compile one source file through the repository's normal object rule.
-
-    Probe sources live below a hidden temporary directory next to the real
-    source.  Their object/dependency files therefore have unique paths and do
-    not contend with another probe or alter the tracked source.
-    """
-    repo_root = Path(__file__).resolve().parent.parent
-    relative = source_path.resolve().relative_to(repo_root / "disasm")
-    object_path = repo_root / "disasm" / "build" / relative.with_suffix(".o")
-    object_path.parent.mkdir(parents=True, exist_ok=True)
-    object_path.unlink(missing_ok=True)
-    env = {
+def _object_build_environment() -> dict[str, str]:
+    """Environment shared by Makefile object builds and captured probe recipes."""
+    return {
         **os.environ,
         "MIPS_BINUTILS_PREFIX": os.environ.get(
             "MIPS_BINUTILS_PREFIX", "/Users/michaegg/homebrew/bin/mips-linux-gnu-"
@@ -187,19 +179,132 @@ def _make_object(source_path: Path, *, capture: bool = False) -> tuple[int, Path
         "OBJDUMP_BUILD": "0",
         "COLOR": "0",
     }
-    kwargs: dict[str, object] = {"cwd": repo_root, "env": env, "text": True}
+
+
+# Placeholder paths (relative to ``disasm/``) used to capture the Makefile's
+# probe compile recipe once.  Every later probe substitutes its own paths into
+# the captured tokens instead of paying the Makefile parse cost again.
+_RECIPE_DIRECTORY = "probes/.pragma_probe_recipe/"
+_RECIPE_SOURCE = _RECIPE_DIRECTORY + "__pragma_recipe__.c"
+_RECIPE_OBJECT = "build/" + _RECIPE_SOURCE[:-2] + ".o"
+_RECIPE_CACHE: dict[tuple[object, ...], list[str]] = {}
+_RECIPE_CACHE_LOCK = threading.Lock()
+
+
+def _parse_probe_recipe(make_output: str) -> list[str] | None:
+    """Extract the compile command for the placeholder probe from ``make -n``.
+
+    The recipe prints an echo line, a (possibly disabled) host compiler check,
+    the real asm-processor/IDO compile, and post-processing commands.  The
+    compile is the last command that consumes the placeholder source and
+    names the placeholder object, so a still-enabled ``cc`` check can never
+    be mistaken for it.
+    """
+    recipe: list[str] | None = None
+    for line in make_output.splitlines():
+        try:
+            tokens = shlex.split(line)
+        except ValueError:
+            continue
+        if not tokens or tokens[0] in {":", "printf", "echo"}:
+            continue
+        if tokens[-1] == _RECIPE_SOURCE and "-o" in tokens and _RECIPE_OBJECT in tokens:
+            recipe = tokens
+    return recipe
+
+
+def _substitute_probe_recipe(recipe: list[str], source_rel: str, object_rel: str) -> list[str]:
+    """Rewrite placeholder paths in a captured recipe for one probe.
+
+    The object placeholder embeds the directory placeholder, so it is replaced
+    first; the ``-I <probe dir>`` include token is rewritten last.
+    """
+    directory_rel = source_rel.rsplit("/", 1)[0] + "/"
+    return [
+        token.replace(_RECIPE_OBJECT, object_rel)
+        .replace(_RECIPE_SOURCE, source_rel)
+        .replace(_RECIPE_DIRECTORY, directory_rel)
+        for token in recipe
+    ]
+
+
+def _probe_compile_recipe(repo_root: Path) -> list[str] | None:
+    """Return the cached direct compile command for isolated probes.
+
+    ``make`` spends most of a probe's wall time discovering sources and
+    grepping every tracked file for ``GLOBAL_ASM`` before it even starts the
+    compiler.  Capturing the recipe with ``make -n`` once per Makefile
+    revision keeps the Makefile authoritative for flags while letting probes
+    invoke asm-processor/IDO directly.  ``None`` falls back to ``make``.
+    """
+    makefile = repo_root / "disasm" / "Makefile"
+    try:
+        key: tuple[object, ...] = (
+            makefile.stat().st_mtime_ns,
+            os.environ.get("MIPS_BINUTILS_PREFIX"),
+        )
+    except OSError:
+        return None
+    with _RECIPE_CACHE_LOCK:
+        cached = _RECIPE_CACHE.get(key)
+        if cached is not None:
+            return cached
+        placeholder = repo_root / "disasm" / _RECIPE_SOURCE
+        try:
+            placeholder.parent.mkdir(parents=True, exist_ok=True)
+            placeholder.write_text("")
+            result = subprocess.run(
+                ["make", "-C", "disasm", "-n", "PRAGMA_PROBE=1", _RECIPE_OBJECT],
+                cwd=repo_root,
+                env=_object_build_environment(),
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                timeout=_command_timeout("PRAGMA_COMPILE_TIMEOUT", 120.0),
+            )
+        except (OSError, subprocess.TimeoutExpired):
+            return None
+        finally:
+            shutil.rmtree(placeholder.parent, ignore_errors=True)
+        if result.returncode != 0:
+            return None
+        recipe = _parse_probe_recipe(result.stdout or "")
+        if recipe is not None:
+            _RECIPE_CACHE[key] = recipe
+        return recipe
+
+
+def _make_object(source_path: Path, *, capture: bool = False) -> tuple[int, Path, str]:
+    """Compile one source file to its build-tree object.
+
+    Tracked sources go through the repository's normal Makefile rule.  Probe
+    sources live below ``disasm/probes/`` and use the captured Makefile recipe
+    directly, so parallel probes skip the Makefile parse and never contend
+    with each other or alter the tracked source.
+    """
+    repo_root = Path(__file__).resolve().parent.parent
+    relative = source_path.resolve().relative_to(repo_root / "disasm")
+    object_path = repo_root / "disasm" / "build" / relative.with_suffix(".o")
+    object_path.parent.mkdir(parents=True, exist_ok=True)
+    object_path.unlink(missing_ok=True)
+    object_rel = object_path.relative_to(repo_root / "disasm").as_posix()
+    kwargs: dict[str, object] = {
+        "cwd": repo_root,
+        "env": _object_build_environment(),
+        "text": True,
+    }
     if capture:
         kwargs["stdout"] = subprocess.PIPE
         kwargs["stderr"] = subprocess.STDOUT
+    command = ["make", "-C", "disasm", "PRAGMA_PROBE=1", object_rel]
+    if relative.parts and relative.parts[0] == "probes":
+        recipe = _probe_compile_recipe(repo_root)
+        if recipe is not None:
+            command = _substitute_probe_recipe(recipe, relative.as_posix(), object_rel)
+            kwargs["cwd"] = repo_root / "disasm"
     try:
         result = subprocess.run(
-            [
-                "make",
-                "-C",
-                "disasm",
-                "PRAGMA_PROBE=1",
-                str(object_path.relative_to(repo_root / "disasm")),
-            ],
+            command,
             timeout=_command_timeout("PRAGMA_COMPILE_TIMEOUT", 120.0),
             **kwargs,
         )
@@ -356,6 +461,34 @@ def _function_bytes(
     return text[offset : offset + size]
 
 
+def _function_byte_views(
+    object_path: Path,
+    function: str,
+    span: int,
+) -> tuple[int | None, bytes | None, bytes | None]:
+    """Return ``(symbol_size, symbol_bytes, span_bytes)`` with one nm/objcopy pass.
+
+    ``symbol_bytes`` covers the compiler's own symbol range and ``span_bytes``
+    covers the baseline owner's span (which may include alignment nops).  A
+    probe needs both, and running the binutils pair once per view doubled the
+    subprocess count of every probe.
+    """
+    symbol = _object_symbol(object_path, function)
+    if symbol is None:
+        return None, None, None
+    text = _object_text(object_path)
+    if text is None:
+        return symbol[1], None, None
+    offset, symbol_size = symbol
+
+    def view(size: int) -> bytes | None:
+        if size <= 0 or offset < 0 or offset + size > len(text):
+            return None
+        return text[offset : offset + size]
+
+    return symbol_size, view(symbol_size), view(span)
+
+
 def _is_nop(word: int) -> bool:
     return word == 0
 
@@ -415,7 +548,10 @@ def _disassemble_bytes(data: bytes) -> list[str]:
                     "-b",
                     "binary",
                     "-m",
-                    "mips:isa32",
+                    # VR4300 is MIPS III: ``mips:isa32`` decodes 64-bit
+                    # operations such as ``dsll32``/``ld`` as ``.word`` and
+                    # silently corrupts the normalized similarity score.
+                    "mips:4300",
                     str(binary),
                 ],
                 stdout=subprocess.PIPE,
@@ -449,8 +585,8 @@ def _instruction_texts(data: bytes) -> list[str]:
     ]
 
 
-def _normalise_instruction_text(text: str) -> str:
-    """Erase register/immediate allocation while retaining opcode shape."""
+def _normalise_instruction_text(text: str, *, immediates: bool = True) -> str:
+    """Erase register (and optionally immediate) allocation, keeping opcode shape."""
     registers = "|".join(
         re.escape(register) for register in NORMALISABLE_REGISTERS
     )
@@ -459,7 +595,8 @@ def _normalise_instruction_text(text: str) -> str:
         "REG",
         text.lower(),
     )
-    text = re.sub(r"(?<![A-Za-z0-9_])-?(?:0x[0-9a-f]+|[0-9]+)(?![A-Za-z0-9_])", "IMM", text)
+    if immediates:
+        text = re.sub(r"(?<![A-Za-z0-9_])-?(?:0x[0-9a-f]+|[0-9]+)(?![A-Za-z0-9_])", "IMM", text)
     return re.sub(r"\s+", " ", text).strip()
 
 
@@ -468,15 +605,24 @@ def _function_mismatch_details(
     function: str,
     expected: bytes,
     actual: bytes | None,
+    *,
+    actual_symbol_size: int | None = None,
 ) -> dict[str, object]:
-    """Summarize a rejected probe without dumping the candidate object."""
+    """Summarize a rejected probe without dumping the candidate object.
+
+    ``actual_symbol_size`` lets a caller that already ran ``nm`` skip a second
+    symbol lookup; without it the size is read from the object.
+    """
     details: dict[str, object] = {
         "expected_size": len(expected),
         "expected_tail_kind": _classify_tail_bytes(expected),
     }
-    symbol = _object_symbol(object_path, function)
-    if symbol is not None:
-        details["actual_size"] = symbol[1]
+    if actual_symbol_size is None:
+        symbol = _object_symbol(object_path, function)
+        if symbol is not None:
+            actual_symbol_size = symbol[1]
+    if actual_symbol_size is not None:
+        details["actual_size"] = actual_symbol_size
     if actual is None:
         details["first_diff_offset"] = None
         return details
@@ -494,11 +640,23 @@ def _function_mismatch_details(
     instruction_count = max(len(expected_texts), len(actual_texts))
     normalized_expected = [_normalise_instruction_text(text) for text in expected_texts]
     normalized_actual = [_normalise_instruction_text(text) for text in actual_texts]
+    register_only_expected = [
+        _normalise_instruction_text(text, immediates=False) for text in expected_texts
+    ]
+    register_only_actual = [
+        _normalise_instruction_text(text, immediates=False) for text in actual_texts
+    ]
     normalized_matcher = difflib.SequenceMatcher(
         None, normalized_expected, normalized_actual, autojunk=False
     )
+    register_only_matcher = difflib.SequenceMatcher(
+        None, register_only_expected, register_only_actual, autojunk=False
+    )
     raw_matcher = difflib.SequenceMatcher(None, expected_words, actual_words, autojunk=False)
     normalized_matches = sum(block.size for block in normalized_matcher.get_matching_blocks())
+    register_only_matches = sum(
+        block.size for block in register_only_matcher.get_matching_blocks()
+    )
     raw_matches = sum(block.size for block in raw_matcher.get_matching_blocks())
     details["expected_instruction_count"] = len(expected_texts)
     details["actual_instruction_count"] = len(actual_texts)
@@ -509,6 +667,11 @@ def _function_mismatch_details(
     details["raw_similarity_score"] = round(raw_matches / instruction_count, 4) if instruction_count else 1.0
     details["exact_similarity_score"] = details["raw_similarity_score"]
     details["similarity_score"] = round(normalized_matches / instruction_count, 4) if instruction_count else 1.0
+    # Registers erased, immediates kept: separates "same code, different
+    # register allocation" from "same shape, different offsets/constants".
+    details["register_only_similarity_score"] = (
+        round(register_only_matches / instruction_count, 4) if instruction_count else 1.0
+    )
     assembly_diff: list[dict[str, object]] = []
     for tag, expected_start, expected_end, actual_start, actual_end in raw_matcher.get_opcodes():
         if tag == "equal":
@@ -590,6 +753,14 @@ def _function_mismatch_details(
         == str(details["actual_instruction_text"]).split(" ", 1)[0]
     ):
         details["mismatch_kind"] = "operand_or_scheduling_drift"
+    # Whole-body classifications beat the first-instruction heuristic: when the
+    # entire opcode stream already lines up, the remaining work is a type,
+    # declaration-order, or struct-offset change rather than a control-flow one.
+    if diff_offsets and len(expected_texts) == len(actual_texts) and instruction_count:
+        if register_only_expected == register_only_actual:
+            details["mismatch_kind"] = "register_allocation_only"
+        elif normalized_expected == normalized_actual:
+            details["mismatch_kind"] = "immediate_drift"
     return details
 
 
@@ -658,13 +829,19 @@ def _probe_one(
             # slot. Compare the candidate over the baseline owner's span so
             # alignment padding is validated instead of causing a false
             # probe rejection. The full ROM gate remains authoritative.
-            actual_symbol = _function_bytes(object_path, function)
-            if expected is None or actual_symbol is None:
+            if expected is None:
                 return {
                     "status": "probe_unavailable",
                     "probe_reason": "missing_function_bytes",
                 }
-            actual = _function_bytes(object_path, function, len(expected))
+            actual_symbol_size, actual_symbol, actual = _function_byte_views(
+                object_path, function, len(expected)
+            )
+            if actual_symbol is None:
+                return {
+                    "status": "probe_unavailable",
+                    "probe_reason": "missing_function_bytes",
+                }
             comparison_span_complete = actual is not None
             if actual is None:
                 actual = actual_symbol
@@ -677,7 +854,11 @@ def _probe_one(
                 }
                 diagnostic.update(
                     _function_mismatch_details(
-                        object_path, function, expected, actual_symbol
+                        object_path,
+                        function,
+                        expected,
+                        actual_symbol,
+                        actual_symbol_size=actual_symbol_size,
                     )
                 )
                 return diagnostic

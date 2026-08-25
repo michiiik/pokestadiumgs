@@ -20,6 +20,19 @@ ASM_PROCESSOR_DIR = Path(__file__).resolve().parent.parent / "disasm" / "tools" 
 sys.path.insert(0, str(ASM_PROCESSOR_DIR))
 import asm_processor  # noqa: E402
 
+# The runner records probe statistics to disasm/build/probe-stats.jsonl by
+# default.  Synthetic test transactions must never land in that file, because
+# it is the data set used for family-level candidate tuning.
+_STATS_ISOLATION = mock.patch.dict(os.environ, {"PRAGMA_PROBE_STATS": ""})
+
+
+def setUpModule() -> None:
+    _STATS_ISOLATION.start()
+
+
+def tearDownModule() -> None:
+    _STATS_ISOLATION.stop()
+
 
 class ScannerTests(unittest.TestCase):
     def test_source_owners_ignores_isolated_pragma_probe_trees(self) -> None:
@@ -278,7 +291,10 @@ class RunnerTests(unittest.TestCase):
                 Path("synthetic.o"), "func_a", expected, actual
             )
         self.assertEqual(details["first_diff_instruction"], 0)
-        self.assertEqual(details["mismatch_kind"], "operand_or_scheduling_drift")
+        # Same opcode stream and immediates, only the destination register
+        # differs: the whole-body class outranks the first-instruction one.
+        self.assertEqual(details["mismatch_kind"], "register_allocation_only")
+        self.assertEqual(details["register_only_similarity_score"], 1.0)
         self.assertEqual(details["expected_instruction_text"], "addiu $a0, $zero, 1")
         self.assertEqual(details["actual_instruction_text"], "addiu $a1, $zero, 1")
         self.assertEqual(details["expected_tail_kind"], "normal_return")
@@ -317,6 +333,77 @@ class RunnerTests(unittest.TestCase):
         self.assertEqual([item["index"] for item in ranking["func_a"]], [1, 2, 0])
         self.assertEqual([item["similarity_rank"] for item in attempts], [3, 1, 2])
 
+    def test_mismatch_diagnostics_classify_immediate_drift(self) -> None:
+        # addiu $a0, $zero, 1 versus addiu $a0, $zero, 2: same registers, only
+        # the constant differs.
+        expected = bytes.fromhex("24040001 03e00008 00000000")
+        actual = bytes.fromhex("24040002 03e00008 00000000")
+        details = runner._function_mismatch_details(
+            Path("synthetic.o"), "func_a", expected, actual, actual_symbol_size=len(actual)
+        )
+        self.assertEqual(details["mismatch_kind"], "immediate_drift")
+        self.assertEqual(details["actual_size"], len(actual))
+        self.assertEqual(details["similarity_score"], 1.0)
+        self.assertLess(details["register_only_similarity_score"], 1.0)
+
+    def test_disassembler_decodes_vr4300_64bit_operations(self) -> None:
+        if not Path(runner._binutils_tool("objdump")).exists():
+            self.skipTest("MIPS binutils objdump is not installed")
+        # dsll $v0, $v0, 0 is a MIPS III (VR4300) instruction that a 32-bit
+        # ISA setting decodes as a bare .word, which would poison the score.
+        texts = runner._disassemble_bytes(bytes.fromhex("00021038 03e00008 00000000"))
+        self.assertEqual(len(texts), 3)
+        self.assertTrue(texts[0].startswith("dsll"), texts)
+
+    def test_probe_recipe_is_parsed_and_substituted(self) -> None:
+        source = runner._RECIPE_SOURCE
+        obj = runner._RECIPE_OBJECT
+        make_output = "\n".join([
+            f'printf "Compiling: {source} -> {obj}\\n"',
+            f"gcc -fsyntax-only -I probes/.pragma_probe_recipe/ -o {obj} {source}",
+            f".venv/bin/python3 tools/asm-processor/build.py cc -- as -- -c -I {runner._RECIPE_DIRECTORY} -o {obj} {source}",
+            ":",
+        ])
+        recipe = runner._parse_probe_recipe(make_output)
+        self.assertIsNotNone(recipe)
+        self.assertEqual(recipe[0], ".venv/bin/python3")
+        command = runner._substitute_probe_recipe(
+            recipe,
+            "probes/.pragma_probe_x1/owner.c",
+            "build/probes/.pragma_probe_x1/owner.o",
+        )
+        self.assertEqual(command[-1], "probes/.pragma_probe_x1/owner.c")
+        self.assertEqual(command[command.index("-o") + 1], "build/probes/.pragma_probe_x1/owner.o")
+        self.assertEqual(command[command.index("-I") + 1], "probes/.pragma_probe_x1/")
+        self.assertIsNone(runner._parse_probe_recipe(":\n:\n"))
+
+    def test_probe_sources_compile_with_direct_recipe(self) -> None:
+        repo_root = Path(__file__).resolve().parent.parent
+        probe_root = runner._probe_root(repo_root)
+        with tempfile.TemporaryDirectory(prefix=".pragma_probe_", dir=probe_root) as directory:
+            source = Path(directory) / "owner.c"
+            source.write_text("void owner(void) {}\n")
+            completed = mock.Mock(returncode=0, stdout="")
+            with mock.patch.object(
+                runner,
+                "_probe_compile_recipe",
+                return_value=["cc", "-o", runner._RECIPE_OBJECT, runner._RECIPE_SOURCE],
+            ), mock.patch.object(runner.subprocess, "run", return_value=completed) as run:
+                result, object_path, _ = runner._make_object(source, capture=True)
+            self.assertEqual(result, 0)
+            command = run.call_args.args[0]
+            self.assertEqual(command[0], "cc")
+            self.assertEqual(command[-1], source.relative_to(repo_root / "disasm").as_posix())
+            self.assertEqual(run.call_args.kwargs["cwd"], repo_root / "disasm")
+            self.assertEqual(object_path.parent.name, Path(directory).name)
+            # Tracked sources keep using make so the Makefile's own rules apply.
+            with tempfile.TemporaryDirectory(dir=repo_root / "disasm" / "src") as tracked:
+                tracked_source = Path(tracked) / "owner.c"
+                tracked_source.write_text("void owner(void) {}\n")
+                with mock.patch.object(runner.subprocess, "run", return_value=completed) as run:
+                    runner._make_object(tracked_source, capture=True)
+                self.assertEqual(run.call_args.args[0][0], "make")
+
     def test_probe_worker_default_and_clamping(self) -> None:
         with mock.patch.dict(os.environ, {}, clear=True):
             self.assertEqual(runner._resolve_probe_workers(None, 50), 10)
@@ -349,8 +436,8 @@ class RunnerTests(unittest.TestCase):
                 return_value=(0, Path(directory) / "probe.o", ""),
             ), mock.patch.object(
                 runner,
-                "_function_bytes",
-                return_value=b"matching-bytes",
+                "_function_byte_views",
+                return_value=(len(b"matching-bytes"), b"matching-bytes", b"matching-bytes"),
             ):
                 result = runner._probe_one(
                     source,
