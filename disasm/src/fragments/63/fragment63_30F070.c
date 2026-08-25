@@ -16,7 +16,16 @@ void func_87E0B7F4(void) {
     func_8004C8C0(0x163);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30F070/func_87E0B834.s")
+extern u8 D_87E1A2C0[];
+extern s32 func_80002B24(void);
+extern s32 func_800030D0(s32, s32);
+extern s32 func_80040E80(s32, void *);
+extern void func_80003120(s32);
+void func_87E0B834(void *arg0) {
+    s32 temp = func_800030D0(func_80002B24(), 0);
+    *(s32 *)((u8 *)arg0 + 8) = func_80040E80(temp, D_87E1A2C0);
+    func_80003120(temp);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30F070/func_87E0B884.s")
 

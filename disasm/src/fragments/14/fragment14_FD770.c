@@ -7,7 +7,13 @@ s32 func_813055E0(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     return result >= 0 ? result : 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FD770/func_8130560C.s")
+s32 func_8130560C(void *arg0, s32 arg1) {
+    u8 *base = (u8 *)arg0;
+    if (arg1 >= *(u16 *)(base + 0x50)) {
+        return -1;
+    }
+    return *(u8 *)(base + arg1 + 0x10);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FD770/func_81305634.s")
 

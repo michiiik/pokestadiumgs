@@ -40,7 +40,15 @@ s32 func_82900BD0(s32 arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33D6A0/func_82900E54.s")
+extern s16 D_82918858;
+extern u8 D_82911D70[];
+extern u8 D_829188C0[];
+void func_82900E54(void) {
+    *(s16 *)(D_829188C0 + 0) = *(s16 *)(D_82911D70 + D_82918858 * 8 + 0);
+    *(s16 *)(D_829188C0 + 2) = *(s16 *)(D_82911D70 + D_82918858 * 8 + 2);
+    *(s16 *)(D_829188C0 + 4) = *(s16 *)(D_82911D70 + D_82918858 * 8 + 4);
+    *(s16 *)(D_829188C0 + 6) = *(s16 *)(D_82911D70 + D_82918858 * 8 + 6);
+}
 #endif
 
 #ifdef VERSION_US

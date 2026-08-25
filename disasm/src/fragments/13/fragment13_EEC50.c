@@ -45,7 +45,12 @@ void func_82401DD4(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82402904.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_824029E4.s")
+s32 func_824029E4(s32 arg0, s16 arg1) {
+    if (arg1 < 0) {
+        return 8;
+    }
+    return *(s16 *)((u8 *)(u32)arg0 + ((s32)arg1 << 1) + 0x100) + 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82402A14.s")
 

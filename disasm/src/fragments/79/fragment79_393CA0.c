@@ -373,7 +373,10 @@ void func_841265D4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84126A64.s")
+void func_84126A64(void) {
+    D_84195208[0][0xD] &= 0xFF7F;
+    D_84195208[1][0xD] &= 0xFF7F;
+}
 #endif
 
 #ifdef VERSION_US
