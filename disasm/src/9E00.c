@@ -19,7 +19,20 @@ extern void *memcpy(void *, const void *, s32); void *func_80009750(void *dest, 
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/9E00/func_80009774.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/9E00/func_80009830.s")
+extern char D_800A1B14[];
+extern char D_800A1B20[];
+void func_80009830(s32 x, s32 y, s32 regNum, void* addr) {
+    u32 bits;
+    s32 exponent;
+
+    bits = *(u32*)addr;
+    exponent = ((bits & 0x7f800000U) >> 0x17) - 0x7f;
+    if ((exponent >= -0x7e && exponent <= 0x7f) || bits == 0) {
+        func_80009774(x, y, D_800A1B14, regNum, *(f32*)addr);
+    } else {
+        func_80009774(x, y, D_800A1B20, regNum);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/9E00/func_800098B4.s")
 
