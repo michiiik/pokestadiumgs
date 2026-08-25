@@ -286,6 +286,19 @@ class TypeIndexTest(unittest.TestCase):
         self.assertIn("D", collected)
         self.assertNotIn("C", collected)
 
+    def test_default_depth_covers_deep_transfer_dependencies(self):
+        header = (
+            "typedef struct A { B b; } A;\n"
+            "typedef struct B { C c; } B;\n"
+            "typedef struct C { D d; } C;\n"
+            "typedef struct D { E e; } D;\n"
+            "typedef struct E { F f; } E;\n"
+            "typedef struct F { s32 value; } F;\n"
+        )
+        index = sweep.index_type_definitions([header])
+        collected = sweep.collect_type_definitions({"A"}, index)
+        self.assertIn("F", collected)
+
     def test_order_types_dependency_first(self):
         defs = {
             "Outer": "typedef struct Outer { Inner inner; } Outer;",
@@ -293,6 +306,32 @@ class TypeIndexTest(unittest.TestCase):
         }
         order = sweep.order_types(defs)
         self.assertLess(order.index("Inner"), order.index("Outer"))
+
+    def test_order_types_ignores_pointer_back_edges(self):
+        defs = {
+            "Outer": "typedef struct Outer { Node node; } Outer;",
+            "Node": "typedef struct Node { Outer *owner; } Node;",
+        }
+        order = sweep.order_types(defs)
+        self.assertLess(order.index("Node"), order.index("Outer"))
+
+    def test_forward_type_declarations_cover_named_aggregates(self):
+        defs = {
+            "Outer": "typedef struct Outer { Node *node; } Outer;",
+            "Node": "typedef struct Node { s32 value; } Node;",
+            "Anonymous": "typedef struct { s32 value; } Anonymous;",
+        }
+        forwards = sweep.forward_type_declarations(defs, {name: f"S1_{name}" for name in defs})
+        self.assertIn("typedef struct S1_Outer S1_Outer;", forwards)
+        self.assertIn("typedef struct S1_Node S1_Node;", forwards)
+        self.assertNotIn("S1_Anonymous", "\n".join(forwards))
+
+    def test_named_aggregate_definition_uses_existing_forward_typedef(self):
+        definition = "typedef struct S1_Node {\n    s32 value;\n} S1_Node;"
+        self.assertEqual(
+            sweep._strip_named_aggregate_typedef(definition),
+            "struct S1_Node {\n    s32 value;\n};",
+        )
 
     def test_s1_prefix_rename_applied_to_definition(self):
         defs = {"Foo": "typedef struct Foo { s32 x; } Foo;"}
@@ -312,6 +351,27 @@ class MergeDeclarationsTest(unittest.TestCase):
         self.assertEqual(merged.count("typedef struct {"), 2)
         self.assertIn("s32 x;", merged)
         self.assertIn("s32 y;", merged)
+
+    def test_partitions_conflicting_complete_declarations(self):
+        first = sweep.TransferResult(
+            function="func_A", outcome="candidate",
+            declaration_units=["typedef struct S1_State { s32 x; } S1_State;"],
+        )
+        second = sweep.TransferResult(
+            function="func_B", outcome="candidate",
+            declaration_units=["typedef struct S1_State { s16 x; } S1_State;"],
+        )
+        compatible = sweep.TransferResult(
+            function="func_C", outcome="candidate",
+            declaration_units=["typedef struct S1_State { s32 x; } S1_State;"],
+        )
+
+        groups = sweep.partition_transfer_results([first, second, compatible])
+
+        self.assertEqual(
+            [[result.function for result in group] for group in groups],
+            [["func_A", "func_C"], ["func_B"]],
+        )
 
 
 class GenerateCandidateAlignmentTest(unittest.TestCase):

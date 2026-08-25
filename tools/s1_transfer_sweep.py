@@ -464,7 +464,7 @@ def index_type_definitions(texts: list[str]) -> dict[str, str]:
 
 
 def collect_type_definitions(
-    seed_names: set[str], type_index: dict[str, str], *, max_depth: int = 4
+    seed_names: set[str], type_index: dict[str, str], *, max_depth: int = 8
 ) -> dict[str, str]:
     """Transitively pull in types referenced by the seed types, bounded by depth.
 
@@ -498,12 +498,28 @@ def order_types(type_defs: dict[str, str]) -> list[str]:
     order: list[str] = []
     done: set[str] = set()
 
+    def dependencies(definition: str) -> set[str]:
+        # A pointer only needs a forward declaration, so it must not force a
+        # complete-definition dependency. This breaks the common S1 graph-node
+        # cycle where a record embeds GraphNode by value while GraphNode points
+        # back to that record.
+        result: set[str] = set()
+        for match in re.finditer(r"\b[A-Za-z_]\w*\b", definition):
+            name = match.group(0)
+            if name not in type_defs:
+                continue
+            suffix = definition[match.end():]
+            if re.match(r"\s*\*", suffix):
+                continue
+            result.add(name)
+        return result
+
     def visit(name: str, stack: frozenset[str]) -> None:
         if name in done or name not in type_defs or name in stack:
             return
         stack = stack | {name}
-        for ident in re.findall(r"\b[A-Za-z_]\w*\b", type_defs[name]):
-            if ident != name and ident in type_defs:
+        for ident in dependencies(type_defs[name]):
+            if ident != name:
                 visit(ident, stack)
         if name not in done:
             done.add(name)
@@ -512,6 +528,44 @@ def order_types(type_defs: dict[str, str]) -> list[str]:
     for name in type_defs:
         visit(name, frozenset())
     return order
+
+
+def forward_type_declarations(type_defs: dict[str, str], rename_map: dict[str, str]) -> list[str]:
+    """Return forward typedefs for named aggregate definitions.
+
+    Pointer fields may refer to a typedef whose complete definition appears
+    later (or participates in a cycle).  A forward typedef keeps those fields
+    valid while the ordered complete definitions still handle by-value edges.
+    Anonymous aggregates are intentionally omitted because they cannot be
+    forward-declared under the eventual alias without changing their type.
+    """
+    forwards: list[str] = []
+    open_re = re.compile(r"^\s*typedef\s+(struct|union|enum)\s+([A-Za-z_]\w*)\s*\{")
+    alias_re = re.compile(r"\}\s*([A-Za-z_]\w*)\s*;\s*$", re.S)
+    for definition in type_defs.values():
+        opening = open_re.match(definition)
+        closing = alias_re.search(definition)
+        if opening is None or closing is None:
+            continue
+        kind, tag = opening.groups()
+        alias = closing.group(1)
+        renamed_tag = apply_rename(tag, rename_map)
+        renamed_alias = apply_rename(alias, rename_map)
+        forwards.append(f"typedef {kind} {renamed_tag} {renamed_alias};")
+    return forwards
+
+
+def _strip_named_aggregate_typedef(definition: str) -> str:
+    """Render a named aggregate body without redeclaring its forward typedef."""
+    match = re.match(
+        r"^\s*typedef\s+(struct|union|enum)\s+([A-Za-z_]\w*)\s*(\{.*\})\s*([A-Za-z_]\w*)\s*;\s*$",
+        definition,
+        re.S,
+    )
+    if match is None:
+        return definition
+    kind, tag, body, _alias = match.groups()
+    return f"{kind} {tag} {body};"
 
 
 def _normalize_ws(text: str) -> str:
@@ -812,7 +866,11 @@ def generate_candidate(
     candidate_type_names = {
         ident for ident in body_identifiers if ident in ctx.type_index
     }
-    type_defs = collect_type_definitions(candidate_type_names, ctx.type_index)
+    # Stadium 1 display/geo records commonly reach vector and matrix typedefs
+    # through five or more nested record layers. Keep the bound finite, but
+    # include those real dependencies instead of emitting fields with unknown
+    # unprefixed types.
+    type_defs = collect_type_definitions(candidate_type_names, ctx.type_index, max_depth=8)
     type_rename: dict[str, str] = {}
     kept_type_defs: dict[str, str] = {}
     for name, type_def in type_defs.items():
@@ -825,7 +883,11 @@ def generate_candidate(
     rename_map = dict(symbol_map)
     rename_map.update(type_rename)
 
-    ordered_type_defs = [apply_rename(kept_type_defs[name], rename_map) for name in order_types(kept_type_defs)]
+    ordered_type_defs = [
+        _strip_named_aggregate_typedef(apply_rename(kept_type_defs[name], rename_map))
+        for name in order_types(kept_type_defs)
+    ]
+    forward_type_defs = forward_type_declarations(kept_type_defs, rename_map)
 
     extra_externs: list[str] = []
     seen_externs: set[str] = set()
@@ -838,7 +900,8 @@ def generate_candidate(
         seen_externs.add(decl)
         extra_externs.append(apply_rename(decl, rename_map))
 
-    declarations = "\n".join(ordered_type_defs + extra_externs)
+    declaration_units = forward_type_defs + ordered_type_defs + extra_externs
+    declarations = "\n".join(declaration_units)
     if declarations:
         declarations += "\n"
 
@@ -852,7 +915,7 @@ def generate_candidate(
     return TransferResult(
         function, "candidate", s1_name=s1_name, symbol_map=symbol_map,
         unmapped_symbols=unmapped, declarations=declarations,
-        declaration_units=ordered_type_defs + extra_externs, variants=variants,
+        declaration_units=declaration_units, variants=variants,
     )
 
 
@@ -901,11 +964,77 @@ def merge_declarations(units: list[str]) -> str:
     return "\n".join(merged) + ("\n" if merged else "")
 
 
+def _declaration_unit_symbol(unit: str) -> str | None:
+    """Return the typedef/extern symbol introduced by one declaration unit."""
+    text = unit.strip()
+    if not text:
+        return None
+    function_pointer = re.search(r"\(\*\s*([A-Za-z_]\w*)\s*\)", text)
+    if function_pointer:
+        return function_pointer.group(1)
+    aggregate_alias = re.search(r"}\s*([A-Za-z_]\w*)\s*;\s*$", text, re.S)
+    if aggregate_alias:
+        return aggregate_alias.group(1)
+    named_definition = re.search(
+        r"\b(?:struct|union|enum)\s+([A-Za-z_]\w*)\s*\{.*\}\s*;\s*$", text, re.S
+    )
+    if named_definition:
+        return named_definition.group(1)
+    trailing_name = re.search(r"\b([A-Za-z_]\w*)\s*(?:\[[^\]]*\])?\s*;\s*$", text, re.S)
+    return trailing_name.group(1) if trailing_name else None
+
+
+def _declaration_unit_symbols(units: list[str]) -> dict[str, str]:
+    symbols: dict[str, str] = {}
+    for unit in units:
+        name = _declaration_unit_symbol(unit)
+        if name is None:
+            continue
+        existing = symbols.get(name)
+        if existing is None or ("{" not in existing and "{" in unit):
+            symbols[name] = unit
+    return symbols
+
+
+def _declaration_conflicts(existing: dict[str, str], incoming: dict[str, str]) -> bool:
+    for name, unit in incoming.items():
+        previous = existing.get(name)
+        if previous is None or previous.strip() == unit.strip():
+            continue
+        # A forward typedef and its later complete definition are compatible;
+        # the complete unit wins when the group is rendered.
+        if "{" not in previous or "{" not in unit:
+            continue
+        return True
+    return False
+
+
+def partition_transfer_results(results: list[TransferResult]) -> list[list[TransferResult]]:
+    """Partition candidates whose shared declarations disagree by symbol."""
+    groups: list[list[TransferResult]] = []
+    group_symbols: list[dict[str, str]] = []
+    for result in results:
+        units = result.declaration_units or ([result.declarations] if result.declarations else [])
+        symbols = _declaration_unit_symbols(units)
+        for index, existing in enumerate(group_symbols):
+            if _declaration_conflicts(existing, symbols):
+                continue
+            groups[index].append(result)
+            for name, unit in symbols.items():
+                if name not in existing or ("{" not in existing[name] and "{" in unit):
+                    existing[name] = unit
+            break
+        else:
+            groups.append([result])
+            group_symbols.append(dict(symbols))
+    return groups
+
+
 # --------------------------------------------------------------------------
 # Driver
 # --------------------------------------------------------------------------
 
-def run_source_group(
+def _run_source_group_once(
     source_path: Path,
     results: list[TransferResult],
     *,
@@ -944,6 +1073,34 @@ def run_source_group(
     return runner.try_candidates_detailed(
         source_path, gate_blocks, labels=gate_labels, declarations=declarations, gate=gate, probe_workers=workers
     )
+
+
+def run_source_group(
+    source_path: Path,
+    results: list[TransferResult],
+    *,
+    gate: bool,
+    workers: int | None,
+) -> dict[str, object]:
+    groups = partition_transfer_results(results)
+    attempts: list[dict[str, object]] = []
+    accepted: list[str] = []
+    statuses: list[str] = []
+    for group in groups:
+        result = _run_source_group_once(source_path, group, gate=gate, workers=workers)
+        attempts.extend(result.get("attempts", []))
+        accepted.extend(str(name) for name in result.get("accepted", []))
+        if result.get("batch_status") is not None:
+            statuses.append(str(result["batch_status"]))
+    if not attempts:
+        return {"attempts": [], "accepted": []}
+    return {
+        "attempts": attempts,
+        "accepted": accepted,
+        "batch_status": "accepted" if accepted else (
+            statuses[0] if len(set(statuses)) == 1 and statuses else "no_candidate_accepted"
+        ),
+    }
 
 
 def sweep(
