@@ -87,7 +87,10 @@ void func_800239B4(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80023A10.s")
+extern s32 D_8009061C[][4];
+s32 func_80023A10(u8 arg0, u8 arg1) {
+    return D_8009061C[arg0][arg1];
+}
 #endif
 
 #ifdef VERSION_US
