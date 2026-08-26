@@ -157,7 +157,11 @@ void func_8413F300(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_8413F32C.s")
+void func_8413F32C(s16 arg0, s16 arg1, u8 arg2) {
+    s32 temp_t7;
+    temp_t7 = (arg2 & 0xFF) << 8;
+    func_80044270((s32)arg0, (s32)arg1, 8, 9, temp_t7, 0, 0x400, 0x400, 0);
+}
 #endif
 
 #ifdef VERSION_US
