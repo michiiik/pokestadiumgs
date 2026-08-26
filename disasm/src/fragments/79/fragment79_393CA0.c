@@ -445,7 +445,23 @@ void func_84126BFC(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84127140.s")
+extern void *D_841951F8[];
+s32 func_84127140(u8 a) {
+    u8 *p;
+    u8 x;
+    u8 *new_var;
+
+    p = D_841951F8[a];
+    x = p[0x49A];
+    new_var = p;
+    if (p[0x11] != 0) {
+        return 0;
+    }
+    if ((x > 0) && (x < 0xFF)) {
+        return 1;
+    }
+    return new_var[0x49A] * 0;
+}
 #endif
 
 #ifdef VERSION_US
