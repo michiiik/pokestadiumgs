@@ -2,7 +2,12 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E136F0.s")
+extern void func_80038E14(s32, s32, s32, s32, f32, f32, f32, s32);
+extern u8 D_87E1EC10;
+s32 func_87E136F0(s32 arg0, s32 arg1) {
+    func_80038E14(arg1, (*(s32 *)((u8 *)(&D_87E1EC10) + (0))), (*(s32 *)((u8 *)(&D_87E1EC10) + (4))), (*(s32 *)((u8 *)(&D_87E1EC10) + (8))), (*(f32 *)((u8 *)(&D_87E1EC10) + (0xC))), (*(f32 *)((u8 *)(&D_87E1EC10) + (0x10))), (*(f32 *)((u8 *)(&D_87E1EC10) + (0x14))), 0);
+    return 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E1374C.s")
 

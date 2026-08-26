@@ -137,7 +137,10 @@ void func_86B05428(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/61/fragment61_code/func_86B07D58.s")
+s16 func_8000B3B0(f32 y, f32 x);
+s16 func_86B07D58(f32 arg0, f32 arg1) {
+    return (s16) ((s32) (func_8000B3B0(arg0, -arg1) + 0x3FFF) % 65535);
+}
 #endif
 
 #ifdef VERSION_US

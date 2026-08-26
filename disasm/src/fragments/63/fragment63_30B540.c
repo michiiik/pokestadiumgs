@@ -125,7 +125,20 @@ void func_87E09BDC(void *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E0A2D4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E0A5BC.s")
+extern void func_87E082E4(void *, s32);
+u8 func_800084A0(void);
+extern void func_80007AEC(s32);
+void func_87E0A5BC(void *arg0) {
+    if (func_800084A0() == 1) {
+        if ((u32) (*(u32 *)((u8 *)(arg0) + (0x7B8))) >= 6U) {
+            func_87E08B90((s32) arg0);
+            func_87E082E4(arg0, 3);
+            func_80007AEC(0xF);
+        }
+    } else {
+        (*(u32 *)((u8 *)(arg0) + (0x7B8))) = 0U;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E0A620.s")
 

@@ -54,7 +54,16 @@ void func_87E00204(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_303990/func_87E0023C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_303990/func_87E0027C.s")
+s32 func_87E0023C(s32);
+extern void func_87E06D8C(u8 *, s32);
+extern void func_87E07AC4(u8 *, s32);
+void func_87E015C0(s32 arg0);
+void func_87E0027C(void) {
+    (*(s32 *)((u8 *)(D_87E1BA20) + (0x24))) = 4;
+    func_87E06D8C(D_87E1BA20 + 0x734, (*(s32 *)((u8 *)(D_87E1BA20) + (0))));
+    func_87E07AC4(D_87E1BA20 + 0x734, func_87E0023C((*(s32 *)((u8 *)(D_87E1BA20) + (0)))));
+    func_87E015C0(1);
+}
 
 extern void func_87E08BEC(u8 *, s32);
 
@@ -118,9 +127,50 @@ void func_87E00590(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_303990/func_87E0123C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_303990/func_87E0132C.s")
+extern void func_87E0123C(s32 *);
+u8 func_800084A0(void);
+s32 func_87E0132C(s32 arg0) {
+    s32 sp1C;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_303990/func_87E013AC.s")
+    sp1C = arg0;
+    switch (arg0) {                                 /* irregular */
+    case 0:
+        if (func_800084A0() == 0) {
+            sp1C = 1;
+        }
+        break;
+    case 1:
+        func_87E0123C(&sp1C);
+        break;
+    case 2:
+        if (func_800084A0() == 1) {
+            sp1C = 3;
+        }
+        break;
+    }
+    return sp1C;
+}
+
+extern void func_87E00A84();
+s32 func_87E0132C(s32);
+extern void func_800086A4(s32);
+extern void func_80007AEC(s32);
+u32 func_87F0F468(void);
+void func_80064D28(void);
+void func_87E013AC(void) {
+    s32 var_s0;
+
+    var_s0 = 0;
+    func_800086A4(2);
+    func_80007AEC(5);
+    do {
+        if (func_87F0F468() == -1U) {
+            func_80064D28();
+        }
+        var_s0 = func_87E0132C(var_s0);
+        func_87E00A84();
+    } while (var_s0 != 3);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_303990/func_87E01424.s")
 

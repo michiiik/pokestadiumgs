@@ -83,11 +83,36 @@ void func_87E13248(void) { func_8004C8C0(361); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E13268.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E1331C.s")
+s32 func_80040E80(s32, s32 *);
+extern u8 D_87E1AC40;
+extern u8 D_87E1EBC0;
+extern void func_80037E9C(s32, void *);
+extern s32 func_800030D0(s32, s32);
+s32 func_80002B24(void);
+extern void func_80003120(s32);
+void func_87E1331C(void *arg0) {
+    s32 sp1C;
+    s32 temp_v0;
+
+    func_80037E9C(0, &D_87E1EBC0);
+    temp_v0 = func_800030D0(func_80002B24(), 0);
+    sp1C = temp_v0;
+    (*(s32 *)((u8 *)(arg0) + (0x28))) = func_80040E80(temp_v0, &D_87E1AC40);
+    func_80003120(sp1C);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E13380.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E133F0.s")
+extern u8 *D_87E1EBD8;
+void func_87E133F0(void) {
+    func_87F0277C((s32) (D_87E1EBD8 + 0x2C));
+    if ((*(s32 *)((u8 *)(D_87E1EBD8) + (0))) & 4) {
+        (*(u32 *)((u8 *)(D_87E1EBD8) + (0x268))) = (u32) ((*(u32 *)((u8 *)(D_87E1EBD8) + (0x268))) + 1);
+        if ((u32) (*(u32 *)((u8 *)(D_87E1EBD8) + (0x268))) >= 0xFFFFFF01U) {
+            (*(u32 *)((u8 *)(D_87E1EBD8) + (0x268))) = 0U;
+        }
+    }
+}
 
 extern u8 *D_87E1EBD8;
 extern void func_8003C6B8(s32);
@@ -106,7 +131,12 @@ void func_87E134C0(void) {
     *(u32 *)(D_87E1EBD8 + 0xC) = 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E134E8.s")
+extern void func_87F0B1A4(u8 *, u8 *, f32, s32, f32, s32, s32);
+extern u8 *D_87E1EBD8;
+void func_87E134E8(void) {
+    func_87F0B1A4(D_87E1EBD8 + 0x1CC, D_87E1EBD8 + 0x88, (*(f32 *)((u8 *)(D_87E1EBD8) + (0x88))) + -520.0f, (*(s32 *)((u8 *)(D_87E1EBD8) + (0x8C))), (*(f32 *)((u8 *)(D_87E1EBD8) + (0x90))), 0xF, 0x2000);
+    (*(s32 *)((u8 *)(D_87E1EBD8) + (0))) = (s32) ((*(s32 *)((u8 *)(D_87E1EBD8) + (0))) | 2);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E13558.s")
 
