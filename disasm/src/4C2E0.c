@@ -4,7 +4,16 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4C2E0/func_8004B6E0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4C2E0/func_8004B754.s")
+s32 func_8004B754(s32 a) {
+    s32 r = -1;
+    if (a > 0 && a <= 0xfd)
+        r = a - 1;
+    else if (a >= 0xfe && a <= 0x116)
+        r = 0xc8;
+    else if (a == 0x117)
+        r = 0x18;
+    return r;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4C2E0/func_8004B7A4.s")
 
