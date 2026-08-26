@@ -183,7 +183,15 @@ void func_86102B64(void *arg0, f32 *arg1, f32 *arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_861047CC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_861048FC.s")
+void func_861048FC(void **p) {
+    void *x = *p;
+    func_86104B2C();
+    *(f32 *)((u8 *)x + 0x18) = 0;
+    *(f32 *)((u8 *)x + 0x14) = 0;
+    *(u32 *)((u8 *)x + 0x0C) |= 0x02000000;
+    *(f32 *)((u8 *)x + 0x10) = 0;
+    *(f32 *)((u8 *)x + 0x50) = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86104948.s")
 
