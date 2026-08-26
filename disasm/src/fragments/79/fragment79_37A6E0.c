@@ -619,7 +619,15 @@ void func_84111C6C(void) { func_841089D8(0); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_84111DB4.s")
+extern void func_80024974(s32, s16, s16, s32, s32);
+void func_84111DB4(u8 *arg0, s32 arg1) {
+    if ((*(f32 *)((u8 *)(arg0) + (0x28))) == 0.0f) {
+        func_80024974(func_8411E1F8((s32) arg0) & 0xFF, (*(s16 *)((u8 *)(arg0) + (0x1A))), (*(s16 *)((u8 *)(arg0) + (0x40))), 0, arg1);
+    } else {
+        func_80024974(func_8411E1F8((s32) arg0) & 0xFF, (*(s16 *)((u8 *)(arg0) + (0x1A))), (*(s16 *)((u8 *)(arg0) + (0x40))), 1, arg1);
+    }
+    func_8003EB84(arg0, (s16) arg1);
+}
 #endif
 
 #ifdef VERSION_US

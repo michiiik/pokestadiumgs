@@ -113,7 +113,13 @@ void func_81300BA0(s32 arg0) { func_8130A570(arg0 + 0xDA8, 0); func_81304208(arg
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_81301448.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_813014D0.s")
+void func_813014D0(void *arg0) {
+    s32 temp_a0;
+    temp_a0 = (s32)arg0;
+    func_8130015C(arg0, 0);
+    func_81300350();
+    *(s32 *)((u8 *)temp_a0 + 0x1A168) = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_8130150C.s")
 

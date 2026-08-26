@@ -45,7 +45,22 @@ extern u8 D_80128574[]; s32 func_80057A5C(s32 index) { return D_80128574[index *
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80057BCC.s")
+s32 func_8005712C(s32, s32, s32, s32);
+s32 func_80057ACC(s32, s32, s32, s32);
+s32 func_80057BCC(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    s32 var_s0;
+
+    var_s0 = 0;
+loop_1:
+    if ((func_8005712C(arg0, arg1, arg2, arg3) == 0) && (func_80057ACC(arg0, arg1, arg2, arg3) != 0)) {
+        return 1;
+    }
+    var_s0 += 1;
+    if (var_s0 == 4) {
+        return 0;
+    }
+    goto loop_1;
+}
 #endif
 
 #ifdef VERSION_US

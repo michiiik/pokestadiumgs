@@ -141,7 +141,30 @@ void func_8AC00DE8(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC00F04.s")
+extern s32 D_8AC08524;
+extern void *D_8AC08528;
+extern void func_8AC00908(s32, s16, s16, s16, s32);
+void func_8AC00F04(s32 arg0) {
+    s32 var_s0;
+    void **var_s1;
+    void *temp_v0;
+    s32 var_v1;
+    if ((D_8AC08524 >= 0) && (D_8AC08524 < 0x64)) {
+        var_s0 = 0;
+        if (D_8AC08524 > 0) {
+            var_s1 = &D_8AC08528;
+            do {
+                temp_v0 = *var_s1;
+                if ((temp_v0 != NULL) && ((*(u16 *)((u8 *)temp_v0 + 2) & 2) != 0)) {
+                    var_v1 = *(s16 *)((u8 *)temp_v0 + 0xE);
+                    func_8AC00908(arg0, *(s16 *)((u8 *)temp_v0 + 8), *(s16 *)((u8 *)temp_v0 + 0xA), *(s16 *)((u8 *)temp_v0 + 0xC), var_v1);
+                }
+                var_s0 += 1;
+                var_s1++;
+            } while (var_s0 < D_8AC08524);
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
