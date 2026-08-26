@@ -22,7 +22,8 @@ void func_885069C0(void) {
     func_8850A0A0(0x28, 0x14, 0x230, 0x100);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C3FA0/func_88506A20.s")
+extern void func_88004990(s32,s32);
+void func_88506A20(void){func_8850A0A0(0,0,0x280,0x1E0);func_88004990(0,0);func_88004990(1,0);func_88004990(2,0);if(*(s32 *)((u8 *)D_88523010+0x18)!=0)func_88004990(3,0);func_88004990(4,0);func_88004990(5,0);}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C3FA0/func_88506AA8.s")
 
