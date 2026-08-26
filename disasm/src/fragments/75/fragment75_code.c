@@ -14,7 +14,20 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/75/fragment75_code/func_8FA00534.s")
+extern void func_80037120(s32, s32, s32 *, s16 *, s16 *);
+extern s32 D_80094908;
+s32 func_8FA00534(s32 arg0, void *arg1) {
+    s16 pad;
+    s32 sp28;
+    s16 sp26;
+    s16 sp24;
+    if (arg0 == 2) {
+        func_80037120(D_80094908 + 0xB4, D_80094908 + 0xA8, &sp28, &sp26, &sp24);
+        *(s16 *)((u8 *)arg1 + 0x1C) = (s16)(-0x2000 - sp26);
+        *(s16 *)((u8 *)arg1 + 0x1E) = (s16)(sp24 + 0x6000);
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
