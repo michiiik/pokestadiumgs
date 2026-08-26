@@ -78,7 +78,8 @@ void func_8260675C(u8 *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82606784.s")
+extern void func_800226C0(s32);
+void func_82606784(u8*a0,s32 a1,s32 a2,s32 a3){if(*(s16*)(a0+6)==0){*(s16*)(a0+6)=1;*(s16*)(a0+8)=0;*(s16*)(a0+0x1C)=a1;*(s16*)(a0+0x1E)=a3;*(s16*)(a0+0x20)=a2;*(s16*)(a0+0x22)=a3;func_800226C0(0x6D);}}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_826067D4.s")
 

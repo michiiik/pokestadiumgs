@@ -208,7 +208,27 @@ void func_83006AF0(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83006EB0.s")
+extern void func_800226C0(s32);
+extern void func_800226C0(s32);
+void func_83006EB0(void *arg0, s32 arg1) {
+    u8 temp_v0;
+
+    if ((arg1 == -1) || (arg1 == 1)) {
+        func_800226C0(3);
+        temp_v0 = (*(u8 *)((u8 *)(arg0) + (0x45)));
+        switch (temp_v0) {                          /* irregular */
+        case 1:
+            (*(s8 *)((u8 *)(arg0) + (0x1E))) = 0x14;
+            return;
+        case 2:
+            (*(s8 *)((u8 *)(arg0) + (0x1E))) = 0x1C;
+            return;
+        case 3:
+            (*(s8 *)((u8 *)(arg0) + (0x1E))) = 0x23;
+            break;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US

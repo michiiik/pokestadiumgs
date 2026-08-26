@@ -104,7 +104,18 @@ void func_8FB029B4(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/9/fragment9_code/func_8FB031E0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/9/fragment9_code/func_8FB032C4.s")
+extern u8 D_8FB03DF8;
+void func_80064D28(void);
+
+void func_8FB032C4(s32 arg0, s32 arg1) {
+    if ((*(s32 *)((u8 *)(&D_8FB03DF8) + (0x40))) != 2) {
+        do {
+            func_80064D28();
+            func_8FB029B4(&D_8FB03DF8);
+            func_8FB031E0(&D_8FB03DF8);
+        } while ((*(s32 *)((u8 *)(&D_8FB03DF8) + (0x40))) != 2);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/9/fragment9_code/func_8FB03328.s")
 

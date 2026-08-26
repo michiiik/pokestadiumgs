@@ -160,7 +160,65 @@ void func_829088EC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_82908A54.s")
+extern void func_80006CD0(s32, s32);
+s32 func_800082E0(s32, s32, s32, s32, s32, s32);
+extern void func_80008514(s32);
+extern void func_80008574();
+extern void func_8004C8C0(s32);
+extern void func_8290894C();
+extern void main_pool_pop_state(s32);
+extern void main_pool_push_state(s32);
+extern u8 D_446E30;
+extern s32 func_80047588(s32 arg0, s32 arg1);
+extern void func_8004C09C(s32 arg0);
+s32 func_8004DDF4(s32 arg0);
+u8 *func_80004638(s32 id, u8 *rom_start, u8 *rom_end, s32 arg3);
+extern u8 D_1000000[];
+extern u8 D_447D00[];
+void func_80047610(void);
+void func_80006D3C(void);
+void func_8004C398(void);
+extern void func_80006CD0(s32, s32);
+s32 func_800082E0(s32, s32, s32, s32, s32, s32);
+extern void func_80008514(s32);
+extern void func_80008574();
+extern void func_8004C8C0(s32);
+extern void func_8290894C();
+extern void main_pool_pop_state(s32);
+extern void main_pool_push_state(s32);
+extern u8 D_446E30;
+extern s32 func_80047588(s32 arg0, s32 arg1);
+extern void func_8004C09C(s32 arg0);
+s32 func_8004DDF4(s32 arg0);
+u8 *func_80004638(s32 id, u8 *rom_start, u8 *rom_end, s32 arg3);
+extern u8 D_1000000[];
+extern u8 D_447D00[];
+void func_80047610(void);
+void func_80006D3C(void);
+void func_8004C398(void);
+s32 func_82908A54(s32 arg0, s32 arg1) {
+    s32 sp24;
+
+    main_pool_push_state(0x454E44);
+    func_80006CD0(0x18000, 0);
+    sp24 = func_800082E0(0, 1, 3, 1, 2, 1);
+    func_80047588(6, 0);
+    func_8004C09C(0x21);
+    func_8004C8C0(0xC1);
+    func_8004DDF4(0xA6);
+    func_80004638((s32) ((u32) ((s32) D_1000000 & 0x0F000000) >> 0x18), &D_446E30, D_447D00, 0);
+    func_8290894C();
+    func_80008514(sp24);
+    func_82908854();
+    func_8290888C();
+    func_829088EC();
+    func_80008574();
+    func_80047610();
+    func_80006D3C();
+    func_8004C398();
+    main_pool_pop_state(0x454E44);
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US

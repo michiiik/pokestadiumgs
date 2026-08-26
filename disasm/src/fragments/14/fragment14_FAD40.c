@@ -56,7 +56,23 @@ void func_813032B0(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FAD40/func_813032D0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FAD40/func_81303364.s")
+f32 func_816092FC(void);
+f32 func_816092FC(void);
+void func_81303364(void *arg0) {
+    f32 temp_fv1;
+
+    (*(f32 *)((u8 *)(arg0) + (0x4DA4))) = (f32) ((*(f32 *)((u8 *)(arg0) + (0x4DA4))) - func_816092FC());
+    temp_fv1 = (*(f32 *)((u8 *)(arg0) + (0x4DA4)));
+    if (temp_fv1 <= 0.0f) {
+        (*(f32 *)((u8 *)(arg0) + (0x4DA4))) = 0.0f;
+        (*(s8 *)((u8 *)(arg0) + (0x4DBD))) = 0;
+        (*(s8 *)((u8 *)(arg0) + (0x4DC4))) = 0;
+        return;
+    }
+    if (temp_fv1 >= 16.0f) {
+        (*(f32 *)((u8 *)(arg0) + (0x4DA4))) = 16.0f;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FAD40/func_813033DC.s")
 

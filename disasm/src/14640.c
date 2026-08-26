@@ -53,7 +53,23 @@ void func_800147C8(s32 arg0, s32 arg1, s32 arg2, s32 arg3) { func_80014708(1, ar
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80014900.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_800149A8.s")
+s32 func_8001519C(s32 arg0);
+s32 func_8001519C(s32 arg0);
+void func_800149A8(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    void *temp_v1;
+
+    temp_v1 = func_8001519C(arg0) + (arg1 * 0x10);
+    if ((*(s8 *)((u8 *)(temp_v1) + (0x18))) == 5) {
+        switch (arg2) {                             /* irregular */
+        case 0:
+            (*(s32 *)((u8 *)(temp_v1) + (0x10))) = arg3;
+            return;
+        case 1:
+            (*(s32 *)((u8 *)(temp_v1) + (0x14))) = arg3;
+            break;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80014A18.s")
 

@@ -25,7 +25,7 @@ void func_82200CB4(void) {
     func_8004C8C0(0x93);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82200CEC.s")
+s32 func_82200CEC(s32 a0){s32 v1=0;volatile s32 *p=&a0;a0&=0xFF;if(a0==1||a0==2||a0==3||a0==4)v1=1;return v1;}
 
 void func_82200D28(void *arg0, s32 arg1)
 {

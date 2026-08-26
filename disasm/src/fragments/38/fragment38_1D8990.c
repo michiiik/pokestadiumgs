@@ -45,7 +45,25 @@ void func_88903B00(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D8990/func_88903B2C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D8990/func_88903BB4.s")
+extern void func_88004990(u8, s32);
+extern void *D_80087200;
+extern u8 *D_889041B0;
+extern void func_88004990(u8, s32);
+extern void *D_80087200;
+extern u8 *D_889041B0;
+void func_88903BB4(void) {
+    s32 *temp_v0;
+
+    if ((*(u16 *)((u8 *)(D_80087200) + (8))) & 0xC000) {
+        func_88004990(*(*(u8 **)((u8 *)(D_889041B0) + (0))), 0);
+        temp_v0 = (*(s32 **)((u8 *)(D_889041B0) + (0x240)));
+        if (temp_v0 != NULL) {
+            *temp_v0 = 1;
+            return;
+        }
+        D_880068B8 = 1;
+    }
+}
 
 extern u8 *D_889041B0;
 extern void func_889033A0(void *arg0);

@@ -16,7 +16,19 @@ extern Vtx *func_800398F8();
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800225C4.s")
+extern void func_800187AC();
+extern s8 D_8009019C;
+extern s8 D_800901A0;
+extern s8 D_800901A4;
+extern void func_80018728(u32, ...);
+
+void func_800225C4(s32 arg0) {
+    func_80018728(0x83000000U, arg0 * 3, arg0);
+    func_800187AC();
+    D_8009019C = 0;
+    D_800901A0 = 0;
+    D_800901A4 = 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -238,7 +250,26 @@ s32 func_80025C9C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025CBC.s")
+extern void func_800315E8();
+extern s8 D_80090B9C;
+void func_8002B1A0(void);
+extern void func_80028140(void);
+extern void func_80018728(u32, ...);
+
+void func_80025CBC(s32 arg0) {
+    s32 temp_s0;
+
+    func_8002B1A0();
+    func_800315E8();
+    func_80028140();
+    temp_s0 = arg0 * 3;
+    func_80018728(0x83000000U, temp_s0);
+    func_80018728(0x83010000U, temp_s0);
+    func_80018728(0x83020000U, temp_s0);
+    func_80018728(0x83030000U, temp_s0);
+    func_80018728(0x83040000U, temp_s0);
+    D_80090B9C = 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -461,7 +492,19 @@ void func_80027F4C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80028014.s")
+extern u8 D_8011F300;
+extern void func_80027EE0(s32);
+extern void func_800279C4(s32);
+
+void func_80028014(void) {
+    func_80027EE0(0xFFD);
+    func_800279C4(0xCF07);
+    if (D_8011F300 == 0x5C) {
+        func_80018728(0x83000000U, 0x1E);
+        return;
+    }
+    func_80018728(0xF1000000U, 0);
+}
 #endif
 
 #ifdef VERSION_US
@@ -1076,7 +1119,16 @@ void func_800341BC(s32 arg0, s32 arg1) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800344C4.s")
+extern s8 D_800D2B4B;
+extern u8 D_800D2B78;
+
+void func_800344C4(u8 arg0, s32 arg1) {
+    void *temp_v1;
+
+    D_800D2B4B = func_800347E8(arg0);
+    temp_v1 = (arg0 * 0x3C) + &D_800D2B78;
+    (*(u8 *)((u8 *)(temp_v1) + (0x14))) = (u8) ((*(u8 *)((u8 *)(temp_v1) + (0x14))) | 8);
+}
 #endif
 
 #ifdef VERSION_US
@@ -2439,7 +2491,17 @@ void func_80036E34(S1_MtxF* arg0, S1_Vec3s* arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800370A4.s")
+extern void func_80036714(S1_MtxF *, s32, s32, s32, f32);
+extern void func_8003614C(void *, s32, s32);
+void func_800370A4(S1_MtxF *arg0, s32 arg1, s32 arg2, S1_Vec3f *arg3, s32 arg4, s32 arg5) {
+    S1_MtxF sp60;
+    S1_MtxF sp20;
+
+    func_80036714(&sp60, arg4, arg5, arg1, 1.0f);
+    func_8003614C(&sp20, (s32) &D_800948D0, arg2);
+    func_80036A38(&sp20, &sp20, &sp60);
+    func_80036C6C(arg0, &sp20, arg3);
+}
 #endif
 
 #ifdef VERSION_US
@@ -4167,11 +4229,25 @@ void func_8003F018(s32 arg0) { func_8003F03C(arg0, D_80126420); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003F03C.s")
+extern S1_unk_D_86002F58_004_000 *func_80038894(S1_MainPoolState *, void *, s16, S1_Vec3f *, S1_Vec3s *, S1_Vec3f *);
+extern u8 D_800948DC[];
+extern u8 D_800948E4[];
+void func_8003F03C(s32 arg0, void *arg1) {
+    func_80038894(NULL, (void *) arg0, -1, &D_800948D0, (S1_Vec3s *) D_800948DC, (S1_Vec3f *) D_800948E4);
+    func_80038F8C(arg1, (void *) arg0);
+    (*(u8 *)((u8 *)(arg0) + (1))) = (u8) ((*(u8 *)((u8 *)(arg0) + (1))) & 0xFFFE);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003F0A8.s")
+extern S1_unk_D_86002F58_004_000 *func_80038894(S1_MainPoolState *, void *, s16, S1_Vec3f *, S1_Vec3s *, S1_Vec3f *);
+extern u8 D_800948DC[];
+extern u8 D_800948E4[];
+void func_8003F0A8(void *arg0) {
+    func_80038894(NULL, arg0, 0, &D_800948D0, (S1_Vec3s *) D_800948DC, (S1_Vec3f *) D_800948E4);
+    func_80038F8C(D_80126438, arg0);
+    (*(u8 *)((u8 *)(arg0) + (1))) = (u8) ((*(u8 *)((u8 *)(arg0) + (1))) & 0xFFFE);
+}
 #endif
 
 #ifdef VERSION_US
@@ -4712,7 +4788,39 @@ void func_80041664(S1_MemoryBlock* arg0, S1_arg1_func_80019420* arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80041A18.s")
+extern void func_800187AC();
+extern s8 D_8009019C;
+extern s8 D_800901A0;
+extern s8 D_800901A4;
+extern void func_80018728(u32, ...);
+extern s8 D_800D2B4B;
+extern u8 D_800D2B78;
+extern u8 D_8011F300;
+extern void func_80027EE0(s32);
+extern void func_800279C4(s32);
+s32 func_80041430(s32, s32, s32, s16, s32, s32);
+extern OSThread D_80126530;
+extern S1_unk_D_86002F58_004_000 *func_80038894(S1_MainPoolState *, void *, s16, S1_Vec3f *, S1_Vec3s *, S1_Vec3f *);
+extern u8 D_800948DC[];
+extern u8 D_800948E4[];
+extern void func_80036714(S1_MtxF *, s32, s32, s32, f32);
+extern void func_8003614C(void *, s32, s32);
+extern void func_800315E8();
+extern s8 D_80090B9C;
+void func_8002B1A0(void);
+extern void func_80028140(void);
+s32 func_80041430(s32, s32, s32, s16, s32, s32);
+extern OSThread D_80126530;
+void func_80041A18(void *arg0) {
+    s32 temp_v0;
+
+    temp_v0 = func_80041430(0, (*(s32 *)((u8 *)(arg0) + (0x14))), (*(s32 *)((u8 *)(&D_80126530) + (0x9F8))), (*(s16 *)((u8 *)(arg0) + (2))), (*(s32 *)((u8 *)(&D_80126530) + (0x9FC))), 0xF000);
+    if (temp_v0 != 0) {
+        (*(s32 *)((u8 *)(arg0) + (0xC))) = temp_v0;
+        return;
+    }
+    (*(s32 *)((u8 *)(arg0) + (0xC))) = 0;
+}
 #endif
 
 #ifdef VERSION_US

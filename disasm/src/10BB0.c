@@ -79,7 +79,17 @@ void func_8001067C(u8 *arg0) { *(s32 *)(arg0 + 0xC) = 0; *(s32 *)(arg0 + 4) = *(
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_8001068C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_800107CC.s")
+extern u8 D_8011EBC0;
+extern u8 D_8011EBE0;
+extern s32 D_8011F2F0;
+extern u8 D_8011BE90[];
+extern s32 D_8011EBD0;
+
+void func_800107CC(s32 arg0) {
+    func_80010610(&D_8011EBE0, D_8011F2F0, arg0);
+    func_80010610(&D_8011EBC0, (*(s32 *)((u8 *)(D_8011BE90) + (0x3460))) + arg0, (*(s32 *)((u8 *)(D_8011BE90) + (0x3464))) - arg0);
+    D_8011EBD0 = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_8001082C.s")
 

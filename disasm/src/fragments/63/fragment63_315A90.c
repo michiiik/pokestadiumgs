@@ -31,11 +31,60 @@ extern u32 D_87E1ABC4;
 extern void func_87E126D4(s32, void *, s32, s32, s32);
 void func_87E127FC(s32 arg0) { func_87E126D4(arg0, &D_87E1ABC4, 0, 30, 4096); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E12830.s")
+extern f32 D_87E1B824;
+extern f32 D_87E1B828;
+extern f32 D_87E1B82C;
+s32 func_80001FF0(void);
+extern f32 D_87E1B830;
+extern f32 D_87E1B834;
+extern f32 D_87E1B838;
+extern f32 D_87E1B83C;
+extern f32 D_87E1B840;
+extern f32 D_87E1B844;
+extern f32 D_87E1B824;
+extern f32 D_87E1B828;
+extern f32 D_87E1B82C;
+s32 func_80001FF0(void);
+void func_87E12830(s32 arg0) {
+    s32 var_a3;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E12900.s")
+    if (((f32) func_80001FF0() * D_87E1B824) >= 0.0f) {
+        var_a3 = (s32) (((f32) func_80001FF0() * D_87E1B828) + 0.5f);
+    } else {
+        var_a3 = (s32) (((f32) func_80001FF0() * D_87E1B82C) - 0.5f);
+    }
+    func_87E126D4(arg0, &D_87E1ABC4, 2, var_a3, 0x5000);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E129D0.s")
+extern f32 D_87E1B830;
+extern f32 D_87E1B834;
+extern f32 D_87E1B838;
+s32 func_80001FF0(void);
+void func_87E12900(s32 arg0) {
+    s32 var_a3;
+
+    if (((f32) func_80001FF0() * D_87E1B830) >= 0.0f) {
+        var_a3 = (s32) (((f32) func_80001FF0() * D_87E1B834) + 0.5f);
+    } else {
+        var_a3 = (s32) (((f32) func_80001FF0() * D_87E1B838) - 0.5f);
+    }
+    func_87E126D4(arg0, &D_87E1ABC4, 1, var_a3, 0x5000);
+}
+
+extern f32 D_87E1B83C;
+extern f32 D_87E1B840;
+extern f32 D_87E1B844;
+s32 func_80001FF0(void);
+void func_87E129D0(s32 arg0) {
+    s32 var_a3;
+
+    if (((f32) func_80001FF0() * D_87E1B83C) >= 0.0f) {
+        var_a3 = (s32) (((f32) func_80001FF0() * D_87E1B840) + 0.5f);
+    } else {
+        var_a3 = (s32) (((f32) func_80001FF0() * D_87E1B844) - 0.5f);
+    }
+    func_87E126D4(arg0, &D_87E1ABC4, 3, var_a3, 0x5000);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E12AA0.s")
 
