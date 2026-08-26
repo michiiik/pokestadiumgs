@@ -486,7 +486,13 @@ void func_8005C028(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005C060.s")
+void func_8005C060(s32 arg0, s32 arg1, s32 arg2) {
+    if (func_80057A80(arg0) != 0) {
+        func_8005BFF0(arg0, arg1, arg2);
+        return;
+    }
+    func_8005C028(arg0, arg1, arg2);
+}
 #endif
 
 #ifdef VERSION_US

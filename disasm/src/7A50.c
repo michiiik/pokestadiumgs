@@ -62,5 +62,7 @@ s32 func_8000731C(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/7A50/func_8000766C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/7A50/func_80007820.s")
+void func_80007820(void *arg0, u16 arg1) {
+    func_80007444(arg0, 0, 0, (s32) (*(u16 *)((u8 *)(D_80087220) + (4))), (s32) (*(u16 *)((u8 *)(D_80087220) + (6))), (arg1 << 0x10) | arg1);
+}
 #endif

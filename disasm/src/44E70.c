@@ -128,5 +128,19 @@ void func_800468C8(Vtx* arg0, s16 arg1, s16 arg2, s16 arg3, s16 arg4, s16 arg5, 
     arg0->v.cn[3] = arg9;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_80046930.s")
+void func_80046930(void *arg0, s16 arg1, s16 arg2) {
+    s16 temp_v0;
+    s16 temp_v1;
+
+    temp_v0 = arg1 * 2;
+    temp_v1 = arg2 * 2;
+    (*(s16 *)((u8 *)(arg0) + (8))) = temp_v0;
+    (*(s16 *)((u8 *)(arg0) + (0xA))) = temp_v1;
+    (*(s16 *)((u8 *)(arg0) + (0xC))) = 0x1FF;
+    (*(s16 *)((u8 *)(arg0) + (0xE))) = 0;
+    (*(s16 *)((u8 *)(arg0) + (0))) = temp_v0;
+    (*(s16 *)((u8 *)(arg0) + (2))) = temp_v1;
+    (*(s16 *)((u8 *)(arg0) + (4))) = 0x1FF;
+    (*(s16 *)((u8 *)(arg0) + (6))) = 0;
+}
 #endif
