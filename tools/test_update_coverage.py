@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 import tempfile
@@ -16,6 +17,24 @@ if str(TOOLS) not in sys.path:
 
 import update_coverage as cov  # noqa: E402
 
+# Repository-location env vars git sets for a hook subprocess's own children
+# (GIT_DIR/GIT_INDEX_FILE point at the *enclosing* repo, e.g. this worktree,
+# when this test file is itself invoked from a pre-commit hook that runs the
+# tools/ test suite). Left inherited, they redirect `git init`/`add`/`commit`
+# below off this throwaway tempdir and onto the enclosing repo instead --
+# stripping them makes every subprocess call resolve purely from cwd/-C.
+_GIT_ENV_VARS_TO_STRIP = (
+    "GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_COMMON_DIR",
+    "GIT_OBJECT_DIRECTORY", "GIT_ALTERNATE_OBJECT_DIRECTORIES",
+)
+
+
+def _clean_git_env() -> dict:
+    env = dict(os.environ)
+    for var in _GIT_ENV_VARS_TO_STRIP:
+        env.pop(var, None)
+    return env
+
 
 def _run_git(repo: Path, *args: str) -> str:
     result = subprocess.run(
@@ -23,6 +42,7 @@ def _run_git(repo: Path, *args: str) -> str:
         check=True,
         capture_output=True,
         text=True,
+        env=_clean_git_env(),
     )
     return result.stdout
 
@@ -66,6 +86,19 @@ class _GitFixture:
 
 class CoverageSnapshotTests(unittest.TestCase):
     def setUp(self) -> None:
+        # cov.coverage_snapshot() below shells out to `git grep --cached`
+        # (update_coverage.py's _git_grep_stdout) without its own env
+        # isolation, so it inherits this process's environment as-is.
+        # Strip the same repository-location vars _clean_git_env() strips
+        # for the subprocess-spawned tests, so that call resolves against
+        # self.repo (the tempdir fixture) rather than a hostile GIT_DIR/
+        # GIT_INDEX_FILE inherited from a git hook subprocess.
+        env_patch = mock.patch.dict(os.environ, {}, clear=False)
+        env_patch.start()
+        self.addCleanup(env_patch.stop)
+        for var in _GIT_ENV_VARS_TO_STRIP:
+            os.environ.pop(var, None)
+
         self._tmp = tempfile.TemporaryDirectory()
         self.repo = Path(self._tmp.name)
         self.fixture = _GitFixture(self.repo)
@@ -190,6 +223,7 @@ class CommandLineTests(unittest.TestCase):
                 check=True,
                 capture_output=True,
                 text=True,
+                env=_clean_git_env(),
             )
             content = output.read_text(encoding="utf-8")
             self.assertTrue(content.startswith(cov.GENERATED_HEADER))
@@ -216,6 +250,7 @@ class CommandLineTests(unittest.TestCase):
                 check=True,
                 capture_output=True,
                 text=True,
+                env=_clean_git_env(),
             )
             content = output.read_text(encoding="utf-8")
             self.assertIn("| `disasm/src/AAA.c` | 3 |", content)
