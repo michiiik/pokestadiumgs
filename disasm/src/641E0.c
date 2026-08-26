@@ -136,7 +136,16 @@ s32 func_80064700(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80064728.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_800647C8.s")
+extern void *D_800A5160;
+extern void *func_8004B7A4(s32);
+s32 func_800647C8(u8 arg0) {
+    void *v;
+    v = func_8004B7A4(arg0);
+    if (v) {
+        return (s32)v;
+    }
+    return (s32)&D_800A5160;
+}
 
 extern u8 D_8009D280[];
 s32 func_80064800(u8 arg0) { s32 index = arg0; if ((arg0 > 0) && (arg0 < 0xFC)) return *(s32 *)(D_8009D280 + index * 12); return 0; }
