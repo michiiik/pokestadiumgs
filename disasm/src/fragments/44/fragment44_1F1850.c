@@ -22,7 +22,26 @@ void func_8AF035E0(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F1850/func_8AF03798.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F1850/func_8AF037EC.s")
+extern void func_8AC0619C(s32 *, u16);
+extern void func_8AC06220(s32 *, u16);
+extern u16 D_8AF2BDC6;
+extern s16 D_8AF2C094;
+extern u8 D_8AF2C098;
+extern u8 D_8AF2C110;
+extern u8 D_8AF2C188;
+extern u8 D_8AF2C200;
+void func_8AF037EC(void) {
+    switch (D_8AF2C094) {                           /* irregular */
+    case 0:
+        func_8AC0619C(&D_8AF2C188, D_8AF2BDC6);
+        func_8AC06220(&D_8AF2C200, D_8AF2BDC6);
+        return;
+    case 1:
+        func_8AC0619C(&D_8AF2C098, D_8AF2BDC6);
+        func_8AC06220(&D_8AF2C110, D_8AF2BDC6);
+        return;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F1850/func_8AF03878.s")
 

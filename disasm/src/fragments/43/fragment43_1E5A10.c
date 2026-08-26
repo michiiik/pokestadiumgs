@@ -31,7 +31,9 @@ void func_8AC002D8(s16 arg0, s16 arg1, u8 arg2)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC00334.s")
+s32 func_8AC00334(s16 arg0, s16 arg1) {
+    return (func_800542B0((s32) arg1) >> arg0) & 1 & 0xFF;
+}
 #endif
 
 #ifdef VERSION_US
@@ -187,6 +189,7 @@ void func_8AC00FEC(void) {
 #endif
 
 #ifdef VERSION_US
+extern u8 *func_8004CA60(u8 *);
 extern void func_800459AC(u8 *, u8, u8, u16, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 s32 func_8AC010D4(u8 *arg0, u16 arg1, u16 arg2) {
     if (arg0 == NULL) {

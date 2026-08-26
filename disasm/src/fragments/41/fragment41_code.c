@@ -121,5 +121,33 @@ void func_88C014D8(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/41/fragment41_code/func_88C015DC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/41/fragment41_code/func_88C01750.s")
+extern void func_80006CD0(s32, s32);
+s32 func_800082E0(s32, s32, s32, s32, s32, s32);
+extern void func_80008514(s32);
+extern void func_80008574();
+extern void func_88C015DC();
+extern void main_pool_pop_state(s32);
+extern void main_pool_push_state(s32);
+s32 func_88C01750(s32 arg0, s32 arg1) {
+    s32 sp24;
+
+    main_pool_push_state(0x434C4544);
+    func_80006CD0(0x10000, 0);
+    sp24 = func_800082E0(1, 0, 2, 0, 2, 1);
+    func_8004C09C(3);
+    func_80047588(0x18, 0);
+    func_88C015DC();
+    func_80008514(sp24);
+    func_88C01398();
+    func_88C01494();
+    func_88C014D8();
+    func_80008574();
+    func_800033DC((s32) D_88C01A60);
+    func_80047610();
+    func_8004C398();
+    func_80006D3C();
+    func_80057944(0U);
+    main_pool_pop_state(0x434C4544);
+    return 0;
+}
 #endif
