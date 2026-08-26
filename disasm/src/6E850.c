@@ -111,7 +111,19 @@ extern void func_8006DEBC(void *); extern void func_8006F23C(void *); void func_
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_8006E7DC.s")
+void func_8006E7DC(f32 (*arg0)[4], void *arg1) {
+    f32 sp3C;
+    f32 sp38;
+    f32 sp34;
+
+    sp3C = (*(f32 *)((u8 *)(arg1) + (0)));
+    sp38 = (*(f32 *)((u8 *)(arg1) + (4)));
+    sp34 = (*(f32 *)((u8 *)(arg1) + (8)));
+    guMtxXFMF(arg0, sp3C, sp38, sp34, &sp3C, &sp38, &sp34);
+    (*(f32 *)((u8 *)(arg1) + (0xC))) = sp3C;
+    (*(f32 *)((u8 *)(arg1) + (0x10))) = sp38;
+    (*(f32 *)((u8 *)(arg1) + (0x14))) = sp34;
+}
 #endif
 
 #ifdef VERSION_US
