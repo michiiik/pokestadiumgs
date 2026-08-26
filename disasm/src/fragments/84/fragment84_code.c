@@ -106,7 +106,6 @@ void func_8FC00F88(void) {
 #endif
 
 #ifdef VERSION_US
-extern u32 D_8FC0C2D8;
 extern void func_80060358(s32, void *);
 void func_8FC00FD0(void) { func_80060358(0, &D_8FC0C2D8); }
 #endif
@@ -261,7 +260,6 @@ void func_8FC021D0(void) {
 extern void func_8FC00E90();
 extern void func_8FC02168();
 extern void func_8FC021D0();
-extern u8 D_8FC02830;
 void func_8FC02248(void) {
     do {
         func_8FC021D0();
@@ -293,7 +291,6 @@ void func_8FC022F4(void) { func_8004C4B0(6); func_8004C4B0(75); }
 #ifdef VERSION_US
 extern void _bzero(s32 *, s32);
 extern void func_8FC0135C();
-extern u8 D_8FC02830;
 void func_8FC0231C(s32 arg0) {
     func_8FC0229C();
     func_8FC022F4();

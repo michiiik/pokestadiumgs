@@ -99,7 +99,6 @@ void func_86805D50(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/56/fragment56_code/func_8680660C.s")
 
-extern s32 D_8682F2A8;
 extern s32 D_8682F2B4;
 void func_868066B8(void) {
     if (D_8682F2B4 != 1) {

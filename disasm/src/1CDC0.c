@@ -203,7 +203,6 @@ void func_8001F7A0(void *arg0) {
     }
 }
 
-extern void func_8001CA3C(void);
 extern void func_8001C404(s32);
 extern u8 D_8008F194[];
 extern u8 D_8008F1A4[];

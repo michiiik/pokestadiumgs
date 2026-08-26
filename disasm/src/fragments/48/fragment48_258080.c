@@ -32,9 +32,6 @@ void func_87C02508(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_258080/func_87C02538.s")
 
-extern void func_87C00198();
-extern s32 func_87C00160(u8 *, s32, u8 *);
-extern s32 func_87C00238(u8 *, u8 *, s32);
 void func_87C02594(u8 *arg0, s32 arg1, s32 arg2) {
     u8 temp0[0x18];
     u8 temp1[0x18];

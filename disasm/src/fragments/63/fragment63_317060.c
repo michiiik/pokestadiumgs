@@ -55,7 +55,6 @@ extern void func_87E1425C(s32);
 extern void func_87E14E08();
 extern void func_87F0277C(s32);
 extern void func_87F0C3EC(s32 *);
-extern u8 D_87E1EC10;
 void func_87E14F98(s32 arg0) {
     func_87E14E08();
     func_87F0277C(arg0 + 4);
@@ -167,7 +166,6 @@ void func_87E1643C(void *arg0, void *arg1, void *arg2, void *arg3) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E17484.s")
 
-extern void func_80038E14(s32, s32, s32, s32, f32, f32, f32, s32);
 extern void *D_87E1EC88;
 s32 func_87E176A0(s32 arg0, s32 arg1) {
     func_80038E14(arg1, (*(s32 *)((u8 *)(D_87E1EC88) + (0x1158))), (*(s32 *)((u8 *)(D_87E1EC88) + (0x115C))), (*(s32 *)((u8 *)(D_87E1EC88) + (0x1160))), (*(f32 *)((u8 *)(D_87E1EC88) + (0x1164))), (*(f32 *)((u8 *)(D_87E1EC88) + (0x1168))), (*(f32 *)((u8 *)(D_87E1EC88) + (0x116C))), 0);
@@ -212,8 +210,6 @@ void func_87E17F14(s32 arg0) {
     main_pool_pop_state(0x4D51454A);
 }
 
-extern void func_87E01628();
-extern void main_pool_pop_state(s32);
 
 void func_87E17F48(void) {
     func_87E01628();

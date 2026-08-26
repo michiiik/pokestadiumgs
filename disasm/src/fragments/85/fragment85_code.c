@@ -53,7 +53,6 @@ void func_8FD00654(void) {
 
 #ifdef VERSION_US
 s32 func_8004C990(s32, s32);
-extern void func_8004D1FC(s32);
 
 void func_8FD008BC(void) {
     func_8004D1FC(func_8004C990(0x1F, 0));
@@ -126,7 +125,6 @@ void func_8FD014A0(void) {
 #endif
 
 #ifdef VERSION_US
-extern u8 D_8FD02188;
 
 void func_8FD014D8(void) {
     if ((*(u8 *)((u8 *)(&D_8FD02188) + (0))) == 2) {
@@ -179,8 +177,6 @@ void func_8FD016E4(void) {
 extern void *D_80087200;
 extern u8 D_8FD020E4;
 extern u16 D_8FD02180;
-extern u16 D_8FD02182;
-extern u16 D_8FD02184;
 void func_8FD01964(void) {
     func_80064D28();
     if (D_8FD020E4 != 0) {

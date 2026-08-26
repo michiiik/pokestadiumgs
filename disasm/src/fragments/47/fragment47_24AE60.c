@@ -121,7 +121,6 @@ void func_860075A8(void *arg0) {
     (*(u8 *)((u8 *)(arg0) + (0x75C0))) = (u8) ((*(u8 *)((u8 *)(arg0) + (0x75C0))) & 0xFFFB);
 }
 
-extern void func_86004968();
 extern void func_87F02328();
 void func_860075E4(void *arg0) {
     (*(u8 *)((u8 *)(arg0) + (0x75C0))) = (u8) ((*(u8 *)((u8 *)(arg0) + (0x75C0))) & 0xFFF7);

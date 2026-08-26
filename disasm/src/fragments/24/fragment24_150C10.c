@@ -470,7 +470,6 @@ void func_82B07AB4(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_82B060A0(s32);
 void func_82B084AC(void) { func_82B060A0(0); }
 #endif
 

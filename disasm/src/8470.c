@@ -50,7 +50,6 @@ void func_800080B8(void) { func_80006D6C(); func_80007E18(); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_800082E0.s")
 
-extern s32 D_800D0554;
 
 s32 func_80008494(void) {
     return D_800D0554;
@@ -105,7 +104,6 @@ extern u8 D_800D0510[]; void func_80008624(void) { func_80002178(D_800D0510); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_800088DC.s")
 
-extern s32 D_800D0554;
 typedef struct {
     u8 pad16[0x16];
     s8 index16;

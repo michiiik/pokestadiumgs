@@ -16,7 +16,6 @@ void func_86C00020(void) {
 }
 
 extern u8 D_800D0510[];
-extern u8 D_86C00350[];
 extern void func_800088DC(void);
 extern void func_80007820(void *, s32);
 extern void func_81A0022C(void *);

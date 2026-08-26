@@ -39,12 +39,8 @@ void func_87F024CC(void);
 extern u8 D_87E1B9C0;
 s32 func_80002984(s32 arg0, s32 arg1);
 extern u8 D_87E1B9D8;
-extern void func_87F0252C(u8 *, s32, s32, s32);
-extern u8 D_80126420;
 void func_87F024CC(void);
-extern u8 D_87E1B9C0;
 s32 func_80002984(s32 arg0, s32 arg1);
-extern u8 D_87E1B9D8;
 void func_87E06068(s32 arg0) {
     func_87F024CC();
     func_87F0252C(&D_87E1B9C0, arg0 + 0x18, func_80002984(0x141C, 0), 0xD);

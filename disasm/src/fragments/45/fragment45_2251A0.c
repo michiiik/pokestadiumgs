@@ -225,7 +225,6 @@ void func_8AB01F80(s16 arg0) {
 #endif
 
 #ifdef VERSION_US
-extern s16 D_8AB126A0;
 
 void func_8AB01FBC(void) {
     D_8AB126A0 = 0;

@@ -31,10 +31,6 @@ extern void func_82906B6C(f32 *, s32 *, f32 *, s32);
 extern f32 D_8291247C;
 extern u8 D_8291248C;
 extern f32 D_82919DA8;
-extern void func_82906B6C(f32 *, s32 *, f32 *, s32);
-extern f32 D_8291247C;
-extern u8 D_8291248C;
-extern f32 D_82919DA8;
 void func_8290711C(s32 arg0) {
     if (arg0 == 0) {
         func_82906A2C(&D_82919DA8, &D_8291247C);

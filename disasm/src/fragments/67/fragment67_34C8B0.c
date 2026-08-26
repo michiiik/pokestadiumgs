@@ -47,7 +47,6 @@ void func_82911880(void) {
 
 extern void func_80064D28();
 extern void func_82910258();
-extern s32 D_8291BE70;
 void func_829118D4(void) {
     if (D_8291BE70 != 0) {
         do {

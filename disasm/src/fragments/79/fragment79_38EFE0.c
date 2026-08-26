@@ -50,7 +50,6 @@ void func_8411F90C(s32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_8411F94C.s")
 
-extern void func_841125F4(s32, s32);
 extern void func_84112564(s32);
 extern void func_84111348(s32, s32);
 extern u8 *D_841911E0;
@@ -237,16 +236,12 @@ void func_84120BB4(u8 *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84120D34.s")
 
-extern void func_84120700(s32);
 extern void func_8411EFE4(s32);
 s32 func_8411E164(s32 arg0);
 void func_8411EE74(u8 *arg0);
 void func_8411EF08(u8 *arg0);
 void func_8410B578(f32 arg0);
-extern void func_800357A8(f32 *, f32, f32, f32);
 void func_8411EF2C(s32 arg0);
-extern void func_84120700(s32);
-extern void func_8411EFE4(s32);
 s32 func_8411E164(s32 arg0);
 void func_8411EE74(u8 *arg0);
 void func_8411EF08(u8 *arg0);
@@ -291,7 +286,6 @@ void func_84120E7C(u8 *arg0) {
 
 extern void func_84120464(s32, s32, s32);
 extern s32 D_84183C90;
-extern void func_800357A8(f32 *, f32, f32, f32);
 void func_841210CC(s32 arg0) {
     func_800357A8(arg0 + 0x5E4, 0.0f, 0.0f, 0.0f);
     func_800357A8(arg0 + 0x5F0, 0.0f, 0.0f, 0.0f);

@@ -113,12 +113,7 @@ void func_8AF0E084(void) {
     D_8AF2E89A = D_8AF2ECFA;
 }
 
-extern void func_8AF00130(s32);
-extern s16 D_8AF2E894;
-extern s16 D_8AF2E896;
-extern s16 D_8AF2E89A;
 extern void *D_8AF2E8A8;
-extern s16 D_8AF2ECF8;
 extern s16 D_8AF2ECFC;
 void func_8AF0E0D8(void) {
     func_8AF00130(1);
@@ -128,13 +123,8 @@ void func_8AF0E0D8(void) {
     D_8AF2E89A = D_8AF2ECFC;
 }
 
-extern void func_8AF00130(s32);
-extern s16 D_8AF2E894;
-extern s16 D_8AF2E896;
 extern s16 D_8AF2E898;
-extern s16 D_8AF2E89A;
 extern void *D_8AF2E8AC;
-extern s16 D_8AF2ECF8;
 extern s16 D_8AF2ECFE;
 void func_8AF0E130(void) {
     func_8AF00130(1);

@@ -316,7 +316,6 @@ void func_80018A94(s32 arg0, s32 *arg1, s32 *arg2) { s32 offset = arg0 * 0x14; *
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80018C14.s")
 
-extern u8 *D_80121EDC[];
 s8 func_80018C60(s32 arg0, s32 arg1, s32 arg2)
 {
   u8 *temp_v1;

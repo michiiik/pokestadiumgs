@@ -284,10 +284,8 @@ void func_86508ABC(void) {
 #endif
 
 #ifdef VERSION_US
-extern s32 func_80007B34(s32);
 s32 func_87F01A40();
 extern s32 D_8650C494;
-extern s32 D_8650C5E0;
 void func_86509480(void) {
     s32 temp_v0;
 

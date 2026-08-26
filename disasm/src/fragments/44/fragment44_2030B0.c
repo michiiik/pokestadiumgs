@@ -44,7 +44,6 @@ s32 func_8AF15E80(s32 arg0, s32 arg1) {
 extern s16 D_8AF33C72;
 extern s16 D_8AF33C74;
 extern s16 D_8AF33C76;
-extern s16 D_8AF33C78;
 extern s16 D_8AF33C7C;
 
 void func_8AF15EF0(void) {

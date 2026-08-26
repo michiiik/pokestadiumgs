@@ -206,7 +206,6 @@ void func_86709128(void) {
 extern s32 func_80007B34(s32);
 s32 func_87F01A40();
 extern s32 D_8670B394;
-extern s32 D_8670BB48;
 void func_8670972C(void) {
     s32 temp_v0;
 

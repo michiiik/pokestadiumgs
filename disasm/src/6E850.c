@@ -69,9 +69,6 @@ s16 func_8006DE54(s16 *arg0, s32 arg1)
 #endif
 
 #ifdef VERSION_US
-extern s16 D_8009E9D4[];
-extern s16 D_8009EBD8[];
-extern s16 D_8009EFE0[];
 s16 func_8006DE74(s16 *arg0, s32 arg1)
 {
   s16 new_var;
@@ -85,9 +82,6 @@ void func_8006DE94(void) {
 }
 
 #ifdef VERSION_US
-extern s16 D_8009E9D4[];
-extern s16 D_8009EBD8[];
-extern s16 D_8009EFE0[];
 s16 func_8006DE9C(s16 *arg0, s32 arg1)
 {
   s16 new_var;

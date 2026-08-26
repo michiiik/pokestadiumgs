@@ -128,7 +128,6 @@ void func_81303D04(void *arg0) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FAD40/func_81303E20.s")
 
 s32 func_81303A38(void *);
-extern void func_81311C18(s32);
 void func_81303EA8(void *arg0) {
     func_81311C18((*(s32 *)((u8 *)(arg0) + (0x4DA0))) + 0x74);
     if (func_81303A38(arg0) != 0) {

@@ -168,8 +168,6 @@ void func_81301D28(s32 arg0, s32 arg1)
   }
 }
 
-extern void func_81311030(s32);
-extern void func_8130F7B8(s32, s32);
 void func_81301D94(s32 arg0) {
     s32 temp_a0 = arg0 + 0xF64C;
     func_81311030(temp_a0);
@@ -177,18 +175,12 @@ void func_81301D94(s32 arg0) {
 }
 
 extern void func_813054F4(s32);
-extern void func_81311650(s32, s32);
 
 void func_81301DD8(s32 arg0, s32 arg1) {
     func_813054F4(arg0 + 0xF630);
     func_81311650(arg0 + 0x74, arg1);
 }
 
-extern void func_8130881C(s32);
-extern void func_8130302C(s32, s32);
-extern void func_8130DEB8(s32, s32);
-extern void func_813060C8(s32, s32);
-extern void func_81311650(s32, s32);
 void func_81301E14(s32 arg0, s32 arg1)
 {
   func_8130881C(arg0 + 0xDA8);
@@ -203,8 +195,6 @@ void func_81301E14(s32 arg0, s32 arg1)
 }
 
 extern void func_8130CB5C(s32);
-extern void func_81311650(s32, s32);
-extern void func_8130DEB8(s32, s32);
 void func_81301E80(s32 arg0, s32 arg1) {
     func_8130CB5C(arg0 + 0xD18);
     func_81311650(arg0 + 0x74, arg1);

@@ -245,7 +245,6 @@ void func_86406660(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-extern u8 *D_86416C00;
 extern void func_86405778(void);
 extern void func_87F0277C(u8 *);
 extern void func_86409260(u8 *);

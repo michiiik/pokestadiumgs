@@ -169,7 +169,6 @@ s32 func_81404334(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_8140487C.s")
 
-extern u8 D_800CE060;
 
 void *func_814049CC(void *arg0) {
     s8 temp_v1;

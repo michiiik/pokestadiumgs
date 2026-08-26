@@ -206,8 +206,6 @@ void func_8F1029CC(void) {
 #endif
 
 #ifdef VERSION_US
-extern void *D_80087200;
-extern u8 D_8F1DECA8;
 void func_8F102B48(void) {
     if ((*(u16 *)((u8 *)(D_80087200) + (0xC))) & 0x200) {
         (*(s8 *)((u8 *)(&D_8F1DECA8) + (0xA6))) = (s8) ((*(s8 *)((u8 *)(&D_8F1DECA8) + (0xA6))) - 1);

@@ -18,9 +18,6 @@ void func_8F900574(void) {
     D_8F911664 = (s32) *(&D_8F901630 + D_8F91163C);
 }
 
-extern u8 D_8F901630;
-extern s32 D_8F91163C;
-extern s32 D_8F911664;
 
 void func_8F900594(void) {
     *(&D_8F901630 + D_8F91163C) = (s8) D_8F911664;

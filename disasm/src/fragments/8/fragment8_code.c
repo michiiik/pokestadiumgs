@@ -21,7 +21,6 @@ void func_82F00644(void *arg0, s32 arg1) {
     }
 }
 
-extern void func_800226C0(s32);
 
 void func_82F00670(void *arg0, s32 arg1) {
     if (arg1 != 0) {
@@ -30,7 +29,6 @@ void func_82F00670(void *arg0, s32 arg1) {
     }
 }
 
-extern void func_800226C0(s32);
 
 void func_82F0069C(void *arg0, s32 arg1) {
     if (arg1 != 0) {
@@ -39,7 +37,6 @@ void func_82F0069C(void *arg0, s32 arg1) {
     }
 }
 
-extern void func_800226C0(s32);
 
 void func_82F006C8(void *arg0, s32 arg1) {
     if (arg1 != 0) {
@@ -140,17 +137,9 @@ extern void func_800086A4(s32);
 extern void func_80007AEC(s32);
 void func_81801794(void);
 extern void func_80021ED8(s32);
-extern void func_8180132C(s32);
 s32 func_81801388(s32, s32);
-extern void func_81804FD0(u8 *);
 s32 func_82F00460(u8 *);
-extern void func_82F00580(u8 *);
-extern u8 D_82F02B28;
-extern u8 D_82F02F48;
-extern u8 D_82F0305C;
-extern u8 D_82F030CC;
 void func_80064D28(void);
-extern u8 D_82F032C0;
 void func_81600AF0(s32 arg0, s32 arg1, s32 arg2);
 s32 func_82F01C34(s32 arg0) {
     func_80064D28();
@@ -182,7 +171,6 @@ extern void func_80008648();
 extern void func_800088DC();
 extern void func_818017A8();
 extern void func_81805308(s32 *);
-extern u8 D_82F032C0;
 
 void func_82F01D38(s32 arg0) {
     func_800088DC();
@@ -204,24 +192,12 @@ void func_82F01D74(s32 arg0, s32 arg1) {
     } while (var_s0 != 1);
 }
 
-extern void func_80006CD0(s32, s32);
 s32 func_800082E0(s32, s32, s32, s32, s32, s32);
-extern void func_80008514(s32);
-extern void func_8004C8C0(s32);
-extern u8 D_446E30;
-extern u8 D_82F031C8;
 u8 *func_80004638(s32 id, u8 *rom_start, u8 *rom_end, s32 arg3);
-extern u8 D_1000000[];
-extern u8 D_447D00[];
-extern void func_8004C09C(s32 arg0);
 s32 func_8004C4B0(s32 value);
 void func_81804A00(u8 *arg0);
 void func_81801F60(u8 *arg0);
-extern s32 func_80047588(s32 arg0, s32 arg1);
-extern void func_800086A4(s32);
-extern void func_80007AEC(s32);
 void func_81801794(void);
-extern void func_80021ED8(s32);
 void func_82F01DC4(s32 arg0, s32 arg1) {
     s32 sp24;
 

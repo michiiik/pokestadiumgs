@@ -241,7 +241,6 @@ s32 func_8220A5BC(s32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_8220A608.s")
 
-extern void func_8003CD84();
 extern void func_8220A608(s32);
 extern s32 D_822109B4;
 s32 func_8220AA08(s32 arg0, s32 arg1) {
@@ -292,7 +291,6 @@ void func_8220AD38(s32 arg0, void *arg1) {
     }
 }
 
-extern u8 D_8220DEF4;
 
 void func_8220AD70(s32 arg0, void *arg1) {
     void *temp_v0;
@@ -304,7 +302,6 @@ void func_8220AD70(s32 arg0, void *arg1) {
     }
 }
 
-extern u8 D_8220DEF4;
 
 void func_8220ADA8(s32 arg0, void *arg1) {
     void *temp_v0;

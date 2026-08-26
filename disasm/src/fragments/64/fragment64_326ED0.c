@@ -43,8 +43,6 @@ void func_87F05BC8(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     func_87F05B88(arg0, arg1, arg2, (s32)temp);
 }
 
-extern void func_87F056E0(void *, s32);
-extern void func_87F05954(s32, s32, s32, s32);
 void func_87F05C0C(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     s32 temp[16];
     func_87F056E0(temp, arg3);
@@ -52,11 +50,8 @@ void func_87F05C0C(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
 }
 
 extern void func_87F057EC(void *, s32, s32);
-extern void func_87F05B88(s32, s32, s32, s32);
 void func_87F05C50(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) { s32 temp[16]; func_87F057EC(temp, arg3, arg4); func_87F05B88(arg0, arg1, arg2, (s32)temp); }
 
-extern void func_87F057EC(void *, s32, s32);
-extern void func_87F05954(s32, s32, s32, s32);
 void func_87F05C98(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) { s32 temp[16]; func_87F057EC(temp, arg3, arg4); func_87F05954(arg0, arg1, arg2, (s32)temp); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_326ED0/func_87F05CE0.s")

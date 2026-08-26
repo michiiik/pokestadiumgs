@@ -69,7 +69,6 @@ void func_8AF19E24(s16 arg0) {
     func_8AF19CB0(arg0, 6);
 }
 
-extern void func_8AF19CB0(s16, s32);
 
 void func_8AF19E50(s16 arg0) {
     func_8AF19CB0(arg0, 0xC);

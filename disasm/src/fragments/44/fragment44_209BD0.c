@@ -27,7 +27,6 @@ s32 func_8AF1BED8(void) {
 }
 
 extern s32 D_8AF27494;
-extern void *D_8AF37244;
 
 s32 func_8AF1BF00(void) {
     if (-D_8AF27494 < (*(s16 *)((u8 *)(D_8AF37244) + (0xA)))) {

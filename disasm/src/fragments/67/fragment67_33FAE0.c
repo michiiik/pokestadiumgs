@@ -20,9 +20,6 @@ extern void func_829034D8();
 extern void func_829035C4();
 extern void func_8290367C();
 extern u8 D_82919D48;
-extern u8 D_22E0;
-extern u8 D_49B780;
-extern u8 D_82919CE0;
 void func_80003F74(u8 *arg0, u8 *arg1, u8 *arg2, s32 arg3);
 void func_829031F4(void *arg0) {
     u8 *temp_a1;
@@ -92,12 +89,6 @@ void func_829034B0(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8290325C(void *);
-extern void func_82903298(void *);
-extern void func_829034D8();
-extern void func_829035C4();
-extern void func_8290367C();
-extern u8 D_82919D48;
 void func_8290379C(void *arg0) {
     func_829035C4();
     (*(s16 *)((u8 *)(arg0) + (0x1068))) = 0;

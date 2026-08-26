@@ -178,21 +178,9 @@ extern u8 D_447D00[];
 void func_80047610(void);
 void func_80006D3C(void);
 void func_8004C398(void);
-extern void func_80006CD0(s32, s32);
 s32 func_800082E0(s32, s32, s32, s32, s32, s32);
-extern void func_80008514(s32);
-extern void func_80008574();
-extern void func_8004C8C0(s32);
-extern void func_8290894C();
-extern void main_pool_pop_state(s32);
-extern void main_pool_push_state(s32);
-extern u8 D_446E30;
-extern s32 func_80047588(s32 arg0, s32 arg1);
-extern void func_8004C09C(s32 arg0);
 s32 func_8004DDF4(s32 arg0);
 u8 *func_80004638(s32 id, u8 *rom_start, u8 *rom_end, s32 arg3);
-extern u8 D_1000000[];
-extern u8 D_447D00[];
 void func_80047610(void);
 void func_80006D3C(void);
 void func_8004C398(void);
@@ -370,8 +358,6 @@ void func_8290AEA8(void) {
 
 #ifdef VERSION_US
 extern void func_8290A81C(s32);
-extern s32 D_8291B858;
-extern s32 D_82912F80;
 void func_8290B220(void) {
     func_80007AEC(8);
     func_8290A81C(3);
@@ -395,7 +381,6 @@ s32 func_8290B3BC(void) {
 #endif
 
 #ifdef VERSION_US
-extern u8 D_8291B831;
 
 s32 func_8290B3E4(void) {
     if (D_8291B831 == 0x1A) {
@@ -482,7 +467,6 @@ s32 func_8290B3E4(void) {
 #endif
 
 #ifdef VERSION_US
-extern s32 D_8291B864;
 
 void func_8290D72C(void) {
     D_8291B864 = 0;

@@ -64,7 +64,6 @@ void func_87F0F390(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_3312D0/func_87F0F3E4.s")
 
-extern u32 D_87F15BB0;
 extern void func_81A0022C(void *);
 void func_87F0F444(void) { func_81A0022C(&D_87F15BB0); }
 

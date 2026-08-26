@@ -105,7 +105,6 @@ s32 func_8130FF18(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-extern f32 func_8130FF70(f32 arg0);
 void func_8130FFE0(f32 arg0, f32 arg1) {
     f32 temp[2];
     temp[0] = func_8130FF70(arg1);

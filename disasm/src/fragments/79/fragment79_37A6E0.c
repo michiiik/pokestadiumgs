@@ -44,11 +44,8 @@ void func_8410B1CC(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8410AE8C(u8 *, s16, s16, s16, s32);
 extern void func_841112C8();
-extern u8 D_84190428[];
 extern u8 *D_841911E0;
-extern u8 D_841910E0[];
 void func_8410B224(void) {
     func_8410AE8C(D_84190428, (*(s16 *)((u8 *)(D_841911E0) + (0x9A))), (*(s16 *)((u8 *)(D_841911E0) + (0x9C))), (*(s16 *)((u8 *)(D_841911E0) + (0x9E))), (s32) (*(s16 *)((u8 *)(D_841911E0) + (0xA0))));
     (*(u8 *)((u8 *)(D_841910E0) + (1))) = (u8) ((*(u8 *)((u8 *)(D_841910E0) + (1))) & 0xFFEF);
@@ -65,8 +62,6 @@ void func_8410B224(void) {
 #endif
 
 #ifdef VERSION_US
-extern u8 *D_841911E0;
-extern u8 *D_841911E4;
 u8 *func_8410B330(u8 *arg0) {
     if (arg0 == *(u8 **)D_841911E0) return D_841911E0;
     return D_841911E4;
@@ -82,7 +77,6 @@ u8 *func_8410B330(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-extern u8 *D_841911E0;
 void func_8410B578(f32 arg0) {
     *(f32 *)(D_841911E0 + 0x8C) = arg0;
     *(u16 *)(D_841911E0 + 0x96) = 0;
@@ -220,12 +214,7 @@ void func_8410E688(u8 *arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8410B704(u8 *, void *, u8 *, u8 *);
-extern void func_8410B884(u8 *, void *, u8 *, s16);
 s32 func_8411DC80(u8, s32 *, s32);
-extern u8 D_8418393C;
-extern u8 *D_841911E8;
-extern u8 *func_8410B330(u8 *);
 extern u8 *D_84193DD0;
 s32 func_8411E140(s32 arg0);
 void func_8410E7D0(u8 *arg0, void *arg1) {
@@ -267,7 +256,6 @@ void func_8410E878(u8 *arg0, s32 arg1) {
 #ifdef VERSION_US
 f32 func_8410EB50();
 extern void func_8411FEE8(s32);
-extern u8 *D_841911E8;
 extern s32 D_841911EC;
 extern s32 D_84184148;
 void func_8410ED30(void) {
@@ -331,8 +319,6 @@ void func_8410F9F0(u8 *arg0, s32 arg1) {}
 #endif
 
 #ifdef VERSION_US
-extern u8 *D_841911E8;
-extern u8 *func_8410B330(u8 *);
 extern void func_841203B4(u8 *, f32, f32);
 extern void func_8410E73C();
 void func_8410FABC(u8 *arg0, s32 arg1) {
@@ -351,8 +337,6 @@ void func_8410FABC(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern u8 *func_8410B330(u8 *);
-extern u8 *D_841911E8;
 extern void func_800371B4(u8 *, u8 *, s32, s16, s32);
 void func_8410FD54(u8 *arg0, s32 arg1) {
     u8 *temp_v0;
@@ -372,7 +356,6 @@ void func_8410FD54(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_800371B4(u8 *, u8 *, s32, s16, s32);
 void func_8410FF0C(u8 *arg0, s32 arg1) {
     u8 *temp_v0;
 
@@ -411,8 +394,6 @@ void func_84110098(u8 *arg0, s32 arg1) {
 #ifdef VERSION_US
 extern void func_8410CC90(u8 *, s32, s16);
 extern void func_84120BB4(u8 *, s32);
-extern s32 D_84184148;
-extern s32 D_841911EC;
 void func_84110320(u8 *arg0, s32 arg1) {
     D_841911E8 = func_8410B330(arg0);
     func_84120BB4(arg0, arg1);
@@ -423,9 +404,6 @@ void func_84110320(u8 *arg0, s32 arg1) {
 
 #ifdef VERSION_US
 extern void func_8410C934(u8 *, s32, s16);
-extern void func_84120BB4(u8 *, s32);
-extern s32 D_84184148;
-extern s32 D_841911EC;
 void func_84110394(u8 *arg0, s32 arg1) {
     D_841911E8 = func_8410B330(arg0);
     func_84120BB4(arg0, arg1);
@@ -437,8 +415,6 @@ void func_84110394(u8 *arg0, s32 arg1) {
 #ifdef VERSION_US
 extern void func_8410CAE4(u8 *, s32, s16);
 extern void func_84120C20(u8 *, s32);
-extern s32 D_84184148;
-extern s32 D_841911EC;
 void func_84110408(u8 *arg0, s32 arg1) {
     D_841911E8 = func_8410B330(arg0);
     func_84120C20(arg0, arg1);
@@ -450,8 +426,6 @@ void func_84110408(u8 *arg0, s32 arg1) {
 #ifdef VERSION_US
 extern void func_8410ED98(u8 *, s32, s32);
 extern void func_84120E14(s32);
-extern s32 D_84184148;
-extern s32 D_841911EC;
 void func_8411047C(u8 *arg0, s32 arg1) {
     D_841911E8 = func_8410B330(arg0);
     func_84120E14(arg1);
@@ -461,10 +435,7 @@ void func_8411047C(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8410C934(u8 *, s32, s16);
 extern void func_84120960(u8 *, s32);
-extern s32 D_84184148;
-extern s32 D_841911EC;
 void func_841104E4(u8 *arg0, s32 arg1) {
     D_841911E8 = func_8410B330(arg0);
     func_84120960(arg0, arg1);
@@ -476,8 +447,6 @@ void func_841104E4(u8 *arg0, s32 arg1) {
 #ifdef VERSION_US
 extern void func_8410CD3C(u8 *, s32, s16);
 extern void func_84120A50(u8 *, s32);
-extern s32 D_84184148;
-extern s32 D_841911EC;
 void func_84110558(u8 *arg0, s32 arg1) {
     D_841911E8 = func_8410B330(arg0);
     func_84120A50(arg0, arg1);
@@ -487,10 +456,7 @@ void func_84110558(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8410CC90(u8 *, s32, s16);
 extern void func_84120CA4(u8 *, s32);
-extern s32 D_84184148;
-extern s32 D_841911EC;
 void func_841105CC(u8 *arg0, s32 arg1) {
     D_841911E8 = func_8410B330(arg0);
     func_84120CA4(arg0, arg1);
@@ -500,10 +466,7 @@ void func_841105CC(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8410CC90(u8 *, s32, s16);
 extern void func_84120D34(u8 *, s32);
-extern s32 D_84184148;
-extern s32 D_841911EC;
 void func_84110640(u8 *arg0, s32 arg1) {
     D_841911E8 = func_8410B330(arg0);
     func_84120D34(arg0, arg1);
@@ -557,8 +520,6 @@ void func_84110640(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern u8 *D_841911E8;
-extern u8 *func_8410B330(u8 *);
 extern void func_84108940(u8 *, s32);
 void func_8411100C(u8 *arg0, s32 arg1) {
     D_841911E8 = func_8410B330(arg0);
@@ -567,11 +528,7 @@ void func_8411100C(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8410C934(u8 *, s32, s16);
 extern void func_8411EFE4(s32);
-extern void func_84120BB4(u8 *, s32);
-extern s32 D_84184148;
-extern s32 D_841911EC;
 void func_84111048(u8 *arg0, s32 arg1) {
     D_841911E8 = func_8410B330(arg0);
     func_84120BB4(arg0, arg1);
@@ -658,7 +615,6 @@ void func_84111348(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern u8 D_8418414C;
 void func_841113F8(s32 arg0, s32 arg1) {
     void *temp_v0;
 
@@ -701,7 +657,6 @@ void func_841113F8(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8411FEE8(s32);
 extern void func_841206D0(u8 *);
 void func_84111BEC(u8 *arg0) {
     *(u16 *)(arg0 + 0x7E8) = 0;
@@ -719,7 +674,6 @@ void func_84111C1C_padding(void) {}
 #endif
 
 #ifdef VERSION_US
-extern void func_841089D8(s32);
 extern s32 func_800238C4(void);
 void func_84111C44(void) {
     (void)func_841089D8(1);
@@ -728,7 +682,6 @@ void func_84111C44(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_841089D8(s32);
 void func_84111C6C(void) { func_841089D8(0); }
 #endif
 
@@ -845,14 +798,12 @@ void func_841120A4(u8 *arg0) {}
 #endif
 
 #ifdef VERSION_US
-extern u8 *D_84193DD0;
 void func_84112564(s32 arg0) {
     D_84193DD0[1] |= 1;
 }
 #endif
 
 #ifdef VERSION_US
-extern u8 *D_84193DD0;
 void func_84112580(s32 arg0) {
     D_84193DD0[1] |= 4;
 }
@@ -941,7 +892,6 @@ void func_8411281C(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8411275C(void);
 void func_84112B44(void) {
     func_8411275C();
 }
@@ -979,7 +929,6 @@ void func_84112DB8(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_84112C98();
 
 void func_84112EAC(void *arg0) {
     if ((*(s16 *)((u8 *)(arg0) + (0x1A))) == 0xFC) {
@@ -1048,9 +997,7 @@ s32 func_84113430(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8411FEE8(s32);
 extern void func_84103640(u8 *, s32);
-extern u8 D_84193DD8[];
 void func_8411346C(s32 arg0) {
     func_8411FEE8(0xFFFF);
     func_84103640(D_84193DD8, 0);
@@ -1058,9 +1005,7 @@ void func_8411346C(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8411FEE8(s32);
 extern void func_84103694(u8 *, u8);
-extern u8 D_84193DD8[];
 void func_841134A0(u8 *arg0) {
     func_8411FEE8(0xFFFF);
     func_84103694(D_84193DD8, arg0[0x618]);
@@ -1137,7 +1082,6 @@ void func_84113BE8(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-extern s32 func_841139D0(u8 *);
 extern void func_841137F8(u8 *);
 void func_84113D08(u8 *arg0) {
     if (func_841139D0(arg0) == 0) {
@@ -1147,7 +1091,6 @@ void func_84113D08(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-extern void func_841136E8(u8 *);
 void func_84113D38(u8 *arg0) {
     if ((func_841139D0(arg0) == 0) && ((*(s16 *)((u8 *)(arg0) + (0x40))) != 0)) {
         func_84112158((s32) arg0, 0xFB);
@@ -1189,16 +1132,6 @@ void func_84114678(void *arg0) {
 
 #ifdef VERSION_US
 f32 func_8410EB50();
-extern void func_8411FEE8(s32);
-extern u8 *D_841911E8;
-extern s32 D_841911EC;
-extern s32 D_84184148;
-extern s32 func_841139D0(u8 *);
-extern void func_841136E8(u8 *);
-extern s32 D_841911F4;
-extern s32 D_84183D50;
-extern s32 D_841911F4;
-extern s32 D_84183D50;
 void func_841149A0(u8 *arg0) {
     (*(u8 *)((u8 *)(arg0) + (0x618))) = (u8) (*(u8 *)((u8 *)(D_84193DD0) + (8)));
     func_84111C44();
@@ -1236,8 +1169,6 @@ void func_841154F8(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-extern s32 D_841911F4;
-extern s32 D_84183D50;
 void func_84115554(u8 *arg0) {
     (*(s8 *)((u8 *)(arg0) + (0x618))) = 0x13;
     func_84111C44();
@@ -1650,8 +1581,6 @@ void func_84118794(u8 *arg0) {
 
 #ifdef VERSION_US
 extern void func_8410B104();
-extern s32 D_841911F4;
-extern s32 D_84183D50;
 void func_84119C9C(s32 arg0) {
     func_8411FEE8(0x3E);
     func_84111C44();
@@ -1670,8 +1599,6 @@ void func_84119C9C(s32 arg0) {
 
 #ifdef VERSION_US
 extern void func_84112E40(s32);
-extern s32 D_841911F4;
-extern s32 D_84183D50;
 void func_8411A150(s32 arg0) {
     func_8411FEE8(0x1F);
     func_84112E40(arg0);
@@ -1712,8 +1639,6 @@ void func_8411A150(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-extern s32 D_84183D50;
-extern s32 D_841911F4;
 void func_8411A728(s32 arg0) {
     func_8411FEE8(0x50);
     (*(s32 *)((u8 *)((arg0 + (D_841911F4 * 4))) + (0x5C8))) = (s32) D_84183D50;
@@ -1882,7 +1807,6 @@ void func_8411B518(u8 *arg0) {
 #ifdef VERSION_US
 s32 func_800427B8(s32);
 extern void func_84112EDC(u8 *);
-extern void func_8410890C(s32, s32);
 void func_8411B808(u8 *arg0) {
     if (func_800427B8((*(s32 *)((u8 *)(arg0) + (0x5C0)))) != 0) {
         func_841126C8((s32) arg0);
@@ -1913,7 +1837,6 @@ void func_8411B808(u8 *arg0) {
 
 #ifdef VERSION_US
 s32 func_800427B8(s32);
-extern void func_84112EDC(u8 *);
 extern void func_84113560(s32);
 void func_8411EE74(u8 *arg0);
 void func_8411BC28(u8 *arg0) {
@@ -1964,7 +1887,6 @@ void func_8411BC28(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8410890C(s32, s32);
 void func_8411C97C(s32 arg0) {
     if (func_84113430(arg0) != 0) {
         func_8410890C(0x112, arg0);

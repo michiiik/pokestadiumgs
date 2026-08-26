@@ -41,7 +41,6 @@ void func_8000575C(u16* buf) {
     }
 }
 
-extern u32 D_800CE040;
 extern s32 D_800CE048;
 extern s32 D_800CE04C;
 extern s32 D_800CE050;

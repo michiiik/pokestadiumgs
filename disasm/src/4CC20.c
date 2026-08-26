@@ -90,7 +90,6 @@ u8 *func_8004CA60(u8 *arg0) { u8 *value = NULL; if (arg0 != NULL) { value = arg0
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004CB7C.s")
 
 extern void func_8004CB7C(s32, s32, s32, s32, s32, s32, s32, s32);
-extern void func_8004CB7C(s32, s32, s32, s32, s32, s32, s32, s32);
 void func_8004D150(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
     func_8004CB7C(arg0, arg1, 0, 0, arg2, arg3, (s32) (u16) arg4, arg5);
 }
@@ -98,7 +97,6 @@ void func_8004D150(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
 extern void func_8004D150(s32, s32, s32, s32, s32, s32);
 void func_8004D19C(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4) { func_8004D150(a0, a1, a2, a3, 0, a4); }
 
-extern void func_8004CB7C(s32, s32, s32, s32, s32, s32, s32, s32);
 void func_8004D1C4(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6) { func_8004CB7C(a0, a1, a2, a3, a4, a5, 0, a6); }
 
 s32 func_8004D1FC(u8 *arg0) {

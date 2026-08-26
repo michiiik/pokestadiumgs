@@ -12,7 +12,6 @@ void func_882302C0(void) {
 }
 
 extern void func_8000612C();
-extern s32 D_880068B8;
 
 void func_882302F8(void) {
     func_8000612C();

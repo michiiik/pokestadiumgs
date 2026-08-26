@@ -336,7 +336,6 @@ void func_8AE05910(s16 arg0) {
 #endif
 
 #ifdef VERSION_US
-extern f32 D_8AE084F0;
 void func_8AE05964(void) {
     D_8AE084F0 -= 0.25f;
     if (D_8AE084F0 < 1.0f) {

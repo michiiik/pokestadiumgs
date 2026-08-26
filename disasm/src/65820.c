@@ -123,7 +123,6 @@ extern void __osSetFpcCsr(s32);
 extern void func_8000644C();
 extern void func_80035620();
 extern void func_80046980();
-extern void main_pool_push_state(s32);
 extern s32 D_8009DE90;
 void func_80035140(s32 value);
 void func_8004C020(void);

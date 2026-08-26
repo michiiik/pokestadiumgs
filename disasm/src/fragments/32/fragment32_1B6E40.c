@@ -31,7 +31,6 @@ void func_8830639C(void) {
     } while (var_s1 != 4);
 }
 
-extern u8 D_88308E38;
 
 void func_88306404(s32 arg0) {
     void *temp_v0;

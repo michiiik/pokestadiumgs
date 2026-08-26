@@ -38,7 +38,6 @@ void func_82508268(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_147D10/func_82508620.s")
 
-extern s16 D_82509680;
 
 s32 func_8250865C(void) {
     return D_82509680 == 3;

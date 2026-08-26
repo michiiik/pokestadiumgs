@@ -11,9 +11,7 @@ void func_88223320(void) {
     D_880068B8 = 0;
 }
 
-extern void func_80049ED8(s32);
 extern void func_800033DC(s32);
-extern s32 D_80087200;
 extern s32 D_880068B4;
 extern s32 D_88234850;
 void func_88223348(void) {

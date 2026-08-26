@@ -209,7 +209,6 @@ void func_83006AF0(s32 arg0, s32 arg1, s32 arg2) {
 
 #ifdef VERSION_US
 extern void func_800226C0(s32);
-extern void func_800226C0(s32);
 void func_83006EB0(void *arg0, s32 arg1) {
     u8 temp_v0;
 
@@ -303,7 +302,6 @@ void func_83007C5C(s32 arg0, void *arg1, void *arg2) {
 #endif
 
 #ifdef VERSION_US
-extern void func_800226C0(s32);
 
 void func_83007D10(void *arg0, s32 arg1) {
     if (arg1 == -1) {

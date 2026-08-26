@@ -251,7 +251,6 @@ void func_841254E0(void) {
 
 #ifdef VERSION_US
 extern u8 D_841951C3;
-extern u8 *D_84195208[];
 s32 func_84125AB8(u8 arg0) {
     if ((s32) D_841951C3 < 0x12) {
         return 0;
@@ -323,7 +322,6 @@ s32 func_84126374(void) {
 #endif
 
 #ifdef VERSION_US
-extern u8 *D_84195208[];
 s32 func_84126390(u8 arg0, u8 arg1)
 {
   s32 result = arg1 == D_84195208[arg0][1];
@@ -968,8 +966,6 @@ void func_8412E754(void) {
 #endif
 
 #ifdef VERSION_US
-extern u8 *D_84195208[];
-extern u8 D_841951BC;
 extern void func_84125424(s32);
 void func_8412E7D8(void) {
     u8 *temp_v0;
@@ -1186,14 +1182,6 @@ extern u8 D_841951BD; void func_8412FC6C(void) { func_84125CF8(D_841951BD, 6, 2,
 #ifdef VERSION_US
 extern void func_84124DEC(u8);
 extern u8 D_841951D8;
-extern u8 D_841951BC;
-extern void func_84126FA0(s32);
-extern u8 D_841951D9;
-extern u8 D_841951C3;
-extern u8 *D_84195208[];
-extern void func_84124DEC(u8);
-extern u8 D_841951D8;
-extern u8 D_841951BC;
 extern void func_84126FA0(s32);
 extern u8 D_841951D9;
 void func_8412FC9C(void) {
@@ -1216,11 +1204,6 @@ void func_8412FC9C(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_84126FA0(s32);
-extern void func_84135B40(s32);
-extern void func_841366C4(u8, s32);
-extern u8 D_841951D8;
-extern u8 D_841951D9;
 void func_8412FF04(void) {
     switch (D_841951D8) {                           /* irregular */
     case 1:
@@ -1290,8 +1273,6 @@ extern u8 D_841951BC; extern u8 *D_84195208[]; void func_84130480(void) { D_8419
 #endif
 
 #ifdef VERSION_US
-extern void func_84125424(s32);
-extern void *D_841951F0;
 
 void func_841307EC(void) {
     if ((*(u8 *)((u8 *)(D_841951F0) + (0x9C4))) == 2) {
@@ -1334,7 +1315,6 @@ extern void func_84130EA8();
 extern u8 D_841951D5;
 extern u8 D_841951D2;
 extern void func_84126BA8(u8);
-extern u8 D_841951BC;
 void func_84130C08(void) {
     if (D_841951D2 != 0) {
         if (D_841951D5 & 0x7F) {
@@ -1352,7 +1332,6 @@ void func_84130C08(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_84126BA8(u8);
 extern s32 D_841951E0;
 
 void func_84130C98(void) {
@@ -1363,7 +1342,6 @@ void func_84130C98(void) {
 #endif
 
 #ifdef VERSION_US
-extern u8 D_841951D2;
 void func_84130CC8(void) {
     if (D_841951D2 != 0) D_841951C8 = 0;
 }
@@ -1686,7 +1664,6 @@ s32 func_84134968(void) { extern OSMesgQueue D_84195164; return osRecvMesg(&D_84
 #endif
 
 #ifdef VERSION_US
-extern OSMesgQueue D_84195164;
 void func_84134994(OSMesg arg0) {
     osSendMesg(&D_84195164, arg0, 0);
 }
@@ -1895,7 +1872,6 @@ void func_84135998(void) {
 
 #ifdef VERSION_US
 extern void func_8413543C();
-extern u8 D_84195278;
 void func_841359D0(void) {
     switch (D_84195278) {                           /* irregular */
     case 1:
@@ -2136,7 +2112,6 @@ void func_84137648(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_84147228(s32, u8, s32, s32, s32);
 void func_841376B0(void *arg0) {
     func_84147228(0x10, 0U, 0, 8, (s32) (*(u8 *)((u8 *)(arg0) + (0x181))));
     func_84147228(0x10, 0U, 0, 3, 0);
@@ -2177,7 +2152,6 @@ void func_841376B0(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-extern void func_84147228(s32, u8, s32, s32, s32);
 void func_84138364(u8 arg0) {
     func_84147228(1, arg0, 0, 0xB, 0);
     func_84147228(1, arg0, 0, 4, 4);

@@ -63,7 +63,6 @@ void func_82D0396C(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
     func_82D03598(arg0, arg1, arg2, arg3);
 }
 
-extern void func_82D03598(s16, s16, u16, u16);
 extern void func_82D03830(s16, s16, s32, s32);
 void func_82D039E4(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
     func_82D03830((s16) (arg0 + 3), (s16) (arg1 + 3), (arg2 - 5) & 0xFFFF, (arg3 - 6) & 0xFFFF);

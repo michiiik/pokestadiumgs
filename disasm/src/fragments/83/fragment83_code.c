@@ -87,7 +87,6 @@ void func_82C009F8(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
 #endif
 
 #ifdef VERSION_US
-extern void func_82C00624(s16, s16, u16, u16);
 extern void func_82C008BC(s16, s16, s32, s32);
 void func_82C00A70(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
     func_82C008BC((s16) (arg0 + 3), (s16) (arg1 + 3), (arg2 - 5) & 0xFFFF, (arg3 - 6) & 0xFFFF);
@@ -357,8 +356,6 @@ s32 func_82C03D50(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-extern s8 *func_8004C874(s32, s32);
-extern s8 *func_8000B580(s8 *, s8 *);
 s32 func_82C03EE0(s8 *arg0, s32 arg1, s32 arg2) {
     func_8000B580(arg0 + 4, func_8004C874(0x15, 7));
     func_8000B580(arg0 + 0x54, func_8004C874(0x15, 0x20));

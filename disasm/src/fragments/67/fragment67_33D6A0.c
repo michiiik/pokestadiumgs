@@ -15,8 +15,6 @@ s32 func_82900BA0(s32 arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-extern s16 D_829188A8;
-extern s16 D_829188AA;
 
 s32 func_82900BD0(s32 arg0, void *arg1) {
     if (arg0 == 2) {
@@ -114,11 +112,9 @@ void func_829014F4(void) {
 #endif
 
 #ifdef VERSION_US
-extern s32 D_8291889C;
 extern s32 D_829188EC;
 extern void func_829014F4(void);
 extern void func_82900C04(s32);
-extern void func_82900C40(s32);
 void func_82901510(s32 arg0) {
     D_829188EC = 1;
     func_829014F4();

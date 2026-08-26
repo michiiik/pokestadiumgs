@@ -58,8 +58,6 @@ void func_8130F09C(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_104FC0/func_8130F184.s")
 
-extern f32 func_816092FC(void);
-extern s32 func_8130CE30(u8 *arg0);
 void func_8130F218(u8 *arg0) {
     f32 step = func_816092FC();
     *(f32 *)(arg0 + 0x30) += step;

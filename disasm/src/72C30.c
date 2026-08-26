@@ -9,7 +9,6 @@ void func_80072030(s32 arg0, u8 arg1, s32 arg2) {
 }
 
 extern s32 func_87F0EDDC;
-extern s32 (*func_80003240(s32 *))(s32 *);
 void func_80072070(s32 arg0, u8 arg1) {
     ((void (*)(s32, u8))(void *)func_80003240(&func_87F0EDDC))(arg0, arg1);
 }
@@ -51,7 +50,6 @@ void func_800723C4(void) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_80072650.s")
 
 s32 (*func_80003240(s32 *))(s32 *);
-extern u8 D_801291E0;
 extern u8 func_87F0EE0C;
 void func_80072740(s32 arg0) {
     func_80003240(&func_87F0EE0C)(&D_801291E0);

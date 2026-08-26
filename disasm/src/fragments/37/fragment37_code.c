@@ -52,7 +52,6 @@ void func_88800354(void)
   }
 }
 
-extern u8 *D_88804050;
 void func_888003CC(void) {
     *(s32 *)D_88804050 = 0;
     D_88804050[0x11] = 2;

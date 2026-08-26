@@ -56,7 +56,6 @@ void func_800072E0(void) {
     func_80006E50(&D_800D0530, 0, 0, 0, 0);
 }
 
-extern s32 D_80087220;
 s32 func_8000731C(void) {
     return D_80087220;
 }

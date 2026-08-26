@@ -18,7 +18,6 @@ u32 func_800020D0(u32 mask) {
     return mask;
 }
 
-extern u8 D_800CC5B0[];
 s32 func_80002120(s32 arg0, s32 arg1) {
     u8 *ptr = D_800CC5B0 + arg0 * 8;
     u32 offset = (u32)arg1 - *(u32 *)(ptr + 0);

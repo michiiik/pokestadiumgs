@@ -64,11 +64,6 @@ void func_8AC006B8(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8AC005D8();
-extern s16 D_8AC08514;
-extern s16 D_8AC08516;
-extern s16 D_8AC08518;
-extern s16 D_8AC0851A;
 void func_8AC006F4(void) {
     D_8AC08514 = 0;
     D_8AC08516 = 0;
@@ -154,7 +149,6 @@ void func_8AC00DE8(void) {
 #endif
 
 #ifdef VERSION_US
-extern s32 D_8AC08524;
 extern void *D_8AC08528;
 extern void func_8AC00908(s32, s16, s16, s16, s32);
 void func_8AC00F04(s32 arg0) {

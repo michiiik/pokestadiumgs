@@ -90,8 +90,6 @@ void func_8F700F90(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_800226C0(s32);
-extern s32 D_8F7023B0;
 extern s32 D_8F7023B4;
 
 void func_8F70104C(void) {

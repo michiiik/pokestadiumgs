@@ -54,7 +54,6 @@ void func_82305914(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_124E40/func_82305988.s")
 
-extern u8 D_82306AF8[];
 void func_823059D4(void) {
     *(s16 *)(D_82306AF8 + 2) = 1;
     *(s16 *)(D_82306AF8 + 6) = -1;

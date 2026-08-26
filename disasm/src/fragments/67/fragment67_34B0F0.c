@@ -57,11 +57,6 @@ extern s32 D_8291BC44;
 extern void func_80007AEC(s32);
 extern void func_8290FA00(void);
 extern void func_80021ED8(s32);
-extern s32 D_8291BC40;
-extern s32 D_8291BC44;
-extern void func_80007AEC(s32);
-extern void func_8290FA00(void);
-extern void func_80021ED8(s32);
 void func_8290FA30(void) {
     s32 var_s0;
 
@@ -81,7 +76,6 @@ void func_8290FA30(void) {
 #ifdef VERSION_US
 extern void func_80064D28(void);
 extern void func_8290E8D8(void);
-extern void func_8290FA00(void);
 void func_8290FA9C(void) {
     func_80064D28();
     func_8290E8D8();

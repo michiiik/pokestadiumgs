@@ -166,7 +166,6 @@ void func_8AF070B4(void) {
 
 extern void func_8002602C();
 extern void func_8AC01064(s32);
-extern s32 D_8AF2646C;
 void func_8AF07110(void) {
     func_8002602C();
     if (D_8AF2646C != 0) {

@@ -97,13 +97,11 @@ void func_800643CC(s32 arg0, s32 arg1, s32 arg2) {
     func_80064248(arg0 & 0xFF, arg1 & 0xFF, arg2 & 0xFF, 0xFF);
 }
 
-extern void func_80064248(s32, s32, s32, s32);
 
 void func_80064404(s32 arg0, s32 arg1, s32 arg2) {
     func_80064248(arg0 & 0xFF, arg1 & 0xFF, arg2 & 0xFF, 4);
 }
 
-extern void func_80064248(s32, s32, s32, s32);
 
 void func_8006443C(s32 arg0, s32 arg1, s32 arg2) {
     func_80064248(arg0 & 0xFF, arg1 & 0xFF, arg2 & 0xFF, 0x7F);

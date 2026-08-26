@@ -41,7 +41,6 @@ void func_86408048(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/52/fragment52_2862C0/func_864081E8.s")
 
-extern u8 *D_86416C00;
 void func_8640826C(void) {
     u8 *temp = D_86416C00 + 0xCE00;
     func_86407E2C(temp + 0x8C, -70.0f, 86.0f, 0x14);

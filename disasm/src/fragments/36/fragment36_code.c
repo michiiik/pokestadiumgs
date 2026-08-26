@@ -28,7 +28,6 @@ void func_887009A0(void) {
     main_pool_pop_state(0x4E414D45);
 }
 
-extern u8 *D_88701E00;
 void func_887009F0(void) {
     *(s16 *)(D_88701E00 + 0x58) = 0;
     *(s16 *)(D_88701E00 + 0x5A) = D_88701E00[0x5E];

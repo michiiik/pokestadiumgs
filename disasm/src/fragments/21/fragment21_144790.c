@@ -195,7 +195,6 @@ void func_82507000(s16 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_144790/func_8250771C.s")
 
-extern s16 D_82508FF0;
 void func_82507AF4(void)
 {
   int new_var;
@@ -208,7 +207,6 @@ void func_82507AF4(void)
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_144790/func_82507B18.s")
 
-extern s16 D_82508FF0;
 
 s32 func_82507B58(void) {
     return D_82508FF0 == 2;

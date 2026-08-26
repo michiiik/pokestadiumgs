@@ -28,9 +28,6 @@ void func_88506A20(void){func_8850A0A0(0,0,0x280,0x1E0);func_88004990(0,0);func_
 extern s8 D_8800EF41;
 extern u8 D_8850D6D8;
 extern s8 D_8800EF40;
-extern s8 D_8800EF41;
-extern u8 D_8850D6D8;
-extern s8 D_8800EF40;
 void func_88506AA8(void) {
     s16 temp_v1;
     s8 *var_a0;

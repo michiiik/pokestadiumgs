@@ -808,7 +808,6 @@ u8 func_8005E03C(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-extern u8 D_80128570[];
 void func_8005E07C(s32 arg0, u8 arg1) { u8 *entry = D_80128570 + arg0 * 0x70; if ((*(u32 *)entry & 2) != 0) *(u8 *)(*(u8 **)(entry + 0x68) + 0x5E5) = arg1; }
 #endif
 
@@ -995,7 +994,6 @@ void func_8005F9CC(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8005F808(s32, s32, s32);
 
 void func_8005F9F4(s32 arg0, s32 arg1) {
     s32 *p = &arg1;

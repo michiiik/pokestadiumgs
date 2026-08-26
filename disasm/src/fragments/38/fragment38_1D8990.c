@@ -47,10 +47,6 @@ void func_88903B00(void) {
 
 extern void func_88004990(u8, s32);
 extern void *D_80087200;
-extern u8 *D_889041B0;
-extern void func_88004990(u8, s32);
-extern void *D_80087200;
-extern u8 *D_889041B0;
 void func_88903BB4(void) {
     s32 *temp_v0;
 
@@ -65,7 +61,6 @@ void func_88903BB4(void) {
     }
 }
 
-extern u8 *D_889041B0;
 extern void func_889033A0(void *arg0);
 void func_88903C28(void) {
     func_889033A0(D_889041B0 + 4);
