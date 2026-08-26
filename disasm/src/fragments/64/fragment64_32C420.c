@@ -29,5 +29,10 @@ void func_87F0989C(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_32C420/func_87F0A3E8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_32C420/func_87F0A5BC.s")
+extern void func_800503A4(s32);
+extern void func_87F09B7C(void *);
+void func_87F0A5BC(void *arg0) {
+    func_800503A4(*(s32 *)((u8 *)arg0 + 0x24));
+    func_87F09B7C((u8 *)arg0 + 0x3C);
+}
 #endif
