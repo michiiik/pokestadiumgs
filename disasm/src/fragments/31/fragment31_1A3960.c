@@ -32,7 +32,13 @@ void func_882309B0(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A3960/func_882309D8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A3960/func_88230A38.s")
+extern void func_88004990(u8, s32);
+extern u32 D_882349B0;
+void func_88230A38(void) {
+    func_88004990(*(*(u8 **)((u8 *)(D_882349B0) + (0))), 0);
+    func_88004990(*(*(u8 **)((u8 *)(D_882349B0) + (4))), 0);
+    D_880068B8 = 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A3960/func_88230A88.s")
 
