@@ -2,7 +2,28 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4C2E0/func_8004B6E0.s")
+extern void _bcopy(u8 *, u8 *, s32);
+extern void main_pool_pop_state(s32);
+extern void main_pool_push_state(s32);
+s32 func_800356CC(s32 arg0);
+s32 func_8004C4A4(void);
+extern u8 *func_800042C0(u8 *, u8 *, s32, s32);
+extern u8 D_801270B0;
+s32 func_8004B6E0(void) {
+    s32 pad_frame[2];
+    s32 sp1C;
+    u8 *sp18;
+    s32 temp_v0;
+
+    temp_v0 = func_800356CC(0xA);
+    sp1C = temp_v0;
+    sp18 = temp_v0 + 0xFD0;
+    func_8004C4A4();
+    main_pool_push_state(0x504D4442);
+    _bcopy(func_800042C0((u8 *) sp1C, sp18, 0, 0), &D_801270B0, 0xFD0);
+    main_pool_pop_state(0x504D4442);
+    return 0;
+}
 
 s32 func_8004B754(s32 a) {
     s32 r = -1;

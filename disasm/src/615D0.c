@@ -182,7 +182,18 @@ s32 func_800625E0(s32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80062614.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_8006276C.s")
+void func_8006276C(s32 arg0, s32 arg1) {
+    s32 pad_frame[2];
+    s32 sp24;
+
+    func_80060EC8(&sp24, arg1 + 0x66);
+    _bcopy(arg1 + 0x44, (void *) arg0, 0x21);
+    _bcopy(&sp24, arg0 + 0x21, 8);
+    _bcopy(arg1 + 0x42, arg0 + 0x29, 2);
+    func_80060A84(arg0 + 0x2B, (s32) (*(u16 *)((u8 *)(arg1) + (0x72))));
+    (*(u8 *)((u8 *)(arg0) + (0x2D))) = (u8) (*(u8 *)((u8 *)(arg1) + (0x74)));
+    (*(u8 *)((u8 *)(arg0) + (0x2E))) = (u8) (*(u8 *)((u8 *)(arg1) + (0x75)));
+}
 
 void func_800627F0(s32 arg0, s32 arg1) {}
 
