@@ -334,9 +334,22 @@ void func_80019188(s32 arg0, s32 arg1) {
 
 extern OSMesgQueue *D_801221B8; void func_800191BC(void) { osRecvMesg(D_801221B8, NULL, 0); osRecvMesg(D_801221B8, NULL, 1); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_800191FC.s")
+extern s32 func_8001926C(s32, s32, s32, s32 *, s32 *);
+s32 func_800191FC(s32 arg0, s32 arg1, s32 arg2) {
+    s32 locals[4];
+    if (func_8001926C(arg0, arg1, arg2, &locals[2], &locals[1]) == 0) {
+        return 0;
+    }
+    return locals[1];
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80019230.s")
+s32 func_80019230(s32 arg0, s32 arg1, s32 arg2) {
+    s32 locals[4];
+    if (func_8001926C(arg0, arg1, arg2, &locals[2], &locals[1]) == 0) {
+        return 0;
+    }
+    return locals[2] - locals[1];
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_8001926C.s")
 
