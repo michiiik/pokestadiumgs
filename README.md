@@ -2,15 +2,10 @@
 
 ## Decompilation coverage
 
-The following block is refreshed by the repository post-commit hook.
-Enable the tracked hook once per checkout with
-`git config core.hooksPath .githooks`.
-
-<!-- AUTO_COVERAGE:START -->
-- US functions with C implementations: **3,142 / 10,532 (29.8%)**
-- Remaining `GLOBAL_ASM` owners: **7,390**
-- Baseline: `f477acf` (vendored US pragma snapshot)
-<!-- AUTO_COVERAGE:END -->
+Current numbers, including a per-source-file breakdown, live in
+[COVERAGE.md](COVERAGE.md). It is regenerated at commit time by
+`.githooks/pre-commit.d/10-coverage.sh`; enable the tracked hooks once per
+checkout with `git config core.hooksPath .githooks`.
 
 Work-in-progress static recompilation of **Pokemon Stadium 2 (US)** for
 Android, using [N64Recomp](https://github.com/N64Recomp/N64Recomp) and the
@@ -55,14 +50,20 @@ The latest rental-roster build handoff is in
 
 The `disasm` directory is a vendored copy of `pret/pokestadiumgs` (forked at
 `michiiik/pokestadiumgs`, imported at `stadium2-names` commit `ccae2a1`). Its
-build currently requires a
-Linux/macOS environment with GNU Make, Python, and `mips-linux-gnu` binutils;
-native Windows is explicitly unsupported upstream.
+build requires GNU Make, Python, and `mips-linux-gnu` binutils; native Windows
+is explicitly unsupported upstream.
 
-On the existing Mac Mini cross-build host, mount `disasm` at `/work` in the
-linux/amd64 build container and run `tools/mac_build_disasm.sh` inside it. The
-verified build produces `build/pokestadiumgs-us.elf` and a byte-identical US
-ROM.
+The toolchain runs natively on this Mac: `disasm/tools/ido/macos` bundles the
+IDO compiler phases the Makefile invokes directly (`DETECTED_OS = macos` is
+autodetected), and `MIPS_BINUTILS_PREFIX` points at a Homebrew-installed
+`mips-linux-gnu-*` cross-binutils (see `tools/try_pragma_compare.py` for the
+recipe this is derived from). Run `make` from `disasm/` as usual; no container
+is required for day-to-day builds.
+
+The linux/amd64 build container remains available as an alternative: mount
+`disasm` at `/work` in the container and run `tools/mac_build_disasm.sh`
+inside it. The verified build (either path) produces
+`build/pokestadiumgs-us.elf` and a byte-identical US ROM.
 
 ## Recompilation
 

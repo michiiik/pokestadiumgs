@@ -5,14 +5,16 @@ the conventions/gotchas found while doing it.
 
 ## Status
 
-- splat is installed and **extraction works**: `disasm/asm/us/` contains
-  **10,720 `.s` files**, matching the 12,810 `#pragma GLOBAL_ASM` stubs in
-  `disasm/src/*.c` (the rest are ultralib/library code).
+- splat is installed and **extraction works**: `disasm/asm/us/` contains a
+  `.s` file for every remaining `#pragma GLOBAL_ASM` stub in `disasm/src/*.c`
+  (the rest of `disasm/asm` is ultralib/library code). The counts from that
+  first extraction are long stale; see [COVERAGE.md](COVERAGE.md) for the
+  current remaining-owner totals, including a per-source-file breakdown.
 - Coverage reported by splat: **4 MB (6.59%) in defined segments, 62 MB (93.41%)
   still unknown bin**. The rental blob at ROM `0x1708000` is in that unknown
   region and is a good candidate for a labelled segment (see below).
-- This is a *scaffolding* milestone, not a decompilation. Nothing new was
-  decompiled to C; 12,810 functions remain as assembly.
+- This is a *scaffolding* milestone, not a decompilation from splat's
+  original run. See COVERAGE.md for how much has been decompiled to C since.
 
 ## Setup (already done; repeat after `distclean`)
 

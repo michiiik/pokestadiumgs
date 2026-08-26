@@ -1,0 +1,24 @@
+#!/bin/sh
+# Dispatcher: runs every executable script in .githooks/pre-commit.d/, in
+# lexical order, and fails the commit if any of them fail. Individual steps
+# live as separate scripts so they can be added/removed independently
+# (e.g. a provenance check dropped in alongside the coverage regenerator)
+# without editing this file or risking merge conflicts between them.
+set -eu
+
+repo_root=$(git rev-parse --show-toplevel)
+hook_dir="$repo_root/.githooks/pre-commit.d"
+
+status=0
+if [ -d "$hook_dir" ]; then
+    for step in "$hook_dir"/*; do
+        [ -e "$step" ] || continue
+        [ -x "$step" ] || continue
+        if ! "$step"; then
+            echo "pre-commit: $step failed" >&2
+            status=1
+        fi
+    done
+fi
+
+exit "$status"
