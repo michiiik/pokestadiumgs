@@ -1,5 +1,17 @@
 # Pokemon Stadium 2 Recomp for Android
 
+## Decompilation coverage
+
+The following block is refreshed by the repository post-commit hook.
+Enable the tracked hook once per checkout with
+`git config core.hooksPath .githooks`.
+
+<!-- AUTO_COVERAGE:START -->
+- US functions with C implementations: **2,915 / 10,532 (27.7%)**
+- Remaining `GLOBAL_ASM` owners: **7,617**
+- Baseline: `f477acf` (vendored US pragma snapshot)
+<!-- AUTO_COVERAGE:END -->
+
 Work-in-progress static recompilation of **Pokemon Stadium 2 (US)** for
 Android, using [N64Recomp](https://github.com/N64Recomp/N64Recomp) and the
 [pret/pokestadiumgs](https://github.com/pret/pokestadiumgs) decompilation.
@@ -67,18 +79,6 @@ mount this repository at `/work`, the pinned engine build at `/n64recomp`, and
 run `tools/mac_generate_recomp.sh`. The first verified pass emitted 33,529
 functions. Current Android runtime and rental-roster status is recorded in
 `PORTING_STATUS.md` and `CLAUDE_HANDOFF.md`.
-
-## Decompilation coverage
-
-The following block is refreshed by the repository post-commit hook.
-Enable the tracked hook once per checkout with
-`git config core.hooksPath .githooks`.
-
-<!-- AUTO_COVERAGE:START -->
-- US functions with C implementations: **2,915 / 10,532 (27.7%)**
-- Remaining `GLOBAL_ASM` owners: **7,617**
-- Baseline: `f477acf` (vendored US pragma snapshot)
-<!-- AUTO_COVERAGE:END -->
 
 ## Symbol naming
 
