@@ -82,7 +82,15 @@ void func_80014C28(s32 arg0, s32 arg1) { func_80014C48(arg0, arg1, 1); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80014E68.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_8001510C.s")
+s32 func_8001519C(s32);
+s32 func_8001510C(s32 arg0, s32 arg1) {
+    u8 *temp_v1;
+    temp_v1 = (u8 *)(u32)func_8001519C(arg0) + (arg1 << 4);
+    if (*(s32 *)(temp_v1 + 0x14) == 0) {
+        arg1 = *(s32 *)(temp_v1 + 0x10);
+    }
+    return arg1;
+}
 
 s32 func_80011250(s32, s32, s32);
 s32 func_8001244C();
