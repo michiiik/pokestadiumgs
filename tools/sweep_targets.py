@@ -321,6 +321,58 @@ def immediate_repair_candidates(
     return repairs
 
 
+_STACK_SLOT_DECL_RE = re.compile(
+    r"^(?P<indent>\s*)(?P<type>(?:(?:const\s+)?(?:u|s)?(?:8|16|32|64)|f(?:32|64)|void\s*\*))"
+    r"\s+(?P<name>sp[0-9A-Fa-f]+)(?P<suffix>\s*(?:=\s*[^;]+)?;)\s*$"
+)
+
+
+def stack_slot_order_candidate(
+    candidate: str, attempt: dict[str, object]
+) -> str | None:
+    """Reorder m2c stack-local declarations by ascending ABI slot.
+
+    IDO's local allocation is sensitive to declaration order.  m2c commonly
+    emits the same fixed locals in descending slot order (``sp28, sp26,
+    sp24``), while the matching source declares them from the lowest slot up.
+    This is a narrow source-shape retry for an existing mismatch; it does not
+    infer or alter types, expressions, or call order.
+    """
+    if attempt.get("status") != "probe_rejected":
+        return None
+    if attempt.get("mismatch_kind") not in {
+        "immediate_drift", "operand_or_scheduling_drift", "instruction_drift",
+    }:
+        return None
+    lines = candidate.splitlines(keepends=True)
+    # Only touch the initial local declaration block in each function.  Once
+    # a statement or a non-declaration is seen, later ``sp`` names may be
+    # nested-scope locals and moving them would change source semantics.
+    changed = False
+    index = 0
+    while index < len(lines):
+        match = _STACK_SLOT_DECL_RE.match(lines[index])
+        if match is None:
+            index += 1
+            continue
+        start = index
+        declarations: list[tuple[int, str]] = []
+        while index < len(lines):
+            current = _STACK_SLOT_DECL_RE.match(lines[index])
+            if current is None:
+                break
+            slot = int(current.group("name")[2:], 16)
+            declarations.append((slot, lines[index]))
+            index += 1
+        if len(declarations) < 2:
+            continue
+        ordered = sorted(declarations, key=lambda item: item[0])
+        if [line for _, line in declarations] != [line for _, line in ordered]:
+            lines[start:index] = [line for _, line in ordered]
+            changed = True
+    return "".join(lines) if changed else None
+
+
 def rewrite_draft(draft: str, variant: dict[str, str]) -> str | None:
     """Turn an m2c ``--valid-syntax`` draft into plain C for one type guess."""
     if "M2C_ERROR" in draft:
@@ -1480,6 +1532,30 @@ def sweep(
                 extra_blocks.append((function, code))
                 extra_labels.append(label)
                 labels_of[function].add(label)
+        # m2c often emits fixed stack locals in descending slot order.  When
+        # the probe has already shown a code-generation drift, try the
+        # declaration-order-only spelling before spending a permuter budget.
+        for attempt in probe["attempts"]:
+            index = int(attempt.get("index", -1))
+            if index < 0 or index >= len(blocks):
+                continue
+            function, candidate = blocks[index]
+            rewritten = stack_slot_order_candidate(candidate, attempt)
+            if rewritten is None:
+                continue
+            base_label = labels[index]
+            label = f"{base_label}:stack-slots-ascending"
+            if label in labels_of[function]:
+                continue
+            if skip_attempts is not None and (function, label) in skip_attempts:
+                continue
+            key = (function, rewritten)
+            if key in extra_seen:
+                continue
+            extra_seen.add(key)
+            extra_blocks.append((function, rewritten))
+            extra_labels.append(label)
+            labels_of[function].add(label)
         if extra_blocks:
             try:
                 extra_probe = runner.try_candidates_detailed(

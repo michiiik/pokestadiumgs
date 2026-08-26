@@ -1814,6 +1814,31 @@ class SweepTests(unittest.TestCase):
             sweep_targets.immediate_repair_candidates("return value;", base), []
         )
 
+    def test_stack_slot_retry_reorders_only_descending_local_declarations(self) -> None:
+        candidate = (
+            "s32 func_a(void) {\n"
+            "    s32 sp28;\n"
+            "    s16 sp26;\n"
+            "    s16 sp24;\n"
+            "    sp28 = 1;\n"
+            "    return sp24;\n"
+            "}\n"
+        )
+        rewritten = sweep_targets.stack_slot_order_candidate(
+            candidate,
+            {"status": "probe_rejected", "mismatch_kind": "immediate_drift"},
+        )
+        self.assertIsNotNone(rewritten)
+        self.assertLess(rewritten.index("s16 sp24"), rewritten.index("s16 sp26"))
+        self.assertLess(rewritten.index("s16 sp26"), rewritten.index("s32 sp28"))
+        self.assertIn("sp28 = 1;", rewritten)
+        self.assertIsNone(
+            sweep_targets.stack_slot_order_candidate(
+                candidate,
+                {"status": "probe_rejected", "mismatch_kind": "register_allocation_only"},
+            )
+        )
+
     def test_bounded_lookup_u8_argument_variant_rewrites_only_function_parameter(self) -> None:
         draft = (
             "u8 func_80073600(s32 arg0) {\n"
