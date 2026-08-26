@@ -103,7 +103,13 @@ s32 func_8210168C(s32 arg0, s32 arg1) {
     return D_82104174;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15A060/func_821016F0.s")
+s32 func_821016F0(void *arg0) {
+    u8 *p = arg0;
+    while (*(s32 *)p != 0) {
+        p += 0x34;
+    }
+    return (p - (u8 *)arg0) / 52;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15A060/func_82101728.s")
 
