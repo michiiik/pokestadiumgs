@@ -206,7 +206,13 @@ void func_8006E7DC(f32 (*arg0)[4], void *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_80070720.s")
+extern s16 *func_80003240(s32);
+extern s32 D_8009491C;
+s16 func_80070720(void) {
+    s16 result;
+    result = *func_80003240(D_8009491C + 0x1A);
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
