@@ -2,7 +2,7 @@
 
 
 #ifdef VERSION_US
-void func_8160BA20(s16 *arg0, s16 arg1, s16 arg2) {
+void Particle_Field9A_SetXY_0A3A0(s16 *arg0, s16 arg1, s16 arg2) {
     arg0[0] = arg1;
     arg0[1] = arg2;
 }

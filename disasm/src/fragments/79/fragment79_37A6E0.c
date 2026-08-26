@@ -258,7 +258,7 @@ f32 func_8410EB50();
 extern void func_8411FEE8(s32);
 extern s32 D_841911EC;
 extern s32 D_84184148;
-void func_8410ED30(void) {
+void BattleAnim_ModelDispatch_072(void) {
     if (func_8410EB50() <= 1.75f) {
         func_8411FEE8(0);
         (*(s32 *)((u8 *)((D_841911E8 + (D_841911EC * 8))) + (8))) = (s32) D_84184148;
@@ -307,11 +307,11 @@ void func_8410ED30(void) {
 #endif
 
 #ifdef VERSION_US
-void func_8410F9E4(u8 *arg0, s32 arg1) {}
+void BattleAnim_ModelDispatch_162(u8 *arg0, s32 arg1) {}
 #endif
 
 #ifdef VERSION_US
-void func_8410F9F0(u8 *arg0, s32 arg1) {}
+void BattleAnim_ModelDispatch_163(u8 *arg0, s32 arg1) {}
 #endif
 
 #ifdef VERSION_US
@@ -321,7 +321,7 @@ void func_8410F9F0(u8 *arg0, s32 arg1) {}
 #ifdef VERSION_US
 extern void func_841203B4(u8 *, f32, f32);
 extern void func_8410E73C();
-void func_8410FABC(u8 *arg0, s32 arg1) {
+void BattleAnim_ModelDispatch_170(u8 *arg0, s32 arg1) {
     D_841911E8 = func_8410B330(arg0);
     func_841203B4(arg0 + 0x2C, 45.0f, 0.02f);
     func_8410E73C(arg0, arg1);
@@ -338,7 +338,7 @@ void func_8410FABC(u8 *arg0, s32 arg1) {
 
 #ifdef VERSION_US
 extern void func_800371B4(u8 *, u8 *, s32, s16, s32);
-void func_8410FD54(u8 *arg0, s32 arg1) {
+void BattleAnim_ModelDispatch_030(u8 *arg0, s32 arg1) {
     u8 *temp_v0;
 
     temp_v0 = func_8410B330(arg0);
@@ -356,7 +356,7 @@ void func_8410FD54(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-void func_8410FF0C(u8 *arg0, s32 arg1) {
+void BattleAnim_ModelDispatch_058(u8 *arg0, s32 arg1) {
     u8 *temp_v0;
 
     temp_v0 = func_8410B330(arg0);
@@ -372,7 +372,7 @@ void func_8410FF0C(u8 *arg0, s32 arg1) {
 
 #ifdef VERSION_US
 extern f64 D_84188F98;
-void func_84110098(u8 *arg0, s32 arg1) {
+void BattleAnim_ModelDispatch_065(u8 *arg0, s32 arg1) {
     u8 *temp_v0;
 
     temp_v0 = func_8410B330(arg0);
@@ -394,7 +394,7 @@ void func_84110098(u8 *arg0, s32 arg1) {
 #ifdef VERSION_US
 extern void func_8410CC90(u8 *, s32, s16);
 extern void func_84120BB4(u8 *, s32);
-void func_84110320(u8 *arg0, s32 arg1) {
+void BattleAnim_ModelDispatch_190(u8 *arg0, s32 arg1) {
     D_841911E8 = func_8410B330(arg0);
     func_84120BB4(arg0, arg1);
     func_8410CC90(arg0, arg1, (*(s16 *)((u8 *)(D_841911E8) + (0x98))));
@@ -404,7 +404,7 @@ void func_84110320(u8 *arg0, s32 arg1) {
 
 #ifdef VERSION_US
 extern void func_8410C934(u8 *, s32, s16);
-void func_84110394(u8 *arg0, s32 arg1) {
+void BattleAnim_ModelDispatch_001(u8 *arg0, s32 arg1) {
     D_841911E8 = func_8410B330(arg0);
     func_84120BB4(arg0, arg1);
     func_8410C934(arg0, arg1, (*(s16 *)((u8 *)(D_841911E8) + (0x98))));
@@ -415,7 +415,7 @@ void func_84110394(u8 *arg0, s32 arg1) {
 #ifdef VERSION_US
 extern void func_8410CAE4(u8 *, s32, s16);
 extern void func_84120C20(u8 *, s32);
-void func_84110408(u8 *arg0, s32 arg1) {
+void BattleAnim_ModelDispatch_078(u8 *arg0, s32 arg1) {
     D_841911E8 = func_8410B330(arg0);
     func_84120C20(arg0, arg1);
     func_8410CAE4(arg0, arg1, (*(s16 *)((u8 *)(D_841911E8) + (0x98))));
@@ -426,7 +426,7 @@ void func_84110408(u8 *arg0, s32 arg1) {
 #ifdef VERSION_US
 extern void func_8410ED98(u8 *, s32, s32);
 extern void func_84120E14(s32);
-void func_8411047C(u8 *arg0, s32 arg1) {
+void BattleAnim_ModelDispatch_099(u8 *arg0, s32 arg1) {
     D_841911E8 = func_8410B330(arg0);
     func_84120E14(arg1);
     func_8410ED98(arg0, arg1, 0);
@@ -436,7 +436,7 @@ void func_8411047C(u8 *arg0, s32 arg1) {
 
 #ifdef VERSION_US
 extern void func_84120960(u8 *, s32);
-void func_841104E4(u8 *arg0, s32 arg1) {
+void BattleAnim_ModelDispatch_085(u8 *arg0, s32 arg1) {
     D_841911E8 = func_8410B330(arg0);
     func_84120960(arg0, arg1);
     func_8410C934(arg0, arg1, (*(s16 *)((u8 *)(D_841911E8) + (0x98))));
@@ -447,7 +447,7 @@ void func_841104E4(u8 *arg0, s32 arg1) {
 #ifdef VERSION_US
 extern void func_8410CD3C(u8 *, s32, s16);
 extern void func_84120A50(u8 *, s32);
-void func_84110558(u8 *arg0, s32 arg1) {
+void BattleAnim_ModelDispatch_106(u8 *arg0, s32 arg1) {
     D_841911E8 = func_8410B330(arg0);
     func_84120A50(arg0, arg1);
     func_8410CD3C(arg0, arg1, (*(s16 *)((u8 *)(D_841911E8) + (0x98))));
@@ -457,7 +457,7 @@ void func_84110558(u8 *arg0, s32 arg1) {
 
 #ifdef VERSION_US
 extern void func_84120CA4(u8 *, s32);
-void func_841105CC(u8 *arg0, s32 arg1) {
+void BattleAnim_ModelDispatch_036(u8 *arg0, s32 arg1) {
     D_841911E8 = func_8410B330(arg0);
     func_84120CA4(arg0, arg1);
     func_8410CC90(arg0, arg1, (*(s16 *)((u8 *)(D_841911E8) + (0x98))));
@@ -467,7 +467,7 @@ void func_841105CC(u8 *arg0, s32 arg1) {
 
 #ifdef VERSION_US
 extern void func_84120D34(u8 *, s32);
-void func_84110640(u8 *arg0, s32 arg1) {
+void BattleAnim_ModelDispatch_043(u8 *arg0, s32 arg1) {
     D_841911E8 = func_8410B330(arg0);
     func_84120D34(arg0, arg1);
     func_8410CC90(arg0, arg1, (*(s16 *)((u8 *)(D_841911E8) + (0x98))));
@@ -521,7 +521,7 @@ void func_84110640(u8 *arg0, s32 arg1) {
 
 #ifdef VERSION_US
 extern void func_84108940(u8 *, s32);
-void func_8411100C(u8 *arg0, s32 arg1) {
+void BattleAnim_ModelDispatch_176(u8 *arg0, s32 arg1) {
     D_841911E8 = func_8410B330(arg0);
     func_84108940(arg0 + 0xB4, 0);
 }
@@ -529,7 +529,7 @@ void func_8411100C(u8 *arg0, s32 arg1) {
 
 #ifdef VERSION_US
 extern void func_8411EFE4(s32);
-void func_84111048(u8 *arg0, s32 arg1) {
+void BattleAnim_ModelDispatch_022(u8 *arg0, s32 arg1) {
     D_841911E8 = func_8410B330(arg0);
     func_84120BB4(arg0, arg1);
     func_8411EFE4(arg1);
@@ -540,14 +540,14 @@ void func_84111048(u8 *arg0, s32 arg1) {
 
 #ifdef VERSION_US
 extern void func_8410CF80(void);
-void func_841110C4(u8 *arg0) {
+void BattleAnim_ModelDispatch_023(u8 *arg0) {
     *(f32 *)(arg0 + 0x2C) = 45.0f;
     func_8410CF80();
 }
 #endif
 
 #ifdef VERSION_US
-void func_841110EC(u8 *arg0, s32 arg1) {
+void BattleAnim_ModelDispatch_015(u8 *arg0, s32 arg1) {
     D_841911E8 = func_8410B330(arg0);
     func_84120BB4(arg0, arg1);
     func_8410C934(arg0, arg1, (*(s16 *)((u8 *)(D_841911E8) + (0x98))));
@@ -560,7 +560,7 @@ void func_841110EC(u8 *arg0, s32 arg1) {
 #ifdef VERSION_US
 extern void func_8410D088(u8 *, s32);
 extern void func_8410E878(u8 *, s32);
-void func_84111170(u8 *arg0, s32 arg1) {
+void BattleAnim_ModelDispatch_016(u8 *arg0, s32 arg1) {
     *(f32 *)(arg0 + 0x2C) = 45.0f;
     func_8410D088(arg0, arg1);
     func_8410E878(arg0, arg1);
@@ -569,7 +569,7 @@ void func_84111170(u8 *arg0, s32 arg1) {
 
 #ifdef VERSION_US
 extern void func_8410E73C(void);
-void func_841111B0(u8 *arg0) {
+void BattleAnim_ModelDispatch_044(u8 *arg0) {
     *(f32 *)(arg0 + 0x2C) = 45.0f;
     func_8410E73C();
 }
@@ -705,7 +705,7 @@ void func_84111DB4(u8 *arg0, s32 arg1) {
     } else {
         func_80024974(func_8411E1F8((s32) arg0) & 0xFF, (*(s16 *)((u8 *)(arg0) + (0x1A))), (*(s16 *)((u8 *)(arg0) + (0x40))), 1, arg1);
     }
-    func_8003EB84(arg0, (s16) arg1);
+    ModelAnim_SetFrame(arg0, (s16) arg1);
 }
 #endif
 
@@ -719,12 +719,12 @@ void func_84111E50(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8003EF48(void *, s16);
+extern void ModelAnim_SetEventFrame(void *, s16);
 s32 func_84111CF8();
 
 void func_84111E80(void *arg0, s16 arg1) {
     if (!((*(u16 *)((u8 *)(arg0) + (0x56))) & 1) && (func_84111CF8() == 0)) {
-        func_8003EF48(arg0, arg1);
+        ModelAnim_SetEventFrame(arg0, arg1);
     }
 }
 #endif
@@ -734,12 +734,12 @@ void func_84111E80(void *arg0, s16 arg1) {
 #endif
 
 #ifdef VERSION_US
-s32 func_8003EFBC();
+s32 ModelAnim_IsEventTrackDone();
 s32 func_84111FA4(void *arg0) {
     if ((*(s32 *)((u8 *)(arg0) + (0x58))) == 0) {
         return 1;
     }
-    if (func_8003EFBC() != 0) {
+    if (ModelAnim_IsEventTrackDone() != 0) {
         return 1;
     }
     return 0;
@@ -1068,7 +1068,7 @@ extern s32 func_841139D0(u8 *);
 extern void func_841136E8(u8 *);
 extern s32 D_841911F4;
 extern s32 D_84183D50;
-void func_84113BE8(u8 *arg0) {
+void BattleAnim_Dispatch_001(u8 *arg0) {
     if ((func_841139D0(arg0) == 0) && ((*(s16 *)((u8 *)(arg0) + (0x40))) != 0)) {
         func_84112158((s32) arg0, 0xFB);
     }
@@ -1083,7 +1083,7 @@ void func_84113BE8(u8 *arg0) {
 
 #ifdef VERSION_US
 extern void func_841137F8(u8 *);
-void func_84113D08(u8 *arg0) {
+void BattleAnim_Dispatch_002(u8 *arg0) {
     if (func_841139D0(arg0) == 0) {
         func_841137F8(arg0);
     }
@@ -1132,7 +1132,7 @@ void func_84114678(void *arg0) {
 
 #ifdef VERSION_US
 f32 func_8410EB50();
-void func_841149A0(u8 *arg0) {
+void BattleAnim_Dispatch_015(u8 *arg0) {
     (*(u8 *)((u8 *)(arg0) + (0x618))) = (u8) (*(u8 *)((u8 *)(D_84193DD0) + (8)));
     func_84111C44();
     func_841134A0(arg0);
@@ -1157,7 +1157,7 @@ void func_841149A0(u8 *arg0) {
 #ifdef VERSION_US
 extern void func_84114BF4(s32);
 extern void func_841153DC(s32);
-void func_841154F8(s32 arg0) {
+void BattleAnim_Dispatch_017(s32 arg0) {
     if ((func_841133EC(arg0) == 0) && ((*(s8 *)((u8 *)(arg0) + (0x7F6))) == 0)) {
         if ((*(u8 *)((u8 *)(arg0) + (0x618))) == 0x9C) {
             func_841153DC(arg0);
@@ -1169,7 +1169,7 @@ void func_841154F8(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-void func_84115554(u8 *arg0) {
+void BattleAnim_Dispatch_043(u8 *arg0) {
     (*(s8 *)((u8 *)(arg0) + (0x618))) = 0x13;
     func_84111C44();
     func_841134A0(arg0);
@@ -1204,7 +1204,7 @@ void func_841155B0(u8 *arg0) {
 #ifdef VERSION_US
 extern void func_841156D0(s32);
 extern void func_841157D8(s32);
-void func_84115850(s32 arg0) {
+void BattleAnim_Dispatch_045(s32 arg0) {
     s8 temp_v0;
 
     if (func_841133EC(arg0) == 0) {
@@ -1225,7 +1225,7 @@ void func_84115850(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-void func_841158D8(u8 *arg0) {
+void BattleAnim_Dispatch_050(u8 *arg0) {
     (*(s8 *)((u8 *)(arg0) + (0x618))) = 0x5B;
     func_84111C44();
     func_841134A0(arg0);
@@ -1253,7 +1253,7 @@ void func_84115940(u8 *arg0) {
 #ifdef VERSION_US
 void func_84115A24(void *arg0)
 {
-  if (func_8003EC34() != 0)
+  if (ModelAnim_IsFinished() != 0)
   {
     *((u8 *) (((u8 *) arg0) + 2)) = (u8) ((*((u8 *) (((u8 *) arg0) + 2))) & 0xFFFD);
     *((s8 *) (((u8 *) arg0) + 0x7F6)) = 3;
@@ -1274,7 +1274,7 @@ void func_84115A24(void *arg0)
 #endif
 
 #ifdef VERSION_US
-void func_84115CF0(u8 *arg0) {
+void BattleAnim_Dispatch_106(u8 *arg0) {
     (*(s16 *)((u8 *)(arg0) + (0x7E8))) = 0;
     (*(s8 *)((u8 *)(arg0) + (0x7F6))) = 5;
     (*(s8 *)((u8 *)(arg0) + (0x618))) = 0x5B;
@@ -1295,7 +1295,7 @@ void func_84115D98(u8 *arg0) {
 
     temp_v0 = (*(s16 *)((u8 *)(arg0) + (0x1A)));
     if ((temp_v0 == 0x32) || (temp_v0 == 0x33)) {
-        if (func_8003EC34(arg0) != 0) {
+        if (ModelAnim_IsFinished(arg0) != 0) {
             func_84108A10(arg0);
             func_84111BEC(arg0);
             (*(s8 *)((u8 *)(arg0) + (0x7F6))) = 1;
@@ -1365,7 +1365,7 @@ void func_84115D98(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-void func_84116918(u8 *arg0) {
+void BattleAnim_Dispatch_113(u8 *arg0) {
     (*(s16 *)((u8 *)(arg0) + (0x7E8))) = 0;
     (*(s8 *)((u8 *)(arg0) + (0x7F6))) = 5;
     (*(s8 *)((u8 *)(arg0) + (0x618))) = 1;
@@ -1581,7 +1581,7 @@ void func_84118794(u8 *arg0) {
 
 #ifdef VERSION_US
 extern void func_8410B104();
-void func_84119C9C(s32 arg0) {
+void BattleAnim_Dispatch_120(s32 arg0) {
     func_8411FEE8(0x3E);
     func_84111C44();
     func_8410B104();
@@ -1599,7 +1599,7 @@ void func_84119C9C(s32 arg0) {
 
 #ifdef VERSION_US
 extern void func_84112E40(s32);
-void func_8411A150(s32 arg0) {
+void BattleAnim_Dispatch_141(s32 arg0) {
     func_8411FEE8(0x1F);
     func_84112E40(arg0);
     (*(s32 *)((u8 *)((arg0 + (D_841911F4 * 4))) + (0x5C8))) = (s32) D_84183D50;
@@ -1639,7 +1639,7 @@ void func_8411A150(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-void func_8411A728(s32 arg0) {
+void BattleAnim_Dispatch_225(s32 arg0) {
     func_8411FEE8(0x50);
     (*(s32 *)((u8 *)((arg0 + (D_841911F4 * 4))) + (0x5C8))) = (s32) D_84183D50;
 }
@@ -1658,7 +1658,7 @@ void func_8411A728(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-void func_8411A8FC(u8 *arg0) {
+void BattleAnim_Dispatch_024(u8 *arg0) {
     if (((*(s8 *)((u8 *)(arg0) + (0x7F6))) != 0) && ((*(s16 *)((u8 *)(arg0) + (0x7E8))) == 4)) {
         func_841206D0(arg0);
         func_8411FEE8(0);
@@ -1692,7 +1692,7 @@ void func_8411A8FC(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-void func_8411AD6C(u8 *arg0) {
+void BattleAnim_Dispatch_101(u8 *arg0) {
     s8 temp_v0;
 
     temp_v0 = (*(s8 *)((u8 *)(arg0) + (0x7F6)));
@@ -1705,7 +1705,7 @@ void func_8411AD6C(u8 *arg0) {
         (*(s8 *)((u8 *)(arg0) + (0x7F6))) = 3;
         return;
     case 3:
-        if (func_8003EC34(arg0) != 0) {
+        if (ModelAnim_IsFinished(arg0) != 0) {
             func_841206D0(arg0);
             func_84112158((s32) arg0, 0xFB);
             func_8411FEE8(0);
@@ -1728,7 +1728,7 @@ void func_8411AD6C(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-void func_8411B014(u8 *arg0) {
+void BattleAnim_Dispatch_092(u8 *arg0) {
     func_84111C44();
     (*(s8 *)((u8 *)(arg0) + (0x7F6))) = 0;
     (*(u8 *)((u8 *)(arg0) + (0x618))) = (u8) (*(u8 *)((u8 *)(D_84193DD0) + (8)));
@@ -1750,7 +1750,7 @@ void func_8411B014(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-void func_8411B2A0(u8 *arg0)
+void BattleAnim_Dispatch_078(u8 *arg0)
 {
   int new_var;
   new_var = 0xA4;
@@ -1778,7 +1778,7 @@ void func_8411B2A0(u8 *arg0)
 
 #ifdef VERSION_US
 extern void func_84113920(u8 *);
-void func_8411B518(u8 *arg0) {
+void BattleAnim_Dispatch_149(u8 *arg0) {
     func_841139D0(arg0);
     func_84113920(arg0);
     if (func_84113430((s32) arg0) != 0) {
@@ -1807,7 +1807,7 @@ void func_8411B518(u8 *arg0) {
 #ifdef VERSION_US
 s32 func_800427B8(s32);
 extern void func_84112EDC(u8 *);
-void func_8411B808(u8 *arg0) {
+void BattleAnim_Dispatch_177(u8 *arg0) {
     if (func_800427B8((*(s32 *)((u8 *)(arg0) + (0x5C0)))) != 0) {
         func_841126C8((s32) arg0);
         func_841136E8(arg0);
@@ -1839,7 +1839,7 @@ void func_8411B808(u8 *arg0) {
 s32 func_800427B8(s32);
 extern void func_84113560(s32);
 void func_8411EE74(u8 *arg0);
-void func_8411BC28(u8 *arg0) {
+void BattleAnim_Dispatch_086(u8 *arg0) {
     func_8411EE74(arg0);
     if (func_800427B8((*(s32 *)((u8 *)(arg0) + (0x5C0)))) != 0) {
         func_841126C8((s32) arg0);
@@ -1887,7 +1887,7 @@ void func_8411BC28(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-void func_8411C97C(s32 arg0) {
+void BattleAnim_Dispatch_184(s32 arg0) {
     if (func_84113430(arg0) != 0) {
         func_8410890C(0x112, arg0);
         (*(s16 *)((u8 *)(arg0) + (0x7E8))) = 0;
@@ -1918,7 +1918,7 @@ void func_8411C97C(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-void func_8411D158(s32 arg0) {
+void BattleAnim_Dispatch_233(s32 arg0) {
     if (func_84113430(arg0) != 0) {
         (*(s16 *)((u8 *)(arg0) + (0x7E8))) = 0;
         (*(s8 *)((u8 *)(arg0) + (0x7F6))) = 1;
@@ -1932,11 +1932,11 @@ void func_8411D158(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-void func_8411D2D4(u8 *arg0) {}
+void BattleAnim_Dispatch_204(u8 *arg0) {}
 #endif
 
 #ifdef VERSION_US
-void func_8411D2DC(u8 *arg0) {}
+void BattleAnim_Dispatch_205(u8 *arg0) {}
 #endif
 
 #ifdef VERSION_US
@@ -1949,7 +1949,7 @@ void func_8411D2DC(u8 *arg0) {}
 
 #ifdef VERSION_US
 extern void func_80024480(s16, s32);
-void func_8411D474(u8 *arg0) {
+void BattleAnim_Dispatch_008(u8 *arg0) {
     (*(s16 *)((u8 *)(arg0) + (0x7E8))) = 0;
     if (func_841139D0(arg0) == 0) {
         func_84112158((s32) arg0, 0xFC);
@@ -1961,14 +1961,14 @@ void func_8411D474(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-void func_8411D4E0(u8 *arg0) {
+void BattleAnim_Dispatch_009(u8 *arg0) {
     func_841139D0(arg0);
     if ((*(s16 *)((u8 *)(arg0) + (0x1A))) == 0xFC) {
         if ((*(s16 *)((u8 *)(arg0) + (0x7E8))) == 0x3C) {
             func_8411FEE8(0);
             (*(s32 *)((u8 *)((arg0 + (D_841911F4 * 4))) + (0x5C8))) = (s32) D_84183D50;
         }
-    } else if ((func_8003EC34(arg0) != 0) || ((*(s16 *)((u8 *)(arg0) + (0x7E8))) == 0x78)) {
+    } else if ((ModelAnim_IsFinished(arg0) != 0) || ((*(s16 *)((u8 *)(arg0) + (0x7E8))) == 0x78)) {
         func_8411FEE8(0);
         (*(s32 *)((u8 *)((arg0 + (D_841911F4 * 4))) + (0x5C8))) = (s32) D_84183D50;
     }

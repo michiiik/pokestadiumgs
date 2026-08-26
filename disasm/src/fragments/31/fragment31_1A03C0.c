@@ -14,22 +14,22 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A03C0/func_8822D45C.s")
 
-extern void func_80049ED8(s32);
+extern void Input_SetRepeatController(s32);
 extern s32 D_80087200;
 extern s32 D_880068B8;
 
 void func_8822D750(void) {
-    func_80049ED8(D_80087200);
+    Input_SetRepeatController(D_80087200);
     D_880068B8 = 0;
 }
 
 extern s32 D_880068B4;
-extern void func_800033DC(s32);
+extern void Util_Free(s32);
 extern u32 D_88234940;
 void func_8822D778(void) {
-    func_80049ED8(D_80087200);
+    Input_SetRepeatController(D_80087200);
     D_880068B4 = 1;
-    func_800033DC(D_88234940);
+    Util_Free(D_88234940);
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A03C0/func_8822D7B4.s")
@@ -41,7 +41,7 @@ void func_8822D874(void) { func_8821D930(D_88234940 + 4); }
 
 
 void func_8822DB00(void) {
-    func_80049ED8(D_80087200);
+    Input_SetRepeatController(D_80087200);
     D_880068B8 = 0;
 }
 

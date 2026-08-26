@@ -7,7 +7,7 @@ extern void func_8600BA50(void);
 extern void func_8600AAD4(void);
 extern void func_87F024CC(void);
 extern void func_86004FDC(void *, s32);
-extern void func_8003EFE0(void);
+extern void ModelRenderer_InitDisplayRoots(void);
 extern void func_8600520C(void *);
 extern u8 D_8600E110[];
 void func_8600CDD0(s32 arg0) {
@@ -16,7 +16,7 @@ void func_8600CDD0(s32 arg0) {
     func_8600AAD4();
     func_87F024CC();
     func_86004FDC(D_8600E110, arg0);
-    func_8003EFE0();
+    ModelRenderer_InitDisplayRoots();
     func_8600520C(D_8600E110);
 }
 

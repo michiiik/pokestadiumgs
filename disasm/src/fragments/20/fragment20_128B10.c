@@ -101,7 +101,7 @@ s32 func_82602930(s32 arg0) {
     s32 result = arg0;
     switch (arg0) {
     case 0:
-        if (func_800084A0() == 0) result = 1;
+        if (StageContext_GetFadeMode() == 0) result = 1;
         break;
     case 1:
         if (func_80044144(D_82615340->unk_04) != 0) {
@@ -119,7 +119,7 @@ s32 func_82602930(s32 arg0) {
         }
         break;
     case 3:
-        if (func_800084A0() == 1) result = 4;
+        if (StageContext_GetFadeMode() == 1) result = 4;
         break;
     }
     return result;

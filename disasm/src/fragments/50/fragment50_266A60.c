@@ -241,7 +241,7 @@ void func_86203BEC(void) {
 #ifdef VERSION_US
 extern void func_86206334();
 void func_86204EB8(void) {
-    if (func_800084A0() == 1) {
+    if (StageContext_GetFadeMode() == 1) {
         func_8620736C();
         func_86206304();
         func_86206334();

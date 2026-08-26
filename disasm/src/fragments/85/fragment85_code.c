@@ -84,7 +84,7 @@ void func_8FD008BC(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_80007820(s32 *, s32);
+extern void GfxImage_FillCurrent(s32 *, s32);
 extern void func_80008648();
 extern void func_800088DC();
 extern void func_8FD009B4();
@@ -95,7 +95,7 @@ extern void func_8FD00CD0();
 extern u8 D_800D0510;
 void func_8FD01120(void) {
     func_800088DC();
-    func_80007820(&D_800D0510, 1);
+    GfxImage_FillCurrent(&D_800D0510, 1);
     func_8FD009B4();
     func_8FD00A5C();
     func_8FD00B28();
@@ -265,7 +265,7 @@ extern void func_80008574();
 extern void func_8FD01E58(s32);
 extern void main_pool_pop_state(s32);
 extern void main_pool_push_state(s32);
-s32 func_8FD01EBC(s32 arg0, s32 arg1) {
+s32 fragment85_main(s32 arg0, s32 arg1) {
     s32 sp24;
 
     main_pool_push_state(0x52434544);
@@ -280,7 +280,7 @@ s32 func_8FD01EBC(s32 arg0, s32 arg1) {
     func_8FD019DC();
     func_80008574();
     func_80047610();
-    func_80006D3C();
+    Gfx_FreeDisplayListBuffers();
     main_pool_pop_state(0x52434544);
     return 0;
 }

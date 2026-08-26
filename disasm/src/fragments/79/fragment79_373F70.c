@@ -30,9 +30,9 @@ void func_8410488C(u8 *arg0) {
     if (ptr != NULL) func_84104818(ptr);
 }
 
-extern void func_8003EB84(u8 *, s16);
-void func_841048B8(u8 *arg0, s16 arg1) {
-    func_8003EB84(arg0, arg1);
+extern void ModelAnim_SetFrame(u8 *, s16);
+void BattleAnim_SetModelAnimFrame(u8 *arg0, s16 arg1) {
+    ModelAnim_SetFrame(arg0, arg1);
 }
 
 extern s32 D_8418CA20[];
@@ -41,26 +41,26 @@ void func_841048E0(u8 *arg0, s16 arg1) {
     func_8003F114(arg0, 0, -1, D_8418CA20[arg1]);
 }
 
-extern void func_8003EAFC(u8 *, s32, s32, s32);
-void func_8410491C(u8 *arg0, s16 arg1) {
-    func_8003EAFC(arg0, 0, D_8418CA20[arg1], 0x10000);
+extern void ModelAnim_BindTransformCurve(u8 *, s32, s32, s32);
+void BattleAnim_BindModelAnim(u8 *arg0, s16 arg1) {
+    ModelAnim_BindTransformCurve(arg0, 0, D_8418CA20[arg1], 0x10000);
 }
 
-void func_84104958(u8 *arg0, s16 arg1) {
-    func_8003EAFC(arg0, 0, D_8418CA20[arg1], 0xFFFF0000);
-    func_8003EB84(arg0, (s16)(*(u16 *)(*(u8 **)(arg0 + 0x44) + 0xA) - 1));
+void BattleAnim_BindModelAnimReversed(u8 *arg0, s16 arg1) {
+    ModelAnim_BindTransformCurve(arg0, 0, D_8418CA20[arg1], 0xFFFF0000);
+    ModelAnim_SetFrame(arg0, (s16)(*(u16 *)(*(u8 **)(arg0 + 0x44) + 0xA) - 1));
 }
 
-void func_841049B4(u8 *arg0) { func_8003EB84(arg0, (s16)(*(u16 *)(*(u8 **)(arg0 + 0x44) + 0xA) - 1)); }
+void func_841049B4(u8 *arg0) { ModelAnim_SetFrame(arg0, (s16)(*(u16 *)(*(u8 **)(arg0 + 0x44) + 0xA) - 1)); }
 
-s32 func_841049E4(u8 *arg0) { s32 result = 0; if (*(s32 *)(arg0 + 0x48) == 0) { result = 1; } return result; }
+s32 BattleAnim_IsModelAnimComplete(u8 *arg0) { s32 result = 0; if (*(s32 *)(arg0 + 0x48) == 0) { result = 1; } return result; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_373F70/func_84104A00.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_373F70/func_84104D28.s")
 
 extern u8 *func_841047AC(void);
-extern void func_84105930(u8 *, f32);
+extern void BattleAnim_GetPointAlongCameraRay(u8 *, f32);
 extern void func_841048E0(u8 *, s16);
 u8 *func_84104F54(u8 *arg0) {
     u8 *value;
@@ -68,7 +68,7 @@ u8 *func_84104F54(u8 *arg0) {
     if (value != NULL) {
         *(u8 **)(value + 0x14) = arg0;
         *(u8 **)(arg0 + 0xC) = value;
-        func_84105930(value + 0x24, 50.0f);
+        BattleAnim_GetPointAlongCameraRay(value + 0x24, 50.0f);
         func_841048E0(value, 0x130);
     }
     return value;

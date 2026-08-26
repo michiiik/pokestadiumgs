@@ -334,9 +334,9 @@ s8 func_80018C60(s32 arg0, s32 arg1, s32 arg2)
 extern u8 *D_80121EDC[]; s8 func_80018CA4(s32 arg0, s32 arg1) { return *(s8 *)(D_80121EDC[arg0] + arg1 + 0x158); }
 
 extern s32 D_8011EBD0;
-extern void func_80010610(s32 *, s32, s32);
+extern void GbApu_InitAllocator(s32 *, s32, s32);
 void func_80018CC0(s32 arg0, s32 arg1) {
-    func_80010610(&D_8011EBD0, arg0, arg1);
+    GbApu_InitAllocator(&D_8011EBD0, arg0, arg1);
 }
 
 extern s32 D_8011EBD0; void func_80018CF0(void) { D_8011EBD0 = 0; }

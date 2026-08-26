@@ -3,7 +3,7 @@
 
 #ifdef VERSION_US
 extern Gfx* D_800D0510;
-void func_82C00020(u8 r, u8 g, u8 b, u8 a) {
+void ParticleGfx_SetPrimColor_fragment83(u8 r, u8 g, u8 b, u8 a) {
     gDPSetPrimColor(D_800D0510++, 0, 0, r, g, b, a);
 }
 #endif
@@ -292,15 +292,15 @@ void func_82C03574(void) { func_8004C4B0(21); func_8004C4B0(19); }
 #endif
 
 #ifdef VERSION_US
-extern s8 *func_8000B580(s8 *, s8 *);
+extern s8 *HAL_Strcpy(s8 *, s8 *);
 extern s8 *func_8004C874(s32, s32);
 s32 func_82C03674(s32 arg0, s32 arg1, void *arg2) {
     s32 var_v1;
 
     var_v1 = 0;
     if ((*(s16 *)((u8 *)(arg2) + (0x34))) == 0) {
-        func_8000B580(arg0 + 4, func_8004C874(0x15, 6));
-        func_8000B580(arg0 + 0x54, func_8004C874(0x15, 0x1E));
+        HAL_Strcpy(arg0 + 4, func_8004C874(0x15, 6));
+        HAL_Strcpy(arg0 + 0x54, func_8004C874(0x15, 0x1E));
         var_v1 = 1;
     }
     return var_v1;
@@ -321,8 +321,8 @@ s32 func_82C03904(s32 arg0, s32 arg1, void *arg2) {
 
     var_v1 = 0;
     if ((*(s16 *)((u8 *)(arg2) + (0x34))) == 5) {
-        func_8000B580(arg0 + 4, func_8004C874(0x15, 0x19));
-        func_8000B580(arg0 + 0x54, func_8004C874(0x15, 0x36));
+        HAL_Strcpy(arg0 + 4, func_8004C874(0x15, 0x19));
+        HAL_Strcpy(arg0 + 0x54, func_8004C874(0x15, 0x36));
         var_v1 = 1;
     }
     return var_v1;
@@ -343,8 +343,8 @@ s32 func_82C03D50(s32 arg0, s32 arg1, s32 arg2) {
 
     var_v1 = 0;
     if ((arg1 & 0xFF00) == 0x300) {
-        func_8000B580(arg0 + 4, func_8004C874(0x15, 0xC));
-        func_8000B580(arg0 + 0x54, func_8004C874(0x15, 0x27));
+        HAL_Strcpy(arg0 + 4, func_8004C874(0x15, 0xC));
+        HAL_Strcpy(arg0 + 0x54, func_8004C874(0x15, 0x27));
         var_v1 = 1;
     }
     return var_v1;
@@ -357,8 +357,8 @@ s32 func_82C03D50(s32 arg0, s32 arg1, s32 arg2) {
 
 #ifdef VERSION_US
 s32 func_82C03EE0(s8 *arg0, s32 arg1, s32 arg2) {
-    func_8000B580(arg0 + 4, func_8004C874(0x15, 7));
-    func_8000B580(arg0 + 0x54, func_8004C874(0x15, 0x20));
+    HAL_Strcpy(arg0 + 4, func_8004C874(0x15, 7));
+    HAL_Strcpy(arg0 + 0x54, func_8004C874(0x15, 0x20));
     return 1;
 }
 #endif
@@ -385,8 +385,8 @@ s32 func_82C041CC(s32 arg0, s32 arg1, s32 arg2) {
 
     var_v1 = 0;
     if ((arg1 & 0xFF00) == 0x100) {
-        func_8000B580(arg0 + 4, func_8004C874(0x15, 0x1B));
-        func_8000B580(arg0 + 0x54, func_8004C874(0x15, 0x39));
+        HAL_Strcpy(arg0 + 4, func_8004C874(0x15, 0x1B));
+        HAL_Strcpy(arg0 + 0x54, func_8004C874(0x15, 0x39));
         var_v1 = 1;
     }
     return var_v1;

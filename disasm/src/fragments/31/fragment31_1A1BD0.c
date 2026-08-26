@@ -4,11 +4,11 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A1BD0/func_8822E950.s")
 
-extern void func_800033DC(void *);
+extern void Util_Free(void *);
 extern void main_pool_pop_state(s32);
 extern u8 **D_88234970;
 void func_8822EA80(void) {
-    func_800033DC(*(volatile void **)(&D_88234970));
+    Util_Free(*(volatile void **)(&D_88234970));
     main_pool_pop_state(0x50495550);
 }
 
@@ -58,11 +58,11 @@ void func_8822FA30(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A1BD0/func_8822FA58.s")
 
-extern void func_80049ED8(s32);
+extern void Input_SetRepeatController(s32);
 extern s32 D_80087200;
 
 void func_8822FF80(void) {
-    func_80049ED8(D_80087200);
+    Input_SetRepeatController(D_80087200);
     D_880068B8 = 0;
 }
 
@@ -75,7 +75,7 @@ void func_8822FFA8(void) {
         func_88211168(1 - (*(s16 *)((u8 *)(D_88234980) + (0x48))), 0);
     }
     D_880068B4 = 1;
-    func_800033DC((void *) D_88234980);
+    Util_Free((void *) D_88234980);
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A1BD0/func_88230010.s")

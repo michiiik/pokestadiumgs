@@ -2,7 +2,7 @@
 
 
 #ifdef VERSION_US
-void func_80009200(s32 ms) {
+void crash_screen_sleep(s32 ms) {
     u64 cycles = OS_USEC_TO_CYCLES(ms * 1000LL); // why not just do OS_NSEC_TO_CYCLES and not multiply by 1000LL?
 
     osSetTime(0);
@@ -15,20 +15,20 @@ void func_80009200(s32 ms) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/9E00/func_8000948C.s")
 
-extern void *memcpy(void *, const void *, s32); void *func_80009750(void *dest, const void *src, s32 size) { return (u8 *)memcpy(dest, src, size) + size; }
+extern void *memcpy(void *, const void *, s32); void *crash_screen_copy_to_buf(void *dest, const void *src, s32 size) { return (u8 *)memcpy(dest, src, size) + size; }
 
 #include <stdarg.h>
 extern u8 D_80087C20[];
 extern s32 _Printf();
 extern void func_8000948C(s32, s32, s32);
-void func_80009774(s32 x, s32 y, const char *fmt, ...) {
+void crash_screen_printf(s32 x, s32 y, const char *fmt, ...) {
     signed char *ptr;
     s32 glyph;
     s32 size;
     signed char buf[0x100];
     va_list args;
     va_start(args, fmt);
-    size = _Printf(func_80009750, (char *)buf, fmt, args);
+    size = _Printf(crash_screen_copy_to_buf, (char *)buf, fmt, args);
     if (size > 0) {
         ptr = buf;
         while (size > 0) {
@@ -46,29 +46,29 @@ void func_80009774(s32 x, s32 y, const char *fmt, ...) {
 
 extern char D_800A1B14[];
 extern char D_800A1B20[];
-void func_80009830(s32 x, s32 y, s32 regNum, void* addr) {
+void crash_screen_print_fpr(s32 x, s32 y, s32 regNum, void* addr) {
     u32 bits;
     s32 exponent;
 
     bits = *(u32*)addr;
     exponent = ((bits & 0x7f800000U) >> 0x17) - 0x7f;
     if ((exponent >= -0x7e && exponent <= 0x7f) || bits == 0) {
-        func_80009774(x, y, D_800A1B14, regNum, *(f32*)addr);
+        crash_screen_printf(x, y, D_800A1B14, regNum, *(f32*)addr);
     } else {
-        func_80009774(x, y, D_800A1B20, regNum);
+        crash_screen_printf(x, y, D_800A1B20, regNum);
     }
 }
 
 extern char D_800A1B30[];
 extern char D_800A1B3C[];
 extern s32 D_80087DE8[];
-void func_800098B4(u32 fpcsr) {
+void crash_screen_print_fpcsr(u32 fpcsr) {
     s32 i;
     u32 bit = 1 << 17;
-    func_80009774(30, 155, D_800A1B30, fpcsr);
+    crash_screen_printf(30, 155, D_800A1B30, fpcsr);
     for (i = 0; i < 6; i++) {
         if (fpcsr & bit) {
-            func_80009774(132, 155, D_800A1B3C, D_80087DE8[i]);
+            crash_screen_printf(132, 155, D_800A1B3C, D_80087DE8[i]);
             break;
         }
         bit >>= 1;
@@ -77,7 +77,7 @@ void func_800098B4(u32 fpcsr) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/9E00/func_80009940.s")
 
-OSThread* func_80009D98(void) {
+OSThread* crash_screen_get_faulted_thread(void) {
     OSThread* thread = __osGetActiveQueue();
 
     while (thread->priority != -1) {

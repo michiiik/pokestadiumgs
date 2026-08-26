@@ -42,7 +42,7 @@ extern s32 D_800972B0[]; s32 func_80050CF8(s32 arg0){s32 result=0;if(arg0>=0&&ar
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051568.s")
 
-u16 func_800515D4(u8* arg0, s32 arg1) {
+u16 Save_Checksum(u8* arg0, s32 arg1) {
     u16 var_v1 = 0;
 
     while (arg1-- > 2) {
@@ -104,7 +104,7 @@ void func_800530DC(void) {
     } while (var_s0 != 4);
 }
 
-extern void func_80052928(s32,s32); extern void func_80051D64(s32,s32); void func_8005311C(s32 a0,s32 a1){func_80052928(a0,a1);func_80051D64(a0,a1);}
+extern void func_80052928(s32,s32); extern void func_80051D64(s32,s32); void Save_ResetAndCommitTypedRecord(s32 a0,s32 a1){func_80052928(a0,a1);func_80051D64(a0,a1);}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_8005314C.s")
 
@@ -114,7 +114,7 @@ s32 func_800532C4(s32 arg0){s32 result=0;switch(arg0){case 0x10:result=1;break;c
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800532F0.s")
 
-void func_80053384(void *arg0, void *arg1) { func_80051A8C(arg0, arg1, 1); }
+void Deck_IsSaveEntryPresent(void *arg0, void *arg1) { func_80051A8C(arg0, arg1, 1); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800533A4.s")
 
@@ -243,7 +243,7 @@ s32 func_80054E10(u16 *arg0)
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055028.s")
 
 extern u8 D_801281C0;
-void func_80055088(s32 arg0, u32 arg1) {
+void Save_ResetBank(s32 arg0, u32 arg1) {
     void *temp_v0;
 
     if ((arg1 >= 0x424E4B30U) && (arg1 < 0x424E4B34U)) {
@@ -273,7 +273,7 @@ void func_8005577C(s32 arg0) {
         if (arg0 == 0) {
             func_80055260(0x11, var_s0);
         } else {
-            func_8005311C(0x11, var_s0);
+            Save_ResetAndCommitTypedRecord(0x11, var_s0);
         }
         var_s0 += 1;
     } while (var_s0 != 0xE);
@@ -294,23 +294,23 @@ void func_800557E4(s32 arg0) {
         func_80055260(0x1D, 0);
         func_80055260(0x1E, 0);
     } else {
-        func_8005311C(0x14, 0);
-        func_8005311C(0x15, 0);
-        func_8005311C(0x13, 0);
-        func_8005311C(0x18, 0);
-        func_8005311C(0x19, 0);
-        func_8005311C(0x1A, 0);
-        func_8005311C(0x1B, 0);
-        func_8005311C(0x1C, 0);
-        func_8005311C(0x1D, 0);
-        func_8005311C(0x1E, 0);
+        Save_ResetAndCommitTypedRecord(0x14, 0);
+        Save_ResetAndCommitTypedRecord(0x15, 0);
+        Save_ResetAndCommitTypedRecord(0x13, 0);
+        Save_ResetAndCommitTypedRecord(0x18, 0);
+        Save_ResetAndCommitTypedRecord(0x19, 0);
+        Save_ResetAndCommitTypedRecord(0x1A, 0);
+        Save_ResetAndCommitTypedRecord(0x1B, 0);
+        Save_ResetAndCommitTypedRecord(0x1C, 0);
+        Save_ResetAndCommitTypedRecord(0x1D, 0);
+        Save_ResetAndCommitTypedRecord(0x1E, 0);
     }
     var_s0 = 0;
     do {
         if (arg0 == 0) {
             func_80055260(0x12, var_s0);
         } else {
-            func_8005311C(0x12, var_s0);
+            Save_ResetAndCommitTypedRecord(0x12, var_s0);
         }
         var_s0 += 1;
     } while (var_s0 != 2);

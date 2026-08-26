@@ -31,7 +31,7 @@ typedef struct S1_Vec3s {
     /* 0x2 */ s16 y;
     /* 0x4 */ s16 z;
 } S1_Vec3s;
-void func_84103550(S1_arg1_func_80019420* arg0) {
+void BattleAnim_RegisterAssetTable(S1_arg1_func_80019420* arg0) {
     if (arg0 != NULL) {
         do {
             if (arg0->unk_02 != 0) {
@@ -87,7 +87,7 @@ void func_841036E8(s32 arg0, s16 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_372DE0/func_84103D2C.s")
 
-void func_84103EA8(S1_MtxF* arg0, S1_MtxF* arg1, S1_Vec3f arg2, f32 arg3) {
+void ParticleGfx_BuildBillboardMatrix(S1_MtxF* arg0, S1_MtxF* arg1, S1_Vec3f arg2, f32 arg3) {
     arg0->mf[0][0] = arg1->mf[0][0] * arg3;
     arg0->mf[0][1] = arg1->mf[1][0] * arg3;
     arg0->mf[0][2] = arg1->mf[2][0] * arg3;
@@ -109,7 +109,7 @@ void func_84103EA8(S1_MtxF* arg0, S1_MtxF* arg1, S1_Vec3f arg2, f32 arg3) {
     arg0->mf[3][3] = 1.0f;
 }
 
-void func_84103F58(S1_MtxF* arg0, S1_MtxF* arg1, S1_Vec3f arg2, f32 arg3) {
+void ParticleGfx_BuildBillboardMatrixYScaled(S1_MtxF* arg0, S1_MtxF* arg1, S1_Vec3f arg2, f32 arg3) {
     arg0->mf[0][0] = arg1->mf[0][0];
     arg0->mf[0][1] = arg1->mf[1][0];
     arg0->mf[0][2] = arg1->mf[2][0];

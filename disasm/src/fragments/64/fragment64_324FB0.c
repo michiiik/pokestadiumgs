@@ -11,12 +11,12 @@ typedef struct {
     u8 pad_00[0xC];
     F2340Node *child;
 } F2340State;
-extern void func_80038FD4(F2340State *, F2340Node *);
+extern void GraphNode_RemoveChild(F2340State *, F2340Node *);
 void func_87F02340(F2340State *arg0) {
     F2340Node *node;
     node = arg0->child;
     while (node) {
-        func_80038FD4(arg0, node);
+        GraphNode_RemoveChild(arg0, node);
         node = arg0->child;
     }
 }

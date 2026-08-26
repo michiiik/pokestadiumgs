@@ -16,11 +16,11 @@ void func_88B00700(s16 *arg0) {
 
     *arg0 = 0xA;
     if (func_88B046F0() != 0) {
-        if (func_88000E54(3U) == 0) {
+        if (Credits_RandomRange(3U) == 0) {
             *arg0 = 0x34;
         }
     } else {
-        temp_v0 = func_88000E54(5U);
+        temp_v0 = Credits_RandomRange(5U);
         switch (temp_v0) {                          /* irregular */
         case 0:
             if (func_88B044D0(1) != 0) {
@@ -49,7 +49,7 @@ typedef union {
               xw, yw, zw, ww;
     };
 } S1_MtxF;
-void func_88B00FB8(Mtx* arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6, f32 arg7, f32 arg8, f32 arg9,
+void MathUtil_BuildTransformMtx_fragment40(Mtx* arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6, f32 arg7, f32 arg8, f32 arg9,
                    f32 argA) {
     S1_MtxF sp20;
 

@@ -3,12 +3,12 @@
 
 #ifdef VERSION_US
 extern u8 *D_88234564;
-extern void func_800033DC(void *);
+extern void Util_Free(void *);
 extern void main_pool_pop_state(s32);
 extern void func_8821CE40(s32);
 extern s32 D_88234560;
 void func_88213410(void) {
-    func_800033DC(D_88234564);
+    Util_Free(D_88234564);
     main_pool_pop_state(0x4D41494C);
     func_8821CE40(4);
     D_88234560 = 5;
@@ -94,7 +94,7 @@ void func_88214394(void) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_882160F8.s")
 
 void func_882164E0(void) {
-    func_800033DC(D_88234564);
+    Util_Free(D_88234564);
     main_pool_pop_state(0x4C495354);
     func_8821CE40(0);
     D_88234560 = 5;
@@ -134,7 +134,7 @@ extern u8 D_88006880[];
 extern void *D_80087200;
 extern void func_880022B4(void *, s32, s32);
 extern void func_88001900(void);
-extern void func_80049ED8(void *);
+extern void Input_SetRepeatController(void *);
 void func_88216EFC(void *arg0) {
     if (*(void **)D_88234740 != arg0) {
         *(void **)D_88234740 = arg0;
@@ -143,7 +143,7 @@ void func_88216EFC(void *arg0) {
             func_88001900();
         } else {
             func_880022B4(D_88006880, 0xF00, 0);
-            func_80049ED8(D_80087200);
+            Input_SetRepeatController(D_80087200);
         }
     }
 }

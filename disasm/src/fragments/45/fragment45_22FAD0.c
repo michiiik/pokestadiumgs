@@ -20,7 +20,7 @@ void func_8AB0B52C(void) { func_8AB0B67C(0); }
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22FAD0/func_8AB0B6E0.s")
 
 extern void func_80007B34(s32);
-s32 func_800084A0();
+s32 StageContext_GetFadeMode();
 extern void func_800225C4(s32);
 s32 func_8002806C();
 
@@ -36,7 +36,7 @@ s32 func_8AB0B74C(s32 arg0) {
         }
         break;
     case 1:
-        if (func_800084A0() == 1) {
+        if (StageContext_GetFadeMode() == 1) {
             sp1C = 0;
         }
         break;

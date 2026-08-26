@@ -126,10 +126,10 @@ void func_87E09BDC(void *arg0, s32 arg1) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E0A2D4.s")
 
 extern void func_87E082E4(void *, s32);
-u8 func_800084A0(void);
+u8 StageContext_GetFadeMode(void);
 extern void func_80007AEC(s32);
 void func_87E0A5BC(void *arg0) {
-    if (func_800084A0() == 1) {
+    if (StageContext_GetFadeMode() == 1) {
         if ((u32) (*(u32 *)((u8 *)(arg0) + (0x7B8))) >= 6U) {
             func_87E08B90((s32) arg0);
             func_87E082E4(arg0, 3);
@@ -160,40 +160,40 @@ void func_87E0A7C8(s32 arg0) {
     func_87E00590();
 }
 
-extern void func_87E15678(s32);
+extern void WidgetTree_OpenMessagePanel_fragment63(s32);
 
 void func_87E0A800(s32 arg0) {
     func_87E0F124(arg0 + 0x8C);
     func_87E00590();
-    func_87E15678(arg0 + 0x644);
+    WidgetTree_OpenMessagePanel_fragment63(arg0 + 0x644);
 }
 
 
 void func_87E0A838(s32 arg0) {
     func_87E0F124(arg0 + 0x8C);
     func_87E00590();
-    func_87E15678(arg0 + 0x644);
+    WidgetTree_OpenMessagePanel_fragment63(arg0 + 0x644);
 }
 
 
 void func_87E0A870(s32 arg0) {
     func_87E0F124(arg0 + 0x8C);
     func_87E00590();
-    func_87E15678(arg0 + 0x644);
+    WidgetTree_OpenMessagePanel_fragment63(arg0 + 0x644);
 }
 
 
 void func_87E0A8A8(s32 arg0) {
     func_87E0F124(arg0 + 0x8C);
     func_87E00590();
-    func_87E15678(arg0 + 0x644);
+    WidgetTree_OpenMessagePanel_fragment63(arg0 + 0x644);
 }
 
 
 void func_87E0A8E0(s32 arg0) {
     func_87E0F124(arg0 + 0x8C);
     func_87E00590();
-    func_87E15678(arg0 + 0x644);
+    WidgetTree_OpenMessagePanel_fragment63(arg0 + 0x644);
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E0A918.s")

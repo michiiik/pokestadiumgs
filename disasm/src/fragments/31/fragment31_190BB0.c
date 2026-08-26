@@ -41,8 +41,8 @@ void func_8821E1E4(void) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_190BB0/func_8821E21C.s")
 
 extern void *D_80087200;
-extern void func_80049ED8(void *);
-void func_8821E490(void) { func_80049ED8(D_80087200); }
+extern void Input_SetRepeatController(void *);
+void func_8821E490(void) { Input_SetRepeatController(D_80087200); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_190BB0/func_8821E4B4.s")
 
@@ -55,7 +55,7 @@ void func_8821E710(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_190BB0/func_8821E73C.s")
 
-void func_8821E8C8(void) { func_80049ED8(D_80087200); }
+void func_8821E8C8(void) { Input_SetRepeatController(D_80087200); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_190BB0/func_8821E8EC.s")
 

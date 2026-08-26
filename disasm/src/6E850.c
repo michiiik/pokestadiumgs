@@ -13,7 +13,7 @@ s32 func_8006DC78(s32 arg0) { u8 local[1]; return (local + (arg0 << 4)) - local;
 #endif
 
 #ifdef VERSION_US
-f32 func_8006DC94(f32 arg0) { if (arg0 < 0.0f) { arg0 = -arg0; } return arg0; }
+f32 Math_FAbs(f32 arg0) { if (arg0 < 0.0f) { arg0 = -arg0; } return arg0; }
 #endif
 
 #ifdef VERSION_US
@@ -27,7 +27,7 @@ void func_8006DCB8_padding2(void) {}
 #endif
 
 #ifdef VERSION_US
-extern u8 D_8009E1C4[]; s32 func_8006DDB0(s16 *arg0,s32 arg1){s16 v=arg0[arg1]; s16 r=*(s16*)(D_8009E1C4+(v<<1)); if(r>0)return r; return 0;}
+extern u8 D_8009E1C4[]; s32 Model_GetVertexThreshold(s16 *arg0,s32 arg1){s16 v=arg0[arg1]; s16 r=*(s16*)(D_8009E1C4+(v<<1)); if(r>0)return r; return 0;}
 #endif
 
 #ifdef VERSION_US
@@ -202,7 +202,7 @@ void func_8006E7DC(f32 (*arg0)[4], void *arg1) {
 #ifdef VERSION_US
 extern s16 *func_80003240(s32);
 extern s32 D_8009491C;
-s16 func_80070720(void) {
+s16 ModelRenderer_GetObjectType(void) {
     s16 result;
     result = *func_80003240(D_8009491C + 0x1A);
     return result;
@@ -234,11 +234,11 @@ extern s16 D_80129078; void func_80070860(s32 arg0) { D_80129078++; }
 #endif
 
 #ifdef VERSION_US
-f32 func_80070B7C(f32 arg0) { if ((f64)arg0 < 0.0) { arg0 = -arg0; } return arg0; }
+f32 Math_AbsF32(f32 arg0) { if ((f64)arg0 < 0.0) { arg0 = -arg0; } return arg0; }
 #endif
 
 #ifdef VERSION_US
-void func_80070BA4(f32 a0, f32 a1, f32 a2, f32 a3, f32 a4, f32 a5,
+void Vec3f_CrossProductComponents(f32 a0, f32 a1, f32 a2, f32 a3, f32 a4, f32 a5,
                    f32 *o0, f32 *o1, f32 *o2) {
     *o0 = (a1 * a5) - (a2 * a4);
     *o1 = (a2 * a3) - (a0 * a5);
@@ -367,7 +367,7 @@ typedef struct S1_StadiumModel {
     /* 0x170 */ S1_ModelVertex mvtx;
 } S1_StadiumModel;
 extern Mtx D_80129038;
-void func_800710A8(Gfx* arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6, s32 arg7, s32 arg8, s32 arg9, s32 arg10, s32 arg11, s32 arg12, s32 arg13, s32 arg14, s32 arg15, s32 arg16) {
+void Gfx_SetCombineMode(Gfx* arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6, s32 arg7, s32 arg8, s32 arg9, s32 arg10, s32 arg11, s32 arg12, s32 arg13, s32 arg14, s32 arg15, s32 arg16) {
     gDPSetCombine(arg0++, GCCc0w0(arg1, arg3, arg5, arg7) | GCCc1w0(arg9, arg11), GCCc0w1(arg2, arg4, arg6, arg8) | GCCc1w1(arg10, arg13, arg15, arg12, arg14, arg16));
 }
 #endif

@@ -18,7 +18,7 @@ typedef struct S1_unk_func_88316128 {
     /* 0x39 */ char unk39[0xA];
     /* 0x43 */ u8 unk_43;
 } S1_unk_func_88316128;
-s32 func_8821C450(S1_unk_func_88316128* arg0, S1_unk_func_88316128* arg1) {
+s32 LabPCList_CompareByPointer(S1_unk_func_88316128* arg0, S1_unk_func_88316128* arg1) {
     return (arg0 == arg1) ? 0 : (arg0 < arg1) ? -1 : 1;
 }
 

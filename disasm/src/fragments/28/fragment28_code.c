@@ -14,19 +14,19 @@ extern u8 D_446E30[];
 extern u8 D_447D00[];
 extern u8 fragment26_ROM_START[];
 extern u8 fragment27_ROM_START[];
-extern u8 *func_80004638(s32 id, u8 *rom_start, u8 *rom_end, s32 arg3);
-extern u8 *func_800047F8(s32 id, u8 *rom_start, u8 *rom_end);
+extern u8 *Asset_LoadToSegment(s32 id, u8 *rom_start, u8 *rom_end, s32 arg3);
+extern u8 *Fragment_Load(s32 id, u8 *rom_start, u8 *rom_end);
 extern void func_80047610(void);
-extern void func_80006D3C(void);
-s32 func_80000020(UNUSED s32 arg0, UNUSED s32 arg1) {
+extern void Gfx_FreeDisplayListBuffers(void);
+s32 fragment28_main(UNUSED s32 arg0, UNUSED s32 arg1) {
     main_pool_push_state(0x4241544C);
     func_80006CD0(0x30000, 0);
     func_800082E0(0, 1, 3, 1, 2, 1);
     D_8FE00118 = func_80047588(7, 0);
-    func_80004638((((u32)&D_1000000 & 0x0F000000) >> 24), D_446E30, D_447D00, 0);
-    func_800047F8((((u32)&D_81000000 & 0x0FF00000) >> 20) - 0x10, fragment26_ROM_START, fragment27_ROM_START);
+    Asset_LoadToSegment((((u32)&D_1000000 & 0x0F000000) >> 24), D_446E30, D_447D00, 0);
+    Fragment_Load((((u32)&D_81000000 & 0x0FF00000) >> 20) - 0x10, fragment26_ROM_START, fragment27_ROM_START);
     func_80047610();
-    func_80006D3C();
+    Gfx_FreeDisplayListBuffers();
     main_pool_pop_state(0x4241544C);
     return 0;
 }

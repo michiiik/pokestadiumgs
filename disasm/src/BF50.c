@@ -3,7 +3,7 @@
 
 #ifdef VERSION_US
 extern s16 D_8008CE50[0x401];
-u16 func_8000B350(f32 y, f32 x) {
+u16 MathUtil_Atan2Lookup(f32 y, f32 x) {
     u16 ret;
 
     if (x == 0) {
@@ -14,22 +14,22 @@ u16 func_8000B350(f32 y, f32 x) {
     return ret;
 }
 
-s16 func_8000B3B0(f32 y, f32 x) {
+s16 MathUtil_Atan2s(f32 y, f32 x) {
     u16 ret;
 
     if (x >= 0) {
         if (y >= 0) {
             if (y >= x) {
-                ret = func_8000B350(x, y);
+                ret = MathUtil_Atan2Lookup(x, y);
             } else {
-                ret = 0x4000 - func_8000B350(y, x);
+                ret = 0x4000 - MathUtil_Atan2Lookup(y, x);
             }
         } else {
             y = -y;
             if (y < x) {
-                ret = 0x4000 + func_8000B350(y, x);
+                ret = 0x4000 + MathUtil_Atan2Lookup(y, x);
             } else {
-                ret = 0x8000 - func_8000B350(x, y);
+                ret = 0x8000 - MathUtil_Atan2Lookup(x, y);
             }
         }
     } else {
@@ -37,22 +37,22 @@ s16 func_8000B3B0(f32 y, f32 x) {
         if (y < 0) {
             y = -y;
             if (y >= x) {
-                ret = 0x8000 + func_8000B350(x, y);
+                ret = 0x8000 + MathUtil_Atan2Lookup(x, y);
             } else {
-                ret = 0xC000 - func_8000B350(y, x);
+                ret = 0xC000 - MathUtil_Atan2Lookup(y, x);
             }
         } else {
             if (y < x) {
-                ret = 0xC000 + func_8000B350(y, x);
+                ret = 0xC000 + MathUtil_Atan2Lookup(y, x);
             } else {
-                ret = -func_8000B350(x, y);
+                ret = -MathUtil_Atan2Lookup(x, y);
             }
         }
     }
     return ret;
 }
 
-s32 func_8000B524(void) { return guRandom() & 0xFFFF; }
+s32 MathUtil_Random16(void) { return guRandom() & 0xFFFF; }
 
-f32 func_8000B548(void) { return (f32)func_8000B524() / 65536.0f; }
+f32 MathUtil_Random_ZeroOne(void) { return (f32)MathUtil_Random16() / 65536.0f; }
 #endif

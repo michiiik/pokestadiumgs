@@ -3,7 +3,7 @@
 
 #ifdef VERSION_US
 extern u8 **D_87F11768;
-void func_87F00020(u8 *arg0) {
+void fragment64_main(u8 *arg0) {
     *D_87F11768 = arg0;
 }
 

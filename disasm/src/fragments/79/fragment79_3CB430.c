@@ -77,7 +77,7 @@ void func_8415C530(void) {
 
 extern f64 D_8418C688;
 extern f64 D_8418C690;
-void func_8415D430(f32 arg0, f32 *arg1, f32 *arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6) {
+void Radial20_RotateVertexOffset(f32 arg0, f32 *arg1, f32 *arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6) {
     UNUSED f32 pad[16];
     f32 sp30[4][4];
     UNUSED s32 pad2[2];

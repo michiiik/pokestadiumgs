@@ -3,7 +3,7 @@
 
 #ifdef VERSION_US
 extern u8 *D_8009491C;
-void func_81003A20(Gfx *gfx, u32 *addresses) {
+void DisplayList_BuildOptionalPlusSegment(Gfx *gfx, u32 *addresses) {
     if (((u8 *)D_8009491C)[0x1C] == 0) {
         gSPDisplayList(gfx++, addresses[0]);
     }
@@ -24,7 +24,7 @@ void func_81003A74(s32 arg0, Func81003A74State *state) {
         addresses = state->addresses;
         gfx = func_80006DEC(0x50);
         state->gfx = gfx;
-        func_81003A20(gfx, addresses);
+        DisplayList_BuildOptionalPlusSegment(gfx, addresses);
     }
 }
 #endif

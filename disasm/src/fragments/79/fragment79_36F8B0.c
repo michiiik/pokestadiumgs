@@ -38,9 +38,9 @@ void func_84100094(u8 *arg0) {
 
 extern u8 *D_8418C950;
 extern u32 D_8418C954;
-extern u8 *func_80002984(s32 arg0, s32 arg1);
+extern u8 *main_pool_alloc(s32 arg0, s32 arg1);
 void func_84100134(void) {
-    D_8418C950 = func_80002984(0xB6D0, 0);
+    D_8418C950 = main_pool_alloc(0xB6D0, 0);
     _bzero(D_8418C950, 0xB6D0);
     D_8418C954 = 0;
 }
@@ -83,7 +83,7 @@ typedef struct Func8410056CParticleS8 {
     s8 active;
     u8 tail[3];
 } Func8410056CParticleS8;
-s32 func_8410056C(void) {
+s32 Particle_CountActive(void) {
     s32 i;
     s32 var_v1 = 0;
     Func8410056CParticleS8 *ptr = (Func8410056CParticleS8 *)D_8418C950;

@@ -7,10 +7,10 @@
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/30/fragment30_170D70/func_88103A64.s")
 
 extern void *D_80087200;
-extern void func_80049ED8(void *);
+extern void Input_SetRepeatController(void *);
 extern s32 D_880068B8;
 void func_88103B90(void) {
-    func_80049ED8(D_80087200);
+    Input_SetRepeatController(D_80087200);
     D_880068B8 = 0;
 }
 
@@ -19,7 +19,7 @@ void func_88103B90(void) {
 extern void func_88103BB8(void);
 extern s32 D_880068B4;
 void func_88103CAC(void) {
-    func_80049ED8(D_80087200);
+    Input_SetRepeatController(D_80087200);
     D_880068B4 = 1;
     func_88103BB8();
 }

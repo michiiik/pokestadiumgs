@@ -6,11 +6,11 @@
 
 u16 func_80060A4C(const u8 *arg0) { return (u16)((arg0[0] << 8) | arg0[1]); }
 
-u32 func_80060A64(const u8 *arg0) { return ((u32)arg0[0] << 16) | ((u32)arg0[1] << 8) | arg0[2]; }
+u32 GbData_ReadU24BE(const u8 *arg0) { return ((u32)arg0[0] << 16) | ((u32)arg0[1] << 8) | arg0[2]; }
 
 void func_80060A84(u8* arg0, s32 arg1) { arg0[0] = (arg1 >> 8) & 0xFF; arg0[1] = arg1 & 0xFF; }
 
-void func_80060A94(u8 *arg0, s32 arg1) {
+void GbData_WriteU24BE(u8 *arg0, s32 arg1) {
     arg0[0] = (arg1 >> 16) & 0xFF;
     arg0[1] = (arg1 >> 8) & 0xFF;
     arg0[2] = arg1 & 0xFF;
@@ -69,7 +69,7 @@ void func_80060EF8(void *arg0, void *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060F38.s")
 
-extern void func_8000B580(void); void func_80060F68() { func_8000B580(); }
+extern void HAL_Strcpy(void); void func_80060F68() { HAL_Strcpy(); }
 
 s32 func_80060F88(void) { return 0x46; }
 
@@ -101,7 +101,7 @@ void func_800615D0(void *arg0, void *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_800616BC.s")
 
-u16 func_8006175C(u16 arg0) { u16 i; for (i = 1; i < 255; i++) { if ((i * i) >= arg0) break; } return i; }
+u16 StatExpSqrt(u16 arg0) { u16 i; for (i = 1; i < 255; i++) { if ((i * i) >= arg0) break; } return i; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_8006179C.s")
 
@@ -121,12 +121,12 @@ u16 func_8006175C(u16 arg0) { u16 i; for (i = 1; i < 255; i++) { if ((i * i) >= 
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80061F44.s")
 
-extern s32 _bcmp(const void *, const void *, s32); s32 func_80061FAC(const void *a, const void *b) { return _bcmp(a, b, 0xD) == 0; }
+extern s32 _bcmp(const void *, const void *, s32); s32 GbSave_PlayerIdentityMatches(const void *a, const void *b) { return _bcmp(a, b, 0xD) == 0; }
 
 extern u8 D_800976A0[]; u8 func_80061FD0(s32 index) { return D_800976A0[index]; }
 
 extern u8 D_800976D7[];
-s32 func_80061FE0(s32 index) { if (index <= 0 || index >= 0x98) return 0; return D_800976D7[index]; }
+s32 Species_ToInternalIndex(s32 index) { if (index <= 0 || index >= 0x98) return 0; return D_800976D7[index]; }
 
 extern u8 D_8009776F[];
 s32 func_80062008(s32 index) { if (index <= 0 || index >= 0xBF) return 0xFC; return D_8009776F[index]; }
@@ -150,7 +150,7 @@ typedef struct S1_DeckHandle {
     /* 0x08 */ s16 count; // Deck_GetSaveEntryCount/Deck_GetCount
     /* 0x0A */ s16 cursor; // Deck_SetCursor
 } S1_DeckHandle;
-S1_DeckHandle* func_80062238(s32 arg0, s32 arg1, s32 arg2, s32 arg3, char* arg4, u16 arg5) {
+S1_DeckHandle* Deck_OpenAndSetName(s32 arg0, s32 arg1, s32 arg2, s32 arg3, char* arg4, u16 arg5) {
     S1_DeckHandle* sp24;
     S1_DeckHandle* temp_v0;
     S1_DeckHandle* var_v1;
@@ -165,8 +165,8 @@ S1_DeckHandle* func_80062238(s32 arg0, s32 arg1, s32 arg2, s32 arg3, char* arg4,
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_8006229C.s")
 
 extern s32 func_80051D64(s32, s32);
-extern void func_800033DC(void *);
-s32 func_80062304(u8 *arg0) { s32 result = 0; if ((arg0[1] & 0x10) && (arg0[4] & 1)) { func_80051D64(arg0[1], arg0[3]); result = 1; } func_800033DC(arg0); return result; }
+extern void Util_Free(void *);
+s32 func_80062304(u8 *arg0) { s32 result = 0; if ((arg0[1] & 0x10) && (arg0[4] & 1)) { func_80051D64(arg0[1], arg0[3]); result = 1; } Util_Free(arg0); return result; }
 
 s32 func_8006236C(u8 *arg0, s32 arg1) { s32 result = 0; if (arg0[5] >= arg1) { *(u16 *)(arg0 + 10) = arg1; result = 1; } return result; }
 

@@ -140,10 +140,10 @@ void func_87E113C8(void) {
     s32 temp_v0;
 
     func_80037E9C(0, &D_87E1EBA0);
-    temp_v0 = func_800030D0(func_80002B24(), 0);
+    temp_v0 = func_800030D0(main_pool_get_available(), 0);
     sp1C = temp_v0;
     (*(s32 *)((u8 *)(D_87E1EBB8) + (0x934))) = func_80040E80(temp_v0, &D_87E1AA80);
-    func_80003120(sp1C);
+    MainPool_FinalizeAllocation(sp1C);
 }
 
 extern void func_8004C4B0(s32);

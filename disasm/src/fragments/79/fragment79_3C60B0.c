@@ -35,23 +35,23 @@ void func_84156880(void) { func_841098C0(); }
 #endif
 
 #ifdef VERSION_US
-void func_841568A0() { func_84109780(); }
+void BattleAnim_EffectSecondaryOwnerAnchorPosition() { func_84109780(); }
 #endif
 
 #ifdef VERSION_US
-void func_841568C0(void) { func_841098C0(); }
+void BattleAnim_EffectTertiaryOwnerBonePosition(void) { func_841098C0(); }
 #endif
 
 #ifdef VERSION_US
-void func_841568E0(void) { func_84109884(); }
+void BattleAnim_EffectSecondaryOwnerBonePosition(void) { func_84109884(); }
 #endif
 
 #ifdef VERSION_US
-void func_84156900(void) { func_84109590(); }
+void BattleAnim_EffectTertiaryOwnerModelScale(void) { func_84109590(); }
 #endif
 
 #ifdef VERSION_US
-void func_84156920(void) { func_84109544(); }
+void BattleAnim_EffectSecondaryOwnerModelScale(void) { func_84109544(); }
 #endif
 
 #ifdef VERSION_US
@@ -85,7 +85,7 @@ void func_841569C0(void) { func_84109B1C(); }
 #ifdef VERSION_US
 extern u8 D_841A4D08[];
 extern void func_8007D454(void *, f32, f32, f32);
-void func_84156BA0(void) {
+void BattleAnim_ResetSharedEffectMatrix(void) {
     func_8007D454(D_841A4D08, 0.0f, 0.0f, 0.0f);
 }
 #endif
@@ -128,12 +128,12 @@ void func_84156CC4(void) {
 
 #ifdef VERSION_US
 extern u16 D_841A4D4A;
-extern void func_84156BA0(void);
+extern void BattleAnim_ResetSharedEffectMatrix(void);
 extern void func_8415C530(void);
 extern void func_84156CCC(void);
 void func_84156E58(void) {
     D_841A4D4A = 0;
-    func_84156BA0();
+    BattleAnim_ResetSharedEffectMatrix();
     func_8415C530();
     func_84156CCC();
 }
@@ -191,9 +191,9 @@ void func_841570D4(void) {
 extern u16 D_841A4D4C;
 extern void func_84162660(void);
 extern void func_84157128(void);
-void func_841572A0(void) {
+void BattleAnim_StartEffect7TexturedRibbonSheet_Init(void) {
     D_841A4D4C = 0;
-    func_84156BA0();
+    BattleAnim_ResetSharedEffectMatrix();
     func_84162660();
     func_84157128();
 }
@@ -205,7 +205,7 @@ void func_841572A0(void) {
 
 #ifdef VERSION_US
 extern s32 func_84162DE8();
-void func_84157344(void) {
+void BattleAnim_StartEffect7TexturedRibbonSheet_Draw(void) {
     #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
     s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp) D_800D0510 = func_84162DE8(D_800D0510);
 }
@@ -218,9 +218,9 @@ void func_84157344(void) {
 #ifdef VERSION_US
 extern u16 D_841A4D4E;
 extern void func_84157398(void);
-void func_84157558(void) {
+void BattleAnim_StartEffect33Radial20_Init(void) {
     D_841A4D4E = 0;
-    func_84156BA0();
+    BattleAnim_ResetSharedEffectMatrix();
     func_8415C530();
     func_84157398();
 }
@@ -231,7 +231,7 @@ void func_84157558(void) {
 #endif
 
 #ifdef VERSION_US
-void func_841575FC(void) {
+void BattleAnim_StartEffect33Radial20_Draw(void) {
     #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
     s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp) D_800D0510 = func_8415DBBC(D_800D0510);
 }
@@ -246,7 +246,7 @@ void func_841576CC(void) { func_8415BD48(0); }
 #endif
 
 #ifdef VERSION_US
-void func_841576EC(void) {
+void BattleAnim_EndEffect32Radial20_Draw(void) {
     #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
     s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp) D_800D0510 = func_8415C2E0(D_800D0510);
 }
@@ -261,7 +261,7 @@ void func_841577B8(void) { func_8415BD48(0); }
 #endif
 
 #ifdef VERSION_US
-void func_841577D8(void) {
+void BattleAnim_EndEffect33Radial20_Draw(void) {
     #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
     s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp) D_800D0510 = func_8415C2E0(D_800D0510);
 }
@@ -274,9 +274,9 @@ void func_841577D8(void) {
 #ifdef VERSION_US
 extern u16 D_841A4D52;
 extern void func_8415782C(void);
-void func_841579B8(void) {
+void BattleAnim_StartEffect98Radial20_Init(void) {
     D_841A4D52 = 0;
-    func_84156BA0();
+    BattleAnim_ResetSharedEffectMatrix();
     func_8415C530();
     func_8415782C();
 }
@@ -287,7 +287,7 @@ void func_841579B8(void) {
 #endif
 
 #ifdef VERSION_US
-void func_84157A5C(void) {
+void BattleAnim_StartEffect98Radial20_Draw(void) {
     #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
     s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp) D_800D0510 = func_8415DBBC(D_800D0510);
 }
@@ -296,9 +296,9 @@ void func_84157A5C(void) {
 #ifdef VERSION_US
 extern u16 D_841A4D54;
 extern void func_84166130(void);
-void func_84157AB0(void) {
+void BattleAnim_StartEffect11Trail50Alt_Init(void) {
     D_841A4D54 = 0;
-    func_84156BA0();
+    BattleAnim_ResetSharedEffectMatrix();
     func_84166130();
 }
 #endif
@@ -313,9 +313,9 @@ void func_84157AB0(void) {
 
 #ifdef VERSION_US
 extern u16 D_841A4D56;
-void func_84157CB0(void) {
+void BattleAnim_StartEffect57Trail50_Init(void) {
     D_841A4D56 = 0;
-    func_84156BA0();
+    BattleAnim_ResetSharedEffectMatrix();
     func_84166130();
 }
 #endif
@@ -331,76 +331,76 @@ void func_84157CB0(void) {
 #ifdef VERSION_US
 extern void func_8415F0D0(s32);
 extern void func_841603A0(s32);
-void func_84157EB0(void) {
+void BattleAnim_StartEffect42Trail40_Init(void) {
     s32 temp[3];
-    extern void func_841568A0();
-    func_84156BA0();
-    func_841568A0(temp);
+    extern void BattleAnim_EffectSecondaryOwnerAnchorPosition();
+    BattleAnim_ResetSharedEffectMatrix();
+    BattleAnim_EffectSecondaryOwnerAnchorPosition(temp);
     func_8415F0D0(0x708);
 }
 #endif
 
 #ifdef VERSION_US
 extern void func_8415F9A0(void);
-void func_84157EE0(void) {
+void BattleAnim_StartEffect42Trail40_Update(void) {
     func_8415F9A0();
 }
 #endif
 
 #ifdef VERSION_US
 extern s32 func_8415FD8C();
-void func_84157F00(void) {
+void BattleAnim_StartEffect42Trail40_Draw(void) {
     #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
     s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp) D_800D0510 = func_8415FD8C(D_800D0510);
 }
 #endif
 
 #ifdef VERSION_US
-void func_84157F54(void) {
+void BattleAnim_StartEffect43Trail40Variant_Init(void) {
     s32 temp[3];
-    extern void func_841568A0();
-    func_84156BA0();
-    func_841568A0(temp);
+    extern void BattleAnim_EffectSecondaryOwnerAnchorPosition();
+    BattleAnim_ResetSharedEffectMatrix();
+    BattleAnim_EffectSecondaryOwnerAnchorPosition(temp);
     func_841603A0(0x708);
 }
 #endif
 
 #ifdef VERSION_US
 extern void func_84160CD8(void);
-void func_84157F84(void) {
+void BattleAnim_StartEffect43Trail40Variant_Update(void) {
     func_84160CD8();
 }
 #endif
 
 #ifdef VERSION_US
 extern s32 func_84161018();
-void func_84157FA4(void) {
+void BattleAnim_StartEffect43Trail40Variant_Draw(void) {
     #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
     s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp) D_800D0510 = func_84161018(D_800D0510);
 }
 #endif
 
 #ifdef VERSION_US
-void func_84157FF8(void) {
+void BattleAnim_StartEffect44Trail40GridAlt_Init(void) {
     s32 temp[3];
-    extern void func_841568A0();
+    extern void BattleAnim_EffectSecondaryOwnerAnchorPosition();
     extern void func_841614E0(s32);
-    func_84156BA0();
-    func_841568A0(temp);
+    BattleAnim_ResetSharedEffectMatrix();
+    BattleAnim_EffectSecondaryOwnerAnchorPosition(temp);
     func_841614E0(0x708);
 }
 #endif
 
 #ifdef VERSION_US
 extern void func_84161DAC(void);
-void func_84158028(void) {
+void BattleAnim_StartEffect44Trail40GridAlt_Update(void) {
     func_84161DAC();
 }
 #endif
 
 #ifdef VERSION_US
 extern s32 func_841621A4();
-void func_84158048(void) {
+void BattleAnim_StartEffect44Trail40GridAlt_Draw(void) {
     #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
     s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp) D_800D0510 = func_841621A4(D_800D0510);
 }
@@ -409,9 +409,9 @@ void func_84158048(void) {
 #ifdef VERSION_US
 extern u16 D_841A4D00;
 extern void func_841639D0(void);
-void func_8415809C(void) {
+void BattleAnim_StartEffect45FourStreamTrail_Init(void) {
     D_841A4D00 = 0;
-    func_84156BA0();
+    BattleAnim_ResetSharedEffectMatrix();
     func_841639D0();
 }
 #endif
@@ -427,9 +427,9 @@ void func_8415809C(void) {
 #ifdef VERSION_US
 extern u16 D_841A4D02;
 extern void func_841647D0(void);
-void func_84158370(void) {
+void BattleAnim_StartEffect62OwnerLinkedFourStream_Init(void) {
     D_841A4D02 = 0;
-    func_84156BA0();
+    BattleAnim_ResetSharedEffectMatrix();
     func_841647D0();
 }
 #endif
@@ -449,7 +449,7 @@ void func_84158370(void) {
 #ifdef VERSION_US
 extern u16 D_841A4D04;
 extern s32 func_84165C2C(void);
-s32 func_841586C8(void) {
+s32 BattleAnim_StartEffect67OwnerAnchoredFourStream_Update(void) {
     (*(s16 *)&D_841A4D04) = (*(s16 *)&D_841A4D04) + 1;
     if (*(s16 *)&D_841A4D04 >= 0x32) {
         return -1;
@@ -460,7 +460,7 @@ s32 func_841586C8(void) {
 
 #ifdef VERSION_US
 extern s32 func_84165CC0();
-void func_84158714(void) {
+void BattleAnim_StartEffect67OwnerAnchoredFourStream_Draw(void) {
     #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
     s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp) D_800D0510 = func_84165CC0(D_800D0510);
 }
@@ -473,9 +473,9 @@ void func_84158714(void) {
 #ifdef VERSION_US
 extern u16 D_841A4D06;
 extern void func_84158768(void);
-void func_84158840(void) {
+void BattleAnim_StartEffect78Radial20_Init(void) {
     D_841A4D06 = 0;
-    func_84156BA0();
+    BattleAnim_ResetSharedEffectMatrix();
     func_8415C530();
     func_84158768();
 }
@@ -483,7 +483,7 @@ void func_84158840(void) {
 
 #ifdef VERSION_US
 extern s32 func_8415DAE4(void);
-s32 func_84158874(void) {
+s32 BattleAnim_StartEffect78Radial20_Update(void) {
     (*(s16 *)&D_841A4D06) = (*(s16 *)&D_841A4D06) + 1;
     if (*(s16 *)&D_841A4D06 >= 0xB5) {
         return -1;
@@ -493,7 +493,7 @@ s32 func_84158874(void) {
 #endif
 
 #ifdef VERSION_US
-void func_841588C0(void) {
+void BattleAnim_StartEffect78Radial20_Draw(void) {
     #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
     s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp) D_800D0510 = func_8415DBBC(D_800D0510);
 }
@@ -506,8 +506,8 @@ void func_841588C0(void) {
 #ifdef VERSION_US
 extern void func_84166F60(void);
 extern void func_84158914(void);
-void func_84158BA8(void) {
-    func_84156BA0();
+void BattleAnim_StartEffect26DoubleTextureTrail_Init(void) {
+    BattleAnim_ResetSharedEffectMatrix();
     func_84166F60();
     func_84158914();
 }
@@ -515,14 +515,14 @@ void func_84158BA8(void) {
 
 #ifdef VERSION_US
 extern void func_841677C4(void);
-void func_84158BD8(void) {
+void BattleAnim_StartEffect26DoubleTextureTrail_Update(void) {
     func_841677C4();
 }
 #endif
 
 #ifdef VERSION_US
 extern s32 func_84168000();
-void func_84158BF8(void) {
+void BattleAnim_StartEffect26DoubleTextureTrail_Draw(void) {
     #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
     s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp) D_800D0510 = func_84168000(D_800D0510);
 }
@@ -536,9 +536,9 @@ void func_84158BF8(void) {
 extern u16 D_841A4D48;
 extern void func_84168540(void);
 extern void func_84158C4C(void);
-void func_84158E24(void) {
+void BattleAnim_StartEffect47SixSlotTrail_Init(void) {
     D_841A4D48 = 0;
-    func_84156BA0();
+    BattleAnim_ResetSharedEffectMatrix();
     func_84168540();
     func_84158C4C();
 }
@@ -546,7 +546,7 @@ void func_84158E24(void) {
 
 #ifdef VERSION_US
 extern s32 func_84169040(void);
-s32 func_84158E58(void) {
+s32 BattleAnim_StartEffect47SixSlotTrail_Update(void) {
     (*(s16 *)&D_841A4D48) = (*(s16 *)&D_841A4D48) + 1;
     if ((*(s16 *)&D_841A4D48 % 10) == 0) {
         func_84158C4C();
@@ -557,7 +557,7 @@ s32 func_84158E58(void) {
 
 #ifdef VERSION_US
 extern s32 func_84169618();
-void func_84158EAC(void) {
+void BattleAnim_StartEffect47SixSlotTrail_Draw(void) {
     #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
     s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp) D_800D0510 = func_84169618(D_800D0510);
 }
@@ -569,21 +569,21 @@ void func_84158EAC(void) {
 
 #ifdef VERSION_US
 extern void func_84158F00(void);
-void func_84159198(void) {
-    func_84156BA0();
+void BattleAnim_StartEffect4DoubleTextureTrail_Init(void) {
+    BattleAnim_ResetSharedEffectMatrix();
     func_84166F60();
     func_84158F00();
 }
 #endif
 
 #ifdef VERSION_US
-void func_841591C8(void) {
+void BattleAnim_StartEffect4DoubleTextureTrail_Update(void) {
     func_841677C4();
 }
 #endif
 
 #ifdef VERSION_US
-void func_841591E8(void) {
+void BattleAnim_StartEffect4DoubleTextureTrail_Draw(void) {
     #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
     s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp) D_800D0510 = func_84168000(D_800D0510);
 }
@@ -595,21 +595,21 @@ void func_841591E8(void) {
 
 #ifdef VERSION_US
 extern void func_8415923C(void);
-void func_841594E0(void) {
-    func_84156BA0();
+void BattleAnim_StartEffect77DoubleTextureTrail_Init(void) {
+    BattleAnim_ResetSharedEffectMatrix();
     func_84166F60();
     func_8415923C();
 }
 #endif
 
 #ifdef VERSION_US
-void func_84159510(void) {
+void BattleAnim_StartEffect77DoubleTextureTrail_Update(void) {
     func_841677C4();
 }
 #endif
 
 #ifdef VERSION_US
-void func_84159530(void) {
+void BattleAnim_StartEffect77DoubleTextureTrail_Draw(void) {
     #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
     s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp) D_800D0510 = func_84168000(D_800D0510);
 }
@@ -621,21 +621,21 @@ void func_84159530(void) {
 
 #ifdef VERSION_US
 extern void func_84159584(void);
-void func_84159708(void) {
-    func_84156BA0();
+void BattleAnim_StartEffect70DoubleTextureTrail_Init(void) {
+    BattleAnim_ResetSharedEffectMatrix();
     func_84166F60();
     func_84159584();
 }
 #endif
 
 #ifdef VERSION_US
-void func_84159738(void) {
+void BattleAnim_StartEffect70DoubleTextureTrail_Update(void) {
     func_841677C4();
 }
 #endif
 
 #ifdef VERSION_US
-void func_84159758(void) {
+void BattleAnim_StartEffect70DoubleTextureTrail_Draw(void) {
     #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
     s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp) D_800D0510 = func_84168000(D_800D0510);
 }
@@ -652,8 +652,8 @@ void func_84159758(void) {
 #ifdef VERSION_US
 extern void func_841597AC(void);
 extern void func_84159A50(void);
-void func_84159C2C(void) {
-    func_84156BA0();
+void BattleAnim_StartEffect39CombinedTrail_Init(void) {
+    BattleAnim_ResetSharedEffectMatrix();
     func_84166F60();
     func_841597AC();
     func_84168540();
@@ -663,7 +663,7 @@ void func_84159C2C(void) {
 
 #ifdef VERSION_US
 extern u16 D_841A4D50;
-void func_84159C6C(void) {
+void BattleAnim_StartEffect39CombinedTrail_Update(void) {
     (*(s16 *)&D_841A4D50) = (*(s16 *)&D_841A4D50) + 1;
     if ((*(s16 *)&D_841A4D50 % 10) == 0) {
         func_84159A50();
@@ -674,7 +674,7 @@ void func_84159C6C(void) {
 #endif
 
 #ifdef VERSION_US
-void func_84159CC8(void) {
+void BattleAnim_StartEffect39CombinedTrail_Draw(void) {
     #define EMIT_GFX(pkt) { Gfx *_g = (Gfx *)(pkt); _g->words.w0 = 0xDA380003; _g->words.w1 = (u32)&D_841A4D08; }
     s32 temp = D_800D0510; D_800D0510 += 8; EMIT_GFX(temp)
     D_800D0510 = func_84168000(D_800D0510);

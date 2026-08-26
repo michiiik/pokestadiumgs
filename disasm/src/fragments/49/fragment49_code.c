@@ -227,10 +227,10 @@ void func_861048FC(void **p) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86105070.s")
 
 extern f32 D_80087E50[];
-s16 func_8000B3B0(f32 y, f32 x);
+s16 MathUtil_Atan2s(f32 y, f32 x);
 void func_8610519C(void) {
     (*(f32 *)((u8 *)(D_87F119DC) + (0x10))) = (f32) D_80087E50[(s32) (((*(s32 *)((u8 *)(D_87F119DC) + (0x1C))) * 0xFF) & 0xFFFF) >> 4];
-    (*(s16 *)((u8 *)(D_87F119DC) + (0x44))) = func_8000B3B0((*(f32 *)((u8 *)(D_87F119DC) + (0x18))), (*(f32 *)((u8 *)(D_87F119DC) + (0x10))));
+    (*(s16 *)((u8 *)(D_87F119DC) + (0x44))) = MathUtil_Atan2s((*(f32 *)((u8 *)(D_87F119DC) + (0x18))), (*(f32 *)((u8 *)(D_87F119DC) + (0x10))));
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86105204.s")

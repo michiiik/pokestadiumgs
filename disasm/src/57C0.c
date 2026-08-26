@@ -4,7 +4,7 @@
 #ifdef VERSION_US
 extern void osWritebackDCacheAll(void);
 
-void func_80004BC0(u8 *arg0) {
+void Sched_ResetTaskState(u8 *arg0) {
     osWritebackDCacheAll();
     *(u16 *)(arg0 + 0x1C) = 0;
     *(u16 *)(arg0 + 0x1E) = 0;
@@ -33,7 +33,7 @@ s32 func_80004BEC(u8 *arg0) {
 #ifdef VERSION_US
 extern s32 func_8000A1E8(s32);
 
-void func_80004EA8(u8 *arg0) {
+void Sched_HandleRdpCompletion(u8 *arg0) {
     func_8000A1E8(2);
     if (*(u16 *)(arg0 + 0x1C) == 3) {
         osSendMesg((OSMesgQueue *)(arg0 + 4), (OSMesg)0x444F4E45, 0);
@@ -67,7 +67,7 @@ struct S1_unk_D_800AA660 {
     /* 0x01B0 */ char unk01B0[0x10];
     /* 0x01C0 */ OSMesgQueue queue1;
     /* 0x01D8 */ struct S1_unk_D_800AA660* nextClient; // Sched_AddClient/NotifyClients linked-list traversal
-    /* 0x01DC */ s32 eventFilter; // func_80004F00's arg1; gates which broadcast events this client receives
+    /* 0x01DC */ s32 eventFilter; // Sched_InitClientQueue's arg1; gates which broadcast events this client receives
     /* 0x01E0 */ char unk01E0[0x2000];
     /* 0x21E0 */ OSMesg mesg;
     /* 0x21E4 */ OSMesgQueue queue2;
@@ -82,7 +82,7 @@ struct S1_UnkStruct80083CA0_2 {
     /* 0x1B4 */ char unk1B4[0xC];
     /* 0x1C0 */ OSMesgQueue unk_1C0;
     /* 0x1D8 */ s32 nextClient; // same layout as S1_unk_D_800AA660's nextClient
-    /* 0x1DC */ s32 eventFilter; // func_80004F00's arg1
+    /* 0x1DC */ s32 eventFilter; // Sched_InitClientQueue's arg1
     /* 0x1E0 */ u8 unk1E0[0x800];
     /* 0x9E0 */ S1_UnkArray4* normalFramebuffer; // DisplayWorker_ProcessFrame's default osViSwapBuffer source
     /* 0x9E4 */ char unk9E4[0x48];
@@ -112,7 +112,7 @@ struct S1_UnkStruct80083CA0_2 {
     /* 0xAB0 */ char unkAB0[0x8];
     /* 0xAB8 */ s32 appliedFrameId; // compared against frameId to detect a new frame
 };
-void func_80004F00(S1_UnkStruct80083CA0_2* arg0, s32 arg1, s32 arg2) {
+void Sched_InitClientQueue(S1_UnkStruct80083CA0_2* arg0, s32 arg1, s32 arg2) {
     arg0->eventFilter = arg1;
     arg0->nextClient = 0;
     osCreateMesgQueue(&arg0->unk_1C0, &arg0->unk_1B0, arg2);
@@ -128,7 +128,7 @@ OSMesg func_80004F34(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-s32 func_80004F60(S1_UnkStruct80083CA0_2* arg0) {
+s32 Sched_TryReceiveClientQueue(S1_UnkStruct80083CA0_2* arg0) {
     u32 sp1C = 'NULL';
 
     if (arg0->unk_1C0.validCount != 0) {
@@ -142,7 +142,7 @@ s32 func_80004F60(S1_UnkStruct80083CA0_2* arg0) {
 #ifdef VERSION_US
 extern u32 D_800CD020[];
 
-void func_80004FA4(void) {
+void Sched_PromotePendingTasks(void) {
     if (D_800CD020[0xA18 / 4] == 0 && D_800CD020[0xA20 / 4] != 0) {
         D_800CD020[0xA18 / 4] = D_800CD020[0xA20 / 4];
         D_800CD020[0xA20 / 4] = 0;
@@ -162,7 +162,7 @@ void func_80004FF4(void) {
 #endif
 
 #ifdef VERSION_US
-void *func_800050A0(void *arg0) {
+void *Sched_TryStartTask(void *arg0) {
     if (arg0 && !func_80004C14(arg0)) {
         arg0 = 0;
     }
@@ -173,9 +173,9 @@ void *func_800050A0(void *arg0) {
 #ifdef VERSION_US
 extern u32 D_800CDA34;
 
-void func_800050D4(void) {
+void Sched_StartPendingTask(void) {
     if (D_800CD020[0xA14 / 4] == 0) {
-        D_800CDA34 = (u32)func_800050A0((void *)D_800CD020[0xA1C / 4]);
+        D_800CDA34 = (u32)Sched_TryStartTask((void *)D_800CD020[0xA1C / 4]);
     }
 }
 #endif
@@ -183,7 +183,7 @@ void func_800050D4(void) {
 #ifdef VERSION_US
 s32 func_80004CF4(u32);
 
-s32 func_80005110(void) {
+s32 Sched_TryYieldActiveTask(void) {
     s32 var_v1;
 
     var_v1 = 0;

@@ -16,7 +16,7 @@ typedef struct S1_unk_D_80068BB0 {
 	/* 0x08 */ u8* img_p;
 	/* 0x0C */ struct S1_unk_D_80068BB0* depth_p;
 } S1_unk_D_80068BB0;
-S1_unk_D_800A7440* func_80006E50(S1_unk_D_800A7440* arg0, s16 x1, s16 y1, s16 x2, s16 y2) {
+S1_unk_D_800A7440* GfxRect_SetBounds(S1_unk_D_800A7440* arg0, s16 x1, s16 y1, s16 x2, s16 y2) {
     if (x2 >= x1) {
         arg0->x1 = x1;
         arg0->y1 = x2;
@@ -43,17 +43,17 @@ S1_unk_D_800A7440* func_80006E50(S1_unk_D_800A7440* arg0, s16 x1, s16 y1, s16 x2
 #pragma GLOBAL_ASM("asm/us/nonmatchings/7A50/func_80007090.s")
 
 typedef struct { u16 fmt; u16 size; u16 width; u16 height; u8 *img_p; void *depth_p; } GfxImage;
-void func_80007174(GfxImage *arg0, s32 fmt, s32 size, s32 width, s32 height, u32 img_p) { arg0->fmt = fmt; arg0->size = size; arg0->width = width; arg0->height = height; arg0->img_p = (u8 *)((img_p + 0x3F) & ~0x3F); arg0->depth_p = NULL; }
+void GfxImage_Initialize(GfxImage *arg0, s32 fmt, s32 size, s32 width, s32 height, u32 img_p) { arg0->fmt = fmt; arg0->size = size; arg0->width = width; arg0->height = height; arg0->img_p = (u8 *)((img_p + 0x3F) & ~0x3F); arg0->depth_p = NULL; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/7A50/func_800071A4.s")
 
-void func_800072A4(u8 *arg0, u8 *arg1) { if (*(u16 *)(arg1 + 2) == 2) { if (*(u16 *)(arg1 + 4) == *(u16 *)(arg0 + 4)) { if (*(u16 *)(arg1 + 6) == *(u16 *)(arg0 + 6)) *(u32 *)(arg0 + 0xC) = (u32)arg1; } } }
+void GfxImage_AttachDepthBuffer(u8 *arg0, u8 *arg1) { if (*(u16 *)(arg1 + 2) == 2) { if (*(u16 *)(arg1 + 4) == *(u16 *)(arg0 + 4)) { if (*(u16 *)(arg1 + 6) == *(u16 *)(arg0 + 6)) *(u32 *)(arg0 + 0xC) = (u32)arg1; } } }
 
 extern S1_unk_D_800A7440 D_800D0530;
 extern s32 D_80087220;
-void func_800072E0(void) {
+void GfxImage_ResetCurrent(void) {
     D_80087220 = 0;
-    func_80006E50(&D_800D0530, 0, 0, 0, 0);
+    GfxRect_SetBounds(&D_800D0530, 0, 0, 0, 0);
 }
 
 s32 func_8000731C(void) {
@@ -66,7 +66,7 @@ s32 func_8000731C(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/7A50/func_8000766C.s")
 
-void func_80007820(void *arg0, u16 arg1) {
+void GfxImage_FillCurrent(void *arg0, u16 arg1) {
     func_80007444(arg0, 0, 0, (s32) (*(u16 *)((u8 *)(D_80087220) + (4))), (s32) (*(u16 *)((u8 *)(D_80087220) + (6))), (arg1 << 0x10) | arg1);
 }
 #endif

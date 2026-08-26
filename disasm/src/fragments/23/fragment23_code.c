@@ -78,13 +78,13 @@ extern void main_pool_push_state(s32);
 extern u8 D_446E30;
 extern void func_8004C09C(s32 arg0);
 extern s32 func_80047588(s32 arg0, s32 arg1);
-u8 *func_80004638(s32 id, u8 *rom_start, u8 *rom_end, s32 arg3);
+u8 *Asset_LoadToSegment(s32 id, u8 *rom_start, u8 *rom_end, s32 arg3);
 extern u8 D_1000000[];
 extern u8 D_447D00[];
 void func_80047610(void);
 void func_8004C398(void);
-void func_80006D3C(void);
-s32 func_82A01720(s32 arg0, s32 arg1) {
+void Gfx_FreeDisplayListBuffers(void);
+s32 fragment23_main(s32 arg0, s32 arg1) {
     s32 sp24;
 
     main_pool_push_state(0x4641544C);
@@ -95,14 +95,14 @@ s32 func_82A01720(s32 arg0, s32 arg1) {
     func_8004C8C0(0x74);
     func_8004C8C0(0xE);
     func_80047588(0x1C, 0);
-    func_80004638((s32) ((u32) ((s32) D_1000000 & 0x0F000000) >> 0x18), &D_446E30, D_447D00, 0);
+    Asset_LoadToSegment((s32) ((u32) ((s32) D_1000000 & 0x0F000000) >> 0x18), &D_446E30, D_447D00, 0);
     func_82A00C84(arg0, arg1);
     func_80008514(sp24);
     func_82A016C4();
     func_80008574();
     func_80047610();
     func_8004C398();
-    func_80006D3C();
+    Gfx_FreeDisplayListBuffers();
     main_pool_pop_state(0x4641544C);
     return 0;
 }

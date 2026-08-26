@@ -174,7 +174,7 @@ void func_8000DA7C(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4)
 #endif
 
 #ifdef VERSION_US
-void func_8000DAA8(void) {}
+void ParticleGfx_NoopStub2(void) {}
 void func_8000DAA8_padding(void) {}
 void func_8000DAA8_padding2(void) {}
 void func_8000DAA8_padding3(void) {}

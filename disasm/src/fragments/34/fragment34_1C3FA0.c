@@ -2,13 +2,13 @@
 
 
 #ifdef VERSION_US
-extern void func_800033DC(s32);
+extern void Util_Free(s32);
 extern s32 D_880068B4;
 extern s32 D_88523010;
 
 void func_88506990(void) {
     D_880068B4 = 1;
-    func_800033DC(D_88523010);
+    Util_Free(D_88523010);
 }
 
 extern void func_800226C0(s32);

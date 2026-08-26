@@ -21,7 +21,7 @@
 extern f64 D_8418C7A8;
 extern f64 D_8418C7B0;
 
-void func_84162A40(f32 arg0, f32 *arg1, f32 arg2) {
+void TexturedRibbonSheet_Update(f32 arg0, f32 *arg1, f32 arg2) {
     f32 sp30[4][4];
     f32 angle = (arg0 * D_8418C7A8) / D_8418C7B0;
     guRotateRPYF(sp30, 90.0f, angle, angle);
@@ -60,7 +60,7 @@ typedef struct S1_TexturedRibbonSheet {
     /* 0x01C */ char unk01C[0x1C];
     /* 0x038 */ S1_TexturedRibbonSheetNode unk_038[10];
 } S1_TexturedRibbonSheet;
-void func_84162AC8(S1_TexturedRibbonSheet* arg0) {
+void TexturedRibbonSheet_UpdateRecord(S1_TexturedRibbonSheet* arg0) {
     s32 i;
     s32 j;
     Vtx* var_a1;

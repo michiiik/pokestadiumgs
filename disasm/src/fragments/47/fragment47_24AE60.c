@@ -81,11 +81,11 @@ void func_86006318(s32 arg0) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_86006C30.s")
 
 extern void func_80007AEC(s32);
-s32 func_800084A0();
+s32 StageContext_GetFadeMode();
 extern void func_86007648(s32, s32);
 
 void func_86006D24(s32 arg0) {
-    if (func_800084A0() == 1) {
+    if (StageContext_GetFadeMode() == 1) {
         func_80007AEC(0xA);
         func_86007648(arg0, 0);
     }

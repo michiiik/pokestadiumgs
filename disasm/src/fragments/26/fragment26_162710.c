@@ -61,7 +61,7 @@ void func_81003F44(void) {
 
 typedef struct { s16 active; u8 data[0x2A]; } Func81005480Slot;
 extern Gfx *func_81004818(Gfx *, Func81005480Slot *, void *, s16);
-Gfx *func_81005480(Gfx *gfx, Func81005480Slot *slots, void *arg2, s16 arg3) {
+Gfx *Particle31_BuildDisplayList(Gfx *gfx, Func81005480Slot *slots, void *arg2, s16 arg3) {
     s32 i;
     for (i = 0; i < 10; i++, slots++) {
         if (slots->active == 1) {

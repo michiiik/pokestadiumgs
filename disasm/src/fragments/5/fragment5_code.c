@@ -25,7 +25,7 @@ void func_83200028(void *arg0, void *arg1, void *arg2) {
 extern void _bzero(void *ptr, s32 size);
 extern u8 D_83200D38[];
 extern void func_81804954(void *arg0, s32 arg1, s32 arg2, void *arg3, s32 arg4);
-extern void func_81804A00(void *arg0);
+extern void WidgetTree_OpenMessagePanel_fragment4(void *arg0);
 extern void *func_8004D690(s32 arg0);
 typedef struct {
     u8 pad00[0x1E];
@@ -41,7 +41,7 @@ typedef struct {
 void func_83200744(Frag5Resource *arg0, s32 arg1) {
     _bzero(arg0, 0x48);
     func_81804954(arg0, 0, 2, D_83200D38, arg1);
-    func_81804A00(arg0);
+    WidgetTree_OpenMessagePanel_fragment4(arg0);
     arg0->active = 1;
     arg0->resource0 = func_8004D690(0x18);
     arg0->resource1 = func_8004D690(0x2D);
@@ -90,12 +90,12 @@ void func_8320092C(s32 arg0, s32 arg1) {
 extern void func_80008574(void);
 extern void func_80047610(void);
 extern void func_8004C398(void);
-extern void func_80006D3C(void);
+extern void Gfx_FreeDisplayListBuffers(void);
 void func_83200A84(s32 arg0, s32 arg1) {
     func_80008574();
     func_80047610();
     func_8004C398();
-    func_80006D3C();
+    Gfx_FreeDisplayListBuffers();
 }
 #endif
 
@@ -105,7 +105,7 @@ extern void main_pool_pop_state(s32 arg0);
 extern void func_8320097C();
 extern void func_8320092C();
 extern void func_83200A84(s32 arg0, s32 arg1);
-s32 func_83200AC0(s32 arg0, s32 arg1) {
+s32 fragment5_main(s32 arg0, s32 arg1) {
     main_pool_push_state(0x57445052);
     func_8320097C(arg0, arg1);
     func_8320092C(arg0, arg1);

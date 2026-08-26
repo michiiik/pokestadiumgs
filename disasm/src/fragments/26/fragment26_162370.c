@@ -2,7 +2,7 @@
 
 
 #ifdef VERSION_US
-Gfx *func_81003AC0(Gfx *gfx, u32 *textures, s32 index) {
+Gfx *DisplayList_BuildSelectedTextureSegment(Gfx *gfx, u32 *textures, s32 index) {
     gDPLoadTextureBlock(gfx++, textures[index + 1], G_IM_FMT_RGBA, G_IM_SIZ_16b, 32, 32, 0,
         G_TX_NOMIRROR | G_TX_CLAMP, G_TX_NOMIRROR | G_TX_CLAMP,
         G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD, G_TX_NOLOD);
@@ -26,7 +26,7 @@ typedef struct {
 extern GlobalState81003B78h2 *D_8009491C;
 extern u16 D_80094904;
 extern void *func_80006DEC();
-void func_81003B78(s32 arg0, TextureState81003B78h2 *state) {
+void DisplayList_InitSelectedTextureSegment(s32 arg0, TextureState81003B78h2 *state) {
     s32 index;
     u32 *textures;
     if (arg0 == 2) {
@@ -40,7 +40,7 @@ void func_81003B78(s32 arg0, TextureState81003B78h2 *state) {
         } else {
             index = D_80094904 & 7;
         }
-        func_81003AC0(state->gfx, textures, index);
+        DisplayList_BuildSelectedTextureSegment(state->gfx, textures, index);
     }
 }
 #endif

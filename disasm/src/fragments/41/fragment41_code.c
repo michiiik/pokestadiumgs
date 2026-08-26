@@ -12,7 +12,7 @@ typedef struct {
     u16 unk26;
 } Frag41_State;
 extern void *D_80087200;
-extern void func_80049ED8(void *);
+extern void Input_SetRepeatController(void *);
 extern Frag41_State *D_88C01A60;
 void func_88C00020(Frag41_Input *arg0) {
     D_88C01A60->unk20 = arg0->unk00;
@@ -20,7 +20,7 @@ void func_88C00020(Frag41_Input *arg0) {
     D_88C01A60->unk23 = arg0->unk03;
     D_88C01A60->unk24 = arg0->unk04;
     D_88C01A60->unk26 = 0;
-    func_80049ED8(D_80087200);
+    Input_SetRepeatController(D_80087200);
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/41/fragment41_code/func_88C00084.s")
@@ -40,7 +40,7 @@ typedef union {
     };
 } Frag41_MtxF;
 
-void func_88C00BFC(Mtx* arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6, f32 arg7, f32 arg8, f32 arg9, f32 argA) {
+void MathUtil_BuildTransformMtx_fragment41(Mtx* arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6, f32 arg7, f32 arg8, f32 arg9, f32 argA) {
     Frag41_MtxF sp20;
 
     guRotateF(sp20.mf, arg4, arg5, arg6, arg7);
@@ -128,7 +128,7 @@ extern void func_80008574();
 extern void func_88C015DC();
 extern void main_pool_pop_state(s32);
 extern void main_pool_push_state(s32);
-s32 func_88C01750(s32 arg0, s32 arg1) {
+s32 fragment41_main(s32 arg0, s32 arg1) {
     s32 sp24;
 
     main_pool_push_state(0x434C4544);
@@ -142,10 +142,10 @@ s32 func_88C01750(s32 arg0, s32 arg1) {
     func_88C01494();
     func_88C014D8();
     func_80008574();
-    func_800033DC((s32) D_88C01A60);
+    Util_Free((s32) D_88C01A60);
     func_80047610();
     func_8004C398();
-    func_80006D3C();
+    Gfx_FreeDisplayListBuffers();
     func_80057944(0U);
     main_pool_pop_state(0x434C4544);
     return 0;

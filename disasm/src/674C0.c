@@ -2,6 +2,6 @@
 
 
 #ifdef VERSION_US
-void func_800668C0(void) {
+void Game_State12_Nop(void) {
 }
 #endif

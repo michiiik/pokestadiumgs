@@ -4,12 +4,12 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_19E800/func_8822B580.s")
 
-extern void func_80049ED8(s32);
+extern void Input_SetRepeatController(s32);
 extern s32 D_80087200;
 extern s32 D_880068B8;
 
 void func_8822B614(void) {
-    func_80049ED8(D_80087200);
+    Input_SetRepeatController(D_80087200);
     D_880068B8 = 0;
 }
 
@@ -37,7 +37,7 @@ void func_8822B8FC(void) {
 
 
 void func_8822B9C4(void) {
-    func_80049ED8(D_80087200);
+    Input_SetRepeatController(D_80087200);
     D_880068B8 = 0;
 }
 

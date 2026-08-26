@@ -8,7 +8,7 @@
 
 extern f64 D_8418C818;
 extern f64 D_8418C820;
-void func_84163DA0(f32 arg0, f32 *arg1, f32 arg2, f32 arg3) {
+void FourStreamTrail_Update(f32 arg0, f32 *arg1, f32 arg2, f32 arg3) {
     f32 spB0[4][4];
     f32 sp70[4][4];
     f32 sp30[4][4];
@@ -23,7 +23,7 @@ void func_84163DA0(f32 arg0, f32 *arg1, f32 arg2, f32 arg3) {
 
 extern u8 *D_84187A70;
 extern void func_84163E60(u8 *);
-s32 func_841641EC(void) {
+s32 FourStreamTrail_IsComplete(void) {
     u8 *ptr = D_84187A70;
     s32 i = 0;
     while (i != 4) {

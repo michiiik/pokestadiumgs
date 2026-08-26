@@ -2,7 +2,7 @@
 
 
 #ifdef VERSION_US
-u16 func_80003820(const u8 *arg0) {
+u16 Jpeg_ReadBigEndianU16(const u8 *arg0) {
     return (u16)((arg0[0] << 8) | arg0[1]);
 }
 
@@ -35,14 +35,14 @@ struct S1_unk_func_80003680_sp300 {
     /* 0x14 */ u8* start_of_scan;
 };
 struct S1_unk_func_80003680_sp90 {
-    /* 0x00 */ s32 unk_00; // func_80003AB8: always 0
-    /* 0x04 */ s32 unk_04; // func_80003AB8: always 1
+    /* 0x00 */ s32 unk_00; // Jpeg_BuildDspOutput: always 0
+    /* 0x04 */ s32 unk_04; // Jpeg_BuildDspOutput: always 1
     /* 0x08 */ s32 chromaSubsamplingMode; // mirrors S1_unk_func_80003680_sp300's chromaSubsamplingMode
     /* 0x0C */ s32 outputBufferA; // (u32)&arg1[0], segment-masked
     /* 0x10 */ s32 outputBufferB; // (u32)&arg1[1], segment-masked
-    /* 0x14 */ s32 outputBufferC; // func_80003AB8: also (u32)&arg1[1] - same value as outputBufferB
+    /* 0x14 */ s32 outputBufferC; // Jpeg_BuildDspOutput: also (u32)&arg1[1] - same value as outputBufferB
 };
-void func_80003AB8(S1_unk_func_80003680_sp90* arg0, u8(arg1)[2][0x80], S1_unk_func_80003680_sp300* arg2) {
+void Jpeg_BuildDspOutput(S1_unk_func_80003680_sp90* arg0, u8(arg1)[2][0x80], S1_unk_func_80003680_sp300* arg2) {
     arg0->unk_00 = 0;
     arg0->chromaSubsamplingMode = arg2->chromaSubsamplingMode;
     arg0->unk_04 = 1;
@@ -88,7 +88,7 @@ struct S1_JpegHuffmanTable {
       u16 codesB[16];
       u8* symbols;
 };
-s32 func_80003AF0(u32 addr, s32 arg1, u8 *arg2)
+s32 Jpeg_DecodeImage(u32 addr, s32 arg1, u8 *arg2)
 {
   S1_UnkStruct80001380 sp318;
   S1_unk_func_80003680_sp300 sp300;
@@ -104,15 +104,15 @@ s32 func_80003AF0(u32 addr, s32 arg1, u8 *arg2)
   s32 j;
   u8 var_s4 = 0;
   s32 var_s2 = 0;
-  temp_s3 = func_800033B4(0x110);
-  temp_s0 = func_800033B4(0x210);
+  temp_s3 = Util_Malloc(0x110);
+  temp_s0 = Util_Malloc(0x210);
   func_80003838(&sp300, arg2);
   func_8000B780(sp300.quantization_table, sp200, 2);
   func_8000BA3C(sp300.huffman_table, spB0, temp_s3, temp_s0, 4);
-  func_800033DC(temp_s0);
-  func_800033DC(temp_s3);
+  Util_Free(temp_s0);
+  Util_Free(temp_s3);
   func_80003A78(&sp74, &spB0, &sp300);
-  func_80003AB8(&sp90, &sp200, &sp300);
+  Jpeg_BuildDspOutput(&sp90, &sp200, &sp300);
   func_800039C8(&sp318, &sp90);
   while (func_8000204C() == 0)
   {
@@ -146,7 +146,7 @@ s32 func_80003AF0(u32 addr, s32 arg1, u8 *arg2)
   return var_s2;
 }
 
-void func_80003CD0(void) { extern OSMesgQueue D_800CD000; extern OSMesg D_800CD018[]; osCreateMesgQueue(&D_800CD000, D_800CD018, 1); }
+void Dma_InitializeCompletionQueue(void) { extern OSMesgQueue D_800CD000; extern OSMesg D_800CD018[]; osCreateMesgQueue(&D_800CD000, D_800CD018, 1); }
 
 typedef struct S1_PERSSZP S1_PERSSZP;
 struct S1_PERSSZP {
@@ -154,9 +154,9 @@ struct S1_PERSSZP {
     /* 0x08 */ u32 header_size;
     /* 0x0C */ u32 decompressed_size1; // How do these differ?
     /* 0x10 */ u32 decompressed_size2;
-    /* 0x14 */ u32 relocationCount; // func_80003D00: (value, offset) pair count following the header
+    /* 0x14 */ u32 relocationCount; // Yay0_DecompressAndRelocate: (value, offset) pair count following the header
 };
-void func_80003D00(u8* in_header, u8* memory) {
+void Yay0_DecompressAndRelocate(u8* in_header, u8* memory) {
     UNUSED s32 pad2;
     S1_PERSSZP* header = in_header;
     u32* sp2C = (u32*)header + 6;
@@ -182,12 +182,12 @@ void func_80003D00(u8* in_header, u8* memory) {
 }
 
 extern OSMesgQueue D_800CD000;
-extern void func_80006BB4(s32, u8 *, s32, s32, OSMesgQueue *, s32);
-void func_80003DD4(u8 *arg0, s32 arg1, s32 arg2, s32 arg3) {
+extern void Storage_QueueSramTransfer(s32, u8 *, s32, s32, OSMesgQueue *, s32);
+void Dma_ReadChunks(u8 *arg0, s32 arg1, s32 arg2, s32 arg3) {
     s32 var_s0;
     for (; arg2 > 0; arg2 -= var_s0) {
         if (arg2 >= 0x1000) var_s0 = 0x1000; else var_s0 = arg2;
-        func_80006BB4(arg3, arg0, arg1, var_s0, &D_800CD000, 0);
+        Storage_QueueSramTransfer(arg3, arg0, arg1, var_s0, &D_800CD000, 0);
         osRecvMesg(&D_800CD000, NULL, 1);
         arg0 += var_s0;
         arg1 += var_s0;
@@ -198,13 +198,13 @@ void func_80003DD4(u8 *arg0, s32 arg1, s32 arg2, s32 arg3) {
 
 s32 func_80003F54(s32 arg0) { return osFlashSectorErase(arg0 << 7); }
 
-extern void func_80006ACC(s32, u8 *, u8 *, s32, OSMesgQueue *, s32);
+extern void Dma_QueueRomRead(s32, u8 *, u8 *, s32, OSMesgQueue *, s32);
 void func_80003F74(u8 *arg0, u8 *arg1, u8 *arg2, s32 arg3) {
     s32 remaining = arg2 - arg1;
     s32 chunk;
     while (remaining > 0) {
         chunk = remaining >= 0x1000 ? 0x1000 : remaining;
-        func_80006ACC(arg3, arg0, arg1, chunk, &D_800CD000, 0);
+        Dma_QueueRomRead(arg3, arg0, arg1, chunk, &D_800CD000, 0);
         osRecvMesg(&D_800CD000, NULL, 1);
         remaining -= chunk;
         arg0 += chunk;
@@ -212,13 +212,13 @@ void func_80003F74(u8 *arg0, u8 *arg1, u8 *arg2, s32 arg3) {
     }
 }
 
-extern void func_80006B40(u8 *, u8 *, s32, OSMesgQueue *, s32);
-void func_80004024(u8 *arg0, u8 *arg1, u8 *arg2) {
+extern void Storage_QueueRomWrite(u8 *, u8 *, s32, OSMesgQueue *, s32);
+void Dma_CopyChunks(u8 *arg0, u8 *arg1, u8 *arg2) {
     s32 remaining = arg2 - arg1;
     s32 chunk;
     while (remaining > 0) {
         chunk = remaining >= 0x1000 ? 0x1000 : remaining;
-        func_80006B40(arg0, arg1, chunk, &D_800CD000, 0);
+        Storage_QueueRomWrite(arg0, arg1, chunk, &D_800CD000, 0);
         osRecvMesg(&D_800CD000, NULL, 1);
         remaining -= chunk;
         arg0 += chunk;
@@ -240,30 +240,30 @@ s32 func_800040C4(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80004458.s")
 
-extern u32 func_800020BC(u32);
-extern void func_8000215C(u32);
+extern u32 Memmap_GetSegmentBaseVaddr(u32);
+extern void Memmap_ClearSegmentMemmap(u32);
 void func_800045E0(void *base_addr, u32 addr) {
     u32 sp1C;
     s32 temp_a0;
     if ((addr & 0xFF000000) == 0x82000000) {
         sp1C = addr & 0xFFFFFF;
-        temp_a0 = func_800020BC(sp1C);
+        temp_a0 = Memmap_GetSegmentBaseVaddr(sp1C);
         if (temp_a0 == (u32)base_addr) {
-            func_8000215C(sp1C);
+            Memmap_ClearSegmentMemmap(sp1C);
         }
     }
 }
 
 extern u8 *func_800042C0(u8 *, u8 *, s32, s32);
-extern s32 func_80002DE4(u8 *);
-extern void func_800020A0(s32, u8 *, s32);
-extern void func_80002DD4(u8 *, s32, void *);
+extern s32 MainPool_GetAllocationSize(u8 *);
+extern void Memmap_SetSegmentMap(s32, u8 *, s32);
+extern void main_pool_set_func(u8 *, s32, void *);
 extern void func_800045E0(void *, u32);
-u8 *func_80004638(s32 id, u8 *rom_start, u8 *rom_end, s32 arg3) {
+u8 *Asset_LoadToSegment(s32 id, u8 *rom_start, u8 *rom_end, s32 arg3) {
     u8 *vaddr = func_800042C0(rom_start, rom_end, arg3, 0);
     if (vaddr != NULL && id > 0) {
-        func_800020A0(id, vaddr, func_80002DE4(vaddr));
-        func_80002DD4(vaddr, id + 0x82000000, (void *)func_800045E0);
+        Memmap_SetSegmentMap(id, vaddr, MainPool_GetAllocationSize(vaddr));
+        main_pool_set_func(vaddr, id + 0x82000000, (void *)func_800045E0);
     }
     return vaddr;
 }
@@ -274,8 +274,8 @@ void func_800046C0(u32 base_addr, u32 addr) {
 
     if ((addr & 0xFF000000) == 0x81000000) {
         sp1C = addr & 0xFFFFFF;
-        if (func_8000248C(sp1C) == base_addr) {
-            func_8000254C(sp1C);
+        if (Memmap_GetFragmentBaseVaddr(sp1C) == base_addr) {
+            Memmap_ClearFragmentMemmap(sp1C);
         }
     }
 }
@@ -310,12 +310,12 @@ struct S1_MainPoolBlock {
 };
 void func_800047B0(S1_MainPoolState* arg0, u32 arg1, S1_Fragment* arg2) {
     func_80002210(arg1, arg2);
-    func_800031FC(arg0, ((u32)arg2 + arg2->sizeInRam) - (u32)arg0->listHeadR);
+    MainPool_ResetStateToOffset(arg0, ((u32)arg2 + arg2->sizeInRam) - (u32)arg0->listHeadR);
 }
 
 #define RELOCATIONS_SIZE 1
 typedef void (*S1_ret_func_80004454)(void);
-S1_ret_func_80004454 func_800047F8(s32 arg0, u8* romStart, u8* romEnd) {
+S1_ret_func_80004454 Fragment_Load(s32 arg0, u8* romStart, u8* romEnd) {
     void* addr = func_800042C0(romStart, romEnd, 0, 0);
 
     if (addr != NULL) {
@@ -329,15 +329,15 @@ struct S1_BinArchive {
     union {
         struct {
             /* 0x00 */ u16 flags; // bit0=preloaded-flat, bit1=lazy/two-pass load, bit2=arg3 variant, bit7=buffered load
-            /* 0x02 */ u16 fragmentModuleId; // func_8000484C's arg3; Fragment_Register's arg0 for FRAGMENT-tagged files
+            /* 0x02 */ u16 fragmentModuleId; // BinArchive_Open's arg3; Fragment_Register's arg0 for FRAGMENT-tagged files
         };
         s32 raw;
     };
-    /* 0x04 */ u32 romStart; // func_8000484C's romStart, kept for on-demand file loads
+    /* 0x04 */ u32 romStart; // BinArchive_Open's romStart, kept for on-demand file loads
     /* 0x08 */ u32 total_size;
     /* 0x0C */ u32 num_files;
 };
-S1_BinArchive* func_8000484C(u8* romStart, u8* romEnd, s32 arg2, s32 arg3) {
+S1_BinArchive* BinArchive_Open(u8* romStart, u8* romEnd, s32 arg2, s32 arg3) {
     S1_BinArchive* ret = NULL;
     u32 sp28;
     u32 sp28_2;
@@ -403,7 +403,7 @@ void func_80004B78(void) { func_80004A40(); }
 
 typedef struct { u32 offset; u32 size; s32 cachedPtr; u32 pad; } BinFile;
 typedef struct { u32 raw0; u32 romStart; u32 total_size; u32 num_files; BinFile files[1]; } BinArchive;
-s32 func_80004B98(BinArchive *archive, s32 file_number) {
+s32 BinArchive_GetCachedFile(BinArchive *archive, s32 file_number) {
     s32 result = 0;
     if ((u32)file_number < archive->num_files) result = archive->files[file_number].cachedPtr;
     return result;

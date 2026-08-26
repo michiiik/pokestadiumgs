@@ -8,7 +8,7 @@
 
 extern f64 D_8418C8B0;
 extern f64 D_8418C8B8;
-void func_84165910(f32 arg0, f32 *arg1, f32 arg2) {
+void OwnerAnchoredFourStream_Update(f32 arg0, f32 *arg1, f32 arg2) {
     UNUSED f32 pad[16];
     f32 sp30[4][4];
     UNUSED s32 pad2[2];
@@ -64,7 +64,7 @@ void func_8416654C(f32 arg0, f32 *arg1, f32 arg2) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D4DA0/func_841670A8.s")
 
 extern f32 D_8418C910;
-void func_84167438(f32 arg0, f32 *arg1, f32 arg2) {
+void DoubleTextureTrail_RotateVertexOffset(f32 arg0, f32 *arg1, f32 arg2) {
     UNUSED f32 pad[16];
     f32 sp30[4][4];
     UNUSED s32 pad2[2];
@@ -169,7 +169,7 @@ struct S1_DoubleTextureTrail {
     /* 0x0B0 */ S1_unk_D_843C2C00_0B0 unk_0B0[10];
 };
 extern u8* D_8418CA20[256];
-Gfx* func_84167D2C(Gfx* arg0, S1_DoubleTextureTrail* arg1) {
+Gfx* DoubleTextureTrail_LoadTextures(Gfx* arg0, S1_DoubleTextureTrail* arg1) {
     S1_unk_D_843C2C00_064* ptr;
 
     ptr = &arg1->unk_064;

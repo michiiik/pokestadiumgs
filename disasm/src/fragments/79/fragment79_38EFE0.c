@@ -160,7 +160,7 @@ s16 *func_841202F0(s16 *arg0, s16 *arg1) {
     return arg0;
 }
 
-s32 func_84120310(s16* arg0, s16 arg1, s16 arg2) {
+s32 BattleAnim_StepToS16(s16* arg0, s16 arg1, s16 arg2) {
     s16 temp_v0 = arg1 - *arg0;
 
     if (arg2 < 0) {
@@ -218,12 +218,12 @@ void func_841206D0(void *arg0)
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84120AC4.s")
 
 extern void func_84120700(s32);
-extern void func_800357A8(f32 *, f32, f32, f32);
+extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
 void func_8411EF2C(s32 arg0);
 void func_8410B578(f32 arg0);
 void func_84120BB4(u8 *arg0, s32 arg1) {
     (*(s16 *)((u8 *)(arg1) + (0x7EA))) = 0;
-    func_800357A8((f32 *) (arg0 + 0xC0), 0.0f, 1.0f, 0.0f);
+    Vec3f_SetComponentsDuplicate((f32 *) (arg0 + 0xC0), 0.0f, 1.0f, 0.0f);
     func_8411EF2C(arg1);
     func_84120700(D_84191208);
     func_84120700(D_8419120C);
@@ -287,8 +287,8 @@ void func_84120E7C(u8 *arg0) {
 extern void func_84120464(s32, s32, s32);
 extern s32 D_84183C90;
 void func_841210CC(s32 arg0) {
-    func_800357A8(arg0 + 0x5E4, 0.0f, 0.0f, 0.0f);
-    func_800357A8(arg0 + 0x5F0, 0.0f, 0.0f, 0.0f);
+    Vec3f_SetComponentsDuplicate(arg0 + 0x5E4, 0.0f, 0.0f, 0.0f);
+    Vec3f_SetComponentsDuplicate(arg0 + 0x5F0, 0.0f, 0.0f, 0.0f);
     func_84120464(arg0, D_84183C90, 0x4000);
 }
 
@@ -315,7 +315,7 @@ void func_84121708(u8 *arg0) {
 s32 func_841211CC(void *, s16, s16);
 void func_84121724(void *arg0) {
     if ((*(s8 *)((u8 *)(arg0) + (0x623))) == 0) {
-        (*(s16 *)((u8 *)(arg0) + (0x5FE))) = func_800372CC((s32) (*(s16 *)((u8 *)(arg0) + (0x5FE))), 0x2C14, 0xB6, 0xB6);
+        (*(s16 *)((u8 *)(arg0) + (0x5FE))) = Math_StepToS32((s32) (*(s16 *)((u8 *)(arg0) + (0x5FE))), 0x2C14, 0xB6, 0xB6);
         if (func_841211CC(arg0, (*(s16 *)((u8 *)(arg0) + (0x5FE))), (s16) (func_8411E1D4((s32) arg0) * -0x4000)) != 0) {
             (*(s8 *)((u8 *)(arg0) + (0x623))) = (s8) ((*(s8 *)((u8 *)(arg0) + (0x623))) + 1);
         }
@@ -392,8 +392,8 @@ void func_84122C94(void *arg0) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84122CCC.s")
 
 void func_84122D74(s32 arg0) {
-    func_800357A8(arg0 + 0x5E4, 0.0f, 0.0f, 0.0f);
-    func_800357A8(arg0 + 0x5F0, 0.0f, 0.0f, 0.0f);
+    Vec3f_SetComponentsDuplicate(arg0 + 0x5E4, 0.0f, 0.0f, 0.0f);
+    Vec3f_SetComponentsDuplicate(arg0 + 0x5F0, 0.0f, 0.0f, 0.0f);
     func_84120464(arg0, D_84183C90, 0x4000);
 }
 
@@ -415,7 +415,7 @@ typedef union {
               xw, yw, zw, ww;
     };
 } S1_MtxF;
-void func_84122E70(S1_Vec3f* arg0, S1_MtxF* arg1) {
+void GalleryCamera_RotateVecByMatrix(S1_Vec3f* arg0, S1_MtxF* arg1) {
     f32 x = (arg1->mf[0][0] * arg0->x) + (arg1->mf[0][1] * arg0->y) + (arg1->mf[0][2] * arg0->z);
     f32 y = (arg1->mf[1][0] * arg0->x) + (arg1->mf[1][1] * arg0->y) + (arg1->mf[1][2] * arg0->z);
     f32 z = (arg1->mf[2][0] * arg0->x) + (arg1->mf[2][1] * arg0->y) + (arg1->mf[2][2] * arg0->z);

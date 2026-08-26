@@ -20,7 +20,7 @@ extern u64 D_800AB5A0[0x1];
 extern u64 D_800AB9A8[0x1];
 extern u64 D_800AC5B0[0x1];
 extern u64 D_800CC5B0[];
-void func_800015C0(S1_UnkStruct80001380* arg0) {
+void DisplayTask_Initialize(S1_UnkStruct80001380* arg0) {
     arg0->task.t.type = M_GFXTASK;
     arg0->task.t.flags = 0;
     arg0->task.t.ucode_boot = D_800AB4A0;
@@ -104,13 +104,13 @@ void func_8000177C(u8 *arg0) {
 #ifdef VERSION_US
 
 extern void func_80004F34(void *);
-extern void func_80004F60(void *);
+extern void Sched_TryReceiveClientQueue(void *);
 
-void func_80001AC8(void) {
+void DisplayWorker_DrainEvents(void) {
     func_80004F34(leoDiskID);
     if (*(s32 *)(leoDiskID + 0x1C8) > 0) {
         do {
-            func_80004F60(leoDiskID);
+            Sched_TryReceiveClientQueue(leoDiskID);
         } while (*(s32 *)(leoDiskID + 0x1C8) > 0);
     }
     func_80004F34(leoDiskID);
@@ -155,7 +155,7 @@ void func_80001CDC(void) { func_80001CB0(); }
 #endif
 
 #ifdef VERSION_US
-void func_80001E18(u16 color) { s32 width = 640; u16 *buf = *(u16 **)(*(u8 **)(leoDiskID + 0x9E0) + 8); while (width-- > 0) { *buf++ = color; } osWritebackDCache(*(void **)(*(u8 **)(leoDiskID + 0x9E0) + 8), 0x500); }
+void Display_ClearFramebufferLine(u16 color) { s32 width = 640; u16 *buf = *(u16 **)(*(u8 **)(leoDiskID + 0x9E0) + 8); while (width-- > 0) { *buf++ = color; } osWritebackDCache(*(void **)(*(u8 **)(leoDiskID + 0x9E0) + 8), 0x500); }
 #endif
 
 #ifdef VERSION_US
@@ -177,31 +177,31 @@ s32 func_80001E70(void) {
 #endif
 
 #ifdef VERSION_US
-s32 func_80001EB8(void) { u8 *ptr = *(u8 **)(D_800AB3C0 + 8); return *(u16 *)ptr; }
+s32 Display_GetFramebufferClearColor(void) { u8 *ptr = *(u8 **)(D_800AB3C0 + 8); return *(u16 *)ptr; }
 #endif
 
 #ifdef VERSION_US
 extern u8 *D_800AB3C0; extern void *osViGetCurrentFramebuffer(void);
-s32 func_80001ECC(void) { s32 result = 0; if (osViGetCurrentFramebuffer() == *(void **)(D_800AB3C0 + 8)) result = 1; return result; }
+s32 Display_IsCurrentFramebuffer(void) { s32 result = 0; if (osViGetCurrentFramebuffer() == *(void **)(D_800AB3C0 + 8)) result = 1; return result; }
 #endif
 
 #ifdef VERSION_US
-void func_80001F08(void) { extern OSMesgQueue D_800AB3E4; osRecvMesg(&D_800AB3E4, NULL, OS_MESG_BLOCK); }
+void Display_WaitForCompletion(void) { extern OSMesgQueue D_800AB3E4; osRecvMesg(&D_800AB3E4, NULL, OS_MESG_BLOCK); }
 #endif
 
 #ifdef VERSION_US
 
 extern OSMesgQueue D_800AB3CC;
-void func_80001F34(s32 arg0) {
+void Display_QueueFramebufferRequest(s32 arg0) {
     osSendMesg(&D_800AB3CC, (OSMesg)arg0, NULL);
 }
 #endif
 
 #ifdef VERSION_US
-void func_80001F60(s32 arg0) {
+void Display_WaitForFrames(s32 arg0) {
     while (arg0-- > 0) {
-        func_80001F34(0);
-        func_80001F08();
+        Display_QueueFramebufferRequest(0);
+        Display_WaitForCompletion();
     }
 }
 #endif
@@ -237,7 +237,7 @@ u8 func_80002014(void) {
 #endif
 
 #ifdef VERSION_US
-void func_80002020(void) { extern u8 leoDiskID[]; Vi_SelectMode(*(s8 *)(leoDiskID + 0xAB1), *(s8 *)(leoDiskID + 0xAB2)); }
+void Display_ApplyPendingVideoMode(void) { extern u8 leoDiskID[]; Vi_SelectMode(*(s8 *)(leoDiskID + 0xAB1), *(s8 *)(leoDiskID + 0xAB2)); }
 #endif
 
 #ifdef VERSION_US
@@ -246,7 +246,7 @@ s32 func_8000204C(void) { extern u8 leoDiskID[]; s32 ready = 1; if (*(s32 *)(leo
 
 #ifdef VERSION_US
 extern s32 D_800871D0;
-void func_80002074(void) {
+void Display_EnableBlackout(void) {
     D_800871D0 = 1;
 }
 #endif

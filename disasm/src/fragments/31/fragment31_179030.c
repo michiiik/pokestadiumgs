@@ -2,12 +2,12 @@
 
 
 #ifdef VERSION_US
-extern void func_800033DC(void *);
+extern void Util_Free(void *);
 extern void *D_882346F8;
 
 void func_88205DB0(void) {
     (*(s32 (**)())((u8 *)(D_882346F8) + (0x9C)))();
-    func_800033DC(D_882346F8);
+    Util_Free(D_882346F8);
 }
 
 extern void func_88200134();

@@ -21,9 +21,9 @@
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_3312D0/func_87F0EE0C.s")
 
 extern u32 D_87F15BB0;
-extern void func_81A00020(void *);
+extern void fragment3_main(void *);
 extern void func_81A005F0(void *);
-void func_87F0EECC(void) { func_81A00020(&D_87F15BB0); func_81A005F0(&D_87F15BB0); }
+void func_87F0EECC(void) { fragment3_main(&D_87F15BB0); func_81A005F0(&D_87F15BB0); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_3312D0/func_87F0EEFC.s")
 
@@ -49,7 +49,7 @@ void func_87F0F118(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_3312D0/func_87F0F2B8.s")
 
-s8 func_80057764(s32);
+s8 GbTower_SetPollMask(s32);
 extern void func_80057944(s32);
 void func_87F0F390(void *arg0) {
     s32 var_s0;
@@ -59,13 +59,13 @@ void func_87F0F390(void *arg0) {
         func_80057944(var_s0 & 0xFF);
         var_s0 += 1;
     } while (var_s0 != 4);
-    (*(s8 *)((u8 *)(arg0) + (0x2178))) = func_80057764(0);
+    (*(s8 *)((u8 *)(arg0) + (0x2178))) = GbTower_SetPollMask(0);
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_3312D0/func_87F0F3E4.s")
 
 extern void func_81A0022C(void *);
-void func_87F0F444(void) { func_81A0022C(&D_87F15BB0); }
+void StageLoader_UpdateSegments(void) { func_81A0022C(&D_87F15BB0); }
 
 extern u32 D_87F15BB8;
 u32 func_87F0F468(void) {

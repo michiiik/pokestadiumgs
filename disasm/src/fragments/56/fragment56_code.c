@@ -76,7 +76,7 @@ void func_86803EA4(void) {
 extern void *D_86808590;
 extern s32 D_8682F2A8;
 void func_86805D50(void) {
-    if (func_800084A0() == 0) {
+    if (StageContext_GetFadeMode() == 0) {
         if ((*(u8 *)((u8 *)(D_86808590) + (0x2180))) == 4) {
             func_80007AEC(0x14);
             func_87F00688();

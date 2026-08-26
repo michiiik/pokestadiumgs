@@ -19,17 +19,17 @@ void func_8620739C(void) {
 
 extern u8 D_87F15B70[];
 extern s32 func_8004DDF4(s32);
-extern s32 func_80002B24(void);
+extern s32 main_pool_get_available(void);
 extern s32 func_800030D0(s32, s32);
-extern s32 func_8004DF18(s32, s32);
-extern void func_80003120(s32);
+extern s32 WidgetTree_RunMessagePanelSilent(s32, s32);
+extern void MainPool_FinalizeAllocation(s32);
 extern void func_87F0252C(void *, void *, void *, s32);
 void func_862075BC(void) {
     s32 handle;
     func_8004DDF4(0xB7);
-    handle = func_800030D0(func_80002B24(), 0);
-    *(s32 *)(D_8620E198 + 0x16C) = func_8004DF18(handle, 0xB7);
-    func_80003120(handle);
+    handle = func_800030D0(main_pool_get_available(), 0);
+    *(s32 *)(D_8620E198 + 0x16C) = WidgetTree_RunMessagePanelSilent(handle, 0xB7);
+    MainPool_FinalizeAllocation(handle);
     func_87F0252C(D_87F15B70, D_8620E198 + 0x728C8, D_8620E198 + 0x728DC, 8);
 }
 #endif

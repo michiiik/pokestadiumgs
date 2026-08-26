@@ -61,9 +61,9 @@ extern void func_88D004C8(void);
 extern void func_80008574(void);
 extern void func_80047610(void);
 extern void func_8004C398(void);
-extern void func_80006D3C(void);
+extern void Gfx_FreeDisplayListBuffers(void);
 extern void func_80057944(s32 arg0);
-s32 func_88D00664(s32 arg0, s32 arg1) {
+s32 fragment42_main(s32 arg0, s32 arg1) {
     s32 stage;
     main_pool_push_state(0x4946554C);
     func_80006CD0(0x10000, 0);
@@ -78,7 +78,7 @@ s32 func_88D00664(s32 arg0, s32 arg1) {
     func_80008574();
     func_80047610();
     func_8004C398();
-    func_80006D3C();
+    Gfx_FreeDisplayListBuffers();
     func_80057944(0);
     main_pool_pop_state(0x4946554C);
     return 0;

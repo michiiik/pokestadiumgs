@@ -145,7 +145,7 @@ extern s32 D_8660678C;
 extern void *D_86607230;
 extern void func_80007AEC(s32);
 void func_87F00688(void);
-u8 func_800084A0(void);
+u8 StageContext_GetFadeMode(void);
 void func_866048EC(void) {
     if ((*(u8 *)((u8 *)(D_86607230) + (0x2180))) == 4) {
         func_80007AEC(0x14);
@@ -153,7 +153,7 @@ void func_866048EC(void) {
         D_8660678C = 0xA;
         return;
     }
-    if (func_800084A0() == 0) {
+    if (StageContext_GetFadeMode() == 0) {
         D_8660678C = 4;
     }
 }
@@ -221,20 +221,20 @@ extern s32 D_86607378;
 extern void func_80027EE0(s32);
 extern void func_8004C09C(s32 arg0);
 extern s32 func_80047588(s32 arg0, s32 arg1);
-u8 *func_80004638(s32 id, u8 *rom_start, u8 *rom_end, s32 arg3);
+u8 *Asset_LoadToSegment(s32 id, u8 *rom_start, u8 *rom_end, s32 arg3);
 extern u8 D_1000000[];
 extern u8 D_447D00[];
 void func_87F0C980(void);
 void func_80047610(void);
 void func_8004C398(void);
-void func_80006D3C(void);
+void Gfx_FreeDisplayListBuffers(void);
 s32 func_800082E0(s32, s32, s32, s32, s32, s32);
-u8 *func_80004638(s32 id, u8 *rom_start, u8 *rom_end, s32 arg3);
+u8 *Asset_LoadToSegment(s32 id, u8 *rom_start, u8 *rom_end, s32 arg3);
 void func_87F0C980(void);
 void func_80047610(void);
 void func_8004C398(void);
-void func_80006D3C(void);
-s32 func_86606388(s32 arg0, void *arg1) {
+void Gfx_FreeDisplayListBuffers(void);
+s32 fragment54_main(s32 arg0, void *arg1) {
     s32 sp24;
 
     D_86607230 = arg1;
@@ -252,7 +252,7 @@ s32 func_86606388(s32 arg0, void *arg1) {
     func_8004C8C0(0x19A);
     func_8004C8C0(0x199);
     func_80047588(D_86607328 | 5 | D_86607378, 0);
-    func_80004638((s32) ((u32) ((s32) D_1000000 & 0x0F000000) >> 0x18), &D_446E30, D_447D00, 0);
+    Asset_LoadToSegment((s32) ((u32) ((s32) D_1000000 & 0x0F000000) >> 0x18), &D_446E30, D_447D00, 0);
     func_87F00030();
     func_87F0C980();
     func_87F01F34(D_86607230);
@@ -262,7 +262,7 @@ s32 func_86606388(s32 arg0, void *arg1) {
     func_80008574();
     func_80047610();
     func_8004C398();
-    func_80006D3C();
+    Gfx_FreeDisplayListBuffers();
     main_pool_pop_state(0x4D523032);
     func_87F0F480(D_86607230);
     func_80027EE0(0xFFE);

@@ -37,7 +37,7 @@ s32 func_82504B04(s32 arg0) {
     var_s0 = arg0;
     switch (arg0) {                                 /* irregular */
     case 0:
-        if (func_800084A0() == 0) {
+        if (StageContext_GetFadeMode() == 0) {
             var_s0 = 1;
         }
         break;
@@ -49,7 +49,7 @@ s32 func_82504B04(s32 arg0) {
         }
         break;
     case 3:
-        if (func_800084A0() == 1) {
+        if (StageContext_GetFadeMode() == 1) {
             var_s0 = 4;
         }
         break;
@@ -68,7 +68,7 @@ s32 func_82504BA0(s32 *arg0, s32 arg1) {
     func_8004C4B0(0x31);
     func_82504810();
     func_80008624();
-    if (func_800084A0() != 0) {
+    if (StageContext_GetFadeMode() != 0) {
         func_800086A4(2);
         func_80007AEC(5);
     }
@@ -78,7 +78,7 @@ s32 func_82504BA0(s32 *arg0, s32 arg1) {
         temp_v0 = func_82504B04(var_s1);
         var_s1 = temp_v0;
     } while (temp_v0 != 4);
-    func_800085EC();
+    StageLoader_WaitForRetrace();
     func_8004C398();
     return 5;
 }

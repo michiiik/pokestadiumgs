@@ -93,17 +93,17 @@ void func_829087E0(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_80007820(s32 *, s32);
+extern void GfxImage_FillCurrent(s32 *, s32);
 extern void func_80008648();
 extern void func_800088DC();
 extern void func_8003C6B8(s32);
-extern void func_8003C970();
+extern void GeoRender_AdvanceFrameCounter();
 extern u8 D_800D0510;
 extern s32 D_8291B868;
 void func_82908800(void) {
     func_800088DC();
-    func_80007820(&D_800D0510, 1);
-    func_8003C970();
+    GfxImage_FillCurrent(&D_800D0510, 1);
+    GeoRender_AdvanceFrameCounter();
     func_8003C6B8(D_8291B868);
     func_829087E0();
     func_80008648();
@@ -172,17 +172,17 @@ extern u8 D_446E30;
 extern s32 func_80047588(s32 arg0, s32 arg1);
 extern void func_8004C09C(s32 arg0);
 s32 func_8004DDF4(s32 arg0);
-u8 *func_80004638(s32 id, u8 *rom_start, u8 *rom_end, s32 arg3);
+u8 *Asset_LoadToSegment(s32 id, u8 *rom_start, u8 *rom_end, s32 arg3);
 extern u8 D_1000000[];
 extern u8 D_447D00[];
 void func_80047610(void);
-void func_80006D3C(void);
+void Gfx_FreeDisplayListBuffers(void);
 void func_8004C398(void);
 s32 func_800082E0(s32, s32, s32, s32, s32, s32);
 s32 func_8004DDF4(s32 arg0);
-u8 *func_80004638(s32 id, u8 *rom_start, u8 *rom_end, s32 arg3);
+u8 *Asset_LoadToSegment(s32 id, u8 *rom_start, u8 *rom_end, s32 arg3);
 void func_80047610(void);
-void func_80006D3C(void);
+void Gfx_FreeDisplayListBuffers(void);
 void func_8004C398(void);
 s32 func_82908A54(s32 arg0, s32 arg1) {
     s32 sp24;
@@ -194,7 +194,7 @@ s32 func_82908A54(s32 arg0, s32 arg1) {
     func_8004C09C(0x21);
     func_8004C8C0(0xC1);
     func_8004DDF4(0xA6);
-    func_80004638((s32) ((u32) ((s32) D_1000000 & 0x0F000000) >> 0x18), &D_446E30, D_447D00, 0);
+    Asset_LoadToSegment((s32) ((u32) ((s32) D_1000000 & 0x0F000000) >> 0x18), &D_446E30, D_447D00, 0);
     func_8290894C();
     func_80008514(sp24);
     func_82908854();
@@ -202,7 +202,7 @@ s32 func_82908A54(s32 arg0, s32 arg1) {
     func_829088EC();
     func_80008574();
     func_80047610();
-    func_80006D3C();
+    Gfx_FreeDisplayListBuffers();
     func_8004C398();
     main_pool_pop_state(0x454E44);
     return 0;

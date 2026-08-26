@@ -34,12 +34,12 @@ void func_88500EF4(void) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1BE300/func_88503644.s")
 
 extern s32 D_880068B4;
-extern void func_800033DC(u8 *);
+extern void Util_Free(u8 *);
 extern void func_888002DC(void);
 extern void main_pool_pop_state(s32);
 void func_885037EC(void) {
     D_880068B4 = 1;
-    func_800033DC(D_8850D6D0);
+    Util_Free(D_8850D6D0);
     func_888002DC();
     main_pool_pop_state(0x50495550);
 }

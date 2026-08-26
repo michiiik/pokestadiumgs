@@ -7,7 +7,7 @@
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_80069F20.s")
 
 extern void func_80069F20();
-void func_8006A13C(s32 arg0) { func_80069F20(arg0, 0, 0); }
+void BattleScene_ResetParticipantModelFlags(s32 arg0) { func_80069F20(arg0, 0, 0); }
 
 extern void func_80069F20(void); void func_8006A160(void) { func_80069F20(); }
 
@@ -141,8 +141,8 @@ extern void func_8006BF78(s32); void func_8006C644(void) { func_8006BF78(1); }
 extern void func_800029E0(void);
 void func_8006C9C0(void) { func_800029E0(); if (D_8009DF70 != 0) *(s32 *)((u8 *)(u32)D_8009DF70 + 0x38) = 0; }
 
-extern void *func_80002984(s32, s32);
-void *func_8006C9F4(void) { void *result = func_80002984(0x440, 0); if (result != NULL) _bzero(result, 0x440); return result; }
+extern void *main_pool_alloc(s32, s32);
+void *func_8006C9F4(void) { void *result = main_pool_alloc(0x440, 0); if (result != NULL) _bzero(result, 0x440); return result; }
 
 extern void func_800029E0(void); void func_8006CA34(void) { func_800029E0(); }
 

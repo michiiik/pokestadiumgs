@@ -3,7 +3,7 @@
 
 #ifdef VERSION_US
 extern u8 D_84400B3F[];
-s32 func_84400020(u8 arg0) { s32 result = 0xA0; if (arg0 > 0 && arg0 < 0xFC) { result = (D_84400B3F[arg0] & 0xE0) & 0xFF; } return result; }
+s32 fragment86_main(u8 arg0) { s32 result = 0xA0; if (arg0 > 0 && arg0 < 0xFC) { result = (D_84400B3F[arg0] & 0xE0) & 0xFF; } return result; }
 #endif
 
 #ifdef VERSION_US

@@ -4,7 +4,7 @@
 #ifdef VERSION_US
 extern void func_8004C8C0(s32);
 s32 func_8004C4B0(s32 value);
-void func_81A00020(void *arg0) {
+void fragment3_main(void *arg0) {
     (*(s32 *)((u8 *)(arg0) + (0))) = 0;
     (*(s32 *)((u8 *)(arg0) + (4))) = 0;
     (*(s32 *)((u8 *)(arg0) + (8))) = -1;

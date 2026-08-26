@@ -3,7 +3,7 @@
 
 #ifdef VERSION_US
 extern u32 D_800CE040;
-void func_800056E0(u16* buf) {
+void SoftReset_ClearLines320(u16* buf) {
     int i, j;
 
     if (D_800CE040 <= 15) {
@@ -22,7 +22,7 @@ void func_800056E0(u16* buf) {
     }
 }
 
-void func_8000575C(u16* buf) {
+void SoftReset_ClearLines640(u16* buf) {
     int i, j;
 
     if (D_800CE040 <= 15) {
@@ -47,7 +47,7 @@ extern s32 D_800CE050;
 void func_800057DC(void) {
     if (D_800CE040 <= 15) {
         if (D_800CE040 == 0) {
-            u16 color = func_80001EB8();
+            u16 color = Display_GetFramebufferClearColor();
              
             D_800CE048 = (color >> 11) & 31;   
             D_800CE04C = (color >> 6) & 31;  
@@ -55,7 +55,7 @@ void func_800057DC(void) {
         }
          
          
-        func_80001E18(((((D_800CE048 * (15 - D_800CE040)) >> 4) << 11) |
+        Display_ClearFramebufferLine(((((D_800CE048 * (15 - D_800CE040)) >> 4) << 11) |
                        (((D_800CE04C * (15 - D_800CE040)) >> 4) << 6) |
                        (((D_800CE050 * (15 - D_800CE040)) >> 4) << 1) | 1) &
                           0xFFFF,

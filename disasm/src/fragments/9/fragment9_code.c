@@ -119,7 +119,7 @@ void func_8FB032C4(s32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/9/fragment9_code/func_8FB03328.s")
 
-extern void func_80006D3C();
+extern void Gfx_FreeDisplayListBuffers();
 extern void func_80008574();
 extern void func_80047610();
 extern void func_8004C398();
@@ -128,14 +128,14 @@ void func_8FB033F0(s32 arg0, s32 arg1) {
     func_80008574();
     func_80047610();
     func_8004C398();
-    func_80006D3C();
+    Gfx_FreeDisplayListBuffers();
 }
 
 extern void func_8FB032C4(s32, s32);
 extern void func_8FB03328(s32, s32);
 extern void main_pool_pop_state(s32);
 extern void main_pool_push_state(s32);
-s32 func_8FB0342C(s32 arg0, s32 arg1) {
+s32 fragment9_main(s32 arg0, s32 arg1) {
     main_pool_push_state(0x52504D45);
     func_8FB03328(arg0, arg1);
     func_8FB032C4(arg0, arg1);

@@ -15,11 +15,11 @@
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/36/fragment36_code/func_88700364.s")
 
 extern void main_pool_pop_state(s32);
-void func_800033DC(s32 arg0);
+void Util_Free(s32 arg0);
 extern u8 *D_88701E00;
 s32 func_8000204C(void);
 void func_887009A0(void) {
-    func_800033DC((s32) D_88701E00);
+    Util_Free((s32) D_88701E00);
     if (func_8000204C() == 0) {
         do {
 

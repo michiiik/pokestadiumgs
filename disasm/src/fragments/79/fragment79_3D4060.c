@@ -8,7 +8,7 @@
 
 extern f64 D_8418C858;
 extern f64 D_8418C860;
-void func_84164B98(f32 arg0, f32 *arg1, f32 arg2) {
+void OwnerLinkedFourStream_Update(f32 arg0, f32 *arg1, f32 arg2) {
     UNUSED f32 pad[16];
     f32 sp30[4][4];
     UNUSED s32 pad2[2];
@@ -21,7 +21,7 @@ void func_84164B98(f32 arg0, f32 *arg1, f32 arg2) {
 extern u8 *D_84187B70;
 extern void func_84109B9C(u8 *);
 extern void func_84164C28(u8 *);
-s32 func_84165008(void) {
+s32 OwnerLinkedFourStream_IsComplete(void) {
     u8 *ptr = D_84187B70;
     s32 i = 0;
     do {

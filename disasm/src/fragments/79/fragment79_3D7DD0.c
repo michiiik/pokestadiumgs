@@ -18,7 +18,7 @@ typedef struct {
     u8 pad[0x88];
     Vtx *vertices;
 } Func84169214State;
-Gfx *func_84169214(Gfx *arg0, Func84169214State *arg1) {
+Gfx *BattleAnim_SixSlotTrail_DrawSegments(Gfx *arg0, Func84169214State *arg1) {
     s32 i;
     Vtx *temp_v0 = arg1->vertices;
     for (i = 0; i < 19; i++) {
@@ -98,7 +98,7 @@ struct S1_unk_D_843C3508 {
     /* 0x0A4 */ S1_unk_D_843C3508_0A4 unk_0A4[20];
 };
 extern u8* D_8418CA20[256];
-Gfx* func_84169344(Gfx* arg0, S1_unk_D_843C3508* arg1) {
+Gfx* BattleAnim_SixSlotTrail_LoadTextures(Gfx* arg0, S1_unk_D_843C3508* arg1) {
     S1_unk_D_843C2C00_064* ptr;
     UNUSED s32 pad[2];
 

@@ -3,7 +3,7 @@
 
 #ifdef VERSION_US
 extern Gfx* D_800D0510;
-void func_82D02A70(u8 r, u8 g, u8 b, u8 a) {
+void ParticleGfx_SetPrimColor_fragment82(u8 r, u8 g, u8 b, u8 a) {
     gDPSetPrimColor(D_800D0510++, 0, 0, r, g, b, a);
 }
 

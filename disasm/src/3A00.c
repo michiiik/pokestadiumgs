@@ -20,7 +20,7 @@ typedef struct S1_MemoryPool {
     /* 0x20 */ struct S1_MemoryBlock *firstBlock;
     /* 0x24 */ struct S1_MemoryBlock freeList;
 } S1_MemoryPool;
-void func_80002F90(S1_MemoryPool* pool, void* addr) {
+void mem_pool_free(S1_MemoryPool* pool, void* addr) {
     struct S1_MemoryBlock* block;
     struct S1_MemoryBlock* freeList;
 
@@ -66,14 +66,14 @@ void func_80002F90(S1_MemoryPool* pool, void* addr) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/3A00/func_800030D0.s")
 
 #define ALIGN16(val) (((val) + 0xFu) & ~0xFu)
-void func_80003120(struct S1_MemoryBlock* block) {
+void MainPool_FinalizeAllocation(struct S1_MemoryBlock* block) {
     s32 size = ALIGN16(block->size + 0x10);
 
     func_80002A40(block, size);
     block->next = (void*)(size - 0x10);
 }
 
-u8 *func_80003164(u8 *arg0, s32 arg1) {
+u8 *MainPool_InitState(u8 *arg0, s32 arg1) {
     s32 value = (arg1 & ~3) - 0x10;
     u8 *ptr = arg0 + 0x10;
     *(s32 *)(arg0 + 4) = 0;
@@ -84,7 +84,7 @@ u8 *func_80003164(u8 *arg0, s32 arg1) {
 }
 
 typedef struct { s32 freeSpace; s32 listHeadL; s32 listHeadR; s32 prev; } MainPoolState;
-s32 func_8000318C(MainPoolState *state, s32 arg1, s32 arg2) {
+s32 MainPool_AllocAligned(MainPoolState *state, s32 arg1, s32 arg2) {
     s32 temp_a2;
     s32 temp_a3;
     s32 var_v0;
@@ -103,9 +103,9 @@ s32 func_8000318C(MainPoolState *state, s32 arg1, s32 arg2) {
     return ret;
 }
 
-void func_800031FC(u8 *arg0, s32 arg1) { if (*(s32 *)(arg0 + 0) >= arg1) { *(s32 *)(arg0 + 4) = arg1; *(s32 *)(arg0 + 0xC) = *(s32 *)(arg0 + 8) + arg1; } }
+void MainPool_ResetStateToOffset(u8 *arg0, s32 arg1) { if (*(s32 *)(arg0 + 0) >= arg1) { *(s32 *)(arg0 + 4) = arg1; *(s32 *)(arg0 + 0xC) = *(s32 *)(arg0 + 8) + arg1; } }
 
-void func_80003224(u8 *arg0) {
+void MainPool_ResetState(u8 *arg0) {
     u8 *ptr = arg0 + 0x10;
     *(s32 *)(arg0 + 4) = 0;
     *(u8 **)(arg0 + 8) = ptr;

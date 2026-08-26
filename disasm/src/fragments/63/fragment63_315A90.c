@@ -128,17 +128,17 @@ extern u8 D_87E1AC40;
 extern u8 D_87E1EBC0;
 extern void func_80037E9C(s32, void *);
 extern s32 func_800030D0(s32, s32);
-s32 func_80002B24(void);
-extern void func_80003120(s32);
+s32 main_pool_get_available(void);
+extern void MainPool_FinalizeAllocation(s32);
 void func_87E1331C(void *arg0) {
     s32 sp1C;
     s32 temp_v0;
 
     func_80037E9C(0, &D_87E1EBC0);
-    temp_v0 = func_800030D0(func_80002B24(), 0);
+    temp_v0 = func_800030D0(main_pool_get_available(), 0);
     sp1C = temp_v0;
     (*(s32 *)((u8 *)(arg0) + (0x28))) = func_80040E80(temp_v0, &D_87E1AC40);
-    func_80003120(sp1C);
+    MainPool_FinalizeAllocation(sp1C);
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E13380.s")

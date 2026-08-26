@@ -137,9 +137,9 @@ void func_86B05428(void) {
 #endif
 
 #ifdef VERSION_US
-s16 func_8000B3B0(f32 y, f32 x);
+s16 MathUtil_Atan2s(f32 y, f32 x);
 s16 func_86B07D58(f32 arg0, f32 arg1) {
-    return (s16) ((s32) (func_8000B3B0(arg0, -arg1) + 0x3FFF) % 65535);
+    return (s16) ((s32) (MathUtil_Atan2s(arg0, -arg1) + 0x3FFF) % 65535);
 }
 #endif
 

@@ -29,10 +29,10 @@ void func_88504EAC(void) {
 
 extern s32 D_880068B4;
 extern void *D_885229A0;
-extern void func_800033DC(void *);
+extern void Util_Free(void *);
 void func_88504EB8(void) {
     D_880068B4 = 1;
-    func_800033DC(D_885229A0);
+    Util_Free(D_885229A0);
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C1BC0/func_88504EE8.s")
@@ -55,7 +55,7 @@ void func_88505514(void *arg0) {
     (*(s16 *)((u8 *)(arg0) + (0x1A))) = (s16) ((s32) ((*(s16 *)((u8 *)(arg0) + (0x16))) * 0xFF) / 8);
 }
 
-void func_88505544(void *arg0)
+void Trade_UpdateBoxSlotShrink(void *arg0)
 {
   s16 temp_v0;
   func_88505264();

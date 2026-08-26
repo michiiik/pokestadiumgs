@@ -2,7 +2,7 @@
 
 #ifdef VERSION_US
 /* Stadium 1 transfer helper: allocates a typed block from the supplied pool. */
-extern void *func_8000318C(void *, size_t, s32);
+extern void *MainPool_AllocAligned(void *, size_t, s32);
 extern Vtx *func_800398F8();
 #endif
 
@@ -581,12 +581,12 @@ void func_80028300(void) {
 #endif
 
 #ifdef VERSION_US
-void func_8002890C(u8 *arg0, u8 *arg1) { if (*arg0 != *arg1) { u8 temp = *arg0; *arg0 = *arg1; *arg1 = temp; } }
+void Audio_SwapSoundCandidates(u8 *arg0, u8 *arg1) { if (*arg0 != *arg1) { u8 temp = *arg0; *arg0 = *arg1; *arg1 = temp; } }
 #endif
 
 #ifdef VERSION_US
 extern u32 D_800D1AD8[24];
-u16 func_8002892C(u16 arg0) {
+u16 Audio_FilterRecentSoundId(u16 arg0) {
     s32 i;
     for (i = 0; i < 24; i++) {
         if (arg0 == D_800D1AD8[i]) return 0;
@@ -600,7 +600,7 @@ u16 func_8002892C(u16 arg0) {
 #endif
 
 #ifdef VERSION_US
-void func_80028A28(u16 arg0) {
+void Audio_RemoveRecentSoundAt(u16 arg0) {
     u32 i;
     for (i = arg0; i > 0; i--) D_800D1AD8[i] = D_800D1AD8[i - 1];
     D_800D1AD8[0] = 0;
@@ -843,7 +843,7 @@ s32 func_800318C8(void) {
 
 #ifdef VERSION_US
 extern u8 D_800D2AD8[];
-u8 func_80031A54(char arg0)
+u8 GbAudio_GetRegisterValue(char arg0)
 {
   return D_800D2AD8[arg0 & 0xFF];
 }
@@ -1411,7 +1411,7 @@ s32 func_800353BC(void) {
 
 #ifdef VERSION_US
 extern s32 func_80025D44(void);
-s32 func_800353E4(void) {
+s32 Audio_WaitForPendingTasks(void) {
     s32 completed = 0;
 
     while (func_80025D44() != 0) {
@@ -1426,7 +1426,7 @@ s32 func_800353E4(void) {
 #endif
 
 #ifdef VERSION_US
-void func_80035470(s32 enabled) { D_80122A40 = enabled ? 0 : 1; }
+void Audio_SetProcessingEnabled(s32 enabled) { D_80122A40 = enabled ? 0 : 1; }
 #endif
 
 #ifdef VERSION_US
@@ -1438,7 +1438,7 @@ void func_80035494(void) {
 
 #ifdef VERSION_US
 extern s32 D_80094868;
-void func_800354A4(void) {
+void Audio_EnableModeFlag(void) {
     D_80094868 = 1;
 }
 #endif
@@ -1483,7 +1483,7 @@ u32 func_8003570C(void) {
 
 #ifdef VERSION_US
 typedef struct { u8 r, g, b, a; } Color3573C;
-Color3573C *func_8003573C(Color3573C *arg0, u8 r, u8 g, u8 b) {
+Color3573C *Color_SetRGB(Color3573C *arg0, u8 r, u8 g, u8 b) {
     arg0->r = r;
     arg0->g = g;
     arg0->b = b;
@@ -1493,7 +1493,7 @@ Color3573C *func_8003573C(Color3573C *arg0, u8 r, u8 g, u8 b) {
 
 #ifdef VERSION_US
 typedef struct { u8 r, g, b, a; } Color3575C;
-Color3575C *func_8003575C(Color3575C *arg0, u8 r, u8 g, u8 b, u8 a) {
+Color3575C *Color_SetRGBA(Color3575C *arg0, u8 r, u8 g, u8 b, u8 a) {
     arg0->r = r;
     arg0->g = g;
     arg0->b = b;
@@ -1504,7 +1504,7 @@ Color3575C *func_8003575C(Color3575C *arg0, u8 r, u8 g, u8 b, u8 a) {
 
 #ifdef VERSION_US
 typedef struct { f32 x, y, z; } Vec3f35784;
-Vec3f35784 *func_80035784(Vec3f35784 *arg0, f32 x, f32 y, f32 z) {
+Vec3f35784 *Vec3f_SetComponents(Vec3f35784 *arg0, f32 x, f32 y, f32 z) {
     arg0->x = x;
     arg0->y = y;
     arg0->z = z;
@@ -1514,7 +1514,7 @@ Vec3f35784 *func_80035784(Vec3f35784 *arg0, f32 x, f32 y, f32 z) {
 
 #ifdef VERSION_US
 typedef struct { f32 x, y, z; } Vec3f357A8;
-Vec3f357A8 *func_800357A8(Vec3f357A8 *arg0, f32 x, f32 y, f32 z) {
+Vec3f357A8 *Vec3f_SetComponentsDuplicate(Vec3f357A8 *arg0, f32 x, f32 y, f32 z) {
     arg0->x = x;
     arg0->y = y;
     arg0->z = z;
@@ -1524,7 +1524,7 @@ Vec3f357A8 *func_800357A8(Vec3f357A8 *arg0, f32 x, f32 y, f32 z) {
 
 #ifdef VERSION_US
 typedef struct { f32 x, y, z; } Vec3f357CC;
-Vec3f357CC *func_800357CC(Vec3f357CC *arg0, Vec3f357CC *arg1) {
+Vec3f357CC *Vec3f_AddInPlace(Vec3f357CC *arg0, Vec3f357CC *arg1) {
     arg0->x += arg1->x;
     arg0->y += arg1->y;
     arg0->z += arg1->z;
@@ -1534,7 +1534,7 @@ Vec3f357CC *func_800357CC(Vec3f357CC *arg0, Vec3f357CC *arg1) {
 
 #ifdef VERSION_US
 typedef struct { f32 x, y, z; } Vec3f35804;
-Vec3f35804 *func_80035804(Vec3f35804 *arg0, Vec3f35804 *arg1, Vec3f35804 *arg2) {
+Vec3f35804 *Vec3f_Add(Vec3f35804 *arg0, Vec3f35804 *arg1, Vec3f35804 *arg2) {
     arg0->x = arg1->x + arg2->x;
     arg0->y = arg1->y + arg2->y;
     arg0->z = arg1->z + arg2->z;
@@ -1544,7 +1544,7 @@ Vec3f35804 *func_80035804(Vec3f35804 *arg0, Vec3f35804 *arg1, Vec3f35804 *arg2) 
 
 #ifdef VERSION_US
 typedef struct { f32 x, y, z; } Vec3f3583C;
-Vec3f3583C *func_8003583C(Vec3f3583C *arg0, Vec3f3583C *arg1) {
+Vec3f3583C *Vec3f_SubtractInPlace(Vec3f3583C *arg0, Vec3f3583C *arg1) {
     arg0->x -= arg1->x;
     arg0->y -= arg1->y;
     arg0->z -= arg1->z;
@@ -1554,7 +1554,7 @@ Vec3f3583C *func_8003583C(Vec3f3583C *arg0, Vec3f3583C *arg1) {
 
 #ifdef VERSION_US
 typedef struct { f32 x, y, z; } Vec3f35874;
-Vec3f35874 *func_80035874(Vec3f35874 *arg0, Vec3f35874 *arg1, Vec3f35874 *arg2) {
+Vec3f35874 *Vec3f_Subtract(Vec3f35874 *arg0, Vec3f35874 *arg1, Vec3f35874 *arg2) {
     arg0->x = arg1->x - arg2->x;
     arg0->y = arg1->y - arg2->y;
     arg0->z = arg1->z - arg2->z;
@@ -1565,7 +1565,7 @@ Vec3f35874 *func_80035874(Vec3f35874 *arg0, Vec3f35874 *arg1, Vec3f35874 *arg2) 
 #ifdef VERSION_US
 typedef struct { f32 x, y, z; } Vec3f358AC;
 typedef struct { s16 x, y, z; } Vec3s358AC;
-Vec3f358AC *func_800358AC(Vec3f358AC *arg0, Vec3s358AC *arg1) {
+Vec3f358AC *Vec3f_FromVec3s(Vec3f358AC *arg0, Vec3s358AC *arg1) {
     arg0->x = arg1->x;
     arg0->y = arg1->y;
     arg0->z = arg1->z;
@@ -1575,7 +1575,7 @@ Vec3f358AC *func_800358AC(Vec3f358AC *arg0, Vec3s358AC *arg1) {
 
 #ifdef VERSION_US
 typedef struct { f32 x, y, z; } Vec3f358F0;
-Vec3f358F0 *func_800358F0(Vec3f358F0 *arg0, Vec3f358F0 *arg1, Vec3f358F0 *arg2, Vec3f358F0 *arg3) {
+Vec3f358F0 *Vec3f_CrossProductFromPoints(Vec3f358F0 *arg0, Vec3f358F0 *arg1, Vec3f358F0 *arg2, Vec3f358F0 *arg3) {
     arg0->x = ((arg2->y - arg1->y) * (arg3->z - arg2->z)) - ((arg3->y - arg2->y) * (arg2->z - arg1->z));
     arg0->y = ((arg2->z - arg1->z) * (arg3->x - arg2->x)) - ((arg3->z - arg2->z) * (arg2->x - arg1->x));
     arg0->z = ((arg2->x - arg1->x) * (arg3->y - arg2->y)) - ((arg3->x - arg2->x) * (arg2->y - arg1->y));
@@ -1588,7 +1588,7 @@ typedef struct {
     f32 x, y, z;
 } Vec3f359A0;
 
-Vec3f359A0 *func_800359A0(Vec3f359A0 *out, Vec3f359A0 *a, Vec3f359A0 *b) {
+Vec3f359A0 *Vec3f_CrossProduct(Vec3f359A0 *out, Vec3f359A0 *a, Vec3f359A0 *b) {
     out->x = (a->y * b->z) - (b->y * a->z);
     out->y = (a->z * b->x) - (b->z * a->x);
     out->z = (a->x * b->y) - (b->x * a->y);
@@ -1605,7 +1605,7 @@ Vec3f35A10 *func_80035A10(Vec3f35A10 *arg0) {
 #endif
 
 #ifdef VERSION_US
-void *func_80035A68(void *arg0, s16 arg1, s16 arg2, s16 arg3) {
+void *Vec3s_SetComponents(void *arg0, s16 arg1, s16 arg2, s16 arg3) {
     (*(s16 *)((u8 *)(arg0) + (0))) = arg1;
     (*(s16 *)((u8 *)(arg0) + (2))) = arg2;
     (*(s16 *)((u8 *)(arg0) + (4))) = arg3;
@@ -1615,28 +1615,28 @@ void *func_80035A68(void *arg0, s16 arg1, s16 arg2, s16 arg3) {
 
 #ifdef VERSION_US
 typedef struct { s16 x, y, z; } Vec3s35AA0;
-Vec3s35AA0 *func_80035AA0(Vec3s35AA0 *arg0, Vec3s35AA0 *arg1) {
+Vec3s35AA0 *Vec3s_AddInPlace(Vec3s35AA0 *arg0, Vec3s35AA0 *arg1) {
     arg0->x += arg1->x; arg0->y += arg1->y; arg0->z += arg1->z; return arg0;
 }
 #endif
 
 #ifdef VERSION_US
 typedef struct { s16 x, y, z; } Vec3s35AD8;
-Vec3s35AD8 *func_80035AD8(Vec3s35AD8 *arg0, Vec3s35AD8 *arg1, Vec3s35AD8 *arg2) {
+Vec3s35AD8 *Vec3s_Add(Vec3s35AD8 *arg0, Vec3s35AD8 *arg1, Vec3s35AD8 *arg2) {
     arg0->x = arg1->x + arg2->x; arg0->y = arg1->y + arg2->y; arg0->z = arg1->z + arg2->z; return arg0;
 }
 #endif
 
 #ifdef VERSION_US
 typedef struct { s16 x, y, z; } Vec3s35B10;
-Vec3s35B10 *func_80035B10(Vec3s35B10 *arg0, Vec3s35B10 *arg1) {
+Vec3s35B10 *Vec3s_SubtractInPlace(Vec3s35B10 *arg0, Vec3s35B10 *arg1) {
     arg0->x -= arg1->x; arg0->y -= arg1->y; arg0->z -= arg1->z; return arg0;
 }
 #endif
 
 #ifdef VERSION_US
 typedef struct { s16 x, y, z; } Vec3s35B48;
-Vec3s35B48 *func_80035B48(Vec3s35B48 *arg0, Vec3s35B48 *arg1, Vec3s35B48 *arg2) {
+Vec3s35B48 *Vec3s_Subtract(Vec3s35B48 *arg0, Vec3s35B48 *arg1, Vec3s35B48 *arg2) {
     arg0->x = arg1->x - arg2->x; arg0->y = arg1->y - arg2->y; arg0->z = arg1->z - arg2->z; return arg0;
 }
 #endif
@@ -1645,13 +1645,13 @@ Vec3s35B48 *func_80035B48(Vec3s35B48 *arg0, Vec3s35B48 *arg1, Vec3s35B48 *arg2) 
 #define ROUND_MAX(x) ((x) + ((x) > 0.0f ? 0.5f : -0.5f))
 typedef struct { s16 x, y, z; } Vec3s35B80;
 typedef struct { f32 x, y, z; } Vec3f35B80;
-Vec3s35B80 *func_80035B80(Vec3s35B80 *arg0, Vec3f35B80 *arg1) {
+Vec3s35B80 *Vec3s_FromVec3f(Vec3s35B80 *arg0, Vec3f35B80 *arg1) {
     arg0->x = ROUND_MAX(arg1->x); arg0->y = ROUND_MAX(arg1->y); arg0->z = ROUND_MAX(arg1->z); return arg0;
 }
 #endif
 
 #ifdef VERSION_US
-void func_80035C44(u32 *dest, u32 *src) {
+void MtxF_Copy(u32 *dest, u32 *src) {
     if (dest != src) {
         s32 i; u32 *d = dest; u32 *s = src;
         for (i = 0; i < 16; i++) { *d++ = *s++; }
@@ -1660,7 +1660,7 @@ void func_80035C44(u32 *dest, u32 *src) {
 #endif
 
 #ifdef VERSION_US
-void func_80035C90(f32 *arg0) {
+void MtxF_Identity(f32 *arg0) {
     s32 i;
     f32 *dest;
     for (dest = arg0 + 1, i = 0; i < 14; dest++, i++) { *dest = 0.0f; }
@@ -1669,9 +1669,9 @@ void func_80035C90(f32 *arg0) {
 #endif
 
 #ifdef VERSION_US
-extern void func_80035C90(f32 *arg0);
-void func_80035CD0(f32 *dest, f32 *source) {
-    func_80035C90(dest);
+extern void MtxF_Identity(f32 *arg0);
+void MtxF_SetTranslation(f32 *dest, f32 *source) {
+    MtxF_Identity(dest);
     dest[12] = source[0];
     dest[13] = source[1];
     dest[14] = source[2];
@@ -1894,8 +1894,8 @@ typedef union S1_arg1_func_80010CA8 S1_arg1_func_80010CA8;
 typedef struct S1_unk_D_86002F58_004_000_004 S1_unk_D_86002F58_004_000_004;
 typedef struct S1_unk_D_86002F58_004_000_00C_028 S1_unk_D_86002F58_004_000_00C_028;
 struct S1_unk_D_8690A610_018 {
-    /* 0x00 */ s16 fogNear; // func_80038258's arg2
-    /* 0x02 */ s16 fogFar; // func_80038258's arg3
+    /* 0x00 */ s16 fogNear; // GeoNode_CreateFog's arg2
+    /* 0x02 */ s16 fogFar; // GeoNode_CreateFog's arg3
     /* 0x04 */ S1_Color_RGBA8_u32 fogColor;
 };
 struct S1_unk_D_86002F58_004_000_000 {
@@ -2034,7 +2034,7 @@ struct S1_unk_D_86002F34_alt9 {
 typedef struct S1_unk_func_80011B94 S1_unk_func_80011B94;
 struct S1_unk_func_80011B94 {
     /* 0x00 */ S1_unk_D_86002F58_004_000_000 unk_00;
-    /* 0x18 */ Gfx* displayList; // func_80038AF4's arg3
+    /* 0x18 */ Gfx* displayList; // GeoNode_CreateDisplayList's arg3
 };
 typedef struct S1_unk_D_86002F34_alt10 S1_unk_D_86002F34_alt10;
 struct S1_unk_D_86002F34_alt10 {
@@ -2076,7 +2076,7 @@ typedef struct S1_unk_D_800ABCC0_008 S1_unk_D_800ABCC0_008;
 typedef struct S1_unk_D_800ABCC0 S1_unk_D_800ABCC0;
 typedef struct S1_unk_D_86002F58_004_000_040_004 S1_unk_D_86002F58_004_000_040_004;
 struct S1_unk_D_800ABCC0_008 {
-    /* 0x00 */ u8 translationKeyCount; // func_8003DE20: ==1 means a static (non-animated) value
+    /* 0x00 */ u8 translationKeyCount; // ModelAnim_EvaluateTranslationChannel: ==1 means a static (non-animated) value
     /* 0x01 */ u8 rotationKeyCount;
     /* 0x02 */ u8 scaleKeyCount;
     /* 0x03 */ u8 unk_03;
@@ -2208,7 +2208,7 @@ struct S1_unk_D_800ABE00_cmd9 {
 typedef struct S1_unk_D_800ABE00_cmdA S1_unk_D_800ABE00_cmdA;
 struct S1_unk_D_800ABE00_cmdA {
     /* 0x00 */ u8 cmd;
-    /* 0x04 */ S1_GraphNode* refNode; // func_80037EE8's arg1
+    /* 0x04 */ S1_GraphNode* refNode; // GeoNode_CreateWithReference's arg1
 };
 typedef struct S1_unk_D_800ABE00_cmdB S1_unk_D_800ABE00_cmdB;
 struct S1_unk_D_800ABE00_cmdB {
@@ -2311,11 +2311,11 @@ struct S1_unk_D_800ABE00_cmd1C {
 typedef struct S1_unk_D_800ABE00_cmd1D S1_unk_D_800ABE00_cmd1D;
 struct S1_unk_D_800ABE00_cmd1D {
     /* 0x00 */ u8 cmd;
-    /* 0x01 */ u8 partIndex; // func_80038770's arg2
-    /* 0x02 */ u8 flags; // bit0/bit1 remapped into func_80038770's arg3
-    /* 0x03 */ u8 animIndex; // func_80038770's arg4
-    /* 0x04 */ S1_Vec3s rotationA; // func_80038770's arg5
-    /* 0x0A */ S1_Vec3s rotationB; // func_80038770's arg6
+    /* 0x01 */ u8 partIndex; // GeoNode_CreateAnimatedPart's arg2
+    /* 0x02 */ u8 flags; // bit0/bit1 remapped into GeoNode_CreateAnimatedPart's arg3
+    /* 0x03 */ u8 animIndex; // GeoNode_CreateAnimatedPart's arg4
+    /* 0x04 */ S1_Vec3s rotationA; // GeoNode_CreateAnimatedPart's arg5
+    /* 0x0A */ S1_Vec3s rotationB; // GeoNode_CreateAnimatedPart's arg6
     /* 0x10 */ u32 translateX; // Q16 fixed point, /65536.0f
     /* 0x14 */ u32 translateY;
     /* 0x18 */ u32 translateZ;
@@ -2323,8 +2323,8 @@ struct S1_unk_D_800ABE00_cmd1D {
 typedef struct S1_unk_D_800ABE00_cmd1E S1_unk_D_800ABE00_cmd1E;
 struct S1_unk_D_800ABE00_cmd1E {
     /* 0x00 */ u8 cmd;
-    /* 0x01 */ u8 partIndex; // func_8003882C's arg2
-    /* 0x02 */ s16 unk_02; // func_8003882C's arg4
+    /* 0x01 */ u8 partIndex; // GeoNode_CreateDisplayListPart's arg2
+    /* 0x02 */ s16 unk_02; // GeoNode_CreateDisplayListPart's arg4
     /* 0x04 */ Gfx* displayList;
 };
 typedef struct S1_unk_D_800ABE00_cmd1F S1_unk_D_800ABE00_cmd1F;
@@ -2343,7 +2343,7 @@ struct S1_unk_D_800ABE00_cmd1F {
 typedef struct S1_unk_D_800ABE00_cmd20 S1_unk_D_800ABE00_cmd20;
 struct S1_unk_D_800ABE00_cmd20 {
     /* 0x00 */ u8 cmd;
-    /* 0x01 */ u8 partIndex; // func_80038A1C's arg2
+    /* 0x01 */ u8 partIndex; // GeoNode_CreateDisplayListMatrixFromTransform's arg2
     /* 0x02 */ s16 unk_02;
     /* 0x04 */ s16 rotX; // degrees, scaled (val<<0xF)/180
     /* 0x06 */ s16 rotY;
@@ -2354,7 +2354,7 @@ struct S1_unk_D_800ABE00_cmd20 {
 typedef struct S1_unk_D_800ABE00_cmd21 S1_unk_D_800ABE00_cmd21;
 struct S1_unk_D_800ABE00_cmd21 {
     /* 0x00 */ u8 cmd;
-    /* 0x01 */ u8 partIndex; // func_80038A70's arg2
+    /* 0x01 */ u8 partIndex; // GeoNode_CreateScale's arg2
     /* 0x02 */ S1_Vec3s position;
     /* 0x08 */ u32 scale; // Q16 fixed point, /65536.0f
     /* 0x0C */ Gfx* displayList;
@@ -2362,7 +2362,7 @@ struct S1_unk_D_800ABE00_cmd21 {
 typedef struct S1_unk_D_800ABE00_cmd22 S1_unk_D_800ABE00_cmd22;
 struct S1_unk_D_800ABE00_cmd22 {
     /* 0x00 */ u8 cmd;
-    /* 0x01 */ u8 partIndex; // func_80038AF4's arg2
+    /* 0x01 */ u8 partIndex; // GeoNode_CreateDisplayList's arg2
     /* 0x04 */ Gfx* displayList;
 };
 typedef struct S1_unk_D_800ABE00_cmd23 S1_unk_D_800ABE00_cmd23;
@@ -2381,7 +2381,7 @@ struct S1_unk_D_800ABE00_cmd23 {
 typedef struct S1_unk_D_800ABE00_cmd24 S1_unk_D_800ABE00_cmd24;
 struct S1_unk_D_800ABE00_cmd24 {
     /* 0x00 */ u8 cmd;
-    /* 0x02 */ s16 anchorId; // func_80038BF8's arg2
+    /* 0x02 */ s16 anchorId; // GeoNode_CreateAnchor's arg2
 };
 typedef struct S1_unk_D_800ABE00_cmd26 S1_unk_D_800ABE00_cmd26;
 struct S1_unk_D_800ABE00_cmd26 {
@@ -2405,7 +2405,7 @@ struct S1_arg1_func_80019420 {
     /* 0x02 */ s16 unk_02;
     /* 0x04 */ void* unk_04;
 };
-void func_80036A38(S1_MtxF* arg0, S1_MtxF* arg1, S1_MtxF* arg2) {
+void MtxF_Multiply(S1_MtxF* arg0, S1_MtxF* arg1, S1_MtxF* arg2) {
     f32 entry0;
     f32 entry1;
     f32 entry2;
@@ -2448,7 +2448,7 @@ void func_80036A38(S1_MtxF* arg0, S1_MtxF* arg1, S1_MtxF* arg2) {
 #endif
 
 #ifdef VERSION_US
-void func_80036C6C(S1_MtxF* dest, S1_MtxF* mtx, S1_Vec3f* s) {
+void MtxF_ScaleRows(S1_MtxF* dest, S1_MtxF* mtx, S1_Vec3f* s) {
     s32 i;
 
     for (i = 0; i < 4; i++) {
@@ -2465,7 +2465,7 @@ void func_80036C6C(S1_MtxF* dest, S1_MtxF* mtx, S1_Vec3f* s) {
 #endif
 
 #ifdef VERSION_US
-void func_80036E34(S1_MtxF* arg0, S1_Vec3s* arg1) {
+void MtxF_TransformVec3s(S1_MtxF* arg0, S1_Vec3s* arg1) {
     f32 entry0 = arg1->x;
     f32 entry1 = arg1->y;
     f32 entry2 = arg1->z;
@@ -2483,14 +2483,14 @@ void func_80036E34(S1_MtxF* arg0, S1_Vec3s* arg1) {
 #ifdef VERSION_US
 extern void func_80036714(S1_MtxF *, s32, s32, s32, f32);
 extern void func_8003614C(void *, s32, s32);
-void func_800370A4(S1_MtxF *arg0, s32 arg1, s32 arg2, S1_Vec3f *arg3, s32 arg4, s32 arg5) {
+void MtxF_BuildTransform(S1_MtxF *arg0, s32 arg1, s32 arg2, S1_Vec3f *arg3, s32 arg4, s32 arg5) {
     S1_MtxF sp60;
     S1_MtxF sp20;
 
     func_80036714(&sp60, arg4, arg5, arg1, 1.0f);
     func_8003614C(&sp20, (s32) &D_800948D0, arg2);
-    func_80036A38(&sp20, &sp20, &sp60);
-    func_80036C6C(arg0, &sp20, arg3);
+    MtxF_Multiply(&sp20, &sp20, &sp60);
+    MtxF_ScaleRows(arg0, &sp20, arg3);
 }
 #endif
 
@@ -2503,7 +2503,7 @@ void func_800370A4(S1_MtxF *arg0, s32 arg1, s32 arg2, S1_Vec3f *arg3, s32 arg4, 
 #endif
 
 #ifdef VERSION_US
-s16 func_80037250(s16 current, s16 target, s16 inc) {
+s16 Math_StepToS(s16 current, s16 target, s16 inc) {
     s16 temp_v0 = target - current;
 
     if (temp_v0 < 0) {
@@ -2523,7 +2523,7 @@ s16 func_80037250(s16 current, s16 target, s16 inc) {
 #endif
 
 #ifdef VERSION_US
-s32 func_800372CC(s32 current, s32 target, s32 inc, s32 dec) {
+s32 Math_StepToS32(s32 current, s32 target, s32 inc, s32 dec) {
     if (current < target) {
         current += inc;
         if (current > target) {
@@ -2540,7 +2540,7 @@ s32 func_800372CC(s32 current, s32 target, s32 inc, s32 dec) {
 #endif
 
 #ifdef VERSION_US
-f32 func_8003730C(f32 current, f32 target, f32 inc, f32 dec) {
+f32 Math_StepToF(f32 current, f32 target, f32 inc, f32 dec) {
     if (current < target) {
         current += inc;
         if (current > target) {
@@ -2572,7 +2572,7 @@ s16 func_80037360(s16* arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-void func_800373D0(f32 arg0, f32 arg1, f32 arg2, S1_Vec3f* arg3) {
+void Color_RGBToHSV(f32 arg0, f32 arg1, f32 arg2, S1_Vec3f* arg3) {
     f32 temp_ft4;
     f32 var_ft5;
     f32 var_fv0;
@@ -2634,19 +2634,19 @@ void func_800373D0(f32 arg0, f32 arg1, f32 arg2, S1_Vec3f* arg3) {
 #endif
 
 #ifdef VERSION_US
-void func_80037580(S1_Color_RGBA8_u32 arg0, S1_Vec3f* arg1) {
-    func_800373D0((s32)arg0.r / 255.0f, (s32)arg0.g / 255.0f, (s32)arg0.b / 255.0f, arg1);
+void Color_RGBA8ToHSV(S1_Color_RGBA8_u32 arg0, S1_Vec3f* arg1) {
+    Color_RGBToHSV((s32)arg0.r / 255.0f, (s32)arg0.g / 255.0f, (s32)arg0.b / 255.0f, arg1);
 }
 #endif
 
 #ifdef VERSION_US
-void func_800375E0(u16 arg0, S1_Vec3f* arg1) {
-    func_800373D0(((arg0 & 0xF800) >> 0xB) / 31.0f, ((arg0 & 0x7C0) >> 6) / 31.0f, ((arg0 & 0x3E) >> 1) / 31.0f, arg1);
+void Color_RGB5551ToHSV(u16 arg0, S1_Vec3f* arg1) {
+    Color_RGBToHSV(((arg0 & 0xF800) >> 0xB) / 31.0f, ((arg0 & 0x7C0) >> 6) / 31.0f, ((arg0 & 0x3E) >> 1) / 31.0f, arg1);
 }
 #endif
 
 #ifdef VERSION_US
-f32 func_80037650(f32 arg0, f32 arg1, f32 arg2) {
+f32 Color_HSVInterpolate(f32 arg0, f32 arg1, f32 arg2) {
     f32 ret;
 
     if (arg0 < 0.0f) {
@@ -2672,7 +2672,7 @@ f32 func_80037650(f32 arg0, f32 arg1, f32 arg2) {
 #endif
 
 #ifdef VERSION_US
-void func_80037790(f32* arg0, f32* arg1, f32* arg2, S1_Vec3f* arg3) {
+void Color_HSVToRGB(f32* arg0, f32* arg1, f32* arg2, S1_Vec3f* arg3) {
     f32 sp24;
     f32 sp20;
     f32 temp_ft4;
@@ -2710,14 +2710,14 @@ void func_80037790(f32* arg0, f32* arg1, f32* arg2, S1_Vec3f* arg3) {
         sp24 = temp_ft4 - sp20;
     }
 
-    *arg0 = func_80037650(arg3->x + 120.0f, sp24, sp20);
-    *arg1 = func_80037650(arg3->x, sp24, sp20);
-    *arg2 = func_80037650(arg3->x - 120.0f, sp24, sp20);
+    *arg0 = Color_HSVInterpolate(arg3->x + 120.0f, sp24, sp20);
+    *arg1 = Color_HSVInterpolate(arg3->x, sp24, sp20);
+    *arg2 = Color_HSVInterpolate(arg3->x - 120.0f, sp24, sp20);
 }
 #endif
 
 #ifdef VERSION_US
-u16 func_80037980(S1_Vec3f* arg0) {
+u16 Color_HSVToRGB5551(S1_Vec3f* arg0) {
     f32 sp2C;
     f32 sp28;
     f32 sp24;
@@ -2725,7 +2725,7 @@ u16 func_80037980(S1_Vec3f* arg0) {
     s32 var_a1;
     s32 var_v1;
 
-    func_80037790(&sp2C, &sp28, &sp24, arg0);
+    Color_HSVToRGB(&sp2C, &sp28, &sp24, arg0);
 
     var_a1 = (sp2C * 31.0f) + 0.5f;
     if (var_a1 >= 0x20) {
@@ -2747,7 +2747,7 @@ u16 func_80037980(S1_Vec3f* arg0) {
 #endif
 
 #ifdef VERSION_US
-S1_Color_RGBA8_u32* func_80037A34(S1_Color_RGBA8_u32* arg0, S1_Vec3f* arg1, s32 arg2) {
+S1_Color_RGBA8_u32* Color_HSVToRGBA8(S1_Color_RGBA8_u32* arg0, S1_Vec3f* arg1, s32 arg2) {
     f32 sp34;
     f32 sp30;
     f32 sp2C;
@@ -2756,7 +2756,7 @@ S1_Color_RGBA8_u32* func_80037A34(S1_Color_RGBA8_u32* arg0, S1_Vec3f* arg1, s32 
     s32 var_v1;
     S1_Color_RGBA8_u32 sp1C;
 
-    func_80037790(&sp34, &sp30, &sp2C, arg1);
+    Color_HSVToRGB(&sp34, &sp30, &sp2C, arg1);
 
     var_a1 = (sp34 * 255.0f) + 0.5f;
     if (var_a1 >= 0x100) {
@@ -2793,7 +2793,7 @@ S1_Color_RGBA8_u32* func_80037A34(S1_Color_RGBA8_u32* arg0, S1_Vec3f* arg1, s32 
 #endif
 
 #ifdef VERSION_US
-void func_80037E00(S1_GraphNode* arg0, u8 arg1) {
+void GeoNode_Init(S1_GraphNode* arg0, u8 arg1) {
     if (arg0 != NULL) {
         arg0->unk_00 = arg1;
         arg0->unk_01 = 0x11;
@@ -2829,14 +2829,14 @@ void func_80037E3C(S1_GraphNode* arg0, S1_func_D_86002F34_000_010 arg1, void* ar
 #endif
 
 #ifdef VERSION_US
-S1_unk_D_86002F34_alt2* func_80037EE8(S1_MainPoolState* arg0, S1_unk_D_86002F34_alt2* arg1, S1_GraphNode* arg2) {
+S1_unk_D_86002F34_alt2* GeoNode_CreateWithReference(S1_MainPoolState* arg0, S1_unk_D_86002F34_alt2* arg1, S1_GraphNode* arg2) {
     if (arg0 != NULL) {
-        arg1 = func_8000318C(arg0, sizeof(S1_unk_D_86002F34_alt2), 4);
+        arg1 = MainPool_AllocAligned(arg0, sizeof(S1_unk_D_86002F34_alt2), 4);
     }
 
     if (arg1 != NULL) {
         arg1->unk_18 = arg2;
-        func_80037E00(arg1, 1);
+        GeoNode_Init(arg1, 1);
     }
 
     return arg1;
@@ -2848,14 +2848,14 @@ S1_unk_D_86002F34_alt2* func_80037EE8(S1_MainPoolState* arg0, S1_unk_D_86002F34_
 #endif
 
 #ifdef VERSION_US
-S1_unk_D_86002F34_alt13* func_80038004(S1_MemoryBlock* arg0, S1_unk_D_86002F34_alt13* arg1, s16 arg2) {
+S1_unk_D_86002F34_alt13* GeoNode_CreateType3(S1_MemoryBlock* arg0, S1_unk_D_86002F34_alt13* arg1, s16 arg2) {
     if (arg0 != NULL) {
-        arg1 = func_8000318C(arg0, sizeof(S1_unk_D_86002F34_alt13), 4);
+        arg1 = MainPool_AllocAligned(arg0, sizeof(S1_unk_D_86002F34_alt13), 4);
     }
 
     if (arg1 != NULL) {
         arg1->unk_18 = arg2;
-        func_80037E00(arg1, 3);
+        GeoNode_Init(arg1, 3);
     }
 
     return arg1;
@@ -2863,15 +2863,15 @@ S1_unk_D_86002F34_alt13* func_80038004(S1_MemoryBlock* arg0, S1_unk_D_86002F34_a
 #endif
 
 #ifdef VERSION_US
-S1_unk_D_86002F34_alt1* func_8003805C(S1_MemoryBlock* arg0, S1_unk_D_86002F34_alt1* arg1, s16 arg2) {
+S1_unk_D_86002F34_alt1* GeoNode_CreateType4(S1_MemoryBlock* arg0, S1_unk_D_86002F34_alt1* arg1, s16 arg2) {
     if (arg0 != NULL) {
-        arg1 = func_8000318C(arg0, sizeof(S1_unk_D_86002F34_alt1), 4);
+        arg1 = MainPool_AllocAligned(arg0, sizeof(S1_unk_D_86002F34_alt1), 4);
     }
 
     if (arg1 != NULL) {
         arg1->unk_18 = arg2;
         arg1->unk_1A = 0;
-        func_80037E00(arg1, 4);
+        GeoNode_Init(arg1, 4);
     }
 
     return arg1;
@@ -2887,17 +2887,17 @@ S1_unk_D_86002F34_alt1* func_8003805C(S1_MemoryBlock* arg0, S1_unk_D_86002F34_al
 #endif
 
 #ifdef VERSION_US
-S1_unk_D_86002F34_alt16* func_80038180(S1_MainPoolState* arg0, S1_unk_D_86002F34_alt16* arg1, u8 arg2, u8 arg3, u8 arg4) {
+S1_unk_D_86002F34_alt16* GeoNode_CreateBackground(S1_MainPoolState* arg0, S1_unk_D_86002F34_alt16* arg1, u8 arg2, u8 arg3, u8 arg4) {
     u32 temp_v0;
 
     if (arg0 != NULL) {
-        arg1 = func_8000318C(arg0, sizeof(S1_unk_D_86002F34_alt16), 4);
+        arg1 = MainPool_AllocAligned(arg0, sizeof(S1_unk_D_86002F34_alt16), 4);
     }
 
     if (arg1 != NULL) {
         temp_v0 = ((arg2 >> 3) << 0xB) | ((arg3 >> 3) << 6) | ((arg4 >> 3) << 1) | 1;
         arg1->unk_18 = (temp_v0 << 0x10) | temp_v0;
-        func_80037E00(arg1, 7);
+        GeoNode_Init(arg1, 7);
     }
     return arg1;
 }
@@ -2909,11 +2909,11 @@ s32 func_8003820C(s32 arg0, s32 arg1) {
 
     var_a2 = arg1;
     if (arg0 != 0) {
-        var_a2 = (s32)(u32)func_8000318C((void *)(u32)arg0, 0x18, 4);
+        var_a2 = (s32)(u32)MainPool_AllocAligned((void *)(u32)arg0, 0x18, 4);
     }
     if (var_a2 != 0) {
         arg1 = var_a2;
-        func_80037E00((S1_GraphNode *) var_a2, 8U);
+        GeoNode_Init((S1_GraphNode *) var_a2, 8U);
         var_a2 = arg1;
     }
     return var_a2;
@@ -2921,16 +2921,16 @@ s32 func_8003820C(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-S1_unk_D_8690A610* func_80038258(s32 arg0, S1_unk_D_8690A610* arg1, s16 arg2, s16 arg3, u8 r, u8 g, u8 b, u8 a) {
+S1_unk_D_8690A610* GeoNode_CreateFog(s32 arg0, S1_unk_D_8690A610* arg1, s16 arg2, s16 arg3, u8 r, u8 g, u8 b, u8 a) {
     if (arg0 != 0) {
-        arg1 = func_8000318C((void *)(u32)arg0, sizeof(S1_unk_D_8690A610), 4);
+        arg1 = MainPool_AllocAligned((void *)(u32)arg0, sizeof(S1_unk_D_8690A610), 4);
     }
 
     if (arg1 != NULL) {
         arg1->unk_18.fogNear = arg2;
         arg1->unk_18.fogFar = arg3;
         arg1->unk_18.fogColor.rgba = (r << 0x18) | (g << 0x10) | (b << 8) | a;
-        func_80037E00(arg1, 0xA);
+        GeoNode_Init(arg1, 0xA);
     }
 
     return arg1;
@@ -2956,16 +2956,16 @@ void func_800383DC(void *arg0, s16 arg1, s16 arg2) {
 #endif
 
 #ifdef VERSION_US
-S1_unk_D_86002F34_alt19* func_8003840C(S1_MainPoolState* arg0, S1_unk_D_86002F34_alt19* arg1, u8 r, u8 g, u8 b) {
+S1_unk_D_86002F34_alt19* GeoNode_CreateAmbientLight(S1_MainPoolState* arg0, S1_unk_D_86002F34_alt19* arg1, u8 r, u8 g, u8 b) {
     if (arg0 != NULL) {
-        arg1 = func_8000318C(arg0, sizeof(S1_unk_D_86002F34_alt19), 4);
+        arg1 = MainPool_AllocAligned(arg0, sizeof(S1_unk_D_86002F34_alt19), 4);
     }
 
     if (arg1 != NULL) {
         arg1->r = r;
         arg1->g = g;
         arg1->b = b;
-        func_80037E00(arg1, 0xD);
+        GeoNode_Init(arg1, 0xD);
     }
 
     return arg1;
@@ -2978,11 +2978,11 @@ s32 func_80038474(s32 arg0, s32 arg1) {
 
     var_a2 = arg1;
     if (arg0 != 0) {
-        var_a2 = (s32)(u32)func_8000318C((void *)(u32)arg0, 0x18, 4);
+        var_a2 = (s32)(u32)MainPool_AllocAligned((void *)(u32)arg0, 0x18, 4);
     }
     if (var_a2 != 0) {
         arg1 = var_a2;
-        func_80037E00((S1_GraphNode *) var_a2, 0x1DU);
+        GeoNode_Init((S1_GraphNode *) var_a2, 0x1DU);
         var_a2 = arg1;
     }
     return var_a2;
@@ -2994,10 +2994,10 @@ s32 func_80038474(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-S1_unk_D_86002F34_alt12* func_8003854C(S1_MainPoolState* arg0, S1_unk_D_86002F34_alt12* arg1, s16 arg2, s16 arg3, s16 arg4,
+S1_unk_D_86002F34_alt12* GeoNode_CreateShadow(S1_MainPoolState* arg0, S1_unk_D_86002F34_alt12* arg1, s16 arg2, s16 arg3, s16 arg4,
                                     s16 arg5) {
     if (arg0 != NULL) {
-        arg1 = func_8000318C(arg0, sizeof(S1_unk_D_86002F34_alt12), 4);
+        arg1 = MainPool_AllocAligned(arg0, sizeof(S1_unk_D_86002F34_alt12), 4);
     }
 
     if (arg1 != NULL) {
@@ -3005,7 +3005,7 @@ S1_unk_D_86002F34_alt12* func_8003854C(S1_MainPoolState* arg0, S1_unk_D_86002F34
         arg1->unk_1A = arg3;
         arg1->unk_1C = arg4;
         arg1->unk_1E = arg5;
-        func_80037E00(arg1, 0xF);
+        GeoNode_Init(arg1, 0xF);
     }
 
     return arg1;
@@ -3013,15 +3013,15 @@ S1_unk_D_86002F34_alt12* func_8003854C(S1_MainPoolState* arg0, S1_unk_D_86002F34
 #endif
 
 #ifdef VERSION_US
-S1_unk_D_86002F34_alt20* func_800385BC(S1_MainPoolState* arg0, S1_unk_D_86002F34_alt20* arg1, s16 arg2, s16 arg3) {
+S1_unk_D_86002F34_alt20* GeoNode_CreateCullDistance(S1_MainPoolState* arg0, S1_unk_D_86002F34_alt20* arg1, s16 arg2, s16 arg3) {
     if (arg0 != NULL) {
-        arg1 = func_8000318C(arg0, sizeof(S1_unk_D_86002F34_alt20), 4);
+        arg1 = MainPool_AllocAligned(arg0, sizeof(S1_unk_D_86002F34_alt20), 4);
     }
 
     if (arg1 != NULL) {
         arg1->unk_18 = arg2;
         arg1->unk_1A = arg3;
-        func_80037E00(arg1, 0x10);
+        GeoNode_Init(arg1, 0x10);
     }
 
     return arg1;
@@ -3029,15 +3029,15 @@ S1_unk_D_86002F34_alt20* func_800385BC(S1_MainPoolState* arg0, S1_unk_D_86002F34
 #endif
 
 #ifdef VERSION_US
-S1_unk_D_86002F34_alt21* func_8003861C(S1_MainPoolState* arg0, S1_unk_D_86002F34_alt21* arg1, s16 arg2, s16 arg3) {
+S1_unk_D_86002F34_alt21* GeoNode_CreateSwitchCase(S1_MainPoolState* arg0, S1_unk_D_86002F34_alt21* arg1, s16 arg2, s16 arg3) {
     if (arg0 != NULL) {
-        arg1 = func_8000318C(arg0, sizeof(S1_unk_D_86002F34_alt21), 4);
+        arg1 = MainPool_AllocAligned(arg0, sizeof(S1_unk_D_86002F34_alt21), 4);
     }
 
     if (arg1 != NULL) {
         arg1->unk_18 = arg2;
         arg1->unk_1A = arg3;
-        func_80037E00(arg1, 0x11);
+        GeoNode_Init(arg1, 0x11);
     }
 
     return arg1;
@@ -3045,15 +3045,15 @@ S1_unk_D_86002F34_alt21* func_8003861C(S1_MainPoolState* arg0, S1_unk_D_86002F34
 #endif
 
 #ifdef VERSION_US
-S1_unk_D_86002F34_alt5* func_8003867C(S1_MainPoolState* arg0, S1_unk_D_86002F34_alt5* arg1, S1_Vec3f* arg2, S1_Vec3s* arg3) {
+S1_unk_D_86002F34_alt5* GeoNode_CreateTranslateRotate(S1_MainPoolState* arg0, S1_unk_D_86002F34_alt5* arg1, S1_Vec3f* arg2, S1_Vec3s* arg3) {
     if (arg0 != NULL) {
-        arg1 = func_8000318C(arg0, sizeof(S1_unk_D_86002F34_alt5), 4);
+        arg1 = MainPool_AllocAligned(arg0, sizeof(S1_unk_D_86002F34_alt5), 4);
     }
 
     if (arg1 != NULL) {
         arg1->unk_18 = *arg2;
         arg1->unk_24 = *arg3;
-        func_80037E00(arg1, 0x12);
+        GeoNode_Init(arg1, 0x12);
     }
 
     return arg1;
@@ -3061,14 +3061,14 @@ S1_unk_D_86002F34_alt5* func_8003867C(S1_MainPoolState* arg0, S1_unk_D_86002F34_
 #endif
 
 #ifdef VERSION_US
-S1_unk_D_86002F34_alt22* func_80038704(S1_MainPoolState* arg0, S1_unk_D_86002F34_alt22* arg1, S1_Vec3f* arg2) {
+S1_unk_D_86002F34_alt22* GeoNode_CreateTranslate(S1_MainPoolState* arg0, S1_unk_D_86002F34_alt22* arg1, S1_Vec3f* arg2) {
     if (arg0 != NULL) {
-        arg1 = func_8000318C(arg0, sizeof(S1_unk_D_86002F34_alt22), 4);
+        arg1 = MainPool_AllocAligned(arg0, sizeof(S1_unk_D_86002F34_alt22), 4);
     }
 
     if (arg1 != NULL) {
         arg1->unk_18 = *arg2;
-        func_80037E00(arg1, 0x13);
+        GeoNode_Init(arg1, 0x13);
     }
 
     return arg1;
@@ -3076,10 +3076,10 @@ S1_unk_D_86002F34_alt22* func_80038704(S1_MainPoolState* arg0, S1_unk_D_86002F34
 #endif
 
 #ifdef VERSION_US
-S1_unk_D_86002F34_alt6* func_80038770(S1_MainPoolState* arg0, S1_unk_D_86002F34_alt6* arg1, s16 arg2, s16 arg3, s16 arg4,
+S1_unk_D_86002F34_alt6* GeoNode_CreateAnimatedPart(S1_MainPoolState* arg0, S1_unk_D_86002F34_alt6* arg1, s16 arg2, s16 arg3, s16 arg4,
                                    S1_Vec3s* arg5, S1_Vec3s* arg6, S1_Vec3f* arg7) {
     if (arg0 != NULL) {
-        arg1 = func_8000318C(arg0, sizeof(S1_unk_D_86002F34_alt6), 4);
+        arg1 = MainPool_AllocAligned(arg0, sizeof(S1_unk_D_86002F34_alt6), 4);
     }
 
     if (arg1 != NULL) {
@@ -3089,7 +3089,7 @@ S1_unk_D_86002F34_alt6* func_80038770(S1_MainPoolState* arg0, S1_unk_D_86002F34_
         arg1->unk_30 = arg2;
         arg1->unk_31 = arg3;
         arg1->unk_32 = arg4;
-        func_80037E00(arg1, 0x14);
+        GeoNode_Init(arg1, 0x14);
     }
 
     return arg1;
@@ -3097,15 +3097,15 @@ S1_unk_D_86002F34_alt6* func_80038770(S1_MainPoolState* arg0, S1_unk_D_86002F34_
 #endif
 
 #ifdef VERSION_US
-S1_unk_D_86002F34_alt7* func_8003882C(S1_MainPoolState* arg0, S1_unk_D_86002F34_alt7* arg1, s32 arg2, Gfx* arg3, s16 arg4) {
+S1_unk_D_86002F34_alt7* GeoNode_CreateDisplayListPart(S1_MainPoolState* arg0, S1_unk_D_86002F34_alt7* arg1, s32 arg2, Gfx* arg3, s16 arg4) {
     if (arg0 != NULL) {
-        arg1 = func_8000318C(arg0, sizeof(S1_unk_D_86002F34_alt7), 4);
+        arg1 = MainPool_AllocAligned(arg0, sizeof(S1_unk_D_86002F34_alt7), 4);
     }
 
     if (arg1 != NULL) {
         arg1->unk_18 = arg3;
         arg1->unk_1C = arg4;
-        func_80037E00(arg1, 0x15);
+        GeoNode_Init(arg1, 0x15);
         arg1->unk_00.unk_03 = arg2;
     }
 
@@ -3123,7 +3123,7 @@ S1_unk_D_86002F34_alt7* func_8003882C(S1_MainPoolState* arg0, S1_unk_D_86002F34_
 
 #ifdef VERSION_US
 extern void func_8003899C(s32, s32, s32, s32, void *);
-void func_80038A1C(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
+void GeoNode_CreateDisplayListMatrixFromTransform(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
     s32 temp[16];
     func_8003614C(temp, arg4, arg5);
     func_8003899C(arg0, arg1, arg2, arg3, temp);
@@ -3131,17 +3131,17 @@ void func_80038A1C(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
 #endif
 
 #ifdef VERSION_US
-S1_unk_D_86002F34_alt9* func_80038A70(S1_MainPoolState* arg0, S1_unk_D_86002F34_alt9* arg1, s32 arg2, Gfx* arg3, S1_Vec3f* arg4,
+S1_unk_D_86002F34_alt9* GeoNode_CreateScale(S1_MainPoolState* arg0, S1_unk_D_86002F34_alt9* arg1, s32 arg2, Gfx* arg3, S1_Vec3f* arg4,
                                    f32 arg5) {
     if (arg0 != NULL) {
-        arg1 = func_8000318C(arg0, sizeof(S1_unk_D_86002F34_alt9), 4);
+        arg1 = MainPool_AllocAligned(arg0, sizeof(S1_unk_D_86002F34_alt9), 4);
     }
 
     if (arg1 != NULL) {
         arg1->unk_1C = *arg4;
         arg1->unk_28 = arg5;
         arg1->unk_18 = arg3;
-        func_80037E00(arg1, 0x18);
+        GeoNode_Init(arg1, 0x18);
         arg1->unk_00.unk_03 = arg2;
     }
 
@@ -3150,14 +3150,14 @@ S1_unk_D_86002F34_alt9* func_80038A70(S1_MainPoolState* arg0, S1_unk_D_86002F34_
 #endif
 
 #ifdef VERSION_US
-S1_unk_func_80011B94* func_80038AF4(S1_MainPoolState* arg0, S1_unk_func_80011B94* arg1, s32 arg2, Gfx* arg3) {
+S1_unk_func_80011B94* GeoNode_CreateDisplayList(S1_MainPoolState* arg0, S1_unk_func_80011B94* arg1, s32 arg2, Gfx* arg3) {
     if (arg0 != NULL) {
-        arg1 = func_8000318C(arg0, sizeof(S1_unk_func_80011B94), 4);
+        arg1 = MainPool_AllocAligned(arg0, sizeof(S1_unk_func_80011B94), 4);
     }
 
     if (arg1 != NULL) {
         arg1->displayList = arg3;
-        func_80037E00(arg1, 0x19);
+        GeoNode_Init(arg1, 0x19);
         arg1->unk_00.unk_03 = arg2;
     }
 
@@ -3166,10 +3166,10 @@ S1_unk_func_80011B94* func_80038AF4(S1_MainPoolState* arg0, S1_unk_func_80011B94
 #endif
 
 #ifdef VERSION_US
-S1_unk_D_86002F34_alt10* func_80038B54(S1_MainPoolState* arg0, S1_unk_D_86002F34_alt10* arg1, s16 arg2, s16 arg3, Gfx* arg4,
+S1_unk_D_86002F34_alt10* GeoNode_CreateShadowTexture(S1_MainPoolState* arg0, S1_unk_D_86002F34_alt10* arg1, s16 arg2, s16 arg3, Gfx* arg4,
                                     s16 arg5, s16 arg6, u8 r, u8 g, u8 b, u8 a) {
     if (arg0 != NULL) {
-        arg1 = func_8000318C(arg0, sizeof(S1_unk_D_86002F34_alt10), 4);
+        arg1 = MainPool_AllocAligned(arg0, sizeof(S1_unk_D_86002F34_alt10), 4);
     }
 
     if (arg1 != NULL) {
@@ -3179,7 +3179,7 @@ S1_unk_D_86002F34_alt10* func_80038B54(S1_MainPoolState* arg0, S1_unk_D_86002F34
         arg1->unk_1C = arg5;
         arg1->unk_1E = arg6;
         arg1->unk_24.rgba = (r << 0x18) | (g << 0x10) | (b << 8) | a;
-        func_80037E00(arg1, 0x1A);
+        GeoNode_Init(arg1, 0x1A);
     }
 
     return arg1;
@@ -3187,14 +3187,14 @@ S1_unk_D_86002F34_alt10* func_80038B54(S1_MainPoolState* arg0, S1_unk_D_86002F34
 #endif
 
 #ifdef VERSION_US
-S1_unk_D_86002F34_alt23* func_80038BF8(S1_MainPoolState* arg0, S1_unk_D_86002F34_alt23* arg1, s16 arg2) {
+S1_unk_D_86002F34_alt23* GeoNode_CreateAnchor(S1_MainPoolState* arg0, S1_unk_D_86002F34_alt23* arg1, s16 arg2) {
     if (arg0 != NULL) {
-        arg1 = func_8000318C(arg0, sizeof(S1_unk_D_86002F34_alt23), 4);
+        arg1 = MainPool_AllocAligned(arg0, sizeof(S1_unk_D_86002F34_alt23), 4);
     }
 
     if (arg1 != NULL) {
         arg1->unk_18 = arg2;
-        func_80037E00(arg1, 0x1B);
+        GeoNode_Init(arg1, 0x1B);
     }
 
     return arg1;
@@ -3202,10 +3202,10 @@ S1_unk_D_86002F34_alt23* func_80038BF8(S1_MainPoolState* arg0, S1_unk_D_86002F34
 #endif
 
 #ifdef VERSION_US
-S1_unk_D_86002F34_alt24* func_80038C50(S1_MainPoolState* arg0, S1_unk_D_86002F34_alt24* arg1, s32 arg2, s16 arg3, s16 arg4,
+S1_unk_D_86002F34_alt24* GeoNode_CreateGroup(S1_MainPoolState* arg0, S1_unk_D_86002F34_alt24* arg1, s32 arg2, s16 arg3, s16 arg4,
                                     s16 arg5, s16 arg6, s16 arg7, s16 arg8, s32 arg9, u8 r, u8 g, u8 b, u8 a) {
     if (arg0 != NULL) {
-        arg1 = func_8000318C(arg0, sizeof(S1_unk_D_86002F34_alt24), 4);
+        arg1 = MainPool_AllocAligned(arg0, sizeof(S1_unk_D_86002F34_alt24), 4);
     }
 
     if (arg1 != NULL) {
@@ -3217,7 +3217,7 @@ S1_unk_D_86002F34_alt24* func_80038C50(S1_MainPoolState* arg0, S1_unk_D_86002F34
         arg1->unk_1A = arg8;
         arg1->unk_24 = arg9;
         arg1->unk_28.rgba = (r << 0x18) | (g << 0x10) | (b << 8) | a;
-        func_80037E00(arg1, 0x1C);
+        GeoNode_Init(arg1, 0x1C);
         arg1->unk_00.unk_03 = arg2;
     }
 
@@ -3226,7 +3226,7 @@ S1_unk_D_86002F34_alt24* func_80038C50(S1_MainPoolState* arg0, S1_unk_D_86002F34
 #endif
 
 #ifdef VERSION_US
-void func_80038D0C(S1_unk_D_86002F34_00C* arg0, s16 arg1, s16 arg2, s16 arg3, s16 arg4) {
+void GeoCamera_SetViewport(S1_unk_D_86002F34_00C* arg0, s16 arg1, s16 arg2, s16 arg3, s16 arg4) {
     arg0->unk_18.x = arg1;
     arg0->unk_18.y = arg2;
     arg0->unk_18.width = arg3;
@@ -3243,7 +3243,7 @@ void func_80038D0C(S1_unk_D_86002F34_00C* arg0, s16 arg1, s16 arg2, s16 arg3, s1
 #endif
 
 #ifdef VERSION_US
-void func_80038DC8(S1_unk_D_86002F34_00C* arg0, f32 arg1, f32 arg2, f32 arg3) {
+void GeoCamera_SetPerspective(S1_unk_D_86002F34_00C* arg0, f32 arg1, f32 arg2, f32 arg3) {
     arg0->unk_24.aspect = (f32)arg0->unk_18.width / arg0->unk_18.height;
     arg0->unk_24.fovy = arg1;
     arg0->unk_24.near = arg2;
@@ -3257,7 +3257,7 @@ void func_80038DC8(S1_unk_D_86002F34_00C* arg0, f32 arg1, f32 arg2, f32 arg3) {
 #endif
 
 #ifdef VERSION_US
-void func_80038F10(S1_unk_D_86002F34_00C* arg0, s16 arg1, s16 arg2, u8 arg3, u8 arg4, u8 arg5) {
+void GeoCamera_SetBackground(S1_unk_D_86002F34_00C* arg0, s16 arg1, s16 arg2, u8 arg3, u8 arg4, u8 arg5) {
     S1_unk_D_86002F34_00C_0CC* ptr = &arg0->unk_CC;
 
     if (arg2 < 2) {
@@ -3310,7 +3310,7 @@ typedef struct {
     GraphNodeLink *child;
 } GraphNode38FD4;
 
-void func_80038FD4(GraphNode38FD4 *root, GraphNodeLink *node) {
+void GraphNode_RemoveChild(GraphNode38FD4 *root, GraphNodeLink *node) {
     node->prev->next = node->next;
     node->next->prev = node->prev;
     if (node == root->child) {
@@ -3354,7 +3354,7 @@ void func_80038FD4(GraphNode38FD4 *root, GraphNodeLink *node) {
 #ifdef VERSION_US
 extern u8 D_80124F68;
 
-void *func_80039398(s32 arg0) {
+void *GeoRender_GetMatrix(s32 arg0) {
     void *var_v1;
 
     var_v1 = NULL;
@@ -3378,7 +3378,7 @@ void *func_80039398(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-void func_80039700(S1_unk_D_86002F34_00C_0CC* arg0, S1_unk_D_86002F34_00C_040* arg1) {
+void GeoOverlay_DrawFadeQuad(S1_unk_D_86002F34_00C_0CC* arg0, S1_unk_D_86002F34_00C_040* arg1) {
     Vtx* temp_v0 = func_8003946C(arg0, arg1);
 
     if (temp_v0 != NULL) {
@@ -3411,7 +3411,7 @@ void func_80039700(S1_unk_D_86002F34_00C_0CC* arg0, S1_unk_D_86002F34_00C_040* a
 #endif
 
 #ifdef VERSION_US
-void func_80039D20(S1_unk_D_86002F34_00C_0CC* arg0, UNUSED S1_unk_D_86002F34_00C_040* arg1) {
+void GeoOverlay_DrawRotatingQuad(S1_unk_D_86002F34_00C_0CC* arg0, UNUSED S1_unk_D_86002F34_00C_040* arg1) {
     Vtx* temp_v0 = func_800398F8(arg0);
 
     if (temp_v0 != 0) {
@@ -3459,7 +3459,7 @@ void func_80039D20(S1_unk_D_86002F34_00C_0CC* arg0, UNUSED S1_unk_D_86002F34_00C
 #endif
 
 #ifdef VERSION_US
-void func_8003A14C(S1_unk_D_86002F34_00C_0CC* arg0, S1_unk_D_86002F34_00C_040* arg1) {
+void GeoOverlay_Draw(S1_unk_D_86002F34_00C_0CC* arg0, S1_unk_D_86002F34_00C_040* arg1) {
     if (arg0->unk_00 != 0) {
         gDPPipeSync(D_800D0510++);
 
@@ -3470,9 +3470,9 @@ void func_8003A14C(S1_unk_D_86002F34_00C_0CC* arg0, S1_unk_D_86002F34_00C_040* a
         gSPMatrix(D_800D0510++, (u32)&D_80094890 & 0x1FFFFFFF, G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
 
         if ((arg0->unk_00 == 1) || (arg0->unk_00 == 2) || (arg0->unk_00 == 3)) {
-            func_80039700(arg0, arg1);
+            GeoOverlay_DrawFadeQuad(arg0, arg1);
         } else {
-            func_80039D20(arg0, arg1);
+            GeoOverlay_DrawRotatingQuad(arg0, arg1);
         }
 
         gDPPipeSync(D_800D0510++);
@@ -3500,7 +3500,7 @@ void func_8003A14C(S1_unk_D_86002F34_00C_0CC* arg0, S1_unk_D_86002F34_00C_040* a
 #ifdef VERSION_US
 extern s32 D_8009490C;
 extern void func_8003A2C8(void);
-void func_8003A7CC(s32 arg0) {
+void Geo_NodeType3Pass(s32 arg0) {
     D_8009490C = arg0;
     func_8003A2C8();
     D_8009490C = 0;
@@ -3628,7 +3628,7 @@ void func_8003B690(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8003A2C8(void); void func_8003C370(void) { func_8003A2C8(); }
+extern void func_8003A2C8(void); void Geo_NodeGroup(void) { func_8003A2C8(); }
 #endif
 
 #ifdef VERSION_US
@@ -3650,13 +3650,13 @@ void func_8003C964(s32 value) { D_80094900 = value; }
 
 #ifdef VERSION_US
 extern u16 D_80094904;
-void func_8003C970(void) { D_80094904++; }
+void GeoRender_AdvanceFrameCounter(void) { D_80094904++; }
 #endif
 
 #ifdef VERSION_US
 typedef struct { char pad[0x1A]; u16 unk_1A; } ModelFrame;
 extern ModelFrame *D_80094910; extern u16 D_80094904;
-s32 func_8003C988(void) { s32 var_v1 = 1; if (D_80094910 != NULL) { var_v1 = D_80094910->unk_1A == D_80094904; } return var_v1; }
+s32 GeoRender_IsModelFrameCurrent(void) { s32 var_v1 = 1; if (D_80094910 != NULL) { var_v1 = D_80094910->unk_1A == D_80094904; } return var_v1; }
 #endif
 
 #ifdef VERSION_US
@@ -3720,7 +3720,7 @@ s32 func_8003CD58(s32 arg0) { s32 var_v1; if ((arg0 != 0) && (arg0 != 5) && (arg
 extern void func_8003CC14();
 extern void *D_801263A8;
 
-void func_8003D08C(s32 arg0) {
+void GeoRender_RestoreRenderMode(s32 arg0) {
     if ((*(s32 *)((u8 *)(D_801263A8) + (0x14))) & 0xFF) {
         func_8003CC14();
     }
@@ -3775,7 +3775,7 @@ void func_8003D7B8(s16 arg0) {
 #endif
 
 #ifdef VERSION_US
-void func_8003DAF0(s32 arg0, s32 arg1, s32 arg2) {
+void GeoRender_SetMaterialParams(s32 arg0, s32 arg1, s32 arg2) {
     s32 *p0 = &arg0;
     s32 *p1 = &arg1;
     *(s32 *)(D_801261B0 + 8) = *p0;
@@ -3789,7 +3789,7 @@ typedef union CandidateColor {
     struct { u8 r, g, b, a; };
     u32 rgba;
 } CandidateColor;
-void func_8003DB10(s32 arg0, CandidateColor arg1, void *arg2, void *arg3, s32 arg4) {
+void GeoRender_SetMaterialTexture(s32 arg0, CandidateColor arg1, void *arg2, void *arg3, s32 arg4) {
     D_801261B0[0] = arg0;
     *(s32 *)(D_801261B0 + 4) = arg1.rgba;
     *(void **)(D_801261B0 + 0xC) = arg2;
@@ -3807,7 +3807,7 @@ void func_8003DB10(s32 arg0, CandidateColor arg1, void *arg2, void *arg3, s32 ar
 #endif
 
 #ifdef VERSION_US
-f32 func_8003DE20(S1_unk_D_800ABCC0* arg0, s32 arg1) {
+f32 ModelAnim_EvaluateTranslationChannel(S1_unk_D_800ABCC0* arg0, s32 arg1) {
     f32 ret;
     s32 var_a2;
     S1_unk_D_800ABCC0_008* temp_v0 = &arg0->channels[arg1];
@@ -3829,7 +3829,7 @@ f32 func_8003DE20(S1_unk_D_800ABCC0* arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-s16 func_8003DED4(S1_unk_D_800ABCC0* arg0, s32 arg1) {
+s16 ModelAnim_EvaluateRotationChannel(S1_unk_D_800ABCC0* arg0, s32 arg1) {
     s32 var_a1;
     s16 var_v1;
     S1_unk_D_800ABCC0_008* temp_v0 = &arg0->channels[arg1];
@@ -3849,7 +3849,7 @@ s16 func_8003DED4(S1_unk_D_800ABCC0* arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-f32 func_8003DF68(S1_unk_D_800ABCC0* arg0, s32 arg1) {
+f32 ModelAnim_EvaluateScaleChannel(S1_unk_D_800ABCC0* arg0, s32 arg1) {
     f32 var_fv1;
     s16 var_a2;
     s32 var_a1;
@@ -3881,7 +3881,7 @@ f32 func_8003DF68(S1_unk_D_800ABCC0* arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-f32 func_8003E054(S1_Vec3s* arg0, s16 arg1, s16 arg2) {
+f32 ModelAnim_InterpolateKeyframe(S1_Vec3s* arg0, s16 arg1, s16 arg2) {
     f32 y;
     s32 i;
     f32 x;
@@ -3913,7 +3913,7 @@ f32 func_8003E054(S1_Vec3s* arg0, s16 arg1, s16 arg2) {
 #endif
 
 #ifdef VERSION_US
-f32 func_8003E250(S1_unk_func_80016B30_arg0* arg0, s16 arg1, s16 arg2) {
+f32 ModelAnim_InterpolateKeyframeTangent(S1_unk_func_80016B30_arg0* arg0, s16 arg1, s16 arg2) {
     f32 y;
     s32 i;
     f32 x;
@@ -3945,7 +3945,7 @@ f32 func_8003E250(S1_unk_func_80016B30_arg0* arg0, s16 arg1, s16 arg2) {
 #endif
 
 #ifdef VERSION_US
-f32 func_8003E440(S1_unk_D_800ABCC0* arg0, s32 arg1) {
+f32 ModelAnim_EvaluateTranslationCurve(S1_unk_D_800ABCC0* arg0, s32 arg1) {
     f32 var_fv1;
     S1_unk_D_800ABCC0_008* temp_v0 = &arg0->channels[arg1];
     s16* tmp;
@@ -3955,9 +3955,9 @@ f32 func_8003E440(S1_unk_D_800ABCC0* arg0, s32 arg1) {
     } else {
         tmp = &arg0->translationValues[temp_v0->translationBaseIndex];
         if (temp_v0->unk_03 & 4) {
-            var_fv1 = func_8003E250(tmp, temp_v0->translationKeyCount, arg0->currentFrame) / 100.0f;
+            var_fv1 = ModelAnim_InterpolateKeyframeTangent(tmp, temp_v0->translationKeyCount, arg0->currentFrame) / 100.0f;
         } else {
-            var_fv1 = func_8003E054(tmp, temp_v0->translationKeyCount, arg0->currentFrame) / 100.0f;
+            var_fv1 = ModelAnim_InterpolateKeyframe(tmp, temp_v0->translationKeyCount, arg0->currentFrame) / 100.0f;
         }
     }
     return var_fv1;
@@ -3965,7 +3965,7 @@ f32 func_8003E440(S1_unk_D_800ABCC0* arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-s16 func_8003E500(S1_unk_D_800ABCC0* arg0, s32 arg1) {
+s16 ModelAnim_EvaluateRotationCurve(S1_unk_D_800ABCC0* arg0, s32 arg1) {
     f32 var_fv1;
     s16* temp_a0;
     S1_unk_D_800ABCC0_008* temp_v0 = &arg0->channels[arg1];
@@ -3975,9 +3975,9 @@ s16 func_8003E500(S1_unk_D_800ABCC0* arg0, s32 arg1) {
     } else {
         temp_a0 = &arg0->rotationValues[temp_v0->rotationBaseIndex];
         if (temp_v0->unk_03 & 2) {
-            var_fv1 = func_8003E250(temp_a0, temp_v0->rotationKeyCount, arg0->currentFrame) / 10.0f;
+            var_fv1 = ModelAnim_InterpolateKeyframeTangent(temp_a0, temp_v0->rotationKeyCount, arg0->currentFrame) / 10.0f;
         } else {
-            var_fv1 = func_8003E054(temp_a0, temp_v0->rotationKeyCount, arg0->currentFrame) / 10.0f;
+            var_fv1 = ModelAnim_InterpolateKeyframe(temp_a0, temp_v0->rotationKeyCount, arg0->currentFrame) / 10.0f;
         }
     }
 
@@ -3994,7 +3994,7 @@ s16 func_8003E500(S1_unk_D_800ABCC0* arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-f32 func_8003E640(S1_unk_D_800ABCC0* arg0, s32 arg1) {
+f32 ModelAnim_EvaluateScaleCurve(S1_unk_D_800ABCC0* arg0, s32 arg1) {
     s16* temp_a0;
     f32 var_fv0;
     f32 var_fv1;
@@ -4005,9 +4005,9 @@ f32 func_8003E640(S1_unk_D_800ABCC0* arg0, s32 arg1) {
     } else {
         temp_a0 = &arg0->scaleValues[temp_v0->scaleBaseIndex];
         if (temp_v0->unk_03 & 1) {
-            var_fv0 = func_8003E250(temp_a0, temp_v0->scaleKeyCount, arg0->currentFrame);
+            var_fv0 = ModelAnim_InterpolateKeyframeTangent(temp_a0, temp_v0->scaleKeyCount, arg0->currentFrame);
         } else {
-            var_fv0 = func_8003E054(temp_a0, temp_v0->scaleKeyCount, arg0->currentFrame);
+            var_fv0 = ModelAnim_InterpolateKeyframe(temp_a0, temp_v0->scaleKeyCount, arg0->currentFrame);
         }
         var_fv1 = var_fv0;
     }
@@ -4016,7 +4016,7 @@ f32 func_8003E640(S1_unk_D_800ABCC0* arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-s32 func_8003E6DC(S1_unk_D_86002F58_004_000_040_raw* arg0, u16 arg1) {
+s32 ModelAnim_AdvanceCurveFrame(S1_unk_D_86002F58_004_000_040_raw* arg0, u16 arg1) {
     S1_unk_D_86002F58_004_000_040_raw_08 spC;
     S1_unk_D_86002F58_004_000_040_raw_08* ptr;
     S1_unk_D_86002F58_004_000_040_004* temp_v0;
@@ -4050,7 +4050,7 @@ s32 func_8003E6DC(S1_unk_D_86002F58_004_000_040_raw* arg0, u16 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern s32 D_801263E0; void func_8003E7A0(void) { D_801263E0 = -1; }
+extern s32 D_801263E0; void ModelAnim_ResetCurveContext(void) { D_801263E0 = -1; }
 #endif
 
 #ifdef VERSION_US
@@ -4058,7 +4058,7 @@ extern s32 D_801263E0; void func_8003E7A0(void) { D_801263E0 = -1; }
 #endif
 
 #ifdef VERSION_US
-extern s32 D_801263E0; void func_8003E8A8(void) { if (D_801263E0 >= 0) { D_801263E0--; } }
+extern s32 D_801263E0; void ModelAnim_EndCurveContext(void) { if (D_801263E0 >= 0) { D_801263E0--; } }
 #endif
 
 #ifdef VERSION_US
@@ -4066,11 +4066,11 @@ extern s32 D_801263E0; void func_8003E8A8(void) { if (D_801263E0 >= 0) { D_80126
 #endif
 
 #ifdef VERSION_US
-void func_8003EAEC(u8 *arg0) { *(s16 *)(arg0 + 0x40) = -1; *(s32 *)(arg0 + 0x44) = 0; }
+void ModelAnim_ClearTransformChannel(u8 *arg0) { *(s16 *)(arg0 + 0x40) = -1; *(s32 *)(arg0 + 0x44) = 0; }
 #endif
 
 #ifdef VERSION_US
-s32 func_8003EAFC(S1_unk_D_86002F58_004_000* arg0, s16 arg1, void* arg2, s32 arg3) {
+s32 ModelAnim_BindTransformCurve(S1_unk_D_86002F58_004_000* arg0, s16 arg1, void* arg2, s32 arg3) {
     S1_unk_D_86002F58_004_000_040_004* temp_v0 = func_80003240(arg2);
     S1_unk_D_86002F58_004_000_040* ptr = &arg0->unk_040;
 
@@ -4086,26 +4086,26 @@ s32 func_8003EAFC(S1_unk_D_86002F58_004_000* arg0, s16 arg1, void* arg2, s32 arg
 #endif
 
 #ifdef VERSION_US
-s32 func_8003EB74(u8 *arg0, s32 arg1) { *(s32 *)(arg0 + 0x4C) = arg1; return *(s32 *)(arg0 + 0x48) >> 16; }
+s32 ModelAnim_SetSpeed(u8 *arg0, s32 arg1) { *(s32 *)(arg0 + 0x4C) = arg1; return *(s32 *)(arg0 + 0x48) >> 16; }
 #endif
 
 #ifdef VERSION_US
-void func_8003EB84(u8 *arg0, s16 value) { *(s32 *)(arg0 + 0x48) = ((s32)value << 16) - *(s32 *)(arg0 + 0x4C); }
+void ModelAnim_SetFrame(u8 *arg0, s16 value) { *(s32 *)(arg0 + 0x48) = ((s32)value << 16) - *(s32 *)(arg0 + 0x4C); }
 #endif
 
 #ifdef VERSION_US
 typedef struct { char pad[0x40]; struct { s16 pad0; void *data; s32 frame; s32 speed; } curve; } ModelAnim;
-s32 func_8003EBA4(ModelAnim *arg0, s16 arg1) { struct { s16 pad0; void *data; s32 frame; s32 speed; } *ptr = &arg0->curve; s32 temp_v0 = ptr->frame + ptr->speed; s32 arg = arg1 << 16; s32 var_a2; s32 v = ptr->speed; if (v >= 0) { var_a2 = ptr->frame < arg; if (var_a2 != 0) var_a2 = temp_v0 >= arg; } else { var_a2 = arg < ptr->frame; if (var_a2 != 0) var_a2 = arg >= temp_v0; } return var_a2; }
+s32 ModelAnim_HasCrossedFrame(ModelAnim *arg0, s16 arg1) { struct { s16 pad0; void *data; s32 frame; s32 speed; } *ptr = &arg0->curve; s32 temp_v0 = ptr->frame + ptr->speed; s32 arg = arg1 << 16; s32 var_a2; s32 v = ptr->speed; if (v >= 0) { var_a2 = ptr->frame < arg; if (var_a2 != 0) var_a2 = temp_v0 >= arg; } else { var_a2 = arg < ptr->frame; if (var_a2 != 0) var_a2 = arg >= temp_v0; } return var_a2; }
 #endif
 
 #ifdef VERSION_US
 typedef struct { s16 flags; char pad2[4]; s16 fallback; char pad8[2]; u16 frameCount; } EventData;
-s32 func_8003EC04(ModelAnim *arg0) { return func_8003EBA4(arg0, ((EventData *)arg0->curve.data)->frameCount - 1); }
+s32 ModelAnim_IsAnimationDone(ModelAnim *arg0) { return ModelAnim_HasCrossedFrame(arg0, ((EventData *)arg0->curve.data)->frameCount - 1); }
 #endif
 
 #ifdef VERSION_US
 typedef struct { u8 pad[0x44]; u8 *value44; s32 value48; } Func3EC34;
-s32 func_8003EC34(Func3EC34 *arg0) { return arg0->value48 >= ((*(u16 *)(arg0->value44 + 0xA) - 1) << 16); }
+s32 ModelAnim_IsFinished(Func3EC34 *arg0) { return arg0->value48 >= ((*(u16 *)(arg0->value44 + 0xA) - 1) << 16); }
 #endif
 
 #ifdef VERSION_US
@@ -4115,11 +4115,11 @@ s32 func_8003EC54(Func3EC54 *arg0) { s32 value = arg0->value48 + arg0->value4C; 
 
 #ifdef VERSION_US
 typedef struct { u16 keyCount; u16 baseIndex; } EventIndex;
-s32 func_8003EC70(s32 arg0, EventIndex* arg1, s32 arg2) { EventIndex* temp_v0 = &arg1[arg2]; s32 ret; if (arg0 < temp_v0->keyCount) { ret = arg0 + temp_v0->baseIndex; } else { ret = (temp_v0->baseIndex + temp_v0->keyCount) - 1; } return ret; }
+s32 ModelAnim_ResolveEventIndex(s32 arg0, EventIndex* arg1, s32 arg2) { EventIndex* temp_v0 = &arg1[arg2]; s32 ret; if (arg0 < temp_v0->keyCount) { ret = arg0 + temp_v0->baseIndex; } else { ret = (temp_v0->baseIndex + temp_v0->keyCount) - 1; } return ret; }
 #endif
 
 #ifdef VERSION_US
-s16 func_8003ECA8(S1_unk_D_86002F58_004_000_054* arg0, u16 arg1) {
+s16 ModelAnim_AdvanceEventFrame(S1_unk_D_86002F58_004_000_054* arg0, u16 arg1) {
     s16 var_v1;
     S1_unk_D_86002F58_004_000_054_004* temp_v0;
 
@@ -4141,7 +4141,7 @@ s16 func_8003ECA8(S1_unk_D_86002F58_004_000_054* arg0, u16 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern s32 D_80126410; void func_8003ED08(void) { D_80126410 = -1; }
+extern s32 D_80126410; void ModelAnim_ResetEventContext(void) { D_80126410 = -1; }
 #endif
 
 #ifdef VERSION_US
@@ -4149,7 +4149,7 @@ extern s32 D_80126410; void func_8003ED08(void) { D_80126410 = -1; }
 #endif
 
 #ifdef VERSION_US
-extern s32 D_80126410; void func_8003EE00(void) { if (D_80126410 >= 0) { D_80126410--; } }
+extern s32 D_80126410; void ModelAnim_EndEventContext(void) { if (D_80126410 >= 0) { D_80126410--; } }
 #endif
 
 #ifdef VERSION_US
@@ -4157,11 +4157,11 @@ extern s32 D_80126410; void func_8003EE00(void) { if (D_80126410 >= 0) { D_80126
 #endif
 
 #ifdef VERSION_US
-void func_8003EECC(u8 *arg0) { *(s16 *)(arg0 + 0x54) = -1; *(s32 *)(arg0 + 0x58) = 0; }
+void ModelAnim_ClearEventTrack(u8 *arg0) { *(s16 *)(arg0 + 0x54) = -1; *(s32 *)(arg0 + 0x58) = 0; }
 #endif
 
 #ifdef VERSION_US
-s16 func_8003EEDC(S1_unk_D_86002F58_004_000* arg0, s16 arg1, s32 arg2) {
+s16 ModelAnim_BindEventTrack(S1_unk_D_86002F58_004_000* arg0, s16 arg1, s32 arg2) {
     S1_unk_D_86002F58_004_000_054_004* temp_v0 = func_80003240(arg2);
     S1_unk_D_86002F58_004_000_054* ptr = &arg0->unk_054;
 
@@ -4176,7 +4176,7 @@ s16 func_8003EEDC(S1_unk_D_86002F58_004_000* arg0, s16 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-void func_8003EF48(u8 *arg0, s16 value) { *(s16 *)(arg0 + 0x5C) = value - 1; }
+void ModelAnim_SetEventFrame(u8 *arg0, s16 value) { *(s16 *)(arg0 + 0x5C) = value - 1; }
 #endif
 
 #ifdef VERSION_US
@@ -4188,15 +4188,15 @@ void func_8003EF70(u8 *arg0) { *(u16 *)(arg0 + 0x56) &= (u16)~1; }
 #endif
 
 #ifdef VERSION_US
-s32 func_8003EF80(u8 *arg0, s16 value) { return value == *(s16 *)(arg0 + 0x5C) + 1; }
+s32 ModelAnim_IsEventFrame(u8 *arg0, s16 value) { return value == *(s16 *)(arg0 + 0x5C) + 1; }
 #endif
 
 #ifdef VERSION_US
-s32 func_8003EFA0(u8 *arg0) { return *(u16 *)(*(s32 *)(arg0 + 0x58) + 0xA) == *(s16 *)(arg0 + 0x5C) + 2; }
+s32 ModelAnim_IsEventTrackNearEnd(u8 *arg0) { return *(u16 *)(*(s32 *)(arg0 + 0x58) + 0xA) == *(s16 *)(arg0 + 0x5C) + 2; }
 #endif
 
 #ifdef VERSION_US
-s32 func_8003EFBC(u8 *arg0) { return *(u16 *)(*(s32 *)(arg0 + 0x58) + 0xA) == *(s16 *)(arg0 + 0x5C) + 1; }
+s32 ModelAnim_IsEventTrackDone(u8 *arg0) { return *(u16 *)(*(s32 *)(arg0 + 0x58) + 0xA) == *(s16 *)(arg0 + 0x5C) + 1; }
 #pragma C_FUNCTION_PADDING(8)
 #endif
 
@@ -4204,7 +4204,7 @@ s32 func_8003EFBC(u8 *arg0) { return *(u16 *)(*(s32 *)(arg0 + 0x58) + 0xA) == *(
 extern void func_80037E9C(s32, void *);
 extern u8 D_80126420[];
 extern u8 D_80126438[];
-void func_8003EFE0(void) {
+void ModelRenderer_InitDisplayRoots(void) {
     func_80037E9C(0, D_80126420);
     func_80037E9C(0, D_80126438);
 }
@@ -4227,7 +4227,7 @@ void func_8003F03C(s32 arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-void func_8003F0A8(void *arg0) {
+void ModelRenderer_AttachSecondaryDisplayObject(void *arg0) {
     func_80038894(NULL, arg0, 0, &D_800948D0, (S1_Vec3s *) D_800948DC, (S1_Vec3f *) D_800948E4);
     func_80038F8C(D_80126438, arg0);
     (*(u8 *)((u8 *)(arg0) + (1))) = (u8) ((*(u8 *)((u8 *)(arg0) + (1))) & 0xFFFE);
@@ -4262,13 +4262,13 @@ void func_8003F1DC(void *arg0) {
 
 #ifdef VERSION_US
 void func_8003F454(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u8 arg4) {
-    func_8003575C((Color3575C *)(u32)(arg0 + 0xA0), arg1 & 0xFF, arg2 & 0xFF, arg3 & 0xFF, (u8) (s32) arg4);
+    Color_SetRGBA((Color3575C *)(u32)(arg0 + 0xA0), arg1 & 0xFF, arg2 & 0xFF, arg3 & 0xFF, (u8) (s32) arg4);
 }
 #endif
 
 #ifdef VERSION_US
 void func_8003F498(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u8 arg4) {
-    func_8003575C((Color3575C *)(u32)(arg0 + 0xA0), arg1 & 0xFF, arg2 & 0xFF, arg3 & 0xFF, (u8) (s32) arg4);
+    Color_SetRGBA((Color3575C *)(u32)(arg0 + 0xA0), arg1 & 0xFF, arg2 & 0xFF, arg3 & 0xFF, (u8) (s32) arg4);
 }
 #endif
 
@@ -4346,7 +4346,7 @@ s32 func_8003F954(u16 value) { return value % 9; }
 
 #ifdef VERSION_US
 extern s32 D_80126520;
-void func_8003FBB4(void) {
+void geo_layout_cmd_jump(void) {
     void *p = (void *)(u32)D_80126520;
     D_80126520 = (s32)func_80003240(*(s32 *)((u8 *)p + 4));
 }
@@ -4367,7 +4367,7 @@ void func_8003FBB4(void) {
 #ifdef VERSION_US
 extern s16 D_80126518;
 extern s32 D_80126498[];
-void func_8003FCC4(void) {
+void geo_layout_cmd_open_node(void) {
     s32 i = D_80126518;
     s32 *table = D_80126498;
     table[i + 1] = table[i];
@@ -4377,7 +4377,7 @@ void func_8003FCC4(void) {
 #endif
 
 #ifdef VERSION_US
-void func_8003FD08(void) {
+void geo_layout_cmd_close_node(void) {
     D_80126518--;
     D_80126520 += 4;
 }
@@ -4426,30 +4426,30 @@ void func_8003FD08(void) {
 #ifdef VERSION_US
 extern S1_MainPoolState *D_80126450;
 extern void func_8003FD34(void *);
-void func_80040134(void) {
+void geo_layout_cmd_create_background(void) {
     struct TargetCmd16 { u8 cmd; u8 r; u8 g; u8 b; } *cmd;
     cmd = (struct TargetCmd16 *)(u32)D_80126520;
-    func_8003FD34(func_80038180(D_80126450, NULL, cmd->r, cmd->g, cmd->b));
+    func_8003FD34(GeoNode_CreateBackground(D_80126450, NULL, cmd->r, cmd->g, cmd->b));
     D_80126520 += sizeof(struct TargetCmd16);
 }
 #endif
 
 #ifdef VERSION_US
 extern s32 func_8003820C(s32, s32);
-void func_8004018C(void) {
+void geo_layout_cmd_create_clear_depth(void) {
     func_8003FD34((void *)(S1_uintptr_t)func_8003820C((s32)(S1_uintptr_t)D_80126450, 0));
     D_80126520 += 4;
 }
 #endif
 
-void func_800401CC(void) {
+void geo_layout_cmd_noop(void) {
 }
 
 #ifdef VERSION_US
-void func_800401D4(void) {
+void geo_layout_cmd_create_fog(void) {
     S1_unk_D_800ABE00_cmd13* cmd = (S1_unk_D_800ABE00_cmd13*)D_80126520;
 
-    func_8003FD34(func_80038258((s32)(S1_uintptr_t)D_80126450, NULL, cmd->fogNear, cmd->fogFar, cmd->r, cmd->g, cmd->b, 0xFF));
+    func_8003FD34(GeoNode_CreateFog((s32)(S1_uintptr_t)D_80126450, NULL, cmd->fogNear, cmd->fogFar, cmd->r, cmd->g, cmd->b, 0xFF));
 
     D_80126520 += sizeof(S1_unk_D_800ABE00_cmd13);
 }
@@ -4466,14 +4466,14 @@ void func_800401D4(void) {
 #ifdef VERSION_US
 s32 func_80038474(s32, s32);
 
-void func_80040370(void) {
+void geo_layout_cmd_29(void) {
     func_8003FD34((void *)(S1_uintptr_t)func_80038474((s32)(S1_uintptr_t)D_80126450, 0));
     D_80126520 += 4;
 }
 #endif
 
 #ifdef VERSION_US
-extern s32 D_80126520; void func_800403B0(void) { D_80126520 += 0xC; }
+extern s32 D_80126520; void geo_layout_cmd_skip(void) { D_80126520 += 0xC; }
 #endif
 
 #ifdef VERSION_US
@@ -4484,17 +4484,17 @@ struct S1_unk_D_800ABE00_cmd16 {
       u8 g;
       u8 b;
 };
-void func_800403C8(void) {
+void geo_layout_cmd_create_ambient_light(void) {
     S1_unk_D_800ABE00_cmd16* cmd = (S1_unk_D_800ABE00_cmd16*)D_80126520;
 
-    func_8003FD34(func_8003840C(D_80126450, NULL, cmd->r, cmd->g, cmd->b));
+    func_8003FD34(GeoNode_CreateAmbientLight(D_80126450, NULL, cmd->r, cmd->g, cmd->b));
 
     D_80126520 += sizeof(S1_unk_D_800ABE00_cmd16);
 }
 #endif
 
 #ifdef VERSION_US
-void func_80040420(void) {
+void geo_layout_cmd_17(void) {
     s32 var_v1;
 
     var_v1 = 0;
@@ -4507,66 +4507,66 @@ void func_80040420(void) {
 #endif
 
 #ifdef VERSION_US
-void func_800404AC(void) {
+void geo_layout_cmd_create_shadow(void) {
     S1_unk_D_800ABE00_cmd18* cmd = (S1_unk_D_800ABE00_cmd18*)D_80126520;
 
-    func_8003FD34(func_8003854C(D_80126450, NULL, cmd->unk_01, cmd->unk_04, cmd->unk_06, cmd->unk_02));
+    func_8003FD34(GeoNode_CreateShadow(D_80126450, NULL, cmd->unk_01, cmd->unk_04, cmd->unk_06, cmd->unk_02));
 
     D_80126520 += sizeof(S1_unk_D_800ABE00_cmd18);
 }
 #endif
 
 #ifdef VERSION_US
-void func_8004050C(void) {
+void geo_layout_cmd_create_cull_distance(void) {
     S1_unk_D_800ABE00_cmd19* cmd = (S1_unk_D_800ABE00_cmd19*)D_80126520;
 
-    func_8003FD34(func_800385BC(D_80126450, NULL, cmd->nearDistance, cmd->farDistance));
+    func_8003FD34(GeoNode_CreateCullDistance(D_80126450, NULL, cmd->nearDistance, cmd->farDistance));
 
     D_80126520 += sizeof(S1_unk_D_800ABE00_cmd19);
 }
 #endif
 
 #ifdef VERSION_US
-void func_8004055C(void) {
+void geo_layout_cmd_create_switch_case(void) {
     S1_unk_D_800ABE00_cmd1A* cmd = (S1_unk_D_800ABE00_cmd1A*)D_80126520;
 
-    func_8003FD34(func_8003861C(D_80126450, NULL, cmd->unk_01, cmd->caseIndex));
+    func_8003FD34(GeoNode_CreateSwitchCase(D_80126450, NULL, cmd->unk_01, cmd->caseIndex));
 
     D_80126520 += sizeof(S1_unk_D_800ABE00_cmd1A);
 }
 #endif
 
 #ifdef VERSION_US
-void func_800405AC(void) {
+void geo_layout_cmd_create_translate_rotate(void) {
     S1_Vec3s sp30;
     S1_Vec3f sp24;
     UNUSED s32 pad;
     S1_unk_D_800ABE00_cmd1B* cmd = (S1_unk_D_800ABE00_cmd1B*)D_80126520;
 
-    func_800358AC(&sp24, &cmd->translation);
-    func_80035A68(&sp30, (cmd->rotX << 0xF) / 180, (cmd->rotY << 0xF) / 180, (cmd->rotZ << 0xF) / 180);
-    func_8003FD34(func_8003867C(D_80126450, NULL, &sp24, &sp30));
+    Vec3f_FromVec3s(&sp24, &cmd->translation);
+    Vec3s_SetComponents(&sp30, (cmd->rotX << 0xF) / 180, (cmd->rotY << 0xF) / 180, (cmd->rotZ << 0xF) / 180);
+    func_8003FD34(GeoNode_CreateTranslateRotate(D_80126450, NULL, &sp24, &sp30));
 
     D_80126520 += sizeof(S1_unk_D_800ABE00_cmd1B);
 }
 #endif
 
 #ifdef VERSION_US
-void func_800406D4(void) {
+void geo_layout_cmd_create_translate(void) {
     S1_Vec3f sp24;
     S1_unk_D_800ABE00_cmd1C* cmd = (S1_unk_D_800ABE00_cmd1C*)D_80126520;
 
     sp24.x = cmd->translateX / 65536.0f;
     sp24.y = cmd->translateY / 65536.0f;
     sp24.z = cmd->translateZ / 65536.0f;
-    func_8003FD34(func_80038704(D_80126450, NULL, &sp24));
+    func_8003FD34(GeoNode_CreateTranslate(D_80126450, NULL, &sp24));
 
     D_80126520 += sizeof(S1_unk_D_800ABE00_cmd1C);
 }
 #endif
 
 #ifdef VERSION_US
-void func_800407A0(void) {
+void geo_layout_cmd_create_animated_part(void) {
     S1_Vec3f sp3C;
     s16 var_a3 = 1;
     S1_unk_D_800ABE00_cmd1D* cmd = (S1_unk_D_800ABE00_cmd1D*)D_80126520;
@@ -4584,37 +4584,37 @@ void func_800407A0(void) {
     }
 
     func_8003FD34(
-        func_80038770(D_80126450, NULL, cmd->partIndex, var_a3, cmd->animIndex, &cmd->rotationA, &cmd->rotationB, &sp3C));
+        GeoNode_CreateAnimatedPart(D_80126450, NULL, cmd->partIndex, var_a3, cmd->animIndex, &cmd->rotationA, &cmd->rotationB, &sp3C));
 
     D_80126520 += sizeof(S1_unk_D_800ABE00_cmd1D);
 }
 #endif
 
 #ifdef VERSION_US
-void func_800408B8(void) {
+void geo_layout_cmd_create_display_list_part(void) {
     S1_unk_D_800ABE00_cmd1E* cmd = (S1_unk_D_800ABE00_cmd1E*)D_80126520;
 
-    func_8003FD34(func_8003882C(D_80126450, NULL, cmd->partIndex, cmd->displayList, cmd->unk_02));
+    func_8003FD34(GeoNode_CreateDisplayListPart(D_80126450, NULL, cmd->partIndex, cmd->displayList, cmd->unk_02));
 
     D_80126520 += sizeof(S1_unk_D_800ABE00_cmd1E);
 }
 #endif
 
 #ifdef VERSION_US
-void func_80040910(void) {
+void geo_layout_cmd_create_model_part(void) {
     S1_Vec3s sp40;
     S1_Vec3f sp34;
     S1_Vec3f sp28;
     S1_unk_D_86002F58_004_000* tmp;
     S1_unk_D_800ABE00_cmd1F* cmd = (S1_unk_D_800ABE00_cmd1F*)D_80126520;
 
-    func_800358AC(&sp34, &cmd->position);
+    Vec3f_FromVec3s(&sp34, &cmd->position);
 
     sp28.x = cmd->scaleX / 100.0f;
     sp28.y = cmd->scaleY / 100.0f;
     sp28.z = cmd->scaleZ / 100.0f;
 
-    func_80035A68(&sp40, (cmd->rotX << 0xF) / 180, (cmd->rotY << 0xF) / 180, (cmd->rotZ << 0xF) / 180);
+    Vec3s_SetComponents(&sp40, (cmd->rotX << 0xF) / 180, (cmd->rotY << 0xF) / 180, (cmd->rotZ << 0xF) / 180);
     tmp = func_80038894(D_80126450, NULL, cmd->modelIndex, &sp34, &sp40, &sp28);
     func_8003FD34(tmp);
 
@@ -4627,13 +4627,13 @@ void func_80040910(void) {
 #endif
 
 #ifdef VERSION_US
-void func_80040BD8(void) {
+void geo_layout_cmd_create_scale(void) {
     S1_Vec3f sp2C;
     S1_unk_D_86002F34_alt9* tmp;
     S1_unk_D_800ABE00_cmd21* cmd = (S1_unk_D_800ABE00_cmd21*)D_80126520;
 
-    func_800358AC(&sp2C, &cmd->position);
-    tmp = func_80038A70(D_80126450, NULL, cmd->partIndex, cmd->displayList, &sp2C, cmd->scale / 65536.0f);
+    Vec3f_FromVec3s(&sp2C, &cmd->position);
+    tmp = GeoNode_CreateScale(D_80126450, NULL, cmd->partIndex, cmd->displayList, &sp2C, cmd->scale / 65536.0f);
     func_8003FD34(tmp);
 
     D_80126520 += sizeof(S1_unk_D_800ABE00_cmd21);
@@ -4641,20 +4641,20 @@ void func_80040BD8(void) {
 #endif
 
 #ifdef VERSION_US
-void func_80040C78(void) {
+void geo_layout_cmd_create_display_list(void) {
     S1_unk_D_800ABE00_cmd22* cmd = (S1_unk_D_800ABE00_cmd22*)D_80126520;
 
-    func_8003FD34(func_80038AF4(D_80126450, NULL, cmd->partIndex, cmd->displayList));
+    func_8003FD34(GeoNode_CreateDisplayList(D_80126450, NULL, cmd->partIndex, cmd->displayList));
 
     D_80126520 += sizeof(S1_unk_D_800ABE00_cmd22);
 }
 #endif
 
 #ifdef VERSION_US
-void func_80040CC8(void) {
+void geo_layout_cmd_create_shadow_texture(void) {
     S1_unk_D_800ABE00_cmd23* cmd = (S1_unk_D_800ABE00_cmd23*)D_80126520;
 
-    func_8003FD34(func_80038B54(D_80126450, NULL, cmd->colorOverrideFlag, cmd->eventFrame, cmd->displayList, cmd->textureIndex1, cmd->textureIndex2,
+    func_8003FD34(GeoNode_CreateShadowTexture(D_80126450, NULL, cmd->colorOverrideFlag, cmd->eventFrame, cmd->displayList, cmd->textureIndex1, cmd->textureIndex2,
                                 cmd->r, cmd->g, cmd->b, cmd->a));
 
     D_80126520 += sizeof(S1_unk_D_800ABE00_cmd23);
@@ -4662,10 +4662,10 @@ void func_80040CC8(void) {
 #endif
 
 #ifdef VERSION_US
-void func_80040D50(void) {
+void geo_layout_cmd_create_anchor(void) {
     S1_unk_D_800ABE00_cmd24* cmd = (S1_unk_D_800ABE00_cmd24*)D_80126520;
 
-    func_8003FD34(func_80038BF8(D_80126450, NULL, cmd->anchorId));
+    func_8003FD34(GeoNode_CreateAnchor(D_80126450, NULL, cmd->anchorId));
 
     D_80126520 += sizeof(S1_unk_D_800ABE00_cmd24);
 }
@@ -4676,10 +4676,10 @@ void func_80040D50(void) {
 #endif
 
 #ifdef VERSION_US
-void func_80040DE0(void) {
+void geo_layout_cmd_create_group(void) {
     S1_unk_D_800ABE00_cmd26* cmd = (S1_unk_D_800ABE00_cmd26*)D_80126520;
 
-    func_8003FD34(func_80038C50(D_80126450, NULL, cmd->unk_01, cmd->unk_04, cmd->unk_06, cmd->unk_08, cmd->unk_0A,
+    func_8003FD34(GeoNode_CreateGroup(D_80126450, NULL, cmd->unk_01, cmd->unk_04, cmd->unk_06, cmd->unk_08, cmd->unk_0A,
                                 cmd->unk_02, cmd->unk_03, cmd->unk_0C, cmd->r, cmd->g, cmd->b, cmd->a));
 
     D_80126520 += sizeof(S1_unk_D_800ABE00_cmd26);
@@ -4724,7 +4724,7 @@ struct S1_Fragment {
 };
 void func_800413A0(S1_MainPoolState* arg0, u32 arg1, S1_Fragment* arg2) {
     func_80002210(arg1, arg2);
-    func_800031FC(arg0, ((u32)arg2 + arg2->sizeInRam) - (u32)arg0->listHeadR);
+    MainPool_ResetStateToOffset(arg0, ((u32)arg2 + arg2->sizeInRam) - (u32)arg0->listHeadR);
 }
 #endif
 
@@ -4742,7 +4742,7 @@ void func_800413A0(S1_MainPoolState* arg0, u32 arg1, S1_Fragment* arg2) {
 
 #ifdef VERSION_US
 extern void *func_80040E80(S1_MemoryBlock *, void *);
-void func_80041664(S1_MemoryBlock* arg0, S1_arg1_func_80019420* arg1) {
+void Fragment_ProcessGeoLayoutList(S1_MemoryBlock* arg0, S1_arg1_func_80019420* arg1) {
     while (arg1->unk_00) {
         if (arg1->unk_00 == 3) {
             arg1->unk_04 = func_80040E80(arg0, arg1->unk_04);
@@ -4814,13 +4814,13 @@ void func_80041B84(void) {
 #endif
 
 #ifdef VERSION_US
-s32 func_80002984(s32, s32);
-s32 func_8000484C(s32, s32, s32, s32);
+s32 main_pool_alloc(s32, s32);
+s32 BinArchive_Open(s32, s32, s32, s32);
 extern s32 D_80126F28;
 extern s32 D_80126F2C;
 void func_80041F14(void) {
-    D_80126F28 = func_8000484C(func_800356CC(8), 0, 1, 1);
-    D_80126F2C = func_80002984(0xF000, 1);
+    D_80126F28 = BinArchive_Open(func_800356CC(8), 0, 1, 1);
+    D_80126F2C = main_pool_alloc(0xF000, 1);
 }
 #endif
 
@@ -4896,7 +4896,7 @@ void func_800428F8(s32 arg0) {
 
 #ifdef VERSION_US
 
-void func_80042930(s32 arg0) {
+void PokeIcon_WaitBackgroundLoad(s32 arg0) {
     void *sp1C;
 
     osRecvMesg((OSMesgQueue *)(u32)(arg0 + 0x70), &sp1C, 1);

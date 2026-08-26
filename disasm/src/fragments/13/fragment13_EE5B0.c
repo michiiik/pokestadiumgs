@@ -35,12 +35,12 @@ void func_824006C8(s32 arg0, s32 arg1) {
 extern u8 D_824090A0[];
 extern void *D_8240AA68;
 extern void func_800088DC(void);
-extern void func_8003C970(void);
+extern void GeoRender_AdvanceFrameCounter(void);
 extern void func_82406E14(void *, void *);
 extern void func_80008648(void);
 void func_82400880(void) {
     func_800088DC();
-    func_8003C970();
+    GeoRender_AdvanceFrameCounter();
     func_82406E14(D_824090A0, D_8240AA68);
     func_80008648();
 }

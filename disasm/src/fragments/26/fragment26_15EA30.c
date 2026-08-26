@@ -6,7 +6,7 @@ extern u32 D_80128C00;
 extern u32 D_80128C30;
 extern u32 D_80128C34;
 extern u32 D_80128C38;
-u32 func_81000180(s32 arg0) {
+u32 ParticleGfx_GetFrameDivisor(s32 arg0) {
     u32 ret = D_80128C00;
     switch (arg0) {
         case 2: ret = D_80128C38; break;
@@ -30,13 +30,13 @@ void func_81000248(Gfx *gfx, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, s
     gDPSetTileSize(gfx, 1, temp_v1, temp_a0, ((temp_v1 + arg5) - 1) << 2, ((temp_a0 + arg6) - 1) << 2);
 }
 
-Gfx *func_810002C4(Gfx *gfx, u8 *texture, s32 fmt, s32 width, s32 height, s32 cms, s32 cmt, s32 masks, s32 maskt, s32 shifts, s32 shiftt) {
+Gfx *ParticleGfx_LoadTextureBlock4ToList(Gfx *gfx, u8 *texture, s32 fmt, s32 width, s32 height, s32 cms, s32 cmt, s32 masks, s32 maskt, s32 shifts, s32 shiftt) {
     gDPLoadTextureBlock_4b(gfx++, texture, fmt, width, height, 0, cms, cmt, masks, maskt, shifts, shiftt);
     return gfx;
 }
 
-void func_810004FC(Gfx *gfx, u8 *texture, s32 width, s32 height) {
-    func_810002C4(gfx, texture, G_IM_FMT_I, width, height,
+void ParticleGfx_LoadTextureI4ToList(Gfx *gfx, u8 *texture, s32 width, s32 height) {
+    ParticleGfx_LoadTextureBlock4ToList(gfx, texture, G_IM_FMT_I, width, height,
         G_TX_NOMIRROR | G_TX_CLAMP, G_TX_NOMIRROR | G_TX_CLAMP,
         G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
 }
@@ -85,7 +85,7 @@ s32 func_810023AC(Func810023ACRangeA *arg0, u8 *arg1, Func810023ACContextA *arg2
             if (arg1 != NULL && func_84100054(arg1, 0x100) != 0) {
                 result = ((Func810023ACInputA *)arg1)->value / selector;
             } else {
-                result = func_81000180(selector);
+                result = ParticleGfx_GetFrameDivisor(selector);
             }
         } else if (arg2 != NULL && arg2->flag != NULL) {
             result = (arg2->value >> 16) / selector;

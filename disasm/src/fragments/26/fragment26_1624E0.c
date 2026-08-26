@@ -25,7 +25,7 @@ typedef struct {
 } Func81003CC0Global;
 extern Func81003CC0Global *D_8009491C;
 
-void func_81003C30(s32 arg0, Func81003CC0State *arg1) {
+void DisplayList_SetFlagInRange(s32 arg0, Func81003CC0State *arg1) {
     s32 temp_a2;
     s32 var_v1;
     Func81003CC0Range *temp_v0;
@@ -50,7 +50,7 @@ void func_81003C30(s32 arg0, Func81003CC0State *arg1) {
     }
 }
 
-void func_81003CC0(s32 arg0, Func81003CC0State *arg1) {
+void DisplayList_SetFlagOutOfRange(s32 arg0, Func81003CC0State *arg1) {
     s32 temp_a2;
     s32 var_v1;
     Func81003CC0Range *temp_v0;
@@ -88,10 +88,10 @@ typedef struct {
     void *unk_0C;
     s32 unk_10;
 } Func81003D50TableAlt;
-extern s32 func_8003EC70();
+extern s32 ModelAnim_ResolveEventIndex();
 void func_81003D50(Func81003D50StateAlt *arg0, s32 arg1, Func81003D50TableAlt *arg2) {
     arg0->unk_20 = -1;
-    arg0->unk_1C = *(u8 *)(func_8003EC70(arg1, arg2->unk_0C, arg0->unk_14) + arg2->unk_10);
+    arg0->unk_1C = *(u8 *)(ModelAnim_ResolveEventIndex(arg1, arg2->unk_0C, arg0->unk_14) + arg2->unk_10);
 }
 
 typedef struct {

@@ -17,14 +17,14 @@ void func_87E0B7F4(void) {
 }
 
 extern u8 D_87E1A2C0[];
-extern s32 func_80002B24(void);
+extern s32 main_pool_get_available(void);
 extern s32 func_800030D0(s32, s32);
 extern s32 func_80040E80(s32, void *);
-extern void func_80003120(s32);
+extern void MainPool_FinalizeAllocation(s32);
 void func_87E0B834(void *arg0) {
-    s32 temp = func_800030D0(func_80002B24(), 0);
+    s32 temp = func_800030D0(main_pool_get_available(), 0);
     *(s32 *)((u8 *)arg0 + 8) = func_80040E80(temp, D_87E1A2C0);
-    func_80003120(temp);
+    MainPool_FinalizeAllocation(temp);
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30F070/func_87E0B884.s")
@@ -103,7 +103,7 @@ void func_87E0C454(void *arg0, s32 arg1) {
 extern void func_87E0BB5C(); extern void func_87E0BFFC(s32, s32, s32);
 void func_87E0C590(s32 arg0, s32 arg1) { func_87E0BB5C(); func_87E0BFFC(arg0, arg1, 1); }
 
-void func_87E0C5C4(s32 arg0, s32 arg1) { func_87E0BFFC(arg0, arg1, 0); }
+void WidgetTree_RunMessagePanelSilent_fragment63(s32 arg0, s32 arg1) { func_87E0BFFC(arg0, arg1, 0); }
 
 void func_87E0C5E4(s32 arg0) { func_87E0BFFC(arg0, -1, 0); }
 

@@ -3,13 +3,13 @@
 
 #ifdef VERSION_US
 extern void func_800226C0(s32);
-extern void func_80049ED8(s32);
+extern void Input_SetRepeatController(s32);
 extern void func_88800B24();
 extern s32 D_80087200;
 extern void **D_882345F4;
 void func_88231170(void) {
     func_800226C0(0x5E);
-    func_80049ED8(D_80087200);
+    Input_SetRepeatController(D_80087200);
     func_88800B24();
     (*(s32 *)((u8 *)(*D_882345F4) + (0xC))) = 1;
 }

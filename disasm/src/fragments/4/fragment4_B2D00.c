@@ -13,7 +13,7 @@
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_B2D00/func_81804954.s")
 
 extern void func_81804858(s32);
-void func_81804A00(u8 *arg0) {
+void WidgetTree_OpenMessagePanel_fragment4(u8 *arg0) {
     func_81804858(*(s32 *)arg0);
 }
 
@@ -43,7 +43,7 @@ s32 func_81804A20(u8 *arg0) {
 
 s32 func_81805594(u8 *arg0, u8 *arg1) { return 1; }
 
-s32 func_800084A0(s32);
+s32 StageContext_GetFadeMode(s32);
 s32 func_81805524();
 
 s32 func_818055A4(void) {
@@ -51,7 +51,7 @@ s32 func_818055A4(void) {
 
     var_a0 = func_81805524() != 0;
     if (var_a0 == 0) {
-        var_a0 = func_800084A0(var_a0) != 0;
+        var_a0 = StageContext_GetFadeMode(var_a0) != 0;
     }
     return var_a0;
 }

@@ -4,11 +4,11 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/37/fragment37_code/func_88800020.s")
 
-extern void func_800033DC(void *);
+extern void Util_Free(void *);
 extern void main_pool_pop_state(s32);
 extern u8 *D_88804050;
 void func_888002DC(void) {
-    func_800033DC(D_88804050);
+    Util_Free(D_88804050);
     main_pool_pop_state(0x504D494E);
 }
 
@@ -48,7 +48,7 @@ void func_88800354(void)
   }
   if (temp_a0 == 2)
   {
-    func_80049ED8(D_80087200);
+    Input_SetRepeatController(D_80087200);
   }
 }
 

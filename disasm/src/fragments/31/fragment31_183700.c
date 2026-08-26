@@ -2,7 +2,7 @@
 
 
 #ifdef VERSION_US
-extern void func_800033DC(s32);
+extern void Util_Free(s32);
 extern void func_8821CE40(s32);
 extern void func_8822EA80();
 extern void func_888002DC();
@@ -11,8 +11,8 @@ extern s32 D_88234560;
 extern s32 D_88234564;
 extern s32 D_88234720;
 void func_88210480(void) {
-    func_800033DC(D_88234564);
-    func_800033DC(D_88234720);
+    Util_Free(D_88234564);
+    Util_Free(D_88234720);
     func_8822EA80();
     func_888002DC();
     main_pool_pop_state(0x41525242);

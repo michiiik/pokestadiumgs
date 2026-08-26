@@ -185,7 +185,7 @@ void func_86709040(void) {
         D_8670BB48 = 0xD;
         return;
     }
-    if (func_800084A0() == 0) {
+    if (StageContext_GetFadeMode() == 0) {
         D_8670BB48 = 4;
     }
 }

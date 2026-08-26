@@ -2,7 +2,7 @@
 
 
 #ifdef VERSION_US
-f32 func_81600020(f32 arg0) {
+f32 fragment11_main(f32 arg0) {
     if (arg0 <= 0.0f) {
         return 0.0f;
     }

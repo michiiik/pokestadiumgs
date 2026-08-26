@@ -91,7 +91,7 @@ void func_87E155DC(u8 *arg0) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E155E8.s")
 
 extern void func_8003C6B8(s32);
-void func_87E15678(u8 *arg0) {
+void WidgetTree_OpenMessagePanel_fragment63(u8 *arg0) {
     func_8003C6B8(*(s32 *)(arg0 + 0x170));
 }
 
@@ -113,10 +113,10 @@ void func_87E15A08(void *arg0) {
     s32 sp1C;
     s32 temp_v0;
 
-    temp_v0 = func_800030D0(func_80002B24(), 0);
+    temp_v0 = func_800030D0(main_pool_get_available(), 0);
     sp1C = temp_v0;
     (*(s32 *)((u8 *)(arg0) + (0x104))) = func_80040E80(temp_v0, &D_87E1B310);
-    func_80003120(sp1C);
+    MainPool_FinalizeAllocation(sp1C);
     (*(s32 *)((u8 *)(arg0) + (0x108))) = func_87F08E3C(func_8004C990(0x1B2, 6), 0x0F000000);
 }
 

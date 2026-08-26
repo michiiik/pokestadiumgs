@@ -36,7 +36,7 @@ struct S1_unk_func_81206FA0 {
     s32 unk_08;
     s32 unk_0C;
 };
-s32 func_800105B8(S1_unk_func_81206FA0* arg0, s32 arg1) {
+s32 GbApu_Alloc(S1_unk_func_81206FA0* arg0, s32 arg1) {
   s32 temp_a2;
   u32 temp_v0;
 
@@ -51,7 +51,7 @@ s32 func_800105B8(S1_unk_func_81206FA0* arg0, s32 arg1) {
   return temp_a2;
 }
 
-void func_80010610(u8 *arg0, s32 arg1, s32 arg2) {
+void GbApu_InitAllocator(u8 *arg0, s32 arg1, s32 arg2) {
     s32 aligned = (arg1 + 0xF) & ~0xF;
     *(s32 *)(arg0 + 0) = aligned;
     *(s32 *)(arg0 + 4) = aligned;
@@ -86,8 +86,8 @@ extern u8 D_8011BE90[];
 extern s32 D_8011EBD0;
 
 void func_800107CC(s32 arg0) {
-    func_80010610(&D_8011EBE0, D_8011F2F0, arg0);
-    func_80010610(&D_8011EBC0, (*(s32 *)((u8 *)(D_8011BE90) + (0x3460))) + arg0, (*(s32 *)((u8 *)(D_8011BE90) + (0x3464))) - arg0);
+    GbApu_InitAllocator(&D_8011EBE0, D_8011F2F0, arg0);
+    GbApu_InitAllocator(&D_8011EBC0, (*(s32 *)((u8 *)(D_8011BE90) + (0x3460))) + arg0, (*(s32 *)((u8 *)(D_8011BE90) + (0x3464))) - arg0);
     D_8011EBD0 = 0;
 }
 
@@ -98,8 +98,8 @@ extern u8 D_8011EC30;
 extern u8 D_8011EC40;
 void func_800108B0(void *arg0) {
     (*(s32 *)((u8 *)(D_8011BE90) + (0x2D94))) = (s32) (*(s32 *)((u8 *)(D_8011BE90) + (0x2D90)));
-    func_80010610(&D_8011EC30, func_800105B8(&D_8011EC20, (*(s32 *)((u8 *)(arg0) + (0)))), (*(s32 *)((u8 *)(arg0) + (0))));
-    func_80010610(&D_8011EC40, func_800105B8(&D_8011EC20, (*(s32 *)((u8 *)(arg0) + (4)))), (*(s32 *)((u8 *)(arg0) + (4))));
+    GbApu_InitAllocator(&D_8011EC30, GbApu_Alloc(&D_8011EC20, (*(s32 *)((u8 *)(arg0) + (0)))), (*(s32 *)((u8 *)(arg0) + (0))));
+    GbApu_InitAllocator(&D_8011EC40, GbApu_Alloc(&D_8011EC20, (*(s32 *)((u8 *)(arg0) + (4)))), (*(s32 *)((u8 *)(arg0) + (4))));
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_80010934.s")

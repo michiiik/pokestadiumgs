@@ -3,8 +3,8 @@
 
 #ifdef VERSION_US
 extern u8 D_8800686C;
-extern s32 func_88000020(u8);
-s32 func_88000020(u8 arg0) {
+extern s32 fragment29_main(u8);
+s32 fragment29_main(u8 arg0) {
     s32 result = 0;
     switch (arg0) {
     case 1:
@@ -18,7 +18,7 @@ s32 func_88000020(u8 arg0) {
 }
 
 void func_8800005C(void) {
-    func_88000020(D_8800686C);
+    fragment29_main(D_8800686C);
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_166060/func_88000080.s")
@@ -96,7 +96,7 @@ void func_880009A8(s32 arg0, s16 arg1, s16 arg2, s16 arg3, s16 arg4, s16 arg5, s
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_166060/func_88000C2C.s")
 
-u32 func_88000E54(u32 arg0) {
+u32 Credits_RandomRange(u32 arg0) {
     s32 sp1C;
 
     if (arg0 == 0) {

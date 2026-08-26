@@ -5,7 +5,7 @@
 typedef struct { s16 unk0,unk2,unk4,unk6,unk8,unkA,unkC,unkE; } AnimBlock;
 typedef struct { char pad[0x168]; AnimBlock blocks[2]; s16 index; } AnimState;
 extern void func_80021834(void *, s32, s32);
-void func_80020050(AnimState *arg0, AnimBlock *arg1, s32 arg2, s32 arg3) {
+void Anim_UpdateDoubleBufferedTransform(AnimState *arg0, AnimBlock *arg1, s32 arg2, s32 arg3) {
     AnimBlock *dst = &arg0->blocks[arg0->index];
     dst->unk0 = (s16)(((((arg1->unk0 - 0x20) << 10) * 0x3333 + 0x4000) >> 15) * 2);
     dst->unk2 = (s16)(((((arg1->unk2 - 0x20) << 10) * 0x3333 + 0x4000) >> 15) * 2);
@@ -56,7 +56,7 @@ typedef struct S1_unk_arg1_func_80045D60 {
     u8 unk5;
     u8 unk6;
 } S1_unk_arg1_func_80045D60;
-void func_80020248(S1_unk_arg0_func_80045A80* arg0, S1_unk_arg1_func_80045A80* arg1, s16* arg2, s16* arg3, s16* arg4, s16* arg5, S1_AnimBlock19* arg6, s32 arg7) {
+void Anim_BuildTransformCurves(S1_unk_arg0_func_80045A80* arg0, S1_unk_arg1_func_80045A80* arg1, s16* arg2, s16* arg3, s16* arg4, s16* arg5, S1_AnimBlock19* arg6, s32 arg7) {
     s32 i;
     s16 sp44[40];
 
@@ -72,9 +72,9 @@ void func_80020248(S1_unk_arg0_func_80045A80* arg0, S1_unk_arg1_func_80045A80* a
 
 
 #ifdef CC_CHECK
-    func_80020050((AnimState *)arg0, (AnimBlock *)arg1, (s32)arg0, arg7);
+    Anim_UpdateDoubleBufferedTransform((AnimState *)arg0, (AnimBlock *)arg1, (s32)arg0, arg7);
 #else
-    func_80020050(arg0, arg1, arg0, arg7);
+    Anim_UpdateDoubleBufferedTransform(arg0, arg1, arg0, arg7);
 #endif
 }
 

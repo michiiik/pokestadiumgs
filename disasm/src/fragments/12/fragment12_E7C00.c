@@ -2,10 +2,10 @@
 
 
 #ifdef VERSION_US
-f32 func_8000B548();
+f32 MathUtil_Random_ZeroOne();
 
 s32 func_814028F0(void) {
-    return (s32) ((func_8000B548() * 15.0f) + 6.0f);
+    return (s32) ((MathUtil_Random_ZeroOne() * 15.0f) + 6.0f);
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81402930.s")

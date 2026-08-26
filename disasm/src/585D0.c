@@ -84,7 +84,7 @@ loop_1:
 #endif
 
 #ifdef VERSION_US
-void func_80057FE8(u8 *start, u8 *end) {
+void GbSave_ComputeChecksum(u8 *start, u8 *end) {
     s32 sum = 0;
 
     while (start < end) {
@@ -363,7 +363,7 @@ void func_8005B120(s32 arg0) { func_80059320(arg0, 0xFF); }
 #endif
 
 #ifdef VERSION_US
-void func_8005B190(s32 arg0) { if (func_80056A5C(arg0, 0) == 0) func_80064D58(arg0, 2); }
+void GbSave_RequirePakPresent(s32 arg0) { if (func_80056A5C(arg0, 0) == 0) func_80064D58(arg0, 2); }
 #endif
 
 #ifdef VERSION_US
@@ -686,7 +686,7 @@ extern u8 D_80128575[]; u8 func_8005D8CC(s32 index) { return D_80128575[index * 
 #ifdef VERSION_US
 extern u8 D_8012874C;
 extern u8 D_8012874D;
-s32 func_8005D8E8(s32 arg0) {
+s32 GbSave_GetPortAvailability(s32 arg0) {
     s32 mask = 1 << arg0;
     if (!(D_8012874C & mask)) {
         return 1;

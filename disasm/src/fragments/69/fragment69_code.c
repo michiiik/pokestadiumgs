@@ -168,7 +168,7 @@ void func_8F1002C4(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-extern void func_80004024(s32 *, s32, s32);
+extern void Dma_CopyChunks(s32 *, s32, s32);
 s32 func_800356CC(s32);
 extern u8 D_8F1DEE68;
 
@@ -176,7 +176,7 @@ void func_8F1027F8(void) {
     s32 temp_v0;
 
     temp_v0 = func_800356CC(9);
-    func_80004024(&D_8F1DEE68, temp_v0, temp_v0 + 0x408);
+    Dma_CopyChunks(&D_8F1DEE68, temp_v0, temp_v0 + 0x408);
 }
 #endif
 

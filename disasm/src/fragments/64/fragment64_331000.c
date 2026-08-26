@@ -16,7 +16,7 @@ void func_87F0E504(u8 *arg0, u8 *arg1) { func_87F0E420(arg0, arg1, 1); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_331000/func_87F0E524.s")
 
-s32 func_87F0E5F0(u8 *arg0, u8 *arg1) { extern s32 func_87F0E524(u8 *, u8 *, s32); return func_87F0E524(arg0, arg1, 0); }
+s32 WidgetTree_RunMessagePanelSilent_fragment64(u8 *arg0, u8 *arg1) { extern s32 func_87F0E524(u8 *, u8 *, s32); return func_87F0E524(arg0, arg1, 0); }
 
 s32 func_87F0E610(u8 *arg0, u8 *arg1) { extern s32 func_87F0E524(u8 *, u8 *, s32); return func_87F0E524(arg0, arg1, 1); }
 

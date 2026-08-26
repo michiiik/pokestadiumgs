@@ -15,7 +15,7 @@
 
 #ifdef VERSION_US
 extern Gfx* D_800D0510;
-void func_8413E5E4(u8 r, u8 g, u8 b, u8 a) {
+void ParticleGfx_SetPrimColor_fragment79(u8 r, u8 g, u8 b, u8 a) {
     gDPSetPrimColor(D_800D0510++, 0, 0, r, g, b, a);
 }
 #endif
@@ -377,7 +377,7 @@ void func_84140F1C(void *arg0) {
 
     temp_v0 = (*(u8 *)((u8 *)(arg0) + (8)));
     if (!(temp_v0 & 1) && (temp_v0 & 0x10) && ((temp_v0_2 = (*(u8 *)((u8 *)(arg0) + (0))), (temp_v0_2 == 1)) || (temp_v0_2 == 2))) {
-        func_8413E5E4((*(u8 *)((u8 *)(arg0) + (0x22))), (*(u8 *)((u8 *)(arg0) + (0x23))), (*(u8 *)((u8 *)(arg0) + (0x24))), 0xA8U);
+        ParticleGfx_SetPrimColor_fragment79((*(u8 *)((u8 *)(arg0) + (0x22))), (*(u8 *)((u8 *)(arg0) + (0x23))), (*(u8 *)((u8 *)(arg0) + (0x24))), 0xA8U);
         func_8413F12C((*(s16 *)((u8 *)(arg0) + (0xA))), (*(s16 *)((u8 *)(arg0) + (0xC))), (*(u16 *)((u8 *)(arg0) + (0xE))), (*(u16 *)((u8 *)(arg0) + (0x10))));
     }
 }
@@ -466,7 +466,7 @@ void func_841420A4(void *arg0) {
 #ifdef VERSION_US
 void func_84142E44(void *arg0) {
     if (!((*(u8 *)((u8 *)(arg0) + (8))) & 1) && ((*(u8 *)((u8 *)(arg0) + (0))) == 0x19)) {
-        func_8413E5E4((*(u8 *)((u8 *)(arg0) + (0x22))), (*(u8 *)((u8 *)(arg0) + (0x23))), (*(u8 *)((u8 *)(arg0) + (0x24))), (*(u8 *)((u8 *)(arg0) + (0x25))));
+        ParticleGfx_SetPrimColor_fragment79((*(u8 *)((u8 *)(arg0) + (0x22))), (*(u8 *)((u8 *)(arg0) + (0x23))), (*(u8 *)((u8 *)(arg0) + (0x24))), (*(u8 *)((u8 *)(arg0) + (0x25))));
         func_8413F5A8((s32) (*(s16 *)((u8 *)(arg0) + (0xA))), (s32) (*(s16 *)((u8 *)(arg0) + (0xC))), 0x21, 2);
     }
 }
@@ -475,7 +475,7 @@ void func_84142E44(void *arg0) {
 #ifdef VERSION_US
 void func_84142EB0(void *arg0) {
     if ((*(u8 *)((u8 *)(arg0) + (0))) == 0x1A) {
-        func_8413E5E4((*(u8 *)((u8 *)(arg0) + (0x22))), (*(u8 *)((u8 *)(arg0) + (0x23))), (*(u8 *)((u8 *)(arg0) + (0x24))), (*(u8 *)((u8 *)(arg0) + (0x25))));
+        ParticleGfx_SetPrimColor_fragment79((*(u8 *)((u8 *)(arg0) + (0x22))), (*(u8 *)((u8 *)(arg0) + (0x23))), (*(u8 *)((u8 *)(arg0) + (0x24))), (*(u8 *)((u8 *)(arg0) + (0x25))));
         func_8413F5A8((s32) (*(s16 *)((u8 *)(arg0) + (0xA))), (s32) (*(s16 *)((u8 *)(arg0) + (0xC))), 0x139, 0);
     }
 }
@@ -517,9 +517,9 @@ void func_84143CF0(void *arg0) {
     u16 sp1E;
 
     sp1E = (u16) ((u32) (*(u32 *)((u8 *)(arg0) + (4))) / 100U);
-    func_8413E5E4(0xFFU, 0xFFU, 0xFFU, (*(u8 *)((u8 *)(arg0) + (0x25))));
+    ParticleGfx_SetPrimColor_fragment79(0xFFU, 0xFFU, 0xFFU, (*(u8 *)((u8 *)(arg0) + (0x25))));
     func_8413F390((s16) ((*(s16 *)((u8 *)(arg0) + (0xA))) + D_84186E9C), (s16) ((*(s16 *)((u8 *)(arg0) + (0xC))) + D_84186EA0), 2, sp1E);
-    func_8413E5E4(0xFFU, 0xFFU, 0xFFU, 0xFFU);
+    ParticleGfx_SetPrimColor_fragment79(0xFFU, 0xFFU, 0xFFU, 0xFFU);
 }
 #endif
 
@@ -637,7 +637,7 @@ void func_84145744(void *arg0) {
 extern void func_8413ED28(s16, s16, u16, u16);
 void func_841457C4(void *arg0) {
     if (!((*(u8 *)((u8 *)(arg0) + (8))) & 1) && ((*(u8 *)((u8 *)(arg0) + (0))) == 0x12)) {
-        func_8413E5E4((*(u8 *)((u8 *)(arg0) + (0x22))), (*(u8 *)((u8 *)(arg0) + (0x23))), (*(u8 *)((u8 *)(arg0) + (0x24))), (*(u8 *)((u8 *)(arg0) + (0x25))));
+        ParticleGfx_SetPrimColor_fragment79((*(u8 *)((u8 *)(arg0) + (0x22))), (*(u8 *)((u8 *)(arg0) + (0x23))), (*(u8 *)((u8 *)(arg0) + (0x24))), (*(u8 *)((u8 *)(arg0) + (0x25))));
         func_8413ED28((*(s16 *)((u8 *)(arg0) + (0xA))), (*(s16 *)((u8 *)(arg0) + (0xC))), (*(u16 *)((u8 *)(arg0) + (0xE))), (*(u16 *)((u8 *)(arg0) + (0x10))));
     }
 }

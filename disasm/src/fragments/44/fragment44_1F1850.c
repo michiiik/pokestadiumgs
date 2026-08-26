@@ -149,7 +149,7 @@ void func_8AF06E74(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F1850/func_8AF06EA4.s")
 
-s32 func_80002984(s32, s32);
+s32 main_pool_alloc(s32, s32);
 extern void func_80025F84(s32);
 extern void func_8AC00FFC(s32);
 extern s32 D_8AF2646C;
@@ -159,7 +159,7 @@ void func_8AF070B4(void) {
     if (D_8AF2646C == 0) {
         func_8AC00FFC(0x47425345);
         D_8AF2646C = 1;
-        D_8AF2C020 = func_80002984(0x8400, 0);
+        D_8AF2C020 = main_pool_alloc(0x8400, 0);
     }
     func_80025F84(D_8AF2C020);
 }

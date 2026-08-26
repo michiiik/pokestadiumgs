@@ -339,14 +339,14 @@ s32 func_82503EF8(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_80064CE8(s32, s32 *, s32 *, s32, s32);
+extern void Fragment_LoadAndCall(s32, s32 *, s32 *, s32, s32);
 s32 func_800718B8(s32);
 extern u8 D_82C00000;
 extern u8 fragment83_ROM_START;
 extern u8 fragment84_ROM_START;
 
 void func_825044D0(void) {
-    func_80064CE8(((u32) ((s32) &D_82C00000 & 0x0FF00000) >> 0x14) - 0x10, &fragment83_ROM_START, &fragment84_ROM_START, 0x300, func_800718B8(6));
+    Fragment_LoadAndCall(((u32) ((s32) &D_82C00000 & 0x0FF00000) >> 0x14) - 0x10, &fragment83_ROM_START, &fragment84_ROM_START, 0x300, func_800718B8(6));
 }
 #endif
 

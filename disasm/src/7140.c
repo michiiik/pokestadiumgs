@@ -4,7 +4,7 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/7140/func_80006540.s")
 
-s32 func_800065DC(void *arg0) {
+s32 Storage_ReadSram(void *arg0) {
     struct Func800065DCState { u8 pad[0x1C]; s32 unk1C; void *vaddr; s32 size; s32 unk28; };
     extern OSMesgQueue D_800D0474;
     extern OSMesg D_800D0440;
@@ -80,7 +80,7 @@ s32 func_80006778(void *arg0) {
     return 0;
 }
 
-s32 func_80006800(u8 *arg0) {
+s32 Storage_ReadFlashArray(u8 *arg0) {
     extern OSMesgQueue D_800D0474;
     extern OSMesg D_800D0440;
     OSIoMesg msg;
@@ -90,7 +90,7 @@ s32 func_80006800(u8 *arg0) {
     return 0;
 }
 
-s32 func_80006870(void *arg0) {
+s32 Storage_StartFlashWriteBuffer(void *arg0) {
     struct Func80006870State { u8 pad[0x1C]; s32 unk1C; void *vaddr; s32 size; s32 unk28; };
     extern OSMesgQueue D_800D0474;
     extern OSMesg D_800D0440;
@@ -129,10 +129,10 @@ void func_80006A78(void *arg0, s32 arg1) {
     osSendMesg(&D_800D045C, arg0, OS_MESG_BLOCK);
 }
 
-s32 func_80006ACC(s32 arg0, void *arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
+s32 Dma_QueueRomRead(s32 arg0, void *arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
     struct Func80006ACCState { u8 unk0; u8 filler[0x18]; s32 unk1C; void *unk20; s32 unk24; s32 unk28; };
     struct Func80006ACCState *p;
-    p = (struct Func80006ACCState *)(u32)func_800033B4(0x2C);
+    p = (struct Func80006ACCState *)(u32)Util_Malloc(0x2C);
     if (p != NULL) {
         p->unk0 = 0xF0;
         p->unk1C = arg2;
@@ -153,10 +153,10 @@ struct S1_UnkStruct80000E80 {
     s32 unk28;
 };
 typedef unsigned int S1_uintptr_t;
-s32 func_80006B40(s32 arg0, void* arg1, s32 arg2, s32 arg3, s32 arg4) {
+s32 Storage_QueueRomWrite(s32 arg0, void* arg1, s32 arg2, s32 arg3, s32 arg4) {
     struct S1_UnkStruct80000E80* temp_v0;
 
-    temp_v0 = func_800033B4(0x2C);
+    temp_v0 = Util_Malloc(0x2C);
     if (temp_v0 != NULL) {
         temp_v0->unk0 = 0xF4;
         temp_v0->unk1C = (S1_uintptr_t)arg1;
@@ -168,10 +168,10 @@ s32 func_80006B40(s32 arg0, void* arg1, s32 arg2, s32 arg3, s32 arg4) {
     return temp_v0 == NULL;
 }
 
-s32 func_80006BB4(s32 arg0, void* arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
+s32 Storage_QueueSramTransfer(s32 arg0, void* arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
     struct S1_UnkStruct80000E80* temp_v0;
 
-    temp_v0 = func_800033B4(0x2C);
+    temp_v0 = Util_Malloc(0x2C);
     if (temp_v0 != NULL) {
         if (arg0 == 0) {
             temp_v0->unk0 = 0xF2;

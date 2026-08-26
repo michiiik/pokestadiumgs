@@ -8,7 +8,7 @@ void func_8411F718(void) {
 }
 
 #ifdef VERSION_US
-s32 func_8411F720(void) {
+s32 n_alResampleParam(void) {
     func_8411F718();
     return 0;
 }

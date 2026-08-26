@@ -43,9 +43,9 @@ s32 func_83400020(s32 arg0, s32 arg1) {
 s32 func_8003C9B8(s32 *, s32, f32 *);
 extern f32 D_834041D4;
 extern u8 D_83404250;
-extern void func_800357A8(f32 *, f32, f32, f32);
+extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
 void func_83402C80(void) {
-    func_800357A8(&D_834041D4, (*(f32 *)((u8 *)(&D_83404250) + (0x24))), (*(f32 *)((u8 *)(&D_83404250) + (0x28))), (*(f32 *)((u8 *)(&D_83404250) + (0x2C))));
+    Vec3f_SetComponentsDuplicate(&D_834041D4, (*(f32 *)((u8 *)(&D_83404250) + (0x24))), (*(f32 *)((u8 *)(&D_83404250) + (0x28))), (*(f32 *)((u8 *)(&D_83404250) + (0x2C))));
     if (func_8003C9B8(&D_83404250, 0x64, &D_834041D4) == 0) {
         func_8003C9B8(&D_83404250, 9, &D_834041D4);
         return;

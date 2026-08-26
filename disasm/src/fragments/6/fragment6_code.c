@@ -124,7 +124,7 @@ void func_83102080(s32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/6/fragment6_code/func_831020D0.s")
 
-extern void func_80006D3C();
+extern void Gfx_FreeDisplayListBuffers();
 extern void func_80008574();
 extern void func_80047610();
 extern void func_8004C398();
@@ -133,14 +133,14 @@ void func_831021E8(s32 arg0, s32 arg1) {
     func_80008574();
     func_8004C398();
     func_80047610();
-    func_80006D3C();
+    Gfx_FreeDisplayListBuffers();
 }
 
 extern void func_83102080(s32, s32);
 extern void func_831020D0(s32, s32);
 extern void main_pool_pop_state(s32);
 extern void main_pool_push_state(s32);
-s32 func_83102224(s32 arg0, s32 arg1) {
+s32 fragment6_main(s32 arg0, s32 arg1) {
     main_pool_push_state(0x4642534C);
     func_831020D0(arg0, arg1);
     func_83102080(arg0, arg1);

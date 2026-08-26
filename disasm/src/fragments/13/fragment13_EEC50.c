@@ -261,15 +261,15 @@ void func_82404F64(void *arg0) {
     (*(u8 *)((u8 *)(&D_82407DF0) + (2))) = (u8) (*(u8 *)((u8 *)(arg0) + (0x52)));
 }
 
-s16 func_8000B3B0(f32 y, f32 x);
+s16 MathUtil_Atan2s(f32 y, f32 x);
 void func_82404FE8(s16 *arg0, s16 *arg1, void *arg2) {
     f32 temp_ft4;
     f32 temp_fv1;
 
     temp_fv1 = (*(f32 *)((u8 *)(arg2) + (0)));
     temp_ft4 = (*(f32 *)((u8 *)(arg2) + (8)));
-    *arg0 = func_8000B3B0(sqrtf((temp_fv1 * temp_fv1) + (temp_ft4 * temp_ft4)), (*(f32 *)((u8 *)(arg2) + (4))));
-    *arg1 = func_8000B3B0((*(f32 *)((u8 *)(arg2) + (8))), (*(f32 *)((u8 *)(arg2) + (0))));
+    *arg0 = MathUtil_Atan2s(sqrtf((temp_fv1 * temp_fv1) + (temp_ft4 * temp_ft4)), (*(f32 *)((u8 *)(arg2) + (4))));
+    *arg1 = MathUtil_Atan2s((*(f32 *)((u8 *)(arg2) + (8))), (*(f32 *)((u8 *)(arg2) + (0))));
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_8240504C.s")

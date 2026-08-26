@@ -11,16 +11,16 @@
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056708.s")
 
 #define ARRAY_COUNT(arr) (s32)(sizeof(arr) / sizeof(arr[0]))
-s32 func_800567B0(s32 arg0, u8* arg1) {
+s32 GbPak_DetectRam(s32 arg0, u8* arg1) {
     s32 var_s0 = 0;
     u8 sp34[0x20];
 
     if (arg1 == NULL) {
         arg1 = sp34;
     }
-    func_8000B650((char*)arg1, 0x55, 0x20);
+    HAL_Memset((char*)arg1, 0x55, 0x20);
     if (func_80056708(arg0, arg1) != 0) {
-        func_8000B650((char*)arg1, 0xAA, 0x20);
+        HAL_Memset((char*)arg1, 0xAA, 0x20);
         if (func_80056708(arg0, arg1) != 0) {
             s32 i;
             for (i = 0; i < ARRAY_COUNT(sp34); i++) {
@@ -48,7 +48,7 @@ s32 func_800567B0(s32 arg0, u8* arg1) {
 
 extern void func_80064D58(s32, s32);
 extern u8 D_801283B0;
-s32 func_80056F08(s32 arg0) {
+s32 GbPak_IsCartOn(s32 arg0) {
     u8 sp1F;
     s32 temp_v0;
 
@@ -86,7 +86,7 @@ s32 func_80056F08(s32 arg0) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80057640.s")
 
 extern u8 D_80128557;
-u8 func_80057764(u8 arg0) {
+u8 GbTower_SetPollMask(u8 arg0) {
     u8 old = D_80128557;
     D_80128557 = arg0;
     return old;

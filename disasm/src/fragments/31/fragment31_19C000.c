@@ -2,12 +2,12 @@
 
 
 #ifdef VERSION_US
-extern void func_80049ED8(s32);
+extern void Input_SetRepeatController(s32);
 extern s32 D_80087200;
 extern s32 D_880068B8;
 
 void func_88228D80(void) {
-    func_80049ED8(D_80087200);
+    Input_SetRepeatController(D_80087200);
     D_880068B8 = 0;
 }
 

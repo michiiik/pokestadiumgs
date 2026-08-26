@@ -2,7 +2,7 @@
 
 
 #ifdef VERSION_US
-s32 func_84200020(const u8 *arg0) {
+s32 fragment80_main(const u8 *arg0) {
     return *(u16 *)(*(u8 **)(arg0 + 0x1C) + 0x2E) < *(u16 *)(*(u8 **)(arg0 + 0x18) + 0x2E);
 }
 
@@ -53,7 +53,7 @@ void func_84200550(u8 *arg0) {}
 
 extern u8 func_84203494(void);
 void func_84200558(u8 *arg0, u8 arg1) {
-    if (func_84200020(arg0)) {
+    if (fragment80_main(arg0)) {
         u32 value = func_84203494();
         *(u8 **)(arg0 + 0x10) += (s32)((*(u8 **)(arg0 + 0x14))[0x11] * arg1 * value) / 0xFF;
     }

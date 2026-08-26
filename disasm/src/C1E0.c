@@ -1228,7 +1228,7 @@ void func_80033DC0(void) {
 
 #pragma GLOBAL_ASM("asm/jp/nonmatchings/C1E0/func_80035704.s")
 
-#pragma GLOBAL_ASM("asm/jp/nonmatchings/C1E0/func_8003573C.s")
+#pragma GLOBAL_ASM("asm/jp/nonmatchings/C1E0/Color_SetRGB.s")
 
 #pragma GLOBAL_ASM("asm/jp/nonmatchings/C1E0/func_80035774.s")
 
@@ -1242,7 +1242,7 @@ void func_80033DC0(void) {
 
 #pragma GLOBAL_ASM("asm/jp/nonmatchings/C1E0/func_80035968.s")
 
-#pragma GLOBAL_ASM("asm/jp/nonmatchings/C1E0/func_800359A0.s")
+#pragma GLOBAL_ASM("asm/jp/nonmatchings/C1E0/Vec3f_CrossProduct.s")
 
 #pragma GLOBAL_ASM("asm/jp/nonmatchings/C1E0/func_800359D8.s")
 
@@ -1737,7 +1737,7 @@ void func_800400CC(void) {
 
 #pragma GLOBAL_ASM("asm/jp/nonmatchings/C1E0/func_8004045C.s")
 
-#pragma GLOBAL_ASM("asm/jp/nonmatchings/C1E0/func_800404AC.s")
+#pragma GLOBAL_ASM("asm/jp/nonmatchings/C1E0/geo_layout_cmd_create_shadow.s")
 
 #pragma GLOBAL_ASM("asm/jp/nonmatchings/C1E0/func_800405D4.s")
 
@@ -2467,7 +2467,7 @@ void func_8004ECE4(void) {
 
 #pragma GLOBAL_ASM("asm/jp/nonmatchings/C1E0/func_80050A40.s")
 
-#pragma GLOBAL_ASM("asm/jp/nonmatchings/C1E0/func_80050B0C.s")
+#pragma GLOBAL_ASM("asm/jp/nonmatchings/C1E0/GbTower_RecvExitMesg.s")
 
 #pragma GLOBAL_ASM("asm/jp/nonmatchings/C1E0/func_80050B58.s")
 
@@ -2561,7 +2561,7 @@ void func_8004ECE4(void) {
 
 #pragma GLOBAL_ASM("asm/jp/nonmatchings/C1E0/func_8005335C.s")
 
-#pragma GLOBAL_ASM("asm/jp/nonmatchings/C1E0/func_80053384.s")
+#pragma GLOBAL_ASM("asm/jp/nonmatchings/C1E0/Deck_IsSaveEntryPresent.s")
 
 #pragma GLOBAL_ASM("asm/jp/nonmatchings/C1E0/func_800533E4.s")
 
@@ -3286,7 +3286,7 @@ void func_8005AA70(void) {
 
 #pragma GLOBAL_ASM("asm/jp/nonmatchings/C1E0/func_8006172C.s")
 
-#pragma GLOBAL_ASM("asm/jp/nonmatchings/C1E0/func_8006175C.s")
+#pragma GLOBAL_ASM("asm/jp/nonmatchings/C1E0/StatExpSqrt.s")
 
 #pragma GLOBAL_ASM("asm/jp/nonmatchings/C1E0/func_8006179C.s")
 

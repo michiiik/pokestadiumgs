@@ -130,7 +130,7 @@ u32 func_841094A4(void) {
 
 extern u8 *D_84190198;
 extern s32 func_8411EF5C(u8 *arg0);
-s32 func_841094B0(void) {
+s32 BattleAnim_GetSecondaryOwnerSpecies(void) {
     return func_8411EF5C(D_84190198);
 }
 

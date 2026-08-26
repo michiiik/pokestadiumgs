@@ -125,12 +125,12 @@ extern void func_80008514(s32);
 extern void func_8004C8C0(s32);
 extern u8 D_446E30;
 extern u8 D_82F031C8;
-u8 *func_80004638(s32 id, u8 *rom_start, u8 *rom_end, s32 arg3);
+u8 *Asset_LoadToSegment(s32 id, u8 *rom_start, u8 *rom_end, s32 arg3);
 extern u8 D_1000000[];
 extern u8 D_447D00[];
 extern void func_8004C09C(s32 arg0);
 s32 func_8004C4B0(s32 value);
-void func_81804A00(u8 *arg0);
+void WidgetTree_OpenMessagePanel_fragment4(u8 *arg0);
 void func_81801F60(u8 *arg0);
 extern s32 func_80047588(s32 arg0, s32 arg1);
 extern void func_800086A4(s32);
@@ -193,15 +193,15 @@ void func_82F01D74(s32 arg0, s32 arg1) {
 }
 
 s32 func_800082E0(s32, s32, s32, s32, s32, s32);
-u8 *func_80004638(s32 id, u8 *rom_start, u8 *rom_end, s32 arg3);
+u8 *Asset_LoadToSegment(s32 id, u8 *rom_start, u8 *rom_end, s32 arg3);
 s32 func_8004C4B0(s32 value);
-void func_81804A00(u8 *arg0);
+void WidgetTree_OpenMessagePanel_fragment4(u8 *arg0);
 void func_81801F60(u8 *arg0);
 void func_81801794(void);
 void func_82F01DC4(s32 arg0, s32 arg1) {
     s32 sp24;
 
-    func_80004638((s32) ((u32) ((s32) D_1000000 & 0x0F000000) >> 0x18), &D_446E30, D_447D00, 0);
+    Asset_LoadToSegment((s32) ((u32) ((s32) D_1000000 & 0x0F000000) >> 0x18), &D_446E30, D_447D00, 0);
     func_80006CD0(0x10000, 0);
     sp24 = func_800082E0(1, 0, 2, 0, 2, 1);
     func_8004C09C(0x10F);
@@ -211,7 +211,7 @@ void func_82F01DC4(s32 arg0, s32 arg1) {
     func_8004C4B0(7);
     func_8004C4B0(0xC);
     func_8004C4B0(0xD);
-    func_81804A00(&D_82F032C0);
+    WidgetTree_OpenMessagePanel_fragment4(&D_82F032C0);
     func_81801F60(&D_82F031C8);
     func_80047588(0xC, 0);
     func_80008514(sp24);
@@ -221,7 +221,7 @@ void func_82F01DC4(s32 arg0, s32 arg1) {
     func_80021ED8(0x5E);
 }
 
-extern void func_80006D3C();
+extern void Gfx_FreeDisplayListBuffers();
 extern void func_80008574();
 extern void func_80047610();
 extern void func_8004C398();
@@ -230,7 +230,7 @@ void func_82F01EC8(s32 arg0, s32 arg1) {
     func_80008574();
     func_80047610();
     func_8004C398();
-    func_80006D3C();
+    Gfx_FreeDisplayListBuffers();
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/8/fragment8_code/func_82F01F04.s")

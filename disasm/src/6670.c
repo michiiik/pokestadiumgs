@@ -8,8 +8,8 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6670/func_80005CA4.s")
 
-extern void func_800063B0(void); extern OSMesgQueue D_800CE100;
-void func_80005EE0(void) { func_800063B0(); osContStartReadData(&D_800CE100); }
+extern void Cont_BlockEepromQueue(void); extern OSMesgQueue D_800CE100;
+void Cont_StartReadInputs(void) { Cont_BlockEepromQueue(); osContStartReadData(&D_800CE100); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6670/func_80005F0C.s")
 
@@ -46,19 +46,19 @@ s32 func_800061EC(void) {
 
 extern u8 D_800CE119; s32 func_80006230(void) { return D_800CE119 != 0; }
 
-extern void func_800063DC(void);
+extern void Cont_NoBlockEepromQueue(void);
 s32 func_80006240(u8 *buffer, u32 size, s32 inaddr) {
     s32 result = 1;
     if (D_800CE119) {
         s32 i = 4;
-        func_800063B0();
+        Cont_BlockEepromQueue();
         do {
             s32 count = size / 8;
             s32 address = (inaddr + 7) & ~7;
             i--;
             result = osEepromLongRead(&D_800CE100, count, buffer, address);
         } while (i > 0 && result);
-        func_800063DC();
+        Cont_NoBlockEepromQueue();
     }
     return result;
 }
@@ -67,23 +67,23 @@ s32 func_800062F8(u8 *buffer, u32 size, s32 inaddr) {
     s32 result = 1;
     if (D_800CE119) {
         s32 i = 4;
-        func_800063B0();
+        Cont_BlockEepromQueue();
         do {
             s32 count = size / 8;
             s32 address = (inaddr + 7) & ~7;
             i--;
             result = osEepromLongWrite(&D_800CE100, count, buffer, address);
         } while (i > 0 && result);
-        func_800063DC();
+        Cont_NoBlockEepromQueue();
     }
     return result;
 }
 
-void func_800063B0(void) { extern OSMesgQueue D_800CE150; osRecvMesg(&D_800CE150, NULL, OS_MESG_BLOCK); }
+void Cont_BlockEepromQueue(void) { extern OSMesgQueue D_800CE150; osRecvMesg(&D_800CE150, NULL, OS_MESG_BLOCK); }
 
-void func_800063DC(void) { extern OSMesgQueue D_800CE150; osSendMesg(&D_800CE150, NULL, OS_MESG_NOBLOCK); }
+void Cont_NoBlockEepromQueue(void) { extern OSMesgQueue D_800CE150; osSendMesg(&D_800CE150, NULL, OS_MESG_NOBLOCK); }
 
-void func_80006408(void) { extern OSMesgQueue D_800CE150; extern OSMesg D_800CE14C; osCreateMesgQueue(&D_800CE150, &D_800CE14C, 1); osSendMesg(&D_800CE150, NULL, OS_MESG_NOBLOCK); }
+void Cont_InitEepromQueue(void) { extern OSMesgQueue D_800CE150; extern OSMesg D_800CE14C; osCreateMesgQueue(&D_800CE150, &D_800CE14C, 1); osSendMesg(&D_800CE150, NULL, OS_MESG_NOBLOCK); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6670/func_8000644C.s")
 #endif

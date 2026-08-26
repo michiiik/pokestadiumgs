@@ -156,7 +156,7 @@ void func_80050578(u8 *arg0, s32 arg1) { if (arg0 != NULL) { u8 *value = *(u8 **
 #ifdef VERSION_US
 extern s32 D_801281B0;
 
-void *func_80050B0C(void) {
+void *GbTower_RecvExitMesg(void) {
     void *sp1C;
 
     osRecvMesg(D_801281B0 + 0x21E4, &sp1C, 1);

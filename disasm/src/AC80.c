@@ -17,7 +17,7 @@
 #pragma GLOBAL_ASM("asm/us/nonmatchings/AC80/func_8000A590.s")
 
 extern void func_8000A304(s32, s32, s32, s32);
-void func_8000A6C8(void) {
+void draw_reference_profiler_bars(void) {
     func_8000A304(0x1E, 0x4F, 0xDC, 0x2ABF);
     func_8000A304(0x4F, 0x80, 0xDC, 0xFFCB);
     func_8000A304(0x80, 0xB1, 0xDC, 0xFBCB);
@@ -29,7 +29,7 @@ void func_8000A6C8(void) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/AC80/func_8000AA2C.s")
 
 extern Gfx* D_800D0510;
-void func_8000AF80(s32 profiler_mode) {
+void draw_profiler(s32 profiler_mode) {
     s32 ulx;
     s32 uly;
     s32 ulx_off;
@@ -44,7 +44,7 @@ void func_8000AF80(s32 profiler_mode) {
     ulx_off = 196;
     uly_off = 9;
 
-    if (func_80008990() != 0) {
+    if (StageContext_IsHighResolution() != 0) {
         ulx <<= 1;
         uly <<= 1;
         ulx_off <<= 1;
@@ -67,7 +67,7 @@ void func_8000AF80(s32 profiler_mode) {
 extern void _bzero(s32 *, s32);
 extern u8 D_800D0F90;
 
-void func_8000B254(void) {
+void clear_profiler_data(void) {
     _bzero(&D_800D0F90, 0xC8);
     (*(s16 *)((u8 *)(&D_800D0F90) + (0x25A))) = 1;
     (*(s16 *)((u8 *)(&D_800D0F90) + (0x25C))) = 1;

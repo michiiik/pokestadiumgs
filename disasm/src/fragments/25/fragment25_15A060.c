@@ -80,21 +80,21 @@ void func_82101420(s32 arg0) {
 
 extern void func_80008574(void);
 extern void func_80047610(void);
-extern void func_80006D3C(void);
+extern void Gfx_FreeDisplayListBuffers(void);
 extern void func_82100A40(void *);
 extern u8 D_82104170[];
 void func_82101648(s32 arg0) {
     func_82101420(arg0);
     func_80008574();
     func_80047610();
-    func_80006D3C();
+    Gfx_FreeDisplayListBuffers();
     func_82100A40(D_82104170);
 }
 
 extern void func_8210144C(u8 *, s32);
 extern void main_pool_push_state(s32);
 extern s32 D_82104174;
-s32 func_8210168C(s32 arg0, s32 arg1) {
+s32 fragment25_main(s32 arg0, s32 arg1) {
     main_pool_push_state(0x50534C44);
     func_8210144C(D_82104170, arg0);
     func_82101040(D_82104170);

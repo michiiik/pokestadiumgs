@@ -40,9 +40,9 @@ void func_84105CF8(u8 *arg0) {}
 #ifdef VERSION_US
 extern u8 *D_84190150;
 extern s32 D_84190154;
-extern u8 *func_80002984(s32, s32);
+extern u8 *main_pool_alloc(s32, s32);
 void func_84105D00(void) {
-    D_84190150 = func_80002984(0x300, 0);
+    D_84190150 = main_pool_alloc(0x300, 0);
     _bzero(D_84190150, 0x300);
     D_84190154 = 0;
 }

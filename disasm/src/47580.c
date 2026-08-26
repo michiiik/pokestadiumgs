@@ -83,7 +83,7 @@ void func_80047348(s32 arg0, s32 arg1) {
     D_80126F50 = 0;
 }
 
-void func_8004735C(s32 arg0, s32 arg1)
+void Font_FreeSetAsset(s32 arg0, s32 arg1)
 {
   s32 temp_v1;
   ;
@@ -100,8 +100,8 @@ void func_8004735C(s32 arg0, s32 arg1)
 
 extern u32 D_437750;
 extern u32 D_446E30;
-extern void func_8000484C(void *, void *, s32, s32);
-void func_80047524(void) { func_8000484C(&D_437750, &D_446E30, 1, 1); }
+extern void BinArchive_Open(void *, void *, s32, s32);
+void func_80047524(void) { BinArchive_Open(&D_437750, &D_446E30, 1, 1); }
 
 extern void func_80004B4C(s32, s32);
 s32 func_80047104(s32);
@@ -124,7 +124,7 @@ void func_80047670(void) {
     D_80126F50[0x7A] |= 4;
 }
 
-void func_80047688(void) { D_80126F50[0x7A] = (u8)(D_80126F50[0x7A] & ~4); }
+void Font_EnableLineBreak(void) { D_80126F50[0x7A] = (u8)(D_80126F50[0x7A] & ~4); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800476A0.s")
 
@@ -248,7 +248,7 @@ void func_8004989C(s32 arg0) {
 
 extern Gfx *D_800D0510;
 extern u8 D_80095098[];
-void func_80049C44(void) { Gfx *temp_v1 = D_800D0510++; temp_v1->words.w0 = 0xDE000000; temp_v1->words.w1 = (u32)D_80095098; }
+void Font_EndTexturedTextRendering(void) { Gfx *temp_v1 = D_800D0510++; temp_v1->words.w0 = 0xDE000000; temp_v1->words.w1 = (u32)D_80095098; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80049C70.s")
 

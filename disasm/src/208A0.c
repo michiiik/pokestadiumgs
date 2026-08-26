@@ -23,9 +23,9 @@ struct S1_unk_D_800FCED8_0198 {
 };
 typedef void (*S1_unk_D_800FCED8_190)(s32, S1_unk_D_800FCED8_01598*, s32, OSMesgQueue*);
 struct S1_unk_D_800FCED8 {
-    /* 0x0000 */ S1_unk_D_800FCED8_0000 unk_0000; // func_8001FCA0: _bzero'd each open, unk_166 set to 0x28
-    /* 0x0190 */ S1_unk_D_800FCED8_190 dmaReadFunc; // func_8001FCA0's arg2 (e.g. AudioStream_DmaReadChunk)
-    /* 0x0194 */ s32 dmaBaseAddr; // func_8001FCA0's arg1; base ROM offset for DMA reads
+    /* 0x0000 */ S1_unk_D_800FCED8_0000 unk_0000; // AudioStream_OpenChannel: _bzero'd each open, unk_166 set to 0x28
+    /* 0x0190 */ S1_unk_D_800FCED8_190 dmaReadFunc; // AudioStream_OpenChannel's arg2 (e.g. AudioStream_DmaReadChunk)
+    /* 0x0194 */ s32 dmaBaseAddr; // AudioStream_OpenChannel's arg1; base ROM offset for DMA reads
     /* 0x0198 */ S1_unk_D_800FCED8_0198 pcmBuffer; // decoded PCM ring buffer; func_80045FF0's decode destination, aliased via D_800FCEE0[i] = this+0x198
     /* 0x1598 */ S1_unk_D_800FCED8_01598 unk_1598[1]; // compressed source-data ring, DMA'd via dmaReadFunc; declared size undersells - indexed by (dmaBytesRequested & 0xFFF) >> 3
     /* 0x15A0 */ u32 unk_15A0;
@@ -45,7 +45,7 @@ struct S1_unk_D_800FCED8 {
     /* 0x25D2 */ s8 decodeBudget; // AudioStream_RefillAndDecode: caps decode iterations per call
     /* 0x25D3 */ char unk25D3[0x5];
 };
-void func_8001FCA0(S1_unk_D_800FCED8* arg0, s32 arg1, S1_unk_D_800FCED8_190 arg2) {
+void AudioStream_OpenChannel(S1_unk_D_800FCED8* arg0, s32 arg1, S1_unk_D_800FCED8_190 arg2) {
     _bzero(&arg0->unk_0000, sizeof(S1_unk_D_800FCED8_0000));
 
     arg0->unk_0000.unk_166 = 0x28;

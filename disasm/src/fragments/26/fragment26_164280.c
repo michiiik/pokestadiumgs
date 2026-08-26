@@ -17,7 +17,7 @@ extern Gfx *func_80070974(Gfx *);
     gDPSetTile((pkt), G_IM_FMT_IA, G_IM_SIZ_8b, 4, 0, G_TX_RENDERTILE, 0, G_TX_NOMIRROR | G_TX_CLAMP, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOMIRROR | G_TX_CLAMP, G_TX_NOMASK, G_TX_NOLOD); \
     gDPSetTileSize((pkt), G_TX_RENDERTILE, 0, 0, 0x7C, 0xFC); \
 }
-Gfx *func_810059D0(Gfx *gfx, Func810059D0Addresses *addresses, s32 index) {
+Gfx *DisplayList_BuildAnimatedModelTexture(Gfx *gfx, Func810059D0Addresses *addresses, s32 index) {
     Func810059D0_LoadTextureBlock(gfx++, addresses->textures[index]);
     func_8007087C();
     gfx = func_80070974(gfx);
@@ -33,6 +33,6 @@ void func_81005AC0(s32 arg0, Func81005AC0UlocA *state) {
  volatile u8 stack_pad[2]; Func81005AC0UlocalsA locals; Gfx *gfx;
  if(arg0==2) { if(func_8003F54C(D_8009491C)!=NULL) {
  locals.index=D_80094904; locals.addresses=state->addresses; gfx=func_80006DEC(0x140);
- state->gfx=gfx; func_810059D0(gfx,locals.addresses,locals.index%8); } }
+ state->gfx=gfx; DisplayList_BuildAnimatedModelTexture(gfx,locals.addresses,locals.index%8); } }
 }
 #endif

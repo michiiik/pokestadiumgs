@@ -2,7 +2,7 @@
 
 
 #ifdef VERSION_US
-s32 func_8000484C(s32, s32, s32, s32);
+s32 BinArchive_Open(s32, s32, s32, s32);
 extern void func_800049B8(s32);
 s32 func_80004B4C(s32, s32);
 s32 func_800356CC(s32);
@@ -12,7 +12,7 @@ void func_8004C020(void) {
     s32 sp1C;
     s32 temp_v0;
 
-    temp_v0 = func_8000484C(func_800356CC(2), 0, 2, 1);
+    temp_v0 = BinArchive_Open(func_800356CC(2), 0, 2, 1);
     sp1C = temp_v0;
     D_80097124 = func_80004B4C(temp_v0, 0x41);
     D_80097128 = func_80004B4C(sp1C, 0);
@@ -168,7 +168,7 @@ typedef union S1_arg1_func_80010CA8 {
     };
     u32 raw;
 } S1_arg1_func_80010CA8;
-void func_8004D7F8(u16* arg0, s32 a1, S1_arg1_func_80010CA8 arg2) {
+void PokeIcon_AdjustImageColors(u16* arg0, s32 a1, S1_arg1_func_80010CA8 arg2) {
     s32 cond;
     s32 arg1 = a1;
 
@@ -311,7 +311,7 @@ s32 func_8004DDF4(s32 arg0) {
 
 void func_8004DEF8(s32 arg0) { func_8004DE84(arg0, 0); }
 
-void func_8004DF18(s32 arg0, s32 arg1) { func_8004DF38(arg0, arg1, 0); }
+void WidgetTree_RunMessagePanelSilent(s32 arg0, s32 arg1) { func_8004DF38(arg0, arg1, 0); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004DF38.s")
 

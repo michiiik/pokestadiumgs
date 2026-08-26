@@ -94,10 +94,10 @@ void func_87E00360(void) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_303990/func_87E00394.s")
 
 extern void func_8003C6B8(s32);
-extern void func_8003C970();
+extern void GeoRender_AdvanceFrameCounter();
 
 void func_87E00590(void) {
-    func_8003C970();
+    GeoRender_AdvanceFrameCounter();
     func_8003C6B8((*(s32 *)((u8 *)(D_87E1BA20) + (0x20))));
 }
 
@@ -128,14 +128,14 @@ void func_87E00590(void) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_303990/func_87E0123C.s")
 
 extern void func_87E0123C(s32 *);
-u8 func_800084A0(void);
+u8 StageContext_GetFadeMode(void);
 s32 func_87E0132C(s32 arg0) {
     s32 sp1C;
 
     sp1C = arg0;
     switch (arg0) {                                 /* irregular */
     case 0:
-        if (func_800084A0() == 0) {
+        if (StageContext_GetFadeMode() == 0) {
             sp1C = 1;
         }
         break;
@@ -143,7 +143,7 @@ s32 func_87E0132C(s32 arg0) {
         func_87E0123C(&sp1C);
         break;
     case 2:
-        if (func_800084A0() == 1) {
+        if (StageContext_GetFadeMode() == 1) {
             sp1C = 3;
         }
         break;

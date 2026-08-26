@@ -79,9 +79,9 @@ void func_860095B8(void *arg0, f64 arg1) { func_86007EB4(arg0); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_86009A90.s")
 
-extern s32 func_8000318C(s32, s32, s32);
+extern s32 MainPool_AllocAligned(s32, s32, s32);
 s32 func_86009BE0(s32 arg0, s32 arg1) {
-    return func_8000318C(arg0, 8, 4);
+    return MainPool_AllocAligned(arg0, 8, 4);
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_86009C08.s")

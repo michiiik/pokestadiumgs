@@ -42,9 +42,9 @@ void func_829031F4(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-s32 func_80002B24();
+s32 main_pool_get_available();
 s32 func_800030D0(s32, s32);
-extern void func_80003120(s32);
+extern void MainPool_FinalizeAllocation(s32);
 s32 func_80004B4C(s32, s32);
 extern void func_829061CC(s32, s32, s32);
 extern void main_pool_push_state(s32);
@@ -57,10 +57,10 @@ void func_82903444(void) {
 
     main_pool_push_state(0x53544144);
     sp18 = func_80004B4C(D_82919D14, D_82919D24);
-    temp_v0 = func_800030D0(func_80002B24(), 0);
+    temp_v0 = func_800030D0(main_pool_get_available(), 0);
     sp1C = temp_v0;
     func_829061CC(D_82919D24, temp_v0, sp18);
-    func_80003120(sp1C);
+    MainPool_FinalizeAllocation(sp1C);
 }
 #endif
 
@@ -297,7 +297,7 @@ typedef struct S1_unk_D_86002F58_004_000 {
     /* 0x0FC */ S1_Vec3f unk_0FC;
     /* 0x108 */ char unk108[0x60];
 } S1_unk_D_86002F58_004_000;
-s32 func_8290455C(S1_unk_D_86002F58_004_000* arg0, s16 arg1, s16 arg2) {
+s32 Intro_StepRotationOvershoot(S1_unk_D_86002F58_004_000* arg0, s16 arg1, s16 arg2) {
     if (arg1 > 0) {
         arg0->unk_01E.y -= arg1;
         if ((arg0->unk_01E.y < arg2) && ((arg2 - arg1) < arg0->unk_01E.y)) {
