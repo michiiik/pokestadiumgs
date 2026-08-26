@@ -228,7 +228,32 @@ void func_841206D0(void *arg0)
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84120E14.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84120E7C.s")
+void func_84120E7C(u8 *arg0) {
+    s32 var_s1;
+    u8 *var_s0;
+    u8 *var_s2;
+    u8 *var_s3;
+    u8 *var_s4;
+    var_s0 = arg0;
+    var_s1 = 0;
+    var_s2 = arg0 + 0x2FC;
+    var_s3 = arg0 + 0x2F6;
+    var_s4 = arg0 + 0x308;
+    do {
+        *(s16 *)(var_s0 + 0x444) = 0;
+        var_s0[0x2F5] = 0x80;
+        var_s0[0x2D9] |= 1;
+        func_841202D0((f32 *)var_s2, (f32 *)(arg0 + 0x24));
+        func_841202F0((s16 *)var_s3, (s16 *)(arg0 + 0x1E));
+        func_841202D0((f32 *)var_s4, (f32 *)(arg0 + 0x30));
+        var_s1 += 1;
+        var_s0 += 0x170;
+        var_s2 += 0x170;
+        var_s3 += 0x170;
+        var_s4 += 0x170;
+        *(s16 *)(var_s0 + 0x188) = *(s16 *)(arg0 + 0x20);
+    } while (var_s1 != 2);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84120F5C.s")
 

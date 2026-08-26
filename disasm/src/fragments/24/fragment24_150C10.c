@@ -265,7 +265,25 @@ void func_82B03934(s32 arg0, s32 arg1) { s32 temp = func_8004C990(0x156, 0); fun
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B04430.s")
+extern void func_800496A4(s32, s32);
+extern void func_8004972C(s32, s32, s32, s32);
+extern void func_800495F8(s32, s32, s32, s32);
+extern u8 D_82B085CC[];
+extern u8 D_82B085D0[];
+void func_82B04430(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+    s32 var_a3;
+    u8 *var_v0;
+    if (arg3 & 5) {
+        var_a3 = arg4;
+        var_v0 = &D_82B085D0;
+    } else {
+        var_a3 = 0xFF;
+        var_v0 = &D_82B085CC;
+    }
+    func_800496A4(4, 0);
+    func_8004972C(var_v0[0], var_v0[1], var_v0[2], var_a3);
+    func_800495F8(arg0, arg1, 0, arg2);
+}
 #endif
 
 #ifdef VERSION_US

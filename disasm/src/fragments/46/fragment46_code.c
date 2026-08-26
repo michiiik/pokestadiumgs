@@ -253,7 +253,26 @@ void func_8AE01394(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE04478.s")
+extern s32 D_8AE09920;
+extern s32 D_8AE09938;
+extern s16 D_8AE09B04;
+extern s16 D_8AE09B40;
+extern s16 D_8AE09B48;
+extern s16 D_8AE09B52;
+extern u8 D_8AE09E78;
+extern u8 D_8AE09EA8;
+extern u8 D_8AE09ED8;
+extern u8 D_8AE09F08;
+extern u8 D_8AE09F38;
+extern u8 D_8AE09F68;
+extern u8 D_8AE09F98;
+extern u8 D_8AE09FC8;
+void func_8AE04478(void) {
+    func_8AC0695C(&D_8AE09EA8, (s32) &D_8AE09E78, (s16) (D_8AE09B40 + 0x1E), 0, 0x10, 0, 0, 0x14, -0x37370538, 0xC8, D_8AE09938);
+    func_8AC069C4(&D_8AE09FC8, (s32) &D_8AE09F98, (s16) (D_8AE09B48 + 0x1E), 0, 8, 0, 0, 0x14, -0x37370538, 0xC8, D_8AE09938);
+    func_8AC069C4(&D_8AE09F68, (s32) &D_8AE09F38, D_8AE09B52, 0, 0x16, 1, 0, 0x18, -0x37370538, 0xC8, D_8AE09920);
+    func_8AC069C4(&D_8AE09F08, (s32) &D_8AE09ED8, (s16) (D_8AE09B04 + 0x14), 0, 8, 0, 0, 0x14, -0x37370538, 0xC8, D_8AE09938);
+}
 #endif
 
 #ifdef VERSION_US

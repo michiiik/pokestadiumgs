@@ -97,7 +97,30 @@ void func_86102B30(void *arg0, f32 *arg1, f32 *arg2) {
     *arg2 = *(f32 *)((u8 *)arg0 + 0x1C) - *(f32 *)((u8 *)D_87F119DC + 0x4C);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86102B64.s")
+extern f32 D_8610AB34;
+extern f32 D_8610AB38;
+extern f32 D_8610AB3C;
+void func_86102B64(void *arg0, f32 *arg1, f32 *arg2) {
+    f32 temp_fv0;
+    f32 temp_fv0_2;
+
+    temp_fv0 = (*(f32 *)((u8 *)(D_87F119DC) + (0x48)));
+    if (temp_fv0 < D_8610AB34) {
+        *arg1 = D_8610AB34 - temp_fv0;
+    } else {
+        *arg1 = (*(f32 *)((u8 *)(arg0) + (0x18))) - temp_fv0;
+    }
+    temp_fv0_2 = (*(f32 *)((u8 *)(D_87F119DC) + (0x4C)));
+    if (temp_fv0_2 < D_8610AB38) {
+        *arg2 = D_8610AB38 - temp_fv0_2;
+        return;
+    }
+    if (D_8610AB3C < temp_fv0_2) {
+        *arg2 = D_8610AB3C - temp_fv0_2;
+        return;
+    }
+    *arg2 = (*(f32 *)((u8 *)(arg0) + (0x1C))) - temp_fv0_2;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86102C08.s")
 
@@ -176,7 +199,22 @@ void func_86105928(f32 *arg0) { f32 zero; f32 value; zero = 0.0f; value = D_8610
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86106630.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86106688.s")
+extern f32 D_8610AC74;
+extern f32 D_8610AC78;
+void func_86106688(void) {
+    f32 var_fv0;
+
+    var_fv0 = (*(f32 *)((u8 *)(D_87F119DC) + (0x4C)));
+    if (D_8610AC74 < var_fv0) {
+        (*(f32 *)((u8 *)(D_87F119DC) + (0x4C))) = (f32) D_8610AC74;
+        (*(f32 *)((u8 *)(D_87F119DC) + (0x14))) = (f32) ((*(f32 *)((u8 *)(D_87F119DC) + (0x14))) * -1.0f);
+        var_fv0 = (*(f32 *)((u8 *)(D_87F119DC) + (0x4C)));
+    }
+    if (var_fv0 < D_8610AC78) {
+        (*(f32 *)((u8 *)(D_87F119DC) + (0x4C))) = (f32) D_8610AC78;
+        (*(f32 *)((u8 *)(D_87F119DC) + (0x14))) = (f32) ((*(f32 *)((u8 *)(D_87F119DC) + (0x14))) * -1.0f);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86106710.s")
 

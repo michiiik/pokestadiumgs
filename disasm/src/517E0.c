@@ -279,7 +279,42 @@ void func_8005577C(s32 arg0) {
     } while (var_s0 != 0xE);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800557E4.s")
+void func_800557E4(s32 arg0) {
+    s32 var_s0;
+
+    if (arg0 == 0) {
+        func_80055260(0x14, 0);
+        func_80055260(0x15, 0);
+        func_80055260(0x13, 0);
+        func_80055260(0x18, 0);
+        func_80055260(0x19, 0);
+        func_80055260(0x1A, 0);
+        func_80055260(0x1B, 0);
+        func_80055260(0x1C, 0);
+        func_80055260(0x1D, 0);
+        func_80055260(0x1E, 0);
+    } else {
+        func_8005311C(0x14, 0);
+        func_8005311C(0x15, 0);
+        func_8005311C(0x13, 0);
+        func_8005311C(0x18, 0);
+        func_8005311C(0x19, 0);
+        func_8005311C(0x1A, 0);
+        func_8005311C(0x1B, 0);
+        func_8005311C(0x1C, 0);
+        func_8005311C(0x1D, 0);
+        func_8005311C(0x1E, 0);
+    }
+    var_s0 = 0;
+    do {
+        if (arg0 == 0) {
+            func_80055260(0x12, var_s0);
+        } else {
+            func_8005311C(0x12, var_s0);
+        }
+        var_s0 += 1;
+    } while (var_s0 != 2);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055948.s")
 

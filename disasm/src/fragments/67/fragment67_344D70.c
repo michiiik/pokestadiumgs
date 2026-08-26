@@ -280,7 +280,14 @@ void func_8290A0B0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290AEA8.s")
+extern void func_8290A5B0(s32);
+extern s32 D_8291B858;
+extern s32 D_82912F80;
+void func_8290AEA8(void) {
+    func_80007AEC(8);
+    func_8290A5B0(2);
+    *(s32 *)((u8 *)&D_8291B838 + (D_8291B858 * 4)) = D_82912F80;
+}
 #endif
 
 #ifdef VERSION_US
@@ -304,7 +311,14 @@ void func_8290A0B0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290B220.s")
+extern void func_8290A81C(s32);
+extern s32 D_8291B858;
+extern s32 D_82912F80;
+void func_8290B220(void) {
+    func_80007AEC(8);
+    func_8290A81C(3);
+    *(s32 *)((u8 *)&D_8291B838 + (D_8291B858 * 4)) = D_82912F80;
+}
 #endif
 
 #ifdef VERSION_US
