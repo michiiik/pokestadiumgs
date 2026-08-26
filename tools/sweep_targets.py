@@ -2135,7 +2135,7 @@ def main() -> int:
         import near_miss_kinds
 
         kinds = tuple(k for k in (args.kinds or "").split(",") if k) or None
-        stats_path = args.stats if args.stats.exists() else near_miss_kinds.resolve_stats_path()
+        stats_path = args.stats if args.stats is not None and args.stats.exists() else near_miss_kinds.resolve_stats_path()
         rows = near_miss_kinds._stats_records(stats_path)
         pool = near_miss_kinds.select_pool(rows, min_similarity=args.min_similarity, kinds=kinds)
         flat = [entry for entries in pool.values() for entry in entries]
