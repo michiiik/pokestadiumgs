@@ -134,7 +134,11 @@ void func_8AB01288(void) { extern u16 D_8AB12692; extern u16 D_8AB12694; extern 
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB0130C.s")
+extern u8 D_8AB148B0[];
+void func_8AB0130C(s16 arg0) {
+    if (D_8AB1269E != 0)
+        *(s32 *)((u8 *)D_8AB148B0 + (arg0 * 4)) = 1;
+}
 #endif
 
 #ifdef VERSION_US
