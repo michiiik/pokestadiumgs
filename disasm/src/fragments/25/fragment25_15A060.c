@@ -124,5 +124,14 @@ f32 func_82101AFC(U82101p *arg0) {
     return (f32)arg0->p->a + ((f32)arg0->p->b * (arg0->q->c + 1.0f) * 0.5f);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15A060/func_82101B44.s")
+typedef struct {
+    u8 pad[0xC];
+    s16 x;
+    s16 y;
+} Func82101B44Record;
+
+f32 func_82101B44(void **arg0) {
+    Func82101B44Record *p = *arg0;
+    return sqrtf((f32)p->x * (f32)p->y) * 0.5f;
+}
 #endif
