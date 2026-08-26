@@ -12,7 +12,19 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1A360/func_80019DE4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/1A360/func_8001A2CC.s")
+void *func_8001A2CC(void *arg0, s32 arg1) {
+    u8 *p = (u8 *)arg0;
+    void *result;
+
+    if (arg1 < p[1]) {
+        result = p + 8;
+    } else if (p[2] >= arg1) {
+        result = p + 0x10;
+    } else {
+        result = p + 0x18;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1A360/func_8001A308.s")
 

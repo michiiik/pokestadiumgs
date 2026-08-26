@@ -4,7 +4,11 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_80072030.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_80072070.s")
+extern s32 func_87F0EDDC;
+extern s32 (*func_80003240(s32 *))(s32 *);
+void func_80072070(s32 arg0, u8 arg1) {
+    ((void (*)(s32, u8))(void *)func_80003240(&func_87F0EDDC))(arg0, arg1);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_800720A8.s")
 

@@ -1930,7 +1930,11 @@ void func_84136124(u8 arg0, s16 arg1, u16 arg2, u8 arg3, u8 arg4) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84136294.s")
+extern u32 D_8419A020[];
+s32 func_84136294(u8 arg0, u8 arg1) {
+    u8 *p = (u8 *)(u32)D_8419A020 + (arg0 << 6);
+    return (*(u32 *)p & (1 << arg1)) != 0;
+}
 #endif
 
 #ifdef VERSION_US

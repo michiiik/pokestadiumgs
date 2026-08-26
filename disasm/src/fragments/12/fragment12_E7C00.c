@@ -10,7 +10,16 @@ s32 func_814028F0(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81402930.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81402978.s")
+void func_81402978(void *arg0, f32 arg1, s32 arg2) {
+    *(s16 *)((u8 *)arg0 + 8) = arg2;
+    *(f32 *)arg0 = arg1;
+
+    if (arg2 >= 0) {
+        *(f32 *)((u8 *)arg0 + 4) = 400.0f;
+    } else {
+        *(f32 *)((u8 *)arg0 + 4) = 0.0f;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_814029AC.s")
 
