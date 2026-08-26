@@ -1556,10 +1556,13 @@ class TargetDiscoveryTests(unittest.TestCase):
                 "s32 func_a(s32 arg0) { return arg0; }\n"
                 "typedef struct S1_Local S1_Local;\n"
                 "S1_Local *func_s1(S1_Local *arg0) { return arg0; }\n"
+                "typedef struct LocalOnly LocalOnly;\n"
+                "LocalOnly *func_abc(LocalOnly *arg0) { return arg0; }\n"
             )
             (source_root / "b.c").write_text(
                 "extern void func_a(void);\n"
                 "extern s32 D_80000010;\n"
+                "extern LocalOnly *D_80000014;\n"
             )
             header = root / "build" / "prototypes.h"
             generated = targets.repository_symbol_header(
@@ -1570,6 +1573,8 @@ class TargetDiscoveryTests(unittest.TestCase):
         self.assertNotIn("void func_a(void);", text)
         self.assertIn("extern s32 D_80000010;", text)
         self.assertNotIn("func_s1", text)
+        self.assertNotIn("func_abc", text)
+        self.assertNotIn("D_80000014", text)
 
     def test_host_preprocess_command_strips_check_only_flags(self) -> None:
         check = [

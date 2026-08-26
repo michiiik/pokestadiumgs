@@ -230,6 +230,109 @@ def _context_cache_lock(cache_path: Path) -> threading.Lock:
 
 _SYMBOL_RE = re.compile(r"\b(?:func_[0-9A-Fa-f]+|D_[0-9A-Fa-f]+)\b")
 _EXTERN_DECL_RE = re.compile(r"\bextern\s+([^;{}]+);")
+_CONTEXT_TYPE_NAMES: set[str] | None = None
+_CONTEXT_TYPE_LOCK = threading.Lock()
+
+# These are the names that can occur in a declaration without a typedef from
+# one of the project's headers.  The generated index is included before the
+# owner source, so importing a source-local ``typedef struct ...`` is not
+# safe: its name may be absent (or mean something different) in the next
+# owner.  Keep this list deliberately broad for the compiler's built-in and
+# N64 ABI spellings; project typedefs are added by _context_type_names().
+_BUILTIN_CONTEXT_TYPES = {
+    "void", "char", "signed", "unsigned", "short", "int", "long", "float",
+    "double", "const", "volatile", "restrict", "static", "struct", "union",
+    "enum", "_Bool", "bool", "true", "false", "__signed", "__attribute__",
+    "u8", "u16", "u32", "u64", "s8", "s16", "s32", "s64", "f32", "f64",
+    "size_t", "ptrdiff_t", "intptr_t", "uintptr_t", "wchar_t", "va_list",
+}
+
+
+def _context_type_names() -> set[str]:
+    """Return typedef/tag names provided by the global include tree.
+
+    Parsing headers is enough here and avoids making every m2c draft invoke a
+    compiler just to decide whether a prototype is portable.  In particular,
+    the ``} Alias;`` form catches the multi-line N64 structs such as ``Gfx``
+    that a single-line typedef regex would miss.
+    """
+    global _CONTEXT_TYPE_NAMES
+    with _CONTEXT_TYPE_LOCK:
+        if _CONTEXT_TYPE_NAMES is not None:
+            return _CONTEXT_TYPE_NAMES
+        names = set(_BUILTIN_CONTEXT_TYPES)
+        roots = (DISASM_ROOT / "include", DISASM_ROOT / "lib" / "ultralib" / "include")
+        for root in roots:
+            if not root.is_dir():
+                continue
+            for path in root.rglob("*.h"):
+                try:
+                    text = path.read_text(encoding="utf-8", errors="replace")
+                except OSError:
+                    continue
+                # Named struct/union/enum tags can be used directly in a
+                # prototype even when their typedef alias is not present.
+                names.update(re.findall(r"\b(?:struct|union|enum)\s+([A-Za-z_]\w*)", text))
+                for match in re.finditer(r"\btypedef\b(.*?);", text, re.S):
+                    body = match.group(1)
+                    pointer_alias = re.search(r"\(\s*\*\s*([A-Za-z_]\w*)\s*\)", body)
+                    if pointer_alias:
+                        names.add(pointer_alias.group(1))
+                        continue
+                    aliases = re.findall(
+                        r"\b([A-Za-z_]\w*)\b\s*(?:\[[^\]]*\])?\s*$", body.strip()
+                    )
+                    if aliases:
+                        names.add(aliases[-1])
+                names.update(
+                    re.findall(r"\}\s*([A-Za-z_]\w*)\s*(?:\[[^\]]*\])?\s*;", text)
+                )
+        _CONTEXT_TYPE_NAMES = names
+        return names
+
+
+def _declaration_type_fragments(declaration: str) -> list[str]:
+    """Extract return/global and parameter type fragments from a prototype."""
+    text = declaration.strip().removesuffix(";").strip()
+    text = re.sub(r"^extern\s+", "", text)
+    function = re.search(r"\bfunc_[0-9A-Fa-f]+\s*\(", text)
+    if function:
+        fragments = [text[: function.start()].strip()]
+        start = function.end() - 1
+        end = text.rfind(")")
+        if end > start:
+            params = text[start + 1 : end]
+            # Function prototypes produced from the source tree do not use
+            # nested commas except in function-pointer parameters.  Keeping
+            # such a parameter as one fragment is conservative: it will be
+            # omitted if its callback typedef is not globally known.
+            fragments.extend(params.split(","))
+        return fragments
+    symbol = re.search(r"\bD_[0-9A-Fa-f]+\b", text)
+    if symbol:
+        return [text[: symbol.start()].strip()]
+    return [text]
+
+
+def _declaration_has_unknown_context_type(declaration: str) -> bool:
+    """Whether a declaration references a typedef unavailable to all owners."""
+    known = _context_type_names()
+    for index, fragment in enumerate(_declaration_type_fragments(declaration)):
+        fragment = fragment.strip()
+        if not fragment:
+            continue
+        if index and fragment != "void":
+            # Drop the parameter's declarator name (``u8 value`` or
+            # ``SomeType *ptr``) before checking the remaining type tokens.
+            fragment = re.sub(
+                r"(?:\*+\s*|\b[A-Za-z_]\w*\s+)([A-Za-z_]\w*)\s*(?:\[[^\]]*\])?$",
+                lambda match: match.group(0)[: match.group(0).rfind(match.group(1))].rstrip(),
+                fragment,
+            )
+        tokens = re.findall(r"\b[A-Za-z_]\w*\b", fragment)
+        if any(token not in known for token in tokens):
+            return True
+    return False
 
 
 def _normalise_declaration(declaration: str) -> str:
@@ -296,10 +399,13 @@ def repository_symbol_header(
         for path in files:
             _, declarations = _source_symbol_declarations(path)
             for symbol, declaration, is_definition in declarations:
-                # Source-local Stadium 1 typedefs are not available to every
-                # owner context.  Skipping them avoids turning a useful
-                # prototype index into a global compile failure.
+                # Source-local typedefs are not available to every owner
+                # context.  Skipping them avoids turning a useful prototype
+                # index into a global compile failure; the owner-local source
+                # remains available to m2c when it really needs that type.
                 if re.search(r"\bS1_[A-Za-z0-9_]*\b", declaration):
+                    continue
+                if _declaration_has_unknown_context_type(declaration):
                     continue
                 by_symbol.setdefault(symbol, set()).add((declaration, is_definition))
         selected: list[str] = []
