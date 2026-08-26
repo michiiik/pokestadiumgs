@@ -361,6 +361,170 @@ class ScannerTests(unittest.TestCase):
         self.assertIn("func_fourth();", candidates[0])
 
 
+class ClassifyCallSequenceShapeTests(unittest.TestCase):
+    """Sub-families split out of the call_sequence/unclassified catch-alls.
+
+    Each fixture is built to fail every pre-existing family's rule (a
+    non-``SIMPLE_WRAPPER_OPS`` instruction, a branch, or an extra call) so it
+    actually reaches the new rules instead of being claimed by
+    ``direct_wrapper``/``multi_call_wrapper``/``constant_map``/etc. first --
+    those pre-existing rules and their owners must stay exactly as they were.
+    """
+
+    def test_dispatcher_switch_is_a_jump_table_with_calls(self) -> None:
+        # "sll" is outside SIMPLE_WRAPPER_OPS, so this cannot be mistaken for
+        # a direct_wrapper despite having exactly one call.
+        instructions = [scanner.Instruction("sll", "$t0, $a0, 2", 0)]
+        family, confidence, notes = scanner.classify(
+            instructions,
+            calls=["func_worker"],
+            globals_=[],
+            jump_tables=["jtbl_80020000"],
+            accesses=[],
+            bounds=[],
+            loops=False,
+        )
+        self.assertEqual(family, "dispatcher_switch")
+        self.assertGreater(confidence, 0.7)
+        self.assertTrue(any("switch" in note for note in notes))
+
+    def test_large_mixed_is_a_size_cutoff(self) -> None:
+        instructions = [scanner.Instruction("nop", "", index) for index in range(300)]
+        family, confidence, notes = scanner.classify(
+            instructions, calls=[], globals_=[], jump_tables=[], accesses=[], bounds=[], loops=False
+        )
+        self.assertEqual(family, "large_mixed")
+        self.assertTrue(any("300" in note for note in notes))
+
+    def test_float_math_needs_no_calls_and_float_ops(self) -> None:
+        instructions = [
+            scanner.Instruction("lwc1", "$f0, 0x0($a0)", 0),
+            scanner.Instruction("lwc1", "$f2, 0x4($a0)", 1),
+            scanner.Instruction("add.s", "$f0, $f0, $f2", 2),
+            scanner.Instruction("swc1", "$f0, 0x0($a1)", 3),
+            scanner.Instruction("jr", "$ra", 4),
+            scanner.Instruction("nop", "", 5),
+        ]
+        family, confidence, notes = scanner.classify(
+            instructions, calls=[], globals_=[], jump_tables=[], accesses=[], bounds=[], loops=False
+        )
+        self.assertEqual(family, "float_math")
+        self.assertTrue(any("float" in note for note in notes))
+
+    def test_predicate_is_short_boolean_result_no_calls(self) -> None:
+        instructions = [
+            scanner.Instruction("slt", "$v0, $a0, $a1", 0),
+            scanner.Instruction("jr", "$ra", 1),
+            scanner.Instruction("nop", "", 2),
+        ]
+        family, confidence, notes = scanner.classify(
+            instructions, calls=[], globals_=[], jump_tables=[], accesses=[], bounds=[], loops=False
+        )
+        self.assertEqual(family, "predicate")
+
+    def test_init_sequence_is_one_or_two_calls_with_narrow_field_stores(self) -> None:
+        # "sb"/"sh" are outside SIMPLE_WRAPPER_OPS, so this single-call owner
+        # cannot be mistaken for direct_wrapper.
+        instructions = [
+            scanner.Instruction("sb", "$a2, 0x0($a1)", 0),
+            scanner.Instruction("sh", "$a3, 0x2($a1)", 1),
+            scanner.Instruction("jal", "func_worker", 2),
+            scanner.Instruction("nop", "", 3),
+            scanner.Instruction("jr", "$ra", 4),
+            scanner.Instruction("nop", "", 5),
+        ]
+        accesses = [
+            scanner.MemoryAccess("sb", 0, "a1", 0),
+            scanner.MemoryAccess("sh", 2, "a1", 1),
+        ]
+        family, confidence, notes = scanner.classify(
+            instructions,
+            calls=["func_worker"],
+            globals_=[],
+            jump_tables=[],
+            accesses=accesses,
+            bounds=[],
+            loops=False,
+        )
+        self.assertEqual(family, "init_sequence")
+
+    def test_call_chain_is_three_plus_calls_with_little_side_effect(self) -> None:
+        # A branch keeps this from matching multi_call_wrapper (which
+        # requires no control-flow branches).
+        instructions = [
+            scanner.Instruction("jal", "func_a", 0),
+            scanner.Instruction("nop", "", 1),
+            scanner.Instruction("jal", "func_b", 2),
+            scanner.Instruction("nop", "", 3),
+            scanner.Instruction("beqz", "$v0, .Lskip", 4),
+            scanner.Instruction("jal", "func_c", 5),
+            scanner.Instruction("nop", "", 6),
+            scanner.Instruction("jr", "$ra", 7),
+            scanner.Instruction("nop", "", 8),
+        ]
+        family, confidence, notes = scanner.classify(
+            instructions,
+            calls=["func_a", "func_b", "func_c"],
+            globals_=[],
+            jump_tables=[],
+            accesses=[],
+            bounds=[],
+            loops=False,
+        )
+        self.assertEqual(family, "call_chain")
+
+    def test_state_machine_is_no_calls_many_branches_over_state(self) -> None:
+        # A non-empty ``globals_`` keeps this from matching the pre-existing
+        # constant_map rule, which requires branches with *no* globals.
+        instructions = [scanner.Instruction("beqz", "$a0, .L", index) for index in range(5)]
+        family, confidence, notes = scanner.classify(
+            instructions,
+            calls=[],
+            globals_=["D_80001234"],
+            jump_tables=[],
+            accesses=[],
+            bounds=[],
+            loops=False,
+        )
+        self.assertEqual(family, "state_machine")
+
+    def test_call_sequence_and_unclassified_remain_the_final_fallbacks(self) -> None:
+        # A branchy multi-call owner outside every new shape's rule still
+        # falls into call_sequence, and a no-call/no-evidence owner still
+        # falls into unclassified -- the two historical catch-alls are
+        # narrowed, not removed.
+        branchy_calls = [
+            scanner.Instruction("jal", "func_a", 0),
+            scanner.Instruction("nop", "", 1),
+            scanner.Instruction("beqz", "$v0, .Lskip", 2),
+            scanner.Instruction("jal", "func_b", 3),
+            scanner.Instruction("nop", "", 4),
+            scanner.Instruction("jr", "$ra", 5),
+            scanner.Instruction("nop", "", 6),
+        ]
+        family, _confidence, _notes = scanner.classify(
+            branchy_calls,
+            calls=["func_a", "func_b"],
+            globals_=[],
+            jump_tables=[],
+            accesses=[],
+            bounds=[],
+            loops=False,
+        )
+        self.assertEqual(family, "call_sequence")
+
+        family, _confidence, _notes = scanner.classify(
+            [scanner.Instruction("or", "$v0, $zero, $zero", 0), scanner.Instruction("jr", "$ra", 1)],
+            calls=[],
+            globals_=[],
+            jump_tables=[],
+            accesses=[],
+            bounds=[],
+            loops=False,
+        )
+        self.assertEqual(family, "unclassified")
+
+
 class AsmProcessorPaddingTests(unittest.TestCase):
     def test_c_function_padding_generates_exact_text_block(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

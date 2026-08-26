@@ -53,6 +53,34 @@ DRAFT_VARIANTS: dict[str, list[str]] = {
 }
 
 
+def _guess_asm_fallback_root() -> Path | None:
+    """Read-only fallback root for a partially generated ``disasm/asm`` tree.
+
+    ``disasm/asm/us/nonmatchings`` is generated per-checkout by splat
+    extraction; an agent worktree may not have run it locally.  A given
+    owner's ``.s`` is deterministic from the ROM + yaml, so it is safe to
+    read (never write) the same relative path from the checkout this
+    worktree was branched from.  Mirrors
+    ``s1_transfer_sweep._guess_gs_asm_fallback_root`` for the
+    ``.claude/worktrees/<name>`` layout used by this agent harness; an
+    ordinary (non-worktree) checkout has nothing to fall back to and this
+    returns ``None``.
+    """
+    env = os.environ.get("PRAGMA_ASM_FALLBACK_ROOT")
+    if env:
+        candidate = Path(env)
+        return candidate if candidate.is_dir() else None
+    parent = REPO_ROOT.parent
+    if parent.name == "worktrees" and parent.parent.name == ".claude":
+        candidate = parent.parent.parent
+        if candidate.is_dir() and (candidate / "disasm" / "asm").is_dir():
+            return candidate
+    return None
+
+
+_ASM_FALLBACK_ROOT = _guess_asm_fallback_root()
+
+
 @dataclass(frozen=True)
 class Owner:
     function: str
@@ -65,7 +93,11 @@ class Owner:
 
     @property
     def asm_path(self) -> Path:
-        return REPO_ROOT / self.asm
+        primary = REPO_ROOT / self.asm
+        if primary.exists() or _ASM_FALLBACK_ROOT is None:
+            return primary
+        fallback = _ASM_FALLBACK_ROOT / self.asm
+        return fallback if fallback.exists() else primary
 
     def as_dict(self) -> dict[str, object]:
         return {
