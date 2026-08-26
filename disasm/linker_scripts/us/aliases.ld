@@ -7,12 +7,6 @@
  * extra `-T` script from the Makefile, the same way hardware_regs.ld,
  * undefined_syms.ld, and the other hand-written scripts are.
  */
-Audio_InitializeTaskState = func_80021B00;
 Audio_BuildSchedulerTask = func_80021B74;
 Audio_ThreadEntry = func_80035174;
-Audio_StopProcessing = func_800353BC;
-Audio_ResetModeSelector = func_80035494;
-Audio_ResetRequestId = func_800355D4;
 Audio_RequestEvent = func_800355E4;
-Dma_QueueRequestMessage = func_80006A78;
-Minigame_SetPlayerMask = func_8007214C;

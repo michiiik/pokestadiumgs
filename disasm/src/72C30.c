@@ -16,7 +16,7 @@ void Minigame_UpdateControllerState(s32 arg0, u8 arg1) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_800720A8.s")
 
 extern u8 D_8012B3F6;
-void func_8007214C(s8 arg0) {
+void Minigame_SetPlayerMask(s8 arg0) {
     D_8012B3F6 = 1 << arg0;
 }
 

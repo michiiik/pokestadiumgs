@@ -29,7 +29,7 @@ extern void func_80064CD0(s16);
 extern void Game_SetState(s32);
 extern void func_80065D90(s32);
 extern void func_8006CBFC(void);
-void func_80065BB0(void) {
+void Game_State02_Run(void) {
     s32 ret;
     s32 i;
     Unk667B0 sp30;

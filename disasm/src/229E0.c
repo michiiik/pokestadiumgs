@@ -1402,7 +1402,7 @@ void func_8003539C(void) { func_80021BBC(); }
 #ifdef VERSION_US
 extern s32 func_80025C9C(void);
 extern s32 D_80122A40;
-s32 func_800353BC(void) {
+s32 Audio_StopProcessing(void) {
     func_80025C9C();
     D_80122A40 = 0;
     return 0;
@@ -1431,7 +1431,7 @@ void Audio_SetProcessingEnabled(s32 enabled) { D_80122A40 = enabled ? 0 : 1; }
 
 #ifdef VERSION_US
 extern s32 D_80094860;
-void func_80035494(void) {
+void Audio_ResetModeSelector(void) {
     D_80094860 = -1;
 }
 #endif
@@ -1449,7 +1449,7 @@ void Audio_EnableModeFlag(void) {
 
 #ifdef VERSION_US
 extern s32 D_80094864;
-void func_800355D4(void) {
+void Audio_ResetRequestId(void) {
     D_80094864 = -1;
 }
 #endif

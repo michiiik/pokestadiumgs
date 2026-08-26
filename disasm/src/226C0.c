@@ -18,7 +18,7 @@ extern void func_800248A0(void);
 extern void func_80018728(u32, ...);
 extern void func_80025EB0(s32, s32, s32, s32);
 
-void func_80021B00(void) {
+void Audio_InitializeTaskState(void) {
     func_80021AC0(0, 0);
     func_80028140();
     func_80035020(2);
