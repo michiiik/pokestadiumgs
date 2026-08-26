@@ -184,7 +184,19 @@ void func_800179B4_padding2(void) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_800179CC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80017A38.s")
+extern OSMesgQueue D_800D1320;
+extern s32 osRecvMesg(OSMesgQueue *, OSMesg *, s32);
+extern u8 D_800D1378;
+void func_80017A38(void) {
+    struct { s32 pad; void *value[2]; } sp20;
+    s8 *temp_v0;
+    if (osRecvMesg(&D_800D1320, (OSMesg *)sp20.value, 0) != -1) {
+        temp_v0 = *(s8 **)((u8 *)&D_800D1378 + (((u32)sp20.value[0] >> 0x18) * 4));
+        if (temp_v0 != NULL) {
+            *temp_v0 = 0;
+        }
+    }
+}
 
 extern OSMesgQueue D_800D1320; extern OSMesg D_800D1338[]; void func_80017A90(void){osCreateMesgQueue(&D_800D1320,D_800D1338,0x10);}
 
