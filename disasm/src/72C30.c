@@ -2,7 +2,11 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_80072030.s")
+extern s32 func_87F0EFA0;
+extern s32 (*func_80003240(s32 *))(s32 *);
+void func_80072030(s32 arg0, u8 arg1, s32 arg2) {
+    ((void (*)(s32, u8, s32))(void *)func_80003240(&func_87F0EFA0))(arg0, arg1, arg2);
+}
 
 extern s32 func_87F0EDDC;
 extern s32 (*func_80003240(s32 *))(s32 *);
