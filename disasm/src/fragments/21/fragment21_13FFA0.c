@@ -187,7 +187,18 @@ s16 func_825028E8(u8 *arg0)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_13FFA0/func_82502924.s")
+s16 func_82502924(u8 *arg0) {
+    s16 result = -1;
+    u8 index;
+    u32 offset;
+
+    if (arg0) {
+        index = *arg0;
+        offset = index * 0x98;
+        result = *(u8 *)(arg0 + offset - 0x93) - 1;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
