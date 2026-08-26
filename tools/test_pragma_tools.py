@@ -376,6 +376,19 @@ class AsmProcessorPaddingTests(unittest.TestCase):
         self.assertEqual(functions[0].data[".text"][1], 12)
         self.assertIn(b"_asmpp_func", output.getvalue())
 
+    def test_c_function_padding_allows_single_nop(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "padding.c"
+            source.write_text("#pragma C_FUNCTION_PADDING(4)\n")
+            output = io.BytesIO()
+            functions, dependencies = asm_processor.run(
+                ["-O2", str(source)], outfile=output
+            )
+
+        self.assertEqual(dependencies, [])
+        self.assertEqual(len(functions), 1)
+        self.assertEqual(functions[0].data[".text"][1], 4)
+
     def test_c_function_padding_rejects_non_word_size(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             source = Path(directory) / "padding.c"

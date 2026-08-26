@@ -521,6 +521,8 @@ class GlobalAsmBlock:
         self.fn_ins_inds = []
         self.glued_line = ''
         self.num_lines = 0
+        # Layout-only padding blocks may legitimately contain a single nop.
+        self.allow_short_text = False
 
     def fail(self, message, line=None):
         context = self.fn_desc
@@ -791,7 +793,7 @@ class GlobalAsmBlock:
             src[0] = state.func_prologue(text_name)
             src[self.num_lines] = state.func_epilogue()
             instr_count = self.fn_section_sizes['.text'] // 4
-            if instr_count < state.min_instr_count:
+            if instr_count < state.min_instr_count and not self.allow_short_text:
                 self.fail("too short .text block")
             tot_emitted = 0
             tot_skipped = 0
@@ -975,6 +977,7 @@ def parse_source(f, opts, out_dependencies, print_source=None):
             if padding <= 0 or padding % 4 != 0:
                 raise Failure("C_FUNCTION_PADDING argument must be a positive multiple of 4: " + raw_line)
             block = GlobalAsmBlock("C_FUNCTION_PADDING at line " + str(line_no))
+            block.allow_short_text = True
             block.process_line('glabel ' + state.make_name('padding'), output_enc)
             for _ in range(padding // 4):
                 block.process_line('nop', output_enc)
