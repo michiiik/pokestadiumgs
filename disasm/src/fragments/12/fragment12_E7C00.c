@@ -195,7 +195,18 @@ s32 func_81404C94(u8 *arg0) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81404CA4.s")
+s32 func_81404CA4(void *arg0)
+{
+  f32 new_var;
+  new_var = func_816092FC();
+  *((f32 *) (((u8 *) arg0) + 0)) = (f32) ((*((f32 *) (((u8 *) arg0) + 0))) + new_var);
+  if ((*((f32 *) (((u8 *) arg0) + 0))) >= 16.0f)
+  {
+    *((s8 *) (((u8 *) arg0) + 6)) = 2;
+    *((f32 *) (((u8 *) arg0) + 0)) = 16.0f;
+  }
+  return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81404D00.s")
 

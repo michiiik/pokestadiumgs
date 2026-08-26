@@ -284,7 +284,24 @@ void func_86108B14(s32 *arg0, s32 *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86108B28.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86108BE0.s")
+void func_86108BE0(s32 arg0, u32 arg1)
+{
+  s32 temp_s4;
+  s32 var_s0;
+  u32 temp_s1;
+  temp_s4 = arg1 * 3;
+  var_s0 = 0;
+  if (temp_s4 > 0)
+  {
+    do
+    {
+      temp_s1 = func_8003570C() % arg1;
+      func_86108B14((temp_s1 * 4) + arg0, ((func_8003570C() % arg1) * 4) + arg0);
+      var_s0 += 1;
+    }
+    while (var_s0 != (arg1 * 3));
+  }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86108C90.s")
 

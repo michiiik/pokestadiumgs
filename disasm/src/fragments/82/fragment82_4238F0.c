@@ -120,13 +120,67 @@ extern u8 D_82D0717C[]; extern u8 D_82D07174[]; extern u8 D_82D07190; void func_
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D065C0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D06670.s")
+void func_82D06670(u8 *arg0)
+{
+  u8 temp_v0;
+  if ((*((u8 *) (((u8 *) arg0) + 0))) == 4)
+  {
+    func_82D062CC(arg0);
+  }
+  ;
+  if ((*((u8 *) (((u8 *) arg0) + 0xC))) == 0)
+  {
+    *((s8 *) (((u8 *) arg0) + 0xB)) = 0;
+    return;
+  }
+  *((u8 *) (((u8 *) arg0) + 0xC)) = (u8) ((*((u8 *) (((u8 *) arg0) + 0xC))) - 1);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D066BC.s")
+void func_82D066BC(u8 *arg0)
+{
+  u8 temp_v0;
+ do { if ((*((u8 *) (((u8 *) arg0) + 0))) == 4) { func_82D06300(arg0); } temp_v0 = *((u8 *) (((u8 *) arg0) + 0xC)); } while (0);
+  if (temp_v0 == 0)
+  {
+    *((s8 *) (((u8 *) arg0) + 0xB)) = 0;
+    return;
+  }
+  *((u8 *) (((u8 *) arg0) + 0xC)) = (u8) (temp_v0 - 1);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D06708.s")
+void func_82D06708(u8 *arg0)
+{
+  u8 *new_var;
+  u8 temp_v0;
+  new_var = arg0;
+  if (4 == (*((u8 *) (((u8 *) new_var) + 0))))
+  {
+    func_82D06334(new_var);
+  }
+  temp_v0 = *((u8 *) (((u8 *) new_var) + 0xC));
+  if (!temp_v0)
+  {
+    *((s8 *) (((u8 *) arg0) + 0xB)) = 0;
+    return;
+  }
+  *((u8 *) (((u8 *) new_var) + 0xC)) = (u8) (temp_v0 + -1);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D06754.s")
+void func_82D06754(u8 *arg0)
+{
+  u8 temp_v0;
+  if ((*((u8 *) (((u8 *) arg0) + 0))) == 4)
+  {
+    func_82D06368(arg0);
+  }
+  ;
+  if ((*((u8 *) (((u8 *) arg0) + 0xC))) == 0)
+  {
+    *((s8 *) (((u8 *) arg0) + 0xB)) = 0;
+    return;
+  }
+  *((u8 *) (((u8 *) arg0) + 0xC)) = (u8) ((*((u8 *) (((u8 *) arg0) + 0xC))) - 1);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D067A0.s")
 

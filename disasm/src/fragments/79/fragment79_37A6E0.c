@@ -1622,7 +1622,18 @@ void func_8411B014(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8411B2A0.s")
+void func_8411B2A0(u8 *arg0)
+{
+  int new_var;
+  new_var = 0xA4;
+  *((s16 *) (((u8 *) arg0) + 0x7E8)) = 0;
+  *((s8 *) (((u8 *) arg0) + 0x7F6)) = 0;
+  func_8411FEE8(0x64);
+  *((s8 *) (((u8 *) arg0) + 0x618)) = new_var;
+  func_84111C44();
+  func_841134A0(arg0);
+  *((s32 *) (((u8 *) (arg0 + (D_841911F4 * 4))) + 0x5C8)) = (s32) D_84183D50;
+}
 #endif
 
 #ifdef VERSION_US

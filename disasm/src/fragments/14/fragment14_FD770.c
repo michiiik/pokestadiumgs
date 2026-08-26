@@ -67,7 +67,19 @@ void func_813061E8(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FD770/func_8130687C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FD770/func_813068C0.s")
+void func_813068C0(void *arg0)
+{
+  unsigned int temp_v0;
+  temp_v0 = *((u8 *) (((u8 *) arg0) + 0x82));
+  if (((s32) temp_v0) >= ((s32) (*((u8 *) (((u8 *) arg0) + 0x86)))))
+  {
+    *((u8 *) (((u8 *) arg0) + 0x82)) = 0U;
+    *((s8 *) (((u8 *) arg0) + 0x8A)) = (s8) (*((s16 *) (((u8 *) arg0) + 0x7C)));
+    *((s8 *) (((u8 *) arg0) + 0x87)) = 1;
+    return;
+  }
+  *((u8 *) (((u8 *) arg0) + 0x82)) = (u8) (temp_v0 + 1);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FD770/func_813068FC.s")
 
