@@ -59,6 +59,11 @@ proposing changes. Rules of thumb:
   per commit. A commit message names the subsystem or family, not a single
   helper.
 - `COVERAGE.md` is generated; never hand-edit it. `README.md` only points at it.
+- Tests that create throwaway git repos must strip `GIT_DIR`, `GIT_INDEX_FILE`
+  and friends from their subprocess environment (see `_GitFixture`): the
+  pre-commit hook exports them, and an unstripped fixture commits onto the real
+  branch and can flip `core.bare`. If git suddenly reports "must be run in a
+  work tree", run `git config core.bare false`.
 
 ## 2. Decompilation process rules
 

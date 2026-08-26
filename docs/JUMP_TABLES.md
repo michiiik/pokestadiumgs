@@ -1,5 +1,28 @@
 # Unblocking `switch` owners: per-object `.rodata` subsegments
 
+## Rollout status (2026-08-27)
+
+- **Applied (commit `b8815d7`):** 33 of the 34 single-owner jump-table runs in the
+  main `text` segment now sit in their C file's `.rodata` subsegment
+  (`disasm/yamls/us/rom.yaml`); ROM byte-identical after re-split with the
+  pinned spimdisasm. `654A0` stays in the shared blob: its three tables mix
+  `.late_rodata_alignment 8` and `4`, and asm-processor's host stub for the
+  4-aligned table (`func_80064940`) compiles one instruction longer, skewing
+  every later text symbol by +4. Fix that in asm-processor (or split the file)
+  before re-adding it.
+- **Installed:** `func_80065BB0` (`src/667B0.c`) as a C `switch`, accepted
+  through the runner with `link_verified: true` (commit `4cd720c`).
+- **Remaining:** the 148 fragment runs. Apply them lazily, one file at a time
+  when its dispatcher is about to be decompiled: `python3
+  tools/add_rodata_subsegments.py for-jtbl <jtbl or function>` prints the yaml
+  lines; re-split; confirm the owner object's `.rodata` size equals the
+  subsegment and that no text symbol moved (compare `nm` offsets against
+  `symbol_addrs_code.txt`); gate the still-assembly owner before the C body.
+- The hand-written linker aliases now live in
+  `disasm/linker_scripts/us/aliases.ld`, so a re-split no longer needs the
+  alias block re-applied (commit `eb02e98`).
+
+
 **Result: it works, end to end, verified.** A `.rodata` subsegment for one C file
 was added to `yamls/us/rom.yaml`, splat was re-run, the assembly owner still
 linked byte-identically, and then the owner was replaced with a real C `switch`
@@ -141,8 +164,8 @@ The build is fast; there was no need to reuse `disasm/build`. Two setup notes:
 * `rsync --exclude build/` also excludes `lib/ultralib/build/`, which holds the
   prebuilt `libultra.a`; without it the build stops at
   `Current version (libultra 2.0L) has not been setup!`. Copy it separately.
-* `RUN_CC_CHECK=0` is required on this machine — the host clang syntax check
-  errors out on pre-existing `-Wint-conversion` in `src/1A360.c`.
+* The host clang syntax check passes on every source since `b314347` and runs
+  inside the runner's gate; no `RUN_CC_CHECK=0` is needed.
 * **splat/spimdisasm version matters.** A plain
   `pip install 'splat64[mips]==0.25.0'` pulls spimdisasm 1.42.4, which prepends a
   `nonmatching <func>, 0x<size>` macro line to every nonmatchings `.s`;
