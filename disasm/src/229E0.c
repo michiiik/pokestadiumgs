@@ -4278,7 +4278,11 @@ s32 func_8003F954(u16 value) { return value % 9; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FBB4.s")
+extern s32 D_80126520;
+void func_8003FBB4(void) {
+    void *p = (void *)(u32)D_80126520;
+    D_80126520 = (s32)func_80003240(*(s32 *)((u8 *)p + 4));
+}
 #endif
 
 #ifdef VERSION_US
@@ -4294,7 +4298,16 @@ s32 func_8003F954(u16 value) { return value % 9; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FCC4.s")
+extern s16 D_80126518;
+extern s32 D_80126520;
+extern s32 D_80126498[];
+void func_8003FCC4(void) {
+    s32 i = D_80126518;
+    s32 *table = D_80126498;
+    table[i + 1] = table[i];
+    D_80126518 = i + 1;
+    D_80126520 += 4;
+}
 #endif
 
 #ifdef VERSION_US
