@@ -92,7 +92,14 @@ void func_8001AFAC(void *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1A360/func_8001AFE0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/1A360/func_8001B00C.s")
+s32 func_8001B00C(s32 *arg0, s32 arg1) {
+    s32 v = func_8001CB5C(arg0);
+    if (v) {
+        func_8001AE60(v, arg1);
+        func_8001AD74((u8 *)arg0 + 0x30, v);
+    }
+    return v;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1A360/func_8001B058.s")
 
