@@ -1842,6 +1842,57 @@ class SweepTests(unittest.TestCase):
         self.assertIn("m2c:s32-s32:compile-retry", labels)
         self.assertTrue(all("M2C_" not in code for _, code in candidates))
 
+    def test_compile_failure_retries_use_only_first_cfe_type_error(self) -> None:
+        warning_then_undefined = (
+            "cfe: Warning 835: pointer conversion warning\n"
+            "cfe: Error: 'D_80000004' undefined; reoccurrences will not be reported."
+        )
+        self.assertEqual(
+            sweep_targets.compile_failure_variant_names(warning_then_undefined), ()
+        )
+        self.assertIn(
+            "ptr-void",
+            sweep_targets.compile_failure_variant_names(
+                "cfe: Error: Unacceptable operand of '+'."
+            ),
+        )
+
+    def test_prepare_candidate_declarations_uses_owner_and_index_spellings(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / "owner.c"
+            source.write_text(
+                '#include "global.h"\n'
+                "extern u16 D_80000004;\n"
+                '#pragma GLOBAL_ASM("asm/us/nonmatchings/test/func_80000000.s")\n'
+                "extern u8 D_80000008;\n"
+                "s32 func_80000010(s32 arg0) { return arg0; }\n"
+            )
+            index = root / "repo-prototypes.h"
+            index.write_text(
+                "extern u32 D_8000000C;\n"
+                "s32 func_80000010(s32 arg0);\n"
+            )
+            candidate = (
+                "extern s32 D_80000008;\n"
+                "void func_80000000(void) {\n"
+                "    D_80000008 = D_8000000C;\n"
+                "    func_80000010(1);\n"
+                "}\n"
+            )
+            with mock.patch.object(
+                sweep_targets.targets, "repository_symbol_header", return_value=index
+            ):
+                prepared = sweep_targets.prepare_candidate_declarations(
+                    "func_80000000", source, candidate
+                )
+
+        self.assertIn("extern u8 D_80000008;", prepared)
+        self.assertIn("extern u32 D_8000000C;", prepared)
+        self.assertIn("s32 func_80000010(s32 arg0);", prepared)
+        self.assertNotIn("extern s32 D_80000008;", prepared)
+        self.assertNotIn("extern u16 D_80000004;", prepared)
+
     def test_split_candidate_declarations_deduplicates_m2c_prefix(self) -> None:
         declarations, body = sweep_targets.split_candidate_declarations(
             "extern s32 helper(s32);\nextern s32 helper(s32);\n\nvoid func_a(void) {}\n"

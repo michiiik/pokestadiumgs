@@ -82,6 +82,7 @@ UNK_FUNCTION_RE = re.compile(r"^M2C_UNK (\w+)\(([^)]*)\);(\s*/\* extern \*/)?", 
 UNK_TYPE_RE = re.compile(r"\bM2C_UNK\b")
 EMPTY_BLOCK_RE = re.compile(r"\{\s*\}")
 EXTERN_LINE_RE = re.compile(r"^\s*extern\b.*;\s*$")
+COMMENT_LINE_RE = re.compile(r"^\s*/\*.*\*/\s*$")
 FIRST_S32_ARG_RE = re.compile(
     r"(^\s*[\w\s*]+\bfunc_[0-9A-Fa-f]+\s*\(\s*)s32(?=\s+arg\d+\s*[,)])",
     re.M,
@@ -138,11 +139,56 @@ FAMILY_VARIANTS: dict[str, tuple[str, ...]] = {
 }
 
 
+_CFE_ERROR_RE = re.compile(r"(?m)^cfe:\s+Error(?:\s+\d+)?\s*:\s*(.*)$")
+_ROM_SYMBOL_RE = re.compile(r"\b(?:func_[0-9A-Fa-f]+|D_[0-9A-Fa-f]+)\b")
+_SOURCE_FUNCTION_DEFINITION_RE = re.compile(
+    r"(?m)^[^;{}\n]*\b(func_[0-9A-Fa-f]+)\s*\([^;{}\n]*\)\s*\{"
+)
+_SYMBOL_INDEX_CACHE: tuple[Path, int, dict[str, str]] | None = None
+
+
+def _first_cfe_error(diagnostic: str | None) -> str | None:
+    """Return the first CFE error message, excluding warnings and context."""
+    text = diagnostic or ""
+    match = _CFE_ERROR_RE.search(text)
+    if match is not None:
+        return match.group(1).strip()
+    # Keep the helper useful for callers that pass only an already-extracted
+    # compiler message. Real runner diagnostics always include ``cfe:``.
+    if "cfe:" not in text.lower() and text.strip():
+        return text.strip()
+    return None
+
+
+def _is_type_error(message: str) -> bool:
+    """Whether a CFE message is actionable by changing a type spelling."""
+    text = message.lower()
+    # Undefined names, syntax errors, and redeclarations cannot be fixed by
+    # trying another global/callee width. Diagnostics often contain the word
+    # ``pointer`` in a preceding warning; only this first error is considered.
+    if any(token in text for token in (
+        "undefined", "syntax", "redeclaration", "redefinition",
+        "undeclared", "too many arguments", "too few arguments",
+    )):
+        return False
+    return any(token in text for token in (
+        "operand", "pointer", "conversion", "convert", "dereference",
+        "selector requires", "lvalue", "type for", "argument",
+        "number of arguments", "incompatible", "unknown type",
+    ))
+
+
 def compile_failure_variant_names(diagnostic: str | None) -> tuple[str, ...]:
     """Choose extra type spellings from a compiler diagnostic sample."""
-    text = (diagnostic or "").lower()
+    message = _first_cfe_error(diagnostic)
+    if message is None or not _is_type_error(message):
+        return ()
+    text = message.lower()
     names: list[str] = []
-    if any(token in text for token in ("pointer", "incompatible", "conversion", "dereference")):
+    if any(token in text for token in (
+        "pointer", "incompatible", "conversion", "dereference", "operand",
+        "selector requires",
+    )):
         names.extend(("ptr-void", "ptr-s32", "u32-void"))
     if any(token in text for token in ("short", "16", "halfword", "s16")):
         names.append("s16-void")
@@ -298,6 +344,9 @@ def rewrite_draft(draft: str, variant: dict[str, str]) -> str | None:
 def compile_failure_candidates(
     draft: str,
     diagnostics: Iterable[str | None],
+    *,
+    function: str | None = None,
+    source_path: Path | None = None,
 ) -> list[tuple[str, str]]:
     """Rewrite a draft using type spellings suggested by compile diagnostics.
 
@@ -314,6 +363,8 @@ def compile_failure_candidates(
             code = rewrite_draft(draft, VARIANTS[name])
             if code is None:
                 continue
+            if function is not None and source_path is not None:
+                code = prepare_candidate_declarations(function, source_path, code)
             if code in seen:
                 continue
             seen.add(code)
@@ -370,10 +421,17 @@ def split_candidate_declarations(code: str) -> tuple[str, str]:
     in_prefix = True
     for line in code.splitlines():
         if in_prefix and (
-            not line.strip() or EXTERN_LINE_RE.match(line) or _is_prototype_line(line)
+            not line.strip()
+            or COMMENT_LINE_RE.match(line)
+            or EXTERN_LINE_RE.match(line)
+            or _is_prototype_line(line)
         ):
             if line.strip():
-                declarations.append(line.strip())
+                # m2c labels each draft with a comment. It is useful context
+                # when printed, but not a declaration and not needed in the
+                # probe source prefix.
+                if not COMMENT_LINE_RE.match(line):
+                    declarations.append(line.strip())
             continue
         in_prefix = False
         body.append(line)
@@ -381,6 +439,124 @@ def split_candidate_declarations(code: str) -> tuple[str, str]:
     declaration_text = "\n".join(unique) + ("\n" if unique else "")
     body_text = "\n".join(body).strip() + "\n"
     return declaration_text, body_text
+
+
+def _symbol_index_declarations() -> dict[str, str]:
+    """Read the generated cross-source declaration index once per mtime."""
+    global _SYMBOL_INDEX_CACHE
+    try:
+        path = targets.repository_symbol_header()
+        if path is None or not path.exists():
+            return {}
+        mtime = path.stat().st_mtime_ns
+    except OSError:
+        return {}
+    if _SYMBOL_INDEX_CACHE is not None:
+        cached_path, cached_mtime, cached = _SYMBOL_INDEX_CACHE
+        if cached_path == path and cached_mtime == mtime:
+            return cached
+    declarations: dict[str, str] = {}
+    for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        name = _declaration_symbol(line)
+        if name and _ROM_SYMBOL_RE.fullmatch(name):
+            declarations[name] = line.rstrip(";") + ";"
+    _SYMBOL_INDEX_CACHE = (path, mtime, declarations)
+    return declarations
+
+
+def _owner_symbol_declarations(
+    source_path: Path, function: str,
+) -> tuple[int, dict[str, list[tuple[int, str]]]]:
+    """Return the pragma offset and declarations visible in the owner file."""
+    try:
+        text = source_path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        # Discovery tests and callers that provide a synthetic owner may not
+        # materialize the source path. In that case the candidate's own
+        # declarations remain untouched and the real index is still usable.
+        return 0, {}
+    pragma = re.search(
+        rf'^#pragma GLOBAL_ASM\("asm/us/nonmatchings/[^\"]+/{re.escape(function)}\.s"\)',
+        text,
+        re.MULTILINE,
+    )
+    cutoff = pragma.start() if pragma is not None else len(text)
+    declarations: dict[str, list[tuple[int, str]]] = collections.defaultdict(list)
+    # ``pragma_targets`` already has the conservative extern parser used for
+    # the index. Reuse its normalized spelling, but retain source positions so
+    # declarations below the pragma can be injected before the replacement.
+    for match in targets._EXTERN_DECL_RE.finditer(text):
+        declaration = targets._normalise_declaration("extern " + match.group(1)) + ";"
+        names = _ROM_SYMBOL_RE.findall(declaration)
+        if len(names) == 1:
+            declarations[names[0]].append((match.start(), declaration))
+    for match in _SOURCE_FUNCTION_DEFINITION_RE.finditer(text):
+        name = match.group(1)
+        declaration = text[match.start() : match.end() - 1].strip() + ";"
+        declarations[name].append((match.start(), targets._normalise_declaration(declaration)))
+    return cutoff, declarations
+
+
+def prepare_candidate_declarations(
+    function: str, source_path: Path, candidate: str,
+) -> str:
+    """Make an m2c body compile in the real owner source context.
+
+    m2c sees the whole owner while drafting, so it may omit an ``extern`` for
+    a symbol declared later in that file or supplied only by the generated
+    repository index. The isolated probe, however, replaces the pragma in
+    source order. Remove candidate declarations that conflict with any
+    owner-local spelling, inject the exact below-pragma owner declaration, and
+    use the index spelling only for symbols absent from the owner entirely.
+    """
+    declarations_text, body = split_candidate_declarations(candidate)
+    candidate_lines = [line for line in declarations_text.splitlines() if line.strip()]
+    cutoff, owner_declarations = _owner_symbol_declarations(source_path, function)
+    index_declarations = _symbol_index_declarations()
+
+    kept: list[str] = []
+    declared_by_candidate: set[str] = set()
+    for line in candidate_lines:
+        name = _declaration_symbol(line)
+        if name is None:
+            kept.append(line)
+            continue
+        declared_by_candidate.add(name)
+        # Any owner-local declaration must win over m2c's context-derived or
+        # variant-derived spelling. This prevents the common below-pragma
+        # redeclaration failure while preserving guesses for truly unknown
+        # cross-source symbols.
+        if name in owner_declarations:
+            continue
+        kept.append(line)
+
+    required: list[str] = []
+    seen = set(kept)
+    for name in _ROM_SYMBOL_RE.findall(candidate):
+        if name == function:
+            continue
+        entries = owner_declarations.get(name, [])
+        below = [declaration for position, declaration in entries if position >= cutoff]
+        if below:
+            declaration = below[0]
+        elif entries:
+            # Already visible above the pragma; no prefix is needed.
+            continue
+        elif name not in declared_by_candidate:
+            declaration = index_declarations.get(name)
+            if declaration is None:
+                continue
+        else:
+            continue
+        if declaration not in seen:
+            seen.add(declaration)
+            required.append(declaration)
+
+    prefix = "\n".join(kept + required)
+    return (prefix + "\n" if prefix else "") + body
 
 
 def partition_gate_batches(
@@ -516,6 +692,7 @@ def draft_variants(
         code = rewrite_draft(draft, variant)
         if code is None or code in seen:
             continue
+        code = prepare_candidate_declarations(function, owner.source_path, code)
         seen.add(code)
         variants.append((f"{label_prefix}:{name}", code))
         unprototyped = callee_unprototyped_variant(code)
@@ -1186,7 +1363,14 @@ def sweep(
                 # function's m2c variants: once it probe_matches, the m2c
                 # variants after it are reported skipped rather than reprobed.
                 for label, code in template_variants_for(function, skip_attempts):
-                    blocks.append((function, code))
+                    blocks.append(
+                        (
+                            function,
+                            prepare_candidate_declarations(
+                                function, targets.REPO_ROOT / source_rel, code
+                            ),
+                        )
+                    )
                     labels.append(label)
                     labels_of[function].add(label)
             for label, code in variants:
@@ -1224,7 +1408,12 @@ def sweep(
             draft = draft_of.get(function)
             if draft is None:
                 continue
-            for label, code in compile_failure_candidates(draft, diagnostics):
+            for label, code in compile_failure_candidates(
+                draft,
+                diagnostics,
+                function=function,
+                source_path=source_path,
+            ):
                 if label in labels_of[function]:
                     continue
                 if skip_attempts is not None and (function, label) in skip_attempts:
