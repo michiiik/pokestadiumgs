@@ -2,7 +2,10 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_8006DC50.s")
+s32 func_8006DC50(s32 arg0) {
+    s32 sp4;
+    return ((((u8 *)&sp4) + (arg0 * 0x50)) - ((u8 *)&sp4)) + 0x40;
+}
 #endif
 
 #ifdef VERSION_US

@@ -3728,7 +3728,17 @@ void func_8003DAF0(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003DB10.s")
+typedef union CandidateColor {
+    struct { u8 r, g, b, a; };
+    u32 rgba;
+} CandidateColor;
+void func_8003DB10(s32 arg0, CandidateColor arg1, void *arg2, void *arg3, s32 arg4) {
+    D_801261B0[0] = arg0;
+    *(s32 *)(D_801261B0 + 4) = arg1.rgba;
+    *(void **)(D_801261B0 + 0xC) = arg2;
+    *(void **)(D_801261B0 + 0x10) = arg3;
+    *(s32 *)(D_801261B0 + 0x14) = arg4;
+}
 #endif
 
 #ifdef VERSION_US
