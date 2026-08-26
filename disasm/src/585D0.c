@@ -167,7 +167,12 @@ void func_80057FE8(u8 *start, u8 *end) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_800590CC.s")
+s32 func_800590CC(s32 arg0) {
+    if (func_80059050(arg0, 0) != 0) {
+        return func_80059050(arg0, 1);
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
