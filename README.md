@@ -68,6 +68,16 @@ run `tools/mac_generate_recomp.sh`. The first verified pass emitted 33,529
 functions. Current Android runtime and rental-roster status is recorded in
 `PORTING_STATUS.md` and `CLAUDE_HANDOFF.md`.
 
+## Decompilation coverage
+
+The following block is refreshed by the repository post-commit hook.
+
+<!-- AUTO_COVERAGE:START -->
+- US functions with C implementations: **2,911 / 10,532 (27.6%)**
+- Remaining `GLOBAL_ASM` owners: **7,621**
+- Baseline: `f477acf` (vendored US pragma snapshot)
+<!-- AUTO_COVERAGE:END -->
+
 ## Symbol naming
 
 The decompilation ships almost entirely as `#pragma GLOBAL_ASM` stubs, so a
