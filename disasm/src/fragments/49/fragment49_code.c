@@ -59,7 +59,19 @@ void func_86100DA8(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_8610109C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86101558.s")
+void func_86101558(f32 *arg0, f32 *arg1) {
+    f32 temp_fa0;
+    f32 temp_fv0;
+    f32 temp_fv1;
+    temp_fv1 = *arg1;
+    temp_fa0 = *arg0;
+    temp_fv0 = sqrtf((temp_fv1 * temp_fv1) + (temp_fa0 * temp_fa0));
+    if (temp_fv0 != 0.0f) {
+        *arg0 = temp_fa0 / temp_fv0;
+        *arg1 /= temp_fv0;
+    }
+}
+void func_86101558_padding(void) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_861015AC.s")
 
