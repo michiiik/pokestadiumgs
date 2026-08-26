@@ -688,6 +688,18 @@ class RunnerTests(unittest.TestCase):
                 "status": "compare_rejected",
                 "probe_status": "probe_match",
                 "mismatch_kind": "operand_or_scheduling_drift",
+                "first_diff_offset": 4,
+                "first_diff_instruction": 1,
+                "expected_instruction": "0x24040001",
+                "actual_instruction": "0x24050001",
+                "expected_instruction_text": "addiu $a0, $zero, 1",
+                "actual_instruction_text": "addiu $a1, $zero, 1",
+                "assembly_diff": [{
+                    "expected": "addiu $a0,$zero,1",
+                    "actual": "addiu $a1,$zero,1",
+                    "normalized_match": False,
+                }],
+                "assembly_diff_truncated": False,
                 "diagnostic": "incompatible pointer conversion",
             }]
             with mock.patch.dict(os.environ, {"PRAGMA_PROBE_STATS": str(stats_path)}):
@@ -704,6 +716,9 @@ class RunnerTests(unittest.TestCase):
             self.assertEqual(row["attempts"][0]["candidate"], "void func_a(void) {}")
             self.assertEqual(row["attempts"][0]["diagnostic"], "incompatible pointer conversion")
             self.assertEqual(row["attempts"][0]["declarations"], "extern void helper(void);")
+            self.assertEqual(row["attempts"][0]["first_diff_instruction"], 1)
+            self.assertEqual(row["attempts"][0]["expected_instruction"], "0x24040001")
+            self.assertEqual(len(row["attempts"][0]["assembly_diff"]), 1)
 
     def test_unverified_probe_hit_uses_sequential_gate_without_duplicate_compare(self) -> None:
         # An unverified probe hit (no ``link_verified`` key, e.g. baseline
