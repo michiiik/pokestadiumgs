@@ -61,11 +61,28 @@ void func_8F700020(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/76/fragment76_code/func_8F700F48.s")
+extern void func_800226C0(s32);
+extern void func_8F700EF4(void);
+extern s32 D_8F7023B0;
+void func_8F700F48(void) {
+    func_800226C0(1);
+    D_8F7023B0 = D_8F7023B0 + 1;
+    if (D_8F7023B0 >= 3) {
+        D_8F7023B0 = 0;
+    }
+    func_8F700EF4();
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/76/fragment76_code/func_8F700F90.s")
+void func_8F700F90(void) {
+    func_800226C0(1);
+    D_8F7023B0 = D_8F7023B0 - 1;
+    if (D_8F7023B0 < 0) {
+        D_8F7023B0 = 2;
+    }
+    func_8F700EF4();
+}
 #endif
 
 #ifdef VERSION_US
