@@ -25,7 +25,15 @@ f32 func_87D0059C(f32 *arg0, f32 *arg1) {
     return temp_fv0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/65/fragment65_code/func_87D005E8.s")
+f32 func_87D005E8(f32 *a, f32 *b, f32 *c) {
+    f32 r = sqrtf((*a) * (*a) + (*b) * (*b) + (*c) * (*c));
+    if (r) {
+        *a /= r;
+        *b /= r;
+        *c /= r;
+    }
+    return r;
+}
 
 void func_87D00648(void *arg0, void *arg1, void *arg2) {
     (*(f32 *)((u8 *)(arg0) + (0))) = (f32) -((*(f32 *)((u8 *)(arg2) + (4))) - (*(f32 *)((u8 *)(arg1) + (4))));
