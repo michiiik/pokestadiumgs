@@ -89,7 +89,20 @@ void func_81309ACC(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_81309AE0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_81309D00.s")
+void func_81309D00(u32 arg0)
+{
+    int new_var;
+    u8 *p = (u8 *)((u32)arg0);
+    u8 v = p[0x137FA];
+
+    if (v)
+    {
+        p[0x137F5] = v;
+        new_var = 0x137FA;
+        if (0) { }
+        p[new_var] = 0;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_81309D34.s")
 

@@ -39,7 +39,12 @@ void func_800721D8(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_80072264.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_800723C4.s")
+extern u8 func_87F097B0;
+extern u8 D_801291E0;
+extern s8 D_8012B363;
+void func_800723C4(void) {
+    ((void (*)(void *, s8))(void *)func_80003240(&func_87F097B0))(&D_801291E0, D_8012B363);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_800723FC.s")
 
