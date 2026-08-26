@@ -32,7 +32,25 @@ typedef struct { s16 x; s16 y; } Vec2s; void func_82303D60(Vec2s *arg0, Vec2s *a
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_124E40/func_8230583C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_124E40/func_82305914.s")
+extern void func_823055DC(u8 *);
+extern void func_8230570C(u8 *);
+extern void func_8230583C(u8 *);
+extern u8 D_82306AF8[];
+void func_82305914(void) {
+    switch ((*(s16 *)((u8 *)(D_82306AF8) + (2)))) {      /* irregular */
+    case 1:
+        func_823055DC(D_82306AF8);
+        return;
+    case 3:
+        func_8230570C(D_82306AF8);
+        return;
+    case 4:
+        func_8230583C(D_82306AF8);
+        /* fallthrough */
+    case 0:
+        return;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_124E40/func_82305988.s")
 

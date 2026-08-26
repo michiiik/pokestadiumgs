@@ -350,7 +350,21 @@ void func_82B04430(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B05E3C.s")
+extern void func_82B06360(s32);
+extern void func_82B060A0(s32);
+void func_82B05E3C(s32 arg0) {
+    switch (arg0) {                                 /* irregular */
+    case 2:
+        func_82B060A0(1);
+        return;
+    case 6:
+        func_82B06360(0);
+        /* fallthrough */
+    case 3:
+    case 4:
+        return;
+    }
+}
 #endif
 
 #ifdef VERSION_US

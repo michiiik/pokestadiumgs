@@ -7,7 +7,24 @@ void func_8822AD40(void) {
     D_880068B8 = 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_19DFC0/func_8822AD4C.s")
+extern void func_88220AD0(s32, s32);
+extern s32 D_80087200;
+extern s32 D_88234660;
+void func_80049ED8(s32 value);
+extern void func_88001900();
+extern s32 D_880068B4;
+extern void func_800033DC(s32);
+extern u32 D_882348F0;
+void func_8822AD4C(void) {
+    if (D_88234660 != 0) {
+        func_88220AD0(0x17C, 0x11F);
+    } else {
+        func_80049ED8(D_80087200);
+        func_88001900();
+        D_880068B4 = 1;
+    }
+    func_800033DC((s32) D_882348F0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_19DFC0/func_8822ADB0.s")
 

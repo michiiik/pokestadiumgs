@@ -109,7 +109,25 @@ void func_82501CDC(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_13FFA0/func_8250202C.s")
+extern void func_82501814(u16 *);
+extern void func_82501D18(u16 *);
+void func_82508268(void);
+extern s16 D_82508F8C;
+extern u16 D_82508F88;
+void func_8250202C(void) {
+    func_82508268();
+    switch (D_82508F8C) {                           /* irregular */
+    case 1:
+        func_82501814(&D_82508F88);
+        return;
+    case 2:
+        func_82501CDC(&D_82508F88);
+        return;
+    case 3:
+        func_82501D18(&D_82508F88);
+        return;
+    }
+}
 #endif
 
 #ifdef VERSION_US

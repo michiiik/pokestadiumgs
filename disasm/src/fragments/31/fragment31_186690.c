@@ -36,7 +36,23 @@ void func_882142DC(void) {
     func_88213A94(*D_88234730, 1);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_88214330.s")
+extern void func_88213BE4(s32, s32);
+extern void func_88220E08(s32);
+extern s32 D_880068B4;
+void func_88214330(void) {
+    s16 temp_v0;
+
+    temp_v0 = (*(s16 *)((u8 *)(D_88234730) + (8)));
+    switch (temp_v0) {                              /* irregular */
+    case 3:
+        func_88220E08(1);
+        return;
+    case 5:
+        D_880068B4 = 1;
+        func_88213BE4(0x12, 0);
+        return;
+    }
+}
 
 extern void func_800226C0(s32);
 void func_88214394(void) {

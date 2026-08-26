@@ -42,7 +42,22 @@ void func_88210480(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_183700/func_88211168.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_183700/func_882114EC.s")
+extern void func_800226C0(s32);
+extern s32 D_88234724;
+void func_88001900(void);
+extern s32 D_882346F0;
+void func_882114EC(void) {
+    s16 temp_v1;
+
+    func_800226C0(0x5E);
+    func_88001900();
+    D_882346F0 = 0;
+    D_88234724 = 0;
+    temp_v1 = (*(s16 *)((u8 *)(D_88234720) + (8)));
+    if ((temp_v1 == 1) || (temp_v1 == 3)) {
+        (*(u8 *)((u8 *)(D_88234720) + (0))) = (u8) ((*(u8 *)((u8 *)(D_88234720) + (0))) ^ 1);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_183700/func_88211550.s")
 
