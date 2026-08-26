@@ -125,7 +125,22 @@ void func_8FC00FD0(void) { func_80060358(0, &D_8FC0C2D8); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/84/fragment84_code/func_8FC01408.s")
+extern void func_800226C0(s32);
+extern void func_8FC0117C();
+extern void func_8FC01288();
+extern s8 D_8FC0243C;
+extern u8 D_8FC0C6FB;
+void func_8FC01408(void) {
+    func_80003F74((u8 *) &D_8FC0C2D8, (u8 *)0x03FEF000, (u8 *)0x03FEF490, 0);
+    D_8FC0243C = 0;
+    if ((s32) D_8FC0C6FB > 0) {
+        func_8FC0117C();
+        func_8FC01288();
+    } else {
+        D_8FC02831 = 3;
+    }
+    func_800226C0(2);
+}
 #endif
 
 #ifdef VERSION_US
@@ -133,7 +148,25 @@ void func_8FC00FD0(void) { func_80060358(0, &D_8FC0C2D8); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/84/fragment84_code/func_8FC01530.s")
+extern void _bcopy(s32 *, s32, s32);
+extern u8 D_8FC0244C;
+extern u8 D_8FC02832;
+extern u8 D_8FC0C776;
+void func_8FC01530(void) {
+    u8 temp_v1;
+    void *temp_v0;
+
+    temp_v0 = (D_8FC02832 * 0x10) + &D_8FC0244C;
+    temp_v1 = (*(u8 *)((u8 *)(temp_v0) + (0)));
+    switch (temp_v1) {                              /* irregular */
+    case 4:
+        _bcopy(&D_8FC0C776, (*(s32 *)((u8 *)(temp_v0) + (0xC))), 0x20);
+        return;
+    case 5:
+        _bcopy(&D_8FC0C776, (*(s32 *)((u8 *)(temp_v0) + (0xC))), 0x16);
+        return;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -182,7 +215,23 @@ void func_8FC01FBC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/84/fragment84_code/func_8FC021D0.s")
+extern void *D_80087200;
+extern u8 D_8FC02438;
+extern u16 D_8FC0C79C;
+extern u16 D_8FC0C79E;
+extern u16 D_8FC0C7A0;
+void func_8FC021D0(void) {
+    func_80064D28();
+    if (D_8FC02438 != 0) {
+        D_8FC0C79C = (*(u16 *)((u8 *)(D_80087200) + (6)));
+        D_8FC0C79E = (*(u16 *)((u8 *)(D_80087200) + (8)));
+        D_8FC0C7A0 = (*(u16 *)((u8 *)(D_80087200) + (0xC)));
+        return;
+    }
+    D_8FC0C79C = 0;
+    D_8FC0C79E = 0;
+    D_8FC0C7A0 = 0;
+}
 #endif
 
 #ifdef VERSION_US
