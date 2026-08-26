@@ -52,7 +52,25 @@ void func_8810009C(s32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/30/fragment30_16D4F0/func_88102234.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/30/fragment30_16D4F0/func_88102338.s")
+extern void func_800226C0(s32);
+extern void func_880040D4();
+extern void func_88100264();
+extern void func_8810179C(s32);
+extern s32 D_88006860;
+extern s8 D_8800EF40;
+void func_88102338(void) {
+    func_800226C0(4);
+    if (D_88006860 == 7) {
+        do {
+            if (D_8800EF40 == -1) {
+                func_80064D28();
+            }
+            func_88100264();
+            func_880040D4();
+            func_8810179C(1);
+        } while (D_88006860 == 7);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/30/fragment30_16D4F0/func_881023CC.s")
 
