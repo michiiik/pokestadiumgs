@@ -263,6 +263,61 @@ def classify(
         return "state_field_access", 0.78, ["global field access with explicit stores"]
     if loops:
         return "loop_or_state_machine", 0.55, ["backward branch requires manual control-flow review"]
+
+    # ---- call_sequence / unclassified sub-family shapes -------------------
+    # Everything below is reached only with ``loops`` False: any backward
+    # branch is already claimed by ``loop_or_state_machine`` above.  These
+    # rules split the two historical catch-alls (``call_sequence``: has
+    # calls but too large/branchy/irregular for a wrapper shape;
+    # ``unclassified``: no calls and no other rule matched) using cheap
+    # structural evidence, so the sweep driver gets a ranking signal for the
+    # 80% of remaining owners that used to land in one of the two.  See
+    # ``tools/analyze_family_shapes.py`` for the owner-count evidence behind
+    # each shape and why two originally considered shapes (a jump-table
+    # dispatcher combined with a loop, and a plain "loop over an indexed
+    # table") never fire here -- any loop is already excluded above.
+    boolean_result_ops = sum(
+        instruction.op in {"slt", "sltu", "slti", "sltiu", "xor", "xori"}
+        for instruction in instructions
+    )
+    float_ops = sum(
+        instruction.op in {
+            "lwc1", "swc1", "add.s", "sub.s", "mul.s", "div.s", "neg.s",
+            "abs.s", "sqrt.s", "mov.s", "mtc1", "mfc1",
+        }
+        or (instruction.op.startswith("c.") and instruction.op.endswith(".s"))
+        or instruction.op.startswith("cvt.")
+        for instruction in instructions
+    )
+    symbol_store_count = sum(
+        access.symbol is not None and access.op in STORE_OPS for access in accesses
+    )
+
+    if jump_tables:
+        # A no-call jtbl owner was already claimed by ``jump_table_map``
+        # above, so reaching here with a jump table means calls are also
+        # present: a dispatch function that both switches on an index and
+        # calls handlers.  A C ``switch`` cannot match this shape -- it
+        # always emits its own ``.rodata`` jump table, while the baseline
+        # keeps ``jtbl_*`` undefined in a separate data segment (the
+        # ``section_layout_drift`` probe rejection in AGENTS.md) -- flag
+        # that explicitly so a generator never tries a plain ``switch``
+        # translation here.
+        return "dispatcher_switch", 0.75, [
+            "computed jump table alongside calls; a C switch cannot match this repo's link layout"
+        ]
+    if len(instructions) > 256:
+        return "large_mixed", 0.45, [f"{len(instructions)} instructions; too large for a targeted shape"]
+    if not calls and float_ops >= 3:
+        return "float_math", 0.72, [f"{float_ops} float ops with no calls"]
+    if not calls and len(instructions) <= 32 and boolean_result_ops >= 1 and branches <= 3:
+        return "predicate", 0.68, ["short, no calls, boolean-result comparison op present"]
+    if 1 <= len(calls) <= 2 and not branches and (symbol_store_count + narrow_copy) >= 2:
+        return "init_sequence", 0.66, ["straight-line multi-field store setup with 1-2 calls"]
+    if len(calls) >= 3 and symbol_store_count <= 1 and narrow_copy <= 1:
+        return "call_chain", 0.62, [f"{len(calls)} calls with little global/struct side effect"]
+    if not calls and branches >= 5:
+        return "state_machine", 0.60, ["no calls but 5+ branches over local/global state"]
     if calls:
         notes.append("call shape is longer or contains branches")
         return "call_sequence", 0.52, notes

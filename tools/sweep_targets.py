@@ -138,6 +138,11 @@ VARIANTS: dict[str, dict[str, str]] = {
         "arg": "u8",
         "drop_mask_temp": "1",
     },
+    # No prior spelling covered a float global; ``float_math`` owners (no
+    # calls, float ops dominant) need one so an unknown global inferred from
+    # an ``lwc1``/``swc1`` can be tried as ``f32`` before the integer
+    # fallbacks.
+    "f32-void": {"global": "f32", "call": "void", "type": "s32"},
 }
 
 # The ordinary pass deliberately stays small.  Probe statistics show that
@@ -158,6 +163,22 @@ FAMILY_VARIANTS: dict[str, tuple[str, ...]] = {
     "direct_wrapper": DEFAULT_VARIANT_NAMES,
     "multi_call_wrapper": DEFAULT_VARIANT_NAMES,
     "call_sequence": DEFAULT_VARIANT_NAMES,
+    # Sub-families split out of call_sequence/unclassified by
+    # scan_asm_families.classify (see tools/analyze_family_shapes.py for the
+    # evidence).  Orders below are priors, not proof; every spelling still
+    # goes through an isolated probe and the full COMPARE=1 gate.
+    "dispatcher_switch": DEFAULT_VARIANT_NAMES,
+    "large_mixed": DEFAULT_VARIANT_NAMES,
+    # No calls, float-op dominant: an unknown global inferred from an
+    # lwc1/swc1 is far more likely f32 than an integer width.
+    "float_math": ("f32-void", "s32-s32", "u8-void"),
+    "predicate": DEFAULT_VARIANT_NAMES,
+    # 1-2 calls with several narrow struct-field stores; try the narrow
+    # temporary/argument spellings before the wider integer fallbacks.
+    "init_sequence": ("u8-void", "s32-s32", "u8-narrow-void", "s16-narrow-void"),
+    "call_chain": DEFAULT_VARIANT_NAMES,
+    # No calls, 5+ branches, frequently over a byte state global.
+    "state_machine": ("u8-void", "s32-s32", "u8-narrow-void"),
 }
 
 
