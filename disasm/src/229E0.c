@@ -298,7 +298,20 @@ extern void func_80034F30(void); void func_80026098(void) { func_80034F30(); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80026298.s")
+s32 func_80018ACC();
+extern u8 D_80090B64;
+s32 func_80026298(void) {
+    func_80018810();
+    if (D_80090B64 != 0) {
+        if (func_80018ACC() == 0) {
+            return 0;
+        }
+        D_80090B64 = 0;
+        /* Duplicate return node #4. Try simplifying control flow for better match */
+        return 1;
+    }
+    return 1;
+}
 #endif
 
 #ifdef VERSION_US
@@ -865,7 +878,18 @@ void func_800337D8(s32 arg0) { s32 *p = &arg0; func_80033864(arg0 & 0xFF); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800337FC.s")
+extern void func_800319D0(s32, s32, s32);
+extern u8 D_800D2B43;
+void func_800337FC(void) {
+    s32 var_s0;
+
+    var_s0 = 0x20;
+    do {
+        func_800319D0(var_s0 & 0xFFFF, 0, 0);
+        var_s0 += 1;
+    } while (var_s0 != 0x30);
+    func_800319D0(0xFF1C, ((D_800D2B43 & 0xF0) * 2) & 0xFF, 0);
+}
 #endif
 
 #ifdef VERSION_US
@@ -2805,7 +2829,20 @@ S1_unk_D_86002F34_alt16* func_80038180(S1_MainPoolState* arg0, S1_unk_D_86002F34
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003820C.s")
+s32 func_8003820C(s32 arg0, s32 arg1) {
+    s32 var_a2;
+
+    var_a2 = arg1;
+    if (arg0 != 0) {
+        var_a2 = func_8000318C(arg0, 0x18, 4);
+    }
+    if (var_a2 != 0) {
+        arg1 = var_a2;
+        func_80037E00((S1_GraphNode *) var_a2, 8U);
+        var_a2 = arg1;
+    }
+    return var_a2;
+}
 #endif
 
 #ifdef VERSION_US
@@ -2861,7 +2898,20 @@ S1_unk_D_86002F34_alt19* func_8003840C(S1_MainPoolState* arg0, S1_unk_D_86002F34
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80038474.s")
+s32 func_80038474(s32 arg0, s32 arg1) {
+    s32 var_a2;
+
+    var_a2 = arg1;
+    if (arg0 != 0) {
+        var_a2 = func_8000318C(arg0, 0x18, 4);
+    }
+    if (var_a2 != 0) {
+        arg1 = var_a2;
+        func_80037E00((S1_GraphNode *) var_a2, 0x1DU);
+        var_a2 = arg1;
+    }
+    return var_a2;
+}
 #endif
 
 #ifdef VERSION_US
