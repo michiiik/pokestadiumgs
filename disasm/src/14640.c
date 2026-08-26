@@ -61,7 +61,18 @@ void func_800147C8(s32 arg0, s32 arg1, s32 arg2, s32 arg3) { func_80014708(1, ar
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80014AA8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80014BD4.s")
+extern s32 func_80014E68(s32, s32, void *);
+extern s32 func_8001510C(s32, s32);
+extern u8 D_8011F258;
+s32 func_80014BD4(s32 arg0) {
+    struct { s32 pad; s32 value[2]; } sp20;
+    s32 index;
+    index = func_8001510C(0, arg0);
+    if (((u8 *)&D_8011F258)[index] == 1) {
+        return 0;
+    }
+    return func_80014E68(0, arg0, &sp20.value[0]);
+}
 
 void func_80014C28(s32 arg0, s32 arg1) { func_80014C48(arg0, arg1, 1); }
 
