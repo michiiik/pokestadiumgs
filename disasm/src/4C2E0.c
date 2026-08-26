@@ -36,11 +36,22 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4C2E0/func_8004BD28.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4C2E0/func_8004BD78.s")
+extern s32 func_8004B754(s32);
+extern u8 D_801270B3[];
+extern u8 D_801270B4[];
+void func_8004BD78(s32 a, s16 b) {
+    s32 i = func_8004B754(a);
+    if (i >= 0)
+        D_801270B3[i << 4] = (u8)b;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4C2E0/func_8004BDB0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4C2E0/func_8004BE18.s")
+void func_8004BE18(s32 a, s32 b) {
+    s32 i = func_8004B754(a);
+    if (i >= 0)
+        *(s32 *)(D_801270B4 + (i << 4)) = b;
+}
 
 extern void func_80004024(s32 *, s32, s32);
 s32 func_800356CC(s32);

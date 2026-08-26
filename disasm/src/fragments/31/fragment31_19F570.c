@@ -49,7 +49,11 @@ void func_8822C5AC(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_19F570/func_8822C5EC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_19F570/func_8822C6AC.s")
+extern u8 **D_88234920;
+extern void func_889033FC(void *, void *);
+void func_8822C6AC(void) {
+    func_889033FC(*D_88234920, (u8 *)D_88234920 + 0x18);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_19F570/func_8822C6D8.s")
 

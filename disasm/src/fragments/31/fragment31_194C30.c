@@ -39,7 +39,11 @@ void func_88221A34(s32 (*arg0)()) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_194C30/func_88221C54.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_194C30/func_88221F28.s")
+extern void *D_88234830;
+extern void func_889033FC(void *, void *);
+void func_88221F28(void) {
+    func_889033FC(*(void **)D_88234830, (u8 *)D_88234830 + 4);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_194C30/func_88221F54.s")
 #endif
