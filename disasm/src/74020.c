@@ -40,7 +40,11 @@ u8 func_800735A0(u8 arg0) { extern u8 D_8009FD73[]; if (arg0 > 0 && arg0 < 0xFB)
 
 u8 func_800735D0(u8 arg0) { extern u8 D_8009FE6F[]; if (arg0 > 0 && arg0 < 0xFB) return D_8009FE6F[arg0]; return 0; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/74020/func_80073600.s")
+u8 func_80073600(u8 arg0) {
+    if (arg0 > 0 && arg0 < 0xFB) return D_8009FF6B[arg0];
+    return 0;
+}
+void func_80073600_padding(void) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/74020/func_80073638.s")
 
