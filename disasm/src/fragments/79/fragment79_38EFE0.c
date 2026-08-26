@@ -254,7 +254,19 @@ void func_84121708(u8 *arg0) {
     *(s16 *)(arg0 + 0x604) = *(s16 *)(arg0 + 0x20);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84121724.s")
+s32 func_841211CC(void *, s16, s16);
+void func_84121724(void *arg0) {
+    if ((*(s8 *)((u8 *)(arg0) + (0x623))) == 0) {
+        (*(s16 *)((u8 *)(arg0) + (0x5FE))) = func_800372CC((s32) (*(s16 *)((u8 *)(arg0) + (0x5FE))), 0x2C14, 0xB6, 0xB6);
+        if (func_841211CC(arg0, (*(s16 *)((u8 *)(arg0) + (0x5FE))), (s16) (func_8411E1D4((s32) arg0) * -0x4000)) != 0) {
+            (*(s8 *)((u8 *)(arg0) + (0x623))) = (s8) ((*(s8 *)((u8 *)(arg0) + (0x623))) + 1);
+        }
+    }
+    if ((*(s8 *)((u8 *)(arg0) + (0x623))) == 1) {
+        (*(s16 *)((u8 *)(arg0) + (0x604))) = (s16) (func_8411E1D4((s32) arg0) * -0x4000);
+    }
+    (*(s16 *)((u8 *)(arg0) + (0x20))) = (s16) (*(s16 *)((u8 *)(arg0) + (0x604)));
+}
 
 void func_841217C8(u8 *arg0) {
     *(s16 *)(arg0 + 0x5FE) = 0;

@@ -31,7 +31,19 @@ void *func_81307204(void *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130785C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_81307C94.s")
+extern void func_8130785C(void *, void *, s32);
+void func_81307C94(void *arg0) {
+    s32 var_s0;
+    void *var_s1;
+
+    var_s1 = (*(void **)((u8 *)(arg0) + (0x137A8)));
+    var_s0 = 0;
+    do {
+        func_8130785C(arg0, var_s1, (*(u8 *)((u8 *)(arg0) + (0x137F9))) + var_s0);
+        var_s0 += 1;
+        var_s1 = (*(void **)((u8 *)(var_s1) + (0x33A0)));
+    } while (var_s0 != 3);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_81307D08.s")
 

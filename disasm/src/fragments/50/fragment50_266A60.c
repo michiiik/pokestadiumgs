@@ -161,7 +161,25 @@ void func_8620148C(void) { func_87F026E8(D_87F119D8, D_87F119DC); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_266A60/func_86203BEC.s")
+void func_86203BEC(void) {
+    f32 temp_fa0;
+    f32 temp_fa1;
+    f32 temp_fv1;
+    void *temp_v1;
+    void *var_v0;
+
+    var_v0 = (*(void **)((u8 *)(D_8620E198) + (0x180)));
+    if (var_v0 != NULL) {
+        do {
+            temp_v1 = (*(void **)((u8 *)(var_v0) + (0x20)));
+            temp_fv1 = (*(f32 *)((u8 *)(var_v0) + (0x48))) - (*(f32 *)((u8 *)(temp_v1) + (0x3C)));
+            temp_fa0 = (*(f32 *)((u8 *)(var_v0) + (0x4C))) - (*(f32 *)((u8 *)(temp_v1) + (0x40)));
+            temp_fa1 = (*(f32 *)((u8 *)(var_v0) + (0x50))) - (*(f32 *)((u8 *)(temp_v1) + (0x44)));
+            (*(f32 *)((u8 *)(temp_v1) + (0x48))) = sqrtf((temp_fv1 * temp_fv1) + (temp_fa0 * temp_fa0) + (temp_fa1 * temp_fa1));
+            var_v0 = (*(void **)((u8 *)(var_v0) + (4)));
+        } while (var_v0 != NULL);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -201,7 +219,18 @@ void func_8620148C(void) { func_87F026E8(D_87F119D8, D_87F119DC); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_266A60/func_86204EB8.s")
+extern void func_86206334();
+void func_86204EB8(void) {
+    if (func_800084A0() == 1) {
+        func_8620736C();
+        func_86206304();
+        func_86206334();
+        func_80007AEC(0x14);
+        (*(s32 *)((u8 *)(D_8620E198) + (0xE8))) = 3;
+        func_87F00688();
+    }
+    func_8620739C();
+}
 #endif
 
 #ifdef VERSION_US
@@ -213,7 +242,17 @@ void func_8620148C(void) { func_87F026E8(D_87F119D8, D_87F119DC); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_266A60/func_862052A0.s")
+extern void func_862048B0();
+extern void func_86204FEC();
+void func_862052A0(void) {
+    func_800086A4(2);
+    func_80007AEC(0xA);
+    do {
+        func_80064D28();
+        func_86204FEC();
+        func_862048B0();
+    } while ((*(s32 *)((u8 *)(D_8620E198) + (0xE8))) != 8);
+}
 #endif
 
 #ifdef VERSION_US

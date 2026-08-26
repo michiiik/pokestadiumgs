@@ -185,7 +185,29 @@ void func_82B0284C(u8 *arg0, u8 *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B02E50.s")
+extern void func_82B02ABC(void *);
+extern void func_82B02BA4(void *);
+extern void func_82B02CA0(void *);
+extern void func_82B02D84(void *);
+void func_82B02E50(void *arg0) {
+    u16 temp_v0;
+
+    temp_v0 = (*(u16 *)((u8 *)(arg0) + (6)));
+    switch (temp_v0) {                              /* irregular */
+    case 1:
+        func_82B02ABC(arg0);
+        break;
+    case 3:
+        func_82B02BA4(arg0);
+        break;
+    case 4:
+        func_82B02CA0(arg0);
+        break;
+    }
+    if ((*(s16 *)((u8 *)(arg0) + (0))) == 3) {
+        func_82B02D84(arg0);
+    }
+}
 #endif
 
 #ifdef VERSION_US

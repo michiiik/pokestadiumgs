@@ -164,7 +164,14 @@ void func_8AC00FEC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC010D4.s")
+extern void func_800459AC(u8 *, u8, u8, u16, s32, s32, s32, s32, s32, s32, s32, s32, s32);
+s32 func_8AC010D4(u8 *arg0, u16 arg1, u16 arg2) {
+    if (arg0 == NULL) {
+        return 0;
+    }
+    func_800459AC(func_8004CA60(arg0), (*(u8 *)((u8 *)(arg0) + (4))), (*(u8 *)((u8 *)(arg0) + (5))), (*(u16 *)((u8 *)(arg0) + (0))), (s32) (*(u16 *)((u8 *)(arg0) + (2))), 1, 0, 0, 0, (s32) arg1, (s32) arg2, 0, 0);
+    return 1;
+}
 #endif
 
 #ifdef VERSION_US

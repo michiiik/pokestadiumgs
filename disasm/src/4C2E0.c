@@ -67,5 +67,12 @@ void func_8004BEEC(s32 arg0, s32 arg1, s16 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4C2E0/func_8004BF3C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4C2E0/func_8004BFC4.s")
+void func_8004BFC4(s32 arg0, s32 arg1, s16 arg2) {
+    s32 temp_v0;
+
+    temp_v0 = func_8004B754(arg1);
+    if ((arg0 != 0) && (temp_v0 >= 0)) {
+        (*(s8 *)((u8 *)(((temp_v0 * 0xC) + arg0)) + (8))) = (s8) arg2;
+    }
+}
 #endif

@@ -132,7 +132,24 @@ u8 *func_8600AAA4(s32 arg0) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_8600AAD4.s")
+extern void func_8004C8C0(s32);
+s32 func_8004C990(s32, s32);
+extern s32 D_8600DE10;
+extern s32 D_8600DE14;
+extern s32 D_8600DE18;
+extern s32 D_8600DE1C;
+extern s32 D_8600DE20;
+void func_8600AAD4(void) {
+    func_87F061D0();
+    func_8004C8C0(0x1B2);
+    func_8004C8C0(0x191);
+    func_8004C8C0(0x192);
+    D_8600DE10 = func_8004C990(0x191, 0);
+    D_8600DE14 = func_8004C990(0x191, 1);
+    D_8600DE18 = func_8004C990(0x191, 2);
+    D_8600DE1C = func_8004C990(0x191, 3);
+    D_8600DE20 = func_8004C990(0x191, 4);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_8600AB6C.s")
 
