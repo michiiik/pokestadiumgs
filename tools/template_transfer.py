@@ -67,6 +67,7 @@ from typing import Iterable
 
 import dedupe_externs
 import pragma_targets as targets
+import probe_stats
 import s1_transfer_sweep as transfer_sweep
 import scan_asm_families as scanner
 import sweep_targets
@@ -138,15 +139,24 @@ def default_stats_path(fallback_root: Path | None = None) -> Path:
     """Local ``probe-stats.jsonl`` if present, else the sibling checkout's, read-only.
 
     This worktree has no probe history of its own; without this fallback,
-    every winner lookup would come back empty.
+    every winner lookup would come back empty. Tries the new
+    ``disasm/probe-stats/probe-stats.jsonl`` location before the legacy
+    ``disasm/build/probe-stats.jsonl`` one, in both the local and sibling
+    checkouts (see ``tools/probe_stats.py``).
     """
     if targets.STATS_PATH.exists():
         return targets.STATS_PATH
+    for legacy in probe_stats.legacy_stats_paths():
+        if legacy.exists():
+            return legacy
     root = fallback_root if fallback_root is not None else _fallback_repo_root()
     if root is not None:
-        candidate = root / "disasm" / "build" / "probe-stats.jsonl"
-        if candidate.exists():
-            return candidate
+        for candidate in (
+            root / "disasm" / "probe-stats" / "probe-stats.jsonl",
+            root / "disasm" / "build" / "probe-stats.jsonl",
+        ):
+            if candidate.exists():
+                return candidate
     return targets.STATS_PATH
 
 

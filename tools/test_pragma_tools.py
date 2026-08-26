@@ -21,9 +21,10 @@ ASM_PROCESSOR_DIR = Path(__file__).resolve().parent.parent / "disasm" / "tools" 
 sys.path.insert(0, str(ASM_PROCESSOR_DIR))
 import asm_processor  # noqa: E402
 
-# The runner records probe statistics to disasm/build/probe-stats.jsonl by
-# default.  Synthetic test transactions must never land in that file, because
-# it is the data set used for family-level candidate tuning.
+# The runner records probe statistics to disasm/probe-stats/probe-stats.jsonl
+# (see tools/probe_stats.py) by default.  Synthetic test transactions must
+# never land in that file, because it is the data set used for family-level
+# candidate tuning.
 _STATS_ISOLATION = mock.patch.dict(os.environ, {"PRAGMA_PROBE_STATS": ""})
 
 
@@ -724,6 +725,11 @@ class RunnerTests(unittest.TestCase):
                     "extern void helper(void);",
                 )
             row = json.loads(stats_path.read_text())
+            # New batch-level provenance fields (tools/probe_stats.py schema 2).
+            self.assertEqual(row["schema_version"], 2)
+            self.assertIn("timestamp", row)
+            self.assertIn("batch_id", row)
+            self.assertIn("worktree", row)
             self.assertEqual(row["counts"], {"wrapper-void:compare_rejected": 1})
             self.assertEqual(row["attempts"][0]["label"], "wrapper-void")
             self.assertEqual(row["attempts"][0]["candidate"], "void func_a(void) {}")
@@ -731,7 +737,10 @@ class RunnerTests(unittest.TestCase):
             self.assertEqual(row["attempts"][0]["declarations"], "extern void helper(void);")
             self.assertEqual(row["attempts"][0]["first_diff_instruction"], 1)
             self.assertEqual(row["attempts"][0]["expected_instruction"], "0x24040001")
-            self.assertEqual(len(row["attempts"][0]["assembly_diff"]), 1)
+            # assembly_diff/assembly_diff_truncated are runtime-only (AGENTS.md)
+            # and must never reach the persisted file.
+            self.assertNotIn("assembly_diff", row["attempts"][0])
+            self.assertNotIn("assembly_diff_truncated", row["attempts"][0])
 
     def test_unverified_probe_hit_uses_sequential_gate_without_duplicate_compare(self) -> None:
         # An unverified probe hit (no ``link_verified`` key, e.g. baseline

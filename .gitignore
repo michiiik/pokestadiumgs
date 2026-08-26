@@ -8,6 +8,10 @@ disasm/build/
 disasm/probes/
 generated/
 
+# Durable probe-stats history (see tools/probe_stats.py) -- deliberately
+# outside disasm/build/ so a build clean cannot wipe candidate-runner history
+disasm/probe-stats/
+
 # Android/Gradle outputs and machine-local configuration
 .gradle/
 android/.gradle/
