@@ -45,7 +45,7 @@ struct S1_unk_D_800FCED8 {
     /* 0x25D2 */ s8 decodeBudget; // AudioStream_RefillAndDecode: caps decode iterations per call
     /* 0x25D3 */ char unk25D3[0x5];
 };
-void func_8001FCA0(S1_unk_D_800FCED8* arg0, s32 arg1, s32 arg2) {
+void func_8001FCA0(S1_unk_D_800FCED8* arg0, s32 arg1, S1_unk_D_800FCED8_190 arg2) {
     _bzero(&arg0->unk_0000, sizeof(S1_unk_D_800FCED8_0000));
 
     arg0->unk_0000.unk_166 = 0x28;

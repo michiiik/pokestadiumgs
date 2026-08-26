@@ -1,5 +1,11 @@
 #include "global.h"
 
+#ifdef VERSION_US
+/* Stadium 1 transfer helper: allocates a typed block from the supplied pool. */
+extern void *func_8000318C(void *, size_t, s32);
+extern Vtx *func_800398F8();
+#endif
+
 
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80021DE0.s")
@@ -1696,6 +1702,7 @@ typedef struct S1_unk_D_86002F34_00C_060 S1_unk_D_86002F34_00C_060;
 typedef struct S1_unk_D_86002F34_00C_024 S1_unk_D_86002F34_00C_024;
 typedef struct S1_unk_D_86002F34_00C_018 S1_unk_D_86002F34_00C_018;
 typedef s32 (*S1_func_D_86002F34_000_010)(s32, struct S1_GraphNode*);
+extern void *func_80003240();
 struct S1_GraphNode {
     /* 0x00 */ u8 unk_00;
     /* 0x01 */ u8 unk_01;
@@ -1766,6 +1773,7 @@ struct S1_unk_D_86002F34_00C {
     /* 0xCC */ S1_unk_D_86002F34_00C_0CC unk_CC;
     /* 0xEC */ char unkEC[0x4];
 };
+extern Vtx *func_8003946C(S1_unk_D_86002F34_00C_0CC *, S1_unk_D_86002F34_00C_040 *);
 typedef struct S1_MainPoolState S1_MainPoolState;
 typedef struct S1_MainPoolBlock S1_MainPoolBlock;
 struct S1_MainPoolState {
@@ -2834,7 +2842,7 @@ s32 func_8003820C(s32 arg0, s32 arg1) {
 
     var_a2 = arg1;
     if (arg0 != 0) {
-        var_a2 = func_8000318C(arg0, 0x18, 4);
+        var_a2 = (s32)(u32)func_8000318C((void *)(u32)arg0, 0x18, 4);
     }
     if (var_a2 != 0) {
         arg1 = var_a2;
@@ -2848,7 +2856,7 @@ s32 func_8003820C(s32 arg0, s32 arg1) {
 #ifdef VERSION_US
 S1_unk_D_8690A610* func_80038258(s32 arg0, S1_unk_D_8690A610* arg1, s16 arg2, s16 arg3, u8 r, u8 g, u8 b, u8 a) {
     if (arg0 != 0) {
-        arg1 = func_8000318C(arg0, sizeof(S1_unk_D_8690A610), 4);
+        arg1 = func_8000318C((void *)(u32)arg0, sizeof(S1_unk_D_8690A610), 4);
     }
 
     if (arg1 != NULL) {
@@ -2903,7 +2911,7 @@ s32 func_80038474(s32 arg0, s32 arg1) {
 
     var_a2 = arg1;
     if (arg0 != 0) {
-        var_a2 = func_8000318C(arg0, 0x18, 4);
+        var_a2 = (s32)(u32)func_8000318C((void *)(u32)arg0, 0x18, 4);
     }
     if (var_a2 != 0) {
         arg1 = var_a2;
@@ -4169,13 +4177,13 @@ void func_8003F1DC(void *arg0) {
 
 #ifdef VERSION_US
 void func_8003F454(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u8 arg4) {
-    func_8003575C(arg0 + 0xA0, arg1 & 0xFF, arg2 & 0xFF, arg3 & 0xFF, (u8) (s32) arg4);
+    func_8003575C((Color3575C *)(u32)(arg0 + 0xA0), arg1 & 0xFF, arg2 & 0xFF, arg3 & 0xFF, (u8) (s32) arg4);
 }
 #endif
 
 #ifdef VERSION_US
 void func_8003F498(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u8 arg4) {
-    func_8003575C(arg0 + 0xA0, arg1 & 0xFF, arg2 & 0xFF, arg3 & 0xFF, (u8) (s32) arg4);
+    func_8003575C((Color3575C *)(u32)(arg0 + 0xA0), arg1 & 0xFF, arg2 & 0xFF, arg3 & 0xFF, (u8) (s32) arg4);
 }
 #endif
 
@@ -4317,22 +4325,22 @@ void func_8003FD08(void) {
 #endif
 
 #ifdef VERSION_US
-extern s32 D_80126450;
-extern void func_8003FD34(s32);
+extern S1_MainPoolState *D_80126450;
+extern void func_8003FD34(void *);
 void func_80040134(void) {
     struct TargetCmd16 { u8 cmd; u8 r; u8 g; u8 b; } *cmd;
     cmd = (struct TargetCmd16 *)(u32)D_80126520;
-    func_8003FD34(func_80038180((S1_MainPoolState *)(u32)D_80126450, NULL, cmd->r, cmd->g, cmd->b));
+    func_8003FD34(func_80038180(D_80126450, NULL, cmd->r, cmd->g, cmd->b));
     D_80126520 += sizeof(struct TargetCmd16);
 }
 #endif
 
 #ifdef VERSION_US
-extern s32 D_80126450;
+extern S1_MainPoolState *D_80126450;
 extern s32 func_8003820C(s32, s32);
-extern void func_8003FD34(s32);
+extern void func_8003FD34(void *);
 void func_8004018C(void) {
-    func_8003FD34(func_8003820C(D_80126450, 0));
+    func_8003FD34((void *)(S1_uintptr_t)func_8003820C((s32)(S1_uintptr_t)D_80126450, 0));
     D_80126520 += 4;
 }
 #endif
@@ -4344,7 +4352,7 @@ void func_800401CC(void) {
 void func_800401D4(void) {
     S1_unk_D_800ABE00_cmd13* cmd = (S1_unk_D_800ABE00_cmd13*)D_80126520;
 
-    func_8003FD34(func_80038258(D_80126450, NULL, cmd->fogNear, cmd->fogFar, cmd->r, cmd->g, cmd->b, 0xFF));
+    func_8003FD34(func_80038258((s32)(S1_uintptr_t)D_80126450, NULL, cmd->fogNear, cmd->fogFar, cmd->r, cmd->g, cmd->b, 0xFF));
 
     D_80126520 += sizeof(S1_unk_D_800ABE00_cmd13);
 }
@@ -4362,7 +4370,7 @@ void func_800401D4(void) {
 s32 func_80038474(s32, s32);
 
 void func_80040370(void) {
-    func_8003FD34(func_80038474(D_80126450, 0));
+    func_8003FD34((void *)(S1_uintptr_t)func_80038474((s32)(S1_uintptr_t)D_80126450, 0));
     D_80126520 += 4;
 }
 #endif
@@ -4487,6 +4495,7 @@ void func_800408B8(void) {
 #endif
 
 #ifdef VERSION_US
+extern S1_unk_D_86002F58_004_000 *func_80038894(S1_MainPoolState *, void *, s16, S1_Vec3f *, S1_Vec3s *, S1_Vec3f *);
 void func_80040910(void) {
     S1_Vec3s sp40;
     S1_Vec3f sp34;
@@ -4627,6 +4636,7 @@ void func_800413A0(S1_MainPoolState* arg0, u32 arg1, S1_Fragment* arg2) {
 #endif
 
 #ifdef VERSION_US
+extern void *func_80040E80(S1_MemoryBlock *, void *);
 void func_80041664(S1_MemoryBlock* arg0, S1_arg1_func_80019420* arg1) {
     while (arg1->unk_00) {
         if (arg1->unk_00 == 3) {

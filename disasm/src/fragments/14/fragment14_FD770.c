@@ -15,7 +15,15 @@ s32 func_8130560C(void *arg0, s32 arg1) {
     return *(u8 *)(base + arg1 + 0x10);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FD770/func_81305634.s")
+s32 func_81305634(void *arg0) {
+    s32 temp_a1;
+
+    temp_a1 = func_813055E0((s32) arg0, (s32) (*(s16 *)((u8 *)(arg0) + (0x7C))), (s32) (*(s16 *)((u8 *)(arg0) + (8))), (s32) (*(s16 *)((u8 *)(arg0) + (0xA))));
+    if (((*(s16 *)((u8 *)(arg0) + (0x7C))) == 0) && ((*(s16 *)((u8 *)(arg0) + (8))) == 1) && ((*(s16 *)((u8 *)(arg0) + (0xA))) == 0)) {
+        return -1;
+    }
+    return func_8130560C(arg0, temp_a1);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FD770/func_813056A0.s")
 
@@ -71,7 +79,16 @@ void func_813069B0(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FD770/func_813069BC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FD770/func_81306B0C.s")
+s16 func_81306B0C(void *arg0) {
+    u8 temp_v0;
+
+    temp_v0 = (*(u8 *)((u8 *)(arg0) + (0x87)));
+    if ((temp_v0 == 0) || (temp_v0 == 5)) {
+        (*(s16 *)((u8 *)(arg0) + (0x80))) = func_813055E0((s32) arg0, (s32) (*(s16 *)((u8 *)(arg0) + (0x7C))), (s32) (*(s16 *)((u8 *)(arg0) + (8))), (s32) (*(s16 *)((u8 *)(arg0) + (0xA))));
+        return (*(s16 *)((u8 *)(arg0) + (0x7E)));
+    }
+    return -1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FD770/func_81306B64.s")
 

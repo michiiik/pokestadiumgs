@@ -180,7 +180,25 @@ void func_8004D7F8(u16* arg0, s32 a1, S1_arg1_func_80010CA8 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D998.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004DA18.s")
+s32 func_8004C8C0(u16);
+s32 func_8004DA18(void *arg0) {
+    s32 var_s0;
+
+    var_s0 = 1;
+    if (func_8004C8C0((*(u16 *)((u8 *)(arg0) + (0x18)))) == 0) {
+        var_s0 = 0;
+    }
+    if (func_8004C8C0((*(u16 *)((u8 *)(arg0) + (0x1C)))) == 0) {
+        var_s0 = 0;
+    }
+    if (func_8004C8C0((*(u16 *)((u8 *)(arg0) + (0x20)))) == 0) {
+        var_s0 = 0;
+    }
+    if (func_8004C8C0((*(u16 *)((u8 *)(arg0) + (0x24)))) == 0) {
+        var_s0 = 0;
+    }
+    return var_s0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004DA8C.s")
 
