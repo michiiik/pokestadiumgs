@@ -841,7 +841,15 @@ u8 func_80031A54(char arg0)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80033188.s")
+extern u16 D_800D2B5C;
+extern void func_80032F0C(void);
+void func_80033188(void) {
+    u16 sp1E;
+
+    sp1E = D_800D2B5C;
+    func_80032F0C();
+    D_800D2B5C = sp1E;
+}
 #endif
 
 #ifdef VERSION_US

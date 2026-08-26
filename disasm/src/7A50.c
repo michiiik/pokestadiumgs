@@ -49,7 +49,12 @@ void func_80007174(GfxImage *arg0, s32 fmt, s32 size, s32 width, s32 height, u32
 
 void func_800072A4(u8 *arg0, u8 *arg1) { if (*(u16 *)(arg1 + 2) == 2) { if (*(u16 *)(arg1 + 4) == *(u16 *)(arg0 + 4)) { if (*(u16 *)(arg1 + 6) == *(u16 *)(arg0 + 6)) *(u32 *)(arg0 + 0xC) = (u32)arg1; } } }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/7A50/func_800072E0.s")
+extern S1_unk_D_800A7440 D_800D0530;
+extern s32 D_80087220;
+void func_800072E0(void) {
+    D_80087220 = 0;
+    func_80006E50(&D_800D0530, 0, 0, 0, 0);
+}
 
 extern s32 D_80087220;
 s32 func_8000731C(void) {
