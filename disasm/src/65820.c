@@ -100,11 +100,49 @@ s32 func_80064E38(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/func_80064E44.s")
+extern void main_pool_pop_state(s32);
+extern void main_pool_push_state(s32);
+extern u8 D_82700000;
+extern u8 fragment22_ROM_START;
+void func_80064E44(void) {
+    s32 sp24;
+
+    main_pool_push_state(0x6F70746E);
+    sp24 = func_80064CE8(((u32) ((s32) &D_82700000 & 0x0FF00000) >> 0x14) - 0x10, &fragment22_ROM_START, fragment23_ROM_START, 0U, 0U);
+    main_pool_pop_state(0x6F70746E);
+    if (sp24 == 0) {
+        func_80064DFC(2);
+        return;
+    }
+    func_80064DFC(1);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/func_80064ED0.s")
+extern void __osSetFpcCsr(s32);
+extern void func_8000644C();
+extern void func_80035620();
+extern void func_80046980();
+extern void main_pool_push_state(s32);
+extern s32 D_8009DE90;
+void func_80035140(s32 value);
+void func_8004C020(void);
+void func_80041B84(void);
+void func_8006D240(void);
+void func_80064ED0(void) {
+    __osSetFpcCsr(0x01000C01);
+    func_8000644C();
+    func_80035140(1);
+    func_80035620();
+    func_8004C020();
+    func_80046980();
+    func_80041B84();
+    func_8006D240();
+    func_80064DFC(0x11);
+    D_80128BE0 = -1;
+    D_8009DE90 = 0;
+    main_pool_push_state(0x47414D45);
+}
 #endif
 
 #ifdef VERSION_US

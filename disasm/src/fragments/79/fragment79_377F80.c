@@ -22,7 +22,44 @@ void func_8410878C(s32 arg0, s32 arg1, s32 arg2) {
     D_841901B8 = 1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_841087B8.s")
+extern void func_8410874C();
+extern u8 *D_84193DD0;
+void func_841089D8(s32 arg0);
+void func_841087B8(s32 arg0, s32 arg1, s32 arg2) {
+    if (((*(u8 *)((u8 *)(D_84193DD0) + (9))) & 7) == 1) {
+        switch (arg0) {                             /* irregular */
+        case 0x2D:
+            func_8410874C();
+            return;
+        case 0x2F:
+            func_8410874C();
+            return;
+        case 0x30:
+            func_8410874C();
+            return;
+        case 0x5F:
+            func_8410874C();
+            return;
+        case 0x67:
+            func_8410874C();
+            return;
+        case 0xAD:
+            func_8410874C();
+            return;
+        case 0x39:
+            func_8410878C(arg0, arg1, arg2);
+            return;
+        case 0xC3:
+            func_8410874C();
+            return;
+        default:
+            func_841089D8(1);
+            return;
+        }
+    } else {
+        func_8410874C();
+    }
+}
 
 extern u32 D_84190188; extern u32 D_841901A8; extern void func_841086F0(void); void func_841088CC(s32 arg0){ func_841086F0(); D_84190188=1; if(arg0==0x5B) D_841901A8=1; }
 
