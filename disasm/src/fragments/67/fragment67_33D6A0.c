@@ -214,7 +214,20 @@ void func_8290263C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33D6A0/func_82902714.s")
+void func_82902714(void) {
+    s32 var_s0;
+
+    func_800088A4(1);
+    func_80007B34(0xA);
+    var_s0 = 0;
+    do {
+        func_8290260C();
+        func_82902634();
+        func_82901BA8();
+        var_s0 += 1;
+    } while (var_s0 != 0xA);
+    func_80025CBC(1);
+}
 #endif
 
 #ifdef VERSION_US

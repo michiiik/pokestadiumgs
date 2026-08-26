@@ -34,7 +34,17 @@ void func_8F400C08(s32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/72/fragment72_code/func_8F400DE8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/72/fragment72_code/func_8F400E74.s")
+void func_8F400E74(s32 arg0, s32 arg1, s32 arg2) {
+    if (arg0 == arg1) {
+        func_8004972C(0xFF, 0xFF, 0, 0xFF);
+        return;
+    }
+    if (arg2 == 0) {
+        func_8004972C(0x80, 0x80, 0x80, 0xFF);
+        return;
+    }
+    func_8004972C(0xFF, 0xFF, 0xFF, 0xFF);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/72/fragment72_code/func_8F400EE0.s")
 

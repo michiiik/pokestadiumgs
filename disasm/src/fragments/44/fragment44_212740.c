@@ -105,7 +105,16 @@ void func_8AF262AC(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_212740/func_8AF26324.s")
+void func_8AF26324(void) {
+    (*(s16 *)((u8 *)(D_8AF3A3C0) + (0x30))) = 0x36;
+    (*(s16 *)((u8 *)(D_8AF3A3C0) + (0x32))) = 0x4F;
+    (*(u16 *)((u8 *)(D_8AF3A664) + (2))) = (u16) ((*(u16 *)((u8 *)(D_8AF3A664) + (2))) | 1);
+    if ((*(u16 *)((u8 *)(D_8AF263C0) + (8))) & 0x8000) {
+        (*(u16 *)((u8 *)(D_8AF3A664) + (2))) = (u16) ((*(u16 *)((u8 *)(D_8AF3A664) + (2))) & 0xFFFE);
+        D_8AF3A662 = 0;
+        func_8AF00130(0xC2);
+    }
+}
 
 void func_8AF263AC(void) {
 }
