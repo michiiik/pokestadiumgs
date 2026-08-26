@@ -117,20 +117,24 @@ VARIANTS: dict[str, dict[str, str]] = {
     },
 }
 
+# The ordinary pass deliberately stays small.  Probe statistics show that
+# ``u8-void`` and ``s32-s32`` account for essentially all successful type
+# spellings; the remaining hypotheses are useful only when a diagnostic points
+# at them.  They remain in ``VARIANTS`` so a targeted retry can still use them.
+DEFAULT_VARIANT_NAMES: tuple[str, ...] = ("u8-void", "s32-s32")
+
 # These orders encode the narrow IDO spellings learned from accepted owners.
 # They are candidate priorities, not ABI proof; every spelling still goes
-# through an isolated probe and the sequential ROM gate.
+# through an isolated probe and the sequential ROM gate.  ``u8-arg`` is kept
+# only for bounded lookups, where an entry ``andi 0xff`` is evidence that the
+# recovered argument itself may be byte-typed.
 FAMILY_VARIANTS: dict[str, tuple[str, ...]] = {
-    "bounded_lookup": ("u8-arg", "u8-void", "u16-s32", "s32-s32", "ptr-void"),
-    "state_field_access": ("u8-void", "u8-narrow-void", "s16-narrow-void", "s16-void", "u16-s32", "s32-s32", "ptr-void"),
-    "constant_map": ("s32-s32", "u8-void", "u16-s32"),
-    "direct_wrapper": ("s32-s32", "ptr-void", "u8-void", "ptr-s32"),
-    # Accepted setup sequences most often use byte-backed globals and void
-    # callees; try that spelling before the register-sized fallback.  The
-    # narrow variant stays last because it is valuable when the draft exposes
-    # a byte flag, but is too disruptive as a first hypothesis.
-    "multi_call_wrapper": ("u8-void", "s32-s32", "ptr-void", "ptr-s32", "u8-narrow-void"),
-    "call_sequence": ("u8-void", "s32-s32", "ptr-void", "ptr-s32", "u8-narrow-void"),
+    "bounded_lookup": ("u8-void", "s32-s32", "u8-arg"),
+    "state_field_access": DEFAULT_VARIANT_NAMES,
+    "constant_map": DEFAULT_VARIANT_NAMES,
+    "direct_wrapper": DEFAULT_VARIANT_NAMES,
+    "multi_call_wrapper": DEFAULT_VARIANT_NAMES,
+    "call_sequence": DEFAULT_VARIANT_NAMES,
 }
 
 
@@ -145,6 +149,34 @@ def compile_failure_variant_names(diagnostic: str | None) -> tuple[str, ...]:
     if any(token in text for token in ("unknown type", "undeclared", "m2c_unk")):
         names.extend(("s32-s32", "u16-s32"))
     return tuple(dict.fromkeys(name for name in names if name in VARIANTS))
+
+
+def mismatch_variant_names(attempt: dict[str, object]) -> tuple[str, ...]:
+    """Select type retries from an isolated instruction-diff diagnostic.
+
+    The normal pass should not spend probes on every ABI width.  A shift by
+    sixteen, however, is strong evidence that m2c inferred a halfword field or
+    temporary, so request the narrow spellings only for that owner.  This is
+    deliberately conservative: an ordinary ``sll``/``sra`` or a missing diff
+    does not expand the matrix.
+    """
+    if attempt.get("status") != "probe_rejected":
+        return ()
+    diffs = attempt.get("assembly_diff")
+    if not isinstance(diffs, list):
+        return ()
+    instruction_text: list[str] = []
+    for diff in diffs:
+        if not isinstance(diff, dict):
+            continue
+        for key in ("expected", "actual", "expected_instruction_text", "actual_instruction_text"):
+            value = diff.get(key)
+            if isinstance(value, str):
+                instruction_text.append(value.lower())
+    joined = "\n".join(instruction_text)
+    if not re.search(r"\b(?:sll|sra)\b[^\n]*,\s*(?:16|0x10)\b", joined):
+        return ()
+    return ("s16-void", "s16-narrow-void")
 
 
 def rewrite_draft(draft: str, variant: dict[str, str]) -> str | None:
@@ -382,7 +414,7 @@ def draft_variants(
     draft = result.stdout
     seen: set[str] = set()
     variants: list[tuple[str, str]] = []
-    names = variant_names or FAMILY_VARIANTS.get(family or "", tuple(VARIANTS))
+    names = variant_names or FAMILY_VARIANTS.get(family or "", DEFAULT_VARIANT_NAMES)
     for name in names:
         variant = VARIANTS[name]
         code = rewrite_draft(draft, variant)
@@ -907,7 +939,7 @@ def sweep(
                 continue
             variant_names: tuple[str, ...] | None = None
             if skip_attempts is not None:
-                planned = FAMILY_VARIANTS.get(fam, tuple(VARIANTS))
+                planned = FAMILY_VARIANTS.get(fam, DEFAULT_VARIANT_NAMES)
                 remaining = tuple(
                     name for name in planned if (function, f"m2c:{name}") not in skip_attempts
                 )
@@ -1011,6 +1043,35 @@ def sweep(
             if draft is None:
                 continue
             for label, code in compile_failure_candidates(draft, diagnostics):
+                if label in labels_of[function]:
+                    continue
+                if skip_attempts is not None and (function, label) in skip_attempts:
+                    continue
+                key = (function, code)
+                if key in extra_seen:
+                    continue
+                extra_seen.add(key)
+                extra_blocks.append((function, code))
+                extra_labels.append(label)
+                labels_of[function].add(label)
+        # A compile diagnostic is not the only useful signal.  Keep the
+        # ordinary matrix narrow, then expand a rejected owner only when its
+        # instruction diff contains the distinctive halfword shift shape.
+        mismatch_names_by_function: dict[str, list[str]] = collections.defaultdict(list)
+        for attempt in probe["attempts"]:
+            function = str(attempt.get("function", ""))
+            for name in mismatch_variant_names(attempt):
+                if name not in mismatch_names_by_function[function]:
+                    mismatch_names_by_function[function].append(name)
+        for function, names in mismatch_names_by_function.items():
+            draft = draft_of.get(function)
+            if draft is None:
+                continue
+            for name in names:
+                code = rewrite_draft(draft, VARIANTS[name])
+                if code is None:
+                    continue
+                label = f"m2c:{name}:mismatch-retry"
                 if label in labels_of[function]:
                     continue
                 if skip_attempts is not None and (function, label) in skip_attempts:

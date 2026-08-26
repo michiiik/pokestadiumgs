@@ -1699,16 +1699,40 @@ class SweepTests(unittest.TestCase):
         self.assertIn("ptr-void", names)
         self.assertIn("ptr-s32", names)
 
-    def test_family_variant_order_keeps_narrow_call_spellings_available(self) -> None:
+    def test_family_variant_policy_keeps_rare_spellings_out_of_first_pass(self) -> None:
         call_variants = sweep_targets.FAMILY_VARIANTS["multi_call_wrapper"]
         self.assertEqual(call_variants[0], "u8-void")
-        self.assertIn("u8-narrow-void", call_variants)
-        self.assertIn("u8-narrow-void", sweep_targets.FAMILY_VARIANTS["call_sequence"])
+        self.assertEqual(call_variants, ("u8-void", "s32-s32"))
+        self.assertNotIn("u8-narrow-void", call_variants)
+        self.assertNotIn("ptr-void", sweep_targets.FAMILY_VARIANTS["call_sequence"])
+        self.assertEqual(
+            sweep_targets.FAMILY_VARIANTS["bounded_lookup"],
+            ("u8-void", "s32-s32", "u8-arg"),
+        )
         narrow = sweep_targets.rewrite_draft(
             "M2C_UNK func_a(M2C_UNK arg0);\n",
             sweep_targets.VARIANTS["s16-narrow-void"],
         )
         self.assertIn("s16 arg0", narrow)
+
+    def test_mismatch_shift_sixteen_selects_halfword_retries(self) -> None:
+        attempt = {
+            "status": "probe_rejected",
+            "assembly_diff": [
+                {"expected": "sll\tv0,a0,0x10", "actual": "sll\tv1,a0,0x2"},
+            ],
+        }
+        self.assertEqual(
+            sweep_targets.mismatch_variant_names(attempt),
+            ("s16-void", "s16-narrow-void"),
+        )
+        self.assertEqual(
+            sweep_targets.mismatch_variant_names({
+                "status": "probe_rejected",
+                "assembly_diff": [{"expected": "sll\tv0,a0,0x2"}],
+            }),
+            (),
+        )
 
     def test_bounded_lookup_u8_argument_variant_rewrites_only_function_parameter(self) -> None:
         draft = (
