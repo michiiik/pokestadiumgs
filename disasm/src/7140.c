@@ -103,7 +103,22 @@ s32 func_80006870(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/7140/func_800068C4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/7140/rsp_init.s")
+void func_800068C4(void *);
+extern OSThread D_800CE170;
+extern u8 D_800D0320;
+extern void *D_800D033C;
+extern void *D_800D03FC;
+extern void *D_800D043C;
+extern OSMesgQueue D_800D0444;
+extern OSMesgQueue D_800D045C;
+extern OSMesgQueue D_800D0474;
+void rsp_init(void) {
+    osCreateMesgQueue(&D_800D0474, &D_800D043C, 1);
+    osCreateMesgQueue(&D_800D045C, &D_800D03FC, 0x10);
+    osCreatePiManager(0x96, &D_800D0444, &D_800D033C, 0x20);
+    osCreateThread(&D_800CE170, 0x14, func_800068C4, NULL, &D_800D0320, 0x5A);
+    osStartThread(&D_800CE170);
+}
 
 void func_80006A78(void *arg0, s32 arg1) {
     extern OSMesgQueue D_800D045C;
