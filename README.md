@@ -71,6 +71,8 @@ functions. Current Android runtime and rental-roster status is recorded in
 ## Decompilation coverage
 
 The following block is refreshed by the repository post-commit hook.
+Enable the tracked hook once per checkout with
+`git config core.hooksPath .githooks`.
 
 <!-- AUTO_COVERAGE:START -->
 - US functions with C implementations: **2,911 / 10,532 (27.6%)**
