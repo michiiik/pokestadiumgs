@@ -179,6 +179,102 @@ def mismatch_variant_names(attempt: dict[str, object]) -> tuple[str, ...]:
     return ("s16-void", "s16-narrow-void")
 
 
+_IMMEDIATE_RE = re.compile(r"(?<![A-Za-z0-9_])-?(?:0x[0-9A-Fa-f]+|[0-9]+)(?![A-Za-z0-9_])")
+_IMMEDIATE_REPAIR_OPS = {
+    "addiu", "ori", "andi", "slti", "sltiu",
+    "lb", "lbu", "lh", "lhu", "lw", "lwc1", "sb", "sh", "sw", "swc1",
+}
+
+
+def _parse_immediate(token: str) -> int | None:
+    try:
+        return int(token, 0)
+    except ValueError:
+        try:
+            return int(token, 10)
+        except ValueError:
+            return None
+
+
+def _replace_immediate_occurrence(
+    candidate: str, actual_value: int, expected_value: int, occurrence: int
+) -> str | None:
+    """Replace one visible candidate literal while preserving its spelling."""
+    seen = 0
+
+    def replacement(match: re.Match[str]) -> str:
+        nonlocal seen
+        value = _parse_immediate(match.group(0))
+        if value != actual_value:
+            return match.group(0)
+        if seen != occurrence:
+            seen += 1
+            return match.group(0)
+        seen += 1
+        token = match.group(0)
+        if token.lower().startswith("0x"):
+            prefix = "0X" if token.startswith("0X") else "0x"
+            sign = "-" if expected_value < 0 else ""
+            return f"{sign}{prefix}{abs(expected_value):X}" if prefix == "0X" else f"{sign}{prefix}{abs(expected_value):x}"
+        return str(expected_value)
+
+    rewritten = _IMMEDIATE_RE.sub(replacement, candidate)
+    return rewritten if rewritten != candidate else None
+
+
+def immediate_repair_candidates(
+    candidate: str, attempt: dict[str, object], *, limit: int = 8
+) -> list[tuple[str, str]]:
+    """Generate literal-only repairs for a same-opcode immediate drift.
+
+    This is intentionally a narrow rule, not a semantic decompiler.  The
+    mismatch classifier has already established that the whole instruction
+    stream differs only in immediates; here we require the per-instruction
+    expected/actual opcode to agree and replace only a literal that is visibly
+    present in the candidate text.  The runner remains the authority.
+    """
+    if attempt.get("status") != "probe_rejected" or attempt.get("mismatch_kind") != "immediate_drift":
+        return []
+    diffs = attempt.get("assembly_diff")
+    if not isinstance(diffs, list):
+        return []
+    repairs: list[tuple[str, str]] = []
+    seen: set[str] = set()
+    for diff_index, diff in enumerate(diffs):
+        if not isinstance(diff, dict):
+            continue
+        expected = diff.get("expected") or diff.get("expected_instruction_text")
+        actual = diff.get("actual") or diff.get("actual_instruction_text")
+        if not isinstance(expected, str) or not isinstance(actual, str):
+            continue
+        expected_op = expected.strip().split(None, 1)[0].lower() if expected.strip() else ""
+        actual_op = actual.strip().split(None, 1)[0].lower() if actual.strip() else ""
+        if expected_op != actual_op or expected_op not in _IMMEDIATE_REPAIR_OPS:
+            continue
+        expected_values = [value for value in (_parse_immediate(t) for t in _IMMEDIATE_RE.findall(expected)) if value is not None]
+        actual_values = [value for value in (_parse_immediate(t) for t in _IMMEDIATE_RE.findall(actual)) if value is not None]
+        if len(expected_values) != len(actual_values):
+            continue
+        for immediate_index, (expected_value, actual_value) in enumerate(zip(expected_values, actual_values)):
+            if expected_value == actual_value or actual_value == 0:
+                continue
+            occurrences = [
+                match for match in _IMMEDIATE_RE.finditer(candidate)
+                if _parse_immediate(match.group(0)) == actual_value
+            ]
+            for occurrence in range(min(len(occurrences), limit - len(repairs))):
+                rewritten = _replace_immediate_occurrence(
+                    candidate, actual_value, expected_value, occurrence
+                )
+                if rewritten is None or rewritten in seen:
+                    continue
+                seen.add(rewritten)
+                repairs.append((f"{diff_index}-{immediate_index}-{occurrence}", rewritten))
+                if len(repairs) >= limit:
+                    return repairs
+    return repairs
+
+
 def rewrite_draft(draft: str, variant: dict[str, str]) -> str | None:
     """Turn an m2c ``--valid-syntax`` draft into plain C for one type guess."""
     if "M2C_ERROR" in draft:
@@ -1158,6 +1254,32 @@ def sweep(
                 if code is None:
                     continue
                 label = f"m2c:{name}:mismatch-retry"
+                if label in labels_of[function]:
+                    continue
+                if skip_attempts is not None and (function, label) in skip_attempts:
+                    continue
+                key = (function, code)
+                if key in extra_seen:
+                    continue
+                extra_seen.add(key)
+                extra_blocks.append((function, code))
+                extra_labels.append(label)
+                labels_of[function].add(label)
+        # Immediate-only drift is a stronger signal than a blind type retry:
+        # use the persisted expected/actual instruction pair to substitute a
+        # visible candidate literal, then send each spelling through the same
+        # isolated probe pass.  This also covers non-m2c/template candidates
+        # because it works from the attempted body itself.
+        for attempt in probe["attempts"]:
+            if attempt.get("mismatch_kind") != "immediate_drift":
+                continue
+            index = int(attempt["index"])
+            if index >= len(blocks):
+                continue
+            function, candidate = blocks[index]
+            base_label = labels[index]
+            for suffix, code in immediate_repair_candidates(candidate, attempt):
+                label = f"{base_label}:immediate-retry:{suffix}"
                 if label in labels_of[function]:
                     continue
                 if skip_attempts is not None and (function, label) in skip_attempts:

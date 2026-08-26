@@ -1778,6 +1778,42 @@ class SweepTests(unittest.TestCase):
             (),
         )
 
+    def test_immediate_drift_rewrites_only_visible_literal(self) -> None:
+        repairs = sweep_targets.immediate_repair_candidates(
+            "s32 func_a(void) { return value + 0x100; }\n",
+            {
+                "status": "probe_rejected",
+                "mismatch_kind": "immediate_drift",
+                "assembly_diff": [{
+                    "expected": "addiu\tv0,v0,0x101",
+                    "actual": "addiu\tv0,v0,0x100",
+                }],
+            },
+        )
+        self.assertEqual(len(repairs), 1)
+        self.assertIn("0x101", repairs[0][1])
+        self.assertNotIn("0x100", repairs[0][1])
+
+    def test_immediate_drift_ignores_opcode_and_zero_repairs(self) -> None:
+        base = {
+            "status": "probe_rejected",
+            "mismatch_kind": "immediate_drift",
+            "assembly_diff": [{
+                "expected": "lw\tv0,0x104(a0)",
+                "actual": "sw\tv0,0x100(a0)",
+            }],
+        }
+        self.assertEqual(
+            sweep_targets.immediate_repair_candidates("return value + 0x100;", base), []
+        )
+        base["assembly_diff"] = [{
+            "expected": "addiu\tv0,v0,0x0",
+            "actual": "addiu\tv0,v0,0x0",
+        }]
+        self.assertEqual(
+            sweep_targets.immediate_repair_candidates("return value;", base), []
+        )
+
     def test_bounded_lookup_u8_argument_variant_rewrites_only_function_parameter(self) -> None:
         draft = (
             "u8 func_80073600(s32 arg0) {\n"
