@@ -1704,6 +1704,14 @@ def try_candidates_detailed(
             timing=result.get("timing") if isinstance(result.get("timing"), dict) else None,
             batch_status=batch_status if isinstance(batch_status, str) else None,
         )
+        # Opt-in: rename a just-accepted winner immediately if it already has
+        # an evidence-backed name and no other pragma owner (tools/name_decompiled.py).
+        if os.environ.get("PRAGMA_NAME_ON_ACCEPT") == "1" and result.get("status") == 0 and result.get("accepted"):
+            try:
+                import name_decompiled
+                name_decompiled.name_after_accept(list(result["accepted"]), quiet=False)
+            except Exception as exc:
+                print(f"PRAGMA_NAME_ON_ACCEPT: name_after_accept failed: {exc}", file=sys.stderr)
         return result
 
 
