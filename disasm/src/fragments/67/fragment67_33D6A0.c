@@ -72,7 +72,20 @@ void func_82900F80(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33D6A0/func_82900FDC.s")
+extern void func_82900D78();
+extern void func_82900E98();
+extern void func_8290299C(u8);
+extern u8 D_82918859;
+extern void func_82900C40(s32);
+extern s32 D_8291889C;
+void func_82900FDC(void) {
+    func_82900C40(D_8291889C);
+    func_82900D78();
+    func_82900E98();
+    func_82900E54();
+    func_82900F80();
+    func_8290299C(D_82918859);
+}
 #endif
 
 #ifdef VERSION_US

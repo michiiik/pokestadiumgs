@@ -185,7 +185,16 @@ void func_8F1027F8(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/69/fragment69_code/func_8F1029CC.s")
+extern void *D_80087200;
+extern u8 D_8F1DECA8;
+void func_8F1029CC(void) {
+    if ((*(u16 *)((u8 *)(D_80087200) + (0xC))) & 0x200) {
+        (*(u8 *)((u8 *)(&D_8F1DECA8) + (0x1D))) = (u8) ((*(u8 *)((u8 *)(&D_8F1DECA8) + (0x1D))) - 1);
+    }
+    if ((*(u16 *)((u8 *)(D_80087200) + (0xC))) & 0x100) {
+        (*(u8 *)((u8 *)(&D_8F1DECA8) + (0x1D))) = (u8) ((*(u8 *)((u8 *)(&D_8F1DECA8) + (0x1D))) + 1);
+    }
+}
 #endif
 
 #ifdef VERSION_US
