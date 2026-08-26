@@ -1712,6 +1712,7 @@ import sweep_targets  # noqa: E402
 import permute_candidate  # noqa: E402
 import pragma_targets as targets  # noqa: E402
 import try_pragma_compare_mcp as mcp  # noqa: E402
+import variant_policy  # noqa: E402
 
 
 class TargetDiscoveryTests(unittest.TestCase):
@@ -1780,6 +1781,154 @@ class TargetDiscoveryTests(unittest.TestCase):
         ])
         self.assertEqual(runner._parse_check_recipe(output)[0], "gcc")
         self.assertEqual(runner._parse_probe_recipe(output)[0], "cc")
+
+
+class PrototypeFallbackTests(unittest.TestCase):
+    """``pragma_targets`` fallback prototype synthesis (item 3 of the issue).
+
+    These never touch the real ``disasm/asm`` tree: it is mostly generated
+    by the splat extraction step and is not fully materialized in every
+    checkout, so every fixture here is a temp-dir ``.s`` file built by hand.
+    """
+
+    def test_infer_prototype_shape_single_argument_used_return(self) -> None:
+        # $a0 is copied into $s0 before anything else touches it (a real
+        # read-before-write use), $a1-$a3 are only ever written (callee
+        # argument setup) before being read, and $v0 is loaded before the
+        # final jr $ra.
+        asm = (
+            "glabel func_80021ED8\n"
+            "    /* 0 80021ED8 0 */  addiu $sp, $sp, -0x20\n"
+            "    /* 0 80021EDC 0 */  or    $s0, $a0, $zero\n"
+            "    /* 0 80021EE0 0 */  or    $a1, $zero, $zero\n"
+            "    /* 0 80021EE4 0 */  lw    $v0, 0x0($s0)\n"
+            "    /* 0 80021EE8 0 */  jr    $ra\n"
+            "    /* 0 80021EEC 0 */   nop\n"
+        )
+        self.assertEqual(targets.infer_prototype_shape(asm), (1, "s32"))
+        self.assertEqual(
+            targets.synthesize_fallback_prototype("func_80021ED8", asm),
+            "s32 func_80021ED8(); /* synthesized */",
+        )
+
+    def test_infer_prototype_shape_void_leaf_with_no_argument_reads(self) -> None:
+        asm = (
+            "glabel func_80000100\n"
+            "    /* 0 0 0 */  addiu $sp, $sp, -0x10\n"
+            "    /* 0 0 0 */  sw    $ra, 0xc($sp)\n"
+            "    /* 0 0 0 */  or    $a0, $zero, $zero\n"
+            "    /* 0 0 0 */  jal   func_80000200\n"
+            "    /* 0 0 0 */   nop\n"
+            "    /* 0 0 0 */  lw    $ra, 0xc($sp)\n"
+            "    /* 0 0 0 */  jr    $ra\n"
+            "    /* 0 0 0 */   nop\n"
+        )
+        self.assertEqual(targets.infer_prototype_shape(asm), (0, "void"))
+
+    def test_infer_prototype_shape_skips_leading_unused_argument_registers(self) -> None:
+        # Only $a2 is ever read; arity still reports the highest qualifying
+        # register index (3), not a count of distinct registers used.
+        asm = (
+            "glabel func_80000200\n"
+            "    /* 0 0 0 */  addiu $sp, $sp, -0x10\n"
+            "    /* 0 0 0 */  or    $v0, $a2, $zero\n"
+            "    /* 0 0 0 */  jr    $ra\n"
+            "    /* 0 0 0 */   nop\n"
+        )
+        self.assertEqual(targets.infer_prototype_shape(asm), (3, "s32"))
+
+    def test_infer_prototype_shape_stack_argument_before_prologue_is_unprototyped(self) -> None:
+        asm = (
+            "glabel func_80000300\n"
+            "    /* 0 0 0 */  lw    $t0, 0x10($sp)\n"
+            "    /* 0 0 0 */  addiu $sp, $sp, -0x10\n"
+            "    /* 0 0 0 */  jr    $ra\n"
+            "    /* 0 0 0 */   nop\n"
+        )
+        self.assertEqual(targets.infer_prototype_shape(asm), (None, "void"))
+        self.assertEqual(
+            targets.synthesize_fallback_prototype("func_80000300", asm),
+            "void func_80000300(); /* synthesized */",
+        )
+
+    def test_infer_prototype_shape_local_frame_offset_is_not_a_stack_argument(self) -> None:
+        # Once the prologue has adjusted $sp, a later 0x18($sp) access is a
+        # local variable slot, not an incoming stack argument -- it must not
+        # trigger the unprototyped fallback.
+        asm = (
+            "glabel func_80000400\n"
+            "    /* 0 0 0 */  addiu $sp, $sp, -0x20\n"
+            "    /* 0 0 0 */  sw    $s0, 0x18($sp)\n"
+            "    /* 0 0 0 */  lw    $s0, 0x18($sp)\n"
+            "    /* 0 0 0 */  jr    $ra\n"
+            "    /* 0 0 0 */   nop\n"
+        )
+        arity, return_type = targets.infer_prototype_shape(asm)
+        self.assertIsNotNone(arity)
+        self.assertEqual(return_type, "void")
+
+    def test_repository_fallback_symbol_header_skips_declared_and_owned_symbols(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source_root = root / "src"
+            source_root.mkdir()
+            asm_root = root / "asm"
+            (asm_root / "test").mkdir(parents=True)
+            symbol_addrs = root / "symbol_addrs_code.txt"
+
+            # Already declared in a tracked source: no synthesis wanted.
+            (source_root / "owner.c").write_text(
+                "extern void func_80000010(s32);\n"
+                '#pragma GLOBAL_ASM("asm/us/nonmatchings/test/func_80000020.s")\n'
+            )
+            # A live pragma owner: no synthesis wanted (its own candidate is
+            # what will eventually define it).
+            (asm_root / "test" / "func_80000020.s").write_text(
+                "glabel func_80000020\n"
+                "    /* 0 0 0 */  jr $ra\n"
+                "    /* 0 0 0 */   nop\n"
+            )
+            # Genuinely undeclared and unowned: gets a synthesized line.
+            (asm_root / "test" / "func_80000030.s").write_text(
+                "glabel func_80000030\n"
+                "    /* 0 0 0 */  or $v0, $a0, $zero\n"
+                "    /* 0 0 0 */  jr $ra\n"
+                "    /* 0 0 0 */   nop\n"
+            )
+            symbol_addrs.write_text(
+                "func_80000010 = 0x80000010; // type:func\n"
+                "func_80000020 = 0x80000020; // type:func\n"
+                "func_80000030 = 0x80000030; // type:func\n"
+                "D_80000040 = 0x80000040; // type:data\n"
+            )
+            output_path = root / "fallback.h"
+            generated = targets.repository_fallback_symbol_header(
+                source_root=source_root,
+                symbol_addrs_path=symbol_addrs,
+                asm_root=asm_root,
+                output_path=output_path,
+                repo_root=root,
+            )
+            text = generated.read_text()
+
+        self.assertIn("func_80000030(); /* synthesized */", text)
+        self.assertNotIn("func_80000010", text)
+        self.assertNotIn("func_80000020", text)
+        self.assertNotIn("D_80000040", text)
+
+    def test_repository_fallback_symbol_header_without_symbol_addrs_is_just_the_guard(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            output_path = root / "fallback.h"
+            generated = targets.repository_fallback_symbol_header(
+                source_root=root / "src",
+                symbol_addrs_path=root / "missing_symbol_addrs.txt",
+                asm_root=root / "asm",
+                output_path=output_path,
+                repo_root=root,
+            )
+            text = generated.read_text()
+        self.assertIn("PRAGMA_REPO_PROTOTYPES_FALLBACK_H", text)
 
 
 class DeclarationTests(unittest.TestCase):
@@ -2182,6 +2331,162 @@ class SweepTests(unittest.TestCase):
         self.assertIsNotNone(rewritten)
         self.assertIn("s32 (*func_80003240(s32 *))();", rewritten)
         self.assertIsNone(sweep_targets.callee_unprototyped_variant("void func_a(void) {}\n"))
+
+    def test_compile_failure_variant_names_with_no_policy_keeps_old_behavior(self) -> None:
+        # Existing tests (and any caller that omits ``policy``) must see the
+        # exact pre-policy result: this is what makes the policy an opt-in.
+        names = sweep_targets.compile_failure_variant_names("incompatible pointer conversion")
+        self.assertIn("ptr-void", names)
+        self.assertIn("ptr-s32", names)
+        self.assertIn("u32-void", names)
+
+    def test_compile_failure_variant_names_dropped_when_policy_has_evidence_against_it(self) -> None:
+        # A policy carrying the issue's own cited evidence (738 attempts, 0
+        # accepted/probe_match) must drop the whole trio automatically.
+        policy = variant_policy.VariantPolicy({
+            (name, variant_policy.CLASS_POINTER_OPERAND): variant_policy.VariantStats(
+                attempts=200, accepted=0, probe_match=0,
+            )
+            for name in ("ptr-void", "ptr-s32", "u32-void")
+        })
+        names = sweep_targets.compile_failure_variant_names(
+            "cfe: Error: Unacceptable operand of '+'.", policy=policy,
+        )
+        self.assertEqual(names, ())
+
+    def test_compile_failure_variant_names_kept_when_policy_has_no_evidence_yet(self) -> None:
+        # An empty/unexplored policy allows the same diagnostic-suggested
+        # names through -- min_attempts gating only bites once there is
+        # enough recorded history to judge.
+        policy = variant_policy.VariantPolicy({})
+        names = sweep_targets.compile_failure_variant_names(
+            "cfe: Error: Unacceptable operand of '+'.", policy=policy,
+        )
+        self.assertIn("ptr-void", names)
+
+    def test_compile_failure_variant_names_skips_trio_for_field_cast_operand_error(self) -> None:
+        # The offending line is the M2C_FIELD-derived cast shape
+        # (``rewrite_draft``'s ``(*(TYPE)((u8 *)(...) + (...)))``): a
+        # pointer-width retry cannot fix this, so the trio should not be
+        # suggested even with a fully permissive policy.
+        diagnostic = (
+            "cfe: Error: probes/x.c, line 12: Unacceptable operand of '+'.\n"
+            "     (*(s32 *)((u8 *)(sp1c) + (0x4))) = 1;\n"
+            " ------------------^\n"
+        )
+        self.assertEqual(sweep_targets.compile_failure_variant_names(diagnostic), ())
+
+    def test_compile_failure_variant_names_keeps_trio_for_plain_operand_error(self) -> None:
+        diagnostic = (
+            "cfe: Error: probes/x.c, line 65: Unacceptable operand of '+'.\n"
+            "     func_87C013CC(arg0 + 0x38, arg0);\n"
+            " ------------------^\n"
+        )
+        names = sweep_targets.compile_failure_variant_names(diagnostic)
+        self.assertIn("ptr-void", names)
+
+    def test_fnptr_cast_candidate_rewrites_dereferenced_global_call(self) -> None:
+        code = "void func_a(s32 arg0) {\n    (*D_800A0000)(arg0);\n}\n"
+        rewritten = sweep_targets.fnptr_cast_candidate(code)
+        self.assertIsNotNone(rewritten)
+        self.assertIn("((void (*)())(D_800A0000))(arg0);", rewritten)
+
+    def test_fnptr_cast_candidate_rewrites_indexed_table_call_with_used_result(self) -> None:
+        code = (
+            "s32 func_a(s32 arg0) {\n"
+            "    s32 result;\n"
+            "    result = table[arg0](arg0, 1);\n"
+            "    return result;\n"
+            "}\n"
+        )
+        rewritten = sweep_targets.fnptr_cast_candidate(code)
+        self.assertIsNotNone(rewritten)
+        self.assertIn("((s32 (*)())(table[arg0]))(arg0, 1);", rewritten)
+
+    def test_fnptr_cast_candidate_returns_none_for_ordinary_calls(self) -> None:
+        self.assertIsNone(sweep_targets.fnptr_cast_candidate("void func_a(void) { func_b(1); }\n"))
+
+    def test_prepare_candidate_declarations_uses_fallback_header_before_synthesizing(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / "owner.c"
+            source.write_text(
+                '#include "global.h"\n'
+                '#pragma GLOBAL_ASM("asm/us/nonmatchings/test/func_80000000.s")\n'
+            )
+            candidate = (
+                "void func_80000000(void) {\n"
+                "    func_80000010(1);\n"
+                "}\n"
+            )
+            fallback_header = root / "fallback.h"
+            fallback_header.write_text("s32 func_80000010(); /* synthesized */\n")
+            with mock.patch.object(
+                sweep_targets.targets, "repository_symbol_header", return_value=None,
+            ), mock.patch.object(
+                sweep_targets.targets, "repository_fallback_symbol_header",
+                return_value=fallback_header,
+            ):
+                sweep_targets._SYMBOL_INDEX_CACHE = None
+                sweep_targets._FALLBACK_SYMBOL_INDEX_CACHE = None
+                prepared = sweep_targets.prepare_candidate_declarations(
+                    "func_80000000", source, candidate,
+                )
+        self.assertIn("s32 func_80000010(); /* synthesized */", prepared)
+
+    def test_prepare_candidate_declarations_synthesizes_undeclared_global_as_byte_array(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / "owner.c"
+            source.write_text(
+                '#include "global.h"\n'
+                '#pragma GLOBAL_ASM("asm/us/nonmatchings/test/func_80000000.s")\n'
+            )
+            candidate = (
+                "void func_80000000(void) {\n"
+                "    D_87F00000 = 1;\n"
+                "}\n"
+            )
+            with mock.patch.object(
+                sweep_targets.targets, "repository_symbol_header", return_value=None,
+            ), mock.patch.object(
+                sweep_targets.targets, "repository_fallback_symbol_header", return_value=None,
+            ):
+                sweep_targets._SYMBOL_INDEX_CACHE = None
+                sweep_targets._FALLBACK_SYMBOL_INDEX_CACHE = None
+                prepared = sweep_targets.prepare_candidate_declarations(
+                    "func_80000000", source, candidate,
+                )
+        self.assertIn("extern u8 D_87F00000[]; /* synthesized fallback */", prepared)
+
+    def test_prepare_candidate_declarations_never_synthesizes_for_owner_declared_symbol(self) -> None:
+        # A symbol the owner source already declares above the pragma must
+        # never fall through to a synthesized guess, even if it happens to
+        # look like an undeclared global.
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / "owner.c"
+            source.write_text(
+                '#include "global.h"\n'
+                "extern u16 D_87F00000;\n"
+                '#pragma GLOBAL_ASM("asm/us/nonmatchings/test/func_80000000.s")\n'
+            )
+            candidate = "void func_80000000(void) {\n    D_87F00000 = 1;\n}\n"
+            with mock.patch.object(
+                sweep_targets.targets, "repository_symbol_header", return_value=None,
+            ), mock.patch.object(
+                sweep_targets.targets, "repository_fallback_symbol_header", return_value=None,
+            ):
+                sweep_targets._SYMBOL_INDEX_CACHE = None
+                sweep_targets._FALLBACK_SYMBOL_INDEX_CACHE = None
+                prepared = sweep_targets.prepare_candidate_declarations(
+                    "func_80000000", source, candidate,
+                )
+        # The owner already declares it above the pragma, so it is visible
+        # in place without needing to be echoed into the prefix -- what
+        # matters here is that it must never fall through to a synthesized
+        # guess.
+        self.assertNotIn("synthesized fallback", prepared)
 
     def test_previously_attempted_labels_returns_function_label_pairs(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

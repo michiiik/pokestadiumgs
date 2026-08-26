@@ -44,6 +44,8 @@ ASM_ROOT = DISASM_ROOT / "asm" / "us" / "nonmatchings"
 M2C_SCRIPT = DISASM_ROOT / "tools" / "m2c" / "m2c.py"
 CONTEXT_CACHE_ROOT = DISASM_ROOT / "build" / "m2c-context"
 SYMBOL_INDEX_HEADER = CONTEXT_CACHE_ROOT / "repo-prototypes.h"
+FALLBACK_SYMBOL_INDEX_HEADER = CONTEXT_CACHE_ROOT / "repo-prototypes-fallback.h"
+SYMBOL_ADDRS_PATH = DISASM_ROOT / "linker_scripts" / "us" / "symbol_addrs_code.txt"
 
 PRAGMA_RE = re.compile(r'^#pragma GLOBAL_ASM\("(asm/us/nonmatchings/([^"]+)/([A-Za-z_]\w*)\.s)"\)$', re.M)
 
@@ -464,6 +466,231 @@ def repository_symbol_header(
         if source_root == SOURCE_ROOT and output_path == SYMBOL_INDEX_HEADER:
             _SYMBOL_INDEX_SNAPSHOT = snapshot
         return output_path
+
+
+def all_declared_symbols(source_root: Path = SOURCE_ROOT) -> set[str]:
+    """Return every symbol name declared or defined anywhere in ``source_root``.
+
+    Unlike ``repository_symbol_header``'s output, this is not filtered down
+    to unambiguous single-spelling declarations -- it only answers "does any
+    source say anything about this symbol at all", which is what the
+    fallback-prototype synthesizer needs to stay conservative: a symbol with
+    conflicting declarations across sources still counts as declared here,
+    so it is never given a synthesized old-style prototype on top.
+    """
+    declared: set[str] = set()
+    for path in _source_files(source_root):
+        symbols, _ = _source_symbol_declarations(path)
+        declared.update(symbols)
+    return declared
+
+
+# ---------------------------------------------------------------------------
+# Fallback prototype synthesis
+#
+# ``repository_symbol_header`` only ever emits a declaration for a symbol
+# some tracked source already declares or defines.  A candidate can still
+# call a ``func_XXXXXXXX`` that is genuinely undeclared anywhere -- an
+# unclaimed leftover in ``symbol_addrs_code.txt`` that no source references
+# yet, or a sibling owner nobody has drafted a declaration for -- and IDO
+# rejects that call with "No prototype for the call to func_..." or a
+# related "undefined" error.  The functions below synthesize a compile-safe,
+# old-style (unprototyped) fallback prototype straight from the target's own
+# assembly, so a call to it can compile without claiming to know the real
+# signature.
+# ---------------------------------------------------------------------------
+
+_FUNC_SYMBOL_ADDR_RE = re.compile(
+    r"^(func_[0-9A-Fa-f]+)\s*=\s*0x[0-9A-Fa-f]+;\s*//\s*type:func\b", re.M
+)
+_ASM_FUNC_STEM_RE = re.compile(r"^func_[0-9A-Fa-f]+$")
+
+_ARG_REGISTERS: tuple[str, ...] = ("a0", "a1", "a2", "a3")
+_RETURN_REGISTER = "v0"
+
+# Instructions whose operand registers are all reads: no general-purpose
+# register is written by the instruction itself.  Stores write memory, not a
+# GPR; branches and jumps only read their operands; multiply/divide write
+# the implicit hi/lo pair, not a named register; ``mtc1``/``mthi``/``mtlo``
+# move a GPR's value *into* somewhere else, so their GPR operand is a read,
+# not the generic "first operand is the destination" default below.
+_ASM_READ_ONLY_OPS = frozenset({
+    "sb", "sh", "sw", "swc1", "sdc1", "swl", "swr",
+    "beq", "beql", "bne", "bnel", "beqz", "bnez",
+    "bltz", "bltzl", "bgez", "bgezl", "blez", "blezl", "bgtz", "bgtzl",
+    "b", "jr", "jalr",
+    "mult", "multu", "div", "divu",
+    "madd", "maddu", "msub", "msubu",
+    "mtc1", "dmtc1", "ctc1", "mthi", "mtlo",
+})
+_ASM_LOAD_OPS = frozenset({"lb", "lbu", "lh", "lhu", "lw", "lwc1", "ldc1", "lwl", "lwr"})
+_ASM_REG_TOKEN_RE = re.compile(r"\$([A-Za-z0-9]+)")
+_ASM_SP_OFFSET_RE = re.compile(r",\s*(-?(?:0x[0-9A-Fa-f]+|\d+))\(\$sp\)\s*$")
+
+
+def _asm_parse_offset(token: str) -> int | None:
+    try:
+        return int(token, 0)
+    except ValueError:
+        return None
+
+
+def infer_prototype_shape(asm_text: str) -> tuple[int | None, str]:
+    """Infer a synthesized old-style prototype's arity and return type.
+
+    Returns ``(arity, return_type)``.  ``arity`` is the highest-numbered
+    ``$a0..$a3`` register read before it is written anywhere in the
+    function (capped at 4 by construction), or ``None`` when the function
+    reads a stack-passed argument -- an ``off($sp)`` load with
+    ``off >= 0x10`` seen before the function's own prologue adjusts
+    ``$sp`` -- meaning it takes more integer arguments than fit in
+    registers.  ``return_type`` is ``"s32"`` when ``$v0`` is written
+    anywhere before the function's ``jr $ra``, else ``"void"``.
+
+    This is a compile-safety heuristic, not ABI reconstruction: the emitted
+    prototype (see ``synthesize_fallback_prototype``) is always the
+    old-style, parameter-list-free form regardless of ``arity``, so any call
+    site's real argument count still compiles.  ``arity`` exists so the
+    heuristic itself stays independently testable and inspectable.
+    """
+    _, instructions, _ = scanner.parse_instructions(asm_text)
+    arg_status: dict[str, str] = {}
+    v0_written = False
+    prologue_done = False
+    stack_args = False
+    for instruction in instructions:
+        op = instruction.op
+        operands = instruction.operands
+        if not prologue_done:
+            if op == "addiu":
+                tokens = scanner.operand_tokens(operands)
+                if len(tokens) == 3 and tokens[0] == "$sp" and tokens[1] == "$sp":
+                    value = scanner.parse_int(tokens[2])
+                    if value is not None and value < 0:
+                        prologue_done = True
+            if not prologue_done and op in _ASM_LOAD_OPS:
+                match = _ASM_SP_OFFSET_RE.search(operands)
+                if match:
+                    offset = _asm_parse_offset(match.group(1))
+                    if offset is not None and offset >= 0x10:
+                        stack_args = True
+        registers = _ASM_REG_TOKEN_RE.findall(operands)
+        if op in _ASM_READ_ONLY_OPS:
+            writes, reads = [], registers
+        else:
+            writes, reads = (registers[:1], registers[1:]) if registers else ([], [])
+        # Reads are classified before writes within the same instruction so
+        # a self-referencing op (``sll $a0, $a0, 8``) still counts as "read"
+        # when it is the register's first appearance: the shift reads the
+        # value the caller passed in before overwriting it.
+        for register in reads:
+            if register in _ARG_REGISTERS and register not in arg_status:
+                arg_status[register] = "read"
+        for register in writes:
+            if register == _RETURN_REGISTER:
+                v0_written = True
+            if register in _ARG_REGISTERS and register not in arg_status:
+                arg_status[register] = "write"
+        if op == "jr" and registers[:1] == ["ra"]:
+            break
+    return_type = "s32" if v0_written else "void"
+    if stack_args:
+        return None, return_type
+    arity = 0
+    for index, register in enumerate(_ARG_REGISTERS):
+        if arg_status.get(register) == "read":
+            arity = index + 1
+    return arity, return_type
+
+
+def synthesize_fallback_prototype(function: str, asm_text: str) -> str:
+    """Return a compile-safe, old-style fallback prototype line for ``function``.
+
+    The parameter list is always omitted (``func_X();``, not
+    ``func_X(s32, s32);``): an old-style declaration with empty parens tells
+    the compiler not to type-check call sites against it at all, so any real
+    argument count still compiles.  Only the inferred return type varies.
+    """
+    _, return_type = infer_prototype_shape(asm_text)
+    return f"{return_type} {function}(); /* synthesized */"
+
+
+def repository_fallback_symbol_header(
+    *,
+    source_root: Path = SOURCE_ROOT,
+    symbol_addrs_path: Path = SYMBOL_ADDRS_PATH,
+    asm_root: Path = ASM_ROOT,
+    output_path: Path = FALLBACK_SYMBOL_INDEX_HEADER,
+    repo_root: Path = REPO_ROOT,
+    refresh: bool = False,
+) -> Path | None:
+    """Build a header of synthesized fallback prototypes, included after the
+    source-derived ``repository_symbol_header`` and strictly lower priority
+    than it: only a ``func_XXXXXXXX`` with no declaration in any tracked
+    source, and no currently-open ``GLOBAL_ASM`` pragma of its own, gets a
+    synthesized line here.  A missing ``symbol_addrs_path`` (a test fixture
+    that only exercises ``infer_prototype_shape`` directly, for example) is
+    not an error: the header is simply just the include guard.
+    """
+    if not symbol_addrs_path.exists():
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        body = "\n".join([
+            "#ifndef PRAGMA_REPO_PROTOTYPES_FALLBACK_H",
+            "#define PRAGMA_REPO_PROTOTYPES_FALLBACK_H",
+            "#endif",
+            "",
+        ])
+        output_path.write_text(body, encoding="utf-8")
+        return output_path
+
+    dependency_mtime = symbol_addrs_path.stat().st_mtime_ns
+    for path in _source_files(source_root):
+        dependency_mtime = max(dependency_mtime, path.stat().st_mtime_ns)
+    if not refresh and output_path.exists() and output_path.stat().st_mtime_ns >= dependency_mtime:
+        return output_path
+
+    declared = all_declared_symbols(source_root)
+    owners = set(owner_index(source_root, repo_root=repo_root, refresh=refresh).keys())
+    text = symbol_addrs_path.read_text(encoding="utf-8", errors="replace")
+    wanted = [
+        match.group(1)
+        for match in _FUNC_SYMBOL_ADDR_RE.finditer(text)
+        if match.group(1) not in declared and match.group(1) not in owners
+    ]
+    if not wanted:
+        stems: dict[str, Path] = {}
+    else:
+        stems = {
+            path.stem: path
+            for path in asm_root.rglob("*.s")
+            if _ASM_FUNC_STEM_RE.match(path.stem)
+        }
+
+    selected: list[str] = []
+    for function in wanted:
+        asm_path = stems.get(function)
+        if asm_path is None:
+            continue
+        try:
+            asm_text = asm_path.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        selected.append(synthesize_fallback_prototype(function, asm_text))
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = output_path.with_name(output_path.name + f".{os.getpid()}.tmp")
+    body = "\n".join([
+        "#ifndef PRAGMA_REPO_PROTOTYPES_FALLBACK_H",
+        "#define PRAGMA_REPO_PROTOTYPES_FALLBACK_H",
+        "/* Synthesized old-style fallback prototypes for func_XXXXXXXX symbols with",
+        " * no declaration in disasm/src.  See pragma_targets.repository_fallback_symbol_header. */",
+        *selected,
+        "#endif",
+        "",
+    ])
+    temporary.write_text(body, encoding="utf-8")
+    os.replace(temporary, output_path)
+    return output_path
 
 
 def _owner_symbol_header(owner: Owner, symbol_header: Path, *, refresh: bool = False) -> Path:

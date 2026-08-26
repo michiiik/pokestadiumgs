@@ -77,6 +77,7 @@ import permute_candidate
 import pragma_targets as targets
 import probe_stats
 import try_pragma_compare as runner
+import variant_policy
 
 
 @contextmanager
@@ -188,6 +189,8 @@ _SOURCE_FUNCTION_DEFINITION_RE = re.compile(
     r"(?m)^[^;{}\n]*\b(func_[0-9A-Fa-f]+)\s*\([^;{}\n]*\)\s*\{"
 )
 _SYMBOL_INDEX_CACHE: tuple[Path, int, dict[str, str]] | None = None
+_FALLBACK_SYMBOL_INDEX_CACHE: tuple[Path, int, dict[str, str]] | None = None
+_GLOBAL_SYMBOL_RE = re.compile(r"D_[0-9A-Fa-f]+")
 
 
 def _first_cfe_error(diagnostic: str | None) -> str | None:
@@ -221,8 +224,35 @@ def _is_type_error(message: str) -> bool:
     ))
 
 
-def compile_failure_variant_names(diagnostic: str | None) -> tuple[str, ...]:
-    """Choose extra type spellings from a compiler diagnostic sample."""
+# ``rewrite_draft`` turns every ``M2C_FIELD(...)`` into a synthesized
+# ``(*(TYPE)((u8 *)(base) + (offset)))`` cast expression before a candidate
+# ever compiles.  When a compiler's "Unacceptable operand" error's offending
+# source line still shows that synthesized cast, the operand shape is
+# already ``u8 *`` -- retrying a different global/callee width cannot fix it,
+# so ``compile_failure_variant_names`` should not spend a probe on the
+# pointer-retry trio for that diagnostic.  This matches the diagnostic's own
+# two-line shape: the ``cfe: Error: ... Unacceptable operand ...`` line
+# immediately followed by the offending source excerpt.
+_FIELD_CAST_OPERAND_ERROR_RE = re.compile(
+    r"[Uu]nacceptable operand[^\n]*\n[^\n]*\(\*\([^)]*\)\s*\(\(u8 \*\)"
+)
+
+
+def compile_failure_variant_names(
+    diagnostic: str | None, *, policy: "variant_policy.VariantPolicy | None" = None,
+) -> tuple[str, ...]:
+    """Choose extra type spellings from a compiler diagnostic sample.
+
+    ``policy`` (default: a permissive policy that behaves exactly like the
+    pre-policy code -- see ``variant_policy.DEFAULT_POLICY``) gates the
+    diagnostic-suggested spellings against recorded probe-stats evidence:
+    a spelling that has already been tried many times for this diagnostic's
+    class with zero accepted/probe-matching outcomes is dropped rather than
+    spent again.  ``sweep_targets.main`` passes a real
+    ``VariantPolicy.from_stats()`` unless ``--variant-policy off`` is given;
+    direct callers (including the existing unit tests) that omit ``policy``
+    keep the old, unfiltered behavior.
+    """
     message = _first_cfe_error(diagnostic)
     if message is None or not _is_type_error(message):
         return ()
@@ -232,12 +262,21 @@ def compile_failure_variant_names(diagnostic: str | None) -> tuple[str, ...]:
         "pointer", "incompatible", "conversion", "dereference", "operand",
         "selector requires",
     )):
-        names.extend(("ptr-void", "ptr-s32", "u32-void"))
+        # An operand error whose own diagnostic still shows the M2C_FIELD
+        # cast shape is not a type-width problem the pointer trio can fix.
+        field_cast_operand = "operand" in text and bool(
+            _FIELD_CAST_OPERAND_ERROR_RE.search(diagnostic or "")
+        )
+        if not field_cast_operand:
+            names.extend(("ptr-void", "ptr-s32", "u32-void"))
     if any(token in text for token in ("short", "16", "halfword", "s16")):
         names.append("s16-void")
     if any(token in text for token in ("unknown type", "undeclared", "m2c_unk")):
         names.extend(("s32-s32", "u16-s32"))
-    return tuple(dict.fromkeys(name for name in names if name in VARIANTS))
+    names = [name for name in dict.fromkeys(names) if name in VARIANTS]
+    active_policy = policy if policy is not None else variant_policy.DEFAULT_POLICY
+    diagnostic_class = variant_policy.classify_diagnostic(diagnostic)
+    return active_policy.allowed_retry_variants(diagnostic_class, names, min_attempts=30)
 
 
 def mismatch_variant_names(attempt: dict[str, object]) -> tuple[str, ...]:
@@ -442,6 +481,7 @@ def compile_failure_candidates(
     *,
     function: str | None = None,
     source_path: Path | None = None,
+    policy: "variant_policy.VariantPolicy | None" = None,
 ) -> list[tuple[str, str]]:
     """Rewrite a draft using type spellings suggested by compile diagnostics.
 
@@ -449,12 +489,13 @@ def compile_failure_candidates(
     (one per first-pass variant).  Collecting the diagnostics first lets us
     union their targeted retry spellings while deduplicating identical C
     bodies.  This keeps the retry pass small, but still lets a later,
-    more-specific diagnostic add a useful ``s16``/pointer rewrite.
+    more-specific diagnostic add a useful ``s16``/pointer rewrite.  ``policy``
+    is forwarded to ``compile_failure_variant_names``; see its docstring.
     """
     candidates: list[tuple[str, str]] = []
     seen: set[str] = set()
     for diagnostic in diagnostics:
-        for name in compile_failure_variant_names(diagnostic):
+        for name in compile_failure_variant_names(diagnostic, policy=policy):
             code = rewrite_draft(draft, VARIANTS[name])
             if code is None:
                 continue
@@ -562,6 +603,45 @@ def _symbol_index_declarations() -> dict[str, str]:
     return declarations
 
 
+def _fallback_symbol_index_declarations() -> dict[str, str]:
+    """Read the generated fallback (synthesized old-style) header once per mtime.
+
+    Strictly lower priority than ``_symbol_index_declarations``: this only
+    covers ``func_XXXXXXXX`` symbols with no declaration in any tracked
+    source (see ``pragma_targets.repository_fallback_symbol_header``), and
+    ``prepare_candidate_declarations`` only consults it after the owner-local
+    and source-derived index lookups have both failed.
+    """
+    global _FALLBACK_SYMBOL_INDEX_CACHE
+    try:
+        path = targets.repository_fallback_symbol_header()
+        if path is None or not path.exists():
+            return {}
+        mtime = path.stat().st_mtime_ns
+    except OSError:
+        return {}
+    if _FALLBACK_SYMBOL_INDEX_CACHE is not None:
+        cached_path, cached_mtime, cached = _FALLBACK_SYMBOL_INDEX_CACHE
+        if cached_path == path and cached_mtime == mtime:
+            return cached
+    declarations: dict[str, str] = {}
+    for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or line.startswith("/*"):
+            continue
+        # Each synthesized line ends with a trailing ``/* synthesized */``
+        # marker comment (see ``synthesize_fallback_prototype``), which
+        # ``_declaration_symbol`` cannot see past -- it only strips a
+        # trailing ``;``.  Extract the symbol name from the code before the
+        # comment, but keep the full line (comment included) as the
+        # injected declaration text.
+        name = _declaration_symbol(re.sub(r"/\*.*?\*/\s*$", "", line))
+        if name and _ROM_SYMBOL_RE.fullmatch(name):
+            declarations[name] = line
+    _FALLBACK_SYMBOL_INDEX_CACHE = (path, mtime, declarations)
+    return declarations
+
+
 def _owner_symbol_declarations(
     source_path: Path, function: str,
 ) -> tuple[int, dict[str, list[tuple[int, str]]]]:
@@ -642,6 +722,15 @@ def prepare_candidate_declarations(
             continue
         elif name not in declared_by_candidate:
             declaration = index_declarations.get(name)
+            if declaration is None:
+                # Source-derived declarations (owner-local, then the repo
+                # index) are always authoritative over a synthesized one.
+                # Only fall further, to the synthesized fallback header and
+                # then a bare byte-array guess, when neither has anything to
+                # say about this symbol.
+                declaration = _fallback_symbol_index_declarations().get(name)
+            if declaration is None and _GLOBAL_SYMBOL_RE.fullmatch(name):
+                declaration = f"extern u8 {name}[]; /* synthesized fallback */"
             if declaration is None:
                 continue
         else:
@@ -789,6 +878,75 @@ def callee_unprototyped_variant(code: str) -> str | None:
     return rewritten if rewritten != code else None
 
 
+# ``(*D_X)(...)`` -- a call through a dereferenced global -- and
+# ``table[i](...)`` -- a call through an indexed function-pointer table --
+# are the two shapes IDO rejects as "No prototype for the call to an
+# anonymous function": one of the top compile-failure causes.  Both patterns
+# require the call's own opening paren to follow immediately (the lookahead),
+# so a plain array read or a parenthesized-but-uncalled dereference is left
+# alone.
+FNPTR_DEREF_CALL_RE = re.compile(r"\(\*([A-Za-z_]\w*)\)\s*(?=\()")
+FNPTR_INDEX_CALL_RE = re.compile(r"\b([A-Za-z_]\w*(?:\[[^\[\]]+\])+)\s*(?=\()")
+_FNPTR_USED_CONTEXT_CHARS = set("=(,+-*/%<>&|!")
+
+
+def _fnptr_call_result_used(text: str, match_start: int) -> bool:
+    """Whether a call at ``match_start`` in ``text`` feeds a larger expression.
+
+    A bare statement call (``(*D_X)(args);``) discards its result; anything
+    else -- an assignment, a return, an argument, a condition, another
+    expression -- uses it.  This only inspects the character immediately
+    before the match, which is enough to tell "start of statement" from
+    "nested in something else" without a real expression parser.
+    """
+    prefix = text[:match_start].rstrip()
+    if not prefix:
+        return False
+    if prefix.endswith("return"):
+        return True
+    return prefix[-1] in _FNPTR_USED_CONTEXT_CHARS
+
+
+def fnptr_cast_candidate(code: str) -> str | None:
+    """Cast an unprototyped function-pointer call expression before calling it.
+
+    m2c leaves a call through a function-pointer expression -- a
+    dereferenced global (``(*D_X)(...)``) or an indexed dispatch table
+    (``table[i](...)``) -- with no prototype for the callee, which IDO
+    rejects as "No prototype for the call to an anonymous function".
+    Wrapping the pointer expression itself in a bare function-pointer cast
+    (``((void (*)())expr)(...)``, or ``s32`` when the result is used) lets
+    the call compile regardless of the real signature; whether the body
+    still matches is left entirely to the probe like every other type
+    guess.  Returns ``None`` when ``code`` has no such call.
+    """
+    events: list[tuple[int, int, str]] = []
+    for match in FNPTR_DEREF_CALL_RE.finditer(code):
+        events.append((match.start(), match.end(), match.group(1)))
+    for match in FNPTR_INDEX_CALL_RE.finditer(code):
+        events.append((match.start(), match.end(), match.group(1)))
+    if not events:
+        return None
+    events.sort(key=lambda item: item[0])
+    pieces: list[str] = []
+    cursor = 0
+    changed = False
+    for start, end, expr in events:
+        if start < cursor:
+            # A deref and an index match should never overlap (they target
+            # disjoint call shapes); skip defensively rather than corrupt
+            # the output if one somehow does.
+            continue
+        used = _fnptr_call_result_used(code, start)
+        return_type = "s32" if used else "void"
+        pieces.append(code[cursor:start])
+        pieces.append(f"(({return_type} (*)())({expr}))")
+        cursor = end
+        changed = True
+    pieces.append(code[cursor:])
+    return "".join(pieces) if changed else None
+
+
 def draft_variants(
     function: str,
     context: bool = True,
@@ -828,6 +986,10 @@ def draft_variants(
         if unprototyped is not None and unprototyped not in seen:
             seen.add(unprototyped)
             variants.append((f"{label_prefix}:{name}:callee-unprototyped", unprototyped))
+        fnptr_cast = fnptr_cast_candidate(code)
+        if fnptr_cast is not None and fnptr_cast not in seen:
+            seen.add(fnptr_cast)
+            variants.append((f"{label_prefix}:{name}:fnptr-cast", fnptr_cast))
     return variants, draft
 
 
@@ -1348,6 +1510,7 @@ def sweep(
     exclude_families: set[str] | None = None,
     min_family_remaining: int = 0,
     templates: bool = False,
+    policy: "variant_policy.VariantPolicy | None" = None,
 ) -> dict[str, object]:
     listing = _sweep_listing(
         source=source,
@@ -1533,6 +1696,7 @@ def sweep(
                     diagnostics,
                     function=function,
                     source_path=source_path,
+                    policy=policy,
                 ):
                     if label in labels_of[function]:
                         continue
@@ -1908,6 +2072,14 @@ def main() -> int:
         help="prepend template-transfer candidates (tools/template_transfer.py) ahead of the m2c "
              "variants for each function, so they probe first (default: off)",
     )
+    parser.add_argument(
+        "--variant-policy", choices=("on", "off"), default="on",
+        help="gate diagnostic-triggered compile-failure retry variants (tools/variant_policy.py) "
+             "by recorded probe-stats evidence -- an explored spelling with zero accepted/"
+             "probe-matching outcomes for its diagnostic class is no longer retried automatically. "
+             "'off' restores the unfiltered behavior of trying every diagnostic-suggested spelling "
+             "(default: on)",
+    )
     parser.add_argument("--near-miss", action="store_true", help="permute rejects at similarity >= --near-miss-min-similarity")
     parser.add_argument(
         "--stats", type=Path, default=None,
@@ -2019,6 +2191,11 @@ def main() -> int:
         fragment_range = parse_fragment_range(args.fragment_range) if args.fragment_range else None
     except ValueError as error:
         parser.error(str(error))
+    policy = (
+        variant_policy.VariantPolicy.from_stats()
+        if args.variant_policy == "on"
+        else variant_policy.VariantPolicy.permissive()
+    )
     result = sweep(
         max_instructions=args.max_instructions,
         min_instructions=args.min_instructions,
@@ -2032,6 +2209,7 @@ def main() -> int:
         exclude_families=set(args.exclude_families) if args.exclude_families else None,
         min_family_remaining=args.min_family_remaining,
         templates=args.templates,
+        policy=policy,
     )
     text = json.dumps(result, indent=2)
     if args.json:
