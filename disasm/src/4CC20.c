@@ -97,7 +97,16 @@ void func_8004D19C(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4) { func_8004D150(a0, a
 extern void func_8004CB7C(s32, s32, s32, s32, s32, s32, s32, s32);
 void func_8004D1C4(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6) { func_8004CB7C(a0, a1, a2, a3, a4, a5, 0, a6); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D1FC.s")
+s32 func_8004D1FC(u8 *arg0) {
+    s32 sp4C;
+
+    sp4C = 0;
+    if (arg0 != NULL) {
+        sp4C = 1;
+        func_800459AC(func_8004CA60(arg0), (*(u8 *)((u8 *)(arg0) + (4))), (*(u8 *)((u8 *)(arg0) + (5))), (*(u16 *)((u8 *)(arg0) + (0))), (s32) (*(u16 *)((u8 *)(arg0) + (2))), 1, 0, 2, 2, 0, 0, 0, 0);
+    }
+    return sp4C;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D27C.s")
 

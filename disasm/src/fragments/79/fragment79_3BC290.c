@@ -95,5 +95,18 @@ void func_8414ED5C(s32 arg0) {
     func_8414D720(arg0, sp1E);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414EDB4.s")
+void func_8414EDB4(s32 arg0) {
+    u8 sp27;
+    u8 sp26;
+    u8 temp_v0;
+
+    temp_v0 = func_84154B24();
+    sp27 = temp_v0;
+    sp26 = 1 - temp_v0;
+    func_8414E880(arg0);
+    func_8414EC18(arg0);
+    func_8414ECE0(arg0);
+    func_8414D720(arg0, sp27);
+    func_8414D720(arg0, sp26);
+}
 #endif
