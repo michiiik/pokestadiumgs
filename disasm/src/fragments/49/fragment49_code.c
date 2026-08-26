@@ -28,7 +28,24 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86100A58.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86100ACC.s")
+extern void func_80037120(s32, s32, s32 *, s16 *, s16 *);
+extern s32 D_80094908;
+s32 func_86100ACC(s32 a, void *p) {
+    s16 pad;
+    s32 x;
+    s16 y;
+    s16 z;
+    if (a == 2) {
+        func_80037120(
+            D_80094908 + 0xB4,
+            D_80094908 + 0xA8,
+            &x, &y, &z
+        );
+        *(s16 *)((u8 *)p + 0x1C) = y + 0x2000;
+        *(s16 *)((u8 *)p + 0x1E) = z - 0x2000;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86100B34.s")
 
