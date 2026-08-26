@@ -59,7 +59,22 @@ s16 func_82B01088(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B011C0.s")
+extern s32 D_82B12674;
+s32 func_82B011C0(s32 arg0, s32 arg1) {
+    s32 var_a2;
+    s32 var_v1;
+    var_a2 = -1;
+    var_v1 = 0;
+    switch (arg0) {
+    case 0: var_a2 = 0xC; break;
+    case 1: var_a2 = 0xA; break;
+    case 2: var_a2 = 0; break;
+    case 4: var_a2 = -2; break;
+    }
+    if (var_a2 >= 0) var_v1 = func_800718B8(var_a2);
+    else if (var_a2 == -2) var_v1 = ((s32 *)&D_82B12674)[arg1];
+    return var_v1;
+}
 #endif
 
 #ifdef VERSION_US
