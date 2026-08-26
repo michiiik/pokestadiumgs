@@ -24,7 +24,18 @@ void func_80043A30(void *arg0, void *arg1, s32 arg2) { func_80043950(arg0, arg1,
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/44300/func_80043B8C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/44300/func_80043BD4.s")
+typedef struct { u8 pad0[2]; s16 count; u8 pad4[8]; u8 *base; } Func80043BD4State;
+s32 func_80043BD4(Func80043BD4State *arg0, s32 arg1, s32 arg2) {
+    s32 var_v1 = 0;
+    if ((arg0 != NULL) && (arg1 < arg0->count)) {
+        if (arg0->base != 0) {
+            arg0 = (Func80043BD4State *)((u8 *)arg0->base + (arg1 * 0x24));
+            (*(s32 *)((u8 *)arg0 + 0x20)) = arg2;
+            var_v1 = 1;
+        }
+    }
+    return var_v1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/44300/func_80043C14.s")
 
