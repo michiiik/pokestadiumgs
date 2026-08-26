@@ -10,7 +10,32 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/40/fragment40_1DC1F0/func_88B00690.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/40/fragment40_1DC1F0/func_88B00700.s")
+s32 func_88B044D0(s32);
+void func_88B00700(s16 *arg0) {
+    u32 temp_v0;
+
+    *arg0 = 0xA;
+    if (func_88B046F0() != 0) {
+        if (func_88000E54(3U) == 0) {
+            *arg0 = 0x34;
+        }
+    } else {
+        temp_v0 = func_88000E54(5U);
+        switch (temp_v0) {                          /* irregular */
+        case 0:
+            if (func_88B044D0(1) != 0) {
+                *arg0 = 0x32;
+                return;
+            }
+            return;
+        case 1:
+            if (func_88B044D0(0) != 0) {
+                *arg0 = 0x33;
+            }
+            break;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/40/fragment40_1DC1F0/func_88B007A0.s")
 

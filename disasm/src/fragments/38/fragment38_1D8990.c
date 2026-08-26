@@ -19,7 +19,14 @@ void func_889033A0(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D8990/func_889034DC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D8990/func_889035A0.s")
+void func_889035A0(void *arg0, u8 *arg1, s16 arg2, s16 arg3) {
+    (*(s16 *)((u8 *)(arg0) + (4))) = arg2;
+    (*(s16 *)((u8 *)(arg0) + (6))) = arg3;
+    (*(u8 **)((u8 *)(arg0) + (8))) = arg1;
+    (*(s16 *)((u8 *)(arg0) + (0xC))) = 0;
+    (*(s8 *)((u8 *)(arg0) + (0xE))) = func_88902B70(arg1);
+    (*(s32 *)((u8 *)(arg0) + (0x10))) = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D8990/func_889035FC.s")
 
