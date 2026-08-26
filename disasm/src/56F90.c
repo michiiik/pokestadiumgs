@@ -46,7 +46,18 @@ s32 func_800567B0(s32 arg0, u8* arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056E90.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056F08.s")
+extern void func_80064D58(s32, s32);
+extern u8 D_801283B0;
+s32 func_80056F08(s32 arg0) {
+    u8 sp1F;
+    s32 temp_v0;
+
+    temp_v0 = osGbpakGetStatus((arg0 * 0x68) + &D_801283B0, &sp1F);
+    if ((temp_v0 == 1) || (temp_v0 == 0xB) || (temp_v0 == 4)) {
+        func_80064D58(arg0, 1);
+    }
+    return (sp1F & 0x80) != 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056F7C.s")
 
