@@ -8,7 +8,14 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14A2E0/func_8270030C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14A2E0/func_82700598.s")
+extern s32 D_827031C8;
+s32 func_82700598(s32 arg0, s32 arg1) {
+    if ((arg0 != 0) && (arg0 == 5) && (D_827031C8 != 0)) {
+        func_8270030C(D_827031C8);
+        func_8003CD84();
+    }
+    return 0;
+}
 
 void func_827005E4(u16 *arg0, u8 *arg1) {
     arg0[0] = 0;
