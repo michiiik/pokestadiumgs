@@ -41,7 +41,17 @@ void *func_87C00160(void *arg0, void *arg1, void *arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C001D0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C00208.s")
+f64 func_87C00208(void *a, void *b) {
+    typedef struct {
+        f64 x;
+        f64 y;
+        f64 z;
+    } V;
+
+    V *x = a;
+    V *y = b;
+    return x->x * y->x + x->y * y->y + x->z * y->z;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C00238.s")
 
