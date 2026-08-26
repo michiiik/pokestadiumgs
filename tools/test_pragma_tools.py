@@ -2137,6 +2137,36 @@ class SweepTests(unittest.TestCase):
             self.assertEqual(sorted(result["accepted"]), ["func_x", "func_x"])
             self.assertEqual(result["candidates"], 2)
 
+    def test_permute_outcome_is_written_to_probe_stats(self) -> None:
+        owner = targets.Owner(
+            "func_a", "disasm/src/synthetic.c", "asm/us/nonmatchings/synthetic/func_a.s"
+        )
+        row = {
+            "function": "func_a",
+            "candidate": "void func_a(void) {}",
+            "label": "m2c:s32-s32",
+            "similarity_score": 0.94,
+            "mismatch_kind": "immediate_drift",
+        }
+        with mock.patch.object(targets, "require_owner", return_value=owner), mock.patch.object(
+            sweep_targets.permute_candidate,
+            "permute",
+            return_value={"outputs": [{"score": "0.25", "code": "void func_a(void) { int x; }"}]},
+        ), mock.patch.object(
+            sweep_targets.runner,
+            "try_candidates_detailed",
+            return_value={"accepted": [], "batch_status": "compare_rejected"},
+        ), mock.patch.object(sweep_targets.runner, "_record_probe_stats") as record:
+            result = sweep_targets.permute_and_gate(
+                [row], seconds=45.0, kind_seconds=120.0, threads=1, workers=1, parallel=1,
+            )
+        self.assertEqual(result["accepted"], [])
+        record.assert_called_once()
+        recorded = record.call_args.args[1][0]
+        self.assertEqual(recorded["status"], "permute_rejected")
+        self.assertEqual(recorded["permute_score"], 0.25)
+        self.assertEqual(recorded["permute_budget_seconds"], 120.0)
+
     def test_near_miss_skip_permuted_excludes_prior_permute_attempts(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             stats = Path(directory) / "stats.jsonl"

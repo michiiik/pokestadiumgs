@@ -800,6 +800,57 @@ def permute_and_gate(
             return row, None, str(error)
         return row, permutation, None
 
+    def record_permute_outcome(
+        row: dict[str, object],
+        *,
+        status: str,
+        candidate: str,
+        budget: float,
+        permutation: dict[str, object] | None = None,
+        error: str | None = None,
+    ) -> None:
+        """Persist permuter outcomes so later near-miss runs can skip them."""
+        function = str(row["function"])
+        try:
+            source_path = targets.require_owner(function).source_path
+        except KeyError:
+            return
+        outputs = permutation.get("outputs") if isinstance(permutation, dict) else None
+        output_count = len(outputs) if isinstance(outputs, list) else 0
+        numeric_scores: list[float] = []
+        if isinstance(outputs, list):
+            for output in outputs:
+                if not isinstance(output, dict):
+                    continue
+                try:
+                    numeric_scores.append(float(output.get("score")))
+                except (TypeError, ValueError):
+                    continue
+        best_score = min(numeric_scores) if numeric_scores else None
+        stat_attempt = {
+            "function": function,
+            "status": status,
+            "probe_status": "permute",
+            "mismatch_kind": row.get("mismatch_kind"),
+            "similarity_score": row.get("similarity_score"),
+            "permute_score": best_score,
+            "permute_budget_seconds": budget,
+            "permute_output_count": output_count,
+            "permute_already_matching": bool(
+                permutation.get("already_matching")
+            ) if isinstance(permutation, dict) else False,
+            "permute_error": error,
+        }
+        runner._record_probe_stats(
+            source_path,
+            [stat_attempt],
+            [f"permute:{row['label']}"],
+            [(function, candidate)],
+            row.get("declarations") if isinstance(row.get("declarations"), str) else None,
+            timing={"permute_seconds": budget, "gate_runs": 0},
+            batch_status=status,
+        )
+
     accepted: list[str] = []
     attempts: list[dict[str, object]] = []
     with ThreadPoolExecutor(max_workers=max(1, parallel)) as executor:
@@ -807,8 +858,15 @@ def permute_and_gate(
         for future in as_completed(futures):
             row, permutation, error = future.result()
             function = str(row["function"])
+            budget = seconds
+            if kind_seconds is not None and row.get("mismatch_kind") in _LONGER_BUDGET_KINDS:
+                budget = kind_seconds
             if permutation is None:
                 attempts.append({"function": function, "status": "permute_failed", "error": error})
+                record_permute_outcome(
+                    row, status="permute_failed", candidate=str(row["candidate"]),
+                    budget=budget, error=error,
+                )
                 continue
             outputs = permutation.get("outputs") or []
             score_zero = []
@@ -823,6 +881,13 @@ def permute_and_gate(
                     score_zero.append(item)
             if permutation.get("already_matching") and not score_zero:
                 score_zero = [{"score": 0, "code": str(row["candidate"])}]
+            first_output_code = next(
+                (
+                    item.get("code") for item in outputs
+                    if isinstance(item, dict) and isinstance(item.get("code"), str)
+                ),
+                str(row["candidate"]),
+            )
             gate_results: list[dict[str, object]] = []
             for output in score_zero:
                 code = output.get("code") if isinstance(output, dict) else None
@@ -844,10 +909,31 @@ def permute_and_gate(
                 accepted.extend(str(name) for name in gated.get("accepted", []))
                 if gated.get("accepted"):
                     break
+            if gate_results:
+                final_gate = gate_results[-1]
+                outcome_status = (
+                    "accepted" if accepted and function in accepted
+                    else str(final_gate.get("batch_status") or "compare_rejected")
+                )
+            else:
+                outcome_status = "permute_rejected"
+            record_permute_outcome(
+                row,
+                status=outcome_status,
+                candidate=str(first_output_code),
+                budget=budget,
+                permutation=permutation,
+            )
             attempts.append({
                 "function": function,
                 "label": row["label"],
                 "similarity_score": row.get("similarity_score"),
+                "permute_score": min(
+                    (float(item.get("score")) for item in outputs if isinstance(item, dict)
+                     and str(item.get("score", "")).replace(".", "", 1).isdigit()),
+                    default=None,
+                ),
+                "permute_budget_seconds": budget,
                 "permute": permutation,
                 "gate": gate_results,
             })
