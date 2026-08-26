@@ -56,7 +56,19 @@ void func_8006AB68(s32 arg0) { s32 *p = &arg0; func_8006A73C(arg0 & 0xFFFF); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006AB8C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006ABD8.s")
+s32 func_8006ABD8(void *arg0) {
+    s32 var_v1;
+
+    var_v1 = 0;
+    if (D_8009DF70 != 0) {
+        var_v1 = 1;
+        (*(s8 *)((u8 *)(D_8009DF70) + (8))) = (s8) (*(s32 *)((u8 *)(arg0) + (0)));
+        (*(s8 *)((u8 *)(D_8009DF70) + (9))) = (s8) (*(s32 *)((u8 *)(arg0) + (4)));
+        (*(s8 *)((u8 *)(D_8009DF70) + (0xA))) = (s8) (*(s32 *)((u8 *)(arg0) + (8)));
+        (*(s8 *)((u8 *)(D_8009DF70) + (0xB))) = (s8) (*(s32 *)((u8 *)(arg0) + (0xC)));
+    }
+    return var_v1;
+}
 
 s32 func_8006AC28(s32 value) { s32 result = 0; if (D_8009DF70 != 0) { *(s32 *)((u8 *)(u32)D_8009DF70 + 0xC) = value; result = 1; } return result; }
 

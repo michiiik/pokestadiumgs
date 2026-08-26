@@ -61,7 +61,21 @@ u8 func_800084A0(void) {
     return ((u8 *)(u32)D_800D0554)[0x11];
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_800084B0.s")
+void func_800084B0(void *arg0) {
+    s8 temp_v0;
+
+    (*(u8 *)((u8 *)(arg0) + (0x11))) = (u8) (*(u8 *)((u8 *)(D_800D0554) + (0x11)));
+    (*(u8 *)((u8 *)(arg0) + (0x12))) = (u8) (*(u8 *)((u8 *)(D_800D0554) + (0x12)));
+    (*(u8 *)((u8 *)(arg0) + (0x13))) = (u8) (*(u8 *)((u8 *)(D_800D0554) + (0x13)));
+    (*(u16 *)((u8 *)(arg0) + (0x14))) = (u16) (*(u16 *)((u8 *)(D_800D0554) + (0x14)));
+    temp_v0 = (*(s8 *)((u8 *)(D_800D0554) + (0x16)));
+    if (temp_v0 < (*(s8 *)((u8 *)(arg0) + (0xE)))) {
+        (*(s8 *)((u8 *)(arg0) + (0x16))) = temp_v0;
+    } else {
+        (*(s8 *)((u8 *)(arg0) + (0x16))) = 0;
+    }
+    D_800D0554 = (s32) arg0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80008514.s")
 

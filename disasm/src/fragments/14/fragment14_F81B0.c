@@ -10,7 +10,34 @@
 
 void func_813000DC(u8 *arg0) {}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_813000E4.s")
+s32 func_813000E4(void *arg0) {
+    s32 var_v1;
+    s8 temp_a0;
+    s8 temp_a0_2;
+    s8 temp_a0_3;
+    s8 temp_a1;
+    void *temp_v0;
+
+    temp_v0 = (*(void **)((u8 *)(arg0) + (0x1A148)));
+    var_v1 = 0;
+    temp_a1 = (*(s8 *)((u8 *)(temp_v0) + (0x900)));
+    if ((temp_a1 >= 0) && (temp_a1 < 4)) {
+        var_v1 = 1;
+    }
+    temp_a0 = (*(s8 *)((u8 *)(temp_v0) + (0x901)));
+    if ((temp_a0 >= 0) && (temp_a0 < 4)) {
+        var_v1 += 1;
+    }
+    temp_a0_2 = (*(s8 *)((u8 *)(temp_v0) + (0x902)));
+    if ((temp_a0_2 >= 0) && (temp_a0_2 < 4)) {
+        var_v1 += 1;
+    }
+    temp_a0_3 = (*(s8 *)((u8 *)(temp_v0) + (0x903)));
+    if ((temp_a0_3 >= 0) && (temp_a0_3 < 4)) {
+        var_v1 += 1;
+    }
+    return var_v1 < 2;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_8130015C.s")
 

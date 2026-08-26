@@ -80,7 +80,21 @@ s32 func_816005CC(u8 *arg0) {
     return ((u32)*(s16 *)(arg0 + 6) * (u32)*(s16 *)(arg0 + 4)) != 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D7BC0/func_816005E8.s")
+s32 func_816005E8(void *arg0, void *arg1) {
+    s32 var_v1;
+
+    var_v1 = (*(s16 *)((u8 *)(arg1) + (0))) == (*(s16 *)((u8 *)(arg0) + (0)));
+    if (var_v1 != 0) {
+        var_v1 = (*(s16 *)((u8 *)(arg1) + (2))) == (*(s16 *)((u8 *)(arg0) + (2)));
+        if (var_v1 != 0) {
+            var_v1 = (*(s16 *)((u8 *)(arg1) + (4))) == (*(s16 *)((u8 *)(arg0) + (4)));
+            if (var_v1 != 0) {
+                var_v1 = (*(s16 *)((u8 *)(arg1) + (6))) == (*(s16 *)((u8 *)(arg0) + (6)));
+            }
+        }
+    }
+    return var_v1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D7BC0/func_81600648.s")
 

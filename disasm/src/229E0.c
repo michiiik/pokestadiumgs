@@ -211,7 +211,17 @@ loop_5:
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025C50.s")
+extern s8 D_80090B90;
+void func_80025C50(u32 arg0) {
+    if (arg0 < 5U) {
+        if (arg0 == 4) {
+            D_80090B90 = 1;
+        } else {
+            D_80090B90 = 0;
+        }
+        func_80018728(0xF0000000U, arg0);
+    }
+}
 #endif
 
 #ifdef VERSION_US
