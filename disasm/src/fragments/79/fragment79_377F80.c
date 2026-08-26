@@ -199,7 +199,12 @@ void func_841098C0(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_84109A18.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_84109B1C.s")
+void func_84109B1C(s32 arg0) {
+    if (func_8003C9B8(D_84190194, func_8411E244(D_84190194, D_8419018C), arg0) == 0) {
+        func_8411DCCC(D_84190194, arg0);
+    }
+    func_84109A18(D_84190194, arg0);
+}
 
 void func_84109B88(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
 }

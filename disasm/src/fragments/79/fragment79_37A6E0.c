@@ -245,7 +245,11 @@ void func_8410E7D0(u8 *arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8410E878.s")
+void func_8410E878(u8 *arg0, s32 arg1) {
+    D_841911E8 = func_8410B330(arg0);
+    func_8410B884(arg0, arg1, D_841911E8, (s16) (func_8411E1D4(arg1) << 0xE));
+    func_8410B704(arg0, arg1, D_841911E8, D_841911E8 + 0x50);
+}
 #endif
 
 #ifdef VERSION_US
@@ -1252,7 +1256,15 @@ void func_84115850(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_841158D8.s")
+void func_841158D8(u8 *arg0) {
+    (*(s8 *)((u8 *)(arg0) + (0x618))) = 0x5B;
+    func_84111C44();
+    func_841134A0(arg0);
+    func_8411FEE8(0x258);
+    (*(s8 *)((u8 *)(arg0) + (0x7F6))) = 5;
+    (*(s16 *)((u8 *)(arg0) + (0x7E8))) = 0;
+    (*(s32 *)((u8 *)((arg0 + (D_841911F4 * 4))) + (0x5C8))) = (s32) D_84183D50;
+}
 #endif
 
 #ifdef VERSION_US
@@ -1384,7 +1396,15 @@ void func_84115D98(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_84116918.s")
+void func_84116918(u8 *arg0) {
+    (*(s16 *)((u8 *)(arg0) + (0x7E8))) = 0;
+    (*(s8 *)((u8 *)(arg0) + (0x7F6))) = 5;
+    (*(s8 *)((u8 *)(arg0) + (0x618))) = 1;
+    func_841136E8(arg0);
+    func_84111C44();
+    func_841134A0(arg0);
+    (*(s32 *)((u8 *)((arg0 + (D_841911F4 * 4))) + (0x5C8))) = (s32) D_84183D50;
+}
 #endif
 
 #ifdef VERSION_US

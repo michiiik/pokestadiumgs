@@ -4405,7 +4405,16 @@ void func_800403C8(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80040420.s")
+void func_80040420(void) {
+    s32 var_v1;
+
+    var_v1 = 0;
+    if ((*(u8 *)((u8 *)(D_80126520) + (1))) & 1) {
+        var_v1 = 1;
+    }
+    func_8003FD34(func_800384C0(D_80126450, 0, (*(s16 *)((u8 *)(D_80126520) + (2))), (*(s32 *)((u8 *)(D_80126520) + (8))), (s32) (*(s16 *)((u8 *)(D_80126520) + (4))), (*(s32 *)((u8 *)(D_80126520) + (0xC))), (s32) (*(s16 *)((u8 *)(D_80126520) + (6))), (*(s32 *)((u8 *)(D_80126520) + (0x10))), var_v1));
+    D_80126520 += 0x14;
+}
 #endif
 
 #ifdef VERSION_US
