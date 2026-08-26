@@ -117,7 +117,15 @@ void func_82E02CA4(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/66/fragment66_code/func_82E02EB0.s")
+extern void func_82E02A70(void);
+extern void func_82E02CCC(s32, s32, s32);
+void func_82E02EB0(s32 arg0, s32 arg1, s32 arg2) {
+    func_82E02A70();
+    func_82E02CCC(arg0, arg1, arg2);
+}
+void func_82E02EB0_padding(void) {}
+void func_82E02EB0_padding2(void) {}
+void func_82E02EB0_padding3(void) {}
 #endif
 
 #ifdef VERSION_US

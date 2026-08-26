@@ -2,7 +2,15 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84156820.s")
+extern void func_84169B80(void);
+extern void _bzero(void *, s32);
+extern u8 D_8419F070[];
+void func_84156820(void) {
+    func_84169B80();
+    _bzero(D_8419F070, 0x5C90);
+}
+void func_84156820_padding(void) {}
+void func_84156820_padding2(void) {}
 #endif
 
 #ifdef VERSION_US
