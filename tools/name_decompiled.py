@@ -70,6 +70,17 @@ SYM_LINE_RE = re.compile(
 # rename itself: `func_X = 0x...; // type:func ProposedName`.
 TYPE_FUNC_NAME_RE = re.compile(r"^(\s*//\s*type:func)(\s+)([A-Za-z_]\w*)\s*$")
 SRC_EXTS = (".c", ".h", ".inc")
+# A whole-identifier-to-whole-identifier (or -address) linker script
+# assignment: `Name = OtherName;` or `Name = 0xADDR;`.  Used both to detect a
+# collision against an existing alias LHS (before a rename) and to detect a
+# self-alias a rename produces (after a rename), e.g. `pokestadiumgs.ld`'s
+# `Audio_InitializeTaskState = func_80021B00;` becoming
+# `Audio_InitializeTaskState = Audio_InitializeTaskState;` once
+# func_80021B00 is renamed to Audio_InitializeTaskState.
+ALIAS_LINE_RE = re.compile(
+    r"^(?P<indent>\s*)(?P<lhs>\w+)(?P<eq>\s*=\s*)(?P<rhs>\w+)(?P<semi>\s*;)(?P<rest>.*)$"
+)
+LINKER_SCRIPT_EXTS = (".ld", ".txt")
 
 
 def _default_paths(repo_root: Path):
@@ -79,6 +90,7 @@ def _default_paths(repo_root: Path):
         "include_dir": disasm / "include",
         "symtab_path": disasm / "linker_scripts" / "us" / "symbol_addrs_code.txt",
         "linker_us_dir": disasm / "linker_scripts" / "us",
+        "linker_scripts_root": disasm / "linker_scripts",
         "asm_root": disasm / "asm" / "us",
         "renames_log": disasm / "probe-stats" / "renames.jsonl",
     }
@@ -269,6 +281,87 @@ def existing_symbol_names(linker_us_dir: Path) -> set:
     return names
 
 
+def iter_linker_script_files(linker_scripts_root: Path, exclude=()):
+    """Every `*.ld` and `*.txt` under linker_scripts_root, recursively, over
+    every version directory (us, jp, ...) and any top-level file
+    (common_undef_syms.ld). `exclude` skips specific paths already handled by
+    a more specialized rewrite (symbol_addrs_code.txt's `// type:func`
+    convention)."""
+    linker_scripts_root = Path(linker_scripts_root)
+    if not linker_scripts_root.exists():
+        return []
+    excluded = set()
+    for p in exclude:
+        if p is None:
+            continue
+        try:
+            excluded.add(Path(p).resolve())
+        except OSError:
+            excluded.add(Path(p))
+    files = []
+    for p in sorted(linker_scripts_root.rglob("*")):
+        if not p.is_file() or p.suffix not in LINKER_SCRIPT_EXTS:
+            continue
+        try:
+            resolved = p.resolve()
+        except OSError:
+            resolved = p
+        if resolved in excluded:
+            continue
+        files.append(p)
+    return files
+
+
+def linker_script_symbol_names(linker_scripts_root: Path, exclude=()) -> dict:
+    """name -> list of (path, rhs) for every `Name = value;`-shaped line (an
+    address definition or a bare-identifier alias) across every .ld/.txt
+    file under linker_scripts_root. Used for collision detection: a planned
+    new name already defined somewhere is a collision UNLESS it is exactly
+    the self-alias case a rename should resolve (rhs == the function being
+    renamed) -- see apply_plan."""
+    entries = collections.defaultdict(list)
+    for path in iter_linker_script_files(linker_scripts_root, exclude=exclude):
+        for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+            m = ALIAS_LINE_RE.match(line)
+            if m:
+                entries[m.group("lhs")].append((path, m.group("rhs")))
+    return dict(entries)
+
+
+def _rewrite_linker_scripts(paths, mapping, reverse_mapping):
+    """Whole-word rename across linker-script files, then drop any line that
+    becomes a redundant self-alias (`Name = Name;`) as a direct result of
+    the rename -- e.g. `Audio_InitializeTaskState = func_80021B00;` after
+    func_80021B00 is renamed to Audio_InitializeTaskState (the symbol itself
+    now carries the name, so the alias is redundant). Returns
+    (files_changed, replacements, removed) where removed is a list of
+    (old, new, line_text) for every dropped alias line."""
+    if not mapping:
+        return 0, 0, []
+    pattern = _whole_word_pattern(mapping.keys())
+    changed = total = 0
+    removed = []
+    for path in paths:
+        text = path.read_text(encoding="utf-8", errors="replace")
+        new_text, n = pattern.subn(lambda m: mapping[m.group(1)], text)
+        if not n:
+            continue
+        out_lines = []
+        for line in new_text.splitlines(keepends=True):
+            body = line[:-1] if line.endswith("\n") else line
+            am = ALIAS_LINE_RE.match(body)
+            if am and am.group("lhs") == am.group("rhs") and am.group("lhs") in reverse_mapping:
+                old = reverse_mapping[am.group("lhs")]
+                removed.append((old, am.group("lhs"), body.strip()))
+                continue
+            out_lines.append(line)
+        new_text = "".join(out_lines)
+        path.write_text(new_text, encoding="utf-8", newline="")
+        changed += 1
+        total += n
+    return changed, total, removed
+
+
 IDENT_RE = re.compile(r"[A-Za-z_]\w*")
 
 
@@ -363,6 +456,9 @@ class ApplyResult:
     src_replacements: int = 0
     asm_files_changed: int = 0
     asm_replacements: int = 0
+    linker_files_changed: int = 0
+    linker_replacements: int = 0
+    removed_aliases: list = field(default_factory=list)  # [(old, new, line_text)]
 
 
 def _rewrite_symtab_line(line: str, old: str, new: str):
@@ -398,14 +494,16 @@ def _rewrite_files(paths, mapping):
 
 
 def apply_plan(rows, *, repo_root: Path = ROOT, src_dir=None, include_dir=None,
-                symtab_path=None, asm_root=None, renames_log=None,
-                dry_run=False) -> ApplyResult:
+                symtab_path=None, asm_root=None, linker_scripts_root=None,
+                renames_log=None, dry_run=False) -> ApplyResult:
     repo_root = Path(repo_root)
     defaults = _default_paths(repo_root)
     src_dir = Path(src_dir) if src_dir else defaults["src_dir"]
     include_dir = Path(include_dir) if include_dir else defaults["include_dir"]
     symtab_path = Path(symtab_path) if symtab_path else defaults["symtab_path"]
     linker_us_dir = symtab_path.parent
+    linker_scripts_root = (Path(linker_scripts_root) if linker_scripts_root
+                            else defaults["linker_scripts_root"])
     asm_root = Path(asm_root) if asm_root else defaults["asm_root"]
     renames_log = Path(renames_log) if renames_log else defaults["renames_log"]
 
@@ -414,16 +512,23 @@ def apply_plan(rows, *, repo_root: Path = ROOT, src_dir=None, include_dir=None,
         return result
 
     # Collision detection: a target name already claimed by any symbol_addrs*
-    # entry, or already used as a C identifier under disasm/src or
-    # disasm/include.  Detected per-row so one collision does not block the
-    # rest of an otherwise-clean batch.
+    # entry, already used as a C identifier under disasm/src or
+    # disasm/include, or already defined by a linker script line elsewhere
+    # under disasm/linker_scripts (any version dir) -- EXCEPT when that line
+    # is exactly the self-alias case the rename should resolve rather than
+    # refuse: `NewName = OldName;` where OldName is the very function being
+    # renamed. Detected per-row so one collision does not block the rest of
+    # an otherwise-clean batch.
     taken = existing_symbol_names(linker_us_dir) | build_identifier_index(
         (src_dir, SRC_EXTS), (include_dir, SRC_EXTS),
     )
+    linker_names = linker_script_symbol_names(linker_scripts_root, exclude=(symtab_path,))
     seen_new = {}
     accepted = []
     for row in rows:
-        if row.new in taken:
+        blocking = [rhs for (_path, rhs) in linker_names.get(row.new, [])
+                    if rhs != row.old]
+        if row.new in taken or blocking:
             result.refused.append((row.old, row.new, f"{row.new!r} already exists"))
             continue
         if row.new in seen_new:
@@ -470,6 +575,21 @@ def apply_plan(rows, *, repo_root: Path = ROOT, src_dir=None, include_dir=None,
     asm_paths = list(_iter_files(asm_root, (".s",))) + list(_iter_files(src_dir, (".s",)))
     result.asm_files_changed, result.asm_replacements = _rewrite_files(asm_paths, mapping)
 
+    # 4. disasm/linker_scripts/**/*.ld and **/*.txt, recursively, any version
+    #    directory (symbol_addrs_code.txt itself is excluded -- already
+    #    rewritten by step 1 with its own `// type:func` handling). Covers
+    #    hand-written alias blocks (pokestadiumgs.ld / aliases.ld), the other
+    #    symbol_addrs* tables, and undefined/unused syms lists. A rename that
+    #    turns an alias line into a self-alias (`Name = Name;`) drops it.
+    reverse_mapping = {new: old for old, new in mapping.items()}
+    linker_paths = iter_linker_script_files(linker_scripts_root, exclude=(symtab_path,))
+    (result.linker_files_changed, result.linker_replacements,
+     result.removed_aliases) = _rewrite_linker_scripts(linker_paths, mapping, reverse_mapping)
+
+    removed_aliases_by_old = collections.defaultdict(list)
+    for old, _new, line_text in result.removed_aliases:
+        removed_aliases_by_old[old].append(line_text)
+
     # Log.
     renames_log.parent.mkdir(parents=True, exist_ok=True)
     now = datetime.datetime.now(datetime.timezone.utc).isoformat()
@@ -477,6 +597,7 @@ def apply_plan(rows, *, repo_root: Path = ROOT, src_dir=None, include_dir=None,
         for r in accepted:
             fh.write(json.dumps({
                 "old": r.old, "new": r.new, "evidence": r.evidence,
+                "removed_aliases": removed_aliases_by_old.get(r.old, []),
                 "timestamp": now,
             }) + "\n")
 
@@ -557,6 +678,9 @@ def _add_common_args(ap):
     ap.add_argument("--asm-root", type=Path, default=None,
                      help="disasm/asm/us root; point this at another checkout's "
                           "populated tree if this worktree's disasm/asm is sparse")
+    ap.add_argument("--linker-scripts-root", type=Path, default=None,
+                     help="disasm/linker_scripts root (recursed over every "
+                          "version dir for *.ld/*.txt rewrites)")
 
 
 def main(argv=None):
@@ -610,7 +734,9 @@ def main(argv=None):
     # apply
     result = apply_plan(rows, repo_root=args.repo_root, src_dir=args.src_dir,
                          include_dir=args.include_dir, symtab_path=args.symtab,
-                         asm_root=args.asm_root, dry_run=args.dry_run)
+                         asm_root=args.asm_root,
+                         linker_scripts_root=args.linker_scripts_root,
+                         dry_run=args.dry_run)
 
     verb = "would rename" if args.dry_run else "renamed"
     print(f"{verb} {len(result.applied)} function(s)")
@@ -626,6 +752,12 @@ def main(argv=None):
               f"({result.src_replacements} replacements)")
         print(f"asm files changed: {result.asm_files_changed} "
               f"({result.asm_replacements} replacements)")
+        print(f"linker script files changed: {result.linker_files_changed} "
+              f"({result.linker_replacements} replacements)")
+        if result.removed_aliases:
+            print(f"removed {len(result.removed_aliases)} self-alias line(s):")
+            for old, new, line_text in result.removed_aliases:
+                print(f"  {old} -> {new}: {line_text}")
 
     if args.verify and not args.dry_run:
         rc = run_verify(args.repo_root)

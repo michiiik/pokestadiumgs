@@ -436,13 +436,49 @@ class ProvenanceAcceptedFunctionsTests(unittest.TestCase):
             self.assertEqual(provenance.accepted_functions([path]), set())
 
 
+# Repository-location env vars git sets for a hook subprocess's own children
+# (GIT_DIR/GIT_INDEX_FILE point at the *enclosing* repo, e.g. this worktree,
+# when this test file is itself invoked from a pre-commit hook that runs the
+# tools/ test suite). Left inherited, they redirect `git init`/`add`/`commit`
+# below off the throwaway tempdir fixture and onto the enclosing repo
+# instead -- stripping them makes every subprocess call below resolve purely
+# from its own cwd.
+_GIT_ENV_VARS_TO_STRIP = (
+    "GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_COMMON_DIR",
+    "GIT_OBJECT_DIRECTORY", "GIT_ALTERNATE_OBJECT_DIRECTORIES",
+)
+
+
+def _clean_git_env() -> dict:
+    env = dict(os.environ)
+    for var in _GIT_ENV_VARS_TO_STRIP:
+        env.pop(var, None)
+    return env
+
+
 class ProvenanceStagedIntegrationTests(unittest.TestCase):
     """End-to-end check against a real throwaway git repo."""
 
+    def setUp(self) -> None:
+        # provenance.check_staged()/main() below shell out to `git diff
+        # --cached` (check_decomp_provenance.py's own subprocess.run, with no
+        # env isolation of its own) and inherit this process's environment.
+        # Strip the same repository-location vars _clean_git_env() strips
+        # for the explicit subprocess calls in this class, so those calls
+        # resolve against the throwaway repo built below rather than a
+        # hostile GIT_DIR/GIT_INDEX_FILE inherited from a git hook
+        # subprocess.
+        env_patch = mock.patch.dict(os.environ, {}, clear=False)
+        env_patch.start()
+        self.addCleanup(env_patch.stop)
+        for var in _GIT_ENV_VARS_TO_STRIP:
+            os.environ.pop(var, None)
+
     def _init_repo(self, root: Path) -> None:
-        subprocess.run(["git", "init", "-q"], cwd=root, check=True)
-        subprocess.run(["git", "config", "user.email", "test@example.com"], cwd=root, check=True)
-        subprocess.run(["git", "config", "user.name", "Test"], cwd=root, check=True)
+        subprocess.run(["git", "init", "-q"], cwd=root, check=True, env=_clean_git_env())
+        subprocess.run(["git", "config", "user.email", "test@example.com"], cwd=root, check=True,
+                        env=_clean_git_env())
+        subprocess.run(["git", "config", "user.name", "Test"], cwd=root, check=True, env=_clean_git_env())
 
     def test_missing_accepted_attempt_blocks(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -452,11 +488,11 @@ class ProvenanceStagedIntegrationTests(unittest.TestCase):
             src_dir.mkdir(parents=True)
             source = src_dir / "x.c"
             source.write_text('#pragma GLOBAL_ASM("asm/us/nonmatchings/x/func_8000ABCD.s")\n')
-            subprocess.run(["git", "add", "disasm/src/x.c"], cwd=root, check=True)
-            subprocess.run(["git", "commit", "-q", "-m", "add pragma"], cwd=root, check=True)
+            subprocess.run(["git", "add", "disasm/src/x.c"], cwd=root, check=True, env=_clean_git_env())
+            subprocess.run(["git", "commit", "-q", "-m", "add pragma"], cwd=root, check=True, env=_clean_git_env())
 
             source.write_text("void func_8000ABCD(void) {\n}\n")
-            subprocess.run(["git", "add", "disasm/src/x.c"], cwd=root, check=True)
+            subprocess.run(["git", "add", "disasm/src/x.c"], cwd=root, check=True, env=_clean_git_env())
 
             with mock.patch.object(probe_stats, "DEFAULT_STATS_PATH", root / "probe-stats" / "probe-stats.jsonl"), \
                  mock.patch.object(probe_stats, "LEGACY_STATS_PATH", root / "build" / "probe-stats.jsonl"):
@@ -471,11 +507,11 @@ class ProvenanceStagedIntegrationTests(unittest.TestCase):
             src_dir.mkdir(parents=True)
             source = src_dir / "x.c"
             source.write_text('#pragma GLOBAL_ASM("asm/us/nonmatchings/x/func_8000ABCD.s")\n')
-            subprocess.run(["git", "add", "disasm/src/x.c"], cwd=root, check=True)
-            subprocess.run(["git", "commit", "-q", "-m", "add pragma"], cwd=root, check=True)
+            subprocess.run(["git", "add", "disasm/src/x.c"], cwd=root, check=True, env=_clean_git_env())
+            subprocess.run(["git", "commit", "-q", "-m", "add pragma"], cwd=root, check=True, env=_clean_git_env())
 
             source.write_text("void func_8000ABCD(void) {\n}\n")
-            subprocess.run(["git", "add", "disasm/src/x.c"], cwd=root, check=True)
+            subprocess.run(["git", "add", "disasm/src/x.c"], cwd=root, check=True, env=_clean_git_env())
 
             stats_path = root / "probe-stats" / "probe-stats.jsonl"
             stats_path.parent.mkdir(parents=True)
@@ -497,11 +533,11 @@ class ProvenanceStagedIntegrationTests(unittest.TestCase):
             src_dir.mkdir(parents=True)
             source = src_dir / "x.c"
             source.write_text("void func_unrelated(void) {}\n")
-            subprocess.run(["git", "add", "disasm/src/x.c"], cwd=root, check=True)
-            subprocess.run(["git", "commit", "-q", "-m", "initial"], cwd=root, check=True)
+            subprocess.run(["git", "add", "disasm/src/x.c"], cwd=root, check=True, env=_clean_git_env())
+            subprocess.run(["git", "commit", "-q", "-m", "initial"], cwd=root, check=True, env=_clean_git_env())
 
             source.write_text("void func_unrelated(void) { return; }\n")
-            subprocess.run(["git", "add", "disasm/src/x.c"], cwd=root, check=True)
+            subprocess.run(["git", "add", "disasm/src/x.c"], cwd=root, check=True, env=_clean_git_env())
 
             missing = provenance.check_staged(root)
             self.assertEqual(missing, [])
@@ -522,10 +558,10 @@ class ProvenanceStagedIntegrationTests(unittest.TestCase):
             src_dir.mkdir(parents=True)
             source = src_dir / "x.c"
             source.write_text('#pragma GLOBAL_ASM("asm/us/nonmatchings/x/func_8000ABCD.s")\n')
-            subprocess.run(["git", "add", "disasm/src/x.c"], cwd=root, check=True)
-            subprocess.run(["git", "commit", "-q", "-m", "add pragma"], cwd=root, check=True)
+            subprocess.run(["git", "add", "disasm/src/x.c"], cwd=root, check=True, env=_clean_git_env())
+            subprocess.run(["git", "commit", "-q", "-m", "add pragma"], cwd=root, check=True, env=_clean_git_env())
             source.write_text("void func_8000ABCD(void) {\n}\n")
-            subprocess.run(["git", "add", "disasm/src/x.c"], cwd=root, check=True)
+            subprocess.run(["git", "add", "disasm/src/x.c"], cwd=root, check=True, env=_clean_git_env())
 
             with mock.patch.object(probe_stats, "DEFAULT_STATS_PATH", root / "probe-stats" / "probe-stats.jsonl"), \
                  mock.patch.object(probe_stats, "LEGACY_STATS_PATH", root / "build" / "probe-stats.jsonl"), \

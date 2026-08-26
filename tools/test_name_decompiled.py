@@ -87,6 +87,13 @@ addiu $t0, $t0, %lo(func_80004000)
 # decoy: func_800010001 should stay untouched
 """
 
+ALIASES_LD = """\
+RealName = func_80002222;
+Unrelated_Alias = func_80099999;
+Wrapper5555 = SomeOtherThing;
+some_symbol = func_80002222 + 4;
+"""
+
 NAMES_JSON = {
     "_README": ["fake test mapping"],
     "functions": {
@@ -121,6 +128,7 @@ class FixtureTestCase(unittest.TestCase):
         (include / "proto.h").write_text(PROTO_H, encoding="utf-8")
         (linker_us / "symbol_addrs_code.txt").write_text(SYMTAB, encoding="utf-8")
         (asm_root / "some.s").write_text(SOME_S, encoding="utf-8")
+        (linker_us / "aliases.ld").write_text(ALIASES_LD, encoding="utf-8")
 
         self.names_path = self.tmp / "names.json"
         self.names_path.write_text(json.dumps(NAMES_JSON), encoding="utf-8")
@@ -130,6 +138,7 @@ class FixtureTestCase(unittest.TestCase):
         self.symtab_path = linker_us / "symbol_addrs_code.txt"
         self.asm_root = disasm / "asm" / "us"
         self.renames_log = disasm / "probe-stats" / "renames.jsonl"
+        self.aliases_ld_path = linker_us / "aliases.ld"
 
     def build_plan(self):
         return nd.build_plan(repo_root=self.tmp, names_files=[str(self.names_path)],
@@ -282,6 +291,104 @@ class ApplyTests(FixtureTestCase):
         self.apply(second)
         lines = self.renames_log.read_text().splitlines()
         self.assertEqual(len(lines), 2)
+
+
+class LinkerScriptTests(FixtureTestCase):
+    """disasm/linker_scripts/**/*.ld and **/*.txt are in the whole-word
+    rewrite set, and a rename that turns an alias line into a self-alias
+    (`Name = Name;`) drops that line rather than leaving a dangling
+    reference to a now-renamed-away symbol."""
+
+    def test_self_alias_removed_after_rename(self):
+        # ALIASES_LD's `RealName = func_80002222;` becomes
+        # `RealName = RealName;` once func_80002222 is renamed to RealName --
+        # a self-alias, which must be dropped.
+        plan = self.build_plan()
+        rows = [r for r in plan.rows if r.old == "func_80002222"]
+        result = self.apply(rows)
+        text = self.aliases_ld_path.read_text()
+        self.assertNotIn("RealName = RealName;", text)
+        self.assertNotIn("func_80002222", text)
+        removed = [(old, new) for old, new, _line in result.removed_aliases]
+        self.assertIn(("func_80002222", "RealName"), removed)
+
+    def test_unrelated_alias_untouched(self):
+        # `Unrelated_Alias = func_80099999;` names a function that is not
+        # part of this rename batch at all -- it must survive verbatim.
+        plan = self.build_plan()
+        rows = [r for r in plan.rows if r.old == "func_80002222"]
+        self.apply(rows)
+        text = self.aliases_ld_path.read_text()
+        self.assertIn("Unrelated_Alias = func_80099999;", text)
+
+    def test_other_expression_rewritten(self):
+        # `some_symbol = func_80002222 + 4;` is not a bare alias line (there
+        # is a `+ 4` between the RHS identifier and the semicolon), so it is
+        # whole-word rewritten like any other linker-script reference, not
+        # treated as an alias to drop.
+        plan = self.build_plan()
+        rows = [r for r in plan.rows if r.old == "func_80002222"]
+        self.apply(rows)
+        text = self.aliases_ld_path.read_text()
+        self.assertIn("some_symbol = RealName + 4;", text)
+        self.assertNotIn("func_80002222", text)
+
+    def test_removed_alias_logged_in_renames_jsonl(self):
+        plan = self.build_plan()
+        rows = [r for r in plan.rows if r.old == "func_80002222"]
+        self.apply(rows)
+        lines = self.renames_log.read_text().splitlines()
+        entry = json.loads(lines[0])
+        self.assertEqual(entry["old"], "func_80002222")
+        self.assertIn("RealName = RealName;", entry["removed_aliases"])
+
+    def test_removed_alias_printed_in_apply_summary(self):
+        # ApplyResult.removed_aliases is what main() prints in the apply
+        # summary; assert the data it needs is well-formed, not stdout.
+        plan = self.build_plan()
+        rows = [r for r in plan.rows if r.old == "func_80002222"]
+        result = self.apply(rows)
+        self.assertEqual(len(result.removed_aliases), 1)
+        old, new, line_text = result.removed_aliases[0]
+        self.assertEqual((old, new), ("func_80002222", "RealName"))
+        self.assertEqual(line_text, "RealName = RealName;")
+
+    def test_alias_lhs_matching_new_name_is_not_a_collision(self):
+        # RealName already appears as an alias LHS in aliases.ld, but its RHS
+        # is func_80002222 -- the very function being renamed to RealName.
+        # That is exactly the case that should rename and drop the alias,
+        # not refuse as a collision.
+        plan = self.build_plan()
+        rows = [r for r in plan.rows if r.old == "func_80002222"]
+        result = self.apply(rows)
+        self.assertEqual(result.applied, [("func_80002222", "RealName")])
+        self.assertEqual(result.refused, [])
+
+    def test_unrelated_alias_lhs_collision_still_refused(self):
+        # aliases.ld already defines `Wrapper5555 = SomeOtherThing;` --
+        # Wrapper5555 is taken by an alias to an unrelated symbol, so
+        # renaming func_80005555 -> Wrapper5555 must still be refused.
+        plan = self.build_plan()
+        rows = [r for r in plan.rows if r.old == "func_80005555"]
+        result = self.apply(rows)
+        self.assertEqual(result.applied, [])
+        self.assertEqual(len(result.refused), 1)
+        old, new, _reason = result.refused[0]
+        self.assertEqual((old, new), ("func_80005555", "Wrapper5555"))
+        # The unrelated alias must survive untouched.
+        self.assertIn("Wrapper5555 = SomeOtherThing;", self.aliases_ld_path.read_text())
+
+    def test_linker_scripts_recursed_over_any_version_dir(self):
+        # A .ld file under a sibling version directory (not disasm's own
+        # us/) must also be discovered and rewritten -- "any version dir".
+        jp_dir = self.tmp / "disasm" / "linker_scripts" / "jp"
+        jp_dir.mkdir(parents=True, exist_ok=True)
+        jp_ld = jp_dir / "pokestadiumgs.ld"
+        jp_ld.write_text("jp_ref = func_80002222;\n", encoding="utf-8")
+        plan = self.build_plan()
+        rows = [r for r in plan.rows if r.old == "func_80002222"]
+        self.apply(rows)
+        self.assertIn("jp_ref = RealName;", jp_ld.read_text())
 
 
 class HookTests(FixtureTestCase):
