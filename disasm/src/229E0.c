@@ -4230,7 +4230,11 @@ void func_8003F4E8(u8 *arg0, u8 value) { arg0[0x1C] = value; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003F818.s")
+extern void _bzero(void *arg0, s32 arg1);
+void func_8003F818(s32 *arg0, s32 arg1) {
+    _bzero(arg0, 0x10);
+    *arg0 = arg1;
+}
 #endif
 
 #ifdef VERSION_US
