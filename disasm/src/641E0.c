@@ -2,9 +2,34 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_800635E0.s")
+extern s32 func_8004C874(s32, s32);
+extern void *D_800A5150;
+extern void *D_800A5154;
+s32 *func_800635E0(u8 arg0) {
+    s32 *temp_v0;
+    s32 *var_v1;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80063620.s")
+    temp_v0 = (s32 *)func_8004C874(8, arg0 - 1);
+    if (temp_v0 != NULL) {
+        var_v1 = temp_v0;
+    } else {
+        var_v1 = (s32 *)&D_800A5150;
+    }
+    return var_v1;
+}
+
+s32 *func_80063620(u8 arg0) {
+    s32 *temp_v0;
+    s32 *var_v1;
+
+    temp_v0 = (s32 *)func_8004C874(0xA, arg0 - 1);
+    if (temp_v0 != NULL) {
+        var_v1 = temp_v0;
+    } else {
+        var_v1 = (s32 *)&D_800A5154;
+    }
+    return var_v1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80063660.s")
 
