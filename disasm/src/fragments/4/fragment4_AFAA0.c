@@ -232,7 +232,13 @@ void func_818036D8(s32 arg0, s32 arg1, s32 arg2, s32 arg3) { func_800498C4(); fu
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81803A74.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81803AE4.s")
+s32 func_81803AE4(u16 arg0) {
+    if (arg0 & 0x8000)
+        return 1;
+    if (arg0 & 0x4000)
+        return -1;
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81803B18.s")
 
