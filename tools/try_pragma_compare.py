@@ -47,6 +47,15 @@ try:
 except ImportError:  # pragma: no cover - the supported host is POSIX/macOS
     fcntl = None
 
+import probe_stats
+
+# Set by a caller (``sweep_targets.py``) that already knows a per-function
+# family mapping (e.g. from a sweep listing) but does not want to thread a
+# ``families`` dict through every ``try_candidates_detailed`` call site.
+# ``_record_probe_stats`` consults this only for an attempt that does not
+# already carry its own ``family`` key.
+family_lookup: Callable[[str], str | None] | None = None
+
 
 MIPS_REGISTERS = (
     "zero", "at", "v0", "v1", "a0", "a1", "a2", "a3",
@@ -1564,27 +1573,23 @@ def _record_probe_stats(
     declarations: str | None = None,
     timing: dict[str, object] | None = None,
     batch_status: str | None = None,
+    families: dict[str, str] | None = None,
 ) -> None:
-    """Append JSONL probe outcomes for family-level tuning.
+    """Append one JSONL probe-outcome batch for family-level tuning.
 
-    The default file is ignored build output; set ``PRAGMA_PROBE_STATS`` to
-    override it, or to an empty string to disable metrics. The transaction lock
-    surrounds this call, making one JSON object append atomic across runners.
+    Delegates the active file's location, rotation, and row shaping to
+    ``tools/probe_stats.py``: see ``probe_stats.stats_path`` for the
+    ``PRAGMA_PROBE_STATS`` contract (unset -> new default location outside
+    ``disasm/build/``, empty string -> disabled) and
+    ``probe_stats.shape_attempt_row`` for what is stripped/truncated before a
+    row is written. The transaction lock surrounds this call, making one
+    batch append atomic across runners. ``families`` (``function -> family``)
+    and the module-level ``family_lookup`` callable are both optional,
+    best-effort sources for a per-attempt ``family`` when the attempt dict
+    does not already carry one -- see ``sweep_targets.py``, which sets
+    ``family_lookup`` from the listing it already has.
     """
-    stats_path_value = os.environ.get("PRAGMA_PROBE_STATS")
-    if stats_path_value == "":
-        return
-    if stats_path_value is None:
-        stats_path = (
-            Path(__file__).resolve().parent.parent
-            / "disasm"
-            / "build"
-            / "probe-stats.jsonl"
-        )
-    else:
-        stats_path = Path(stats_path_value).expanduser()
     try:
-        stats_path.parent.mkdir(parents=True, exist_ok=True)
         counts: dict[str, int] = {}
         rows: list[dict[str, object]] = []
         for index, attempt in enumerate(attempts):
@@ -1596,6 +1601,7 @@ def _record_probe_stats(
             row = {
                 "index": index,
                 "function": attempt.get("function"),
+                "family": attempt.get("family"),
                 "label": label,
                 "status": attempt.get("status"),
                 "probe_status": attempt.get("probe_status"),
@@ -1633,14 +1639,16 @@ def _record_probe_stats(
             rows.append(row)
             key = f"{label or 'unlabeled'}:{attempt.get('status', 'unknown')}"
             counts[key] = counts.get(key, 0) + 1
-        with stats_path.open("a", encoding="utf-8") as handle:
-            handle.write(json.dumps({
-                "source": source_path.as_posix(),
-                "counts": counts,
-                "timing": timing,
-                "batch_status": batch_status,
-                "attempts": rows,
-            }, sort_keys=True) + "\n")
+        batch = probe_stats.new_batch_row(
+            source_path.as_posix(),
+            rows,
+            counts=counts,
+            timing=timing,
+            batch_status=batch_status,
+            families=families,
+            family_lookup=family_lookup,
+        )
+        probe_stats.append_batch(batch)
     except OSError:
         # Metrics must never turn a valid source transaction into a failure.
         return
@@ -1678,12 +1686,16 @@ def try_candidates_detailed(
     labels: list[str | None] | None = None,
     gate: bool = True,
     declarations: str | None = None,
+    families: dict[str, str] | None = None,
 ) -> dict[str, object]:
     """Run one candidate transaction while excluding other MCP processes.
 
     ``declarations`` is a block of shared ``extern``/prototype lines that is
     prepended to every candidate for probing and installed once, ahead of the
     first accepted replacement, so variants need not repeat their externs.
+    ``families`` (``function -> family``) is an optional, best-effort mapping
+    forwarded to the stats writer for owners whose attempt dict does not
+    already carry a ``family`` key; see ``_record_probe_stats``.
     """
     with _candidate_transaction_lock():
         result = _try_candidates_detailed_unlocked(
@@ -1703,6 +1715,7 @@ def try_candidates_detailed(
             declarations,
             timing=result.get("timing") if isinstance(result.get("timing"), dict) else None,
             batch_status=batch_status if isinstance(batch_status, str) else None,
+            families=families,
         )
         return result
 

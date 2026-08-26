@@ -68,13 +68,35 @@ import subprocess
 import sys
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from contextlib import contextmanager
 from pathlib import Path
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 
 import dedupe_externs
 import permute_candidate
 import pragma_targets as targets
+import probe_stats
 import try_pragma_compare as runner
+
+
+@contextmanager
+def _family_lookup_scope(lookup: Callable[[str], str | None]):
+    """Temporarily set ``runner.family_lookup`` for a batch of runner calls.
+
+    ``try_pragma_compare._record_probe_stats`` consults ``runner.family_lookup``
+    for an attempt whose dict has no ``family`` key of its own -- see
+    ``sweep``/``large_sweep``, which already know a per-function family from
+    their listing and would otherwise have to thread a ``families`` dict
+    through every nested ``try_candidates_detailed``/``permute_and_gate``
+    call site. Restores the previous value (``None`` outside a sweep) on
+    exit, including when a broken source raises past this scope.
+    """
+    previous = runner.family_lookup
+    runner.family_lookup = lookup
+    try:
+        yield
+    finally:
+        runner.family_lookup = previous
 
 FIELD_RE = re.compile(r"M2C_FIELD\(\s*([^,]+?)\s*,\s*([^,]+?)\s*,\s*([^)]+?)\s*\)")
 UNK_GLOBAL_RE = re.compile(r"^extern M2C_UNK (\w+);", re.M)
@@ -842,46 +864,40 @@ def template_variants_for(
     return variants
 
 
-def previously_attempted(stats_path: Path = targets.STATS_PATH, label_prefix: str = "m2c:") -> set[str]:
-    """Functions that already have sweep attempts recorded in the stats file."""
+def previously_attempted(stats_path: Path | None = None, label_prefix: str = "m2c:") -> set[str]:
+    """Functions that already have sweep attempts recorded in the stats file.
+
+    ``stats_path=None`` (the default) reads the active file plus any legacy
+    or rotated file (``probe_stats.iter_attempts``); an explicit path reads
+    only that file (and its own rotated siblings).
+    """
     attempted: set[str] = set()
-    if not stats_path.exists():
-        return attempted
-    for line in stats_path.read_text(encoding="utf-8").splitlines():
-        try:
-            record = json.loads(line)
-        except json.JSONDecodeError:
-            continue
-        for attempt in record.get("attempts", []):
-            label = attempt.get("label") or ""
-            if label.startswith(label_prefix) and attempt.get("function"):
-                attempted.add(str(attempt["function"]))
+    paths = None if stats_path is None else [stats_path]
+    for attempt in probe_stats.iter_attempts(paths):
+        label = attempt.get("label") or ""
+        if label.startswith(label_prefix) and attempt.get("function"):
+            attempted.add(str(attempt["function"]))
     return attempted
 
 
 def previously_attempted_labels(
-    stats_path: Path = targets.STATS_PATH, label_prefix: str = "m2c:"
+    stats_path: Path | None = None, label_prefix: str = "m2c:"
 ) -> set[tuple[str, str]]:
     """``(function, label)`` pairs that already have a sweep attempt on file.
 
     Unlike ``previously_attempted``, this is keyed per variant spelling: a
     function that only has an old-label reject on file is still swept for a
     new label added later to ``FAMILY_VARIANTS``, because only the exact
-    ``(function, label)`` pair already attempted is skipped.
+    ``(function, label)`` pair already attempted is skipped. See
+    ``previously_attempted`` for ``stats_path=None`` semantics.
     """
     attempted: set[tuple[str, str]] = set()
-    if not stats_path.exists():
-        return attempted
-    for line in stats_path.read_text(encoding="utf-8").splitlines():
-        try:
-            record = json.loads(line)
-        except json.JSONDecodeError:
-            continue
-        for attempt in record.get("attempts", []):
-            label = attempt.get("label") or ""
-            function = attempt.get("function")
-            if label.startswith(label_prefix) and function:
-                attempted.add((str(function), label))
+    paths = None if stats_path is None else [stats_path]
+    for attempt in probe_stats.iter_attempts(paths):
+        label = attempt.get("label") or ""
+        function = attempt.get("function")
+        if label.startswith(label_prefix) and function:
+            attempted.add((str(function), label))
     return attempted
 
 
@@ -950,18 +966,11 @@ def _sweep_listing(
     }
 
 
-def _stats_records(stats_path: Path = targets.STATS_PATH) -> list[dict[str, object]]:
-    records: list[dict[str, object]] = []
-    if not stats_path.exists():
-        return records
-    for line in stats_path.read_text(encoding="utf-8").splitlines():
-        try:
-            value = json.loads(line)
-        except json.JSONDecodeError:
-            continue
-        if isinstance(value, dict):
-            records.append(value)
-    return records
+def _stats_records(stats_path: Path | None = None) -> list[dict[str, object]]:
+    """Batch dicts from the stats file(s). ``None`` reads the full default set
+    (active + legacy + rotated); an explicit path reads only that file."""
+    paths = None if stats_path is None else [stats_path]
+    return list(probe_stats.iter_batches(paths))
 
 
 def _near_miss_sort_key(attempt: dict[str, object]) -> tuple[float, str]:
@@ -974,7 +983,7 @@ def _near_miss_sort_key(attempt: dict[str, object]) -> tuple[float, str]:
 
 def near_miss(
     *,
-    stats_path: Path = targets.STATS_PATH,
+    stats_path: Path | None = None,
     minimum_similarity: float = 0.8,
     seconds: float = 45.0,
     kind_seconds: float | None = 120.0,
@@ -1046,6 +1055,7 @@ def near_miss(
                 "similarity_score": float(score),
                 "best_status": status,
                 "mismatch_kind": attempt.get("mismatch_kind"),
+                "family": attempt.get("family"),
                 "statuses": set(),
             })
             statuses = row["statuses"]
@@ -1069,6 +1079,7 @@ def near_miss(
                     "similarity_score": float(score),
                     "best_status": status,
                     "mismatch_kind": attempt.get("mismatch_kind"),
+                    "family": attempt.get("family") or row.get("family"),
                 })
 
     candidates = [
@@ -1192,6 +1203,7 @@ def permute_and_gate(
             "probe_status": "permute",
             "mismatch_kind": row.get("mismatch_kind"),
             "similarity_score": row.get("similarity_score"),
+            "family": row.get("family"),
             "permute_score": best_score,
             "permute_budget_seconds": budget,
             "permute_output_count": output_count,
@@ -1413,300 +1425,301 @@ def sweep(
                     draft_results[function] = error
     draft_seconds = round(time.monotonic() - draft_started, 1)
 
-    for source_rel, rows in sorted(by_source.items(), key=lambda item: -len(item[1])):
-        blocks: list[tuple[str, str]] = []
-        labels: list[str] = []
-        family_of: dict[str, str] = {}
-        draft_of: dict[str, str] = {}
-        labels_of: dict[str, set[str]] = collections.defaultdict(set)
-        for row in rows:
-            function = str(row["function"])
-            family_of[function] = family_of_all[function]
-            if function not in draft_results:
-                # Already accounted for (skipped_attempted) in the drafting
-                # phase above.
-                continue
-            outcome = draft_results[function]
-            if isinstance(outcome, KeyError):
-                # Another session replaced this pragma since the target list
-                # was captured; it is no longer ours to attempt.
-                summary[family_of[function]]["vanished"] += 1
-                continue
-            if isinstance(outcome, (OSError, subprocess.SubprocessError)):
-                summary[family_of[function]]["draft_failed"] += 1
-                print(f"{function}: draft error: {outcome}", file=sys.stderr)
-                continue
-            variants, draft = outcome
-            if draft is None:
-                summary[family_of[function]]["draft_failed"] += 1
-                continue
-            if not variants:
-                summary[family_of[function]]["draft_unusable"] += 1
-                continue
-            draft_of[function] = draft
-            if templates:
-                # Prepended so a template candidate probes before this
-                # function's m2c variants: once it probe_matches, the m2c
-                # variants after it are reported skipped rather than reprobed.
-                for label, code in template_variants_for(function, skip_attempts):
-                    blocks.append(
-                        (
-                            function,
-                            prepare_candidate_declarations(
-                                function, targets.REPO_ROOT / source_rel, code
-                            ),
+    with _family_lookup_scope(family_of_all.get):
+        for source_rel, rows in sorted(by_source.items(), key=lambda item: -len(item[1])):
+            blocks: list[tuple[str, str]] = []
+            labels: list[str] = []
+            family_of: dict[str, str] = {}
+            draft_of: dict[str, str] = {}
+            labels_of: dict[str, set[str]] = collections.defaultdict(set)
+            for row in rows:
+                function = str(row["function"])
+                family_of[function] = family_of_all[function]
+                if function not in draft_results:
+                    # Already accounted for (skipped_attempted) in the drafting
+                    # phase above.
+                    continue
+                outcome = draft_results[function]
+                if isinstance(outcome, KeyError):
+                    # Another session replaced this pragma since the target list
+                    # was captured; it is no longer ours to attempt.
+                    summary[family_of[function]]["vanished"] += 1
+                    continue
+                if isinstance(outcome, (OSError, subprocess.SubprocessError)):
+                    summary[family_of[function]]["draft_failed"] += 1
+                    print(f"{function}: draft error: {outcome}", file=sys.stderr)
+                    continue
+                variants, draft = outcome
+                if draft is None:
+                    summary[family_of[function]]["draft_failed"] += 1
+                    continue
+                if not variants:
+                    summary[family_of[function]]["draft_unusable"] += 1
+                    continue
+                draft_of[function] = draft
+                if templates:
+                    # Prepended so a template candidate probes before this
+                    # function's m2c variants: once it probe_matches, the m2c
+                    # variants after it are reported skipped rather than reprobed.
+                    for label, code in template_variants_for(function, skip_attempts):
+                        blocks.append(
+                            (
+                                function,
+                                prepare_candidate_declarations(
+                                    function, targets.REPO_ROOT / source_rel, code
+                                ),
+                            )
                         )
-                    )
+                        labels.append(label)
+                        labels_of[function].add(label)
+                for label, code in variants:
+                    blocks.append((function, code))
                     labels.append(label)
                     labels_of[function].add(label)
-            for label, code in variants:
-                blocks.append((function, code))
-                labels.append(label)
-                labels_of[function].add(label)
-        if not blocks:
-            continue
-        source_path = targets.REPO_ROOT / source_rel
-        # Pass 1: probe every variant in isolation.  Pass 2 gates only the
-        # hits, plus padding retries for bodies that matched the baseline
-        # prefix but stopped short of its trailing alignment nops.
-        try:
-            probe = runner.try_candidates_detailed(
-                source_path, blocks, labels=labels, gate=False, probe_workers=workers
-            )
-        except Exception as error:  # one broken source must not end the sweep
-            print(f"{source_rel}: probe pass failed: {error}", file=sys.stderr)
-            summary["_errors"]["probe_pass_failed"] += 1
-            continue
-        _accumulate_timing(sweep_timing, probe)
-        # Compile failures are useful diagnostics, not dead ends.  Feed a
-        # small, diagnostic-selected family of extra type spellings through a
-        # second isolated pass before deciding which bodies reach the gate.
-        extra_blocks: list[tuple[str, str]] = []
-        extra_labels: list[str] = []
-        extra_seen: set[tuple[str, str]] = set()
-        diagnostics_by_function: dict[str, list[str | None]] = collections.defaultdict(list)
-        for attempt in probe["attempts"]:
-            if attempt.get("status") == "compile_failed":
-                diagnostics_by_function[str(attempt["function"])].append(
-                    attempt.get("diagnostic") if isinstance(attempt.get("diagnostic"), str) else None
-                )
-        for function, diagnostics in diagnostics_by_function.items():
-            draft = draft_of.get(function)
-            if draft is None:
+            if not blocks:
                 continue
-            for label, code in compile_failure_candidates(
-                draft,
-                diagnostics,
-                function=function,
-                source_path=source_path,
-            ):
-                if label in labels_of[function]:
-                    continue
-                if skip_attempts is not None and (function, label) in skip_attempts:
-                    continue
-                key = (function, code)
-                if key in extra_seen:
-                    continue
-                extra_seen.add(key)
-                extra_blocks.append((function, code))
-                extra_labels.append(label)
-                labels_of[function].add(label)
-        # A compile diagnostic is not the only useful signal.  Keep the
-        # ordinary matrix narrow, then expand a rejected owner only when its
-        # instruction diff contains the distinctive halfword shift shape.
-        mismatch_names_by_function: dict[str, list[str]] = collections.defaultdict(list)
-        for attempt in probe["attempts"]:
-            function = str(attempt.get("function", ""))
-            for name in mismatch_variant_names(attempt):
-                if name not in mismatch_names_by_function[function]:
-                    mismatch_names_by_function[function].append(name)
-        for function, names in mismatch_names_by_function.items():
-            draft = draft_of.get(function)
-            if draft is None:
-                continue
-            for name in names:
-                code = rewrite_draft(draft, VARIANTS[name])
-                if code is None:
-                    continue
-                label = f"m2c:{name}:mismatch-retry"
-                if label in labels_of[function]:
-                    continue
-                if skip_attempts is not None and (function, label) in skip_attempts:
-                    continue
-                key = (function, code)
-                if key in extra_seen:
-                    continue
-                extra_seen.add(key)
-                extra_blocks.append((function, code))
-                extra_labels.append(label)
-                labels_of[function].add(label)
-        # Immediate-only drift is a stronger signal than a blind type retry:
-        # use the persisted expected/actual instruction pair to substitute a
-        # visible candidate literal, then send each spelling through the same
-        # isolated probe pass.  This also covers non-m2c/template candidates
-        # because it works from the attempted body itself.
-        for attempt in probe["attempts"]:
-            if attempt.get("mismatch_kind") != "immediate_drift":
-                continue
-            index = int(attempt["index"])
-            if index >= len(blocks):
-                continue
-            function, candidate = blocks[index]
-            base_label = labels[index]
-            for suffix, code in immediate_repair_candidates(candidate, attempt):
-                label = f"{base_label}:immediate-retry:{suffix}"
-                if label in labels_of[function]:
-                    continue
-                if skip_attempts is not None and (function, label) in skip_attempts:
-                    continue
-                key = (function, code)
-                if key in extra_seen:
-                    continue
-                extra_seen.add(key)
-                extra_blocks.append((function, code))
-                extra_labels.append(label)
-                labels_of[function].add(label)
-        # m2c often emits fixed stack locals in descending slot order.  When
-        # the probe has already shown a code-generation drift, try the
-        # declaration-order-only spelling before spending a permuter budget.
-        for attempt in probe["attempts"]:
-            index = int(attempt.get("index", -1))
-            if index < 0 or index >= len(blocks):
-                continue
-            function, candidate = blocks[index]
-            rewritten = stack_slot_order_candidate(candidate, attempt)
-            if rewritten is None:
-                continue
-            base_label = labels[index]
-            label = f"{base_label}:stack-slots-ascending"
-            if label in labels_of[function]:
-                continue
-            if skip_attempts is not None and (function, label) in skip_attempts:
-                continue
-            key = (function, rewritten)
-            if key in extra_seen:
-                continue
-            extra_seen.add(key)
-            extra_blocks.append((function, rewritten))
-            extra_labels.append(label)
-            labels_of[function].add(label)
-        if extra_blocks:
+            source_path = targets.REPO_ROOT / source_rel
+            # Pass 1: probe every variant in isolation.  Pass 2 gates only the
+            # hits, plus padding retries for bodies that matched the baseline
+            # prefix but stopped short of its trailing alignment nops.
             try:
-                extra_probe = runner.try_candidates_detailed(
-                    source_path,
-                    extra_blocks,
-                    labels=extra_labels,
-                    gate=False,
-                    probe_workers=workers,
+                probe = runner.try_candidates_detailed(
+                    source_path, blocks, labels=labels, gate=False, probe_workers=workers
                 )
-                _accumulate_timing(sweep_timing, extra_probe)
-                offset = len(blocks)
-                for attempt in extra_probe["attempts"]:
-                    attempt["index"] = int(attempt["index"]) + offset
-                probe["attempts"].extend(extra_probe["attempts"])
-                blocks.extend(extra_blocks)
-                labels.extend(extra_labels)
-            except Exception as error:
-                print(f"{source_rel}: compile-retry probe failed: {error}", file=sys.stderr)
-                summary["_errors"]["compile_retry_failed"] += 1
-        gate_blocks: list[tuple[str, str]] = []
-        gate_labels: list[str] = []
-        for attempt in probe["attempts"]:
-            index = int(attempt["index"])
-            padding = padding_retry(attempt)
-            duplicate_helpers = duplicate_tail_helper_count(attempt)
-            if attempt.get("status") == "probe_match":
-                gate_blocks.append(blocks[index])
-                gate_labels.append(labels[index])
-            elif padding:
-                function, code = blocks[index]
-                gate_blocks.append((function, code.rstrip() + f"\n#pragma C_FUNCTION_PADDING({padding})\n"))
-                gate_labels.append(labels[index] + "+padding")
-            elif duplicate_helpers:
-                function, code = blocks[index]
-                gate_blocks.append(
-                    (function, append_duplicate_tail_helpers(function, code, duplicate_helpers))
-                )
-                gate_labels.append(labels[index] + f"+duplicate-tail-{duplicate_helpers}")
-        result = probe
-        if gate_blocks:
-            # m2c puts an extern block in every draft.  Different owners may
-            # infer different types for the same shared symbol, so a single
-            # combined source can fail before the actual candidates are
-            # compared.  Strip the local boilerplate and gate compatible
-            # declaration blocks separately; each call still uses the MCP
-            # transaction lock and the full ROM compare.
-            gate_batches: dict[str, list[tuple[str, str, str]]] = collections.defaultdict(list)
-            for (function, code), label in zip(gate_blocks, gate_labels):
-                declarations, body = split_candidate_declarations(code)
-                gate_batches[declarations].append((function, body, label))
-            gate_attempts: list[dict[str, object]] = []
-            gate_accepted: list[str] = []
-            gate_statuses: list[str] = []
-            for declarations, batch in partition_gate_batches(
-                gate_batches, source_rel=source_rel, family_of=family_of, summary=summary
-            ):
+            except Exception as error:  # one broken source must not end the sweep
+                print(f"{source_rel}: probe pass failed: {error}", file=sys.stderr)
+                summary["_errors"]["probe_pass_failed"] += 1
+                continue
+            _accumulate_timing(sweep_timing, probe)
+            # Compile failures are useful diagnostics, not dead ends.  Feed a
+            # small, diagnostic-selected family of extra type spellings through a
+            # second isolated pass before deciding which bodies reach the gate.
+            extra_blocks: list[tuple[str, str]] = []
+            extra_labels: list[str] = []
+            extra_seen: set[tuple[str, str]] = set()
+            diagnostics_by_function: dict[str, list[str | None]] = collections.defaultdict(list)
+            for attempt in probe["attempts"]:
+                if attempt.get("status") == "compile_failed":
+                    diagnostics_by_function[str(attempt["function"])].append(
+                        attempt.get("diagnostic") if isinstance(attempt.get("diagnostic"), str) else None
+                    )
+            for function, diagnostics in diagnostics_by_function.items():
+                draft = draft_of.get(function)
+                if draft is None:
+                    continue
+                for label, code in compile_failure_candidates(
+                    draft,
+                    diagnostics,
+                    function=function,
+                    source_path=source_path,
+                ):
+                    if label in labels_of[function]:
+                        continue
+                    if skip_attempts is not None and (function, label) in skip_attempts:
+                        continue
+                    key = (function, code)
+                    if key in extra_seen:
+                        continue
+                    extra_seen.add(key)
+                    extra_blocks.append((function, code))
+                    extra_labels.append(label)
+                    labels_of[function].add(label)
+            # A compile diagnostic is not the only useful signal.  Keep the
+            # ordinary matrix narrow, then expand a rejected owner only when its
+            # instruction diff contains the distinctive halfword shift shape.
+            mismatch_names_by_function: dict[str, list[str]] = collections.defaultdict(list)
+            for attempt in probe["attempts"]:
+                function = str(attempt.get("function", ""))
+                for name in mismatch_variant_names(attempt):
+                    if name not in mismatch_names_by_function[function]:
+                        mismatch_names_by_function[function].append(name)
+            for function, names in mismatch_names_by_function.items():
+                draft = draft_of.get(function)
+                if draft is None:
+                    continue
+                for name in names:
+                    code = rewrite_draft(draft, VARIANTS[name])
+                    if code is None:
+                        continue
+                    label = f"m2c:{name}:mismatch-retry"
+                    if label in labels_of[function]:
+                        continue
+                    if skip_attempts is not None and (function, label) in skip_attempts:
+                        continue
+                    key = (function, code)
+                    if key in extra_seen:
+                        continue
+                    extra_seen.add(key)
+                    extra_blocks.append((function, code))
+                    extra_labels.append(label)
+                    labels_of[function].add(label)
+            # Immediate-only drift is a stronger signal than a blind type retry:
+            # use the persisted expected/actual instruction pair to substitute a
+            # visible candidate literal, then send each spelling through the same
+            # isolated probe pass.  This also covers non-m2c/template candidates
+            # because it works from the attempted body itself.
+            for attempt in probe["attempts"]:
+                if attempt.get("mismatch_kind") != "immediate_drift":
+                    continue
+                index = int(attempt["index"])
+                if index >= len(blocks):
+                    continue
+                function, candidate = blocks[index]
+                base_label = labels[index]
+                for suffix, code in immediate_repair_candidates(candidate, attempt):
+                    label = f"{base_label}:immediate-retry:{suffix}"
+                    if label in labels_of[function]:
+                        continue
+                    if skip_attempts is not None and (function, label) in skip_attempts:
+                        continue
+                    key = (function, code)
+                    if key in extra_seen:
+                        continue
+                    extra_seen.add(key)
+                    extra_blocks.append((function, code))
+                    extra_labels.append(label)
+                    labels_of[function].add(label)
+            # m2c often emits fixed stack locals in descending slot order.  When
+            # the probe has already shown a code-generation drift, try the
+            # declaration-order-only spelling before spending a permuter budget.
+            for attempt in probe["attempts"]:
+                index = int(attempt.get("index", -1))
+                if index < 0 or index >= len(blocks):
+                    continue
+                function, candidate = blocks[index]
+                rewritten = stack_slot_order_candidate(candidate, attempt)
+                if rewritten is None:
+                    continue
+                base_label = labels[index]
+                label = f"{base_label}:stack-slots-ascending"
+                if label in labels_of[function]:
+                    continue
+                if skip_attempts is not None and (function, label) in skip_attempts:
+                    continue
+                key = (function, rewritten)
+                if key in extra_seen:
+                    continue
+                extra_seen.add(key)
+                extra_blocks.append((function, rewritten))
+                extra_labels.append(label)
+                labels_of[function].add(label)
+            if extra_blocks:
                 try:
-                    gate_result = runner.try_candidates_detailed(
+                    extra_probe = runner.try_candidates_detailed(
                         source_path,
-                        [(function, body) for function, body, _ in batch],
-                        labels=[label for _, _, label in batch],
-                        declarations=declarations or None,
-                        gate=gate,
+                        extra_blocks,
+                        labels=extra_labels,
+                        gate=False,
                         probe_workers=workers,
                     )
+                    _accumulate_timing(sweep_timing, extra_probe)
+                    offset = len(blocks)
+                    for attempt in extra_probe["attempts"]:
+                        attempt["index"] = int(attempt["index"]) + offset
+                    probe["attempts"].extend(extra_probe["attempts"])
+                    blocks.extend(extra_blocks)
+                    labels.extend(extra_labels)
                 except Exception as error:
-                    print(f"{source_rel}: gate pass failed: {error}", file=sys.stderr)
-                    summary["_errors"]["gate_pass_failed"] += 1
-                    gate_statuses.append("gate_pass_failed")
-                    continue
-                _accumulate_timing(sweep_timing, gate_result)
-                gate_statuses.append(str(gate_result.get("batch_status")))
-                gate_attempts.extend(gate_result.get("attempts", []))
-                gate_accepted.extend(str(name) for name in gate_result.get("accepted", []))
-            batch_status = "accepted" if gate_accepted else (gate_statuses[0] if len(set(gate_statuses)) == 1 and gate_statuses else "no_candidate_accepted")
-            result = {
-                "status": 0 if gate_accepted else 1,
-                "accepted": gate_accepted,
-                "attempts": gate_attempts,
-                "rejected_ranking": probe.get("rejected_ranking", {}),
-                "batch_status": batch_status,
-                "probe_workers": workers,
-                "gate": gate,
-            }
-            # Keep the diagnostics of pass 1 for functions that had nothing to gate.
-            gated_functions = {function for function, _ in gate_blocks}
-            result["attempts"] = list(result["attempts"]) + [
-                attempt for attempt in probe["attempts"] if attempt["function"] not in gated_functions
-            ]
-        per_function: dict[str, dict[str, object]] = {}
-        for attempt in result["attempts"]:
-            function = str(attempt["function"])
-            status = str(attempt.get("status"))
-            best = per_function.setdefault(function, {"status": None, "score": -1.0, "kind": None})
-            rank = {"accepted": 5, "probe_match": 4, "compare_rejected": 3, "probe_rejected": 2, "compile_failed": 1, "skipped": 0}
-            if rank.get(status, 0) > rank.get(str(best["status"]), -1):
-                best["status"] = status
-            score = attempt.get("similarity_score")
-            if isinstance(score, (int, float)) and score > float(best["score"]):
-                best["score"] = float(score)
-                best["kind"] = attempt.get("mismatch_kind")
-        for function, best in per_function.items():
-            fam = family_of[function]
-            summary[fam]["attempted"] += 1
-            summary[fam][f"best:{best['status']}"] += 1
-            if best["kind"]:
-                summary[fam][f"kind:{best['kind']}"] += 1
-            if best["score"] >= 0.9 and best["status"] not in {"accepted", "probe_match"}:
-                summary[fam]["near_miss_ge_0.9"] += 1
-        if result.get("accepted"):
-            accepted_functions.extend(result["accepted"])
-            touched_sources.append(source_rel)
-        print(
-            f"{source_rel}: {len(rows)} targets, {len(blocks)} probes, "
-            f"accepted {len(result.get('accepted', []))} ({result['batch_status']})",
-            file=sys.stderr,
-        )
+                    print(f"{source_rel}: compile-retry probe failed: {error}", file=sys.stderr)
+                    summary["_errors"]["compile_retry_failed"] += 1
+            gate_blocks: list[tuple[str, str]] = []
+            gate_labels: list[str] = []
+            for attempt in probe["attempts"]:
+                index = int(attempt["index"])
+                padding = padding_retry(attempt)
+                duplicate_helpers = duplicate_tail_helper_count(attempt)
+                if attempt.get("status") == "probe_match":
+                    gate_blocks.append(blocks[index])
+                    gate_labels.append(labels[index])
+                elif padding:
+                    function, code = blocks[index]
+                    gate_blocks.append((function, code.rstrip() + f"\n#pragma C_FUNCTION_PADDING({padding})\n"))
+                    gate_labels.append(labels[index] + "+padding")
+                elif duplicate_helpers:
+                    function, code = blocks[index]
+                    gate_blocks.append(
+                        (function, append_duplicate_tail_helpers(function, code, duplicate_helpers))
+                    )
+                    gate_labels.append(labels[index] + f"+duplicate-tail-{duplicate_helpers}")
+            result = probe
+            if gate_blocks:
+                # m2c puts an extern block in every draft.  Different owners may
+                # infer different types for the same shared symbol, so a single
+                # combined source can fail before the actual candidates are
+                # compared.  Strip the local boilerplate and gate compatible
+                # declaration blocks separately; each call still uses the MCP
+                # transaction lock and the full ROM compare.
+                gate_batches: dict[str, list[tuple[str, str, str]]] = collections.defaultdict(list)
+                for (function, code), label in zip(gate_blocks, gate_labels):
+                    declarations, body = split_candidate_declarations(code)
+                    gate_batches[declarations].append((function, body, label))
+                gate_attempts: list[dict[str, object]] = []
+                gate_accepted: list[str] = []
+                gate_statuses: list[str] = []
+                for declarations, batch in partition_gate_batches(
+                    gate_batches, source_rel=source_rel, family_of=family_of, summary=summary
+                ):
+                    try:
+                        gate_result = runner.try_candidates_detailed(
+                            source_path,
+                            [(function, body) for function, body, _ in batch],
+                            labels=[label for _, _, label in batch],
+                            declarations=declarations or None,
+                            gate=gate,
+                            probe_workers=workers,
+                        )
+                    except Exception as error:
+                        print(f"{source_rel}: gate pass failed: {error}", file=sys.stderr)
+                        summary["_errors"]["gate_pass_failed"] += 1
+                        gate_statuses.append("gate_pass_failed")
+                        continue
+                    _accumulate_timing(sweep_timing, gate_result)
+                    gate_statuses.append(str(gate_result.get("batch_status")))
+                    gate_attempts.extend(gate_result.get("attempts", []))
+                    gate_accepted.extend(str(name) for name in gate_result.get("accepted", []))
+                batch_status = "accepted" if gate_accepted else (gate_statuses[0] if len(set(gate_statuses)) == 1 and gate_statuses else "no_candidate_accepted")
+                result = {
+                    "status": 0 if gate_accepted else 1,
+                    "accepted": gate_accepted,
+                    "attempts": gate_attempts,
+                    "rejected_ranking": probe.get("rejected_ranking", {}),
+                    "batch_status": batch_status,
+                    "probe_workers": workers,
+                    "gate": gate,
+                }
+                # Keep the diagnostics of pass 1 for functions that had nothing to gate.
+                gated_functions = {function for function, _ in gate_blocks}
+                result["attempts"] = list(result["attempts"]) + [
+                    attempt for attempt in probe["attempts"] if attempt["function"] not in gated_functions
+                ]
+            per_function: dict[str, dict[str, object]] = {}
+            for attempt in result["attempts"]:
+                function = str(attempt["function"])
+                status = str(attempt.get("status"))
+                best = per_function.setdefault(function, {"status": None, "score": -1.0, "kind": None})
+                rank = {"accepted": 5, "probe_match": 4, "compare_rejected": 3, "probe_rejected": 2, "compile_failed": 1, "skipped": 0}
+                if rank.get(status, 0) > rank.get(str(best["status"]), -1):
+                    best["status"] = status
+                score = attempt.get("similarity_score")
+                if isinstance(score, (int, float)) and score > float(best["score"]):
+                    best["score"] = float(score)
+                    best["kind"] = attempt.get("mismatch_kind")
+            for function, best in per_function.items():
+                fam = family_of[function]
+                summary[fam]["attempted"] += 1
+                summary[fam][f"best:{best['status']}"] += 1
+                if best["kind"]:
+                    summary[fam][f"kind:{best['kind']}"] += 1
+                if best["score"] >= 0.9 and best["status"] not in {"accepted", "probe_match"}:
+                    summary[fam]["near_miss_ge_0.9"] += 1
+            if result.get("accepted"):
+                accepted_functions.extend(result["accepted"])
+                touched_sources.append(source_rel)
+            print(
+                f"{source_rel}: {len(rows)} targets, {len(blocks)} probes, "
+                f"accepted {len(result.get('accepted', []))} ({result['batch_status']})",
+                file=sys.stderr,
+            )
     # Surface the listing's per-family remaining-owner count next to the
     # counters this run actually produced, so a saturated family (a good
     # ``--exclude-family``/``--min-family-remaining`` candidate) is visible
@@ -1771,6 +1784,7 @@ def large_sweep(
         limit=limit,
     )
     rows = list(listing["targets"])
+    family_of_all: dict[str, str] = {str(row["function"]): str(row["family"]) for row in rows}
     dirty = dedupe_externs.dirty_sources()
     by_source: dict[str, list[dict[str, object]]] = collections.defaultdict(list)
     skipped_dirty_targets = 0
@@ -1784,56 +1798,58 @@ def large_sweep(
     drafted = 0
     probed = 0
     permute_rows: list[dict[str, object]] = []
-    for source_rel, source_rows in by_source.items():
-        source_path = targets.REPO_ROOT / source_rel
-        blocks: list[tuple[str, str]] = []
-        labels: list[str] = []
-        for row in source_rows:
-            function = str(row["function"])
+    with _family_lookup_scope(family_of_all.get):
+        for source_rel, source_rows in by_source.items():
+            source_path = targets.REPO_ROOT / source_rel
+            blocks: list[tuple[str, str]] = []
+            labels: list[str] = []
+            for row in source_rows:
+                function = str(row["function"])
+                try:
+                    variants, draft = draft_large_variants(function)
+                except (KeyError, OSError, subprocess.SubprocessError) as error:
+                    print(f"{function}: large draft error: {error}", file=sys.stderr)
+                    continue
+                if draft is None or not variants:
+                    continue
+                drafted += 1
+                for label, code in variants:
+                    blocks.append((function, code))
+                    labels.append(label)
+            if not blocks:
+                continue
             try:
-                variants, draft = draft_large_variants(function)
-            except (KeyError, OSError, subprocess.SubprocessError) as error:
-                print(f"{function}: large draft error: {error}", file=sys.stderr)
+                probe = runner.try_candidates_detailed(
+                    source_path, blocks, labels=labels, gate=False, probe_workers=workers
+                )
+            except Exception as error:  # one broken source must not end the sweep
+                print(f"{source_rel}: large probe pass failed: {error}", file=sys.stderr)
                 continue
-            if draft is None or not variants:
-                continue
-            drafted += 1
-            for label, code in variants:
-                blocks.append((function, code))
-                labels.append(label)
-        if not blocks:
-            continue
-        try:
-            probe = runner.try_candidates_detailed(
-                source_path, blocks, labels=labels, gate=False, probe_workers=workers
-            )
-        except Exception as error:  # one broken source must not end the sweep
-            print(f"{source_rel}: large probe pass failed: {error}", file=sys.stderr)
-            continue
-        probed += len(blocks)
-        for attempt in probe.get("attempts", []):
-            if attempt.get("status") != "probe_rejected":
-                continue
-            score = attempt.get("similarity_score")
-            if not isinstance(score, (int, float)) or float(score) < minimum_similarity:
-                continue
-            index = int(attempt["index"])
-            function, code = blocks[index]
-            permute_rows.append({
-                "function": function,
-                "candidate": code,
-                "label": labels[index],
-                "similarity_score": float(score),
-                "mismatch_kind": attempt.get("mismatch_kind"),
-            })
+            probed += len(blocks)
+            for attempt in probe.get("attempts", []):
+                if attempt.get("status") != "probe_rejected":
+                    continue
+                score = attempt.get("similarity_score")
+                if not isinstance(score, (int, float)) or float(score) < minimum_similarity:
+                    continue
+                index = int(attempt["index"])
+                function, code = blocks[index]
+                permute_rows.append({
+                    "function": function,
+                    "candidate": code,
+                    "label": labels[index],
+                    "similarity_score": float(score),
+                    "mismatch_kind": attempt.get("mismatch_kind"),
+                    "family": family_of_all.get(function),
+                })
 
-    permute_result = permute_and_gate(
-        permute_rows,
-        seconds=large_seconds,
-        threads=permute_threads,
-        workers=workers,
-        parallel=permute_parallel,
-    )
+        permute_result = permute_and_gate(
+            permute_rows,
+            seconds=large_seconds,
+            threads=permute_threads,
+            workers=workers,
+            parallel=permute_parallel,
+        )
     return {
         "matched": listing["matched"],
         "skipped_dirty_targets": skipped_dirty_targets,
@@ -1872,7 +1888,10 @@ def main() -> int:
              "variants for each function, so they probe first (default: off)",
     )
     parser.add_argument("--near-miss", action="store_true", help="permute rejects at similarity >= --near-miss-min-similarity")
-    parser.add_argument("--stats", type=Path, default=targets.STATS_PATH, help="probe stats JSONL for --near-miss")
+    parser.add_argument(
+        "--stats", type=Path, default=None,
+        help="probe stats JSONL for --near-miss (default: the active file plus any legacy/rotated file)",
+    )
     parser.add_argument("--near-miss-seconds", type=float, default=45.0)
     parser.add_argument(
         "--near-miss-min-similarity", type=float, default=0.8,

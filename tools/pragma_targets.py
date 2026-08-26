@@ -33,6 +33,7 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
+import probe_stats
 import scan_asm_families as scanner
 import try_pragma_compare as runner
 
@@ -522,8 +523,15 @@ def _refresh_preprocessed_context(
     return cache_path
 
 
-STATS_PATH = DISASM_ROOT / "build" / "probe-stats.jsonl"
-_SOLVED_CACHE: tuple[int, list[dict[str, object]]] | None = None
+# The active probe-stats file at import time (see ``probe_stats.stats_path``
+# for the ``PRAGMA_PROBE_STATS`` contract; like the historical constant this
+# replaces, it is frozen at import time -- callers that need the *current*
+# env-resolved path should use ``probe_stats.stats_path()`` directly).  This
+# is also the default single-file target every reader below falls back to;
+# ``None``/omitted goes through ``probe_stats`` instead, which additionally
+# reads the legacy ``disasm/build/probe-stats.jsonl`` and any rotated file.
+STATS_PATH = probe_stats.DEFAULT_STATS_PATH
+_SOLVED_CACHE: tuple[tuple[tuple[str, int], ...], list[dict[str, object]]] | None = None
 
 
 def _opcode_sequence(asm_text: str) -> list[str]:
@@ -548,28 +556,29 @@ def solved_shapes(
     fallback tree is still found.
     """
     global _SOLVED_CACHE
-    stats_path = stats_path or STATS_PATH
+    effective_stats = stats_path or STATS_PATH
     roots = asm_roots or [ASM_ROOT]
-    try:
-        stamp = stats_path.stat().st_mtime_ns
-    except OSError:
+    # ``resolve_paths`` also picks up any ``<stem>.<N><suffix>`` rotated
+    # sibling of ``effective_stats`` (see ``probe_stats.rotate_if_needed``);
+    # an explicit ``stats_path`` reads exactly that file's own history, while
+    # the default ``STATS_PATH`` does not additionally pull in the legacy
+    # ``disasm/build/`` file -- run ``python3 tools/probe_stats.py migrate``
+    # once to fold that history into the new location instead.
+    resolved = probe_stats.resolve_paths([effective_stats])
+    if not resolved:
         return []
+    stamp = tuple(sorted((str(path), path.stat().st_mtime_ns) for path in resolved))
     cache_key = (stamp, tuple(str(root) for root in roots))
     if _SOLVED_CACHE is not None and _SOLVED_CACHE[0] == cache_key:
         return _SOLVED_CACHE[1]
     solved: dict[str, dict[str, object]] = {}
     asm_by_function: dict[str, Path] = {}
-    if stats_path.exists():
-        for root in roots:
-            if not root.is_dir():
-                continue
-            for path in root.rglob("*.s"):
-                asm_by_function.setdefault(path.stem, path)
-    for line in stats_path.read_text(encoding="utf-8").splitlines():
-        try:
-            record = json.loads(line)
-        except json.JSONDecodeError:
+    for root in roots:
+        if not root.is_dir():
             continue
+        for path in root.rglob("*.s"):
+            asm_by_function.setdefault(path.stem, path)
+    for record in probe_stats.iter_batches([effective_stats]):
         for attempt in record.get("attempts", []):
             if attempt.get("status") != "accepted" or not attempt.get("candidate"):
                 continue
