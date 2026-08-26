@@ -1236,7 +1236,25 @@ void func_84130864(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84130C08.s")
+extern void func_84130EA8();
+extern u8 D_841951D5;
+extern u8 D_841951D2;
+extern void func_84126BA8(u8);
+extern u8 D_841951BC;
+void func_84130C08(void) {
+    if (D_841951D2 != 0) {
+        if (D_841951D5 & 0x7F) {
+            func_84126BA8(D_841951BC);
+            return;
+        }
+        func_84136678(D_841951BC, -1);
+        func_84135B00(0x66U);
+        func_841246AC((s32) D_841951BD, D_841951BF);
+        func_84136CA8();
+        return;
+    }
+    func_84130EA8();
+}
 #endif
 
 #ifdef VERSION_US
@@ -1279,7 +1297,22 @@ void func_84130DDC(void) { D_84195208[D_841951BC][0xE] |= 1; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84130E04.s")
+extern void func_84134E30(s32);
+void func_84134DD8(u8 arg0);
+void func_84136D40(u8 arg0);
+void func_84130E04(void) {
+    if (D_841951D2 != 0) {
+        func_84134E30(1);
+    }
+    if ((D_841951BF == 0xAD) && !((*(u8 *)((u8 *)(D_84195200[D_841951BC]) + (0x24))) & 7)) {
+        func_84124594(D_841951BC);
+    } else {
+        func_84134CBC(D_841951BC, 0U);
+    }
+    func_84134DD8(D_841951BF);
+    func_84136D40(0U);
+    func_84136CA8();
+}
 #endif
 
 #ifdef VERSION_US
@@ -1287,7 +1320,21 @@ void func_84130DDC(void) { D_84195208[D_841951BC][0xE] |= 1; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841310E4.s")
+void func_84134DD8(u8 arg0);
+void func_84135034(u8 arg0, u8 arg1);
+void func_841310E4(void) {
+    s32 temp_v1;
+    u8 *temp_v0;
+
+    if ((*(u8 *)((u8 *)(D_84195208[D_841951BC]) + (0xF))) & 4) {
+        func_84134CBC(D_841951BC, 0U);
+        func_84134DD8(D_841951BF);
+        temp_v0 = D_84195208[D_841951BC];
+        temp_v1 = (*(s32 *)((u8 *)(temp_v0) + (0x4C)));
+        func_84135034((temp_v1 - (*(u8 *)((u8 *)(temp_v0) + (0x12)))) & 0xFF, (temp_v1 - 1) & 0xFF);
+        func_84136CA8();
+    }
+}
 #endif
 
 #ifdef VERSION_US

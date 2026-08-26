@@ -28,7 +28,22 @@ s32 func_8AB0019C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB0026C.s")
+s16 func_8AB001D8(s16);
+extern u16 D_8AB13F2E;
+extern u8 D_8AB12F00[];
+void func_8AB0026C(s16 arg0, s16 arg1) {
+    void *sp1C;
+
+    sp1C = ((s16) D_8AB13F2E * 4) + D_8AB12F00;
+    if (func_8AB0019C() == 0) {
+        (*(s16 *)((u8 *)(sp1C) + (0))) = func_8AB001D8(arg0);
+        (*(s16 *)((u8 *)(sp1C) + (2))) = arg1;
+        D_8AB13F2E = (s16) D_8AB13F2E + 1;
+        if ((s16) D_8AB13F2E >= 0x400) {
+            D_8AB13F2E = 0;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US

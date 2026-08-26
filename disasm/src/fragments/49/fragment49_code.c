@@ -73,7 +73,30 @@ void func_86101558(f32 *arg0, f32 *arg1) {
 }
 void func_86101558_padding(void) {}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_861015AC.s")
+extern f32 D_8610AADC;
+extern s32 D_8610AD20;
+f32 func_861015AC(f32 arg0, f32 arg1) {
+    f32 temp_fa0;
+    f32 temp_fa1;
+    f32 temp_ft4;
+    f32 var_fv1;
+    void *var_v0;
+
+    var_v0 = (*(void **)((u8 *)(D_8610AD20) + (0x260C)));
+    var_fv1 = 0.0f;
+    if (var_v0 != NULL) {
+        do {
+            temp_fa0 = arg0 - (*(f32 *)((u8 *)(var_v0) + (0x48)));
+            temp_fa1 = arg1 - (*(f32 *)((u8 *)(var_v0) + (0x4C)));
+            temp_ft4 = (((700.0f * (D_8610AADC * (*(f32 *)((u8 *)(D_8610AD20) + (0x9768))))) + 30.0f) * 3.0f) - sqrtf((temp_fa0 * temp_fa0) + (temp_fa1 * temp_fa1));
+            if (temp_ft4 > 0.0f) {
+                var_fv1 += temp_ft4;
+            }
+            var_v0 = (*(void **)((u8 *)(var_v0) + (4)));
+        } while (var_v0 != NULL);
+    }
+    return var_fv1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_8610167C.s")
 
