@@ -49,7 +49,18 @@ s32 func_8AC00334(s16 arg0, s16 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC006B8.s")
+extern s16 D_8AC08514;
+extern s16 D_8AC08516;
+extern s16 D_8AC08518;
+extern s16 D_8AC0851A;
+extern void func_8AC005D8();
+void func_8AC006B8(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    D_8AC08514 = (s16) arg0;
+    D_8AC08516 = (s16) arg1;
+    D_8AC08518 = (s16) arg2;
+    D_8AC0851A = (s16) arg3;
+    func_8AC005D8();
+}
 #endif
 
 #ifdef VERSION_US

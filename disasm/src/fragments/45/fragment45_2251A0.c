@@ -196,7 +196,13 @@ void func_8AB01728(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB01F80.s")
+extern void *D_8AB1678C;
+void func_80042FBC(void *arg0, void *arg1);
+extern s16 D_8AB126A0;
+void func_8AB01F80(s16 arg0) {
+    func_80042FBC(D_8AB1678C, arg0 + 1);
+    D_8AB126A0 = 1;
+}
 #endif
 
 #ifdef VERSION_US

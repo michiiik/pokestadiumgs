@@ -30,7 +30,18 @@ void func_889035A0(void *arg0, u8 *arg1, s16 arg2, s16 arg3) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D8990/func_889035FC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D8990/func_88903B00.s")
+extern u8 *D_889041B0;
+extern s32 D_880068B8;
+void func_88903B00(void) {
+    s32 *temp_v0;
+
+    temp_v0 = (*(s32 **)((u8 *)(D_889041B0) + (0x240)));
+    if (temp_v0 == NULL) {
+        D_880068B8 = 0;
+        return;
+    }
+    *temp_v0 = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D8990/func_88903B2C.s")
 

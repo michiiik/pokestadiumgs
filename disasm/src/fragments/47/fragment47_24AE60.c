@@ -113,7 +113,13 @@ void func_86007300(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_86007428.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_860075A8.s")
+extern void func_80021ED8(s32);
+extern void func_86004968();
+void func_860075A8(void *arg0) {
+    func_80021ED8(0x21);
+    func_86004968(arg0);
+    (*(u8 *)((u8 *)(arg0) + (0x75C0))) = (u8) ((*(u8 *)((u8 *)(arg0) + (0x75C0))) & 0xFFFB);
+}
 
 extern void func_86004968();
 extern void func_87F02328();

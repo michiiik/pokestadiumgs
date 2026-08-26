@@ -47,7 +47,15 @@ void func_885093F0(void) { s32 i = 0; u8 *ptr = D_88523050; do { i += 1; ptr += 
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C5AA0/func_88509A38.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C5AA0/func_88509E74.s")
+extern u8 D_885230F0;
+void func_8850A0A0(s16 arg0, s16 arg1, s16 arg2, s16 arg3);
+void func_88509E74(void) {
+    if (D_885230F0 == 0) {
+        func_8850A0A0(0x200, 0xB9, 0x4C, 0x5A);
+        return;
+    }
+    func_8850A0A0(0x2D, 0xB9, 0x4C, 0x5A);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C5AA0/func_88509EC8.s")
 
