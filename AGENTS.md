@@ -1,74 +1,247 @@
 # Repository agent guidance
 
-## Byte-matching decompilation
+This file is the entry point for any agent session in this repository. Read it
+fully before touching the tree. It has four parts: how to run a session
+(§1), the decompilation process rules (§2), the tool reference (§3), and the
+verified source-shape heuristics (§4). Historical detail lives in the
+referenced docs and in git history, not here.
 
-- Treat `pret/pokestadiumgs` as the immutable US-ROM matching baseline.
-- Keep descriptive names independently in linker aliases and the symbol registry.
-- Work in small, coherent subsystem batches; do not commit discovery-by-discovery changes.
-- Replace an assembly owner with C only when its full ROM remains byte-identical.
-- Keep the original assembly as the comparison oracle and run `COMPARE=1` after every batch.
-- If comparison fails, classify the first drift as an instruction mismatch or layout/address drift, then reshape or revert the batch.
-- Commit verified subsystem batches only; defer large state machines until smaller compiler-faithful patterns are established.
-- Use the MCP candidate runner's isolated object probes to test variants concurrently without touching tracked source, then run only function-byte hits through the sequential full COMPARE=1 gate. Try about 10 plausible compiler-faithful variants for ordinary functions, expanding to 10–50 for difficult functions when justified; stop the full gate for that function after the first accepted candidate and retain only byte-identical winners.
-- Never perform manual candidate probes by replacing a pragma or implementation in a tracked source file. Send every candidate, including instruction-scheduling experiments, through the MCP runner; inspect its isolated-probe diagnostics and let only an accepted candidate update the live source. Manual source edits are reserved for documentation or intentional post-MCP cleanup, never for testing a hypothesis.
-- When available, use Stadium 1 as a pattern reference: prioritize direct wrapper return-vs-void forms, explicit `s32` loop counters, array-index versus pointer-add variants, deliberate signed/unsigned masks, explicit null checks, and `uintptr_t` casts for raw address arithmetic. Treat these as candidate-generation hints, not proof of Stadium 2 ABI compatibility.
-- A Stadium 1 particle-pool count loop transferred byte-identically when represented with a uniquely named padded local record, an `s8` flag at the proven offset, `s32 i`, `s32` result initialized before the pool load, and post-incremented record pointers. Use this exact declaration/order heuristic only for the same fixed-stride byte-flag scan; still require an isolated MCP probe and the full `COMPARE=1` gate.
-- Document recurring patterns discovered from successful conversions and repository-wide scans in this guide, including the evidence and limits of each heuristic. Use those learnings to prioritize candidate variants, but continue to verify every owner with `COMPARE=1` rather than treating a pattern as proof.
-- Current repository scan reinforces these candidate hints: preserve narrow `sb`/`sh`/`sw` widths, initialize results before explicit NULL branches, keep exact wrapper prototypes and call order, retain explicit temporary buffers in multi-call wrappers, and use raw 32-bit global/address arithmetic where the assembly does. For difficult state helpers, try raw-global declarations plus explicit `(u8 *)(u32)global + offset` expressions before inferred structs; these remain ABI hypotheses until comparison proves them.
-- Two verified byte-flag helpers show that the four-instruction `lbu`/`andi`/`jr`/`sb` shape can match with a direct `u8 *` indexed compound assignment when the literal 16-bit mask is preserved (`arg0[offset] &= 0xFF7F` and `0xFFFE`). This is a narrow candidate-generation heuristic for the same load-mask-store shape, not proof for wider state updates or different signedness.
-- Two verified indexed flag setters show that a `lbu` global index, four-byte pointer-table lookup, and `lbu`/`ori`/`sb` update can match `table[index][offset] |= literal` when the table is declared as `u8 *[]` and the byte offset and mask are preserved (`0x10` with `0x20` or `0x40`). Keep the declarations local to the owner when an earlier use site has not declared the table; this is a shape-specific heuristic, not proof for other pointer-table updates. A separate byte-table setter matched only with a `u8` argument, so preserve narrow argument types when the assembly masks an index.
-- Two verified four-halfword writers show that `sh` stores at offsets 0, 2, 4, and 6, with the fourth value loaded from the fifth stack argument, match direct `u8 *` plus `u16 *` casts and `s32` register-sized parameters. Preserve the explicit halfword widths; this does not establish a general struct layout.
-- Paired two-component signed-halfword add/sub helpers matched the exact `lh`/`addu` or `subu`/`sh` schedule when preserving `s16` widths and operand order; the add form needed a uniquely named two-`s16` struct while the sub form matched explicit `u8 *` offsets. Probe both spellings because IDO scheduling is source-shape-sensitive.
-- Three verified three-component float copy helpers matched a direct `f32 *` indexed assignment sequence (`arg0[0..2] = arg1[0..2]`), preserving the `lwc1`/`swc1` order and final store in the return delay slot. Keep this heuristic limited to the exact three-copy shape.
-- Five verified `lhu`/`andi` bit-test helpers matched an initialized `s32 result = 0`, explicit `if (global & mask) result = 1`, and return sequence. Preserve the narrow `u16` global declaration and literal mask; compact boolean returns and ternaries produced different code, so this is only a candidate hint for the same branch shape.
-- Four verified state predicates with normalized byte arguments matched `u8` parameters, initialized `s32` results, and explicit nested flag/value checks over raw byte offsets (`0x4`, `0xD`, `0x10`, and `0x14`). Use a byte-typed parameter before adding casts; the same predicates with `s32` parameters did not match.
-- The two word-field predicates matched only after overlaying uniquely named local structs with exact padding to offsets `0x10` and `0x14`, and writing the comparison as `arg0 == state->value`; raw `u32 *` casts and reversed comparisons produced the opposite branch operand order. The overlays remain local ABI hypotheses, not a general declaration for the shared state object.
-- Three verified `14640.c` helpers show two narrow stack-layout heuristics: a 12-byte local with a four-byte leading pad can place a live word/pointer at the baseline's `sp+0x20`/`sp+0x2C` slot without changing the surrounding call sequence, and declaring a temporary pointer before the saved-result pointer can move the latter spill by four bytes while preserving the frame. Use these only when the mismatch is an isolated stack-slot immediate drift; still require an isolated MCP probe and full `COMPARE=1` gate.
-- For wrapper candidates, a global loaded with `lw` into an argument is commonly a pointer even when no source declaration exists; the scanner now tries a `void *` declaration before the `u32` fallback. Reuse an existing callee prototype when the source already defines it, and use an old-style declaration when later source call sites use a different arity. These changes prevent false compile failures, but they do not overcome compiler scheduling drift such as a `lui` emitted before the saved-`ra` store; every candidate still requires `COMPARE=1`.
-- Use `tools/scan_asm_families.py` to group pragma-backed US owners by assembly shape and emit per-source runner bundles. Its generated wrapper/lookup bodies are hypotheses only; inspect the manifest's connected callees, globals, tables, bounds, and memory widths, then run each bundle through the isolated probe filter plus sequential full gate and verify the combined ROM before committing.
-- The family scanner annotates owners found in `tools/s1_transfer.json` with the Stadium 1 name and evidence, and copies that reference into generated bundles. Treat it as a source-navigation hint only: inspect the Stadium 1 body and still require an isolated probe plus `COMPARE=1` for Stadium 2.
-- `tools/xmatch_stadium1.py --near-source <source.c>` reports 60%+ normalized Stadium 1 shape neighbors even when the strict transfer matcher rejects them. Use these as extension-pattern references for Stadium 2, never as automatic names or byte-match proof.
-- The scanner now emits labeled wrapper and short single-table lookup variants, while suppressing long or side-effecting lookup shapes. A family classification without a candidate bundle is a review queue, not a translation failure.
-- A read-only probe audit found a repeatable IDO scheduling hypothesis for multi-local near-misses: m2c often declares fixed stack locals in descending slot order (`sp28`, `sp26`, `sp24`), while the matching source shape declares them ascending (`sp24`, `sp26`, `sp28`). `sweep_targets.py` now emits a diagnostic-triggered `stack-slots-ascending` retry that changes declaration order only; it remains a candidate hint and still requires an isolated MCP probe plus the full `COMPARE=1` gate.
-- Two verified `14640.c` result wrappers (`func_800191FC` and `func_80019230`) forward three incoming `s32` arguments into a five-argument helper and match only with a four-word local `s32` array, passing the fourth and fifth helper pointers as `&locals[2]` and `&locals[1]`. This preserves the baseline's `0x30` frame and `sp+0x24`/`sp+0x28` result slots; shorter locals shifted the whole frame by four or eight bytes. Apply only to the same forwarded-argument/stack-result shape and still require MCP plus full `COMPARE=1`.
-- A verified `14640.c` indexed-state helper (`func_8001510C`) preserves the incoming index formal in place and uses a single `u8 *` temporary from `(u8 *)(u32)func_8001519C(arg0) + (arg1 << 4)`. Introducing a separate saved-index local changed IDO's frame and register schedule; use this only for the same post-call index fallback shape and still require MCP plus full `COMPARE=1`.
-- The MCP result includes one diagnostic per attempted variant (`accepted`, `compile_failed`, `compare_rejected`, or `skipped`) plus a final batch status. Use that distinction to change the hypothesis family instead of repeating the same rejected body.
-- Probe rejections also report the expected and candidate symbol sizes plus the first differing byte. Check for post-return alignment `nop`s and symbol-size drift before expanding a candidate matrix; a semantically correct body is not a byte hit when its emitted symbol range differs.
-- When a C body matches an owner but IDO stops the symbol before baseline-only trailing alignment nops, use the declarative `#pragma C_FUNCTION_PADDING(bytes)` marker handled by `asm-processor`. Keep the implementation owner in C and use the marker only for verified layout bytes; do not add a second per-function `GLOBAL_ASM` tail. Confirm the marker with an isolated MCP probe and the full `COMPARE=1` gate.
-- When a probe reports a clean prefix match with `expected_tail_kind: duplicate_jr_nop_tail`, `tools/sweep_targets.py` may append one uniquely named empty C helper per missing eight-byte `jr`/delay-slot pair and send that retry through the MCP gate. This is only a candidate-generation heuristic for duplicate return tails; retain it only after the isolated probe and full `COMPARE=1` gate accept it.
-- The candidate runner falls back to the sequential full gate only for owners whose own baseline bytes are unavailable; a missing symbol in one block must not promote every rejected variant in the batch. Keep this distinction visible in the per-attempt `probe_reason` field.
-- Set `PRAGMA_COMPILE_TIMEOUT`, `PRAGMA_COMPARE_TIMEOUT`, and optionally `PRAGMA_PROBE_STATS=/path/to/file.jsonl` when diagnosing a slow or low-yield batch. Stats default to ignored `disasm/build/probe-stats.jsonl`, preserve candidate text plus labels, probe/final statuses, symbol sizes, and mismatch classes for family-level tuning, and can be disabled with an empty variable.
-- Probe mismatch diagnostics classify the expected/actual return tail (`normal_return`, duplicate `jr/nop`, or alignment-only nops). Use that evidence to choose between a real C tail helper and `C_FUNCTION_PADDING`; never infer padding solely from a semantic match.
-- A verified duplicate-`jr`/`nop` tail matched with an empty C owner followed by a uniquely named `<owner>_padding(void) {}` helper (`func_8000D90C`). This is a narrow layout heuristic for duplicate return tails; still require the isolated MCP hit and full `COMPARE=1` gate, and do not use it for alignment-only tails.
-- The scanner may emit short, branch-free multi-call wrapper bundles when register/stack-transfer evidence is explicit. These bodies preserve call order but remain hypotheses; inspect connected globals and saved-argument slots, then send every generated variant through the MCP and the combined `COMPARE=1` gate.
-- A verified small mode dispatcher matched only when written as a C `switch` over a `u8` global with literal case labels; equivalent `if`/`else` forms changed branch layout. Use this as a candidate-generation hint for compact enum dispatches, never as proof without an isolated probe and `COMPARE=1`.
-- A verified resource initializer matched a direct byte-stride global write followed by an `s32`-indexed `while (i < table[arg][bound])` loop and a final wrapper call. Preserve the narrow index type, literal stride, and array-index form only for the same table/loop shape; this is not a general structure-layout rule.
-- The MCP runner supports `gate: false` for probe-only batches: it reports isolated `probe_match` owners and never edits live C or runs the linker/ROM gate. Keep `accepted` empty in this mode; only a later sequential `COMPARE=1` hit may install a replacement. Isolated probes default to 10 workers on this host, while candidate order still controls the first full-gate winner.
-- Probe rejections now include objdump-backed side-by-side instruction diffs, exact and register/immediate-normalized similarity scores, and a per-function `rejected_ranking`. Treat normalized scores as hill-climbing guidance only; a score of `1.0` can still differ in ABI operands and is never byte-match proof.
-- Two whole-body mismatch classes outrank the first-instruction heuristic: `register_allocation_only` (identical opcodes and immediates, only register choice differs; look at declaration order, temporaries, and types) and `immediate_drift` (identical opcodes and registers, only offsets/constants differ; look at struct offsets, strides, and literal widths). `register_only_similarity_score` reports the register-erased, immediate-preserving match ratio behind that split.
-- Probe compiles bypass `make`: the runner captures the Makefile's `PRAGMA_PROBE=1` recipe once per Makefile revision via `make -n` and invokes asm-processor/IDO directly, so flags stay Makefile-authoritative while a probe costs roughly a third of a second. Tracked-source rebuilds and the full gate still go through `make`. `tools/test_pragma_tools.py` isolates `PRAGMA_PROBE_STATS`, so test transactions never land in the default stats file.
-- The MCP runner exposes discovery and drafting tools beside `try_pragma_candidates`: `find_owner` (which tracked source owns a pragma; `source` may now be omitted from `try_pragma_candidates` when every candidate resolves to one owner), `get_function_asm`, `list_targets` (remaining owners ranked by instruction count with the family scanner's classification), `draft_candidates` (m2c first drafts using a preprocessed context from the owner source), and `permute_candidate` (decomp-permuter on a compiling near-match body for a bounded wall-clock budget). Drafts and permuter outputs are hypotheses: a permuter score of `0` is an instruction-diff match, not a byte/relocation match, so it still goes through the isolated probe and the `COMPARE=1` gate.
-- Use `declarations` on `try_pragma_candidates` for the shared `extern`/prototype lines of a batch: they are prepended to every probe and installed once ahead of the first accepted replacement, so variants stop repeating their externs. `tools/dedupe_externs.py --apply --verify` removes exact duplicate top-level `extern` lines that earlier batches left behind and re-runs the ROM gate.
-- `tools/sweep_targets.py` automates the small-function loop: `list_targets` filter -> m2c `--valid-syntax` draft -> mechanical rewrites (`M2C_FIELD` to raw `u8 *` access, unknown globals/returns tried as several types) -> isolated probes per source -> gated install of the hits, with an automatic `#pragma C_FUNCTION_PADDING(n)` retry for clean prefix matches that stop short of baseline alignment nops. Its per-family summary (`best:*`, `kind:*`, `near_miss_ge_0.9`) is the measurement to read before hand-writing variants for a family.
-- The sweep now supports `--fragment-range START-END` (for example `17-32`) and a `--near-miss` pass. Treat a fragment-band sweep as exclusive: while it runs, do not hand-decompile or independently probe owners in that band; let the sweep finish, then commit only its touched paths. The near-miss pass selects the best non-accepted `m2c:` stats entry at similarity >= 0.9, skips owners already accepted by a later full gate, runs `permute_candidate.permute()` for its bounded budget, and sends only score-0 outputs back through the MCP/full gate. Pass `--json` to retain its machine-readable report.
-- Compile-failed sweep attempts retain their diagnostic and shared declarations in probe stats. Use the diagnostic-selected retry spellings (`s16`, `u32`, pointer globals, and pointer-returning calls) before classifying a draft as unusable. Family-specific variant order (`bounded_lookup`, `state_field_access`, wrappers, and constant maps) encodes successful IDO source-shape priorities, but remains a hypothesis and never bypasses isolated probes or `COMPARE=1`.
-- The sweep now reconciles m2c's whole-file context with pragma source order before probing: declarations already visible above the pragma are not duplicated, below-pragma owner declarations use the owner's exact spelling, and symbols absent from the owner use only the unambiguous repository index spelling. Compile retries are generated only from the first CFE type/operand error; undefined, syntax, and redeclaration diagnostics are not type-matrix signals. This reduces declaration churn without treating any candidate as a match until the MCP probe and full gate agree.
-- `draft_candidates` also returns `similar_solved`: previously accepted candidates ranked by opcode-sequence similarity to the target (from `probe-stats.jsonl` winners; CLI `tools/pragma_targets.py similar <function>`). Use the winner's spelling as the first variant when similarity is high and the length matches; it is a hint, not proof.
-- m2c and decomp-permuter are optional, gitignored clones under `disasm/tools/` (install with `tools/setup_decomp_tools.sh`). Their absence turns the corresponding tools into explicit errors, never into silent no-ops.
-- Probe sources live under ignored `disasm/probes/`, outside Makefile `src` discovery, with a dedicated `PRAGMA_PROBE=1` asm-processor rule. The runner sweeps stale `.pragma_probe_*` trees under the dedicated and legacy build/source roots, and restores rejected live sources from memory rather than creating backup files. Never manually delete or reuse a probe tree while a runner transaction is active.
-- A `.text`-byte probe hit is now additionally checked against the baseline object's link shape (allocatable sections, symbols, and `.text` relocations). A hit whose shape matches exactly reports `link_verified: true` and is deferred into one combined `COMPARE=1` gate shared by every other verified hit in the batch instead of the historical per-function sequential gate; an unverified hit (shape unavailable, or a relocation-only mismatch) still uses the sequential gate. If the combined gate fails, its verified hits fall back to the sequential gate one at a time, trying later deferred variants of the same function until one is accepted or all are exhausted.
-- `section_layout_drift` (an added or resized allocatable section, most often a C `switch` emitting a new `.rodata` jump table where the baseline keeps its `jtbl_*` symbols undefined in a separate data segment) is a definitive probe rejection, not just an unverified hit: the linked ROM cannot be byte-identical even though the instruction bytes matched, so the runner reports `probe_rejected`/`mismatch_kind: section_layout_drift` immediately instead of spending a sequential gate on it.
-- Runner results and probe stats now carry a `timing` object (`probe_seconds`, `gate_seconds`, `gate_runs`, `gate_mode` of `sequential`/`combined`/`combined_then_sequential`/`None`, `total_seconds`). Read `gate_mode` and `gate_runs` before tuning batch size or worker counts for a slow sweep; per-attempt stats rows also carry `link_verified`/`link_mismatch`/`probe_seconds`.
-- The runner caches the tracked baseline object per process (`_ensure_baseline_object`, keyed on source+object mtimes) so a second probe pass over an unchanged source in the same sweep skips its `make` rebuild; any live-source edit, ours or another process's, invalidates the cache entry.
-- `tools/sweep_targets.py --skip-attempted` now tracks skip state per `(function, variant label)` pair, not per function: a variant spelling added to `FAMILY_VARIANTS` after an owner's earlier reject is still drafted and swept, since only the exact label already recorded in the stats file is skipped. Its m2c drafting phase now runs every remaining owner's draft through a thread pool (`PRAGMA_PROBE_WORKERS`-sized by default) ahead of the per-source probe/gate loop, instead of one m2c subprocess at a time inside it.
-- `--near-miss` considers every recorded label by default, not only `m2c:` drafts; pass `--near-miss-labels` (comma-separated prefixes) to restrict it. It now skips an owner that already has a `permute:`-labeled attempt on file (a previous near-miss run over the same candidate) unless `--near-miss-retry` is given, and `--near-miss-parallel` runs multiple `decomp-permuter` budgets concurrently while gating each score-0 output sequentially on the main thread, since gating holds the runner's cross-process transaction lock.
-- A verified-hit batch installs winners incrementally, not as one combined text: starting from the baseline, each winner is layered on top of the last *kept* state and recompiled, and a winner that only conflicts once combined with an earlier one (for example m2c inferring a different prototype for the same shared callee in two owners' drafts) is dropped and reported `combined_compile_failed` with `reason: "conflicts with an earlier winner in this batch"`, while the rest of the batch still gates once. A dropped winner is never retried alone afterward -- it already compiles in isolation (that is how it became a winner), so a lone retry would just re-accept and lose it again on the next combined install. Only a genuine full-ROM-compare rejection (not a compile conflict) still reverts everything it covers. Whenever a batch ends with nothing installed, every attempt still marked `accepted` is rewritten to that batch status so stats and the `accepted` list never disagree with what is actually in the file; `timing["install_compiles"]` counts the incremental installer's object rebuilds separately from `timing["gate_runs"]`'s real compares.
-- Probe stats rows and runner results carry `batch_status` next to `timing` (`_record_probe_stats(..., batch_status=...)`): read it alongside per-attempt `status` to tell "this candidate individually failed" apart from "the whole batch was reverted out from under an otherwise-accepted candidate."
-- `tools/sweep_targets.py`'s `split_candidate_declarations` now also hoists leading bare prototype lines (`<type> (*name(args))(args);` and plain `<ret> name(args);`, no `extern` keyword) into the shared declarations block, not just `extern ...;` lines. Before gating, `partition_gate_batches` detects when two declaration groups for the same source declare the same symbol name with different text -- the larger group (ties: first seen) gates first, and a smaller conflicting group is deferred as `deferred_conflicting_prototype` and logged to stderr rather than sent through a combined install doomed to fail to compile. `callee_unprototyped_variant` is a companion hypothesis, not a fix: for a draft with a function-pointer-returning prototype it emits an extra `m2c:<variant>:callee-unprototyped` candidate with the returned function's parameter list erased to `()`, and the probe alone decides whether that still matches.
-- `sweep_targets.near_miss` checks `pragma_targets.require_owner` before spending a permuter budget on a stats row: a function that no longer owns a `GLOBAL_ASM` pragma (solved by a later run since the stats were recorded) is skipped and counted in `skipped_solved` instead of wasting a `decomp-permuter` budget. `--near-miss-min-similarity` (default `0.8`) now controls the score floor from the CLI. Owners whose best recorded attempt is `register_allocation_only` or `immediate_drift` tend to need more search time than a real semantic gap; give them a longer `--near-miss-seconds`, or pass `--near-miss-kind-seconds` (default `120`) to give only those two mismatch kinds a separate, longer budget while everything else keeps `--near-miss-seconds` (default `45`). `--near-miss-parallel` now defaults to `2` concurrent `decomp-permuter` budgets instead of `1`; the permuter pass previously accepted 60 of 116 owners at the old, tighter defaults (`0.9`/no kind budget/serial), so the wider floor and longer kind budget are meant to pull in more of the remaining near-misses at the cost of more permuter time per run.
-- `tools/s1_transfer_sweep.py` transplants finished Stadium 1 C bodies onto GS pragmas listed in `tools/s1_transfer.json`: it aligns the GS `.s` words with the S1 ROM words, decodes each `jal`/`%hi`/`%lo` target from the S1 side to build an S1-name -> GS-name rename table, pulls the S1 struct/typedef definitions the body needs under an `S1_` prefix, and sends the renamed body through the runner (probe-only pass, then gate only the hits) under `s1:` labels. `--dry-run` prints candidates and unmapped symbols without touching the runner; alignment failures and unmapped S1 globals are diagnostics, not matches, and every transfer still needs the isolated probe and `COMPARE=1`.
-- `scan_asm_families.bounded_lookup_candidates`'s opcode allowlist (`SIMPLE_LOOKUP_OPS`) was missing `sw`, `subu`, and `blez`/`bgtz` (plus the `l`/`z` long forms), so it silently suppressed almost every real owner before candidate generation ever ran: a scan of all 146 remaining `bounded_lookup` owners found 145 rejected as "control flow or side effects exceed the simple-table shape," mostly for exactly these three reasons (an argument-spill `sw $a0, N($sp)`, a small non-power-of-two record stride built from a `sll`/`subu` chain, or a two-sided range check using `blez` instead of `bltz`). The store filter also flagged that harmless stack-homed `sw` as a side effect; it now only suppresses a store to non-stack memory (`access.base != "sp"`).
-- Cross-referencing every `bounded_lookup`-family probe attempt in `probe-stats.jsonl` against its baseline `.s` (`assembly_diff` itself is a runtime-only field, never persisted to the stats file) against the 29 accepted `bounded_lookup`-family owners on file found a dominant, previously-ungenerated shape: of the 14 accepted owners that return a looked-up value (excluding void state-mutator misclassifications), 9/14 (64%) use a guard-clause early return -- `if (cond) return table[index]; return 0;` -- 5/14 (36%) use the assign-then-return shape the generator already tried (`result = 0; if (cond) result = table[index]; return result;`), and 0/14 ever matched a ternary return, though the generator spent half its candidate budget on that spelling. The 9 guard-return owners also share two other proven traits the generator ignored: a `u8` (not `s32`) parameter whenever the baseline masks the argument with `andi $a0, $a0, 0xff` at entry, and a compound `arg0 > 0 && arg0 < N` condition read from the actual second range-check branch (`blez` -> `arg0 > 0`, `bltz` -> `arg0 >= 0`) instead of a blind `arg0 >= 0 &&` guess tried on every owner without negative-check evidence. `bounded_lookup_candidates` now emits the guard-return shape first (primary), the assign-then-return shape second (secondary), and the ternary last (tertiary, kept only because the probe is free to prove it right); it derives the parameter type and compound condition from this same branch/mask evidence, and recovers non-power-of-two record strides (12, 22 bytes) by symbolically walking the `sll`/`subu`/`addu` chain (`_table_index_multiplier`) instead of only reading a single `sll` shift, which previously truncated a 22-byte stride to 4.
-- `tools/sweep_targets.py sweep()` takes `--exclude-family NAME` (repeatable) and `--min-family-remaining N` (default `0`, off): a family whose remaining-owner count in the listing (`pragma_targets.list_targets`'s `family_counts`) is below the threshold, or is named explicitly, has its rows dropped before drafting and counted per family as `excluded_family`. The per-family summary also always carries a `remaining` counter from that same listing, next to `attempted`/`best:*`/etc., so a run's own output shows which families are close to saturated (`multi_call_wrapper` at 17/19 and `multi_call` at 14/16 accepted are the current examples) without cross-referencing `pragma_targets.py targets --family NAME`.
-- `tools/sweep_targets.py --large` sweeps owners with more than `--min-instructions` (default `64`) instructions -- 3,458 remaining owners this size never reach the ordinary sweep because m2c's `--valid-syntax` structured control-flow recovery usually fails to produce a draft at all past that size. `large_sweep` drafts each with `--gotos-only` (`draft_large_variants`, reusing `pragma_targets.DRAFT_VARIANTS["m2c-gotos"]`) instead, tries only the `s32-s32`/`u8-void` type spellings labeled `m2c-gotos:<variant>`, probes every variant in isolation, and skips the ordinary sweep's gate-the-hits pass entirely: every `probe_rejected` result at `similarity_score >= 0.7` goes straight into `permute_and_gate` (the near-miss permute-then-gate loop, factored out of `near_miss` so both callers share it) with a flat `--large-seconds` budget (default `180`). Its summary reports `drafted`/`probed`/`permuted`/`accepted` counts instead of the ordinary sweep's per-family breakdown.
-- `tools/template_transfer.py` turns `pragma_targets.similar_solved` from a hint into a real candidate source: `find_templates` raises its minimum to `0.9` and requires equal opcode-sequence length, then `generate_template_candidates` aligns the target's and the winner's `.s` word-for-word (`xmatch_stadium1.norm`, reusing `s1_transfer_sweep.parse_gs_asm`), builds a winner-name -> target-name rename table from every `jal`/`%hi`/`%lo` pair, and locates each differing plain immediate (`addiu`/`ori`/`andi`/loads/stores/`slti`/`sltiu`) as a literal in the winner's accepted C body to substitute -- emitting `template:<winner>:<score>` candidates (`alignment_failed`/`inconsistent_rename`/`winner_asm_missing` are diagnostics, not matches). `sweep_targets.py --templates` (off by default) prepends these ahead of a function's m2c variants so they probe first. Both this worktree's partial `disasm/asm` tree and its missing `probe-stats.jsonl` fall back read-only to the sibling checkout (`--stats`, and `pragma_targets.solved_shapes`'s new `asm_roots` param), the same mechanism `s1_transfer_sweep --gs-asm-fallback` uses.
+## 1. Running a session
+
+### 1.1 Start with parallel investigation
+
+When the user states a goal, do not start editing. First fan out **parallel
+read-only investigation agents** (one per independent question: the affected
+tools, the assembly shape, the probe statistics, the docs, the git history) and
+synthesise their reports into a short plan with evidence and numbers before
+proposing changes. Rules of thumb:
+
+- Investigation agents are read-only: no source edits, no runner batches, no
+  `make`. They report facts with file/line references and counts.
+- Implementation is delegated to coding agents with a precise spec (files,
+  functions, tests, constraints). Run one agent per independent change in an
+  isolated git worktree; forbid them from editing `AGENTS.md`, `README.md`, and
+  `disasm/src` unless that is the task, and require the unit-test suite to pass
+  before they commit on their branch.
+- Live-runner work (probing, gating, renaming, extern cleanup) must run in the
+  main checkout, one process at a time, and must never overlap with a merge.
+- The coordinating session merges branches in order, resolves conflicts, reruns
+  `tools/run_tests.sh`, folds the agents' "doc notes" into this file, and
+  commits. Reviewing and integrating stays with the coordinator; writing code
+  is delegated.
+- Measure before and after. Every process change must cite the metric it moves
+  (`tools/report_candidate_yield.py`, `tools/near_miss_kinds.py report`,
+  `COVERAGE.md`, `tools/name_decompiled.py debt`).
+
+### 1.2 Shared-checkout etiquette
+
+- Several sessions may use this checkout. Foreign modified `disasm/src` files
+  or live `disasm/probes/.pragma_probe_*` trees mean another runner
+  transaction is in flight: do not build, commit, or run the runner over it.
+- Commit your own finished work promptly and **by explicit path**; never sweep
+  foreign edits into your commit.
+- Prefer one git worktree per session for tooling work. Worktrees fall back
+  read-only to the sibling checkout for `disasm/asm` and probe stats.
+- Restart the MCP server after editing `tools/try_pragma_compare*.py` (the
+  module is loaded once per server process).
+
+### 1.3 Commits and hooks
+
+- Enable the tracked hooks once per checkout: `git config core.hooksPath .githooks`.
+- `.githooks/pre-commit` runs every executable in `.githooks/pre-commit.d/`:
+  `10-coverage.sh` regenerates and stages `COVERAGE.md` from the index so the
+  number lands in the commit it describes; `15-provenance.sh` blocks removing a
+  `GLOBAL_ASM` pragma that has no `accepted` runner attempt on file
+  (`DECOMP_PROVENANCE_SKIP=1` bypasses, only with a stated justification);
+  `20-tests.sh` runs `tools/run_tests.sh` when `tools/*.py` is staged
+  (`SKIP_TOOL_TESTS=1` bypasses). There is no post-commit hook any more.
+- Commit verified batches per source file or per sweep run, not one function
+  per commit. A commit message names the subsystem or family, not a single
+  helper.
+- `COVERAGE.md` is generated; never hand-edit it. `README.md` only points at it.
+
+## 2. Decompilation process rules
+
+1. `pret/pokestadiumgs` is the immutable US-ROM matching baseline; the vendored
+   copy lives in `disasm/`. The original assembly is the comparison oracle.
+2. An assembly owner is replaced by C only when the full ROM stays
+   byte-identical (`make -C disasm COMPARE=1`). A `.text` byte match, a
+   permuter score of 0, or a similarity of 1.0 is evidence, never proof.
+3. Every candidate goes through the MCP runner (`try_pragma_candidates`):
+   isolated object probe first, then link-shape verification, then the ROM
+   gate. Never test a hypothesis by hand-editing a tracked source; manual edits
+   are for documentation or deliberate post-acceptance cleanup only.
+4. Try about 10 plausible compiler-faithful variants for ordinary functions,
+   10–50 for difficult ones when justified; stop after the first accepted
+   candidate. Change the hypothesis family when a diagnostic repeats instead of
+   resending the same body.
+5. Read the runner's per-attempt diagnostics (`status`, `mismatch_kind`,
+   `similarity_score`, `first_diff_*`, `link_verified`, `expected_tail_kind`)
+   and act on the class: `register_allocation_only` → declaration order,
+   temporaries, widths; `immediate_drift` → offsets, strides, literal widths;
+   `section_layout_drift` → definitive rejection (see 2.7); `symbol_size_drift`
+   / alignment tails → `#pragma C_FUNCTION_PADDING(n)` or a `<owner>_padding`
+   helper, only for verified layout bytes.
+6. Shared declarations for a batch go in the `declarations` argument, not in
+   every candidate; `tools/dedupe_externs.py --apply --verify` cleans up
+   duplicates left by earlier batches.
+7. Jump tables: splat originally placed every `jtbl_*` in a shared data/rodata
+   blob, so a C `switch` (whose table IDO emits into the owner's `.rodata`)
+   shifted the ROM (`section_layout_drift`). The fix is a per-file `.rodata`
+   subsegment in `disasm/yamls/us/rom.yaml` (`- [rom, .rodata, <file>]` plus a
+   retyped `rodata` tail), re-split with the pinned spimdisasm, and the
+   hand-written alias lines re-applied to `pokestadiumgs.ld`; verified
+   byte-identical for a text-segment file and a fragment. Before decompiling
+   a `dispatcher_switch` / `jump_table_map` owner, give its file a subsegment
+   with `python3 tools/add_rodata_subsegments.py plan|for-jtbl` and gate the
+   still-assembly owner first. Details, gotchas, and the run-by-run plan are in
+   `docs/JUMP_TABLES.md`.
+8. Name a function at the moment it is decompiled (a renamed pragma owner loses
+   its `.s`; see `DECOMP_SETUP.md`). After a batch is accepted run
+   `python3 tools/name_decompiled.py apply --verify` (or set
+   `PRAGMA_NAME_ON_ACCEPT=1` for the runner) so evidence-backed Stadium 1 /
+   `gs_names.json` names land in the same change. Until then, record intended
+   names as `// type:func Name` comments in `symbol_addrs_code.txt`.
+9. The ROM gate runs `make -C disasm COMPARE=1` with the host-side clang
+   syntax check enabled (`PRAGMA_GATE_CC_CHECK=0` opts out for diagnosis
+   only). A candidate that matches bytes but fails the check is not
+   installable: it would break the next plain `make`. The Makefile keeps
+   IDO-accepted int/pointer conversions as warnings; a real arity or
+   declaration mismatch must be fixed in the candidate (for example an
+   old-style `void f()` definition when byte-matched callers pass arguments).
+10. Probe statistics are the process memory. They must never be disabled during
+   real work, and their location (`disasm/probe-stats/`) is outside `build/`.
+   Any decompiled owner without an `accepted` row is a process violation the
+   pre-commit hook rejects.
+11. Document a recurring pattern in §4 only with its evidence count and its
+    limits; use it to order candidates, never to skip the gate.
+
+## 3. Tool reference
+
+### 3.1 Runner and MCP
+
+- `tools/try_pragma_compare.py` / `tools/try_pragma_compare_mcp.py` — the
+  candidate runner. MCP tools: `try_pragma_candidates` (`gate: false` for
+  probe-only batches; `declarations` for shared externs; `source` may be
+  omitted when every candidate resolves to one owner), `find_owner`,
+  `get_function_asm`, `list_targets`, `draft_candidates` (m2c drafts plus
+  `similar_solved`), `permute_candidate`.
+- Probe compiles bypass `make`: the recipe is captured once per Makefile
+  revision and asm-processor/IDO run directly (~0.3–0.7 s per probe; the ROM
+  gate is ~2 s incremental). Probe sources live under ignored `disasm/probes/`.
+- A `.text` hit is checked against the baseline object's link shape. Verified
+  hits (`link_verified: true`) share one combined gate; unverified hits gate
+  sequentially; `section_layout_drift` is rejected immediately. Winners are
+  installed incrementally; a winner that only conflicts in combination is
+  reported `combined_compile_failed` and not retried alone.
+- Results and stats carry `timing` (`probe_seconds`, `gate_seconds`,
+  `gate_runs`, `gate_mode`) and `batch_status`. Tune batch size and workers
+  from those, not from guesses. `PRAGMA_COMPILE_TIMEOUT`,
+  `PRAGMA_COMPARE_TIMEOUT`, `PRAGMA_PROBE_WORKERS` are the knobs.
+- m2c and decomp-permuter are optional clones under `disasm/tools/`
+  (`tools/setup_decomp_tools.sh`); their absence is an explicit error.
+
+### 3.2 Probe statistics
+
+- Default file `disasm/probe-stats/probe-stats.jsonl` (schema 2: batch rows
+  carry `timestamp`, `batch_id`, `worktree`, `git_head`; attempts carry
+  `family`, `label`, `status`, `mismatch_kind`, scores, `candidate`,
+  `declarations`, a 2000-char `diagnostic`; `assembly_diff` is runtime-only).
+  Rotates at 64 MiB to `probe-stats.<N>.jsonl`; every reader includes rotated
+  and legacy (`disasm/build/probe-stats.jsonl`) files. `PRAGMA_PROBE_STATS`
+  overrides the path; empty disables (tests only).
+- `python3 tools/probe_stats.py migrate` folds the legacy file in once.
+- `python3 tools/report_candidate_yield.py` — attempts, compile-fail rate,
+  probe matches and accepts per label prefix. Cite it when changing variants.
+- `python3 tools/check_decomp_provenance.py --staged` — the pre-commit guard.
+
+### 3.3 Discovery and drafting
+
+- `python3 tools/pragma_targets.py targets [--family F] [--limit N]` — remaining
+  owners ranked by instruction count with family classification and
+  `family_counts`; `draft <func>` and `similar <func>` for m2c drafts and
+  solved-shape neighbours.
+- `tools/scan_asm_families.py` — the family classifier and bundle generator.
+  Families: `bounded_lookup`, `state_field_access`, `constant_map`,
+  `direct_wrapper`, `multi_call_wrapper`, `call_sequence`, `jump_table_map`,
+  `loop_or_state_machine`, plus the shape sub-families `call_chain`,
+  `dispatcher_switch`, `large_mixed`, `init_sequence`, `float_math`,
+  `state_machine`, `predicate`, and `unclassified`.
+  `tools/analyze_family_shapes.py` prints the feature clusters behind them.
+- `tools/xmatch_stadium1.py --near-source <c>` and `tools/s1_transfer.json` —
+  Stadium 1 shape neighbours and evidence-backed names (hints, never proof).
+- `tools/s1_transfer_sweep.py` — transplants Stadium 1 bodies onto GS pragmas
+  (`s1:` labels; `--dry-run` first). `tools/template_transfer.py` /
+  `sweep_targets.py --templates` — rewrites an accepted winner of identical
+  opcode shape onto the target (`template:` labels).
+
+### 3.4 Sweeps
+
+- `tools/sweep_targets.py` — the small-function loop: listing filter → m2c
+  draft → mechanical rewrites → isolated probes per source → gated install →
+  padding/duplicate-tail retries. Read its per-family summary (`best:*`,
+  `kind:*`, `near_miss_ge_0.9`, `remaining`) before hand-writing variants.
+  Options: `--fragment-range A-B` (exclusive band: nobody else touches it while
+  it runs), `--skip-attempted` (per function+label), `--exclude-family`,
+  `--min-family-remaining`, `--large` (owners >64 instructions via
+  `--gotos-only` drafts straight into permute-and-gate), `--variant-policy`.
+- Variant selection is data-driven (`tools/variant_policy.py`): a retry
+  spelling runs only when it is unexplored (<30 attempts) or has a recorded
+  accept/probe-match rate above zero. The pointer-retry trio
+  (`ptr-void`/`ptr-s32`/`u32-void`) is no longer emitted automatically (738
+  attempts, 0 accepts); function-pointer calls get a `fnptr-cast` variant;
+  missing prototypes fall back to synthesized old-style declarations from
+  `repo-prototypes-fallback.h`.
+- Near-miss program: `python3 tools/near_miss_kinds.py report` shows the
+  open-owner pool by `mismatch_kind` × similarity band;
+  `sweep_targets.py --near-miss-kinds [--kinds ...] [--min-similarity 0.9]`
+  runs the deterministic kind-specific rewrites (declaration-order permutations,
+  width swaps, temp hoist/inline, operand swaps; offset/frame/literal/stride
+  repairs; statement split/merge and loop-form swaps) through probe-only
+  batches and gates the hits before any permuter time. `--near-miss` remains the
+  permuter path (`--near-miss-kind-seconds` gives `register_allocation_only`
+  and `immediate_drift` a longer budget).
+
+### 3.5 Naming and coverage
+
+- `tools/name_decompiled.py plan|apply|debt` — applies evidence-backed names
+  to decompiled `func_` symbols everywhere (`symbol_addrs_code.txt`, C
+  sources, includes, and the `.s` tree), refuses collisions per row, logs to
+  `disasm/probe-stats/renames.jsonl`; `--verify` runs the ROM gate.
+- `tools/apply_names.py` — the general naming applier (`--dry-run`, `--check`,
+  `--qa`); `docs/NAMING.md` explains the evidence rules.
+- `tools/update_coverage.py [--staged|--revision R]` — generates `COVERAGE.md`
+  (totals plus per-file remaining owners).
+- `tools/run_tests.sh` — the unit-test suite (`unittest`, no pytest).
+
+## 4. Verified source-shape heuristics
+
+Each entry: shape → spelling that matched → evidence → limit. Order candidates
+by these; always probe and gate.
+
+| Shape | Spelling that matched | Evidence | Limit |
+|---|---|---|---|
+| Wrapper returning a callee result vs void | Direct `return f(...)` / plain call, exact prototype and call order; explicit temporaries in multi-call wrappers | many owners | — |
+| Fixed-stride byte-flag pool scan | Uniquely named padded local record, `s8` flag at the proven offset, `s32 i`, result initialised before the pool load, post-incremented record pointer | 1 S1 transfer | same scan only |
+| `lbu`/`andi`/`jr`/`sb` flag clear | `arg0[off] &= 0xFF7F` (`0xFFFE`) on a `u8 *`, literal 16-bit mask kept | 2 | same load-mask-store shape |
+| `lbu` index → pointer table → `lbu`/`ori`/`sb` | `table[index][off] \|= lit` with `u8 *[]` table declared locally; byte-typed argument when the asm masks it | 2 (+1) | — |
+| Four `sh` stores at 0/2/4/6, fifth value from stack | `u8 *` plus `u16 *` casts, `s32` params, explicit halfword widths | 2 | no struct inferred |
+| Two-component `s16` add/sub | add: uniquely named two-`s16` struct; sub: explicit `u8 *` offsets — probe both | 2 | — |
+| Three-component float copy | `arg0[0..2] = arg1[0..2]` on `f32 *` | 3 | exact 3-copy shape |
+| `lhu`/`andi` bit test | `s32 result = 0; if (global & mask) result = 1; return result;` with `u16` global | 5 | no ternary / compact bool |
+| Byte-argument state predicates | `u8` parameter, initialised `s32` result, nested explicit checks over raw byte offsets | 4 | `s32` params did not match |
+| Word-field predicates | Uniquely named local struct overlay padded to 0x10/0x14, comparison written `arg0 == state->value` | 2 | overlay is local |
+| Isolated stack-slot immediate drift | 12-byte local with 4-byte leading pad; declare a temp pointer before the saved-result pointer | 3 (`14640.c`) | only for slot drift |
+| Forwarded 3-arg wrapper into 5-arg helper | Four-word `s32 locals[4]`, pass `&locals[2]`, `&locals[1]` | 2 | keeps 0x30 frame |
+| Post-call index fallback | Keep the incoming index formal in place; single `u8 *` temp from `(u8 *)(u32)f(arg0) + (arg1 << 4)` | 1 | — |
+| Compact enum dispatcher | C `switch` over a `u8` global with literal cases | 1 | blocked by §2.7 when a jtbl is emitted |
+| Resource initializer | Byte-stride global write, `s32`-indexed `while (i < table[arg][bound])`, final wrapper call | 1 | same table/loop shape |
+| Multi-local near-miss | Declare fixed stack locals ascending (`sp24, sp26, sp28`) rather than m2c's descending order (`stack-slots-ascending` retry) | audit | — |
+| Duplicate `jr`/`nop` tail | Empty owner + uniquely named `<owner>_padding(void) {}` helper | 1 | not for alignment-only tails |
+| Trailing alignment nops | `#pragma C_FUNCTION_PADDING(bytes)` | several | verified layout bytes only |
+| Bounded lookup returning a value | Guard-clause early return `if (cond) return table[i]; return 0;` first; assign-then-return second; ternary last; `u8` param when the asm masks with `andi 0xff`; compound condition read from the real second range check (`blez` → `> 0`, `bltz` → `>= 0`); non-power-of-two strides from the `sll`/`subu`/`addu` chain | 9/14 guard, 5/14 assign, 0/14 ternary | — |
+| Globals loaded with `lw` into an argument | Try `void *` before `u32` | scan | no help for `lui`-before-`sw $ra` scheduling drift |
+| General | Preserve narrow `sb`/`sh`/`sw` widths, initialise results before NULL checks, raw 32-bit address arithmetic (`(u8 *)(u32)global + off`) before inferred structs, `uintptr_t` casts for raw addresses, explicit `s32` loop counters, array-index vs pointer-add as separate variants, deliberate signed/unsigned masks | repo scan | ABI hypotheses until compared |
+
+Type spellings: `u8-void` and `s32-s32` account for essentially all m2c-draft
+accepts; other widths only on diagnostic evidence via the variant policy.

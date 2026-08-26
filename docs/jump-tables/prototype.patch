@@ -1,0 +1,143 @@
+--- a/disasm/yamls/us/rom.yaml
++++ b/disasm/yamls/us/rom.yaml
+@@ -325,6 +325,8 @@
+     
+     # .rodata
+     - [0xA23F0, rodata]
++    - [0xA6070, .rodata, 667B0] # jtbl_800A5470 (func_80065BB0)
++    - [0xA6090, rodata]
+     - [0xA6860, lib, libultra, setintmask, .rodata]
+     - [0xA68E0, lib, libultra, sinf, .rodata]
+     - [0xA6930, lib, libultra, exceptasm, .rodata]
+@@ -1293,6 +1295,8 @@
+     - [0x358830, textbin, fragments/69/fragment69_header]
+     - [0x358850, c,       fragments/69/fragment69_code]
+     - [0x35C130, data,    fragments/69/fragment69_data]
++    - [0x35C840, .rodata, fragments/69/fragment69_code] # jtbl_8F104014/404C/407C
++    - [0x35C8D0, rodata,  fragments/69/fragment69_reloc]
+   
+   - name: fragment70
+     type: code
+--- a/disasm/linker_scripts/us/pokestadiumgs.ld
++++ b/disasm/linker_scripts/us/pokestadiumgs.ld
+@@ -600,6 +600,7 @@
+         build/src/654A0.o(.rodata);
+         build/src/65820.o(.rodata);
+         build/src/65E20.o(.rodata);
++        build/asm/us/data/A23F0.rodata.o(.rodata);
+         build/src/667B0.o(.rodata);
+         build/src/66990.o(.rodata);
+         build/src/66B50.o(.rodata);
+@@ -623,7 +624,7 @@
+         build/src/72C30.o(.rodata);
+         build/src/73C80.o(.rodata);
+         build/src/74020.o(.rodata);
+-        build/asm/us/data/A23F0.rodata.o(.rodata);
++        build/asm/us/data/A6090.rodata.o(.rodata);
+         build/lib/libultra.a:setintmask.o(.rodata);
+         build/lib/libultra.a:sinf.o(.rodata);
+         build/lib/libultra.a:exceptasm.o(.rodata);
+@@ -4654,6 +4655,7 @@
+         fragment69_RODATA_START = .;
+         build/asm/us/data/fragments/69/fragment69_header.o(.rodata);
+         build/src/fragments/69/fragment69_code.o(.rodata);
++        build/asm/us/data/fragments/69/fragment69_reloc.rodata.o(.rodata);
+         fragment69_RODATA_END = .;
+         fragment69_RODATA_SIZE = ABSOLUTE(fragment69_RODATA_END - fragment69_RODATA_START);
+     }
+--- a/disasm/src/667B0.c
++++ b/disasm/src/667B0.c
+@@ -1,6 +1,90 @@
+ #include "global.h"
+ 
++extern u8 fragment11_ROM_START[];
++extern u8 fragment12_ROM_START[];
++extern u8 fragment17_ROM_START[];
++extern u8 fragment18_ROM_START[];
++extern u8 D_81600000[];
++extern u8 D_82200000[];
++extern s32 D_8009DEB0;
+ 
+-#ifdef VERSION_US
+-#pragma GLOBAL_ASM("asm/us/nonmatchings/667B0/func_80065BB0.s")
+-#endif
++typedef struct {
++    /* 0x00 */ s16 unk_00;
++    /* 0x02 */ s16 unk_02;
++    /* 0x04 */ s16 unk_04;
++    /* 0x06 */ s16 unk_06;
++    /* 0x08 */ u16 unk_08;
++    /* 0x0A */ u8 pad_0A[0x1E];
++} Unk667B0; /* size = 0x28 */
++
++extern void func_80057944(u8);
++extern void main_pool_push_state(u32);
++extern void main_pool_pop_state(u32);
++extern void func_8006CC0C(void);
++extern void func_800047F8(s32, void *, void *);
++extern s32 func_80064E38(void);
++extern s32 func_80064CE8(s32, void *, void *, s32, void *);
++extern void func_80064CB8(s16);
++extern void func_80064CD0(s16);
++extern void func_80064DFC(s32);
++extern void func_80065D90(s32);
++extern void func_8006CBFC(void);
++
++void func_80065BB0(void) {
++    s32 ret;
++    s32 i;
++    Unk667B0 sp30;
++
++    for (i = 0; i < 4; i++) {
++        func_80057944(i);
++    }
++
++    main_pool_push_state(0x67626368);
++    func_8006CC0C();
++    func_800047F8               ((((u32)D_81600000 & 0x0FF00000) >> 20) - 0x10, fragment11_ROM_START, fragment12_ROM_START);
++    if (func_80064E38() == 1) {
++        D_8009DEB0 = 0;
++    }
++    ret = func_80064CE8((((u32)D_82200000 & 0x0FF00000) >> 20) - 0x10, fragment17_ROM_START, fragment18_ROM_START, D_8009DEB0, &sp30);
++    D_8009DEB0 = ret;
++    main_pool_pop_state(0x67626368);
++
++    switch (ret) {
++        case 1:
++            func_80064CB8(sp30.unk_02);
++            func_80064CD0(sp30.unk_04);
++            func_80064DFC(14);
++            break;
++        case 2:
++            func_80064DFC(3);
++            func_80065D90(1);
++            break;
++        case 3:
++            func_80064DFC(13);
++            break;
++        case 5:
++            func_80064DFC(11);
++            break;
++        case 4:
++            func_80064DFC(19);
++            break;
++        case 7:
++            switch (sp30.unk_08 & 0xFF00) {
++                case 0:
++                    func_8006CBFC();
++                    func_80064DFC(8);
++                    break;
++                case 0x300:
++                    func_8006CBFC();
++                    func_80064DFC(9);
++                    break;
++                default:
++                    func_80064DFC(3);
++                    break;
++            }
++            break;
++        default:
++            func_80064DFC(1);
++            break;
++    }
++}

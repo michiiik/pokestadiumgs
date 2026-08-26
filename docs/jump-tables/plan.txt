@@ -1,0 +1,320 @@
+
+== disasm/asm/us/data/A23F0.rodata.s  (text, rom 0xA23F0..0xA6FD0)
+   0x0A2460..0x0A24D0  4420                         jtbl_800A1860  
+   0x0A24D0..0x0A24F0  57C0                         jtbl_800A18D0  
+   0x0A24F0..0x0A2510  7140                         jtbl_800A18F0  
+   0x0A2900..0x0A2930  CE80                         jtbl_800A1D00  
+   0x0A2930..0x0A2980  10BB0                        jtbl_800A1D3C,jtbl_800A1D54  
+   0x0A2980..0x0A2B60  14640                        jtbl_800A1DD8,jtbl_800A1DEC,jtbl_800A1E10  
+   0x0A2B80..0x0A2BD0  1C2D0                        jtbl_800A1F80,jtbl_800A1FA4  
+   0x0A2BD0..0x0A3260  1CDC0                        jtbl_800A1FD0,jtbl_800A2008,jtbl_800A204C  
+   0x0A3260..0x0A4928  229E0                        jtbl_800A2670,jtbl_800A2B38,jtbl_800A2B64  UNALIGNED -> widen to 0xA3260..0xA4930
+   0x0A492C..0x0A4EA0  229E0                        jtbl_800A3D58,jtbl_800A3D94,jtbl_800A3E04  UNALIGNED -> widen to 0xA4920..0xA4EA0
+   0x0A4EC0..0x0A4EE0  43700                        jtbl_800A42C0  
+   0x0A4EE0..0x0A5120  47580                        jtbl_800A43C0,jtbl_800A4440,jtbl_800A449C  
+   0x0A5130..0x0A51B0  4EE50                        jtbl_800A4530  
+   0x0A51B0..0x0A55B0  517E0                        jtbl_800A45B0,jtbl_800A45EC,jtbl_800A4628  
+   0x0A5610..0x0A5BF0  585D0                        jtbl_800A4A44,jtbl_800A4A60,jtbl_800A4A7C  
+   0x0A5BF0..0x0A5C80  615D0                        jtbl_800A4FF0,jtbl_800A5004,jtbl_800A5018  
+   0x0A5C90..0x0A5D50  63CF0                        jtbl_800A5094,jtbl_800A5104  
+   0x0A5D50..0x0A5EA0  641E0                        jtbl_800A5164,jtbl_800A5180,jtbl_800A519C  
+   0x0A5EA0..0x0A5FD0  654A0                        jtbl_800A52A0,jtbl_800A52DC,jtbl_800A5318  
+   0x0A5FD0..0x0A6020  65820                        jtbl_800A53D0  
+   0x0A6020..0x0A6070  65E20                        jtbl_800A5420  
+   0x0A6070..0x0A6090  667B0                        jtbl_800A5470  
+   0x0A6090..0x0A60C0  66990                        jtbl_800A5490  
+   0x0A60C0..0x0A60E0  66DF0                        jtbl_800A54C0  
+   0x0A60E0..0x0A6120  674D0                        jtbl_800A54E0,jtbl_800A5504  
+   0x0A6120..0x0A61F0  67F00                        jtbl_800A5520,jtbl_800A5570,jtbl_800A55C0  
+   0x0A61F0..0x0A6210  68F90                        jtbl_800A55F0  
+   0x0A6210..0x0A6270  69650                        jtbl_800A5610,jtbl_800A564C  
+   0x0A6270..0x0A62B0  69F70                        jtbl_800A5670  
+   0x0A62B0..0x0A64E0  6AA80                        jtbl_800A56B0,jtbl_800A56EC,jtbl_800A5770  
+   0x0A64E0..0x0A6500  6DEC0                        jtbl_800A58E0  
+   0x0A6560..0x0A6700  6E850                        jtbl_800A5964,jtbl_800A5978,jtbl_800A59B8  
+   0x0A6700..0x0A6750  72C30                        jtbl_800A5B18  
+   0x0A6750..0x0A6FD0  74020                        jtbl_800A5B50  
+
+== disasm/asm/us/data/fragments/1/fragment1_data.data.s  (fragment1, rom 0xAC540..0xACB68)
+   0x0AC540..0x0ACB68  fragments/1/fragment1_code   jtbl_83503DE8,jtbl_83503E50,jtbl_83503E64  UNALIGNED -> widen to 0xAC540..0xACB70; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/4/fragment4_data.data.s  (fragment4, rom 0xB3F00..0xB45D4)
+   0x0B4240..0x0B42C0  fragments/4/fragment4_AE600  jtbl_81805C64  inside a .data subsegment (needs a trailing `rodata` split)
+   0x0B4570..0x0B45C0  fragments/4/fragment4_B2D00  jtbl_81805FA4,jtbl_81805FB8  inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/6/fragment6_data.data.s  (fragment6, rom 0xB8030..0xB9A48)
+   0x0B9738..0x0B9A48  fragments/6/fragment6_code   jtbl_83103998  UNALIGNED -> widen to 0xB9730..0xB9A50; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/7/fragment7_data.data.s  (fragment7, rom 0xC5BD0..0xC9F70)
+   0x0C9A9C..0x0C9F70  fragments/7/fragment7_BA250  jtbl_8300F958,jtbl_8300F9FC,jtbl_8300FB00  UNALIGNED -> widen to 0xC9A90..0xC9F70; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/8/fragment8_data.data.s  (fragment8, rom 0xCE660..0xCF974)
+   0x0CF878..0x0CF974  fragments/8/fragment8_code   jtbl_82F03228,jtbl_82F03298  UNALIGNED -> widen to 0xCF870..0xCF980; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/9/fragment9_data.data.s  (fragment9, rom 0xD3910..0xD427C)
+   0x0D3910..0x0D427C  fragments/9/fragment9_code   jtbl_8FB03B48,jtbl_8FB03B78,jtbl_8FB03BA8  UNALIGNED -> widen to 0xD3910..0xD4280; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/10/fragment10_data.data.s  (fragment10, rom 0xD7460..0xD7694)
+   0x0D74C0..0x0D75D0  fragments/10/fragment10_D5250 jtbl_8280292C,jtbl_8280296C  inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/11/fragment11_data.data.s  (fragment11, rom 0xE38A0..0xE3E9C)
+   0x0E3BB0..0x0E3E80  fragments/11/fragment11_D9520 jtbl_8160C014,jtbl_8160C198,jtbl_8160C20C  inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/12/fragment12_data.data.s  (fragment12, rom 0xECAB0..0xECECC)
+   0x0ECBE0..0x0ECC60  fragments/12/fragment12_E5330 jtbl_81407918  inside a .data subsegment (needs a trailing `rodata` split)
+   0x0ECC60..0x0ECEC0  fragments/12/fragment12_E7C00 jtbl_81407AA0,jtbl_81407AB4,jtbl_81407AC8  inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/13/fragment13_data.data.s  (fragment13, rom 0xF53D0..0xF8044)
+   0x0F6F80..0x0F7120  fragments/13/fragment13_EEC50 jtbl_82409058,jtbl_82409080  inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/14/fragment14_data.data.s  (fragment14, rom 0x109EC0..0x10ABD4)
+   0x10A310..0x10A430  fragments/14/fragment14_F81B0 jtbl_81312198,jtbl_813121B4,jtbl_813121DC  inside a .data subsegment (needs a trailing `rodata` split)
+   0x10A538..0x10A600  fragments/14/fragment14_FAD40 jtbl_813123A8,jtbl_813123F8,jtbl_81312418  UNALIGNED -> widen to 0x10A530..0x10A600; inside a .data subsegment (needs a trailing `rodata` split)
+   0x10A608..0x10A660  fragments/14/fragment14_FCD40 jtbl_81312478,jtbl_81312490,jtbl_813124A8  UNALIGNED -> widen to 0x10A600..0x10A660; inside a .data subsegment (needs a trailing `rodata` split)
+   0x10A660..0x10A6E8  fragments/14/fragment14_FD770 jtbl_813124D4,jtbl_813124F8,jtbl_81312510  UNALIGNED -> widen to 0x10A660..0x10A6F0; inside a .data subsegment (needs a trailing `rodata` split)
+   0x10A6E8..0x10A780  fragments/14/fragment14_FF070 jtbl_81312564,jtbl_81312598,jtbl_813125B8  UNALIGNED -> widen to 0x10A6E0..0x10A780; inside a .data subsegment (needs a trailing `rodata` split)
+   0x10A7C8..0x10A8C0  fragments/14/fragment14_FF070 jtbl_81312648,jtbl_81312680,jtbl_813126B8  UNALIGNED -> widen to 0x10A7C0..0x10A8C0; inside a .data subsegment (needs a trailing `rodata` split)
+   0x10A8C0..0x10AA10  fragments/14/fragment14_104FC0 jtbl_81312800,jtbl_81312820,jtbl_81312840  inside a .data subsegment (needs a trailing `rodata` split)
+   0x10AA28..0x10AB90  fragments/14/fragment14_1077C0 jtbl_81312968,jtbl_813129D4  UNALIGNED -> widen to 0x10AA20..0x10AB90; inside a .data subsegment (needs a trailing `rodata` split)
+   0x10AB90..0x10ABD0  fragments/14/fragment14_109280 jtbl_81312A04,jtbl_81312A18,jtbl_81312A2C  inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/16/fragment16_data.data.s  (fragment16, rom 0x10F080..0x10F34A)
+   0x10F080..0x10F34A  fragments/16/fragment16_code jtbl_82001D30  UNALIGNED -> widen to 0x10F080..0x10F350; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/17/fragment17_data.data.s  (fragment17, rom 0x11D0B0..0x120208)
+   0x11DA40..0x11DA80  fragments/17/fragment17_10F9E0 jtbl_8220E080,jtbl_8220E098  inside a .data subsegment (needs a trailing `rodata` split)
+   0x11DA80..0x11DAE0  fragments/17/fragment17_10FFC0 jtbl_8220E0D4,jtbl_8220E0F0,jtbl_8220E10C  inside a .data subsegment (needs a trailing `rodata` split)
+   0x11DAE0..0x11DB80  fragments/17/fragment17_113A60 jtbl_8220E128,jtbl_8220E14C,jtbl_8220E188  inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/19/fragment19_data.data.s  (fragment19, rom 0x126B50..0x127EBE)
+   0x126DF0..0x126E30  fragments/19/fragment19_121100 jtbl_82305D10,jtbl_82305D30  inside a .data subsegment (needs a trailing `rodata` split)
+   0x126E30..0x126E50  fragments/19/fragment19_124E40 jtbl_82305D50  inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/20/fragment20_data.data.s  (fragment20, rom 0x13D3F0..0x13E4BC)
+   0x13D8B0..0x13DB50  fragments/20/fragment20_12C460 jtbl_826157E0,jtbl_82615830,jtbl_826158B4  inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/21/fragment21_data.data.s  (fragment21, rom 0x148600..0x14960A)
+   0x148C50..0x148F70  fragments/21/fragment21_13FFA0 jtbl_82508CD0  inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/22/fragment22_data.data.s  (fragment22, rom 0x14D470..0x14DA24)
+   0x14D5C0..0x14D600  fragments/22/fragment22_14B090 jtbl_82703300,jtbl_82703314  inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/23/fragment23_data.data.s  (fragment23, rom 0x14F760..0x14F95A)
+   0x14F7C8..0x14F95A  fragments/23/fragment23_code jtbl_82A01950,jtbl_82A0196C  UNALIGNED -> widen to 0x14F7C0..0x14F960; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/24/fragment24_data.data.s  (fragment24, rom 0x158320..0x1587F4)
+   0x158470..0x158490  fragments/24/fragment24_14FE20 jtbl_82B08670  inside a .data subsegment (needs a trailing `rodata` split)
+   0x158490..0x1585C0  fragments/24/fragment24_150C10 jtbl_82B08698,jtbl_82B086AC,jtbl_82B086C4  inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/26/fragment26_data.data.s  (fragment26, rom 0x1648D0..0x165040)
+   0x164A80..0x165040  fragments/26/fragment26_162710 jtbl_810061D0,jtbl_810062F4,jtbl_81006410  inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/29/fragment29_data.data.s  (fragment29, rom 0x16BFE0..0x16C8E6)
+   0x16C0A0..0x16C800  fragments/29/fragment29_166060 jtbl_88006060,jtbl_88006078,jtbl_88006090  inside a .data subsegment (needs a trailing `rodata` split)
+   0x16C800..0x16C840  fragments/29/fragment29_168330 jtbl_880067C0,jtbl_880067E0  inside a .data subsegment (needs a trailing `rodata` split)
+   0x16C840..0x16C8A0  fragments/29/fragment29_16BBA0 jtbl_88006800  inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/31/fragment31_data.data.s  (fragment31, rom 0x1A6980..0x1A7C54)
+   0x1A6E00..0x1A6E60  fragments/31/fragment31_1736F0 jtbl_88233B80  inside a .data subsegment (needs a trailing `rodata` split)
+   0x1A6E60..0x1A7090  fragments/31/fragment31_175260 jtbl_88233C00,jtbl_88233C14,jtbl_88233D3C  inside a .data subsegment (needs a trailing `rodata` split)
+   0x1A7090..0x1A7120  fragments/31/fragment31_177430 jtbl_88233E1C,jtbl_88233E40,jtbl_88233E58  inside a .data subsegment (needs a trailing `rodata` split)
+   0x1A7120..0x1A71D0  fragments/31/fragment31_17B150 jtbl_88233ED8,jtbl_88233EF0,jtbl_88233F08  inside a .data subsegment (needs a trailing `rodata` split)
+   0x1A71E0..0x1A7200  fragments/31/fragment31_183700 jtbl_88233F64  inside a .data subsegment (needs a trailing `rodata` split)
+   0x1A7200..0x1A7350  fragments/31/fragment31_186690 jtbl_88233F90,jtbl_88233FA4,jtbl_88233FC0  inside a .data subsegment (needs a trailing `rodata` split)
+   0x1A7350..0x1A73D0  fragments/31/fragment31_18F6D0 jtbl_882340D0,jtbl_88234104  inside a .data subsegment (needs a trailing `rodata` split)
+   0x1A73D0..0x1A7410  fragments/31/fragment31_1900C0 jtbl_88234150,jtbl_88234170  inside a .data subsegment (needs a trailing `rodata` split)
+   0x1A7410..0x1A7590  fragments/31/fragment31_190BB0 jtbl_882341A0,jtbl_882341B8,jtbl_882341D0  inside a .data subsegment (needs a trailing `rodata` split)
+   0x1A7590..0x1A75C0  fragments/31/fragment31_194450 jtbl_88234310  inside a .data subsegment (needs a trailing `rodata` split)
+   0x1A75C0..0x1A7610  fragments/31/fragment31_194C30 jtbl_88234340,jtbl_88234360,jtbl_88234374  inside a .data subsegment (needs a trailing `rodata` split)
+   0x1A76A0..0x1A7780  fragments/31/fragment31_19DFC0 jtbl_88234470  inside a .data subsegment (needs a trailing `rodata` split)
+   0x1A7780..0x1A77B0  fragments/31/fragment31_19E800 jtbl_88234518  inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/32/fragment32_data.data.s  (fragment32, rom 0x1B9A50..0x1BA224)
+   0x1B9BA4..0x1B9C40  fragments/32/fragment32_1B1330 jtbl_88308908  UNALIGNED -> widen to 0x1B9BA0..0x1B9C40; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/34/fragment34_data.data.s  (fragment34, rom 0x1CA690..0x1CB97C)
+   0x1CA9C0..0x1CAA60  fragments/34/fragment34_1BD630 jtbl_8850D3B0,jtbl_8850D3D0,jtbl_8850D3F0  inside a .data subsegment (needs a trailing `rodata` split)
+   0x1CAA60..0x1CAA90  fragments/34/fragment34_1BE300 jtbl_8850D464  inside a .data subsegment (needs a trailing `rodata` split)
+   0x1CAA90..0x1CAB20  fragments/34/fragment34_1C1BC0 jtbl_8850D498,jtbl_8850D4AC,jtbl_8850D4C4  inside a .data subsegment (needs a trailing `rodata` split)
+   0x1CAB5C..0x1CAC80  fragments/34/fragment34_1C5AA0 jtbl_8850D54C,jtbl_8850D578,jtbl_8850D59C  UNALIGNED -> widen to 0x1CAB50..0x1CAC80; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/35/fragment35_data.data.s  (fragment35, rom 0x1CE100..0x1CE538)
+   0x1CE3E0..0x1CE450  fragments/35/fragment35_1CCC20 jtbl_886017E0  inside a .data subsegment (needs a trailing `rodata` split)
+   0x1CE450..0x1CE490  fragments/35/fragment35_1CCE70 jtbl_88601850,jtbl_8860186C  inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/36/fragment36_data.data.s  (fragment36, rom 0x1D04F0..0x1D07F4)
+   0x1D04F0..0x1D07F4  fragments/36/fragment36_code jtbl_88701DE0  UNALIGNED -> widen to 0x1D04F0..0x1D0800; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/37/fragment37_data.data.s  (fragment37, rom 0x1D4850..0x1D49BC)
+   0x1D4850..0x1D49B4  fragments/37/fragment37_code jtbl_88803FA4,jtbl_88804024,jtbl_88804038  UNALIGNED -> widen to 0x1D4850..0x1D49C0; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/38/fragment38_data.data.s  (fragment38, rom 0x1D9400..0x1D97AC)
+   0x1D9400..0x1D95D0  fragments/38/fragment38_1D5610 jtbl_88903E60,jtbl_88903E84,jtbl_88903EB4  inside a .data subsegment (needs a trailing `rodata` split)
+   0x1D95D0..0x1D9760  fragments/38/fragment38_1D8160 jtbl_88904008,jtbl_88904020,jtbl_8890403C  inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/40/fragment40_data.data.s  (fragment40, rom 0x1E19E0..0x1E2BC8)
+   0x1E1F40..0x1E2134  fragments/40/fragment40_1DC1F0 jtbl_88B05D78,jtbl_88B05E58  UNALIGNED -> widen to 0x1E1F40..0x1E2140; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/43/fragment43_data.data.s  (fragment43, rom 0x1ED590..0x1EE18C)
+   0x1ED840..0x1EDB90  fragments/43/fragment43_1E5A10 jtbl_8AC08128,jtbl_8AC08144  inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/44/fragment44_data.data.s  (fragment44, rom 0x214630..0x223A44)
+   0x2169D0..0x216BB0  fragments/44/fragment44_1EE290 jtbl_8AF28790,jtbl_8AF28820,jtbl_8AF288B0  inside a .data subsegment (needs a trailing `rodata` split)
+   0x216D00..0x217140  fragments/44/fragment44_1F1850 jtbl_8AF28D50,jtbl_8AF28D80,jtbl_8AF28E28  inside a .data subsegment (needs a trailing `rodata` split)
+   0x217300..0x217360  fragments/44/fragment44_1F5F20 jtbl_8AF29090,jtbl_8AF290A8,jtbl_8AF290CC  inside a .data subsegment (needs a trailing `rodata` split)
+   0x217360..0x2173D4  fragments/44/fragment44_1F6BF0 jtbl_8AF290F8  UNALIGNED -> widen to 0x217360..0x2173E0; inside a .data subsegment (needs a trailing `rodata` split)
+   0x2173D4..0x2174A0  fragments/44/fragment44_1F85B0 jtbl_8AF2916C,jtbl_8AF29184  UNALIGNED -> widen to 0x2173D0..0x2174A0; inside a .data subsegment (needs a trailing `rodata` split)
+   0x217750..0x217A20  fragments/44/fragment44_1FD260 jtbl_8AF29598,jtbl_8AF295B4,jtbl_8AF295D0  inside a .data subsegment (needs a trailing `rodata` split)
+   0x217A40..0x217B50  fragments/44/fragment44_2030B0 jtbl_8AF297D0  inside a .data subsegment (needs a trailing `rodata` split)
+   0x217D6C..0x217E20  fragments/44/fragment44_205C30 jtbl_8AF29AFC,jtbl_8AF29B34,jtbl_8AF29B7C  UNALIGNED -> widen to 0x217D60..0x217E20; inside a .data subsegment (needs a trailing `rodata` split)
+   0x2180C8..0x218230  fragments/44/fragment44_20A610 jtbl_8AF29E60,jtbl_8AF29E9C  UNALIGNED -> widen to 0x2180C0..0x218230; inside a .data subsegment (needs a trailing `rodata` split)
+   0x218230..0x218454  fragments/44/fragment44_20D3A0 jtbl_8AF29FC0,jtbl_8AF29FE8,jtbl_8AF2A0CC  UNALIGNED -> widen to 0x218230..0x218460; inside a .data subsegment (needs a trailing `rodata` split)
+   0x218454..0x2187D0  fragments/44/fragment44_20F140 jtbl_8AF2A3EC,jtbl_8AF2A414,jtbl_8AF2A440  UNALIGNED -> widen to 0x218450..0x2187D0; inside a .data subsegment (needs a trailing `rodata` split)
+   0x2187D0..0x218800  fragments/44/fragment44_212740 jtbl_8AF2A560  inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/45/fragment45_data.data.s  (fragment45, rom 0x2361E0..0x23C294)
+   0x236580..0x2369E8  fragments/45/fragment45_2251A0 jtbl_8AB11668,jtbl_8AB11698,jtbl_8AB116C8  UNALIGNED -> widen to 0x236580..0x2369F0; inside a .data subsegment (needs a trailing `rodata` split)
+   0x236AF0..0x236B80  fragments/45/fragment45_22AB80 jtbl_8AB11978,jtbl_8AB119BC  inside a .data subsegment (needs a trailing `rodata` split)
+   0x236B84..0x236C00  fragments/45/fragment45_22AB80 jtbl_8AB11A08,jtbl_8AB11A44  UNALIGNED -> widen to 0x236B80..0x236C00; inside a .data subsegment (needs a trailing `rodata` split)
+   0x236C04..0x236D40  fragments/45/fragment45_22FAD0 jtbl_8AB11A84,jtbl_8AB11AC0,jtbl_8AB11AFC  UNALIGNED -> widen to 0x236C00..0x236D40; inside a .data subsegment (needs a trailing `rodata` split)
+   0x236DAC..0x236E10  fragments/45/fragment45_2324B0 jtbl_8AB11C2C,jtbl_8AB11C5C  UNALIGNED -> widen to 0x236DA0..0x236E10; inside a .data subsegment (needs a trailing `rodata` split)
+   0x236E14..0x236E80  fragments/45/fragment45_2348E0 jtbl_8AB11C94,jtbl_8AB11CC8  UNALIGNED -> widen to 0x236E10..0x236E80; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/46/fragment46_data.data.s  (fragment46, rom 0x242AA0..0x246448)
+   0x243980..0x246448  fragments/46/fragment46_code jtbl_8AE08414,jtbl_8AE08434,jtbl_8AE08454  UNALIGNED -> widen to 0x243980..0x246450; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/47/fragment47_data.data.s  (fragment47, rom 0x253770..0x254734)
+   0x253AF0..0x253D40  fragments/47/fragment47_246640 jtbl_8600D6A8,jtbl_8600D6D8  inside a .data subsegment (needs a trailing `rodata` split)
+   0x253D40..0x253F70  fragments/47/fragment47_24AE60 jtbl_8600D8D8,jtbl_8600D8F4,jtbl_8600D910  inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/49/fragment49_data.data.s  (fragment49, rom 0x264710..0x26539C)
+   0x264FE0..0x26539C  fragments/49/fragment49_code jtbl_8610ABEC,jtbl_8610ACC0  UNALIGNED -> widen to 0x264FE0..0x2653A0; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/50/fragment50_data.data.s  (fragment50, rom 0x26EA70..0x274BE4)
+   0x2749A0..0x274B40  fragments/50/fragment50_266A60 jtbl_8620E0D4  inside a .data subsegment (needs a trailing `rodata` split)
+   0x274B40..0x274B70  fragments/50/fragment50_26BF40 jtbl_8620E104  inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/51/fragment51_data.data.s  (fragment51, rom 0x27CCC0..0x27D404)
+   0x27D2B0..0x27D330  fragments/51/fragment51_275E40 jtbl_863074EC  inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/52/fragment52_data.data.s  (fragment52, rom 0x287A90..0x28817C)
+   0x287D80..0x288070  fragments/52/fragment52_27E4E0 jtbl_864099FC,jtbl_86409AD0,jtbl_86409B00  inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/53/fragment53_data.data.s  (fragment53, rom 0x293A90..0x2997CC)
+   0x296358..0x2997CC  fragments/53/fragment53_code jtbl_8650D680,jtbl_8650D70C,jtbl_8650D72C  UNALIGNED -> widen to 0x296350..0x2997D0; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/54/fragment54_data.data.s  (fragment54, rom 0x29FE40..0x2A1B44)
+   0x29FF20..0x2A1B44  fragments/54/fragment54_code jtbl_86607024,jtbl_86607038,jtbl_8660704C  UNALIGNED -> widen to 0x29FF20..0x2A1B50; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/55/fragment55_data.data.s  (fragment55, rom 0x2AD040..0x2B0ABC)
+   0x2ADB40..0x2B0ABC  fragments/55/fragment55_code jtbl_8670C344,jtbl_8670C3A4,jtbl_8670C3D4  UNALIGNED -> widen to 0x2ADB40..0x2B0AC0; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/56/fragment56_data.data.s  (fragment56, rom 0x2B8A00..0x2BA74C)
+   0x2B8FB4..0x2BA74C  fragments/56/fragment56_code jtbl_868081C4,jtbl_86808234,jtbl_86808268  UNALIGNED -> widen to 0x2B8FB0..0x2BA750; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/57/fragment57_data.data.s  (fragment57, rom 0x2C3F90..0x2C652A)
+   0x2C3F90..0x2C652A  fragments/57/fragment57_code jtbl_833094E0,jtbl_83309600,jtbl_83309654  UNALIGNED -> widen to 0x2C3F90..0x2C6530; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/58/fragment58_data.data.s  (fragment58, rom 0x2CBB90..0x2CCD14)
+   0x2CBB90..0x2CCD14  fragments/58/fragment58_code jtbl_83404088,jtbl_834040B0,jtbl_834040E8  UNALIGNED -> widen to 0x2CBB90..0x2CCD20; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/59/fragment59_data.data.s  (fragment59, rom 0x2DB460..0x2DE814)
+   0x2DB7E8..0x2DE814  fragments/59/fragment59_code jtbl_8690EFFC,jtbl_8690F034,jtbl_8690F04C  UNALIGNED -> widen to 0x2DB7E0..0x2DE820; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/60/fragment60_data.data.s  (fragment60, rom 0x2EE550..0x2F222C)
+   0x2EE550..0x2F222C  fragments/60/fragment60_code jtbl_86A0F3D0,jtbl_86A0F3F4,jtbl_86A0F41C  UNALIGNED -> widen to 0x2EE550..0x2F2230; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/61/fragment61_data.data.s  (fragment61, rom 0x3000B0..0x301DCC)
+   0x3000B0..0x301DCC  fragments/61/fragment61_code jtbl_86B0DC38,jtbl_86B0DC84,jtbl_86B0DCBC  UNALIGNED -> widen to 0x3000B0..0x301DD0; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/63/fragment63_data.data.s  (fragment63, rom 0x31CFE0..0x322604)
+   0x31EDF0..0x31EE70  fragments/63/fragment63_303990 jtbl_87E1B480,jtbl_87E1B49C,jtbl_87E1B4B8  inside a .data subsegment (needs a trailing `rodata` split)
+   0x31EE70..0x31EED0  fragments/63/fragment63_306150 jtbl_87E1B528  inside a .data subsegment (needs a trailing `rodata` split)
+   0x31EEF0..0x31F000  fragments/63/fragment63_30B540 jtbl_87E1B580,jtbl_87E1B59C,jtbl_87E1B5BC  inside a .data subsegment (needs a trailing `rodata` split)
+   0x31F020..0x31F050  fragments/63/fragment63_310270 jtbl_87E1B6C0  inside a .data subsegment (needs a trailing `rodata` split)
+   0x31F050..0x31F150  fragments/63/fragment63_312AE0 jtbl_87E1B6E8,jtbl_87E1B6FC  inside a .data subsegment (needs a trailing `rodata` split)
+   0x31F150..0x31F1D0  fragments/63/fragment63_315A90 jtbl_87E1B7E0,jtbl_87E1B804  inside a .data subsegment (needs a trailing `rodata` split)
+   0x31F1D0..0x31F2F0  fragments/63/fragment63_317060 jtbl_87E1B864,jtbl_87E1B88C,jtbl_87E1B8A8  inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/64/fragment64_data.data.s  (fragment64, rom 0x3321A0..0x334674)
+   0x334100..0x3341B0  fragments/64/fragment64_326ED0 jtbl_87F114D4,jtbl_87F114FC  inside a .data subsegment (needs a trailing `rodata` split)
+   0x3341B0..0x334310  fragments/64/fragment64_3290A0 jtbl_87F11548,jtbl_87F11584,jtbl_87F115DC  inside a .data subsegment (needs a trailing `rodata` split)
+   0x334310..0x334340  fragments/64/fragment64_32C420 jtbl_87F116A8  inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/66/fragment66_data.data.s  (fragment66, rom 0x33B4A0..0x33C75C)
+   0x33B4A0..0x33C75C  fragments/66/fragment66_code jtbl_82E055B4,jtbl_82E055F0,jtbl_82E0561C  UNALIGNED -> widen to 0x33B4A0..0x33C760; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/67/fragment67_data.data.s  (fragment67, rom 0x34E600..0x357958)
+   0x353EB0..0x353EE0  fragments/67/fragment67_33CB20 jtbl_829173B0  inside a .data subsegment (needs a trailing `rodata` split)
+   0x353EE0..0x353F30  fragments/67/fragment67_33D6A0 jtbl_829173E0,jtbl_829173FC,jtbl_82917410  inside a .data subsegment (needs a trailing `rodata` split)
+   0x353F30..0x353FD0  fragments/67/fragment67_33FAE0 jtbl_8291744C,jtbl_82917498  inside a .data subsegment (needs a trailing `rodata` split)
+   0x354000..0x354230  fragments/67/fragment67_344D70 jtbl_82917518,jtbl_82917590,jtbl_829175F4  inside a .data subsegment (needs a trailing `rodata` split)
+   0x354240..0x3542C0  fragments/67/fragment67_34B0F0 jtbl_82917748,jtbl_82917760,jtbl_82917778  inside a .data subsegment (needs a trailing `rodata` split)
+   0x3542C0..0x3542F0  fragments/67/fragment67_34C8B0 jtbl_829177CC  inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/69/fragment69_data.data.s  (fragment69, rom 0x35C130..0x35D554)
+   0x35C4E0..0x35D554  fragments/69/fragment69_code jtbl_8F104014,jtbl_8F10404C,jtbl_8F10407C  UNALIGNED -> widen to 0x35C4E0..0x35D560; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/71/fragment71_data.data.s  (fragment71, rom 0x35F710..0x35F87C)
+   0x35F73C..0x35F87C  fragments/71/fragment71_code jtbl_8F300EB0,jtbl_8F300EE8  UNALIGNED -> widen to 0x35F730..0x35F880; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/72/fragment72_data.data.s  (fragment72, rom 0x361CC0..0x361D9A)
+   0x361CC0..0x361D9A  fragments/72/fragment72_code jtbl_8F402084,jtbl_8F4020A4  UNALIGNED -> widen to 0x361CC0..0x361DA0; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/75/fragment75_data.data.s  (fragment75, rom 0x365E50..0x3665A4)
+   0x365E50..0x3665A4  fragments/75/fragment75_code jtbl_8FA01D10  UNALIGNED -> widen to 0x365E50..0x3665B0; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/76/fragment76_data.data.s  (fragment76, rom 0x367B40..0x368BB0)
+   0x367B40..0x368B5C  fragments/76/fragment76_code jtbl_8F7022E8,jtbl_8F702308,jtbl_8F702324  UNALIGNED -> widen to 0x367B40..0x368B60; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/77/fragment77_data.data.s  (fragment77, rom 0x36C530..0x36D5B0)
+   0x36C530..0x36D5B0  fragments/77/fragment77_code jtbl_8F803994,jtbl_8F803A1C,jtbl_8F803A3C  inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/78/fragment78_data.data.s  (fragment78, rom 0x36F2C0..0x36F3C4)
+   0x36F2C0..0x36F3C4  fragments/78/fragment78_code jtbl_8F9015D8  UNALIGNED -> widen to 0x36F2C0..0x36F3D0; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/79/fragment79_data.data.s  (fragment79, rom 0x3D9A00..0x414658)
+   0x3F83E0..0x3F8480  fragments/79/fragment79_36F8B0 jtbl_84188B64,jtbl_84188BB0,jtbl_84188BD4  inside a .data subsegment (needs a trailing `rodata` split)
+   0x3F84C0..0x3F84E0  fragments/79/fragment79_3749B0 jtbl_84188C30  inside a .data subsegment (needs a trailing `rodata` split)
+   0x3F84E0..0x3F8530  fragments/79/fragment79_375530 jtbl_84188C50,jtbl_84188C7C  inside a .data subsegment (needs a trailing `rodata` split)
+   0x3F8530..0x3F86B0  fragments/79/fragment79_377570 jtbl_84188CA0,jtbl_84188D08,jtbl_84188D74  inside a .data subsegment (needs a trailing `rodata` split)
+   0x3F86C0..0x3F8CE0  fragments/79/fragment79_37A6E0 jtbl_84188FA0,jtbl_84188FC0,jtbl_84188FF0  inside a .data subsegment (needs a trailing `rodata` split)
+   0x3F8CE0..0x3F90B0  fragments/79/fragment79_38D510 jtbl_84189450,jtbl_84189510,jtbl_841895D0  inside a .data subsegment (needs a trailing `rodata` split)
+   0x3F9310..0x3FA624  fragments/79/fragment79_38EFE0 jtbl_84189A80,jtbl_84189D40,jtbl_84189DA0  UNALIGNED -> widen to 0x3F9310..0x3FA630; inside a .data subsegment (needs a trailing `rodata` split)
+   0x3FA624..0x3FAA50  fragments/79/fragment79_393CA0 jtbl_8418AD94,jtbl_8418ADAC,jtbl_8418ADCC  UNALIGNED -> widen to 0x3FA620..0x3FAA50; inside a .data subsegment (needs a trailing `rodata` split)
+   0x3FAA50..0x3FB098  fragments/79/fragment79_3ADCA0 jtbl_8418B1D0,jtbl_8418B244,jtbl_8418B2B8  UNALIGNED -> widen to 0x3FAA50..0x3FB0A0; inside a .data subsegment (needs a trailing `rodata` split)
+   0x3FB098..0x3FB2A0  fragments/79/fragment79_3B7EA0 jtbl_8418B820,jtbl_8418B8B4  UNALIGNED -> widen to 0x3FB090..0x3FB2A0; inside a .data subsegment (needs a trailing `rodata` split)
+   0x3FB2B0..0x3FB760  fragments/79/fragment79_3BC290 jtbl_8418BA20,jtbl_8418BC90,jtbl_8418BD08  inside a .data subsegment (needs a trailing `rodata` split)
+   0x3FB760..0x3FB9D0  fragments/79/fragment79_3BEAF0 jtbl_8418BED0  inside a .data subsegment (needs a trailing `rodata` split)
+   0x3FB9D0..0x3FBCA0  fragments/79/fragment79_3BF4C0 jtbl_8418C170,jtbl_8418C184,jtbl_8418C198  inside a .data subsegment (needs a trailing `rodata` split)
+   0x3FBCA0..0x3FBDC0  fragments/79/fragment79_3C50B0 jtbl_8418C410,jtbl_8418C4A0  inside a .data subsegment (needs a trailing `rodata` split)
+   0x3FBEB0..0x3FBFD0  fragments/79/fragment79_3CB430 jtbl_8418C698,jtbl_8418C6C0,jtbl_8418C710  inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/80/fragment80_data.data.s  (fragment80, rom 0x41C940..0x41CFE0)
+   0x41C9A0..0x41CC78  fragments/80/fragment80_4194A0 jtbl_84203520  UNALIGNED -> widen to 0x41C9A0..0x41CC80; inside a .data subsegment (needs a trailing `rodata` split)
+   0x41CC78..0x41CE2C  fragments/80/fragment80_41A5F0 jtbl_842037F8  UNALIGNED -> widen to 0x41CC70..0x41CE30; inside a .data subsegment (needs a trailing `rodata` split)
+   0x41CE2C..0x41CFE0  fragments/80/fragment80_41AC50 jtbl_842039AC  UNALIGNED -> widen to 0x41CE20..0x41CFE0; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/81/fragment81_data.data.s  (fragment81, rom 0x41F9D0..0x42085C)
+   0x420194..0x42085C  fragments/81/fragment81_code jtbl_84302B3C,jtbl_84302C04  UNALIGNED -> widen to 0x420190..0x420860; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/82/fragment82_data.data.s  (fragment82, rom 0x427E00..0x4283BC)
+   0x428110..0x428190  fragments/82/fragment82_420EA0 jtbl_82D07290,jtbl_82D072AC,jtbl_82D072C4  inside a .data subsegment (needs a trailing `rodata` split)
+   0x428190..0x4282A0  fragments/82/fragment82_4238F0 jtbl_82D07330,jtbl_82D07354,jtbl_82D07378  inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/83/fragment83_data.data.s  (fragment83, rom 0x42E150..0x42E4E0)
+   0x42E150..0x42E4E0  fragments/83/fragment83_code jtbl_82C04A20,jtbl_82C04A44,jtbl_82C04A60  inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/84/fragment84_data.data.s  (fragment84, rom 0x431590..0x4319C9)
+   0x431598..0x4319C9  fragments/84/fragment84_code jtbl_8FC027DC,jtbl_8FC027F8,jtbl_8FC02814  UNALIGNED -> widen to 0x431590..0x4319D0; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/85/fragment85_data.data.s  (fragment85, rom 0x434040..0x43436C)
+   0x434078..0x43436C  fragments/85/fragment85_code jtbl_8FD02124,jtbl_8FD02138,jtbl_8FD0214C  UNALIGNED -> widen to 0x434070..0x434370; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/86/fragment86_data.data.s  (fragment86, rom 0x435140..0x43585C)
+   0x435248..0x43585C  fragments/86/fragment86_code jtbl_84400C48,jtbl_84400CC0  UNALIGNED -> widen to 0x435240..0x435860; inside a .data subsegment (needs a trailing `rodata` split)
+
+== disasm/asm/us/data/fragments/87/fragment87_data.data.s  (fragment87, rom 0x436A20..0x436B24)
+   0x436A20..0x436B24  fragments/87/fragment87_code jtbl_81B010B0  UNALIGNED -> widen to 0x436A20..0x436B30; inside a .data subsegment (needs a trailing `rodata` split)
+
+182 jump-table runs, 150 need manual attention
