@@ -7,8 +7,8 @@ Enable the tracked hook once per checkout with
 `git config core.hooksPath .githooks`.
 
 <!-- AUTO_COVERAGE:START -->
-- US functions with C implementations: **3,119 / 10,532 (29.6%)**
-- Remaining `GLOBAL_ASM` owners: **7,413**
+- US functions with C implementations: **3,120 / 10,532 (29.6%)**
+- Remaining `GLOBAL_ASM` owners: **7,412**
 - Baseline: `f477acf` (vendored US pragma snapshot)
 <!-- AUTO_COVERAGE:END -->
 
