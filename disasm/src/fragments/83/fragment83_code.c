@@ -78,11 +78,21 @@ void func_82C003F8(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C009F8.s")
+extern void func_82C00624(s16, s16, u16, u16);
+extern void func_82C00804(s16, s16, s32, s32);
+void func_82C009F8(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
+    func_82C00804((s16) (arg0 + 3), (s16) (arg1 + 3), (arg2 - 6) & 0xFFFF, (arg3 - 6) & 0xFFFF);
+    func_82C00624(arg0, arg1, arg2, arg3);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C00A70.s")
+extern void func_82C00624(s16, s16, u16, u16);
+extern void func_82C008BC(s16, s16, s32, s32);
+void func_82C00A70(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
+    func_82C008BC((s16) (arg0 + 3), (s16) (arg1 + 3), (arg2 - 5) & 0xFFFF, (arg3 - 6) & 0xFFFF);
+    func_82C00624(arg0, arg1, arg2, arg3);
+}
 #endif
 
 #ifdef VERSION_US
@@ -217,11 +227,41 @@ void func_82C02B30(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C033E4.s")
+extern void func_82C02A44();
+extern void func_82C0329C();
+extern u8 D_82C04C39;
+void func_82C033E4(void) {
+    switch (D_82C04C39) {                           /* irregular */
+    case 1:
+        func_82C02A44();
+        return;
+    case 3:
+        func_82C02B30();
+        return;
+    case 6:
+        func_82C0329C();
+        return;
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C03450.s")
+extern void *D_80087200;
+extern u8 D_82C04A10;
+extern u16 D_82C04C30;
+extern u16 D_82C04C34;
+void func_82C03450(void) {
+    func_80064D28();
+    if (D_82C04A10 != 0) {
+        D_82C04C30 = (*(u16 *)((u8 *)(D_80087200) + (6)));
+        D_82C04C32 = (*(u16 *)((u8 *)(D_80087200) + (8)));
+        D_82C04C34 = (*(u16 *)((u8 *)(D_80087200) + (0xC)));
+        return;
+    }
+    D_82C04C30 = 0;
+    D_82C04C32 = 0;
+    D_82C04C34 = 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -311,7 +351,17 @@ s32 func_82C03EE0(s8 *arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C041CC.s")
+s32 func_82C041CC(s32 arg0, s32 arg1, s32 arg2) {
+    s32 var_v1;
+
+    var_v1 = 0;
+    if ((arg1 & 0xFF00) == 0x100) {
+        func_8000B580(arg0 + 4, func_8004C874(0x15, 0x1B));
+        func_8000B580(arg0 + 0x54, func_8004C874(0x15, 0x39));
+        var_v1 = 1;
+    }
+    return var_v1;
+}
 #endif
 
 #ifdef VERSION_US
