@@ -175,7 +175,25 @@ void func_86404D48(u8 *arg0, u8 *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/52/fragment52_27E4E0/func_86405778.s")
+extern void func_86404D8C();
+extern void func_8640533C();
+extern void func_864055CC();
+void func_86405778(void) {
+    s32 temp_v0;
+
+    temp_v0 = (*(s32 *)((u8 *)(D_86416C00) + (0x10)));
+    switch (temp_v0) {                              /* irregular */
+    case 3:
+        func_864055CC();
+        return;
+    case 4:
+        func_86404D8C();
+        return;
+    default:
+        func_8640533C();
+        return;
+    }
+}
 #endif
 
 #ifdef VERSION_US

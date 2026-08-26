@@ -105,7 +105,14 @@ s32 func_82404360(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82404378.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_824043D8.s")
+s32 func_824043D8(void *arg0) {
+    (*(f32 *)((u8 *)(arg0) + (0x1C))) = (f32) ((*(f32 *)((u8 *)(arg0) + (0x1C))) - func_82403F10());
+    if ((*(f32 *)((u8 *)(arg0) + (0x1C))) <= 0.0f) {
+        (*(f32 *)((u8 *)(arg0) + (0x1C))) = 0.0f;
+        (*(s8 *)((u8 *)(arg0) + (0x21))) = 4;
+    }
+    return 0;
+}
 
 s32 func_82404430(u8 *arg0) {
     *(f32 *)(arg0 + 0x1C) = 0.0f;
@@ -170,7 +177,24 @@ void func_82404DD8(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82404E50.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82404F64.s")
+extern u8 D_82407DE8;
+extern u8 D_82407DF0;
+extern u8 D_82408160;
+extern u8 D_82408168;
+void func_82404F64(void *arg0) {
+    (*(u8 *)((u8 *)(&D_82408160) + (0))) = (u8) (*(u8 *)((u8 *)(arg0) + (0x47)));
+    (*(u8 *)((u8 *)(&D_82408160) + (1))) = (u8) (*(u8 *)((u8 *)(arg0) + (0x48)));
+    (*(u8 *)((u8 *)(&D_82408160) + (2))) = (u8) (*(u8 *)((u8 *)(arg0) + (0x49)));
+    (*(u8 *)((u8 *)(&D_82408168) + (0))) = (u8) (*(u8 *)((u8 *)(arg0) + (0x4A)));
+    (*(u8 *)((u8 *)(&D_82408168) + (1))) = (u8) (*(u8 *)((u8 *)(arg0) + (0x4B)));
+    (*(u8 *)((u8 *)(&D_82408168) + (2))) = (u8) (*(u8 *)((u8 *)(arg0) + (0x4C)));
+    (*(u8 *)((u8 *)(&D_82407DE8) + (0))) = (u8) (*(u8 *)((u8 *)(arg0) + (0x4D)));
+    (*(u8 *)((u8 *)(&D_82407DE8) + (1))) = (u8) (*(u8 *)((u8 *)(arg0) + (0x4E)));
+    (*(u8 *)((u8 *)(&D_82407DE8) + (2))) = (u8) (*(u8 *)((u8 *)(arg0) + (0x4F)));
+    (*(u8 *)((u8 *)(&D_82407DF0) + (0))) = (u8) (*(u8 *)((u8 *)(arg0) + (0x50)));
+    (*(u8 *)((u8 *)(&D_82407DF0) + (1))) = (u8) (*(u8 *)((u8 *)(arg0) + (0x51)));
+    (*(u8 *)((u8 *)(&D_82407DF0) + (2))) = (u8) (*(u8 *)((u8 *)(arg0) + (0x52)));
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82404FE8.s")
 

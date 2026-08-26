@@ -77,7 +77,30 @@ void func_8AF00760_padding(void) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1EE290/func_8AF00B74.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1EE290/func_8AF00D90.s")
+s16 func_8AF00B74();
+extern s16 D_8AF2BA6C;
+extern s32 D_8AF2BDD0;
+extern s16 D_8AF2BDD4;
+extern s32 D_8AF2BE78;
+extern s16 D_8AF2BE7C;
+void func_8AF00D90(void) {
+    s16 temp_v0;
+
+    temp_v0 = func_8AF00B74();
+    if (temp_v0 != D_8AF2BA6C) {
+        D_8AF2BDD0 = 1;
+        D_8AF2BDD4 = 4;
+        D_8AF2BE78 = 1;
+        D_8AF2BE7C = temp_v0;
+        return;
+    }
+    if (D_8AF2BDD0 != 0) {
+        D_8AF2BDD4 -= 1;
+        if (D_8AF2BDD4 < 0) {
+            D_8AF2BDD0 = 0;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1EE290/func_8AF00E24.s")
 
