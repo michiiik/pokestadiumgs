@@ -1735,6 +1735,35 @@ class SweepTests(unittest.TestCase):
         self.assertIsNone(sweep_targets.padding_retry({**clean, "expected_tail_kind": "normal_return"}))
         self.assertIsNone(sweep_targets.padding_retry({**clean, "mismatch_kind": "instruction_drift"}))
 
+    def test_duplicate_tail_retry_uses_empty_helpers_per_eight_bytes(self) -> None:
+        clean = {
+            "mismatch_kind": "symbol_size_drift", "diff_offsets": [],
+            "expected_size": 80, "actual_size": 56,
+            "expected_tail_kind": "duplicate_jr_nop_tail",
+        }
+        self.assertEqual(sweep_targets.duplicate_tail_helper_count(clean), 3)
+        code = sweep_targets.append_duplicate_tail_helpers(
+            "func_test", "void func_test(void) {}", 3
+        )
+        self.assertEqual(
+            code,
+            "void func_test(void) {}\n"
+            "void func_test_padding(void) {}\n"
+            "void func_test_padding2(void) {}\n"
+            "void func_test_padding3(void) {}\n",
+        )
+        self.assertIsNone(
+            sweep_targets.duplicate_tail_helper_count({**clean, "diff_offsets": [8]})
+        )
+        self.assertIsNone(
+            sweep_targets.duplicate_tail_helper_count(
+                {**clean, "expected_tail_kind": "jr_nop_plus_alignment"}
+            )
+        )
+        self.assertIsNone(
+            sweep_targets.duplicate_tail_helper_count({**clean, "expected_size": 78})
+        )
+
     def test_fragment_range_and_compile_failure_variant_selection(self) -> None:
         self.assertEqual(sweep_targets.parse_fragment_range("17-32"), (17, 32))
         with self.assertRaises(ValueError):

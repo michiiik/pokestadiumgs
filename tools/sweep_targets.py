@@ -684,6 +684,40 @@ def padding_retry(attempt: dict[str, object]) -> int | None:
     return padding if padding % 4 == 0 else None
 
 
+def duplicate_tail_helper_count(attempt: dict[str, object]) -> int | None:
+    """Return the number of empty helpers needed for a duplicate return tail.
+
+    A duplicate ``jr $ra``/delay-slot pair is emitted as a real neighboring
+    function by IDO, not as ``C_FUNCTION_PADDING``.  The runner can therefore
+    safely retry a clean prefix match by appending one empty helper for every
+    missing eight-byte pair.  This remains a candidate until the MCP probes
+    and gates it, just like the alignment-padding retry above.
+    """
+    if (
+        attempt.get("mismatch_kind") != "symbol_size_drift"
+        or attempt.get("diff_offsets")
+        or attempt.get("expected_tail_kind") != "duplicate_jr_nop_tail"
+    ):
+        return None
+    expected = attempt.get("expected_size")
+    actual = attempt.get("actual_size")
+    if not isinstance(expected, int) or not isinstance(actual, int) or expected <= actual:
+        return None
+    missing = expected - actual
+    if missing % 8:
+        return None
+    return missing // 8
+
+
+def append_duplicate_tail_helpers(function: str, code: str, count: int) -> str:
+    """Append ``count`` uniquely named empty helpers to a candidate body."""
+    helpers = []
+    for index in range(count):
+        suffix = "_padding" if index == 0 else f"_padding{index + 1}"
+        helpers.append(f"void {function}{suffix}(void) {{}}")
+    return code.rstrip() + "\n" + "\n".join(helpers) + "\n"
+
+
 FUNCPTR_PROTOTYPE_RE = re.compile(r"\(\*\s*(\w+)\s*\([^)]*\)\)\s*\(([^)]*)\)\s*;")
 
 
@@ -1580,6 +1614,7 @@ def sweep(
         for attempt in probe["attempts"]:
             index = int(attempt["index"])
             padding = padding_retry(attempt)
+            duplicate_helpers = duplicate_tail_helper_count(attempt)
             if attempt.get("status") == "probe_match":
                 gate_blocks.append(blocks[index])
                 gate_labels.append(labels[index])
@@ -1587,6 +1622,12 @@ def sweep(
                 function, code = blocks[index]
                 gate_blocks.append((function, code.rstrip() + f"\n#pragma C_FUNCTION_PADDING({padding})\n"))
                 gate_labels.append(labels[index] + "+padding")
+            elif duplicate_helpers:
+                function, code = blocks[index]
+                gate_blocks.append(
+                    (function, append_duplicate_tail_helpers(function, code, duplicate_helpers))
+                )
+                gate_labels.append(labels[index] + f"+duplicate-tail-{duplicate_helpers}")
         result = probe
         if gate_blocks:
             # m2c puts an extern block in every draft.  Different owners may

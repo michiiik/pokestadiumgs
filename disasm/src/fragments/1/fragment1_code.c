@@ -10,7 +10,33 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/1/fragment1_code/func_83500200.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/1/fragment1_code/func_8350026C.s")
+s32 func_80040E80(s32, s32 *);
+extern void func_80041E2C();
+extern u8 D_83503BEC;
+extern u8 D_83503C24;
+extern u8 D_83503F30;
+extern s32 D_83503F54;
+extern s32 D_83503F6C;
+extern u8 D_83503F70;
+extern s32 func_800030D0(s32, s32);
+s32 func_80002B24(void);
+extern void func_80003120(s32);
+void func_8003EFE0(void);
+void func_87F02CB0(s32 arg0, s32 arg1);
+void func_8003F018(s32 arg0);
+void func_8350026C(void) {
+    s32 sp1C[3];
+    s32 temp_v0;
+    temp_v0 = func_800030D0(func_80002B24(), 0);
+    sp1C[0] = temp_v0;
+    D_83503F54 = func_80040E80(temp_v0, &D_83503C24);
+    D_83503F6C = func_80040E80(sp1C[0], &D_83503BEC);
+    func_80003120(sp1C[0]);
+    func_8003EFE0();
+    func_80041E2C();
+    func_87F02CB0((s32) &D_83503F30, 0x64);
+    func_8003F018((s32) &D_83503F70);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/1/fragment1_code/func_83500300.s")
 
