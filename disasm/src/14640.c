@@ -73,7 +73,22 @@ void func_80014C28(s32 arg0, s32 arg1) { func_80014C48(arg0, arg1, 1); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_8001510C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80015148.s")
+s32 func_80011250(s32, s32, s32);
+s32 func_8001244C();
+s32 func_80015148(s32 arg0, s32 arg1) {
+    s32 temp_v0;
+    s32 temp_v0_2;
+
+    temp_v0_2 = func_8001244C();
+    if (temp_v0_2 != 0) {
+        return temp_v0_2;
+    }
+    temp_v0 = func_80011250(arg0, 2, arg1);
+    if (temp_v0 != 0) {
+        return temp_v0;
+    }
+    return 0;
+}
 
 extern s32 D_8011EA50;
 extern s32 D_8011EA54;
@@ -217,7 +232,17 @@ void func_80018810(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_8001895C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80018A10.s")
+extern OSMesgQueue D_8011DFC0;
+u32 func_80018A10(s32 *arg0) {
+    void *sp1C;
+
+    if (osRecvMesg(&D_8011DFC0, &sp1C, 0) == -1) {
+        *arg0 = 0;
+        return 0U;
+    }
+    *arg0 = (s32) sp1C & 0xFFFFFF;
+    return (u32) sp1C >> 0x18;
+}
 
 void func_80018A74(void) { func_8001480C(); }
 
