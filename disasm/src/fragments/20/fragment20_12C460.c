@@ -38,7 +38,24 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_826057A8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_826058CC.s")
+s32 func_826058CC(s32 arg0) {
+    s32 result;
+
+    switch (arg0) {
+    case 0:
+    case 4:
+        result = 0;
+        break;
+    case 1:
+    case 3:
+        result = 1;
+        break;
+    default:
+        result = -1;
+        break;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82605908.s")
 
