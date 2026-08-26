@@ -16,7 +16,16 @@ void func_88300020(s32 arg0, s32 arg1) { func_8004300C(arg0); func_88600020(arg1
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/32/fragment32_1B1330/func_88300230.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/32/fragment32_1B1330/func_883002B8.s")
+s32 func_8004C4B0(s32 value);
+extern void func_8004C8C0();
+void func_883002B8(void) {
+    func_8004C4B0(1);
+    func_8004C4B0(2);
+    func_8004C4B0(3);
+    func_8004C4B0((s32) D_88308934);
+    func_8004C8C0(0x14C);
+    func_88004FF0(0x3B);
+}
 
 extern void func_8004C8C0();
 void func_88300304(void) { func_8004C8C0(155); func_8004C8C0(265); }

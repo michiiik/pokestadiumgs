@@ -137,7 +137,15 @@ void func_82504D94(void *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_144790/func_825064A4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_144790/func_8250684C.s")
+extern void _bzero(s16 *, s32);
+extern void func_8004C8C0(s32);
+extern s16 D_82508FF0;
+void func_8250684C(void) {
+    func_8004C8C0(0x4B);
+    func_8004C8C0(0x85);
+    _bzero(&D_82508FF0, 0x68C);
+    D_82508FF0 = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_144790/func_82506888.s")
 
