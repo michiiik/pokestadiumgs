@@ -20,7 +20,15 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15A060/func_82100AEC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15A060/func_82100B2C.s")
+extern u8 *D_8210418C;
+s32 func_82100B2C(s32 a, void *p) {
+    if (a == 1 && *(u8 *)p == 4) {
+        *(s16 *)((u8 *)p + 0x30) = 0x1c;
+        *(s16 *)((u8 *)p + 0x32) =
+            *(s32 *)((u8 *)*(void **)((u8 *)*(void **)((u8 *)D_8210418C + 4) + 8) + 0x10);
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15A060/func_82100B6C.s")
 
