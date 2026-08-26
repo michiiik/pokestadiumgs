@@ -95,7 +95,14 @@ void func_8FC00F34(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/84/fragment84_code/func_8FC00F88.s")
+s32 func_8FC00F48(u32 *, s32);
+extern u8 D_8FC0C766;
+extern u32 D_8FC0C2D8;
+void func_8FC00F88(void) {
+    (*(s8 *)((u8 *)(&D_8FC0C2D8) + (0x48C))) = 0x50;
+    (*(s8 *)((u8 *)(&D_8FC0C2D8) + (0x48D))) = 0x33;
+    func_8FC00F34(&D_8FC0C766, func_8FC00F48(&D_8FC0C2D8, 0x48C) & 0xFFFF);
+}
 #endif
 
 #ifdef VERSION_US
@@ -211,7 +218,23 @@ void func_8FC01FBC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/84/fragment84_code/func_8FC02168.s")
+extern void func_8FC01E28();
+extern void func_8FC01E9C();
+extern void func_8FC02074();
+extern u8 D_8FC02830;
+void func_8FC02168(void) {
+    switch (D_8FC02830) {                           /* irregular */
+    case 0:
+        func_8FC02074();
+        return;
+    case 2:
+        func_8FC01E28();
+        return;
+    case 1:
+        func_8FC01E9C();
+        return;
+    }
+}
 #endif
 
 #ifdef VERSION_US

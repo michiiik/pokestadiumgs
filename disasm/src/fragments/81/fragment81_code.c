@@ -36,7 +36,19 @@ u8 func_84300348(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_84300858.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_843008B0.s")
+s32 func_800630F0(s32);
+extern s32 D_84302C98;
+u8 func_8006397C(u8 arg0);
+u8 func_800639C0(u8 arg0);
+s32 func_843008B0(u8 arg0) {
+    s32 var_v1;
+
+    var_v1 = ((1 << func_800630F0(func_8006397C(arg0) & 0xFF)) & D_84302C98) != 0;
+    if (var_v1 == 0) {
+        var_v1 = ((1 << func_800630F0(func_800639C0(arg0) & 0xFF)) & D_84302C98) != 0;
+    }
+    return var_v1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_84300928.s")
 
