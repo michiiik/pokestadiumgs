@@ -34,7 +34,13 @@ f32 func_818006B4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AE600/func_81800D70.s")
+s32 func_8004C990(s32, s32);
+extern void func_8004D1FC(s32);
+extern void func_81800020(f32, f32, s32, s32, s32, s32, f32, f32);
+void func_81800D70(s32 arg0, s32 arg1) {
+    func_8004D1FC(func_8004C990(0xEF, 0));
+    func_81800020((f32) arg0, (f32) arg1, 0x41000000, 0x41600000, 0x50, 0, 1.0f, 1.0f);
+}
 #endif
 
 #ifdef VERSION_US

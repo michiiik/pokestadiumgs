@@ -46,7 +46,25 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/1/fragment1_code/func_83503720.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/1/fragment1_code/func_835038BC.s")
+extern void func_83502EF0();
+s32 func_83503720(s32);
+extern void func_800086A4(s32);
+extern void func_80007AEC(s32);
+void func_80064D28(void);
+void func_835038BC(void) {
+    s32 temp_v0;
+    s32 var_s0;
+
+    var_s0 = 0;
+    func_800086A4(2);
+    func_80007AEC(0x1E);
+    do {
+        func_80064D28();
+        func_83502EF0();
+        temp_v0 = func_83503720(var_s0);
+        var_s0 = temp_v0;
+    } while (temp_v0 != 5);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/1/fragment1_code/func_83503918.s")
 #endif

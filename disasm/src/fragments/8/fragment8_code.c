@@ -50,11 +50,35 @@ void func_82F006C8(void *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/8/fragment8_code/func_82F006F4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/8/fragment8_code/func_82F00730.s")
+extern void func_82F006F4(void *);
+void func_82F00730(void *arg0, s32 arg1) {
+    if (arg1 == 1) {
+        (*(s8 *)((u8 *)(arg0) + (0x1E))) = 0;
+        func_800226C0(0x11);
+        func_82F006F4(arg0);
+        return;
+    }
+    if (arg1 != 0) {
+        (*(s8 *)((u8 *)(arg0) + (0x1E))) = 6;
+        func_800226C0(3);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/8/fragment8_code/func_82F00788.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/8/fragment8_code/func_82F007C0.s")
+extern void func_82F00788(void *);
+void func_82F007C0(void *arg0, s32 arg1) {
+    if (arg1 == 1) {
+        (*(s8 *)((u8 *)(arg0) + (0x1E))) = 0;
+        func_800226C0(0x11);
+        func_82F00788(arg0);
+        return;
+    }
+    if (arg1 != 0) {
+        (*(s8 *)((u8 *)(arg0) + (0x1E))) = 5;
+        func_800226C0(3);
+    }
+}
 
 extern u8 D_800D0510[];
 extern void func_80007444(void *, s32, s32, s32, s32, s32);

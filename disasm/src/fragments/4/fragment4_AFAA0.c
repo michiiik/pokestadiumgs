@@ -206,7 +206,12 @@ void func_81802E34(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81802EA0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_8180351C.s")
+void func_8004989C(s32 arg0);
+void func_800496A4(s32 a0, s32 a1);
+void func_8180351C(void *arg0) {
+    func_8004989C((s32) (*(s8 *)((u8 *)(arg0) + (6))));
+    func_800496A4((s32) (*(s8 *)((u8 *)(arg0) + (4))), (*(s8 *)((u8 *)(arg0) + (5))) + 2);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81803558.s")
 

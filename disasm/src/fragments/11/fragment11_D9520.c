@@ -204,9 +204,15 @@ void func_8160732C(void *arg0, void *arg1) {
     (*(s16 *)((u8 *)(arg0) + (6))) = (s16) ((*(s16 *)((u8 *)(arg1) + (6))) - 0x13);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81607360.s")
+extern void func_816028E4(void *, s32, s32, s32, s32);
+extern u32 D_800D0510;
+void func_81607360(s32 arg0) {
+    func_816028E4(&D_800D0510, (s32) (*(s16 *)((u8 *)(arg0) + (0))), (s32) (*(s16 *)((u8 *)(arg0) + (2))), (s32) (*(s16 *)((u8 *)(arg0) + (4))), (s32) (*(s16 *)((u8 *)(arg0) + (6))));
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_816073A0.s")
+void func_816073A0(void *arg0) {
+    func_816028E4(&D_800D0510, (s32) (s16) ((*(s16 *)((u8 *)(arg0) + (0))) + 8), (s32) (s16) ((*(s16 *)((u8 *)(arg0) + (2))) + 8), (s32) (s16) ((*(s16 *)((u8 *)(arg0) + (4))) - 0x13), (*(s16 *)((u8 *)(arg0) + (6))) - 0x13);
+}
 
 extern u32 D_800D0510;
 extern void func_816028E4(void *, s32, s32, s32, s32);

@@ -27,7 +27,15 @@ s32 func_81304E14(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FCD40/func_8130500C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FCD40/func_81305068.s")
+f32 func_816092FC(void);
+s32 func_81305068(void *arg0) {
+    (*(f32 *)((u8 *)(arg0) + (0xC))) = (f32) ((*(f32 *)((u8 *)(arg0) + (0xC))) - func_816092FC());
+    if ((*(f32 *)((u8 *)(arg0) + (0xC))) <= 0.0f) {
+        (*(f32 *)((u8 *)(arg0) + (0xC))) = 0.0f;
+        (*(s8 *)((u8 *)(arg0) + (0x1A))) = 5;
+    }
+    return 1;
+}
 
 s32 func_813050C0(u8 *arg0) {
     *(f32 *)(arg0 + 0xC) = 0.0f;
