@@ -51,7 +51,16 @@ void func_8001A9D4(u32 *arg0) {
     arg0[2] = 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/1A360/func_8001A9E4.s")
+void func_8001A9E4(void *arg0) {
+    func_8001A9D4(arg0);
+    func_8001A9D4((u8 *)arg0 + 0x10);
+    func_8001A9D4((u8 *)arg0 + 0x20);
+    func_8001A9D4((u8 *)arg0 + 0x30);
+    *(u32 *)((u8 *)arg0 + 0x0C) = (u32)arg0;
+    *(u32 *)((u8 *)arg0 + 0x1C) = (u32)arg0;
+    *(u32 *)((u8 *)arg0 + 0x2C) = (u32)arg0;
+    *(u32 *)((u8 *)arg0 + 0x3C) = (u32)arg0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1A360/func_8001AA34.s")
 
