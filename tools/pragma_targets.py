@@ -42,6 +42,7 @@ SOURCE_ROOT = DISASM_ROOT / "src"
 ASM_ROOT = DISASM_ROOT / "asm" / "us" / "nonmatchings"
 M2C_SCRIPT = DISASM_ROOT / "tools" / "m2c" / "m2c.py"
 CONTEXT_CACHE_ROOT = DISASM_ROOT / "build" / "m2c-context"
+SYMBOL_INDEX_HEADER = CONTEXT_CACHE_ROOT / "repo-prototypes.h"
 
 PRAGMA_RE = re.compile(r'^#pragma GLOBAL_ASM\("(asm/us/nonmatchings/([^"]+)/([A-Za-z_]\w*)\.s)"\)$', re.M)
 
@@ -217,12 +218,135 @@ def list_targets(
 
 _CONTEXT_CACHE_LOCK = threading.Lock()
 _CONTEXT_CACHE_PATH_LOCKS: dict[Path, threading.Lock] = {}
+_SYMBOL_INDEX_LOCK = threading.Lock()
+_SYMBOL_INDEX_SNAPSHOT: tuple[tuple[str, int], ...] | None = None
 
 
 def _context_cache_lock(cache_path: Path) -> threading.Lock:
     """One lock per cache file: pooled drafts of the same source must not race."""
     with _CONTEXT_CACHE_LOCK:
         return _CONTEXT_CACHE_PATH_LOCKS.setdefault(cache_path, threading.Lock())
+
+
+_SYMBOL_RE = re.compile(r"\b(?:func_[0-9A-Fa-f]+|D_[0-9A-Fa-f]+)\b")
+_EXTERN_DECL_RE = re.compile(r"\bextern\s+([^;{}]+);")
+
+
+def _normalise_declaration(declaration: str) -> str:
+    """Collapse source whitespace while preserving C pointer spelling."""
+    return re.sub(r"\s+", " ", declaration.strip())
+
+
+def _source_symbol_declarations(path: Path) -> tuple[set[str], list[tuple[str, str, bool]]]:
+    """Extract simple function/global declarations from one C source.
+
+    The index intentionally records only declarations whose names are tied to
+    a ROM symbol.  Bodies and source-local typedefs stay out of the generated
+    header; owner-local context already supplies those and importing them
+    globally would create more conflicts than it solves.
+    """
+    text = path.read_text(encoding="utf-8", errors="replace")
+    symbols: set[str] = set()
+    declarations: list[tuple[str, str, bool]] = []
+
+    for match in _EXTERN_DECL_RE.finditer(text):
+        declaration = _normalise_declaration("extern " + match.group(1)) + ";"
+        names = _SYMBOL_RE.findall(declaration)
+        if len(names) == 1:
+            symbols.add(names[0])
+            declarations.append((names[0], declaration, False))
+
+    # Most decompiled bodies put the complete signature on the line that
+    # opens the body.  Convert that prefix into a prototype.  Splitting after
+    # the last semicolon also handles compact ``extern ...; void func(...)``
+    # lines already present in the source tree.
+    for line in text.splitlines():
+        if "{" not in line or "func_" not in line:
+            continue
+        prefix = line.split("{", 1)[0].rsplit(";", 1)[-1].strip()
+        names = _SYMBOL_RE.findall(prefix)
+        if len(names) != 1 or not re.search(r"\bfunc_[0-9A-Fa-f]+\s*\(", prefix):
+            continue
+        declaration = _normalise_declaration(prefix) + ";"
+        symbols.add(names[0])
+        declarations.append((names[0], declaration, True))
+
+    return symbols, declarations
+
+
+def repository_symbol_header(
+    *,
+    source_root: Path = SOURCE_ROOT,
+    output_path: Path = SYMBOL_INDEX_HEADER,
+    refresh: bool = False,
+) -> Path | None:
+    """Build a cached header of unambiguous cross-source ROM declarations.
+
+    This is deliberately conservative.  A symbol with conflicting spellings,
+    or a declaration that depends on a source-local ``S1_`` type, is omitted;
+    m2c can still fall back to its targeted type variants for those owners.
+    """
+    global _SYMBOL_INDEX_SNAPSHOT
+    files = _source_files(source_root)
+    snapshot = tuple((path.as_posix(), path.stat().st_mtime_ns) for path in files)
+    with _SYMBOL_INDEX_LOCK:
+        if not refresh and output_path.exists() and snapshot == _SYMBOL_INDEX_SNAPSHOT:
+            return output_path
+        by_symbol: dict[str, set[tuple[str, bool]]] = {}
+        for path in files:
+            _, declarations = _source_symbol_declarations(path)
+            for symbol, declaration, is_definition in declarations:
+                # Source-local Stadium 1 typedefs are not available to every
+                # owner context.  Skipping them avoids turning a useful
+                # prototype index into a global compile failure.
+                if re.search(r"\bS1_[A-Za-z0-9_]*\b", declaration):
+                    continue
+                by_symbol.setdefault(symbol, set()).add((declaration, is_definition))
+        selected: list[str] = []
+        for symbol, declarations in sorted(by_symbol.items()):
+            definitions = {decl for decl, is_definition in declarations if is_definition}
+            spellings = definitions or {decl for decl, _ in declarations}
+            if len(spellings) != 1:
+                continue
+            selected.append(next(iter(spellings)))
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        temporary = output_path.with_name(output_path.name + f".{os.getpid()}.tmp")
+        body = "\n".join([
+            "#ifndef PRAGMA_REPO_PROTOTYPES_H",
+            "#define PRAGMA_REPO_PROTOTYPES_H",
+            '#include "global.h"',
+            "/* Generated from unambiguous declarations in disasm/src. */",
+            *selected,
+            "#endif",
+            "",
+        ])
+        temporary.write_text(body, encoding="utf-8")
+        os.replace(temporary, output_path)
+        if source_root == SOURCE_ROOT and output_path == SYMBOL_INDEX_HEADER:
+            _SYMBOL_INDEX_SNAPSHOT = snapshot
+        return output_path
+
+
+def _owner_symbol_header(owner: Owner, symbol_header: Path, *, refresh: bool = False) -> Path:
+    """Remove declarations already present in an owner's source context."""
+    declared, _ = _source_symbol_declarations(owner.source_path)
+    if not declared:
+        return symbol_header
+    relative = Path(owner.source).with_suffix(".h")
+    output_path = CONTEXT_CACHE_ROOT / "owner-prototypes" / relative
+    dependency_mtime = max(owner.source_path.stat().st_mtime_ns, symbol_header.stat().st_mtime_ns)
+    if not refresh and output_path.exists() and output_path.stat().st_mtime_ns >= dependency_mtime:
+        return output_path
+    lines = symbol_header.read_text(encoding="utf-8").splitlines()
+    filtered = [
+        line for line in lines
+        if not any(re.search(rf"\b{re.escape(symbol)}\b", line) for symbol in declared)
+    ]
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = output_path.with_name(output_path.name + f".{os.getpid()}.{threading.get_ident()}.tmp")
+    temporary.write_text("\n".join(filtered) + "\n", encoding="utf-8")
+    os.replace(temporary, output_path)
+    return output_path
 
 
 def preprocessed_context(owner: Owner, *, refresh: bool = False) -> Path | None:
@@ -233,29 +357,43 @@ def preprocessed_context(owner: Owner, *, refresh: bool = False) -> Path | None:
     preprocess command could not be captured or failed; drafts then run
     without a context.
     """
+    symbol_header = repository_symbol_header(refresh=refresh)
+    if symbol_header is not None:
+        symbol_header = _owner_symbol_header(owner, symbol_header, refresh=refresh)
     check = runner.host_check_recipe(REPO_ROOT)
     if check is None:
         return None
     source_rel = owner.source_path.relative_to(DISASM_ROOT)
     cache_path = CONTEXT_CACHE_ROOT / source_rel.with_suffix(".ctx.c")
     with _context_cache_lock(cache_path):
-        return _refresh_preprocessed_context(owner, check, source_rel, cache_path, refresh)
+        return _refresh_preprocessed_context(owner, check, source_rel, cache_path, symbol_header, refresh)
 
 
 def _refresh_preprocessed_context(
-    owner: Owner, check: list[str], source_rel: Path, cache_path: Path, refresh: bool
+    owner: Owner,
+    check: list[str],
+    source_rel: Path,
+    cache_path: Path,
+    symbol_header: Path | None,
+    refresh: bool,
 ) -> Path | None:
     try:
+        dependency_mtime = owner.source_path.stat().st_mtime_ns
+        if symbol_header is not None:
+            dependency_mtime = max(dependency_mtime, symbol_header.stat().st_mtime_ns)
         if (
             not refresh
             and cache_path.exists()
-            and cache_path.stat().st_mtime_ns >= owner.source_path.stat().st_mtime_ns
+            and cache_path.stat().st_mtime_ns >= dependency_mtime
         ):
             return cache_path
     except OSError:
         pass
     include_directory = source_rel.parent.as_posix() + "/"
-    command = runner.host_preprocess_command(check, include_directory) + [source_rel.as_posix()]
+    command = runner.host_preprocess_command(check, include_directory)
+    if symbol_header is not None:
+        command += ["-include", symbol_header.relative_to(DISASM_ROOT).as_posix()]
+    command += [source_rel.as_posix()]
     try:
         result = subprocess.run(
             command,

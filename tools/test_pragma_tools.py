@@ -1532,6 +1532,30 @@ class TargetDiscoveryTests(unittest.TestCase):
         self.assertEqual(index["func_a"].source, "disasm/src/a.c")
         self.assertEqual(index["func_a"].asm, "disasm/asm/us/nonmatchings/a/func_a.s")
 
+    def test_repository_symbol_header_prefers_definitions_and_skips_s1_types(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source_root = root / "src"
+            source_root.mkdir()
+            (source_root / "a.c").write_text(
+                "s32 func_a(s32 arg0) { return arg0; }\n"
+                "typedef struct S1_Local S1_Local;\n"
+                "S1_Local *func_s1(S1_Local *arg0) { return arg0; }\n"
+            )
+            (source_root / "b.c").write_text(
+                "extern void func_a(void);\n"
+                "extern s32 D_80000010;\n"
+            )
+            header = root / "build" / "prototypes.h"
+            generated = targets.repository_symbol_header(
+                source_root=source_root, output_path=header, refresh=True,
+            )
+            text = generated.read_text()
+        self.assertIn("s32 func_a(s32 arg0);", text)
+        self.assertNotIn("void func_a(void);", text)
+        self.assertIn("extern s32 D_80000010;", text)
+        self.assertNotIn("func_s1", text)
+
     def test_host_preprocess_command_strips_check_only_flags(self) -> None:
         check = [
             "gcc", "-MMD", "-MP", "-fsyntax-only", "-Iinclude", "-I", runner._RECIPE_DIRECTORY,
