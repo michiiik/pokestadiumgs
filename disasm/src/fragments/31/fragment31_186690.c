@@ -241,7 +241,21 @@ extern u16 D_88234758; s32 func_8821B95C(void) { s32 result = 0; if (D_88234758 
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_8821B980.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_8821B9EC.s")
+extern u8 *D_88234750;
+u32 func_8821B9EC(s32 arg0) {
+    u8 *p = (u8 *)D_88234750;
+    u32 i = 0;
+
+    if (D_88234744) {
+        do {
+            if (arg0 == *(s32 *)p)
+                return i;
+            p += 4;
+            i++;
+        } while (i < (u16)D_88234744);
+    }
+    return -1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_8821BA34.s")
 
