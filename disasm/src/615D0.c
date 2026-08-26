@@ -69,7 +69,7 @@ void func_80060EF8(void *arg0, void *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060F38.s")
 
-extern void func_8000B580(void); void func_80060F68(void) { func_8000B580(); }
+extern void func_8000B580(void); void func_80060F68() { func_8000B580(); }
 
 s32 func_80060F88(void) { return 0x46; }
 

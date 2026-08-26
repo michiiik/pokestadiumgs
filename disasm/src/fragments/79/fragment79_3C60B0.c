@@ -35,7 +35,7 @@ void func_84156880(void) { func_841098C0(); }
 #endif
 
 #ifdef VERSION_US
-void func_841568A0(void) { func_84109780(); }
+void func_841568A0() { func_84109780(); }
 #endif
 
 #ifdef VERSION_US
