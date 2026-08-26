@@ -155,7 +155,20 @@ void func_80016354(s32 a0, s32 a1, s32 a2, s32 a3) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_8001644C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_8001647C.s")
+extern void *func_80016500(s32, s32, s32, s32, s32, s32, s32);
+extern OSMesgQueue D_8011DE50;
+void *func_8001647C(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6, s32 arg7) {
+    void *temp_v0;
+    void *sp2C;
+    temp_v0 = func_80016500(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+    if (temp_v0 == NULL) {
+        return NULL;
+    }
+    sp2C = temp_v0;
+    osSendMesg(&D_8011DE50, temp_v0, 0);
+    (*(s32 *)((u8 *)sp2C + (0x18))) = arg0;
+    return sp2C;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80016500.s")
 
