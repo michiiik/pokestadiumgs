@@ -1900,7 +1900,44 @@ def main() -> int:
         "--large-seconds", type=float, default=LARGE_SECONDS_DEFAULT,
         help="decomp-permuter budget per owner in --large mode (default 180)",
     )
+    parser.add_argument(
+        "--near-miss-kinds", action="store_true",
+        help="run tools/near_miss_kinds.py's targeted mismatch-kind rewrites (decl order, "
+             "immediate/offset repair, loop-form, ...) before falling back to the permuter",
+    )
+    parser.add_argument(
+        "--kinds", type=str,
+        help="comma-separated mismatch kinds for --near-miss-kinds (default: all)",
+    )
+    parser.add_argument(
+        "--min-similarity", type=float, default=0.9,
+        help="minimum recorded similarity score for --near-miss-kinds (default 0.9)",
+    )
+    parser.add_argument(
+        "--permute-seconds", type=float, default=0.0,
+        help="permuter fallback budget per owner for --near-miss-kinds when no generated "
+             "rewrite probe-matches (default 0: off)",
+    )
     args = parser.parse_args()
+    if args.near_miss_kinds:
+        import near_miss_kinds
+
+        kinds = tuple(k for k in (args.kinds or "").split(",") if k) or None
+        stats_path = args.stats if args.stats.exists() else near_miss_kinds.resolve_stats_path()
+        rows = near_miss_kinds._stats_records(stats_path)
+        pool = near_miss_kinds.select_pool(rows, min_similarity=args.min_similarity, kinds=kinds)
+        flat = [entry for entries in pool.values() for entry in entries]
+        flat.sort(key=lambda e: (-float(e["similarity_score"]), str(e["function"])))
+        if args.limit is not None:
+            flat = flat[: max(0, args.limit)]
+        result = near_miss_kinds.run(
+            flat, probe_workers=args.workers, permute_seconds=args.permute_seconds,
+        )
+        text = json.dumps(result, indent=2, default=list)
+        if args.json:
+            args.json.write_text(text + "\n")
+        print(text)
+        return 0 if result.get("accepted") else 1
     if args.large:
         result = large_sweep(
             min_instructions=args.min_instructions if args.min_instructions is not None else LARGE_MINIMUM_INSTRUCTIONS,
