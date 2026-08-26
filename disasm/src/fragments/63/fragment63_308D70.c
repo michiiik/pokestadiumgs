@@ -96,7 +96,14 @@ void func_87E06D84(u8 *arg0) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E07278.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E072FC.s")
+void func_87E072FC(void *a, u16 b) {
+    u8 *p;
+    p = *(u8 **)((u8 *)a + 368);
+    *(u16 *)(p + 8692) |= b;
+    p = *(u8 **)((u8 *)a + 368);
+    if (*(u16 *)(p + 8692) == 0xFFF)
+        *(u16 *)(p + 8692) = 0;
+}
 
 extern void func_87E0168C(s32, s32, s32);
 extern void func_87E06EC0();

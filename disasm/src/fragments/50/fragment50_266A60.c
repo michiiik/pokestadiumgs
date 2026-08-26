@@ -39,7 +39,27 @@ s32 func_86200738(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_266A60/func_86200794.s")
+extern void func_80037120(s32, s32, s32 *, s16 *, s16 *);
+extern s32 D_80094908;
+s32 func_86200794(s32 a, void *p) {
+    s16 pad;
+    s32 x;
+    s16 y;
+    s16 z;
+
+    if (a == 2) {
+        func_80037120(
+            D_80094908 + 0xB4,
+            D_80094908 + 0xA8,
+            &x,
+            &y,
+            &z
+        );
+        *(s16 *)((u8 *)p + 0x1C) = y + 0x2000;
+        *(s16 *)((u8 *)p + 0x1E) = z - 0x2000;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
