@@ -725,7 +725,16 @@ void func_8412C240(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412C7F0.s")
+s32 func_84125080();
+void func_8412C7F0(void) {
+    u8 *temp_v0;
+
+    if (!((*(u8 *)((u8 *)(D_84195200[D_841951BC]) + (0x24))) & 7)) {
+        temp_v0 = D_84195208[D_841951BC];
+        (*(u8 *)((u8 *)(temp_v0) + (0xF))) = (u8) ((*(u8 *)((u8 *)(temp_v0) + (0xF))) | 2);
+        (*(s8 *)((u8 *)(D_84195208[D_841951BC]) + (0x12))) = (s8) ((func_84125080() & 1) + 1);
+    }
+}
 #endif
 
 #ifdef VERSION_US
