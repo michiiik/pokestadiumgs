@@ -101,7 +101,20 @@ s32 func_87E15698(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E15920.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E15A08.s")
+s32 func_80040E80(s32, s32 *);
+s32 func_8004C990(s32, s32);
+s32 func_87F08E3C(s32, s32);
+extern u8 D_87E1B310;
+void func_87E15A08(void *arg0) {
+    s32 sp1C;
+    s32 temp_v0;
+
+    temp_v0 = func_800030D0(func_80002B24(), 0);
+    sp1C = temp_v0;
+    (*(s32 *)((u8 *)(arg0) + (0x104))) = func_80040E80(temp_v0, &D_87E1B310);
+    func_80003120(sp1C);
+    (*(s32 *)((u8 *)(arg0) + (0x108))) = func_87F08E3C(func_8004C990(0x1B2, 6), 0x0F000000);
+}
 
 void func_87E15A78(void *arg0) {
     if (((*(f32 *)((u8 *)(arg0) + (0))) == 0.0f) && ((*(f32 *)((u8 *)(arg0) + (4))) == 0.0f) && ((*(f32 *)((u8 *)(arg0) + (8))) == 0.0f)) {
