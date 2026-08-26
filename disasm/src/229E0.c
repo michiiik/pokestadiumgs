@@ -757,7 +757,11 @@ void func_8002C2A0(unsigned short arg0)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80031530.s")
+void func_80031530(u16 a) {
+    func_800314D4(a | 0x10000000);
+}
+
+void func_80031530_padding(void) {}
 #endif
 
 #ifdef VERSION_US
