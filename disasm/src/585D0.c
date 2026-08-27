@@ -143,7 +143,12 @@ void GbSave_ComputeChecksum(u8 *start, u8 *end) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80058D98.s")
+extern u8 D_801285D8[];
+void func_80058D98(s32 arg0) {
+    func_80057BCC(arg0, *(s32 *)(D_801285D8 + arg0 * 112), 0x600, 0x640);
+}
+void func_80058D98_padding(void) {}
+void func_80058D98_padding2(void) {}
 #endif
 
 #ifdef VERSION_US
