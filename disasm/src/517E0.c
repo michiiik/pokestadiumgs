@@ -4,7 +4,25 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80050BE0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80050CAC.s")
+extern u8 D_801281C0;
+struct Func80050CACEntry {
+    s32 unk0;
+    s32 unk4;
+    s32 unk8;
+};
+s32 func_80050CAC(s32 arg0, s32 arg1) {
+    struct Func80050CACEntry *temp_v0;
+    s32 var_v1 = 0;
+    temp_v0 = (struct Func80050CACEntry *)((u8 *)&D_801281C0 + (arg0 * 0xC));
+    if ((temp_v0->unk0 & 1) != 0) {
+        if (arg1 == 0) {
+            var_v1 = temp_v0->unk4;
+        } else {
+            var_v1 = temp_v0->unk8;
+        }
+    }
+    return var_v1;
+}
 
 extern s32 D_800972B0[]; s32 func_80050CF8(s32 arg0){s32 result=0;if(arg0>=0&&arg0<4)result=D_800972B0[arg0];return result;}
 
@@ -167,7 +185,13 @@ void func_80053ECC(u8 *arg0, u8 *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80053F04.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80054210.s")
+extern void *func_80051138(s32);
+
+typedef struct { s32 a, b; } Pair80054210;
+void func_80054210(Pair80054210 *arg0) {
+    Pair80054210 *v0 = (Pair80054210 *)((u8 *)func_80051138(0) + 0x14);
+    *arg0 = *v0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80054248.s")
 
