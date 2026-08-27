@@ -54,7 +54,37 @@ s32 GbPak_DetectRam(s32 arg0, u8* arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056870.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056960.s")
+extern u8 D_80128550[];
+extern s32 func_80056F7C(s32);
+extern s32 func_8005D92C(s32);
+extern s32 func_8005805C(s32);
+extern s32 func_80057038(s32, u8 *);
+extern void func_80064D58(s32, s32);
+s32 func_80056960(s32 arg0, u8 *arg1, u8 *arg2) {
+    u8 *state;
+    struct {
+        s32 previous;
+        s32 result;
+        u8 trailing[0x50];
+    } local;
+    local.result = 0;
+    if (arg1 != NULL) *arg1 = D_80128550[arg0];
+    state = &D_80128550[arg0];
+    if (*state == 1) return 1;
+    if (func_80056F7C(arg0) != 0) {
+        if (arg2 != NULL) {
+            local.previous = func_8005D92C(arg0);
+            if ((func_8005805C(arg0) == local.previous) && (func_80057038(arg0, arg2) != 0)) {
+                local.result = GbPak_DetectRam(arg0, arg2);
+            }
+            if (local.result == 0) func_80064D58(arg0, 1);
+        }
+    } else {
+        func_80064D58(arg0, 1);
+    }
+    *state = 1;
+    return local.result;
+}
 
 extern u8 D_801283B0;
 extern u8 D_80128550[];
@@ -181,7 +211,16 @@ s32 func_800570CC(s32 arg0, u8 *arg1, s32 arg2, s32 arg3) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_8005712C.s")
+extern u8 D_80128555;
+extern s32 func_8005655C(u8, s32, s32, u8 *, s32);
+s32 func_8005712C(s32 arg0, u8 *arg1, s32 arg2, s32 arg3) {
+    s32 result;
+    result = 1;
+    if (D_80128555 & (1 << arg0)) {
+        result = func_8005655C(arg0, 1, arg2, arg1, arg3);
+    }
+    return result;
+}
 
 extern u8 D_801283B0;
 extern u8 D_80128555;
@@ -215,11 +254,58 @@ void func_800572D8(u8 arg0) {
     func_80057210(arg0, &data[8], 0, 0x20);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80057318.s")
+s32 func_80057318(u8 arg0) {
+    u8 data[0x20];
+    s32 result;
+    result = func_8005718C(arg0, data, 0x2000, 0x20);
+    if (result != 0) {
+        return result;
+    }
+    if (data[0] == 1) {
+        _bzero(data, 0x20);
+        result = func_80057210(arg0, data, 0x2000, 0x20);
+        if (result != 0) {
+            return result;
+        }
+    }
+    HAL_Memset((char *)data, 1, 0x20);
+    result = func_80057210(arg0, data, 0x2000, 0x20);
+    if (result != 0) {
+        return result;
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_800573C4.s")
+s32 func_800573C4(u8 arg0, u8 *arg1, u8 arg2) {
+    u8 data[0x20];
+    s32 result;
+    HAL_Memset((char *)data, arg2, 0x20);
+    result = func_80057210(arg0, data, 0x4000, 0x20);
+    if (result != 0) {
+        return result;
+    }
+    result = func_8005718C(arg0, data, 0xA000, 0x20);
+    if (result != 0) {
+        return result;
+    }
+    *arg1 = data[0];
+    return result;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80057450.s")
+s32 func_80057450(u8 arg0, u8 arg1, u8 arg2) {
+    u8 data[0x20];
+    s32 result;
+    HAL_Memset((char *)data, arg2, 0x20);
+    result = func_80057210(arg0, data, 0x4000, 0x20);
+    if (result != 0) {
+        return result;
+    }
+    HAL_Memset((char *)data, arg1, 0x20);
+    result = func_80057210(arg0, data, 0xA000, 0x20);
+    if (result != 0) {
+        return result;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_800574E0.s")
 
