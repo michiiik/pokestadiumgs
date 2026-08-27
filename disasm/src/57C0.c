@@ -207,7 +207,13 @@ s32 Sched_TryYieldActiveTask(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_80005388.s")
+void Sched_HandleRdpEvent(void) {
+    Sched_HandleRdpCompletion((u8 *)D_800CD020[0xA1C / 4]);
+    if (*(u16 *)((u8 *)D_800CD020[0xA1C / 4] + 0x1C) == 3) {
+        D_800CD020[0xA1C / 4] = 0;
+        D_800CD020[0xA2C / 4] = 0;
+    }
+}
 #endif
 
 #ifdef VERSION_US
