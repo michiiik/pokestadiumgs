@@ -186,8 +186,6 @@ void func_8004E748(s32 arg0) {
 
 extern s32 D_80128098; void func_8004E7AC(void) { D_80128098 = 0; }
 
-extern s32 D_8012809C;
-extern s32 D_801280A0[];
 void func_8004E7B8(void) {
     s32 i = D_8012809C;
     s32 *table = D_801280A0;
@@ -197,7 +195,6 @@ void func_8004E7B8(void) {
 }
 
 extern s32 D_80128098;
-extern s32 D_8012809C;
 void func_8004E7FC(void) {
     D_8012809C -= 1;
     D_80128098 += 4;

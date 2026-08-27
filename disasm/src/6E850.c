@@ -61,12 +61,10 @@ s16 func_8006DDE8(s16 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern u16 D_8009E3C8[];
 s16 func_8006DE08(s16 *arg0, s32 arg1) { s16 index = arg0[arg1]; u16 *table = D_8009E3C8 + index; s16 result = (s16)(*table - 1); return result; }
 #endif
 
 #ifdef VERSION_US
-extern s16 D_8009E7D0[];
 s16 func_8006DE34(s16 *arg0, s32 arg1) {
     s16 *table = D_8009E7D0;
     s16 value = arg0[arg1];
@@ -76,9 +74,6 @@ s16 func_8006DE34(s16 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern s16 D_8009E9D4[];
-extern s16 D_8009EBD8[];
-extern s16 D_8009EFE0[];
 s16 func_8006DE54(s16 *arg0, s32 arg1)
 {
   s16 value = arg0[arg1];
