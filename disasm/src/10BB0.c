@@ -20,11 +20,41 @@ extern void func_80019580(s32); s32 func_800103C8(s32 arg0) { func_80019580(arg0
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_80010448.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_800104A0.s")
+s32 GbApu_Alloc();
+s32 func_80010510();
+s32 func_800104A0(void *arg0, s32 arg1) {
+    s32 func_800103C8();
+    s32 result = GbApu_Alloc(arg0, arg1);
+    if (result != 0) {
+        result = func_800103C8(result, arg1);
+    }
+    return result;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_800104D8.s")
+s32 func_800104D8(void *arg0, s32 arg1) {
+    s32 func_800103C8();
+    s32 result = func_80010510(arg0, arg1);
+    if (result != 0) {
+        result = func_800103C8(result, arg1);
+    }
+    return result;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_80010510.s")
+s32 func_80010510(u8 *arg0, s32 arg1) {
+    s32 temp_v0;
+    u8 *var_v1;
+    temp_v0 = GbApu_Alloc(arg0, arg1);
+    if (temp_v0 != 0) {
+        var_v1 = (u8 *)temp_v0;
+        if ((u32)temp_v0 < *(u32 *)(arg0 + 4)) {
+            do {
+                *var_v1 = 0;
+                var_v1 += 1;
+            } while ((u32)var_v1 < *(u32 *)(arg0 + 4));
+        }
+    }
+    return temp_v0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_8001056C.s")
 
