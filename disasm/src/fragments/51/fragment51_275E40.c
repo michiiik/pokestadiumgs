@@ -73,7 +73,13 @@ void func_863007B8(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/51/fragment51_275E40/func_86300FB4.s")
+extern void *D_87F119DC;
+extern void MtxF_Copy(u32 *dest, u32 *src);
+void func_86300FB4(void) {
+    void *state = D_87F119DC;
+    void *source = *(void **)((u8 *)state + 0x20);
+    MtxF_Copy((u32 *)((u8 *)state + 0x84), (u32 *)((u8 *)source + 0x84));
+}
 #endif
 
 #ifdef VERSION_US
