@@ -65,11 +65,77 @@ void *func_8001A2CC(void *arg0, s32 arg1) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/1A360/func_8001A308.s")
+extern u8 D_8011BE90[];
+extern s32 func_80014190();
+s32 func_8001A308(s32 arg0, s32 arg1) {
+    s32 result;
+    u8 *entry;
+    if (arg0 == 0xFF) return 0;
+    if (func_80014190() == 0) {
+        *(s32 *)(D_8011BE90 + 0x2D10) = arg0 + 0x10000000;
+        return 0;
+    }
+    entry = *(u8 **)(D_8011BE90 + 0x2BD8) + arg0 * 0x14;
+    if (arg1 >= entry[0]) {
+        *(s32 *)(D_8011BE90 + 0x2D10) = (arg0 << 8) + arg1 + 0x03000000;
+        return 0;
+    }
+    result = *(s32 *)(*(u8 **)(entry + 8) + arg1 * 4);
+    if (result == 0) {
+        *(s32 *)(D_8011BE90 + 0x2D10) = (arg0 << 8) + arg1 + 0x01000000;
+        return result;
+    }
+    return result;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/1A360/func_8001A3DC.s")
+extern u8 D_8011BE90[];
+extern s32 func_80014190();
+s32 func_8001A3DC(s32 arg0, s32 arg1) {
+    s32 result;
+    u8 *entry;
+    s32 *table;
+    if (arg0 == 0xFF) return 0;
+    if (func_80014190() == 0) {
+        *(s32 *)(D_8011BE90 + 0x2D10) = arg0 + 0x10000000;
+        return 0;
+    }
+    entry = *(u8 **)(D_8011BE90 + 0x2BD8) + arg0 * 0x14;
+    if (arg1 >= entry[1]) {
+        *(s32 *)(D_8011BE90 + 0x2D10) = (arg0 << 8) + arg1 + 0x04000000;
+        return 0;
+    }
+    table = *(s32 **)(entry + 0xC);
+    if ((u32)table < 0x80000000U) return 0;
+    result = table[arg1];
+    if (result == 0)
+        *(s32 *)(D_8011BE90 + 0x2D10) = (arg0 << 8) + arg1 + 0x05000000;
+    return result;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/1A360/func_8001A4C0.s")
+extern u8 D_8011BE90[];
+extern s32 func_80014190();
+s32 *func_8001A4C0(s32 arg0, s32 arg1) {
+    s32 *result;
+    u8 *entry;
+    void *base;
+    if (arg0 == 0xFF) return NULL;
+    if (func_80014190() == 0) {
+        *(s32 *)(D_8011BE90 + 0x2D10) = arg0 + 0x10000000;
+        return NULL;
+    }
+    entry = *(u8 **)(D_8011BE90 + 0x2BD8) + arg0 * 0x14;
+    if (arg1 >= *(u16 *)(entry + 4)) {
+        *(s32 *)(D_8011BE90 + 0x2D10) = (arg0 << 8) + arg1 + 0x04000000;
+        return NULL;
+    }
+    base = *(void **)(entry + 0x10);
+    result = (s32 *)((u8 *)base + (arg1 << 3));
+    if ((u32)base < 0x80000000U) return NULL;
+    if (result == NULL)
+        *(s32 *)(D_8011BE90 + 0x2D10) = (arg0 << 8) + arg1 + 0x05000000;
+    if (*result == 0) return NULL;
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1A360/func_8001A5B4.s")
 
