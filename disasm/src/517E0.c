@@ -255,7 +255,19 @@ extern u8 D_801281F0[]; u8 *func_800534FC(s32 arg0){u8 *result=NULL;if(arg0>=0&&
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80053524.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80053584.s")
+extern void *func_80050F60(s32, void *, s32);
+extern void func_80060D70(u8 *, u8 *);
+extern void func_80051BF0(s32, void *, s32);
+
+void func_80053584(void *arg0, s32 arg1) {
+    u8 *v0;
+    if (arg1 == 0) {
+        return;
+    }
+    v0 = (u8 *)func_80050F60(0, arg0, arg1);
+    func_80060D70(v0 + 0x10, arg1);
+    func_80051BF0(0x11, arg0, 2);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800535D4.s")
 
@@ -399,7 +411,18 @@ s32 func_80054E10(u16 *arg0)
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80054E48.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055028.s")
+extern s32 func_80054E48(s32);
+
+s32 func_80055028(void) {
+    s32 result = 0;
+    s32 i;
+    for (i = 0; i < 4; i++) {
+        if (func_80054E48(i)) {
+            result |= 1 << i;
+        }
+    }
+    return result;
+}
 
 extern u8 D_801281C0;
 void Save_ResetBank(s32 arg0, u32 arg1) {
