@@ -230,7 +230,20 @@ void func_80016B24(s32 a0, s32 a1, s32 a2, s32 a3) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80017070.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80017224.s")
+s32 func_80017224(void *arg0, s32 arg1, void **arg2) {
+    s32 i = 0;
+    while (i < arg1) {
+        if (*(s32 *)((u8 *)arg0 + 4) == *(s32 *)((u8 *)arg2[i] + 4)) {
+            break;
+        }
+        i++;
+    }
+    if (i == arg1) {
+        arg2[arg1] = arg0;
+        arg1++;
+    }
+    return arg1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_8001726C.s")
 
