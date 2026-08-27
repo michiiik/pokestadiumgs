@@ -23,7 +23,21 @@ s32 func_80004BEC(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_80004CF4.s")
+s32 func_80004CF4(u32 arg0) {
+    u32 temp_v0;
+    s32 var_v1;
+
+    temp_v0 = *(u32 *)((u8 *)(u32)arg0 + 0x20);
+    var_v1 = 0;
+    if ((temp_v0 == 1) || (temp_v0 == 4)) {
+        if (*(u16 *)((u8 *)(u32)arg0 + 0x1C) == 1) {
+            *(u16 *)((u8 *)(u32)arg0 + 0x1C) = 2;
+            osSpTaskYield();
+            var_v1 = 1;
+        }
+    }
+    return var_v1;
+}
 #endif
 
 #ifdef VERSION_US
