@@ -23,7 +23,12 @@ void func_8FD0006C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/85/fragment85_code/func_8FD00124.s")
+extern s32 func_8004C990(s32, s32);
+extern void func_8004D19C(s32, s32, s32, s32, s32);
+void func_8FD00124(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
+    s32 value = func_8004C990((s32)arg2, (s32)arg3);
+    func_8004D19C((s32)arg0, (s32)arg1, value, 0, 0);
+}
 #endif
 
 #ifdef VERSION_US
@@ -31,7 +36,24 @@ void func_8FD0006C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/85/fragment85_code/func_8FD00514.s")
+extern s32 func_8004CA10(u16 *);
+extern s32 func_8004CA24(u16 *);
+extern u8 *func_8004CA60(u8 *);
+extern s32 func_8004CA38(u8 *);
+extern s32 func_8004CA4C(u8 *);
+extern void func_8FD00170(s16, s16, u16, u16, s32, s32, u8 *, s32, s32, s32);
+void func_8FD00514(s16 arg0, s16 arg1, u16 arg2, u16 arg3, u16 *arg4) {
+    s32 sp44;
+    s32 sp40;
+    s32 sp3C;
+    s32 sp24 = 1;
+    u8 *sp34;
+    sp44 = func_8004CA10(arg4);
+    sp40 = func_8004CA24(arg4);
+    sp34 = func_8004CA60((u8 *)arg4);
+    sp3C = func_8004CA38((u8 *)arg4);
+    func_8FD00170(arg0, arg1, arg2, arg3, sp44, sp40, sp34, sp3C, func_8004CA4C((u8 *)arg4), sp24);
+}
 #endif
 
 #ifdef VERSION_US
