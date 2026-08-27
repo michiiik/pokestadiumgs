@@ -2,11 +2,78 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3A00/func_80002E00.s")
+s32 main_pool_alloc(s32, s32);
+s32 func_80002E48(s32, s32);
+s32 func_80002E00(s32 arg0, s32 arg1) {
+    s32 block;
+    s32 result;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3A00/func_80002E48.s")
+    arg0 = (arg0 + 3) & ~3;
+    block = main_pool_alloc(arg0, arg1);
+    if (block != 0) {
+        result = func_80002E48(block, arg0);
+    }
+    return result;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3A00/func_80002EB8.s")
+s32 func_80002E48(s32 arg0, s32 arg1) {
+    u8 *base;
+    s32 size;
+    OSMesgQueue *queue;
+
+    base = (u8 *)arg0;
+    size = (arg1 & ~3) - 0x28;
+    *(s32 *)(base + 0x1C) = size;
+    *(u8 **)(base + 0x20) = base + 0x28;
+    *(u8 **)(base + 0x24) = base + 0x28;
+    *(s32 *)(base + 0x28) = 0;
+    *(s32 *)(base + 0x2C) = size;
+    queue = (OSMesgQueue *)(base + 4);
+    osCreateMesgQueue(queue, (OSMesg *)base, 1);
+    osSendMesg(queue, NULL, 0);
+    return (s32)base;
+}
+
+typedef struct MemPoolBlock3A00 {
+    struct MemPoolBlock3A00 *next;
+    u32 size;
+} MemPoolBlock3A00;
+typedef struct MemPool3A00 {
+    OSMesg msgs[1];
+    OSMesgQueue queue;
+    u32 available;
+    MemPoolBlock3A00 *firstBlock;
+    MemPoolBlock3A00 freeList;
+} MemPool3A00;
+void *func_80002EB8(MemPool3A00 *node, s32 size) {
+    MemPoolBlock3A00 *freeBlock;
+    void *addr;
+
+    osRecvMesg(&node->queue, 0, 1);
+
+    addr = NULL;
+    size = ((size + 3) & ~3) + sizeof(MemPoolBlock3A00);
+    freeBlock = &node->freeList;
+
+    while (freeBlock->next != NULL) {
+        if (freeBlock->next->size >= size) {
+            addr = (u8 *)freeBlock->next + sizeof(MemPoolBlock3A00);
+            if (freeBlock->next->size - size <= sizeof(MemPoolBlock3A00)) {
+                freeBlock->next = freeBlock->next->next;
+            } else {
+                MemPoolBlock3A00 *newBlock = (MemPoolBlock3A00 *)((u8 *)freeBlock->next + size);
+                newBlock->size = freeBlock->next->size - size;
+                newBlock->next = freeBlock->next->next;
+                freeBlock->next->size = size;
+                freeBlock->next = newBlock;
+            }
+            break;
+        }
+        freeBlock = freeBlock->next;
+    }
+    osSendMesg(&node->queue, 0, 0);
+    return addr;
+}
 
 typedef struct S1_MemoryBlock {
     /* 0x00 */ struct S1_MemoryBlock *next;
@@ -63,7 +130,18 @@ void mem_pool_free(S1_MemoryPool* pool, void* addr) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3A00/func_800030D0.s")
+u8 *MainPool_InitState(u8 *, s32);
+u8 *func_800030D0(s32 arg0, s32 arg1) {
+    s32 block;
+    u8 *result = NULL;
+
+    arg0 = (arg0 + 3) & ~3;
+    block = main_pool_alloc(arg0, arg1);
+    if (block != 0) {
+        result = MainPool_InitState((u8 *)block, arg0);
+    }
+    return result;
+}
 
 #define ALIGN16(val) (((val) + 0xFu) & ~0xFu)
 void MainPool_FinalizeAllocation(struct S1_MemoryBlock* block) {
