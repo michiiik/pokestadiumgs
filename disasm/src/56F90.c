@@ -38,13 +38,34 @@ s32 GbPak_DetectRam(s32 arg0, u8* arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056A5C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056AF8.s")
+extern u8 D_801283B0;
+extern u8 D_80128550[];
+extern u8 D_80128554;
+void func_80056AF8(void) {
+    s32 i;
+    for (i = 0; i < 4; i++) {
+        if (D_80128554 & (1 << i)) {
+            osGbpakPower((OSPfs *)((u8 *)&D_801283B0 + (i * 0x68)), 0);
+            D_80128550[i] = 0;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056BA4.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056C98.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056E90.s")
+extern u8 D_801283B0;
+extern void func_80064D58(s32, s32);
+s32 func_80056E90(s32 arg0) {
+    u8 local[12];
+    s32 result;
+    result = osGbpakGetStatus((arg0 * 0x68) + &D_801283B0, &local[11]);
+    if ((result == 1) || (result == 0xB) || (result == 4)) {
+        func_80064D58(arg0, 1);
+    }
+    return ((local[11] & 0x80) != 0) == 0;
+}
 
 extern void func_80064D58(s32, s32);
 extern u8 D_801283B0;
