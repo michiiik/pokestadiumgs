@@ -172,7 +172,27 @@ void func_80004FF4(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_80004FFC.s")
+typedef struct SchedState57C0 {
+    u8 padA10[0xA10];
+    S1_unk_D_800AA660 *clientList;
+    u8 padA14[0x24];
+    s16 shutdownCounter;
+} SchedState57C0;
+void func_80004FFC(u32 arg0) {
+    S1_unk_D_800AA660 *var_s0 = *(S1_unk_D_800AA660 **)((u8 *)D_800CD020 + 0xA10);
+    if (var_s0 != NULL) {
+        do {
+            if (*(s16 *)((u8 *)D_800CD020 + 0xA38) == 0) {
+                if (var_s0->eventFilter != 2) {
+                    osSendMesg((OSMesgQueue *)((u8 *)var_s0 + 0x1C0), (OSMesg)arg0, 0);
+                }
+            } else if (var_s0->eventFilter != 0) {
+                osSendMesg((OSMesgQueue *)((u8 *)var_s0 + 0x1C0), (OSMesg)arg0, 0);
+            }
+            var_s0 = var_s0->nextClient;
+        } while (var_s0 != NULL);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -209,7 +229,25 @@ s32 Sched_TryYieldActiveTask(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_80005148.s")
+extern S1_unk_D_800AA660 *D_800CDA30;
+extern s16 D_800CDA58;
+extern void func_80064DF4(void);
+extern void Audio_StopProcessing(void);
+void func_80005148(void) {
+    S1_unk_D_800AA660 *var_s0;
+    var_s0 = D_800CDA30;
+    if (var_s0 != NULL) {
+        do {
+            if (var_s0->eventFilter == 0) {
+                osStopThread(var_s0);
+            }
+            var_s0 = var_s0->nextClient;
+        } while (var_s0 != NULL);
+    }
+    D_800CDA58 = 1;
+    func_80064DF4();
+    Audio_StopProcessing();
+}
 #endif
 
 #ifdef VERSION_US
@@ -235,11 +273,39 @@ void Sched_HandleRdpEvent(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/Thread3_CreateThread.s")
+extern u8 D_800CD9D0[];
+extern void func_800053D4(void *);
+void Thread3_CreateThread(void) {
+    D_800CD020[0xA10 / 4] = 0;
+    D_800CD020[0xA14 / 4] = 0;
+    D_800CD020[0xA18 / 4] = 0;
+    D_800CD020[0xA1C / 4] = 0;
+    D_800CD020[0xA20 / 4] = 0;
+    D_800CD020[0xA24 / 4] = 0;
+    D_800CD020[0xA28 / 4] = 0;
+    D_800CD020[0xA2C / 4] = 0;
+    osCreateThread((OSThread *)D_800CD020, 3, func_800053D4, NULL, &D_800CD9D0, 0x64);
+    osStartThread((OSThread *)D_800CD020);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_80005568.s")
+void func_80005568(S1_unk_D_800AA660 *arg0) {
+    S1_unk_D_800AA660 *var_v1;
+    S1_unk_D_800AA660 *var_a1;
+    if (*(S1_unk_D_800AA660 **)((u8 *)D_800CD020 + 0xA10) == NULL) {
+        *(S1_unk_D_800AA660 **)((u8 *)D_800CD020 + 0xA10) = arg0;
+    } else {
+        var_v1 = *(S1_unk_D_800AA660 **)((u8 *)D_800CD020 + 0xA10);
+        var_a1 = var_v1->nextClient;
+        while (var_a1 != NULL) {
+            var_v1 = var_a1;
+            var_a1 = var_a1->nextClient;
+        }
+        var_v1->nextClient = arg0;
+    }
+    arg0->nextClient = NULL;
+}
 #endif
 
 #ifdef VERSION_US
