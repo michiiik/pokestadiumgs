@@ -30,11 +30,34 @@ extern s32 D_80097120; void func_8004C398(void) { D_80097120 = 0; }
 
 void func_8004C3A4(s32 unused, u8 *arg1) { *(s32 *)arg1 = 0; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C3B0.s")
+s32 func_8004C3B0(s32 arg0, s32 arg1) {
+    s32 result;
+    u8 *entry;
+    result = 0;
+    if (arg0 != 0 && arg1 >= 0) {
+        entry = (u8 *)((u8 *)(u32)arg0 + arg1 * 0x10 + 0x10);
+        if ((u32)arg1 < (u32)*(s32 *)((u8 *)(u32)arg0 + 0xC) && entry != NULL) {
+            result = *(s32 *)(entry + 8);
+        }
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C3EC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C468.s")
+extern s32 func_8004C3B0(s32, s32);
+extern void main_pool_try_free(s32);
+s32 func_8004C468(s32 arg0, s32 arg1) {
+    s32 result;
+    s32 value;
+    result = 0;
+    value = func_8004C3B0(arg0, arg1);
+    if (value != 0) {
+        main_pool_try_free(value);
+        result = 1;
+    }
+    return result;
+}
 
 extern s32 D_80097120; s32 func_8004C4A4(void) { return D_80097120; }
 
@@ -85,7 +108,19 @@ u8 *func_8004CA60(u8 *arg0) { u8 *value = NULL; if (arg0 != NULL) { value = arg0
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004CA74.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004CB28.s")
+extern s32 func_8004CA74(u8 *);
+u8 *func_8004CB28(u8 *arg0) {
+    u8 *result;
+    u8 *base;
+    s32 offset;
+    result = NULL;
+    if (arg0 != NULL && arg0[4] == 2) {
+        base = func_8004CA60(arg0);
+        offset = func_8004CA74(arg0);
+        result = base + offset + 8;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004CB7C.s")
 
