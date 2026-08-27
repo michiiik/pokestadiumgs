@@ -1159,7 +1159,13 @@ void func_800344C4(u8 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80034518.s")
+extern u8 D_800D2B8E;
+void func_80034518(u8 arg0, s32 arg1)
+{
+  unsigned char new_var;
+  new_var = func_800347E8(arg0);
+  (&D_800D2B8E)[0x3C * arg0] = (new_var << 1) << 5;
+}
 #endif
 
 #ifdef VERSION_US
@@ -4373,7 +4379,13 @@ s32 func_8003F954(u16 value) { return value % 9; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003F970.s")
+s32 func_8003F970(s32 arg0, u16 arg1) {
+    s32 result = 0;
+    if (arg0 == 0xEB) {
+        result = func_8003F954(arg1);
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
@@ -4568,7 +4580,13 @@ void geo_layout_cmd_create_fog(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8004032C.s")
+void geo_layout_cmd_28(void) {
+    s32 *node = (s32 *)D_80126498[D_80126518];
+    if (node != NULL) {
+        *((u8 *)node + 2) |= 1;
+    }
+    D_80126520 += 4;
+}
 #endif
 
 #ifdef VERSION_US
