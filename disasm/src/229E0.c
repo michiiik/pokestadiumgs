@@ -4390,7 +4390,21 @@ void geo_layout_cmd_close_node(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FD98.s")
+extern s32 D_80126520;
+extern S1_MainPoolState *D_80126450;
+extern void func_8003FD34(void *);
+extern void *func_800380B8(S1_MainPoolState *, s32, s16);
+extern void *func_8003811C(S1_MainPoolState *, s32, s16);
+void func_8003FD98(void) {
+    struct Cmd {
+        u8 pad[4];
+        void *child;
+    } *cmd;
+
+    cmd = (struct Cmd *)(u32)D_80126520;
+    func_8003FD34(cmd->child);
+    D_80126520 += 8;
+}
 #endif
 
 #ifdef VERSION_US
@@ -4402,7 +4416,16 @@ void geo_layout_cmd_close_node(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FE6C.s")
+void func_8003FE6C(void) {
+    struct Cmd {
+        u8 pad[4];
+        S1_GraphNode *reference;
+    } *cmd;
+
+    cmd = (struct Cmd *)(u32)D_80126520;
+    func_8003FD34(GeoNode_CreateWithReference(D_80126450, NULL, cmd->reference));
+    D_80126520 += 8;
+}
 #endif
 
 #ifdef VERSION_US
@@ -4410,19 +4433,59 @@ void geo_layout_cmd_close_node(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80040004.s")
+void func_80040004(void) {
+    struct Cmd {
+        u8 command;
+        u8 pad;
+        s16 value;
+    } *cmd;
+
+    cmd = (struct Cmd *)(u32)D_80126520;
+    func_8003FD34(GeoNode_CreateType3((S1_MemoryBlock *)D_80126450, NULL, cmd->value));
+    D_80126520 += 4;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80040050.s")
+void func_80040050(void) {
+    struct Cmd {
+        u8 command;
+        u8 pad;
+        s16 value;
+    } *cmd;
+
+    cmd = (struct Cmd *)(u32)D_80126520;
+    func_8003FD34(GeoNode_CreateType4((S1_MemoryBlock *)D_80126450, NULL, cmd->value));
+    D_80126520 += 4;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8004009C.s")
+void func_8004009C(void) {
+    struct Cmd {
+        u8 command;
+        u8 pad;
+        s16 value;
+    } *cmd;
+
+    cmd = (struct Cmd *)(u32)D_80126520;
+    func_8003FD34(func_800380B8(D_80126450, 0, cmd->value));
+    D_80126520 += 4;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800400E8.s")
+void func_800400E8(void) {
+    struct Cmd {
+        u8 command;
+        u8 pad;
+        s16 value;
+    } *cmd;
+
+    cmd = (struct Cmd *)(u32)D_80126520;
+    func_8003FD34(func_8003811C(D_80126450, 0, cmd->value));
+    D_80126520 += 4;
+}
 #endif
 
 #ifdef VERSION_US
