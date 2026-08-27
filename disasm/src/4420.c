@@ -194,7 +194,21 @@ void Dma_ReadChunks(u8 *arg0, s32 arg1, s32 arg2, s32 arg3) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80003E84.s")
+extern void func_80006C40(s32, s32, s16, OSMesgQueue *, s32);
+s32 func_80003E84(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    OSMesg message;
+    while (arg2 > 0) {
+        func_80006C40(arg3, arg0, (s16)arg1, &D_800CD000, 0);
+        osRecvMesg(&D_800CD000, &message, 1);
+        if (arg3 == 1 && osFlashWriteArray(arg1) != 0) {
+            return -1;
+        }
+        arg2--;
+        arg0 += 0x80;
+        arg1++;
+    }
+    return 0;
+}
 
 s32 func_80003F54(s32 arg0) { return osFlashSectorErase(arg0 << 7); }
 
@@ -232,13 +246,62 @@ s32 func_800040C4(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800040D0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800041E4.s")
+u8 *func_800041E4(s32 arg0, u8 *arg1, u8 *arg2, s32 arg3) {
+    u8 *result;
+    if (arg0 == 0) {
+        result = main_pool_alloc(*(s32 *)(arg2 + 0x10), arg3);
+    } else {
+        result = MainPool_AllocAligned(arg0, *(s32 *)(arg2 + 0x10), 0x10);
+    }
+    if (result != NULL) {
+        Yay0_DecompressAndRelocate(arg2, result);
+    }
+    func_800029E0(arg1);
+    return result;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80004254.s")
+u8 *func_80004254(s32 arg0, u8 *arg1, u8 *arg2, s32 arg3, s32 arg4, s32 arg5) {
+    u8 *result;
+    if (arg0 == 0) {
+        result = main_pool_alloc(arg4, arg5);
+    } else {
+        result = MainPool_AllocAligned(arg0, arg4, 0x10);
+    }
+    if (result != NULL) {
+        func_80003F74(result, arg1, arg2, arg3);
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800042C0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80004458.s")
+u8 *func_80004458(s32 arg0, u8 *arg1, u8 *arg2) {
+    u8 *header;
+    u8 *data;
+    u8 *result;
+    result = NULL;
+    header = main_pool_alloc(0x18, 1);
+    if (header != NULL) {
+        func_80003F74(header, arg1, arg1 + 0x18, 0);
+        if (*(u32 *)header == 0x50455253 && *(u32 *)(header + 4) == 0x2D535A50) {
+            data = main_pool_alloc(((arg2 - arg1) + 0xF) & ~0xF, 1);
+            if (data != NULL) {
+                func_80003F74(data, arg1, arg2, 0);
+                result = func_800041E4(arg0, data, data, -1);
+            }
+        } else if (*(u32 *)header == 0x50524553 && *(u32 *)(header + 4) == 0x4A504547) {
+            data = main_pool_alloc(((arg2 - arg1) + 0xF) & ~0xF, 1);
+            if (data != NULL) {
+                func_80003F74(data, arg1, arg2, 0);
+                result = func_800040D0(arg0, data, data, -1);
+            }
+        } else {
+            result = func_80004254(arg0, arg1, arg2, 0, ((arg2 - arg1) + 0xF) & ~0xF, -1);
+        }
+        func_800029E0(header);
+    }
+    return result;
+}
 
 extern u32 Memmap_GetSegmentBaseVaddr(u32);
 extern void Memmap_ClearSegmentMemmap(u32);
@@ -280,7 +343,21 @@ void func_800046C0(u32 base_addr, u32 addr) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80004718.s")
+void func_80004718(s32 arg0, u8 *arg1) {
+    UNUSED s32 pad;
+    s32 allocationSize;
+    u32 sizeInRam;
+    allocationSize = MainPool_GetAllocationSize(arg1);
+    main_pool_set_func(arg1, arg0 + 0x81000000, (void *)func_800046C0);
+    sizeInRam = *(u32 *)(arg1 + 0x1C);
+    if ((u32)allocationSize < sizeInRam) {
+        func_80002A40(arg1, sizeInRam);
+        func_80002210(arg0, arg1);
+        return;
+    }
+    func_80002210(arg0, arg1);
+    func_80002A40(arg1, *(u32 *)(arg1 + 0x1C));
+}
 
 #define RELOCATIONS_SIZE 1
 typedef struct S1_Fragment S1_Fragment;
