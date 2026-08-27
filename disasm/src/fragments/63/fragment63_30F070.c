@@ -2,7 +2,17 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30F070/func_87E0B700.s")
+extern void *D_87F119DC;
+extern void func_87F0B4AC(void *, f32 *, f32 *, s16 *);
+void func_87E0B700(void) {
+    void *state = D_87F119DC;
+    void *a0 = *(void **)((u8 *)*(void **)((u8 *)state + 0x38) + 0x0C);
+    func_87F0B4AC(
+        (u8 *)a0 + 0x14,
+        (f32 *)((u8 *)state + 0x48),
+        (f32 *)((u8 *)state + 0x54),
+        (s16 *)((u8 *)state + 0x42));
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30F070/func_87E0B73C.s")
 
