@@ -154,15 +154,54 @@ void func_86502620(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/53/fragment53_code/func_86505858.s")
+extern void GeoCamera_SetPerspective(void *, f32, f32, f32);
+extern void func_80038E14(s32, s32, f32, s32, f32, f32, f32, s32);
+extern f32 D_8650C47C;
+extern f32 D_8650D1E0;
+s32 func_86505858(s32 arg0, s32 arg1) {
+    extern s32 D_8650C5E0;
+    GeoCamera_SetPerspective((void *)(u32)arg1, D_8650D1E0, 100.0f, 12800.0f);
+    func_80038E14(arg1,
+        *(s32 *)((u8 *)(&D_8650C5E0) + 0x24),
+        D_8650C47C,
+        *(s32 *)((u8 *)(&D_8650C5E0) + 0x2C),
+        0.0f, D_8650C47C, 0.0f, 0);
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/53/fragment53_code/func_865058CC.s")
+extern void func_80037120(s32, s32, s32 *, s16 *, s16 *);
+extern s32 D_80094908;
+s32 func_865058CC(s32 arg0, void *arg1) {
+    s16 pad;
+    s32 sp28;
+    s16 sp26;
+    s16 sp24;
+    if (arg0 == 2) {
+        func_80037120(D_80094908 + 0xB4, D_80094908 + 0xA8, &sp28, &sp26, &sp24);
+        *(s16 *)((u8 *)arg1 + 0x1C) = (s16)(sp26 + 0x2000);
+        *(s16 *)((u8 *)arg1 + 0x1E) = (s16)(sp24 - 0x2000);
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/53/fragment53_code/func_86505934.s")
+extern void func_80037120(s32, s32, s32 *, s16 *, s16 *);
+extern s32 D_80094908;
+s32 func_86505934(s32 arg0, void *arg1) {
+    s16 pad;
+    s32 sp28;
+    s16 sp26;
+    s16 sp24;
+    if (arg0 == 2) {
+        func_80037120(D_80094908 + 0xB4, D_80094908 + 0xA8, &sp28, &sp26, &sp24);
+        *(s16 *)((u8 *)arg1 + 0x1C) = (s16)(-0x2000 - sp26);
+        *(s16 *)((u8 *)arg1 + 0x1E) = (s16)(sp24 + 0x6000);
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
