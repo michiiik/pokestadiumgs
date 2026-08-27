@@ -27,7 +27,25 @@ u8 func_80062DD4(u8 arg0) { extern u8 D_8009782D[]; if (arg0 > 0 && arg0 < 0xFC)
 
 u8 func_80062E10(u8 arg0) { extern u8 D_8009782E[]; if (arg0 > 0 && arg0 < 0xFC) return D_8009782E[arg0 * 6]; return 0; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/638E0/func_80062E4C.s")
+extern u8 D_8009782E[];
+u8 func_80062E4C(u8 arg0) {
+    s32 temp_a0;
+    u8 temp_a1;
+    s32 temp_lo;
+    s32 var_v1;
+
+    temp_a0 = arg0;
+    if ((temp_a0 > 0) && (temp_a0 < 0xFC)) {
+        temp_lo = (temp_a1 = D_8009782E[temp_a0 * 6]) / 5;
+        if (temp_lo >= 8) {
+            var_v1 = 7;
+        } else {
+            var_v1 = temp_lo;
+        }
+        return var_v1;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/638E0/func_80062EB0.s")
 
