@@ -92,9 +92,43 @@ void StageContext_SaveAndSwitch(void *arg0) {
     D_800D0554 = (s32) arg0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80008514.s")
+extern s32 D_800D0554;
+extern void func_8003539C(void);
+extern void Display_QueueFramebufferRequest(s32);
+extern void Display_WaitForCompletion(void);
+extern u8 func_80002014(void);
+extern void Display_ClearFramebufferLine(u16);
+void func_80008514(s32 arg0) {
+    D_800D0554 = arg0;
+    func_8003539C();
+    Display_QueueFramebufferRequest(0);
+    Display_WaitForCompletion();
+    *(u8 *)((u8 *)(u32)D_800D0554 + 0x17) = func_80002014();
+    Display_ClearFramebufferLine(*(u16 *)((u8 *)(u32)arg0 + 0x14));
+    StageLoader_SwapDisplayListAndReset();
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80008574.s")
+extern s32 D_800D0554;
+extern s32 D_800D0540;
+extern void func_80008188(void);
+extern void func_800080E0(void);
+extern void func_8003539C(void);
+extern void Display_QueueFramebufferRequest(s32);
+extern void Display_WaitForCompletion(void);
+extern u8 func_80002014(void);
+extern void Display_WaitForFrames(s32);
+void func_80008574(void) {
+    if (D_800D0554 != 0) {
+        func_80008188();
+        func_800080E0();
+        func_8003539C();
+        Display_QueueFramebufferRequest((s32)&D_800D0540);
+        Display_WaitForCompletion();
+        *(u8 *)((u8 *)(u32)D_800D0554 + 0x17) = func_80002014();
+        Display_WaitForFrames(2);
+        D_800D0554 = 0;
+    }
+}
 
 s32 func_8000204C();
 
@@ -130,7 +164,14 @@ s32 func_80008648(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_800087E8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_800088A4.s")
+extern s32 D_800D0554;
+extern void Display_ClearFramebufferLine(u16);
+void func_800088A4(u16 arg0) {
+    if (D_800D0554 != 0) {
+        *(u16 *)((u8 *)(u32)D_800D0554 + 0x14) = arg0 | 1;
+        Display_ClearFramebufferLine(arg0);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_800088DC.s")
 
