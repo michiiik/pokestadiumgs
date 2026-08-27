@@ -11,7 +11,7 @@ void Util_Memcpy(u32 *dst, const u32 *src, s32 wordCount) {
     }
 }
 
-extern void func_80002680(void *, s32);
+extern void main_pool_init(void *, s32);
 extern void Dma_InitializeCompletionQueue(void);
 extern void *func_80002E00(s32, s32);
 extern u32 D_800871F0;
@@ -22,7 +22,7 @@ void Util_InitMainPools(void) {
     s32 size = osGetMemSize();
     D_800871F0 = size - 0x400000;
     D_800871F4 = size;
-    func_80002680(D_80134470, size | 0x80000000);
+    main_pool_init(D_80134470, size | 0x80000000);
     Dma_InitializeCompletionQueue();
     D_800CCDF0 = func_80002E00(0x10000, 0);
 }

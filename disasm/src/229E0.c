@@ -1138,7 +1138,6 @@ void func_800341BC(s32 arg0, s32 arg1) {}
 
 #ifdef VERSION_US
 extern s8 D_800D2B4B;
-extern u8 D_800D2B78;
 
 void func_800344C4(u8 arg0, s32 arg1) {
     void *temp_v1;
@@ -3392,7 +3391,7 @@ void *GeoRender_GetMatrix(s32 arg0) {
 #ifdef VERSION_US
 extern u8 D_80126010;
 extern u8 D_800948E4[];
-void func_800393C0(void) {
+void GeoRender_ResetTransformStack(void) {
     struct Vec3Words {
         s32 x;
         s32 y;
@@ -4258,7 +4257,6 @@ void func_8003F018(s32 arg0) { func_8003F03C(arg0, D_80126420); }
 #ifdef VERSION_US
 extern S1_unk_D_86002F58_004_000 *func_80038894(S1_MainPoolState *, void *, s16, S1_Vec3f *, S1_Vec3s *, S1_Vec3f *);
 extern u8 D_800948DC[];
-extern u8 D_800948E4[];
 void func_8003F03C(s32 arg0, void *arg1) {
     func_80038894(NULL, (void *) arg0, -1, &D_800948D0, (S1_Vec3s *) D_800948DC, (S1_Vec3f *) D_800948E4);
     func_80038F8C(arg1, (void *) arg0);
@@ -4428,12 +4426,11 @@ void geo_layout_cmd_close_node(void) {
 #endif
 
 #ifdef VERSION_US
-extern s32 D_80126520;
 extern S1_MainPoolState *D_80126450;
 extern void func_8003FD34(void *);
 extern void *func_800380B8(S1_MainPoolState *, s32, s16);
 extern void *func_8003811C(S1_MainPoolState *, s32, s16);
-void func_8003FD98(void) {
+void geo_layout_cmd_attach_node(void) {
     struct Cmd {
         u8 pad[4];
         void *child;
@@ -4454,7 +4451,7 @@ void func_8003FD98(void) {
 #endif
 
 #ifdef VERSION_US
-void func_8003FE6C(void) {
+void geo_layout_cmd_create_reference(void) {
     struct Cmd {
         u8 pad[4];
         S1_GraphNode *reference;
@@ -4471,7 +4468,7 @@ void func_8003FE6C(void) {
 #endif
 
 #ifdef VERSION_US
-void func_80040004(void) {
+void geo_layout_cmd_create_type3(void) {
     struct Cmd {
         u8 command;
         u8 pad;
@@ -4485,7 +4482,7 @@ void func_80040004(void) {
 #endif
 
 #ifdef VERSION_US
-void func_80040050(void) {
+void geo_layout_cmd_create_type4(void) {
     struct Cmd {
         u8 command;
         u8 pad;
@@ -4499,7 +4496,7 @@ void func_80040050(void) {
 #endif
 
 #ifdef VERSION_US
-void func_8004009C(void) {
+void geo_layout_cmd_create_ortho(void) {
     struct Cmd {
         u8 command;
         u8 pad;
@@ -4513,7 +4510,7 @@ void func_8004009C(void) {
 #endif
 
 #ifdef VERSION_US
-void func_800400E8(void) {
+void geo_layout_cmd_create_perspective(void) {
     struct Cmd {
         u8 command;
         u8 pad;
@@ -4527,8 +4524,6 @@ void func_800400E8(void) {
 #endif
 
 #ifdef VERSION_US
-extern S1_MainPoolState *D_80126450;
-extern void func_8003FD34(void *);
 void geo_layout_cmd_create_background(void) {
     struct TargetCmd16 { u8 cmd; u8 r; u8 g; u8 b; } *cmd;
     cmd = (struct TargetCmd16 *)(u32)D_80126520;

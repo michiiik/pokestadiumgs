@@ -121,8 +121,6 @@ void func_8004EE94(void) {
 #endif
 
 #ifdef VERSION_US
-extern s32 D_80128120;
-extern u8 D_80128128[];
 extern s32 D_800971F0;
 extern void func_8004EE04(u8 *, s32, s32);
 typedef void (*Callback_800503A4)();
@@ -150,9 +148,6 @@ void func_8005049C(void) { func_80050428(); }
 #endif
 
 #ifdef VERSION_US
-extern s32 D_80128120;
-extern u8 D_80128128[];
-extern s32 D_800971F0;
 void func_800504BC(s16 *arg0) {
     if (D_800971F0 != 0) {
         arg0[0] = *(s16 *)(D_80128128 + D_80128120 * 4);
@@ -213,7 +208,7 @@ extern void Sched_InitClientQueue();
 extern void func_80005568();
 extern void func_80004F34();
 typedef void (*CallbackThread_80050700)();
-void func_80050700(s32 arg0) {
+void GbTower_AudioThread(s32 arg0) {
     CallbackThread_80050700 callback = (CallbackThread_80050700)func_80003240(D_815097B0);
     __osSetFpcCsr(0x01000C01);
     Sched_InitClientQueue(D_801281B4, 0, 1);
@@ -230,17 +225,10 @@ loop:
 
 #ifdef VERSION_US
 extern s32 D_801281B0;
-extern s32 D_801281B4;
 extern u8 D_81509440[];
 extern u8 D_81509674[];
-extern u8 D_800CD020[];
-extern void *func_80003240();
-extern void __osSetFpcCsr();
-extern void Sched_InitClientQueue();
-extern void func_80005568();
-extern void func_80004F34();
 typedef void (*CallbackThread_800507B8)();
-void func_800507B8(s32 arg0) {
+void GbTower_EmuThread(s32 arg0) {
     CallbackThread_800507B8 callback1 = (CallbackThread_800507B8)func_80003240(D_81509440);
     CallbackThread_800507B8 callback2 = (CallbackThread_800507B8)func_80003240(D_81509674);
     __osSetFpcCsr(0x01000C01);
@@ -267,7 +255,6 @@ loop:
 #endif
 
 #ifdef VERSION_US
-extern s32 D_801281B0;
 
 void *GbTower_RecvExitMesg(void) {
     void *sp1C;
@@ -278,8 +265,6 @@ void *GbTower_RecvExitMesg(void) {
 #endif
 
 #ifdef VERSION_US
-extern s32 D_801281B0;
-extern s32 D_801281B4;
 extern u8 D_801281B8;
 extern u8 GbTower_SetPollMask(u8);
 extern void Display_ApplyPendingVideoMode(void);

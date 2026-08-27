@@ -11,7 +11,7 @@
 #pragma GLOBAL_ASM("asm/us/nonmatchings/AC80/func_8000A28C.s")
 
 extern Gfx *D_800D0510;
-void func_8000A304(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+void draw_profiler_rect(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     s32 y;
     s32 y2;
     y2 = arg2 + 2;
@@ -27,7 +27,7 @@ void func_8000A304(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     gDPFillRectangle(D_800D0510++, arg0, y, arg1, y2);
 }
 
-void func_8000A3EC(u64 start, u64 endA, u64 endB, s16 y, u16 color) {
+void draw_profiler_bar_cpu(u64 start, u64 endA, u64 endB, s16 y, u16 color) {
     u64 first;
     u64 second;
     s32 x0;
@@ -40,17 +40,17 @@ void func_8000A3EC(u64 start, u64 endA, u64 endB, s16 y, u16 color) {
     x1 = (((second * 64) / 3000) * 3) / 1000 + 30;
     if (x0 >= 226) x0 = 225;
     if (x1 >= 226) x1 = 225;
-    if (x0 < x1) func_8000A304(x0, x1, y, color);
+    if (x0 < x1) draw_profiler_rect(x0, x1, y, color);
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/AC80/func_8000A590.s")
 
-extern void func_8000A304(s32, s32, s32, s32);
+extern void draw_profiler_rect(s32, s32, s32, s32);
 void draw_reference_profiler_bars(void) {
-    func_8000A304(0x1E, 0x4F, 0xDC, 0x2ABF);
-    func_8000A304(0x4F, 0x80, 0xDC, 0xFFCB);
-    func_8000A304(0x80, 0xB1, 0xDC, 0xFBCB);
-    func_8000A304(0xB1, 0xE2, 0xDC, 0xF94B);
+    draw_profiler_rect(0x1E, 0x4F, 0xDC, 0x2ABF);
+    draw_profiler_rect(0x4F, 0x80, 0xDC, 0xFFCB);
+    draw_profiler_rect(0x80, 0xB1, 0xDC, 0xFBCB);
+    draw_profiler_rect(0xB1, 0xE2, 0xDC, 0xF94B);
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/AC80/func_8000A730.s")

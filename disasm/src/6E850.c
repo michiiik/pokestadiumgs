@@ -30,7 +30,7 @@ extern s16 D_8009E9D4[];
 extern s16 D_8009EBD8[];
 extern s16 D_8009EDDC[];
 extern s16 D_8009EFE0[];
-s16 func_8006DCD0(s16 *arg0, s32 arg1) {
+s16 Model_GetVertexClass(s16 *arg0, s32 arg1) {
     s16 index;
     s16 value;
 
@@ -157,7 +157,7 @@ void func_8006E7DC(f32 (*arg0)[4], void *arg1) {
 
 #ifdef VERSION_US
 typedef struct Copy60 { s32 words[15]; } Copy60;
-void func_8006EB14(void *arg0, void *arg1) {
+void Model_CopyPositionBuffer(void *arg0, void *arg1) {
     *(Copy60 *)arg1 = *(Copy60 *)arg0;
 }
 void func_8006EB14_padding(void) {}
@@ -208,7 +208,30 @@ f32 func_8006EF04(f32 *arg0, f32 *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_8006F658.s")
+extern u32 Memmap_GetSegmentVaddr(u32);
+void func_8006F658(u8 *arg0, u8 *arg1, f32 arg2) {
+    s16 *classes;
+    s16 *indices;
+    s32 cls;
+    s32 i;
+    u16 count;
+    u8 *record;
+
+    classes = (s16 *)Memmap_GetSegmentVaddr(*(u32 *)(arg0 + 0x10));
+    indices = (s16 *)Memmap_GetSegmentVaddr(*(u32 *)(arg0 + 0x14));
+    count = *(u16 *)(arg0 + 4);
+    record = arg1;
+    i = 0;
+    while (i < count) {
+        cls = Model_GetVertexClass(classes, i);
+        if ((cls != 0) && (cls != 1) && (i == *indices)) {
+            *(f32 *)(record + 0x24) += arg2;
+        }
+        i++;
+        record += 0x50;
+        indices++;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -275,7 +298,35 @@ extern s16 D_80129078; void func_80070860(s32 arg0) { D_80129078++; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_8007087C.s")
+extern void MtxF_Copy(u32 *, u32 *);
+extern u32 *func_8003936C(s32);
+extern void func_8006E1C8();
+extern void func_8006FBC4();
+void func_80070FDC(f32 arg0[4][4]);
+void func_80071068(f32 arg0[4][4]);
+extern f32 D_80129080[4][4];
+extern f32 D_80129120[4][4];
+extern f32 D_8009F3B0[4][4];
+void func_8007087C(void) {
+    u16 *state;
+    u8 *entry;
+    f32 scaleMtx[4][4];
+
+    state = func_8003F54C((void *)D_8009491C);
+    if (state != NULL) {
+        entry = *(u8 **)(((u8 (*)[4])state)[(s16)*state] + 0xC);
+        MtxF_Copy(D_80129120[0], func_8003936C(0));
+        func_80070FDC(D_80129120);
+        func_80071068(D_80129120);
+        if ((*(s16 *)(entry + 2) == 0) || (*(s16 *)((u8 *)state + 6) == 0)) {
+            guScaleF(scaleMtx, 1.0f, 1.0f, 1.0f);
+            func_8006E1C8(entry, D_80129080, D_80129120, D_8009F3B0, scaleMtx);
+            *(s16 *)(entry + 2) = 1;
+        } else {
+            func_8006FBC4(entry, D_80129120);
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US

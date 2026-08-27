@@ -320,7 +320,7 @@ u8 *func_800041E4(s32 arg0, u8 *arg1, u8 *arg2, s32 arg3) {
     if (result != NULL) {
         Yay0_DecompressAndRelocate(arg2, result);
     }
-    func_800029E0(arg1);
+    main_pool_try_free(arg1);
     return result;
 }
 
@@ -365,7 +365,7 @@ u8 *func_800042C0(u8 *arg0, u8 *arg1, s32 arg2, s32 arg3) {
         } else {
             result = func_80004254(0, arg0, arg1, arg3, ((arg1 - arg0) + 0xF) & ~0xF, arg2);
         }
-        func_800029E0(header);
+        main_pool_try_free(header);
     }
     return result;
 }
@@ -393,7 +393,7 @@ u8 *func_80004458(s32 arg0, u8 *arg1, u8 *arg2) {
         } else {
             result = func_80004254(arg0, arg1, arg2, 0, ((arg2 - arg1) + 0xF) & ~0xF, -1);
         }
-        func_800029E0(header);
+        main_pool_try_free(header);
     }
     return result;
 }
@@ -529,7 +529,7 @@ S1_BinArchive* BinArchive_Open(u8* romStart, u8* romEnd, s32 arg2, s32 arg3) {
             ret = newaddr;
             if (newaddr != NULL) {
                 sp28 = (ret->num_files * 0x10) + 0x10;
-                func_800029E0(ret);
+                main_pool_try_free(ret);
                 newaddr = func_800042C0(romStart, romStart + sp28, 0, 0);
                 ret = newaddr;
                 if (newaddr != NULL) {
@@ -546,7 +546,7 @@ S1_BinArchive* BinArchive_Open(u8* romStart, u8* romEnd, s32 arg2, s32 arg3) {
             ret = newaddr;
             if (newaddr != NULL) {
                 sp28_2 = (ret->num_files * 0x10) + 0x10;
-                func_800029E0(ret);
+                main_pool_try_free(ret);
                 newaddr = func_800042C0(romStart, romStart + sp28_2, 1, 0);
                 ret = newaddr;
                 if ((newaddr != NULL) && (arg3 == 1)) {
@@ -563,7 +563,7 @@ S1_BinArchive* BinArchive_Open(u8* romStart, u8* romEnd, s32 arg2, s32 arg3) {
     return ret;
 }
 
-void func_800049B8(void) { func_800029E0(); }
+void func_800049B8(void) { main_pool_try_free(); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800049D8.s")
 

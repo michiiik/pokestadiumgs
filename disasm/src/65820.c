@@ -59,7 +59,7 @@ s32 Fragment_LoadAndCall(s32 arg0, u8* romStart, u8* romEnd, u32 arg3, u32 arg4)
 
     result = func(arg3, arg4);
 
-    func_800029E0(func);
+    main_pool_try_free(func);
 
     return result;
 }

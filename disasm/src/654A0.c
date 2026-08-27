@@ -23,8 +23,6 @@ void func_800649E0(void) {
     _bzero(&D_80128B58, 0x80);
 }
 
-extern s8 D_80128B50;
-extern u8 D_80128B58;
 extern u8 D_80128B5A;
 u8 func_80064980(u8);
 void func_80064A10(u8 arg0, u8 arg1) {

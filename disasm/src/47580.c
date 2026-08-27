@@ -112,7 +112,7 @@ void func_80047558(s32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047588.s")
 
-extern u8 *D_80126F50; void func_80047610(void) { func_800029E0(D_80126F50); }
+extern u8 *D_80126F50; void func_80047610(void) { main_pool_try_free(D_80126F50); }
 
 extern u16 D_80094FB4;
 void func_80047634(u16 arg0) { D_80094FB4 |= arg0; }

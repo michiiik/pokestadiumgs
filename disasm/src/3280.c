@@ -11,7 +11,7 @@ extern u8 D_800CCDB0[];
 extern OSMesgQueue D_800CCDB4;
 #define POOL3280 (*(Pool3280 *)D_800CCDB0)
 #define POOL_ALIGN16(v) (((v) + 0xF) & ~0xF)
-void func_80002680(void *arg0, void *arg1) {
+void main_pool_init(void *arg0, void *arg1) {
     POOL3280.start = (PoolBlock3280 *)(u32)(POOL_ALIGN16((u32)arg0) + 0x10);
     POOL3280.end = (PoolBlock3280 *)(u32)(POOL_ALIGN16((u32)arg1 - 0xF) - 0x10);
     POOL3280.available = (s32)POOL3280.end - (s32)POOL3280.start;
@@ -30,7 +30,7 @@ void func_80002680(void *arg0, void *arg1) {
     osSendMesg(&D_800CCDB4, NULL, 0);
 }
 
-s32 func_80002740(s32 arg0, s32 arg1) {
+s32 main_pool_alloc_from_pool(s32 arg0, s32 arg1) {
     PoolBlock3280 *newListHead;
     s32 result;
     arg0 = POOL_ALIGN16(arg0) + 0x10;
@@ -63,13 +63,12 @@ s32 func_80002740(s32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/3280/func_800027F0.s")
 
-extern OSMesgQueue D_800CCDB4;
-extern s32 func_80002740(s32, s32);
+extern s32 main_pool_alloc_from_pool(s32, s32);
 extern u8 *main_pool_set_func(u8 *, s32, s32);
-s32 func_8000290C(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+s32 main_pool_alloc_with_func(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     s32 result;
     osRecvMesg(&D_800CCDB4, NULL, 1);
-    result = func_80002740(arg0, arg1);
+    result = main_pool_alloc_from_pool(arg0, arg1);
     if (result != 0) {
         main_pool_set_func((u8 *)(u32)result, arg2, arg3);
     }
@@ -77,23 +76,18 @@ s32 func_8000290C(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     return result;
 }
 
-extern s32 func_80002740(s32, s32);
-extern OSMesgQueue D_800CCDB4;
 s32 main_pool_alloc(s32 arg0, s32 arg1) {
     s32 result;
 
     osRecvMesg(&D_800CCDB4, NULL, 1);
-    result = func_80002740(arg0, arg1);
+    result = main_pool_alloc_from_pool(arg0, arg1);
     osSendMesg(&D_800CCDB4, NULL, 0);
     return result;
 }
 
-extern OSMesgQueue D_800CCDB4;
-extern s32 func_80002740(s32, s32);
 extern s32 func_800027F0(s32, s32);
 extern s32 main_pool_get_available(void);
-extern u8 *main_pool_set_func(u8 *, s32, s32);
-s32 func_800029E0(s32 arg0) {
+s32 main_pool_try_free(s32 arg0) {
     if (arg0 != 0) {
         osRecvMesg(&D_800CCDB4, NULL, 1);
         func_800027F0(arg0, 1);
@@ -124,7 +118,7 @@ s32 main_pool_push_state(s32 arg0) {
     available = POOL3280.available;
     listHeadL = POOL3280.listHeadL;
     listHeadR = POOL3280.listHeadR;
-    state = (PoolState3280 *)(u32)func_80002740(0x10, 0);
+    state = (PoolState3280 *)(u32)main_pool_alloc_from_pool(0x10, 0);
     if (state != NULL) {
         ((PoolBlock3280 *)((u8 *)state - 0x10))->arg = arg0;
         state->prev = POOL3280.mainState;
@@ -139,7 +133,7 @@ s32 main_pool_push_state(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/3280/main_pool_pop_state.s")
 
-u8 *func_80002D20(u32 arg0, s32 *arg1) {
+u8 *main_pool_search(u32 arg0, s32 *arg1) {
     PoolBlock3280 *node;
     PoolBlock3280 *otherNode;
     node = POOL3280.listHeadL->prev;

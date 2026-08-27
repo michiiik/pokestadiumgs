@@ -68,7 +68,6 @@ void func_8000CCF0(s32 arg0)
 #endif
 
 #ifdef VERSION_US
-extern u8 D_8011BE90[];
 void func_8000CFB4(s32 arg0, s32 arg1)
 {
     struct LocalEntry {

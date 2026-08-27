@@ -46,9 +46,7 @@ void func_8006A180(void) {
     }
 }
 
-extern s32 D_8009DF70;
 extern void *main_pool_alloc(s32, s32);
-extern void _bzero(void *, s32);
 typedef struct NodeA1FC { s32 pad0; s32 next; s32 value; } NodeA1FC;
 NodeA1FC *func_8006A1FC(s32 arg0) {
     NodeA1FC *result = NULL;
@@ -64,9 +62,6 @@ NodeA1FC *func_8006A1FC(s32 arg0) {
     return result;
 }
 
-extern s32 D_8009DF70;
-extern void *main_pool_alloc(s32, s32);
-extern void _bzero(void *, s32);
 typedef struct InitA278 { u8 pad0[4]; s16 value4; s16 value6; s16 value8; } InitA278;
 InitA278 *func_8006A278(void) {
     InitA278 *result = NULL;
@@ -89,7 +84,6 @@ extern s32 D_8009DF70; s32 func_8006A2F8(u16 value){s32 result=0; s32 ptr=D_8009
 
 extern s32 D_8009DF70; s32 func_8006A328(u16 value){s32 result=0; s32 ptr=D_8009DF70; if(ptr!=0){*(u16 *)((u8 *)(u32)ptr+4)&=~value; result=1;} return result;}
 
-extern s32 D_8009DF70;
 s32 func_8006A35C(u16 value) { s32 result = 0; if (D_8009DF70 != 0) result = ((*(u16 *)((u8 *)(u32)D_8009DF70 + 4) & value) != 0); return result; }
 
 s32 func_8006A388(void) { s32 result = 0; if (D_8009DF70 != 0 && (*(u16 *)((u8 *)(u32)D_8009DF70 + 4) & 1) != 0) result = 1; return result; }
@@ -102,7 +96,6 @@ s32 func_8006A400(s32 value) { s32 result = 0; if (D_8009DF70 != 0) { *(s16 *)((
 
 s32 func_8006A424(void) { s32 result = 0; s32 ptr = D_8009DF70; if (ptr != 0) result = *(s16 *)((u8 *)(u32)ptr + 2); return result; }
 
-extern void _bzero(void *, s32);
 s32 func_8006A444(s32 value) { s32 result = 0; if (D_8009DF70 != 0) { *(s16 *)((u8 *)(u32)D_8009DF70 + 6) = value; _bzero((u8 *)(u32)D_8009DF70 + 0x3C, 0x44); result = 1; } return result; }
 
 s32 func_8006A48C(void) { s32 result = -1; s32 ptr = D_8009DF70; if (ptr != 0) result = *(s16 *)((u8 *)(u32)ptr + 6); return result; }
@@ -293,7 +286,6 @@ extern void func_8006BF78(s32); void func_8006C58C(void) { func_8006BF78(0); }
 
 extern void func_8006BF78(s32); void func_8006C644(void) { func_8006BF78(1); }
 
-extern s32 D_8009DF70;
 extern s32 func_800718B8(s32);
 extern void func_80073208(void *, s32);
 void *func_8006C664(void) {
@@ -315,13 +307,12 @@ void *func_8006C664(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006C714.s")
 
-extern void func_800029E0(void);
-void func_8006C9C0(void) { func_800029E0(); if (D_8009DF70 != 0) *(s32 *)((u8 *)(u32)D_8009DF70 + 0x38) = 0; }
+extern void main_pool_try_free(void);
+void func_8006C9C0(void) { main_pool_try_free(); if (D_8009DF70 != 0) *(s32 *)((u8 *)(u32)D_8009DF70 + 0x38) = 0; }
 
-extern void *main_pool_alloc(s32, s32);
 void *func_8006C9F4(void) { void *result = main_pool_alloc(0x440, 0); if (result != NULL) _bzero(result, 0x440); return result; }
 
-extern void func_800029E0(void); void func_8006CA34(void) { func_800029E0(); }
+extern void main_pool_try_free(void); void func_8006CA34(void) { main_pool_try_free(); }
 
 typedef struct SmallCA54 { s16 flag; s8 value; u8 pad3; } SmallCA54;
 SmallCA54 *func_8006CA54(s32 arg0) {
@@ -336,7 +327,7 @@ SmallCA54 *func_8006CA54(s32 arg0) {
     return result;
 }
 
-extern void func_800029E0(void); void func_8006CAC0(void) { func_800029E0(); }
+extern void main_pool_try_free(void); void func_8006CAC0(void) { main_pool_try_free(); }
 
 typedef struct InitCAE0 {
     s16 flag;
@@ -365,7 +356,7 @@ InitCAE0 *func_8006CAE0(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, u16 ar
     return result;
 }
 
-extern void func_800029E0(void); void func_8006CB80(void) { func_800029E0(); }
+extern void main_pool_try_free(void); void func_8006CB80(void) { main_pool_try_free(); }
 
 s32 func_8006CBA0(s32 a,s32 b){s32 result=0; s32 next=a+1; if(b==next)result=1; return result;}
 
@@ -375,7 +366,6 @@ extern s16 D_8009DF74; void func_8006CBFC(void) { D_8009DF74 = 1; }
 
 extern s16 D_8009DF74; void func_8006CC0C(void) { D_8009DF74 = 0; }
 
-extern s32 D_8009DF70;
 extern void *Util_Malloc(s32);
 extern void Util_Free(void *);
 extern void _bcopy(void *, void *, s32);
@@ -432,7 +422,6 @@ s32 func_8006CC18(s32 arg0, s32 arg1) {
     return result;
 }
 
-extern void _bcopy(void *, void *, s32);
 typedef struct CopyCDA0C { s32 words[22]; } CopyCDA0C;
 s32 func_8006CDA0(u8 *arg0,u8 *arg1) {
  s32 result=0; s32 offset; u8 *src; u8 *dst;

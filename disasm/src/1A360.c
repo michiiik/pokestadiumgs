@@ -88,8 +88,6 @@ s32 func_8001A308(s32 arg0, s32 arg1) {
     return result;
 }
 
-extern u8 D_8011BE90[];
-extern s32 func_80014190();
 s32 func_8001A3DC(s32 arg0, s32 arg1) {
     s32 result;
     u8 *entry;
@@ -112,8 +110,6 @@ s32 func_8001A3DC(s32 arg0, s32 arg1) {
     return result;
 }
 
-extern u8 D_8011BE90[];
-extern s32 func_80014190();
 s32 *func_8001A4C0(s32 arg0, s32 arg1) {
     s32 *result;
     u8 *entry;

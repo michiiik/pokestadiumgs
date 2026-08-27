@@ -143,7 +143,6 @@ void func_800435D4(u8 *arg0) {
     }
 }
 
-extern Gfx *D_800D0510;
 extern void func_80043500();
 extern void func_80007328();
 extern void func_800435D4();
@@ -158,7 +157,6 @@ s32 func_80043678(u8 *arg0) {
     return *(s32 *)((u8 *)(u32)*(u32 *)(arg0 + 0x20) + 8);
 }
 
-extern s32 D_80094C60;
 void func_800436CC(s32 value) { if (value >= 0 && value < 7) D_80094C60 = value; }
 
 

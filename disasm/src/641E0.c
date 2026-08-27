@@ -86,7 +86,6 @@ void func_80063C90(u8 arg0, unsigned short arg1)
 }
 
 extern u8 D_800998AC[];
-extern u8 D_80098318[];
 s32 func_80063CC4(arg0, arg1) u8 arg0; u8 arg1; { s32 index = arg0; s32 bit_index; if ((arg0 > 0) && (arg0 < 0x98) && (arg1 > 0) && (arg1 < 0x38)) { bit_index = arg1 - 1; return (D_800998AC[index * 9 + (bit_index / 8)] & (1 << (bit_index % 8))) != 0; } return 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80063D54.s")

@@ -131,7 +131,6 @@ void func_8001082C(void *arg0) {
     GbApu_InitAllocator((u8 *)&D_8011EC20, GbApu_Alloc(&D_8011EBC0, *(s32 *)((u8 *)arg0 + 0xC)), *(s32 *)((u8 *)arg0 + 0xC));
 }
 
-extern S1_unk_func_81206FA0 D_8011EC20;
 extern u8 D_8011EC30;
 extern u8 D_8011EC40;
 void func_800108B0(void *arg0) {

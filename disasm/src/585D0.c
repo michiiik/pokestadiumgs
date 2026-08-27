@@ -45,14 +45,14 @@ extern u8 D_80128574[]; s32 func_80057A5C(s32 index) { return D_80128574[index *
 #endif
 
 #ifdef VERSION_US
-s32 func_8005712C(s32, s32, s32, s32);
+s32 GbPak_WriteCommand(s32, s32, s32, s32);
 s32 func_80057ACC(s32, s32, s32, s32);
 s32 func_80057BCC(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     s32 var_s0;
 
     var_s0 = 0;
 loop_1:
-    if ((func_8005712C(arg0, arg1, arg2, arg3) == 0) && (func_80057ACC(arg0, arg1, arg2, arg3) != 0)) {
+    if ((GbPak_WriteCommand(arg0, arg1, arg2, arg3) == 0) && (func_80057ACC(arg0, arg1, arg2, arg3) != 0)) {
         return 1;
     }
     var_s0 += 1;
@@ -407,7 +407,7 @@ void func_8005B120(s32 arg0) { func_80059320(arg0, 0xFF); }
 #endif
 
 #ifdef VERSION_US
-void GbSave_RequirePakPresent(s32 arg0) { if (func_80056A5C(arg0, 0) == 0) func_80064D58(arg0, 2); }
+void GbSave_RequirePakPresent(s32 arg0) { if (GbTower_CheckPakRemoved(arg0, 0) == 0) func_80064D58(arg0, 2); }
 #endif
 
 #ifdef VERSION_US
