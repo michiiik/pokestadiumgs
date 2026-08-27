@@ -372,7 +372,13 @@ void func_800542E4(s32 arg0, u8 arg1) {
     func_80053F04(0x13, 0, arg0, &sp1F);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_8005431C.s")
+u8 func_8005431C(void) {
+    u8 result = 0;
+    if ((*(s32 *)((u8 *)&D_801281C0 + (func_80050D20(0x13, -1) * 0xC)) & 1) != 0) {
+        result = *((u8 *)func_800510CC(0) + 1);
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_8005437C.s")
 
