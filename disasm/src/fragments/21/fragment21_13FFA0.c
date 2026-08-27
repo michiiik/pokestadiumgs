@@ -2,7 +2,17 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_13FFA0/func_82500020.s")
+extern s16 D_82508F6E;
+s32 func_82500020(s32 arg0, void *arg1) {
+    if (arg0 != 0 && arg0 == 1) {
+        if (D_82508F6E != 0) {
+            *(u16 *)((u8 *)arg1 + 2) |= 2;
+        } else {
+            *(u16 *)((u8 *)arg1 + 2) &= 0xFFFD;
+        }
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -19,7 +29,17 @@ s32 func_82500064(s32 arg0, s32 arg1) { switch (arg0) { case 0: D_82508F80 = arg
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_13FFA0/func_825001B4.s")
+extern s16 D_82508F6C;
+s32 func_825001B4(s32 arg0, void *arg1) {
+    if (arg0 != 0 && arg0 == 1) {
+        if (D_82508F6C != 0) {
+            *(u16 *)((u8 *)arg1 + 2) |= 2;
+        } else {
+            *(u16 *)((u8 *)arg1 + 2) &= 0xFFFD;
+        }
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
