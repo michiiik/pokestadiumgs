@@ -32,7 +32,17 @@ u8 func_88903084(u8 arg0) { u8 result = 0; switch (arg0) { case 0x1e: result=0x1
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D8160/func_889030D8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D8160/func_8890311C.s")
+u8 func_8890311C(u8 arg0) {
+    u8 result = 0;
+    if (arg0 != 0x19) {
+        if (arg0 == 0x85) {
+            result = 0x87;
+        }
+    } else {
+        result = 0x1A;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D8160/func_88903150.s")
 
