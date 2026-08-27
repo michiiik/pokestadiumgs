@@ -205,7 +205,6 @@ void func_800516C4(u8 *arg0, s32 arg1, s32 arg2) {
     }
 }
 
-extern void func_80051610(void *, s32, s32);
 void func_80051724(u8 *arg0, s32 arg1, s32 arg2) {
     s32 *temp_v0;
 
@@ -465,7 +464,6 @@ void func_80054A24(s32 arg0, u8 arg1) {
     }
 }
 
-extern void *func_80051138(s32);
 s32 func_80054AA0(s32 arg0) {
     s32 result = 0;
     void *temp_v0;

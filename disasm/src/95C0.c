@@ -13,13 +13,11 @@ void func_80008B7C(void) {
     gSPTexture(D_800D05A0++, 0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF);
 }
 
-extern Gfx *D_800D05A0;
 void func_80008C18(s16 arg0, s16 arg1, s16 arg2) {
     gSPTextureRectangle(D_800D05A0++, arg0 * 4, arg1 * 4, (arg0 + 6) << 2, (arg1 + 8) << 2, G_TX_RENDERTILE,
                         ((arg2 % 16) * 6) << 5, (u16)(arg2 / 16) << 8, 0x0400, 0x0400);
 }
 
-extern Gfx *D_800D05A0;
 void func_80008D24(s16 arg0, s16 arg1, s16 arg2) {
     gSPTextureRectangle(D_800D05A0++, arg0 * 8, arg1 * 8, (arg0 + 6) << 3, (arg1 + 8) << 3, G_TX_RENDERTILE,
                         ((arg2 % 16) * 6) << 5, (u16)(arg2 / 16) << 8, 0x0200, 0x0200);

@@ -123,8 +123,6 @@ void func_80009EB4(s32 arg0, s32 arg1, s32 arg2) {
     *(s16 *)(D_800D05B0 + 0x9D2) = *arg2p;
 }
 
-extern u8 D_800D05B0[];
-extern OSMesgQueue D_800D0F60;
 extern void *D_800D0F78;
 extern s32 func_8000339C(void);
 extern void func_80009E04(void *);

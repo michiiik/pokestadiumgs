@@ -127,8 +127,6 @@ s32 func_8004BA34(s32 arg0) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4C2E0/func_8004BD28.s")
 
 extern s32 func_8004B754(s32);
-extern u8 D_801270B3[];
-extern u8 D_801270B4[];
 void func_8004BD78(s32 a, s16 b) {
     s32 i = func_8004B754(a);
     if (i >= 0)

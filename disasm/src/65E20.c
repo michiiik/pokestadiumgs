@@ -21,7 +21,6 @@ void func_800657B0(void) {
 
 extern void func_80065814(s32);
 extern void Audio_ResetRequestId(void);
-extern void func_800354B4(s32, s32, s32);
 extern void func_800727D4(s32);
 extern void func_80065B20(void);
 void func_80065974(u32 arg0) {
@@ -46,12 +45,10 @@ void func_80065974(u32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/65E20/func_80065A18.s")
 
-extern s32 Fragment_LoadAndCall(s32, void *, void *, u32, u32);
 extern void Game_SetState(s32);
 extern u8 D_83F00000;
 extern u8 D_82900000;
 extern u8 fragment15_ROM_START;
-extern u8 fragment16_ROM_START;
 extern u8 fragment67_ROM_START;
 extern u8 fragment68_ROM_START;
 void func_80065B20(void) {
