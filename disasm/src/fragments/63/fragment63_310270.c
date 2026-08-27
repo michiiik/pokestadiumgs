@@ -4,7 +4,16 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_310270/func_87E0C900.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_310270/func_87E0C93C.s")
+extern void *D_87F119DC;
+extern void func_87F0B4AC(void *, f32 *, f32 *, s16 *);
+void func_87E0C93C(void) {
+    void *state = D_87F119DC;
+    func_87F0B4AC(
+        *(void **)((u8 *)*(void **)((u8 *)state + 0x38) + 0x0C),
+        (f32 *)((u8 *)state + 0x48),
+        (f32 *)((u8 *)state + 0x54),
+        (s16 *)((u8 *)state + 0x42));
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_310270/func_87E0C974.s")
 
