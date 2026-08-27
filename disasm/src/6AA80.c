@@ -251,7 +251,18 @@ loop:
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006B07C.s")
+s32 func_8006B07C(s8 *arg0) {
+    s32 result = -1;
+    s32 sentinel = -1;
+    s32 i = 0;
+    for (i = 0; i < 4; i++) {
+        if (*(s8 *)((u8 *)arg0 + i) == sentinel) {
+            result = i;
+            break;
+        }
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006B0B8.s")
 
