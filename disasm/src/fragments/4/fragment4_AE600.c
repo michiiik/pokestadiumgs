@@ -65,11 +65,46 @@ void func_81800E30(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AE600/func_8180128C.s")
+extern s32 func_8004CA4C(u8 *);
+extern u16 func_8004CA10(u16 *);
+extern u16 func_8004CA24(u16 *);
+s32 func_8180128C(u8 *arg0) {
+    s32 scale;
+    s32 value;
+
+    scale = 8;
+    switch (func_8004CA4C(arg0)) {
+    case 0:
+        scale = 4;
+        break;
+    case 1:
+        break;
+    case 2:
+        scale = 0x10;
+        break;
+    case 3:
+        scale = 0x20;
+        break;
+    }
+    value = func_8004CA10((u16 *)arg0);
+    return func_8004CA24((u16 *)arg0) * scale * value;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AE600/func_8180132C.s")
+extern s32 StageContext_GetFadeMode(void);
+extern void func_80007AEC(s32);
+s32 func_8180132C(s32 arg0) {
+    switch (StageContext_GetFadeMode()) {
+    case 1:
+        func_80007AEC(arg0);
+    case 2:
+    case 3:
+        return 0;
+    case 0:
+        return 1;
+    }
+}
 #endif
 
 #ifdef VERSION_US
