@@ -11,11 +11,58 @@ void BattleScene_ResetParticipantModelFlags(s32 arg0) { func_80069F20(arg0, 0, 0
 
 extern void func_80069F20(void); void func_8006A160(void) { func_80069F20(); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006A180.s")
+extern s32 D_8009DF70;
+extern void _bzero(void *, s32);
+void func_8006A180(void) {
+    u8 *ptr;
+    if (D_8009DF70 != 0) {
+        ptr = *(u8 **)((u8 *)(u32)D_8009DF70 + 0x24);
+        if (ptr != NULL) {
+            _bzero(ptr, 0x958);
+            *(s8 *)(*(u8 **)((u8 *)(u32)D_8009DF70 + 0x24) + 0x93C) = -1;
+            *(s8 *)(*(u8 **)((u8 *)(u32)D_8009DF70 + 0x24) + 0x93D) = -1;
+            *(s8 *)(*(u8 **)((u8 *)(u32)D_8009DF70 + 0x24) + 0x93E) = -1;
+            *(s8 *)(*(u8 **)((u8 *)(u32)D_8009DF70 + 0x24) + 0x93F) = -1;
+        }
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006A1FC.s")
+extern s32 D_8009DF70;
+extern void *main_pool_alloc(s32, s32);
+extern void _bzero(void *, s32);
+typedef struct NodeA1FC { s32 pad0; s32 next; s32 value; } NodeA1FC;
+NodeA1FC *func_8006A1FC(s32 arg0) {
+    NodeA1FC *result = NULL;
+    if (D_8009DF70 != 0) {
+        result = main_pool_alloc(0xC, 0);
+        if (result != NULL) {
+            _bzero(result, 0xC);
+            result->next = *(s32 *)((u8 *)(u32)D_8009DF70 + 0x1C);
+            result->value = arg0;
+            *(NodeA1FC **)((u8 *)(u32)D_8009DF70 + 0x30) = result;
+        }
+    }
+    return result;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006A278.s")
+extern s32 D_8009DF70;
+extern void *main_pool_alloc(s32, s32);
+extern void _bzero(void *, s32);
+typedef struct InitA278 { u8 pad0[4]; s16 value4; s16 value6; s16 value8; } InitA278;
+InitA278 *func_8006A278(void) {
+    InitA278 *result = NULL;
+    if (D_8009DF70 != 0) {
+        result = main_pool_alloc(0x50, 0);
+        if (result != NULL) {
+            *(InitA278 **)((u8 *)(u32)D_8009DF70 + 0x34) = result;
+            _bzero(result, 0x50);
+            result->value4 = 1;
+            result->value6 = 0xF;
+            result->value8 = 0x1E;
+        }
+    }
+    return result;
+}
 
 extern s32 D_8009DF70; void func_8006A2EC(void) { D_8009DF70 = 0; }
 
@@ -41,7 +88,16 @@ s32 func_8006A444(s32 value) { s32 result = 0; if (D_8009DF70 != 0) { *(s16 *)((
 
 s32 func_8006A48C(void) { s32 result = -1; s32 ptr = D_8009DF70; if (ptr != 0) result = *(s16 *)((u8 *)(u32)ptr + 6); return result; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006A4AC.s")
+typedef struct CopyA4AC { s32 words[17]; } CopyA4AC;
+s32 func_8006A4AC(void *arg0) {
+    s32 result = 0;
+    if ((D_8009DF70 != 0) && (arg0 != NULL)) {
+        *(s16 *)((u8 *)(u32)D_8009DF70 + 6) = 0xE;
+        *(CopyA4AC *)((u8 *)(u32)D_8009DF70 + 0x3C) = *(CopyA4AC *)arg0;
+        result = 1;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006A51C.s")
 
@@ -211,7 +267,32 @@ SmallCA54 *func_8006CA54(s32 arg0) {
 
 extern void func_800029E0(void); void func_8006CAC0(void) { func_800029E0(); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006CAE0.s")
+typedef struct InitCAE0 {
+    s16 flag;
+    s16 value4;
+    u16 value5;
+    u16 pad6;
+    s16 value0;
+    s16 value1;
+    s16 value2;
+    s16 value3;
+} InitCAE0;
+InitCAE0 *func_8006CAE0(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, u16 arg5) {
+    InitCAE0 *result = main_pool_alloc(0x10, 0);
+    if (result != NULL) {
+        _bzero(result, 0x10);
+        if (D_8009DF70 != 0) {
+            result->flag = ((*(u16 *)((u8 *)(u32)D_8009DF70 + 4) & 1) != 0);
+            result->value4 = (s16)arg4;
+            result->value5 = (u16)arg5;
+            result->value0 = (s16)arg0;
+            result->value1 = (s16)arg1;
+            result->value2 = (s16)arg2;
+            result->value3 = (s16)arg3;
+        }
+    }
+    return result;
+}
 
 extern void func_800029E0(void); void func_8006CB80(void) { func_800029E0(); }
 
