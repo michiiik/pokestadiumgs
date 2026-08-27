@@ -8,7 +8,22 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/AC80/func_8000A1E8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/AC80/func_8000A28C.s")
+extern u8 D_800D0F90;
+extern OSTime osGetTime(void);
+typedef struct {
+    s16 pad0;
+    s16 count;
+    u8 pad[0x84];
+    OSTime times[8];
+} ProfilerRecord;
+void func_8000A28C(void) {
+    ProfilerRecord *record = (ProfilerRecord *)&D_800D0F90;
+    record += *(s16 *)((u8 *)&D_800D0F90 + 0x25C);
+    if (record->count < 8) {
+        record->times[record->count] = osGetTime();
+        record->count++;
+    }
+}
 
 extern Gfx *D_800D0510;
 void draw_profiler_rect(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
