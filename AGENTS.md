@@ -8,13 +8,22 @@ referenced docs and in git history, not here.
 
 ## 1. Running a session
 
-### 1.1 Start with parallel investigation
+### 1.1 Two kinds of session
 
-When the user states a goal, do not start editing. First fan out **parallel
-read-only investigation agents** (one per independent question: the affected
-tools, the assembly shape, the probe statistics, the docs, the git history) and
-synthesise their reports into a short plan with evidence and numbers before
-proposing changes. Rules of thumb:
+**Decompilation sessions** (the goal is "decompile owners in fragment N /
+family F / file X") run the lean loop in §2 and §3.4 directly: list targets,
+run the sweeps, hand-write candidates for the leftovers, commit per batch.
+Do not spawn investigation or implementation agents for this loop; the
+overhead costs more than it saves. Keep the sweep waves running alongside hand
+work: `--fragment-range`/`--skip-attempted` bands, `--large`, `--near-miss`,
+`--near-miss-kinds` — they supply most of the volume.
+
+**Tooling and process sessions** (the goal changes how the pipeline works:
+runner, sweep, classifier, hooks, docs, layout) start with **parallel
+read-only investigation agents** — one per independent question (the
+affected tools, the assembly shape, the probe statistics, the docs, the git
+history) — and synthesise their reports into a short plan with evidence and
+numbers before proposing changes. Then:
 
 - Investigation agents are read-only: no source edits, no runner batches, no
   `make`. They report facts with file/line references and counts.
