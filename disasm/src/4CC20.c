@@ -105,7 +105,19 @@ s32 func_8004C948(s32 arg0) {
     return var_v1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C990.s")
+extern s32 func_8004C3B0(s32, s32);
+s32 func_8004C990(s32 arg0, s32 arg1) {
+    s32 var_v1;
+    s32 temp_v0;
+    var_v1 = 0;
+    if (D_80097120 != 0) {
+        temp_v0 = func_8004C3B0(*(s32 *)((u8 *)(u32)D_80097120 + 4), arg0);
+        if (temp_v0 != 0 && arg1 >= 0 && (u32)arg1 < (u32)*(s32 *)(u32)temp_v0) {
+            var_v1 = *(s32 *)((u8 *)(u32)temp_v0 + arg1 * 4 + 4) + temp_v0 - 8;
+        }
+    }
+    return var_v1;
+}
 
 u16 func_8004CA10(u16 *arg0) { u16 value = 0; if (arg0 != NULL) { value = *arg0; } return value; }
 
@@ -168,7 +180,19 @@ s32 func_8004D1FC(u8 *arg0) {
     return sp4C;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D27C.s")
+extern void func_80045DB4(u8 *, s32, s32, u8, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
+s32 func_8004D27C(u8 *arg0, s32 arg1, s32 arg2) {
+    s32 sp54;
+    sp54 = 0;
+    if (arg0 != NULL) {
+        sp54 = 1;
+        func_80045DB4(func_8004CA60(arg0), arg1, arg2,
+                      *(u8 *)(arg0 + 4), (s32)*(u8 *)(arg0 + 5),
+                      (s32)*(u16 *)(arg0 + 0), (s32)*(u16 *)(arg0 + 2),
+                      1, 0, 2, 2, 0, 0, 0, 0);
+    }
+    return sp54;
+}
 
 s32 func_8004D314(s32 arg0, s32 arg1) { s32 result = -1; if (arg0 == 0xEF && arg1 == 0) result = 0; return result; }
 
@@ -247,7 +271,23 @@ void PokeIcon_AdjustImageColors(u16* arg0, s32 a1, S1_arg1_func_80010CA8 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D878.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D998.s")
+extern void Gfx_DrawTextureRgba16(s16, s16, s16, s16, u8 *, s16, s32);
+void func_8004D998(s32 arg0, s32 arg1, u8 *arg2, s32 arg3, s32 arg4) {
+    s32 var_v0;
+
+    var_v0 = arg0;
+    if (arg2 != NULL) {
+        switch (arg3) {
+        case 1:
+            var_v0 = arg0 - 0x14;
+            break;
+        case 2:
+            var_v0 = arg0 - 0x28;
+            break;
+        }
+        Gfx_DrawTextureRgba16((s16)var_v0, (s16)arg1, 0x28, 0x28, arg2, 0x28, arg4);
+    }
+}
 
 s32 func_8004C8C0(u16);
 s32 func_8004DA18(void *arg0) {
@@ -386,7 +426,25 @@ s32 func_8004DE3C(s32 arg0, s32 arg1) {
     return var_v1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004DE84.s")
+extern s32 D_80097120;
+extern s32 func_8004C3B0(s32, s32);
+typedef struct HandlerResult_DE84D { u8 pad[8]; s32 *table; } HandlerResult_DE84D;
+s32 func_8004DE84(s32 arg0, s32 arg1) {
+    s32 var_v1;
+    s32 temp_a0;
+    s32 temp_v0;
+    var_v1 = 0;
+    if (D_80097120 != 0) {
+        temp_a0 = *(s32 *)((u8 *)(u32)D_80097120 + 0x24);
+        if (temp_a0 != 0) {
+            temp_v0 = func_8004C3B0(temp_a0, arg0);
+            if (temp_v0 != 0) {
+                var_v1 = ((HandlerResult_DE84D *(*)(s32, s32))(u32)temp_v0)(0, 0)->table[arg1];
+            }
+        }
+    }
+    return var_v1;
+}
 
 void func_8004DEF8(s32 arg0) { func_8004DE84(arg0, 0); }
 
