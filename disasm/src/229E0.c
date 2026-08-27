@@ -443,7 +443,9 @@ void func_800277C4(u16 resource_id, u8 mode) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800277F0.s")
+void func_800277F0(u16 resource_id, void *context) {
+    func_8002781C(resource_id, 0, context);
+}
 #endif
 
 #ifdef VERSION_US
