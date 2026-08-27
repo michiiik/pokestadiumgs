@@ -28,7 +28,11 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4AC10/func_8004B09C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4AC10/func_8004B2CC.s")
+extern u8 D_80095110[];
+extern void func_8004B09C(s32, s32, s32, s32, void *, s32, s32, s32, s32);
+void func_8004B2CC(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u8 arg4, u8 arg5, u8 arg6, s32 arg7) {
+    func_8004B09C(arg0, arg1, arg2, arg3, D_80095110, arg4, arg5, arg6, arg7);
+}
 
 extern u8 D_80095114[];
 extern void func_8004B09C(s32, s32, s32, s32, void *, s32, s32, s32, s32);
