@@ -3,8 +3,8 @@
 # Decompilation coverage
 
 <!-- AUTO_COVERAGE:START -->
-- US functions with C implementations: **3,546 / 10,532 (33.7%)**
-- Remaining `GLOBAL_ASM` owners: **6,986**
+- US functions with C implementations: **3,552 / 10,532 (33.7%)**
+- Remaining `GLOBAL_ASM` owners: **6,980**
 - Baseline: `f477acf` (vendored US pragma snapshot)
 <!-- AUTO_COVERAGE:END -->
 
@@ -89,7 +89,7 @@
 | `disasm/src/fragments/12/fragment12_E7C00.c` | 54 | 72 | 25.0% |
 | `disasm/src/fragments/13/fragment13_EE0A0.c` | 4 | 6 | 33.3% |
 | `disasm/src/fragments/13/fragment13_EE5B0.c` | 5 | 10 | 50.0% |
-| `disasm/src/fragments/13/fragment13_EEC50.c` | 62 | 79 | 21.5% |
+| `disasm/src/fragments/13/fragment13_EEC50.c` | 59 | 79 | 25.3% |
 | `disasm/src/fragments/14/fragment14_104FC0.c` | 20 | 26 | 23.1% |
 | `disasm/src/fragments/14/fragment14_1077C0.c` | 21 | 28 | 25.0% |
 | `disasm/src/fragments/14/fragment14_109280.c` | 9 | 14 | 35.7% |
@@ -118,7 +118,7 @@
 | `disasm/src/fragments/21/fragment21_13FFA0.c` | 40 | 56 | 28.6% |
 | `disasm/src/fragments/21/fragment21_144790.c` | 35 | 46 | 23.9% |
 | `disasm/src/fragments/21/fragment21_147D10.c` | 7 | 11 | 36.4% |
-| `disasm/src/fragments/22/fragment22_14A2E0.c` | 8 | 12 | 33.3% |
+| `disasm/src/fragments/22/fragment22_14A2E0.c` | 7 | 12 | 41.7% |
 | `disasm/src/fragments/22/fragment22_14B090.c` | 32 | 40 | 20.0% |
 | `disasm/src/fragments/23/fragment23_code.c` | 16 | 20 | 20.0% |
 | `disasm/src/fragments/24/fragment24_14FE20.c` | 8 | 10 | 20.0% |
@@ -260,7 +260,7 @@
 | `disasm/src/fragments/48/fragment48_258D80.c` | 9 | 11 | 18.2% |
 | `disasm/src/fragments/48/fragment48_2597B0.c` | 4 | 5 | 20.0% |
 | `disasm/src/fragments/49/fragment49_code.c` | 98 | 116 | 15.5% |
-| `disasm/src/fragments/5/fragment5_code.c` | 4 | 10 | 60.0% |
+| `disasm/src/fragments/5/fragment5_code.c` | 2 | 10 | 80.0% |
 | `disasm/src/fragments/50/fragment50_266A60.c` | 46 | 52 | 11.5% |
 | `disasm/src/fragments/50/fragment50_26BF40.c` | 13 | 16 | 18.8% |
 | `disasm/src/fragments/50/fragment50_26D1D0.c` | 6 | 7 | 14.3% |

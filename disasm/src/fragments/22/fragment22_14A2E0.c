@@ -51,7 +51,38 @@ void func_82700978(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14A2E0/func_82700998.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14A2E0/func_82700AF4.s")
+extern void func_82700604(void);
+extern void func_80008624(void);
+extern s32 StageContext_GetFadeMode(void);
+extern void func_800086A4(s32);
+extern void func_80007AEC(s32);
+extern void func_80064D28(void);
+extern void func_82702658(void);
+extern void func_827000B8(void);
+extern void func_82700924(void);
+extern s32 func_82700998(s32);
+extern void StageLoader_WaitForRetrace(void);
+void func_82700AF4(void) {
+    s32 temp_v0;
+    s32 var_s0;
+
+    var_s0 = 0;
+    func_82700604();
+    func_80008624();
+    if (StageContext_GetFadeMode() != 0) {
+        func_800086A4(2);
+        func_80007AEC(5);
+    }
+    do {
+        func_80064D28();
+        func_82702658();
+        func_827000B8();
+        func_82700924();
+        temp_v0 = func_82700998(var_s0);
+        var_s0 = temp_v0;
+    } while (temp_v0 != 3);
+    StageLoader_WaitForRetrace();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14A2E0/func_82700B84.s")
 #endif
