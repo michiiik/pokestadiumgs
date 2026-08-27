@@ -43,7 +43,18 @@ s32 func_8004C3B0(s32 arg0, s32 arg1) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C3EC.s")
+extern void main_pool_set_func(s32, s32, void (*)(s32, u8 *));
+s32 func_8004C3EC(s32 arg0, s32 arg1, s32 arg2) {
+    s32 result;
+    result = func_8004C3B0(arg0, arg1);
+    if (result == 0 || arg2 == 0) {
+        result = func_80004B4C(arg0, arg1);
+        if (result != 0) {
+            main_pool_set_func(result, arg0 + 0x18 + arg1 * 0x10, func_8004C3A4);
+        }
+    }
+    return result;
+}
 
 extern s32 func_8004C3B0(s32, s32);
 extern void main_pool_try_free(s32);
@@ -106,7 +117,19 @@ s32 func_8004CA4C(u8 *arg0) { s32 value = -1; if (arg0 != NULL) { value = arg0[5
 
 u8 *func_8004CA60(u8 *arg0) { u8 *value = NULL; if (arg0 != NULL) { value = arg0 + 8; } return value; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004CA74.s")
+s32 func_8004CA74(u8 *arg0) {
+    s32 result = 0;
+    if (arg0 != NULL) {
+        switch (arg0[5]) {
+        case 0: result = (*(u16 *)(arg0 + 2) * *(u16 *)(arg0 + 0)) / 2; break;
+        case 1: result = *(u16 *)(arg0 + 2) * *(u16 *)(arg0 + 0); break;
+        case 2: result = (*(u16 *)(arg0 + 2) * *(u16 *)(arg0 + 0)) * 2; break;
+        case 3: result = (*(u16 *)(arg0 + 2) * *(u16 *)(arg0 + 0)) * 4; break;
+        default: break;
+        }
+    }
+    return result;
+  }
 
 extern s32 func_8004CA74(u8 *);
 u8 *func_8004CB28(u8 *arg0) {
@@ -246,7 +269,16 @@ s32 func_8004DA18(void *arg0) {
     return var_s0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004DA8C.s")
+extern s32 func_8004C8C0(u16); extern s32 func_8004DD1C(s32);
+s32 func_8004DA8C(u8 *arg0) {
+    s32 result = 1;
+    if (arg0[0x15] == 0) {
+        if (func_8004C8C0(*(u16 *)(arg0 + 0x10)) == 0) result = 0;
+    } else if (func_8004DD1C(*(u16 *)(arg0 + 0x12)) == 0) {
+        result = 0;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004DAF0.s")
 
