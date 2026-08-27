@@ -4,7 +4,27 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80046980.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80046AC0.s")
+s32 func_80046AC0(u8 *arg0, s32 arg1, s32 arg2) {
+    s32 result;
+    u8 value;
+    result = 1;
+    if (arg1 != 0) {
+        if (arg1 != 1) {
+            result = 0;
+        } else {
+            value = arg0[0x7B];
+            if (value < 3) {
+                arg0[0x7B] = value + 1;
+            } else {
+                result = 0;
+            }
+        }
+    }
+    if (result) {
+        (arg0 + arg0[0x7B])[0x74] = arg2;
+    }
+    return result;
+}
 
 void func_80046B14(u8 *arg0) {
     if (arg0[0x7B] > 0) {
@@ -14,13 +34,56 @@ void func_80046B14(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80046B2C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80046BB4.s")
+#pragma pack(1)
+struct PackedWord { s32 value; };
+#pragma pack(0)
+s32 func_80046BB4(u8 *arg0, s32 arg1, u8 *arg2) {
+    s32 result;
+    u8 value;
+    result = 1;
+    if (arg1 != 0) {
+        if (arg1 != 1) {
+            result = 0;
+        } else {
+            value = arg0[0x7C];
+            if (value < 3) {
+                arg0[0x7C] = value + 1;
+            } else {
+                result = 0;
+            }
+        }
+    }
+    if (result) {
+        *(struct PackedWord *)((u8 *)arg0 + (arg0[0x7C] << 2) + 0x54) = *(struct PackedWord *)arg2;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80046C18.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80046CA8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80046D70.s")
+s32 func_80046D70(u8 *arg0, s32 arg1, u8 *arg2) {
+    s32 result;
+    u8 value;
+    result = 1;
+    if (arg1 != 0) {
+        if (arg1 != 1) {
+            result = 0;
+        } else {
+            value = arg0[0x7D];
+            if (value < 3) {
+                arg0[0x7D] = value + 1;
+            } else {
+                result = 0;
+            }
+        }
+    }
+    if (result) {
+        *(struct PackedWord *)((u8 *)arg0 + (arg0[0x7D] << 2) + 0x64) = *(struct PackedWord *)arg2;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80046DD4.s")
 
@@ -52,7 +115,26 @@ void func_800472B8(s32 arg0) {
     func_80047244(D_80126F50, arg0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800472E0.s")
+s32 func_800472E0(u8 *arg0) {
+    s32 count;
+    s32 value;
+    u8 *next;
+
+    count = 1;
+    value = *arg0;
+    next = arg0;
+    next++;
+    if (value != 0) {
+        do {
+            if (value == 10) {
+                count++;
+            }
+            value = *next;
+            next++;
+        } while (value != 0);
+    }
+    return count;
+}
 
 s32 func_80047318(u8 *arg0)
 {
