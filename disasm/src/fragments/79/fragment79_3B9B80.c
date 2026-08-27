@@ -13,7 +13,18 @@ s32 func_8414A3C0(u8 arg0, u32 arg1) {
     return (*(u32 *)(D_841951F8[arg0] + 0x49C) & arg1) != 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B9B80/func_8414A3E8.s")
+extern void func_8414A2F0(s32, u8);
+void func_8414A3E8(void) {
+    s32 i;
+    u8 **p;
+    p = D_841951F8;
+    i = 0;
+    do {
+        func_8414A2F0(i & 0xFF, (*p)[0x49A]);
+        i++;
+        p++;
+    } while (i != 2);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B9B80/func_8414A440.s")
 
