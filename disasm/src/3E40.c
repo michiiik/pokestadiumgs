@@ -2,7 +2,26 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3E40/func_80003240.s")
+u32 Memmap_GetFragmentVaddr(u32);
+u32 Memmap_GetSegmentVaddr(u32);
+u32 func_8000339C(void);
+u32 func_80003240(u32 arg0) {
+    u32 sp18;
+    u32 var_v1;
+
+    sp18 = 0;
+    var_v1 = sp18;
+    if (arg0 < func_8000339C()) {
+        var_v1 = arg0 | 0x80000000;
+    } else if (arg0 < 0x10000000U) {
+        var_v1 = Memmap_GetSegmentVaddr(arg0);
+    } else if ((arg0 >= 0x81000000U) && (arg0 < 0x90000000U)) {
+        var_v1 = Memmap_GetFragmentVaddr(arg0);
+    } else if ((arg0 >= 0x80000000U) && (arg0 < (u32)(func_8000339C() + 0x80000000))) {
+        var_v1 = arg0;
+    }
+    return var_v1;
+}
 
 
 void Util_Memcpy(u32 *dst, const u32 *src, s32 wordCount) {
