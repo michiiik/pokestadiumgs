@@ -56,7 +56,23 @@ s32 func_80010510(u8 *arg0, s32 arg1) {
     return temp_v0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_8001056C.s")
+typedef struct {
+    s32 unk0;
+    s32 unk4;
+    s32 unk8;
+    s32 unkC;
+} T_1056C_A;
+s32 func_8001056C(T_1056C_A *arg0, s32 arg1) {
+    s32 saved;
+    s32 result;
+    saved = arg0->unk4;
+    result = GbApu_Alloc(arg0, arg1);
+    if (result != 0) {
+        arg0->unk4 = saved;
+        arg0->unkC -= 1;
+    }
+    return result;
+}
 
 #define ALIGN16(val) (((val) + 0xFu) & ~0xFu)
 typedef struct S1_unk_func_81206FA0 S1_unk_func_81206FA0;
