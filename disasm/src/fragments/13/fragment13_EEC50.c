@@ -272,13 +272,26 @@ void func_82404FE8(s16 *arg0, s16 *arg1, void *arg2) {
     *arg1 = MathUtil_Atan2s((*(f32 *)((u8 *)(arg2) + (8))), (*(f32 *)((u8 *)(arg2) + (0))));
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_8240504C.s")
+extern void func_8005F37C(u8, void *, void *, void *, void *);
+void func_8240504C(void *arg0, s32 arg1) {
+    *(f32 *)((u8 *)arg0 + 0) = 0.0f;
+    if ((arg1 >= 0) && (arg1 < 4)) {
+        func_8005F37C((u8)arg1, (u8 *)arg0 + 4, (u8 *)arg0 + 6, (u8 *)arg0 + 7, (u8 *)arg0 + 8);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_824050A8.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82405244.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82405494.s")
+void func_82405494(void *arg0, void *arg1, void *arg2, f32 arg3)
+{
+  f32 temp_fa1;
+  f32 temp_fv0;
+  f32 temp_fv1;
+  f32 new_var;
+ do { temp_fv0 = *((f32 *) (((u8 *) arg1) + 0)); *((f32 *) (((u8 *) arg0) + 0)) = (f32) ((((*((f32 *) (((u8 *) arg2) + 0))) - temp_fv0) * arg3) + temp_fv0); temp_fv1 = *((f32 *) (((u8 *) arg1) + 4)); new_var = arg3; *((f32 *) (((u8 *) arg0) + 4)) = (f32) ((((*((f32 *) (((u8 *) arg2) + 4))) - temp_fv1) * new_var) + temp_fv1); temp_fa1 = *((f32 *) (((u8 *) arg1) + 8)); *((f32 *) (((u8 *) arg0) + 8)) = (f32) ((((*((f32 *) (((u8 *) arg2) + 8))) - temp_fa1) * new_var) + temp_fa1); } while (0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_824054E4.s")
 
@@ -331,7 +344,14 @@ s32 func_82406CCC(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82406E14.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82407088.s")
+extern f32 (*D_8160BD1C)(f32);
+f32 func_82407088(void *arg0) {
+    f32 factor;
+    f32 start;
+    factor = D_8160BD1C(*(f32 *)((u8 *)arg0 + 0x200) / 20.0f);
+    start = (f32)*(s32 *)((u8 *)arg0 + 0x1E0);
+    return ((f32)*(s32 *)((u8 *)arg0 + 0x1DC) - start) * factor + start;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_824070E4.s")
 
