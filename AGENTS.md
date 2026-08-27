@@ -11,15 +11,34 @@ referenced docs and in git history, not here.
 ### 1.1 Two kinds of session
 
 **Decompilation sessions** (the goal is "decompile owners in fragment N /
-family F / file X") run the hand-decompilation loop in §2.5. As of
-2026-08-27 the mechanical sweeps are saturated: every remaining owner of
-64 instructions or fewer has been probed with the current variant set, a
-full wave (`--skip-attempted` bands, `--near-miss`, `--large`) yields about
-six owners per hour of compute, and the remaining pool (7,3xx owners, median
-60 instructions, p75 111) is hand-work territory. Do not spawn investigation
-or implementation agents for this loop; do not start a session by launching
-sweeps. Run a sweep only when §2.5 says so (a new heuristic or variant
-spelling landed, or the near-miss pool needs a permuter budget).
+family F / file X") run **fleet mode**: the session is a coordinator that
+assigns one source file each to 4–8 Sonnet decompilation agents, which run
+the hand loop in §2.5 against the runner API for a 60-minute time box, commit
+their file by explicit path, and report the spellings that matched. Measured
+on 2026-08-27 (four agents, 20 minutes): 40 owners accepted, ~17k tokens per
+matched owner (~10k in text-segment files, ~55k in fragments), versus 4–5
+owners/hour for a single hand session. The mechanical sweeps are saturated
+(every remaining owner of 64 instructions or fewer has been probed with the
+current variant set); run them only when §2.5 says so.
+
+Coordinator rules:
+
+- One file per agent, never shared. Pick files by remaining owners of ≤128
+  instructions (`python3 tools/pragma_targets.py targets --source <file>`),
+  text-segment files before fragments (fragments cost ~5× more per owner),
+  and skip any file another session touched in the last four hours
+  (`git log --since="4 hours ago" --format= --name-only -- disasm/src`).
+- The agent prompt is §2.5 plus: the file path, whether the file already has
+  its `.rodata` subsegment (`docs/JUMP_TABLES.md`; if not, skip `jtbl_`
+  owners), the 60-minute box, "runner-only installs, never hand-edit, never
+  `DECOMP_PROVENANCE_SKIP`", commit-by-path every 5 accepts, and the report
+  format (attempted/accepted, variants probed, best mismatch kinds, one line
+  per accepted spelling, why it gave up, commit shas).
+- When agents report, fold every *second* confirmation of a spelling into §4,
+  add runner bugs and recurring unsolved shapes to §5, then reassign files.
+  Do not run tooling changes and a fleet at the same time in one checkout.
+- Do not spawn investigation agents for this loop; the assembly reading is
+  the agents' job, not a separate phase.
 
 **Tooling and process sessions** (the goal changes how the pipeline works:
 runner, sweep, classifier, hooks, docs, layout) start with **parallel
@@ -340,7 +359,36 @@ by these; always probe and gate.
 | Globals loaded with `lw` into an argument | Try `void *` before `u32` | scan | no help for `lui`-before-`sw $ra` scheduling drift |
 | Near-miss `immediate_drift` with an `addiu $sp` frame mismatch | `near_miss_kinds` `frame-padding` (add/remove a pad local to hit the baseline frame) | 2/2 probe hits accepted (first bounded run, 2026-08-27) | — |
 | Near-miss `register_allocation_only` / `operand_or_scheduling_drift` | `commute-swap`, `decl-order`, `hoist-temp`, `type-width`, `loop-form`, `reorder-store-call` | 0 hits in 146 attempts on the first run — treat as unproven; prefer hand analysis of the first differing instruction | — |
+| Float divide by a power of two | Divide by the **integer** literal (`x / 16`), not `16.0f`: a float literal divisor is strength-reduced to `mul.s` by the reciprocal, an int divisor keeps `div.s` | 1 (`func_8130A98C`) | — |
+| Guard/return polarity | IDO branches on the negated condition: write the `if` in the polarity whose negation is the observed `beq`/`bne`, e.g. `if (arg1 == x) { ... } return v;` rather than `if (arg1 != x) return v;` | 2 (`func_81306EE0`, `func_80059234`) | — |
+| Several `return 1;` guards sharing one epilogue | A single `return a \|\| b \|\| c \|\| d;` expression; separate guard clauses allocate differently and add bytes | 1 (`func_8130AA54`) | — |
+| Wrapper whose callee result feeds a conditional second call | `s32 result = f(arg0, N); if (result != 0) { g(arg0); } return result;` (second call's value discarded; `$v1` spill/reload across the call is the tell) | 3 (`func_8005A0B4/A0F4/A134`) | — |
+| Table-field forward with 112-byte stride into bcopy/bzero | Load the field into an explicit `s32 v0 = *(s32 *)(D_X + idx * 112);` **before** the call; inlining it into the argument reorders the frame allocation | 6 (`585D0.c`) | same stride/forward shape |
+| Non-power-of-two stride (`arg2 * 47`) | Hoist the multiply into its own local declared **before** the table-load local to fix `addu` operand order | 2 (`func_8005C880/C988`) | — |
+| Selector index into two parallel tables | `idx = f(SEL, -1); if (arg0 == 0) D_A[idx * 0xC] + ADD else D_B[idx * 0xC] + ADD` — note the inverted condition sense | 11 (`517E0.c` wrapper family) | — |
+| Small struct copy from a returned pointer | Uniquely named `typedef struct { s32 a, b; }` and `*arg0 = *(Pair *)((u8 *)ret + off);` | 3 (`func_80054210/8005493C/8005487C`) | — |
+| Callee prototyped earlier as `void` but its return is needed | Block-scope re-prototype does not work (hard "redeclaration" error); the earlier definition must change to return the value — do it as a separate gated change | 1 (`func_80055BA8`, open) | — |
+| Wrapper called with four registers but only three read | Declare only the parameters the body reads (`a3` was caller garbage); the fourth formal changes the frame | 1 (`func_841518D0`) | — |
 | General | Preserve narrow `sb`/`sh`/`sw` widths, initialise results before NULL checks, raw 32-bit address arithmetic (`(u8 *)(u32)global + off`) before inferred structs, `uintptr_t` casts for raw addresses, explicit `s32` loop counters, array-index vs pointer-add as separate variants, deliberate signed/unsigned masks | repo scan | ABI hypotheses until compared |
 
 Type spellings: `u8-void` and `s32-s32` account for essentially all m2c-draft
 accepts; other widths only on diagnostic evidence via the variant policy.
+
+## 5. Tooling backlog and recurring unsolved shapes
+
+- Runner: `probe_error` / `list index out of range` on the last pragma owner
+  of a file when the function has trailing alignment nops
+  (`func_8005633C`, `func_8130CDD4`); reproduces with a trivial body, so it
+  is a diagnostics-path bug, not a candidate problem.
+- Runner: `654A0.c` cannot get its `.rodata` subsegment until asm-processor
+  handles mixed 4/8-byte `.late_rodata_alignment` without growing `.text`.
+- Shape: `u8 *p = arg0 + 4; p[arg1 + 8] = 0xFF; p[0] |= 2;` — IDO keeps the
+  table pointer in `$t7`; no declaration-order/pointer-form variant reproduced
+  it (`func_841523BC`, `func_84151CD8`, likely `func_84151DD4`). Needs a
+  dedicated variant family.
+- Shape: decrement/increment counter pairs stuck at similarity 1.0 with
+  `$v0`/`$v1` swapped (`func_8130B91C`, `func_8130B95C`).
+- Shape: 15-case dispatcher `func_80050D20` matches except for how IDO shares
+  the last case's tail with `default` (size 200 vs 196).
+- Sweep families other than `frame-padding` in `near_miss_kinds` have no
+  accepts yet (0/146); re-evaluate after the fleet's records accumulate.
