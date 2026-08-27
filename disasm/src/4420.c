@@ -6,7 +6,71 @@ u16 Jpeg_ReadBigEndianU16(const u8 *arg0) {
     return (u16)((arg0[0] << 8) | arg0[1]);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80003838.s")
+typedef struct S1_JpegMarkerState4420 {
+    u8 chromaSubsamplingMode;
+    u8 hasRestartMarkers;
+    u8 pad02[2];
+    s16 width;
+    s16 height;
+    u8 *quantization_table;
+    u8 *huffman_table;
+    u8 *start_of_frame;
+    u8 *start_of_scan;
+} S1_JpegMarkerState4420;
+void func_80003838(S1_JpegMarkerState4420 *arg0, u8 *arg1) {
+    s32 temp_v0_2;
+    s32 var_s2;
+    s32 var_v0;
+    u8 temp_t6;
+    s32 temp_v0;
+
+    var_s2 = 1;
+    arg0->hasRestartMarkers = 0;
+    while (var_s2 != 0) {
+        if (*arg1++ == 0xFF) {
+            temp_v0 = *arg1++;
+            switch (temp_v0) {
+                case 0:
+                    break;
+                case 0xD9:
+                    var_s2 = 0;
+                    break;
+                case 0xDB:
+                    arg0->quantization_table = arg1 + 2;
+                    arg1 += Jpeg_ReadBigEndianU16(arg1);
+                    break;
+                case 0xC4:
+                    arg0->huffman_table = arg1 + 2;
+                    arg1 += Jpeg_ReadBigEndianU16(arg1);
+                    break;
+                case 0xC0:
+                    arg0->start_of_frame = arg1 + 2;
+                    arg1 += Jpeg_ReadBigEndianU16(arg1);
+                    break;
+                case 0xDA:
+                    arg1 += Jpeg_ReadBigEndianU16(arg1);
+                    arg0->start_of_scan = arg1;
+                    break;
+                case 0xD8:
+                    break;
+                default:
+                    if ((temp_v0 >= 0xD0) && (temp_v0 <= 0xD7)) {
+                        arg0->hasRestartMarkers = 1;
+                    } else {
+                        arg1 += Jpeg_ReadBigEndianU16(arg1);
+                    }
+                    break;
+            }
+        }
+    }
+    if (arg0->start_of_frame[7] == 0x21) {
+        arg0->chromaSubsamplingMode = 0;
+    } else {
+        arg0->chromaSubsamplingMode = 2;
+    }
+    arg0->width = (arg0->start_of_frame[3] << 8) | arg0->start_of_frame[4];
+    arg0->height = (arg0->start_of_frame[1] << 8) | arg0->start_of_frame[2];
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800039C8.s")
 
@@ -273,7 +337,38 @@ u8 *func_80004254(s32 arg0, u8 *arg1, u8 *arg2, s32 arg3, s32 arg4, s32 arg5) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800042C0.s")
+u8 *func_800042C0(u8 *arg0, u8 *arg1, s32 arg2, s32 arg3) {
+    u8 *header;
+    u8 *data;
+    u8 *result;
+    s32 mode;
+    if (arg2 == 0) {
+        mode = 1;
+    } else {
+        mode = 0;
+    }
+    header = main_pool_alloc(0x18, mode);
+    if (header != NULL) {
+        func_80003F74(header, arg0, arg0 + 0x18, arg3);
+        if (*(u32 *)header == 0x50455253 && *(u32 *)(header + 4) == 0x2D535A50) {
+            data = main_pool_alloc(((arg1 - arg0) + 0xF) & ~0xF, mode);
+            if (data != NULL) {
+                func_80003F74(data, arg0, arg1, arg3);
+                result = func_800041E4(0, data, data, arg2);
+            }
+        } else if (*(u32 *)header == 0x50524553 && *(u32 *)(header + 4) == 0x4A504547) {
+            data = main_pool_alloc(((arg1 - arg0) + 0xF) & ~0xF, mode);
+            if (data != NULL) {
+                func_80003F74(data, arg0, arg1, arg3);
+                result = func_800040D0(0, data, data, arg2);
+            }
+        } else {
+            result = func_80004254(0, arg0, arg1, arg3, ((arg1 - arg0) + 0xF) & ~0xF, arg2);
+        }
+        func_800029E0(header);
+    }
+    return result;
+}
 
 u8 *func_80004458(s32 arg0, u8 *arg1, u8 *arg2) {
     u8 *header;
@@ -472,7 +567,44 @@ void func_800049B8(void) { func_800029E0(); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800049D8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_80004A40.s")
+typedef struct S1_BinArchiveFile4420 {
+    u32 offset;
+    u32 size;
+    u32 cachedPtr;
+    u32 pad;
+} S1_BinArchiveFile4420;
+extern u8 *func_800049D8(S1_MainPoolState *, S1_BinArchive *, S1_BinArchiveFile4420 *);
+u8 *func_80004A40(poolState, archive, file_number)
+S1_MainPoolState *poolState;
+S1_BinArchive *archive;
+s32 file_number;
+{
+    u8 *result;
+    UNUSED s32 pad;
+    S1_BinArchiveFile4420 *file;
+    result = NULL;
+    file = (S1_BinArchiveFile4420 *)((u8 *)archive + 0x10 + (file_number * 0x10));
+    if ((u32)file_number < archive->num_files) {
+        if (archive->flags & 1) {
+            result = (u8 *)archive + file->offset;
+        } else if (!(archive->flags & 4) && file->cachedPtr != 0) {
+            result = (u8 *)file->cachedPtr;
+        } else {
+            result = func_800049D8(poolState, archive, file);
+            if (result != NULL) {
+                if (*(u32 *)(result + 8) == 0x46524147 && *(u32 *)(result + 0xC) == 0x4D454E54) {
+                    if (poolState == NULL) {
+                        func_80004718(archive->fragmentModuleId, result);
+                    } else {
+                        func_800047B0(poolState, archive->fragmentModuleId, (S1_Fragment *)result);
+                    }
+                }
+                file->cachedPtr = (u32)result;
+            }
+        }
+    }
+    return result;
+}
 
 void func_80004B4C(s32 arg0,s32 arg1){func_80004A40(0,arg0,arg1);}
 
