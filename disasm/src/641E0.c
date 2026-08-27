@@ -84,7 +84,9 @@ void func_80063C90(u8 arg0, unsigned short arg1)
   func_80063BF4(*new_var2, new_var4);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80063CC4.s")
+extern u8 D_800998AC[];
+extern u8 D_80098318[];
+s32 func_80063CC4(arg0, arg1) u8 arg0; u8 arg1; { s32 index = arg0; s32 bit_index; if ((arg0 > 0) && (arg0 < 0x98) && (arg1 > 0) && (arg1 < 0x38)) { bit_index = arg1 - 1; return (D_800998AC[index * 9 + (bit_index / 8)] & (1 << (bit_index % 8))) != 0; } return 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80063D54.s")
 
@@ -138,13 +140,14 @@ void func_8006443C(s32 arg0, s32 arg1, s32 arg2) {
 
 s32 func_8006456C(s32 arg0) { s32 *value = &arg0; if (((*value) & 0x2FFF) == 0x2AAA) return 1; return 0; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80064590.s")
+s32 func_80064590(u16 arg0, u16 arg1) { s32 value; if (arg0 == 0) return 3; value = ((s32)(arg0 * 0x30) / (s32)arg1) & 0xFFFF; if (value >= 0x18) return 0; if (value >= 0xA) return 1; return 2; }
 
 s32 func_8006461C(s32 arg0) { s32 temp_v0 = arg0 & 0xFF; s32 *value = &arg0; if (temp_v0 & 0xF) return 1; if (temp_v0 & 0xF0) return 2; return 0; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80064650.s")
+s32 func_80064650(arg0, arg1) u16 arg0; u8 arg1; { s32 value = arg1; if (arg0 == 0) return 1; if (value == 0) return 0; if (value & 7) return 2; if (value & 8) return 3; if (value & 0x10) return 4; if (value & 0x20) return 5; return 6; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_800646C8.s")
+s32 func_80064650();
+void func_800646C8(s32 arg0, s32 arg1) { s32 *p0 = &arg0; s32 *p1 = &arg1; func_8004C874(0xE, func_80064650((*p0) & 0xFFFF, (*p1) & 0xFF)); }
 
 s32 func_80064700(s32 arg0) {
     s32 *ptr = &arg0;
@@ -173,5 +176,5 @@ s32 func_800647C8(u8 arg0) {
 extern u8 D_8009D280[];
 s32 func_80064800(u8 arg0) { s32 index = arg0; if ((arg0 > 0) && (arg0 < 0xFC)) return *(s32 *)(D_8009D280 + index * 12); return 0; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_8006483C.s")
+s32 func_8006483C(u8 *arg0) { s32 value; if (!(arg0[0x1E] & 1)) return 0; value = arg0[0x1C]; if (value < 6) return 1; if (value < 0xB) return 2; if (value < 0x29) return 3; return 4; }
 #endif
