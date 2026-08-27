@@ -4,9 +4,46 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/AC80/func_8000A080.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/AC80/func_8000A170.s")
+extern u8 D_800D0F90;
+extern OSTime osGetTime(void);
+typedef struct {
+    s16 count;
+    u8 pad[0x46];
+    OSTime times[8];
+    u8 tail[0x40];
+} ProfilerRecordA170;
+void func_8000A170(void) {
+    ProfilerRecordA170 *record = (ProfilerRecordA170 *)&D_800D0F90;
+    record += *(s16 *)((u8 *)&D_800D0F90 + 0x25A);
+    if (record->count < 8) {
+        record->times[record->count] = osGetTime();
+        record->count++;
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/AC80/func_8000A1E8.s")
+extern u8 D_800D0F90;
+extern OSTime osGetTime(void);
+typedef struct {
+    s16 pad0;
+    s16 count;
+    u8 pad[0x2C];
+    OSTime times[8];
+    u8 tail[0x58];
+} ProfilerRecordA1E8;
+OSTime func_8000A1E8(s32 arg0) {
+    OSTime time;
+    if (arg0 == 0) {
+        if (*(s16 *)((u8 *)&D_800D0F90 + 0x25C) == 2) {
+            *(s16 *)((u8 *)&D_800D0F90 + 0x25C) = 0;
+        } else {
+            *(s16 *)((u8 *)&D_800D0F90 + 0x25C) += 1;
+        }
+        ((ProfilerRecordA1E8 *)&D_800D0F90 + *(s16 *)((u8 *)&D_800D0F90 + 0x25C))->count = 0;
+    }
+    time = osGetTime();
+    ((ProfilerRecordA1E8 *)&D_800D0F90 + *(s16 *)((u8 *)&D_800D0F90 + 0x25C))->times[arg0] = time;
+    return time;
+}
 
 extern u8 D_800D0F90;
 extern OSTime osGetTime(void);
@@ -58,7 +95,23 @@ void draw_profiler_bar_cpu(u64 start, u64 endA, u64 endB, s16 y, u16 color) {
     if (x0 < x1) draw_profiler_rect(x0, x1, y, color);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/AC80/func_8000A590.s")
+void func_8000A590(OSTime start, OSTime end, s16 posY, s16 *last_max, s16 *reset_ctr) {
+    u64 duration;
+    s32 ulx;
+    s32 lrx;
+    duration = end - start;
+    if ((s64)duration < 0) duration = 0;
+    lrx = (((duration * 64) / 3000) * 3) / 1000 + 30;
+    if (lrx > 225) lrx = 225;
+    if (++*reset_ctr > 15 || *last_max < lrx) {
+        *reset_ctr = 0;
+        *last_max = lrx;
+    }
+    lrx = *last_max;
+    ulx = lrx - 4;
+    if (ulx < 30) ulx = 30;
+    if (ulx < lrx) draw_profiler_rect(ulx, lrx, posY, 0xA67F);
+}
 
 extern void draw_profiler_rect(s32, s32, s32, s32);
 void draw_reference_profiler_bars(void) {
