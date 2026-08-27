@@ -11,12 +11,15 @@ referenced docs and in git history, not here.
 ### 1.1 Two kinds of session
 
 **Decompilation sessions** (the goal is "decompile owners in fragment N /
-family F / file X") run the lean loop in §2 and §3.4 directly: list targets,
-run the sweeps, hand-write candidates for the leftovers, commit per batch.
-Do not spawn investigation or implementation agents for this loop; the
-overhead costs more than it saves. Keep the sweep waves running alongside hand
-work: `--fragment-range`/`--skip-attempted` bands, `--large`, `--near-miss`,
-`--near-miss-kinds` — they supply most of the volume.
+family F / file X") run the hand-decompilation loop in §2.5. As of
+2026-08-27 the mechanical sweeps are saturated: every remaining owner of
+64 instructions or fewer has been probed with the current variant set, a
+full wave (`--skip-attempted` bands, `--near-miss`, `--large`) yields about
+six owners per hour of compute, and the remaining pool (7,3xx owners, median
+60 instructions, p75 111) is hand-work territory. Do not spawn investigation
+or implementation agents for this loop; do not start a session by launching
+sweeps. Run a sweep only when §2.5 says so (a new heuristic or variant
+spelling landed, or the near-miss pool needs a permuter budget).
 
 **Tooling and process sessions** (the goal changes how the pipeline works:
 runner, sweep, classifier, hooks, docs, layout) start with **parallel
@@ -130,6 +133,86 @@ numbers before proposing changes. Then:
 11. Document a recurring pattern in §4 only with its evidence count and its
     limits; use it to order candidates, never to skip the gate.
 
+## 2.5 The hand-decompilation loop
+
+This is the default working mode. Volume now comes from reading assembly and
+writing compiler-faithful C, with the runner as the oracle. Work one source
+file at a time so declarations, structs and names accumulate in one place.
+
+### Pick targets in this order
+
+1. **Near-misses at ≥ 0.95 similarity** — `python3 tools/near_miss_kinds.py
+   list --kind register_allocation_only|immediate_drift|
+   operand_or_scheduling_drift --min-similarity 0.95`. About 385 owners sit
+   here with a recorded best candidate; each is usually one source-shape change
+   away. Read the recorded `first_diff_*` instructions and `mismatch_kind`
+   before writing anything.
+2. **Files that already have their `.rodata` subsegment** (the 26 text-segment
+   files listed in `docs/JUMP_TABLES.md`): their `dispatcher_switch` /
+   `jump_table_map` owners can now be written as a C `switch`. For a fragment
+   dispatcher, add the subsegment first (`tools/add_rodata_subsegments.py
+   for-jtbl`, re-split, gate the assembly owner) — see §2 rule 7.
+3. **The rest of a file you are already in**: `python3 tools/pragma_targets.py
+   targets --source disasm/src/<file>.c` ranks its remaining owners by size and
+   family. Finish a file's small owners before moving on; every solved
+   neighbour is a struct/ABI hint for the next one.
+4. **65–128-instruction owners** (about 1,900) by family: `init_sequence`,
+   `call_chain`, `float_math`, `predicate`, `state_field_access` are the
+   shape-predictable ones. Leave `large_mixed` (>256) for last.
+
+### Work one function
+
+1. `get_function_asm` / read the `.s`. Note argument masks (`andi 0xff` →
+   `u8` parameter), frame size (`addiu $sp`), saved registers, stack-arg
+   loads, narrow loads/stores, and the return tail (`jr`/`nop` duplicates,
+   alignment nops).
+2. `draft_candidates` gives an m2c draft plus `similar_solved` (accepted
+   bodies with the same opcode shape). Start from the closest accepted
+   winner's spelling, not from m2c, when similarity is high and the length
+   matches. Check the neighbouring solved functions in the same file.
+3. Write 5–10 variants that differ in one hypothesis each (declaration order,
+   temp widths, index-vs-pointer form, guard-return vs assign-then-return,
+   explicit temporaries, old-style callee prototypes). Use the §4 table to
+   order them. Put shared externs in `declarations`, not in each body.
+4. Send them as **one probe-only batch** (`gate: false`) with descriptive
+   labels (`<family>:<shape>:<hypothesis>`, e.g. `lookup:guard-return:u8-arg`).
+   Read the per-attempt result: `mismatch_kind`, `first_diff_offset`,
+   `expected_instruction_text` vs `actual_instruction_text`,
+   `similarity_score`, `expected_size` vs `actual_size`, `expected_tail_kind`.
+5. Iterate on the diagnostic, never on intuition alone:
+   `register_allocation_only` → declaration order, temporaries, widths;
+   `immediate_drift` → offsets, strides, literal widths, frame padding;
+   `symbol_size_drift` / tail kinds → `C_FUNCTION_PADDING` or a `_padding`
+   helper; a `section_layout_drift` on a `switch` → the file needs its
+   subsegment first. A `similarity_score` of 1.0 with different registers is
+   an operand-order or declaration-order problem, not a semantic one.
+6. Gate the first probe hit (`gate: true`). Then name it if evidence exists
+   (`python3 tools/name_decompiled.py plan`), and move to the next owner in
+   the file.
+7. Stop after ~15 variants unless the best is ≥ 0.95; leave the record (the
+   near-miss tooling and `similar_solved` build on it) and move on. Do not
+   commit a body that only matches with `DECOMP_PROVENANCE_SKIP`.
+
+### Batches and commits
+
+- Commit per source file or per working block (five to twenty owners), with a
+  message naming the file or subsystem; do not commit one helper at a time.
+- Run `python3 tools/dedupe_externs.py --apply --verify` when a file's extern
+  block has grown, and `name_decompiled.py apply --verify` at the end of a
+  session.
+- When a shape matches for the second time with the same spelling, add a row
+  to §4 with the evidence count and limit.
+
+### When a sweep is still worth running
+
+- `--near-miss --near-miss-parallel 4 --near-miss-kind-seconds 300` overnight on
+  the ≥ 0.95 pool (about 5% conversion; the only sweep that still pays).
+- `--skip-attempted` bands right after a new variant spelling or rewrite rule
+  lands in `sweep_targets.py` / `near_miss_kinds.py` — it costs nothing when
+  there is nothing new to try.
+- `--large` only with a budget above 180 s per owner; at 180 s it drafts
+  well (median 0.89 similarity) but does not close.
+
 ## 3. Tool reference
 
 ### 3.1 Runner and MCP
@@ -189,7 +272,7 @@ numbers before proposing changes. Then:
   `sweep_targets.py --templates` — rewrites an accepted winner of identical
   opcode shape onto the target (`template:` labels).
 
-### 3.4 Sweeps
+### 3.4 Sweeps (saturated for ≤64-instruction owners since 2026-08-27; see §2.5)
 
 - `tools/sweep_targets.py` — the small-function loop: listing filter → m2c
   draft → mechanical rewrites → isolated probes per source → gated install →
