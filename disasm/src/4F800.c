@@ -140,7 +140,36 @@ void func_800503A4(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4F800/func_80050428.s")
+typedef struct TreeNode_80050428 {
+    u8 pad0[4];
+    s32 id;
+    u8 pad8[12];
+    struct TreeNode_80050428 *next;
+    struct TreeNode_80050428 *children;
+} TreeNode_80050428;
+void *func_80050428(arg0, arg1)
+TreeNode_80050428 *arg0;
+s32 arg1;
+{
+    TreeNode_80050428 *first;
+    TreeNode_80050428 *node;
+    void *result;
+    result = NULL;
+    first = arg0->children;
+    if (arg1 == arg0->id) {
+        result = arg0;
+    } else {
+        node = first;
+        if (first != NULL) {
+            do {
+                result = func_80050428(node, arg1);
+                if (result != NULL) break;
+                node = node->next;
+            } while (node != first);
+        }
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
