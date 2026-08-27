@@ -38,14 +38,14 @@ void func_80042BB0(u16 *arg0) {
 
 extern u8 D_80094C64;
 extern s32 main_pool_get_available(void);
-extern s32 func_800030D0();
+extern s32 MainPool_AllocState();
 extern s32 func_80040E80();
 extern void MainPool_FinalizeAllocation();
 extern void GeoCamera_SetViewport(void *, s16, s16, s16, s32);
 extern void GeoCamera_SetPerspective(void *, f32, f32, f32);
 void func_80042BC0(u8 *arg0, s16 arg1, s16 arg2, s16 arg3, s32 arg4) {
     s32 temp;
-    temp = func_800030D0(main_pool_get_available(), 0);
+    temp = MainPool_AllocState(main_pool_get_available(), 0);
     *(s32 *)(arg0 + 0x18) = func_80040E80(temp, &D_80094C64);
     *(s32 *)(arg0 + 0x1C) = D_80126F40;
     MainPool_FinalizeAllocation(temp);

@@ -31,11 +31,11 @@ void func_87E0CB88(void) {
 
 extern u8 D_87E1A400[];
 extern s32 main_pool_get_available(void);
-extern s32 func_800030D0(s32, s32);
+extern s32 MainPool_AllocState(s32, s32);
 extern s32 func_80040E80(s32, void *);
 extern void MainPool_FinalizeAllocation(s32);
 void func_87E0CBC8(void *arg0) {
-    s32 temp = func_800030D0(main_pool_get_available(), 0);
+    s32 temp = MainPool_AllocState(main_pool_get_available(), 0);
     *(s32 *)((u8 *)arg0 + 8) = func_80040E80(temp, D_87E1A400);
     MainPool_FinalizeAllocation(temp);
 }

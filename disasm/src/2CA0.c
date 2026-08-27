@@ -29,7 +29,7 @@ extern u8 D_800CC5B0[]; void Memmap_ClearSegmentMemmap(s32 index) { *(s32 *)(D_8
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/2CA0/func_80002178.s")
 
-extern u32 func_800024A0(u32);
+extern u32 Memmap_GetFragmentVaddr(u32);
 extern void Memmap_SetFragmentMap(s32, s32, s32);
 extern void _bzero(void *, s32);
 typedef struct MemmapFragment {
@@ -47,7 +47,7 @@ typedef struct MemmapRelocTable {
     u32 relocations[1];
 } MemmapRelocTable;
 
-void func_80002210(u32 id, MemmapFragment *fragment) {
+void Memmap_RelocateFragment(u32 id, MemmapFragment *fragment) {
     u32 isLoNeg;
     u32 *luiRefs[32];
     u32 luiVals[32];
@@ -76,11 +76,11 @@ void func_80002210(u32 id, MemmapFragment *fragment) {
 
         switch ((reloc & 0x7F000000) >> 24) {
             case 2:
-                *relocDataP = func_800024A0(*relocDataP);
+                *relocDataP = Memmap_GetFragmentVaddr(*relocDataP);
                 break;
             case 4:
                 *relocDataP =
-                    (((u32)(func_800024A0(((*relocDataP * 4) & 0x0FFFFFFC) + 0x80000000) & 0x0FFFFFFF) >> 2) |
+                    (((u32)(Memmap_GetFragmentVaddr(((*relocDataP * 4) & 0x0FFFFFFC) + 0x80000000) & 0x0FFFFFFF) >> 2) |
                      (*relocDataP & 0xFC000000));
                 break;
             case 5:
@@ -91,7 +91,7 @@ void func_80002210(u32 id, MemmapFragment *fragment) {
                 luiInstRef = luiRefs[(*relocDataP >> 0x15) & 0x1F];
                 regValP = &luiVals[(*relocDataP >> 0x15) & 0x1F];
 
-                temp_v0_5 = func_800024A0((*regValP << 0x10) + (s16)*relocDataP);
+                temp_v0_5 = Memmap_GetFragmentVaddr((*regValP << 0x10) + (s16)*relocDataP);
                 isLoNeg = (temp_v0_5 & 0x8000) ? 1 : 0;
                 *luiInstRef = (*luiInstRef & 0xFFFF0000) | ((temp_v0_5 >> 16) + isLoNeg);
                 *relocDataP = (*relocDataP & 0xFFFF0000) | (temp_v0_5 & 0xFFFF);
@@ -108,7 +108,7 @@ extern u8 D_800CC630[]; void Memmap_SetFragmentMap(s32 index, s32 value1, s32 va
 
 extern u8 D_800CC630[]; s32 Memmap_GetFragmentBaseVaddr(s32 index) { return *(s32 *)(D_800CC630 + index * 8); }
 
-u32 func_800024A0(u32 arg0) {
+u32 Memmap_GetFragmentVaddr(u32 arg0) {
     u32 index;
     u32 value;
 
@@ -132,7 +132,7 @@ s32 Memmap_GetFragmentVaddrMask(s32 arg0, s32 arg1) {
 
 extern u8 D_800CC630[]; void Memmap_ClearFragmentMemmap(s32 index) { *(s32 *)(D_800CC630 + index * 8) = 0; *(s32 *)(D_800CC630 + index * 8 + 4) = 0; }
 
-u32 func_80002568(u32 addr) {
+u32 Memmap_GetLoadedFragmentVaddr(u32 addr) {
     typedef struct {
         u32 vaddr;
         u32 size;

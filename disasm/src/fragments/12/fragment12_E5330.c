@@ -12,7 +12,7 @@ void func_81400020(s32 arg0) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E5330/func_81400098.s")
 
 s32 main_pool_get_available();
-s32 func_800030D0(s32, s32);
+s32 MainPool_AllocState(s32, s32);
 extern void MainPool_FinalizeAllocation(s32);
 extern void func_81406AAC(s32 *, s32);
 extern void func_81406EA8(s32 *);
@@ -24,7 +24,7 @@ void func_81400124(void) {
     s32 sp1C;
     s32 temp_v0;
 
-    temp_v0 = func_800030D0(main_pool_get_available(), 0);
+    temp_v0 = MainPool_AllocState(main_pool_get_available(), 0);
     sp1C = temp_v0;
     D_814077A0 = func_81600E28(temp_v0, 1, 0x12);
     MainPool_FinalizeAllocation(sp1C);

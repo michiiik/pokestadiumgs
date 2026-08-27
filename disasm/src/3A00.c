@@ -3,20 +3,20 @@
 
 #ifdef VERSION_US
 s32 main_pool_alloc(s32, s32);
-s32 func_80002E48(s32, s32);
-s32 func_80002E00(s32 arg0, s32 arg1) {
+s32 mem_pool_init(s32, s32);
+s32 mem_pool_try_init(s32 arg0, s32 arg1) {
     s32 block;
     s32 result;
 
     arg0 = (arg0 + 3) & ~3;
     block = main_pool_alloc(arg0, arg1);
     if (block != 0) {
-        result = func_80002E48(block, arg0);
+        result = mem_pool_init(block, arg0);
     }
     return result;
 }
 
-s32 func_80002E48(s32 arg0, s32 arg1) {
+s32 mem_pool_init(s32 arg0, s32 arg1) {
     u8 *base;
     s32 size;
     OSMesgQueue *queue;
@@ -45,7 +45,7 @@ typedef struct MemPool3A00 {
     MemPoolBlock3A00 *firstBlock;
     MemPoolBlock3A00 freeList;
 } MemPool3A00;
-void *func_80002EB8(MemPool3A00 *node, s32 size) {
+void *mem_pool_alloc(MemPool3A00 *node, s32 size) {
     MemPoolBlock3A00 *freeBlock;
     void *addr;
 
@@ -131,7 +131,7 @@ void mem_pool_free(S1_MemoryPool* pool, void* addr) {
 }
 
 u8 *MainPool_InitState(u8 *, s32);
-u8 *func_800030D0(s32 arg0, s32 arg1) {
+u8 *MainPool_AllocState(s32 arg0, s32 arg1) {
     s32 block;
     u8 *result = NULL;
 

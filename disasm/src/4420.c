@@ -447,10 +447,10 @@ void func_80004718(s32 arg0, u8 *arg1) {
     sizeInRam = *(u32 *)(arg1 + 0x1C);
     if ((u32)allocationSize < sizeInRam) {
         func_80002A40(arg1, sizeInRam);
-        func_80002210(arg0, arg1);
+        Memmap_RelocateFragment(arg0, arg1);
         return;
     }
-    func_80002210(arg0, arg1);
+    Memmap_RelocateFragment(arg0, arg1);
     func_80002A40(arg1, *(u32 *)(arg1 + 0x1C));
 }
 
@@ -481,7 +481,7 @@ struct S1_MainPoolBlock {
       s32 arg;  
 };
 void func_800047B0(S1_MainPoolState* arg0, u32 arg1, S1_Fragment* arg2) {
-    func_80002210(arg1, arg2);
+    Memmap_RelocateFragment(arg1, arg2);
     MainPool_ResetStateToOffset(arg0, ((u32)arg2 + arg2->sizeInRam) - (u32)arg0->listHeadR);
 }
 

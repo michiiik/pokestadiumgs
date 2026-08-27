@@ -4821,7 +4821,7 @@ struct S1_Fragment {
       char data[RELOCATIONS_SIZE];
 };
 void func_800413A0(S1_MainPoolState* arg0, u32 arg1, S1_Fragment* arg2) {
-    func_80002210(arg1, arg2);
+    Memmap_RelocateFragment(arg1, arg2);
     MainPool_ResetStateToOffset(arg0, ((u32)arg2 + arg2->sizeInRam) - (u32)arg0->listHeadR);
 }
 #endif

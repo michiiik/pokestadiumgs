@@ -113,7 +113,7 @@ void func_87E15A08(void *arg0) {
     s32 sp1C;
     s32 temp_v0;
 
-    temp_v0 = func_800030D0(main_pool_get_available(), 0);
+    temp_v0 = MainPool_AllocState(main_pool_get_available(), 0);
     sp1C = temp_v0;
     (*(s32 *)((u8 *)(arg0) + (0x104))) = func_80040E80(temp_v0, &D_87E1B310);
     MainPool_FinalizeAllocation(sp1C);

@@ -22,7 +22,7 @@ void func_88D00488(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/42/fragment42_code/func_88D004C8.s")
 
-extern s32 func_80002E00(s32, s32);
+extern s32 mem_pool_try_init(s32, s32);
 extern void func_80057908(s32);
 extern s32 func_8005DA1C(s32);
 extern u8 func_8005D92C(s32);
@@ -34,7 +34,7 @@ extern void func_88A00D0C(s32);
 extern s8 D_88006868[];
 extern u8 D_8800686D[];
 void func_88D005CC(void) {
-    s32 pool = func_80002E00(0x14000, 0);
+    s32 pool = mem_pool_try_init(0x14000, 0);
     func_80057908(0);
     D_88006868[0] = 0;
     *(s16 *)(D_88006868 + 2) = func_8005DA1C(D_88006868[0]);

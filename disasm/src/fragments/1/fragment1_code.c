@@ -18,7 +18,7 @@ extern u8 D_83503F30;
 extern s32 D_83503F54;
 extern s32 D_83503F6C;
 extern u8 D_83503F70;
-extern s32 func_800030D0(s32, s32);
+extern s32 MainPool_AllocState(s32, s32);
 s32 main_pool_get_available(void);
 extern void MainPool_FinalizeAllocation(s32);
 void ModelRenderer_InitDisplayRoots(void);
@@ -27,7 +27,7 @@ void func_8003F018(s32 arg0);
 void func_8350026C(void) {
     s32 sp1C[3];
     s32 temp_v0;
-    temp_v0 = func_800030D0(main_pool_get_available(), 0);
+    temp_v0 = MainPool_AllocState(main_pool_get_available(), 0);
     sp1C[0] = temp_v0;
     D_83503F54 = func_80040E80(temp_v0, &D_83503C24);
     D_83503F6C = func_80040E80(sp1C[0], &D_83503BEC);
