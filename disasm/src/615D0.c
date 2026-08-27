@@ -353,7 +353,23 @@ void func_800619E8(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80061ED0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80061F44.s")
+extern u8 func_80062EB0(u8, u8);
+void func_80061F44(u8 *arg0) {
+    s32 i;
+    u8 *p;
+
+    *(u16 *)(arg0 + 0x26) = *(u16 *)(arg0 + 0x28);
+    arg0[0x24] = 0;
+    p = arg0;
+    i = 0;
+    do {
+        if (p[2] != 0) {
+            p[0x18] = func_80062EB0(p[2], p[0x18]);
+        }
+        i++;
+        p++;
+    } while (i != 4);
+}
 
 extern s32 _bcmp(const void *, const void *, s32); s32 GbSave_PlayerIdentityMatches(const void *a, const void *b) { return _bcmp(a, b, 0xD) == 0; }
 
