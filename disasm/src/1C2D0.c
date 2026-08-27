@@ -12,7 +12,18 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1C2D0/func_8001BABC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/1C2D0/func_8001BCA4.s")
+extern f32 func_8001BA28();
+extern f32 func_8001BABC();
+void func_8001BCA4(u8 *arg0) {
+    u8 *state;
+    state = arg0;
+    if (state[0x80] != 0) {
+        *(f32 *)(state + 0x38) = func_8001BA28(state + 0x80);
+    }
+    if (state[0xA0] != 0) {
+        *(f32 *)(state + 0x3C) = func_8001BABC(state + 0x8C);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1C2D0/func_8001BD00.s")
 
