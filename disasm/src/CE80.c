@@ -31,7 +31,36 @@ void func_8000C800(s32 arg0, s32 arg1, s32 arg2, OSMesgQueue *arg3)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/CE80/func_8000CCF0.s")
+extern u8 D_8011BE90[];
+void func_8000CCF0(s32 arg0)
+{
+    s32 i;
+    s32 offset;
+    s32 target_offset;
+    s32 product;
+    u8 *entry;
+    s32 new_var;
+    u8 *target;
+
+    i = 0;
+    offset = 0;
+    product = *(s32 *)(D_8011BE90 + 0x2C28) * arg0;
+    target_offset = product << 5;
+    while (i < *(s32 *)(D_8011BE90 + 0x2C28)) {
+        entry = (u8 *)(offset + *(u32 *)(D_8011BE90 + 0x3468)) + (new_var = 0xD0);
+        target = (u8 *)(target_offset + *(u32 *)(D_8011BE90 + 0x14)) + (new_var = 0);
+        if ((*(u32 *)entry >> 31) != 0) {
+            func_8001FC60(target, entry);
+            entry[0] &= 0xFFBF;
+        } else {
+            target[0] &= 0xFF7F;
+        }
+        entry[6] = 0;
+        i++;
+        offset += 0x100;
+        target_offset += 0x20;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -63,11 +92,31 @@ void func_8000CFB4(s32 arg0, s32 arg1)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/CE80/func_8000D024.s")
+s32 func_8000D024(s32 arg0, u8 *arg1, s16 arg2)
+{
+    u8 *entry;
+
+    entry = ((arg1 + (arg1[3] * 0x8C)) + (arg2 * 0x1C)) + ((0, 0x40));
+    arg0 = func_8000DDC8(arg0, 0x3D0, *(u16 *)(entry + 0xE), *(s16 *)(entry + 0x10), arg1);
+    if (*(s16 *)(entry + 0x12) != 0) {
+        arg0 = func_8000DDC8(arg0, (*(s16 *)(entry + 0x10) + 0x3D0) & 0xFFFF, 0, *(s16 *)(entry + 0x12), arg1);
+    }
+    return arg0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/CE80/func_8000D0CC.s")
+s32 func_8000D0CC(s32 arg0, u8 *arg1, s16 arg2)
+{
+    u8 *entry;
+
+    entry = ((arg1 + (arg1[3] * 0x8C)) + (arg2 * 0x1C)) + ((0, 0x40));
+    arg0 = func_8000DE34(arg0, 0x3D0, *(u16 *)(entry + 0xE), *(s16 *)(entry + 0x10), arg1);
+    if (*(s16 *)(entry + 0x12) != 0) {
+        arg0 = func_8000DE34(arg0, (*(s16 *)(entry + 0x10) + 0x3D0) & 0xFFFF, 0, *(s16 *)(entry + 0x12), arg1);
+    }
+    return arg0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -236,7 +285,17 @@ s32 func_8000DB24(s32 arg0, s32 arg1, u8 *arg2, s16 arg3)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/CE80/func_8000DBD0.s")
+s32 func_8000DBD0(s32 arg0, s32 arg1, u8 *arg2, s16 arg3)
+{
+    u8 *entry;
+
+    entry = ((arg2 + (arg2[3] * 0x8C)) + (arg3 * 0x1C)) + ((0, 0x158));
+    arg0 = func_8000DDC8(arg0, 0xC70, *(u16 *)(entry + 0xE), *(s16 *)(entry + 0x10), arg2);
+    if (*(s16 *)(entry + 0x12) != 0) {
+        arg0 = func_8000DDC8(arg0, (*(s16 *)(entry + 0x10) + 0xC70) & 0xFFFF, 0, *(s16 *)(entry + 0x12), arg2);
+    }
+    return arg0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -285,7 +344,17 @@ s32 func_8000DEE8(s32 arg0, s32 arg1, u8 *arg2, s16 arg3)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/CE80/func_8000E13C.s")
+s32 func_8000E13C(s32 arg0, u8 *arg1, s16 arg2)
+{
+    u8 *entry;
+
+    entry = ((arg1 + (arg1[3] * 0x8C)) + (arg2 * 0x1C)) + ((0, 0x158));
+    arg0 = func_8000DE34(arg0, 0xC70, *(u16 *)(entry + 0xE), *(s16 *)(entry + 0x10), arg1);
+    if (*(s16 *)(entry + 0x12) != 0) {
+        arg0 = func_8000DE34(arg0, (*(s16 *)(entry + 0x10) + 0xC70) & 0xFFFF, 0, *(s16 *)(entry + 0x12), arg1);
+    }
+    return arg0;
+}
 #endif
 
 #ifdef VERSION_US
