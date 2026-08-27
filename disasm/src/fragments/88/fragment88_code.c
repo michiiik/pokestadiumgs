@@ -2,7 +2,15 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/88/fragment88_code/func_81C00020.s")
+u16 func_81C00020(u8 arg0) {
+    u16 result;
+    if (arg0 < 0x29) {
+        result = arg0 + 0x2A4;
+    } else {
+        result = arg0 + 0x2A7;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/88/fragment88_code/func_81C00050.s")
 
