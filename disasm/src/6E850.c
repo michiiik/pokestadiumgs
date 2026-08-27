@@ -23,7 +23,27 @@ void func_8006DCB8_padding2(void) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_8006DCD0.s")
+extern s16 D_8009E5CC[];
+extern u16 D_8009E3C8[];
+extern s16 D_8009E7D0[];
+extern s16 D_8009E9D4[];
+extern s16 D_8009EBD8[];
+extern s16 D_8009EDDC[];
+extern s16 D_8009EFE0[];
+s16 func_8006DCD0(s16 *arg0, s32 arg1) {
+    s16 index;
+    s16 value;
+
+    index = arg0[arg1];
+    value = D_8009E5CC[index]; if (value > 0) return 0;
+    value = ((s16 *)D_8009E3C8)[index]; if (value > 0) return 1;
+    value = D_8009E7D0[index]; if (value > 0) return 2;
+    value = D_8009E9D4[index]; if (value > 0) return 3;
+    value = D_8009EBD8[index]; if (value > 0) return 4;
+    value = D_8009EDDC[index]; if (value > 0) return 5;
+    value = D_8009EFE0[index]; if (value > 0) return 6;
+    return index;
+}
 #endif
 
 #ifdef VERSION_US
@@ -136,7 +156,11 @@ void func_8006E7DC(f32 (*arg0)[4], void *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_8006EB14.s")
+typedef struct Copy60 { s32 words[15]; } Copy60;
+void func_8006EB14(void *arg0, void *arg1) {
+    *(Copy60 *)arg1 = *(Copy60 *)arg0;
+}
+void func_8006EB14_padding(void) {}
 #endif
 
 #ifdef VERSION_US
@@ -148,7 +172,19 @@ void func_8006E7DC(f32 (*arg0)[4], void *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_8006EF04.s")
+extern f32 D_800A5990;
+extern f32 D_800A5994;
+extern f32 D_800A5998;
+f32 func_8006EF04(f32 *arg0, f32 *arg1) {
+    f32 x = arg0[3] - arg1[3];
+    f32 y = arg0[4] - arg1[4];
+    f32 z = arg0[5] - arg1[5];
+
+    if (Math_FAbs(x) < D_800A5990) x = 0.0f;
+    if (Math_FAbs(y) < D_800A5994) y = 0.0f;
+    if (Math_FAbs(z) < D_800A5998) z = 0.0f;
+    return sqrtf((x * x) + (y * y) + (z * z));
+}
 #endif
 
 #ifdef VERSION_US
@@ -259,11 +295,38 @@ void func_80070C14(f32 *arg0, f32 *arg1, f32 *arg2) { f32 x = *arg0; f32 y = *ar
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_80070F30.s")
+void func_80070F30(f32 *arg0, f32 *arg1) {
+    f32 x0 = arg0[0];
+    f32 y0 = arg0[1];
+    f32 z0 = arg0[2];
+    f32 x1 = arg0[4];
+    f32 y1 = arg0[5];
+    f32 z1 = arg0[6];
+    f32 x2 = arg0[8];
+    f32 y2 = arg0[9];
+    f32 z2 = arg0[10];
+    arg1[0] = sqrtf((x0 * x0) + (y0 * y0) + (z0 * z0));
+    arg1[1] = sqrtf((x1 * x1) + (y1 * y1) + (z1 * z1));
+    arg1[2] = sqrtf((x2 * x2) + (y2 * y2) + (z2 * z2));
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_80070FDC.s")
+void func_80070FDC(f32 arg0[4][4]) {
+    u8 pad[12];
+    f32 x;
+    f32 y;
+    f32 z;
+    f32 translateMtx[4][4];
+    f32 scaleMtx[4][4];
+    f32 scale[3];
+
+    func_80070F30((f32 *)arg0, scale);
+    guScaleF(scaleMtx, scale[0], scale[1], scale[2]);
+    guMtxXFMF(arg0, 0.0f, 0.0f, 0.0f, &x, &y, &z);
+    guTranslateF(translateMtx, x, y, z);
+    guMtxCatF(scaleMtx, translateMtx, arg0);
+}
 #endif
 
 #ifdef VERSION_US
