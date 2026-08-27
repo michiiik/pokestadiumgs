@@ -2,7 +2,28 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_800609D0.s")
+extern s32 func_8003514C(void);
+extern u8 D_80097380[];
+extern u8 D_80097480[];
+extern u8 D_80097580[];
+extern u8 *D_80097680;
+void func_800609D0(void) {
+    s32 mode;
+    mode = func_8003514C();
+    switch (mode) {
+    case 1:
+        D_80097680 = D_80097380;
+        break;
+    case 2:
+    case 3:
+        D_80097680 = D_80097480;
+        break;
+    case 4:
+    case 5:
+        D_80097680 = D_80097580;
+        break;
+    }
+}
 
 u16 func_80060A4C(const u8 *arg0) { return (u16)((arg0[0] << 8) | arg0[1]); }
 
@@ -20,19 +41,54 @@ u8 func_80060AAC(u8 arg0) { extern u8 *D_80097680; return D_80097680[arg0]; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060AC8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060B28.s")
+s32 func_80060B28(u8 arg0) {
+    u8 i;
+    for (i = 0; i < 0x100; i++) {
+        if (arg0 == D_80097680[i]) {
+            return i;
+        }
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060B74.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060C08.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060C50.s")
+s8 *func_80060C50(s8 *arg0, u8 *arg1) {
+    s8 *result;
+    result = arg0;
+    while (*arg1 != 0x50) {
+        *arg0 = D_80097680[*arg1];
+        arg0++;
+        arg1++;
+    }
+    *arg0 = 0;
+    return result;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060C98.s")
+extern u8 func_80060AC8(u8, s32);
+s8 *func_80060C98(s8 *arg0, u8 *arg1, s32 arg2) {
+    s8 *result;
+    result = arg0;
+    while (*arg1 != 0x50) {
+        *arg0++ = func_80060AC8(*arg1++, arg2);
+    }
+    *arg0 = 0;
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060D1C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060D70.s")
+u8 *func_80060D70(u8 *arg0, s8 *arg1) {
+    u8 *result;
+    result = arg0;
+    while (*arg1 != 0) {
+        *arg0++ = func_80060B28(*arg1++);
+    }
+    *arg0 = 0x50;
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060DDC.s")
 
