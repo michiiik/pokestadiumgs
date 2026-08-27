@@ -73,7 +73,29 @@ void func_80064D28(void) { Cont_StartReadInputs(); func_80005F0C(); func_80049ED
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/func_80064D58.s")
+extern u8 D_82A00000;
+extern u8 fragment23_ROM_START[];
+extern u8 fragment24_ROM_START[];
+extern void GbTower_PowerOffAllPaks(void);
+extern void Audio_StopProcessing(void);
+extern void Display_ClearFramebufferLine(s32);
+extern void Display_ApplyPendingVideoMode(void);
+extern void Display_WaitForFrames(s32);
+extern void main_pool_pop_state(s32);
+extern s32 Fragment_LoadAndCall(s32, u8 *, u8 *, u32, u32);
+extern void func_80064DF4(void);
+void func_80064D58(s32 arg0, s32 arg1) {
+    osViBlack(1U);
+    GbTower_PowerOffAllPaks();
+    Audio_StopProcessing();
+    func_80064DF4();
+    Display_ClearFramebufferLine(1);
+    Display_ApplyPendingVideoMode();
+    Display_WaitForFrames(0xA);
+    main_pool_pop_state(0x47414D45);
+    Fragment_LoadAndCall((((u32) &D_82A00000 & 0x0FF00000) >> 20) - 0x10,
+        fragment23_ROM_START, fragment24_ROM_START, (u32) arg0, (u32) arg1);
+}
 #endif
 
 void func_80064DF4(void) {
@@ -145,7 +167,22 @@ void Game_ThreadInit(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/func_80064F54.s")
+extern s32 D_8009DE90;
+extern void func_8004B6E0(void);
+extern void func_80050BE0(void);
+extern void main_pool_push_state(s32);
+extern void func_8005AEA0(void);
+extern void main_pool_pop_state(s32);
+void func_80064F54(void) {
+    if (D_8009DE90 == 0) {
+        D_8009DE90 = 1;
+        func_8004B6E0();
+        func_80050BE0();
+        main_pool_push_state(0x4750414B);
+        func_8005AEA0();
+        main_pool_pop_state(0x4750414B);
+    }
+}
 #endif
 
 #ifdef VERSION_US
