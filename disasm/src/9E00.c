@@ -9,7 +9,35 @@ void crash_screen_sleep(s32 ms) {
     while (osGetTime() < cycles) {}
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/9E00/func_800092C8.s")
+extern void *D_80087200;
+extern u16 D_80087E00[];
+extern void Cont_StartReadInputs(void);
+extern void func_80005F0C(void);
+void func_800092C8(void) {
+    s32 result = 0;
+    s32 index = 0;
+    u16 input;
+    u16 expected;
+    s32 match;
+    do {
+        Cont_StartReadInputs();
+        func_80005F0C();
+        input = *(u16 *)((u8 *)D_80087200 + 8);
+        if (input != 0) {
+            expected = (match = D_80087E00[index]);
+            index++;
+            match = expected == input;
+            if (match != 0) {
+                if (index == 10) {
+                    result = 1;
+                }
+            } else {
+                index = 0;
+            }
+        }
+        crash_screen_sleep(10);
+    } while (result == 0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/9E00/func_80009384.s")
 
