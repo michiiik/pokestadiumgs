@@ -22,7 +22,7 @@
 | `disasm/src/208A0.c` | 1 | 5 | 80.0% |
 | `disasm/src/20C50.c` | 2 | 4 | 50.0% |
 | `disasm/src/226C0.c` | 2 | 5 | 60.0% |
-| `disasm/src/229E0.c` | 288 | 571 | 49.6% |
+| `disasm/src/229E0.c` | 287 | 571 | 49.7% |
 | `disasm/src/2CA0.c` | 1 | 13 | 92.3% |
 | `disasm/src/3280.c` | 3 | 14 | 78.6% |
 | `disasm/src/3E40.c` | 2 | 11 | 81.8% |
