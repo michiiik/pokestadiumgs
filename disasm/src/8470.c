@@ -8,7 +8,17 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80007AEC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80007B34.s")
+s32 func_80007A84();
+extern s32 D_800D0554;
+s32 func_80007B34(void) {
+    s32 var_v1;
+
+    var_v1 = 0;
+    if ((D_800D0554 != 0) && ((*(u8 *)((u8 *)(D_800D0554) + (0x11))) == 0)) {
+        var_v1 = func_80007A84();
+    }
+    return var_v1;
+}
 
 extern s32 D_800D0554;
 void StageFade_SetMode(s32 arg0) {
