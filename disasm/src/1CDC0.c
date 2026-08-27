@@ -31,7 +31,18 @@ s32 func_8001C1C0(u8 **arg0, u8 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1CDC0/func_8001C6C8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/1CDC0/func_8001C744.s")
+extern u8 D_80121EF4[];
+extern void func_8001CB1C();
+extern void func_8001C6C8();
+void func_8001C744(void *arg0, s32 arg1) {
+    s32 temp_a2;
+    temp_a2 = *(s32 *)((u8 *)arg0 + (arg1 << 2) + 0x54);
+    if (temp_a2 != 0) {
+        func_8001CB1C(D_80121EF4, (void *)(u32)(temp_a2 + 0x80));
+        func_8001C6C8(temp_a2);
+        *(s32 *)((u8 *)arg0 + (arg1 << 2) + 0x54) = 0;
+    }
+}
 
 void func_8001C744();
 void func_8001AAD8();
