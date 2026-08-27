@@ -14,7 +14,16 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/CE80/func_8000C800.s")
+void func_8000C800(s32 arg0, s32 arg1, s32 arg2, OSMesgQueue *arg3)
+{
+    if (arg0 & 0x80000000) {
+        _bcopy(arg0, arg1, arg2);
+        osSendMesg(arg3, (OSMesg)1, 0);
+    } else {
+        func_8001544C(arg0, arg1, arg2, 2);
+        osSendMesg(arg3, (OSMesg)1, 0);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -30,7 +39,27 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/CE80/func_8000CFB4.s")
+extern u8 D_8011BE90[];
+void func_8000CFB4(s32 arg0, s32 arg1)
+{
+    struct LocalEntry {
+        u32 unk0 : 1;
+        u32 unk1 : 1;
+        u32 unk2 : 30;
+    };
+    s32 i;
+    u8 *ptr;
+
+    i = arg0 + 1;
+    while (i < *(s16 *)(D_8011BE90 + 0x2BE8)) {
+        ptr = (u8 *)(*(u32 *)(D_8011BE90 + 0x14) + (((*(u32 *)(D_8011BE90 + 0x2C28) * i) + arg1) << 5));
+        if (((struct LocalEntry *)ptr)->unk1) {
+            break;
+        }
+        ptr[0] &= 0xFF7F;
+        i++;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -193,7 +222,17 @@ void func_8000DB0C(u8 *arg0, s32 arg1, s32 arg2) { *(u32 *)(arg0 + 0) = 0x070200
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/CE80/func_8000DB24.s")
+s32 func_8000DB24(s32 arg0, s32 arg1, u8 *arg2, s16 arg3)
+{
+    u8 *entry;
+
+    entry = ((arg2 + (arg2[3] * 0x8C)) + (arg3 * 0x1C)) + ((0, 0x40));
+    arg0 = func_8000DDC8(arg0, 0xC70, *(u16 *)(entry + 0xE), *(s16 *)(entry + 0x10), arg2);
+    if (*(s16 *)(entry + 0x12) != 0) {
+        arg0 = func_8000DDC8(arg0, (*(s16 *)(entry + 0x10) + 0xC70) & 0xFFFF, 0, *(s16 *)(entry + 0x12), arg2);
+    }
+    return arg0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -216,11 +255,29 @@ void func_8000DEA0(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/CE80/func_8000DEA8.s")
+s32 func_8000DEA8(s32 arg0, s32 arg1, u8 *arg2, s16 arg3)
+{
+    if (arg2[4] == 1) {
+        arg0 = func_8000DBD0(arg0, arg1, arg2, arg3);
+    }
+    return arg0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/CE80/func_8000DEE8.s")
+s32 func_8000DEE8(s32 arg0, s32 arg1, u8 *arg2, s16 arg3)
+{
+    if (arg2[4] == 1) {
+        if (arg2[0x18] != 0) {
+            arg0 = func_8000D56C(arg0, arg1, arg2, arg3);
+        } else {
+            arg0 = func_8000DB24(arg0, arg1, arg2, arg3);
+        }
+    } else {
+        arg0 = func_8000D1D8(arg0, arg1, arg2, arg3);
+    }
+    return arg0;
+}
 #endif
 
 #ifdef VERSION_US
