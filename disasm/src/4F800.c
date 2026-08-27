@@ -2,7 +2,24 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4F800/func_8004EC00.s")
+extern s32 D_80128120;
+extern u8 D_80128128[];
+typedef struct Pair4EC00G { u8 bytes[4]; } Pair4EC00G;
+void func_8004EC00(s32 arg0, s32 arg1) {
+    s32 index;
+    Pair4EC00G *entry;
+    Pair4EC00G *entry2;
+    index = D_80128120;
+    if (index < 0x1F) {
+        entry = (Pair4EC00G *)(D_80128128 + index * 4);
+        entry[1] = entry[0];
+        D_80128120 = index + 1;
+        index = D_80128120;
+    }
+    entry2 = (Pair4EC00G *)(D_80128128 + index * 4);
+    *(s16 *)entry2 = arg0;
+    *(s16 *)((u8 *)entry2 + 2) = arg1;
+}
 #endif
 
 #ifdef VERSION_US

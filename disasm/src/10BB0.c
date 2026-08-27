@@ -211,7 +211,24 @@ void func_80011A40(u8 *arg0) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_8001244C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_800124A4.s")
+extern S1_unk_func_81206FA0 D_8011EF80;
+extern s32 D_8011EF8C;
+s32 func_800124A4(s32 arg0, s32 arg1, s32 arg2)
+{
+  s32 locals[2];
+  s32 result;
+  locals[0] = D_8011EF8C;
+  result = GbApu_Alloc(&D_8011EF80, arg2);
+  *((s32 *) ((D_8011BE90 + (locals[0] * 0xC)) + 0x3100)) = result;
+  if (result == 0)
+  {
+    return 0;
+    return result;
+  }
+  *((s16 *) ((D_8011BE90 + (locals[0] * 0xC)) + 0x3108)) = arg0;
+  *((s16 *) ((D_8011BE90 + (locals[0] * 0xC)) + 0x310A)) = arg1;
+  *((s32 *) ((D_8011BE90 + (locals[0] * 0xC)) + 0x3104)) = arg2;
+}
 
 s32 func_80012528(s32 arg0, s32 arg1, s32 arg2, s8 arg3, s32 arg4) {
     u8 *result;
