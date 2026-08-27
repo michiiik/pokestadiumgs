@@ -451,7 +451,19 @@ u8 func_800549DC(s32 arg0) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80054A24.s")
+void func_80054A24(s32 arg0, u8 arg1) {
+    void *temp_v0;
+    u8 current;
+    if ((arg0 >= 0) && (arg0 < 2)) {
+        temp_v0 = func_80051138(0);
+        current = *((u8 *)temp_v0 + arg0 + 0x54);
+        if (current != arg1) {
+            temp_v0 = func_80051138(0);
+            *((u8 *)temp_v0 + arg0 + 0x54) = arg1;
+            func_80051BF0(0x14, 0, 2);
+        }
+    }
+}
 
 extern void *func_80051138(s32);
 s32 func_80054AA0(s32 arg0) {
