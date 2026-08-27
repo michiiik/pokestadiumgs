@@ -250,7 +250,24 @@ s16 ModelRenderer_GetObjectType(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_800707D0.s")
+extern u16 *func_8003F54C(void *);
+extern u16 D_80094904[];
+extern void func_81003F44(void);
+void func_800707D0(void *arg0) {
+    u16 *state = func_8003F54C(arg0);
+
+    if ((state != NULL) && (*(s16 *)((u8 *)arg0 + 0x1A) != 0xDB)) {
+        state[0] = 0;
+        state[1]++;
+        if (state[2] == D_80094904[0]) {
+            state[3] = 0;
+        } else {
+            state[3] = 1;
+        }
+        state[2] = D_80094904[0];
+        ((void (*)(void))func_80003240((s32)func_81003F44))();
+    }
+}
 #endif
 
 #ifdef VERSION_US
