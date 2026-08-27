@@ -46,7 +46,45 @@ void func_81311A9C(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_109280/func_81311C18.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_109280/func_81311C70.s")
+extern void func_81311B98();
+
+typedef struct {
+    void *owner;
+    u8 pad04[0x14];
+    u8 status;
+    s8 index;
+} Frag14State;
+typedef struct {
+    u8 pad00[4];
+    s16 value;
+    u8 pad06[2];
+} Frag14Entry;
+typedef struct {
+    u8 pad00[0x18];
+    s16 fallback;
+    u8 pad1A[6];
+    Frag14Entry *entries;
+} Frag14Record;
+s32 func_81311C70(void *arg0, void *arg1) {
+    Frag14State *state = arg0;
+    Frag14Record *record = arg1;
+    s16 result;
+    s8 index;
+    if ((record == state->owner) && (state->status == 4)) {
+        index = state->index;
+        state->status = 0;
+        if (index >= 0) {
+            result = record->entries[index].value;
+        } else {
+            result = record->fallback;
+        }
+        return (result << 16) >> 16;
+    }
+    if (state->status != 3) {
+        func_81311B98();
+    }
+    return 0;
+}
 
 void func_81311CFC(void *arg0) {
     (*(s32 *)((u8 *)(arg0) + (0))) = 0;
