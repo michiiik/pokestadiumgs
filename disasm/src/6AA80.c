@@ -2,7 +2,26 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_80069E80.s")
+extern void main_pool_push_state(s32);
+extern void main_pool_pop_state(s32);
+extern void func_800355E4(s32);
+extern void Fragment_Load(s32, void *, void *);
+extern s32 Fragment_LoadAndCall(s32, void *, void *, u32, u32);
+extern s32 Game_SetState(s32);
+extern u8 D_88000000;
+extern u8 D_88B00000;
+extern u8 fragment29_ROM_START;
+extern u8 fragment30_ROM_START;
+extern u8 fragment40_ROM_START;
+extern u8 fragment41_ROM_START;
+void func_80069E80(void) {
+    main_pool_push_state(0x70727374);
+    func_800355E4(0x44);
+    Fragment_Load(((u32) ((s32) &D_88000000 & 0x0FF00000) >> 20) - 0x10, &fragment29_ROM_START, &fragment30_ROM_START);
+    Fragment_LoadAndCall(((u32) ((s32) &D_88B00000 & 0x0FF00000) >> 20) - 0x10, &fragment40_ROM_START, &fragment41_ROM_START, 0, 0);
+    main_pool_pop_state(0x70727374);
+    Game_SetState(2);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_80069F20.s")
 
@@ -194,7 +213,41 @@ s32 func_8006AF94(void) { s32 result = -1; s32 ptr = D_8009DF70; if (ptr != 0) r
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006AFB4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006AFE4.s")
+void func_8006AFE4(s8 *arg0, s8 *arg1) {
+    s32 found = 0;
+    s32 i = 0;
+    s8 *ptr = arg0;
+    s8 value;
+    do {
+        i++;
+        *ptr = -2;
+        ptr++;
+    } while (i < 4);
+    i = 0;
+    ptr = arg1;
+    do {
+        value = *ptr;
+        i++;
+        if (value >= 0) {
+            arg0[value] = value;
+        } else if (value == -1) {
+            found = 1;
+        }
+        ptr++;
+    } while (i < 4);
+    i = 0;
+    if (found != 0) {
+        ptr = arg0;
+loop:
+        i++;
+        if (*ptr == -2) {
+            *ptr = -1;
+            return;
+        }
+        ptr++;
+        if (i != 4) goto loop;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006B07C.s")
 
@@ -306,7 +359,27 @@ extern s16 D_8009DF74; void func_8006CC0C(void) { D_8009DF74 = 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006CC18.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006CDA0.s")
+extern void _bcopy(void *, void *, s32);
+typedef struct CopyCDA0C { s32 words[22]; } CopyCDA0C;
+s32 func_8006CDA0(u8 *arg0,u8 *arg1) {
+ s32 result=0; s32 offset; u8 *src; u8 *dst;
+ if(D_8009DF70!=0) {
+  result=1; func_8006A3B8(*(u16 *)arg0); func_8006A400(*(s16 *)(arg0+2));
+  if(arg0[4]!=0) func_8006A2F8(1); else func_8006A328(1);
+  func_8006AC4C(arg0[5]); func_8006B7D8(arg0[6]);
+  *(u16 *)(*(u8 **)((u8 *)(u32)D_8009DF70+0x24)+0x934)=*(u16 *)(arg0+8);
+  _bcopy(arg0+0xA,*(u8 **)((u8 *)(u32)D_8009DF70+0x24)+0x904,0xC);
+  *(u8 *)(*(u8 **)((u8 *)(u32)D_8009DF70+0x24)+0x955)=arg0[0x16];
+  src=arg1;
+  for(offset=0; offset!=0x240; offset+=0x60) {
+            dst=*(u8 **)((u8 *)(u32)D_8009DF70+0x24)+offset;
+            _bzero(dst,0x60);
+            *(CopyCDA0C *)dst=*(CopyCDA0C *)src;
+            src+=0x58;
+        }
+ }
+ return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006CEE8.s")
 
