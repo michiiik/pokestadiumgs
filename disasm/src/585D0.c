@@ -192,7 +192,10 @@ s32 func_800590CC(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80059274.s")
+extern u8 D_801285D4[];
+void func_80059274(s32 arg0) {
+    func_80057BCC(arg0, *(s32 *)(D_801285D4 + arg0 * 112), 0x4000, 0x3E40);
+}
 #endif
 
 #ifdef VERSION_US
@@ -343,15 +346,33 @@ void func_8005B058(s32 arg0) { func_80059320(arg0, 1); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005B078.s")
+s32 func_80057A80(s32);
+s32 func_8005B078(s32 arg0) {
+    if (func_80057A80(arg0) != 0) {
+        return 1;
+    }
+    return func_80059320(arg0, 2);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005B0B0.s")
+s32 func_80057A80(s32);
+s32 func_8005B0B0(s32 arg0) {
+    if (func_80057A80(arg0) != 0) {
+        return 1;
+    }
+    return func_80059320(arg0, 8);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005B0E8.s")
+s32 func_80057A80(s32);
+s32 func_8005B0E8(s32 arg0) {
+    if (func_80057A80(arg0) != 0) {
+        return 1;
+    }
+    return func_80059320(arg0, 16);
+}
 #endif
 
 #ifdef VERSION_US
@@ -552,15 +573,37 @@ void func_8005C060(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005C52C.s")
+extern u8 D_801285D0[];
+extern u8 D_801285D8[];
+extern void _bcopy(s32, s32, s32);
+extern void _bzero(s32, s32);
+void func_8005C52C(s32 arg0, s32 arg1) {
+    s32 v0 = *(s32 *)(D_801285D0 + arg1 * 112);
+    _bzero(arg0, 0x98);
+    _bcopy(v0 + 0x49, arg0 + 0x39, 0x2A);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005C584.s")
+extern u8 D_801285D0[];
+extern u8 D_801285D8[];
+extern void _bcopy(s32, s32, s32);
+extern void _bzero(s32, s32);
+void func_8005C584(s32 arg0, s32 arg1) {
+    s32 v0 = *(s32 *)(D_801285D0 + arg1 * 112);
+    _bcopy(v0 + 0x3E6, arg0, 0x98);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005C5CC.s")
+extern u8 D_801285D0[];
+extern u8 D_801285D8[];
+extern void _bcopy(s32, s32, s32);
+extern void _bzero(s32, s32);
+void func_8005C5CC(s32 arg0, s32 arg1) {
+    s32 v0 = *(s32 *)(D_801285D0 + arg1 * 112);
+    _bcopy(v0 + 0x3E7, arg0, 0x98);
+}
 #endif
 
 #ifdef VERSION_US
@@ -568,15 +611,36 @@ void func_8005C060(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005C694.s")
+extern u8 D_801285D0[];
+extern u8 D_801285D8[];
+extern void _bcopy(s32, s32, s32);
+extern void _bzero(s32, s32);
+void func_8005C694(s32 arg0, s32 arg1) {
+    s32 v0 = *(s32 *)(D_801285D0 + arg1 * 112);
+    _bcopy(arg0 + 0x39, v0 + 0x49, 0x2A);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005C6D8.s")
+extern u8 D_801285D0[];
+extern u8 D_801285D8[];
+extern void _bcopy(s32, s32, s32);
+extern void _bzero(s32, s32);
+void func_8005C6D8(s32 arg0, s32 arg1) {
+    s32 v0 = *(s32 *)(D_801285D0 + arg1 * 112);
+    _bcopy(arg0, v0 + 0x3E6, 0x98);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005C714.s")
+extern u8 D_801285D0[];
+extern u8 D_801285D8[];
+extern void _bcopy(s32, s32, s32);
+extern void _bzero(s32, s32);
+void func_8005C714(s32 arg0, s32 arg1) {
+    s32 v0 = *(s32 *)(D_801285D0 + arg1 * 112);
+    _bcopy(arg0, v0 + 0x3E7, 0x98);
+}
 #endif
 
 #ifdef VERSION_US
@@ -828,7 +892,11 @@ void func_8005E07C(s32 arg0, u8 arg1) { u8 *entry = D_80128570 + arg0 * 0x70; if
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005E2BC.s")
+extern u8 D_801285D8[];
+extern void _bcopy(s32, s32, s32);
+void func_8005E2BC(u8 arg0, s32 arg1) {
+    _bcopy(arg1, *(s32 *)(D_801285D8 + arg0 * 112) + 0x5FA, 3);
+}
 #endif
 
 #ifdef VERSION_US
