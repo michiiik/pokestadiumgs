@@ -35,7 +35,18 @@ s32 *func_80063620(u8 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80063690.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_800636C0.s")
+extern u8 D_800982F0[];
+extern u8 func_80063660(u8);
+s32 func_800636C0(u8 arg0, u8 arg1) {
+    u8 *p = D_800982F0;
+    while (*p != 0xFF) {
+        if (p[0] == func_80063660(arg0) && arg1 == p[1]) {
+            return 1;
+        }
+        p += 2;
+    }
+    return 0;
+}
 
 s32 func_80063754(s32 arg0) { s32 *value = &arg0; arg0 &= 0xFF; if (arg0 == 0x9E || (arg0 >= 0xB5 && arg0 < 0xBE)) return 1; return 0; }
 
