@@ -32,7 +32,18 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84151420.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84151498.s")
+extern s32 func_84151420(u8 *, u8);
+
+s32 func_84151498(u8 *arg0) {
+    s32 i;
+
+    for (i = 0; i < 4; i++) {
+        if (func_84151420(arg0, i) != 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_841514F8.s")
 
@@ -44,7 +55,17 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84151838.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_841518D0.s")
+extern void func_841506D0(void *, u8, u8, u8);
+extern void func_84150878(void *, u8, u8, u8);
+extern void func_841509E0(void *, u8, u8, u8);
+
+void func_841518D0(void *arg0, u8 arg1, u8 arg2) {
+    u8 local = arg2 / 3;
+
+    func_841506D0(arg0, arg1, 0xA1, local);
+    func_84150878(arg0, arg1, 0xA1, local);
+    func_841509E0(arg0, arg1, 0xA1, local);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84151940.s")
 
