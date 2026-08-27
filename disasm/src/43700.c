@@ -90,7 +90,42 @@ s32 func_80043444(u8 *arg0) { return 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_80043450.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_80043500.s")
+extern s32 D_80094C60;
+extern void func_800430B4();
+extern s32 func_8004335C();
+extern void func_80043450();
+extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
+void func_80043500(u8 *arg0) {
+    s32 result;
+    u16 flags;
+    s16 countdown;
+    f32 scale;
+
+    result = 0;
+    if (D_80094C60 != 0) {
+        func_800430B4();
+    }
+    flags = *(u16 *)(arg0 + 0);
+    if (*(u16 *)(arg0 + 0) & 2) {
+        result = func_8004335C((*(u16 *)(arg0 + 0) & 1) != 0, *(s32 *)(arg0 + 0x1C) + 0x1E);
+        if (result == 0) {
+            result = func_80043444((u8 *)((u32)*(u32 *)(arg0 + 0x1C) + 0x1E));
+        }
+    }
+    if (result != 0) {
+        *(s16 *)(arg0 + 0xE) = 0;
+        *(s16 *)(arg0 + 0xC) = 0x78;
+    } else if (*(u16 *)(arg0 + 0) & 4) {
+        countdown = *(s16 *)(arg0 + 0xC);
+        if (countdown > 0) {
+            *(s16 *)(arg0 + 0xC) = countdown - 1;
+        } else {
+            func_80043450(arg0);
+        }
+    }
+    scale = *(f32 *)(arg0 + 0x10);
+    Vec3f_SetComponentsDuplicate((f32 *)((u32)*(u32 *)(arg0 + 0x1C) + 0x30), scale, scale, scale);
+}
 
 extern Gfx *D_800D0510;
 extern void GfxImage_FillCurrent();
