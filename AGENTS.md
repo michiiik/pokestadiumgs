@@ -383,7 +383,8 @@ accepts; other widths only on diagnostic evidence via the variant policy.
 
 - Runner: `probe_error` / `list index out of range` on the last pragma owner
   of a file when the function has trailing alignment nops
-  (`func_8005633C`, `func_8130CDD4`, `func_80021BBC`); reproduces with a trivial body, so it
+  (`func_8005633C`, `func_8130CDD4`, `func_80021BBC`, `func_8001FC60`,
+  `func_80071E48`); reproduces with a trivial body, so it
   is a diagnostics-path bug, not a candidate problem.
 - Runner: `654A0.c` cannot get its `.rodata` subsegment until asm-processor
   handles mixed 4/8-byte `.late_rodata_alignment` without growing `.text`.
