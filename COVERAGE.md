@@ -3,8 +3,8 @@
 # Decompilation coverage
 
 <!-- AUTO_COVERAGE:START -->
-- US functions with C implementations: **3,575 / 10,532 (33.9%)**
-- Remaining `GLOBAL_ASM` owners: **6,957**
+- US functions with C implementations: **3,592 / 10,532 (34.1%)**
+- Remaining `GLOBAL_ASM` owners: **6,940**
 - Baseline: `f477acf` (vendored US pragma snapshot)
 <!-- AUTO_COVERAGE:END -->
 
@@ -200,7 +200,7 @@
 | `disasm/src/fragments/34/fragment34_1C3FA0.c` | 6 | 11 | 45.5% |
 | `disasm/src/fragments/34/fragment34_1C5AA0.c` | 43 | 52 | 17.3% |
 | `disasm/src/fragments/35/fragment35_1CCC20.c` | 4 | 5 | 20.0% |
-| `disasm/src/fragments/35/fragment35_1CCE70.c` | 8 | 11 | 27.3% |
+| `disasm/src/fragments/35/fragment35_1CCE70.c` | 5 | 11 | 54.5% |
 | `disasm/src/fragments/36/fragment36_code.c` | 11 | 15 | 26.7% |
 | `disasm/src/fragments/37/fragment37_code.c` | 12 | 16 | 25.0% |
 | `disasm/src/fragments/38/fragment38_1D5610.c` | 14 | 21 | 33.3% |
@@ -211,7 +211,7 @@
 | `disasm/src/fragments/4/fragment4_AE600.c` | 11 | 15 | 26.7% |
 | `disasm/src/fragments/4/fragment4_AFAA0.c` | 40 | 73 | 45.2% |
 | `disasm/src/fragments/4/fragment4_B2D00.c` | 18 | 23 | 21.7% |
-| `disasm/src/fragments/40/fragment40_1DC1F0.c` | 18 | 20 | 10.0% |
+| `disasm/src/fragments/40/fragment40_1DC1F0.c` | 12 | 20 | 40.0% |
 | `disasm/src/fragments/40/fragment40_1E0550.c` | 18 | 23 | 21.7% |
 | `disasm/src/fragments/41/fragment41_code.c` | 6 | 12 | 50.0% |
 | `disasm/src/fragments/42/fragment42_code.c` | 4 | 7 | 42.9% |
@@ -396,8 +396,8 @@
 | `disasm/src/fragments/80/fragment80_41A5F0.c` | 8 | 10 | 20.0% |
 | `disasm/src/fragments/80/fragment80_41AC50.c` | 24 | 34 | 29.4% |
 | `disasm/src/fragments/81/fragment81_code.c` | 32 | 36 | 11.1% |
-| `disasm/src/fragments/82/fragment82_420EA0.c` | 33 | 39 | 15.4% |
-| `disasm/src/fragments/82/fragment82_4238F0.c` | 39 | 58 | 32.8% |
+| `disasm/src/fragments/82/fragment82_420EA0.c` | 32 | 39 | 17.9% |
+| `disasm/src/fragments/82/fragment82_4238F0.c` | 32 | 58 | 44.8% |
 | `disasm/src/fragments/83/fragment83_code.c` | 43 | 64 | 32.8% |
 | `disasm/src/fragments/84/fragment84_code.c` | 27 | 42 | 35.7% |
 | `disasm/src/fragments/85/fragment85_code.c` | 21 | 34 | 38.2% |

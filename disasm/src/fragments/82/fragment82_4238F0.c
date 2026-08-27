@@ -7,7 +7,11 @@ void ParticleGfx_SetPrimColor_fragment82(u8 r, u8 g, u8 b, u8 a) {
     gDPSetPrimColor(D_800D0510++, 0, 0, r, g, b, a);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D02AC8.s")
+void func_82D02AC8(u16 arg0, u16 arg1, u16 arg2, u16 arg3) {
+    gDPPipeSync(D_800D0510++);
+    gDPSetFillColor(D_800D0510++, (((((arg0 << 8) & 0xF800) | ((arg1 << 3) & 0x7C0) | ((arg2 >> 2) & 0x3E) | (arg3 & 1)) << 16) |
+        (((arg0 << 8) & 0xF800) | ((arg1 << 3) & 0x7C0) | ((arg2 >> 2) & 0x3E) | (arg3 & 1))));
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D02B44.s")
 
@@ -38,7 +42,10 @@ void func_82D02D20(s32 arg0, s32 arg1)
   func_8004D1FC(func_8004C990(temp_a2, temp_a3, temp_a2, temp_a3));
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D02D5C.s")
+void func_82D02D5C(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
+    s32 value = func_8004C990((s32)arg2, (s32)arg3);
+    func_8004D19C((s32)arg0, (s32)arg1, value, 0, 0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D02DA8.s")
 
@@ -46,7 +53,9 @@ void func_82D02D20(s32 arg0, s32 arg1)
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D03144.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D03324.s")
+void func_82D03324(s16 arg0, s16 arg1, s32 arg2) {
+    func_80044270((s32)arg0, (s32)arg1, (s16)arg2, 0x28, 0, 0, 0x400, 0x400, 0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D03380.s")
 
@@ -89,13 +98,39 @@ void func_82D039E4(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D05C90.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D05CF4.s")
+extern u8 D_82D07184;
+typedef struct { u8 pad0[2]; s16 value2; u8 pad4[2]; s16 value6; u8 pad8[2]; u8 flagsA; u8 valueB; u8 countC; u8 padD[7]; s16 output14; } Fragment82BaseRateState;
+void func_82D05CF4(Fragment82BaseRateState *arg0) {
+    if (D_82D07184 >= arg0->countC) {
+        arg0->flagsA |= 1;
+        arg0->output14 = arg0->value2 + (arg0->value6 * arg0->countC) / D_82D07184;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D05D74.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D05E38.s")
+extern u8 D_82D07184;
+extern u8 D_82D07188;
+typedef struct { u8 pad0[6]; s16 value6; u8 pad8[2]; u8 flagsA; u8 valueB; u8 countC; u8 padD[7]; s16 output14; } Fragment82State;
+void func_82D05E38(Fragment82State *arg0) {
+    if (D_82D07188 >= arg0->countC) {
+        arg0->flagsA |= 1;
+        arg0->output14 = (-arg0->value6 * arg0->countC) / D_82D07184;
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D05EB4.s")
+extern u8 D_82D06F97;
+extern u8 D_82D07188;
+typedef struct { u8 pad0[6]; s16 value6; u8 pad8[2]; u8 flagsA; u8 valueB; u8 countC; u8 padD[0x16]; u8 output23; } Fragment82RateState;
+void func_82D05EB4(Fragment82RateState *arg0) {
+    if (D_82D07188 >= arg0->countC) {
+        if (arg0->countC == 0) {
+            arg0->output23 = D_82D06F97;
+            return;
+        }
+        arg0->output23 = (arg0->countC * D_82D06F97) / D_82D07188;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D05F30.s")
 
@@ -113,7 +148,21 @@ extern u8 D_82D0717C[]; extern u8 D_82D07174[]; extern u8 D_82D07190; void func_
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D0639C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D06488.s")
+extern u8 D_82D07194;
+typedef struct { s16 field0; u8 pad2[2]; s16 field4; } Fragment82GlobalState;
+extern Fragment82GlobalState D_82D07198;
+typedef struct { u8 pad0[2]; s16 value2; u8 pad4[2]; s16 value6; u8 pad8[2]; u8 flagsA; u8 valueB; u8 countC; u8 padD[7]; s16 output14; u8 pad16[2]; s16 value18; } Fragment82OffsetState;
+void func_82D06488(Fragment82OffsetState *arg0) {
+    if (D_82D07194 >= arg0->countC) {
+        arg0->flagsA |= 1;
+        arg0->output14 = arg0->value2 - ((D_82D07194 - arg0->countC) * 0x2D);
+        D_82D07198.field0 = arg0->output14 + arg0->value18;
+        if (arg0->countC == 0) {
+            D_82D07198.field0 = 0;
+            D_82D07198.field4 = 0x280;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D06514.s")
 

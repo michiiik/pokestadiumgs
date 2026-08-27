@@ -27,7 +27,16 @@ void func_82D00020(u8 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_420EA0/func_82D00590.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_420EA0/func_82D006B8.s")
+extern u8 D_82D07428[];
+void func_82D00590(u8);
+void func_82D06B34(s32, s32, s32);
+void func_82D006B8(void) {
+    D_82D07428[0x10E] = 0;
+    D_82D07428[0xE] = 0;
+    *(u16 *)(D_82D07428 + 4) = 0;
+    func_82D00590(D_82D07428[0x10] = 1);
+    func_82D06B34(9, 1, 0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_420EA0/func_82D00704.s")
 
