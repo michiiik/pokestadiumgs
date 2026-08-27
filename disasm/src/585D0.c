@@ -176,7 +176,13 @@ s32 func_800590CC(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005910C.s")
+extern void func_8005F190();
+extern s32 GbPak_ReadCommand();
+extern u8 D_80128570[];
+extern u8 D_801285D4[];
+s32 func_8005910C(s32 arg0) {
+    return GbPak_ReadCommand(arg0, *(s32 *)(D_801285D4 + arg0 * 112), 0x4000, 0x3E40) == 0;
+}
 #endif
 
 #ifdef VERSION_US
