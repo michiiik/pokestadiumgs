@@ -139,7 +139,36 @@ s32 main_pool_push_state(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/3280/main_pool_pop_state.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3280/func_80002D20.s")
+u8 *func_80002D20(u32 arg0, s32 *arg1) {
+    PoolBlock3280 *node;
+    PoolBlock3280 *otherNode;
+    node = POOL3280.listHeadL->prev;
+    while (node != NULL) {
+        s32 isAddrLater = (arg0 >= (u32)((u8 *)node + 0x10));
+        otherNode = node->next;
+        if (isAddrLater && (arg0 < ((u32)otherNode & 0xFFFFFFFF))) {
+            if (arg1 != NULL) {
+                *arg1 = node->arg;
+            }
+            return (u8 *)node + 0x10;
+        }
+        node = node->prev;
+    }
+    node = POOL3280.listHeadR;
+    otherNode = node->next;
+    while (otherNode != NULL) {
+        s32 isAddrLater = (arg0 >= (u32)((u8 *)node + 0x10));
+        PoolBlock3280 *new_var = otherNode;
+        if (isAddrLater && (arg0 < ((u32)new_var & 0xFFFFFFFF))) {
+            if (arg1 != NULL) {
+                *arg1 = node->arg;
+            }
+            return (u8 *)node + 0x10;
+        }
+        otherNode = (node = otherNode)->next;
+    }
+    return NULL;
+}
 
 u8 *main_pool_set_func(u8 *arg0, s32 arg1, s32 arg2) {
     arg0 -= 0x10;
