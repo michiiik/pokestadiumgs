@@ -215,7 +215,16 @@ void func_80051724(u8 *arg0, s32 arg1, s32 arg2) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051780.s")
+typedef struct Func80051780Entry {
+    s32 unk0;
+    s32 unk4;
+    s32 unk8;
+} Func80051780Entry;
+void func_80051780(s32 arg0, s32 arg1, s32 arg2) {
+    Func80051780Entry *temp_v0 = (Func80051780Entry *)((u8 *)&D_801281C0 + arg2 * 0xC);
+    s32 v1 = arg0 - temp_v0->unk4;
+    _bcopy(temp_v0->unk8 + v1, arg0, arg1);
+}
 
 extern void _bzero(void *, s32);
 void func_800517D8(u8 *arg0, s32 arg1, s32 arg2) {
@@ -325,7 +334,22 @@ extern void func_80060C08(u16 *,u16 *); void func_80053B04(u16 *a0,u16 *a1){a0[0
 
 extern void func_8006276C(s32,s32); void func_80053DDC(s32 a0,s32 a1){func_8006276C(a1,a0);}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80053E08.s")
+void func_80053E08(u8 *arg0, u8 *arg1) {
+    u8 *var_s2;
+    s32 var_s1;
+    u8 *var_s0;
+    func_80060D70(arg1, arg0);
+    var_s0 = arg0 + 0x10;
+    var_s1 = 0;
+    var_s2 = arg1 + 0x10;
+    *(u16 *)(arg1 + 0xC) = *(u16 *)(arg0 + 0xC);
+    do {
+        func_80051864((s32)var_s0, (s32)var_s2);
+        var_s1 += 0x3C;
+        var_s0 += 0x58;
+        var_s2 += 0x3C;
+    } while (var_s1 != 0x168);
+}
 
 void func_80053E8C(u8 *arg0, u8 *arg1) {
     *(u16 *)(arg1 + 0) = *(u16 *)(arg0 + 0);
@@ -350,7 +374,19 @@ void func_80054210(Pair80054210 *arg0) {
     *arg0 = *v0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80054248.s")
+extern s32 _bcmp(const void *, const void *, s32);
+typedef struct Func80054248Pair {
+    s32 a;
+    s32 b;
+} Func80054248Pair;
+void func_80054248(Func80054248Pair *arg0) {
+    Func80054248Pair *temp_v0;
+    if (_bcmp(arg0, (u8 *)func_80051138(0) + 0x14, sizeof(Func80054248Pair)) != 0) {
+        temp_v0 = (Func80054248Pair *)((u8 *)func_80051138(0) + 0x14);
+        *temp_v0 = *arg0;
+        func_80051BF0(0x14, 0, 2);
+    }
+}
 
 extern void func_80053B38(s32, s32, s32, u8 *);
 
@@ -437,7 +473,19 @@ void func_8005493C(Pair8005493C *arg0) {
     *arg0 = *v0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80054974.s")
+extern s32 _bcmp(const void *, const void *, s32);
+typedef struct Func80054974Pair {
+    s32 a;
+    s32 b;
+} Func80054974Pair;
+void func_80054974(Func80054974Pair *arg0) {
+    Func80054974Pair *temp_v0;
+    if (_bcmp(arg0, (u8 *)func_80051138(0) + 0x4C, sizeof(Func80054974Pair)) != 0) {
+        temp_v0 = (Func80054974Pair *)((u8 *)func_80051138(0) + 0x4C);
+        *temp_v0 = *arg0;
+        func_80051BF0(0x14, 0, 2);
+    }
+}
 
 
 u8 func_800549DC(s32 arg0) {
