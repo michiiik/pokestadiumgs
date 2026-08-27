@@ -67,13 +67,37 @@ s32 GbPak_IsCartOn(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_8005712C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_8005718C.s")
+extern u8 D_801283B0;
+extern u8 D_80128555;
+extern u8 D_80128557;
+extern u8 D_80128558;
+s32 func_8005718C(s32 arg0, u8 *arg1, u16 arg2, u16 arg3) {
+    s32 result;
+    result = 1;
+    if (D_80128555 & (1 << arg0)) {
+        result = osGbpakReadWrite((arg0 * 0x68) + &D_801283B0, 0, arg2, arg1, arg3);
+    }
+    return result;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80057210.s")
+s32 func_80057210(s32 arg0, u8 *arg1, u16 arg2, u16 arg3) {
+    s32 result;
+    result = 1;
+    if (D_80128555 & (1 << arg0)) {
+        result = osGbpakReadWrite((arg0 * 0x68) + &D_801283B0, 1, arg2, arg1, arg3);
+    }
+    return result;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80057294.s")
+void func_80057294(u8 arg0, OSGbpakId *arg1, u8 *arg2) {
+    osGbpakReadId((arg0 * 0x68) + &D_801283B0, arg1, arg2);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_800572D8.s")
+void func_800572D8(u8 arg0) {
+    u8 data[0x28];
+    HAL_Memset((char *)&data[8], 0xA, 0x20);
+    func_80057210(arg0, &data[8], 0, 0x20);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80057318.s")
 
@@ -94,10 +118,24 @@ u8 GbTower_SetPollMask(u8 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_8005777C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80057908.s")
+extern u8 D_801283B0;
+extern u8 D_80128555;
+extern u8 D_80128557;
+extern u8 D_80128558;
+void func_80057908(u8 arg0) {
+    if (D_80128555 & (1 << arg0)) {
+        D_80128558 |= 1 << arg0;
+    }
+}
 
 extern u8 D_80128558;
 void func_80057944(u8 arg0) { D_80128558 &= ~(1 << arg0); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80057970.s")
+void func_80057970(u8 arg0) {
+    s32 mask;
+    mask = ~(1 << arg0);
+    D_80128555 &= mask;
+    D_80128557 &= mask;
+    D_80128558 &= mask;
+}
 #endif
