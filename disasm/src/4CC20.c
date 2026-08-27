@@ -305,7 +305,19 @@ s32 func_8004DDF4(s32 arg0) {
     return var_v1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004DE3C.s")
+extern s32 func_80004B78(s32, s32, s32);
+s32 func_8004DE3C(s32 arg0, s32 arg1) {
+    s32 temp_a1;
+    s32 var_v1;
+    var_v1 = 0;
+    if (D_80097120 != 0) {
+        temp_a1 = *(s32 *)((u8 *)(D_80097120) + 0x24);
+        if (temp_a1 != 0) {
+            var_v1 = func_80004B78(arg0, temp_a1, arg1);
+        }
+    }
+    return var_v1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004DE84.s")
 
