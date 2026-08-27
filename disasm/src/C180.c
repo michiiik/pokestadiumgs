@@ -21,7 +21,22 @@ s8 *HAL_Strcpy(s8 *arg0, s8 *arg1) {
     return arg0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/C180/func_8000B5B0.s")
+extern s32 strlen();
+s8 *func_8000B5B0(s8 *arg0, s8 *arg1) {
+    s8 *dst;
+    s8 temp;
+
+    dst = arg0 + strlen(arg0);
+    temp = *arg1++;
+    *dst++ = temp;
+    while (temp != 0) {
+        temp = *arg1;
+        dst++;
+        arg1++;
+        dst[-1] = temp;
+    }
+    return arg0;
+}
 
 s32 HAL_Strcmp(const s8 *a, const s8 *b) { s8 ca = *a; s8 cb = *b; while (ca == cb) { if (ca == 0) return 0; ca = *++a; cb = *++b; } return ca - cb; }
 
