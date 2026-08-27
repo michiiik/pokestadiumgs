@@ -296,7 +296,14 @@ void func_841210CC(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_841211CC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84121260.s")
+void func_84121260(void *arg0) {
+    (*(s16 *)((u8 *)(arg0) + (0x5FE))) = 0;
+    (*(s16 *)((u8 *)(arg0) + (0x5FC))) = 0;
+    (*(s8 *)((u8 *)(arg0) + (0x623))) = 0;
+    (*(s8 *)((u8 *)(arg0) + (0x624))) = 0;
+    (*(s16 *)((u8 *)(arg0) + (0x604))) = (s16) (*(s16 *)((u8 *)(arg0) + (0x20)));
+    func_84120464((s32) arg0, D_84183C90, 0x4000);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_841212A0.s")
 
