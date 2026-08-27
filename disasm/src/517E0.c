@@ -184,15 +184,49 @@ u16 Save_Checksum(u8* arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051610.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051680.s")
+extern void _bcopy(void *, void *, s32);
+void func_80051680(void *arg0, void *arg1, s32 arg2, s32 arg3) {
+    s32 *temp_v0;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800516C4.s")
+    _bcopy(arg0, arg1, arg2);
+    temp_v0 = (s32 *)((u8 *)&D_801281C0 + (arg3 * 0xC));
+    *temp_v0 |= 2;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051724.s")
+extern void func_80051610(void *, s32, s32);
+void func_800516C4(u8 *arg0, s32 arg1, s32 arg2) {
+    s32 *temp_v0;
+
+    if ((*arg0 & 2) != 0) {
+        *arg0 &= 0xFFFD;
+        func_80051610(arg0, arg1, 1);
+        temp_v0 = (s32 *)((u8 *)&D_801281C0 + (arg2 * 0xC));
+        *temp_v0 |= 2;
+    }
+}
+
+extern void func_80051610(void *, s32, s32);
+void func_80051724(u8 *arg0, s32 arg1, s32 arg2) {
+    s32 *temp_v0;
+
+    if ((*arg0 & 2) != 0) {
+        func_80051610(arg0, arg1, 0);
+        temp_v0 = (s32 *)((u8 *)&D_801281C0 + (arg2 * 0xC));
+        *temp_v0 |= 2;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051780.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800517D8.s")
+extern void _bzero(void *, s32);
+void func_800517D8(u8 *arg0, s32 arg1, s32 arg2) {
+    s32 *temp_v0;
+
+    _bzero(arg0, arg1);
+    *arg0 |= 2;
+    temp_v0 = (s32 *)((u8 *)&D_801281C0 + (arg2 * 0xC));
+    *temp_v0 |= 2;
+}
 
 extern void func_80061248();
 extern void func_800619E8(void *);
@@ -389,7 +423,19 @@ u8 func_800549DC(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80054A24.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80054AA0.s")
+extern void *func_80051138(s32);
+s32 func_80054AA0(s32 arg0) {
+    s32 result = 0;
+    void *temp_v0;
+    u32 flags;
+
+    temp_v0 = func_80051138(0);
+    flags = *(u32 *)((u8 *)temp_v0 + 0xC);
+    if ((arg0 >= 0) && (arg0 < 0x20)) {
+        result = (flags & (1 << arg0)) != 0;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80054AF4.s")
 
