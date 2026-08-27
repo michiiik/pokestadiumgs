@@ -16,13 +16,42 @@ void func_80042B14(u8 *arg0) {
     *(u32 *)(arg0 + 4) = 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_80042B20.s")
+extern s32 func_80064728();
+extern void func_8003F5AC();
+void func_80042B20(u8 *arg0, s32 arg1, s32 arg2, s32 *arg3, s32 *arg4) {
+    if (arg1 != 0) {
+        *arg3 = func_80064728(arg2);
+        *(u16 *)(arg0 + 0) |= 1;
+        func_8003F5AC(arg4, arg2);
+    } else {
+        *arg3 = arg2;
+        *(u16 *)(arg0 + 0) &= 0xFFFE;
+        *arg4 = 0;
+    }
+    *(u16 *)(arg0 + 0) |= 2;
+    *(s32 *)(arg0 + 4) = arg2;
+}
 
 void func_80042BB0(u16 *arg0) {
     *arg0 &= (u16)~2;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_80042BC0.s")
+extern u8 D_80094C64;
+extern s32 main_pool_get_available(void);
+extern s32 func_800030D0();
+extern s32 func_80040E80();
+extern void MainPool_FinalizeAllocation();
+extern void GeoCamera_SetViewport(void *, s16, s16, s16, s32);
+extern void GeoCamera_SetPerspective(void *, f32, f32, f32);
+void func_80042BC0(u8 *arg0, s16 arg1, s16 arg2, s16 arg3, s32 arg4) {
+    s32 temp;
+    temp = func_800030D0(main_pool_get_available(), 0);
+    *(s32 *)(arg0 + 0x18) = func_80040E80(temp, &D_80094C64);
+    *(s32 *)(arg0 + 0x1C) = D_80126F40;
+    MainPool_FinalizeAllocation(temp);
+    GeoCamera_SetViewport((void *)(u32)*(u32 *)((u8 *)(u32)*(u32 *)(arg0 + 0x18) + 0xC), arg1, arg2, arg3, arg4);
+    GeoCamera_SetPerspective((void *)(u32)*(u32 *)((u8 *)(u32)*(u32 *)(arg0 + 0x18) + 0xC), 30.0f, 100.0f, 12800.0f);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_80042C68.s")
 
@@ -42,7 +71,16 @@ void func_80042FE4(void *arg0, void *arg1) { func_80042EB8(arg0, 0, arg1, 0); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_8004300C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_80043064.s")
+extern s32 func_800427B8();
+extern void func_80042D8C();
+s32 func_80043064(u8 *arg0) {
+    s32 result = 0;
+    if (func_800427B8(*(s32 *)(arg0 + 0x14), arg0) != 0) {
+        result = *(u16 *)(u32)*(u32 *)((u8 *)(u32)*(u32 *)(arg0 + 0x14) + 0x38);
+        func_80042D8C(arg0);
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_800430B4.s")
 
@@ -54,9 +92,36 @@ s32 func_80043444(u8 *arg0) { return 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_80043500.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_800435D4.s")
+extern Gfx *D_800D0510;
+extern void GfxImage_FillCurrent();
+extern void func_8000766C();
+void func_800435D4(u8 *arg0) {
+    void (*callback)();
+    callback = *(void (**)())(arg0 + 8);
+    if (callback == NULL) {
+        GfxImage_FillCurrent(&D_800D0510, *(u16 *)(arg0 + 2));
+    } else {
+        callback(arg0);
+        gDPPipeSync(D_800D0510++);
+        gDPSetTexturePersp(D_800D0510++, G_TP_PERSP);
+        func_8000766C(&D_800D0510, 0, 0, *(s16 *)(arg0 + 4), *(s16 *)(arg0 + 6));
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_80043678.s")
+extern Gfx *D_800D0510;
+extern void func_80043500();
+extern void func_80007328();
+extern void func_800435D4();
+extern void GeoRender_AdvanceFrameCounter();
+extern void func_8003C6B8();
+s32 func_80043678(u8 *arg0) {
+    func_80043500(arg0);
+    func_80007328(&D_800D0510, *(s32 *)(arg0 + 0x20));
+    func_800435D4(arg0);
+    GeoRender_AdvanceFrameCounter();
+    func_8003C6B8(*(s32 *)(arg0 + 0x18));
+    return *(s32 *)((u8 *)(u32)*(u32 *)(arg0 + 0x20) + 8);
+}
 
 extern s32 D_80094C60;
 void func_800436CC(s32 value) { if (value >= 0 && value < 7) D_80094C60 = value; }
