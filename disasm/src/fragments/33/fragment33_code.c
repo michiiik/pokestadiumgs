@@ -116,7 +116,37 @@ void func_88400F48(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/33/fragment33_code/func_8840104C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/33/fragment33_code/func_88401200.s")
+extern s32 func_80001FF0(void);
+extern void func_80064D28(void);
+extern void func_88400610(void);
+extern void func_88600020(void *);
+extern void StageFade_StartFromTransparent(s32);
+extern void *D_884017E0;
+extern f32 D_884017D4;
+void func_88401200(void) {
+    u16 count;
+    s32 i;
+
+    count = (u16)(((f32)func_80001FF0() * D_884017D4) / 2);
+    *(u16 *)((u8 *)D_884017E0 + 0) = *(u16 *)((u8 *)D_884017E0 + 0) & 0xFFFB;
+    *(u16 *)((u8 *)D_884017E0 + 0) = *(u16 *)((u8 *)D_884017E0 + 0) & 0xFFFD;
+    *(s32 *)((u8 *)*(u32 *)((u8 *)D_884017E0 + 0x1C) + 0x4C) = 0;
+    StageFade_StartFromTransparent(count);
+    i = 0;
+    if (count != 0) {
+        do {
+            func_80064D28();
+            func_88400610();
+            i += 1;
+        } while (i != count);
+    }
+    if (*(s16 *)((u8 *)D_884017E0 + 0xC) < 0x78) {
+        *(s16 *)((u8 *)D_884017E0 + 0xC) = *(s16 *)((u8 *)D_884017E0 + 0xC);
+    } else {
+        *(s16 *)((u8 *)D_884017E0 + 0xC) = 0x78;
+    }
+    func_88600020(D_884017E0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/33/fragment33_code/func_88401364.s")
 

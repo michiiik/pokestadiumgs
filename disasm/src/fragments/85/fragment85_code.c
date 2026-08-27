@@ -19,7 +19,11 @@ void func_8FD0006C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/85/fragment85_code/func_8FD000E4.s")
+extern void func_8FD00074(u8, u8, u8, u8);
+void func_8FD000E4(u8 *arg0, u8 arg1) {
+    func_8FD00074(arg0[0], arg0[1], arg0[2], arg1);
+}
+void func_8FD000E4_padding(void) {}
 #endif
 
 #ifdef VERSION_US
@@ -82,7 +86,18 @@ void func_8FD008BC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/85/fragment85_code/func_8FD008E8.s")
+extern void func_80044270(s16, s16, s16, s16, s32, s32, s32, s32, s32);
+void func_8FD008E8(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
+    s32 temp_v0;
+    s32 temp_a2;
+    s32 temp_a3;
+    temp_a2 = arg2;
+    temp_a3 = arg3;
+    if ((temp_a2 >= 7) && (temp_a3 >= 7)) {
+        temp_v0 = temp_a2 - 6;
+        func_80044270((s16)(arg0 + 2), (s16)(arg1 + 2), (s16)temp_v0, (s16)(temp_a3 - 6), 0, 0, (0x10000 / temp_v0) & 0xFFFF, 0, 0);
+    }
+}
 #endif
 
 #ifdef VERSION_US
