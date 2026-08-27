@@ -20,7 +20,6 @@ s32 StageFade_StartFromTransparent(void) {
     return var_v1;
 }
 
-extern s32 D_800D0554;
 void StageFade_SetMode(s32 arg0) {
     if (D_800D0554 != 0) {
         ((u8 *)(u32)D_800D0554)[0x11] = arg0;

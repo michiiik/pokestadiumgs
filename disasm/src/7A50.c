@@ -61,8 +61,6 @@ void GfxImage_Initialize(GfxImage *arg0, s32 fmt, s32 size, s32 width, s32 heigh
 
 void GfxImage_AttachDepthBuffer(u8 *arg0, u8 *arg1) { if (*(u16 *)(arg1 + 2) == 2) { if (*(u16 *)(arg1 + 4) == *(u16 *)(arg0 + 4)) { if (*(u16 *)(arg1 + 6) == *(u16 *)(arg0 + 6)) *(u32 *)(arg0 + 0xC) = (u32)arg1; } } }
 
-extern S1_unk_D_800A7440 D_800D0530;
-extern s32 D_80087220;
 void GfxImage_ResetCurrent(void) {
     D_80087220 = 0;
     GfxRect_SetBounds(&D_800D0530, 0, 0, 0, 0);

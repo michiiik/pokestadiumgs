@@ -294,7 +294,6 @@ extern void func_8006276C(s32,s32); void func_80053DDC(s32 a0,s32 a1){func_80062
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80053E08.s")
 
-extern void func_80060D70(u8 *, u8 *);
 void func_80053E8C(u8 *arg0, u8 *arg1) {
     *(u16 *)(arg1 + 0) = *(u16 *)(arg0 + 0);
     *(u16 *)(arg1 + 2) = *(u16 *)(arg0 + 2);
@@ -359,7 +358,6 @@ void func_800542E4(s32 arg0, u8 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800547F4.s")
 
-extern void *func_80051138(s32);
 
 typedef struct { s32 a, b, c, d; } Quad8005487C;
 void func_8005487C(Quad8005487C *arg0) {
@@ -369,7 +367,6 @@ void func_8005487C(Quad8005487C *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800548C4.s")
 
-extern void *func_80051138(s32);
 
 typedef struct { s32 a, b; } Pair8005493C;
 void func_8005493C(Pair8005493C *arg0) {
@@ -379,7 +376,6 @@ void func_8005493C(Pair8005493C *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80054974.s")
 
-extern void *func_80051138(s32);
 
 u8 func_800549DC(s32 arg0) {
     u8 result = 0;
@@ -424,7 +420,6 @@ s32 func_80055028(void) {
     return result;
 }
 
-extern u8 D_801281C0;
 void Save_ResetBank(s32 arg0, u32 arg1) {
     void *temp_v0;
 

@@ -109,8 +109,6 @@ void func_84124A14(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-extern u8 *D_84195200[];
-extern void func_84134CBC(u8, u8);
 void func_84124BA0(u8 arg0) {
     if (D_84195200[arg0][0x24] & 7) {
         func_84134CBC(arg0, 8);

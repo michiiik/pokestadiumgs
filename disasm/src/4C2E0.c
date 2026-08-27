@@ -85,7 +85,6 @@ void func_8004BE18(s32 a, s32 b) {
 
 extern void Dma_CopyChunks(s32 *, s32, s32);
 s32 func_800356CC(s32);
-extern u8 D_801270B0;
 
 void func_8004BE50(void) {
     s32 temp_v0;
