@@ -73,7 +73,11 @@ void func_87F02684(F2684State *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_324FB0/func_87F02878.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_324FB0/func_87F029B8.s")
+extern u32 D_87F119C0;
+extern void func_87F029EC(u32 *, s32, s32);
+void func_87F029B8(s32 arg0, u8 arg1) {
+    func_87F029EC(&D_87F119C0, arg0, arg1);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_324FB0/func_87F029EC.s")
 #endif
