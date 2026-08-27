@@ -85,7 +85,20 @@ s16 func_8004B920(s32 arg0, s32 arg1) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4C2E0/func_8004B98C.s")
+extern u8 D_801270B4[];
+s32 func_8004B98C(s32 arg0) {
+    s32 result = 0;
+    s32 value = func_8004B754(arg0);
+    if (value >= 0) {
+        result = *(s32 *)(D_801270B4 + (value << 4));
+        if (result != -1) {
+            result = 2;
+        } else {
+            result = 1;
+        }
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4C2E0/func_8004B9E0.s")
 
