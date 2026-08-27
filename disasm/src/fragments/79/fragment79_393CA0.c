@@ -518,7 +518,23 @@ void func_84128298(void) { if (D_841951C3 != 0x2D) D_841951C8 = 0; D_841951D2 = 
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841282C0.s")
+s32 func_841282C0(void)
+{
+  u8 *temp_v0;
+  u8 temp_v1;
+  temp_v0 = D_84195208[D_841951BD];
+  ;
+  if ((*((u8 *) (((u8 *) temp_v0) + 0x11))) & 0x20)
+  {
+    *((u8 *) (((u8 *) temp_v0) + 0x11)) = (u8) ((*((u8 *) (((u8 *) temp_v0) + 0x11))) & 0xFFDF);
+    if (((*((u8 *) (((u8 *) D_84195208[D_841951BD]) + 0xF))) & 0x40) && (((D_841951BF == 0x59) || (D_841951BF == 0x5A)) || (D_841951BF == 0xDE)))
+    {
+      return 0;
+    }
+    return 1;
+  }
+  return 0;
+}
 #endif
 
 #ifdef VERSION_US

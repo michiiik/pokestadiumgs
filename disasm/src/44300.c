@@ -14,7 +14,24 @@ void func_80043A0C(void *arg0, void *arg1, s32 arg2) { func_80043950(arg0, arg1,
 
 void func_80043A30(void *arg0, void *arg1, s32 arg2) { func_80043950(arg0, arg1, 1, arg2); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/44300/func_80043A54.s")
+s32 func_80043A54(void *arg0, s32 arg1, s16 arg2)
+{
+  s32 temp_v0;
+  u8 *new_var;
+  s32 var_v1;
+  var_v1 = 0;
+  if ((arg0 != 0) && (arg1 < (*((s16 *) (((u8 *) arg0) + 2)))))
+  {
+    ;
+    if ((*((s32 *) (((u8 *) arg0) + 0xC))) != 0)
+    {
+      new_var = (u8 *) ((*((s32 *) (((u8 *) arg0) + 0xC))) + (arg1 * (0x24 & 0xFFu)));
+      *((s16 *) (new_var + 2)) = arg2;
+      var_v1 = 1;
+    }
+  }
+  return var_v1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/44300/func_80043AA0.s")
 

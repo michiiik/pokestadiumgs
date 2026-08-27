@@ -130,7 +130,29 @@ void Font_EnableLineBreak(void) { D_80126F50[0x7A] = (u8)(D_80126F50[0x7A] & ~4)
 
 s32 func_800476FC(s32 arg0, s32 arg1) { s32 result = 0; if (arg1 > 0 && arg1 < 0x100 && D_80126F50 != NULL) { *(s32 *)(D_80126F50 + 0x50) = arg0; D_80126F50[0x7F] = arg1; result = 1; } return result; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047738.s")
+s32 func_80047738(s32 arg0, s32 arg1, s32 arg2, s32 arg3)
+{
+  s32 temp_a0;
+  s32 var_v1;
+  void *temp_v0;
+  var_v1 = 0;
+  if (D_80126F50 != 0)
+  {
+    temp_a0 = *((s32 *) (((u8 *) D_80126F50) + 0x50));
+    if (temp_a0 != 0)
+    {
+      temp_v0 = temp_a0 + (arg0 * 0x10);
+      if (arg0 < ((s32) (*((u8 *) (((u8 *) D_80126F50) + 0x7F)))))
+      {
+        *((s32 *) (((u8 *) (temp_a0 + (arg0 * 0x10))) + 4)) = arg1;
+        *((s32 *) (((u8 *) temp_v0) + 8)) = arg2;
+        *((s32 *) (((u8 *) (temp_a0 + (arg0 * 0x10))) + 0xC)) = arg3;
+        var_v1 = 1;
+      }
+    }
+  }
+  return var_v1;
+}
 
 s32 func_80047790(s32 arg0) {
     s32 var_v1;
