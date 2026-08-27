@@ -436,7 +436,7 @@ s32 func_8002738C(s32 arg0) {
 
 #ifdef VERSION_US
 
-extern void func_8002781C(u16 resource_id, u8 mode);
+extern void func_8002781C(u16 resource_id, u8 mode, ...);
 void func_800277C4(u16 resource_id, u8 mode) {
     func_8002781C(resource_id, mode);
 }
