@@ -6,7 +6,23 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1C2D0/func_8001B8D0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/1C2D0/func_8001BA28.s")
+extern f32 D_8008E994[];
+f32 func_8001BA28(void *arg0) {
+    struct State { u8 pad0[2]; u16 sum; u16 step; u8 pad6[2]; f32 scale; };
+    struct State *state = arg0;
+    u32 index;
+    f32 one;
+    f32 result;
+    one = 1.0f;
+    state->sum += state->step;
+    index = (state->sum >> 8) & 0xFF;
+    if (index >= 0x7F) {
+        index = 0x7F;
+        state->pad0[0] = 0;
+    }
+    result = (D_8008E994[index] - one) * state->scale + one;
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1C2D0/func_8001BA84.s")
 
