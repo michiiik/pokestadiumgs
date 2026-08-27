@@ -2,7 +2,18 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_81306EE0.s")
+extern u8 D_8009F860;
+
+s32 func_81306EE0(u8 *arg0, s32 arg1) {
+    u8 v1 = D_8009F860;
+    if (arg1 == arg0[0x137FB]) {
+        if (v1 == 1) {
+            return 4;
+        }
+        return v1;
+    }
+    return v1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_81306F20.s")
 
@@ -156,7 +167,11 @@ void func_8130A88C(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130A8E0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130A98C.s")
+
+extern void (*D_8160BD1C)(f32);
+void func_8130A98C(void *arg0) {
+    D_8160BD1C(*(f32 *)((u8 *)arg0 + 0xE8FC) / 16);
+}
 
 s32 func_8130A9C8(u8 *arg0) {
     return arg0[0xE912] == 7;
@@ -166,7 +181,14 @@ s32 func_8130A9C8(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130AA18.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130AA54.s")
+
+s32 func_8130AA54(u8 *arg0, s32 arg1) {
+    u8 *base = arg0 + 0x8000;
+    return (arg1 != base[0x6914] + base[0x6915])
+        || (base[0x6913] != 0)
+        || (*(s32 *)(base + 0x690C) != 0)
+        || (base[0x6912] < 0xC);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130AAA8.s")
 
