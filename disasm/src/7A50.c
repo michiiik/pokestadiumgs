@@ -36,7 +36,19 @@ S1_unk_D_800A7440* GfxRect_SetBounds(S1_unk_D_800A7440* arg0, s16 x1, s16 y1, s1
     return arg0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/7A50/func_80006EC0.s")
+extern s32 D_80087220;
+extern S1_unk_D_800A7440 D_800D0530;
+s32 GfxRect_ClipToScissor(S1_unk_D_800A7440 *arg0) {
+    s32 ret = 0;
+    if (D_80087220 != NULL) {
+        if (arg0->x1 < D_800D0530.x1) arg0->x1 = D_800D0530.x1;
+        if (D_800D0530.y1 < arg0->y1) arg0->y1 = D_800D0530.y1;
+        if (arg0->y2 < D_800D0530.y2) arg0->y2 = D_800D0530.y2;
+        if (D_800D0530.x2 < arg0->x2) arg0->x2 = D_800D0530.x2;
+        ret = arg0->y1 >= arg0->x1 && arg0->x2 >= arg0->y2;
+    }
+    return ret;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/7A50/func_80006F70.s")
 
