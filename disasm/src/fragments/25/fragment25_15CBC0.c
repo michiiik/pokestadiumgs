@@ -53,7 +53,31 @@ void func_82102D10(f32 *arg0) {
     func_821028E0(arg0[0], arg0[1]);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15CBC0/func_82102D34.s")
+extern f32 D_82104160;
+extern f32 D_82104164;
+extern f32 D_82104168;
+extern f32 D_8210416C;
+void func_82102D34(f32 *arg0) {
+    f32 value;
+    f32 limit;
+    f32 step;
+
+    value = *arg0;
+    limit = D_82104160;
+    if (limit < *arg0) {
+        step = D_82104164;
+        do {
+            *arg0 -= step;
+        } while (limit < *arg0);
+    }
+    limit = D_82104168;
+    step = D_8210416C;
+    if (*arg0 < limit) {
+        do {
+            *arg0 += step;
+        } while (*arg0 < limit);
+    }
+}
 
 typedef struct { f32 x; f32 y; } V82102;
 void func_82102DB8(V82102 *arg0, V82102 *arg1, f32 arg2) {
