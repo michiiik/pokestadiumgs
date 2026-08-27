@@ -25,5 +25,7 @@ void func_882041E0(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_177430/func_882052F8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_177430/func_88205D7C.s")
+s32 func_88205D7C(void) {
+    return (D_882346AC == 3) ? 1 : 0;
+}
 #endif
