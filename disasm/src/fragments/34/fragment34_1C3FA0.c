@@ -50,7 +50,41 @@ void func_88506AA8(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C3FA0/func_88507370.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C3FA0/func_885075A8.s")
+extern s32 func_8004C874(s32, s32);
+extern s32 func_88002958(s32 *, s32, s32, s32);
+extern u16 *func_8004C990(s32, s32);
+extern void func_880048D4(s32, s32, s16, s32, s32, s32, s32, s32, s32,
+                           s32 *, s32 *, s32 *, s32 *, s32, s32, s32);
+extern s32 *D_80087200;
+extern s32 D_88000E4C;
+extern s32 D_8800EDE8;
+extern s32 D_88523018;
+void func_885075A8(void) {
+    s8 pad;
+    s32 sp68[3];
+    s32 var_s1;
+    s32 var_s0;
+
+    var_s0 = 0;
+    *(s16 *)((u8 *)D_88523010 + 0x1E) = *(s16 *)((u8 *)D_88523010 + 0x1E) - 1;
+    var_s1 = (s32)sp68;
+    if (*(u16 *)((u8 *)D_80087200 + 8) & 0x8000) {
+        *(s16 *)((u8 *)D_88523010 + 0x1E) = 0;
+    }
+    if (*(s16 *)((u8 *)D_88523010 + 0x1E) <= 0) {
+        for (; var_s0 != 3; var_s0 += 1, var_s1 += 4) {
+            *(s32 *)var_s1 = func_8004C874(0x34, var_s0 + 0x14);
+        }
+        var_s1 = func_88002958(sp68, 3, 8, 1) & 0xFFFF;
+        var_s0 = ((s32)*(u16 *)((u8 *)func_8004C990(0x79, 0)) + var_s1 + 0x35) & 0xFFFF;
+        func_880048D4(0, 3, 0x13F - (var_s0 >> 1), 0x11F, 0, 1, 0xE6, 0xFF, 0xF0,
+                      &D_88000E4C, &D_88000E4C, &D_88000E4C, &D_88000E4C, 0, 0, 2);
+        *(s32 *)((u8 *)D_88523010 + 8) = (s32)&D_8800EDE8;
+        *(s16 *)((u8 *)(*(s32 *)((u8 *)D_88523010 + 8)) + 0x10) = (s16)var_s0;
+        *(s16 *)((u8 *)(*(s32 *)((u8 *)D_88523010 + 8)) + 0x12) = 0x65;
+        D_88523018 = 1;
+    }
+}
 
 extern void func_88506AA8();
 extern void func_8850716C();
