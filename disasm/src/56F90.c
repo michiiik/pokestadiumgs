@@ -8,7 +8,27 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_8005655C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056708.s")
+extern u8 D_801283B0;
+extern s32 func_800570CC();
+extern s32 func_8005712C();
+extern s32 _bcmp(const void *, const void *, s32);
+s32 func_80056708(s32 arg0, u8 *arg1) {
+    struct {
+        u8 leading[8];
+        s32 result;
+        u8 data[0x20];
+        u8 pad[3];
+        u8 status;
+    } local;
+    local.result = 0;
+    if ((func_8005712C(arg0, arg1, 0, 0x20) == 0) &&
+        (func_800570CC(arg0, local.data, 0, 0x20) == 0) &&
+        (_bcmp(local.data, arg1, 0x20) == 0) &&
+        (osGbpakGetStatus((arg0 * 0x68) + &D_801283B0, &local.status) == 0)) {
+        local.result = ((local.status & 4) != 0) == 0;
+    }
+    return local.result;
+}
 
 #define ARRAY_COUNT(arr) (s32)(sizeof(arr) / sizeof(arr[0]))
 s32 GbPak_DetectRam(s32 arg0, u8* arg1) {
@@ -36,7 +56,32 @@ s32 GbPak_DetectRam(s32 arg0, u8* arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056960.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056A5C.s")
+extern u8 D_801283B0;
+extern u8 D_80128550[];
+extern void func_80064D58(s32, s32);
+extern s32 HAL_Strcmp(const s8 *, const s8 *);
+extern s8 D_800A49B0[];
+extern s8 D_800A49BC[];
+extern s8 D_800A49C8[];
+extern s8 D_800A49D4[];
+extern s8 D_800A49E0[];
+extern s8 D_800A49EC[];
+extern s8 D_800A49F8[];
+s32 func_80056A5C(s32 arg0, u8 arg1) {
+    u8 status;
+    s32 sp20;
+    OSPfs *pfs;
+    pfs = (arg0 * 0x68) + &D_801283B0;
+    if (osGbpakGetStatus(pfs, &status) != 0) {
+        func_80064D58(arg0, 1);
+    }
+    sp20 = ((status & 4) != 0) == 0;
+    if (arg1 == 0) {
+        osGbpakPower(pfs, 0);
+        D_80128550[arg0] = 0;
+    }
+    return sp20;
+}
 
 extern u8 D_801283B0;
 extern u8 D_80128550[];
@@ -51,7 +96,33 @@ void func_80056AF8(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056BA4.s")
+s32 func_80056BA4(u8 *arg0) {
+    s8 *name;
+    arg0[0x3D] = 0;
+    name = (s8 *)(arg0 + 0x34);
+    if (HAL_Strcmp(name, D_800A49B0) == 0) {
+        return 1;
+    }
+    if (HAL_Strcmp(name, D_800A49BC) == 0) {
+        return 1;
+    }
+    if (HAL_Strcmp(name, D_800A49C8) == 0) {
+        return 1;
+    }
+    if (HAL_Strcmp(name, D_800A49D4) == 0) {
+        return 1;
+    }
+    if (HAL_Strcmp(name, D_800A49E0) == 0) {
+        return 1;
+    }
+    if (HAL_Strcmp(name, D_800A49EC) == 0) {
+        return 1;
+    }
+    if (HAL_Strcmp(name, D_800A49F8) == 0) {
+        return 1;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056C98.s")
 
@@ -82,9 +153,33 @@ s32 GbPak_IsCartOn(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056F7C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80057038.s")
+extern u8 D_801283B0;
+extern s32 func_800570CC();
+extern s32 _bcmp(const void *, const void *, s32);
+s32 func_80057038(s32 arg0, u8 *arg1) {
+    u8 status;
+    u8 data[0x20];
+    s32 result;
+    result = 0;
+    if ((func_800570CC(arg0, data, 0, 0x20) == 0) &&
+        (_bcmp(data, arg1, 0x20) == 0) &&
+        (osGbpakGetStatus((arg0 * 0x68) + &D_801283B0, &status) == 0) &&
+        !(status & 4)) {
+        result = 1;
+    }
+    return result;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_800570CC.s")
+extern u8 D_80128555;
+extern s32 func_8005655C(u8, s32, s32, u8 *, s32);
+s32 func_800570CC(s32 arg0, u8 *arg1, s32 arg2, s32 arg3) {
+    s32 result;
+    result = 1;
+    if (D_80128555 & (1 << arg0)) {
+        result = func_8005655C(arg0, 0, arg2, arg1, arg3);
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_8005712C.s")
 
