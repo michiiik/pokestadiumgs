@@ -102,7 +102,21 @@ void StageLoader_WaitForRetrace(void) {
 
 extern u8 D_800D0510[]; void func_80008624(void) { func_80002178(D_800D0510); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80008648.s")
+extern s32 D_800D0540;
+extern void func_800080E0(void);
+extern void func_8003539C(void);
+extern void Display_QueueFramebufferRequest(s32);
+extern void Display_WaitForCompletion(void);
+extern u8 func_80002014(void);
+s32 func_80008648(void) {
+    func_800080E0();
+    func_8003539C();
+    Display_QueueFramebufferRequest((s32)&D_800D0540);
+    Display_WaitForCompletion();
+    *(u8 *)((u8 *)(u32)D_800D0554 + 0x17) = func_80002014();
+    StageLoader_SwapDisplayListAndReset();
+    return *(s8 *)((u8 *)(u32)D_800D0554 + 0x17);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_800086A4.s")
 
