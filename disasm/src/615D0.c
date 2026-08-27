@@ -332,7 +332,18 @@ u16 StatExpSqrt(u16 arg0) { u16 i; for (i = 1; i < 255; i++) { if ((i * i) >= ar
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80061940.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_800619E8.s")
+extern u8 func_80061ED0(u8, s32);
+void func_800619E8(u8 *arg0) {
+    u8 value;
+    value = func_80061ED0(arg0[0], *(s32 *)(arg0 + 8));
+    arg0[0x1D] = value;
+    *(u16 *)(arg0 + 0x28) = func_8006183C(0, (s32)arg0[0], (s32)*(u16 *)(arg0 + 0xC), value & 0xFF, (s32)*(u16 *)(arg0 + 0x16));
+    *(u16 *)(arg0 + 0x2A) = func_8006183C(1, (s32)arg0[0], (s32)*(u16 *)(arg0 + 0xE), (s32)arg0[0x1D], (s32)*(u16 *)(arg0 + 0x16));
+    *(u16 *)(arg0 + 0x2C) = func_8006183C(2, (s32)arg0[0], (s32)*(u16 *)(arg0 + 0x10), (s32)arg0[0x1D], (s32)*(u16 *)(arg0 + 0x16));
+    *(u16 *)(arg0 + 0x2E) = func_8006183C(3, (s32)arg0[0], (s32)*(u16 *)(arg0 + 0x12), (s32)arg0[0x1D], (s32)*(u16 *)(arg0 + 0x16));
+    *(u16 *)(arg0 + 0x30) = func_8006183C(4, (s32)arg0[0], (s32)*(u16 *)(arg0 + 0x14), (s32)arg0[0x1D], (s32)*(u16 *)(arg0 + 0x16));
+    *(u16 *)(arg0 + 0x32) = func_8006183C(5, (s32)arg0[0], (s32)*(u16 *)(arg0 + 0x14), (s32)arg0[0x1D], (s32)*(u16 *)(arg0 + 0x16));
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80061ADC.s")
 
