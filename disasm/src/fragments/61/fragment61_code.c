@@ -36,13 +36,13 @@
 #ifdef VERSION_US
 extern u8 *D_86B181C0;
 extern void func_800088A4(s32);
-extern void func_80007B34(s32);
+extern void StageFade_StartFromTransparent(s32);
 void func_86B01720(s32 arg0) {
     *(s32 *)(D_86B181C0 + 0x18) = arg0;
     *(s32 *)D_86B181C0 = 0xC;
     *(s32 *)(D_86B181C0 + 4) = 0xD;
     func_800088A4((u16)0xFFFF);
-    func_80007B34(0xA);
+    StageFade_StartFromTransparent(0xA);
 }
 #endif
 

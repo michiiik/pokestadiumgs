@@ -214,7 +214,7 @@ void func_82902714(void) {
     s32 var_s0;
 
     func_800088A4(1);
-    func_80007B34(0xA);
+    StageFade_StartFromTransparent(0xA);
     var_s0 = 0;
     do {
         func_8290260C();

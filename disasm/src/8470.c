@@ -10,7 +10,7 @@
 
 s32 func_80007A84();
 extern s32 D_800D0554;
-s32 func_80007B34(void) {
+s32 StageFade_StartFromTransparent(void) {
     s32 var_v1;
 
     var_v1 = 0;

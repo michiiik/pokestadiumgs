@@ -101,14 +101,14 @@ void func_88C01494(void) {
 }
 
 extern void func_800225C4(s32);
-extern void func_80007B34(s32);
+extern void StageFade_StartFromTransparent(s32);
 extern f32 D_88C01A54;
 void func_88C014D8(void) {
     u16 count;
     s32 i;
     count = (u16)((f32)func_80001FF0() * D_88C01A54 / 2);
     func_800225C4(count * 2);
-    func_80007B34(count);
+    StageFade_StartFromTransparent(count);
     if (count != 0) {
         i = 0;
         do {

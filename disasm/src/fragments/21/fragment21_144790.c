@@ -29,7 +29,7 @@ void func_8250498C(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_144790/func_825049DC.s")
 
-extern void func_80007B34(s32);
+extern void StageFade_StartFromTransparent(s32);
 s32 func_825049DC();
 s32 func_82504B04(s32 arg0) {
     s32 var_s0;
@@ -44,7 +44,7 @@ s32 func_82504B04(s32 arg0) {
     case 1:
         if (func_825049DC() != 0) {
             var_s0 = 3;
-            func_80007B34(5);
+            StageFade_StartFromTransparent(5);
             func_80035424(0xF);
         }
         break;

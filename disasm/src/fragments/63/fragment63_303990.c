@@ -72,13 +72,13 @@ void func_87E002E4(void) {
     func_87E08BEC(D_87E1BA20 + 0x8C4, (*(s32 *)((u8 *)(D_87E1BA20) + (0))));
 }
 
-extern void func_80007B34(s32);
+extern void StageFade_StartFromTransparent(s32);
 extern void func_800225C4(s32);
 
 void func_87E00320(s32 *arg0) {
     (*(s32 *)((u8 *)(D_87E1BA20) + (0x1C))) = 0xFF;
     *arg0 = 2;
-    func_80007B34(0xF);
+    StageFade_StartFromTransparent(0xF);
     func_800225C4(0xF);
 }
 

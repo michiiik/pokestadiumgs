@@ -2,7 +2,7 @@
 
 
 #ifdef VERSION_US
-extern void func_80007B34(s32);
+extern void StageFade_StartFromTransparent(s32);
 extern void func_800088A4(s32);
 extern void *D_863075D8;
 void func_86300020(s32 arg0) {
@@ -10,7 +10,7 @@ void func_86300020(s32 arg0) {
     (*(s32 *)((u8 *)(D_863075D8) + (0))) = 7;
     (*(s32 *)((u8 *)(D_863075D8) + (4))) = 8;
     func_800088A4(0xFFFF);
-    func_80007B34(0xA);
+    StageFade_StartFromTransparent(0xA);
 }
 #endif
 

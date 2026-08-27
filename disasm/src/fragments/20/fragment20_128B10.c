@@ -114,7 +114,7 @@ s32 func_82602930(s32 arg0) {
         if (func_82614F0C() != 0) {
             result = 3;
             func_800088A4(1);
-            func_80007B34(5);
+            StageFade_StartFromTransparent(5);
             func_800226C0(0x65);
         }
         break;

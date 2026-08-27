@@ -233,14 +233,14 @@ void func_86405778(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_80007B34(s32);
+extern void StageFade_StartFromTransparent(s32);
 extern void func_800088A4(s32);
 void func_86406660(s32 arg0) {
     (*(s32 *)((u8 *)(D_86416C00) + (0xCEB4))) = arg0;
     (*(s32 *)((u8 *)(D_86416C00) + (0x10))) = 7;
     (*(s32 *)((u8 *)(D_86416C00) + (0x68))) = 8;
     func_800088A4(0xFFFF);
-    func_80007B34(0xA);
+    StageFade_StartFromTransparent(0xA);
 }
 #endif
 

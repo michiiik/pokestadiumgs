@@ -368,14 +368,14 @@ void func_86109394(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86109404.s")
 
-extern void func_80007B34(s32);
+extern void StageFade_StartFromTransparent(s32);
 extern void func_800088A4(s32);
 void func_861094BC(s32 arg0) {
     (*(s32 *)((u8 *)(D_8610AD20) + (0x97E8))) = arg0;
     (*(s32 *)((u8 *)(D_8610AD20) + (0x3C))) = 7;
     (*(s32 *)((u8 *)(D_8610AD20) + (0x40))) = 8;
     func_800088A4(0xFFFF);
-    func_80007B34(0xA);
+    StageFade_StartFromTransparent(0xA);
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86109510.s")

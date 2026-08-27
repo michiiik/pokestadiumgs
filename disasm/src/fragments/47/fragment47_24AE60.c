@@ -128,8 +128,8 @@ void func_860075E4(void *arg0) {
     func_87F02328();
 }
 
-extern void func_800088A4(s32); extern void func_80007B34(s32);
-void func_86007614(void *arg0) { func_800088A4(1); func_80007B34(0xA); }
+extern void func_800088A4(s32); extern void StageFade_StartFromTransparent(s32);
+void func_86007614(void *arg0) { func_800088A4(1); StageFade_StartFromTransparent(0xA); }
 
 void func_86007640(u8 *arg0) {}
 

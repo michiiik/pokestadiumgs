@@ -84,13 +84,13 @@ void func_8290FA9C(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_80007B34(s32);
+extern void StageFade_StartFromTransparent(s32);
 extern void func_800225C4(s32);
 void func_8290FACC(void) {
     s32 var_s0;
 
     func_800225C4(0x10);
-    func_80007B34(0x10);
+    StageFade_StartFromTransparent(0x10);
     var_s0 = 0;
     do {
         func_8290FA00();

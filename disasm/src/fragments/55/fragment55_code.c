@@ -203,7 +203,7 @@ void func_86709128(void) {
 #endif
 
 #ifdef VERSION_US
-extern s32 func_80007B34(s32);
+extern s32 StageFade_StartFromTransparent(s32);
 s32 func_87F01A40();
 extern s32 D_8670B394;
 void func_8670972C(void) {
@@ -221,14 +221,14 @@ void func_8670972C(void) {
         (*(s32 *)((u8 *)(&D_8670BB48) + (0))) = 2;
         (*(s32 *)((u8 *)(&D_8670BB48) + (0x30))) = 3;
         func_800088A4(0xFFFF);
-        func_80007B34(0xA);
+        StageFade_StartFromTransparent(0xA);
         return;
     case 4:
         (*(s32 *)((u8 *)(&D_8670BB48) + (0x48))) = 1;
         (*(s32 *)((u8 *)(&D_8670BB48) + (0))) = 2;
         (*(s32 *)((u8 *)(&D_8670BB48) + (0x30))) = 3;
         func_800088A4(0xFFFF);
-        func_80007B34(0xA);
+        StageFade_StartFromTransparent(0xA);
         return;
     }
 }

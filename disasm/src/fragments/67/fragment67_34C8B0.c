@@ -57,11 +57,11 @@ void func_829118D4(void) {
     }
 }
 
-extern void func_80007B34(s32);
+extern void StageFade_StartFromTransparent(s32);
 void func_8291192C(void) {
     s32 var_s0;
 
-    func_80007B34(0x10);
+    StageFade_StartFromTransparent(0x10);
     var_s0 = 0;
     do {
         func_82911850();
