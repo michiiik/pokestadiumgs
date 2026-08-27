@@ -86,7 +86,12 @@ s32 func_86009BE0(s32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_86009C08.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_86009C58.s")
+extern f64 func_87C0068C(void *);
+f64 func_86009C58(void *arg0, u8 *arg1) {
+    u8 data[0x18];
+    func_87C00160(data, (s32)((u8 *)arg0 + 0x10), arg1);
+    return *(f64 *)arg0 - func_87C0068C(data);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_86009C98.s")
 
