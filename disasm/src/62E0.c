@@ -65,5 +65,13 @@ void func_800057DC(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/62E0/func_800058B4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/62E0/SoftReset_CreateThread.s")
+extern u8 D_800CDA60[];
+extern void Sched_InitClientQueue();
+extern void func_800058B4(void *);
+void SoftReset_CreateThread(void) {
+    Sched_InitClientQueue(D_800CDA60, 2, 1);
+    *(s32 *)(D_800CDA60 + 0x5E0) = 0;
+    osCreateThread((OSThread *)D_800CDA60, 0x15, func_800058B4, NULL, &D_800CE040, 0x1E);
+    osStartThread((OSThread *)D_800CDA60);
+}
 #endif
