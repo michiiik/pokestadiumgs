@@ -53,11 +53,49 @@ u8 func_80062F2C(u8 arg0) { extern u8 D_8009782F[]; if (arg0 > 0 && arg0 < 0xFC)
 
 u8 func_80062F68(u8 arg0) { extern u8 D_80097E13[]; if (arg0 > 0 && arg0 < 0x3A) return D_80097E13[arg0]; return 0; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/638E0/func_80062F98.s")
+s32 func_80062F98(u8 arg0) {
+    s32 temp_a0;
+    s32 temp_s1;
+    s32 var_s0;
+
+    temp_a0 = arg0;
+    if (temp_a0 > 0) {
+        var_s0 = 1;
+        if (temp_a0 < 0xFC) {
+            do {
+                temp_s1 = var_s0 & 0xFF;
+                if (temp_a0 == (s32) func_80062F68((u8) temp_s1)) {
+                    return temp_s1;
+                }
+                var_s0 += 1;
+            } while (var_s0 != 0x3A);
+        }
+    }
+    return 0;
+}
 
 u8 func_80063014(u8 arg0) { extern u8 D_80097E4F[]; if (arg0 > 0 && arg0 < 0x38) return D_80097E4F[arg0]; return 0; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/638E0/func_80063044.s")
+s32 func_80063044(u8 arg0) {
+    s32 temp_a0;
+    s32 temp_s1;
+    s32 var_s0;
+
+    temp_a0 = arg0;
+    if (temp_a0 > 0) {
+        var_s0 = 1;
+        if (temp_a0 < 0xA6) {
+            do {
+                temp_s1 = var_s0 & 0xFF;
+                if (temp_a0 == (s32) func_80063014((u8) temp_s1)) {
+                    return temp_s1;
+                }
+                var_s0 += 1;
+            } while (var_s0 != 0x38);
+        }
+    }
+    return 0;
+}
 
 extern u8 func_80062D98(u8);s32 func_800630C0(u8 arg0){return func_80062D98(arg0)<0x14;}
 #endif
