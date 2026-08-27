@@ -69,7 +69,8 @@ u8 func_80063B7C(u8 arg0) { s32 index = arg0; if ((arg0 > 0) && (arg0 < 0xFC)) r
 extern u8 D_8009D27C[];
 s32 func_80063BB8(u8 arg0) { s32 index = arg0; if ((arg0 > 0) && (arg0 < 0xFC)) return *(s32 *)(D_8009D27C + index * 12); return 0; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80063BF4.s")
+extern u8 D_80098318[];
+s32 func_80063BF4(arg0, arg1) u8 arg0; u8 arg1; { s32 index = arg0; s32 bit_index; if ((arg0 > 0) && (arg0 < 0xFC) && (arg1 > 0) && (arg1 < 0x3A)) { bit_index = arg1 - 1; return (D_80098318[index * 22 + (bit_index / 8)] & (1 << (bit_index % 8))) != 0; } return 0; }
 
 void func_80063C90(u8 arg0, unsigned short arg1)
 {
@@ -134,7 +135,8 @@ void func_8006443C(s32 arg0, s32 arg1, s32 arg2) {
     func_80064248(arg0 & 0xFF, arg1 & 0xFF, arg2 & 0xFF, 0x7F);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80064474.s")
+extern u8 D_80098313[];
+s32 func_80064474(arg0, arg1) u8 arg0; u16 arg1; { s32 index = arg0; u8 value; s32 threshold; if ((arg0 > 0) && (arg0 < 0xFC)) { value = D_80098313[index * 22]; if (value == 0xFF) return 0; if (value == 0) return 1; if (value == 0xFE) return 2; threshold = (((arg1 & 0xF000) >> 8) | ((arg1 & 0xF0) >> 4)) & 0xFF; if (value < threshold) return 1; return 2; } return 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80064520.s")
 
