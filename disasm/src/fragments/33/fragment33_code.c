@@ -85,7 +85,36 @@ void func_884001CC(u8 *arg0) {
     Vec3f_SetComponentsDuplicate((f32 *)((u8 *)*(u32 *)(arg0 + 0x1C) + 0x30), scale, scale, scale);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/33/fragment33_code/func_88400284.s")
+extern void func_80044270(s16, s16, s16, s16, s32, s32, s32, s32, s32);
+extern u8 *func_8004C990(s32, s32);
+extern u8 *func_8004CA60(u8 *);
+extern void func_800459AC(u8 *, u8, u8, u16, s32, s32, s32, s32, s32, s32, s32, s32, s32);
+extern void func_8800528C(s32);
+void func_88400284(s32 arg0) {
+    s16 var_s0;
+    s16 var_s1;
+    s32 var_s3;
+    u8 *temp_v0;
+    u8 *var_s2;
+
+    temp_v0 = func_8004C990(0x3C, 0);
+    var_s2 = func_8004CA60(temp_v0);
+    var_s0 = 0;
+    var_s1 = 0xD8;
+    func_8800528C(arg0);
+    var_s3 = 0;
+    do {
+        func_800459AC(var_s2, temp_v0[4], temp_v0[5], 0xA0, 0x18, 1, 0, 2, 2, 0, 0, 0, 0);
+        func_80044270(0, var_s0, 0xA0, 0x18, -0x10, -0x10, 0x400, 0x400, 0);
+        func_80044270(0xA0, var_s0, 0xA0, 0x18, 0x13F0, -0x10, -0x400, 0x400, 0);
+        func_80044270(0, var_s1, 0xA0, 0x18, -0x10, 0x2F0, 0x400, -0x400, 0);
+        func_80044270(0xA0, var_s1, 0xA0, 0x18, 0x13F0, 0x2F0, -0x400, -0x400, 0);
+        var_s3 += 1;
+        var_s2 += 0xF00;
+        var_s0 += 0x18;
+        var_s1 -= 0x18;
+    } while (var_s3 != 5);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/33/fragment33_code/func_8840045C.s")
 
