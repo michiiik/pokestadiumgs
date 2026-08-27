@@ -14,7 +14,45 @@ extern s32 D_80128120; void func_8004EC5C(void) { if (D_80128120 > 0) { D_801281
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4F800/func_8004ECD4.s")
+extern s32 D_80128120;
+extern u8 D_80128128[];
+extern void func_8004EC00();
+extern void func_8004EC5C(void);
+typedef void (*CallbackNode_8004ECD4)();
+typedef void (*RenderNode_8004ECD4)();
+extern RenderNode_8004ECD4 D_80097200[];
+typedef struct Node_8004ECD4 {
+    u8 type; u8 pad1; u16 flags; u8 pad4[4]; s16 x; s16 y; u8 padC[8];
+    struct Node_8004ECD4 *next; u8 pad18[4]; CallbackNode_8004ECD4 callback;
+} Node_8004ECD4;
+typedef struct Copy4_8004ECD4 { u8 bytes[4]; } Copy4_8004ECD4;
+void func_8004ECD4(void *arg0, s32 arg1, s32 arg2) {
+    Node_8004ECD4 *head;
+    Node_8004ECD4 *node;
+    CallbackNode_8004ECD4 callback;
+    Copy4_8004ECD4 pair;
+    s16 *coords;
+    head = *(Node_8004ECD4 **)((u8 *)arg0 + 0x18);
+    node = head;
+    coords = (s16 *)pair.bytes;
+    if (head != NULL) {
+        do {
+            func_8004EC00(arg1, arg2);
+            if (node->flags & 1) {
+                callback = node->callback;
+                if (callback != NULL) {
+                    callback(1, node);
+                }
+                pair = *(Copy4_8004ECD4 *)(D_80128128 + D_80128120 * 4);
+                coords[0] += node->x;
+                coords[1] += node->y;
+                D_80097200[node->type](node, coords[0], coords[1]);
+            }
+            func_8004EC5C();
+            node = node->next;
+        } while (node != head);
+    }
+}
 #endif
 
 #ifdef VERSION_US
