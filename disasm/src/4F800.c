@@ -83,7 +83,24 @@ void func_8004EE94(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4F800/func_800503A4.s")
+extern s32 D_80128120;
+extern u8 D_80128128[];
+extern s32 D_800971F0;
+extern void func_8004EE04(u8 *, s32, s32);
+typedef void (*Callback_800503A4)();
+void func_800503A4(u8 *arg0) {
+    if (arg0 != NULL && (*(u16 *)(arg0 + 2) & 1)) {
+        D_80128120 = 0;
+        *(s16 *)(D_80128128 + 0) = 0;
+        *(s16 *)(D_80128128 + 2) = 0;
+        D_800971F0 = (s32)arg0;
+        if (*(Callback_800503A4 *)(arg0 + 0x1C) != NULL) {
+            (*(Callback_800503A4 *)(arg0 + 0x1C))(1, arg0);
+        }
+        func_8004EE04(arg0, 0, 0);
+        D_800971F0 = 0;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -95,7 +112,18 @@ void func_8005049C(void) { func_80050428(); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4F800/func_800504BC.s")
+extern s32 D_80128120;
+extern u8 D_80128128[];
+extern s32 D_800971F0;
+void func_800504BC(s16 *arg0) {
+    if (D_800971F0 != 0) {
+        arg0[0] = *(s16 *)(D_80128128 + D_80128120 * 4);
+        arg0[1] = *(s16 *)(D_80128128 + D_80128120 * 4 + 2);
+        return;
+    }
+    arg0[0] = 0;
+    arg0[1] = 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -138,11 +166,58 @@ void func_80050578(u8 *arg0, s32 arg1) { if (arg0 != NULL) { u8 *value = *(u8 **
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4F800/func_80050700.s")
+extern s32 D_801281B4;
+extern u8 D_815097B0[];
+extern u8 D_800CD020[];
+extern void *func_80003240();
+extern void __osSetFpcCsr();
+extern void Sched_InitClientQueue();
+extern void func_80005568();
+extern void func_80004F34();
+typedef void (*CallbackThread_80050700)();
+void func_80050700(s32 arg0) {
+    CallbackThread_80050700 callback = (CallbackThread_80050700)func_80003240(D_815097B0);
+    __osSetFpcCsr(0x01000C01);
+    Sched_InitClientQueue(D_801281B4, 0, 1);
+    func_80005568(D_801281B4);
+loop:
+    func_80004F34(D_801281B4);
+    if (*(s16 *)(D_800CD020 + 0xA38) >= 0x15) {
+        goto loop;
+    }
+    callback(D_801281B4);
+    goto loop;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4F800/func_800507B8.s")
+extern s32 D_801281B0;
+extern s32 D_801281B4;
+extern u8 D_81509440[];
+extern u8 D_81509674[];
+extern u8 D_800CD020[];
+extern void *func_80003240();
+extern void __osSetFpcCsr();
+extern void Sched_InitClientQueue();
+extern void func_80005568();
+extern void func_80004F34();
+typedef void (*CallbackThread_800507B8)();
+void func_800507B8(s32 arg0) {
+    CallbackThread_800507B8 callback1 = (CallbackThread_800507B8)func_80003240(D_81509440);
+    CallbackThread_800507B8 callback2 = (CallbackThread_800507B8)func_80003240(D_81509674);
+    __osSetFpcCsr(0x01000C01);
+    Sched_InitClientQueue(D_801281B0, 0, 1);
+    func_80005568(D_801281B0);
+    callback1(D_801281B0);
+    osStartThread((OSThread *)D_801281B4);
+loop:
+    func_80004F34(D_801281B0);
+    if (*(s16 *)(D_800CD020 + 0xA38) >= 0x15) {
+        goto loop;
+    }
+    callback2(D_801281B0);
+    goto loop;
+}
 #endif
 
 #ifdef VERSION_US
@@ -165,5 +240,23 @@ void *GbTower_RecvExitMesg(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4F800/func_80050B40.s")
+extern s32 D_801281B0;
+extern s32 D_801281B4;
+extern u8 D_801281B8;
+extern u8 GbTower_SetPollMask(u8);
+extern void Display_ApplyPendingVideoMode(void);
+extern void func_800055B0();
+extern void main_pool_pop_state();
+typedef struct Copy8_80050B40 { u8 bytes[8]; } Copy8_80050B40;
+void func_80050B40(void *arg0) {
+    *(Copy8_80050B40 *)arg0 = *(Copy8_80050B40 *)((u8 *)D_801281B0 + 0x2208);
+    GbTower_SetPollMask(D_801281B8);
+    osViBlack(1);
+    Display_ApplyPendingVideoMode();
+    func_800055B0(D_801281B0);
+    func_800055B0(D_801281B4);
+    osDestroyThread((OSThread *)D_801281B0);
+    osDestroyThread((OSThread *)D_801281B4);
+    main_pool_pop_state(0x4742454D);
+}
 #endif
