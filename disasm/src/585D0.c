@@ -652,7 +652,13 @@ void func_8005C714(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005C880.s")
+extern u8 D_801285D8[];
+extern void func_8006276C(s32, s32);
+void func_8005C880(s32 arg0, s32 arg1, s32 arg2) {
+    s32 offset = arg2 * 47;
+    s32 v0 = *(s32 *)(D_801285D8 + arg1 * 112);
+    func_8006276C(v0 + offset + 0x40C, arg0);
+}
 #endif
 
 #ifdef VERSION_US
@@ -660,7 +666,13 @@ void func_8005C714(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005C988.s")
+extern u8 D_801285D8[];
+extern void func_8006276C(s32, s32);
+void func_8005C988(s32 arg0, s32 arg1, s32 arg2) {
+    s32 offset = arg2 * 47;
+    s32 v0 = *(s32 *)(D_801285D8 + arg1 * 112);
+    func_8006276C(v0 + offset + 0x11A, arg0);
+}
 #endif
 
 #ifdef VERSION_US
@@ -888,7 +900,12 @@ void func_8005E07C(s32 arg0, u8 arg1) { u8 *entry = D_80128570 + arg0 * 0x70; if
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005E278.s")
+extern u8 D_801285D8[];
+extern void _bcopy(s32, s32, s32);
+void func_8005E278(u8 arg0, s32 arg1) {
+    s32 idx = arg0;
+    _bcopy(*(s32 *)(D_801285D8 + idx * 112) + 0x5FA, arg1, 3);
+}
 #endif
 
 #ifdef VERSION_US
