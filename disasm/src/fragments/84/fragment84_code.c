@@ -9,11 +9,27 @@ void ParticleGfx_SetPrimColor_fragment84(u8 r, u8 g, u8 b, u8 a) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/84/fragment84_code/func_8FC00078.s")
+void func_8FC00078(u16 arg0, u16 arg1, u16 arg2, u16 arg3) {
+    gDPPipeSync(D_800D0510++);
+    gDPSetFillColor(D_800D0510++, (((((arg0 << 8) & 0xF800) | ((arg1 << 3) & 0x7C0) | ((arg2 >> 2) & 0x3E) | (arg3 & 1)) << 16) |
+        (((arg0 << 8) & 0xF800) | ((arg1 << 3) & 0x7C0) | ((arg2 >> 2) & 0x3E) | (arg3 & 1))));
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/84/fragment84_code/func_8FC000F4.s")
+extern s32 func_8004C990(s32, s32, s32, s32);
+extern void func_8004D1FC(s32);
+void func_8FC000F4(s32 arg0, s32 arg1) {
+    s32 temp_a2;
+    s32 temp_a3;
+    unsigned long long new_var;
+
+    new_var = 0xFFFF;
+    temp_a2 = arg0 & new_var;
+    temp_a3 = arg1 & new_var;
+    func_8004D1FC(func_8004C990(temp_a2, temp_a3, temp_a2, temp_a3));
+}
+void func_8FC000F4_padding(void) {}
 #endif
 
 #ifdef VERSION_US
@@ -78,7 +94,31 @@ void func_8FC007E0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/84/fragment84_code/func_8FC00E90.s")
+extern u8 D_8FC02830;
+extern Gfx *D_800D0510;
+extern void func_800088DC(void);
+extern void func_80008648(void);
+extern void GfxImage_FillCurrent(Gfx **, s32);
+extern void func_8FC003F8(s32, s32, s32, s32, s32, s32, s32);
+extern void func_8FC00558(void);
+extern void func_8FC0069C(void);
+extern void func_8FC00774(void);
+extern void func_8FC00AC4(void);
+extern void func_8FC00B68(void);
+void func_8FC00E90(void) {
+    func_800088DC();
+    if (D_8FC02830 == 2) {
+        func_8FC003F8(0x96, 0x64, 0x154, 0x14A, 0x50, 0x50, 0xFF);
+        func_8FC00B68();
+    } else {
+        GfxImage_FillCurrent(&D_800D0510, 0x89);
+        func_8FC00558();
+        func_8FC0069C();
+        func_8FC00774();
+        func_8FC00AC4();
+    }
+    func_80008648();
+}
 #endif
 
 #ifdef VERSION_US
@@ -91,7 +131,16 @@ void func_8FC00F34(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/84/fragment84_code/func_8FC00F48.s")
+s32 func_8FC00F48(u32 *arg0, s32 arg1) {
+    s32 result = 0;
+    while ((u32)arg1-- > 0) {
+        result += *(u8 *)arg0;
+        result &= 0xFFFF;
+        arg0 = (u32 *)((u8 *)arg0 + 1);
+    }
+    result += 0x83;
+    return result & 0xFFFF;
+}
 #endif
 
 #ifdef VERSION_US
@@ -150,7 +199,28 @@ void func_8FC01408(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/84/fragment84_code/func_8FC01480.s")
+extern u8 D_8FC02832;
+extern u8 D_8FC0244C;
+extern u8 D_8FC0C776;
+extern u8 D_8FC0C768;
+extern void _bcopy(s32 *, s32, s32);
+void func_8FC01480(void) {
+    u8 *record = (u8 *)((D_8FC02832 * 0x10) + &D_8FC0244C);
+    switch (record[0]) {
+    case 4:
+        _bcopy(*(s32 *)(record + 0xC), (s32)&D_8FC0C776, 0x20);
+        *(u16 *)((u8 *)&D_8FC0C768 + 0x2E) = 0x1F;
+        *(u16 *)((u8 *)&D_8FC0C768 + 0xC) = 0;
+        *(s32 *)((u8 *)&D_8FC0C768 + 0x30) = 0;
+        break;
+    case 5:
+        _bcopy(*(s32 *)(record + 0xC), (s32)&D_8FC0C776, 0x16);
+        *(u16 *)((u8 *)&D_8FC0C768 + 0x2E) = 0x15;
+        *(u16 *)((u8 *)&D_8FC0C768 + 0xC) = 0;
+        *(s32 *)((u8 *)&D_8FC0C768 + 0x30) = 1;
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
