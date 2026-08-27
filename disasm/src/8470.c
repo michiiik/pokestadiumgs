@@ -6,7 +6,15 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80007A84.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80007AEC.s")
+extern s32 D_800D0554;
+s32 func_80007A84();
+s32 func_80007AEC(void) {
+    s32 result = 0;
+    if ((D_800D0554 != 0) && (*(u8 *)((u8 *)(u32)D_800D0554 + 0x11) == 1)) {
+        result = func_80007A84();
+    }
+    return result;
+}
 
 s32 func_80007A84();
 extern s32 D_800D0554;

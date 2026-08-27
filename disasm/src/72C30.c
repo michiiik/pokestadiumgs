@@ -34,7 +34,13 @@ void Minigame_SetModeDefaults(u8 *arg0) {
     arg0[0xE] = 1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_800721EC.s")
+void func_800721EC(u8 *arg0, u8 *arg1) {
+    arg1[0xE] = 0;
+    if (arg0[0x2182] & 1) arg1[0xE] |= 1;
+    if (arg0[0x2182] & 2) arg1[0xE] |= 2;
+    if (arg0[0x2182] & 4) arg1[0xE] |= 4;
+    if (arg0[0x2182] & 8) arg1[0xE] |= 8;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_80072264.s")
 
