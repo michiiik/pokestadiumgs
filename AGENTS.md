@@ -367,6 +367,9 @@ by these; always probe and gate.
 | Non-power-of-two stride (`arg2 * 47`) | Hoist the multiply into its own local declared **before** the table-load local to fix `addu` operand order | 2 (`func_8005C880/C988`) | — |
 | Selector index into two parallel tables | `idx = f(SEL, -1); if (arg0 == 0) D_A[idx * 0xC] + ADD else D_B[idx * 0xC] + ADD` — note the inverted condition sense | 11 (`517E0.c` wrapper family) | — |
 | Small struct copy from a returned pointer | Uniquely named `typedef struct { s32 a, b; }` and `*arg0 = *(Pair *)((u8 *)ret + off);` | 3 (`func_80054210/8005493C/8005487C`) | — |
+| Nested command constructor from a fixed record | Use a local typed overlay with the proven padding/child field, then pass the nested field directly to the helper; keep each constructor's exact field width | 6 (`229E0.c`: `func_8003FD98/3FE6C/40004/40050/4009C/400E8`) | only when the record offsets and helper call shape are proven |
+| Fixed-record parser/serializer with narrow fields | Keep the raw record base, use explicit `u8`/`u16` temporaries and direct offset loads/stores; parser loops use the observed break/fill shape, serializers keep the observed conversion order | 8 (`615D0.c`) | exact record format only; do not infer a shared struct from this pattern |
+| Byte-indexed state-table loop | Use a byte-typed argument/index, initialize the table pointer before the loop, and preserve explicit post-increment/index updates around the lookup | 2 (`615D0.c`: `func_80060B28/60F98`) | only when the assembly shows byte masking and the same loop-carried pointer |
 | Callee prototyped earlier as `void` but its return is needed | Block-scope re-prototype does not work (hard "redeclaration" error); the earlier definition must change to return the value — do it as a separate gated change | 1 (`func_80055BA8`, open) | — |
 | Wrapper called with four registers but only three read | Declare only the parameters the body reads (`a3` was caller garbage); the fourth formal changes the frame | 1 (`func_841518D0`) | — |
 | General | Preserve narrow `sb`/`sh`/`sw` widths, initialise results before NULL checks, raw 32-bit address arithmetic (`(u8 *)(u32)global + off`) before inferred structs, `uintptr_t` casts for raw addresses, explicit `s32` loop counters, array-index vs pointer-add as separate variants, deliberate signed/unsigned masks | repo scan | ABI hypotheses until compared |
@@ -390,5 +393,10 @@ accepts; other widths only on diagnostic evidence via the variant policy.
   `$v0`/`$v1` swapped (`func_8130B91C`, `func_8130B95C`).
 - Shape: 15-case dispatcher `func_80050D20` matches except for how IDO shares
   the last case's tail with `default` (size 200 vs 196).
+- Shape: jump-table owners can remain normalized matches with relocation-only
+  immediate drift even after a file has a `.rodata` subsegment
+  (`func_80060AC8`, `func_80060B74`, `func_8006179C`); preserve the assembly
+  owner until the table offset is proven rather than accepting the normalized
+  score.
 - Sweep families other than `frame-padding` in `near_miss_kinds` have no
   accepts yet (0/146); re-evaluate after the fleet's records accumulate.
