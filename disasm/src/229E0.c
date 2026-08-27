@@ -508,7 +508,21 @@ void func_80028014(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002806C.s")
+extern u8 D_8011BE90;
+extern u16 D_800D2B44;
+extern s16 D_800D2BA8;
+extern u8 D_800D2B78;
+s32 func_8002806C(void) {
+    u8 *base;
+    s32 result;
+
+    base = &D_8011BE90;
+    result = *(u8 *)(base + 0x3470) - 0x27;
+    if (((u32)*(s32 *)(base + 0x346C) >> 31) == 0) {
+        return 0;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
@@ -981,7 +995,9 @@ void func_800339E4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80033ACC.s")
+void func_80033ACC(u8 arg0) {
+    D_800D2B44 += *(s16 *)((u8 *)&D_800D2BA8 + (arg0 * 0x3C));
+}
 #endif
 
 #ifdef VERSION_US
@@ -1031,7 +1047,13 @@ void func_80033F14(s32 arg0, s32 arg1) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80033F20.s")
+void func_80033F20(u8 arg0, u8 arg1) {
+    u8 *entry;
+
+    entry = &D_800D2B78 + (arg0 * 0x3C);
+    entry[3] &= 0xFFFD;
+    *(s32 *)(entry + 8) = *(s32 *)(entry + 0xC);
+}
 #endif
 
 #ifdef VERSION_US
@@ -3368,7 +3390,23 @@ void *GeoRender_GetMatrix(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800393C0.s")
+extern u8 D_80126010;
+extern u8 D_800948E4[];
+void func_800393C0(void) {
+    struct Vec3Words {
+        s32 x;
+        s32 y;
+        s32 z;
+    };
+    struct State {
+        struct Vec3Words value;
+        u8 pad[0x174];
+        s32 flag;
+    };
+
+    ((struct State *)&D_80126010)->flag = 0;
+    ((struct State *)&D_80126010)->value = *(struct Vec3Words *)D_800948E4;
+}
 #endif
 
 #ifdef VERSION_US
