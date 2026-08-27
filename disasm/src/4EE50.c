@@ -294,5 +294,28 @@ u16 func_8004EB38(u16 *arg0) { return *arg0; }
 extern u8 D_80097154[];
 s32 func_8004EB40(u16 *arg0) { u16 index = *arg0; return *(s32 *)(D_80097154 + (index * 8)); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4EE50/func_8004EB58.s")
+extern u8 D_80097150[];
+s32 func_8004EB58(s32 arg0, s32 arg1) {
+    typedef struct CallbackEntry {
+        void (*callback)(void);
+        s32 unused;
+    } CallbackEntry;
+    s32 current;
+    u16 index;
+
+    D_80128090 = arg0;
+    D_80128094 = 0;
+    D_80128098 = func_80003240(arg1);
+    D_8012809C = 0;
+    D_801280A0[0] = 0;
+    current = D_80128098;
+    if (current != 0) {
+        do {
+            index = *(u16 *)(u32)current;
+            ((CallbackEntry *)D_80097150)[index].callback();
+            current = D_80128098;
+        } while (current != 0);
+    }
+    return D_80128094;
+}
 #endif
