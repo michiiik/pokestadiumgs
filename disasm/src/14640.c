@@ -71,7 +71,14 @@ void func_800149A8(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80014A18.s")
+s32 func_80014A18(s32 arg0, s32 arg1, s32 arg2) {
+    extern s32 func_80014AA8();
+    if (*(s32 *)(D_8011BE90 + 0x2D14) != 0) {
+        return 0;
+    }
+    *(s32 *)(*(u8 **)(D_8011BE90 + (arg0 * 4) + 0x604C) + 0xDC) = 0;
+    return func_80014AA8(arg0, arg1, arg2);
+}
 
 extern s32 func_80014AA8(s32, s32, s32);
 s32 func_80014A5C(s32 arg0, s32 arg1, s32 arg2) {
