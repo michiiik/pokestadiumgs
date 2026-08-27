@@ -204,7 +204,16 @@ s32 func_8006AF84(void) {
 
 s32 func_8006AF94(void) { s32 result = -1; s32 ptr = D_8009DF70; if (ptr != 0) result = *(s16 *)((u8 *)(u32)ptr + 0x10); return result; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006AFB4.s")
+s32 func_8006AFB4(s32 arg0) {
+    s32 result;
+    s32 value = 1;
+    if ((arg0 != 0x45) && (arg0 != 0x46) && (arg0 != 0x47)) {
+        result = 0;
+    } else {
+        result = value;
+    }
+    return result;
+}
 
 void func_8006AFE4(s8 *arg0, s8 *arg1) {
     s32 found = 0;
