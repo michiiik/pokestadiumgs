@@ -444,7 +444,11 @@ void func_8AC04744(s32 *arg0, s32 arg1, s32 arg2, s32 arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC05ED4.s")
+extern void func_8AC05E40(s32, s32, s32);
+void func_8AC05ED4(s32 arg0, s32 arg1, s32 arg2) {
+    func_8AC05E40(arg0, arg1, arg2);
+    *(s16 *)((u8 *)arg2 + 0x70) = 1;
+}
 #endif
 
 #ifdef VERSION_US
