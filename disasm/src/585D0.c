@@ -585,10 +585,6 @@ void func_8005C52C(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern u8 D_801285D0[];
-extern u8 D_801285D8[];
-extern void _bcopy(s32, s32, s32);
-extern void _bzero(s32, s32);
 void func_8005C584(s32 arg0, s32 arg1) {
     s32 v0 = *(s32 *)(D_801285D0 + arg1 * 112);
     _bcopy(v0 + 0x3E6, arg0, 0x98);
@@ -596,10 +592,6 @@ void func_8005C584(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern u8 D_801285D0[];
-extern u8 D_801285D8[];
-extern void _bcopy(s32, s32, s32);
-extern void _bzero(s32, s32);
 void func_8005C5CC(s32 arg0, s32 arg1) {
     s32 v0 = *(s32 *)(D_801285D0 + arg1 * 112);
     _bcopy(v0 + 0x3E7, arg0, 0x98);
@@ -611,10 +603,6 @@ void func_8005C5CC(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern u8 D_801285D0[];
-extern u8 D_801285D8[];
-extern void _bcopy(s32, s32, s32);
-extern void _bzero(s32, s32);
 void func_8005C694(s32 arg0, s32 arg1) {
     s32 v0 = *(s32 *)(D_801285D0 + arg1 * 112);
     _bcopy(arg0 + 0x39, v0 + 0x49, 0x2A);
@@ -622,10 +610,6 @@ void func_8005C694(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern u8 D_801285D0[];
-extern u8 D_801285D8[];
-extern void _bcopy(s32, s32, s32);
-extern void _bzero(s32, s32);
 void func_8005C6D8(s32 arg0, s32 arg1) {
     s32 v0 = *(s32 *)(D_801285D0 + arg1 * 112);
     _bcopy(arg0, v0 + 0x3E6, 0x98);
@@ -633,10 +617,6 @@ void func_8005C6D8(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern u8 D_801285D0[];
-extern u8 D_801285D8[];
-extern void _bcopy(s32, s32, s32);
-extern void _bzero(s32, s32);
 void func_8005C714(s32 arg0, s32 arg1) {
     s32 v0 = *(s32 *)(D_801285D0 + arg1 * 112);
     _bcopy(arg0, v0 + 0x3E7, 0x98);
@@ -652,7 +632,6 @@ void func_8005C714(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern u8 D_801285D8[];
 extern void func_8006276C(s32, s32);
 void func_8005C880(s32 arg0, s32 arg1, s32 arg2) {
     s32 offset = arg2 * 47;
@@ -666,8 +645,6 @@ void func_8005C880(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-extern u8 D_801285D8[];
-extern void func_8006276C(s32, s32);
 void func_8005C988(s32 arg0, s32 arg1, s32 arg2) {
     s32 offset = arg2 * 47;
     s32 v0 = *(s32 *)(D_801285D8 + arg1 * 112);
@@ -900,8 +877,6 @@ void func_8005E07C(s32 arg0, u8 arg1) { u8 *entry = D_80128570 + arg0 * 0x70; if
 #endif
 
 #ifdef VERSION_US
-extern u8 D_801285D8[];
-extern void _bcopy(s32, s32, s32);
 void func_8005E278(u8 arg0, s32 arg1) {
     s32 idx = arg0;
     _bcopy(*(s32 *)(D_801285D8 + idx * 112) + 0x5FA, arg1, 3);
@@ -909,8 +884,6 @@ void func_8005E278(u8 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern u8 D_801285D8[];
-extern void _bcopy(s32, s32, s32);
 void func_8005E2BC(u8 arg0, s32 arg1) {
     _bcopy(arg1, *(s32 *)(D_801285D8 + arg0 * 112) + 0x5FA, 3);
 }
