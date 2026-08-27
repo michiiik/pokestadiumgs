@@ -10,9 +10,38 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/AC80/func_8000A28C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/AC80/func_8000A304.s")
+extern Gfx *D_800D0510;
+void func_8000A304(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    s32 y;
+    s32 y2;
+    y2 = arg2 + 2;
+    y = arg2;
+    if (StageContext_IsHighResolution() != 0) {
+        arg0 *= 2;
+        arg1 *= 2;
+        y = arg2 * 2;
+        y2 *= 2;
+    }
+    gDPPipeSync(D_800D0510++);
+    gDPSetFillColor(D_800D0510++, ((u16)arg3 << 16) | (u16)arg3);
+    gDPFillRectangle(D_800D0510++, arg0, y, arg1, y2);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/AC80/func_8000A3EC.s")
+void func_8000A3EC(u64 start, u64 endA, u64 endB, s16 y, u16 color) {
+    u64 first;
+    u64 second;
+    s32 x0;
+    s32 x1;
+    first = endA - start;
+    if ((s64)first < 0) first = 0;
+    second = endB - start;
+    if ((s64)second < 0) second = 0;
+    x0 = (((first * 64) / 3000) * 3) / 1000 + 30;
+    x1 = (((second * 64) / 3000) * 3) / 1000 + 30;
+    if (x0 >= 226) x0 = 225;
+    if (x1 >= 226) x1 = 225;
+    if (x0 < x1) func_8000A304(x0, x1, y, color);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/AC80/func_8000A590.s")
 
