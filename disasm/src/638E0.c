@@ -2,7 +2,20 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/638E0/func_80062CE0.s")
+extern s32 func_8004C874(s32, s32);
+extern void *D_800A5080;
+s32 *func_80062CE0(u8 arg0) {
+    s32 *temp_v0;
+    s32 *var_v1;
+
+    temp_v0 = (s32 *)func_8004C874(6, arg0 - 1);
+    if (temp_v0 != NULL) {
+        var_v1 = temp_v0;
+    } else {
+        var_v1 = (s32 *)&D_800A5080;
+    }
+    return var_v1;
+}
 
 u8 func_80062D20(u8 arg0) { extern u8 D_8009782A[]; if (arg0 > 0 && arg0 < 0xFC) return D_8009782A[arg0 * 6]; return 0; }
 
