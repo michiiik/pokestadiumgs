@@ -4,7 +4,19 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/67F00/func_80067300.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/67F00/func_80067454.s")
+struct Func800675A0Source;
+typedef struct { s32 words[24]; } Func80067454Copy;
+void func_80067454(struct Func800675A0Source *arg0, void *arg1) {
+    Func80067454Copy *dst;
+    Func80067454Copy *src;
+    s32 i;
+    dst = (Func80067454Copy *)arg0;
+    src = *(Func80067454Copy **)((u8 *)arg1 + 0x24);
+    for (i = 0; i < 6; i++) {
+        ((Func80067454Copy *)arg0)[i] = ((Func80067454Copy *)src)[i];
+    }
+    ((u8 *)arg0)[0x240] = 0;
+}
 
 typedef struct Func800675A0Record {
     s32 words[24];
