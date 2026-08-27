@@ -91,7 +91,28 @@ OSThread* crash_screen_get_faulted_thread(void) {
     return NULL;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/9E00/func_80009E04.s")
+extern OSMesgQueue D_800D0F60;
+extern OSThread *crash_screen_get_faulted_thread(void);
+extern void func_800092C8(void);
+extern void func_80009940(OSThread *);
+void func_80009E04(void *arg0) {
+    void *msg;
+    OSThread *thread;
+    osSetEventMesg(0xA, &D_800D0F60, 1);
+    osSetEventMesg(0xC, &D_800D0F60, 2);
+    for (;;) {
+        osRecvMesg(&D_800D0F60, &msg, 1);
+        thread = crash_screen_get_faulted_thread();
+        if (thread != NULL) {
+            break;
+        }
+    }
+    osStopThread(thread);
+    func_800092C8();
+    func_80009940(thread);
+forever:
+    goto forever;
+}
 
 extern u8 D_800D05B0[];
 void func_80009EB4(s32 arg0, s32 arg1, s32 arg2) {
@@ -102,7 +123,21 @@ void func_80009EB4(s32 arg0, s32 arg1, s32 arg2) {
     *(s16 *)(D_800D05B0 + 0x9D2) = *arg2p;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/9E00/crash_screen_init.s")
+extern u8 D_800D05B0[];
+extern OSMesgQueue D_800D0F60;
+extern void *D_800D0F78;
+extern s32 func_8000339C(void);
+extern void func_80009E04(void *);
+void crash_screen_init(void) {
+    s32 result;
+    result = (func_8000339C() | 0xA0000000) + 0xFFFDA800;
+    *(s32 *)(D_800D05B0 + 0x9CC) = result;
+    *(s16 *)(D_800D05B0 + 0x9D0) = 0x140;
+    *(s16 *)(D_800D05B0 + 0x9D2) = 0x10;
+    osCreateMesgQueue(&D_800D0F60, &D_800D0F78, 1);
+    osCreateThread((OSThread *)D_800D05B0, 2, func_80009E04, NULL, &D_800D0F60, 0x80);
+    osStartThread((OSThread *)D_800D05B0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/9E00/func_80009F80.s")
 #endif
