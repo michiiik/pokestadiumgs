@@ -43,7 +43,31 @@ void func_8821C750(s32 arg0, s32 arg1) { func_8821C47C(arg0, arg1, 7); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_18F6D0/func_8821C820.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_18F6D0/func_8821C924.s")
+
+typedef struct {
+    u8 pad_00[8];
+    u8 unk_08;
+} Func8821C924Leaf;
+typedef struct {
+    Func8821C924Leaf *unk_00;
+    u8 unk_04;
+} Func8821C924Inner;
+typedef struct {
+    Func8821C924Inner *unk_00;
+    s8 unk_04;
+} Func8821C924Item;
+
+s32 func_8821C924(Func8821C924Item *arg0, Func8821C924Item *arg1) {
+    s32 result;
+    result = arg0->unk_00->unk_00->unk_08 - arg1->unk_00->unk_00->unk_08;
+    if (result == 0) {
+        result = arg0->unk_00->unk_04 - arg1->unk_00->unk_04;
+        if (result == 0) {
+            result = arg0->unk_04 - arg1->unk_04;
+        }
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_18F6D0/func_8821C970.s")
 
