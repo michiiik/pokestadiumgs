@@ -367,9 +367,11 @@ by these; always probe and gate.
 | Non-power-of-two stride (`arg2 * 47`) | Hoist the multiply into its own local declared **before** the table-load local to fix `addu` operand order | 2 (`func_8005C880/C988`) | — |
 | Selector index into two parallel tables | `idx = f(SEL, -1); if (arg0 == 0) D_A[idx * 0xC] + ADD else D_B[idx * 0xC] + ADD` — note the inverted condition sense | 11 (`517E0.c` wrapper family) | — |
 | Small struct copy from a returned pointer | Uniquely named `typedef struct { s32 a, b; }` and `*arg0 = *(Pair *)((u8 *)ret + off);` | 3 (`func_80054210/8005493C/8005487C`) | — |
-| Nested command constructor from a fixed record | Use a local typed overlay with the proven padding/child field, then pass the nested field directly to the helper; keep each constructor's exact field width | 6 (`229E0.c`: `func_8003FD98/3FE6C/40004/40050/4009C/400E8`) | only when the record offsets and helper call shape are proven |
+| Nested command constructor from a fixed record | Use a local typed overlay with the proven padding/child field, then pass the nested field directly to the helper; keep each constructor's exact field width | 10 (`229E0.c`: `func_8003FD98/3FE6C/40004/40050/4009C/400E8`; `4EE50.c`: `func_8004E868/4E8D0/4E9C8/4EA60`) | only when the record offsets and helper call shape are proven |
 | Fixed-record parser/serializer with narrow fields | Keep the raw record base, use explicit `u8`/`u16` temporaries and direct offset loads/stores; parser loops use the observed break/fill shape, serializers keep the observed conversion order | 8 (`615D0.c`) | exact record format only; do not infer a shared struct from this pattern |
 | Byte-indexed state-table loop | Use a byte-typed argument/index, initialize the table pointer before the loop, and preserve explicit post-increment/index updates around the lookup | 2 (`615D0.c`: `func_80060B28/60F98`) | only when the assembly shows byte masking and the same loop-carried pointer |
+| Aligned pool wrapper with conditional initialization | Round the requested size with `(arg0 + 3) & ~3`, declare the allocation local before the result, and initialize/return the result only when the block is nonzero | 2 (`3A00.c`: `func_80002E00/030D0`) | same pool-allocation wrapper shape |
+| Aligned graph-node constructor wrapper | If the pool handle is nonzero, replace the incoming result with `MainPool_AllocAligned`; if the result is nonzero, call the constructor with the observed old-style narrow-field formals, then return it | 4 (`4EE50.c`: `func_8004E368/4E3C8/4E438/4E52C`) | only for the matching allocation/constructor call sequence |
 | Callee prototyped earlier as `void` but its return is needed | Block-scope re-prototype does not work (hard "redeclaration" error); the earlier definition must change to return the value — do it as a separate gated change | 1 (`func_80055BA8`, open) | — |
 | Wrapper called with four registers but only three read | Declare only the parameters the body reads (`a3` was caller garbage); the fourth formal changes the frame | 1 (`func_841518D0`) | — |
 | General | Preserve narrow `sb`/`sh`/`sw` widths, initialise results before NULL checks, raw 32-bit address arithmetic (`(u8 *)(u32)global + off`) before inferred structs, `uintptr_t` casts for raw addresses, explicit `s32` loop counters, array-index vs pointer-add as separate variants, deliberate signed/unsigned masks | repo scan | ABI hypotheses until compared |
@@ -381,7 +383,7 @@ accepts; other widths only on diagnostic evidence via the variant policy.
 
 - Runner: `probe_error` / `list index out of range` on the last pragma owner
   of a file when the function has trailing alignment nops
-  (`func_8005633C`, `func_8130CDD4`); reproduces with a trivial body, so it
+  (`func_8005633C`, `func_8130CDD4`, `func_80021BBC`); reproduces with a trivial body, so it
   is a diagnostics-path bug, not a candidate problem.
 - Runner: `654A0.c` cannot get its `.rodata` subsegment until asm-processor
   handles mixed 4/8-byte `.late_rodata_alignment` without growing `.text`.
@@ -395,8 +397,18 @@ accepts; other widths only on diagnostic evidence via the variant policy.
   the last case's tail with `default` (size 200 vs 196).
 - Shape: jump-table owners can remain normalized matches with relocation-only
   immediate drift even after a file has a `.rodata` subsegment
-  (`func_80060AC8`, `func_80060B74`, `func_8006179C`); preserve the assembly
-  owner until the table offset is proven rather than accepting the normalized
-  score.
+  (`func_80060AC8`, `func_80060B74`, `func_8006179C`, `func_80067930`,
+  `func_80002178`); preserve the assembly owner until the table offset is
+  proven rather than accepting the normalized score.
+- Shape: large fixed-record constructor `func_8004E610` reaches similarity 1.0
+  with equal 312-byte output, but IDO assigns the stack byte load to a
+  different temporary (`$t0` versus `$t8`); declaration-order and temporary
+  variants did not resolve it.
+- Shape: `func_8004E298` remains an instruction-drift near miss (100 generated
+  bytes versus 112 expected), with the first difference in the ABI stack-home
+  sequence; do not pad it without proving the missing body shape.
+- Shape: `func_80067800` has a one-instruction return-tail drift and the
+  permuter cannot assemble its `.late_rodata_alignment`; preserve the helper
+  until the late-rodata path is repaired.
 - Sweep families other than `frame-padding` in `near_miss_kinds` have no
   accepts yet (0/146); re-evaluate after the fleet's records accumulate.
