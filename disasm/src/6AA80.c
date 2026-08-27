@@ -293,7 +293,25 @@ extern void func_8006BF78(s32); void func_8006C58C(void) { func_8006BF78(0); }
 
 extern void func_8006BF78(s32); void func_8006C644(void) { func_8006BF78(1); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006C664.s")
+extern s32 D_8009DF70;
+extern s32 func_800718B8(s32);
+extern void func_80073208(void *, s32);
+void *func_8006C664(void) {
+    u8 *result = NULL; volatile s32 *globalp = &D_8009DF70;
+    s32 linked; s32 state;  s16 kind;
+    state=*globalp;
+    if(state!=0){
+        result=*(u8 **)((u8 *)(u32)state+0x1C);
+        result[0x9C2]=*(u8 *)((u8 *)(u32)state+0x1A);
+        state=*globalp; linked=*(s32 *)((u8 *)(u32)state+0x20);
+        if(linked!=0){*(s32 *)(result+0x9D8)=linked+0x3B8; state=*globalp;}
+        kind=*(s16 *)((u8 *)(u32)state+6);
+        if(kind!=0xE) *(s32 *)(result+0x9D4)=func_800718B8(kind);
+        else *(s32 *)(result+0x9D4)=state+0x3C;
+        if(result[0x9C2]==2){func_80073208(result, *(s32 *)((u8 *)(u32)*globalp + 0x20));}
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006C714.s")
 
@@ -357,7 +375,62 @@ extern s16 D_8009DF74; void func_8006CBFC(void) { D_8009DF74 = 1; }
 
 extern s16 D_8009DF74; void func_8006CC0C(void) { D_8009DF74 = 0; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006CC18.s")
+extern s32 D_8009DF70;
+extern void *Util_Malloc(s32);
+extern void Util_Free(void *);
+extern void _bcopy(void *, void *, s32);
+extern void func_80054B7C();
+extern void func_80051D64(s32, s32);
+typedef struct PacketCC18B {
+    u16 value0;
+    s16 value2;
+    s8 flag4;
+    s8 value5;
+    s8 value6;
+    s8 value7;
+    u16 value8;
+    u8 copyA[12];
+    u8 tail16;
+} PacketCC18B;
+typedef struct CopyCC18Phase2B { s32 words[22]; } CopyCC18Phase2B;
+s32 func_8006CC18(s32 arg0, s32 arg1) {
+    s32 result;
+    u8 pad[8];
+    PacketCC18B packet;
+    u8 *buffer;
+    s32 count;
+    s32 offset;
+    u8 *src;
+    result = 0;
+    if (D_8009DF70 != 0) {
+        buffer = Util_Malloc(0x210);
+        result = 1;
+        packet.value0 = *(u16 *)((u8 *)(u32)D_8009DF70);
+        packet.value2 = *(s16 *)((u8 *)(u32)D_8009DF70 + 2);
+        packet.flag4 = ((*(u16 *)((u8 *)(u32)D_8009DF70 + 4) & 1) != 0);
+        if (arg0 != 0) packet.value5 = *(s16 *)((u8 *)(u32)D_8009DF70 + 0x12) + 1;
+        else packet.value5 = *(s16 *)((u8 *)(u32)D_8009DF70 + 0x12);
+        packet.value6 = arg1;
+        packet.value7 = *(s16 *)((u8 *)(u32)D_8009DF70 + 0x16);
+        packet.value8 = *(u16 *)(*(u8 **)((u8 *)(u32)D_8009DF70 + 0x24) + 0x934);
+        _bcopy(*(u8 **)((u8 *)(u32)D_8009DF70 + 0x24) + 0x904, packet.copyA, 0xC);
+        count = 0;
+        offset = 0;
+        packet.tail16 = *(u8 *)(*(u8 **)((u8 *)(u32)D_8009DF70 + 0x24) + 0x955);
+        do {
+            src = *(u8 **)((u8 *)(u32)D_8009DF70 + 0x24) + offset;
+            offset += 0x60;
+            if (*src != 0) {
+                ((CopyCC18Phase2B *)buffer)[count] = *(CopyCC18Phase2B *)src;
+                count++;
+            }
+        } while (offset != 0x240);
+        func_80054B7C(&packet, buffer, count);
+        func_80051D64(0x15, 0);
+        Util_Free(buffer);
+    }
+    return result;
+}
 
 extern void _bcopy(void *, void *, s32);
 typedef struct CopyCDA0C { s32 words[22]; } CopyCDA0C;
@@ -381,7 +454,21 @@ s32 func_8006CDA0(u8 *arg0,u8 *arg1) {
  return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006CEE8.s")
+s32 func_8006CEE8(u16 arg0) {
+ u16 high; s32 value; s32 low; s32 result; u16 *home=&arg0;
+ high=arg0;
+ value=high;
+ result=-1;
+ high&=0xFF00;
+ switch(high){
+ case 0:
+  low=(u16)value; low&=0xFF;
+  switch(low){case 0:result=0x55;break;case 1:result=0x53;break;case 2:result=0x54;break;case 3:result=0x56;break;}
+  break;
+ case 0x300:result=0x5E;break;
+ }
+ return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006CF70.s")
 
