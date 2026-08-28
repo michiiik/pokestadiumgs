@@ -18,7 +18,8 @@ void func_88213410(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_88213530.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_88213A3C.s")
+extern u8 *D_88234730;
+u8 *func_88213A3C(s32 arg0) { switch (arg0) { case 3: return D_88234730 + 0xC4; case 4: return D_88234730 + 0xF8; case 5: return D_88234730 + 0x12C; } }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_88213A94.s")
 
@@ -106,7 +107,8 @@ void func_88216520(void) { func_88200134(0, 2); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_88216544.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_88216D54.s")
+extern u8 *D_88234740;
+u8 *func_88216D54(s32 arg0) { switch (arg0) { case 0: case 1: return D_88234740 + 0xC4; case 2: return D_88234740 + 0xF8; } }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_88216D98.s")
 
@@ -149,7 +151,8 @@ void func_88216EFC(void *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_88216F74.s")
+extern void func_800226C0(s32); extern void *D_80087200; extern u8 *D_88234740; extern s8 D_88234746; extern u8 D_882338A4[];
+void func_88216F74(void) { func_800226C0(0x4B); if ((*(u16 *)((u8 *)D_80087200 + 8) & 2) != 0) { D_88234746--; if (D_88234746 < 0) D_88234746 = 3; } else if ((*(u16 *)((u8 *)D_80087200 + 8) & 1) != 0) { D_88234746++; if (D_88234746 >= 4) D_88234746 = 0; } if (D_882338A4[D_88234746] + 1 < ((s8 *)D_88234740)[4]) D_88234740[4] = D_882338A4[D_88234746] + 1; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_88217040.s")
 
