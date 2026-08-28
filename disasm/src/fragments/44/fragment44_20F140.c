@@ -26,7 +26,31 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20F140/func_8AF21D14.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20F140/func_8AF21EE0.s")
+extern u8 *D_8AF2BDD8;
+extern s16 D_8AF3A082;
+extern u8 *D_8AF3A090;
+extern s16 D_8AF3A176;
+extern s16 func_8AF21C04(void);
+void func_8AF21EE0(void) {
+    s16 temp_v0;
+    *(u8 *)(D_8AF2BDD8 + 1) = (u8)D_8AF3A082;
+    temp_v0 = func_8AF21C04();
+    switch (D_8AF3A176) {
+    case 4:
+        *(s16 *)(D_8AF3A090 + 0x32) = (s16)(((temp_v0 * 5) * 2) + 4);
+        return;
+    case 5:
+        *(s16 *)(D_8AF3A090 + 0x32) = (s16)(((temp_v0 * 5) * 2) + 5);
+        return;
+    case 6:
+        *(s16 *)(D_8AF3A090 + 0x32) = (s16)(((temp_v0 * 5) * 2) + 7);
+        return;
+    case 7:
+    default:
+        *(s16 *)(D_8AF3A090 + 0x32) = (s16)(((temp_v0 * 5) * 2) + 9);
+        return;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20F140/func_8AF21FBC.s")
 
