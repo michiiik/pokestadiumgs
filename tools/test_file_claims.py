@@ -116,13 +116,42 @@ class IsLiveTests(unittest.TestCase):
         }
         self.assertTrue(file_claims.is_live(entry))
 
-    def test_dead_pid_same_host_is_not_live(self) -> None:
+    def test_dead_pid_same_host_still_lives_out_its_ttl(self) -> None:
+        """A claim outlives the process that recorded it.
+
+        Every probe and gate runs in a fresh interpreter, so the recording
+        pid is dead moments later; requiring it to be alive made every
+        claim non-live on arrival (50 claims, 0 live, 2026-08-28). The TTL
+        is what governs, and a session refreshes it by touching.
+        """
         import socket
         entry = {
             "owner": f"{_dead_pid()}@{socket.gethostname()}:sess",
             "expires_at": time.time() + 3600,
         }
+        self.assertTrue(file_claims.is_live(entry))
+
+    def test_expired_claim_is_not_live_regardless_of_pid(self) -> None:
+        import socket
+        entry = {
+            "owner": f"{os.getpid()}@{socket.gethostname()}:sess",
+            "expires_at": time.time() - 1,
+        }
         self.assertFalse(file_claims.is_live(entry))
+
+    def test_same_session_new_pid_refreshes_rather_than_refusing(self) -> None:
+        """A session installs from a new pid each batch; it must not lock itself out."""
+        import tempfile
+        tmpdir = tempfile.TemporaryDirectory()
+        self.addCleanup(tmpdir.cleanup)
+        registry = Path(tmpdir.name) / "claims.json"
+        first = f"{_dead_pid()}@host-a:/jobs/sess-1"
+        second = f"{os.getpid()}@host-a:/jobs/sess-1"
+        self.assertTrue(file_claims.claim("disasm/src/A.c", owner=first, registry=registry))
+        self.assertTrue(file_claims.claim("disasm/src/A.c", owner=second, registry=registry))
+        self.assertTrue(file_claims.touch("disasm/src/A.c", owner=second, registry=registry))
+        other = f"{os.getpid()}@host-a:/jobs/sess-2"
+        self.assertFalse(file_claims.claim("disasm/src/A.c", owner=other, registry=registry))
 
     def test_dead_pid_different_host_trusts_ttl(self) -> None:
         entry = {

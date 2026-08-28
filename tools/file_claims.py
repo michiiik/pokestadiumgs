@@ -202,27 +202,21 @@ def _pid_running(pid: int) -> bool:
 def is_live(entry: dict[str, object], *, now: float | None = None) -> bool:
     """Whether a claims-registry ``entry`` still holds.
 
-    Expired (past ``expires_at``) is never live. Otherwise, when the
-    owner's hostname matches this host, a pid that is no longer running
-    also means not live -- a crashed process leaks no claim past its own
-    check-in. A claim recorded on another host cannot be confirmed dead
-    locally, so it lives out its TTL; ``expire()`` (or the next
-    ``claim()``/``touch()`` cycle) eventually reclaims it. A malformed or
-    freeform owner (no ``pid@host:session`` shape, e.g. a test's
-    ``CLAIMS_OWNER``) has no pid to check either, so only the TTL applies.
+    Liveness is the TTL alone. The pid inside an owner string belongs to
+    whichever short-lived process happened to install -- every probe and
+    gate runs in a fresh interpreter -- so a "is that pid still running"
+    test answered "no" almost immediately and killed the claim on arrival:
+    50 recorded claims, 0 live, measured 2026-08-28 with a fleet actively
+    installing. A session holds a file by touching it (``claim`` and
+    ``touch`` both extend ``expires_at``); when it stops working that file,
+    the TTL reclaims it. ``_pid_running`` stays available for diagnostics.
     """
     if now is None:
         now = time.time()
     expires_at = entry.get("expires_at")
     if isinstance(expires_at, (int, float)) and now >= expires_at:
         return False
-    owner = entry.get("owner")
-    if not isinstance(owner, str):
-        return True
-    pid, host = _owner_pid_host(owner)
-    if pid is None or host != socket.gethostname():
-        return True
-    return _pid_running(pid)
+    return True
 
 
 # ---------------------------------------------------------------------------
@@ -337,9 +331,13 @@ def claim(
     with _registry_lock(reg_path):
         data = _load(reg_path)
         entry = data.get(key)
-        if entry is not None and is_live(entry, now=now) and entry.get("owner") != owner:
+        # Compare by session, not by full owner string: a session installs
+        # from a new pid on every batch, so pid-equality would make a session
+        # refuse (and then steal the claimed_at of) its own live claim.
+        held_by = str(entry.get("owner", "")) if entry is not None else ""
+        if entry is not None and is_live(entry, now=now) and not same_session(held_by, owner):
             return False
-        same_owner_live = entry is not None and entry.get("owner") == owner and is_live(entry, now=now)
+        same_owner_live = entry is not None and same_session(held_by, owner) and is_live(entry, now=now)
         claimed_at = entry.get("claimed_at") if same_owner_live else now
         data[key] = {
             "owner": owner,
@@ -367,8 +365,9 @@ def touch(
     with _registry_lock(reg_path):
         data = _load(reg_path)
         entry = data.get(key)
-        if entry is None or entry.get("owner") != owner:
+        if entry is None or not same_session(str(entry.get("owner", "")), owner):
             return False
+        entry["owner"] = owner
         entry["last_touch"] = now
         entry["expires_at"] = now + ttl_seconds
         data[key] = entry

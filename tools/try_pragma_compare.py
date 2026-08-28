@@ -2196,7 +2196,18 @@ def _claim_or_refuse(source_path: Path) -> str | None:
         _CLAIMED_SOURCE_PATHS.add(key)
         return None
     existing = file_claims.holder(source_path)
-    holder_owner = existing.get("owner") if existing else "unknown"
+    holder_owner = str(existing.get("owner")) if existing else "unknown"
+    # Refuse only when both sides carry a real session identity. A bare-$PPID
+    # tag (no CLAUDE_JOB_DIR) names a shell, not a session, so refusing on one
+    # would block a co-tenant tool that never sets the variable -- and any
+    # session whose next batch runs from a different shell -- from installing
+    # its own work. See file_claims.session_is_reliable.
+    if not (
+        file_claims.session_is_reliable(owner)
+        and file_claims.session_is_reliable(holder_owner)
+    ):
+        _CLAIMED_SOURCE_PATHS.add(key)
+        return None
     return f"{source_path} is claimed by {holder_owner}"
 
 
