@@ -167,7 +167,18 @@ void func_8F100D58(s32 arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/69/fragment69_code/func_8F10128C.s")
+extern Gfx *D_800D0510;
+extern u8 D_80094E38[];
+extern u8 D_8F1040A0[];
+extern s32 D_8F1DEE24;
+extern void Gfx_DrawTextureRgba16(s16, s16, s16, s16, u8 *, s16, s32);
+void func_8F10128C(void) {
+    u8 *texture;
+
+    texture = D_8F1040A0 + D_8F1DEE24 * 0xC80;
+    gSPDisplayList(D_800D0510++, D_80094E38);
+    Gfx_DrawTextureRgba16(0xA0, 0x1E, 0x28, 0x28, texture, 0x28, 0);
+}
 #endif
 
 #ifdef VERSION_US
