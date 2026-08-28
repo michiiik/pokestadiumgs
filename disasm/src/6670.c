@@ -4,7 +4,9 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6670/func_80005A70.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6670/func_80005B88.s")
+typedef struct { u8 pad0[2]; s16 x; s16 y; u8 pad6[0xC]; s16 angle; f32 magnitude; f32 x_norm; f32 y_norm; } InputState_6670;
+extern s16 MathUtil_Atan2s(f32, f32);
+void func_80005B88(InputState_6670 *state) { s16 x; s16 y; f32 x_norm; f32 y_norm; f32 magnitude; f32 old_magnitude; f32 scale; x = state->x; state->x_norm = 0.0f; state->y_norm = 0.0f; if (x < -7) { state->x_norm = (f32)(x + 6); } if (x >= 8) { state->x_norm = (f32)(x - 6); } y = state->y; if (y < -7) { state->y_norm = (f32)(y + 6); } if (y >= 8) { state->y_norm = (f32)(y - 6); } x_norm = state->x_norm; y_norm = state->y_norm; magnitude = sqrtf((x_norm * x_norm) + (y_norm * y_norm)); state->magnitude = magnitude; if (magnitude > 64.0f) { scale = 64.0f / state->magnitude; state->magnitude = 64.0f; state->x_norm = x_norm * scale; state->y_norm = y_norm * scale; } if (state->magnitude > 0.0f) { state->angle = MathUtil_Atan2s(-state->y_norm, state->x_norm); } }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6670/func_80005CA4.s")
 
