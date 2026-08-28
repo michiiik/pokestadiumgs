@@ -46,7 +46,30 @@ s32 func_8004B7A4(s32 arg0) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4C2E0/func_8004B7E0.s")
+typedef struct { f32 x, y, z; } FleetVec3f4C2E0;
+typedef struct { s16 x, y, z; } FleetVec3s4C2E0;
+extern FleetVec3f4C2E0 D_800948D0;
+extern u8 D_801270BC[];
+extern FleetVec3f4C2E0 *Vec3f_FromVec3s(FleetVec3f4C2E0 *, FleetVec3s4C2E0 *);
+extern FleetVec3s4C2E0 *Vec3s_FromVec3f(FleetVec3s4C2E0 *, FleetVec3f4C2E0 *);
+extern s32 func_8004B754(s32 a);
+s32 func_8004B7E0(s32 arg0, FleetVec3f4C2E0 *arg1) {
+    s32 result = 0;
+    s32 value;
+    u32 packed;
+    FleetVec3s4C2E0 vec;
+    value = func_8004B754(arg0);
+    *arg1 = D_800948D0;
+    if (value >= 0) {
+        packed = *(u32 *)((u8 *)D_801270BC + (value * 16));
+        vec.x = (s16)(packed >> 16) >> 6;
+        vec.y = (s16)(packed >> 6) >> 4;
+        vec.z = (s16)(packed << 6) >> 6;
+        Vec3f_FromVec3s(arg1, &vec);
+        result = 1;
+    }
+    return result;
+}
 
 f32 func_8004B888(s32 arg0) {
     f32 result = 1.0f;
@@ -160,7 +183,17 @@ s32 func_8004BC6C(s32 arg0, s32 arg1) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4C2E0/func_8004BCBC.s")
+extern s32 func_8004B754(s32 a);
+void func_8004BCBC(s32 arg0, s32 arg1) {
+    s32 value = func_8004B754(arg0);
+    struct { FleetVec3s4C2E0 vec; s16 pad[3]; } storage;
+    if (value >= 0) {
+        Vec3s_FromVec3f(&storage.vec, (FleetVec3f4C2E0 *)(u32)arg1);
+        *((s32 *)(D_801270BC + (value << 4))) =
+            ((((unsigned short)(storage.vec.x ^ 0)) << 22) |
+             ((storage.vec.y & 0xFFF) << 10)) | (storage.vec.z & 0x3FF);
+    }
+}
 
 void func_8004BD28(s32 arg0, f32 arg1) {
     s32 value = func_8004B754(arg0);
