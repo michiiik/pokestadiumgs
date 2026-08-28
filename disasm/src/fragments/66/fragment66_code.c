@@ -62,7 +62,36 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/66/fragment66_code/func_82E02828.s")
+extern s32 StageContext_GetFadeMode(void);
+extern void StageFade_StartFromTransparent(s32);
+extern void func_82E030B0(void);
+extern void func_800225C4(s32);
+extern s32 D_82E05440;
+
+s32 func_82E02828(s32 arg0) {
+    s32 state = arg0;
+    switch (arg0) {
+    case 0:
+        if (StageContext_GetFadeMode() == 0) {
+            state = 1;
+        }
+        break;
+    case 1:
+        func_82E030B0();
+        if (D_82E05440 != 0) {
+            state = 2;
+            StageFade_StartFromTransparent(5);
+            func_800225C4(0xA);
+        }
+        break;
+    case 2:
+        if (StageContext_GetFadeMode() == 1) {
+            state = 3;
+        }
+        break;
+    }
+    return state;
+}
 #endif
 
 #ifdef VERSION_US
