@@ -23,7 +23,25 @@ s32 func_87E05400(u32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E05944.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E059F4.s")
+extern Gfx *D_800D0510;
+extern void *D_8009491C;
+extern void func_8003CD84(void *);
+void func_87E059F4(s32 arg0, s32 arg1) {
+    u8 *context;
+    void *temp_v0;
+    void *temp_a0;
+    if (arg0 == 5) {
+        context = (u8 *)D_8009491C;
+        temp_v0 = *(void **)(context + 0x14);
+        temp_a0 = *(void **)((u8 *)temp_v0 + 0x20);
+        gDPPipeSync(D_800D0510++);
+        gDPSetCombine(D_800D0510++, 0xFFFFFF, 0xFFFCF238);
+        gSPSegment(D_800D0510++, 0xF,
+                   *(void **)((u8 *)(*(void **)((u8 *)temp_a0 + 4)) + 8));
+        gSPDisplayList(D_800D0510++, *(void **)temp_a0);
+        func_8003CD84(temp_a0);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E05AB0.s")
 
@@ -147,7 +165,28 @@ void func_87E079FC(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E07A2C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E07AC4.s")
+extern void func_87E06290(u8 *);
+extern s32 func_87E07A2C(u8 *);
+extern u32 func_8003570C(void);
+void func_87E07AC4(u8 *arg0, s32 arg1) {
+    *(s32 *)(arg0 + 0) = 0;
+    *(s32 *)(arg0 + 8) = (s32)*(s8 *)((u8 *)*(void **)(arg0 + 0x170) + 0x2183);
+    *(s32 *)(arg0 + 4) = 0;
+    *(s32 *)(arg0 + 0x188) = 0;
+    *(s32 *)(arg0 + 0x17C) = 0;
+    *(s32 *)(arg0 + 0x180) = 0;
+    *(s32 *)(arg0 + 0x184) = (func_8003570C() % 13U) + 6;
+    *(s32 *)(arg0 + 0x178) = arg1;
+    *(s32 *)(arg0 + 0xC) = func_87E07A2C(arg0);
+    if (*(u8 *)((u8 *)*(void **)(arg0 + 0x170) + 0x2180) == 0) {
+        *(s32 *)(arg0 + 0x174) = 1;
+    } else if (*(s8 *)((u8 *)*(void **)(arg0 + 0x170) + 0x218F) == 0) {
+        *(s32 *)(arg0 + 0x174) = 0;
+    } else {
+        *(s32 *)(arg0 + 0x174) = 1;
+    }
+    func_87E06290(arg0);
+}
 
 extern void func_87F02684(s32);
 extern void func_87E01628(void);
