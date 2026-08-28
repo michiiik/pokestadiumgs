@@ -174,7 +174,19 @@ void func_82C02328(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C026D4.s")
+extern s32 func_82C02664(u8 *, u8);
+s32 func_82C026D4(s32 arg0) {
+    s32 i;
+    s32 count;
+
+    count = 0;
+    for (i = 1; i != 0xFC; i++) {
+        if (func_82C02664((u8 *) arg0, i) != 0) {
+            count++;
+        }
+    }
+    return count & 0xFFFF;
+}
 #endif
 
 #ifdef VERSION_US
