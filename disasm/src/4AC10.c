@@ -10,9 +10,31 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4AC10/func_8004A44C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4AC10/func_8004A5B8.s")
+extern Gfx *D_800D0510;
+extern s32 StageContext_IsHighResolution(void);
+extern u8 D_80094DE0[];
+void func_8004A5B8(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u16 arg4) {
+    gSPDisplayList(D_800D0510++, D_80094DE0);
+    gDPSetFillColor(D_800D0510++, (arg4 << 16) | arg4);
+    if (StageContext_IsHighResolution() != 0) {
+        gDPFillRectangle(D_800D0510++, arg0 + 7, arg1 + 7, arg0 + arg2 - 8, arg1 + arg3 - 8);
+    } else {
+        gDPFillRectangle(D_800D0510++, arg0 + 3, arg1 + 3, arg0 + arg2 - 4, arg1 + arg3 - 4);
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4AC10/func_8004A708.s")
+extern Gfx *D_800D0510;
+extern s32 StageContext_IsHighResolution(void);
+extern u8 D_80094DE0[];
+void func_8004A708(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u16 arg4) {
+    gSPDisplayList(D_800D0510++, D_80094DE0);
+    gDPSetFillColor(D_800D0510++, (arg4 << 16) | arg4);
+    if (StageContext_IsHighResolution() != 0) {
+        gDPFillRectangle(D_800D0510++, arg0 + 5, arg1 + 5, arg0 + arg2 - 6, arg1 + arg3 - 6);
+    } else {
+        gDPFillRectangle(D_800D0510++, arg0 + 3, arg1 + 3, arg0 + arg2 - 4, arg1 + arg3 - 4);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4AC10/func_8004A858.s")
 
