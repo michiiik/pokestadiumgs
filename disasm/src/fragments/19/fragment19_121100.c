@@ -98,7 +98,24 @@ s32 func_82301428(void) {
     return D_82305E6E;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82301434.s")
+extern u16 D_82305E72;
+s32 func_82301434(s32 arg0, u8 *arg1) {
+    switch (arg0) {
+    case 0:
+        arg1[0x28] = 0x11;
+        break;
+    case 1:
+        if (D_82305E72 & 2) {
+            *(u16 *)(arg1 + 2) |= 2;
+        } else {
+            *(u16 *)(arg1 + 2) &= 0xFFFD;
+        }
+        break;
+    default:
+        break;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82301494.s")
 
@@ -112,7 +129,29 @@ s32 func_82301428(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82301814.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82301964.s")
+extern s16 D_82305E6A;
+extern f32 D_82305EE0;
+extern u8 D_82305A7A[];
+s32 func_82301964(s32 arg0, u8 *arg1) {
+    s16 index;
+    index = D_82305E6A;
+    switch (arg0) {
+    case 0:
+        arg1[0x28] = 0x11;
+        break;
+    case 1:
+        if (D_82305EE0 < 1.0f) {
+            *(u16 *)(arg1 + 2) &= 0xFFFD;
+            break;
+        }
+        *(u16 *)(arg1 + 2) |= 2;
+        *(s16 *)(arg1 + 0x26) = *(s16 *)(D_82305A7A + index * 36);
+        break;
+    default:
+        break;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_823019F4.s")
 
