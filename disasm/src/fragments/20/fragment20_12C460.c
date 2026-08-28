@@ -231,13 +231,41 @@ s32 func_8260D3F4(s32 arg0, s32 arg1, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260E03C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260E140.s")
+extern s16 D_8261A4AE;
+extern void func_8004B010(s32, s16);
+void func_8260E140(u8 *arg0, s32 arg1) {
+    s16 x;
+    s16 y;
+
+    x = *(s16 *)(arg0 + 0x14) + *(s16 *)(arg0 + 0x10);
+    y = *(s16 *)(arg0 + 0x16) + *(s16 *)(arg0 + 0x12);
+    func_8004B010((s32)(s16)(x + 0x3C), (s16)(y + (D_8261A4AE * 0x1F) + 0xBC));
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260E1B4.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260E2C4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260E398.s")
+extern u8 D_82615744[];
+extern void func_800498C4(void);
+extern void func_800496A4(s32, s32);
+extern void func_8004972C(s32, s32, s32, s32);
+extern s32 func_8004C874(s32, s32);
+extern void func_800495F8(s32, s32, s32, s32);
+extern void func_800499EC(void);
+void func_8260E398(u8 *arg0, s32 arg1)
+{
+  s16 x;
+  s16 y;
+  s32 i;
+  s32 xbase;
+  s32 ybase;
+  s32 index;
+  s32 color;
+  x = (*((s16 *) (arg0 + 0x14))) + (*((s16 *) (arg0 + 0x10)));
+ do { y = (*((s16 *) (arg0 + 0x16))) + (*((s16 *) (arg0 + 0x12))); func_800498C4(); func_800496A4(8, 0); ybase = y + 0x9E; i = 0; xbase = x + 0x4B; do { index = ((*((s16 *) (arg0 + 2))) * 4) + i; func_8004972C(D_82615744[index * 3], D_82615744[(index * 3) + 1], D_82615744[(index * 3) + 2], 0xFF); color = func_8004C874(0x12, index); func_800495F8(xbase, ybase, 1, color); i += 1; xbase += 0x87; } while (i != 4); } while (0);
+  func_800499EC();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260E4A8.s")
 
@@ -425,7 +453,32 @@ void func_82613AC4(void *arg0) {
     } while (var_s1 != 0x33E0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82613B48.s")
+extern void func_82608EC4(u8 *, s32);
+void func_82613B48(void *arg0) {
+    s32 temp_a1;
+    s32 var_s2;
+    s16 temp_v0;
+    s32 var_s1;
+    u8 *temp_a0;
+    u8 *var_s0;
+
+    var_s2 = 1;
+    var_s0 = arg0;
+    var_s1 = 0;
+    do {
+        temp_v0 = *(s16 *)(var_s0 + 0x114);
+        temp_a0 = var_s0 + 0x114;
+        if ((temp_v0 == 2) || (temp_v0 == 3)) {
+            temp_a1 = var_s2;
+            if (*(s16 *)(temp_a0 + 6) != 0) {
+                var_s2 = 0;
+                func_82608EC4(temp_a0, temp_a1);
+            }
+        }
+        var_s1 += 0x298;
+        var_s0 += 0x298;
+    } while (var_s1 != 0x33E0);
+}
 
 void func_82613BE0(void *arg0) {
     s32 temp_a1;
