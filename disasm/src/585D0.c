@@ -904,7 +904,26 @@ u8 func_8005DF98(s32 i) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005DFD4.s")
+extern u8 D_80128570[];
+extern void func_8005F9CC(s32, s32);
+extern void func_8005F9F4(s32, s32);
+void func_8005DFD4(s32 arg0, u8 arg1)
+{
+  u8 *rec = D_80128570 + (arg0 * 112);
+  if ((*((u32 *) rec)) & 2)
+  {
+    s32 t0 = *((s32 *) (rec + 0x68));
+    *((u8 *) ((*((s32 *) (rec + 0x68))) + 0x5E4)) = arg1;
+    if (arg1 == 0)
+    {
+      func_8005F9CC(arg0, 0x711);
+    }
+    else
+    {
+      func_8005F9F4(arg0, 0x711);
+    }
+  }
+}
 #endif
 
 #ifdef VERSION_US
