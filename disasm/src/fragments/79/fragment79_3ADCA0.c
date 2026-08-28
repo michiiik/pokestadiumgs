@@ -367,9 +367,9 @@ void func_84140270(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-extern void func_84140270();
-extern void func_841402FC();
-extern void func_84140474();
+extern void func_84140270(void *);
+extern void func_841402FC(void *);
+extern void func_84140474(void *);
 void func_84140690(void *arg0) {
     s32 temp_v0;
 
@@ -380,10 +380,10 @@ void func_84140690(void *arg0) {
             func_84140270(arg0);
             return;
         case 1:
-            func_841402FC();
+            func_841402FC(arg0);
             return;
         case 2:
-            func_84140474();
+            func_84140474(arg0);
             break;
         }
     }
@@ -1087,11 +1087,47 @@ void func_84147228(u8 arg0, u8 arg1, u8 arg2, u8 arg3, s32 arg4) { func_841470C4
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84147968.s")
+extern u8 D_84186F34;
+void func_84147968(void *arg0, s16 arg1) {
+    s32 var_v0;
+
+    if (arg1 > 0) {
+        var_v0 = D_84186F34 - *(u8 *)((u8 *)arg0 + 9);
+    } else {
+        var_v0 = *(u8 *)((u8 *)arg0 + 9) - 1;
+    }
+    *(s16 *)((u8 *)arg0 + 0xA) = (s16) ((var_v0 * 0xC5) / 6 - 0x25);
+    *(s16 *)((u8 *)arg0 + 0xC) = 0;
+    *(s16 *)((u8 *)arg0 + 0xE) = (s16) (0x140 - (*(s16 *)((u8 *)arg0 + 0xA) << 1));
+    *(s16 *)((u8 *)arg0 + 0x10) = 0xF0;
+    *(u8 *)((u8 *)arg0 + 0x22) = 0;
+    *(u8 *)((u8 *)arg0 + 0x23) = 0;
+    *(u8 *)((u8 *)arg0 + 0x24) = 0;
+    *(u8 *)((u8 *)arg0 + 0x25) = 0xFF;
+    *(u8 *)((u8 *)arg0 + 8) = *(u8 *)((u8 *)arg0 + 8) & 0xFFFC;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84147A04.s")
+extern u8 D_84186F34;
+void func_84147A04(void *arg0, s16 arg1) {
+    s32 var_v0;
+
+    if (arg1 > 0) {
+        var_v0 = D_84186F34 - *(u8 *)((u8 *)arg0 + 9);
+    } else {
+        var_v0 = *(u8 *)((u8 *)arg0 + 9) - 1;
+    }
+    *(s16 *)((u8 *)arg0 + 0xC) = (s16) ((var_v0 * 0xB8) / 6 - 0x1E);
+    *(s16 *)((u8 *)arg0 + 0xA) = 0;
+    *(s16 *)((u8 *)arg0 + 0xE) = 0x140;
+    *(s16 *)((u8 *)arg0 + 0x10) = (s16) (0xF0 - (*(s16 *)((u8 *)arg0 + 0xC) << 1));
+    *(u8 *)((u8 *)arg0 + 0x22) = 0;
+    *(u8 *)((u8 *)arg0 + 0x23) = 0;
+    *(u8 *)((u8 *)arg0 + 0x24) = 0;
+    *(u8 *)((u8 *)arg0 + 0x25) = 0xFF;
+    *(u8 *)((u8 *)arg0 + 8) = *(u8 *)((u8 *)arg0 + 8) & 0xFFFC;
+}
 #endif
 
 #ifdef VERSION_US
