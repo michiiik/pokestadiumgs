@@ -3752,7 +3752,13 @@ void func_8003CA30(Gfx* arg0, S1_arg1_func_81407874_014_000_010* arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003CBD4.s")
+extern s32 D_801261A8;
+void func_8003CBD4(void) {
+    if (D_801261A8 == 0) {
+        D_801261A8 = 1;
+        gDPPipeSync(D_800D0510++);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -4813,7 +4819,13 @@ void geo_layout_cmd_create_anchor(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80040D9C.s")
+void func_80040D9C(void) {
+    s32 *node = (s32 *)D_80126498[D_80126518];
+    if (node != NULL) {
+        *((u8 *)node + 2) |= 4;
+    }
+    D_80126520 += 4;
+}
 #endif
 
 #ifdef VERSION_US
