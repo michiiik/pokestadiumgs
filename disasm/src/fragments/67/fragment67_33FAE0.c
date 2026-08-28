@@ -352,7 +352,33 @@ s32 Intro_StepRotationOvershoot(S1_unk_D_86002F58_004_000* arg0, s16 arg1, s16 a
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33FAE0/func_829045E4.s")
+s32 func_829045E4(void *arg0, s16 arg1, s16 arg2) {
+    s16 current;
+    s16 after;
+    s32 delta;
+    s32 quotient;
+    current = *(s16 *)((u8 *)arg0 + 0x20);
+    delta = current - arg2;
+    quotient = delta / 182;
+    if ((quotient >= -0x168) && (quotient < -0x149)) {
+        arg1 = (s16)((s16)(delta + 0x10000) / 4);
+    }
+    *(s16 *)((u8 *)arg0 + 0x20) = current - arg1;
+    if (arg1 > 0) {
+        after = *(s16 *)((u8 *)arg0 + 0x20);
+        if ((arg2 >= after) && (after >= (arg2 - arg1))) {
+            *(s16 *)((u8 *)arg0 + 0x20) = arg2;
+            return 1;
+        }
+    } else {
+        after = *(s16 *)((u8 *)arg0 + 0x20);
+        if ((after >= arg2) && ((arg2 - arg1) >= after)) {
+            *(s16 *)((u8 *)arg0 + 0x20) = arg2;
+            return 1;
+        }
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
