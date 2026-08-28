@@ -9,15 +9,21 @@ void ParticleGfx_SetPrimColor_fragment83(u8 r, u8 g, u8 b, u8 a) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C00078.s")
+void func_82C00078(u8 *arg0, u8 arg1) {
+    ParticleGfx_SetPrimColor_fragment83(arg0[0], arg0[1], arg0[2], arg1);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C000B0.s")
+void func_82C000B0(u16 arg0, u16 arg1, u16 arg2, u16 arg3) {
+    gDPPipeSync(D_800D0510++);
+    gDPSetFillColor(D_800D0510++, (((((arg0 << 8) & 0xF800) | ((arg1 << 3) & 0x7C0) | ((arg2 >> 2) & 0x3E) | (arg3 & 1)) << 16) |
+        (((arg0 << 8) & 0xF800) | ((arg1 << 3) & 0x7C0) | ((arg2 >> 2) & 0x3E) | (arg3 & 1))));
+}
 #endif
 
 #ifdef VERSION_US
-extern void func_82C000B0(s32, s32, s32, s32);
+extern void func_82C000B0(u16, u16, u16, u16);
 void func_82C0012C(s32 arg0) {
     if (arg0 != 0) {
         u8 *value = (u8 *)(u32)arg0;
