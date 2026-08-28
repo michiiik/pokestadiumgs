@@ -350,7 +350,29 @@ void func_8AC01F20(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC02C80.s")
+extern void _bzero(void *, s32);
+extern s32 func_8AC06D8C(s32, s32);
+extern void func_8004E308(s32, s32 *, s32 *);
+extern u8 func_8AC02A34;
+extern u8 func_8AC02DA0;
+extern u8 func_8AC030EC;
+extern s32 func_8AC02998(s32, void *);
+extern s32 func_8AC02D04(s32, void *);
+extern s32 func_8AC03050(s32, void *);
+extern u8 D_8AC099BC;
+extern s32 func_8004C990(s32, s32);
+extern void func_800504BC(s16 *);
+void func_8AC02C80(s32 arg0, s32 arg1, s32 arg2, void *arg3) {
+    s32 v0;
+
+    _bzero(arg3, 0x2C);
+    v0 = func_8AC06D8C(arg0, arg1);
+    (*(s32 *)((u8 *)(arg3) + (0))) = v0;
+    v0 = func_8AC06D8C(arg0, arg2);
+    (*(s32 *)((u8 *)(arg3) + (4))) = v0;
+    func_8004E308((*(s32 *)((u8 *)(arg3) + (0))), (s32 *) func_8AC02998, (s32 *) arg3);
+    func_8004E308((*(s32 *)((u8 *)(arg3) + (4))), (s32 *) &func_8AC02A34, (s32 *) arg3);
+}
 #endif
 
 #ifdef VERSION_US
@@ -362,7 +384,17 @@ void func_8AC01F20(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC02FCC.s")
+void func_8AC02FCC(s32 arg0, s32 arg1, s32 arg2, void *arg3) {
+    s32 v0;
+
+    _bzero(arg3, 0x2C);
+    v0 = func_8AC06D8C(arg0, arg1);
+    (*(s32 *)((u8 *)(arg3) + (0))) = v0;
+    v0 = func_8AC06D8C(arg0, arg2);
+    (*(s32 *)((u8 *)(arg3) + (4))) = v0;
+    func_8004E308((*(s32 *)((u8 *)(arg3) + (0))), (s32 *) func_8AC02D04, (s32 *) arg3);
+    func_8004E308((*(s32 *)((u8 *)(arg3) + (4))), (s32 *) &func_8AC02DA0, (s32 *) arg3);
+}
 #endif
 
 #ifdef VERSION_US
@@ -374,7 +406,17 @@ void func_8AC01F20(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC03334.s")
+void func_8AC03334(s32 arg0, s32 arg1, s32 arg2, void *arg3) {
+    s32 v0;
+
+    _bzero(arg3, 0x2C);
+    v0 = func_8AC06D8C(arg0, arg1);
+    (*(s32 *)((u8 *)(arg3) + (0))) = v0;
+    v0 = func_8AC06D8C(arg0, arg2);
+    (*(s32 *)((u8 *)(arg3) + (4))) = v0;
+    func_8004E308((*(s32 *)((u8 *)(arg3) + (0))), (s32 *) func_8AC03050, (s32 *) arg3);
+    func_8004E308((*(s32 *)((u8 *)(arg3) + (4))), (s32 *) &func_8AC030EC, (s32 *) arg3);
+}
 #endif
 
 #ifdef VERSION_US
