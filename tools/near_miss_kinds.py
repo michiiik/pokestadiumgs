@@ -70,6 +70,25 @@ def resolve_stats_path() -> Path:
     return new_path
 
 
+def resolve_stats_paths(stats_path: Path | None = None) -> list[Path]:
+    """Every probe-stats file ``tag-ties`` should read, rotated siblings included.
+
+    ``resolve_stats_path`` (singular, above) picks exactly one of the new or
+    legacy default file and is what ``report``/``list``/``run`` have always
+    used; it does not expand a rotated ``<stem>.<N><suffix>`` sibling, so a
+    file that rotated at the 64 MiB boundary silently loses its older half.
+    ``tag-ties`` needs the full history to count total attempts correctly,
+    so this mirrors ``tools/variant_policy.py: default_stats_paths()``
+    instead: an explicit ``stats_path`` (``--stats``) is expanded for its own
+    rotated siblings only (``probe_stats.resolve_paths``, matching a caller
+    that wants exactly one file's history); the default reads the active
+    file plus the legacy file, each with their own rotated siblings.
+    """
+    if stats_path is not None:
+        return sweep.probe_stats.resolve_paths([stats_path])
+    return list(sweep.variant_policy.default_stats_paths())
+
+
 def _stats_records(path: Path) -> list[dict[str, object]]:
     """Parse a probe-stats JSONL file into its batch records."""
     if not path.exists():
@@ -176,6 +195,135 @@ def select_pool(
     for kind_name, entries in grouped.items():
         entries.sort(key=lambda e: (-float(e["similarity_score"]), str(e["function"])))
     return dict(grouped)
+
+
+# ---------------------------------------------------------------------------
+# tag-ties: register-allocation ties routed to the permuter, not another
+# hand-decompilation batch (issue 7/7, AGENTS.md #2.5 "When a sweep is still
+# worth running")
+# ---------------------------------------------------------------------------
+
+TIE_KIND_DEFAULT = "register_allocation_only"
+TIE_MIN_ATTEMPTS_DEFAULT = 6
+TIE_MIN_SIMILARITY_DEFAULT = 0.99
+
+
+def compute_tie_pool(
+    stats_rows,
+    *,
+    min_attempts: int = TIE_MIN_ATTEMPTS_DEFAULT,
+    min_similarity: float = TIE_MIN_SIMILARITY_DEFAULT,
+    kind: str = TIE_KIND_DEFAULT,
+) -> list[dict[str, object]]:
+    """Owners stuck on a register-allocation tie after repeated hand attempts.
+
+    ``stats_rows`` is the parsed probe-stats batch list (as from
+    ``_stats_records``/``resolve_stats_paths`` + ``probe_stats.iter_batches``).
+    For every function this tallies *every* recorded attempt (not just the
+    best one -- ``select_pool`` already answers "what's the best candidate",
+    this answers "how many hand variants were burned on it") and tracks the
+    single highest-``similarity_score`` attempt, preferring an ``accepted``
+    attempt on an exact tie.  A function is a "tie" when:
+
+    * its best attempt's ``mismatch_kind`` is ``kind`` (default
+      ``register_allocation_only``);
+    * its best attempt's ``similarity_score`` is at least ``min_similarity``
+      (default 0.99 -- the near-1.0 register-choice-only signature);
+    * it was not already solved (the best attempt is not ``accepted``); and
+    * it has at least ``min_attempts`` attempts recorded in total, across
+      every label/batch (default 6 -- roughly the "one hand batch" AGENTS.md
+      §2.5 describes before a function should move to the permuter).
+
+    Each returned dict carries ``function``, ``source``, ``attempts`` (the
+    total count), ``similarity_score``/``exact_similarity_score`` (best
+    attempt's normalized and raw scores -- a tie is exactly the case where
+    these two diverge: near-1.0 normalized, lower raw, because only register
+    choice differs), ``label`` (the best attempt's), ``last_seen`` (the
+    latest batch timestamp carrying an attempt for this function, or
+    ``None`` if no batch had one), and ``permuted`` (``True`` if any
+    recorded label for this function starts with ``permute`` -- i.e. the
+    near-miss permuter has already run on it, so ``tag-ties`` output after an
+    overnight run shows conversions and re-tries alike). Sorted by attempts
+    descending, then similarity descending, then function name -- the
+    most-hand-hammered owners first.
+
+    Pure: no filesystem or pragma-database access, so it is unit-testable
+    against a synthetic stats fixture alone.
+    """
+    by_function: dict[str, dict[str, object]] = {}
+    for record in stats_rows:
+        if not isinstance(record, dict):
+            continue
+        source = record.get("source")
+        timestamp = record.get("timestamp")
+        attempts = record.get("attempts")
+        if not isinstance(attempts, list):
+            continue
+        for attempt in attempts:
+            if not isinstance(attempt, dict):
+                continue
+            function = attempt.get("function")
+            if not isinstance(function, str) or not function:
+                continue
+            entry = by_function.setdefault(function, {
+                "function": function,
+                "source": source,
+                "attempts": 0,
+                "similarity_score": None,
+                "exact_similarity_score": None,
+                "label": None,
+                "mismatch_kind": None,
+                "best_status": None,
+                "last_seen": None,
+                "permuted": False,
+            })
+            entry["attempts"] = int(entry["attempts"]) + 1
+            if source and not entry.get("source"):
+                entry["source"] = source
+            label = str(attempt.get("label") or "")
+            if label.startswith("permute"):
+                entry["permuted"] = True
+            if isinstance(timestamp, str):
+                if entry["last_seen"] is None or timestamp > str(entry["last_seen"]):
+                    entry["last_seen"] = timestamp
+            score = attempt.get("similarity_score")
+            if not isinstance(score, (int, float)):
+                continue
+            status = str(attempt.get("status") or "")
+            current_score = entry["similarity_score"]
+            replace = current_score is None or float(score) > float(current_score)
+            if not replace and float(score) == float(current_score):
+                replace = status == "accepted" and entry.get("best_status") != "accepted"
+            if replace:
+                entry.update({
+                    "similarity_score": float(score),
+                    "exact_similarity_score": attempt.get("exact_similarity_score"),
+                    "label": label,
+                    "mismatch_kind": attempt.get("mismatch_kind"),
+                    "best_status": status,
+                })
+
+    rows: list[dict[str, object]] = []
+    for entry in by_function.values():
+        if entry.get("best_status") == "accepted":
+            continue
+        if entry.get("mismatch_kind") != kind:
+            continue
+        score = entry.get("similarity_score")
+        if not isinstance(score, (int, float)) or float(score) < min_similarity:
+            continue
+        if int(entry["attempts"]) < min_attempts:
+            continue
+        rows.append(entry)
+
+    rows.sort(
+        key=lambda e: (
+            -int(e["attempts"]),
+            -float(e["similarity_score"] or 0.0),
+            str(e["function"]),
+        )
+    )
+    return rows
 
 
 # ---------------------------------------------------------------------------
@@ -1162,7 +1310,51 @@ def main() -> int:
     run_cmd.add_argument("--permute-seconds", type=float, default=0.0)
     run_cmd.add_argument("--json", type=Path)
 
+    tag_ties_cmd = commands.add_parser(
+        "tag-ties",
+        help="list owners stuck on a register-allocation tie after repeated hand attempts "
+             "-- route these to the permuter (--near-miss --tie-pool), not another agent batch",
+    )
+    tag_ties_cmd.add_argument("--stats", type=Path, help="probe-stats.jsonl (default: resolve_stats_paths(), rotated siblings included)")
+    tag_ties_cmd.add_argument("--min-attempts", type=int, default=TIE_MIN_ATTEMPTS_DEFAULT)
+    tag_ties_cmd.add_argument("--min-similarity", type=float, default=TIE_MIN_SIMILARITY_DEFAULT)
+    tag_ties_cmd.add_argument("--kind", default=TIE_KIND_DEFAULT, help=f"mismatch kind that counts as a tie (default {TIE_KIND_DEFAULT})")
+    tag_ties_cmd.add_argument("--json", action="store_true", help="print the full row list as JSON instead of a table")
+    tag_ties_cmd.add_argument("--names", action="store_true", help="print only function names, one per line (feeds --targets-file)")
+
     args = parser.parse_args()
+
+    if args.command == "tag-ties":
+        tie_stats_paths = resolve_stats_paths(args.stats)
+        tie_rows = list(sweep.probe_stats.iter_batches(tie_stats_paths))
+        pool = compute_tie_pool(
+            tie_rows, min_attempts=args.min_attempts, min_similarity=args.min_similarity, kind=args.kind,
+        )
+        if args.names:
+            for entry in pool:
+                print(entry["function"])
+            return 0
+        if args.json:
+            print(json.dumps(pool, indent=2))
+            return 0
+        header = (
+            f"{'function':<20} {'source':<24} {'attempts':>8} {'similarity':>10} "
+            f"{'raw_sim':>8} {'permuted':>9}  {'last_seen':<20} label"
+        )
+        print(header)
+        for entry in pool:
+            similarity = entry.get("similarity_score")
+            raw = entry.get("exact_similarity_score")
+            print(
+                f"{str(entry.get('function')):<20} {str(entry.get('source')):<24} "
+                f"{int(entry.get('attempts', 0)):>8} "
+                f"{(f'{float(similarity):.4f}' if isinstance(similarity, (int, float)) else '-'):>10} "
+                f"{(f'{float(raw):.4f}' if isinstance(raw, (int, float)) else '-'):>8} "
+                f"{str(bool(entry.get('permuted'))):>9}  "
+                f"{str(entry.get('last_seen') or '-'):<20} {entry.get('label')}"
+            )
+        return 0
+
     stats_path = args.stats if args.stats is not None else resolve_stats_path()
     rows = _stats_records(stats_path)
 

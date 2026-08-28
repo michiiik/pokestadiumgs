@@ -16,6 +16,8 @@ Usage:
     tools/sweep_targets.py --skip-attempted --max-instructions 16
     tools/sweep_targets.py --near-miss --near-miss-parallel 4
     tools/sweep_targets.py --near-miss --near-miss-labels m2c:,manual: --near-miss-retry
+    tools/sweep_targets.py --near-miss --tie-pool --near-miss-parallel 4 --near-miss-kind-seconds 300
+    tools/sweep_targets.py --near-miss --targets-file ties.txt --near-miss-parallel 4
     tools/sweep_targets.py --exclude-family multi_call_wrapper --min-family-remaining 5
     tools/sweep_targets.py --large --large-seconds 240
 
@@ -41,6 +43,20 @@ already accepted it) before spending a permuter budget on it.  The default
 time than a real semantic gap; ``--near-miss-kind-seconds`` (default 120,
 versus the plain ``--near-miss-seconds`` default of 45) gives only those two
 mismatch kinds that longer budget.
+
+``--targets-file PATH`` (one function name per line; ``#``-comments and blank
+lines ignored) restricts ``--near-miss`` to exactly that owner list, e.g. the
+hand-attempted register-allocation ties routed here instead of to another
+agent batch (see ``docs/REGISTER_TIES.md``).  ``--tie-pool`` is a shorthand
+that computes the same list internally by calling
+``near_miss_kinds.compute_tie_pool`` over the same ``--stats`` file (its own
+``--tie-pool-min-attempts``/``--tie-pool-min-similarity``, default 6 and
+0.99, mirror ``near_miss_kinds.py tag-ties``'s defaults) instead of reading a
+file; the two are mutually exclusive.  ``--skip-attempted`` has **no effect**
+on ``--near-miss`` (with or without ``--targets-file``/``--tie-pool``): it
+only gates the plain small-function ``sweep()`` path below, and a register
+tie is deliberately sent to the permuter *because* it was already attempted
+by hand -- skipping it here would defeat the point.
 
 ``--exclude-family`` (repeatable) drops one or more families from a sweep
 entirely; ``--min-family-remaining`` drops any family whose remaining-owner
@@ -1084,6 +1100,23 @@ def previously_attempted_labels(
     return attempted
 
 
+def load_targets_file(path: Path) -> set[str]:
+    """Parse a ``--targets-file``: one function name per line.
+
+    Blank lines and ``#``-comment lines (leading ``#``, whitespace-stripped)
+    are ignored; a trailing inline comment is not stripped, so keep the file
+    to one bare function name per line.  Pure and file-format-only -- no stats
+    or pragma lookups here, so it is unit-testable without a real checkout.
+    """
+    names: set[str] = set()
+    for line in path.read_text(encoding="utf-8").splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        names.add(stripped)
+    return names
+
+
 def parse_fragment_range(value: str) -> tuple[int, int]:
     """Parse the inclusive ``START-END`` fragment selector used by sweeps."""
     match = re.fullmatch(r"(\d+)-(\d+)", value.strip())
@@ -1176,6 +1209,7 @@ def near_miss(
     label_prefixes: tuple[str, ...] | None = None,
     skip_permuted: bool = True,
     parallel: int = 2,
+    target_functions: set[str] | None = None,
 ) -> dict[str, object]:
     """Permute high-scoring rejects, then gate only score-0 outputs.
 
@@ -1187,6 +1221,10 @@ def near_miss(
     2) runs that many ``decomp-permuter`` budgets concurrently; gating a
     score-0 output still happens on the main thread as each permute job
     completes, since it holds the runner's cross-process transaction lock.
+    ``target_functions``, when given (``--targets-file``/``--tie-pool`` on
+    the CLI), restricts the pool to exactly those function names -- applied
+    before ``skip_permuted``, so a targeted owner that was already permuted
+    is still reported in ``skipped_permuted`` rather than silently vanishing.
 
     A candidate whose owner no longer holds a ``GLOBAL_ASM`` pragma (a later
     full-gate acceptance from a different run solved it since these stats
@@ -1269,6 +1307,8 @@ def near_miss(
         row for row in grouped.values()
         if str(row.get("best_status")) != "accepted"
     ]
+    if target_functions is not None:
+        candidates = [row for row in candidates if str(row["function"]) in target_functions]
     skipped_permuted = 0
     if skip_permuted:
         before = len(candidates)
@@ -1304,6 +1344,7 @@ def near_miss(
         "attempts": result["attempts"],
         "skipped_permuted": skipped_permuted,
         "skipped_solved": skipped_solved,
+        "target_pool": len(target_functions) if target_functions is not None else None,
     }
 
 
@@ -2105,6 +2146,31 @@ def main() -> int:
     parser.add_argument("--near-miss-labels", type=str, help="comma-separated label prefixes to consider (default: any)")
     parser.add_argument("--near-miss-retry", action="store_true", help="do not skip owners with an existing permute: attempt")
     parser.add_argument(
+        "--targets-file", type=Path,
+        help="restrict --near-miss to these function names, one per line ('#'-comments/blank "
+             "lines ignored) -- e.g. a hand-attempted register-tie list from "
+             "'near_miss_kinds.py tag-ties --names'. Only used with --near-miss. Mutually "
+             "exclusive with --tie-pool. NOTE: --skip-attempted never applies to --near-miss "
+             "(with or without this flag) -- these owners are targeted precisely because they "
+             "were already attempted by hand.",
+    )
+    parser.add_argument(
+        "--tie-pool", action="store_true",
+        help="restrict --near-miss to the same register-allocation-tie pool "
+             "'near_miss_kinds.py tag-ties' would list, computed internally from --stats "
+             "(no file needed). Mutually exclusive with --targets-file. See --tie-pool-min-"
+             "attempts/--tie-pool-min-similarity. NOTE: --skip-attempted never applies to "
+             "--near-miss, by design -- see --targets-file.",
+    )
+    parser.add_argument(
+        "--tie-pool-min-attempts", type=int, default=6,
+        help="--tie-pool: minimum total recorded attempts for an owner to count as a tie (default 6)",
+    )
+    parser.add_argument(
+        "--tie-pool-min-similarity", type=float, default=0.99,
+        help="--tie-pool: minimum best similarity_score for an owner to count as a tie (default 0.99)",
+    )
+    parser.add_argument(
         "--large", action="store_true",
         help="sweep owners with more than --min-instructions (default 64) instructions via --gotos-only drafts and the near-miss permuter",
     )
@@ -2131,6 +2197,8 @@ def main() -> int:
              "rewrite probe-matches (default 0: off)",
     )
     args = parser.parse_args()
+    if (args.targets_file or args.tie_pool) and not args.near_miss:
+        parser.error("--targets-file/--tie-pool require --near-miss")
     if args.near_miss_kinds:
         import near_miss_kinds
 
@@ -2167,6 +2235,22 @@ def main() -> int:
         print(text)
         return 0 if result["accepted"] else 1
     if args.near_miss:
+        if args.targets_file and args.tie_pool:
+            parser.error("--targets-file and --tie-pool are mutually exclusive")
+        target_functions: set[str] | None = None
+        if args.targets_file:
+            target_functions = load_targets_file(args.targets_file)
+        elif args.tie_pool:
+            import near_miss_kinds
+
+            tie_stats_paths = near_miss_kinds.resolve_stats_paths(args.stats)
+            tie_rows = list(probe_stats.iter_batches(tie_stats_paths))
+            tie_pool = near_miss_kinds.compute_tie_pool(
+                tie_rows,
+                min_attempts=args.tie_pool_min_attempts,
+                min_similarity=args.tie_pool_min_similarity,
+            )
+            target_functions = {str(row["function"]) for row in tie_pool}
         label_prefixes = tuple(
             prefix for prefix in (args.near_miss_labels or "").split(",") if prefix
         ) or None
@@ -2181,6 +2265,7 @@ def main() -> int:
             label_prefixes=label_prefixes,
             skip_permuted=not args.near_miss_retry,
             parallel=args.near_miss_parallel,
+            target_functions=target_functions,
         )
         text = json.dumps(result, indent=2, default=list)
         if args.json:
