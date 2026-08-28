@@ -277,7 +277,26 @@ void func_8413F82C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_8413F988.s")
+extern u8 D_84186F7C[];
+extern u8 D_84186F80[];
+extern u8 D_84186F84[];
+extern s32 func_80064590(u16, u16);
+void func_8413F988(u16 arg0, u16 arg1) {
+    s32 temp_v0;
+
+    temp_v0 = func_80064590(arg0, arg1);
+    switch (temp_v0) {
+    case 0:
+        ParticleGfx_SetPrimColor_fragment79(D_84186F7C[0], D_84186F7C[1], D_84186F7C[2], 0xFF);
+        return;
+    case 1:
+        ParticleGfx_SetPrimColor_fragment79(D_84186F80[0], D_84186F80[1], D_84186F80[2], 0xFF);
+        return;
+    case 2:
+        ParticleGfx_SetPrimColor_fragment79(D_84186F84[0], D_84186F84[1], D_84186F84[2], 0xFF);
+        return;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -727,7 +746,18 @@ void func_84145B24(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_8414605C.s")
+extern u8 D_84186868[];
+extern u8 D_841869E0[];
+extern u8 D_841868B8[];
+extern u8 D_84186890[];
+extern void func_84140690(void *arg0);
+extern void func_84140C8C(void *arg0);
+void func_8414605C(void) {
+    func_84140690(D_84186868);
+    gSPDisplayList(D_800D0510++, D_841869E0);
+    func_84142E44(D_841868B8);
+    func_84140C8C(D_84186890);
+}
 #endif
 
 #ifdef VERSION_US
@@ -838,7 +868,23 @@ void func_841465CC(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_841466B0.s")
+extern u16 D_84186CD4[];
+extern u16 D_84186CE0[];
+extern u16 D_84186CE4;
+extern u16 D_84186CEC;
+void func_841466B0(void *arg0) {
+    s32 index;
+    s32 offset;
+
+    index = *(u8 *)((u8 *)arg0 + 1);
+    offset = index << 1;
+    *(u16 *)((u8 *)arg0 + 0xA) = *(u16 *)((u8 *)D_84186CD4 + offset);
+    *(u16 *)((u8 *)arg0 + 0xC) = *(u16 *)((u8 *)D_84186CE0 + offset);
+    *(u16 *)((u8 *)arg0 + 0xE) = D_84186CE4;
+    *(u16 *)((u8 *)arg0 + 0x10) = D_84186CEC;
+    *(s16 *)((u8 *)arg0 + 0x12) = *(s16 *)((u8 *)arg0 + 0xA);
+    *(s16 *)((u8 *)arg0 + 0x14) = *(s16 *)((u8 *)arg0 + 0xC);
+}
 #endif
 
 #ifdef VERSION_US
