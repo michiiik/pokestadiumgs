@@ -2,7 +2,14 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/9/fragment9_code/func_8FB00020.s")
+extern Gfx *D_800D0510;
+extern u8 D_80094DE0[];
+void func_8FB00020(s32 arg0, s32 arg1, s32 arg2) {
+    gSPDisplayList(D_800D0510++, D_80094DE0);
+    gDPPipeSync(D_800D0510++);
+    gDPSetFillColor(D_800D0510++, 0xFFC7FFC1);
+    gDPFillRectangle(D_800D0510++, arg0, arg1, arg0 + arg2, arg1 + 2);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/9/fragment9_code/func_8FB000D0.s")
 
