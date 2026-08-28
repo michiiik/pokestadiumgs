@@ -2,7 +2,16 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_81300020.s")
+extern void main_pool_pop_state(s32);
+extern void main_pool_push_state(s32);
+extern void func_80057908(u8);
+extern s32 func_8005A0B4(s32);
+void func_81300020(s32 arg0) {
+    main_pool_pop_state(0x50504354);
+    main_pool_push_state(0x50504354);
+    func_80057908((u8)arg0);
+    func_8005A0B4(arg0);
+}
 
 s32 func_81300064(s32 arg0) {
     if ((arg0 >= 0) && (arg0 < 4) && (func_8005D92C(arg0) == 7) && (func_800606F4(arg0) > 0)) {
