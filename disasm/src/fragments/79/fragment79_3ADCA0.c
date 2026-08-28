@@ -582,7 +582,27 @@ void func_84142EB0(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84143BF4.s")
+extern s16 D_84186EC4;
+extern s16 D_84186EC8;
+extern s16 D_84186ECC;
+extern void func_8413F390(s16, s16, s32, u16);
+void func_84143BF4(void *arg0) {
+    u16 sp26;
+
+    sp26 = (u16)((u32)*(u32 *)((u8 *)arg0 + 4) / 100U);
+    ParticleGfx_SetPrimColor_fragment79(0xFFU, 0xFFU, 0xFFU, *(u8 *)((u8 *)arg0 + 0x25));
+    func_8413F390(
+        (s16)(*(s16 *)((u8 *)arg0 + 0xA) + D_84186EC4),
+        (s16)(*(s16 *)((u8 *)arg0 + 0xC) + D_84186ECC),
+        2,
+        (u16)((s32)sp26 / 60) & 0xFFFF);
+    func_8413F390(
+        (s16)(*(s16 *)((u8 *)arg0 + 0xA) + D_84186EC8),
+        (s16)(*(s16 *)((u8 *)arg0 + 0xC) + D_84186ECC),
+        2,
+        (u16)((s32)sp26 % 60) & 0xFFFF);
+    ParticleGfx_SetPrimColor_fragment79(0xFFU, 0xFFU, 0xFFU, 0xFFU);
+}
 #endif
 
 #ifdef VERSION_US
