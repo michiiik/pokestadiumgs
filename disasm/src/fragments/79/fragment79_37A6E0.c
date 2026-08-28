@@ -226,7 +226,13 @@ void func_8410B884(u8 *arg0, void *arg1, u8 *arg2, s16 arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8410D040.s")
+void func_8410D040(u8 *arg0, s32 arg1) {
+    extern void func_841203B4(u8 *, f32, f32);
+    if (*(f32 *)(arg0 + 0xB8) <= *(f32 *)(arg0 + 0xAC)) {
+        return;
+    }
+    func_841203B4(arg0 + 0xAC, *(f32 *)(arg0 + 0xB8), 0.02f);
+}
 #endif
 
 #ifdef VERSION_US
