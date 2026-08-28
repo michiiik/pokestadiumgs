@@ -41,7 +41,54 @@ s32 func_80004CF4(u32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_80004D4C.s")
+extern s32 func_8000A1E8(s32);
+s32 func_80004D4C(u8 *arg0) {
+    s32 result;
+    u32 taskType;
+    u16 state;
+
+    result = 0;
+    state = *(u16 *)(arg0 + 0x1C);
+    if (state == 2) {
+        if (osSpTaskYielded((OSTask *)(arg0 + 0x20)) == 0) {
+            taskType = *(s32 *)(arg0 + 0x20);
+            *(u16 *)(arg0 + 0x1C) = 3;
+            switch (taskType) {
+            case 1:
+                func_8000A1E8(1);
+                if (*(u16 *)(arg0 + 0x1E) == 2) {
+                    osSendMesg((OSMesgQueue *)(arg0 + 4), (OSMesg)0x444F4E45, 0);
+                }
+                break;
+            case 4:
+                osSendMesg((OSMesgQueue *)(arg0 + 4), (OSMesg)0x444F4E45, 0);
+                break;
+            }
+        }
+        result = 1;
+    } else {
+        taskType = *(s32 *)(arg0 + 0x20);
+        switch (taskType) {
+        case 2:
+            if (state == 1) {
+                func_8000A28C();
+                osSendMesg((OSMesgQueue *)(arg0 + 4), (OSMesg)0x444F4E45, 0);
+            }
+            break;
+        case 1:
+            func_8000A1E8(1);
+            if (*(u16 *)(arg0 + 0x1E) == 2) {
+                osSendMesg((OSMesgQueue *)(arg0 + 4), (OSMesg)0x444F4E45, 0);
+            }
+            break;
+        case 4:
+            osSendMesg((OSMesgQueue *)(arg0 + 4), (OSMesg)0x444F4E45, 0);
+            break;
+        }
+        *(u16 *)(arg0 + 0x1C) = 3;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US

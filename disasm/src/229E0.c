@@ -1178,14 +1178,7 @@ void func_8003455C(u8 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8003492C(u8, s32);
-void func_8003459C(u8 arg0, s32 arg1) {
-    s8 sp1F;
-    s8 new_var;
-    sp1F = func_800347E8(arg0);
-    new_var = func_800347E8(arg0);
-    func_8003492C(arg0, (((((u8)sp1F) ^ 0) << 8) + new_var) & 0xFFFF);
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003459C.s")
 #endif
 
 #ifdef VERSION_US
@@ -3759,13 +3752,7 @@ void func_8003CA30(Gfx* arg0, S1_arg1_func_81407874_014_000_010* arg1) {
 #endif
 
 #ifdef VERSION_US
-extern s32 D_801261A8;
-void func_8003CBD4(void) {
-    if (D_801261A8 == 0) {
-        D_801261A8 = 1;
-        gDPPipeSync(D_800D0510++);
-    }
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003CBD4.s")
 #endif
 
 #ifdef VERSION_US
@@ -4457,22 +4444,7 @@ void geo_layout_cmd_close_node(void) {
 #endif
 
 #ifdef VERSION_US
-extern void *D_80126454;
-extern s32 D_80126458[];
-void func_8003FD34(void *arg0) {
-    s32 index;
-    s32 *entry;
-    if (arg0 != NULL) {
-        index = D_80126518;
-        entry = &D_80126498[index];
-        entry[0] = (s32)arg0;
-        if (index == 0) {
-            if (D_80126454 == NULL) D_80126454 = arg0;
-        } else {
-            func_80038F8C((void *)(u32)entry[-1], arg0);
-        }
-    }
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FD34.s")
 #endif
 
 #ifdef VERSION_US
@@ -4826,13 +4798,7 @@ void geo_layout_cmd_create_anchor(void) {
 #endif
 
 #ifdef VERSION_US
-void func_80040D9C(void) {
-    s32 *node = (s32 *)D_80126498[D_80126518];
-    if (node != NULL) {
-        *((u8 *)node + 2) |= 4;
-    }
-    D_80126520 += 4;
-}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80040D9C.s")
 #endif
 
 #ifdef VERSION_US
