@@ -7,12 +7,18 @@ answers the questions that come before that call:
 * which tracked source owns a ``GLOBAL_ASM`` pragma (``find_owner``);
 * what the target assembly looks like (``function_asm``);
 * which owners are small/simple enough to batch next (``list_targets``);
+* which owners are shape-hard rather than merely unattempted, from recorded
+  probe history (``load_owner_hardness``, ``targets --skip-ties``);
+* which files are worth assigning to a fleet agent next
+  (``rank-files``);
 * what m2c proposes as a first C draft (``draft_candidates``).
 
 Usage:
     tools/pragma_targets.py owner func_8410AE50
     tools/pragma_targets.py asm func_8410AE50
     tools/pragma_targets.py targets --max-instructions 12 --family direct_wrapper
+    tools/pragma_targets.py targets --source disasm/src/585D0.c --skip-ties
+    tools/pragma_targets.py rank-files --exclude-recent 4 --json
     tools/pragma_targets.py draft func_8410AE50
 
 Everything here is read-only with respect to tracked sources.  Drafts are
@@ -23,6 +29,7 @@ candidate.
 from __future__ import annotations
 
 import argparse
+import collections
 import difflib
 import json
 import os
@@ -31,11 +38,13 @@ import subprocess
 import threading
 import sys
 from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import probe_stats
 import scan_asm_families as scanner
 import try_pragma_compare as runner
+import variant_policy
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DISASM_ROOT = REPO_ROOT / "disasm"
@@ -221,18 +230,31 @@ def list_targets(
     max_instructions: int | None = None,
     min_instructions: int | None = None,
     limit: int = 50,
+    skip_ties: bool = False,
+    stats_paths=None,
 ) -> dict[str, object]:
-    """Rank remaining owners by size so small same-shape batches are easy to pick."""
+    """Rank remaining owners by size so small same-shape batches are easy to pick.
+
+    Every row also carries recorded probe-hardness fields (``prior_attempts``,
+    ``best_similarity``, ``best_mismatch_kind``, ``best_raw_similarity``,
+    ``last_attempt``, and a one-word ``hardness`` label -- see
+    ``OwnerHardness``), loaded once for the whole call via
+    ``load_owner_hardness(stats_paths)``, not per owner. ``skip_ties=True``
+    additionally hides owners whose ``hardness`` is a register-allocation
+    tie (``OwnerHardness.is_tie``) -- the ``585D0.c`` shape that a fresh
+    agent's time box is unlikely to close.
+    """
     owners = list(owner_index().values())
     if source:
         wanted = source.replace("\\", "/").removeprefix("./")
         owners = [owner for owner in owners if owner.source == wanted or owner.source.endswith("/" + wanted)]
+    hardness = load_owner_hardness(stats_paths)
     rows: list[dict[str, object]] = []
     family_counts: dict[str, int] = {}
     for owner in owners:
         if not owner.asm_path.exists():
             continue
-        row = _classify_owner(owner)
+        row = dict(_classify_owner(owner))  # copy: _classify_owner's cache is shared, never mutate it
         count = int(row["instructions"])
         if max_instructions is not None and count > max_instructions:
             continue
@@ -241,6 +263,11 @@ def list_targets(
         family_counts[str(row["family"])] = family_counts.get(str(row["family"]), 0) + 1
         if family and row["family"] != family:
             continue
+        h = hardness.get(owner.function, _EMPTY_HARDNESS)
+        if skip_ties and h.is_tie:
+            continue
+        row.update(h.as_dict())
+        row["hardness"] = h.label
         rows.append(row)
     rows.sort(key=lambda row: (int(row["instructions"]), str(row["source"]), str(row["function"])))
     return {
@@ -903,6 +930,351 @@ def similar_solved(
     return ranked[:limit]
 
 
+# ---------------------------------------------------------------------------
+# Owner hardness from recorded probe history
+#
+# Ranking owners/files by remaining-owner *count* alone treats a
+# never-attempted function the same as one that has been probed dozens of
+# times and keeps landing on the same unsolvable-by-source-shape register
+# swap.  The fleet wave of 2026-08-28 made the difference visible: `585D0.c`
+# got 0/12 accepts because its owners' best recorded attempts were mostly
+# `register_allocation_only` at `similarity_score` 1.0 after many tries (a
+# register-allocation tie -- no C source shape changes that), while
+# `4AC10.c` got 6/14 because its owners had few attempts and
+# `operand_or_scheduling_drift`/`instruction_drift` best kinds (a real
+# semantic gap an agent can still close).  The functions below turn recorded
+# probe-stats history into that signal.
+# ---------------------------------------------------------------------------
+
+# Kinds where the candidate is still short of a byte match for a reason a
+# source-shape rewrite can plausibly fix (a missing statement, a wrong
+# offset, a scheduling difference) -- as opposed to `register_allocation_only`
+# at high similarity, which is IDO's register allocator picking differently
+# for equivalent C, not a gap in the candidate.
+DRIFT_MISMATCH_KINDS = frozenset({
+    "instruction_drift",
+    "operand_or_scheduling_drift",
+    "immediate_drift",
+})
+
+FRESH_ATTEMPT_THRESHOLD = 5
+TIE_SIMILARITY_THRESHOLD = 0.99
+TIE_ATTEMPT_THRESHOLD = 6
+STUCK_ATTEMPT_THRESHOLD = 15
+STUCK_SIMILARITY_THRESHOLD = 0.9
+
+
+@dataclass(frozen=True)
+class OwnerHardness:
+    """One owner's aggregated probe-attempt history.
+
+    ``best_similarity``/``best_mismatch_kind``/``best_raw_similarity`` all
+    come from the single recorded attempt with the highest
+    ``similarity_score`` for this function (ties broken by whichever the
+    scan visits first); an owner with no recorded attempts gets the all-zero
+    default below, which classifies as ``fresh``.  ``best_raw_similarity``
+    reads the runner's `exact_similarity_score` field -- the pre-register-
+    normalization match ratio the code and AGENTS.md call "raw" (see the
+    ``func_80051610``-style backlog entry: a candidate can score
+    ``similarity_score`` 1.0 through register normalisation while its raw
+    score is much lower with values swapped between fields).
+    """
+
+    prior_attempts: int = 0
+    best_similarity: float | None = None
+    best_raw_similarity: float | None = None
+    best_mismatch_kind: str | None = None
+    last_attempt: str | None = None
+
+    def as_dict(self) -> dict[str, object]:
+        return {
+            "prior_attempts": self.prior_attempts,
+            "best_similarity": self.best_similarity,
+            "best_mismatch_kind": self.best_mismatch_kind,
+            "best_raw_similarity": self.best_raw_similarity,
+            "last_attempt": self.last_attempt,
+        }
+
+    @property
+    def is_fresh(self) -> bool:
+        """Few enough attempts that the pool hasn't really been tried yet."""
+        return self.prior_attempts < FRESH_ATTEMPT_THRESHOLD
+
+    @property
+    def is_tie(self) -> bool:
+        """A register-allocation tie: near-1.0 similarity, many tries, same kind.
+
+        This is the ``585D0.c`` shape -- a byte match that no declaration-
+        order/temp-width/width rewrite has reached after real effort.  Not
+        impossible, but a poor use of a fresh agent's time box.
+        """
+        return (
+            self.best_mismatch_kind == "register_allocation_only"
+            and self.best_similarity is not None
+            and self.best_similarity >= TIE_SIMILARITY_THRESHOLD
+            and self.prior_attempts >= TIE_ATTEMPT_THRESHOLD
+        )
+
+    @property
+    def is_drift(self) -> bool:
+        """A semantic gap (missing statement, wrong offset, wrong schedule)."""
+        return (
+            self.best_mismatch_kind in DRIFT_MISMATCH_KINDS
+            and self.best_similarity is not None
+            and self.best_similarity < 1.0
+        )
+
+    @property
+    def is_stuck(self) -> bool:
+        """Heavily attempted with no attempt ever getting close."""
+        return self.prior_attempts >= STUCK_ATTEMPT_THRESHOLD and (
+            self.best_similarity is None or self.best_similarity < STUCK_SIMILARITY_THRESHOLD
+        )
+
+    @property
+    def label(self) -> str:
+        """One-word hardness summary; always one of fresh/drift/tie/stuck."""
+        if self.is_tie:
+            return "tie"
+        if self.is_stuck:
+            return "stuck"
+        if self.is_drift:
+            return "drift"
+        if self.is_fresh:
+            return "fresh"
+        # An owner with 5-14 attempts whose best kind is neither a
+        # recognized drift shape nor a >=0.99 register-allocation tie still
+        # needs a label: below a byte match, there is still room for a
+        # source-shape change to close (drift-like); at or above it with an
+        # unrecognized kind, nothing here explains what a rewrite would
+        # change (tie-like).
+        if self.best_similarity is not None and self.best_similarity < 1.0:
+            return "drift"
+        return "tie"
+
+
+_EMPTY_HARDNESS = OwnerHardness()
+
+_HARDNESS_CACHE: dict[tuple[tuple[str, int], ...], dict[str, OwnerHardness]] = {}
+
+
+def _resolve_hardness_stats_paths(stats_paths) -> tuple[Path, ...]:
+    if stats_paths is None:
+        return variant_policy.default_stats_paths()
+    if isinstance(stats_paths, (str, Path)):
+        return tuple(probe_stats.resolve_paths([Path(stats_paths)]))
+    return tuple(probe_stats.resolve_paths([Path(item) for item in stats_paths]))
+
+
+def load_owner_hardness(stats_paths=None) -> dict[str, OwnerHardness]:
+    """Aggregate every function's recorded probe-attempt history, once.
+
+    Reads across every resolved probe-stats file (default:
+    ``variant_policy.default_stats_paths()``, i.e. the current and legacy
+    locations plus any rotated ``<stem>.<N><suffix>`` sibling of either) in
+    a single pass and returns ``{function: OwnerHardness}``.  Call this once
+    per invocation and look up owners from the returned mapping -- do not
+    call it per owner, it re-parses every batch file each time it actually
+    runs.
+
+    ``stats_paths`` may be ``None`` (the default above), a single path (the
+    ``--stats`` CLI flag, expanded the same way a default path is: any
+    rotated sibling next to it is picked up too), or an iterable of paths.
+    Results are cached by the resolved paths' mtimes, so a second call in
+    the same process with unchanged files is free.
+    """
+    paths = _resolve_hardness_stats_paths(stats_paths)
+    cache_key = tuple(sorted((str(path), path.stat().st_mtime_ns) for path in paths))
+    cached = _HARDNESS_CACHE.get(cache_key)
+    if cached is not None:
+        return cached
+
+    prior_attempts: dict[str, int] = collections.Counter()
+    best_similarity: dict[str, float] = {}
+    best_raw_similarity: dict[str, float | None] = {}
+    best_mismatch_kind: dict[str, str | None] = {}
+    last_attempt: dict[str, str] = {}
+
+    for batch in probe_stats.iter_batches(paths):
+        attempts = batch.get("attempts")
+        if not isinstance(attempts, list):
+            continue
+        timestamp = batch.get("timestamp")
+        timestamp = timestamp if isinstance(timestamp, str) and timestamp else None
+        for attempt in attempts:
+            if not isinstance(attempt, dict):
+                continue
+            function = attempt.get("function")
+            if not isinstance(function, str) or not function:
+                continue
+            prior_attempts[function] += 1
+            if timestamp is not None:
+                current = last_attempt.get(function)
+                if current is None or timestamp > current:
+                    last_attempt[function] = timestamp
+            score = attempt.get("similarity_score")
+            if not isinstance(score, (int, float)):
+                continue
+            score = float(score)
+            if function not in best_similarity or score > best_similarity[function]:
+                best_similarity[function] = score
+                raw = attempt.get("exact_similarity_score")
+                best_raw_similarity[function] = float(raw) if isinstance(raw, (int, float)) else None
+                kind = attempt.get("mismatch_kind")
+                best_mismatch_kind[function] = kind if isinstance(kind, str) and kind else None
+
+    result: dict[str, OwnerHardness] = {
+        function: OwnerHardness(
+            prior_attempts=count,
+            best_similarity=best_similarity.get(function),
+            best_raw_similarity=best_raw_similarity.get(function),
+            best_mismatch_kind=best_mismatch_kind.get(function),
+            last_attempt=last_attempt.get(function),
+        )
+        for function, count in prior_attempts.items()
+    }
+    _HARDNESS_CACHE[cache_key] = result
+    return result
+
+
+def _fragment_number(source: str) -> int | None:
+    """Mirrors ``sweep_targets._fragment_number`` without importing it back.
+
+    ``sweep_targets`` already imports this module, so importing it here for
+    one regex would be circular; the pattern (``.../fragments/<N>/...``) is
+    small enough to keep in sync by inspection.
+    """
+    match = re.search(r"(?:^|/)fragments/(\d+)(?:/|$)", source.replace("\\", "/"))
+    return int(match.group(1)) if match else None
+
+
+# Repository-location env vars git sets for a hook subprocess's own children
+# (GIT_DIR/GIT_INDEX_FILE point at the *enclosing* repo -- e.g. this
+# worktree -- when this module itself runs from inside a pre-commit hook or
+# test fixture). Left inherited, they override ``cwd`` below and redirect a
+# ``repo_root`` fixture repo's git calls onto the enclosing repo instead.
+_GIT_ENV_VARS_TO_STRIP = (
+    "GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_COMMON_DIR",
+    "GIT_OBJECT_DIRECTORY", "GIT_ALTERNATE_OBJECT_DIRECTORIES",
+)
+
+
+def _git_lines(args: list[str], *, repo_root: Path = REPO_ROOT) -> list[str]:
+    env = {key: value for key, value in os.environ.items() if key not in _GIT_ENV_VARS_TO_STRIP}
+    try:
+        result = subprocess.run(
+            ["git", *args],
+            cwd=repo_root,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            timeout=30,
+            env=env,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return []
+    if result.returncode != 0:
+        return []
+    return [line for line in result.stdout.splitlines() if line.strip()]
+
+
+def _recently_touched_sources(hours: float, *, repo_root: Path = REPO_ROOT) -> set[str]:
+    """Repo-relative ``disasm/src`` paths touched by a commit in the last ``hours``.
+
+    Formats an absolute ISO-8601 UTC timestamp for ``--since`` rather than
+    git's natural-language ``"<N> hours ago"`` form: git's approxidate
+    parser silently mis-parses a fractional ``N`` (``--since="4.0 hours
+    ago"`` matched the entire multi-year history instead of the last four
+    hours -- ``argparse``'s ``--exclude-recent`` is typed ``float``, so a
+    whole-number CLI value like ``4`` still becomes ``4.0`` internally).  An
+    absolute timestamp has no such ambiguity.
+    """
+    since = (datetime.now(timezone.utc) - timedelta(hours=hours)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    lines = _git_lines(
+        ["log", f"--since={since}", "--format=", "--name-only", "--", "disasm/src"],
+        repo_root=repo_root,
+    )
+    return set(lines)
+
+
+def _dirty_sources(*, repo_root: Path = REPO_ROOT) -> set[str]:
+    """Repo-relative ``disasm/src`` paths with uncommitted working-tree changes."""
+    lines = _git_lines(["status", "--porcelain", "--", "disasm/src"], repo_root=repo_root)
+    paths: set[str] = set()
+    for line in lines:
+        # Porcelain short format: "XY path" or "XY orig -> new" for a rename.
+        chunk = line[3:].strip() if len(line) > 3 else line.strip()
+        if " -> " in chunk:
+            chunk = chunk.split(" -> ", 1)[1]
+        if chunk:
+            paths.add(chunk)
+    return paths
+
+
+def rank_files(
+    *,
+    max_instructions: int = 128,
+    exclude_recent_hours: float | None = None,
+    fragments: bool = True,
+    stats_paths=None,
+    repo_root: Path = REPO_ROOT,
+) -> dict[str, object]:
+    """Score every source file with remaining owners by hardness signal.
+
+    For each source file, counts remaining owners of at most
+    ``max_instructions`` instructions, and within those: ``fresh`` (see
+    ``OwnerHardness.is_fresh``), ``drift`` (``OwnerHardness.is_drift``), and
+    ``ties`` (``OwnerHardness.is_tie``) -- an owner can count toward both
+    ``fresh`` and ``drift`` at once (few attempts *and* a promising kind is
+    the strongest signal, e.g. `4AC10.c`).  ``score = fresh + drift``; ties
+    contribute nothing to ``score`` but are still reported so a coordinator
+    can see why a file with many remaining owners scores low.  Rows are
+    sorted by ``score`` descending, then remaining owners descending, then
+    file path.
+
+    ``exclude_recent_hours``, when given, drops any file touched by a commit
+    in that many hours (``git log --since``) or currently dirty in the
+    working tree -- both read-only checks against ``repo_root`` (a test
+    fixture parameter; every real caller uses the default ``REPO_ROOT``).
+    ``fragments=False`` drops ``disasm/src/fragments/...`` files entirely.
+    """
+    hardness = load_owner_hardness(stats_paths)
+    excluded: set[str] = set()
+    if exclude_recent_hours is not None:
+        excluded |= _recently_touched_sources(exclude_recent_hours, repo_root=repo_root)
+        excluded |= _dirty_sources(repo_root=repo_root)
+
+    per_file: dict[str, dict[str, object]] = {}
+    for owner in owner_index().values():
+        if not owner.asm_path.exists():
+            continue
+        if not fragments and _fragment_number(owner.source) is not None:
+            continue
+        if owner.source in excluded:
+            continue
+        row = _classify_owner(owner)
+        if int(row["instructions"]) > max_instructions:
+            continue
+        entry = per_file.setdefault(
+            owner.source,
+            {"file": owner.source, "remaining": 0, "fresh": 0, "drift": 0, "ties": 0},
+        )
+        entry["remaining"] = int(entry["remaining"]) + 1
+        h = hardness.get(owner.function, _EMPTY_HARDNESS)
+        if h.is_fresh:
+            entry["fresh"] = int(entry["fresh"]) + 1
+        if h.is_drift:
+            entry["drift"] = int(entry["drift"]) + 1
+        if h.is_tie:
+            entry["ties"] = int(entry["ties"]) + 1
+
+    rows = list(per_file.values())
+    for entry in rows:
+        entry["score"] = int(entry["fresh"]) + int(entry["drift"])
+    rows.sort(key=lambda entry: (-int(entry["score"]), -int(entry["remaining"]), str(entry["file"])))
+    return {"files": rows}
+
+
 def _m2c_python() -> str:
     return os.environ.get("M2C_PYTHON") or sys.executable
 
@@ -964,6 +1336,24 @@ def draft_candidates(
     }
 
 
+def _print_rank_files_table(rows: list[dict[str, object]]) -> None:
+    header = ("FILE", "REMAINING", "FRESH", "DRIFT", "TIES", "SCORE")
+    lines = [header] + [
+        (
+            str(row["file"]),
+            str(row["remaining"]),
+            str(row["fresh"]),
+            str(row["drift"]),
+            str(row["ties"]),
+            str(row["score"]),
+        )
+        for row in rows
+    ]
+    widths = [max(len(line[col]) for line in lines) for col in range(len(header))]
+    for line in lines:
+        print("  ".join(value.ljust(width) for value, width in zip(line, widths)).rstrip())
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     commands = parser.add_subparsers(dest="command", required=True)
@@ -977,6 +1367,11 @@ def main() -> int:
     targets.add_argument("--max-instructions", type=int)
     targets.add_argument("--min-instructions", type=int)
     targets.add_argument("--limit", type=int, default=50)
+    targets.add_argument(
+        "--skip-ties", action="store_true",
+        help="hide owners whose recorded best attempt is a register-allocation tie",
+    )
+    targets.add_argument("--stats", type=Path, help="probe-stats file (default: variant_policy.default_stats_paths())")
     draft = commands.add_parser("draft", help="run m2c over a pragma's assembly")
     draft.add_argument("function")
     draft.add_argument("--variant", action="append", dest="variants")
@@ -984,6 +1379,20 @@ def main() -> int:
     similar = commands.add_parser("similar", help="rank accepted candidates by opcode-shape similarity")
     similar.add_argument("function")
     similar.add_argument("--limit", type=int, default=3)
+    rank_files_cmd = commands.add_parser(
+        "rank-files", help="score every source file with remaining owners by hardness signal",
+    )
+    rank_files_cmd.add_argument("--max-instructions", type=int, default=128)
+    rank_files_cmd.add_argument(
+        "--exclude-recent", type=float, default=None, dest="exclude_recent_hours", metavar="HOURS",
+        help="drop files touched by a commit in the last HOURS, or dirty in the working tree",
+    )
+    fragments_group = rank_files_cmd.add_mutually_exclusive_group()
+    fragments_group.add_argument("--fragments", action="store_true", dest="fragments", default=True)
+    fragments_group.add_argument("--no-fragments", action="store_false", dest="fragments")
+    rank_files_cmd.add_argument("--stats", type=Path, help="probe-stats file (default: variant_policy.default_stats_paths())")
+    rank_files_cmd.add_argument("--limit", type=int, default=50)
+    rank_files_cmd.add_argument("--json", action="store_true")
     args = parser.parse_args()
 
     if args.command == "owner":
@@ -1001,6 +1410,8 @@ def main() -> int:
             max_instructions=args.max_instructions,
             min_instructions=args.min_instructions,
             limit=args.limit,
+            skip_ties=args.skip_ties,
+            stats_paths=args.stats,
         ), indent=2))
     elif args.command == "similar":
         print(json.dumps(similar_solved(args.function, limit=args.limit), indent=2))
@@ -1009,6 +1420,18 @@ def main() -> int:
         for item in result["drafts"]:
             print(f"/* {item['label']} */")
             print(item["code"] or f"/* error: {item['error']} */")
+    elif args.command == "rank-files":
+        result = rank_files(
+            max_instructions=args.max_instructions,
+            exclude_recent_hours=args.exclude_recent_hours,
+            fragments=args.fragments,
+            stats_paths=args.stats,
+        )
+        rows = result["files"][: max(0, args.limit)] if args.limit else result["files"]
+        if args.json:
+            print(json.dumps({**result, "files": rows}, indent=2))
+        else:
+            _print_rank_files_table(rows)
     return 0
 
 
