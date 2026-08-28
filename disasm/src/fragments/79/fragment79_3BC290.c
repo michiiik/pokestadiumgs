@@ -36,9 +36,39 @@ void func_8414CDB8(u8 *arg0, u8 arg1, u8 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414CE08.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414CEE0.s")
+extern void func_84149D54(void *, u8, u8);
+extern void func_84149D0C(void *);
+void func_8414CEE0(s32 arg0, u8 arg1, u8 arg2) {
+    u8 rec[0x20];
+    u8 *value;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414CF74.s")
+    func_84149D54(rec, arg1, arg2);
+    func_84149D0C(rec);
+    value = (u8 *)(u32)arg0 + arg1 * 2 + 4;
+    if (*(u16 *)(*(u8 **)(rec + 0x14) + 0x42) > 0) {
+        *(u16 *)(value + 0x16) = *(s32 *)(rec + 0xC);
+    } else {
+        *(u16 *)(value + 0xA) = *(s32 *)(rec + 0xC);
+    }
+    *(u16 *)(value + 0x1E) = *(s32 *)(rec + 0xC) >> 3;
+}
+
+extern void func_84149D54(void *, u8, u8);
+extern void func_84149D0C(void *);
+void func_8414CF74(s32 arg0, u8 arg1, u8 arg2) {
+    u8 rec[0x20];
+    u8 *value;
+
+    func_84149D54(rec, arg1, arg2);
+    func_84149D0C(rec);
+    value = (u8 *)(u32)arg0 + arg1 * 2 + 4;
+    if (*(u16 *)(*(u8 **)(rec + 0x14) + 0x42) > 0) {
+        *(u16 *)(value + 0x16) = *(s32 *)(rec + 0xC);
+    } else {
+        *(u16 *)(value + 0xA) = *(s32 *)(rec + 0xC);
+    }
+    *(u16 *)(value + 0x1A) = *(s32 *)(rec + 0xC) >> 2;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414D008.s")
 
