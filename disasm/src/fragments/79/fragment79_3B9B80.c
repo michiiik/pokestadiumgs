@@ -26,9 +26,54 @@ void func_8414A3E8(void) {
     } while (i != 2);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B9B80/func_8414A440.s")
+extern void _bzero(void *, s32);
+void func_8414A440(u8 *arg0, u8 arg1, u8 arg2) {
+    s32 i;
+    u8 *var_s0;
+    u8 *temp_s2;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B9B80/func_8414A4E4.s")
+    *(s32 *)(arg0 + 0x10) = 0;
+    *(s32 *)(arg0 + 0x14) = 0;
+    *(s32 *)(arg0 + 0x18) = 0;
+    *(s32 *)(arg0 + 0x0C) = 0;
+    *(s32 *)(arg0 + 0x1C) = 0;
+    *(s32 *)(arg0 + 0x20) = 0;
+    *(s32 *)(arg0 + 0x24) = 0x80000000;
+    var_s0 = arg0 + 0x28;
+    i = 0;
+    do {
+        temp_s2 = var_s0;
+        _bzero(var_s0, 0x40);
+        i += 0x40;
+        var_s0 += 0x40;
+        temp_s2[arg1 + 6] = arg2;
+    } while (i != 0x80);
+}
+
+extern void _bzero(void *, s32);
+void func_8414A4E4(u8 *arg0, u8 arg1, u8 arg2, u8 arg3) {
+    s32 i;
+    u8 *var_s0;
+    u8 *temp_s2;
+
+    *(s32 *)(arg0 + 0x10) = 0;
+    *(s32 *)(arg0 + 0x14) = 0;
+    *(s32 *)(arg0 + 0x18) = 0;
+    *(s32 *)(arg0 + 0x0C) = 0;
+    *(s32 *)(arg0 + 0x1C) = 0;
+    *(s32 *)(arg0 + 0x20) = 0;
+    *(s32 *)(arg0 + 0x24) = 0x80000000;
+    var_s0 = arg0 + 0x28;
+    i = 0;
+    do {
+        temp_s2 = var_s0;
+        _bzero(var_s0, 0x40);
+        i += 0x40;
+        var_s0 += 0x40;
+        temp_s2[arg1 + 2] = arg2;
+        temp_s2[arg1 + 6] = arg3;
+    } while (i != 0x80);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B9B80/func_8414A59C.s")
 
@@ -62,7 +107,18 @@ void func_8414BEE8(void) {
     _bzero(D_8419D7C0, 0xFC0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B9B80/func_8414BF10.s")
+extern u8 func_80062D20(u8);
+s32 func_8414BF10(u8 arg0, u8 arg1) {
+    u8 temp_v0;
+
+    temp_v0 = func_80062D20(arg1);
+    if (D_841951F8[arg0][9] < 2) {
+        if (temp_v0 == 7) return 0;
+        if (temp_v0 == 0x62) return 0;
+        if (temp_v0 == 0x72) return 0;
+    }
+    return 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B9B80/func_8414BF94.s")
 
