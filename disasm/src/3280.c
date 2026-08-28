@@ -96,7 +96,30 @@ s32 main_pool_try_free(s32 arg0) {
     return main_pool_get_available();
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3280/func_80002A40.s")
+extern s32 main_pool_alloc_from_pool(s32, s32);
+extern u8 *main_pool_set_func(u8 *, s32, s32);
+extern s32 func_800027F0(s32, s32);
+u8 *func_80002A40(u8 *arg0, u32 arg1)
+{
+  PoolBlock3280 *prior = (PoolBlock3280 *) (((u8 *) arg0) - 0x10);
+  u8 *newaddr = 0;
+  osRecvMesg(&D_800CCDB4, 0, 1);
+  if (prior->next == ((Pool3280 *) D_800CCDB0)->listHeadL)
+  {
+    u32 diff = ((u32) prior->next) - ((u32) arg0);
+    arg1 = (arg1 + 0xF) & (~0xF);
+    if ((diff >= arg1) || (((u32) (*((Pool3280 *) D_800CCDB0)).available) >= (arg1 - diff)))
+    {
+      s32 savedArg = prior->arg;
+      PoolFunc3280 savedFunc = prior->func;
+      func_800027F0((s32) arg0, 0);
+      newaddr = (u8 *) ((u32) main_pool_alloc_from_pool(arg1, 0));
+      main_pool_set_func(newaddr, savedArg, (s32) savedFunc);
+    }
+  }
+  osSendMesg(&D_800CCDB4, 0, 0);
+  return newaddr;
+}
 
 extern s32 D_800CCDCC;
 s32 main_pool_get_available(void) {
