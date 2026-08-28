@@ -342,7 +342,25 @@ void func_8AC01F20(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC02998.s")
+extern u8 D_8AC099BC;
+extern s32 func_8004C990(s32, s32);
+extern void func_800504BC(s16 *);
+s32 func_8AC02998(s32 arg0, void *arg1) {
+    void *temp_v1;
+
+    temp_v1 = (*(void **)((u8 *)(arg1) + (0x20)));
+    switch (arg0) {
+        case 0:
+            (*(s32 *)((u8 *)(temp_v1) + (0x10))) = func_8004C990((*(u16 *)((u8 *)(arg1) + (0x24))), (*(u16 *)((u8 *)(arg1) + (0x26))));
+            break;
+        case 1:
+            func_800504BC((s16 *)(&D_8AC099BC));
+            (*(s16 *)((u8 *)(temp_v1) + (8))) = (*(s16 *)((u8 *)(arg1) + (8))) + (*(s16 *)((u8 *)(&D_8AC099BC) + (0)));
+            (*(s16 *)((u8 *)(temp_v1) + (0xA))) = (*(s16 *)((u8 *)(arg1) + (0xA))) + (*(s16 *)((u8 *)(&D_8AC099BC) + (2)));
+            break;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -376,7 +394,22 @@ void func_8AC02C80(s32 arg0, s32 arg1, s32 arg2, void *arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC02D04.s")
+s32 func_8AC02D04(s32 arg0, void *arg1) {
+    void *temp_v1;
+
+    temp_v1 = (*(void **)((u8 *)(arg1) + (0x20)));
+    switch (arg0) {
+        case 0:
+            (*(s32 *)((u8 *)(temp_v1) + (0x10))) = func_8004C990((*(u16 *)((u8 *)(arg1) + (0x24))), (*(u16 *)((u8 *)(arg1) + (0x26))));
+            break;
+        case 1:
+            func_800504BC((s16 *)(&D_8AC099BC));
+            (*(s16 *)((u8 *)(temp_v1) + (8))) = (*(s16 *)((u8 *)(arg1) + (8))) + (*(s16 *)((u8 *)(&D_8AC099BC) + (0)));
+            (*(s16 *)((u8 *)(temp_v1) + (0xA))) = (*(s16 *)((u8 *)(arg1) + (0xA))) + (*(s16 *)((u8 *)(&D_8AC099BC) + (2)));
+            break;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -398,7 +431,22 @@ void func_8AC02FCC(s32 arg0, s32 arg1, s32 arg2, void *arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC03050.s")
+s32 func_8AC03050(s32 arg0, void *arg1) {
+    void *temp_v1;
+
+    temp_v1 = (*(void **)((u8 *)(arg1) + (0x20)));
+    switch (arg0) {
+        case 0:
+            (*(s32 *)((u8 *)(temp_v1) + (0x10))) = func_8004C990((*(u16 *)((u8 *)(arg1) + (0x24))), (*(u16 *)((u8 *)(arg1) + (0x26))));
+            break;
+        case 1:
+            func_800504BC((s16 *)(&D_8AC099BC));
+            (*(s16 *)((u8 *)(temp_v1) + (8))) = (*(s16 *)((u8 *)(arg1) + (8))) + (*(s16 *)((u8 *)(&D_8AC099BC) + (0)));
+            (*(s16 *)((u8 *)(temp_v1) + (0xA))) = (*(s16 *)((u8 *)(arg1) + (0xA))) + (*(s16 *)((u8 *)(&D_8AC099BC) + (2)));
+            break;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
