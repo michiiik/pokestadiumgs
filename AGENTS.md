@@ -39,6 +39,30 @@ Coordinator rules:
   Do not run tooling changes and a fleet at the same time in one checkout.
 - Do not spawn investigation agents for this loop; the assembly reading is
   the agents' job, not a separate phase.
+- Agent prompts must also say: search only inside the repository (a
+  `find / -iname gbi.h` from one agent walked `~/Music` and raised a macOS
+  media-library permission prompt on 2026-08-28; the header is
+  `disasm/lib/ultralib/include/PR/gbi.h`); use a per-agent scratch directory
+  (`$CLAUDE_JOB_DIR/tmp/<file>/`), because agents sharing the job tmp
+  directory overwrote each other's `batch1.py`; and cap each owner at ~12
+  variants / ~8 minutes, stopping after two batches once the best result is
+  `register_allocation_only` at similarity 1.0.
+- Measure yield per file after the first box and do not reassign a file that
+  yielded fewer than two accepts: its remaining owners go to §5. Wave of
+  2026-08-28 on the six text-segment files no session had touched for 19
+  hours (`585D0` ×2, `14640`, `6E850`, `CE80`, `4AC10`): 12 accepts from
+  ~295 variants and ~1.25M tokens (~105k per accept versus ~17k in the
+  pilot), and half of them came from one file (`4AC10`, 6/14, where a single
+  spelling — the `gbi.h` macros — unlocked a family). Files left untouched by
+  a running fleet are usually untouched because their small owners are
+  register-allocation ties, not because nobody got to them. When the
+  text-segment pool looks like that, point the wave at fragments (the
+  concurrent fleet kept landing 5–6 commits/hour there) or at the ≥ 0.95
+  near-miss pool.
+- Two coordinators in one checkout: a coordinator that commits with a broad
+  stage (`git add -A`, `git commit -a`) sweeps the other fleet's uncommitted
+  installs into its own commits (`0525ec9`); commit by explicit path only,
+  and treat a dirty file as owned even when `git log` shows no recent commit.
 
 **Tooling and process sessions** (the goal changes how the pipeline works:
 runner, sweep, classifier, hooks, docs, layout) start with **parallel
@@ -361,7 +385,8 @@ by these; always probe and gate.
 | Near-miss `register_allocation_only` / `operand_or_scheduling_drift` | `commute-swap`, `decl-order`, `hoist-temp`, `type-width`, `loop-form`, `reorder-store-call` | 0 hits in 146 attempts on the first run — treat as unproven; prefer hand analysis of the first differing instruction | — |
 | Float divide by a power of two | Divide by the **integer** literal (`x / 16`), not `16.0f`: a float literal divisor is strength-reduced to `mul.s` by the reciprocal, an int divisor keeps `div.s` | 1 (`func_8130A98C`) | — |
 | Guard/return polarity | IDO branches on the negated condition: write the `if` in the polarity whose negation is the observed `beq`/`bne`, e.g. `if (arg1 == x) { ... } return v;` rather than `if (arg1 != x) return v;` | 2 (`func_81306EE0`, `func_80059234`) | — |
-| Several `return 1;` guards sharing one epilogue | A single `return a \|\| b \|\| c \|\| d;` expression; separate guard clauses allocate differently and add bytes | 1 (`func_8130AA54`) | — |
+| Display-list append (`Gfx` command into `D_800D0510++`) | Use the real `gbi.h` macros — `gSPDisplayList(D_800D0510++, addr)`, `gDPSetFillColor`, `gDPFillRectangle` — never hand-written `p->words.w0 = ...; p->words.w1 = ...;` stores, which stall at 0.93–0.95 on a constant-load/pointer-increment scheduling swap | 6 (`4AC10.c`: `func_8004AC24/AE3C/AF18/A5B8/A708/AD00`) | RDP texture-load sequences (`gDPSetTile`/`gDPLoadBlock`, `func_8004A010`) not yet tried |
+| Several `return 1;` guards sharing one epilogue | A single `return a \|\| b \|\| c \|\| d;` expression; separate guard clauses allocate differently and add bytes | 2 (`func_8130AA54`, `func_80057A80`) | — |
 | Wrapper whose callee result feeds a conditional second call | `s32 result = f(arg0, N); if (result != 0) { g(arg0); } return result;` (second call's value discarded; `$v1` spill/reload across the call is the tell) | 3 (`func_8005A0B4/A0F4/A134`) | — |
 | Table-field forward with 112-byte stride into bcopy/bzero | Load the field into an explicit `s32 v0 = *(s32 *)(D_X + idx * 112);` **before** the call; inlining it into the argument reorders the frame allocation | 6 (`585D0.c`) | same stride/forward shape |
 | Non-power-of-two stride (`arg2 * 47`) | Hoist the multiply into its own local declared **before** the table-load local to fix `addu` operand order | 2 (`func_8005C880/C988`) | — |
@@ -411,5 +436,67 @@ accepts; other widths only on diagnostic evidence via the variant policy.
 - Shape: `func_80067800` has a one-instruction return-tail drift and the
   permuter cannot assemble its `.late_rodata_alignment`; preserve the helper
   until the late-rodata path is repaired.
+- Shape: `func_8004B010` (`4AC10.c`, 0.94) re-reads global `s16 D_800950D0`
+  after a call and stores `(v + 1) % 12`; every spelling either adds an 8-byte
+  spill or lets IDO CSE the address across the call. Next targets in that
+  file are the RDP texture-load sequences `func_8004A010` (+ `A174/A2E0/A44C`
+  which call it 8× each) with `gDPSetTile`/`gDPLoadBlock`/`gDPSetTileSize`.
+- Runner: a candidate can report `similarity_score` 1.0 through register
+  normalisation while `raw_similarity_score` is 0.63 with values swapped
+  between struct fields; never treat 1.0 as done without the gate.
+- Runner: `probe_unavailable` on `func_8006092C` (`585D0.c`) for a
+  well-formed candidate; not isolated.
+- Runner: the synthesised fallback prototype for a callee that is *defined
+  later in the same file* defaults to `s32` and fails the probe with
+  "redeclaration; incompatible return type" when the real definition returns
+  `u8` (`func_8005D92C`). Workaround: pass the matching prototype in
+  `declarations`. Same class: a same-file forward call to a still-pragma
+  function fails the moment that pragma becomes a C definition unless an
+  earlier accepted candidate carried the forward prototype in its
+  `declarations` (`CE80.c`: `func_8000DDC8`/`func_8000DE34`, five callers).
+- Shape: a callee that an already-accepted caller invokes with fewer
+  arguments than its real signature (`func_80018A74(void){ func_8001480C(); }`)
+  needs a K&R definition to compile, and the K&R form starts IDO's register
+  allocation differently — `func_8001480C` sits at similarity 1.0 but cannot
+  close without changing the caller in the same gated change (same class as
+  the `func_80055BA8` return-type case).
+- Shape: fixed-stride byte-flag clear loop (`func_8001644C`, 8 records at
+  0x160): IDO unrolls every simple `do { p += stride; *p = 0; } while (p != end)`
+  spelling (inserting a `divu`); a pretest `while` got 60 bytes versus 48.
+  Needs a spelling that defeats the unroll heuristic.
+- Shape: byte-argument helpers in `585D0.c` that compute a record pointer
+  and make an out-of-line call before writing through the pointer argument
+  overshoot the frame by exactly 8 bytes with a `$v1`/`$a3` swap
+  (`func_8005A92C`, `func_8005FC7C`, `func_8005FDB0`); no declaration-order
+  or type variant closed it.
+- Shape: `D_80128570`/`D_801285D0` 112-byte-stride record lookups sit at
+  similarity 1.0 `register_allocation_only` (`func_8005C0B0/C12C/C1AC`,
+  `func_8005C2B4/C2FC/C348`, `func_8005D9E0`, `func_8005DFD4`); six variants
+  each, nothing moved the allocator. Do not spend fleet time here.
+- Shape: forward-call wrappers whose last stack argument is a non-zero literal
+  (`func_8005F37C`, `func_8005F5D4`) get a different list-scheduler order
+  around the call than the accepted `0`-literal siblings; every source
+  reordering gave byte-identical diagnostics.
+- Shape: `func_8005CBA0` / `func_8005CAA4` literal switches match except for
+  whether the last case shares the `jr` delay slot with `default` (same
+  class as `func_80050D20`).
+- Shape: `6E850.c` float/matrix owners: `func_8007074C` at similarity 1.0
+  (`$a3` versus `$a2` for the persisted state copy), `func_8006EFF0` (0.94,
+  IDO spills and reloads `arg1+0x14` through `sp+0x14` as a register-pressure
+  artefact), `func_8006E944` (0.89; a bare `x * 1.0f` is constant-folded, a
+  named `f32 weight = 1.0f` restores the instruction but costs 8 frame
+  bytes), `func_8007065C` (0.88, Gfx command block builder). Leave the file
+  to a hand session.
+- Shape: `CE80.c` channel-pool helpers: `func_8000DDC8`/`func_8000DE34` spill
+  only `$a1`/`$a2` to their homes with a fifth stack argument (0.79),
+  `func_8000D174` keeps two address registers IDO folds away (0.88),
+  `func_8000D710` (0.90, one register), `func_8000D7B8` (0.86, one missing
+  spill slot), `func_8000C6D8` (0.73 at equal size; IDO hoists
+  `D_800D1220`/`D_8008FA40` into `$s3`–`$s5` in every spelling).
+- Shape: `14640.c`: `func_800186B8` ring-buffer push (0.95; the original
+  keeps the record base and stores via `addiu`+offset instead of one folded
+  immediate), `func_80013A40` pool allocator (0.68, 12 bytes over, `arg0`
+  spilled in every variant), `func_80016AB4` at similarity 1.0 with a
+  `u8 *base = arg0;` local but an 8-byte frame difference.
 - Sweep families other than `frame-padding` in `near_miss_kinds` have no
   accepts yet (0/146); re-evaluate after the fleet's records accumulate.
