@@ -2,7 +2,36 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/18/fragment18_code/func_81700020.s")
+extern void _bzero(void *, s32);
+extern s32 func_8004C8C0(s32);
+extern void func_81700020(u8 *);
+extern s32 func_8170031C(u8 *);
+extern s32 D_81700DA0;
+extern u8 D_81700DB0[];
+extern u8 D_81700E40[];
+void func_81700020(u8 *arg0) {
+    _bzero(arg0, 0x24);
+    *(s16 *)(arg0 + 0x00) = -1;
+    *(s16 *)(arg0 + 0x02) = -1;
+    *(s16 *)(arg0 + 0x04) = 0;
+    *(s16 *)(arg0 + 0x06) = 0;
+    *(s32 *)(arg0 + 0x08) = 0;
+    *(s16 *)(arg0 + 0x0C) = 0;
+    *(s16 *)(arg0 + 0x0E) = 0;
+    *(s16 *)(arg0 + 0x10) = 0;
+    *(s16 *)(arg0 + 0x12) = 0;
+    *(s16 *)(arg0 + 0x14) = 0;
+    *(s16 *)(arg0 + 0x16) = 0;
+    *(s16 *)(arg0 + 0x18) = 0;
+    *(s16 *)(arg0 + 0x1A) = 0xFF;
+    *(s16 *)(arg0 + 0x1C) = 0;
+    arg0[0x1E] = 0xFF;
+    arg0[0x1F] = 0xFF;
+    arg0[0x20] = 0xFF;
+    arg0[0x21] = 0xFF;
+    arg0[0x22] = 0xFF;
+    arg0[0x23] = 0xFF;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/18/fragment18_code/func_817000A4.s")
 
@@ -51,7 +80,13 @@ void func_817001E0(void *arg0)
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/18/fragment18_code/func_81700974.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/18/fragment18_code/func_81700AF4.s")
+s32 func_81700AF4(s32 arg0, void *arg1) {
+    typedef struct { u8 bytes[4]; } Copy4;
+    if (arg0 < 4) {
+        *(Copy4 *)arg1 = *(Copy4 *)(D_81700DB0 + arg0 * 0x24);
+    }
+    return 0;
+}
 
 extern u8 D_81700DC0[];
 s32 func_81700B2C(s32 arg0) { s32 result = 0; if (arg0 < 4) result = *(s16 *)((u8 *)D_81700DC0 + arg0 * 36); return result; }
