@@ -119,7 +119,9 @@ void GbSave_ComputeChecksum(u8 *start, u8 *end) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80058850.s")
+s32 func_80058850(u8 arg0) {
+    return (arg0 < 0x29) ? ((arg0 + 0x2A4) & 0xFFFF) : ((arg0 + 0x2A7) & 0xFFFF);
+}
 #endif
 
 #ifdef VERSION_US

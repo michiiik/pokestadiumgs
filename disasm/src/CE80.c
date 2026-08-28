@@ -6,7 +6,35 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/CE80/func_8000C614.s")
+extern s32 func_8000DDC8(s32 arg0, s32 arg1, u16 arg2, s16 arg3, u8 *arg4);
+extern s32 func_8000DE34(s32 arg0, s32 arg1, u16 arg2, s16 arg3, u8 *arg4);
+extern s32 D_8008FA40;
+extern u8 D_800D1220[];
+extern u8 D_8011EBF0[];
+void func_8000C614(s32 arg0)
+{
+    s32 i;
+    u8 *entry;
+
+    if (arg0 >= 8) {
+        arg0 = 7;
+    }
+    D_8008FA40 = arg0;
+    for (i = 0; i < 7; i++) {
+        entry = D_800D1220 + i * 0x18;
+        *(s32 *)(entry + 4) = 0;
+        *(s32 *)(entry + 8) = 0;
+        if (i < D_8008FA40) {
+            *(s32 *)(entry + 0) = GbApu_Alloc(D_8011EBF0, 0x25D8);
+            *(s32 *)(entry + 0xC) = GbApu_Alloc(D_8011EBF0, 0x280);
+            if (*(s32 *)(entry + 0) != 0) {
+                *(s32 *)(entry + 0x14) = *(s32 *)(entry + 0) + 0x198;
+            }
+        } else {
+            *(s32 *)(entry + 0) = 0;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
