@@ -15,7 +15,22 @@ void func_87E0C93C(void) {
         (s16 *)((u8 *)state + 0x42));
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_310270/func_87E0C974.s")
+extern Gfx *D_800D0510;
+extern void *D_8009491C;
+extern void func_8003CD84();
+void func_87E0C974(s32 arg0, s32 arg1) {
+    void *context;
+
+    if (arg0 == 5) {
+        gDPPipeSync(D_800D0510++);
+        gDPSetCombine(D_800D0510++, 0xFFFFFF, 0xFFFCF238);
+        context = *(void **)((u8 *)D_8009491C + 0x14);
+        gSPSegment(D_800D0510++, 0xF,
+                   *(void **)((u8 *)*(void **)((u8 *)context + 4) + 8));
+        gSPDisplayList(D_800D0510++, *(void **)context);
+        func_8003CD84();
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_310270/func_87E0CA2C.s")
 
@@ -116,7 +131,33 @@ void func_87E0D73C(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_310270/func_87E0D8EC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_310270/func_87E0DA4C.s")
+extern void func_87E0CEE4(void *, s32);
+extern void func_87E134C0(void);
+extern void func_87E13490(void);
+extern void func_87E13480(void *);
+extern void func_87E1366C(void);
+void func_87E0DA4C(void *arg0) {
+    s32 i;
+    u8 *node;
+
+    node = *(u8 **)((u8 *)arg0 + 0x1C);
+    *(s32 *)((u8 *)arg0 + 0x3F4) = 4;
+    if (node != NULL) {
+        do {
+            *(u8 *)(node + 0x25) |= 1;
+            node = *(u8 **)(node + 4);
+        } while (node != NULL);
+    }
+    i = 0;
+    do {
+        func_87E0CEE4(arg0, i);
+        i += 1;
+    } while (i != 4);
+    func_87E134C0();
+    func_87E13490();
+    func_87E13480(NULL);
+    func_87E1366C();
+}
 
 extern void func_87E0CC18(void *);
 extern void func_87F0BD10();
