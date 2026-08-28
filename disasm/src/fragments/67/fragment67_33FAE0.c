@@ -145,7 +145,26 @@ void func_8290379C(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33FAE0/func_82903DC0.s")
+extern s32 D_82919C10;
+extern void *D_82919D18;
+extern u8 D_82911FDF[];
+extern s32 D_82911FC0[];
+extern s32 func_8004C990(s32, s32);
+extern void func_829000CC(void);
+extern void func_829000F8(s32, s32, s32, s32);
+extern void func_829001E4(s32, s32, s32, s32);
+extern void func_8004D19C(s32, s32, void *, s32, s32);
+void func_82903DC0(void *arg0) {
+    u8 *base;
+    if (((u8 *)arg0)[0x18] & 1) {
+        base = (u8 *)D_82911FDF;
+        D_82919D18 = (void *)func_8004C990(0x43, ((s32 *)D_82911FC0)[base[D_82919C10 * 0x14]]);
+        func_829000CC();
+        func_829000F8(0xFF, 0xFF, 0xFF, 0xFF);
+        func_829001E4(0xFF, 0, 0, 0xFF);
+        func_8004D19C(0x1A, 9, D_82919D18, 0, 0);
+    }
+}
 #endif
 
 #ifdef VERSION_US
