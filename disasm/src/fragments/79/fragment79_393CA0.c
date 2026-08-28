@@ -1622,7 +1622,21 @@ void BattleAnim_Table_84186004_078(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8413207C.s")
+extern u8 *D_84195208[];
+s32 func_8413207C(void) {
+    u16 y = *(u16 *)(D_84195208[0] + 0x40);
+    u16 x = *(u16 *)(D_84195208[1] + 0x40);
+    if (y == x) {
+        if (func_84125080() < 0x80) {
+            return 1;
+        }
+        return 2;
+    }
+    if (x < y) {
+        return 1;
+    }
+    return 2;
+}
 #endif
 
 #ifdef VERSION_US
