@@ -2,9 +2,41 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E07BD0.s")
+extern void func_80051D64(s32, s32);
+extern void func_8005493C(u16 *);
+extern void func_80054974(u16 *);
+extern void func_80054E48(s32);
+extern void func_80055948(s32);
+void func_87E07BD0(void) {
+    u16 sp18[4];
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E07C20.s")
+    func_80055948(3);
+    func_8005493C(&sp18[0]);
+    sp18[0] |= 4;
+    func_80054974(&sp18[0]);
+    func_80051D64(0x14, 0);
+    func_80054E48(3);
+}
+
+extern void main_pool_push_state(s32);
+extern void main_pool_pop_state(s32);
+extern void func_80055948(s32);
+extern void func_8005493C(u16 *);
+extern void func_80054974(u16 *);
+extern void func_80051D64(s32, s32);
+extern void func_80054E48(s32);
+void func_87E07C20(s32 arg0) {
+    u16 sp18[4];
+
+    main_pool_push_state(0x4D475346);
+    func_80055948(3);
+    func_8005493C(&sp18[0]);
+    sp18[0] |= arg0;
+    func_80054974(&sp18[0]);
+    func_80051D64(0x14, 0);
+    func_80054E48(3);
+    main_pool_pop_state(0x4D475346);
+}
 
 extern void func_87E07C20(s32);
 void func_87E07C90(void) { func_87E07C20(2); }
@@ -45,7 +77,22 @@ void func_87E07F18(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E081A0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E082E4.s")
+extern void func_87E080F8(s32);
+extern void func_87E01628(void);
+extern void main_pool_pop_state(s32);
+void func_87E082E4(void *arg0, s32 arg1) {
+    *(s32 *)((u8 *)arg0 + 0) = arg1;
+    if (arg1 != 1) {
+        if ((arg1 == 2) || (arg1 == 3)) {
+            func_87E080F8(*(s32 *)((u8 *)arg0 + 0x20) + 0x2188);
+            *(s32 *)((u8 *)*(void **)((u8 *)arg0 + 0x20) + 0x21F0) = 0;
+            func_87E01628();
+            main_pool_pop_state(0x4D47434D);
+        }
+    } else {
+        *(s32 *)((u8 *)*(void **)((u8 *)arg0 + 0x20) + 0x21F0) = 1;
+    }
+}
 
 extern s32 func_8005DED8(s32);
 extern s32 func_80060368(s32);
@@ -88,7 +135,21 @@ void func_87E08810(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E088E0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E08B14.s")
+extern void func_87E0C628(s32, s32);
+extern void func_87E0DAE0(s32, s32);
+extern void func_87E12674(s32, s32);
+extern void func_87E14FF4(s32, s32);
+extern void func_87E179F4(s32, s32);
+extern void func_87F0D48C(s32, s32, s32);
+void func_87E08B14(s32 arg0) {
+    main_pool_push_state(0x434D4C42);
+    func_87E0C628(arg0 + 0x60, *(s32 *)((u8 *)arg0 + 0x20));
+    func_87E0DAE0(arg0 + 0x8C, *(s32 *)((u8 *)arg0 + 0x20));
+    func_87E12674(arg0 + 0x628, *(s32 *)((u8 *)arg0 + 0x20));
+    func_87E14FF4(arg0 + 0x644, *(s32 *)((u8 *)arg0 + 0x20));
+    func_87E179F4(arg0 + 0x7BC, *(s32 *)((u8 *)arg0 + 0x20));
+    func_87F0D48C(arg0 + 0x1970, *(s32 *)((u8 *)arg0 + 0x20), 0);
+}
 
 extern void func_87E0BE28(s32);
 extern void func_87E0CD84(s32);
@@ -105,7 +166,34 @@ void func_87E08B90(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E08BEC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E08CD8.s")
+extern s32 func_87E0B0EC(s32);
+extern void func_87E08810(s32);
+extern void func_87E08B14(s32);
+extern void func_87E08844(s32, s32);
+extern void func_87E015C0(s32);
+extern void func_80021ED8(s32);
+extern void func_87E082E4(void *, s32);
+void func_87E08CD8(s32 arg0) {
+    s32 sp24;
+    s32 temp_v0;
+
+    temp_v0 = func_87E0B0EC(arg0 + 0x24);
+    sp24 = temp_v0;
+    if (temp_v0 != 2) {
+        func_87E08810(arg0);
+        if (sp24 != 0) {
+            if (sp24 == 1) {
+                func_87E08B14(arg0);
+                func_87E08844(arg0, 1);
+                func_87E015C0(1);
+                func_80021ED8(0x4D);
+            }
+        } else {
+            func_87E082E4((void *)arg0, 2);
+            func_87E015C0(0);
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E08D70.s")
 
