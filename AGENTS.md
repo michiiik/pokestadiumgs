@@ -70,13 +70,45 @@ Coordinator rules:
   spelling — the `gbi.h` macros — unlocked a family). Files left untouched by
   a running fleet are usually untouched because their small owners are
   register-allocation ties, not because nobody got to them. When the
-  text-segment pool looks like that, point the wave at fragments (the
-  concurrent fleet kept landing 5–6 commits/hour there) or at the ≥ 0.95
-  near-miss pool.
+  text-segment pool looks like that, point the wave at fragments or at the
+  ≥ 0.95 near-miss pool.
+- **Rank by the `fresh` column, not by `rank-files`' composite `score`.**
+  `score` is `fresh + drift`, a count; a file whose score is mostly `drift`
+  is a file whose owners other sessions already probed and failed. Evening
+  wave of 2026-08-28: the two files picked off the composite score
+  (`fragment7_BA250` 19 fresh / 28 drift, `fragment17_10FFC0`) returned
+  0 accepts between them, while every fresh-heavy fragment returned 4–10.
+- **Hand each successor agent the previous one's winning spellings and an
+  explicit skip list.** This is what sustains yield across boxes:
+  `fragment79_393CA0` gave 10, 10, then 8 owners over three boxes at
+  ~20–25k tokens per accept, versus ~105k in the morning wave with no
+  hand-off. Put the spellings in the prompt verbatim (bases, strides,
+  store order, argument widths), and list the exhausted owners by name so
+  the next agent does not re-probe them.
+- Evening wave totals for comparison: 69 owners from 13 agent-boxes across
+  9 fragment files. Fragments are *not* 5× more expensive than text
+  segments once family unlocks are used; that earlier ratio measured
+  agents working without them.
 - Two coordinators in one checkout: a coordinator that commits with a broad
   stage (`git add -A`, `git commit -a`) sweeps the other fleet's uncommitted
   installs into its own commits (`0525ec9`); commit by explicit path only,
   and treat a dirty file as owned even when `git log` shows no recent commit.
+- This checkout is usually shared with a **Codex session** working the same
+  ROM. It does not set `CLAUDE_JOB_DIR`, so its claims carry a bare-`$PPID`
+  tag and its commit messages are generically named ("Decompile fragment NN
+  … helpers"). Check `python3 tools/file_claims.py list` and `git status`
+  before assigning, and re-check when reassigning a file for a second box:
+  on 2026-08-28 both sessions worked `fragment43_1E5A10.c` for ten minutes
+  before the overlap was spotted (Codex commit `ae9d92e` interleaved with
+  five of ours). When it happens, move your agent and tell it **not** to
+  revert or stash — part of the working tree is the other session's.
+- Claim identity is per **job**, not per agent: every agent under one
+  coordinator shares `$CLAUDE_JOB_DIR`, so claims cannot separate them, and
+  a per-agent `CLAIMS_OWNER` export does not survive between Bash calls
+  (agents refused their own claims with it). Install-time claims are
+  therefore advisory — `PRAGMA_CLAIMS_ENFORCE=1` restores refusal — and the
+  guard that matters stays at commit time (`12-claims.sh`). Keep assigning
+  one file per agent by hand; the registry is a warning, not a lock.
 
 **Tooling and process sessions** (the goal changes how the pipeline works:
 runner, sweep, classifier, hooks, docs, layout) start with **parallel
@@ -459,7 +491,7 @@ by these; always probe and gate.
 | Near-miss `register_allocation_only` / `operand_or_scheduling_drift` | `commute-swap`, `decl-order`, `hoist-temp`, `type-width`, `loop-form`, `reorder-store-call` | 0 hits in 146 attempts on the first run — treat as unproven; prefer hand analysis of the first differing instruction | — |
 | Float divide by a power of two | Divide by the **integer** literal (`x / 16`), not `16.0f`: a float literal divisor is strength-reduced to `mul.s` by the reciprocal, an int divisor keeps `div.s` | 1 (`func_8130A98C`) | — |
 | Guard/return polarity | IDO branches on the negated condition: write the `if` in the polarity whose negation is the observed `beq`/`bne`, e.g. `if (arg1 == x) { ... } return v;` rather than `if (arg1 != x) return v;` | 2 (`func_81306EE0`, `func_80059234`) | — |
-| Display-list append (`Gfx` command into `D_800D0510++`) | Use the real `gbi.h` macros — `gSPDisplayList(D_800D0510++, addr)`, `gDPSetFillColor`, `gDPFillRectangle` — never hand-written `p->words.w0 = ...; p->words.w1 = ...;` stores, which stall at 0.93–0.95 on a constant-load/pointer-increment scheduling swap | 6 (`4AC10.c`: `func_8004AC24/AE3C/AF18/A5B8/A708/AD00`) | RDP texture-load sequences (`gDPSetTile`/`gDPLoadBlock`, `func_8004A010`) not yet tried |
+| Display-list append (`Gfx` command into `D_800D0510++`) | Use the real `gbi.h` macros — `gSPDisplayList(D_800D0510++, addr)`, `gDPSetFillColor`, `gDPFillRectangle` — never hand-written `p->words.w0 = ...; p->words.w1 = ...;` stores, which stall at 0.93–0.95 on a constant-load/pointer-increment scheduling swap | 7 (`4AC10.c`: `func_8004AC24/AE3C/AF18/A5B8/A708/AD00`; `fragment47_24E0A0.c`: `func_8600B474`) | holds across overlays; RDP texture-load sequences (`gDPSetTile`/`gDPLoadBlock`, `func_8004A010`) still untried, and one owner (`func_82C01FE4`) drifts on the order of two independent `lui` loads inside the macro |
 | Several `return 1;` guards sharing one epilogue | A single `return a \|\| b \|\| c \|\| d;` expression; separate guard clauses allocate differently and add bytes | 2 (`func_8130AA54`, `func_80057A80`) | — |
 | Wrapper whose callee result feeds a conditional second call | `s32 result = f(arg0, N); if (result != 0) { g(arg0); } return result;` (second call's value discarded; `$v1` spill/reload across the call is the tell) | 3 (`func_8005A0B4/A0F4/A134`) | — |
 | Table-field forward with 112-byte stride into bcopy/bzero | Load the field into an explicit `s32 v0 = *(s32 *)(D_X + idx * 112);` **before** the call; inlining it into the argument reorders the frame allocation | 6 (`585D0.c`) | same stride/forward shape |
@@ -473,12 +505,45 @@ by these; always probe and gate.
 | Aligned graph-node constructor wrapper | If the pool handle is nonzero, replace the incoming result with `MainPool_AllocAligned`; if the result is nonzero, call the constructor with the observed old-style narrow-field formals, then return it | 4 (`4EE50.c`: `func_8004E368/4E3C8/4E438/4E52C`) | only for the matching allocation/constructor call sequence |
 | Callee prototyped earlier as `void` but its return is needed | Block-scope re-prototype does not work (hard "redeclaration" error); the earlier definition must change to return the value — do it as a separate gated change | 1 (`func_80055BA8`, open) | — |
 | Wrapper called with four registers but only three read | Declare only the parameters the body reads (`a3` was caller garbage); the fourth formal changes the frame | 1 (`func_841518D0`) | — |
+| Record-stride forwarding wrapper (overlay fragments) | `helper(&BASE[BASE[idx_field] * STRIDE], a0, ...)` with the remaining formals forwarded verbatim; the clamp variant is `idx = BASE[idx_field] - 1; if (idx < 0) idx = LAST;` then the same forward | 12 (`fragment79_393CA0.c`, bases `D_84195280` stride 0x280, `D_84195208`, `D_841951F8`) | argument widths vary per owner (`u8`/`s16`/`u16`, 5th arg stack-passed) — read each `.s` |
+| Pointer-table guard lookup | `if (arg0 < 4) { u8 *ptr = D_84186160[arg0]; if (ptr) helper(ptr, ...); }` | 2 (`func_84134D80`, `func_84135B8C`) | a `ptr + 8` variant exists; pick by the offset in the `.s` |
+| `_bzero`-then-forward call chain | `_bzero(dst, N); v0 = ctor(a, b); dst[0] = v0; dispatch(field, &callback, dst);` — the callback is referenced by address even when it is still an unsolved sibling | 5 (`fragment43_1E5A10.c`: `func_8AC02C80/02FCC/03334/02770/02830`) | `_bzero` may come before or after the constructor; word stores precede byte stores |
+| Dual-global notify chain | `func_8411EF08((u8 *) D_84191208)` — an `s32`-typed global holding a pointer bit pattern, passed straight through, then the second global | 2 (`func_84120A50`, `func_84120CA4`) | only where the global is `s32`-typed but dereferenced |
+| Index-arithmetic loop over a strided array | `for (i = 0; i < n; i++) { ... &arr[i * STRIDE] ... }` — the pointer-accumulator spelling allocates differently | 2 (`func_86009318`, `func_86009260`) | — |
+| Dead tail longer than one `jr`/`nop` pair | When `symbol_size_drift` is more than 8 bytes short, add N uniquely-named trailing `void <owner>_paddingK(void) {}` helpers; `#pragma C_FUNCTION_PADDING` did not reproduce it | 1 (`func_841352DC`) | one owner so far; prefer the pragma first |
 | General | Preserve narrow `sb`/`sh`/`sw` widths, initialise results before NULL checks, raw 32-bit address arithmetic (`(u8 *)(u32)global + off`) before inferred structs, `uintptr_t` casts for raw addresses, explicit `s32` loop counters, array-index vs pointer-add as separate variants, deliberate signed/unsigned masks | repo scan | ABI hypotheses until compared |
 
 Type spellings: `u8-void` and `s32-s32` account for essentially all m2c-draft
 accepts; other widths only on diagnostic evidence via the variant policy.
 
 ## 5. Tooling backlog and recurring unsolved shapes
+
+- Shape (blocking, 2026-08-28): adding a **second formal** to an
+  already-accepted one-parameter function costs +0x10 of `.text` (IDO
+  reserves an incoming-argument save area) regardless of the new
+  parameter's type. This makes the `func_84111E50` fix unviable and leaves
+  `func_841137F8`, `func_8411388C`, `func_8411B160`, `func_84115988`
+  blocked. It is *not* a blanket N→N+1 rule: the same edit on
+  `BattleAnim_ModelDispatch_044` produced zero drift. The probe's
+  link-shape check reports it as `section_layout_drift` before any gate —
+  always probe a `companion_edits` change rather than reasoning about it.
+- Shape: an incoming-argument stack-home spill (`sw a0, N(sp)` with no
+  intervening call) that no C spelling reproduces — the single most common
+  dead end in fragment work (7+ owners in `fragment79_393CA0.c` alone,
+  plus `func_8000DDC8`/`func_8000DE34`, `func_82C02664`). Drop an owner as
+  soon as its first diff is this.
+- Shape: an unaligned 4-byte copy assembled as `lwl/lwr`+`swl/swr` needs a
+  **struct-typed assignment** (`*(Pair16 *)(p + a) = *(Pair16 *)(p + b);`
+  with a 2×`s16` typedef); a plain `*(s32 *)` cast compiles to `lw`/`sw`
+  because IDO trusts the cast's alignment (`func_82201C70`: raw 0.26 →
+  0.74, size exact, still unaccepted).
+- Shape: a leading null/zero guard that IDO emits as a branch-likely
+  (`bnel`/`beql`) where every C spelling produces a plain `bne`
+  (`func_8AE011E0`/`func_8AE01248`, `func_84112418`). The §4 guard-polarity
+  row does not cover it.
+- Runner: `probe_unavailable` / `list index out of range` also reproduces on
+  `func_82C04880` (`fragment83_code.c`) — same last-owner diagnostics bug,
+  now five recorded instances.
 
 - Runner: `probe_error` / `list index out of range` on the last pragma owner
   of a file when the function has trailing alignment nops
