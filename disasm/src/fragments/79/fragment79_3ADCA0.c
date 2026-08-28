@@ -21,7 +21,11 @@ void ParticleGfx_SetPrimColor_fragment79(u8 r, u8 g, u8 b, u8 a) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_8413E63C.s")
+void func_8413E63C(u16 arg0, u16 arg1, u16 arg2, u16 arg3) {
+    gDPPipeSync(D_800D0510++);
+    gDPSetFillColor(D_800D0510++, (((((arg0 << 8) & 0xF800) | ((arg1 << 3) & 0x7C0) | ((arg2 >> 2) & 0x3E) | (arg3 & 1)) << 16) |
+        (((arg0 << 8) & 0xF800) | ((arg1 << 3) & 0x7C0) | ((arg2 >> 2) & 0x3E) | (arg3 & 1))));
+}
 #endif
 
 #ifdef VERSION_US
