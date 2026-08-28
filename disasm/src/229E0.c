@@ -1178,7 +1178,14 @@ void func_8003455C(u8 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003459C.s")
+extern void func_8003492C(u8, s32);
+void func_8003459C(u8 arg0, s32 arg1) {
+    s8 sp1F;
+    s8 new_var;
+    sp1F = func_800347E8(arg0);
+    new_var = func_800347E8(arg0);
+    func_8003492C(arg0, (((((u8)sp1F) ^ 0) << 8) + new_var) & 0xFFFF);
+}
 #endif
 
 #ifdef VERSION_US
