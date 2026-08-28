@@ -344,7 +344,12 @@ void func_8004989C(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800499EC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80049B48.s")
+extern u8 *D_80126F50; extern Gfx *D_800D0510; extern u8 D_80095018[];
+void func_80049B48(void) {
+    D_80126F50[0x7A] |= 1;
+    D_80126F50[0x7A] &= 0xFFFD;
+    gSPDisplayList(D_800D0510++, D_80095018);
+}
 
 extern u8 D_80095040[]; extern Gfx *D_800D0510;
 void func_80049B9C(void) { D_80126F50[0x7A] &= 0xFFFC; gSPDisplayList(D_800D0510++, D_80095040); }
