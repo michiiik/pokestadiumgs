@@ -109,6 +109,14 @@ says "register tie — stop" when §2 step 6's stop condition applies.
 - Never search outside this repository (no `find /`) — SDK headers are all
   under `disasm/lib/ultralib/include/PR/`.
 - Stay inside your time box. Stop and report when it expires, even mid-owner.
+- **Do not set `CLAIMS_OWNER`.** The runner records an advisory claim on the
+  file you install into, using this job's identity. A custom per-agent value
+  looks like a different session to `tools/file_claims.py`, and because the
+  Bash tool does not carry an `export` from one call to the next, you would
+  alternate between two identities and collide with your own earlier claim
+  (agents hit `file_claimed_by_other` against themselves, 2026-08-28). If a
+  claim warning names another session, that is information, not an error:
+  finish your batch, commit by explicit path, and say so in your report.
 
 ## 6. Report format
 

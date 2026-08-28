@@ -281,12 +281,35 @@ class RunnerClaimIntegrationTests(unittest.TestCase):
         claim_mock.assert_called_once()
         touch_mock.assert_called_once()
 
-    def test_refusal_names_the_holder_without_writing_anything(self) -> None:
-        with mock.patch.object(file_claims, "claim", return_value=False), \
-             mock.patch.object(file_claims, "holder", return_value={"owner": "other@host:sess"}):
+    def test_conflict_is_advisory_by_default(self) -> None:
+        """A conflicting live claim warns and proceeds unless enforcement is on.
+
+        Identity is not stable across the calls of one work session
+        (CLAUDE_JOB_DIR names the whole job; a per-agent CLAIMS_OWNER export
+        does not survive between shell invocations), so refusing here made
+        agents block themselves. The commit-time guard is where a real
+        cross-session sweep is stopped.
+        """
+        env = {k: v for k, v in os.environ.items() if k != "PRAGMA_CLAIMS_ENFORCE"}
+        with mock.patch.dict(os.environ, env, clear=True), \
+             mock.patch.object(file_claims, "claim", return_value=False), \
+             mock.patch.object(file_claims, "holder", return_value={"owner": "other@host:/jobs/x"}):
+            self.assertIsNone(runner._claim_or_refuse(Path("disasm/src/AAA.c")))
+
+    def test_refusal_names_the_holder_when_enforcement_is_on(self) -> None:
+        with mock.patch.dict(os.environ, {"PRAGMA_CLAIMS_ENFORCE": "1"}), \
+             mock.patch.object(file_claims, "claim", return_value=False), \
+             mock.patch.object(file_claims, "holder", return_value={"owner": "other@host:/jobs/x"}):
             diagnostic = runner._claim_or_refuse(Path("disasm/src/AAA.c"))
         self.assertIsNotNone(diagnostic)
-        self.assertIn("other@host:sess", diagnostic)
+        self.assertIn("other@host:/jobs/x", diagnostic)
+
+    def test_unreliable_identity_never_refuses_even_when_enforcing(self) -> None:
+        """A bare-$PPID tag names a shell, not a session; it must not block."""
+        with mock.patch.dict(os.environ, {"PRAGMA_CLAIMS_ENFORCE": "1"}), \
+             mock.patch.object(file_claims, "claim", return_value=False), \
+             mock.patch.object(file_claims, "holder", return_value={"owner": "5@host:4242"}):
+            self.assertIsNone(runner._claim_or_refuse(Path("disasm/src/AAA.c")))
 
     def test_gate_false_batch_never_claims(self) -> None:
         # A probe-only batch returns from _try_candidates_detailed_unlocked
@@ -306,19 +329,23 @@ class RunnerClaimIntegrationTests(unittest.TestCase):
         claim_mock.assert_not_called()
 
     def test_batch_refused_by_a_foreign_claim_never_reaches_the_gate(self) -> None:
+        """With enforcement on, a foreign live claim stops the batch before the gate."""
         with tempfile.TemporaryDirectory() as directory:
             source = Path(directory) / "synthetic.c"
             source.write_text('#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_1.s")\n')
-            with mock.patch.object(runner, "probe_candidates", return_value=[
-                {"function": "func_1", "status": "probe_match", "link_verified": False}
-            ]), mock.patch.object(file_claims, "claim", return_value=False), \
-                 mock.patch.object(file_claims, "holder", return_value={"owner": "other@host:sess"}), \
+            with mock.patch.dict(os.environ, {"PRAGMA_CLAIMS_ENFORCE": "1"}), \
+                 mock.patch.object(runner, "probe_candidates", return_value=[
+                     {"function": "func_1", "status": "probe_match", "link_verified": False}
+                 ]), mock.patch.object(file_claims, "claim", return_value=False), \
+                 mock.patch.object(
+                     file_claims, "holder", return_value={"owner": "other@host:/jobs/x"}
+                 ), \
                  mock.patch.object(runner, "compare_current_tree") as gate_mock:
                 result = runner._try_candidates_detailed_unlocked(
                     source, [("func_1", "int func_1(void) { return 0; }")], gate=True,
                 )
         self.assertEqual(result["batch_status"], "file_claimed_by_other")
-        self.assertIn("other@host:sess", result["claim_diagnostic"])
+        self.assertIn("other@host:/jobs/x", result["claim_diagnostic"])
         gate_mock.assert_not_called()
 
 

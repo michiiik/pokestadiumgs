@@ -2178,12 +2178,26 @@ def _claim_or_refuse(source_path: Path) -> str | None:
     batch) never claims anything, matching AGENTS.md's "probe-only batches
     do not claim" rule.
 
-    Returns ``None`` when this process now holds (or already held) the
-    claim; otherwise a diagnostic string naming the live holder, and the
-    caller must refuse the install rather than write anything. The first
-    call for a given path in this process claims it; every later call for
-    the same path just touches (extends) that claim, per
-    ``tools/file_claims.py``.
+    Returns ``None`` in every case except an *enforced* conflict, and the
+    claim is recorded either way. The first call for a given path in this
+    process claims it; every later call for the same path just touches
+    (extends) that claim, per ``tools/file_claims.py``.
+
+    Install-time claims are **advisory by default**: a conflict prints a
+    warning and proceeds. Refusing here proved worse than the collision it
+    guards against, because a session's identity is not stable across the
+    calls of one work session -- ``CLAUDE_JOB_DIR`` names the whole job
+    (every agent under it shares one tag) while a per-agent
+    ``CLAIMS_OWNER`` export does not survive from one shell invocation to
+    the next, so a single agent alternates identities and refuses its own
+    live claim (observed 2026-08-28: agents hitting ``file_claimed_by_other``
+    against themselves). The guard that actually prevents damage -- one
+    session's broad ``git add`` sweeping another's uncommitted installs --
+    lives at commit time in ``tools/check_file_claims.py``, where the
+    identity only has to hold for one command.
+
+    Set ``PRAGMA_CLAIMS_ENFORCE=1`` to make a conflict between two reliable
+    identities refuse the install instead of warning.
     """
     import file_claims
 
@@ -2197,18 +2211,19 @@ def _claim_or_refuse(source_path: Path) -> str | None:
         return None
     existing = file_claims.holder(source_path)
     holder_owner = str(existing.get("owner")) if existing else "unknown"
-    # Refuse only when both sides carry a real session identity. A bare-$PPID
-    # tag (no CLAUDE_JOB_DIR) names a shell, not a session, so refusing on one
-    # would block a co-tenant tool that never sets the variable -- and any
-    # session whose next batch runs from a different shell -- from installing
-    # its own work. See file_claims.session_is_reliable.
-    if not (
-        file_claims.session_is_reliable(owner)
-        and file_claims.session_is_reliable(holder_owner)
-    ):
-        _CLAIMED_SOURCE_PATHS.add(key)
-        return None
-    return f"{source_path} is claimed by {holder_owner}"
+    _CLAIMED_SOURCE_PATHS.add(key)
+    both_reliable = file_claims.session_is_reliable(owner) and file_claims.session_is_reliable(
+        holder_owner
+    )
+    if both_reliable and os.environ.get("PRAGMA_CLAIMS_ENFORCE") == "1":
+        return f"{source_path} is claimed by {holder_owner}"
+    print(
+        f"WARNING {source_path} carries a live claim by {holder_owner}; "
+        f"installing anyway as {owner} (advisory claim). Another session may "
+        f"be editing this file -- commit by explicit path.",
+        file=sys.stderr,
+    )
+    return None
 
 
 # Paths this process has already claimed via _claim_or_refuse -- later calls
