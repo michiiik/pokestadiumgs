@@ -8,7 +8,19 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/10/fragment10_D5250/func_82800984.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/10/fragment10_D5250/func_82800AE0.s")
+extern void func_82800864(f32, s16 *);
+extern Gfx *D_800D0510;
+extern s32 func_8004C990(s32, s32);
+extern void func_8004D19C(s32, s32, s32, s32, s32);
+void func_82800AE0(u8 *arg0) {
+    s16 coords[2];
+
+    func_82800864(*(f32 *)(arg0 + 0x94), coords);
+    gDPPipeSync(D_800D0510++);
+    gDPSetPrimColor(D_800D0510++, 0xFF, 0xFF, 0xFF, 0x64, 0x64, 0xFF);
+    gDPSetEnvColor(D_800D0510++, 0x40, 0x0A, 0x0A, 0);
+    func_8004D19C(coords[0] - 4, coords[1] - 4, func_8004C990(0x36, 0), 0, 0);
+}
 
 s32 func_82800B94(u8 *arg0) {
     return *(u32 *)(arg0 + 0x88) == 0 || *(u32 *)(arg0 + 0x8C) == 0;
@@ -24,7 +36,30 @@ s32 func_82800BB4(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/10/fragment10_D5250/func_8280105C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/10/fragment10_D5250/func_82801144.s")
+extern s32 func_8004C874(s32, s32);
+extern void func_816044AC(s32, s32, s32, s32, s32, void *);
+extern void func_800498C4(void);
+extern void func_800496A4(s32, s32);
+extern void func_8004989C(s32);
+extern void func_800495BC(s32, s32, s32 *);
+extern void func_800495F8(s32, s32, s32, s32);
+extern void func_800499EC(void);
+extern u8 D_82802838;
+void func_82801144(void) {
+    s32 result1;
+    s32 result2;
+
+    result1 = func_8004C874(0x19, 0xE);
+    result2 = func_8004C874(0x19, 0x12);
+    func_816044AC(0x63, 0xDC, 0x1BC, 0x92, 1, &D_82802838);
+    func_800498C4();
+    func_800496A4(0x10, 1);
+    func_8004989C(0x20);
+    func_800495BC(0x70, 0xE7, result1);
+    func_800496A4(8, 1);
+    func_800495F8(0x20E, 0x14B, 2, result2);
+    func_800499EC();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/10/fragment10_D5250/func_828011F8.s")
 
