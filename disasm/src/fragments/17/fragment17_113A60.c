@@ -200,7 +200,22 @@ void func_82208518(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_822088FC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82208954.s")
+extern u8 D_8220D8D0[];
+extern s16 D_8220EB84;
+extern void func_8220AD1C(s16 *);
+extern void func_8220B7A0(s16, s16, u8 *, u8 *);
+void func_82208954(s32 arg0) {
+    s16 coords[2];
+    s32 pad[2];
+    u8 *record;
+
+    record = D_8220D8D0 + arg0 * 0x34;
+    D_8220EB84 = 0;
+    if (*(s16 *)(record + 4) != 0) {
+        func_8220AD1C(coords);
+        func_8220B7A0(coords[0], coords[1], record + 0x24, record + 0x27);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_822089C0.s")
 
