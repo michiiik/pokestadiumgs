@@ -353,7 +353,14 @@ void BattleAnim_StartEffect11Trail50Alt_Init(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84157C58.s")
+extern u8 D_841A4D08[];
+extern s32 func_84166A64(s32, s32);
+void func_84157C58(void) {
+    s32 temp = D_800D0510;
+    D_800D0510 += 8;
+    gSPMatrix((Gfx *)(u32)temp, &D_841A4D08, G_MTX_MODELVIEW | G_MTX_LOAD);
+    D_800D0510 = func_84166A64(D_800D0510, 0x22);
+}
 #endif
 
 #ifdef VERSION_US
@@ -370,7 +377,12 @@ void BattleAnim_StartEffect57Trail50_Init(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84157E58.s")
+void func_84157E58(void) {
+    s32 temp = D_800D0510;
+    D_800D0510 += 8;
+    gSPMatrix((Gfx *)(u32)temp, &D_841A4D08, G_MTX_MODELVIEW | G_MTX_LOAD);
+    D_800D0510 = func_84166A64(D_800D0510, 0x23);
+}
 #endif
 
 #ifdef VERSION_US
