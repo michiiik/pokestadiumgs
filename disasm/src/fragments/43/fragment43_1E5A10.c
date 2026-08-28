@@ -330,7 +330,20 @@ void func_8AC01F20(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC027D0.s")
+extern void _bzero(void *, s32);
+extern s32 func_8AC06D8C(s32, s32);
+extern void func_8004E308(s32, s32 *, s32 *);
+extern u8 func_8AC02564;
+void func_8AC027D0(s32 arg0, s32 arg1, void *arg2, s32 arg3) {
+    s32 v0;
+
+    v0 = func_8AC06D8C(arg0, arg1);
+    _bzero(arg2, 0x30);
+    (*(s32 *)((u8 *)(arg2) + (0))) = v0;
+    func_8004E308(v0, (s32 *) &func_8AC02564, (s32 *) arg2);
+    (*(s32 *)((u8 *)(v0) + (0x2C))) = arg3;
+    (*(u8 *)((u8 *)(v0) + (0x28))) = 1;
+}
 #endif
 
 #ifdef VERSION_US
