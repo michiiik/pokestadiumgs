@@ -186,9 +186,33 @@ s32 func_8160072C(s16 *arg0) {
     return (u32)arg0[3] * (u32)arg0[2];
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D7BC0/func_81600744.s")
+void *func_81600744(void *arg0, s32 arg1) {
+    void *result = NULL;
+    void *node;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D7BC0/func_81600780.s")
+    node = *(void **)(*(u8 **)((u8 *)arg0 + 0x28));
+    while (node != NULL) {
+        if (arg1 == *(s32 *)((u8 *)node + 8)) {
+            return node;
+        }
+        node = *(void **)((u8 *)node + 0x14);
+    }
+    return result;
+}
+
+void *func_81600780(void *arg0, s32 arg1) {
+    void *result = NULL;
+    void *node;
+
+    node = *(void **)(*(u8 **)((u8 *)arg0 + 0x2C));
+    while (node != NULL) {
+        if (arg1 == *(s32 *)((u8 *)node + 8)) {
+            return node;
+        }
+        node = *(void **)((u8 *)node + 0x14);
+    }
+    return result;
+}
 
 s32 func_816007BC(void *arg0) { u8 *base = *(u8 **)((u8 *)arg0 + 0x28); u8 *next = *(u8 **)(base + 8); s32 result; if (next != NULL) result = *(s32 *)(next + 0x14); else result = *(s32 *)base; return result; }
 
