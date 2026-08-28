@@ -6,7 +6,17 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/36/fragment36_code/func_88700080.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/36/fragment36_code/func_88700288.s")
+extern s32 func_88700080(void *);
+void func_88700288(void *arg0, s16 arg1, s16 arg2, s16 arg3, u8 arg4, u8 arg5, u8 arg6, u8 arg7) {
+    *(s16 *)((u8 *)arg0 + 0) = arg1;
+    *(s16 *)((u8 *)arg0 + 4) = arg2;
+    *(s16 *)((u8 *)arg0 + 6) = arg3;
+    *(u8 *)((u8 *)arg0 + 8) = arg4;
+    *(u8 *)((u8 *)arg0 + 9) = arg5;
+    *(u8 *)((u8 *)arg0 + 10) = arg6;
+    *(u8 *)((u8 *)arg0 + 11) = arg7;
+    func_88700080(arg0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/36/fragment36_code/func_887002F4.s")
 
