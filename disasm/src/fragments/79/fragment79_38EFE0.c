@@ -355,7 +355,18 @@ void func_841218EC(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84121920.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84121AB8.s")
+extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
+extern u8 *D_841911E0;
+extern f32 D_80087E50[];
+extern f32 D_80088E50[0x1000];
+void func_84121AB8(void *arg0) {
+    Vec3f_SetComponentsDuplicate((f32 *)((u8 *)(*(void **)D_841911E0) + 0xC0), 0.0f, 1.0f, 0.0f);
+    (*(s16 *)((u8 *)(arg0) + (0x5FE))) = 0;
+    (*(s16 *)((u8 *)(arg0) + (0x600))) = 0;
+    (*(s16 *)((u8 *)(arg0) + (0x5FC))) = 0;
+    (*(u8 *)((u8 *)(arg0) + (0x623))) = 0;
+    (*(f32 *)((u8 *)(arg0) + (0x60C))) = 0.0f;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84121B18.s")
 
