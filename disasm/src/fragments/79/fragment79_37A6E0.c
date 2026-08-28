@@ -566,7 +566,17 @@ void BattleAnim_ModelDispatch_043(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_841106B4.s")
+extern u8 *func_8410B330(u8 *);
+extern void func_8410B420(u8 *, void *, s16);
+extern void func_8410EA58(u8 *, void *, s16);
+extern u8 *D_841911E8;
+extern s32 D_841911EC;
+extern s32 D_84184148;
+void func_841106B4(u8 *arg0, void *arg1) {
+    D_841911E8 = func_8410B330(arg0);
+    func_8410B420(arg0, arg1, *(s16 *)(D_841911E8 + 0x98));
+    *(s32 *)(D_841911E8 + (D_841911EC * 8) + 8) = D_84184148;
+}
 #endif
 
 #ifdef VERSION_US
@@ -574,7 +584,19 @@ void BattleAnim_ModelDispatch_043(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_841107D8.s")
+extern void func_8410B60C(u8 *, void *, u8 *, u8 *);
+extern void func_8410B884(u8 *, void *, u8 *, s16);
+extern void func_8410D174(u8 *, void *);
+extern u8 *func_8410B330(u8 *);
+extern u8 *D_841911E8;
+
+void func_841107D8(u8 *arg0, void *arg1) {
+    D_841911E8 = func_8410B330(arg0);
+    func_841203B4(arg0 + 0x2C, *(f32 *)(D_841911E8 + 0x88), 0.05f);
+    func_8410D174(arg0, arg1);
+    func_8410B884(arg0, arg1, D_841911E8, *(s16 *)((u8 *)arg1 + 0x20));
+    func_8410B60C(arg0, arg1, D_841911E8, arg0 + 0xB4);
+}
 #endif
 
 #ifdef VERSION_US
@@ -684,7 +706,17 @@ void BattleAnim_ModelDispatch_044(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_841111D8.s")
+extern u8 *func_8410B330(u8 *);
+extern void func_8410B420(u8 *, void *, s16);
+extern void func_8410EA58(u8 *, void *, s16);
+extern u8 *D_841911E8;
+extern s32 D_841911EC;
+extern s32 D_84184148;
+void func_841111D8(u8 *arg0, void *arg1) {
+    D_841911E8 = func_8410B330(arg0);
+    func_8410EA58(arg0, arg1, *(s16 *)(D_841911E8 + 0x98));
+    *(s32 *)(D_841911E8 + (D_841911EC * 8) + 8) = D_84184148;
+}
 #endif
 
 #ifdef VERSION_US
@@ -836,7 +868,7 @@ void func_84111DB4(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8003F3BC(void);
+extern void func_8003F3BC();
 void func_84111E50(u8 *arg0) {
     if ((*(u16 *)(arg0 + 0x56) & 1) == 0) {
         func_8003F3BC();
@@ -904,7 +936,12 @@ void func_841120A4(u8 *arg0) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_84112290.s")
+void func_84112290(u8 *arg0) {
+    func_8003EF70(arg0);
+    *(u8 *)(arg0 + 2) = *(u8 *)(arg0 + 2) | 0x20;
+    func_8003F3BC(arg0, -1);
+    ModelAnim_SetEventFrame(arg0, 0);
+}
 #endif
 
 #ifdef VERSION_US
@@ -2083,7 +2120,29 @@ void BattleAnim_Dispatch_101(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8411AF6C.s")
+extern u8 *D_841911E0;
+void func_8411AF6C(u8 *arg0) {
+    u8 *entry;
+    s32 index;
+    if ((*(u16 *)(arg0 + 0x7EC) & 1) == 0) {
+        *(s16 *)(D_841911E0 + 0x98) = 0;
+        index = arg0[0x618] - 1;
+        entry = *(u8 **)(arg0 + 0x2D4) + (index * 0x14);
+        arg0[0x616] = entry[0];
+        arg0[0x61F] = 0xFF;
+        arg0[0x617] = entry[1];
+        arg0[0x619] = entry[0xB];
+        arg0[0x61A] = entry[0xA];
+        arg0[0x61B] = entry[6];
+        arg0[0x620] = entry[9];
+        arg0[0x61C] = entry[2];
+        arg0[0x61D] = entry[3];
+        *(s16 *)(arg0 + 0x628) = entry[0xC];
+        *(s16 *)(arg0 + 0x62A) = entry[0xD];
+        *(s16 *)(arg0 + 0x62C) = entry[0xE];
+        arg0[0x661] = entry[0xF];
+    }
+}
 #endif
 
 #ifdef VERSION_US
