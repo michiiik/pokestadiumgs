@@ -741,5 +741,11 @@ s32 func_80056184(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800562B8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_8005633C.s")
+extern s32 func_800562B8(s32);
+s32 func_8005633C(void) {
+    s32 result = 0;
+    if (func_800562B8(0) != 0) result = 1;
+    if (func_800562B8(1) != 0) result = 2;
+    return result;
+}
 #endif
