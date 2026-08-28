@@ -23,30 +23,44 @@ current variant set); run them only when §2.5 says so.
 
 Coordinator rules:
 
-- One file per agent, never shared. Pick files by remaining owners of ≤128
-  instructions (`python3 tools/pragma_targets.py targets --source <file>`),
-  text-segment files before fragments (fragments cost ~5× more per owner),
-  and skip any file another session touched in the last four hours
-  (`git log --since="4 hours ago" --format= --name-only -- disasm/src`).
-- The agent prompt is §2.5 plus: the file path, whether the file already has
-  its `.rodata` subsegment (`docs/JUMP_TABLES.md`; if not, skip `jtbl_`
-  owners), the 60-minute box, "runner-only installs, never hand-edit, never
-  `DECOMP_PROVENANCE_SKIP`", commit-by-path every 5 accepts, and the report
-  format (attempted/accepted, variants probed, best mismatch kinds, one line
-  per accepted spelling, why it gave up, commit shas).
+- One file per agent, never shared (the runner enforces it: the first install
+  into a file claims it in `disasm/probe-stats/claims.json`, and another live
+  session's install is refused with `file_claimed_by_other`). Pick files with
+  `python3 tools/pragma_targets.py rank-files --exclude-recent 4` — it scores
+  files by recorded probe hardness (`fresh` owners with < 5 attempts plus
+  `drift` owners; register ties count zero) and hides files touched by any
+  session in the window or dirty in the tree — and cross-check with
+  `python3 tools/file_claims.py free --exclude-recent 4`, which also sees
+  claims that have not been committed yet. `score` is a count, not a rate:
+  look at the `ties` column before trusting a big file at the top.
+- Before assigning a file run `python3 tools/analyze_family_shapes.py
+  siblings --source <file>`: if its owners cluster around a shared `jal`
+  target or carry a `gbi-macro` tag, the agent's first job is the shared
+  callee (`unlock --function <callee>` shows how many owners it unblocks),
+  then the siblings with the same spelling. `siblings --all --top 30` ranks
+  the largest unsolved families tree-wide (984 groups on 2026-08-28; the
+  biggest have 7–12 members).
+- The agent prompt is now: "Read `docs/FLEET_AGENT.md`; your file is
+  `disasm/src/<X>.c`; time box N minutes." That document carries the §2.5
+  loop, the §4 table, the runner field cheat-sheet, `tools/fleet_probe.py`
+  (JSON batch in, diagnostic table out) and `tools/file_brief.py` (solved
+  signatures, extern block, record strides, SDK macros, and the callees
+  defined later in the file), the hard rules, and the report format. Add
+  only the file-specific facts (`.rodata` subsegment status, owners to skip).
 - When agents report, fold every *second* confirmation of a spelling into §4,
   add runner bugs and recurring unsolved shapes to §5, then reassign files.
   Do not run tooling changes and a fleet at the same time in one checkout.
 - Do not spawn investigation agents for this loop; the assembly reading is
   the agents' job, not a separate phase.
-- Agent prompts must also say: search only inside the repository (a
-  `find / -iname gbi.h` from one agent walked `~/Music` and raised a macOS
-  media-library permission prompt on 2026-08-28; the header is
-  `disasm/lib/ultralib/include/PR/gbi.h`); use a per-agent scratch directory
-  (`$CLAUDE_JOB_DIR/tmp/<file>/`), because agents sharing the job tmp
-  directory overwrote each other's `batch1.py`; and cap each owner at ~12
-  variants / ~8 minutes, stopping after two batches once the best result is
-  `register_allocation_only` at similarity 1.0.
+- `docs/FLEET_AGENT.md` already carries the lessons of 2026-08-28: search
+  only inside the repository (a `find / -iname gbi.h` walked `~/Music` and
+  raised a macOS media-library prompt; the header is
+  `disasm/lib/ultralib/include/PR/gbi.h`), per-agent scratch directories
+  (`$CLAUDE_JOB_DIR/tmp/<file>/`; agents overwrote each other's `batch1.py`),
+  and the per-owner cap (~12 variants / ~8 minutes; stop after two batches at
+  `register_allocation_only` ≥ 0.99 — the runner now says so itself via the
+  `futility` field). Register ties go to the permuter, not to agents:
+  `docs/REGISTER_TIES.md`.
 - Measure yield per file after the first box and do not reassign a file that
   yielded fewer than two accepts: its remaining owners go to §5. Wave of
   2026-08-28 on the six text-segment files no session had touched for 19
@@ -105,7 +119,13 @@ numbers before proposing changes. Then:
 - Enable the tracked hooks once per checkout: `git config core.hooksPath .githooks`.
 - `.githooks/pre-commit` runs every executable in `.githooks/pre-commit.d/`:
   `10-coverage.sh` regenerates and stages `COVERAGE.md` from the index so the
-  number lands in the commit it describes; `15-provenance.sh` blocks removing a
+  number lands in the commit it describes; `12-claims.sh` runs
+  `tools/check_file_claims.py --staged` and blocks committing a `disasm/src`
+  file that another live session's runner claim covers, or claimed files from
+  two sessions at once (`PRAGMA_CLAIMS_SKIP=1` bypasses with a justification;
+  `CLAIMS_OWNER=<tag>` lets a coordinator commit for its own agents; a claim
+  whose session tag is a bare `$PPID` — no `CLAUDE_JOB_DIR` — only warns);
+  `15-provenance.sh` blocks removing a
   `GLOBAL_ASM` pragma that has no `accepted` runner attempt on file
   (`DECOMP_PROVENANCE_SKIP=1` bypasses, only with a stated justification);
   `20-tests.sh` runs `tools/run_tests.sh` when `tools/*.py` is staged
@@ -118,7 +138,13 @@ numbers before proposing changes. Then:
   and friends from their subprocess environment (see `_GitFixture`): the
   pre-commit hook exports them, and an unstripped fixture commits onto the real
   branch and can flip `core.bare`. If git suddenly reports "must be run in a
-  work tree", run `git config core.bare false`.
+  work tree", run `git config core.bare false`. The same applies to any tool
+  that shells out to `git` and may run nested inside the hook
+  (`file_claims.py`, `check_file_claims.py` strip them).
+- Tooling sessions merge their agents' worktree branches on an integration
+  branch first, then into `master`; `.claude/worktrees/` is ignored. Agents'
+  commits carry a hook-regenerated `COVERAGE.md` from the worktree state —
+  take `master`'s copy before merging.
 
 ## 2. Decompilation process rules
 
@@ -232,7 +258,10 @@ file at a time so declarations, structs and names accumulate in one place.
 6. Gate the first probe hit (`gate: true`). Then name it if evidence exists
    (`python3 tools/name_decompiled.py plan`), and move to the next owner in
    the file.
-7. Stop after ~15 variants unless the best is ≥ 0.95; leave the record (the
+7. Stop after two probe batches once the best is `register_allocation_only`
+   at ≥ 0.99 (the result's `futility` field says so): that owner belongs to
+   the permuter (`docs/REGISTER_TIES.md`), not to more hand variants.
+   Otherwise stop after ~15 variants unless the best is ≥ 0.95; leave the record (the
    near-miss tooling and `similar_solved` build on it) and move on. Do not
    commit a body that only matches with `DECOMP_PROVENANCE_SKIP`.
 
@@ -281,6 +310,25 @@ file at a time so declarations, structs and names accumulate in one place.
 - m2c and decomp-permuter are optional clones under `disasm/tools/`
   (`tools/setup_decomp_tools.sh`); their absence is an explicit error.
 
+- Result fields added 2026-08-28: every attempt carries `prior_attempts`,
+  `best_prior` (`{similarity_score, raw_similarity_score, mismatch_kind,
+  label, timestamp}`), `futility` (`register-tie: …` / `stuck: …` / null),
+  `raw_similarity_score` next to `similarity_score`, and
+  `normalized_only_match` (≥ 0.99 normalised but < 0.9 raw — the 1.0 that
+  hides swapped fields); the batch carries `futility_summary`. Callees
+  defined anywhere in the target file get their real signature injected
+  instead of the `s32` fallback prototype.
+- `companion_edits=[{"function", "old", "new"}]` (API and MCP) applies an
+  exact-once edit to an already-accepted body or prototype in the same file
+  for both the probe and the gate and installs it only together with the
+  candidate; the stats row records the edited function names. It may not add
+  or remove a `#pragma GLOBAL_ASM`. Use it for the §4 "callee prototyped as
+  `void`" and "caller passes fewer arguments" cases; the function-pointer
+  cast spelling in the T5 example is unverified until a gate accepts it.
+- `tools/fleet_probe.py batch.json [--gate] [--json out]` — CLI front end for
+  agents that are not wired to the MCP server; prints one row per attempt and
+  a per-function verdict (including "register tie — stop").
+
 ### 3.2 Probe statistics
 
 - Default file `disasm/probe-stats/probe-stats.jsonl` (schema 2: batch rows
@@ -295,7 +343,28 @@ file at a time so declarations, structs and names accumulate in one place.
   probe matches and accepts per label prefix. Cite it when changing variants.
 - `python3 tools/check_decomp_provenance.py --staged` — the pre-commit guard.
 
+- `python3 tools/near_miss_kinds.py tag-ties [--min-attempts 6]
+  [--min-similarity 0.99] [--names]` — every owner whose best attempt is a
+  register tie, with total attempts and whether the permuter already ran on
+  it (`permute:` labels); 248 owners on 2026-08-28, some with 100–190
+  recorded hand attempts.
+
 ### 3.3 Discovery and drafting
+- `python3 tools/pragma_targets.py rank-files [--exclude-recent H]
+  [--no-fragments] [--json]` and `targets --source <file> --skip-ties` —
+  hardness-aware file ranking and owner listing (`prior_attempts`,
+  `best_similarity`, `best_mismatch_kind`, `hardness` = fresh/drift/tie/stuck
+  per owner). `--exclude-recent` uses an absolute timestamp because `git log
+  --since="4.0 hours ago"` silently matches the whole history.
+- `python3 tools/file_brief.py <file> [--json]` — read this before touching a
+  file: solved signatures, extern block, symbols by solved-body count, record
+  strides, SDK macros, and the callees defined later in the file with their
+  real return types.
+- `python3 tools/analyze_family_shapes.py siblings --source <file> |
+  --all --top N` and `unlock --function <func>` — opcode-shape clustering of
+  remaining owners (registers/immediates abstracted, `jal` targets kept,
+  edit distance ≤ 0.15) with the closest solved body and `gbi-macro`
+  tagging; `unlock` lists the remaining owners that call a helper.
 
 - `python3 tools/pragma_targets.py targets [--family F] [--limit N]` — remaining
   owners ranked by instruction count with family classification and
@@ -341,6 +410,11 @@ file at a time so declarations, structs and names accumulate in one place.
   batches and gates the hits before any permuter time. `--near-miss` remains the
   permuter path (`--near-miss-kind-seconds` gives `register_allocation_only`
   and `immediate_drift` a longer budget).
+
+- `python3 tools/sweep_targets.py --near-miss --tie-pool --near-miss-parallel 4
+  --near-miss-kind-seconds 300` — the standing overnight permuter run over the
+  `tag-ties` pool; `--targets-file names.txt` pins an explicit list.
+  `--skip-attempted` never applies to `--near-miss` (by design).
 
 ### 3.5 Naming and coverage
 
@@ -446,20 +520,21 @@ accepts; other widths only on diagnostic evidence via the variant policy.
   between struct fields; never treat 1.0 as done without the gate.
 - Runner: `probe_unavailable` on `func_8006092C` (`585D0.c`) for a
   well-formed candidate; not isolated.
-- Runner: the synthesised fallback prototype for a callee that is *defined
-  later in the same file* defaults to `s32` and fails the probe with
-  "redeclaration; incompatible return type" when the real definition returns
-  `u8` (`func_8005D92C`). Workaround: pass the matching prototype in
-  `declarations`. Same class: a same-file forward call to a still-pragma
+- Runner (fixed 2026-08-28): the fallback prototype for a callee defined
+  later in the same file now comes from a position-independent scan of the
+  file (`func_8005D92C` sat on the same line as an `extern`, which the
+  line-anchored regex missed). `sweep_targets.py`'s
+  `_SOURCE_FUNCTION_DEFINITION_RE` has the same line-anchoring defect and is
+  not fixed yet. Still open: a same-file forward call to a still-pragma
   function fails the moment that pragma becomes a C definition unless an
   earlier accepted candidate carried the forward prototype in its
   `declarations` (`CE80.c`: `func_8000DDC8`/`func_8000DE34`, five callers).
 - Shape: a callee that an already-accepted caller invokes with fewer
   arguments than its real signature (`func_80018A74(void){ func_8001480C(); }`)
   needs a K&R definition to compile, and the K&R form starts IDO's register
-  allocation differently — `func_8001480C` sits at similarity 1.0 but cannot
-  close without changing the caller in the same gated change (same class as
-  the `func_80055BA8` return-type case).
+  allocation differently — `func_8001480C` sits at similarity 1.0. Both this
+  and the `func_80055BA8` return-type case are now reachable with
+  `companion_edits` (§3.1); nobody has gated one yet.
 - Shape: fixed-stride byte-flag clear loop (`func_8001644C`, 8 records at
   0x160): IDO unrolls every simple `do { p += stride; *p = 0; } while (p != end)`
   spelling (inserting a `divu`); a pretest `while` got 60 bytes versus 48.
