@@ -114,7 +114,11 @@ void func_80060E88(void *arg0, void *arg1) {
     func_80060D1C(arg0, sp1C);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060EC8.s")
+extern char * func_80060F68(char *arg0, char *arg1);
+void func_80060EC8(void *arg0, void *arg1) {
+    char sp1C[11];
+    func_80060D70(arg0, func_80060F68(sp1C, arg1));
+}
 
 void func_80060EF8(void *arg0, void *arg1) {
     u8 sp1C[9];
@@ -123,9 +127,13 @@ void func_80060EF8(void *arg0, void *arg1) {
     func_80060C08(arg0, sp1C);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060F38.s")
+extern char * func_80060F68(char *arg0, char *arg1);
+void func_80060F38(void *arg0, void *arg1) {
+    char sp1C[19];
+    func_80060D70(arg0, func_80060F68(sp1C, arg1));
+}
 
-extern void HAL_Strcpy(void); void func_80060F68() { HAL_Strcpy(); }
+extern char *HAL_Strcpy(char *, char *); char *func_80060F68(char *arg0, char *arg1) { return HAL_Strcpy(arg0, arg1); }
 
 s32 func_80060F88(void) { return 0x46; }
 
@@ -466,7 +474,7 @@ s32 func_8006236C(u8 *arg0, s32 arg1) { s32 result = 0; if (arg0[5] >= arg1) { *
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_8006249C.s")
 
 s32 func_800625E0(s32 arg0, s32 arg1) {
-    extern void func_80060F68();
+    extern char *func_80060F68(char *, char *);
     func_80060F68(arg0, func_8004B7A4(arg1));
     return arg0;
 }
