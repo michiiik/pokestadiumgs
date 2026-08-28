@@ -42,7 +42,14 @@ void func_8AE00020(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE003F8.s")
+extern s32 main_pool_alloc(s32, s32);
+extern s16 D_8AE0A15E;
+extern s32 D_8AE0A164;
+extern void func_8004D878(void *, s16, s32);
+void func_8AE003F8(void) {
+    D_8AE0A164 = main_pool_alloc(0xC80, 0);
+    func_8004D878((void *)D_8AE0A164, D_8AE0A15E, 0);
+}
 #endif
 
 #ifdef VERSION_US
@@ -215,7 +222,15 @@ void func_8AE01394(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE02868.s")
+extern void func_8AE027B0(s32, void *, u16 *, void *, s32);
+extern u16 D_8AE0994C;
+extern u8 D_8AE099B4[];
+s32 func_8AE02868(s32 arg0, void *arg1) {
+    u16 *p = &D_8AE0994C;
+    func_8AE027B0(arg0, arg1, p, D_8AE099B4, 1);
+    *p = *p + 0x800;
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
