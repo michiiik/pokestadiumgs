@@ -2,7 +2,20 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414CA00.s")
+extern void func_84149D54(void *, u8, u8);
+extern void func_84149D0C(void *);
+void func_8414CA00(s32 arg0, u8 arg1, u8 arg2) {
+    u8 rec[0x20];
+    u8 pad[8];
+
+    func_84149D54(rec, arg1, arg2);
+    func_84149D0C(rec);
+    if (*(u16 *)(*(u8 **)(rec + 0x14) + 0x42) > 0) {
+        *(u16 *)((u8 *)(u32)arg0 + arg1 * 2 + 0x1A) = *(s32 *)(rec + 0xC);
+    } else {
+        *(u16 *)((u8 *)(u32)arg0 + arg1 * 2 + 0xE) = *(s32 *)(rec + 0xC);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414CA80.s")
 
