@@ -3,8 +3,8 @@
 # Decompilation coverage
 
 <!-- AUTO_COVERAGE:START -->
-- US functions with C implementations: **3,873 / 10,532 (36.8%)**
-- Remaining `GLOBAL_ASM` owners: **6,659**
+- US functions with C implementations: **3,876 / 10,532 (36.8%)**
+- Remaining `GLOBAL_ASM` owners: **6,656**
 - Baseline: `f477acf` (vendored US pragma snapshot)
 <!-- AUTO_COVERAGE:END -->
 
@@ -22,7 +22,7 @@
 | `disasm/src/208A0.c` | 1 | 5 | 80.0% |
 | `disasm/src/20C50.c` | 2 | 4 | 50.0% |
 | `disasm/src/226C0.c` | 1 | 5 | 80.0% |
-| `disasm/src/229E0.c` | 284 | 571 | 50.3% |
+| `disasm/src/229E0.c` | 283 | 571 | 50.4% |
 | `disasm/src/2CA0.c` | 1 | 13 | 92.3% |
 | `disasm/src/3280.c` | 3 | 14 | 78.6% |
 | `disasm/src/3E40.c` | 1 | 11 | 90.9% |
@@ -365,12 +365,12 @@
 | `disasm/src/fragments/79/fragment79_377F80.c` | 23 | 45 | 48.9% |
 | `disasm/src/fragments/79/fragment79_379450.c` | 5 | 12 | 58.3% |
 | `disasm/src/fragments/79/fragment79_379E90.c` | 3 | 7 | 57.1% |
-| `disasm/src/fragments/79/fragment79_37A6E0.c` | 193 | 330 | 41.5% |
+| `disasm/src/fragments/79/fragment79_37A6E0.c` | 192 | 330 | 41.8% |
 | `disasm/src/fragments/79/fragment79_38D510.c` | 11 | 36 | 69.4% |
 | `disasm/src/fragments/79/fragment79_38EBD0.c` | 2 | 8 | 75.0% |
 | `disasm/src/fragments/79/fragment79_38EFE0.c` | 51 | 109 | 53.2% |
 | `disasm/src/fragments/79/fragment79_393CA0.c` | 333 | 461 | 27.8% |
-| `disasm/src/fragments/79/fragment79_3ADCA0.c` | 86 | 166 | 48.2% |
+| `disasm/src/fragments/79/fragment79_3ADCA0.c` | 85 | 166 | 48.8% |
 | `disasm/src/fragments/79/fragment79_3B7DB0.c` | 1 | 3 | 66.7% |
 | `disasm/src/fragments/79/fragment79_3B7EA0.c` | 17 | 49 | 65.3% |
 | `disasm/src/fragments/79/fragment79_3B9B80.c` | 20 | 28 | 28.6% |
