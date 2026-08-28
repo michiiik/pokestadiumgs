@@ -67,7 +67,21 @@ extern u8 D_8AB14D08[]; extern u8 D_8AB154D8[]; extern u8 D_8AB15CA8[]; extern v
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB00478.s")
+typedef struct Copy34 { s32 words[13]; } Copy34;
+extern Copy34 D_8AB11130;
+extern Copy34 D_8AB110FC;
+extern Copy34 D_8AB11060;
+extern Copy34 D_8AB11094;
+extern Copy34 D_8AB16508;
+extern s32 func_8004C990(s32, s32);
+void func_8AB00478(void) {
+    Copy34 *src;
+    Copy34 *dst;
+    src = &D_8AB11130;
+    dst = &D_8AB16508;
+    *dst = *src;
+    dst->words[0] = func_8004C990(0x99, 1);
+}
 #endif
 
 #ifdef VERSION_US
@@ -236,7 +250,29 @@ void func_8AB01728(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB01C04.s")
+extern void func_800504BC(s16 *);
+extern void func_8AB019B8(s16, s16, void *);
+
+s32 func_8AB01C04(s32 mode, void *record) {
+    s16 values[2];
+    s16 first;
+    s16 second;
+    void *preserved;
+
+    preserved = record;
+    switch (mode) {
+    case 0:
+        *(u16 *)((u8 *)preserved + 2) = *(u16 *)((u8 *)preserved + 2) & 0xFFFD;
+        break;
+    case 1:
+        func_800504BC(values);
+        first = *(s16 *)((u8 *)preserved + 8) + values[0];
+        second = *(s16 *)((u8 *)preserved + 0xA) + values[1];
+        func_8AB019B8(first, second, preserved);
+        break;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -304,7 +340,34 @@ s32 func_8AB023EC(u32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB02BA8.s")
+extern u8 *D_8AB11D0C;
+extern s16 D_8AB12696;
+
+s32 func_8AB02BA8(void) {
+    u8 state;
+    s32 result;
+
+    state = D_8AB11D0C[2];
+    switch (state) {
+    default:
+        D_8AB12696 = 0x17;
+        result = 0x1C8;
+        break;
+    case 1:
+        D_8AB12696 = 0x17;
+        result = 0x1C8;
+        break;
+    case 2:
+        D_8AB12696 = 0x2F;
+        result = 0x1DF;
+        break;
+    case 3:
+        result = 0x20E;
+        D_8AB12696 = 0x48;
+        break;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
