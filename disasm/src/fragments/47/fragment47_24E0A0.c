@@ -91,7 +91,17 @@ f64 func_860091F4(void *arg0, f64 arg1, s32 arg2, f64 arg3, s32 arg4) {
     return 0.0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_86009260.s")
+extern f64 func_87C00664(void *);
+extern void func_86008D2C(void *, s32, void *, void *, f64, void *);
+void func_86009260(void *arg0, f64 arg1, void *arg2, s32 arg3, void *arg4) {
+    s32 i;
+
+    for (i = 0; i < arg3; i++) {
+        if (func_87C00664((u8 *)arg2 + i * 0x40) > 0.0) {
+            func_86008D2C(arg0, 1, arg0, (u8 *)arg2 + i * 0x40, arg1, arg4);
+        }
+    }
+}
 
 extern f64 func_87C00664(void *);
 extern void func_86008E64(void *, s32, void *, void *);
