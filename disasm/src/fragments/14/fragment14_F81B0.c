@@ -114,7 +114,20 @@ void func_81300BA0(s32 arg0) { func_8130A570(arg0 + 0xDA8, 0); func_81304208(arg
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_813011B8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_8130125C.s")
+extern s32 func_813000E4(void *arg0);
+extern s32 func_81302290(void *);
+s8 func_8130125C(void *arg0, s32 arg1) {
+    s32 sp1C;
+    s8 temp_v1;
+    sp1C = func_81302290(arg0);
+    if (func_813000E4(arg0) != 0) {
+        temp_v1 = *(s8 *)((u8 *)(*(void **)((u8 *)arg0 + 0x1A148)) + 0x954);
+        if ((temp_v1 >= 0) && (temp_v1 < sp1C)) {
+            return temp_v1;
+        }
+    }
+    return -1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_813012C0.s")
 
@@ -122,6 +135,7 @@ void func_81300BA0(s32 arg0) { func_8130A570(arg0 + 0xDA8, 0); func_81304208(arg
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_81301448.s")
 
+extern void func_8130015C(void *, s32);
 void func_813014D0(void *arg0) {
     s32 temp_a0;
     temp_a0 = (s32)arg0;
@@ -130,7 +144,14 @@ void func_813014D0(void *arg0) {
     *(s32 *)((u8 *)temp_a0 + 0x1A168) = 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_8130150C.s")
+extern void func_81300350(void);
+void func_8130150C(void *arg0) {
+    s32 temp_a0;
+    temp_a0 = (s32)arg0;
+    func_8130015C(arg0, 0);
+    func_81300350();
+    *(s32 *)((u8 *)temp_a0 + 0x1A168) = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_81301548.s")
 
@@ -232,7 +253,16 @@ void func_81301F58(u8 *arg0, s32 arg1) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_813021B4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_81302290.s")
+extern s32 func_80055A74(s32);
+extern s32 func_80055BA8(void);
+s32 func_81302290(void *arg0) {
+    s8 value = *(s8 *)((u8 *)(*(void **)((u8 *)arg0 + 0x1A148)) + 0x944);
+    if (value < 0) {
+        return 0;
+    }
+    func_80055A74(value);
+    return func_80055BA8();
+}
 
 s32 func_813022D8(void *arg0) {
     s8 value = *(s8 *)((u8 *)(*(void **)((u8 *)arg0 + 0x1A148)) + 0x944);
