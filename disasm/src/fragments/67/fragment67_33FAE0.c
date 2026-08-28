@@ -30,7 +30,14 @@ void func_829031F4(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33FAE0/func_8290325C.s")
+extern void func_80041E2C(void);
+extern void func_8003F018(s32);
+extern s32 func_80041C98(s32);
+void func_8290325C(void *arg0) {
+    func_80041E2C();
+    func_8003F018((s32)((u8 *)arg0 + 4));
+    *(s32 *)arg0 = func_80041C98(5);
+}
 #endif
 
 #ifdef VERSION_US
@@ -38,7 +45,18 @@ void func_829031F4(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33FAE0/func_829033DC.s")
+extern f64 D_82917438;
+extern f64 D_82917440;
+void func_829033DC(f32 *arg0, f32 arg1, f32 arg2) {
+    f32 temp_fv0;
+    f64 temp_fv1;
+    temp_fv0 = *arg0;
+    *arg0 = ((arg1 - temp_fv0) * arg2) + temp_fv0;
+    temp_fv1 = (f64)*(volatile f32 *)arg0;
+    if ((temp_fv1 < D_82917438) && (D_82917440 < temp_fv1)) {
+        *arg0 = 0.0f;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -73,7 +91,16 @@ void func_829034B0(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33FAE0/func_829034D8.s")
+extern u8 D_82918990[];
+extern void *D_82919C38;
+extern void *D_82919DC4;
+extern void func_829034B0(void *);
+extern void func_82903058(void *, s32);
+void func_829034D8(void) {
+    D_82919C38 = *(void **)((u8 *)D_82919DC4 + 0xC);
+    func_829034B0(D_82919C38);
+    func_82903058(D_82918990, 0);
+}
 #endif
 
 #ifdef VERSION_US
@@ -142,7 +169,18 @@ void func_8290379C(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33FAE0/func_829042A4.s")
+extern f64 D_82917478;
+extern f64 D_82917480;
+void func_829042A4(f32 *arg0, f32 arg1, f32 arg2) {
+    f32 temp_fv0;
+    f64 temp_fv1;
+    temp_fv0 = *arg0;
+    *arg0 = ((arg1 - temp_fv0) * arg2) + temp_fv0;
+    temp_fv1 = (f64)*(volatile f32 *)arg0;
+    if ((temp_fv1 < D_82917478) && (D_82917480 < temp_fv1)) {
+        *arg0 = 0.0f;
+    }
+}
 #endif
 
 #ifdef VERSION_US
