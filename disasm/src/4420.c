@@ -565,7 +565,24 @@ S1_BinArchive* BinArchive_Open(u8* romStart, u8* romEnd, s32 arg2, s32 arg3) {
 
 void func_800049B8(void) { main_pool_try_free(); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800049D8.s")
+struct S1_BinArchive;
+struct S1_BinArchiveFile4420;
+extern u8 * func_800042C0(u8 *arg0, u8 *arg1, s32 arg2, s32 arg3);
+extern u8 * func_80004458(s32 arg0, u8 *arg1, u8 *arg2);
+u8 *func_800049D8(S1_MainPoolState *arg0, struct S1_BinArchive *arg1, struct S1_BinArchiveFile4420 *arg2) {
+    UNUSED s32 pad;
+    u8 *start;
+    u8 *end;
+    u8 *result;
+    start = (u8 *)(*(u32 *)arg2 + *(u32 *)((u8 *)arg1 + 4));
+    end = start + *(u32 *)((u8 *)arg2 + 4);
+    if (arg0 == NULL) {
+        result = func_800042C0(start, end, 0, 0);
+    } else {
+        result = func_80004458((s32)arg0, start, end);
+    }
+    return result;
+}
 
 typedef struct S1_BinArchiveFile4420 {
     u32 offset;
