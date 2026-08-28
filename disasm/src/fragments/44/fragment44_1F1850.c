@@ -133,7 +133,22 @@ void func_8AF0454C(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F1850/func_8AF04DB8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F1850/func_8AF04E2C.s")
+extern s32 func_8AF04DB8(s32);
+s32 *func_8AF04E2C(arg0, arg1)
+void *arg0;
+s32 arg1;
+{
+    s32 index;
+
+    index = func_8AF04DB8(arg1);
+    if (index == -1) {
+        return NULL;
+    }
+    if (index >= 100) {
+        return NULL;
+    }
+    return (s32 *)((u8 *)arg0 + index * 0xC + 0x28);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F1850/func_8AF04E8C.s")
 
@@ -143,15 +158,120 @@ void func_8AF0454C(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F1850/func_8AF05C10.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F1850/func_8AF05DC8.s")
+void *func_8AF05DC8(void *arg0) {
+    u8 *node;
+    s32 key;
+    s32 entry_key;
+    void *result;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F1850/func_8AF05E14.s")
+    node = *(u8 **)((u8 *)arg0 + 0x500);
+    key = *(s32 *)((u8 *)arg0 + 0x4B8);
+    result = NULL;
+    if (node == NULL) {
+        return NULL;
+    }
+loop:
+    entry_key = *(s32 *)(node + 4);
+    if (entry_key != 0) {
+        if (entry_key == key) {
+            result = node;
+        } else {
+            node += 0x34;
+            goto loop;
+        }
+    }
+    return result;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F1850/func_8AF05E94.s")
+extern u8 D_8AF27E30[];
+extern u8 D_8AF28274[];
+extern u8 D_8AF284E4[];
+s32 func_8AF05E14(void *arg0, s32 arg1) {
+    s32 result;
+    u8 *node;
+    s32 state;
+    s32 entry;
+
+    result = -1;
+    state = *(s32 *)((u8 *)arg0 + 0x4DC);
+    switch (state) {
+    default:
+        break;
+    case 0x59:
+        node = D_8AF27E30;
+        break;
+    case 0x42:
+        node = D_8AF28274;
+        break;
+    case 0x4D:
+        node = D_8AF284E4;
+        break;
+    }
+    while (1) {
+        entry = *(s32 *)(node + 4);
+        if (entry == 0) {
+            break;
+        }
+        if (arg1 == entry) {
+            result = *(s32 *)(node + 0x20);
+            break;
+        }
+        node += 0x34;
+    }
+    return result;
+}
+
+s32 func_8AF05E94(void *arg0) {
+    u8 *node;
+    s32 key;
+    s32 entry_key;
+    s32 result;
+
+    node = *(u8 **)((u8 *)arg0 + 0x500);
+    key = *(s32 *)((u8 *)arg0 + 0x4B8);
+    result = -1;
+    if (node == NULL) {
+        return -1;
+    }
+loop:
+    entry_key = *(s32 *)(node + 4);
+    if (entry_key != 0) {
+        if (entry_key == key) {
+            result = *(s32 *)(node + 0x20);
+        } else {
+            node += 0x34;
+            goto loop;
+        }
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F1850/func_8AF05EE0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F1850/func_8AF06404.s")
+s32 func_8AF06404(void *arg0) {
+    u8 *node;
+    s32 key;
+    s32 entry_key;
+    s32 result;
+
+    node = *(u8 **)((u8 *)arg0 + 0x500);
+    key = *(s32 *)((u8 *)arg0 + 0x4B8);
+    result = -1;
+    if (node == NULL) {
+        return -1;
+    }
+loop:
+    entry_key = *(s32 *)(node + 4);
+    if (entry_key != 0) {
+        if (entry_key == key) {
+            result = *(s32 *)(node + 0x24);
+        } else {
+            node += 0x34;
+            goto loop;
+        }
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F1850/func_8AF06450.s")
 
