@@ -10,9 +10,27 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_3312D0/func_87F0E84C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_3312D0/func_87F0E978.s")
+extern u8 D_87F113D0[];
+extern s32 func_800625E0(s32, s32);
+void func_87F0E978(u8 *arg0, s32 arg1) {
+    arg0[0] = 0;
+    arg0[4] = D_87F113D0[arg1];
+    func_800625E0((s32)(arg0 + 0x38), arg0[4]);
+    if (arg0[4] == 0x19) {
+        arg0[0x22] |= 2;
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_3312D0/func_87F0E9D8.s")
+extern s32 func_87F0E790(void *, void *, u8);
+extern s32 func_87F0E84C(void *, void *, u8);
+extern void func_87F0E978(u8 *, s32);
+void func_87F0E9D8(void *arg0, void *arg1, s32 arg2) {
+    u8 value;
+    value = D_87F113D0[arg2];
+    if ((func_87F0E790(arg1, arg0, value) == 0) && (func_87F0E84C(arg1, arg0, value) == 0)) {
+        func_87F0E978(arg0, arg2);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_3312D0/func_87F0EA40.s")
 
@@ -62,7 +80,18 @@ void func_87F0F390(void *arg0) {
     (*(s8 *)((u8 *)(arg0) + (0x2178))) = GbTower_SetPollMask(0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_3312D0/func_87F0F3E4.s")
+extern void func_87F0F118(void);
+extern void func_87F0F158(void *, s32);
+void func_87F0F3E4(void *arg0) {
+    s32 i;
+    GbTower_SetPollMask(*(u8 *)((u8 *)arg0 + 0x2178));
+    func_87F0F118();
+    i = 0;
+    do {
+        func_87F0F158(arg0, i);
+        i += 1;
+    } while (i != 4);
+}
 
 extern void func_81A0022C(void *);
 void StageLoader_UpdateSegments(void) { func_81A0022C(&D_87F15BB0); }
