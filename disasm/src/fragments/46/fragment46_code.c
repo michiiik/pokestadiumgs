@@ -38,7 +38,21 @@ void func_8AE00020(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE00380.s")
+extern void *D_8AE084BC;
+extern void *D_80094908;
+extern void func_80038E14(void *, s32, s32, s32, f32, f32, f32, s32);
+extern void GeoCamera_SetPerspective(void *, f32, f32, f32);
+void func_8AE00380(void) {
+    u8 *temp_v0;
+    u8 *temp_v1;
+    temp_v0 = (u8 *)D_8AE084BC + 0xB4;
+    temp_v1 = (u8 *)D_8AE084BC + 0xA8;
+    func_80038E14(D_8AE084BC,
+        *(s32 *)(temp_v1 + 0), *(s32 *)(temp_v1 + 4), *(s32 *)(temp_v1 + 8),
+        *(f32 *)(temp_v0 + 0), *(f32 *)(temp_v0 + 4), *(f32 *)(temp_v0 + 8), 0);
+    GeoCamera_SetPerspective(D_8AE084BC, 30.0f, 100.0f, 12800.0f);
+    D_80094908 = D_8AE084BC;
+}
 #endif
 
 #ifdef VERSION_US
@@ -53,7 +67,16 @@ void func_8AE003F8(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE0043C.s")
+extern Gfx *D_800D0510;
+extern u8 D_80094E00[];
+extern u8 D_80094EF8[];
+extern u8 D_80094F50[];
+void func_8AE0043C(void) {
+    gSPDisplayList(D_800D0510++, D_80094E00);
+    gDPSetEnvColor(D_800D0510++, 0xC8, 0xFF, 0xFF, 0xB4);
+    gSPDisplayList(D_800D0510++, D_80094EF8);
+    gSPDisplayList(D_800D0510++, D_80094F50);
+}
 #endif
 
 #ifdef VERSION_US
@@ -255,7 +278,28 @@ s32 func_8AE028B0(s32 arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE03214.s")
+extern s32 func_8004C874(s32, s32);
+s32 func_8AE03214(s16 arg0) {
+    s32 value;
+    if (arg0 < 2) {
+        value = 0x15;
+    } else if (arg0 < 6) {
+        value = 0x16;
+    } else if (arg0 < 0xB) {
+        value = 0x17;
+    } else if (arg0 < 0x15) {
+        value = 0x18;
+    } else if (arg0 < 0x29) {
+        value = 0x19;
+    } else if (arg0 < 0x51) {
+        value = 0x1A;
+    } else if (arg0 < 0x64) {
+        value = 0x1B;
+    } else {
+        value = 0x1C;
+    }
+    return func_8004C874(0x2B, value);
+}
 #endif
 
 #ifdef VERSION_US
@@ -271,7 +315,23 @@ s32 func_8AE028B0(s32 arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE038DC.s")
+extern void _bzero(void *, s32);
+extern s32 func_8AE032C8(u8, s32);
+extern void func_8004C54C(s32, s32);
+extern void func_8004C8A0(void *, s32, s32, s32);
+extern void func_800495BC(s32, s32, s32, s32, void *);
+extern u8 D_8AE083EC[];
+extern s32 D_8AE09E64;
+extern s32 D_8AE09AE4;
+void func_8AE038DC(s32 arg0, s32 arg1, void *arg2) {
+    u8 sp28[0x100];
+    _bzero(sp28, 0x100);
+    func_8004C54C(0x33, func_8AE032C8(*(u8 *)((u8 *)arg2 + 2), 0));
+    func_8004C8A0(sp28, 0x100, 0x2B, 9);
+    if (D_8AE09E64 >= 4) {
+        func_800495BC(arg0, arg1, D_8AE083EC, D_8AE09AE4, sp28);
+    }
+}
 #endif
 
 #ifdef VERSION_US
