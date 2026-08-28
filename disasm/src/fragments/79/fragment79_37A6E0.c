@@ -96,7 +96,17 @@ void func_8410B224(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8410B2DC.s")
+extern void func_84111248();
+void func_8410B2DC(u8 *arg0, u8 *arg1) {
+    *(f32 *)(arg0 + 0x34) = 20.0f;
+    *(f32 *)(arg0 + 0x38) = 6400.0f;
+    *(f32 *)(arg0 + 0x2C) = 45.0f;
+    *(f32 *)(arg1 + 0x34) = 20.0f;
+    *(f32 *)(arg1 + 0x38) = 6400.0f;
+    *(f32 *)(arg1 + 0x2C) = 45.0f;
+    func_84111248();
+    func_841112C8();
+}
 #endif
 
 #ifdef VERSION_US
@@ -576,7 +586,25 @@ void BattleAnim_ModelDispatch_043(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_84110980.s")
+extern u8 * func_8410B330(u8 *);
+extern void func_8410DFC4(u8 *, void *);
+extern void func_8410E688(u8 *arg0, void *arg1);
+extern s32 func_8411DC80(u8, s32 *, s32);
+void func_84110980(u8 *arg0, void *arg1) {
+    extern u8 *D_841911E8;
+    extern s32 func_8411DC80(u8, s32 *, s32);
+    extern void func_8410DFC4(u8 *, void *);
+    extern void func_8410E688(u8 *, void *);
+    extern u8 D_8418393C;
+
+    D_841911E8 = func_8410B330(arg0);
+    func_841203B4(arg0 + 0x2C, *(f32 *)(D_841911E8 + 0x88), 0.05f);
+    if (func_8411DC80(*(u8 *)((u8 *)arg1 + 0x61F),
+            (s32 *)&D_8418393C, 8) == 0) {
+        func_8410DFC4(arg0, arg1);
+        func_8410E688(arg0, arg1);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1466,7 +1494,24 @@ void func_84115D98(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_841163A0.s")
+extern void func_84112158(s32, s32);
+void func_841163A0(s32 arg0) {
+    extern void func_84116248(s32);
+
+    if (func_841133EC(arg0) == 0) {
+        s8 temp_v0 = *(s8 *)((u8 *)arg0 + 0x7F6);
+        switch (temp_v0) {
+        case 0:
+            func_84116248(arg0);
+            return;
+        case 1:
+            if (ModelAnim_IsFinished(arg0) != 0) {
+                func_84112158(arg0, 0xFB);
+            }
+            break;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
