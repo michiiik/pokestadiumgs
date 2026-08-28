@@ -645,7 +645,10 @@ void func_841440B4(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84144BF4.s")
+extern s32 func_8004C874(s32, s32);
+extern void func_800495BC(s32, s32, s32 *);
+extern u16 D_8419D7A0;
+void func_84144BF4(void *arg0) { s32 resource = func_8004C874(0x16, 0); *(s16 *)((u8 *)arg0 + 0xA) = *(s16 *)((u8 *)arg0 + 0xA) - 1; if (*(s16 *)((u8 *)arg0 + 0xA) < -(s32)D_8419D7A0) { *(s16 *)((u8 *)arg0 + 0xA) = 0; } func_800495BC(*(s16 *)((u8 *)arg0 + 0xA), *(s16 *)((u8 *)arg0 + 0xC), (s32 *)resource); func_800495BC(*(s16 *)((u8 *)arg0 + 0xA) + D_8419D7A0, *(s16 *)((u8 *)arg0 + 0xC), (s32 *)resource); }
 #endif
 
 #ifdef VERSION_US
