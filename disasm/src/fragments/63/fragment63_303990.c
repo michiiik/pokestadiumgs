@@ -43,7 +43,12 @@ void func_87E00184(void) {
     (*(s32 *)((u8 *)(D_87E1BA20) + (0x24))) = 1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_303990/func_87E001CC.s")
+extern void func_87E03D28(s32);
+extern void func_87F0F390(s32);
+void func_87E001CC(void) {
+    func_87E03D28((s32)(D_87E1BA20 + 0x2B0));
+    func_87F0F390(*(s32 *)D_87E1BA20);
+}
 
 extern void func_87E04A14(u8 *);
 
@@ -109,7 +114,31 @@ void func_87E00590(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_303990/func_87E00A84.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_303990/func_87E00BDC.s")
+extern s32 func_87E182A8(u8 *);
+extern void func_87E17F48(void);
+extern void func_87E0006C(void);
+extern void func_87E00148(void);
+extern void StageFade_StartFromTransparent(s32);
+void func_87E00BDC(s32 *arg0) {
+    s32 result;
+    s32 state;
+    result = func_87E182A8(D_87E1BA20 + 0x2260);
+    if (result != 0) {
+        state = result;
+        func_87E17F48();
+        switch (state) {
+        case 1:
+            func_87E0006C();
+            func_87E00148();
+            break;
+        case 2:
+            *(s32 *)(D_87E1BA20 + 0x1C) = 0xFE;
+            *arg0 = 2;
+            StageFade_StartFromTransparent(5);
+            break;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_303990/func_87E00C70.s")
 
@@ -117,7 +146,25 @@ void func_87E00590(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_303990/func_87E00E04.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_303990/func_87E00ED4.s")
+extern s32 func_87E04114(u8 *);
+extern void func_87E001CC(void);
+extern void func_87E00D54(void);
+extern void func_87E00148(void);
+void func_87E00ED4(s32 arg0) {
+    s32 temp_v0;
+    temp_v0 = func_87E04114(D_87E1BA20 + 0x2B0);
+    if (temp_v0 != 2) {
+        func_87E001CC();
+        switch (temp_v0) {
+        case 0:
+            func_87E00D54();
+            return;
+        case 1:
+            func_87E00148();
+            break;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_303990/func_87E00F4C.s")
 
