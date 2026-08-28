@@ -83,7 +83,28 @@ s32 func_82504BA0(s32 *arg0, s32 arg1) {
     return 5;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_144790/func_82504C50.s")
+extern u16 D_82508FF6;
+#pragma pack(1)
+struct Fragment21PackedWord { s32 value; };
+#pragma pack(0)
+void func_82504C50(void *arg0, s32 arg1) {
+    if ((arg0 != NULL) && (*(s16 *)((u8 *)arg0 + 8) == 0)) {
+        *(s16 *)((u8 *)arg0 + 8) = 1;
+        *(s16 *)((u8 *)arg0 + 0xC) = 0;
+        if (arg1 == 1) {
+            *(s16 *)((u8 *)arg0 + 0x10) = 0;
+            *(s16 *)((u8 *)arg0 + 0x12) = 0x1E0;
+        } else {
+            if (D_82508FF6 & 2) {
+                *(s16 *)((u8 *)arg0 + 0x10) = -0x280;
+            } else {
+                *(s16 *)((u8 *)arg0 + 0x10) = 0x280;
+            }
+            *(s16 *)((u8 *)arg0 + 0x12) = 0;
+        }
+        *(struct Fragment21PackedWord *)((u8 *)arg0 + 0x14) = *(struct Fragment21PackedWord *)((u8 *)arg0 + 0x10);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_144790/func_82504CC8.s")
 
