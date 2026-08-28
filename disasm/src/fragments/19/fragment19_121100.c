@@ -198,7 +198,16 @@ void func_823030A4(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82303A04.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82303B5C.s")
+extern s16 D_82305E6C;
+extern s16 D_82305E70;
+s32 func_82303B5C(void) {
+    s16 *p = &D_82305E6C;
+    s32 var_v1 = 0;
+    s32 var_a0 = 0;
+    if (*p >= 0) var_v1 = *p + 1;
+    if (D_82305E70 >= 0) var_a0 = D_82305E70 + 1;
+    return (var_a0 << 16) | var_v1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82303B94.s")
 #endif
