@@ -37,6 +37,30 @@ CANDIDATE_ITEMS = {
     "description": "Ordered candidates; later variants for a solved function are skipped.",
 }
 
+COMPANION_EDIT_ITEMS = {
+    "type": "array",
+    "items": {
+        "type": "object",
+        "required": ["function", "old", "new"],
+        "properties": {
+            "function": {"type": "string", "description": "Name of the already-accepted function/prototype in the same source file being edited."},
+            "old": {"type": "string", "description": "Exact current text of that function's definition or prototype line(s). Must match exactly once in the file."},
+            "new": {"type": "string", "description": "Replacement text."},
+        },
+    },
+    "description": (
+        "Paired-change edits to an already-accepted body or prototype elsewhere in the "
+        "same file (e.g. a caller that must be re-spelled to keep compiling once a new "
+        "candidate gets its real signature). Applied to the working copy of the source "
+        "before the candidate is inserted, for both the isolated probe and the gate, in "
+        "the same transaction as the candidates. Installed together with the candidates "
+        "only on a successful gate; on any failure nothing is written. The edited "
+        "function must already be a plain C definition or extern/prototype line, not a "
+        "GLOBAL_ASM pragma owner, and an edit may not add or remove a "
+        "#pragma GLOBAL_ASM line."
+    ),
+}
+
 TOOLS = [
     {
         "name": "try_pragma_candidates",
@@ -47,6 +71,7 @@ TOOLS = [
             "declarations": {"type": "string", "description": "Optional shared extern/prototype block prepended to every candidate probe and installed once ahead of the first accepted replacement."},
             "workers": {"type": "integer", "minimum": 1, "description": "Maximum parallel isolated compile probes (default: PRAGMA_PROBE_WORKERS or 10)."},
             "gate": {"type": "boolean", "default": True, "description": "Run the sequential full COMPARE=1 gate and update source (default true). Set false for isolated probe-only results."},
+            "companion_edits": COMPANION_EDIT_ITEMS,
         }},
     },
     {
@@ -141,6 +166,17 @@ def tool_try_pragma_candidates(args):
     declarations = args.get("declarations")
     if declarations is not None and not isinstance(declarations, str):
         raise ToolError("declarations must be a string when provided")
+    companion_edits = args.get("companion_edits")
+    if companion_edits is not None:
+        if not isinstance(companion_edits, list) or not companion_edits:
+            raise ToolError("companion_edits must be a non-empty list when provided")
+        for item in companion_edits:
+            if not isinstance(item, dict) or not all(
+                isinstance(item.get(key), str) for key in ("function", "old", "new")
+            ):
+                raise ToolError(
+                    "each companion_edits item needs string 'function', 'old', and 'new'"
+                )
     blocks = [(item["function"], item["code"]) for item in candidates]
     labels = [item.get("label") for item in candidates]
     source = _resolve_source(args, [function for function, _ in blocks])
@@ -154,6 +190,7 @@ def tool_try_pragma_candidates(args):
         labels=labels,
         gate=bool(args.get("gate", True)),
         declarations=declarations,
+        companion_edits=companion_edits,
     )
     for attempt in result.get("attempts", []):
         index = attempt.get("index")

@@ -48,3 +48,6 @@ __pycache__/
 disasm/tools/m2c/
 disasm/tools/decomp-permuter/
 disasm/tools/decomp-venv/
+
+# per-session git worktrees created by tooling sessions
+.claude/worktrees/

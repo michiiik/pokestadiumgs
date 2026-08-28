@@ -32,11 +32,14 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import statistics
+import sys
 from collections import Counter, defaultdict
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
+import pragma_targets
 import scan_asm_families as scanner
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -77,6 +80,20 @@ def resolve_asm_path(asm_root: Path, fallback_root: Path | None, asm_rel: Path) 
     return None
 
 
+def owners_for_source(
+    source_path: Path, asm_root: Path, fallback_root: Path | None
+) -> list[tuple[str, Path, Path]]:
+    """Remaining pragma owners of a single tracked source file, with a fallback root."""
+    text = source_path.read_text(encoding="utf-8", errors="replace")
+    owners: list[tuple[str, Path, Path]] = []
+    for match in scanner.PRAGMA_RE.finditer(text):
+        asm_rel = Path(match.group(1))
+        asm_path = resolve_asm_path(asm_root, fallback_root, asm_rel)
+        if asm_path is not None:
+            owners.append((asm_rel.stem, source_path, asm_path))
+    return owners
+
+
 def source_owners_with_fallback(
     source_root: Path, asm_root: Path, fallback_root: Path | None
 ) -> list[tuple[str, Path, Path]]:
@@ -85,13 +102,15 @@ def source_owners_with_fallback(
     for source_path in sorted(source_root.rglob("*.c")):
         if any(part.startswith(".pragma_probe_") for part in source_path.parts):
             continue
-        text = source_path.read_text(encoding="utf-8", errors="replace")
-        for match in scanner.PRAGMA_RE.finditer(text):
-            asm_rel = Path(match.group(1))
-            asm_path = resolve_asm_path(asm_root, fallback_root, asm_rel)
-            if asm_path is not None:
-                owners.append((asm_rel.stem, source_path, asm_path))
+        owners.extend(owners_for_source(source_path, asm_root, fallback_root))
     return owners
+
+
+def display_relpath(path: Path) -> str:
+    try:
+        return path.resolve().relative_to(REPO_ROOT).as_posix()
+    except ValueError:
+        return path.as_posix()
 
 
 def count_backward_branches(instructions: list[scanner.Instruction], labels: dict[str, int]) -> int:
@@ -288,7 +307,7 @@ def summarize(rows: list[Features]) -> dict[str, object]:
     return summary
 
 
-def parse_args() -> argparse.Namespace:
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--source-root", type=Path, default=REPO_ROOT / "disasm" / "src")
     parser.add_argument("--asm-root", type=Path, default=REPO_ROOT / "disasm" / "asm" / "us" / "nonmatchings")
@@ -310,11 +329,11 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--limit", type=int, default=0, help="limit scanned owners after filtering")
     parser.add_argument("--json", type=Path, help="write full per-owner feature rows to this path")
-    return parser.parse_args()
+    return parser.parse_args(argv)
 
 
-def main() -> int:
-    args = parse_args()
+def main_shapes(argv: list[str] | None = None) -> int:
+    args = parse_args(argv)
     fallback_root = None
     if not args.no_fallback:
         fallback_root = args.asm_fallback_root or _guess_asm_fallback_root()
@@ -345,6 +364,570 @@ def main() -> int:
             encoding="utf-8",
         )
     return 0
+
+
+# ---------------------------------------------------------------------------
+# ``siblings`` / ``unlock``: deliberate family-unlock hunting.
+#
+# A fleet wave on 2026-08-28 found by accident that six of twelve accepts in
+# ``4AC10.c`` shared one spelling (the ``gbi.h`` display-list macros) because
+# they were siblings -- near-identical opcode shapes calling the same helper.
+# The tools below make that discoverable on purpose: cluster a file's (or the
+# whole tree's) remaining pragma owners by opcode shape, so an agent's first
+# job is "solve one member of the largest group, then batch its siblings with
+# the same spelling" instead of stumbling into it after the fact.
+# ---------------------------------------------------------------------------
+
+# The Gfx command-word pointer every display-list append macro
+# (``gSPDisplayList``/``gDPSetFillColor``/``gDPFillRectangle``, see AGENTS.md
+# S4 "Display-list append") increments through, plus the RDP command
+# constants (``G_SETFILLCOLOR``/``G_FILLRECT``/``G_ENDDL``/``G_TEXRECT``/
+# ``G_SETTILE``/``G_LOADBLOCK``/``G_SETTILESIZE``-family opcode bytes) those
+# macros emit into the high half-word of the first or second command word.
+GBI_POINTER_SYMBOL = "D_800D0510"
+GBI_CONSTANT_RE = re.compile(
+    r"0x(?:DB060038|DA380000|DE000000|E7000000|F7000000"
+    r"|FD[0-9A-Fa-f]{6}|F5[0-9A-Fa-f]{6}|F3[0-9A-Fa-f]{6})"
+)
+GBI_MACRO_HINT = (
+    "gbi.h macros (gSPDisplayList/gDPSetFillColor/gDPFillRectangle) writing "
+    "into D_800D0510++, not hand-written words.w0/w1 stores -- see AGENTS.md "
+    "S4 'Display-list append'"
+)
+
+# Two shapes at similarity 1.0 with different registers are usually the same
+# hand-decompilation spelling with a register-allocation tie (see AGENTS.md
+# S2.5's "near-miss" guidance); 0.15 keeps a group tight enough that its
+# members are plausibly the same C spelling rather than merely the same
+# family, while still absorbing a handful of scheduling differences.
+SIBLING_DISTANCE_THRESHOLD = 0.15
+
+
+def is_gbi_macro_asm(asm_text: str) -> bool:
+    return GBI_POINTER_SYMBOL in asm_text or bool(GBI_CONSTANT_RE.search(asm_text))
+
+
+def shape_signature(instructions: list[scanner.Instruction]) -> list[str]:
+    """Abstract an owner's assembly into an opcode-shape token sequence.
+
+    Registers and immediates are dropped (two owners differing only in which
+    temp register IDO picked, or in a literal offset, are the same shape).
+    A ``jal`` keeps its target name as part of the token instead of being
+    abstracted to a bare ``jal``, because siblings usually call the same
+    helper -- that is the signal this tool is built to surface. A run of
+    consecutive ``sw`` (or ``lw``) instructions collapses to one token: the
+    number of fields a display-list/record constructor happens to touch is
+    not part of its shape.
+    """
+    tokens: list[str] = []
+    for instruction in instructions:
+        if instruction.op == "jal":
+            targets = scanner.operand_tokens(instruction.operands)
+            token = f"jal:{targets[-1]}" if targets else "jal"
+        else:
+            token = instruction.op
+        if token in ("sw", "lw") and tokens and tokens[-1] == token:
+            continue
+        tokens.append(token)
+    return tokens
+
+
+def edit_distance(a: list[str], b: list[str]) -> int:
+    """Levenshtein distance over token sequences (insert/delete/substitute)."""
+    if a == b:
+        return 0
+    n, m = len(a), len(b)
+    if n == 0:
+        return m
+    if m == 0:
+        return n
+    previous = list(range(m + 1))
+    for i in range(1, n + 1):
+        current = [i] + [0] * m
+        ai = a[i - 1]
+        for j in range(1, m + 1):
+            cost = 0 if ai == b[j - 1] else 1
+            current[j] = min(
+                previous[j] + 1,  # deletion
+                current[j - 1] + 1,  # insertion
+                previous[j - 1] + cost,  # substitution / match
+            )
+        previous = current
+    return previous[m]
+
+
+def normalized_distance(a: list[str], b: list[str]) -> float:
+    if not a and not b:
+        return 0.0
+    return edit_distance(a, b) / max(len(a), len(b), 1)
+
+
+@dataclass
+class SiblingOwner:
+    function: str
+    source: str
+    asm: str
+    instruction_count: int
+    tokens: list[str] = field(default_factory=list)
+    calls: set[str] = field(default_factory=set)
+    gbi_macro: bool = False
+
+
+def build_sibling_owner(function: str, source_path: Path, asm_path: Path) -> SiblingOwner:
+    text = asm_path.read_text(encoding="utf-8", errors="replace")
+    _, instructions, _ = scanner.parse_instructions(text)
+    return SiblingOwner(
+        function=function,
+        source=display_relpath(source_path),
+        asm=display_relpath(asm_path),
+        instruction_count=len(instructions),
+        tokens=shape_signature(instructions),
+        calls=set(scanner.extract_calls(instructions)),
+        gbi_macro=is_gbi_macro_asm(text),
+    )
+
+
+@dataclass
+class SiblingGroup:
+    group_id: int
+    members: list[SiblingOwner]
+    shared_jal_targets: list[str]
+    gbi_macro: bool
+    closest_solved: dict[str, object] | None = None
+
+    @property
+    def size(self) -> int:
+        return len(self.members)
+
+    @property
+    def instruction_range(self) -> tuple[int, int]:
+        counts = [member.instruction_count for member in self.members]
+        return (min(counts), max(counts))
+
+
+def cluster_siblings(
+    owners: list[SiblingOwner], threshold: float = SIBLING_DISTANCE_THRESHOLD
+) -> list[SiblingGroup]:
+    """Group owners whose shape signatures are identical or within ``threshold``.
+
+    Greedy nearest-cluster assignment (each owner joins its closest existing
+    cluster if within threshold, else starts a new one) rather than
+    union-find: a transitive chain (A close to B, B close to C, A far from C)
+    would otherwise merge unrelated shapes into one group, which defeats the
+    point of a spelling-hunting tool.
+    """
+    clusters: list[dict[str, object]] = []
+    for owner in sorted(owners, key=lambda item: item.function):
+        best_index: int | None = None
+        best_distance: float | None = None
+        for index, cluster in enumerate(clusters):
+            distance = normalized_distance(owner.tokens, cluster["representative"])
+            if distance <= threshold and (best_distance is None or distance < best_distance):
+                best_index, best_distance = index, distance
+        if best_index is not None:
+            clusters[best_index]["members"].append(owner)
+        else:
+            clusters.append({"representative": owner.tokens, "members": [owner]})
+
+    groups: list[SiblingGroup] = []
+    for cluster in clusters:
+        members: list[SiblingOwner] = cluster["members"]
+        shared: set[str] | None = None
+        for member in members:
+            shared = set(member.calls) if shared is None else shared & member.calls
+        groups.append(
+            SiblingGroup(
+                group_id=0,
+                members=sorted(members, key=lambda item: item.function),
+                shared_jal_targets=sorted(shared or set()),
+                gbi_macro=any(member.gbi_macro for member in members),
+            )
+        )
+    groups.sort(key=lambda group: (-group.size, group.members[0].function))
+    for index, group in enumerate(groups, start=1):
+        group.group_id = index
+    return groups
+
+
+_FUNCTION_LOCATION_CACHE: dict[str, str] | None = None
+FUNCTION_DEFINITION_RE = re.compile(
+    r"(?m)^\s*(?:static\s+)?(?:const\s+)?(?:void|[us](?:8|16|32|64))(?:\s*\*)?\s+"
+    r"(func_[0-9A-Fa-f]+)\s*\([^;{]*\)\s*\{"
+)
+
+
+def build_function_locations(source_root: Path | None = None) -> dict[str, str]:
+    """Map every already-decompiled ``func_*`` definition to its source file.
+
+    Used only to annotate a "closest solved" match with the file an agent
+    should open next; a function this misses (an unusual multi-line
+    signature) simply shows ``"?"`` for its source, never a wrong file.
+    """
+    global _FUNCTION_LOCATION_CACHE
+    if _FUNCTION_LOCATION_CACHE is not None and source_root is None:
+        return _FUNCTION_LOCATION_CACHE
+    root = source_root or (REPO_ROOT / "disasm" / "src")
+    locations: dict[str, str] = {}
+    for source_path in sorted(root.rglob("*.c")):
+        if any(part.startswith(".pragma_probe_") for part in source_path.parts):
+            continue
+        text = source_path.read_text(encoding="utf-8", errors="replace")
+        for match in FUNCTION_DEFINITION_RE.finditer(text):
+            locations.setdefault(match.group(1), display_relpath(source_path))
+    if source_root is None:
+        _FUNCTION_LOCATION_CACHE = locations
+    return locations
+
+
+_SOLVED_SIGNATURE_CACHE: dict[str, dict[str, object]] | None = None
+
+
+def _stats_path_override(fallback_root: Path | None) -> Path | None:
+    """A worktree's own probe-stats file is usually absent (gitignored,
+    per-checkout process memory); AGENTS.md SS1.2 says worktrees fall back
+    read-only to the sibling checkout for probe stats, same as ``disasm/asm``.
+    """
+    if pragma_targets.probe_stats.DEFAULT_STATS_PATH.exists():
+        return None
+    if fallback_root is None:
+        return None
+    candidate = fallback_root / "disasm" / "probe-stats" / "probe-stats.jsonl"
+    return candidate if candidate.exists() else None
+
+
+def build_solved_index(
+    asm_root: Path, fallback_root: Path | None, source_root: Path | None = None
+) -> dict[str, dict[str, object]]:
+    """Shape signature + source file for every accepted (already-solved) owner.
+
+    Cached for the process lifetime: this reads the whole probe-stats history
+    once, which is the expensive part of "closest solved", and every caller
+    in one run (a single file's siblings report or the tree-wide ``--all``
+    walk) asks with the same ``asm_root``/``fallback_root``.
+    """
+    global _SOLVED_SIGNATURE_CACHE
+    if _SOLVED_SIGNATURE_CACHE is not None:
+        return _SOLVED_SIGNATURE_CACHE
+
+    asm_roots = [asm_root]
+    if fallback_root is not None:
+        asm_roots.append(fallback_root / "disasm" / "asm" / "us" / "nonmatchings")
+    stats_override = _stats_path_override(fallback_root)
+    rows = pragma_targets.solved_shapes(stats_path=stats_override, asm_roots=asm_roots)
+
+    asm_index: dict[str, Path] = {}
+    for root in asm_roots:
+        if not root.is_dir():
+            continue
+        for path in root.rglob("*.s"):
+            asm_index.setdefault(path.stem, path)
+
+    locations = build_function_locations(source_root)
+    index: dict[str, dict[str, object]] = {}
+    for row in rows:
+        function = str(row["function"])
+        asm_path = asm_index.get(function)
+        if asm_path is None:
+            continue
+        text = asm_path.read_text(encoding="utf-8", errors="replace")
+        _, instructions, _ = scanner.parse_instructions(text)
+        index[function] = {
+            "tokens": shape_signature(instructions),
+            "source": locations.get(function, "?"),
+        }
+    _SOLVED_SIGNATURE_CACHE = index
+    return index
+
+
+def find_closest_solved(
+    group: SiblingGroup, solved_index: dict[str, dict[str, object]]
+) -> dict[str, object] | None:
+    """The nearest already-accepted spelling to any member of ``group``.
+
+    Its spelling is the first variant worth trying on the group's easiest
+    member, per the coordinator's "solve one, batch its siblings" workflow.
+    """
+    member_names = {member.function for member in group.members}
+    best: tuple[str, float, str] | None = None
+    for name, row in solved_index.items():
+        if name in member_names:
+            continue
+        tokens = row["tokens"]
+        if not isinstance(tokens, list) or not tokens:
+            continue
+        for member in group.members:
+            distance = normalized_distance(member.tokens, tokens)
+            if best is None or distance < best[1]:
+                best = (name, distance, str(row["source"]))
+    if best is None:
+        return None
+    name, distance, source = best
+    return {"function": name, "source": source, "distance": round(distance, 3)}
+
+
+def group_to_dict(group: SiblingGroup) -> dict[str, object]:
+    low, high = group.instruction_range
+    return {
+        "group_id": group.group_id,
+        "size": group.size,
+        "instruction_range": [low, high],
+        "shared_jal_targets": group.shared_jal_targets,
+        "gbi_macro": group.gbi_macro,
+        "suggested_spelling": GBI_MACRO_HINT if group.gbi_macro else None,
+        "members": [member.function for member in group.members],
+        "closest_solved": group.closest_solved,
+    }
+
+
+def _resolve_source_arg(value: str) -> Path:
+    candidate = Path(value)
+    if candidate.is_absolute():
+        return candidate
+    for base in (Path.cwd(), REPO_ROOT):
+        resolved = (base / value).resolve()
+        if resolved.exists():
+            return resolved
+    return REPO_ROOT / value
+
+
+def build_file_siblings_report(
+    source_path: Path,
+    asm_root: Path,
+    fallback_root: Path | None,
+    *,
+    min_group: int = 2,
+    source_root: Path | None = None,
+) -> dict[str, object]:
+    owner_tuples = owners_for_source(source_path, asm_root, fallback_root)
+    owners = [build_sibling_owner(function, src, asm) for function, src, asm in owner_tuples]
+    groups = cluster_siblings(owners)
+    # A group below --min-group is still shown when it is tagged gbi-macro:
+    # a lone display-list builder (the callee every sibling calls, not a
+    # sibling itself) is exactly the "solve this one first" evidence the
+    # wave of 2026-08-28 found by accident, and hiding it behind the size
+    # filter would put the tool back where it started.
+    displayed = [group for group in groups if group.size >= min_group or group.gbi_macro]
+    solved_index = build_solved_index(asm_root, fallback_root, source_root)
+    for group in displayed:
+        group.closest_solved = find_closest_solved(group, solved_index)
+    return {
+        "source": display_relpath(source_path),
+        "owners_remaining": len(owners),
+        "groups_found": len(groups),
+        "groups_shown": len(displayed),
+        "min_group": min_group,
+        "groups": [group_to_dict(group) for group in displayed],
+    }
+
+
+def build_all_siblings_report(
+    source_root: Path,
+    asm_root: Path,
+    fallback_root: Path | None,
+    *,
+    min_group: int = 2,
+    top: int = 30,
+) -> dict[str, object]:
+    all_groups: list[tuple[SiblingGroup, str]] = []
+    files_scanned = 0
+    owners_total = 0
+    for source_path in sorted(source_root.rglob("*.c")):
+        if any(part.startswith(".pragma_probe_") for part in source_path.parts):
+            continue
+        owner_tuples = owners_for_source(source_path, asm_root, fallback_root)
+        if not owner_tuples:
+            continue
+        files_scanned += 1
+        owners = [build_sibling_owner(function, src, asm) for function, src, asm in owner_tuples]
+        owners_total += len(owners)
+        source_display = display_relpath(source_path)
+        for group in cluster_siblings(owners):
+            if group.size >= min_group or group.gbi_macro:
+                all_groups.append((group, source_display))
+
+    all_groups.sort(key=lambda item: (-item[0].size, item[1], item[0].members[0].function))
+    top_groups = all_groups[:top]
+    # The closest-solved search is the expensive step (compared against
+    # every accepted winner in the tree); only compute it for the groups
+    # actually shown, not every group found while walking ~6,800 owners.
+    solved_index = build_solved_index(asm_root, fallback_root, source_root)
+    rows: list[dict[str, object]] = []
+    for rank, (group, source) in enumerate(top_groups, start=1):
+        group.closest_solved = find_closest_solved(group, solved_index)
+        row = group_to_dict(group)
+        row["rank"] = rank
+        row["source"] = source
+        rows.append(row)
+    return {
+        "files_scanned": files_scanned,
+        "owners_remaining_total": owners_total,
+        "groups_found_total": len(all_groups),
+        "top": top,
+        "min_group": min_group,
+        "groups": rows,
+    }
+
+
+def render_siblings_report(report: dict[str, object]) -> str:
+    lines: list[str] = []
+    if "source" in report:
+        lines.append(
+            f"source: {report['source']}  (owners remaining: {report['owners_remaining']}, "
+            f"groups found: {report['groups_found']}, shown: {report['groups_shown']}, "
+            f"min-group: {report['min_group']})"
+        )
+    else:
+        lines.append(
+            f"tree-wide: {report['files_scanned']} files scanned, "
+            f"{report['owners_remaining_total']} remaining owners, "
+            f"{report['groups_found_total']} groups >= min-group {report['min_group']} "
+            f"(top {report['top']} shown)"
+        )
+    groups = report["groups"]
+    if not groups:
+        lines.append("  (no groups met the threshold)")
+        return "\n".join(lines)
+    for group in groups:
+        low, high = group["instruction_range"]
+        tag = " [gbi-macro]" if group["gbi_macro"] else ""
+        rank_prefix = f"#{group['rank']} " if "rank" in group else ""
+        source_suffix = f"  source: {group['source']}" if "source" in group else ""
+        lines.append(
+            f"{rank_prefix}group {group['group_id']}: size {group['size']}, "
+            f"instructions {low}-{high}{tag}{source_suffix}"
+        )
+        if group["shared_jal_targets"]:
+            lines.append(f"    shared jal targets: {', '.join(group['shared_jal_targets'])}")
+        lines.append(f"    members: {', '.join(group['members'])}")
+        if group["gbi_macro"]:
+            lines.append(f"    suggested spelling: {group['suggested_spelling']}")
+        closest = group["closest_solved"]
+        if closest:
+            lines.append(
+                f"    closest solved: {closest['function']} "
+                f"({closest['source']}, distance {closest['distance']})"
+            )
+        else:
+            lines.append("    closest solved: none found")
+        lines.append("")
+    return "\n".join(lines).rstrip()
+
+
+def _add_fallback_args(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument("--source-root", type=Path, default=REPO_ROOT / "disasm" / "src")
+    parser.add_argument("--asm-root", type=Path, default=REPO_ROOT / "disasm" / "asm" / "us" / "nonmatchings")
+    parser.add_argument(
+        "--asm-fallback-root",
+        type=Path,
+        default=None,
+        help="read-only checkout root to fall back to for a missing .s (auto-guessed if omitted)",
+    )
+    parser.add_argument("--no-fallback", action="store_true", help="disable the asm fallback root lookup")
+
+
+def _resolve_fallback_root(args: argparse.Namespace) -> Path | None:
+    if args.no_fallback:
+        return None
+    return args.asm_fallback_root or _guess_asm_fallback_root()
+
+
+def cmd_siblings(argv: list[str]) -> int:
+    parser = argparse.ArgumentParser(
+        prog="analyze_family_shapes.py siblings",
+        description=(
+            "Cluster a file's (or the whole tree's) remaining pragma owners by "
+            "opcode shape, so an agent can solve one member of the largest "
+            "group and batch its siblings with the same spelling."
+        ),
+    )
+    parser.add_argument("--source", help="path to a disasm/src/*.c file (required unless --all)")
+    parser.add_argument(
+        "--all", action="store_true", help="walk every source file; print the largest unsolved groups tree-wide"
+    )
+    parser.add_argument(
+        "--min-group",
+        type=int,
+        default=2,
+        help="minimum group size to report (a gbi-macro-tagged group is always reported)",
+    )
+    parser.add_argument("--top", type=int, default=30, help="--all only: how many groups to print")
+    parser.add_argument("--json", action="store_true", help="print machine-readable JSON instead of a text report")
+    _add_fallback_args(parser)
+    args = parser.parse_args(argv)
+    fallback_root = _resolve_fallback_root(args)
+
+    if args.all:
+        report = build_all_siblings_report(
+            args.source_root, args.asm_root, fallback_root, min_group=args.min_group, top=args.top
+        )
+    else:
+        if not args.source:
+            parser.error("--source is required unless --all is given")
+        source_path = _resolve_source_arg(args.source)
+        if not source_path.exists():
+            print(f"error: source file not found: {args.source}", file=sys.stderr)
+            return 1
+        report = build_file_siblings_report(
+            source_path, args.asm_root, fallback_root, min_group=args.min_group, source_root=args.source_root
+        )
+
+    if args.json:
+        print(json.dumps(report, indent=2, default=str))
+    else:
+        print(render_siblings_report(report))
+    return 0
+
+
+def cmd_unlock(argv: list[str]) -> int:
+    parser = argparse.ArgumentParser(
+        prog="analyze_family_shapes.py unlock",
+        description="List remaining pragma owners that call a given function (its callers).",
+    )
+    parser.add_argument("--function", required=True, help="e.g. func_8004A010")
+    parser.add_argument("--json", action="store_true")
+    _add_fallback_args(parser)
+    args = parser.parse_args(argv)
+    fallback_root = _resolve_fallback_root(args)
+
+    owners = source_owners_with_fallback(args.source_root, args.asm_root, fallback_root)
+    callers: list[dict[str, object]] = []
+    for function, source_path, asm_path in owners:
+        if function == args.function:
+            continue
+        text = asm_path.read_text(encoding="utf-8", errors="replace")
+        _, instructions, _ = scanner.parse_instructions(text)
+        call_count = scanner.extract_calls(instructions).count(args.function)
+        if call_count:
+            callers.append(
+                {
+                    "function": function,
+                    "source": display_relpath(source_path),
+                    "call_count": call_count,
+                    "instruction_count": len(instructions),
+                }
+            )
+    callers.sort(key=lambda row: (-row["call_count"], row["function"]))
+    report = {"target": args.function, "caller_count": len(callers), "callers": callers}
+
+    if args.json:
+        print(json.dumps(report, indent=2))
+    else:
+        print(f"{args.function}: {len(callers)} remaining owner(s) call it")
+        for row in callers:
+            print(
+                f"  {row['function']}  ({row['source']}, {row['call_count']}x, "
+                f"{row['instruction_count']} instructions)"
+            )
+    return 0
+
+
+def main() -> int:
+    argv = sys.argv[1:]
+    if argv and argv[0] == "siblings":
+        return cmd_siblings(argv[1:])
+    if argv and argv[0] == "unlock":
+        return cmd_unlock(argv[1:])
+    return main_shapes(argv)
 
 
 if __name__ == "__main__":
