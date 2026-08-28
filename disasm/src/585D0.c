@@ -186,7 +186,14 @@ void func_80058D98_padding2(void) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80059050.s")
+extern u8 D_801285D4[];
+extern s32 GbPak_ReadCommand(s32, s32, s32, s32);
+extern s32 func_800591BC(s32, s32);
+s32 func_80059050(s32 arg0, s32 arg1) {
+    s32 base = *(s32 *)(D_801285D4 + arg0 * 112);
+    s32 size = (arg1 == 0) ? 0x4000 : 0x6000;
+    return GbPak_ReadCommand(arg0, base + arg1 * 0x1A60, size, 0x1A60) == 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -213,7 +220,12 @@ s32 func_8005910C(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_800591BC.s")
+extern s32 func_80057BCC(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
+s32 func_800591BC(s32 arg0, s32 arg1) {
+    s32 base = *(s32 *)(D_801285D4 + arg0 * 112);
+    s32 size = (arg1 == 0) ? 0x4000 : 0x6000;
+    return func_80057BCC(arg0, base + arg1 * 0x1A60, size, 0x1A60);
+}
 #endif
 
 #ifdef VERSION_US
@@ -995,11 +1007,33 @@ s32 func_8005E304(s32 arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005E5D8.s")
+extern u8 D_80128570[];
+extern void _bzero(s32, s32);
+extern void func_8005E350(s32, u8, s32, s32);
+extern void func_8005E524(s32, s32);
+void func_8005E5D8(s32 arg0) {
+    s32 sp1C;
+    s32 sp20;
+
+    sp20 = *(s32 *)(D_80128570 + arg0 * 112 + 0x60);
+    sp1C = (s32)(D_80128570 + arg0 * 112 + 8);
+    _bzero(sp1C, 0x20);
+    func_8005E350(sp1C, *(u8 *)(sp20 + 0x88A), sp20 + 0x88B, 1);
+    func_8005E524((u8)arg0, sp1C);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005E648.s")
+void func_8005E648(s32 arg0) {
+    s32 sp1C;
+    s32 sp20;
+
+    sp20 = *(s32 *)(D_80128570 + arg0 * 112 + 0x60);
+    sp1C = (s32)(D_80128570 + arg0 * 112 + 8);
+    _bzero(sp1C, 0x20);
+    func_8005E350(sp1C, *(u8 *)(sp20 + 0x865), sp20 + 0x866, 1);
+    func_8005E524((u8)arg0, sp1C);
+}
 #endif
 
 #ifdef VERSION_US
