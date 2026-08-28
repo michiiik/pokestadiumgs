@@ -46,7 +46,13 @@ void func_81801878(u8 *arg0, u8 *arg1, u8 *arg2) { *(s16 *)(arg0 + 0) = *(s16 *)
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_8180189C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_8180194C.s")
+extern void func_8180194C(u8 *, u8 *, u8 *, f32);
+void func_8180194C(u8 *arg0, u8 *arg1, u8 *arg2, f32 arg3) {
+    *(s16 *)(arg0 + 0) = (s16)(*(s16 *)(arg1 + 0) +
+        (*(s16 *)(arg2 + 0) - *(s16 *)(arg1 + 0)) * arg3);
+    *(s16 *)(arg0 + 2) = (s16)(*(s16 *)(arg1 + 2) +
+        (*(s16 *)(arg2 + 2) - *(s16 *)(arg1 + 2)) * arg3);
+}
 
 s32 func_818019B8(u8 *arg0, u8 *arg1) {
     s32 result = *(s16 *)(arg1 + 0) == *(s16 *)(arg0 + 0);
@@ -247,7 +253,14 @@ void func_818036D8(s32 arg0, s32 arg1, s32 arg2, s32 arg3) { func_800498C4(); fu
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81803720.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_818037A0.s")
+void func_818037A0(u8 *arg0, u8 *arg1, s32 arg2, s32 arg3) {
+    if (*(s16 *)(arg0 + 4) <= 0) *(s16 *)(arg0 + 4) = (s16)arg2;
+    if (*(s16 *)(arg0 + 6) <= 0) *(s16 *)(arg0 + 6) = (s16)arg3;
+    if (*(s16 *)(arg1 + 0) < 0) *(s16 *)(arg1 + 0) = *(s16 *)(arg0 + 0) % arg2;
+    if (*(s16 *)(arg1 + 2) < 0) *(s16 *)(arg1 + 2) = *(s16 *)(arg0 + 2) % arg3;
+    if (*(s16 *)(arg1 + 4) < 0) *(s16 *)(arg1 + 4) = (s16)arg2;
+    if (*(s16 *)(arg1 + 6) < 0) *(s16 *)(arg1 + 6) = (s16)arg3;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81803868.s")
 
@@ -269,7 +282,19 @@ s32 func_81803AE4(u16 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81803BE8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81803C14.s")
+extern u8 *func_81803BB8();
+extern s32 func_81803BE8();
+s32 func_81803C14(s32 arg0, s32 arg1) {
+    s32 mask;
+    u8 *value;
+
+    mask = func_81803BE8(arg0, arg1);
+    value = func_81803BB8(arg0, arg1);
+    if (value == 0) return 0;
+    if (mask == 0) return 0;
+    if (*value >= 0x21) return 0;
+    return ((1 << (*value + 0x1F)) & mask) != 0;
+}
 
 void func_81803C9C(void *arg0)
 {
