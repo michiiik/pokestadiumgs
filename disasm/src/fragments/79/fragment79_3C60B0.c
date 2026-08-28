@@ -140,7 +140,25 @@ void func_84156E58(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84156E8C.s")
+extern u16 D_841A4D4A;
+extern u16 D_841A4D4C;
+extern u16 D_841A4D4E;
+extern u16 D_841A4D52;
+extern void func_84156CCC(void);
+extern void func_84157128(void);
+extern void func_84157398(void);
+extern void func_8415782C(void);
+extern s32 func_8415DAE4(void);
+s32 func_84156E8C(void) {
+    (*(s16 *)&D_841A4D4A) = (*(s16 *)&D_841A4D4A) + 1;
+    if (*(s16 *)&D_841A4D4A >= 0xB5) {
+        return -1;
+    }
+    if (*(s16 *)&D_841A4D4A < 0x78 && (*(s16 *)&D_841A4D4A % 7) == 0) {
+        func_84156CCC();
+    }
+    return func_8415DAE4();
+}
 #endif
 
 #ifdef VERSION_US
@@ -200,7 +218,16 @@ void BattleAnim_StartEffect7TexturedRibbonSheet_Init(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_841572D4.s")
+s32 func_841572D4(void) {
+    (*(s16 *)&D_841A4D4C) = (*(s16 *)&D_841A4D4C) + 1;
+    if (*(s16 *)&D_841A4D4C >= 0x709) {
+        return -1;
+    }
+    if (*(s16 *)&D_841A4D4C < 0x6EA && (*(s16 *)&D_841A4D4C % 3) == 0) {
+        func_84157128();
+    }
+    return func_84162C88();
+}
 #endif
 
 #ifdef VERSION_US
@@ -227,7 +254,16 @@ void BattleAnim_StartEffect33Radial20_Init(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_8415758C.s")
+s32 func_8415758C(void) {
+    (*(s16 *)&D_841A4D4E) = (*(s16 *)&D_841A4D4E) + 1;
+    if (*(s16 *)&D_841A4D4E >= 0xB5) {
+        return -1;
+    }
+    if (*(s16 *)&D_841A4D4E < 0x78 && (*(s16 *)&D_841A4D4E % 7) == 0) {
+        func_84157398();
+    }
+    return func_8415DAE4();
+}
 #endif
 
 #ifdef VERSION_US
@@ -283,7 +319,16 @@ void BattleAnim_StartEffect98Radial20_Init(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_841579EC.s")
+s32 func_841579EC(void) {
+    (*(s16 *)&D_841A4D52) = (*(s16 *)&D_841A4D52) + 1;
+    if (*(s16 *)&D_841A4D52 >= 0xB5) {
+        return -1;
+    }
+    if (*(s16 *)&D_841A4D52 < 0x78 && (*(s16 *)&D_841A4D52 % 7) == 0) {
+        func_8415782C();
+    }
+    return func_8415DAE4();
+}
 #endif
 
 #ifdef VERSION_US
