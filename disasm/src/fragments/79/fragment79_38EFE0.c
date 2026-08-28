@@ -192,7 +192,15 @@ s32 BattleAnim_StepToS16(s16* arg0, s16 arg1, s16 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_841203B4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_8412041C.s")
+extern f32 D_80087E50[];
+extern f32 D_80088E50[0x1000];
+void func_8412041C(void *arg0, f32 arg1, s16 arg2) {
+    s32 index;
+
+    index = ((u16) arg2) >> 4;
+    (*(f32 *)((u8 *)(arg0) + (0))) = D_80088E50[index] * arg1;
+    (*(f32 *)((u8 *)(arg0) + (8))) = D_80087E50[index] * arg1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84120464.s")
 
