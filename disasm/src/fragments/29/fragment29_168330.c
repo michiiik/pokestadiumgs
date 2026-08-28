@@ -139,7 +139,22 @@ void func_880040D4(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88004804.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_880048D4.s")
+extern u8 D_8800ED50[];
+extern void func_880046EC(s32, s32, s16, s16, s32, s32, u8, u8, u8,
+                          s32 *, s32 *, s32 *, s32 *, u8, u8, void *);
+
+void func_880048D4(s32 arg0, s32 arg1, s16 arg2, s16 arg3, s32 arg4, s32 arg5,
+                   u8 arg6, u8 arg7, u8 arg8, s32 *arg9, s32 *arg10,
+                   s32 *arg11, s32 *arg12, u8 arg13, u8 arg14, s32 arg15) {
+    u8 *entry;
+
+    entry = D_8800ED50 + ((u8)arg15 * 0x4C);
+    if (*(s32 *)(entry + 0x20) == 0) {
+        func_880046EC(arg0, arg1, arg2, arg3, arg4, arg5,
+                       arg6, arg7, arg8, arg9, arg10, arg11, arg12,
+                       arg13, arg14, entry);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88004990.s")
 #endif
