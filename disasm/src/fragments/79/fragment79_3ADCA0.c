@@ -465,7 +465,21 @@ void func_84140C8C(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84140CFC.s")
+extern void func_8413FBC4(s16, s16, u8, void *);
+void func_84140CFC(void *arg0) {
+    u8 temp_v0;
+    u8 temp_a2;
+
+    temp_v0 = *(u8 *)((u8 *)arg0 + 8);
+    temp_a2 = *(u8 *)((u8 *)arg0 + 1);
+    if (!(temp_v0 & 1) && !(temp_v0 & 0x10) && (*(u8 *)((u8 *)arg0 + 0) == 2)) {
+        func_8413FBC4(
+            (s16)(*(s16 *)((u8 *)arg0 + 0xA) + 2),
+            (s16)(*(s16 *)((u8 *)arg0 + 0xC) + 2),
+            temp_a2,
+            arg0);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1321,11 +1335,53 @@ void func_84147A04(void *arg0, s16 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84147A9C.s")
+extern u8 D_84186F34;
+extern void func_8414782C(void *, s32, s32);
+extern void func_84147968(void *, s16);
+extern void func_84147A04(void *, s16);
+void func_84147A9C(void *arg0) {
+    s32 temp_v0;
+
+    if (D_84186F34 >= *(u8 *)((u8 *)arg0 + 9)) {
+        temp_v0 = *(s32 *)((u8 *)arg0 + 4);
+        switch (temp_v0) {
+        case 0:
+            func_8414782C(arg0, 1, 0x3FAA3D71);
+            return;
+        case 1:
+            func_84147968(arg0, 1);
+            return;
+        case 2:
+            func_84147A04(arg0, 1);
+            break;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84147B20.s")
+extern u8 D_84186F34;
+extern void func_8414782C(void *, s32, s32);
+extern void func_84147968(void *, s16);
+extern void func_84147A04(void *, s16);
+void func_84147B20(void *arg0) {
+    s32 temp_v0;
+
+    if (D_84186F34 >= *(u8 *)((u8 *)arg0 + 9)) {
+        temp_v0 = *(s32 *)((u8 *)arg0 + 4);
+        switch (temp_v0) {
+        case 0:
+            func_8414782C(arg0, -1, 0x3FAA3D71);
+            return;
+        case 1:
+            func_84147968(arg0, -1);
+            return;
+        case 2:
+            func_84147A04(arg0, -1);
+            break;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
