@@ -20,7 +20,15 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_84202198.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_84202294.s")
+extern void _bzero(void *, s32);
+void func_84202294(void *arg0, u8 arg1, u8 arg2, u8 arg3, u8 arg4) {
+    _bzero(arg0, 0x10);
+    ((u8 *)arg0)[1] = arg1;
+    ((u8 *)arg0)[2] = 3;
+    ((u8 *)arg0)[3] = arg2;
+    ((u8 *)arg0)[4] = arg3;
+    ((u8 *)arg0)[5] = arg4;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_842022F0.s")
 
