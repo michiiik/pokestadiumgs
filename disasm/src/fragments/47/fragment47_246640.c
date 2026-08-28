@@ -55,7 +55,16 @@ s32 func_86000B9C(u8 *arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_246640/func_86001838.s")
+extern void func_87C01CBC();
+void func_86001838(s32 arg0, u8 *arg1) {
+    s32 pad;
+    u8 *obj = *(u8 **)(arg1 + 0x14);
+    func_87C01CBC(obj + 0x16C);
+    *(f32 *)(arg1 + 0x24) = (f32)*(f64 *)(obj + 0x198);
+    *(f32 *)(arg1 + 0x28) = (f32)*(f64 *)(obj + 0x1A0);
+    *(f32 *)(arg1 + 0x28) -= 26.0f;
+    *(f32 *)(arg1 + 0x2C) = (f32)*(f64 *)(obj + 0x1A8);
+}
 #endif
 
 #ifdef VERSION_US
@@ -148,7 +157,15 @@ void func_86002444(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_246640/func_8600297C.s")
+extern void func_860043B4();
+s32 func_8600297C(s32 arg0, u8 *arg1) {
+    u8 *state = *(u8 **)(arg1 + 0x14);
+    state[0x28A] |= 0x10;
+    if (arg0 != 2) return 0;
+    func_860043B4(state, arg1 + 0x60);
+    return 1;
+}
+void func_8600297C_padding(void) {}
 #endif
 
 #ifdef VERSION_US
@@ -232,7 +249,15 @@ void func_86003754(u8 *arg0) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_246640/func_86003CFC.s")
+extern void func_87C01DB8();
+void func_86003CFC(u8 *arg0) {
+    *(s32 *)(arg0 + 0x1868) = 1;
+    *(s32 *)(arg0 + 0x186C) = 1;
+    func_87C01DB8(arg0 + 0x17A0, 0, 0, arg0);
+    arg0[0x13D] = 0xFF;
+    *(f64 *)(arg0 + 0x17D0) = 0.0;
+    *(f64 *)(arg0 + 0x17E0) = 0.0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -250,7 +275,15 @@ void func_86003DAC(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_246640/func_86003DD0.s")
+extern void func_87C01E30(void *,void *,s32); extern void func_87C00120(void *,f64,f64,f64); extern f64 D_8600D60C;
+void func_86003DD0(u8 *arg0) {
+    *(s32 *)(arg0+0x1868)=0;
+    *(s32 *)(arg0+0x186C)=1;
+    func_87C01E30(arg0+0x17A0,&D_8600D60C,0);
+    func_87C00120(arg0+0x18,0.0,0.0,0.0);
+    func_87C00120(arg0+0x30,0.0,0.0,0.0);
+    arg0[0x13D]=0xFF;
+}
 #endif
 
 #ifdef VERSION_US
