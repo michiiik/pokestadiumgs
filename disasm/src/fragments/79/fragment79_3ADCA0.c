@@ -773,7 +773,20 @@ void func_84144A00(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84144B98.s")
+extern s16 D_84186E10, D_84186E14;
+extern u16 D_84186E18;
+extern u8 *func_8413D260(void);
+extern void func_8004989C(s32);
+extern void func_800495BC(s32, s32, s32 *);
+void func_84144B98(void *arg0) {
+    struct S { s32 *resource; s32 pad; } local;
+
+    local.resource = func_8413D260();
+    func_8004989C(D_84186E18);
+    func_800495BC(*(s16 *)((u8 *)arg0 + 0xA) + D_84186E10,
+                  *(s16 *)((u8 *)arg0 + 0xC) + D_84186E14,
+                  local.resource);
+}
 #endif
 
 #ifdef VERSION_US
