@@ -351,7 +351,27 @@ void func_8006BA74(u8 *arg0) {
 
 extern void func_8006BF78(s32); void func_8006C58C(void) { func_8006BF78(0); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006C5AC.s")
+extern void _bcopy(void *, void *, s32);
+void func_8006C5AC(s32 arg0, void *arg1, s32 arg2, s32 arg3)
+{
+  void *base;
+  void *temp;
+  if (D_8009DF70 != 0)
+  {
+    base = *((void **) (((u8 *) ((u32) D_8009DF70)) + 0x2C));
+    temp = ((u8 *) base) + arg0;
+    if (((base != 0) && (arg0 >= 0)) && (arg0 < 4))
+    {
+      _bcopy(arg1, (((u8 *) (*((void **) (((u8 *) ((u32) D_8009DF70)) + 0x2C)))) + (arg0 * 0x16)) + 0x1C, 0x16);
+      temp = ((u8 *) base) + arg0;
+      if (1)
+      {
+        *((s8 *) (((u8 *) temp) + 0x74)) = arg2;
+      }
+      *((s8 *) (((u8 *) temp) + 0x78)) = arg3;
+    }
+  }
+}
 
 extern void func_8006BF78(s32); void func_8006C644(void) { func_8006BF78(1); }
 
