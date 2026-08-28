@@ -23,9 +23,18 @@ void func_880022F0(void) { D_8800ED40 = 10; D_8800ED41 = 1; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88002AA8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88002BA0.s")
+extern Gfx *D_800D0510;
+void func_88002BA0(u8 arg0, u8 arg1, u8 arg2) {
+    gDPPipeSync(D_800D0510++);
+    gDPSetEnvColor(D_800D0510++, arg0, arg1, arg2, 0xFF);
+    gDPSetRenderMode(D_800D0510++, 0x0F0A7008, 0);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88002C2C.s")
+void func_88002C2C(u8 arg0, u8 arg1, u8 arg2) {
+    gDPPipeSync(D_800D0510++);
+    gDPSetEnvColor(D_800D0510++, arg0, arg1, arg2, 0xFF);
+    gDPSetRenderMode(D_800D0510++, 0x0F0A4000, 0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88002CB8.s")
 
