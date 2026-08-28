@@ -150,7 +150,8 @@ void func_8AE01394(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE015C4.s")
+extern void func_8AE013B4(); extern void _bzero(void *, s32);
+void func_8AE015C4(s16 arg0, s16 arg1) { s32 pad; u8 sp1C[0x50]; _bzero(sp1C, 0x50); func_8AE013B4(sp1C, arg0, arg1); }
 #endif
 
 #ifdef VERSION_US
