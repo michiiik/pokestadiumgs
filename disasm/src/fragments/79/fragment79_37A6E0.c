@@ -23,7 +23,24 @@ void func_8410AE50(u8 *arg0, s16 a1, s16 a2, s16 a3, s16 a4) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8410B08C.s")
+void func_8410B08C(void) {
+    extern void func_8410AE8C(u8 *, s16, s16, s16, s32);
+    extern u8 D_84190428[];
+    extern u8 D_841910E0[];
+    extern u8 *D_841911E0;
+    extern u8 *D_841911E4;
+    func_8410AE8C(D_84190428,
+        *(s16 *)(D_841911E0 + 0x9A),
+        *(s16 *)(D_841911E0 + 0x9C),
+        *(s16 *)(D_841911E0 + 0x9E),
+        (s32)*(s16 *)(D_841911E0 + 0xA0));
+    func_8410AE8C(D_841910E0,
+        *(s16 *)(D_841911E4 + 0x9A),
+        *(s16 *)(D_841911E4 + 0x9C),
+        *(s16 *)(D_841911E4 + 0x9E),
+        (s32)*(s16 *)(D_841911E4 + 0xA0));
+    D_841910E0[1] = (u8)(D_841910E0[1] | 0x10);
+}
 #endif
 
 #ifdef VERSION_US
@@ -1337,7 +1354,13 @@ void func_84115D98(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_84116410.s")
+void func_84116410(u8 *arg0) {
+    if ((*(u16 *)(arg0 + 0x7EC) & 1) == 0) {
+        s32 index = arg0[0x618] - 1;
+        arg0[0x616] = *(u8 *)(*(u8 **)(arg0 + 0x2D4) + (index * 0x14));
+        func_841146D4(arg0, index);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1564,7 +1587,17 @@ void func_84118794(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_84118990.s")
+extern void func_84111C44(void);
+extern void func_8411FEE8(s32);
+void func_84118990(s32 arg0) {
+    extern void func_8410B104(void);
+    func_8410B104();
+    func_84111C44();
+    func_8411FEE8(0x50);
+    *(s16 *)((u8 *)arg0 + 0x7E8) = 0;
+    *(u8 *)((u8 *)arg0 + 0x7F6) = 1;
+    *(s32 *)((u8 *)(arg0 + (D_841911F4 * 4)) + 0x5C8) = D_84183D50;
+}
 #endif
 
 #ifdef VERSION_US
@@ -1712,7 +1745,14 @@ void BattleAnim_Dispatch_024(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8411AB5C.s")
+extern void func_84111C44(void);
+extern void func_84113560(s32);
+void func_8411AB5C(s32 arg0) {
+    *(u8 *)((u8 *)arg0 + 0x618) = 1;
+    func_84111C44();
+    func_84113560(0x126);
+    *(s32 *)((u8 *)(arg0 + (D_841911F4 * 4)) + 0x5C8) = D_84183D50;
+}
 #endif
 
 #ifdef VERSION_US
