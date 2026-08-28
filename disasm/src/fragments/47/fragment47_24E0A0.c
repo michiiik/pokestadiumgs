@@ -2,7 +2,14 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_86007A80.s")
+extern void *func_87C00120(void *, f64, f64, f64);
+void func_86007A80(void *arg0, f64 arg1) {
+    f64 t = (2.0 * arg1) / 3.0;
+    f64 value = *(f64 *)((u8 *)arg0 + 0xC8);
+    f64 result = t * value * value * 5.0;
+    *(f64 *)((u8 *)arg0 + 0xE0) = arg1;
+    func_87C00120((u8 *)arg0 + 0x60, result, result, result);
+}
 
 extern u8 D_8600DE30[];
 extern void func_86007B4C(void *, f64);
@@ -66,7 +73,14 @@ f64 func_86007F50(void *arg0, s32 arg1, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_86008F4C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_860091F4.s")
+extern f64 func_86008F4C(void *, s32, f64, s32, f64, s32);
+f64 func_860091F4(void *arg0, f64 arg1, s32 arg2, f64 arg3, s32 arg4) {
+    f64 result = func_86008F4C(arg0, 1, arg1, arg2, arg3, arg4);
+    if (result > 0.0) {
+        return result;
+    }
+    return 0.0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_86009260.s")
 
