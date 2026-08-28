@@ -102,10 +102,17 @@ says "register tie — stop" when §2 step 6's stop condition applies.
 - Touch **only your assigned file**. Never another agent's `disasm/src/*.c`.
 - Runner-only installs (`fleet_probe.py --gate`). Never hand-edit a tracked
   source to test a hypothesis. Never `DECOMP_PROVENANCE_SKIP`.
-- Never `git add -A`, `git commit -a`, `git stash`, or `git reset`. Commit by
-  **explicit path** (`git add disasm/src/<file>.c ... && git commit`) every
-  ~5 accepts, so a broad stage never sweeps up another agent's uncommitted
-  work in a shared checkout.
+- Never `git add -A`, `git commit -a`, `git stash`, or `git reset`. Commit
+  every ~5 accepts with:
+
+      git commit --only disasm/src/<your file>.c COVERAGE.md -m "..."
+
+  Do **not** use `git add <file> && git commit`. The git index is shared by
+  every process in this checkout, so a plain commit also commits whatever
+  another session has staged — that is how one agent's file ended up inside
+  an unrelated tooling commit on 2026-08-28. `--only` commits exactly the
+  paths you name and leaves everyone else's staged work alone. Name
+  `COVERAGE.md` too, or the coverage snapshot lags a commit behind.
 - Never search outside this repository (no `find /`) — SDK headers are all
   under `disasm/lib/ultralib/include/PR/`.
 - Stay inside your time box. Stop and report when it expires, even mid-owner.

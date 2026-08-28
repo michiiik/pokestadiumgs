@@ -165,6 +165,18 @@ numbers before proposing changes. Then:
 - Commit verified batches per source file or per sweep run, not one function
   per commit. A commit message names the subsystem or family, not a single
   helper.
+- **In a shared checkout, commit with `git commit --only <path> COVERAGE.md`,
+  never `git add <path> && git commit`.** The git index is shared by every
+  process in the checkout, so a plain `git commit` includes whatever any
+  other session has staged, even when you staged only your own file: on
+  2026-08-28 a coordinator's tooling commit (`c709fc3`, staged with three
+  explicit `tools/` paths) swept in an agent's `fragment79_38EFE0.c` that
+  was sitting staged-but-uncommitted. `--only` builds a temporary index
+  from HEAD plus the named paths, so another session's staged work is
+  untouched and stays staged. Name `COVERAGE.md` in the list as well —
+  verified 2026-08-28: `10-coverage.sh` regenerates it into the temporary
+  index, but a path not named in `--only` does not reach the commit, so
+  omitting it makes the coverage snapshot lag by one commit.
 - `COVERAGE.md` is generated; never hand-edit it. `README.md` only points at it.
 - Tests that create throwaway git repos must strip `GIT_DIR`, `GIT_INDEX_FILE`
   and friends from their subprocess environment (see `_GitFixture`): the
