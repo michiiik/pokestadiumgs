@@ -73,7 +73,9 @@ extern void func_8AB04AE4(void);
 extern s32 func_8AB08DBC(s32);
 s32 func_8AB08C6C(s32 arg0) { s32 result = 0x13; switch (arg0) { case 0: func_8AB04AE4(); break; case 1: if (StageContext_GetFadeMode() == 0) result = func_8AB08DBC(0); break; } return result; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22AB80/func_8AB08CD0.s")
+extern s16 D_8AB16CC8;
+extern s32 func_8AB08D3C(s32);
+s32 func_8AB08CD0(s32 arg0) { s32 result = 0x15; s16 *p; p = &D_8AB16CC8; switch (arg0) { case 0: *p = 0; break; case 1: if (*p >= 0xA) func_8AB08D3C(0); *p += 1; break; } return result; }
 
 extern void StageFade_StartFromTransparent(s32);
 s32 StageContext_GetFadeMode();
