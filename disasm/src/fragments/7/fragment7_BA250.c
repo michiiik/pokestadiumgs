@@ -78,7 +78,48 @@ void func_8300136C(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83001788.s")
+extern void func_800226C0(s32);
+extern void func_8300AC8C(void *, s32, s32, void *);
+extern void func_8300B728(void *, s32, s32, void *);
+void func_83001788(void *arg0, s32 arg1) {
+    s32 temp_v0;
+    s32 temp_v0_2;
+    if (arg1 == -1) {
+        *(u8 *)((u8 *)arg0 + 0x1E) = 0x23;
+        *(u8 *)((u8 *)arg0 + 0x52) = 0;
+        func_800226C0(3);
+        return;
+    }
+    if (arg1 > 0) {
+        if (arg1 < ((s32)*(u8 *)((u8 *)(u32)arg0 + 0x3A06D) + 1)) {
+            temp_v0 = *(u8 *)((u8 *)arg0 + 0x46);
+            switch (temp_v0) {
+            case 1:
+                *(u8 *)((u8 *)arg0 + 0x1E) = 0x29;
+                func_800226C0(0x90);
+                return;
+            case 3:
+                temp_v0_2 = *(u8 *)((u8 *)arg0 + 0x52);
+                if (temp_v0_2 == 0) {
+                    *(u8 *)((u8 *)arg0 + 0x52) = (u8)arg1;
+                    func_800226C0(0x90);
+                    return;
+                }
+                func_8300AC8C((u8 *)(u32)arg0 + 0x3A06C, temp_v0_2 - 1, arg1 - 1, arg0);
+                *(u8 *)((u8 *)arg0 + 0x52) = 0;
+                *(u8 *)((u8 *)arg0 + 0x1E) = 0x23;
+                func_800226C0(0x44);
+                return;
+            case 4:
+                *(u8 *)((u8 *)arg0 + 0x1E) = 0x29;
+                func_800226C0(0x90);
+                return;
+            }
+        } else {
+            func_800226C0(5);
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -102,7 +143,46 @@ void func_8300136C(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83001FA4.s")
+extern void func_800226C0(s32);
+extern void func_8300AC8C(void *, s32, s32, void *);
+extern void func_8300B728(void *, s32, s32, void *);
+void func_83001FA4(void *arg0, s32 arg1) {
+    u8 temp_v0;
+    if (arg1 == -1) {
+        *(u8 *)((u8 *)arg0 + 0x1E) = 0x1C;
+        func_800226C0(3);
+        *(u8 *)((u8 *)arg0 + 0x52) = 0;
+        return;
+    }
+    if (arg1 > 0) {
+        if (arg1 < ((s32)*(u8 *)((u8 *)(u32)arg0 + 0x3EA5D) + 1)) {
+            temp_v0 = *(u8 *)((u8 *)arg0 + 0x46);
+            switch (temp_v0) {
+            case 1:
+                *(u8 *)((u8 *)arg0 + 0x1E) = 0x21;
+                func_800226C0(0x90);
+                return;
+            case 3:
+                if (*(u8 *)((u8 *)arg0 + 0x52) == 0) {
+                    *(u8 *)((u8 *)arg0 + 0x52) = (u8)arg1;
+                    func_800226C0(0x90);
+                    return;
+                }
+                func_800226C0(0x44);
+                func_8300B728((u8 *)(u32)arg0 + 0x3EA5C, arg1 - 1, (s32)*(u8 *)((u8 *)arg0 + 0x52) - 1, arg0);
+                *(u8 *)((u8 *)arg0 + 0x52) = 0;
+                *(u8 *)((u8 *)arg0 + 0x1E) = 0x1C;
+                return;
+            case 4:
+                *(u8 *)((u8 *)arg0 + 0x1E) = 0x21;
+                func_800226C0(0x90);
+                return;
+            }
+        } else {
+            func_800226C0(5);
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -130,7 +210,33 @@ void func_8300136C(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83002F50.s")
+extern void func_800226C0(s32);
+void func_83002F50(void *arg0, s32 arg1) {
+    void *temp_a2;
+    u8 temp_v0;
+
+    temp_a2 = arg0;
+    if (arg1 == -1) {
+        temp_v0 = *(u8 *)((u8 *)arg0 + 0x3F);
+        switch (temp_v0) {
+        case 1:
+            *(u8 *)((u8 *)temp_a2 + 0x1E) = 3;
+            func_800226C0(3);
+            return;
+        case 2:
+            *(u8 *)((u8 *)temp_a2 + 0x1E) = 0x10;
+            func_800226C0(3);
+            return;
+        }
+    } else if (arg1 > 0) {
+        if (*(s32 *)((u8 *)(u32)temp_a2 + (arg1 * 4) + 0x3FECC) != 0) {
+            *(u8 *)((u8 *)temp_a2 + 0x1E) = 0x13;
+            func_800226C0(0x8D);
+            return;
+        }
+        func_800226C0(5);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -154,7 +260,41 @@ void func_8300136C(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_830042F0.s")
+extern u8 *func_818054D0(s32, u8);
+extern void func_81801CB8(u8 *, u8 *, u8 *, s32);
+extern u8 D_8300D164[];
+extern u8 D_8300F8C8[];
+extern u8 D_8300F8D0[];
+void func_830042F0(s32 arg0, void *arg1, u8 *arg2) {
+    s32 pad;
+    u8 *sp24;
+    u8 *var_a1;
+    u8 *var_a2;
+    sp24 = func_818054D0(arg0, *(u8 *)((u8 *)arg1 + 0x1C)) + 0x10;
+    var_a1 = sp24;
+    var_a2 = func_818054D0(arg0, *(u8 *)((u8 *)arg1 + 0x1D)) + 0x10;
+    if ((((arg0 - (s32)D_8300D164) / 0x34) + 1) == *(u8 *)((u8 *)arg1 + 0x40)) {
+        switch (*(u8 *)((u8 *)arg1 + 0x1C)) {
+        case 0x0B:
+        case 0x0C:
+            var_a1 = D_8300F8C8;
+            break;
+        case 0x0D:
+            var_a1 = D_8300F8D0;
+            break;
+        }
+        switch (*(u8 *)((u8 *)arg1 + 0x1D)) {
+        case 0x0B:
+        case 0x0C:
+            var_a2 = D_8300F8C8;
+            break;
+        case 0x0D:
+            var_a2 = D_8300F8D0;
+            break;
+        }
+    }
+    func_81801CB8(arg2, var_a1, var_a2, *(s32 *)((u8 *)arg1 + 0x2C));
+}
 #endif
 
 #ifdef VERSION_US
@@ -422,7 +562,28 @@ void func_83008700(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83008D18.s")
+extern f32 func_818055E0(void);
+extern void func_818057D0(s32, void *, void *);
+extern void func_8180567C(s32, void *, void *);
+extern void func_81803964(void *, void *, f32, s32);
+extern u8 D_8300F118[];
+extern u8 D_8300F138[];
+void func_83008D18(s32 arg0, void *arg1, void *arg2) {
+    s32 pad;
+    f32 temp_fv0;
+
+    temp_fv0 = func_818055E0();
+    func_818057D0(arg0, arg1, arg2);
+    func_8180567C(arg0, arg1, arg2);
+    if (*(u8 *)((u8 *)arg1 + 0x3E) == 2) {
+        if ((s32)(*(u8 *)((u8 *)arg1 + 0x57)) > 0) {
+            func_81803964(D_8300F118, arg2, temp_fv0, 0);
+        }
+        if ((s32)(*(u8 *)((u8 *)arg1 + 0x57)) < 2) {
+            func_81803964(D_8300F138, arg2, temp_fv0, 0);
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
