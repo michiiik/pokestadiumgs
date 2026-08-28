@@ -1724,7 +1724,12 @@ s32 func_841349C0(f32 arg0) { s32 value = (s32)arg0; f64 fraction = (f64)(arg0 -
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84134CBC.s")
+extern void func_84134A6C(u8 *, u8, u8);
+extern void func_841350F4(u8 *, u8, u8);
+extern u8 D_84195280[];
+void func_84134CBC(u8 arg0, u8 arg1) {
+    func_84134A6C(&D_84195280[D_84195280[0x4D81] * 0x280], arg0, arg1);
+}
 #endif
 
 #ifdef VERSION_US
@@ -1793,7 +1798,9 @@ void func_84134F50(u8 *arg0, u8 arg1, u8 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84134F78.s")
+void func_84134F78(u8 arg0, u8 arg1) {
+    func_84134F50(&D_84195280[D_84195280[0x4D81] * 0x280], arg0, arg1);
+}
 #endif
 
 #ifdef VERSION_US
@@ -1803,7 +1810,9 @@ void func_84134FC0(u8 *arg0, u8 arg1, u8 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84134FEC.s")
+void func_84134FEC(u8 arg0, u8 arg1) {
+    func_84134FC0(&D_84195280[D_84195280[0x4D81] * 0x280], arg0, arg1);
+}
 #endif
 
 #ifdef VERSION_US
@@ -1841,7 +1850,9 @@ void func_841350AC(u8 arg0, u8 arg1, u8 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8413523C.s")
+void func_8413523C(u8 arg0, u8 arg1) {
+    func_841350F4(&D_84195280[D_84195280[0x4D81] * 0x280], arg0, arg1);
+}
 #endif
 
 #ifdef VERSION_US
