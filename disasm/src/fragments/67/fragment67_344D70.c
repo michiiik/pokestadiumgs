@@ -415,7 +415,13 @@ s32 func_8290B3E4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290BC84.s")
+extern void ModelAnim_SetFrame(u8 *, s16);
+void func_8290BC84(u8 *arg0, s32 arg1) {
+    s32 temp_v0;
+
+    temp_v0 = *(u16 *)(*(u8 **)(arg0 + 0x44) + 0xA);
+    ModelAnim_SetFrame(arg0, (s16)((((arg1 / temp_v0) + 1) * temp_v0) - arg1));
+}
 #endif
 
 #ifdef VERSION_US
