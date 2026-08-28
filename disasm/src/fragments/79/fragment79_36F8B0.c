@@ -183,7 +183,34 @@ s16 func_84100688(Func84100688Table *arg0, u32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_841032F0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_84103394.s")
+extern u8 *D_80094910;
+extern void func_841031F4(u8 *, void *, s32);
+extern s32 func_84100054(u8 *arg0, s32 arg1);
+extern s32 func_84100074(u8 *arg0, s32 arg1);
+void func_84103394(s32 arg0) {
+    s32 i;
+    s32 result;
+    u8 *record;
+    void *child;
+
+    record = D_8418C950;
+    for (i = 0; i < 0x12C; i++, record += 0x9C) {
+        if (*(s8 *)(record + 0x98) != 0) {
+            if (func_84100074(record, 0x102800) != 0) {
+                if (func_84100054(record, 0x1000) != 0) {
+                    child = *(void **)(record + 0x10);
+                    result = 0;
+                    if ((child != NULL) && ((*(u32 *)((u8 *)child + 8) & 2) != 0)) {
+                        result = 3;
+                    }
+                    if (result == *(s16 *)(D_80094910 + 0x18)) {
+                        func_841031F4(record, child, arg0);
+                    }
+                }
+            }
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_84103478.s")
 #endif
