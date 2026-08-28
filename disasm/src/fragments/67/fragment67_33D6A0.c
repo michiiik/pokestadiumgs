@@ -142,7 +142,28 @@ void func_82900FDC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33D6A0/func_829013F8.s")
+extern s16 D_829188AC;
+extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
+extern void func_800371B4(u8 *, u8 *, f32, s16, s32);
+extern void func_82900E54(void);
+extern void func_82900E98(void);
+extern void func_82900F80(void);
+void func_829013F8(void) {
+    extern s32 D_829188A4;
+    D_829188A0 = *(void **)((u8 *)(u32)D_829188A4 + 0xC);
+    D_829188A8 = 0;
+    D_829188AA = 0;
+    D_829188AC = 0x96;
+    Vec3f_SetComponentsDuplicate((f32 *)((u8 *)D_829188A0 + 0xB4), 0.0f, 50.0f, 0.0f);
+    func_800371B4((u8 *)D_829188A0 + 0xB4, (u8 *)D_829188A0 + 0xA8, (f32)D_829188AC, D_829188A8, (s32)D_829188AA);
+    *(f32 *)((u8 *)D_829188A0 + 0x34) = 40.0f;
+    *(f32 *)((u8 *)D_829188A0 + 0x38) = 6400.0f;
+    *(f32 *)((u8 *)D_829188A0 + 0x2C) = 45.0f;
+    func_82900D78();
+    func_82900E98();
+    func_82900E54();
+    func_82900F80();
+}
 #endif
 
 #ifdef VERSION_US
