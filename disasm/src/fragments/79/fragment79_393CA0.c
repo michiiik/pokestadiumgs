@@ -1860,7 +1860,15 @@ void func_84135034(u8 arg0, u8 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84135068.s")
+extern u8 D_84195280[];
+void func_84135068(u8 arg0, u8 arg1) {
+    s32 idx = D_84195280[0x4D81] - 1;
+    if (idx < 0) {
+        idx = 0x1D;
+    }
+    D_84195280[idx * 0x280 + 0xA] = arg0;
+    D_84195280[idx * 0x280 + 0xB] = arg1;
+}
 #endif
 
 #ifdef VERSION_US
