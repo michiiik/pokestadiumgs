@@ -445,12 +445,36 @@ void func_84140690(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84140B64.s")
+extern u8 D_84186B60[];
+extern void func_8413F5A8(s32,s32,s32,s32);
+void func_84140B64(void *arg0) {
+    u8 sp27;
+    s32 temp_v0;
+
+    temp_v0 = *(u8 *)((u8 *)arg0 + 9);
+    if (temp_v0 >= 31) {
+        sp27 = 0x177 - temp_v0 * 4;
+    } else if (temp_v0 >= 16) {
+        sp27 = 0xFF;
+    } else {
+        sp27 = temp_v0 * 4 + 0xC3;
+        if (temp_v0 == 1) {
+            *(u8 *)((u8 *)arg0 + 9) = 0x2E;
+        }
+    }
+    gSPDisplayList(D_800D0510++, D_841869E0);
+    ParticleGfx_SetPrimColor_fragment79(0xFF, 0xEB, 0xC3, 0xFF);
+    func_8413F5A8(*(s16 *)((u8 *)arg0 + 0xA), *(s16 *)((u8 *)arg0 + 0xC), 0x131, 0);
+    gSPDisplayList(D_800D0510++, D_84186B60);
+    ParticleGfx_SetPrimColor_fragment79(0xFF, 0xFF, 0xFF, sp27);
+    func_8413E6B8(0xFF, 0xC8, 0, 0xFF);
+    func_8413F5A8(*(s16 *)((u8 *)arg0 + 0xA), *(s16 *)((u8 *)arg0 + 0xC), 0x131, 1);
+}
 #endif
 
 #ifdef VERSION_US
 extern void func_84140718();
-extern void func_84140B64();
+extern void func_84140B64(void *);
 void func_84140C8C(void *arg0) {
     s32 temp_v0;
 
@@ -461,7 +485,7 @@ void func_84140C8C(void *arg0) {
             func_84140718();
             return;
         case 2:
-            func_84140B64();
+            func_84140B64(arg0);
             break;
         }
     }
