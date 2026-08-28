@@ -338,7 +338,24 @@ void func_8413FB80(s16 arg0, s16 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84140270.s")
+extern u8 D_841869E0[];
+extern void func_8413EC88(s16, s16, u16, u16, void *);
+extern void func_8413FDB0(void *);
+void func_84140270(void *arg0) {
+    gSPDisplayList(D_800D0510++, D_841869E0);
+    ParticleGfx_SetPrimColor_fragment79(
+        *(u8 *)((u8 *)arg0 + 0x22),
+        *(u8 *)((u8 *)arg0 + 0x23),
+        *(u8 *)((u8 *)arg0 + 0x24),
+        *(u8 *)((u8 *)arg0 + 0x25));
+    func_8413EC88(
+        *(s16 *)((u8 *)arg0 + 0xA),
+        *(s16 *)((u8 *)arg0 + 0xC),
+        *(u16 *)((u8 *)arg0 + 0xE),
+        *(u16 *)((u8 *)arg0 + 0x10),
+        func_8004C990(0x157, 0));
+    func_8413FDB0(arg0);
+}
 #endif
 
 #ifdef VERSION_US
@@ -360,7 +377,7 @@ void func_84140690(void *arg0) {
         temp_v0 = (*(s32 *)((u8 *)(arg0) + (4)));
         switch (temp_v0) {                          /* irregular */
         case 0:
-            func_84140270();
+            func_84140270(arg0);
             return;
         case 1:
             func_841402FC();
