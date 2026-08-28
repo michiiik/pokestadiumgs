@@ -119,7 +119,31 @@ void func_8AC00830(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC00840.s")
+extern s16 D_8AC08520;
+extern s16 D_8AC0851E;
+extern s16 D_8AC0851C;
+extern s16 D_8AC08522;
+extern void func_8AC00830(void);
+s32 func_8AC00840(void) {
+    D_8AC08520 = 0;
+    if (D_8AC0851E == 1) {
+        if (D_8AC0851C > 0) {
+            D_8AC0851C -= 1;
+        } else {
+            D_8AC08520 = -1;
+        }
+    } else {
+        func_8AC00830();
+    }
+    if (D_8AC08522 > 0) {
+        D_8AC08522 -= 1;
+        return 1;
+    }
+    if (D_8AC08520 == 0) {
+        return 1;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
