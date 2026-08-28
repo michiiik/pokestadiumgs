@@ -56,7 +56,17 @@ s32 func_822047BC(s32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82205A14.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82205A48.s")
+extern s32 D_8220DA10;
+s32 func_82205A48(s32 arg0, void *arg1) {
+    if (arg0 != 0 && arg0 == 1) {
+        if (D_8220DA10 != 0) {
+            *(u16 *)((u8 *)arg1 + 2) |= 2;
+        } else {
+            *(u16 *)((u8 *)arg1 + 2) &= 0xFFFD;
+        }
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82205A8C.s")
 
