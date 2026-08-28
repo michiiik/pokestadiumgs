@@ -40,7 +40,26 @@ void func_8410AF1C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8410AFD4.s")
+extern void func_8410AE8C(u8 *, s16, s16, s16, s32);
+extern u8 *D_841911E0;
+extern u8 *D_841911E4;
+extern u8 D_84190428[];
+extern u8 D_841910E0[];
+void func_8410AFD4(void) {
+    func_8410AE50(D_841911E0, 0, 0, 0xA0, 0xF0);
+    func_8410AE8C(D_84190428,
+        *(s16 *)(D_841911E0 + 0x9A),
+        *(s16 *)(D_841911E0 + 0x9C),
+        *(s16 *)(D_841911E0 + 0x9E),
+        (s32)*(s16 *)(D_841911E0 + 0xA0));
+    func_8410AE50(D_841911E4, 0xA0, 0, 0xA0, 0xF0);
+    func_8410AE8C(D_841910E0,
+        *(s16 *)(D_841911E4 + 0x9A),
+        *(s16 *)(D_841911E4 + 0x9C),
+        *(s16 *)(D_841911E4 + 0x9E),
+        (s32)*(s16 *)(D_841911E4 + 0xA0));
+    D_841910E0[1] = (u8)(D_841910E0[1] | 0x10);
+}
 #endif
 
 #ifdef VERSION_US
