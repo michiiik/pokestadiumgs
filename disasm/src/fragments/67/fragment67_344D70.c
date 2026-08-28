@@ -716,23 +716,58 @@ void func_8290DA10(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290DAA4.s")
+extern void func_800371B4(s32, s32, f32, s16, s32);
+void func_8290DAA4(void) {
+    Vec3f_SetComponentsDuplicate((f32 *)(D_8291A380 + 0xB4), 0.0f, 15.0f, 0.0f);
+    D_8291B85C = -0x1700;
+    D_8291B85E = -0x1400;
+    D_8291B860 = 0x96;
+    func_800371B4(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290DB3C.s")
+extern void func_800371B4(s32, s32, f32, s16, s32);
+void func_8290DB3C(void) {
+    Vec3f_SetComponentsDuplicate((f32 *)(D_8291A380 + 0xB4), 0.0f, 15.0f, 0.0f);
+    D_8291B85C = 0x1900;
+    D_8291B85E = 0;
+    D_8291B860 = 0x8C;
+    func_800371B4(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290DBD0.s")
+extern void func_800371B4(s32, s32, f32, s16, s32);
+void func_8290DBD0(void) {
+    Vec3f_SetComponentsDuplicate((f32 *)(D_8291A380 + 0xB4), 0.0f, 15.0f, 0.0f);
+    D_8291B85C = 0;
+    D_8291B85E = 0;
+    D_8291B860 = 0x96;
+    func_800371B4(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290DC60.s")
+extern void func_800371B4(s32, s32, f32, s16, s32);
+void func_8290DC60(void) {
+    Vec3f_SetComponentsDuplicate((f32 *)(D_8291A380 + 0xB4), 0.0f, 15.0f, 0.0f);
+    D_8291B85C = 0;
+    D_8291B85E = 0;
+    D_8291B860 = 0xB4;
+    func_800371B4(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290DCF0.s")
+extern void func_800371B4(s32, s32, f32, s16, s32);
+void func_8290DCF0(void) {
+    Vec3f_SetComponentsDuplicate((f32 *)(D_8291A380 + 0xB4), 0.0f, 15.0f, 0.0f);
+    D_8291B85C = 0;
+    D_8291B85E = 0;
+    D_8291B860 = 0x78;
+    func_800371B4(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E);
+}
 #endif
 
 #ifdef VERSION_US
