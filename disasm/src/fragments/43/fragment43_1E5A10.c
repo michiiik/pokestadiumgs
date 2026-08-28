@@ -623,7 +623,12 @@ void func_8AC05F00(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC06400.s")
+void func_8AC06400(void *arg0, void *arg1) {
+    (*(f32 *)((u8 *)(arg0) + (0x40))) = 1.0f;
+    (*(f32 *)((u8 *)(arg0) + (0x44))) = 1.0f;
+    (*(f32 *)((u8 *)(arg0) + (0x48))) = (f32)(*(s16 *)((u8 *)(arg1) + (0xC))) * 0.5f + (f32)(*(s16 *)((u8 *)(arg1) + (0x8)));
+    (*(f32 *)((u8 *)(arg0) + (0x4C))) = (f32)(*(s16 *)((u8 *)(arg1) + (0xE))) * 0.5f + (f32)(*(s16 *)((u8 *)(arg1) + (0xA)));
+}
 #endif
 
 #ifdef VERSION_US
