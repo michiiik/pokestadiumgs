@@ -49,7 +49,20 @@ void func_8220BE84(s16 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_11B210/func_8220C340.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_11B210/func_8220C42C.s")
+void func_8220C42C(u8 *arg0, u8 *arg1, s16 *arg2) {
+    if (*arg2 == 1) {
+        arg0[0] = 0xDC;
+        arg0[1] = 0x96;
+        arg0[2] = 0x96;
+    } else {
+        arg0[0] = 0xFF;
+        arg0[1] = 0xFF;
+        arg0[2] = 0xFF;
+    }
+    arg1[0] = 0;
+    arg1[1] = 0;
+    arg1[2] = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_11B210/func_8220C470.s")
 
