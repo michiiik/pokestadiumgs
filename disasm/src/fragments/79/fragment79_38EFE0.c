@@ -48,7 +48,25 @@ void func_8411F90C(s32 arg0, s32 arg1) {
     func_841125F4(func_8411F750(arg0), 0x1F);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_8411F94C.s")
+extern s32 D_84191208;
+extern s32 D_8419120C;
+extern s32 func_8003570C(void);
+extern u16 D_84183C60[];
+extern u8 *D_841911E0;
+extern void func_84111348(s32, s32);
+extern void func_841125F4(s32, s32);
+extern s32 func_8411F750(s32 arg0);
+extern void func_8411FEE8(u16 arg0);
+void func_8411F94C(void *arg0, void *arg1) {
+    u32 v0;
+
+    func_8411FEE8(0x64);
+    func_841125F4(D_84191208, 0);
+    func_841125F4(D_8419120C, 0);
+    v0 = func_8003570C();
+    (*(u16 *)((u8 *)(D_841911E0) + (0x98))) = D_84183C60[v0 % 5];
+    func_84111348(func_8411F750((s32) arg0), 0xA);
+}
 
 extern void func_84112564(s32);
 extern void func_84111348(s32, s32);
