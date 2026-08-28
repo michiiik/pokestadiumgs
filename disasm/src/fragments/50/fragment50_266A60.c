@@ -180,7 +180,17 @@ void func_86201620(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_266A60/func_86201DE4.s")
+extern Gfx *D_800D0510;
+extern u8 D_86209270[];
+extern void func_8003CD84(void);
+void func_86201DE4(s32 arg0, s32 arg1) {
+    if (arg0 == 5) {
+        gDPPipeSync(D_800D0510++);
+        gDPSetCombine(D_800D0510++, 0xFFFFFF, 0xFFFCF238);
+        gSPDisplayList(D_800D0510++, D_86209270);
+        func_8003CD84();
+    }
+}
 #endif
 
 #ifdef VERSION_US
