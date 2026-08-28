@@ -3,8 +3,8 @@
 # Decompilation coverage
 
 <!-- AUTO_COVERAGE:START -->
-- US functions with C implementations: **4,044 / 10,532 (38.4%)**
-- Remaining `GLOBAL_ASM` owners: **6,488**
+- US functions with C implementations: **4,045 / 10,532 (38.4%)**
+- Remaining `GLOBAL_ASM` owners: **6,487**
 - Baseline: `f477acf` (vendored US pragma snapshot)
 <!-- AUTO_COVERAGE:END -->
 
@@ -101,7 +101,7 @@
 | `disasm/src/fragments/15/fragment15_code.c` | 4 | 6 | 33.3% |
 | `disasm/src/fragments/16/fragment16_code.c` | 22 | 29 | 24.1% |
 | `disasm/src/fragments/17/fragment17_10F9E0.c` | 5 | 5 | 0.0% |
-| `disasm/src/fragments/17/fragment17_10FFC0.c` | 42 | 56 | 25.0% |
+| `disasm/src/fragments/17/fragment17_10FFC0.c` | 41 | 56 | 26.8% |
 | `disasm/src/fragments/17/fragment17_113A60.c` | 58 | 82 | 29.3% |
 | `disasm/src/fragments/17/fragment17_11A7F0.c` | 4 | 5 | 20.0% |
 | `disasm/src/fragments/17/fragment17_11B210.c` | 21 | 28 | 25.0% |
