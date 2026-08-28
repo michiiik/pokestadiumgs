@@ -9,7 +9,21 @@ void func_81400020(s32 arg0) {
     func_81600A34((void *)arg0, D_81407BB0 + 1, 1, 0, 0x1A1, 0x230, 0x3F);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E5330/func_81400098.s")
+extern s32 D_814077AC;
+extern s32 func_81600DA8(void *, void *);
+extern void func_81600F0C(void *, s32, s32, s32, s32);
+extern void func_814025E8(s32, s32);
+void func_81400098(s32 arg0) {
+    if (func_81600DA8((void *)arg0, D_81407BB0) != 0) {
+        func_81600F0C(D_81407BB0, 0, 0, 0x280, 0x1E0);
+    } else {
+        func_81600F0C(D_81407BB0, 0, 0x1A1, 0x230, 0x3F);
+    }
+    func_814025E8(
+        ((u32)*(s32 *)(*(u8 **)((u8 *)(u32)D_814077AC + 0x844) + 0x40)) >> 31,
+        *(s32 *)((u8 *)(u32)D_814077AC + 0x888)
+    );
+}
 
 s32 main_pool_get_available();
 s32 MainPool_AllocState(s32, s32);
@@ -18,7 +32,6 @@ extern void func_81406AAC(s32 *, s32);
 extern void func_81406EA8(s32 *);
 s32 func_81600E28(s32, s32, s32);
 extern s32 D_814077A0;
-extern s32 D_814077AC;
 extern u8 D_81407BB8;
 void func_81400124(void) {
     s32 sp1C;
@@ -100,11 +113,28 @@ void func_814002E8(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E5330/func_81400FA4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E5330/func_81401178.s")
+extern u8 *D_814077D0[];
+extern s32 func_8004D1FC(u8 *);
+void func_81401178(s32 arg0) {
+    s32 var_v0;
+    if (arg0 >= 0) {
+        var_v0 = arg0;
+    } else {
+        var_v0 = 0;
+    }
+    func_8004D1FC(D_814077D0[var_v0]);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E5330/func_814011B4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E5330/func_81401394.s")
+extern Gfx *D_800D0510;
+extern u8 *D_814077C0;
+extern u8 D_80094E38[];
+void func_81401394(void) {
+    func_8004D1FC(D_814077C0);
+    gSPDisplayList(D_800D0510++, D_80094E38);
+    gDPSetCombine(D_800D0510++, 0xFFB3FF, 0xFF65FEFF);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E5330/func_81401404.s")
 
