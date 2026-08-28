@@ -383,9 +383,49 @@ s32 func_80062008(s32 index) { if (index <= 0 || index >= 0xBF) return 0xFC; ret
 
 s32 func_80062030(s32 value) { if (value > 0 && value < 0xFC) return value; return 0xFC; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80062054.s")
+extern void func_80053808(s32, s32, s32);
+extern s32 func_800532F0(s32);
+extern s32 func_80053230(s32);
+extern s32 func_8005370C(s32, s32);
+void func_80062054(u8 *arg0) {
+    u8 *s0;
+    s0 = arg0;
+    if (arg0[0] == 1) {
+        arg0[4] = arg0[4] | 1;
+        func_80053808(arg0[1], arg0[3], 0);
+    }
+    *(u16 *)(s0 + 8) = func_800532F0(s0[1]);
+    *(u16 *)(s0 + 6) = func_80053230(s0[1]);
+    s0[5] = func_8005370C(s0[1], s0[3]);
+    if (s0[0] == 2) {
+        *(u16 *)(s0 + 0xA) = s0[5];
+    } else {
+        *(u16 *)(s0 + 0xA) = 0;
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_800620E8.s")
+extern void func_8005D2BC(s32, s32, s32, s32);
+extern s32 func_8005CBA0(s32);
+extern s32 func_8005CAA4(s32);
+extern s32 func_8005CF20(s32, s32, s32);
+void func_800620E8(u8 *arg0) {
+    u8 *s0;
+    s0 = arg0;
+    if (s0[0] == 1) {
+        func_8005D2BC(s0[1], s0[2], s0[3], 0);
+    }
+    if (s0[0] != 0) {
+        s0[4] = s0[4] | 1;
+    }
+    *(u16 *)(s0 + 8) = func_8005CBA0(s0[1]);
+    *(u16 *)(s0 + 6) = func_8005CAA4(s0[1]);
+    s0[5] = func_8005CF20(s0[1], s0[2], s0[3]);
+    if (s0[0] == 2) {
+        *(u16 *)(s0 + 0xA) = s0[5];
+    } else {
+        *(u16 *)(s0 + 0xA) = 0;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_8006218C.s")
 
@@ -412,7 +452,8 @@ S1_DeckHandle* Deck_OpenAndSetName(s32 arg0, s32 arg1, s32 arg2, s32 arg3, char*
     return sp24;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_8006229C.s")
+extern void func_80052150(s32, s32); extern void Util_Free(void *);
+s32 func_8006229C(u8 *arg0) { s32 result = 0; if ((arg0[1] & 0x10) && (arg0[4] & 1)) { func_80052150(arg0[1], arg0[3]); result = 1; } Util_Free(arg0); return result; }
 
 extern s32 func_80051D64(s32, s32);
 extern void Util_Free(void *);

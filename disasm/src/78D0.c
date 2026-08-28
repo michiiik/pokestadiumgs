@@ -20,11 +20,43 @@ extern void *D_800D051C;
 extern void main_pool_try_free();
 void Gfx_FreeDisplayListBuffers(void) { main_pool_try_free(D_800D051C); main_pool_try_free(D_800D0518); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/78D0/func_80006D6C.s")
+void func_80006D6C(void) {
+    struct DisplayListState {
+        s32 entries[3];
+        s32 size;
+        s16 index;
+    };
+    struct DisplayListState *state = (struct DisplayListState *)&D_800D0518;
+    s32 *entry;
+    state->index = state->index ^ 1;
+    entry = state->entries + state->index;
+    state->entries[2] = *entry + state->size;
+    D_800D0510 = *entry;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/78D0/func_80006DAC.s")
+void func_80006DAC(void **arg0, s32 *arg1) {
+    struct DisplayListState {
+        s32 entries[3];
+        s32 size;
+        s16 index;
+    };
+    struct DisplayListState *state = (struct DisplayListState *)&D_800D0518;
+    *arg1 = D_800D0510 - state->entries[state->index];
+    *arg0 = (void *)state->entries[state->index];
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/78D0/func_80006DEC.s")
+u32 func_80006DEC(s32 arg0) {
+    struct DisplayListState { s32 entries[3]; s32 size; s16 index; };
+    u32 value;
+    u32 result = 0;
+    arg0 = (arg0 + 7) & ~7;
+    value = ((struct DisplayListState *)&D_800D0518)->entries[2] - arg0;
+    if (value >= (u32)D_800D0510) {
+        ((struct DisplayListState *)&D_800D0518)->entries[2] = value;
+        result = value;
+    }
+    return result;
+}
 
 extern s32 D_800D0520;
 extern s32 D_800D0510;

@@ -31,9 +31,11 @@ s32 *func_80063620(u8 arg0) {
     return var_v1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80063660.s")
+extern u8 D_80097FED[];
+u8 func_80063660(u8 arg0) { return arg0 == 0 ? 0 : D_80097FED[arg0 * 3]; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80063690.s")
+extern u8 D_80097FEE[];
+u8 func_80063690(u8 arg0) { return arg0 == 0 ? 0 : D_80097FEE[arg0 * 3]; }
 
 extern u8 D_800982F0[];
 extern u8 func_80063660(u8);
@@ -50,7 +52,8 @@ s32 func_800636C0(u8 arg0, u8 arg1) {
 
 s32 func_80063754(s32 arg0) { s32 *value = &arg0; arg0 &= 0xFF; if (arg0 == 0x9E || (arg0 >= 0xB5 && arg0 < 0xBE)) return 1; return 0; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_8006378C.s")
+extern u8 D_80097FEF[];
+u8 func_8006378C(u8 arg0) { return arg0 == 0 ? 1 : D_80097FEF[arg0 * 3]; }
 
 extern u8 D_8009830A[];
 u8 func_800637C0(u8 arg0) { s32 index = arg0; if ((arg0 > 0) && (arg0 < 0xFC)) return D_8009830A[index * 22]; return 0; }

@@ -30,7 +30,19 @@ void func_80021B50(void) {
     func_80018728(0x82010000, 0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/226C0/func_80021B74.s")
+extern s32 D_80090090;
+extern s32 func_80017AC0(void);
+extern void func_80034FE0(void);
+s32 func_80021B74(void) {
+    s32 *address;
+    address = &D_80090090;
+    *address = func_80017AC0();
+    func_80034FE0();
+    if (*address == 0) {
+        return 0;
+    }
+    return *address;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/226C0/func_80021BBC.s")
 #endif
