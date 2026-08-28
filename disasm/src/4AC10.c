@@ -58,7 +58,29 @@ void func_8004AC24(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u16 arg4) {
     gSPDisplayList(D_800D0510++, D_80094F50);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4AC10/func_8004AD00.s")
+extern Gfx *D_800D0510;
+extern s32 StageContext_IsHighResolution(void);
+extern void func_8004A858(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5);
+extern void func_8004A174(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
+extern void func_8004A44C(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
+extern u8 D_80094E38[];
+extern u8 D_80094F50[];
+void func_8004AD00(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
+    if (arg2 >= 15 && arg3 >= 15) {
+        if (StageContext_IsHighResolution() != 0) {
+            func_8004A858(arg0 + 6, arg1 + 6, arg2 - 12, arg3 - 12, arg4, arg5);
+        } else {
+            func_8004A858(arg0 + 2, arg1 + 2, arg2 - 4, arg3 - 4, arg4, arg5);
+        }
+    }
+    gSPDisplayList(D_800D0510++, D_80094E38);
+    if (StageContext_IsHighResolution() != 0) {
+        func_8004A174(arg0, arg1, arg2, arg3);
+    } else {
+        func_8004A44C(arg0, arg1, arg2, arg3);
+    }
+    gSPDisplayList(D_800D0510++, D_80094F50);
+}
 
 extern Gfx *D_800D0510;
 extern s32 StageContext_IsHighResolution(void);
