@@ -187,9 +187,27 @@ void func_81605CDC(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) { func_8160
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81606FE0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_8160710C.s")
+extern u32 D_800D0510;
+#define GFX_DL (*(Gfx **)&D_800D0510)
+extern u8 D_80094E38[];
+extern u8 D_80094F50[];
+extern void *D_8160BD94;
+extern void *D_8160BD90;
+extern void func_8004D19C(s32, s32, void *, s32, s32);
+void func_8160710C(s32 arg0, s32 arg1) {
+    gSPDisplayList(GFX_DL++, D_80094E38);
+    gDPSetRenderMode(GFX_DL++, 0x0F0A7008, 0);
+    func_8004D19C(arg0, arg1, D_8160BD94, 0, 0);
+    gSPDisplayList(GFX_DL++, D_80094F50);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_816071AC.s")
+extern void func_8004D19C(s32, s32, void *, s32, s32);
+void func_816071AC(s32 arg0, s32 arg1) {
+    gSPDisplayList(GFX_DL++, D_80094E38);
+    gDPSetRenderMode(GFX_DL++, 0x0F0A7008, 0);
+    func_8004D19C(arg0, arg1, D_8160BD90, 0, 0);
+    gSPDisplayList(GFX_DL++, D_80094F50);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_8160724C.s")
 
