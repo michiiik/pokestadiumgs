@@ -42,7 +42,16 @@ void func_86007E4C(u8 *arg0, s32 arg1, s32 arg2) {
     func_87C00198(arg0 + 0x108, arg0 + 0x108, value);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_86007EB4.s")
+extern void func_87C00AE4(void *, void *);
+extern void func_87C015E4(void *, void *);
+extern void *func_87C002A8(void *, void *, f64);
+void func_86007EB4(void *arg0) {
+    f64 vec[3];
+    func_87C00AE4((u8 *)arg0 + 0x78, (u8 *)arg0 + 0x78);
+    func_87C015E4((u8 *)arg0 + 0x78, (u8 *)arg0 + 0x48);
+    func_87C00198((u8 *)arg0 + 0xB0, arg0, func_87C002A8(vec, (u8 *)arg0 + 0x48, *(f64 *)((u8 *)arg0 + 0xD8)));
+    func_87C00198((u8 *)arg0 + 0x98, arg0, func_87C002A8(vec, (u8 *)arg0 + 0x48, *(f64 *)((u8 *)arg0 + 0xD0) + *(f64 *)((u8 *)arg0 + 0xC8)));
+}
 
 f64 func_86007F50(void *arg0, s32 arg1, s32 arg2) {
     f64 temp_fv1;
