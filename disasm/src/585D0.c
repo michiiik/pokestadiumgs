@@ -983,7 +983,15 @@ void func_8005E07C(s32 arg0, u8 arg1) { u8 *entry = D_80128570 + arg0 * 0x70; if
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005E1F0.s")
+extern u8 D_80128570[];
+void func_8005E1F0(u8 arg0, void *arg1) {
+    typedef struct { u8 bytes[0x32]; } Copy32;
+    u8 *entry;
+
+    entry = D_80128570 + arg0 * 0x70;
+    (*(u8 **)(entry + 0x68))[0x5FD] = 1;
+    *(Copy32 *)((*(u8 **)(entry + 0x68)) + 0x5FE) = *(Copy32 *)arg1;
+}
 #endif
 
 #ifdef VERSION_US
