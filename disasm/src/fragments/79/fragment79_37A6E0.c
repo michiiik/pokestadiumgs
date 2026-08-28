@@ -92,7 +92,13 @@ void func_8410B224(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8410B27C.s")
+void func_8410B27C(u8 *arg0, u8 *arg1) {
+    extern void *main_pool_alloc(s32, s32);
+    D_841911E0 = main_pool_alloc(0xA4, 0);
+    *(u8 **)D_841911E0 = arg0;
+    D_841911E4 = main_pool_alloc(0xA4, 0);
+    *(u8 **)D_841911E4 = arg1;
+}
 #endif
 
 #ifdef VERSION_US
