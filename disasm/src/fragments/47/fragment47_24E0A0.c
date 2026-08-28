@@ -30,7 +30,7 @@ void func_86007AF8(void *arg0, f64 arg1) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_86007D98.s")
 
 extern void func_87C00198();
-extern void func_87C00160(u8 *, s32, u8 *);
+extern void *func_87C00160(u8 *, s32, u8 *);
 extern s32 func_87C00238(u8 *, u8 *, s32);
 void func_86007E4C(u8 *arg0, s32 arg1, s32 arg2) {
     u8 temp0[0x18];
@@ -160,7 +160,25 @@ f64 func_86009C58(void *arg0, u8 *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_86009F28.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_86009FB8.s")
+extern void func_87C00718(void *, void *, f64);
+extern s32 func_86009C08(void *arg0, void *arg1);
+extern void * func_87C00160(u8 *, s32, u8 *);
+s32 func_86009FB8(void *arg0, void *arg1, void *arg2) {
+    void *result;
+    f64 sign;
+
+    if (func_86009C08(arg0, arg1) != 0) {
+        result = func_87C00160(arg2, (s32)arg1, (u8 *)arg0 + 0x10);
+        if (*(s32 *)((u8 *)arg0 + 0x48) != 0) {
+            sign = 1.0;
+        } else {
+            sign = -1.0;
+        }
+        func_87C00718(arg2, result, sign);
+        return 1;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_8600A04C.s")
 
