@@ -26,7 +26,14 @@ s32 func_82900BD0(s32 arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33D6A0/func_82900C04.s")
+extern void func_80041E2C(void);
+extern void func_8003F018(s32);
+extern s32 func_80041C98(s32);
+void func_82900C04(s32 arg0) {
+    func_80041E2C();
+    func_8003F018((s32)((u8 *)(u32)arg0 + 4));
+    *(s32 *)(u32)arg0 = func_80041C98(5);
+}
 #endif
 
 #ifdef VERSION_US
@@ -50,11 +57,47 @@ void func_82900E54(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33D6A0/func_82900E98.s")
+extern s16 D_82918858;
+extern u8 D_82911D00[];
+extern s16 D_829188B0[];
+void func_82900E98(void) {
+    D_829188B0[0] = ((s16 *)((u8 *)D_82911D00 + D_82918858 * 14))[0];
+    D_829188B0[1] = ((s16 *)((u8 *)D_82911D00 + D_82918858 * 14))[1];
+    D_829188B0[2] = ((s16 *)((u8 *)D_82911D00 + D_82918858 * 14))[2];
+    D_829188B0[3] = ((s16 *)((u8 *)D_82911D00 + D_82918858 * 14))[3];
+    D_829188B0[4] = ((s16 *)((u8 *)D_82911D00 + D_82918858 * 14))[4];
+    D_829188B0[5] = ((s16 *)((u8 *)D_82911D00 + D_82918858 * 14))[5];
+    D_829188B0[6] = ((s16 *)((u8 *)D_82911D00 + D_82918858 * 14))[6];
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33D6A0/func_82900EFC.s")
+extern void *D_829188A0;
+extern void GeoCamera_SetViewport(void *, s16, s16, s16, s16);
+extern void GeoCamera_SetPerspective(void *, s32, f32, f32);
+extern void func_80038E14(void *, s32, s32, s32, f32, f32, f32, s32);
+void func_82900EFC(void) {
+    GeoCamera_SetViewport(
+        D_829188A0,
+        *(s16 *)((u8 *)D_829188A0 + 0x1C),
+        *(s16 *)((u8 *)D_829188A0 + 0x1E),
+        *(s16 *)((u8 *)D_829188A0 + 0x20),
+        *(s16 *)((u8 *)D_829188A0 + 0x22));
+    GeoCamera_SetPerspective(
+        D_829188A0,
+        *(s32 *)((u8 *)D_829188A0 + 0x2C),
+        20.0f,
+        6400.0f);
+    func_80038E14(
+        D_829188A0,
+        *(s32 *)((u8 *)D_829188A0 + 0xA8),
+        *(s32 *)((u8 *)D_829188A0 + 0xAC),
+        *(s32 *)((u8 *)D_829188A0 + 0xB0),
+        *(f32 *)((u8 *)D_829188A0 + 0xB4),
+        *(f32 *)((u8 *)D_829188A0 + 0xB8),
+        *(f32 *)((u8 *)D_829188A0 + 0xBC),
+        0);
+}
 #endif
 
 #ifdef VERSION_US
@@ -128,7 +171,14 @@ void func_82901510(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33D6A0/func_82901628.s")
+extern Gfx *D_800D0510;
+extern u8 D_80094D90[];
+extern void Gfx_FillRectRgb(s16, s16, s16, s16, s32, s32, s32);
+void func_82901628(s16 arg0, s16 arg1, s16 arg2, s16 arg3) {
+    gSPDisplayList(D_800D0510++, D_80094D90);
+    Gfx_FillRectRgb(arg0, arg1, arg2, arg3, 0, 0, 0);
+}
+void func_82901628_padding(void) {}
 #endif
 
 #ifdef VERSION_US
@@ -163,7 +213,26 @@ void func_82902260(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33D6A0/func_82902268.s")
+extern u8 D_82918899;
+extern void func_82901C98(void);
+extern void func_82901DD4(void);
+extern void func_82902024(void);
+void func_82902268(void) {
+    switch (D_82918899) {
+    case 0:
+        func_82901C98();
+        return;
+    case 1:
+        func_82901DD4();
+        return;
+    case 2:
+        func_82902024();
+        return;
+    case 3:
+        func_82902260();
+        return;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -206,7 +275,25 @@ void func_8290263C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33D6A0/func_82902694.s")
+extern void *D_80087200;
+extern s32 D_829188EC;
+extern void func_80064D28(void);
+extern void func_8290260C(void);
+extern void func_82902634(void);
+extern void func_82901BA8(void);
+void func_82902694(void) {
+    if (D_829188EC != 0) {
+        do {
+            func_80064D28();
+            func_8290260C();
+            func_82902634();
+            if ((*(u16 *)((u8 *)D_80087200 + 8) & 0xD000) != 0) {
+                D_829188EC = 0;
+            }
+            func_82901BA8();
+        } while (D_829188EC != 0);
+    }
+}
 #endif
 
 #ifdef VERSION_US
