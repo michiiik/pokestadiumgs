@@ -147,13 +147,48 @@ u32 func_841094EC(void) {
     return D_841901B8;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_841094F8.s")
+extern u32 func_8411EE54(u8 *arg0);
+extern f32 D_84188E20;
+f32 func_841094F8(void) {
+    f32 var_ft1;
+    u32 temp_v0;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_84109544.s")
+    temp_v0 = func_8411EE54((u8 *) D_84190194);
+    var_ft1 = (f32) temp_v0;
+    return var_ft1 * D_84188E20;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_84109590.s")
+extern f32 D_84188E24;
+f32 func_84109544(void) {
+    f32 var_ft1;
+    u32 temp_v0;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_841095DC.s")
+    temp_v0 = func_8411EE54(D_84190198);
+    var_ft1 = (f32) temp_v0;
+    return var_ft1 * D_84188E24;
+}
+
+extern u8 *D_8419019C;
+extern f32 D_84188E28;
+f32 func_84109590(void) {
+    f32 var_ft1;
+    u32 temp_v0;
+
+    temp_v0 = func_8411EE54(D_8419019C);
+    var_ft1 = (f32) temp_v0;
+    return var_ft1 * D_84188E28;
+}
+
+extern u32 func_8411E358(s32 arg0, s32 arg1);
+extern f32 D_84188E2C;
+f32 func_841095DC(void) {
+    f32 var_ft1;
+    u32 temp_v0;
+
+    temp_v0 = func_8411E358(D_84190194, D_8419018C);
+    var_ft1 = (f32) temp_v0;
+    return var_ft1 * D_84188E2C;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_84109630.s")
 
@@ -175,7 +210,13 @@ void func_84109780(s32 arg0) {
     func_84109630((s32) D_84190198, arg0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_841097E4.s")
+extern s32 func_8411E22C(u8 *);
+s32 func_841097E4(s32 arg0) {
+    if (func_8003C9B8((s32) D_8419019C, func_8411E22C(D_8419019C), arg0) == 0) {
+        func_8411DCCC((s32) D_8419019C, arg0);
+    }
+    func_84109630((s32) D_8419019C, arg0);
+}
 
 void func_84109848(s32 arg0) {
     func_8411DCCC(D_84190194, arg0);
@@ -187,7 +228,6 @@ void func_84109884(s32 arg0) {
     func_84109630(D_84190198, arg0);
 }
 
-extern u8 *D_8419019C;
 void func_841098C0(s32 arg0) {
     func_8411DCCC(D_8419019C, arg0);
     func_84109630(D_8419019C, arg0);
