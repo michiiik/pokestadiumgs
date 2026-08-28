@@ -19,13 +19,31 @@ s32 func_87E05400(u32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E055B0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E05874.s")
+extern Gfx *D_800D0510;
+extern void *D_8009491C;
+extern u8 *func_8004CA60(u8 *);
+extern void func_8003CD84();
+void func_87E05874(s32 arg0, s32 arg1) {
+    u8 *context;
+    void *temp_v0;
+
+    if (arg0 == 5) {
+        context = (u8 *)D_8009491C;
+        temp_v0 = *(void **)(context + 0x14);
+        gDPPipeSync(D_800D0510++);
+        gDPSetCombine(D_800D0510++, 0xFFFFFF, 0xFFFCF238);
+        gSPSegment(D_800D0510++, 0xF,
+                   func_8004CA60(*(u8 **)((u8 *)temp_v0 + 0xC)));
+        gSPDisplayList(D_800D0510++, *(void **)((u8 *)temp_v0 + 0x10));
+        func_8003CD84();
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E05944.s")
 
 extern Gfx *D_800D0510;
 extern void *D_8009491C;
-extern void func_8003CD84(void *);
+extern void func_8003CD84();
 void func_87E059F4(s32 arg0, s32 arg1) {
     u8 *context;
     void *temp_v0;
@@ -129,7 +147,31 @@ void func_87E06B18(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E06BCC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E06CB4.s")
+extern s32 main_pool_get_available(void);
+extern s32 MainPool_AllocState(s32, s32);
+extern void MainPool_FinalizeAllocation(s32);
+extern s32 func_80040E80(s32, void *);
+extern u8 D_87E19B18;
+extern s32 func_87F08E3C(s32, s32);
+extern s32 func_87F08DF8(s32, s32, s32, s32);
+extern s32 func_8004C990(s32, s32);
+void func_87E06CB4(void *arg0) {
+    s32 state;
+
+    state = MainPool_AllocState(main_pool_get_available(), 0);
+    *(s32 *)((u8 *)arg0 + 0x168) = func_80040E80(state, &D_87E19B18);
+    MainPool_FinalizeAllocation(state);
+    state = main_pool_alloc(0x138, 0);
+    *(s32 *)((u8 *)arg0 + 0x158) = state;
+    *(s32 *)(state + 0) = 0;
+    *(s32 *)(state + 0xC) = func_8004C990(0x1B2, 1);
+    *(s32 *)(state + 0x10) = func_87F08E3C(*(s32 *)(state + 0xC), 0x0F000000);
+    state = *(s32 *)((u8 *)arg0 + 0x158);
+    state += 0x9C;
+    *(s32 *)(state + 0) = 1;
+    *(s32 *)(state + 0xC) = func_8004C990(0x169, 0);
+    *(s32 *)(state + 0x10) = func_87F08DF8(*(s32 *)(state + 0xC), 0x41000000, 0xC1180000, 0x0F000000);
+}
 
 void func_87E06D84(u8 *arg0) {}
 
