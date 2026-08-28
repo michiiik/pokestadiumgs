@@ -1057,7 +1057,9 @@ void func_84146D98(u8 *arg0, u8 *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84147228.s")
+extern u8 *func_841460C0(u8, u8, u8);
+extern void func_841470C4(u8 *, u8, s32);
+void func_84147228(u8 arg0, u8 arg1, u8 arg2, u8 arg3, s32 arg4) { func_841470C4(func_841460C0(arg0, arg1, arg2), arg3, arg4); }
 #endif
 
 #ifdef VERSION_US
