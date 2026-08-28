@@ -45,7 +45,12 @@ s32 func_8AC00334(s16 arg0, s16 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC005D8.s")
+extern Gfx *D_800D0510;
+extern s16 D_8AC08514;
+extern s16 D_8AC08516;
+extern s16 D_8AC08518;
+extern s16 D_8AC0851A;
+void func_8AC005D8(void) { gDPPipeSync(D_800D0510++); gDPSetScissor(D_800D0510++, G_SC_NON_INTERLACE, D_8AC08514, D_8AC08516, D_8AC08518, D_8AC0851A); }
 #endif
 
 #ifdef VERSION_US
@@ -84,11 +89,21 @@ void func_8AC00738(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC0077C.s")
+extern s16 D_8AC08514;
+extern s16 D_8AC08516;
+extern s16 D_8AC08518;
+extern s16 D_8AC0851A;
+extern void func_8AC005D8();
+void func_8AC0077C(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    D_8AC08514 = (s16) arg0; D_8AC08516 = (s16) arg1; D_8AC08518 = (s16) arg2; D_8AC0851A = (s16) arg3; func_8AC005D8();
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC007B8.s")
+extern s16 D_8AC08514; extern s16 D_8AC08516; extern s16 D_8AC08518; extern s16 D_8AC0851A; extern void func_8AC005D8();
+void func_8AC007B8(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+ D_8AC08514 = (s16) arg0; D_8AC08516 = (s16) arg1; D_8AC08518 = (s16) (arg0 + arg2); D_8AC0851A = (s16) (arg1 + arg3); func_8AC005D8();
+}
 #endif
 
 #ifdef VERSION_US
@@ -294,7 +309,7 @@ void func_8AC01664(void *arg0)
 #endif
 
 #ifdef VERSION_US
-extern void func_8AC0077C(s16, s16, s16, s16);
+extern void func_8AC0077C(s32, s32, s32, s32);
 extern s16 D_8AC099C0;
 extern s16 D_8AC099C2;
 extern s16 D_8AC099C4;
