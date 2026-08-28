@@ -363,7 +363,18 @@ s32 func_8005A134(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005A5C4.s")
+u8 func_8005A5C4(u8 arg0, u8 *arg1) {
+    arg0 = arg0 & 0xFF;
+    switch (arg0) {
+    case 0xBB:
+        *arg1 |= 1;
+        break;
+    case 0xBD:
+        *arg1 |= 2;
+        break;
+    }
+    return *arg1;
+}
 #endif
 
 #ifdef VERSION_US
@@ -374,7 +385,17 @@ void func_8005A8E4(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005A8EC.s")
+u8 func_8005A8EC(u8 arg0, u8 *arg1) {
+    arg0 = arg0 & 0xFF;
+    if (arg0 != 0x46) {
+        if (arg0 == 0x74) {
+            *arg1 |= 4;
+        }
+    } else {
+        *arg1 |= 8;
+    }
+    return *arg1;
+}
 #endif
 
 #ifdef VERSION_US
