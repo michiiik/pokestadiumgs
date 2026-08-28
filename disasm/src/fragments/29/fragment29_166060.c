@@ -31,7 +31,18 @@ void func_880002F4(u8 *arg0, s16 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_166060/func_88000308.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_166060/func_88000488.s")
+extern Gfx *D_800D0510;
+void func_88000488(s32 *arg0, s32 arg1) {
+    if (*arg0 != arg1) {
+        gDPPipeSync(D_800D0510++);
+        if (arg1 != 0) {
+            gDPSetCombine(D_800D0510++, 0x509AA1, 0x3335FEFF);
+        } else {
+            gDPSetCombine(D_800D0510++, 0x129A25, 0xFF37FFFF);
+        }
+        *arg0 = arg1;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_166060/func_88000510.s")
 
@@ -81,7 +92,20 @@ s32 func_880007B0(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_166060/func_88000808.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_166060/func_880008B0.s")
+extern Gfx *D_800D0510;
+void func_880008B0(s16 arg0, s16 arg1, s16 arg2) {
+    s32 i;
+
+    for (i = 0; i != 2; i++, arg1++) {
+        gDPPipeSync(D_800D0510++);
+        if (i == 0) {
+            gDPSetFillColor(D_800D0510++, 0x10001);
+        } else {
+            gDPSetFillColor(D_800D0510++, 0xFFFFFFFF);
+        }
+        gDPFillRectangle(D_800D0510++, arg0, arg1, arg0 + arg2 - 1, arg1);
+    }
+}
 
 extern void func_8004B2CC(s32, s32, s32, s32, s32, s32, s32, s32);
 void func_880009A8(s32 arg0, s16 arg1, s16 arg2, s16 arg3, s16 arg4, s16 arg5, s16 arg6) {
@@ -110,7 +134,27 @@ u32 Credits_RandomRange(u32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_166060/func_88000FC4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_166060/func_88001144.s")
+typedef struct {
+    s16 x1;
+    s16 y1;
+    s16 x2;
+    s16 y2;
+} S1_unk_D_800A7440;
+extern S1_unk_D_800A7440 *GfxRect_SetBounds(S1_unk_D_800A7440 *, s16, s16, s16, s16);
+extern s32 GfxRect_ClipToScissor(S1_unk_D_800A7440 *);
+extern Gfx *D_800D0510;
+void func_88001144(s16 arg0, s16 arg1, s16 arg2, s16 arg3, s32 arg4) {
+    S1_unk_D_800A7440 rect;
+
+    GfxRect_SetBounds(&rect, arg0, arg1, arg0 + arg2 - 1, arg1 + arg3 - 1);
+    if (GfxRect_ClipToScissor(&rect) != 0) {
+        if ((arg4 == 0) || (arg4 == 0x100000)) {
+            rect.y1++;
+            rect.x2++;
+        }
+        gDPFillRectangle(D_800D0510++, rect.x1, rect.y2, rect.y1, rect.x2);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_166060/func_88001234.s")
 
