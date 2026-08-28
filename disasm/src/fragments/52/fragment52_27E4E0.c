@@ -9,7 +9,26 @@ void func_86400020(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/52/fragment52_27E4E0/func_86400114.s")
+extern f32 func_87D00720(void *, void *, void *, f32 *, f32 *);
+extern s32 func_87D00670(void *, void *, f32 *, void *, void *, f32 *);
+
+s32 func_86400114(void *arg0, f32 arg1, void *arg2, void *arg3, void *arg4, f32 *arg5) {
+    f32 sp30[2];
+    f32 sp2C;
+    s32 sp28;
+    f32 sp24;
+    f32 sp20;
+
+    sp28 = 0;
+    func_87D00720(arg0, arg2, arg3, sp30, &sp2C);
+    if ((sp2C < arg1) &&
+        (func_87D00670(arg0, arg4, &sp24, arg2, arg3, &sp20) != 0) &&
+        (sp20 >= 0.0f) && (sp20 <= 1.0f)) {
+        *arg5 = arg1 - sp2C;
+        sp28 = 1;
+    }
+    return sp28;
+}
 #endif
 
 #ifdef VERSION_US
@@ -105,7 +124,34 @@ void func_864018B0(u8 *arg0, u8 *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/52/fragment52_27E4E0/func_86402A2C.s")
+extern f32 D_86409A40;
+extern f32 D_86409A44;
+extern f64 D_86409A48;
+extern f32 D_86409A50;
+extern f32 D_86409A54;
+extern f32 D_86409A58;
+
+void func_86402A2C(u8 *arg0) {
+    s32 flags = *(s32 *)(arg0 + 0xC);
+
+    if ((flags & 0x80000000) && !(flags & 0x40000)) {
+        if (*(f32 *)(arg0 + 0x4C) < D_86409A40) {
+            *(f32 *)(arg0 + 0x14) = *(f32 *)(arg0 + 0x14) + D_86409A44;
+            if ((f64)D_86409A48 < (f64)*(f32 *)(arg0 + 0x14)) {
+                *(f32 *)(arg0 + 0x14) = D_86409A50;
+            }
+        } else {
+            *(f32 *)(arg0 + 0x14) = *(f32 *)(arg0 + 0x14) - D_86409A54;
+        }
+    } else {
+        *(f32 *)(arg0 + 0x14) = *(f32 *)(arg0 + 0x14) - D_86409A58;
+    }
+    *(f32 *)(arg0 + 0x4C) = *(f32 *)(arg0 + 0x14) + *(f32 *)(arg0 + 0x4C);
+    if (*(f32 *)(arg0 + 0x4C) < 0.0f) {
+        *(f32 *)(arg0 + 0x4C) = 0.0f;
+        *(f32 *)(arg0 + 0x14) = *(f32 *)(arg0 + 0x14) * -0.75f;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -223,7 +269,26 @@ void func_86405778(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/52/fragment52_27E4E0/func_86405EA4.s")
+extern u8 *D_86416C00;
+extern void func_87C037C0(u8 *, s32);
+extern s32 StageContext_GetFadeMode(void);
+extern void func_86407034(void);
+extern void func_864057E0(void);
+extern void func_80007AEC(s32);
+extern void func_87F00688(void);
+extern void func_87F0277C(u8 *);
+
+void func_86405EA4(void) {
+    func_87C037C0(D_86416C00 + 0xCEC8, *(s32 *)(*(u8 **)(D_86416C00 + 0xB4) + 0xC));
+    if (StageContext_GetFadeMode() == 1) {
+        func_86407034();
+        func_864057E0();
+        func_80007AEC(0x14);
+        *(s32 *)(D_86416C00 + 0x10) = 3;
+        func_87F00688();
+    }
+    func_87F0277C(D_86416C00 + 0xE0);
+}
 #endif
 
 #ifdef VERSION_US
