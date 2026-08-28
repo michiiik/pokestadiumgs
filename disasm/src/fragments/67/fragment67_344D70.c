@@ -396,7 +396,31 @@ void func_8290AEEC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290B184.s")
+extern void func_80007AEC(s32);
+extern void func_8290A2FC(void);
+extern void func_8290ACA8(void);
+extern void func_8290A5B0(s32);
+extern u8 D_8291A7C0;
+extern s32 D_8291B858;
+extern s32 D_82912F80;
+void func_8290B184(void) {
+    u8 *base;
+
+    func_80007AEC(8);
+    func_8290A2FC();
+    func_8290ACA8();
+    func_8290A5B0(3);
+    base = (u8 *)&D_8291A7C0;
+    *(s16 *)(base + 0x1A0) = 0;
+    *(u8 *)(base + 5) &= 0xFFFE;
+    *(u8 *)(base + 0x1A9) &= 0xFFFE;
+    *(u8 *)(base + 0x34D) &= 0xFFFE;
+    *(u8 *)(base + 0x4F1) &= 0xFFFE;
+    *(u8 *)(base + 0x21) = 0;
+    *(u8 *)(base + 0x1C5) = 0;
+    *(u8 *)(base + 0x369) = 0;
+    *(s32 *)((u8 *)&D_8291B838 + (D_8291B858 * 4)) = D_82912F80;
+}
 #endif
 
 #ifdef VERSION_US
