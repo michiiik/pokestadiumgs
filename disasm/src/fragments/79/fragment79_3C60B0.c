@@ -478,7 +478,19 @@ void BattleAnim_StartEffect45FourStreamTrail_Init(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84158308.s")
+extern u16 D_841A4D00;
+extern u16 D_841A4D02;
+extern u8 D_841A4D08[];
+extern s32 func_84164280(s32);
+extern s32 func_841650A8(s32);
+void func_84158308(void) {
+    if (*(s16 *)&D_841A4D00 >= 2) {
+        s32 temp = D_800D0510;
+        D_800D0510 += 8;
+        gSPMatrix((Gfx *)(u32)temp, &D_841A4D08, G_MTX_MODELVIEW | G_MTX_LOAD);
+        D_800D0510 = func_84164280(D_800D0510);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -496,7 +508,14 @@ void BattleAnim_StartEffect62OwnerLinkedFourStream_Init(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84158520.s")
+void func_84158520(void) {
+    if (*(s16 *)&D_841A4D02 >= 2) {
+        s32 temp = D_800D0510;
+        D_800D0510 += 8;
+        gSPMatrix((Gfx *)(u32)temp, &D_841A4D08, G_MTX_MODELVIEW | G_MTX_LOAD);
+        D_800D0510 = func_841650A8(D_800D0510);
+    }
+}
 #endif
 
 #ifdef VERSION_US
