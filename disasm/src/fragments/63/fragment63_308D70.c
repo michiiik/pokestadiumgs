@@ -77,7 +77,25 @@ u32 func_87E067F0(s32 arg0, s32 arg1) {
     return D_87E19B4C[arg0];
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E06808.s")
+extern Gfx *D_800D0510;
+extern u8 D_80094E38[];
+extern void func_80007328(Gfx **, s32);
+extern void GfxImage_FillCurrent(Gfx **, u16);
+extern s32 func_8004C990(s32, s32);
+extern void func_8004D19C(s32, s32, s32, s32, s32);
+void func_87E06808(s32 arg0) {
+    u8 *var_s1;
+    s32 var_s2;
+
+    var_s1 = *(u8 **)((u8 *)arg0 + 0x150);
+    for (var_s2 = 0; var_s2 != 0xC; var_s2 += 1, var_s1 += 0x9C) {
+        func_80007328(&D_800D0510, *(s32 *)(var_s1 + 0x90));
+        GfxImage_FillCurrent(&D_800D0510, 0xFFFE);
+        gSPDisplayList(D_800D0510++, D_80094E38);
+        gDPSetRenderMode(D_800D0510++, 0x0F0A7008, 0);
+        func_8004D19C(0, 0, func_8004C990(0x172, func_87E067F0(var_s2, *(s32 *)(var_s1 + 0x88))), 0, 0);
+    }
+}
 
 extern void func_8004C8C0(s32);
 void func_87E06908(s32 arg0) {
@@ -123,7 +141,35 @@ void func_87E06D84(u8 *arg0) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E07040.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E07194.s")
+extern void func_87E07040(s32, void *, s32);
+extern void func_87F0B24C(s32, u8 *, f32, f32, f32, s32, s32);
+void func_87E07194(void *arg0) {
+    u8 *var_s0;
+    s32 temp_v0;
+    f32 temp_f0;
+
+    var_s0 = *(u8 **)((u8 *)arg0 + 0x24);
+    if (var_s0 != NULL) {
+        do {
+            temp_v0 = *(s32 *)(var_s0 + 0xC);
+            if (temp_v0 & 0x20000000) {
+                func_87E07040(*(s32 *)(var_s0 + 0x20), var_s0, 0xF);
+            } else if (temp_v0 & 0x10000000) {
+                func_87E07040(*(s32 *)(var_s0 + 0x20) + 8, var_s0, 0xF);
+            }
+            var_s0 = *(u8 **)(var_s0 + 4);
+        } while (var_s0 != NULL);
+    }
+    var_s0 = *(u8 **)((u8 *)arg0 + 0x38);
+    if (var_s0 != NULL) {
+        temp_f0 = 0.0f;
+        do {
+            func_87F0B24C(*(s32 *)(var_s0 + 0x20) + 8,
+                          var_s0 + 0x54, 0.0f, 0.0f, temp_f0, 0xF, 0);
+            var_s0 = *(u8 **)(var_s0 + 4);
+        } while (var_s0 != NULL);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E07278.s")
 
