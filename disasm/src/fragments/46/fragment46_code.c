@@ -234,7 +234,15 @@ s32 func_8AE02868(s32 arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE028B0.s")
+extern void func_8AE027B0(s32, void *, u16 *, void *, s32);
+extern u16 D_8AE09AC0;
+extern u8 D_8AE09AC8[];
+s32 func_8AE028B0(s32 arg0, void *arg1) {
+    u16 *p = &D_8AE09AC0;
+    func_8AE027B0(arg0, arg1, p, D_8AE09AC8, -1);
+    *p = *p + 0x800;
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
