@@ -52,6 +52,18 @@ Coordinator rules:
   Do not run tooling changes and a fleet at the same time in one checkout.
 - Do not spawn investigation agents for this loop; the assembly reading is
   the agents' job, not a separate phase.
+- **Never introduce a new rule through a mid-task message.** A message to a
+  running agent arrives wrapped in a system-reminder, which is exactly the
+  shape of a prompt injection; on 2026-08-28 two separate agents refused a
+  genuine coordinator instruction (a changed `git commit` invocation) on
+  those grounds, and they were right to — one of them also caught that the
+  instruction was wrong. Commit the rule to `docs/FLEET_AGENT.md` or this
+  file first, then send at most a pointer: "re-read `docs/FLEET_AGENT.md`
+  §5, it changed in commit `<sha>`." An agent can verify a committed
+  document; it cannot verify a message. Mid-task messages should otherwise
+  carry only scope changes the agent cannot derive itself — stop, switch
+  file, skip these owners — and should never ask an agent to touch a path
+  outside its assignment.
 - `docs/FLEET_AGENT.md` already carries the lessons of 2026-08-28: search
   only inside the repository (a `find / -iname gbi.h` walked `~/Music` and
   raised a macOS media-library prompt; the header is
@@ -561,6 +573,15 @@ accepts; other widths only on diagnostic evidence via the variant policy.
 - Runner: `probe_unavailable` / `list index out of range` also reproduces on
   `func_82C04880` (`fragment83_code.c`) — same last-owner diagnostics bug,
   now five recorded instances.
+- Runner (cosmetic): a `companion_edits` install can leave a redundant
+  forward prototype next to the retyped declaration it just fixed (the
+  callee-declaration scan injects one, the companion edit corrects the
+  file-level extern). Valid C, harmless, but `dedupe_externs.py` should
+  learn to fold it away (`fragment47_24E0A0.c`, `func_87C00160`).
+- Shape: `func_86007F6C` and `func_86009D7C` (`fragment47_24E0A0.c`) both
+  plateau at 0.909 with one extra instruction and an unexplained
+  `mov.s $f12,$f14` shuffle, at exact instruction counts — a float
+  argument-register scheduling difference worth its own investigation.
 
 - Runner: `probe_error` / `list index out of range` on the last pragma owner
   of a file when the function has trailing alignment nops
