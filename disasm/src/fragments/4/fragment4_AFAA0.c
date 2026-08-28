@@ -263,7 +263,11 @@ void func_81803C9C(void *arg0)
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81803CD4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81803D44.s")
+extern f32 func_81803CD4(f32);
+
+void func_81803D44(f32 arg0, f32 arg1) {
+    func_81803CD4(func_81803CD4(arg1) - func_81803CD4(arg0));
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81803D80.s")
 
