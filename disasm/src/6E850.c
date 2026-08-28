@@ -352,7 +352,22 @@ void func_8006F658(u8 *arg0, u8 *arg1, f32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_8007065C.s")
+extern u32 Memmap_GetSegmentVaddr(u32);
+extern void func_8006FF80(void *, s32);
+extern Mtx D_80129038;
+Gfx *func_8007065C(Gfx *arg0, void *arg1, s32 arg2) {
+    void *segment;
+    segment = (void *)(u32)Memmap_GetSegmentVaddr(*(u32 *)((u8 *)arg1 + 4));
+    if (*(u16 *)segment >= 0xF) {
+        return arg0;
+    }
+    func_8006FF80(arg1, arg2);
+    gMoveWd(arg0++, G_MW_SEGMENT, 0x38, arg2);
+    gSPMatrix(arg0++, &D_80129038, G_MTX_PUSH);
+    gSPDisplayList(arg0++, *(void **)((u8 *)segment + 0x1C));
+    gSPPopMatrixN(arg0++, G_MTX_MODELVIEW, 1);
+    return arg0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -427,7 +442,31 @@ void func_8007087C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_80070974.s")
+extern Gfx *func_80006DEC(s32);
+extern Gfx *func_80070A4C(Gfx *);
+extern Gfx *func_8007065C(Gfx *, void *, s32);
+extern u8 D_8009F3D0[];
+extern u8 D_8009F410[];
+Gfx *func_80070974(Gfx *arg0) {
+    s16 *state;
+    void *entry;
+    s32 matrix;
+    Gfx *gfx;
+
+    state = (s16 *)func_8003F54C((void *)D_8009491C);
+    if (state == NULL) {
+        return arg0;
+    }
+    entry = ((void **)state)[(s16)*state + 3];
+    matrix = func_80006DEC(0xA0);
+    gSPMatrix(arg0++, D_8009F3D0, G_MTX_LOAD | G_MTX_PUSH);
+    gfx = func_80070A4C(arg0);
+    gfx = func_8007065C(gfx, entry, matrix);
+    gSPPopMatrixN(gfx++, G_MTX_MODELVIEW, 1);
+    gSPDisplayList(gfx++, D_8009F410);
+    (*state)++;
+    return gfx;
+}
 #endif
 
 #ifdef VERSION_US
