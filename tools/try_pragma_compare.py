@@ -48,6 +48,7 @@ except ImportError:  # pragma: no cover - the supported host is POSIX/macOS
     fcntl = None
 
 import probe_stats
+import variant_policy
 
 # Set by a caller (``sweep_targets.py``) that already knows a per-function
 # family mapping (e.g. from a sweep listing) but does not want to thread a
@@ -1116,7 +1117,42 @@ def _function_mismatch_details(
             details["mismatch_kind"] = "register_allocation_only"
         elif normalized_expected == normalized_actual:
             details["mismatch_kind"] = "immediate_drift"
+    _annotate_normalized_only_match(details)
     return details
+
+
+def _annotate_normalized_only_match(details: dict[str, object]) -> None:
+    """Flag a normalised score that is hiding a real raw-instruction mismatch.
+
+    ``similarity_score`` erases register allocation; ``raw_similarity_score``
+    does not.  A candidate can reach a normalised 1.0 (or anything >= 0.99)
+    while its raw score sits well below that -- an agent trusted exactly
+    such a 1.0 that had ``raw_similarity_score`` 0.63 with values swapped
+    between struct fields (AGENTS.md Sec 5).  This sets a boolean
+    ``normalized_only_match`` and folds a plain-language warning into
+    ``details["diagnostic"]`` so the flag is visible anywhere the diagnostic
+    text is rendered, not just to a caller that inspects both score fields.
+    """
+    similarity_score = details.get("similarity_score")
+    raw_similarity_score = details.get("raw_similarity_score")
+    normalized_only_match = (
+        isinstance(similarity_score, (int, float))
+        and isinstance(raw_similarity_score, (int, float))
+        and similarity_score >= 0.99
+        and raw_similarity_score < 0.9
+    )
+    details["normalized_only_match"] = normalized_only_match
+    summary = (
+        f"similarity_score={similarity_score} raw_similarity_score={raw_similarity_score} "
+        f"mismatch_kind={details.get('mismatch_kind')}"
+    )
+    if normalized_only_match:
+        summary += (
+            "; normalized_only_match: the normalised similarity score is hiding "
+            "register/field differences that raw_similarity_score exposes -- do not "
+            "treat this as a match without checking assembly_diff"
+        )
+    details["diagnostic"] = summary
 
 
 def _declaration_prefix(declarations: str | None) -> str:
@@ -1125,6 +1161,334 @@ def _declaration_prefix(declarations: str | None) -> str:
         return ""
     body = declarations.strip()
     return body + "\n" if body else ""
+
+
+_CALL_SYMBOL_RE = re.compile(r"\bfunc_[0-9A-Fa-f]+\b")
+
+# A signature's return-type/qualifier prefix: any number of storage-class or
+# base-type keywords, then exactly one base type name, then optional
+# pointer stars.  Deliberately excludes ``=``, ``(``, ``return``, and other
+# expression tokens, so a mere call site (``result = func_X(arg);``,
+# ``if (func_X(arg))``) never gets mistaken for a declaration or definition.
+_SIGNATURE_TYPE_PREFIX_RE = re.compile(
+    r"^(?:(?:extern|static|const|volatile|unsigned|signed|struct\s+\w+|union\s+\w+)\s+)*"
+    r"[A-Za-z_]\w*\s*\**$"
+)
+
+# A bare identifier used as a C control-flow keyword is grammatically
+# indistinguishable from a bare type name to ``_SIGNATURE_TYPE_PREFIX_RE``
+# (both are just one word) -- ``return func_X(arg);`` must not be mistaken
+# for a definition whose "return type" is literally named ``return``.
+_CONTROL_FLOW_KEYWORDS = frozenset({
+    "return", "if", "while", "for", "switch", "case", "else", "do", "goto",
+    "break", "continue", "sizeof",
+})
+
+
+def _is_signature_type_prefix(prefix: str) -> bool:
+    """Whether ``prefix`` reads as a return-type/qualifier list, not an expression."""
+    if not _SIGNATURE_TYPE_PREFIX_RE.match(prefix):
+        return False
+    tokens = re.findall(r"[A-Za-z_]\w*", prefix)
+    return bool(tokens) and tokens[-1] not in _CONTROL_FLOW_KEYWORDS
+
+# The leading-line shape a hand-written or m2c-drafted candidate uses for its
+# own forward declarations (see this module's docstring): blank lines,
+# ``/* ... */`` comments, ``extern ...;`` lines, and bare ``<type> f(...);``
+# prototypes, all before the body opens its first ``{``.
+_EXTERN_LINE_RE = re.compile(r"^\s*extern\b.*;\s*$")
+_COMMENT_ONLY_LINE_RE = re.compile(r"^\s*/\*.*\*/\s*$")
+_BARE_PROTOTYPE_LINE_RE = re.compile(r"^\s*[^={}]*\([^;{}]*\)\s*;\s*$")
+
+
+def _find_balanced_close_paren(text: str, open_index: int) -> int | None:
+    """Return the index of the ``)`` matching ``text[open_index] == '('``."""
+    depth = 0
+    for index in range(open_index, len(text)):
+        char = text[index]
+        if char == "(":
+            depth += 1
+        elif char == ")":
+            depth -= 1
+            if depth == 0:
+                return index
+    return None
+
+
+def _statement_start(text: str, before: int) -> int:
+    """Index just past the nearest ``;``/``{``/``}`` before ``before`` (or 0).
+
+    Anchoring on the nearest statement-terminating character -- not the
+    start of the source *line* -- is what lets this find a definition that
+    shares its line with an earlier statement, e.g. ``extern u8 D_x[]; u8
+    func_8005D92C(s32 index) { ... }``: a line-anchored scan stops at the
+    ``;`` inside that same line and never sees the real signature after it.
+    """
+    boundary = max(text.rfind(char, 0, before) for char in ";{}")
+    return boundary + 1
+
+
+def scan_source_for_callee_signature(source_text: str, function: str) -> str | None:
+    """Scan a whole C source for an existing declaration/definition of ``function``.
+
+    Returns the exact ``"<return-type-and-quals> function(<params>)"``
+    signature as written in ``source_text`` (no trailing ``;``/``{``) --
+    from a real definition when one exists, else from a plain
+    ``extern``/prototype declaration -- or ``None`` when the source says
+    nothing about it anywhere.
+
+    This is deliberately position-independent: it is not limited to
+    declarations above some cutoff.  A callee DEFINED LATER IN THE SAME FILE
+    than the call site is exactly the case a synthesized fallback prototype
+    must defer to instead of guessing (AGENTS.md Sec 5's
+    ``func_8005D92C``: a synthesized ``s32 func_8005D92C()`` conflicted with
+    the real, later ``u8 func_8005D92C(s32 arg0) { ... }`` and IDO rejected
+    the redeclaration).  A real definition always wins over a plain
+    prototype when both exist, since it is authoritative.
+    """
+    name_pattern = re.compile(rf"\b{re.escape(function)}\s*\(")
+    best_definition: str | None = None
+    best_declaration: str | None = None
+    for match in name_pattern.finditer(source_text):
+        open_paren = match.end() - 1
+        close_paren = _find_balanced_close_paren(source_text, open_paren)
+        if close_paren is None:
+            continue
+        after = source_text[close_paren + 1 : close_paren + 33].lstrip()
+        if not after or after[0] not in "{;":
+            continue
+        terminator = after[0]
+        start = _statement_start(source_text, match.start())
+        prefix = source_text[start : match.start()].strip()
+        if not prefix or not _is_signature_type_prefix(prefix):
+            continue
+        params = source_text[open_paren + 1 : close_paren].strip()
+        signature = re.sub(r"\s+", " ", f"{prefix} {function}({params})").strip()
+        if terminator == "{":
+            # A real definition is authoritative; stop scanning immediately.
+            return signature
+        if best_declaration is None:
+            best_declaration = signature
+    return best_definition or best_declaration
+
+
+def _as_extern_declaration(signature: str) -> str:
+    """Format a scanned signature as a standalone forward declaration."""
+    text = re.sub(r"^extern\s+", "", signature.strip())
+    return f"extern {text};"
+
+
+def _candidate_declared_callee_names(candidate: str) -> set[str]:
+    """Return callee names the candidate's own leading lines already declare.
+
+    Mirrors the documented candidate convention (a run of blank, comment,
+    ``extern ...;``, or bare-prototype lines before the body): a name that
+    only appears *inside* the body -- a call, not a declaration -- must not
+    count here, or a genuinely missing forward declaration would never get
+    synthesized for it.
+    """
+    names: set[str] = set()
+    for line in candidate.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if _COMMENT_ONLY_LINE_RE.match(stripped):
+            continue
+        is_extern = _EXTERN_LINE_RE.match(stripped) is not None
+        is_bare_prototype = (
+            not is_extern
+            and _BARE_PROTOTYPE_LINE_RE.match(stripped) is not None
+            and not stripped.startswith("extern")
+        )
+        if is_extern or is_bare_prototype:
+            names.update(_CALL_SYMBOL_RE.findall(stripped))
+            continue
+        break
+    return names
+
+
+def _missing_callee_declarations(
+    function: str,
+    candidate: str,
+    baseline_source: str,
+    already_declared: set[str],
+) -> str:
+    """Extra ``extern`` lines this one candidate needs beyond ``already_declared``.
+
+    For every ``func_XXXXXXXX`` the candidate calls -- other than
+    ``function`` itself, and other than a name ``already_declared`` already
+    covers -- scan ``baseline_source`` (the whole owner file, pragma and
+    all) for its real signature and reuse it verbatim.  A callee the scan
+    finds nothing about is left alone: no default is guessed, so a probe
+    against a genuinely undeclared symbol compiles (or fails) exactly as it
+    always has (``synthesise only when nothing is found``, AGENTS.md Sec 5).
+    A name already covered by ``already_declared`` never gets a second,
+    possibly-conflicting declaration layered on top, whether or not that
+    existing one agrees with what the scan would have found.
+    """
+    referenced = {name for name in _CALL_SYMBOL_RE.findall(candidate) if name != function}
+    missing = sorted(referenced - already_declared)
+    lines: list[str] = []
+    for name in missing:
+        signature = scan_source_for_callee_signature(baseline_source, name)
+        if signature is None:
+            continue
+        lines.append(_as_extern_declaration(signature))
+    return "\n".join(lines)
+
+
+def _augment_blocks_with_callee_declarations(
+    blocks: list[tuple[str, str]], prefix: str, baseline_source: str,
+) -> list[tuple[str, str]]:
+    """Prepend ``prefix`` and any needed synthesized callee declarations.
+
+    Beyond the historical behaviour (prepend the shared ``declarations``
+    block to every candidate, verbatim), this closes the fallback-prototype
+    gap described in AGENTS.md Sec 5: for a callee neither the shared
+    ``declarations`` block nor the candidate's own leading lines already
+    declare, ``baseline_source`` is scanned for a real signature (a
+    definition or prototype anywhere in the file, including further down
+    than the pragma being replaced) and, when found, that exact signature is
+    injected instead of leaving the callee to whatever the compiler's
+    implicit-declaration default would otherwise produce.  Nothing changes
+    for a callee already declared somewhere, nor for one the scan finds
+    nothing about: this only ever adds a declaration it is confident is
+    correct.
+    """
+    shared_declared = set(_CALL_SYMBOL_RE.findall(prefix))
+    augmented: list[tuple[str, str]] = []
+    for function, candidate in blocks:
+        already_declared = (
+            shared_declared | {function} | _candidate_declared_callee_names(candidate)
+        )
+        extra = _missing_callee_declarations(function, candidate, baseline_source, already_declared)
+        pieces = [piece for piece in (prefix.rstrip("\n"), extra) if piece]
+        new_prefix = "\n".join(pieces)
+        if new_prefix:
+            augmented.append((function, new_prefix + "\n" + candidate))
+        else:
+            augmented.append((function, candidate))
+    return augmented
+
+
+def _load_prior_attempt_history() -> dict[str, list[dict[str, object]]]:
+    """Group every historical probe-stats attempt by function, oldest first.
+
+    Reads ``variant_policy.default_stats_paths()`` (the active stats file
+    plus any legacy file and rotated siblings of either) through
+    ``probe_stats.iter_batches`` so each attempt keeps its batch's
+    ``timestamp``.  Cheap and silent when no stats exist yet -- a fresh
+    worktree has no ``disasm/probe-stats/`` -- since both of those already
+    tolerate missing files by returning nothing.  Called once per batch
+    (see ``_annotate_prior_attempts``), never per attempt.
+    """
+    history: dict[str, list[dict[str, object]]] = {}
+    try:
+        paths = variant_policy.default_stats_paths()
+    except OSError:
+        return history
+    for batch in probe_stats.iter_batches(paths):
+        attempts = batch.get("attempts")
+        if not isinstance(attempts, list):
+            continue
+        timestamp = batch.get("timestamp")
+        for attempt in attempts:
+            if not isinstance(attempt, dict):
+                continue
+            function = attempt.get("function")
+            if not isinstance(function, str) or not function:
+                continue
+            enriched = dict(attempt)
+            enriched.setdefault("timestamp", timestamp)
+            history.setdefault(function, []).append(enriched)
+    return history
+
+
+def _best_prior_attempt(prior: list[dict[str, object]]) -> dict[str, object] | None:
+    """Return the highest-``similarity_score`` entry from ``prior``, summarized."""
+    if not prior:
+        return None
+
+    def score_of(attempt: dict[str, object]) -> float:
+        score = attempt.get("similarity_score")
+        return float(score) if isinstance(score, (int, float)) else -1.0
+
+    best = max(prior, key=score_of)
+    return {
+        "similarity_score": best.get("similarity_score"),
+        # Older stats rows only carry the pre-rename ``exact_similarity_score``
+        # field; a newer row's own ``raw_similarity_score`` takes priority.
+        "raw_similarity_score": best.get("raw_similarity_score", best.get("exact_similarity_score")),
+        "mismatch_kind": best.get("mismatch_kind"),
+        "label": best.get("label"),
+        "timestamp": best.get("timestamp"),
+    }
+
+
+def _futility_verdict(prior: list[dict[str, object]], best_prior: dict[str, object] | None) -> str | None:
+    """Classify a function's prior-attempt history as futile to keep retrying.
+
+    ``register-tie``: at least six prior attempts already sit at
+    ``similarity_score >= 0.99`` with ``mismatch_kind ==
+    "register_allocation_only"`` -- IDO's own register allocator, not the
+    source shape, is the only remaining variable, so another source-shape
+    variant will not close it (see the ``§4``/``§5`` register-tie entries in
+    AGENTS.md, e.g. ``func_8130B91C``/``func_8130B95C``,
+    ``func_8005C0B0``-family).  ``stuck``: at least fifteen prior attempts
+    and the best of them is still below 0.9 similarity -- a bigger structural
+    rewrite is needed, not another small variant.
+    """
+    register_tie_count = sum(
+        1
+        for attempt in prior
+        if attempt.get("mismatch_kind") == "register_allocation_only"
+        and isinstance(attempt.get("similarity_score"), (int, float))
+        and attempt["similarity_score"] >= 0.99
+    )
+    if register_tie_count >= 6:
+        return (
+            f"register-tie: {register_tie_count} prior attempts at >=0.99 "
+            "register_allocation_only — source-shape variants will not close this"
+        )
+    if len(prior) >= 15:
+        best_score = best_prior.get("similarity_score") if best_prior else None
+        if isinstance(best_score, (int, float)) and best_score < 0.9:
+            return f"stuck: {len(prior)} attempts, best {best_score}"
+    return None
+
+
+def _annotate_prior_attempts(result: dict[str, object]) -> None:
+    """Populate ``prior_attempts``/``best_prior``/``futility`` on every attempt.
+
+    Loads the probe-stats history exactly once for the whole batch (never
+    per attempt), then looks up each attempt's function in that one
+    dictionary.  Also sets a batch-level ``result["futility_summary"]``
+    (``function -> futility string``) for every function in this batch whose
+    prior history is futile, so a caller can see the batch's futile
+    functions without re-scanning every attempt.  A no-op, cheap either way,
+    when the batch has no attempts or no stats history exists.
+    """
+    attempts = result.get("attempts")
+    if not isinstance(attempts, list):
+        result.setdefault("futility_summary", {})
+        return
+    history = _load_prior_attempt_history()
+    summary: dict[str, str] = {}
+    for attempt in attempts:
+        if not isinstance(attempt, dict):
+            continue
+        function = attempt.get("function")
+        if not isinstance(function, str) or not function:
+            continue
+        prior = history.get(function, [])
+        best_prior = _best_prior_attempt(prior)
+        futility = _futility_verdict(prior, best_prior)
+        attempt["prior_attempts"] = len(prior)
+        attempt["best_prior"] = best_prior
+        attempt["futility"] = futility
+        if futility is not None:
+            summary[function] = futility
+    result["futility_summary"] = summary
 
 
 def _replace_candidate_text(source: str, function: str, candidate: str) -> str | None:
@@ -1308,6 +1672,15 @@ def _probe_one_uncounted(
                         )
                     )
                     diagnostic["mismatch_kind"] = "section_layout_drift"
+                    if isinstance(diagnostic.get("diagnostic"), str):
+                        # Keep the human-readable summary's mismatch_kind in sync
+                        # with the definitive section_layout_drift override above.
+                        diagnostic["diagnostic"] = re.sub(
+                            r"mismatch_kind=\S+",
+                            "mismatch_kind=section_layout_drift",
+                            diagnostic["diagnostic"],
+                            count=1,
+                        )
                     diagnostic.update(verdict)
                     return diagnostic
                 match.update(verdict)
@@ -1441,6 +1814,32 @@ def _resolve_probe_workers(workers: int | None, candidate_count: int) -> int:
         except ValueError:
             workers = 10
     return max(1, min(workers, candidate_count or 1))
+
+
+def _print_normalized_only_match_warnings(attempts: list[dict[str, object]]) -> None:
+    """Print a console warning for every ``normalized_only_match`` attempt.
+
+    ``similarity_score`` alone can read as a clean match (>= 0.99, even
+    1.0) while ``raw_similarity_score`` -- unaffected by register
+    normalisation -- says otherwise; this is exactly the class of result an
+    agent trusted this week (a 1.0 with ``raw_similarity_score`` 0.63 and
+    values swapped between struct fields, AGENTS.md Sec 5).  Both the
+    sequential and the combined gate share this one exit path
+    (``finish()``), so the warning surfaces regardless of which gate mode a
+    batch used.
+    """
+    for attempt in attempts:
+        if not attempt.get("normalized_only_match"):
+            continue
+        function = attempt.get("function", "<unknown>")
+        similarity_score = attempt.get("similarity_score")
+        raw_similarity_score = attempt.get("raw_similarity_score")
+        print(
+            f"WARNING {function}: similarity_score={similarity_score} but "
+            f"raw_similarity_score={raw_similarity_score} -- normalised score is "
+            "hiding a register/field difference; check assembly_diff before trusting it",
+            file=sys.stderr,
+        )
 
 
 def _rank_probe_rejections(
@@ -1617,6 +2016,8 @@ def _record_probe_stats(
                 "actual_instruction_text": attempt.get("actual_instruction_text"),
                 "similarity_score": attempt.get("similarity_score"),
                 "exact_similarity_score": attempt.get("exact_similarity_score"),
+                "raw_similarity_score": attempt.get("raw_similarity_score"),
+                "normalized_only_match": attempt.get("normalized_only_match"),
                 "similarity_rank": attempt.get("similarity_rank"),
                 "assembly_diff": attempt.get("assembly_diff"),
                 "assembly_diff_truncated": attempt.get("assembly_diff_truncated"),
@@ -1706,6 +2107,7 @@ def try_candidates_detailed(
             gate=gate,
             declarations=declarations,
         )
+        _annotate_prior_attempts(result)
         batch_status = result.get("batch_status")
         _record_probe_stats(
             source_path,
@@ -1747,8 +2149,7 @@ def _try_candidates_detailed_unlocked(
     repo_root = Path(__file__).resolve().parent.parent
     baseline = source_path.read_text()
     prefix = _declaration_prefix(declarations)
-    if prefix:
-        blocks = [(function, prefix + candidate) for function, candidate in blocks]
+    blocks = _augment_blocks_with_callee_declarations(blocks, prefix, baseline)
     accepted: dict[str, str] = {}
     accepted_indices: dict[str, int] = {}
     _cleanup_stale_probe_dirs(repo_root)
@@ -1775,6 +2176,7 @@ def _try_candidates_detailed_unlocked(
         payload["timing"] = dict(timing)
         payload.setdefault("rejected_ranking", rejection_rankings)
         payload.setdefault("probe_workers", probe_workers)
+        _print_normalized_only_match_warnings(attempts)
         return payload
 
     if not gate:
