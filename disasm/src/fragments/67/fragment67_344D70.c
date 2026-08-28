@@ -214,11 +214,45 @@ s32 func_82908A54(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_82908BD8.s")
+extern f32 Math_StepToF(f32, f32, f32, f32);
+void func_82908BD8(f32 *arg0, f32 *arg1, f32 *arg2, s16 arg3) {
+    f32 stepX;
+    f32 stepY;
+    f32 stepZ;
+
+    stepX = (arg1[0] - arg2[0]) / (f32)arg3;
+    stepY = (arg1[1] - arg2[1]) / (f32)arg3;
+    stepZ = (arg1[2] - arg2[2]) / (f32)arg3;
+    if (stepX < 0.0f) stepX *= -1.0f;
+    if (stepY < 0.0f) stepY *= -1.0f;
+    if (stepZ < 0.0f) stepZ *= -1.0f;
+    arg0[0] = Math_StepToF(arg0[0], arg1[0], stepX, stepX);
+    arg0[1] = Math_StepToF(arg0[1], arg1[1], stepY, stepY);
+    arg0[2] = Math_StepToF(arg0[2], arg1[2], stepZ, stepZ);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_82908CF4.s")
+extern f32 Math_StepToF(f32, f32, f32, f32);
+void func_82908CF4(f32 *arg0, f32 *arg1, f32 *arg2, s16 arg3) {
+    f32 stepX;
+    f32 stepY;
+    f32 stepZ;
+    f32 stepW;
+
+    stepX = (arg1[0] - arg2[0]) / (f32)arg3;
+    stepY = (arg1[1] - arg2[1]) / (f32)arg3;
+    stepZ = (arg1[2] - arg2[2]) / (f32)arg3;
+    stepW = (arg1[3] - arg2[3]) / (f32)arg3;
+    if (stepX < 0.0f) stepX *= -1.0f;
+    if (stepY < 0.0f) stepY *= -1.0f;
+    if (stepZ < 0.0f) stepZ *= -1.0f;
+    if (stepW < 0.0f) stepW *= -1.0f;
+    arg0[0] = Math_StepToF(arg0[0], arg1[0], stepX, stepX);
+    arg0[1] = Math_StepToF(arg0[1], arg1[1], stepY, stepY);
+    arg0[2] = Math_StepToF(arg0[2], arg1[2], stepZ, stepZ);
+    arg0[3] = Math_StepToF(arg0[3], arg1[3], stepW, stepW);
+}
 #endif
 
 #ifdef VERSION_US
@@ -302,7 +336,29 @@ void func_8290A0B0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290AB10.s")
+extern u8 D_8291B831;
+extern u8 D_8291A964;
+extern void func_8290A920(s32, s32);
+extern void func_8290A208(s32);
+void func_8290AB10(s32 arg0) {
+    s32 i;
+
+    D_8291B831 = 0;
+    i = 1;
+    if (arg0 >= 2) {
+        u8 *record;
+        record = &D_8291A964;
+        do {
+            func_8290A920(i, i);
+            func_8290A208(i);
+            record += 0x1A4;
+            record[-0x19E] = record[-0x19E] | 0x10;
+            record[-0x19F] = record[-0x19F] & -2;
+            record[-2] = 1;
+            i++;
+        } while (i != arg0);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -392,7 +448,49 @@ void func_8290AEEC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290B098.s")
+extern s16 D_8291B828;
+extern u8 D_829131EC;
+extern u8 D_829131F8;
+extern u8 D_82913204;
+extern u8 D_8291A7C0;
+extern u8 D_8291A7C4;
+extern u8 D_8291A960;
+extern s16 D_8291B874;
+extern s16 D_8291B876;
+extern s16 D_8291B878;
+extern u8 D_8291B838;
+extern s32 D_8291B858;
+extern s32 D_82912F80;
+extern void func_80007AEC(s32);
+extern void func_8290A5B0(s32);
+extern void func_8003F2C4(s32, s32, s32);
+extern void ModelAnim_SetFrame(u8 *, s16);
+extern void func_8290AB10(s32);
+void func_8290B098(void) {
+    s16 mode;
+    u8 *config;
+
+    mode = D_8291B828;
+    if (mode == 0x24) {
+        config = &D_829131EC;
+    }
+    if (mode == 0x25) {
+        config = &D_829131F8;
+    }
+    if (mode == 0x26) {
+        config = &D_82913204;
+    }
+    func_80007AEC(8);
+    func_8290A5B0(1);
+    func_8003F2C4(*(s32 *)&D_8291A7C0, (s32)&D_8291A7C4, config[0]);
+    ModelAnim_SetFrame(&D_8291A7C4, config[1]);
+    *(s16 *)&D_8291A960 = 0;
+    func_8290AB10(6);
+    *(s16 *)&D_8291B874 = *(s16 *)(config + 4);
+    *(s16 *)&D_8291B876 = *(s16 *)(config + 6);
+    *(s16 *)&D_8291B878 = *(s16 *)(config + 8);
+    *(s32 *)((u8 *)&D_8291B838 + D_8291B858 * 4) = D_82912F80;
+}
 #endif
 
 #ifdef VERSION_US
