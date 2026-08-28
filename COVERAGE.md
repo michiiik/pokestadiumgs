@@ -3,8 +3,8 @@
 # Decompilation coverage
 
 <!-- AUTO_COVERAGE:START -->
-- US functions with C implementations: **3,732 / 10,532 (35.4%)**
-- Remaining `GLOBAL_ASM` owners: **6,800**
+- US functions with C implementations: **3,739 / 10,532 (35.5%)**
+- Remaining `GLOBAL_ASM` owners: **6,793**
 - Baseline: `f477acf` (vendored US pragma snapshot)
 <!-- AUTO_COVERAGE:END -->
 
@@ -158,7 +158,7 @@
 | `disasm/src/fragments/31/fragment31_194450.c` | 2 | 6 | 66.7% |
 | `disasm/src/fragments/31/fragment31_194C30.c` | 4 | 8 | 50.0% |
 | `disasm/src/fragments/31/fragment31_195910.c` | 3 | 5 | 40.0% |
-| `disasm/src/fragments/31/fragment31_1965A0.c` | 6 | 9 | 33.3% |
+| `disasm/src/fragments/31/fragment31_1965A0.c` | 5 | 9 | 44.4% |
 | `disasm/src/fragments/31/fragment31_197640.c` | 24 | 38 | 36.8% |
 | `disasm/src/fragments/31/fragment31_19BCA0.c` | 3 | 5 | 40.0% |
 | `disasm/src/fragments/31/fragment31_19C000.c` | 3 | 5 | 40.0% |
@@ -202,7 +202,7 @@
 | `disasm/src/fragments/35/fragment35_1CCE70.c` | 5 | 11 | 54.5% |
 | `disasm/src/fragments/36/fragment36_code.c` | 11 | 15 | 26.7% |
 | `disasm/src/fragments/37/fragment37_code.c` | 12 | 16 | 25.0% |
-| `disasm/src/fragments/38/fragment38_1D5610.c` | 14 | 21 | 33.3% |
+| `disasm/src/fragments/38/fragment38_1D5610.c` | 9 | 21 | 57.1% |
 | `disasm/src/fragments/38/fragment38_1D8160.c` | 8 | 14 | 42.9% |
 | `disasm/src/fragments/38/fragment38_1D8990.c` | 5 | 10 | 50.0% |
 | `disasm/src/fragments/39/fragment39_1DA300.c` | 3 | 3 | 0.0% |
@@ -216,7 +216,7 @@
 | `disasm/src/fragments/42/fragment42_code.c` | 4 | 7 | 42.9% |
 | `disasm/src/fragments/43/fragment43_1E5A10.c` | 79 | 114 | 30.7% |
 | `disasm/src/fragments/43/fragment43_1EC950.c` | 5 | 5 | 0.0% |
-| `disasm/src/fragments/44/fragment44_1EE290.c` | 28 | 38 | 26.3% |
+| `disasm/src/fragments/44/fragment44_1EE290.c` | 27 | 38 | 28.9% |
 | `disasm/src/fragments/44/fragment44_1F0680.c` | 17 | 18 | 5.6% |
 | `disasm/src/fragments/44/fragment44_1F1850.c` | 38 | 47 | 19.1% |
 | `disasm/src/fragments/44/fragment44_1F5480.c` | 4 | 5 | 20.0% |
