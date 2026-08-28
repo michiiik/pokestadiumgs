@@ -6,7 +6,27 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1BE300/func_88500D60.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1BE300/func_88500E4C.s")
+extern u8 *D_8850D6D0;
+s8 func_88500E4C(void) {
+    typedef struct {
+        u8 pad2F[0x2F];
+        u8 count;
+        s8 index;
+        u8 pad31;
+    } State;
+    State *state;
+    s8 index;
+    s8 result;
+
+    state = (State *)D_8850D6D0;
+    index = state->index;
+    if (index >= state->count) {
+        result = 0;
+    } else {
+        result = *((s8 *)state + index + 0x32);
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1BE300/func_88500E80.s")
 
