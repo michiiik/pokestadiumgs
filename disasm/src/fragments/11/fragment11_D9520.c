@@ -209,7 +209,7 @@ void func_816071AC(s32 arg0, s32 arg1) {
     gSPDisplayList(GFX_DL++, D_80094F50);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_8160724C.s")
+void func_8160724C(s16 *arg0, s16 *arg1) { s16 value; value = arg1[0]; if (arg0[0] < value) arg0[0] = value; value = arg1[1]; if (arg0[1] < value) arg0[1] = value; if ((arg1[0] + arg1[2]) < (arg0[2] + arg0[0])) { arg0[2] = (arg1[0] + arg1[2]) - arg0[0]; if (arg0[2] < 0) arg0[2] = 0; } if ((arg1[1] + arg1[3]) < (arg0[3] + arg0[1])) { arg0[3] = (arg1[1] + arg1[3]) - arg0[1]; if (arg0[3] < 0) arg0[3] = 0; } }
 
 void func_816072FC(void *arg0) {
     if ((*(s16 *)((u8 *)(arg0) + (4))) < 0x10) {
@@ -298,7 +298,7 @@ f32 func_816092FC(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81609344.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_8160945C.s")
+void func_8160945C(s16 *arg0, s16 *arg1, s16 *arg2, f32 arg3) { arg0[0] = arg1[0] + (arg2[0] - arg1[0]) * arg3; arg0[1] = arg1[1] + (arg2[1] - arg1[1]) * arg3; arg0[2] = arg1[2] + (arg2[2] - arg1[2]) * arg3; arg0[3] = arg1[3] + (arg2[3] - arg1[3]) * arg3; }
 
 extern u8 D_8160C128;
 
