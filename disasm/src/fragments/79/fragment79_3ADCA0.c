@@ -1123,7 +1123,8 @@ void func_84147228(u8 arg0, u8 arg1, u8 arg2, u8 arg3, s32 arg4) { func_841470C4
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_841480C0.s")
+extern void func_84146D38(u8 *arg0);
+void func_841480C0(u8 *arg0) { u8 value = arg0[9]; if (arg0[0] == 1) { func_84146D38(arg0); if (value >= 2) { *(s16 *)(arg0 + 0xA) += value * (((value & 1) << 1) - 1); } } }
 #endif
 
 #ifdef VERSION_US
