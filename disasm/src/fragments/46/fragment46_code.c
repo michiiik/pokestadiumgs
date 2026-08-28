@@ -85,7 +85,17 @@ void func_8AE00CBC(f32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE00F84.s")
+u8 *func_8AE00F84(u8 *arg0, u8 arg1) {
+    do {
+        if (arg0[1] == 0xFF) {
+            return NULL;
+        }
+        if (arg0[1] == arg1) {
+            return arg0;
+        }
+        arg0 += 5;
+    } while (1);
+}
 #endif
 
 #ifdef VERSION_US
