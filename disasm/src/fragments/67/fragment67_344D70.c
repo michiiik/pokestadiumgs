@@ -645,7 +645,19 @@ void func_8290D72C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290D738.s")
+extern s32 D_8291A380;
+extern s16 D_8291B85C;
+extern s16 D_8291B85E;
+extern s16 D_8291B860;
+extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
+extern void func_800371B4(s32, s32, f32, s16, s32);
+void func_8290D738(void) {
+    Vec3f_SetComponentsDuplicate((f32 *)(D_8291A380 + 0xB4), 0.0f, 30.0f, 0.0f);
+    D_8291B85C = 0;
+    D_8291B85E = 0;
+    D_8291B860 = 0xBE;
+    func_800371B4(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E);
+}
 #endif
 
 #ifdef VERSION_US
