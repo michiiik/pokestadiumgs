@@ -276,7 +276,56 @@ s32 func_8006B7D8(s32 value) { s32 result = 0; if (D_8009DF70 != 0) { *(s16 *)((
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006B7FC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006B854.s")
+s32 func_8006B854(s32 arg0, s32 arg1) {
+    s32 high;
+    s32 low;
+    s32 result;
+
+    high = arg0 & 0xFF00;
+    result = -1;
+    switch (high) {
+    case 0x200:
+        low = arg0 & 0xFF;
+        if (arg1 == 5) {
+            result = 0;
+        } else {
+            switch (low) {
+            case 0:
+                result = 1;
+                break;
+            case 1:
+                result = 2;
+                break;
+            case 3:
+                result = 3;
+                break;
+            }
+        }
+        break;
+    case 0:
+    case 0x100:
+        low = arg0 & 0xFF;
+        switch (low) {
+        case 0:
+            result = 1;
+            break;
+        case 1:
+            result = 2;
+            break;
+        case 3:
+            result = 3;
+            break;
+        }
+        break;
+    case 0x300:
+        result = 4;
+        break;
+    case 0x600:
+        result = 5;
+        break;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006B928.s")
 

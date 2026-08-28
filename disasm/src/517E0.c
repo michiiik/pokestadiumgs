@@ -63,7 +63,16 @@ void *func_80051138(s32 arg0) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800511A4.s")
+s32 func_800511A4(s32 arg0) {
+    s32 idx = func_80050D20(0x15, -1);
+    s32 result;
+    if (arg0 == 0) {
+        result = *(s32 *)(D_801281C4 + idx * 0xC);
+    } else {
+        result = *(s32 *)(D_801281C8 + idx * 0xC);
+    }
+    return result;
+}
 
 
 void *func_80051208(s32 arg0) {
@@ -567,7 +576,25 @@ void Save_ResetBank(s32 arg0, u32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800550E8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800551EC.s")
+s32 func_800551EC(u8 *arg0, s32 arg1) {
+    struct Footer {
+        u16 magic;
+        u16 version;
+        u16 checksum;
+    } *footer;
+
+    footer = (struct Footer *)(arg0 + arg1 - 6);
+    if (footer->magic != 0x5033) {
+        return 0;
+    }
+    if (footer->version != 0x7630) {
+        return 0;
+    }
+    if (footer->checksum != Save_Checksum(arg0, arg1)) {
+        return 0;
+    }
+    return 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055260.s")
 
@@ -651,7 +678,18 @@ s32 func_80055A74(s32 arg0) { extern s32 D_800972C0; s32 old = D_800972C0; if (a
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055BF8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055CCC.s")
+extern void func_80053B38(s32, s32, s32, u8 *);
+u8 func_80055CCC(s32 arg0) {
+    u8 result;
+    u8 padding[8];
+
+    result = 0;
+    if ((*(s32 *)((u8 *)&D_801281C0 + (func_80050D20(0x1E, -1) * 0xC)) & 1) &&
+        (arg0 >= 0) && (arg0 < 0x22)) {
+        func_80053B38(0x1E, 0, arg0, &result);
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055D44.s")
 
