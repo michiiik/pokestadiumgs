@@ -1678,6 +1678,43 @@ def _candidate_transaction_lock():
                 fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
 
 
+def _claim_or_refuse(source_path: Path) -> str | None:
+    """Claim ``source_path`` for this runner process, or explain a refusal.
+
+    Called once, at the install boundary in ``_try_candidates_detailed_unlocked``
+    -- right before a gated batch's first write into the live source tree,
+    since a refusal decided after that write would be too late to prevent it.
+    A batch that never reaches this point (``gate=False``, i.e. a probe-only
+    batch) never claims anything, matching AGENTS.md's "probe-only batches
+    do not claim" rule.
+
+    Returns ``None`` when this process now holds (or already held) the
+    claim; otherwise a diagnostic string naming the live holder, and the
+    caller must refuse the install rather than write anything. The first
+    call for a given path in this process claims it; every later call for
+    the same path just touches (extends) that claim, per
+    ``tools/file_claims.py``.
+    """
+    import file_claims
+
+    owner = file_claims.current_owner()
+    key = file_claims.registry_key(source_path)
+    if key in _CLAIMED_SOURCE_PATHS:
+        file_claims.touch(source_path, owner=owner)
+        return None
+    if file_claims.claim(source_path, owner=owner):
+        _CLAIMED_SOURCE_PATHS.add(key)
+        return None
+    existing = file_claims.holder(source_path)
+    holder_owner = existing.get("owner") if existing else "unknown"
+    return f"{source_path} is claimed by {holder_owner}"
+
+
+# Paths this process has already claimed via _claim_or_refuse -- later calls
+# for the same path touch instead of re-claiming (see its docstring).
+_CLAIMED_SOURCE_PATHS: set[str] = set()
+
+
 def try_candidates_detailed(
     source_path: Path,
     blocks: list[tuple[str, str]],
@@ -1790,6 +1827,17 @@ def _try_candidates_detailed_unlocked(
             "attempts": attempts,
             "batch_status": "probe_only",
             "gate": False,
+        })
+
+    claim_refusal = _claim_or_refuse(source_path)
+    if claim_refusal is not None:
+        return finish({
+            "status": 2,
+            "accepted": [],
+            "attempts": attempts,
+            "batch_status": "file_claimed_by_other",
+            "claim_diagnostic": claim_refusal,
+            "gate": True,
         })
 
     gate_started = time.monotonic()

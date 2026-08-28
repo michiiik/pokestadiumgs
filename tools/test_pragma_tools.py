@@ -27,13 +27,32 @@ import asm_processor  # noqa: E402
 # candidate tuning.
 _STATS_ISOLATION = mock.patch.dict(os.environ, {"PRAGMA_PROBE_STATS": ""})
 
+# A gated try_candidates_detailed() call also claims its source path (see
+# try_pragma_compare._claim_or_refuse / tools/file_claims.py) in the real
+# disasm/probe-stats/claims.json by default.  These synthetic /tmp source
+# paths must never land there either -- point the whole module at a
+# throwaway registry instead.
+_CLAIMS_REGISTRY_DIR = tempfile.TemporaryDirectory()
+_CLAIMS_ISOLATION = mock.patch.dict(
+    os.environ, {"PRAGMA_CLAIMS_REGISTRY": str(Path(_CLAIMS_REGISTRY_DIR.name) / "claims.json")}
+)
+
 
 def setUpModule() -> None:
     _STATS_ISOLATION.start()
+    _CLAIMS_ISOLATION.start()
 
 
 def tearDownModule() -> None:
+    # Stop in reverse (LIFO) order: both patch the same os.environ dict, and
+    # each one's stop() restores its own start()-time snapshot of the whole
+    # dict, not just the key it set. Stopping _STATS_ISOLATION first would
+    # have _CLAIMS_ISOLATION.stop() then restore a snapshot that still
+    # includes PRAGMA_PROBE_STATS="" -- silently disabling probe-stats
+    # again for every module that runs after this one.
+    _CLAIMS_ISOLATION.stop()
     _STATS_ISOLATION.stop()
+    _CLAIMS_REGISTRY_DIR.cleanup()
 
 
 class ScannerTests(unittest.TestCase):
