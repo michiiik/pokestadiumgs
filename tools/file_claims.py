@@ -159,6 +159,22 @@ def owner_session(owner: str) -> str:
     return f"{match.group('host')}:{match.group('session')}"
 
 
+def session_is_reliable(owner: str) -> bool:
+    """Whether ``owner``'s session tag identifies a session, not just a shell.
+
+    ``_session_tag()`` falls back to ``$PPID`` when ``CLAUDE_JOB_DIR`` is
+    unset; that number changes with every shell the harness spawns, so a
+    runner call and a later ``git commit`` from the same interactive session
+    would look like different sessions. A tag that is a bare integer is
+    therefore *unreliable*: the pre-commit guard reports such claims as a
+    warning instead of failing the commit. Job-dir tags (paths) and freeform
+    ``CLAIMS_OWNER`` overrides are reliable.
+    """
+    match = _OWNER_RE.match(owner)
+    session = match.group("session") if match else owner
+    return not session.isdigit()
+
+
 def same_session(owner_a: str, owner_b: str) -> bool:
     """Whether ``owner_a`` and ``owner_b`` name the same live session."""
     return owner_session(owner_a) == owner_session(owner_b)

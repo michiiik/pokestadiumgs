@@ -93,14 +93,31 @@ def find_violations(
         for path in staged_files
         if path in data and file_claims.is_live(data[path])
     }
-    foreign = {
+    committer_reliable = file_claims.session_is_reliable(committer)
+    reliable_claims = {
         path: entry
         for path, entry in live_claims.items()
+        if committer_reliable and file_claims.session_is_reliable(str(entry.get("owner", "")))
+    }
+    foreign = {
+        path: entry
+        for path, entry in reliable_claims.items()
         if not file_claims.same_session(str(entry.get("owner", "")), committer)
     }
     distinct_sessions = {
-        file_claims.owner_session(str(entry.get("owner", ""))) for entry in live_claims.values()
+        file_claims.owner_session(str(entry.get("owner", ""))) for entry in reliable_claims.values()
     }
+    advisory = {path: entry for path, entry in live_claims.items() if path not in reliable_claims}
+    if advisory:
+        # A bare-$PPID session tag on either side cannot prove the claim is
+        # foreign (see file_claims.session_is_reliable); warn, do not block.
+        print(
+            "check_file_claims: WARNING staged file(s) carry live claims whose session "
+            "identity is a bare PPID (no CLAUDE_JOB_DIR); not blocking:",
+            file=sys.stderr,
+        )
+        for path, entry in sorted(advisory.items()):
+            print(f"  {path}: claimed by {entry.get('owner')}", file=sys.stderr)
     multi_owner = len(distinct_sessions) > 1
     return foreign, multi_owner, live_claims
 
