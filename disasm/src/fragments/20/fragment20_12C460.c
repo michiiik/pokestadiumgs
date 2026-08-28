@@ -22,7 +22,28 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82604C08.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82604C40.s")
+void *func_82604C40(s32 arg0, s32 arg1, void *arg2, s32 arg3) {
+    s32 var_v0;
+    u8 *var_a0;
+    void *var_v1;
+
+    var_v1 = NULL;
+    var_v0 = 0;
+    if (arg3 > 0) {
+        var_a0 = arg2;
+loop_2:
+        var_v0 += 1;
+        if ((arg0 == *(s16 *)var_a0) && (arg1 == *(s16 *)(var_a0 + 2))) {
+            var_v1 = var_a0;
+        } else {
+            var_a0 += 0x298;
+            if (var_v0 != arg3) {
+                goto loop_2;
+            }
+        }
+    }
+    return var_v1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82604C98.s")
 
