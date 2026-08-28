@@ -1500,6 +1500,70 @@ def _replace_candidate_text(source: str, function: str, candidate: str) -> str |
     return replacement if count == 1 else None
 
 
+def _companion_edit_pragma_pattern(function: str) -> re.Pattern[str]:
+    return re.compile(
+        rf'^#pragma GLOBAL_ASM\("asm/us/nonmatchings/[^"]+/{re.escape(function)}\.s"\)$',
+        re.MULTILINE,
+    )
+
+
+def apply_companion_edits(
+    source_text: str,
+    companion_edits: list[dict[str, str]] | None,
+) -> tuple[str, str | None]:
+    """Apply a "paired change" batch of edits to a working copy of source text.
+
+    Pure and side-effect free: never touches disk, so it is exercised
+    directly in ``test_runner_companion.py`` with synthetic source text.
+
+    Each edit is ``{"function": ..., "old": ..., "new": ...}``.  ``old`` must
+    match ``text`` (as edited by any earlier item in the list) exactly once;
+    the target ``function`` must not currently be a ``#pragma GLOBAL_ASM``
+    owner (it must already be a plain C definition or an
+    ``extern``/prototype line); and neither ``old`` nor ``new`` may mention
+    ``GLOBAL_ASM`` -- a companion edit may not add or remove a pragma.
+
+    Returns ``(edited_text, None)`` on success. On failure returns
+    ``(source_text, diagnostic)`` unchanged -- the caller must not use the
+    first element in that case.
+    """
+    if not companion_edits:
+        return source_text, None
+    text = source_text
+    for edit in companion_edits:
+        function = edit.get("function") if isinstance(edit, dict) else None
+        old = edit.get("old") if isinstance(edit, dict) else None
+        new = edit.get("new") if isinstance(edit, dict) else None
+        if not function or old is None or new is None:
+            return source_text, (
+                "companion edit missing a string 'function', 'old', or 'new'"
+            )
+        if "GLOBAL_ASM" in old or "GLOBAL_ASM" in new:
+            return source_text, (
+                f"companion edit for {function}: may not add or remove a "
+                "#pragma GLOBAL_ASM line"
+            )
+        if _companion_edit_pragma_pattern(function).search(text):
+            return source_text, (
+                f"companion edit for {function}: function is still a "
+                "GLOBAL_ASM pragma owner, not an existing C definition or "
+                "extern/prototype line"
+            )
+        count = text.count(old)
+        if count == 0:
+            return source_text, (
+                f"companion edit for {function}: 'old' text was not found "
+                "in the source file"
+            )
+        if count > 1:
+            return source_text, (
+                f"companion edit for {function}: 'old' text matches "
+                f"{count} times; it must match exactly once"
+            )
+        text = text.replace(old, new, 1)
+    return text, None
+
+
 def _remove_probe_outputs(object_path: Path) -> None:
     """Remove the temporary object and files produced alongside it."""
     for path in (
@@ -1526,6 +1590,7 @@ def _probe_one(
     candidate: str,
     expected: bytes | None,
     expected_shape: dict[str, object] | None = None,
+    companion_edits: list[dict[str, str]] | None = None,
 ) -> dict[str, object]:
     """Compile one candidate in an isolated temporary source/object pair.
 
@@ -1533,9 +1598,15 @@ def _probe_one(
     ``.text`` match is additionally checked for section-layout and relocation
     drift and reports ``link_verified``.  Without it the result carries
     ``link_verified: None`` and stays on the sequential-gate path.
+
+    ``companion_edits`` (see ``apply_companion_edits``) is applied to the
+    working copy of the source before the candidate body is spliced in, so
+    an isolated probe sees the same paired change the gate will.
     """
     started = time.monotonic()
-    result = _probe_one_uncounted(source_path, function, candidate, expected, expected_shape)
+    result = _probe_one_uncounted(
+        source_path, function, candidate, expected, expected_shape, companion_edits
+    )
     result["probe_seconds"] = round(time.monotonic() - started, 3)
     return result
 
@@ -1579,8 +1650,16 @@ def _probe_one_uncounted(
     candidate: str,
     expected: bytes | None,
     expected_shape: dict[str, object] | None,
+    companion_edits: list[dict[str, str]] | None = None,
 ) -> dict[str, object]:
     baseline = source_path.read_text()
+    if companion_edits:
+        baseline, companion_error = apply_companion_edits(baseline, companion_edits)
+        if companion_error is not None:
+            return {
+                "status": "companion_edit_failed",
+                "diagnostic": companion_error,
+            }
     replacement = _replace_candidate_text(baseline, function, candidate)
     if replacement is None:
         return {
@@ -1711,11 +1790,14 @@ def probe_candidates(
     source_path: Path,
     blocks: list[tuple[str, str]],
     workers: int | None = None,
+    companion_edits: list[dict[str, str]] | None = None,
 ) -> list[dict[str, object]]:
     """Parallel-filter candidates without modifying the live source.
 
     This is only a cheap object-level filter.  A ``probe_match`` is still sent
     through the sequential full linker/ROM comparison before it can be kept.
+    ``companion_edits`` is forwarded to every isolated probe unchanged; see
+    ``apply_companion_edits``.
     """
     results: list[dict[str, object]] = [
         {"index": index, "function": function, "status": "probe_unavailable"}
@@ -1751,7 +1833,13 @@ def probe_candidates(
     with ThreadPoolExecutor(max_workers=workers) as executor:
         futures = {
             executor.submit(
-                _probe_one, source_path, function, candidate, expected[function], expected_shape
+                _probe_one,
+                source_path,
+                function,
+                candidate,
+                expected[function],
+                expected_shape,
+                companion_edits,
             ): index
             for index, (function, candidate) in enumerate(blocks)
             if expected[function] is not None
@@ -2031,6 +2119,7 @@ def _record_probe_stats(
                 "probe_seconds": attempt.get("probe_seconds"),
                 "diagnostic": attempt.get("diagnostic"),
                 "declarations": declarations,
+                "companion_edits": attempt.get("companion_edits"),
                 "candidate": (
                     blocks[index][1]
                     if blocks is not None and index < len(blocks)
@@ -2125,6 +2214,7 @@ def try_candidates_detailed(
     gate: bool = True,
     declarations: str | None = None,
     families: dict[str, str] | None = None,
+    companion_edits: list[dict[str, str]] | None = None,
 ) -> dict[str, object]:
     """Run one candidate transaction while excluding other MCP processes.
 
@@ -2134,6 +2224,17 @@ def try_candidates_detailed(
     ``families`` (``function -> family``) is an optional, best-effort mapping
     forwarded to the stats writer for owners whose attempt dict does not
     already carry a ``family`` key; see ``_record_probe_stats``.
+
+    ``companion_edits`` is the "paired change" hook: a list of
+    ``{"function", "old", "new"}`` dicts describing a small edit to an
+    *already-accepted* body or prototype elsewhere in the same file (for
+    example a caller that must be re-spelled to keep compiling once the new
+    candidate gets its real signature). See ``apply_companion_edits`` for the
+    exact contract. The edits are applied to the candidate's working copy of
+    the source for both the isolated probe and the gate, and are installed
+    together with the candidate only on a successful gate; on any failure
+    nothing is written. Omitted (the default), behaviour is identical to
+    before this parameter existed.
     """
     with _candidate_transaction_lock():
         result = _try_candidates_detailed_unlocked(
@@ -2143,6 +2244,7 @@ def try_candidates_detailed(
             labels=labels,
             gate=gate,
             declarations=declarations,
+            companion_edits=companion_edits,
         )
         _annotate_prior_attempts(result)
         batch_status = result.get("batch_status")
@@ -2175,6 +2277,7 @@ def _try_candidates_detailed_unlocked(
     labels: list[str | None] | None = None,
     gate: bool = True,
     declarations: str | None = None,
+    companion_edits: list[dict[str, str]] | None = None,
 ) -> dict[str, object]:
     """Try candidates and retain the first winner per function.
 
@@ -2182,22 +2285,73 @@ def _try_candidates_detailed_unlocked(
     Only candidates whose relocatable function bytes equal the baseline are
     sent through the sequential full linker/ROM comparison.  ``accepted`` is
     populated only after that final combined comparison also succeeds.
+
+    ``companion_edits`` (see ``apply_companion_edits`` and
+    ``try_candidates_detailed``) is validated once, up front, against the
+    untouched on-disk source. ``working_source`` -- the text every write to
+    ``source_path`` in this function uses from that point on, whether for a
+    sequential gate or a combined install -- carries those edits; ``baseline``
+    (the true, unedited disk snapshot) is kept only for restoring the tree on
+    failure, so a rejected batch leaves nothing behind.
     """
+    started = time.monotonic()
     repo_root = Path(__file__).resolve().parent.parent
     baseline = source_path.read_text()
     prefix = _declaration_prefix(declarations)
-    blocks = _augment_blocks_with_callee_declarations(blocks, prefix, baseline)
+    companion_function_names: list[str] | None = None
+    working_source = baseline
+    if companion_edits:
+        companion_function_names = [
+            edit.get("function") if isinstance(edit, dict) else None
+            for edit in companion_edits
+        ]
+        working_source, companion_error = apply_companion_edits(baseline, companion_edits)
+        if companion_error is not None:
+            attempts = [
+                {
+                    "index": index,
+                    "function": function,
+                    "status": "companion_edit_failed",
+                    "diagnostic": companion_error,
+                    "companion_edits": companion_function_names,
+                }
+                for index, (function, _) in enumerate(blocks)
+            ]
+            return {
+                "status": 2,
+                "accepted": [],
+                "attempts": attempts,
+                "batch_status": "companion_edit_failed",
+                "gate": gate,
+                "timing": {
+                    "probe_seconds": 0.0,
+                    "gate_seconds": 0.0,
+                    "gate_runs": 0,
+                    "gate_mode": None,
+                    "install_compiles": 0,
+                    "total_seconds": round(time.monotonic() - started, 3),
+                },
+                "rejected_ranking": {},
+                "probe_workers": _resolve_probe_workers(probe_workers, len(blocks)),
+            }
+
+    blocks = _augment_blocks_with_callee_declarations(blocks, prefix, working_source)
+
     accepted: dict[str, str] = {}
     accepted_indices: dict[str, int] = {}
     _cleanup_stale_probe_dirs(repo_root)
     probe_workers = _resolve_probe_workers(probe_workers, len(blocks))
-    started = time.monotonic()
-    attempts = probe_candidates(source_path, blocks, workers=probe_workers)
+    attempts = probe_candidates(
+        source_path, blocks, workers=probe_workers, companion_edits=companion_edits
+    )
     probe_seconds = time.monotonic() - started
     if labels is not None:
         for index, attempt in enumerate(attempts):
             if index < len(labels) and labels[index]:
                 attempt["label"] = labels[index]
+    if companion_function_names is not None:
+        for attempt in attempts:
+            attempt["companion_edits"] = companion_function_names
 
     rejection_rankings = _rank_probe_rejections(attempts, blocks)
     timing: dict[str, object] = {
@@ -2257,7 +2411,7 @@ def _try_candidates_detailed_unlocked(
         """Gate one candidate alone against the baseline tree (historical path)."""
         function, candidate = blocks[index]
         attempt = attempts[index]
-        source_path.write_text(baseline)
+        source_path.write_text(working_source)
         os.utime(source_path, None)
         rebuild_source_object(source_path)
         timing["gate_runs"] = int(timing["gate_runs"]) + 1
@@ -2311,7 +2465,7 @@ def _try_candidates_detailed_unlocked(
         winner_indices = dict(accepted_indices)
         winner_indices.update(pending)
         kept, invalid_pragma = _install_incrementally(
-            source_path, baseline, prefix, winners, attempts, winner_indices, timing
+            source_path, working_source, prefix, winners, attempts, winner_indices, timing
         )
         if invalid_pragma:
             restore_baseline()
@@ -2422,7 +2576,7 @@ def _try_candidates_detailed_unlocked(
 
     final_indices = dict(accepted_indices)
     final_kept, invalid_pragma = _install_incrementally(
-        source_path, baseline, prefix, accepted, attempts, final_indices, timing
+        source_path, working_source, prefix, accepted, attempts, final_indices, timing
     )
     if invalid_pragma:
         restore_baseline()

@@ -1960,7 +1960,7 @@ class DeclarationTests(unittest.TestCase):
             )
             probed: list[tuple[str, str]] = []
 
-            def fake_probe(source_path, blocks, workers=None):
+            def fake_probe(source_path, blocks, workers=None, companion_edits=None):
                 probed.extend(blocks)
                 return [
                     {"index": index, "function": function, "status": "probe_match"}
