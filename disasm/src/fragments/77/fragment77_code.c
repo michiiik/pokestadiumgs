@@ -25,7 +25,34 @@ void func_8F800020(s32 arg0, s32 arg1, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/77/fragment77_code/func_8F8012C0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/77/fragment77_code/func_8F8013FC.s")
+extern s32 D_8F809F98;
+extern u16 D_8F809FF0;
+extern u8 D_8F803BF0;
+extern u8 D_8F803BF4;
+extern u8 D_8F803E08;
+extern void func_8005DAC8(s32, u16);
+extern u8 *func_8006218C(s32, s32, s32, s32);
+extern void func_8006249C(void *, s32, u8 *);
+extern void func_8005B058(s32);
+extern void func_80059468(s32);
+extern void func_80062304(u8 *);
+void func_8F8013FC(u8 arg0) {
+    u8 *sp1C;
+
+    func_8005DAC8(D_8F809F98, D_8F809FF0);
+    if (arg0 == 0) {
+        sp1C = func_8006218C(0x20, D_8F809F98, 0, 1);
+        func_8006249C(&D_8F803BF4, (s32)D_8F803BF0, sp1C);
+        func_8005B058(D_8F809F98);
+    } else {
+        sp1C = func_8006218C(0x21, D_8F809F98, arg0 - 1, 1);
+        func_8006249C((u8 *)&D_8F803E08 + (s32)arg0 * 0x6F8 - 0x6F4,
+                      *(u8 *)((u8 *)&D_8F803E08 + (s32)arg0 * 0x6F8 - 0x6F8),
+                      sp1C);
+        func_80059468(D_8F809F98);
+    }
+    func_80062304(sp1C);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/77/fragment77_code/func_8F8014E4.s")
 
