@@ -452,7 +452,15 @@ void func_8AC05ED4(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC05F00.s")
+extern Gfx *D_800D0510;
+void func_8AC05F00(void *arg0) {
+    Gfx *temp_v1;
+    if (*(s16 *)((u8 *)arg0 + 0x70) != 0) {
+        temp_v1 = D_800D0510++;
+        temp_v1->words.w0 = 0xDE000000;
+        temp_v1->words.w1 = *(s32 *)((u8 *)arg0 + 0x3C);
+    }
+}
 #endif
 
 #ifdef VERSION_US
