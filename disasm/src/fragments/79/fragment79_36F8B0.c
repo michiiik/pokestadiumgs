@@ -34,7 +34,25 @@ void func_84100094(u8 *arg0) {
     arg0[0x92] = 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_8410009C.s")
+extern s32 func_84100054(u8 *arg0, s32 arg1);
+extern s32 func_84100074(u8 *arg0, s32 arg1);
+s32 func_8410009C(u8 *arg0) {
+    s32 result;
+
+    result = 0;
+    if (arg0[0x92] == 0) {
+        result = 1;
+    }
+    if (arg0[0x7F] == 0xFF) {
+        if (func_84100074(arg0, 1) != 0) {
+            result = 1;
+        }
+    }
+    if ((func_84100054(arg0, 0x20000) != 0) && (*(f32 *)(arg0 + 0x24) <= 0.0f)) {
+        result = 1;
+    }
+    return result;
+}
 
 extern u8 *D_8418C950;
 extern u32 D_8418C954;
@@ -97,7 +115,27 @@ s32 Particle_CountActive(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_841005E0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_84100688.s")
+typedef struct {
+    u8 pad_00[1];
+    u8 mode;
+    u8 divisor;
+    u8 count;
+    s16 *values;
+} Func84100688Table;
+
+s16 func_84100688(Func84100688Table *arg0, u32 arg1) {
+    s32 i;
+
+    if (arg0->mode == 0) {
+        arg1 %= arg0->divisor;
+    }
+    for (i = 0; i < arg0->count - 1; i++) {
+        if (arg1 >= (u32)arg0->values[i] && arg1 < (u32)arg0->values[i + 1]) {
+            return (s16)i;
+        }
+    }
+    return arg0->count - 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_84100710.s")
 
