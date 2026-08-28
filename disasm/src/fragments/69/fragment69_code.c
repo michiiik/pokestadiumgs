@@ -142,7 +142,20 @@ void func_8F1002C4(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/69/fragment69_code/func_8F100D58.s")
+extern s32 func_8004B7E0(s32, void *);
+extern s32 func_8004B8E4(s32);
+typedef struct { f32 x; f32 y; f32 z; } Func8F100D58Vec3f;
+
+void func_8F100D58(s32 arg0, void *arg1) {
+    Func8F100D58Vec3f sp1C;
+
+    func_8004B7E0(arg0, &sp1C);
+    if (sp1C.y > -150.0f) {
+        *(f32 *)((u8 *)arg1 + 4) = (f32)(func_8004B8E4(arg0) * 4);
+        return;
+    }
+    *(f32 *)((u8 *)arg1 + 4) = 0.0f;
+}
 #endif
 
 #ifdef VERSION_US
