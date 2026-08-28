@@ -37,9 +37,32 @@ void StageFade_SetMode(s32 arg0) {
 
 void Profiler_SetDisplayModes(s32 arg0, s32 arg1) { extern s32 D_80087230; extern s32 D_80087234; if ((u32)arg0 < 3) D_80087230 = arg0; if ((u32)arg1 < 2) D_80087234 = arg1; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80007BD0.s")
+extern Gfx *D_800D0510;
+void func_80007BD0(void) {
+    gDPPipeSync(D_800D0510++);
+    gDPPipelineMode(D_800D0510++, G_PM_1PRIMITIVE);
+    gDPSetTextureLOD(D_800D0510++, G_TL_TILE);
+    gDPSetTextureLUT(D_800D0510++, G_TT_NONE);
+    gDPSetTextureDetail(D_800D0510++, G_TD_CLAMP);
+    gDPSetTexturePersp(D_800D0510++, G_TP_PERSP);
+    gDPSetTextureFilter(D_800D0510++, G_TF_BILERP);
+    gDPSetTextureConvert(D_800D0510++, G_TC_FILT);
+    gDPSetCombineKey(D_800D0510++, G_CK_NONE);
+    gDPSetAlphaCompare(D_800D0510++, G_AC_NONE);
+    gDPSetColorDither(D_800D0510++, G_CD_MAGICSQ);
+    gDPSetAlphaDither(D_800D0510++, G_AD_PATTERN);
+    gDPSetCycleType(D_800D0510++, G_CYC_1CYCLE);
+    gDPSetRenderMode(D_800D0510++, 0x0F0A4000, 0);
+    gDPSetCombine(D_800D0510++, 0xFFFFFF, 0xFFFE793C);
+    gDPPipeSync(D_800D0510++);
+  }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80007DB4.s")
+extern Gfx *D_800D0510;
+void func_80007DB4(void) {
+    gSPClearGeometryMode(D_800D0510++, 0x3F0604);
+    gSPSetGeometryMode(D_800D0510++, G_SHADE | G_SHADING_SMOOTH | G_CULL_BACK);
+    gSPTexture(D_800D0510++, 0, 0, 0, G_TX_RENDERTILE, G_OFF);
+}
 
 extern void GfxImage_ResetCurrent(void);
 extern s32 func_8000339C(void);
@@ -47,11 +70,11 @@ extern void Memmap_SetSegmentMap(s32, s32, s32);
 extern void func_80002178(void *);
 extern void func_80007BD0(void);
 extern void func_80007DB4(void);
-extern u8 D_800D0510[];
+extern Gfx *D_800D0510;
 void func_80007E18(void) {
     GfxImage_ResetCurrent();
     Memmap_SetSegmentMap(0, 0x80000000, func_8000339C());
-    func_80002178(D_800D0510);
+    func_80002178(&D_800D0510);
     func_80007BD0();
     func_80007DB4();
 }
@@ -140,7 +163,7 @@ void StageLoader_WaitForRetrace(void) {
     }
 }
 
-extern u8 D_800D0510[]; void func_80008624(void) { func_80002178(D_800D0510); }
+extern Gfx *D_800D0510; void func_80008624(void) { func_80002178(&D_800D0510); }
 
 extern s32 D_800D0540;
 extern void func_800080E0(void);
