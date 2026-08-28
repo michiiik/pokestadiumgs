@@ -167,7 +167,26 @@ void func_824041F8(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82404230.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_8240429C.s")
+extern s32 func_8004C874(s32, s32);
+extern s32 func_800472E0(s32);
+extern s16 func_80049148(s32, s32, s32);
+extern s32 func_8004C990(s32, s32);
+void func_8240429C(u8 *arg0) {
+    *(s32 *)(arg0 + 8) = func_8004C874(0x3C, 0x3E);
+    *(s32 *)(arg0 + 0xC) = func_8004C874(0x3C, 0x3F);
+    *(s32 *)(arg0 + 0x10) = func_8004C874(0x3C, 0x40);
+    func_800472E0(*(s32 *)(arg0 + 8));
+    *(s16 *)(arg0 + 4) = func_80049148(2, 1, *(s32 *)(arg0 + 8));
+    *(s32 *)(arg0 + 0x14) = func_8004C990(0x12, 3);
+    *(s32 *)(arg0 + 0x18) = func_8004C990(0x12, 2);
+    *(s16 *)(arg0 + 4) = 0xAF;
+    *(s16 *)(arg0 + 6) = 0x4C;
+    *(s16 *)(arg0 + 0) = 0x48;
+    *(s16 *)(arg0 + 2) = 0x40;
+    *(u8 *)(arg0 + 0x21) = 0;
+    *(s8 *)(arg0 + 0x20) = -1;
+    *(f32 *)(arg0 + 0x1C) = 0.0f;
+}
 
 s32 func_82404360(u8 *arg0) {
     *(s8 *)(arg0 + 0x20) = -1;
