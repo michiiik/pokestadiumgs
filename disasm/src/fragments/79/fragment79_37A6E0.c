@@ -1265,7 +1265,25 @@ void func_841155B0(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_841157D8.s")
+extern void func_84111348(s32 arg0, s32 arg1);
+extern void func_84112158(s32, s32);
+extern void func_8411FEE8(s32);
+void func_841157D8(s32 arg0) {
+    s16 var_v0;
+
+    var_v0 = *(s16 *)((u8 *)(u32)arg0 + 0x7E8);
+    if (var_v0 == 1) {
+        *(s16 *)(D_841911E0 + 0x98) = 8;
+        func_84111348(arg0, 0xF);
+        var_v0 = *(s16 *)((u8 *)(u32)arg0 + 0x7E8);
+    }
+    if (var_v0 == 0x1E) {
+        func_8411FEE8(0);
+    }
+    if (ModelAnim_IsFinished(arg0) != 0) {
+        func_84112158(arg0, 0x106);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1434,7 +1452,21 @@ void func_84116410(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_841168A0.s")
+extern u32 func_8003570C(void);
+void func_841168A0(u8 *arg0) {
+    extern u8 D_84183BDC;
+    extern u32 func_8003570C(void);
+    s32 sp1C;
+
+    if ((*(u16 *)(arg0 + 0x7EC) & 1) == 0) {
+        sp1C = *(u8 *)(arg0 + 0x618) - 1;
+        *(u16 *)(D_841911E0 + 0x98) =
+            *(u16 *)((u8 *)&D_84183BDC +
+                ((func_8003570C() % 6) * 2));
+        *(u8 *)(arg0 + 0x61F) = 0xFF;
+        func_841146D4(arg0, sp1C);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1758,7 +1790,21 @@ void BattleAnim_Dispatch_141(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8411A3D4.s")
+void func_8411A3D4(void *arg0) {
+    extern u8 D_84183C74;
+    extern u32 func_8003570C(void);
+    void *temp_v1;
+
+    if ((*(u16 *)((u8 *)arg0 + 0x7EC) & 1) == 0) {
+        *(u16 *)(D_841911E0 + 0x98) =
+            *(u16 *)((u8 *)&D_84183C74 +
+                ((func_8003570C() % 3) * 2));
+        temp_v1 = *(void **)((u8 *)arg0 + 0x2D4);
+        *(u8 *)((u8 *)arg0 + 0x619) = *(u8 *)((u8 *)temp_v1 + 0x13CF);
+        *(u8 *)((u8 *)arg0 + 0x61A) = *(u8 *)((u8 *)temp_v1 + 0x13CE);
+        *(u8 *)((u8 *)arg0 + 0x620) = *(u8 *)((u8 *)temp_v1 + 0x13CD);
+    }
+}
 #endif
 
 #ifdef VERSION_US
