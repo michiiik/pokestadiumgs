@@ -1927,7 +1927,17 @@ void func_84135284(u8 arg0, u8 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841352DC.s")
+extern u8 D_84195280[];
+extern void func_841351EC(void *, u8);
+void func_841352DC(u8 arg0) {
+    s32 idx = D_84195280[0x4D81] - 1;
+    if (idx < 0) {
+        idx = 0x1D;
+    }
+    func_841351EC(D_84195280 + idx * 0x280, arg0);
+}
+void func_841352DC_padding1(void) {}
+void func_841352DC_padding2(void) {}
 #endif
 
 #ifdef VERSION_US
