@@ -313,5 +313,34 @@ void func_80005568(S1_unk_D_800AA660 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_800055F4.s")
+extern OSMesgQueue D_800CDA10;
+void func_800055F4(void *arg0, s32 arg1) {
+    s32 taskType;
+
+    if (arg0 != NULL) {
+        Sched_ResetTaskState((u8 *)arg0);
+        taskType = *(s32 *)((u8 *)arg0 + 0x20);
+        switch (taskType) {
+        case 2:
+            D_800CD020[0xA20 / 4] = (u32)arg0;
+            return;
+        case 1:
+            if (arg1 != 0 && D_800CD020[0xA1C / 4] == 0) {
+                D_800CD020[0xA1C / 4] = (u32)arg0;
+                D_800CD020[0xA24 / 4] = 0;
+                osSendMesg(&D_800CDA10, (OSMesg)0x67, 0);
+                return;
+            }
+            D_800CD020[0xA24 / 4] = (u32)arg0;
+            return;
+        case 4:
+            if (D_800CD020[0xA1C / 4] == 0) {
+                D_800CD020[0xA1C / 4] = (u32)arg0;
+                D_800CD020[0xA24 / 4] = 0;
+                osSendMesg(&D_800CDA10, (OSMesg)0x67, 0);
+            }
+            break;
+        }
+    }
+}
 #endif
