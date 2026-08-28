@@ -53,11 +53,37 @@ void func_8820C000(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820EB14.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820ECE8.s")
+extern u8 func_8006378C(u8);
+extern void *Color_SetRGB(void *, u8, u8, u8);
+extern void func_880006E0(void *);
+extern u8 D_88005FA0[];
+void func_8820ECE8(u8 arg0, u8 *arg1) {
+    u8 sp1C[4];
+
+    if (arg0 == func_8006378C(*arg1)) {
+        func_880006E0(D_88005FA0);
+        return;
+    }
+    func_880006E0(Color_SetRGB(sp1C, 0x96, 0x96, 0x96));
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820ED44.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820F74C.s")
+extern s32 func_88202158(u8 *, s32);
+extern void func_800496A4(s32, s32);
+extern void func_800495F8(s32, s32, s32, void *, s32);
+extern u8 D_88233F50[];
+extern void *D_8800687C;
+extern void *func_88A00938(u8 *);
+extern void func_80048E30(void *, s16, s16, void *, s32);
+void func_8820F74C(s16 arg0, s16 arg1, u8 *arg2, u8 arg3) {
+    if (func_88202158(arg2, 1) == 0) {
+        func_800496A4(4, 1);
+        func_800495F8((s32)arg0 + 0xD3, (s32)arg1 + 4, 2, D_88233F50, (s32)arg3);
+    }
+    func_800496A4(8, 2);
+    func_80048E30(D_8800687C, arg0, arg1, func_88A00938(arg2), 1);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820F7EC.s")
 
