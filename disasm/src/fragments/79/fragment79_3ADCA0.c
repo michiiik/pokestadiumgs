@@ -25,7 +25,10 @@ void ParticleGfx_SetPrimColor_fragment79(u8 r, u8 g, u8 b, u8 a) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_8413E6B8.s")
+void func_8413E6B8(u8 arg0, u8 arg1, u8 arg2, u8 arg3) {
+    gDPPipeSync(D_800D0510++);
+    gDPSetEnvColor(D_800D0510++, arg0, arg1, arg2, arg3);
+}
 #endif
 
 #ifdef VERSION_US
@@ -115,11 +118,33 @@ void func_8413F034(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_8413F060.s")
+extern void func_80044270(s32, s32, s32, s32, s32, s32, s32, s32, s32);
+void func_8413F060(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
+    s32 temp_v0;
+    s32 temp_a2;
+    s32 temp_a3;
+    temp_a2 = arg2;
+    temp_a3 = arg3;
+    if ((temp_a2 >= 7) && (temp_a3 >= 7)) {
+        temp_v0 = temp_a2 - 6;
+        func_80044270((s16)(arg0 + 2), (s16)(arg1 + 2), (s16)temp_v0, (s16)(temp_a3 - 6), 0, 0, (0x10000 / temp_v0) & 0xFFFF, 0, 0);
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_8413F12C.s")
+extern void func_80044270(s32, s32, s32, s32, s32, s32, s32, s32, s32);
+void func_8413F12C(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
+    s32 temp_v0;
+    s32 temp_a2;
+    s32 temp_a3;
+    temp_a2 = arg2;
+    temp_a3 = arg3;
+    if ((temp_a2 >= 7) && (temp_a3 >= 7)) {
+        temp_v0 = temp_a2 - 6;
+        func_80044270((s16)(arg0 + 2), (s16)(arg1 + 2), (s16)temp_v0, (s16)(temp_a3 - 6), 0, 0, (0x10000 / temp_v0) & 0xFFFF, 0, 0);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -185,7 +210,22 @@ void func_8413F5F4(s16 arg0, s16 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_8413F640.s")
+extern void func_8413F5A8(s32,s32,s32,s32);
+extern s32 func_800630F0(s32);
+extern u8 D_84186F98[];
+extern u8 D_84186FE8[];
+void func_8413F640(s16 arg0, s16 arg1, s32 arg2) {
+    s32 temp_v0;
+    s32 saved_index;
+    u8 *temp_v0_2;
+    temp_v0 = func_800630F0(arg2 & 0xFF);
+    if (temp_v0 != 0x12) {
+        saved_index = temp_v0;
+        temp_v0_2 = D_84186F98 + saved_index * 3;
+        ParticleGfx_SetPrimColor_fragment79(temp_v0_2[0], temp_v0_2[1], temp_v0_2[2], 0xFF);
+        func_8413F5A8((s32)arg0, (s32)arg1, 0x24, D_84186FE8[saved_index]);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1123,7 +1163,11 @@ s32 func_84148494(u8 arg0, u8 arg1, u8 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_841484CC.s")
+s32 func_841484CC(u8 arg0, u8 arg1, u8 arg2, u8 arg3) {
+    u8 *value;
+    value = func_841460C0(arg0, arg1, arg2);
+    return (value[8] & arg3) != 0;
+}
 #endif
 
 #ifdef VERSION_US
