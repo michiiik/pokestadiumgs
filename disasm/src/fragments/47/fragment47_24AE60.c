@@ -46,7 +46,14 @@ s32 func_86004E84(Func86004E84State *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_86005CB4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_860062E0.s")
+extern u16 D_800CE060[];
+s32 func_860062E0(s32 arg0, u16 arg1) {
+    if (D_800CE060[4] & arg1) {
+        return 1;
+    }
+    return 0;
+}
+void func_860062E0_padding(void) {}
 
 extern void func_86001AFC(s32);
 void func_86006318(s32 arg0) {
@@ -66,7 +73,31 @@ void func_86006318(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_86006448.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_86006538.s")
+extern u8 D_8600DE30[];
+extern void func_86006364(s32);
+extern void func_860057D0(s32, f64);
+extern s32 StageContext_GetFadeMode(void);
+extern void func_86007648(s32, s32);
+extern void func_86006318(s32 arg0);
+void func_86006538(s32 arg0) {
+    s32 count;
+    s32 i;
+
+    func_86006318(arg0);
+    func_86006364(arg0);
+    if (StageContext_GetFadeMode() == 1) {
+        func_86007648(arg0, 2);
+    }
+    count = *(s32 *)D_8600DE30;
+    i = 0;
+    if (count > 0) {
+        do {
+            func_860057D0(arg0, *(f64 *)((u8 *)arg0 + 0x6890) / (f64)count);
+            count = *(s32 *)D_8600DE30;
+            i++;
+        } while (i < count);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_860065E8.s")
 
