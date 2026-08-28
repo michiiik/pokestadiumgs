@@ -52,7 +52,32 @@ void func_87E0F740(u8 *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E0FDB4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E0FFA0.s")
+extern Gfx *D_800D0510;
+extern u8 D_80094E38[];
+extern u8 D_80094F50[];
+extern void func_800504BC(s16 *);
+extern s32 func_8004C990(s32, s32);
+extern s32 func_8004D1FC(u8 *);
+extern void func_80044270(s16, s16, s16, s16, s32, s32, s32, s32, s32);
+void func_87E0FFA0(void *arg0, s32 arg1) {
+    s32 temp_v0;
+    s32 sp40;
+    s16 coords[2];
+
+    if (arg1 != -1) {
+        func_800504BC(coords);
+        gSPDisplayList(D_800D0510++, D_80094E38);
+        temp_v0 = func_8004C990(*(u16 *)((u8 *)arg0 + 0x24), arg1);
+        sp40 = temp_v0;
+        func_8004D1FC((u8 *)(u32)temp_v0);
+        func_80044270((s16)(*(s16 *)((u8 *)arg0 + 8) + coords[0]),
+                      (s16)(*(s16 *)((u8 *)arg0 + 0xA) + coords[1]),
+                      *(s16 *)((u8 *)(u32)sp40),
+                      *(s16 *)((u8 *)(u32)sp40 + 2),
+                      0, 0, 0x400, 0x400, 0);
+        gSPDisplayList(D_800D0510++, D_80094F50);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E10094.s")
 
@@ -226,7 +251,20 @@ void func_87E11AB8(void) {
     func_8003C6B8((*(s32 *)((u8 *)(D_87E1EBB8) + (0x934))));
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E11B30.s")
+extern u8 D_87E1A4B0[];
+extern void func_8004C54C(s32, s32);
+void func_87E11B30(s32 arg0) {
+    u8 *var_a1;
+    u8 *temp_v0;
+    *(u8 *)((u8 *)(u32)D_87E1EBB8 + 0x938) = arg0;
+    temp_v0 = *(u8 **)((u8 *)(u32)D_87E1EBB8 + 0x2C4);
+    if (*(u8 *)(temp_v0 + 0x2182) & (1 << arg0)) {
+        var_a1 = ((u8 *)(u32)temp_v0) + (arg0 * 0x6C0) + 0x6AA;
+    } else {
+        var_a1 = D_87E1A4B0;
+    }
+    func_8004C54C(0x15, (s32)var_a1);
+}
 
 extern s32 func_8004C874(s32, s32);
 extern void func_8004C54C(s32, s32);
