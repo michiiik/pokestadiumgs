@@ -75,11 +75,13 @@ void func_841518D0(void *arg0, u8 arg1, u8 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84151B8C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84151CD8.s")
+void *func_84154B64(s32);
+void func_84151CD8(void *arg0, u8 arg1) { s32 base; base = (s32)(u32)arg0 + 4; if ((*(u8 *)((u8 *)func_84154B64((1 - arg1) & 0xFF) + 0x19) & 8) == 0) { *(u8 *)((u8 *)(u32)base + arg1 + 8) = 0xFF; *(u8 *)((u8 *)(u32)base) |= 2; } }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84151D3C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84151DD4.s")
+void *func_84154B64(s32);
+void func_84151DD4(void *arg0, u8 arg1) { void *state; s32 base; state = func_84154B64(arg1); base = (s32)(u32)arg0 + 4; if (((*(u8 *)((u8 *)state + 0x18) & 0x10) == 0) && (((s32)*(u16 *)((u8 *)state + 0x2A) >> 2) < (s32)*(u16 *)((u8 *)state + 0x28))) { *(u8 *)((u8 *)(u32)base + arg1 + 8) = 0xFF; *(u8 *)((u8 *)(u32)base) |= 2; } }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84151E44.s")
 
