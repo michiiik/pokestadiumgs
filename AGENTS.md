@@ -10,141 +10,44 @@ referenced docs and in git history, not here.
 
 ### 1.1 Two kinds of session
 
-**Decompilation sessions** (the goal is "decompile owners in fragment N /
-family F / file X") run **fleet mode**: the session is a coordinator that
-assigns one source file each to 4–8 Sonnet decompilation agents, which run
-the hand loop in §2.5 against the runner API for a 60-minute time box, commit
-their file by explicit path, and report the spellings that matched. Measured
-on 2026-08-27 (four agents, 20 minutes): 40 owners accepted, ~17k tokens per
-matched owner (~10k in text-segment files, ~55k in fragments), versus 4–5
-owners/hour for a single hand session. The mechanical sweeps are saturated
-(every remaining owner of 64 instructions or fewer has been probed with the
-current variant set); run them only when §2.5 says so.
+**Decompilation sessions** ("decompile owners in fragment N / family F /
+file X") run **fleet mode**: the session is a coordinator that assigns one
+source file each to 4–8 Sonnet agents, which follow `docs/FLEET_AGENT.md`
+for a 45–60 minute box and report what matched. Measurements and past
+incidents behind these rules: `docs/FLEET_LOG.md`.
 
 Coordinator rules:
 
-- One file per agent, never shared (the runner enforces it: the first install
-  into a file claims it in `disasm/probe-stats/claims.json`, and another live
-  session's install is refused with `file_claimed_by_other`). Pick files with
-  `python3 tools/pragma_targets.py rank-files --exclude-recent 4` — it scores
-  files by recorded probe hardness (`fresh` owners with < 5 attempts plus
-  `drift` owners; register ties count zero) and hides files touched by any
-  session in the window or dirty in the tree — and cross-check with
-  `python3 tools/file_claims.py free --exclude-recent 4`, which also sees
-  claims that have not been committed yet. `score` is a count, not a rate:
-  look at the `ties` column before trusting a big file at the top.
-- Before assigning a file run `python3 tools/analyze_family_shapes.py
-  siblings --source <file>`: if its owners cluster around a shared `jal`
-  target or carry a `gbi-macro` tag, the agent's first job is the shared
-  callee (`unlock --function <callee>` shows how many owners it unblocks),
-  then the siblings with the same spelling. `siblings --all --top 30` ranks
-  the largest unsolved families tree-wide (984 groups on 2026-08-28; the
-  biggest have 7–12 members).
-- The agent prompt is now: "Read `docs/FLEET_AGENT.md`; your file is
-  `disasm/src/<X>.c`; time box N minutes." That document carries the §2.5
-  loop, the §4 table, the runner field cheat-sheet, `tools/fleet_probe.py`
-  (JSON batch in, diagnostic table out) and `tools/file_brief.py` (solved
-  signatures, extern block, record strides, SDK macros, and the callees
-  defined later in the file), the hard rules, and the report format. Add
-  only the file-specific facts (`.rodata` subsegment status, owners to skip).
-- When agents report, fold every *second* confirmation of a spelling into §4,
-  add runner bugs and recurring unsolved shapes to §5, then reassign files.
-  Do not run tooling changes and a fleet at the same time in one checkout.
-- Do not spawn investigation agents for this loop; the assembly reading is
-  the agents' job, not a separate phase.
-- **Never introduce a new rule through a mid-task message.** A message to a
-  running agent arrives wrapped in a system-reminder, which is exactly the
-  shape of a prompt injection; on 2026-08-28 two separate agents refused a
-  genuine coordinator instruction (a changed `git commit` invocation) on
-  those grounds, and they were right to — one of them also caught that the
-  instruction was wrong. Commit the rule to `docs/FLEET_AGENT.md` or this
-  file first, then send at most a pointer: "re-read `docs/FLEET_AGENT.md`
-  §5, it changed in commit `<sha>`." An agent can verify a committed
-  document; it cannot verify a message. Mid-task messages should otherwise
-  carry only scope changes the agent cannot derive itself — stop, switch
-  file, skip these owners — and should never ask an agent to touch a path
-  outside its assignment.
-- `docs/FLEET_AGENT.md` already carries the lessons of 2026-08-28: search
-  only inside the repository (a `find / -iname gbi.h` walked `~/Music` and
-  raised a macOS media-library prompt; the header is
-  `disasm/lib/ultralib/include/PR/gbi.h`), per-agent scratch directories
-  (`$CLAUDE_JOB_DIR/tmp/<file>/`; agents overwrote each other's `batch1.py`),
-  and the per-owner cap (~12 variants / ~8 minutes; stop after two batches at
-  `register_allocation_only` ≥ 0.99 — the runner now says so itself via the
-  `futility` field). Register ties go to the permuter, not to agents:
-  `docs/REGISTER_TIES.md`.
-- Measure yield per file after the first box and do not reassign a file that
-  yielded fewer than two accepts: its remaining owners go to §5. Wave of
-  2026-08-28 on the six text-segment files no session had touched for 19
-  hours (`585D0` ×2, `14640`, `6E850`, `CE80`, `4AC10`): 12 accepts from
-  ~295 variants and ~1.25M tokens (~105k per accept versus ~17k in the
-  pilot), and half of them came from one file (`4AC10`, 6/14, where a single
-  spelling — the `gbi.h` macros — unlocked a family). Files left untouched by
-  a running fleet are usually untouched because their small owners are
-  register-allocation ties, not because nobody got to them. When the
-  text-segment pool looks like that, point the wave at fragments or at the
-  ≥ 0.95 near-miss pool.
-- **Rank by the `fresh` column, not by `rank-files`' composite `score`.**
-  `score` is `fresh + drift`, a count; a file whose score is mostly `drift`
-  is a file whose owners other sessions already probed and failed. Evening
-  wave of 2026-08-28: the two files picked off the composite score
-  (`fragment7_BA250` 19 fresh / 28 drift, `fragment17_10FFC0`) returned
-  0 accepts between them, while every fresh-heavy fragment returned 4–10.
-- **Hand each successor agent the previous one's winning spellings and an
-  explicit skip list.** This is what sustains yield across boxes:
-  `fragment79_393CA0` gave 10, 10, then 8 owners over three boxes at
-  ~20–25k tokens per accept, versus ~105k in the morning wave with no
-  hand-off. Put the spellings in the prompt verbatim (bases, strides,
-  store order, argument widths), and list the exhausted owners by name so
-  the next agent does not re-probe them.
-- Evening wave totals for comparison: 69 owners from 13 agent-boxes across
-  9 fragment files. Fragments are *not* 5× more expensive than text
-  segments once family unlocks are used; that earlier ratio measured
-  agents working without them.
-- Two coordinators in one checkout: a coordinator that commits with a broad
-  stage (`git add -A`, `git commit -a`) sweeps the other fleet's uncommitted
-  installs into its own commits (`0525ec9`); commit by explicit path only,
-  and treat a dirty file as owned even when `git log` shows no recent commit.
-- This checkout is usually shared with a **Codex session** working the same
-  ROM. It does not set `CLAUDE_JOB_DIR`, so its claims carry a bare-`$PPID`
-  tag and its commit messages are generically named ("Decompile fragment NN
-  … helpers"). Check `python3 tools/file_claims.py list` and `git status`
-  before assigning, and re-check when reassigning a file for a second box:
-  on 2026-08-28 both sessions worked `fragment43_1E5A10.c` for ten minutes
-  before the overlap was spotted (Codex commit `ae9d92e` interleaved with
-  five of ours). When it happens, move your agent and tell it **not** to
-  revert or stash — part of the working tree is the other session's.
-- Claim identity is per **job**, not per agent: every agent under one
-  coordinator shares `$CLAUDE_JOB_DIR`, so claims cannot separate them, and
-  a per-agent `CLAIMS_OWNER` export does not survive between Bash calls
-  (agents refused their own claims with it). Install-time claims are
-  therefore advisory — `PRAGMA_CLAIMS_ENFORCE=1` restores refusal — and the
-  guard that matters stays at commit time (`12-claims.sh`). Keep assigning
-  one file per agent by hand; the registry is a warning, not a lock.
-
-**Tooling and process sessions** (the goal changes how the pipeline works:
-runner, sweep, classifier, hooks, docs, layout) start with **parallel
-read-only investigation agents** — one per independent question (the
-affected tools, the assembly shape, the probe statistics, the docs, the git
-history) — and synthesise their reports into a short plan with evidence and
-numbers before proposing changes. Then:
-
-- Investigation agents are read-only: no source edits, no runner batches, no
-  `make`. They report facts with file/line references and counts.
-- Implementation is delegated to coding agents with a precise spec (files,
-  functions, tests, constraints). Run one agent per independent change in an
-  isolated git worktree; forbid them from editing `AGENTS.md`, `README.md`, and
-  `disasm/src` unless that is the task, and require the unit-test suite to pass
-  before they commit on their branch.
-- Live-runner work (probing, gating, renaming, extern cleanup) must run in the
-  main checkout, one process at a time, and must never overlap with a merge.
-- The coordinating session merges branches in order, resolves conflicts, reruns
-  `tools/run_tests.sh`, folds the agents' "doc notes" into this file, and
-  commits. Reviewing and integrating stays with the coordinator; writing code
-  is delegated.
-- Measure before and after. Every process change must cite the metric it moves
-  (`tools/report_candidate_yield.py`, `tools/near_miss_kinds.py report`,
-  `COVERAGE.md`, `tools/name_decompiled.py debt`).
+- One file per agent, never shared, and assignment is manual: install-time
+  claims are advisory (§1.2), not a lock.
+- Pick files with `python3 tools/pragma_targets.py rank-files
+  --exclude-recent 4`, ranking by the **`fresh`** column, not by `score`
+  (`score` counts drift owners other sessions already failed on). Cross-check
+  `python3 tools/file_claims.py free --exclude-recent 4` and `git status`,
+  and re-check both when reassigning a file for a second box.
+- Before assigning, run `python3 tools/analyze_family_shapes.py siblings
+  --source <file>`. If the owners cluster on a shared `jal` target or carry
+  a `gbi-macro` tag, the agent's first job is that family, not the file's
+  smallest owner (`unlock --function <callee>` shows what a helper unblocks).
+- The agent prompt is: "Read `docs/FLEET_AGENT.md`; your file is
+  `disasm/src/<X>.c`; time box N minutes." Everything file-specific comes
+  from `docs/regions/<path>.md`, which `tools/file_brief.py` prints to the
+  agent — put new file-specific findings there, not in this document.
+- After each box: append the agent's winning spellings and its exhausted
+  owners to the region notes (`python3 tools/region_notes.py append`), fold
+  a spelling into §4 only once two *different* files confirm it, and add
+  tool defects to §5.
+- Reassign a file only if its box yielded two or more accepts; otherwise take
+  a fresh file. Hand every successor agent the predecessor's spellings and
+  skip list — that is what keeps yield up across boxes.
+- Never introduce a rule through a mid-task message: an agent cannot verify a
+  message, and three have refused one as prompt injection. Commit the rule to
+  `docs/FLEET_AGENT.md` or this file, then send a pointer to the sha. Messages
+  may carry scope changes only (stop, switch file, skip these owners), and
+  must never ask an agent to touch a path outside its assignment.
+- Do not run tooling changes and a fleet in one checkout at the same time.
+- Do not spawn investigation agents for this loop; reading the assembly is
+  the agents' job.
 
 ### 1.2 Shared-checkout etiquette
 
@@ -157,19 +60,24 @@ numbers before proposing changes. Then:
   read-only to the sibling checkout for `disasm/asm` and probe stats.
 - Restart the MCP server after editing `tools/try_pragma_compare*.py` (the
   module is loaded once per server process).
+- A **Codex session** commonly shares this checkout. It does not set
+  `CLAUDE_JOB_DIR`, so its claims carry a bare-`$PPID` tag and its commit
+  messages are generic ("Decompile fragment NN … helpers"). Treat any dirty
+  file as owned by someone.
+- Install-time file claims (`disasm/probe-stats/claims.json`, written by the
+  runner) are **advisory**: identity is per job, not per agent, so a conflict
+  warns and proceeds. `PRAGMA_CLAIMS_ENFORCE=1` makes it refuse. The
+  commit-time hook (§1.3) is the guard that matters.
 
 ### 1.3 Commits and hooks
 
 - Enable the tracked hooks once per checkout: `git config core.hooksPath .githooks`.
 - `.githooks/pre-commit` runs every executable in `.githooks/pre-commit.d/`:
   `10-coverage.sh` regenerates and stages `COVERAGE.md` from the index so the
-  number lands in the commit it describes; `12-claims.sh` runs
-  `tools/check_file_claims.py --staged` and blocks committing a `disasm/src`
-  file that another live session's runner claim covers, or claimed files from
+  number lands in the commit it describes; `12-claims.sh` blocks committing a
+  `disasm/src` file another live session's claim covers, or claimed files from
   two sessions at once (`PRAGMA_CLAIMS_SKIP=1` bypasses with a justification;
-  `CLAIMS_OWNER=<tag>` lets a coordinator commit for its own agents; a claim
-  whose session tag is a bare `$PPID` — no `CLAUDE_JOB_DIR` — only warns);
-  `15-provenance.sh` blocks removing a
+  bare-`$PPID` identities only warn); `15-provenance.sh` blocks removing a
   `GLOBAL_ASM` pragma that has no `accepted` runner attempt on file
   (`DECOMP_PROVENANCE_SKIP=1` bypasses, only with a stated justification);
   `20-tests.sh` runs `tools/run_tests.sh` when `tools/*.py` is staged
@@ -177,23 +85,16 @@ numbers before proposing changes. Then:
 - Commit verified batches per source file or per sweep run, not one function
   per commit. A commit message names the subsystem or family, not a single
   helper.
-- **In a shared checkout, commit with `git commit --only <path>`, never
-  `git add <path> && git commit`.** The git index is shared by every
-  process in the checkout, so a plain `git commit` includes whatever any
-  other session has staged, even when you staged only your own file: on
-  2026-08-28 a coordinator's tooling commit (`c709fc3`, staged with three
-  explicit `tools/` paths) swept in an agent's `fragment79_38EFE0.c` that
-  was sitting staged-but-uncommitted. `--only` builds a temporary index
-  from HEAD plus the named paths, so another session's staged work is
-  untouched and stays staged.
-- Do **not** add `COVERAGE.md` to the `--only` list. `git commit --only`
-  points `GIT_INDEX_FILE` at that temporary index, so `10-coverage.sh`
-  regenerates and stages the snapshot into the commit by itself (verified
-  on `9494a60`, which named only the agent's source file). Telling an agent
-  to name it was a coordinator error on 2026-08-28: an agent correctly
-  refused, on the grounds that it had been told to touch a file outside its
-  assignment. Instructions to an agent must never ask it to stage someone
-  else's path.
+- **In a shared checkout, commit with `git commit --only <your path>`, never
+  `git add <path> && git commit`.** The git index is shared by every process
+  in the checkout, so a plain `git commit` also commits whatever another
+  session has staged; `--only` builds a temporary index from HEAD plus the
+  named paths and leaves their work staged and untouched
+  (`docs/FLEET_LOG.md` records the commit where this went wrong).
+- Name only your own path. `COVERAGE.md` reaches the commit by itself:
+  `--only` points `GIT_INDEX_FILE` at that temporary index and
+  `10-coverage.sh` stages the snapshot there. Never ask an agent to stage a
+  path outside its assignment.
 - `COVERAGE.md` is generated; never hand-edit it. `README.md` only points at it.
 - Tests that create throwaway git repos must strip `GIT_DIR`, `GIT_INDEX_FILE`
   and friends from their subprocess environment (see `_GitFixture`): the
@@ -420,7 +321,11 @@ file at a time so declarations, structs and names accumulate in one place.
 - `python3 tools/file_brief.py <file> [--json]` — read this before touching a
   file: solved signatures, extern block, symbols by solved-body count, record
   strides, SDK macros, and the callees defined later in the file with their
-  real return types.
+  real return types. Prints that file's `tools/region_notes.py` notes first.
+- `python3 tools/region_notes.py show|append|list` — the per-file notes
+  store behind `file_brief.py`'s banner: file-specific spellings, skip
+  lists and unsolved shapes that do not generalise into §4/§5, at
+  `docs/regions/<source path>.md`.
 - `python3 tools/analyze_family_shapes.py siblings --source <file> |
   --all --top N` and `unlock --function <func>` — opcode-shape clustering of
   remaining owners (registers/immediates abstracted, `jal` targets kept,
@@ -506,7 +411,6 @@ by these; always probe and gate.
 | `lhu`/`andi` bit test | `s32 result = 0; if (global & mask) result = 1; return result;` with `u16` global | 5 | no ternary / compact bool |
 | Byte-argument state predicates | `u8` parameter, initialised `s32` result, nested explicit checks over raw byte offsets | 4 | `s32` params did not match |
 | Word-field predicates | Uniquely named local struct overlay padded to 0x10/0x14, comparison written `arg0 == state->value` | 2 | overlay is local |
-| Isolated stack-slot immediate drift | 12-byte local with 4-byte leading pad; declare a temp pointer before the saved-result pointer | 3 (`14640.c`) | only for slot drift |
 | Forwarded 3-arg wrapper into 5-arg helper | Four-word `s32 locals[4]`, pass `&locals[2]`, `&locals[1]` | 2 | keeps 0x30 frame |
 | Post-call index fallback | Keep the incoming index formal in place; single `u8 *` temp from `(u8 *)(u32)f(arg0) + (arg1 << 4)` | 1 | — |
 | Compact enum dispatcher | C `switch` over a `u8` global with literal cases | 1 | blocked by §2.7 when a jtbl is emitted |
@@ -518,58 +422,21 @@ by these; always probe and gate.
 | Globals loaded with `lw` into an argument | Try `void *` before `u32` | scan | no help for `lui`-before-`sw $ra` scheduling drift |
 | Near-miss `immediate_drift` with an `addiu $sp` frame mismatch | `near_miss_kinds` `frame-padding` (add/remove a pad local to hit the baseline frame) | 2/2 probe hits accepted (first bounded run, 2026-08-27) | — |
 | Near-miss `register_allocation_only` / `operand_or_scheduling_drift` | `commute-swap`, `decl-order`, `hoist-temp`, `type-width`, `loop-form`, `reorder-store-call` | 0 hits in 146 attempts on the first run — treat as unproven; prefer hand analysis of the first differing instruction | — |
-| Float divide by a power of two | Divide by the **integer** literal (`x / 16`), not `16.0f`: a float literal divisor is strength-reduced to `mul.s` by the reciprocal, an int divisor keeps `div.s` | 1 (`func_8130A98C`) | — |
 | Guard/return polarity | IDO branches on the negated condition: write the `if` in the polarity whose negation is the observed `beq`/`bne`, e.g. `if (arg1 == x) { ... } return v;` rather than `if (arg1 != x) return v;` | 2 (`func_81306EE0`, `func_80059234`) | — |
 | Display-list append (`Gfx` command into `D_800D0510++`) | Use the real `gbi.h` macros — `gSPDisplayList(D_800D0510++, addr)`, `gDPSetFillColor`, `gDPFillRectangle` — never hand-written `p->words.w0 = ...; p->words.w1 = ...;` stores, which stall at 0.93–0.95 on a constant-load/pointer-increment scheduling swap | 7 (`4AC10.c`: `func_8004AC24/AE3C/AF18/A5B8/A708/AD00`; `fragment47_24E0A0.c`: `func_8600B474`) | holds across overlays; RDP texture-load sequences (`gDPSetTile`/`gDPLoadBlock`, `func_8004A010`) still untried, and one owner (`func_82C01FE4`) drifts on the order of two independent `lui` loads inside the macro |
 | Several `return 1;` guards sharing one epilogue | A single `return a \|\| b \|\| c \|\| d;` expression; separate guard clauses allocate differently and add bytes | 2 (`func_8130AA54`, `func_80057A80`) | — |
-| Wrapper whose callee result feeds a conditional second call | `s32 result = f(arg0, N); if (result != 0) { g(arg0); } return result;` (second call's value discarded; `$v1` spill/reload across the call is the tell) | 3 (`func_8005A0B4/A0F4/A134`) | — |
-| Table-field forward with 112-byte stride into bcopy/bzero | Load the field into an explicit `s32 v0 = *(s32 *)(D_X + idx * 112);` **before** the call; inlining it into the argument reorders the frame allocation | 6 (`585D0.c`) | same stride/forward shape |
-| Non-power-of-two stride (`arg2 * 47`) | Hoist the multiply into its own local declared **before** the table-load local to fix `addu` operand order | 2 (`func_8005C880/C988`) | — |
-| Selector index into two parallel tables | `idx = f(SEL, -1); if (arg0 == 0) D_A[idx * 0xC] + ADD else D_B[idx * 0xC] + ADD` — note the inverted condition sense | 11 (`517E0.c` wrapper family) | — |
-| Small struct copy from a returned pointer | Uniquely named `typedef struct { s32 a, b; }` and `*arg0 = *(Pair *)((u8 *)ret + off);` | 3 (`func_80054210/8005493C/8005487C`) | — |
 | Nested command constructor from a fixed record | Use a local typed overlay with the proven padding/child field, then pass the nested field directly to the helper; keep each constructor's exact field width | 10 (`229E0.c`: `func_8003FD98/3FE6C/40004/40050/4009C/400E8`; `4EE50.c`: `func_8004E868/4E8D0/4E9C8/4EA60`) | only when the record offsets and helper call shape are proven |
-| Fixed-record parser/serializer with narrow fields | Keep the raw record base, use explicit `u8`/`u16` temporaries and direct offset loads/stores; parser loops use the observed break/fill shape, serializers keep the observed conversion order | 8 (`615D0.c`) | exact record format only; do not infer a shared struct from this pattern |
-| Byte-indexed state-table loop | Use a byte-typed argument/index, initialize the table pointer before the loop, and preserve explicit post-increment/index updates around the lookup | 2 (`615D0.c`: `func_80060B28/60F98`) | only when the assembly shows byte masking and the same loop-carried pointer |
-| Aligned pool wrapper with conditional initialization | Round the requested size with `(arg0 + 3) & ~3`, declare the allocation local before the result, and initialize/return the result only when the block is nonzero | 2 (`3A00.c`: `func_80002E00/030D0`) | same pool-allocation wrapper shape |
-| Aligned graph-node constructor wrapper | If the pool handle is nonzero, replace the incoming result with `MainPool_AllocAligned`; if the result is nonzero, call the constructor with the observed old-style narrow-field formals, then return it | 4 (`4EE50.c`: `func_8004E368/4E3C8/4E438/4E52C`) | only for the matching allocation/constructor call sequence |
-| Callee prototyped earlier as `void` but its return is needed | Block-scope re-prototype does not work (hard "redeclaration" error); the earlier definition must change to return the value — do it as a separate gated change | 1 (`func_80055BA8`, open) | — |
-| Wrapper called with four registers but only three read | Declare only the parameters the body reads (`a3` was caller garbage); the fourth formal changes the frame | 1 (`func_841518D0`) | — |
-| Record-stride forwarding wrapper (overlay fragments) | `helper(&BASE[BASE[idx_field] * STRIDE], a0, ...)` with the remaining formals forwarded verbatim; the clamp variant is `idx = BASE[idx_field] - 1; if (idx < 0) idx = LAST;` then the same forward | 12 (`fragment79_393CA0.c`, bases `D_84195280` stride 0x280, `D_84195208`, `D_841951F8`) | argument widths vary per owner (`u8`/`s16`/`u16`, 5th arg stack-passed) — read each `.s` |
-| Pointer-table guard lookup | `if (arg0 < 4) { u8 *ptr = D_84186160[arg0]; if (ptr) helper(ptr, ...); }` | 2 (`func_84134D80`, `func_84135B8C`) | a `ptr + 8` variant exists; pick by the offset in the `.s` |
-| `_bzero`-then-forward call chain | `_bzero(dst, N); v0 = ctor(a, b); dst[0] = v0; dispatch(field, &callback, dst);` — the callback is referenced by address even when it is still an unsolved sibling | 5 (`fragment43_1E5A10.c`: `func_8AC02C80/02FCC/03334/02770/02830`) | `_bzero` may come before or after the constructor; word stores precede byte stores |
-| Dual-global notify chain | `func_8411EF08((u8 *) D_84191208)` — an `s32`-typed global holding a pointer bit pattern, passed straight through, then the second global | 2 (`func_84120A50`, `func_84120CA4`) | only where the global is `s32`-typed but dereferenced |
-| Index-arithmetic loop over a strided array | `for (i = 0; i < n; i++) { ... &arr[i * STRIDE] ... }` — the pointer-accumulator spelling allocates differently | 2 (`func_86009318`, `func_86009260`) | — |
-| Dead tail longer than one `jr`/`nop` pair | When `symbol_size_drift` is more than 8 bytes short, add N uniquely-named trailing `void <owner>_paddingK(void) {}` helpers; `#pragma C_FUNCTION_PADDING` did not reproduce it | 1 (`func_841352DC`) | one owner so far; prefer the pragma first |
 | General | Preserve narrow `sb`/`sh`/`sw` widths, initialise results before NULL checks, raw 32-bit address arithmetic (`(u8 *)(u32)global + off`) before inferred structs, `uintptr_t` casts for raw addresses, explicit `s32` loop counters, array-index vs pointer-add as separate variants, deliberate signed/unsigned masks | repo scan | ABI hypotheses until compared |
 
 Type spellings: `u8-void` and `s32-s32` account for essentially all m2c-draft
 accepts; other widths only on diagnostic evidence via the variant policy.
 
+A row here generalises across two or more source files. A spelling verified
+in only one file lives in that file's notes under `docs/regions/` and
+reaches an agent through `tools/file_brief.py`, not here.
+
 ## 5. Tooling backlog and recurring unsolved shapes
 
-- Shape (blocking, 2026-08-28): adding a **second formal** to an
-  already-accepted one-parameter function costs +0x10 of `.text` (IDO
-  reserves an incoming-argument save area) regardless of the new
-  parameter's type. This makes the `func_84111E50` fix unviable and leaves
-  `func_841137F8`, `func_8411388C`, `func_8411B160`, `func_84115988`
-  blocked. It is *not* a blanket N→N+1 rule: the same edit on
-  `BattleAnim_ModelDispatch_044` produced zero drift. The probe's
-  link-shape check reports it as `section_layout_drift` before any gate —
-  always probe a `companion_edits` change rather than reasoning about it.
-- Shape: an incoming-argument stack-home spill (`sw a0, N(sp)` with no
-  intervening call) that no C spelling reproduces — the single most common
-  dead end in fragment work (7+ owners in `fragment79_393CA0.c` alone,
-  plus `func_8000DDC8`/`func_8000DE34`, `func_82C02664`). Drop an owner as
-  soon as its first diff is this.
-- Shape: an unaligned 4-byte copy assembled as `lwl/lwr`+`swl/swr` needs a
-  **struct-typed assignment** (`*(Pair16 *)(p + a) = *(Pair16 *)(p + b);`
-  with a 2×`s16` typedef); a plain `*(s32 *)` cast compiles to `lw`/`sw`
-  because IDO trusts the cast's alignment (`func_82201C70`: raw 0.26 →
-  0.74, size exact, still unaccepted).
-- Shape: a leading null/zero guard that IDO emits as a branch-likely
-  (`bnel`/`beql`) where every C spelling produces a plain `bne`
-  (`func_8AE011E0`/`func_8AE01248`, `func_84112418`). The §4 guard-polarity
-  row does not cover it.
 - Runner: `probe_unavailable` / `list index out of range` also reproduces on
   `func_82C04880` (`fragment83_code.c`) — same last-owner diagnostics bug,
   now five recorded instances.
@@ -578,11 +445,6 @@ accepts; other widths only on diagnostic evidence via the variant policy.
   callee-declaration scan injects one, the companion edit corrects the
   file-level extern). Valid C, harmless, but `dedupe_externs.py` should
   learn to fold it away (`fragment47_24E0A0.c`, `func_87C00160`).
-- Shape: `func_86007F6C` and `func_86009D7C` (`fragment47_24E0A0.c`) both
-  plateau at 0.909 with one extra instruction and an unexplained
-  `mov.s $f12,$f14` shuffle, at exact instruction counts — a float
-  argument-register scheduling difference worth its own investigation.
-
 - Runner: `probe_error` / `list index out of range` on the last pragma owner
   of a file when the function has trailing alignment nops
   (`func_8005633C`, `func_8130CDD4`, `func_80021BBC`, `func_8001FC60`,
@@ -590,34 +452,6 @@ accepts; other widths only on diagnostic evidence via the variant policy.
   is a diagnostics-path bug, not a candidate problem.
 - Runner: `654A0.c` cannot get its `.rodata` subsegment until asm-processor
   handles mixed 4/8-byte `.late_rodata_alignment` without growing `.text`.
-- Shape: `u8 *p = arg0 + 4; p[arg1 + 8] = 0xFF; p[0] |= 2;` — IDO keeps the
-  table pointer in `$t7`; no declaration-order/pointer-form variant reproduced
-  it (`func_841523BC`, `func_84151CD8`, likely `func_84151DD4`). Needs a
-  dedicated variant family.
-- Shape: decrement/increment counter pairs stuck at similarity 1.0 with
-  `$v0`/`$v1` swapped (`func_8130B91C`, `func_8130B95C`).
-- Shape: 15-case dispatcher `func_80050D20` matches except for how IDO shares
-  the last case's tail with `default` (size 200 vs 196).
-- Shape: jump-table owners can remain normalized matches with relocation-only
-  immediate drift even after a file has a `.rodata` subsegment
-  (`func_80060AC8`, `func_80060B74`, `func_8006179C`, `func_80067930`,
-  `func_80002178`); preserve the assembly owner until the table offset is
-  proven rather than accepting the normalized score.
-- Shape: large fixed-record constructor `func_8004E610` reaches similarity 1.0
-  with equal 312-byte output, but IDO assigns the stack byte load to a
-  different temporary (`$t0` versus `$t8`); declaration-order and temporary
-  variants did not resolve it.
-- Shape: `func_8004E298` remains an instruction-drift near miss (100 generated
-  bytes versus 112 expected), with the first difference in the ABI stack-home
-  sequence; do not pad it without proving the missing body shape.
-- Shape: `func_80067800` has a one-instruction return-tail drift and the
-  permuter cannot assemble its `.late_rodata_alignment`; preserve the helper
-  until the late-rodata path is repaired.
-- Shape: `func_8004B010` (`4AC10.c`, 0.94) re-reads global `s16 D_800950D0`
-  after a call and stores `(v + 1) % 12`; every spelling either adds an 8-byte
-  spill or lets IDO CSE the address across the call. Next targets in that
-  file are the RDP texture-load sequences `func_8004A010` (+ `A174/A2E0/A44C`
-  which call it 8× each) with `gDPSetTile`/`gDPLoadBlock`/`gDPSetTileSize`.
 - Runner: a candidate can report `similarity_score` 1.0 through register
   normalisation while `raw_similarity_score` is 0.63 with values swapped
   between struct fields; never treat 1.0 as done without the gate.
@@ -632,49 +466,9 @@ accepts; other widths only on diagnostic evidence via the variant policy.
   function fails the moment that pragma becomes a C definition unless an
   earlier accepted candidate carried the forward prototype in its
   `declarations` (`CE80.c`: `func_8000DDC8`/`func_8000DE34`, five callers).
-- Shape: a callee that an already-accepted caller invokes with fewer
-  arguments than its real signature (`func_80018A74(void){ func_8001480C(); }`)
-  needs a K&R definition to compile, and the K&R form starts IDO's register
-  allocation differently — `func_8001480C` sits at similarity 1.0. Both this
-  and the `func_80055BA8` return-type case are now reachable with
-  `companion_edits` (§3.1); nobody has gated one yet.
-- Shape: fixed-stride byte-flag clear loop (`func_8001644C`, 8 records at
-  0x160): IDO unrolls every simple `do { p += stride; *p = 0; } while (p != end)`
-  spelling (inserting a `divu`); a pretest `while` got 60 bytes versus 48.
-  Needs a spelling that defeats the unroll heuristic.
-- Shape: byte-argument helpers in `585D0.c` that compute a record pointer
-  and make an out-of-line call before writing through the pointer argument
-  overshoot the frame by exactly 8 bytes with a `$v1`/`$a3` swap
-  (`func_8005A92C`, `func_8005FC7C`, `func_8005FDB0`); no declaration-order
-  or type variant closed it.
-- Shape: `D_80128570`/`D_801285D0` 112-byte-stride record lookups sit at
-  similarity 1.0 `register_allocation_only` (`func_8005C0B0/C12C/C1AC`,
-  `func_8005C2B4/C2FC/C348`, `func_8005D9E0`, `func_8005DFD4`); six variants
-  each, nothing moved the allocator. Do not spend fleet time here.
-- Shape: forward-call wrappers whose last stack argument is a non-zero literal
-  (`func_8005F37C`, `func_8005F5D4`) get a different list-scheduler order
-  around the call than the accepted `0`-literal siblings; every source
-  reordering gave byte-identical diagnostics.
-- Shape: `func_8005CBA0` / `func_8005CAA4` literal switches match except for
-  whether the last case shares the `jr` delay slot with `default` (same
-  class as `func_80050D20`).
-- Shape: `6E850.c` float/matrix owners: `func_8007074C` at similarity 1.0
-  (`$a3` versus `$a2` for the persisted state copy), `func_8006EFF0` (0.94,
-  IDO spills and reloads `arg1+0x14` through `sp+0x14` as a register-pressure
-  artefact), `func_8006E944` (0.89; a bare `x * 1.0f` is constant-folded, a
-  named `f32 weight = 1.0f` restores the instruction but costs 8 frame
-  bytes), `func_8007065C` (0.88, Gfx command block builder). Leave the file
-  to a hand session.
-- Shape: `CE80.c` channel-pool helpers: `func_8000DDC8`/`func_8000DE34` spill
-  only `$a1`/`$a2` to their homes with a fifth stack argument (0.79),
-  `func_8000D174` keeps two address registers IDO folds away (0.88),
-  `func_8000D710` (0.90, one register), `func_8000D7B8` (0.86, one missing
-  spill slot), `func_8000C6D8` (0.73 at equal size; IDO hoists
-  `D_800D1220`/`D_8008FA40` into `$s3`–`$s5` in every spelling).
-- Shape: `14640.c`: `func_800186B8` ring-buffer push (0.95; the original
-  keeps the record base and stores via `addiu`+offset instead of one folded
-  immediate), `func_80013A40` pool allocator (0.68, 12 bytes over, `arg0`
-  spilled in every variant), `func_80016AB4` at similarity 1.0 with a
-  `u8 *base = arg0;` local but an 8-byte frame difference.
 - Sweep families other than `frame-padding` in `near_miss_kinds` have no
   accepts yet (0/146); re-evaluate after the fleet's records accumulate.
+
+Skip lists and unsolved shapes that are specific to one function or file
+live in that file's notes under `docs/regions/` and reach an agent through
+`tools/file_brief.py`, not here.

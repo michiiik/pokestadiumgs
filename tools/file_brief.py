@@ -42,6 +42,7 @@ import sys
 from pathlib import Path
 
 import pragma_targets
+import region_notes
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
@@ -241,6 +242,8 @@ def build_brief(source_path: Path) -> dict[str, object]:
     record_strides, pointer_strides = stride_candidates(solved or functions)
     return {
         "source": _display_path(source_path),
+        "region_notes": region_notes.load(source_path),
+        "region_notes_path": _display_path(region_notes.path_for(source_path)),
         "counts": {
             "solved": len(solved),
             "other_defined": len(functions) - len(solved),
@@ -273,8 +276,22 @@ def render_text(brief: dict[str, object]) -> str:
     def emit(text: str = "") -> None:
         lines.append(text)
 
+    emit("== region notes ==")
+    if brief["region_notes"]:
+        emit(brief["region_notes"])
+    else:
+        emit(
+            "  no region notes yet for this file -- add skip lists and "
+            "proven spellings with:"
+        )
+        emit(
+            f"    python3 tools/region_notes.py append {brief['source']} "
+            f'--text "..." [--heading "..."]'
+        )
+        emit(f"  they would live at {brief['region_notes_path']}")
+
     counts = brief["counts"]
-    emit(f"file brief: {brief['source']}")
+    emit(f"\nfile brief: {brief['source']}")
     emit(
         f"counts: solved={counts['solved']} other_defined={counts['other_defined']} "
         f"remaining={counts['remaining']} total_owners={counts['solved'] + counts['remaining']}"
