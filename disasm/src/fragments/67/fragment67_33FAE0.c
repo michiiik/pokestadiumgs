@@ -518,7 +518,22 @@ void func_82904824(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33FAE0/func_829053F8.s")
+extern void *D_80087200;
+extern void func_80064D28(void);
+extern void func_829050C8(void *);
+extern void func_82904208(void);
+void func_829053F8(void) {
+    s32 var_s0;
+    var_s0 = 1;
+    do {
+        func_80064D28();
+        func_829050C8(D_82918990);
+        if ((*(u16 *)((u8 *)D_80087200 + 8) & 0xD000) && (*(s16 *)((u8 *)D_82918990 + 0x1068) == 0xA)) {
+            var_s0 = 0;
+        }
+        func_82904208();
+    } while (var_s0 != 0);
+}
 #endif
 
 #ifdef VERSION_US
