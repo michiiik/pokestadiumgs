@@ -84,7 +84,13 @@ s32 func_86009BE0(s32 arg0, s32 arg1) {
     return MainPool_AllocAligned(arg0, 8, 4);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_86009C08.s")
+s32 func_86009C08(void *arg0, void *arg1) {
+    f64 x = *(f64 *)((u8 *)arg0 + 0x10) - *(f64 *)((u8 *)arg1 + 0x0);
+    f64 y = *(f64 *)((u8 *)arg0 + 0x20) - *(f64 *)((u8 *)arg1 + 0x10);
+    f64 radius = *(f64 *)((u8 *)arg0 + 0x8);
+
+    return ((x * x) + (y * y)) < (radius * radius);
+}
 
 extern f64 func_87C0068C(void *);
 f64 func_86009C58(void *arg0, u8 *arg1) {
