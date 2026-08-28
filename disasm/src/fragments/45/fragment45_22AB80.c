@@ -156,7 +156,36 @@ s32 func_8AB09FBC(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22AB80/func_8AB0A074.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22AB80/func_8AB0A1A4.s")
+extern u8 *D_8AB16B80;
+extern u8 *D_8AB16B84;
+extern u8 *D_8AB16B88;
+extern u8 *D_8AB16B90;
+extern u8 *D_8AB16B94;
+extern u8 *D_8AB16B98;
+extern s16 D_8AB16CDE;
+extern void func_8AB00B98(u8 *, u32);
+void func_8AB0A1A4(void) {
+    (*(u16 *)((u8 *)(D_8AB16B80) + (2))) = (u16) ((*(u16 *)((u8 *)(D_8AB16B80) + (2))) & 0xFFFE);
+    (*(u16 *)((u8 *)(D_8AB16B84) + (2))) = (u16) ((*(u16 *)((u8 *)(D_8AB16B84) + (2))) & 0xFFFE);
+    (*(u16 *)((u8 *)(D_8AB16B88) + (2))) = (u16) ((*(u16 *)((u8 *)(D_8AB16B88) + (2))) & 0xFFFE);
+    func_8AB00B98(D_8AB16B90, -1U);
+    func_8AB00B98(D_8AB16B94, -1U);
+    func_8AB00B98(D_8AB16B98, -1U);
+    switch (D_8AB16CDE) {
+    case 0:
+        (*(u16 *)((u8 *)(D_8AB16B80) + (2))) = (u16) ((*(u16 *)((u8 *)(D_8AB16B80) + (2))) | 1);
+        func_8AB00B98(D_8AB16B90, 0xFFFF00FFU);
+        return;
+    case 1:
+        (*(u16 *)((u8 *)(D_8AB16B84) + (2))) = (u16) ((*(u16 *)((u8 *)(D_8AB16B84) + (2))) | 1);
+        func_8AB00B98(D_8AB16B94, 0xFFFF00FFU);
+        return;
+    case 2:
+        (*(u16 *)((u8 *)(D_8AB16B88) + (2))) = (u16) ((*(u16 *)((u8 *)(D_8AB16B88) + (2))) | 1);
+        func_8AB00B98(D_8AB16B98, 0xFFFF00FFU);
+        return;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22AB80/func_8AB0A2D8.s")
 
