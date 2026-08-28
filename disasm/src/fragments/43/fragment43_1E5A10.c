@@ -214,7 +214,19 @@ void func_8AC00F04(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC00FAC.s")
+extern u8 func_80063B7C(u8);
+s32 func_8AC00FAC(u8 arg0) {
+    s32 var_s0;
+    u8 temp_v0;
+    var_s0 = arg0;
+loop_1:
+    temp_v0 = func_80063B7C(var_s0);
+    if (temp_v0 != 0) {
+        var_s0 = temp_v0 & 0xFF;
+        goto loop_1;
+    }
+    return var_s0;
+}
 #endif
 
 #ifdef VERSION_US
