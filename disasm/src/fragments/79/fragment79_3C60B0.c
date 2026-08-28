@@ -218,7 +218,7 @@ void BattleAnim_StartEffect7TexturedRibbonSheet_Init(void) {
 #endif
 
 #ifdef VERSION_US
-s32 func_841572D4(void) {
+s32 BattleAnim_StartEffect7TexturedRibbonSheet_Update(void) {
     (*(s16 *)&D_841A4D4C) = (*(s16 *)&D_841A4D4C) + 1;
     if (*(s16 *)&D_841A4D4C >= 0x709) {
         return -1;
@@ -254,7 +254,7 @@ void BattleAnim_StartEffect33Radial20_Init(void) {
 #endif
 
 #ifdef VERSION_US
-s32 func_8415758C(void) {
+s32 BattleAnim_StartEffect33Radial20_Update(void) {
     (*(s16 *)&D_841A4D4E) = (*(s16 *)&D_841A4D4E) + 1;
     if (*(s16 *)&D_841A4D4E >= 0xB5) {
         return -1;
@@ -319,7 +319,7 @@ void BattleAnim_StartEffect98Radial20_Init(void) {
 #endif
 
 #ifdef VERSION_US
-s32 func_841579EC(void) {
+s32 BattleAnim_StartEffect98Radial20_Update(void) {
     (*(s16 *)&D_841A4D52) = (*(s16 *)&D_841A4D52) + 1;
     if (*(s16 *)&D_841A4D52 >= 0xB5) {
         return -1;
@@ -483,7 +483,7 @@ extern u16 D_841A4D02;
 extern u8 D_841A4D08[];
 extern s32 func_84164280(s32);
 extern s32 func_841650A8(s32);
-void func_84158308(void) {
+void BattleAnim_StartEffect45FourStreamTrail_Draw(void) {
     if (*(s16 *)&D_841A4D00 >= 2) {
         s32 temp = D_800D0510;
         D_800D0510 += 8;
@@ -508,7 +508,7 @@ void BattleAnim_StartEffect62OwnerLinkedFourStream_Init(void) {
 #endif
 
 #ifdef VERSION_US
-void func_84158520(void) {
+void BattleAnim_StartEffect62OwnerLinkedFourStream_Draw(void) {
     if (*(s16 *)&D_841A4D02 >= 2) {
         s32 temp = D_800D0510;
         D_800D0510 += 8;
@@ -546,7 +546,7 @@ void BattleAnim_StartEffect67OwnerAnchoredFourStream_Draw(void) {
 extern void func_841569E0(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
 extern void func_8415C644(f32, f32, f32, f32, f32, f32, s32, s32, s32, s32, s32, f32, f32, f32, s32);
 extern f32 D_8418C598;
-void func_84158768(void) {
+void BattleAnim_StartEffect78Radial20_EmitVariantA(void) {
     f32 out[6];
     func_841569E0(&out[5], &out[4], &out[3], &out[2], &out[1], &out[0]);
     out[2] *= 6.0f;
@@ -558,12 +558,12 @@ void func_84158768(void) {
 
 #ifdef VERSION_US
 extern u16 D_841A4D06;
-extern void func_84158768(void);
+extern void BattleAnim_StartEffect78Radial20_EmitVariantA(void);
 void BattleAnim_StartEffect78Radial20_Init(void) {
     D_841A4D06 = 0;
     BattleAnim_ResetSharedEffectMatrix();
     func_8415C530();
-    func_84158768();
+    BattleAnim_StartEffect78Radial20_EmitVariantA();
 }
 #endif
 
