@@ -6,7 +6,25 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B00E34.s")
+extern void func_800226C0(void);
+extern s16 D_82B12450;
+s32 func_82B00E34(s32 arg0) {
+    s16 *sp1C;
+    s16 *temp_v1;
+    s32 var_a1;
+    s32 var_v0;
+    var_a1 = 0;
+    var_v0 = 0;
+    if ((arg0 == 0xA6) || (arg0 == 0xA8)) var_v0 = 1;
+    temp_v1 = &(&D_82B12450)[var_v0];
+    if ((*(s16 *)((u8 *)(temp_v1) + (0xFF4))) == 0) {
+        sp1C = temp_v1;
+        func_800226C0();
+        var_a1 = 1;
+        (*(s16 *)((u8 *)(temp_v1) + (0xFF4))) = 1;
+    }
+    return var_a1;
+}
 #endif
 
 #ifdef VERSION_US
@@ -377,7 +395,21 @@ void func_82B05E3C(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B05E98.s")
+extern s16 D_82B12450;
+void func_82B05E98(s32 arg0, s32 arg1, u16 arg2, s32 arg3, s32 arg4, s32 arg5, u8 arg6) {
+    u8 *base;
+    u8 *half;
+    if (arg0 >= 0 && arg0 < 2) {
+        base = (u8 *)&D_82B12450 + (arg0 << 2);
+        *(s32 *)(base + 0xBBC) = arg1;
+        half = (u8 *)&D_82B12450 + (arg0 << 1);
+        *(s16 *)(half + 0xBC4) = arg2;
+        *(s16 *)(half + 0xBC8) = arg3;
+        *(s32 *)(base + 0xBCC) = arg4;
+        *(s32 *)(base + 0xBD4) = arg5;
+        *(s16 *)(half + 0xBDC) = arg6;
+    }
+}
 #endif
 
 #ifdef VERSION_US
