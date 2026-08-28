@@ -8,16 +8,65 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22FAD0/func_8AB0B3F4.s")
 
-extern void func_8AB0B67C(s32);
+extern s32 func_8AB0B67C(s32);
 void func_8AB0B52C(void) { func_8AB0B67C(0); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22FAD0/func_8AB0B54C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22FAD0/func_8AB0B5E0.s")
+extern s32 func_8AB0B54C(s32);
+extern s32 func_80001FF0(void);
+extern s16 D_8AB16F6C;
+extern u32 D_8AB1268C;
+s32 func_8AB0B5E0(s32 arg0) {
+    if ((D_8AB16F6C >= 0) && (((u32) D_8AB1268C % (u32) (func_80001FF0() / 2)) == 0)) {
+        D_8AB16F6C -= 1;
+        if (D_8AB16F6C < 0) {
+            D_8AB16F6C = 0;
+        }
+        arg0 = func_8AB0B54C(arg0);
+    }
+    return arg0;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22FAD0/func_8AB0B67C.s")
+extern void func_8AB04AE4(void);
+extern s32 func_8AB0B7CC(s32);
+extern s32 StageContext_GetFadeMode(void);
+s32 func_8AB0B67C(s32 arg0) {
+    s32 result = 0x2E;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22FAD0/func_8AB0B6E0.s")
+    switch (arg0) {
+    case 0:
+        func_8AB04AE4();
+        break;
+    case 1:
+        if (StageContext_GetFadeMode() == 0) {
+            result = func_8AB0B7CC(0);
+        }
+        break;
+    }
+    return result;
+}
+
+extern s32 func_8AB0B74C(s32);
+extern s16 D_8AB16F7E;
+s32 func_8AB0B6E0(s32 arg0) {
+    s32 result = 0x30;
+    s16 *p;
+
+    p = &D_8AB16F7E;
+    switch (arg0) {
+    case 0:
+        *p = 0;
+        break;
+    case 1:
+        if (*p >= 0xA) {
+            func_8AB0B74C(0);
+        }
+        *p += 1;
+        break;
+    }
+    return result;
+}
 
 extern void StageFade_StartFromTransparent(s32);
 s32 StageContext_GetFadeMode();
@@ -79,7 +128,34 @@ s32 func_8AB0C9B0(void) {
     return 0x37;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22FAD0/func_8AB0C9B8.s")
+extern void func_8AB01FBC(void);
+extern void func_8AB03ED4(void);
+extern void func_8AB012A4(void);
+extern s32 func_8AB0BACC(s32);
+extern s32 func_8AB0B5E0(s32);
+extern s16 D_8AB16F92;
+s32 func_8AB0C9B8(s32 arg0) {
+    s32 result = 0x38;
+    s16 *p;
+
+    p = &D_8AB16F92;
+    switch (arg0) {
+    case 0:
+        *p = 0;
+        func_8AB01FBC();
+        break;
+    case 1:
+        *p += 1;
+        func_8AB03ED4();
+        if (*p >= 0xB) {
+            func_8AB012A4();
+            result = func_8AB0BACC(0);
+        }
+        result = func_8AB0B5E0(result);
+        break;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22FAD0/func_8AB0CA58.s")
 
