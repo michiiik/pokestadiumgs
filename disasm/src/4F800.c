@@ -130,7 +130,22 @@ void func_8004EE94(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4F800/func_800501A0.s")
+extern s32 D_800971F8;
+extern void func_8004FC58(u8 *, s32, s32);
+extern void func_8004FE00(u8 *, s32, s32);
+extern void func_8004ECD4(void *, s32, s32);
+void func_800501A0(u8 *arg0, s32 arg1, s32 arg2) {
+    if (*(u16 *)(arg0 + 2) & 2) {
+        if (*(u8 *)(arg0 + 0x29) == 0) {
+            func_8004FC58(arg0, arg1, arg2);
+        } else {
+            func_8004FE00(arg0, arg1, arg2);
+        }
+    }
+    D_800971F8 = (s32)arg0;
+    func_8004ECD4(arg0, arg1, arg2);
+    D_800971F8 = 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -237,11 +252,39 @@ void func_80050578(u8 *arg0, s32 arg1) { if (arg0 != NULL) { u8 *value = *(u8 **
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4F800/func_80050640.s")
+extern s32 func_800505A4(u8 *);
+s32 func_80050640(u8 *arg0)
+{
+  s32 result = -2;
+  int new_var;
+  if ((*((u16 *) (arg0 + 4))) & 1)
+  {
+    if ((*((u8 **) (arg0 + 8))) != 0)
+    {
+      *((s16 *) arg0) = func_800505A4(arg0);
+      result = *((s16 *) (((*((u8 **) ((*((u8 **) (arg0 + 8))) + 4))) + ((*((s16 *) (arg0 + 2))) * 4)) + (new_var = 2)));
+    }
+  }
+  return result;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4F800/func_800506A4.s")
+s32 func_800506A4(u8 *arg0) {
+    s32 result = 0;
+    u8 *value;
+    u8 *sub;
+    value = *(u8 **)(arg0 + 0x34);
+    if (value != NULL) {
+        sub = *(u8 **)(value + 8);
+        if (sub != NULL) {
+            if (*(u16 *)(sub + 2) == *(s16 *)(value + 2) + 1) {
+                if (*(s16 *)(*(u8 **)(sub + 4) + (*(s16 *)(value + 2) * 4)) == *(s16 *)value + 1) result = 1;
+            }
+        }
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
