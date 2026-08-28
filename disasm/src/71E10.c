@@ -27,7 +27,8 @@ finish:
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/71E10/func_8007131C.s")
+typedef struct {u8 pad[0x1D];u8 value;u8 rest[0x3A];} R;
+s32 func_8007131C(R *arg0){s32 result=0; s32 count=0; s32 i,j,k; R *p=arg0; while(count<6){if(p->pad[0]==0||p->pad[0]>=0xFC)break;result+=p->value;count++;p++;} for(i=0;i<count;i++)for(j=i+1;j<count;j++)for(k=j+1;k<count;k++){s32 v=arg0[i].value+arg0[j].value+arg0[k].value;if(result>=v)result=v;}return result;}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/71E10/func_800714E8.s")
 
