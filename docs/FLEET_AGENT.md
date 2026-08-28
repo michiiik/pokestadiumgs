@@ -14,6 +14,9 @@ Do not touch any other file's pragmas or run `make`.
   later in the file** with its real return type/params (pass these in
   `declarations`; the runner's fallback prototype defaults to `s32` and a
   narrower real return type, e.g. `u8`, fails the probe as a "redeclaration").
+  Its first section is that file's **region notes** (`docs/regions/`) —
+  treat them as the first source of proven spellings and skip lists,
+  before §4 below or your own reading of the `.s`.
 - Headers live in the repo only: `disasm/lib/ultralib/include/PR/gbi.h` has
   the `gSP*`/`gDP*` macros. Never search outside this repository.
 
@@ -140,3 +143,11 @@ variants probed, the most common `mismatch_kind` you hit, why you stopped
 on any owner you gave up on (near-miss similarity + kind), and any new
 shape worth a §4 row (spelling + evidence count + limit) for the
 coordinator to fold in.
+
+Before your box ends, save what you learned in your file's region notes
+so the next agent gets it for free:
+
+    python3 tools/region_notes.py append disasm/src/<your file>.c \
+        --text "..." [--heading "..."]
+    git commit --only docs/regions/<same path>.md disasm/src/<your file>.c \
+        -m "..."
