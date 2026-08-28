@@ -321,7 +321,31 @@ void func_86203ED8(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_266A60/func_86204A00.s")
+extern void func_8620739C(void);
+extern s32 func_87F08208(void *);
+extern void func_800225C4(s32);
+extern void func_800279C4(s32);
+extern void func_800226C0(s32);
+extern void func_800088A4(s32);
+extern void func_86200020(s32 arg0);
+void func_86204A00(void) {
+    s32 temp_v0;
+    func_8620739C();
+    temp_v0 = func_87F08208((u8 *)D_8620E198 + 0x73C1C);
+    switch (temp_v0) {
+    case 1:
+        func_800088A4(0xFFFF);
+        StageFade_StartFromTransparent(0x14);
+        *(s32 *)((u8 *)D_8620E198 + 0xE8) = 2;
+        func_800225C4(0x28);
+        func_800279C4(0xCF0B);
+        break;
+    case 2:
+        func_86200020(0);
+        func_800226C0(3);
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
