@@ -2,7 +2,7 @@
 
 
 #ifdef VERSION_US
-s32 *func_8004C874(s32, s32, s16);
+s32 *func_8004C874(s32, s32, ...);
 extern u8 D_8AF29BB0;
 
 s32 *func_8AF19880(s16 arg0) {
@@ -17,7 +17,7 @@ s32 *func_8AF19880(s16 arg0) {
     return var_v1;
 }
 
-s32 *func_8004C874(s32, s32, s16);
+s32 *func_8004C874(s32, s32, ...);
 extern u8 D_8AF29BC0;
 
 s32 *func_8AF198C4(s16 arg0) {
@@ -36,7 +36,7 @@ s32 *func_8AF198C4(s16 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_207AF0/func_8AF19970.s")
 
-s32 *func_8004C874(s32, s32, s16);
+s32 *func_8004C874(s32, s32, ...);
 extern u8 D_8AF29BF8;
 
 s32 *func_8AF199D8(s16 arg0) {
@@ -98,9 +98,73 @@ void func_8AF19E50(s16 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_207AF0/func_8AF19FAC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_207AF0/func_8AF1A0DC.s")
+extern s16 func_8AF19A1C(s32);
+extern u8 *func_8AF19E7C(u8 *, s32, s32, s16);
+extern s8 D_8AF29D44;
+extern s32 D_8AF2BAAC;
+extern s16 D_8AF35050;
+extern s8 D_8AF354A8;
+extern s32 D_8AF357D0;
+extern void _bzero(s32 *, s32);
+extern s32 * func_8004C874(s32, s32, ...);
+void func_8AF1A0DC(s16 arg0) {
+    s16 *p = &arg0;
+    s32 padding[4];
+    s16 sp22;
+    s32 sp1C;
+    u8 *temp_v0;
+    s16 value;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_207AF0/func_8AF1A1B8.s")
+    sp1C = D_8AF2BAAC;
+    D_8AF35050 = 2;
+    sprintf(&D_8AF354A8, &D_8AF29D44,
+            func_8004C874(0x3B, *p + 0xD2));
+    sp22 = func_8AF19A1C(6);
+    _bzero(&D_8AF357D0, 0x1758);
+    value = *p;
+    if (value == 1) {
+        temp_v0 = func_8AF19E7C(&D_8AF357D0, sp1C, 0x4000, sp22);
+        temp_v0[0] = 0xFF;
+        temp_v0[0xC] = 0xFF;
+        func_8AF19E7C(temp_v0 + 0x18, sp1C, 0x100, sp22);
+        return;
+    }
+    func_8AF19E7C(&D_8AF357D0, sp1C, (0x8000 >> value) & 0xFFFF, sp22);
+}
+
+extern u8 *func_8AF19FAC(u8 *, s32, s32, s16);
+extern s8 D_8AF29DA0;
+extern s32 D_8AF2BAC4;
+extern s32 * func_8004C874(s32, s32, ...);
+void func_8AF1A1B8(s16 arg0, s16 arg1) {
+    s16 *p0 = &arg0;
+    s32 padding[4];
+    s16 sp22;
+    s32 temp_s0;
+    u8 *temp_v0;
+    s16 value;
+
+    temp_s0 = D_8AF2BAC4;
+    D_8AF35050 = 2;
+    sprintf(&D_8AF354A8, &D_8AF29DA0, func_8004C874(0x3B, arg1));
+    sp22 = func_8AF19A1C(0xC);
+    _bzero(&D_8AF357D0, 0x1758);
+    value = *p0;
+    switch (value) {
+    case 0:
+        temp_v0 = func_8AF19FAC(&D_8AF357D0, temp_s0, 0x8000, sp22);
+        temp_v0[0] = 0xFF;
+        temp_v0[0xC] = 0xFF;
+        func_8AF19FAC(temp_v0 + 0x18, temp_s0, 0x200, sp22);
+        return;
+    case 4:
+        func_8AF19FAC(&D_8AF357D0, temp_s0, 0x400, sp22);
+        return;
+    default:
+        func_8AF19FAC(&D_8AF357D0, temp_s0, (0x8000 >> value) & 0xFFFF, sp22);
+        return;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_207AF0/func_8AF1A2B8.s")
 
