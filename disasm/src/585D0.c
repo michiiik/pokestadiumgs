@@ -37,7 +37,14 @@ extern u8 D_80128574[]; s32 func_80057A5C(s32 index) { return D_80128574[index *
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80057A80.s")
+u8 func_8005D92C(s32);
+s32 func_80057A80(s32 arg0) {
+    s32 v0 = func_8005D92C(arg0);
+    if (v0 == 1 || v0 == 2 || v0 == 3 || v0 == 4) {
+        return 1;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -95,7 +102,16 @@ void GbSave_ComputeChecksum(u8 *start, u8 *end) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80058018.s")
+void func_80058018(u8 *arg0, u8 *arg1, u8 *arg2) {
+    s32 sum;
+    sum = 0;
+    if (arg0 <= arg1) {
+        do {
+            sum += *arg0++;
+        } while (arg0 <= arg1);
+    }
+    func_800579E8(arg2, sum);
+}
 #endif
 
 #ifdef VERSION_US
@@ -416,7 +432,13 @@ void func_8005B120(s32 arg0) { func_80059320(arg0, 0xFF); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005B140.s")
+extern u8 D_80128570[];
+extern s32 GbPak_ValidateAndRefresh(s32, s32, u8 *);
+void func_8005B140(s32 arg0) {
+    if (GbPak_ValidateAndRefresh(arg0, 0, D_80128570 + arg0 * 112 + 0x28) == 0) {
+        func_80064D58(arg0, 2);
+    }
+}
 #endif
 
 #ifdef VERSION_US
