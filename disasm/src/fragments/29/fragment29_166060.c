@@ -23,7 +23,17 @@ void func_8800005C(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_166060/func_88000080.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_166060/func_88000288.s")
+extern void func_88000080(void *, s16, s16, s16);
+void func_88000288(void *arg0, s16 arg1, s16 arg2, s16 arg3, u8 arg4, u8 arg5, u8 arg6, u8 arg7) {
+    *(s16 *)((u8 *)arg0 + 0) = arg1;
+    *(s16 *)((u8 *)arg0 + 4) = arg2;
+    *(s16 *)((u8 *)arg0 + 6) = arg3;
+    *(u8 *)((u8 *)arg0 + 8) = arg4;
+    *(u8 *)((u8 *)arg0 + 9) = arg5;
+    *(u8 *)((u8 *)arg0 + 10) = arg6;
+    *(u8 *)((u8 *)arg0 + 11) = arg7;
+    func_88000080(arg0, arg1, arg2, arg3);
+}
 
 void func_880002F4(u8 *arg0, s16 arg1) {
     *(s16 *)arg0 = arg1;
