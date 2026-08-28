@@ -119,7 +119,31 @@ s32 func_82B01254(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B01850.s")
+extern void func_82B0173C(s32, s32);
+void func_82B01850(s32 arg0, s32 arg1) {
+    s32 mode;
+    switch (arg1 & 0xFFFF0000) {
+    case 0x10000:
+        mode = 0;
+        break;
+    case 0x20000:
+        mode = 1;
+        break;
+    case 0x30000:
+        mode = 2;
+        break;
+    case 0x40000:
+        mode = 3;
+        break;
+    case 0x50000:
+        mode = 4;
+        break;
+    default:
+        mode = 0;
+        break;
+    }
+    func_82B0173C(arg0, mode);
+}
 #endif
 
 #ifdef VERSION_US
@@ -268,7 +292,24 @@ void func_82B02E50(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B038BC.s")
+extern void func_82B0284C(u8 *, u8 *);
+extern void func_800498C4(void);
+extern void func_800496A4(s32, s32);
+extern void func_8004972C(s32, s32, s32, s32);
+extern s32 func_8004C874(s32, s32);
+extern void func_800495F8(s32, s32, s32, s32);
+extern void func_800499EC(void);
+void func_82B038BC(void *arg0) {
+    struct { s16 x; s16 y; s32 pad[2]; } pair;
+    s32 color;
+    func_82B0284C(arg0, (u8 *)&pair);
+    func_800498C4();
+    func_800496A4(0x10, 0);
+    func_8004972C(0xFF, 0xFF, 0xFF, 0xFF);
+    color = func_8004C874(0x1B, 0x17);
+    func_800495F8(pair.x + 0xE3, pair.y + 9, 1, color);
+    func_800499EC();
+}
 #endif
 
 #ifdef VERSION_US
@@ -336,7 +377,29 @@ void func_82B04430(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B0504C.s")
+extern void func_82B0284C(u8 *, u8 *);
+extern void func_800498C4(void);
+extern void func_800496A4(s32, s32);
+extern void func_8004972C(s32, s32, s32, s32);
+extern s32 func_8004C874(s32, s32);
+extern void func_800495F8(s32, s32, s32, s32);
+extern void func_800499EC(void);
+extern s16 D_82B12696[];
+void func_82B0504C(void *arg0) {
+    struct { s16 x; s16 y; s32 pad[3]; } pair;
+    s16 index;
+    s32 color;
+    func_82B0284C(arg0, (u8 *)&pair);
+    func_800498C4();
+    func_800496A4(0x10, 0);
+    func_8004972C(0xFF, 0xFF, 0xFF, 0xFF);
+    index = *(s16 *)((u8 *)arg0 + 2);
+    if (D_82B12696[index] != 0) {
+        color = func_8004C874(0x1B, index + 0x2D);
+        func_800495F8(pair.x + 0x4E, pair.y + 0xD, 1, color);
+    }
+    func_800499EC();
+}
 #endif
 
 #ifdef VERSION_US
@@ -444,7 +507,17 @@ void func_82B05EF0(s32 arg0, s32 arg1, u16 arg2, s32 arg3, s32 arg4, s32 arg5) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B062F8.s")
+extern void _bzero(void *, s32);
+extern s32 func_8004C874(s32, s32);
+extern void HAL_Strcpy(void *, s32);
+extern s16 D_82B0865C[];
+void func_82B062F8(void *arg0, s32 arg1) {
+    _bzero(arg0, 0x58);
+    if (arg1 < 4) {
+        ((u8 *)arg0)[0x1D] = ((s16 *)&D_82B0865C)[arg1];
+        HAL_Strcpy((u8 *)arg0 + 0x34, func_8004C874(0x1B, 0x30));
+    }
+}
 #endif
 
 #ifdef VERSION_US
