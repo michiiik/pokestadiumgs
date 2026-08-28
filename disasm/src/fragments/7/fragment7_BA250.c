@@ -10,7 +10,12 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_8300021C.s")
+extern void _bzero(void *, s32);
+void func_8300021C(s32 arg0) {
+    _bzero((u8 *)(u32)arg0 + 0x3FF18, 8);
+    _bzero((u8 *)(u32)arg0 + 0x3FF20, 8);
+    *(s32 *)((u8 *)(u32)arg0 + 0x3FF28) = 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -235,7 +240,18 @@ void func_83006EB0(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83006FDC.s")
+extern f32 func_818055E0(void);
+extern void func_81805644(s32, s32, s32);
+extern void func_818036D8(s32, s32, s32, s32);
+extern u8 D_8300D908[];
+void func_83006FDC(s32 arg0, s32 arg1, s32 arg2) {
+    s32 pad;
+    f32 temp_fv0;
+
+    temp_fv0 = func_818055E0();
+    func_81805644(arg0, arg1, arg2);
+    func_818036D8((s32)(D_8300D908 + ((*(u8 *)((u8 *)(u32)arg1 + 0x3D) << 5) - 0x20)), arg2, *(s32 *)&temp_fv0, 0);
+}
 #endif
 
 #ifdef VERSION_US
@@ -255,7 +271,9 @@ void func_83006EB0(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83007318.s")
+extern s32 _bcmp(void *, void *, s32);
+extern void func_800226C0(s32);
+void func_83007318(void *arg0, s32 arg1) { switch (arg1) { case -1: if (_bcmp((u8 *)(u32)arg0 + 0x39E48, (u8 *)(u32)arg0 + 0x34130, 0x5D18) != 0) { *(u8 *)((u8 *)(u32)arg0 + 0x1E) = 7; func_800226C0(3); return; } *(u8 *)((u8 *)(u32)arg0 + 0x1E) = 1; func_800226C0(3); return; case 1: *(u8 *)((u8 *)(u32)arg0 + 0x1E) = 0x14; func_800226C0(0xA3); return; case 2: *(u8 *)((u8 *)(u32)arg0 + 0x1E) = 0x1C; func_800226C0(0xA3); return; case 3: *(u8 *)((u8 *)(u32)arg0 + 0x1E) = 0x23; func_800226C0(0xA3); return; } }
 #endif
 
 #ifdef VERSION_US
@@ -279,7 +297,24 @@ void func_83006EB0(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83007BE4.s")
+extern void func_800226C0(s32);
+void func_83007BE4(void *arg0, s32 arg1) {
+    void *temp_a2;
+
+    temp_a2 = arg0;
+    switch (arg1) {
+    case -1:
+        (*(u8 *)((u8 *)(temp_a2) + 0x1E)) = 0x10;
+        func_800226C0(3);
+        return;
+    case 1:
+    case 2:
+    case 3:
+        (*(u8 *)((u8 *)(u32)temp_a2 + 0x3FECD)) = 1;
+        func_800226C0(2);
+        return;
+    }
+}
 #endif
 
 #ifdef VERSION_US
