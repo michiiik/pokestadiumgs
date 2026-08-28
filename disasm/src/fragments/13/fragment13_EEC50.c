@@ -71,11 +71,29 @@ void func_82401DD4(s32 arg0) {
     func_800495F8(0xA0, 0x12, 1, value);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82401E30.s")
+extern Gfx *D_800D0510;
+extern void func_8004D1FC(u8 *);
+extern void func_82400BD0(f32, f32, f32, f32, s32, s32, f32, f32);
+void func_82401E30(s32 arg0, s32 arg1) {
+    gDPSetEnvColor(D_800D0510++, 0xAA, 0xAA, 0xFF, 0xFF);
+    func_8004D1FC((u8 *)(u32)D_82407838);
+    func_82400BD0((f32)arg0, (f32)arg1, (f32)*(u16 *)(u8 *)(u32)D_82407838, (f32)*(u16 *)((u8 *)(u32)D_82407838 + 2), 0, 0, 1.0f, 1.0f);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82401F08.s")
+void func_82401F08(s32 arg0, s32 arg1) {
+    gDPSetEnvColor(D_800D0510++, 0xAA, 0xFF, 0xAA, 0xFF);
+    func_8004D1FC((u8 *)(u32)D_8240783C);
+    func_82400BD0((f32)arg0, (f32)arg1, (f32)*(u16 *)(u8 *)(u32)D_8240783C, (f32)*(u16 *)((u8 *)(u32)D_8240783C + 2), 0, 0, 1.0f, 1.0f);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82401FE0.s")
+extern Gfx *D_800D0510;
+extern void func_8004D1FC(u8 *);
+extern void func_82400BD0(f32, f32, f32, f32, s32, s32, f32, f32);
+void func_82401FE0(s32 arg0, s32 arg1) {
+    gDPSetEnvColor(D_800D0510++, 0xFF, 0xFF, 0xFF, 0xFF);
+    func_8004D1FC((u8 *)(u32)D_82407830);
+    func_82400BD0((f32)arg0, (f32)arg1, (f32)*(u16 *)(u8 *)(u32)D_82407830, (f32)*(u16 *)((u8 *)(u32)D_82407830 + 2), 0, 0, 1.0f, 1.0f);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_824020B4.s")
 
