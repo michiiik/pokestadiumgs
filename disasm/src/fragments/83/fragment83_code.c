@@ -162,7 +162,20 @@ void func_82C02328(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C02390.s")
+extern u8 D_82C04A14;
+extern s8 D_82C04C42;
+void func_82C02390(void *arg0, void *arg1, s8 arg2) {
+    u8 factor;
+
+    if (arg2 > 0) {
+        factor = ((D_82C04A14 - D_82C04C42) + 1) & 0xFF;
+    } else {
+        factor = (u8)D_82C04C42;
+    }
+    *(s16 *)((u8 *)arg0 + 6) = (s16)((*(s16 *)((u8 *)arg1 + 6) * factor) / (s32)D_82C04A14);
+    *(s16 *)((u8 *)arg0 + 2) = (s16)(((*(s16 *)((u8 *)arg1 + 6) - *(s16 *)((u8 *)arg0 + 6)) / 2) +
+        *(s16 *)((u8 *)arg1 + 2));
+}
 #endif
 
 #ifdef VERSION_US
@@ -215,7 +228,34 @@ void func_82C02950(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C02A44.s")
+extern u16 D_82C04C34;
+extern u16 D_82C04C32;
+extern u8 D_82C04C38;
+extern void func_82C0298C(void);
+extern void func_800226C0(s32);
+void func_82C02A44(void) {
+    if (D_82C04C34 & 0x800) {
+        *(s8 *)((u8 *)&D_82C04C38 + 2) = *(s8 *)((u8 *)&D_82C04C38 + 2) - 1;
+        if (*(s8 *)((u8 *)&D_82C04C38 + 2) < 0) {
+            *(s8 *)((u8 *)&D_82C04C38 + 2) = *(u8 *)((u8 *)&D_82C04C38 + 3) - 1;
+        }
+        func_800226C0(1);
+    } else if (D_82C04C34 & 0x400) {
+        *(s8 *)((u8 *)&D_82C04C38 + 2) = *(s8 *)((u8 *)&D_82C04C38 + 2) + 1;
+        if (*(s8 *)((u8 *)&D_82C04C38 + 2) > *(u8 *)((u8 *)&D_82C04C38 + 3) - 1) {
+            *(s8 *)((u8 *)&D_82C04C38 + 2) = 0;
+        }
+        func_800226C0(1);
+    }
+    if (D_82C04C32 & 0x8000) {
+        func_82C0298C();
+        return;
+    }
+    if (D_82C04C32 & 0x4000) {
+        *(u8 *)((u8 *)&D_82C04C38 + 1) = 9;
+        func_800226C0(3);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -386,7 +426,16 @@ s32 func_82C03EE0(s8 *arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C03FB4.s")
+extern s8 * func_8004C874(s32, s32);
+s32 func_82C03FB4(s32 arg0, s32 arg1, void *arg2) {
+    HAL_Strcpy(arg0 + 4, func_8004C874(0x15, 0x10));
+    if ((arg1 & 0xFF00) != 0x200 || (*(s16 *)((u8 *)arg2 + 0x34)) == 5) {
+        HAL_Strcpy(arg0 + 0x54, func_8004C874(0x15, 0x2B));
+    } else {
+        HAL_Strcpy(arg0 + 0x54, func_8004C874(0x15, 0x3C));
+    }
+    return 1;
+}
 #endif
 
 #ifdef VERSION_US
