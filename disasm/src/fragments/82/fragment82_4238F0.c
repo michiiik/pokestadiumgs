@@ -86,9 +86,84 @@ void func_82D039E4(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D049A0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D04B84.s")
+extern s32 func_80049064(s32, s32, s32, s32);
+extern void func_800498C4(void);
+extern void func_800496A4(s32, s32);
+extern s32 func_8004C874(s32, s32);
+extern void func_800499EC(void);
+extern u8 D_82D071D8[];
+extern void func_82D02D20(s32 arg0, s32 arg1);
+void func_82D04B84(void *arg0) {
+    gSPDisplayList(D_800D0510++, D_82D071D8);
+    ParticleGfx_SetPrimColor_fragment82(
+        *(u8 *)((u8 *)arg0 + 0x20),
+        *(u8 *)((u8 *)arg0 + 0x21),
+        *(u8 *)((u8 *)arg0 + 0x22),
+        *(u8 *)((u8 *)arg0 + 0x23));
+    func_82D02D20(0xF7, 0);
+    func_82D03324(
+        *(s16 *)((u8 *)arg0 + 0x14),
+        *(s16 *)((u8 *)arg0 + 0x16),
+        *(u16 *)((u8 *)arg0 + 0x18));
+    func_800498C4();
+    func_800496A4(0x10, 0);
+    func_80049064(
+        *(s16 *)((u8 *)arg0 + 0x14) + 0x40,
+        *(s16 *)((u8 *)arg0 + 0x16) + 4,
+        0,
+        func_8004C874(0x43, 0));
+    func_800499EC();
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D04C44.s")
+extern void func_8004972C(s32, s32, s32, s32);
+extern void func_8004B010(s32, s32);
+extern s32 func_80049064(s32, s32, s32, s32);
+extern void func_800498C4(void);
+extern void func_800496A4(s32, s32);
+extern s32 func_8004C874(s32, s32);
+extern void func_800499EC(void);
+extern u8 D_82D071D8[];
+extern void func_82D02D20(s32 arg0, s32 arg1);
+void func_82D04C44(void *arg0) {
+    u8 *sp24;
+
+    sp24 = *(u8 **)((u8 *)arg0 + 0x10);
+    gSPDisplayList(D_800D0510++, D_82D071D8);
+    ParticleGfx_SetPrimColor_fragment82(
+        *(u8 *)((u8 *)arg0 + 0x20),
+        *(u8 *)((u8 *)arg0 + 0x21),
+        *(u8 *)((u8 *)arg0 + 0x22),
+        *(u8 *)((u8 *)arg0 + 0x23));
+    func_82D02D20(0xF7, 0);
+    func_82D03324(
+        *(s16 *)((u8 *)arg0 + 0x14),
+        *(s16 *)((u8 *)arg0 + 0x16),
+        *(u16 *)((u8 *)arg0 + 0x18));
+    func_800498C4();
+    func_800496A4(0x10, 0);
+    if (sp24[0] == 0) {
+        if (*(s8 *)(sp24 + 1) == *(u8 *)((u8 *)arg0 + 1)) {
+            func_8004972C(0xFF, 0xFF, 0, *(u8 *)((u8 *)arg0 + 0x27));
+        } else {
+            func_8004972C(0xFF, 0xFF, 0xFF, *(u8 *)((u8 *)arg0 + 0x27));
+        }
+    } else {
+        func_8004972C(0xFF, 0xFF, 0xFF, *(u8 *)((u8 *)arg0 + 0x27));
+    }
+    func_80049064(
+        *(s16 *)((u8 *)arg0 + 0x14) + 0x40,
+        *(s16 *)((u8 *)arg0 + 0x16) + 4,
+        0,
+        func_8004C874(0x43, *(u8 *)((u8 *)arg0 + 1) + 1));
+    func_800499EC();
+    if (*(u8 *)((u8 *)arg0 + 0xB) == 0 &&
+        *(s8 *)(sp24 + 1) == *(u8 *)((u8 *)arg0 + 1) &&
+        sp24[0] == 0) {
+        func_8004B010(
+            (s16)(*(s16 *)((u8 *)arg0 + 0x14) + 0x18),
+            (s16)(*(s16 *)((u8 *)arg0 + 0x16) + 4));
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D04DC8.s")
 
@@ -166,7 +241,38 @@ void func_82D06488(Fragment82OffsetState *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D06514.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D065C0.s")
+extern void func_82D02B44(s16, s16, u16, u16);
+extern void func_82D05BD8(u8 *);
+extern void func_82D05D74(u8 *);
+extern void func_82D06040(u8 *);
+extern u8 D_82D06FB4[];
+extern void func_82D05EB4(Fragment82RateState *arg0);
+extern void func_82D06488(Fragment82OffsetState *arg0);
+void func_82D065C0(u8 *arg0) {
+    s32 count;
+
+    switch (arg0[0]) {
+    case 2:
+        func_82D05D74(arg0);
+        break;
+    case 3:
+        func_82D05EB4((Fragment82RateState *)arg0);
+        break;
+    case 5:
+        func_82D06488((Fragment82OffsetState *)arg0);
+        break;
+    case 4:
+        func_82D06040(arg0);
+        break;
+    }
+    count = arg0[0xC];
+    if (count == 0) {
+        arg0[0xB] = 0;
+        arg0[0xA] &= 0xFFFE;
+        return;
+    }
+    arg0[0xC] = count - 1;
+}
 
 void func_82D06670(u8 *arg0)
 {
