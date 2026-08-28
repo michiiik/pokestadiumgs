@@ -89,7 +89,30 @@ void func_8004C874(s32 arg0, s32 arg1) { func_8004C7A0(0, 0, arg0, arg1); }
 
 void func_8004C8A0(void) { func_8004C7A0(); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C8C0.s")
+extern s32 func_8004C3EC(s32 arg0, s32 arg1, s32 arg2);
+s32 func_8004C8C0(arg0) s32 arg0; {
+    s32 sp18;
+    s32 result;
+    s32 i;
+    s32 value;
+    result = 0;
+    if (D_80097120 != 0) {
+        sp18 = 0;
+        value = func_8004C3EC(*(s32 *)((u8 *)(u32)D_80097120 + 4), arg0, 1);
+        result = sp18;
+        if (value != 0) {
+            i = 0;
+            if (*(s32 *)(u32)value != 0) {
+                do {
+                    i++;
+                    *(s32 *)((u8 *)(u32)value + i * 4) &= 0xFFFFF;
+                } while ((u32)i < (u32)*(s32 *)(u32)value);
+            }
+            result = 1;
+        }
+    }
+    return result;
+}
 
 s32 func_8004C948(s32 arg0) {
     s32 temp_a0;
