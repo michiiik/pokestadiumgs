@@ -77,9 +77,23 @@ void func_841036E8(s32 arg0, s16 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_372DE0/func_841038F4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_372DE0/func_841039AC.s")
+extern void func_8410383C(S1_MtxF *, s16, s16, s16, f32);
+extern void func_841037A0(S1_MtxF *);
+void func_841039AC(s16 arg0, s16 arg1, s16 arg2, f32 arg3) {
+    S1_MtxF mat;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_372DE0/func_841039F4.s")
+    func_8410383C(&mat, arg0, arg1, arg2, arg3);
+    func_841037A0(&mat);
+}
+
+extern void func_841038F4(S1_MtxF *, s16, s16, s16, f32);
+extern void func_841037A0(S1_MtxF *);
+void func_841039F4(s16 arg0, s16 arg1, s16 arg2, f32 arg3) {
+    S1_MtxF mat;
+
+    func_841038F4(&mat, arg0, arg1, arg2, arg3);
+    func_841037A0(&mat);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_372DE0/func_84103A3C.s")
 
@@ -143,11 +157,39 @@ void ParticleGfx_BuildBillboardMatrixYScaled(S1_MtxF* arg0, S1_MtxF* arg1, S1_Ve
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_372DE0/func_841044A4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_372DE0/func_84104528.s")
+extern void ParticleGfx_BuildBillboardMatrix(S1_MtxF *, S1_MtxF *, S1_Vec3f, f32);
+extern void func_841037A0(S1_MtxF *);
+void func_84104528(S1_MtxF *arg0, S1_Vec3f arg1, f32 arg2) {
+    S1_MtxF mat;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_372DE0/func_84104590.s")
+    ParticleGfx_BuildBillboardMatrix(&mat, (S1_MtxF *)((u8 *)arg0 + 0x64), arg1, arg2);
+    func_841037A0(&mat);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_372DE0/func_84104600.s")
+extern void func_84103FF0(S1_MtxF *, S1_MtxF *, S1_Vec3f, f32, s16);
+extern void func_841037A0(S1_MtxF *);
+void func_84104590(S1_MtxF *arg0, S1_Vec3f arg1, f32 arg2, s16 arg3) {
+    S1_MtxF mat;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_372DE0/func_84104668.s")
+    func_84103FF0(&mat, (S1_MtxF *)((u8 *)arg0 + 0x64), arg1, arg2, arg3);
+    func_841037A0(&mat);
+}
+
+extern void ParticleGfx_BuildBillboardMatrixYScaled(S1_MtxF *, S1_MtxF *, S1_Vec3f, f32);
+extern void func_841037A0(S1_MtxF *);
+void func_84104600(S1_MtxF *arg0, S1_Vec3f arg1, f32 arg2) {
+    S1_MtxF mat;
+
+    ParticleGfx_BuildBillboardMatrixYScaled(&mat, (S1_MtxF *)((u8 *)arg0 + 0x64), arg1, arg2);
+    func_841037A0(&mat);
+}
+
+extern void func_8410413C(S1_MtxF *, S1_MtxF *, S1_Vec3f, f32, s16);
+extern void func_841037A0(S1_MtxF *);
+void func_84104668(S1_MtxF *arg0, S1_Vec3f arg1, f32 arg2, s16 arg3) {
+    S1_MtxF mat;
+
+    func_8410413C(&mat, (S1_MtxF *)((u8 *)arg0 + 0x64), arg1, arg2, arg3);
+    func_841037A0(&mat);
+}
 #endif
