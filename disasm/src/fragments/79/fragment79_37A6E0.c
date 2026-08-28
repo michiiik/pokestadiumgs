@@ -1580,7 +1580,15 @@ void func_84118794(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8411938C.s")
+extern void func_84111C44(void);
+extern void func_8411FEE8(s32);
+void func_8411938C(s32 arg0) {
+    func_84111C44();
+    func_8411FEE8(0x50);
+    *(s16 *)((u8 *)arg0 + 0x7E8) = 0;
+    *(u8 *)((u8 *)arg0 + 0x7F6) = 1;
+    *(s32 *)((u8 *)(arg0 + (D_841911F4 * 4)) + 0x5C8) = D_84183D50;
+}
 #endif
 
 #ifdef VERSION_US
@@ -1821,7 +1829,13 @@ void BattleAnim_Dispatch_149(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8411B710.s")
+void func_8411B710(u8 *arg0) {
+    s32 index;
+    if ((*(u16 *)(arg0 + 0x7EC) & 1) == 0) {
+        index = func_8411E1F8((s32)arg0);
+        *(u16 *)(arg0 + 0x65C) = *(u16 *)((u8 *)(u32)D_84193DD0 + (index << 4) + 0xC);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1852,7 +1866,13 @@ void BattleAnim_Dispatch_177(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8411BAB8.s")
+void func_8411BAB8(u8 *arg0) {
+    s32 index;
+    if ((*(u16 *)(arg0 + 0x7EC) & 1) == 0) {
+        index = func_8411E1F8((s32)arg0);
+        *(u16 *)(arg0 + 0x65C) = *(u16 *)((u8 *)(u32)D_84193DD0 + (index << 4) + 0xC);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1891,7 +1911,15 @@ void BattleAnim_Dispatch_086(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8411C2B4.s")
+extern void func_841125A4(s32);
+extern void func_8411FEE8(s32);
+void func_8411C2B4(s32 arg0) {
+    func_841125A4(D_8419120C);
+    *(s16 *)((u8 *)arg0 + 0x7E8) = 0;
+    *(u8 *)((u8 *)arg0 + 0x7F6) = 0;
+    func_8411FEE8(0x320);
+    *(s32 *)((u8 *)(arg0 + (D_841911F4 * 4)) + 0x5C8) = D_84183D50;
+}
 #endif
 
 #ifdef VERSION_US
@@ -1926,7 +1954,15 @@ void BattleAnim_Dispatch_184(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8411CBD0.s")
+extern void func_841125A4(s32);
+extern void func_8411FEE8(s32);
+void func_8411CBD0(s32 arg0) {
+    func_841125A4(D_8419120C);
+    *(s16 *)((u8 *)arg0 + 0x7E8) = 0;
+    *(u8 *)((u8 *)arg0 + 0x7F6) = 0;
+    func_8411FEE8(0x320);
+    *(s32 *)((u8 *)(arg0 + (D_841911F4 * 4)) + 0x5C8) = D_84183D50;
+}
 #endif
 
 #ifdef VERSION_US
