@@ -195,11 +195,113 @@ f32 func_8006EF04(f32 *arg0, f32 *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_8006F438.s")
+extern void func_8006EFF0(f32 *, f32 *, f32, f32, f32);
+extern f32 func_8006EF04(f32 *arg0, f32 *arg1);
+void func_8006F438(void *arg0, u8 *arg1, f32 arg2, f32 arg3)
+{
+  u8 *record;
+  u8 *item;
+  u8 *objA;
+  u8 *objB;
+  f32 *posA;
+  f32 *posB;
+  s16 indexA;
+  s16 indexB;
+  s16 flagA;
+  u16 *new_var;
+  s16 flagB;
+  f32 weight;
+  f32 computed;
+  record = arg1;
+  for (;;)
+  {
+    item = record + 8;
+    record += 0x50;
+    indexA = *((s16 *) item);
+    if (indexA == (-1))
+    {
+      break;
+    }
+    indexB = *((s16 *) (item + 2));
+    flagA = *((s16 *) (item + 4));
+    flagB = *((s16 *) (item + 6));
+    weight = *((f32 *) (item + 8));
+    objA = arg1 + (indexA * 0x50);
+    if ((*((u16 *) (objA + 0x4A))) != 0)
+    {
+      flagA = 0;
+    }
+    objB = arg1 + (indexB * 0x50);
+    new_var = (u16 *) (objB + 0x4A);
+    if ((*new_var) != 0)
+    {
+      flagB = 0;
+    }
+    if ((flagB != 0) || (flagA != 0))
+    {
+      posA = (f32 *) (objA + 0x14);
+      posB = (f32 *) (objB + 0x14);
+      computed = func_8006EF04(posA, posB);
+      func_8006EFF0(posA, posB, weight, computed, arg3);
+    }
+  }
+
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_8006F548.s")
+extern void func_8006F0A8(f32 *, f32 *, f32, f32, f32);
+extern f32 func_8006EF04(f32 *arg0, f32 *arg1);
+void func_8006F548(void *arg0, u8 *arg1, f32 arg2, f32 arg3)
+{
+  u8 *record;
+  u8 *item;
+  u8 *objA;
+  u8 *objB;
+  f32 *posA;
+  f32 *posB;
+  s16 indexA;
+  s16 indexB;
+  s16 flagA;
+  u16 *new_var;
+  s16 flagB;
+  f32 weight;
+  f32 computed;
+  record = arg1;
+  for (;;)
+  {
+    item = record + 8;
+    record += 0x50;
+    indexA = *((s16 *) item);
+    if (indexA == (-1))
+    {
+      break;
+    }
+    indexB = *((s16 *) (item + 2));
+    flagA = *((s16 *) (item + 4));
+    flagB = *((s16 *) (item + 6));
+    weight = *((f32 *) (item + 8));
+    objA = arg1 + (indexA * 0x50);
+    if ((*((u16 *) (objA + 0x4A))) != 0)
+    {
+      flagA = 0;
+    }
+    objB = arg1 + (indexB * 0x50);
+    new_var = (u16 *) (objB + 0x4A);
+    if ((*new_var) != 0)
+    {
+      flagB = 0;
+    }
+    if ((flagB != 0) || (flagA != 0))
+    {
+      posA = (f32 *) (objA + 0x14);
+      posB = (f32 *) (objB + 0x14);
+      computed = func_8006EF04(posA, posB);
+      func_8006F0A8(posA, posB, weight, computed, arg3);
+    }
+  }
+
+}
 #endif
 
 #ifdef VERSION_US
