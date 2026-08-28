@@ -28,7 +28,28 @@ void func_8AF02DA4(s32 arg0, s32 arg1) { func_8AF02C28(arg0, arg1, &D_8AF2BE10, 
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F0680/func_8AF02DD0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F0680/func_8AF02F18.s")
+extern Gfx *D_800D0510;
+extern u8 D_80094E00[];
+extern u8 D_80094F50[];
+extern void func_8AF02DD0(void *);
+void func_8AF02F18(void *arg0) {
+    s32 i;
+    u8 *ptr;
+    u8 *count_base;
+
+    gSPDisplayList(D_800D0510++, D_80094E00);
+    count_base = (u8 *)arg0 + 0x44;
+    if (*(s16 *)(count_base + 0x2C) > 0) {
+        ptr = (u8 *)arg0 + 0x74;
+        i = 0;
+        do {
+            func_8AF02DD0(ptr);
+            i++;
+            ptr += 0x10;
+        } while (i < *(s16 *)(count_base + 0x2C));
+    }
+    gSPDisplayList(D_800D0510++, D_80094F50);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F0680/func_8AF02FC8.s")
 
