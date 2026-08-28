@@ -112,7 +112,24 @@ s32 func_8004BA34(s32 arg0) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4C2E0/func_8004BA70.s")
+extern u8 *Asset_LoadToSegment(s32, u8 *, u8 *, s32);
+extern u8 D_447D00[];
+extern u8 D_4488E0[];
+extern u8 D_4494C0[];
+u8 *func_8004BA70(s32 arg0) {
+    u8 *result;
+
+    result = 0;
+    switch (arg0) {
+    case 0:
+        result = Asset_LoadToSegment(0, D_447D00, D_4488E0, 0);
+        break;
+    case 1:
+        result = Asset_LoadToSegment(0, D_4488E0, D_4494C0, 0);
+        break;
+    }
+    return result;
+}
 
 f32 func_8004BAE8(s32 arg0, s32 arg1) {
     f32 result = 1.0f;
