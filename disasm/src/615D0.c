@@ -435,7 +435,36 @@ void func_800620E8(u8 *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_8006218C.s")
+extern void *Util_Malloc(s32);
+extern void func_80062054(u8 *);
+extern void func_800620E8(u8 *);
+u8 *func_8006218C(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    s32 temp_v1;
+    u8 *temp_v0;
+    u8 *var_s0;
+    var_s0 = NULL;
+    if ((arg1 >= 0) && (arg1 < 4)) {
+        temp_v0 = Util_Malloc(0xC);
+        var_s0 = temp_v0;
+        if (temp_v0 != NULL) {
+            temp_v0[0] = arg3;
+            temp_v0[1] = arg0;
+            temp_v0[2] = arg1;
+            temp_v0[3] = arg2;
+            temp_v1 = arg0 & 0xF0;
+            temp_v0[4] = 0;
+            switch (temp_v1) {
+            case 16:
+                func_80062054(var_s0);
+                break;
+            case 32:
+                func_800620E8(var_s0);
+                break;
+            }
+        }
+    }
+    return var_s0;
+}
 
 typedef struct S1_DeckHandle {
     /* 0x00 */ u8 mode; // func_8006218C's arg3; ==1 selected by Deck_Initialize*Backend to reset the entry count
