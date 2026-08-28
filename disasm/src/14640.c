@@ -32,7 +32,20 @@ void func_800143B8(s32 arg0, s32 arg1) { if (arg0 != 0xFF) { u8 *ptr = D_8011BE9
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80014448.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_800144E4.s")
+extern void func_80014448(s32, void *);
+extern s32 func_80014BD4(s32);
+void func_800144E4(s32 arg0, s32 arg1, s32 arg2, OSMesgQueue *arg3) {
+    s32 temp[2];
+    if (arg1 & 2) {
+        func_80014448(arg0, &temp[0]);
+    }
+    if (arg1 & 1) {
+        func_80014BD4(arg0);
+    }
+    if (arg2 != 0) {
+        osSendMesg(arg3, (OSMesg)(arg2 << 24), 0);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_8001454C.s")
 
