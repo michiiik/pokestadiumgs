@@ -373,7 +373,18 @@ void BattleAnim_ModelDispatch_072(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8410F724.s")
+extern void func_800371B4(u8 *, u8 *, s32, s16, s32);
+extern u8 * func_8410B330(u8 *);
+void func_8410F724(u8 *arg0, s32 arg1) {
+    extern s32 BattleAnim_StepToS16(s16 *, s16, s16);
+    extern void func_800371B4(u8 *, u8 *, s32, s16, s32);
+    D_841911E8 = func_8410B330(arg0);
+    BattleAnim_StepToS16((s16 *)(D_841911E8 + 0x92), -0x8000, 0x71C);
+    func_800371B4(arg0 + 0xA8, arg0 + 0xB4,
+        *(s32 *)(D_841911E8 + 0x74),
+        *(s16 *)(D_841911E8 + 0x90),
+        (s32)*(s16 *)(D_841911E8 + 0x92));
+}
 #endif
 
 #ifdef VERSION_US
@@ -381,7 +392,18 @@ void BattleAnim_ModelDispatch_072(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8410F844.s")
+extern void func_800371B4(u8 *, u8 *, s32, s16, s32);
+extern u8 * func_8410B330(u8 *);
+void func_8410F844(u8 *arg0, s32 arg1) {
+    extern s32 BattleAnim_StepToS16(s16 *, s16, s16);
+    extern void func_800371B4(u8 *, u8 *, s32, s16, s32);
+    D_841911E8 = func_8410B330(arg0);
+    BattleAnim_StepToS16((s16 *)(D_841911E8 + 0x92), 0x4000, 0x71C);
+    func_800371B4(arg0 + 0xA8, arg0 + 0xB4,
+        *(s32 *)(D_841911E8 + 0x74),
+        *(s16 *)(D_841911E8 + 0x90),
+        (s32)*(s16 *)(D_841911E8 + 0x92));
+}
 #endif
 
 #ifdef VERSION_US
