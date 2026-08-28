@@ -543,7 +543,17 @@ void BattleAnim_StartEffect67OwnerAnchoredFourStream_Draw(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84158768.s")
+extern void func_841569E0(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
+extern void func_8415C644(f32, f32, f32, f32, f32, f32, s32, s32, s32, s32, s32, f32, f32, f32, s32);
+extern f32 D_8418C598;
+void func_84158768(void) {
+    f32 out[6];
+    func_841569E0(&out[5], &out[4], &out[3], &out[2], &out[1], &out[0]);
+    out[2] *= 6.0f;
+    out[1] *= 6.0f;
+    out[0] *= 6.0f;
+    func_8415C644(out[5], out[4], out[3], out[2], out[1], out[0], 5, 0xFF, 0xFF, 0xFF, 0xB4, D_8418C598, 2.0f, 20.0f, 0x3C);
+}
 #endif
 
 #ifdef VERSION_US
