@@ -93,7 +93,17 @@ f64 func_860091F4(void *arg0, f64 arg1, s32 arg2, f64 arg3, s32 arg4) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_86009260.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_86009318.s")
+extern f64 func_87C00664(void *);
+extern void func_86008E64(void *, s32, void *, void *);
+void func_86009318(void *arg0, void *arg1, s32 arg2) {
+    s32 i;
+
+    for (i = 0; i < arg2; i++) {
+        if (func_87C00664((u8 *)arg1 + i * 0x40) > 0.0) {
+            func_86008E64(arg0, 1, arg0, (u8 *)arg1 + i * 0x40);
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_860093AC.s")
 
@@ -205,7 +215,23 @@ void func_8600AAD4(void) {
 
 void func_8600B468(u8 *arg0, s32 arg1) {}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_8600B474.s")
+extern Gfx *D_800D0510;
+extern u8 D_80094E38[];
+extern u8 D_80094F50[];
+extern void func_8600B100(void *);
+extern void func_8600B328(void *);
+extern void func_87F061F0(void);
+extern void func_8600ACC4(void *, s32, s32, void *, void *);
+extern u8 D_8600D43C[];
+extern u8 D_8600D440[];
+void func_8600B474(void *arg0, void *arg1) {
+    gSPDisplayList(D_800D0510++, D_80094E38);
+    func_8600B100(arg1);
+    func_8600B328(arg1);
+    gSPDisplayList(D_800D0510++, D_80094F50);
+    func_87F061F0();
+    func_8600ACC4(arg0, 0x86, 0x10, D_8600D440, D_8600D43C);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_8600B51C.s")
 #endif
