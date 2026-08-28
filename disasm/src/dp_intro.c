@@ -147,11 +147,39 @@ void func_80001CD4(void) {
 }
 
 #ifdef VERSION_US
-void func_80001CDC(void) { func_80001CB0(); }
+s32 func_80001CDC(s32 arg0) { return func_80001CB0(arg0); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/Thread5_CreateThread.s")
+extern s32 func_80001CDC(s32);
+extern void func_80001B20(void *);
+extern s32 func_800071A4(s32, s32, s32, s32, s32);
+extern void Display_ClearFramebufferLine(u16);
+extern void func_80003F74(u8 *, u8 *, u8 *, s32);
+extern u8 *D_800AB3C0;
+extern u8 D_800AB3C4[];
+extern u8 D_800AB3C8[];
+extern OSMesgQueue D_800AB3CC;
+extern OSMesgQueue D_800AB3E4;
+void Thread5_CreateThread(void) {
+    OSThread *thread = (OSThread *)leoDiskID;
+    if (func_80001CDC(osTvType) == 0) {
+        osViBlack(1);
+        osViSetYScale(1.0f);
+        while (1) {}
+    }
+    osCreateThread(thread, 5, func_80001B20, NULL, &D_800AB3C0, 0x28);
+    osStartThread(thread);
+    osCreateMesgQueue(&D_800AB3CC, (OSMesg *)D_800AB3C4, 1);
+    osCreateMesgQueue(&D_800AB3E4, (OSMesg *)D_800AB3C8, 1);
+    *(s16 *)(leoDiskID + 0xA88) = 0;
+    leoDiskID[0xA8A] = 0;
+    leoDiskID[0xA8B] = 0;
+    *(f32 *)(leoDiskID + 0xA8C) = 1.0f;
+    *(s32 *)(leoDiskID + 0x9E0) = func_800071A4(0, 2, 0x280, 1, 1);
+    Display_ClearFramebufferLine(1);
+    func_80003F74(D_800AB4A0, (u8 *)0xB0000B70, (u8 *)0xB0000C70, 0);
+}
 #endif
 
 #ifdef VERSION_US
