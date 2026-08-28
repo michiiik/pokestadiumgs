@@ -19,7 +19,31 @@ void func_880022F0(void) { D_8800ED40 = 10; D_8800ED41 = 1; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88002958.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88002A08.s")
+extern s32 func_800472E0(u8 *); extern s32 func_800472B8(s32);
+s32 func_88002A08(u8 **arg0, u16 arg1, s32 arg2, s16 arg3) {
+    s32 temp_s2;
+    s32 temp_s3;
+    s32 var_s0;
+    s32 var_s2;
+    u8 **var_s1;
+    s32 result;
+
+    temp_s3 = arg1;
+    var_s2 = 0;
+    var_s0 = 0;
+    if (temp_s3 != 0) {
+        var_s1 = arg0;
+        do {
+            temp_s2 = func_800472E0(*var_s1);
+            var_s0 += 1;
+            var_s2 += temp_s2;
+            var_s1 += 1;
+            var_s2 &= 0xFFFF;
+        } while (var_s0 != temp_s3);
+    }
+    result = func_800472B8(arg2);
+    return (result * var_s2 + (arg3 * (var_s2 - 1))) & 0xFFFF;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88002AA8.s")
 
@@ -75,7 +99,39 @@ void func_88003FBC(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88004014.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_880040D4.s")
+extern u8 D_8800ED50[]; extern void func_88003A00(u8 *);
+void func_880040D4(void) {
+    u8 *entry;
+    u32 i;
+    s32 state;
+    u8 *child;
+    void (*callback)(void);
+
+    entry = D_8800ED50;
+    i = 0;
+    state = 2;
+    do {
+        child = entry + 4;
+        if ((*(s32 *)(entry + 0x20) == state) && (*(s32 *)(child + 0x28) != 0)) {
+            callback = (void (*)(void))(u32)*(u32 *)(child + 0x34);
+            if (callback != 0) {
+                callback();
+            }
+        }
+        i += 1;
+        entry += 0x4C;
+    } while (i < 6);
+
+    entry = D_8800ED50;
+    i = 0;
+    do {
+        if (*(s32 *)(entry + 0x20) != 0) {
+            func_88003A00(entry + 4);
+        }
+        i += 1;
+        entry += 0x4C;
+    } while (i != 6);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88004180.s")
 
