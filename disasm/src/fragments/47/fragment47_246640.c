@@ -135,7 +135,26 @@ void func_86001DBC(u8 *arg0) { arg0[0x1639] &= 0xFFFE; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_246640/func_860023CC.s")
+extern f32 D_8600D670;
+extern void func_86007B4C(void *, f64);
+extern void *func_87C00308(void *, void *, void *, f64);
+extern void *func_87C00160(void *, void *, void *);
+extern void func_87C00718(void *, void *, f64);
+extern void func_86007E4C(u8 *, s32, s32);
+void func_860023CC(u8 *arg0, f64 arg1) {
+    f32 value;
+    f32 scaled;
+    *(f64 *)(arg0 + 0x17C8) = arg1;
+    func_86007B4C(arg0, arg1);
+    value = (f32)(arg1 / 200.0);
+    *(f32 *)(arg0 + 0x150) = value;
+    *(f32 *)(arg0 + 0x154) = value;
+    *(f32 *)(arg0 + 0x158) = value;
+    scaled = value * D_8600D670;
+    *(f32 *)(arg0 + 0x2B8) = scaled;
+    *(f32 *)(arg0 + 0x2BC) = scaled;
+    *(f32 *)(arg0 + 0x2C0) = scaled;
+}
 #endif
 
 #ifdef VERSION_US
@@ -233,11 +252,34 @@ void func_86003754(u8 *arg0) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_246640/func_8600375C.s")
+void func_8600375C(u8 *arg0, u8 *arg1, f64 arg2) {
+    u8 sp38[0x18];
+    u8 sp20[0x18];
+    func_87C00308(sp20, arg0, arg1, 0.5);
+    func_87C00160(sp38, arg1, arg0);
+    func_87C00718(sp38, sp38, arg2);
+    func_86007E4C(arg1, (s32)sp20, (s32)sp38);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_246640/func_860037D8.s")
+extern f64 D_8600DF18;
+extern f64 D_8600DF20;
+extern s32 func_8600472C(u8 *);
+extern void func_87C01DB8();
+void func_860037D8(u8 *arg0, u8 *arg1, s32 *arg2, f64 *arg3) {
+    *arg2 = (*(s32 *)((u8 *)(arg1) + (0x1810)));
+    if (func_8600472C(arg0) == 0) {
+        func_87C01DB8(arg0 + 0x17A0, 7, 1);
+        if (func_8600472C(arg1) != 0) {
+            (*(s32 *)((u8 *)(arg0) + (0x1898))) = 1;
+            *arg3 = D_8600DF18;
+            return;
+        }
+        *arg3 = D_8600DF20;
+        (*(s32 *)((u8 *)(arg0) + (0x1898))) = 0;
+    }
+}
 #endif
 
 #ifdef VERSION_US
