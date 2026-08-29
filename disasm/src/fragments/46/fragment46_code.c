@@ -10,7 +10,29 @@ void func_8AE00020(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE00040.s")
+typedef struct {
+    u32 x;
+    u32 y;
+    u32 z;
+} Triple32;
+extern Triple32 D_8AE078F4;
+extern Triple32 D_8AE07900;
+extern void *D_8AE084BC;
+extern void *D_8AE084C4;
+extern s16 D_8AE084E0;
+extern void *D_8AE084E4;
+extern void *D_8AE098A8;
+extern s16 D_8AE098B0;
+extern Triple32 D_8AE098B8;
+extern Triple32 D_8AE098C8;
+void func_8AE00040(void) {
+    D_8AE098B0 = 1;
+    D_8AE084E4 = D_8AE098A8;
+    D_8AE084BC = D_8AE084C4;
+    D_8AE098B8 = D_8AE078F4;
+    D_8AE098C8 = D_8AE07900;
+    D_8AE084E0 = 0;
+}
 #endif
 
 #ifdef VERSION_US
