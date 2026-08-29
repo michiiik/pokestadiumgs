@@ -387,7 +387,32 @@ void func_82B04430(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B044B8.s")
+extern void func_800496A4(s32, s32);
+extern void func_8004972C(s32, s32, s32, s32);
+extern void func_8004C594(s32, s32);
+extern s32 func_8004C8A0(void *, s32, s32, s32);
+extern void func_800495F8(s32, s32, s32, s32);
+extern u8 D_82B085CC[];
+extern u8 D_82B085D0[];
+void func_82B044B8(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+    u8 buffer[0x24];
+    u8 *color;
+    s32 alpha;
+    func_800496A4(4, 0);
+    alpha = 0xFF;
+    color = D_82B085CC;
+    if (arg3 & 2) {
+        alpha = arg4;
+        color = D_82B085D0;
+    } else {
+        alpha = 0xFF;
+        color = D_82B085CC;
+    }
+    func_8004972C(color[0], color[1], color[2], alpha);
+    func_8004C594(3, arg2);
+    alpha = func_8004C8A0(buffer, 0x20, 0x1B, 0x2A);
+    func_800495F8(arg0, arg1, 0, alpha);
+}
 #endif
 
 #ifdef VERSION_US
