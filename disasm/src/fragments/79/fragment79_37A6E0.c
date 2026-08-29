@@ -211,7 +211,26 @@ void func_8410B884(u8 *arg0, void *arg1, u8 *arg2, s16 arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8410C304.s")
+extern u8 *D_841911E8;
+extern u8 *func_8410B330(u8 *);
+extern void func_8410BDA0(u8 *, s32);
+extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
+extern void func_84120BB4(u8 *, s32);
+void func_8410C304(u8 *arg0, s32 arg1, s32 arg2) {
+    u8 *temp_v0;
+    temp_v0 = func_8410B330(arg0);
+    D_841911E8 = temp_v0;
+    func_84120BB4(arg0, arg1);
+    *(f32 *)(D_841911E8 + 0x50) = func_8411E1D4(arg1) * -150.0f;
+    *(f32 *)(D_841911E8 + 0x54) = 20.0f;
+    *(f32 *)(D_841911E8 + 0x58) = 0.0f;
+    *(f32 *)(D_841911E8 + 0x74) = 180.0f;
+    *(f32 *)(arg0 + 0x2C) = 45.0f;
+    *(f32 *)(D_841911E8 + 0x88) = 45.0f;
+    Vec3f_SetComponentsDuplicate((f32 *)(D_841911E8 + 0x68), -1.0f, -1.0f, -1.0f);
+    Vec3f_SetComponentsDuplicate((f32 *)(D_841911E8 + 0x5C), -1.0f, -1.0f, -1.0f);
+    func_8410BDA0(arg0, arg1);
+}
 #endif
 
 #ifdef VERSION_US
@@ -1008,7 +1027,9 @@ void func_84111DB4(u8 *arg0, s32 arg1) {
 
 #ifdef VERSION_US
 extern void func_8003F3BC();
-void func_84111E50(u8 *arg0) {
+void func_84111E50(arg0)
+u8 *arg0;
+{
     if ((*(u16 *)(arg0 + 0x56) & 1) == 0) {
         func_8003F3BC();
     }
@@ -1073,7 +1094,16 @@ void func_841120A4(u8 *arg0) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_841120AC.s")
+extern void func_84111D64(u8 *, s32);
+extern void func_84111DB4(u8 *arg0, s32 arg1);
+void func_841120AC(u8 *arg0, s32 arg1, s32 arg2) {
+    s32 temp_v0;
+    temp_v0 = arg1 * 0x14;
+    func_84111D64(arg0, *(u8 *)(*(u8 **)(arg0 + 0x2D4) + temp_v0));
+    func_84111E50(arg0, *(s8 *)(*(u8 **)(arg0 + 0x2D4) + temp_v0 + 1));
+    func_84111DB4(arg0, (*(u16 *)(*(u8 **)(arg0 + 0x44) + 0xA) *
+        ((arg2 / *(u16 *)(*(u8 **)(arg0 + 0x44) + 0xA)) + 1)) - arg2);
+}
 #endif
 
 #ifdef VERSION_US
