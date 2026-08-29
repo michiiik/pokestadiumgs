@@ -1039,22 +1039,22 @@ def _function_mismatch_details(
             actual_index = actual_start + delta
             expected_text = (
                 expected_texts[expected_index]
-                if expected_index < expected_end
+                if expected_index < len(expected_texts)
                 else "<missing>"
             )
             actual_text = (
                 actual_texts[actual_index]
-                if actual_index < actual_end
+                if actual_index < len(actual_texts)
                 else "<missing>"
             )
             expected_normalized = (
                 normalized_expected[expected_index]
-                if expected_index < expected_end
+                if expected_index < len(normalized_expected)
                 else "<missing>"
             )
             actual_normalized = (
                 normalized_actual[actual_index]
-                if actual_index < actual_end
+                if actual_index < len(normalized_actual)
                 else "<missing>"
             )
             assembly_diff.append({

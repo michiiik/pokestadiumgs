@@ -440,6 +440,33 @@ class NormalizedOnlyMatchTests(unittest.TestCase):
         self.assertNotIn("func_B", printed)
 
 
+class FunctionMismatchDetailsTests(unittest.TestCase):
+    def test_short_instruction_texts_are_bounded_by_text_list_lengths(self) -> None:
+        expected = b"\x00\x00\x00\x01" * 3
+        actual = b"\x00\x00\x00\x01\x00\x00\x00\x02\x00\x00\x00\x03"
+        with mock.patch.object(
+            runner,
+            "_instruction_texts",
+            side_effect=[["expected instruction"], ["actual instruction"]],
+        ):
+            details = runner._function_mismatch_details(
+                Path("unused.o"),
+                "func_synthetic",
+                expected,
+                actual,
+                actual_symbol_size=len(actual),
+            )
+
+        self.assertEqual(details["expected_instruction_count"], 1)
+        self.assertEqual(details["actual_instruction_count"], 1)
+        self.assertTrue(
+            any(
+                diff["expected"] == "<missing>" or diff["actual"] == "<missing>"
+                for diff in details["assembly_diff"]
+            )
+        )
+
+
 class PrototypeScannerTests(unittest.TestCase):
     """Deliverable C: scan_source_for_callee_signature and friends."""
 
