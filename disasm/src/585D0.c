@@ -269,7 +269,46 @@ void func_80059468(s32 arg0) { func_80059320(arg0, 4); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_800596D0.s")
+extern u8 D_80128570[];
+extern s32 D_80128730[];
+void func_800596D0(s32 arg0, u32 arg1) {
+    u8 *record;
+    s32 index;
+    if (arg1 >= 0x44415430U && arg1 < 0x44415434U) {
+        index = arg1 - 0x44415430U;
+        record = D_80128570 + index * 0x70;
+        *(u32 *)record &= 0xDFFFFFFE;
+        *(u32 *)(record + 0x60) = 0;
+        return;
+    }
+    if (arg1 >= 0x424F5830U && arg1 < 0x424F5834U) {
+        index = arg1 - 0x424F5830U;
+        record = D_80128570 + index * 0x70;
+        *(u32 *)record &= 0xBFFFFFFB;
+        *(u32 *)(record + 0x64) = 0;
+        return;
+    }
+    if (arg1 >= 0x44543230U && arg1 < 0x44543234U) {
+        index = arg1 - 0x44543230U;
+        record = D_80128570 + index * 0x70;
+        *(u32 *)record &= 0xDFFFFFFD;
+        *(u32 *)(record + 0x68) = 0;
+        return;
+    }
+    if (arg1 >= 0x50545030U && arg1 < 0x50545034U) {
+        index = arg1 - 0x50545030U;
+        record = D_80128570 + index * 0x70;
+        *(u32 *)record &= 0xDFFFFFF7;
+        *(u32 *)(record + 0x6C) = 0;
+        return;
+    }
+    if (arg1 >= 0x444C4430U && arg1 < 0x444C4434U) {
+        index = arg1 - 0x444C4430U;
+        record = D_80128570 + index * 0x70;
+        *(u32 *)record &= 0xDFFFFFEF;
+        D_80128730[index] = 0;
+    }
+}
 #endif
 
 #ifdef VERSION_US
