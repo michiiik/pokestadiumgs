@@ -61,9 +61,54 @@ void func_883005B8(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/32/fragment32_1B1330/func_88300640.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/32/fragment32_1B1330/func_8830088C.s")
+extern Gfx *D_800D0510;
+extern s32 func_8004C990(s32, s32);
+extern void func_8004D19C(s32, s32, s32, s32, s32);
+extern s8 D_88308DFF;
+extern u8 D_88308E00;
+void func_8830088C(void) {
+    gDPPipeSync(D_800D0510++);
+    gDPSetCombine(D_800D0510++, 0x309661, 0x552EFF7F);
+    gDPSetPrimColor(D_800D0510++, 0, 0, 0xA0, 0xA0, 0x96, 0xFF);
+    gDPSetEnvColor(D_800D0510++, 0x0A, 0x0A, 0x0A, 0xFF);
+    func_8004D19C(0x1FA, 0x16E, func_8004C990(0x9B, D_88308DFF), 0, 0);
+    if (D_88308E00 > 0) {
+        D_88308DFF += 2;
+    } else {
+        D_88308DFF += 1;
+    }
+    if (D_88308DFF >= 0xF) {
+        D_88308DFF -= 0xF;
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/32/fragment32_1B1330/func_8830099C.s")
+extern u8 *func_8004CA60(u8 *);
+extern void func_800459AC(u8 *, u8, u8, u16, s32, s32, s32, s32, s32, s32, s32, s32, s32);
+extern s32 func_8004C990(s32, s32);
+extern void func_8004D19C(s32, s32, s32, s32, s32);
+extern s32 func_8830602C(void);
+extern void func_8830639C(void);
+extern void func_8830610C(s16, s16, u16, u16);
+extern u8 *D_88308938;
+extern u8 D_88308E0F;
+extern s16 D_88308F10;
+void func_8830099C(void) {
+    func_800459AC(
+        func_8004CA60(D_88308938),
+        D_88308938[4],
+        D_88308938[5],
+        *(u16 *)D_88308938,
+        *(u16 *)(D_88308938 + 2),
+        1, 0, 1, 1, 3, 3, 0, 0
+    );
+    if (func_8830602C() != 0) {
+        func_8830639C();
+    }
+    if (D_88308E0F != 0) {
+        func_8830610C(0x11E, 0x3A, 0x13, 0xDE);
+        func_8004D19C(0x123, D_88308F10, func_8004C990(0x10B, 0), 0, 0);
+    }
+}
 
 s32 func_88300A78(void) { s32 value = D_88308E04; s32 result; if (value < 5) { result = value & 0xFF; } else { result = (8 - value) & 0xFF; } D_88308E04 = value + 1; if (D_88308E04 >= 8) { D_88308E04 = 0; } return result; }
 
