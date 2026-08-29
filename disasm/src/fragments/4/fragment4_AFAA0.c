@@ -224,7 +224,7 @@ void func_81802690(u8 *arg0, f32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81802754.s")
 
-extern void func_81802438(s32, s32);
+extern void func_81802438();
 extern void func_81802208(s32, f32);
 extern void func_81802308(s32);
 extern void func_818024B0(s32, s32);
@@ -257,7 +257,31 @@ s32 func_81802C14(u8 *arg0) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81802CA8.s")
+extern u8 *func_81801FA0(void);
+extern s32 func_81802C14(u8 *);
+extern s32 func_8004D1FC(u8 *);
+extern u8 D_80094D90[];
+extern u8 D_80094DB8[];
+u8 *func_81802CA8(void *arg0, s32 arg1) {
+    u8 *value;
+    value = func_81801FA0();
+    if (value != NULL) {
+        func_81802438(*(s32 *)((u8 *)(u32)arg0 + 0xC));
+        if (arg1 != 0) {
+            func_81802C14(value);
+        } else {
+            func_8004D1FC(value);
+        }
+    } else if (*(u8 *)(*(u8 **)((u8 *)(u32)arg0 + 0xC) + 3) >= 0xFF) {
+        gSPDisplayList(D_800D0510++, D_80094D90);
+    } else {
+        gSPDisplayList(D_800D0510++, D_80094DB8);
+    }
+    func_81802208(*(s32 *)((u8 *)(u32)arg0 + 0xC), 1.0f);
+    func_81802308(*(s32 *)((u8 *)(u32)arg0 + 0xC));
+    func_818024B0(*(s32 *)((u8 *)(u32)arg0 + 0xC), 0x3F800000);
+    return value;
+}
 
 void func_81802D98(void *arg0) {
     func_8004C8C0((s32) (*(s16 *)((u8 *)(arg0) + (0x30))));
