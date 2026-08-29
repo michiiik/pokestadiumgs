@@ -20,7 +20,17 @@ s32 func_81300064(s32 arg0) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_813000BC.s")
+void func_813000BC(void *arg0, s32 arg1) {
+    typedef struct {
+        u8 pad_0[0x1A141];
+        s8 flag;
+        u8 pad_1[0x2A];
+        s32 value;
+    } State;
+    State *state = (State *)arg0;
+    state->flag = arg1;
+    state->value = 1;
+}
 
 void func_813000DC(u8 *arg0) {}
 
@@ -165,9 +175,33 @@ void func_8130150C(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_813019C8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_81301BDC.s")
+void func_8130C334(void *);
+void func_81311AAC(void *, s32);
+void func_8130F2C4(void *, s32);
+void func_8130B3B8(void *, void *);
+s32 func_8130CDD4(void *);
+void func_813000BC(void *, s32);
+void func_81301BDC(s32 arg0, s32 arg1) {
+    s32 sub = arg0 + 0xD18;
+    func_8130C334((void *)sub);
+    func_81311AAC((void *)(arg0 + 0x74), arg1);
+    func_8130F2C4((void *)arg0, arg1);
+    func_8130B3B8((void *)sub, (void *)(arg0 + 0x1A154));
+    if (func_8130CDD4((void *)sub)) {
+        func_813000BC((void *)arg0, 2);
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_81301C54.s")
+void func_81301C54(s32 arg0, s32 arg1) {
+    s32 sub = arg0 + 0xD18;
+    func_8130C334((void *)sub);
+    func_81311AAC((void *)(arg0 + 0x74), arg1);
+    func_8130F2C4((void *)arg0, arg1);
+    func_8130B3B8((void *)sub, (void *)(arg0 + 0x1A154));
+    if (func_8130CDD4((void *)sub)) {
+        func_813000BC((void *)arg0, 2);
+    }
+}
 
 void func_81301CCC(u8 *arg0, s32 arg1) {}
 
@@ -269,5 +303,29 @@ s32 func_813022D8(void *arg0) {
     return value >= 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_813022F4.s")
+extern s32 func_813022D8(void *);
+extern s32 func_81302290(void *);
+extern void func_8160A270(void *);
+extern void func_8160A384(void *, s32, s32, s32);
+extern void func_80055028(void);
+s32 func_813022F4(void *arg0, void *arg1) {
+    typedef struct {
+        u8 pad_0[0x1A13C];
+        s32 status;
+    } State;
+    s32 sp1C;
+    s8 value;
+    if (func_813022D8(arg0) != 0) {
+        sp1C = func_81302290(arg0);
+        if (sp1C < 0xA) {
+            func_8160A270(arg1);
+            value = *(s8 *)((u8 *)(*(void **)((u8 *)arg0 + 0x1A148)) + 0x944);
+            func_8160A384(arg1, value, sp1C, *(s32 *)((u8 *)arg0 + 0x1A168));
+            ((State *)arg0)->status = 1;
+            func_80055028();
+            return 1;
+        }
+    }
+    return 0;
+}
 #endif
