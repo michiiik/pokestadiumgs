@@ -80,7 +80,30 @@ f64 func_86007F50(void *arg0, s32 arg1, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_860086A4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_86008820.s")
+extern f64 func_87C00664(void *);
+extern f64 func_87C00208(void *, void *);
+s32 func_86008820(f64 *arg0, f64 *arg1, void *arg2, void *arg3, void *arg4) {
+    volatile u8 frame_pad[8];
+    f64 sp38;
+    f64 sp30;
+    f64 sp28;
+    f64 denominator;
+    f64 temp_fv0;
+    f64 temp_fs1;
+
+    temp_fs1 = func_87C00664(arg2);
+    sp38 = func_87C00664(arg3);
+    sp30 = func_87C00208(arg2, arg3);
+    sp28 = func_87C00208(arg3, arg4);
+    temp_fv0 = func_87C00208(arg4, arg2);
+    denominator = temp_fs1 * sp38 - sp30 * sp30;
+    if (denominator == 0.0) {
+        return 0;
+    }
+    *arg0 = ((sp30 * temp_fv0) - (temp_fs1 * sp28)) / denominator;
+    *arg1 = ((sp30 * sp28) - (sp38 * temp_fv0)) / denominator;
+    return 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_86008904.s")
 
@@ -190,7 +213,28 @@ s32 func_86009FB8(void *arg0, void *arg1, void *arg2) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_8600A04C.s")
+typedef struct Copy8600A04C {
+    s32 a;
+    s32 b;
+    s32 c;
+    s32 d;
+    s32 e;
+    s32 f;
+} Copy8600A04C;
+extern Copy8600A04C D_8600D970;
+extern void func_87C010AC(void *, void *, void *);
+extern s32 func_86009FB8(void *arg0, void *arg1, void *arg2);
+s32 func_8600A04C(void *arg0, void *arg1, void *arg2) {
+    Copy8600A04C sp30;
+    Copy8600A04C sp18;
+
+    if (func_86009FB8(arg0, arg1, &sp30) != 0) {
+        sp18 = D_8600D970;
+        func_87C010AC(arg2, &sp18, &sp30);
+        return 1;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_8600A0C8.s")
 
@@ -206,7 +250,25 @@ s32 func_8600A1C0(f32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_8600A20C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_8600A5B0.s")
+extern u8 *func_8004CA60(u8 *);
+extern s32 func_8004CA38(u8 *);
+extern s32 func_8004CA4C(u8 *);
+extern void func_8600A20C(s16, s16, u16, u16, s32, s32, u8 *, s32, s32, s32);
+extern s32 func_8004CA10(void *);
+extern s32 func_8004CA24(void *);
+void func_8600A5B0(s16 arg0, s16 arg1, u16 arg2, u16 arg3, void *arg4) {
+    s32 sp44;
+    s32 sp40;
+    s32 sp3C;
+    s32 sp24 = 1;
+    u8 *sp34;
+
+    sp44 = func_8004CA10((u16 *)arg4);
+    sp40 = func_8004CA24((u16 *)arg4);
+    sp34 = func_8004CA60((u8 *)arg4);
+    sp3C = func_8004CA38((u8 *)arg4);
+    func_8600A20C(arg0, arg1, arg2, arg3, sp44, sp40, sp34, sp3C, func_8004CA4C((u8 *)arg4), sp24);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_8600A650.s")
 
@@ -271,5 +333,29 @@ void func_8600B474(void *arg0, void *arg1) {
     func_8600ACC4(arg0, 0x86, 0x10, D_8600D440, D_8600D43C);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_8600B51C.s")
+extern s32 func_8004C990(s32, s32);
+extern void func_8004D1FC(void *);
+extern s32 func_8004CA10(void *);
+extern s32 func_8004CA24(void *);
+extern void func_8600A650(f32, f32, f32, f32, s32, s32, f32, f32);
+void func_8600B51C(s32 arg0, s32 arg1) {
+    volatile u8 frame_pad[8];
+    s32 sp3C;
+    s32 sp38;
+    s32 sp34;
+    u8 *temp_v0;
+
+    temp_v0 = func_8004C990(0x191, 0);
+    func_8004D1FC(temp_v0);
+    sp34 = func_8004CA10(temp_v0);
+    sp38 = func_8004CA24(temp_v0);
+    sp3C = func_8004CA10(temp_v0);
+    func_8600A650(
+        (f32)(arg0 - sp34 / 2),
+        (f32)(arg1 - sp38 / 2),
+        (f32)sp3C,
+        (f32)func_8004CA24(temp_v0),
+        0, 0, 1.0f, 1.0f
+    );
+}
 #endif
