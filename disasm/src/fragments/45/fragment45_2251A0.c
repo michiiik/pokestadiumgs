@@ -261,11 +261,83 @@ void func_8AB007E0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB00858.s")
+extern Gfx *D_800D0510;
+extern u8 D_80094E38[];
+extern s32 func_8004C990(s32, s32);
+extern u8 *func_8004CA60(u8 *);
+extern void func_800459AC(u8 *, u8, u8, u16, s32, s32, s32, s32, s32, s32, s32, s32, s32);
+extern void func_80044270(s16, s16, s16, s16, s32, s32, s32, s32, s32);
+void func_8AB00858(s32 arg0, s32 arg1) {
+    s32 var_s0;
+    s32 var_s5;
+    s32 temp_v0;
+    s32 var_s1;
+    s32 var_s4;
+
+    temp_v0 = func_8004C990(arg0, arg1);
+    gSPDisplayList(D_800D0510++, D_80094E38);
+    gDPSetRenderMode(D_800D0510++, 0x0F0A4000, 0);
+    gDPSetEnvColor(D_800D0510++, 0, 0xFF, 0, 0xFF);
+    var_s4 = 0;
+    var_s5 = 0;
+    do {
+        func_800459AC(((*(u16 *)((u8 *)temp_v0 + 0)) << 5) * var_s4 +
+                          func_8004CA60((u8 *)temp_v0),
+                      *(u8 *)((u8 *)temp_v0 + 4), *(u8 *)((u8 *)temp_v0 + 5),
+                      *(u16 *)((u8 *)temp_v0 + 0), 0x20, 1, 0, 0, 2, 7, 0, 0, 0);
+        var_s1 = 0;
+        var_s0 = var_s5;
+loop_2:
+        if (var_s0 < 0x1E0) {
+            func_80044270(0, var_s0, 0x280, 0x20, 0, 0, 0x400, 0x400, 0);
+        }
+        var_s1 += 0x80;
+        var_s0 += 0x80;
+        if (var_s1 != 0x200) {
+            goto loop_2;
+        }
+        var_s4 += 1;
+        var_s5 += 0x20;
+    } while (var_s4 != 4);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB009E0.s")
+void func_8AB009E0(s32 arg0, s32 arg1) {
+    s32 var_s0;
+    s32 var_s5;
+    s32 temp_v0;
+    s32 var_s1;
+    s32 var_s4;
+    s32 var_s2;
+
+    temp_v0 = func_8004C990(arg0, arg1);
+    gSPDisplayList(D_800D0510++, D_80094E38);
+    gDPSetRenderMode(D_800D0510++, 0x0F0A4000, 0);
+    gDPSetEnvColor(D_800D0510++, 0, 0xFF, 0, 0xFF);
+    var_s4 = 0;
+    var_s5 = 0;
+    var_s2 = 0x200;
+    do {
+        func_800459AC(((*(u16 *)((u8 *)temp_v0 + 0)) << 5) * var_s4 +
+                          func_8004CA60((u8 *)temp_v0),
+                      *(u8 *)((u8 *)temp_v0 + 4), *(u8 *)((u8 *)temp_v0 + 5),
+                      *(u16 *)((u8 *)temp_v0 + 0), 0x20, 1, 0, 0, 2, 7, 0, 0, 0);
+        var_s1 = 0;
+        var_s0 = var_s5;
+loop_2:
+        if ((var_s0 >= 0x137) && (var_s0 < 0x1AE)) {
+            func_80044270(0x40, var_s0, var_s2, 0x20, 0x800, 0, 0x400, 0x400, 0);
+        }
+        var_s1 += 0x80;
+        var_s0 += 0x80;
+        if (var_s1 != var_s2) {
+            goto loop_2;
+        }
+        var_s4 += 1;
+        var_s5 += 0x20;
+    } while (var_s4 != 4);
+}
 #endif
 
 #ifdef VERSION_US
