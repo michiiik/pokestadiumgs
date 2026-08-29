@@ -11,7 +11,38 @@ void func_880022F0(void) { D_8800ED40 = 10; D_8800ED41 = 1; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_8800254C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88002640.s")
+typedef struct { u8 pad0[4]; s16 mode; u8 pad6[2]; s32 status; u8 padC[4]; u16 x; u16 alt; s16 out; } Fragment29Node;
+typedef struct { u8 pad0[8]; u16 flags; } Fragment29Input;
+extern s16 func_8800230C(void);
+extern void func_8800254C(Fragment29Node *);
+extern Fragment29Input *D_80087200;
+void func_88002640(Fragment29Node *arg0) {
+    s16 mode;
+    s16 current;
+
+    if (arg0->status != 0) goto done;
+    mode = func_8800230C();
+    current = arg0->mode;
+    if (mode == current) goto done;
+    if (current != 0) goto set_status;
+    arg0->mode = mode;
+    if (mode == 0x10) goto positive;
+    if (mode == 0x20) goto negative;
+    if (mode == 0x100) goto positive;
+    if (mode != 0x200) goto done;
+negative:
+    if (D_80087200->flags & 0x220) arg0->out = -arg0->x;
+    else arg0->out = -arg0->alt;
+    goto done;
+positive:
+    if (D_80087200->flags & 0x110) arg0->out = arg0->x;
+    else arg0->out = arg0->alt;
+    goto done;
+set_status:
+    arg0->status = 1;
+done:
+    func_8800254C(arg0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88002720.s")
 
