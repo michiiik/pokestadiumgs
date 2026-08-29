@@ -2,7 +2,22 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4AC10/func_8004A010.s")
+extern Gfx *D_800D0510;
+extern void func_80044270(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6, s32 arg7, s32 arg8);
+void Ui_DrawTexturedRect8x8(s32 arg0, s32 arg1, s32 arg2, s32 arg3, void *arg4) {
+    s32 local0;
+    s32 local1;
+    local0 = (arg2 < 9) ? 0x400 : 0;
+    local1 = (arg3 < 9) ? 0x400 : 0;
+    gDPSetTextureImage(D_800D0510++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, arg4);
+    gDPSetTile(D_800D0510++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_CLAMP, 0, 0, G_TX_CLAMP, 0, 0);
+    gDPLoadSync(D_800D0510++);
+    gDPLoadBlock(D_800D0510++, G_TX_LOADTILE, 0, 0, 0x3F, 0x400);
+    gDPPipeSync(D_800D0510++);
+    gDPSetTile(D_800D0510++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 2, 0, G_TX_RENDERTILE, 0, G_TX_CLAMP, 0, 0, G_TX_CLAMP, 0, 0);
+    gDPSetTileSize(D_800D0510++, G_TX_RENDERTILE, 0, 0, 0x1C, 0x1C);
+    func_80044270((s16)arg0, (s16)arg1, (s16)arg2, (s16)arg3, 0, 0, local0, local1, 0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4AC10/func_8004A174.s")
 
