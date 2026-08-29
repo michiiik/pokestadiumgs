@@ -280,7 +280,23 @@ s32 func_81404CA4(void *arg0)
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_814052F4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_814053E4.s")
+extern void func_81404724(void *arg0, void *arg1);
+extern void func_814047C0(void *arg0, void *arg1);
+extern void func_81600A34(void *arg0, void *arg1, void *arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6);
+void func_814053E4(void *arg0, void *arg1, void *arg2) {
+    s16 first[4];
+    s16 second[4];
+
+    if (*(s32 *)((u8 *)arg0 + 0x14) == 0)
+        return;
+    func_81404724(arg0, first);
+    func_814047C0(arg0, second);
+    if (*(s8 *)((u8 *)arg0 + 9) < 2)
+        func_81600A34(arg1, (u8 *)arg0 + 1, arg2, first[0], first[1], first[2], first[3]);
+    func_81600A34(arg1, (u8 *)arg0 + 2, arg2, second[0], second[1], second[2], second[3]);
+    if (*(s8 *)((u8 *)arg0 + 9) >= 2)
+        func_81600A34(arg1, (u8 *)arg0 + 1, arg2, first[0], first[1], first[2], first[3]);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_814054CC.s")
 
@@ -306,15 +322,54 @@ s32 func_81406A9C(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81406AAC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81406EA8.s")
+extern void func_81404BEC(void *arg0);
+extern void func_800226C0(s32 arg0);
+void func_81406EA8(void *arg0) {
+    s32 i;
+
+    for (i = 0; i != 4; i++) {
+        if (*(s32 *)((u8 *)arg0 + 0x18F48 + i * 4) != 0)
+            func_81404BEC((u8 *)arg0 + i * 0x4D68 + 0x1990);
+    }
+    func_800226C0(0xA5);
+    func_81403A18(arg0);
+    func_81403A18((u8 *)arg0 + 0xCC8);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81406F44.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81407118.s")
+extern void func_81406700(void *arg0, void *arg1);
+extern void func_81403CD0(void *arg0, void *arg1);
+void func_81407118(void *arg0, void *arg1) {
+    s32 i;
+
+    for (i = 0; i != 4; i++) {
+        if (*(s32 *)((u8 *)arg0 + 0x18F48 + i * 4) != 0)
+            func_81406700((u8 *)arg0 + i * 0x4D68 + 0x1990, arg1);
+    }
+    func_81403CD0(arg0, arg1);
+    func_81403CD0((u8 *)arg0 + 0xCC8, arg1);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_814071C4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81407258.s")
+extern s32 func_81406A9C(u8 *arg0);
+s32 func_81407258(void *arg0) {
+    s32 i;
+    s32 result;
+
+    for (i = 0; i != 4; i++) {
+        if (*(s32 *)((u8 *)arg0 + 0x18F48 + i * 4) != 0) {
+            if (func_81406A9C((u8 *)arg0 + i * 0x4D68 + 0x1990) == 0)
+                return 0;
+        }
+    }
+    if (*(s32 *)((u8 *)arg0 + 0x18F5C) != 0)
+        result = -1;
+    else
+        result = 1;
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81407310.s")
 #endif
