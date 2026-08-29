@@ -226,7 +226,39 @@ void func_8F10128C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/69/fragment69_code/func_8F101CDC.s")
+extern void func_800088DC(void);
+extern void GfxImage_FillCurrent(void *, u16);
+extern void GeoRender_AdvanceFrameCounter(void);
+extern void func_8003C6B8(s32);
+extern void func_8F10128C(void);
+extern void func_8F100B54(void);
+extern void func_8F101318(void);
+extern void func_80008648(void);
+extern void *D_80087200;
+extern s32 D_8F103988;
+extern s32 D_8F1DECA4;
+extern s32 D_8F103984;
+extern Gfx *D_800D0510;
+void func_8F101CDC(void) {
+    func_800088DC();
+    GfxImage_FillCurrent(&D_800D0510, 0x5295);
+    if (D_8F103988 != 0) {
+        if (D_8F103988 > 0) {
+            D_8F103988--;
+        }
+        GeoRender_AdvanceFrameCounter();
+    }
+    func_8003C6B8(D_8F1DECA4);
+    func_8F10128C();
+    if ((*(u16 *)((u8 *)D_80087200 + 8)) & 0x10) {
+        D_8F103984 ^= 1;
+    }
+    if (D_8F103984 != 0) {
+        func_8F101318();
+    }
+    func_8F100B54();
+    func_80008648();
+}
 #endif
 
 #ifdef VERSION_US
