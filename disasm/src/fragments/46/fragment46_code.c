@@ -561,7 +561,52 @@ void func_8AE05B1C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE05BF0.s")
+typedef struct {
+    s32 unk0;
+    s32 unk4;
+} Fragment46Entry;
+typedef struct {
+    u8 pad0[2];
+    s16 saved;
+    u8 pad4[4];
+    Fragment46Entry *result;
+    u8 tail[4];
+} Fragment46SearchLocals16;
+extern s16 D_8AE084E0;
+extern s16 D_8AE084E2;
+extern s32 D_8AE084E8;
+extern Fragment46Entry *func_8AE0559C(s16);
+extern s16 func_8AE017A4(s16);
+extern void func_8AE01738(void);
+extern s32 func_8AE00F24(void);
+Fragment46Entry *func_8AE05BF0(void) {
+    volatile Fragment46SearchLocals16 locals;
+    s32 var_s0;
+    Fragment46Entry *temp_v0;
+
+    var_s0 = 0;
+    locals.saved = D_8AE084E0;
+    do {
+        D_8AE084E0 -= 1;
+        if (D_8AE084E0 <= 0) {
+            D_8AE084E0 = 0x38;
+        }
+        temp_v0 = func_8AE0559C(D_8AE084E0);
+        if (temp_v0 == NULL || temp_v0->unk4 == 0) {
+            var_s0 += 1;
+        } else {
+            break;
+        }
+    } while (var_s0 != 0x38);
+    if (locals.saved != D_8AE084E0) {
+        locals.result = temp_v0;
+        D_8AE084E2 = func_8AE017A4(D_8AE084E0);
+        func_8AE01738();
+        D_8AE084E8 = func_8AE00F24();
+        temp_v0 = locals.result;
+    }
+    return temp_v0;
+}
 #endif
 
 #ifdef VERSION_US
