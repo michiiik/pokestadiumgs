@@ -27,7 +27,67 @@ void func_87E12120(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E123B8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_315A90/func_87E12568.s")
+extern u8 D_87E1B9D8;
+extern u8 D_87E1AB30;
+extern s32 func_80040E80(s32, s32 *);
+extern void func_87F0252C(void *, void *, void *, s32);
+void func_87E12568(s32 arg0) {
+    u8 *sp24;
+    u8 *sp20;
+    s32 sp1C;
+    s32 temp_v0;
+    s32 var_a1;
+    u8 *var_a0;
+    u8 *var_a2;
+    u8 *var_a3;
+    u8 *var_t0;
+    u8 *var_v0;
+    u8 *var_v1;
+    extern void *main_pool_alloc(s32, s32);
+    extern void func_87F0252C(void *, void *, void *, s32);
+    extern s32 main_pool_get_available(void);
+    extern s32 MainPool_AllocState(s32, s32);
+    extern s32 func_80040E80(s32, s32 *);
+    extern void MainPool_FinalizeAllocation(s32);
+    extern void func_87E123B8(s32);
+
+    sp24 = (u8 *)main_pool_alloc(0xC60, 0);
+    sp20 = (u8 *)main_pool_alloc(0x4A0, 0);
+    func_87F0252C(&D_87E1B9D8, (u8 *)(u32)arg0 + 4, sp24, 8);
+    var_a0 = sp20;
+    var_a1 = 0;
+    var_v1 = sp24;
+    var_v0 = sp20;
+    var_a2 = sp20 + 0x94;
+    var_a3 = sp20 + 0x128;
+    var_t0 = sp20 + 0x1BC;
+    do {
+        *(u8 **)(var_v1 + 0x38) = var_a0;
+        *(s32 *)(var_v0 + 0x4) = 0;
+        *(s32 *)(var_v0 + 0x8) = 0;
+        *(u8 **)(var_v1 + 0x1C4) = var_a2;
+        *(s32 *)(var_v0 + 0x9C) = 0;
+        *(s32 *)(var_v0 + 0x98) = 0;
+        *(u8 **)(var_v1 + 0x350) = var_a3;
+        *(s32 *)(var_v0 + 0x130) = 0;
+        *(s32 *)(var_v0 + 0x12C) = 0;
+        *(u8 **)(var_v1 + 0x4DC) = var_t0;
+        var_a1 += 4;
+        *(s32 *)(var_v0 + 0x1C4) = 0;
+        *(s32 *)(var_v0 + 0x1C0) = 0;
+        var_t0 += 0x250;
+        var_a3 += 0x250;
+        var_a2 += 0x250;
+        var_a0 += 0x250;
+        var_v1 += 0x630;
+        var_v0 += 0x250;
+    } while (var_a1 != 8);
+    temp_v0 = MainPool_AllocState(main_pool_get_available(), 0);
+    sp1C = temp_v0;
+    *(s32 *)((u8 *)(u32)arg0 + 0x18) = func_80040E80(temp_v0, (s32 *)&D_87E1AB30);
+    MainPool_FinalizeAllocation(sp1C);
+    func_87E123B8(arg0);
+}
 
 extern void func_8004C8C0(s32);
 extern void func_87E12568(s32);
