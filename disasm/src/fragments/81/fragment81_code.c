@@ -66,7 +66,32 @@ s32 func_843008B0(u8 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_84300928.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_843009A4.s")
+typedef struct {
+    u16 value;
+    u8 tail[0x92];
+} Fragment81Row;
+extern u8 D_84302566[];
+extern u8 D_84302C88[];
+extern u8 D_84303008[];
+extern u8 D_84303108[];
+extern s32 func_84300648(u8);
+extern void func_84300200(u8 *, u8);
+void func_843009A4(u8 arg0) {
+    s32 result;
+    s32 first;
+    s32 limit;
+
+    if (arg0 > 0 && arg0 < 0xFC) {
+        result = func_84300648(arg0);
+        first = ((Fragment81Row *)D_84302566)[D_84302C88[1]].value;
+        limit = *(u16 *)(D_84302C88 + 0xE);
+        if ((first < limit && result < limit) || (first >= limit && result >= limit)) {
+            func_84300200(D_84303008, arg0);
+        } else {
+            func_84300200(D_84303108, arg0);
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_84300A54.s")
 
@@ -90,7 +115,37 @@ s32 func_843008B0(u8 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_84301AEC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_84301BA4.s")
+extern void func_8430188C(u8);
+extern u8 func_84300CC0(void);
+extern u8 func_84301094(u8 *);
+extern u8 func_843013A4(u8 *);
+extern u8 func_84301490(u8 *);
+void func_84301BA4(u8 *arg0) {
+    u8 value;
+
+    value = arg0[0];
+    switch (value) {
+    case 0x84:
+        arg0[2] = 0x90;
+        arg0[3] = 0;
+        arg0[4] = 0;
+        arg0[5] = 0;
+        return;
+    case 0xCA:
+        arg0[2] = 0x44;
+        arg0[3] = 0xF3;
+        arg0[4] = 0xDB;
+        arg0[5] = 0xC2;
+        return;
+    default:
+        func_8430188C(value);
+        arg0[2] = func_84300CC0();
+        arg0[3] = func_84301094(arg0);
+        arg0[4] = func_843013A4(arg0);
+        arg0[5] = func_84301490(arg0);
+        return;
+    }
+}
 
 extern u8 func_80062E10(u8);
 void func_84301C58(u8 *arg0) {
