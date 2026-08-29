@@ -3554,10 +3554,10 @@ void GeoOverlay_Draw(S1_unk_D_86002F34_00C_0CC* arg0, S1_unk_D_86002F34_00C_040*
 
 #ifdef VERSION_US
 extern s32 D_8009490C;
-extern void func_8003A2C8(void);
+extern void func_8003A2C8(void *, ...);
 void Geo_NodeType3Pass(s32 arg0) {
     D_8009490C = arg0;
-    func_8003A2C8();
+    func_8003A2C8((void *)arg0);
     D_8009490C = 0;
 }
 #endif
@@ -3679,11 +3679,16 @@ void func_8003B690(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003C344.s")
+extern void func_8003C2D8(s16);
+extern void func_8003A2C8(void *, ...);
+void Geo_NodeAnchor(void *arg0) {
+    func_8003C2D8(*(s16 *)((u8 *)arg0 + 0x18));
+    func_8003A2C8(arg0);
+}
 #endif
 
 #ifdef VERSION_US
-extern void func_8003A2C8(void); void Geo_NodeGroup(void) { func_8003A2C8(); }
+extern void func_8003A2C8(void *, ...); void Geo_NodeGroup(void *arg0) { func_8003A2C8(arg0); }
 #endif
 
 #ifdef VERSION_US

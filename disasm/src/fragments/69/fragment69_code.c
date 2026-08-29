@@ -114,7 +114,35 @@ void func_8F1002C4(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/69/fragment69_code/func_8F1003EC.s")
+extern u8 D_8F1DF270[];
+extern u8 D_8F1DF282[];
+extern void func_8F100290(void *);
+extern void func_8F1002F0(void *);
+extern void func_8F1002C4(void *);
+void func_8F1003EC(void)
+{
+  u8 *ptr;
+ ptr = D_8F1DF270; do {
+    switch (*((s16 *) ptr))
+    {
+      case 1:
+        func_8F100290(ptr);
+        break;
+
+      case 2:
+        func_8F1002F0(ptr);
+        break;
+
+      case 5:
+        func_8F1002C4(ptr);
+        break;
+
+    }
+
+    ptr += 6;
+  }
+  while (ptr != D_8F1DF282);
+}
 #endif
 
 #ifdef VERSION_US
@@ -159,7 +187,19 @@ void func_8F100D58(s32 arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/69/fragment69_code/func_8F100DCC.s")
+extern void func_8004D1FC(u8 *);
+extern void func_80044270(s16, s16, s16, s16, s32, s32, s32, s32, s32);
+void func_8F100DCC(void *arg0, void *arg1) {
+    u8 *sp3C;
+    void *temp_s0;
+    sp3C = *(u8 **)((u8 *)arg0 + 4);
+    *(s16 *)((u8 *)arg1 + 2) = (s16)(*(s16 *)((u8 *)arg1 + 2) + 6);
+    *(u16 *)((u8 *)arg1 + 4) = (u16)(*(u16 *)((u8 *)arg1 + 4) & 0xFFFD);
+    temp_s0 = arg1;
+    func_8004D1FC(sp3C);
+    func_80044270(*(s16 *)((u8 *)temp_s0 + 0), *(s16 *)((u8 *)temp_s0 + 2),
+        (s16)(*(u16 *)(u32)sp3C / 2), (s16)(*(u16 *)((u8 *)sp3C + 2) / 2), 0, 0, 0x800, 0x800, 0);
+}
 #endif
 
 #ifdef VERSION_US
