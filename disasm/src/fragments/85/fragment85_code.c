@@ -15,7 +15,11 @@ void func_8FD0006C(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/85/fragment85_code/func_8FD00074.s")
+extern Gfx *D_800D0510;
+void func_8FD00074(u8 arg0, u8 arg1, u8 arg2, u8 arg3) {
+    gDPPipeSync(D_800D0510++);
+    gDPSetPrimColor(D_800D0510++, 0, 0, arg0, arg1, arg2, arg3);
+}
 #endif
 
 #ifdef VERSION_US
@@ -101,7 +105,26 @@ void func_8FD008E8(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/85/fragment85_code/func_8FD009B4.s")
+extern Gfx *D_800D0510;
+extern u8 D_8FD01FB8[];
+extern u8 D_8FD020A0;
+extern s16 D_8FD020B0;
+extern s16 D_8FD020B4;
+extern u16 D_8FD020B8;
+extern u16 D_8FD020BC;
+extern void func_8FD00680(s16, s16, u16, u16);
+extern void func_8FD000E4(u8 *arg0, u8 arg1);
+extern void func_8FD00654(void);
+extern void func_8FD008BC(void);
+extern void func_8FD008E8(s16 arg0, s16 arg1, u16 arg2, u16 arg3);
+void func_8FD009B4(void) {
+    gSPDisplayList(D_800D0510++, D_8FD01FB8);
+    func_8FD000E4(&D_8FD020A0, 0xFF);
+    func_8FD008BC();
+    func_8FD008E8(D_8FD020B0, D_8FD020B4, D_8FD020B8, D_8FD020BC);
+    func_8FD00654();
+    func_8FD00680(D_8FD020B0, D_8FD020B4, D_8FD020B8, D_8FD020BC);
+}
 #endif
 
 #ifdef VERSION_US
@@ -109,7 +132,20 @@ void func_8FD008E8(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/85/fragment85_code/func_8FD00B28.s")
+extern Gfx *D_800D0510;
+extern u8 D_8FD02060[];
+extern u8 D_8FD02188;
+extern s16 D_8FD020D6;
+extern s16 D_8FD020D8;
+extern u16 D_8FD020DC;
+extern u16 D_8FD020E0;
+extern void func_8FD005B4(s16, s16, u16, u16);
+void func_8FD00B28(void) {
+    gSPDisplayList(D_800D0510++, D_8FD02060);
+    if ((D_8FD02188 == 2) || (D_8FD02188 == 4)) {
+        func_8FD005B4(D_8FD020D6, D_8FD020D8, D_8FD020DC, D_8FD020E0);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -129,7 +165,7 @@ extern void func_8FD00A5C();
 extern void func_8FD00B28();
 extern void func_8FD00BA4();
 extern void func_8FD00CD0();
-extern u8 D_800D0510;
+extern Gfx *D_800D0510;
 void func_8FD01120(void) {
     func_800088DC();
     GfxImage_FillCurrent(&D_800D0510, 1);
