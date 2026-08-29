@@ -212,12 +212,31 @@ void func_8004AF18(s32 arg0, s32 arg1) {
     gSPDisplayList(D_800D0510++, D_80094F50);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4AC10/func_8004B010.s")
+extern s16 D_800950D0;
+extern void func_8004AF18(s32, s32);
+void Ui_DrawAnimatedTextureMarker(s16 arg0, s16 arg1)
+{
+  s16 phase = D_800950D0;
+  s16 *new_var;
+  new_var = &D_800950D0;
+  if (phase < 6)
+  {
+    arg0 += phase;
+  }
+  else
+  {
+    arg0 = (arg0 - phase) + 0xC;
+  }
+  func_8004AF18(arg0, arg1);
+  phase = *new_var;
+  phase = (phase + 1) % 12;
+  D_800950D0 = phase;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4AC10/func_8004B09C.s")
 
 extern u8 D_80095110[];
-extern void func_8004B09C(s32, s32, s32, s32, void *, s32, s32, s32, s32);
+extern s32 func_8004B09C(s32, s32, s32, s32, u16 *, u8, u8, u8, s32);
 void func_8004B2CC(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u8 arg4, u8 arg5, u8 arg6, s32 arg7) {
     func_8004B09C(arg0, arg1, arg2, arg3, D_80095110, arg4, arg5, arg6, arg7);
 }

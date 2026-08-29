@@ -81,7 +81,7 @@ extern void func_8004C54C(s32, s32);
 extern s32 func_8004C8A0(void *, s32, s32, s32);
 extern s32 func_80048E30(s32, s32, s32, void *, s32);
 extern void func_88002820(s32, s32, s32, s32, s32, s32, void *);
-extern void func_8004B010(s32, s16);
+extern void Ui_DrawAnimatedTextureMarker(s32, s16);
 
 void func_881033FC(void) {
     typedef struct {
@@ -121,7 +121,7 @@ void func_881033FC(void) {
                    *(s16 *)((u8 *)D_88104E90 + 0x1A),
                    (u8 *)D_88104E90 + 0x30);
     func_800499EC();
-    func_8004B010(0x65,
+    Ui_DrawAnimatedTextureMarker(0x65,
                    (s16)(*(s16 *)((u8 *)D_88104E90 + 0x2C) * 0x1A + 0xC5));
 }
 

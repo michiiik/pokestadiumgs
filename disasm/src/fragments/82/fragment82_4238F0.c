@@ -126,7 +126,7 @@ void func_82D04B84(void *arg0) {
 }
 
 extern void func_8004972C(s32, s32, s32, s32);
-extern void func_8004B010(s32, s32);
+extern void Ui_DrawAnimatedTextureMarker(s32, s32);
 extern s32 func_80049064(s32, s32, s32, s32);
 extern void func_800498C4(void);
 extern void func_800496A4(s32, s32);
@@ -169,7 +169,7 @@ void func_82D04C44(void *arg0) {
     if (*(u8 *)((u8 *)arg0 + 0xB) == 0 &&
         *(s8 *)(sp24 + 1) == *(u8 *)((u8 *)arg0 + 1) &&
         sp24[0] == 0) {
-        func_8004B010(
+        Ui_DrawAnimatedTextureMarker(
             (s16)(*(s16 *)((u8 *)arg0 + 0x14) + 0x18),
             (s16)(*(s16 *)((u8 *)arg0 + 0x16) + 4));
     }
