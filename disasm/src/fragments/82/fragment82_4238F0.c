@@ -80,7 +80,17 @@ void func_82D039E4(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D03A5C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D03BEC.s")
+extern f32 D_80087E50[];
+extern u16 D_82D07280;
+extern void func_82D02D5C(s16, s16, u16, u16);
+extern int func_80044270(s32, s32, int, int, int, int, int, int, int);
+void func_82D03BEC(s16 arg0, s16 arg1, u16 arg2) {
+    s32 sp34;
+    sp34 = (s32)(D_80087E50[(s32)D_82D07280 >> 4] * 2);
+    D_82D07280 += 0x2000;
+    func_82D02D5C(arg0, (s16)(arg1 - sp34), 0x1C, 0);
+    func_80044270(arg0, (s16)(arg1 + arg2 + sp34), 0x20, 0xA, 0, 0x120, 0x400, -0x400, 0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D03CC0.s")
 
