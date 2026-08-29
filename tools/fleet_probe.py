@@ -18,6 +18,9 @@ Input (default form) -- a JSON file:
     {
       "source": "disasm/src/4AC10.c",
       "declarations": "extern Gfx *D_800D0510;\\n",
+      "companion_edits": [
+        {"function": "func_8004A020", "old": "old text", "new": "new text"}
+      ],
       "candidates": [
         {"function": "func_8004A010", "label": "wrapper:guard-return:u8-arg",
          "body": "void func_8004A010(s32 arg0) { ... }"},
@@ -80,7 +83,15 @@ def _resolve_source(raw: str) -> Path:
     return path
 
 
-def _load_json_batch(path: Path) -> tuple[str | None, str | None, list[tuple[str, str]], list[str]]:
+def _load_json_batch(
+    path: Path,
+) -> tuple[
+    str | None,
+    str | None,
+    list[tuple[str, str]],
+    list[str],
+    list[dict[str, str]] | None,
+]:
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
     except json.JSONDecodeError as exc:
@@ -93,6 +104,26 @@ def _load_json_batch(path: Path) -> tuple[str | None, str | None, list[tuple[str
     declarations = payload.get("declarations")
     if declarations is not None and not isinstance(declarations, str):
         raise InputError(f"{path}: 'declarations' must be a string")
+    companion_edits = payload.get("companion_edits")
+    if companion_edits is not None:
+        if not isinstance(companion_edits, list):
+            raise InputError(f"{path}: 'companion_edits' must be a list")
+        validated_edits: list[dict[str, str]] = []
+        for index, edit in enumerate(companion_edits):
+            if not isinstance(edit, dict):
+                raise InputError(f"{path}: companion_edits[{index}] must be an object")
+            if any(not isinstance(edit.get(field), str) for field in ("function", "old", "new")):
+                raise InputError(
+                    f"{path}: companion_edits[{index}] must contain string "
+                    "fields 'function', 'old', and 'new'"
+                )
+            if not edit["function"]:
+                raise InputError(f"{path}: companion_edits[{index}] 'function' must not be empty")
+            validated_edits.append(
+                {field: edit[field] for field in ("function", "old", "new")}
+            )
+    else:
+        validated_edits = None
     candidates = payload.get("candidates")
     if not isinstance(candidates, list) or not candidates:
         raise InputError(f"{path}: 'candidates' must be a non-empty list")
@@ -110,7 +141,7 @@ def _load_json_batch(path: Path) -> tuple[str | None, str | None, list[tuple[str
         label = entry.get("label")
         labels.append(label if isinstance(label, str) and label else f"candidate{index}")
         blocks.append((function, body))
-    return source, declarations, blocks, labels
+    return source, declarations, blocks, labels, validated_edits
 
 
 def _load_directory_batch(path: Path) -> tuple[list[tuple[str, str]], list[str]]:
@@ -153,14 +184,21 @@ def load_batch(
     *,
     source_override: str | None,
     declarations_override: str | None,
-) -> tuple[Path, str | None, list[tuple[str, str]], list[str]]:
-    """Return ``(source_path, declarations, blocks, labels)`` for one batch."""
+) -> tuple[
+    Path,
+    str | None,
+    list[tuple[str, str]],
+    list[str],
+    list[dict[str, str]] | None,
+]:
+    """Return source, declarations, candidates, labels, and companion edits."""
     if input_path.is_dir():
         blocks, labels = _load_directory_batch(input_path)
         source = source_override
         declarations = declarations_override
+        companion_edits = None
     else:
-        source, declarations, blocks, labels = _load_json_batch(input_path)
+        source, declarations, blocks, labels, companion_edits = _load_json_batch(input_path)
         if source_override:
             source = source_override
         if declarations_override is not None:
@@ -170,7 +208,7 @@ def load_batch(
             "no 'source' in the batch JSON and no --source given; "
             "required to know which file the candidates replace pragmas in"
         )
-    return _resolve_source(source), declarations, blocks, labels
+    return _resolve_source(source), declarations, blocks, labels, companion_edits
 
 
 def _compact_text(value: object) -> str | None:
@@ -263,6 +301,15 @@ def _label_of(attempt: dict[str, object]) -> str:
     return label if isinstance(label, str) and label else "(unlabeled)"
 
 
+def _has_register_tie_futility(attempts: list[dict[str, object]]) -> bool:
+    """Return whether the runner explicitly declared register-tie futility."""
+    return any(
+        isinstance(futility := attempt.get("futility"), str)
+        and futility.startswith("register-tie")
+        for attempt in attempts
+    )
+
+
 def summarize_function(function: str, attempts: list[dict[str, object]]) -> str:
     accepted = [a for a in attempts if a.get("status") == "accepted"]
     if accepted:
@@ -298,8 +345,10 @@ def summarize_function(function: str, attempts: list[dict[str, object]]) -> str:
     futility = _compact_text(best.get("futility"))
     if futility:
         verdict += f" futility={futility}"
-    if best.get("mismatch_kind") == "register_allocation_only" and isinstance(sim, (int, float)) and sim >= 0.99:
+    if _has_register_tie_futility(attempts):
         verdict += " -- register tie — stop"
+    elif best.get("mismatch_kind") == "register_allocation_only" and isinstance(sim, (int, float)) and sim >= 0.99:
+        verdict += " -- possible register tie (advisory; runner futility not set)"
     return verdict
 
 
@@ -323,7 +372,7 @@ def run(
     gate: bool,
     probe_workers: int | None,
 ) -> dict[str, object]:
-    source_path, declarations, blocks, labels = load_batch(
+    source_path, declarations, blocks, labels, companion_edits = load_batch(
         input_path, source_override=source_override, declarations_override=declarations_override
     )
     if not source_path.exists():
@@ -335,6 +384,7 @@ def run(
         labels=labels,
         gate=gate,
         declarations=declarations,
+        companion_edits=companion_edits,
     )
 
 
@@ -390,6 +440,15 @@ def main(argv: list[str] | None = None) -> int:
         args.json.write_text(json.dumps(result, indent=2, default=str), encoding="utf-8")
         print(f"raw result written to {args.json}")
 
+    # Probe-only rejection is expected during the hand-decompilation loop and
+    # remains nonfatal.  A runner-internal result is infrastructure failure,
+    # even though it may still carry attempts useful for diagnosis.
+    if (
+        result.get("batch_status") == "runner_internal_error"
+        or result.get("status") == "runner_internal_error"
+    ):
+        print("fleet_probe: runner internal error", file=sys.stderr)
+        return 1
     return 0
 
 

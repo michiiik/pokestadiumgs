@@ -38,6 +38,7 @@ import sys
 import tempfile
 import threading
 import time
+import traceback
 from contextlib import contextmanager
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
@@ -1714,6 +1715,50 @@ def _compile_diagnostic(
     return f"{head}\n...\n{tail}"
 
 
+_RUNNER_INTERNAL_ERROR_MAX_CHARS = 4000
+
+
+def _bounded_runner_internal_diagnostic(text: str) -> str:
+    """Bound a worker traceback while retaining its start and exception tail."""
+    limit = _RUNNER_INTERNAL_ERROR_MAX_CHARS
+    if len(text) <= limit:
+        return text
+    marker = "\n... runner traceback truncated ...\n"
+    available = max(0, limit - len(marker))
+    head_size = available // 2
+    tail_size = available - head_size
+    tail = text[-tail_size:] if tail_size else ""
+    return text[:head_size] + marker + tail
+
+
+def _runner_internal_error_result(
+    error: Exception,
+    *,
+    phase: str,
+    context: dict[str, object],
+) -> dict[str, object]:
+    """Describe an exception escaping a probe worker without misclassifying it.
+
+    Worker exceptions are runner failures, not candidate outcomes.  Keep the
+    traceback in both the general diagnostic field and a dedicated field so
+    callers that only render one of them still expose the actual exception.
+    Both fields are bounded before the result can reach stats or a caller.
+    """
+    traceback_text = "".join(
+        traceback.format_exception(type(error), error, error.__traceback__)
+    )
+    diagnostic = _bounded_runner_internal_diagnostic(traceback_text)
+    return {
+        "status": "runner_internal_error",
+        "probe_reason": "runner_internal_error",
+        "exception_type": type(error).__name__,
+        "phase": phase,
+        "context": context,
+        "diagnostic": diagnostic,
+        "traceback": diagnostic,
+    }
+
+
 def _probe_one_uncounted(
     source_path: Path,
     function: str,
@@ -1919,11 +1964,15 @@ def probe_candidates(
             try:
                 result = future.result()
             except Exception as error:  # pragma: no cover - defensive worker boundary
-                result = {
-                    "status": "probe_unavailable",
-                    "probe_reason": "probe_error",
-                    "diagnostic": str(error),
-                }
+                result = _runner_internal_error_result(
+                    error,
+                    phase="probe_candidates.future_result",
+                    context={
+                        "source": source_path.as_posix(),
+                        "function": blocks[index][0],
+                        "candidate_index": index,
+                    },
+                )
             results[index].update(result)
             results[index]["index"] = index
             results[index]["function"] = blocks[index][0]
@@ -2049,6 +2098,11 @@ def _rank_probe_rejections(
 
 def _full_gate_eligible(attempt: dict[str, object]) -> bool:
     """Return whether this specific attempt may use the sequential fallback."""
+    if (
+        attempt.get("status") == "runner_internal_error"
+        or attempt.get("probe_reason") == "runner_internal_error"
+    ):
+        return False
     if attempt.get("status") == "probe_match":
         return True
     return (
@@ -2193,7 +2247,11 @@ def _record_probe_stats(
                 "link_verified": attempt.get("link_verified"),
                 "link_mismatch": attempt.get("link_mismatch"),
                 "probe_seconds": attempt.get("probe_seconds"),
+                "exception_type": attempt.get("exception_type"),
+                "phase": attempt.get("phase"),
+                "context": attempt.get("context"),
                 "diagnostic": attempt.get("diagnostic"),
+                "traceback": attempt.get("traceback"),
                 "declarations": declarations,
                 "companion_edits": attempt.get("companion_edits"),
                 "candidate": (

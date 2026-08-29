@@ -1229,8 +1229,8 @@ def rank_files(
     the strongest signal, e.g. `4AC10.c`).  ``score = fresh + drift``; ties
     contribute nothing to ``score`` but are still reported so a coordinator
     can see why a file with many remaining owners scores low.  Rows are
-    sorted by ``score`` descending, then remaining owners descending, then
-    file path.
+    sorted by fresh-owner count descending, then the existing composite
+    score, remaining owners, and file path as deterministic tie-breakers.
 
     ``exclude_recent_hours``, when given, drops any file touched by a commit
     in that many hours (``git log --since``) or currently dirty in the
@@ -1271,7 +1271,14 @@ def rank_files(
     rows = list(per_file.values())
     for entry in rows:
         entry["score"] = int(entry["fresh"]) + int(entry["drift"])
-    rows.sort(key=lambda entry: (-int(entry["score"]), -int(entry["remaining"]), str(entry["file"])))
+    rows.sort(
+        key=lambda entry: (
+            -int(entry["fresh"]),
+            -int(entry["score"]),
+            -int(entry["remaining"]),
+            str(entry["file"]),
+        )
+    )
     return {"files": rows}
 
 

@@ -55,13 +55,56 @@ class LoadBatchTests(unittest.TestCase):
                     {"function": "func_1", "label": "a:b:c", "body": "void func_1(void) {}"},
                 ],
             }) as path:
-                source, declarations, blocks, labels = fleet_probe.load_batch(
+                source, declarations, blocks, labels, companion_edits = fleet_probe.load_batch(
                     path, source_override=None, declarations_override=None
                 )
         self.assertEqual(source, Path("/repo/disasm/src/X.c"))
         self.assertEqual(declarations, "extern s32 D_X;\n")
         self.assertEqual(blocks, [("func_1", "void func_1(void) {}")])
         self.assertEqual(labels, ["a:b:c"])
+        self.assertIsNone(companion_edits)
+
+    def test_json_batch_parses_companion_edits(self) -> None:
+        edits = [{"function": "func_2", "old": "old", "new": "new"}]
+        with _tmp_json({
+            "source": "disasm/src/X.c",
+            "companion_edits": edits,
+            "candidates": [{"function": "func_1", "body": "void func_1(void) {}"}],
+        }) as path:
+            _source, _declarations, _blocks, _labels, companion_edits = fleet_probe.load_batch(
+                path, source_override=None, declarations_override=None
+            )
+        self.assertEqual(companion_edits, edits)
+
+    def test_json_batch_validates_companion_edits(self) -> None:
+        invalid_payloads = [
+            {"function": "func_2", "old": "old"},
+            "not an object",
+        ]
+        for edit in invalid_payloads:
+            with self.subTest(edit=edit):
+                with _tmp_json({
+                    "source": "disasm/src/X.c",
+                    "companion_edits": [edit],
+                    "candidates": [{"function": "func_1", "body": "x"}],
+                }) as path:
+                    with self.assertRaises(fleet_probe.InputError):
+                        fleet_probe.load_batch(
+                            path, source_override=None, declarations_override=None
+                        )
+
+    def test_directory_batch_keeps_declarations_and_has_no_companion_edits(self) -> None:
+        with _tmp_dir() as directory:
+            (directory / "candidate.c").write_text(
+                "# function: func_1\nvoid func_1(void) {}\n"
+            )
+            _source, declarations, _blocks, _labels, companion_edits = fleet_probe.load_batch(
+                directory,
+                source_override="disasm/src/X.c",
+                declarations_override="extern s32 D_X;\n",
+            )
+        self.assertEqual(declarations, "extern s32 D_X;\n")
+        self.assertIsNone(companion_edits)
 
     def test_json_batch_requires_source_somewhere(self) -> None:
         with _tmp_json({"candidates": [{"function": "func_1", "body": "x"}]}) as path:
@@ -74,7 +117,7 @@ class LoadBatchTests(unittest.TestCase):
                 "source": "disasm/src/orig.c",
                 "candidates": [{"function": "func_1", "body": "x"}],
             }) as path:
-                source, _decl, _blocks, _labels = fleet_probe.load_batch(
+                source, _decl, _blocks, _labels, _companion_edits = fleet_probe.load_batch(
                     path, source_override="disasm/src/override.c", declarations_override=None
                 )
         self.assertEqual(source, Path("/repo/disasm/src/override.c"))
@@ -92,10 +135,11 @@ class LoadBatchTests(unittest.TestCase):
             (directory / "assign-then-return.c").write_text(
                 "# function: func_8004A010\ns32 func_8004A010(s32 a) { return a; }\n"
             )
-            source, declarations, blocks, labels = fleet_probe.load_batch(
+            source, declarations, blocks, labels, companion_edits = fleet_probe.load_batch(
                 directory, source_override="disasm/src/X.c", declarations_override=None
             )
         self.assertEqual(declarations, None)
+        self.assertIsNone(companion_edits)
         self.assertEqual(labels, ["assign-then-return", "guard-return"])
         self.assertEqual({function for function, _ in blocks}, {"func_8004A010"})
         self.assertTrue(all("return" in body for _, body in blocks))
@@ -103,7 +147,7 @@ class LoadBatchTests(unittest.TestCase):
     def test_directory_batch_guesses_function_without_header(self) -> None:
         with _tmp_dir() as directory:
             (directory / "guess.c").write_text("void func_8004A010(s32 a) { return; }\n")
-            _source, _decl, blocks, labels = fleet_probe.load_batch(
+            _source, _decl, blocks, labels, _companion_edits = fleet_probe.load_batch(
                 directory, source_override="disasm/src/X.c", declarations_override=None
             )
         self.assertEqual(blocks, [("func_8004A010", "void func_8004A010(s32 a) { return; }\n")])
@@ -180,7 +224,7 @@ class SummarizeTests(unittest.TestCase):
         self.assertIn("PROBE MATCH via a", summary)
         self.assertIn("--gate", summary)
 
-    def test_register_tie_stop_flag(self) -> None:
+    def test_register_tie_without_futility_is_advisory(self) -> None:
         attempts = [
             _fake_attempt(
                 "func_1", "a",
@@ -188,6 +232,39 @@ class SummarizeTests(unittest.TestCase):
                 mismatch_kind="register_allocation_only",
                 similarity_score=0.995,
             )
+        ]
+        summary = fleet_probe.summarize(attempts)
+        self.assertIn("possible register tie", summary)
+        self.assertIn("advisory", summary)
+        self.assertNotIn("register tie — stop", summary)
+
+    def test_register_tie_stop_requires_runner_futility(self) -> None:
+        attempts = [
+            _fake_attempt(
+                "func_1", "a",
+                mismatch_kind="register_allocation_only",
+                similarity_score=0.995,
+                futility="register-tie: 6 prior attempts at >=0.99",
+            )
+        ]
+        summary = fleet_probe.summarize(attempts)
+        self.assertIn("register tie — stop", summary)
+        self.assertNotIn("possible register tie", summary)
+
+    def test_register_tie_futility_is_authoritative_for_best_other_than_tie(self) -> None:
+        attempts = [
+            _fake_attempt(
+                "func_1", "tie-history",
+                mismatch_kind="register_allocation_only",
+                similarity_score=0.995,
+                futility="register-tie: 6 prior attempts at >=0.99",
+            ),
+            _fake_attempt(
+                "func_1", "best-current",
+                mismatch_kind="immediate_drift",
+                similarity_score=0.999,
+                futility="register-tie: 6 prior attempts at >=0.99",
+            ),
         ]
         summary = fleet_probe.summarize(attempts)
         self.assertIn("register tie — stop", summary)
@@ -238,10 +315,21 @@ class RunAndMainTests(unittest.TestCase):
     def test_run_calls_try_candidates_detailed_with_expected_args(self) -> None:
         captured: dict[str, object] = {}
 
-        def fake_try_candidates_detailed(source_path, blocks, *, probe_workers=None, labels=None, gate=True, declarations=None, families=None):
+        def fake_try_candidates_detailed(
+            source_path,
+            blocks,
+            *,
+            probe_workers=None,
+            labels=None,
+            gate=True,
+            declarations=None,
+            families=None,
+            companion_edits=None,
+        ):
             captured.update(
                 source_path=source_path, blocks=blocks, probe_workers=probe_workers,
                 labels=labels, gate=gate, declarations=declarations,
+                companion_edits=companion_edits,
             )
             return {"status": 0, "accepted": [], "attempts": [], "batch_status": "probe_only", "gate": gate}
 
@@ -262,6 +350,28 @@ class RunAndMainTests(unittest.TestCase):
         self.assertEqual(captured["labels"], ["l"])
         self.assertEqual(captured["probe_workers"], 3)
         self.assertFalse(captured["gate"])
+        self.assertIsNone(captured["companion_edits"])
+
+    def test_run_forwards_companion_edits(self) -> None:
+        captured: dict[str, object] = {}
+
+        def fake_try_candidates_detailed(source_path, blocks, **kwargs):
+            captured.update(kwargs)
+            return {"status": 1, "accepted": [], "attempts": [], "batch_status": "probe_only", "gate": False}
+
+        edits = [{"function": "func_2", "old": "old", "new": "new"}]
+        with _tmp_json({
+            "source": "x.c",
+            "companion_edits": edits,
+            "candidates": [{"function": "func_1", "body": "void func_1(void) {}"}],
+        }) as path:
+            (path.parent / "x.c").write_text("stub")
+            with mock.patch.object(try_pragma_compare, "try_candidates_detailed", fake_try_candidates_detailed):
+                with mock.patch.object(fleet_probe, "REPO_ROOT", path.parent):
+                    fleet_probe.run(
+                        path, source_override=None, declarations_override=None, gate=False, probe_workers=None
+                    )
+        self.assertEqual(captured["companion_edits"], edits)
 
     def test_run_rejects_missing_source_file(self) -> None:
         with _tmp_json({
@@ -314,6 +424,46 @@ class RunAndMainTests(unittest.TestCase):
             with mock.patch("sys.stderr"):
                 exit_code = fleet_probe.main([str(path)])
         self.assertEqual(exit_code, 2)
+
+    def test_main_keeps_probe_only_rejections_nonfatal(self) -> None:
+        def fake_try_candidates_detailed(source_path, blocks, **kwargs):
+            return {
+                "status": 1,
+                "accepted": [],
+                "attempts": [_fake_attempt("func_1", "a", similarity_score=0.4)],
+                "batch_status": "probe_only",
+                "gate": False,
+            }
+
+        with _tmp_json({
+            "source": "x.c",
+            "candidates": [{"function": "func_1", "body": "void func_1(void) {}"}],
+        }) as path:
+            (path.parent / "x.c").write_text("stub")
+            with mock.patch.object(try_pragma_compare, "try_candidates_detailed", fake_try_candidates_detailed):
+                with mock.patch.object(fleet_probe, "REPO_ROOT", path.parent):
+                    exit_code = fleet_probe.main([str(path)])
+        self.assertEqual(exit_code, 0)
+
+    def test_main_fails_on_runner_internal_error(self) -> None:
+        def fake_try_candidates_detailed(source_path, blocks, **kwargs):
+            return {
+                "status": 2,
+                "accepted": [],
+                "attempts": [],
+                "batch_status": "runner_internal_error",
+                "gate": False,
+            }
+
+        with _tmp_json({
+            "source": "x.c",
+            "candidates": [{"function": "func_1", "body": "void func_1(void) {}"}],
+        }) as path:
+            (path.parent / "x.c").write_text("stub")
+            with mock.patch.object(try_pragma_compare, "try_candidates_detailed", fake_try_candidates_detailed):
+                with mock.patch.object(fleet_probe, "REPO_ROOT", path.parent):
+                    exit_code = fleet_probe.main([str(path)])
+        self.assertEqual(exit_code, 1)
 
 
 import contextlib

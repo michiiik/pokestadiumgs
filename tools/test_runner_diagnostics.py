@@ -9,6 +9,8 @@
   it is defined or declared anywhere in the target source, instead of
   synthesizing a blind default -- Deliverable C (AGENTS.md Sec 5,
   ``func_8005D92C``).
+* structured runner-internal diagnostics for exceptions escaping probe worker
+  futures, including full-gate eligibility -- Deliverable D.
 
 All of these are pure-Python; none of them run the real compiler pipeline
 (see AGENTS.md Sec 3.1/5 and this task's own constraints), so every test
@@ -47,6 +49,152 @@ def _attempt(function: str, similarity_score: float, mismatch_kind: str | None, 
     row = {"function": function, "similarity_score": similarity_score, "mismatch_kind": mismatch_kind}
     row.update(extra)
     return row
+
+
+class ProbeWorkerExceptionTests(unittest.TestCase):
+    """Deliverable D: worker exceptions are runner failures, not probe misses."""
+
+    def test_worker_exception_is_structured_and_bounded(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.c"
+            source.write_text(
+                '#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_a.s")\n'
+            )
+            with mock.patch.object(
+                runner,
+                "source_object_path",
+                return_value=(None, Path(directory) / "synthetic.o"),
+            ), mock.patch.object(
+                runner, "_ensure_baseline_object", return_value=True
+            ), mock.patch.object(
+                runner, "_function_bytes", return_value=b"baseline"
+            ), mock.patch.object(
+                runner, "_object_link_shape", return_value=None
+            ), mock.patch.object(
+                runner,
+                "_probe_one",
+                side_effect=IndexError("list index out of range"),
+            ):
+                results = runner.probe_candidates(
+                    source,
+                    [("func_a", "void func_a(void) {}")],
+                    workers=1,
+                )
+
+        attempt = results[0]
+        self.assertEqual(attempt["status"], "runner_internal_error")
+        self.assertEqual(attempt["probe_reason"], "runner_internal_error")
+        self.assertEqual(attempt["exception_type"], "IndexError")
+        self.assertEqual(attempt["phase"], "probe_candidates.future_result")
+        self.assertEqual(attempt["context"]["function"], "func_a")
+        self.assertEqual(attempt["context"]["candidate_index"], 0)
+        self.assertIn("IndexError", attempt["diagnostic"])
+        self.assertIn("list index out of range", attempt["diagnostic"])
+        self.assertEqual(attempt["traceback"], attempt["diagnostic"])
+        self.assertLessEqual(
+            len(attempt["diagnostic"]), runner._RUNNER_INTERNAL_ERROR_MAX_CHARS
+        )
+        self.assertFalse(runner._full_gate_eligible(attempt))
+        oversized = runner._bounded_runner_internal_diagnostic(
+            "traceback head\n" + ("x" * runner._RUNNER_INTERNAL_ERROR_MAX_CHARS) + "\nexception tail"
+        )
+        self.assertEqual(len(oversized), runner._RUNNER_INTERNAL_ERROR_MAX_CHARS)
+        self.assertIn("traceback head", oversized)
+        self.assertIn("runner traceback truncated", oversized)
+        self.assertIn("exception tail", oversized)
+
+    def test_internal_error_does_not_fall_back_to_full_gate(self) -> None:
+        internal_error = {
+            "index": 0,
+            "function": "func_a",
+            "status": "runner_internal_error",
+            "probe_reason": "runner_internal_error",
+            "exception_type": "IndexError",
+            "phase": "probe_candidates.future_result",
+            "context": {"function": "func_a", "candidate_index": 0},
+            "diagnostic": "IndexError: list index out of range",
+            "traceback": "IndexError: list index out of range",
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.c"
+            source.write_text(
+                '#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_a.s")\n'
+            )
+            with mock.patch.object(
+                runner, "probe_candidates", return_value=[internal_error]
+            ), mock.patch.object(
+                runner, "_claim_or_refuse", return_value=None
+            ), mock.patch.object(
+                runner, "_record_probe_stats"
+            ), mock.patch.object(
+                runner, "_try_candidate_detailed"
+            ) as full_gate, mock.patch.object(
+                runner, "compare_current_tree"
+            ) as full_compare:
+                result = runner.try_candidates_detailed(
+                    source,
+                    [("func_a", "void func_a(void) {}")],
+                )
+
+        self.assertEqual(result["status"], 1)
+        self.assertEqual(result["batch_status"], "no_candidate_accepted")
+        self.assertEqual(result["attempts"][0]["status"], "runner_internal_error")
+        full_gate.assert_not_called()
+        full_compare.assert_not_called()
+
+    def test_only_legacy_unavailable_reasons_remain_gate_eligible(self) -> None:
+        self.assertTrue(
+            runner._full_gate_eligible({
+                "status": "probe_unavailable",
+                "probe_reason": "baseline_object_unavailable",
+            })
+        )
+        self.assertTrue(
+            runner._full_gate_eligible({
+                "status": "probe_unavailable",
+                "probe_reason": "missing_function_bytes",
+            })
+        )
+        self.assertFalse(
+            runner._full_gate_eligible({
+                "status": "probe_unavailable",
+                "probe_reason": "probe_error",
+            })
+        )
+        self.assertFalse(
+            runner._full_gate_eligible({
+                "status": "probe_unavailable",
+                "probe_reason": "runner_internal_error",
+            })
+        )
+
+    def test_structured_fields_are_persisted_in_probe_stats(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            stats_path = Path(directory) / "probe-stats.jsonl"
+            attempt = runner._runner_internal_error_result(
+                IndexError("list index out of range"),
+                phase="probe_candidates.future_result",
+                context={"function": "func_a", "candidate_index": 0},
+            )
+            attempt["function"] = "func_a"
+            with mock.patch.dict(
+                runner.os.environ, {"PRAGMA_PROBE_STATS": str(stats_path)}
+            ):
+                runner._record_probe_stats(
+                    Path("synthetic.c"),
+                    [attempt],
+                    [None],
+                    [("func_a", "void func_a(void) {}")],
+                )
+
+            row = json.loads(stats_path.read_text())["attempts"][0]
+        self.assertEqual(row["status"], "runner_internal_error")
+        self.assertEqual(row["probe_reason"], "runner_internal_error")
+        self.assertEqual(row["exception_type"], "IndexError")
+        self.assertEqual(row["phase"], "probe_candidates.future_result")
+        self.assertEqual(row["context"]["function"], "func_a")
+        self.assertIn("list index out of range", row["diagnostic"])
+        self.assertIn("list index out of range", row["traceback"])
 
 
 class PriorAttemptHistoryTests(unittest.TestCase):

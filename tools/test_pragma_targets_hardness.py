@@ -302,6 +302,14 @@ class RankFilesTests(unittest.TestCase):
         _write_asm(self.asm_root / "x" / "func_b1.s", "func_b1", 6)
         _write_asm(self.asm_root / "x" / "func_b2.s", "func_b2", 6)
 
+        # drift.c: four owners with fewer fresh owners than good.c, but more
+        # drift signal overall.  The old composite-score ordering put this
+        # file first; fresh-owner priority must keep good.c ahead of it.
+        drift_functions = [f"func_d{i}" for i in range(1, 5)]
+        (self.source_root / "drift.c").write_text("".join(_pragma(function) for function in drift_functions))
+        for function in drift_functions:
+            _write_asm(self.asm_root / "x" / f"{function}.s", function, 6)
+
         # big.c: one owner over the instruction cap -- must not be counted.
         (self.source_root / "big.c").write_text(_pragma("func_big"))
         _write_asm(self.asm_root / "x" / "func_big.s", "func_big", 200)
@@ -311,9 +319,21 @@ class RankFilesTests(unittest.TestCase):
             exact_similarity_score=1.0, mismatch_kind="register_allocation_only",
         )
         tie_attempt2 = dict(tie_attempt, function="func_b2")
+        drift_attempts = [
+            _attempt(
+                function, status="probe_rejected", similarity_score=0.97,
+                exact_similarity_score=0.90, mismatch_kind="instruction_drift",
+            )
+            for function in drift_functions
+            for _ in range(8)
+        ]
         self.stats = self.root / "probe-stats.jsonl"
         _write_stats(self.stats, [
-            _batch([dict(tie_attempt) for _ in range(8)] + [dict(tie_attempt2) for _ in range(8)]),
+            _batch(
+                [dict(tie_attempt) for _ in range(8)]
+                + [dict(tie_attempt2) for _ in range(8)]
+                + drift_attempts,
+            ),
         ])
 
     def _rank(self, **kwargs):
@@ -341,10 +361,38 @@ class RankFilesTests(unittest.TestCase):
         self.assertEqual(by_file["disasm/src/bad.c"]["ties"], 2)
         self.assertEqual(by_file["disasm/src/bad.c"]["score"], 0)
 
-        # Sorted by score descending: good.c must come before bad.c.
+        # Fresh-owner priority: good.c must come before bad.c.
         files_in_order = [row["file"] for row in result["files"]]
         self.assertLess(
             files_in_order.index("disasm/src/good.c"), files_in_order.index("disasm/src/bad.c"),
+        )
+
+    def test_fresh_count_outranks_drift_count(self) -> None:
+        result = self._rank(max_instructions=128)
+        by_file = {row["file"]: row for row in result["files"]}
+
+        fresh_file = by_file["disasm/src/good.c"]
+        drift_file = by_file["disasm/src/drift.c"]
+        self.assertEqual(fresh_file["fresh"], 2)
+        self.assertEqual(fresh_file["drift"], 0)
+        self.assertEqual(fresh_file["score"], 2)
+        self.assertEqual(drift_file["fresh"], 0)
+        self.assertEqual(drift_file["drift"], 4)
+        self.assertEqual(drift_file["score"], 4)
+
+        files_in_order = [row["file"] for row in result["files"]]
+        # Fresh is the primary key: drift.c's larger composite score cannot
+        # outrank good.c when it has fewer fresh owners.
+        self.assertLess(
+            files_in_order.index("disasm/src/good.c"),
+            files_in_order.index("disasm/src/drift.c"),
+        )
+
+        # Among files with equal fresh counts, retain the old score
+        # tie-breaker: drift.c remains ahead of the all-tie bad.c.
+        self.assertLess(
+            files_in_order.index("disasm/src/drift.c"),
+            files_in_order.index("disasm/src/bad.c"),
         )
 
     def test_oversized_owner_excluded_by_max_instructions(self) -> None:

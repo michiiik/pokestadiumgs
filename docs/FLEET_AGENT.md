@@ -1,7 +1,8 @@
 # Fleet decompilation agent brief
 
 You are one of several Sonnet agents in a fleet. You own **one source file**
-for a timeboxed session. Do not read `AGENTS.md`; this page has what you need.
+for a timeboxed session. Read the repository `AGENTS.md` first; this page is
+the task supplement for the fleet session.
 Do not touch any other file's pragmas or run `make`.
 
 ## 1. Start here (under a minute)
@@ -19,6 +20,24 @@ Do not touch any other file's pragmas or run `make`.
   before §4 below or your own reading of the `.s`.
 - Headers live in the repo only: `disasm/lib/ultralib/include/PR/gbi.h` has
   the `gSP*`/`gDP*` macros. Never search outside this repository.
+
+### Preflight and interpreting zero-accept batches
+
+- The coordinator's preflight uses `python3 tools/pragma_targets.py rank-files
+  --exclude-recent 4` and treats `fresh` as the primary ranking signal; the
+  claims and dirty-tree checks in `AGENTS.md` still apply.
+- A zero-accept batch containing `runner_internal_error`, an invalid pragma,
+  or an unavailable/environment failure is tooling/process evidence, not
+  source exhaustion. Record and report it, then repair or requeue the
+  preflight rather than changing source hypotheses.
+- Only a runner-reported `futility` authorizes the register-tie stop.
+  Similarity, a zero-accept batch, or a repeated error alone does not.
+- For fragment `jump_table_map`/`dispatcher_switch` owners, a missing required
+  `.rodata` subsegment is coordinator layout work; return the owner with that
+  prerequisite instead of treating it as an agent miss.
+- If supported by the runner, JSON fleet batches may use `companion_edits` for
+  the documented same-file exact-once edit; it must not add or remove a
+  `#pragma GLOBAL_ASM`.
 
 ## 2. The loop, per function
 
@@ -40,13 +59,14 @@ Do not touch any other file's pragmas or run `make`.
    `repeated_drift`, and a `first_diff_fingerprint` in probe stats. These are
    history and handoff context, not acceptance evidence.
 5. Gate the first probe hit: `python3 tools/fleet_probe.py batch.json --gate`.
-6. Cap **~12 variants / ~8 minutes per owner**. If the best after two batches
-   is `register_allocation_only` at similarity ≥ 0.99, stop on that owner —
-   it is a known-hard register tie, not a spelling you haven't tried. If the
-   runner reports `repeated-drift` after 12 prior rejected attempts sharing
-   one first-diff fingerprint, stop repeating that source shape and report the
-   fingerprint and first differing instruction. This is advisory only: it
-   never suppresses a candidate or changes the ROM gate.
+6. Cap **~12 variants / ~8 minutes per owner**. If, after two batches, the
+   runner reports `futility` for a best `register_allocation_only` result at
+   similarity ≥ 0.99, stop on that owner — it is a known-hard register tie,
+   not a spelling you haven't tried. Similarity alone does not authorize this
+   stop. If the runner reports `repeated-drift` after 12 prior rejected
+   attempts sharing one first-diff fingerprint, stop repeating that source
+   shape and report the fingerprint and first differing instruction. This is
+   advisory only: it never suppresses a candidate or changes the ROM gate.
 
 ## 3. `fleet_probe.py` / `file_brief.py` usage
 
