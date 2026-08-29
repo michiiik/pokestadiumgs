@@ -157,7 +157,29 @@ s32 func_86602720(s32 arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/54/fragment54_code/func_8660278C.s")
+extern s32 D_8660670C;
+extern s32 D_86606710;
+extern s32 D_8660681C;
+void func_8660278C(void) {
+    switch (D_8660681C) {
+    case 1:
+        D_8660670C = 1;
+        D_86606710 = 0x78;
+        return;
+    case 2:
+        D_8660670C = 2;
+        D_86606710 = 0x8C;
+        return;
+    case 3:
+        D_8660670C = 4;
+        D_86606710 = 0x78;
+        return;
+    case 4:
+        D_8660670C = 6;
+        D_86606710 = 0x8C;
+        return;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -222,7 +244,26 @@ void func_866048EC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/54/fragment54_code/func_86604954.s")
+extern s32 D_86606714;
+extern s32 D_8660678C;
+extern s32 func_87F006AC(void);
+extern void func_800279C4(s32);
+extern void func_80021ED8(s32);
+extern void func_87F0CA30(void);
+s32 func_86604954(void) {
+    if (D_86606714 == 1) {
+        return 0;
+    }
+    if (func_87F006AC() == 1) {
+        func_800279C4(0x2F00);
+    }
+    if (func_87F006AC() == 2) {
+        D_8660678C = 0xC;
+        func_800279C4(0x2F01);
+        func_80021ED8(0x15);
+        func_87F0CA30();
+    }
+}
 #endif
 
 #ifdef VERSION_US
