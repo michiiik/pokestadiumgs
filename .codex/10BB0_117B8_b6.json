@@ -1,0 +1,36 @@
+{
+  "source": "disasm/src/10BB0.c",
+  "declarations": "extern u8 D_8008D660[];",
+  "candidates": [
+    {
+      "function": "func_800117B8",
+      "label": "sch:dst-first:base-temp:shift",
+      "body": "void func_800117B8(u8 *arg0, s32 arg1) {\n    s32 i;\n    s16 *dst = (s16 *)arg0;\n    u8 *base = D_8008D660;\n    s16 *src = (s16 *)(base + (arg1 << 4));\n    for (i = 0; i != 8; i += 4) {\n        dst[0] = src[0];\n        dst[1] = src[1];\n        dst[2] = src[2];\n        dst[3] = src[3];\n        src += 4;\n        dst += 4;\n    }\n}"
+    },
+    {
+      "function": "func_800117B8",
+      "label": "sch:offset-temp:dst:src",
+      "body": "void func_800117B8(u8 *arg0, s32 arg1) {\n    s32 i;\n    s32 offset = arg1 << 4;\n    s16 *dst = (s16 *)arg0;\n    s16 *src = (s16 *)(D_8008D660 + offset);\n    for (i = 0; i != 8; i += 4) {\n        dst[0] = src[0];\n        dst[1] = src[1];\n        dst[2] = src[2];\n        dst[3] = src[3];\n        src += 4;\n        dst += 4;\n    }\n}"
+    },
+    {
+      "function": "func_800117B8",
+      "label": "sch:postinc:for",
+      "body": "void func_800117B8(u8 *arg0, s32 arg1) {\n    s32 i;\n    s16 *dst = (s16 *)arg0;\n    s16 *src = (s16 *)(D_8008D660 + arg1 * 0x10);\n    for (i = 0; i != 8; i += 4) {\n        *dst++ = *src++;\n        *dst++ = *src++;\n        *dst++ = *src++;\n        *dst++ = *src++;\n    }\n}"
+    },
+    {
+      "function": "func_800117B8",
+      "label": "sch:postinc:dowhile",
+      "body": "void func_800117B8(u8 *arg0, s32 arg1) {\n    s32 i;\n    s16 *dst = (s16 *)arg0;\n    s16 *src = (s16 *)(D_8008D660 + arg1 * 0x10);\n    i = 0;\n    do {\n        *dst++ = *src++;\n        *dst++ = *src++;\n        *dst++ = *src++;\n        *dst++ = *src++;\n        i += 4;\n    } while (i != 8);\n}"
+    },
+    {
+      "function": "func_800117B8",
+      "label": "sch:preinc-offsets:dowhile",
+      "body": "void func_800117B8(u8 *arg0, s32 arg1) {\n    s32 i;\n    s16 *dst = (s16 *)arg0;\n    s16 *src = (s16 *)(D_8008D660 + arg1 * 0x10);\n    i = 0;\n    do {\n        dst += 4;\n        src += 4;\n        dst[-4] = src[-4];\n        dst[-3] = src[-3];\n        dst[-2] = src[-2];\n        dst[-1] = src[-1];\n        i += 4;\n    } while (i != 8);\n}"
+    },
+    {
+      "function": "func_800117B8",
+      "label": "sch:s16-dst-formal:for",
+      "body": "void func_800117B8(s16 *dst, s32 arg1) {\n    s32 i;\n    s16 *src = (s16 *)(D_8008D660 + arg1 * 0x10);\n    for (i = 0; i != 8; i += 4) {\n        dst[0] = src[0];\n        dst[1] = src[1];\n        dst[2] = src[2];\n        dst[3] = src[3];\n        src += 4;\n        dst += 4;\n    }\n}"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "source": "disasm/src/10BB0.c",
+  "declarations": "extern u8 D_8008D660[];",
+  "candidates": [
+    {
+      "function": "func_800117B8",
+      "label": "m2cbody:base-temp-first:dst-mid",
+      "body": "void func_800117B8(u8 *arg0, s32 arg1) {\n    s32 i = 0;\n    s16 temp;\n    u8 *base = D_8008D660;\n    u8 *dst = arg0;\n    u8 *src = base + (arg1 << 4);\n\n    do {\n        i += 4;\n        dst += 8;\n        *(s16 *)(dst - 8) = *(s16 *)src;\n        temp = *(s16 *)(src + 2);\n        src += 8;\n        *(s16 *)(dst - 6) = temp;\n        *(s16 *)(dst - 4) = *(s16 *)(src - 4);\n        *(s16 *)(dst - 2) = *(s16 *)(src - 2);\n    } while (i != 8);\n}"
+    },
+    {
+      "function": "func_800117B8",
+      "label": "m2cbody:dst-first:base-temp",
+      "body": "void func_800117B8(u8 *arg0, s32 arg1) {\n    s32 i = 0;\n    s16 temp;\n    u8 *dst = arg0;\n    u8 *base = D_8008D660;\n    u8 *src = base + (arg1 << 4);\n\n    do {\n        i += 4;\n        dst += 8;\n        *(s16 *)(dst - 8) = *(s16 *)src;\n        temp = *(s16 *)(src + 2);\n        src += 8;\n        *(s16 *)(dst - 6) = temp;\n        *(s16 *)(dst - 4) = *(s16 *)(src - 4);\n        *(s16 *)(dst - 2) = *(s16 *)(src - 2);\n    } while (i != 8);\n}"
+    },
+    {
+      "function": "func_800117B8",
+      "label": "m2cbody:offset-temp:dst-first",
+      "body": "void func_800117B8(u8 *arg0, s32 arg1) {\n    s32 i = 0;\n    s16 temp;\n    s32 offset = arg1 << 4;\n    u8 *dst = arg0;\n    u8 *src = D_8008D660 + offset;\n\n    do {\n        i += 4;\n        dst += 8;\n        *(s16 *)(dst - 8) = *(s16 *)src;\n        temp = *(s16 *)(src + 2);\n        src += 8;\n        *(s16 *)(dst - 6) = temp;\n        *(s16 *)(dst - 4) = *(s16 *)(src - 4);\n        *(s16 *)(dst - 2) = *(s16 *)(src - 2);\n    } while (i != 8);\n}"
+    },
+    {
+      "function": "func_800117B8",
+      "label": "m2cbody:src-first:dst-second",
+      "body": "void func_800117B8(u8 *arg0, s32 arg1) {\n    s32 i = 0;\n    s16 temp;\n    u8 *src = (u8 *)D_8008D660 + (arg1 << 4);\n    u8 *dst = arg0;\n\n    do {\n        i += 4;\n        dst += 8;\n        *(s16 *)(dst - 8) = *(s16 *)src;\n        temp = *(s16 *)(src + 2);\n        src += 8;\n        *(s16 *)(dst - 6) = temp;\n        *(s16 *)(dst - 4) = *(s16 *)(src - 4);\n        *(s16 *)(dst - 2) = *(s16 *)(src - 2);\n    } while (i != 8);\n}"
+    },
+    {
+      "function": "func_800117B8",
+      "label": "m2cbody:src-s16-base-s32",
+      "body": "void func_800117B8(u8 *arg0, s32 arg1) {\n    s32 i = 0;\n    s16 temp;\n    s32 base = (s32)D_8008D660;\n    u8 *dst = arg0;\n    u8 *src = (u8 *)(base + (arg1 << 4));\n\n    do {\n        i += 4;\n        dst += 8;\n        *(s16 *)(dst - 8) = *(s16 *)src;\n        temp = *(s16 *)(src + 2);\n        src += 8;\n        *(s16 *)(dst - 6) = temp;\n        *(s16 *)(dst - 4) = *(s16 *)(src - 4);\n        *(s16 *)(dst - 2) = *(s16 *)(src - 2);\n    } while (i != 8);\n}"
+    }
+  ]
+}

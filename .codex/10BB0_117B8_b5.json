@@ -1,0 +1,31 @@
+{
+ "source": "disasm/src/10BB0.c",
+ "declarations": "extern u8 D_8008D660[];",
+ "candidates": [
+  {
+   "function": "func_800117B8",
+   "label": "prologue:base-temp-first:dst-mid:shift",
+   "body": "void func_800117B8(u8 *arg0, s32 arg1) {\n    s32 i;\n    u8 *base = D_8008D660;\n    s16 *dst = (s16 *)arg0;\n    s16 *src = (s16 *)(base + (arg1 << 4));\n    for (i = 0; i != 8; i += 4) {\n        dst[0] = src[0];\n        dst[1] = src[1];\n        dst[2] = src[2];\n        dst[3] = src[3];\n        src += 4;\n        dst += 4;\n    }\n}"
+  },
+  {
+   "function": "func_800117B8",
+   "label": "prologue:base-temp-first:mul",
+   "body": "void func_800117B8(u8 *arg0, s32 arg1) {\n    s32 i;\n    u8 *base = D_8008D660;\n    s16 *dst = (s16 *)arg0;\n    s16 *src = (s16 *)(base + arg1 * 0x10);\n    for (i = 0; i != 8; i += 4) {\n        dst[0] = src[0];\n        dst[1] = src[1];\n        dst[2] = src[2];\n        dst[3] = src[3];\n        src += 4;\n        dst += 4;\n    }\n}"
+  },
+  {
+   "function": "func_800117B8",
+   "label": "prologue:dst-first:shift",
+   "body": "void func_800117B8(u8 *arg0, s32 arg1) {\n    s32 i;\n    s16 *dst = (s16 *)arg0;\n    s16 *src = (s16 *)(D_8008D660 + (arg1 << 4));\n    for (i = 0; i != 8; i += 4) {\n        dst[0] = src[0];\n        dst[1] = src[1];\n        dst[2] = src[2];\n        dst[3] = src[3];\n        src += 4;\n        dst += 4;\n    }\n}"
+  },
+  {
+   "function": "func_800117B8",
+   "label": "prologue:base-temp-first:s32-base",
+   "body": "void func_800117B8(u8 *arg0, s32 arg1) {\n    s32 i;\n    s32 base = (s32)D_8008D660;\n    s16 *dst = (s16 *)arg0;\n    s16 *src = (s16 *)((u8 *)(u32)(base + (arg1 << 4)));\n    for (i = 0; i != 8; i += 4) {\n        dst[0] = src[0];\n        dst[1] = src[1];\n        dst[2] = src[2];\n        dst[3] = src[3];\n        src += 4;\n        dst += 4;\n    }\n}"
+  },
+  {
+   "function": "func_800117B8",
+   "label": "prologue:do-while:base-first",
+   "body": "void func_800117B8(u8 *arg0, s32 arg1) {\n    s32 i;\n    u8 *base = D_8008D660;\n    s16 *dst = (s16 *)arg0;\n    s16 *src = (s16 *)(base + (arg1 << 4));\n    i = 0;\n    do {\n        dst[0] = src[0];\n        dst[1] = src[1];\n        dst[2] = src[2];\n        dst[3] = src[3];\n        src += 4;\n        dst += 4;\n        i += 4;\n    } while (i != 8);\n}"
+  }
+ ]
+}
