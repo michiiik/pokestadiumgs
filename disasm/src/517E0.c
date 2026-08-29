@@ -445,7 +445,21 @@ u8 func_80054410(s32 arg0) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80054488.s")
+extern void * func_800510CC(s32 arg0);
+extern void func_80051BF0(s32, void *, s32);
+
+s32 func_80054488(s32 arg0, u8 arg1) {
+    s32 result = 0;
+    u8 *record;
+    record = (u8 *)&D_801281C0 + (func_80050D20(0x13, -1) * 0xC);
+    if (arg0 < 0x10 && (*(s32 *)record & 1) != 0 &&
+        arg1 != *(u8 *)((u8 *)func_800510CC(0) + arg0 + 0x2F)) {
+        *(u8 *)((u8 *)func_800510CC(0) + arg0 + 0x2F) = arg1;
+        func_80051BF0(0x13, 0, 2);
+        result = 1;
+    }
+    return result;
+}
 
 u8 func_8005453C(s32 arg0) {
     u8 result = 0;
@@ -455,7 +469,21 @@ u8 func_8005453C(s32 arg0) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800545B4.s")
+extern void * func_800510CC(s32 arg0);
+extern void func_80051BF0(s32, void *, s32);
+
+s32 func_800545B4(s32 arg0, u8 arg1) {
+    s32 result = 0;
+    u8 *record;
+    record = (u8 *)&D_801281C0 + (func_80050D20(0x13, -1) * 0xC);
+    if (arg0 < 9 && (*(s32 *)record & 1) != 0 &&
+        arg1 != *(u8 *)((u8 *)func_800510CC(0) + arg0 + 0x3F)) {
+        *(u8 *)((u8 *)func_800510CC(0) + arg0 + 0x3F) = arg1;
+        func_80051BF0(0x13, 0, 2);
+        result = 1;
+    }
+    return result;
+}
 
 u8 func_80054668(s32 arg0) {
     u8 result = 0;
@@ -465,7 +493,21 @@ u8 func_80054668(s32 arg0) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800546E0.s")
+extern void * func_800510CC(s32 arg0);
+extern void func_80051BF0(s32, void *, s32);
+
+s32 func_800546E0(s32 arg0, u8 arg1) {
+    s32 result = 0;
+    u8 *record;
+    record = (u8 *)&D_801281C0 + (func_80050D20(0x13, -1) * 0xC);
+    if (arg0 < 3 && (*(s32 *)record & 1) != 0 &&
+        arg1 != *(u8 *)((u8 *)func_800510CC(0) + arg0 + 0x48)) {
+        *(u8 *)((u8 *)func_800510CC(0) + arg0 + 0x48) = arg1;
+        func_80051BF0(0x13, 0, 2);
+        result = 1;
+    }
+    return result;
+}
 
 u8 func_80054794(void) {
     u8 result = 0;
@@ -475,7 +517,17 @@ u8 func_80054794(void) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800547F4.s")
+extern void * func_800510CC(s32 arg0);
+extern void func_80051BF0(s32, void *, s32);
+
+u8 func_800547F4(u8 arg0) {
+    if ((*(s32 *)((u8 *)&D_801281C0 + (func_80050D20(0x13, -1) * 0xC)) & 1) != 0 &&
+        arg0 != *((u8 *)func_800510CC(0) + 0x4B)) {
+        *((u8 *)func_800510CC(0) + 0x4B) = arg0;
+        func_80051BF0(0x13, 0, 2);
+    }
+    return arg0;
+}
 
 
 typedef struct { s32 a, b, c, d; } Quad8005487C;
