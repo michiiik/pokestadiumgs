@@ -27,9 +27,13 @@ s32 func_80014190(s32 arg0) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80014208.s")
+extern u8 D_8011F258;
+extern u8 D_8011F190;
+extern s32 func_8001510C(s32 arg0, s32 arg1);
+s32 func_80014208(s32 arg0) { if (arg0 == 0xFF) { return 1; } if (((u8 *)&D_8011F258)[arg0] >= 2) { return 1; } if (((u8 *)&D_8011F258)[func_8001510C(0, arg0)] >= 2) { return 1; } return 0; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80014280.s")
+extern s32 func_8001510C(s32 arg0, s32 arg1);
+s32 func_80014280(s32 arg0) { if (arg0 == 0xFF) { return 1; } if (((u8 *)&D_8011F190)[arg0] >= 2) { return 1; } if (((u8 *)&D_8011F190)[func_8001510C(2, arg0)] >= 2) { return 1; } return 0; }
 
 extern u8 D_8011BE90[];
 extern u8 *D_80121EDC[];
@@ -62,7 +66,10 @@ void func_800144E4(s32 arg0, s32 arg1, s32 arg2, OSMesgQueue *arg3) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_8001454C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80014638.s")
+extern s32 func_8001A308(s32, s32);
+extern s32 func_8001A3DC(s32, s32);
+extern void func_8001454C(s32, s32);
+s32 func_80014638(s32 arg0, s32 arg1, s32 arg2) { s32 *ptr; if (arg1 < 0x7F) { ptr = (s32 *)func_8001A308(arg0, arg1); if (ptr == NULL) return -1; if (((u8 *)ptr)[1] != 0) func_8001454C(ptr[2], arg0); func_8001454C(ptr[4], arg0); if (((u8 *)ptr)[2] != 0x7F) func_8001454C(ptr[6], arg0); } else if (arg1 == 0x7F) { ptr = (s32 *)func_8001A3DC(arg0, arg2); if (ptr == NULL) return -1; func_8001454C(ptr[1], arg0); return 0; } }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80014708.s")
 
@@ -205,7 +212,8 @@ extern u8 D_8011BE90[]; void func_80015E58(void) { *(s32 *)(D_8011BE90 + 0x2074)
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80015E6C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_8001603C.s")
+s32 func_8001603C(s32 arg0, s32 arg1) { s32 *ptr; s32 value; if (arg1 < 0x80) { ptr = func_8001A308(arg0, arg1); if (ptr == NULL) return 0; value = ptr[4]; goto done; } if (arg1 < 0x100) { ptr = func_8001A3DC(arg0, arg1 - 0x80); if (ptr == NULL) return 0; value = ptr[1]; goto done; } ptr = func_8001A4C0(arg0, arg1 - 0x100); if (ptr == NULL) return 0; value = ptr[0]; done: return value; }
+void func_8001603C_padding(void) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_800160D4.s")
 
