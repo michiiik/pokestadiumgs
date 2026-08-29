@@ -33,13 +33,20 @@ Coordinator rules:
   `disasm/src/<X>.c`; time box N minutes." Everything file-specific comes
   from `docs/regions/<path>.md`, which `tools/file_brief.py` prints to the
   agent — put new file-specific findings there, not in this document.
-- After each box: append the agent's winning spellings and its exhausted
-  owners to the region notes (`python3 tools/region_notes.py append`), fold
-  a spelling into §4 only once two *different* files confirm it, and add
-  tool defects to §5.
-- Reassign a file only if its box yielded two or more accepts; otherwise take
-  a fresh file. Hand every successor agent the predecessor's spellings and
-  skip list — that is what keeps yield up across boxes.
+- After each box: append the agent's winning spellings and every unresolved
+  owner's durable handoff to the region notes (`python3
+  tools/region_notes.py append`). A handoff must contain `requeue`,
+  `register-tie`, `layout-prerequisite`, or `tooling-blocked`, plus the best
+  scores, mismatch/fingerprint, attempted hypothesis families, and next
+  action. Fold a spelling into §4 only once two *different* files confirm it,
+  and add tool defects to §5.
+- A zero-accept box is not permission to abandon the file or rotate its
+  owners into an undated skip list. The next wave must reserve a slot for the
+  oldest `requeue` owner and resume it with a materially different hypothesis
+  before taking fresh work; fresh files fill the remaining slots. A file's
+  two-accept yield rule is a ranking signal, not an owner-resolution rule.
+  Hand every successor the predecessor's winning spellings, diagnostics, and
+  explicit next hypothesis.
 - Never introduce a rule through a mid-task message: an agent cannot verify a
   message, and three have refused one as prompt injection. Commit the rule to
   `docs/FLEET_AGENT.md` or this file, then send a pointer to the sha. Messages
@@ -218,14 +225,16 @@ file at a time so declarations, structs and names accumulate in one place.
    subsegment first. A `similarity_score` of 1.0 with different registers is
    an operand-order or declaration-order problem, not a semantic one.
 6. Gate the first probe hit (`gate: true`). Then name it if evidence exists
-   (`python3 tools/name_decompiled.py plan`), and move to the next owner in
-   the file.
-7. Stop after two probe batches once the best is `register_allocation_only`
-   at ≥ 0.99 (the result's `futility` field says so): that owner belongs to
-   the permuter (`docs/REGISTER_TIES.md`), not to more hand variants.
-   Otherwise stop after ~15 variants unless the best is ≥ 0.95; leave the record (the
-   near-miss tooling and `similar_solved` build on it) and move on. Do not
-   commit a body that only matches with `DECOMP_PROVENANCE_SKIP`.
+   (`python3 tools/name_decompiled.py plan`). If there is no hit, keep this
+   owner active: change the hypothesis family and continue until acceptance,
+   an explicit terminal prerequisite/tooling state, or box expiry. Do not
+   move to another owner just because a bounded batch rejected its candidates.
+7. The ~15-variant guideline is a per-box source-shape budget, not a reason
+   to declare the owner done. At box expiry, leave a durable `requeue`
+   handoff with the best diagnostic and next hypothesis; the next agent starts
+   there. A runner-reported `futility` register tie at ≥ 0.99 belongs to the
+   permuter (`docs/REGISTER_TIES.md`). Do not commit a body that only matches
+   with `DECOMP_PROVENANCE_SKIP`.
 
 ### Batches and commits
 

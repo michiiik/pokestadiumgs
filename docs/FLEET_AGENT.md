@@ -59,14 +59,26 @@ Do not touch any other file's pragmas or run `make`.
    `repeated_drift`, and a `first_diff_fingerprint` in probe stats. These are
    history and handoff context, not acceptance evidence.
 5. Gate the first probe hit: `python3 tools/fleet_probe.py batch.json --gate`.
-6. Cap **~12 variants / ~8 minutes per owner**. If, after two batches, the
-   runner reports `futility` for a best `register_allocation_only` result at
-   similarity ≥ 0.99, stop on that owner — it is a known-hard register tie,
-   not a spelling you haven't tried. Similarity alone does not authorize this
-   stop. If the runner reports `repeated-drift` after 12 prior rejected
-   attempts sharing one first-diff fingerprint, stop repeating that source
-   shape and report the fingerprint and first differing instruction. This is
-   advisory only: it never suppresses a candidate or changes the ROM gate.
+6. Keep one owner active until it reaches a terminal state. A probe batch is
+   a hypothesis budget, not an owner-resolution budget: after about 12
+   variants, stop repeating that *source shape*, change the hypothesis family,
+   and continue on the same owner. Do not switch to another function merely
+   because the current batch produced no hit. The only terminal states are a
+   full-ROM-gated acceptance, runner-reported register-tie `futility`, an
+   explicit coordinator-owned prerequisite (for example a missing fragment
+   `.rodata` subsegment), or a tooling/environment failure that must be
+   repaired outside the agent. If the 60-minute box expires first, record the
+   owner as `requeue` with its best diagnostic and next hypothesis; the next
+   box resumes that owner before taking fresh work.
+
+   If the runner reports `futility` for a best `register_allocation_only`
+   result at similarity ≥ 0.99, stop on that owner — it is a known-hard
+   register tie, not a spelling you haven't tried. Similarity alone does not
+   authorize this stop. If the runner reports `repeated-drift` after 12 prior
+   rejected attempts sharing one first-diff fingerprint, stop repeating that
+   source shape and report the fingerprint and first differing instruction.
+   This is advisory only: it never suppresses a candidate or changes the ROM
+   gate.
 
 ## 3. `fleet_probe.py` / `file_brief.py` usage
 
@@ -160,6 +172,11 @@ not count toward `repeated-drift`.
 - Never search outside this repository (no `find /`) — SDK headers are all
   under `disasm/lib/ultralib/include/PR/`.
 - Stay inside your time box. Stop and report when it expires, even mid-owner.
+- A time-boxed owner that is not accepted is not exhausted. Its report and
+  region note must say `requeue`, include the best normalized/raw scores,
+  mismatch kind, first differing instruction, attempted hypothesis families,
+  and the next materially different hypothesis. Reserve it for the next box;
+  do not bury it in an undated skip list.
 - **Do not set `CLAIMS_OWNER`.** The runner records an advisory claim on the
   file you install into, using this job's identity. A custom per-agent value
   looks like a different session to `tools/file_claims.py`, and because the
@@ -172,11 +189,12 @@ not count toward `repeated-drift`.
 ## 6. Report format
 
 For each accepted owner: one line — spelling/family that matched, evidence
-(similarity, gate result), commit sha. Then: total attempted/accepted,
-variants probed, the most common `mismatch_kind` you hit, why you stopped
-on any owner you gave up on (near-miss similarity + kind), and any new
-shape worth a §4 row (spelling + evidence count + limit) for the
-coordinator to fold in.
+(similarity, gate result), commit sha. For every non-accepted owner, report
+one of `requeue`, `register-tie`, `layout-prerequisite`, or
+`tooling-blocked`, with its best scores, mismatch/fingerprint, and next
+action. Then give total attempted/accepted, variants probed, the most common
+`mismatch_kind`, and any new shape worth a §4 row (spelling + evidence count
++ limit) for the coordinator to fold in. “Skipped” is not a terminal status.
 
 Before your box ends, save what you learned in your file's region notes
 so the next agent gets it for free:
