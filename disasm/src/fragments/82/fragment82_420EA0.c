@@ -13,7 +13,19 @@ void func_82D00020(u8 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_420EA0/func_82D00108.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_420EA0/func_82D00158.s")
+extern s32 func_82D00030(u8 *, u8);
+s32 func_82D00158(u8 *arg0) {
+    s32 i;
+    s32 count;
+
+    count = 0;
+    for (i = 1; i != 0xFC; i++) {
+        if (func_82D00030(arg0, i) != 0) {
+            count++;
+        }
+    }
+    return count & 0xFFFF;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_420EA0/func_82D001C0.s")
 
