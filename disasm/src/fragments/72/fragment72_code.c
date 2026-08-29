@@ -130,5 +130,48 @@ s32 func_8F401BC4(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/72/fragment72_code/func_8F401D88.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/72/fragment72_code/func_8F401F30.s")
+extern void Dma_CopyChunks(s32, s32, s32);
+extern s32 func_800356CC(s32);
+extern s32 D_8F4020E4;
+extern void func_800226C0(s32);
+extern void func_8F4001CC(void);
+extern void *D_80087200;
+extern void main_pool_push_state(s32);
+extern void main_pool_pop_state(s32);
+extern void func_80006CD0(s32, s32);
+extern s32 func_800082E0(s32, s32, s32, s32, s32, s32);
+extern void func_8004C09C(s32);
+extern void func_8004C4B0(s32);
+extern void func_80047588(s32, s32);
+extern void Asset_LoadToSegment(s32, u8 *, u8 *, s32);
+extern void func_8F400DE8(void);
+extern void func_80008514(s32);
+extern void func_8F401D88(void);
+extern void func_80008574(void);
+extern void func_80047610(void);
+extern void func_8004C398(void);
+extern void Gfx_FreeDisplayListBuffers(void);
+extern u8 D_1000000[];
+extern u8 D_446E30[];
+extern u8 D_447D00[];
+s32 func_8F401F30(s32 arg0, s32 arg1) {
+    s32 sp24;
+
+    main_pool_push_state(0x49434D4B);
+    func_80006CD0(0x18000, 0);
+    sp24 = func_800082E0(1, 0, 2, 0, 2, 1);
+    func_8004C09C(3);
+    func_8004C4B0(0x42);
+    func_80047588(0x18, 0);
+    Asset_LoadToSegment(((u32)&D_1000000 & 0x0F000000) >> 24, &D_446E30, &D_447D00, 0);
+    func_8F400DE8();
+    func_80008514(sp24);
+    func_8F401D88();
+    func_80008574();
+    func_80047610();
+    func_8004C398();
+    Gfx_FreeDisplayListBuffers();
+    main_pool_pop_state(0x49434D4B);
+    return 0;
+}
 #endif
