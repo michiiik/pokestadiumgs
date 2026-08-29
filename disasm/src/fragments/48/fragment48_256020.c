@@ -325,7 +325,28 @@ void *func_87C00C80(void *arg0, void *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C00D14.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C00F9C.s")
+extern f64 D_87C03DE8;
+extern f64 func_87C00D14(f64, f64);
+f64 func_87C00F9C(f64 arg0) {
+    f64 root;
+    f64 abs_value;
+    if (arg0 > 0.0) {
+        abs_value = arg0;
+    } else {
+        abs_value = -arg0;
+    }
+    if (abs_value > 1.0) {
+        return 0.0;
+    }
+    root = (f64)sqrtf((f32)(1.0 - (arg0 * arg0)));
+    if (root != 0.0) {
+        return -func_87C00D14(arg0, root);
+    }
+    if (arg0 > 0.0) {
+        return 0.0;
+    }
+    return D_87C03DE8;
+}
 
 extern f64 func_87C00F9C(f64);
 extern void func_87C00BF4(void *, void *, f64);
