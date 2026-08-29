@@ -795,7 +795,25 @@ u8 func_80055CCC(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055D44.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055DC4.s")
+extern void func_80053B38(s32, s32, s32, u8 *);
+extern void func_80053F04(s32, s32, s32, u8 *);
+
+typedef struct {
+    u8 leading[3];
+    u8 value;
+    u8 padding[8];
+} Temp80055DC4;
+
+void func_80055DC4(s32 arg0, u8 arg1) {
+    Temp80055DC4 temp;
+    if ((*(s32 *)((u8 *)&D_801281C0 + (func_80050D20(0x1E, -1) * 0xC)) & 1) != 0 &&
+        arg0 >= 0 && arg0 < 0x22) {
+        func_80053B38(0x1E, 0, arg0, &temp.value);
+        if (temp.value != arg1) {
+            func_80053F04(0x1E, 0, arg0, &arg1);
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055E54.s")
 
