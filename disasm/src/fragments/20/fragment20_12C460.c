@@ -149,7 +149,40 @@ void func_82607B74(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82609584.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82609730.s")
+extern Gfx *D_800D0510;
+extern u8 D_80094E38[];
+extern void func_82609584(s32, s32, s32, s16);
+
+void func_82609730(void *arg0, s32 arg1) {
+    s16 temp_s5;
+    s16 temp_s6;
+    s32 temp_a2;
+    s32 var_s0;
+    u8 *temp_a3;
+    u8 *var_s1;
+    u8 *var_s2;
+    temp_a3 = (u8 *)arg0 + 0x30;
+    if (arg1 != 0) {
+        gSPDisplayList(D_800D0510++, D_80094E38);
+        gDPSetRenderMode(D_800D0510++, 0x0F0A4000, 0);
+    }
+    temp_s5 = *(s16 *)((u8 *)arg0 + 0x14) + *(s16 *)((u8 *)arg0 + 0x10);
+    temp_s6 = *(s16 *)((u8 *)arg0 + 0x16) + *(s16 *)((u8 *)arg0 + 0x12);
+    var_s0 = 0;
+    if (*(s16 *)(temp_a3 + 4) > 0) {
+        var_s1 = temp_a3;
+        var_s2 = temp_a3;
+        do {
+            temp_a2 = *(s32 *)(var_s2 + 0x24);
+            if ((*(s16 *)(var_s1 + 0xA) < 0xFF) && (temp_a2 != 0)) {
+                func_82609584(temp_s5 + (var_s0 * 0x86) + 0xB, temp_s6 + 9, temp_a2, *(s16 *)(var_s1 + 0x12));
+            }
+            var_s0 += 1;
+            var_s1 += 2;
+            var_s2 += 4;
+        } while (var_s0 < *(s16 *)(temp_a3 + 4));
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82609868.s")
 
@@ -173,7 +206,22 @@ void func_82607B74(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260BD50.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260BE24.s")
+extern Gfx *D_800D0510;
+extern u8 D_80094D90[];
+extern void Gfx_FillRectRgb(s16, s16, s16, s16, u8, u8, u8);
+
+void func_8260BE24(u8 *arg0, s32 arg1) {
+    s16 pad;
+    s16 temp_t1;
+    s16 temp_t0;
+    temp_t1 = *(s16 *)(arg0 + 0x14) + *(s16 *)(arg0 + 0x10);
+    temp_t0 = *(s16 *)(arg0 + 0x16) + *(s16 *)(arg0 + 0x12);
+    if (arg1 != 0) {
+        gSPDisplayList(D_800D0510++, D_80094D90);
+    }
+    Gfx_FillRectRgb(temp_t1 + 0x3A, temp_t0 + 0x28, 0x124, 0x59, 0, 0, 0);
+    Gfx_FillRectRgb(temp_t1 + 0x3A, temp_t0 + 0xB0, 0x124, 0x4A, 0, 0, 0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260BEF4.s")
 
