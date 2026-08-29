@@ -4344,7 +4344,21 @@ void func_8003F4E8(u8 *arg0, u8 value) { arg0[0x1C] = value; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003F54C.s")
+extern void *func_80003240();
+void *func_8003F54C(void *arg0) {
+    void *result = NULL;
+    void *entry;
+    void *value;
+
+    entry = *(void **)((u8 *)arg0 + 0xC);
+    if (entry != NULL) {
+        value = (*(void *(**)(s32, s32))((u8 *)entry + 0x2C))(0, 0);
+        if (*(void **)((u8 *)value + 0x18) != NULL) {
+            result = func_80003240(*(void **)((u8 *)value + 0x18));
+        }
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
@@ -4830,11 +4844,42 @@ void geo_layout_cmd_create_group(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800411F0.s")
+extern void Yay0_DecompressAndRelocate(u8 *, u8 *);
+u8 *func_800411F0(void *arg0, u8 *arg1, s32 arg2, u8 *arg3) {
+    u8 *var_a1;
+    u8 *sp1C;
+
+    if (arg1 == NULL) {
+        var_a1 = MainPool_AllocAligned(arg0, *(u32 *)((u8 *)arg3 + 0x10), 0x10);
+    } else {
+        var_a1 = arg1;
+    }
+    if (var_a1 != NULL) {
+        sp1C = var_a1;
+        Yay0_DecompressAndRelocate(arg3, var_a1);
+    }
+    return var_a1;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8004124C.s")
+extern void Util_Memcpy(u32 *, const u32 *, s32);
+extern void *MainPool_AllocAligned(void *, size_t, s32);
+void *func_8004124C(void *arg0, void *arg1, s32 arg2, s32 arg3, u32 arg4) {
+    void *var_a0;
+    void *sp1C;
+
+    if (arg1 == NULL) {
+        var_a0 = MainPool_AllocAligned(arg0, arg4, 0x10);
+    } else {
+        var_a0 = arg1;
+    }
+    if (var_a0 != NULL) {
+        sp1C = var_a0;
+        Util_Memcpy(var_a0, arg2 + arg3, arg4 >> 2);
+    }
+    return var_a0;
+}
 #endif
 
 #ifdef VERSION_US
