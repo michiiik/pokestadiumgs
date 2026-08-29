@@ -142,7 +142,24 @@ void func_81309550(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_813095C4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_813096B4.s")
+extern void func_813095C4(void *, s32, s32);
+extern void func_800226C0(s32);
+void func_813096B4(void *arg0) {
+    struct S { u8 pad0[0x137B6]; s16 count; u8 gap0[0x1C]; s16 x; s16 y; u8 gap1[0x1D]; u8 state; };
+    struct S *s = arg0;
+    s16 temp_v0;
+
+    temp_v0 = s->count;
+    if (temp_v0 != 0) {
+        s->count = temp_v0 - 1;
+        s->x = -1;
+        s->y = -2;
+        s->state = 10;
+        func_800226C0(1);
+    } else {
+        func_813095C4(arg0, 8, 0);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_81309740.s")
 
