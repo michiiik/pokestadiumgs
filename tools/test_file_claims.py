@@ -297,7 +297,10 @@ class RunnerClaimIntegrationTests(unittest.TestCase):
             self.assertIsNone(runner._claim_or_refuse(Path("disasm/src/AAA.c")))
 
     def test_refusal_names_the_holder_when_enforcement_is_on(self) -> None:
-        with mock.patch.dict(os.environ, {"PRAGMA_CLAIMS_ENFORCE": "1"}), \
+        with mock.patch.dict(os.environ, {
+            "PRAGMA_CLAIMS_ENFORCE": "1",
+            "CLAIMS_OWNER": "runner@host:/jobs/runner",
+        }), \
              mock.patch.object(file_claims, "claim", return_value=False), \
              mock.patch.object(file_claims, "holder", return_value={"owner": "other@host:/jobs/x"}):
             diagnostic = runner._claim_or_refuse(Path("disasm/src/AAA.c"))
@@ -333,7 +336,10 @@ class RunnerClaimIntegrationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             source = Path(directory) / "synthetic.c"
             source.write_text('#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_1.s")\n')
-            with mock.patch.dict(os.environ, {"PRAGMA_CLAIMS_ENFORCE": "1"}), \
+            with mock.patch.dict(os.environ, {
+                "PRAGMA_CLAIMS_ENFORCE": "1",
+                "CLAIMS_OWNER": "runner@host:/jobs/runner",
+            }), \
                  mock.patch.object(runner, "probe_candidates", return_value=[
                      {"function": "func_1", "status": "probe_match", "link_verified": False}
                  ]), mock.patch.object(file_claims, "claim", return_value=False), \
