@@ -1,0 +1,7 @@
+# Region notes -- disasm/src/fragments/63/fragment63_30F070.c
+
+Per-file spellings, skip lists, and unsolved shapes for this source file. Delivered to agents by `tools/file_brief.py`; extend it with `tools/region_notes.py append`.
+
+## Fleet wave 2026-08-29 (2026-08-29)
+
+Accepted through fleet_probe.py probe plus link_verified full COMPARE=1 gate: func_87E0B73C uses the local gbi.h macro spelling gDPPipeSync(D_800D0510++), gDPSetCombine, context at D_8009491C+0x14, gSPSegment, gSPDisplayList, then func_8003CD84; func_87E0C4B4 uses a do/while node loop with the current field inlined as *(f32 *)(node+0x48) - 160.0f before func_87F0B1A4 and the fixed 0/-90/0 call to func_87F0B2F4; func_87E0C390 and func_87E0C3F8 use an f32 * table cursor advanced by += 3 and fields table[-3], table[-2], table[-1]; func_87E0C664 uses declaration order s32 temp_v0 before s32 sp18 and calls func_87F0277C((u8 *)arg0 + 0xC, arg0). Deferred: func_87E0BEB4 reached 0.9512 normalized/0.7683 raw with operand_or_scheduling_drift, repeated first diff expected lw $s1,$a0,24 versus actual lw $s0,$a0,24; func_87E0B884 reached 0.9231/0.7582 with expected frame 104 versus actual 80; func_87E0B9F0 reached 0.9560/0.8242, first variant expected $s5 arg0 but used $s7, saved-arg variant moved to a later $s3 scheduling drift. func_87E0C290 was not attempted because its assembly consumes $a0/$a1 while the existing accepted func_87E0C608 wrapper declares and calls it as void/no-args; resolving that needs a separately validated companion change.
