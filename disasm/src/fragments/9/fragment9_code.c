@@ -54,9 +54,61 @@ s32 func_8FB00F78(void *arg0, void *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/9/fragment9_code/func_8FB01CF8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/9/fragment9_code/func_8FB01EC4.s")
+extern u8 D_8FB03490[];
+extern u8 D_8FB03494[];
+extern void func_8004AD00(s32, s32, s32, s32, s32, s32);
+extern void func_800498C4(void);
+extern void func_800496A4(s32, s32);
+extern void func_80049628(s32, s32, s32);
+extern void func_800499EC(void);
+extern void func_8FB00020(s32, s32, s32);
+void func_8FB01EC4(void *arg0) {
+    s32 var_s0;
+    u8 *var_s1;
+    struct { u16 x; u16 y; u16 w; u16 h; s16 offset; u16 count; } *state = arg0;
+    func_8004AD00(state->x - 0xA, state->y - 0xA, state->w + 0x14, state->h + 0x14, (s32)&D_8FB03490, (s32)&D_8FB03494);
+    func_800498C4();
+    func_800496A4(4, 0);
+    var_s0 = state->count;
+    var_s1 = (u8 *)arg0 + var_s0;
+    if (var_s0 >= 0) {
+        do {
+            func_80049628(state->x + ((state->count - var_s0) * 0x14), state->y, *(s8 *)(var_s1 + 0xC) + 0x30);
+            var_s0 -= 1;
+            var_s1 -= 1;
+        } while (var_s0 >= 0);
+    }
+    func_800499EC();
+    func_8FB00020(state->x + ((state->count - state->offset) * 0x14), state->y + 0x12, 0x14);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/9/fragment9_code/func_8FB01FCC.s")
+void func_8FB01FCC(void *arg0) {
+    s8 temp_v0;
+    u16 temp_v1;
+    s32 var_s0;
+    u8 *var_s2;
+    struct { u16 x; u16 y; u16 w; u16 h; s16 offset; u16 count; } *state = arg0;
+    func_8004AD00(state->x - 0xA, state->y - 0xA, state->w + 0x14, state->h + 0x14, (s32)&D_8FB03490, (s32)&D_8FB03494);
+    func_800498C4();
+    func_800496A4(4, 0);
+    var_s0 = state->count;
+    var_s2 = (u8 *)arg0 + var_s0;
+    if (var_s0 >= 0) {
+        do {
+            temp_v0 = *(s8 *)(var_s2 + 0xC);
+            temp_v1 = state->count;
+            if (temp_v0 < 0xA) {
+                func_80049628(state->x + ((temp_v1 - var_s0) * 0x14), state->y, temp_v0 + 0x30);
+            } else {
+                func_80049628(state->x + ((temp_v1 - var_s0) * 0x14), state->y, temp_v0 + 0x37);
+            }
+            var_s0 -= 1;
+            var_s2 -= 1;
+        } while (var_s0 >= 0);
+    }
+    func_800499EC();
+    func_8FB00020(state->x + ((state->count - state->offset) * 0x14), state->y + 0x12, 0x14);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/9/fragment9_code/func_8FB02108.s")
 
@@ -109,7 +161,36 @@ void func_8FB029B4(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/9/fragment9_code/func_8FB03164.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/9/fragment9_code/func_8FB031E0.s")
+extern u8 D_8FB03B2C[];
+extern void func_800088DC(void);
+extern void GfxImage_FillCurrent(Gfx **, s32);
+extern void func_800495F8(s32, s32, s32, s32);
+extern void func_80008648(void);
+extern void func_8FB02A10(void *, s32);
+extern void func_8FB03164(void *);
+void func_8FB031E0(void *arg0) {
+    s32 var_s0;
+    s32 var_s1;
+    struct { u8 pad[0x34]; s32 index; } *state = arg0;
+    func_800088DC();
+    GfxImage_FillCurrent(&D_800D0510, 0x89);
+    func_800498C4();
+    func_800496A4(0x10, 0);
+    func_800495F8(0x140, 0x1E, 1, (s32)&D_8FB03B2C);
+    func_800496A4(8, 0);
+    var_s0 = 0;
+    var_s1 = 0x1E;
+    do {
+        func_8FB02A10(arg0, var_s0);
+        var_s0 += 1;
+    } while (var_s0 != var_s1);
+    func_800495F8(0x64, 0x46, 1, *(s32 *)((u8 *)arg0 + (state->index << 2)));
+    func_800499EC();
+    if (*(s32 *)((u8 *)arg0 + 0x40) == 1) {
+        func_8FB03164(arg0);
+    }
+    func_80008648();
+}
 
 extern u8 D_8FB03DF8;
 void func_80064D28(void);
@@ -124,7 +205,34 @@ void func_8FB032C4(s32 arg0, s32 arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/9/fragment9_code/func_8FB03328.s")
+extern void func_800060F4(s32, s32);
+extern void func_80006CD0(s32, s32);
+extern s32 func_800082E0(s32, s32, s32, s32, s32, s32);
+extern void func_8004C09C(s32);
+extern void func_8004C4B0(s32);
+extern s32 func_80047588(s32, s32);
+extern void func_8FB02560(void *);
+extern void func_80008514(s32);
+extern void func_800086A4(s32);
+extern void func_80007AEC(s32);
+extern s32 D_8FB03DF0;
+void func_8FB03328(s32 arg0, s32 arg1) {
+    s32 sp24;
+    func_800060F4(0xF, 2);
+    func_80006CD0(0x10000, 0);
+    sp24 = func_800082E0(1, 0, 2, 0, 2, 1);
+    func_8004C09C(0x107);
+    func_8004C4B0(6);
+    func_8004C4B0(8);
+    func_8004C4B0(0x41);
+    func_8004C4B0(0xF);
+    func_8004C4B0(0x2A);
+    D_8FB03DF0 = func_80047588(0x1E, 0);
+    func_8FB02560(&D_8FB03DF8);
+    func_80008514(sp24);
+    func_800086A4(2);
+    func_80007AEC(0x10);
+}
 
 extern void Gfx_FreeDisplayListBuffers();
 extern void func_80008574();
