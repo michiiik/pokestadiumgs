@@ -41,7 +41,28 @@ s32 func_8AC00334(s16 arg0, s16 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC004E0.s")
+extern u8 func_8005453C(s32);
+s32 func_8AC004E0(s16 arg0) {
+    s32 result = 0;
+    switch (arg0) {
+    case 0:
+        if ((func_8005453C(0) == 1) && (func_8005453C(3) == 1) && (func_8005453C(6) == 1)) {
+            result = 1;
+        }
+        break;
+    case 1:
+        if ((func_8005453C(1) == 1) && (func_8005453C(4) == 1) && (func_8005453C(7) == 1)) {
+            result = 1;
+        }
+        break;
+    case 2:
+        if ((func_8005453C(2) == 1) && (func_8005453C(5) == 1) && (func_8005453C(8) == 1)) {
+            result = 1;
+        }
+        break;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
