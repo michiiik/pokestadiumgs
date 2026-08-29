@@ -97,9 +97,63 @@ void func_82401FE0(s32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_824020B4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_824021AC.s")
+extern void func_800498C4(void);
+extern void func_82401DD4(s32);
+extern void func_82401F08(s32, s32);
+extern void func_800499EC(void);
+extern void func_800496A4(s32, s32);
+extern s32 func_8004C874(s32, s32);
+extern void func_800495BC(s32, s32, s32);
+extern Gfx *D_800D0510;
+extern u8 D_80094E38[];
+extern u8 D_80094F50[];
+void func_824021AC(s32 arg0, s32 arg1) {
+    if (arg0 != 0) {
+        func_800498C4();
+        func_82401DD4(arg1);
+        func_800499EC();
+        return;
+    }
+    gSPDisplayList(D_800D0510++, D_80094E38);
+    func_82401F08(0xF0, 0xCF);
+    gSPDisplayList(D_800D0510++, D_80094F50);
+    func_800498C4();
+    func_800496A4(2, 1);
+    func_800495BC(0x100, 0xD1, func_8004C874(0x3C, 5));
+    func_800499EC();
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_8240227C.s")
+extern void func_800498C4(void);
+extern void func_82401DD4(s32);
+extern void func_82401FE0(s32, s32);
+extern void func_82401E30(s32, s32);
+extern void func_82401F08(s32, s32);
+extern void func_800499EC(void);
+extern void func_800496A4(s32, s32);
+extern s32 func_8004C874(s32, s32);
+extern void func_800495BC(s32, s32, s32);
+extern Gfx *D_800D0510;
+extern u8 D_80094E38[];
+extern u8 D_80094F50[];
+void func_8240227C(s32 arg0, s32 arg1) {
+    if (arg0 != 0) {
+        func_800498C4();
+        func_82401DD4(arg1);
+        func_800499EC();
+        return;
+    }
+    gSPDisplayList(D_800D0510++, D_80094E38);
+    func_82401FE0(0x1F, 0xCD);
+    func_82401E30(0x92, 0xCF);
+    func_82401F08(0xF2, 0xCF);
+    gSPDisplayList(D_800D0510++, D_80094F50);
+    func_800498C4();
+    func_800496A4(2, 1);
+    func_800495BC(0x35, 0xD1, func_8004C874(0x3C, 1));
+    func_800495BC(0xA2, 0xD1, func_8004C874(0x3C, 2));
+    func_800495BC(0x102, 0xD1, func_8004C874(0x3C, 0x41));
+    func_800499EC();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_8240239C.s")
 
