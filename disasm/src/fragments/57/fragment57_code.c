@@ -51,7 +51,43 @@ s32 func_833018B8(s32 arg0, void *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/57/fragment57_code/func_83303220.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/57/fragment57_code/func_83303564.s")
+extern void *D_800D0510;
+extern void *D_80087200;
+extern s32 D_833090AC;
+extern u8 D_8330A288[];
+extern s32 D_8330A2C4;
+extern s32 D_8330A2EC;
+extern s32 D_8330A4C8;
+extern void func_800088DC(void);
+extern void GfxImage_FillCurrent(void *, u16);
+extern void GeoRender_AdvanceFrameCounter(void);
+extern void func_8003C6B8(s32);
+extern void func_83302290(void);
+extern void func_83302AC8(void);
+extern void func_83302D8C(void);
+extern void func_83303220(void);
+extern void func_81A0022C(void *);
+extern void func_80008648(void);
+void func_83303564(void) {
+    func_800088DC();
+    GfxImage_FillCurrent(&D_800D0510, 1);
+    if (D_8330A2EC == 1) {
+        func_83303220();
+    }
+    if (D_8330A2C4 == 0) {
+        GeoRender_AdvanceFrameCounter();
+    }
+    func_8003C6B8(D_8330A4C8);
+    func_83302D8C();
+    if ((*(u16 *)((u8 *)D_80087200 + 6) & 0x2000) && (D_833090AC == 1)) {
+        func_83302AC8();
+    }
+    if (D_8330A2C4 == 1) {
+        func_83302290();
+    }
+    func_81A0022C(D_8330A288);
+    func_80008648();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/57/fragment57_code/func_83303640.s")
 
@@ -69,7 +105,18 @@ s32 func_833018B8(s32 arg0, void *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/57/fragment57_code/func_83307AAC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/57/fragment57_code/func_83307C2C.s")
+extern s32 D_83308E2C;
+extern void func_80021ED8(s32);
+s32 func_83307C2C(s32 arg0) {
+    if (arg0 > 0) {
+        arg0 += 1;
+    }
+    if ((D_83308E2C * 5 + 5) < arg0) {
+        func_80021ED8(0x57);
+        arg0 = 0;
+    }
+    return arg0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/57/fragment57_code/func_83307C7C.s")
 
