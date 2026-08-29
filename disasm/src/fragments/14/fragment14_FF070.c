@@ -448,7 +448,20 @@ void func_8130B9F4(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130BC44.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130BD2C.s")
+extern f32 func_816092FC(void);
+extern void func_8130F5AC(s32);
+s32 func_8130BD2C(void *arg0) {
+    struct S { u8 pad0[0xE8F0]; f32 value; u8 gap0[8]; f32 zero; u8 gap1[0x12]; u8 state; };
+    struct S *s = arg0;
+    s->zero = 0.0f;
+    s->value -= func_816092FC();
+    if (s->value <= 0.0f) {
+        s->value = 0.0f;
+        s->state = 0xD;
+    }
+    func_8130F5AC(*(s32 *)((u8 *)arg0 + 0xE8EC));
+    return 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130BDB8.s")
 
