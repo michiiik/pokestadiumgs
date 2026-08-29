@@ -12,7 +12,25 @@ extern f32 D_8011EA8C; f32 func_8000FFB0(f32 arg0) { return 256.0f * D_8011EA8C 
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_800102BC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_80010334.s")
+extern u8 D_8011BE90[];
+extern void func_8001CA3C(s32);
+void func_80010334(s32 arg0)
+{
+  s32 index;
+  index = 0;
+  if ((*((s16 *) (D_8011BE90 + 0x2BF0))) > 0)
+  {
+    do
+    {
+      if (((((u32) (*((s32 *) (D_8011BE90 + (index * 0x160) + 0x346C)))) >> 31) != 0) && (arg0 == *((u8 *) (D_8011BE90 + (index * 0x160) + 0x3470))))
+      {
+        func_8001CA3C(*((s32 *) ((D_8011BE90 + (index * 4)) + 0x604C)));
+      }
+      index++;
+    }
+    while (index < (*((s16 *) (D_8011BE90 + 0x2BF0))));
+  }
+}
 
 extern void func_80019580(s32); s32 func_800103C8(s32 arg0) { func_80019580(arg0); arg0 += 0x20000000; return arg0; }
 
