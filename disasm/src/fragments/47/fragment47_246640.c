@@ -220,7 +220,14 @@ void func_860029D0(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_246640/func_86002F5C.s")
+extern f64 func_87C00090(f64, f64, f64);
+extern f64 D_8600E028;
+void func_86002F5C(u8 *arg0) {
+    *(f64 *)(arg0 + 0x1860) = func_87C00090(
+        *(f64 *)(arg0 + 0x1860), 0.0,
+        *(f64 *)(*(u8 **)(arg0 + 0x1870) + 0x6890) * D_8600E028);
+    *(f64 *)(arg0 + 0x1858) = 0.0;
+}
 #endif
 
 #ifdef VERSION_US
