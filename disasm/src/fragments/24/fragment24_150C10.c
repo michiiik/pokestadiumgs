@@ -222,7 +222,33 @@ void func_82B0284C(u8 *arg0, u8 *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B02A34.s")
+extern s32 func_82B00E34(s32 arg0);
+#pragma pack(1)
+struct PackedWord82B02A34 { s32 value; };
+#pragma pack(0)
+void func_82B02A34(void *arg0, s32 arg1) {
+    struct PackedWord82B02A34 *src;
+    s32 mode;
+    if (arg0 != NULL) {
+        if (*(u16 *)((u8 *)arg0 + 6) == 2) {
+            *(u16 *)((u8 *)arg0 + 6) = 4;
+            *(u16 *)((u8 *)arg0 + 8) = 0;
+            if (arg1 >= 0 && arg1 < 4) {
+                src = (struct PackedWord82B02A34 *)((u8 *)arg0 + (arg1 << 2) + 0x2C);
+                *(struct PackedWord82B02A34 *)((u8 *)arg0 + 0x18) = *src;
+            }
+            if (*(s16 *)((u8 *)arg0 + 0x1A) == 0) {
+                mode = 0xA7;
+                if (*(s16 *)((u8 *)arg0 + 0x18) >= 0) {
+                    mode = 0xA8;
+                } else {
+                    mode = 0xA7;
+                }
+                func_82B00E34(mode);
+            }
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
