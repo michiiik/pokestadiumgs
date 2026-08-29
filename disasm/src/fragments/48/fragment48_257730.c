@@ -48,7 +48,23 @@ void func_87C019B0(u8 *arg0, s16 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_257730/func_87C01CBC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_257730/func_87C01DB8.s")
+extern void func_87C019B0(u8 *arg0, s16 arg1);
+void func_87C01DB8(u8 *arg0, s32 arg1, s32 arg2) {
+    s32 original;
+
+    original = arg1;
+    if ((arg2 != 0) || (arg1 != *(s16 *)(arg0 + 0x14))) {
+        *(f32 *)(arg0 + 8) = 0.0f;
+    }
+    func_87C019B0(arg0, (s16)arg1);
+    *(s32 *)(arg0 + 4) = 0;
+    if (original < 0) {
+        *(s32 *)(arg0 + 0x1C) = 1;
+    } else {
+        *(s32 *)(arg0 + 0x1C) = 0;
+    }
+    *(s32 *)(arg0 + 0x18) = 0;
+}
 
 s16 func_87C01E28(u8 *arg0) {
     return *(s16 *)(arg0 + 0x14);
