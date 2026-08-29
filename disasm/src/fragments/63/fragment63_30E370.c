@@ -2,11 +2,45 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30E370/func_87E0AA00.s")
+extern u8 D_87E1A240[];
+extern void func_87E10EA8(s32);
+extern void func_87E10E64(s32);
+extern void func_87E10F2C(s32);
+void func_87E0AA00(void *arg0) {
+    s32 *entry;
+    s32 state;
+
+    state = *(s32 *)((u8 *)arg0 + 0);
+    entry = (s32 *)((u8 *)D_87E1A240 +
+        (*(s32 *)*(void **)((u8 *)arg0 + 8) * 0xC));
+    if ((state == 2) || (state == 3)) {
+        func_87E10EA8(-1);
+        func_87E10F2C(-1);
+        return;
+    }
+    func_87E10E64(entry[0]);
+    func_87E10EA8(entry[1]);
+    func_87E10F2C(entry[2]);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30E370/func_87E0AA8C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30E370/func_87E0AAE4.s")
+extern Gfx *D_800D0510;
+extern void *D_8009491C;
+extern void func_8003CD84(void);
+void func_87E0AAE4(s32 arg0, s32 arg1) {
+    void *context;
+
+    if (arg0 == 5) {
+        gDPPipeSync(D_800D0510++);
+        gDPSetCombine(D_800D0510++, 0xFFFFFF, 0xFFFCF238);
+        context = *(void **)((u8 *)D_8009491C + 0x14);
+        gSPSegment(D_800D0510++, 0xF,
+                   *(void **)((u8 *)*(void **)((u8 *)context + 4) + 8));
+        gSPDisplayList(D_800D0510++, *(void **)context);
+        func_8003CD84();
+    }
+}
 
 extern void func_8004C8C0(s32);
 void func_87E0AB9C(void) { func_8004C8C0(425); }
@@ -29,7 +63,25 @@ void func_87E0AC6C(s32 arg0) { func_87F02684((arg0 + 28)); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30E370/func_87E0AC8C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30E370/func_87E0ADA8.s")
+extern void func_87E0AC0C(u8 *);
+extern void func_87E11C38(s32);
+void func_87F061D0(void);
+extern void func_87E0AB9C(void);
+extern void func_87E0ABBC(u8 *arg0);
+void func_87E0ADA8(u8 *arg0, s32 arg1, s32 *arg2, s32 arg3, s32 arg4) {
+    (*(s32 *)((u8 *)(arg0) + (0))) = 0;
+    (*(s32 *)((u8 *)(arg0) + (4))) = arg1;
+    (*(s32 **)((u8 *)(arg0) + (8))) = arg2;
+    (*(s32 *)((u8 *)(arg0) + (0x10))) = arg3;
+    (*(s32 *)((u8 *)(arg0) + (0xC))) = arg4;
+    (*(s32 *)((u8 *)(arg0) + (0x38))) = 0;
+    (*(f32 *)((u8 *)(arg0) + (0x14))) = (f32) (*arg2 << 5);
+    func_87E0AB9C();
+    func_87E0ABBC(arg0);
+    func_87E0AC0C(arg0);
+    func_87F061D0();
+    func_87E11C38(*(*(s32 **)((u8 *)(arg0) + (8))));
+}
 
 s32 func_87E0AE28(void *arg0)
 {
