@@ -27,7 +27,7 @@ s32 func_81305634(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FD770/func_813056A0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FD770/func_8130571C.s")
+f32 func_8130571C(void *arg0) { u8 *base = (u8 *)arg0; f32 result = 1.0f; if (base[0x87] == 3) { result = (f32)base[0x82] / (f32)base[0x86]; } return result; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FD770/func_81305780.s")
 
@@ -81,7 +81,8 @@ void func_813068C0(void *arg0)
   *((u8 *) (((u8 *) arg0) + 0x82)) = (u8) (temp_v0 + 1);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FD770/func_813068FC.s")
+extern f32 func_816092FC(void);
+void func_813068FC(void *arg0) { *(f32 *)((u8 *)arg0 + 0x78) += func_816092FC(); if (*(f32 *)((u8 *)arg0 + 0x78) >= 4.0f) { *(f32 *)((u8 *)arg0 + 0x78) = 4.0f; *(u8 *)((u8 *)arg0 + 0x87) = 1; } }
 
 f32 func_816092FC(void);
 void func_81306954(void *arg0) {
