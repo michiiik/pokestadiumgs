@@ -12,7 +12,20 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80013EF8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80014190.s")
+extern u8 D_8011F1F4;
+extern s32 func_8001510C(s32, s32);
+s32 func_80014190(s32 arg0) {
+    if (arg0 == 0xFF) {
+        return 1;
+    }
+    if (((u8 *)&D_8011F1F4)[arg0] >= 2) {
+        return 1;
+    }
+    if (((u8 *)&D_8011F1F4)[func_8001510C(1, arg0)] >= 2) {
+        return 1;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80014208.s")
 
