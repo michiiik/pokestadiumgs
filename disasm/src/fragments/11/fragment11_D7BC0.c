@@ -121,9 +121,57 @@ void func_81600408(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D7BC0/func_81600450.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D7BC0/func_816004C0.s")
+s32 func_816004C0(u8 *arg0, u8 *arg1) {
+    return (*(s16 *)(arg0 + 0) + *(s16 *)(arg0 + 4) < *(s16 *)(arg1 + 0))
+        || (*(s16 *)(arg1 + 0) + *(s16 *)(arg1 + 4) < *(s16 *)(arg0 + 0))
+        || (*(s16 *)(arg0 + 2) + *(s16 *)(arg0 + 6) < *(s16 *)(arg1 + 2))
+        || (*(s16 *)(arg1 + 2) + *(s16 *)(arg1 + 6) < *(s16 *)(arg0 + 2));
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D7BC0/func_81600520.s")
+s32 func_81600520(void *arg0, s32 arg1) {
+    typedef struct {
+        s16 x;
+        s16 y;
+        s16 width;
+        s16 height;
+    } Rect;
+    Rect *rect = (Rect *)arg0;
+    s16 temp_v0;
+    s16 temp_v0_2;
+    s16 temp_v0_3;
+    s16 temp_v0_4;
+    s32 var_v1;
+    s32 var_v1_2;
+
+    if (arg1 != 0) {
+        temp_v0 = rect->x;
+        var_v1_2 = temp_v0 < 1;
+        if (var_v1_2 != 0) {
+            var_v1_2 = temp_v0 + rect->width >= 0x280;
+            if (var_v1_2 != 0) {
+                temp_v0_2 = rect->y;
+                var_v1_2 = temp_v0_2 < 1;
+                if (var_v1_2 != 0) {
+                    var_v1_2 = temp_v0_2 + rect->height >= 0x1E0;
+                }
+            }
+        }
+        return var_v1_2;
+    }
+    temp_v0_3 = rect->x;
+    var_v1 = temp_v0_3 < 1;
+    if (var_v1 != 0) {
+        var_v1 = temp_v0_3 + rect->width >= 0x140;
+        if (var_v1 != 0) {
+            temp_v0_4 = rect->y;
+            var_v1 = temp_v0_4 < 1;
+            if (var_v1 != 0) {
+                var_v1 = temp_v0_4 + rect->height >= 0xF0;
+            }
+        }
+    }
+    return var_v1;
+}
 
 s32 func_816005CC(u8 *arg0) {
     return ((u32)*(s16 *)(arg0 + 6) * (u32)*(s16 *)(arg0 + 4)) != 0;
@@ -220,18 +268,69 @@ void func_816007E0(void) {}
 void func_816007E0_padding(void) {}
 void func_816007E0_padding2(void) {}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D7BC0/func_816007F8.s")
+extern s32 func_816007BC(void *arg0);
+s32 func_816007F8(void *arg0, s32 arg1) {
+    s32 result;
+    s32 node;
+
+    result = func_816007BC(arg0);
+    node = result;
+    if (result != 0) {
+        do {
+            if (arg1 == *(s32 *)((u8 *)(u32)node + 8)) {
+                return node;
+            }
+            node = *(s32 *)((u8 *)(u32)node + 0x14);
+        } while (node != 0);
+    }
+    return 0;
+}
 
 typedef struct B1648Node B1648Node; typedef struct B1648Holder B1648Holder; typedef struct B1648Root B1648Root; struct B1648Node { u8 pad0[8]; s32 key; u8 pad0C[4]; B1648Node *next; }; struct B1648Holder { u8 pad0[8]; B1648Node *head; }; struct B1648Root { u8 pad0[0x28]; B1648Holder *holder; };
 void *func_81600848(B1648Root *arg0, s32 arg1) { B1648Node *node = arg0->holder->head; while (node != NULL) { if (arg1 == node->key) return node; node = node->next; } return NULL; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D7BC0/func_81600884.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D7BC0/func_816008EC.s")
+extern void func_81600408(u8 *arg0);
+void func_816008EC(void *arg0, u8 *arg1) {
+    u8 *holder;
+    u8 *node;
+
+    holder = *(u8 **)((u8 *)arg0 + 0x28);
+    node = *(u8 **)holder;
+    if (arg1 == node) {
+        *(u8 **)holder = *(u8 **)(node + 0x14);
+    }
+    holder = *(u8 **)((u8 *)arg0 + 0x28);
+    node = *(u8 **)(holder + 8);
+    if (arg1 == node) {
+        *(u8 **)(holder + 8) = *(u8 **)(node + 0x10);
+    }
+    holder = *(u8 **)((u8 *)arg0 + 0x28);
+    node = *(u8 **)(holder + 4);
+    if (arg1 == node) {
+        *(u8 **)(holder + 4) = *(u8 **)(node + 0x10);
+    }
+    func_81600408(arg1);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D7BC0/func_81600954.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D7BC0/func_816009C0.s")
+extern void * func_81600780(void *arg0, s32 arg1);
+extern s32 func_816007F8(void *arg0, s32 arg1);
+void func_816009C0(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    void *temp_v0;
+
+    func_816007F8((void *)(u32)arg0, arg2);
+    *(s32 *)((u8 *)(u32)arg1 + 0x1C) = arg3;
+    if (arg3 == 0) {
+        temp_v0 = func_81600780((void *)(u32)arg0, arg2);
+        if (temp_v0 == NULL || *(s32 *)((u8 *)temp_v0 + 0x1C) == 1) {
+            arg3 = 1;
+        }
+    }
+    *(s32 *)((u8 *)(u32)arg1 + 0x18) = arg3;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D7BC0/func_81600A34.s")
 
@@ -241,7 +340,7 @@ extern void func_816009C0(s32, s32, s32, s32);
 void func_81600AF0(s32 arg0, s32 arg1, s32 arg2) {
     s32 temp_v0;
 
-    temp_v0 = func_816007F8();
+    temp_v0 = func_816007F8(arg0, arg1);
     if (temp_v0 != 0) {
         func_816009C0(arg0, temp_v0, arg1, arg2);
     }
@@ -249,7 +348,22 @@ void func_81600AF0(s32 arg0, s32 arg1, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D7BC0/func_81600B30.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D7BC0/func_81600DA8.s")
+extern void * func_81600744(void *arg0, s32 arg1);
+s32 func_81600DA8(void *arg0, void *arg1) {
+    void *temp_v0;
+
+    temp_v0 = func_81600744(arg0, (s32)(u32)arg1);
+    if (temp_v0 == NULL) {
+        return 1;
+    }
+    if (*(s16 *)((u8 *)temp_v0 + 4) <= 0) {
+        return 0;
+    }
+    if (*(s16 *)((u8 *)temp_v0 + 6) <= 0) {
+        return 0;
+    }
+    return *(s32 *)((u8 *)temp_v0 + 0x18);
+}
 
 void func_81600E04(void *arg0)
 {
@@ -274,5 +388,29 @@ void func_81600E04(void *arg0)
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D7BC0/func_816013EC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D7BC0/func_816018CC.s")
+extern u8 *D_8008720C;
+extern void *osViGetCurrentFramebuffer(void);
+extern s32 func_800356CC(s32);
+extern void Dma_CopyChunks(s32, s32, s32);
+extern void func_800226C0(s32);
+void func_816018CC(s32 arg0) {
+    s32 pad_frame[2];
+    s32 sp1C;
+    void *sp18;
+    s32 temp_v1;
+    s32 var_v0;
+
+    if ((*(u16 *)(D_8008720C + 6) & 0x2000) && (*(u16 *)(D_8008720C + 8) & 0x8000)) {
+        sp18 = osViGetCurrentFramebuffer();
+        sp1C = func_800356CC(9);
+        temp_v1 = func_800356CC(9);
+        if (arg0 != 0) {
+            var_v0 = 4;
+        } else {
+            var_v0 = 1;
+        }
+        Dma_CopyChunks((s32)(u32)sp18, sp1C, temp_v1 + (var_v0 * 0x25800));
+        func_800226C0(2);
+    }
+}
 #endif
