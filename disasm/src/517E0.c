@@ -549,7 +549,25 @@ void func_8005487C(Quad8005487C *arg0) {
     *arg0 = *v0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800548C4.s")
+extern s32 _bcmp(const void *, const void *, s32);
+extern void * func_80051138(s32 arg0);
+extern void func_80051BF0(s32, void *, s32);
+
+typedef struct {
+    s32 a;
+    s32 b;
+    s32 c;
+    s32 d;
+} Quad800548C4;
+
+void func_800548C4(Quad800548C4 *arg0) {
+    Quad800548C4 *dst;
+    if (_bcmp(arg0, (u8 *)func_80051138(0) + 4, 0x10) != 0) {
+        dst = (Quad800548C4 *)((u8 *)func_80051138(0) + 4);
+        *dst = *arg0;
+        func_80051BF0(0x14, 0, 2);
+    }
+}
 
 
 typedef struct { s32 a, b; } Pair8005493C;
