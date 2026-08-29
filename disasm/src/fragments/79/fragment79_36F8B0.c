@@ -165,7 +165,22 @@ s16 func_84100688(Func84100688Table *arg0, u32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_84101D54.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_84102750.s")
+extern u8 D_8418C958;
+extern s32 func_8003C9B8(s32, s16, s32);
+void func_84102750(s32 arg0, void *arg1) {
+    void *temp_v0;
+    void *temp_v1;
+
+    if (arg1 != NULL) {
+        temp_v1 = *(void **)((u8 *)arg1 + 0x10);
+        if (temp_v1 != NULL) {
+            temp_v0 = *(void **)((u8 *)temp_v1 + 0x10);
+            if ((temp_v0 != NULL) && (*(s16 *)temp_v0 == 0)) {
+                func_8003C9B8(arg0, 1, (s32)(u32)((u8 *)&D_8418C958 + *(s16 *)((u8 *)temp_v0 + 2) * 0xC));
+            }
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_841027B4.s")
 
@@ -212,5 +227,25 @@ void func_84103394(s32 arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_84103478.s")
+extern void func_841032F0(u8 *, s32);
+extern void func_841031F4(u8 *, void *, s32);
+extern s32 func_84100054(u8 *arg0, s32 arg1);
+extern s32 func_84100074(u8 *arg0, s32 arg1);
+void func_84103478(s32 arg0) {
+    s32 mask = 0x100800;
+    s32 i;
+    u8 *record;
+
+    record = D_8418C950;
+    for (i = 0; i < 0x12C; i++, record += 0x9C) {
+        if ((*(s8 *)(record + 0x98) != 0) && (func_84100074(record, mask) != 0) && (func_84100054(record, 0x1000) != 0) && (func_84100054(record, 0x2000) != 0)) {
+            if (func_84100074(record, 0x4000) != 0) {
+                u8 *child = *(u8 **)(record + 0x10);
+                func_841031F4(record, child, arg0);
+            } else {
+                func_841032F0(record, arg0);
+            }
+        }
+    }
+}
 #endif
