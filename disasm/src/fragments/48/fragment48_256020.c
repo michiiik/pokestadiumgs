@@ -192,7 +192,17 @@ f64 func_87C006F0(void *arg0, void *arg1) {
     return sqrtf((f32)func_87C006B4(arg0, arg1));
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C00718.s")
+extern f64 D_87C03DB0;
+extern f64 func_87C00664(void *);
+extern void * func_87C00120(void *arg0, f64 arg1, f64 arg2, f64 arg3);
+extern void * func_87C002A8(void *arg0, void *arg1, f64 arg2);
+void *func_87C00718(void *arg0, void *arg1, f64 arg2) {
+    f64 length = func_87C00664(arg1);
+    if (D_87C03DB0 < length) {
+        return func_87C002A8(arg0, arg1, arg2 / (f64)sqrtf((f32)length));
+    }
+    return func_87C00120(arg0, 0.0, 0.0, 0.0);
+}
 
 f32 *func_87C007B0(f32 *arg0, f64 *arg1) {
     arg0[0] = (f32)arg1[0];
@@ -293,7 +303,25 @@ void func_87C00BC8(void *arg0, void *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C00BF4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C00C80.s")
+extern f64 func_87C00664(void *);
+extern void *func_87C00718(void *, void *, f64);
+extern void func_87C00BF4(void *, void *, f64);
+extern void func_87C00944(void *, void *, void *);
+void *func_87C00C80(void *arg0, void *arg1) {
+    typedef struct { f64 x; f64 y; f64 z; } V3;
+    typedef struct { f64 x; f64 y; f64 z; f64 w; } V4;
+    V4 result;
+    f64 length;
+    V3 normalized;
+    length = func_87C00664(arg1);
+    if (length > 0.0) {
+        func_87C00BF4(&result,
+            func_87C00718(&normalized, arg1, 1.0),
+            (f64)sqrtf((f32)length));
+        func_87C00944(arg0, arg0, &result);
+    }
+    return arg0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C00D14.s")
 
