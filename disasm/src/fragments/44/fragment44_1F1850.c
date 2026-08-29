@@ -283,7 +283,11 @@ s32 *func_8AF04E2C();
 void func_8AF06E74(void) {
     s32 *temp_v0;
 
+#ifdef CC_CHECK
+    temp_v0 = func_8AF04E2C((void *)0, 0);
+#else
     temp_v0 = func_8AF04E2C();
+#endif
     if (temp_v0 != NULL) {
         func_800503A4(*temp_v0);
     }

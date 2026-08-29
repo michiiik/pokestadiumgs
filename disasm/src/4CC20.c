@@ -90,7 +90,13 @@ void func_8004C874(s32 arg0, s32 arg1) { func_8004C7A0(0, 0, arg0, arg1); }
 void func_8004C8A0(void) { func_8004C7A0(); }
 
 extern s32 func_8004C3EC(s32 arg0, s32 arg1, s32 arg2);
-s32 func_8004C8C0(arg0) s32 arg0; {
+#ifdef CC_CHECK
+s32 func_8004C8C0(u16 arg0) {
+#else
+s32 func_8004C8C0(arg0)
+s32 arg0;
+{
+#endif
     s32 sp18;
     s32 result;
     s32 i;

@@ -68,10 +68,18 @@ u8 *arg0;
 
 extern void func_800635E0(u8, u8 *);
 extern void func_80063620(u8, u8 *);
+#ifdef CC_CHECK
+s32 func_88A008CC(u8 *);
+#else
 s32 func_88A008CC();
+#endif
 
 void func_88A00938(u8 *arg0) {
+#ifdef CC_CHECK
+    if (func_88A008CC((u8 *)0) != 0) {
+#else
     if (func_88A008CC() != 0) {
+#endif
         func_80063620(*arg0, arg0);
         return;
     }

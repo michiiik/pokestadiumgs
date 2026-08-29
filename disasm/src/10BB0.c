@@ -32,7 +32,12 @@ void func_80010334(s32 arg0)
   }
 }
 
-extern void func_80019580(s32); s32 func_800103C8(s32 arg0) { func_80019580(arg0); arg0 += 0x20000000; return arg0; }
+extern void func_80019580(s32);
+#ifdef CC_CHECK
+s32 func_800103C8(s32 arg0, s32 arg1) { func_80019580(arg0); arg0 += 0x20000000; return arg0; }
+#else
+s32 func_800103C8(s32 arg0) { func_80019580(arg0); arg0 += 0x20000000; return arg0; }
+#endif
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_800103F0.s")
 
@@ -41,7 +46,9 @@ extern void func_80019580(s32); s32 func_800103C8(s32 arg0) { func_80019580(arg0
 s32 GbApu_Alloc();
 s32 func_80010510();
 s32 func_800104A0(void *arg0, s32 arg1) {
+#ifndef CC_CHECK
     s32 func_800103C8();
+#endif
     s32 result = GbApu_Alloc(arg0, arg1);
     if (result != 0) {
         result = func_800103C8(result, arg1);
@@ -50,7 +57,9 @@ s32 func_800104A0(void *arg0, s32 arg1) {
 }
 
 s32 func_800104D8(void *arg0, s32 arg1) {
+#ifndef CC_CHECK
     s32 func_800103C8();
+#endif
     s32 result = func_80010510(arg0, arg1);
     if (result != 0) {
         result = func_800103C8(result, arg1);

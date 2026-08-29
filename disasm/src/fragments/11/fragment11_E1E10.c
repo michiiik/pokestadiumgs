@@ -94,10 +94,18 @@ void func_8160A928(u8 *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E1E10/func_8160A994.s")
 
+#ifdef CC_CHECK
+s32 func_8160A8DC(u8 *);
+#else
 s32 func_8160A8DC();
+#endif
 
 s32 func_8160A9CC(void) {
+#ifdef CC_CHECK
+    return func_8160A8DC((u8 *)0) >= 6;
+#else
     return func_8160A8DC() >= 6;
+#endif
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E1E10/func_8160A9F0.s")
