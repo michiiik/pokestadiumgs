@@ -1715,7 +1715,7 @@ void func_84115D98(u8 *arg0) {
 extern void func_800231A0(u8, s16, s32, ...);
 extern void func_84108728(u8, void *, s32);
 extern void func_84115D98(u8 *arg0);
-void func_84115F04(u8 *arg0) {
+void BattleAnim_Dispatch_108(u8 *arg0) {
     s32 result;
     if (func_841133EC((s32)arg0) != 0) return;
     if (*(s8 *)(arg0 + 0x7F6) != 0) return;
