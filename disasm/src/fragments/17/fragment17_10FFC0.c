@@ -131,7 +131,43 @@ s32 func_82201D08(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82201D30.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82201EB4.s")
+extern void func_8004C990(u16, u16, u8 *);
+extern s16 D_8220D788;
+extern u8 D_8220E368[];
+s32 func_82201EB4(s32 arg0, u8 *arg1) {
+    s32 sp18;
+    s32 temp_v1;
+    u8 *temp_v0;
+    u8 *temp_v0_2;
+    temp_v1 = *(s32 *)(arg1 + 0x20);
+    switch (arg0) {
+    case 0:
+        if (temp_v1 == 0) {
+            arg1[1] |= 4;
+            sp18 = temp_v1;
+            func_8004C990(*(u16 *)(arg1 + 0x24), *(u16 *)(arg1 + 0x26), arg1);
+        } else {
+            *(u16 *)(arg1 + 2) &= 0xFFFD;
+        }
+        temp_v0 = (u8 *)((u32)&D_8220E368 + temp_v1 * 4);
+        *(s16 *)(temp_v0 + 0) = 0;
+        *(s16 *)(temp_v0 + 2) = 0;
+        *(s16 *)(temp_v0 + 8) = *(s16 *)(arg1 + 8);
+        *(s16 *)(temp_v0 + 0xA) = *(s16 *)(arg1 + 0xA);
+        break;
+    case 1:
+        temp_v0_2 = (u8 *)((u32)&D_8220E368 + (2 * temp_v1) * 2);
+        if (D_8220D788 < *(s16 *)(temp_v0_2 + 2)) {
+            *(s16 *)(arg1 + 8) = *(s16 *)(temp_v0_2 + 0) + *(s16 *)(temp_v0_2 + 8);
+            *(s16 *)(arg1 + 0xA) = *(s16 *)(temp_v0_2 + 2) + *(s16 *)(temp_v0_2 + 0xA);
+            *(u16 *)(arg1 + 2) |= 2;
+        } else {
+            *(u16 *)(arg1 + 2) &= 0xFFFD;
+        }
+        break;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82201FBC.s")
 
@@ -147,7 +183,24 @@ s32 func_82201D08(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82202A84.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82202B80.s")
+extern u16 D_8220E4C0;
+s32 func_82202B80(s32 arg0, u8 *arg1) {
+    switch (arg0) {
+    case 0:
+        *(u16 *)(arg1 + 2) &= 0xFFFD;
+        break;
+    case 1:
+        if (D_8220E4C0 & 4) {
+            *(u16 *)(arg1 + 2) |= 2;
+        } else {
+            *(u16 *)(arg1 + 2) &= 0xFFFD;
+        }
+        break;
+    default:
+        break;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82202BE4.s")
 
