@@ -22,7 +22,7 @@ def _write_stats(path: Path) -> None:
     batches = [
         {
             "schema_version": 2,
-            "source": "disasm/src/fragments/1/fragment1_code.c",
+            "source": "/Users/michaegg/projects/pokemonStadiumGSRecomp/disasm/src/fragments/1/fragment1_code.c",
             "attempts": [
                 {
                     "function": "func_accept",
@@ -48,6 +48,18 @@ def _write_stats(path: Path) -> None:
                     "label": "manual:unavailable",
                     "status": "probe_unavailable",
                     "probe_reason": "probe_error",
+                },
+            ],
+        },
+        {
+            "schema_version": 2,
+            "source": "/tmp/other-project/disasm/other_source.c",
+            "attempts": [
+                {
+                    "function": "func_other",
+                    "label": "manual:other",
+                    "status": "probe_match",
+                    "link_verified": True,
                 },
             ],
         },
@@ -125,6 +137,11 @@ class SourceReportTests(unittest.TestCase):
             accepted.mismatch_kinds,
             {"immediate_drift": 1, "register_allocation_only": 1},
         )
+
+        unrelated = rows["/tmp/other-project/disasm/other_source.c"]
+        self.assertEqual(unrelated.batches, 1)
+        self.assertEqual(unrelated.attempts, 1)
+        self.assertEqual(unrelated.probe_matches, 1)
 
         zero_accept = rows["disasm/src/fragments/2/fragment2_code.c"]
         self.assertEqual(zero_accept.batches, 1)

@@ -185,7 +185,17 @@ def collect(stats_paths: tuple[Path, ...]) -> tuple[dict[str, Tally], dict[str, 
 
 def _source_name(record: dict[str, object]) -> str:
     source = record.get("source")
-    return source if isinstance(source, str) and source else "(no source)"
+    if not isinstance(source, str) or not source:
+        return "(no source)"
+    # Stats can be emitted from either the checkout or a worktree.  Keep the
+    # repository-relative spelling for sources that identify this tree, while
+    # leaving unrelated absolute paths distinguishable.
+    normalized = source.replace("\\", "/")
+    marker = "disasm/src/"
+    marker_index = normalized.find(marker)
+    if marker_index >= 0:
+        return normalized[marker_index:]
+    return normalized
 
 
 def collect_by_source(stats_paths: tuple[Path, ...]) -> dict[str, SourceTally]:
