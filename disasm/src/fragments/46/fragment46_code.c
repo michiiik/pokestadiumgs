@@ -4,7 +4,7 @@
 #ifdef VERSION_US
 extern void func_800226C0();
 
-void func_8AE00020(void) {
+void func_8AE00020() {
     func_800226C0();
 }
 #endif
@@ -69,7 +69,18 @@ void func_8AE0014C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE001D4.s")
+extern s32 D_8AE09B44;
+extern s16 D_8AE09B48;
+extern s16 D_8AE09B54;
+extern s32 func_8004C874(s32, s32);
+extern s16 func_80049148(s32, s32, s32);
+extern void func_8AE00020();
+void func_8AE001D4(void) {
+    D_8AE09B54 = 1;
+    D_8AE09B44 = func_8004C874(0x2B, 6);
+    D_8AE09B48 = func_80049148(1, 0, D_8AE09B44);
+    func_8AE00020(0x47);
+}
 #endif
 
 #ifdef VERSION_US
