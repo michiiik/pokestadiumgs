@@ -517,7 +517,21 @@ void func_841217C8(u8 *arg0) {
     *(s16 *)(arg0 + 0x604) = *(s16 *)(arg0 + 0x20);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_841217E4.s")
+extern s32 func_841211CC(void *, s16, s16);
+void func_841217E4(u8 *arg0) {
+    extern f32 func_8411E1B4(u8 *);
+    if (*(s8 *)(arg0 + 0x623) < 3) {
+        *(s16 *)(arg0 + 0x5FE) = Math_StepToS32(*(s16 *)(arg0 + 0x5FE), 0x3FFC, 0x16C, 0x16C);
+        if (func_841211CC(arg0, *(s16 *)(arg0 + 0x5FE), (s16)(func_8411E1D4((s32)arg0) << 14)) != 0) {
+            *(s8 *)(arg0 + 0x623) = *(s8 *)(arg0 + 0x623) + 1;
+        }
+    }
+    if (*(s8 *)(arg0 + 0x623) >= 3) {
+        func_841211CC(arg0, *(s16 *)(arg0 + 0x5FE), (s16)(func_8411E1D4((s32)arg0) << 14));
+        *(f32 *)(arg0 + 0x28) = (f32)Math_StepToS32((s32)*(f32 *)(arg0 + 0x28), (s32)((f64)(-func_8411E1B4(arg0)) * 3.5), 5, 5);
+    }
+    *(s16 *)(arg0 + 0x20) = *(s16 *)(arg0 + 0x604);
+}
 
 extern void func_84120E7C(u8 *);
 void func_841218EC(u8 *arg0) {
