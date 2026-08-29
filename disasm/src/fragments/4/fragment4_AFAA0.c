@@ -199,7 +199,13 @@ void func_81802208(s32 arg0, f32 arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81802308.s")
+void func_81802308(s32 arg0) {
+    if (*(s8 *)((u8 *)(u32)arg0 + 0xA) >= 0) {
+        gDPSetCombine(D_800D0510++,
+            GCCc0w0(*(s8 *)((u8 *)(u32)arg0 + 0xA), *(s8 *)((u8 *)(u32)arg0 + 0xC), *(s8 *)((u8 *)(u32)arg0 + 0xE), *(s8 *)((u8 *)(u32)arg0 + 0x10)) | GCCc1w0(*(s8 *)((u8 *)(u32)arg0 + 0x12), *(s8 *)((u8 *)(u32)arg0 + 0x14)),
+            GCCc0w1(*(s8 *)((u8 *)(u32)arg0 + 0xB), *(s8 *)((u8 *)(u32)arg0 + 0xD), *(s8 *)((u8 *)(u32)arg0 + 0xF), *(s8 *)((u8 *)(u32)arg0 + 0x11)) | GCCc1w1(*(s8 *)((u8 *)(u32)arg0 + 0x13), *(s8 *)((u8 *)(u32)arg0 + 0x16), *(s8 *)((u8 *)(u32)arg0 + 0x18), *(s8 *)((u8 *)(u32)arg0 + 0x15), *(s8 *)((u8 *)(u32)arg0 + 0x17), *(s8 *)((u8 *)(u32)arg0 + 0x19)));
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81802438.s")
 
