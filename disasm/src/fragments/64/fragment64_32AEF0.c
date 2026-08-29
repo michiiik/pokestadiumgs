@@ -30,7 +30,30 @@ void func_87F08C08(s8 *arg0, void *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_32AEF0/func_87F08C68.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_32AEF0/func_87F08D6C.s")
+extern void func_87F08C68(s8 *, void *);
+extern s32 func_87F08A94(s8 *, void *);
+extern s32 func_87F08280(s8 *, s32, void *, s32, s32, s32);
+typedef struct {
+    s8 record;
+    u8 pad[7];
+    f32 arg2;
+    f32 arg3;
+} Func87F08D6C_Local;
+s32 func_87F08D6C(void *arg0, s32 arg1, f32 arg2, f32 arg3, s32 arg4, s32 arg5) {
+    volatile Func87F08D6C_Local local;
+    s32 result;
+
+    if (arg0 == NULL) {
+        result = 0;
+    } else {
+        local.arg2 = arg2;
+        local.arg3 = arg3;
+        func_87F08C08((s8 *)&local.record, arg0);
+        func_87F08C68((s8 *)&local.record, arg0);
+        result = func_87F08280((s8 *)&local.record, arg1, arg0, arg4, func_87F08A94((s8 *)&local.record, arg0), arg5);
+    }
+    return result;
+}
 
 extern s32 func_87F08D6C(void *, s32, f32, f32, s32, s32);
 s32 func_87F08DF8(void *arg0, f32 arg1, f32 arg2, s32 arg3) {
