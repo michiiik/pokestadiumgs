@@ -9,7 +9,36 @@ s32 func_87E136F0(s32 arg0, s32 arg1) {
     return 1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E1374C.s")
+extern void *D_87F119DC;
+extern f32 D_87E1B860;
+void func_87E1374C(void) {
+    s32 *state_ptr;
+    s32 state;
+
+    state_ptr = *(s32 **)((u8 *)D_87F119DC + 0x38);
+    state = *state_ptr;
+    switch (state) {
+    case 1:
+        *(f32 *)((u8 *)D_87F119DC + 0x18) -= 2.5f;
+        *(f32 *)((u8 *)D_87F119DC + 0x50) += *(f32 *)((u8 *)D_87F119DC + 0x18);
+        if (*(f32 *)((u8 *)D_87F119DC + 0x50) < 0.0f) {
+            *(f32 *)((u8 *)D_87F119DC + 0x50) = 0.0f;
+            *(f32 *)((u8 *)D_87F119DC + 0x18) *= D_87E1B860;
+            return;
+        }
+        break;
+    case 0:
+        return;
+    case 2:
+        *(f32 *)((u8 *)D_87F119DC + 0x14) += 5.5f;
+        *(f32 *)((u8 *)D_87F119DC + 0x4C) += *(f32 *)((u8 *)D_87F119DC + 0x14);
+        if (*(f32 *)((u8 *)D_87F119DC + 0x4C) > 360.0f) {
+            *(u8 *)((u8 *)D_87F119DC + 0x25) &= 0xFFFE;
+            *state_ptr = 0;
+        }
+        break;
+    }
+}
 
 extern Gfx *D_800D0510;
 extern void *D_8009491C;
@@ -326,7 +355,35 @@ void func_87E17F48(void) {
     main_pool_pop_state(0x4D514D53);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E17F74.s")
+extern s32 main_pool_push_state(s32);
+extern void func_87E17ED0(void *);
+extern void func_87E18A14(void *, s32, s32);
+void func_87E17F74(void *arg0, void *arg1) {
+    s32 state;
+
+    main_pool_push_state(0x4D514D53);
+    *(void **)((u8 *)arg0 + 0x264) = arg1;
+    state = *(s32 *)((u8 *)arg1 + 0x21F8);
+    switch (state) {
+    case 0:
+    case 1:
+        *(s32 *)((u8 *)arg0 + 0) = 1;
+        func_87E18A14((u8 *)arg0 + 4,
+                      *(s32 *)((u8 *)*(void **)((u8 *)arg0 + 0x264) + 0x2200),
+                      0x2C);
+        break;
+    case 2:
+        *(s32 *)((u8 *)arg0 + 0) = 3;
+        func_87E17ED0(arg0);
+        break;
+    case 3:
+        *(s32 *)((u8 *)arg0 + 0) = 4;
+        func_87E18A14((u8 *)arg0 + 0x238,
+                      *(s32 *)((u8 *)*(void **)((u8 *)arg0 + 0x264) + 0x2204),
+                      0x2D);
+        break;
+    }
+}
 
 void func_87E18034(u8 *arg0, s32 arg1) {
     *(s32 *)(*(u8 **)(arg0 + 0x264) + 0x2200) = arg1;
