@@ -36,11 +36,36 @@ void func_8AE00040(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE000C8.s")
+extern Triple32 D_8AE078DC;
+extern Triple32 D_8AE078E8;
+extern void *D_8AE084C0;
+extern void *D_8AE098A4;
+extern s16 D_8AE098B0;
+extern Triple32 D_8AE098B8;
+extern Triple32 D_8AE098C8;
+extern Triple32 D_8AE0790C;
+extern Triple32 D_8AE07918;
+extern void *D_8AE084C8;
+extern void *D_8AE098AC;
+void func_8AE000C8(void) {
+    D_8AE098B0 = 0;
+    D_8AE084E4 = D_8AE098A4;
+    D_8AE084BC = D_8AE084C0;
+    D_8AE098B8 = D_8AE078DC;
+    D_8AE098C8 = D_8AE078E8;
+    D_8AE084E0 = 0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE0014C.s")
+void func_8AE0014C(void) {
+    D_8AE098B0 = 2;
+    D_8AE084E4 = D_8AE098AC;
+    D_8AE084BC = D_8AE084C8;
+    D_8AE098B8 = D_8AE0790C;
+    D_8AE098C8 = D_8AE07918;
+    D_8AE084E0 = 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -236,7 +261,48 @@ void func_8AE015C4(s16 arg0, s16 arg1) { s32 pad; u8 sp1C[0x50]; _bzero(sp1C, 0x
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE01EA4.s")
+typedef struct {
+    s16 unk0;
+    u8 pad_2[2];
+    s32 unk4;
+    s32 unk8;
+    s32 unkC;
+    s32 unk10;
+    s32 unk14;
+    s32 unk18;
+    s32 unk1C;
+    s32 unk20;
+    u8 pad_24[4];
+} Record28;
+extern s16 D_8AE09E68;
+extern void *D_8AE084E4;
+extern void func_8AE018C4(s16, s32);
+extern void func_8AE019A0(s16, s32);
+extern void func_8AE01A90(s16, s32);
+extern void func_8AE01B88(s16, s32);
+extern void func_8AE01CCC(s16, s32);
+extern void func_8AE01DC0(s16, s32);
+void func_8AE01EA4(void) {
+    Record28 *record = D_8AE084E4;
+
+    for (;;) {
+        if (record->unk0 == -1) {
+            break;
+        }
+        func_8AE018C4(record->unk0, record->unk4);
+        func_8AE019A0(record->unk0, record->unk8);
+        if (D_8AE09E68 == 6) {
+            func_8AE01A90(record->unk0, record->unkC);
+            func_8AE01B88(record->unk0, record->unk14);
+        } else {
+            func_8AE01A90(record->unk0, record->unk10);
+            func_8AE01B88(record->unk0, record->unk18);
+        }
+        func_8AE01CCC(record->unk0, record->unk1C);
+        func_8AE01DC0(record->unk0, record->unk20);
+        record++;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -408,7 +474,19 @@ void func_8AE04478(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE050AC.s")
+extern s32 D_8AE09944;
+extern void func_8004D19C(s32, s32, s32, s32, s32);
+extern s16 D_8AE084E0;
+void func_8AE050AC(s32 arg0, s16 arg1, s16 arg2) {
+    s16 *record;
+    s16 x;
+    s16 y;
+
+    record = (s16 *)((u8 *)(D_8AE084E0 * 4 + arg0) - 4);
+    x = record[0];
+    y = record[1];
+    func_8004D19C(x + arg1 - 4, y + arg2 - 4, D_8AE09944, 0, 0);
+}
 #endif
 
 #ifdef VERSION_US
