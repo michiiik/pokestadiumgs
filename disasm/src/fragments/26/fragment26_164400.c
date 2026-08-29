@@ -9,14 +9,14 @@ typedef struct {
     u32 *addresses;
     Gfx *gfx;
 } Func81005DB4State;
-extern void *func_80006DEC();
+extern void *Gfx_AllocDisplayList();
 
 void func_81005DB4(s32 arg0, Func81005DB4State *state) {
     Gfx *gfx;
     u32 *addresses;
     if (arg0 == 2) {
         addresses = state->addresses;
-        gfx = func_80006DEC(0xF0);
+        gfx = Gfx_AllocDisplayList(0xF0);
         state->gfx = gfx;
         func_81005B50(gfx, addresses);
     }

@@ -28,11 +28,11 @@ Gfx *DisplayList_BuildAnimatedModelTexture(Gfx *gfx, Func810059D0Addresses *addr
 
 typedef struct { u8 pad[0x14]; u32 *addresses; Gfx *gfx; } Func81005AC0UlocA;
 typedef struct { u16 unused; u16 index; u32 *addresses; } Func81005AC0UlocalsA;
-extern u8 *D_8009491C; extern u16 D_80094904; extern void *func_8003F54C(void *); extern Gfx *func_80006DEC(s32);
+extern u8 *D_8009491C; extern u16 D_80094904; extern void *func_8003F54C(void *); extern Gfx *Gfx_AllocDisplayList(s32);
 void func_81005AC0(s32 arg0, Func81005AC0UlocA *state) {
  volatile u8 stack_pad[2]; Func81005AC0UlocalsA locals; Gfx *gfx;
  if(arg0==2) { if(func_8003F54C(D_8009491C)!=NULL) {
- locals.index=D_80094904; locals.addresses=state->addresses; gfx=func_80006DEC(0x140);
+ locals.index=D_80094904; locals.addresses=state->addresses; gfx=Gfx_AllocDisplayList(0x140);
  state->gfx=gfx; DisplayList_BuildAnimatedModelTexture(gfx,locals.addresses,locals.index%8); } }
 }
 #endif

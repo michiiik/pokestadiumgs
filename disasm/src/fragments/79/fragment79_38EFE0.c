@@ -224,7 +224,7 @@ void func_841203B4(f32 *arg0, f32 arg1, f32 arg2) {
 
 extern f32 D_80087E50[];
 extern f32 D_80088E50[0x1000];
-void func_8412041C(void *arg0, f32 arg1, s16 arg2) {
+void BattleAnim_Vec3fSetPolarXZ(void *arg0, f32 arg1, s16 arg2) {
     s32 index;
 
     index = ((u16) arg2) >> 4;

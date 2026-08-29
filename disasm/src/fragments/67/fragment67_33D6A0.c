@@ -315,15 +315,15 @@ void func_82902634(void) {
 }
 
 #ifdef VERSION_US
-extern void func_80007AEC(s32);
-extern void func_800088A4(s32);
+extern void StageFade_StartFromOpaque(s32);
+extern void StageContext_SetClearColor(s32);
 extern void func_80064D28();
 extern void func_82901BA8();
 void func_8290263C(void) {
     s32 var_s0;
 
-    func_800088A4(1);
-    func_80007AEC(0x10);
+    StageContext_SetClearColor(1);
+    StageFade_StartFromOpaque(0x10);
     var_s0 = 0;
     do {
         func_80064D28();
@@ -359,7 +359,7 @@ void func_82902694(void) {
 void func_82902714(void) {
     s32 var_s0;
 
-    func_800088A4(1);
+    StageContext_SetClearColor(1);
     StageFade_StartFromTransparent(0xA);
     var_s0 = 0;
     do {

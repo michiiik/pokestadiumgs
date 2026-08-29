@@ -33,7 +33,7 @@ void func_80021B50(void) {
 extern s32 D_80090090;
 extern s32 func_80017AC0(void);
 extern void func_80034FE0(void);
-s32 func_80021B74(void) {
+s32 Audio_BuildSchedulerTask(void) {
     s32 *address;
     address = &D_80090090;
     *address = func_80017AC0();

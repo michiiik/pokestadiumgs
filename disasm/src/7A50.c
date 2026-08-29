@@ -53,7 +53,7 @@ s32 GfxRect_ClipToScissor(S1_unk_D_800A7440 *arg0) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/7A50/func_80006F70.s")
 
 extern s32 D_80087220;
-void func_80007090(void **arg0) { Gfx *cmd; if (D_80087220 != 0) { cmd = *(Gfx **)arg0; gDPPipeSync(cmd++); gDPSetScissor(cmd++, G_SC_NON_INTERLACE, D_800D0530.x1, D_800D0530.y2, D_800D0530.y1 + 1, D_800D0530.x2 + 1); *arg0 = cmd; } }
+void Gfx_ApplyScissorRect(void **arg0) { Gfx *cmd; if (D_80087220 != 0) { cmd = *(Gfx **)arg0; gDPPipeSync(cmd++); gDPSetScissor(cmd++, G_SC_NON_INTERLACE, D_800D0530.x1, D_800D0530.y2, D_800D0530.y1 + 1, D_800D0530.x2 + 1); *arg0 = cmd; } }
 
 typedef struct { u16 fmt; u16 size; u16 width; u16 height; u8 *img_p; void *depth_p; } GfxImage;
 void GfxImage_Initialize(GfxImage *arg0, s32 fmt, s32 size, s32 width, s32 height, u32 img_p) { arg0->fmt = fmt; arg0->size = size; arg0->width = width; arg0->height = height; arg0->img_p = (u8 *)((img_p + 0x3F) & ~0x3F); arg0->depth_p = NULL; }

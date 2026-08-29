@@ -331,7 +331,7 @@ void func_8FD01E58(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-extern void func_80006CD0(s32, s32);
+extern void Gfx_InitDisplayListBuffers(s32, s32);
 s32 func_800082E0(s32, s32, s32, s32, s32, s32);
 extern void func_80008514(s32);
 extern void func_80008574();
@@ -343,13 +343,13 @@ s32 fragment85_main(s32 arg0, s32 arg1) {
 
     main_pool_push_state(0x52434544);
     sp24 = func_800082E0(0, 1, 2, 0, 2, 1);
-    func_80006CD0(0x10000, 0);
+    Gfx_InitDisplayListBuffers(0x10000, 0);
     func_80047588(6, 0);
     func_8004C09C(0x43);
     func_8FD01E58(0);
     func_80008514(sp24);
     func_800086A4(2);
-    func_80007AEC(0xA);
+    StageFade_StartFromOpaque(0xA);
     func_8FD019DC();
     func_80008574();
     func_80047610();

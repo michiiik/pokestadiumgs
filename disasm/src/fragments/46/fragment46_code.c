@@ -562,7 +562,7 @@ void func_8AE05B1C(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_80007AEC(s32);
+extern void StageFade_StartFromOpaque(s32);
 extern void func_800086A4(s32);
 extern void func_80064D28();
 extern void func_8AE00380();
@@ -576,7 +576,7 @@ void func_8AE06118(void) {
 
     var_s0 = 0;
     func_800086A4(2);
-    func_80007AEC(5);
+    StageFade_StartFromOpaque(5);
     do {
         func_80064D28();
         if (var_s0 == 1) {

@@ -227,12 +227,12 @@ void func_86604084(void) {
 #ifdef VERSION_US
 extern s32 D_8660678C;
 extern void *D_86607230;
-extern void func_80007AEC(s32);
+extern void StageFade_StartFromOpaque(s32);
 void func_87F00688(void);
 u8 StageContext_GetFadeMode(void);
 void func_866048EC(void) {
     if ((*(u8 *)((u8 *)(D_86607230) + (0x2180))) == 4) {
-        func_80007AEC(0x14);
+        StageFade_StartFromOpaque(0x14);
         func_87F00688();
         D_8660678C = 0xA;
         return;
@@ -303,7 +303,7 @@ s32 func_86604954(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_80006CD0(s32, s32);
+extern void Gfx_InitDisplayListBuffers(s32, s32);
 s32 func_800082E0(s32, s32, s32, s32, s32, s32);
 extern void func_80008514(s32);
 extern void func_80008574();
@@ -345,7 +345,7 @@ s32 fragment54_main(s32 arg0, void *arg1) {
         func_80027EE0(0xFFF);
     }
     main_pool_push_state(0x4D523032);
-    func_80006CD0(0x20000, 0);
+    Gfx_InitDisplayListBuffers(0x20000, 0);
     sp24 = func_800082E0(0, 1, 3, 1, 2, 1);
     func_8004C09C(0x123);
     func_87F06EAC(0x6A, &D_86607320, D_86607230);

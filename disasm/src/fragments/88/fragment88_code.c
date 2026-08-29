@@ -2,7 +2,7 @@
 
 
 #ifdef VERSION_US
-u16 func_81C00020(u8 arg0) {
+u16 fragment88_main(u8 arg0) {
     u16 result;
     if (arg0 < 0x29) {
         result = arg0 + 0x2A4;

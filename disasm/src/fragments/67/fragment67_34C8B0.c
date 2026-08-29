@@ -31,12 +31,12 @@ void func_82911850(void) {
     func_80008648();
 }
 
-extern void func_80007AEC(s32);
+extern void StageFade_StartFromOpaque(s32);
 extern s32 D_8291BE70;
 void func_82911880(void) {
     s32 var_s0;
 
-    func_80007AEC(0xC);
+    StageFade_StartFromOpaque(0xC);
     var_s0 = 0;
     do {
         func_82911850();

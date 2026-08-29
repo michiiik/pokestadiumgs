@@ -379,7 +379,7 @@ void func_86405778(void) {
 extern u8 *D_86416C00;
 extern void func_87F0277C(u8 *);
 extern s32 func_87F08208(u8 *);
-extern void func_800088A4(s32);
+extern void StageContext_SetClearColor(s32);
 extern void StageFade_StartFromTransparent(s32);
 extern void func_800225C4(s32);
 extern void func_800279C4(s32);
@@ -392,7 +392,7 @@ void func_86405E08(void) {
     state = func_87F08208(D_86416C00 + 0xA8);
     switch (state) {
     case 1:
-        func_800088A4(0xFFFF);
+        StageContext_SetClearColor(0xFFFF);
         StageFade_StartFromTransparent(0x14);
         *(s32 *)(D_86416C00 + 0x10) = 2;
         func_800225C4(0x28);
@@ -412,7 +412,7 @@ extern void func_87C037C0(u8 *, s32);
 extern s32 StageContext_GetFadeMode(void);
 extern void func_86407034(void);
 extern void func_864057E0(void);
-extern void func_80007AEC(s32);
+extern void StageFade_StartFromOpaque(s32);
 extern void func_87F00688(void);
 extern void func_87F0277C(u8 *);
 
@@ -421,7 +421,7 @@ void func_86405EA4(void) {
     if (StageContext_GetFadeMode() == 1) {
         func_86407034();
         func_864057E0();
-        func_80007AEC(0x14);
+        StageFade_StartFromOpaque(0x14);
         *(s32 *)(D_86416C00 + 0x10) = 3;
         func_87F00688();
     }
@@ -508,12 +508,12 @@ void func_86406544(void) {
 
 #ifdef VERSION_US
 extern void StageFade_StartFromTransparent(s32);
-extern void func_800088A4(s32);
+extern void StageContext_SetClearColor(s32);
 void func_86406660(s32 arg0) {
     (*(s32 *)((u8 *)(D_86416C00) + (0xCEB4))) = arg0;
     (*(s32 *)((u8 *)(D_86416C00) + (0x10))) = 7;
     (*(s32 *)((u8 *)(D_86416C00) + (0x68))) = 8;
-    func_800088A4(0xFFFF);
+    StageContext_SetClearColor(0xFFFF);
     StageFade_StartFromTransparent(0xA);
 }
 #endif
@@ -546,7 +546,7 @@ void func_864066B4(void) {
 
 #ifdef VERSION_US
 extern void func_800086A4(s32);
-extern void func_80007AEC(s32);
+extern void StageFade_StartFromOpaque(s32);
 extern void func_80064D28(void);
 extern void func_864069DC(void);
 extern void func_86406544(void);
@@ -560,7 +560,7 @@ void func_86406C6C(void)
   };
 
   func_800086A4(2);
-  func_80007AEC(0xA);
+  StageFade_StartFromOpaque(0xA);
   do
   {
     ((struct Func86406C6CState *)D_86416C00)->counter =

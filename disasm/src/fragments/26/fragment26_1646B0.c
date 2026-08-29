@@ -10,7 +10,7 @@ typedef struct Func81005F38State {
     Gfx *gfx;
 } Func81005F38State;
 
-extern Gfx *func_80006DEC(s32);
+extern Gfx *Gfx_AllocDisplayList(s32);
 extern void func_81005E00(Gfx *, u32 *);
 
 void func_81005F38(s32 arg0, Func81005F38State *state) {
@@ -19,7 +19,7 @@ void func_81005F38(s32 arg0, Func81005F38State *state) {
 
     if (arg0 == 2) {
         addresses = state->addresses;
-        gfx = func_80006DEC(0x50);
+        gfx = Gfx_AllocDisplayList(0x50);
         state->gfx = gfx;
         func_81005E00(gfx, addresses);
     }

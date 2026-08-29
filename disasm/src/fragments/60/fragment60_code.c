@@ -60,13 +60,13 @@ void func_86A004AC(void) {
 
 #ifdef VERSION_US
 extern u8 *D_86A46548;
-extern void func_800088A4(s32);
+extern void StageContext_SetClearColor(s32);
 extern void StageFade_StartFromTransparent(s32);
 void func_86A01480(s32 arg0) {
     *(s32 *)(D_86A46548 + 0x18) = arg0;
     *(s32 *)D_86A46548 = 8;
     *(s32 *)(D_86A46548 + 4) = 9;
-    func_800088A4((u16)0xFFFF);
+    StageContext_SetClearColor((u16)0xFFFF);
     StageFade_StartFromTransparent(0xA);
 }
 #endif

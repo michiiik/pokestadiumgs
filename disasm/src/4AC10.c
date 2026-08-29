@@ -99,7 +99,7 @@ void Ui_DrawBorderStyleC(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
 extern Gfx *D_800D0510;
 extern s32 StageContext_IsHighResolution(void);
 extern u8 D_80094DE0[];
-void func_8004A5B8(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u16 arg4) {
+void Ui_FillInsetRectangleA(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u16 arg4) {
     gSPDisplayList(D_800D0510++, D_80094DE0);
     gDPSetFillColor(D_800D0510++, (arg4 << 16) | arg4);
     if (StageContext_IsHighResolution() != 0) {
@@ -112,7 +112,7 @@ void func_8004A5B8(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u16 arg4) {
 extern Gfx *D_800D0510;
 extern s32 StageContext_IsHighResolution(void);
 extern u8 D_80094DE0[];
-void func_8004A708(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u16 arg4) {
+void Ui_FillInsetRectangleB(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u16 arg4) {
     gSPDisplayList(D_800D0510++, D_80094DE0);
     gDPSetFillColor(D_800D0510++, (arg4 << 16) | arg4);
     if (StageContext_IsHighResolution() != 0) {
@@ -128,10 +128,10 @@ extern Gfx *D_800D0510;
 extern s32 StageContext_IsHighResolution(void);
 extern void Ui_DrawBorderStyleA(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
 extern void Ui_DrawBorderStyleC(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
-extern void func_8004A5B8(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u16 arg4);
+extern void Ui_FillInsetRectangleA(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u16 arg4);
 extern u8 D_80094E38[];
 extern u8 D_80094F50[];
-void func_8004AC24(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u16 arg4) {
+void Ui_DrawBorderedPanel(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u16 arg4) {
     gSPDisplayList(D_800D0510++, D_80094E38);
     if (StageContext_IsHighResolution() != 0) {
         Ui_DrawBorderStyleA(arg0, arg1, arg2, arg3);
@@ -139,7 +139,7 @@ void func_8004AC24(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u16 arg4) {
         Ui_DrawBorderStyleC(arg0, arg1, arg2, arg3);
     }
     if (arg2 >= 15 && arg3 >= 15) {
-        func_8004A5B8(arg0, arg1, arg2, arg3, arg4);
+        Ui_FillInsetRectangleA(arg0, arg1, arg2, arg3, arg4);
     }
     gSPDisplayList(D_800D0510++, D_80094F50);
 }
@@ -151,7 +151,7 @@ extern void Ui_DrawBorderStyleA(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
 extern void Ui_DrawBorderStyleC(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
 extern u8 D_80094E38[];
 extern u8 D_80094F50[];
-void func_8004AD00(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
+void Ui_DrawGradientPanel(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
     if (arg2 >= 15 && arg3 >= 15) {
         if (StageContext_IsHighResolution() != 0) {
             func_8004A858(arg0 + 6, arg1 + 6, arg2 - 12, arg3 - 12, arg4, arg5);
@@ -172,7 +172,7 @@ extern Gfx *D_800D0510;
 extern s32 StageContext_IsHighResolution(void);
 extern void Ui_DrawBorderStyleB(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
 extern void Ui_DrawBorderStyleC(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
-extern void func_8004A708(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u16 arg4);
+extern void Ui_FillInsetRectangleB(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u16 arg4);
 extern u8 D_80094E38[];
 extern u8 D_80094F50[];
 void func_8004AE3C(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u16 arg4) {
@@ -183,7 +183,7 @@ void func_8004AE3C(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u16 arg4) {
         Ui_DrawBorderStyleC(arg0, arg1, arg2, arg3);
     }
     if (arg2 >= 15 && arg3 >= 15) {
-        func_8004A708(arg0, arg1, arg2, arg3, arg4);
+        Ui_FillInsetRectangleB(arg0, arg1, arg2, arg3, arg4);
     }
     gSPDisplayList(D_800D0510++, D_80094F50);
 }

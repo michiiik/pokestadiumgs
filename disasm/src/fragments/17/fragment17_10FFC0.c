@@ -256,7 +256,7 @@ void func_82203E40(void) { func_822014D8(); StageFade_StartFromTransparent(5); f
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82203E70.s")
 
-extern void func_80007AEC(s32);
+extern void StageFade_StartFromOpaque(s32);
 extern void func_800086A4(s32);
 extern void func_80064D28();
 extern void func_822015B4();
@@ -270,7 +270,7 @@ void func_8220402C(void) {
 
     var_s0 = 0;
     func_800086A4(2);
-    func_80007AEC(5);
+    StageFade_StartFromOpaque(5);
     do {
         func_80064D28();
         func_822015B4();

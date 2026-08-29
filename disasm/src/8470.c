@@ -8,7 +8,7 @@
 
 extern s32 D_800D0554;
 s32 func_80007A84();
-s32 func_80007AEC(void) {
+s32 StageFade_StartFromOpaque(void) {
     s32 result = 0;
     if ((D_800D0554 != 0) && (*(u8 *)((u8 *)(u32)D_800D0554 + 0x11) == 1)) {
         result = func_80007A84();
@@ -38,7 +38,7 @@ void StageFade_SetMode(s32 arg0) {
 void Profiler_SetDisplayModes(s32 arg0, s32 arg1) { extern s32 D_80087230; extern s32 D_80087234; if ((u32)arg0 < 3) D_80087230 = arg0; if ((u32)arg1 < 2) D_80087234 = arg1; }
 
 extern Gfx *D_800D0510;
-void func_80007BD0(void) {
+void Gfx_SetDefaultRenderState(void) {
     gDPPipeSync(D_800D0510++);
     gDPPipelineMode(D_800D0510++, G_PM_1PRIMITIVE);
     gDPSetTextureLOD(D_800D0510++, G_TL_TILE);
@@ -58,7 +58,7 @@ void func_80007BD0(void) {
   }
 
 extern Gfx *D_800D0510;
-void func_80007DB4(void) {
+void Gfx_SetDefaultGeometryState(void) {
     gSPClearGeometryMode(D_800D0510++, 0x3F0604);
     gSPSetGeometryMode(D_800D0510++, G_SHADE | G_SHADING_SMOOTH | G_CULL_BACK);
     gSPTexture(D_800D0510++, 0, 0, 0, G_TX_RENDERTILE, G_OFF);
@@ -68,20 +68,20 @@ extern void GfxImage_ResetCurrent(void);
 extern s32 func_8000339C(void);
 extern void Memmap_SetSegmentMap(s32, s32, s32);
 extern void func_80002178(void *);
-extern void func_80007BD0(void);
-extern void func_80007DB4(void);
+extern void Gfx_SetDefaultRenderState(void);
+extern void Gfx_SetDefaultGeometryState(void);
 extern Gfx *D_800D0510;
 void func_80007E18(void) {
     GfxImage_ResetCurrent();
     Memmap_SetSegmentMap(0, 0x80000000, func_8000339C());
     func_80002178(&D_800D0510);
-    func_80007BD0();
-    func_80007DB4();
+    Gfx_SetDefaultRenderState();
+    Gfx_SetDefaultGeometryState();
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80007E6C.s")
 
-void StageLoader_SwapDisplayListAndReset(void) { func_80006D6C(); func_80007E18(); }
+void StageLoader_SwapDisplayListAndReset(void) { Gfx_SwapDisplayListBuffer(); func_80007E18(); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_800080E0.s")
 
@@ -189,7 +189,7 @@ s32 func_80008648(void) {
 
 extern s32 D_800D0554;
 extern void Display_ClearFramebufferLine(u16);
-void func_800088A4(u16 arg0) {
+void StageContext_SetClearColor(u16 arg0) {
     if (D_800D0554 != 0) {
         *(u16 *)((u8 *)(u32)D_800D0554 + 0x14) = arg0 | 1;
         Display_ClearFramebufferLine(arg0);

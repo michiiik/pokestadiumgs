@@ -13,7 +13,7 @@ extern void *D_80087200;
 extern u16 D_80087E00[];
 extern void Cont_StartReadInputs(void);
 extern void func_80005F0C(void);
-void func_800092C8(void) {
+void crash_screen_wait_for_button_combo(void) {
     s32 result = 0;
     s32 index = 0;
     u16 input;
@@ -121,9 +121,9 @@ OSThread* crash_screen_get_faulted_thread(void) {
 
 extern OSMesgQueue D_800D0F60;
 extern OSThread *crash_screen_get_faulted_thread(void);
-extern void func_800092C8(void);
+extern void crash_screen_wait_for_button_combo(void);
 extern void func_80009940(OSThread *);
-void func_80009E04(void *arg0) {
+void crash_screen_thread_entry(void *arg0) {
     void *msg;
     OSThread *thread;
     osSetEventMesg(0xA, &D_800D0F60, 1);
@@ -136,7 +136,7 @@ void func_80009E04(void *arg0) {
         }
     }
     osStopThread(thread);
-    func_800092C8();
+    crash_screen_wait_for_button_combo();
     func_80009940(thread);
 forever:
     goto forever;
@@ -153,7 +153,7 @@ void func_80009EB4(s32 arg0, s32 arg1, s32 arg2) {
 
 extern void *D_800D0F78;
 extern s32 func_8000339C(void);
-extern void func_80009E04(void *);
+extern void crash_screen_thread_entry(void *);
 void crash_screen_init(void) {
     s32 result;
     result = (func_8000339C() | 0xA0000000) + 0xFFFDA800;
@@ -161,7 +161,7 @@ void crash_screen_init(void) {
     *(s16 *)(D_800D05B0 + 0x9D0) = 0x140;
     *(s16 *)(D_800D05B0 + 0x9D2) = 0x10;
     osCreateMesgQueue(&D_800D0F60, &D_800D0F78, 1);
-    osCreateThread((OSThread *)D_800D05B0, 2, func_80009E04, NULL, &D_800D0F60, 0x80);
+    osCreateThread((OSThread *)D_800D05B0, 2, crash_screen_thread_entry, NULL, &D_800D0F60, 0x80);
     osStartThread((OSThread *)D_800D05B0);
 }
 

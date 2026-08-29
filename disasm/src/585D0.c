@@ -102,7 +102,7 @@ void GbSave_ComputeChecksum(u8 *start, u8 *end) {
 #endif
 
 #ifdef VERSION_US
-void func_80058018(u8 *arg0, u8 *arg1, u8 *arg2) {
+void GbSave_ComputeChecksumRange(u8 *arg0, u8 *arg1, u8 *arg2) {
     s32 sum;
     sum = 0;
     if (arg0 <= arg1) {
@@ -508,13 +508,13 @@ extern u8 D_80128570[];
 extern s32 GbPak_ValidateAndRefresh(s32, s32, u8 *);
 void func_8005B140(s32 arg0) {
     if (GbPak_ValidateAndRefresh(arg0, 0, D_80128570 + arg0 * 112 + 0x28) == 0) {
-        func_80064D58(arg0, 2);
+        Game_ShutdownAndLoadFragment(arg0, 2);
     }
 }
 #endif
 
 #ifdef VERSION_US
-void GbSave_RequirePakPresent(s32 arg0) { if (GbTower_CheckPakRemoved(arg0, 0) == 0) func_80064D58(arg0, 2); }
+void GbSave_RequirePakPresent(s32 arg0) { if (GbTower_CheckPakRemoved(arg0, 0) == 0) Game_ShutdownAndLoadFragment(arg0, 2); }
 #endif
 
 #ifdef VERSION_US

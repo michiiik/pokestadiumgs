@@ -254,7 +254,7 @@ extern void func_80008624(void);
 extern void StageLoader_WaitForRetrace(void);
 extern s32 _bcmp(const void *, const void *, s32);
 extern void func_82D0284C(void);
-s32 func_82D029EC(s32 arg0, s32 arg1) {
+s32 fragment82_main(s32 arg0, s32 arg1) {
     main_pool_push_state(0x524C4544);
     func_82D028B8();
     func_82D06D50();

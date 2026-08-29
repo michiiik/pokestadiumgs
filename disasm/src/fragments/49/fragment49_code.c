@@ -20,7 +20,7 @@ extern s32 D_8610AD20;
 extern s32 StageContext_GetFadeMode(void);
 extern void func_86105008(void);
 extern void func_86104CAC(void);
-extern void func_80007AEC(s32);
+extern void StageFade_StartFromOpaque(s32);
 extern void func_87F00688(void);
 extern void func_87F0277C(s32);
 
@@ -28,7 +28,7 @@ void func_86100728(void) {
     if (StageContext_GetFadeMode() == 1) {
         func_86105008();
         func_86104CAC();
-        func_80007AEC(0x14);
+        StageFade_StartFromOpaque(0x14);
         *(s32 *)((u8 *)(u32)D_8610AD20 + 0x3C) = 3;
         func_87F00688();
     }
@@ -521,12 +521,12 @@ void func_86109394(void) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86109404.s")
 
 extern void StageFade_StartFromTransparent(s32);
-extern void func_800088A4(s32);
+extern void StageContext_SetClearColor(s32);
 void func_861094BC(s32 arg0) {
     (*(s32 *)((u8 *)(D_8610AD20) + (0x97E8))) = arg0;
     (*(s32 *)((u8 *)(D_8610AD20) + (0x3C))) = 7;
     (*(s32 *)((u8 *)(D_8610AD20) + (0x40))) = 8;
-    func_800088A4(0xFFFF);
+    StageContext_SetClearColor(0xFFFF);
     StageFade_StartFromTransparent(0xA);
 }
 
@@ -538,7 +538,7 @@ extern void func_861086AC();
 extern void func_861095EC();
 void func_86109864(void) {
     func_800086A4(2);
-    func_80007AEC(0xA);
+    StageFade_StartFromOpaque(0xA);
     do {
         func_80064D28();
         func_861095EC();

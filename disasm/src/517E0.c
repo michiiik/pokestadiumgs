@@ -194,7 +194,7 @@ u16 Save_Checksum(u8* arg0, s32 arg1) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051610.s")
 
 extern void _bcopy(void *, void *, s32);
-void func_80051680(void *arg0, void *arg1, s32 arg2, s32 arg3) {
+void Save_WriteRecord(void *arg0, void *arg1, s32 arg2, s32 arg3) {
     s32 *temp_v0;
 
     _bcopy(arg0, arg1, arg2);
@@ -203,7 +203,7 @@ void func_80051680(void *arg0, void *arg1, s32 arg2, s32 arg3) {
 }
 
 extern void func_80051610(void *, s32, s32);
-void func_800516C4(u8 *arg0, s32 arg1, s32 arg2) {
+void Save_CommitRecord(u8 *arg0, s32 arg1, s32 arg2) {
     s32 *temp_v0;
 
     if ((*arg0 & 2) != 0) {
@@ -214,7 +214,7 @@ void func_800516C4(u8 *arg0, s32 arg1, s32 arg2) {
     }
 }
 
-void func_80051724(u8 *arg0, s32 arg1, s32 arg2) {
+void Save_InvalidateRecord(u8 *arg0, s32 arg1, s32 arg2) {
     s32 *temp_v0;
 
     if ((*arg0 & 2) != 0) {
@@ -229,14 +229,14 @@ typedef struct Func80051780Entry {
     s32 unk4;
     s32 unk8;
 } Func80051780Entry;
-void func_80051780(s32 arg0, s32 arg1, s32 arg2) {
+void Save_RestoreRecord(s32 arg0, s32 arg1, s32 arg2) {
     Func80051780Entry *temp_v0 = (Func80051780Entry *)((u8 *)&D_801281C0 + arg2 * 0xC);
     s32 v1 = arg0 - temp_v0->unk4;
     _bcopy(temp_v0->unk8 + v1, arg0, arg1);
 }
 
 extern void _bzero(void *, s32);
-void func_800517D8(u8 *arg0, s32 arg1, s32 arg2) {
+void Save_ClearRecord(u8 *arg0, s32 arg1, s32 arg2) {
     s32 *temp_v0;
 
     _bzero(arg0, arg1);

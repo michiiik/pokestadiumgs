@@ -113,12 +113,12 @@ void func_82908800(void) {
 #ifdef VERSION_US
 extern void func_800086A4(s32);
 extern void func_800355E4(s32);
-extern void func_80007AEC(s32);
+extern void StageFade_StartFromOpaque(s32);
 extern s32 D_8291B864;
 void func_82908854(void) {
     func_800086A4(0x14);
     func_800355E4(0x51);
-    func_80007AEC(0x10);
+    StageFade_StartFromOpaque(0x10);
     D_8291B864 = 1;
 }
 #endif
@@ -160,7 +160,7 @@ void func_829088EC(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_80006CD0(s32, s32);
+extern void Gfx_InitDisplayListBuffers(s32, s32);
 s32 func_800082E0(s32, s32, s32, s32, s32, s32);
 extern void func_80008514(s32);
 extern void func_80008574();
@@ -188,7 +188,7 @@ s32 func_82908A54(s32 arg0, s32 arg1) {
     s32 sp24;
 
     main_pool_push_state(0x454E44);
-    func_80006CD0(0x18000, 0);
+    Gfx_InitDisplayListBuffers(0x18000, 0);
     sp24 = func_800082E0(0, 1, 3, 1, 2, 1);
     func_80047588(6, 0);
     func_8004C09C(0x21);
@@ -374,7 +374,7 @@ void func_8290AB10(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-extern void func_80007AEC(s32);
+extern void StageFade_StartFromOpaque(s32);
 extern void func_8290E2A8(void);
 extern void func_8290A5B0(s32);
 extern u8 D_8291A960;
@@ -384,7 +384,7 @@ extern u8 D_8291AE4C;
 extern s32 D_8291B858;
 extern s32 D_82912F80;
 void func_8290ADD0(void) {
-    func_80007AEC(8);
+    StageFade_StartFromOpaque(8);
     func_8290E2A8();
     func_8290A5B0(4);
     *(s16 *)&D_8291A960 = 0;
@@ -397,7 +397,7 @@ void func_8290ADD0(void) {
 
 #ifdef VERSION_US
 void func_8290AE3C(void) {
-    func_80007AEC(8);
+    StageFade_StartFromOpaque(8);
     func_8290E2A8();
     func_8290A5B0(3);
     *(s16 *)&D_8291A960 = 0;
@@ -413,14 +413,14 @@ extern void func_8290A5B0(s32);
 extern s32 D_8291B858;
 extern s32 D_82912F80;
 void func_8290AEA8(void) {
-    func_80007AEC(8);
+    StageFade_StartFromOpaque(8);
     func_8290A5B0(2);
     *(s32 *)((u8 *)&D_8291B838 + (D_8291B858 * 4)) = D_82912F80;
 }
 #endif
 
 #ifdef VERSION_US
-extern void func_80007AEC(s32);
+extern void StageFade_StartFromOpaque(s32);
 extern void func_8290A5B0(s32);
 extern u8 D_8291A7E1;
 extern u8 D_8291A985;
@@ -429,7 +429,7 @@ extern u8 D_8291ACCD;
 extern s32 D_8291B858;
 extern s32 D_82912F80;
 void func_8290AEEC(void) {
-    func_80007AEC(8);
+    StageFade_StartFromOpaque(8);
     func_8290A5B0(4);
     D_8291A7E1 = 0;
     D_8291A985 = 0;
@@ -461,7 +461,7 @@ extern s16 D_8291B878;
 extern u8 D_8291B838;
 extern s32 D_8291B858;
 extern s32 D_82912F80;
-extern void func_80007AEC(s32);
+extern void StageFade_StartFromOpaque(s32);
 extern void func_8290A5B0(s32);
 extern void func_8003F2C4(s32, s32, s32);
 extern void ModelAnim_SetFrame(u8 *, s16);
@@ -480,7 +480,7 @@ void func_8290B098(void) {
     if (mode == 0x26) {
         config = &D_82913204;
     }
-    func_80007AEC(8);
+    StageFade_StartFromOpaque(8);
     func_8290A5B0(1);
     func_8003F2C4(*(s32 *)&D_8291A7C0, (s32)&D_8291A7C4, config[0]);
     ModelAnim_SetFrame(&D_8291A7C4, config[1]);
@@ -494,7 +494,7 @@ void func_8290B098(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_80007AEC(s32);
+extern void StageFade_StartFromOpaque(s32);
 extern void func_8290A2FC(void);
 extern void func_8290ACA8(void);
 extern void func_8290A5B0(s32);
@@ -504,7 +504,7 @@ extern s32 D_82912F80;
 void func_8290B184(void) {
     u8 *base;
 
-    func_80007AEC(8);
+    StageFade_StartFromOpaque(8);
     func_8290A2FC();
     func_8290ACA8();
     func_8290A5B0(3);
@@ -524,7 +524,7 @@ void func_8290B184(void) {
 #ifdef VERSION_US
 extern void func_8290A81C(s32);
 void func_8290B220(void) {
-    func_80007AEC(8);
+    StageFade_StartFromOpaque(8);
     func_8290A81C(3);
     *(s32 *)((u8 *)&D_8291B838 + (D_8291B858 * 4)) = D_82912F80;
 }
@@ -651,7 +651,7 @@ extern s16 D_8291B85E;
 extern s16 D_8291B860;
 extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
 extern void func_800371B4(s32, s32, f32, s16, s32);
-void func_8290D738(void) {
+void BattleAnim_Fragment67Dispatch_045(void) {
     Vec3f_SetComponentsDuplicate((f32 *)(D_8291A380 + 0xB4), 0.0f, 30.0f, 0.0f);
     D_8291B85C = 0;
     D_8291B85E = 0;
@@ -662,7 +662,7 @@ void func_8290D738(void) {
 
 #ifdef VERSION_US
 extern void func_800371B4(s32, s32, f32, s16, s32);
-void func_8290D7C8(void) {
+void BattleAnim_Fragment67Dispatch_001(void) {
     Vec3f_SetComponentsDuplicate((f32 *)(D_8291A380 + 0xB4), 0.0f, 15.0f, 0.0f);
     D_8291B85C = 0;
     D_8291B85E = 0;
@@ -673,7 +673,7 @@ void func_8290D7C8(void) {
 
 #ifdef VERSION_US
 extern void func_800371B4(s32, s32, f32, s16, s32);
-void func_8290D858(void) {
+void BattleAnim_Fragment67Dispatch_005(void) {
     Vec3f_SetComponentsDuplicate((f32 *)(D_8291A380 + 0xB4), 0.0f, 15.0f, 0.0f);
     D_8291B85C = 0;
     D_8291B85E = 0x1A00;
@@ -684,7 +684,7 @@ void func_8290D858(void) {
 
 #ifdef VERSION_US
 extern void func_800371B4(s32, s32, f32, s16, s32);
-void func_8290D8EC(void) {
+void BattleAnim_Fragment67Dispatch_009(void) {
     Vec3f_SetComponentsDuplicate((f32 *)(D_8291A380 + 0xB4), 0.0f, 15.0f, 0.0f);
     D_8291B85C = 0;
     D_8291B85E = -0x1A00;
@@ -695,7 +695,7 @@ void func_8290D8EC(void) {
 
 #ifdef VERSION_US
 extern void func_800371B4(s32, s32, f32, s16, s32);
-void func_8290D980(void) {
+void BattleAnim_Fragment67Dispatch_013(void) {
     Vec3f_SetComponentsDuplicate((f32 *)(D_8291A380 + 0xB4), 0.0f, 15.0f, 0.0f);
     D_8291B85C = 0;
     D_8291B85E = 0;
@@ -706,7 +706,7 @@ void func_8290D980(void) {
 
 #ifdef VERSION_US
 extern void func_800371B4(s32, s32, f32, s16, s32);
-void func_8290DA10(void) {
+void BattleAnim_Fragment67Dispatch_017(void) {
     Vec3f_SetComponentsDuplicate((f32 *)(D_8291A380 + 0xB4), 0.0f, 15.0f, 0.0f);
     D_8291B85C = 0x1900;
     D_8291B85E = 0x1900;
@@ -717,7 +717,7 @@ void func_8290DA10(void) {
 
 #ifdef VERSION_US
 extern void func_800371B4(s32, s32, f32, s16, s32);
-void func_8290DAA4(void) {
+void BattleAnim_Fragment67Dispatch_021(void) {
     Vec3f_SetComponentsDuplicate((f32 *)(D_8291A380 + 0xB4), 0.0f, 15.0f, 0.0f);
     D_8291B85C = -0x1700;
     D_8291B85E = -0x1400;
@@ -728,7 +728,7 @@ void func_8290DAA4(void) {
 
 #ifdef VERSION_US
 extern void func_800371B4(s32, s32, f32, s16, s32);
-void func_8290DB3C(void) {
+void BattleAnim_Fragment67Dispatch_025(void) {
     Vec3f_SetComponentsDuplicate((f32 *)(D_8291A380 + 0xB4), 0.0f, 15.0f, 0.0f);
     D_8291B85C = 0x1900;
     D_8291B85E = 0;
@@ -739,7 +739,7 @@ void func_8290DB3C(void) {
 
 #ifdef VERSION_US
 extern void func_800371B4(s32, s32, f32, s16, s32);
-void func_8290DBD0(void) {
+void BattleAnim_Fragment67Dispatch_029(void) {
     Vec3f_SetComponentsDuplicate((f32 *)(D_8291A380 + 0xB4), 0.0f, 15.0f, 0.0f);
     D_8291B85C = 0;
     D_8291B85E = 0;
@@ -750,7 +750,7 @@ void func_8290DBD0(void) {
 
 #ifdef VERSION_US
 extern void func_800371B4(s32, s32, f32, s16, s32);
-void func_8290DC60(void) {
+void BattleAnim_Fragment67Dispatch_033(void) {
     Vec3f_SetComponentsDuplicate((f32 *)(D_8291A380 + 0xB4), 0.0f, 15.0f, 0.0f);
     D_8291B85C = 0;
     D_8291B85E = 0;
@@ -761,7 +761,7 @@ void func_8290DC60(void) {
 
 #ifdef VERSION_US
 extern void func_800371B4(s32, s32, f32, s16, s32);
-void func_8290DCF0(void) {
+void BattleAnim_Fragment67Dispatch_037(void) {
     Vec3f_SetComponentsDuplicate((f32 *)(D_8291A380 + 0xB4), 0.0f, 15.0f, 0.0f);
     D_8291B85C = 0;
     D_8291B85E = 0;
@@ -772,7 +772,7 @@ void func_8290DCF0(void) {
 
 #ifdef VERSION_US
 extern s16 D_8291B828; extern s32 D_8291A380; extern s16 D_8291B85C; extern s16 D_8291B85E; extern s16 D_8291B860; extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32); extern void func_800371B4(s32, s32, f32, s16, s32);
-void func_8290DD80(void) { s16 mode; mode = D_8291B828; switch (mode) { case 0x24: Vec3f_SetComponentsDuplicate(D_8291A380 + 0xB4, 0.0f, 30.0f, 0.0f); D_8291B85C = -0x400; D_8291B85E = 0x3A00; D_8291B860 = 0x78; break; case 0x25: Vec3f_SetComponentsDuplicate(D_8291A380 + 0xB4, 0.0f, 30.0f, 0.0f); D_8291B85C = -0x800; D_8291B85E = 0x4500; D_8291B860 = 0x96; break; case 0x26: Vec3f_SetComponentsDuplicate(D_8291A380 + 0xB4, 0.0f, 30.0f, 0.0f); D_8291B85C = -0x400; D_8291B85E = 0x3700; D_8291B860 = 0x96; break; } func_800371B4(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E); }
+void BattleAnim_Fragment67Dispatch_041(void) { s16 mode; mode = D_8291B828; switch (mode) { case 0x24: Vec3f_SetComponentsDuplicate(D_8291A380 + 0xB4, 0.0f, 30.0f, 0.0f); D_8291B85C = -0x400; D_8291B85E = 0x3A00; D_8291B860 = 0x78; break; case 0x25: Vec3f_SetComponentsDuplicate(D_8291A380 + 0xB4, 0.0f, 30.0f, 0.0f); D_8291B85C = -0x800; D_8291B85E = 0x4500; D_8291B860 = 0x96; break; case 0x26: Vec3f_SetComponentsDuplicate(D_8291A380 + 0xB4, 0.0f, 30.0f, 0.0f); D_8291B85C = -0x400; D_8291B85E = 0x3700; D_8291B860 = 0x96; break; } func_800371B4(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E); }
 #endif
 
 #ifdef VERSION_US

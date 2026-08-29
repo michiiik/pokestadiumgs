@@ -226,7 +226,7 @@ void func_820019EC(void) {
 
     var_s1 = 0;
     func_800086A4(2);
-    func_80007AEC(0xA);
+    StageFade_StartFromOpaque(0xA);
     do {
         func_80064D28();
         func_82000100();

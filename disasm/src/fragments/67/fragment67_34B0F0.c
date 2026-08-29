@@ -54,7 +54,7 @@ void func_8290FA00(void) {
 #ifdef VERSION_US
 extern s32 D_8291BC40;
 extern s32 D_8291BC44;
-extern void func_80007AEC(s32);
+extern void StageFade_StartFromOpaque(s32);
 extern void func_8290FA00(void);
 extern void func_80021ED8(s32);
 void func_8290FA30(void) {
@@ -62,7 +62,7 @@ void func_8290FA30(void) {
 
     D_8291BC40 = 1;
     D_8291BC44 = 1;
-    func_80007AEC(0xC);
+    StageFade_StartFromOpaque(0xC);
     var_s0 = 0;
     do {
         func_8290FA00();

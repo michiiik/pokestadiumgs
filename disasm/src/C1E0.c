@@ -2521,7 +2521,7 @@ void func_8004ECE4(void) {
 
 #pragma GLOBAL_ASM("asm/jp/nonmatchings/C1E0/func_80051690.s")
 
-#pragma GLOBAL_ASM("asm/jp/nonmatchings/C1E0/func_800516C4.s")
+#pragma GLOBAL_ASM("asm/jp/nonmatchings/C1E0/Save_CommitRecord.s")
 
 #pragma GLOBAL_ASM("asm/jp/nonmatchings/C1E0/func_800516F0.s")
 

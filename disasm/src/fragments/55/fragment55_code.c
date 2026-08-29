@@ -231,7 +231,7 @@ extern s32 D_8670BB48;
 extern void *D_8670FEB0;
 void func_86709040(void) {
     if ((*(u8 *)((u8 *)(D_8670FEB0) + (0x2180))) == 4) {
-        func_80007AEC(0x14);
+        StageFade_StartFromOpaque(0x14);
         func_87F00688();
         D_8670BB48 = 0xD;
         return;
@@ -271,14 +271,14 @@ void func_8670972C(void) {
         (*(s32 *)((u8 *)(&D_8670BB48) + (0x48))) = 0;
         (*(s32 *)((u8 *)(&D_8670BB48) + (0))) = 2;
         (*(s32 *)((u8 *)(&D_8670BB48) + (0x30))) = 3;
-        func_800088A4(0xFFFF);
+        StageContext_SetClearColor(0xFFFF);
         StageFade_StartFromTransparent(0xA);
         return;
     case 4:
         (*(s32 *)((u8 *)(&D_8670BB48) + (0x48))) = 1;
         (*(s32 *)((u8 *)(&D_8670BB48) + (0))) = 2;
         (*(s32 *)((u8 *)(&D_8670BB48) + (0x30))) = 3;
-        func_800088A4(0xFFFF);
+        StageContext_SetClearColor(0xFFFF);
         StageFade_StartFromTransparent(0xA);
         return;
     }

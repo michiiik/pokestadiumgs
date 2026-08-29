@@ -21,7 +21,7 @@ void func_83F00298(void) {
 
     var_s0 = 0;
     func_800086A4(0xA);
-    func_80007AEC(1);
+    StageFade_StartFromOpaque(1);
     do {
         func_80064D28();
         func_83F0002C();

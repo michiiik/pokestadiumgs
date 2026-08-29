@@ -12,7 +12,7 @@ typedef struct {
     OSTime times[8];
     u8 tail[0x40];
 } ProfilerRecordA170;
-void func_8000A170(void) {
+void profiler_log_thread4_time(void) {
     ProfilerRecordA170 *record = (ProfilerRecordA170 *)&D_800D0F90;
     record += *(s16 *)((u8 *)&D_800D0F90 + 0x25A);
     if (record->count < 8) {
@@ -30,7 +30,7 @@ typedef struct {
     OSTime times[8];
     u8 tail[0x58];
 } ProfilerRecordA1E8;
-OSTime func_8000A1E8(s32 arg0) {
+OSTime profiler_log_gfx_time(s32 arg0) {
     OSTime time;
     if (arg0 == 0) {
         if (*(s16 *)((u8 *)&D_800D0F90 + 0x25C) == 2) {
@@ -53,7 +53,7 @@ typedef struct {
     u8 pad[0x84];
     OSTime times[8];
 } ProfilerRecord;
-void func_8000A28C(void) {
+void profiler_log_vblank_time(void) {
     ProfilerRecord *record = (ProfilerRecord *)&D_800D0F90;
     record += *(s16 *)((u8 *)&D_800D0F90 + 0x25C);
     if (record->count < 8) {
@@ -95,7 +95,7 @@ void draw_profiler_bar_cpu(u64 start, u64 endA, u64 endB, s16 y, u16 color) {
     if (x0 < x1) draw_profiler_rect(x0, x1, y, color);
 }
 
-void func_8000A590(OSTime start, OSTime end, s16 posY, s16 *last_max, s16 *reset_ctr) {
+void draw_profiler_bar_cpu_keep_max(OSTime start, OSTime end, s16 posY, s16 *last_max, s16 *reset_ctr) {
     u64 duration;
     s32 ulx;
     s32 lrx;

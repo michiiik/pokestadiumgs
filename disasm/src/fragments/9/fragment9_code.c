@@ -56,7 +56,7 @@ s32 func_8FB00F78(void *arg0, void *arg1) {
 
 extern u8 D_8FB03490[];
 extern u8 D_8FB03494[];
-extern void func_8004AD00(s32, s32, s32, s32, s32, s32);
+extern void Ui_DrawGradientPanel(s32, s32, s32, s32, s32, s32);
 extern void func_800498C4(void);
 extern void func_800496A4(s32, s32);
 extern void func_80049628(s32, s32, s32);
@@ -66,7 +66,7 @@ void func_8FB01EC4(void *arg0) {
     s32 var_s0;
     u8 *var_s1;
     struct { u16 x; u16 y; u16 w; u16 h; s16 offset; u16 count; } *state = arg0;
-    func_8004AD00(state->x - 0xA, state->y - 0xA, state->w + 0x14, state->h + 0x14, (s32)&D_8FB03490, (s32)&D_8FB03494);
+    Ui_DrawGradientPanel(state->x - 0xA, state->y - 0xA, state->w + 0x14, state->h + 0x14, (s32)&D_8FB03490, (s32)&D_8FB03494);
     func_800498C4();
     func_800496A4(4, 0);
     var_s0 = state->count;
@@ -88,7 +88,7 @@ void func_8FB01FCC(void *arg0) {
     s32 var_s0;
     u8 *var_s2;
     struct { u16 x; u16 y; u16 w; u16 h; s16 offset; u16 count; } *state = arg0;
-    func_8004AD00(state->x - 0xA, state->y - 0xA, state->w + 0x14, state->h + 0x14, (s32)&D_8FB03490, (s32)&D_8FB03494);
+    Ui_DrawGradientPanel(state->x - 0xA, state->y - 0xA, state->w + 0x14, state->h + 0x14, (s32)&D_8FB03490, (s32)&D_8FB03494);
     func_800498C4();
     func_800496A4(4, 0);
     var_s0 = state->count;
@@ -206,7 +206,7 @@ void func_8FB032C4(s32 arg0, s32 arg1) {
 }
 
 extern void func_800060F4(s32, s32);
-extern void func_80006CD0(s32, s32);
+extern void Gfx_InitDisplayListBuffers(s32, s32);
 extern s32 func_800082E0(s32, s32, s32, s32, s32, s32);
 extern void func_8004C09C(s32);
 extern void func_8004C4B0(s32);
@@ -214,12 +214,12 @@ extern s32 func_80047588(s32, s32);
 extern void func_8FB02560(void *);
 extern void func_80008514(s32);
 extern void func_800086A4(s32);
-extern void func_80007AEC(s32);
+extern void StageFade_StartFromOpaque(s32);
 extern s32 D_8FB03DF0;
 void func_8FB03328(s32 arg0, s32 arg1) {
     s32 sp24;
     func_800060F4(0xF, 2);
-    func_80006CD0(0x10000, 0);
+    Gfx_InitDisplayListBuffers(0x10000, 0);
     sp24 = func_800082E0(1, 0, 2, 0, 2, 1);
     func_8004C09C(0x107);
     func_8004C4B0(6);
@@ -231,7 +231,7 @@ void func_8FB03328(s32 arg0, s32 arg1) {
     func_8FB02560(&D_8FB03DF8);
     func_80008514(sp24);
     func_800086A4(2);
-    func_80007AEC(0x10);
+    StageFade_StartFromOpaque(0x10);
 }
 
 extern void Gfx_FreeDisplayListBuffers();

@@ -54,7 +54,7 @@ void func_83200744(Frag5Resource *arg0, s32 arg1) {
 
 #ifdef VERSION_US
 extern void func_80064D28(void);
-extern void func_80007AEC(s32);
+extern void StageFade_StartFromOpaque(s32);
 extern s32 StageContext_GetFadeMode();
 extern void func_81804FD0(u8 *);
 extern s32 func_81804A20(u8 *);
@@ -66,7 +66,7 @@ s32 func_832007D4(s32 arg0) {
     func_80064D28();
     switch (arg0) {
     case 0:
-        func_80007AEC(5);
+        StageFade_StartFromOpaque(5);
         break;
     case 1:
         if (StageContext_GetFadeMode() == 0) {
@@ -125,7 +125,7 @@ void func_8320092C(s32 arg0, s32 arg1) {
 
 #ifdef VERSION_US
 extern void Asset_LoadToSegment(s32, u8 *, u8 *, s32);
-extern void func_80006CD0(s32, s32);
+extern void Gfx_InitDisplayListBuffers(s32, s32);
 extern s32 func_800082E0(s32, s32, s32, s32, s32, s32);
 extern void func_8004C09C(s32);
 extern void func_8004C4B0(s32);
@@ -134,7 +134,7 @@ extern s32 func_80047588(s32, s32);
 extern void func_8004C54C(s32, s32);
 extern void func_80008514(s32);
 extern void func_800086A4(s32);
-extern void func_80007AEC(s32);
+extern void StageFade_StartFromOpaque(s32);
 extern void func_81801794(void);
 extern u8 D_1000000[];
 extern u8 D_446E30[];
@@ -147,7 +147,7 @@ void func_8320097C(s32 arg0, s32 arg1) {
 
     Asset_LoadToSegment((s32) ((u32) ((s32) D_1000000 & 0x0F000000) >> 0x18), &D_446E30, D_447D00, 0);
     D_83200DF8 = 0;
-    func_80006CD0(0x10000, 0);
+    Gfx_InitDisplayListBuffers(0x10000, 0);
     sp24 = func_800082E0(1, 0, 2, 0, 2, 1);
     func_8004C09C(0x10F);
     func_8004C4B0(0x3D);
@@ -159,7 +159,7 @@ void func_8320097C(s32 arg0, s32 arg1) {
     func_8004C54C(0x46, (s32) &D_83200D90);
     func_80008514(sp24);
     func_800086A4(2);
-    func_80007AEC(1);
+    StageFade_StartFromOpaque(1);
     func_81801794();
 }
 #endif

@@ -153,7 +153,7 @@ s32 func_82E02828(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-extern void func_80007AEC(s32);
+extern void StageFade_StartFromOpaque(s32);
 extern void func_800086A4(s32);
 extern void func_80064D28();
 extern void func_82E02658();
@@ -163,7 +163,7 @@ void func_82E028D0(void) {
 
     var_s0 = 0;
     func_800086A4(2);
-    func_80007AEC(5);
+    StageFade_StartFromOpaque(5);
     do {
         func_80064D28();
         var_s0 = func_82E02828(var_s0);

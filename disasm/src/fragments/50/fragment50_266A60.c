@@ -6,7 +6,7 @@ extern void *D_8620E198;
 extern void *D_87F119DC;
 extern u8 D_8620DF60[];
 extern s32 D_8620DF90;
-extern void func_800088A4(s32);
+extern void StageContext_SetClearColor(s32);
 extern void StageFade_StartFromTransparent(s32);
 extern void func_862005B4(s32, s32, s32);
 extern void func_8620218C(void *, void *);
@@ -14,7 +14,7 @@ void func_86200020(s32 arg0) {
     *(s32 *)((u8 *)D_8620E198 + 0x73CC0) = arg0;
     *(s32 *)((u8 *)D_8620E198 + 0xE8) = 7;
     *(s32 *)((u8 *)D_8620E198 + 0xEC) = 8;
-    func_800088A4(0xFFFF);
+    StageContext_SetClearColor(0xFFFF);
     StageFade_StartFromTransparent(0xA);
 }
 void func_86200020_padding(void) {}
@@ -340,7 +340,7 @@ extern s32 func_87F08208(void *);
 extern void func_800225C4(s32);
 extern void func_800279C4(s32);
 extern void func_800226C0(s32);
-extern void func_800088A4(s32);
+extern void StageContext_SetClearColor(s32);
 extern void func_86200020(s32 arg0);
 void func_86204A00(void) {
     s32 temp_v0;
@@ -348,7 +348,7 @@ void func_86204A00(void) {
     temp_v0 = func_87F08208((u8 *)D_8620E198 + 0x73C1C);
     switch (temp_v0) {
     case 1:
-        func_800088A4(0xFFFF);
+        StageContext_SetClearColor(0xFFFF);
         StageFade_StartFromTransparent(0x14);
         *(s32 *)((u8 *)D_8620E198 + 0xE8) = 2;
         func_800225C4(0x28);
@@ -373,7 +373,7 @@ void func_86204EB8(void) {
         func_8620736C();
         func_86206304();
         func_86206334();
-        func_80007AEC(0x14);
+        StageFade_StartFromOpaque(0x14);
         (*(s32 *)((u8 *)(D_8620E198) + (0xE8))) = 3;
         func_87F00688();
     }
@@ -394,7 +394,7 @@ extern void func_862048B0();
 extern void func_86204FEC();
 void func_862052A0(void) {
     func_800086A4(2);
-    func_80007AEC(0xA);
+    StageFade_StartFromOpaque(0xA);
     do {
         func_80064D28();
         func_86204FEC();

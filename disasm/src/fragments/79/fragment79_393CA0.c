@@ -766,7 +766,7 @@ s32 func_8412A200(u8 arg0) {
 #ifdef VERSION_US
 extern u8 D_841951D3;
 extern s32 func_84126374(void);
-void func_8412A73C(void) {
+void BattleAnim_Table_84185F10_006(void) {
     if (!(((u8 *)D_84195208[D_841951BD])[0x10] & 0x10) &&
         !(((u8 *)D_84195200[D_841951BD])[0x24] & 0x27) &&
         (func_84126374() != 0) &&
@@ -794,7 +794,7 @@ extern void func_84124594(u8 arg0);
 extern void func_84135B00(u8);
 extern void func_84136678(u8, s32);
 extern void func_84136CA8(void);
-void func_8412AA68(void) {
+void BattleAnim_Table_84185F10_010(void) {
     u8 *ptr = D_84195208[D_841951BC];
     if (ptr[0x10] & 4) {
         func_84126BFC(D_841951BC);
@@ -886,7 +886,7 @@ void BattleAnim_Table_84185F10_023(void) {
 extern u8 D_841951BC;
 extern u8 *D_84195208[];
 extern void func_84125424(s32);
-void func_8412C700(void) {
+void BattleAnim_Table_84185F10_026(void) {
     u8 *rec = D_84195208[D_841951BC];
     if (rec[0xF] & 0x10) {
         rec[0xF] &= 0xFF8F;
@@ -1035,7 +1035,7 @@ extern u8 D_841951C5;
 extern u8 func_80063690(u8);
 extern s32 func_80063660(u8);
 extern s32 func_84125080();
-void func_8412DAF4(void) {
+void BattleAnim_Table_84185F10_044(void) {
     u8 limit;
     if ((D_841951D2 == 0) &&
         (func_80063660(D_841951C5) == 0x4B) &&
@@ -1187,7 +1187,7 @@ extern void func_841254E0(void);
 extern void func_84135B00(u8);
 extern void func_84136678(u8, s32);
 extern void func_84136CA8(void);
-void func_8412F0F0(void) {
+void BattleAnim_Table_84186004_007(void) {
     if (((u8 *)D_841951F8[D_841951BD])[0xB] & 4) {
         D_841951D2 = 1;
         func_84136678(D_841951BD, -1);
@@ -1212,7 +1212,7 @@ extern u8 D_841951BD;
 extern void *D_841951F8[];
 extern u8 *D_84195208[];
 extern s32 D_841951C8;
-void func_8412F348(void) {
+void BattleAnim_Table_84186004_010(void) {
     void *rec = D_841951F8[D_841951BD];
     u8 *flag = (u8 *) rec + 0x10;
     if (*flag != 0) {
@@ -1247,7 +1247,7 @@ void BattleAnim_Table_84186004_014(void) { func_8412F49C(); }
 
 #ifdef VERSION_US
 extern u8 D_841951BC; extern u8 *D_84195208[]; extern s8 D_841951C1; extern s8 D_841951C2; extern s32 func_84126EDC(u16); extern s32 func_84126E88(u16); extern void func_84127DB8(void);
-void func_8412F604(void) {
+void BattleAnim_Table_84186004_015(void) {
     u16 val = *(u16 *)(D_84195208[D_841951BC] + 0x2E);
     D_841951C1 = func_84126EDC(val);
     D_841951C2 = func_84126E88(val);
@@ -1262,7 +1262,7 @@ extern void func_84136218(u8, u8);
 extern void func_841366C4(u8, s32);
 extern void func_84135B40(s32);
 extern void func_84136124(u8, s16, u16, u8, u8);
-void func_8412F65C(void) {
+void BattleAnim_Table_84186004_016(void) {
     (*(u8 *)((u8 *)D_841951F0 + 0x9C4)) = 1;
     (*(u8 *)((u8 *)D_841951F0 + 0x9C5)) = 5;
     func_84136218(D_841951BC, 6);
@@ -1273,7 +1273,7 @@ void func_8412F65C(void) {
 #endif
 
 #ifdef VERSION_US
-void func_8412F6DC(void) {
+void BattleAnim_Table_84186004_017(void) {
     (*(u8 *)((u8 *)D_841951F0 + 0x9C4)) = 2;
     (*(u8 *)((u8 *)D_841951F0 + 0x9C5)) = 5;
     func_84136218(D_841951BC, 6);
@@ -1450,7 +1450,7 @@ void BattleAnim_Table_84186004_048(void) {
 
 #ifdef VERSION_US
 extern s32 func_84126374(void);
-void func_841301B0(void) {
+void BattleAnim_Table_84186004_052(void) {
     if (D_841951D2 == 0) {
         if ((((u8 *)D_84195208[D_841951BD])[0x10] & 0x10) ||
             (*(u8 *)((u8 *)D_84195200[D_841951BD] + 0x24) & 0x27) ||
@@ -1477,7 +1477,7 @@ extern u8 D_841951BC; extern u8 *D_84195208[]; void BattleAnim_Table_84186004_05
 #endif
 
 #ifdef VERSION_US
-void func_841304A8(void) {
+void BattleAnim_Table_84186004_056(void) {
     if (D_84195208[D_841951BD][0xF] & 0x40) {
         D_841951C8 = D_841951C8 << 1;
         if (D_841951C8 >= 0x10000) {
@@ -1488,7 +1488,7 @@ void func_841304A8(void) {
 #endif
 
 #ifdef VERSION_US
-void func_84130500(void) {
+void BattleAnim_Table_84186004_057(void) {
     if (D_84195208[D_841951BD][0xF] & 0x20) {
         D_841951C8 = D_841951C8 << 1;
         if (D_841951C8 >= 0x10000) {
@@ -1520,7 +1520,7 @@ void BattleAnim_Table_84186004_059(void) {
 #endif
 
 #ifdef VERSION_US
-void func_84130798(void) {
+void BattleAnim_Table_84186004_061(void) {
     if (D_84195208[D_841951BD][0x2A] != 0) {
         D_841951C8 = D_841951C8 << 1;
         if (D_841951C8 >= 0x10000) {
@@ -1541,7 +1541,7 @@ void BattleAnim_Table_84186004_062(void) {
 
 #ifdef VERSION_US
 extern u8 D_841951C4;
-void func_84130824(void) {
+void BattleAnim_Table_84186004_063(void) {
     u8 value = *(u8 *)((u8 *)D_841951F0 + 0x9C4);
     if (value != 1) {
         if (value == 2) {

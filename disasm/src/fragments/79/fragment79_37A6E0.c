@@ -270,7 +270,7 @@ void func_8410C304(u8 *arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-void func_8410D040(u8 *arg0, s32 arg1) {
+void BattleAnim_ModelDispatch_024(u8 *arg0, s32 arg1) {
     extern void func_841203B4(u8 *, f32, f32);
     if (*(f32 *)(arg0 + 0xB8) <= *(f32 *)(arg0 + 0xAC)) {
         return;
@@ -428,7 +428,7 @@ void BattleAnim_ModelDispatch_072(void) {
 #ifdef VERSION_US
 extern void func_800371B4(u8 *, u8 *, s32, s16, s32);
 extern u8 * func_8410B330(u8 *);
-void func_8410F724(u8 *arg0, s32 arg1) {
+void BattleAnim_ModelDispatch_149(u8 *arg0, s32 arg1) {
     extern s32 BattleAnim_StepToS16(s16 *, s16, s16);
     extern void func_800371B4(u8 *, u8 *, s32, s16, s32);
     D_841911E8 = func_8410B330(arg0);
@@ -447,7 +447,7 @@ void func_8410F724(u8 *arg0, s32 arg1) {
 #ifdef VERSION_US
 extern void func_800371B4(u8 *, u8 *, s32, s16, s32);
 extern u8 * func_8410B330(u8 *);
-void func_8410F844(u8 *arg0, s32 arg1) {
+void BattleAnim_ModelDispatch_156(u8 *arg0, s32 arg1) {
     extern s32 BattleAnim_StepToS16(s16 *, s16, s16);
     extern void func_800371B4(u8 *, u8 *, s32, s16, s32);
     D_841911E8 = func_8410B330(arg0);
@@ -462,7 +462,7 @@ void func_8410F844(u8 *arg0, s32 arg1) {
 #ifdef VERSION_US
 extern void func_8410AF1C(void);
 extern u8 * func_8410B330(u8 *);
-void func_8410F8AC(u8 *arg0, s32 arg1) {
+void BattleAnim_ModelDispatch_134(u8 *arg0, s32 arg1) {
     extern u8 *D_841911E8;
     extern u8 *D_841911E0;
     extern s32 D_841911EC;
@@ -520,7 +520,7 @@ extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
 extern void func_800371B4(u8 *, u8 *, s32, s16, s32);
 extern f32 D_84188F90;
 extern f32 D_84188F94;
-void func_8410FC28(u8 *arg0, s32 arg1) {
+void BattleAnim_ModelDispatch_029(u8 *arg0, s32 arg1) {
     D_841911E8 = func_8410B330(arg0);
     *(f32 *)(arg0 + 0x2C) = 45.0f;
     func_84120960(arg0, arg1);
@@ -557,7 +557,7 @@ void BattleAnim_ModelDispatch_030(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-void func_8410FDEC(u8 *arg0, s32 arg1) {
+void BattleAnim_ModelDispatch_057(u8 *arg0, s32 arg1) {
     D_841911E8 = func_8410B330(arg0);
     *(f32 *)(arg0 + 0x2C) = 45.0f;
     func_84120960(arg0, arg1);
@@ -589,7 +589,7 @@ void BattleAnim_ModelDispatch_058(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-void func_8410FF6C(u8 *arg0, s32 arg1) {
+void BattleAnim_ModelDispatch_064(u8 *arg0, s32 arg1) {
     D_841911E8 = func_8410B330(arg0);
     *(f32 *)(arg0 + 0x2C) = 45.0f;
     func_84120960(arg0, arg1);
@@ -722,7 +722,7 @@ extern void func_8410EA58(u8 *, void *, s16);
 extern u8 *D_841911E8;
 extern s32 D_841911EC;
 extern s32 D_84184148;
-void func_841106B4(u8 *arg0, void *arg1) {
+void BattleAnim_ModelDispatch_218(u8 *arg0, void *arg1) {
     D_841911E8 = func_8410B330(arg0);
     func_8410B420(arg0, arg1, *(s16 *)(D_841911E8 + 0x98));
     *(s32 *)(D_841911E8 + (D_841911EC * 8) + 8) = D_84184148;
@@ -740,7 +740,7 @@ extern void func_8410D174(u8 *, void *);
 extern u8 *func_8410B330(u8 *);
 extern u8 *D_841911E8;
 
-void func_841107D8(u8 *arg0, void *arg1) {
+void BattleAnim_ModelDispatch_079(u8 *arg0, void *arg1) {
     D_841911E8 = func_8410B330(arg0);
     func_841203B4(arg0 + 0x2C, *(f32 *)(D_841911E8 + 0x88), 0.05f);
     func_8410D174(arg0, arg1);
@@ -762,7 +762,7 @@ extern u8 * func_8410B330(u8 *);
 extern void func_8410DFC4(u8 *, void *);
 extern void func_8410E688(u8 *arg0, void *arg1);
 extern s32 func_8411DC80(u8, s32 *, s32);
-void func_84110980(u8 *arg0, void *arg1) {
+void BattleAnim_ModelDispatch_093(u8 *arg0, void *arg1) {
     extern u8 *D_841911E8;
     extern s32 func_8411DC80(u8, s32 *, s32);
     extern void func_8410DFC4(u8 *, void *);
@@ -862,7 +862,7 @@ extern void func_8410EA58(u8 *, void *, s16);
 extern u8 *D_841911E8;
 extern s32 D_841911EC;
 extern s32 D_84184148;
-void func_841111D8(u8 *arg0, void *arg1) {
+void BattleAnim_ModelDispatch_071(u8 *arg0, void *arg1) {
     D_841911E8 = func_8410B330(arg0);
     func_8410EA58(arg0, arg1, *(s16 *)(D_841911E8 + 0x98));
     *(s32 *)(D_841911E8 + (D_841911EC * 8) + 8) = D_84184148;
@@ -1750,7 +1750,7 @@ void BattleAnim_Dispatch_108(u8 *arg0) {
 
 #ifdef VERSION_US
 extern void func_84112158(s32, s32);
-void func_841163A0(s32 arg0) {
+void BattleAnim_Dispatch_059(s32 arg0) {
     extern void func_84116248(s32);
 
     if (func_841133EC(arg0) == 0) {
@@ -2064,7 +2064,7 @@ void func_84118794(u8 *arg0) {
 #ifdef VERSION_US
 extern void func_84111C44(void);
 extern void func_8411FEE8(s32);
-void func_84118990(s32 arg0) {
+void BattleAnim_Dispatch_064(s32 arg0) {
     extern void func_8410B104(void);
     func_8410B104();
     func_84111C44();
@@ -2090,7 +2090,7 @@ void func_84118990(s32 arg0) {
 #ifdef VERSION_US
 extern void func_84111C44(void);
 extern void func_8411FEE8(s32);
-void func_8411938C(s32 arg0) {
+void BattleAnim_Dispatch_197(s32 arg0) {
     func_84111C44();
     func_8411FEE8(0x50);
     *(s16 *)((u8 *)arg0 + 0x7E8) = 0;
@@ -2179,7 +2179,7 @@ void func_8411A3D4(void *arg0) {
 #ifdef VERSION_US
 extern void func_84111C44(void);
 extern void func_8411FEE8(s32);
-void func_8411A44C(u8 *arg0) {
+void BattleAnim_Dispatch_036(u8 *arg0) {
     extern void func_84108A10(u8 *);
 
     func_8411FEE8(0x258);
@@ -2213,7 +2213,7 @@ void BattleAnim_Dispatch_225(s32 arg0) {
 #ifdef VERSION_US
 extern void func_8411A310(u8 *arg0);
 extern void func_8411EE74(u8 *arg0);
-void func_8411A76C(u8 *arg0) {
+void BattleAnim_Dispatch_226(u8 *arg0) {
     s32 temp_v0;
 
     temp_v0 = *(u16 *)((u8 *)D_84193DD0 + 6);
@@ -2236,7 +2236,7 @@ void func_8411A76C(u8 *arg0) {
 #ifdef VERSION_US
 extern void func_84111348(s32 arg0, s32 arg1);
 extern void func_84112EDC(u8 *);
-void func_8411A880(u8 *arg0) {
+void BattleAnim_Dispatch_023(u8 *arg0) {
     extern s32 func_800427B8(s32);
     extern void func_84112EDC(u8 *);
 
@@ -2269,7 +2269,7 @@ void BattleAnim_Dispatch_024(u8 *arg0) {
 extern s32 func_800427B8(s32);
 extern void func_8410890C(s32, s32);
 extern void func_84112EDC(u8 *);
-void func_8411AA3C(u8 *arg0) {
+void BattleAnim_Dispatch_163(u8 *arg0) {
     extern s32 func_800427B8(s32);
     extern void func_84112EDC(u8 *);
     extern void func_8410890C(s32, s32);
@@ -2291,7 +2291,7 @@ void func_8411AA3C(u8 *arg0) {
 
 #ifdef VERSION_US
 extern void func_8411FEE8(s32);
-void func_8411AAE0(u8 *arg0) {
+void BattleAnim_Dispatch_164(u8 *arg0) {
     if (*(s8 *)(arg0 + 0x7F6) != 0) {
         func_841139D0(func_8411E164((s32)arg0));
         if (*(s16 *)(arg0 + 0x7E8) == 4) {
@@ -2306,7 +2306,7 @@ void func_8411AAE0(u8 *arg0) {
 #ifdef VERSION_US
 extern void func_84111C44(void);
 extern void func_84113560(s32);
-void func_8411AB5C(s32 arg0) {
+void BattleAnim_Dispatch_127(s32 arg0) {
     *(u8 *)((u8 *)arg0 + 0x618) = 1;
     func_84111C44();
     func_84113560(0x126);
@@ -2320,7 +2320,7 @@ void func_8411AB5C(s32 arg0) {
 
 #ifdef VERSION_US
 extern void func_8411FEE8(s32);
-void func_8411ACE8(s32 arg0) {
+void BattleAnim_Dispatch_129(s32 arg0) {
     if (func_841133EC(arg0) == 0) {
         if (*(s16 *)((u8 *)arg0 + 0x7E8) == 0x46) {
             *(u16 *)((u8 *)arg0 + 0x7F4) = *(u16 *)((u8 *)arg0 + 0x7F4) & 0xFFFE;
@@ -2441,7 +2441,7 @@ void BattleAnim_Dispatch_078(u8 *arg0)
 extern void func_84111C44(void);
 extern void func_841134A0(u8 *arg0);
 extern void func_8411FEE8(s32);
-void func_8411B4A4(u8 *arg0) {
+void BattleAnim_Dispatch_148(u8 *arg0) {
     extern void func_84108AF8(u8 *);
 
     *(s16 *)(arg0 + 0x7E8) = 0;
@@ -2561,7 +2561,7 @@ void BattleAnim_Dispatch_086(u8 *arg0) {
 #ifdef VERSION_US
 extern void func_841125A4(s32);
 extern void func_8411FEE8(s32);
-void func_8411C2B4(s32 arg0) {
+void BattleAnim_Dispatch_169(s32 arg0) {
     func_841125A4(D_8419120C);
     *(s16 *)((u8 *)arg0 + 0x7E8) = 0;
     *(u8 *)((u8 *)arg0 + 0x7F6) = 0;
@@ -2604,7 +2604,7 @@ void BattleAnim_Dispatch_184(s32 arg0) {
 #ifdef VERSION_US
 extern void func_841125A4(s32);
 extern void func_8411FEE8(s32);
-void func_8411CBD0(s32 arg0) {
+void BattleAnim_Dispatch_239(s32 arg0) {
     func_841125A4(D_8419120C);
     *(s16 *)((u8 *)arg0 + 0x7E8) = 0;
     *(u8 *)((u8 *)arg0 + 0x7F6) = 0;
@@ -2690,7 +2690,7 @@ void BattleAnim_Dispatch_009(u8 *arg0) {
 #ifdef VERSION_US
 extern void func_84112158(s32, s32);
 extern void func_841125F4(void *arg0, s32 arg1);
-void func_8411D60C(s32 arg0) {
+void BattleAnim_Dispatch_247(s32 arg0) {
     if (ModelAnim_IsFinished(arg0) != 0) {
         func_84112158(arg0, 0xFB);
         func_841206D0((u8 *)arg0);

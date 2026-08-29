@@ -188,7 +188,7 @@ extern u8 D_82F030CC;
 void func_80064D28(void);
 extern u8 D_82F032C0;
 void func_81600AF0(s32 arg0, s32 arg1, s32 arg2);
-extern void func_80006CD0(s32, s32);
+extern void Gfx_InitDisplayListBuffers(s32, s32);
 s32 func_800082E0(s32, s32, s32, s32, s32, s32);
 extern void func_80008514(s32);
 extern void func_8004C8C0(s32);
@@ -203,7 +203,7 @@ void WidgetTree_OpenMessagePanel_fragment4(u8 *arg0);
 void func_81801F60(u8 *arg0);
 extern s32 func_80047588(s32 arg0, s32 arg1);
 extern void func_800086A4(s32);
-extern void func_80007AEC(s32);
+extern void StageFade_StartFromOpaque(s32);
 void func_81801794(void);
 extern void func_80021ED8(s32);
 s32 func_81801388(s32, s32);
@@ -271,7 +271,7 @@ void func_82F01DC4(s32 arg0, s32 arg1) {
     s32 sp24;
 
     Asset_LoadToSegment((s32) ((u32) ((s32) D_1000000 & 0x0F000000) >> 0x18), &D_446E30, D_447D00, 0);
-    func_80006CD0(0x10000, 0);
+    Gfx_InitDisplayListBuffers(0x10000, 0);
     sp24 = func_800082E0(1, 0, 2, 0, 2, 1);
     func_8004C09C(0x10F);
     func_8004C8C0(0x14C);
@@ -285,7 +285,7 @@ void func_82F01DC4(s32 arg0, s32 arg1) {
     func_80047588(0xC, 0);
     func_80008514(sp24);
     func_800086A4(2);
-    func_80007AEC(1);
+    StageFade_StartFromOpaque(1);
     func_81801794();
     func_80021ED8(0x5E);
 }
@@ -313,7 +313,7 @@ extern void func_82F01D74(s32, s32);
 extern void func_82F01EC8(s32, s32);
 extern void main_pool_pop_state(s32);
 extern u8 D_82F032C0;
-s32 func_82F01F04(s32 arg0, s32 arg1) {
+s32 fragment8_main(s32 arg0, s32 arg1) {
     s32 state;
     s32 result;
     main_pool_push_state(0x544D434E);

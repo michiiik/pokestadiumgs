@@ -25,13 +25,13 @@ typedef struct {
 } GlobalState81003B78h2;
 extern GlobalState81003B78h2 *D_8009491C;
 extern u16 D_80094904;
-extern void *func_80006DEC();
+extern void *Gfx_AllocDisplayList();
 void DisplayList_InitSelectedTextureSegment(s32 arg0, TextureState81003B78h2 *state) {
     s32 index;
     u32 *textures;
     if (arg0 == 2) {
         textures = state->textures;
-        state->gfx = (Gfx *)func_80006DEC(0x50);
+        state->gfx = (Gfx *)Gfx_AllocDisplayList(0x50);
         if (D_8009491C->modelId == 0x58) {
             index = D_8009491C->unk_48 >> 16;
             if (index >= 0x42) index -= 0x42; else index = 0;

@@ -26,7 +26,7 @@ typedef struct {
     u32* addresses;
     Gfx* gfx;
 } Func810038BCState;
-extern void* func_80006DEC();
+extern void* Gfx_AllocDisplayList();
 extern Gfx* DisplayList_BuildIndexedTextureSegment();
 extern u16 D_80094904;
 
@@ -35,7 +35,7 @@ void DisplayList_InitIndexedTextureSegment(s32 arg0, Func810038BCState* state) {
     u32* addresses;
     if (arg0 == 2) {
         addresses = state->addresses;
-        gfx = func_80006DEC(0x50);
+        gfx = Gfx_AllocDisplayList(0x50);
         state->gfx = gfx;
         DisplayList_BuildIndexedTextureSegment(gfx, addresses, D_80094904 & 7);
     }
@@ -54,7 +54,7 @@ void DisplayList_InitTwoSegmentChain(s32 arg0, Func810038BCState* state) {
     u32* addresses;
     if (arg0 == 2) {
         addresses = state->addresses;
-        gfx = func_80006DEC(0x18);
+        gfx = Gfx_AllocDisplayList(0x18);
         state->gfx = gfx;
         DisplayList_BuildTwoSegmentChain(gfx, addresses);
     }
@@ -76,7 +76,7 @@ void func_810039CC(s32 arg0, Func810038BCState* state) {
     u32* addresses;
     if (arg0 == 2) {
         addresses = state->addresses;
-        gfx = func_80006DEC(0x50);
+        gfx = Gfx_AllocDisplayList(0x50);
         state->gfx = gfx;
         DisplayList_BuildConditionalSegment(gfx, addresses);
     }

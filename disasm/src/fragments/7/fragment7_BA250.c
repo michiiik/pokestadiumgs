@@ -721,14 +721,14 @@ void func_8300A4BC(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_80006CD0(s32, s32);
+extern void Gfx_InitDisplayListBuffers(s32, s32);
 s32 func_800082E0(s32, s32, s32, s32, s32, s32);
 extern void func_80008514(s32);
 extern void StageLoader_WaitForRetrace();
 extern void main_pool_push_state(s32);
 void func_8300A6B0(s32 arg0, s32 arg1) {
     main_pool_push_state(0x4D535F31);
-    func_80006CD0(0x10000, 0);
+    Gfx_InitDisplayListBuffers(0x10000, 0);
     func_80008514(func_800082E0(1, 0, 2, 0, 2, 1));
     StageLoader_WaitForRetrace();
 }
