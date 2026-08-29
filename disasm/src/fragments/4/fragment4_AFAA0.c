@@ -347,7 +347,13 @@ void func_818037A0(u8 *arg0, u8 *arg1, s32 arg2, s32 arg3) {
     if (*(s16 *)(arg1 + 6) < 0) *(s16 *)(arg1 + 6) = (s16)arg3;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81803868.s")
+extern void func_81800020(f32, f32, f32, f32, s32, s32, f32, f32);
+extern s32 func_8004D1FC(u8 *);
+void func_81803868(u8 *arg0, void *arg1, void *arg2) {
+    func_8004D1FC(arg0);
+    func_81800020((f32)*(s16 *)((u8 *)arg1 + 0), (f32)*(s16 *)((u8 *)arg1 + 2), (f32)*(s16 *)((u8 *)arg1 + 4), (f32)*(s16 *)((u8 *)arg1 + 6), (s32)*(s16 *)((u8 *)arg2 + 0), (s32)*(s16 *)((u8 *)arg2 + 2), (f32)(*(s16 *)((u8 *)arg2 + 4) / *(s16 *)((u8 *)arg1 + 4)), (f32)(*(s16 *)((u8 *)arg2 + 6) / *(s16 *)((u8 *)arg1 + 6)));
+}
+void func_81803868_padding(void) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81803964.s")
 
