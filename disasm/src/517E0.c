@@ -296,7 +296,7 @@ s32 func_800532C4(s32 arg0){s32 result=0;switch(arg0){case 0x10:result=1;break;c
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800532F0.s")
 
-void Deck_IsSaveEntryPresent(void *arg0, void *arg1) { func_80051A8C(arg0, arg1, 1); }
+s32 Deck_IsSaveEntryPresent(void *arg0, void *arg1) { return func_80051A8C(arg0, arg1, 1); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800533A4.s")
 
@@ -304,9 +304,20 @@ void Deck_IsSaveEntryPresent(void *arg0, void *arg1) { func_80051A8C(arg0, arg1,
 
 extern u8 D_801281F0[]; u8 *func_800534FC(s32 arg0){u8 *result=NULL;if(arg0>=0&&arg0<0xE)result=D_801281F0+arg0*0x20;return result;}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80053524.s")
+s32 func_80053524(s32 arg0, u8 *arg1) {
+    s32 result = 0;
+    s32 next;
+    *arg1 = 0;
+    if (Deck_IsSaveEntryPresent((void *)0x11, (void *)arg0) != 0) {
+        next = func_80050F60(0, arg0);
+        if (next != -0x10) {
+            next += 0x10;
+            result = func_80060C08((u16 *)arg1, (u16 *)next);
+        }
+    }
+    return result;
+}
 
-extern void *func_80050F60(s32, void *, s32);
 extern void func_80060D70(u8 *, u8 *);
 extern void func_80051BF0(s32, void *, s32);
 
@@ -335,9 +346,9 @@ void func_80053A30(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80053A50.s")
 
-extern void func_80060C08(u16 *,u16 *); void func_80053AC8(u16 *a0,u16 *a1){a0[0]=a1[0];a0[1]=a1[1];a0[2]=a1[2];func_80060C08(a0+4,a1+4);}
+void func_80053AC8(u16 *a0,u16 *a1){a0[0]=a1[0];a0[1]=a1[1];a0[2]=a1[2];func_80060C08(a0+4,a1+4);}
 
-extern void func_80060C08(u16 *,u16 *); void func_80053B04(u16 *a0,u16 *a1){a0[0]=a1[0];a0[1]=a1[1];func_80060C08(a0+2,a1+2);}
+void func_80053B04(u16 *a0,u16 *a1){a0[0]=a1[0];a0[1]=a1[1];func_80060C08(a0+2,a1+2);}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80053B38.s")
 
@@ -674,7 +685,15 @@ s32 func_80055A74(s32 arg0) { extern s32 D_800972C0; s32 old = D_800972C0; if (a
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055B14.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055BA8.s")
+s32 Deck_FindFirstFreeTeamSlot(void) {
+    s32 i;
+    for (i = 0; i < 0xA; i++) {
+        if (Deck_IsSaveEntryPresent((void *)0x10, (void *)i) == 0) {
+            break;
+        }
+    }
+    return i;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055BF8.s")
 
