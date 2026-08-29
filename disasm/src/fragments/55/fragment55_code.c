@@ -53,7 +53,31 @@ void func_867000C8(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/55/fragment55_code/func_867006C4.s")
+extern Gfx *D_800D0510;
+extern void *D_8009491C;
+extern s32 func_8004C990(s32, s32);
+extern u8 *func_8004CA60(u8 *);
+extern void func_8003CD84(void);
+extern s32 D_8670AB90[];
+extern s32 D_8670C97C;
+extern void *D_8670C978;
+/* function: func_867006C4 */
+void func_867006C4(s32 arg0, s32 arg1) {
+    void *context;
+    s32 index;
+
+    if (arg0 == 5) {
+        context = D_8009491C;
+        index = *(s32 *)((u8 *)context + 0x14);
+        D_8670C97C = func_8004C990(0x1B2, D_8670AB90[index]);
+        gDPPipeSync(D_800D0510++);
+        gDPSetCombine(D_800D0510++, 0xFFFFFF, 0xFFFCF238);
+        gSPSegment(D_800D0510++, 0xF,
+                   func_8004CA60((u8 *)D_8670C97C));
+        gSPDisplayList(D_800D0510++, D_8670C978);
+        func_8003CD84();
+    }
+}
 #endif
 
 #ifdef VERSION_US
