@@ -120,3 +120,7 @@ void func_81301030(void *arg0) {
 ## Fleet box correction (2026-08-29)
 
 - Runner target summary after this box reports func_81300F7C at 30 prior attempts, best 0.9348 normalized / 0.7174 raw; the earlier note saying 25 attempts referred to the pre-batch count. The deferred diagnosis is unchanged.
+
+## Fleet box 2026-08-29 continuation (zero accepts) (2026-08-29)
+
+71 probe variants attempted: func_813012C0 (29: 21 probe_rejected, 8 compile_failed), func_81301648 (27 probe_rejected), and func_813010B0 (15: 11 probe_rejected, 4 compile_failed); 59 probe_rejected and 12 compile_failed, 0 probe matches and therefore 0 ROM gates. Most common mismatch_kind was operand_or_scheduling_drift. Strongest func_813012C0 result was call-sequence:state-setup:top-decls:s32-pointers at 0.8750 normalized / 0.5000 raw; m2c spill retries reached stuck after 29 attempts. Strongest func_81301648 result was call-sequence:state-cleanup:three-vars:explicit-branch at 1.0000 normalized / 0.7123 raw, immediate_drift: expected frame -0x30 but candidate frame -0x38; treat as normalized-only and do not gate. Strongest func_813010B0 result was call-sequence:state-init:m2c-fixed:explicit-final-result at 0.8333 / 0.5303, operand_or_scheduling_drift; corrected nested lw/lh pointer chain still allocated a larger frame. Do not repeat these exact forms; route 012C0/01648 to allocator/permuter or a new source-shape hypothesis, and leave 010B0 for fresh analysis. Dispatcher owners remain blocked by the absent .rodata subsegment.
