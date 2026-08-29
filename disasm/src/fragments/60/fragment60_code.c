@@ -309,7 +309,17 @@ void func_86A0B66C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/60/fragment60_code/func_86A0B7A0.s")
+extern u8 D_86A42D70;
+extern void *D_87F119DC;
+void func_86A0B7A0(void)
+{
+  s32 new_var;
+  void *temp_a0;
+  new_var = *((s32 *) (((u8 *) D_87F119DC) + 0x20));
+  temp_a0 = (new_var * 0x168) + (&D_86A42D70);
+  *((f32 *) (((u8 *) D_87F119DC) + 0x48)) = (f32) (*((f32 *) (((u8 *) temp_a0) + 0x24)));
+  *((f32 *) (((u8 *) D_87F119DC) + 0x50)) = (f32) (*((f32 *) (((u8 *) temp_a0) + 0x2C)));
+}
 #endif
 
 #ifdef VERSION_US
