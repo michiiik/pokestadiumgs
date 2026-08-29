@@ -377,7 +377,21 @@ s32 func_8130B770(void *arg0) {
     return 1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130B7F8.s")
+extern f32 func_816092FC(void);
+extern void func_8130B620(void *, s32);
+/* function: func_8130B7F8 */
+s32 func_8130B7F8(void *arg0) {
+    struct S { u8 pad[0xE8F0]; f32 first; u8 gap[8]; f32 second; u8 gap2[0x12]; u8 mode; };
+
+    ((struct S *)arg0)->first = 16.0f;
+    ((struct S *)arg0)->second += func_816092FC();
+    if (((struct S *)arg0)->second >= 16.0f) {
+        ((struct S *)arg0)->second = 16.0f;
+        ((struct S *)arg0)->mode = 7;
+        func_8130B620((void *)arg0, (s32)0);
+    }
+    return 1;
+}
 
 extern f32 func_816092FC(void);
 extern void func_8130F5AC(s32);
