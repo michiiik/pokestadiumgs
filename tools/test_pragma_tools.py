@@ -891,6 +891,13 @@ class RunnerTests(unittest.TestCase):
                 "actual_instruction": "0x24050001",
                 "expected_instruction_text": "addiu $a0, $zero, 1",
                 "actual_instruction_text": "addiu $a1, $zero, 1",
+                "prior_attempts": 7,
+                "best_prior": {
+                    "similarity_score": 0.95,
+                    "mismatch_kind": "immediate_drift",
+                },
+                "futility": "repeated-drift: 12 prior rejected attempts",
+                "repeated_drift": "repeated-drift: 12 prior rejected attempts",
                 "assembly_diff": [{
                     "expected": "addiu $a0,$zero,1",
                     "actual": "addiu $a1,$zero,1",
@@ -920,6 +927,23 @@ class RunnerTests(unittest.TestCase):
             self.assertEqual(row["attempts"][0]["declarations"], "extern void helper(void);")
             self.assertEqual(row["attempts"][0]["first_diff_instruction"], 1)
             self.assertEqual(row["attempts"][0]["expected_instruction"], "0x24040001")
+            self.assertEqual(row["attempts"][0]["prior_attempts"], 7)
+            self.assertEqual(
+                row["attempts"][0]["best_prior"],
+                {"similarity_score": 0.95, "mismatch_kind": "immediate_drift"},
+            )
+            self.assertEqual(
+                row["attempts"][0]["futility"],
+                "repeated-drift: 12 prior rejected attempts",
+            )
+            self.assertEqual(
+                row["attempts"][0]["repeated_drift"],
+                "repeated-drift: 12 prior rejected attempts",
+            )
+            self.assertEqual(
+                row["attempts"][0]["first_diff_fingerprint"],
+                '["operand_or_scheduling_drift",4,1,"0x24040001","0x24050001"]',
+            )
             # assembly_diff/assembly_diff_truncated are runtime-only (AGENTS.md)
             # and must never reach the persisted file.
             self.assertNotIn("assembly_diff", row["attempts"][0])

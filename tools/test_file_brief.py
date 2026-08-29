@@ -12,6 +12,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 TOOLS = Path(__file__).resolve().parent
 if str(TOOLS) not in sys.path:
@@ -160,6 +161,39 @@ class RemainingOwnersFallbackTests(unittest.TestCase):
         self.assertTrue(all(row["instructions"] is None for row in rows))
 
 
+class RemainingOwnerHistoryTests(unittest.TestCase):
+    def test_retains_probe_history_from_pragma_targets(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source_path = Path(tmp) / "synthetic.c"
+            source_path.write_text(SYNTHETIC_SOURCE)
+            pragmas = file_brief.parse_pragmas(SYNTHETIC_SOURCE)
+            target = {
+                "function": "func_80000010",
+                "instructions": 18,
+                "family": "bounded_lookup",
+                "prior_attempts": 7,
+                "best_similarity": 0.9876,
+                "best_raw_similarity": 0.8123,
+                "best_mismatch_kind": "immediate_drift",
+                "last_attempt": "2026-08-29T01:02:03+00:00",
+                "hardness": "drift",
+            }
+            with mock.patch.object(
+                file_brief.pragma_targets,
+                "list_targets",
+                return_value={"targets": [target]},
+            ):
+                rows = file_brief.remaining_owners_table(source_path, pragmas)
+
+        row = rows[0]
+        self.assertEqual(row["prior_attempts"], 7)
+        self.assertEqual(row["best_similarity"], 0.9876)
+        self.assertEqual(row["best_raw_similarity"], 0.8123)
+        self.assertEqual(row["best_mismatch_kind"], "immediate_drift")
+        self.assertEqual(row["last_attempt"], "2026-08-29T01:02:03+00:00")
+        self.assertEqual(row["hardness"], "drift")
+
+
 class BuildBriefAndRenderTests(unittest.TestCase):
     def test_build_brief_end_to_end_on_synthetic_file(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -188,6 +222,27 @@ class BuildBriefAndRenderTests(unittest.TestCase):
             "remaining owners",
         ):
             self.assertIn(heading, text)
+
+    def test_render_text_includes_owner_probe_history(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source_path = Path(tmp) / "synthetic.c"
+            source_path.write_text(SYNTHETIC_SOURCE)
+            brief = file_brief.build_brief(source_path)
+        brief["remaining_owners"][0].update(
+            {
+                "prior_attempts": 7,
+                "best_similarity": 0.9876,
+                "best_raw_similarity": 0.8123,
+                "best_mismatch_kind": "immediate_drift",
+                "last_attempt": "2026-08-29T01:02:03+00:00",
+                "hardness": "drift",
+            }
+        )
+
+        text = file_brief.render_text(brief)
+        self.assertIn("attempts=7 best=0.9876 raw=0.8123", text)
+        self.assertIn("mismatch=immediate_drift", text)
+        self.assertIn("last=2026-08-29T01:02:03+00:00 hardness=drift", text)
 
     def test_main_writes_json_when_requested(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

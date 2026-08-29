@@ -1425,6 +1425,70 @@ def _best_prior_attempt(prior: list[dict[str, object]]) -> dict[str, object] | N
     }
 
 
+_REJECTED_ATTEMPT_STATUSES = frozenset({
+    "probe_rejected",
+    "compare_rejected",
+    "combined_compare_rejected",
+})
+_REPEATED_DRIFT_THRESHOLD = 12
+
+
+def _first_diff_fingerprint(attempt: dict[str, object]) -> str | None:
+    """Return a stable fingerprint for a rejected first-difference shape.
+
+    The fingerprint deliberately includes both the location and the expected
+    and actual instruction. An offset alone is too coarse for a useful handoff,
+    while a full assembly diff is too sensitive to later changes. Older stats
+    rows without an explicit status remain readable when they carry the
+    complete first-difference fields; known non-rejected rows never contribute
+    to the repeated-drift count.
+    """
+    status = attempt.get("status")
+    if status not in _REJECTED_ATTEMPT_STATUSES and status is not None:
+        return None
+    persisted = attempt.get("first_diff_fingerprint")
+    if isinstance(persisted, str) and persisted:
+        return persisted
+    mismatch_kind = attempt.get("mismatch_kind")
+    first_diff_offset = attempt.get("first_diff_offset")
+    first_diff_instruction = attempt.get("first_diff_instruction")
+    expected = attempt.get("expected_instruction") or attempt.get(
+        "expected_instruction_text"
+    )
+    actual = attempt.get("actual_instruction") or attempt.get(
+        "actual_instruction_text"
+    )
+    if (
+        mismatch_kind is None
+        or (first_diff_offset is None and first_diff_instruction is None)
+        or (expected is None and actual is None)
+    ):
+        return None
+    return json.dumps(
+        [mismatch_kind, first_diff_offset, first_diff_instruction, expected, actual],
+        ensure_ascii=True,
+        separators=(",", ":"),
+    )
+
+
+def _repeated_drift_verdict(prior: list[dict[str, object]]) -> str | None:
+    """Return an advisory verdict for a repeated rejected first difference."""
+    counts: dict[str, int] = {}
+    for attempt in prior:
+        fingerprint = _first_diff_fingerprint(attempt)
+        if fingerprint is not None:
+            counts[fingerprint] = counts.get(fingerprint, 0) + 1
+    if not counts:
+        return None
+    fingerprint, count = max(counts.items(), key=lambda item: item[1])
+    if count < _REPEATED_DRIFT_THRESHOLD:
+        return None
+    return (
+        f"repeated-drift: {count} prior rejected attempts share first-diff "
+        f"fingerprint {fingerprint}"
+    )
+
+
 def _futility_verdict(prior: list[dict[str, object]], best_prior: dict[str, object] | None) -> str | None:
     """Classify a function's prior-attempt history as futile to keep retrying.
 
@@ -1436,7 +1500,10 @@ def _futility_verdict(prior: list[dict[str, object]], best_prior: dict[str, obje
     AGENTS.md, e.g. ``func_8130B91C``/``func_8130B95C``,
     ``func_8005C0B0``-family).  ``stuck``: at least fifteen prior attempts
     and the best of them is still below 0.9 similarity -- a bigger structural
-    rewrite is needed, not another small variant.
+    rewrite is needed, not another small variant. ``repeated-drift``: twelve
+    prior rejected attempts share the same first-difference fingerprint. This
+    is informational only and never suppresses a candidate or changes gate
+    behavior.
     """
     register_tie_count = sum(
         1
@@ -1454,7 +1521,7 @@ def _futility_verdict(prior: list[dict[str, object]], best_prior: dict[str, obje
         best_score = best_prior.get("similarity_score") if best_prior else None
         if isinstance(best_score, (int, float)) and best_score < 0.9:
             return f"stuck: {len(prior)} attempts, best {best_score}"
-    return None
+    return _repeated_drift_verdict(prior)
 
 
 def _annotate_prior_attempts(result: dict[str, object]) -> None:
@@ -1482,9 +1549,12 @@ def _annotate_prior_attempts(result: dict[str, object]) -> None:
             continue
         prior = history.get(function, [])
         best_prior = _best_prior_attempt(prior)
+        repeated_drift = _repeated_drift_verdict(prior)
         futility = _futility_verdict(prior, best_prior)
         attempt["prior_attempts"] = len(prior)
         attempt["best_prior"] = best_prior
+        attempt["repeated_drift"] = repeated_drift
+        attempt["first_diff_fingerprint"] = _first_diff_fingerprint(attempt)
         attempt["futility"] = futility
         if futility is not None:
             summary[function] = futility
@@ -2107,6 +2177,12 @@ def _record_probe_stats(
                 "raw_similarity_score": attempt.get("raw_similarity_score"),
                 "normalized_only_match": attempt.get("normalized_only_match"),
                 "similarity_rank": attempt.get("similarity_rank"),
+                "prior_attempts": attempt.get("prior_attempts"),
+                "best_prior": attempt.get("best_prior"),
+                "futility": attempt.get("futility"),
+                "repeated_drift": attempt.get("repeated_drift"),
+                "first_diff_fingerprint": attempt.get("first_diff_fingerprint")
+                or _first_diff_fingerprint(attempt),
                 "assembly_diff": attempt.get("assembly_diff"),
                 "assembly_diff_truncated": attempt.get("assembly_diff_truncated"),
                 "permute_score": attempt.get("permute_score"),

@@ -9,6 +9,7 @@ compiles anything or reads the main checkout's disasm tree.
 
 from __future__ import annotations
 
+import io
 import json
 import sys
 import unittest
@@ -140,6 +141,29 @@ class FormatTableTests(unittest.TestCase):
         self.assertIn("func_1", table)
         self.assertIn("compile_failed", table)
 
+    def test_table_exposes_link_futility_and_compact_diagnostic(self) -> None:
+        table = fleet_probe.format_table(
+            [
+                _fake_attempt(
+                    "func_1",
+                    "compile",
+                    prior_attempts=7,
+                    link_verified=False,
+                    link_mismatch="section_layout_drift",
+                    futility="stuck: 15 attempts, best 0.81",
+                    diagnostic="compiler error: bad type\nnext line",
+                )
+            ]
+        )
+        self.assertIn("PRIOR", table)
+        self.assertIn("LINK", table)
+        self.assertIn("FUTILITY", table)
+        self.assertIn("DIAGNOSTIC", table)
+        self.assertIn("7", table)
+        self.assertIn("no:section_layout_drift", table)
+        self.assertIn("stuck: 15 attempts, best 0.81", table)
+        self.assertIn("compiler error: bad type next line", table)
+
 
 class SummarizeTests(unittest.TestCase):
     def test_accepted_wins_over_everything(self) -> None:
@@ -204,6 +228,11 @@ class SummarizeTests(unittest.TestCase):
         summary = fleet_probe.summarize(attempts)
         self.assertIn("no scored attempts", summary)
 
+    def test_summary_exposes_futility(self) -> None:
+        attempts = [_fake_attempt("func_1", "a", futility="register-tie: six prior attempts")]
+        summary = fleet_probe.summarize(attempts)
+        self.assertIn("futility=register-tie: six prior attempts", summary)
+
 
 class RunAndMainTests(unittest.TestCase):
     def test_run_calls_try_candidates_detailed_with_expected_args(self) -> None:
@@ -247,9 +276,20 @@ class RunAndMainTests(unittest.TestCase):
             return {
                 "status": 1,
                 "accepted": [],
-                "attempts": [_fake_attempt("func_1", "a", status="probe_rejected", similarity_score=0.4)],
+                "attempts": [
+                    _fake_attempt(
+                        "func_1",
+                        "a",
+                        status="probe_rejected",
+                        similarity_score=0.4,
+                        link_verified=False,
+                        futility="stuck: 15 attempts, best 0.81",
+                        diagnostic="compiler error: bad type\nnext line",
+                    )
+                ],
                 "batch_status": "probe_only",
                 "gate": False,
+                "futility_summary": {"func_1": "stuck: 15 attempts, best 0.81"},
             }
 
         with _tmp_json({
@@ -259,9 +299,15 @@ class RunAndMainTests(unittest.TestCase):
             (path.parent / "x.c").write_text("stub")
             with mock.patch.object(try_pragma_compare, "try_candidates_detailed", fake_try_candidates_detailed):
                 with mock.patch.object(fleet_probe, "REPO_ROOT", path.parent):
-                    with mock.patch("sys.stdout") as _stdout:
+                    output = io.StringIO()
+                    with mock.patch("sys.stdout", output):
                         exit_code = fleet_probe.main([str(path)])
         self.assertEqual(exit_code, 0)
+        rendered = output.getvalue()
+        self.assertIn("LINK", rendered)
+        self.assertIn("no", rendered)
+        self.assertIn("compiler error: bad type next line", rendered)
+        self.assertIn("futility_summary:", rendered)
 
     def test_main_reports_input_errors_on_stderr(self) -> None:
         with _tmp_json({"source": "x.c"}) as path:

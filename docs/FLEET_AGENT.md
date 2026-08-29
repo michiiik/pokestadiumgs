@@ -36,10 +36,17 @@ Do not touch any other file's pragmas or run `make`.
    order/temps/widths; `immediate_drift` → offsets/strides/literal widths;
    `section_layout_drift` → reject, needs a `.rodata` subsegment first;
    `symbol_size_drift`/tail kinds → `C_FUNCTION_PADDING` or a `_padding` helper.
+   The runner also records `prior_attempts`, `best_prior`, `futility`,
+   `repeated_drift`, and a `first_diff_fingerprint` in probe stats. These are
+   history and handoff context, not acceptance evidence.
 5. Gate the first probe hit: `python3 tools/fleet_probe.py batch.json --gate`.
 6. Cap **~12 variants / ~8 minutes per owner**. If the best after two batches
    is `register_allocation_only` at similarity ≥ 0.99, stop on that owner —
-   it is a known-hard register tie, not a spelling you haven't tried.
+   it is a known-hard register tie, not a spelling you haven't tried. If the
+   runner reports `repeated-drift` after 12 prior rejected attempts sharing
+   one first-diff fingerprint, stop repeating that source shape and report the
+   fingerprint and first differing instruction. This is advisory only: it
+   never suppresses a candidate or changes the ROM gate.
 
 ## 3. `fleet_probe.py` / `file_brief.py` usage
 
@@ -51,10 +58,17 @@ python3 tools/file_brief.py disasm/src/<file>.c
 ```
 `batch.json`: `{"source": "disasm/src/X.c", "declarations": "...",
 "candidates": [{"function": "func_...", "label": "family:shape:hyp", "body": "..."}]}`.
-Table columns: label, status, similarity, raw similarity, mismatch kind,
-expected/actual size, first-diff offset, expected vs actual instruction at
-that offset. A trailing verdict line per function names the best label, and
-says "register tie — stop" when §2 step 6's stop condition applies.
+Table columns include label, status, similarity, raw similarity, prior-attempt
+count, link verification, mismatch kind, futility, compiler/link diagnostic,
+expected/actual size, first-diff offset, and expected vs actual instruction at
+that offset. A trailing verdict line per function names the best label and
+includes the link/futility context; it says "register tie — stop" when §2 step
+6's stop condition applies.
+The persisted `prior_attempts` count is per owner across current, legacy, and
+rotated stats files; `best_prior` preserves the strongest prior normalized and
+raw scores. A first-diff fingerprint combines mismatch kind, location, and
+expected/actual instruction. Compiler failures and non-rejected outcomes do
+not count toward `repeated-drift`.
 
 ## 4. Verified source-shape heuristics (copied verbatim from AGENTS.md §4 — order candidates by these; always probe and gate)
 

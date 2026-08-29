@@ -176,6 +176,68 @@ class PriorAttemptHistoryTests(unittest.TestCase):
         self.assertIsNone(attempt["best_prior"])
         self.assertIsNone(attempt["futility"])
 
+    def test_repeated_first_diff_is_advisory_at_twelve_prior_rejections(self) -> None:
+        attempts = [
+            _attempt(
+                "func_80000000",
+                0.95,
+                "immediate_drift",
+                status="probe_rejected",
+                first_diff_offset=8,
+                first_diff_instruction=2,
+                expected_instruction="0x24040001",
+                actual_instruction="0x24040002",
+                label=f"v{i}",
+            )
+            for i in range(12)
+        ]
+        _write_stats(self.current, [_batch("2026-01-01T00:00:00Z", attempts)])
+        result: dict[str, object] = {
+            "attempts": [{
+                "function": "func_80000000",
+                "status": "probe_rejected",
+                "mismatch_kind": "immediate_drift",
+                "first_diff_offset": 8,
+                "first_diff_instruction": 2,
+                "expected_instruction": "0x24040001",
+                "actual_instruction": "0x24040002",
+            }]
+        }
+        runner._annotate_prior_attempts(result)
+
+        attempt = result["attempts"][0]
+        self.assertEqual(attempt["prior_attempts"], 12)
+        self.assertEqual(
+            attempt["first_diff_fingerprint"],
+            '["immediate_drift",8,2,"0x24040001","0x24040002"]',
+        )
+        self.assertIn("repeated-drift", attempt["repeated_drift"])
+        self.assertIn("12 prior rejected attempts", attempt["futility"])
+        self.assertEqual(result["futility_summary"], {"func_80000000": attempt["futility"]})
+        self.assertEqual(attempt["status"], "probe_rejected")
+
+    def test_compile_failures_do_not_count_as_repeated_drift(self) -> None:
+        attempts = [
+            _attempt(
+                "func_80000000",
+                0.95,
+                "immediate_drift",
+                status="compile_failed",
+                first_diff_offset=8,
+                first_diff_instruction=2,
+                expected_instruction="0x24040001",
+                actual_instruction="0x24040002",
+            )
+            for _ in range(12)
+        ]
+        _write_stats(self.current, [_batch("2026-01-01T00:00:00Z", attempts)])
+        result: dict[str, object] = {"attempts": [{"function": "func_80000000"}]}
+        runner._annotate_prior_attempts(result)
+
+        attempt = result["attempts"][0]
+        self.assertIsNone(attempt["repeated_drift"])
+        self.assertIsNone(attempt["futility"])
+
 
 class NormalizedOnlyMatchTests(unittest.TestCase):
     """Deliverable B: the normalized_only_match flag on a fake details dict."""

@@ -23,10 +23,11 @@ Sections printed:
    ``declarations`` so a same-file forward call does not fall back to the
    runner's synthesized ``s32`` prototype and fail on a narrower real
    return type (see AGENTS.md §5, the ``func_8005D92C`` class of bug).
-8. Remaining owners (instruction count, family), via
+8. Remaining owners (instruction count, family, probe history), via
    ``tools/pragma_targets.py``'s existing listing/classification -- this
    script does not re-parse ``.s`` files or re-implement the family
-   classifier.
+   classifier.  The history fields are prior attempts, best normalized/raw
+   similarity, best mismatch kind, last attempt timestamp, and hardness.
 
 Usage:
     tools/file_brief.py disasm/src/4AC10.c
@@ -58,6 +59,18 @@ SYMBOL_REF_RE = re.compile(r"\b(func_[0-9A-Fa-f]+|D_[0-9A-Fa-f]+)\b")
 STRIDE_RE = re.compile(r"([A-Za-z_]\w*)\s*\*\s*(0x[0-9A-Fa-f]+|\d+)")
 SDK_MACRO_RE = re.compile(r"\b((?:gSP|gDP|gu|os)[A-Za-z0-9_]*)\b")
 COMMON_POINTER_STRIDES = {"1", "2", "4", "8"}
+
+# Keep the structured owner-history fields aligned with
+# ``pragma_targets.OwnerHardness.as_dict``.  Synthetic/unavailable sources
+# use these defaults so JSON and text briefs have one stable row shape.
+OWNER_HISTORY_DEFAULTS = {
+    "prior_attempts": 0,
+    "best_similarity": None,
+    "best_mismatch_kind": None,
+    "best_raw_similarity": None,
+    "last_attempt": None,
+    "hardness": "fresh",
+}
 
 
 def _collapse_ws(text: str) -> str:
@@ -189,6 +202,14 @@ def later_defined_functions(functions: list[ParsedFunction], first_remaining_lin
     return [function for function in functions if function.start_line > first_remaining_line]
 
 
+def _owner_history_fields(row: dict[str, object]) -> dict[str, object]:
+    """Return the stable probe-history fields for one remaining owner."""
+    return {
+        key: row[key] if key in row else default
+        for key, default in OWNER_HISTORY_DEFAULTS.items()
+    }
+
+
 def remaining_owners_table(source_path: Path, pragmas: list[tuple[int, str]]) -> list[dict[str, object]]:
     """Instruction count + family per remaining owner, via ``pragma_targets``.
 
@@ -212,16 +233,31 @@ def remaining_owners_table(source_path: Path, pragmas: list[tuple[int, str]]) ->
                 "function": row.get("function"),
                 "instructions": row.get("instructions"),
                 "family": row.get("family"),
+                **_owner_history_fields(row),
             }
             for row in targets
         ]
         known = {row["function"] for row in rows}
         for line_number, function in pragmas:
             if function not in known:
-                rows.append({"function": function, "instructions": None, "family": None, "line": line_number})
+                rows.append(
+                    {
+                        "function": function,
+                        "instructions": None,
+                        "family": None,
+                        "line": line_number,
+                        **OWNER_HISTORY_DEFAULTS,
+                    }
+                )
         return rows
     return [
-        {"function": function, "instructions": None, "family": None, "line": line_number}
+        {
+            "function": function,
+            "instructions": None,
+            "family": None,
+            "line": line_number,
+            **OWNER_HISTORY_DEFAULTS,
+        }
         for line_number, function in pragmas
     ]
 
@@ -347,16 +383,25 @@ def render_text(brief: dict[str, object]) -> str:
     else:
         emit("  (none: every defined function in this file comes before the first remaining pragma)")
 
-    emit("\n== remaining owners (instructions, family) ==")
+    emit("\n== remaining owners (instructions, family, probe history) ==")
     if brief["remaining_owners"]:
         for row in brief["remaining_owners"]:
             instructions = row.get("instructions")
             family = row.get("family")
             extra = f" line {row['line']}" if instructions is None and "line" in row else ""
+            best = row.get("best_similarity")
+            best_text = f"{best:.4f}" if isinstance(best, (int, float)) else "-"
+            raw = row.get("best_raw_similarity")
+            raw_text = f"{raw:.4f}" if isinstance(raw, (int, float)) else "-"
             emit(
                 f"  {row['function']:<20} "
                 f"{'instructions=' + str(instructions) if instructions is not None else 'instructions=?'} "
-                f"family={family if family is not None else '?'}{extra}"
+                f"family={family if family is not None else '?'} "
+                f"attempts={row.get('prior_attempts', 0)} "
+                f"best={best_text} raw={raw_text} "
+                f"mismatch={row.get('best_mismatch_kind') or '-'} "
+                f"last={row.get('last_attempt') or '-'} "
+                f"hardness={row.get('hardness') or '-'}{extra}"
             )
     else:
         emit("  (none: file fully decompiled)")

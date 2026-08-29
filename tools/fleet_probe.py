@@ -7,9 +7,11 @@ from the raw JSON.  That is pure overhead: the runner already returns
 everything needed (``status``, ``mismatch_kind``, ``similarity_score``,
 ``raw_similarity_score``, ``first_diff_offset``, the instruction text at the
 first difference, sizes, ``link_verified``, ``diagnostic``) per attempt in
-``attempts[]``.  This script takes one JSON description of a batch, calls the
-runner once, and prints a compact table plus a one-line verdict per function,
-so an agent reads a table instead of a raw JSON blob.
+``attempts[]`` (including prior-attempt count, futility, and link status).  This
+script takes one JSON description of a batch, calls the runner once, and prints
+a compact table plus a one-line verdict per function, so an agent reads a
+table instead of a raw JSON blob.  Compiler/link diagnostics are collapsed to
+single-line table cells and truncated to fit the table.
 
 Input (default form) -- a JSON file:
 
@@ -171,8 +173,16 @@ def load_batch(
     return _resolve_source(source), declarations, blocks, labels
 
 
+def _compact_text(value: object) -> str | None:
+    """Return a single-line representation suitable for the CLI table."""
+    if value is None:
+        return None
+    text = re.sub(r"\s+", " ", str(value)).strip()
+    return text or None
+
+
 def _fmt(value: object, width: int) -> str:
-    text = "-" if value is None else str(value)
+    text = _compact_text(value) or "-"
     if len(text) > width:
         text = text[: width - 1] + "…"
     return f"{text:<{width}}"
@@ -184,7 +194,11 @@ COLUMNS = [
     ("STATUS", 16),
     ("SIM", 6),
     ("RAW", 6),
+    ("PRIOR", 5),
+    ("LINK", 28),
     ("MISMATCH", 24),
+    ("FUTILITY", 34),
+    ("DIAGNOSTIC", 48),
     ("EXP", 5),
     ("ACT", 5),
     ("DIFF@", 6),
@@ -199,6 +213,26 @@ def _score_text(value: object) -> str:
     return "-"
 
 
+def _link_text(attempt: dict[str, object]) -> str:
+    """Format link-shape verification and its reason for one table cell."""
+    verified = attempt.get("link_verified")
+    status = "yes" if verified is True else "no" if verified is False else "?"
+    mismatch = _compact_text(attempt.get("link_mismatch"))
+    return f"{status}:{mismatch}" if mismatch else status
+
+
+def _diagnostic_text(attempt: dict[str, object]) -> str | None:
+    """Choose a short useful diagnostic, including link-only failures."""
+    diagnostic = _compact_text(attempt.get("diagnostic"))
+    if diagnostic:
+        return diagnostic
+    link_mismatch = _compact_text(attempt.get("link_mismatch"))
+    link_detail = _compact_text(attempt.get("link_detail"))
+    if link_mismatch or link_detail:
+        return ": ".join(part for part in (link_mismatch, link_detail) if part)
+    return _compact_text(attempt.get("reason"))
+
+
 def format_table(attempts: list[dict[str, object]]) -> str:
     header = " ".join(_fmt(name, width) for name, width in COLUMNS)
     lines = [header, "-" * len(header)]
@@ -209,7 +243,11 @@ def format_table(attempts: list[dict[str, object]]) -> str:
             attempt.get("status"),
             _score_text(attempt.get("similarity_score")),
             _score_text(attempt.get("raw_similarity_score")),
+            attempt.get("prior_attempts"),
+            _link_text(attempt),
             attempt.get("mismatch_kind"),
+            attempt.get("futility"),
+            _diagnostic_text(attempt),
             attempt.get("expected_size"),
             attempt.get("actual_size"),
             attempt.get("first_diff_offset"),
@@ -228,14 +266,21 @@ def _label_of(attempt: dict[str, object]) -> str:
 def summarize_function(function: str, attempts: list[dict[str, object]]) -> str:
     accepted = [a for a in attempts if a.get("status") == "accepted"]
     if accepted:
-        return f"{function}: ACCEPTED via {_label_of(accepted[0])}"
+        attempt = accepted[0]
+        return f"{function}: ACCEPTED via {_label_of(attempt)} link={_link_text(attempt)}"
     probe_matches = [a for a in attempts if a.get("status") == "probe_match"]
     if probe_matches:
-        return f"{function}: PROBE MATCH via {_label_of(probe_matches[0])} (gate not run -- pass --gate)"
+        attempt = probe_matches[0]
+        return (
+            f"{function}: PROBE MATCH via {_label_of(attempt)} link={_link_text(attempt)} "
+            "(gate not run -- pass --gate)"
+        )
     scored = [a for a in attempts if isinstance(a.get("similarity_score"), (int, float))]
     if not scored:
         statuses = sorted({str(a.get("status")) for a in attempts})
-        return f"{function}: no scored attempts ({len(attempts)} tried; status: {', '.join(statuses)})"
+        diagnostic = _diagnostic_text(attempts[-1]) if attempts else None
+        detail = f"; diagnostic={diagnostic}" if diagnostic else ""
+        return f"{function}: no scored attempts ({len(attempts)} tried; status: {', '.join(statuses)}{detail})"
     best = max(
         scored,
         key=lambda a: (
@@ -247,8 +292,12 @@ def summarize_function(function: str, attempts: list[dict[str, object]]) -> str:
     raw = best.get("raw_similarity_score")
     verdict = (
         f"{function}: best={_label_of(best)} status={best.get('status')} "
-        f"sim={_score_text(sim)} raw={_score_text(raw)} mismatch={best.get('mismatch_kind')}"
+        f"sim={_score_text(sim)} raw={_score_text(raw)} link={_link_text(best)} "
+        f"mismatch={best.get('mismatch_kind')}"
     )
+    futility = _compact_text(best.get("futility"))
+    if futility:
+        verdict += f" futility={futility}"
     if best.get("mismatch_kind") == "register_allocation_only" and isinstance(sim, (int, float)) and sim >= 0.99:
         verdict += " -- register tie — stop"
     return verdict
@@ -330,6 +379,12 @@ def main(argv: list[str] | None = None) -> int:
     accepted = result.get("accepted")
     print()
     print(f"batch_status={batch_status} gate={result.get('gate')} accepted={accepted}")
+
+    futility_summary = result.get("futility_summary")
+    if isinstance(futility_summary, dict) and futility_summary:
+        print("futility_summary:")
+        for function, reason in futility_summary.items():
+            print(f"  {function}: {_compact_text(reason) or '-'}")
 
     if args.json:
         args.json.write_text(json.dumps(result, indent=2, default=str), encoding="utf-8")
