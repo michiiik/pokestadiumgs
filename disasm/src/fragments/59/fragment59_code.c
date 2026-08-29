@@ -45,7 +45,49 @@ void func_86900138_padding(void) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/59/fragment59_code/func_869003C8.s")
+extern s32 D_8690E120;
+extern u8 D_8690F9E8;
+extern u8 D_86919040;
+extern u8 D_869195E0;
+extern u8 *D_8691AD58;
+extern s32 D_8690E11C;
+extern s32 func_87F08208(void *);
+extern void func_8003F210(void *, s32);
+extern void ModelAnim_SetFrame(u8 *, s16);
+extern void func_800088A4(s32);
+extern void StageFade_StartFromTransparent(s32);
+extern void func_800225C4(s32);
+extern void func_800279C4(s32);
+extern void func_869015F0(s32);
+extern void func_800226C0(s32);
+void func_869003C8(void) {
+    u8 *var_s0;
+    s32 temp_v0;
+
+    D_8690E120 = 0;
+    temp_v0 = func_87F08208(&D_8690F9E8);
+    switch (temp_v0) {
+    case 1:
+        var_s0 = &D_86919040;
+        do {
+            func_8003F210(var_s0, 2);
+            ModelAnim_SetFrame(var_s0, 0xB);
+            var_s0 += 0x168;
+        } while (var_s0 != &D_869195E0);
+        func_800088A4(0xFFFF);
+        StageFade_StartFromTransparent(0x14);
+        *(s32 *)D_8691AD58 = 2;
+        func_800225C4(0x28);
+        func_800279C4(0xCF0B);
+        D_8690E11C = 0;
+        return;
+    case 2:
+        func_869015F0(0);
+        func_800226C0(3);
+        D_8690E11C = 1;
+        return;
+    }
+}
 #endif
 
 void func_869004A4(void) {
@@ -212,7 +254,35 @@ void func_8690B848(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/59/fragment59_code/func_8690C6C4.s")
+extern s32 D_8690FAC0;
+extern s32 D_8690FAC4;
+extern s32 D_8690FAC8;
+extern s32 D_8690FACC;
+extern void func_87F0A6C8(s32, s32, s32 *, s32 *);
+void func_8690C6C4(s32 arg0) {
+    s32 sp24;
+    s32 sp20;
+
+    sp24 = -1;
+    sp20 = 0x960000FF;
+    switch (arg0) {
+    case 0:
+        func_87F0A6C8(D_8690FAC0, 0x4E4D3143, &sp24, &sp20);
+        return;
+    case 1:
+        func_87F0A6C8(D_8690FAC4, 0x4E4D3243, &sp24, &sp20);
+        func_87F0A6C8(D_8690FAC4, 0x4E4D3343, &sp24, &sp20);
+        return;
+    case 2:
+        func_87F0A6C8(D_8690FAC8, 0x4E4D3443, &sp24, &sp20);
+        func_87F0A6C8(D_8690FAC8, 0x4E4D3143, &sp24, &sp20);
+        func_87F0A6C8(D_8690FAC8, 0x4E4D3543, &sp24, &sp20);
+        return;
+    case 3:
+        func_87F0A6C8(D_8690FACC, 0x4E4D3143, &sp24, &sp20);
+        return;
+    }
+}
 #endif
 
 #ifdef VERSION_US
