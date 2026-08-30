@@ -373,7 +373,36 @@ void func_80018A94(s32 arg0, s32 *arg1, s32 *arg2) { s32 offset = arg0 * 0x14; *
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80018B24.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80018B78.s")
+extern void func_80018B24();
+extern void func_80018810(void);
+extern s32 func_800187AC(void);
+typedef struct {
+    s32 leading_pad;
+    s32 message;
+} Func80018B78Locals;
+extern void func_80018728(s32 arg0, s32 arg1);
+s32 func_80018B78(s32 arg0) {
+    s32 status;
+    Func80018B78Locals local;
+
+    func_80018B24(arg0);
+    status = D_8011BE90[0x3454];
+    if (status == 0) {
+    } else {
+        func_80018810();
+        if (arg0 == D_8011BE90[0x3455]) {
+            return -2;
+        }
+        if (status >= 3) {
+            D_8011BE90[0x3455] = arg0;
+            return -3;
+        }
+        osRecvMesg(*(OSMesgQueue **)(D_8011BE90 + 0x6324), &local.message, 1);
+    }
+    func_80018B24();
+    func_80018728(0xF9000000, arg0);
+    func_800187AC();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80018C14.s")
 
