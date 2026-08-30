@@ -558,7 +558,38 @@ void func_8F102F94(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/69/fragment69_code/func_8F1036F4.s")
+extern void func_800086A4(s32);
+extern void StageFade_StartFromOpaque(s32);
+extern void func_80064D28(void);
+extern void func_8F102FB4(s32, s32);
+extern void func_8F101DA0(void);
+extern s32 func_8F103478(s32);
+extern s32 D_8F1DEE58;
+extern void func_8F1003EC(void);
+extern void func_8F101CDC(void);
+void func_8F1036F4(void) {
+    s32 var_a1;
+    s32 temp_v0;
+    s32 var_s0;
+
+    var_s0 = 0;
+    func_800086A4(2);
+    StageFade_StartFromOpaque(5);
+    do {
+        func_80064D28();
+        if ((4 != D_8F1DEE58) && (5 != D_8F1DEE58) && (6 != D_8F1DEE58)) {
+            var_a1 = 1;
+        } else {
+            var_a1 = 0;
+        }
+        func_8F102FB4(0, var_a1);
+        func_8F1003EC();
+        func_8F101DA0();
+        func_8F101CDC();
+        temp_v0 = func_8F103478(var_s0);
+        var_s0 = temp_v0;
+    } while (temp_v0 != 8);
+}
 #endif
 
 #ifdef VERSION_US
