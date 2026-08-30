@@ -175,5 +175,13 @@ void func_84155574(u8 *arg0, u8 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C40B0/func_84155750.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C40B0/func_841557B0.s")
+extern u8 D_8419E920[];
+extern u8 D_8419E780[];
+extern void _bcopy(void *, u8 *, s32);
+void func_841557B0(void)
+{
+  u8 temp_v0;
+  temp_v0 = ((*D_8419E920) - 1) & 0xFF;
+ *D_8419E920 = temp_v0; _bcopy((D_8419E920 + (temp_v0 * 0x19C)) + 4, D_8419E780, 0x19C);
+}
 #endif
