@@ -25,7 +25,29 @@ void func_8AF00130(void) {
 
 extern u8 D_8AF2BE98[]; extern s32 D_8AF2BF10; void func_8AF00150(void) { _bzero(D_8AF2BE98, 0x78); D_8AF2BF10 = 0; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1EE290/func_8AF0017C.s")
+extern s16 D_8AF2BE9A;
+u8 *func_8AF0017C(s16 arg0) {
+    s32 i;
+    u8 *entry;
+    entry = D_8AF2BE98;
+    if (arg0 == D_8AF2BE9A) {
+        return entry;
+    }
+    entry += 0xC;
+    if (arg0 == *(s16 *)(entry + 2)) {
+        return entry;
+    }
+    entry += 0xC;
+    i = 2;
+    do {
+        if (arg0 == *(s16 *)(entry + 2)) {
+            return entry;
+        }
+        i++;
+        entry += 0xC;
+    } while (i != 0xA);
+    return NULL;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1EE290/func_8AF00240.s")
 
