@@ -48,6 +48,12 @@ Do not touch any other file's pragmas or run `make`.
   prerequisite and report its section, alignment, and symbols; do not try
   ordinary C candidates until the layout is prepared and the assembly owner
   has been gated.
+- If the first-diff fingerprint shows a direct helper call becoming `jalr` or
+  introducing `trunc.w.s`/another unexpected conversion, treat that as a
+  callee-ABI hypothesis failure. Reconstruct the helper's real return/formal
+  types from `file_brief.py` and nearby accepted bodies before trying more
+  expression or declaration permutations; record the fingerprint in the
+  requeue handoff if the ABI remains unresolved.
 - If supported by the runner, JSON fleet batches may use `companion_edits` for
   the documented same-file exact-once edit; it must not add or remove a
   `#pragma GLOBAL_ASM`.

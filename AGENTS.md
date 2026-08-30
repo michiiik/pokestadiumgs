@@ -458,7 +458,7 @@ by these; always probe and gate.
 | Near-miss `immediate_drift` with an `addiu $sp` frame mismatch | `near_miss_kinds` `frame-padding` (add/remove a pad local to hit the baseline frame) | 2/2 probe hits accepted (first bounded run, 2026-08-27) | — |
 | Near-miss `register_allocation_only` / `operand_or_scheduling_drift` | `commute-swap`, `decl-order`, `hoist-temp`, `type-width`, `loop-form`, `reorder-store-call` | 0 hits in 146 attempts on the first run — treat as unproven; prefer hand analysis of the first differing instruction | — |
 | Guard/return polarity | IDO branches on the negated condition: write the `if` in the polarity whose negation is the observed `beq`/`bne`, e.g. `if (arg1 == x) { ... } return v;` rather than `if (arg1 != x) return v;` | 2 (`func_81306EE0`, `func_80059234`) | — |
-| Display-list append (`Gfx` command into `D_800D0510++`) | Use the real `gbi.h` macros — `gSPDisplayList(D_800D0510++, addr)`, `gDPSetFillColor`, `gDPFillRectangle` — never hand-written `p->words.w0 = ...; p->words.w1 = ...;` stores, which stall at 0.93–0.95 on a constant-load/pointer-increment scheduling swap | 7 (`4AC10.c`: `func_8004AC24/AE3C/AF18/A5B8/A708/AD00`; `fragment47_24E0A0.c`: `func_8600B474`) | holds across overlays; RDP texture-load sequences (`gDPSetTile`/`gDPLoadBlock`, `func_8004A010`) still untried, and one owner (`func_82C01FE4`) drifts on the order of two independent `lui` loads inside the macro |
+| Display-list append (`Gfx` command into `D_800D0510++`) | Use the real `gbi.h` macros — `gSPDisplayList(D_800D0510++, addr)`, `gDPSetFillColor`, `gDPFillRectangle` — never hand-written `p->words.w0 = ...; p->words.w1 = ...;` stores, which stall at 0.93–0.95 on a constant-load/pointer-increment scheduling swap | 10 (`4AC10.c`: `func_8004AC24/AE3C/AF18/A5B8/A708/AD00`; `fragment47_24E0A0.c`: `func_8600B474`; `fragment49_code.c`: `func_86100BA0/05F68/09D64`) | holds across overlays; RDP texture-load sequences (`gDPSetTile`/`gDPLoadBlock`, `func_8004A010`) still untried, and one owner (`func_82C01FE4`) drifts on the order of two independent `lui` loads inside the macro |
 | Several `return 1;` guards sharing one epilogue | A single `return a \|\| b \|\| c \|\| d;` expression; separate guard clauses allocate differently and add bytes | 2 (`func_8130AA54`, `func_80057A80`) | — |
 | Nested command constructor from a fixed record | Use a local typed overlay with the proven padding/child field, then pass the nested field directly to the helper; keep each constructor's exact field width | 10 (`229E0.c`: `func_8003FD98/3FE6C/40004/40050/4009C/400E8`; `4EE50.c`: `func_8004E868/4E8D0/4E9C8/4EA60`) | only when the record offsets and helper call shape are proven |
 | General | Preserve narrow `sb`/`sh`/`sw` widths, initialise results before NULL checks, raw 32-bit address arithmetic (`(u8 *)(u32)global + off`) before inferred structs, `uintptr_t` casts for raw addresses, explicit `s32` loop counters, array-index vs pointer-add as separate variants, deliberate signed/unsigned masks | repo scan | ABI hypotheses until compared |
@@ -529,6 +529,14 @@ reaches an agent through `tools/file_brief.py`, not here.
   (`fragments/44/fragment44_1F1850.c`: old-style definitions + a
   too-few-arguments call, strict clang). `RUN_CC_CHECK=0` completes the ROM
   compare until that file is cleaned up.
+- Fleet (2026-08-30): a readiness-aware wave produced 13 new full-ROM-gated
+  owners from five fresh-heavy, layout-ready fragment files, confirming that
+  `READY_FRESH` is a better selection signal than the composite score. Do not
+  count explicit requeues as fresh work. Repeated helper-call drift that adds
+  `jalr` or `trunc.w.s` is an ABI hypothesis failure; stop expression
+  permutations and reconstruct the direct callee signature. A repeated
+  argument-home fingerprint (`expected sw a1,4(sp)` vs `actual sll t6,a1,12`)
+  likewise requires a new scheduling model, not more return-width variants.
 
 Skip lists and unsolved shapes that are specific to one function or file
 live in that file's notes under `docs/regions/` and reach an agent through

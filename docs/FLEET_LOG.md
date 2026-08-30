@@ -12,6 +12,7 @@ Per-file spellings and skip lists are not here either — they live in
 | 2026-08-27 | Pilot: 4 agents, 20 min, text-segment files | 40 owners, ~17k tokens/owner (~10k text, ~55k fragments) |
 | 2026-08-28 morning | 6 boxes on the text-segment files no session had touched for 19 h (`585D0` ×2, `14640`, `6E850`, `CE80`, `4AC10`) | 12 owners from ~295 variants, ~105k tokens/owner |
 | 2026-08-28 evening | 15 boxes on 9 fragment files, family unlocks + hand-off | 85 owners, ~20–30k tokens/owner on the productive files |
+| 2026-08-30 readiness-aware wave | 5 fresh-heavy, layout-ready fragment files with family hand-offs | 13 new owners, all link-verified and full-ROM gated; coverage 4,650 → 4,663 |
 
 A single hand session, for comparison, lands 4–5 owners/hour.
 
@@ -62,6 +63,25 @@ The corrective tooling now reports `READY_FRESH`/`JT_UNREADY` in
 `file_brief.py` warn about owner-local rodata that disappears with a pragma.
 The next wave should select ready fresh owners, reserve explicit requeues
 separately, and route unready owners to a layout-preparation queue.
+
+## 2026-08-30 readiness-aware wave result
+
+The first wave using the readiness-aware ranking produced 13 new exact owners
+from five files: one in `fragment14_FF070.c`, two in
+`fragment43_1E5A10.c`, four in `fragment49_code.c`, and six across the two
+fragment-79 files. Every installed owner reported `link_verified=true` and
+the full-ROM hash `1561c75d11cedf356a8ddb1a4a5f9d5d`; the repository test suite
+also passed 676 tests and the final `COMPARE=1` build passed.
+
+The remaining misses were not generic fragment failures. Three owners in
+`fragment79_37A6E0.c` repeatedly drifted after a helper ABI introduced
+`jalr`/float conversion; the next attempt must reconstruct the direct callee
+signature and calling convention. Four owners in `fragment43_1E5A10.c`
+shared the fingerprint `expected sw a1,4(sp)` versus `actual sll t6,a1,12`;
+they need a materially different argument-home/float-table scheduling model.
+Other terminal cases were explicit register ties or frame-layout mismatches.
+These owners were recorded as requeues with fingerprints rather than being
+counted as fresh work.
 
 ## What the numbers say
 
