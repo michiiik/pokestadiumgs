@@ -82,7 +82,24 @@ void func_86001A58(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_246640/func_86001A60.s")
+extern u8 D_87F15B70[];
+extern u8 D_8600D540[];
+extern void func_8003F03C(void *, void *);
+extern void func_8003F1DC(void *);
+extern void func_8003F114(void *, s32, s32, s32);
+extern void func_87C01888(void *, void *, void *);
+extern void func_80037E3C(void *, void (*)(s32, u8 *), void *);
+extern void func_86001838(s32, u8 *);
+extern void func_86001B1C(u8 *);
+void func_86001A60(u8 *arg0, s32 *arg1) {
+    u8 *temp_s0 = arg0 + 4;
+    func_8003F03C(temp_s0, D_87F15B70);
+    func_8003F1DC(temp_s0);
+    func_8003F114(temp_s0, 0, -1, arg1[*(s32 *)arg0]);
+    func_87C01888(arg0 + 0x16C, temp_s0, D_8600D540);
+    func_80037E3C(temp_s0, func_86001838, arg0);
+    func_86001B1C(arg0);
+}
 #endif
 
 #ifdef VERSION_US
