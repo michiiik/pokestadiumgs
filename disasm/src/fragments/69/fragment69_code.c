@@ -110,7 +110,42 @@ void func_8F1002C4(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/69/fragment69_code/func_8F1002F0.s")
+typedef struct {
+    s16 state;
+    s16 pad2;
+    s16 index;
+} Fragment69MenuRecord;
+typedef struct {
+    s16 values[5];
+} Fragment69LimitRecord;
+extern void *D_80087200;
+extern u8 D_8F1DF270[];
+extern Fragment69LimitRecord D_8F1039D0[];
+void func_8F1002F0(void *arg0) {
+    Fragment69MenuRecord *record = (Fragment69MenuRecord *)arg0;
+    s32 rowIndex;
+    Fragment69LimitRecord *row;
+
+    if ((*(u16 *)((u8 *)D_80087200 + 0xC)) & 0x800) {
+        record->index--;
+        if (record->index < 0) {
+            rowIndex = ((u8 *)record - D_8F1DF270) / 6;
+            row = &D_8F1039D0[rowIndex];
+            record->index = row->values[0] - 1;
+        }
+    }
+    if ((*(u16 *)((u8 *)D_80087200 + 0xC)) & 0x400) {
+        rowIndex = ((u8 *)record - D_8F1DF270) / 6;
+        row = &D_8F1039D0[rowIndex];
+        record->index++;
+        if (record->index >= row->values[0]) record->index = 0;
+    }
+    if ((*(u16 *)((u8 *)D_80087200 + 0xC)) & 0x8000) {
+        record->state = 3;
+        return;
+    }
+    if ((*(u16 *)((u8 *)D_80087200 + 0xC)) & 0x4000) record->state = 4;
+}
 #endif
 
 #ifdef VERSION_US
