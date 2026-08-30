@@ -421,7 +421,44 @@ void func_8AC02830(s32 arg0, s32 arg1, void *arg2, s32 arg3, s32 arg4) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC02898.s")
+extern void func_800504BC(s16 *);
+extern void func_800498C4(void);
+extern void func_800496A4(s32, s32);
+extern void func_8004972C(s32, s32, s32, s32);
+extern void func_800497E4(s32, s32, s32, s32);
+extern s32 func_80049668(s32);
+extern void func_8004989C(s32);
+extern void func_800495F8(s16, s16, u8, s32);
+extern void func_800499EC(void);
+#pragma pack(1)
+struct Fragment43PackedWord { s32 value; };
+#pragma pack(0)
+struct Fragment43RenderState { u8 pad0[2]; u16 flags; u8 pad4[4]; s16 x; s16 y; u8 padC[0x14]; s32 callback; u16 mode; s8 shade; u8 alpha; struct Fragment43PackedWord color0; struct Fragment43PackedWord color1; };
+s32 func_8AC02898(s32 arg0, struct Fragment43RenderState *arg1) {
+    s16 sp3E; s16 sp3C; s16 sp3A; s16 sp38; s32 sp34; u8 padding[8]; struct Fragment43PackedWord sp28; struct Fragment43PackedWord sp24;
+    sp34 = arg1->callback;
+    switch (arg0) {
+    case 0:
+        arg1->flags &= 0xFFFD;
+        break;
+    case 1:
+        func_800504BC(&sp38);
+        sp3E = sp38 + arg1->x;
+        sp3C = sp3A + arg1->y;
+        sp28 = *(struct Fragment43PackedWord *)((u8 *)arg1 + 0x28);
+        sp24 = *(struct Fragment43PackedWord *)((u8 *)arg1 + 0x2C);
+        func_800498C4();
+        func_800496A4(arg1->mode, 0);
+        func_8004972C(((u8 *)&sp28)[0], ((u8 *)&sp28)[1], ((u8 *)&sp28)[2], ((u8 *)&sp28)[3]);
+        func_800497E4(((u8 *)&sp24)[0], ((u8 *)&sp24)[1], ((u8 *)&sp24)[2], ((u8 *)&sp24)[3]);
+        func_80049668(0);
+        func_8004989C(arg1->shade);
+        func_800495F8(sp3E, sp3C, arg1->alpha, sp34);
+        func_800499EC();
+        break;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
