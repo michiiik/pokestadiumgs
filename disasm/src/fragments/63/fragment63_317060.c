@@ -112,7 +112,36 @@ void func_87E14458(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E14898.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E14984.s")
+extern s32 ModelAnim_IsEventTrackDone(u8 *);
+extern u32 func_8003570C(void);
+extern void func_8003F3BC(u8 *, s32);
+void func_87E14984(void *arg0) {
+    s32 sp1C;
+    s32 sp18;
+    void *temp_v0;
+    u8 *global;
+
+    global = (u8 *)D_87F119DC;
+    temp_v0 = *(void **)((u8 *)arg0 + 0xC);
+    if (*(s32 *)((u8 *)temp_v0 + 4) == *(s16 *)(global + 0x64)) {
+        sp1C = *(s32 *)((u8 *)temp_v0 + 0xC);
+        sp18 = *(s32 *)((u8 *)temp_v0 + 8);
+    } else {
+        sp1C = *(s32 *)((u8 *)temp_v0 + 0x18);
+        sp18 = *(s32 *)((u8 *)temp_v0 + 0x14);
+    }
+    if (ModelAnim_IsEventTrackDone(global + 0x24) != 0) {
+        if (sp1C != 0) {
+            if ((func_8003570C() % 31U) < 2U) {
+                func_8003F3BC((u8 *)D_87F119DC + 0x24, -1);
+                func_8003F3BC((u8 *)D_87F119DC + 0x24, sp18);
+            }
+        } else {
+            func_8003F3BC((u8 *)D_87F119DC + 0x24, -1);
+            func_8003F3BC((u8 *)D_87F119DC + 0x24, sp18);
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E14A60.s")
 
@@ -426,7 +455,46 @@ void func_87E181B4(u8 *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E181D0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E182A8.s")
+extern s32 func_87E18054(u8 *);
+extern s32 func_87E181D0();
+extern s32 func_87E18120(s32 arg0);
+s32 func_87E182A8(u8 *arg0) {
+    s32 temp_v0;
+    s32 temp_v0_2;
+    s32 var_v1;
+
+    temp_v0 = *(s32 *)(arg0 + 0);
+    var_v1 = 0;
+    switch (temp_v0) {
+    case 1:
+        var_v1 = func_87E18054(arg0);
+        break;
+    case 3:
+        var_v1 = func_87E18120((s32)arg0);
+        break;
+    case 4:
+        var_v1 = func_87E181D0(arg0);
+        break;
+    }
+    if (var_v1 == 2) {
+        temp_v0_2 = *(s32 *)(arg0 + 0);
+        switch (temp_v0_2) {
+        case 0:
+            *(s32 *)(*(u8 **)(arg0 + 0x264) + 0x21F8) = 0;
+            break;
+        case 1:
+            *(s32 *)(*(u8 **)(arg0 + 0x264) + 0x21F8) = 1;
+            break;
+        case 3:
+            *(s32 *)(*(u8 **)(arg0 + 0x264) + 0x21F8) = 2;
+            break;
+        case 4:
+            *(s32 *)(*(u8 **)(arg0 + 0x264) + 0x21F8) = 3;
+            break;
+        }
+    }
+    return var_v1;
+}
 
 extern void func_87E1918C(s32);
 extern void func_87E03448();
