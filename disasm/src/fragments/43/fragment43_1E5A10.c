@@ -616,7 +616,14 @@ void func_8AC03334(s32 arg0, s32 arg1, s32 arg2, void *arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC0405C.s")
+extern Gfx *D_800D0510;
+extern u8 D_8AC07D90[];
+typedef struct { u8 r; u8 g; u8 b; u8 a; } Fragment43Color405C;
+void func_8AC0405C(s32 arg0, s32 arg1, s32 arg2, Fragment43Color405C color) {
+    gSPDisplayList(D_800D0510++, D_8AC07D90);
+    gDPSetPrimColor(D_800D0510++, 0, 0, color.r, color.g, color.b, color.a);
+    gSPTextureRectangleFlip(D_800D0510++, arg0 << 2, arg1 << 2, (arg0 + 2) << 2, (arg1 + arg2) << 2, 0, 0, 0, 0x400, 0);
+}
 #endif
 
 #ifdef VERSION_US
