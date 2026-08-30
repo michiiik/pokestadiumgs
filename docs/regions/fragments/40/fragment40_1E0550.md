@@ -1,0 +1,7 @@
+# Region notes -- disasm/src/fragments/40/fragment40_1E0550.c
+
+Per-file spellings, skip lists, and unsolved shapes for this source file. Delivered to agents by `tools/file_brief.py`; extend it with `tools/region_notes.py append`.
+
+## 2026-08-30 60-minute fleet box (2026-08-30)
+
+Accepted five requested fresh owners, all link_verified and full-ROM gated. func_88B04A08: hal-strcmp:pool-scan:typed-do-break; u16 arg, s32 result, u8 *ptr, u32 i, result=0, do/while pool scan, result=1 then break. func_88B04ADC: hal-strcmp:pool-scan:transferred-typed-do-break; exact A08 local/loop spelling transferred with D_88B0636C, count offset 0x3EA, stride 0x10, result polarity 1->0. func_88B04950: hal-strcmp:pool-scan:transferred-no-owner-id; same pool spelling without the arg0 record-ID comparison. func_88B048C4: call-sequence:halfword-scan:permuter-score0-exact-lines; exact source-line layout is required: the outer do/while(0), inner scan, and return must remain on one physical line. Reformatting reproduced operand_or_scheduling_drift at instruction 10 (expected addiu s3,s3,0; actual addiu s1,s1,0), best normalized/raw 0.9714/0.9714; 41 prior runner attempts before acceptance, including a score-0 permuter transfer. func_88B05494: call-sequence:selector-dispatch:direct-flags-index-before-low-guard; u16 selector, direct D_88B069CE/D_88B069AC conditions, and assign u8 index=result before the low guard. Intermediate flag locals produced register_allocation_only, normalized/raw 1.0000/0.5526; accepted on runner attempt 13. No unresolved requested owner remains.
