@@ -238,7 +238,43 @@ void func_82208954(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82208A1C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82208DCC.s")
+extern s32 StageContext_GetFadeMode(void); extern void func_800086A4(s32); extern void StageFade_StartFromOpaque(s32); extern void func_80064D28(void); extern void func_8220B930(void); extern void func_8220C340(void); extern void func_82204148(void); extern s32 func_82208A1C(s32); extern void func_800548C4(void *); extern void func_80051D64(s32, s32); extern s32 D_8220DA0C; extern u8 D_8220EC28[];
+extern void func_82208518(void);
+void func_82208DCC(void) {
+    s32 temp_v0;
+    s16 temp_v0_2;
+    s32 var_s0;
+    s32 var_s1;
+    s32 new_var;
+
+    var_s0 = 1;
+    new_var = StageContext_GetFadeMode();
+    if (new_var != 0) {
+        var_s0 = 0;
+        func_800086A4(2);
+        StageFade_StartFromOpaque(5);
+    }
+    var_s1 = 9;
+    do {
+        func_80064D28();
+        func_8220B930();
+        func_8220C340();
+        func_82204148();
+        func_82208518();
+        temp_v0 = func_82208A1C(var_s0);
+        var_s0 = temp_v0;
+    } while (temp_v0 != var_s1);
+    ;
+    if (D_8220DA0C != (*((s16 *) (*((u8 **) (((u8 *) D_8220DA08) + 0x20)))))) {
+        if ((*((s16 *) (*((u8 **) (((u8 *) D_8220DA08) + 0x20))))) == 0) {
+            *((u16 *) (D_8220EC28 + 2)) &= 0xFFFE;
+        } else {
+            *((u16 *) (D_8220EC28 + 2)) |= 1;
+        }
+        func_800548C4((void *) D_8220EC28);
+    }
+    func_80051D64(0x14, 0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82208EB0.s")
 
