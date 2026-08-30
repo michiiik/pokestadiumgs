@@ -37,7 +37,40 @@ void func_86200020_padding(void) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_266A60/func_862005B4.s")
+extern void Vec3f_CrossProductFromPoints(f32 *, f32 *, f32 *, f32 *);
+extern void func_80035A10(f32 *);
+
+void func_862005B4(s32 arg0, s32 arg1, s32 arg2) {
+    struct Point { f32 x; f32 y; f32 z; };
+    struct Record {
+        f32 x; f32 y; f32 z; f32 w;
+        u8 index0; u8 index1; u8 index2; u8 pad;
+    };
+    s32 pad[2];
+    f32 cross[3];
+    s32 i;
+    i = 0;
+    if (arg2 > 0) {
+        do {
+            Vec3f_CrossProductFromPoints(
+                cross,
+                (f32 *)(u32)(((u32)(((struct Record *)(u32)arg1)->index0) * 12) + (u32)arg0),
+                (f32 *)(u32)(((u32)(((struct Record *)(u32)arg1)->index1) * 12) + (u32)arg0),
+                (f32 *)(u32)(((u32)(((struct Record *)(u32)arg1)->index2) * 12) + (u32)arg0)
+            );
+            func_80035A10(cross);
+            ((struct Record *)(u32)arg1)->x = cross[0];
+            ((struct Record *)(u32)arg1)->y = cross[1];
+            ((struct Record *)(u32)arg1)->z = cross[2];
+            ((struct Record *)(u32)arg1)->w =
+                -((((struct Record *)(u32)arg1)->x * ((struct Point *)(u32)arg0)[((struct Record *)(u32)arg1)->index0].x) +
+                  (((struct Record *)(u32)arg1)->y * ((struct Point *)(u32)arg0)[((struct Record *)(u32)arg1)->index0].y) +
+                  (((struct Record *)(u32)arg1)->z * ((struct Point *)(u32)arg0)[((struct Record *)(u32)arg1)->index0].z));
+            arg1 += 0x14;
+            i += 1;
+        } while (i != arg2);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -382,7 +415,40 @@ void func_86204EB8(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_266A60/func_86204F20.s")
+extern s32 func_87F01A40(void);
+extern u32 func_87F006AC(void);
+extern void func_800279C4(s32);
+extern void func_80021ED8(s32);
+extern void func_86200020(s32 arg0);
+void func_86204F20(void) {
+    s32 state;
+
+    if (StageContext_GetFadeMode() == 0) {
+        state = func_87F01A40();
+    } else {
+        state = 2;
+    }
+    switch (state) {
+    case 0:
+    case 2:
+        if (func_87F006AC() == 1) {
+            func_800279C4(0x2F00);
+        }
+        if (func_87F006AC() == 2) {
+            *(s32 *)((u8 *)D_8620E198 + 0xE8) = 4;
+            func_800279C4(0x2F01);
+            func_80021ED8(0x2F);
+            return;
+        }
+        return;
+    case 3:
+        func_86200020(0);
+        return;
+    case 4:
+        func_86200020(1);
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
