@@ -244,7 +244,22 @@ void func_80011788(void *arg0) { s32 var_v0 = 0; u8 *var_v1 = (u8 *)arg0; do { v
 
 void func_80011A40(u8 *arg0) {}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_80011A48.s")
+extern void func_80011A40(u8 *arg0);
+void func_80011A48(void) {
+    s32 mode;
+    s32 i;
+    s32 j;
+    if (*(s16 *)(D_8011BE90 + 0x2BDC) == 2) mode = 2; else mode = 1;
+    i = 0;
+    while (i < *(s8 *)(D_8011BE90 + 1)) {
+        j = 0;
+        while (j < mode) {
+            func_80011A40(D_8011BE90 + i * 0x2D0 + 0x18);
+            j++;
+        }
+        i++;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_80011B0C.s")
 
