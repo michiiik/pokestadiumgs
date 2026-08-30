@@ -253,7 +253,42 @@ void func_863035B0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/51/fragment51_275E40/func_86303610.s")
+extern s32 func_87F01A40(void);
+extern u32 func_87F006AC(void);
+extern void func_80021ED8(s32);
+extern void func_87F0277C(void *);
+extern void func_800279C4(s32);
+extern void func_86300020(s32 arg0);
+void func_86303610(void) {
+    s32 state;
+
+    if (StageContext_GetFadeMode() == 0) {
+        state = func_87F01A40();
+    } else {
+        state = 2;
+    }
+    switch (state) {
+    case 0:
+    case 2:
+        if (func_87F006AC() == 1) {
+            func_800279C4(0x2F00);
+        }
+        if (func_87F006AC() == 2) {
+            *(s32 *)D_863075D8 = 4;
+            func_800279C4(0x2F01);
+            func_80021ED8(0x23);
+        }
+        break;
+    case 3:
+        func_86300020(0);
+        break;
+    case 4:
+        func_86300020(1);
+        break;
+    }
+    func_87F0277C((u8 *)D_863075D8 + 0x12C);
+    func_87F0277C((u8 *)D_863075D8 + 0x770);
+}
 #endif
 
 #ifdef VERSION_US
