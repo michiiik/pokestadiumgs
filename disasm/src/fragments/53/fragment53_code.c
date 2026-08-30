@@ -358,7 +358,35 @@ void func_86509480(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/53/fragment53_code/func_86509D8C.s")
+extern s32 func_87F02104(void);
+void func_86509D8C(void) {
+    s32 temp_v0;
+
+    temp_v0 = func_87F02104();
+    switch (temp_v0) {
+    case 1:
+        StageContext_SetClearColor(1);
+        *(s32 *)((u8 *)&D_8650C5E0 + 0xC) = 0xC;
+        *(s32 *)((u8 *)&D_8650C5E0 + 0x4C) = 2;
+        StageFade_StartFromTransparent(0xA);
+        *(s32 *)((u8 *)&D_8650C5E0 + 0x8) = 0;
+        return;
+    case 2:
+        *(s32 *)((u8 *)&D_8650C5E0 + 0x58) = 0;
+        *(s32 *)((u8 *)&D_8650C5E0 + 0xC) = 2;
+        *(s32 *)((u8 *)&D_8650C5E0 + 0x4C) = 2;
+        StageContext_SetClearColor(0xFFFF);
+        StageFade_StartFromTransparent(0xA);
+        return;
+    case 3:
+        *(s32 *)((u8 *)&D_8650C5E0 + 0x58) = 1;
+        *(s32 *)((u8 *)&D_8650C5E0 + 0xC) = 2;
+        *(s32 *)((u8 *)&D_8650C5E0 + 0x4C) = 2;
+        StageContext_SetClearColor(0xFFFF);
+        StageFade_StartFromTransparent(0xA);
+        return;
+    }
+}
 #endif
 
 #ifdef VERSION_US
