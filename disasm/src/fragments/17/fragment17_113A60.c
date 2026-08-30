@@ -2,7 +2,39 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_822040A0.s")
+typedef struct { s16 a; s16 b; } Pair16_b2;
+extern s16 D_822105F0;
+extern s16 D_822105F4;
+extern s16 D_822106B2;
+extern s16 D_822106B4;
+extern s16 D_822106CC, D_822106CE;
+extern s16 D_822106BA;
+extern f32 D_822106C4;
+extern f32 D_822106C8;
+extern void func_800226C0(s32);
+extern u16 D_822106B6;
+extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
+extern s16 D_82210640;
+extern s16 D_82210642;
+extern s16 D_82210644;
+extern s16 D_82210646;
+extern s32 func_8220D67C(void);
+void func_822040A0(s16 *arg0) {
+    s16 *v0 = &D_822105F0;
+    v0[0] = 1;
+    v0[1] = 0;
+    v0[8] = arg0[4];
+    v0[9] = arg0[5];
+    v0[10] = arg0[6];
+    v0[11] = arg0[7];
+    v0[12] = arg0[6] - arg0[0x14];
+    v0[13] = arg0[7] - arg0[0x15];
+    *(Pair16_b2 *)&D_822105F4 = *(Pair16_b2 *)&v0[8];
+    v0[4] = v0[10];
+    v0[5] = v0[11];
+    v0[6] = v0[4] - v0[12];
+    v0[7] = v0[5] - v0[13];
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82204148.s")
 
