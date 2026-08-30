@@ -28,7 +28,27 @@ extern s32 D_800972B0[]; s32 func_80050CF8(s32 arg0){s32 result=0;if(arg0>=0&&ar
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80050D20.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80050DE4.s")
+s32 func_80050DE4(s32 arg0) {
+    s32 result = 0;
+    switch (arg0) {
+    case 0x10: result = 0x180; break;
+    case 0x11: result = 0x4D8; break;
+    case 0x12: result = 0x20C; break;
+    case 0x13: result = 0x54; break;
+    case 0x14: result = 0x60; break;
+    case 0x15: result = 0x1A0; break;
+    case 0x16: result = 0x936; break;
+    case 0x17: result = 0x58A; break;
+    case 0x18: result = 0x250; break;
+    case 0x19: result = 0x1B10; break;
+    case 0x1A: result = 0x490; break;
+    case 0x1B: result = 0xBD0; break;
+    case 0x1C: result = 0x3F0; break;
+    case 0x1D: result = 0x648; break;
+    case 0x1E: result = 0x50; break;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80050E88.s")
 
@@ -325,11 +345,47 @@ extern void func_80052928(s32,s32); extern void func_80051D64(s32,s32); void Sav
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_8005314C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80053230.s")
+s32 func_80053230(s32 arg0) {
+    s32 result = 0;
+    switch (arg0) {
+    case 0x10: result = 0x6; break;
+    case 0x11: result = 0x14; break;
+    case 0x13: result = 0x2D; break;
+    case 0x12: result = 0xFA; break;
+    case 0x16: result = 0x32; break;
+    case 0x17: result = 0x1E; break;
+    case 0x18: result = 0x8; break;
+    case 0x19: result = 0x6; break;
+    case 0x1A: result = 0x1; break;
+    case 0x1B: result = 0x8; break;
+    case 0x1C: result = 0x32; break;
+    case 0x1D: result = 0x64; break;
+    case 0x1E: result = 0x46; break;
+    }
+    return result;
+}
 
 s32 func_800532C4(s32 arg0){s32 result=0;switch(arg0){case 0x10:result=1;break;case 0x11:result=0xE;break;}return result;}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800532F0.s")
+s32 func_800532F0(s32 arg0) {
+    s32 result = 0;
+    switch (arg0) {
+    case 0x10: result = 0x58; break;
+    case 0x11: result = 0x58; break;
+    case 0x12: result = 0x2; break;
+    case 0x13: result = 0x1; break;
+    case 0x16: result = 0x76; break;
+    case 0x17: result = 0x76; break;
+    case 0x18: result = 0x44; break;
+    case 0x19: result = 0x490; break;
+    case 0x1A: result = 0x490; break;
+    case 0x1B: result = 0x220; break;
+    case 0x1C: result = 0x14; break;
+    case 0x1D: result = 0x10; break;
+    case 0x1E: result = 0x1; break;
+    }
+    return result;
+}
 
 s32 Deck_IsSaveEntryPresent(void *arg0, void *arg1) { return func_80051A8C(arg0, arg1, 1); }
 
