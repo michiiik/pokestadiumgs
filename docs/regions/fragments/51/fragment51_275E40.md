@@ -13,3 +13,7 @@ requeue func_86300DD4: two candidates were attempted; one had a malformed scratc
 ## 2026-08-31 successor box requeue (2026-08-31)
 
 requeue func_86300DD4: four valid probes, no link_verified candidate or ROM gate. Best improved to normalized/raw 0.9324/0.6757, 292 expected versus 296 actual bytes, with the recurring operand/scheduling drift at offset 25: expected lui $a2, actual lui $v0. Tried for increment-expression, do-loop increment-before-multiply, stores-before-state, and post-increment condition forms. Next action is declaration/allocation ordering that keeps D_863075D8 in $a2 while preserving the 0x40 frame.
+
+## 2026-08-31 third successor box requeue (2026-08-31)
+
+requeue func_86300DD4: four declaration/lifetime-order variants; no link_verified candidate or ROM gate. Best regressed to normalized/raw 0.8533/0.5733, 300 bytes versus 292 expected, and disrupted the proven 0x40 frame. Persistent drift remains around keeping D_863075D8 in $a2 while preserving slt -> mul.s -> bnel. Next action is a different formal/global lifetime strategy, not more loop-form variants.

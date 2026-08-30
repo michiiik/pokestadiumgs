@@ -57,3 +57,7 @@ requeue func_86508B20: six new candidates; no link_verified hit or ROM gate. Bes
 ## 2026-08-31 successor box requeue (2026-08-31)
 
 requeue func_86508B20: seven new selector-lifetime variants across two batches; no link_verified candidate or ROM gate. Best remains normalized/raw 0.9853/0.8824 with expected sw $s4,40(sp) versus actual sw $s0,24(sp). The runner reported repeated-drift advisory, not register-tie futility. Next action is to reconstruct the original nested control flow and compiler temporary structure that keeps selector 1 live through the initial branch while separately reusing $s4 for the endpoint; avoid more direct scalar/pointer declaration permutations.
+
+## 2026-08-31 third successor box requeue (2026-08-31)
+
+requeue func_86508B20: four additional nested selector-lifetime/control-flow variants; no link_verified candidate or ROM gate. Best regressed to normalized/raw 0.8971/0.6912; expected sw $s4,40(sp), actual sw $s0,24(sp). One initial batch had declaration preflight failures and was rerun with corrected declarations. Next action is deeper reconstruction of compiler temporary/register lifetime; avoid direct pointer/scalar permutations.

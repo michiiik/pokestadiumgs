@@ -9,3 +9,7 @@ requeue func_8AF221C4: ten candidates across raw-pointer, pointer-variable, dire
 ## 2026-08-31 successor box requeue (2026-08-31)
 
 requeue func_8AF221C4: seven candidates across two batches; no link_verified candidate or ROM gate. Best was normalized/raw 0.74/0.34 with operand/scheduling drift at offset 13, expected lui $a3 versus actual lui $a2. The m2c void-pointer arithmetic forms failed IDO compilation. Next action is an IDO-valid typed byte-pointer field form that preserves the observed global-load ordering.
+
+## 2026-08-31 third successor box requeue (2026-08-31)
+
+requeue func_8AF221C4: five typed IDO-valid variants; no link_verified candidate or ROM gate. Best normalized/raw 0.66/0.34 with persistent $a3 versus $a2 scheduling drift. Next action is to preserve typed record fields while forcing the D_8AF3A160/D_8AF3A164/D_8AF3A168 global declaration/evaluation order that produces the observed $a1/$a3/$t0 address allocation.

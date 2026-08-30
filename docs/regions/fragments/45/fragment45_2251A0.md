@@ -9,3 +9,7 @@ requeue func_8AB02240: eight candidates across macro, loop, frame, and ABI hypot
 ## 2026-08-31 successor box requeue (2026-08-31)
 
 requeue func_8AB02240: eight materially different ABI/local candidates; no link_verified candidate or ROM gate. Best was normalized/raw 0.8696/0.7101, 268 expected versus 276 actual bytes, first diff expected sw $s3,40(sp) versus actual sw $t6,0($s5). The helper is strongly indicated as six s16 parameters; next action is to model the pre-macro $s3 sign-extension/local lifetime and exact declaration order.
+
+## 2026-08-31 third successor box requeue (2026-08-31)
+
+requeue func_8AB02240: three exact-six-s16 ABI/local variants; no link_verified candidate or ROM gate. Best remains normalized/raw 0.8696/0.7101; runner reports stuck at 16 attempts, expected 268 bytes versus actual 324, first diff expected sw $a3,68(sp) versus actual sw $a0,56(sp). Next action is to revisit caller formal typing/order and force the pre-macro $s3 sign-extension/local lifetime.
