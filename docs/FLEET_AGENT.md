@@ -18,6 +18,12 @@ Do not touch any other file's pragmas or run `make`.
   Its first section is that file's **region notes** (`docs/regions/`) —
   treat them as the first source of proven spellings and skip lists,
   before §4 below or your own reading of the `.s`.
+  Later typedefs are not automatically hoisted by the candidate runner. If a
+  candidate needs a later simple typedef or exact prototype, pass it through
+  the batch `declarations` channel; never put a typedef at the beginning of
+  the candidate body. Ambiguous, conditional, or dependent typedefs remain
+  `tooling-blocked`; do not use a raw fallback that conflicts with the later
+  exact declaration.
 - Headers live in the repo only: `disasm/lib/ultralib/include/PR/gbi.h` has
   the `gSP*`/`gDP*` macros. Never search outside this repository.
 
@@ -103,7 +109,10 @@ Do not touch any other file's pragmas or run `make`.
    rejected attempts sharing one first-diff fingerprint, stop repeating that
    source shape and report the fingerprint and first differing instruction.
    This is advisory only: it never suppresses a candidate or changes the ROM
-   gate.
+   gate. Once the fingerprint is stable and the permuter/exhausted shape has
+   been tried, continue only with an explicitly new ABI/global/stack model.
+   Record the fingerprint and classification (`register tie`,
+   `tooling-blocked`, or `requeue`) in the handoff.
 
 ## 3. `fleet_probe.py` / `file_brief.py` usage
 
@@ -123,8 +132,11 @@ includes the link/futility context; it says "register tie — stop" when §2 ste
 6's stop condition applies.
 `relocation_masked: true` means the raw object differed only in recognized
 relocation fields with identical relocation topology. It is deliberately
-`link_verified: false` and must pass the sequential full-ROM gate; never report
-the masked probe result itself as an acceptance.
+`link_verified: false`, but remains eligible for the sequential full-ROM gate:
+run `python3 tools/fleet_probe.py batch.json --gate`. Never report the masked
+probe result itself as an acceptance. It is not a reason to reorder switch
+cases or weaken relocation checks; hard layout stops remain
+`section_layout_drift`/non-text layout failures.
 The persisted `prior_attempts` count is per owner across current, legacy, and
 rotated stats files; `best_prior` preserves the strongest prior normalized and
 raw scores. A first-diff fingerprint combines mismatch kind, location, and
