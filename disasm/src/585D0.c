@@ -1149,7 +1149,20 @@ void func_8005EE4C(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005F0B8.s")
+extern u8 D_8012874D;
+extern s32 D_80128748;
+extern void func_8005A174(s32, s32 *);
+void func_8005F0B8(s32 arg0) {
+    s32 *arg0p;
+    s32 temp_a0;
+    s32 temp_v0;
+    arg0p = &arg0;
+    temp_a0 = *arg0p & 0xFF;
+    temp_v0 = ~(1 << temp_a0);
+    D_8012874D &= temp_v0;
+    D_80128748 &= temp_v0;
+    func_8005A174(temp_a0, &D_80128748);
+}
 #endif
 
 #ifdef VERSION_US
