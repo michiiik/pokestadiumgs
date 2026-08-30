@@ -17,3 +17,7 @@ requeue; runner futility reached after 24 prior attempts (25 recorded candidate 
 ## Wave 6 handoff (2026-08-31)
 
 Wave 6 handoff: func_82B04624 unresolved after 12 serial CC_CHECK=1 probes. Best normalized/raw similarity was 1.0000/0.9836 with immediate_drift; frame and instruction count otherwise matched, but expected the local buffer at sp+56 and actual placed it at sp+48. Preserve the 0xC0 frame and adjust declaration/stack-slot ordering to place the buffer at sp+0x38.
+
+## func_82B07960 requeue 2026-08-31 (2026-08-31)
+
+requeue; func_82B07960 fresh owner attempted 3 batches / 5 variants under CC_CHECK=1, no probe hit or gate. Best label call_sequence:mode-loop:switch-raw-bound, normalized 0.8571, raw 0.4921, expected 252 bytes vs actual 248; mismatch operand_or_scheduling_drift, first diff offset 5: expected sw $s2, $sp, 32 but actual sw $ra, $sp, 36. Other labels raw-while and switch-u8-bound-local were 0.7778/0.4603 and 0.7619/0.4444. Tried raw while, typed pointer, switch with raw bound, and local-limit variants; declarations supplied exact later prototypes. Next action: materially different ABI/local-layout model to make IDO save s2 before ra (likely typed packed state/record overlay or declaration ordering matching address-observable global base), then probe and sequential full-ROM gate.
