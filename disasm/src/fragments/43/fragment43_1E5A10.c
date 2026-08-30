@@ -647,7 +647,26 @@ void func_8AC0405C(s32 arg0, s32 arg1, s32 arg2, Fragment43Color405C color) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC044DC.s")
+extern void func_800504BC(s16 *);
+extern void func_8AC0405C(s32 arg0, s32 arg1, s32 arg2, Fragment43Color405C color);
+s32 func_8AC044DC(s32 arg0, void *arg1) {
+    struct { s32 pad[2]; s16 angles[2]; } scratch;
+    if ((arg0 != 0) && (arg0 == 1)) {
+        func_800504BC(scratch.angles);
+        {
+            s16 x;
+            Fragment43Color405C color;
+            s16 y;
+            s16 z;
+            x = *(s16 *)((u8 *)arg1 + 8) + scratch.angles[0];
+            y = *(s16 *)((u8 *)arg1 + 0xA) + scratch.angles[1];
+            z = *(s16 *)((u8 *)arg1 + 0xE);
+            color = *(Fragment43Color405C *)((u8 *)arg1 + 0x28);
+            func_8AC0405C(x, y, z, color);
+        }
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
