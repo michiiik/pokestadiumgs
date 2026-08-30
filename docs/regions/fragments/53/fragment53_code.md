@@ -13,3 +13,39 @@ Requeue:
 - `func_86508B20`: runner repeated-drift futility after 13 prior rejected attempts sharing the prologue fingerprint `["section_layout_drift",13,3,"0xafb40028","0xafb00018"]` (expected `sw $s4,40(sp)`, actual `sw $s0,24(sp)`). Best candidate was `call-chain:record-loop:direct-conditions:no-final-return` with normalized similarity `0.9853` and raw similarity `0.8824`, expected 67 instructions/268 bytes versus actual 68/272, `mismatch_kind=section_layout_drift`, first diff offset 47 instruction 11 (expected branch `0x1000002f` / `b 0xec`, actual `0x10000030` / `b 0xf0`). Other close candidates reached 0.9286 normalized/0.8143 raw with the same size drift. Attempted families: m2c raw-pointer loop with explicit ABI declarations, direct selector conditions with no final return, `s32`/`u32` return widths, `var_s2` pointer-step variants, `D_8650DB70` pointer/global forms, pointer declaration order, do/while versus while, explicit endpoint local, five-pointer/live-constant forms, and a 45-second runner permuter (best score 490/1055, no exact source). Initial compile failures were context preflight only: missing `D_8650C494` and treating the value-producing `func_8003F114` as void; corrected declarations produced the near-hit. Next materially different hypothesis: reconstruct the original nested outer-control-flow/selector temporary layout and explicitly model the saved `$s4` lifetime (including endpoint/constant reuse) rather than trying more pointer declaration permutations; verify `func_8003F114`'s return ABI from its eventual definition before using its result.
 
 Box totals: 1 accepted owner, 1 requeued owner, 1 full-ROM acceptance, 27 probe candidates attempted after preflight correction plus 45 seconds of permuter exploration; no register-tie futility.
+
+## 2026-08-30 fleet box (continued) (2026-08-30)
+
+Accepted:
+
+- None. No candidate reached link_verified=true, so no full-ROM gate was run and no source pragma was installed.
+
+Requeue:
+
+- `func_86502524`: 78 recorded attempts (54 compiled probes rejected, 24 compile-preflight failures). The best spelling is the global-readback form:
+
+```c
+D_8650C498 = D_8650C474 + 0x5C;
+D_8650C4B4 = (D_8650C498 - D_8650C4CC) - 0xA;
+D_8650D9D4 = (s32)(((sqrtf((f32)((f64)(D_8650C4AC - D_8650C498) / D_8650D6B0)) / D_8650C4B8) + 1.0f) - 2.0f);
+func_865020D8();
+```
+
+  followed by direct scalar assignments from `D_8650C4F4` to the 12 tail globals in descending address order within each group. It reached normalized/raw similarity `0.9254/0.9254`, `mismatch_kind=instruction_drift`, first diff offset `180`; the candidate is 268 bytes/67 instructions versus 252/63 expected. The prologue and first tail store match; the remaining drift is the four extra address-load instructions needed for the three contiguous float-store groups.
+
+  Attempted materially different families: corrected direct scalar/global-readback forms, explicit integer and float temporaries, pointer and volatile-pointer forms, contiguous arrays, raw offset groups, chained/comma assignments, declaration-order variants, raw symbol-base casts, and a 90-second permuter run. The initial compile failures were preflight-only missing declarations, including `D_8650C4B8`; corrected probes produced the result above.
+
+  Next action: inspect or reconstruct an existing source-level record/alias declaration that makes IDO reuse the address base for each contiguous three-float group while retaining the direct relocation shape. Do not repeat scalar, array, pointer, or declaration-order permutations without new evidence.
+
+- `func_865038A8` remains the coordinator-specified requeue: 34 prior attempts, normalized `1.0` / raw `0.9444`, immediate drift.
+- `func_86508B20` remains the existing requeue: best normalized/raw `0.9853/0.8824`, section-layout drift; next hypothesis is the saved `$s4` lifetime and nested control-flow shape recorded above.
+
+Prerequisite skips preserved:
+
+- Jump-table-unready: `func_86501EA0`, `func_86501FA0`, `func_865082C8`, `func_8650515C`. These require the per-file `.rodata` subsegment before switch candidates.
+
+Untouched owners:
+
+- `func_865046A8`, `func_86508780`, `func_86501D6C`, `func_8650863C`, `func_8650455C`, `func_86509318`, `func_8650A278`, `func_86508890`, `func_86500D5C`, `func_86508484`, `func_86502B88`, `func_8650A3E4`, `func_8650A074`, `func_86509E54`, `func_86502958`, `func_86502720`, `func_86503938`, `func_86504EB0`, `func_86500020`, `func_86500EF8`, `func_86506B2C`, `func_86502D80`, `func_86500354`, `func_865020D8`, `func_865040E4`, `func_865059A0`, `func_86503B98`, `func_86500780`, `func_86505EA8`, `func_865064B0`, `func_86508C2C`, `func_86503178`, `func_86504740`, `func_86507AFC`, `func_8650952C`, `func_86501280`, and `func_86506E78`.
+
+Box result: 0 accepted owners, 1 durable requeue, 78 recorded attempts for the active owner, and no source-file changes. Foreign generated `COVERAGE.md` dirt was preserved.
