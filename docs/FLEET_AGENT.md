@@ -24,8 +24,11 @@ Do not touch any other file's pragmas or run `make`.
 ### Preflight and interpreting zero-accept batches
 
 - The coordinator's preflight uses `python3 tools/pragma_targets.py rank-files
-  --exclude-recent 4` and treats `fresh` as the primary ranking signal; the
-  claims and dirty-tree checks in `AGENTS.md` still apply.
+  --exclude-recent 4` and treats `READY_FRESH` (`actionable_fresh` in JSON) as
+  the primary ranking signal. `JT_UNREADY` is a count of jump-table owners
+  whose file lacks the required per-file `.rodata` subsegment; do not spend a
+  normal box on those owners. The claims and dirty-tree checks in `AGENTS.md`
+  still apply.
 - `fresh` is an owner-level requirement, not just a file-level score. After
   selecting a file, inspect `targets --source <file>` and include the chosen
   owner's `prior_attempts` in the handoff. A fresh slot uses an owner with
@@ -40,6 +43,11 @@ Do not touch any other file's pragmas or run `make`.
 - For fragment `jump_table_map`/`dispatcher_switch` owners, a missing required
   `.rodata` subsegment is coordinator layout work; return the owner with that
   prerequisite instead of treating it as an agent miss.
+- `file_brief.py` may report `manual-layout-required` for leading owner-local
+  `.rodata`/`.late_rodata` in split assembly. Preserve the owner as a layout
+  prerequisite and report its section, alignment, and symbols; do not try
+  ordinary C candidates until the layout is prepared and the assembly owner
+  has been gated.
 - If supported by the runner, JSON fleet batches may use `companion_edits` for
   the documented same-file exact-once edit; it must not add or remove a
   `#pragma GLOBAL_ASM`.

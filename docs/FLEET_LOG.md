@@ -39,6 +39,30 @@ Corrective process: rank at owner level, reserve requeues without counting them
 as fresh slots, distinguish display-list GBI from texture-load families, and
 preflight invalid owners and companion edits.
 
+## 2026-08-30 jump-table readiness audit
+
+The next five-box wave produced no new source acceptance. The boxes did make
+progress on durable diagnostics, but several selected owners were prerequisites
+rather than probeable C work: `6E850.c` had three dispatcher owners blocked by
+the missing per-file rodata layout, `14640.c` had an owner whose assembly begins
+with a local `.rodata` section, and `585D0.c` still contained a large
+layout-blocked pool. A concurrent foreign change accepted
+`func_8003FC34` in `229E0.c`; it is not counted as a result of this wave.
+
+The repository-wide audit found 649 active jump-table owners in 177 files:
+548 `dispatcher_switch` and 101 `jump_table_map` owners. Only 60 owners in 24
+files have a matching dotted `.rodata` subsegment in `rom.yaml`; 589 owners in
+153 files do not, including all 505 fragment owners. In the default <=128
+instruction pool, 358 jump-table owners remain and 329 in 111 files are
+unready. The previous ranker counted these as fresh, so a large apparent fresh
+pool could produce a zero-yield box without any agent hypothesis being tested.
+
+The corrective tooling now reports `READY_FRESH`/`JT_UNREADY` in
+`rank-files`, exposes per-owner `jump_table_status` in `targets`, and makes
+`file_brief.py` warn about owner-local rodata that disappears with a pragma.
+The next wave should select ready fresh owners, reserve explicit requeues
+separately, and route unready owners to a layout-preparation queue.
+
 ## What the numbers say
 
 - **Family unlocks carry the yield.** Half the morning's accepts came from one

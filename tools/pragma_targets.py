@@ -123,6 +123,55 @@ class Owner:
 _INDEX_SNAPSHOT: tuple[tuple[str, int], ...] | None = None
 _INDEX: dict[str, Owner] = {}
 _CLASSIFICATION_CACHE: dict[tuple[str, int], dict[str, object]] = {}
+_RODATA_OWNER_CACHE: dict[tuple[str, int], set[str]] = {}
+
+
+def _rodata_subsegment_owners(*, repo_root: Path | None = None) -> set[str]:
+    """Return source keys with an explicit US per-file rodata subsegment.
+
+    The jump-table layout work is intentionally not inferred from the data
+    blobs: only a dotted ``.rodata``/``.late_rodata`` YAML entry makes a
+    source file ready for a C switch.  Missing YAML (notably synthetic test
+    roots) is treated as no known entries and remains safe for callers.
+    """
+    root = repo_root or REPO_ROOT
+    yaml_path = root / "disasm" / "yamls" / "us" / "rom.yaml"
+    try:
+        stamp = yaml_path.stat().st_mtime_ns
+    except OSError:
+        return set()
+    cache_key = (yaml_path.as_posix(), stamp)
+    cached = _RODATA_OWNER_CACHE.get(cache_key)
+    if cached is not None:
+        return cached
+    owners: set[str] = set()
+    try:
+        for line in yaml_path.read_text(encoding="utf-8", errors="replace").splitlines():
+            # Per-file entries are [address, .rodata, source-key].  Keep this
+            # textual so the helper has no YAML dependency.
+            match = re.search(
+                r"\[\s*[^,]+,\s*\.(?:rodata|late_rodata)\s*,\s*([^\]\s#]+)",
+                line,
+            )
+            if match:
+                owners.add(match.group(1).strip("\"'"))
+    except OSError:
+        return set()
+    _RODATA_OWNER_CACHE[cache_key] = owners
+    return owners
+
+
+def _jump_table_readiness(
+    owner: Owner,
+    row: dict[str, object],
+    *,
+    repo_root: Path | None = None,
+) -> tuple[bool, bool]:
+    """Return ``(ready, unready)`` for an owner's jump-table layout."""
+    has_jump_table = bool(row.get("jump_tables"))
+    source_key = owner.source.removeprefix("disasm/src/").removesuffix(".c")
+    has_subsegment = source_key in _rodata_subsegment_owners(repo_root=repo_root)
+    return (has_jump_table and has_subsegment, has_jump_table and not has_subsegment)
 
 
 def _source_files(source_root: Path) -> list[Path]:
@@ -232,6 +281,7 @@ def list_targets(
     limit: int = 50,
     skip_ties: bool = False,
     stats_paths=None,
+    repo_root: Path | None = None,
 ) -> dict[str, object]:
     """Rank remaining owners by size so small same-shape batches are easy to pick.
 
@@ -263,6 +313,10 @@ def list_targets(
         family_counts[str(row["family"])] = family_counts.get(str(row["family"]), 0) + 1
         if family and row["family"] != family:
             continue
+        ready, unready = _jump_table_readiness(owner, row, repo_root=repo_root)
+        row["jump_table_ready"] = ready
+        row["jump_table_unready"] = unready
+        row["jump_table_status"] = "ready" if ready else ("unready" if unready else "not_applicable")
         h = hardness.get(owner.function, _EMPTY_HARDNESS)
         if skip_ties and h.is_tie:
             continue
@@ -1224,13 +1278,14 @@ def rank_files(
     For each source file, counts remaining owners of at most
     ``max_instructions`` instructions, and within those: ``fresh`` (see
     ``OwnerHardness.is_fresh``), ``drift`` (``OwnerHardness.is_drift``), and
-    ``ties`` (``OwnerHardness.is_tie``) -- an owner can count toward both
-    ``fresh`` and ``drift`` at once (few attempts *and* a promising kind is
-    the strongest signal, e.g. `4AC10.c`).  ``score = fresh + drift``; ties
-    contribute nothing to ``score`` but are still reported so a coordinator
-    can see why a file with many remaining owners scores low.  Rows are
-    sorted by fresh-owner count descending, then the existing composite
-    score, remaining owners, and file path as deterministic tie-breakers.
+    ``ties`` (``OwnerHardness.is_tie``).  Jump-table owners are split into
+    ``jump_table_ready`` and ``jump_table_unready`` based on the per-file
+    rodata subsegment in ``rom.yaml``.  ``actionable_fresh`` and
+    ``actionable_drift`` exclude only the latter; ordinary owners remain
+    actionable.  ``score = fresh + drift`` remains available for comparison.
+    Rows are sorted by actionable fresh owners first, then total fresh owners,
+    so a large file whose fresh pool is mostly layout-blocked cannot displace
+    a smaller file with work an agent can actually probe.
 
     ``exclude_recent_hours``, when given, drops any file touched by a commit
     in that many hours (``git log --since``) or currently dirty in the
@@ -1257,14 +1312,23 @@ def rank_files(
             continue
         entry = per_file.setdefault(
             owner.source,
-            {"file": owner.source, "remaining": 0, "fresh": 0, "drift": 0, "ties": 0},
+            {"file": owner.source, "remaining": 0, "fresh": 0, "drift": 0, "ties": 0,
+             "jump_table_ready": 0, "jump_table_unready": 0,
+             "actionable_fresh": 0, "actionable_drift": 0},
         )
         entry["remaining"] = int(entry["remaining"]) + 1
+        ready, unready = _jump_table_readiness(owner, row, repo_root=repo_root)
+        entry["jump_table_ready"] = int(entry["jump_table_ready"]) + int(ready)
+        entry["jump_table_unready"] = int(entry["jump_table_unready"]) + int(unready)
         h = hardness.get(owner.function, _EMPTY_HARDNESS)
         if h.is_fresh:
             entry["fresh"] = int(entry["fresh"]) + 1
+            if not unready:
+                entry["actionable_fresh"] = int(entry["actionable_fresh"]) + 1
         if h.is_drift:
             entry["drift"] = int(entry["drift"]) + 1
+            if not unready:
+                entry["actionable_drift"] = int(entry["actionable_drift"]) + 1
         if h.is_tie:
             entry["ties"] = int(entry["ties"]) + 1
 
@@ -1273,8 +1337,11 @@ def rank_files(
         entry["score"] = int(entry["fresh"]) + int(entry["drift"])
     rows.sort(
         key=lambda entry: (
+            -int(entry["actionable_fresh"]),
             -int(entry["fresh"]),
+            -int(entry["actionable_drift"]),
             -int(entry["score"]),
+            int(entry["jump_table_unready"]),
             -int(entry["remaining"]),
             str(entry["file"]),
         )
@@ -1344,13 +1411,17 @@ def draft_candidates(
 
 
 def _print_rank_files_table(rows: list[dict[str, object]]) -> None:
-    header = ("FILE", "REMAINING", "FRESH", "DRIFT", "TIES", "SCORE")
+    header = (
+        "FILE", "REMAINING", "READY_FRESH", "FRESH", "DRIFT", "JT_UNREADY", "TIES", "SCORE",
+    )
     lines = [header] + [
         (
             str(row["file"]),
             str(row["remaining"]),
+            str(row["actionable_fresh"]),
             str(row["fresh"]),
             str(row["drift"]),
+            str(row["jump_table_unready"]),
             str(row["ties"]),
             str(row["score"]),
         )

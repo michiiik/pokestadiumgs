@@ -40,6 +40,17 @@ def _write_asm(path: Path, function: str, instruction_count: int) -> None:
     path.write_text("".join(lines))
 
 
+def _write_jump_table_asm(path: Path, function: str, table: str) -> None:
+    lines = [
+        f"glabel {function}\n",
+        f"    /* 0 0 0 */  lui $at, %hi({table})\n",
+        "    /* 0 0 0 */  addiu $t0, $t0, 1\n",
+        "    /* 0 0 0 */  jr $ra\n",
+    ]
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("".join(lines))
+
+
 def _attempt(
     function: str,
     *,
@@ -314,6 +325,22 @@ class RankFilesTests(unittest.TestCase):
         (self.source_root / "big.c").write_text(_pragma("func_big"))
         _write_asm(self.asm_root / "x" / "func_big.s", "func_big", 200)
 
+        # A ready and an unready jump-table file exercise the layout-aware
+        # ranking.  The ready file has a dotted .rodata subsegment; the
+        # unready file is still a valid source file but needs coordinator
+        # layout work before a C switch can be probed.
+        (self.source_root / "ready.c").write_text(_pragma("func_ready"))
+        _write_jump_table_asm(
+            self.asm_root / "x" / "func_ready.s", "func_ready", "jtbl_80020000",
+        )
+        (self.source_root / "blocked.c").write_text(_pragma("func_blocked"))
+        _write_jump_table_asm(
+            self.asm_root / "x" / "func_blocked.s", "func_blocked", "jtbl_80021000",
+        )
+        yaml_path = self.root / "disasm" / "yamls" / "us" / "rom.yaml"
+        yaml_path.parent.mkdir(parents=True)
+        yaml_path.write_text("subsegments:\n    - [0x100, .rodata, ready]\n")
+
         tie_attempt = _attempt(
             "func_b1", status="probe_rejected", similarity_score=1.0,
             exact_similarity_score=1.0, mismatch_kind="register_allocation_only",
@@ -403,6 +430,25 @@ class RankFilesTests(unittest.TestCase):
         result_uncapped = self._rank(max_instructions=256)
         files_uncapped = {row["file"] for row in result_uncapped["files"]}
         self.assertIn("disasm/src/big.c", files_uncapped)
+
+    def test_jump_table_readiness_is_reported_and_affects_order(self) -> None:
+        result = self._rank(max_instructions=128)
+        by_file = {row["file"]: row for row in result["files"]}
+
+        ready = by_file["disasm/src/ready.c"]
+        blocked = by_file["disasm/src/blocked.c"]
+        self.assertEqual(ready["jump_table_ready"], 1)
+        self.assertEqual(ready["jump_table_unready"], 0)
+        self.assertEqual(ready["actionable_fresh"], 1)
+        self.assertEqual(blocked["jump_table_ready"], 0)
+        self.assertEqual(blocked["jump_table_unready"], 1)
+        self.assertEqual(blocked["actionable_fresh"], 0)
+
+        files_in_order = [row["file"] for row in result["files"]]
+        self.assertLess(
+            files_in_order.index("disasm/src/ready.c"),
+            files_in_order.index("disasm/src/blocked.c"),
+        )
 
 
 class RankFilesFragmentsAndRecentTests(unittest.TestCase):

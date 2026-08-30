@@ -23,7 +23,11 @@ Sections printed:
    ``declarations`` so a same-file forward call does not fall back to the
    runner's synthesized ``s32`` prototype and fail on a narrower real
    return type (see AGENTS.md §5, the ``func_8005D92C`` class of bug).
-8. Remaining owners (instruction count, family, probe history), via
+8. Leading owner-local ``.rodata``/``.late_rodata`` sections in the split
+   assembly. These payloads disappear when their pragma is replaced and are
+   flagged as manual-layout prerequisites; exact byte reproduction still
+   requires the runner and full-ROM gate.
+9. Remaining owners (instruction count, family, probe history), via
    ``tools/pragma_targets.py``'s existing listing/classification -- this
    script does not re-parse ``.s`` files or re-implement the family
    classifier.  The history fields are prior attempts, best normalized/raw
@@ -202,6 +206,82 @@ def later_defined_functions(functions: list[ParsedFunction], first_remaining_lin
     return [function for function in functions if function.start_line > first_remaining_line]
 
 
+LOCAL_RODATA_NAMES = {".rodata", ".late_rodata"}
+
+
+def _disasm_root_for_source(source_path: Path) -> Path | None:
+    """Find the containing ``disasm`` directory for real and synthetic files."""
+    resolved = source_path.resolve()
+    for parent in (resolved, *resolved.parents):
+        if parent.name == "disasm":
+            return parent
+    return None
+
+
+def _owner_asm_path(source_path: Path, asm_directory: str, function: str) -> Path | None:
+    disasm_root = _disasm_root_for_source(source_path)
+    if disasm_root is None:
+        return None
+    return disasm_root / "asm" / "us" / "nonmatchings" / asm_directory / f"{function}.s"
+
+
+def _parse_owner_local_sections(text: str, function: str) -> list[dict[str, object]]:
+    """Parse leading owner-local rodata metadata without compiling it."""
+    function_label = re.search(rf"^\s*glabel\s+{re.escape(function)}\b", text, re.MULTILINE)
+    prefix = text[: function_label.start()] if function_label else text
+    sections: list[dict[str, object]] = []
+    current: dict[str, object] | None = None
+    for line in prefix.splitlines():
+        section_match = re.match(r"^\s*\.section\s+(\S+)", line)
+        if section_match:
+            if current is not None:
+                sections.append(current)
+            name = section_match.group(1)
+            current = (
+                {"function": function, "name": name, "size": None, "alignment": None,
+                 "rom_start": None, "rom_end": None, "symbols": []}
+                if name in LOCAL_RODATA_NAMES else None
+            )
+            continue
+        if current is None:
+            continue
+        align_match = re.match(r"^\s*\.(align|late_rodata_alignment)\s+(\d+)", line)
+        if align_match:
+            value = int(align_match.group(2))
+            current["alignment"] = (1 << value) if align_match.group(1) == "align" else value
+        label_match = re.match(r"^\s*(?:dlabel|glabel)\s+(\S+)", line)
+        if label_match:
+            symbols = current["symbols"]
+            assert isinstance(symbols, list)
+            symbols.append(label_match.group(1))
+        address_match = re.search(r"/\*\s*([0-9A-Fa-f]{6})\s+[0-9A-Fa-f]{8}\s*\*/", line)
+        if address_match:
+            address = int(address_match.group(1), 16)
+            current["rom_start"] = (
+                f"0x{address:X}" if current["rom_start"] is None
+                else f"0x{min(int(str(current['rom_start']), 16), address):X}"
+            )
+    if current is not None:
+        sections.append(current)
+    return sections
+
+
+def owner_local_sections(source_path: Path, pragmas: list[tuple[int, str]]) -> list[dict[str, object]]:
+    """Describe leading owner-local rodata sections when the split asm exists."""
+    sections: list[dict[str, object]] = []
+    source_text = source_path.read_text(encoding="utf-8", errors="replace")
+    for match in PRAGMA_LINE_RE.finditer(source_text):
+        function = match.group(2)
+        if not any(pragma_function == function for _line, pragma_function in pragmas):
+            continue
+        asm = _owner_asm_path(source_path, match.group(1), function)
+        if asm is None or not asm.exists():
+            continue
+        text = asm.read_text(encoding="utf-8", errors="replace")
+        sections.extend(_parse_owner_local_sections(text, function))
+    return sections
+
+
 def _owner_history_fields(row: dict[str, object]) -> dict[str, object]:
     """Return the stable probe-history fields for one remaining owner."""
     return {
@@ -276,6 +356,7 @@ def build_brief(source_path: Path) -> dict[str, object]:
     solved = [function for function in functions if re.fullmatch(r"func_[0-9A-Fa-f]+", function.name)]
     first_remaining_line = pragmas[0][0] if pragmas else None
     record_strides, pointer_strides = stride_candidates(solved or functions)
+    local_sections = owner_local_sections(source_path, pragmas)
     return {
         "source": _display_path(source_path),
         "region_notes": region_notes.load(source_path),
@@ -298,6 +379,7 @@ def build_brief(source_path: Path) -> dict[str, object]:
             {"function": f.name, "return_type": _collapse_ws(f.ret), "params": _collapse_ws(f.params) or "void", "line": f.start_line}
             for f in later_defined_functions(functions, first_remaining_line)
         ],
+        "owner_local_sections": local_sections,
         "remaining_owners": remaining_owners_table(source_path, pragmas),
     }
 
@@ -372,6 +454,20 @@ def render_text(brief: dict[str, object]) -> str:
             emit(f"  {macro:<24} x{count}")
     else:
         emit("  (none found)")
+
+    emit("\n== owner-local rodata sections ==")
+    if brief["owner_local_sections"]:
+        emit("  WARNING: manual-layout-required; replacing these GLOBAL_ASM owners removes payload bytes")
+        for row in brief["owner_local_sections"]:
+            alignment = row.get("alignment") or "?"
+            symbols = ", ".join(row.get("symbols") or []) or "?"
+            rom_start = row.get("rom_start") or "?"
+            emit(
+                f"  {row['function']}: {row['name']} (size=?, alignment={alignment}, "
+                f"rom_start={rom_start}, symbols={symbols})"
+            )
+    else:
+        emit("  (none detected)")
 
     emit("\n== functions defined later in the file than the first remaining pragma ==")
     emit("   (pass matching prototypes in `declarations`; the runner's fallback defaults to s32)")

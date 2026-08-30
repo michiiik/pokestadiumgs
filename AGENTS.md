@@ -21,10 +21,13 @@ Coordinator rules:
 - One file per agent, never shared, and assignment is manual: install-time
   claims are advisory (§1.2), not a lock.
 - Pick files with `python3 tools/pragma_targets.py rank-files
-  --exclude-recent 4`, ranking by the **`fresh`** column, not by `score`
-  (`score` counts drift owners other sessions already failed on). Cross-check
-  `python3 tools/file_claims.py free --exclude-recent 4` and `git status`,
-  and re-check both when reassigning a file for a second box.
+  --exclude-recent 4`, ranking first by **`READY_FRESH`**
+  (`actionable_fresh` in JSON), then by `fresh`, not by `score` (`score` counts
+  drift owners other sessions already failed on). `JT_UNREADY` marks
+  jump-table owners whose file still lacks the required per-file `.rodata`
+  subsegment; those are coordinator layout work, not normal fresh slots.
+  Cross-check `python3 tools/file_claims.py free --exclude-recent 4` and `git
+  status`, and re-check both when reassigning a file for a second box.
 - Before assigning, run `python3 tools/analyze_family_shapes.py siblings
   --source <file>`. If the owners cluster on a shared `jal` target or carry
   a `gbi-macro` tag, the agent's first job is that family, not the file's
@@ -340,14 +343,20 @@ file at a time so declarations, structs and names accumulate in one place.
 ### 3.3 Discovery and drafting
 - `python3 tools/pragma_targets.py rank-files [--exclude-recent H]
   [--no-fragments] [--json]` and `targets --source <file> --skip-ties` —
-  hardness-aware file ranking and owner listing (`prior_attempts`,
+  hardness- and layout-aware file ranking and owner listing (`prior_attempts`,
   `best_similarity`, `best_mismatch_kind`, `hardness` = fresh/drift/tie/stuck
-  per owner). `--exclude-recent` uses an absolute timestamp because `git log
-  --since="4.0 hours ago"` silently matches the whole history.
+  per owner). `rank-files` reports `READY_FRESH`, `JT_UNREADY`, and their
+  JSON forms `actionable_fresh`/`jump_table_unready`; `targets` reports each
+  jump-table owner's `jump_table_status`. `--exclude-recent` uses an absolute
+  timestamp because `git log --since="4.0 hours ago"` silently matches the
+  whole history.
 - `python3 tools/file_brief.py <file> [--json]` — read this before touching a
   file: solved signatures, extern block, symbols by solved-body count, record
   strides, SDK macros, and the callees defined later in the file with their
-  real return types. Prints that file's `tools/region_notes.py` notes first.
+  real return types. It also warns when an owner has leading local `.rodata` or
+  `.late_rodata` in split assembly; those owners need manual layout work before
+  a switch candidate is useful. Prints that file's `tools/region_notes.py`
+  notes first.
 - `python3 tools/region_notes.py show|append|list` — the per-file notes
   store behind `file_brief.py`'s banner: file-specific spellings, skip
   lists and unsolved shapes that do not generalise into §4/§5, at

@@ -73,6 +73,36 @@ class ParseFunctionsTests(unittest.TestCase):
         self.assertIn("func_80000100(v);", body)
 
 
+class OwnerLocalSectionTests(unittest.TestCase):
+    def test_reports_leading_rodata_with_manual_layout_warning(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = root / "disasm/src/X.c"
+            source.parent.mkdir(parents=True)
+            source.write_text('#pragma GLOBAL_ASM("asm/us/nonmatchings/X/func_80000010.s")\n')
+            asm = root / "disasm/asm/us/nonmatchings/X/func_80000010.s"
+            asm.parent.mkdir(parents=True)
+            asm.write_text(
+                ".section .rodata\n"
+                ".align 2\n"
+                "dlabel D_80001000\n"
+                "    /* 001000 80001000 */ .asciz \"BUFFER\"\n"
+                ".section .text\n"
+                "glabel func_80000010\n"
+            )
+            brief = file_brief.build_brief(source)
+
+        sections = brief["owner_local_sections"]
+        self.assertEqual(len(sections), 1)
+        self.assertEqual(sections[0]["name"], ".rodata")
+        self.assertEqual(sections[0]["alignment"], 4)
+        self.assertEqual(sections[0]["rom_start"], "0x1000")
+        self.assertEqual(sections[0]["symbols"], ["D_80001000"])
+        rendered = file_brief.render_text(brief)
+        self.assertIn("manual-layout-required", rendered)
+        self.assertIn("D_80001000", rendered)
+
+
 class ParsePragmasTests(unittest.TestCase):
     def test_finds_all_remaining_pragmas_in_order(self) -> None:
         pragmas = file_brief.parse_pragmas(SYNTHETIC_SOURCE)
@@ -218,6 +248,7 @@ class BuildBriefAndRenderTests(unittest.TestCase):
             "func_/D_ symbols referenced",
             "record-stride-like constants",
             "SDK macros already used",
+            "owner-local rodata sections",
             "functions defined later in the file",
             "remaining owners",
         ):
