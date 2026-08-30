@@ -530,7 +530,17 @@ void func_8AE04478(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE04EB8.s")
+extern Gfx *D_800D0510;
+extern u8 D_8AE07268[];
+extern u8 *D_8AE0993C;
+extern s32 func_8004D1FC(u8 *);
+void func_8AE04EB8(s32 arg0, s32 arg1) {
+    gSPDisplayList(D_800D0510++, D_8AE07268);
+    arg0 *= 4;
+    arg1 *= 4;
+    func_8004D1FC(D_8AE0993C);
+    gSPTextureRectangle(D_800D0510++, arg0, arg1, arg0 + 0x30, arg1 + 0x30, 0, -0x10, -0x10, 0x800, 0x800);
+}
 #endif
 
 #ifdef VERSION_US
@@ -562,7 +572,55 @@ void func_8AE050AC(s32 arg0, s16 arg1, s16 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE0566C.s")
+extern Fragment46LookupEntry D_8AE08508[];
+s16 func_8AE0566C(s16 arg0) {
+    Fragment46LookupEntry *entry;
+    s16 key;
+    s16 sentinel;
+    s32 index;
+
+    entry = D_8AE08508;
+    index = 0;
+    sentinel = -1;
+loop_1:
+    key = entry->key;
+    if (sentinel == key) {
+        return -1;
+    }
+    if (arg0 == key) {
+        return (s16)index;
+    }
+    entry++;
+    key = entry->key;
+    if (sentinel == key) {
+        return -1;
+    }
+    if (arg0 == key) {
+        return (s16)(index + 1);
+    }
+    entry++;
+    key = entry->key;
+    if (sentinel == key) {
+        return -1;
+    }
+    if (arg0 == key) {
+        return (s16)(index + 2);
+    }
+    entry++;
+    key = entry->key;
+    if (sentinel == key) {
+        return -1;
+    }
+    if (arg0 == key) {
+        return (s16)(index + 3);
+    }
+    index += 4;
+    entry++;
+    if (index == 0x38) {
+        return -1;
+    }
+    goto loop_1;
+}
 #endif
 
 #ifdef VERSION_US
