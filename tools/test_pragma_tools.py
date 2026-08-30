@@ -1079,6 +1079,25 @@ def _symbol_entry(value: int, size: int, type_: str, ndx: str, name: str) -> dic
     return {"value": value, "size": size, "type": type_, "ndx": ndx, "name": name}
 
 
+def _relocation_shape(
+    text: bytes,
+    relocations: list[tuple[int, str, int]],
+    *,
+    target_value: int = 0,
+    relocation_section: str = ".rel.text",
+) -> dict[str, object]:
+    return {
+        "sections": {".text": _section_entry(".text", len(text))},
+        "section_names": {1: ".text", 2: ".data"},
+        "symbols": {
+            2: _symbol_entry(0, len(text), "FUNC", "1", "func_a"),
+            5: _symbol_entry(target_value, 0, "NOTYPE", "2", "target"),
+        },
+        "relocations": {relocation_section: relocations},
+        "text": text,
+    }
+
+
 class LinkShapeTests(unittest.TestCase):
     """Synthetic, mock-based coverage for the link-shape verification helpers."""
 
@@ -1263,6 +1282,131 @@ class LinkShapeTests(unittest.TestCase):
         self.assertIsNone(verdict["link_verified"])
         self.assertEqual(verdict["link_mismatch"], "shape_unavailable")
 
+    def test_relocation_fields_only_promotes_hi16_lo16_addend_spelling(self) -> None:
+        expected = bytes.fromhex("3c080000 250800a4")
+        actual = bytes.fromhex("3c080000 2508000c")
+        relocations = [(0, "R_MIPS_HI16", 5), (4, "R_MIPS_LO16", 5)]
+        baseline = _relocation_shape(expected, relocations, target_value=0)
+        candidate = _relocation_shape(actual, relocations, target_value=0x98)
+        self.assertTrue(
+            runner._relocation_fields_only_match(
+                baseline, candidate, (0, 8), (0, 8), expected, actual
+            )
+        )
+
+    def test_relocation_fields_only_rejects_non_field_instruction_changes(self) -> None:
+        expected = bytes.fromhex("3c080000 250800a4")
+        relocations = [(0, "R_MIPS_HI16", 5), (4, "R_MIPS_LO16", 5)]
+        baseline = _relocation_shape(expected, relocations)
+        for actual in (
+            bytes.fromhex("3c090000 250800a4"),  # register change
+            bytes.fromhex("34080000 250800a4"),  # opcode change
+        ):
+            with self.subTest(actual=actual.hex()):
+                candidate = _relocation_shape(actual, relocations)
+                self.assertFalse(
+                    runner._relocation_fields_only_match(
+                        baseline, candidate, (0, 8), (0, 8), expected, actual
+                    )
+                )
+
+    def test_relocation_fields_only_rejects_topology_mismatch(self) -> None:
+        expected = bytes.fromhex("3c080000 250800a4")
+        actual = bytes.fromhex("3c080000 2508000c")
+        baseline = _relocation_shape(
+            expected, [(0, "R_MIPS_HI16", 5), (4, "R_MIPS_LO16", 5)]
+        )
+        variants = (
+            [(0, "R_MIPS_HI16", 5)],
+            [(0, "R_MIPS_HI16", 5), (0, "R_MIPS_LO16", 5)],
+            [(0, "R_MIPS_HI16", 5), (4, "R_MIPS_GPREL16", 5)],
+        )
+        for relocations in variants:
+            with self.subTest(relocations=relocations):
+                candidate = _relocation_shape(actual, relocations)
+                self.assertFalse(
+                    runner._relocation_fields_only_match(
+                        baseline, candidate, (0, 8), (0, 8), expected, actual
+                    )
+                )
+
+    def test_relocation_fields_only_rejects_unknown_rela_and_missing_shape(self) -> None:
+        expected = bytes.fromhex("3c080000")
+        actual = bytes.fromhex("3c080001")
+        baseline = _relocation_shape(expected, [(0, "R_MIPS_HI16", 5)])
+        variants = (
+            _relocation_shape(actual, [(0, "R_MIPS_UNKNOWN", 5)]),
+            _relocation_shape(
+                actual, [(0, "R_MIPS_HI16", 5)], relocation_section=".rela.text"
+            ),
+            _relocation_shape(actual, [(4, "R_MIPS_HI16", 5)]),
+            None,
+        )
+        for candidate in variants:
+            with self.subTest(candidate=candidate):
+                self.assertFalse(
+                    runner._relocation_fields_only_match(
+                        baseline, candidate, (0, 4), (0, 4), expected, actual
+                    )
+                )
+
+    def test_probe_promotes_relocation_fields_only_but_forces_unverified(self) -> None:
+        expected = bytes.fromhex("3c080000 250800a4")
+        actual = bytes.fromhex("3c080000 2508000c")
+        relocations = [(0, "R_MIPS_HI16", 5), (4, "R_MIPS_LO16", 5)]
+        baseline = _relocation_shape(expected, relocations, target_value=0)
+        candidate = _relocation_shape(actual, relocations, target_value=0x98)
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.c"
+            source.write_text('#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_a.s")\n')
+            with mock.patch.object(
+                runner, "_make_object", return_value=(0, Path(directory) / "probe.o", ""),
+            ), mock.patch.object(
+                runner, "_function_byte_views", return_value=(8, actual, actual),
+            ), mock.patch.object(
+                runner, "_object_link_shape", return_value=candidate,
+            ):
+                result = runner._probe_one(
+                    source, "func_a", "void func_a(void) {}", expected,
+                    expected_shape=baseline,
+                )
+        self.assertEqual(result["status"], "probe_match")
+        self.assertEqual(result["probe_reason"], "relocation_fields_only")
+        self.assertTrue(result["relocation_masked"])
+        self.assertFalse(result["link_verified"])
+
+    def test_probe_promotes_masked_match_despite_section_content_drift(self) -> None:
+        expected = bytes.fromhex("3c080000 250800a4")
+        actual = bytes.fromhex("3c080000 2508000c")
+        relocations = [(0, "R_MIPS_HI16", 5), (4, "R_MIPS_LO16", 5)]
+        baseline = _relocation_shape(expected, relocations, target_value=0)
+        candidate = _relocation_shape(actual, relocations, target_value=0x98)
+        baseline["sections"][".data"] = {
+            **_section_entry(".data", 4, flags="WA"), "bytes": b"\0\0\0\0",
+        }
+        candidate["sections"][".data"] = {
+            **_section_entry(".data", 4, flags="WA"), "bytes": b"\0\0\0\x0c",
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.c"
+            source.write_text('#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_a.s")\n')
+            with mock.patch.object(
+                runner, "_make_object", return_value=(0, Path(directory) / "probe.o", ""),
+            ), mock.patch.object(
+                runner, "_function_byte_views", return_value=(8, actual, actual),
+            ), mock.patch.object(
+                runner, "_object_link_shape", return_value=candidate,
+            ):
+                result = runner._probe_one(
+                    source, "func_a", "void func_a(void) {}", expected,
+                    expected_shape=baseline,
+                )
+        self.assertEqual(result["status"], "probe_match")
+        self.assertEqual(result["probe_reason"], "relocation_fields_only")
+        self.assertTrue(result["relocation_masked"])
+        self.assertFalse(result["link_verified"])
+        self.assertEqual(result["link_mismatch"], "section_content_drift")
+
     def test_probe_one_reports_link_verified_with_expected_shape(self) -> None:
         expected_bytes = b"\x00" * 8
         baseline_shape = {
@@ -1335,6 +1479,62 @@ class LinkShapeTests(unittest.TestCase):
         self.assertEqual(result["probe_reason"], "section_layout_drift")
         self.assertEqual(result["mismatch_kind"], "section_layout_drift")
 
+    def test_probe_exact_bytes_leaves_section_content_drift_unverified(self) -> None:
+        expected = b"\0" * 4
+        baseline = _relocation_shape(expected, [])
+        candidate = _relocation_shape(expected, [])
+        baseline["sections"][".data"] = {
+            **_section_entry(".data", 4, flags="WA"), "bytes": b"\0\0\0\0",
+        }
+        candidate["sections"][".data"] = {
+            **_section_entry(".data", 4, flags="WA"), "bytes": b"\0\0\0\x04",
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.c"
+            source.write_text('#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_a.s")\n')
+            with mock.patch.object(
+                runner, "_make_object", return_value=(0, Path(directory) / "probe.o", ""),
+            ), mock.patch.object(
+                runner, "_function_byte_views", return_value=(4, expected, expected),
+            ), mock.patch.object(
+                runner, "_object_link_shape", return_value=candidate,
+            ):
+                result = runner._probe_one(
+                    source, "func_a", "void func_a(void) {}", expected,
+                    expected_shape=baseline,
+                )
+        self.assertEqual(result["status"], "probe_match")
+        self.assertFalse(result["link_verified"])
+        self.assertEqual(result["link_mismatch"], "section_content_drift")
+
+    def test_probe_rejects_masked_match_with_section_layout_drift(self) -> None:
+        expected = bytes.fromhex("3c080000")
+        actual = bytes.fromhex("3c080001")
+        relocations = [(0, "R_MIPS_HI16", 5)]
+        baseline = _relocation_shape(expected, relocations)
+        candidate = _relocation_shape(actual, relocations)
+        candidate["sections"][".rodata"] = _section_entry(
+            ".rodata", 0x10, flags="A"
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.c"
+            source.write_text('#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_a.s")\n')
+            with mock.patch.object(
+                runner, "_make_object", return_value=(0, Path(directory) / "probe.o", ""),
+            ), mock.patch.object(
+                runner, "_function_byte_views", return_value=(4, actual, actual),
+            ), mock.patch.object(
+                runner, "_object_link_shape", return_value=candidate,
+            ), mock.patch.object(
+                runner, "_function_mismatch_details", return_value={},
+            ):
+                result = runner._probe_one(
+                    source, "func_a", "void func_a(void) {}", expected,
+                    expected_shape=baseline,
+                )
+        self.assertEqual(result["status"], "probe_rejected")
+        self.assertEqual(result["probe_reason"], "section_layout_drift")
+
     def test_probe_one_without_expected_shape_leaves_link_verified_none(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             source = Path(directory) / "synthetic.c"
@@ -1356,8 +1556,9 @@ class LinkShapeTests(unittest.TestCase):
                 "function": "func_a",
                 "status": "accepted",
                 "probe_status": "probe_match",
-                "link_verified": True,
+                "link_verified": False,
                 "link_mismatch": None,
+                "relocation_masked": True,
                 "probe_seconds": 0.01,
             }]
             with mock.patch.dict(os.environ, {"PRAGMA_PROBE_STATS": str(stats_path)}):
@@ -1370,7 +1571,8 @@ class LinkShapeTests(unittest.TestCase):
                 )
             row = json.loads(stats_path.read_text())
             self.assertEqual(row["timing"], {"probe_seconds": 1.5, "gate_runs": 1})
-            self.assertTrue(row["attempts"][0]["link_verified"])
+            self.assertFalse(row["attempts"][0]["link_verified"])
+            self.assertTrue(row["attempts"][0]["relocation_masked"])
 
     def test_probe_stats_records_batch_status(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -1569,25 +1771,43 @@ class GateFlowTests(unittest.TestCase):
             self.assertEqual(called_candidates, [candidate0, candidate1])
             self.assertIn("func_a", result["accepted"])
 
-    def test_mixed_unverified_and_verified_hits_share_combined_gate(self) -> None:
+    def test_mixed_masked_hit_is_gated_before_link_verified_combined_path(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             source = Path(directory) / "synthetic.c"
             source.write_text(
                 '#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_a.s")\n'
                 '#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_b.s")\n'
             )
+            events: list[str] = []
+
+            def sequential_gate(*args: object) -> tuple[int, str]:
+                events.append("sequential")
+                return 0, "accepted"
+
+            def combined_gate(*args: object) -> int:
+                events.append("combined")
+                return 0
+
             with mock.patch.object(
                 runner, "probe_candidates",
                 return_value=[
-                    {"index": 0, "function": "func_a", "status": "probe_match"},
+                    {
+                        "index": 0,
+                        "function": "func_a",
+                        "status": "probe_match",
+                        "probe_reason": "relocation_fields_only",
+                        "relocation_masked": True,
+                        "link_verified": False,
+                        "link_mismatch": "section_content_drift",
+                    },
                     {"index": 1, "function": "func_b", "status": "probe_match", "link_verified": True},
                 ],
             ), mock.patch.object(
                 runner, "rebuild_source_object", return_value=0,
             ), mock.patch.object(
-                runner, "_try_candidate_detailed", return_value=(0, "accepted"),
+                runner, "_try_candidate_detailed", side_effect=sequential_gate,
             ) as sequential_gate, mock.patch.object(
-                runner, "compare_current_tree", return_value=0,
+                runner, "compare_current_tree", side_effect=combined_gate,
             ) as full_compare:
                 result = runner.try_candidates_detailed(
                     source,
@@ -1598,6 +1818,7 @@ class GateFlowTests(unittest.TestCase):
                 )
             sequential_gate.assert_called_once()
             full_compare.assert_called_once()
+            self.assertEqual(events, ["sequential", "combined"])
             self.assertEqual(sorted(result["accepted"]), ["func_a", "func_b"])
 
     def test_incremental_install_drops_conflicting_winner(self) -> None:

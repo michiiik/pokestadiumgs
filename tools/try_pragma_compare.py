@@ -783,6 +783,110 @@ def _normalized_function_relocations(
     return normalized
 
 
+_REL_RELOCATION_FIELD_MASKS = {
+    "R_MIPS_HI16": 0x0000FFFF,
+    "R_MIPS_LO16": 0x0000FFFF,
+    "R_MIPS_GPREL16": 0x0000FFFF,
+    "R_MIPS_LITERAL": 0x0000FFFF,
+    "R_MIPS_PC16": 0x0000FFFF,
+    "R_MIPS_26": 0x03FFFFFF,
+    "R_MIPS_32": 0xFFFFFFFF,
+}
+
+
+def _relocation_fields_only_match(
+    expected_shape: dict[str, object] | None,
+    actual_shape: dict[str, object] | None,
+    expected_symbol: tuple[int, int] | None,
+    actual_symbol: tuple[int, int] | None,
+    expected: bytes,
+    actual: bytes,
+) -> bool:
+    """Return whether complete equal spans differ only in identical REL fields.
+
+    This is deliberately stricter than relocation normalization: relocation
+    targets and addends may explain different instruction immediates, but the
+    result remains only a probe promotion and must still pass the full ROM
+    gate. Any unavailable or malformed ELF view fails closed.
+    """
+    if (
+        expected_shape is None
+        or actual_shape is None
+        or expected_symbol is None
+        or actual_symbol is None
+        or len(expected) != len(actual)
+    ):
+        return False
+    expected_start, _ = expected_symbol
+    actual_start, _ = actual_symbol
+
+    def topology(
+        shape: dict[str, object], start: int, span: bytes
+    ) -> list[tuple[int, str, int]] | None:
+        text = shape.get("text")
+        relocations = shape.get("relocations")
+        if not isinstance(text, bytes) or not isinstance(relocations, dict):
+            return None
+        if (
+            start < 0
+            or start + len(span) > len(text)
+            or text[start:start + len(span)] != span
+        ):
+            return None
+        end = start + len(span)
+        sites: list[tuple[int, str, int]] = []
+        occupied: set[int] = set()
+        for section_name in (".rel.text", ".rela.text"):
+            entries = relocations.get(section_name, [])
+            if not isinstance(entries, list):
+                return None
+            for entry in entries:
+                if not isinstance(entry, tuple) or len(entry) != 3:
+                    return None
+                offset, kind, symbol_index = entry
+                if (
+                    not isinstance(offset, int)
+                    or isinstance(offset, bool)
+                    or not isinstance(kind, str)
+                    or not isinstance(symbol_index, int)
+                    or isinstance(symbol_index, bool)
+                    or offset < 0
+                    or offset + 4 > len(text)
+                ):
+                    return None
+                if not (start <= offset < end):
+                    continue
+                if section_name == ".rela.text" or kind not in _REL_RELOCATION_FIELD_MASKS:
+                    return None
+                relative = offset - start
+                if relative % 4 != 0 or relative + 4 > len(span):
+                    return None
+                covered = set(range(relative, relative + 4))
+                if occupied & covered:
+                    return None
+                occupied.update(covered)
+                sites.append((relative, kind, _REL_RELOCATION_FIELD_MASKS[kind]))
+        sites.sort(key=lambda item: (item[0], item[1]))
+        return sites
+
+    expected_sites = topology(expected_shape, expected_start, expected)
+    actual_sites = topology(actual_shape, actual_start, actual)
+    if expected_sites is None or actual_sites is None:
+        return False
+    if [(offset, kind) for offset, kind, _ in expected_sites] != [
+        (offset, kind) for offset, kind, _ in actual_sites
+    ]:
+        return False
+
+    allowed = bytearray(len(expected))
+    for offset, _, mask in expected_sites:
+        allowed[offset:offset + 4] = mask.to_bytes(4, "big")
+    return all(
+        ((left ^ right) & ~mask) == 0
+        for left, right, mask in zip(expected, actual, allowed)
+    )
+
+
 def _compare_link_shape(
     expected_shape: dict[str, object] | None,
     actual_shape: dict[str, object] | None,
@@ -794,8 +898,9 @@ def _compare_link_shape(
     Returns ``link_verified`` (``True``/``False``/``None`` for unknown) with a
     ``link_mismatch`` reason.  ``section_layout_drift`` is *definitive*: an
     added or resized allocatable section changes the ROM regardless of the
-    instruction bytes.  ``relocation_drift`` is advisory only, so the caller
-    keeps the candidate eligible for the sequential ROM gate.
+    instruction bytes. ``section_content_drift`` and ``relocation_drift`` are
+    advisory for REL objects, so the caller keeps the candidate eligible for
+    the sequential ROM gate.
     """
     if expected_shape is None or actual_shape is None or expected_symbol is None or actual_symbol is None:
         return {"link_verified": None, "link_mismatch": "shape_unavailable"}
@@ -1912,6 +2017,58 @@ def _probe_one_uncounted(
             if actual is None:
                 actual = actual_symbol
             if not comparison_span_complete or actual != expected:
+                actual_shape = _object_link_shape(object_path) if expected_shape is not None else None
+                try:
+                    expected_span = _shape_symbol(expected_shape, function)
+                    actual_span = _shape_symbol(actual_shape, function)
+                    verdict = _compare_link_shape(
+                        expected_shape, actual_shape, expected_span, actual_span
+                    )
+                except (AssertionError, IndexError, KeyError, TypeError, ValueError):
+                    expected_span = None
+                    actual_span = None
+                    verdict = {
+                        "link_verified": False,
+                        "link_mismatch": "relocation_shape_invalid",
+                    }
+                if verdict.get("link_mismatch") == "section_layout_drift":
+                    reason = str(verdict["link_mismatch"])
+                    diagnostic = {
+                        "status": "probe_rejected",
+                        "probe_reason": reason,
+                        "comparison_span_size": len(actual),
+                        "comparison_span_complete": comparison_span_complete,
+                    }
+                    diagnostic.update(
+                        _function_mismatch_details(
+                            object_path,
+                            function,
+                            expected,
+                            actual_symbol,
+                            actual_symbol_size=actual_symbol_size,
+                        )
+                    )
+                    diagnostic["mismatch_kind"] = reason
+                    diagnostic.update(verdict)
+                    return diagnostic
+                if comparison_span_complete and _relocation_fields_only_match(
+                    expected_shape,
+                    actual_shape,
+                    expected_span,
+                    actual_span,
+                    expected,
+                    actual,
+                ):
+                    return {
+                        "status": "probe_match",
+                        "probe_reason": "relocation_fields_only",
+                        "relocation_masked": True,
+                        "link_verified": False,
+                        "link_mismatch": verdict.get("link_mismatch"),
+                        "link_detail": verdict.get("link_detail"),
+                        "comparison_span_size": len(actual),
+                        "comparison_span_complete": True,
+                    }
                 diagnostic = {
                     "status": "probe_rejected",
                     "probe_reason": "function_bytes_differ",
@@ -1939,12 +2096,13 @@ def _probe_one_uncounted(
                     expected_shape, actual_shape, expected_span, actual_span
                 )
                 if verdict.get("link_mismatch") == "section_layout_drift":
-                    # Definitive: the candidate adds or resizes an allocatable
-                    # section, so the linked ROM cannot be byte-identical even
-                    # though the instruction bytes are.
+                    # Definitive: an allocatable section's layout differs, so
+                    # the linked ROM cannot be byte-identical even though the
+                    # instruction bytes are.
+                    reason = str(verdict["link_mismatch"])
                     diagnostic = {
                         "status": "probe_rejected",
-                        "probe_reason": "section_layout_drift",
+                        "probe_reason": reason,
                         "comparison_span_size": len(actual),
                         "comparison_span_complete": comparison_span_complete,
                     }
@@ -1957,13 +2115,13 @@ def _probe_one_uncounted(
                             actual_symbol_size=actual_symbol_size,
                         )
                     )
-                    diagnostic["mismatch_kind"] = "section_layout_drift"
+                    diagnostic["mismatch_kind"] = reason
                     if isinstance(diagnostic.get("diagnostic"), str):
                         # Keep the human-readable summary's mismatch_kind in sync
-                        # with the definitive section_layout_drift override above.
+                        # with the definitive section-drift override above.
                         diagnostic["diagnostic"] = re.sub(
                             r"mismatch_kind=\S+",
-                            "mismatch_kind=section_layout_drift",
+                            f"mismatch_kind={reason}",
                             diagnostic["diagnostic"],
                             count=1,
                         )
@@ -2338,6 +2496,7 @@ def _record_probe_stats(
                 "permute_error": attempt.get("permute_error"),
                 "link_verified": attempt.get("link_verified"),
                 "link_mismatch": attempt.get("link_mismatch"),
+                "relocation_masked": attempt.get("relocation_masked"),
                 "probe_seconds": attempt.get("probe_seconds"),
                 "exception_type": attempt.get("exception_type"),
                 "phase": attempt.get("phase"),

@@ -168,6 +168,44 @@ class ProbeWorkerExceptionTests(unittest.TestCase):
             })
         )
 
+    def test_relocation_masked_match_uses_one_sequential_gate_and_can_reject(self) -> None:
+        promoted = {
+            "index": 0,
+            "function": "func_a",
+            "status": "probe_match",
+            "probe_reason": "relocation_fields_only",
+            "relocation_masked": True,
+            "link_verified": False,
+            "link_mismatch": "section_content_drift",
+        }
+        self.assertTrue(runner._full_gate_eligible(promoted))
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.c"
+            source.write_text(
+                '#pragma GLOBAL_ASM("asm/us/nonmatchings/synthetic/func_a.s")\n'
+            )
+            with mock.patch.object(
+                runner, "probe_candidates", return_value=[promoted]
+            ), mock.patch.object(
+                runner, "_claim_or_refuse", return_value=None
+            ), mock.patch.object(
+                runner, "rebuild_source_object", return_value=0
+            ), mock.patch.object(
+                runner, "_try_candidate_detailed", return_value=(2, "compare_rejected")
+            ) as sequential_gate, mock.patch.object(
+                runner, "compare_current_tree"
+            ) as combined_gate:
+                result = runner.try_candidates_detailed(
+                    source, [("func_a", "void func_a(void) {}")]
+                )
+
+        sequential_gate.assert_called_once()
+        combined_gate.assert_not_called()
+        self.assertEqual(result["attempts"][0]["probe_status"], "probe_match")
+        self.assertEqual(result["attempts"][0]["status"], "compare_rejected")
+        self.assertEqual(result["timing"]["gate_runs"], 1)
+        self.assertEqual(result["timing"]["gate_mode"], "sequential")
+
     def test_structured_fields_are_persisted_in_probe_stats(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             stats_path = Path(directory) / "probe-stats.jsonl"
