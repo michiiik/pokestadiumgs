@@ -2207,6 +2207,9 @@ def main() -> int:
         rows = near_miss_kinds._stats_records(stats_path)
         pool = near_miss_kinds.select_pool(rows, min_similarity=args.min_similarity, kinds=kinds)
         flat = [entry for entries in pool.values() for entry in entries]
+        if args.source is not None:
+            wanted = os.path.normpath(str(args.source))
+            flat = [e for e in flat if os.path.normpath(str(e.get("source") or "")).endswith(wanted)]
         flat.sort(key=lambda e: (-float(e["similarity_score"]), str(e["function"])))
         if args.limit is not None:
             flat = flat[: max(0, args.limit)]
