@@ -114,7 +114,6 @@ void func_8F1002C4(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-extern u8 D_8F1DF270[];
 extern u8 D_8F1DF282[];
 extern void func_8F100290(void *);
 extern void func_8F1002F0(void *);
@@ -150,11 +149,108 @@ void func_8F1003EC(void)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/69/fragment69_code/func_8F100594.s")
+typedef struct {
+    s16 state;
+    s16 timer;
+    s16 selected;
+} Fragment69MenuState;
+extern s16 D_8F1039C8[][5];
+extern u8 D_8F1039E8[];
+extern u8 D_8F103A04[];
+extern void *D_8F103A20[];
+extern void *D_8F103A28[];
+extern void func_800498C4(void);
+extern void func_800496A4(s32, s32);
+extern void func_8004972C(s32, s32, s32, s32);
+extern void Font_EnableTwoCycleTexturing(void);
+extern void func_800497E4(s32, s32, s32, s32);
+extern s32 func_8003514C(void);
+extern void func_800495BC(s32, s32, void *);
+extern void Font_DisableTwoCycleTexturing(void);
+extern void func_800499EC(void);
+void func_8F100594(Fragment69MenuState *arg0) {
+    void *text;
+    void *itemText;
+    s32 item;
+    s32 tableOffset;
+    s32 yOffset;
+    s16 *position;
+
+    func_800498C4();
+    func_800496A4(0x20, 0);
+    func_8004972C(0xFF, 0xFF, 0xFF, 0xFF);
+    Font_EnableTwoCycleTexturing();
+    func_800497E4(0, 0xFF, 0, 0xFF);
+    if (func_8003514C() == 0) {
+        text = D_8F1039E8;
+    } else {
+        text = D_8F103A04;
+    }
+    position = D_8F1039C8[((u8 *)arg0 - D_8F1DF270) / 6];
+    func_800495BC(position[0] + 0xA, position[1] + 4, text);
+    Font_DisableTwoCycleTexturing();
+    item = 0; tableOffset = 0; yOffset = 0; do {
+        if (item == arg0->selected) {
+            func_8004972C(0xFF, 0xFF, 0, 0xFF);
+        } else {
+            func_8004972C(0xFF, 0xFF, 0xFF, 0xFF);
+        }
+        if (func_8003514C() == 0) {
+            itemText = *(void **)((u8 *)D_8F103A20 + tableOffset);
+        } else {
+            itemText = *(void **)((u8 *)D_8F103A28 + tableOffset);
+        }
+        func_800495BC(position[0] + 0xA, position[1] + yOffset + 0x28, itemText);
+        item++;
+        tableOffset += 4;
+        yOffset += 0xE;
+    } while (item != 2);
+    func_800499EC();
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/69/fragment69_code/func_8F100740.s")
+extern u8 D_8F103A30[];
+extern u8 D_8F103A48[];
+void func_8F100740(Fragment69MenuState *arg0) {
+    void *text;
+    void *itemText;
+    s32 item;
+    s32 tableOffset;
+    s32 yOffset;
+    s16 *position;
+
+    func_800498C4();
+    func_800496A4(0x20, 0);
+    func_8004972C(0xFF, 0xFF, 0xFF, 0xFF);
+    Font_EnableTwoCycleTexturing();
+    func_800497E4(0xFF, 0, 0, 0xFF);
+    if (func_8003514C() == 0) {
+        text = D_8F103A30;
+    } else {
+        text = D_8F103A48;
+    }
+    position = D_8F1039C8[((u8 *)arg0 - D_8F1DF270) / 6];
+    func_800495BC(position[0] + 0xA, position[1] + 4, text);
+    Font_DisableTwoCycleTexturing();
+    item = 0; tableOffset = 0; yOffset = 0; do {
+        if (item == arg0->selected) {
+            func_8004972C(0xFF, 0xFF, 0, 0xFF);
+        } else {
+            func_8004972C(0xFF, 0xFF, 0xFF, 0xFF);
+        }
+        if (func_8003514C() == 0) {
+            itemText = *(void **)((u8 *)D_8F103A20 + tableOffset);
+        } else {
+            itemText = *(void **)((u8 *)D_8F103A28 + tableOffset);
+        }
+        func_800495BC(position[0] + 0xA, position[1] + yOffset + 0x14, itemText);
+        item++;
+        tableOffset += 4;
+        yOffset += 0xC;
+    } while (item != 2);
+    func_800499EC();
+}
 #endif
 
 #ifdef VERSION_US
@@ -238,7 +334,6 @@ extern void *D_80087200;
 extern s32 D_8F103988;
 extern s32 D_8F1DECA4;
 extern s32 D_8F103984;
-extern Gfx *D_800D0510;
 void func_8F101CDC(void) {
     func_800088DC();
     GfxImage_FillCurrent(&D_800D0510, 0x5295);
@@ -282,11 +377,63 @@ void func_8F101CDC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/69/fragment69_code/func_8F102618.s")
+typedef union {
+    s32 word;
+    s8 bytes[4];
+} Fragment69PackedState;
+extern s8 D_8F1DEE48[];
+extern s32 D_8F1DECA0;
+extern s32 D_8F1DECF0;
+extern u16 D_8F1DEE26;
+extern s32 D_8F1DEE30;
+extern s32 D_8F1DEE44;
+extern s32 D_8F1DEE5C;
+extern s32 func_80041FD0(s32, u16, Fragment69PackedState, s32);
+void func_8F102618(void) {
+    if (*(u16 *)((u8 *)D_80087200 + 0xC) & 0x200) {
+        D_8F1DEE48[3]--;
+        if (D_8F1DEE48[3] < -8) {
+            D_8F1DEE48[3] = 8;
+        }
+    }
+    if (*(u16 *)((u8 *)D_80087200 + 0xC) & 0x100) {
+        D_8F1DEE48[3]++;
+        if (D_8F1DEE48[3] >= 9) {
+            D_8F1DEE48[3] = -8;
+        }
+    }
+    if (D_8F1DEE44 != ((Fragment69PackedState *)D_8F1DEE48)->word) {
+        D_8F1DEE5C = 0;
+        if (func_80041FD0(D_8F1DECA0, D_8F1DEE26, *(Fragment69PackedState *)D_8F1DEE48, 0) != 0) {
+            D_8F1DEE44 = ((Fragment69PackedState *)D_8F1DEE48)->word;
+            D_8F1DEE30 = D_8F1DECF0;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/69/fragment69_code/func_8F102708.s")
+void func_8F102708(void) {
+    if (*(u16 *)((u8 *)D_80087200 + 0xC) & 0x200) {
+        D_8F1DEE48[2]--;
+        if (D_8F1DEE48[2] < -8) {
+            D_8F1DEE48[2] = 8;
+        }
+    }
+    if (*(u16 *)((u8 *)D_80087200 + 0xC) & 0x100) {
+        D_8F1DEE48[2]++;
+        if (D_8F1DEE48[2] >= 9) {
+            D_8F1DEE48[2] = -8;
+        }
+    }
+    if (D_8F1DEE44 != ((Fragment69PackedState *)D_8F1DEE48)->word) {
+        D_8F1DEE5C = 0;
+        if (func_80041FD0(D_8F1DECA0, D_8F1DEE26, *(Fragment69PackedState *)D_8F1DEE48, 0) != 0) {
+            D_8F1DEE44 = ((Fragment69PackedState *)D_8F1DEE48)->word;
+            D_8F1DEE30 = D_8F1DECF0;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -307,7 +454,6 @@ void func_8F1027F8(void) {
 #endif
 
 #ifdef VERSION_US
-extern void *D_80087200;
 extern u8 D_8F1DECA8;
 void func_8F1029CC(void) {
     if ((*(u16 *)((u8 *)(D_80087200) + (0xC))) & 0x200) {
@@ -353,7 +499,6 @@ void func_8F102B48(void) {
 #endif
 
 #ifdef VERSION_US
-extern u8 D_8F1DF270[];
 extern s32 func_8F100220(s32);
 extern void func_8004BE50(void);
 s32 func_8F102F58(void) {
