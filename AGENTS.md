@@ -500,6 +500,26 @@ reaches an agent through `tools/file_brief.py`, not here.
   `declarations` (`CE80.c`: `func_8000DDC8`/`func_8000DE34`, five callers).
 - Sweep families other than `frame-padding` in `near_miss_kinds` have no
   accepts yet (0/146); re-evaluate after the fleet's records accumulate.
+- Probe comparator (2026-08-30): a decompiled `switch` whose jump table the
+  baseline stub references via `%lo(jtbl_…)` reads as `immediate_drift` at
+  normalized similarity 1.0 — the C object resolves the section offset
+  numerically where the stub keeps a symbol relocation. Relocation-equivalent;
+  verified through the ROM gate (`517E0.c`
+  `func_80050DE4/80053230/800532F0`). The comparator should normalise
+  relocation-carried immediates.
+- Runner (2026-08-30): a gate batch that ends `no_candidate_accepted` after a
+  `probe_rejected` can still leave the winning candidate's bodies installed in
+  the tracked source (observed with the `517E0.c` switch batch above); check
+  `git diff` after a failed gate before re-probing the same owners.
+- Runner: `companion_edits` refuses an extern/prototype edit when the named
+  function is still a GLOBAL_ASM pragma owner, so callee-signature fixes in
+  file-scope externs cannot ride along with a candidate; they must be landed
+  as a separate ROM-verified edit first.
+- Build (2026-08-30): `make -C disasm COMPARE=1` fails in the host clang
+  syntax check on committed, unmodified code
+  (`fragments/44/fragment44_1F1850.c`: old-style definitions + a
+  too-few-arguments call, strict clang). `RUN_CC_CHECK=0` completes the ROM
+  compare until that file is cleaned up.
 
 Skip lists and unsolved shapes that are specific to one function or file
 live in that file's notes under `docs/regions/` and reach an agent through
