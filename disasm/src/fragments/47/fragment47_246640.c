@@ -248,7 +248,29 @@ void func_86002F5C(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_246640/func_86002FB4.s")
+extern u8 D_8600DE30[];
+extern void func_86000AE0(void);
+extern f64 func_87C00090(f64, f64, f64);
+extern void *func_87C00160(void *, void *, void *);
+extern f64 func_87C0068C(void *);
+extern f64 fragment48_main(f64);
+extern void func_860032DC(u8 *);
+void func_86002FB4(u8 *arg0) {
+    u8 sp28[0x18];
+    *(void (**)(void))(arg0 + 0x1824) = func_86000AE0;
+    *(f64 *)(arg0 + 0x1860) = func_87C00090(
+        *(f64 *)(arg0 + 0x1860),
+        *(f64 *)(D_8600DE30 + 0x88),
+        *(f64 *)(D_8600DE30 + 0x1F8) * *(f64 *)(*(u8 **)(arg0 + 0x1870) + 0x6890));
+    func_87C00160((u8 *)sp28 - 8, arg0, arg0 + 0x1878);
+    *(f64 *)sp28 = 0.0;
+    if (func_87C0068C((u8 *)sp28 - 8) < *(f64 *)(arg0 + 0x17C8) * 0.5) {
+        func_86003EFC(arg0, 5);
+    }
+    *(f64 *)(arg0 + 0x1858) = fragment48_main(
+        *(f64 *)(arg0 + 0x1860) + *(f64 *)(arg0 + 0x1858));
+    func_860032DC(arg0);
+}
 #endif
 
 #ifdef VERSION_US
