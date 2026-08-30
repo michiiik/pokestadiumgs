@@ -247,7 +247,28 @@ void func_86002F5C(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_246640/func_860032DC.s")
+extern f64 D_8600DED0;
+extern s32 func_8600472C(u8 *);
+extern s32 func_860047E8(u8 *);
+extern void func_86001924(void *);
+extern void func_800278C0(u16, u8, u8 *, f32);
+void func_860032DC(u8 *arg0) {
+    f32 value;
+    u16 mode;
+    value = -1.0f;
+    if (*(s32 *)(arg0 + 0x1828) == 5) return;
+    if (*(s32 *)(arg0 + 0x1828) == 7) return;
+    if (*(s32 *)(arg0 + 0x1828) == 8) return;
+    if (func_8600472C(arg0) != 0) value = 1.75f;
+    else if (func_860047E8(arg0) != 0) value = 1.0f;
+    else if (D_8600DED0 <= *(f64 *)(arg0 + 0x1860)) value = 1.25f;
+    if (value > 0.0f) {
+        mode = 0x4000;
+        func_86001924(arg0);
+        if (func_8600472C(arg0) != 0) mode = 0x4401;
+        func_800278C0(mode, arg0[0x1813], arg0 + 0x1890, value);
+    }
+}
 #endif
 
 #ifdef VERSION_US
