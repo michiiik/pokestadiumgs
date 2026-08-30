@@ -185,11 +185,23 @@ s32 func_86A0585C(f32 arg0, f32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/60/fragment60_code/func_86A0638C.s")
+extern s16 D_86A45264[];
+extern s32 MathUtil_Atan2s(f32, f32);
+void func_86A0638C(s32 arg0, f32 arg1, f32 arg2) {
+    if ((arg1 != 0.0f) || (arg2 != 0.0f)) {
+        D_86A45264[arg0] = (s16)((MathUtil_Atan2s(arg1, -arg2) + 0x3FFF) % 0xFFFF);
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/60/fragment60_code/func_86A06400.s")
+extern s16 D_86A45254[];
+extern s32 MathUtil_Atan2s(f32, f32);
+void func_86A06400(s32 arg0, f32 arg1, f32 arg2) {
+    if ((arg1 != 0.0f) || (arg2 != 0.0f)) {
+        D_86A45254[arg0] = (s16)((MathUtil_Atan2s(arg1, -arg2) + 0x3FFF) % 0xFFFF);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -387,7 +399,40 @@ void func_86A0B98C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/60/fragment60_code/func_86A0BB40.s")
+extern void *D_8009491C;
+extern u32 D_86A11184;
+extern u8 *D_86A11188;
+void func_86A0BB40(s32 arg0, s32 arg1) {
+    void *context;
+    s32 temp_v0;
+
+    if (arg0 == 5) {
+        context = D_8009491C;
+        temp_v0 = *(s32 *)((u8 *)context + 0x14);
+        switch (temp_v0) {
+        case 0:
+            gDPSetPrimColor(D_800D0510++, 0, 0, 0xFF, 0xFF, 0xFF, 0xFF);
+            gDPSetEnvColor(D_800D0510++, 0, 0, 0x9B, 0xFF);
+            break;
+        case 1:
+            gDPSetPrimColor(D_800D0510++, 0, 0, 0xFF, 0xFF, 0xFF, 0xFF);
+            gDPSetEnvColor(D_800D0510++, 0, 0x82, 0, 0xFF);
+            break;
+        case 2:
+            gDPSetPrimColor(D_800D0510++, 0, 0, 0xFF, 0xFF, 0xFF, 0xFF);
+            gDPSetEnvColor(D_800D0510++, 0x9B, 0, 0, 0xFF);
+            break;
+        case 3:
+            gDPSetPrimColor(D_800D0510++, 0, 0, 0xFF, 0xFF, 0xFF, 0xFF);
+            gDPSetEnvColor(D_800D0510++, 0xC3, 0x64, 0, 0xFF);
+            break;
+        }
+        gDPSetCombine(D_800D0510++, 0x30B3FF, 0x5FFEFE38);
+        gSPSegment(D_800D0510++, 0xF, func_8004CA60(D_86A11188));
+        gSPDisplayList(D_800D0510++, D_86A11184);
+        func_8003CD84();
+    }
+}
 #endif
 
 #ifdef VERSION_US
