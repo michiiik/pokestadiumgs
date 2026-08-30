@@ -76,7 +76,9 @@ Do not touch any other file's pragmas or run `make`.
    batch.json` (no `--gate`). Read the printed table and iterate on
    `mismatch_kind`, never on intuition: `register_allocation_only` → decl
    order/temps/widths; `immediate_drift` → offsets/strides/literal widths;
-   `section_layout_drift` → reject, needs a `.rodata` subsegment first;
+   non-text `section_layout_drift` → reject, needs a `.rodata` subsegment
+   first; `text_layout_drift` is recoverable owner-size/frame drift and should
+   remain eligible for a sequential gate after a body or verified-padding fix;
    `symbol_size_drift`/tail kinds → `C_FUNCTION_PADDING` or a `_padding` helper.
    The runner also records `prior_attempts`, `best_prior`, `futility`,
    `repeated_drift`, and a `first_diff_fingerprint` in probe stats. These are

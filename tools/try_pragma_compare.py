@@ -896,11 +896,14 @@ def _compare_link_shape(
     """Decide whether a ``.text`` match will also link byte-identically.
 
     Returns ``link_verified`` (``True``/``False``/``None`` for unknown) with a
-    ``link_mismatch`` reason.  ``section_layout_drift`` is *definitive*: an
-    added or resized allocatable section changes the ROM regardless of the
-    instruction bytes. ``section_content_drift`` and ``relocation_drift`` are
-    advisory for REL objects, so the caller keeps the candidate eligible for
-    the sequential ROM gate.
+    ``link_mismatch`` reason.  A non-text ``section_layout_drift`` is
+    *definitive*: an added or resized allocatable section changes the ROM
+    layout regardless of the instruction bytes.  A changed ``.text`` size is
+    reported separately as ``text_layout_drift`` because it is recoverable by
+    changing the owner body or verified padding; the caller keeps it eligible
+    for the sequential ROM gate. ``section_content_drift`` and
+    ``relocation_drift`` are advisory for REL objects, so the caller keeps the
+    candidate eligible for the sequential ROM gate.
     """
     if expected_shape is None or actual_shape is None or expected_symbol is None or actual_symbol is None:
         return {"link_verified": None, "link_mismatch": "shape_unavailable"}
@@ -917,6 +920,8 @@ def _compare_link_shape(
                 "link_mismatch": "section_layout_drift",
                 "link_detail": f"section {name} exists only in the {side} object",
             }
+        if name == ".text":
+            continue
         if int(expected["size"]) != int(actual["size"]):
             return {
                 "link_verified": False,
@@ -931,6 +936,28 @@ def _compare_link_shape(
                 "link_mismatch": "section_content_drift",
                 "link_detail": f"section {name} bytes differ",
             }
+    expected_text = expected_sections.get(".text")
+    actual_text = actual_sections.get(".text")
+    if (expected_text is None) != (actual_text is None):
+        side = "candidate" if expected_text is None else "baseline"
+        return {
+            "link_verified": False,
+            "link_mismatch": "section_layout_drift",
+            "link_detail": f"section .text exists only in the {side} object",
+        }
+    if (
+        expected_text is not None
+        and actual_text is not None
+        and int(expected_text["size"]) != int(actual_text["size"])
+    ):
+        return {
+            "link_verified": False,
+            "link_mismatch": "text_layout_drift",
+            "link_detail": (
+                f"section .text size 0x{int(expected_text['size']):x} -> "
+                f"0x{int(actual_text['size']):x}"
+            ),
+        }
     expected_relocations = _normalized_function_relocations(expected_shape, *expected_symbol)
     actual_relocations = _normalized_function_relocations(actual_shape, *actual_symbol)
     if expected_relocations != actual_relocations:

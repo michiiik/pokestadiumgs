@@ -1181,7 +1181,7 @@ class LinkShapeTests(unittest.TestCase):
         self.assertFalse(verdict["link_verified"])
         self.assertEqual(verdict["link_mismatch"], "section_layout_drift")
 
-    def test_text_size_difference_is_layout_drift(self) -> None:
+    def test_text_size_difference_is_recoverable_text_layout_drift(self) -> None:
         baseline = {
             "sections": {".text": _section_entry(".text", 8)},
             "section_names": {1: ".text"},
@@ -1197,7 +1197,8 @@ class LinkShapeTests(unittest.TestCase):
             "text": b"\x00" * 12,
         }
         verdict = runner._compare_link_shape(baseline, candidate, (0, 8), (0, 12))
-        self.assertEqual(verdict["link_mismatch"], "section_layout_drift")
+        self.assertEqual(verdict["link_mismatch"], "text_layout_drift")
+        self.assertFalse(verdict["link_verified"])
 
     def test_relocation_target_mismatch_is_relocation_drift(self) -> None:
         text = bytes.fromhex("0c000000 00000000")  # jal (addend 0); nop delay slot

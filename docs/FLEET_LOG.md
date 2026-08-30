@@ -13,6 +13,7 @@ Per-file spellings and skip lists are not here either — they live in
 | 2026-08-28 morning | 6 boxes on the text-segment files no session had touched for 19 h (`585D0` ×2, `14640`, `6E850`, `CE80`, `4AC10`) | 12 owners from ~295 variants, ~105k tokens/owner |
 | 2026-08-28 evening | 15 boxes on 9 fragment files, family unlocks + hand-off | 85 owners, ~20–30k tokens/owner on the productive files |
 | 2026-08-30 readiness-aware wave | 5 fresh-heavy, layout-ready fragment files with family hand-offs | 13 new owners, all link-verified and full-ROM gated; coverage 4,650 → 4,663 |
+| 2026-08-30 owner-explicit wave | 5 boxes with explicit fresh-owner lists | 6 new owners from 439 attempts; coverage 4,666 → 4,672 |
 
 A single hand session, for comparison, lands 4–5 owners/hour.
 
@@ -102,6 +103,33 @@ pass an explicit owner list from `targets --skip-ties`, carry each owner's
 `prior_attempts`, and keep family unlocks separate from register-tie/requeue
 work. The next wave should report accepted owners per file and candidate count
 per owner so a productive family is not mistaken for a productive file.
+
+## 2026-08-30 owner-explicit wave audit
+
+The five-box wave produced six exact owners from 439 recorded attempts: one in
+`fragment51_275E40.c`, three in `fragment69_code.c`, and two in
+`fragment79_3C40B0.c`. Every accepted owner was link-verified and passed the
+full-ROM gate. The final local coverage snapshot was 4,672 / 10,532 (44.4%).
+
+The attempt mix explains the apparent lack of progress: 356 were ordinary
+probe rejections, 44 were compiler failures, 17 were skipped candidates after
+an earlier gate winner, and only 16 were probe matches. Fragment69's direct
+global-lvalue/call-chain family and fragment79's masked-`u8` loop family each
+converted multiple owners; the accepted source-shape handoffs were the main
+yield multiplier.
+
+The failed boxes exposed three separate problems. Fragment46's first owner
+spent eight probes on duplicate/invalid declarations before 40 valid probes
+settled at 0.9444 normalized / 0.7778 raw. Fragment60 was blocked before a
+meaningful batch because fragment51 was dirty in the shared checkout. Across
+the wave, the runner also labeled recoverable `.text` size differences as
+`section_layout_drift`; the comparator now emits `text_layout_drift` for that
+case, leaving only non-text section layout changes as immediate prerequisites.
+
+Future waves should keep the one-function-until-terminal rule, but reserve a
+runner transaction per shared checkout (or give each agent an isolated
+worktree), validate declarations/types before spending a batch, and rank by
+owner-level family evidence rather than file freshness alone.
 
 ## What the numbers say
 

@@ -76,6 +76,14 @@ Coordinator rules:
 - Several sessions may use this checkout. Foreign modified `disasm/src` files
   or live `disasm/probes/.pragma_probe_*` trees mean another runner
   transaction is in flight: do not build, commit, or run the runner over it.
+- One source file per agent does not make a shared checkout safe for concurrent
+  runner work. The runner lock serializes its rewrite/restore and gate phases,
+  but another agent's installed, uncommitted source still makes a global gate
+  unsafe and can cause a clean agent to report `tooling-blocked`. Use isolated
+  worktrees/snapshots for concurrent runner agents; otherwise serialize runner
+  ownership and let the other agents do assembly-only preparation. If a
+  foreign source becomes dirty, stop before the next probe and preserve the
+  owner as `tooling-blocked` for a later box.
 - Commit your own finished work promptly and **by explicit path**; never sweep
   foreign edits into your commit.
 - Prefer one git worktree per session for tooling work. Worktrees fall back
@@ -149,9 +157,12 @@ Coordinator rules:
    `similarity_score`, `first_diff_*`, `link_verified`, `expected_tail_kind`)
    and act on the class: `register_allocation_only` → declaration order,
    temporaries, widths; `immediate_drift` → offsets, strides, literal widths;
-   `section_layout_drift` → definitive rejection (see 2.7); `symbol_size_drift`
-   / alignment tails → `#pragma C_FUNCTION_PADDING(n)` or a `<owner>_padding`
-   helper, only for verified layout bytes.
+   non-text `section_layout_drift` → definitive rejection (see 2.7);
+   `text_layout_drift` → recoverable owner-size/frame drift, so keep the
+   candidate eligible for a sequential gate after fixing the body or verified
+   padding; `symbol_size_drift` / alignment tails →
+   `#pragma C_FUNCTION_PADDING(n)` or a `<owner>_padding` helper, only for
+   verified layout bytes.
 6. Shared declarations for a batch go in the `declarations` argument, not in
    every candidate; `tools/dedupe_externs.py --apply --verify` cleans up
    duplicates left by earlier batches.
@@ -236,8 +247,10 @@ file at a time so declarations, structs and names accumulate in one place.
    `register_allocation_only` → declaration order, temporaries, widths;
    `immediate_drift` → offsets, strides, literal widths, frame padding;
    `symbol_size_drift` / tail kinds → `C_FUNCTION_PADDING` or a `_padding`
-   helper; a `section_layout_drift` on a `switch` → the file needs its
-   subsegment first. A `similarity_score` of 1.0 with different registers is
+   helper; a non-text `section_layout_drift` on a `switch` → the file needs
+   its subsegment first. A `text_layout_drift` is a recoverable owner-size
+   or frame mismatch; fix the body or verified padding before gating. A
+   `similarity_score` of 1.0 with different registers is
    an operand-order or declaration-order problem, not a semantic one.
 6. Gate the first probe hit (`gate: true`). Then name it if evidence exists
    (`python3 tools/name_decompiled.py plan`). If there is no hit, keep this
@@ -286,7 +299,8 @@ file at a time so declarations, structs and names accumulate in one place.
   gate is ~2 s incremental). Probe sources live under ignored `disasm/probes/`.
 - A `.text` hit is checked against the baseline object's link shape. Verified
   hits (`link_verified: true`) share one combined gate; unverified hits gate
-  sequentially; `section_layout_drift` is rejected immediately. Winners are
+  sequentially; non-text `section_layout_drift` is rejected immediately, but
+  `text_layout_drift` remains eligible for the sequential gate. Winners are
   installed incrementally; a winner that only conflicts in combination is
   reported `combined_compile_failed` and not retried alone.
 - A candidate whose only raw `.text` differences are recognized relocation
@@ -537,6 +551,16 @@ reaches an agent through `tools/file_brief.py`, not here.
   permutations and reconstruct the direct callee signature. A repeated
   argument-home fingerprint (`expected sw a1,4(sp)` vs `actual sll t6,a1,12`)
   likewise requires a new scheduling model, not more return-width variants.
+- Fleet (2026-08-30): the five-box owner-explicit wave produced 6 accepted
+  owners from 439 recorded attempts (356 probe rejections, 44 compiler
+  failures, 17 skipped gate entries, and 16 probe matches). Fragment69's
+  direct-lvalue family produced three accepts; fragment79 produced two; the
+  remaining fresh fragment46 owner spent 40 valid probes below a gateable
+  match. A foreign dirty source blocked fragment60 before meaningful probing.
+  The wave also exposed that the runner's old `section_layout_drift` label
+  included recoverable `.text` size changes; these are now reported as
+  `text_layout_drift`. Keep one-function persistence, but select only owners
+  with a valid first hypothesis and serialize runner work in a shared checkout.
 
 Skip lists and unsolved shapes that are specific to one function or file
 live in that file's notes under `docs/regions/` and reach an agent through
