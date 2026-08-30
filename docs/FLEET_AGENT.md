@@ -105,6 +105,10 @@ expected/actual size, first-diff offset, and expected vs actual instruction at
 that offset. A trailing verdict line per function names the best label and
 includes the link/futility context; it says "register tie — stop" when §2 step
 6's stop condition applies.
+`relocation_masked: true` means the raw object differed only in recognized
+relocation fields with identical relocation topology. It is deliberately
+`link_verified: false` and must pass the sequential full-ROM gate; never report
+the masked probe result itself as an acceptance.
 The persisted `prior_attempts` count is per owner across current, legacy, and
 rotated stats files; `best_prior` preserves the strongest prior normalized and
 raw scores. A first-diff fingerprint combines mismatch kind, location, and

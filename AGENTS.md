@@ -286,6 +286,11 @@ file at a time so declarations, structs and names accumulate in one place.
   sequentially; `section_layout_drift` is rejected immediately. Winners are
   installed incrementally; a winner that only conflicts in combination is
   reported `combined_compile_failed` and not retried alone.
+- A candidate whose only raw `.text` differences are recognized relocation
+  fields with identical relocation topology is reported with
+  `relocation_masked: true`. It is never link-verified from that comparison
+  and always goes through the sequential full-ROM gate; the mask is only
+  permission to run the authoritative gate, not acceptance evidence.
 - Results and stats carry `timing` (`probe_seconds`, `gate_seconds`,
   `gate_runs`, `gate_mode`) and `batch_status`. Tune batch size and workers
   from those, not from guesses. `PRAGMA_COMPILE_TIMEOUT`,
@@ -458,6 +463,12 @@ reaches an agent through `tools/file_brief.py`, not here.
 
 ## 5. Tooling backlog and recurring unsolved shapes
 
+- Runner (fixed 2026-08-30): raw object comparison previously rejected exact
+  source spellings when equivalent symbol-plus-addend forms changed only
+  relocatable immediate fields. The runner now promotes same-topology,
+  recognized relocation-field-only differences to an unverified sequential
+  full-ROM gate. An audit found seven high-similarity owners worth replaying;
+  `relocation_masked` must never be treated as `link_verified`.
 - Runner: `probe_unavailable` / `list index out of range` also reproduces on
   `func_82C04880` (`fragment83_code.c`) — same last-owner diagnostics bug,
   now five recorded instances.
