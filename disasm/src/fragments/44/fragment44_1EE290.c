@@ -130,7 +130,28 @@ void func_8AF00D90(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1EE290/func_8AF0118C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1EE290/func_8AF013D8.s")
+extern void func_800504BC(s16 *);
+extern void func_8AF0118C(s16, s16, void *);
+s32 func_8AF013D8(s32 mode, void *record) {
+    s16 values[2];
+    s16 first;
+    s16 second;
+    void *preserved;
+
+    preserved = record;
+    switch (mode) {
+    case 0:
+        *(u16 *)((u8 *)preserved + 2) = *(u16 *)((u8 *)preserved + 2) & 0xFFFD;
+        break;
+    case 1:
+        func_800504BC(values);
+        first = *(s16 *)((u8 *)preserved + 8) + values[0];
+        second = *(s16 *)((u8 *)preserved + 0xA) + values[1];
+        func_8AF0118C(first, second, preserved);
+        break;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1EE290/func_8AF0145C.s")
 
