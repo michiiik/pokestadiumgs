@@ -30,10 +30,11 @@ extern void func_8411DD8C(void *, void *);
 #else
 extern void func_8411DD8C(void);
 #endif
-void func_8411E084(void) {
 #ifdef CC_CHECK
-    func_8411DD8C((void *)0, (void *)0);
+void func_8411E084(void *arg0, void *arg1) {
+    func_8411DD8C(arg0, arg1);
 #else
+void func_8411E084(void) {
     func_8411DD8C();
 #endif
 }
@@ -175,10 +176,16 @@ s32 func_8411EF64(s32 arg0) {
     return D_84190418;
 }
 
+#ifdef CC_CHECK
+extern void func_8411E084(void *, void *);
+#else
 extern void func_8411E084(void);
+#endif
 extern f32 func_8411E1CC(u8 *arg0);
 f32 func_8411EF90(u8 *arg0) {
+#ifndef CC_CHECK
     extern void func_8411E084();
+#endif
     f32 values[2];
     f32 temp_fv1;
     f32 var_fa0;

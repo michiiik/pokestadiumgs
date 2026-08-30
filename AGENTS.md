@@ -542,7 +542,9 @@ reaches an agent through `tools/file_brief.py`, not here.
   syntax check on committed, unmodified code
   (`fragments/44/fragment44_1F1850.c`: old-style definitions + a
   too-few-arguments call, strict clang). `RUN_CC_CHECK=0` completes the ROM
-  compare until that file is cleaned up.
+  compare until that file is cleaned up. The same class in
+  `fragments/79/fragment79_38D510.c` was repaired on 2026-08-30 with the
+  file's own `#ifdef CC_CHECK` shim pattern (ROM compare verified).
 - Fleet (2026-08-30): a readiness-aware wave produced 13 new full-ROM-gated
   owners from five fresh-heavy, layout-ready fragment files, confirming that
   `READY_FRESH` is a better selection signal than the composite score. Do not
