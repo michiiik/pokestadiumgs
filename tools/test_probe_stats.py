@@ -21,6 +21,16 @@ import check_decomp_provenance as provenance  # noqa: E402
 
 
 class StatsPathTests(unittest.TestCase):
+    def test_git_head_replaces_malformed_utf8(self) -> None:
+        def run(command, **kwargs):
+            self.assertEqual(kwargs["encoding"], "utf-8")
+            self.assertEqual(kwargs["errors"], "replace")
+            decoded = b"abc\xff\n".decode(kwargs["encoding"], kwargs["errors"])
+            return mock.Mock(returncode=0, stdout=decoded)
+
+        with mock.patch.object(probe_stats.subprocess, "run", side_effect=run):
+            self.assertEqual(probe_stats._git_head(Path("/tmp/repo")), "abc\ufffd")
+
     def test_unset_env_resolves_to_new_default_location(self) -> None:
         with mock.patch.dict(os.environ, {}, clear=False):
             os.environ.pop("PRAGMA_PROBE_STATS", None)

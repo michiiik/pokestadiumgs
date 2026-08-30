@@ -682,6 +682,19 @@ class RunnerTests(unittest.TestCase):
         self.assertEqual(command[command.index("-I") + 1], "probes/.pragma_probe_x1/")
         self.assertIsNone(runner._parse_probe_recipe(":\n:\n"))
 
+    def test_compare_capture_replaces_malformed_utf8(self) -> None:
+        def run(command, **kwargs):
+            self.assertEqual(kwargs["encoding"], "utf-8")
+            self.assertEqual(kwargs["errors"], "replace")
+            # subprocess.run performs this decoding before returning text.
+            decoded = b"diagnostic \xff\n".decode(kwargs["encoding"], kwargs["errors"])
+            return mock.Mock(returncode=1, stdout=decoded)
+
+        with mock.patch.object(runner.subprocess, "run", side_effect=run):
+            result, output = runner._run_compare(Path("/tmp/repo"))
+        self.assertEqual(result, 1)
+        self.assertIn("diagnostic \ufffd", output)
+
     def test_probe_sources_compile_with_direct_recipe(self) -> None:
         repo_root = Path(__file__).resolve().parent.parent
         probe_root = runner._probe_root(repo_root)

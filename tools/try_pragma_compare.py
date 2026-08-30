@@ -174,7 +174,7 @@ def _command_timeout(environment_name: str, default: float) -> float:
 def _timeout_output(error: subprocess.TimeoutExpired) -> str:
     output = error.stdout if error.stdout is not None else error.output
     if isinstance(output, bytes):
-        output = output.decode(errors="replace")
+        output = output.decode(encoding="utf-8", errors="replace")
     return str(output or "")
 
 
@@ -312,6 +312,8 @@ def _probe_recipes(repo_root: Path) -> dict[str, list[str] | None]:
                 cwd=repo_root,
                 env=_object_build_environment(),
                 text=True,
+                encoding="utf-8",
+                errors="replace",
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 timeout=_command_timeout("PRAGMA_COMPILE_TIMEOUT", 120.0),
@@ -362,6 +364,8 @@ def _make_object(source_path: Path, *, capture: bool = False) -> tuple[int, Path
         "text": True,
     }
     if capture:
+        kwargs["encoding"] = "utf-8"
+        kwargs["errors"] = "replace"
         kwargs["stdout"] = subprocess.PIPE
         kwargs["stderr"] = subprocess.STDOUT
     command = ["make", "-C", "disasm", "PRAGMA_PROBE=1", object_rel]
@@ -465,6 +469,8 @@ def _run_compare(repo_root: Path) -> tuple[int, str]:
             cwd=repo_root,
             env=env,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             timeout=_command_timeout("PRAGMA_COMPARE_TIMEOUT", 300.0),
@@ -493,6 +499,8 @@ def _object_text(object_path: Path) -> bytes | None:
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
+            encoding="utf-8",
+            errors="replace",
         )
         if result.returncode != 0 or not output.exists():
             return None
@@ -506,6 +514,8 @@ def _object_symbol(object_path: Path, function: str) -> tuple[int, int] | None:
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         text=True,
+        encoding="utf-8",
+        errors="replace",
     )
     if result.returncode != 0:
         return None
@@ -596,6 +606,8 @@ def _readelf(object_path: Path, *flags: str) -> str | None:
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             timeout=_command_timeout("PRAGMA_OBJDUMP_TIMEOUT", 5.0),
         )
     except (OSError, subprocess.TimeoutExpired):
@@ -669,6 +681,8 @@ def _object_section_bytes(object_path: Path, section: str) -> bytes | None:
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
+            encoding="utf-8",
+            errors="replace",
         )
         if result.returncode != 0 or not output.exists():
             return None
@@ -1046,6 +1060,8 @@ def _disassemble_bytes(data: bytes) -> list[str]:
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 text=True,
+                encoding="utf-8",
+                errors="replace",
                 timeout=_command_timeout("PRAGMA_OBJDUMP_TIMEOUT", 5.0),
             )
         except (OSError, subprocess.TimeoutExpired):

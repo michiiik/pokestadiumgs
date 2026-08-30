@@ -200,6 +200,8 @@ def _git_head(repo_root: Path) -> str | None:
             ["git", "rev-parse", "--short", "HEAD"],
             cwd=repo_root,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             timeout=5,
