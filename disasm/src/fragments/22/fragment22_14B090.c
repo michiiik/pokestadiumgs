@@ -294,7 +294,11 @@ s32 arg1;
 
 extern void func_82702954();
 extern void func_82702A2C();
+#ifdef CC_CHECK
+extern void func_82702BC8(void *, s32);
+#else
 extern void func_82702BC8();
+#endif
 extern void func_82702CD8();
 void func_82702DF8(s16 *arg0) {
     s16 temp_v0;
@@ -308,7 +312,11 @@ void func_82702DF8(s16 *arg0) {
         func_82702A2C();
         return;
     case 3:
+#ifdef CC_CHECK
+        func_82702BC8((void *)0, 0);
+#else
         func_82702BC8();
+#endif
         return;
     case 4:
         func_82702CD8();
