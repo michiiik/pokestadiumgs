@@ -109,7 +109,56 @@ void func_86B01720(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/61/fragment61_code/func_86B052BC.s")
+extern void func_86B05194(void);
+extern u8 *func_87F025B8(u8 *, void (*)(void));
+extern void func_8003F1DC(u8 *);
+extern void func_8003F114(u8 *, s32, s32, s32);
+extern void func_8003F210(u8 *, s32);
+extern u8 D_86B12AD0;
+extern f32 D_80087E50[];
+extern f32 D_80088E50[];
+extern f32 D_86B0D17C;
+extern f32 D_86B0D178;
+extern f64 D_86B0DDE0;
+extern s32 D_86B0E19C;
+extern s32 D_86B0E1A0;
+void func_86B052BC(s32 arg0) {
+    u8 *object;
+    u8 *base;
+    f32 scale;
+    f32 factor;
+    s32 index;
+
+    object = func_87F025B8(&D_86B12AD0, func_86B05194);
+    if (object != NULL) {
+        *(s32 *)(object + 0x1C) = 0;
+        *(f32 *)(object + 0x48) = 0.0f;
+        *(f32 *)(object + 0x4C) = 0.0f;
+        *(f32 *)(object + 0x50) = 0.0f;
+        base = object + 0x24;
+        *(s32 *)(object + 0x20) = arg0;
+        scale = (f32)((f64)D_86B0D178 * D_86B0DDE0);
+        *(f32 *)(object + 0x5C) = scale;
+        *(f32 *)(object + 0x58) = scale;
+        *(f32 *)(object + 0x54) = scale;
+        func_8003F1DC(base);
+        switch (arg0) {
+        case 0:
+            func_8003F114(base, 0, -1, D_86B0E19C);
+            func_8003F210(base, 0);
+            break;
+        case 1:
+            index = ((guRandom() % 65535) & 0xFFFF) >> 4;
+            factor = 45.0f * D_86B0D17C;
+            *(f32 *)(object + 0x48) = D_80088E50[index] * factor;
+            *(f32 *)(object + 0x4C) = D_80087E50[index] * factor;
+            *(f32 *)(object + 0x50) = 0.0f;
+            func_8003F114(base, 0, -1, D_86B0E1A0);
+            func_8003F210(base, 0);
+            break;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
