@@ -21,3 +21,7 @@ No accepted owner. func_82501754 received 11 serial CC_CHECK-enabled candidates;
 ## Fleet box 2026-08-31: mapping helper requeued (2026-08-31)
 
 requeue: func_82501754 received 7 new serial CC_CHECK-enabled candidates. Best normalized/raw similarity was 0.8958/0.7500 at exact 192 bytes, with persistent instruction drift at offset 16: expected or v1,zero,zero versus actual lui a0,0. Next action: force a0/D_82508FCC address formation after the switch via an explicit call wrapper or separate post-branch assignment while preserving the scalar model and explicit (s16 *)D_82508680 cast.
+
+## Wave 11 handoff (2026-08-31)
+
+No accepted owner. func_82504524 received 12 CC_CHECK-enabled probes. Best normalized/raw similarity was 0.6400/0.1400; the persistent first mismatch is expected lui $a2 versus actual lui $a1. Next action is a declaration and global address model that places D_82508F68 in $a2 and D_82508680 in $a3. No link_verified candidate or ROM gate.
