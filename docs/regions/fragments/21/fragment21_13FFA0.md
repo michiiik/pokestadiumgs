@@ -17,3 +17,7 @@ requeue func_82501754: runner work was finally available; four probe batches and
 ## Fleet box 2026-08-31: mapping helper requeued (2026-08-31)
 
 No accepted owner. func_82501754 received 11 serial CC_CHECK-enabled candidates; best switch:scalar:boolean-init-before-flag was 0.8958 normalized / 0.7917 raw, exact 192-byte size, with instruction drift at offset 24: expected lui $t6 but actual or $a1,$zero,$zero. Next spelling: preserve the switch and scalar address model, but move boolean zero initialization after the flag-address/load scheduling point. Keep the prior ordinary-retry skip list unchanged.
+
+## Fleet box 2026-08-31: mapping helper requeued (2026-08-31)
+
+requeue: func_82501754 received 7 new serial CC_CHECK-enabled candidates. Best normalized/raw similarity was 0.8958/0.7500 at exact 192 bytes, with persistent instruction drift at offset 16: expected or v1,zero,zero versus actual lui a0,0. Next action: force a0/D_82508FCC address formation after the switch via an explicit call wrapper or separate post-branch assignment while preserving the scalar model and explicit (s16 *)D_82508680 cast.
