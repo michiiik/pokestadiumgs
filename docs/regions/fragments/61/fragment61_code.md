@@ -29,3 +29,7 @@ requeue func_86B0355C: 28 recorded attempts, best normalized 1.0000/raw 0.9216; 
 ## Tooling-blocked func_86B0B6CC (2026-08-30) (2026-08-30)
 
 tooling-blocked func_86B0B6CC: selected as the smallest zero-attempt gbi-macro owner (58 instructions). Assembly matches the established fragment60 func_86A0B8A4 shape: void func_86B0B6CC(s32 arg0, s32 arg1), s32 pad[2], s32 temp_v0, guard arg0 == 5, func_8004C990(0x133, 0), then gDPPipeSync, gDPSetEnvColor(0, 0, 0, 0x80), gDPSetCombine(0xFCFFD3FF, 0xFFFEFE38), gSPSegment(0xF, func_8004CA60((u8 *)temp_v0)), gSPDisplayList(D_86B0E7F4), and func_8003CD84. Prepared exact analog plus ABI/layout variants but ran no probes: foreign live installs remained in disasm/src/fragments/11/fragment11_E1E10.c and disasm/src/14640.c, making runner/build activity unsafe under the shared-checkout rules. Next action: when all foreign source installs are clean and no probe transaction is active, run the prepared gbi-macro batch; lead hypothesis is the fragment60 spelling above. No owner is exhausted.
+
+## 2026-08-31 fleet box acceptance (2026-08-31)
+
+Accepted func_86B0B6CC in the fleet box via the established fragment60 gbi-macro spelling. The runner reported three link-verified matches; the full make -C disasm COMPARE=1 gate ran with CC_CHECK enabled and produced checksum 1561c75d11cedf356a8ddb1a4a5f9d5d. The owner is committed in 44bfdb46. Keep the s32 arg0/s32 arg1, s32 pad[2], and s32 temp_v0 layout; use gDPPipeSync, gDPSetEnvColor, gDPSetCombine, gSPSegment, gSPDisplayList, and func_8003CD84 in the established order.

@@ -49,3 +49,7 @@ Untouched owners:
 - `func_865046A8`, `func_86508780`, `func_86501D6C`, `func_8650863C`, `func_8650455C`, `func_86509318`, `func_8650A278`, `func_86508890`, `func_86500D5C`, `func_86508484`, `func_86502B88`, `func_8650A3E4`, `func_8650A074`, `func_86509E54`, `func_86502958`, `func_86502720`, `func_86503938`, `func_86504EB0`, `func_86500020`, `func_86500EF8`, `func_86506B2C`, `func_86502D80`, `func_86500354`, `func_865020D8`, `func_865040E4`, `func_865059A0`, `func_86503B98`, `func_86500780`, `func_86505EA8`, `func_865064B0`, `func_86508C2C`, `func_86503178`, `func_86504740`, `func_86507AFC`, `func_8650952C`, `func_86501280`, and `func_86506E78`.
 
 Box result: 0 accepted owners, 1 durable requeue, 78 recorded attempts for the active owner, and no source-file changes. Foreign generated `COVERAGE.md` dirt was preserved.
+
+## 2026-08-31 fleet box requeue (2026-08-31)
+
+requeue func_86508B20: six new candidates; no link_verified hit or ROM gate. Best remains normalized/raw 0.9853/0.8824 with operand_or_scheduling_drift: expected sw $s4,40(sp), actual sw $s0,24(sp). Next action is to reconstruct selector lifetime and loop endpoint reuse to force the saved $s4 allocation; do not repeat pointer-declaration permutations.
