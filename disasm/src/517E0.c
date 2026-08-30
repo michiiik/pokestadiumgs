@@ -32,9 +32,44 @@ extern s32 D_800972B0[]; s32 func_80050CF8(s32 arg0){s32 result=0;if(arg0>=0&&ar
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80050E88.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80050F60.s")
+extern s32 func_80050D20(s32, s32);
+extern u8 D_801281C4[];
+extern u8 D_801281C8[];
+s32 func_80050F60(arg0, arg1)
+s32 arg0;
+s32 arg1;
+{
+    s32 temp_v0;
+    s32 var_a0;
+    s32 var_a2;
+    s32 var_v1;
+    temp_v0 = func_80050D20(0x11, arg1);
+    if (arg0 == 0) var_a2 = *(s32 *)(D_801281C4 + temp_v0 * 0xC);
+    else var_a2 = *(s32 *)(D_801281C8 + temp_v0 * 0xC);
+    if (arg1 > 0) {
+        var_v1 = arg1 - 1;
+    } else {
+        var_v1 = arg1;
+    }
+    var_a0 = var_a2;
+    if (temp_v0 == 2) var_a0 += var_v1 * 0x4D8;
+    else var_a0 += var_v1 * 0x4D8 + 0x1E00;
+    return var_a0;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051028.s")
+extern s32 func_80050D20(s32, s32);
+extern u8 D_801281C4[];
+extern u8 D_801281C8[];
+void *func_80051028(s32 arg0, s32 arg1) {
+    s32 idx = func_80050D20(0x12, -1);
+    void *result;
+    if (arg0 == 0) {
+        result = (void *)(*(s32 *)(D_801281C4 + idx * 0xC) + (arg1 * 0x20C) + 0x200);
+    } else {
+        result = (void *)(*(s32 *)(D_801281C8 + idx * 0xC) + (arg1 * 0x20C) + 0x200);
+    }
+    return result;
+}
 
 extern s32 func_80050D20(s32, s32);
 extern u8 D_801281C4[];
@@ -823,7 +858,24 @@ void func_80055DC4(s32 arg0, u8 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80056024.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800560F0.s")
+extern void func_80055EF0(void *, s32);
+s32 func_800560F0(s32 arg0) {
+    s32 result = 1;
+    u8 local[0x18];
+    s32 mode;
+    if (arg0 != 0) {
+        mode = 1;
+    } else {
+        mode = 0;
+    }
+    func_80055EF0((u8 *)local - 4, mode);
+    if ((((u8 *)local - 4)[6] & 1) != 1) result = 0;
+    if ((((u8 *)local - 4)[7] & 0xF) != 0xF) result = 0;
+    if ((((u8 *)local - 4)[8] & 0xF) != 0xF) result = 0;
+    if ((((u8 *)local - 4)[9] & 1) != 1) result = 0;
+    if ((*(u16 *)((u8 *)local - 2) & 0x100) == 0) result = 0;
+    return result;
+}
 
 s32 func_80056184(void *arg0) {
     s32 var_v1;
