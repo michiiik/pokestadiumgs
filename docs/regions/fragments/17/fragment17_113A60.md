@@ -13,3 +13,7 @@ requeue: The final ABI-shape batch added 4 probe-only candidates (cumulative 69 
 ## 2026-08-30 fleet box closure: permuter candidate rejected (2026-08-30)
 
 requeue: The final runner-mediated probe of the 600-second permuter best (score 90) was probe-only and rejected: expected_size=324, actual_size=324, 81/81 normalized instructions, but raw_similarity_score=0.7531, similarity_score=1.0 only because normalization hid register/field differences; mismatch_kind=immediate_drift with first_diff_offset=3, expected addiu $sp,$sp,-88 and actual addiu $sp,$sp,-112. link_verified was absent and no gate ran. The permuter candidate included a non-semantic empty if and is not installable. Cumulative owner evidence is 70 isolated runner probes plus two bounded permuter passes; func_822072D0 remains a requeue, with no source installation or accepted spelling.
+
+## Wave 6 handoff (2026-08-31)
+
+Wave 6 handoff: func_82209F50 unresolved after 10 serial CC_CHECK=1 probes. Best normalized/raw similarity was 1.0000/0.8902 with immediate_drift; expected frame -56 (0x38 bytes), actual -48. Next retry should force the 0x38-byte frame/local lifetime while preserving the m2c float expression and stack spills.
