@@ -177,7 +177,49 @@ void func_864018B0(u8 *arg0, u8 *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/52/fragment52_27E4E0/func_86401F60.s")
+extern f32 D_864099DC; extern f32 D_864099E0; extern f32 D_864099E4; extern f32 D_864099E8; extern f32 D_864099EC; extern f32 D_864099F0; extern f32 D_864099F4; extern f32 D_864099F8;
+s32 func_86401F60(void *arg0) {
+    f32 temp_fv0;
+    f32 temp_fv1;
+    s32 var_v1;
+
+    temp_fv0 = *(f32 *)((u8 *)arg0 + 0x48);
+    var_v1 = 0;
+    if (*(f32 *)((u8 *)arg0 + 0x48) <= D_864099DC) {
+        var_v1 = 0x200;
+    }
+    if (D_864099E0 <= *(f32 *)((u8 *)arg0 + 0x48)) {
+        var_v1 = (var_v1 | 0x100) & 0xFFFF;
+    }
+    temp_fv1 = *(f32 *)((u8 *)arg0 + 0x50);
+    if (temp_fv1 <= D_864099E4) {
+        var_v1 = (var_v1 | 0x800) & 0xFFFF;
+    }
+    if (D_864099E8 <= temp_fv1) {
+        var_v1 = (var_v1 | 0x400) & 0xFFFF;
+    }
+    if ((*(f32 *)((u8 *)arg0 + 0x48) <= -148.0f) &&
+        (D_864099EC <= *(f32 *)((u8 *)arg0 + 0x48)) &&
+        (temp_fv1 > -92.5f) && (temp_fv1 < 92.5f)) {
+        var_v1 = (var_v1 | 0x100) & 0xFFFF;
+    }
+    if ((*(f32 *)((u8 *)arg0 + 0x48) >= 148.0f) &&
+        (*(f32 *)((u8 *)arg0 + 0x48) <= D_864099F0) &&
+        (temp_fv1 > -92.5f) && (temp_fv1 < 92.5f)) {
+        var_v1 = (var_v1 | 0x200) & 0xFFFF;
+    }
+    if ((temp_fv1 <= -92.5f) && (D_864099F4 <= temp_fv1) &&
+        (*(f32 *)((u8 *)arg0 + 0x48) > -148.0f) &&
+        (*(f32 *)((u8 *)arg0 + 0x48) < 148.0f)) {
+        var_v1 = (var_v1 | 0x400) & 0xFFFF;
+    }
+    if ((temp_fv1 >= 92.5f) && (temp_fv1 <= D_864099F8) &&
+        (*(f32 *)((u8 *)arg0 + 0x48) > -148.0f) &&
+        (*(f32 *)((u8 *)arg0 + 0x48) < 148.0f)) {
+        var_v1 = (var_v1 | 0x800) & 0xFFFF;
+    }
+    return var_v1;
+}
 #endif
 
 #ifdef VERSION_US
