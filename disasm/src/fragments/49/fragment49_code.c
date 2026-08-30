@@ -521,7 +521,54 @@ void func_86107A10_padding(void) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86108018.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_861086AC.s")
+extern Gfx *D_800D0510;
+extern s32 D_8610AD20;
+extern void func_800088DC(void);
+extern void GfxImage_FillCurrent(void *, u16);
+extern void func_8000766C(void *, s32, s32, s32, s32);
+extern s32 func_87F00930(void);
+extern void GeoRender_AdvanceFrameCounter(void);
+extern void func_8003C6B8(s32);
+extern void func_86108018(void);
+extern void func_87F0A5BC(u8 *);
+extern void func_87F07FE8(u8 *);
+extern void func_87F022F0(void);
+extern void func_87F01D44(void);
+extern void func_87F0C88C(u8 *);
+extern void func_80008648(void);
+void func_861086AC(void) {
+    s32 flags;
+    func_800088DC();
+    GfxImage_FillCurrent(&D_800D0510, 1);
+    func_8000766C(&D_800D0510, 0, 0, 0x140, 0xF0);
+    if (func_87F00930() == 0) {
+        GeoRender_AdvanceFrameCounter();
+    }
+    func_8003C6B8(*(s32 *)((u8 *)D_8610AD20 + 0x38));
+    if (*(s32 *)((u8 *)D_8610AD20 + 0x3C) == 5) {
+        func_86108018();
+        if (*(s32 *)((u8 *)D_8610AD20 + 0x97DC) != 0) {
+            func_87F0A5BC((u8 *)D_8610AD20 + 0x9704);
+        }
+        flags = *(s32 *)((u8 *)D_8610AD20 + 0x97E0);
+    } else {
+        flags = *(s32 *)((u8 *)D_8610AD20 + 0x97E0);
+        if (!(flags & 1)) {
+            func_86108018();
+            flags = *(s32 *)((u8 *)D_8610AD20 + 0x97E0);
+        }
+    }
+    if (flags & 1) {
+        func_87F07FE8((u8 *)D_8610AD20 + 0x44);
+        flags = *(s32 *)((u8 *)D_8610AD20 + 0x97E0);
+    }
+    if (flags & 2) {
+        func_87F022F0();
+    }
+    func_87F01D44();
+    func_87F0C88C((u8 *)D_8610AD20 + 0x2C);
+    func_80008648();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_8610880C.s")
 
