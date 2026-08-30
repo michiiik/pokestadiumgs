@@ -9,3 +9,7 @@ Accepted func_8AB0F484 with call-sequence:counter-threshold:pointer-global: s32 
 ## Fleet box 2026-08-31: threshold helper requeued (2026-08-31)
 
 No accepted owner. func_8AB0D4BC received 5 probes plus 45 seconds of permuter time; best was 0.9487 normalized similarity with a 24-byte frame and an s16 temporary, still operand_or_scheduling_drift. Next spelling: hoist func_8AB023EC(0x64) into the s16 temporary while preserving the existing threshold/map structure. Keep deferred func_8AB0E21C, func_8AB0E280, func_8AB0F518, func_8AB0E8B4 and jump-table func_8AB0E0F4/func_8AB0DFC0 skipped.
+
+## Wave 10 handoff (2026-08-31)
+
+No accepted owner. func_8AB0EF44 was tooling-blocked after two candidate attempts failed CFE parser compilation before semantic scoring. No source, link verification, or ROM gate. Next action is to repair the runner/parser cascade involving generated assembly placeholders, then retry the raw-global dispatcher candidate.
