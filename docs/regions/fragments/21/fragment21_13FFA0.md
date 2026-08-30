@@ -13,3 +13,7 @@ tooling-blocked (2026-08-30 14:00Z, resumed box): no candidate was submitted and
 ## 2026-08-31 tooling-blocked-owner requeue (2026-08-31)
 
 requeue func_82501754: runner work was finally available; four probe batches and 19 candidates were attempted. Best switch:scalar:ternary-bool reached normalized/raw 0.9167/0.6042 with exact 192/192-byte size, but no link_verified candidate or ROM gate. Compile failures confirmed D_82508680 needs an s32 address model with explicit (s16 *) casting. Next action is to preserve the switch mapping while targeting register allocation around lhu/result initialization and the boolean temporary.
+
+## Fleet box 2026-08-31: mapping helper requeued (2026-08-31)
+
+No accepted owner. func_82501754 received 11 serial CC_CHECK-enabled candidates; best switch:scalar:boolean-init-before-flag was 0.8958 normalized / 0.7917 raw, exact 192-byte size, with instruction drift at offset 24: expected lui $t6 but actual or $a1,$zero,$zero. Next spelling: preserve the switch and scalar address model, but move boolean zero initialization after the flag-address/load scheduling point. Keep the prior ordinary-retry skip list unchanged.
