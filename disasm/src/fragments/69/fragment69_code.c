@@ -470,7 +470,33 @@ void func_8F1029CC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/69/fragment69_code/func_8F102A98.s")
+extern s32 func_80041FD0(s32, u16, Fragment69PackedState, s32);
+void func_8F102A98(void) {
+    s32 previous;
+    s32 var_a3;
+
+    previous = D_8F1DEE5C;
+    if ((*(u16 *)((u8 *)D_80087200 + 0xC)) & 0x200) {
+        D_8F1DEE5C--;
+        if (D_8F1DEE5C < 0) {
+            D_8F1DEE5C = 0;
+        }
+    }
+    if ((*(u16 *)((u8 *)D_80087200 + 0xC)) & 0x100) {
+        D_8F1DEE5C++;
+        if (D_8F1DEE5C >= 2) {
+            D_8F1DEE5C = 1;
+        }
+    }
+    if (previous != D_8F1DEE5C) {
+        if (D_8F1DEE5C != 0) {
+            var_a3 = 1;
+        } else {
+            var_a3 = 0;
+        }
+        func_80041FD0(D_8F1DECA0, D_8F1DEE26, *(Fragment69PackedState *)&D_8F1DEE44, var_a3);
+    }
+}
 #endif
 
 #ifdef VERSION_US
