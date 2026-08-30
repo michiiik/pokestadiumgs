@@ -4436,7 +4436,22 @@ void geo_layout_cmd_jump(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FC34.s")
+extern s16 D_8012651A;
+extern s32 D_80126458[];
+extern void * func_80003240();
+void func_8003FC34(void)
+{
+    s32 new_var;
+    s32 i = D_8012651A;
+    s32 p = D_80126520;
+    new_var = p;
+    D_80126458[i] = p + 8;
+    if (D_80126520)
+    {
+    }
+    D_8012651A = i + 1;
+    D_80126520 = (s32)func_80003240(*((s32 *) (*((s32 **) (new_var + 4)))));
+}
 #endif
 
 #ifdef VERSION_US
