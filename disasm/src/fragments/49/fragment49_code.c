@@ -14,7 +14,34 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86100418.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_8610068C.s")
+extern s32 D_8610AD20;
+extern s32 func_87F08208(void *);
+extern void StageContext_SetClearColor(s32);
+extern void StageFade_StartFromTransparent(s32);
+extern void func_800225C4(s32);
+extern void func_800226C0(s32);
+extern void func_800279C4(s32);
+extern void func_861094BC(s32 arg0);
+extern void func_87F0277C(s32);
+void func_8610068C(void) {
+    s32 temp_v0;
+
+    func_87F0277C(D_8610AD20 + 0x7C);
+    temp_v0 = func_87F08208((void *)(u32)(D_8610AD20 + 0x44));
+    switch (temp_v0) {
+    case 1:
+        StageContext_SetClearColor(0xFFFF);
+        StageFade_StartFromTransparent(0x14);
+        *(s32 *)((u8 *)(u32)D_8610AD20 + 0x3C) = 2;
+        func_800225C4(0x28);
+        func_800279C4(0xCF0B);
+        return;
+    case 2:
+        func_861094BC(0);
+        func_800226C0(3);
+        return;
+    }
+}
 
 extern s32 D_8610AD20;
 extern s32 StageContext_GetFadeMode(void);
@@ -97,7 +124,33 @@ s32 func_86100B34(s32 arg0, void *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86100BE0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86100CFC.s")
+extern s32 D_8610AD20;
+extern f32 D_8610AAAC;
+extern f32 D_8610AAB0;
+extern f32 D_8610AAB4;
+void func_86100CFC(void *arg0) {
+    f32 temp_fv1;
+    f32 var_fv0;
+    void *temp_v0;
+
+    temp_v0 = (void *)((u8 *)arg0 + 0x24);
+    if (*(s32 *)((u8 *)(u32)D_8610AD20 + 0x3C) == 4) {
+        var_fv0 = D_8610AAAC;
+    } else {
+        var_fv0 = D_8610AAB0;
+    }
+    if (*(f32 *)((u8 *)temp_v0 + 0x28) < var_fv0) {
+        *(f32 *)((u8 *)temp_v0 + 0x28) = var_fv0;
+        temp_fv1 = *(f32 *)((u8 *)arg0 + 0x14);
+        if (temp_fv1 < 0.0f) {
+            *(f32 *)((u8 *)arg0 + 0x14) = temp_fv1 * -0.5f;
+        }
+    }
+    if (D_8610AAB4 < *(f32 *)((u8 *)temp_v0 + 0x28)) {
+        *(f32 *)((u8 *)temp_v0 + 0x28) = D_8610AAB4;
+        *(f32 *)((u8 *)arg0 + 0x14) = *(f32 *)((u8 *)arg0 + 0x14) * (f32)0;
+    }
+}
 
 void func_86100DA8(void *arg0) {
     if ((*(f32 *)((u8 *)(arg0) + (0x10))) < -15.0f) {
