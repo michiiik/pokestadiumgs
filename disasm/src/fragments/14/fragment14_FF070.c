@@ -481,7 +481,26 @@ s32 func_8130BFCC(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130C14C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130C270.s")
+extern f32 func_816092FC(void);
+extern void func_8130B12C(void *arg0);
+s32 func_8130C270(void *arg0) {
+    struct S { u8 pad0[0xE8F8]; f32 value; u8 gap0[0x16]; u8 state; u8 gap1[2]; u8 count; };
+    struct S *s = arg0;
+    f32 delta = func_816092FC();
+    f32 step = delta / 8;
+    if (s->value + step < (f32)s->count) {
+        s->value = s->value + step;
+    } else {
+        if ((f32)s->count < s->value - step) {
+            s->value = s->value - step;
+        } else {
+            s->value = (f32)s->count;
+            s->state = 2;
+        }
+    }
+    func_8130B12C(arg0);
+    return 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130C334.s")
 
