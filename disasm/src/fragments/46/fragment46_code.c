@@ -382,7 +382,47 @@ s32 func_8AE028B0(s32 arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE028F8.s")
+typedef struct { u8 pad0[0x20]; void *unk20; u8 pad24[4]; u8 unk28; u8 pad29[3]; u32 unk2C; } Fragment46Owner028F8;
+typedef struct { u16 unk0; u8 pad2[2]; void *unk4; } State028F8;
+extern u8 D_8AE07A9C[];
+extern u8 D_8AE07AB4[];
+extern State028F8 D_8AE07ACC;
+extern s16 D_8AE084F4;
+extern s16 D_8AE084F6;
+s32 func_8AE028F8(s32 arg0, Fragment46Owner028F8 *arg1) {
+    Fragment46Owner028F8 *temp_v0;
+    temp_v0 = arg1->unk20;
+    switch (arg0) {
+    case 0:
+        D_8AE07ACC.unk0 = 1;
+        D_8AE07ACC.unk4 = D_8AE07A9C;
+        temp_v0->unk2C = 0xC8C8FAC8;
+        temp_v0->unk28 = 1;
+        break;
+    case 1:
+        switch (D_8AE084F4) {
+        case 1:
+            D_8AE07ACC.unk0 = 0;
+            D_8AE07ACC.unk4 = D_8AE07AB4;
+            break;
+        case 2:
+            D_8AE07ACC.unk0 = 0;
+            D_8AE07ACC.unk4 = D_8AE07A9C;
+            break;
+        default:
+            D_8AE07ACC.unk0 = 1;
+            break;
+        }
+        break;
+    }
+    if (D_8AE084F6 > 0) {
+        D_8AE084F6 -= 1;
+    }
+    if (D_8AE084F6 == 0) {
+        D_8AE084F4 = 0;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
