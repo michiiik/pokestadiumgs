@@ -9,3 +9,9 @@ Adding a **second formal** to an already-accepted one-parameter function costs +
 ## Unsolved shape: branch-likely null guard (AGENTS.md §5) (2026-08-28)
 
 A leading null/zero guard that IDO emits as a branch-likely (`bnel`/`beql`) where every C spelling produces a plain `bne` -- `func_84112418`. The §4 guard-polarity row does not cover it.
+
+## Box handoff (2026-08-30)
+
+Accepted through link-verified full-ROM gates in this box: `func_84110F64`, `func_84113920`, `func_84113C54`, `func_8411957C`, `func_8411B304`, `func_8411A258`, `func_84116548`, `func_84116980`, and `func_8411A19C`. The `func_8411DC80` first formal was corrected to `u16` in its existing call sites after its `andi 0xFFFF` mask was confirmed by assembly.
+
+- **requeue:** `func_8411D0A0` remains unresolved after initializer, raw-pointer, and temporary/declaration-order hypotheses plus a bounded permuter run. Best probe: normalized similarity `1.0000`, raw similarity `0.8478`; mismatch kind `register_allocation_only`; first diff instruction 24, expected `lui v1, ...` and produced `lui v0, ...` (the following `D_84191208`/`D_8419120C` pointer registers are swapped). Next action: try a materially different register-allocation spelling for the two post-call global pointer clears, then gate only a link-verified hit.

@@ -802,7 +802,7 @@ extern void func_8410DFC4(u8 *, void *);
 extern void func_8410E688(u8 *arg0, void *arg1);
 extern void func_8410E7D0(u8 *arg0, void *arg1);
 extern s32 func_8411DC80(u16, s32 *, s32);
-void func_84110F64(u8 *arg0, s32 arg1) {
+void BattleAnim_ModelDispatch_009(u8 *arg0, s32 arg1) {
     s32 index;
 
     index = func_8411E1F8(arg1);
@@ -1485,7 +1485,7 @@ void BattleAnim_Dispatch_001(u8 *arg0) {
 extern f32 D_84188FEC;
 extern void func_84112158(s32, s32);
 extern void func_841136E8(u8 *);
-void func_84113C54(u8 *arg0) {
+void BattleAnim_Dispatch_190(u8 *arg0) {
     s32 index;
 
     if ((func_841139D0(arg0) == 0) && (*(s16 *)(arg0 + 0x40) != 0)) {
@@ -1844,7 +1844,7 @@ extern void func_84111348(s32 arg0, s32 arg1);
 extern void func_84111C44(void);
 extern void func_841126C8(s32 arg0);
 extern void func_84112EDC(u8 *);
-void func_84116548(u8 *arg0) {
+void BattleAnim_Dispatch_156(u8 *arg0) {
     func_841139D0(func_8411E164((s32)arg0));
     if (func_800427B8(*(s32 *)(arg0 + 0x5C0)) != 0) {
         func_841126C8((s32)arg0);
@@ -1913,7 +1913,7 @@ extern void func_841126C8(s32 arg0);
 extern s32 func_84113430(s32 arg0);
 extern void func_841168A0(u8 *arg0);
 extern void func_8411FEE8(s32);
-void func_84116980(u8 *arg0) {
+void BattleAnim_Dispatch_114(u8 *arg0) {
     if (func_84113430((s32)arg0) != 0) {
         func_84112EAC(arg0);
         *(u8 *)(arg0 + 0x7F6) = 0;
@@ -2207,7 +2207,7 @@ extern f32 D_84188FEC;
 extern void func_84111348(s32 arg0, s32 arg1);
 extern s32 func_84113430(s32 arg0);
 extern void func_8411FEE8(s32);
-void func_8411957C(u8 *arg0) {
+void BattleAnim_Dispatch_199(u8 *arg0) {
     if (*(s8 *)(arg0 + 0x7F6) != 1) {
         if (func_84113430((s32)arg0) != 0) {
             *(s16 *)(arg0 + 0x7E8) = 0;
@@ -2269,7 +2269,7 @@ extern void func_84111348(s32 arg0, s32 arg1);
 extern void func_841126C8(s32 arg0);
 extern s32 func_84113430(s32 arg0);
 extern void func_8411FEE8(s32);
-void func_8411A19C(u8 *arg0) {
+void BattleAnim_Dispatch_142(u8 *arg0) {
     s32 index;
 
     if (func_84113430((s32)arg0) != 0) {
@@ -2291,7 +2291,7 @@ void func_8411A19C(u8 *arg0) {
 
 #ifdef VERSION_US
 extern void func_8410890C(s32, s32);
-void func_8411A258(s32 arg0) {
+void BattleAnim_Dispatch_143(s32 arg0) {
     if (func_841133EC(arg0) != 0) return;
 
     BattleAnim_Dispatch_002((u8 *)arg0);
@@ -2593,7 +2593,7 @@ extern void func_84111348(s32 arg0, s32 arg1);
 extern void func_84112158(s32, s32);
 extern void func_841126C8(s32 arg0);
 extern s32 func_84113430(s32 arg0);
-void func_8411B304(u8 *arg0) {
+void BattleAnim_Dispatch_079(u8 *arg0) {
     if (func_84113430((s32)arg0) == 0) {
         return;
     }

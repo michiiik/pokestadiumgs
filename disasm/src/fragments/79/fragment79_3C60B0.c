@@ -110,7 +110,7 @@ void BattleAnim_ResetSharedEffectMatrix(void) {
 
 #ifdef VERSION_US
 extern void func_8415A9E4(s32, s32, s32);
-void func_84156BD4(void) {
+void BattleAnim_StartEffect34TerrainGrid_Init(void) {
     u8 pad[8];
     f32 sp1C;
 
@@ -329,7 +329,7 @@ void BattleAnim_StartEffect33Radial20_Draw(void) {
 
 #ifdef VERSION_US
 extern void func_8415BBA0(f32, f32, s32, s32, s32, s32, s32, s32, s32, s32);
-void func_84157650(void) {
+void BattleAnim_EndEffect32Radial20_Init(void) {
     s32 sp3C;
     f32 sp38;
     f32 sp34;
@@ -356,7 +356,7 @@ void BattleAnim_EndEffect32Radial20_Draw(void) {
 
 #ifdef VERSION_US
 extern void func_8415BBA0(f32, f32, s32, s32, s32, s32, s32, s32, s32, s32);
-void func_84157740(void) {
+void BattleAnim_EndEffect33Radial20_Init(void) {
     s32 sp3C;
     f32 sp38;
     f32 sp34;

@@ -450,7 +450,7 @@ extern void func_80047610(void);
 extern void Gfx_FreeDisplayListBuffers(void);
 extern void func_8FC02248(void);
 extern void func_8FC0231C(s32 arg0);
-s32 func_8FC02368(s32 arg0, s32 arg1) {
+s32 fragment84_main(s32 arg0, s32 arg1) {
     s32 sp24;
 
     main_pool_push_state(0x52434544);
