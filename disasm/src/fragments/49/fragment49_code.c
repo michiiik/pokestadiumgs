@@ -120,7 +120,13 @@ s32 func_86100B34(s32 arg0, void *arg1) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86100BA0.s")
+extern Gfx *D_800D0510;
+s32 func_86100BA0(s32 arg0, void *arg1) {
+    if (arg0 == 2) {
+        gDPSetScissor(D_800D0510++, 0, 0, 10, 320, 230);
+    }
+    return 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86100BE0.s")
 
@@ -436,7 +442,24 @@ void func_86105928(f32 *arg0) { f32 zero; f32 value; zero = 0.0f; value = D_8610
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86105CD8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86105F68.s")
+extern Gfx *D_800D0510;
+extern void *D_8009491C;
+extern s32 func_8004C990(s32, s32);
+extern u8 *func_8004CA60(u8 *);
+extern void func_8003CD84(void);
+void func_86105F68(s32 arg0, s32 arg1) {
+    void *context;
+    void *temp_v0;
+    if (arg0 == 5) {
+        context = D_8009491C;
+        temp_v0 = *(void **)((u8 *)context + 0x14);
+        gDPPipeSync(D_800D0510++);
+        gSPSegment(D_800D0510++, 0xF, func_8004CA60((u8 *)func_8004C990(0xDD, *(s32 *)temp_v0)));
+        gDPSetCombine(D_800D0510++, 0xFFFFFF, 0xFFFCF238);
+        gSPDisplayList(D_800D0510++, *(void **)((u8 *)(u32)D_8610AD20 + 0x6E0));
+        func_8003CD84();
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86106044.s")
 
