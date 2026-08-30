@@ -9,3 +9,7 @@ func_86300DD4 remains requeue after box expiry; no accepted candidate and no ROM
 ## 2026-08-31 fleet box requeue (2026-08-31)
 
 requeue func_86300DD4: two candidates were attempted; one had a malformed scratch label and one was rejected, so no gate ran. Best new result was normalized/raw 0.8947/0.6316, operand_or_scheduling_drift, 292 expected versus 304 actual bytes, first diff offset 25 (expected lui $a2, actual lui $v0). Next action is to preserve the proven 0x40 frame while finding a loop form that emits slt -> mul.s -> bnel; avoid added declarations or explicit temporaries that inflate the frame.
+
+## 2026-08-31 successor box requeue (2026-08-31)
+
+requeue func_86300DD4: four valid probes, no link_verified candidate or ROM gate. Best improved to normalized/raw 0.9324/0.6757, 292 expected versus 296 actual bytes, with the recurring operand/scheduling drift at offset 25: expected lui $a2, actual lui $v0. Tried for increment-expression, do-loop increment-before-multiply, stores-before-state, and post-increment condition forms. Next action is declaration/allocation ordering that keeps D_863075D8 in $a2 while preserving the 0x40 frame.

@@ -5,3 +5,7 @@ Per-file spellings, skip lists, and unsolved shapes for this source file. Delive
 ## 2026-08-31 fleet box requeue (2026-08-31)
 
 requeue func_8AB02240: eight candidates across macro, loop, frame, and ABI hypotheses; no link_verified hit or ROM gate. Best normalized/raw similarity was 0.8676/0.7353 with operand_or_scheduling_drift: expected 268 bytes/67 instructions versus actual 272/68, first diff expected sw $a3,68(sp) versus actual sw $a0,56(sp); expected sll/sra $a3 before gDPSetEnvColor while actual used andi directly. Next action is to resolve the caller/helper ABI and formal-width ordering, especially arg3 and func_8AB01FC8.
+
+## 2026-08-31 successor box requeue (2026-08-31)
+
+requeue func_8AB02240: eight materially different ABI/local candidates; no link_verified candidate or ROM gate. Best was normalized/raw 0.8696/0.7101, 268 expected versus 276 actual bytes, first diff expected sw $s3,40(sp) versus actual sw $t6,0($s5). The helper is strongly indicated as six s16 parameters; next action is to model the pre-macro $s3 sign-extension/local lifetime and exact declaration order.
