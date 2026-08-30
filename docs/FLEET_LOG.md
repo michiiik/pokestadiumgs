@@ -83,6 +83,26 @@ Other terminal cases were explicit register ties or frame-layout mismatches.
 These owners were recorded as requeues with fingerprints rather than being
 counted as fresh work.
 
+## 2026-08-30 Wave 2 owner-level result
+
+The following five-box wave used the readiness-aware file ranking and produced
+three new exact owners: one in `fragment53_code.c` and two in
+`fragment61_code.c`. Coverage moved from 4,663 to 4,666. The accepted owners
+all reported `link_verified=true` and passed the full ROM gate; the final suite
+and `COMPARE=1` build also remained green.
+
+The zero-yield boxes show the remaining selection gap. `fragment47_246640.c`
+was file-ready but its gbi family led to 52 probes on register-tie and padded
+`V4` frame owners with no acceptance. `fragment24_150C10.c` selected a fresh
+owner but its best result was a section/frame drift (`0xB8` expected versus
+`0xC0` actual), not a useful semantic near miss. Fragment 55 likewise
+contained several already-exhausted gbi allocation fingerprints. File-level
+`READY_FRESH` is therefore necessary but not sufficient: the coordinator must
+pass an explicit owner list from `targets --skip-ties`, carry each owner's
+`prior_attempts`, and keep family unlocks separate from register-tie/requeue
+work. The next wave should report accepted owners per file and candidate count
+per owner so a productive family is not mistaken for a productive file.
+
 ## What the numbers say
 
 - **Family unlocks carry the yield.** Half the morning's accepts came from one
