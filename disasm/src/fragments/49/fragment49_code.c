@@ -626,7 +626,37 @@ void func_86109864(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86109AE0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86109D64.s")
+extern Gfx *D_800D0510;
+extern void *D_8009491C;
+extern u8 D_8610A224[];
+extern void func_8003CD84(void);
+typedef struct {
+    u8 prim_r;
+    u8 prim_g;
+    u8 prim_b;
+    u8 prim_a;
+    u8 env_r;
+    u8 env_g;
+    u8 env_b;
+    u8 env_a;
+} Func86109D64Color;
+void func_86109D64(s32 arg0, s32 arg1) {
+    u8 *context;
+    void *record;
+    Func86109D64Color *color;
+    if (arg0 == 5) {
+        context = (u8 *)D_8009491C;
+        record = *(void **)(context + 0x14);
+        color = (Func86109D64Color *)(D_8610A224 + (*(u8 *)((u8 *)record + 0x10) << 3));
+        gDPPipeSync(D_800D0510++);
+        gDPSetCombine(D_800D0510++, 0x30E7FF, 0x5FFE9E38);
+        gDPSetPrimColor(D_800D0510++, 0, 0, color->prim_r, color->prim_g, color->prim_b, color->prim_a);
+        gDPSetEnvColor(D_800D0510++, color->env_r, color->env_g, color->env_b, color->env_a);
+        gSPSegment(D_800D0510++, 0xF, *(void **)((u8 *)record + 4));
+        gSPDisplayList(D_800D0510++, *(void **)record);
+        func_8003CD84();
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86109EAC.s")
 
