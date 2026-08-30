@@ -29,6 +29,13 @@ Coordinator rules:
   --source <file>`. If the owners cluster on a shared `jal` target or carry
   a `gbi-macro` tag, the agent's first job is that family, not the file's
   smallest owner (`unlock --function <callee>` shows what a helper unblocks).
+- `rank-files` is a file-level signal, not permission to choose any owner in
+  that file. Before assigning a fresh slot, run
+  `python3 tools/pragma_targets.py targets --source <file>` and choose an
+  owner with `prior_attempts < 5`, unless the slot is explicitly the oldest
+  documented `requeue` or a near-miss/permuter follow-up. A shared family
+  unlock never overrides an owner history: do not spend a fresh box on a
+  100+ attempt owner merely because its file has fresh siblings.
 - The agent prompt is: "Read `docs/FLEET_AGENT.md`; your file is
   `disasm/src/<X>.c`; time box N minutes." Everything file-specific comes
   from `docs/regions/<path>.md`, which `tools/file_brief.py` prints to the
@@ -47,6 +54,11 @@ Coordinator rules:
   two-accept yield rule is a ranking signal, not an owner-resolution rule.
   Hand every successor the predecessor's winning spellings, diagnostics, and
   explicit next hypothesis.
+- A candidate batch must be preflighted against the selected source. Candidate
+  names must still own active `GLOBAL_ASM` pragmas; companion edits may target
+  only an existing accepted C definition/prototype and may not target a
+  candidate owner. Invalid-owner or invalid-companion diagnostics are process
+  evidence and must not consume a hypothesis budget.
 - Never introduce a rule through a mid-task message: an agent cannot verify a
   message, and three have refused one as prompt injection. Commit the rule to
   `docs/FLEET_AGENT.md` or this file, then send a pointer to the sha. Messages

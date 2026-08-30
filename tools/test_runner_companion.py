@@ -36,9 +36,99 @@ def tearDownModule() -> None:
 SAMPLE_SOURCE = (
     '#include "global.h"\n\n'
     '#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_8001480C.s")\n\n'
+    '#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80018AB0.s")\n\n'
     'void func_80018A74(void) { func_8001480C(); }\n\n'
     'void func_80018A94(s32 arg0) { (void)arg0; }\n'
 )
+
+
+class CandidateBatchPreflightTests(unittest.TestCase):
+    def _source_path(self, directory: Path) -> Path:
+        source_path = directory / "preflight_test.c"
+        source_path.write_text(SAMPLE_SOURCE)
+        return source_path
+
+    def test_accepts_active_owner_without_companion_edit(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            errors = runner.validate_candidate_batch(
+                self._source_path(Path(tmp)),
+                ["func_8001480C"],
+            )
+        self.assertEqual(errors, [])
+
+    def test_finds_definition_immediately_after_pragma(self) -> None:
+        source = (
+            '#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_8001480C.s")\n'
+            'void func_80018A74(void) { func_8001480C(); }\n'
+        )
+        self.assertEqual(
+            runner.scan_source_for_callee_signature(source, "func_80018A74"),
+            "void func_80018A74(void)",
+        )
+
+    def test_rejects_non_owner_candidate(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            errors = runner.validate_candidate_batch(
+                self._source_path(Path(tmp)),
+                ["func_80018A94"],
+            )
+        self.assertEqual(len(errors), 1)
+        self.assertIn("not an active GLOBAL_ASM owner", errors[0])
+
+    def test_rejects_companion_target_that_is_candidate_owner(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            errors = runner.validate_candidate_batch(
+                self._source_path(Path(tmp)),
+                ["func_8001480C"],
+                [{
+                    "function": "func_8001480C",
+                    "old": "anything",
+                    "new": "anything else",
+                }],
+            )
+        self.assertEqual(len(errors), 1)
+        self.assertIn("also a candidate owner", errors[0])
+
+    def test_rejects_companion_target_that_is_still_assembly(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            errors = runner.validate_candidate_batch(
+                self._source_path(Path(tmp)),
+                ["func_8001480C"],
+                [{
+                    "function": "func_80018AB0",
+                    "old": "void func_80018AB0(void) {}",
+                    "new": "void func_80018AB0(void) { (void)0; }",
+                }],
+            )
+        self.assertEqual(len(errors), 1)
+        self.assertIn("still a GLOBAL_ASM owner", errors[0])
+
+    def test_rejects_companion_text_not_about_named_definition(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            errors = runner.validate_candidate_batch(
+                self._source_path(Path(tmp)),
+                ["func_8001480C"],
+                [{
+                    "function": "func_80018A94",
+                    "old": "unrelated text",
+                    "new": "also unrelated",
+                }],
+            )
+        self.assertEqual(len(errors), 1)
+        self.assertIn("old text does not contain target", errors[0])
+
+    def test_accepts_exact_edit_of_existing_definition(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            errors = runner.validate_candidate_batch(
+                self._source_path(Path(tmp)),
+                ["func_8001480C"],
+                [{
+                    "function": "func_80018A94",
+                    "old": "void func_80018A94(s32 arg0) { (void)arg0; }",
+                    "new": "void func_80018A94(s32 arg0) { (void)arg0; (void)0; }",
+                }],
+            )
+        self.assertEqual(errors, [])
 
 
 class ApplyCompanionEditsTests(unittest.TestCase):
@@ -173,7 +263,14 @@ class ApplyCompanionEditsTests(unittest.TestCase):
         candidate = "s32 func_8001480C(s32 arg0) { return arg0; }"
         installed = runner._replace_candidate_text(working, "func_8001480C", candidate)
         self.assertIsNotNone(installed)
-        self.assertNotIn("GLOBAL_ASM", installed)
+        self.assertNotIn(
+            '#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_8001480C.s")',
+            installed,
+        )
+        self.assertIn(
+            '#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80018AB0.s")',
+            installed,
+        )
         self.assertIn("s32 func_8001480C(s32 arg0) { return arg0; }", installed)
         self.assertIn("((void (*)(void))func_8001480C)();", installed)
 

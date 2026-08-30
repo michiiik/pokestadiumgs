@@ -180,6 +180,14 @@ def tool_try_pragma_candidates(args):
     blocks = [(item["function"], item["code"]) for item in candidates]
     labels = [item.get("label") for item in candidates]
     source = _resolve_source(args, [function for function, _ in blocks])
+    preflight_errors = runner.validate_candidate_batch(
+        source,
+        [function for function, _ in blocks],
+        companion_edits,
+    )
+    if preflight_errors:
+        details = "\n".join(f"- {error}" for error in preflight_errors)
+        raise ToolError(f"candidate batch preflight failed:\n{details}")
     workers = args.get("workers")
     if workers is not None:
         workers = int(workers)

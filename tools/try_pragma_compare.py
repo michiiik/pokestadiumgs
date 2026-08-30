@@ -1247,23 +1247,27 @@ def scan_source_for_callee_signature(source_text: str, function: str) -> str | N
     the redeclaration).  A real definition always wins over a plain
     prototype when both exist, since it is authoritative.
     """
+    # Preprocessor pragmas are not C statement boundaries.  Remove them for
+    # this syntax-only scan so a definition immediately following a
+    # GLOBAL_ASM line is still recognized as an authoritative declaration.
+    scan_text = re.sub(r"(?m)^\s*#pragma[^\n]*(?:\n|$)", "", source_text)
     name_pattern = re.compile(rf"\b{re.escape(function)}\s*\(")
     best_definition: str | None = None
     best_declaration: str | None = None
-    for match in name_pattern.finditer(source_text):
+    for match in name_pattern.finditer(scan_text):
         open_paren = match.end() - 1
-        close_paren = _find_balanced_close_paren(source_text, open_paren)
+        close_paren = _find_balanced_close_paren(scan_text, open_paren)
         if close_paren is None:
             continue
-        after = source_text[close_paren + 1 : close_paren + 33].lstrip()
+        after = scan_text[close_paren + 1 : close_paren + 33].lstrip()
         if not after or after[0] not in "{;":
             continue
         terminator = after[0]
-        start = _statement_start(source_text, match.start())
-        prefix = source_text[start : match.start()].strip()
+        start = _statement_start(scan_text, match.start())
+        prefix = scan_text[start : match.start()].strip()
         if not prefix or not _is_signature_type_prefix(prefix):
             continue
-        params = source_text[open_paren + 1 : close_paren].strip()
+        params = scan_text[open_paren + 1 : close_paren].strip()
         signature = re.sub(r"\s+", " ", f"{prefix} {function}({params})").strip()
         if terminator == "{":
             # A real definition is authoritative; stop scanning immediately.
@@ -1576,6 +1580,94 @@ def _companion_edit_pragma_pattern(function: str) -> re.Pattern[str]:
         rf'^#pragma GLOBAL_ASM\("asm/us/nonmatchings/[^"]+/{re.escape(function)}\.s"\)$',
         re.MULTILINE,
     )
+
+
+def validate_candidate_batch(
+    source_path: Path,
+    functions: list[str],
+    companion_edits: list[dict[str, str]] | None = None,
+) -> list[str]:
+    """Validate a fleet/MCP batch before starting compiler workers.
+
+    This read-only preflight catches invalid owners and companion edits before
+    they consume probe batches. The transactional checks in
+    apply_companion_edits still run later.
+    """
+    try:
+        source_text = source_path.read_text()
+    except OSError as error:
+        return [f"cannot read source file {source_path}: {error}"]
+
+    owner_matches = list(
+        re.finditer(
+            r'^#pragma GLOBAL_ASM\("asm/us/nonmatchings/[^"]+/([A-Za-z_]\w*)\.s"\)$',
+            source_text,
+            re.MULTILINE,
+        )
+    )
+    owners: dict[str, int] = {}
+    for match in owner_matches:
+        name = match.group(1)
+        owners[name] = owners.get(name, 0) + 1
+
+    errors: list[str] = []
+    for function in dict.fromkeys(functions):
+        count = owners.get(function, 0)
+        if count == 0:
+            errors.append(
+                f"candidate {function} is not an active GLOBAL_ASM owner in "
+                f"{source_path}"
+            )
+        elif count > 1:
+            errors.append(
+                f"candidate {function} has {count} matching GLOBAL_ASM owners in "
+                f"{source_path}"
+            )
+
+    candidate_names = set(functions)
+    working = source_text
+    for index, edit in enumerate(companion_edits or []):
+        function = edit.get("function") if isinstance(edit, dict) else None
+        old = edit.get("old") if isinstance(edit, dict) else None
+        new = edit.get("new") if isinstance(edit, dict) else None
+        prefix = f"companion_edits[{index}]"
+        if not all(isinstance(value, str) for value in (function, old, new)):
+            errors.append(f"{prefix} requires string function, old, and new fields")
+            continue
+        assert function is not None and old is not None and new is not None
+        if function in candidate_names:
+            errors.append(
+                f"{prefix} target {function} is also a candidate owner; "
+                "companion edits require an existing accepted C definition or "
+                "prototype"
+            )
+            continue
+        if function in owners:
+            errors.append(
+                f"{prefix} target {function} is still a GLOBAL_ASM owner; "
+                "resolve that owner separately before using a companion edit"
+            )
+            continue
+        if scan_source_for_callee_signature(working, function) is None:
+            errors.append(
+                f"{prefix} target {function} is not an existing C definition "
+                "or prototype"
+            )
+            continue
+        if not re.search(rf"\b{re.escape(function)}\s*\(", old):
+            errors.append(f"{prefix} old text does not contain target {function}")
+            continue
+        if not re.search(rf"\b{re.escape(function)}\s*\(", new):
+            errors.append(f"{prefix} new text does not contain target {function}")
+            continue
+        edited, error = apply_companion_edits(working, [
+            {"function": function, "old": old, "new": new},
+        ])
+        if error is not None:
+            errors.append(f"{prefix}: {error}")
+        else:
+            working = edited
+    return errors
 
 
 def apply_companion_edits(

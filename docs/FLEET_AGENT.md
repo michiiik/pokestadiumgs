@@ -26,6 +26,11 @@ Do not touch any other file's pragmas or run `make`.
 - The coordinator's preflight uses `python3 tools/pragma_targets.py rank-files
   --exclude-recent 4` and treats `fresh` as the primary ranking signal; the
   claims and dirty-tree checks in `AGENTS.md` still apply.
+- `fresh` is an owner-level requirement, not just a file-level score. After
+  selecting a file, inspect `targets --source <file>` and include the chosen
+  owner's `prior_attempts` in the handoff. A fresh slot uses an owner with
+  fewer than 5 attempts; an older owner requires an explicit requeue or
+  near-miss/permuter reason.
 - A zero-accept batch containing `runner_internal_error`, an invalid pragma,
   or an unavailable/environment failure is tooling/process evidence, not
   source exhaustion. Record and report it, then repair or requeue the
@@ -38,6 +43,10 @@ Do not touch any other file's pragmas or run `make`.
 - If supported by the runner, JSON fleet batches may use `companion_edits` for
   the documented same-file exact-once edit; it must not add or remove a
   `#pragma GLOBAL_ASM`.
+- The runner preflight rejects candidate names that are not active owners in
+  the selected source. A companion edit must name an existing accepted C
+  definition/prototype; it must never name the candidate owner still backed by
+  `GLOBAL_ASM`, and its old/new text must include that named function.
 
 ## 2. The loop, per function
 
@@ -130,7 +139,7 @@ not count toward `repeated-drift`.
 | Near-miss `register_allocation_only` / `operand_or_scheduling_drift` | `commute-swap`, `decl-order`, `hoist-temp`, `type-width`, `loop-form`, `reorder-store-call` | 0 hits in 146 attempts on the first run — treat as unproven; prefer hand analysis of the first differing instruction | — |
 | Float divide by a power of two | Divide by the **integer** literal (`x / 16`), not `16.0f`: a float literal divisor is strength-reduced to `mul.s` by the reciprocal, an int divisor keeps `div.s` | 1 (`func_8130A98C`) | — |
 | Guard/return polarity | IDO branches on the negated condition: write the `if` in the polarity whose negation is the observed `beq`/`bne`, e.g. `if (arg1 == x) { ... } return v;` rather than `if (arg1 != x) return v;` | 2 (`func_81306EE0`, `func_80059234`) | — |
-| Display-list append (`Gfx` command into `D_800D0510++`) | Use the real `gbi.h` macros — `gSPDisplayList(D_800D0510++, addr)`, `gDPSetFillColor`, `gDPFillRectangle` — never hand-written `p->words.w0 = ...; p->words.w1 = ...;` stores, which stall at 0.93–0.95 on a constant-load/pointer-increment scheduling swap | 6 (`4AC10.c`: `func_8004AC24/AE3C/AF18/A5B8/A708/AD00`) | RDP texture-load sequences (`gDPSetTile`/`gDPLoadBlock`, `func_8004A010`) not yet tried |
+| Display-list append (`Gfx` command into `D_800D0510++`) | Use the real `gbi.h` macros — `gSPDisplayList(D_800D0510++, addr)`, `gDPSetFillColor`, `gDPFillRectangle` — never hand-written `p->words.w0 = ...; p->words.w1 = ...;` stores, which stall at 0.93–0.95 on a constant-load/pointer-increment scheduling swap | 6 (`4AC10.c`: `func_8004AC24/AE3C/AF18/A5B8/A708/AD00`) | Applies to display-list append only; RDP texture-load sequences (`gDPSetTile`/`gDPLoadBlock`, `func_8004A010`) remain a separate, unproven family |
 | Several `return 1;` guards sharing one epilogue | A single `return a \|\| b \|\| c \|\| d;` expression; separate guard clauses allocate differently and add bytes | 2 (`func_8130AA54`, `func_80057A80`) | — |
 | Wrapper whose callee result feeds a conditional second call | `s32 result = f(arg0, N); if (result != 0) { g(arg0); } return result;` (second call's value discarded; `$v1` spill/reload across the call is the tell) | 3 (`func_8005A0B4/A0F4/A134`) | — |
 | Table-field forward with 112-byte stride into bcopy/bzero | Load the field into an explicit `s32 v0 = *(s32 *)(D_X + idx * 112);` **before** the call; inlining it into the argument reorders the frame allocation | 6 (`585D0.c`) | same stride/forward shape |
@@ -144,7 +153,7 @@ not count toward `repeated-drift`.
 | Aligned graph-node constructor wrapper | If the pool handle is nonzero, replace the incoming result with `MainPool_AllocAligned`; if the result is nonzero, call the constructor with the observed old-style narrow-field formals, then return it | 4 (`4EE50.c`: `func_8004E368/4E3C8/4E438/4E52C`) | only for the matching allocation/constructor call sequence |
 | Callee prototyped earlier as `void` but its return is needed | Block-scope re-prototype does not work (hard "redeclaration" error); the earlier definition must change to return the value — do it as a separate gated change | 1 (`func_80055BA8`, open) | — |
 | Wrapper called with four registers but only three read | Declare only the parameters the body reads (`a3` was caller garbage); the fourth formal changes the frame | 1 (`func_841518D0`) | — |
-| General | Preserve narrow `sb`/`sh`/`sw` widths, initialise results before NULL checks, raw 32-bit address arithmetic (`(u8 *)(u32)global + off`) before inferred structs, `uintptr_t` casts for raw addresses, explicit `s32` loop counters, array-index vs pointer-add as separate variants, deliberate signed/unsigned masks | repo scan | ABI hypotheses until compared |
+| General | Preserve narrow `sb`/`sh`/`sw` widths, initialise results before NULL checks, raw 32-bit address arithmetic (`(u8 *)(u32)global + off`) before inferred structs, explicit `s32` loop counters, array-index vs pointer-add as separate variants, deliberate signed/unsigned masks | repo scan | ABI hypotheses until compared; IDO does not provide `uintptr_t` in this checkout, so unsupported types are tooling/preflight failures rather than useful candidates |
 
 ## 5. Hard rules
 

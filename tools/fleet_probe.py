@@ -377,6 +377,14 @@ def run(
     )
     if not source_path.exists():
         raise InputError(f"source file does not exist: {source_path}")
+    preflight_errors = runner.validate_candidate_batch(
+        source_path,
+        [function for function, _ in blocks],
+        companion_edits,
+    )
+    if preflight_errors:
+        details = "\n".join(f"- {error}" for error in preflight_errors)
+        raise InputError(f"batch preflight failed:\n{details}")
     return runner.try_candidates_detailed(
         source_path,
         blocks,

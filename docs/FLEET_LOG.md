@@ -15,6 +15,30 @@ Per-file spellings and skip lists are not here either — they live in
 
 A single hand session, for comparison, lands 4–5 owners/hour.
 
+## 2026-08-30 Wave 4 low-yield audit
+
+The 60-minute wave produced one accepted owner from five boxes: 611 attempts,
+543 genuine probe rejections, 54 compiler failures, 12 invalid companion-edit
+batches, and one full-ROM-gated acceptance. The agents stayed on their assigned
+owners; the low yield was target and hypothesis quality.
+
+- `func_8001874C` was selected from a fresh-heavy file but had 281 prior
+  attempts at start; its best result was 0.9231 normalized / 0.8462 raw with
+  repeated prologue drift.
+- `func_8AC00028` was an intentional requeue with 203 attempts and repeated
+  scheduling drift; it was a permuter/tooling follow-up, not a fresh slot.
+- Three genuinely fresh owners produced the one acceptance: `func_82208DCC`
+  accepted after a state-loop/permuter pass; `func_82609584` reached
+  0.9720 normalized / 0.5514 raw; `func_8AE01A90` reached 0.9677 / 0.9516
+  with persistent operand drift.
+- The 12 companion failures named unresolved pragma owners. Compiler failures
+  included unsupported IDO `uintptr_t`, syntax errors, and conflicting
+  prototypes; these should be rejected before the batch starts.
+
+Corrective process: rank at owner level, reserve requeues without counting them
+as fresh slots, distinguish display-list GBI from texture-load families, and
+preflight invalid owners and companion edits.
+
 ## What the numbers say
 
 - **Family unlocks carry the yield.** Half the morning's accepts came from one

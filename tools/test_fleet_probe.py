@@ -24,6 +24,12 @@ import fleet_probe  # noqa: E402
 import try_pragma_compare  # noqa: E402
 
 
+_FLEET_SOURCE = (
+    'void func_2(void) {}\n'
+    '#pragma GLOBAL_ASM("asm/us/nonmatchings/s/func_1.s")\n'
+)
+
+
 def _fake_attempt(function: str, label: str, **overrides: object) -> dict[str, object]:
     row = {
         "function": function,
@@ -338,7 +344,7 @@ class RunAndMainTests(unittest.TestCase):
             "candidates": [{"function": "func_1", "label": "l", "body": "void func_1(void) {}"}],
         }) as path:
             fake_source = path.parent / "x.c"
-            fake_source.write_text("stub")
+            fake_source.write_text(_FLEET_SOURCE)
             with mock.patch.object(try_pragma_compare, "try_candidates_detailed", fake_try_candidates_detailed):
                 with mock.patch.object(fleet_probe, "REPO_ROOT", path.parent):
                     result = fleet_probe.run(
@@ -359,13 +365,17 @@ class RunAndMainTests(unittest.TestCase):
             captured.update(kwargs)
             return {"status": 1, "accepted": [], "attempts": [], "batch_status": "probe_only", "gate": False}
 
-        edits = [{"function": "func_2", "old": "old", "new": "new"}]
+        edits = [{
+            "function": "func_2",
+            "old": "void func_2(void) {}",
+            "new": "void func_2(void) { (void)0; }",
+        }]
         with _tmp_json({
             "source": "x.c",
             "companion_edits": edits,
             "candidates": [{"function": "func_1", "body": "void func_1(void) {}"}],
         }) as path:
-            (path.parent / "x.c").write_text("stub")
+            (path.parent / "x.c").write_text(_FLEET_SOURCE)
             with mock.patch.object(try_pragma_compare, "try_candidates_detailed", fake_try_candidates_detailed):
                 with mock.patch.object(fleet_probe, "REPO_ROOT", path.parent):
                     fleet_probe.run(
@@ -406,7 +416,7 @@ class RunAndMainTests(unittest.TestCase):
             "source": "x.c",
             "candidates": [{"function": "func_1", "label": "a", "body": "void func_1(void) {}"}],
         }) as path:
-            (path.parent / "x.c").write_text("stub")
+            (path.parent / "x.c").write_text(_FLEET_SOURCE)
             with mock.patch.object(try_pragma_compare, "try_candidates_detailed", fake_try_candidates_detailed):
                 with mock.patch.object(fleet_probe, "REPO_ROOT", path.parent):
                     output = io.StringIO()
@@ -439,7 +449,7 @@ class RunAndMainTests(unittest.TestCase):
             "source": "x.c",
             "candidates": [{"function": "func_1", "body": "void func_1(void) {}"}],
         }) as path:
-            (path.parent / "x.c").write_text("stub")
+            (path.parent / "x.c").write_text(_FLEET_SOURCE)
             with mock.patch.object(try_pragma_compare, "try_candidates_detailed", fake_try_candidates_detailed):
                 with mock.patch.object(fleet_probe, "REPO_ROOT", path.parent):
                     exit_code = fleet_probe.main([str(path)])
@@ -459,7 +469,7 @@ class RunAndMainTests(unittest.TestCase):
             "source": "x.c",
             "candidates": [{"function": "func_1", "body": "void func_1(void) {}"}],
         }) as path:
-            (path.parent / "x.c").write_text("stub")
+            (path.parent / "x.c").write_text(_FLEET_SOURCE)
             with mock.patch.object(try_pragma_compare, "try_candidates_detailed", fake_try_candidates_detailed):
                 with mock.patch.object(fleet_probe, "REPO_ROOT", path.parent):
                     exit_code = fleet_probe.main([str(path)])

@@ -2073,7 +2073,7 @@ class McpDispatchTests(unittest.TestCase):
 
         with mock.patch.object(targets, "find_owner", return_value=owner), mock.patch.object(
             runner, "try_candidates_detailed", side_effect=fake_try
-        ):
+        ), mock.patch.object(runner, "validate_candidate_batch", return_value=[]):
             response = mcp.call_tool("try_pragma_candidates", {
                 "candidates": [{"function": "func_a", "code": "void func_a(void) {}"}],
                 "declarations": "extern u8 D_1;",
