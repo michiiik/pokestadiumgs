@@ -61,3 +61,7 @@ requeue func_86508B20: seven new selector-lifetime variants across two batches; 
 ## 2026-08-31 third successor box requeue (2026-08-31)
 
 requeue func_86508B20: four additional nested selector-lifetime/control-flow variants; no link_verified candidate or ROM gate. Best regressed to normalized/raw 0.8971/0.6912; expected sw $s4,40(sp), actual sw $s0,24(sp). One initial batch had declaration preflight failures and was rerun with corrected declarations. Next action is deeper reconstruction of compiler temporary/register lifetime; avoid direct pointer/scalar permutations.
+
+## Wave 7 handoff (2026-08-31)
+
+Wave 7 handoff: func_86508780 remains unresolved after 9 serial CC_CHECK=1 probes. Best normalized/raw similarity was 0.8824/0.5588; no link_verified candidate or ROM gate. The durable operand_or_scheduling_drift fingerprint at offset 41 is expected sw $s0,24(sp) versus actual sw $ra,20(sp). Next action is to reconstruct the compiler temporary/register lifetime that creates the expected saved $s0 spill; preserve the existing file requeue skip list.

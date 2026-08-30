@@ -17,3 +17,7 @@ requeue func_86300DD4: four valid probes, no link_verified candidate or ROM gate
 ## 2026-08-31 third successor box requeue (2026-08-31)
 
 requeue func_86300DD4: four declaration/lifetime-order variants; no link_verified candidate or ROM gate. Best regressed to normalized/raw 0.8533/0.5733, 300 bytes versus 292 expected, and disrupted the proven 0x40 frame. Persistent drift remains around keeping D_863075D8 in $a2 while preserving slt -> mul.s -> bnel. Next action is a different formal/global lifetime strategy, not more loop-form variants.
+
+## Wave 7 handoff (2026-08-31)
+
+Wave 7 handoff: func_86301E54 remains unresolved after 9 serial CC_CHECK=1 probes across global/address, volatility, float, and call-order shapes. Best normalized/raw similarity was 0.7200/0.6200; the stable operand_or_scheduling_drift includes expected -0x20 frame versus actual -0x28. Next action is a typed padded state overlay matching m2c field ordering and the store/call/store sequence while preserving the exact 0x20 frame.
