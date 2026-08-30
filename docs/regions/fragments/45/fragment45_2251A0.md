@@ -13,3 +13,7 @@ requeue func_8AB02240: eight materially different ABI/local candidates; no link_
 ## 2026-08-31 third successor box requeue (2026-08-31)
 
 requeue func_8AB02240: three exact-six-s16 ABI/local variants; no link_verified candidate or ROM gate. Best remains normalized/raw 0.8696/0.7101; runner reports stuck at 16 attempts, expected 268 bytes versus actual 324, first diff expected sw $a3,68(sp) versus actual sw $a0,56(sp). Next action is to revisit caller formal typing/order and force the pre-macro $s3 sign-extension/local lifetime.
+
+## Wave 8 handoff (2026-08-31)
+
+Wave 8 handoff: func_8AB0234C remains unresolved after 3 serial CC_CHECK=1 probes. Best normalized/raw similarity was 1.0000/0.8500 and was rejected as register_allocation_only with the expected $a1 versus actual $v1; another candidate reached 0.9500/0.7500 with operand scheduling drift. Next action is declaration/local ordering that forces expected $a0/$a1 constant staging before retrying successor owners. No link_verified candidate or ROM gate.
