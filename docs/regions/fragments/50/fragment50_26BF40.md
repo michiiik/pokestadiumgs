@@ -38,3 +38,7 @@ void func_862055F0(u8 *arg0, s32 arg1, s32 arg2) {
 ```
 
 Required declarations are `extern u8 D_86208F28[];`, `extern f32 D_8620E100;`, and the existing `extern s32 D_8620E198;`. Next action: resume this owner before any caller, using the best spelling as a register-tie/permuter base with a longer or macro-guided permutation budget; do not repeat the exhausted raw-pointer, add-order, typed-overlay, or ordinary float-temp families. Only after a link-verified full-ROM acceptance should its exact signature/body be transferred to `func_86205B8C`, `func_86205C8C`, `func_86205D98`, and `func_86206334`. `func_86205D98` is a jump-table dispatcher with `jtbl_8620E104`, so it additionally requires coordinator-owned rodata/layout work and was not probed in this lane.
+
+## Wave 12 handoff (2026-08-31)
+
+No accepted owner. func_86205500 received 7 probes; best state-field overlay similarity was normalized/raw 0.4483/0.1379, with the first mismatch at instruction 0. Raw-pointer forms were too compact at 42 versus expected 58 instructions. Next action is a padded state overlay rooted at 0x70000 with pointer fields at offsets 0x728BC and 0x728C0. No link_verified candidate or ROM gate.

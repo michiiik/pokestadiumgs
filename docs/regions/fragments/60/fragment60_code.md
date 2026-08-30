@@ -17,3 +17,7 @@ tooling-blocked: The owner was fresh at prior_attempts=0. Three probe-only batch
 ## Fleet box 2026-08-31: prologue helper requeued (2026-08-31)
 
 requeue: func_86A06650 received 7 variants with CC checks. Best normalized/raw similarity was 0.8636/0.6591 with the correct -0x30 frame, but expected sw ra,20(sp) versus actual sw a0,48(sp); an earlier 1.0-normalized result used the wrong -0x38 frame. No link-verified candidate or ROM gate. Next action: preserve the 0x30 frame and change declaration/lifetime layout to force saved-RA/prologue ordering.
+
+## Wave 12 handoff (2026-08-31)
+
+No accepted owner. func_86A05504 received 7 CC_CHECK-enabled probes. Best similarity was normalized/raw 0.7312/0.3441 with 364 versus expected 372 bytes; the persistent first mismatch is expected lui $v1 for D_86A452B0 versus actual lui $v0. Next action is compiler lifetime and declaration ordering that keeps the count in $v1 while the table base occupies $v0. No link_verified candidate or ROM gate.
