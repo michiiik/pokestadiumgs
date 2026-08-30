@@ -1,0 +1,15 @@
+# Region notes -- disasm/src/fragments/34/fragment34_1BE300.c
+
+Per-file spellings, skip lists, and unsolved shapes for this source file. Delivered to agents by `tools/file_brief.py`; extend it with `tools/region_notes.py append`.
+
+## 2026-08-30 family-unlock lane (2026-08-30)
+
+accepted func_88500CF0: label state-field:nested-records:typed-address. Exact signature u8 *func_88500CF0(u8). The matching local shape is Item size 0x58; Row has Item items[30] plus 0x24 tail for size 0xA74; State has signed itemIndex at 0xC88, signed rowIndex at 0xC89, and rows at 0xC90. Probe link_verified=true and full COMPARE=1 gate passed. 11 probe variants; earlier 4 history rows were compile failures from invalid void pointer arithmetic.
+
+accepted func_88500E80: label init-sequence:direct-child-fields:u8-prototype. Exact spelling reloads both child pointers through D_8850D6D0, sets each child +0x34 word to 1, calls func_88004990(u8, s32) for each child byte with arg1 0, then sets D_880068B8=1. Probe link_verified=true and full COMPARE=1 gate passed. 5 probe variants.
+
+accepted func_885010EC: label call-sequence:word-record-copy:typed-pointer-table. Use a 4-byte-aligned CopyRecord containing s32 words[0x320] for the exact 0xC80 assignment loop, and a typed MainState pointer table at offset 0x14 indexed by the byte at 0x10. This corrected the final addu base/index operand order. Exact dependencies include void func_88500E80(void). Probe link_verified=true and full COMPARE=1 gate passed. 15 probe variants; prior near miss source-cast-expression was normalized 1.0/raw 0.9844 at addu t7,v0,t6 versus t7,t6,v0.
+
+requeue func_88501380: 14 probe variants, all operand_or_scheduling_drift. Best normalized 0.8492/raw 0.2222 with typed-stride-pointers and related implicit-loop-end forms; fingerprint operand_or_scheduling_drift instruction 0, expected addiu sp,sp,-0x480 versus actual -0x488. Best raw was 0.2713 at normalized 0.8140 with counts-first-inline-count, actual frame -0x498. Tried typed 0x58 Item arrays, raw 0x420 buffer, single aggregate, counts/items declaration order, scoped live ranges, explicit versus implicit loop end, destination reuse, base derived from end, 0xA960-sized typed pointers, and integer-cast strides. The best later form still saves s7 because IDO hoists 0xA960 into s4; target materializes 0xA960 in at inside the first loop and shares it across state/source increments. Next action: start from the implicit-loop-end body, use a lower-level m2c/goto control-flow spelling and alter the paired stride updates so 0xA960 is rematerialized in at rather than held in a saved register; only then tune later loop scheduling. Proven callee signature is u8 *func_88500CF0(u8).
+
+layout-prerequisite func_88503644: do not probe as C switch yet. jtbl_8850D464 at ROM 0x1CAA60..0x1CAA90 is still inside fragment34 data and tools/add_rodata_subsegments.py plan reports that fragments/34/fragment34_1BE300 needs a trailing rodata split. Coordinator must perform and assembly-gate that layout change first. Its call to func_88500CF0 passes u8 value 0 and the accepted return is u8 *.
