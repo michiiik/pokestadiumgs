@@ -299,6 +299,54 @@ def _ensure_worktree_oracles(
         pass
 
 
+def _gate_cache_source_digest(root: Path) -> str | None:
+    """Hash the tracked-like libultra inputs while excluding generated trees."""
+    digest = hashlib.sha256()
+    try:
+        files = sorted(
+            path for path in root.rglob("*")
+            if path.is_file() and not {"build", "extracted"}.intersection(path.relative_to(root).parts)
+        )
+        for path in files:
+            relative = path.relative_to(root).as_posix()
+            digest.update(relative.encode("utf-8"))
+            digest.update(b"\0")
+            digest.update(path.read_bytes())
+        return digest.hexdigest()
+    except OSError:
+        return None
+
+
+def _ensure_worktree_gate_cache(repo_root: Path) -> None:
+    """Seed an isolated worktree with a private, validated libultra build cache.
+
+    The extracted comparison objects are intentionally ignored, so a fresh
+    worktree cannot rebuild libultra in COMPARE mode.  Reuse is safe only when
+    the worktree's libultra inputs exactly match the primary checkout.  The
+    generated cache is copied (never symlinked) and timestamped locally, so a
+    gate cannot mutate another checkout's build outputs.
+    """
+    primary = _primary_worktree_root(repo_root)
+    if primary is None:
+        return
+    local_lib = repo_root / "disasm" / "lib" / "ultralib"
+    shared_lib = primary / "disasm" / "lib" / "ultralib"
+    local_archive = local_lib / "build" / "L" / "libultra" / "libultra.a"
+    shared_build = shared_lib / "build"
+    if local_archive.is_file() or not shared_build.is_dir():
+        return
+    if _gate_cache_source_digest(local_lib) != _gate_cache_source_digest(shared_lib):
+        return
+    try:
+        shutil.copytree(shared_build, local_lib / "build", dirs_exist_ok=True, symlinks=True)
+        now = time.time()
+        for path in (local_lib / "build").rglob("*"):
+            if path.is_file():
+                os.utime(path, (now, now))
+    except OSError:
+        pass
+
+
 # Placeholder paths (relative to ``disasm/``) used to capture the Makefile's
 # probe compile recipe once.  Every later probe substitutes its own paths into
 # the captured tokens instead of paying the Makefile parse cost again.
@@ -563,6 +611,7 @@ def _try_candidate_detailed(source_path: Path, function: str, candidate: str) ->
 def _run_compare(repo_root: Path) -> tuple[int, str]:
     """Run the full compare with a bounded lifetime and captured diagnostics."""
     _ensure_worktree_oracles(repo_root, full_tree=True)
+    _ensure_worktree_gate_cache(repo_root)
     env = _object_build_environment(repo_root)
     env.setdefault("MIPS_BINUTILS_PREFIX", "/Users/michaegg/homebrew/bin/mips-linux-gnu-")
     # The full gate also runs the Makefile's host-side syntax check (clang,

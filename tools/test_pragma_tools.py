@@ -783,6 +783,42 @@ class RunnerTests(unittest.TestCase):
             self.assertTrue(local.is_symlink())
             self.assertEqual(local.resolve(), oracle.resolve())
 
+    def test_worktree_gate_cache_is_copied_when_inputs_match(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            main = Path(directory) / "main"
+            worktree = Path(directory) / "worktree"
+            git_dir = main / ".git" / "worktrees" / "lane"
+            for root in (main, worktree):
+                lib = root / "disasm" / "lib" / "ultralib"
+                (lib / "src").mkdir(parents=True)
+                (lib / "src" / "same.c").write_text("void same(void) {}\n")
+            archive = main / "disasm" / "lib" / "ultralib" / "build" / "L" / "libultra" / "libultra.a"
+            archive.parent.mkdir(parents=True)
+            archive.write_bytes(b"archive")
+            git_dir.mkdir(parents=True)
+            (worktree / ".git").write_text(f"gitdir: {git_dir}\n")
+            runner._ensure_worktree_gate_cache(worktree)
+            copied = worktree / "disasm" / "lib" / "ultralib" / "build" / "L" / "libultra" / "libultra.a"
+            self.assertEqual(copied.read_bytes(), b"archive")
+
+    def test_worktree_gate_cache_refuses_mismatched_inputs(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            main = Path(directory) / "main"
+            worktree = Path(directory) / "worktree"
+            git_dir = main / ".git" / "worktrees" / "lane"
+            for root, body in ((main, "primary"), (worktree, "changed")):
+                lib = root / "disasm" / "lib" / "ultralib"
+                (lib / "src").mkdir(parents=True)
+                (lib / "src" / "same.c").write_text(body)
+            archive = main / "disasm" / "lib" / "ultralib" / "build" / "L" / "libultra" / "libultra.a"
+            archive.parent.mkdir(parents=True)
+            archive.write_bytes(b"archive")
+            git_dir.mkdir(parents=True)
+            (worktree / ".git").write_text(f"gitdir: {git_dir}\n")
+            runner._ensure_worktree_gate_cache(worktree)
+            copied = worktree / "disasm" / "lib" / "ultralib" / "build" / "L" / "libultra" / "libultra.a"
+            self.assertFalse(copied.exists())
+
     def test_mismatch_diagnostics_identify_symbol_size_drift(self) -> None:
         expected = bytes.fromhex("03e00008 00000000")
         actual = bytes.fromhex("03e00008")
