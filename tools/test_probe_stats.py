@@ -117,6 +117,18 @@ class ResolvePathsTests(unittest.TestCase):
 
 
 class IterBatchesTests(unittest.TestCase):
+    def test_iter_batches_streams_without_reading_whole_file(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "probe-stats.jsonl"
+            path.write_text('{"attempts": []}\n{"attempts": []}\n')
+            with mock.patch.object(
+                Path,
+                "read_text",
+                side_effect=AssertionError("whole-file read is not bounded"),
+            ):
+                batches = list(probe_stats.iter_batches([path]))
+            self.assertEqual(len(batches), 2)
+
     def test_iter_batches_tolerates_corrupt_lines(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "stats.jsonl"

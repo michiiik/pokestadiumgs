@@ -158,19 +158,19 @@ def iter_batches_with_paths(
     """
     for path in resolve_paths(paths):
         try:
-            text = path.read_text(encoding="utf-8", errors="replace")
+            with path.open("r", encoding="utf-8", errors="replace") as handle:
+                for line in handle:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    try:
+                        record = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
+                    if isinstance(record, dict):
+                        yield path, record
         except OSError:
             continue
-        for line in text.splitlines():
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                record = json.loads(line)
-            except json.JSONDecodeError:
-                continue
-            if isinstance(record, dict):
-                yield path, record
 
 
 def iter_batches(paths: Iterable[Path] | None = None) -> Iterator[dict[str, object]]:

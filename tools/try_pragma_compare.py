@@ -2500,44 +2500,35 @@ def _load_prior_attempt_history() -> dict[str, list[dict[str, object]]]:
         paths = _probe_stats_history_paths()
     except OSError:
         return history
-    records = list(probe_stats.iter_batches_with_paths(paths))
-
     # Pre-provenance migrations wrote a lossy shaped copy to the active file
     # while retaining the raw legacy source. When the migration marker proves
     # that relationship, pair shaped active rows one-to-one with distinct raw
     # hashes sharing their migration signature. This is deliberately not a
     # general lossy identity: ambiguous raw rows keep separate hashes and thus
-    # preserve their multiplicity.
+    # preserve their multiplicity. The first pass retains only those hashes;
+    # the second reparses each ledger and populates history without ever
+    # retaining the expanded batch payloads as a list.
     raw_by_source_and_shape: dict[tuple[Path, str], list[str]] = {}
-    shaped_active_by_source_and_shape: dict[tuple[Path, str], list[int]] = {}
-    for index, (path, batch) in enumerate(records):
+    for path, batch in probe_stats.iter_batches_with_paths(paths):
         if batch.get("batch_id") or batch.get(probe_stats.MIGRATION_PROVENANCE_KEY):
             continue
-        raw_sha256 = probe_stats.raw_batch_sha256(batch)
-        shaped_sha256 = probe_stats.raw_batch_sha256(probe_stats.shape_legacy_batch(batch))
         if path.parent.name == "build":
+            raw_sha256 = probe_stats.raw_batch_sha256(batch)
+            shaped_sha256 = probe_stats.raw_batch_sha256(
+                probe_stats.shape_legacy_batch(batch)
+            )
             key = (path.resolve(strict=False), shaped_sha256)
             hashes = raw_by_source_and_shape.setdefault(key, [])
             if raw_sha256 not in hashes:
                 hashes.append(raw_sha256)
-        elif raw_sha256 == shaped_sha256:
-            legacy_source = _legacy_path_for_migrated_active(path)
-            if legacy_source is not None:
-                key = (legacy_source, shaped_sha256)
-                shaped_active_by_source_and_shape.setdefault(key, []).append(index)
-    upgraded_identities: dict[int, str] = {}
-    for key, active_indices in shaped_active_by_source_and_shape.items():
-        for index, raw_sha256 in zip(
-            active_indices, raw_by_source_and_shape.get(key, [])
-        ):
-            upgraded_identities[index] = f"legacy-raw:{raw_sha256}"
 
     seen_batches: set[str] = set()
-    for index, (_, batch) in enumerate(records):
+    shaped_active_offsets: dict[tuple[Path, str], int] = {}
+    legacy_sources_by_active: dict[Path, Path | None] = {}
+    for path, batch in probe_stats.iter_batches_with_paths(paths):
         batch_id = batch.get("batch_id")
-        if index in upgraded_identities:
-            identity = upgraded_identities[index]
-        elif isinstance(batch_id, str) and batch_id:
+        identity: str | None = None
+        if isinstance(batch_id, str) and batch_id:
             identity = f"id:{batch_id}"
         else:
             migration = batch.get(probe_stats.MIGRATION_PROVENANCE_KEY)
@@ -2549,8 +2540,22 @@ def _load_prior_attempt_history() -> dict[str, list[dict[str, object]]]:
                 and re.fullmatch(r"[0-9a-f]{64}", raw_sha256)
             ):
                 identity = f"legacy-raw:{raw_sha256}"
-            else:
-                identity = f"legacy-raw:{probe_stats.raw_batch_sha256(batch)}"
+            elif path.parent.name != "build":
+                shaped_sha256 = probe_stats.raw_batch_sha256(batch)
+                if path not in legacy_sources_by_active:
+                    legacy_sources_by_active[path] = _legacy_path_for_migrated_active(
+                        path
+                    )
+                legacy_source = legacy_sources_by_active[path]
+                if legacy_source is not None:
+                    key = (legacy_source, shaped_sha256)
+                    offset = shaped_active_offsets.get(key, 0)
+                    raw_hashes = raw_by_source_and_shape.get(key, [])
+                    if offset < len(raw_hashes):
+                        identity = f"legacy-raw:{raw_hashes[offset]}"
+                        shaped_active_offsets[key] = offset + 1
+        if identity is None:
+            identity = f"legacy-raw:{probe_stats.raw_batch_sha256(batch)}"
         if identity in seen_batches:
             continue
         seen_batches.add(identity)

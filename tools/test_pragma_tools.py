@@ -1909,6 +1909,32 @@ class RunnerTests(unittest.TestCase):
                 history = runner._load_prior_attempt_history()
             self.assertEqual(len(history["func_legacy"]), 2)
 
+    def test_prior_history_streams_ledgers_in_two_bounded_passes(self) -> None:
+        path = Path("/synthetic/probe-stats.jsonl")
+        calls = 0
+
+        def batches(_paths: object):
+            nonlocal calls
+            calls += 1
+            for index in range(200):
+                yield path, {
+                    "batch_id": f"batch-{index}",
+                    "attempts": [
+                        {"function": f"func_{index}", "status": "probe_rejected"}
+                    ],
+                }
+
+        with mock.patch.object(
+            runner, "_probe_stats_history_paths", return_value=(path,)
+        ), mock.patch.object(
+            runner.probe_stats, "iter_batches_with_paths", side_effect=batches
+        ):
+            history = runner._load_prior_attempt_history()
+
+        self.assertEqual(calls, 2)
+        self.assertEqual(len(history), 200)
+        self.assertEqual(history["func_199"][0]["status"], "probe_rejected")
+
     def test_unverified_probe_hit_uses_sequential_gate_without_duplicate_compare(self) -> None:
         # An unverified probe hit (no ``link_verified`` key, e.g. baseline
         # shape unavailable) still uses the historical sequential gate.  That
