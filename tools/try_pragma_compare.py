@@ -200,8 +200,8 @@ def _primary_worktree_root(repo_root: Path) -> Path | None:
 def _shared_worktree_venv(repo_root: Path) -> Path | None:
     """Find a usable venv when an isolated Git worktree has none of its own.
 
-    ``disasm/.venv`` is intentionally ignored, so ``git worktree add`` does
-    not populate it.  The primary checkout's venv is safe to reuse: it only
+    The repository venvs are intentionally ignored, so ``git worktree add``
+    does not populate them. The primary checkout's venv is safe to reuse: it only
     provides the Python interpreter and pinned build dependencies, while all
     source, build, and probe paths remain relative to ``repo_root``.  An
     explicit ``PRAGMA_SHARED_VENV`` takes precedence for nonstandard layouts.
@@ -210,7 +210,9 @@ def _shared_worktree_venv(repo_root: Path) -> Path | None:
     candidates = [Path(explicit)] if explicit else []
     primary = _primary_worktree_root(repo_root)
     if primary is not None:
-        candidates.append(primary / "disasm" / ".venv")
+        # This repository's maintained environment is at its root. Keep the
+        # historical disasm-local path as a fallback for older checkouts.
+        candidates.extend((primary / ".venv", primary / "disasm" / ".venv"))
     for candidate in candidates:
         python = candidate / "bin" / "python3"
         if python.is_file() and os.access(python, os.X_OK):
@@ -299,70 +301,448 @@ def _ensure_worktree_oracles(
         pass
 
 
-def _gate_cache_source_digest(root: Path) -> str | None:
-    """Hash the tracked-like libultra inputs while excluding generated trees."""
-    digest = hashlib.sha256()
-    ignored = (("build",), ("extracted",), ("tools", "gcc"), ("tools", "ido"))
+_GIT_ENVIRONMENT_VARIABLES = (
+    "GIT_DIR",
+    "GIT_WORK_TREE",
+    "GIT_INDEX_FILE",
+    "GIT_COMMON_DIR",
+    "GIT_OBJECT_DIRECTORY",
+    "GIT_ALTERNATE_OBJECT_DIRECTORIES",
+)
+
+
+def _clean_git_environment() -> dict[str, str]:
+    """Return an environment that resolves Git against the requested worktree."""
+    environment = dict(os.environ)
+    for name in _GIT_ENVIRONMENT_VARIABLES:
+        environment.pop(name, None)
+    return environment
+
+
+def _private_output_path(repo_root: Path, path: Path, description: str) -> None:
+    """Refuse generated output paths that escape through an existing symlink."""
     try:
-        files = sorted(
-            path for path in root.rglob("*")
-            if path.is_file()
-            and not any(path.relative_to(root).parts[:len(prefix)] == prefix for prefix in ignored)
+        relative = path.relative_to(repo_root)
+    except ValueError as error:
+        raise RuntimeError(
+            f"isolated gate bootstrap refused {description} outside its worktree: {path}"
+        ) from error
+    current = repo_root
+    for part in relative.parts:
+        current = current / part
+        if os.path.lexists(current) and current.is_symlink():
+            raise RuntimeError(
+                f"isolated gate bootstrap refused symlinked {description}: {current}"
+            )
+
+
+def _regular_nonempty_file(path: Path) -> bool:
+    """Return whether *path* is a private, usable generated file."""
+    try:
+        return path.is_file() and not path.is_symlink() and path.stat().st_size > 0
+    except OSError:
+        return False
+
+
+def _files_equal(left: Path, right: Path) -> bool:
+    """Compare files without trusting timestamps from a previous bootstrap."""
+    try:
+        if left.stat().st_size != right.stat().st_size:
+            return False
+        with left.open("rb") as left_file, right.open("rb") as right_file:
+            while True:
+                left_chunk = left_file.read(1024 * 1024)
+                right_chunk = right_file.read(1024 * 1024)
+                if left_chunk != right_chunk:
+                    return False
+                if not left_chunk:
+                    return True
+    except OSError:
+        return False
+
+
+def _copy_baserom_atomically(source: Path, destination: Path, repo_root: Path) -> None:
+    """Install the immutable baserom as a private regular file in a worktree."""
+    if not _regular_nonempty_file(source):
+        raise RuntimeError(
+            f"isolated gate bootstrap needs a regular primary baserom: {source}"
         )
-        for path in files:
-            relative = path.relative_to(root).as_posix()
-            digest.update(relative.encode("utf-8"))
+    _private_output_path(repo_root, destination, "baserom destination")
+    if _regular_nonempty_file(destination) and _files_equal(source, destination):
+        return
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    _private_output_path(repo_root, destination, "baserom destination")
+    temporary: Path | None = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            prefix=f".{destination.name}.", suffix=".tmp", dir=destination.parent, delete=False
+        ) as output:
+            temporary = Path(output.name)
+            with source.open("rb") as input_file:
+                shutil.copyfileobj(input_file, output, length=1024 * 1024)
+            output.flush()
+            os.fsync(output.fileno())
+        os.replace(temporary, destination)
+        temporary = None
+    except OSError as error:
+        raise RuntimeError(
+            f"isolated gate bootstrap could not copy baserom to {destination}: {error}"
+        ) from error
+    finally:
+        if temporary is not None:
+            try:
+                temporary.unlink()
+            except OSError:
+                pass
+
+
+def _bootstrap_command(
+    repo_root: Path,
+    command: list[str],
+    description: str,
+    *,
+    environment: dict[str, str] | None = None,
+) -> str:
+    """Run one private bootstrap step and turn failures into gate diagnostics."""
+    try:
+        result = subprocess.run(
+            command,
+            cwd=repo_root,
+            env=environment,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            timeout=_command_timeout("PRAGMA_COMPARE_TIMEOUT", 300.0),
+        )
+    except subprocess.TimeoutExpired as error:
+        raise RuntimeError(
+            f"isolated gate bootstrap timed out during {description} after {error.timeout}s\n"
+            f"{_timeout_output(error)}"
+        ) from error
+    except OSError as error:
+        raise RuntimeError(
+            f"isolated gate bootstrap could not start {description}: {error}"
+        ) from error
+    if result.returncode != 0:
+        raise RuntimeError(
+            f"isolated gate bootstrap failed during {description} "
+            f"(exit {result.returncode})\n{result.stdout or ''}"
+        )
+    return result.stdout or ""
+
+
+def _tracked_asm_changes(repo_root: Path) -> str:
+    """Return tracked assembly changes while ignoring extraction-only files."""
+    return _bootstrap_command(
+        repo_root,
+        ["git", "status", "--porcelain=v1", "--untracked-files=no", "--", "disasm/asm"],
+        "tracked assembly safety check",
+        environment=_clean_git_environment(),
+    ).strip()
+
+
+def _snapshot_tracked_asm(
+    repo_root: Path,
+) -> dict[Path, tuple[str, bytes | str, int]]:
+    """Capture clean tracked assembly without acquiring Git's shared index lock."""
+    listing = _bootstrap_command(
+        repo_root,
+        ["git", "ls-files", "-z", "--", "disasm/asm"],
+        "tracked assembly listing",
+        environment=_clean_git_environment(),
+    )
+    snapshot: dict[Path, tuple[str, bytes | str, int]] = {}
+    try:
+        for name in listing.split("\0"):
+            if not name:
+                continue
+            relative = Path(name)
+            if relative.parts[:2] != ("disasm", "asm"):
+                raise RuntimeError(
+                    f"isolated gate bootstrap received an unsafe tracked assembly path: {name}"
+                )
+            path = repo_root / relative
+            if path.is_symlink():
+                snapshot[relative] = ("symlink", os.readlink(path), 0)
+                continue
+            if not path.is_file():
+                raise RuntimeError(
+                    f"isolated gate bootstrap cannot snapshot tracked assembly file {path}"
+                )
+            snapshot[relative] = (
+                "file",
+                path.read_bytes(),
+                path.stat().st_mode & 0o777,
+            )
+    except OSError as error:
+        raise RuntimeError(
+            f"isolated gate bootstrap could not snapshot tracked assembly: {error}"
+        ) from error
+    return snapshot
+
+
+def _restore_tracked_asm(
+    repo_root: Path, snapshot: dict[Path, tuple[str, bytes | str, int]]
+) -> None:
+    """Restore extraction-rewritten aliases from a verified-clean byte snapshot."""
+    try:
+        for relative, (kind, contents, mode) in snapshot.items():
+            path = repo_root / relative
+            _private_output_path(repo_root, path.parent, "tracked assembly restoration")
+            path.parent.mkdir(parents=True, exist_ok=True)
+            if os.path.lexists(path):
+                if path.is_dir() and not path.is_symlink():
+                    raise RuntimeError(
+                        f"isolated gate bootstrap refused assembly directory at {path}"
+                    )
+                path.unlink()
+            if kind == "symlink":
+                path.symlink_to(str(contents))
+            elif kind == "file" and isinstance(contents, bytes):
+                path.write_bytes(contents)
+                path.chmod(mode)
+            else:
+                raise RuntimeError(
+                    f"isolated gate bootstrap has invalid assembly snapshot data for {path}"
+                )
+    except OSError as error:
+        raise RuntimeError(
+            f"isolated gate bootstrap could not restore tracked assembly: {error}"
+        ) from error
+    changes = _tracked_asm_changes(repo_root)
+    if changes:
+        raise RuntimeError(
+            "isolated gate bootstrap could not restore tracked assembly cleanly:\n"
+            f"{changes}"
+        )
+
+
+def _gate_bootstrap_identity(repo_root: Path) -> dict[str, object]:
+    """Describe the tracked inputs whose extraction outputs may be reused."""
+    head = _bootstrap_command(
+        repo_root,
+        ["git", "rev-parse", "--verify", "HEAD"],
+        "worktree revision check",
+        environment=_clean_git_environment(),
+    ).strip()
+    if not head:
+        raise RuntimeError("isolated gate bootstrap could not identify the worktree revision")
+    digest = hashlib.sha256()
+    try:
+        for relative in (
+            Path("disasm/yamls/us/header.yaml"),
+            Path("disasm/yamls/us/rom.yaml"),
+        ):
+            path = repo_root / relative
+            if not _regular_nonempty_file(path):
+                raise RuntimeError(
+                    f"isolated gate bootstrap needs tracked extraction input {path}"
+                )
+            digest.update(relative.as_posix().encode("utf-8"))
             digest.update(b"\0")
             digest.update(path.read_bytes())
-        return digest.hexdigest()
-    except OSError:
+    except OSError as error:
+        raise RuntimeError(
+            f"isolated gate bootstrap could not read tracked extraction inputs: {error}"
+        ) from error
+    return {"schema": 1, "head": head, "extraction_sha256": digest.hexdigest()}
+
+
+def _read_gate_bootstrap_marker(path: Path) -> dict[str, object] | None:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
         return None
+    return value if isinstance(value, dict) else None
 
 
-def _ensure_worktree_gate_cache(repo_root: Path) -> None:
-    """Seed an isolated worktree with a private, validated libultra build cache.
+def _write_gate_bootstrap_marker(path: Path, value: dict[str, object]) -> None:
+    """Publish bootstrap provenance only after all private outputs validate."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary: Path | None = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w",
+            encoding="utf-8",
+            prefix=f".{path.name}.",
+            suffix=".tmp",
+            dir=path.parent,
+            delete=False,
+        ) as output:
+            temporary = Path(output.name)
+            json.dump(value, output, sort_keys=True)
+            output.write("\n")
+            output.flush()
+            os.fsync(output.fileno())
+        os.replace(temporary, path)
+        temporary = None
+    except OSError as error:
+        raise RuntimeError(
+            f"isolated gate bootstrap could not record private output provenance: {error}"
+        ) from error
+    finally:
+        if temporary is not None:
+            try:
+                temporary.unlink()
+            except OSError:
+                pass
 
-    The extracted comparison objects are intentionally ignored, so a fresh
-    worktree cannot rebuild libultra in COMPARE mode.  Reuse is safe only when
-    the worktree's libultra inputs exactly match the primary checkout.  The
-    generated cache is copied (never symlinked) and timestamped locally, so a
-    gate cannot mutate another checkout's build outputs.
+
+def _ensure_worktree_gate_prerequisites(repo_root: Path) -> None:
+    """Build every ignored full-gate prerequisite privately in a linked worktree.
+
+    A linked worktree intentionally omits the baserom, extracted assembly,
+    auto linker scripts, and libultra outputs. Derive them locally from the
+    immutable baserom and tracked sources. Never copy or link either mutable
+    build tree from the primary checkout.
     """
     primary = _primary_worktree_root(repo_root)
     if primary is None:
         return
-    local_lib = repo_root / "disasm" / "lib" / "ultralib"
-    shared_lib = primary / "disasm" / "lib" / "ultralib"
-    local_archive = local_lib / "build" / "L" / "libultra" / "libultra.a"
-    shared_build = shared_lib / "build"
-    shared_linker = primary / "disasm" / "build" / "linker_scripts"
-    try:
-        # Dereference any cache symlinks: the isolated gate must not retain a
-        # path back into the primary checkout's mutable build tree.
-        copied_roots = []
-        if (not local_archive.is_file() and shared_build.is_dir()
-                and _gate_cache_source_digest(local_lib) == _gate_cache_source_digest(shared_lib)):
-            local_build = local_lib / "build"
-            shutil.copytree(shared_build, local_build, dirs_exist_ok=True, symlinks=False)
-            copied_roots.append(local_build)
-        if shared_linker.is_dir():
-            local_linker = repo_root / "disasm" / "build" / "linker_scripts"
-            if local_linker.exists() and not local_linker.is_symlink():
-                shutil.rmtree(local_linker)
-            shutil.copytree(
-                shared_linker,
-                local_linker,
-                dirs_exist_ok=True,
-                symlinks=False,
+
+    disasm = repo_root / "disasm"
+    primary_baserom = primary / "disasm" / "baseroms" / "us" / "baserom.z64"
+    baserom = disasm / "baseroms" / "us" / "baserom.z64"
+    auto_sources = (
+        disasm / "linker_scripts" / "us" / "auto" / "undefined_syms_auto.ld",
+        disasm / "linker_scripts" / "us" / "auto" / "undefined_funcs_auto.ld",
+    )
+    auto_outputs = tuple(
+        disasm / "build" / "linker_scripts" / "us" / "auto" / path.name
+        for path in auto_sources
+    )
+    lib_build = disasm / "lib" / "ultralib" / "build"
+    built_archive = lib_build / "L" / "libultra" / "libultra.a"
+    marker = disasm / "build" / ".pragma_private_gate_bootstrap.json"
+
+    for path, description in (
+        (baserom, "baserom destination"),
+        (auto_sources[0], "generated auto linker script"),
+        (auto_sources[1], "generated auto linker script"),
+        (auto_outputs[0], "preprocessed auto linker script"),
+        (auto_outputs[1], "preprocessed auto linker script"),
+        (built_archive, "private libultra build"),
+        (marker, "private bootstrap marker"),
+    ):
+        _private_output_path(repo_root, path, description)
+
+    identity = _gate_bootstrap_identity(repo_root)
+    marker_matches = _read_gate_bootstrap_marker(marker) == identity
+    needs_extract = not marker_matches or not all(
+        _regular_nonempty_file(path) for path in auto_sources
+    )
+    asm_snapshot: dict[Path, tuple[str, bytes | str, int]] | None = None
+    if needs_extract:
+        changes = _tracked_asm_changes(repo_root)
+        if changes:
+            raise RuntimeError(
+                "isolated gate bootstrap refused to re-extract over tracked assembly changes:\n"
+                f"{changes}"
             )
-            copied_roots.append(local_linker)
-        now = time.time()
-        for root in copied_roots:
-            for path in root.rglob("*"):
-                if path.is_file():
-                    os.utime(path, (now, now))
-    except OSError:
-        pass
+        asm_snapshot = _snapshot_tracked_asm(repo_root)
+
+    _copy_baserom_atomically(primary_baserom, baserom, repo_root)
+    environment = _object_build_environment(repo_root)
+
+    if needs_extract:
+        # An unmarked tree may contain output copied by an older runner. Remove
+        # only ignored, verified-private outputs and derive them again locally.
+        try:
+            marker.unlink(missing_ok=True)
+            for path in (*auto_sources, *auto_outputs):
+                path.unlink(missing_ok=True)
+            if lib_build.exists():
+                shutil.rmtree(lib_build)
+        except OSError as error:
+            raise RuntimeError(
+                f"isolated gate bootstrap could not clear stale private outputs: {error}"
+            ) from error
+        _bootstrap_command(
+            repo_root,
+            ["make", "-C", "disasm", "setup", "COLOR=0"],
+            "local tool setup",
+            environment=environment,
+        )
+        extract_error: RuntimeError | None = None
+        try:
+            _bootstrap_command(
+                repo_root,
+                ["make", "-C", "disasm", "extract", "COLOR=0"],
+                "local ROM extraction",
+                environment=environment,
+            )
+        except RuntimeError as error:
+            extract_error = error
+        try:
+            _restore_tracked_asm(repo_root, asm_snapshot or {})
+        except RuntimeError as restore_error:
+            if extract_error is not None:
+                raise RuntimeError(f"{extract_error}\n{restore_error}") from restore_error
+            raise
+        if extract_error is not None:
+            raise extract_error
+        missing = [str(path) for path in auto_sources if not _regular_nonempty_file(path)]
+        if missing:
+            raise RuntimeError(
+                "isolated gate bootstrap extraction did not create required files:\n"
+                + "\n".join(missing)
+            )
+
+    if not _regular_nonempty_file(built_archive):
+        compiler_platform = "macos" if sys.platform == "darwin" else "linux"
+        compiler = disasm / "tools" / "ido" / compiler_platform / "5.3" / "cc"
+        if not _regular_nonempty_file(compiler) or not os.access(compiler, os.X_OK):
+            raise RuntimeError(
+                f"isolated gate bootstrap needs the tracked IDO 5.3 compiler: {compiler}"
+            )
+        prefix = environment["MIPS_BINUTILS_PREFIX"]
+        _bootstrap_command(
+            repo_root,
+            [
+                "make",
+                "-C",
+                "disasm/lib/ultralib",
+                "VERSION=L",
+                "TARGET=libultra",
+                "FIXUPS=1",
+                f"CROSS={prefix}",
+                f"CC={compiler}",
+                f"AS={compiler}",
+                "VERBOSE=0",
+                "COLOR=0",
+                "-j2",
+            ],
+            "private libultra build",
+            environment=environment,
+        )
+        if not _regular_nonempty_file(built_archive):
+            raise RuntimeError(
+                f"isolated gate bootstrap libultra build did not create {built_archive}"
+            )
+
+    if not all(_regular_nonempty_file(path) for path in auto_outputs):
+        _bootstrap_command(
+            repo_root,
+            [
+                "make",
+                "-C",
+                "disasm",
+                "build/linker_scripts/us/auto/undefined_syms_auto.ld",
+                "build/linker_scripts/us/auto/undefined_funcs_auto.ld",
+                "COLOR=0",
+            ],
+            "local auto linker preprocessing",
+            environment=environment,
+        )
+    missing = [str(path) for path in auto_outputs if not _regular_nonempty_file(path)]
+    if missing:
+        raise RuntimeError(
+            "isolated gate bootstrap did not create local auto linker outputs:\n"
+            + "\n".join(missing)
+        )
+    _write_gate_bootstrap_marker(marker, identity)
 
 
 # Placeholder paths (relative to ``disasm/``) used to capture the Makefile's
@@ -628,8 +1008,11 @@ def _try_candidate_detailed(source_path: Path, function: str, candidate: str) ->
 
 def _run_compare(repo_root: Path) -> tuple[int, str]:
     """Run the full compare with a bounded lifetime and captured diagnostics."""
+    try:
+        _ensure_worktree_gate_prerequisites(repo_root)
+    except RuntimeError as error:
+        return 2, f"{error}\n"
     _ensure_worktree_oracles(repo_root, full_tree=True)
-    _ensure_worktree_gate_cache(repo_root)
     env = _object_build_environment(repo_root)
     env.setdefault("MIPS_BINUTILS_PREFIX", "/Users/michaegg/homebrew/bin/mips-linux-gnu-")
     # The full gate also runs the Makefile's host-side syntax check (clang,

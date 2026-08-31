@@ -736,7 +736,7 @@ class RunnerTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             main = Path(directory) / "main"
             worktree = Path(directory) / "worktree"
-            venv = main / "disasm" / ".venv" / "bin"
+            venv = main / ".venv" / "bin"
             git_dir = main / ".git" / "worktrees" / "lane"
             venv.mkdir(parents=True)
             worktree.mkdir()
@@ -746,7 +746,7 @@ class RunnerTests(unittest.TestCase):
             (worktree / ".git").write_text(f"gitdir: {git_dir}\n")
             with mock.patch.dict(os.environ, {}, clear=True):
                 environment = runner._object_build_environment(worktree)
-            self.assertEqual(environment["VENV"], str((main / "disasm" / ".venv").resolve()))
+            self.assertEqual(environment["VENV"], str((main / ".venv").resolve()))
 
     def test_worktree_oracle_links_primary_nonmatchings(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -783,48 +783,204 @@ class RunnerTests(unittest.TestCase):
             self.assertTrue(local.is_symlink())
             self.assertEqual(local.resolve(), oracle.resolve())
 
-    def test_worktree_gate_cache_is_copied_when_inputs_match(self) -> None:
+    def test_worktree_gate_prerequisites_are_built_privately(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             main = Path(directory) / "main"
             worktree = Path(directory) / "worktree"
             git_dir = main / ".git" / "worktrees" / "lane"
-            for root in (main, worktree):
-                lib = root / "disasm" / "lib" / "ultralib"
-                (lib / "src").mkdir(parents=True)
-                (lib / "src" / "same.c").write_text("void same(void) {}\n")
-            archive = main / "disasm" / "lib" / "ultralib" / "build" / "L" / "libultra" / "libultra.a"
-            archive.parent.mkdir(parents=True)
-            archive.write_bytes(b"archive")
-            linker = main / "disasm" / "build" / "linker_scripts" / "us" / "auto.ld"
-            linker.parent.mkdir(parents=True)
-            linker.write_bytes(b"linker")
-            (main / "disasm" / "lib" / "ultralib" / "tools" / "gcc").mkdir(parents=True)
-            (main / "disasm" / "lib" / "ultralib" / "tools" / "gcc" / "host").write_text("ignored")
             git_dir.mkdir(parents=True)
+            worktree.mkdir()
             (worktree / ".git").write_text(f"gitdir: {git_dir}\n")
-            runner._ensure_worktree_gate_cache(worktree)
-            copied = worktree / "disasm" / "lib" / "ultralib" / "build" / "L" / "libultra" / "libultra.a"
-            self.assertEqual(copied.read_bytes(), b"archive")
-            copied_linker = worktree / "disasm" / "build" / "linker_scripts" / "us" / "auto.ld"
-            self.assertEqual(copied_linker.read_bytes(), b"linker")
+            baserom = main / "disasm" / "baseroms" / "us" / "baserom.z64"
+            baserom.parent.mkdir(parents=True)
+            baserom.write_bytes(b"private immutable rom")
+            venv = main / ".venv" / "bin" / "python3"
+            venv.parent.mkdir(parents=True)
+            venv.write_text("python")
+            venv.chmod(0o755)
+            for relative in ("yamls/us/header.yaml", "yamls/us/rom.yaml"):
+                path = worktree / "disasm" / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text(relative)
+            compiler_platform = "macos" if sys.platform == "darwin" else "linux"
+            compiler = worktree / "disasm" / "tools" / "ido" / compiler_platform / "5.3" / "cc"
+            compiler.parent.mkdir(parents=True)
+            compiler.write_text("compiler")
+            compiler.chmod(0o755)
+            tracked_asm = worktree / "disasm" / "asm" / "us" / "nonmatchings" / "alias.s"
+            tracked_asm.parent.mkdir(parents=True)
+            tracked_asm.write_text("tracked alias\n")
 
-    def test_worktree_gate_cache_refuses_mismatched_inputs(self) -> None:
+            # Mutable primary outputs must never be used as bootstrap inputs.
+            primary_lib_sentinel = main / "disasm" / "lib" / "ultralib" / "build" / "primary-only"
+            primary_lib_sentinel.parent.mkdir(parents=True)
+            primary_lib_sentinel.write_text("do not copy")
+            primary_linker_sentinel = main / "disasm" / "build" / "linker_scripts" / "primary-only"
+            primary_linker_sentinel.parent.mkdir(parents=True)
+            primary_linker_sentinel.write_text("do not copy")
+
+            calls = []
+
+            def bootstrap(repo_root, command, description, *, environment=None):
+                self.assertEqual(repo_root, worktree)
+                calls.append((description, command, environment))
+                if description == "worktree revision check":
+                    return "test-head\n"
+                if description == "tracked assembly safety check":
+                    return ""
+                if description == "tracked assembly listing":
+                    return "disasm/asm/us/nonmatchings/alias.s\0"
+                if description == "local ROM extraction":
+                    for name in ("undefined_syms_auto.ld", "undefined_funcs_auto.ld"):
+                        path = worktree / "disasm" / "linker_scripts" / "us" / "auto" / name
+                        path.parent.mkdir(parents=True, exist_ok=True)
+                        path.write_text(f"source {name}\n")
+                    tracked_asm.write_text("splat replacement\n")
+                elif description == "private libultra build":
+                    archive = worktree / "disasm" / "lib" / "ultralib" / "build" / "L" / "libultra" / "libultra.a"
+                    archive.parent.mkdir(parents=True, exist_ok=True)
+                    archive.write_bytes(b"locally built archive")
+                elif description == "local auto linker preprocessing":
+                    for name in ("undefined_syms_auto.ld", "undefined_funcs_auto.ld"):
+                        path = worktree / "disasm" / "build" / "linker_scripts" / "us" / "auto" / name
+                        path.parent.mkdir(parents=True, exist_ok=True)
+                        path.write_text(f"local output {name}\n")
+                return ""
+
+            with mock.patch.object(runner, "_bootstrap_command", side_effect=bootstrap):
+                runner._ensure_worktree_gate_prerequisites(worktree)
+
+            local_baserom = worktree / "disasm" / "baseroms" / "us" / "baserom.z64"
+            self.assertEqual(local_baserom.read_bytes(), baserom.read_bytes())
+            self.assertFalse(local_baserom.is_symlink())
+            self.assertEqual(list(local_baserom.parent.glob(".baserom.z64.*.tmp")), [])
+            self.assertEqual(tracked_asm.read_text(), "tracked alias\n")
+            self.assertFalse((worktree / "disasm" / "lib" / "ultralib" / "build" / "primary-only").exists())
+            self.assertFalse((worktree / "disasm" / "build" / "linker_scripts" / "primary-only").exists())
+            descriptions = [description for description, _, _ in calls]
+            self.assertIn("local tool setup", descriptions)
+            self.assertIn("local ROM extraction", descriptions)
+            self.assertIn("tracked assembly listing", descriptions)
+            self.assertIn("private libultra build", descriptions)
+            self.assertIn("local auto linker preprocessing", descriptions)
+            make_environments = [environment for description, _, environment in calls if description.startswith(("local ", "private "))]
+            self.assertTrue(make_environments)
+            self.assertTrue(all(environment["VENV"] == str((main / ".venv").resolve()) for environment in make_environments))
+
+            # Proven private outputs are reusable; only the tracked identity is
+            # rechecked, and no primary mutable artifact is consulted.
+            calls.clear()
+            with mock.patch.object(runner, "_bootstrap_command", side_effect=bootstrap):
+                runner._ensure_worktree_gate_prerequisites(worktree)
+            self.assertEqual([description for description, _, _ in calls], ["worktree revision check"])
+
+    def test_worktree_gate_prerequisites_refuse_dirty_tracked_asm(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             main = Path(directory) / "main"
             worktree = Path(directory) / "worktree"
             git_dir = main / ".git" / "worktrees" / "lane"
-            for root, body in ((main, "primary"), (worktree, "changed")):
-                lib = root / "disasm" / "lib" / "ultralib"
-                (lib / "src").mkdir(parents=True)
-                (lib / "src" / "same.c").write_text(body)
-            archive = main / "disasm" / "lib" / "ultralib" / "build" / "L" / "libultra" / "libultra.a"
-            archive.parent.mkdir(parents=True)
-            archive.write_bytes(b"archive")
             git_dir.mkdir(parents=True)
+            worktree.mkdir()
             (worktree / ".git").write_text(f"gitdir: {git_dir}\n")
-            runner._ensure_worktree_gate_cache(worktree)
-            copied = worktree / "disasm" / "lib" / "ultralib" / "build" / "L" / "libultra" / "libultra.a"
-            self.assertFalse(copied.exists())
+            for relative in ("yamls/us/header.yaml", "yamls/us/rom.yaml"):
+                path = worktree / "disasm" / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text(relative)
+            with mock.patch.object(
+                runner,
+                "_bootstrap_command",
+                side_effect=["test-head\n", " M disasm/asm/us/nonmatchings/alias.s\n"],
+            ):
+                with self.assertRaisesRegex(RuntimeError, "refused to re-extract.*tracked assembly"):
+                    runner._ensure_worktree_gate_prerequisites(worktree)
+            self.assertFalse((worktree / "disasm" / "baseroms" / "us" / "baserom.z64").exists())
+
+    def test_worktree_gate_prerequisites_refuse_symlinked_output(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            main = Path(directory) / "main"
+            worktree = Path(directory) / "worktree"
+            git_dir = main / ".git" / "worktrees" / "lane"
+            git_dir.mkdir(parents=True)
+            worktree.mkdir()
+            (worktree / ".git").write_text(f"gitdir: {git_dir}\n")
+            primary_baserom = main / "disasm" / "baseroms" / "us" / "baserom.z64"
+            primary_baserom.parent.mkdir(parents=True)
+            primary_baserom.write_bytes(b"rom")
+            local_baserom = worktree / "disasm" / "baseroms" / "us" / "baserom.z64"
+            local_baserom.parent.mkdir(parents=True)
+            local_baserom.symlink_to(primary_baserom)
+            with self.assertRaisesRegex(RuntimeError, "refused symlinked baserom destination"):
+                runner._ensure_worktree_gate_prerequisites(worktree)
+            self.assertEqual(primary_baserom.read_bytes(), b"rom")
+
+    def test_worktree_gate_prerequisites_restore_asm_after_extract_failure(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            main = Path(directory) / "main"
+            worktree = Path(directory) / "worktree"
+            git_dir = main / ".git" / "worktrees" / "lane"
+            git_dir.mkdir(parents=True)
+            worktree.mkdir()
+            (worktree / ".git").write_text(f"gitdir: {git_dir}\n")
+            baserom = main / "disasm" / "baseroms" / "us" / "baserom.z64"
+            baserom.parent.mkdir(parents=True)
+            baserom.write_bytes(b"rom")
+            for relative in ("yamls/us/header.yaml", "yamls/us/rom.yaml"):
+                path = worktree / "disasm" / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text(relative)
+            tracked_asm = worktree / "disasm" / "asm" / "us" / "nonmatchings" / "alias.s"
+            tracked_asm.parent.mkdir(parents=True)
+            tracked_asm.write_text("tracked alias\n")
+            descriptions = []
+
+            def bootstrap(repo_root, command, description, *, environment=None):
+                descriptions.append(description)
+                if description == "worktree revision check":
+                    return "test-head\n"
+                if description == "tracked assembly safety check":
+                    return ""
+                if description == "tracked assembly listing":
+                    return "disasm/asm/us/nonmatchings/alias.s\0"
+                if description == "local ROM extraction":
+                    tracked_asm.write_text("partial extraction\n")
+                    raise RuntimeError("synthetic extraction failure")
+                return ""
+
+            with mock.patch.object(runner, "_bootstrap_command", side_effect=bootstrap):
+                with self.assertRaisesRegex(RuntimeError, "synthetic extraction failure"):
+                    runner._ensure_worktree_gate_prerequisites(worktree)
+            self.assertEqual(tracked_asm.read_text(), "tracked alias\n")
+            self.assertIn("tracked assembly listing", descriptions)
+
+    def test_worktree_gate_snapshot_restores_broken_tracked_symlink(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            worktree = Path(directory)
+            alias = worktree / "disasm" / "asm" / "us" / "nonmatchings" / "alias.s"
+            alias.parent.mkdir(parents=True)
+            alias.symlink_to("missing_target.s")
+            with mock.patch.object(
+                runner,
+                "_bootstrap_command",
+                return_value="disasm/asm/us/nonmatchings/alias.s\0",
+            ):
+                snapshot = runner._snapshot_tracked_asm(worktree)
+            alias.unlink()
+            alias.write_text("splat replacement\n")
+            with mock.patch.object(runner, "_tracked_asm_changes", return_value=""):
+                runner._restore_tracked_asm(worktree, snapshot)
+            self.assertTrue(alias.is_symlink())
+            self.assertEqual(os.readlink(alias), "missing_target.s")
+
+    def test_compare_reports_private_bootstrap_failure_without_running_make(self) -> None:
+        with mock.patch.object(
+            runner,
+            "_ensure_worktree_gate_prerequisites",
+            side_effect=RuntimeError("synthetic private bootstrap failure"),
+        ), mock.patch.object(runner.subprocess, "run") as run:
+            result, output = runner._run_compare(Path("/tmp/repo"))
+        self.assertEqual(result, 2)
+        self.assertIn("synthetic private bootstrap failure", output)
+        run.assert_not_called()
 
     def test_mismatch_diagnostics_identify_symbol_size_drift(self) -> None:
         expected = bytes.fromhex("03e00008 00000000")
