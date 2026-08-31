@@ -750,11 +750,49 @@ void func_8AC05F00(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC0602C.s")
+typedef struct Fragment43Motion602C { u8 pad00[0x40]; f32 unk40; f32 unk44; f32 unk48; f32 unk4C; f32 unk50; f32 unk54; s16 unk58; s16 unk5A; } Fragment43Motion602C;
+extern f32 D_80088E50[];
+extern f32 D_8AC08178;
+extern void func_8AC05F38(Fragment43Motion602C *);
+void func_8AC0602C(Fragment43Motion602C *arg0, u16 arg1, s32 arg2) {
+    f32 *temp_v0;
+    f32 temp_fv0;
+
+    if (arg2 != 0) {
+        arg1 <<= 12;
+        temp_v0 = &D_80088E50[arg1 >> 4];
+        temp_fv0 = D_8AC08178;
+        if (arg0) {
+        }
+        arg0->unk40 = 1.0f - (*temp_v0 * temp_fv0);
+        arg0->unk44 = (*temp_v0 * temp_fv0) + 1.0f;
+    } else {
+        func_8AC05F38(arg0);
+    }
+    arg0->unk4C = arg0->unk54 + ((f32)arg0->unk5A * 0.5f * (1.0f - arg0->unk44));
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC060E4.s")
+extern f32 D_8AC0817C;
+extern void func_8AC05F38(Fragment43Motion602C *);
+void func_8AC060E4(Fragment43Motion602C *arg0, u16 arg1, s32 arg2) {
+    f32 *temp_v0;
+    f32 temp_fv0;
+
+    if (arg2 != 0) {
+        arg1 <<= 12;
+        temp_v0 = &D_80088E50[arg1 >> 4];
+        temp_fv0 = D_8AC0817C;
+        if (arg0) {
+        }
+        arg0->unk40 = 1.0f - (*temp_v0 * temp_fv0);
+        arg0->unk44 = (*temp_v0 * temp_fv0) + 1.0f;
+    } else {
+        func_8AC05F38(arg0);
+    }
+    arg0->unk4C = arg0->unk54 - ((f32)arg0->unk5A * 0.5f * (1.0f - arg0->unk44));
+}
 #endif
 
 #ifdef VERSION_US
