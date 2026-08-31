@@ -9,3 +9,7 @@ Wave 6 handoff: func_82605218 unresolved. Best similarity was 0.7374 normalized 
 ## Wave 15 retry (2026-08-31)
 
 requeue: `func_82610D6C` (50 instructions; first selected at 0 attempts) was rerun after the isolated-worktree venv/oracle bootstrap repair. Both raw-`s16` pointer variants reached real probes but matched only 0.9000 normalized / 0.6200 raw, 196 actual versus 200 expected bytes. The durable first difference is offset 28: expected `or $s3, $a0, $zero`, actual `addiu $s0, $zero, 1`. Do not retry either raw spelling; reconstruct the source temporary/local lifetime that preserves the incoming argument in `$s3` before the loop. No link-verified hit or ROM gate.
+
+## Wave 16 handoff (2026-08-31) (2026-08-31)
+
+requeue: func_82610D6C. Count-local reached 0.8800/0.5200 at 188 bytes; count-direct-late 0.9000/0.5400 at 196 bytes; base aliases were best at 0.9000/0.6200 at 196 bytes; base-local was 180/204 bytes. First diff offset 28: expected or s3,a0,zero, actual addiu s0,zero,1. Exhausted raw-s16 pointers, count-local, base-alias, and nested-n families. Next emit lh t6,18(a0), move s3,a0, li s0,1 with the 40-byte frame.

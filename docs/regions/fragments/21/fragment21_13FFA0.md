@@ -25,3 +25,7 @@ requeue: func_82501754 received 7 new serial CC_CHECK-enabled candidates. Best n
 ## Wave 11 handoff (2026-08-31)
 
 No accepted owner. func_82504524 received 12 CC_CHECK-enabled probes. Best normalized/raw similarity was 0.6400/0.1400; the persistent first mismatch is expected lui $a2 versus actual lui $a1. Next action is a declaration and global address model that places D_82508F68 in $a2 and D_82508680 in $a3. No link_verified candidate or ROM gate.
+
+## Wave 16 handoff (2026-08-31) (2026-08-31)
+
+tooling-blocked: func_825003DC was fresh (prior_attempts=0); EMFILE occurred before any probe. The model is six arguments (five s32 values plus an s32* output) with an f32 return. Next action: after descriptor recovery, try explicit sum/end/den temporaries.
