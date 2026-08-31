@@ -200,11 +200,18 @@ def _shared_worktree_venv(repo_root: Path) -> Path | None:
     does not populate them. The primary checkout's venv is safe to reuse: it only
     provides the Python interpreter and pinned build dependencies, while all
     source, build, and probe paths remain relative to ``repo_root``. An
-    explicit ``PRAGMA_SHARED_VENV`` takes precedence for nonstandard layouts,
-    followed by root ``.venv`` and the historical ``disasm/.venv`` fallback.
+    explicit ``PRAGMA_SHARED_VENV`` takes precedence for nonstandard layouts;
+    a relative override is anchored to ``repo_root`` so Make's ``-C disasm``
+    cannot reinterpret it. Root ``.venv`` and historical ``disasm/.venv``
+    follow.
     """
     explicit = os.environ.get("PRAGMA_SHARED_VENV")
-    candidates = [Path(explicit)] if explicit else []
+    candidates: list[Path] = []
+    if explicit:
+        override = Path(os.path.expandvars(explicit)).expanduser()
+        if not override.is_absolute():
+            override = repo_root.resolve() / override
+        candidates.append(override)
     primary = _primary_worktree_root(repo_root)
     canonical_root = primary if primary is not None else repo_root
     candidates.extend((canonical_root / ".venv", canonical_root / "disasm" / ".venv"))
@@ -2470,8 +2477,18 @@ def _load_prior_attempt_history() -> dict[str, list[dict[str, object]]]:
         if isinstance(batch_id, str) and batch_id:
             identity = f"id:{batch_id}"
         else:
+            normalized_batch = dict(batch)
+            batch_attempts = normalized_batch.get("attempts")
+            if isinstance(batch_attempts, list):
+                normalized_batch["attempts"] = [
+                    probe_stats.shape_attempt_row(attempt)
+                    for attempt in batch_attempts
+                    if isinstance(attempt, dict)
+                ]
             identity = "content:" + hashlib.sha256(
-                json.dumps(batch, sort_keys=True, separators=(",", ":")).encode("utf-8")
+                json.dumps(
+                    normalized_batch, sort_keys=True, separators=(",", ":")
+                ).encode("utf-8")
             ).hexdigest()
         if identity in seen_batches:
             continue

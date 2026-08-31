@@ -903,6 +903,26 @@ class RunnerTests(unittest.TestCase):
             self.assertEqual(environment["VENV"], str(override))
             self.assertEqual(environment["PYTHON"], str(override / "bin" / "python3"))
 
+    def test_relative_shared_venv_override_is_anchored_before_make_chdir(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "root"
+            override = root / "custom-venv"
+            python = override / "bin" / "python3"
+            python.parent.mkdir(parents=True)
+            python.write_text("python\n")
+            python.chmod(0o755)
+            (root / "disasm").mkdir()
+            with mock.patch.dict(
+                os.environ, {"PRAGMA_SHARED_VENV": "custom-venv"}, clear=True
+            ):
+                environment = runner._object_build_environment(root)
+            self.assertEqual(environment["VENV"], str(override.resolve()))
+            self.assertEqual(environment["PYTHON"], str(override.resolve() / "bin" / "python3"))
+            self.assertEqual(
+                Path(environment["VENV"]),
+                (root / "disasm" / Path(environment["VENV"])).resolve(),
+            )
+
     def test_linked_build_environment_honors_shared_venv_override(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             main = Path(directory) / "main"
@@ -1695,6 +1715,47 @@ class RunnerTests(unittest.TestCase):
                 },
             )
             self.assertEqual(len(history["func_shared"]), 1)
+
+    def test_migrated_legacy_history_without_batch_id_is_counted_once(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            current = root / "probe-stats" / "probe-stats.jsonl"
+            legacy = root / "build" / "probe-stats.jsonl"
+            marker = current.parent / ".migrated-from-legacy"
+            legacy.parent.mkdir(parents=True)
+            legacy.write_text(
+                json.dumps(
+                    {
+                        "timestamp": "2026-08-31T00:00:00Z",
+                        "attempts": [
+                            {
+                                "function": "func_legacy",
+                                "status": "probe_rejected",
+                                "similarity_score": 0.75,
+                                "assembly_diff": [{"expected": "a", "actual": "b"}],
+                                "assembly_diff_truncated": False,
+                                "diagnostic": "x" * 3000,
+                            }
+                        ],
+                    }
+                )
+                + "\n"
+            )
+            result = runner.probe_stats.migrate_legacy(
+                legacy_path=legacy, target_path=current, marker_path=marker
+            )
+            self.assertTrue(result["migrated"])
+            with mock.patch.object(
+                runner.variant_policy, "STATS_PATH_CURRENT", current
+            ), mock.patch.object(
+                runner.variant_policy, "STATS_PATH_LEGACY", legacy
+            ), mock.patch.dict(os.environ, {}, clear=True):
+                history = runner._load_prior_attempt_history()
+            self.assertEqual(len(history["func_legacy"]), 1)
+            self.assertEqual(
+                len(history["func_legacy"][0]["diagnostic"]),
+                runner.probe_stats.DIAGNOSTIC_MAX_CHARS,
+            )
 
     def test_unverified_probe_hit_uses_sequential_gate_without_duplicate_compare(self) -> None:
         # An unverified probe hit (no ``link_verified`` key, e.g. baseline
