@@ -148,8 +148,10 @@ def resolve_paths(paths: Iterable[Path] | None = None) -> list[Path]:
     return resolved
 
 
-def iter_batches(paths: Iterable[Path] | None = None) -> Iterator[dict[str, object]]:
-    """Yield one batch dict per JSONL line across ``resolve_paths(paths)``.
+def iter_batches_with_paths(
+    paths: Iterable[Path] | None = None,
+) -> Iterator[tuple[Path, dict[str, object]]]:
+    """Yield ``(source path, batch)`` for every valid JSONL record.
 
     A corrupt or partial line (a concurrent writer's append can race a
     reader) is skipped rather than raised.
@@ -168,7 +170,13 @@ def iter_batches(paths: Iterable[Path] | None = None) -> Iterator[dict[str, obje
             except json.JSONDecodeError:
                 continue
             if isinstance(record, dict):
-                yield record
+                yield path, record
+
+
+def iter_batches(paths: Iterable[Path] | None = None) -> Iterator[dict[str, object]]:
+    """Yield one batch dict per JSONL line across ``resolve_paths(paths)``."""
+    for _, batch in iter_batches_with_paths(paths):
+        yield batch
 
 
 def iter_attempts(paths: Iterable[Path] | None = None) -> Iterator[dict[str, object]]:
@@ -201,6 +209,17 @@ def shape_attempt_row(
     if isinstance(diagnostic, str) and len(diagnostic) > diagnostic_max_chars:
         row["diagnostic"] = diagnostic[:diagnostic_max_chars]
     return row
+
+
+def shape_legacy_batch(batch: dict[str, object]) -> dict[str, object]:
+    """Return the exact lossy batch shape written by ``migrate_legacy``."""
+    shaped = dict(batch)
+    attempts = shaped.get("attempts")
+    if isinstance(attempts, list):
+        shaped["attempts"] = [
+            shape_attempt_row(attempt) for attempt in attempts if isinstance(attempt, dict)
+        ]
+    return shaped
 
 
 def _git_head(repo_root: Path) -> str | None:
@@ -368,11 +387,10 @@ def migrate_legacy(
             if not isinstance(batch, dict):
                 continue
             raw_sha256 = raw_batch_sha256(batch)
+            batch = shape_legacy_batch(batch)
             attempts = batch.get("attempts")
             if isinstance(attempts, list):
-                shaped = [shape_attempt_row(a) for a in attempts if isinstance(a, dict)]
-                batch = {**batch, "attempts": shaped}
-                copied_attempts += len(shaped)
+                copied_attempts += len(attempts)
             batch[MIGRATION_PROVENANCE_KEY] = {
                 "kind": "legacy_raw_batch_sha256",
                 "sha256": raw_sha256,

@@ -1801,6 +1801,72 @@ class RunnerTests(unittest.TestCase):
                 history = runner._load_prior_attempt_history()
             self.assertEqual(len(history["func_legacy"]), 2)
 
+    def test_pre_provenance_migrated_copy_pairs_with_raw_legacy(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            current = root / "probe-stats" / "probe-stats.jsonl"
+            legacy = root / "build" / "probe-stats.jsonl"
+            raw = {
+                "timestamp": "2026-08-31T00:00:00Z",
+                "attempts": [
+                    {
+                        "function": "func_legacy",
+                        "status": "probe_rejected",
+                        "diagnostic": "x" * 3000,
+                        "assembly_diff": [{"expected": "a", "actual": "b"}],
+                    }
+                ],
+            }
+            current.parent.mkdir(parents=True)
+            current.write_text(json.dumps(runner.probe_stats.shape_legacy_batch(raw)) + "\n")
+            (current.parent / runner.probe_stats.MIGRATION_MARKER_NAME).write_text(
+                "migrated 1 batches\n"
+            )
+            legacy.parent.mkdir(parents=True)
+            legacy.write_text(json.dumps(raw) + "\n")
+            with mock.patch.object(
+                runner.variant_policy, "STATS_PATH_CURRENT", current
+            ), mock.patch.object(
+                runner.variant_policy, "STATS_PATH_LEGACY", legacy
+            ), mock.patch.dict(os.environ, {}, clear=True):
+                history = runner._load_prior_attempt_history()
+            self.assertEqual(len(history["func_legacy"]), 1)
+
+    def test_pre_provenance_ambiguous_shapes_preserve_raw_multiplicity(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            current = root / "probe-stats" / "probe-stats.jsonl"
+            legacy = root / "build" / "probe-stats.jsonl"
+
+            def raw_batch(actual: str) -> dict[str, object]:
+                return {
+                    "timestamp": "2026-08-31T00:00:00Z",
+                    "attempts": [
+                        {
+                            "function": "func_legacy",
+                            "status": "probe_rejected",
+                            "assembly_diff": [{"expected": "same", "actual": actual}],
+                        }
+                    ],
+                }
+
+            raw_batches = [raw_batch("first"), raw_batch("second")]
+            shaped = runner.probe_stats.shape_legacy_batch(raw_batches[0])
+            current.parent.mkdir(parents=True)
+            current.write_text(json.dumps(shaped) + "\n" + json.dumps(shaped) + "\n")
+            (current.parent / runner.probe_stats.MIGRATION_MARKER_NAME).write_text(
+                "migrated 2 batches\n"
+            )
+            legacy.parent.mkdir(parents=True)
+            legacy.write_text("".join(json.dumps(batch) + "\n" for batch in raw_batches))
+            with mock.patch.object(
+                runner.variant_policy, "STATS_PATH_CURRENT", current
+            ), mock.patch.object(
+                runner.variant_policy, "STATS_PATH_LEGACY", legacy
+            ), mock.patch.dict(os.environ, {}, clear=True):
+                history = runner._load_prior_attempt_history()
+            self.assertEqual(len(history["func_legacy"]), 2)
+
     def test_unverified_probe_hit_uses_sequential_gate_without_duplicate_compare(self) -> None:
         # An unverified probe hit (no ``link_verified`` key, e.g. baseline
         # shape unavailable) still uses the historical sequential gate.  That

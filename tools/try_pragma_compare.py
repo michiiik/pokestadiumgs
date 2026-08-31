@@ -2471,10 +2471,41 @@ def _load_prior_attempt_history() -> dict[str, list[dict[str, object]]]:
         paths = _probe_stats_history_paths()
     except OSError:
         return history
+    records = list(probe_stats.iter_batches_with_paths(paths))
+
+    # Pre-provenance migrations wrote a lossy shaped copy to the active file
+    # while retaining the raw legacy source. When the migration marker proves
+    # that relationship, pair shaped active rows one-to-one with distinct raw
+    # hashes sharing their migration signature. This is deliberately not a
+    # general lossy identity: ambiguous raw rows keep separate hashes and thus
+    # preserve their multiplicity.
+    raw_by_shape: dict[str, list[str]] = {}
+    shaped_active_by_shape: dict[str, list[int]] = {}
+    for index, (path, batch) in enumerate(records):
+        if batch.get("batch_id") or batch.get(probe_stats.MIGRATION_PROVENANCE_KEY):
+            continue
+        raw_sha256 = probe_stats.raw_batch_sha256(batch)
+        shaped_sha256 = probe_stats.raw_batch_sha256(probe_stats.shape_legacy_batch(batch))
+        if path.parent.name == "build":
+            hashes = raw_by_shape.setdefault(shaped_sha256, [])
+            if raw_sha256 not in hashes:
+                hashes.append(raw_sha256)
+        elif (
+            raw_sha256 == shaped_sha256
+            and (path.parent / probe_stats.MIGRATION_MARKER_NAME).is_file()
+        ):
+            shaped_active_by_shape.setdefault(shaped_sha256, []).append(index)
+    upgraded_identities: dict[int, str] = {}
+    for shaped_sha256, active_indices in shaped_active_by_shape.items():
+        for index, raw_sha256 in zip(active_indices, raw_by_shape.get(shaped_sha256, [])):
+            upgraded_identities[index] = f"legacy-raw:{raw_sha256}"
+
     seen_batches: set[str] = set()
-    for batch in probe_stats.iter_batches(paths):
+    for index, (_, batch) in enumerate(records):
         batch_id = batch.get("batch_id")
-        if isinstance(batch_id, str) and batch_id:
+        if index in upgraded_identities:
+            identity = upgraded_identities[index]
+        elif isinstance(batch_id, str) and batch_id:
             identity = f"id:{batch_id}"
         else:
             migration = batch.get(probe_stats.MIGRATION_PROVENANCE_KEY)
