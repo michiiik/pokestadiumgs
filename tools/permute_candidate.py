@@ -44,12 +44,29 @@ BASE_SCORE_RE = re.compile(r"base score = (\d+)")
 OUTPUT_DIR_RE = re.compile(r"^output-(\d+)-(\d+)$")
 
 
+def _permuter_root() -> Path:
+    return targets.readonly_tool_path(
+        Path("disasm/tools/decomp-permuter"), override_name="PRAGMA_PERMUTER_ROOT"
+    )
+
+
+def _permuter_venv_python() -> Path:
+    return targets.readonly_tool_path(
+        Path("disasm/tools/decomp-venv/bin/python3"),
+        override_name="PRAGMA_PERMUTER_VENV_PYTHON",
+    )
+
+
 def _permuter_python() -> str:
     override = os.environ.get("PERMUTER_PYTHON")
     if override:
-        return override
-    if PERMUTER_VENV_PYTHON.exists():
-        return str(PERMUTER_VENV_PYTHON)
+        expanded = os.path.expandvars(os.path.expanduser(override))
+        if os.sep in expanded and not os.path.isabs(expanded):
+            return str((REPO_ROOT / expanded).resolve(strict=False))
+        return expanded
+    python = _permuter_venv_python()
+    if python.is_file() and os.access(python, os.X_OK):
+        return str(python)
     return sys.executable
 
 
@@ -92,13 +109,19 @@ def compile_script_text(compiler: str, flags: list[str], include_directory: str)
     )
 
 
-def _strip_other_functions(source: str, function: str) -> str:
-    sys.path.insert(0, str(PERMUTER_ROOT))
-    try:
-        import strip_other_fns  # type: ignore
-    finally:
-        sys.path.pop(0)
-    stripped = strip_other_fns.strip_other_fns(source, function)
+def _strip_other_functions(source: str, function: str, permuter_root: Path) -> str:
+    # Loading the shared helper as an import can create ``__pycache__`` in the
+    # primary checkout. Compile the immutable source directly so all shared
+    # tool trees remain read-only even under a fresh linked worktree.
+    helper = permuter_root / "strip_other_fns.py"
+    namespace: dict[str, object] = {"__name__": "_pragma_strip_other_fns"}
+    exec(compile(helper.read_text(), str(helper), "exec"), namespace)
+    strip = namespace.get("strip_other_fns")
+    if not callable(strip):
+        raise RuntimeError(f"invalid decomp-permuter helper: {helper}")
+    stripped = strip(source, function)
+    if not isinstance(stripped, str):
+        raise RuntimeError(f"invalid decomp-permuter helper result: {helper}")
     return "\n".join(
         line for line in stripped.splitlines() if not line.startswith("#pragma GLOBAL_ASM")
     ) + "\n"
@@ -109,12 +132,13 @@ def build_work_directory(
     code: str,
     *,
     declarations: str | None = None,
-    work_root: Path = WORK_ROOT,
+    work_root: Path | None = None,
 ) -> Path:
     """Materialize base.c, compile.sh, target.o, and function.txt for the permuter."""
-    if not PERMUTER_ROOT.exists():
+    permuter_root = _permuter_root()
+    if not permuter_root.is_dir():
         raise FileNotFoundError(
-            f"decomp-permuter is not installed at {PERMUTER_ROOT}; run tools/setup_decomp_tools.sh"
+            f"decomp-permuter is not installed at {permuter_root}; run tools/setup_decomp_tools.sh"
         )
     recipes = runner._probe_recipes(REPO_ROOT)
     if recipes["compile"] is None or recipes["check"] is None:
@@ -125,6 +149,7 @@ def build_work_directory(
     if substituted is None:
         raise ValueError(f"{owner.source} does not contain exactly one pragma for {owner.function}")
 
+    work_root = work_root or WORK_ROOT
     work_root.mkdir(parents=True, exist_ok=True)
     work_dir = Path(tempfile.mkdtemp(prefix=f"{owner.function}-", dir=work_root))
     source_rel = owner.source_path.relative_to(DISASM_ROOT)
@@ -143,7 +168,9 @@ def build_work_directory(
     )
     if result.returncode != 0:
         raise RuntimeError(f"host preprocess failed:\n{result.stderr[-2000:]}")
-    (work_dir / "base.c").write_text(_strip_other_functions(result.stdout, owner.function))
+    (work_dir / "base.c").write_text(
+        _strip_other_functions(result.stdout, owner.function, permuter_root)
+    )
 
     compiler, flags = _split_recipe(recipes["compile"])
     script = work_dir / "compile.sh"
@@ -152,7 +179,7 @@ def build_work_directory(
 
     target_s = work_dir / "target.s"
     target_s.write_text(
-        (PERMUTER_ROOT / "prelude.inc").read_text() + owner.asm_path.read_text()
+        (permuter_root / "prelude.inc").read_text() + owner.asm_path.read_text()
     )
     assemble = subprocess.run(
         [runner._binutils_tool("as"), "-march=vr4300", "-mabi=32", str(target_s), "-o", str(work_dir / "target.o")],
@@ -225,9 +252,10 @@ def permute(
     """Run the permuter for at most ``seconds`` and return the best outputs."""
     owner = targets.require_owner(function)
     work_dir = build_work_directory(owner, code, declarations=declarations)
+    permuter_root = _permuter_root()
     command = [
         _permuter_python(),
-        str(PERMUTER_ROOT / "permuter.py"),
+        str(permuter_root / "permuter.py"),
         str(work_dir),
         "-j",
         str(max(1, threads)),
@@ -240,7 +268,8 @@ def permute(
     started = time.monotonic()
     process = subprocess.Popen(
         command,
-        cwd=PERMUTER_ROOT,
+        cwd=work_dir,
+        env=targets.readonly_tool_environment(),
         text=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,

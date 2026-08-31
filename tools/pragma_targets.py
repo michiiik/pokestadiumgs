@@ -65,6 +65,42 @@ DRAFT_VARIANTS: dict[str, list[str]] = {
 }
 
 
+def readonly_tool_path(relative: Path, *, override_name: str | None = None) -> Path:
+    """Resolve an ignored read-only tool from the primary checkout.
+
+    Linked worktrees do not contain the optional ``disasm/tools`` clones.
+    Prefer the canonical primary path when it exists instead of requiring a
+    mutable directory symlink in each worktree. Relative explicit overrides
+    are anchored to this checkout, matching the runner's shared-venv rules.
+    """
+    if override_name:
+        override = os.environ.get(override_name)
+        if override:
+            path = Path(os.path.expandvars(override)).expanduser()
+            if not path.is_absolute():
+                path = REPO_ROOT / path
+            return path.resolve(strict=False)
+    primary = runner._primary_worktree_root(REPO_ROOT)
+    if primary is not None:
+        shared = (primary / relative).resolve(strict=False)
+        if shared.exists():
+            return shared
+    return (REPO_ROOT / relative).resolve(strict=False)
+
+
+def readonly_tool_environment() -> dict[str, str]:
+    """Return an environment that cannot create bytecode in shared tools."""
+    environment = dict(os.environ)
+    environment.setdefault("PYTHONDONTWRITEBYTECODE", "1")
+    return environment
+
+
+def m2c_script() -> Path:
+    return readonly_tool_path(
+        Path("disasm/tools/m2c/m2c.py"), override_name="PRAGMA_M2C_SCRIPT"
+    )
+
+
 def _guess_asm_fallback_root() -> Path | None:
     """Read-only fallback root for a partially generated ``disasm/asm`` tree.
 
@@ -1350,7 +1386,13 @@ def rank_files(
 
 
 def _m2c_python() -> str:
-    return os.environ.get("M2C_PYTHON") or sys.executable
+    override = os.environ.get("M2C_PYTHON")
+    if not override:
+        return sys.executable
+    expanded = os.path.expandvars(os.path.expanduser(override))
+    if os.sep in expanded and not os.path.isabs(expanded):
+        return str((REPO_ROOT / expanded).resolve(strict=False))
+    return expanded
 
 
 def draft_candidates(
@@ -1366,9 +1408,10 @@ def draft_candidates(
     types; they are starting points for candidate families, never proof.
     """
     owner = require_owner(function)
-    if not M2C_SCRIPT.exists():
+    script = m2c_script()
+    if not script.is_file():
         raise FileNotFoundError(
-            f"m2c is not installed at {M2C_SCRIPT}; run tools/setup_decomp_tools.sh"
+            f"m2c is not installed at {script}; run tools/setup_decomp_tools.sh"
         )
     context_path = preprocessed_context(owner) if context else None
     names = variants or ["m2c", "m2c-no-casts"]
@@ -1378,7 +1421,7 @@ def draft_candidates(
         if flags is None:
             drafts.append({"label": name, "code": None, "error": "unknown variant"})
             continue
-        command = [_m2c_python(), str(M2C_SCRIPT), "--target", "mips-ido-c"]
+        command = [_m2c_python(), str(script), "--target", "mips-ido-c"]
         if context_path is not None:
             command += ["--context", str(context_path)]
         command += flags + list(extra_args or []) + [str(owner.asm_path)]
@@ -1389,6 +1432,7 @@ def draft_candidates(
                 text=True,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
+                env=readonly_tool_environment(),
                 timeout=runner._command_timeout("PRAGMA_M2C_TIMEOUT", 60.0),
             )
         except subprocess.TimeoutExpired:

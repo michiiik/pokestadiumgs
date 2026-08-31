@@ -979,11 +979,30 @@ def draft_variants(
     """
     owner = targets.require_owner(function)
     context_path = targets.preprocessed_context(owner) if context else None
-    command = [sys.executable, str(targets.M2C_SCRIPT), "--target", "mips-ido-c", "--valid-syntax", "--globals", "used"]
+    script = targets.m2c_script()
+    if not script.is_file():
+        return [], None
+    command = [
+        targets._m2c_python(),
+        str(script),
+        "--target",
+        "mips-ido-c",
+        "--valid-syntax",
+        "--globals",
+        "used",
+    ]
     command += list(extra_m2c_args)
     if context_path is not None:
         command += ["--context", str(context_path)]
-    result = subprocess.run(command + [str(owner.asm_path)], text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=60)
+    result = subprocess.run(
+        command + [str(owner.asm_path)],
+        cwd=targets.REPO_ROOT,
+        env=targets.readonly_tool_environment(),
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        timeout=60,
+    )
     if result.returncode != 0 or not result.stdout.strip():
         return [], None
     draft = result.stdout

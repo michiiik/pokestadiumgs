@@ -2967,6 +2967,69 @@ import variant_policy  # noqa: E402
 
 
 class TargetDiscoveryTests(unittest.TestCase):
+    def test_linked_worktree_draft_uses_primary_readonly_m2c(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            main = Path(directory) / "main"
+            worktree = Path(directory) / "worktree"
+            git_dir = main / ".git" / "worktrees" / "draft"
+            git_dir.mkdir(parents=True)
+            worktree.mkdir()
+            (worktree / ".git").write_text(f"gitdir: {git_dir}\n")
+            script = main / "disasm" / "tools" / "m2c" / "m2c.py"
+            script.parent.mkdir(parents=True)
+            script.write_text("# primary read-only m2c\n")
+            asm = worktree / "disasm" / "asm" / "us" / "nonmatchings" / "x" / "func_a.s"
+            asm.parent.mkdir(parents=True)
+            asm.write_text("glabel func_a\n  jr $ra\n   nop\n")
+            owner = targets.Owner(
+                "func_a",
+                "disasm/src/x.c",
+                "disasm/asm/us/nonmatchings/x/func_a.s",
+            )
+            completed = mock.Mock(returncode=0, stdout="void func_a(void) {}\n", stderr="")
+            with mock.patch.object(targets, "REPO_ROOT", worktree), mock.patch.object(
+                targets, "DISASM_ROOT", worktree / "disasm"
+            ), mock.patch.object(targets, "_ASM_FALLBACK_ROOT", None), mock.patch.object(
+                targets, "require_owner", return_value=owner
+            ), mock.patch.object(
+                targets, "function_asm", return_value={"instruction_count": 2}
+            ), mock.patch.object(
+                targets, "similar_solved", return_value=[]
+            ), mock.patch.object(
+                targets.subprocess, "run", return_value=completed
+            ) as run, mock.patch.dict(os.environ, {}, clear=True):
+                result = targets.draft_candidates(
+                    "func_a", variants=["m2c"], context=False
+                )
+
+            self.assertEqual(result["drafts"][0]["code"], completed.stdout)
+            command = run.call_args.args[0]
+            self.assertEqual(Path(command[1]), script.resolve())
+            self.assertEqual(run.call_args.kwargs["cwd"], worktree)
+            self.assertEqual(
+                run.call_args.kwargs["env"]["PYTHONDONTWRITEBYTECODE"], "1"
+            )
+            self.assertFalse((worktree / "disasm" / "tools" / "m2c").exists())
+
+    def test_m2c_explicit_overrides_remain_authoritative(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            script = root / "custom" / "m2c.py"
+            script.parent.mkdir()
+            script.write_text("# override\n")
+            with mock.patch.object(targets, "REPO_ROOT", root), mock.patch.dict(
+                os.environ,
+                {
+                    "PRAGMA_M2C_SCRIPT": "custom/m2c.py",
+                    "M2C_PYTHON": "custom/python3",
+                },
+                clear=True,
+            ):
+                self.assertEqual(targets.m2c_script(), script.resolve())
+                self.assertEqual(
+                    targets._m2c_python(), str((root / "custom" / "python3").resolve())
+                )
+
     def test_owner_index_maps_functions_to_sources(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -3236,6 +3299,87 @@ class DedupeExternTests(unittest.TestCase):
 
 
 class PermuterWrapperTests(unittest.TestCase):
+    def test_linked_worktree_permuter_uses_primary_tools_and_private_cwd(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            main = Path(directory) / "main"
+            worktree = Path(directory) / "worktree"
+            git_dir = main / ".git" / "worktrees" / "permute"
+            git_dir.mkdir(parents=True)
+            worktree.mkdir()
+            (worktree / ".git").write_text(f"gitdir: {git_dir}\n")
+            permuter_root = main / "disasm" / "tools" / "decomp-permuter"
+            permuter_root.mkdir(parents=True)
+            permuter_script = permuter_root / "permuter.py"
+            permuter_script.write_text("# primary read-only permuter\n")
+            (permuter_root / "strip_other_fns.py").write_text(
+                "def strip_other_fns(source, function):\n    return source\n"
+            )
+            python = main / "disasm" / "tools" / "decomp-venv" / "bin" / "python3"
+            python.parent.mkdir(parents=True)
+            python.write_text("#!/bin/sh\n")
+            python.chmod(0o755)
+            work_dir = worktree / "disasm" / "build" / "permuter" / "func_a-test"
+            work_dir.mkdir(parents=True)
+            owner = targets.Owner("func_a", "disasm/src/x.c", "disasm/asm/x/func_a.s")
+
+            class FinishedProcess:
+                pid = 999999
+                stdout: list[str] = []
+
+                def wait(self, timeout=None):
+                    return 0
+
+            primary_before = {path.relative_to(main) for path in main.rglob("*")}
+            with mock.patch.object(targets, "REPO_ROOT", worktree), mock.patch.object(
+                permute_candidate, "REPO_ROOT", worktree
+            ), mock.patch.object(
+                permute_candidate, "DISASM_ROOT", worktree / "disasm"
+            ), mock.patch.object(
+                targets, "require_owner", return_value=owner
+            ), mock.patch.object(
+                permute_candidate, "build_work_directory", return_value=work_dir
+            ), mock.patch.object(
+                permute_candidate, "_collect_outputs", return_value=[]
+            ), mock.patch.object(
+                permute_candidate.subprocess, "Popen", return_value=FinishedProcess()
+            ) as popen, mock.patch.dict(os.environ, {}, clear=True):
+                result = permute_candidate.permute(
+                    "func_a", "void func_a(void) {}", seconds=60, keep=True
+                )
+                stripped = permute_candidate._strip_other_functions(
+                    "void func_a(void) {}", "func_a", permuter_root
+                )
+
+            command = popen.call_args.args[0]
+            self.assertEqual(Path(command[0]), python.resolve())
+            self.assertEqual(Path(command[1]), permuter_script.resolve())
+            self.assertEqual(popen.call_args.kwargs["cwd"], work_dir)
+            self.assertEqual(
+                popen.call_args.kwargs["env"]["PYTHONDONTWRITEBYTECODE"], "1"
+            )
+            self.assertEqual(result["work_dir"], str(work_dir.relative_to(worktree)))
+            self.assertEqual(stripped, "void func_a(void) {}\n")
+            self.assertEqual(
+                {path.relative_to(main) for path in main.rglob("*")}, primary_before
+            )
+            self.assertFalse(
+                (worktree / "disasm" / "tools" / "decomp-permuter").exists()
+            )
+            self.assertFalse(
+                (worktree / "disasm" / "tools" / "decomp-venv").exists()
+            )
+
+    def test_permuter_explicit_interpreter_override_remains_authoritative(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with mock.patch.object(permute_candidate, "REPO_ROOT", root), mock.patch.dict(
+                os.environ, {"PERMUTER_PYTHON": "custom/python3"}, clear=True
+            ):
+                self.assertEqual(
+                    permute_candidate._permuter_python(),
+                    str((root / "custom" / "python3").resolve()),
+                )
+
     def test_extract_function_returns_only_the_target_body(self) -> None:
         code = (
             "extern u8 D_1;\nvoid other(void) { if (D_1) { D_1 = 0; } }\n"
@@ -3294,6 +3438,50 @@ class McpDispatchTests(unittest.TestCase):
 
 
 class SweepTests(unittest.TestCase):
+    def test_linked_worktree_sweep_draft_uses_shared_m2c_and_local_cwd(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            main = Path(directory) / "main"
+            worktree = Path(directory) / "worktree"
+            git_dir = main / ".git" / "worktrees" / "sweep"
+            git_dir.mkdir(parents=True)
+            worktree.mkdir()
+            (worktree / ".git").write_text(f"gitdir: {git_dir}\n")
+            script = main / "disasm" / "tools" / "m2c" / "m2c.py"
+            script.parent.mkdir(parents=True)
+            script.write_text("# primary m2c\n")
+            asm = worktree / "disasm" / "asm" / "func_a.s"
+            asm.parent.mkdir(parents=True)
+            asm.write_text("glabel func_a\n")
+            source = worktree / "disasm" / "src" / "x.c"
+            source.parent.mkdir(parents=True)
+            source.write_text('#pragma GLOBAL_ASM("asm/func_a.s")\n')
+            owner = targets.Owner("func_a", "disasm/src/x.c", "disasm/asm/func_a.s")
+            completed = mock.Mock(returncode=0, stdout="raw draft\n", stderr="")
+            with mock.patch.object(targets, "REPO_ROOT", worktree), mock.patch.object(
+                targets, "require_owner", return_value=owner
+            ), mock.patch.object(
+                targets, "preprocessed_context", return_value=None
+            ), mock.patch.object(
+                sweep_targets, "rewrite_draft", return_value="void func_a(void) {}"
+            ), mock.patch.object(
+                sweep_targets,
+                "prepare_candidate_declarations",
+                return_value="void func_a(void) {}",
+            ), mock.patch.object(
+                sweep_targets.subprocess, "run", return_value=completed
+            ) as run, mock.patch.dict(os.environ, {}, clear=True):
+                variants, raw = sweep_targets.draft_variants(
+                    "func_a", context=False, variant_names=("s32-s32",)
+                )
+
+            self.assertEqual(raw, completed.stdout)
+            self.assertEqual(variants[0][1], "void func_a(void) {}")
+            self.assertEqual(Path(run.call_args.args[0][1]), script.resolve())
+            self.assertEqual(run.call_args.kwargs["cwd"], worktree)
+            self.assertEqual(
+                run.call_args.kwargs["env"]["PYTHONDONTWRITEBYTECODE"], "1"
+            )
+
     def test_rewrite_draft_inlines_fields_and_resolves_unknown_types(self) -> None:
         draft = (
             "extern M2C_UNK D_1;\n"
