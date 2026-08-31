@@ -1757,6 +1757,50 @@ class RunnerTests(unittest.TestCase):
                 runner.probe_stats.DIAGNOSTIC_MAX_CHARS,
             )
 
+    def test_raw_migration_identity_preserves_distinct_lossy_batches(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            current = root / "probe-stats" / "probe-stats.jsonl"
+            legacy = root / "build" / "probe-stats.jsonl"
+            migration_source = root / "migration-source.jsonl"
+            marker = current.parent / ".migrated-from-legacy"
+
+            def raw_batch(actual: str) -> dict[str, object]:
+                return {
+                    "timestamp": "2026-08-31T00:00:00Z",
+                    "attempts": [
+                        {
+                            "function": "func_legacy",
+                            "status": "probe_rejected",
+                            "diagnostic": "x" * 3000,
+                            "assembly_diff": [{"expected": "same", "actual": actual}],
+                        }
+                    ],
+                }
+
+            first = raw_batch("first")
+            second = raw_batch("second")
+            migration_source.write_text(json.dumps(first) + "\n")
+            legacy.parent.mkdir(parents=True)
+            legacy.write_text(json.dumps(first) + "\n" + json.dumps(second) + "\n")
+            result = runner.probe_stats.migrate_legacy(
+                legacy_path=migration_source,
+                target_path=current,
+                marker_path=marker,
+            )
+            self.assertTrue(result["migrated"])
+            migrated = json.loads(current.read_text())
+            provenance = migrated[runner.probe_stats.MIGRATION_PROVENANCE_KEY]
+            self.assertEqual(provenance["sha256"], runner.probe_stats.raw_batch_sha256(first))
+
+            with mock.patch.object(
+                runner.variant_policy, "STATS_PATH_CURRENT", current
+            ), mock.patch.object(
+                runner.variant_policy, "STATS_PATH_LEGACY", legacy
+            ), mock.patch.dict(os.environ, {}, clear=True):
+                history = runner._load_prior_attempt_history()
+            self.assertEqual(len(history["func_legacy"]), 2)
+
     def test_unverified_probe_hit_uses_sequential_gate_without_duplicate_compare(self) -> None:
         # An unverified probe hit (no ``link_verified`` key, e.g. baseline
         # shape unavailable) still uses the historical sequential gate.  That

@@ -21,7 +21,8 @@ wipes -- every batch's history was lost with it.  This module owns:
 * keeping any single file bounded (``rotate_if_needed``); and
 * a one-time, idempotent copy of the legacy file into the new location
   (``migrate_legacy``, also usable as ``python3 tools/probe_stats.py
-  migrate``).
+  migrate``), retaining a canonical raw-batch hash so readers can deduplicate
+  the shaped copy against its exact legacy source without conflating rows;
 
 Every batch row written through this module carries ``schema_version: 2``,
 an ISO-8601 UTC ``timestamp``, a ``batch_id`` (uuid4 hex), the ``worktree``
@@ -32,6 +33,7 @@ this module never rejects a row for missing metadata.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
@@ -47,12 +49,19 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_STATS_PATH = REPO_ROOT / "disasm" / "probe-stats" / "probe-stats.jsonl"
 LEGACY_STATS_PATH = REPO_ROOT / "disasm" / "build" / "probe-stats.jsonl"
 MIGRATION_MARKER_NAME = ".migrated-from-legacy"
+MIGRATION_PROVENANCE_KEY = "_probe_stats_migration"
 
 SCHEMA_VERSION = 2
 DIAGNOSTIC_MAX_CHARS = 2000
 DEFAULT_MAX_BYTES = 64 * 1024 * 1024
 
 _ROTATED_RE_CACHE: dict[tuple[str, str], re.Pattern[str]] = {}
+
+
+def raw_batch_sha256(batch: dict[str, object]) -> str:
+    """Return a stable identity for one unmodified legacy JSON batch."""
+    encoded = json.dumps(batch, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
 
 
 def stats_path() -> Path | None:
@@ -327,8 +336,10 @@ def migrate_legacy(
 
     Every copied attempt is passed through ``shape_attempt_row`` first, so a
     legacy row's ``assembly_diff``/oversized ``diagnostic`` does not survive
-    the move.  Idempotent: a marker file next to the target records that the
-    migration ran (successfully, or because there was nothing to migrate),
+    the move. The migrated batch records a namespaced hash of the canonical
+    raw row computed before that lossy shaping. Idempotent: a marker file next
+    to the target records that the migration ran (successfully, or because
+    there was nothing to migrate),
     and a later call is a no-op until the marker is removed.
     """
     legacy = legacy_path if legacy_path is not None else LEGACY_STATS_PATH
@@ -356,11 +367,16 @@ def migrate_legacy(
                 continue
             if not isinstance(batch, dict):
                 continue
+            raw_sha256 = raw_batch_sha256(batch)
             attempts = batch.get("attempts")
             if isinstance(attempts, list):
                 shaped = [shape_attempt_row(a) for a in attempts if isinstance(a, dict)]
                 batch = {**batch, "attempts": shaped}
                 copied_attempts += len(shaped)
+            batch[MIGRATION_PROVENANCE_KEY] = {
+                "kind": "legacy_raw_batch_sha256",
+                "sha256": raw_sha256,
+            }
             out.write(json.dumps(batch, sort_keys=True) + "\n")
             copied_batches += 1
 

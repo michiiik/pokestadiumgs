@@ -2477,19 +2477,17 @@ def _load_prior_attempt_history() -> dict[str, list[dict[str, object]]]:
         if isinstance(batch_id, str) and batch_id:
             identity = f"id:{batch_id}"
         else:
-            normalized_batch = dict(batch)
-            batch_attempts = normalized_batch.get("attempts")
-            if isinstance(batch_attempts, list):
-                normalized_batch["attempts"] = [
-                    probe_stats.shape_attempt_row(attempt)
-                    for attempt in batch_attempts
-                    if isinstance(attempt, dict)
-                ]
-            identity = "content:" + hashlib.sha256(
-                json.dumps(
-                    normalized_batch, sort_keys=True, separators=(",", ":")
-                ).encode("utf-8")
-            ).hexdigest()
+            migration = batch.get(probe_stats.MIGRATION_PROVENANCE_KEY)
+            raw_sha256 = migration.get("sha256") if isinstance(migration, dict) else None
+            if (
+                isinstance(migration, dict)
+                and migration.get("kind") == "legacy_raw_batch_sha256"
+                and isinstance(raw_sha256, str)
+                and re.fullmatch(r"[0-9a-f]{64}", raw_sha256)
+            ):
+                identity = f"legacy-raw:{raw_sha256}"
+            else:
+                identity = f"legacy-raw:{probe_stats.raw_batch_sha256(batch)}"
         if identity in seen_batches:
             continue
         seen_batches.add(identity)
