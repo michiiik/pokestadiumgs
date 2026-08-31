@@ -748,6 +748,21 @@ class RunnerTests(unittest.TestCase):
                 environment = runner._object_build_environment(worktree)
             self.assertEqual(environment["VENV"], str((main / "disasm" / ".venv").resolve()))
 
+    def test_worktree_oracle_links_primary_nonmatchings(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            main = Path(directory) / "main"
+            worktree = Path(directory) / "worktree"
+            oracle = main / "disasm" / "asm" / "us" / "nonmatchings"
+            git_dir = main / ".git" / "worktrees" / "lane"
+            oracle.mkdir(parents=True)
+            worktree.mkdir()
+            git_dir.mkdir(parents=True)
+            (worktree / ".git").write_text(f"gitdir: {git_dir}\n")
+            runner._ensure_worktree_oracles(worktree)
+            local = worktree / "disasm" / "asm" / "us" / "nonmatchings"
+            self.assertTrue(local.is_symlink())
+            self.assertEqual(local.resolve(), oracle.resolve())
+
     def test_mismatch_diagnostics_identify_symbol_size_drift(self) -> None:
         expected = bytes.fromhex("03e00008 00000000")
         actual = bytes.fromhex("03e00008")

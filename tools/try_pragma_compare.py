@@ -179,6 +179,24 @@ def _timeout_output(error: subprocess.TimeoutExpired) -> str:
     return str(output or "")
 
 
+def _primary_worktree_root(repo_root: Path) -> Path | None:
+    """Return the primary checkout for a linked Git worktree, if known."""
+    git_file = repo_root / ".git"
+    try:
+        if not git_file.is_file():
+            return None
+        line = git_file.read_text(encoding="utf-8").strip()
+        prefix = "gitdir: "
+        if not line.startswith(prefix):
+            return None
+        git_dir = Path(line[len(prefix):]).resolve()
+        if git_dir.parent.name != "worktrees":
+            return None
+        return git_dir.parent.parent.parent
+    except OSError:
+        return None
+
+
 def _shared_worktree_venv(repo_root: Path) -> Path | None:
     """Find a usable venv when an isolated Git worktree has none of its own.
 
@@ -190,17 +208,9 @@ def _shared_worktree_venv(repo_root: Path) -> Path | None:
     """
     explicit = os.environ.get("PRAGMA_SHARED_VENV")
     candidates = [Path(explicit)] if explicit else []
-    git_file = repo_root / ".git"
-    try:
-        if git_file.is_file():
-            line = git_file.read_text(encoding="utf-8").strip()
-            prefix = "gitdir: "
-            if line.startswith(prefix):
-                git_dir = Path(line[len(prefix):]).resolve()
-                if git_dir.parent.name == "worktrees":
-                    candidates.append(git_dir.parent.parent.parent / "disasm" / ".venv")
-    except OSError:
-        pass
+    primary = _primary_worktree_root(repo_root)
+    if primary is not None:
+        candidates.append(primary / "disasm" / ".venv")
     for candidate in candidates:
         python = candidate / "bin" / "python3"
         if python.is_file() and os.access(python, os.X_OK):
@@ -227,6 +237,30 @@ def _object_build_environment(repo_root: Path | None = None) -> dict[str, str]:
         if shared_venv is not None:
             environment["VENV"] = str(shared_venv)
     return environment
+
+
+def _ensure_worktree_oracles(repo_root: Path) -> None:
+    """Expose immutable split assembly to a linked worktree when omitted by Git.
+
+    Splat's large ``asm/us/nonmatchings`` tree is ignored and therefore absent
+    after ``git worktree add``.  GLOBAL_ASM includes require it even for a
+    baseline object probe.  Link the missing directory to the primary
+    checkout without overwriting an existing local oracle; no tracked source
+    or generated output is shared.
+    """
+    primary = _primary_worktree_root(repo_root)
+    if primary is None:
+        return
+    local = repo_root / "disasm" / "asm" / "us" / "nonmatchings"
+    shared = primary / "disasm" / "asm" / "us" / "nonmatchings"
+    if local.exists() or local.is_symlink() or not shared.is_dir():
+        return
+    try:
+        local.parent.mkdir(parents=True, exist_ok=True)
+        local.symlink_to(shared, target_is_directory=True)
+    except OSError:
+        # A caller still gets the compiler's useful missing-include error.
+        pass
 
 
 # Placeholder paths (relative to ``disasm/``) used to capture the Makefile's
@@ -390,6 +424,7 @@ def _make_object(source_path: Path, *, capture: bool = False) -> tuple[int, Path
     with each other or alter the tracked source.
     """
     repo_root = Path(__file__).resolve().parent.parent
+    _ensure_worktree_oracles(repo_root)
     relative = source_path.resolve().relative_to(repo_root / "disasm")
     object_path = repo_root / "disasm" / "build" / relative.with_suffix(".o")
     object_path.parent.mkdir(parents=True, exist_ok=True)
@@ -491,6 +526,7 @@ def _try_candidate_detailed(source_path: Path, function: str, candidate: str) ->
 
 def _run_compare(repo_root: Path) -> tuple[int, str]:
     """Run the full compare with a bounded lifetime and captured diagnostics."""
+    _ensure_worktree_oracles(repo_root)
     env = _object_build_environment(repo_root)
     env.setdefault("MIPS_BINUTILS_PREFIX", "/Users/michaegg/homebrew/bin/mips-linux-gnu-")
     # The full gate also runs the Makefile's host-side syntax check (clang,
