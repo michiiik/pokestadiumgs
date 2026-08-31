@@ -684,14 +684,11 @@ class RunnerTests(unittest.TestCase):
         self.assertIsNone(runner._parse_probe_recipe(":\n:\n"))
 
     def test_compare_capture_replaces_malformed_utf8(self) -> None:
-        def run(command, **kwargs):
-            self.assertEqual(kwargs["encoding"], "utf-8")
-            self.assertEqual(kwargs["errors"], "replace")
-            # subprocess.run performs this decoding before returning text.
-            decoded = b"diagnostic \xff\n".decode(kwargs["encoding"], kwargs["errors"])
-            return mock.Mock(returncode=1, stdout=decoded)
+        decoded = b"diagnostic \xff\n".decode("utf-8", "replace")
 
-        with mock.patch.object(runner.subprocess, "run", side_effect=run):
+        with mock.patch.object(
+            runner, "_run_bounded_process_group", return_value=(1, decoded, False)
+        ):
             result, output = runner._run_compare(Path("/tmp/repo"))
         self.assertEqual(result, 1)
         self.assertIn("diagnostic \ufffd", output)
@@ -702,12 +699,13 @@ class RunnerTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix=".pragma_probe_", dir=probe_root) as directory:
             source = Path(directory) / "owner.c"
             source.write_text("void owner(void) {}\n")
-            completed = mock.Mock(returncode=0, stdout="")
             with mock.patch.object(
                 runner,
                 "_probe_compile_recipe",
                 return_value=["cc", "-o", runner._RECIPE_OBJECT, runner._RECIPE_SOURCE],
-            ), mock.patch.object(runner.subprocess, "run", return_value=completed) as run:
+            ), mock.patch.object(
+                runner, "_run_bounded_process_group", return_value=(0, "", False)
+            ) as run:
                 result, object_path, _ = runner._make_object(source, capture=True)
             self.assertEqual(result, 0)
             command = run.call_args.args[0]
@@ -719,7 +717,9 @@ class RunnerTests(unittest.TestCase):
             with tempfile.TemporaryDirectory(dir=repo_root / "disasm" / "src") as tracked:
                 tracked_source = Path(tracked) / "owner.c"
                 tracked_source.write_text("void owner(void) {}\n")
-                with mock.patch.object(runner.subprocess, "run", return_value=completed) as run:
+                with mock.patch.object(
+                    runner, "_run_bounded_process_group", return_value=(0, "", False)
+                ) as run:
                     runner._make_object(tracked_source, capture=True)
                 self.assertEqual(run.call_args.args[0][0], "make")
 
@@ -770,6 +770,82 @@ class RunnerTests(unittest.TestCase):
             if child_exists():
                 os.kill(child_pid, signal.SIGKILL)
                 self.fail(f"bootstrap descendant {child_pid} survived process-group cleanup")
+
+    def test_compare_timeout_kills_and_reaps_descendants(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            child_pid_path = root / "compare-child.pid"
+            script = (
+                "import pathlib,subprocess,sys,time; "
+                "child=subprocess.Popen([sys.executable,'-c','import time; time.sleep(60)']); "
+                "pathlib.Path(sys.argv[1]).write_text(str(child.pid)); time.sleep(60)"
+            )
+            real_popen = runner.subprocess.Popen
+
+            def spawn_descendant(command, **kwargs):
+                return real_popen(
+                    [sys.executable, "-c", script, str(child_pid_path)], **kwargs
+                )
+
+            with mock.patch.object(
+                runner, "_ensure_worktree_gate_prerequisites"
+            ), mock.patch.object(runner, "_ensure_worktree_oracles"), mock.patch.object(
+                runner.subprocess, "Popen", side_effect=spawn_descendant
+            ), mock.patch.dict(
+                os.environ,
+                {"PRAGMA_COMPARE_TIMEOUT": "0.8", "PRAGMA_BOOTSTRAP_TERM_SECONDS": "0.2"},
+            ):
+                result, output = runner._run_compare(root)
+            self.assertEqual(result, 124)
+            self.assertIn("compare timed out", output)
+            self._assert_process_exited(child_pid_path, "compare")
+
+    def test_make_object_timeout_kills_and_reaps_descendants(self) -> None:
+        repo_root = Path(__file__).resolve().parent.parent
+        with tempfile.TemporaryDirectory(dir=repo_root / "disasm" / "src") as directory:
+            source = Path(directory) / "synthetic.c"
+            source.write_text("void synthetic(void) {}\n")
+            child_pid_path = Path(directory) / "compile-child.pid"
+            script = (
+                "import pathlib,subprocess,sys,time; "
+                "child=subprocess.Popen([sys.executable,'-c','import time; time.sleep(60)']); "
+                "pathlib.Path(sys.argv[1]).write_text(str(child.pid)); time.sleep(60)"
+            )
+            real_popen = runner.subprocess.Popen
+
+            def spawn_descendant(command, **kwargs):
+                return real_popen(
+                    [sys.executable, "-c", script, str(child_pid_path)], **kwargs
+                )
+
+            with mock.patch.object(
+                runner.subprocess, "Popen", side_effect=spawn_descendant
+            ), mock.patch.dict(
+                os.environ,
+                {"PRAGMA_COMPILE_TIMEOUT": "0.8", "PRAGMA_BOOTSTRAP_TERM_SECONDS": "0.2"},
+            ):
+                result, _, output = runner._make_object(source, capture=True)
+            self.assertEqual(result, 124)
+            self.assertIn("compile timed out", output)
+            self._assert_process_exited(child_pid_path, "compile")
+
+    def _assert_process_exited(self, pid_path: Path, description: str) -> None:
+        self.assertTrue(pid_path.is_file())
+        pid = int(pid_path.read_text())
+
+        def process_exists() -> bool:
+            try:
+                os.kill(pid, 0)
+                return True
+            except ProcessLookupError:
+                return False
+
+        deadline = time.monotonic() + 2.0
+        while process_exists() and time.monotonic() < deadline:
+            time.sleep(0.02)
+        if process_exists():
+            os.kill(pid, signal.SIGKILL)
+            self.fail(f"{description} descendant {pid} survived process-group cleanup")
 
     def test_worktree_build_environment_reuses_primary_venv(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -832,9 +908,17 @@ class RunnerTests(unittest.TestCase):
             git_dir.mkdir(parents=True)
             local = worktree / "disasm" / "asm" / "us" / "nonmatchings"
             local.mkdir(parents=True)
+            oracle = local / "local" / "func.s"
+            oracle.parent.mkdir()
+            oracle.write_text("local oracle\n")
             marker = worktree / "disasm" / "build" / ".pragma_private_gate_bootstrap.json"
-            marker.parent.mkdir(parents=True)
-            marker.write_text('{"schema": 2}\n')
+            runner._write_gate_bootstrap_marker(
+                marker,
+                {
+                    "schema": 2,
+                    "outputs": {"asm_oracles": runner._private_asm_manifest(worktree)},
+                },
+            )
             (worktree / ".git").write_text(f"gitdir: {git_dir}\n")
             runner._ensure_worktree_oracles(worktree, full_tree=True)
             self.assertFalse((local / "primary_only").exists())
@@ -892,6 +976,17 @@ class RunnerTests(unittest.TestCase):
                         path = worktree / "disasm" / "linker_scripts" / "us" / "auto" / name
                         path.parent.mkdir(parents=True, exist_ok=True)
                         path.write_text(f"source {name}\n")
+                    generated_asm = (
+                        worktree
+                        / "disasm"
+                        / "asm"
+                        / "us"
+                        / "nonmatchings"
+                        / "generated"
+                        / "func.s"
+                    )
+                    generated_asm.parent.mkdir(parents=True, exist_ok=True)
+                    generated_asm.write_text("generated oracle\n")
                     tracked_asm.write_text("splat replacement\n")
                 elif description == "private libultra build":
                     archive = worktree / "disasm" / "lib" / "ultralib" / "build" / "L" / "libultra" / "libultra.a"
@@ -929,6 +1024,24 @@ class RunnerTests(unittest.TestCase):
             with mock.patch.object(runner, "_bootstrap_command", side_effect=bootstrap):
                 runner._ensure_worktree_gate_prerequisites(worktree)
             self.assertEqual(calls, [])
+
+            # A missing locally extracted oracle invalidates the marker and
+            # forces extraction instead of silently borrowing primary ASM.
+            generated_asm = (
+                worktree
+                / "disasm"
+                / "asm"
+                / "us"
+                / "nonmatchings"
+                / "generated"
+                / "func.s"
+            )
+            generated_asm.unlink()
+            calls.clear()
+            with mock.patch.object(runner, "_bootstrap_command", side_effect=bootstrap):
+                runner._ensure_worktree_gate_prerequisites(worktree)
+            self.assertIn("local ROM extraction", [description for description, _, _ in calls])
+            self.assertTrue(generated_asm.is_file())
 
             # A dirty lib source invalidates provenance and forces a new local
             # extraction/build rather than reusing the archive.
@@ -969,6 +1082,9 @@ class RunnerTests(unittest.TestCase):
             for path in (*auto_sources, *auto_outputs):
                 path.parent.mkdir(parents=True, exist_ok=True)
                 path.write_text(f"valid {path.name}\n")
+            asm_oracle = worktree / "disasm" / "asm" / "us" / "nonmatchings" / "func.s"
+            asm_oracle.parent.mkdir(parents=True)
+            asm_oracle.write_text("private oracle\n")
             lib_build = worktree / "disasm" / "lib" / "ultralib" / "build"
             lib_build.mkdir(parents=True)
             runner._write_gate_bootstrap_marker(
@@ -988,6 +1104,7 @@ class RunnerTests(unittest.TestCase):
                         "auto_sources": runner._output_manifest(worktree, auto_sources),
                         "auto_outputs": runner._output_manifest(worktree, auto_outputs),
                         "libultra": runner._output_manifest(worktree, (archive,)),
+                        "asm_oracles": runner._private_asm_manifest(worktree),
                     },
                 },
             )
@@ -1141,7 +1258,7 @@ class RunnerTests(unittest.TestCase):
             runner,
             "_ensure_worktree_gate_prerequisites",
             side_effect=RuntimeError("synthetic private bootstrap failure"),
-        ), mock.patch.object(runner.subprocess, "run") as run:
+        ), mock.patch.object(runner, "_run_bounded_process_group") as run:
             result, output = runner._run_compare(Path("/tmp/repo"))
         self.assertEqual(result, 2)
         self.assertIn("synthetic private bootstrap failure", output)
@@ -1285,9 +1402,9 @@ class RunnerTests(unittest.TestCase):
             source = Path(directory) / "synthetic.c"
             source.write_text("void synthetic(void) {}\n")
             with mock.patch.object(
-                runner.subprocess,
-                "run",
-                side_effect=runner.subprocess.TimeoutExpired("make", 1),
+                runner,
+                "_run_bounded_process_group",
+                return_value=(124, "", True),
             ):
                 result, object_path, output = runner._make_object(source, capture=True)
             self.assertEqual(result, 124)

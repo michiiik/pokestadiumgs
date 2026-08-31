@@ -173,13 +173,6 @@ def _command_timeout(environment_name: str, default: float) -> float:
     return timeout if timeout > 0 else default
 
 
-def _timeout_output(error: subprocess.TimeoutExpired) -> str:
-    output = error.stdout if error.stdout is not None else error.output
-    if isinstance(output, bytes):
-        output = output.decode(encoding="utf-8", errors="replace")
-    return str(output or "")
-
-
 def _primary_worktree_root(repo_root: Path) -> Path | None:
     """Return the primary checkout for a linked Git worktree, if known."""
     git_file = repo_root / ".git"
@@ -274,7 +267,9 @@ def _ensure_worktree_oracles(
     # symlinks on later probes or full gates.
     private_marker = repo_root / "disasm" / "build" / ".pragma_private_gate_bootstrap.json"
     private_state = _read_gate_bootstrap_marker(private_marker)
-    if private_state is not None and private_state.get("schema") == 2:
+    if private_state is not None and _private_asm_marker_usable(
+        repo_root, private_state, source_path=source_path, full_tree=full_tree
+    ):
         return
     local_root = repo_root / "disasm" / "asm" / "us" / "nonmatchings"
     shared_root = primary / "disasm" / "asm" / "us" / "nonmatchings"
@@ -404,35 +399,30 @@ def _copy_baserom_atomically(source: Path, destination: Path, repo_root: Path) -
                 pass
 
 
-def _bootstrap_command(
-    repo_root: Path,
+def _run_bounded_process_group(
     command: list[str],
-    description: str,
     *,
-    environment: dict[str, str] | None = None,
-) -> str:
-    """Run one bootstrap step and reap its entire process group on every exit."""
-    try:
-        process = subprocess.Popen(
-            command,
-            cwd=repo_root,
-            env=environment,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            start_new_session=True,
-        )
-    except OSError as error:
-        raise RuntimeError(
-            f"isolated gate bootstrap could not start {description}: {error}"
-        ) from error
-    timeout = _command_timeout("PRAGMA_COMPARE_TIMEOUT", 300.0)
+    cwd: Path,
+    environment: dict[str, str] | None,
+    timeout: float,
+    capture: bool,
+) -> tuple[int, str, bool]:
+    """Run a bounded command, always reaping its process and descendants."""
+    process = subprocess.Popen(
+        command,
+        cwd=cwd,
+        env=environment,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        stdout=subprocess.PIPE if capture else None,
+        stderr=subprocess.STDOUT if capture else None,
+        start_new_session=True,
+    )
     output = ""
     try:
         output, _ = process.communicate(timeout=timeout)
-    except subprocess.TimeoutExpired as error:
+    except subprocess.TimeoutExpired:
         try:
             os.killpg(process.pid, signal.SIGTERM)
         except ProcessLookupError:
@@ -456,10 +446,7 @@ def _bootstrap_command(
                 except OSError:
                     pass
             output, _ = process.communicate()
-        raise RuntimeError(
-            f"isolated gate bootstrap timed out during {description} after {error.timeout}s\n"
-            f"{output or _timeout_output(error)}"
-        ) from error
+        return 124, output or "", True
     except BaseException:
         try:
             os.killpg(process.pid, signal.SIGKILL)
@@ -482,12 +469,40 @@ def _bootstrap_command(
     finally:
         if process.stdout is not None and not process.stdout.closed:
             process.stdout.close()
-    if process.returncode != 0:
+    return process.returncode, output or "", False
+
+
+def _bootstrap_command(
+    repo_root: Path,
+    command: list[str],
+    description: str,
+    *,
+    environment: dict[str, str] | None = None,
+) -> str:
+    """Run one bootstrap step and reap its entire process group on every exit."""
+    timeout = _command_timeout("PRAGMA_COMPARE_TIMEOUT", 300.0)
+    try:
+        returncode, output, timed_out = _run_bounded_process_group(
+            command,
+            cwd=repo_root,
+            environment=environment,
+            timeout=timeout,
+            capture=True,
+        )
+    except OSError as error:
+        raise RuntimeError(
+            f"isolated gate bootstrap could not start {description}: {error}"
+        ) from error
+    if timed_out:
+        raise RuntimeError(
+            f"isolated gate bootstrap timed out during {description} after {timeout}s\n{output}"
+        )
+    if returncode != 0:
         raise RuntimeError(
             f"isolated gate bootstrap failed during {description} "
-            f"(exit {process.returncode})\n{output or ''}"
+            f"(exit {returncode})\n{output}"
         )
-    return output or ""
+    return output
 
 
 def _tracked_asm_changes(repo_root: Path) -> str:
@@ -661,7 +676,7 @@ def _gate_bootstrap_identity(repo_root: Path) -> dict[str, object]:
 
 def _file_fingerprint(path: Path) -> dict[str, object] | None:
     """Return content evidence for one private regular output."""
-    if not _regular_nonempty_file(path):
+    if path.is_symlink() or not _regular_nonempty_file(path):
         return None
     try:
         digest = hashlib.sha256()
@@ -678,6 +693,85 @@ def _output_manifest(repo_root: Path, paths: tuple[Path, ...]) -> dict[str, obje
         path.relative_to(repo_root).as_posix(): _file_fingerprint(path)
         for path in paths
     }
+
+
+def _private_asm_manifest(repo_root: Path) -> dict[str, object] | None:
+    """Fingerprint locally extracted regular assembly oracles."""
+    root = repo_root / "disasm" / "asm" / "us" / "nonmatchings"
+    if root.is_symlink() or not root.is_dir():
+        return None
+    paths = tuple(
+        sorted(
+            path
+            for path in root.rglob("*.s")
+            if path.is_file() and not path.is_symlink()
+        )
+    )
+    if not paths:
+        return None
+    return _output_manifest(repo_root, paths)
+
+
+def _private_asm_manifest_matches(repo_root: Path, marker: dict[str, object]) -> bool:
+    outputs = marker.get("outputs")
+    if marker.get("schema") != 2 or not isinstance(outputs, dict):
+        return False
+    recorded = outputs.get("asm_oracles")
+    return isinstance(recorded, dict) and bool(recorded) and recorded == _private_asm_manifest(
+        repo_root
+    )
+
+
+def _private_asm_marker_usable(
+    repo_root: Path,
+    marker: dict[str, object],
+    *,
+    source_path: Path | None,
+    full_tree: bool,
+) -> bool:
+    """Validate all private ASM for a gate, or only one probe's dependencies."""
+    outputs = marker.get("outputs")
+    if marker.get("schema") != 2 or not isinstance(outputs, dict):
+        return False
+    recorded = outputs.get("asm_oracles")
+    if not isinstance(recorded, dict) or not recorded:
+        return False
+    root = repo_root / "disasm" / "asm" / "us" / "nonmatchings"
+    if root.is_symlink() or not root.is_dir():
+        return False
+    if full_tree:
+        return _private_asm_manifest_matches(repo_root, marker)
+    if source_path is None:
+        return False
+    try:
+        source = source_path.read_text(encoding="utf-8")
+    except OSError:
+        return False
+    dependencies = set(re.findall(r'GLOBAL_ASM\("asm/us/nonmatchings/([^"\n]+\.s)"\)', source))
+    for relative in dependencies:
+        path = root / relative
+        key = path.relative_to(repo_root).as_posix()
+        if recorded.get(key) != _file_fingerprint(path):
+            return False
+    return True
+
+
+def _remove_shared_asm_overlays(repo_root: Path) -> None:
+    """Remove only symlink overlays before deriving the private ASM tree."""
+    root = repo_root / "disasm" / "asm" / "us" / "nonmatchings"
+    try:
+        if root.is_symlink():
+            root.unlink()
+            return
+        if not root.is_dir():
+            return
+        for path in sorted(root.rglob("*"), reverse=True):
+            if path.is_symlink():
+                path.unlink()
+    except OSError as error:
+        raise RuntimeError(
+            f"isolated gate bootstrap could not remove shared assembly overlays: {error}"
+        ) from error
 
 
 _LIB_BUILD_OWNERSHIP = {"schema": 1, "owner": "try_pragma_compare.private_gate"}
@@ -799,11 +893,14 @@ def _ensure_worktree_gate_prerequisites(repo_root: Path) -> None:
     auto_outputs_match = identity_matches and recorded_outputs.get(
         "auto_outputs"
     ) == _output_manifest(repo_root, auto_outputs)
+    asm_oracles_match = identity_matches and _private_asm_manifest_matches(
+        repo_root, recorded
+    )
     lib_output = (built_archive,)
     lib_matches = identity_matches and recorded_outputs.get("libultra") == _output_manifest(
         repo_root, lib_output
     )
-    needs_extract = not auto_sources_match
+    needs_extract = not auto_sources_match or not asm_oracles_match
     needs_lib_build = not lib_matches
     needs_auto_preprocess = needs_extract or not auto_outputs_match
     if lib_build.exists() and not _runner_owns_lib_build(lib_build):
@@ -847,6 +944,7 @@ def _ensure_worktree_gate_prerequisites(repo_root: Path) -> None:
         )
         extract_error: RuntimeError | None = None
         try:
+            _remove_shared_asm_overlays(repo_root)
             _bootstrap_command(
                 repo_root,
                 ["make", "-C", "disasm", "extract", "COLOR=0"],
@@ -868,6 +966,10 @@ def _ensure_worktree_gate_prerequisites(repo_root: Path) -> None:
             raise RuntimeError(
                 "isolated gate bootstrap extraction did not create required files:\n"
                 + "\n".join(missing)
+            )
+        if _private_asm_manifest(repo_root) is None:
+            raise RuntimeError(
+                "isolated gate bootstrap extraction did not create a private regular ASM oracle"
             )
 
     if needs_lib_build:
@@ -933,6 +1035,11 @@ def _ensure_worktree_gate_prerequisites(repo_root: Path) -> None:
     # Record the identity that actually produced these outputs, not the
     # pre-bootstrap snapshot used to decide whether rebuilding was necessary.
     final_identity = _gate_bootstrap_identity(repo_root)
+    asm_manifest = _private_asm_manifest(repo_root)
+    if asm_manifest is None:
+        raise RuntimeError(
+            "isolated gate bootstrap cannot record provenance without a private regular ASM oracle"
+        )
     _write_gate_bootstrap_marker(
         marker,
         {
@@ -942,6 +1049,7 @@ def _ensure_worktree_gate_prerequisites(repo_root: Path) -> None:
                 "auto_sources": _output_manifest(repo_root, auto_sources),
                 "auto_outputs": _output_manifest(repo_root, auto_outputs),
                 "libultra": _output_manifest(repo_root, lib_output),
+                "asm_oracles": asm_manifest,
             },
         },
     )
@@ -1114,35 +1222,29 @@ def _make_object(source_path: Path, *, capture: bool = False) -> tuple[int, Path
     object_path.parent.mkdir(parents=True, exist_ok=True)
     object_path.unlink(missing_ok=True)
     object_rel = object_path.relative_to(repo_root / "disasm").as_posix()
-    kwargs: dict[str, object] = {
-        "cwd": repo_root,
-        "env": _object_build_environment(repo_root),
-        "text": True,
-    }
-    if capture:
-        kwargs["encoding"] = "utf-8"
-        kwargs["errors"] = "replace"
-        kwargs["stdout"] = subprocess.PIPE
-        kwargs["stderr"] = subprocess.STDOUT
+    cwd = repo_root
     command = ["make", "-C", "disasm", "PRAGMA_PROBE=1", object_rel]
     if relative.parts and relative.parts[0] == "probes":
         recipe = _probe_compile_recipe(repo_root)
         if recipe is not None:
             command = _substitute_probe_recipe(recipe, relative.as_posix(), object_rel)
-            kwargs["cwd"] = repo_root / "disasm"
+            cwd = repo_root / "disasm"
+    timeout = _command_timeout("PRAGMA_COMPILE_TIMEOUT", 120.0)
     try:
-        result = subprocess.run(
+        returncode, output, timed_out = _run_bounded_process_group(
             command,
-            timeout=_command_timeout("PRAGMA_COMPILE_TIMEOUT", 120.0),
-            **kwargs,
+            cwd=cwd,
+            environment=_object_build_environment(repo_root),
+            timeout=timeout,
+            capture=capture,
         )
-    except subprocess.TimeoutExpired as error:
+    except OSError as error:
         _remove_probe_outputs(object_path)
-        return 124, object_path, (
-            f"compile timed out after {error.timeout}s\n{_timeout_output(error)}"
-        )
-    output = result.stdout if capture and isinstance(result.stdout, str) else ""
-    return result.returncode, object_path, output
+        return 127, object_path, f"compile could not start: {error}\n"
+    if timed_out:
+        _remove_probe_outputs(object_path)
+        return 124, object_path, f"compile timed out after {timeout}s\n{output}"
+    return returncode, object_path, output
 
 
 def rebuild_source_object(source_path: Path) -> int:
@@ -1224,23 +1326,20 @@ def _run_compare(repo_root: Path) -> tuple[int, str]:
     # touched again); the Makefile now keeps IDO-accepted int/pointer
     # conversions as warnings, so the check only rejects real breakage.
     env["RUN_CC_CHECK"] = "0" if os.environ.get("PRAGMA_GATE_CC_CHECK") == "0" else "1"
+    timeout = _command_timeout("PRAGMA_COMPARE_TIMEOUT", 300.0)
     try:
-        result = subprocess.run(
+        returncode, output, timed_out = _run_bounded_process_group(
             ["make", "-C", "disasm", "COMPARE=1", "-j2"],
             cwd=repo_root,
-            env=env,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            timeout=_command_timeout("PRAGMA_COMPARE_TIMEOUT", 300.0),
+            environment=env,
+            timeout=timeout,
+            capture=True,
         )
-    except subprocess.TimeoutExpired as error:
-        return 124, (
-            f"compare timed out after {error.timeout}s\n{_timeout_output(error)}"
-        )
-    return result.returncode, result.stdout or ""
+    except OSError as error:
+        return 127, f"compare could not start: {error}\n"
+    if timed_out:
+        return 124, f"compare timed out after {timeout}s\n{output}"
+    return returncode, output
 
 
 def compare_current_tree(repo_root: Path) -> int:
