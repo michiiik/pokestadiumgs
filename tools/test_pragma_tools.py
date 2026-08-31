@@ -798,6 +798,8 @@ class RunnerTests(unittest.TestCase):
             linker = main / "disasm" / "build" / "linker_scripts" / "us" / "auto.ld"
             linker.parent.mkdir(parents=True)
             linker.write_bytes(b"linker")
+            (main / "disasm" / "lib" / "ultralib" / "tools" / "gcc").mkdir(parents=True)
+            (main / "disasm" / "lib" / "ultralib" / "tools" / "gcc" / "host").write_text("ignored")
             git_dir.mkdir(parents=True)
             (worktree / ".git").write_text(f"gitdir: {git_dir}\n")
             runner._ensure_worktree_gate_cache(worktree)

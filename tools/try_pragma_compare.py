@@ -302,10 +302,12 @@ def _ensure_worktree_oracles(
 def _gate_cache_source_digest(root: Path) -> str | None:
     """Hash the tracked-like libultra inputs while excluding generated trees."""
     digest = hashlib.sha256()
+    ignored = (("build",), ("extracted",), ("tools", "gcc"), ("tools", "ido"))
     try:
         files = sorted(
             path for path in root.rglob("*")
-            if path.is_file() and not {"build", "extracted"}.intersection(path.relative_to(root).parts)
+            if path.is_file()
+            and not any(path.relative_to(root).parts[:len(prefix)] == prefix for prefix in ignored)
         )
         for path in files:
             relative = path.relative_to(root).as_posix()
@@ -334,17 +336,19 @@ def _ensure_worktree_gate_cache(repo_root: Path) -> None:
     local_archive = local_lib / "build" / "L" / "libultra" / "libultra.a"
     shared_build = shared_lib / "build"
     shared_linker = primary / "disasm" / "build" / "linker_scripts"
-    if local_archive.is_file() or not shared_build.is_dir():
-        return
-    if _gate_cache_source_digest(local_lib) != _gate_cache_source_digest(shared_lib):
-        return
     try:
         # Dereference any cache symlinks: the isolated gate must not retain a
         # path back into the primary checkout's mutable build tree.
-        copied_roots = [local_lib / "build"]
-        shutil.copytree(shared_build, copied_roots[0], dirs_exist_ok=True, symlinks=False)
+        copied_roots = []
+        if (not local_archive.is_file() and shared_build.is_dir()
+                and _gate_cache_source_digest(local_lib) == _gate_cache_source_digest(shared_lib)):
+            local_build = local_lib / "build"
+            shutil.copytree(shared_build, local_build, dirs_exist_ok=True, symlinks=False)
+            copied_roots.append(local_build)
         if shared_linker.is_dir():
             local_linker = repo_root / "disasm" / "build" / "linker_scripts"
+            if local_linker.exists() and not local_linker.is_symlink():
+                shutil.rmtree(local_linker)
             shutil.copytree(
                 shared_linker,
                 local_linker,
