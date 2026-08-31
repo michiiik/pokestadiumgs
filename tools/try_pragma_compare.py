@@ -2455,6 +2455,35 @@ def _probe_stats_append_lock(path: Path):
                 fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
 
 
+def _legacy_path_for_migrated_active(active_path: Path) -> Path | None:
+    """Return the exact canonical legacy source recorded for an active ledger."""
+    marker = active_path.parent / probe_stats.MIGRATION_MARKER_NAME
+    try:
+        text = marker.read_text(encoding="utf-8").strip()
+    except OSError:
+        return None
+    if " from " not in text or " to " not in text or " on " not in text:
+        return None
+    _, source_and_target = text.split(" from ", 1)
+    source_text, target_and_time = source_and_target.rsplit(" to ", 1)
+    target_text, _ = target_and_time.rsplit(" on ", 1)
+    source = Path(source_text)
+    target = Path(target_text)
+    if not source.is_absolute() or not target.is_absolute():
+        return None
+    source = source.resolve(strict=False)
+    target = target.resolve(strict=False)
+    active = active_path.resolve(strict=False)
+    if active != target:
+        rotated = re.fullmatch(
+            rf"{re.escape(target.stem)}\.\d+{re.escape(target.suffix)}",
+            active.name,
+        )
+        if active.parent != target.parent or rotated is None:
+            return None
+    return source
+
+
 def _load_prior_attempt_history() -> dict[str, list[dict[str, object]]]:
     """Group every historical probe-stats attempt by function, oldest first.
 
@@ -2479,25 +2508,28 @@ def _load_prior_attempt_history() -> dict[str, list[dict[str, object]]]:
     # hashes sharing their migration signature. This is deliberately not a
     # general lossy identity: ambiguous raw rows keep separate hashes and thus
     # preserve their multiplicity.
-    raw_by_shape: dict[str, list[str]] = {}
-    shaped_active_by_shape: dict[str, list[int]] = {}
+    raw_by_source_and_shape: dict[tuple[Path, str], list[str]] = {}
+    shaped_active_by_source_and_shape: dict[tuple[Path, str], list[int]] = {}
     for index, (path, batch) in enumerate(records):
         if batch.get("batch_id") or batch.get(probe_stats.MIGRATION_PROVENANCE_KEY):
             continue
         raw_sha256 = probe_stats.raw_batch_sha256(batch)
         shaped_sha256 = probe_stats.raw_batch_sha256(probe_stats.shape_legacy_batch(batch))
         if path.parent.name == "build":
-            hashes = raw_by_shape.setdefault(shaped_sha256, [])
+            key = (path.resolve(strict=False), shaped_sha256)
+            hashes = raw_by_source_and_shape.setdefault(key, [])
             if raw_sha256 not in hashes:
                 hashes.append(raw_sha256)
-        elif (
-            raw_sha256 == shaped_sha256
-            and (path.parent / probe_stats.MIGRATION_MARKER_NAME).is_file()
-        ):
-            shaped_active_by_shape.setdefault(shaped_sha256, []).append(index)
+        elif raw_sha256 == shaped_sha256:
+            legacy_source = _legacy_path_for_migrated_active(path)
+            if legacy_source is not None:
+                key = (legacy_source, shaped_sha256)
+                shaped_active_by_source_and_shape.setdefault(key, []).append(index)
     upgraded_identities: dict[int, str] = {}
-    for shaped_sha256, active_indices in shaped_active_by_shape.items():
-        for index, raw_sha256 in zip(active_indices, raw_by_shape.get(shaped_sha256, [])):
+    for key, active_indices in shaped_active_by_source_and_shape.items():
+        for index, raw_sha256 in zip(
+            active_indices, raw_by_source_and_shape.get(key, [])
+        ):
             upgraded_identities[index] = f"legacy-raw:{raw_sha256}"
 
     seen_batches: set[str] = set()

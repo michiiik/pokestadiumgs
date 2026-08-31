@@ -1820,7 +1820,8 @@ class RunnerTests(unittest.TestCase):
             current.parent.mkdir(parents=True)
             current.write_text(json.dumps(runner.probe_stats.shape_legacy_batch(raw)) + "\n")
             (current.parent / runner.probe_stats.MIGRATION_MARKER_NAME).write_text(
-                "migrated 1 batches\n"
+                f"migrated 1 batches (1 attempts) from {legacy} to {current} "
+                "on 2026-08-31T00:00:00Z\n"
             )
             legacy.parent.mkdir(parents=True)
             legacy.write_text(json.dumps(raw) + "\n")
@@ -1855,7 +1856,8 @@ class RunnerTests(unittest.TestCase):
             current.parent.mkdir(parents=True)
             current.write_text(json.dumps(shaped) + "\n" + json.dumps(shaped) + "\n")
             (current.parent / runner.probe_stats.MIGRATION_MARKER_NAME).write_text(
-                "migrated 2 batches\n"
+                f"migrated 2 batches (2 attempts) from {legacy} to {current} "
+                "on 2026-08-31T00:00:00Z\n"
             )
             legacy.parent.mkdir(parents=True)
             legacy.write_text("".join(json.dumps(batch) + "\n" for batch in raw_batches))
@@ -1863,6 +1865,46 @@ class RunnerTests(unittest.TestCase):
                 runner.variant_policy, "STATS_PATH_CURRENT", current
             ), mock.patch.object(
                 runner.variant_policy, "STATS_PATH_LEGACY", legacy
+            ), mock.patch.dict(os.environ, {}, clear=True):
+                history = runner._load_prior_attempt_history()
+            self.assertEqual(len(history["func_legacy"]), 2)
+
+    def test_pre_provenance_upgrade_never_cross_pairs_worktree_legacy(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            main = Path(directory) / "main"
+            worktree = Path(directory) / "worktree"
+            git_dir = main / ".git" / "worktrees" / "lane"
+            git_dir.mkdir(parents=True)
+            worktree.mkdir()
+            (worktree / ".git").write_text(f"gitdir: {git_dir}\n")
+            primary_current = main / "disasm" / "probe-stats" / "probe-stats.jsonl"
+            primary_legacy = main / "disasm" / "build" / "probe-stats.jsonl"
+            local_current = worktree / "disasm" / "probe-stats" / "probe-stats.jsonl"
+            local_legacy = worktree / "disasm" / "build" / "probe-stats.jsonl"
+            raw = {
+                "timestamp": "2026-08-31T00:00:00Z",
+                "attempts": [
+                    {
+                        "function": "func_legacy",
+                        "status": "probe_rejected",
+                        "assembly_diff": [{"expected": "a", "actual": "b"}],
+                    }
+                ],
+            }
+            primary_current.parent.mkdir(parents=True)
+            primary_current.write_text(
+                json.dumps(runner.probe_stats.shape_legacy_batch(raw)) + "\n"
+            )
+            (primary_current.parent / runner.probe_stats.MIGRATION_MARKER_NAME).write_text(
+                f"migrated 1 batches (1 attempts) from {primary_legacy} "
+                f"to {primary_current} on 2026-08-31T00:00:00Z\n"
+            )
+            local_legacy.parent.mkdir(parents=True)
+            local_legacy.write_text(json.dumps(raw) + "\n")
+            with mock.patch.object(runner, "RUNNER_REPO_ROOT", worktree), mock.patch.object(
+                runner.variant_policy, "STATS_PATH_CURRENT", local_current
+            ), mock.patch.object(
+                runner.variant_policy, "STATS_PATH_LEGACY", local_legacy
             ), mock.patch.dict(os.environ, {}, clear=True):
                 history = runner._load_prior_attempt_history()
             self.assertEqual(len(history["func_legacy"]), 2)
