@@ -3030,6 +3030,14 @@ class TargetDiscoveryTests(unittest.TestCase):
                     targets._m2c_python(), str((root / "custom" / "python3").resolve())
                 )
 
+    def test_readonly_tool_environment_forces_no_bytecode(self) -> None:
+        with mock.patch.dict(
+            os.environ, {"PYTHONDONTWRITEBYTECODE": "0", "TOOL_OPTION": "preserved"}, clear=True
+        ):
+            environment = targets.readonly_tool_environment()
+        self.assertEqual(environment["PYTHONDONTWRITEBYTECODE"], "1")
+        self.assertEqual(environment["TOOL_OPTION"], "preserved")
+
     def test_owner_index_maps_functions_to_sources(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

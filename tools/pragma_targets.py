@@ -91,7 +91,10 @@ def readonly_tool_path(relative: Path, *, override_name: str | None = None) -> P
 def readonly_tool_environment() -> dict[str, str]:
     """Return an environment that cannot create bytecode in shared tools."""
     environment = dict(os.environ)
-    environment.setdefault("PYTHONDONTWRITEBYTECODE", "1")
+    # This is a safety invariant, not a user-selectable tool option: an
+    # inherited ``0`` must not permit a linked runner to mutate the primary
+    # checkout's ignored read-only tool trees with ``__pycache__`` files.
+    environment["PYTHONDONTWRITEBYTECODE"] = "1"
     return environment
 
 
