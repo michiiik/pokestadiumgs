@@ -763,6 +763,26 @@ class RunnerTests(unittest.TestCase):
             self.assertTrue(local.is_symlink())
             self.assertEqual(local.resolve(), oracle.resolve())
 
+    def test_worktree_oracle_overlays_missing_owner_directory(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            main = Path(directory) / "main"
+            worktree = Path(directory) / "worktree"
+            oracle = main / "disasm" / "asm" / "us" / "nonmatchings" / "fragments" / "20" / "owner"
+            git_dir = main / ".git" / "worktrees" / "lane"
+            oracle.mkdir(parents=True)
+            (oracle / "func_a.s").write_text("")
+            (worktree / "disasm" / "asm" / "us" / "nonmatchings" / "fragments").mkdir(parents=True)
+            worktree.mkdir(exist_ok=True)
+            git_dir.mkdir(parents=True)
+            (worktree / ".git").write_text(f"gitdir: {git_dir}\n")
+            source = worktree / "disasm" / "src" / "owner.c"
+            source.parent.mkdir(parents=True)
+            source.write_text('#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/owner/func_a.s")\n')
+            runner._ensure_worktree_oracles(worktree, source)
+            local = worktree / "disasm" / "asm" / "us" / "nonmatchings" / "fragments" / "20" / "owner"
+            self.assertTrue(local.is_symlink())
+            self.assertEqual(local.resolve(), oracle.resolve())
+
     def test_mismatch_diagnostics_identify_symbol_size_drift(self) -> None:
         expected = bytes.fromhex("03e00008 00000000")
         actual = bytes.fromhex("03e00008")

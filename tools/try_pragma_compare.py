@@ -239,7 +239,22 @@ def _object_build_environment(repo_root: Path | None = None) -> dict[str, str]:
     return environment
 
 
-def _ensure_worktree_oracles(repo_root: Path) -> None:
+def _link_missing_oracle_entries(local: Path, shared: Path) -> None:
+    """Overlay missing oracle entries with symlinks without replacing tracked ones."""
+    try:
+        for shared_child in shared.iterdir():
+            local_child = local / shared_child.name
+            if not os.path.lexists(local_child):
+                local_child.symlink_to(shared_child, target_is_directory=shared_child.is_dir())
+            elif shared_child.is_dir() and local_child.is_dir() and not local_child.is_symlink():
+                _link_missing_oracle_entries(local_child, shared_child)
+    except OSError:
+        pass
+
+
+def _ensure_worktree_oracles(
+    repo_root: Path, source_path: Path | None = None, *, full_tree: bool = False
+) -> None:
     """Expose immutable split assembly to a linked worktree when omitted by Git.
 
     Splat's large ``asm/us/nonmatchings`` tree is ignored and therefore absent
@@ -251,13 +266,34 @@ def _ensure_worktree_oracles(repo_root: Path) -> None:
     primary = _primary_worktree_root(repo_root)
     if primary is None:
         return
-    local = repo_root / "disasm" / "asm" / "us" / "nonmatchings"
-    shared = primary / "disasm" / "asm" / "us" / "nonmatchings"
-    if local.exists() or local.is_symlink() or not shared.is_dir():
+    local_root = repo_root / "disasm" / "asm" / "us" / "nonmatchings"
+    shared_root = primary / "disasm" / "asm" / "us" / "nonmatchings"
+    if not shared_root.is_dir():
         return
     try:
-        local.parent.mkdir(parents=True, exist_ok=True)
-        local.symlink_to(shared, target_is_directory=True)
+        if not os.path.lexists(local_root):
+            local_root.parent.mkdir(parents=True, exist_ok=True)
+            local_root.symlink_to(shared_root, target_is_directory=True)
+            return
+        if local_root.is_symlink():
+            return
+        if full_tree:
+            _link_missing_oracle_entries(local_root, shared_root)
+            return
+        if source_path is None:
+            return
+        source = source_path.read_text(encoding="utf-8")
+        owners = re.findall(r'GLOBAL_ASM\("asm/us/nonmatchings/([^"/]+(?:/[^"/]+)*)/[^"/]+\.s"\)', source)
+        for owner in set(owners):
+            local = local_root / owner
+            shared = shared_root / owner
+            if not shared.is_dir():
+                continue
+            if not os.path.lexists(local):
+                local.parent.mkdir(parents=True, exist_ok=True)
+                local.symlink_to(shared, target_is_directory=True)
+            elif local.is_dir() and not local.is_symlink():
+                _link_missing_oracle_entries(local, shared)
     except OSError:
         # A caller still gets the compiler's useful missing-include error.
         pass
@@ -424,7 +460,7 @@ def _make_object(source_path: Path, *, capture: bool = False) -> tuple[int, Path
     with each other or alter the tracked source.
     """
     repo_root = Path(__file__).resolve().parent.parent
-    _ensure_worktree_oracles(repo_root)
+    _ensure_worktree_oracles(repo_root, source_path)
     relative = source_path.resolve().relative_to(repo_root / "disasm")
     object_path = repo_root / "disasm" / "build" / relative.with_suffix(".o")
     object_path.parent.mkdir(parents=True, exist_ok=True)
@@ -526,7 +562,7 @@ def _try_candidate_detailed(source_path: Path, function: str, candidate: str) ->
 
 def _run_compare(repo_root: Path) -> tuple[int, str]:
     """Run the full compare with a bounded lifetime and captured diagnostics."""
-    _ensure_worktree_oracles(repo_root)
+    _ensure_worktree_oracles(repo_root, full_tree=True)
     env = _object_build_environment(repo_root)
     env.setdefault("MIPS_BINUTILS_PREFIX", "/Users/michaegg/homebrew/bin/mips-linux-gnu-")
     # The full gate also runs the Makefile's host-side syntax check (clang,
