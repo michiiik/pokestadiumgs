@@ -239,7 +239,53 @@ void func_87E07330(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E076E0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E078DC.s")
+extern s32 func_87E06E48(void *);
+extern void func_87E0736C(void *);
+extern void func_87E076E0(void *);
+extern void func_87F0277C(void *);
+s32 func_87E078DC(s32 arg0) {
+    s32 temp_v0;
+    s32 sp20;
+
+    sp20 = 2;
+    D_87E1EB90 = arg0;
+    func_87F0277C(arg0 + 0x18);
+    func_87F0277C(arg0 + 0x2C);
+    func_87F0277C(arg0 + 0x40);
+    temp_v0 = *(s32 *)(arg0 + 4);
+    switch (temp_v0) {
+    case 0:
+        if (func_87E06E48((void *)arg0) != 0) *(s32 *)(arg0 + 4) = 1;
+        break;
+    case 1: {
+        s32 temp_v0_2;
+        temp_v0_2 = *(s32 *)(arg0 + 0x174);
+        switch (temp_v0_2) {
+        case 0:
+            func_87E0736C((void *)arg0);
+            break;
+        case 1:
+            func_87E076E0((void *)arg0);
+            break;
+        }
+        break;
+    }
+    case 2:
+        if (func_87E06E48((void *)arg0) != 0) {
+            sp20 = 0;
+            *(u8 *)(*(s32 *)(arg0 + 0x170) + 0x2183) = *(s32 *)(arg0 + 8);
+        }
+        break;
+    case 3:
+        if (func_87E06E48((void *)arg0) != 0) {
+            sp20 = 1;
+            *(u8 *)(*(s32 *)(arg0 + 0x170) + 0x2183) = *(s32 *)(arg0 + 8);
+        }
+        break;
+    }
+    *(s32 *)(arg0 + 0) = *(s32 *)(arg0 + 0) + 1;
+    return sp20;
+}
 
 extern void func_800088DC();
 extern void func_87E0664C();
