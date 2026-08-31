@@ -724,10 +724,29 @@ class RunnerTests(unittest.TestCase):
 
     def test_probe_worker_default_and_clamping(self) -> None:
         with mock.patch.dict(os.environ, {}, clear=True):
-            self.assertEqual(runner._resolve_probe_workers(None, 50), 10)
+            with mock.patch.object(runner.resource, "getrlimit", return_value=(256, 256)):
+                self.assertEqual(runner._resolve_probe_workers(None, 50), 4)
         with mock.patch.dict(os.environ, {"PRAGMA_PROBE_WORKERS": "3"}):
-            self.assertEqual(runner._resolve_probe_workers(None, 50), 3)
-            self.assertEqual(runner._resolve_probe_workers(20, 2), 2)
+            with mock.patch.object(runner.resource, "getrlimit", return_value=(256, 256)):
+                self.assertEqual(runner._resolve_probe_workers(None, 50), 3)
+                self.assertEqual(runner._resolve_probe_workers(20, 50), 12)
+                self.assertEqual(runner._resolve_probe_workers(20, 2), 2)
+
+    def test_worktree_build_environment_reuses_primary_venv(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            main = Path(directory) / "main"
+            worktree = Path(directory) / "worktree"
+            venv = main / "disasm" / ".venv" / "bin"
+            git_dir = main / ".git" / "worktrees" / "lane"
+            venv.mkdir(parents=True)
+            worktree.mkdir()
+            (venv / "python3").write_text("")
+            (venv / "python3").chmod(0o755)
+            git_dir.mkdir(parents=True)
+            (worktree / ".git").write_text(f"gitdir: {git_dir}\n")
+            with mock.patch.dict(os.environ, {}, clear=True):
+                environment = runner._object_build_environment(worktree)
+            self.assertEqual(environment["VENV"], str((main / "disasm" / ".venv").resolve()))
 
     def test_mismatch_diagnostics_identify_symbol_size_drift(self) -> None:
         expected = bytes.fromhex("03e00008 00000000")

@@ -31,6 +31,7 @@ import difflib
 import hashlib
 import json
 import re
+import resource
 import shlex
 import shutil
 import subprocess
@@ -178,9 +179,39 @@ def _timeout_output(error: subprocess.TimeoutExpired) -> str:
     return str(output or "")
 
 
-def _object_build_environment() -> dict[str, str]:
+def _shared_worktree_venv(repo_root: Path) -> Path | None:
+    """Find a usable venv when an isolated Git worktree has none of its own.
+
+    ``disasm/.venv`` is intentionally ignored, so ``git worktree add`` does
+    not populate it.  The primary checkout's venv is safe to reuse: it only
+    provides the Python interpreter and pinned build dependencies, while all
+    source, build, and probe paths remain relative to ``repo_root``.  An
+    explicit ``PRAGMA_SHARED_VENV`` takes precedence for nonstandard layouts.
+    """
+    explicit = os.environ.get("PRAGMA_SHARED_VENV")
+    candidates = [Path(explicit)] if explicit else []
+    git_file = repo_root / ".git"
+    try:
+        if git_file.is_file():
+            line = git_file.read_text(encoding="utf-8").strip()
+            prefix = "gitdir: "
+            if line.startswith(prefix):
+                git_dir = Path(line[len(prefix):]).resolve()
+                if git_dir.parent.name == "worktrees":
+                    candidates.append(git_dir.parent.parent.parent / "disasm" / ".venv")
+    except OSError:
+        pass
+    for candidate in candidates:
+        python = candidate / "bin" / "python3"
+        if python.is_file() and os.access(python, os.X_OK):
+            return candidate
+    return None
+
+
+def _object_build_environment(repo_root: Path | None = None) -> dict[str, str]:
     """Environment shared by Makefile object builds and captured probe recipes."""
-    return {
+    root = repo_root or Path(__file__).resolve().parent.parent
+    environment = {
         **os.environ,
         "MIPS_BINUTILS_PREFIX": os.environ.get(
             "MIPS_BINUTILS_PREFIX", "/Users/michaegg/homebrew/bin/mips-linux-gnu-"
@@ -190,6 +221,12 @@ def _object_build_environment() -> dict[str, str]:
         "OBJDUMP_BUILD": "0",
         "COLOR": "0",
     }
+    local_venv = root / "disasm" / ".venv" / "bin" / "python3"
+    if not (local_venv.is_file() and os.access(local_venv, os.X_OK)):
+        shared_venv = _shared_worktree_venv(root)
+        if shared_venv is not None:
+            environment["VENV"] = str(shared_venv)
+    return environment
 
 
 # Placeholder paths (relative to ``disasm/``) used to capture the Makefile's
@@ -310,7 +347,7 @@ def _probe_recipes(repo_root: Path) -> dict[str, list[str] | None]:
             result = subprocess.run(
                 ["make", "-C", "disasm", "-n", "PRAGMA_PROBE=1", "RUN_CC_CHECK=1", _RECIPE_OBJECT],
                 cwd=repo_root,
-                env=_object_build_environment(),
+                env=_object_build_environment(repo_root),
                 text=True,
                 encoding="utf-8",
                 errors="replace",
@@ -360,7 +397,7 @@ def _make_object(source_path: Path, *, capture: bool = False) -> tuple[int, Path
     object_rel = object_path.relative_to(repo_root / "disasm").as_posix()
     kwargs: dict[str, object] = {
         "cwd": repo_root,
-        "env": _object_build_environment(),
+        "env": _object_build_environment(repo_root),
         "text": True,
     }
     if capture:
@@ -454,7 +491,7 @@ def _try_candidate_detailed(source_path: Path, function: str, candidate: str) ->
 
 def _run_compare(repo_root: Path) -> tuple[int, str]:
     """Run the full compare with a bounded lifetime and captured diagnostics."""
-    env = os.environ.copy()
+    env = _object_build_environment(repo_root)
     env.setdefault("MIPS_BINUTILS_PREFIX", "/Users/michaegg/homebrew/bin/mips-linux-gnu-")
     # The full gate also runs the Makefile's host-side syntax check (clang,
     # -fsyntax-only) unless the caller opts out with PRAGMA_GATE_CC_CHECK=0.
@@ -2308,12 +2345,25 @@ def _ensure_baseline_object(source_path: Path, object_path: Path) -> bool:
 
 
 def _resolve_probe_workers(workers: int | None, candidate_count: int) -> int:
+    """Bound concurrent compiler children by both policy and FD headroom.
+
+    Each isolated probe owns pipes to a compiler plus several binutils
+    children.  A default of ten was excessive on the macOS launcher's common
+    256-file soft limit, especially when several MCP servers coexist.  An
+    explicit worker request still works, but never exceeds conservative
+    descriptor headroom.
+    """
     if workers is None:
         try:
-            workers = int(os.environ.get("PRAGMA_PROBE_WORKERS", "10"))
+            workers = int(os.environ.get("PRAGMA_PROBE_WORKERS", "4"))
         except ValueError:
-            workers = 10
-    return max(1, min(workers, candidate_count or 1))
+            workers = 4
+    try:
+        soft_limit = resource.getrlimit(resource.RLIMIT_NOFILE)[0]
+        fd_cap = max(1, (soft_limit - 64) // 16)
+    except (OSError, ValueError):
+        fd_cap = workers
+    return max(1, min(workers, candidate_count or 1, fd_cap))
 
 
 def _print_normalized_only_match_warnings(attempts: list[dict[str, object]]) -> None:
