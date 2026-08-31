@@ -313,7 +313,22 @@ extern void func_800615D0(s32,s32); void func_80051864(s32 a0,s32 a1){func_80061
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051890.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800519AC.s")
+void func_800519AC(u8 *arg0, u8 *arg1) {
+    u8 *temp_a3 = arg1;
+    _bzero(arg1, 0x48);
+    temp_a3[0] = arg0[0x36];
+    temp_a3[1] = arg0[0x37];
+    *(u16 *)(temp_a3 + 2) = *(u16 *)(arg0 + 0x38);
+    temp_a3[4] = *(u32 *)(arg0 + 0x40) >> 31;
+    temp_a3[5] = (*(u32 *)(arg0 + 0x40) << 1) >> 31;
+    temp_a3[6] = (*(u32 *)(arg0 + 0x40) << 2) >> 31;
+    temp_a3[7] = (*(u32 *)(arg0 + 0x40) << 3) >> 31;
+    temp_a3[8] = (*(u32 *)(arg0 + 0x40) << 4) >> 31;
+    temp_a3[9] = (*(u32 *)(arg0 + 0x40) << 5) >> 31;
+    temp_a3[0xB] = *(s16 *)(arg0 + 0x34);
+    _bcopy(arg0 + 0x14, temp_a3 + 0x14, 0x20);
+    _bcopy(arg0, temp_a3 + 0x34, 0x14);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80051A8C.s")
 
