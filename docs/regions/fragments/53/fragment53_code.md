@@ -64,4 +64,8 @@ requeue func_86508B20: four additional nested selector-lifetime/control-flow var
 
 ## Wave 7 handoff (2026-08-31)
 
+## Wave 15 retry handoff (2026-08-31)
+
+requeue: `func_86501D6C` (77 instructions; first selected at 0 attempts) was rerun after the isolated-worktree venv/oracle bootstrap repair. The three float-loop variants were all rejected: best `float-loop:locals-before-globals:explicit` scored 0.5126 normalized / 0.1345 raw, expected 308 bytes but actual 476. Its first difference is offset 1, expected `lui $a3, 0x0000`, actual `lui $t0, 0x0000`; the other variants show the same early global-load/register-lifetime failure. Keep this owner requeued, but change family: recover the real global declaration/load order from the assembly before attempting another loop spelling. No link-verified hit or ROM gate.
+
 Wave 7 handoff: func_86508780 remains unresolved after 9 serial CC_CHECK=1 probes. Best normalized/raw similarity was 0.8824/0.5588; no link_verified candidate or ROM gate. The durable operand_or_scheduling_drift fingerprint at offset 41 is expected sw $s0,24(sp) versus actual sw $ra,20(sp). Next action is to reconstruct the compiler temporary/register lifetime that creates the expected saved $s0 spill; preserve the existing file requeue skip list.
