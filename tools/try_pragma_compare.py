@@ -194,20 +194,20 @@ def _primary_worktree_root(repo_root: Path) -> Path | None:
 
 
 def _shared_worktree_venv(repo_root: Path) -> Path | None:
-    """Find a usable venv when an isolated Git worktree has none of its own.
+    """Select the canonical build venv for a primary or linked checkout.
 
     The repository venvs are intentionally ignored, so ``git worktree add``
     does not populate them. The primary checkout's venv is safe to reuse: it only
     provides the Python interpreter and pinned build dependencies, while all
     source, build, and probe paths remain relative to ``repo_root``. An
-    explicit ``PRAGMA_SHARED_VENV`` takes precedence for nonstandard layouts;
-    otherwise only the canonical primary root ``.venv`` is eligible.
+    explicit ``PRAGMA_SHARED_VENV`` takes precedence for nonstandard layouts,
+    followed by root ``.venv`` and the historical ``disasm/.venv`` fallback.
     """
     explicit = os.environ.get("PRAGMA_SHARED_VENV")
     candidates = [Path(explicit)] if explicit else []
     primary = _primary_worktree_root(repo_root)
-    if primary is not None:
-        candidates.append(primary / ".venv")
+    canonical_root = primary if primary is not None else repo_root
+    candidates.extend((canonical_root / ".venv", canonical_root / "disasm" / ".venv"))
     for candidate in candidates:
         python = candidate / "bin" / "python3"
         if python.is_file() and os.access(python, os.X_OK):
@@ -228,23 +228,14 @@ def _object_build_environment(repo_root: Path | None = None) -> dict[str, str]:
         "OBJDUMP_BUILD": "0",
         "COLOR": "0",
     }
-    primary = _primary_worktree_root(root)
-    if primary is not None:
-        # A linked worktree may contain a relocated disasm/.venv symlink whose
-        # bin/python3 resolves to the system interpreter and cannot import
-        # splat. Always select the maintained primary root environment and
-        # name its interpreter explicitly for every bootstrap/make recipe.
-        shared_venv = _shared_worktree_venv(root)
-        if shared_venv is not None:
-            environment["VENV"] = str(shared_venv)
-            environment["PYTHON"] = str(shared_venv / "bin" / "python3")
-    else:
-        local_venv = root / "disasm" / ".venv" / "bin" / "python3"
-        if not (local_venv.is_file() and os.access(local_venv, os.X_OK)):
-            shared_venv = _shared_worktree_venv(root)
-            if shared_venv is not None:
-                environment["VENV"] = str(shared_venv)
-                environment["PYTHON"] = str(shared_venv / "bin" / "python3")
+    # A linked worktree may contain a relocated disasm/.venv symlink whose
+    # bin/python3 resolves to the system interpreter and cannot import splat.
+    # Centralized selection avoids it, while primary checkouts use the same
+    # explicit -> root -> historical precedence.
+    shared_venv = _shared_worktree_venv(root)
+    if shared_venv is not None:
+        environment["VENV"] = str(shared_venv)
+        environment["PYTHON"] = str(shared_venv / "bin" / "python3")
     return environment
 
 
@@ -2430,9 +2421,16 @@ def _probe_stats_history_paths(repo_root: Path | None = None) -> tuple[Path, ...
     ):
         return variant_policy.default_stats_paths()
     primary = _primary_worktree_root(root)
-    shared_root = primary if primary is not None else root
-    legacy = shared_root / "disasm" / "build" / "probe-stats.jsonl"
-    return tuple(probe_stats.resolve_paths((target, legacy)))
+    if primary is None:
+        return tuple(probe_stats.resolve_paths((target, local_legacy)))
+    primary_legacy = primary / "disasm" / "build" / "probe-stats.jsonl"
+    # New writes land only in the primary active ledger, but pre-change linked
+    # worktrees may still contain unique active/legacy evidence. Read all four
+    # roots until those worktrees age out; _load_prior_attempt_history removes
+    # batches already copied into the primary ledger.
+    return tuple(
+        probe_stats.resolve_paths((target, primary_legacy, local_current, local_legacy))
+    )
 
 
 @contextmanager
@@ -2466,7 +2464,18 @@ def _load_prior_attempt_history() -> dict[str, list[dict[str, object]]]:
         paths = _probe_stats_history_paths()
     except OSError:
         return history
+    seen_batches: set[str] = set()
     for batch in probe_stats.iter_batches(paths):
+        batch_id = batch.get("batch_id")
+        if isinstance(batch_id, str) and batch_id:
+            identity = f"id:{batch_id}"
+        else:
+            identity = "content:" + hashlib.sha256(
+                json.dumps(batch, sort_keys=True, separators=(",", ":")).encode("utf-8")
+            ).hexdigest()
+        if identity in seen_batches:
+            continue
+        seen_batches.add(identity)
         attempts = batch.get("attempts")
         if not isinstance(attempts, list):
             continue

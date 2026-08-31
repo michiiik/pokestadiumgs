@@ -873,6 +873,57 @@ class RunnerTests(unittest.TestCase):
             )
             self.assertNotEqual(environment["PYTHON"], "/usr/bin/python3")
 
+    def test_primary_build_environment_prefers_root_venv(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            root_python = root / ".venv" / "bin" / "python3"
+            historical_python = root / "disasm" / ".venv" / "bin" / "python3"
+            for python in (root_python, historical_python):
+                python.parent.mkdir(parents=True)
+                python.write_text("python\n")
+                python.chmod(0o755)
+            with mock.patch.dict(os.environ, {}, clear=True):
+                environment = runner._object_build_environment(root)
+            self.assertEqual(environment["VENV"], str(root / ".venv"))
+            self.assertEqual(environment["PYTHON"], str(root_python))
+
+    def test_primary_build_environment_honors_shared_venv_override(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "root"
+            override = Path(directory) / "override"
+            for venv in (override, root / ".venv", root / "disasm" / ".venv"):
+                python = venv / "bin" / "python3"
+                python.parent.mkdir(parents=True)
+                python.write_text("python\n")
+                python.chmod(0o755)
+            with mock.patch.dict(
+                os.environ, {"PRAGMA_SHARED_VENV": str(override)}, clear=True
+            ):
+                environment = runner._object_build_environment(root)
+            self.assertEqual(environment["VENV"], str(override))
+            self.assertEqual(environment["PYTHON"], str(override / "bin" / "python3"))
+
+    def test_linked_build_environment_honors_shared_venv_override(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            main = Path(directory) / "main"
+            worktree = Path(directory) / "worktree"
+            override = Path(directory) / "override"
+            git_dir = main / ".git" / "worktrees" / "lane"
+            git_dir.mkdir(parents=True)
+            worktree.mkdir()
+            (worktree / ".git").write_text(f"gitdir: {git_dir}\n")
+            for venv in (override, main / ".venv", main / "disasm" / ".venv"):
+                python = venv / "bin" / "python3"
+                python.parent.mkdir(parents=True)
+                python.write_text("python\n")
+                python.chmod(0o755)
+            with mock.patch.dict(
+                os.environ, {"PRAGMA_SHARED_VENV": str(override)}, clear=True
+            ):
+                environment = runner._object_build_environment(worktree)
+            self.assertEqual(environment["VENV"], str(override))
+            self.assertEqual(environment["PYTHON"], str(override / "bin" / "python3"))
+
     def test_worktree_oracle_links_primary_nonmatchings(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             main = Path(directory) / "main"
@@ -1596,6 +1647,54 @@ class RunnerTests(unittest.TestCase):
             ), mock.patch.dict(os.environ, {}, clear=True):
                 history = runner._load_prior_attempt_history()
             self.assertEqual(history["func_shared"][0]["status"], "accepted")
+
+    def test_linked_worktree_history_merges_and_dedupes_old_local_ledgers(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            main = Path(directory) / "main"
+            worktree = Path(directory) / "worktree"
+            git_dir = main / ".git" / "worktrees" / "lane"
+            git_dir.mkdir(parents=True)
+            worktree.mkdir()
+            (worktree / ".git").write_text(f"gitdir: {git_dir}\n")
+            primary_current = main / "disasm" / "probe-stats" / "probe-stats.jsonl"
+            primary_legacy = main / "disasm" / "build" / "probe-stats.jsonl"
+            local_current = worktree / "disasm" / "probe-stats" / "probe-stats.jsonl"
+            local_legacy = worktree / "disasm" / "build" / "probe-stats.jsonl"
+
+            def batch(batch_id: str, function: str) -> dict[str, object]:
+                return {
+                    "batch_id": batch_id,
+                    "timestamp": "2026-08-31T00:00:00Z",
+                    "attempts": [{"function": function, "status": "accepted"}],
+                }
+
+            shared = batch("shared-batch", "func_shared")
+            for path, rows in (
+                (primary_current, [shared, batch("primary-active", "func_primary")]),
+                (primary_legacy, [batch("primary-legacy", "func_primary_legacy")]),
+                (local_current, [shared, batch("local-active", "func_local")]),
+                (local_legacy, [batch("local-legacy", "func_local_legacy")]),
+            ):
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text("".join(json.dumps(row) + "\n" for row in rows))
+
+            with mock.patch.object(runner, "RUNNER_REPO_ROOT", worktree), mock.patch.object(
+                runner.variant_policy, "STATS_PATH_CURRENT", local_current
+            ), mock.patch.object(
+                runner.variant_policy, "STATS_PATH_LEGACY", local_legacy
+            ), mock.patch.dict(os.environ, {}, clear=True):
+                history = runner._load_prior_attempt_history()
+            self.assertEqual(
+                set(history),
+                {
+                    "func_shared",
+                    "func_primary",
+                    "func_primary_legacy",
+                    "func_local",
+                    "func_local_legacy",
+                },
+            )
+            self.assertEqual(len(history["func_shared"]), 1)
 
     def test_unverified_probe_hit_uses_sequential_gate_without_duplicate_compare(self) -> None:
         # An unverified probe hit (no ``link_verified`` key, e.g. baseline
