@@ -795,11 +795,16 @@ class RunnerTests(unittest.TestCase):
             archive = main / "disasm" / "lib" / "ultralib" / "build" / "L" / "libultra" / "libultra.a"
             archive.parent.mkdir(parents=True)
             archive.write_bytes(b"archive")
+            linker = main / "disasm" / "build" / "linker_scripts" / "us" / "auto.ld"
+            linker.parent.mkdir(parents=True)
+            linker.write_bytes(b"linker")
             git_dir.mkdir(parents=True)
             (worktree / ".git").write_text(f"gitdir: {git_dir}\n")
             runner._ensure_worktree_gate_cache(worktree)
             copied = worktree / "disasm" / "lib" / "ultralib" / "build" / "L" / "libultra" / "libultra.a"
             self.assertEqual(copied.read_bytes(), b"archive")
+            copied_linker = worktree / "disasm" / "build" / "linker_scripts" / "us" / "auto.ld"
+            self.assertEqual(copied_linker.read_bytes(), b"linker")
 
     def test_worktree_gate_cache_refuses_mismatched_inputs(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
