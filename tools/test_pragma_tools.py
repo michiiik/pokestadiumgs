@@ -6,6 +6,7 @@ from __future__ import annotations
 import io
 import json
 import os
+import signal
 import sys
 import tempfile
 import time
@@ -732,6 +733,44 @@ class RunnerTests(unittest.TestCase):
                 self.assertEqual(runner._resolve_probe_workers(20, 50), 12)
                 self.assertEqual(runner._resolve_probe_workers(20, 2), 2)
 
+    def test_bootstrap_timeout_kills_and_reaps_descendants(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            child_pid_path = root / "child.pid"
+            script = (
+                "import pathlib,subprocess,sys,time; "
+                "child=subprocess.Popen([sys.executable,'-c','import time; time.sleep(60)']); "
+                "pathlib.Path(sys.argv[1]).write_text(str(child.pid)); time.sleep(60)"
+            )
+            started = time.monotonic()
+            with mock.patch.dict(
+                os.environ,
+                {"PRAGMA_COMPARE_TIMEOUT": "0.8", "PRAGMA_BOOTSTRAP_TERM_SECONDS": "0.2"},
+            ):
+                with self.assertRaisesRegex(RuntimeError, "timed out during descendant test"):
+                    runner._bootstrap_command(
+                        root,
+                        [sys.executable, "-c", script, str(child_pid_path)],
+                        "descendant test",
+                    )
+            self.assertLess(time.monotonic() - started, 4.0)
+            self.assertTrue(child_pid_path.is_file())
+            child_pid = int(child_pid_path.read_text())
+
+            def child_exists() -> bool:
+                try:
+                    os.kill(child_pid, 0)
+                    return True
+                except ProcessLookupError:
+                    return False
+
+            deadline = time.monotonic() + 2.0
+            while child_exists() and time.monotonic() < deadline:
+                time.sleep(0.02)
+            if child_exists():
+                os.kill(child_pid, signal.SIGKILL)
+                self.fail(f"bootstrap descendant {child_pid} survived process-group cleanup")
+
     def test_worktree_build_environment_reuses_primary_venv(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             main = Path(directory) / "main"
@@ -783,6 +822,23 @@ class RunnerTests(unittest.TestCase):
             self.assertTrue(local.is_symlink())
             self.assertEqual(local.resolve(), oracle.resolve())
 
+    def test_worktree_oracle_preserves_private_extraction(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            main = Path(directory) / "main"
+            worktree = Path(directory) / "worktree"
+            git_dir = main / ".git" / "worktrees" / "lane"
+            shared = main / "disasm" / "asm" / "us" / "nonmatchings" / "primary_only"
+            shared.mkdir(parents=True)
+            git_dir.mkdir(parents=True)
+            local = worktree / "disasm" / "asm" / "us" / "nonmatchings"
+            local.mkdir(parents=True)
+            marker = worktree / "disasm" / "build" / ".pragma_private_gate_bootstrap.json"
+            marker.parent.mkdir(parents=True)
+            marker.write_text('{"schema": 2}\n')
+            (worktree / ".git").write_text(f"gitdir: {git_dir}\n")
+            runner._ensure_worktree_oracles(worktree, full_tree=True)
+            self.assertFalse((local / "primary_only").exists())
+
     def test_worktree_gate_prerequisites_are_built_privately(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             main = Path(directory) / "main"
@@ -807,6 +863,9 @@ class RunnerTests(unittest.TestCase):
             compiler.parent.mkdir(parents=True)
             compiler.write_text("compiler")
             compiler.chmod(0o755)
+            lib_makefile = worktree / "disasm" / "lib" / "ultralib" / "Makefile"
+            lib_makefile.parent.mkdir(parents=True)
+            lib_makefile.write_text("all:\n\t@true\n")
             tracked_asm = worktree / "disasm" / "asm" / "us" / "nonmatchings" / "alias.s"
             tracked_asm.parent.mkdir(parents=True)
             tracked_asm.write_text("tracked alias\n")
@@ -824,8 +883,6 @@ class RunnerTests(unittest.TestCase):
             def bootstrap(repo_root, command, description, *, environment=None):
                 self.assertEqual(repo_root, worktree)
                 calls.append((description, command, environment))
-                if description == "worktree revision check":
-                    return "test-head\n"
                 if description == "tracked assembly safety check":
                     return ""
                 if description == "tracked assembly listing":
@@ -867,12 +924,122 @@ class RunnerTests(unittest.TestCase):
             self.assertTrue(make_environments)
             self.assertTrue(all(environment["VENV"] == str((main / ".venv").resolve()) for environment in make_environments))
 
-            # Proven private outputs are reusable; only the tracked identity is
-            # rechecked, and no primary mutable artifact is consulted.
+            # Proven private outputs are reusable without invoking setup/build.
             calls.clear()
             with mock.patch.object(runner, "_bootstrap_command", side_effect=bootstrap):
                 runner._ensure_worktree_gate_prerequisites(worktree)
-            self.assertEqual([description for description, _, _ in calls], ["worktree revision check"])
+            self.assertEqual(calls, [])
+
+            # A dirty lib source invalidates provenance and forces a new local
+            # extraction/build rather than reusing the archive.
+            dirty = worktree / "disasm" / "lib" / "ultralib" / "src" / "dirty.c"
+            dirty.parent.mkdir(parents=True)
+            dirty.write_text("void dirty(void) {}\n")
+            calls.clear()
+            with mock.patch.object(runner, "_bootstrap_command", side_effect=bootstrap):
+                runner._ensure_worktree_gate_prerequisites(worktree)
+            descriptions = [description for description, _, _ in calls]
+            self.assertIn("local ROM extraction", descriptions)
+            self.assertIn("private libultra build", descriptions)
+
+    def test_worktree_gate_rebuilds_corrupt_owned_archive(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            main = Path(directory) / "main"
+            worktree = Path(directory) / "worktree"
+            git_dir = main / ".git" / "worktrees" / "lane"
+            git_dir.mkdir(parents=True)
+            worktree.mkdir()
+            (worktree / ".git").write_text(f"gitdir: {git_dir}\n")
+            primary_baserom = main / "disasm" / "baseroms" / "us" / "baserom.z64"
+            primary_baserom.parent.mkdir(parents=True)
+            primary_baserom.write_bytes(b"rom")
+            compiler_platform = "macos" if sys.platform == "darwin" else "linux"
+            compiler = worktree / "disasm" / "tools" / "ido" / compiler_platform / "5.3" / "cc"
+            compiler.parent.mkdir(parents=True)
+            compiler.write_text("compiler")
+            compiler.chmod(0o755)
+            auto_sources = tuple(
+                worktree / "disasm" / "linker_scripts" / "us" / "auto" / name
+                for name in ("undefined_syms_auto.ld", "undefined_funcs_auto.ld")
+            )
+            auto_outputs = tuple(
+                worktree / "disasm" / "build" / "linker_scripts" / "us" / "auto" / name
+                for name in ("undefined_syms_auto.ld", "undefined_funcs_auto.ld")
+            )
+            for path in (*auto_sources, *auto_outputs):
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text(f"valid {path.name}\n")
+            lib_build = worktree / "disasm" / "lib" / "ultralib" / "build"
+            lib_build.mkdir(parents=True)
+            runner._write_gate_bootstrap_marker(
+                runner._lib_build_owner_path(lib_build), runner._LIB_BUILD_OWNERSHIP
+            )
+            archive = lib_build / "L" / "libultra" / "libultra.a"
+            archive.parent.mkdir(parents=True)
+            archive.write_bytes(b"original archive")
+            identity = {"schema": 2, "inputs_sha256": "stable"}
+            marker = worktree / "disasm" / "build" / ".pragma_private_gate_bootstrap.json"
+            runner._write_gate_bootstrap_marker(
+                marker,
+                {
+                    "schema": 2,
+                    "identity": identity,
+                    "outputs": {
+                        "auto_sources": runner._output_manifest(worktree, auto_sources),
+                        "auto_outputs": runner._output_manifest(worktree, auto_outputs),
+                        "libultra": runner._output_manifest(worktree, (archive,)),
+                    },
+                },
+            )
+            archive.write_bytes(b"x")
+            calls = []
+
+            def bootstrap(repo_root, command, description, *, environment=None):
+                calls.append(description)
+                if description == "private libultra build":
+                    archive.parent.mkdir(parents=True, exist_ok=True)
+                    archive.write_bytes(b"rebuilt archive")
+                elif description == "local auto linker preprocessing":
+                    for path in auto_outputs:
+                        path.parent.mkdir(parents=True, exist_ok=True)
+                        path.write_text(f"rebuilt {path.name}\n")
+                return ""
+
+            with mock.patch.object(runner, "_gate_bootstrap_identity", return_value=identity), mock.patch.object(
+                runner, "_bootstrap_command", side_effect=bootstrap
+            ):
+                runner._ensure_worktree_gate_prerequisites(worktree)
+            self.assertEqual(calls, ["private libultra build"])
+            self.assertEqual(archive.read_bytes(), b"rebuilt archive")
+
+            auto_outputs[0].write_bytes(b"x")
+            calls.clear()
+            with mock.patch.object(runner, "_gate_bootstrap_identity", return_value=identity), mock.patch.object(
+                runner, "_bootstrap_command", side_effect=bootstrap
+            ):
+                runner._ensure_worktree_gate_prerequisites(worktree)
+            self.assertEqual(calls, ["local auto linker preprocessing"])
+            self.assertEqual(auto_outputs[0].read_text(), f"rebuilt {auto_outputs[0].name}\n")
+
+    def test_worktree_gate_preserves_unowned_lib_build(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            main = Path(directory) / "main"
+            worktree = Path(directory) / "worktree"
+            git_dir = main / ".git" / "worktrees" / "lane"
+            git_dir.mkdir(parents=True)
+            worktree.mkdir()
+            (worktree / ".git").write_text(f"gitdir: {git_dir}\n")
+            sentinel = worktree / "disasm" / "lib" / "ultralib" / "build" / "foreign-output"
+            sentinel.parent.mkdir(parents=True)
+            sentinel.write_text("preserve me")
+            with mock.patch.object(
+                runner,
+                "_gate_bootstrap_identity",
+                return_value={"schema": 2, "inputs_sha256": "stable"},
+            ):
+                with self.assertRaisesRegex(RuntimeError, "unowned libultra build tree.*preserved"):
+                    runner._ensure_worktree_gate_prerequisites(worktree)
+            self.assertEqual(sentinel.read_text(), "preserve me")
 
     def test_worktree_gate_prerequisites_refuse_dirty_tracked_asm(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -889,7 +1056,7 @@ class RunnerTests(unittest.TestCase):
             with mock.patch.object(
                 runner,
                 "_bootstrap_command",
-                side_effect=["test-head\n", " M disasm/asm/us/nonmatchings/alias.s\n"],
+                return_value=" M disasm/asm/us/nonmatchings/alias.s\n",
             ):
                 with self.assertRaisesRegex(RuntimeError, "refused to re-extract.*tracked assembly"):
                     runner._ensure_worktree_gate_prerequisites(worktree)
@@ -935,8 +1102,6 @@ class RunnerTests(unittest.TestCase):
 
             def bootstrap(repo_root, command, description, *, environment=None):
                 descriptions.append(description)
-                if description == "worktree revision check":
-                    return "test-head\n"
                 if description == "tracked assembly safety check":
                     return ""
                 if description == "tracked assembly listing":

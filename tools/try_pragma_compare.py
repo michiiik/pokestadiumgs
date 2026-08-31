@@ -32,6 +32,7 @@ import hashlib
 import json
 import re
 import resource
+import signal
 import shlex
 import shutil
 import subprocess
@@ -268,6 +269,13 @@ def _ensure_worktree_oracles(
     primary = _primary_worktree_root(repo_root)
     if primary is None:
         return
+    # Once this worktree has completed a private extraction, that local oracle
+    # is authoritative. Do not fill any of its gaps with primary-worktree
+    # symlinks on later probes or full gates.
+    private_marker = repo_root / "disasm" / "build" / ".pragma_private_gate_bootstrap.json"
+    private_state = _read_gate_bootstrap_marker(private_marker)
+    if private_state is not None and private_state.get("schema") == 2:
+        return
     local_root = repo_root / "disasm" / "asm" / "us" / "nonmatchings"
     shared_root = primary / "disasm" / "asm" / "us" / "nonmatchings"
     if not shared_root.is_dir():
@@ -403,9 +411,9 @@ def _bootstrap_command(
     *,
     environment: dict[str, str] | None = None,
 ) -> str:
-    """Run one private bootstrap step and turn failures into gate diagnostics."""
+    """Run one bootstrap step and reap its entire process group on every exit."""
     try:
-        result = subprocess.run(
+        process = subprocess.Popen(
             command,
             cwd=repo_root,
             env=environment,
@@ -414,23 +422,72 @@ def _bootstrap_command(
             errors="replace",
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
-            timeout=_command_timeout("PRAGMA_COMPARE_TIMEOUT", 300.0),
+            start_new_session=True,
         )
-    except subprocess.TimeoutExpired as error:
-        raise RuntimeError(
-            f"isolated gate bootstrap timed out during {description} after {error.timeout}s\n"
-            f"{_timeout_output(error)}"
-        ) from error
     except OSError as error:
         raise RuntimeError(
             f"isolated gate bootstrap could not start {description}: {error}"
         ) from error
-    if result.returncode != 0:
+    timeout = _command_timeout("PRAGMA_COMPARE_TIMEOUT", 300.0)
+    output = ""
+    try:
+        output, _ = process.communicate(timeout=timeout)
+    except subprocess.TimeoutExpired as error:
+        try:
+            os.killpg(process.pid, signal.SIGTERM)
+        except ProcessLookupError:
+            pass
+        except OSError:
+            try:
+                process.terminate()
+            except OSError:
+                pass
+        grace = _command_timeout("PRAGMA_BOOTSTRAP_TERM_SECONDS", 1.0)
+        try:
+            output, _ = process.communicate(timeout=grace)
+        except subprocess.TimeoutExpired:
+            try:
+                os.killpg(process.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+            except OSError:
+                try:
+                    process.kill()
+                except OSError:
+                    pass
+            output, _ = process.communicate()
+        raise RuntimeError(
+            f"isolated gate bootstrap timed out during {description} after {error.timeout}s\n"
+            f"{output or _timeout_output(error)}"
+        ) from error
+    except BaseException:
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+        except OSError:
+            try:
+                process.kill()
+            except OSError:
+                pass
+        try:
+            process.communicate(timeout=1.0)
+        except subprocess.TimeoutExpired:
+            try:
+                process.kill()
+            except OSError:
+                pass
+            process.communicate()
+        raise
+    finally:
+        if process.stdout is not None and not process.stdout.closed:
+            process.stdout.close()
+    if process.returncode != 0:
         raise RuntimeError(
             f"isolated gate bootstrap failed during {description} "
-            f"(exit {result.returncode})\n{result.stdout or ''}"
+            f"(exit {process.returncode})\n{output or ''}"
         )
-    return result.stdout or ""
+    return output or ""
 
 
 def _tracked_asm_changes(repo_root: Path) -> str:
@@ -519,35 +576,137 @@ def _restore_tracked_asm(
         )
 
 
+def _update_bootstrap_digest(
+    digest: "hashlib._Hash", label: str, path: Path, *, ignored: tuple[tuple[str, ...], ...] = ()
+) -> None:
+    """Hash one file/tree, including absence and symlink identity."""
+    digest.update(label.encode("utf-8"))
+    digest.update(b"\0")
+    if not os.path.lexists(path):
+        digest.update(b"missing\0")
+        return
+    if path.is_symlink():
+        digest.update(b"symlink\0")
+        digest.update(os.readlink(path).encode("utf-8"))
+        digest.update(b"\0")
+        return
+    if path.is_file():
+        digest.update(b"file\0")
+        digest.update(path.read_bytes())
+        digest.update(b"\0")
+        return
+    if not path.is_dir():
+        digest.update(b"other\0")
+        return
+    digest.update(b"tree\0")
+    for child in sorted(path.rglob("*")):
+        relative = child.relative_to(path)
+        if any(relative.parts[: len(prefix)] == prefix for prefix in ignored):
+            continue
+        if child.is_dir() and not child.is_symlink():
+            continue
+        _update_bootstrap_digest(digest, relative.as_posix(), child)
+
+
 def _gate_bootstrap_identity(repo_root: Path) -> dict[str, object]:
-    """Describe the tracked inputs whose extraction outputs may be reused."""
-    head = _bootstrap_command(
-        repo_root,
-        ["git", "rev-parse", "--verify", "HEAD"],
-        "worktree revision check",
-        environment=_clean_git_environment(),
-    ).strip()
-    if not head:
-        raise RuntimeError("isolated gate bootstrap could not identify the worktree revision")
+    """Hash every relevant extraction, lib, and build-tool input."""
     digest = hashlib.sha256()
     try:
         for relative in (
-            Path("disasm/yamls/us/header.yaml"),
-            Path("disasm/yamls/us/rom.yaml"),
+            "disasm/Makefile",
+            "disasm/.make_options",
+            "disasm/requirements.txt",
+            "disasm/yamls/us/header.yaml",
+            "disasm/yamls/us/rom.yaml",
+            "disasm/linker_scripts/us/symbol_addrs.txt",
+            "disasm/linker_scripts/us/symbol_addrs_code.txt",
+            "disasm/linker_scripts/us/symbol_addrs_ultralib.txt",
+            "disasm/linker_scripts/us/ignored_addresses.txt",
+            "disasm/relocs/reloc_addrs-us.txt",
+            "disasm/tools/splat_ext",
         ):
-            path = repo_root / relative
-            if not _regular_nonempty_file(path):
-                raise RuntimeError(
-                    f"isolated gate bootstrap needs tracked extraction input {path}"
-                )
-            digest.update(relative.as_posix().encode("utf-8"))
-            digest.update(b"\0")
-            digest.update(path.read_bytes())
+            _update_bootstrap_digest(digest, relative, repo_root / relative)
+        _update_bootstrap_digest(
+            digest,
+            "disasm/lib/ultralib",
+            repo_root / "disasm" / "lib" / "ultralib",
+            ignored=(("build",), ("extracted",), ("tools", "gcc"), ("tools", "ido")),
+        )
+        compiler_platform = "macos" if sys.platform == "darwin" else "linux"
+        _update_bootstrap_digest(
+            digest,
+            "disasm/tools/ido/5.3",
+            repo_root / "disasm" / "tools" / "ido" / compiler_platform / "5.3",
+        )
+        shared_venv = _shared_worktree_venv(repo_root)
+        if shared_venv is not None:
+            _update_bootstrap_digest(digest, "shared-venv/pyvenv.cfg", shared_venv / "pyvenv.cfg")
+        prefix = os.environ.get(
+            "MIPS_BINUTILS_PREFIX", "/Users/michaegg/homebrew/bin/mips-linux-gnu-"
+        )
+        digest.update(f"mips-prefix\0{prefix}\0".encode("utf-8"))
+        for tool in ("ar", "as", "ld", "objcopy"):
+            executable = shutil.which(f"{prefix}{tool}")
+            _update_bootstrap_digest(
+                digest,
+                f"mips-tool/{tool}",
+                Path(executable) if executable is not None else Path(f"{prefix}{tool}"),
+            )
     except OSError as error:
         raise RuntimeError(
-            f"isolated gate bootstrap could not read tracked extraction inputs: {error}"
+            f"isolated gate bootstrap could not read private build inputs: {error}"
         ) from error
-    return {"schema": 1, "head": head, "extraction_sha256": digest.hexdigest()}
+    return {"schema": 2, "inputs_sha256": digest.hexdigest()}
+
+
+def _file_fingerprint(path: Path) -> dict[str, object] | None:
+    """Return content evidence for one private regular output."""
+    if not _regular_nonempty_file(path):
+        return None
+    try:
+        digest = hashlib.sha256()
+        with path.open("rb") as source:
+            while chunk := source.read(1024 * 1024):
+                digest.update(chunk)
+        return {"size": path.stat().st_size, "sha256": digest.hexdigest()}
+    except OSError:
+        return None
+
+
+def _output_manifest(repo_root: Path, paths: tuple[Path, ...]) -> dict[str, object]:
+    return {
+        path.relative_to(repo_root).as_posix(): _file_fingerprint(path)
+        for path in paths
+    }
+
+
+_LIB_BUILD_OWNERSHIP = {"schema": 1, "owner": "try_pragma_compare.private_gate"}
+
+
+def _lib_build_owner_path(lib_build: Path) -> Path:
+    return lib_build / ".pragma_runner_owned.json"
+
+
+def _runner_owns_lib_build(lib_build: Path) -> bool:
+    return _read_gate_bootstrap_marker(_lib_build_owner_path(lib_build)) == _LIB_BUILD_OWNERSHIP
+
+
+def _reset_owned_lib_build(lib_build: Path) -> None:
+    """Reset only a build tree this runner previously claimed."""
+    if lib_build.exists():
+        if not _runner_owns_lib_build(lib_build):
+            raise RuntimeError(
+                "isolated gate bootstrap refused to remove an unowned libultra build tree: "
+                f"{lib_build}"
+            )
+        try:
+            shutil.rmtree(lib_build)
+        except OSError as error:
+            raise RuntimeError(
+                f"isolated gate bootstrap could not reset its libultra build: {error}"
+            ) from error
+    lib_build.mkdir(parents=True, exist_ok=True)
+    _write_gate_bootstrap_marker(_lib_build_owner_path(lib_build), _LIB_BUILD_OWNERSHIP)
 
 
 def _read_gate_bootstrap_marker(path: Path) -> dict[str, object] | None:
@@ -629,10 +788,29 @@ def _ensure_worktree_gate_prerequisites(repo_root: Path) -> None:
         _private_output_path(repo_root, path, description)
 
     identity = _gate_bootstrap_identity(repo_root)
-    marker_matches = _read_gate_bootstrap_marker(marker) == identity
-    needs_extract = not marker_matches or not all(
-        _regular_nonempty_file(path) for path in auto_sources
+    recorded = _read_gate_bootstrap_marker(marker) or {}
+    recorded_outputs = recorded.get("outputs")
+    if not isinstance(recorded_outputs, dict):
+        recorded_outputs = {}
+    identity_matches = recorded.get("schema") == 2 and recorded.get("identity") == identity
+    auto_sources_match = identity_matches and recorded_outputs.get(
+        "auto_sources"
+    ) == _output_manifest(repo_root, auto_sources)
+    auto_outputs_match = identity_matches and recorded_outputs.get(
+        "auto_outputs"
+    ) == _output_manifest(repo_root, auto_outputs)
+    lib_output = (built_archive,)
+    lib_matches = identity_matches and recorded_outputs.get("libultra") == _output_manifest(
+        repo_root, lib_output
     )
+    needs_extract = not auto_sources_match
+    needs_lib_build = not lib_matches
+    needs_auto_preprocess = needs_extract or not auto_outputs_match
+    if lib_build.exists() and not _runner_owns_lib_build(lib_build):
+        raise RuntimeError(
+            "isolated gate bootstrap found an unowned libultra build tree and preserved it: "
+            f"{lib_build}"
+        )
     asm_snapshot: dict[Path, tuple[str, bytes | str, int]] | None = None
     if needs_extract:
         changes = _tracked_asm_changes(repo_root)
@@ -646,15 +824,17 @@ def _ensure_worktree_gate_prerequisites(repo_root: Path) -> None:
     _copy_baserom_atomically(primary_baserom, baserom, repo_root)
     environment = _object_build_environment(repo_root)
 
+    if needs_extract or needs_lib_build or needs_auto_preprocess:
+        marker.unlink(missing_ok=True)
+    if needs_lib_build:
+        _reset_owned_lib_build(lib_build)
+
     if needs_extract:
-        # An unmarked tree may contain output copied by an older runner. Remove
-        # only ignored, verified-private outputs and derive them again locally.
+        # Derive extraction outputs locally. The lib build was either absent or
+        # explicitly runner-owned; an unowned tree was rejected above.
         try:
-            marker.unlink(missing_ok=True)
-            for path in (*auto_sources, *auto_outputs):
+            for path in auto_sources:
                 path.unlink(missing_ok=True)
-            if lib_build.exists():
-                shutil.rmtree(lib_build)
         except OSError as error:
             raise RuntimeError(
                 f"isolated gate bootstrap could not clear stale private outputs: {error}"
@@ -690,7 +870,7 @@ def _ensure_worktree_gate_prerequisites(repo_root: Path) -> None:
                 + "\n".join(missing)
             )
 
-    if not _regular_nonempty_file(built_archive):
+    if needs_lib_build:
         compiler_platform = "macos" if sys.platform == "darwin" else "linux"
         compiler = disasm / "tools" / "ido" / compiler_platform / "5.3" / "cc"
         if not _regular_nonempty_file(compiler) or not os.access(compiler, os.X_OK):
@@ -722,7 +902,14 @@ def _ensure_worktree_gate_prerequisites(repo_root: Path) -> None:
                 f"isolated gate bootstrap libultra build did not create {built_archive}"
             )
 
-    if not all(_regular_nonempty_file(path) for path in auto_outputs):
+    if needs_auto_preprocess:
+        try:
+            for path in auto_outputs:
+                path.unlink(missing_ok=True)
+        except OSError as error:
+            raise RuntimeError(
+                f"isolated gate bootstrap could not clear stale auto linker outputs: {error}"
+            ) from error
         _bootstrap_command(
             repo_root,
             [
@@ -742,7 +929,22 @@ def _ensure_worktree_gate_prerequisites(repo_root: Path) -> None:
             "isolated gate bootstrap did not create local auto linker outputs:\n"
             + "\n".join(missing)
         )
-    _write_gate_bootstrap_marker(marker, identity)
+    # setup may have populated a previously absent tracked compiler/tool input.
+    # Record the identity that actually produced these outputs, not the
+    # pre-bootstrap snapshot used to decide whether rebuilding was necessary.
+    final_identity = _gate_bootstrap_identity(repo_root)
+    _write_gate_bootstrap_marker(
+        marker,
+        {
+            "schema": 2,
+            "identity": final_identity,
+            "outputs": {
+                "auto_sources": _output_manifest(repo_root, auto_sources),
+                "auto_outputs": _output_manifest(repo_root, auto_outputs),
+                "libultra": _output_manifest(repo_root, lib_output),
+            },
+        },
+    )
 
 
 # Placeholder paths (relative to ``disasm/``) used to capture the Makefile's
