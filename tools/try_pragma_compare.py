@@ -53,6 +53,8 @@ except ImportError:  # pragma: no cover - the supported host is POSIX/macOS
 import probe_stats
 import variant_policy
 
+RUNNER_REPO_ROOT = Path(__file__).resolve().parent.parent
+
 # Set by a caller (``sweep_targets.py``) that already knows a per-function
 # family mapping (e.g. from a sweep listing) but does not want to thread a
 # ``families`` dict through every ``try_candidates_detailed`` call site.
@@ -197,16 +199,15 @@ def _shared_worktree_venv(repo_root: Path) -> Path | None:
     The repository venvs are intentionally ignored, so ``git worktree add``
     does not populate them. The primary checkout's venv is safe to reuse: it only
     provides the Python interpreter and pinned build dependencies, while all
-    source, build, and probe paths remain relative to ``repo_root``.  An
-    explicit ``PRAGMA_SHARED_VENV`` takes precedence for nonstandard layouts.
+    source, build, and probe paths remain relative to ``repo_root``. An
+    explicit ``PRAGMA_SHARED_VENV`` takes precedence for nonstandard layouts;
+    otherwise only the canonical primary root ``.venv`` is eligible.
     """
     explicit = os.environ.get("PRAGMA_SHARED_VENV")
     candidates = [Path(explicit)] if explicit else []
     primary = _primary_worktree_root(repo_root)
     if primary is not None:
-        # This repository's maintained environment is at its root. Keep the
-        # historical disasm-local path as a fallback for older checkouts.
-        candidates.extend((primary / ".venv", primary / "disasm" / ".venv"))
+        candidates.append(primary / ".venv")
     for candidate in candidates:
         python = candidate / "bin" / "python3"
         if python.is_file() and os.access(python, os.X_OK):
@@ -216,7 +217,7 @@ def _shared_worktree_venv(repo_root: Path) -> Path | None:
 
 def _object_build_environment(repo_root: Path | None = None) -> dict[str, str]:
     """Environment shared by Makefile object builds and captured probe recipes."""
-    root = repo_root or Path(__file__).resolve().parent.parent
+    root = repo_root or RUNNER_REPO_ROOT
     environment = {
         **os.environ,
         "MIPS_BINUTILS_PREFIX": os.environ.get(
@@ -227,11 +228,23 @@ def _object_build_environment(repo_root: Path | None = None) -> dict[str, str]:
         "OBJDUMP_BUILD": "0",
         "COLOR": "0",
     }
-    local_venv = root / "disasm" / ".venv" / "bin" / "python3"
-    if not (local_venv.is_file() and os.access(local_venv, os.X_OK)):
+    primary = _primary_worktree_root(root)
+    if primary is not None:
+        # A linked worktree may contain a relocated disasm/.venv symlink whose
+        # bin/python3 resolves to the system interpreter and cannot import
+        # splat. Always select the maintained primary root environment and
+        # name its interpreter explicitly for every bootstrap/make recipe.
         shared_venv = _shared_worktree_venv(root)
         if shared_venv is not None:
             environment["VENV"] = str(shared_venv)
+            environment["PYTHON"] = str(shared_venv / "bin" / "python3")
+    else:
+        local_venv = root / "disasm" / ".venv" / "bin" / "python3"
+        if not (local_venv.is_file() and os.access(local_venv, os.X_OK)):
+            shared_venv = _shared_worktree_venv(root)
+            if shared_venv is not None:
+                environment["VENV"] = str(shared_venv)
+                environment["PYTHON"] = str(shared_venv / "bin" / "python3")
     return environment
 
 
@@ -2384,11 +2397,64 @@ def _augment_blocks_with_callee_declarations(
     return augmented
 
 
+def _probe_stats_target(repo_root: Path | None = None) -> Path | None:
+    """Resolve default process evidence to the primary checkout."""
+    override = os.environ.get("PRAGMA_PROBE_STATS")
+    if override == "":
+        return None
+    if override is not None:
+        return Path(os.path.expandvars(override)).expanduser()
+    root = repo_root or RUNNER_REPO_ROOT
+    primary = _primary_worktree_root(root)
+    shared_root = primary if primary is not None else root
+    return shared_root / "disasm" / "probe-stats" / "probe-stats.jsonl"
+
+
+def _probe_stats_history_paths(repo_root: Path | None = None) -> tuple[Path, ...]:
+    """Return active/rotated history, sharing defaults across worktrees."""
+    target = _probe_stats_target(repo_root)
+    if target is None:
+        return ()
+    if os.environ.get("PRAGMA_PROBE_STATS") is not None:
+        return tuple(probe_stats.resolve_paths((target,)))
+    root = repo_root or RUNNER_REPO_ROOT
+    local_current = root / "disasm" / "probe-stats" / "probe-stats.jsonl"
+    local_legacy = root / "disasm" / "build" / "probe-stats.jsonl"
+    # Preserve dependency injection used by diagnostics/tests and by callers
+    # that deliberately configure variant_policy's history roots. Normal
+    # linked-worktree imports retain their module-local defaults and proceed
+    # to the canonical primary paths below.
+    if (
+        variant_policy.STATS_PATH_CURRENT != local_current
+        or variant_policy.STATS_PATH_LEGACY != local_legacy
+    ):
+        return variant_policy.default_stats_paths()
+    primary = _primary_worktree_root(root)
+    shared_root = primary if primary is not None else root
+    legacy = shared_root / "disasm" / "build" / "probe-stats.jsonl"
+    return tuple(probe_stats.resolve_paths((target, legacy)))
+
+
+@contextmanager
+def _probe_stats_append_lock(path: Path):
+    """Serialize append plus rotation for one shared stats ledger."""
+    key = hashlib.sha256(str(path.resolve(strict=False)).encode("utf-8")).hexdigest()[:20]
+    lock_path = Path(tempfile.gettempdir()) / f"pokemon_stadium_probe_stats_{key}.lock"
+    with lock_path.open("a+") as handle:
+        if fcntl is not None:
+            fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            if fcntl is not None:
+                fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+
+
 def _load_prior_attempt_history() -> dict[str, list[dict[str, object]]]:
     """Group every historical probe-stats attempt by function, oldest first.
 
-    Reads ``variant_policy.default_stats_paths()`` (the active stats file
-    plus any legacy file and rotated siblings of either) through
+    Reads the shared active stats file plus any legacy file and rotated
+    siblings through
     ``probe_stats.iter_batches`` so each attempt keeps its batch's
     ``timestamp``.  Cheap and silent when no stats exist yet -- a fresh
     worktree has no ``disasm/probe-stats/`` -- since both of those already
@@ -2397,7 +2463,7 @@ def _load_prior_attempt_history() -> dict[str, list[dict[str, object]]]:
     """
     history: dict[str, list[dict[str, object]]] = {}
     try:
-        paths = variant_policy.default_stats_paths()
+        paths = _probe_stats_history_paths()
     except OSError:
         return history
     for batch in probe_stats.iter_batches(paths):
@@ -3359,8 +3425,9 @@ def _record_probe_stats(
     ``PRAGMA_PROBE_STATS`` contract (unset -> new default location outside
     ``disasm/build/``, empty string -> disabled) and
     ``probe_stats.shape_attempt_row`` for what is stripped/truncated before a
-    row is written. The transaction lock surrounds this call, making one
-    batch append atomic across runners. ``families`` (``function -> family``)
+    row is written. A stats-target lock surrounds rotation and append, making
+    one batch atomic across runners and linked worktrees. ``families``
+    (``function -> family``)
     and the module-level ``family_lookup`` callable are both optional,
     best-effort sources for a per-attempt ``family`` when the attempt dict
     does not already carry one -- see ``sweep_targets.py``, which sets
@@ -3439,7 +3506,11 @@ def _record_probe_stats(
             families=families,
             family_lookup=family_lookup,
         )
-        probe_stats.append_batch(batch)
+        target = _probe_stats_target()
+        if target is None:
+            return
+        with _probe_stats_append_lock(target):
+            probe_stats.append_batch(batch, path=target)
     except OSError:
         # Metrics must never turn a valid source transaction into a failure.
         return

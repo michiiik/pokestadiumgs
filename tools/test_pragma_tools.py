@@ -11,6 +11,7 @@ import sys
 import tempfile
 import time
 import unittest
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from unittest import mock
 
@@ -855,13 +856,22 @@ class RunnerTests(unittest.TestCase):
             git_dir = main / ".git" / "worktrees" / "lane"
             venv.mkdir(parents=True)
             worktree.mkdir()
-            (venv / "python3").write_text("")
-            (venv / "python3").chmod(0o755)
+            (venv / "python3").symlink_to("/usr/bin/python3")
             git_dir.mkdir(parents=True)
             (worktree / ".git").write_text(f"gitdir: {git_dir}\n")
+            relocated = worktree / "relocated-venv"
+            (relocated / "bin").mkdir(parents=True)
+            (relocated / "bin" / "python3").symlink_to("/usr/bin/python3")
+            local_venv = worktree / "disasm" / ".venv"
+            local_venv.parent.mkdir(parents=True)
+            local_venv.symlink_to(relocated, target_is_directory=True)
             with mock.patch.dict(os.environ, {}, clear=True):
                 environment = runner._object_build_environment(worktree)
             self.assertEqual(environment["VENV"], str((main / ".venv").resolve()))
+            self.assertEqual(
+                environment["PYTHON"], str((main / ".venv").resolve() / "bin" / "python3")
+            )
+            self.assertNotEqual(environment["PYTHON"], "/usr/bin/python3")
 
     def test_worktree_oracle_links_primary_nonmatchings(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -1018,6 +1028,13 @@ class RunnerTests(unittest.TestCase):
             make_environments = [environment for description, _, environment in calls if description.startswith(("local ", "private "))]
             self.assertTrue(make_environments)
             self.assertTrue(all(environment["VENV"] == str((main / ".venv").resolve()) for environment in make_environments))
+            self.assertTrue(
+                all(
+                    environment["PYTHON"]
+                    == str((main / ".venv").resolve() / "bin" / "python3")
+                    for environment in make_environments
+                )
+            )
 
             # Proven private outputs are reusable without invoking setup/build.
             calls.clear()
@@ -1496,6 +1513,89 @@ class RunnerTests(unittest.TestCase):
             # and must never reach the persisted file.
             self.assertNotIn("assembly_diff", row["attempts"][0])
             self.assertNotIn("assembly_diff_truncated", row["attempts"][0])
+
+    def test_linked_worktree_probe_stats_default_to_primary_ledger(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            main = Path(directory) / "main"
+            worktree = Path(directory) / "worktree"
+            git_dir = main / ".git" / "worktrees" / "lane"
+            git_dir.mkdir(parents=True)
+            worktree.mkdir()
+            (worktree / ".git").write_text(f"gitdir: {git_dir}\n")
+            primary_stats = main / "disasm" / "probe-stats" / "probe-stats.jsonl"
+            local_stats = worktree / "disasm" / "probe-stats" / "probe-stats.jsonl"
+            attempts = [{"function": "func_shared", "status": "accepted"}]
+            with mock.patch.object(runner, "RUNNER_REPO_ROOT", worktree), mock.patch.object(
+                runner.probe_stats, "_git_head", return_value="deadbeef"
+            ), mock.patch.dict(os.environ, {}, clear=True):
+                runner._record_probe_stats(
+                    worktree / "disasm" / "src" / "owner.c",
+                    attempts,
+                    ["shared:accepted"],
+                )
+            row = json.loads(primary_stats.read_text())
+            self.assertEqual(row["attempts"][0]["function"], "func_shared")
+            self.assertFalse(local_stats.exists())
+
+    def test_primary_probe_stats_append_is_concurrency_safe(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            main = Path(directory) / "main"
+            worktree = Path(directory) / "worktree"
+            git_dir = main / ".git" / "worktrees" / "lane"
+            git_dir.mkdir(parents=True)
+            worktree.mkdir()
+            (worktree / ".git").write_text(f"gitdir: {git_dir}\n")
+            primary_stats = main / "disasm" / "probe-stats" / "probe-stats.jsonl"
+
+            def record(index: int) -> None:
+                runner._record_probe_stats(
+                    worktree / "disasm" / "src" / "owner.c",
+                    [{"function": f"func_{index}", "status": "accepted"}],
+                    [f"parallel:{index}"],
+                )
+
+            with mock.patch.object(runner, "RUNNER_REPO_ROOT", worktree), mock.patch.object(
+                runner.probe_stats, "_git_head", return_value="deadbeef"
+            ), mock.patch.dict(os.environ, {}, clear=True):
+                with ThreadPoolExecutor(max_workers=8) as pool:
+                    list(pool.map(record, range(24)))
+            rows = [json.loads(line) for line in primary_stats.read_text().splitlines()]
+            self.assertEqual(len(rows), 24)
+            self.assertEqual(
+                {row["attempts"][0]["function"] for row in rows},
+                {f"func_{index}" for index in range(24)},
+            )
+
+    def test_linked_worktree_prior_history_reads_primary_ledger(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            main = Path(directory) / "main"
+            worktree = Path(directory) / "worktree"
+            git_dir = main / ".git" / "worktrees" / "lane"
+            git_dir.mkdir(parents=True)
+            worktree.mkdir()
+            (worktree / ".git").write_text(f"gitdir: {git_dir}\n")
+            primary_stats = main / "disasm" / "probe-stats" / "probe-stats.jsonl"
+            primary_stats.parent.mkdir(parents=True)
+            primary_stats.write_text(
+                json.dumps(
+                    {
+                        "timestamp": "2026-08-31T00:00:00Z",
+                        "attempts": [{"function": "func_shared", "status": "accepted"}],
+                    }
+                )
+                + "\n"
+            )
+            with mock.patch.object(runner, "RUNNER_REPO_ROOT", worktree), mock.patch.object(
+                runner.variant_policy,
+                "STATS_PATH_CURRENT",
+                worktree / "disasm" / "probe-stats" / "probe-stats.jsonl",
+            ), mock.patch.object(
+                runner.variant_policy,
+                "STATS_PATH_LEGACY",
+                worktree / "disasm" / "build" / "probe-stats.jsonl",
+            ), mock.patch.dict(os.environ, {}, clear=True):
+                history = runner._load_prior_attempt_history()
+            self.assertEqual(history["func_shared"][0]["status"], "accepted")
 
     def test_unverified_probe_hit_uses_sequential_gate_without_duplicate_compare(self) -> None:
         # An unverified probe hit (no ``link_verified`` key, e.g. baseline
