@@ -24,7 +24,20 @@ s32 func_86B000F0(s32 arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/61/fragment61_code/func_86B00158.s")
+extern void func_80037120(s32, s32, s32 *, s16 *, s16 *);
+extern s32 D_80094908;
+s32 func_86B00158(s32 arg0, void *arg1) {
+    s16 pad;
+    s32 sp28;
+    s16 sp26;
+    s16 sp24;
+    if (arg0 == 2) {
+        func_80037120(D_80094908 + 0xB4, D_80094908 + 0xA8, &sp28, &sp26, &sp24);
+        *(s16 *)((u8 *)arg1 + 0x1C) = (s16)(-0x2000 - sp26);
+        *(s16 *)((u8 *)arg1 + 0x1E) = (s16)(sp24 + 0x6000);
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -36,7 +49,28 @@ s32 func_86B000F0(s32 arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/61/fragment61_code/func_86B00994.s")
+extern s32 D_86B0D160; extern s32 D_86B0D164; extern void *D_86B0E0A8; extern u8 *D_86B181C0; extern s32 func_87F08208(void *); extern void StageContext_SetClearColor(s32); extern void StageFade_StartFromTransparent(s32); extern void func_800225C4(s32); extern void func_800279C4(s32); extern void func_800226C0(s32); extern void func_86B01720(s32);
+void func_86B00994(void) {
+    s32 temp_v0;
+    D_86B0D164 = 0;
+    temp_v0 = func_87F08208(&D_86B0E0A8);
+    switch (temp_v0) {
+    case 1:
+        StageContext_SetClearColor(0xFFFF);
+        StageFade_StartFromTransparent(0x14);
+        *(s32 *)D_86B181C0 = 2;
+        func_800225C4(0x28);
+        func_800279C4(0xCF0B);
+        D_86B0D160 = 0;
+        return;
+    case 2:
+        func_86B01720(0);
+        func_800226C0(3);
+        D_86B0D160 = 1;
+        return;
+    }
+}
+void func_86B00994_padding(void) {}
 #endif
 
 #ifdef VERSION_US
