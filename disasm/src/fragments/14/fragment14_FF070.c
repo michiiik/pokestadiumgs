@@ -89,7 +89,31 @@ void func_81307C94(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_81308F54.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130911C.s")
+extern s32 func_8130437C(s32 arg0);
+extern void func_800226C0(s32);
+void func_8130911C(void *arg0) {
+    struct S { u8 pad0[0x137AC]; s32 value; u8 gap0[0x20]; f32 fvalue; u8 gap1[0x10]; s32 flag; u8 gap2[0x8]; s32 flag2; u8 gap3[1]; u8 state; };
+    struct S *s = arg0;
+    s32 result = func_8130437C(s->value + 0x15370);
+    if (result == -1) {
+        goto neg1;
+    }
+    if (result != 1) {
+        goto end;
+    }
+    s->flag = 1;
+    s->state = 4;
+    func_800226C0(3);
+    goto end;
+neg1:
+    s->flag2 = 0;
+    s->flag = 1;
+    s->fvalue = 16.0f;
+    s->state = 6;
+    func_800226C0(3);
+end:
+    ;
+}
 
 extern s32 func_813042E4(s32, void *);
 extern void func_800226C0(s32);
