@@ -67,6 +67,21 @@ class CandidateBatchPreflightTests(unittest.TestCase):
             "void func_80018A74(void)",
         )
 
+    def test_synthesizes_later_underscore_helper_prototype(self) -> None:
+        source = (
+            '#pragma GLOBAL_ASM("asm/us/nonmatchings/test/func_80000000.s")\n'
+            'extern void _bcopy(s32, s32, s32);\n'
+        )
+        blocks = runner._augment_blocks_with_callee_declarations(
+            [("func_80000000", "void func_80000000(s32 arg0) { _bcopy(arg0, arg0, 1); }")],
+            "",
+            source,
+        )
+        self.assertEqual(
+            blocks[0][1].splitlines()[0],
+            "extern void _bcopy(s32, s32, s32);",
+        )
+
     def test_rejects_non_owner_candidate(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             errors = runner.validate_candidate_batch(

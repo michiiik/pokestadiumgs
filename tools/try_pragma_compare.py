@@ -2243,7 +2243,13 @@ def _declaration_prefix(declarations: str | None) -> str:
     return body + "\n" if body else ""
 
 
-_CALL_SYMBOL_RE = re.compile(r"\bfunc_[0-9A-Fa-f]+\b")
+# Stadium sources also use underscore-prefixed SDK helpers (notably
+# ``_bcopy``/``_bzero``) whose real prototypes are often declared later in the
+# same file. Include those helpers so IDO does not invent an anonymous
+# old-style declaration before it reaches the authoritative later prototype.
+_CALL_SYMBOL_RE = re.compile(
+    r"\b(?:func_[0-9A-Fa-f]+|_[A-Za-z_][A-Za-z0-9_]*)\b"
+)
 
 # A signature's return-type/qualifier prefix: any number of storage-class or
 # base-type keywords, then exactly one base type name, then optional
@@ -2565,7 +2571,7 @@ def _missing_callee_declarations(
 ) -> str:
     """Extra ``extern`` lines this one candidate needs beyond ``already_declared``.
 
-    For every ``func_XXXXXXXX`` the candidate calls -- other than
+    For every known function/helper symbol the candidate calls -- other than
     ``function`` itself, and other than a name ``already_declared`` already
     covers -- scan ``baseline_source`` (the whole owner file, pragma and
     all) for its real signature and reuse it verbatim.  A callee the scan
