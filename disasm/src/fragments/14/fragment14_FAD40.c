@@ -197,7 +197,23 @@ s32 func_81303A38(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FAD40/func_81303A88.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FAD40/func_81303BF4.s")
+extern u8 D_81311DA8[];
+extern s32 func_81302290(void *);
+extern void func_81302E58(void *arg0, s32 arg1);
+extern s32 func_81311C70(s32, s32 *, u8, s32);
+void func_81303BF4(u8 *arg0) {
+    u8 *table;
+    table = &D_81311DA8[func_81302BB0(arg0) * 36];
+    if (func_81311C70(*(s32 *)(arg0 + 0x4DA0) + 0x74, (s32 *)table, arg0[0xA], -1) != 0) {
+        if ((func_81302BB0(arg0) != 0) && (func_81302290(*(void **)(arg0 + 0x4DA0)) < 10)) {
+            arg0[0x4DBD] = 0xB;
+            return;
+        }
+        func_8130A570(*(s32 *)(arg0 + 0x4DA0) + 0xDA8, 0);
+        arg0[0x4DBD] = 3;
+        func_81302E58(arg0, 0);
+    }
+}
 
 extern s32 func_813022F4(void *arg0, void *arg1);
 extern void func_81311C18(s32 arg0);
