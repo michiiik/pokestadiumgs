@@ -339,12 +339,14 @@ file at a time so declarations, structs and names accumulate in one place.
   defined anywhere in the target file get their real signature injected
   instead of the `s32` fallback prototype.
 - `companion_edits=[{"function", "old", "new"}]` (API and MCP) applies an
-  exact-once edit to an already-accepted body or prototype in the same file
-  for both the probe and the gate and installs it only together with the
-  candidate; the stats row records the edited function names. It may not add
-  or remove a `#pragma GLOBAL_ASM`. Use it for the §4 "callee prototyped as
-  `void`" and "caller passes fewer arguments" cases; the function-pointer
-  cast spelling in the T5 example is unverified until a gate accepts it.
+  exact-once edit to a C body or prototype in the same file for both the probe
+  and the gate and installs it only together with the candidate; candidate
+  substitution happens first, so a stale extern for the candidate owner may be
+  retyped in the same transaction. The stats row records the edited function
+  names. It may not add or remove a `#pragma GLOBAL_ASM`. Use it for the §4
+  "callee prototyped as `void`" and "caller passes fewer arguments" cases; the
+  function-pointer cast spelling in the T5 example is unverified until a gate
+  accepts it.
 - `tools/fleet_probe.py batch.json [--gate] [--no-auto-gate] [--json out]` —
   CLI front end for agents that are not wired to the MCP server; prints one row
   per attempt and a per-function verdict (including "register tie — stop").
@@ -579,10 +581,10 @@ reaches an agent through `tools/file_brief.py`, not here.
   `probe_rejected` can still leave the winning candidate's bodies installed in
   the tracked source (observed with the `517E0.c` switch batch above); check
   `git diff` after a failed gate before re-probing the same owners.
-- Runner: `companion_edits` refuses an extern/prototype edit when the named
-  function is still a GLOBAL_ASM pragma owner, so callee-signature fixes in
-  file-scope externs cannot ride along with a candidate; they must be landed
-  as a separate ROM-verified edit first.
+- Runner (fixed 2026-09-02): `companion_edits` now substitutes candidate
+  owners before applying same-file extern/prototype edits, so a stale callee
+  signature can be corrected in the same candidate transaction while the
+  no-add/remove-pragma guard remains active.
 - Build (2026-08-30): `make -C disasm COMPARE=1` fails in the host clang
   syntax check on committed, unmodified code
   (`fragments/44/fragment44_1F1850.c`: old-style definitions + a

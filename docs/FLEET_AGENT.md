@@ -64,9 +64,10 @@ Do not touch any other file's pragmas or run `make`.
   the documented same-file exact-once edit; it must not add or remove a
   `#pragma GLOBAL_ASM`.
 - The runner preflight rejects candidate names that are not active owners in
-  the selected source. A companion edit must name an existing accepted C
-  definition/prototype; it must never name the candidate owner still backed by
-  `GLOBAL_ASM`, and its old/new text must include that named function.
+  the selected source. A companion edit must name an existing C
+  definition/prototype after candidate substitution; it may name the candidate
+  owner when it retypes a stale extern/prototype, and its old/new text must
+  include that named function.
 
 ## 2. The loop, per function
 

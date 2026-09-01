@@ -1344,7 +1344,12 @@ def try_candidate(source_path: Path, function: str, candidate: str) -> int:
     return result
 
 
-def _try_candidate_detailed(source_path: Path, function: str, candidate: str) -> tuple[int, str]:
+def _try_candidate_detailed(
+    source_path: Path,
+    function: str,
+    candidate: str,
+    companion_edits: list[dict[str, str]] | None = None,
+) -> tuple[int, str]:
     """Run one candidate and identify the phase that accepted or rejected it."""
     source = source_path.read_text()
     candidate = candidate.rstrip() + "\n"
@@ -1357,6 +1362,11 @@ def _try_candidate_detailed(source_path: Path, function: str, candidate: str) ->
     if count != 1:
         print(f"could not find exactly one pragma for {function}", file=sys.stderr)
         return 2, "invalid_pragma"
+    if companion_edits:
+        source_after, companion_error = apply_companion_edits(source_after, companion_edits)
+        if companion_error is not None:
+            print(f"could not apply companion edit for {function}: {companion_error}", file=sys.stderr)
+            return 2, "companion_edit_failed"
 
     accepted = False
     source_path.write_text(source_after)
@@ -3192,6 +3202,21 @@ def validate_candidate_batch(
 
     candidate_names = set(functions)
     working = source_text
+    replaced_candidates: set[str] = set()
+    if blocks:
+        # Companion edits are applied after candidate substitution.  This is
+        # important for the issue-#38 case where a stale file-scope extern for
+        # the candidate owner must be retyped in the same transaction: before
+        # substitution that owner still has a GLOBAL_ASM pragma, but after it
+        # has a real C definition and the extern edit is safe.
+        for function, candidate in blocks:
+            if function in replaced_candidates:
+                continue
+            replacement = _replace_candidate_text(working, function, candidate)
+            if replacement is None:
+                continue
+            working = replacement
+            replaced_candidates.add(function)
     for index, edit in enumerate(companion_edits or []):
         function = edit.get("function") if isinstance(edit, dict) else None
         old = edit.get("old") if isinstance(edit, dict) else None
@@ -3201,14 +3226,14 @@ def validate_candidate_batch(
             errors.append(f"{prefix} requires string function, old, and new fields")
             continue
         assert function is not None and old is not None and new is not None
-        if function in candidate_names:
+        if function in candidate_names and function not in replaced_candidates:
             errors.append(
                 f"{prefix} target {function} is also a candidate owner; "
-                "companion edits require an existing accepted C definition or "
-                "prototype"
+                "pass candidate blocks so its substitution can precede the "
+                "companion edit"
             )
             continue
-        if function in owners:
+        if function in owners and function not in replaced_candidates:
             errors.append(
                 f"{prefix} target {function} is still a GLOBAL_ASM owner; "
                 "resolve that owner separately before using a companion edit"
@@ -3252,8 +3277,8 @@ def apply_companion_edits(
     Each edit is ``{"function": ..., "old": ..., "new": ...}``.  ``old`` must
     match ``text`` (as edited by any earlier item in the list) exactly once;
     the target ``function`` must not currently be a ``#pragma GLOBAL_ASM``
-    owner (it must already be a plain C definition or an
-    ``extern``/prototype line); and neither ``old`` nor ``new`` may mention
+    owner (the caller may substitute a candidate first when retyping that
+    candidate's stale extern); and neither ``old`` nor ``new`` may mention
     ``GLOBAL_ASM`` -- a companion edit may not add or remove a pragma.
 
     Returns ``(edited_text, None)`` on success. On failure returns
@@ -3430,19 +3455,19 @@ def _probe_one_uncounted(
     companion_edits: list[dict[str, str]] | None = None,
 ) -> dict[str, object]:
     baseline = source_path.read_text()
-    if companion_edits:
-        baseline, companion_error = apply_companion_edits(baseline, companion_edits)
-        if companion_error is not None:
-            return {
-                "status": "companion_edit_failed",
-                "diagnostic": companion_error,
-            }
     replacement = _replace_candidate_text(baseline, function, candidate)
     if replacement is None:
         return {
             "status": "probe_unavailable",
             "probe_reason": "invalid_pragma",
         }
+    if companion_edits:
+        replacement, companion_error = apply_companion_edits(replacement, companion_edits)
+        if companion_error is not None:
+            return {
+                "status": "companion_edit_failed",
+                "diagnostic": companion_error,
+            }
 
     repo_root = _repo_root_for_path(source_path)
     temporary_directory = tempfile.TemporaryDirectory(
@@ -3880,6 +3905,7 @@ def _install_incrementally(
     attempts: list[dict[str, object]],
     winner_indices: dict[str, int],
     timing: dict[str, object],
+    companion_edits: list[dict[str, str]] | None = None,
 ) -> tuple[dict[str, str], bool]:
     """Install winners cumulatively, dropping any that conflict with an earlier one.
 
@@ -3900,6 +3926,53 @@ def _install_incrementally(
     winners can repair; ``source_path`` is left at the last good state and
     the caller must revert the whole batch.
     """
+    if companion_edits:
+        # A self-referential companion edit must see the candidate's C
+        # definition before it inspects the target.  Replace every winner
+        # first, then apply the paired edits once to the complete candidate
+        # set so edits may safely refer to any winner in the batch.
+        combined = baseline
+        for function, candidate in winners.items():
+            text = candidate
+            if prefix and text.startswith(prefix):
+                text = text[len(prefix):]
+            pragma = re.compile(
+                rf'^#pragma GLOBAL_ASM\("asm/us/nonmatchings/[^"]+/{re.escape(function)}\.s"\)$',
+                re.MULTILINE,
+            )
+            combined, count = pragma.subn(text.rstrip("\n"), combined, count=1)
+            if count != 1:
+                source_path.write_text(baseline)
+                os.utime(source_path, None)
+                return {}, True
+        combined, companion_error = apply_companion_edits(combined, companion_edits)
+        if companion_error is not None:
+            for function, index in winner_indices.items():
+                attempt = attempts[index]
+                attempt.update({
+                    "probe_status": attempt.get("probe_status", attempt.get("status")),
+                    "status": "combined_compile_failed",
+                    "reason": companion_error,
+                })
+            source_path.write_text(baseline)
+            os.utime(source_path, None)
+            return {}, False
+        source_path.write_text(combined)
+        os.utime(source_path, None)
+        timing["install_compiles"] = int(timing.get("install_compiles", 0)) + 1
+        if rebuild_source_object(source_path) == 0:
+            return dict(winners), False
+        for function, index in winner_indices.items():
+            attempt = attempts[index]
+            attempt.update({
+                "probe_status": attempt.get("probe_status", attempt.get("status")),
+                "status": "combined_compile_failed",
+                "reason": "companion candidate set failed to compile",
+            })
+        source_path.write_text(baseline)
+        os.utime(source_path, None)
+        return {}, False
+
     combined = baseline
     kept: dict[str, str] = {}
     for install_index, (function, candidate) in enumerate(winners.items()):
@@ -4220,12 +4293,12 @@ def _try_candidates_detailed_unlocked(
     populated only after that final combined comparison also succeeds.
 
     ``companion_edits`` (see ``apply_companion_edits`` and
-    ``try_candidates_detailed``) is validated once, up front, against the
-    untouched on-disk source. ``working_source`` -- the text every write to
-    ``source_path`` in this function uses from that point on, whether for a
-    sequential gate or a combined install -- carries those edits; ``baseline``
-    (the true, unedited disk snapshot) is kept only for restoring the tree on
-    failure, so a rejected batch leaves nothing behind.
+    ``try_candidates_detailed``) is validated by the public entry points
+    against a simulated candidate substitution. ``working_source`` starts as
+    the untouched disk snapshot; each probe, sequential gate, and combined
+    install substitutes its candidate before applying the companion edits.
+    ``baseline`` is kept for restoring the tree on failure, so a rejected
+    batch leaves nothing behind.
     """
     started = time.monotonic()
     repo_root = _repo_root_for_path(source_path)
@@ -4238,8 +4311,15 @@ def _try_candidates_detailed_unlocked(
             edit.get("function") if isinstance(edit, dict) else None
             for edit in companion_edits
         ]
-        working_source, companion_error = apply_companion_edits(baseline, companion_edits)
-        if companion_error is not None:
+        preflight_errors = validate_candidate_batch(
+            source_path,
+            [function for function, _ in blocks],
+            companion_edits,
+            blocks,
+            declarations,
+        )
+        if preflight_errors:
+            companion_error = "\n".join(preflight_errors)
             attempts = [
                 {
                     "index": index,
@@ -4363,11 +4443,16 @@ def _try_candidates_detailed_unlocked(
         """Gate one candidate alone against the baseline tree (historical path)."""
         function, candidate = blocks[index]
         attempt = attempts[index]
-        source_path.write_text(working_source)
+        source_path.write_text(baseline)
         os.utime(source_path, None)
         rebuild_source_object(source_path)
         timing["gate_runs"] = int(timing["gate_runs"]) + 1
-        result, outcome = _try_candidate_detailed(source_path, function, candidate)
+        if companion_edits:
+            result, outcome = _try_candidate_detailed(
+                source_path, function, candidate, companion_edits
+            )
+        else:
+            result, outcome = _try_candidate_detailed(source_path, function, candidate)
         attempt.update({
             "status": outcome,
             "exit_code": result,
@@ -4417,7 +4502,14 @@ def _try_candidates_detailed_unlocked(
         winner_indices = dict(accepted_indices)
         winner_indices.update(pending)
         kept, invalid_pragma = _install_incrementally(
-            source_path, working_source, prefix, winners, attempts, winner_indices, timing
+            source_path,
+            working_source,
+            prefix,
+            winners,
+            attempts,
+            winner_indices,
+            timing,
+            companion_edits,
         )
         if invalid_pragma:
             restore_baseline()
@@ -4529,7 +4621,14 @@ def _try_candidates_detailed_unlocked(
 
     final_indices = dict(accepted_indices)
     final_kept, invalid_pragma = _install_incrementally(
-        source_path, working_source, prefix, accepted, attempts, final_indices, timing
+        source_path,
+        working_source,
+        prefix,
+        accepted,
+        attempts,
+        final_indices,
+        timing,
+        companion_edits,
     )
     if invalid_pragma:
         restore_baseline()

@@ -43,21 +43,20 @@ COMPANION_EDIT_ITEMS = {
         "type": "object",
         "required": ["function", "old", "new"],
         "properties": {
-            "function": {"type": "string", "description": "Name of the already-accepted function/prototype in the same source file being edited."},
+            "function": {"type": "string", "description": "Name of the function whose existing definition/prototype is being edited; it may be the candidate owner when candidate substitution creates its C definition first."},
             "old": {"type": "string", "description": "Exact current text of that function's definition or prototype line(s). Must match exactly once in the file."},
             "new": {"type": "string", "description": "Replacement text."},
         },
     },
     "description": (
-        "Paired-change edits to an already-accepted body or prototype elsewhere in the "
-        "same file (e.g. a caller that must be re-spelled to keep compiling once a new "
-        "candidate gets its real signature). Applied to the working copy of the source "
-        "before the candidate is inserted, for both the isolated probe and the gate, in "
-        "the same transaction as the candidates. Installed together with the candidates "
-        "only on a successful gate; on any failure nothing is written. The edited "
-        "function must already be a plain C definition or extern/prototype line, not a "
-        "GLOBAL_ASM pragma owner, and an edit may not add or remove a "
-        "#pragma GLOBAL_ASM line."
+        "Paired-change edits to a C body or prototype in the same file (e.g. a caller "
+        "that must be re-spelled to keep compiling once a new candidate gets its real "
+        "signature). Candidate substitution happens before these edits for both the "
+        "isolated probe and the gate, so a stale extern for the candidate owner may be "
+        "retyped in the same transaction. Installed together with the candidates only "
+        "on a successful gate; on any failure nothing is written. The edit must target "
+        "an existing definition/prototype after candidate substitution, and may not add "
+        "or remove a #pragma GLOBAL_ASM line."
     ),
 }
 

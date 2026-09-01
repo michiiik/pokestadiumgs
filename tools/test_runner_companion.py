@@ -35,6 +35,7 @@ def tearDownModule() -> None:
 # arguments than its real signature.
 SAMPLE_SOURCE = (
     '#include "global.h"\n\n'
+    'extern void func_8001480C(void);\n\n'
     '#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_8001480C.s")\n\n'
     '#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80018AB0.s")\n\n'
     'void func_80018A74(void) { func_8001480C(); }\n\n'
@@ -127,6 +128,20 @@ class CandidateBatchPreflightTests(unittest.TestCase):
                     "old": "void func_80018A94(s32 arg0) { (void)arg0; }",
                     "new": "void func_80018A94(s32 arg0) { (void)arg0; (void)0; }",
                 }],
+            )
+        self.assertEqual(errors, [])
+
+    def test_accepts_retype_of_candidate_owners_stale_extern(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            errors = runner.validate_candidate_batch(
+                self._source_path(Path(tmp)),
+                ["func_8001480C"],
+                [{
+                    "function": "func_8001480C",
+                    "old": "extern void func_8001480C(void);",
+                    "new": "extern s32 func_8001480C(s32 arg0);",
+                }],
+                [("func_8001480C", "s32 func_8001480C(s32 arg0) { return arg0; }")],
             )
         self.assertEqual(errors, [])
 
@@ -274,6 +289,24 @@ class ApplyCompanionEditsTests(unittest.TestCase):
         self.assertIn("s32 func_8001480C(s32 arg0) { return arg0; }", installed)
         self.assertIn("((void (*)(void))func_8001480C)();", installed)
 
+    def test_candidate_substitution_precedes_self_companion_edit(self) -> None:
+        candidate = "s32 func_8001480C(s32 arg0) { return arg0; }"
+        replaced = runner._replace_candidate_text(
+            SAMPLE_SOURCE, "func_8001480C", candidate
+        )
+        self.assertIsNotNone(replaced)
+        edited, error = runner.apply_companion_edits(replaced, [{
+            "function": "func_8001480C",
+            "old": "extern void func_8001480C(void);",
+            "new": "extern s32 func_8001480C(s32 arg0);",
+        }])
+        self.assertIsNone(error)
+        self.assertIn("extern s32 func_8001480C(s32 arg0);", edited)
+        self.assertNotIn(
+            '#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_8001480C.s")',
+            edited,
+        )
+
 
 class TryCandidatesDetailedCompanionFailureTests(unittest.TestCase):
     """The public entry point short-circuits on a bad companion edit.
@@ -328,6 +361,43 @@ class TryCandidatesDetailedCompanionFailureTests(unittest.TestCase):
             )
             self.assertEqual(result["batch_status"], "companion_edit_failed")
             self.assertEqual(source_path.read_text(), SAMPLE_SOURCE)
+
+    def test_self_companion_edit_is_installed_after_candidate_gate(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source_path = self._write_source(Path(tmp))
+            companion_edits = [{
+                "function": "func_8001480C",
+                "old": "extern void func_8001480C(void);",
+                "new": "extern s32 func_8001480C(s32 arg0);",
+            }]
+            candidate = "s32 func_8001480C(s32 arg0) { return arg0; }"
+            with mock.patch.object(
+                runner,
+                "probe_candidates",
+                return_value=[{
+                    "index": 0,
+                    "function": "func_8001480C",
+                    "status": "probe_match",
+                    "link_verified": True,
+                }],
+            ), mock.patch.object(
+                runner, "rebuild_source_object", return_value=0
+            ), mock.patch.object(
+                runner, "compare_current_tree", return_value=0
+            ):
+                result = runner.try_candidates_detailed(
+                    source_path,
+                    [("func_8001480C", candidate)],
+                    companion_edits=companion_edits,
+                )
+            self.assertEqual(result["accepted"], ["func_8001480C"])
+            installed = source_path.read_text()
+            self.assertIn("extern s32 func_8001480C(s32 arg0);", installed)
+            self.assertIn(candidate, installed)
+            self.assertNotIn(
+                '#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_8001480C.s")',
+                installed,
+            )
 
     def test_backwards_compatible_when_omitted(self) -> None:
         """Omitting companion_edits must not change the shape of a result."""
