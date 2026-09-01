@@ -21,3 +21,11 @@ func_8600A144 accepted, link_verified plus full COMPARE=1 (2026-08-31). For both
 ## Register tie: func_86009EF8 (2026-08-31)
 
 register-tie (2026-08-31): runner futility reported 13 prior attempts at >=0.99 register_allocation_only and directed stop. This box tried threshold/value/result declaration orders and inline-load forms; best current raw 0.6154 / normalized 0.9231 instruction_drift because the unused second formal was stored before the expected leading mtc1. Do not resume source-shape variants; send the recorded >=0.99 candidate to the permuter.
+
+## Requeue: func_86008E64 fleet box (2026-09-02) (2026-09-02)
+
+requeue: fresh 58-instruction call-chain owner; no prior probe attempts or recorded best score. Assembly fingerprint: 0x86008E80 jal func_87C007DC, conditional subtract of arg0+0xC8 when arg1 != 0, positive f64 guard, then jal func_87C00814, six-word record copy, func_87C002A8 scale, func_87C00160 apply, func_86007EB4 cleanup, return 1/0. Prepared 8 distinct candidates in /private/tmp/gs49_func_86008E64_batch.json; no runner invoked, so normalized/raw score and mismatch kind are unavailable. Hypothesis families: typed Vec overlays, raw 0x18-byte records, explicit result temporaries, guard polarity, and declaration/order variants. Next action: run the JSON as one probe-only batch, inspect first-diff diagnostics, then change hypothesis family based on mismatch; preserve exact prototypes for func_87C007DC(const f64 *, const f64 *), func_87C00814(void *, void *, void *), func_87C002A8(void *, void *, f64), and func_87C00160(void *, void *, void *).
+
+## Wave 49 coordinator replay (2026-09-02)
+
+tooling-blocked; 8 fresh candidates could not compile because the batch redeclared existing func_87C00160 with an incompatible prototype and defined func_86008E64 as s32 against the existing owner prototype void. No candidate reached comparison. Next action: prepare a fresh full-definition batch using the existing helper prototype and void owner signature, then separately verify whether the target return value requires an accepted prototype change; do not repeat the conflicting declarations.

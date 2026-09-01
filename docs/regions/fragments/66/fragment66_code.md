@@ -21,3 +21,15 @@ requeue: prepared 8 novel compiler-faithful call-sequence candidates in /private
 ## Wave 48 coordinator replay (2026-09-02)
 
 requeue; the original 8 call-sequence candidates reached best similarity 0.9753 raw 0.8765 with an 8-byte frame overshoot, expected -0x48 versus actual -0x50. A focused byte-workspace repair improved raw similarity to 0.9136 with exact 324-byte size, but still mismatched at instruction 12: expected sw ,76(sp), actual addiu ,3. The repair tried byte workspace, named status field at offset 0xD, pointer status, explicit byte, status temporary, ternary, and reordered forms. Next action: force the target formal home stores through an address-taken or accepted prototype/lifetime shape without adding locals, then gate the first link-verified hit.
+
+## 2026-09-02 fleet box final handoff (2026-09-02)
+
+requeue: prepared 8 novel formal-home/lifetime candidates in /private/tmp/gs49_func_82E0292C_batch.json; runner intentionally not invoked per box instruction. Prior best remains normalized 0.9630, raw 0.9136 at exact 324-byte owner size. Stable fingerprint: instruction 3/offset 12 expected sw $a0, 0x48($sp) but prior actual addiu $a0, $zero, 3; corresponding expected instruction 6/offset 24 sw $a1, 0x4C($sp) was absent. Attempted hypotheses in this batch: address-taken arg0, address-taken arg1, both anchors, post-call formal reads, volatile formal anchors, explicit home writes after first call, and opaque arg0 lifetime. All preserve the 0x20 byte workspace/status-byte model and exact signature; no candidate/declarations identity was repeated from full probe history. Next action: run this batch through the serialized runner; if home-store candidates still drift, investigate compiler parameter-spill scheduling or accepted prototype/lifetime idioms.
+
+## 2026-09-02 fleet box count correction (2026-09-02)
+
+Correction: the JSON batch contains 9 candidates (not 8); all are novel and JSON-validated.
+
+## Wave 49 coordinator replay (2026-09-02)
+
+requeue; 9 formal-home candidates compared after the prior 0.9630 normalized and 0.9136 raw near miss. Best new result was 0.8642 normalized and 0.7407 raw, with the target home store still displaced and frame or early-call drift. Tried formal-address, formal-lifetime, formal-home, and address-anchor variants. No link verification or gate. Next action: model the compiler emitted formal-home stores without adding address-anchor locals, likely by matching the original parameter use and one byte workspace exactly.

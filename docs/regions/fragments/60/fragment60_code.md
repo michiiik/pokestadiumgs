@@ -29,3 +29,15 @@ tooling-blocked: Fresh owner func_86A014D0 (prior_attempts=0, 107 instructions, 
 ## func_86A01C5C (2026-09-02) (2026-09-02)
 
 Accepted call_chain owner. Winning spelling is direct initialization followed by a do-while loop: func_800086A4(2), StageFade_StartFromOpaque(0xA), func_80064D28(), func_86A0167C(), func_86A012D4(), and while (*(s32 *)D_86A46548 != 9). The first batch had 8 distinct candidates covering raw-pointer do-while, typed/context temporaries, pre-test while, state temporary, literal variants, and break polarity. Candidate call-chain:do-while:raw-pointer was link_verified=true; combined full-ROM gate accepted with gate_mode=combined, gate_runs=1, install_compiles=1. Best rejected diagnostic was register_allocation_only normalized 1.0/raw 0.7692 at instruction 8: expected lui s1 / addiu s1 and li s0, while actual used s0/s1; it was skipped after the earlier accepted candidate. Prior best was normalized/raw 0.9615 with instruction drift.
+
+## func_86A05AAC fleet box 2026-09-02 (2026-09-02)
+
+requeue: Prepared /private/tmp/gs49_func_86A05AAC_batch.json with 8 complete compiler-faithful definitions and shared declarations; no runner invoked per assignment. Owner prior_attempts=2, best normalized similarity=0.9750 and raw=0.5750, mismatch=operand_or_scheduling_drift. Stable first-diff fingerprint: offset 25, expected subu result in v0 but prior body emitted t2 (expected instruction text op/0x31 ,,8 vs actual op/0x31 ,,8). Assembly model is 0x18 frame, MathUtil_Atan2s(arg1-record[4], -(arg2-record[8])), add 0x3FFF then modulo 0xFFFF, compare signed halfword target against +/- thresholds. Attempted hypotheses in batch: raw result-first, guard polarity, typed angle-local declaration order, explicit difference temporaries, s16 angle width, comparison-difference temporaries, target-before-angle declaration order, and single-expression return. Next action: run this batch through the runner when the shared checkout is clear; prioritize candidates that keep the subtraction result in v0 and preserve the observed delayed stack spills, then inspect the new first-diff fingerprint.
+
+## func_86A05AAC fingerprint correction (2026-09-02)
+
+Correction: exact fingerprint is offset 25, expected instruction text 'op/0x31 $v0, $v0, 8' versus actual 'op/0x31 $t2, $v0, 8'; shell interpolation in the preceding note omitted register names.
+
+## Wave 49 coordinator replay (2026-09-02)
+
+requeue; 8 near-miss candidates compared with no link verification. Best call-sequence:typed:explicit-difference-temps reached similarity 0.9512 raw 0.7805, exact target size 160 versus candidate 164, with stable late operand drift at instruction 25: expected op/0x31 on  but actual op/0x31 on . Tried raw, guard-polarity, typed angle, explicit difference temporaries, s16 widths, declaration order, and assignment forms. Next action: preserve the exact target temporary register through a declaration/lifetime repair, then gate the first link-verified hit.
