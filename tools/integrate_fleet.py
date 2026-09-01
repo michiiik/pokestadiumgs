@@ -63,6 +63,16 @@ BYPASS_PATTERNS = (
 
 LOG_PATH = REPO_ROOT / "docs" / "FLEET_INTEGRATION_LOG.md"
 
+# Generated files that never block integration. ``COVERAGE.md`` is rewritten
+# from the index by ``.githooks/pre-commit.d/10-coverage.sh`` on every commit,
+# and the git index is shared by every session in the checkout (AGENTS.md
+# Sec 1.3), so a session that exits mid-work routinely leaves a stale staged
+# copy behind. Treating that as a dirty tree would wedge unattended
+# integration until a human intervened -- exactly what this tool exists to
+# avoid -- and it cannot mask a real problem, because the value is derived
+# from the tree the ROM gate then rebuilds.
+IGNORED_WHEN_DIRTY = ("COVERAGE.md",)
+
 
 class IntegrationError(RuntimeError):
     pass
@@ -190,6 +200,25 @@ def log_result(entries: list[dict[str, object]]) -> None:
         handle.writelines(lines)
 
 
+def blocking_dirt(status_porcelain: str) -> list[str]:
+    """Working-tree entries that must stop an unattended merge.
+
+    Everything except the regenerated files in ``IGNORED_WHEN_DIRTY``: a real
+    uncommitted source change would make a gate failure ambiguous between the
+    merge and the local edit, which is the one thing an unattended run cannot
+    resolve.
+    """
+    blocking: list[str] = []
+    for line in status_porcelain.splitlines():
+        if not line.strip():
+            continue
+        path = line[3:].strip().strip('"')
+        if path in IGNORED_WHEN_DIRTY:
+            continue
+        blocking.append(line)
+    return blocking
+
+
 def resolve_branches(pattern: str) -> list[str]:
     out = git("for-each-ref", "--format=%(refname:short)", "refs/heads/")
     names = [n.strip() for n in out.splitlines() if n.strip()]
@@ -197,11 +226,11 @@ def resolve_branches(pattern: str) -> list[str]:
 
 
 def land(pattern: str, base: str, gate_timeout: int, dry_run: bool) -> int:
-    status = git("status", "--porcelain")
-    if status.strip():
+    blocking = blocking_dirt(git("status", "--porcelain"))
+    if blocking:
         raise IntegrationError(
             "working tree is dirty; integration needs a clean tree so a gate "
-            "failure can only come from the merge:\n" + status.strip()[:600]
+            "failure can only come from the merge:\n" + "\n".join(blocking)[:600]
         )
 
     original = git("rev-parse", "--abbrev-ref", "HEAD").strip()

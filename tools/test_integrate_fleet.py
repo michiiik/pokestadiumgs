@@ -119,3 +119,24 @@ class ProveTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class BlockingDirtTests(unittest.TestCase):
+    def test_stale_generated_coverage_does_not_block(self) -> None:
+        self.assertEqual(fleet.blocking_dirt("MM COVERAGE.md\n"), [])
+
+    def test_a_modified_source_blocks(self) -> None:
+        self.assertEqual(
+            len(fleet.blocking_dirt(" M disasm/src/1A360.c\n")), 1
+        )
+
+    def test_untracked_file_blocks(self) -> None:
+        self.assertEqual(len(fleet.blocking_dirt("?? stray.c\n")), 1)
+
+    def test_clean_tree_is_empty(self) -> None:
+        self.assertEqual(fleet.blocking_dirt("\n"), [])
+
+    def test_mixed_reports_only_the_real_one(self) -> None:
+        blocking = fleet.blocking_dirt("MM COVERAGE.md\n M disasm/src/1A360.c\n")
+        self.assertEqual(len(blocking), 1)
+        self.assertIn("1A360.c", blocking[0])
