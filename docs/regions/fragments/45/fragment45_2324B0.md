@@ -17,3 +17,11 @@ No accepted owner. func_8AB0EF44 was tooling-blocked after two candidate attempt
 ## Fleet box 2026-09-02: func_8AB0E280 tooling-blocked (2026-09-02)
 
 tooling-blocked; owner kept active for requeue. Submitted 9 distinct call_sequence candidates covering s16 baseline/local result, explicit load/increment temporaries, separate guard polarity, u8 argument, s32 global overlay, and declaration order, with declarations for s16 D_8AB1723A and exact s32 func_8AB0E2EC(s32). PRAGMA_GATE_CC_CHECK=1 and bounded 30s compile/compare limits were used. Two runner invocations returned no attempt rows, no diagnostics, no JSON, and no link_verified result; therefore no normalized/raw score, mismatch_kind, first-diff offset/fingerprint, or expected/actual size was produced. Assembly fingerprint remains prior best normalized 0.8889/raw 0.6667, operand_or_scheduling_drift, 27 expected instructions, with first observed scheduling-sensitive region at the second branch delay-slot lui versus ra-save delay slot. Next materially different action: repair/restart the runner transaction or MCP service, verify it emits per-attempt diagnostics, then rerun a fresh 9+ candidate batch before changing source hypotheses.
+
+## 2026-09-02
+
+Wave 47 fresh owner func_8AB0F5F8: prepared 8 distinct call-sequence candidates in /private/tmp/gs47_func_8AB0F5F8_batch.json; prior_attempts=0. Assembly shape: 0x2D result, case-0 D_8AB1724A reset plus flag/helper setup and indexed D_8AB12CB0 selection, case-1 increment/threshold and func_8AB0E2EC(0). No probe scores/fingerprint yet; coordinator should replay JSON. Next action: run batch through fleet_probe.py, inspect first-diff diagnostics, then gate any link-verified hit.
+
+## Wave 47 coordinator replay (2026-09-02)
+
+requeue; 8 state-machine candidates compared. Best state-machine candidate reached similarity 0.8444 raw 0.5444; the stable fingerprint is branch-distance drift at instruction 27, expected beq ,,60 versus actual beq ,,56. Tried guard-return, explicit state temporary, nested conditions, and branch-form variants. Next action: adjust the source shape around the preceding comparison and statement grouping, then send a new batch with novel bodies.
