@@ -97,3 +97,11 @@ requeue: func_826131A4 (call_sequence, 'reset scan', 77 instr, 308 expected byte
 The 16 permuter attempts recorded for func_82610E34 on 2026-08-31 all fell inside the window where the permuter was dead: readonly_tool_path symlink-resolved decomp-venv's interpreter to the system Python, so every run died on ModuleNotFoundError before doing any work (3f654bb8 introduced it, 9e9a92b0 fixed it). Those attempts carry no information and must not be read as 'the permuter already failed here'. This is one of only two owners repo-wide affected.
 
 Re-run it. The permuter now converts: it closed func_82614BD0 in this same file from base score 275 to zero in 44 seconds, and that body gated and landed.
+
+## Wave 46 func_82610FF8 fresh batch (2026-09-02)
+
+requeue: fresh owner (prior_attempts=0), no probe run in this worker. Assembly is a 99-instruction call_sequence with frame 0x28: increment s16 field +6 and guard against D_82615768; choose state 3 when s16 +0x12 > 0 else 5; clear +6/+8/+0x18; scan records at arg0+0x114 via func_82604C40(1,i,records,0x14), accept entries whose s16 +0x32 != -1 into pointer table +0x34F4 with s16 count at +0x18; call kinds 2 and 3, then func_826078B4 over pointer table and func_800226C0(0x69). Batch hypotheses cover raw offsets, explicit limit/count temporaries, declaration/lifetime order, loop forms, shift-vs-multiply indexing, and call-order scheduling. Scores/fingerprint: none yet; next action replay OUT with runner, then classify first-diff (expected likely operand_or_scheduling_drift or register_allocation_only) and retain accepted candidate only after link/full-ROM gate. tooling-blocked: no evidence. register-tie: not reported. layout-prerequisite: none.
+
+## Coordinator replay after wave 46 (2026-09-02)
+
+Direct replay of the worker batch scored two candidates and compile-failed the rest. Best normalized/raw similarity 0.8182/0.2828; expected 396 versus actual 364 and a stable -40 expected versus -48 actual frame drift. No link verification or gate. Requeue with a new frame/lifetime model and corrected declarations.
