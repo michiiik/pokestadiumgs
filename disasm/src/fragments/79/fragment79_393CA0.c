@@ -2724,7 +2724,27 @@ s32 func_8413771C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84137CA4.s")
+extern void func_84134E30(s32); extern u8 D_84199D81; extern u8 D_8418548C[];
+void func_84137CA4(void) {
+    u8 *addr = &D_84199D81;
+    u8 flags;
+
+    flags = *addr;
+    if (flags & 1) {
+        flags = *addr;
+        flags &= 0xFFFE;
+        *addr = flags;
+    }
+    flags = *addr;
+    if (flags & 2) {
+        flags &= 0xFFFD;
+    }
+    *addr = flags;
+    if (flags & 4) {
+        flags &= 0xFFFB;
+        *addr = flags;
+    }
+}
 #endif
 
 #ifdef VERSION_US
