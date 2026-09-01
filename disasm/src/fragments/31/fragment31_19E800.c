@@ -13,7 +13,16 @@ void func_8822B614(void) {
     D_880068B8 = 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_19E800/func_8822B63C.s")
+extern u32 D_88234910;
+extern s8 D_889041B8;
+void func_8822B63C(void) {
+    if (*(s32 *)((u8 *)(D_88234910) + 0x18C) == 0) {
+        Input_SetRepeatController(D_80087200);
+        *(s32 *)((u8 *)(*(void **)((u8 *)(D_88234910) + 0)) + 0x2C) = 1;
+        *(s32 *)((u8 *)(D_88234910) + 0x48) = 1;
+        D_889041B8 = 2;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_19E800/func_8822B6A4.s")
 
