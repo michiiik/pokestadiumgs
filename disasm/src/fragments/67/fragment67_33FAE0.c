@@ -137,7 +137,21 @@ void func_8290379C(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33FAE0/func_82903BA4.s")
+extern Gfx *D_800D0510;
+extern u8 D_80094DB8[];
+extern u8 D_80094D90[];
+extern void Gfx_FillRectRgb(s16, s16, s16, s16, u8, u8, u8);
+extern void Gfx_FillRectRgba(s16, s16, s16, s16, u8, u8, u8, u8);
+void func_82903BA4(void) {
+    gSPDisplayList(D_800D0510++, D_80094DB8);
+    gDPSetCombine(D_800D0510++, 0xFFFFFF, 0xFFFE793C);
+    gDPSetRenderMode(D_800D0510++, 0x00504240, 0);
+    Gfx_FillRectRgba(0, 0x1C, 0x140, 4, 0, 0, 0, 0);
+    Gfx_FillRectRgba(0, 0xD0, 0x140, 4, 0, 0, 0, 0);
+    gSPDisplayList(D_800D0510++, D_80094D90);
+    Gfx_FillRectRgb(0, 0, 0x140, 0x1E, 0, 0, 0);
+    Gfx_FillRectRgb(0, 0xD2, 0x140, 0x1E, 0, 0, 0);
+}
 #endif
 
 #ifdef VERSION_US
