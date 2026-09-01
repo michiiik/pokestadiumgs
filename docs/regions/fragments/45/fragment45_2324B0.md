@@ -13,3 +13,7 @@ No accepted owner. func_8AB0D4BC received 5 probes plus 45 seconds of permuter t
 ## Wave 10 handoff (2026-08-31)
 
 No accepted owner. func_8AB0EF44 was tooling-blocked after two candidate attempts failed CFE parser compilation before semantic scoring. No source, link verification, or ROM gate. Next action is to repair the runner/parser cascade involving generated assembly placeholders, then retry the raw-global dispatcher candidate.
+
+## Fleet box 2026-09-02: func_8AB0E280 tooling-blocked (2026-09-02)
+
+tooling-blocked; owner kept active for requeue. Submitted 9 distinct call_sequence candidates covering s16 baseline/local result, explicit load/increment temporaries, separate guard polarity, u8 argument, s32 global overlay, and declaration order, with declarations for s16 D_8AB1723A and exact s32 func_8AB0E2EC(s32). PRAGMA_GATE_CC_CHECK=1 and bounded 30s compile/compare limits were used. Two runner invocations returned no attempt rows, no diagnostics, no JSON, and no link_verified result; therefore no normalized/raw score, mismatch_kind, first-diff offset/fingerprint, or expected/actual size was produced. Assembly fingerprint remains prior best normalized 0.8889/raw 0.6667, operand_or_scheduling_drift, 27 expected instructions, with first observed scheduling-sensitive region at the second branch delay-slot lui versus ra-save delay slot. Next materially different action: repair/restart the runner transaction or MCP service, verify it emits per-attempt diagnostics, then rerun a fresh 9+ candidate batch before changing source hypotheses.
