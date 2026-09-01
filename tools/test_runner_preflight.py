@@ -308,5 +308,53 @@ class MissingDeclarationTests(unittest.TestCase):
         self.assertEqual(extra, "")
 
 
+class TypedefOrderingTests(unittest.TestCase):
+    """A synthesized declaration must not outrun the typedef it depends on.
+
+    docs/regions/517E0.md records the failure this prevents: the runner put
+    ``extern void func_8005487C(Quad8005487C *arg0);`` above the
+    ``typedef struct { ... } Quad8005487C;`` that defines it, and every
+    candidate in the batch died with a Syntax Error before comparison.
+    """
+
+    SOURCE = (
+        "typedef struct { s32 a, b, c, d; } Quad8005487C;\n"
+        "typedef struct Named {\n    s32 x;\n} NamedType;\n"
+        "void func_8005487C(Quad8005487C *arg0);\n"
+        "void func_80037120(s32 a, s32 b);\n"
+    )
+
+    def test_single_line_typedef_is_caught(self) -> None:
+        self.assertIn("Quad8005487C", runner._file_local_type_names(self.SOURCE))
+
+    def test_multi_line_typedef_is_caught(self) -> None:
+        self.assertIn("NamedType", runner._file_local_type_names(self.SOURCE))
+
+    def test_struct_tag_is_caught(self) -> None:
+        self.assertIn("Named", runner._file_local_type_names(self.SOURCE))
+
+    def test_declaration_needing_a_local_type_is_dropped(self) -> None:
+        extra = runner._missing_callee_declarations(
+            "func_1", "void func_1(void) { func_8005487C(0); }", self.SOURCE, set(), None
+        )
+        self.assertEqual(extra, "")
+
+    def test_declaration_of_primitives_still_emitted(self) -> None:
+        extra = runner._missing_callee_declarations(
+            "func_1", "void func_1(void) { func_80037120(1, 2); }", self.SOURCE, set(), None
+        )
+        self.assertIn("func_80037120", extra)
+
+    def test_cross_file_declaration_is_screened_too(self) -> None:
+        extra = runner._missing_callee_declarations(
+            "func_1",
+            "void func_1(void) { func_99999999(0); }",
+            self.SOURCE,
+            set(),
+            {"func_99999999": "extern void func_99999999(NamedType *p);"},
+        )
+        self.assertEqual(extra, "")
+
+
 if __name__ == "__main__":
     unittest.main()

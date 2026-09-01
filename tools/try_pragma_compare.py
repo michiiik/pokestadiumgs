@@ -2494,6 +2494,58 @@ def _declaration_index(repo_root: Path) -> dict[str, str]:
     return index
 
 
+_TYPEDEF_KEYWORD_RE = re.compile(r"\btypedef\b")
+_IDENTIFIER_RE = re.compile(r"[A-Za-z_]\w*")
+_STRUCT_TAG_RE = re.compile(r"\b(?:struct|union|enum)\s+([A-Za-z_]\w*)")
+
+
+def _file_local_type_names(baseline_source: str) -> set[str]:
+    """Type names the owner file defines itself.
+
+    A synthesized declaration is emitted *above* the candidate, which is above
+    everything the file declares later, so a declaration mentioning a type the
+    file defines further down is a syntax error rather than a help -- the
+    failure ``docs/regions/517E0.md`` records as
+    ``extern void func_8005487C(Quad8005487C *arg0);`` landing before the
+    ``typedef struct { ... } Quad8005487C;`` that defines it.
+
+    Both spellings have to be caught, so this walks each ``typedef`` to its
+    terminating ``;`` at brace depth zero and takes the last identifier in the
+    span; a regex anchored on ``^}`` sees only the multi-line form. Struct,
+    union and enum tags are collected too, since a signature may name one
+    without a typedef.
+    """
+    names: set[str] = set()
+    for match in _TYPEDEF_KEYWORD_RE.finditer(baseline_source):
+        depth = 0
+        index = match.end()
+        length = len(baseline_source)
+        while index < length:
+            char = baseline_source[index]
+            if char == "{":
+                depth += 1
+            elif char == "}":
+                depth -= 1
+            elif char == ";" and depth <= 0:
+                break
+            index += 1
+        span = baseline_source[match.end():index]
+        identifiers = _IDENTIFIER_RE.findall(span)
+        if identifiers:
+            names.add(identifiers[-1])
+    for match in _STRUCT_TAG_RE.finditer(baseline_source):
+        names.add(match.group(1))
+    names.discard("")
+    return names
+
+
+def _declaration_is_self_contained(declaration: str, local_types: set[str]) -> bool:
+    """Whether ``declaration`` can compile above the file's own typedefs."""
+    return not any(
+        re.search(rf"\b{re.escape(name)}\b", declaration) for name in local_types
+    )
+
+
 def _missing_callee_declarations(
     function: str,
     candidate: str,
@@ -2514,25 +2566,37 @@ def _missing_callee_declarations(
     possibly-conflicting declaration layered on top, whether or not that
     existing one agrees with what the scan would have found.
     """
+    local_types = _file_local_type_names(baseline_source)
+
+    def emit(declaration: str | None) -> str | None:
+        """Keep a declaration only if it can stand above the file's typedefs."""
+        if declaration is None:
+            return None
+        return declaration if _declaration_is_self_contained(declaration, local_types) else None
+
     referenced = {name for name in _CALL_SYMBOL_RE.findall(candidate) if name != function}
     missing = sorted(referenced - already_declared)
     lines: list[str] = []
     for name in missing:
         signature = scan_source_for_callee_signature(baseline_source, name)
-        if signature is not None:
-            lines.append(_as_extern_declaration(signature))
-        elif cross_file and name in cross_file:
-            lines.append(cross_file[name])
+        chosen = (
+            emit(_as_extern_declaration(signature)) if signature is not None
+            else emit(cross_file.get(name)) if cross_file else None
+        )
+        if chosen:
+            lines.append(chosen)
 
     # Data symbols the owner file never declares. Same evidence-only rule:
     # the owner file first, then a spelling every sibling agrees on.
     data_referenced = {name for name in _DATA_SYMBOL_RE.findall(candidate)}
     for name in sorted(data_referenced - already_declared):
         declaration = scan_source_for_data_declaration(baseline_source, name)
-        if declaration is not None:
-            lines.append(declaration + ";")
-        elif cross_file and name in cross_file:
-            lines.append(cross_file[name])
+        chosen = (
+            emit(declaration + ";") if declaration is not None
+            else emit(cross_file.get(name)) if cross_file else None
+        )
+        if chosen:
+            lines.append(chosen)
     return "\n".join(lines)
 
 
