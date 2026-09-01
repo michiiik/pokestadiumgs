@@ -101,6 +101,22 @@ Do not touch any other file's pragmas or run `make`.
    front; `--no-auto-gate` forces a pure probe for diagnosis.
    Watch stderr for `futility:` lines: they are advice from the owner's
    recorded history (a `register-tie` names the permuter call worth making),
+
+   **Poll the permuter; never wait on it.** `permute_candidate.py` writes to
+   `disasm/build/permuter/<function>-<suffix>/`; read that directory yourself.
+   Two trees in wave 32 each burned most of a box blocked on a background
+   permuter notification that a subagent cannot receive, and both stopped with
+   an uncommitted source still installed. A run that exceeds the foreground
+   timeout is normal: start it, do other work, then read its output.
+
+   Interpreting a run: base score and best score are the whole answer. Zero
+   means feed that body back through `fleet_probe.py` as a normal candidate so
+   it can gate (wave 32 `func_82614BD0`: base 275, zero in 44s, gated and
+   accepted). A non-zero best is never sent to the gate, and it is real
+   evidence about the owner, not a non-result — record both numbers. Two wave-32
+   examples worth copying: `func_826131A4` base 2200 / best 1285 at 300s, and
+   `func_80060250` base 480 / best 120, which together with a companion-edit
+   test ruled the 8-byte frame gap structural rather than a register tie.
    not a stop order.
 6. Keep one owner active until it reaches a terminal state. A probe batch is
    a hypothesis budget, not an owner-resolution budget: after about 12
