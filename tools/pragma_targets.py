@@ -65,27 +65,45 @@ DRAFT_VARIANTS: dict[str, list[str]] = {
 }
 
 
-def readonly_tool_path(relative: Path, *, override_name: str | None = None) -> Path:
+def readonly_tool_path(
+    relative: Path,
+    *,
+    override_name: str | None = None,
+    follow_symlinks: bool = True,
+) -> Path:
     """Resolve an ignored read-only tool from the primary checkout.
 
     Linked worktrees do not contain the optional ``disasm/tools`` clones.
     Prefer the canonical primary path when it exists instead of requiring a
     mutable directory symlink in each worktree. Relative explicit overrides
     are anchored to this checkout, matching the runner's shared-venv rules.
+
+    ``follow_symlinks=False`` normalises the path without resolving symlinks.
+    That matters for a **virtualenv interpreter**: ``decomp-venv/bin/python3``
+    is a symlink chain ending at the system Python, and running that target
+    directly leaves ``sys.prefix`` outside the venv, so none of the venv's
+    site-packages are importable. Resolving it is why every permuter run in
+    this repo died on ``ModuleNotFoundError: No module named 'toml'`` while
+    ``decomp-venv`` had toml installed all along -- a silent, repo-wide block
+    on the register-tie pool that several waves of region notes recorded as
+    "permuter blocked" without finding the cause.
     """
+    def normalise(path: Path) -> Path:
+        return path.resolve(strict=False) if follow_symlinks else Path(os.path.abspath(path))
+
     if override_name:
         override = os.environ.get(override_name)
         if override:
             path = Path(os.path.expandvars(override)).expanduser()
             if not path.is_absolute():
                 path = REPO_ROOT / path
-            return path.resolve(strict=False)
+            return normalise(path)
     primary = runner._primary_worktree_root(REPO_ROOT)
     if primary is not None:
-        shared = (primary / relative).resolve(strict=False)
+        shared = normalise(primary / relative)
         if shared.exists():
             return shared
-    return (REPO_ROOT / relative).resolve(strict=False)
+    return normalise(REPO_ROOT / relative)
 
 
 def readonly_tool_environment() -> dict[str, str]:

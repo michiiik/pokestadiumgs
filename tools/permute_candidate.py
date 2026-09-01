@@ -51,9 +51,13 @@ def _permuter_root() -> Path:
 
 
 def _permuter_venv_python() -> Path:
+    # follow_symlinks=False is load-bearing: this is a venv interpreter, and
+    # resolving it to the system Python it points at silently drops the venv's
+    # site-packages (see readonly_tool_path).
     return targets.readonly_tool_path(
         Path("disasm/tools/decomp-venv/bin/python3"),
         override_name="PRAGMA_PERMUTER_VENV_PYTHON",
+        follow_symlinks=False,
     )
 
 

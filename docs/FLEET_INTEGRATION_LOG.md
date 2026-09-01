@@ -53,3 +53,29 @@ replaces a human reviewer, so it is append-only.
 
 - head: `2efeeaac`
 - merge failed with no conflicted paths
+
+## 2026-09-01T13:09:48Z
+
+### fleet/tree-3 — **landed**
+
+- head: `c88f4511`
+
+### fleet/tree-4 — **landed**
+
+- head: `2efeeaac`
+
+## 2026-09-01T13:12:07Z
+
+### fleet/tree-1 — **landed**
+
+- head: `a6ab749d`
+
+### fleet/tree-5 — **landed**
+
+- head: `53bd873d`
+
+## 2026-09-01T13:12:59Z
+
+### fleet/tree-2 — **landed**
+
+- head: `76786183`
