@@ -5124,7 +5124,25 @@ s32 func_80042A64(s32 arg0) { return 0; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80042A70.s")
+extern void *func_80004B4C(void *arg0, s32 arg1);
+extern S1_MemoryBlock *MainPool_AllocState(s32 arg0, s32 arg1);
+extern s32 main_pool_get_available(void);
+extern void MainPool_FinalizeAllocation(S1_MemoryBlock *arg0);
+extern s32 D_80126F24;
+S1_arg1_func_80019420 *func_80042A70(s32 arg0) {
+    s32 sp24;
+    S1_arg1_func_80019420 *sp20;
+    S1_MemoryBlock *sp1C;
+    sp20 = NULL;
+    sp24 = (s32)func_80004B4C((void *)D_80126F24, arg0);
+    if (sp24 != 0) {
+        sp1C = MainPool_AllocState(main_pool_get_available(), 0);
+        sp20 = (S1_arg1_func_80019420 *)(sp24 + 0x20);
+        Fragment_ProcessGeoLayoutList(sp1C, sp20);
+        MainPool_FinalizeAllocation(sp1C);
+    }
+    return sp20;
+}
 #endif
 
 #ifdef VERSION_US
