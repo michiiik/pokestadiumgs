@@ -4447,11 +4447,46 @@ s32 func_8003F970(s32 arg0, u16 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FA00.s")
+extern void func_80027E30(s32);
+extern void func_80027F4C(void);
+extern s16 D_8012651A;
+extern s32 D_80126458[];
+extern s16 D_8012651E;
+extern s16 D_80126518;
+extern s32 D_80126520;
+extern void *func_80003240();
+void func_8003FA00(void)
+{
+  s32 p = D_80126520;
+  s32 i = D_8012651A;
+  if (D_8012651A)
+  {
+  }
+  D_80126458[i] = p + 8;
+  D_8012651A = i + 1;
+  D_80126458[D_8012651A] = (D_80126518 << 16) + D_8012651E;
+  D_8012651A = D_8012651A + 1;
+  D_8012651E = D_8012651A;
+  D_80126520 = (s32) func_80003240(*((s32 *) (((u8 *) p) + 4)));
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FA94.s")
+void func_8003FA94(void) {
+    s32 new_var;
+    s32 p = D_80126520;
+    s32 i = D_8012651A;
+    if (D_8012651A)
+    {
+    }
+    new_var = p;
+    D_80126458[i] = p + 8;
+    D_8012651A = i + 1;
+    D_80126458[D_8012651A] = (D_80126518 << 16) + D_8012651E;
+    D_8012651A = D_8012651A + 1;
+    D_8012651E = D_8012651A;
+    D_80126520 = (s32)func_80003240(*((s32 *) (*((s32 **) (new_var + 4)))));
+}
 #endif
 
 #ifdef VERSION_US
