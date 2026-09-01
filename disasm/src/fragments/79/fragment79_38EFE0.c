@@ -468,7 +468,8 @@ void func_841210CC(s32 arg0) {
     func_84120464(arg0, D_84183C90, 0x4000);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84121130.s")
+extern void func_841204BC(void *, s32, s32, s32, f32);
+void func_84121130(void *arg0) { f32 d = *(f32 *)((u8 *)arg0 + 0x28) - *(f32 *)((u8 *)arg0 + 0x650); if (((*(f32 *)((u8 *)arg0 + 0x28) - *(f32 *)((u8 *)arg0 + 0x650))) >= 200.0f) { *(f32 *)((u8 *)arg0 + 0x28) = *(f32 *)((u8 *)arg0 + 0x650) + 200.0f; return; } func_841204BC(arg0, 0x3FB9999A, 0x3C75C28F, 0x4000, 18.0f); ; if (((*(f32 *)((u8 *)arg0 + 0x28) - *(f32 *)((u8 *)arg0 + 0x650))) >= 200.0f) { *(f32 *)((u8 *)arg0 + 0x28) = *(f32 *)((u8 *)arg0 + 0x650) + 200.0f; } }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_841211CC.s")
 
