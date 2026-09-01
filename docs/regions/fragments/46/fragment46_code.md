@@ -59,3 +59,9 @@ Accepted through runner-mediated probe and gate. Winning spelling: s16 func_8AE0
 ## func_8AE02470 requeue (2026-08-30) (2026-08-30)
 
 Explicit runner futility after the bounded call-sequence batch. The owner has 15 total attempts, best 0.8387 normalized / 0.4839 raw, mismatch_kind instruction_drift, and hardness stuck. The strongest candidates remained 60 instructions versus the 62-instruction oracle and repeatedly diverged at offset 32/instruction 8: expected lw a1,0x1c(sp) for the post-call dispatch reload, actual lui a0; the resulting branch/control-flow layout also drifted. Attempted families included typed and raw overlays, switch/goto/common-store forms, exact and synthesized func_800504BC prototypes, integer/pointer formals, local aliases, variadic-cast and volatile experiments, and reordered/deferred stores. The C89 compile failures in experimental case-label declarations were process-only. Next action: force the oracle post-call stack-argument reload while preserving the 0x18 frame, or use a validated permuter run; do not gate the rejected candidates.
+
+## 2026-09-01
+
+## func_8AE00AF4 requeue (Wave 24)
+
+Fresh call_sequence owner probed with raw stack/matrix and local-array matrix spellings (3 variants; 21 prior attempts). All compiled after removing conflicting injected declarations, but no match: best `callseq:raw:stack-matrix:matrix-local`, normalized 0.7625/raw 0.4125, expected 296 bytes (74 instructions) vs actual 320 bytes (80), first diff offset 3 expected `addiu $sp,$sp,-216` vs actual `addiu $sp,$sp,-312`, mismatch `operand_or_scheduling_drift`. Earlier variants were 340/332 bytes. Attempted raw offset records, stack matrices via alloca/local arrays, explicit count/local declaration. Next action: model exact 0xD8 frame with fixed typed matrix locals and declaration order, plus correct `Gfx_AllocDisplayList`/matrix helper prototypes; do not gate current candidates.

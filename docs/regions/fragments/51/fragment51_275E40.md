@@ -21,3 +21,7 @@ requeue func_86300DD4: four declaration/lifetime-order variants; no link_verifie
 ## Wave 7 handoff (2026-08-31)
 
 Wave 7 handoff: func_86301E54 remains unresolved after 9 serial CC_CHECK=1 probes across global/address, volatility, float, and call-order shapes. Best normalized/raw similarity was 0.7200/0.6200; the stable operand_or_scheduling_drift includes expected -0x20 frame versus actual -0x28. Next action is a typed padded state overlay matching m2c field ordering and the store/call/store sequence while preserving the exact 0x20 frame.
+
+## Wave 24 handoff (2026-09-01) (2026-09-01)
+
+requeue func_863005B8: three valid probe variants (including repaired runner) produced no link_verified hit or gate. Best normalized/raw 0.8293/0.3780, 320 expected vs 328 actual bytes, operand_or_scheduling_drift; first diff offset 3, expected frame -88 (0x58), actual -80 (0x50). Explicit base/callback/field/index/angle and direct-global forms, plus unused frame-pad locals, all retained an 0x50 frame. Assembly shape is 0x58 frame, sdc1 fs0-3 and s0-s7 saves; next action is a materially different ABI/stack-lifetime model that forces the missing 8-byte frame while preserving call-chain order and float temporaries; do not repeat these declarations. Tooling runner was healthy; no gate eligible.

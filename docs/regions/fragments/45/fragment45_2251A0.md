@@ -17,3 +17,11 @@ requeue func_8AB02240: three exact-six-s16 ABI/local variants; no link_verified 
 ## Wave 8 handoff (2026-08-31)
 
 Wave 8 handoff: func_8AB0234C remains unresolved after 3 serial CC_CHECK=1 probes. Best normalized/raw similarity was 1.0000/0.8500 and was rejected as register_allocation_only with the expected $a1 versus actual $v1; another candidate reached 0.9500/0.7500 with operand scheduling drift. Next action is declaration/local ordering that forces expected $a0/$a1 constant staging before retrying successor owners. No link_verified candidate or ROM gate.
+
+## Fleet requeue: func_8AB00FF8 (2026-08-31)
+
+Requeue after 20 CC_CHECK probes. Best normalized/raw similarity was 0.8537/0.4268 with 328 expected versus 304 actual bytes; the key mismatch is scheduling around lui t3, 0xFB00 and coordinate-load ordering. No link-verified hit, install, or full-ROM gate. Resume this same owner only with a materially different scheduling/register model.
+
+## Wave 26 requeue (2026-09-01) (2026-09-01)
+
+requeue func_8AB01140: 60 probe-only candidates across fill-vs-env opcode correction, raw byte packing, struct/array/union locals, named/volatile fields, packed expression groupings, helper cast/prototype forms, and corrected gSPTextureRectangle coordinates. Best labels gbi:envcolor:struct-color-pad:correct-rect and gbi:envcolor:array2:multiline are exact 328-byte/82-instruction size (expected=actual) with normalized similarity 0.9878, raw similarity 0.5488, mismatch_kind operand_or_scheduling_drift. First mismatch at offset 93: expected lbu $t8,1($t0), actual lbu $t7,0($t0); remaining eight color-pack operand/scheduling differences. No link_verified hit, no gate, no source edit or commit. Next action: model the color as a typed named 4-byte overlay/cast backed by the existing 8-byte stack local, preserving the target local offset and normal gDPSetEnvColor field-access scheduler; investigate declaration order/ABI rather than repeating raw pointer indexing.

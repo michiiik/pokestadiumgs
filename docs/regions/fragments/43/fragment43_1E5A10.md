@@ -1,5 +1,9 @@
 # Region notes -- disasm/src/fragments/43/fragment43_1E5A10.c
 
+## Requeue: func_8AC03AFC (2026-09-01)
+
+requeue: Wave 24 probe-only batch attempted 3 display-list candidates; all compile-failed before scoring. The initial batch's duplicate `Fragment43Color405C` declaration was corrected, after which IDO rejected the candidate macro expansion (`Syntax Error` in `gDPFillRectangle` expansion), so this is candidate syntax evidence rather than a runner/tooling failure. Assembly shape is a 0x40-frame conditional call to `func_800504BC`, then three commands: `gSPDisplayList(D_8AC07D90)`, `gDPSetPrimColor` from record offset 0x28, and an F6 rectangle using scratch angles plus record offsets 0x0C/0x0E. No similarity, link verification, gate, or source install. Next action: use a C89-compatible raw `Gfx` command construction or split the macro expansion into proven existing macro spellings, preserving declaration order and the 0x40 frame; then probe fresh variants.
+
 Per-file spellings, skip lists, and unsolved shapes for this source file. Delivered to agents by `tools/file_brief.py`; extend it with `tools/region_notes.py append`.
 
 ## Verified spelling: _bzero-then-forward call chain (AGENTS.md §4) (2026-08-28)
@@ -25,3 +29,7 @@ Accepted: func_8AC0405C via u8 D_8AC07D90[] plus RGBA field order and gSPTexture
 ## Fleet box 2026-08-31: multiply helper requeued (2026-08-31)
 
 requeue: func_8AC0665C received 9 serial CC_CHECK-enabled variants. Best normalized similarity was 1.0 and raw 0.9808, but the persistent operand drift is expected multu s1,t6 versus actual multu t6,s1. No link-verified candidate or ROM gate. Next action: investigate an allocator/register constraint or materially different multiplication abstraction; do not repeat commuted operands, raw offsets, or explicit stride temporaries.
+
+## Requeue: func_8AC06DC8 recursive helper (2026-09-01) (2026-09-01)
+
+requeue: func_8AC06DC8 was probed with 5 runner-only variants after the recursive tooling path was repaired; no link-verified hit or gate. The best valid all-declarations raw-offset body produced 232 bytes versus expected 208, normalized similarity 0.6379 / raw 0.569, with operand_or_scheduling_drift first at offset 9 (expected lh $v0, actual lh $v1), followed by prologue/global scheduling and loop-shape drift. Initial attempts that declared locals after statements were compile failures from IDO syntax rules, not tooling failure. Attempted raw pointer/null, typed base, direct field, declaration-hoisted recursive forms. Next action: materially different typed overlay/field ABI and declaration/register lifetime hypothesis; inspect recursive call argument roles before further variants.

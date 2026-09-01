@@ -37,3 +37,11 @@ requeue: This bounded owner reached the runner's repeated-drift/stuck terminal a
 ## Fleet box 2026-08-31: float state initializer accepted (2026-08-31)
 
 Accepted func_86706A30 using a typed state/row model with 0x168-byte row stride. Thirteen CC_CHECK-enabled variants were probed; the final candidate normalized 1.0/raw 0.8684 and passed link verification plus make -C disasm COMPARE=1 RUN_CC_CHECK=1. Commit 74713a35. No evidence-backed rename is known.
+
+## Fleet requeue: func_86708EDC (2026-08-31)
+
+Requeue after 23 attempts (6 preflight failures, 17 scored CC_CHECK probes). Best body is exact-size 356 bytes with normalized similarity 1.0000 and raw 0.8539; first difference is instruction 1, expected the D_8670BBB0 base in $v0 but IDO selected $v1 or $a0. No install or full-ROM gate. Resume with the void-pointer/u8-pointer counter model plus an explicit load temporary; do not repeat the exhausted global-base spellings.
+
+## 2026-09-01
+
+requeue: 6 probe variants attempted; no install or gate. Corrected raw explicit candidate scored normalized 0.3853/raw 0.1468, expected 436 bytes vs actual 348, first diff instruction 0 offset 1: expected lui $t0,%hi(D_87F119DC) but actual lui $v0. Typed candidates were compile failures from duplicate/redeclared existing globals and local type incompatibility. Attempted typed state/row/aux overlays, guard and assign control flow, raw offset fields, 0xAC auxiliary stride, 0x168 row stride, float temporaries and clamping. Next action: use existing State86706A30/Row86706A30 declarations without redeclaring globals, add only missing auxiliary declarations, and materially adjust source live ranges/global base model to force D_87F119DC into t0; probe then gate only a link-verified candidate.

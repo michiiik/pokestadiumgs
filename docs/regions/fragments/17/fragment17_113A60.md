@@ -17,3 +17,7 @@ requeue: The final runner-mediated probe of the 600-second permuter best (score 
 ## Wave 6 handoff (2026-08-31)
 
 Wave 6 handoff: func_82209F50 unresolved after 10 serial CC_CHECK=1 probes. Best normalized/raw similarity was 1.0000/0.8902 with immediate_drift; expected frame -56 (0x38 bytes), actual -48. Next retry should force the 0x38-byte frame/local lifetime while preserving the m2c float expression and stack spills.
+
+## 2026-08-31 shared-checkout probe guard (2026-08-31)
+
+tooling-blocked: func_822075D0 was selected as the fresh family-unlocking owner (0 prior attempts) and received 9 CC_CHECK=1 probe-only candidates. Best was call-sequence:family-sibling:switch-raw-offsets at similarity 0.8765, raw 0.3704, expected/actual size 324/324; all candidates shared the first-diff fingerprint at offset 3: expected addiu $sp,$sp,-88, actual addiu $sp,$sp,-80. The first model left the sp54/sp38 carriers dead. A second batch with explicit post-call reloads was prepared but not run because the shared checkout has foreign modified source (disasm/src/fragments/20/fragment20_12C460.c), extensive concurrent dirty work, and a live claims entry. Do not probe/build/commit over that guard. Next action: when the checkout is clean and claims are reconciled, run the prepared carrier-lifetime batch, keeping func_822075D0 active; it explicitly reloads sp54 after func_8004C990 and sp38 after func_8004CA60 before record/table address formation. No source candidate was installed or gated.
