@@ -857,7 +857,58 @@ void func_826144EC(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82614A0C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82614BD0.s")
+extern s16 D_8261A490;
+extern u16 D_8261A494;
+extern s16 D_8261DA4C;
+extern void func_82614A0C(void *arg0);
+extern void func_82614630(void *arg0);
+extern void func_8261479C(void *arg0);
+extern void func_826148D4(void *arg0);
+extern void func_826139D4(void *arg0);
+extern void func_82613A4C(void *arg0);
+extern void func_82613AC4(void *arg0);
+extern void func_82613B48(void *arg0);
+extern void func_82613BE0(void *arg0);
+extern void func_82613E20(void *arg0);
+extern void func_82614088(void *arg0);
+extern void func_8261410C(void *arg0);
+extern void func_826143E4(void *arg0);
+extern void func_82614468(void *arg0);
+extern void func_826144EC(void *arg0);
+s32 func_82614BD0(void) {
+    void *s0 = &D_8261A490;
+
+    if (*(u16 *)((u8 *)s0 + 4) & 1) {
+        func_82613A4C(s0);
+        func_826139D4(s0);
+        func_82613B48(s0);
+        func_82613BE0(s0);
+        func_82613C64(s0);
+        func_82613D60(s0);
+        func_82613E20(s0);
+        func_82613EA4(s0);
+        func_82613F64(s0);
+        func_82613AC4(s0);
+        func_82614088(s0);
+        func_8261410C(s0);
+        func_82614190(s0);
+        func_82614250(s0);
+        func_82614324(s0);
+        func_826143E4(s0);
+        func_82614468(s0);
+        func_82614570(s0);
+        func_82614A0C(s0);
+        func_826144EC(s0);
+        if (D_8261DA4C != 0) {
+            func_82614630(&D_8261DA4C);
+        }
+        func_8261479C(s0);
+        if (D_8261DA4C) {
+        }
+        func_826148D4(s0);
+    }
+    return (D_8261A494 & 1) != 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82614CE0.s")
 
