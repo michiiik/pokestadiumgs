@@ -466,7 +466,29 @@ void func_86003E5C(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_246640/func_860043B4.s")
+extern s32 func_86009F28(void *, void *, void *);
+extern s32 func_8600A04C(void *, void *, void *);
+extern void *func_87C008B0(void *);
+extern void func_87C00814(void *, void *, void *);
+extern void func_87C013CC(void *, void *);
+typedef struct { f64 x; f64 y; f64 z; f64 w; } V4;
+typedef struct { f64 x; f64 y; f64 z; } V3;
+void func_860043B4(register u8 *arg0, void *arg1) {
+    V3 sp40;
+    V4 sp20;
+    if (func_86009F28(*(u8 **)(arg0 + 0x1870) + 0x66B8, arg0, &sp40) != 0) {
+        func_8600A04C(*(u8 **)(arg0 + 0x1870) + 0x66B8, arg0, &sp20);
+    } else if (func_86009F28(*(u8 **)(arg0 + 0x1870) + 0x6668, arg0, &sp40) != 0) {
+        func_8600A04C(*(u8 **)(arg0 + 0x1870) + 0x6668, arg0, &sp20);
+    } else {
+        func_87C008B0(&sp20);
+        func_87C00814(*(u8 **)(arg0 + 0x1870) + 0x6848, arg0, &sp40);
+    }
+    func_87C013CC(&sp20, arg1);
+    ((f32 *)((u8 *)arg1 + 0x30))[0]=(f32)sp40.x;
+    ((f32 *)((u8 *)arg1 + 0x30))[1]=(f32)sp40.y;
+    ((f32 *)((u8 *)arg1 + 0x30))[2]=(f32)sp40.z;
+}
 #endif
 
 #ifdef VERSION_US
