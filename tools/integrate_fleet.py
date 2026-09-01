@@ -75,7 +75,20 @@ LOG_PATH = REPO_ROOT / "docs" / "FLEET_INTEGRATION_LOG.md"
 # integration until a human intervened -- exactly what this tool exists to
 # avoid -- and it cannot mask a real problem, because the value is derived
 # from the tree the ROM gate then rebuilds.
-IGNORED_WHEN_DIRTY = ("COVERAGE.md",)
+IGNORED_WHEN_DIRTY = ("COVERAGE.md", "docs/FLEET_INTEGRATION_LOG.md")
+
+# Generated files restored to HEAD immediately before each merge. Exempting a
+# file from the dirty check is not enough on its own: git itself refuses with
+# "Your local changes to the following files would be overwritten by merge"
+# whenever a locally-modified file is one the merge must touch, and that
+# surfaced as the useless "merge failed with no conflicted paths". Safe to
+# discard because these are regenerated -- by the pre-commit hook, and by
+# REGENERATED_ON_CONFLICT during the merge.
+#
+# The integration log is deliberately NOT here: no branch ever touches it, so
+# it cannot block a merge, and resetting it would destroy the audit trail this
+# tool exists to leave behind.
+RESET_BEFORE_MERGE = ("COVERAGE.md",)
 
 # Generated files whose merge conflicts are resolved by regenerating them
 # rather than by parking the branch. Every fleet branch carries a
@@ -233,6 +246,12 @@ def log_result(entries: list[dict[str, object]]) -> None:
         handle.writelines(lines)
 
 
+def reset_generated_files() -> None:
+    """Restore RESET_BEFORE_MERGE paths to HEAD so a merge is never refused."""
+    for path in RESET_BEFORE_MERGE:
+        git("restore", "--staged", "--worktree", "--source=HEAD", "--", path, check=False)
+
+
 def conflicted_paths() -> list[str]:
     out = git("diff", "--name-only", "--diff-filter=U")
     return [line.strip() for line in out.splitlines() if line.strip()]
@@ -377,6 +396,7 @@ def land(pattern: str, base: str, gate_timeout: int, dry_run: bool) -> int:
             continue
 
         git("checkout", base, capture=True)
+        reset_generated_files()
         merge = subprocess.run(
             ["git", "merge", "--no-ff", "--no-edit", branch],
             cwd=REPO_ROOT, capture_output=True, text=True,

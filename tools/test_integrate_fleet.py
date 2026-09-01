@@ -201,3 +201,26 @@ class CollectTests(unittest.TestCase):
             (P(raw) / "gs-fleet-1").mkdir()
             rc = fleet.collect(f"{raw}/gs-fleet-*", "fleet/*")
         self.assertEqual(rc, 1)
+
+
+class ResetBeforeMergeTests(unittest.TestCase):
+    """Exempting a generated file from the dirty check is not sufficient.
+
+    Git refuses the merge outright ("Your local changes ... would be
+    overwritten by merge") when a locally-modified file is one the merge must
+    touch, which surfaced as "merge failed with no conflicted paths".
+    """
+
+    def test_coverage_is_reset(self) -> None:
+        self.assertIn("COVERAGE.md", fleet.RESET_BEFORE_MERGE)
+
+    def test_integration_log_is_never_reset(self) -> None:
+        """Resetting it would destroy the audit trail; no branch touches it."""
+        self.assertNotIn("docs/FLEET_INTEGRATION_LOG.md", fleet.RESET_BEFORE_MERGE)
+        self.assertIn("docs/FLEET_INTEGRATION_LOG.md", fleet.IGNORED_WHEN_DIRTY)
+
+    def test_reset_restores_from_head(self) -> None:
+        calls = []
+        with mock.patch.object(fleet, "git", side_effect=lambda *a, **k: calls.append(a)):
+            fleet.reset_generated_files()
+        self.assertTrue(any("--source=HEAD" in c and "COVERAGE.md" in c for c in calls))

@@ -41,3 +41,15 @@ replaces a human reviewer, so it is append-only.
 
 - head: `36919a4e`
 - merge conflict: Auto-merging COVERAGE.md
+
+## 2026-09-01T13:06:08Z
+
+### fleet/tree-3 — **parked**
+
+- head: `c88f4511`
+- merge failed with no conflicted paths
+
+### fleet/tree-4 — **parked**
+
+- head: `2efeeaac`
+- merge failed with no conflicted paths
