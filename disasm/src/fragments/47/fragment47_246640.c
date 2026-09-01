@@ -140,7 +140,13 @@ void func_86001DBC(u8 *arg0) { arg0[0x1639] &= 0xFFFE; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_246640/func_860021C4.s")
+extern void func_86002070(void *, s32, f32, void *, void *);
+extern void func_86003EFC(void *, s32);
+extern f32 MathUtil_Random_ZeroOne(void);
+extern f32 D_8600D668;
+extern f32 D_8600D66C;
+extern void func_87C01F6C(void *, f32);
+void func_860021C4(u8 *arg0, s32 arg1, f32 arg2, void *arg3, void *arg4) { f32 random; func_86002070(arg0, arg1, arg2, arg3, arg4); func_86003EFC(arg0, 0); random = MathUtil_Random_ZeroOne(); func_87C01F6C(arg0 + 0x17A0, random * D_8600D668 + D_8600D66C); }
 #endif
 
 #ifdef VERSION_US
