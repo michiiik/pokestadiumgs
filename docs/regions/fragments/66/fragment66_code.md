@@ -33,3 +33,11 @@ Correction: the JSON batch contains 9 candidates (not 8); all are novel and JSON
 ## Wave 49 coordinator replay (2026-09-02)
 
 requeue; 9 formal-home candidates compared after the prior 0.9630 normalized and 0.9136 raw near miss. Best new result was 0.8642 normalized and 0.7407 raw, with the target home store still displaced and frame or early-call drift. Tried formal-address, formal-lifetime, formal-home, and address-anchor variants. No link verification or gate. Next action: model the compiler emitted formal-home stores without adding address-anchor locals, likely by matching the original parameter use and one byte workspace exactly.
+
+## 2026-09-02 fleet box formal-home batch (2026-09-02)
+
+requeue: prepared 8 novel complete-function candidates in /private/tmp/gs50_func_82E0292C_batch.json; no runner invoked per instruction. Prior best remains normalized 0.9630, raw 0.9136 at exact 324-byte owner size. Stable fingerprint: instruction 3/offset 12 expected sw $a0, 0x48($sp) and instruction 6/offset 24 expected sw $a1, 0x4C($sp), with prior actual addiu $a0,$zero,3 and absent second home store. Attempted hypotheses: comma-expression formal anchors in both orders, post-call comma anchors, conditional self-use of each formal, logical anchor branches, and short-circuit formal anchor; all retain u8 work[0x20], status work[0xD], exact s32/s16* signature, and shared real declarations. Next action: run this batch through the serialized runner; if still displaced, investigate compiler parameter-spill scheduling or accepted prototype/lifetime idioms.
+
+## Wave 50 coordinator replay (2026-09-02)
+
+requeue; 8 formal-home candidates compared with no link verification. Every result repeated the same instruction-12 fingerprint: expected sw ,76(sp), actual addiu ,3, with best similarity 0.8148 raw 0.7037 and exact target size 324 versus candidate 292. Next action: change the function parameter-use model to emit both formal home stores before func_80055948 while retaining the exact byte workspace; consider a permuter or accepted companion ABI hypothesis.

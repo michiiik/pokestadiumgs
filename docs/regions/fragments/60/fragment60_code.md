@@ -41,3 +41,11 @@ Correction: exact fingerprint is offset 25, expected instruction text 'op/0x31 $
 ## Wave 49 coordinator replay (2026-09-02)
 
 requeue; 8 near-miss candidates compared with no link verification. Best call-sequence:typed:explicit-difference-temps reached similarity 0.9512 raw 0.7805, exact target size 160 versus candidate 164, with stable late operand drift at instruction 25: expected op/0x31 on  but actual op/0x31 on . Tried raw, guard-polarity, typed angle, explicit difference temporaries, s16 widths, declaration order, and assignment forms. Next action: preserve the exact target temporary register through a declaration/lifetime repair, then gate the first link-verified hit.
+
+## func_86A05AAC fleet box handoff (2026-09-02)
+
+requeue; owner func_86A05AAC remains GLOBAL_ASM. Best prior: normalized 0.9512, raw 0.7805, near target size. Stable fingerprint: operand_or_scheduling_drift at offset 25, expected lwc1 0xC4420008 (lwc1 ..., 8($v0)), actual 0xC44A0008 (lwc1 ..., 8($t2)); expected value lifetime keeps the record pointer in $v0. Assembly has 24-byte frame and computes record base before MathUtil_Atan2s. This batch tries 8 novel compiler-faithful shapes: pointer-v0 record-first, explicit cast, angle-before-target, target hoist, separate float differences, target pointer, guard returns, and preserve-angle nested guards. Next action: run the JSON batch through the coordinator runner in a serialized transaction; if the same fingerprint persists, try a more explicit value-lifetime shape that forces the record pointer to remain live across the first load/stack stores while retaining the 24-byte frame.
+
+## Wave 50 coordinator replay (2026-09-02)
+
+requeue; 8 pointer-v0 candidates compared with no link verification. Best reached similarity 0.8571 raw 0.5000, expected 160 bytes versus actual 168, with early prologue drift; the prior best remains 0.9512 raw 0.7805 and late op/0x31 register mismatch. Next action: return to the prior explicit-difference near miss and use a dedicated register-allocation/permuter pass rather than pointer-v0 rewrites.
