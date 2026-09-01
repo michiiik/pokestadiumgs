@@ -50,7 +50,23 @@ s32 func_80050DE4(s32 arg0) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80050E88.s")
+extern s32 func_80050D20(s32, s32);
+extern u8 D_801281C4[];
+extern u8 D_801281C8[];
+s32 func_80050E88(s32 arg0, s32 arg1, s32 arg2) {
+    s32 temp_v0;
+    s32 var_v1;
+    temp_v0 = func_80050D20(0x10, arg1);
+    if (arg0 != 0) {
+        goto block_2;
+    }
+    var_v1 = *(s32 *)(D_801281C4 + (temp_v0 * 0xC)) + ((arg1 % 4) * 0xF00) + (arg2 * 0x180);
+    goto block_3;
+block_2:
+    var_v1 = *(s32 *)(D_801281C8 + (temp_v0 * 0xC)) + ((arg1 % 4) * 0xF00) + (arg2 * 0x180);
+block_3:
+    return var_v1;
+}
 
 extern s32 func_80050D20(s32, s32);
 extern u8 D_801281C4[];
