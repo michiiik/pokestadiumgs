@@ -79,3 +79,27 @@ replaces a human reviewer, so it is append-only.
 ### fleet/tree-2 — **landed**
 
 - head: `76786183`
+
+## 2026-09-01T13:49:06Z
+
+### fleet/tree-5 — **landed**
+
+- head: `1aa16ca6`
+
+## 2026-09-01T13:49:55Z
+
+### fleet/tree-3 — **landed**
+
+- head: `45206b01`
+
+## 2026-09-01T13:55:31Z
+
+### fleet/tree-4 — **landed**
+
+- head: `6b67283b`
+
+## 2026-09-01T14:02:42Z
+
+### fleet/tree-1 — **landed**
+
+- head: `5be67a0d`
