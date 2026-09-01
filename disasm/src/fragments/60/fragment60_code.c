@@ -80,7 +80,21 @@ void func_86A01480(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/60/fragment60_code/func_86A01C5C.s")
+extern void func_800086A4(s32);
+extern void StageFade_StartFromOpaque(s32);
+extern void func_80064D28(void);
+extern void func_86A0167C(void);
+extern void func_86A012D4(void);
+extern u8 *D_86A46548;
+void func_86A01C5C(void) {
+    func_800086A4(2);
+    StageFade_StartFromOpaque(0xA);
+    do {
+        func_80064D28();
+        func_86A0167C();
+        func_86A012D4();
+    } while (*(s32 *)D_86A46548 != 9);
+}
 #endif
 
 #ifdef VERSION_US
