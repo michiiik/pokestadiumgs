@@ -628,7 +628,20 @@ void Audio_RemoveRecentSoundAt(u16 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80028CA8.s")
+extern void func_800314D4(s32);
+extern s32 func_80028ADC(void);
+void func_80028CA8(void) {
+    s32 v0;
+    s32 masked;
+
+    v0 = func_80028ADC();
+    masked = v0 & 0xFFFF;
+    if (v0 != 0) {
+        func_800314D4(masked);
+    }
+}
+void func_80028CA8_padding(void) {}
+void func_80028CA8_padding2(void) {}
 #endif
 
 #ifdef VERSION_US
@@ -835,7 +848,21 @@ void func_80031844(s32 arg0, s32 arg1) { s32 *p0 = &arg0; *p0 = arg0; arg0 &= 0x
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80031880.s")
+void func_80031880(s32 arg0, s32 arg1) {
+    switch (arg1) {
+        case 1:
+            arg0 |= 0x3000;
+            break;
+        case 2:
+            arg0 |= 0x2000;
+            break;
+        case 0:
+            break;
+        default:
+            return;
+    }
+    func_800314D4(arg0);
+}
 #endif
 
 #ifdef VERSION_US
@@ -1327,7 +1354,15 @@ u8 func_80034E10(const u8 *arg0, s32 unused) { return arg0[0]; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80034E1C.s")
+extern void func_80032F0C(void);
+extern void func_80034A94(u16 arg0);
+void func_80034E1C(u16 arg0) {
+    if (arg0 & 0xFF) {
+        func_80034A94(arg0);
+    } else {
+        func_80032F0C();
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -4920,7 +4955,12 @@ void func_800413A0(S1_MainPoolState* arg0, u32 arg1, S1_Fragment* arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800413E8.s")
+extern void func_800412B0(s32, s32, s32, s32, s32, s32);
+void func_800413E8(s32 arg0, s32 arg1, s32 *arg2, s32 *arg3, s32 arg4, s32 arg5) {
+    s32 sum1 = arg3[0] + arg2[1];
+    s32 sum2 = sum1 + arg3[1];
+    func_800412B0(arg0, arg1, sum1, sum2, arg4, arg5);
+}
 #endif
 
 #ifdef VERSION_US
