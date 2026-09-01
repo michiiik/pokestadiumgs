@@ -83,6 +83,14 @@ tmp_*.json
 tmp_scratch/
 wave*_*/
 probe[0-9]*.json
+# Prefix forms of the same scratch files (batch_<addr>_<hypothesis>.json and the
+# candidate/declaration snippets beside them). The suffix patterns above miss
+# these, so a live fleet re-polluted `git status` with seven of them.
+# Anchored to the repo root: unanchored, `candidate_*.c` would also swallow a
+# real source under disasm/src/.
+/batch_*.json
+/candidate_*.c
+/decl_*.txt
 
 # Timestamped hand backups left beside a tool during an edit
 *.bak-[0-9]*
