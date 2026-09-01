@@ -247,7 +247,13 @@ void func_827025F0(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14B090/func_82702810.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14B090/func_82702954.s")
+extern void func_800498C4(void);
+extern void func_8004972C(s32, s32, s32, s32);
+extern void func_800496A4(s32, s32);
+extern s32 func_8004C874(s32, s32);
+extern void func_800495F8(s32, s32, s32, s32);
+extern void func_800499EC(void);
+void func_82702954(arg0, arg1) void *arg0; s32 arg1; { s32 result; s32 value; result = func_8004C874(0x1A, 4); value = (*(s16 *)((u8 *)arg0 + 0xC) * 0xFF) / 255; func_800498C4(); func_8004972C(0xFF, 0xFF, 0xFF, value); if (result != 0) { func_800496A4(8, 0); func_800495F8(*(s16 *)((u8 *)arg0 + 0x12) + 0x1E, *(s16 *)((u8 *)arg0 + 0x14) + 6, 0, result); } func_800499EC(); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14B090/func_82702A2C.s")
 
