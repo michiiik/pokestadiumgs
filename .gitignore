@@ -89,6 +89,10 @@ probe[0-9]*.json
 # Anchored to the repo root: unanchored, `candidate_*.c` would also swallow a
 # real source under disasm/src/.
 /batch_*.json
+# Dot-prefixed variant of the same: an agent wrote .batch_82614BD0.json, which
+# matches neither *_batch*.json (nothing precedes "batch") nor the anchored
+# /batch_*.json (the leading dot).
+/.batch*.json
 /candidate_*.c
 /decl_*.txt
 
