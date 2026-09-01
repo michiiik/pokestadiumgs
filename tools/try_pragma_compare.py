@@ -3413,14 +3413,17 @@ def _resolve_probe_workers(workers: int | None, candidate_count: int) -> int:
             workers = 4
     try:
         soft_limit = resource.getrlimit(resource.RLIMIT_NOFILE)[0]
-        fd_cap = max(1, (soft_limit - 64) // 16)
-        open_fds = _open_file_descriptor_count()
-        if open_fds is not None:
-            # Keep the historical 64-descriptor safety reserve, but account
-            # for descriptors already consumed by co-resident MCP workers.
-            # A reserve of 16 covers the child pipes opened during launch.
-            live_cap = max(0, (soft_limit - open_fds - 16) // 16)
-            fd_cap = min(fd_cap, live_cap)
+        if soft_limit in (-1, resource.RLIM_INFINITY):
+            fd_cap = workers
+        else:
+            fd_cap = max(1, (soft_limit - 64) // 16)
+            open_fds = _open_file_descriptor_count()
+            if open_fds is not None:
+                # Keep the historical 64-descriptor safety reserve, but
+                # account for descriptors already consumed by co-resident MCP
+                # workers. A reserve of 16 covers child pipes during launch.
+                live_cap = max(0, (soft_limit - open_fds - 16) // 16)
+                fd_cap = min(fd_cap, live_cap)
     except (OSError, ValueError):
         fd_cap = workers
     return max(0, min(workers, candidate_count or 1, fd_cap))
