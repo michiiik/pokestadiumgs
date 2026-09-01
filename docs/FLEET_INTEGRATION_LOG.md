@@ -34,3 +34,10 @@ replaces a human reviewer, so it is append-only.
 ### codex/goal-0831a-f61 — **screened-clean (dry run)**
 
 - head: `36919a4e`
+
+## 2026-09-01T10:24:01Z
+
+### codex/goal-0831a-f61 — **parked**
+
+- head: `36919a4e`
+- merge conflict: Auto-merging COVERAGE.md

@@ -140,3 +140,39 @@ class BlockingDirtTests(unittest.TestCase):
         blocking = fleet.blocking_dirt("MM COVERAGE.md\n M disasm/src/1A360.c\n")
         self.assertEqual(len(blocking), 1)
         self.assertIn("1A360.c", blocking[0])
+
+
+class GeneratedConflictTests(unittest.TestCase):
+    """COVERAGE.md conflicts on every parallel branch; a real one must park."""
+
+    def test_source_conflict_is_never_auto_resolved(self) -> None:
+        with mock.patch.object(
+            fleet, "conflicted_paths",
+            return_value=["COVERAGE.md", "disasm/src/1A360.c"],
+        ):
+            ok, reason = fleet.resolve_generated_conflicts()
+        self.assertFalse(ok)
+        self.assertIn("1A360.c", reason)
+
+    def test_no_conflicted_paths_is_a_failure(self) -> None:
+        with mock.patch.object(fleet, "conflicted_paths", return_value=[]):
+            ok, _ = fleet.resolve_generated_conflicts()
+        self.assertFalse(ok)
+
+    def test_coverage_only_conflict_regenerates_and_commits(self) -> None:
+        with mock.patch.object(fleet, "conflicted_paths", return_value=["COVERAGE.md"]), \
+             mock.patch.object(fleet, "run", return_value=(True, "")), \
+             mock.patch.object(fleet, "git", return_value=""), \
+             mock.patch.object(fleet.subprocess, "run") as commit:
+            commit.return_value = mock.Mock(returncode=0, stdout="", stderr="")
+            ok, reason = fleet.resolve_generated_conflicts()
+        self.assertTrue(ok)
+        self.assertIn("COVERAGE.md", reason)
+
+    def test_failed_regeneration_parks(self) -> None:
+        with mock.patch.object(fleet, "conflicted_paths", return_value=["COVERAGE.md"]), \
+             mock.patch.object(fleet, "run", return_value=(False, "boom")), \
+             mock.patch.object(fleet, "git", return_value=""):
+            ok, reason = fleet.resolve_generated_conflicts()
+        self.assertFalse(ok)
+        self.assertIn("could not regenerate", reason)

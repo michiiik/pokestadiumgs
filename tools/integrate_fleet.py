@@ -73,6 +73,15 @@ LOG_PATH = REPO_ROOT / "docs" / "FLEET_INTEGRATION_LOG.md"
 # from the tree the ROM gate then rebuilds.
 IGNORED_WHEN_DIRTY = ("COVERAGE.md",)
 
+# Generated files whose merge conflicts are resolved by regenerating them
+# rather than by parking the branch. Every fleet branch carries a
+# hook-regenerated COVERAGE.md computed from its own worktree, so *every*
+# parallel branch conflicts here and nowhere else; AGENTS.md Sec 1.3 already
+# prescribes taking the integration branch's copy. Regenerating from the
+# merged tree is strictly better than either side, because it is the only
+# value that describes what actually merged.
+REGENERATED_ON_CONFLICT = {"COVERAGE.md": ["python3", "tools/update_coverage.py"]}
+
 
 class IntegrationError(RuntimeError):
     pass
@@ -200,6 +209,43 @@ def log_result(entries: list[dict[str, object]]) -> None:
         handle.writelines(lines)
 
 
+def conflicted_paths() -> list[str]:
+    out = git("diff", "--name-only", "--diff-filter=U")
+    return [line.strip() for line in out.splitlines() if line.strip()]
+
+
+def resolve_generated_conflicts() -> tuple[bool, str]:
+    """Resolve a conflict that is purely in regenerated files.
+
+    Returns ``(True, note)`` when every conflicted path was regenerated and
+    the merge was committed, ``(False, reason)`` when anything else conflicted
+    and the caller should abort and park. A real source conflict is never
+    resolved here: two sessions disagreeing about a function body is exactly
+    the case an unattended run must not guess at.
+    """
+    paths = conflicted_paths()
+    if not paths:
+        return False, "merge failed with no conflicted paths"
+    unexpected = [path for path in paths if path not in REGENERATED_ON_CONFLICT]
+    if unexpected:
+        return False, f"merge conflict in {', '.join(sorted(unexpected))}"
+
+    for path in paths:
+        ok, out = run(REGENERATED_ON_CONFLICT[path], timeout=300)
+        if not ok:
+            return False, f"could not regenerate {path}: {out.strip()[-200:]}"
+        git("add", "--", path)
+
+    commit = subprocess.run(
+        ["git", "commit", "--no-edit"], cwd=REPO_ROOT, capture_output=True, text=True,
+        env={k: v for k, v in os.environ.items()
+             if k not in {"GIT_DIR", "GIT_INDEX_FILE", "GIT_WORK_TREE", "GIT_OBJECT_DIRECTORY"}},
+    )
+    if commit.returncode != 0:
+        return False, f"merge commit failed: {(commit.stdout + commit.stderr).strip()[:200]}"
+    return True, f"regenerated on conflict: {', '.join(sorted(paths))}"
+
+
 def blocking_dirt(status_porcelain: str) -> list[str]:
     """Working-tree entries that must stop an unattended merge.
 
@@ -267,13 +313,15 @@ def land(pattern: str, base: str, gate_timeout: int, dry_run: bool) -> int:
             cwd=REPO_ROOT, capture_output=True, text=True,
         )
         if merge.returncode != 0:
-            git("merge", "--abort", check=False)
-            reason = f"merge conflict: {(merge.stdout + merge.stderr).strip()[:300]}"
-            print(f"  PARKED: {reason}")
-            entries.append({"branch": branch, "head": head,
-                            "verdict": "parked", "reasons": [reason]})
-            parked += 1
-            continue
+            resolved, reason = resolve_generated_conflicts()
+            if not resolved:
+                git("merge", "--abort", check=False)
+                print(f"  PARKED: {reason}")
+                entries.append({"branch": branch, "head": head,
+                                "verdict": "parked", "reasons": [reason]})
+                parked += 1
+                continue
+            print(f"  {reason}")
 
         print("  merged; proving...")
         failures = prove(gate_timeout)
