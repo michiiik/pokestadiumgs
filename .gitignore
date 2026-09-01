@@ -93,6 +93,10 @@ probe[0-9]*.json
 # matches neither *_batch*.json (nothing precedes "batch") nor the anchored
 # /batch_*.json (the leading dot).
 /.batch*.json
+# Permuter working files: the seed body and its declarations block, written
+# beside the repo root before a permute_candidate.py run.
+/.permute_*.c
+/.permute_*.txt
 /candidate_*.c
 /decl_*.txt
 
