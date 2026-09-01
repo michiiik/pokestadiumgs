@@ -11,7 +11,10 @@ generated/
 
 # Durable probe-stats history (see tools/probe_stats.py) -- deliberately
 # outside disasm/build/ so a build clean cannot wipe candidate-runner history
-disasm/probe-stats/
+# No trailing slash: a fleet clone replaces this with a SYMLINK to the primary
+# checkout's ledger so the fleet shares one process memory, and a
+# directory-only pattern would leave that symlink showing up as untracked.
+disasm/probe-stats
 
 # Android/Gradle outputs and machine-local configuration
 .gradle/
