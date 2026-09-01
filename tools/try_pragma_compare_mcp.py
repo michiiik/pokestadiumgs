@@ -71,6 +71,7 @@ TOOLS = [
             "declarations": {"type": "string", "description": "Optional shared extern/prototype block prepended to every candidate probe and installed once ahead of the first accepted replacement."},
             "workers": {"type": "integer", "minimum": 1, "description": "Maximum parallel isolated compile probes (default: PRAGMA_PROBE_WORKERS or 10)."},
             "gate": {"type": "boolean", "default": True, "description": "Run the sequential full COMPARE=1 gate and update source (default true). Set false for isolated probe-only results."},
+            "auto_gate": {"type": "boolean", "default": True, "description": "With gate:false, still run the authoritative ROM gate as soon as a candidate comes back link-verified, instead of returning the hit for a second round-trip (AGENTS.md 2.5 step 6). Set false to force a pure probe."},
             "companion_edits": COMPANION_EDIT_ITEMS,
         }},
     },
@@ -184,10 +185,13 @@ def tool_try_pragma_candidates(args):
         source,
         [function for function, _ in blocks],
         companion_edits,
+        blocks,
+        declarations,
     )
     if preflight_errors:
         details = "\n".join(f"- {error}" for error in preflight_errors)
         raise ToolError(f"candidate batch preflight failed:\n{details}")
+    futility = runner.futility_warnings(blocks, runner._load_prior_attempt_history())
     workers = args.get("workers")
     if workers is not None:
         workers = int(workers)
@@ -197,6 +201,7 @@ def tool_try_pragma_candidates(args):
         probe_workers=workers,
         labels=labels,
         gate=bool(args.get("gate", True)),
+        auto_gate=None if args.get("auto_gate") is None else bool(args["auto_gate"]),
         declarations=declarations,
         companion_edits=companion_edits,
     )
@@ -205,6 +210,8 @@ def tool_try_pragma_candidates(args):
         if isinstance(index, int) and index < len(labels) and labels[index]:
             attempt["label"] = labels[index]
     result["source"] = source.relative_to(ROOT).as_posix()
+    if futility:
+        result["futility_warnings"] = futility
     return result, int(result["status"]) not in (0, 1)
 
 

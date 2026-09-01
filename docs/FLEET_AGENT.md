@@ -79,7 +79,12 @@ Do not touch any other file's pragmas or run `make`.
    widths, index-vs-pointer, guard-return vs assign-then-return, explicit
    temporaries, old-style callee prototypes). Order candidates by §4's table.
 4. Send them as one **probe-only** batch: `python3 tools/fleet_probe.py
-   batch.json` (no `--gate`). Read the printed table and iterate on
+   batch.json` (no `--gate`). **Put at least eight candidates in it.** A probe
+   costs ~0.35 s and they run in parallel; your own round-trip is the
+   expensive part. Measured over a two-hour fleet window: median batch size 2,
+   46% of batches held a single candidate, and the runner used 6% of the
+   wall clock. Never send a one-candidate probe batch.
+   Read the printed table and iterate on
    `mismatch_kind`, never on intuition: `register_allocation_only` → decl
    order/temps/widths; `immediate_drift` → offsets/strides/literal widths;
    non-text `section_layout_drift` → reject, needs a `.rodata` subsegment
@@ -89,7 +94,14 @@ Do not touch any other file's pragmas or run `make`.
    The runner also records `prior_attempts`, `best_prior`, `futility`,
    `repeated_drift`, and a `first_diff_fingerprint` in probe stats. These are
    history and handoff context, not acceptance evidence.
-5. Gate the first probe hit: `python3 tools/fleet_probe.py batch.json --gate`.
+5. A link-verified probe hit gates itself — the runner runs the full ROM gate
+   in the same invocation, so a probe-only run can come back already
+   `accepted`. Do not keep probing an owner that already has a hit, and do not
+   re-send a winning body just to gate it. `--gate` still forces a gate up
+   front; `--no-auto-gate` forces a pure probe for diagnosis.
+   Watch stderr for `futility:` lines: they are advice from the owner's
+   recorded history (a `register-tie` names the permuter call worth making),
+   not a stop order.
 6. Keep one owner active until it reaches a terminal state. A probe batch is
    a hypothesis budget, not an owner-resolution budget: after about 12
    variants, stop repeating that *source shape*, change the hypothesis family,

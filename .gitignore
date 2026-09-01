@@ -6,6 +6,7 @@
 # Decompilation outputs
 disasm/build/
 disasm/probes/
+disasm/scratch/
 generated/
 
 # Durable probe-stats history (see tools/probe_stats.py) -- deliberately
@@ -51,3 +52,34 @@ disasm/tools/decomp-venv/
 
 # per-session git worktrees created by tooling sessions
 .claude/worktrees/
+
+# Agent candidate-batch scratch files (tools/fleet_probe.py inputs and their
+# results). These are per-attempt working files, not process evidence -- the
+# durable record is disasm/probe-stats/ and docs/regions/. Left untracked and
+# unignored they drown the `git status` check AGENTS.md 1.2 depends on to spot
+# a concurrent runner transaction (361 of them on 2026-09-01).
+#
+# Deliberately narrow: docs/regions/*.md region notes and tools/*.py are real
+# work and must keep showing up in `git status`.
+*_batch*.json
+*_probe.json
+*_probe[0-9]*.json
+*_gate*.json
+*_result*.json
+*_successor*.json
+*_candidates/
+.agents/
+.agent*.json
+.coord_*.json
+.fleet_tmp*
+.fleet*.tmp
+.luna*.json
+.tmp*.json
+.wave*.json
+tmp_*.json
+tmp_scratch/
+wave*_*/
+probe[0-9]*.json
+
+# Timestamped hand backups left beside a tool during an edit
+*.bak-[0-9]*

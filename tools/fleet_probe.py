@@ -371,6 +371,7 @@ def run(
     declarations_override: str | None,
     gate: bool,
     probe_workers: int | None,
+    auto_gate: bool | None = None,
 ) -> dict[str, object]:
     source_path, declarations, blocks, labels, companion_edits = load_batch(
         input_path, source_override=source_override, declarations_override=declarations_override
@@ -381,10 +382,14 @@ def run(
         source_path,
         [function for function, _ in blocks],
         companion_edits,
+        blocks,
+        declarations,
     )
     if preflight_errors:
         details = "\n".join(f"- {error}" for error in preflight_errors)
         raise InputError(f"batch preflight failed:\n{details}")
+    for warning in runner.futility_warnings(blocks, runner._load_prior_attempt_history()):
+        print(f"futility: {warning}", file=sys.stderr)
     return runner.try_candidates_detailed(
         source_path,
         blocks,
@@ -393,6 +398,7 @@ def run(
         gate=gate,
         declarations=declarations,
         companion_edits=companion_edits,
+        auto_gate=auto_gate,
     )
 
 
@@ -404,6 +410,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--gate", action="store_true",
         help="run the full ROM gate (default: probe-only, gate: false)",
+    )
+    parser.add_argument(
+        "--no-auto-gate", dest="auto_gate", action="store_false", default=None,
+        help="with a probe-only run, do NOT gate automatically on a link-verified hit",
     )
     parser.add_argument("--workers", type=int, default=None, help="probe_workers override")
     parser.add_argument("--json", type=Path, help="also write the raw runner result as JSON to this path")
@@ -420,6 +430,7 @@ def main(argv: list[str] | None = None) -> int:
             declarations_override=declarations_override,
             gate=args.gate,
             probe_workers=args.workers,
+            auto_gate=args.auto_gate,
         )
     except InputError as exc:
         print(f"fleet_probe: {exc}", file=sys.stderr)

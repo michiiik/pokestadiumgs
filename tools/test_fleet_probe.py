@@ -331,11 +331,12 @@ class RunAndMainTests(unittest.TestCase):
             declarations=None,
             families=None,
             companion_edits=None,
+            auto_gate=None,
         ):
             captured.update(
                 source_path=source_path, blocks=blocks, probe_workers=probe_workers,
                 labels=labels, gate=gate, declarations=declarations,
-                companion_edits=companion_edits,
+                companion_edits=companion_edits, auto_gate=auto_gate,
             )
             return {"status": 0, "accepted": [], "attempts": [], "batch_status": "probe_only", "gate": gate}
 
@@ -357,6 +358,9 @@ class RunAndMainTests(unittest.TestCase):
         self.assertEqual(captured["probe_workers"], 3)
         self.assertFalse(captured["gate"])
         self.assertIsNone(captured["companion_edits"])
+        # Not passed on the CLI: the runner resolves its own default so a
+        # probe-only batch still gates on a link-verified hit.
+        self.assertIsNone(captured["auto_gate"])
 
     def test_run_forwards_companion_edits(self) -> None:
         captured: dict[str, object] = {}

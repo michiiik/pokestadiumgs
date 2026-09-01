@@ -2381,11 +2381,125 @@ def _candidate_declared_callee_names(candidate: str) -> set[str]:
     return names
 
 
+_DATA_SYMBOL_RE = re.compile(r"\bD_[0-9A-Fa-f]{6,}\b")
+
+# Per-file declaration cache, keyed by (path, mtime_ns) so a source the runner
+# rewrote during a gate is the only file rescanned on the next batch.
+_DECLARATION_FILE_CACHE: dict[tuple[str, int], dict[str, str]] = {}
+_DECLARATION_INDEX_CACHE: dict[str, tuple[frozenset[tuple[str, int]], dict[str, str]]] = {}
+
+
+def scan_source_for_data_declaration(source_text: str, symbol: str) -> str | None:
+    """Scan a whole C source for an existing declaration of data ``symbol``.
+
+    The data counterpart to ``scan_source_for_callee_signature``: returns the
+    exact declaration as written (``"extern OSMesgQueue D_800CDA10"``,
+    ``"extern f32 D_8008F708[]"``), without the trailing ``;``, or ``None``
+    when the source says nothing about it.  A definition is not distinguished
+    from an ``extern`` here because either one tells us the true type, which
+    is the only thing the probe needs; the emitted line is always an
+    ``extern``.
+
+    Nothing is ever guessed.  A ``D_`` symbol the scan cannot find is left
+    undeclared so the probe fails exactly as it always has -- the same
+    "synthesise only when nothing is found" rule ``_missing_callee_declarations``
+    follows for callees (AGENTS.md Sec 5).
+    """
+    scan_text = re.sub(r"(?m)^\s*#pragma[^\n]*(?:\n|$)", "", source_text)
+    pattern = re.compile(
+        rf"(?m)^\s*(?:extern\s+)?([A-Za-z_][\w\s\*]*?)\b{re.escape(symbol)}\s*"
+        rf"((?:\[[^\]]*\])*)\s*(?:=[^;]*)?;"
+    )
+    for match in pattern.finditer(scan_text):
+        type_text = " ".join(match.group(1).split())
+        if not type_text or not _is_signature_type_prefix(type_text):
+            continue
+        # A function pointer or prototype is a callee, not a data symbol.
+        if "(" in type_text:
+            continue
+        arrays = match.group(2).strip()
+        return f"extern {type_text} {symbol}{arrays}".strip()
+    return None
+
+
+def _declaration_index(repo_root: Path) -> dict[str, str]:
+    """Map every ``func_``/``D_`` symbol to a declaration some source already gives it.
+
+    The in-file scans (``scan_source_for_callee_signature`` /
+    ``scan_source_for_data_declaration``) only see the owner's own file, so a
+    callee defined in a *sibling* file, or a ``D_`` data symbol the owner file
+    never declares, previously fell through to IDO's implicit-declaration
+    default and cost the whole attempt a ``compile_failed`` on "there should be
+    a full prototype for the function being called".  That was 13% of all
+    candidate attempts measured over a two-hour fleet window.
+
+    This index closes that gap with the same evidence-only rule the in-file
+    scans use: a symbol is declared here **only** when some tracked
+    ``disasm/src`` file already declares it, and only when every file that
+    declares it agrees.  A symbol two files spell differently is dropped
+    rather than guessed at -- an ambiguous type is exactly the case where a
+    synthesized declaration could change codegen and manufacture a false
+    result.
+    """
+    src_root = repo_root / "disasm" / "src"
+    try:
+        sources = sorted(src_root.rglob("*.c"))
+    except OSError:
+        return {}
+    if not sources:
+        return {}
+
+    stamps: list[tuple[str, int]] = []
+    for path in sources:
+        try:
+            stamps.append((str(path), path.stat().st_mtime_ns))
+        except OSError:
+            continue
+    fingerprint = frozenset(stamps)
+
+    cached = _DECLARATION_INDEX_CACHE.get(str(src_root))
+    if cached is not None and cached[0] == fingerprint:
+        return cached[1]
+
+    found: dict[str, set[str]] = {}
+    for key in stamps:
+        per_file = _DECLARATION_FILE_CACHE.get(key)
+        if per_file is None:
+            per_file = {}
+            try:
+                text = Path(key[0]).read_text(errors="replace")
+            except OSError:
+                text = ""
+            for symbol in set(_CALL_SYMBOL_RE.findall(text)):
+                signature = scan_source_for_callee_signature(text, symbol)
+                if signature is not None:
+                    per_file[symbol] = _as_extern_declaration(signature)
+            for symbol in set(_DATA_SYMBOL_RE.findall(text)):
+                declaration = scan_source_for_data_declaration(text, symbol)
+                if declaration is not None:
+                    per_file[symbol] = declaration + ";"
+            _DECLARATION_FILE_CACHE[key] = per_file
+        for symbol, spelling in per_file.items():
+            found.setdefault(symbol, set()).add(spelling)
+
+    # Bound the per-file cache so a long-lived MCP process does not retain a
+    # scan for every revision of every file it has ever probed.
+    if len(_DECLARATION_FILE_CACHE) > 4 * len(sources) + 64:
+        live = set(stamps)
+        for key in [k for k in _DECLARATION_FILE_CACHE if k not in live]:
+            del _DECLARATION_FILE_CACHE[key]
+
+    index = {symbol: next(iter(spellings)) for symbol, spellings in found.items() if len(spellings) == 1}
+    _DECLARATION_INDEX_CACHE[str(src_root)] = (fingerprint, index)
+    return index
+
+
 def _missing_callee_declarations(
     function: str,
     candidate: str,
     baseline_source: str,
     already_declared: set[str],
+    cross_file: dict[str, str] | None = None,
 ) -> str:
     """Extra ``extern`` lines this one candidate needs beyond ``already_declared``.
 
@@ -2405,14 +2519,26 @@ def _missing_callee_declarations(
     lines: list[str] = []
     for name in missing:
         signature = scan_source_for_callee_signature(baseline_source, name)
-        if signature is None:
-            continue
-        lines.append(_as_extern_declaration(signature))
+        if signature is not None:
+            lines.append(_as_extern_declaration(signature))
+        elif cross_file and name in cross_file:
+            lines.append(cross_file[name])
+
+    # Data symbols the owner file never declares. Same evidence-only rule:
+    # the owner file first, then a spelling every sibling agrees on.
+    data_referenced = {name for name in _DATA_SYMBOL_RE.findall(candidate)}
+    for name in sorted(data_referenced - already_declared):
+        declaration = scan_source_for_data_declaration(baseline_source, name)
+        if declaration is not None:
+            lines.append(declaration + ";")
+        elif cross_file and name in cross_file:
+            lines.append(cross_file[name])
     return "\n".join(lines)
 
 
 def _augment_blocks_with_callee_declarations(
     blocks: list[tuple[str, str]], prefix: str, baseline_source: str,
+    repo_root: Path | None = None,
 ) -> list[tuple[str, str]]:
     """Prepend ``prefix`` and any needed synthesized callee declarations.
 
@@ -2429,13 +2555,18 @@ def _augment_blocks_with_callee_declarations(
     nothing about: this only ever adds a declaration it is confident is
     correct.
     """
-    shared_declared = set(_CALL_SYMBOL_RE.findall(prefix))
+    shared_declared = (
+        set(_CALL_SYMBOL_RE.findall(prefix)) | set(_DATA_SYMBOL_RE.findall(prefix))
+    )
+    cross_file = _declaration_index(repo_root) if repo_root is not None else None
     augmented: list[tuple[str, str]] = []
     for function, candidate in blocks:
         already_declared = (
             shared_declared | {function} | _candidate_declared_callee_names(candidate)
         )
-        extra = _missing_callee_declarations(function, candidate, baseline_source, already_declared)
+        extra = _missing_callee_declarations(
+            function, candidate, baseline_source, already_declared, cross_file
+        )
         pieces = [piece for piece in (prefix.rstrip("\n"), extra) if piece]
         new_prefix = "\n".join(pieces)
         if new_prefix:
@@ -2722,9 +2853,12 @@ def _futility_verdict(prior: list[dict[str, object]], best_prior: dict[str, obje
     ``func_8005C0B0``-family).  ``stuck``: at least fifteen prior attempts
     and the best of them is still below 0.9 similarity -- a bigger structural
     rewrite is needed, not another small variant. ``repeated-drift``: twelve
-    prior rejected attempts share the same first-difference fingerprint. This
-    is informational only and never suppresses a candidate or changes gate
-    behavior.
+    prior rejected attempts share the same first-difference fingerprint.
+
+    This verdict is annotated onto every attempt and surfaced to the caller by
+    ``futility_warnings``. It is advice, never a refusal: replaying a
+    two-hour window with it as a hard block destroyed every accept in that
+    window. It never changes gate behaviour.
     """
     register_tie_count = sum(
         1
@@ -2798,16 +2932,168 @@ def _companion_edit_pragma_pattern(function: str) -> re.Pattern[str]:
     )
 
 
+def _normalize_candidate_body(candidate: str) -> str:
+    """Collapse a candidate to a whitespace/comment-insensitive identity.
+
+    Two candidates that differ only in indentation, line breaks, or comments
+    compile to the same object, so for "have we already tried this?" purposes
+    they are the same attempt.
+    """
+    text = re.sub(r"/\*.*?\*/", " ", candidate, flags=re.DOTALL)
+    text = re.sub(r"//[^\n]*", " ", text)
+    return " ".join(text.split())
+
+
+def _candidate_identity(candidate: str) -> str:
+    return hashlib.sha256(_normalize_candidate_body(candidate).encode("utf-8")).hexdigest()
+
+
+# Statuses whose verdict a re-send provably cannot change, given the same
+# body, the same declarations, and the same tree.
+_DUPLICATE_BLOCKING_STATUSES = frozenset({
+    "probe_rejected",
+    "compare_rejected",
+    "combined_compare_rejected",
+})
+
+
+def _duplicate_candidate_errors(
+    blocks: list[tuple[str, str]],
+    history: dict[str, list[dict[str, object]]],
+    declarations: str | None = None,
+) -> list[str]:
+    """Reject candidate bodies this owner has already been sent *unchanged*.
+
+    A re-sent body cannot produce new information only when everything else
+    it depends on is also unchanged, so the identity deliberately spans the
+    body **and** the shared ``declarations`` block, and only a prior attempt
+    the compiler actually rejected counts.
+
+    Both narrowings are load-bearing, and replaying the measured two-hour
+    window against the real ledger is what established them:
+
+    * Keying on the body alone destroyed all six of the window's accepts.
+      Five were the historical discover-then-re-send-to-gate round trip (a
+      body that had just come back ``probe_match``, sent again with
+      ``gate: true``), which is why a non-rejected prior never blocks.
+    * ``func_8822B63C`` accepted a body that had ``compile_failed`` 41
+      seconds earlier: identical text, but the declarations block had grown
+      from 22 to 45 characters to declare ``D_88234910``. Same body, new
+      externs is a genuinely different attempt -- and that particular
+      failure is the class ``_declaration_index`` now prevents outright.
+
+    With both narrowings the same replay blocks 26% of attempts and destroys
+    no accept.
+    """
+    prefix_identity = _candidate_identity(declarations or "")
+    errors: list[str] = []
+    seen_in_batch: dict[tuple[str, str], int] = {}
+    for index, (function, candidate) in enumerate(blocks):
+        identity = (_candidate_identity(candidate), prefix_identity)
+        key = (function, identity[0])
+        if key in seen_in_batch:
+            errors.append(
+                f"candidates[{index}] for {function} duplicates candidates"
+                f"[{seen_in_batch[key]}] in this same batch; every candidate "
+                "must test a different hypothesis"
+            )
+            continue
+        seen_in_batch[key] = index
+        for prior in history.get(function, ()):
+            prior_text = prior.get("candidate")
+            if not isinstance(prior_text, str):
+                continue
+            if prior.get("status") not in _DUPLICATE_BLOCKING_STATUSES:
+                continue
+            prior_identity = (
+                _candidate_identity(prior_text),
+                _candidate_identity(prior.get("declarations") or ""),
+            )
+            if prior_identity != identity:
+                continue
+            label = prior.get("label") or "unlabelled"
+            status = prior.get("status") or "unknown"
+            score = prior.get("similarity_score")
+            when = prior.get("timestamp") or "an earlier batch"
+            errors.append(
+                f"candidates[{index}] for {function} is a body already "
+                f"rejected as {label!r} ({status}, similarity {score}) at "
+                f"{when} with these same declarations; re-sending it cannot "
+                "produce a new result — change the hypothesis family, or "
+                "change the declarations block if that was the problem"
+            )
+            break
+    return errors
+
+
+def futility_warnings(
+    blocks: list[tuple[str, str]],
+    history: dict[str, list[dict[str, object]]],
+) -> list[str]:
+    """Advice for owners whose recorded history is already futile.
+
+    ``_futility_verdict`` has always computed this and written it onto every
+    attempt; nothing surfaced it, so nothing acted on it. Over a two-hour
+    fleet window 612 of 1205 attempts were sent for owners already flagged.
+
+    These are **warnings, not refusals**, and that is a measured decision
+    rather than a cautious default. Replaying that same window with the
+    verdict as a hard block destroyed all six of its accepts: ``func_81303BF4``
+    accepted at ``register-tie: 12 prior attempts at >=0.99``,
+    ``func_8822B63C`` at ``stuck: 16 attempts, best 0.8077``, and
+    ``func_80050E88`` at ``repeated-drift: 40``. The verdict is a good
+    ranking signal and a bad stopping rule -- persistence past it is
+    precisely how several owners close. Surface it loudly, let the agent
+    decide, and keep the decision in the process evidence.
+    """
+    warnings: list[str] = []
+    for function in dict.fromkeys(function for function, _ in blocks):
+        prior = history.get(function, [])
+        verdict = _futility_verdict(prior, _best_prior_attempt(prior))
+        if verdict is None:
+            continue
+        if verdict.startswith("register-tie"):
+            nudge = (
+                f"a source-shape variant is unlikely to close this; consider "
+                f"permute_candidate on {function} with its best prior body "
+                "(docs/REGISTER_TIES.md)"
+            )
+        elif verdict.startswith("stuck"):
+            nudge = (
+                "the shape is likely wrong, not the spelling: re-read the .s "
+                "and change hypothesis family, or leave a requeue handoff "
+                "(tools/region_notes.py append)"
+            )
+        else:
+            nudge = (
+                "every recent rejection shares one first-difference "
+                "fingerprint; target that instruction or change family"
+            )
+        warnings.append(f"{function}: {verdict} — {nudge}")
+    return warnings
+
+
 def validate_candidate_batch(
     source_path: Path,
     functions: list[str],
     companion_edits: list[dict[str, str]] | None = None,
+    blocks: list[tuple[str, str]] | None = None,
+    declarations: str | None = None,
 ) -> list[str]:
     """Validate a fleet/MCP batch before starting compiler workers.
 
     This read-only preflight catches invalid owners and companion edits before
     they consume probe batches. The transactional checks in
     apply_companion_edits still run later.
+
+    When ``blocks`` (the ``(function, code)`` pairs) is supplied it also
+    rejects candidate bodies this owner has already had rejected under the
+    same ``declarations`` (``_duplicate_candidate_errors``). That is a
+    preflight diagnostic, so per AGENTS.md Sec 1.1 it is process evidence and
+    does not consume a hypothesis budget.
+
+    Futility is deliberately *not* refused here -- see ``futility_warnings``,
+    which callers surface alongside the result.
     """
     try:
         source_text = source_path.read_text()
@@ -2883,6 +3169,10 @@ def validate_candidate_batch(
             errors.append(f"{prefix}: {error}")
         else:
             working = edited
+
+    if blocks:
+        history = _load_prior_attempt_history()
+        errors.extend(_duplicate_candidate_errors(blocks, history, declarations))
     return errors
 
 
@@ -3791,6 +4081,7 @@ def try_candidates_detailed(
     declarations: str | None = None,
     families: dict[str, str] | None = None,
     companion_edits: list[dict[str, str]] | None = None,
+    auto_gate: bool | None = None,
 ) -> dict[str, object]:
     """Run one candidate transaction while excluding other MCP processes.
 
@@ -3821,6 +4112,7 @@ def try_candidates_detailed(
             gate=gate,
             declarations=declarations,
             companion_edits=companion_edits,
+            auto_gate=auto_gate,
         )
         _annotate_prior_attempts(result)
         batch_status = result.get("batch_status")
@@ -3854,6 +4146,7 @@ def _try_candidates_detailed_unlocked(
     gate: bool = True,
     declarations: str | None = None,
     companion_edits: list[dict[str, str]] | None = None,
+    auto_gate: bool | None = None,
 ) -> dict[str, object]:
     """Try candidates and retain the first winner per function.
 
@@ -3911,7 +4204,11 @@ def _try_candidates_detailed_unlocked(
                 "probe_workers": _resolve_probe_workers(probe_workers, len(blocks)),
             }
 
-    blocks = _augment_blocks_with_callee_declarations(blocks, prefix, working_source)
+    if auto_gate is None:
+        auto_gate = os.environ.get("PRAGMA_AUTO_GATE", "1") != "0"
+    auto_gated = False
+
+    blocks = _augment_blocks_with_callee_declarations(blocks, prefix, working_source, repo_root)
 
     accepted: dict[str, str] = {}
     accepted_indices: dict[str, int] = {}
@@ -3952,14 +4249,29 @@ def _try_candidates_detailed_unlocked(
             for attempt in attempts
             if attempt.get("status") == "probe_match"
         ]
-        return finish({
-            "status": 0 if probe_matches else 1,
-            "accepted": [],
-            "probe_matches": probe_matches,
-            "attempts": attempts,
-            "batch_status": "probe_only",
-            "gate": False,
-        })
+        # A link-verified probe match is already the strongest evidence a
+        # probe-only batch can produce, and the very next thing AGENTS.md
+        # Sec 2.5 step 6 asks for is a gate. Over a two-hour fleet window all
+        # 24 probe matches came back inside probe_only batches (23 of them
+        # link-verified) and only 7 batches ever gated, so every accept cost a
+        # second discovery round-trip and 47 further variants were probed on
+        # owners that already had a winner in hand. When auto-gate is on, run
+        # the authoritative gate now instead of handing the hit back.
+        auto_gate_hits = [
+            attempt["function"]
+            for attempt in attempts
+            if attempt.get("status") == "probe_match" and attempt.get("link_verified") is True
+        ]
+        if not (auto_gate and auto_gate_hits):
+            return finish({
+                "status": 0 if probe_matches else 1,
+                "accepted": [],
+                "probe_matches": probe_matches,
+                "attempts": attempts,
+                "batch_status": "probe_only",
+                "gate": False,
+            })
+        auto_gated = True
 
     claim_refusal = _claim_or_refuse(source_path)
     if claim_refusal is not None:
@@ -4134,6 +4446,7 @@ def _try_candidates_detailed_unlocked(
             "attempts": attempts,
             "batch_status": batch_status,
             "gate": True,
+            "auto_gated": auto_gated,
         })
 
     # No probe hit means no source edit was made and no linker invocation is

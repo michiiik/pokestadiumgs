@@ -148,11 +148,17 @@ Coordinator rules:
 3. Every candidate goes through the MCP runner (`try_pragma_candidates`):
    isolated object probe first, then link-shape verification, then the ROM
    gate. Never test a hypothesis by hand-editing a tracked source; manual edits
-   are for documentation or deliberate post-acceptance cleanup only.
+   are for documentation or deliberate post-acceptance cleanup only. A
+   probe-only batch now gates by itself the moment a candidate comes back
+   `link_verified` (§3.1); you do not send a second batch to gate a hit.
 4. Try about 10 plausible compiler-faithful variants for ordinary functions,
    10–50 for difficult ones when justified; stop after the first accepted
    candidate. Change the hypothesis family when a diagnostic repeats instead of
-   resending the same body.
+   resending the same body — the runner now refuses a body that owner has
+   already had *rejected* under the same `declarations` (§3.1). That refusal
+   is a preflight diagnostic: it costs no hypothesis budget, but it is not a
+   puzzle to work around. `futility` warns and never refuses; persistence
+   past it is how several owners actually close.
 5. Read the runner's per-attempt diagnostics (`status`, `mismatch_kind`,
    `similarity_score`, `first_diff_*`, `link_verified`, `expected_tail_kind`)
    and act on the class: `register_allocation_only` → declaration order,
@@ -240,6 +246,12 @@ file at a time so declarations, structs and names accumulate in one place.
    order them. Put shared externs in `declarations`, not in each body.
 4. Send them as **one probe-only batch** (`gate: false`) with descriptive
    labels (`<family>:<shape>:<hypothesis>`, e.g. `lookup:guard-return:u8-arg`).
+   **Eight candidates is a floor, not a ceiling.** A probe costs ~0.35 s and
+   they run in parallel; the expensive part is your own round-trip. Measured
+   over a two-hour fleet window: 398 batches for 1205 attempts, median batch
+   size 2, and 46% of batches carried a single candidate — while the runner
+   used 424 s of a 7200 s window (6%). Compute is not the constraint; batches
+   per hour is. Never send a one-candidate probe batch.
    Read the per-attempt result: `mismatch_kind`, `first_diff_offset`,
    `expected_instruction_text` vs `actual_instruction_text`,
    `similarity_score`, `expected_size` vs `actual_size`, `expected_tail_kind`.
@@ -252,7 +264,10 @@ file at a time so declarations, structs and names accumulate in one place.
    or frame mismatch; fix the body or verified padding before gating. A
    `similarity_score` of 1.0 with different registers is
    an operand-order or declaration-order problem, not a semantic one.
-6. Gate the first probe hit (`gate: true`). Then name it if evidence exists
+6. The first `link_verified` probe hit gates itself — the runner runs the
+   authoritative ROM gate in the same call rather than handing the hit back
+   (`auto_gate: false` opts out for diagnosis). Do not keep probing variants
+   for an owner that already has a hit. Then name it if evidence exists
    (`python3 tools/name_decompiled.py plan`). If there is no hit, keep this
    owner active: change the hypothesis family and continue until acceptance,
    an explicit terminal prerequisite/tooling state, or box expiry. Do not
@@ -330,9 +345,39 @@ file at a time so declarations, structs and names accumulate in one place.
   or remove a `#pragma GLOBAL_ASM`. Use it for the §4 "callee prototyped as
   `void`" and "caller passes fewer arguments" cases; the function-pointer
   cast spelling in the T5 example is unverified until a gate accepts it.
-- `tools/fleet_probe.py batch.json [--gate] [--json out]` — CLI front end for
-  agents that are not wired to the MCP server; prints one row per attempt and
-  a per-function verdict (including "register tie — stop").
+- `tools/fleet_probe.py batch.json [--gate] [--no-auto-gate] [--json out]` —
+  CLI front end for agents that are not wired to the MCP server; prints one row
+  per attempt and a per-function verdict (including "register tie — stop").
+
+- Batch preflight (`validate_candidate_batch`, runs before any compiler worker
+  starts) refuses, on top of the invalid-owner/companion checks, a candidate
+  body this owner has already had **rejected** under the **same
+  `declarations`** — whitespace- and comment-insensitive, checked against the
+  full probe-stats history and within the batch itself. Both narrowings are
+  measured, not cautious: replaying the two-hour window with body-only
+  identity destroyed all six of its accepts (five were the legitimate
+  discover-then-gate re-send; `func_8822B63C` accepted a body that had
+  `compile_failed` 41 s earlier under a shorter externs block). As shipped the
+  same replay blocks 19% of attempts and destroys none.
+- `futility_warnings` surfaces the `_futility_verdict` the runner has always
+  computed and nothing ever read — on the MCP result as `futility_warnings`,
+  on stderr from `fleet_probe.py`. It **warns and never refuses**: the same
+  replay showed the verdict is a good ranking signal and a bad stopping rule
+  (`func_81303BF4` closed at `register-tie: 12`, `func_8822B63C` at `stuck:
+  16`, `func_80050E88` at `repeated-drift: 40`). Read it, then decide; a
+  `register-tie` warning names the `permute_candidate` call worth making.
+- Probe-only batches self-gate: a `link_verified` hit runs the full ROM gate
+  in the same call and the result carries `auto_gated: true`. `auto_gate:
+  false` (MCP) / `--no-auto-gate` (CLI) / `PRAGMA_AUTO_GATE=0` forces a pure
+  probe.
+- Declaration synthesis covers three sources, in order, and never guesses: the
+  owner's own file, then a spelling every other `disasm/src` file agrees on
+  (`_declaration_index`, cached per file mtime), for both `func_` callees and
+  `D_` data symbols. A symbol two files spell differently, or that nothing
+  declares, is left alone. This closed the largest compile-failure class:
+  "there should be a full prototype for the function being called" plus
+  undefined `D_` symbols were 153 of 1205 attempts (13%) in the measured
+  window.
 
 ### 3.2 Probe statistics
 
