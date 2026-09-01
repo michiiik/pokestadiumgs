@@ -55,6 +55,27 @@ import variant_policy
 
 RUNNER_REPO_ROOT = Path(__file__).resolve().parent.parent
 
+
+def _repo_root_for_path(path: Path) -> Path:
+    """Find the checkout containing a source/object path.
+
+    The runner module can be imported from the primary checkout while a
+    candidate source belongs to a linked worktree. Deriving the root from the
+    path keeps probes, scratch files, and build outputs in that worktree
+    instead of silently writing into the primary checkout.
+    """
+    candidate = Path(path)
+    if not candidate.is_absolute():
+        candidate = Path.cwd() / candidate
+    candidate = candidate.absolute()
+    for parent in (candidate, *candidate.parents):
+        if parent.name != "disasm":
+            continue
+        root = parent.parent
+        if (root / ".git").exists() or root == RUNNER_REPO_ROOT:
+            return root
+    return RUNNER_REPO_ROOT
+
 # Set by a caller (``sweep_targets.py``) that already knows a per-function
 # family mapping (e.g. from a sweep listing) but does not want to thread a
 # ``families`` dict through every ``try_candidates_detailed`` call site.
@@ -119,7 +140,7 @@ def _mips_instruction_description(word: int) -> str:
 
 
 def source_object_path(source_path: Path) -> tuple[Path, Path]:
-    repo_root = Path(__file__).resolve().parent.parent
+    repo_root = _repo_root_for_path(source_path)
     relative = source_path.resolve().relative_to(repo_root / "disasm")
     return repo_root, repo_root / "disasm" / "build" / relative.with_suffix(".o")
 
@@ -134,33 +155,64 @@ def _binutils_tool(name: str) -> str:
 def _probe_root(repo_root: Path) -> Path:
     """Return the dedicated source root used by isolated probe candidates."""
     root = repo_root / "disasm" / "probes"
+    _private_output_path(repo_root, root, "probe root")
     root.mkdir(parents=True, exist_ok=True)
+    if root.is_symlink() or not root.is_dir():
+        raise RuntimeError(f"isolated probe refused unsafe probe root: {root}")
+    return root
+
+
+def _scratch_root(repo_root: Path | None = None) -> Path:
+    """Return the scratch root for short-lived binutils working directories.
+
+    Deliberately not ``$TMPDIR``. The helpers below run once per function in
+    tight loops, and a runner killed mid-flight (OOM, timeout, hung host)
+    never unwinds their ``TemporaryDirectory`` context manager. Directories
+    stranded under ``/var/folders`` accumulate until ``dirhelper`` can no
+    longer walk them, which stalls the synchronous launchd boot sequence.
+    Keeping scratch in-repo keeps that failure local and sweepable.
+    """
+    checkout = repo_root or RUNNER_REPO_ROOT
+    root = checkout / "disasm" / "scratch"
+    _private_output_path(checkout, root, "scratch root")
+    root.mkdir(parents=True, exist_ok=True)
+    if root.is_symlink() or not root.is_dir():
+        raise RuntimeError(f"isolated runner refused unsafe scratch root: {root}")
     return root
 
 
 def _cleanup_stale_probe_dirs(repo_root: Path) -> None:
-    """Remove abandoned probe source trees without touching tracked sources.
+    """Remove abandoned probe and scratch trees without touching tracked sources.
 
     Probe transactions are process-serialized by ``_candidate_transaction_lock``.
     A one-hour age threshold keeps a live/debugging probe safe while cleaning
-    directories left behind by an interrupted runner process.
+    directories left behind by an interrupted runner process. Scratch roots are
+    swept on the same schedule so a killed runner cannot strand them forever.
     """
     stale_after = _command_timeout("PRAGMA_PROBE_STALE_SECONDS", 3600.0)
     now = time.time()
     roots = (
         _probe_root(repo_root),
+        _scratch_root(repo_root),
         repo_root / "disasm" / "src",
         repo_root / "disasm" / "build" / "src",
         repo_root / "disasm" / "build" / "probes",
     )
+    patterns = (
+        ".pragma_probe_*",
+        ".pragma_text_*",
+        ".pragma_section_*",
+        ".pragma_disasm_*",
+    )
     for root in roots:
-        for directory in root.rglob(".pragma_probe_*"):
-            try:
-                if not directory.is_dir() or now - directory.stat().st_mtime < stale_after:
+        for pattern in patterns:
+            for directory in root.rglob(pattern):
+                try:
+                    if not directory.is_dir() or now - directory.stat().st_mtime < stale_after:
+                        continue
+                    shutil.rmtree(directory)
+                except OSError:
                     continue
-                shutil.rmtree(directory)
-            except OSError:
-                continue
 
 
 def _command_timeout(environment_name: str, default: float) -> float:
@@ -481,6 +533,23 @@ def _run_bounded_process_group(
         if process.stdout is not None and not process.stdout.closed:
             process.stdout.close()
     return process.returncode, output or "", False
+
+
+def _run_binutils(command: list[str], *, cwd: Path) -> tuple[int, str] | None:
+    """Run one binutils helper with the same timeout/reaping guarantees as builds."""
+    try:
+        returncode, output, timed_out = _run_bounded_process_group(
+            command,
+            cwd=cwd,
+            environment=None,
+            timeout=_command_timeout("PRAGMA_OBJDUMP_TIMEOUT", 5.0),
+            capture=True,
+        )
+    except OSError:
+        return None
+    if timed_out:
+        return None
+    return returncode, output
 
 
 def _bootstrap_command(
@@ -1226,7 +1295,7 @@ def _make_object(source_path: Path, *, capture: bool = False) -> tuple[int, Path
     directly, so parallel probes skip the Makefile parse and never contend
     with each other or alter the tracked source.
     """
-    repo_root = Path(__file__).resolve().parent.parent
+    repo_root = _repo_root_for_path(source_path)
     _ensure_worktree_oracles(repo_root, source_path)
     relative = source_path.resolve().relative_to(repo_root / "disasm")
     object_path = repo_root / "disasm" / "build" / relative.with_suffix(".o")
@@ -1270,7 +1339,7 @@ def invalidate_link_outputs(repo_root: Path) -> None:
 
 
 def try_candidate(source_path: Path, function: str, candidate: str) -> int:
-    with _candidate_transaction_lock():
+    with _candidate_transaction_lock(source_path):
         result, _ = _try_candidate_detailed(source_path, function, candidate)
     return result
 
@@ -1294,8 +1363,9 @@ def _try_candidate_detailed(source_path: Path, function: str, candidate: str) ->
     try:
         if rebuild_source_object(source_path) != 0:
             return 2, "compile_failed"
-        invalidate_link_outputs(Path(__file__).resolve().parent.parent)
-        result, output = _run_compare(Path(__file__).resolve().parent.parent)
+        repo_root = _repo_root_for_path(source_path)
+        invalidate_link_outputs(repo_root)
+        result, output = _run_compare(repo_root)
         print(output, end="")
 
         if result != 0:
@@ -1363,34 +1433,27 @@ def compare_current_tree(repo_root: Path) -> int:
 
 def _object_text(object_path: Path) -> bytes | None:
     """Return the raw relocatable .text section from an object file."""
-    with tempfile.TemporaryDirectory(prefix=".pragma_text_") as directory:
+    repo_root = _repo_root_for_path(object_path)
+    with tempfile.TemporaryDirectory(prefix=".pragma_text_", dir=_scratch_root(repo_root)) as directory:
         output = Path(directory) / "text.bin"
-        result = subprocess.run(
+        result = _run_binutils(
             [_binutils_tool("objcopy"), "--dump-section", f".text={output}", str(object_path)],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
+            cwd=repo_root,
         )
-        if result.returncode != 0 or not output.exists():
+        if result is None or result[0] != 0 or not output.exists():
             return None
         return output.read_bytes()
 
 
 def _object_symbol(object_path: Path, function: str) -> tuple[int, int] | None:
     """Return a function's section offset and size from a relocatable object."""
-    result = subprocess.run(
+    result = _run_binutils(
         [_binutils_tool("nm"), "-S", "--defined-only", str(object_path)],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        text=True,
-        encoding="utf-8",
-        errors="replace",
+        cwd=_repo_root_for_path(object_path),
     )
-    if result.returncode != 0:
+    if result is None or result[0] != 0:
         return None
-    for line in result.stdout.splitlines():
+    for line in result[1].splitlines():
         fields = line.split()
         if len(fields) < 4 or fields[-1] != function or fields[-2].upper() == "U":
             continue
@@ -1471,21 +1534,15 @@ _READELF_RELOC_RE = re.compile(r"^([0-9a-fA-F]+)\s+([0-9a-fA-F]+)\s+(R_\w+)")
 
 
 def _readelf(object_path: Path, *flags: str) -> str | None:
-    try:
-        result = subprocess.run(
-            [_binutils_tool("readelf"), *flags, "-W", str(object_path)],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-            timeout=_command_timeout("PRAGMA_OBJDUMP_TIMEOUT", 5.0),
-        )
-    except (OSError, subprocess.TimeoutExpired):
+    result = _run_binutils(
+        [_binutils_tool("readelf"), *flags, "-W", str(object_path)],
+        cwd=_repo_root_for_path(object_path),
+    )
+    if result is None:
         return None
-    if result.returncode != 0:
+    if result[0] != 0:
         return None
-    return result.stdout
+    return result[1]
 
 
 def _parse_readelf_sections(text: str) -> dict[int, dict[str, object]]:
@@ -1545,17 +1602,14 @@ def _parse_readelf_relocations(text: str) -> dict[str, list[tuple[int, str, int]
 
 
 def _object_section_bytes(object_path: Path, section: str) -> bytes | None:
-    with tempfile.TemporaryDirectory(prefix=".pragma_section_") as directory:
+    repo_root = _repo_root_for_path(object_path)
+    with tempfile.TemporaryDirectory(prefix=".pragma_section_", dir=_scratch_root(repo_root)) as directory:
         output = Path(directory) / "section.bin"
-        result = subprocess.run(
+        result = _run_binutils(
             [_binutils_tool("objcopy"), "--dump-section", f"{section}={output}", str(object_path)],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
+            cwd=repo_root,
         )
-        if result.returncode != 0 or not output.exists():
+        if result is None or result[0] != 0 or not output.exists():
             return None
         return output.read_bytes()
 
@@ -1904,53 +1958,48 @@ def _classify_tail_bytes(data: bytes) -> str:
     return "no_return_found"
 
 
-def _disassemble_bytes(data: bytes) -> list[str]:
+def _disassemble_bytes(data: bytes, repo_root: Path | None = None) -> list[str]:
     """Disassemble raw big-endian MIPS words with the configured binutils."""
     words = len(data) // 4
     if words == 0:
         return []
     data = data[: words * 4]
-    with tempfile.TemporaryDirectory(prefix=".pragma_disasm_") as directory:
+    scratch_root = _scratch_root(repo_root)
+    with tempfile.TemporaryDirectory(prefix=".pragma_disasm_", dir=scratch_root) as directory:
         binary = Path(directory) / "function.bin"
         binary.write_bytes(data)
-        try:
-            result = subprocess.run(
-                [
-                    _binutils_tool("objdump"),
-                    "-D",
-                    "-EB",
-                    "-b",
-                    "binary",
-                    "-m",
-                    # VR4300 is MIPS III: ``mips:isa32`` decodes 64-bit
-                    # operations such as ``dsll32``/``ld`` as ``.word`` and
-                    # silently corrupts the normalized similarity score.
-                    "mips:4300",
-                    str(binary),
-                ],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                text=True,
-                encoding="utf-8",
-                errors="replace",
-                timeout=_command_timeout("PRAGMA_OBJDUMP_TIMEOUT", 5.0),
-            )
-        except (OSError, subprocess.TimeoutExpired):
+        result = _run_binutils(
+            [
+                _binutils_tool("objdump"),
+                "-D",
+                "-EB",
+                "-b",
+                "binary",
+                "-m",
+                # VR4300 is MIPS III: ``mips:isa32`` decodes 64-bit
+                # operations such as ``dsll32``/``ld`` as ``.word`` and
+                # silently corrupts the normalized similarity score.
+                "mips:4300",
+                str(binary),
+            ],
+            cwd=scratch_root,
+        )
+        if result is None:
             return []
-    if result.returncode != 0:
+    if result[0] != 0:
         return []
     instruction_re = re.compile(r"^\s*[0-9a-fA-F]+:\s+[0-9a-fA-F]{8}\s+(.+?)\s*$")
     instructions = []
-    for line in result.stdout.splitlines():
+    for line in result[1].splitlines():
         match = instruction_re.match(line)
         if match:
             instructions.append(match.group(1))
     return instructions
 
 
-def _instruction_texts(data: bytes) -> list[str]:
+def _instruction_texts(data: bytes, *, repo_root: Path | None = None) -> list[str]:
     """Return objdump text, falling back to the local compact decoder."""
-    instructions = _disassemble_bytes(data)
+    instructions = _disassemble_bytes(data, repo_root=repo_root)
     if instructions:
         return instructions
     return [
@@ -2003,8 +2052,9 @@ def _function_mismatch_details(
         details["first_diff_offset"] = None
         return details
     details["actual_tail_kind"] = _classify_tail_bytes(actual)
-    expected_texts = _instruction_texts(expected)
-    actual_texts = _instruction_texts(actual)
+    scratch_root = _repo_root_for_path(object_path)
+    expected_texts = _instruction_texts(expected, repo_root=scratch_root)
+    actual_texts = _instruction_texts(actual, repo_root=scratch_root)
     expected_words = [
         int.from_bytes(expected[offset:offset + 4], "big")
         for offset in range(0, len(expected) - 3, 4)
@@ -3040,7 +3090,7 @@ def _probe_one_uncounted(
             "probe_reason": "invalid_pragma",
         }
 
-    repo_root = Path(__file__).resolve().parent.parent
+    repo_root = _repo_root_for_path(source_path)
     temporary_directory = tempfile.TemporaryDirectory(
         prefix=".pragma_probe_", dir=_probe_root(repo_root)
     )
@@ -3256,6 +3306,18 @@ def probe_candidates(
     )
 
     workers = _resolve_probe_workers(workers, len(blocks))
+    if workers == 0:
+        open_fds = _open_file_descriptor_count()
+        for result in results:
+            result.update({
+                "status": "probe_unavailable",
+                "probe_reason": "fd_limit",
+                "diagnostic": (
+                    "probe workers disabled: no descriptor headroom remains"
+                    + (f" (open_fds={open_fds})" if open_fds is not None else "")
+                ),
+            })
+        return results
     with ThreadPoolExecutor(max_workers=workers) as executor:
         futures = {
             executor.submit(
@@ -3325,6 +3387,16 @@ def _ensure_baseline_object(source_path: Path, object_path: Path) -> bool:
     return True
 
 
+def _open_file_descriptor_count() -> int | None:
+    """Return this process's open descriptor count when the host exposes it."""
+    for directory in (Path("/dev/fd"), Path("/proc/self/fd")):
+        try:
+            return len(list(directory.iterdir()))
+        except OSError:
+            continue
+    return None
+
+
 def _resolve_probe_workers(workers: int | None, candidate_count: int) -> int:
     """Bound concurrent compiler children by both policy and FD headroom.
 
@@ -3342,9 +3414,16 @@ def _resolve_probe_workers(workers: int | None, candidate_count: int) -> int:
     try:
         soft_limit = resource.getrlimit(resource.RLIMIT_NOFILE)[0]
         fd_cap = max(1, (soft_limit - 64) // 16)
+        open_fds = _open_file_descriptor_count()
+        if open_fds is not None:
+            # Keep the historical 64-descriptor safety reserve, but account
+            # for descriptors already consumed by co-resident MCP workers.
+            # A reserve of 16 covers the child pipes opened during launch.
+            live_cap = max(0, (soft_limit - open_fds - 16) // 16)
+            fd_cap = min(fd_cap, live_cap)
     except (OSError, ValueError):
         fd_cap = workers
-    return max(1, min(workers, candidate_count or 1, fd_cap))
+    return max(0, min(workers, candidate_count or 1, fd_cap))
 
 
 def _print_normalized_only_match_warnings(attempts: list[dict[str, object]]) -> None:
@@ -3609,7 +3688,7 @@ def _record_probe_stats(
 
 
 @contextmanager
-def _candidate_transaction_lock():
+def _candidate_transaction_lock(path: Path | None = None):
     """Serialize live-source/full-ROM transactions across MCP processes.
 
     Isolated object probes are still parallel within one request, but the
@@ -3618,7 +3697,7 @@ def _candidate_transaction_lock():
     restore a rejected candidate while another agent is running its full gate,
     producing a false combined-compare rejection.
     """
-    repo_root = Path(__file__).resolve().parent.parent
+    repo_root = _repo_root_for_path(path) if path is not None else RUNNER_REPO_ROOT
     repo_key = hashlib.sha256(str(repo_root).encode()).hexdigest()[:16]
     lock_name = f"pokemon_stadium_pragma_runner_{repo_key}.lock"
     lock_path = Path(tempfile.gettempdir()) / lock_name
@@ -3668,19 +3747,23 @@ def _claim_or_refuse(source_path: Path) -> str | None:
     owner = file_claims.current_owner()
     key = file_claims.registry_key(source_path)
     if key in _CLAIMED_SOURCE_PATHS:
-        file_claims.touch(source_path, owner=owner)
-        return None
+        if file_claims.touch(source_path, owner=owner):
+            return None
+        # The cached identity may have changed (for example a caller reused
+        # this interpreter with a different CLAIMS_OWNER). Re-enter the
+        # normal claim/refusal path instead of bypassing enforcement.
+        _CLAIMED_SOURCE_PATHS.discard(key)
     if file_claims.claim(source_path, owner=owner):
         _CLAIMED_SOURCE_PATHS.add(key)
         return None
     existing = file_claims.holder(source_path)
     holder_owner = str(existing.get("owner")) if existing else "unknown"
-    _CLAIMED_SOURCE_PATHS.add(key)
     both_reliable = file_claims.session_is_reliable(owner) and file_claims.session_is_reliable(
         holder_owner
     )
     if both_reliable and os.environ.get("PRAGMA_CLAIMS_ENFORCE") == "1":
         return f"{source_path} is claimed by {holder_owner}"
+    _CLAIMED_SOURCE_PATHS.add(key)
     print(
         f"WARNING {source_path} carries a live claim by {holder_owner}; "
         f"installing anyway as {owner} (advisory claim). Another session may "
@@ -3726,7 +3809,7 @@ def try_candidates_detailed(
     nothing is written. Omitted (the default), behaviour is identical to
     before this parameter existed.
     """
-    with _candidate_transaction_lock():
+    with _candidate_transaction_lock(source_path):
         result = _try_candidates_detailed_unlocked(
             source_path,
             blocks,
@@ -3785,7 +3868,7 @@ def _try_candidates_detailed_unlocked(
     failure, so a rejected batch leaves nothing behind.
     """
     started = time.monotonic()
-    repo_root = Path(__file__).resolve().parent.parent
+    repo_root = _repo_root_for_path(source_path)
     baseline = source_path.read_text()
     prefix = _declaration_prefix(declarations)
     companion_function_names: list[str] | None = None

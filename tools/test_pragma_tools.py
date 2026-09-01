@@ -734,6 +734,57 @@ class RunnerTests(unittest.TestCase):
                 self.assertEqual(runner._resolve_probe_workers(20, 50), 12)
                 self.assertEqual(runner._resolve_probe_workers(20, 2), 2)
 
+    def test_probe_workers_disable_when_descriptor_headroom_is_exhausted(self) -> None:
+        with mock.patch.object(runner.resource, "getrlimit", return_value=(256, 256)), mock.patch.object(
+            runner, "_open_file_descriptor_count", return_value=244
+        ):
+            self.assertEqual(runner._resolve_probe_workers(4, 50), 0)
+
+    def test_linked_path_selects_its_checkout_for_runner_outputs(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "worktree"
+            source = root / "disasm" / "src" / "synthetic.c"
+            source.parent.mkdir(parents=True)
+            (root / ".git").write_text("gitdir: /tmp/worktrees/synthetic\n")
+            self.assertEqual(runner._repo_root_for_path(source), root)
+            self.assertEqual(runner._scratch_root(root), root / "disasm" / "scratch")
+
+    def test_scratch_symlink_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "worktree"
+            (root / "disasm").mkdir(parents=True)
+            target = Path(directory) / "outside"
+            target.mkdir()
+            (root / "disasm" / "scratch").symlink_to(target, target_is_directory=True)
+            with self.assertRaisesRegex(RuntimeError, "scratch root"):
+                runner._scratch_root(root)
+
+    def test_enforced_claim_refusal_is_not_cached(self) -> None:
+        import file_claims
+
+        source = Path(tempfile.mkdtemp()) / "synthetic.c"
+        source.parent.mkdir(exist_ok=True)
+        key = file_claims.registry_key(source)
+        runner._CLAIMED_SOURCE_PATHS.discard(key)
+        try:
+            with mock.patch.dict(os.environ, {"CLAIMS_OWNER": "owner-a"}, clear=False):
+                self.assertIsNone(runner._claim_or_refuse(source))
+            with mock.patch.dict(
+                os.environ,
+                {"CLAIMS_OWNER": "owner-b", "PRAGMA_CLAIMS_ENFORCE": "1"},
+                clear=False,
+            ):
+                self.assertIn("claimed by owner-a", runner._claim_or_refuse(source) or "")
+                self.assertIn("claimed by owner-a", runner._claim_or_refuse(source) or "")
+        finally:
+            runner._CLAIMED_SOURCE_PATHS.discard(key)
+
+    def test_binutils_timeout_is_treated_as_unavailable(self) -> None:
+        with mock.patch.object(
+            runner, "_run_bounded_process_group", return_value=(124, "", True)
+        ):
+            self.assertIsNone(runner._object_symbol(Path("/tmp/synthetic.o"), "func_a"))
+
     def test_bootstrap_timeout_kills_and_reaps_descendants(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
