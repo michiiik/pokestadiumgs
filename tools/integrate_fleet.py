@@ -289,6 +289,51 @@ def blocking_dirt(status_porcelain: str) -> list[str]:
     return blocking
 
 
+def collect(clone_glob: str, ref_pattern: str) -> int:
+    """Fetch fleet branches out of the sibling clones into this checkout.
+
+    The clones are independent repositories created by
+    ``setup_fleet_clones.sh``; this checkout is their *origin*, not the other
+    way round, so a branch an agent commits in gs-fleet-N is invisible here
+    until it is fetched. Without this step `land` simply finds nothing and
+    reports success, which is the worst possible failure mode for an
+    unattended loop.
+
+    The clone is authoritative for its own branch, so the refspec is forced:
+    an agent that amends or resets its branch should not wedge collection.
+    """
+    clones = sorted(
+        path for path in Path(clone_glob).parent.glob(Path(clone_glob).name)
+        if (path / ".git").exists()
+    )
+    if not clones:
+        print(f"no clones matched {clone_glob!r}")
+        return 1
+    collected = 0
+    for clone in clones:
+        refs = subprocess.run(
+            ["git", "ls-remote", str(clone), f"refs/heads/{ref_pattern}"],
+            capture_output=True, text=True,
+        )
+        names = [
+            line.split("refs/heads/", 1)[1]
+            for line in refs.stdout.splitlines()
+            if "refs/heads/" in line
+        ]
+        if not names:
+            print(f"  {clone.name}: no {ref_pattern} branch")
+            continue
+        for name in names:
+            git("fetch", "--quiet", str(clone),
+                f"+refs/heads/{name}:refs/heads/{name}", check=False)
+            head = git("rev-parse", "--short", name, check=False).strip()
+            ahead = git("rev-list", "--count", f"master..{name}", check=False).strip()
+            print(f"  {clone.name}: {name} @ {head} ({ahead or '?'} commit(s) ahead)")
+            collected += 1
+    print(f"collected {collected} branch(es) from {len(clones)} clone(s)")
+    return 0
+
+
 def resolve_branches(pattern: str) -> list[str]:
     out = git("for-each-ref", "--format=%(refname:short)", "refs/heads/")
     names = [n.strip() for n in out.splitlines() if n.strip()]
@@ -384,12 +429,22 @@ def main(argv: list[str] | None = None) -> int:
     p_land.add_argument("--dry-run", action="store_true",
                         help="screen only; never merge or build")
 
+    p_collect = sub.add_parser(
+        "collect", help="fetch fleet branches out of the sibling clones")
+    p_collect.add_argument(
+        "--clones", default=str(REPO_ROOT.parent / "gs-fleet-*"),
+        help="glob over clone directories (default: ../gs-fleet-*)")
+    p_collect.add_argument(
+        "--refs", default="fleet/*", help="branch pattern to fetch from each clone")
+
     p_check = sub.add_parser("check", help="screen one branch without merging")
     p_check.add_argument("--branch", required=True)
     p_check.add_argument("--base", default="master")
 
     args = parser.parse_args(argv)
     try:
+        if args.command == "collect":
+            return collect(args.clones, args.refs)
         if args.command == "check":
             reasons = screen(args.base, args.branch)
             if reasons:

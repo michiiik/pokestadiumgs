@@ -176,3 +176,28 @@ class GeneratedConflictTests(unittest.TestCase):
             ok, reason = fleet.resolve_generated_conflicts()
         self.assertFalse(ok)
         self.assertIn("could not regenerate", reason)
+
+
+class CollectTests(unittest.TestCase):
+    """Without collect, land finds nothing and reports success.
+
+    The clones are independent repos and this checkout is their origin, not
+    the reverse, so agent work is invisible here until fetched. A silent
+    "landed 0, parked 0" is the worst failure mode for an unattended loop.
+    """
+
+    def test_no_matching_clones_is_an_error(self) -> None:
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as raw:
+            rc = fleet.collect(f"{raw}/gs-fleet-*", "fleet/*")
+        self.assertEqual(rc, 1)
+
+    def test_clone_without_git_is_skipped(self) -> None:
+        import tempfile
+        from pathlib import Path as P
+
+        with tempfile.TemporaryDirectory() as raw:
+            (P(raw) / "gs-fleet-1").mkdir()
+            rc = fleet.collect(f"{raw}/gs-fleet-*", "fleet/*")
+        self.assertEqual(rc, 1)
