@@ -40,6 +40,10 @@ import sys
 import time
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import check_decomp_provenance as provenance  # noqa: E402
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 # Paths whose modification would weaken the proof rather than be caught by it.
@@ -176,12 +180,32 @@ def prove(gate_timeout: int) -> list[str]:
         tail = "\n".join(out.strip().splitlines()[-12:])
         failures.append(f"tools test suite failed:\n{tail}")
 
-    ok, out = run(["python3", "tools/check_decomp_provenance.py"], timeout=300)
-    if not ok:
-        tail = "\n".join(out.strip().splitlines()[-12:])
-        failures.append(f"decomp provenance check failed:\n{tail}")
+    unproven = unproven_pragma_removals()
+    if unproven:
+        failures.append(
+            "merge drops GLOBAL_ASM pragmas with no accepted runner attempt: "
+            + ", ".join(unproven)
+        )
 
     return failures
+
+
+def unproven_pragma_removals(base: str = "master") -> list[str]:
+    """Owners this merge un-pragmas without an ``accepted`` attempt on record.
+
+    ``check_decomp_provenance.py`` only supports ``--staged``, and after the
+    merge commit there is no staged diff -- calling it here made argparse
+    ``parser.error`` out with exit 2, so every merge reported a provenance
+    failure and would have parked forever. The meaningful question for a merge
+    is the same one the hook asks, scoped to the range it actually brought in.
+    """
+    diff = git("diff", f"{base}@{{1}}...HEAD", check=False)
+    if not diff:
+        return []
+    dropped = provenance.removed_pragma_functions(diff)
+    if not dropped:
+        return []
+    return sorted(set(dropped) - provenance.accepted_functions())
 
 
 def log_result(entries: list[dict[str, object]]) -> None:

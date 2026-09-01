@@ -23,7 +23,23 @@ SRC=$(cd "$(dirname "$0")/.." && pwd)
 NAME=$(basename "$SRC")
 
 # Gitignored, but required for a build to run at all.
-UNTRACKED_DEPS="disasm/baseroms disasm/tools/m2c disasm/tools/decomp-permuter disasm/tools/decomp-venv disasm/tools/vtxdis"
+# disasm/.venv is the Makefile's VENV: `VENV ?= .venv` resolves against make's
+# cwd, and the build runs `make -C disasm`, so the repo-root .venv is NOT the
+# one that matters (both are copied; other tooling uses the root one).
+#
+# Without it a clone can still LINK a warm disasm/build and pass COMPARE=1 --
+# which is how five clones were "verified" while none could compile. The first
+# source change in any of them died on ".venv/bin/python3: No such file".
+# Verify a clone with a forced compile, never a bare gate.
+#
+# disasm/asm is the big one (95MB): only 346 of its files are tracked, and the
+# split asm/us/nonmatchings/*.s that every GLOBAL_ASM pragma #includes are
+# splat-generated and gitignored. A clone without them compiles nothing --
+# "Cannot open file GLOBAL_ASM:asm/us/nonmatchings/.../func_*.s for #include".
+# disasm/assets and disasm/lib are the same story as disasm/asm: splat-extracted
+# binaries and the vendored ultralib, both gitignored and both required to
+# compile. disasm/probes is deliberately NOT copied -- it is scratch.
+UNTRACKED_DEPS=".venv disasm/.venv disasm/asm disasm/assets disasm/lib disasm/baseroms disasm/tools/m2c disasm/tools/decomp-permuter disasm/tools/decomp-venv disasm/tools/vtxdis"
 
 echo "source:  $SRC"
 echo "parent:  $PARENT"
@@ -79,5 +95,5 @@ while [ "$i" -le "$COUNT" ]; do
 done
 
 echo
-echo "Verify one before assigning work:"
-echo "  cd $PARENT/gs-fleet-1 && make -C disasm COMPARE=1"
+echo "Verify one before assigning work -- force a real COMPILE, not just a link:"
+echo "  cd $PARENT/gs-fleet-1 && touch disasm/src/1A360.c && make -C disasm COMPARE=1"
