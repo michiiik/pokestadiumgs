@@ -2887,7 +2887,7 @@ extern void func_84111248();
 extern void func_841125A4(s32);
 extern void func_84113560(s32);
 extern void func_8411FEE8(s32);
-void func_8411D0A0(s32 arg0) {
+void BattleAnim_Dispatch_232(s32 arg0) {
     func_841125A4(D_8419120C);
     func_841112C8();
     *(s16 *)((u8 *)arg0 + 0x7E8) = 0;

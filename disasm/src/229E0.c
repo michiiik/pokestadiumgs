@@ -4455,7 +4455,7 @@ extern s16 D_8012651E;
 extern s16 D_80126518;
 extern s32 D_80126520;
 extern void *func_80003240();
-void func_8003FA00(void)
+void geo_layout_cmd_branch_and_link(void)
 {
   s32 p = D_80126520;
   s32 i = D_8012651A;
@@ -4472,7 +4472,7 @@ void func_8003FA00(void)
 #endif
 
 #ifdef VERSION_US
-void func_8003FA94(void) {
+void geo_layout_cmd_2A(void) {
     s32 new_var;
     s32 p = D_80126520;
     s32 i = D_8012651A;
@@ -4509,7 +4509,7 @@ void geo_layout_cmd_jump(void) {
 extern s16 D_8012651A;
 extern s32 D_80126458[];
 extern void * func_80003240();
-void func_8003FC34(void)
+void geo_layout_cmd_27(void)
 {
     s32 new_var;
     s32 i = D_8012651A;
@@ -5204,7 +5204,7 @@ extern S1_MemoryBlock *MainPool_AllocState(s32 arg0, s32 arg1);
 extern s32 main_pool_get_available(void);
 extern void MainPool_FinalizeAllocation(S1_MemoryBlock *arg0);
 extern s32 D_80126F24;
-S1_arg1_func_80019420 *func_80042A70(s32 arg0) {
+S1_arg1_func_80019420 *BattleAnim_LoadResourceTable(s32 arg0) {
     s32 sp24;
     S1_arg1_func_80019420 *sp20;
     S1_MemoryBlock *sp1C;
