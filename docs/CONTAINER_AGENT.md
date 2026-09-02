@@ -127,6 +127,14 @@ Examples:
     AGENT=openai_compat OPENAI_API_KEY=local-key OPENAI_BASE_URL=http://my-host:8000/v1 \
     GENERATOR_MODEL=my-local-model container/run.sh disasm/src/4AC10.c /abs/out
 
+
+> **Kimi login is mounted live, not copied.** `container/run.sh` bind-mounts
+> the host's `~/.kimi-code` read-write. Kimi Code rotates its refresh token on
+> every refresh, so a refresh inside a *copy* invalidates the host login
+> ("The provided authorization grant is invalid", credential cleared; fix with
+> `kimi login`). Do not use `kimi` on the host while a container run is active,
+> and never run two Kimi containers at once.
+
 ## 4. Supplying your own `--generator-cmd`
 
 `--generator-cmd` is a shell command template, substituted by

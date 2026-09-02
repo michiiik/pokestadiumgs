@@ -70,16 +70,13 @@ fi
 # directory (which also holds session history, logs, etc.).
 kimi_home_src="${KIMI_CODE_HOME:-$HOME/.kimi-code}"
 if [ "${AGENT:-claude}" = "kimi" ] && [ -z "${KIMI_MODEL_API_KEY:-}" ] && [ -f "$kimi_home_src/credentials/kimi-code.json" ]; then
-    kimi_home="$(mktemp -d)"
-    [ -f "$kimi_home_src/config.toml" ] && cp "$kimi_home_src/config.toml" "$kimi_home/config.toml"
-    cp -R "$kimi_home_src/credentials" "$kimi_home/credentials"
-    [ -d "$kimi_home_src/oauth" ] && cp -R "$kimi_home_src/oauth" "$kimi_home/oauth"
-    [ -f "$kimi_home_src/region" ] && cp "$kimi_home_src/region" "$kimi_home/region"
-    [ -f "$kimi_home_src/device_id" ] && cp "$kimi_home_src/device_id" "$kimi_home/device_id"
-    # Mounted at the container's default ~/.kimi-code (root's $HOME) -- do
-    # not also forward a host-side KIMI_CODE_HOME override below, which
-    # would point the in-container CLI away from this mount.
-    extra_args+=(-v "$kimi_home:/root/.kimi-code")
+    # Mount the REAL login directory read-write, not a copy. Kimi Code
+    # rotates its refresh token on every refresh; a refresh inside a copied
+    # directory invalidates the host's token and the host's next refresh
+    # fails with "authorization grant is invalid" and clears the credential.
+    # Consequence: do not use `kimi` on the host while a container run is
+    # active, and never run two kimi containers at once.
+    extra_args+=(-v "$kimi_home_src:/root/.kimi-code")
 elif [ -n "${KIMI_CODE_HOME:-}" ]; then
     extra_args+=(-e KIMI_CODE_HOME="$KIMI_CODE_HOME")
 fi
