@@ -59,9 +59,24 @@ type RunRecord struct {
 	EndedAt       time.Time `json:"ended_at,omitempty"`
 	StoppedReason string    `json:"stopped_reason,omitempty"`
 	MatchedOwners []string  `json:"matched_owners,omitempty"`
-	Branch        string    `json:"branch,omitempty"`
-	PRURL         string    `json:"pr_url,omitempty"`
-	Note          string    `json:"note,omitempty"`
+	// NeedsManualCommit holds, per owner, the tail of `git commit --only`'s
+	// failure output for an owner whose host re-gate accepted the candidate
+	// but whose commit then failed (merge-report.json's
+	// {"status":"accepted","committed":false,"commit_error":...} form --
+	// see tools/container_merge.py's write_merge_report). Such an owner is
+	// neither counted in MatchedOwners nor requeued: the candidate is
+	// already installed in the merge repo's working tree, so requeueing
+	// would re-probe a duplicate. An operator must commit it by hand.
+	NeedsManualCommit map[string]string `json:"needs_manual_commit,omitempty"`
+	Branch            string            `json:"branch,omitempty"`
+	PRURL             string            `json:"pr_url,omitempty"`
+	Note              string            `json:"note,omitempty"`
+	// WaitReason explains why a queued/requeued run is still waiting as of
+	// the last control-loop pass: "cooldown" (its agent is cooling down) or
+	// "concurrency" (global --max-concurrent or the agent's own
+	// --agent-concurrency cap is full). Empty once launched, and empty
+	// until the first pass that considered and deferred this run.
+	WaitReason string `json:"wait_reason,omitempty"`
 }
 
 // State is the full persisted control-loop state.

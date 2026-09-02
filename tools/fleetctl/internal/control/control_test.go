@@ -275,6 +275,12 @@ func TestCooldownBlocksLaunch(t *testing.T) {
 	if len(loop.State.Queue) != 1 || loop.State.Queue[0] != "a" {
 		t.Fatalf("queue = %v, want [a]", loop.State.Queue)
 	}
+	if loop.State.Runs["a"].WaitReason != "cooldown" {
+		t.Fatalf("a wait_reason = %q, want %q", loop.State.Runs["a"].WaitReason, "cooldown")
+	}
+	if loop.State.Runs["b"].WaitReason != "" {
+		t.Fatalf("b wait_reason = %q, want empty once launched", loop.State.Runs["b"].WaitReason)
+	}
 }
 
 func TestAgentConcurrencyCap(t *testing.T) {
@@ -298,6 +304,37 @@ func TestAgentConcurrencyCap(t *testing.T) {
 	}
 	if loop.State.Runs["b"].Status != fleetstate.StatusQueued {
 		t.Fatalf("b should remain queued: codex is capped at 1 concurrent, got %s", loop.State.Runs["b"].Status)
+	}
+	if loop.State.Runs["b"].WaitReason != "concurrency" {
+		t.Fatalf("b wait_reason = %q, want %q (per-agent concurrency cap, not a cooldown)", loop.State.Runs["b"].WaitReason, "concurrency")
+	}
+}
+
+// TestGlobalConcurrencyWaitReason checks that a run left queued because the
+// global --max-concurrent cap (not a per-agent cap or a cooldown) is full
+// is recorded with wait_reason "concurrency" too, per
+// docs/FLEET_CONTROLLER.md sec 6's "distinguish cooldown vs concurrency"
+// design note.
+func TestGlobalConcurrencyWaitReason(t *testing.T) {
+	fake := &runner.Fake{
+		InspectResults: map[string][]runner.InspectResult{"cid": {{Found: true, Running: true}}},
+	}
+	loop, outDir := newTestLoop(t, fake)
+	loop.MaxConcurrent = 1
+	loop.State.Runs["already-running"] = runningRec("already-running", "cid", outDir, "codex")
+	loop.State.Runs["b"] = &fleetstate.RunRecord{
+		Spec: fleetstate.RunSpec{ID: "b", File: "disasm/src/b.c", Owners: []string{"f2"}, Agent: "kimi"}, Status: fleetstate.StatusQueued,
+	}
+	loop.State.Queue = []string{"b"}
+
+	if _, err := loop.RunOnce(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if loop.State.Runs["b"].Status != fleetstate.StatusQueued {
+		t.Fatalf("b should remain queued: global max-concurrent=1 is full, got %s", loop.State.Runs["b"].Status)
+	}
+	if loop.State.Runs["b"].WaitReason != "concurrency" {
+		t.Fatalf("b wait_reason = %q, want %q", loop.State.Runs["b"].WaitReason, "concurrency")
 	}
 }
 
@@ -403,6 +440,178 @@ func TestMergeNoAcceptedOwnersSkipsPR(t *testing.T) {
 	}
 }
 
+// --- merge-report.json owner-entry shapes ------------------------------------
+//
+// tools/container_merge.py's write_merge_report emits, per owner, either a
+// bare status string, or -- only for an owner whose host re-gate accepted
+// but whose `git commit --only` then failed -- an object
+// {"status":"accepted","committed":false,"commit_error":"<tail>"}. These
+// tests exercise both shapes, plus the (defensive) object-with-committed:true
+// shape, through loadMergeReport/matchedOwners/needsManualCommitOwners as
+// exercised by runMerge.
+
+func TestMergeReportPlainStringAccepted(t *testing.T) {
+	fake := &runner.Fake{InspectResults: map[string][]runner.InspectResult{"cid": {{Found: true, Running: false}}}}
+	loop, dir := newTestLoop(t, fake)
+	outDir := filepath.Join(dir, "out")
+	mustWriteFile(t, filepath.Join(outDir, "summary.json"), `{"stopped_reason":"completed"}`)
+	fake.MergeFunc = func(spec runner.MergeSpec) (runner.ProcessResult, error) {
+		mustWriteFile(t, filepath.Join(spec.OutDir, "merge-report.json"), `{"owners":{"func_1":"accepted"}}`)
+		return runner.ProcessResult{}, nil
+	}
+	rec := &fleetstate.RunRecord{
+		Spec:        fleetstate.RunSpec{ID: "x-p0", File: "disasm/src/x.c", Owners: []string{"func_1"}, Agent: "codex"},
+		Status:      fleetstate.StatusRunning,
+		ContainerID: "cid",
+		OutDir:      outDir,
+	}
+	loop.State.Runs["x-p0"] = rec
+
+	if _, err := loop.RunOnce(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if len(rec.MatchedOwners) != 1 || rec.MatchedOwners[0] != "func_1" {
+		t.Fatalf("matched = %v, want [func_1]: a bare \"accepted\" string must count as matched", rec.MatchedOwners)
+	}
+	if len(rec.NeedsManualCommit) != 0 {
+		t.Fatalf("needs_manual_commit = %v, want empty for a plain string entry", rec.NeedsManualCommit)
+	}
+	if _, requeued := loop.State.Runs["x-p0-r1"]; requeued {
+		t.Fatal("a fully matched owner must not be requeued")
+	}
+}
+
+func TestMergeReportObjectCommittedTrueCountsMatched(t *testing.T) {
+	fake := &runner.Fake{InspectResults: map[string][]runner.InspectResult{"cid": {{Found: true, Running: false}}}}
+	loop, dir := newTestLoop(t, fake)
+	outDir := filepath.Join(dir, "out")
+	mustWriteFile(t, filepath.Join(outDir, "summary.json"), `{"stopped_reason":"completed"}`)
+	fake.MergeFunc = func(spec runner.MergeSpec) (runner.ProcessResult, error) {
+		mustWriteFile(t, filepath.Join(spec.OutDir, "merge-report.json"),
+			`{"owners":{"func_1":{"status":"accepted","committed":true}}}`)
+		return runner.ProcessResult{}, nil
+	}
+	rec := &fleetstate.RunRecord{
+		Spec:        fleetstate.RunSpec{ID: "x-p0", File: "disasm/src/x.c", Owners: []string{"func_1"}, Agent: "codex"},
+		Status:      fleetstate.StatusRunning,
+		ContainerID: "cid",
+		OutDir:      outDir,
+	}
+	loop.State.Runs["x-p0"] = rec
+
+	if _, err := loop.RunOnce(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if len(rec.MatchedOwners) != 1 || rec.MatchedOwners[0] != "func_1" {
+		t.Fatalf("matched = %v, want [func_1]: an object entry with committed:true must still count as matched", rec.MatchedOwners)
+	}
+	if len(rec.NeedsManualCommit) != 0 {
+		t.Fatalf("needs_manual_commit = %v, want empty", rec.NeedsManualCommit)
+	}
+}
+
+func TestMergeReportObjectCommittedFalseNeedsManualCommit(t *testing.T) {
+	fake := &runner.Fake{InspectResults: map[string][]runner.InspectResult{"cid": {{Found: true, Running: false}}}}
+	loop, dir := newTestLoop(t, fake)
+	outDir := filepath.Join(dir, "out")
+	mustWriteFile(t, filepath.Join(outDir, "summary.json"), `{"stopped_reason":"completed"}`)
+	fake.MergeFunc = func(spec runner.MergeSpec) (runner.ProcessResult, error) {
+		mustWriteFile(t, filepath.Join(spec.OutDir, "merge-report.json"),
+			`{"owners":{"func_1":{"status":"accepted","committed":false,"commit_error":"error: did not match any file(s) known to git\nfatal: pathspec"}}}`)
+		return runner.ProcessResult{ExitCode: 1}, nil
+	}
+	rec := &fleetstate.RunRecord{
+		Spec:        fleetstate.RunSpec{ID: "x-p0", File: "disasm/src/x.c", Owners: []string{"func_1"}, Agent: "codex"},
+		Status:      fleetstate.StatusRunning,
+		ContainerID: "cid",
+		OutDir:      outDir,
+	}
+	loop.State.Runs["x-p0"] = rec
+
+	if _, err := loop.RunOnce(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+
+	// Not matched.
+	if len(rec.MatchedOwners) != 0 {
+		t.Fatalf("matched = %v, want empty: accepted-but-uncommitted must not count as matched", rec.MatchedOwners)
+	}
+	// Not requeued -- the candidate is already installed in the merge repo's
+	// working tree, and a requeue would re-probe a duplicate.
+	if len(loop.State.Queue) != 0 {
+		t.Fatalf("queue = %v, want empty: an accepted-but-uncommitted owner must not be requeued", loop.State.Queue)
+	}
+	for id := range loop.State.Runs {
+		if id != "x-p0" {
+			t.Fatalf("unexpected extra run %s: accepted-but-uncommitted owner must not spawn a requeue", id)
+		}
+	}
+	// Recorded for a manual commit.
+	tail, ok := rec.NeedsManualCommit["func_1"]
+	if !ok {
+		t.Fatalf("needs_manual_commit = %v, want an entry for func_1", rec.NeedsManualCommit)
+	}
+	if !strings.Contains(tail, "did not match any file") {
+		t.Fatalf("needs_manual_commit[func_1] = %q, want the commit_error tail preserved", tail)
+	}
+	// No PR opened: zero owners actually matched this run.
+	if findCall(fake, "GhPRCreate") != nil {
+		t.Fatal("must not open a PR: no owner in this run was fully matched")
+	}
+}
+
+// TestMergeReportMixedMatchedAndManualCommitMentionsBothInPRBody exercises a
+// run where one owner matched (triggering a PR for the *other* owners of
+// this run) and a second owner needs a manual commit -- the manual-commit
+// owner must be mentioned in that PR's body, not silently dropped, and must
+// still not be requeued.
+func TestMergeReportMixedMatchedAndManualCommitMentionsBothInPRBody(t *testing.T) {
+	fake := &runner.Fake{
+		InspectResults: map[string][]runner.InspectResult{"cid": {{Found: true, Running: false}}},
+		GhPRURL:        "https://github.com/example/pokemonStadiumGSRecomp/pull/2",
+	}
+	loop, dir := newTestLoop(t, fake)
+	outDir := filepath.Join(dir, "out")
+	mustWriteFile(t, filepath.Join(outDir, "summary.json"), `{"stopped_reason":"completed"}`)
+	fake.MergeFunc = func(spec runner.MergeSpec) (runner.ProcessResult, error) {
+		mustWriteFile(t, filepath.Join(spec.OutDir, "merge-report.json"), `{"owners":{
+			"func_1":"accepted",
+			"func_2":{"status":"accepted","committed":false,"commit_error":"fatal: commit failed"}
+		}}`)
+		return runner.ProcessResult{ExitCode: 1}, nil
+	}
+	rec := &fleetstate.RunRecord{
+		Spec:        fleetstate.RunSpec{ID: "x-p0", File: "disasm/src/x.c", Owners: []string{"func_1", "func_2"}, Agent: "codex"},
+		Status:      fleetstate.StatusRunning,
+		ContainerID: "cid",
+		OutDir:      outDir,
+	}
+	loop.State.Runs["x-p0"] = rec
+
+	if _, err := loop.RunOnce(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if len(rec.MatchedOwners) != 1 || rec.MatchedOwners[0] != "func_1" {
+		t.Fatalf("matched = %v, want [func_1]", rec.MatchedOwners)
+	}
+	if _, ok := rec.NeedsManualCommit["func_2"]; !ok {
+		t.Fatalf("needs_manual_commit = %v, want an entry for func_2", rec.NeedsManualCommit)
+	}
+	prCall := findCall(fake, "GhPRCreate")
+	if prCall == nil {
+		t.Fatal("GhPRCreate not called: func_1 matched, a PR should still open")
+	}
+	if !strings.Contains(prCall.PR.Body, "func_2") || !strings.Contains(prCall.PR.Body, "needs manual commit") {
+		t.Fatalf("PR body = %s, want func_2's needs-manual-commit status mentioned", prCall.PR.Body)
+	}
+	// func_2 must not be requeued either.
+	for id := range loop.State.Runs {
+		if id != "x-p0" {
+			t.Fatalf("unexpected extra run %s: func_2 needs a manual commit, not a requeue", id)
+		}
+	}
+}
+
 // onlyOtherRunID returns the single run id in runs that is not exclude,
 // failing the test if there is not exactly one.
 func onlyOtherRunID(t *testing.T, runs map[string]*fleetstate.RunRecord, exclude string) string {
@@ -466,6 +675,70 @@ func TestRunPersistsStateAtomically(t *testing.T) {
 	}
 	if reloaded.Runs["a"].Status != fleetstate.StatusRunning {
 		t.Fatalf("persisted status = %s, want running", reloaded.Runs["a"].Status)
+	}
+}
+
+// --- MergeRepo (docs/FLEET_CONTROLLER.md sec 6, "merge-repo == launch-repo") -
+
+// TestMergeRepoSeparatesLaunchFromMergeCheckout checks that, when Loop.MergeRepo
+// is set to a different checkout than Loop.Repo, every merge/branch/PR call
+// (git checkout, git checkout -b, merge --repo, import-stats --repo, git
+// push, gh pr create) targets MergeRepo, while a container launch (which
+// happens in a separate test path, but shares the same ExecRunner.RepoRoot
+// concept) is unaffected -- Loop.Repo is never passed to those calls.
+func TestMergeRepoSeparatesLaunchFromMergeCheckout(t *testing.T) {
+	fake := &runner.Fake{
+		InspectResults: map[string][]runner.InspectResult{"cid": {{Found: true, Running: false}}},
+		GhPRURL:        "https://github.com/example/pokemonStadiumGSRecomp/pull/3",
+	}
+	loop, dir := newTestLoop(t, fake)
+	loop.MergeRepo = "/merge-worktree"
+	outDir := filepath.Join(dir, "out")
+	mustWriteFile(t, filepath.Join(outDir, "summary.json"), `{"stopped_reason":"completed"}`)
+	fake.MergeFunc = func(spec runner.MergeSpec) (runner.ProcessResult, error) {
+		if spec.RepoRoot != "/merge-worktree" {
+			t.Fatalf("Merge repo root = %s, want /merge-worktree", spec.RepoRoot)
+		}
+		mustWriteFile(t, filepath.Join(spec.OutDir, "merge-report.json"), `{"owners":{"func_1":"accepted"}}`)
+		return runner.ProcessResult{}, nil
+	}
+	rec := runningRec("x-p0", "cid", outDir, "codex")
+	loop.State.Runs["x-p0"] = rec
+
+	if _, err := loop.RunOnce(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+
+	for _, method := range []string{"GitCheckout", "GitCheckoutNewBranch", "GitPush"} {
+		call := findCall(fake, method)
+		if call == nil {
+			t.Fatalf("%s not called", method)
+		}
+		if call.Strings[0] != "/merge-worktree" {
+			t.Fatalf("%s repo root = %s, want /merge-worktree (Loop.Repo=/repo must not leak in)", method, call.Strings[0])
+		}
+	}
+	importCall := findCall(fake, "ImportStats")
+	if importCall == nil || importCall.Strings[1] != "/merge-worktree" {
+		t.Fatalf("ImportStats repo root = %+v, want /merge-worktree", importCall)
+	}
+	prCall := findCall(fake, "GhPRCreate")
+	if prCall == nil || prCall.PR.RepoRoot != "/merge-worktree" {
+		t.Fatalf("GhPRCreate repo root = %+v, want /merge-worktree", prCall)
+	}
+}
+
+// TestMergeRepoDefaultsToRepo checks that an unset Loop.MergeRepo (the
+// common case, a single shared checkout) falls back to Loop.Repo -- the
+// pre-existing tests in this file all rely on exactly this default.
+func TestMergeRepoDefaultsToRepo(t *testing.T) {
+	loop := &Loop{Repo: "/repo"}
+	if got := loop.mergeRepo(); got != "/repo" {
+		t.Fatalf("mergeRepo() = %s, want /repo", got)
+	}
+	loop.MergeRepo = "/other"
+	if got := loop.mergeRepo(); got != "/other" {
+		t.Fatalf("mergeRepo() = %s, want /other", got)
 	}
 }
 

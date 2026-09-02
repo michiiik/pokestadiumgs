@@ -35,10 +35,16 @@ type Loop struct {
 	// RunsDir is the parent of every run's own --out directory
 	// (<RunsDir>/<run-id>).
 	RunsDir string
-	// Repo is the checkout container/run.sh, tools/pragma_targets.py, and
-	// tools/container_merge.py are invoked from, and the checkout branches,
-	// commits, and PRs are made against.
+	// Repo is the checkout container/run.sh and tools/pragma_targets.py are
+	// invoked from (a container's launch cwd).
 	Repo string
+	// MergeRepo is the checkout the merge/branch/PR step -- git checkout,
+	// git checkout -b, tools/container_merge.py merge/import-stats, git
+	// push, gh pr create -- operates against. Empty means "same as Repo"
+	// (see mergeRepo()); a caller only needs to set it when the merge step
+	// should run against a different checkout, e.g. a dedicated merge
+	// worktree (docs/FLEET_CONTROLLER.md sec 6, "Merge-repo == launch-repo").
+	MergeRepo string
 	// IntegrationBranch is the branch a run's throwaway container/<id>
 	// branch is created from and, on a matched owner, PR'd back into.
 	IntegrationBranch string
@@ -78,6 +84,15 @@ func (l *Loop) maxConcurrent() int {
 	return 4
 }
 
+// mergeRepo is the checkout the merge/branch/PR step runs against: MergeRepo
+// if the caller set one, else Repo.
+func (l *Loop) mergeRepo() string {
+	if l.MergeRepo != "" {
+		return l.MergeRepo
+	}
+	return l.Repo
+}
+
 func (l *Loop) pollInterval() time.Duration {
 	if l.PollInterval > 0 {
 		return l.PollInterval
@@ -103,6 +118,9 @@ func (l *Loop) cooldownFor(agent string) time.Duration {
 func (l *Loop) LoadPlan(p *planpkg.Plan) error {
 	if l.State.Repo == "" {
 		l.State.Repo = p.Repo
+	}
+	if l.State.MergeRepo == "" {
+		l.State.MergeRepo = l.mergeRepo()
 	}
 	if l.AgentConcurrency == nil && len(p.AgentConcurrency) > 0 {
 		l.AgentConcurrency = p.AgentConcurrency
@@ -253,33 +271,108 @@ func branchName(spec fleetstate.RunSpec) string {
 	return "container/" + spec.ID
 }
 
+// ownerResult is one entry of merge-report.json's "owners" map, as written
+// by tools/container_merge.py's write_merge_report: either a bare status
+// string ("accepted" | "rejected" | "error" | "missing_source" | ...), or,
+// when a host re-gate accepted but `git commit --only` then failed, an
+// object {"status": "accepted", "committed": false, "commit_error": "<tail>"}.
+// IsObject distinguishes the two forms -- a bare string never sets
+// Committed/CommitError, and (per write_merge_report) is only ever emitted
+// for a status that is NOT "accepted and committed==false", so a plain
+// string result is trusted as fully matched without checking Committed.
+type ownerResult struct {
+	Status      string
+	Committed   bool
+	CommitError string
+	IsObject    bool
+}
+
+func (o *ownerResult) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err == nil {
+		*o = ownerResult{Status: s}
+		return nil
+	}
+	var obj struct {
+		Status      string `json:"status"`
+		Committed   bool   `json:"committed"`
+		CommitError string `json:"commit_error"`
+	}
+	if err := json.Unmarshal(data, &obj); err != nil {
+		return err
+	}
+	*o = ownerResult{
+		Status: obj.Status, Committed: obj.Committed, CommitError: obj.CommitError, IsObject: true,
+	}
+	return nil
+}
+
+// matched reports whether this owner's candidate is fully installed: the
+// host re-gate accepted it AND (it is a plain "accepted" string -- commit
+// succeeded or was never attempted, e.g. --commit not passed -- or the
+// object form's own committed flag is true).
+func (o ownerResult) matched() bool {
+	return o.Status == "accepted" && (!o.IsObject || o.Committed)
+}
+
+// needsManualCommit reports whether the host re-gate accepted this owner
+// but its own `git commit --only` failed -- the candidate is installed in
+// the merge repo's working tree but not yet committed.
+func (o ownerResult) needsManualCommit() bool {
+	return o.Status == "accepted" && o.IsObject && !o.Committed
+}
+
+// displayStatus is what buildPRBody's table shows for one owner.
+func (o ownerResult) displayStatus() string {
+	if o.needsManualCommit() {
+		return "accepted, NOT committed (needs manual commit; see fleetctl status)"
+	}
+	return o.Status
+}
+
 type mergeReportDoc struct {
-	CCCheckBypassed bool              `json:"cc_check_bypassed"`
-	FreshHistory    bool              `json:"fresh_history"`
-	Owners          map[string]string `json:"owners"`
+	CCCheckBypassed bool                   `json:"cc_check_bypassed"`
+	FreshHistory    bool                   `json:"fresh_history"`
+	Owners          map[string]ownerResult `json:"owners"`
 }
 
 func loadMergeReport(outDir string) mergeReportDoc {
 	data, err := os.ReadFile(filepath.Join(outDir, "merge-report.json"))
 	if err != nil {
-		return mergeReportDoc{Owners: map[string]string{}}
+		return mergeReportDoc{Owners: map[string]ownerResult{}}
 	}
 	var doc mergeReportDoc
 	if err := json.Unmarshal(data, &doc); err != nil || doc.Owners == nil {
-		return mergeReportDoc{Owners: map[string]string{}}
+		return mergeReportDoc{Owners: map[string]ownerResult{}}
 	}
 	return doc
 }
 
-func ownersWithStatus(report map[string]string, status string) []string {
+// matchedOwners returns every owner whose candidate is fully installed
+// (accepted and committed), sorted.
+func matchedOwners(report map[string]ownerResult) []string {
 	var out []string
-	for owner, s := range report {
-		if s == status {
+	for owner, r := range report {
+		if r.matched() {
 			out = append(out, owner)
 		}
 	}
 	sort.Strings(out)
 	return out
+}
+
+// needsManualCommitOwners returns, sorted, every owner the host re-gate
+// accepted but whose commit failed, alongside its commit-error tail.
+func needsManualCommitOwners(report map[string]ownerResult) (owners []string, tails map[string]string) {
+	tails = map[string]string{}
+	for owner, r := range report {
+		if r.needsManualCommit() {
+			owners = append(owners, owner)
+			tails[owner] = r.CommitError
+		}
+	}
+	sort.Strings(owners)
+	return owners, tails
 }
 
 func subtract(all, remove []string) []string {
@@ -307,9 +400,10 @@ func buildPRBody(rec *fleetstate.RunRecord, report mergeReportDoc) string {
 	owners := append([]string(nil), rec.Spec.Owners...)
 	sort.Strings(owners)
 	for _, o := range owners {
-		status := report.Owners[o]
-		if status == "" {
-			status = "not attempted"
+		result, ok := report.Owners[o]
+		status := "not attempted"
+		if ok {
+			status = result.displayStatus()
 		}
 		fmt.Fprintf(&b, "| %s | %s |\n", o, status)
 	}
@@ -329,36 +423,43 @@ func effortSuffix(effort string) string {
 // (see docs/FLEET_CONTROLLER.md).
 func (l *Loop) runMerge(ctx context.Context, rec *fleetstate.RunRecord) error {
 	branch := branchName(rec.Spec)
+	mergeRepo := l.mergeRepo()
 
-	if err := l.Runner.GitCheckout(ctx, l.Repo, l.IntegrationBranch); err != nil {
+	if err := l.Runner.GitCheckout(ctx, mergeRepo, l.IntegrationBranch); err != nil {
 		return fmt.Errorf("checkout %s before branching: %w", l.IntegrationBranch, err)
 	}
-	if err := l.Runner.GitCheckoutNewBranch(ctx, l.Repo, branch, l.IntegrationBranch); err != nil {
+	if err := l.Runner.GitCheckoutNewBranch(ctx, mergeRepo, branch, l.IntegrationBranch); err != nil {
 		return fmt.Errorf("create branch %s: %w", branch, err)
 	}
 	rec.Branch = branch
 
 	// Commits, if any, land on `branch` because it is already checked out.
 	if _, err := l.Runner.Merge(ctx, runner.MergeSpec{
-		OutDir: rec.OutDir, RepoRoot: l.Repo, FreshHistory: true, Commit: true,
+		OutDir: rec.OutDir, RepoRoot: mergeRepo, FreshHistory: true, Commit: true,
 	}); err != nil {
 		l.logf("run %s: merge step error: %v", rec.Spec.ID, err)
 	}
-	if _, err := l.Runner.ImportStats(ctx, rec.OutDir, l.Repo); err != nil {
+	if _, err := l.Runner.ImportStats(ctx, rec.OutDir, mergeRepo); err != nil {
 		l.logf("run %s: import-stats error: %v", rec.Spec.ID, err)
 	}
 
 	report := loadMergeReport(rec.OutDir)
-	accepted := ownersWithStatus(report.Owners, "accepted")
+	accepted := matchedOwners(report.Owners)
 	rec.MatchedOwners = accepted
+	needsCommit, commitTails := needsManualCommitOwners(report.Owners)
+	if len(needsCommit) > 0 {
+		rec.NeedsManualCommit = commitTails
+		l.logf("run %s: %d owner(s) accepted but NOT committed (git commit --only failed); see fleetctl status and %s/merge-results/",
+			rec.Spec.ID, len(needsCommit), rec.OutDir)
+	}
 
 	if len(accepted) > 0 {
-		if err := l.Runner.GitPush(ctx, l.Repo, branch); err != nil {
+		if err := l.Runner.GitPush(ctx, mergeRepo, branch); err != nil {
 			l.logf("run %s: git push %s failed: %v", rec.Spec.ID, branch, err)
 		} else {
 			title := fmt.Sprintf("Container match: %s", strings.Join(accepted, ", "))
 			url, err := l.Runner.GhPRCreate(ctx, runner.PRSpec{
-				RepoRoot: l.Repo, Base: l.IntegrationBranch, Title: title, Body: buildPRBody(rec, report),
+				RepoRoot: mergeRepo, Base: l.IntegrationBranch, Title: title, Body: buildPRBody(rec, report),
 			})
 			if err != nil {
 				l.logf("run %s: gh pr create failed: %v", rec.Spec.ID, err)
@@ -371,13 +472,18 @@ func (l *Loop) runMerge(ctx context.Context, rec *fleetstate.RunRecord) error {
 		l.logf("run %s: no owners matched this run", rec.Spec.ID)
 	}
 
-	if err := l.Runner.GitCheckout(ctx, l.Repo, l.IntegrationBranch); err != nil {
+	if err := l.Runner.GitCheckout(ctx, mergeRepo, l.IntegrationBranch); err != nil {
 		l.logf("run %s: checkout back to %s failed: %v", rec.Spec.ID, l.IntegrationBranch, err)
 	}
 
 	rec.Status = fleetstate.StatusDone
 
-	unmatched := subtract(rec.Spec.Owners, accepted)
+	// An owner needing a manual commit already has its candidate installed
+	// in the merge repo's working tree -- requeueing it would re-probe a
+	// duplicate against a tree that (once committed by hand) will already
+	// contain it. Only owners neither matched nor awaiting a manual commit
+	// go back on the queue for a fresh attempt.
+	unmatched := subtract(subtract(rec.Spec.Owners, accepted), needsCommit)
 	if len(unmatched) > 0 {
 		newID := l.State.NextRequeueID(rec.Spec.ID)
 		newSpec := fleetstate.RunSpec{
@@ -418,10 +524,13 @@ func (l *Loop) launchEligible(ctx context.Context) error {
 		}
 		switch {
 		case totalRunning >= max:
+			rec.WaitReason = "concurrency"
 			remaining = append(remaining, id)
 		case l.State.OnCooldown(rec.Spec.Agent, now):
+			rec.WaitReason = "cooldown"
 			remaining = append(remaining, id)
 		case l.AgentConcurrency[rec.Spec.Agent] > 0 && byAgent[rec.Spec.Agent] >= l.AgentConcurrency[rec.Spec.Agent]:
+			rec.WaitReason = "concurrency"
 			remaining = append(remaining, id)
 		default:
 			if err := l.launch(ctx, rec); err != nil {
@@ -467,6 +576,7 @@ func (l *Loop) launch(ctx context.Context, rec *fleetstate.RunRecord) error {
 	rec.StartedAt = l.now()
 	rec.EndedAt = time.Time{}
 	rec.StoppedReason = ""
+	rec.WaitReason = ""
 	l.logf("run %s: launched container %s (agent=%s:%s owners=%d resume=%v seeds=%d)",
 		rec.Spec.ID, id, rec.Spec.Agent, rec.Spec.Model, len(rec.Spec.Owners), spec.Resume, len(seedFrom))
 	return nil

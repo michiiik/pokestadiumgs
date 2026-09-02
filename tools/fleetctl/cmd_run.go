@@ -21,7 +21,8 @@ func runRunCmd(args []string) error {
 	planPath := fs.String("plan", "", "plan JSON from `fleetctl plan` (required)")
 	stateDir := fs.String("state-dir", "", "directory holding state.json (required)")
 	runsDir := fs.String("runs-dir", "", "directory each run's --out dir is created under (required)")
-	repo := fs.String("repo", "", "checkout to launch containers / merge / branch / PR against (required)")
+	repo := fs.String("repo", "", "checkout to launch containers from, and tools/pragma_targets.py runs against (required)")
+	mergeRepo := fs.String("merge-repo", "", "checkout the merge/branch/PR step (git checkout/branch/push, tools/container_merge.py, gh pr create) operates on (default: --repo)")
 	maxConcurrent := fs.Int("max-concurrent", -1, "max containers running at once (default: the plan's --slots, else 4)")
 	integrationBranch := fs.String("integration-branch", "master", "branch a run's throwaway branch is cut from and PR'd back into")
 	once := fs.Bool("once", false, "perform a single control-loop pass and exit, instead of looping until the queue drains")
@@ -54,6 +55,7 @@ func runRunCmd(args []string) error {
 		StatePath:         statePath,
 		RunsDir:           *runsDir,
 		Repo:              *repo,
+		MergeRepo:         *mergeRepo,
 		IntegrationBranch: *integrationBranch,
 		DefaultCooldown:   *defaultCooldown,
 		PollInterval:      *pollInterval,

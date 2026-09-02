@@ -62,7 +62,7 @@ never touches docker, git, or GitHub, so there is no `--dry-run` for it.
 ### `fleetctl run`
 
     fleetctl run --plan P --state-dir S --runs-dir D --repo R \
-        [--max-concurrent 4] [--integration-branch master] \
+        [--merge-repo M] [--max-concurrent 4] [--integration-branch master] \
         [--once] [--dry-run] [--default-cooldown 1h] [--poll-interval 30s]
 
 The control loop. Loads `--plan`'s queue into `<state-dir>/state.json`
@@ -78,6 +78,21 @@ The control loop. Loads `--plan`'s queue into `<state-dir>/state.json`
    on cooldown.
 4. **Persist.** `state.json` is rewritten atomically (temp file + rename)
    after every pass.
+
+`--merge-repo M` points the merge/branch/PR step -- `git checkout`,
+`git checkout -b`, `tools/container_merge.py merge`/`import-stats`,
+`git push`, `gh pr create` -- at a different checkout than `--repo`
+(`container/run.sh`'s cwd and `tools/pragma_targets.py`'s target). Defaults
+to `--repo` when omitted, the common case of one shared checkout; set it
+when the merge/branch/PR step should run against a dedicated merge worktree
+instead (see sec 2 for exactly which calls this affects).
+
+A run left in the queue after a pass records **why** in `state.json`'s
+`wait_reason` field, distinct from `stopped_reason`: `"cooldown"` (its
+agent is cooling down) or `"concurrency"` (the global `--max-concurrent` cap
+or that agent's own `--agent-concurrency` cap is full) -- `fleetctl status`
+shows it alongside the cooldowns table so an operator can tell "waiting for
+a slot" from "waiting out a cooldown" at a glance.
 
 `--once` performs a single pass and returns instead of looping until the
 queue drains -- used for the `--dry-run` smoke test (sec 5) and for driving
@@ -98,8 +113,11 @@ on the next pass, so a `--dry-run --once` run is safe to point at the real
     fleetctl status --state-dir S
 
 Prints one row per run (id, status, file, agent, owner count, matched-owner
-count, note/stopped-reason), a cooldowns table, and a
-`running=N queued=M (agent=n ...)` summary line.
+count, note/stopped-reason/wait-reason/needs-manual-commit owners), a
+`NEEDS MANUAL COMMIT` section (one line per owner still awaiting a manual
+`git commit --only`, with its run id, branch, out dir, and the first line
+of the recorded commit error -- see sec 2's "Reading the merge report"),
+a cooldowns table, and a `running=N queued=M (agent=n ...)` summary line.
 
 ### `fleetctl stop`
 
@@ -143,8 +161,9 @@ launched and recorded.
                                               v
                                             done
                                               |
-                (owners the merge left unmatched: fresh run, new run id,
-                 seeded from this out dir, appended to the queue)
+                (owners neither matched nor awaiting a manual commit:
+                 fresh run, new run id, seeded from this out dir,
+                 appended to the queue)
                                               v
                                     a *new* queued entry
 
@@ -164,25 +183,57 @@ single goroutine with no concurrent merge dispatch, so "one merge at a
 time" (required because the git index is shared -- `AGENTS.md` sec 1.3) is
 structural, not a separate lock. The merge step itself is:
 
-1. `git -C <repo> checkout <integration-branch>`
-2. `git -C <repo> checkout -b container/<run-id> <integration-branch>` --
+1. `git -C <merge-repo> checkout <integration-branch>`
+2. `git -C <merge-repo> checkout -b container/<run-id> <integration-branch>` --
    created *before* the merge commit so any commit `merge --commit` makes
    lands on this throwaway branch, not the integration branch.
-3. `python3 tools/container_merge.py merge <out> --repo <repo> --fresh-history --commit`
-4. `python3 tools/container_merge.py import-stats <out> --repo <repo>`
-5. Read `<out>/merge-report.json`'s `owners` map for this run's accepted
-   owners. If any:
-   - `git -C <repo> push -u origin container/<run-id>`
+3. `python3 tools/container_merge.py merge <out> --repo <merge-repo> --fresh-history --commit`
+4. `python3 tools/container_merge.py import-stats <out> --repo <merge-repo>`
+5. Read `<out>/merge-report.json`'s `owners` map (see "Reading the merge
+   report" below) for this run's matched owners. If any:
+   - `git -C <merge-repo> push -u origin container/<run-id>`
    - `gh pr create --base <integration-branch> --title "Container match: <owners>" --body <owner/status table>`
-6. `git -C <repo> checkout <integration-branch>` regardless of whether
+     -- the table also names any owner that needs a manual commit (below),
+     so it is never silently dropped from a PR opened for its sibling
+     owners.
+6. `git -C <merge-repo> checkout <integration-branch>` regardless of whether
    anything was accepted, so the checkout is never left on a throwaway
    branch between runs.
+
+`<merge-repo>` is `--merge-repo` if set, else `--repo` (sec 1).
 
 `--fresh-history` and `--commit` are always passed to `merge` (sec 9.3 of
 `docs/CONTAINER_AGENT.md` -- a prior host re-gate on record must never trip
 the "already rejected" preflight for a re-attempt); `--no-cc-check` is not
 passed by `fleetctl run` itself (it is a real bypass of a real check, per
 sec 9.2, and stays a human's deliberate call outside this tool).
+
+**Reading the merge report.** `tools/container_merge.py`'s
+`write_merge_report` (see its own docstring) maps each owner to either a
+bare status string (`"accepted"`, `"rejected"`, `"error"`, ...) or, when a
+host re-gate accepted the candidate but the immediately-following
+`git commit --only` failed, an object
+`{"status": "accepted", "committed": false, "commit_error": "<tail>"}`.
+`fleetctl` treats an owner as **matched** only when its status is
+`"accepted"` *and* (it is the bare-string form -- committed, or commit was
+never attempted -- or the object form's own `committed` is `true`);
+`state.json`'s `matched_owners` and the PR's accepted-owner list are built
+from exactly this set. An owner that is `"accepted"` but the object form
+with `committed: false` is recorded separately, in `state.json`'s
+`needs_manual_commit` map (owner -> the commit-error tail), and is:
+
+- **not** counted as matched (no silent "probably fine"),
+- **not** requeued for a fresh attempt -- its candidate is already applied
+  in `<merge-repo>`'s working tree on the throwaway `container/<run-id>`
+  branch (the failed step is only the commit itself), so requeueing would
+  have a fresh container re-probe a duplicate of work already done,
+- surfaced in `fleetctl status` (a `NEEDS MANUAL COMMIT` section plus a
+  per-row note) and in the PR body's status table when a PR opens for other
+  matched owners of the same run.
+
+An operator resolves one by inspecting `<merge-repo>`'s working tree (and
+`<out>/merge-results/<owner>.commit.log` for the full failure, not just the
+15-line tail `fleetctl` keeps) and committing by hand.
 
 ## 3. Persistence and restart
 
@@ -249,35 +300,42 @@ reseed of that partition (e.g. `container/14640-p0-r1`). `<fileslug>` is
 the source file's basename without `.c`
 (`disasm/src/fragments/79/fragment79_3BF4C0.c` -> `fragment79_3BF4C0`).
 
-A PR is opened only when a run's host re-gate accepted at least one owner,
-titled `Container match: <owner1>, <owner2>, ...` (every accepted owner in
-that run, sorted), based against `--integration-branch` (default
-`master`), with a body table of every owner the run attempted and that
-owner's `merge-report.json` status (`accepted`, `rejected`, or `error`).
+A PR is opened only when a run has at least one **matched** owner (sec 2 --
+accepted and committed), titled `Container match: <owner1>, <owner2>, ...`
+(every matched owner in that run, sorted), based against
+`--integration-branch` (default `master`), with a body table of every owner
+the run attempted and that owner's status (`accepted`, `rejected`, `error`,
+or, for an accepted-but-uncommitted owner, `accepted, NOT committed (needs
+manual commit; see fleetctl status)`).
 
 ## 6. Design notes / open questions
 
-- **Merge-repo == launch-repo.** `fleetctl run` takes one `--repo` for
-  everything: `container/run.sh`'s cwd, `tools/container_merge.py`'s
-  `--repo`, and the checkout `git`/`gh` operate on. A setup that wants the
-  merge/branch/PR step to run against a *different* checkout than the one
-  containers are launched from (e.g. a dedicated merge worktree) would need
-  a second `--merge-repo` flag; not added since every current use is a
-  single shared checkout.
+- **Merge-repo == launch-repo, unless `--merge-repo` says otherwise.**
+  `fleetctl run` takes `--repo` for `container/run.sh`'s cwd and
+  `tools/pragma_targets.py`'s target, and a separate `--merge-repo`
+  (defaulting to `--repo`) for the merge/branch/PR step's
+  `git`/`gh`/`tools/container_merge.py --repo` calls (sec 1, sec 2). Every
+  current use still points both at the same single shared checkout; the
+  flag exists for a setup that wants a dedicated merge worktree instead.
 - **Per-agent concurrency vs. cooldown interaction.** An agent at its
-  `--agent-concurrency` cap is treated identically to one on cooldown
-  (skipped this pass, retried next pass) -- there is no separate signal in
-  `status` distinguishing "waiting for a slot" from "waiting out a
-  cooldown" beyond the cooldowns table already printed.
-- **`merge-report.json`'s `owners` map is the only signal `fleetctl` reads
-  to decide what got committed** -- it does not separately confirm each
-  accepted owner's `git commit --only` actually succeeded (that is
-  `tools/container_merge.py`'s own `committed`/`commit_detail` column,
-  visible in its printed table but not in `merge-report.json`). A commit
-  failure after an accepted re-gate would currently still be reported as
-  "matched" by `fleetctl status`; surfacing `container_merge.py`'s commit
-  outcome per owner would need either a `merge-report.json` schema change
-  owned by `tools/container_merge.py` or parsing its stdout table.
+  `--agent-concurrency` cap is treated identically to one on cooldown for
+  *launch* purposes (skipped this pass, retried next pass), but
+  `state.json`'s `wait_reason` field (sec 1) now records which one applied
+  to a still-queued run, and `fleetctl status` prints it -- "waiting for a
+  slot" (`"concurrency"`, whether the global `--max-concurrent` cap or a
+  per-agent `--agent-concurrency` cap) is distinguishable from "waiting out
+  a cooldown" (`"cooldown"`) without cross-referencing the cooldowns table
+  by hand.
+- **`merge-report.json`'s `owners` map now records the commit outcome too**
+  (`tools/container_merge.py`'s `write_merge_report`): an owner whose host
+  re-gate accepted the candidate but whose own `git commit --only` failed
+  maps to `{"status": "accepted", "committed": false, "commit_error": ...}`
+  instead of a bare string, and `fleetctl` reads that -- such an owner is
+  excluded from `matched_owners`/the PR's accepted list, recorded in
+  `needs_manual_commit` instead of silently reported "matched", and neither
+  requeued (the candidate is already applied in the merge repo's working
+  tree) nor dropped (it is surfaced in `fleetctl status` and the PR body;
+  see sec 2's "Reading the merge report").
 - **No automatic backoff on repeated `--resume` failures.** A run that
   keeps coming back `generator_exhausted` is requeued and retried every
   time its agent's cooldown lapses, forever -- there is no cap on
