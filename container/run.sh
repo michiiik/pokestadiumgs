@@ -15,15 +15,24 @@
 # Candidate generator env (see container/generators/README.md), forwarded
 # from this shell's environment when set -- entrypoint.sh requires whichever
 # key AGENT's wrapper needs, unless --candidate-file is passed:
-#   AGENT             claude (default) | codex | qwen | kimi | openai_compat
+#   AGENT             claude (default) | codex | qwen | kimi | kimi_api | openai_compat
 #   GENERATOR_MODEL   override the wrapper's default model
-#   GENERATOR_EFFORT  codex reasoning effort (low|medium|high|xhigh)
+#   GENERATOR_EFFORT  codex reasoning effort (low|medium|high|xhigh); also
+#                     forwarded to kimi as KIMI_MODEL_THINKING_EFFORT
+#                     (low|high|max for the default kimi-code/k3)
 #   ANTHROPIC_API_KEY claude
 #   OPENAI_API_KEY    codex, qwen (or DASHSCOPE_API_KEY), openai_compat
 #   OPENAI_BASE_URL   openai_compat (required), qwen (optional)
 #   DASHSCOPE_API_KEY qwen, alternate to OPENAI_API_KEY
-#   MOONSHOT_API_KEY  kimi
-#   MOONSHOT_BASE_URL kimi, optional (default: global Moonshot endpoint)
+#   MOONSHOT_API_KEY  kimi_api
+#   MOONSHOT_BASE_URL kimi_api, optional (default: global Moonshot endpoint)
+#   KIMI_MODEL_NAME   kimi, alternate to a subscription login: paired with
+#   KIMI_MODEL_API_KEY   KIMI_MODEL_API_KEY, the official CLI's own
+#                     stateless API-key model definition (both required
+#                     together; see container/generators/kimi.sh)
+#   KIMI_CODE_HOME    kimi, optional: relocate the CLI's data/config root
+#                     (default ~/.kimi-code) on both host lookup and
+#                     in-container env
 set -euo pipefail
 
 if [ "$#" -lt 2 ]; then
@@ -54,6 +63,27 @@ if [ "${AGENT:-claude}" = "codex" ] && [ -z "${OPENAI_API_KEY:-}" ] && [ -f "$HO
     extra_args+=(-v "$codex_home:/root/.codex")
 fi
 
+# Kimi Code CLI with a subscription login instead of an API key: mount a
+# throwaway copy of the host's ~/.kimi-code (or $KIMI_CODE_HOME) login state
+# so token refreshes never touch the original -- same pattern as codex above.
+# Copies the specific files the CLI reads for auth/config, not the whole
+# directory (which also holds session history, logs, etc.).
+kimi_home_src="${KIMI_CODE_HOME:-$HOME/.kimi-code}"
+if [ "${AGENT:-claude}" = "kimi" ] && [ -z "${KIMI_MODEL_API_KEY:-}" ] && [ -f "$kimi_home_src/credentials/kimi-code.json" ]; then
+    kimi_home="$(mktemp -d)"
+    [ -f "$kimi_home_src/config.toml" ] && cp "$kimi_home_src/config.toml" "$kimi_home/config.toml"
+    cp -R "$kimi_home_src/credentials" "$kimi_home/credentials"
+    [ -d "$kimi_home_src/oauth" ] && cp -R "$kimi_home_src/oauth" "$kimi_home/oauth"
+    [ -f "$kimi_home_src/region" ] && cp "$kimi_home_src/region" "$kimi_home/region"
+    [ -f "$kimi_home_src/device_id" ] && cp "$kimi_home_src/device_id" "$kimi_home/device_id"
+    # Mounted at the container's default ~/.kimi-code (root's $HOME) -- do
+    # not also forward a host-side KIMI_CODE_HOME override below, which
+    # would point the in-container CLI away from this mount.
+    extra_args+=(-v "$kimi_home:/root/.kimi-code")
+elif [ -n "${KIMI_CODE_HOME:-}" ]; then
+    extra_args+=(-e KIMI_CODE_HOME="$KIMI_CODE_HOME")
+fi
+
 docker run \
     --platform linux/amd64 \
     --rm \
@@ -67,6 +97,8 @@ docker run \
     -e DASHSCOPE_API_KEY \
     -e MOONSHOT_API_KEY \
     -e MOONSHOT_BASE_URL \
+    -e KIMI_MODEL_NAME \
+    -e KIMI_MODEL_API_KEY \
     -v "$out_dir:/out" \
     "${extra_args[@]}" \
     gs-decomp-agent:latest \

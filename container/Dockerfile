@@ -27,8 +27,10 @@ ENV DEBIAN_FRONTEND=noninteractive \
 # ca-certificates, wget, curl, gnupg: NodeSource setup + any tool-side fetches.
 #
 # container/generators/README.md's install lines: the claude/codex/qwen
-# wrappers each need their CLI on PATH; kimi.sh and openai_compat.sh need
-# only python3 stdlib (already required above), no extra install.
+# wrappers each need their CLI on PATH; kimi_api.sh and openai_compat.sh need
+# only python3 stdlib (already required above), no extra install. kimi.sh
+# needs the official Kimi Code CLI (installed separately below, a native
+# binary with no npm/pip dependency).
 RUN apt-get update && apt-get install -y --no-install-recommends \
         git make build-essential gcc-multilib \
         python3 python3-venv python3-pip \
@@ -38,6 +40,21 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get install -y --no-install-recommends nodejs \
     && npm install -g @anthropic-ai/claude-code @openai/codex @qwen-code/qwen-code \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Kimi Code CLI (container/generators/kimi.sh): a standalone native binary,
+# not an npm/pip package -- installed via Moonshot's own installer script
+# (https://moonshotai.github.io/kimi-code/), pinned to an exact version so
+# the image doesn't silently pick up a new release on rebuild.
+# KIMI_INSTALL_DIR=/usr/local puts the binary straight at /usr/local/bin/kimi
+# (already on PATH), matching the installer's own
+# `sudo env KIMI_INSTALL_DIR=/usr/local bash` example -- no PATH/rc-file
+# juggling needed since this image's RUN steps aren't login shells anyway.
+# Manifest + per-platform sha256 checksum verified by the script itself
+# (linux-x64 target, matching --platform linux/amd64 above).
+ENV KIMI_CODE_VERSION=0.39.1
+RUN curl -fsSL https://code.kimi.com/kimi-code/install.sh \
+        | KIMI_VERSION="$KIMI_CODE_VERSION" KIMI_INSTALL_DIR=/usr/local bash \
+    && kimi --version
 
 WORKDIR /work
 COPY . /work

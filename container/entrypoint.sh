@@ -16,12 +16,14 @@
 #                          API key. Otherwise this entrypoint defaults
 #                          --generator-cmd to
 #                          "/work/container/generators/run_generator.sh {prompt} {batch}"
-#                          and requires the API key AGENT's wrapper needs
+#                          and requires the auth AGENT's wrapper needs
 #                          (ANTHROPIC_API_KEY for claude, OPENAI_API_KEY for
 #                          codex/openai_compat, OPENAI_API_KEY or
 #                          DASHSCOPE_API_KEY for qwen, MOONSHOT_API_KEY for
-#                          kimi) so a missing key fails fast here instead of
-#                          partway through the driver's first iteration.
+#                          kimi_api, a mounted subscription login or
+#                          KIMI_MODEL_NAME+KIMI_MODEL_API_KEY for kimi) so a
+#                          missing key fails fast here instead of partway
+#                          through the driver's first iteration.
 #
 # /out is expected to be a mounted volume (see container/run.sh) that the
 # driver writes results/logs into.
@@ -114,6 +116,15 @@ if [ "$have_candidate_file" -eq 0 ] && [ "$have_generator_cmd" -eq 0 ]; then
             fi
             ;;
         kimi)
+            kimi_home="${KIMI_CODE_HOME:-$HOME/.kimi-code}"
+            if [ ! -f "$kimi_home/credentials/kimi-code.json" ] \
+               && { [ -z "${KIMI_MODEL_API_KEY:-}" ] || [ -z "${KIMI_MODEL_NAME:-}" ]; }; then
+                echo "entrypoint: AGENT=kimi needs a subscription login (a credentials file under \${KIMI_CODE_HOME:-~/.kimi-code}/credentials/, mounted by container/run.sh from the host's copy) or both \$KIMI_MODEL_NAME and \$KIMI_MODEL_API_KEY set (the CLI's own stateless API-key model definition)." >&2
+                echo "entrypoint: for a plain Moonshot API key with no CLI login state, use AGENT=kimi_api (\$MOONSHOT_API_KEY) instead." >&2
+                exit 1
+            fi
+            ;;
+        kimi_api)
             [ -n "${MOONSHOT_API_KEY:-}" ] || fail_missing_key MOONSHOT_API_KEY
             ;;
         *)

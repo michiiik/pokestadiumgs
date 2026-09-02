@@ -80,24 +80,28 @@ By default (no `--generator-cmd`, no `--candidate-file`), `entrypoint.sh`
 injects `--generator-cmd "/work/container/generators/run_generator.sh
 {prompt} {batch}"`, a dispatcher that execs `container/generators/$AGENT.sh
 <prompt> <batch>`, selected by the `AGENT` env var (default `claude`).
-`container/run.sh` forwards `AGENT`, `GENERATOR_MODEL`, and every agent's
-API key through to `docker run` when set in your shell.
+`container/run.sh` forwards `AGENT`, `GENERATOR_MODEL`, `GENERATOR_EFFORT`,
+and every agent's auth through to `docker run` when set in your shell.
 `container/generators/README.md` is the authoritative source for this table
 (CLI/package, verified flags, provider docs); keep changes there:
 
 | `AGENT=`        | CLI / package                          | Required env vars                                      | Default model (`GENERATOR_MODEL`) |
 |------------------|------------------------------------------|------------------------------------------------------------|--------------------------------------|
 | `claude`         | `@anthropic-ai/claude-code` (`claude`)   | `ANTHROPIC_API_KEY`                                          | `sonnet`                             |
-| `codex`          | `@openai/codex` (`codex`)                | `OPENAI_API_KEY`                                              | `gpt-5.1-codex`                      |
+| `codex`          | `@openai/codex` (`codex`)                | `OPENAI_API_KEY`, or a mounted ChatGPT login (`~/.codex/auth.json`) | `gpt-5.1-codex`               |
 | `qwen`           | `@qwen-code/qwen-code` (`qwen`)          | `OPENAI_API_KEY` (or `DASHSCOPE_API_KEY`)                    | `qwen3-coder-plus`                   |
-| `kimi`           | none -- routes to `openai_compat.sh`     | `MOONSHOT_API_KEY`                                            | `kimi-k2.7-code`                     |
+| `kimi`           | official Kimi Code CLI (`kimi`, native binary) | a mounted subscription login (`~/.kimi-code/credentials/`), or `KIMI_MODEL_NAME`+`KIMI_MODEL_API_KEY` | `kimi-code/k3` |
+| `kimi_api`       | none -- routes to `openai_compat.sh`     | `MOONSHOT_API_KEY`                                            | `kimi-k2.7-code`                     |
 | `openai_compat`  | none (`python3` stdlib only)             | `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `GENERATOR_MODEL`       | (none -- must be set)                |
 
-`entrypoint.sh` checks that `AGENT`'s required key is present *before*
-starting the driver, so a missing key fails fast instead of partway through
-the first iteration. That check (and the default `--generator-cmd`
+`entrypoint.sh` checks that `AGENT`'s required auth is present *before*
+starting the driver, so a missing key/login fails fast instead of partway
+through the first iteration. That check (and the default `--generator-cmd`
 injection) is skipped entirely when the caller passes `--generator-cmd` or
 `--candidate-file` themselves -- see §4 and §5.
+
+For `kimi`, `GENERATOR_EFFORT` (`low`/`high`/`max` for the default
+`kimi-code/k3`) is forwarded to the CLI as `KIMI_MODEL_THINKING_EFFORT`.
 
 Examples:
 
@@ -108,6 +112,16 @@ Examples:
     # codex, overriding the model
     export OPENAI_API_KEY=sk-...
     AGENT=codex GENERATOR_MODEL=gpt-5.1-codex container/run.sh disasm/src/4AC10.c /abs/out
+
+    # kimi, official CLI under your own subscription login (already logged
+    # in via `kimi login` on the host -- container/run.sh mounts a throwaway
+    # copy of ~/.kimi-code, same pattern as codex's ~/.codex/auth.json)
+    AGENT=kimi container/run.sh disasm/src/4AC10.c /abs/out
+    # ...or at high thinking effort:
+    AGENT=kimi GENERATOR_EFFORT=high container/run.sh disasm/src/4AC10.c /abs/out
+
+    # kimi_api, a plain Moonshot API key (no CLI, no login state)
+    AGENT=kimi_api MOONSHOT_API_KEY=sk-... container/run.sh disasm/src/4AC10.c /abs/out
 
     # openai_compat, pointed at a self-hosted OpenAI-compatible endpoint
     AGENT=openai_compat OPENAI_API_KEY=local-key OPENAI_BASE_URL=http://my-host:8000/v1 \
