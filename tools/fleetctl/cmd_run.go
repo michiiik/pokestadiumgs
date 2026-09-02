@@ -22,9 +22,10 @@ func runRunCmd(args []string) error {
 	stateDir := fs.String("state-dir", "", "directory holding state.json (required)")
 	runsDir := fs.String("runs-dir", "", "directory each run's --out dir is created under (required)")
 	repo := fs.String("repo", "", "checkout to launch containers from, and tools/pragma_targets.py runs against (required)")
-	mergeRepo := fs.String("merge-repo", "", "checkout the merge/branch/PR/self-merge step (git checkout/branch/push/pull, tools/container_merge.py, gh pr create/checks/merge) operates on (default: --repo)")
+	mergeRepo := fs.String("merge-repo", "", "checkout the merge/branch/PR/self-merge step (git fetch/checkout -B/checkout --detach/push, tools/container_merge.py, gh pr create/checks/merge/view) operates on (default: --repo)")
 	maxConcurrent := fs.Int("max-concurrent", -1, "max containers running at once (default: the plan's --slots, else 4)")
-	prBase := fs.String("pr-base", "master", "branch a run's throwaway branch is cut from, PR'd into, and (with --auto-merge) merged into")
+	prBase := fs.String("pr-base", "master", "branch a run's throwaway branch is PR'd into, and (with --auto-merge) merged into")
+	baseRef := fs.String("base-ref", "", "ref the merge repo's throwaway branch is force-created from (git checkout -B) and left detached at afterward -- default origin/<pr-base>. Deliberately a remote-tracking ref, never --pr-base's own local branch: the merge repo may be a linked worktree whose local base branch is already checked out elsewhere (e.g. the main checkout), so the merge flow never checks that branch out itself")
 	once := fs.Bool("once", false, "perform a single control-loop pass and exit, instead of looping until the queue drains")
 	dryRun := fs.Bool("dry-run", false, "print every docker/git/gh command instead of executing it (real containers are never started, no gh pr merge/issue comment ever runs for real)")
 	defaultCooldown := fs.Duration("default-cooldown", time.Hour, "cooldown applied to an agent with no --cooldown entry in the plan")
@@ -66,6 +67,7 @@ func runRunCmd(args []string) error {
 		Repo:                *repo,
 		MergeRepo:           *mergeRepo,
 		IntegrationBranch:   *prBase,
+		BaseRef:             *baseRef,
 		DefaultCooldown:     *defaultCooldown,
 		PollInterval:        *pollInterval,
 		DisableAutoMerge:    !*autoMerge,

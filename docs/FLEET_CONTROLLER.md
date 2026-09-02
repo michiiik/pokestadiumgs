@@ -63,6 +63,7 @@ never touches docker, git, or GitHub, so there is no `--dry-run` for it.
 
     fleetctl run [--plan P] --state-dir S --runs-dir D --repo R \
         [--merge-repo M] [--max-concurrent 4] [--pr-base master] \
+        [--base-ref REF] \
         [--once] [--dry-run] [--default-cooldown 1h] [--poll-interval 30s] \
         [--auto-merge] [--replan] [--src-overlay DIR] [--stall-after 3h] \
         [--alert-issue N] [--alert-macos] [--daily-summary-hour 9]
@@ -84,15 +85,27 @@ The control loop. Loads `--plan`'s queue into `<state-dir>/state.json`
 5. **Persist.** `state.json` is rewritten atomically (temp file + rename)
    after every pass.
 
-`--merge-repo M` points the merge/branch/PR/self-merge step -- `git
-checkout`, `git checkout -b`, `tools/container_merge.py
-merge`/`import-stats`, `git push`/`pull --ff-only`, `gh pr
-create`/`checks`/`merge` -- at a different checkout than `--repo`
+`--merge-repo M` points the merge/branch/PR/self-merge step -- `git fetch`,
+`git checkout -B`/`checkout --detach`, `tools/container_merge.py
+merge`/`import-stats`, `git push`, `gh pr
+create`/`checks`/`merge`/`view` -- at a different checkout than `--repo`
 (`container/run.sh`'s cwd and `tools/pragma_targets.py`'s target, including
 the ranking `--replan` re-runs -- sec 8). Defaults to `--repo` when omitted,
 the common case of one shared checkout; set it when the merge/branch/PR
 step should run against a dedicated merge worktree instead (see sec 2 for
 exactly which calls this affects).
+
+**`--merge-repo` never checks out, force-resets, or pulls `--pr-base`'s own
+local branch.** If `--merge-repo` is a linked worktree of the same
+checkout `--repo` (or another session) uses, that local branch may already
+be checked out elsewhere -- `git checkout master` there fails outright
+("already checked out"), and even when it wouldn't fail, that local branch
+copy is commonly stale. Instead, every merge-repo git call sec 2/7
+describes below works against `--base-ref` (default
+`origin/<pr-base>`) -- a remote-tracking ref -- and the merge repo is left
+**detached** at it between runs, never on a named local base branch.
+`git fetch origin` is the merge repo's only call that touches that
+remote-tracking ref at all.
 
 **`--plan` is required only the first time `--state-dir` has no plan
 persisted in `state.json` yet.** `LoadPlan` now persists the whole plan
@@ -115,11 +128,12 @@ the loop from an external scheduler (sec 4) instead of its own sleep.
 `--dry-run` prints every `docker`/`git`/`gh pr create`/`gh pr merge`/`gh
 issue comment`/`osascript` command instead of running it
 (`container/run.sh` and `tools/container_merge.py`/`tools/pragma_targets.py`
-invocations, plus the read-only `gh pr checks`/`docker image inspect`
-queries sec 7/10 use, are still real subprocess constructions, logged
-verbatim; only the process that would actually start a container, move a
-branch, commit, push, merge a PR, comment on an issue, or open a PR is
-suppressed). **No real container is ever started under `--dry-run`, and
+invocations, plus the read-only `gh pr checks`/`gh pr view`/`git status
+--porcelain`/`docker image inspect` queries sec 2/7/10 use, are still real
+subprocess constructions, logged verbatim; only the process that would
+actually start a container, move a branch, commit, push, merge a PR,
+comment on an issue, or open a PR is suppressed). **No real container is
+ever started under `--dry-run`, and
 `gh pr merge`/`gh issue comment` never run for real** -- `LaunchContainer`
 returns a synthetic `dryrun-<run-id>` id and the poll loop treats it as
 already exited-cleanly on the next pass, and `GhPRCreate` returns an empty
@@ -141,7 +155,11 @@ count, note/stopped-reason/wait-reason/needs-manual-commit owners/PR URL), a
 of the recorded commit error -- see sec 2's "Reading the merge report"),
 a cooldowns table, a `MERGE BLOCKED: <reason>` line when a post-merge
 fast-forward has failed (sec 7), and a `running=N queued=M (agent=n ...)`
-summary line. `--json` prints the same information as one
+summary line. A run whose merge step found `--merge-repo` dirty in a way
+that would conflict with the merge (sec 2) shows status
+`merge_blocked_dirty`, with the conflicting path in its note column --
+distinct from `MERGE BLOCKED`, which is global (every run), not per-run.
+`--json` prints the same information as one
 `control.BuildStatus` JSON document instead -- for scripting, and what the
 `--alert-issue` daily summary (sec 9) embeds for machines.
 
@@ -182,9 +200,17 @@ launched and recorded.
                                               v
                                           merging
                                               |
-                (sequential: branch -> merge --commit -> import-stats ->
-                 push+PR if any owner matched -> checkout back)
-                                              v
+             dirty? (git status --porcelain finds a conflicting path, sec 2)
+                              |                                  |
+                             yes                                 no
+                              |                                  |
+                              v                                  v
+                    merge_blocked_dirty          (sequential: fetch -> branch -B
+                    (alert, left open,             <base-ref> -> merge --commit ->
+                    never auto-retried)             import-stats -> push+PR if any
+                                                      owner matched -> checkout
+                                                      --detach <base-ref>)
+                                                                   v
                        no owner matched --------------- >=1 owner matched
                               |                                  |
                               v                                  v
@@ -201,7 +227,7 @@ launched and recorded.
                               |                |                |
                               |                v                v
                               |     gh pr merge, then      gate_failed
-                              |     fast-forward <pr-base>  (alert, left
+                              |     fetch <base-ref>       (alert, left
                               |     (sec 7); on success:    open, never
                               |     merged + Replan (sec 8) auto-retried)
                               |                |
@@ -228,10 +254,25 @@ single goroutine with no concurrent merge dispatch, so "one merge at a
 time" (required because the git index is shared -- `AGENTS.md` sec 1.3) is
 structural, not a separate lock. The merge step itself is:
 
-1. `git -C <merge-repo> checkout <pr-base>`
-2. `git -C <merge-repo> checkout -b container/<run-id> <pr-base>` --
-   created *before* the merge commit so any commit `merge --commit` makes
-   lands on this throwaway branch, not the base branch.
+0. `git -C <merge-repo> status --porcelain` -- if any **tracked** entry
+   (not `??` untracked) names a path under `disasm/src/`, `COVERAGE.md`, or
+   `docs/regions/` (the trees the merge step itself writes to), abort
+   immediately: no fetch, no branch, no commit. The run moves to
+   `merge_blocked_dirty` (its note names the conflicting path) and a
+   rate-limited `merge_blocked_dirty` alert fires (sec 9) -- left exactly
+   as-is, like `gate_failed`, for an operator to resolve by hand. Anything
+   else -- untracked files anywhere, or tracked modifications outside those
+   three paths (e.g. another session's own uncommitted edits to
+   `disasm/Makefile` or `tools/try_pragma_compare.py`) -- is tolerated:
+   `<merge-repo>` is commonly a checkout other tools/sessions share, and
+   only the paths this merge would actually touch need to be clean.
+1. `git -C <merge-repo> fetch origin`
+2. `git -C <merge-repo> checkout -B container/<run-id> <base-ref>` --
+   force-created (`-B`, not `-b`) *before* the merge commit, from
+   `<base-ref>` fresh off the fetch, so any commit `merge --commit` makes
+   lands on this throwaway branch, not the base branch, and always starts
+   from current remote state rather than wherever the branch was left last
+   time.
 3. `python3 tools/container_merge.py merge <out> --repo <merge-repo> --fresh-history --commit`
 4. `python3 tools/container_merge.py import-stats <out> --repo <merge-repo>`
 5. Read `<out>/merge-report.json`'s `owners` map (see "Reading the merge
@@ -245,14 +286,20 @@ structural, not a separate lock. The merge step itself is:
      run's status becomes `pr_open` instead of `done` -- see sec 7 for what
      happens next. `--auto-merge=false` restores the pre-self-merge
      behavior: `done`, PR left open for a human.
-6. `git -C <merge-repo> checkout <pr-base>` regardless of whether anything
-   was accepted, so the checkout is never left on a throwaway branch
-   between runs.
+6. `git -C <merge-repo> checkout --detach <base-ref>` regardless of whether
+   anything was accepted, so the merge repo is never left on a throwaway
+   branch between runs -- and never on a named local base branch either
+   (see sec 1's "`--merge-repo` never checks out ... `--pr-base`'s own
+   local branch").
 
 `<merge-repo>` is `--merge-repo` if set, else `--repo` (sec 1). `<pr-base>`
-is `--pr-base` (sec 1; default `master`) -- it replaces the earlier
-`--integration-branch` flag name now that the same branch is also
-self-merge's target (sec 7), not just where a throwaway branch is cut from.
+is `--pr-base` (sec 1; default `master`) -- the branch name `gh pr
+create --base`/`gh pr merge` operate on. `<base-ref>` is `--base-ref` (sec
+1; default `origin/<pr-base>`) -- the ref every merge-repo git call above
+actually branches from, verifies against, and detaches onto; it replaces
+the earlier `--integration-branch` flag name now that the same branch is
+also self-merge's target (sec 7), not just where a throwaway branch is cut
+from.
 
 `--fresh-history` and `--commit` are always passed to `merge` (sec 9.3 of
 `docs/CONTAINER_AGENT.md` -- a prior host re-gate on record must never trip
@@ -489,6 +536,18 @@ also, from here, self-merged on green -- sec 7.
   notification and an issue comment for the same event share one clock,
   rather than each notifier tracking its own. Simpler, and in practice the
   two are usually both on or both off.
+- **Why `--base-ref` (a remote-tracking ref) instead of `--pr-base`'s own
+  local branch.** `--merge-repo` is frequently a linked worktree of the
+  same checkout `--repo` (or an entirely separate session/tool) already
+  has checked out -- and git refuses to check out a branch that is already
+  checked out in another worktree ("already checked out"), so a plain
+  `git -C <merge-repo> checkout master` fails outright whenever the main
+  checkout has `master` checked out, which is the common case. A local
+  branch there can also simply be stale even when it isn't already
+  checked out elsewhere. `--base-ref` (sec 1, sec 2, sec 7) sidesteps
+  both: the merge repo only ever fetches, branches from, and detaches onto
+  a remote-tracking ref, and never checks out, force-resets, or pulls the
+  local branch of the same name.
 
 ## 7. Self-merge on green
 
@@ -512,23 +571,29 @@ Every pass, for every run currently `pr_open` (sorted by run id, so a
    pass.
 2. **`SUCCESS`:** `gh pr merge <n> --merge --delete-branch`. On success the
    run moves to `merged` (`merged_at` recorded), then:
-   - **fast-forward `--pr-base`** in `--merge-repo`: `git checkout
-     <pr-base>` + `git pull --ff-only`. On success, `state.json`'s
-     `last_merge_at` is updated (sec 10's stale-image awareness) and
-     `git rev-parse HEAD` is recorded as the run's `merge_commit_sha`, then
-     **`Replan` runs** (sec 8) -- so the very next launch already sees
-     whatever this merge just landed.
-   - **On failure**, `state.json`'s `merge_blocked`/`merge_blocked_reason`
-     are set, a rate-limited `ff_failed` alert fires (sec 9), and *no
-     further `pr_open` run is evaluated this pass* -- "stop merging until
-     fixed" is deliberately global, not per-run, since every self-merge
-     shares the same `--pr-base` and a stuck fast-forward means the local
-     checkout genuinely needs a human's attention (a merge/rebase
-     conflict, most likely) before any more of them can land cleanly. The
-     *next* pass retries the fast-forward once, at the top of `pollPRs`,
-     before touching any `pr_open` run -- if it now succeeds,
-     `merge_blocked` clears and merging resumes automatically; no restart
-     or flag needed to recover.
+   - **fast-forward `<base-ref>`** in `--merge-repo`: `git fetch origin`
+     -- and *only* that. `<merge-repo>`'s local `--pr-base` branch is never
+     checked out or pulled here (sec 1, sec 2), so there is no local branch
+     left to fast-forward or rebase -- fetching is enough to bring
+     `<base-ref>` (e.g. `origin/master`) up to date with whatever `gh pr
+     merge` just pushed. On success, `state.json`'s `last_merge_at` is
+     updated (sec 10's stale-image awareness), `gh pr view <n> --json
+     mergeCommit` is recorded as the run's `merge_commit_sha` (logging a
+     non-blocking warning if a `git rev-parse <base-ref>` right after the
+     fetch doesn't yet match it -- GitHub's own merge-commit metadata can
+     lag the fetch by a beat), then **`Replan` runs** (sec 8) -- so the
+     very next launch already sees whatever this merge just landed.
+   - **On failure** (the fetch itself failed -- network, auth, ...),
+     `state.json`'s `merge_blocked`/`merge_blocked_reason` are set, a
+     rate-limited `ff_failed` alert fires (sec 9), and *no further
+     `pr_open` run is evaluated this pass* -- "stop merging until fixed" is
+     deliberately global, not per-run, since every self-merge shares the
+     same `<base-ref>` and a stuck fetch usually means the merge repo (or
+     its network access) genuinely needs a human's attention before any
+     more of them can land cleanly. The *next* pass retries the fetch once,
+     at the top of `pollPRs`, before touching any `pr_open` run -- if it
+     now succeeds, `merge_blocked` clears and merging resumes
+     automatically; no restart or flag needed to recover.
 3. **`FAILURE`:** the run moves to `gate_failed`, a rate-limited
    `gate_failed` alert fires (sec 9), and it is left exactly as-is --
    `fleetctl status` (its PR URL is in the note column) and the PR itself
@@ -590,7 +655,7 @@ without needing the plan file again.
 
 ## 9. Alerting
 
-Five events, each posted through every configured `Notifier`
+Six events, each posted through every configured `Notifier`
 (`--alert-issue N`: `gh issue comment N --body ...` against `--merge-repo`;
 `--alert-macos`: `osascript -e 'display notification ...'`), rate-limited
 by `Loop.alert` to at most one post per `"event[:key]"` per hour (`key` is
@@ -601,7 +666,8 @@ alerts don't share a bucket, but `ff_failed` -- with no natural per-run key
 | Event | Fired when | Key |
 |---|---|---|
 | `gate_failed` | a PR's checks reported `FAILURE` (sec 7) | run id |
-| `ff_failed` | the post-merge (or retry) fast-forward of `--pr-base` failed (sec 7) | (none) |
+| `ff_failed` | the post-merge (or retry) fetch of `<base-ref>` failed (sec 7) | (none) |
+| `merge_blocked_dirty` | a run's merge step found `--merge-repo` dirty in a way that conflicts with the merge (sec 2) | run id |
 | `container_vanished` | a running container's id is no longer known to `docker inspect` (sec 2) | run id |
 | `agent_exhausted` | a run stopped `generator_exhausted` (sec 2) | agent name |
 | `no_progress_stall` | a still-`running` run's best similarity (read from `<out>/state.json`, the same per-owner `best_similarity` `docs/CONTAINER_AGENT.md` documents) hasn't improved for `--stall-after` (default 3h) | run id |

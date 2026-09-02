@@ -213,14 +213,33 @@ func (r *ExecRunner) ImportStats(ctx context.Context, outDir, repoRoot string) (
 		r.pythonBin(), "tools/container_merge.py", "import-stats", outDir, "--repo", repoRoot)
 }
 
-func (r *ExecRunner) GitCheckoutNewBranch(ctx context.Context, repoRoot, branch, from string) error {
-	result, err := r.runOrDryRun(ctx, r.RepoRoot, nil, "git", "-C", repoRoot, "checkout", "-b", branch, from)
-	return gitErr(result, err, "git checkout -b "+branch, r.DryRun)
+func (r *ExecRunner) GitFetch(ctx context.Context, repoRoot string) error {
+	result, err := r.runOrDryRun(ctx, r.RepoRoot, nil, "git", "-C", repoRoot, "fetch", "origin")
+	return gitErr(result, err, "git fetch origin", r.DryRun)
 }
 
-func (r *ExecRunner) GitCheckout(ctx context.Context, repoRoot, ref string) error {
-	result, err := r.runOrDryRun(ctx, r.RepoRoot, nil, "git", "-C", repoRoot, "checkout", ref)
-	return gitErr(result, err, "git checkout "+ref, r.DryRun)
+func (r *ExecRunner) GitCheckoutNewBranch(ctx context.Context, repoRoot, branch, from string) error {
+	result, err := r.runOrDryRun(ctx, r.RepoRoot, nil, "git", "-C", repoRoot, "checkout", "-B", branch, from)
+	return gitErr(result, err, "git checkout -B "+branch, r.DryRun)
+}
+
+func (r *ExecRunner) GitCheckoutDetach(ctx context.Context, repoRoot, ref string) error {
+	result, err := r.runOrDryRun(ctx, r.RepoRoot, nil, "git", "-C", repoRoot, "checkout", "--detach", ref)
+	return gitErr(result, err, "git checkout --detach "+ref, r.DryRun)
+}
+
+// GitStatusPorcelain is a read-only query (never gated by DryRun, same
+// reasoning as RankFiles/Targets/DockerImageID/GitRevParse) used to check
+// the merge repo is clean before a run's merge step branches it.
+func (r *ExecRunner) GitStatusPorcelain(ctx context.Context, repoRoot string) (string, error) {
+	result, err := run(ctx, r.RepoRoot, nil, "git", "-C", repoRoot, "status", "--porcelain")
+	if err != nil {
+		return "", fmt.Errorf("git status --porcelain: %w", err)
+	}
+	if result.ExitCode != 0 {
+		return "", fmt.Errorf("git status --porcelain: exit %d: %s", result.ExitCode, strings.TrimSpace(result.Stderr))
+	}
+	return result.Stdout, nil
 }
 
 func (r *ExecRunner) GitPush(ctx context.Context, repoRoot, branch string) error {
@@ -228,14 +247,10 @@ func (r *ExecRunner) GitPush(ctx context.Context, repoRoot, branch string) error
 	return gitErr(result, err, "git push -u origin "+branch, r.DryRun)
 }
 
-func (r *ExecRunner) GitPullFF(ctx context.Context, repoRoot string) error {
-	result, err := r.runOrDryRun(ctx, r.RepoRoot, nil, "git", "-C", repoRoot, "pull", "--ff-only")
-	return gitErr(result, err, "git pull --ff-only", r.DryRun)
-}
-
 // GitRevParse is a read-only query (never gated by DryRun, matching
-// RankFiles/Targets/DockerImageID) used to record the commit sha a
-// just-merged PR landed as, after fast-forwarding onto it.
+// RankFiles/Targets/DockerImageID) used to verify a remote-tracking ref
+// (e.g. origin/master, --base-ref) has picked up a just-merged PR's merge
+// commit.
 func (r *ExecRunner) GitRevParse(ctx context.Context, repoRoot, ref string) (string, error) {
 	result, err := run(ctx, r.RepoRoot, nil, "git", "-C", repoRoot, "rev-parse", ref)
 	if err != nil {
@@ -334,6 +349,32 @@ func (r *ExecRunner) GhPRMerge(ctx context.Context, repoRoot string, prNumber in
 		return fmt.Errorf("gh pr merge %d: exit %d: %s", prNumber, result.ExitCode, strings.TrimSpace(result.Stderr))
 	}
 	return nil
+}
+
+// GhPRView is a read-only query (never gated by DryRun, same as
+// GhPRChecks): it returns the merge commit sha `gh pr view --json
+// mergeCommit` reports for a just-merged PR, so the merge repo never has
+// to check out or rev-parse a local base branch to learn it.
+func (r *ExecRunner) GhPRView(ctx context.Context, repoRoot string, prNumber int) (string, error) {
+	result, err := run(ctx, repoRoot, nil, "gh", "pr", "view", strconv.Itoa(prNumber), "--json", "mergeCommit")
+	if err != nil {
+		return "", fmt.Errorf("gh pr view %d: %w", prNumber, err)
+	}
+	if result.ExitCode != 0 {
+		return "", fmt.Errorf("gh pr view %d: exit %d: %s", prNumber, result.ExitCode, strings.TrimSpace(result.Stderr))
+	}
+	var payload struct {
+		MergeCommit *struct {
+			Oid string `json:"oid"`
+		} `json:"mergeCommit"`
+	}
+	if err := json.Unmarshal([]byte(result.Stdout), &payload); err != nil {
+		return "", fmt.Errorf("gh pr view %d: parse output: %w", prNumber, err)
+	}
+	if payload.MergeCommit == nil || payload.MergeCommit.Oid == "" {
+		return "", fmt.Errorf("gh pr view %d: mergeCommit not yet reported", prNumber)
+	}
+	return payload.MergeCommit.Oid, nil
 }
 
 func (r *ExecRunner) GhIssueComment(ctx context.Context, repoRoot string, issueNumber int, body string) error {

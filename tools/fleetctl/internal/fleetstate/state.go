@@ -35,6 +35,13 @@ const (
 	// StatusGateFailed is a StatusPROpen run whose PR's checks reported a
 	// FAILURE -- left open for manual triage, never auto-retried.
 	StatusGateFailed Status = "gate_failed"
+	// StatusMergeBlockedDirty is a run whose merge step found the merge
+	// repo already carrying uncommitted changes to a path the merge itself
+	// would touch (disasm/src/, COVERAGE.md, docs/regions/ -- see
+	// docs/FLEET_CONTROLLER.md sec 2, "the merge repo must be clean") and
+	// refused to branch or commit anything -- left exactly as-is, like
+	// StatusGateFailed, for an operator to resolve by hand.
+	StatusMergeBlockedDirty Status = "merge_blocked_dirty"
 )
 
 // RunSpec is one queued unit of work: one file, one partition of that
@@ -88,10 +95,11 @@ type RunRecord struct {
 	// MergedAt is when `gh pr merge` succeeded for this run's PR (Status ==
 	// StatusMerged).
 	MergedAt time.Time `json:"merged_at,omitempty"`
-	// MergeCommitSHA is the merge repo's base-branch HEAD immediately after
-	// the post-merge fast-forward (docs/FLEET_CONTROLLER.md sec 2,
-	// "self-merge on green") -- the commit this run's matched owners landed
-	// as.
+	// MergeCommitSHA is this run's PR's merge commit sha, from `gh pr view
+	// --json mergeCommit` once the post-merge fetch of --base-ref (sec 2,
+	// "self-merge on green") has run -- the commit this run's matched
+	// owners landed as. The merge repo's local base branch is never
+	// checked out to learn this.
 	MergeCommitSHA string `json:"merge_commit_sha,omitempty"`
 	// ImageID is the gs-decomp-agent image id (docker image inspect
 	// --format {{.Id}}) this run's container was launched from; empty when

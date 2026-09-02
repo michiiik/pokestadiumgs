@@ -109,20 +109,37 @@ type Runner interface {
 	// ImportStats runs `python3 tools/container_merge.py import-stats <out> --repo <repo>`.
 	ImportStats(ctx context.Context, outDir, repoRoot string) (ProcessResult, error)
 
-	// GitCheckoutNewBranch runs `git -C repoRoot checkout -b branch from`.
+	// GitFetch runs `git -C repoRoot fetch origin` -- the merge repo's only
+	// mutating call against its remote-tracking refs. Used both before
+	// branching a new run (so --base-ref, e.g. origin/master, is current)
+	// and as the post-merge "fast-forward" (sec 2/7): the merge repo's own
+	// local base branch is never checked out or pulled, so there is no
+	// local branch left to fast-forward -- only its remote-tracking ref
+	// needs refreshing.
+	GitFetch(ctx context.Context, repoRoot string) error
+	// GitCheckoutNewBranch runs `git -C repoRoot checkout -B branch from`
+	// (force-create/reset, not `-b`): `from` is ordinarily a remote-
+	// tracking ref like origin/master (--base-ref), so this always starts
+	// the throwaway branch fresh from the fetched remote state, never from
+	// wherever the branch happened to be left last time.
 	GitCheckoutNewBranch(ctx context.Context, repoRoot, branch, from string) error
-	// GitCheckout runs `git -C repoRoot checkout ref`.
-	GitCheckout(ctx context.Context, repoRoot, ref string) error
+	// GitCheckoutDetach runs `git -C repoRoot checkout --detach ref` --
+	// leaves the merge repo checked out at ref with no local branch
+	// attached, so a run's merge step never requires (or fights over)
+	// checking out the local base branch itself, which may already be
+	// checked out elsewhere (e.g. the main checkout, if the merge repo is
+	// a linked worktree).
+	GitCheckoutDetach(ctx context.Context, repoRoot, ref string) error
+	// GitStatusPorcelain runs `git -C repoRoot status --porcelain` -- a
+	// read-only query (never gated by DryRun, same as RankFiles/Targets/
+	// DockerImageID/GitRevParse) used to confirm the merge repo is clean
+	// of conflicting changes before a run's merge step branches it.
+	GitStatusPorcelain(ctx context.Context, repoRoot string) (string, error)
 	// GitPush runs `git -C repoRoot push -u origin branch`.
 	GitPush(ctx context.Context, repoRoot, branch string) error
-	// GitPullFF runs `git -C repoRoot pull --ff-only` against whatever
-	// branch is currently checked out -- the second half of "fast-forward
-	// the merge repo's local base branch" after a self-merge (the first
-	// half is GitCheckout to the base branch itself).
-	GitPullFF(ctx context.Context, repoRoot string) error
 	// GitRevParse runs `git -C repoRoot rev-parse ref` and returns the
-	// resolved sha, e.g. to record the commit a just-merged PR landed as
-	// after fast-forwarding onto it.
+	// resolved sha -- used to verify a remote-tracking ref (e.g.
+	// origin/master) has picked up a just-merged PR's merge commit.
 	GitRevParse(ctx context.Context, repoRoot, ref string) (string, error)
 	// GhPRCreate runs `gh pr create --base ... --title ... --body ...` and
 	// returns the printed PR URL.
@@ -132,6 +149,11 @@ type Runner interface {
 	GhPRChecks(ctx context.Context, repoRoot string, prNumber int) (PRChecksResult, error)
 	// GhPRMerge runs `gh pr merge <prNumber> --merge --delete-branch`.
 	GhPRMerge(ctx context.Context, repoRoot string, prNumber int) error
+	// GhPRView runs `gh pr view <prNumber> --json mergeCommit` and returns
+	// the merge commit's sha -- a read-only query (never gated by DryRun,
+	// same as GhPRChecks) used to record a just-merged PR's landed commit
+	// without ever checking out or rev-parsing a local base branch.
+	GhPRView(ctx context.Context, repoRoot string, prNumber int) (mergeCommitSHA string, err error)
 	// GhIssueComment runs `gh issue comment <issueNumber> --body ...` --
 	// the --alert-issue notifier's one effect.
 	GhIssueComment(ctx context.Context, repoRoot string, issueNumber int, body string) error

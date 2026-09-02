@@ -363,7 +363,7 @@ func TestMergeSequencingAndPRConstruction(t *testing.T) {
 	}
 
 	assertSubsequence(t, methodSequence(fake), []string{
-		"InspectContainer", "GitCheckout", "GitCheckoutNewBranch", "Merge", "ImportStats", "GitPush", "GhPRCreate", "GitCheckout",
+		"InspectContainer", "GitStatusPorcelain", "GitFetch", "GitCheckoutNewBranch", "Merge", "ImportStats", "GitPush", "GhPRCreate", "GitCheckoutDetach",
 	})
 
 	if rec.Branch != "container/x-p0" {
@@ -385,8 +385,8 @@ func TestMergeSequencingAndPRConstruction(t *testing.T) {
 	}
 
 	branchCall := findCall(fake, "GitCheckoutNewBranch")
-	if branchCall == nil || branchCall.Strings[0] != "/repo" || branchCall.Strings[1] != "container/x-p0" || branchCall.Strings[2] != "master" {
-		t.Fatalf("branch call = %+v", branchCall)
+	if branchCall == nil || branchCall.Strings[0] != "/repo" || branchCall.Strings[1] != "container/x-p0" || branchCall.Strings[2] != "origin/master" {
+		t.Fatalf("branch call = %+v, want from=origin/master (the default --base-ref)", branchCall)
 	}
 
 	prCall := findCall(fake, "GhPRCreate")
@@ -714,7 +714,7 @@ func TestMergeRepoSeparatesLaunchFromMergeCheckout(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	for _, method := range []string{"GitCheckout", "GitCheckoutNewBranch", "GitPush"} {
+	for _, method := range []string{"GitStatusPorcelain", "GitFetch", "GitCheckoutNewBranch", "GitPush", "GitCheckoutDetach"} {
 		call := findCall(fake, method)
 		if call == nil {
 			t.Fatalf("%s not called", method)
@@ -744,6 +744,95 @@ func TestMergeRepoDefaultsToRepo(t *testing.T) {
 	loop.MergeRepo = "/other"
 	if got := loop.mergeRepo(); got != "/other" {
 		t.Fatalf("mergeRepo() = %s, want /other", got)
+	}
+}
+
+// TestBaseRefDefaultsToOriginPRBase checks that an unset Loop.BaseRef
+// defaults to "origin/<IntegrationBranch>" -- deliberately a remote-
+// tracking ref, never the local branch itself (docs/FLEET_CONTROLLER.md
+// sec 2) -- and that an explicit --base-ref overrides it.
+func TestBaseRefDefaultsToOriginPRBase(t *testing.T) {
+	loop := &Loop{IntegrationBranch: "master"}
+	if got := loop.baseRef(); got != "origin/master" {
+		t.Fatalf("baseRef() = %s, want origin/master", got)
+	}
+	loop.BaseRef = "origin/release"
+	if got := loop.baseRef(); got != "origin/release" {
+		t.Fatalf("baseRef() = %s, want origin/release", got)
+	}
+}
+
+// --- merge repo dirty-check (docs/FLEET_CONTROLLER.md sec 2, "the merge
+// repo must be clean") ---------------------------------------------------
+
+// TestRunMergeAbortsWhenMergeRepoHasConflictingDirtyFiles checks that a
+// tracked, modified file under one of the paths the merge step itself
+// writes to (disasm/src/, COVERAGE.md, docs/regions/) blocks the merge
+// entirely: no fetch, no branch, no commit -- the run is marked
+// merge_blocked_dirty and an alert fires, instead of runMerge touching a
+// shared merge repo that another session has mid-flight changes in.
+func TestRunMergeAbortsWhenMergeRepoHasConflictingDirtyFiles(t *testing.T) {
+	fake := &runner.Fake{
+		InspectResults:           map[string][]runner.InspectResult{"cid": {{Found: true, Running: false}}},
+		GitStatusPorcelainResult: " M disasm/src/x.c\n",
+	}
+	loop, dir := newTestLoop(t, fake)
+	outDir := filepath.Join(dir, "out")
+	mustWriteFile(t, filepath.Join(outDir, "summary.json"), `{"stopped_reason":"completed"}`)
+	notifier := &fakeNotifier{}
+	loop.Notifiers = []Notifier{notifier}
+	rec := runningRec("x-p0", "cid", outDir, "codex")
+	loop.State.Runs["x-p0"] = rec
+
+	if _, err := loop.RunOnce(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if rec.Status != fleetstate.StatusMergeBlockedDirty {
+		t.Fatalf("status = %s, want merge_blocked_dirty", rec.Status)
+	}
+	if !strings.Contains(rec.Note, "disasm/src/x.c") {
+		t.Fatalf("note = %q, want it to name the conflicting path", rec.Note)
+	}
+	for _, method := range []string{"GitFetch", "GitCheckoutNewBranch", "Merge", "GitPush"} {
+		if findCall(fake, method) != nil {
+			t.Fatalf("%s must not run once the merge repo is found dirty", method)
+		}
+	}
+	if len(notifier.calls) != 1 {
+		t.Fatalf("notifier calls = %d, want 1 (merge_blocked_dirty)", len(notifier.calls))
+	}
+}
+
+// TestRunMergeToleratesUnrelatedDirtyFiles checks that modifications
+// outside disasm/src/, COVERAGE.md, and docs/regions/ (e.g. another
+// session's own uncommitted edits to disasm/Makefile and
+// tools/try_pragma_compare.py) -- and any untracked file, anywhere -- do
+// not block the merge.
+func TestRunMergeToleratesUnrelatedDirtyFiles(t *testing.T) {
+	fake := &runner.Fake{
+		InspectResults: map[string][]runner.InspectResult{"cid": {{Found: true, Running: false}}},
+		GitStatusPorcelainResult: " M disasm/Makefile\n" +
+			" M tools/try_pragma_compare.py\n" +
+			"?? disasm/src/scratch.c\n",
+	}
+	loop, dir := newTestLoop(t, fake)
+	outDir := filepath.Join(dir, "out")
+	mustWriteFile(t, filepath.Join(outDir, "summary.json"), `{"stopped_reason":"completed"}`)
+	fake.MergeFunc = func(spec runner.MergeSpec) (runner.ProcessResult, error) {
+		mustWriteFile(t, filepath.Join(spec.OutDir, "merge-report.json"), `{"owners":{"func_1":"accepted","func_2":"accepted"}}`)
+		return runner.ProcessResult{}, nil
+	}
+	rec := runningRec("x-p0", "cid", outDir, "codex")
+	loop.State.Runs["x-p0"] = rec
+
+	if _, err := loop.RunOnce(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if rec.Status == fleetstate.StatusMergeBlockedDirty {
+		t.Fatalf("status = %s, unrelated dirty files must not block the merge", rec.Status)
+	}
+	if findCall(fake, "GitFetch") == nil || findCall(fake, "GitCheckoutNewBranch") == nil {
+		t.Fatal("the merge should have proceeded past the dirty check")
 	}
 }
 

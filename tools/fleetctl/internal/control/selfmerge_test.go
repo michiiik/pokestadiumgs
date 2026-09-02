@@ -37,6 +37,7 @@ func prOpenRec(id, prURL string, prNumber int) *fleetstate.RunRecord {
 func TestSelfMergeSuccessMergesAndFastForwards(t *testing.T) {
 	fake := &runner.Fake{
 		GhPRChecksResult:  runner.PRChecksResult{State: "SUCCESS"},
+		GhPRViewResult:    "deadbeef",
 		GitRevParseResult: "deadbeef",
 	}
 	loop, _ := newTestLoop(t, fake)
@@ -62,13 +63,20 @@ func TestSelfMergeSuccessMergesAndFastForwards(t *testing.T) {
 	if mergeCall == nil || mergeCall.Strings[0] != "/repo" || mergeCall.Strings[1] != "42" {
 		t.Fatalf("GhPRMerge call = %+v", mergeCall)
 	}
-	if findCall(fake, "GitPullFF") == nil {
-		t.Fatal("GitPullFF (the fast-forward) was not called")
+	// The post-merge "fast-forward" is now just a fetch -- the merge repo's
+	// local base branch is never checked out (docs/FLEET_CONTROLLER.md sec
+	// 2); the merge commit sha comes from `gh pr view`, verified against a
+	// rev-parse of --base-ref (default origin/<pr-base>).
+	if findCall(fake, "GitFetch") == nil {
+		t.Fatal("GitFetch (the post-merge fast-forward) was not called")
 	}
-	// Fast-forward checks out IntegrationBranch before pulling.
-	checkoutCall := findCall(fake, "GitCheckout")
-	if checkoutCall == nil || checkoutCall.Strings[1] != "master" {
-		t.Fatalf("GitCheckout call = %+v, want master", checkoutCall)
+	viewCall := findCall(fake, "GhPRView")
+	if viewCall == nil || viewCall.Strings[0] != "/repo" || viewCall.Strings[1] != "42" {
+		t.Fatalf("GhPRView call = %+v, want repo /repo, PR 42", viewCall)
+	}
+	revParseCall := findCall(fake, "GitRevParse")
+	if revParseCall == nil || revParseCall.Strings[1] != "origin/master" {
+		t.Fatalf("GitRevParse call = %+v, want ref origin/master", revParseCall)
 	}
 }
 
@@ -144,7 +152,7 @@ func TestAutoMergeDisabledSkipsPollPRsEntirely(t *testing.T) {
 func TestSelfMergeFastForwardFailureBlocksFurtherMergesUntilFixed(t *testing.T) {
 	fake := &runner.Fake{
 		GhPRChecksResult: runner.PRChecksResult{State: "SUCCESS"},
-		GitPullFFErr:     fmt.Errorf("conflict"),
+		GitFetchErr:      fmt.Errorf("network unreachable"),
 	}
 	loop, _ := newTestLoop(t, fake)
 	notifier := &fakeNotifier{}
@@ -190,7 +198,7 @@ func TestSelfMergeFastForwardFailureBlocksFurtherMergesUntilFixed(t *testing.T) 
 
 	// Fix the underlying problem -- the next pass's retry recovers and
 	// resumes merging.
-	fake.GitPullFFErr = nil
+	fake.GitFetchErr = nil
 	if err := loop.pollPRs(context.Background()); err != nil {
 		t.Fatal(err)
 	}
