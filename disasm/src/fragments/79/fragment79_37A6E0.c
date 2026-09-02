@@ -1236,7 +1236,8 @@ void func_841122D4(u8 *arg0) { if (func_84111C8C() != 0) { func_84112158(arg0, 0
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_84112418.s")
+extern void func_84111DB4(u8 *arg0, s32 arg1);
+s32 func_84112418(u8 *arg0) { if (func_84111C8C()) { if (ModelAnim_IsFinished(arg0) != 0) { func_84111DB4(arg0, 0); } return 0; } return 0; }
 #endif
 
 #ifdef VERSION_US
