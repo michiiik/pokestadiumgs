@@ -21,7 +21,15 @@ void func_860002A0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_246640/func_860004C8.s")
+extern void * func_87C00160(void *, void *, void *);
+extern f64 func_87C00D14(f64,f64);
+f32 func_860004C8(void *arg0, void *arg1) {
+    u8 value[0x18];
+    func_87C00160(value, arg1, arg0);
+    return (f32)func_87C00D14(*(f64 *)value, *(f64 *)(value + 0x10));
+}
+void func_860004C8_padding(void) {}
+void func_860004C8_padding2(void) {}
 #endif
 
 #ifdef VERSION_US
