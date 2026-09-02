@@ -27,7 +27,6 @@ import signal
 import subprocess
 import sys
 import tempfile
-import threading
 import time
 from pathlib import Path
 
@@ -224,6 +223,30 @@ def extract_function(code: str, function: str) -> str:
 NOISE_RE = re.compile(r"resource_tracker|warnings\.warn|leaked semaphore")
 
 
+def _terminate_process_group(process: subprocess.Popen[object], *, grace: float = 5.0) -> None:
+    """Stop a timed-out permuter without waiting on an inherited pipe."""
+    try:
+        os.killpg(process.pid, signal.SIGTERM)
+    except ProcessLookupError:
+        return
+    try:
+        process.wait(timeout=max(0.0, grace))
+        return
+    except subprocess.TimeoutExpired:
+        pass
+    try:
+        os.killpg(process.pid, signal.SIGKILL)
+    except ProcessLookupError:
+        pass
+    try:
+        process.wait(timeout=max(0.0, grace))
+    except subprocess.TimeoutExpired:
+        # The direct child should be gone after SIGKILL; retain the final
+        # fallback for unusual process wrappers that do not expose a group.
+        process.kill()
+        process.wait(timeout=max(0.0, grace))
+
+
 def _collect_outputs(work_dir: Path, function: str, limit: int) -> list[dict[str, object]]:
     outputs: list[dict[str, object]] = []
     for entry in work_dir.iterdir():
@@ -270,49 +293,32 @@ def permute(
     if stop_on_zero:
         command.append("--stop-on-zero")
     started = time.monotonic()
-    process = subprocess.Popen(
-        command,
-        cwd=work_dir,
-        env=targets.readonly_tool_environment(),
-        text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        start_new_session=True,
-    )
+    log_path = work_dir / "permuter.log"
     timed_out = False
-
-    def _killer() -> None:
-        nonlocal timed_out
-        remaining = seconds - (time.monotonic() - started)
+    with log_path.open("w", encoding="utf-8") as log_handle:
+        process = subprocess.Popen(
+            command,
+            cwd=work_dir,
+            env=targets.readonly_tool_environment(),
+            text=True,
+            stdout=log_handle,
+            stderr=subprocess.STDOUT,
+            start_new_session=True,
+        )
         try:
-            process.wait(timeout=max(0.0, remaining))
+            process.wait(timeout=max(0.0, seconds))
         except subprocess.TimeoutExpired:
             timed_out = True
-            try:
-                os.killpg(process.pid, signal.SIGTERM)
-            except ProcessLookupError:
-                pass
+            _terminate_process_group(process)
 
-    killer = threading.Thread(target=_killer, daemon=True)
-    killer.start()
-    log_lines: list[str] = []
+    log_lines = log_path.read_text(encoding="utf-8", errors="replace").splitlines()
     base_score: int | None = None
     already_matching = False
-    assert process.stdout is not None
-    for line in process.stdout:
-        log_lines.append(line.rstrip("\n"))
+    for line in log_lines:
         match = BASE_SCORE_RE.search(line)
         if match and base_score is None:
             base_score = int(match.group(1))
-            if base_score == 0:
-                # Nothing to permute: the supplied body already diffs clean.
-                already_matching = True
-                try:
-                    os.killpg(process.pid, signal.SIGTERM)
-                except ProcessLookupError:
-                    pass
-    process.wait()
-    killer.join(timeout=1.0)
+            already_matching = base_score == 0
     outputs = _collect_outputs(work_dir, owner.function, limit)
     log_lines = [line for line in log_lines if line.strip() and not NOISE_RE.search(line)]
     result: dict[str, object] = {

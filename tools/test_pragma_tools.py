@@ -7,6 +7,7 @@ import io
 import json
 import os
 import signal
+import subprocess
 import sys
 import tempfile
 import time
@@ -3358,6 +3359,31 @@ class DedupeExternTests(unittest.TestCase):
 
 
 class PermuterWrapperTests(unittest.TestCase):
+    def test_timed_out_permuter_group_gets_bounded_sigkill_fallback(self) -> None:
+        class TimedProcess:
+            pid = 12345
+
+            def __init__(self) -> None:
+                self.waits = 0
+
+            def wait(self, timeout=None):
+                self.waits += 1
+                if self.waits < 2:
+                    raise subprocess.TimeoutExpired("permuter", timeout)
+                return 0
+
+            def kill(self) -> None:
+                raise AssertionError("direct kill should not be needed")
+
+        process = TimedProcess()
+        with mock.patch.object(permute_candidate.os, "killpg") as killpg:
+            permute_candidate._terminate_process_group(process, grace=0.01)
+        self.assertEqual(
+            [call.args[1] for call in killpg.call_args_list],
+            [signal.SIGTERM, signal.SIGKILL],
+        )
+        self.assertEqual(process.waits, 2)
+
     def test_linked_worktree_permuter_uses_primary_tools_and_private_cwd(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             main = Path(directory) / "main"
