@@ -43,6 +43,7 @@ Test mode (no generator; exercise the loop once with a fixed batch):
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -64,6 +65,7 @@ DEFAULT_GENERATOR_TIMEOUT = 600.0
 PROBE_TIMEOUT_CAP = 300.0
 MISC_TIMEOUT = 60.0
 BEST_CANDIDATES_KEPT = 5
+TRIED_LABELS_SHOWN = 30
 
 
 # ---------------------------------------------------------------------------
@@ -126,7 +128,91 @@ def _new_owner_state() -> dict:
         "history": [],
         "best_candidates": [],
         "permuter_runs": [],
+        "tried_bodies": [],
+        "tried_labels": [],
     }
+
+
+# ---------------------------------------------------------------------------
+# Already-tried-body tracking
+#
+# fleet_probe.py's own preflight (tools/try_pragma_compare.py
+# ``validate_candidate_batch`` / ``_duplicate_candidate_errors``) rejects a
+# whole batch outright if any one candidate resends a body (under the same
+# ``declarations``) it has already rejected -- exit 2, "batch preflight
+# failed". A generator that resends a body it already tried earlier in the
+# same run loses the whole batch, not just that one candidate. This driver
+# tracks every body it has actually sent to the probe (per owner, across the
+# whole run, persisted in ``state.json`` so ``--resume`` inherits it too) and
+# filters a batch *before* probing, so a repeat never reaches fleet_probe at
+# all.
+# ---------------------------------------------------------------------------
+
+def _normalize_body_for_dedup(text: str | None) -> str:
+    """Strip and collapse runs of whitespace to one space."""
+    return " ".join((text or "").split())
+
+
+def _tried_body_key(body: str | None, declarations: str | None) -> str:
+    """The runner's own dedup key is ``(body, declarations)``; hash both
+    (independently, whitespace-normalized) into one lookup key."""
+    body_hash = hashlib.sha1(_normalize_body_for_dedup(body).encode("utf-8")).hexdigest()
+    decl_hash = hashlib.sha1(_normalize_body_for_dedup(declarations).encode("utf-8")).hexdigest()
+    return f"{body_hash}:{decl_hash}"
+
+
+def filter_batch(batch: dict, owner_state: dict) -> tuple[dict, list[dict]]:
+    """Drop candidates whose ``(body, declarations)`` key was already probed
+    this run (``owner_state["tried_bodies"]``), plus exact duplicates within
+    ``batch`` itself.
+
+    Returns ``(filtered_batch, dropped)`` where ``filtered_batch`` is a
+    shallow copy of ``batch`` with a possibly-shorter ``candidates`` list,
+    and ``dropped`` is a list of ``{"label": ..., "reason": ...}`` entries in
+    original order.
+    """
+    declarations = batch.get("declarations")
+    tried = set(owner_state.get("tried_bodies") or [])
+    seen_in_batch: set[str] = set()
+    kept: list[dict] = []
+    dropped: list[dict] = []
+    for candidate in batch.get("candidates") or []:
+        key = _tried_body_key(candidate.get("body"), declarations)
+        label = candidate.get("label") or "(unlabelled)"
+        if key in tried:
+            dropped.append({"label": label, "reason": "already tried this run"})
+            continue
+        if key in seen_in_batch:
+            dropped.append({"label": label, "reason": "duplicate within this batch"})
+            continue
+        seen_in_batch.add(key)
+        kept.append(candidate)
+    filtered = dict(batch)
+    filtered["candidates"] = kept
+    return filtered, dropped
+
+
+def _record_tried_bodies(batch: dict, owner_state: dict) -> None:
+    """Record every candidate actually sent in ``batch`` into
+    ``owner_state["tried_bodies"]``/``["tried_labels"]``, regardless of the
+    probe's verdict (rejected and compile-failed both count -- a re-send
+    still can't produce a new result)."""
+    declarations = batch.get("declarations")
+    tried = set(owner_state.get("tried_bodies") or [])
+    tried_labels = owner_state.setdefault("tried_labels", [])
+    for candidate in batch.get("candidates") or []:
+        tried.add(_tried_body_key(candidate.get("body"), declarations))
+        label = candidate.get("label")
+        if label and label not in tried_labels:
+            tried_labels.append(label)
+    owner_state["tried_bodies"] = sorted(tried)
+
+
+_PREFLIGHT_INDEX_RE = re.compile(r"candidates\[(\d+)\]")
+
+
+def _parse_preflight_indices(stderr: str | None) -> list[int]:
+    return sorted({int(match) for match in _PREFLIGHT_INDEX_RE.findall(stderr or "")})
 
 
 # ---------------------------------------------------------------------------
@@ -291,6 +377,7 @@ def build_prompt(
     best_candidates: list[dict],
     permuter_seed: dict | None,
     batch_path: Path,
+    tried_labels: list[str] | None = None,
 ) -> str:
     parts = [
         f"You are generating candidate C function bodies for one GLOBAL_ASM",
@@ -334,6 +421,15 @@ def build_prompt(
             "Change the hypothesis family for any candidate whose diagnostic "
             "repeats one shown above instead of resending the same source shape."
         )
+    if tried_labels:
+        shown = list(tried_labels)[-TRIED_LABELS_SHOWN:]
+        parts.append("")
+        parts.append(
+            f"== labels already tried this run (showing last {len(shown)} of "
+            f"{len(tried_labels)}; do not resend a body under a repeat of one of "
+            "these hypotheses) =="
+        )
+        parts.append(", ".join(shown))
     if permuter_seed:
         parts.append("")
         parts.append(
@@ -744,6 +840,18 @@ def run_iteration(
     result_path = out_dir / "results" / f"{owner}_iter{iteration}.json"
     result_path.parent.mkdir(parents=True, exist_ok=True)
 
+    filtered_batch, dropped = filter_batch(batch, owner_state)
+    for entry in dropped:
+        logger.log(f"{owner}: iter {iteration}: dropping candidate {entry['label']!r} ({entry['reason']})")
+    if dropped:
+        batch = filtered_batch
+        save_json(batch_path, batch)
+
+    if not (batch.get("candidates") or []):
+        logger.log(f"{owner}: iter {iteration}: no candidates remain after dedup filtering; skipping probe")
+        owner_state["plateau_count"] = owner_state.get("plateau_count", 0) + 1
+        return "continue"
+
     remaining_budget = max(1.0, deadline - time.monotonic())
     probe_timeout = max(10.0, min(PROBE_TIMEOUT_CAP, remaining_budget))
     try:
@@ -757,6 +865,37 @@ def run_iteration(
         owner_state["plateau_count"] += 1
         return "continue"
 
+    if probe_proc.returncode == 2 and "preflight failed" in (probe_proc.stderr or "").lower():
+        indices = _parse_preflight_indices(probe_proc.stderr)
+        if indices:
+            logger.log(
+                f"{owner}: iter {iteration}: preflight failed on candidates {indices}; "
+                "dropping them and retrying the probe once"
+            )
+            index_set = set(indices)
+            remaining_candidates = [
+                c for i, c in enumerate(batch.get("candidates") or []) if i not in index_set
+            ]
+            batch = dict(batch)
+            batch["candidates"] = remaining_candidates
+            save_json(batch_path, batch)
+            if not remaining_candidates:
+                logger.log(f"{owner}: iter {iteration}: no candidates remain after preflight retry filtering")
+                owner_state["plateau_count"] = owner_state.get("plateau_count", 0) + 1
+                return "continue"
+            remaining_budget = max(1.0, deadline - time.monotonic())
+            probe_timeout = max(10.0, min(PROBE_TIMEOUT_CAP, remaining_budget))
+            try:
+                probe_proc = invoke_probe(repo_dir, batch_path, result_path, timeout=probe_timeout)
+            except subprocess.TimeoutExpired:
+                logger.log(f"{owner}: iter {iteration}: probe retry timed out after {probe_timeout:.0f}s")
+                owner_state["plateau_count"] += 1
+                return "continue"
+            except OSError as exc:
+                logger.log(f"{owner}: iter {iteration}: probe retry failed to launch: {exc}")
+                owner_state["plateau_count"] += 1
+                return "continue"
+
     result = load_json(result_path)
     if result is None:
         logger.log(
@@ -765,6 +904,10 @@ def run_iteration(
         )
         owner_state["plateau_count"] += 1
         return "continue"
+
+    # The probe ran (on whatever survived filtering/retry): every one of
+    # these bodies has now had its one shot this run, whatever its verdict.
+    _record_tried_bodies(batch, owner_state)
 
     attempts = result.get("attempts") or []
     scored = [a for a in attempts if isinstance(a.get("similarity_score"), (int, float))]
@@ -951,6 +1094,7 @@ def process_owner(
             owner=owner, source_rel=source_rel, file_brief=file_brief, asm_text=asm_text,
             best_candidates=owner_state["best_candidates"],
             permuter_seed=owner_state.get("permuter_seed"), batch_path=batch_path,
+            tried_labels=owner_state.get("tried_labels"),
         )
         prompt_path.write_text(prompt_text, encoding="utf-8")
 

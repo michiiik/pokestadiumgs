@@ -296,11 +296,17 @@ class RunIterationTests(unittest.TestCase):
             self.assertEqual(owner_state["plateau_count"], 4)
             self.assertEqual(owner_state["best_similarity"], 0.5)
 
+            # A distinct body/label: with tried-body dedup filtering (issue:
+            # dropped-batches-preflight-rejection), resending the same body
+            # from iteration 0 would be dropped before ever reaching the
+            # probe, which would defeat this test's actual point (that a
+            # *result* improvement resets the plateau counter).
+            batch2 = {"source": "disasm/src/X.c", "candidates": [{"function": owner, "label": "a2", "body": "body_a2"}]}
             high_result = {
                 "batch_status": "no_candidate_accepted", "accepted": [],
-                "attempts": [{"function": owner, "label": "a", "status": "rejected", "similarity_score": 0.9}],
+                "attempts": [{"function": owner, "label": "a2", "status": "rejected", "similarity_score": 0.9}],
             }
-            self._run(out_dir, repo_dir, owner, batch, high_result, owner_state, iteration=1)
+            self._run(out_dir, repo_dir, owner, batch2, high_result, owner_state, iteration=1)
             self.assertEqual(owner_state["best_similarity"], 0.9)
             self.assertEqual(owner_state["plateau_count"], 0)
 
@@ -587,6 +593,151 @@ class RunIterationTests(unittest.TestCase):
 
 
 # ---------------------------------------------------------------------------
+# filter_batch / tried-body dedup (a generator resending an already-probed
+# body -- or two identical candidates in one batch -- makes fleet_probe's
+# own preflight reject the WHOLE batch; this driver must catch it first)
+# ---------------------------------------------------------------------------
+
+class FilterBatchTests(unittest.TestCase):
+    def test_drops_previously_tried_body_and_in_batch_duplicate(self) -> None:
+        owner_state = container_agent._new_owner_state()
+        owner_state["tried_bodies"] = [
+            container_agent._tried_body_key("void func_1(void) { return; }", "")
+        ]
+        batch = {
+            "declarations": "",
+            "candidates": [
+                {"function": "func_1", "label": "already-tried", "body": "void func_1(void) { return; }"},
+                {"function": "func_1", "label": "dup-a", "body": "void func_1(void) { return 1; }"},
+                # Same body as dup-a modulo whitespace -- an in-batch duplicate.
+                {"function": "func_1", "label": "dup-b", "body": "void   func_1(void)   {   return 1;   }"},
+                {"function": "func_1", "label": "new", "body": "void func_1(void) { return 2; }"},
+            ],
+        }
+
+        filtered, dropped = container_agent.filter_batch(batch, owner_state)
+
+        self.assertEqual([c["label"] for c in filtered["candidates"]], ["dup-a", "new"])
+        self.assertEqual([d["label"] for d in dropped], ["already-tried", "dup-b"])
+        self.assertEqual(dropped[0]["reason"], "already tried this run")
+        self.assertEqual(dropped[1]["reason"], "duplicate within this batch")
+
+    def test_empty_batch_after_filtering_counts_as_plateau_without_probing(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            repo_dir.mkdir()
+            out_dir = Path(tmp) / "out"
+            owner = "func_1"
+            owner_state = container_agent._new_owner_state()
+            body = "void func_1(void) { return; }"
+            owner_state["tried_bodies"] = [container_agent._tried_body_key(body, "")]
+            batch = {
+                "source": "disasm/src/X.c", "declarations": "",
+                "candidates": [{"function": owner, "label": "a", "body": body}],
+            }
+            batch_path = out_dir / "batches" / "func_1_iter0.json"
+            container_agent.save_json(batch_path, batch)
+            logger = container_agent.Logger(out_dir / "log.txt")
+
+            with mock.patch.object(container_agent, "invoke_probe") as probe_mock:
+                status = container_agent.run_iteration(
+                    repo_dir=repo_dir, out_dir=out_dir, source_rel="disasm/src/X.c", owner=owner,
+                    iteration=0, batch=batch, batch_path=batch_path, owner_state=owner_state,
+                    deadline=time.monotonic() + 60.0, permuter_seconds=0.0, logger=logger,
+                )
+
+        self.assertEqual(status, "continue")
+        probe_mock.assert_not_called()
+        self.assertEqual(owner_state["plateau_count"], 1)
+
+    def test_preflight_retry_drops_indexed_candidates_and_probes_once_more(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            repo_dir.mkdir()
+            out_dir = Path(tmp) / "out"
+            owner = "func_1"
+            owner_state = container_agent._new_owner_state()
+            batch = {
+                "source": "disasm/src/X.c",
+                "declarations": "",
+                "candidates": [
+                    {"function": owner, "label": "a", "body": "body_a"},
+                    {"function": owner, "label": "b", "body": "body_b"},
+                    {"function": owner, "label": "c", "body": "body_c"},
+                ],
+            }
+            batch_path = out_dir / "batches" / "func_1_iter0.json"
+            container_agent.save_json(batch_path, batch)
+            calls = {"n": 0}
+
+            def fake_probe(repo_dir_arg, batch_path_arg, result_path, *, timeout):
+                calls["n"] += 1
+                current = container_agent.load_json(batch_path_arg)
+                if calls["n"] == 1:
+                    self.assertEqual([c["label"] for c in current["candidates"]], ["a", "b", "c"])
+                    return SimpleNamespace(
+                        returncode=2, stdout="",
+                        stderr=(
+                            "fleet_probe: batch preflight failed:\n"
+                            "- candidates[1] for func_1 is a body already rejected as 'b' "
+                            "(probe_rejected, similarity 0.4) at an earlier batch with these "
+                            "same declarations; re-sending it cannot produce a new result"
+                        ),
+                    )
+                self.assertEqual(calls["n"], 2)
+                self.assertEqual([c["label"] for c in current["candidates"]], ["a", "c"])
+                result = {
+                    "batch_status": "no_candidate_accepted", "accepted": [],
+                    "attempts": [
+                        {"function": owner, "label": "a", "status": "rejected", "similarity_score": 0.2},
+                        {"function": owner, "label": "c", "status": "rejected", "similarity_score": 0.3},
+                    ],
+                }
+                container_agent.save_json(result_path, result)
+                return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+            logger = container_agent.Logger(out_dir / "log.txt")
+            with mock.patch.object(container_agent, "invoke_probe", side_effect=fake_probe):
+                status = container_agent.run_iteration(
+                    repo_dir=repo_dir, out_dir=out_dir, source_rel="disasm/src/X.c", owner=owner,
+                    iteration=0, batch=batch, batch_path=batch_path, owner_state=owner_state,
+                    deadline=time.monotonic() + 60.0, permuter_seconds=0.0, logger=logger,
+                )
+
+        self.assertEqual(status, "continue")
+        self.assertEqual(calls["n"], 2)
+        self.assertEqual(len(owner_state["tried_bodies"]), 2)
+        self.assertIn("a", owner_state["tried_labels"])
+        self.assertIn("c", owner_state["tried_labels"])
+        self.assertNotIn("b", owner_state["tried_labels"])
+
+
+class TriedBodiesPersistenceTests(unittest.TestCase):
+    def test_tried_bodies_round_trips_through_state_json_and_still_dedups(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            state_path = Path(tmp) / "state.json"
+            owner_state = container_agent._new_owner_state()
+            batch = {
+                "declarations": "extern int g;",
+                "candidates": [{"function": "func_1", "label": "a", "body": "void func_1(void) {}"}],
+            }
+            container_agent._record_tried_bodies(batch, owner_state)
+            container_agent.save_json(state_path, {"func_1": owner_state})
+
+            loaded_state = container_agent.load_json(state_path)
+            reloaded_owner_state = loaded_state["func_1"]
+            self.assertEqual(reloaded_owner_state["tried_bodies"], owner_state["tried_bodies"])
+            self.assertEqual(reloaded_owner_state["tried_labels"], ["a"])
+
+            # --resume passes the reloaded owner_state straight into
+            # filter_batch, so a re-send of the exact same body/declarations
+            # must still be dropped after the JSON round trip.
+            filtered, dropped = container_agent.filter_batch(batch, reloaded_owner_state)
+            self.assertEqual(filtered["candidates"], [])
+            self.assertEqual(len(dropped), 1)
+
+
+# ---------------------------------------------------------------------------
 # build_prompt
 # ---------------------------------------------------------------------------
 
@@ -626,6 +777,26 @@ class BuildPromptTests(unittest.TestCase):
             batch_path=Path("/tmp/batch.json"),
         )
         self.assertNotIn("NORMALIZED-ONLY MATCH", prompt)
+
+    def test_tried_labels_shown_and_capped(self) -> None:
+        labels = [f"label{i}" for i in range(40)]
+        prompt = container_agent.build_prompt(
+            owner="func_1", source_rel="disasm/src/X.c", file_brief="brief", asm_text="asm",
+            best_candidates=[], permuter_seed=None, batch_path=Path("/tmp/batch.json"),
+            tried_labels=labels,
+        )
+        self.assertIn("labels already tried this run", prompt)
+        self.assertIn("label39", prompt)
+        self.assertNotIn("label0,", prompt)
+        self.assertNotIn("label0 ", prompt)
+
+    def test_no_tried_labels_section_when_empty(self) -> None:
+        prompt = container_agent.build_prompt(
+            owner="func_1", source_rel="disasm/src/X.c", file_brief="brief", asm_text="asm",
+            best_candidates=[], permuter_seed=None, batch_path=Path("/tmp/batch.json"),
+            tried_labels=[],
+        )
+        self.assertNotIn("labels already tried this run", prompt)
 
 
 # ---------------------------------------------------------------------------
