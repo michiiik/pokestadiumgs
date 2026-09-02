@@ -131,7 +131,36 @@ void GbSave_ComputeChecksumRange(u8 *arg0, u8 *arg1, u8 *arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005805C.s")
+extern s32 func_80057294(u8, OSGbpakId *, u8 *);
+extern s32 HAL_Strcmp(const s8 *, const s8 *);
+extern u8 D_800A4A10[];
+extern u8 D_800A4A18[];
+extern u8 D_800A4A1C[];
+extern u8 D_800A4A24[];
+extern u8 D_800A4A2C[];
+extern u8 D_800A4A30[];
+extern u8 D_800A4A34[];
+extern u8 D_800A4A38[];
+s32 GbSave_IdentifyFormat(s32 arg0) {
+    OSGbpakId id;
+    u8 status;
+    s32 result = 0;
+    if (func_80057294(arg0 & 0xFF, &id, &status) == 0 && id.company_code == 0x3031 && id.country_code != 0) {
+        id.game_title[7] = 0;
+        if (HAL_Strcmp(id.game_title, D_800A4A10) == 0) {
+            if (HAL_Strcmp(id.game_title + 8, D_800A4A18) == 0) result = 1;
+            else if (HAL_Strcmp(id.game_title + 8, D_800A4A1C) == 0) result = 2;
+            else if (HAL_Strcmp(id.game_title + 8, D_800A4A24) == 0) result = 3;
+            else {
+                id.game_title[9] = 0;
+                if (HAL_Strcmp(id.game_title + 8, D_800A4A2C) == 0) result = 4;
+                else if (HAL_Strcmp(id.game_title + 8, D_800A4A30) == 0) result = 5;
+                else if (HAL_Strcmp(id.game_title + 8, D_800A4A34) == 0) result = 6;
+            }
+        } else if (HAL_Strcmp(id.game_title, D_800A4A38) == 0) result = 7;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
@@ -406,7 +435,45 @@ s32 func_8005A134(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005A228.s")
+extern u8 D_80097374[];
+extern s32 GbPak_IsCartOff(s32);
+extern s32 GbPak_IsCartOn(s32);
+extern s32 func_80056F7C(s32);
+extern s32 GbTower_VerifyPakStillInserted(s32, u8 *);
+extern s32 GbSave_IdentifyFormat(s32 arg0);
+extern u8 D_80128570[];
+s32 GbTower_PollPortState(s32 arg0) {
+    s32 result = 0;
+    u8 *status = D_80097374 + arg0;
+    switch (*status) {
+    case 0:
+        GbTower_CheckPakRemoved(arg0, 0);
+        *status += 1;
+    case 1:
+        if (GbPak_IsCartOff(arg0) != 0) {
+            *status += 1;
+        }
+        break;
+    case 2:
+        if (GbPak_IsCartOn(arg0) != 0) {
+            *status += 1;
+        }
+        result = 1;
+        break;
+    case 3:
+        if (func_80056F7C(arg0) != 0) {
+            result = 3;
+            if (GbSave_IdentifyFormat(arg0) == *(u8 *)(D_80128570 + arg0 * 0x70 + 4)) {
+                if (GbTower_VerifyPakStillInserted(arg0, D_80128570 + arg0 * 0x70 + 0x28) != 0) {
+                    result = 2;
+                }
+            }
+        }
+        *status = 0;
+        break;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
