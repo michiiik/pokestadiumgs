@@ -23,7 +23,12 @@
 #                          kimi_api, a mounted subscription login or
 #                          KIMI_MODEL_NAME+KIMI_MODEL_API_KEY for kimi) so a
 #                          missing key fails fast here instead of partway
-#                          through the driver's first iteration.
+#                          through the driver's first iteration. It also
+#                          exports PROBE_TOOL (off for AGENT=openai_compat/
+#                          kimi_api, on otherwise; never overrides a value
+#                          the caller already exported) -- see the driver's
+#                          --probe-tool and docs/CONTAINER_AGENT.md's "Fast
+#                          inner loop" section.
 #
 # /out is expected to be a mounted volume (see container/run.sh) that the
 # driver writes results/logs into.
@@ -145,6 +150,22 @@ if [ "$have_candidate_file" -eq 0 ] && [ "$have_generator_cmd" -eq 0 ]; then
             # of guessing a key requirement here.
             ;;
     esac
+
+    # --- default PROBE_TOOL from AGENT -------------------------------------
+    # tools/container_agent.py's --probe-tool (a paragraph in BATCH_CONTRACT
+    # telling the generator it may call tools/probe_one.py to iterate before
+    # writing the batch) falls back to $PROBE_TOOL when the flag itself is
+    # not passed -- see docs/CONTAINER_AGENT.md's "Fast inner loop" section.
+    # openai_compat and kimi_api are plain HTTP wrappers with no tool access
+    # at all (see container/generators/README.md), so that paragraph would
+    # just be noise for them; every other agent here is agentic (Read/Write/
+    # Bash) and can act on it. Only set a default -- never override a value
+    # the caller already exported.
+    case "$AGENT" in
+        openai_compat|kimi_api) PROBE_TOOL="${PROBE_TOOL:-off}" ;;
+        *)                      PROBE_TOOL="${PROBE_TOOL:-on}" ;;
+    esac
+    export PROBE_TOOL
 fi
 
 mkdir -p /out

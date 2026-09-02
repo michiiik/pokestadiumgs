@@ -62,7 +62,7 @@ REPO_ROOT_DEFAULT = TOOLS_DIR.parent
 PRAGMA_RE = re.compile(r'#pragma\s+GLOBAL_ASM\("[^"]*/([A-Za-z_]\w*)\.s"\)')
 OUTPUT_DIR_RE = re.compile(r"^output-(\d+)-(\d+)$")
 
-DEFAULT_GENERATOR_TIMEOUT = 600.0
+DEFAULT_GENERATOR_TIMEOUT = 1800.0
 PROBE_TIMEOUT_CAP = 300.0
 MISC_TIMEOUT = 60.0
 BEST_CANDIDATES_KEPT = 5
@@ -661,6 +661,35 @@ def _extern_block_symbol_names(file_brief: str) -> list[str]:
 # Prompt construction
 # ---------------------------------------------------------------------------
 
+# The "iterate before you write the batch" rule, toggled by --probe-tool
+# (default "on"; see parse_args/main). ON is for an agentic generator that
+# has real Read/Write/Bash tool access (claude.sh, codex.sh, qwen.sh,
+# kimi.sh) and can shell out to tools/probe_one.py itself; OFF is for the
+# plain-HTTP wrappers (openai_compat.sh, kimi_api.sh) that have no tool
+# access at all, where a paragraph telling the model to run a local script
+# would just be noise -- entrypoint.sh sets PROBE_TOOL=off for those two
+# AGENT values (see docs/CONTAINER_AGENT.md's "Fast inner loop" section).
+PROBE_TOOL_RULE_ON = """\
+- You MAY and SHOULD iterate before writing the batch: put a draft in a file
+  and run `python3 tools/probe_one.py --source {source_rel} --function {owner}
+  --body draft.c [--declarations decls.h]` (about 10-20 s each; use --quiet
+  for just the numbers). Read the diff, change one thing, probe again. Do
+  this as many times as useful (dozens is fine), then put your best 8-16
+  distinct bodies in the batch, best first. probe_one.py's "--body" must
+  point at a file holding a COMPLETE function definition (return type, name,
+  parameter list, braces) -- the same shape a batch candidate's "body" must
+  be, not a bare statement block. The working directory is the repo root, so
+  "{source_rel}" and any relative paths you pass resolve from there. Do NOT
+  run make, fleet_probe.py, the permuter, or write into disasm/src yourself.
+"""
+
+PROBE_TOOL_RULE_OFF = """\
+- Do NOT compile, assemble, run make, probes or the permuter yourself: the
+  driver probes every candidate against the ROM right after you write the
+  file and feeds the diagnostics back. Spend your time on the C, not on
+  building a toolchain loop.
+"""
+
 BATCH_CONTRACT = """\
 Write a JSON batch file to the path given below (create or overwrite it).
 Schema:
@@ -688,11 +717,7 @@ Rules:
   prototypes, ...).
 - Give every candidate a distinct, descriptive "label"
   ("<family>:<shape>:<hypothesis>").
-- Do NOT compile, assemble, run make, probes or the permuter yourself: the
-  driver probes every candidate against the ROM right after you write the
-  file and feeds the diagnostics back. Spend your time on the C, not on
-  building a toolchain loop.
-- Do not add or remove any "#pragma GLOBAL_ASM" line.
+{probe_rule}- Do not add or remove any "#pragma GLOBAL_ASM" line.
 - A companion_edit may only retarget an existing C definition/prototype
   already in the file (or the candidate owner's own stale extern); it must
   not target another still-pragma owner.
@@ -808,8 +833,12 @@ def build_prompt(
     batch_path: Path,
     tried_labels: list[str] | None = None,
     m2c_draft: str | None = None,
+    probe_tool: bool = True,
 ) -> str:
     extern_names = _extern_block_symbol_names(file_brief)
+    probe_rule = (PROBE_TOOL_RULE_ON if probe_tool else PROBE_TOOL_RULE_OFF).format(
+        source_rel=source_rel, owner=owner,
+    )
 
     def _assemble(full_diff_count: int) -> str:
         parts = [
@@ -862,7 +891,9 @@ def build_prompt(
                 + ", ".join(extern_names)
             )
         parts.append("")
-        parts.append(BATCH_CONTRACT.format(source_rel=source_rel, owner=owner, batch_path=batch_path))
+        parts.append(BATCH_CONTRACT.format(
+            source_rel=source_rel, owner=owner, batch_path=batch_path, probe_rule=probe_rule,
+        ))
         return "\n".join(parts)
 
     prompt = _assemble(len(best_candidates))
@@ -1734,6 +1765,7 @@ def process_owner(
     max_generator_failures: int = 3,
     generator_timeout: float = DEFAULT_GENERATOR_TIMEOUT,
     permuter_bodies: int = DEFAULT_PERMUTER_BODIES,
+    probe_tool: bool = True,
 ) -> str:
     if gen_failures is None:
         gen_failures = {"consecutive": 0}
@@ -1764,6 +1796,7 @@ def process_owner(
             best_candidates=owner_state["best_candidates"],
             permuter_seed=owner_state.get("permuter_seed"), batch_path=batch_path,
             tried_labels=owner_state.get("tried_labels"), m2c_draft=m2c_draft,
+            probe_tool=probe_tool,
         )
         prompt_path.write_text(prompt_text, encoding="utf-8")
 
@@ -1977,9 +2010,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--generator-timeout", type=float, default=DEFAULT_GENERATOR_TIMEOUT,
         help=(
             "cap in seconds on a single generator invocation; the run's remaining "
-            "budget still bounds it further (default: 600). Kimi K3 at high effort "
-            "can exceed 10 minutes for one batch -- raise this rather than letting "
-            "it time out."
+            "budget still bounds it further (default: 1800, raised from 600 now "
+            "that an agentic generator is expected to spend time iterating with "
+            "tools/probe_one.py -- see --probe-tool). Kimi K3 at high effort "
+            "can exceed 10 minutes for one batch on its own -- raise this further "
+            "rather than letting it time out."
         ),
     )
     parser.add_argument(
@@ -1988,6 +2023,18 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
             "stop the whole run after this many consecutive generator failures "
             "(non-zero exit, timeout, or no valid batch JSON); a quota/rate-limit-looking "
             "failure counts double (default: 3)"
+        ),
+    )
+    parser.add_argument(
+        "--probe-tool", choices=["on", "off"], default=None,
+        help=(
+            "toggle the BATCH_CONTRACT paragraph telling an agentic generator it "
+            "may/should call tools/probe_one.py to iterate on drafts before "
+            "writing the batch (see PROBE_TOOL_RULE_ON/OFF). Default: the "
+            "PROBE_TOOL env var if set, else 'on'. Pass 'off' (or set "
+            "PROBE_TOOL=off) for a generator with no tool access, e.g. the "
+            "plain-HTTP openai_compat/kimi_api wrappers -- entrypoint.sh already "
+            "does this automatically for those two AGENT values."
         ),
     )
     parser.add_argument(
@@ -2019,6 +2066,11 @@ def main(argv: list[str] | None = None) -> int:
     logger = Logger(out_dir / "log.txt")
 
     source_rel = _resolve_source_rel(repo_dir, args.source)
+    # --probe-tool wins when passed explicitly; otherwise fall back to the
+    # PROBE_TOOL env var (entrypoint.sh sets it to "off" for the HTTP-only
+    # AGENT values), defaulting to "on" when neither is set.
+    probe_tool_arg = args.probe_tool or os.environ.get("PROBE_TOOL", "on")
+    probe_tool = probe_tool_arg != "off"
     started = time.monotonic()
     deadline = started + args.budget_seconds
 
@@ -2100,6 +2152,7 @@ def main(argv: list[str] | None = None) -> int:
             permuter_seconds=args.permuter_seconds, generator_cmd=args.generator_cmd, logger=logger,
             gen_failures=gen_failures, max_generator_failures=args.max_generator_failures,
             generator_timeout=args.generator_timeout, permuter_bodies=args.permuter_bodies,
+            probe_tool=probe_tool,
         )
         summary["iteration_counts"][owner] = owner_state["iterations"]
         summary["best_per_owner"][owner] = owner_state["best_similarity"]

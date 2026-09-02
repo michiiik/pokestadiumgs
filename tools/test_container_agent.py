@@ -1196,6 +1196,31 @@ class BuildPromptTests(unittest.TestCase):
             self.assertIn(f"first mismatch at offset {entry['feedback']['first_diff_offset']}", prompt)
         self.assertNotIn("(diff omitted", prompt)
 
+    def test_probe_tool_on_by_default_mentions_probe_one(self) -> None:
+        prompt = container_agent.build_prompt(
+            owner="func_1", source_rel="disasm/src/X.c", file_brief="brief", asm_text="asm",
+            best_candidates=[], permuter_seed=None, batch_path=Path("/tmp/batch.json"),
+        )
+        self.assertIn("tools/probe_one.py", prompt)
+        self.assertIn(
+            "--source disasm/src/X.c --function func_1", prompt,
+        )
+        self.assertIn("MAY and SHOULD iterate", prompt)
+        self.assertNotIn(
+            "Do NOT compile, assemble, run make, probes or the permuter yourself", prompt,
+        )
+
+    def test_probe_tool_off_restores_do_not_compile_rule(self) -> None:
+        prompt = container_agent.build_prompt(
+            owner="func_1", source_rel="disasm/src/X.c", file_brief="brief", asm_text="asm",
+            best_candidates=[], permuter_seed=None, batch_path=Path("/tmp/batch.json"),
+            probe_tool=False,
+        )
+        self.assertNotIn("tools/probe_one.py", prompt)
+        self.assertIn(
+            "Do NOT compile, assemble, run make, probes or the permuter yourself", prompt,
+        )
+
 
 # ---------------------------------------------------------------------------
 # process_owner
@@ -2175,15 +2200,53 @@ class ArgParsingTests(unittest.TestCase):
         self.assertEqual(args.owner_order, "size")
         self.assertIsNone(args.max_instructions)
         self.assertEqual(args.permuter_bodies, container_agent.DEFAULT_PERMUTER_BODIES)
+        self.assertEqual(args.generator_timeout, container_agent.DEFAULT_GENERATOR_TIMEOUT)
+        self.assertEqual(container_agent.DEFAULT_GENERATOR_TIMEOUT, 1800.0)
+        # --probe-tool is unset by default (None) so main() can fall back to
+        # the PROBE_TOOL env var -- see ProbeToolResolutionTests below.
+        self.assertIsNone(args.probe_tool)
 
     def test_overrides(self) -> None:
         args = container_agent.parse_args([
             "--source", "disasm/src/X.c", "--out", "/tmp/out",
             "--owner-order", "file", "--max-instructions", "48", "--permuter-bodies", "5",
+            "--probe-tool", "off",
         ])
         self.assertEqual(args.owner_order, "file")
         self.assertEqual(args.max_instructions, 48)
         self.assertEqual(args.permuter_bodies, 5)
+        self.assertEqual(args.probe_tool, "off")
+
+
+class ProbeToolResolutionTests(unittest.TestCase):
+    """main()'s --probe-tool/PROBE_TOOL precedence: an explicit --probe-tool
+    wins; otherwise fall back to the PROBE_TOOL env var; otherwise default to
+    "on". Exercised directly against parse_args's contract plus main()'s
+    resolution expression, without needing to run a whole owner loop."""
+
+    def _resolve(self, argv, env):
+        args = container_agent.parse_args(argv)
+        with mock.patch.dict(container_agent.os.environ, env, clear=False):
+            probe_tool_arg = args.probe_tool or container_agent.os.environ.get("PROBE_TOOL", "on")
+        return probe_tool_arg != "off"
+
+    def test_flag_wins_over_env(self) -> None:
+        argv = ["--source", "disasm/src/X.c", "--out", "/tmp/out", "--probe-tool", "off"]
+        self.assertFalse(self._resolve(argv, {"PROBE_TOOL": "on"}))
+
+    def test_env_used_when_flag_absent(self) -> None:
+        argv = ["--source", "disasm/src/X.c", "--out", "/tmp/out"]
+        self.assertFalse(self._resolve(argv, {"PROBE_TOOL": "off"}))
+        self.assertTrue(self._resolve(argv, {"PROBE_TOOL": "on"}))
+
+    def test_defaults_on_when_neither_set(self) -> None:
+        argv = ["--source", "disasm/src/X.c", "--out", "/tmp/out"]
+        env = dict(container_agent.os.environ)
+        env.pop("PROBE_TOOL", None)
+        with mock.patch.dict(container_agent.os.environ, env, clear=True):
+            args = container_agent.parse_args(argv)
+            probe_tool_arg = args.probe_tool or container_agent.os.environ.get("PROBE_TOOL", "on")
+        self.assertEqual(probe_tool_arg, "on")
 
 
 # ---------------------------------------------------------------------------

@@ -75,7 +75,8 @@ container as the output directory. The driver
 | `--owner-order {size,file}` | discovery order when `--owners` is not given: smallest-instructions-first (default) or the order owners appear in the source |
 | `--max-instructions N` | skip discovered owners with more instructions than `N` (default: unlimited); ignored when `--owners` is given explicitly |
 | `--generator-cmd` | shell template for candidate generation; `{prompt}` and `{batch}` are substituted |
-| `--generator-timeout` | cap in seconds on a single generator invocation (default 600); still bounded further by the run's remaining budget. Kimi K3 at high effort can exceed 10 minutes per batch -- raise this rather than letting it time out |
+| `--generator-timeout` | cap in seconds on a single generator invocation (default 1800, raised from 600 -- see §4.1); still bounded further by the run's remaining budget. Kimi K3 at high effort can exceed 10 minutes per batch on its own -- raise this further rather than letting it time out |
+| `--probe-tool {on,off}` | toggle the `BATCH_CONTRACT` paragraph telling an agentic generator it may/should call `tools/probe_one.py` to iterate before writing the batch (see §4.1). Default: the `PROBE_TOOL` env var if set, else `on` |
 | `--candidate-file` | test mode: use a fixed batch file once for the first owner, then exit -- no generator/model call at all |
 
 ## 3. Choosing the coding agent
@@ -177,6 +178,63 @@ section is omitted entirely when it has nothing to show):
    rule alongside the declaration-hygiene filtering already applied to the
    previous batch's shared `declarations` (see §6 step 1).
 8. The batch JSON contract/rules (`BATCH_CONTRACT`) and the exact output path.
+
+### 4.1 Fast inner loop
+
+`BATCH_CONTRACT` (step 8 above) includes a paragraph -- on by default,
+toggled by `--probe-tool {on,off}` -- inviting an agentic generator to
+iterate for itself, in its own turn, before it ever writes the batch file:
+
+> You MAY and SHOULD iterate before writing the batch: put a draft in a
+> file and run `python3 tools/probe_one.py --source <source> --function
+> <owner> --body draft.c [--declarations decls.h]` (about 10-20 s each; use
+> `--quiet` for just the numbers). Read the diff, change one thing, probe
+> again. Do this as many times as useful (dozens is fine), then put your
+> best 8-16 distinct bodies in the batch, best first. Do NOT run `make`,
+> `fleet_probe.py`, the permuter, or write into `disasm/src` yourself.
+
+This is a deliberate reversal from the driver's own outer loop, which
+still tells the generator not to touch the toolchain (`--probe-tool off`
+renders that older rule instead -- see below): `tools/probe_one.py` (issue
+#39 follow-up) is a single-candidate wrapper around `tools/fleet_probe.py`
+that a model can call directly, itself, dozens of times inside one turn --
+write a draft body to a scratch file, probe it, read back similarity/raw
+score/frame size/first mismatch/a diff excerpt, change one thing, probe
+again -- instead of paying a full driver generate/probe/prompt-rebuild
+cycle (~5 minutes) for every single hypothesis. It never touches the ROM
+gate (`--no-auto-gate` is always passed) and never installs anything, so it
+is safe for a generator to call it freely.
+
+**Probe-stats isolation.** `tools/fleet_probe.py`/`tools/try_pragma_compare.py`
+normally record every attempt into a shared history
+(`PRAGMA_PROBE_STATS`) that the runner's own preflight consults to reject
+an already-rejected body. A generator iterating on drafts calls
+`probe_one.py` many times per turn; if those quick probes landed in that
+same shared history, a later driver batch containing the winning body could
+get rejected as "already rejected" before it ever reached the real gate. So
+by default `probe_one.py` points its `fleet_probe.py` subprocess at a
+private scratch file instead, `disasm/scratch/probe_one-stats.jsonl`,
+leaving the driver's real probe-stats history untouched. Pass `--stats
+shared` to opt back into the runner's default history, or `--stats PATH`
+for an explicit location.
+
+**Expected pattern**, from a generator's point of view: read the file brief
+and target assembly from the prompt, write a candidate body to a scratch
+file, run `probe_one.py --quiet` for a quick score, and only drop `--quiet`
+(or add `--json out.json`) when a candidate is worth reading the diff for.
+Repeat, changing one hypothesis at a time per the "how to read the diff"
+guide already in the prompt, until a handful of distinct, promising bodies
+have emerged -- then write those (8-16, best first) to the batch JSON file
+at the path the contract names. `--probe-tool` exists because not every
+generator wrapper can act on this: `container/generators/claude.sh`,
+`codex.sh`, `qwen.sh`, and `kimi.sh` all give the model real Read/Write/Bash
+tool access and can run `probe_one.py` mid-turn (see
+`container/generators/README.md`), but `openai_compat.sh`/`kimi_api.sh` are
+plain HTTP chat-completions calls with no tool access at all -- for those,
+`container/entrypoint.sh` exports `PROBE_TOOL=off` automatically (never
+overriding a value the caller already set) whenever `AGENT` is
+`openai_compat` or `kimi_api`, and the driver's `--probe-tool` falls back to
+that env var whenever the flag itself is not passed on the command line.
 
 ## 5. Test mode
 

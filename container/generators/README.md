@@ -15,6 +15,38 @@ JSON schema and the exact `{batch}` output path (see `BATCH_CONTRACT` in
 `tools/container_agent.py`), so every wrapper's only jobs are: run the
 model, and make sure `{batch}` ends up on disk as valid JSON.
 
+## Agents are expected to call `tools/probe_one.py`
+
+`BATCH_CONTRACT`'s "you MAY and SHOULD iterate before writing the batch"
+rule (`--probe-tool on`, the default -- see `docs/CONTAINER_AGENT.md`'s
+"Fast inner loop" section) tells the model to draft a candidate, run
+`python3 tools/probe_one.py --source ... --function ... --body draft.c`
+against the repo's own gate, read the diff, and repeat before writing the
+final batch. That only works for a wrapper that actually gives the model
+tool/shell access:
+
+- `claude.sh`, `codex.sh`, `qwen.sh`, `kimi.sh` are all agentic (the model
+  writes `$BATCH` itself via a file tool) and, as of this doc, all run with
+  auto-approved tool calls -- no interactive confirmation prompt that could
+  never be answered in a non-interactive container -- so the model can also
+  shell out to `probe_one.py` mid-turn: `claude.sh`'s `--allowedTools Read
+  Write Bash` already includes `Bash`; `codex.sh`'s
+  `--dangerously-bypass-approvals-and-sandbox` skips both approvals and the
+  default read-only sandbox; `kimi.sh`'s `-p` mode runs under the CLI's own
+  `auto` permission policy by default (confirmed locally, see the script's
+  header); `qwen.sh` needs an explicit `--approval-mode yolo` (added here --
+  without it, `-p` mode does *not* auto-approve tool calls at all per
+  [qwen-code's headless-mode docs](https://qwenlm.github.io/qwen-code-docs/en/users/features/headless/),
+  and the model would sit waiting for an approval prompt that can never
+  arrive).
+- `openai_compat.sh`/`kimi_api.sh` are plain HTTP calls with no tool access
+  whatsoever, so the probe-tool paragraph would be pure noise for them.
+  `container/entrypoint.sh` sets `PROBE_TOOL=off` for `AGENT=openai_compat`
+  and `AGENT=kimi_api` (never overriding a value the caller already
+  exported), and `tools/container_agent.py`'s `--probe-tool` flag falls back
+  to that env var whenever the flag itself is not passed on the command
+  line (see `parse_args`/`main`).
+
 Select which coding agent generates candidates with the `AGENT` env var
 (default `claude`); `run_generator.sh` execs `container/generators/$AGENT.sh
 <prompt> <batch>` and fails clearly on an unknown value.
@@ -71,7 +103,7 @@ ids they can reach, so override `GENERATOR_MODEL` if it 404s.
 ## qwen.sh
 
 `qwen -p "$(cat "$PROMPT")" --output-format text --model
-"${GENERATOR_MODEL:-qwen3-coder-plus}"`
+"${GENERATOR_MODEL:-qwen3-coder-plus}" --approval-mode yolo`
 
 Agentic, same shape as claude.sh. Flags verified against `qwen --help`
 locally (qwen-code 0.22.3): `-p/--prompt` runs one prompt non-interactively
@@ -81,6 +113,20 @@ OpenAI-compatible mode uses `OPENAI_API_KEY` (+ optional `OPENAI_BASE_URL`,
 `OPENAI_MODEL`/`QWEN_MODEL`); DashScope mode uses `DASHSCOPE_API_KEY`. The
 wrapper requires at least one of `OPENAI_API_KEY` / `DASHSCOPE_API_KEY` to be
 set and otherwise leaves provider selection to qwen's own config.
+
+`--approval-mode yolo` is required for `-p` mode to have any tool access at
+all: per
+[qwen-code's headless-mode docs](https://qwenlm.github.io/qwen-code-docs/en/users/features/headless/),
+"Headless / CI runs combined with `--yolo` (or `--approval-mode=yolo`)
+auto-approve every tool call, including `shell`, `write`, and `edit`" --
+without it, a tool call would sit waiting for an interactive approval that
+this non-interactive wrapper can never provide, so the model could neither
+write `$BATCH` nor shell out to `tools/probe_one.py`. Unlike `claude.sh`'s
+`--allowedTools` (an allowlist of specific tools), `--yolo`/`--approval-mode
+yolo` is a blanket auto-approve and does not itself add any sandboxing; this
+is acceptable here for the same reason `codex.sh`'s
+`--dangerously-bypass-approvals-and-sandbox` is -- both only ever run inside
+the already-sandboxed `gs-decomp-agent` container, never on a bare host.
 
 ## kimi.sh
 
