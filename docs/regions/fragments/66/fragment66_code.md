@@ -41,3 +41,7 @@ requeue: prepared 8 novel complete-function candidates in /private/tmp/gs50_func
 ## Wave 50 coordinator replay (2026-09-02)
 
 requeue; 8 formal-home candidates compared with no link verification. Every result repeated the same instruction-12 fingerprint: expected sw ,76(sp), actual addiu ,3, with best similarity 0.8148 raw 0.7037 and exact target size 324 versus candidate 292. Next action: change the function parameter-use model to emit both formal home stores before func_80055948 while retaining the exact byte workspace; consider a permuter or accepted companion ABI hypothesis.
+
+## 2026-09-02 Wave 51 (2026-09-02)
+
+func_82E0292C requeue. Wave 51 tried nine call-sequence and parameter-home variants; two failed compilation and the best scored 0.8519 normalized / 0.7284 raw. The durable fingerprint is instruction 12: expected sw $a1, 76($sp), actual addiu $a0, $zero, 3. A prior exact-size candidate reached 0.9630 / 0.9136. Next action: resume from that prior body and target argument home stores/declaration order with a 300-second permuter slot or explicit parameter-spill hypotheses.

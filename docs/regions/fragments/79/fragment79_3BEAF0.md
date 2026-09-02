@@ -17,3 +17,7 @@ requeue; prepared 8 novel complete-function candidates in /private/tmp/gs50_func
 ## Wave 50 coordinator replay (2026-09-02)
 
 requeue; 8 direct-return candidates compared with no link verification. Best regressed to similarity 0.8824 raw 0.5000, expected 136 bytes versus actual 136, with stack byte/store ordering drift at instruction 24. The prior best remains 0.9143 raw 0.5714 with late lhu v0 versus v1 allocation drift. Next action: preserve the prior raw-offset shape and target only the late result lifetime through a permuter or minimal declaration change.
+
+## 2026-09-02 Wave 51 (2026-09-02)
+
+func_8414F8B4 requeue. Wave 51 tried eight stack/local ordering variants; best current score 0.8571 normalized / 0.4571 raw, while prior history contains 0.9143 / 0.5714. Current variants diverge earlier in the stack/store sequence. Next action: recover the prior 0.9143 body from probe stats and permute that body or test a materially different local-layout family; do not continue the lower-scoring v0-body variants.

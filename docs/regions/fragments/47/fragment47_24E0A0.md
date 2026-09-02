@@ -37,3 +37,7 @@ tooling-blocked: Wave 50 prepared 8 complete source-compatible void definitions 
 ## Wave 50 coordinator replay (2026-09-02)
 
 requeue; 8 corrected void candidates compared after the prior declaration blocker. Best reached similarity 0.8793 raw 0.3966, expected 232 bytes versus actual 216, with target frame -248 versus candidate -80. The existing helper prototype was respected and no candidate-owner redeclaration was added. Next action: investigate the target’s large double scratch layout and resolve the void-versus-return ABI separately before more bodies.
+
+## 2026-09-02 Wave 51 (2026-09-02)
+
+func_86008E64 requeue. The first wave-51 replay was tooling-blocked by the later stale prototype extern void func_86008E64(void *, s32, void *, void *). Retyping that prototype transactionally to s32 allowed all eight candidates to compile. Best then reached 0.9138 normalized / 0.6034 raw with exact 232-byte size; the copy-struct shape compiled a -264 frame versus expected -248. Next action: keep the s32 self-prototype companion edit, refine the copy-struct local layout to the exact frame, and permute the best body if structural variants stall.

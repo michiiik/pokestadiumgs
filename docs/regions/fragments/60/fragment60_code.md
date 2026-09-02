@@ -49,3 +49,7 @@ requeue; owner func_86A05AAC remains GLOBAL_ASM. Best prior: normalized 0.9512, 
 ## Wave 50 coordinator replay (2026-09-02)
 
 requeue; 8 pointer-v0 candidates compared with no link verification. Best reached similarity 0.8571 raw 0.5000, expected 160 bytes versus actual 168, with early prologue drift; the prior best remains 0.9512 raw 0.7805 and late op/0x31 register mismatch. Next action: return to the prior explicit-difference near miss and use a dedicated register-allocation/permuter pass rather than pointer-v0 rewrites.
+
+## 2026-09-02 Wave 51 (2026-09-02)
+
+func_86A05AAC requeue. Wave 51 tried eight variants; best 0.9512 normalized / 0.7805 raw, expected 160 bytes and actual 164. The late durable fingerprint is op 0x31 using expected $v0 versus actual $t2. A dedicated 180-second permuter run stayed at score 365 with no output. Next action: change the IR/operand hypothesis around the final load/store lifetime before another 300-second permuter run; declaration-order-only variants are exhausted.
