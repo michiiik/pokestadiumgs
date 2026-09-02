@@ -172,7 +172,21 @@ void func_86001F44(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_246640/func_86001FCC.s")
+extern f64 func_86009C98(void *, f64, f64);
+extern f64 D_8600DEE0;
+extern f32 __cosf(f32);
+extern void func_86001F44(u8 *arg0);
+extern u8 D_8600DE30[];
+void func_86001FCC(void *arg0) {
+    u8 *base;
+
+    base = *(u8 **)((u8 *)arg0 + 0x1870) + 0x6668;
+    func_86001F44(arg0);
+    *(f64 *)((u8 *)arg0 + 0x8) = func_86009C98(base, *(f64 *)arg0, *(f64 *)((u8 *)arg0 + 0x10));
+    *(f64 *)((u8 *)arg0 + 0x18) = -*(f64 *)(D_8600DE30 + 0xB0) * (f64)__sinf((f32)*(f64 *)((u8 *)arg0 + 0x17D8));
+    *(f64 *)((u8 *)arg0 + 0x20) = *(f64 *)(D_8600DE30 + 0xB8);
+    *(f64 *)((u8 *)arg0 + 0x28) = -D_8600DEE0 * (f64)__cosf((f32)*(f64 *)((u8 *)arg0 + 0x17D8));
+}
 #endif
 
 #ifdef VERSION_US
