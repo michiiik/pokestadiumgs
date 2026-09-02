@@ -435,7 +435,45 @@ s32 func_8005A134(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005A228.s")
+extern u8 D_80097374[];
+extern s32 GbPak_IsCartOff(s32);
+extern s32 GbPak_IsCartOn(s32);
+extern s32 func_80056F7C(s32);
+extern s32 GbTower_VerifyPakStillInserted(s32, u8 *);
+extern s32 func_8005805C(s32 arg0);
+extern u8 D_80128570[];
+s32 func_8005A228(s32 arg0) {
+    s32 result = 0;
+    u8 *status = D_80097374 + arg0;
+    switch (*status) {
+    case 0:
+        GbTower_CheckPakRemoved(arg0, 0);
+        *status += 1;
+    case 1:
+        if (GbPak_IsCartOff(arg0) != 0) {
+            *status += 1;
+        }
+        break;
+    case 2:
+        if (GbPak_IsCartOn(arg0) != 0) {
+            *status += 1;
+        }
+        result = 1;
+        break;
+    case 3:
+        if (func_80056F7C(arg0) != 0) {
+            result = 3;
+            if (func_8005805C(arg0) == *(u8 *)(D_80128570 + arg0 * 0x70 + 4)) {
+                if (GbTower_VerifyPakStillInserted(arg0, D_80128570 + arg0 * 0x70 + 0x28) != 0) {
+                    result = 2;
+                }
+            }
+        }
+        *status = 0;
+        break;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
