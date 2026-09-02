@@ -442,7 +442,7 @@ extern s32 func_80056F7C(s32);
 extern s32 GbTower_VerifyPakStillInserted(s32, u8 *);
 extern s32 GbSave_IdentifyFormat(s32 arg0);
 extern u8 D_80128570[];
-s32 func_8005A228(s32 arg0) {
+s32 GbTower_PollPortState(s32 arg0) {
     s32 result = 0;
     u8 *status = D_80097374 + arg0;
     switch (*status) {
