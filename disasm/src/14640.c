@@ -338,7 +338,12 @@ void func_80018704(s32 arg0, s32 arg1) { func_800186B8(arg0, &arg1); }
 
 void func_80018728(s32 arg0, s32 arg1) { func_800186B8(arg0, &arg1); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_8001874C.s")
+void func_8001874C(s32 arg0, s8 arg1) {
+    s32 value;
+
+    value = arg1 << 24;
+    func_800186B8(arg0, &value);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_8001877C.s")
 
