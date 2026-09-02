@@ -22,6 +22,7 @@ on:
     paths:
       - 'disasm/src/**'
       - 'disasm/include/**'
+      - 'disasm/linker_scripts/**'
       - 'container/**'
       - 'tools/**'
   workflow_dispatch: {}
