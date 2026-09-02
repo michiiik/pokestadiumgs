@@ -60,7 +60,7 @@ REPO_ROOT_DEFAULT = TOOLS_DIR.parent
 PRAGMA_RE = re.compile(r'#pragma\s+GLOBAL_ASM\("[^"]*/([A-Za-z_]\w*)\.s"\)')
 OUTPUT_DIR_RE = re.compile(r"^output-(\d+)-(\d+)$")
 
-GENERATOR_TIMEOUT_CAP = 600.0
+DEFAULT_GENERATOR_TIMEOUT = 600.0
 PROBE_TIMEOUT_CAP = 300.0
 MISC_TIMEOUT = 60.0
 BEST_CANDIDATES_KEPT = 5
@@ -368,7 +368,17 @@ def invoke_generator(command: str, *, cwd: Path, timeout: float) -> subprocess.C
 # Generator health tracking (quota / rate-limit exhaustion)
 # ---------------------------------------------------------------------------
 
-QUOTA_SIGNATURES = ("rate limit", "quota", "usage limit", "429", "too many requests")
+# Whole-phrase, case-insensitive signatures. "429" only matches as a
+# standalone token (\b429\b) so reasoning text mentioning an offset like
+# "0x429" does not trip it.
+QUOTA_SIGNATURES = (
+    r"\brate[ -]limit\b",
+    r"\bquota\b",
+    r"\busage limit\b",
+    r"\btoo many requests\b",
+    r"\b429\b",
+)
+_QUOTA_RE = re.compile("|".join(f"(?:{sig})" for sig in QUOTA_SIGNATURES), re.IGNORECASE)
 
 
 def _decode(text: object) -> str:
@@ -380,8 +390,8 @@ def _decode(text: object) -> str:
 
 
 def _looks_like_quota(*texts: object) -> bool:
-    combined = " ".join(_decode(t) for t in texts).lower()
-    return any(signature in combined for signature in QUOTA_SIGNATURES)
+    combined = " ".join(_decode(t) for t in texts)
+    return bool(_QUOTA_RE.search(combined))
 
 
 def _record_generator_outcome(
@@ -919,6 +929,7 @@ def process_owner(
     logger: Logger,
     gen_failures: dict | None = None,
     max_generator_failures: int = 3,
+    generator_timeout: float = DEFAULT_GENERATOR_TIMEOUT,
 ) -> str:
     if gen_failures is None:
         gen_failures = {"consecutive": 0}
@@ -944,21 +955,25 @@ def process_owner(
         prompt_path.write_text(prompt_text, encoding="utf-8")
 
         remaining_budget = max(1.0, deadline - time.monotonic())
-        gen_timeout = max(10.0, min(GENERATOR_TIMEOUT_CAP, remaining_budget))
+        gen_timeout = max(10.0, min(generator_timeout, remaining_budget))
         command = render_generator_command(generator_cmd, prompt_path, batch_path)
         timed_out = False
+        timeout_stderr = ""
         try:
             gen_result = invoke_generator(command, cwd=repo_dir, timeout=gen_timeout)
         except subprocess.TimeoutExpired as exc:
             logger.log(f"{owner}: iter {iteration}: generator timed out after {gen_timeout:.0f}s")
             gen_result = None
             timed_out = True
-            timeout_texts = (_decode(getattr(exc, "stdout", None)), _decode(getattr(exc, "stderr", None)))
+            timeout_stderr = _decode(getattr(exc, "stderr", None))
         except OSError as exc:
             logger.log(f"{owner}: iter {iteration}: generator failed to launch: {exc}")
             owner_state["status"] = "generator_failed"
+            # A launch failure never produced a real exit code, so quota
+            # classification (which only applies to a non-zero exit) does
+            # not apply here.
             exhausted = _record_generator_outcome(
-                gen_failures, ok=False, quota=_looks_like_quota(str(exc)), stderr_tail=str(exc),
+                gen_failures, ok=False, quota=False, stderr_tail=str(exc),
                 owner=owner, iteration=iteration, max_failures=max_generator_failures, logger=logger,
             )
             if exhausted:
@@ -981,12 +996,23 @@ def process_owner(
         if not gen_ok:
             if batch is None:
                 logger.log(f"{owner}: iter {iteration}: no valid batch JSON at {batch_path}")
+            # Quota/rate-limit classification only applies to a generator
+            # that actually exited non-zero, and only inspects stderr: a
+            # timeout's captured output is the model's own (possibly
+            # truncated) reasoning text, and an exit-0-but-no-batch failure
+            # has no non-zero exit to attribute to a quota signal at all.
+            # Either case matching a quota phrase by accident must not
+            # double-count a plain timeout or missing-batch failure.
             if timed_out:
-                failure_texts = timeout_texts
+                quota = False
+                stderr_tail = timeout_stderr
+            elif gen_result is not None and gen_result.returncode != 0:
+                stderr_text = gen_result.stderr or ""
+                quota = _looks_like_quota(stderr_text)
+                stderr_tail = stderr_text
             else:
-                failure_texts = (gen_result.stdout or "", gen_result.stderr or "") if gen_result is not None else ()
-            quota = _looks_like_quota(*failure_texts)
-            stderr_tail = _decode(failure_texts[-1]) if failure_texts else ""
+                quota = False
+                stderr_tail = (gen_result.stderr or "") if gen_result is not None else ""
             exhausted = _record_generator_outcome(
                 gen_failures, ok=False, quota=quota, stderr_tail=stderr_tail,
                 owner=owner, iteration=iteration, max_failures=max_generator_failures, logger=logger,
@@ -1118,6 +1144,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="test mode: use this batch once for the first owner instead of any generator, then exit",
     )
     parser.add_argument(
+        "--generator-timeout", type=float, default=DEFAULT_GENERATOR_TIMEOUT,
+        help=(
+            "cap in seconds on a single generator invocation; the run's remaining "
+            "budget still bounds it further (default: 600). Kimi K3 at high effort "
+            "can exceed 10 minutes for one batch -- raise this rather than letting "
+            "it time out."
+        ),
+    )
+    parser.add_argument(
         "--max-generator-failures", type=int, default=3,
         help=(
             "stop the whole run after this many consecutive generator failures "
@@ -1231,6 +1266,7 @@ def main(argv: list[str] | None = None) -> int:
             max_iterations=args.max_iterations, plateau=args.plateau,
             permuter_seconds=args.permuter_seconds, generator_cmd=args.generator_cmd, logger=logger,
             gen_failures=gen_failures, max_generator_failures=args.max_generator_failures,
+            generator_timeout=args.generator_timeout,
         )
         summary["iteration_counts"][owner] = owner_state["iterations"]
         summary["best_per_owner"][owner] = owner_state["best_similarity"]

@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import json
 import shlex
+import subprocess
 import sys
 import tempfile
 import time
@@ -971,6 +972,159 @@ class GeneratorExhaustionTests(unittest.TestCase):
         self.assertEqual(status, "max_iterations")
         self.assertEqual(owner_state["iterations"], 3)
         self.assertEqual(gen_failures["consecutive"], 1)
+
+
+# ---------------------------------------------------------------------------
+# Generator timeout handling / quota classification scoping
+# ---------------------------------------------------------------------------
+
+class GeneratorTimeoutAndQuotaClassificationTests(unittest.TestCase):
+    """A generator timeout must count as exactly one failure and must never
+    be misread as a quota/rate-limit signal from the model's own partial
+    reasoning text. Quota classification applies only to a non-zero exit,
+    and only inspects stderr."""
+
+    def _run_owner(
+        self, tmp, *, invoke_generator_stub, max_generator_failures=10,
+        generator_timeout=container_agent.DEFAULT_GENERATOR_TIMEOUT, deadline_seconds=60.0,
+    ):
+        repo_dir = Path(tmp) / "repo"
+        repo_dir.mkdir()
+        out_dir = Path(tmp) / "out"
+        owner = "func_1"
+        source_rel = "disasm/src/X.c"
+        owner_state = container_agent._new_owner_state()
+        state = {owner: owner_state}
+        state_path = out_dir / "state.json"
+        logger = container_agent.Logger(out_dir / "log.txt")
+        gen_failures = {"consecutive": 0}
+
+        with mock.patch.object(container_agent, "file_brief_text", return_value="brief"), \
+             mock.patch.object(container_agent, "owner_asm_text", return_value="asm"), \
+             mock.patch.object(container_agent, "invoke_generator", side_effect=invoke_generator_stub):
+            status = container_agent.process_owner(
+                repo_dir=repo_dir, out_dir=out_dir, source_rel=source_rel, owner=owner,
+                owner_state=owner_state, state=state, state_path=state_path,
+                deadline=time.monotonic() + deadline_seconds, max_iterations=1, plateau=100,
+                permuter_seconds=0.0, generator_cmd="generator --prompt {prompt} --batch {batch}",
+                logger=logger, gen_failures=gen_failures, max_generator_failures=max_generator_failures,
+                generator_timeout=generator_timeout,
+            )
+        log_text = (out_dir / "log.txt").read_text(encoding="utf-8")
+        return status, gen_failures, log_text
+
+    def test_timeout_counts_one_failure_and_logs_no_quota_signal(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            def timeout_generator(command, *, cwd, timeout):
+                # Partial reasoning text captured off a killed generator --
+                # mentions an offset that happens to look like "429".
+                text = "reasoning: computing offset 0x429 into the jump table"
+                raise subprocess.TimeoutExpired(cmd=command, timeout=timeout, output=text, stderr=text)
+
+            status, gen_failures, log_text = self._run_owner(tmp, invoke_generator_stub=timeout_generator)
+
+        self.assertEqual(status, "max_iterations")
+        self.assertEqual(gen_failures["consecutive"], 1)
+        self.assertNotIn("quota", log_text.lower())
+
+    def test_nonzero_exit_with_rate_limit_stderr_counts_two_failures(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            def failing_generator(command, *, cwd, timeout):
+                return SimpleNamespace(returncode=1, stdout="", stderr="Error: Rate limit exceeded, try later")
+
+            status, gen_failures, log_text = self._run_owner(tmp, invoke_generator_stub=failing_generator)
+
+        self.assertEqual(gen_failures["consecutive"], 2)
+        self.assertIn("quota", log_text.lower())
+
+    def test_nonzero_exit_with_hex_offset_in_stderr_is_not_quota(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            def failing_generator(command, *, cwd, timeout):
+                return SimpleNamespace(
+                    returncode=1, stdout="",
+                    stderr="unexpected token near 0x429 in decoded instruction",
+                )
+
+            status, gen_failures, log_text = self._run_owner(tmp, invoke_generator_stub=failing_generator)
+
+        self.assertEqual(gen_failures["consecutive"], 1)
+        self.assertNotIn("quota", log_text.lower())
+
+    def test_stdout_quota_word_with_exit_zero_and_missing_batch_is_not_quota(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            def missing_batch_generator(command, *, cwd, timeout):
+                # Exit 0, but the batch file is never written -- stdout
+                # happens to mention "quota" in the model's own reasoning.
+                return SimpleNamespace(
+                    returncode=0, stdout="checking my quota of remaining tool calls", stderr="",
+                )
+
+            status, gen_failures, log_text = self._run_owner(tmp, invoke_generator_stub=missing_batch_generator)
+
+        self.assertEqual(gen_failures["consecutive"], 1)
+        self.assertNotIn("quota", log_text.lower())
+
+    def test_generator_timeout_flag_bounds_the_invocation_timeout(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            repo_dir.mkdir()
+            out_dir = Path(tmp) / "out"
+            owner = "func_1"
+            source_rel = "disasm/src/X.c"
+            owner_state = container_agent._new_owner_state()
+            state = {owner: owner_state}
+            state_path = out_dir / "state.json"
+            logger = container_agent.Logger(out_dir / "log.txt")
+
+            with mock.patch.object(container_agent, "file_brief_text", return_value="brief"), \
+                 mock.patch.object(container_agent, "owner_asm_text", return_value="asm"), \
+                 mock.patch.object(container_agent, "invoke_generator") as gen_mock:
+                gen_mock.side_effect = subprocess.TimeoutExpired(cmd="x", timeout=1)
+                container_agent.process_owner(
+                    repo_dir=repo_dir, out_dir=out_dir, source_rel=source_rel, owner=owner,
+                    owner_state=owner_state, state=state, state_path=state_path,
+                    deadline=time.monotonic() + 3600.0, max_iterations=1, plateau=100,
+                    permuter_seconds=0.0, generator_cmd="generator --prompt {prompt} --batch {batch}",
+                    logger=logger, gen_failures={"consecutive": 0}, max_generator_failures=10,
+                    generator_timeout=45.0,
+                )
+
+            self.assertEqual(gen_mock.call_count, 1)
+            _, kwargs = gen_mock.call_args
+            # deadline is far away, so the flag itself (not the remaining
+            # budget) bounds the invocation timeout.
+            self.assertEqual(kwargs["timeout"], 45.0)
+
+    def test_generator_timeout_flag_is_bounded_by_remaining_budget(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            repo_dir.mkdir()
+            out_dir = Path(tmp) / "out"
+            owner = "func_1"
+            source_rel = "disasm/src/X.c"
+            owner_state = container_agent._new_owner_state()
+            state = {owner: owner_state}
+            state_path = out_dir / "state.json"
+            logger = container_agent.Logger(out_dir / "log.txt")
+
+            with mock.patch.object(container_agent, "file_brief_text", return_value="brief"), \
+                 mock.patch.object(container_agent, "owner_asm_text", return_value="asm"), \
+                 mock.patch.object(container_agent, "invoke_generator") as gen_mock:
+                gen_mock.side_effect = subprocess.TimeoutExpired(cmd="x", timeout=1)
+                container_agent.process_owner(
+                    repo_dir=repo_dir, out_dir=out_dir, source_rel=source_rel, owner=owner,
+                    owner_state=owner_state, state=state, state_path=state_path,
+                    deadline=time.monotonic() + 20.0, max_iterations=1, plateau=100,
+                    permuter_seconds=0.0, generator_cmd="generator --prompt {prompt} --batch {batch}",
+                    logger=logger, gen_failures={"consecutive": 0}, max_generator_failures=10,
+                    generator_timeout=600.0,
+                )
+
+            _, kwargs = gen_mock.call_args
+            # the run's remaining budget (~20s) is tighter than the 600s
+            # flag, so it -- not the flag -- bounds the invocation timeout.
+            self.assertLessEqual(kwargs["timeout"], 20.0)
+            self.assertGreater(kwargs["timeout"], 10.0)
 
 
 # ---------------------------------------------------------------------------

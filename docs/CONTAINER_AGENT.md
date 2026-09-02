@@ -72,6 +72,7 @@ container as the output directory. The driver
 | `--permuter-seconds` | budget per permuter invocation |
 | `--owners` | restrict the run to an explicit owner list instead of every pragma in the file |
 | `--generator-cmd` | shell template for candidate generation; `{prompt}` and `{batch}` are substituted |
+| `--generator-timeout` | cap in seconds on a single generator invocation (default 600); still bounded further by the run's remaining budget. Kimi K3 at high effort can exceed 10 minutes per batch -- raise this rather than letting it time out |
 | `--candidate-file` | test mode: use a fixed batch file once for the first owner, then exit -- no generator/model call at all |
 
 ## 3. Choosing the coding agent
