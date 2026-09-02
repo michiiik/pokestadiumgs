@@ -284,6 +284,7 @@ class RunIterationTests(unittest.TestCase):
             owner_state = container_agent._new_owner_state()
             owner_state["plateau_count"] = 3
             owner_state["best_similarity"] = 0.5
+            owner_state["best_effective_similarity"] = 0.5
 
             batch = {"source": "disasm/src/X.c", "candidates": [{"function": owner, "label": "a", "body": "body_a"}]}
             low_result = {
@@ -462,6 +463,168 @@ class RunIterationTests(unittest.TestCase):
             status = self._run(out_dir, repo_dir, owner, batch, None, owner_state)
         self.assertEqual(status, "continue")
         self.assertEqual(owner_state["plateau_count"], 1)
+
+    def test_normalized_only_match_does_not_win_or_trigger_permuter(self) -> None:
+        # Reproduces the observed real-run attempt: similarity_score=1.0,
+        # raw_similarity_score=0.6667, mismatch_kind=immediate_drift, a
+        # diagnostic flagging it as normalized-only, and status
+        # "probe_rejected" (never "accepted"). It must not be allowed to
+        # look like a perfect (or even near-95%) match to the driver.
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            repo_dir.mkdir()
+            out_dir = Path(tmp) / "out"
+            owner = "func_1"
+            owner_state = container_agent._new_owner_state()
+            batch = {"source": "disasm/src/X.c", "candidates": [{"function": owner, "label": "a", "body": "body_a"}]}
+            result = {
+                "batch_status": "no_candidate_accepted", "accepted": [],
+                "attempts": [{
+                    "function": owner, "label": "a", "status": "probe_rejected",
+                    "similarity_score": 1.0, "raw_similarity_score": 0.6667,
+                    "mismatch_kind": "immediate_drift",
+                    "diagnostic": (
+                        "normalized_only_match: the normalised similarity score is hiding "
+                        "register/field differences"
+                    ),
+                }],
+            }
+            logger = container_agent.Logger(out_dir / "log.txt")
+            batch_path = out_dir / "batches" / "func_1_iter0.json"
+            container_agent.save_json(batch_path, batch)
+
+            def fake_probe(repo_dir_arg, batch_path_arg, result_path, *, timeout):
+                container_agent.save_json(result_path, result)
+                return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+            with mock.patch.object(container_agent, "invoke_probe", side_effect=fake_probe), \
+                 mock.patch.object(container_agent, "run_permuter") as run_permuter_mock:
+                status = container_agent.run_iteration(
+                    repo_dir=repo_dir, out_dir=out_dir, source_rel="disasm/src/X.c", owner=owner,
+                    iteration=0, batch=batch, batch_path=batch_path, owner_state=owner_state,
+                    deadline=time.monotonic() + 60.0, permuter_seconds=30.0, logger=logger,
+                )
+        self.assertEqual(status, "continue")
+        run_permuter_mock.assert_not_called()
+        self.assertNotIn("permuter_seed", owner_state)
+        # No improvement is recorded -- plateau increments, not resets.
+        self.assertEqual(owner_state["plateau_count"], 1)
+        self.assertEqual(owner_state["best_similarity"], 0.0)
+        self.assertEqual(owner_state["best_effective_similarity"], 0.0)
+        self.assertTrue(owner_state["best_candidates"][0]["normalized_only"])
+
+    def test_later_genuine_improvement_counts_over_normalized_only_match(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            repo_dir.mkdir()
+            out_dir = Path(tmp) / "out"
+            owner = "func_1"
+            owner_state = container_agent._new_owner_state()
+
+            batch0 = {"source": "disasm/src/X.c", "candidates": [{"function": owner, "label": "a", "body": "body_a"}]}
+            normalized_only_result = {
+                "batch_status": "no_candidate_accepted", "accepted": [],
+                "attempts": [{
+                    "function": owner, "label": "a", "status": "probe_rejected",
+                    "similarity_score": 1.0, "raw_similarity_score": 0.6667,
+                    "mismatch_kind": "immediate_drift",
+                    "diagnostic": "normalized_only_match: hiding register/field differences",
+                }],
+            }
+            self._run(out_dir, repo_dir, owner, batch0, normalized_only_result, owner_state, iteration=0, permuter_seconds=30.0)
+            self.assertEqual(owner_state["plateau_count"], 1)
+            self.assertEqual(owner_state["best_similarity"], 0.0)
+
+            batch1 = {"source": "disasm/src/X.c", "candidates": [{"function": owner, "label": "b", "body": "body_b"}]}
+            genuine_result = {
+                "batch_status": "no_candidate_accepted", "accepted": [],
+                "attempts": [{
+                    "function": owner, "label": "b", "status": "near_miss",
+                    "similarity_score": 0.96, "raw_similarity_score": 0.95,
+                }],
+            }
+            self._run(out_dir, repo_dir, owner, batch1, genuine_result, owner_state, iteration=1, permuter_seconds=30.0)
+
+        self.assertEqual(owner_state["best_similarity"], 0.96)
+        self.assertEqual(owner_state["best_effective_similarity"], 0.96)
+        self.assertEqual(owner_state["plateau_count"], 0)
+
+    def test_raw_only_improvement_at_equal_normalized_similarity_counts(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            repo_dir.mkdir()
+            out_dir = Path(tmp) / "out"
+            owner = "func_1"
+            owner_state = container_agent._new_owner_state()
+
+            batch0 = {"source": "disasm/src/X.c", "candidates": [{"function": owner, "label": "a", "body": "body_a"}]}
+            result0 = {
+                "batch_status": "no_candidate_accepted", "accepted": [],
+                "attempts": [{
+                    "function": owner, "label": "a", "status": "rejected",
+                    "similarity_score": 0.8, "raw_similarity_score": 0.70,
+                }],
+            }
+            self._run(out_dir, repo_dir, owner, batch0, result0, owner_state, iteration=0)
+            self.assertEqual(owner_state["best_similarity"], 0.8)
+            self.assertEqual(owner_state["best_raw_similarity"], 0.70)
+            self.assertEqual(owner_state["plateau_count"], 0)
+
+            batch1 = {"source": "disasm/src/X.c", "candidates": [{"function": owner, "label": "b", "body": "body_b"}]}
+            result1 = {
+                "batch_status": "no_candidate_accepted", "accepted": [],
+                "attempts": [{
+                    "function": owner, "label": "b", "status": "rejected",
+                    "similarity_score": 0.8, "raw_similarity_score": 0.75,
+                }],
+            }
+            self._run(out_dir, repo_dir, owner, batch1, result1, owner_state, iteration=1)
+
+        self.assertEqual(owner_state["best_similarity"], 0.8)
+        self.assertEqual(owner_state["best_raw_similarity"], 0.75)
+        self.assertEqual(owner_state["plateau_count"], 0)
+
+
+# ---------------------------------------------------------------------------
+# build_prompt
+# ---------------------------------------------------------------------------
+
+class BuildPromptTests(unittest.TestCase):
+    def test_normalized_only_candidate_gets_flagged_in_prompt(self) -> None:
+        prompt = container_agent.build_prompt(
+            owner="func_1",
+            source_rel="disasm/src/X.c",
+            file_brief="brief",
+            asm_text="asm",
+            best_candidates=[{
+                "label": "a", "similarity_score": 1.0, "raw_similarity_score": 0.6667,
+                "mismatch_kind": "immediate_drift", "futility": None,
+                "diagnostic": "normalized_only_match: hiding register/field differences",
+                "body": "void func_1(void) {}",
+                "normalized_only": True,
+            }],
+            permuter_seed=None,
+            batch_path=Path("/tmp/batch.json"),
+        )
+        self.assertIn("NORMALIZED-ONLY MATCH", prompt)
+        self.assertIn("raw=0.6667", prompt)
+
+    def test_non_normalized_only_candidate_has_no_flag_line(self) -> None:
+        prompt = container_agent.build_prompt(
+            owner="func_1",
+            source_rel="disasm/src/X.c",
+            file_brief="brief",
+            asm_text="asm",
+            best_candidates=[{
+                "label": "a", "similarity_score": 0.8, "raw_similarity_score": 0.75,
+                "mismatch_kind": None, "futility": None, "diagnostic": None,
+                "body": "void func_1(void) {}",
+                "normalized_only": False,
+            }],
+            permuter_seed=None,
+            batch_path=Path("/tmp/batch.json"),
+        )
+        self.assertNotIn("NORMALIZED-ONLY MATCH", prompt)
 
 
 # ---------------------------------------------------------------------------
@@ -852,7 +1015,8 @@ class ResumeTests(unittest.TestCase):
                     "history": [], "best_candidates": [], "permuter_runs": [],
                 },
                 "func_b": {
-                    "status": "plateau", "best_similarity": 0.4, "best_raw_similarity": 0.4,
+                    "status": "plateau", "best_similarity": 0.4, "best_effective_similarity": 0.4,
+                    "best_raw_similarity": 0.4,
                     "best_label": "x", "iterations": 2, "plateau_count": 6,
                     "history": [],
                     "best_candidates": [{

@@ -118,6 +118,7 @@ def _new_owner_state() -> dict:
     return {
         "status": "in_progress",
         "best_similarity": 0.0,
+        "best_effective_similarity": 0.0,
         "best_raw_similarity": None,
         "best_label": None,
         "iterations": 0,
@@ -126,6 +127,56 @@ def _new_owner_state() -> dict:
         "best_candidates": [],
         "permuter_runs": [],
     }
+
+
+# ---------------------------------------------------------------------------
+# Normalized-only match detection
+#
+# The probe's ``similarity_score`` is normalized (it can read 1.0, or close
+# to it, even while real register/immediate/field differences remain -- see
+# ``raw_similarity_score``). An attempt whose diagnostic flags this
+# explicitly, or whose normalized score looks perfect/near-perfect while its
+# raw score is well below it and it was NOT actually accepted, is a
+# "normalized-only match": it must never be allowed to look like a genuine
+# near-miss to the driver (best-candidate selection, the improvement test,
+# or the permuter trigger).
+# ---------------------------------------------------------------------------
+
+def _is_normalized_only_match(attempt: dict) -> bool:
+    if attempt.get("normalized_only") is True:
+        return True
+    diagnostic = attempt.get("diagnostic") or ""
+    if "normalized_only_match" in diagnostic:
+        return True
+    similarity = attempt.get("similarity_score")
+    raw = attempt.get("raw_similarity_score")
+    status = attempt.get("status")
+    if (
+        isinstance(similarity, (int, float)) and similarity >= 0.999
+        and status != "accepted"
+        and isinstance(raw, (int, float)) and raw < 0.95
+    ):
+        return True
+    return False
+
+
+def attempt_rank(attempt: dict) -> tuple[float, float]:
+    """Rank key for an attempt (or a ``best_candidates`` entry): ``(effective
+    similarity, raw similarity)``.
+
+    Ordinarily ``effective`` is just ``similarity_score``. But a
+    normalized-only match (see ``_is_normalized_only_match``) has its
+    ``effective`` capped at ``0.9 + 0.1 * raw`` so it can never rank above,
+    or tie with, a genuine near-miss -- it always stays below the 0.95
+    permuter threshold unless raw itself is already high.
+    """
+    similarity = attempt.get("similarity_score") or 0.0
+    raw = attempt.get("raw_similarity_score")
+    raw_value = raw if isinstance(raw, (int, float)) else 0.0
+    effective = similarity
+    if _is_normalized_only_match(attempt):
+        effective = min(similarity, 0.9 + 0.1 * raw_value)
+    return (effective, raw_value)
 
 
 # ---------------------------------------------------------------------------
@@ -268,6 +319,12 @@ def build_prompt(
             diagnostic = entry.get("diagnostic")
             if diagnostic:
                 parts.append(f"   diagnostic: {diagnostic}")
+            if entry.get("normalized_only"):
+                parts.append(
+                    "   NORMALIZED-ONLY MATCH: the shape is right but "
+                    f"immediates/registers/fields differ (raw={entry.get('raw_similarity_score')}); "
+                    "vary constants, field offsets and operand order, not structure."
+                )
             body = entry.get("body")
             if body:
                 parts.append("   body:")
@@ -701,10 +758,7 @@ def run_iteration(
 
     attempts = result.get("attempts") or []
     scored = [a for a in attempts if isinstance(a.get("similarity_score"), (int, float))]
-    iteration_best = (
-        max(scored, key=lambda a: (a.get("similarity_score") or 0.0, a.get("raw_similarity_score") or 0.0))
-        if scored else None
-    )
+    iteration_best = max(scored, key=attempt_rank) if scored else None
 
     owner_state["history"].append({
         "iteration": iteration,
@@ -744,6 +798,8 @@ def run_iteration(
                 source_rel_fallback=source_rel, logger=logger,
             )
         owner_state["best_similarity"] = 1.0
+        owner_state["best_effective_similarity"] = 1.0
+        owner_state["best_raw_similarity"] = 1.0
         owner_state["plateau_count"] = 0
         logger.log(f"{owner}: ACCEPTED ({', '.join(accepted_functions)})")
         return "accepted"
@@ -763,11 +819,9 @@ def run_iteration(
             "futility": attempt.get("futility"),
             "diagnostic": ((attempt.get("diagnostic") or "")[:500]) or None,
             "body": body,
+            "normalized_only": _is_normalized_only_match(attempt),
         })
-    owner_state["best_candidates"].sort(
-        key=lambda entry: (entry.get("similarity_score") or 0.0, entry.get("raw_similarity_score") or 0.0),
-        reverse=True,
-    )
+    owner_state["best_candidates"].sort(key=attempt_rank, reverse=True)
     seen_labels: set[str] = set()
     deduped: list[dict] = []
     for entry in owner_state["best_candidates"]:
@@ -777,10 +831,26 @@ def run_iteration(
         deduped.append(entry)
     owner_state["best_candidates"] = deduped[:BEST_CANDIDATES_KEPT]
 
-    previous_best = owner_state.get("best_similarity") or 0.0
-    current_best = (iteration_best.get("similarity_score") or 0.0) if iteration_best else 0.0
-    if current_best > previous_best + 1e-9:
-        owner_state["best_similarity"] = current_best
+    previous_effective = owner_state.get("best_effective_similarity") or 0.0
+    previous_raw = owner_state.get("best_raw_similarity") or 0.0
+    current_effective, current_raw = attempt_rank(iteration_best) if iteration_best else (0.0, 0.0)
+    # A normalized-only match never advances "best" tracking -- not even to
+    # its own capped effective value -- so a later genuine near-miss is
+    # always free to register as an improvement over whatever came before it.
+    is_improvement = (
+        iteration_best is not None
+        and not _is_normalized_only_match(iteration_best)
+        and (
+            current_effective > previous_effective + 1e-9
+            or (
+                abs(current_effective - previous_effective) <= 1e-9
+                and current_raw > previous_raw + 1e-9
+            )
+        )
+    )
+    if is_improvement:
+        owner_state["best_effective_similarity"] = current_effective
+        owner_state["best_similarity"] = iteration_best.get("similarity_score") or 0.0
         owner_state["best_raw_similarity"] = iteration_best.get("raw_similarity_score")
         owner_state["best_label"] = iteration_best.get("label")
         owner_state["plateau_count"] = 0
@@ -788,11 +858,14 @@ def run_iteration(
         owner_state["plateau_count"] = owner_state.get("plateau_count", 0) + 1
 
     # A strong near-miss or a runner-reported register tie is worth a permuter pass.
+    # A normalized-only match never triggers it, no matter how close its
+    # capped effective similarity gets to the threshold.
     if iteration_best is not None and permuter_seconds > 0 and time.monotonic() < deadline:
         futility = str(iteration_best.get("futility") or "")
         is_register_tie = futility.startswith("register-tie")
-        similarity = iteration_best.get("similarity_score") or 0.0
-        if similarity >= 0.95 or is_register_tie:
+        effective_similarity, _ = attempt_rank(iteration_best)
+        is_normalized_only = _is_normalized_only_match(iteration_best)
+        if not is_normalized_only and (effective_similarity >= 0.95 or is_register_tie):
             label = iteration_best.get("label")
             body = candidate_bodies.get(label)
             if body:
@@ -806,7 +879,8 @@ def run_iteration(
                         owner_state["permuter_runs"].append({
                             "iteration": iteration,
                             "label": label,
-                            "similarity_score": similarity,
+                            "similarity_score": iteration_best.get("similarity_score") or 0.0,
+                            "effective_similarity": effective_similarity,
                             "is_register_tie": is_register_tie,
                             "timed_out": permuter_result.get("timed_out"),
                             "best_score": (permuter_result.get("best") or {}).get("score"),
