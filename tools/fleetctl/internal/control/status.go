@@ -28,6 +28,11 @@ type RunStatus struct {
 	PRNumber          int       `json:"pr_number,omitempty"`
 	MergedAt          time.Time `json:"merged_at,omitempty"`
 	MergeCommitSHA    string    `json:"merge_commit_sha,omitempty"`
+	// MergeBlockedRetries mirrors fleetstate.RunRecord.MergeBlockedRetries --
+	// how many times control.Loop.retryBlockedMergeRuns has re-attempted
+	// this run's merge step; nonzero only for a run that has been (or
+	// currently is) merge_blocked_dirty.
+	MergeBlockedRetries int `json:"merge_blocked_retries,omitempty"`
 }
 
 // StatusJSON is `fleetctl status --json`'s whole document: one row per run,
@@ -62,23 +67,24 @@ func BuildStatus(state *fleetstate.State) StatusJSON {
 		}
 		sort.Strings(needsCommit)
 		runs = append(runs, RunStatus{
-			ID:                id,
-			Status:            string(rec.Status),
-			File:              rec.Spec.File,
-			Agent:             rec.Spec.Agent,
-			Model:             rec.Spec.Model,
-			Owners:            len(rec.Spec.Owners),
-			Matched:           len(rec.MatchedOwners),
-			Attempt:           rec.Spec.Attempt,
-			Note:              rec.Note,
-			StoppedReason:     rec.StoppedReason,
-			WaitReason:        rec.WaitReason,
-			NeedsManualCommit: needsCommit,
-			Branch:            rec.Branch,
-			PRURL:             rec.PRURL,
-			PRNumber:          rec.PRNumber,
-			MergedAt:          rec.MergedAt,
-			MergeCommitSHA:    rec.MergeCommitSHA,
+			ID:                  id,
+			Status:              string(rec.Status),
+			File:                rec.Spec.File,
+			Agent:               rec.Spec.Agent,
+			Model:               rec.Spec.Model,
+			Owners:              len(rec.Spec.Owners),
+			Matched:             len(rec.MatchedOwners),
+			Attempt:             rec.Spec.Attempt,
+			Note:                rec.Note,
+			StoppedReason:       rec.StoppedReason,
+			WaitReason:          rec.WaitReason,
+			NeedsManualCommit:   needsCommit,
+			Branch:              rec.Branch,
+			PRURL:               rec.PRURL,
+			PRNumber:            rec.PRNumber,
+			MergedAt:            rec.MergedAt,
+			MergeCommitSHA:      rec.MergeCommitSHA,
+			MergeBlockedRetries: rec.MergeBlockedRetries,
 		})
 	}
 

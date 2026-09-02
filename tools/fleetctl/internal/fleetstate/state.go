@@ -131,6 +131,13 @@ type RunRecord struct {
 	// --agent-concurrency cap is full). Empty once launched, and empty
 	// until the first pass that considered and deferred this run.
 	WaitReason string `json:"wait_reason,omitempty"`
+	// MergeBlockedRetries counts every time control.Loop.retryBlockedMergeRuns
+	// has re-attempted this run's merge step since it first reached
+	// StatusMergeBlockedDirty -- incremented before each attempt, whether or
+	// not that attempt clears the block. `fleetctl status` reports it so an
+	// operator can see a run is being retried automatically (sec 2), not
+	// stuck waiting on a restart.
+	MergeBlockedRetries int `json:"merge_blocked_retries,omitempty"`
 }
 
 // State is the full persisted control-loop state.

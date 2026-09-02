@@ -55,6 +55,8 @@ type Fake struct {
 	GitCheckoutDetachErr     error
 	GitStatusPorcelainResult string
 	GitStatusPorcelainErr    error
+	GitResetPathErr          error
+	GitCheckoutPathErr       error
 	GitPushErr               error
 	GitRevParseResult        string
 	GitRevParseErr           error
@@ -170,6 +172,16 @@ func (f *Fake) GitCheckoutDetach(_ context.Context, repoRoot, ref string) error 
 func (f *Fake) GitStatusPorcelain(_ context.Context, repoRoot string) (string, error) {
 	f.record(Call{Method: "GitStatusPorcelain", Strings: []string{repoRoot}})
 	return f.GitStatusPorcelainResult, f.GitStatusPorcelainErr
+}
+
+func (f *Fake) GitResetPath(_ context.Context, repoRoot, path string) error {
+	f.record(Call{Method: "GitResetPath", Strings: []string{repoRoot, path}})
+	return f.GitResetPathErr
+}
+
+func (f *Fake) GitCheckoutPath(_ context.Context, repoRoot, path string) error {
+	f.record(Call{Method: "GitCheckoutPath", Strings: []string{repoRoot, path}})
+	return f.GitCheckoutPathErr
 }
 
 func (f *Fake) GitPush(_ context.Context, repoRoot, branch string) error {
