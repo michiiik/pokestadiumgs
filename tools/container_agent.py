@@ -67,6 +67,22 @@ MISC_TIMEOUT = 60.0
 BEST_CANDIDATES_KEPT = 5
 TRIED_LABELS_SHOWN = 30
 
+# feedback["diff_excerpt"] rendering (see _build_feedback): how many
+# non-exact-match assembly_diff entries to keep, and a byte cap so one
+# pathological attempt (hundreds of diff entries) can't blow out state.json
+# or the prompt on its own.
+DIFF_EXCERPT_MAX_ENTRIES = 40
+DIFF_EXCERPT_MAX_BYTES = 3072
+
+# build_prompt's overall size guard: with a full diff excerpt on every one
+# of the (up to BEST_CANDIDATES_KEPT) best candidates, a large owner's file
+# brief + assembly + candidate bodies can add up. If the fully-rendered
+# prompt would exceed this, only the top FULL_DIFF_CANDIDATES entries keep
+# their diff excerpt/frame/instruction-count/first-mismatch lines; the rest
+# fall back to the header line only.
+PROMPT_SIZE_CAP = 60_000
+FULL_DIFF_CANDIDATES = 2
+
 
 # ---------------------------------------------------------------------------
 # Small utilities
@@ -266,6 +282,76 @@ def attempt_rank(attempt: dict) -> tuple[float, float]:
 
 
 # ---------------------------------------------------------------------------
+# Per-candidate feedback: fleet_probe's result JSON carries a rich
+# ``assembly_diff`` (one entry per compared instruction, with
+# expected/actual text, offsets and match flags) plus size/tail/futility
+# fields that a 500-char ``diagnostic`` string throws away. This distills
+# that into a small, JSON-serializable dict cheap enough to keep in
+# ``state.json`` (so --resume inherits it) and to render in the next
+# prompt (see build_prompt).
+# ---------------------------------------------------------------------------
+
+_FEEDBACK_PASSTHROUGH_KEYS = (
+    "expected_size", "actual_size",
+    "expected_instruction_count", "actual_instruction_count",
+    "first_diff_offset",
+    "expected_instruction_text", "actual_instruction_text",
+    "mismatch_kind", "futility",
+    "register_only_similarity_score", "repeated_drift",
+    "expected_tail_kind", "actual_tail_kind",
+)
+
+
+def _build_feedback(attempt: dict) -> dict:
+    """Extract a compact feedback dict from one probe attempt.
+
+    Copies the scalar diagnostic fields in ``_FEEDBACK_PASSTHROUGH_KEYS``
+    verbatim (only those actually present), then builds ``diff_excerpt``:
+    the first ``DIFF_EXCERPT_MAX_ENTRIES`` non-``exact_match`` entries of
+    ``assembly_diff``, each rendered as one line, with one line of
+    exact-match context immediately before the first mismatch. Capped at
+    ``DIFF_EXCERPT_MAX_BYTES``; ``diff_excerpt_truncated`` is set whenever
+    the excerpt stopped early (entry/byte cap) or the source
+    ``assembly_diff`` was itself already truncated by the probe.
+    """
+    feedback: dict = {}
+    for key in _FEEDBACK_PASSTHROUGH_KEYS:
+        value = attempt.get(key)
+        if value is not None:
+            feedback[key] = value
+
+    diff = attempt.get("assembly_diff") or []
+    lines: list[str] = []
+    context_line: str | None = None
+    shown = 0
+    truncated = bool(attempt.get("assembly_diff_truncated"))
+    budget = DIFF_EXCERPT_MAX_BYTES
+    for entry in diff:
+        if entry.get("exact_match"):
+            context_line = f"  @{entry.get('expected_offset')}: {entry.get('expected')}  (match)"
+            continue
+        line = (
+            f"  @{entry.get('expected_offset')}: expected `{entry.get('expected')}`"
+            f"  actual `{entry.get('actual')}`"
+        )
+        pending = ([context_line] if (shown == 0 and context_line) else []) + [line]
+        pending_size = sum(len(p) + 1 for p in pending)
+        if shown >= DIFF_EXCERPT_MAX_ENTRIES or pending_size > budget:
+            truncated = True
+            break
+        lines.extend(pending)
+        budget -= pending_size
+        shown += 1
+
+    if lines:
+        if truncated:
+            lines.append("  ... (diff truncated)")
+        feedback["diff_excerpt"] = "\n".join(lines)
+        feedback["diff_excerpt_truncated"] = truncated
+    return feedback
+
+
+# ---------------------------------------------------------------------------
 # Owner discovery
 # ---------------------------------------------------------------------------
 
@@ -371,6 +457,103 @@ Rules:
 - Write ONLY that JSON object (no commentary) to: {batch_path}
 """
 
+# Static reading guide for the per-candidate feedback rendered below (see
+# _render_best_candidates). Wording for the mismatch_kind rows is pulled
+# from AGENTS.md §2 rule 5 / §2.5 step 5 and docs/REGISTER_TIES.md, so a
+# generator gets the same guidance a human agent works from.
+DIFF_READING_GUIDE = """\
+== how to read the diff ==
+Map the signal in a candidate's diagnostics to a source-level change, then
+vary only that -- do not restructure the whole function on a repeat diagnostic:
+- Stack frame size differs (the "frame:" line, or an "addiu $sp" mismatch)
+  while the rest of the body matches: the number/width of locals, u8 buffer
+  sizes, or an extra temporary. This is `immediate_drift` territory --
+  offsets, strides, literal widths, frame padding.
+- Register drift with identical opcodes (mismatch_kind
+  register_allocation_only, or similarity_score near 1.0 with a lower raw
+  score): declaration order, temporaries, widths (AGENTS.md §2 rule 5) --
+  not a semantic problem. For an operand_or_scheduling_drift near-miss, try
+  commute-swap, decl-order, hoist-temp, type-width, loop-form,
+  reorder-store-call (AGENTS.md §4). A clean register tie
+  (similarity_score >= 0.99, mismatch_kind register_allocation_only) rarely
+  yields to more hand variants -- see docs/REGISTER_TIES.md and stop after
+  two batches.
+- Missing/extra nop, or a shifted delay-slot instruction: statement order,
+  or short-circuit vs a nested if.
+- jump-table / jr differences: the switch's case shape; a non-text
+  section_layout_drift on a switch means the file needs its .rodata
+  subsegment first (AGENTS.md §2 rule 7), not a body rewrite.
+- Float immediates differ: an f32 vs f64 literal, or constant folding
+  happening at a different point.
+- Call argument setup order differs: the evaluation order of the
+  arguments, or an explicit temporary precomputed before the call vs
+  passed inline.
+- symbol_size_drift, or a duplicated jr/nop / alignment tail: a verified
+  `#pragma C_FUNCTION_PADDING(n)` or a `<owner>_padding` helper, not a body
+  change (AGENTS.md §2 rule 5).
+- text_layout_drift: a recoverable owner-size or frame mismatch -- fix the
+  body or add verified padding; the candidate stays eligible for a
+  sequential gate once it does.
+"""
+
+
+def _render_best_candidates(best_candidates: list[dict], *, full_diff_count: int) -> list[str]:
+    """Render the "best candidates tried so far" section.
+
+    The first ``full_diff_count`` entries (already sorted best-first by the
+    caller) get the frame/instruction-count/first-mismatch lines and the
+    diff excerpt from their ``feedback`` dict; the rest get the header line
+    only. See build_prompt's size guard for why ``full_diff_count`` can be
+    less than ``len(best_candidates)``.
+    """
+    lines: list[str] = [
+        "== best candidates tried so far this run (highest similarity first; "
+        "do not resend these bodies verbatim, but use their diagnostics) =="
+    ]
+    for index, entry in enumerate(best_candidates):
+        lines.append(
+            f"-- label={entry.get('label')} similarity={entry.get('similarity_score')} "
+            f"raw={entry.get('raw_similarity_score')} mismatch={entry.get('mismatch_kind')} "
+            f"futility={entry.get('futility')}"
+        )
+        diagnostic = entry.get("diagnostic")
+        if diagnostic:
+            lines.append(f"   diagnostic: {diagnostic}")
+        if entry.get("normalized_only"):
+            lines.append(
+                "   NORMALIZED-ONLY MATCH: the shape is right but "
+                f"immediates/registers/fields differ (raw={entry.get('raw_similarity_score')}); "
+                "vary constants, field offsets and operand order, not structure."
+            )
+        if index < full_diff_count:
+            feedback = entry.get("feedback") or {}
+            expected_size = feedback.get("expected_size")
+            actual_size = feedback.get("actual_size")
+            if expected_size is not None and actual_size is not None and expected_size != actual_size:
+                lines.append(f"   frame: expected {expected_size} bytes, actual {actual_size}")
+            expected_count = feedback.get("expected_instruction_count")
+            actual_count = feedback.get("actual_instruction_count")
+            if expected_count is not None or actual_count is not None:
+                lines.append(f"   instructions: expected {expected_count}, actual {actual_count}")
+            first_diff_offset = feedback.get("first_diff_offset")
+            if first_diff_offset is not None:
+                lines.append(
+                    f"   first mismatch at offset {first_diff_offset}: "
+                    f"expected `{feedback.get('expected_instruction_text')}` "
+                    f"actual `{feedback.get('actual_instruction_text')}`"
+                )
+            diff_excerpt = feedback.get("diff_excerpt")
+            if diff_excerpt:
+                lines.append("   diff:")
+                lines.extend(f"   {line}" for line in diff_excerpt.splitlines())
+        else:
+            lines.append("   (diff omitted -- see the top candidates above for the excerpt)")
+        body = entry.get("body")
+        if body:
+            lines.append("   body:")
+            lines.append(body)
+    return lines
+
 
 def build_prompt(
     *,
@@ -383,68 +566,58 @@ def build_prompt(
     batch_path: Path,
     tried_labels: list[str] | None = None,
 ) -> str:
-    parts = [
-        f"You are generating candidate C function bodies for one GLOBAL_ASM",
-        f"owner, {owner}, in {source_rel}. Read the file brief and the target",
-        "assembly below, then write a batch of candidate bodies to the path",
-        "given at the end of this prompt.",
-        "",
-        "== file brief ==",
-        file_brief.strip(),
-        "",
-        f"== target assembly: {owner} ==",
-        asm_text.strip(),
-    ]
-    if best_candidates:
-        parts.append("")
-        parts.append(
-            "== best candidates tried so far this run (highest similarity first; "
-            "do not resend these bodies verbatim, but use their diagnostics) =="
-        )
-        for entry in best_candidates:
+    def _assemble(full_diff_count: int) -> str:
+        parts = [
+            f"You are generating candidate C function bodies for one GLOBAL_ASM",
+            f"owner, {owner}, in {source_rel}. Read the file brief and the target",
+            "assembly below, then write a batch of candidate bodies to the path",
+            "given at the end of this prompt.",
+            "",
+            "== file brief ==",
+            file_brief.strip(),
+            "",
+            f"== target assembly: {owner} ==",
+            asm_text.strip(),
+        ]
+        if best_candidates:
+            parts.append("")
+            parts.extend(_render_best_candidates(best_candidates, full_diff_count=full_diff_count))
+            parts.append("")
+            parts.append(DIFF_READING_GUIDE.rstrip("\n"))
+            parts.append("")
             parts.append(
-                f"-- label={entry.get('label')} similarity={entry.get('similarity_score')} "
-                f"raw={entry.get('raw_similarity_score')} mismatch={entry.get('mismatch_kind')} "
-                f"futility={entry.get('futility')}"
+                "Change the hypothesis family for any candidate whose diagnostic "
+                "repeats one shown above instead of resending the same source shape."
             )
-            diagnostic = entry.get("diagnostic")
-            if diagnostic:
-                parts.append(f"   diagnostic: {diagnostic}")
-            if entry.get("normalized_only"):
-                parts.append(
-                    "   NORMALIZED-ONLY MATCH: the shape is right but "
-                    f"immediates/registers/fields differ (raw={entry.get('raw_similarity_score')}); "
-                    "vary constants, field offsets and operand order, not structure."
-                )
-            body = entry.get("body")
-            if body:
-                parts.append("   body:")
-                parts.append(body)
+        if tried_labels:
+            shown = list(tried_labels)[-TRIED_LABELS_SHOWN:]
+            parts.append("")
+            parts.append(
+                f"== labels already tried this run (showing last {len(shown)} of "
+                f"{len(tried_labels)}; do not resend a body under a repeat of one of "
+                "these hypotheses) =="
+            )
+            parts.append(", ".join(shown))
+        if permuter_seed:
+            parts.append("")
+            parts.append(
+                "== decomp-permuter output (score="
+                f"{permuter_seed.get('score')}; 0 means an instruction-exact match -- "
+                "submit it close to verbatim as one candidate) =="
+            )
+            parts.append(permuter_seed.get("body") or "")
         parts.append("")
-        parts.append(
-            "Change the hypothesis family for any candidate whose diagnostic "
-            "repeats one shown above instead of resending the same source shape."
-        )
-    if tried_labels:
-        shown = list(tried_labels)[-TRIED_LABELS_SHOWN:]
-        parts.append("")
-        parts.append(
-            f"== labels already tried this run (showing last {len(shown)} of "
-            f"{len(tried_labels)}; do not resend a body under a repeat of one of "
-            "these hypotheses) =="
-        )
-        parts.append(", ".join(shown))
-    if permuter_seed:
-        parts.append("")
-        parts.append(
-            "== decomp-permuter output (score="
-            f"{permuter_seed.get('score')}; 0 means an instruction-exact match -- "
-            "submit it close to verbatim as one candidate) =="
-        )
-        parts.append(permuter_seed.get("body") or "")
-    parts.append("")
-    parts.append(BATCH_CONTRACT.format(source_rel=source_rel, owner=owner, batch_path=batch_path))
-    return "\n".join(parts)
+        parts.append(BATCH_CONTRACT.format(source_rel=source_rel, owner=owner, batch_path=batch_path))
+        return "\n".join(parts)
+
+    prompt = _assemble(len(best_candidates))
+    if len(prompt) > PROMPT_SIZE_CAP and len(best_candidates) > FULL_DIFF_CANDIDATES:
+        # The fully-rendered diffs pushed the prompt past the size guard:
+        # keep the excerpt only for the top FULL_DIFF_CANDIDATES entries
+        # (already sorted best-first) and fall back to header-only for the
+        # rest, rather than truncating file_brief/asm_text/bodies.
+        prompt = _assemble(FULL_DIFF_CANDIDATES)
+    return prompt
 
 
 # ---------------------------------------------------------------------------
@@ -977,6 +1150,7 @@ def run_iteration(
             "diagnostic": ((attempt.get("diagnostic") or "")[:500]) or None,
             "body": body,
             "normalized_only": _is_normalized_only_match(attempt),
+            "feedback": _build_feedback(attempt),
         })
     owner_state["best_candidates"].sort(key=attempt_rank, reverse=True)
     seen_labels: set[str] = set()

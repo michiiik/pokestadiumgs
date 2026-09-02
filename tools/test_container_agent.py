@@ -225,6 +225,112 @@ class RunPermuterTests(unittest.TestCase):
 # run_iteration
 # ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# _build_feedback: distilling fleet_probe's rich per-attempt assembly_diff
+# (see a real result at
+# gs-container-runs/fragment47-codex-luna-run3/results/func_86000020_iter1.json)
+# into a compact, prompt-ready dict.
+# ---------------------------------------------------------------------------
+
+class BuildFeedbackTests(unittest.TestCase):
+    def _diff_entry(self, offset, expected, actual, *, exact_match=False):
+        return {
+            "expected_instruction": offset // 4,
+            "actual_instruction": offset // 4,
+            "expected_offset": offset,
+            "actual_offset": offset,
+            "expected": expected,
+            "actual": actual,
+            "expected_normalized": expected,
+            "actual_normalized": actual,
+            "normalized_match": exact_match,
+            "exact_match": exact_match,
+        }
+
+    def test_passthrough_fields_and_diff_excerpt_with_context_line(self) -> None:
+        attempt = {
+            "expected_size": 336,
+            "actual_size": 340,
+            "expected_instruction_count": 84,
+            "actual_instruction_count": 85,
+            "first_diff_offset": 3,
+            "expected_instruction_text": "addiu $sp, $sp, -144",
+            "actual_instruction_text": "addiu $sp, $sp, -152",
+            "mismatch_kind": "operand_or_scheduling_drift",
+            "futility": None,
+            "register_only_similarity_score": 0.5059,
+            "repeated_drift": None,
+            "expected_tail_kind": "normal_return",
+            "actual_tail_kind": "normal_return",
+            "assembly_diff": [
+                self._diff_entry(0, "addiu\tsp,sp,-144", "addiu\tsp,sp,-144", exact_match=True),
+                self._diff_entry(4, "sw\tra,20(sp)", "sdc1\t$f20,24(sp)"),
+                self._diff_entry(8, "sw\ta0,144(sp)", "sw\ts0,32(sp)"),
+            ],
+        }
+
+        feedback = container_agent._build_feedback(attempt)
+
+        self.assertEqual(feedback["expected_size"], 336)
+        self.assertEqual(feedback["actual_size"], 340)
+        self.assertEqual(feedback["expected_instruction_count"], 84)
+        self.assertEqual(feedback["actual_instruction_count"], 85)
+        self.assertEqual(feedback["first_diff_offset"], 3)
+        self.assertEqual(feedback["expected_instruction_text"], "addiu $sp, $sp, -144")
+        self.assertEqual(feedback["actual_instruction_text"], "addiu $sp, $sp, -152")
+        self.assertEqual(feedback["mismatch_kind"], "operand_or_scheduling_drift")
+        self.assertEqual(feedback["register_only_similarity_score"], 0.5059)
+        self.assertEqual(feedback["expected_tail_kind"], "normal_return")
+        self.assertEqual(feedback["actual_tail_kind"], "normal_return")
+
+        excerpt = feedback["diff_excerpt"]
+        lines = excerpt.splitlines()
+        # One line of exact-match context precedes the first mismatch.
+        self.assertIn("@0: addiu\tsp,sp,-144  (match)", lines[0])
+        self.assertIn("@4: expected `sw\tra,20(sp)`  actual `sdc1\t$f20,24(sp)`", lines[1])
+        self.assertIn("@8: expected `sw\ta0,144(sp)`  actual `sw\ts0,32(sp)`", lines[2])
+        self.assertFalse(feedback["diff_excerpt_truncated"])
+
+    def test_no_assembly_diff_omits_excerpt(self) -> None:
+        feedback = container_agent._build_feedback({"mismatch_kind": "immediate_drift"})
+        self.assertNotIn("diff_excerpt", feedback)
+        self.assertEqual(feedback["mismatch_kind"], "immediate_drift")
+
+    def test_none_fields_are_not_copied(self) -> None:
+        feedback = container_agent._build_feedback({"expected_size": 100, "actual_size": None})
+        self.assertEqual(feedback["expected_size"], 100)
+        self.assertNotIn("actual_size", feedback)
+
+    def test_entry_count_cap_marks_truncated(self) -> None:
+        diff = [self._diff_entry(i * 4, f"exp{i}", f"act{i}") for i in range(60)]
+        feedback = container_agent._build_feedback({"assembly_diff": diff})
+
+        excerpt = feedback["diff_excerpt"]
+        self.assertTrue(feedback["diff_excerpt_truncated"])
+        self.assertIn("truncated", excerpt)
+        shown = [ln for ln in excerpt.splitlines() if ln.strip().startswith("@")]
+        self.assertEqual(len(shown), container_agent.DIFF_EXCERPT_MAX_ENTRIES)
+
+    def test_byte_cap_marks_truncated_before_entry_cap(self) -> None:
+        # Ten entries whose lines are individually large enough that the
+        # ~3 KB budget runs out well before the 40-entry cap does.
+        diff = [
+            self._diff_entry(i * 4, "x" * 500, "y" * 500)
+            for i in range(10)
+        ]
+        feedback = container_agent._build_feedback({"assembly_diff": diff})
+
+        self.assertTrue(feedback["diff_excerpt_truncated"])
+        self.assertLessEqual(len(feedback["diff_excerpt"].encode("utf-8")), container_agent.DIFF_EXCERPT_MAX_BYTES + 200)
+
+    def test_source_truncated_flag_propagates(self) -> None:
+        feedback = container_agent._build_feedback({
+            "assembly_diff": [self._diff_entry(0, "a", "b")],
+            "assembly_diff_truncated": True,
+        })
+        self.assertTrue(feedback["diff_excerpt_truncated"])
+
+
 class RunIterationTests(unittest.TestCase):
     def _run(self, out_dir, repo_dir, owner, batch, result, owner_state, *, iteration=0, permuter_seconds=0.0):
         logger = container_agent.Logger(out_dir / "log.txt")
@@ -357,6 +463,55 @@ class RunIterationTests(unittest.TestCase):
             self.assertEqual(owner_state["best_candidates"][0]["label"], "label0")
             self.assertEqual(owner_state["best_candidates"][0]["similarity_score"], 0.99)
             self.assertEqual(owner_state["best_candidates"][0]["body"], "body0-v2")
+
+    def test_best_candidates_entries_carry_feedback_from_assembly_diff(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            repo_dir.mkdir()
+            out_dir = Path(tmp) / "out"
+            owner = "func_1"
+            owner_state = container_agent._new_owner_state()
+            batch = {"source": "disasm/src/X.c", "candidates": [{"function": owner, "label": "a", "body": "body_a"}]}
+            result = {
+                "batch_status": "no_candidate_accepted", "accepted": [],
+                "attempts": [{
+                    "function": owner, "label": "a", "status": "probe_rejected",
+                    "similarity_score": 0.83, "raw_similarity_score": 0.27,
+                    "mismatch_kind": "operand_or_scheduling_drift",
+                    "expected_size": 336, "actual_size": 340,
+                    "expected_instruction_count": 84, "actual_instruction_count": 85,
+                    "first_diff_offset": 3,
+                    "expected_instruction_text": "addiu $sp, $sp, -144",
+                    "actual_instruction_text": "addiu $sp, $sp, -152",
+                    "assembly_diff": [
+                        {
+                            "expected_offset": 0, "expected": "addiu\tsp,sp,-144",
+                            "actual": "addiu\tsp,sp,-144", "exact_match": True,
+                        },
+                        {
+                            "expected_offset": 4, "expected": "sw\tra,20(sp)",
+                            "actual": "sdc1\t$f20,24(sp)", "exact_match": False,
+                        },
+                    ],
+                }],
+            }
+            self._run(out_dir, repo_dir, owner, batch, result, owner_state)
+
+            feedback = owner_state["best_candidates"][0]["feedback"]
+            self.assertEqual(feedback["expected_size"], 336)
+            self.assertEqual(feedback["actual_size"], 340)
+            self.assertEqual(feedback["first_diff_offset"], 3)
+            self.assertIn("sw\tra,20(sp)", feedback["diff_excerpt"])
+
+            # Persisted through state.json as-is (small, JSON-serializable) so
+            # --resume inherits it.
+            state = {owner: owner_state}
+            state_path = out_dir / "state.json"
+            container_agent.save_json(state_path, state)
+            reloaded = container_agent.load_json(state_path)
+            self.assertEqual(
+                reloaded[owner]["best_candidates"][0]["feedback"]["first_diff_offset"], 3,
+            )
 
     def test_permuter_triggered_by_high_similarity(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -797,6 +952,119 @@ class BuildPromptTests(unittest.TestCase):
             tried_labels=[],
         )
         self.assertNotIn("labels already tried this run", prompt)
+
+    def _candidate_with_feedback(self, label, **feedback_overrides):
+        feedback = {
+            "expected_size": 336, "actual_size": 340,
+            "expected_instruction_count": 84, "actual_instruction_count": 85,
+            "first_diff_offset": 3,
+            "expected_instruction_text": "addiu $sp, $sp, -144",
+            "actual_instruction_text": "addiu $sp, $sp, -152",
+            "diff_excerpt": (
+                "  @0: addiu\tsp,sp,-144  (match)\n"
+                "  @4: expected `sw\tra,20(sp)`  actual `sdc1\t$f20,24(sp)`"
+            ),
+            "diff_excerpt_truncated": False,
+        }
+        feedback.update(feedback_overrides)
+        return {
+            "label": label, "similarity_score": 0.83, "raw_similarity_score": 0.27,
+            "mismatch_kind": "operand_or_scheduling_drift", "futility": None,
+            "diagnostic": "similarity_score=0.83 raw=0.27 mismatch_kind=operand_or_scheduling_drift",
+            "body": f"void {label}(void) {{}}",
+            "normalized_only": False,
+            "feedback": feedback,
+        }
+
+    def test_frame_instructions_and_first_mismatch_lines_rendered(self) -> None:
+        prompt = container_agent.build_prompt(
+            owner="func_86000020", source_rel="disasm/src/X.c", file_brief="brief", asm_text="asm",
+            best_candidates=[self._candidate_with_feedback("a")],
+            permuter_seed=None, batch_path=Path("/tmp/batch.json"),
+        )
+        self.assertIn("frame: expected 336 bytes, actual 340", prompt)
+        self.assertIn("instructions: expected 84, actual 85", prompt)
+        self.assertIn(
+            "first mismatch at offset 3: expected `addiu $sp, $sp, -144` "
+            "actual `addiu $sp, $sp, -152`",
+            prompt,
+        )
+        self.assertIn("sdc1\t$f20,24(sp)", prompt)
+        self.assertIn("== how to read the diff ==", prompt)
+
+    def test_frame_line_omitted_when_sizes_match(self) -> None:
+        prompt = container_agent.build_prompt(
+            owner="func_1", source_rel="disasm/src/X.c", file_brief="brief", asm_text="asm",
+            best_candidates=[self._candidate_with_feedback("a", expected_size=100, actual_size=100)],
+            permuter_seed=None, batch_path=Path("/tmp/batch.json"),
+        )
+        self.assertNotIn("frame: expected", prompt)
+
+    def test_diff_excerpt_truncation_note_surfaces_in_prompt(self) -> None:
+        prompt = container_agent.build_prompt(
+            owner="func_1", source_rel="disasm/src/X.c", file_brief="brief", asm_text="asm",
+            best_candidates=[self._candidate_with_feedback(
+                "a",
+                diff_excerpt=(
+                    "  @4: expected `sw\tra,20(sp)`  actual `sdc1\t$f20,24(sp)`\n"
+                    "  ... (diff truncated)"
+                ),
+                diff_excerpt_truncated=True,
+            )],
+            permuter_seed=None, batch_path=Path("/tmp/batch.json"),
+        )
+        self.assertIn("(diff truncated)", prompt)
+
+    def test_size_guard_drops_diffs_beyond_top_two(self) -> None:
+        # A large diff_excerpt (near the 3 KB per-candidate cap) on each of
+        # BEST_CANDIDATES_KEPT candidates, plus a large file brief/assembly,
+        # pushes the fully-rendered prompt well past PROMPT_SIZE_CAP.
+        big_excerpt = "\n".join(
+            f"  @{i * 4}: expected `sw\ta0,{i}(sp)`  actual `sw\ta1,{i}(sp)`" for i in range(40)
+        )
+        candidates = [
+            self._candidate_with_feedback(f"label{i}", diff_excerpt=big_excerpt)
+            for i in range(container_agent.BEST_CANDIDATES_KEPT)
+        ]
+        # A large file brief/assembly on top of a full diff excerpt for
+        # every candidate is what actually pushes a real owner's prompt
+        # over the cap (the diffs alone rarely do).
+        unguarded = container_agent._render_best_candidates(candidates, full_diff_count=len(candidates))
+        prompt = container_agent.build_prompt(
+            owner="func_1", source_rel="disasm/src/X.c",
+            file_brief="brief line\n" * 1500, asm_text="asm line\n" * 4000,
+            best_candidates=candidates, permuter_seed=None,
+            batch_path=Path("/tmp/batch.json"),
+        )
+        # Confirms the fixture actually exercises the guard (an "unguarded"
+        # rendering of the section alone would already be sizeable) rather
+        # than passing trivially because nothing was ever close to the cap.
+        self.assertGreater(len("\n".join(unguarded)), 5_000)
+
+        full_diff_count = container_agent.FULL_DIFF_CANDIDATES
+        self.assertGreater(len(candidates), full_diff_count)
+        for entry in candidates[:full_diff_count]:
+            self.assertIn(f"first mismatch at offset {entry['feedback']['first_diff_offset']}", prompt)
+        for entry in candidates[full_diff_count:]:
+            label = entry["label"]
+            label_pos = prompt.index(f"label={label}")
+            # No diff excerpt (its distinctive "sw\ta0," lines) was rendered
+            # for this candidate -- just the header-only fallback.
+            omitted_marker = "(diff omitted"
+            self.assertIn(omitted_marker, prompt[label_pos:label_pos + 4000])
+            next_label_pos = prompt.find("-- label=", label_pos + 1)
+            end = next_label_pos if next_label_pos != -1 else len(prompt)
+            self.assertNotIn("sw\ta0,", prompt[label_pos:end])
+
+    def test_small_prompt_keeps_full_diff_for_all_candidates(self) -> None:
+        candidates = [self._candidate_with_feedback(f"label{i}") for i in range(3)]
+        prompt = container_agent.build_prompt(
+            owner="func_1", source_rel="disasm/src/X.c", file_brief="brief", asm_text="asm",
+            best_candidates=candidates, permuter_seed=None, batch_path=Path("/tmp/batch.json"),
+        )
+        for entry in candidates:
+            self.assertIn(f"first mismatch at offset {entry['feedback']['first_diff_offset']}", prompt)
+        self.assertNotIn("(diff omitted", prompt)
 
 
 # ---------------------------------------------------------------------------
