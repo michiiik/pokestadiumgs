@@ -14,7 +14,7 @@
 #   alibaba  Alibaba Cloud Model Studio (Bailian). Anthropic-compatible
 #            endpoint documented at
 #            https://www.alibabacloud.com/help/en/model-studio/claude-code
-#            Two plans, chosen by $ALIBABA_PLAN (default "coding" -- it's
+#            Two plans, chosen by $ALIBABA_PLAN (default "token"; the coding key on this host was rejected --
 #            the one with the qwen3-coder-* models):
 #              coding  https://coding-intl.dashscope.aliyuncs.com/apps/anthropic
 #                      (the /apps/anthropic sibling of the Coding Plan's

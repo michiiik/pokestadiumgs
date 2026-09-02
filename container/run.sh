@@ -38,7 +38,7 @@
 #   CLAUDE_VIA        claude_via only: alibaba | zai | custom (AGENT=alibaba
 #                     and AGENT=zai set this for you -- see
 #                     container/generators/README.md)
-#   ALIBABA_PLAN      alibaba/claude_via(alibaba): coding (default) | token
+#   ALIBABA_PLAN      alibaba/claude_via(alibaba): token (default) | coding
 #                     -- selects which Bailian plan's key/endpoint is used
 #   ALIBABA_API_KEY   alibaba/claude_via(alibaba), optional: use this key
 #                     directly instead of the ~/.qwen/settings.json lookup
