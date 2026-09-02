@@ -376,6 +376,14 @@ Everything lands under the mounted `--out` directory:
 | `summary.json` | owners attempted, owners matched, best similarity per owner, iteration counts, wall time for the run |
 | `probe-stats/probe-stats.jsonl` | a copy of the runner's own probe-stats history (see §9.1) |
 
+`merge` (§9) writes its own results back under the same `--out` directory:
+
+| Path | Contents |
+|---|---|
+| `merge-results/<owner>.json` | the raw `fleet_probe --gate --json` result for each owner, kept (not deleted) so a failed re-gate can be inspected |
+| `merge-report.json` | `owner -> status` for the run, plus `cc_check_bypassed` / `fresh_history` flags (§9.2/§9.3) |
+| `merge-history.jsonl` | only with `--fresh-history`: this run's own probe-stats history (§9.3) |
+
 ## 8. Why the container never commits
 
 The container's own verdict is not trusted by construction -- it might be
@@ -409,12 +417,17 @@ in a shared checkout would sweep in whatever another session has staged.
 
 Useful flags: `--repo PATH` (host checkout to re-gate/commit against,
 default `.`); `--dry-run` (re-gate every owner and print the table, but
-never commit, even with `--commit`).
+never commit, even with `--commit`); `--no-cc-check` (§9.2); `--fresh-history`
+(§9.3).
 
 The command prints a table (owner, source, host-re-gate status, whether it
 committed, detail) and exits non-zero if any container-accepted candidate
 fails the host re-gate, so it is safe to gate a script or CI step on its
-exit code.
+exit code. Every run also writes `<out>/merge-report.json`
+(`owner -> status`, plus the `--no-cc-check` / `--fresh-history` flags for
+that run) and keeps each owner's raw `fleet_probe --gate --json` output at
+`<out>/merge-results/<owner>.json` rather than deleting it, so a rejected
+owner can be inspected after the fact without re-running anything.
 
 To read a run's own progress without merging anything:
 `python3 tools/container_merge.py summary /abs/out` prints `summary.json`
@@ -424,6 +437,9 @@ iteration/history counts).
 `merge` always ends by printing a reminder to also run `import-stats`
 (§9.1) -- probe-stats history is a separate import from accepted
 candidates, and easy to forget since `merge` never does it for you.
+(`--fresh-history` runs, §9.3, fold their own history in automatically on a
+successful accept -- the reminder is still printed for the ordinary,
+non-fresh-history probe-stats copy at `<out>/probe-stats/probe-stats.jsonl`.)
 
 ### 9.1 Importing probe-stats history
 
@@ -447,6 +463,64 @@ different out dirs, never double-counts. It prints how many lines were
 read, how many were new, and how many were already present; `--dry-run`
 counts without writing. Like `merge`, this never runs automatically -- it
 is its own deliberate host-side step.
+
+### 9.2 `--no-cc-check`: working around an unrelated host clang failure
+
+    python3 tools/container_merge.py merge /abs/out --commit --no-cc-check
+
+`disasm/Makefile`'s `COMPARE=1` build runs a host clang syntax check
+(`RUN_CC_CHECK=1`, `CC_CHECK_COMP=gcc` -- which is clang on macOS) over the
+whole tree as part of `merge`'s host re-gate. On the first real merge, an
+unrelated file (`disasm/src/fragments/79/fragment79_37A6E0.c`, three "too
+many arguments to function call" errors) failed that check, which made
+*every* host re-gate report `compare_rejected` regardless of the
+candidate -- the ROM gate itself never even ran.
+
+`--no-cc-check` sets `PRAGMA_GATE_CC_CHECK=0` for the `fleet_probe --gate`
+subprocess only (this process's own environment, and any other subprocess
+it starts, are untouched), which `tools/try_pragma_compare.py` honours by
+passing `RUN_CC_CHECK=0` to `make`. This is a real bypass of a real check,
+so it is loud by design: `merge` prints a `WARNING` line naming it, and
+records `"cc_check_bypassed": true` in `<out>/merge-report.json` (alongside
+the run's `owner -> status` map) as a durable record that every candidate
+accepted in that run was **not** verified to compile cleanly by the host's
+own check. Use it only to work around a known-unrelated failure, and treat
+`merge-report.json`'s flag as something to check before trusting a
+`--no-cc-check` run's results.
+
+### 9.3 `--fresh-history`: re-gating without the shared probe-stats history
+
+    python3 tools/container_merge.py merge /abs/out --commit --fresh-history
+
+The host's shared probe-stats history (§9.1's target,
+`<repo>/disasm/probe-stats/probe-stats.jsonl` by default) is also a
+preflight the runner consults before probing: it dedups on the exact
+attempt body, so once one host re-gate has been recorded as rejected (for
+example, because of the clang-check problem §9.2 exists for), a second
+`merge` attempt for the same owner is refused before it even reaches the
+ROM gate ("already rejected") -- even after the underlying problem is
+fixed.
+
+`--fresh-history` points `PRAGMA_PROBE_STATS` at a dedicated
+`<out>/merge-history.jsonl` for the `fleet_probe --gate` subprocess
+(created empty if it doesn't already exist, and reused across every owner
+in the same `merge` run), so the runner's preflight only ever sees attempts
+*this run* has made -- never a prior host re-gate recorded in the real,
+shared history. That real history is also exactly what
+`tools/check_decomp_provenance.py`'s pre-commit hook checks for an
+"accepted attempt on record" before it allows a `disasm/src` file's removal
+to be committed, so re-gating against a private history file alone would
+make a `--fresh-history` merge's own commit step fail that hook. `merge`
+closes this gap itself: whenever `--fresh-history` produced at least one
+owner the host re-gate accepted, it folds `<out>/merge-history.jsonl`'s
+accepted line(s) (only lines with at least one `attempts[].status ==
+"accepted"` entry -- never the rejected-attempt noise from the rest of the
+run) into the host's real probe-stats history, using the same
+verbatim-dedup logic as `import-stats` (§9.1), so the pre-commit hook still
+finds the accepted attempt it requires. This happens automatically as part
+of `merge` itself -- no separate `import-stats` step is needed for
+`--fresh-history`'s own history file (see §9's note on the reminder
+`merge` still prints for the *ordinary* probe-stats copy).
 
 ## Temp-file leak bounding
 

@@ -418,6 +418,64 @@ class RunPermuterTests(unittest.TestCase):
             self.assertEqual(candidate_path.read_text(encoding="utf-8"), "void func_1(void) {}")
             self.assertEqual(declarations_path.read_text(encoding="utf-8"), "extern int g;")
 
+    def test_quick_zero_output_finish_logs_warning_with_log_tail(self) -> None:
+        # Real-run repro: base.c fails to compile (a redeclaration, here),
+        # the permuter process exits almost immediately with zero outputs,
+        # and the one-line summary alone ("outputs=0") gives no hint why.
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            repo_dir.mkdir()
+            out_dir = Path(tmp) / "out"
+            logger = container_agent.Logger(out_dir / "log.txt")
+            work_dir = Path(tmp) / "disasm" / "build" / "permuter" / "func_1-abc123"
+            work_dir.mkdir(parents=True)
+            (work_dir / "permuter.log").write_text(
+                "irrelevant setup line 1\nirrelevant setup line 2\n"
+                "line 1\nline 2\nline 3\n"
+                "cfe: Error: line 2130: redeclaration of 'func_1'\n"
+                "Unable to compile base.c\n",
+                encoding="utf-8",
+            )
+            fake_process = mock.Mock()
+            poll_result = {"timed_out": False, "outputs": [], "best": None, "work_dir": str(work_dir)}
+            with mock.patch.object(
+                container_agent, "invoke_permuter", return_value=fake_process
+            ), mock.patch.object(
+                container_agent, "poll_permuter", return_value=poll_result
+            ):
+                container_agent.run_permuter(
+                    repo_dir, out_dir, "func_1", 0, "void func_1(void) {}", "extern int g;",
+                    permuter_seconds=30.0, logger=logger,
+                )
+            log_text = (out_dir / "log.txt").read_text(encoding="utf-8")
+            self.assertIn("WARNING", log_text)
+            self.assertIn("zero outputs", log_text)
+            self.assertIn("cfe: Error: line 2130: redeclaration of 'func_1'", log_text)
+            self.assertIn("Unable to compile base.c", log_text)
+            self.assertNotIn("irrelevant setup line", log_text)  # only the last 5 lines are included
+
+    def test_slow_zero_output_finish_does_not_warn(self) -> None:
+        # A run that actually used its whole budget searching (rather than
+        # dying immediately in the compile step) is not a failure signal.
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            repo_dir.mkdir()
+            out_dir = Path(tmp) / "out"
+            logger = container_agent.Logger(out_dir / "log.txt")
+            fake_process = mock.Mock()
+            poll_result = {"timed_out": True, "outputs": [], "best": None, "work_dir": None}
+            with mock.patch.object(
+                container_agent, "invoke_permuter", return_value=fake_process
+            ), mock.patch.object(
+                container_agent, "poll_permuter", return_value=poll_result
+            ):
+                container_agent.run_permuter(
+                    repo_dir, out_dir, "func_1", 0, "void func_1(void) {}", None,
+                    permuter_seconds=30.0, logger=logger,
+                )
+            log_text = (out_dir / "log.txt").read_text(encoding="utf-8")
+            self.assertNotIn("WARNING", log_text)
+
 
 # ---------------------------------------------------------------------------
 # run_iteration
@@ -2212,20 +2270,141 @@ class FilterDeclarationsTests(unittest.TestCase):
             "declarations": "extern void func_A(void);\nextern u8 D_80328E00;",
             "candidates": [],
         }
-        filtered, dropped = container_agent.filter_declarations(batch, source)
+        filtered, dropped, conflicts = container_agent.filter_declarations(batch, source)
         self.assertEqual(dropped, ["extern void func_A(void);"])
         self.assertEqual(filtered["declarations"], "extern u8 D_80328E00;")
+        self.assertEqual(conflicts, [])
 
     def test_keeps_declarations_for_names_not_in_source(self) -> None:
         source = "void func_A(void) {\n    return;\n}\n"
         batch = {"declarations": "extern u8 D_80328E00;", "candidates": []}
-        filtered, dropped = container_agent.filter_declarations(batch, source)
+        filtered, dropped, conflicts = container_agent.filter_declarations(batch, source)
         self.assertEqual(dropped, [])
+        self.assertEqual(conflicts, [])
         self.assertIs(filtered, batch)
 
     def test_no_declarations_field_is_a_noop(self) -> None:
-        filtered, dropped = container_agent.filter_declarations({"candidates": []}, "void func_A(void) {}")
+        filtered, dropped, conflicts = container_agent.filter_declarations(
+            {"candidates": []}, "void func_A(void) {}"
+        )
         self.assertEqual(dropped, [])
+        self.assertEqual(conflicts, [])
+
+    # -----------------------------------------------------------------
+    # Issue #38: a stale file declaration must not silently win over a
+    # batch's differently-typed one -- see filter_declarations' docstring.
+    # -----------------------------------------------------------------
+
+    def test_identical_signature_is_dropped_silently(self) -> None:
+        # Same type, only the parameter name differs -- not a conflict.
+        source = "extern f64 func_87C0068C(void *arg0);\n"
+        batch = {
+            "declarations": "extern f64 func_87C0068C(void *);",
+            "candidates": [],
+        }
+        filtered, dropped, conflicts = container_agent.filter_declarations(batch, source)
+        self.assertEqual(dropped, ["extern f64 func_87C0068C(void *);"])
+        self.assertEqual(conflicts, [])
+        self.assertEqual(filtered["declarations"], "")
+        self.assertNotIn("companion_edits", filtered)
+
+    def test_differing_signature_becomes_companion_edit(self) -> None:
+        # Reproduces the real-run bug: the file's stale "extern void" must
+        # not silently override the batch's (correct) "extern f64" -- and
+        # must not simply be redeclared either (that's the compile error).
+        old_line = "extern void func_87C0068C(void *arg0);"
+        source = f"{old_line}\n\nvoid func_1(void) {{ return; }}\n"
+        new_line = "extern f64 func_87C0068C(void *);"
+        batch = {"declarations": new_line, "candidates": []}
+        filtered, dropped, conflicts = container_agent.filter_declarations(batch, source)
+
+        self.assertEqual(dropped, [])
+        self.assertEqual(filtered["declarations"], "")
+        self.assertEqual(len(conflicts), 1)
+        conflict = conflicts[0]
+        self.assertEqual(conflict["name"], "func_87C0068C")
+        self.assertTrue(conflict["companion_edit"])
+        self.assertEqual(conflict["file_declaration"], old_line)
+        self.assertEqual(conflict["batch_declaration"], new_line)
+        self.assertEqual(
+            filtered["companion_edits"],
+            [{"function": "func_87C0068C", "old": old_line, "new": new_line}],
+        )
+
+    def test_companion_edits_are_deduped_against_existing(self) -> None:
+        old_line = "extern void func_87C0068C(void *arg0);"
+        source = f"{old_line}\n"
+        new_line = "extern f64 func_87C0068C(void *);"
+        existing_edit = {"function": "func_87C0068C", "old": old_line, "new": new_line}
+        batch = {
+            "declarations": new_line,
+            "companion_edits": [existing_edit, {"function": "other", "old": "a", "new": "b"}],
+            "candidates": [],
+        }
+        filtered, dropped, conflicts = container_agent.filter_declarations(batch, source)
+        self.assertEqual(len(conflicts), 1)
+        self.assertEqual(
+            filtered["companion_edits"],
+            [existing_edit, {"function": "other", "old": "a", "new": "b"}],
+        )
+
+    def test_pragma_owner_conflict_keeps_batch_line_without_companion_edit(self) -> None:
+        old_line = "extern void func_87C0068C(void *arg0);"
+        source = (
+            f"{old_line}\n\n"
+            '#pragma GLOBAL_ASM("asm/nonmatchings/X/func_87C0068C.s")\n'
+            "void func_87C0068C(void *arg0);\n"
+        )
+        new_line = "extern f64 func_87C0068C(void *);"
+        batch = {"declarations": new_line, "candidates": []}
+        filtered, dropped, conflicts = container_agent.filter_declarations(batch, source)
+
+        self.assertEqual(dropped, [])
+        self.assertEqual(filtered["declarations"], new_line)
+        self.assertNotIn("companion_edits", filtered)
+        self.assertEqual(len(conflicts), 1)
+        self.assertFalse(conflicts[0]["companion_edit"])
+        self.assertEqual(conflicts[0]["name"], "func_87C0068C")
+
+    def test_non_extern_source_declaration_falls_back_to_silent_drop(self) -> None:
+        # A full definition (not a plain extern line) has no single
+        # comparable signature to check against -- old silent-drop behavior.
+        source = "f64 func_87C0068C(void *arg0) {\n    return 0.0;\n}\n"
+        batch = {"declarations": "extern void func_87C0068C(void *);", "candidates": []}
+        filtered, dropped, conflicts = container_agent.filter_declarations(batch, source)
+        self.assertEqual(dropped, ["extern void func_87C0068C(void *);"])
+        self.assertEqual(conflicts, [])
+
+
+class NormalizeDeclarationSignatureTests(unittest.TestCase):
+    def test_ignores_parameter_names(self) -> None:
+        a = container_agent._normalize_declaration_signature("extern f64 func_A(void *arg0);")
+        b = container_agent._normalize_declaration_signature("extern f64 func_A(void *);")
+        self.assertEqual(a, b)
+
+    def test_different_return_type_differs(self) -> None:
+        a = container_agent._normalize_declaration_signature("extern void func_A(void *arg0);")
+        b = container_agent._normalize_declaration_signature("extern f64 func_A(void *);")
+        self.assertNotEqual(a, b)
+
+    def test_ignores_whitespace_and_pointer_spacing(self) -> None:
+        a = container_agent._normalize_declaration_signature("extern   f64   func_A( void  *arg0 );")
+        b = container_agent._normalize_declaration_signature("extern f64 func_A(void*arg1);")
+        self.assertEqual(a, b)
+
+    def test_unnamed_multiword_type_param_is_not_mistaken_for_a_name(self) -> None:
+        a = container_agent._normalize_declaration_signature(
+            "extern s32 func_A(unsigned int arg0, void *arg1);"
+        )
+        b = container_agent._normalize_declaration_signature(
+            "extern s32 func_A(unsigned int, void*);"
+        )
+        self.assertEqual(a, b)
+
+    def test_data_symbol_type_differs(self) -> None:
+        a = container_agent._normalize_declaration_signature("extern u8 D_X;")
+        b = container_agent._normalize_declaration_signature("extern void *D_X;")
+        self.assertNotEqual(a, b)
 
 
 class ExternBlockSymbolNamesTests(unittest.TestCase):
@@ -2267,6 +2446,34 @@ class BuildPromptDoNotRedeclareRuleTests(unittest.TestCase):
             best_candidates=[], permuter_seed=None, batch_path=Path("/tmp/batch.json"),
         )
         self.assertNotIn("do not redeclare", prompt)
+
+    def test_rule_line_mentions_companion_edit_type_conflicts(self) -> None:
+        prompt = container_agent.build_prompt(
+            owner="func_1", source_rel="disasm/src/X.c", file_brief="brief", asm_text="asm",
+            best_candidates=[], permuter_seed=None, batch_path=Path("/tmp/batch.json"),
+            type_conflicts=[{
+                "name": "func_87C0068C",
+                "file_declaration": "extern void func_87C0068C(void *arg0);",
+                "companion_edit": True,
+            }],
+        )
+        self.assertIn(
+            "the file declares func_87C0068C as `extern void func_87C0068C(void *arg0);`; "
+            "your batch retyped it via a companion edit.",
+            prompt,
+        )
+
+    def test_rule_line_omits_non_companion_edit_conflicts(self) -> None:
+        prompt = container_agent.build_prompt(
+            owner="func_1", source_rel="disasm/src/X.c", file_brief="brief", asm_text="asm",
+            best_candidates=[], permuter_seed=None, batch_path=Path("/tmp/batch.json"),
+            type_conflicts=[{
+                "name": "func_87C0068C",
+                "file_declaration": "extern void func_87C0068C(void *arg0);",
+                "companion_edit": False,
+            }],
+        )
+        self.assertNotIn("retyped it via a companion edit", prompt)
 
 
 class RunIterationDeclarationHygieneTests(unittest.TestCase):
@@ -2313,6 +2520,169 @@ class RunIterationDeclarationHygieneTests(unittest.TestCase):
             log_text = (out_dir / "log.txt").read_text(encoding="utf-8")
             self.assertIn("dropping already-declared statement", log_text)
             self.assertIn("extern void func_A(void);", log_text)
+
+    def test_type_conflict_becomes_companion_edit_and_is_recorded(self) -> None:
+        # Issue #38 / real-run repro: the file's stale "extern void" for
+        # func_87C0068C must not silently win, nor be redeclared alongside
+        # the batch's "extern f64" -- it must become a companion_edit and
+        # drop out of "declarations" entirely.
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            source_path = repo_dir / "disasm" / "src" / "X.c"
+            source_path.parent.mkdir(parents=True)
+            old_line = "extern void func_87C0068C(void *arg0);"
+            source_path.write_text(
+                f"{old_line}\n\nvoid func_1(void) {{\n    return;\n}}\n", encoding="utf-8",
+            )
+            out_dir = Path(tmp) / "out"
+            owner = "func_1"
+            owner_state = container_agent._new_owner_state()
+            new_line = "extern f64 func_87C0068C(void *);"
+            batch = {
+                "source": "disasm/src/X.c",
+                "declarations": new_line,
+                "candidates": [{"function": owner, "label": "a", "body": "void func_1(void) { return; }"}],
+            }
+            result = {
+                "batch_status": "no_candidate_accepted", "accepted": [],
+                "attempts": [{"function": owner, "label": "a", "status": "rejected", "similarity_score": 0.1}],
+            }
+            seen_batches: list[dict] = []
+            logger = container_agent.Logger(out_dir / "log.txt")
+            batch_path = out_dir / "batches" / "func_1_iter0.json"
+            container_agent.save_json(batch_path, batch)
+
+            def fake_probe(repo_dir_arg, batch_path_arg, result_path, *, timeout):
+                seen_batches.append(container_agent.load_json(batch_path_arg))
+                container_agent.save_json(result_path, result)
+                return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+            with mock.patch.object(container_agent, "invoke_probe", side_effect=fake_probe):
+                container_agent.run_iteration(
+                    repo_dir=repo_dir, out_dir=out_dir, source_rel="disasm/src/X.c", owner=owner,
+                    iteration=0, batch=batch, batch_path=batch_path, owner_state=owner_state,
+                    deadline=time.monotonic() + 60.0, permuter_seconds=0.0, logger=logger,
+                )
+
+            self.assertEqual(len(seen_batches), 1)
+            self.assertEqual(seen_batches[0]["declarations"], "")
+            self.assertEqual(
+                seen_batches[0]["companion_edits"],
+                [{"function": "func_87C0068C", "old": old_line, "new": new_line}],
+            )
+            log_text = (out_dir / "log.txt").read_text(encoding="utf-8")
+            self.assertIn("TYPE CONFLICT", log_text)
+            self.assertIn("companion edit created", log_text)
+            self.assertEqual(len(owner_state["type_conflicts"]), 1)
+            self.assertEqual(owner_state["type_conflicts"][0]["name"], "func_87C0068C")
+            self.assertTrue(owner_state["type_conflicts"][0]["companion_edit"])
+
+    def test_pragma_owner_type_conflict_keeps_declaration_and_warns(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            source_path = repo_dir / "disasm" / "src" / "X.c"
+            source_path.parent.mkdir(parents=True)
+            old_line = "extern void func_87C0068C(void *arg0);"
+            source_path.write_text(
+                f"{old_line}\n\n"
+                '#pragma GLOBAL_ASM("asm/nonmatchings/X/func_87C0068C.s")\n'
+                "void func_87C0068C(void *arg0);\n\n"
+                "void func_1(void) {\n    return;\n}\n",
+                encoding="utf-8",
+            )
+            out_dir = Path(tmp) / "out"
+            owner = "func_1"
+            owner_state = container_agent._new_owner_state()
+            new_line = "extern f64 func_87C0068C(void *);"
+            batch = {
+                "source": "disasm/src/X.c",
+                "declarations": new_line,
+                "candidates": [{"function": owner, "label": "a", "body": "void func_1(void) { return; }"}],
+            }
+            result = {
+                "batch_status": "no_candidate_accepted", "accepted": [],
+                "attempts": [{"function": owner, "label": "a", "status": "rejected", "similarity_score": 0.1}],
+            }
+            seen_batches: list[dict] = []
+            logger = container_agent.Logger(out_dir / "log.txt")
+            batch_path = out_dir / "batches" / "func_1_iter0.json"
+            container_agent.save_json(batch_path, batch)
+
+            def fake_probe(repo_dir_arg, batch_path_arg, result_path, *, timeout):
+                seen_batches.append(container_agent.load_json(batch_path_arg))
+                container_agent.save_json(result_path, result)
+                return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+            with mock.patch.object(container_agent, "invoke_probe", side_effect=fake_probe):
+                container_agent.run_iteration(
+                    repo_dir=repo_dir, out_dir=out_dir, source_rel="disasm/src/X.c", owner=owner,
+                    iteration=0, batch=batch, batch_path=batch_path, owner_state=owner_state,
+                    deadline=time.monotonic() + 60.0, permuter_seconds=0.0, logger=logger,
+                )
+
+            self.assertEqual(len(seen_batches), 1)
+            self.assertEqual(seen_batches[0]["declarations"], new_line)
+            self.assertNotIn("companion_edits", seen_batches[0])
+            log_text = (out_dir / "log.txt").read_text(encoding="utf-8")
+            self.assertIn("WARNING TYPE CONFLICT", log_text)
+            self.assertIn("no companion edit", log_text)
+            self.assertEqual(len(owner_state["type_conflicts"]), 1)
+            self.assertFalse(owner_state["type_conflicts"][0]["companion_edit"])
+
+
+class RunIterationPermuterDeclarationsTests(unittest.TestCase):
+    def test_permuter_receives_declarations_after_type_conflict_filtering(self) -> None:
+        # Regression for the real-run bug: the permuter's base.c must never
+        # see the file's already-conflicting declaration alongside the
+        # batch's -- run_permuter must get exactly the post-filter string,
+        # not the batch's original unfiltered "declarations".
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            source_path = repo_dir / "disasm" / "src" / "X.c"
+            source_path.parent.mkdir(parents=True)
+            source_path.write_text(
+                "extern void func_87C0068C(void *arg0);\n\nvoid func_1(void) {\n    return;\n}\n",
+                encoding="utf-8",
+            )
+            out_dir = Path(tmp) / "out"
+            owner = "func_1"
+            owner_state = container_agent._new_owner_state()
+            batch = {
+                "source": "disasm/src/X.c",
+                "declarations": "extern f64 func_87C0068C(void *);",
+                "candidates": [{"function": owner, "label": "a", "body": "body_a"}],
+            }
+            result = {
+                "batch_status": "no_candidate_accepted", "accepted": [],
+                "attempts": [{
+                    "function": owner, "label": "a", "status": "near_miss",
+                    "similarity_score": 0.97, "futility": None,
+                }],
+            }
+            permuter_result = {"timed_out": False, "outputs": [], "best": None}
+            logger = container_agent.Logger(out_dir / "log.txt")
+            batch_path = out_dir / "batches" / "func_1_iter0.json"
+            container_agent.save_json(batch_path, batch)
+            jobs: list = []
+
+            def fake_probe(repo_dir_arg, batch_path_arg, result_path, *, timeout):
+                container_agent.save_json(result_path, result)
+                return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+            with mock.patch.object(container_agent, "invoke_probe", side_effect=fake_probe), \
+                 mock.patch.object(container_agent, "run_permuter", return_value=permuter_result) as run_permuter_mock:
+                container_agent.run_iteration(
+                    repo_dir=repo_dir, out_dir=out_dir, source_rel="disasm/src/X.c", owner=owner,
+                    iteration=0, batch=batch, batch_path=batch_path, owner_state=owner_state,
+                    deadline=time.monotonic() + 60.0, permuter_seconds=30.0, logger=logger,
+                    permuter_jobs=jobs,
+                )
+                jobs[0].thread.join(timeout=5.0)
+
+        run_permuter_mock.assert_called_once()
+        # The dropped/companion-edited statement must not reach the permuter.
+        declarations_arg = run_permuter_mock.call_args[0][5]
+        self.assertEqual(declarations_arg, "")
 
 
 # ---------------------------------------------------------------------------

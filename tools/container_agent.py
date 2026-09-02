@@ -235,6 +235,7 @@ def _new_owner_state() -> dict:
         "tried_labels": [],
         "m2c_draft": None,
         "m2c_draft_fetched": False,
+        "type_conflicts": [],
     }
 
 
@@ -707,30 +708,159 @@ def _name_declared_in_source(name: str, source_text: str) -> bool:
     return False
 
 
-def filter_declarations(batch: dict, source_text: str) -> tuple[dict, list[str]]:
-    """Drop top-level ``declarations`` statements that redeclare a name the
-    source file already declares or defines.
+def _find_source_extern_declaration(name: str, source_text: str) -> str | None:
+    """Return the exact text of ``name``'s declaration in ``source_text`` if
+    it is a plain one-line ``extern ...;`` statement (no braces, nothing
+    else on the line) -- the only shape a companion_edit can safely retarget.
+    ``None`` when ``name`` is declared some other way (a function definition,
+    an array, a multi-line extern, ...)."""
+    pattern = re.compile(
+        rf"^[ \t]*extern\b[^\n{{}};]*\b{re.escape(name)}\b[^\n{{}};]*;[ \t]*$", re.M,
+    )
+    match = pattern.search(source_text)
+    return match.group(0) if match else None
 
-    Returns ``(filtered_batch, dropped_statements)``; ``filtered_batch`` is a
-    shallow copy of ``batch`` with a (possibly empty) ``declarations`` string
-    when anything was dropped, or ``batch`` unchanged when nothing was.
+
+# Bare C type keywords: never mistaken for a trailing parameter *name* when
+# normalising a declaration's signature (see _strip_param_name) -- "unsigned
+# int" is one unnamed parameter, not a type "unsigned" named "int".
+_KNOWN_TYPE_TOKENS = {
+    "void", "char", "short", "int", "long", "float", "double",
+    "signed", "unsigned", "const", "volatile", "struct", "union", "enum",
+    "s8", "s16", "s32", "s64", "u8", "u16", "u32", "u64", "f32", "f64",
+}
+_PARAM_TRAILING_NAME_RE = re.compile(r"^(?P<type>.*[*\s])(?P<name>[A-Za-z_]\w*)$")
+
+
+def _strip_param_name(param: str) -> str:
+    """Drop one parameter's trailing declarator name, e.g. ``"void *arg0"``
+    -> ``"void *"``, ``"s32 arg0"`` -> ``"s32"``. A param with no name
+    (``"void *"``, ``"s32"``, an unnamed ``"unsigned int"``) is returned
+    unchanged."""
+    param = param.strip()
+    if not param or param in ("void", "..."):
+        return param
+    match = _PARAM_TRAILING_NAME_RE.match(param)
+    if not match:
+        return param
+    if match.group("name") in _KNOWN_TYPE_TOKENS:
+        return param
+    type_part = match.group("type").rstrip()
+    return type_part or param
+
+
+def _normalize_declaration_signature(statement: str) -> str:
+    """Normalise one declaration statement for signature comparison:
+    collapse whitespace, standardize ``*`` spacing, and drop parameter
+    *names* (keeping their types) so ``"extern f64 f(void *arg0);"`` and
+    ``"extern f64 f(void *);"`` compare equal but a differing return type or
+    parameter type does not."""
+    text = statement.strip().rstrip(";").strip()
+    text = re.sub(r"\s+", " ", text)
+    text = re.sub(r"\s*\*\s*", " *", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    paren = text.find("(")
+    if paren == -1:
+        return text
+    head = text[:paren].rstrip()
+    rest = text[paren:]
+    close = rest.rfind(")")
+    if close == -1:
+        return text
+    params_str = rest[1:close]
+    tail = rest[close + 1:].strip()
+    params = [p.strip() for p in params_str.split(",")] if params_str.strip() else []
+    normalized_params = [_strip_param_name(p) for p in params]
+    result = f"{head}({', '.join(normalized_params)})"
+    return f"{result} {tail}" if tail else result
+
+
+def filter_declarations(batch: dict, source_text: str) -> tuple[dict, list[str], list[dict]]:
+    """Drop top-level ``declarations`` statements that redeclare a name the
+    source file already declares or defines, and flag the ones that would
+    redeclare a name under a DIFFERENT signature (issue #38: a stale file
+    declaration must not silently win over a batch's retyped one).
+
+    For each statement naming something already in ``source_text``:
+    - If the source declares it via a full definition/array/multi-line
+      extern (no single comparable ``extern ...;`` line), or the comparable
+      line's normalised signature matches the batch's: dropped silently, as
+      before.
+    - If the source's plain one-line ``extern ...;`` declaration has a
+      DIFFERENT normalised signature: the batch line is a genuine type
+      conflict, recorded in the returned ``conflicts`` list. Unless ``name``
+      is itself a GLOBAL_ASM owner in this file (never safe to retarget --
+      it has no real signature yet), the batch line becomes a
+      ``companion_edit`` that replaces the file's stale line, and is removed
+      from "declarations" (the companion_edit now supplies the correct
+      type, so leaving it in "declarations" too would just redeclare it).
+      For a GLOBAL_ASM-owner name, no companion_edit is made and the batch
+      line is instead kept in "declarations" as-is (flagged in the
+      conflict as such).
+
+    Returns ``(filtered_batch, dropped_statements, conflicts)``.
+    ``filtered_batch`` is a shallow copy of ``batch`` with a (possibly
+    empty) "declarations" string and, when any companion_edits were
+    derived, an updated "companion_edits" list -- or ``batch`` unchanged
+    when nothing was dropped/flagged.
     """
     statements = _split_declaration_statements(batch.get("declarations") or "")
     if not statements:
-        return batch, []
+        return batch, [], []
+    pragma_owners = {match.group(1) for match in PRAGMA_RE.finditer(source_text)}
     kept: list[str] = []
     dropped: list[str] = []
+    conflicts: list[dict] = []
+    new_companion_edits: list[dict] = []
     for statement in statements:
         name = _declaration_statement_name(statement)
-        if name and _name_declared_in_source(name, source_text):
+        if not name or not _name_declared_in_source(name, source_text):
+            kept.append(statement)
+            continue
+        file_line = _find_source_extern_declaration(name, source_text)
+        if file_line is None:
+            # Declared some other way (a definition, an array, a multi-line
+            # extern...) -- no comparable single-line signature to check
+            # against, so fall back to the old silent-drop behavior.
             dropped.append(statement)
             continue
-        kept.append(statement)
-    if not dropped:
-        return batch, []
+        file_sig = _normalize_declaration_signature(file_line)
+        batch_sig = _normalize_declaration_signature(statement)
+        if file_sig == batch_sig:
+            dropped.append(statement)
+            continue
+        is_pragma_owner = name in pragma_owners
+        conflicts.append({
+            "name": name,
+            "file_declaration": file_line.strip(),
+            "batch_declaration": statement.strip(),
+            "file_signature": file_sig,
+            "batch_signature": batch_sig,
+            "companion_edit": not is_pragma_owner,
+        })
+        if is_pragma_owner:
+            # Can't safely retarget a still-pragma owner's declaration --
+            # keep the batch's line in "declarations" as-is (a warning is
+            # logged by the caller); this risks a redeclaration diagnostic,
+            # but a silently-stale extern is worse (issue #38).
+            kept.append(statement)
+            continue
+        edit = {"function": name, "old": file_line, "new": statement.strip()}
+        if edit not in new_companion_edits:
+            new_companion_edits.append(edit)
+        # Not kept in "declarations": the companion_edit now supplies the
+        # correct type in place, so repeating it here would just redeclare it.
+    if not dropped and not conflicts:
+        return batch, [], []
     filtered = dict(batch)
     filtered["declarations"] = "\n".join(kept)
-    return filtered, dropped
+    if new_companion_edits:
+        existing_edits = list(batch.get("companion_edits") or [])
+        for edit in new_companion_edits:
+            if edit not in existing_edits:
+                existing_edits.append(edit)
+        filtered["companion_edits"] = existing_edits
+    return filtered, dropped, conflicts
 
 
 _EXTERN_BLOCK_SECTION_RE = re.compile(
@@ -931,6 +1061,7 @@ def build_prompt(
     tried_labels: list[str] | None = None,
     m2c_draft: str | None = None,
     probe_tool: bool = True,
+    type_conflicts: list[dict] | None = None,
 ) -> str:
     extern_names = _extern_block_symbol_names(file_brief)
     probe_rule = (PROBE_TOOL_RULE_ON if probe_tool else PROBE_TOOL_RULE_OFF).format(
@@ -987,6 +1118,14 @@ def build_prompt(
                 "The file already declares these callees/data (do not redeclare): "
                 + ", ".join(extern_names)
             )
+        companion_edit_conflicts = [c for c in (type_conflicts or []) if c.get("companion_edit")]
+        if companion_edit_conflicts:
+            parts.append("")
+            for conflict in companion_edit_conflicts:
+                parts.append(
+                    f"the file declares {conflict['name']} as `{conflict['file_declaration']}`; "
+                    "your batch retyped it via a companion edit."
+                )
         parts.append("")
         parts.append(BATCH_CONTRACT.format(
             source_rel=source_rel, owner=owner, batch_path=batch_path, probe_rule=probe_rule,
@@ -1304,6 +1443,49 @@ def poll_permuter(
     }
 
 
+# A permuter run that exits on its own (never hit its time budget) with zero
+# outputs in well under a normal pass almost always means base.c never even
+# compiled (a bad declaration, a redeclaration, ...) -- see run_permuter's
+# call to _log_permuter_quick_failure below. 10s is generous: a real
+# permuter search that actually starts iterating variants runs for the whole
+# budget; one that dies in the setup/compile step exits in a couple of
+# seconds.
+PERMUTER_QUICK_FAILURE_SECONDS = 10.0
+PERMUTER_LOG_TAIL_LINES = 5
+
+
+def _log_permuter_quick_failure(
+    owner: str,
+    iteration: int,
+    label_suffix: str,
+    result: dict,
+    elapsed: float,
+    *,
+    logger: Logger,
+) -> None:
+    """Log a WARNING with the tail of the permuter's own ``permuter.log``
+    when a run finishes suspiciously fast with zero outputs -- this is the
+    class of failure that otherwise only shows up as a silent
+    ``outputs=0`` in the one-line summary (e.g. base.c failed to compile
+    because of a stale/conflicting declaration)."""
+    work_dir = result.get("work_dir")
+    tail_text = "(no work_dir kept -- pass --keep, or the permuter never got far enough to create one)"
+    if work_dir:
+        log_file = Path(work_dir) / "permuter.log"
+        try:
+            lines = log_file.read_text(encoding="utf-8", errors="replace").splitlines()
+        except OSError:
+            tail_text = f"(could not read {log_file})"
+        else:
+            tail = lines[-PERMUTER_LOG_TAIL_LINES:]
+            tail_text = "\n".join(f"    {line}" for line in tail) if tail else "(permuter.log is empty)"
+    logger.log(
+        f"{owner}: WARNING permuter iter {iteration}{label_suffix} finished in {elapsed:.1f}s "
+        f"with zero outputs (likely base.c failed to compile) -- last "
+        f"{PERMUTER_LOG_TAIL_LINES} line(s) of permuter.log:\n{tail_text}"
+    )
+
+
 def run_permuter(
     repo_dir: Path,
     out_dir: Path,
@@ -1335,6 +1517,7 @@ def run_permuter(
 
     before = _snapshot_permuter_dirs(repo_dir, owner)
     log_path = tmp_dir / f"{stem}_permuter.log"
+    started = time.monotonic()
     try:
         process = invoke_permuter(
             repo_dir, owner, candidate_path, declarations_path,
@@ -1345,10 +1528,13 @@ def run_permuter(
         return None
 
     result = poll_permuter(repo_dir, owner, process, before, budget_seconds=permuter_seconds + 30.0)
+    elapsed = time.monotonic() - started
     logger.log(
         f"{owner}: permuter iter {iteration}{label_suffix} finished timed_out={result['timed_out']} "
         f"outputs={len(result['outputs'])} best_score={(result['best'] or {}).get('score')}"
     )
+    if not result["timed_out"] and not result["outputs"] and elapsed < PERMUTER_QUICK_FAILURE_SECONDS:
+        _log_permuter_quick_failure(owner, iteration, label_suffix, result, elapsed, logger=logger)
     return result
 
 
@@ -1671,12 +1857,30 @@ def run_iteration(
     except OSError:
         source_text = None
     if source_text is not None:
-        decl_filtered_batch, dropped_declarations = filter_declarations(batch, source_text)
+        decl_filtered_batch, dropped_declarations, declaration_conflicts = filter_declarations(
+            batch, source_text
+        )
         for statement in dropped_declarations:
             logger.log(
                 f"{owner}: iter {iteration}: dropping already-declared statement: {statement!r}"
             )
-        if dropped_declarations:
+        for conflict in declaration_conflicts:
+            if conflict["companion_edit"]:
+                logger.log(
+                    f"{owner}: iter {iteration}: TYPE CONFLICT: file declares "
+                    f"{conflict['file_signature']}; batch declares {conflict['batch_signature']} "
+                    "(companion edit created)"
+                )
+            else:
+                logger.log(
+                    f"{owner}: iter {iteration}: WARNING TYPE CONFLICT: file declares "
+                    f"{conflict['file_signature']}; batch declares {conflict['batch_signature']} "
+                    f"({conflict['name']} is a GLOBAL_ASM owner in this file; keeping batch "
+                    "declaration in place, no companion edit)"
+                )
+        if declaration_conflicts:
+            owner_state.setdefault("type_conflicts", []).extend(declaration_conflicts)
+        if dropped_declarations or declaration_conflicts:
             batch = decl_filtered_batch
             save_json(batch_path, batch)
 
@@ -1943,7 +2147,7 @@ def process_owner(
             best_candidates=owner_state["best_candidates"],
             permuter_seed=owner_state.get("permuter_seed"), batch_path=batch_path,
             tried_labels=owner_state.get("tried_labels"), m2c_draft=m2c_draft,
-            probe_tool=probe_tool,
+            probe_tool=probe_tool, type_conflicts=owner_state.get("type_conflicts"),
         )
         prompt_path.write_text(prompt_text, encoding="utf-8")
 

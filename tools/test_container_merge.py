@@ -71,6 +71,31 @@ def _rejected_result() -> dict[str, object]:
     }
 
 
+class _FakeGateProc:
+    """Stand-in for ``subprocess.CompletedProcess`` in fake ``subprocess.run``s."""
+
+    def __init__(self, returncode: int = 0, stdout: str = "", stderr: str = "") -> None:
+        self.returncode = returncode
+        self.stdout = stdout
+        self.stderr = stderr
+
+
+def _fake_gate_subprocess_run(result_payload: dict[str, object], calls: list[dict[str, object]]):
+    """A ``subprocess.run`` replacement for ``run_fleet_probe_gate``'s own call:
+    records ``{"cmd", "cwd", "env"}`` for each invocation and writes
+    ``result_payload`` to the ``--json <path>`` argument, exactly like the
+    real ``fleet_probe.py --gate`` would.
+    """
+
+    def fake_run(cmd, *, cwd, capture_output, text, timeout, env):
+        calls.append({"cmd": list(cmd), "cwd": cwd, "env": env})
+        result_path = Path(cmd[cmd.index("--json") + 1])
+        result_path.write_text(json.dumps(result_payload), encoding="utf-8")
+        return _FakeGateProc(0)
+
+    return fake_run
+
+
 @contextlib.contextmanager
 def _tmp_out_dir():
     with tempfile.TemporaryDirectory() as tmp:
@@ -198,6 +223,147 @@ class ProcessOwnerTests(unittest.TestCase):
         commit_mock.assert_not_called()
 
 
+class RunFleetProbeGateTests(unittest.TestCase):
+    """``run_fleet_probe_gate``'s own subprocess call: env handling and
+    whether the ``--json`` result file survives the call. These stub
+    ``subprocess.run`` directly (rather than ``run_fleet_probe_gate``
+    itself) so the env actually reaching the subprocess is observable."""
+
+    def test_extra_env_overlaid_on_cleaned_environment(self) -> None:
+        calls: list[dict[str, object]] = []
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            batch_path = repo_root / "batch.json"
+            batch_path.write_text("{}", encoding="utf-8")
+            with mock.patch.object(
+                container_merge.subprocess, "run",
+                side_effect=_fake_gate_subprocess_run(_accepted_result("func_1")["result"], calls),
+            ), mock.patch.dict(
+                os.environ, {"SOME_HOST_VAR": "keep-me", "GIT_DIR": "poison"}
+            ):
+                container_merge.run_fleet_probe_gate(
+                    batch_path, repo_root=repo_root,
+                    extra_env={"PRAGMA_GATE_CC_CHECK": "0"},
+                )
+        self.assertEqual(len(calls), 1)
+        env = calls[0]["env"]
+        self.assertEqual(env.get("PRAGMA_GATE_CC_CHECK"), "0")
+        self.assertEqual(env.get("SOME_HOST_VAR"), "keep-me")
+        self.assertNotIn("GIT_DIR", env)
+
+    def test_fresh_history_env_reaches_subprocess(self) -> None:
+        calls: list[dict[str, object]] = []
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            batch_path = repo_root / "batch.json"
+            batch_path.write_text("{}", encoding="utf-8")
+            history_path = repo_root / "out" / "merge-history.jsonl"
+            with mock.patch.object(
+                container_merge.subprocess, "run",
+                side_effect=_fake_gate_subprocess_run(_accepted_result("func_1")["result"], calls),
+            ):
+                container_merge.run_fleet_probe_gate(
+                    batch_path, repo_root=repo_root,
+                    extra_env={"PRAGMA_PROBE_STATS": str(history_path)},
+                )
+        self.assertEqual(calls[0]["env"].get("PRAGMA_PROBE_STATS"), str(history_path))
+
+    def test_no_extra_env_still_runs_with_cleaned_environment(self) -> None:
+        calls: list[dict[str, object]] = []
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            batch_path = repo_root / "batch.json"
+            batch_path.write_text("{}", encoding="utf-8")
+            with mock.patch.object(
+                container_merge.subprocess, "run",
+                side_effect=_fake_gate_subprocess_run(_accepted_result("func_1")["result"], calls),
+            ):
+                container_merge.run_fleet_probe_gate(batch_path, repo_root=repo_root)
+        self.assertNotIn("PRAGMA_GATE_CC_CHECK", calls[0]["env"])
+
+    def test_result_path_is_written_and_kept(self) -> None:
+        calls: list[dict[str, object]] = []
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            batch_path = repo_root / "batch.json"
+            batch_path.write_text("{}", encoding="utf-8")
+            result_path = repo_root / "out" / "merge-results" / "func_1.json"
+            with mock.patch.object(
+                container_merge.subprocess, "run",
+                side_effect=_fake_gate_subprocess_run(_rejected_result()["result"], calls),
+            ):
+                gate = container_merge.run_fleet_probe_gate(
+                    batch_path, repo_root=repo_root, result_path=result_path,
+                )
+            self.assertTrue(result_path.is_file())
+            self.assertEqual(gate["result"]["batch_status"], "no_candidate_accepted")
+
+    def test_default_temp_result_path_is_deleted(self) -> None:
+        written: dict[str, Path] = {}
+
+        def fake_run(cmd, *, cwd, capture_output, text, timeout, env):
+            result_path = Path(cmd[cmd.index("--json") + 1])
+            written["path"] = result_path
+            result_path.write_text(
+                json.dumps({"batch_status": "accepted", "accepted": []}), encoding="utf-8"
+            )
+            return _FakeGateProc(0)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            batch_path = repo_root / "batch.json"
+            batch_path.write_text("{}", encoding="utf-8")
+            with mock.patch.object(container_merge.subprocess, "run", side_effect=fake_run):
+                container_merge.run_fleet_probe_gate(batch_path, repo_root=repo_root)
+        self.assertFalse(written["path"].exists())
+
+
+class BuildGateEnvTests(unittest.TestCase):
+    def test_no_flags_returns_empty_env(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            env = container_merge.build_gate_env(
+                Path(tmp), no_cc_check=False, fresh_history=False
+            )
+        self.assertEqual(env, {})
+
+    def test_no_cc_check_sets_env_var(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            env = container_merge.build_gate_env(
+                Path(tmp), no_cc_check=True, fresh_history=False
+            )
+        self.assertEqual(env.get("PRAGMA_GATE_CC_CHECK"), "0")
+
+    def test_fresh_history_points_at_out_dir_and_creates_file(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            out_dir = Path(tmp) / "out"
+            out_dir.mkdir()
+            env = container_merge.build_gate_env(
+                out_dir, no_cc_check=False, fresh_history=True
+            )
+            expected = out_dir / "merge-history.jsonl"
+            self.assertEqual(env.get("PRAGMA_PROBE_STATS"), str(expected))
+            self.assertTrue(expected.is_file())
+
+    def test_fresh_history_leaves_existing_file_untouched(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            out_dir = Path(tmp)
+            history_path = out_dir / "merge-history.jsonl"
+            history_path.write_text('{"already": "here"}\n', encoding="utf-8")
+            container_merge.build_gate_env(out_dir, no_cc_check=False, fresh_history=True)
+            self.assertEqual(
+                history_path.read_text(encoding="utf-8"), '{"already": "here"}\n'
+            )
+
+    def test_both_flags_together(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            out_dir = Path(tmp)
+            env = container_merge.build_gate_env(out_dir, no_cc_check=True, fresh_history=True)
+        self.assertEqual(env.get("PRAGMA_GATE_CC_CHECK"), "0")
+        self.assertEqual(
+            env.get("PRAGMA_PROBE_STATS"), str(out_dir / "merge-history.jsonl")
+        )
+
+
 class MergeTests(unittest.TestCase):
     def _run_merge(self, out_dir: Path, **kwargs) -> tuple[int, str]:
         buffer = io.StringIO()
@@ -294,6 +460,152 @@ class MergeTests(unittest.TestCase):
             ), mock.patch.object(container_merge, "git_commit_only") as commit_mock:
                 self._run_merge(out_dir, commit=True, dry_run=False)
         commit_mock.assert_not_called()
+
+    # -- --no-cc-check ----------------------------------------------------
+
+    def test_no_cc_check_passes_env_to_gate_and_result_path(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1")
+            captured: dict[str, object] = {}
+
+            def fake_gate(path, *, repo_root, extra_env=None, result_path=None, **_kw):
+                captured["extra_env"] = extra_env
+                captured["result_path"] = result_path
+                return _accepted_result("func_1")
+
+            with mock.patch.object(container_merge, "run_fleet_probe_gate", side_effect=fake_gate):
+                self._run_merge(out_dir, commit=False, dry_run=False, no_cc_check=True)
+        self.assertEqual(captured["extra_env"], {"PRAGMA_GATE_CC_CHECK": "0"})
+        self.assertEqual(captured["result_path"], out_dir / "merge-results" / "func_1.json")
+
+    def test_no_cc_check_prints_loud_warning(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1")
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", return_value=_accepted_result("func_1")
+            ):
+                _code, out = self._run_merge(out_dir, commit=False, dry_run=False, no_cc_check=True)
+        self.assertIn("WARNING", out)
+        self.assertIn("--no-cc-check", out)
+        self.assertIn("PRAGMA_GATE_CC_CHECK=0", out)
+
+    def test_no_warning_without_no_cc_check(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1")
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", return_value=_accepted_result("func_1")
+            ):
+                _code, out = self._run_merge(out_dir, commit=False, dry_run=False)
+        self.assertNotIn("WARNING", out)
+
+    # -- merge-report.json --------------------------------------------------
+
+    def test_merge_report_records_cc_check_bypassed_true(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1")
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", return_value=_accepted_result("func_1")
+            ):
+                self._run_merge(out_dir, commit=False, dry_run=False, no_cc_check=True)
+            report = json.loads((out_dir / "merge-report.json").read_text(encoding="utf-8"))
+            self.assertTrue(report["cc_check_bypassed"])
+            self.assertEqual(report["owners"], {"func_1": "accepted"})
+
+    def test_merge_report_default_is_not_bypassed(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1")
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", return_value=_rejected_result()
+            ):
+                self._run_merge(out_dir, commit=False, dry_run=False)
+            report = json.loads((out_dir / "merge-report.json").read_text(encoding="utf-8"))
+            self.assertFalse(report["cc_check_bypassed"])
+            self.assertFalse(report["fresh_history"])
+            self.assertEqual(report["owners"], {"func_1": "rejected"})
+
+    # -- --fresh-history ------------------------------------------------
+
+    def test_fresh_history_passes_env_to_gate(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1")
+            captured: dict[str, object] = {}
+
+            def fake_gate(path, *, repo_root, extra_env=None, result_path=None, **_kw):
+                captured["extra_env"] = extra_env
+                return _accepted_result("func_1")
+
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", side_effect=fake_gate
+            ), mock.patch.object(container_merge, "import_fresh_history_after_accept", return_value=None):
+                self._run_merge(out_dir, commit=False, dry_run=False, fresh_history=True)
+            self.assertEqual(
+                captured["extra_env"], {"PRAGMA_PROBE_STATS": str(out_dir / "merge-history.jsonl")}
+            )
+            self.assertTrue((out_dir / "merge-history.jsonl").is_file())
+
+    def test_fresh_history_imports_after_a_successful_accept(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1")
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", return_value=_accepted_result("func_1")
+            ), mock.patch.object(
+                container_merge, "import_fresh_history_after_accept",
+                return_value="container_merge: --fresh-history: imported 1 accepted line",
+            ) as import_mock:
+                _code, out = self._run_merge(out_dir, commit=False, dry_run=False, fresh_history=True)
+            import_mock.assert_called_once_with(out_dir, repo_root=out_dir)
+            self.assertIn("imported 1 accepted line", out)
+
+    def test_fresh_history_not_imported_when_nothing_accepted(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1")
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", return_value=_rejected_result()
+            ), mock.patch.object(
+                container_merge, "import_fresh_history_after_accept"
+            ) as import_mock:
+                self._run_merge(out_dir, commit=False, dry_run=False, fresh_history=True)
+            import_mock.assert_not_called()
+
+    def test_fresh_history_flag_off_never_imports(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1")
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", return_value=_accepted_result("func_1")
+            ), mock.patch.object(
+                container_merge, "import_fresh_history_after_accept"
+            ) as import_mock:
+                self._run_merge(out_dir, commit=False, dry_run=False)
+            import_mock.assert_not_called()
+
+    # -- merge-results/<owner>.json kept ---------------------------------
+
+    def test_merge_results_json_kept_for_inspection(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1")
+            calls: list[dict[str, object]] = []
+            with mock.patch.object(
+                container_merge.subprocess, "run",
+                side_effect=_fake_gate_subprocess_run(_rejected_result()["result"], calls),
+            ):
+                self._run_merge(out_dir, commit=False, dry_run=False)
+            result_path = out_dir / "merge-results" / "func_1.json"
+            self.assertTrue(result_path.is_file())
+            payload = json.loads(result_path.read_text(encoding="utf-8"))
+            self.assertEqual(payload["batch_status"], "no_candidate_accepted")
+
+    def test_merge_results_json_kept_for_multiple_owners(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1")
+            _write_batch(out_dir / "accepted", "func_2")
+            calls: list[dict[str, object]] = []
+            with mock.patch.object(
+                container_merge.subprocess, "run",
+                side_effect=_fake_gate_subprocess_run(_accepted_result("func_1")["result"], calls),
+            ):
+                self._run_merge(out_dir, commit=False, dry_run=False)
+            self.assertTrue((out_dir / "merge-results" / "func_1.json").is_file())
+            self.assertTrue((out_dir / "merge-results" / "func_2.json").is_file())
 
 
 class ImportStatsTests(unittest.TestCase):
@@ -393,6 +705,129 @@ class ImportStatsTests(unittest.TestCase):
             self.assertEqual(code, 0)
             self.assertTrue(expected_target.is_file())
             self.assertEqual(expected_target.read_text(encoding="utf-8").strip(), row)
+
+
+class AppendHistoryLinesTests(unittest.TestCase):
+    """``append_history_lines``: the dedup-append core ``import_stats`` was
+    refactored onto, and that ``import_fresh_history_after_accept`` reuses
+    with ``only_accepted=True``."""
+
+    def test_only_accepted_filters_out_non_accepted_lines(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "source.jsonl"
+            accepted_row = json.dumps(
+                {"attempts": [{"function": "func_1", "status": "accepted"}]}, sort_keys=True
+            )
+            rejected_row = json.dumps(
+                {"attempts": [{"function": "func_2", "status": "rejected"}]}, sort_keys=True
+            )
+            source.write_text(f"{accepted_row}\n{rejected_row}\n", encoding="utf-8")
+            target = Path(tmp) / "target.jsonl"
+
+            considered, new_count, duplicates = container_merge.append_history_lines(
+                source, target, only_accepted=True
+            )
+            self.assertEqual((considered, new_count, duplicates), (1, 1, 0))
+            self.assertEqual(target.read_text(encoding="utf-8").strip(), accepted_row)
+
+    def test_only_accepted_false_keeps_every_line(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "source.jsonl"
+            row = json.dumps({"batch_id": "x"}, sort_keys=True)
+            source.write_text(row + "\n", encoding="utf-8")
+            target = Path(tmp) / "target.jsonl"
+            considered, new_count, _duplicates = container_merge.append_history_lines(source, target)
+        self.assertEqual((considered, new_count), (1, 1))
+
+    def test_dry_run_reports_without_writing(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "source.jsonl"
+            row = json.dumps({"batch_id": "x"}, sort_keys=True)
+            source.write_text(row + "\n", encoding="utf-8")
+            target = Path(tmp) / "target.jsonl"
+            considered, new_count, _duplicates = container_merge.append_history_lines(
+                source, target, dry_run=True
+            )
+        self.assertEqual((considered, new_count), (1, 1))
+        self.assertFalse(target.exists())
+
+    def test_duplicate_against_target_is_skipped(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "source.jsonl"
+            row = json.dumps({"batch_id": "x"}, sort_keys=True)
+            source.write_text(row + "\n", encoding="utf-8")
+            target = Path(tmp) / "target.jsonl"
+            target.write_text(row + "\n", encoding="utf-8")
+            considered, new_count, duplicates = container_merge.append_history_lines(source, target)
+        self.assertEqual((considered, new_count, duplicates), (1, 0, 1))
+
+
+class ImportFreshHistoryAfterAcceptTests(unittest.TestCase):
+    """``import_fresh_history_after_accept``: folds a ``--fresh-history``
+    run's ``<out>/merge-history.jsonl`` accepted line(s) into the host's
+    real probe-stats history so ``tools/check_decomp_provenance.py``'s
+    pre-commit hook still finds an accepted attempt on record."""
+
+    def test_no_fresh_history_file_returns_none(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            out_dir = Path(tmp) / "out"
+            out_dir.mkdir()
+            repo_root = Path(tmp) / "repo"
+            repo_root.mkdir()
+            result = container_merge.import_fresh_history_after_accept(
+                out_dir, repo_root=repo_root
+            )
+        self.assertIsNone(result)
+
+    def test_imports_only_accepted_lines_into_host_history(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            out_dir = Path(tmp) / "out"
+            out_dir.mkdir()
+            accepted_row = json.dumps(
+                {"attempts": [{"function": "func_1", "status": "accepted"}]}, sort_keys=True
+            )
+            rejected_row = json.dumps(
+                {"attempts": [{"function": "func_2", "status": "rejected"}]}, sort_keys=True
+            )
+            (out_dir / "merge-history.jsonl").write_text(
+                f"{accepted_row}\n{rejected_row}\n", encoding="utf-8"
+            )
+            target = Path(tmp) / "host-stats.jsonl"
+            with mock.patch.dict(os.environ, {"PRAGMA_PROBE_STATS": str(target)}):
+                status_line = container_merge.import_fresh_history_after_accept(
+                    out_dir, repo_root=Path(tmp)
+                )
+            self.assertIsNotNone(status_line)
+            self.assertIn("1 accepted line", status_line)
+            self.assertEqual(target.read_text(encoding="utf-8").strip(), accepted_row)
+
+    def test_already_present_line_is_not_double_counted(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            out_dir = Path(tmp) / "out"
+            out_dir.mkdir()
+            accepted_row = json.dumps(
+                {"attempts": [{"function": "func_1", "status": "accepted"}]}, sort_keys=True
+            )
+            (out_dir / "merge-history.jsonl").write_text(accepted_row + "\n", encoding="utf-8")
+            target = Path(tmp) / "host-stats.jsonl"
+            target.write_text(accepted_row + "\n", encoding="utf-8")
+            with mock.patch.dict(os.environ, {"PRAGMA_PROBE_STATS": str(target)}):
+                container_merge.import_fresh_history_after_accept(out_dir, repo_root=Path(tmp))
+            self.assertEqual(target.read_text(encoding="utf-8").count(accepted_row), 1)
+
+    def test_disabled_host_history_returns_status_without_writing(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            out_dir = Path(tmp) / "out"
+            out_dir.mkdir()
+            (out_dir / "merge-history.jsonl").write_text(
+                json.dumps({"attempts": [{"status": "accepted"}]}) + "\n", encoding="utf-8"
+            )
+            with mock.patch.dict(os.environ, {"PRAGMA_PROBE_STATS": ""}):
+                status_line = container_merge.import_fresh_history_after_accept(
+                    out_dir, repo_root=Path(tmp)
+                )
+        self.assertIsNotNone(status_line)
+        self.assertIn("disabled", status_line)
 
 
 class SummaryTests(unittest.TestCase):
