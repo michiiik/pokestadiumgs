@@ -98,6 +98,9 @@ and every agent's auth through to `docker run` when set in your shell.
 | `kimi`           | official Kimi Code CLI (`kimi`, native binary) | a mounted subscription login (`~/.kimi-code/credentials/`), or `KIMI_MODEL_NAME`+`KIMI_MODEL_API_KEY` | `kimi-code/k3` |
 | `kimi_api`       | none -- routes to `openai_compat.sh`     | `MOONSHOT_API_KEY`                                            | `kimi-k2.7-code`                     |
 | `openai_compat`  | none (`python3` stdlib only)             | `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `GENERATOR_MODEL`       | (none -- must be set)                |
+| `claude_via`     | `@anthropic-ai/claude-code` (`claude`), a third-party Anthropic-compatible endpoint | `CLAUDE_VIA=alibaba\|zai\|custom` + that provider's token, `GENERATOR_MODEL` | (none -- must be set) |
+| `alibaba`        | shorthand for `claude_via CLAUDE_VIA=alibaba` | `ANTHROPIC_AUTH_TOKEN` (`run.sh` reads it from `~/.qwen/settings.json`) or `ALIBABA_API_KEY`, `GENERATOR_MODEL` | (none -- must be set) |
+| `zai`            | shorthand for `claude_via CLAUDE_VIA=zai` | `ZAI_API_KEY`, `GENERATOR_MODEL`                              | (none -- must be set)                |
 
 `entrypoint.sh` checks that `AGENT`'s required auth is present *before*
 starting the driver, so a missing key/login fails fast instead of partway
@@ -131,6 +134,27 @@ Examples:
     # openai_compat, pointed at a self-hosted OpenAI-compatible endpoint
     AGENT=openai_compat OPENAI_API_KEY=local-key OPENAI_BASE_URL=http://my-host:8000/v1 \
     GENERATOR_MODEL=my-local-model container/run.sh disasm/src/4AC10.c /abs/out
+
+    # alibaba, Bailian Coding Plan (shorthand for AGENT=claude_via
+    # CLAUDE_VIA=alibaba) -- run.sh reads the Coding Plan key out of
+    # ~/.qwen/settings.json for you; no key export needed if it's there
+    AGENT=alibaba ALIBABA_PLAN=coding GENERATOR_MODEL=qwen3-coder-plus \
+    container/run.sh disasm/src/4AC10.c /abs/out
+
+    # alibaba, Bailian Token Plan instead (verified working on this repo's
+    # dev machine as of 2026-09-02 -- see container/generators/README.md's
+    # claude_via.sh section for why "coding" may 401 for you too)
+    AGENT=alibaba ALIBABA_PLAN=token GENERATOR_MODEL=qwen3.7-plus \
+    container/run.sh disasm/src/4AC10.c /abs/out
+
+    # zai, Z.ai GLM Coding Plan
+    AGENT=zai ZAI_API_KEY=... GENERATOR_MODEL=glm-4.6 \
+    container/run.sh disasm/src/4AC10.c /abs/out
+
+    # claude_via, any other Anthropic-compatible endpoint
+    AGENT=claude_via CLAUDE_VIA=custom \
+    CLAUDE_VIA_BASE_URL=https://my-provider.example/anthropic CLAUDE_VIA_API_KEY=... \
+    GENERATOR_MODEL=my-model container/run.sh disasm/src/4AC10.c /abs/out
 
 
 > **Kimi login is mounted live, not copied.** `container/run.sh` bind-mounts

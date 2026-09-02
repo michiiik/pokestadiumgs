@@ -5,11 +5,22 @@
 # and select which coding agent generates candidates with the AGENT env var
 # (default: claude). See container/generators/README.md for the full list.
 #
+# AGENT=alibaba and AGENT=zai are shorthands for AGENT=claude_via
+# CLAUDE_VIA=<that provider> (container/generators/claude_via.sh -- the
+# Claude Code CLI pointed at a third-party Anthropic-compatible endpoint):
+# expanded here rather than requiring the caller to set both env vars.
+#
 # Usage: run_generator.sh <prompt-file> <batch-file>
 set -eu
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 AGENT="${AGENT:-claude}"
+case "$AGENT" in
+  alibaba|zai)
+    export CLAUDE_VIA="$AGENT"
+    AGENT=claude_via
+    ;;
+esac
 TARGET="$SCRIPT_DIR/$AGENT.sh"
 
 if [ ! -f "$TARGET" ]; then

@@ -25,12 +25,14 @@ against the repo's own gate, read the diff, and repeat before writing the
 final batch. That only works for a wrapper that actually gives the model
 tool/shell access:
 
-- `claude.sh`, `codex.sh`, `qwen.sh`, `kimi.sh` are all agentic (the model
-  writes `$BATCH` itself via a file tool) and, as of this doc, all run with
-  auto-approved tool calls -- no interactive confirmation prompt that could
-  never be answered in a non-interactive container -- so the model can also
-  shell out to `probe_one.py` mid-turn: `claude.sh`'s `--allowedTools Read
-  Write Bash` already includes `Bash`; `codex.sh`'s
+- `claude.sh`, `codex.sh`, `qwen.sh`, `kimi.sh`, `claude_via.sh` (and its
+  `alibaba`/`zai` shorthands) are all agentic (the model writes `$BATCH`
+  itself via a file tool) and, as of this doc, all run with auto-approved
+  tool calls -- no interactive confirmation prompt that could never be
+  answered in a non-interactive container -- so the model can also shell out
+  to `probe_one.py` mid-turn: `claude.sh`'s `--allowedTools Read Write Bash`
+  already includes `Bash` (`claude_via.sh` uses the identical
+  `--allowedTools` invocation, just against a different endpoint); `codex.sh`'s
   `--dangerously-bypass-approvals-and-sandbox` skips both approvals and the
   default read-only sandbox; `kimi.sh`'s `-p` mode runs under the CLI's own
   `auto` permission policy by default (confirmed locally, see the script's
@@ -49,7 +51,9 @@ tool/shell access:
 
 Select which coding agent generates candidates with the `AGENT` env var
 (default `claude`); `run_generator.sh` execs `container/generators/$AGENT.sh
-<prompt> <batch>` and fails clearly on an unknown value.
+<prompt> <batch>` and fails clearly on an unknown value. `AGENT=alibaba` and
+`AGENT=zai` are shorthands, expanded by `run_generator.sh` itself, for
+`AGENT=claude_via CLAUDE_VIA=alibaba`/`CLAUDE_VIA=zai`.
 
 ## Agents
 
@@ -61,6 +65,9 @@ Select which coding agent generates candidates with the `AGENT` env var
 | `kimi`           | official Kimi Code CLI (`kimi`, native binary)    | a mounted subscription login (`~/.kimi-code/credentials/`), or `KIMI_MODEL_NAME`+`KIMI_MODEL_API_KEY` | `kimi-code/k3` |
 | `kimi_api`       | none -- routes to `openai_compat.sh`              | `MOONSHOT_API_KEY`                               | `kimi-k2.7-code`                   |
 | `openai_compat`  | none (`python3` stdlib only)                      | `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `GENERATOR_MODEL` | (none -- must be set)        |
+| `claude_via`     | `@anthropic-ai/claude-code` (`claude`), pointed at a third-party Anthropic-compatible endpoint | `CLAUDE_VIA` (`alibaba`\|`zai`\|`custom`) + that provider's token, `GENERATOR_MODEL` | (none -- must be set) |
+| `alibaba`        | shorthand for `claude_via` `CLAUDE_VIA=alibaba`   | `ANTHROPIC_AUTH_TOKEN` (`container/run.sh` reads this from `~/.qwen/settings.json`, or set `ALIBABA_API_KEY` directly), `GENERATOR_MODEL` | (none -- must be set) |
+| `zai`            | shorthand for `claude_via` `CLAUDE_VIA=zai`       | `ZAI_API_KEY`, `GENERATOR_MODEL`                 | (none -- must be set)              |
 
 Install lines for the Dockerfile (the other agent copies these; not added
 here):
@@ -71,6 +78,8 @@ npm install -g @openai/codex
 npm install -g @qwen-code/qwen-code
 # kimi: pinned native-binary install via Moonshot's installer script, see container/Dockerfile
 # kimi_api and openai_compat need only python3, already required by the repo's tooling
+# claude_via (and its alibaba/zai shorthands) reuse the same @anthropic-ai/claude-code
+# install as claude.sh -- no separate package
 ```
 
 ## claude.sh
@@ -190,6 +199,99 @@ writes it to `$BATCH` itself.
 
 Requires `OPENAI_API_KEY`, `OPENAI_BASE_URL` (no trailing slash;
 `/chat/completions` is appended), `GENERATOR_MODEL`.
+
+## claude_via.sh
+
+`ANTHROPIC_BASE_URL=<provider base> ANTHROPIC_AUTH_TOKEN=<provider token>
+ANTHROPIC_MODEL="$GENERATOR_MODEL"
+ANTHROPIC_DEFAULT_SONNET_MODEL=/_OPUS_MODEL=/_HAIKU_MODEL="$GENERATOR_MODEL"
+claude -p "$(cat "$PROMPT")" --output-format text --model "$GENERATOR_MODEL"
+--allowedTools Read Write Bash`
+
+Agentic, identical invocation shape to `claude.sh` -- only the endpoint and
+auth differ. Runs the real `@anthropic-ai/claude-code` CLI against a
+third-party **Anthropic-compatible** endpoint (not an OpenAI-compatible one
+like `qwen.sh`/`openai_compat.sh`), selected by `$CLAUDE_VIA`:
+
+- **`alibaba`** -- Alibaba Cloud Model Studio (Bailian). Base URL and plan
+  chosen by `$ALIBABA_PLAN` (default `coding`):
+  - `coding` &rarr; `https://coding-intl.dashscope.aliyuncs.com/apps/anthropic`
+    (models e.g. `qwen3-coder-plus`, `qwen3-coder-next`, `qwen3.7-plus`,
+    `glm-5`, `kimi-k2.5`)
+  - `token` &rarr; `https://token-plan.ap-southeast-1.maas.aliyuncs.com/apps/anthropic`
+    (models e.g. `qwen3.7-plus`, `qwen3.7-max`, `qwen3.8-max-preview`,
+    `deepseek-v4-pro`, `kimi-k2.7-code`, `glm-5.2`, `MiniMax-M2.5`)
+
+  Both documented at
+  [alibabacloud.com/help/en/model-studio/claude-code](https://www.alibabacloud.com/help/en/model-studio/claude-code)
+  (mirrored at
+  [help.aliyun.com/en/model-studio/claude-code](https://help.aliyun.com/en/model-studio/claude-code)).
+  Auth token: `$ANTHROPIC_AUTH_TOKEN` if already set -- `container/run.sh`
+  resolves this on the **host** from `~/.qwen/settings.json`'s `"env"` block
+  (`BAILIAN_CODING_PLAN_API_KEY` / `BAILIAN_TOKEN_PLAN_API_KEY`, matching
+  `$ALIBABA_PLAN`) and forwards it in, never writing the key to disk or logs
+  -- else `$ALIBABA_API_KEY` if the caller exported that directly instead
+  (this is also the override this wrapper's own host-side test used, since
+  the natively-run test bypasses `run.sh`'s resolution).
+
+  `AGENT=alibaba` is a shorthand for `AGENT=claude_via CLAUDE_VIA=alibaba`,
+  expanded by `run_generator.sh`.
+
+- **`zai`** -- Z.ai / Zhipu GLM Coding Plan. Base URL
+  `https://api.z.ai/api/anthropic`
+  ([docs.z.ai/devpack/tool/claude](https://docs.z.ai/devpack/tool/claude) --
+  "the only provider besides Anthropic itself with a true
+  Anthropic-compatible API"). Auth: `$ZAI_API_KEY`. **No key for this
+  provider exists on this machine yet** -- the wrapper fails clearly, naming
+  the missing env var, rather than guessing.
+
+  `AGENT=zai` is a shorthand for `AGENT=claude_via CLAUDE_VIA=zai`.
+
+- **`custom`** -- any other Anthropic-compatible endpoint:
+  `$CLAUDE_VIA_BASE_URL` (base URL) + `$CLAUDE_VIA_API_KEY` (token).
+
+`$GENERATOR_MODEL` is **required** for every `claude_via` provider (no
+`sonnet`-style default -- a third-party endpoint has no such alias) and is
+forwarded as `ANTHROPIC_DEFAULT_SONNET_MODEL`/`_OPUS_MODEL`/`_HAIKU_MODEL`
+too, so any internal Claude Code model routing (background/haiku-tier calls
+the CLI makes on its own) stays on the same provider instead of resolving an
+Anthropic-side alias that would fail auth against a provider token.
+`$ANTHROPIC_API_KEY`/`$CLAUDE_CODE_OAUTH_TOKEN` are unset before exec so a
+real Anthropic credential already in the environment (e.g. this same host
+also running `AGENT=claude`) is never picked up in preference to the
+provider token.
+
+**Host verification (native, no container/no image rebuild), 2026-09-02:**
+`claude -p "Reply with the single word OK" --output-format text` against
+each Alibaba plan, with `ANTHROPIC_API_KEY`/`CLAUDE_CODE_OAUTH_TOKEN` unset:
+- Token Plan (`ALIBABA_PLAN=token`, model `qwen3.7-plus`,
+  `https://token-plan.ap-southeast-1.maas.aliyuncs.com/apps/anthropic`):
+  replied `OK` (with a harmless "isn't described by this version's model
+  catalog" warning -- Claude Code doesn't recognize the model id for context
+  window purposes, but the call succeeds).
+- Coding Plan (`ALIBABA_PLAN=coding`, model `qwen3-coder-plus`,
+  `https://coding-intl.dashscope.aliyuncs.com/apps/anthropic`): **failed**
+  with `Failed to authenticate. API Error: 401 invalid access token or token
+  expired`. Confirmed with a raw `curl` against both the Anthropic endpoint
+  and the Coding Plan's OpenAI-compatible
+  `https://coding-intl.dashscope.aliyuncs.com/v1/chat/completions` --
+  identical `{"error":{"code":"invalid_api_key","message":"invalid access
+  token or token expired", ...}}` from both, so this is not a `claude_via.sh`
+  or endpoint-format bug. `~/.qwen/settings.json`'s
+  `BAILIAN_CODING_PLAN_API_KEY` and `BAILIAN_TOKEN_PLAN_API_KEY` are, as
+  stored on this machine, byte-for-byte the *same* key value -- it
+  authenticates fine against the Token Plan endpoint and is rejected outright
+  by the Coding Plan endpoint over both protocols, so the Coding Plan itself
+  is not enrolled/active for whatever account minted that key (or the value
+  under `BAILIAN_CODING_PLAN_API_KEY` is a stale/misfiled duplicate of the
+  Token Plan key, not an actual Coding Plan key). `ALIBABA_PLAN` therefore
+  defaults to `coding` per this task's spec (it lists the coder models), but
+  `token` is the plan that has actually verified working on this machine as
+  of this writing -- try `token` first if `coding` 401s for you too.
+- Dispatcher end-to-end (native, `container/generators/run_generator.sh`,
+  no docker): `AGENT=alibaba ALIBABA_PLAN=token GENERATOR_MODEL=qwen3.7-plus`
+  with a prompt asking Claude to write `{"ok": true}` to a batch path --
+  wrote the file, `validate_batch` accepted it, wrapper exited 0.
 
 ## Contract every wrapper follows
 

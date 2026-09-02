@@ -15,8 +15,10 @@
 # Candidate generator env (see container/generators/README.md), forwarded
 # from this shell's environment when set -- entrypoint.sh requires whichever
 # key AGENT's wrapper needs, unless --candidate-file is passed:
-#   AGENT             claude (default) | codex | qwen | kimi | kimi_api | openai_compat
-#   GENERATOR_MODEL   override the wrapper's default model
+#   AGENT             claude (default) | codex | qwen | kimi | kimi_api |
+#                     openai_compat | claude_via | alibaba | zai
+#   GENERATOR_MODEL   override the wrapper's default model (REQUIRED for
+#                     claude_via/alibaba/zai -- no default)
 #   GENERATOR_EFFORT  codex reasoning effort (low|medium|high|xhigh); also
 #                     forwarded to kimi as KIMI_MODEL_THINKING_EFFORT
 #                     (low|high|max for the default kimi-code/k3)
@@ -33,6 +35,28 @@
 #   KIMI_CODE_HOME    kimi, optional: relocate the CLI's data/config root
 #                     (default ~/.kimi-code) on both host lookup and
 #                     in-container env
+#   CLAUDE_VIA        claude_via only: alibaba | zai | custom (AGENT=alibaba
+#                     and AGENT=zai set this for you -- see
+#                     container/generators/README.md)
+#   ALIBABA_PLAN      alibaba/claude_via(alibaba): coding (default) | token
+#                     -- selects which Bailian plan's key/endpoint is used
+#   ALIBABA_API_KEY   alibaba/claude_via(alibaba), optional: use this key
+#                     directly instead of the ~/.qwen/settings.json lookup
+#                     below
+#   ZAI_API_KEY       zai/claude_via(zai): Z.ai GLM Coding Plan key. No key
+#                     for this provider exists on this machine yet.
+#   CLAUDE_VIA_BASE_URL / CLAUDE_VIA_API_KEY
+#                     claude_via(custom): any other Anthropic-compatible
+#                     endpoint's base URL + token
+#
+# alibaba key resolution: when AGENT is alibaba (or claude_via with
+# CLAUDE_VIA=alibaba) and the caller has not exported ALIBABA_API_KEY or
+# ANTHROPIC_AUTH_TOKEN themselves, this script reads the matching Bailian
+# plan's dedicated key out of ~/.qwen/settings.json's "env" block
+# (BAILIAN_CODING_PLAN_API_KEY or BAILIAN_TOKEN_PLAN_API_KEY, selected by
+# $ALIBABA_PLAN) and forwards it into the container as ANTHROPIC_AUTH_TOKEN.
+# The key is never written to disk or logged -- it only ever lives in this
+# shell's environment and docker's own -e passthrough.
 set -euo pipefail
 
 if [ "$#" -lt 2 ]; then
@@ -81,6 +105,35 @@ elif [ -n "${KIMI_CODE_HOME:-}" ]; then
     extra_args+=(-e KIMI_CODE_HOME="$KIMI_CODE_HOME")
 fi
 
+# Alibaba Cloud Model Studio (AGENT=alibaba, or AGENT=claude_via
+# CLAUDE_VIA=alibaba): resolve the matching plan's dedicated API key out of
+# ~/.qwen/settings.json's "env" block into ANTHROPIC_AUTH_TOKEN for the
+# container, unless the caller already exported ALIBABA_API_KEY (used
+# directly by container/generators/claude_via.sh instead) or
+# ANTHROPIC_AUTH_TOKEN themselves. Never written to disk or logged -- held
+# only in this shell's environment for the docker run -e below.
+want_alibaba=0
+case "${AGENT:-claude}" in
+    alibaba) want_alibaba=1 ;;
+    claude_via) [ "${CLAUDE_VIA:-}" = "alibaba" ] && want_alibaba=1 ;;
+esac
+if [ "$want_alibaba" -eq 1 ] && [ -z "${ALIBABA_API_KEY:-}" ] && [ -z "${ANTHROPIC_AUTH_TOKEN:-}" ] \
+   && [ -f "$HOME/.qwen/settings.json" ]; then
+    settings_key="BAILIAN_CODING_PLAN_API_KEY"
+    [ "${ALIBABA_PLAN:-token}" = "token" ] && settings_key="BAILIAN_TOKEN_PLAN_API_KEY"
+    resolved_token="$(python3 -c '
+import json, sys
+try:
+    d = json.load(open(sys.argv[1]))
+    print(d.get("env", {}).get(sys.argv[2], ""))
+except Exception:
+    pass
+' "$HOME/.qwen/settings.json" "$settings_key")"
+    if [ -n "$resolved_token" ]; then
+        export ANTHROPIC_AUTH_TOKEN="$resolved_token"
+    fi
+fi
+
 # --tmpfs bounds two IDO temp-file leak sinks in RAM instead of the
 # container's writable layer: /tmp (the default) and /work/disasm/scratch
 # (tools/try_pragma_compare.py, imported by the permuter driver, redirects
@@ -109,6 +162,13 @@ docker run \
     -e MOONSHOT_BASE_URL \
     -e KIMI_MODEL_NAME \
     -e KIMI_MODEL_API_KEY \
+    -e CLAUDE_VIA \
+    -e ALIBABA_PLAN \
+    -e ALIBABA_API_KEY \
+    -e ZAI_API_KEY \
+    -e CLAUDE_VIA_BASE_URL \
+    -e CLAUDE_VIA_API_KEY \
+    -e ANTHROPIC_AUTH_TOKEN \
     -v "$out_dir:/out" \
     "${extra_args[@]}" \
     gs-decomp-agent:latest \

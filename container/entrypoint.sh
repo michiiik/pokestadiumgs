@@ -21,7 +21,15 @@
 #                          codex/openai_compat, OPENAI_API_KEY or
 #                          DASHSCOPE_API_KEY for qwen, MOONSHOT_API_KEY for
 #                          kimi_api, a mounted subscription login or
-#                          KIMI_MODEL_NAME+KIMI_MODEL_API_KEY for kimi) so a
+#                          KIMI_MODEL_NAME+KIMI_MODEL_API_KEY for kimi,
+#                          GENERATOR_MODEL plus a provider token for
+#                          claude_via -- ANTHROPIC_AUTH_TOKEN/ALIBABA_API_KEY
+#                          for CLAUDE_VIA=alibaba, ZAI_API_KEY for
+#                          CLAUDE_VIA=zai, CLAUDE_VIA_BASE_URL+
+#                          CLAUDE_VIA_API_KEY for CLAUDE_VIA=custom; the
+#                          AGENT=alibaba/AGENT=zai shorthands expand to this
+#                          with CLAUDE_VIA set for you, see
+#                          container/generators/README.md) so a
 #                          missing key fails fast here instead of partway
 #                          through the driver's first iteration. It also
 #                          exports PROBE_TOOL (off for AGENT=openai_compat/
@@ -143,6 +151,46 @@ if [ "$have_candidate_file" -eq 0 ] && [ "$have_generator_cmd" -eq 0 ]; then
             ;;
         kimi_api)
             [ -n "${MOONSHOT_API_KEY:-}" ] || fail_missing_key MOONSHOT_API_KEY
+            ;;
+        claude_via)
+            [ -n "${GENERATOR_MODEL:-}" ] || fail_missing_key GENERATOR_MODEL
+            case "${CLAUDE_VIA:-}" in
+                alibaba)
+                    if [ -z "${ANTHROPIC_AUTH_TOKEN:-}" ] && [ -z "${ALIBABA_API_KEY:-}" ]; then
+                        echo "entrypoint: AGENT=claude_via CLAUDE_VIA=alibaba needs \$ANTHROPIC_AUTH_TOKEN (container/run.sh resolves this from ~/.qwen/settings.json, selected by \$ALIBABA_PLAN) or \$ALIBABA_API_KEY." >&2
+                        exit 1
+                    fi
+                    ;;
+                zai)
+                    [ -n "${ZAI_API_KEY:-}" ] || fail_missing_key ZAI_API_KEY
+                    ;;
+                custom)
+                    [ -n "${CLAUDE_VIA_BASE_URL:-}" ] || fail_missing_key CLAUDE_VIA_BASE_URL
+                    [ -n "${CLAUDE_VIA_API_KEY:-}" ] || fail_missing_key CLAUDE_VIA_API_KEY
+                    ;;
+                "")
+                    echo "entrypoint: AGENT=claude_via needs \$CLAUDE_VIA set to alibaba|zai|custom." >&2
+                    exit 1
+                    ;;
+                *)
+                    # Unknown CLAUDE_VIA: let container/generators/claude_via.sh's
+                    # own error surface instead of guessing here.
+                    ;;
+            esac
+            ;;
+        alibaba)
+            # Shorthand for AGENT=claude_via CLAUDE_VIA=alibaba, expanded by
+            # container/generators/run_generator.sh -- same key requirement.
+            [ -n "${GENERATOR_MODEL:-}" ] || fail_missing_key GENERATOR_MODEL
+            if [ -z "${ANTHROPIC_AUTH_TOKEN:-}" ] && [ -z "${ALIBABA_API_KEY:-}" ]; then
+                echo "entrypoint: AGENT=alibaba needs \$ANTHROPIC_AUTH_TOKEN (container/run.sh resolves this from ~/.qwen/settings.json's BAILIAN_CODING_PLAN_API_KEY/BAILIAN_TOKEN_PLAN_API_KEY, selected by \$ALIBABA_PLAN, default coding) or \$ALIBABA_API_KEY set directly." >&2
+                exit 1
+            fi
+            ;;
+        zai)
+            # Shorthand for AGENT=claude_via CLAUDE_VIA=zai.
+            [ -n "${GENERATOR_MODEL:-}" ] || fail_missing_key GENERATOR_MODEL
+            [ -n "${ZAI_API_KEY:-}" ] || fail_missing_key ZAI_API_KEY
             ;;
         *)
             # Unknown AGENT: let container/generators/run_generator.sh's own
