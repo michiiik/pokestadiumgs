@@ -1280,7 +1280,23 @@ void func_8005F9F4(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005FBCC.s")
+extern u8 func_8005D92C(s32 index);
+extern u8 D_80128570[];
+void func_8005FBCC(s32 arg0, u8 arg1, u8 arg2) {
+    if ((*(s32 *)(D_80128570 + arg0 * 112) & 1) != 0) {
+        switch (func_8005D92C(arg0)) {
+        case 5:
+        case 6:
+            *(u8 *)(*(s32 *)(D_80128570 + arg0 * 112 + 0x60) + 0x86B) = arg1;
+            *(u8 *)(*(s32 *)(D_80128570 + arg0 * 112 + 0x60) + 0x86A) = arg2;
+            break;
+        case 7:
+            *(u8 *)(*(s32 *)(D_80128570 + arg0 * 112 + 0x60) + 0x846) = arg1;
+            *(u8 *)(*(s32 *)(D_80128570 + arg0 * 112 + 0x60) + 0x845) = arg2;
+            break;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
