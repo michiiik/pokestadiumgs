@@ -5,6 +5,10 @@ for a timeboxed session. Read the repository `AGENTS.md` first; this page is
 the task supplement for the fleet session.
 Do not touch any other file's pragmas or run `make`.
 
+For the orchestrator-free, one-file-per-container alternative (issue #39,
+polls its own permuter output instead of waiting on a notification a
+subagent can't receive), see `docs/CONTAINER_AGENT.md`.
+
 ## 1. Start here (under a minute)
 
 - Scratch dir: `$CLAUDE_JOB_DIR/tmp/<file>/` — yours alone; do not share it.

@@ -1,0 +1,26 @@
+# Keep the gs-decomp-agent build context slim. This file controls what is
+# sent to the Docker daemon at all -- excluded paths are invisible to every
+# build stage, not just the final image.
+
+.git
+
+# Loose scratch/probe/result JSON files agents drop at the repo root.
+*_batch*.json
+*_probe*.json
+*_result*.json
+.agent*batch*.json
+.agent*result*.json
+
+tmp/
+tmp_scratch/
+artifacts/
+build-mac/
+runtime-snapshot/
+android/
+fallback/
+
+# Generated build output inside disasm/ -- (re)created at image build time
+# by `make -C disasm extract`/`rom`, no need to ship a stale host copy.
+disasm/build/
+disasm/scratch/
+disasm/probe-stats/

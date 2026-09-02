@@ -301,6 +301,10 @@ file at a time so declarations, structs and names accumulate in one place.
 
 ## 3. Tool reference
 
+Unattended, one-file-per-container alternative to fleet mode (issue #39):
+`docs/CONTAINER_AGENT.md` (build/run, output contract, loop/plateau/permuter-poll
+semantics), merged into the tree with `tools/container_merge.py`.
+
 ### 3.1 Runner and MCP
 
 - `tools/try_pragma_compare.py` / `tools/try_pragma_compare_mcp.py` — the
