@@ -69,7 +69,7 @@ container as the output directory. The driver
 | `--budget-seconds` | overall wall-clock budget for the run |
 | `--max-iterations` | overall iteration cap, independent of the time budget |
 | `--plateau N` | stop an owner after `N` consecutive iterations with no best-similarity improvement |
-| `--permuter-seconds` | budget per permuter invocation (default 300) |
+| `--permuter-seconds` | budget per permuter invocation (default 300 in `--mode full`, 1200 in `--mode permuter-only` -- §6.1) |
 | `--permuter-bodies N` | on a trigger, run the permuter on up to `N` distinct bodies from that iteration, each its own background process (default 3) |
 | `--owners` | restrict the run to an explicit owner list instead of every pragma in the file |
 | `--owner-order {size,file}` | discovery order when `--owners` is not given: smallest-instructions-first (default) or the order owners appear in the source |
@@ -79,6 +79,9 @@ container as the output directory. The driver
 | `--probe-tool {on,off}` | toggle the `BATCH_CONTRACT` paragraph telling an agentic generator it may/should call `tools/probe_one.py` to iterate before writing the batch (see §4.1). Default: the `PROBE_TOOL` env var if set, else `on` |
 | `--candidate-file` | test mode: use a fixed batch file once for the first owner, then exit -- no generator/model call at all |
 | `--seed-from DIR[,DIR...]` | seed a **fresh** run (not `--resume`) from one or more earlier `--out` dirs' own `state.json` -- see §2.1 |
+| `--examples N` | up to `N` already-matched functions of the active owner's family, rendered as worked examples in the prompt (§4 item 3); default 3, `0` disables |
+| `--mode {full,permuter-only}` | `full` (default): the normal generate/probe/permuter loop. `permuter-only`: never calls the generator -- see §6.1 |
+| `--tie-pool-file PATH` | in `--mode permuter-only`, a JSON file shaped like `tie-pool.json` to seed owners' best bodies from -- see §6.1 |
 
 ### 2.1 Seeding a fresh run from earlier output dirs
 
@@ -284,22 +287,36 @@ section is omitted entirely when it has nothing to show):
    the extern/prototype block, symbol usage, stride/SDK-macro hints, and the
    remaining-owners table.
 2. **Target assembly** for the active owner (`tools/pragma_targets.py asm`).
-3. **m2c draft** -- a structural hint from `tools/pragma_targets.py draft`
+3. **Worked examples** -- up to `--examples` (default 3, `0` disables)
+   already-matched functions of the owner's own family, each rendered as
+   `== matched example (family <family>): <name> ==` followed by its full C
+   definition (and its `.s` size when that's cheap to look up). Prefers
+   `tools/pragma_targets.py similar <owner>` (opcode-shape similarity
+   against every previously accepted candidate, AGENTS.md §2.5 step 2: "start
+   from the closest accepted winner's spelling, not from m2c"); when that
+   returns nothing, falls back to other already-defined functions in the
+   same source file (preferring ones whose `.s` still lives in the owner's
+   own nonmatchings directory -- the same directory `list_targets`'s family
+   classification comes from), then other files in the same directory.
+   Capped at ~12 KB total (`EXAMPLES_BYTE_CAP`). Fetched once per owner per
+   run and cached in `state.json` (`examples`), so `--resume`/`--seed-from`
+   do not refetch.
+4. **m2c draft** -- a structural hint from `tools/pragma_targets.py draft`
    (unknown-struct fields, guessed types; retype/reshape freely, never a
    match). Fetched once per owner per run and cached in
    `state.json` (`m2c_draft`), so `--resume` does not re-run it.
-4. **Best candidates tried so far this run** -- up to 5, highest similarity
+5. **Best candidates tried so far this run** -- up to 5, highest similarity
    first, with diagnostics/frame/instruction-count/diff-excerpt feedback and
    the static diff-reading guide.
-5. **Labels already tried this run** -- the last 30, so a generator does not
+6. **Labels already tried this run** -- the last 30, so a generator does not
    resend a hypothesis under a new name.
-6. **decomp-permuter output**, when a background job (§6 step 3) has
+7. **decomp-permuter output**, when a background job (§6 step 3) has
    produced one -- submit it close to verbatim as one candidate.
-7. **"The file already declares these callees/data (do not redeclare)"** --
+8. **"The file already declares these callees/data (do not redeclare)"** --
    names pulled from the file brief's extern/prototype block, as an explicit
    rule alongside the declaration-hygiene filtering already applied to the
    previous batch's shared `declarations` (see §6 step 1).
-8. The batch JSON contract/rules (`BATCH_CONTRACT`) and the exact output path.
+9. The batch JSON contract/rules (`BATCH_CONTRACT`) and the exact output path.
 
 ### 4.1 Fast inner loop
 
@@ -406,15 +423,69 @@ Every iteration's outcome (similarity, status, diagnostic) is appended to
 that owner's `history[]` in `state.json` as it happens, so a run killed
 mid-owner still leaves a readable trail.
 
+Whenever an owner's run ends in **`accepted`** or **`plateau`** (only those
+two -- not `budget_expired`/`max_iterations`/`generator_failed`, which are
+run/box bookkeeping, not durable knowledge about the file), the driver:
+
+- appends a short, dated note to `<out>/region-notes/<source path, "/" ->
+  "__">.md`, in the exact section format `tools/region_notes.py append`
+  itself produces (§7, §9.5 on the host side): `"<owner>: matched (<label>),
+  <N> iterations, agent <AGENT>"` on an accept, or `"<owner>: plateau at
+  <best> (raw <raw>), mismatch <kind>; tried families: <family, ...>;
+  tie-pool yes|no"` on a plateau, plus one `"TYPE CONFLICT: <callee> is <new
+  sig>, not <old sig>"` line per companion-edit type conflict this run
+  recorded (`filter_declarations`/`run_iteration`, AGENTS.md §2 rule 9).
+- on a **plateau** specifically, also checks whether the owner's best
+  attempt was a tie -- a normalized-only match (near-1.0 similarity, raw
+  well below 0.95) or a runner-reported register-allocation tie
+  (`docs/REGISTER_TIES.md`) -- and if so, marks `state.json`'s
+  `tie_pool: true` for that owner and appends its best body/declarations to
+  a cumulative `<out>/tie-pool.json`, the input a later `--mode
+  permuter-only` pass (§6.1) reads via `--tie-pool-file`.
+
+### 6.1 `--mode permuter-only`: a permuter-first pass over a tie pool
+
+    container/run.sh disasm/src/4AC10.c /abs/out2 --mode permuter-only \
+        --tie-pool-file /abs/out/tie-pool.json --budget-seconds 28800
+
+`docs/REGISTER_TIES.md`: "coordinators run the permuter overnight ... instead
+of looping agents through the same class of diff." `--mode permuter-only`
+(default `full`) is that overnight pass: the driver **never calls the
+generator** (`--generator-cmd`/`AGENT` are not required in this mode). For
+each owner it takes up to `--permuter-bodies` distinct bodies from
+`state.json`'s `best_candidates` -- populated by `--seed-from` and/or
+`--tie-pool-file <json>` (the same shape `tie-pool.json` itself is:
+`{owner: {source, body, declarations, raw, label}}`) for any owner
+`--seed-from` didn't already cover -- and runs `tools/permute_candidate.py`
+on each in the **foreground** (there is no concurrent generator call here to
+overlap with, unlike the background jobs in §6 step 3), with
+`--permuter-seconds` defaulting to **1200** in this mode (300 in `full`).
+
+- The first output with score 0 is probed as a one-candidate batch (label
+  `"permuter:zero"`) through the exact same probe/gate path a normal run
+  uses (`run_iteration`), so a real accept writes `accepted/<owner>.json`
+  exactly as it always does.
+- Otherwise, the lowest-scoring output across every body tried is recorded
+  as a new (unprobed) `best_candidates[0]` entry (label
+  `"permuter-only:best"`) -- the seed a *later* permuter-only pass over this
+  same `--out` (or a fresh run seeded from it) starts closer from -- and the
+  owner is done for this pass (`plateau`).
+
+Tie-pool recording and region notes (above) apply the same way regardless of
+which mode produced the `plateau`/`accepted` status, so a permuter-only pass
+over a tie pool keeps updating both.
+
 ## 7. Output contract
 
 Everything lands under the mounted `--out` directory:
 
 | Path | Contents |
 |---|---|
-| `state.json` | `owner -> {best_similarity, iterations, history[], status}` for every owner attempted this run |
+| `state.json` | `owner -> {best_similarity, iterations, history[], status, ...}` for every owner attempted this run; also carries per-owner `examples` (§4 item 3) and `tie_pool` (§6.1) |
 | `accepted/<owner>.json` | a `fleet_probe` batch JSON (`source`, `declarations`, one `candidates[]` entry, optional `companion_edits`) for each owner that reached a gated accept |
 | `accepted/<owner>.patch` | the same accepted change as a patch, for inspection without re-running anything |
+| `tie-pool.json` | `owner -> {source, body, declarations, raw, label}`, cumulative across this run, for every owner whose plateaued best was a register-allocation tie (§6, §6.1); the `--tie-pool-file` input to a later `--mode permuter-only` pass |
+| `region-notes/<source, "/" -> "__">.md` | dated notes appended on every accept/plateau (§6), in the exact shape `tools/region_notes.py append` produces; folded into `docs/regions/<source>.md` by the host merge step (§9.5) |
 | `log.txt` | the run's diagnostics log |
 | `summary.json` | owners attempted, owners matched, best similarity per owner, iteration counts, wall time for the run |
 | `probe-stats/probe-stats.jsonl` | a copy of the runner's own probe-stats history (see §9.1) |
