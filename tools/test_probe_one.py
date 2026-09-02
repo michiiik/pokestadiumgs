@@ -35,11 +35,19 @@ def _stub_writes_result(result: dict, *, returncode: int = 0, stdout: str = "", 
     """
     calls: list[dict] = []
 
-    def _fake(batch_path: Path, result_path: Path, *, repo_root: Path, timeout: float):
+    def _fake(
+        batch_path: Path,
+        result_path: Path,
+        *,
+        repo_root: Path,
+        timeout: float,
+        env: dict | None = None,
+    ):
         calls.append({
             "batch": json.loads(batch_path.read_text(encoding="utf-8")),
             "repo_root": repo_root,
             "timeout": timeout,
+            "env": env,
         })
         result_path.write_text(json.dumps(result), encoding="utf-8")
         return _completed(returncode, stdout, stderr)
@@ -175,6 +183,31 @@ class RenderReportTests(unittest.TestCase):
         )
         self.assertTrue(probe_one.is_normalized_only_match(attempt))
 
+    def test_quiet_report_is_summary_only(self) -> None:
+        lines = probe_one.render_report(_attempt(), max_diff=60, quiet=True)
+        text = "\n".join(lines)
+        self.assertIn("status: probe_rejected", text)
+        self.assertIn("similarity: 0.9000", text)
+        self.assertIn("raw: 0.8000", text)
+        self.assertIn("first mismatch at offset 12", text)
+        self.assertIn("expected `addiu a1, a1, 4`", text)
+        # everything the full report adds beyond the summary is gone:
+        self.assertNotIn("mismatch_kind:", text)
+        self.assertNotIn("instructions:", text)
+        self.assertNotIn("diff:", text)
+        self.assertNotIn("(match)", text)
+        self.assertNotIn("diagnostic:", text)
+
+    def test_quiet_frame_still_shown_only_when_different(self) -> None:
+        same = probe_one.render_report(
+            _attempt(expected_size=64, actual_size=64), max_diff=60, quiet=True
+        )
+        self.assertFalse(any("frame:" in line for line in same))
+        diff = probe_one.render_report(
+            _attempt(expected_size=64, actual_size=72), max_diff=60, quiet=True
+        )
+        self.assertTrue(any("frame: expected 64 bytes, actual 72" in line for line in diff))
+
     def test_diff_excerpt_truncation(self) -> None:
         diff = [
             {"expected_offset": 0, "actual_offset": 0, "expected": "nop", "actual": "nop", "exact_match": True},
@@ -206,6 +239,41 @@ class ExitCodeTests(unittest.TestCase):
 
     def test_unknown_status_is_two(self) -> None:
         self.assertEqual(probe_one.exit_code_for_attempt(_attempt(status="probe_unavailable")), 2)
+
+
+class StatsEnvTests(unittest.TestCase):
+    def test_default_points_at_scratch_file_and_creates_dir(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            env, display = probe_one.resolve_stats_env(None, repo_root=repo_root, base_env={})
+            expected = repo_root / "disasm" / "scratch" / "probe_one-stats.jsonl"
+            self.assertEqual(env["PRAGMA_PROBE_STATS"], str(expected))
+            self.assertEqual(display, str(expected))
+            self.assertTrue(expected.parent.is_dir())
+
+    def test_shared_removes_override_from_env(self) -> None:
+        base = {"PRAGMA_PROBE_STATS": "/somewhere/else.jsonl", "PATH": "/bin"}
+        env, display = probe_one.resolve_stats_env(
+            "shared", repo_root=Path("/repo"), base_env=base
+        )
+        self.assertNotIn("PRAGMA_PROBE_STATS", env)
+        self.assertEqual(env["PATH"], "/bin")
+        self.assertIn("shared", display)
+        # base_env passed in must not be mutated.
+        self.assertEqual(base["PRAGMA_PROBE_STATS"], "/somewhere/else.jsonl")
+
+    def test_shared_with_no_prior_override_still_absent(self) -> None:
+        env, _display = probe_one.resolve_stats_env(
+            "shared", repo_root=Path("/repo"), base_env={"PATH": "/bin"}
+        )
+        self.assertNotIn("PRAGMA_PROBE_STATS", env)
+
+    def test_explicit_path_honoured_verbatim(self) -> None:
+        env, display = probe_one.resolve_stats_env(
+            "/custom/stats.jsonl", repo_root=Path("/repo"), base_env={}
+        )
+        self.assertEqual(env["PRAGMA_PROBE_STATS"], "/custom/stats.jsonl")
+        self.assertEqual(display, "/custom/stats.jsonl")
 
 
 class MainTests(unittest.TestCase):
@@ -313,7 +381,7 @@ class MainTests(unittest.TestCase):
         self.assertIn("runner internal error", err)
 
     def test_timeout_exits_two(self) -> None:
-        def _fake(batch_path, result_path, *, repo_root, timeout):
+        def _fake(batch_path, result_path, *, repo_root, timeout, env=None):
             raise subprocess.TimeoutExpired(cmd="fleet_probe.py", timeout=timeout)
 
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -370,6 +438,82 @@ class MainTests(unittest.TestCase):
         batch = fake.calls[0]["batch"]
         self.assertEqual(batch["declarations"], "extern s32 D_X;\n")
         self.assertEqual(batch["candidates"][0]["label"], "custom-label")
+
+    def test_stats_env_set_by_default(self) -> None:
+        result = {"attempts": [_attempt(status="probe_rejected")]}
+        fake = _stub_writes_result(result)
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp = Path(tmp_dir)
+            body_path = self._write_body(tmp)
+            fake_repo_root = tmp / "repo"
+            fake_repo_root.mkdir()
+            with mock.patch.object(probe_one, "REPO_ROOT", fake_repo_root):
+                code, out, _err = self._run_main(
+                    ["--source", "disasm/src/X.c", "--function", "func_X", "--body", str(body_path)],
+                    fake,
+                )
+            expected_path = fake_repo_root / "disasm" / "scratch" / "probe_one-stats.jsonl"
+            self.assertEqual(code, 0)
+            self.assertEqual(len(fake.calls), 1)
+            self.assertEqual(fake.calls[0]["env"]["PRAGMA_PROBE_STATS"], str(expected_path))
+            self.assertIn(f"stats: {expected_path}", out)
+            self.assertTrue(expected_path.parent.is_dir())
+
+    def test_stats_shared_omits_env_override(self) -> None:
+        result = {"attempts": [_attempt(status="probe_rejected")]}
+        fake = _stub_writes_result(result)
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp = Path(tmp_dir)
+            body_path = self._write_body(tmp)
+            code, out, _err = self._run_main(
+                [
+                    "--source", "disasm/src/X.c", "--function", "func_X",
+                    "--body", str(body_path), "--stats", "shared",
+                ],
+                fake,
+            )
+        self.assertEqual(code, 0)
+        self.assertNotIn("PRAGMA_PROBE_STATS", fake.calls[0]["env"])
+        self.assertIn("stats: shared", out)
+
+    def test_stats_custom_path_honoured(self) -> None:
+        result = {"attempts": [_attempt(status="probe_rejected")]}
+        fake = _stub_writes_result(result)
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp = Path(tmp_dir)
+            body_path = self._write_body(tmp)
+            custom = str(tmp / "custom-stats.jsonl")
+            code, out, _err = self._run_main(
+                [
+                    "--source", "disasm/src/X.c", "--function", "func_X",
+                    "--body", str(body_path), "--stats", custom,
+                ],
+                fake,
+            )
+        self.assertEqual(code, 0)
+        self.assertEqual(fake.calls[0]["env"]["PRAGMA_PROBE_STATS"], custom)
+        self.assertIn(f"stats: {custom}", out)
+
+    def test_quiet_flag_shrinks_output(self) -> None:
+        result = {"attempts": [_attempt(status="probe_rejected")]}
+        fake = _stub_writes_result(result)
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp = Path(tmp_dir)
+            body_path = self._write_body(tmp)
+            code, out, _err = self._run_main(
+                [
+                    "--source", "disasm/src/X.c", "--function", "func_X",
+                    "--body", str(body_path), "--quiet",
+                ],
+                fake,
+            )
+        self.assertEqual(code, 0)
+        self.assertIn("status: probe_rejected", out)
+        self.assertIn("similarity: 0.9000", out)
+        self.assertIn("first mismatch at offset 12", out)
+        self.assertNotIn("diff:", out)
+        self.assertNotIn("mismatch_kind:", out)
+        self.assertNotIn("instructions:", out)
 
     def test_json_output_written(self) -> None:
         result = {"attempts": [_attempt(status="probe_rejected")]}

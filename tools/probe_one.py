@@ -19,7 +19,7 @@ it never touches the ROM gate and never installs anything.
 Usage:
     tools/probe_one.py --source disasm/src/X.c --function func_X \\
         --body body.c [--declarations decls.h] [--label L] \\
-        [--json out.json] [--max-diff N]
+        [--json out.json] [--max-diff N] [--stats PATH|shared] [--quiet]
 
     echo '...' | tools/probe_one.py --source disasm/src/X.c \\
         --function func_X --body -
@@ -32,6 +32,18 @@ Exit codes:
          fleet_probe/runner error, a timeout, or a status this tool cannot
          make sense of
 
+Probe-stats isolation:
+    A coding agent typically calls this tool many times per turn while
+    iterating on drafts of one candidate. ``fleet_probe.py`` records every
+    attempt into the probe-stats history that the runner's preflight
+    consults (``PRAGMA_PROBE_STATS`` -- see ``try_pragma_compare.py``); if
+    quick probes landed there, a later driver batch containing the same
+    body would get rejected as "already rejected". So by default this tool
+    points the child process at a private scratch file,
+    ``disasm/scratch/probe_one-stats.jsonl``, instead of the runner's real
+    history. Pass ``--stats shared`` to opt back into the runner's default
+    history, or ``--stats PATH`` for an explicit location.
+
 The rendering logic (diff excerpt, frame/instruction-count lines, first
 mismatch, normalized-only-match warning) is a standalone copy of the same
 logic in ``tools/container_agent.py`` (``_build_feedback`` /
@@ -43,6 +55,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import subprocess
 import sys
@@ -57,6 +70,10 @@ DEFAULT_LABEL = "probe"
 DEFAULT_TIMEOUT = 120.0
 DEFAULT_MAX_DIFF = 60
 COMPILE_ERROR_MAX_LINES = 30
+
+# Where quick, throwaway probes record their PRAGMA_PROBE_STATS outcomes by
+# default -- see ``resolve_stats_env`` for the full contract.
+DEFAULT_STATS_REL = Path("disasm") / "scratch" / "probe_one-stats.jsonl"
 
 # Statuses fleet_probe/try_pragma_compare can report for a single attempt
 # that mean the probe actually ran and produced a real verdict.
@@ -109,13 +126,65 @@ def build_batch_payload(
 
 
 # ---------------------------------------------------------------------------
+# probe-stats isolation
+# ---------------------------------------------------------------------------
+
+def resolve_stats_env(
+    stats_arg: str | None, *, repo_root: Path, base_env: dict[str, str] | None = None
+) -> tuple[dict[str, str], str]:
+    """Build the ``fleet_probe.py`` child environment and a display string
+    for the report header.
+
+    ``fleet_probe.py``/``try_pragma_compare.py`` record every attempt into
+    the probe-stats history named by ``PRAGMA_PROBE_STATS`` (unset -> the
+    runner's shared default history; ``""`` -> disabled; anything else -> an
+    explicit override path -- see ``try_pragma_compare.py``'s
+    ``_probe_stats_target``/``_record_probe_stats``). A coding agent calls
+    this tool many times per turn while iterating on drafts; if those
+    attempts landed in the run's real history, a later driver batch
+    containing the same body would be rejected by the runner's preflight as
+    "already rejected". So, unless told otherwise, this tool points the
+    child process at a private scratch file instead:
+
+    - ``stats_arg`` is ``None`` (``--stats`` omitted): use
+      ``<repo_root>/disasm/scratch/probe_one-stats.jsonl``, creating its
+      parent directory so the child can append to it right away.
+    - ``stats_arg == "shared"``: opt back into the runner's own default
+      history by removing ``PRAGMA_PROBE_STATS`` from the child
+      environment entirely, so fleet_probe.py resolves it itself.
+    - any other ``stats_arg``: an explicit path, passed through verbatim.
+    """
+    env = dict(base_env if base_env is not None else os.environ)
+    if stats_arg == "shared":
+        env.pop("PRAGMA_PROBE_STATS", None)
+        return env, "shared (runner's default probe-stats history)"
+    if stats_arg:
+        env["PRAGMA_PROBE_STATS"] = stats_arg
+        return env, stats_arg
+    path = repo_root / DEFAULT_STATS_REL
+    path.parent.mkdir(parents=True, exist_ok=True)
+    env["PRAGMA_PROBE_STATS"] = str(path)
+    return env, str(path)
+
+
+# ---------------------------------------------------------------------------
 # Runner invocation (isolated so tests can stub it)
 # ---------------------------------------------------------------------------
 
 def run_probe_subprocess(
-    batch_path: Path, result_path: Path, *, repo_root: Path, timeout: float
+    batch_path: Path,
+    result_path: Path,
+    *,
+    repo_root: Path,
+    timeout: float,
+    env: dict[str, str] | None = None,
 ) -> subprocess.CompletedProcess:
-    """Run ``tools/fleet_probe.py`` once, probe-only, on one batch file."""
+    """Run ``tools/fleet_probe.py`` once, probe-only, on one batch file.
+
+    ``env``, when given, replaces the child process's environment (used to
+    point ``PRAGMA_PROBE_STATS`` at a scratch file by default -- see
+    ``resolve_stats_env``); ``None`` inherits the parent environment as-is.
+    """
     cmd = [
         sys.executable,
         FLEET_PROBE_REL,
@@ -125,7 +194,7 @@ def run_probe_subprocess(
         str(result_path),
     ]
     return subprocess.run(
-        cmd, cwd=repo_root, capture_output=True, text=True, timeout=timeout,
+        cmd, cwd=repo_root, capture_output=True, text=True, timeout=timeout, env=env,
     )
 
 
@@ -197,19 +266,45 @@ def _fmt_score(value: object) -> str:
     return "-"
 
 
-def render_report(attempt: dict, *, max_diff: int) -> list[str]:
+def render_report(attempt: dict, *, max_diff: int, quiet: bool = False) -> list[str]:
+    """Render a human-readable report for one probe attempt.
+
+    With ``quiet=True``, rendering stops after the summary lines --
+    function/label, status, similarity/raw, frame (only when it differs),
+    and the first mismatch -- and everything else (probe_reason,
+    mismatch_kind, futility, instruction counts, the normalized-only-match
+    warning, the diff excerpt, and compiler diagnostics) is omitted. That is
+    exactly what an agent iterating on drafts needs when it just wants the
+    number.
+    """
     lines: list[str] = []
     lines.append(f"function: {attempt.get('function')}   label: {attempt.get('label')}")
     lines.append(f"status: {attempt.get('status')}")
-
-    probe_reason = attempt.get("probe_reason")
-    if probe_reason:
-        lines.append(f"probe_reason: {probe_reason}")
 
     similarity = attempt.get("similarity_score")
     raw = attempt.get("raw_similarity_score")
     if similarity is not None or raw is not None:
         lines.append(f"similarity: {_fmt_score(similarity)}   raw: {_fmt_score(raw)}")
+
+    expected_size = attempt.get("expected_size")
+    actual_size = attempt.get("actual_size")
+    if expected_size is not None and actual_size is not None and expected_size != actual_size:
+        lines.append(f"frame: expected {expected_size} bytes, actual {actual_size}")
+
+    first_diff_offset = attempt.get("first_diff_offset")
+    if first_diff_offset is not None:
+        lines.append(
+            f"first mismatch at offset {first_diff_offset}: "
+            f"expected `{attempt.get('expected_instruction_text')}` "
+            f"actual `{attempt.get('actual_instruction_text')}`"
+        )
+
+    if quiet:
+        return lines
+
+    probe_reason = attempt.get("probe_reason")
+    if probe_reason:
+        lines.append(f"probe_reason: {probe_reason}")
 
     mismatch_kind = attempt.get("mismatch_kind")
     if mismatch_kind:
@@ -219,23 +314,10 @@ def render_report(attempt: dict, *, max_diff: int) -> list[str]:
     if futility:
         lines.append(f"futility: {futility}")
 
-    expected_size = attempt.get("expected_size")
-    actual_size = attempt.get("actual_size")
-    if expected_size is not None and actual_size is not None and expected_size != actual_size:
-        lines.append(f"frame: expected {expected_size} bytes, actual {actual_size}")
-
     expected_count = attempt.get("expected_instruction_count")
     actual_count = attempt.get("actual_instruction_count")
     if expected_count is not None or actual_count is not None:
         lines.append(f"instructions: expected {expected_count}, actual {actual_count}")
-
-    first_diff_offset = attempt.get("first_diff_offset")
-    if first_diff_offset is not None:
-        lines.append(
-            f"first mismatch at offset {first_diff_offset}: "
-            f"expected `{attempt.get('expected_instruction_text')}` "
-            f"actual `{attempt.get('actual_instruction_text')}`"
-        )
 
     if is_normalized_only_match(attempt):
         lines.append("")
@@ -315,6 +397,20 @@ def main(argv: list[str] | None = None) -> int:
         "--timeout", type=float, default=DEFAULT_TIMEOUT,
         help=f"fleet_probe.py subprocess timeout in seconds (default {DEFAULT_TIMEOUT})",
     )
+    parser.add_argument(
+        "--stats",
+        help=(
+            "PRAGMA_PROBE_STATS override for the fleet_probe.py subprocess. "
+            f"Default: a private scratch file ({DEFAULT_STATS_REL}), so "
+            "quick probes do not pollute the runner's real probe-stats "
+            "history. Pass 'shared' to opt back into the runner's default "
+            "history, or an explicit path."
+        ),
+    )
+    parser.add_argument(
+        "--quiet", action="store_true",
+        help="print only the summary lines (status/similarity/raw/frame/first mismatch), no diff",
+    )
     args = parser.parse_args(argv)
 
     try:
@@ -344,6 +440,8 @@ def main(argv: list[str] | None = None) -> int:
         declarations=declarations,
     )
 
+    stats_env, stats_display = resolve_stats_env(args.stats, repo_root=REPO_ROOT)
+
     with tempfile.TemporaryDirectory(prefix="probe_one_") as tmp_dir:
         tmp_path = Path(tmp_dir)
         batch_path = tmp_path / "batch.json"
@@ -352,7 +450,8 @@ def main(argv: list[str] | None = None) -> int:
 
         try:
             proc = run_probe_subprocess(
-                batch_path, result_path, repo_root=REPO_ROOT, timeout=args.timeout
+                batch_path, result_path, repo_root=REPO_ROOT, timeout=args.timeout,
+                env=stats_env,
             )
         except subprocess.TimeoutExpired:
             print(
@@ -413,7 +512,8 @@ def main(argv: list[str] | None = None) -> int:
             attempts[0],
         )
 
-        print("\n".join(render_report(attempt, max_diff=args.max_diff)))
+        print(f"stats: {stats_display}")
+        print("\n".join(render_report(attempt, max_diff=args.max_diff, quiet=args.quiet)))
 
         if args.json:
             args.json.write_text(json.dumps(attempt, indent=2, default=str), encoding="utf-8")
