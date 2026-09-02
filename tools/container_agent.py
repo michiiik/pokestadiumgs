@@ -360,6 +360,10 @@ Rules:
   prototypes, ...).
 - Give every candidate a distinct, descriptive "label"
   ("<family>:<shape>:<hypothesis>").
+- Do NOT compile, assemble, run make, probes or the permuter yourself: the
+  driver probes every candidate against the ROM right after you write the
+  file and feeds the diagnostics back. Spend your time on the C, not on
+  building a toolchain loop.
 - Do not add or remove any "#pragma GLOBAL_ASM" line.
 - A companion_edit may only retarget an existing C definition/prototype
   already in the file (or the candidate owner's own stale extern); it must
