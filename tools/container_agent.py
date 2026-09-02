@@ -102,6 +102,18 @@ def save_json(path: Path, data: object) -> None:
     tmp.replace(path)
 
 
+def _finalize_run(summary: dict, out_dir: Path, stopped_reason: str, started: float) -> None:
+    """Stamp ``summary`` with its stop reason/timing and close out its current
+    ``runs`` entry (if any), then write ``<out_dir>/summary.json``."""
+    summary["stopped_reason"] = stopped_reason
+    summary["ended_at"] = now_iso()
+    summary["wall_seconds"] = round(time.monotonic() - started, 1)
+    if summary.get("runs"):
+        summary["runs"][-1]["ended"] = summary["ended_at"]
+        summary["runs"][-1]["stop_reason"] = stopped_reason
+    save_json(out_dir / "summary.json", summary)
+
+
 def _new_owner_state() -> dict:
     return {
         "status": "in_progress",
@@ -293,6 +305,65 @@ def invoke_generator(command: str, *, cwd: Path, timeout: float) -> subprocess.C
     return subprocess.run(
         command, shell=True, cwd=cwd, capture_output=True, text=True, timeout=timeout,
     )
+
+
+# ---------------------------------------------------------------------------
+# Generator health tracking (quota / rate-limit exhaustion)
+# ---------------------------------------------------------------------------
+
+QUOTA_SIGNATURES = ("rate limit", "quota", "usage limit", "429", "too many requests")
+
+
+def _decode(text: object) -> str:
+    if text is None:
+        return ""
+    if isinstance(text, bytes):
+        return text.decode("utf-8", errors="replace")
+    return str(text)
+
+
+def _looks_like_quota(*texts: object) -> bool:
+    combined = " ".join(_decode(t) for t in texts).lower()
+    return any(signature in combined for signature in QUOTA_SIGNATURES)
+
+
+def _record_generator_outcome(
+    gen_failures: dict,
+    *,
+    ok: bool,
+    quota: bool,
+    stderr_tail: str,
+    owner: str,
+    iteration: int,
+    max_failures: int,
+    logger: Logger,
+) -> bool:
+    """Update the run's consecutive-generator-failure counter.
+
+    A successful iteration (generator exited zero AND produced a valid batch)
+    resets the counter to zero. Otherwise the counter is incremented by 2 when
+    the failure looks like a quota/rate-limit signature, else by 1. Returns
+    True once ``max_failures`` is reached, meaning the whole run should stop.
+    """
+    if ok:
+        gen_failures["consecutive"] = 0
+        return False
+
+    if quota:
+        logger.log(f"{owner}: iter {iteration}: generator output looks like a quota/rate-limit signal")
+
+    increment = 2 if quota else 1
+    gen_failures["consecutive"] = gen_failures.get("consecutive", 0) + increment
+
+    tail = stderr_tail.strip()
+    if tail:
+        logger.log(f"{owner}: iter {iteration}: generator stderr tail: {tail[-500:]}")
+
+    logger.log(
+        f"{owner}: iter {iteration}: generator failure count now "
+        f"{gen_failures['consecutive']} (limit {max_failures})"
+    )
+    return max_failures > 0 and gen_failures["consecutive"] >= max_failures
 
 
 # ---------------------------------------------------------------------------
@@ -772,7 +843,11 @@ def process_owner(
     permuter_seconds: float,
     generator_cmd: str,
     logger: Logger,
+    gen_failures: dict | None = None,
+    max_generator_failures: int = 3,
 ) -> str:
+    if gen_failures is None:
+        gen_failures = {"consecutive": 0}
     file_brief = file_brief_text(repo_dir, source_rel)
     asm_text = owner_asm_text(repo_dir, owner)
 
@@ -797,32 +872,70 @@ def process_owner(
         remaining_budget = max(1.0, deadline - time.monotonic())
         gen_timeout = max(10.0, min(GENERATOR_TIMEOUT_CAP, remaining_budget))
         command = render_generator_command(generator_cmd, prompt_path, batch_path)
+        timed_out = False
         try:
             gen_result = invoke_generator(command, cwd=repo_dir, timeout=gen_timeout)
-        except subprocess.TimeoutExpired:
+        except subprocess.TimeoutExpired as exc:
             logger.log(f"{owner}: iter {iteration}: generator timed out after {gen_timeout:.0f}s")
             gen_result = None
+            timed_out = True
+            timeout_texts = (_decode(getattr(exc, "stdout", None)), _decode(getattr(exc, "stderr", None)))
         except OSError as exc:
             logger.log(f"{owner}: iter {iteration}: generator failed to launch: {exc}")
             owner_state["status"] = "generator_failed"
+            exhausted = _record_generator_outcome(
+                gen_failures, ok=False, quota=_looks_like_quota(str(exc)), stderr_tail=str(exc),
+                owner=owner, iteration=iteration, max_failures=max_generator_failures, logger=logger,
+            )
+            if exhausted:
+                logger.log(
+                    f"{owner}: generator exhausted after {gen_failures['consecutive']} consecutive "
+                    f"failure(s) (limit {max_generator_failures}); stopping run"
+                )
+                owner_state["status"] = "generator_failed"
+                return "generator_exhausted"
             return "generator_failed"
 
         if gen_result is not None and gen_result.returncode != 0:
             logger.log(
                 f"{owner}: iter {iteration}: generator exited {gen_result.returncode}: "
-                f"{gen_result.stderr.strip()[:500]}"
+                f"{(gen_result.stderr or '').strip()[:500]}"
             )
 
         batch = load_json(batch_path)
-        if batch is None:
-            logger.log(f"{owner}: iter {iteration}: no valid batch JSON at {batch_path}")
+        gen_ok = (not timed_out) and gen_result is not None and gen_result.returncode == 0 and batch is not None
+        if not gen_ok:
+            if batch is None:
+                logger.log(f"{owner}: iter {iteration}: no valid batch JSON at {batch_path}")
+            if timed_out:
+                failure_texts = timeout_texts
+            else:
+                failure_texts = (gen_result.stdout or "", gen_result.stderr or "") if gen_result is not None else ()
+            quota = _looks_like_quota(*failure_texts)
+            stderr_tail = _decode(failure_texts[-1]) if failure_texts else ""
+            exhausted = _record_generator_outcome(
+                gen_failures, ok=False, quota=quota, stderr_tail=stderr_tail,
+                owner=owner, iteration=iteration, max_failures=max_generator_failures, logger=logger,
+            )
             owner_state["iterations"] += 1
             owner_state["plateau_count"] += 1
             save_json(state_path, state)
+            if exhausted:
+                logger.log(
+                    f"{owner}: generator exhausted after {gen_failures['consecutive']} consecutive "
+                    f"failure(s) (limit {max_generator_failures}); stopping run"
+                )
+                owner_state["status"] = "generator_failed"
+                return "generator_exhausted"
             if owner_state["plateau_count"] >= plateau:
                 owner_state["status"] = "plateau"
                 return "plateau"
             continue
+
+        _record_generator_outcome(
+            gen_failures, ok=True, quota=False, stderr_tail="",
+            owner=owner, iteration=iteration, max_failures=max_generator_failures, logger=logger,
+        )
 
         status = run_iteration(
             repo_dir=repo_dir, out_dir=out_dir, source_rel=source_rel, owner=owner,
@@ -865,10 +978,7 @@ def run_test_mode(
     batch = load_json(candidate_file)
     if batch is None:
         logger.log(f"error: could not read candidate file {candidate_file}")
-        summary["stopped_reason"] = "invalid_candidate_file"
-        summary["ended_at"] = now_iso()
-        summary["wall_seconds"] = round(time.monotonic() - started, 1)
-        save_json(out_dir / "summary.json", summary)
+        _finalize_run(summary, out_dir, "invalid_candidate_file", started)
         return 2
 
     functions = []
@@ -879,10 +989,7 @@ def run_test_mode(
     owner = functions[0] if functions else None
     if owner is None:
         logger.log(f"error: {candidate_file} has no candidates with a function name")
-        summary["stopped_reason"] = "invalid_candidate_file"
-        summary["ended_at"] = now_iso()
-        summary["wall_seconds"] = round(time.monotonic() - started, 1)
-        save_json(out_dir / "summary.json", summary)
+        _finalize_run(summary, out_dir, "invalid_candidate_file", started)
         return 2
 
     batch_source = batch.get("source") or source_rel
@@ -906,10 +1013,7 @@ def run_test_mode(
     summary["best_per_owner"][owner] = owner_state["best_similarity"]
     if status == "accepted":
         summary["matched"].append(owner)
-    summary["stopped_reason"] = "test_mode_exit"
-    summary["ended_at"] = now_iso()
-    summary["wall_seconds"] = round(time.monotonic() - started, 1)
-    save_json(out_dir / "summary.json", summary)
+    _finalize_run(summary, out_dir, "test_mode_exit", started)
     logger.log(f"test mode complete: status={status}")
     return 0
 
@@ -939,6 +1043,22 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--candidate-file", type=Path,
         help="test mode: use this batch once for the first owner instead of any generator, then exit",
     )
+    parser.add_argument(
+        "--max-generator-failures", type=int, default=3,
+        help=(
+            "stop the whole run after this many consecutive generator failures "
+            "(non-zero exit, timeout, or no valid batch JSON); a quota/rate-limit-looking "
+            "failure counts double (default: 3)"
+        ),
+    )
+    parser.add_argument(
+        "--resume", action="store_true",
+        help="resume an existing run in --out (its state.json); without this, a non-empty state.json is an error",
+    )
+    parser.add_argument(
+        "--skip-status", default="accepted",
+        help="comma-separated owner statuses to skip when resuming (default: accepted)",
+    )
     return parser.parse_args(argv)
 
 
@@ -964,7 +1084,24 @@ def main(argv: list[str] | None = None) -> int:
     deadline = started + args.budget_seconds
 
     state_path = out_dir / "state.json"
-    state = load_json(state_path) or {}
+    summary_path = out_dir / "summary.json"
+    existing_state = load_json(state_path)
+    if existing_state:
+        if not args.resume:
+            logger.log(
+                f"error: {state_path} already has a run; pass --resume or use a new --out dir"
+            )
+            return 2
+        state = existing_state
+    else:
+        state = {}
+
+    prior_summary = load_json(summary_path) if args.resume else None
+    runs: list[dict] = list((prior_summary or {}).get("runs") or [])
+    generator_desc = args.generator_cmd or (
+        f"--candidate-file {args.candidate_file}" if args.candidate_file else None
+    )
+    runs.append({"started": now_iso(), "ended": None, "generator_cmd": generator_desc, "stop_reason": None})
 
     summary: dict = {
         "source": source_rel,
@@ -975,6 +1112,7 @@ def main(argv: list[str] | None = None) -> int:
         "best_per_owner": {},
         "iteration_counts": {},
         "stopped_reason": None,
+        "runs": runs,
     }
 
     if args.candidate_file:
@@ -986,10 +1124,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if not args.generator_cmd:
         logger.log("error: --generator-cmd is required (or use --candidate-file for a one-shot test)")
-        summary["stopped_reason"] = "no_generator"
-        summary["ended_at"] = now_iso()
-        summary["wall_seconds"] = round(time.monotonic() - started, 1)
-        save_json(out_dir / "summary.json", summary)
+        _finalize_run(summary, out_dir, "no_generator", started)
         return 2
 
     if args.owners:
@@ -999,18 +1134,29 @@ def main(argv: list[str] | None = None) -> int:
 
     logger.log(f"discovered {len(owners)} owner(s) for {source_rel}: {', '.join(owners) or '(none)'}")
 
+    skip_statuses = {s.strip() for s in (args.skip_status or "").split(",") if s.strip()}
+    gen_failures = {"consecutive": 0}
+
     stopped_reason = "completed" if owners else "no_owners"
     for owner in owners:
         if time.monotonic() >= deadline:
             stopped_reason = "budget_expired"
             break
-        summary["owners_attempted"].append(owner)
         owner_state = state.setdefault(owner, _new_owner_state())
+        if owner_state.get("status") in skip_statuses:
+            logger.log(f"{owner}: resume: skipping (status={owner_state.get('status')})")
+            summary["iteration_counts"][owner] = owner_state["iterations"]
+            summary["best_per_owner"][owner] = owner_state["best_similarity"]
+            if owner_state.get("status") == "accepted":
+                summary["matched"].append(owner)
+            continue
+        summary["owners_attempted"].append(owner)
         status = process_owner(
             repo_dir=repo_dir, out_dir=out_dir, source_rel=source_rel, owner=owner,
             owner_state=owner_state, state=state, state_path=state_path, deadline=deadline,
             max_iterations=args.max_iterations, plateau=args.plateau,
             permuter_seconds=args.permuter_seconds, generator_cmd=args.generator_cmd, logger=logger,
+            gen_failures=gen_failures, max_generator_failures=args.max_generator_failures,
         )
         summary["iteration_counts"][owner] = owner_state["iterations"]
         summary["best_per_owner"][owner] = owner_state["best_similarity"]
@@ -1020,13 +1166,13 @@ def main(argv: list[str] | None = None) -> int:
         if status == "budget_expired":
             stopped_reason = "budget_expired"
             break
+        if status == "generator_exhausted":
+            stopped_reason = "generator_exhausted"
+            break
 
-    summary["stopped_reason"] = stopped_reason
-    summary["ended_at"] = now_iso()
-    summary["wall_seconds"] = round(time.monotonic() - started, 1)
-    save_json(out_dir / "summary.json", summary)
+    _finalize_run(summary, out_dir, stopped_reason, started)
     logger.log(f"done: matched={summary['matched']} stopped_reason={stopped_reason}")
-    return 0
+    return 3 if stopped_reason == "generator_exhausted" else 0
 
 
 if __name__ == "__main__":

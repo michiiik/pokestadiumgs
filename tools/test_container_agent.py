@@ -688,5 +688,258 @@ class MainEndToEndTests(unittest.TestCase):
             self.assertEqual(state["func_1"]["status"], "accepted")
 
 
+# ---------------------------------------------------------------------------
+# Generator exhaustion (quota/rate-limit early stop)
+# ---------------------------------------------------------------------------
+
+class GeneratorExhaustionTests(unittest.TestCase):
+    def test_consecutive_failures_stop_the_whole_run(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            repo_dir.mkdir()
+            out_dir = Path(tmp) / "out"
+            source_rel = "disasm/src/X.c"
+
+            def failing_generator(command, *, cwd, timeout):
+                return SimpleNamespace(returncode=1, stdout="", stderr="boom, no output produced")
+
+            with mock.patch.object(container_agent, "file_brief_text", return_value="brief"), \
+                 mock.patch.object(container_agent, "owner_asm_text", return_value="asm"), \
+                 mock.patch.object(container_agent, "invoke_generator", side_effect=failing_generator), \
+                 mock.patch.object(container_agent, "invoke_probe") as probe_mock:
+                exit_code = container_agent.main([
+                    "--source", source_rel,
+                    "--out", str(out_dir),
+                    "--repo", str(repo_dir),
+                    "--owners", "func_1,func_2",
+                    "--generator-cmd", "generator --prompt {prompt} --batch {batch}",
+                    "--max-generator-failures", "2",
+                    "--plateau", "100",
+                    "--max-iterations", "100",
+                ])
+
+            self.assertEqual(exit_code, 3)
+            probe_mock.assert_not_called()
+
+            summary = json.loads((out_dir / "summary.json").read_text(encoding="utf-8"))
+            self.assertEqual(summary["stopped_reason"], "generator_exhausted")
+            self.assertEqual(summary["runs"][-1]["stop_reason"], "generator_exhausted")
+            self.assertIsNotNone(summary["runs"][-1]["ended"])
+
+            state = json.loads((out_dir / "state.json").read_text(encoding="utf-8"))
+            self.assertEqual(state["func_1"]["status"], "generator_failed")
+            # the run stopped before func_2 was ever reached
+            self.assertNotIn("func_2", state)
+
+    def test_quota_signature_counts_as_two_failures(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            repo_dir.mkdir()
+            out_dir = Path(tmp) / "out"
+            source_rel = "disasm/src/X.c"
+
+            def quota_generator(command, *, cwd, timeout):
+                return SimpleNamespace(returncode=1, stdout="", stderr="Error: Rate limit exceeded, try later")
+
+            with mock.patch.object(container_agent, "file_brief_text", return_value="brief"), \
+                 mock.patch.object(container_agent, "owner_asm_text", return_value="asm"), \
+                 mock.patch.object(container_agent, "invoke_generator", side_effect=quota_generator), \
+                 mock.patch.object(container_agent, "invoke_probe") as probe_mock:
+                exit_code = container_agent.main([
+                    "--source", source_rel,
+                    "--out", str(out_dir),
+                    "--repo", str(repo_dir),
+                    "--owners", "func_1",
+                    "--generator-cmd", "generator --prompt {prompt} --batch {batch}",
+                    "--max-generator-failures", "2",
+                    "--plateau", "100",
+                    "--max-iterations", "100",
+                ])
+
+            self.assertEqual(exit_code, 3)
+            probe_mock.assert_not_called()
+            log_text = (out_dir / "log.txt").read_text(encoding="utf-8")
+            self.assertIn("quota", log_text.lower())
+
+            state = json.loads((out_dir / "state.json").read_text(encoding="utf-8"))
+            # a single quota-looking failure counts double, so it alone reaches the limit of 2
+            self.assertEqual(state["func_1"]["iterations"], 1)
+
+    def test_success_resets_the_failure_counter(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            repo_dir.mkdir()
+            out_dir = Path(tmp) / "out"
+            owner = "func_1"
+            source_rel = "disasm/src/X.c"
+
+            # iteration 0: invalid batch (failure); iteration 1: valid batch (success,
+            # resets the counter); iteration 2: invalid batch again (failure -> count 1,
+            # not 2, proving the reset actually happened).
+            def batch_for_iteration(n):
+                if n in (0, 2):
+                    return None
+                return {"source": source_rel, "candidates": [{"function": owner, "label": "a", "body": "b"}]}
+
+            def result_for_call(_n, _batch):
+                return {
+                    "batch_status": "no_candidate_accepted", "accepted": [],
+                    "attempts": [{"function": owner, "label": "a", "status": "rejected", "similarity_score": 0.1}],
+                }
+
+            owner_state = container_agent._new_owner_state()
+            state = {owner: owner_state}
+            state_path = out_dir / "state.json"
+            logger = container_agent.Logger(out_dir / "log.txt")
+            gen_failures = {"consecutive": 0}
+
+            with mock.patch.object(container_agent, "file_brief_text", return_value="brief"), \
+                 mock.patch.object(container_agent, "owner_asm_text", return_value="asm"), \
+                 mock.patch.object(container_agent, "invoke_generator", side_effect=make_invoke_generator(batch_for_iteration)), \
+                 mock.patch.object(container_agent, "invoke_probe", side_effect=make_invoke_probe(result_for_call)):
+                status = container_agent.process_owner(
+                    repo_dir=repo_dir, out_dir=out_dir, source_rel=source_rel, owner=owner,
+                    owner_state=owner_state, state=state, state_path=state_path,
+                    deadline=time.monotonic() + 60.0, max_iterations=3, plateau=100,
+                    permuter_seconds=0.0, generator_cmd="generator --prompt {prompt} --batch {batch}",
+                    logger=logger, gen_failures=gen_failures, max_generator_failures=5,
+                )
+
+        self.assertEqual(status, "max_iterations")
+        self.assertEqual(owner_state["iterations"], 3)
+        self.assertEqual(gen_failures["consecutive"], 1)
+
+
+# ---------------------------------------------------------------------------
+# --resume / --skip-status / non-empty-state guard
+# ---------------------------------------------------------------------------
+
+class ResumeTests(unittest.TestCase):
+    def test_nonempty_state_without_resume_is_an_error(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            repo_dir.mkdir()
+            out_dir = Path(tmp) / "out"
+            out_dir.mkdir()
+            container_agent.save_json(out_dir / "state.json", {"func_a": container_agent._new_owner_state()})
+
+            with mock.patch.object(container_agent, "invoke_generator") as gen_mock:
+                exit_code = container_agent.main([
+                    "--source", "disasm/src/X.c",
+                    "--out", str(out_dir),
+                    "--repo", str(repo_dir),
+                    "--generator-cmd", "generator --prompt {prompt} --batch {batch}",
+                ])
+
+            self.assertEqual(exit_code, 2)
+            gen_mock.assert_not_called()
+            log_text = (out_dir / "log.txt").read_text(encoding="utf-8")
+            self.assertIn("--resume", log_text)
+
+    def test_resume_skips_accepted_and_continues_iteration_numbering(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            repo_dir.mkdir()
+            out_dir = Path(tmp) / "out"
+            out_dir.mkdir()
+            source_rel = "disasm/src/X.c"
+            owner = "func_b"
+
+            state = {
+                "func_a": {
+                    "status": "accepted", "best_similarity": 1.0, "best_raw_similarity": 1.0,
+                    "best_label": "a", "iterations": 3, "plateau_count": 0,
+                    "history": [], "best_candidates": [], "permuter_runs": [],
+                },
+                "func_b": {
+                    "status": "plateau", "best_similarity": 0.4, "best_raw_similarity": 0.4,
+                    "best_label": "x", "iterations": 2, "plateau_count": 6,
+                    "history": [],
+                    "best_candidates": [{
+                        "label": "x", "similarity_score": 0.4, "raw_similarity_score": 0.4,
+                        "mismatch_kind": None, "futility": None, "diagnostic": None, "body": "prev_body",
+                    }],
+                    "permuter_runs": [],
+                },
+            }
+            container_agent.save_json(out_dir / "state.json", state)
+            container_agent.save_json(out_dir / "summary.json", {"runs": [{
+                "started": "2026-09-01T00:00:00Z", "ended": "2026-09-01T00:05:00Z",
+                "generator_cmd": "old-generator", "stop_reason": "generator_exhausted",
+            }]})
+
+            batch_paths_seen: list[str] = []
+
+            def gen_stub(command, *, cwd, timeout):
+                batch_path = _extract_path_arg(command, "--batch")
+                batch_paths_seen.append(batch_path.name)
+                batch_path.parent.mkdir(parents=True, exist_ok=True)
+                container_agent.save_json(batch_path, {
+                    "source": source_rel,
+                    "candidates": [{"function": owner, "label": "b2", "body": "body_b2"}],
+                })
+                return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+            def result_for_call(_n, _batch):
+                return {
+                    "batch_status": "no_candidate_accepted", "accepted": [],
+                    "attempts": [{"function": owner, "label": "b2", "status": "rejected", "similarity_score": 0.35}],
+                }
+
+            with mock.patch.object(container_agent, "file_brief_text", return_value="brief"), \
+                 mock.patch.object(container_agent, "owner_asm_text", return_value="asm"), \
+                 mock.patch.object(container_agent, "invoke_generator", side_effect=gen_stub), \
+                 mock.patch.object(container_agent, "invoke_probe", side_effect=make_invoke_probe(result_for_call)):
+                exit_code = container_agent.main([
+                    "--source", source_rel,
+                    "--out", str(out_dir),
+                    "--repo", str(repo_dir),
+                    "--owners", "func_a,func_b",
+                    "--generator-cmd", "generator --prompt {prompt} --batch {batch}",
+                    "--resume", "--plateau", "1", "--max-iterations", "3",
+                ])
+
+            self.assertEqual(exit_code, 0)
+            # func_a (already accepted) never triggers a new generator call
+            self.assertEqual(batch_paths_seen, ["func_b_iter2.json"])
+
+            summary = json.loads((out_dir / "summary.json").read_text(encoding="utf-8"))
+            self.assertIn("func_a", summary["matched"])
+            self.assertNotIn("func_a", summary["owners_attempted"])
+            self.assertIn("func_b", summary["owners_attempted"])
+            self.assertEqual(len(summary["runs"]), 2)
+            self.assertEqual(summary["runs"][0]["generator_cmd"], "old-generator")
+            self.assertEqual(summary["runs"][1]["generator_cmd"], "generator --prompt {prompt} --batch {batch}")
+
+            state_after = json.loads((out_dir / "state.json").read_text(encoding="utf-8"))
+            self.assertEqual(state_after["func_b"]["iterations"], 3)
+            self.assertEqual(state_after["func_b"]["status"], "plateau")
+
+    def test_skip_status_can_also_skip_plateaued_owners(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            repo_dir.mkdir()
+            out_dir = Path(tmp) / "out"
+            out_dir.mkdir()
+            state = {"func_a": {**container_agent._new_owner_state(), "status": "plateau", "iterations": 5}}
+            container_agent.save_json(out_dir / "state.json", state)
+
+            with mock.patch.object(container_agent, "invoke_generator") as gen_mock:
+                exit_code = container_agent.main([
+                    "--source", "disasm/src/X.c",
+                    "--out", str(out_dir),
+                    "--repo", str(repo_dir),
+                    "--owners", "func_a",
+                    "--generator-cmd", "generator --prompt {prompt} --batch {batch}",
+                    "--resume", "--skip-status", "accepted,plateau",
+                ])
+
+            self.assertEqual(exit_code, 0)
+            gen_mock.assert_not_called()
+            summary = json.loads((out_dir / "summary.json").read_text(encoding="utf-8"))
+            self.assertNotIn("func_a", summary["owners_attempted"])
+            self.assertEqual(summary["stopped_reason"], "completed")
+
+
 if __name__ == "__main__":
     unittest.main()
