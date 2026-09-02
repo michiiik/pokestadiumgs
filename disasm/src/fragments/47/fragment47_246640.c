@@ -21,7 +21,15 @@ void func_860002A0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_246640/func_860004C8.s")
+extern void * func_87C00160(void *, void *, void *);
+extern f64 func_87C00D14(f64,f64);
+f32 func_860004C8(void *arg0, void *arg1) {
+    u8 value[0x18];
+    func_87C00160(value, arg1, arg0);
+    return (f32)func_87C00D14(*(f64 *)value, *(f64 *)(value + 0x10));
+}
+void func_860004C8_padding(void) {}
+void func_860004C8_padding2(void) {}
 #endif
 
 #ifdef VERSION_US
@@ -68,7 +76,24 @@ void func_86001838(s32 arg0, u8 *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_246640/func_860018A8.s")
+extern void func_86007AF8(void *, f64);
+extern void func_87F06430(f32 *, s32);
+extern f32 D_8600D638;
+void func_860018A8(void *arg0) {
+    f32 values[3];
+    f32 constant;
+
+    *(s32 *)((u8 *)arg0 + 0x194) = 0;
+    func_86007AF8((u8 *)arg0 + 0x198, 14.0);
+    func_87F06430(values, *(s32 *)arg0);
+    constant = D_8600D638;
+    *(f64 *)((u8 *)arg0 + 0x198) = (f64)values[0];
+    *(f64 *)((u8 *)arg0 + 0x1A0) = (f64)values[1];
+    *(f64 *)((u8 *)arg0 + 0x1A8) = (f64)values[2];
+    *(f32 *)((u8 *)arg0 + 0x34) = constant;
+    *(f32 *)((u8 *)arg0 + 0x38) = constant;
+    *(f32 *)((u8 *)arg0 + 0x3C) = constant;
+}
 #endif
 
 #ifdef VERSION_US
@@ -128,7 +153,22 @@ void func_86001DBC(u8 *arg0) { arg0[0x1639] &= 0xFFFE; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_246640/func_86001F44.s")
+extern f32 __sinf(f32);
+extern f32 __cosf(f32);
+extern f64 D_8600DED8;
+void func_86001F44(u8 *arg0) {
+    struct Temp {
+        u8 pad[8];
+        f64 value;
+    };
+    struct Temp *temp;
+
+    temp = (struct Temp *)(*(u8 **)(arg0 + 0x1870) + 0x6668);
+    *(f64 *)arg0 = (f64)__sinf((f32)*(f64 *)(arg0 + 0x17D8)) *
+        (temp->value + D_8600DED8);
+    *(f64 *)(arg0 + 0x10) = (f64)__cosf((f32)*(f64 *)(arg0 + 0x17D8)) *
+        (temp->value + D_8600DED8);
+}
 #endif
 
 #ifdef VERSION_US

@@ -130,6 +130,55 @@ def _strip_other_functions(source: str, function: str, permuter_root: Path) -> s
     ) + "\n"
 
 
+def _augment_candidate_declarations(
+    function: str,
+    code: str,
+    declarations: str | None,
+    baseline_source: str,
+    repo_root: Path | None,
+) -> str:
+    """Prepend shared declarations plus any fallback callee prototypes.
+
+    ``try_pragma_compare``'s probe path never hands IDO a candidate that
+    calls a callee with no declaration in scope: before probing,
+    ``_augment_blocks_with_callee_declarations`` scans the owner's whole file
+    for a real signature of every callee the candidate references but
+    neither the shared ``declarations`` block nor the candidate's own
+    leading lines already declare, and injects it. Skipping that step here
+    let a candidate call an undeclared callee (e.g. ``func_87C00160``),
+    which IDO's cfe implicitly declares at the call site; when the file's
+    *own* prototype for that callee (declared further down, ahead of a
+    sibling owner) was later reached by the permuter's flattened base.c, the
+    two conflicting declarations of the same name failed with "redeclaration
+    ... Incompatible function return type" and the whole base was
+    unusable ("Unable to compile"). Reusing the exact probe-path helper here
+    keeps the permuter's composition consistent with the probe that already
+    validated this candidate.
+    """
+    prefix = runner._declaration_prefix(declarations)
+    body = code.rstrip() + "\n"
+    augmented = runner._augment_blocks_with_callee_declarations(
+        [(function, body)],
+        prefix,
+        baseline_source,
+        repo_root,
+    )
+    return augmented[0][1]
+
+
+def _compose_candidate(
+    owner: targets.Owner, code: str, declarations: str | None, baseline_source: str
+) -> str:
+    """``_augment_candidate_declarations`` bound to a known owner's repo root."""
+    return _augment_candidate_declarations(
+        owner.function,
+        code,
+        declarations,
+        baseline_source,
+        runner._repo_root_for_path(owner.source_path),
+    )
+
+
 def _candidate_source(
     source: str,
     function: str,
@@ -137,9 +186,10 @@ def _candidate_source(
     *,
     declarations: str | None = None,
     companion_edits: list[dict[str, str]] | None = None,
+    repo_root: Path | None = None,
 ) -> str:
-    """Substitute a candidate, then apply its paired source transaction."""
-    candidate = runner._declaration_prefix(declarations) + code.rstrip() + "\n"
+    """Compose a candidate (with callee-declaration synthesis), then apply its paired source transaction."""
+    candidate = _augment_candidate_declarations(function, code, declarations, source, repo_root)
     substituted = runner._replace_candidate_text(source, function, candidate)
     if substituted is None:
         raise ValueError(f"source does not contain exactly one pragma for {function}")
@@ -174,6 +224,7 @@ def build_work_directory(
             code,
             declarations=declarations,
             companion_edits=companion_edits,
+            repo_root=runner._repo_root_for_path(owner.source_path),
         )
     except ValueError as error:
         raise ValueError(f"{owner.source}: {error}") from error

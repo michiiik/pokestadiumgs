@@ -1226,7 +1226,7 @@ void func_84112290(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-extern s32 func_84111C8C(void); extern void func_84111E50();
+extern s32 func_84111C8C(void);
 extern void func_84112158(s32, s32);
 void func_841122D4(u8 *arg0) { if (func_84111C8C() != 0) { func_84112158(arg0, 0x105); } else { *(u16 *)(arg0 + 0x7F4) |= 1; func_84111E50(arg0, *(u8 *)(*(u8 **)(arg0 + 0x2D4) + 0x1465)); } }
 #endif

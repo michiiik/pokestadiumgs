@@ -1,0 +1,60 @@
+# Container ROM gate: rebuilds the ROM from a PR's disasm/src,
+# disasm/include, and disasm/linker_scripts inside the prebuilt
+# gs-decomp-agent:latest image (see docs/CONTAINER_AGENT.md) and only
+# passes if the checksum matches the retail ROM. Replaces a human manually
+# re-gating a container-produced match before it merges.
+#
+# Trigger note: the paths filter below covers "any PR touching
+# disasm/src/**" from the gate's design goal directly. It does NOT by
+# itself catch a `container/*`-named branch whose diff happens to touch
+# none of these paths (GitHub's pull_request `paths` filter can only match
+# on changed files, not on the head branch name, so there is no path list
+# that also expresses "or the branch is named container/*"). In practice
+# every container/* branch this repo produces touches disasm/src/**,
+# disasm/include/**, container/**, or tools/**, so this does not miss real
+# cases; the rare exception (e.g. a container/* branch that only touches
+# docs) can still be gated on demand via workflow_dispatch, or by pushing a
+# no-op touch under one of the watched paths. See docs/PR_GATE.md.
+name: Container ROM Gate
+
+on:
+  pull_request:
+    paths:
+      - 'disasm/src/**'
+      - 'disasm/include/**'
+      - 'container/**'
+      - 'tools/**'
+  workflow_dispatch: {}
+
+concurrency:
+  group: container-gate-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    name: Rebuild + compare ROM in container
+    # Self-hosted runner on the Mac Mini that owns gs-decomp-agent:latest
+    # (registered per docs/PR_GATE.md). Needs the docker CLI on PATH and
+    # the image already built (`container/build.sh`) -- this job does not
+    # build the image itself; see gate_pr.sh --rebuild-image for that.
+    runs-on: [self-hosted, macOS, ARM64, gs-decomp]
+    timeout-minutes: 30
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+
+      - name: Run container ROM gate
+        run: |
+          container/gate_pr.sh "$GITHUB_WORKSPACE" 2>&1 | tee "$RUNNER_TEMP/container-gate-compare.log"
+
+      - name: Upload compare log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: container-gate-compare-log
+          path: ${{ runner.temp }}/container-gate-compare.log
+          if-no-files-found: warn
+          retention-days: 14
