@@ -14,7 +14,8 @@ import (
 )
 
 // Status is one node of the run state machine documented in
-// docs/FLEET_CONTROLLER.md: queued -> running -> merging -> done|requeued.
+// docs/FLEET_CONTROLLER.md: queued -> running -> merging ->
+// done|requeued|pr_open -> merged|gate_failed.
 type Status string
 
 const (
@@ -24,6 +25,16 @@ const (
 	StatusDone     Status = "done"
 	StatusRequeued Status = "requeued"
 	StatusFailed   Status = "failed"
+	// StatusPROpen is a run whose merge step opened a PR and --auto-merge
+	// is on: the control loop polls its checks (control.Loop.pollPRs) until
+	// they land on StatusMerged or StatusGateFailed.
+	StatusPROpen Status = "pr_open"
+	// StatusMerged is a StatusPROpen run whose PR's checks all went SUCCESS
+	// and `gh pr merge --merge --delete-branch` succeeded.
+	StatusMerged Status = "merged"
+	// StatusGateFailed is a StatusPROpen run whose PR's checks reported a
+	// FAILURE -- left open for manual triage, never auto-retried.
+	StatusGateFailed Status = "gate_failed"
 )
 
 // RunSpec is one queued unit of work: one file, one partition of that
@@ -70,7 +81,32 @@ type RunRecord struct {
 	NeedsManualCommit map[string]string `json:"needs_manual_commit,omitempty"`
 	Branch            string            `json:"branch,omitempty"`
 	PRURL             string            `json:"pr_url,omitempty"`
-	Note              string            `json:"note,omitempty"`
+	// PRNumber is parsed from PRURL (the trailing /pull/<n>) so
+	// control.Loop.pollPRs can call `gh pr checks`/`gh pr merge` without
+	// re-parsing the URL every pass. Zero until a PR is opened.
+	PRNumber int `json:"pr_number,omitempty"`
+	// MergedAt is when `gh pr merge` succeeded for this run's PR (Status ==
+	// StatusMerged).
+	MergedAt time.Time `json:"merged_at,omitempty"`
+	// MergeCommitSHA is the merge repo's base-branch HEAD immediately after
+	// the post-merge fast-forward (docs/FLEET_CONTROLLER.md sec 2,
+	// "self-merge on green") -- the commit this run's matched owners landed
+	// as.
+	MergeCommitSHA string `json:"merge_commit_sha,omitempty"`
+	// ImageID is the gs-decomp-agent image id (docker image inspect
+	// --format {{.Id}}) this run's container was launched from; empty when
+	// launched with --src-overlay (sec 6, "stale-image awareness" --
+	// SrcOverlay makes the baked-in image irrelevant, so it is not even
+	// queried).
+	ImageID string `json:"image_id,omitempty"`
+	// BestSimilarity/BestSimilarityAt track this run's own progress, read
+	// from <out_dir>/state.json on every poll while Status == StatusRunning
+	// -- BestSimilarityAt is the last time BestSimilarity improved, and a
+	// gap since then of --stall-after or more raises a no_progress_stall
+	// alert (sec 4).
+	BestSimilarity   float64   `json:"best_similarity,omitempty"`
+	BestSimilarityAt time.Time `json:"best_similarity_at,omitempty"`
+	Note             string    `json:"note,omitempty"`
 	// WaitReason explains why a queued/requeued run is still waiting as of
 	// the last control-loop pass: "cooldown" (its agent is cooling down) or
 	// "concurrency" (global --max-concurrent or the agent's own
@@ -89,6 +125,32 @@ type State struct {
 	Runs              map[string]*RunRecord `json:"runs"`        // by RunSpec ID, every id ever seen
 	Cooldowns         map[string]time.Time  `json:"cooldowns"`   // agent -> until
 	RequeueSeq        map[string]int        `json:"requeue_seq"` // base spec id -> next requeue suffix
+
+	// PlanJSON is the most recently loaded/rebuilt plan (planpkg.Plan),
+	// persisted verbatim so a restarted `run` needs --plan only for the
+	// very first start (docs/FLEET_CONTROLLER.md sec 3) and so `Replan`
+	// knows what ranking options (--files, --agent, ...) to rebuild the
+	// queue with (sec 2). Stored as a raw blob, not planpkg.Plan itself, to
+	// avoid an import cycle (planpkg already imports fleetstate for
+	// RunSpec).
+	PlanJSON json.RawMessage `json:"plan,omitempty"`
+
+	// MergeBlocked is set when a post-merge fast-forward of the base branch
+	// failed (sec 2, "self-merge on green"): no further `gh pr merge` runs
+	// until a later poll pass's retry of the fast-forward succeeds.
+	MergeBlocked       bool   `json:"merge_blocked,omitempty"`
+	MergeBlockedReason string `json:"merge_blocked_reason,omitempty"`
+	// LastMergeAt is when fleetctl's own self-merge last landed a commit on
+	// the base branch -- compared against a launch's image build time for
+	// stale-image awareness (sec 6).
+	LastMergeAt time.Time `json:"last_merge_at,omitempty"`
+
+	// AlertSent rate-limits Loop.alert to at most one notification per
+	// "event[:key]" per hour (sec 4).
+	AlertSent map[string]time.Time `json:"alert_sent,omitempty"`
+	// LastDailySummary is when the --alert-issue daily summary last posted,
+	// so it fires at most once per UTC calendar day (sec 4).
+	LastDailySummary time.Time `json:"last_daily_summary,omitempty"`
 }
 
 // New returns an empty State ready to have a plan's queue loaded into it.
@@ -97,6 +159,7 @@ func New() *State {
 		Runs:       map[string]*RunRecord{},
 		Cooldowns:  map[string]time.Time{},
 		RequeueSeq: map[string]int{},
+		AlertSent:  map[string]time.Time{},
 	}
 }
 
@@ -123,6 +186,9 @@ func Load(path string) (*State, error) {
 	}
 	if s.RequeueSeq == nil {
 		s.RequeueSeq = map[string]int{}
+	}
+	if s.AlertSent == nil {
+		s.AlertSent = map[string]time.Time{}
 	}
 	return &s, nil
 }
@@ -190,6 +256,17 @@ func (s *State) RunningCount() (total int, byAgent map[string]int) {
 		}
 	}
 	return total, byAgent
+}
+
+// CountByStatus returns how many runs currently have exactly this status.
+func (s *State) CountByStatus(status Status) int {
+	n := 0
+	for _, rec := range s.Runs {
+		if rec.Status == status {
+			n++
+		}
+	}
+	return n
 }
 
 // NextRequeueID returns a fresh, stable id for a requeue of baseID

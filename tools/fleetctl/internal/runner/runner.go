@@ -6,7 +6,10 @@
 // history, or GitHub.
 package runner
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // LaunchSpec is everything needed to start one container run via
 // container/run.sh (docs/CONTAINER_AGENT.md sec 2).
@@ -22,6 +25,12 @@ type LaunchSpec struct {
 	Agent            string   // AGENT env
 	Model            string   // GENERATOR_MODEL env
 	Effort           string   // GENERATOR_EFFORT env; "" = unset
+	// SrcOverlay, when set, is forwarded as env SRC_OVERLAY=<dir> -- it
+	// overlays the current sources into the container at start (container/
+	// run.sh + entrypoint.sh), so a launch can pick up post-merge sources
+	// without rebuilding the gs-decomp-agent image (docs/FLEET_CONTROLLER.md
+	// sec 6, "stale-image awareness").
+	SrcOverlay string
 }
 
 // InspectResult is the outcome of a `docker inspect` poll.
@@ -54,6 +63,15 @@ type PRSpec struct {
 	Base     string // --base, the integration branch
 	Title    string
 	Body     string
+}
+
+// PRChecksResult is the aggregate outcome of `gh pr checks <n>` (see
+// GhPRChecks): every reported check's state rolled up into one of
+// "SUCCESS" (every check succeeded), "FAILURE" (at least one check failed,
+// errored, or was cancelled/timed out), or "PENDING" (still running, or no
+// checks reported yet).
+type PRChecksResult struct {
+	State string
 }
 
 // FileRank is one row of `tools/pragma_targets.py rank-files --json`.
@@ -97,13 +115,39 @@ type Runner interface {
 	GitCheckout(ctx context.Context, repoRoot, ref string) error
 	// GitPush runs `git -C repoRoot push -u origin branch`.
 	GitPush(ctx context.Context, repoRoot, branch string) error
+	// GitPullFF runs `git -C repoRoot pull --ff-only` against whatever
+	// branch is currently checked out -- the second half of "fast-forward
+	// the merge repo's local base branch" after a self-merge (the first
+	// half is GitCheckout to the base branch itself).
+	GitPullFF(ctx context.Context, repoRoot string) error
+	// GitRevParse runs `git -C repoRoot rev-parse ref` and returns the
+	// resolved sha, e.g. to record the commit a just-merged PR landed as
+	// after fast-forwarding onto it.
+	GitRevParse(ctx context.Context, repoRoot, ref string) (string, error)
 	// GhPRCreate runs `gh pr create --base ... --title ... --body ...` and
 	// returns the printed PR URL.
 	GhPRCreate(ctx context.Context, spec PRSpec) (url string, err error)
+	// GhPRChecks runs `gh pr checks <prNumber> --json name,state` and rolls
+	// every reported check up into one PRChecksResult.
+	GhPRChecks(ctx context.Context, repoRoot string, prNumber int) (PRChecksResult, error)
+	// GhPRMerge runs `gh pr merge <prNumber> --merge --delete-branch`.
+	GhPRMerge(ctx context.Context, repoRoot string, prNumber int) error
+	// GhIssueComment runs `gh issue comment <issueNumber> --body ...` --
+	// the --alert-issue notifier's one effect.
+	GhIssueComment(ctx context.Context, repoRoot string, issueNumber int, body string) error
 
 	// RankFiles runs `python3 tools/pragma_targets.py rank-files --json ...`.
 	RankFiles(ctx context.Context, repoRoot string, maxInstructions int, excludeRecentHours float64, limit int) ([]FileRank, error)
 	// Targets runs `python3 tools/pragma_targets.py targets --source ...`
 	// and returns every matched owner (it pages past --limit itself).
 	Targets(ctx context.Context, repoRoot string, source string) ([]TargetOwner, error)
+
+	// DockerImageID runs `docker image inspect <image> --format
+	// '{{.Id}}|{{.Created}}'` -- a read-only query, never gated by DryRun
+	// (see docs/FLEET_CONTROLLER.md sec 6, "stale-image awareness").
+	DockerImageID(ctx context.Context, image string) (id string, created time.Time, err error)
+
+	// OsascriptNotify runs `osascript -e 'display notification ...'` --
+	// the --alert-macos notifier's one effect.
+	OsascriptNotify(ctx context.Context, title, body string) error
 }

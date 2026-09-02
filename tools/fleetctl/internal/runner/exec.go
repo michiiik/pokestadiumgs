@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // ExecRunner is the real Runner: it shells out to docker, git, gh, and the
@@ -128,6 +129,9 @@ func (r *ExecRunner) LaunchContainer(ctx context.Context, spec LaunchSpec) (stri
 	if spec.Effort != "" {
 		env = append(env, "GENERATOR_EFFORT="+spec.Effort)
 	}
+	if spec.SrcOverlay != "" {
+		env = append(env, "SRC_OVERLAY="+spec.SrcOverlay)
+	}
 
 	if r.DryRun {
 		r.log("[dry-run] (cwd=%s) %s %s", r.RepoRoot, strings.Join(env, " "), quoteArgs(argv))
@@ -224,6 +228,25 @@ func (r *ExecRunner) GitPush(ctx context.Context, repoRoot, branch string) error
 	return gitErr(result, err, "git push -u origin "+branch, r.DryRun)
 }
 
+func (r *ExecRunner) GitPullFF(ctx context.Context, repoRoot string) error {
+	result, err := r.runOrDryRun(ctx, r.RepoRoot, nil, "git", "-C", repoRoot, "pull", "--ff-only")
+	return gitErr(result, err, "git pull --ff-only", r.DryRun)
+}
+
+// GitRevParse is a read-only query (never gated by DryRun, matching
+// RankFiles/Targets/DockerImageID) used to record the commit sha a
+// just-merged PR landed as, after fast-forwarding onto it.
+func (r *ExecRunner) GitRevParse(ctx context.Context, repoRoot, ref string) (string, error) {
+	result, err := run(ctx, r.RepoRoot, nil, "git", "-C", repoRoot, "rev-parse", ref)
+	if err != nil {
+		return "", fmt.Errorf("git rev-parse %s: %w", ref, err)
+	}
+	if result.ExitCode != 0 {
+		return "", fmt.Errorf("git rev-parse %s: exit %d: %s", ref, result.ExitCode, strings.TrimSpace(result.Stderr))
+	}
+	return strings.TrimSpace(result.Stdout), nil
+}
+
 func gitErr(result ProcessResult, err error, what string, dryRun bool) error {
 	if err != nil {
 		return fmt.Errorf("%s: %w", what, err)
@@ -250,17 +273,150 @@ func (r *ExecRunner) GhPRCreate(ctx context.Context, spec PRSpec) (string, error
 	return strings.TrimSpace(result.Stdout), nil
 }
 
+// checkState classifies one entry of `gh pr checks --json name,state`'s
+// output. gh's own "state" values include SUCCESS, FAILURE, ERROR,
+// PENDING, QUEUED, IN_PROGRESS, CANCELLED, SKIPPED, NEUTRAL, STALE,
+// ACTION_REQUIRED, TIMED_OUT -- treated here as three buckets: SUCCESS
+// (SUCCESS, SKIPPED, NEUTRAL all count as "did not block"), FAILURE
+// (FAILURE, ERROR, CANCELLED, TIMED_OUT, ACTION_REQUIRED, STALE all count
+// as "the gate did not pass"), everything else PENDING.
+func checkState(raw string) string {
+	switch strings.ToUpper(raw) {
+	case "SUCCESS", "SKIPPED", "NEUTRAL":
+		return "SUCCESS"
+	case "FAILURE", "ERROR", "CANCELLED", "TIMED_OUT", "ACTION_REQUIRED", "STALE":
+		return "FAILURE"
+	default:
+		return "PENDING"
+	}
+}
+
+// GhPRChecks is a read-only query (never gated by DryRun): it rolls every
+// reported check up into one PRChecksResult -- SUCCESS only when every
+// check reported SUCCESS, FAILURE if any one check failed, PENDING
+// otherwise (including "no checks reported yet").
+func (r *ExecRunner) GhPRChecks(ctx context.Context, repoRoot string, prNumber int) (PRChecksResult, error) {
+	// gh pr checks exits non-zero when a check has failed or is still
+	// pending, so --json output is parsed regardless of exit code.
+	result, err := run(ctx, repoRoot, nil, "gh", "pr", "checks", strconv.Itoa(prNumber), "--json", "name,state")
+	if err != nil {
+		return PRChecksResult{}, fmt.Errorf("gh pr checks %d: %w", prNumber, err)
+	}
+	var rows []struct {
+		Name  string `json:"name"`
+		State string `json:"state"`
+	}
+	if err := json.Unmarshal([]byte(result.Stdout), &rows); err != nil {
+		return PRChecksResult{}, fmt.Errorf("gh pr checks %d: parse output: %w", prNumber, err)
+	}
+	if len(rows) == 0 {
+		return PRChecksResult{State: "PENDING"}, nil
+	}
+	agg := "SUCCESS"
+	for _, row := range rows {
+		switch checkState(row.State) {
+		case "FAILURE":
+			return PRChecksResult{State: "FAILURE"}, nil
+		case "PENDING":
+			agg = "PENDING"
+		}
+	}
+	return PRChecksResult{State: agg}, nil
+}
+
+func (r *ExecRunner) GhPRMerge(ctx context.Context, repoRoot string, prNumber int) error {
+	argv := []string{"gh", "pr", "merge", strconv.Itoa(prNumber), "--merge", "--delete-branch"}
+	result, err := r.runOrDryRun(ctx, repoRoot, nil, argv...)
+	if err != nil {
+		return fmt.Errorf("gh pr merge %d: %w", prNumber, err)
+	}
+	if !r.DryRun && result.ExitCode != 0 {
+		return fmt.Errorf("gh pr merge %d: exit %d: %s", prNumber, result.ExitCode, strings.TrimSpace(result.Stderr))
+	}
+	return nil
+}
+
+func (r *ExecRunner) GhIssueComment(ctx context.Context, repoRoot string, issueNumber int, body string) error {
+	argv := []string{"gh", "issue", "comment", strconv.Itoa(issueNumber), "--body", body}
+	result, err := r.runOrDryRun(ctx, repoRoot, nil, argv...)
+	if err != nil {
+		return fmt.Errorf("gh issue comment %d: %w", issueNumber, err)
+	}
+	if !r.DryRun && result.ExitCode != 0 {
+		return fmt.Errorf("gh issue comment %d: exit %d: %s", issueNumber, result.ExitCode, strings.TrimSpace(result.Stderr))
+	}
+	return nil
+}
+
+// DockerImageID is a read-only query (never gated by DryRun, same
+// reasoning as RankFiles/Targets: it touches neither a container, git
+// history, nor GitHub) used for stale-image awareness
+// (docs/FLEET_CONTROLLER.md sec 6).
+func (r *ExecRunner) DockerImageID(ctx context.Context, image string) (string, time.Time, error) {
+	result, err := run(ctx, r.RepoRoot, nil,
+		"docker", "image", "inspect", image, "--format", "{{.Id}}|{{.Created}}")
+	if err != nil {
+		return "", time.Time{}, fmt.Errorf("docker image inspect %s: %w", image, err)
+	}
+	if result.ExitCode != 0 {
+		return "", time.Time{}, fmt.Errorf("docker image inspect %s: exit %d: %s", image, result.ExitCode, strings.TrimSpace(result.Stderr))
+	}
+	parts := strings.SplitN(strings.TrimSpace(result.Stdout), "|", 2)
+	if len(parts) != 2 {
+		return "", time.Time{}, fmt.Errorf("docker image inspect %s: unexpected output %q", image, result.Stdout)
+	}
+	created, err := time.Parse(time.RFC3339Nano, parts[1])
+	if err != nil {
+		return "", time.Time{}, fmt.Errorf("docker image inspect %s: parse created time %q: %w", image, parts[1], err)
+	}
+	return parts[0], created, nil
+}
+
+// OsascriptNotify runs `osascript -e 'display notification ...'` -- the
+// --alert-macos notifier's one effect, gated by DryRun like every other
+// real-world side effect this package can produce.
+func (r *ExecRunner) OsascriptNotify(ctx context.Context, title, body string) error {
+	script := fmt.Sprintf("display notification %s with title %s", osascriptQuote(body), osascriptQuote(title))
+	result, err := r.runOrDryRun(ctx, r.RepoRoot, nil, "osascript", "-e", script)
+	if err != nil {
+		return fmt.Errorf("osascript notify: %w", err)
+	}
+	if !r.DryRun && result.ExitCode != 0 {
+		return fmt.Errorf("osascript notify: exit %d: %s", result.ExitCode, strings.TrimSpace(result.Stderr))
+	}
+	return nil
+}
+
+// osascriptQuote wraps s in AppleScript double quotes, escaping backslashes
+// and embedded quotes -- osascript's -e argument is itself AppleScript
+// source, not a shell string.
+func osascriptQuote(s string) string {
+	s = strings.ReplaceAll(s, `\`, `\\`)
+	s = strings.ReplaceAll(s, `"`, `\"`)
+	return `"` + s + `"`
+}
+
 func (r *ExecRunner) RankFiles(ctx context.Context, repoRoot string, maxInstructions int, excludeRecentHours float64, limit int) ([]FileRank, error) {
 	argv := []string{r.pythonBin(), "tools/pragma_targets.py", "rank-files", "--json"}
 	if maxInstructions > 0 {
 		argv = append(argv, "--max-instructions", strconv.Itoa(maxInstructions))
 	}
-	if excludeRecentHours > 0 {
+	// Negative means "omit the flag entirely" (rank-files' own --exclude-
+	// recent default of None, no filtering at all); 0 or positive is passed
+	// through explicitly -- 0 still applies rank-files' unconditional
+	// dirty-working-tree exclusion, just with no commit-recency window,
+	// which control.Loop.Replan (docs/FLEET_CONTROLLER.md sec 2) relies on.
+	if excludeRecentHours >= 0 {
 		argv = append(argv, "--exclude-recent", strconv.FormatFloat(excludeRecentHours, 'g', -1, 64))
 	}
 	if limit > 0 {
 		argv = append(argv, "--limit", strconv.Itoa(limit))
 	}
+	// rank-files is read-only (never gated by DryRun -- see the type
+	// doc), but its command is still logged so a `run --dry-run --replan`
+	// pass shows exactly what it queried, matching every other command
+	// this package logs.
+	r.log("(cwd=%s) %s", repoRoot, quoteArgs(argv))
 	result, err := run(ctx, repoRoot, nil, argv...)
 	if err != nil {
 		return nil, fmt.Errorf("rank-files: %w", err)
@@ -281,8 +437,9 @@ func (r *ExecRunner) Targets(ctx context.Context, repoRoot string, source string
 	// A high --limit so every owner in the file comes back in one call --
 	// list_targets is already sorted smallest-instructions-first and this
 	// is a per-file query, never the whole tree.
-	result, err := run(ctx, repoRoot, nil,
-		r.pythonBin(), "tools/pragma_targets.py", "targets", "--source", source, "--limit", "100000")
+	argv := []string{r.pythonBin(), "tools/pragma_targets.py", "targets", "--source", source, "--limit", "100000"}
+	r.log("(cwd=%s) %s", repoRoot, quoteArgs(argv))
+	result, err := run(ctx, repoRoot, nil, argv...)
 	if err != nil {
 		return nil, fmt.Errorf("targets --source %s: %w", source, err)
 	}

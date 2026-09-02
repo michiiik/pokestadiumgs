@@ -15,9 +15,9 @@ import (
 // docs/CONTAINER_AGENT.md sec 3's AGENT/GENERATOR_MODEL/GENERATOR_EFFORT
 // triple. Effort is empty when the spec has only two fields.
 type Spec struct {
-	Agent  string
-	Model  string
-	Effort string
+	Agent  string `json:"agent"`
+	Model  string `json:"model"`
+	Effort string `json:"effort,omitempty"`
 }
 
 // Parse reads "agent:model" or "agent:model:effort". The model field may
