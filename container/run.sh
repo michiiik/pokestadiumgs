@@ -170,6 +170,6 @@ docker run \
     -e CLAUDE_VIA_API_KEY \
     -e ANTHROPIC_AUTH_TOKEN \
     -v "$out_dir:/out" \
-    "${extra_args[@]}" \
+    ${extra_args[@]+"${extra_args[@]}"} \
     gs-decomp-agent:latest \
     "$@"
