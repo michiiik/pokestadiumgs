@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
@@ -9,12 +10,14 @@ import (
 	"strings"
 	"time"
 
+	"fleetctl/internal/control"
 	"fleetctl/internal/fleetstate"
 )
 
 func runStatusCmd(args []string) error {
 	fs := flag.NewFlagSet("status", flag.ContinueOnError)
 	stateDir := fs.String("state-dir", "", "directory holding state.json (required)")
+	asJSON := fs.Bool("json", false, "print control.StatusJSON instead of the table (for scripting, and what alerts embed for machines)")
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
@@ -25,11 +28,20 @@ func runStatusCmd(args []string) error {
 	if err != nil {
 		return err
 	}
+	if *asJSON {
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		return enc.Encode(control.BuildStatus(state))
+	}
 	printStatusTable(os.Stdout, state)
 	return nil
 }
 
 func printStatusTable(w *os.File, state *fleetstate.State) {
+	if state.MergeBlocked {
+		fmt.Fprintf(w, "MERGE BLOCKED: %s\n\n", state.MergeBlockedReason)
+	}
+
 	ids := make([]string, 0, len(state.Runs))
 	for id := range state.Runs {
 		ids = append(ids, id)
@@ -55,6 +67,9 @@ func printStatusTable(w *os.File, state *fleetstate.State) {
 		}
 		if len(rec.NeedsManualCommit) > 0 {
 			note = appendNote(note, "needs_manual_commit: "+strings.Join(sortedKeys(rec.NeedsManualCommit), ","))
+		}
+		if rec.PRURL != "" {
+			note = appendNote(note, rec.PRURL)
 		}
 		fmt.Fprintf(w, "%-28s %-10s %-30s %-20s %-8d %-8d %-8d %s\n",
 			id, rec.Status, file, agent, len(rec.Spec.Owners), len(rec.MatchedOwners), rec.Spec.Attempt, note)

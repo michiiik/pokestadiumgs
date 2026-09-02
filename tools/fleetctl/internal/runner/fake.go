@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"time"
 )
 
 // Call records one method invocation against a Fake, for assertions in
@@ -52,9 +53,29 @@ type Fake struct {
 	GitCheckoutNewBranchErr error
 	GitCheckoutErr          error
 	GitPushErr              error
+	GitPullFFErr            error
+	GitRevParseResult       string
+	GitRevParseErr          error
 
 	GhPRURL string
 	GhPRErr error
+
+	// GhPRChecksFunc, when set, overrides GhPRChecksResult/GhPRChecksErr for
+	// full control keyed by PR number (e.g. a test driving one PR through
+	// PENDING -> SUCCESS across polls).
+	GhPRChecksFunc   func(prNumber int) (PRChecksResult, error)
+	GhPRChecksResult PRChecksResult
+	GhPRChecksErr    error
+
+	GhPRMergeErr error
+
+	GhIssueCommentErr error
+
+	DockerImageIDResult  string
+	DockerImageIDCreated time.Time
+	DockerImageIDErr     error
+
+	OsascriptErr error
 
 	RankFilesResult []FileRank
 	RankFilesErr    error
@@ -141,9 +162,47 @@ func (f *Fake) GitPush(_ context.Context, repoRoot, branch string) error {
 	return f.GitPushErr
 }
 
+func (f *Fake) GitPullFF(_ context.Context, repoRoot string) error {
+	f.record(Call{Method: "GitPullFF", Strings: []string{repoRoot}})
+	return f.GitPullFFErr
+}
+
+func (f *Fake) GitRevParse(_ context.Context, repoRoot, ref string) (string, error) {
+	f.record(Call{Method: "GitRevParse", Strings: []string{repoRoot, ref}})
+	return f.GitRevParseResult, f.GitRevParseErr
+}
+
 func (f *Fake) GhPRCreate(_ context.Context, spec PRSpec) (string, error) {
 	f.record(Call{Method: "GhPRCreate", PR: spec})
 	return f.GhPRURL, f.GhPRErr
+}
+
+func (f *Fake) GhPRChecks(_ context.Context, repoRoot string, prNumber int) (PRChecksResult, error) {
+	f.record(Call{Method: "GhPRChecks", Strings: []string{repoRoot, fmt.Sprintf("%d", prNumber)}})
+	if f.GhPRChecksFunc != nil {
+		return f.GhPRChecksFunc(prNumber)
+	}
+	return f.GhPRChecksResult, f.GhPRChecksErr
+}
+
+func (f *Fake) GhPRMerge(_ context.Context, repoRoot string, prNumber int) error {
+	f.record(Call{Method: "GhPRMerge", Strings: []string{repoRoot, fmt.Sprintf("%d", prNumber)}})
+	return f.GhPRMergeErr
+}
+
+func (f *Fake) GhIssueComment(_ context.Context, repoRoot string, issueNumber int, body string) error {
+	f.record(Call{Method: "GhIssueComment", Strings: []string{repoRoot, fmt.Sprintf("%d", issueNumber), body}})
+	return f.GhIssueCommentErr
+}
+
+func (f *Fake) DockerImageID(_ context.Context, image string) (string, time.Time, error) {
+	f.record(Call{Method: "DockerImageID", Strings: []string{image}})
+	return f.DockerImageIDResult, f.DockerImageIDCreated, f.DockerImageIDErr
+}
+
+func (f *Fake) OsascriptNotify(_ context.Context, title, body string) error {
+	f.record(Call{Method: "OsascriptNotify", Strings: []string{title, body}})
+	return f.OsascriptErr
 }
 
 func (f *Fake) RankFiles(_ context.Context, repoRoot string, maxInstructions int, excludeRecentHours float64, limit int) ([]FileRank, error) {

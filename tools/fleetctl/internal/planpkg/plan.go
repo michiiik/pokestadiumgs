@@ -36,20 +36,62 @@ type Options struct {
 	AgentConcurrency map[string]int
 	BudgetSeconds    int
 
-	// Forwarded to `rank-files` when Files is used.
+	// Forwarded to `rank-files` when Files is used. ExcludeRecentHours < 0
+	// omits --exclude-recent entirely (no filtering at all); >= 0 (0
+	// included) passes it through explicitly -- see ExecRunner.RankFiles.
 	MaxInstructions    int
 	ExcludeRecentHours float64
 }
 
 // Plan is the JSON document `fleetctl plan` writes and `fleetctl run` reads.
+// Besides the queue it built, it also records the Options it was built
+// with (Files/FileList/Agents/MaxInstructions/ExcludeRecentHours/
+// BudgetSeconds), so a Plan loaded back out of state.json's persisted copy
+// (fleetstate.State.PlanJSON) can be fed straight into ToOptions and Build
+// again for control.Loop.Replan (docs/FLEET_CONTROLLER.md sec 2).
 type Plan struct {
-	GeneratedAt      time.Time            `json:"generated_at"`
-	Repo             string               `json:"repo"`
-	Slots            int                  `json:"slots"`
-	OwnersPerRun     int                  `json:"owners_per_run"`
-	Cooldowns        map[string]string    `json:"cooldowns,omitempty"`
-	AgentConcurrency map[string]int       `json:"agent_concurrency,omitempty"`
-	Queue            []fleetstate.RunSpec `json:"queue"`
+	GeneratedAt  time.Time `json:"generated_at"`
+	Repo         string    `json:"repo"`
+	Slots        int       `json:"slots"`
+	OwnersPerRun int       `json:"owners_per_run"`
+	// Files/FileList mirror Options: Files > 0 means the plan ranked its
+	// own top-N files (a Replan reranks fresh); FileList means an explicit
+	// --file list was used (a Replan reuses that exact list).
+	Files              int                  `json:"files,omitempty"`
+	FileList           []string             `json:"file_list,omitempty"`
+	Agents             []agentspec.Spec     `json:"agents,omitempty"`
+	MaxInstructions    int                  `json:"max_instructions,omitempty"`
+	ExcludeRecentHours float64              `json:"exclude_recent_hours,omitempty"`
+	BudgetSeconds      int                  `json:"budget_seconds,omitempty"`
+	Cooldowns          map[string]string    `json:"cooldowns,omitempty"`
+	AgentConcurrency   map[string]int       `json:"agent_concurrency,omitempty"`
+	Queue              []fleetstate.RunSpec `json:"queue"`
+}
+
+// ToOptions reconstructs the Options a Plan was Build-ed with, so it can be
+// fed into Build again (control.Loop.Replan's use case).
+func (p *Plan) ToOptions() (Options, error) {
+	cooldowns := make(map[string]time.Duration, len(p.Cooldowns))
+	for agent, s := range p.Cooldowns {
+		d, err := time.ParseDuration(s)
+		if err != nil {
+			return Options{}, fmt.Errorf("planpkg: cooldown %s=%q: %w", agent, s, err)
+		}
+		cooldowns[agent] = d
+	}
+	return Options{
+		Repo:               p.Repo,
+		Files:              p.Files,
+		FileList:           append([]string(nil), p.FileList...),
+		Slots:              p.Slots,
+		OwnersPerRun:       p.OwnersPerRun,
+		Agents:             append([]agentspec.Spec(nil), p.Agents...),
+		Cooldowns:          cooldowns,
+		AgentConcurrency:   p.AgentConcurrency,
+		BudgetSeconds:      p.BudgetSeconds,
+		MaxInstructions:    p.MaxInstructions,
+		ExcludeRecentHours: p.ExcludeRecentHours,
+	}, nil
 }
 
 // fileSlug turns "disasm/src/fragments/79/fragment79_3BF4C0.c" into
@@ -133,13 +175,19 @@ func Build(ctx context.Context, r runner.Runner, opts Options) (*Plan, error) {
 	}
 
 	return &Plan{
-		GeneratedAt:      time.Now().UTC(),
-		Repo:             opts.Repo,
-		Slots:            opts.Slots,
-		OwnersPerRun:     ownersPerRun,
-		Cooldowns:        cooldowns,
-		AgentConcurrency: opts.AgentConcurrency,
-		Queue:            queue,
+		GeneratedAt:        time.Now().UTC(),
+		Repo:               opts.Repo,
+		Slots:              opts.Slots,
+		OwnersPerRun:       ownersPerRun,
+		Files:              opts.Files,
+		FileList:           opts.FileList,
+		Agents:             opts.Agents,
+		MaxInstructions:    opts.MaxInstructions,
+		ExcludeRecentHours: opts.ExcludeRecentHours,
+		BudgetSeconds:      opts.BudgetSeconds,
+		Cooldowns:          cooldowns,
+		AgentConcurrency:   opts.AgentConcurrency,
+		Queue:              queue,
 	}, nil
 }
 

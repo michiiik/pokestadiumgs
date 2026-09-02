@@ -375,8 +375,13 @@ func TestMergeSequencingAndPRConstruction(t *testing.T) {
 	if len(rec.MatchedOwners) != 1 || rec.MatchedOwners[0] != "func_1" {
 		t.Fatalf("matched = %v, want [func_1]", rec.MatchedOwners)
 	}
-	if rec.Status != fleetstate.StatusDone {
-		t.Fatalf("status = %s", rec.Status)
+	// --auto-merge defaults to true (DisableAutoMerge's zero value), so a
+	// PR opened this run is not "done" yet -- pollPRs takes it from here.
+	if rec.Status != fleetstate.StatusPROpen {
+		t.Fatalf("status = %s, want pr_open", rec.Status)
+	}
+	if rec.PRNumber != 1 {
+		t.Fatalf("pr number = %d, want 1 (parsed from %s)", rec.PRNumber, fake.GhPRURL)
 	}
 
 	branchCall := findCall(fake, "GitCheckoutNewBranch")

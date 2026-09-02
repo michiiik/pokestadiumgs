@@ -6,6 +6,22 @@
 #   SOURCE                repo-relative path to the file to work on, e.g.
 #                          disasm/src/foo.c
 #
+# Optional (stale-image fix, issue #39 follow-up):
+#   SRC_OVERLAY            set by container/run.sh from `SRC_OVERLAY=<host
+#                          checkout dir>` to the in-container mountpoint
+#                          (/src, read-only). When set, this entrypoint
+#                          overlays that checkout's disasm/src,
+#                          disasm/include, and disasm/linker_scripts onto
+#                          /work/disasm (container/overlay_src.sh) and runs
+#                          one incremental `make -C disasm rom` before the
+#                          driver starts, so a container launched from an
+#                          image built before some GLOBAL_ASM owners landed
+#                          on master doesn't still discover and treat them
+#                          as owners. See container/overlay_src.sh's own
+#                          header and the "ROM gate note" below for why
+#                          `make rom` (no COMPARE) is what runs here, not
+#                          `make COMPARE=1`.
+#
 # Candidate generator (see container/generators/README.md):
 #   AGENT                 which coding agent generates candidates (default:
 #                          claude). Selects container/generators/$AGENT.sh.
@@ -87,6 +103,31 @@ if [ -z "${SOURCE:-}" ]; then
     echo "entrypoint: SOURCE is required -- pass a repo-relative decomp source path (e.g. disasm/src/foo.c)" >&2
     echo "entrypoint: usually set via container/run.sh <disasm/src/file.c> <out-dir> [driver args...]" >&2
     exit 1
+fi
+
+# --- SRC_OVERLAY: overlay a live checkout's sources over the baked image ---
+# container/run.sh sets SRC_OVERLAY=<host checkout dir> and mounts it
+# read-only at /src when the caller wants this run to see sources newer
+# than what the image baked at build time -- see the header comment above.
+# Read container/overlay_src.sh out of /src itself (never a possibly-stale
+# baked copy at /work/container/overlay_src.sh) so this stays correct even
+# for an image built before overlay_src.sh existed at all -- that script's
+# own header explains why.
+if [ -n "${SRC_OVERLAY:-}" ]; then
+    if [ ! -d /src ]; then
+        echo "entrypoint: SRC_OVERLAY is set but /src is not mounted -- container/run.sh should mount it read-only" >&2
+        exit 1
+    fi
+    echo "entrypoint: SRC_OVERLAY set -- overlaying /src onto /work/disasm and rebuilding" >&2
+    overlay_start=$(date +%s)
+    bash /src/container/overlay_src.sh /src
+    # Incremental, no explicit COMPARE (see the "ROM gate note" above) --
+    # brings the baked build tree in sync with the overlaid sources before
+    # the driver starts, without tripping lib/ultralib's COMPARE=1
+    # force-propagation.
+    make -C /work/disasm rom
+    overlay_elapsed=$(( $(date +%s) - overlay_start ))
+    echo "entrypoint: SRC_OVERLAY overlay + make -C disasm rom done in ${overlay_elapsed}s" >&2
 fi
 
 # --- detect whether the caller already handles candidate generation --------

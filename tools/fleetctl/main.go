@@ -46,8 +46,15 @@ func usage() {
 Usage:
   fleetctl plan --repo R (--files N | --file F...) --slots K --agent SPEC... [flags]
   fleetctl run --plan P --state-dir S --runs-dir D --repo R [flags]
-  fleetctl status --state-dir S
+  fleetctl status --state-dir S [--json]
   fleetctl stop --state-dir S (--run ID | --all)
+
+--plan is required only the first time --state-dir has no plan persisted in
+state.json yet; a restart reuses it (see docs sec 3). "run" also
+self-merges a run's PR once its checks go green (--auto-merge, default
+true), can re-plan against --merge-repo after every merge or at startup
+(--replan), and can alert on gate_failed/ff_failed/vanished/exhausted/stall
+events (--alert-issue N, --alert-macos).
 
 Run "fleetctl <command> -h" for command-specific flags. See
 docs/FLEET_CONTROLLER.md for the full reference.`)

@@ -14,7 +14,9 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -54,6 +56,36 @@ type Loop struct {
 	CooldownDefaults map[string]time.Duration
 	DefaultCooldown  time.Duration
 	PollInterval     time.Duration
+
+	// DisableAutoMerge turns off self-merge-on-green (sec 2): a PR is left
+	// at StatusDone once opened, same as before self-merge existed, and
+	// pollPRs is never called. The zero value (false) matches --auto-merge's
+	// own default of true.
+	DisableAutoMerge bool
+
+	// SrcOverlay, when set, is forwarded to every launch as env
+	// SRC_OVERLAY=<dir> (sec 6) and also suppresses the stale-image check
+	// (a launch built from an overlay never runs stale baked-in sources).
+	SrcOverlay string
+	// ImageRef is the image DockerImageID queries for stale-image awareness
+	// (sec 6); "" defaults to "gs-decomp-agent:latest".
+	ImageRef string
+
+	// StallAfter is how long a running run's best similarity may sit
+	// unimproved before a no_progress_stall alert fires; <=0 defaults to
+	// 3h.
+	StallAfter time.Duration
+
+	// Notifiers receive every rate-limited alert event (sec 4): gate_failed,
+	// ff_failed, container_vanished, agent_exhausted, no_progress_stall,
+	// controller_error.
+	Notifiers []Notifier
+	// DailySummaryNotifier, if set, additionally receives one daily summary
+	// post at DailySummaryHourUTC (only --alert-issue posts a daily
+	// summary, per sec 4 -- --alert-macos does not).
+	DailySummaryNotifier Notifier
+	// DailySummaryHourUTC is the UTC hour (0-23) maybeDailySummary fires on.
+	DailySummaryHourUTC int
 
 	// Now is an injectable clock (tests only); nil uses time.Now.
 	Now func() time.Time
@@ -100,6 +132,24 @@ func (l *Loop) pollInterval() time.Duration {
 	return 30 * time.Second
 }
 
+func (l *Loop) autoMergeEnabled() bool {
+	return !l.DisableAutoMerge
+}
+
+func (l *Loop) stallAfter() time.Duration {
+	if l.StallAfter > 0 {
+		return l.StallAfter
+	}
+	return 3 * time.Hour
+}
+
+func (l *Loop) imageRef() string {
+	if l.ImageRef != "" {
+		return l.ImageRef
+	}
+	return "gs-decomp-agent:latest"
+}
+
 func (l *Loop) cooldownFor(agent string) time.Duration {
 	if d, ok := l.CooldownDefaults[agent]; ok {
 		return d
@@ -143,7 +193,28 @@ func (l *Loop) LoadPlan(p *planpkg.Plan) error {
 		l.State.Runs[spec.ID] = &fleetstate.RunRecord{Spec: spec, Status: fleetstate.StatusQueued}
 		l.State.Queue = append(l.State.Queue, spec.ID)
 	}
+	// Persist the plan itself (not just its queue) so a restarted `run`
+	// needs --plan only for this very first load (docs/FLEET_CONTROLLER.md
+	// sec 3) and so Replan knows what ranking options to rebuild with (sec
+	// 2). Marshal failure is not fatal to loading the plan's queue.
+	if data, err := json.Marshal(p); err == nil {
+		l.State.PlanJSON = data
+	}
 	return nil
+}
+
+// PersistedPlan unmarshals State.PlanJSON, the plan LoadPlan (or a prior
+// Replan) most recently persisted -- nil, false if none has ever been
+// loaded into this state.
+func (l *Loop) PersistedPlan() (*planpkg.Plan, bool) {
+	if len(l.State.PlanJSON) == 0 {
+		return nil, false
+	}
+	var p planpkg.Plan
+	if err := json.Unmarshal(l.State.PlanJSON, &p); err != nil {
+		return nil, false
+	}
+	return &p, true
 }
 
 // RunOnce performs exactly one control-loop pass: poll every running
@@ -154,11 +225,18 @@ func (l *Loop) RunOnce(ctx context.Context) (bool, error) {
 	if err := l.pollRunning(ctx); err != nil {
 		return false, err
 	}
+	if l.autoMergeEnabled() {
+		if err := l.pollPRs(ctx); err != nil {
+			return false, err
+		}
+	}
+	l.maybeDailySummary(ctx)
 	if err := l.launchEligible(ctx); err != nil {
 		return false, err
 	}
 	total, _ := l.State.RunningCount()
-	return total > 0 || len(l.State.Queue) > 0, nil
+	prOpen := l.State.CountByStatus(fleetstate.StatusPROpen)
+	return total > 0 || len(l.State.Queue) > 0 || prOpen > 0, nil
 }
 
 // Run drives RunOnce to completion: repeatedly, persisting state after
@@ -167,6 +245,9 @@ func (l *Loop) RunOnce(ctx context.Context) (bool, error) {
 func (l *Loop) Run(ctx context.Context, once bool) error {
 	for {
 		stillWork, err := l.RunOnce(ctx)
+		if err != nil {
+			l.alert(ctx, "controller_error", "", "fleetctl: control loop error", err.Error())
+		}
 		if saveErr := l.State.SaveAtomic(l.StatePath); saveErr != nil && err == nil {
 			err = saveErr
 		}
@@ -197,6 +278,7 @@ func (l *Loop) pollRunning(ctx context.Context) error {
 			continue
 		}
 		if res.Found && res.Running {
+			l.checkStall(ctx, rec)
 			continue
 		}
 		if err := l.handleExit(ctx, rec); err != nil {
@@ -204,6 +286,44 @@ func (l *Loop) pollRunning(ctx context.Context) error {
 		}
 	}
 	return nil
+}
+
+// checkStall reads <rec.OutDir>/state.json (container_agent.py's own
+// per-owner progress record, saved every iteration -- see
+// docs/CONTAINER_AGENT.md) and tracks the best similarity seen across every
+// owner this run has attempted. When that best has not improved for
+// stallAfter(), it raises a rate-limited no_progress_stall alert (sec 4).
+// A missing or unparsable state.json (e.g. the very first poll, before any
+// iteration has saved one yet) is silently skipped, not an error.
+func (l *Loop) checkStall(ctx context.Context, rec *fleetstate.RunRecord) {
+	data, err := os.ReadFile(filepath.Join(rec.OutDir, "state.json"))
+	if err != nil {
+		return
+	}
+	var owners map[string]struct {
+		BestSimilarity float64 `json:"best_similarity"`
+	}
+	if err := json.Unmarshal(data, &owners); err != nil {
+		return
+	}
+	var best float64
+	for _, o := range owners {
+		if o.BestSimilarity > best {
+			best = o.BestSimilarity
+		}
+	}
+	now := l.now()
+	if rec.BestSimilarityAt.IsZero() || best > rec.BestSimilarity {
+		rec.BestSimilarity = best
+		rec.BestSimilarityAt = now
+		return
+	}
+	if now.Sub(rec.BestSimilarityAt) >= l.stallAfter() {
+		l.alert(ctx, "no_progress_stall", rec.Spec.ID,
+			fmt.Sprintf("run %s: no progress for %s", rec.Spec.ID, now.Sub(rec.BestSimilarityAt).Round(time.Minute)),
+			fmt.Sprintf("Run %s (file %s, agent %s:%s) best similarity has stayed at %.4f since %s.",
+				rec.Spec.ID, rec.Spec.File, rec.Spec.Agent, rec.Spec.Model, rec.BestSimilarity, rec.BestSimilarityAt.Format(time.RFC3339)))
+	}
 }
 
 type summaryDoc struct {
@@ -237,6 +357,10 @@ func (l *Loop) handleExit(ctx context.Context, rec *fleetstate.RunRecord) error 
 		rec.StoppedReason = ""
 		rec.Note = "vanished without summary.json"
 		l.requeueResume(rec)
+		l.alert(ctx, "container_vanished", rec.Spec.ID,
+			fmt.Sprintf("run %s: container vanished", rec.Spec.ID),
+			fmt.Sprintf("Run %s (file %s, agent %s:%s) had no readable summary.json; requeued with --resume (attempt %d).",
+				rec.Spec.ID, rec.Spec.File, rec.Spec.Agent, rec.Spec.Model, rec.Spec.Attempt))
 		return nil
 	}
 	rec.StoppedReason = summary.StoppedReason
@@ -249,6 +373,10 @@ func (l *Loop) handleExit(ctx context.Context, rec *fleetstate.RunRecord) error 
 		rec.Status = fleetstate.StatusRequeued
 		rec.Note = "generator_exhausted"
 		l.requeueResume(rec)
+		l.alert(ctx, "agent_exhausted", rec.Spec.Agent,
+			fmt.Sprintf("agent %s exhausted (cooldown)", rec.Spec.Agent),
+			fmt.Sprintf("Agent %s hit generator_exhausted on run %s; cooling down until %s.",
+				rec.Spec.Agent, rec.Spec.ID, until.Format(time.RFC3339)))
 		return nil
 	}
 
@@ -417,6 +545,26 @@ func effortSuffix(effort string) string {
 	return ":" + effort
 }
 
+var prURLNumberRe = regexp.MustCompile(`/pull/(\d+)\D*$`)
+
+// prNumberFromURL extracts the trailing /pull/<n> from a `gh pr create`
+// URL, e.g. "https://github.com/o/r/pull/123" -> 123. 0 (with GhPRCreate
+// never erroring) means either a --dry-run (GhPRCreate.Fake returns "" or a
+// stub), or an unrecognised URL shape -- either way pollPRs never picks the
+// run up (it skips PRNumber == 0), matching the pre-self-merge behavior for
+// a run whose PR it could not identify.
+func prNumberFromURL(url string) int {
+	m := prURLNumberRe.FindStringSubmatch(url)
+	if m == nil {
+		return 0
+	}
+	n, err := strconv.Atoi(m[1])
+	if err != nil {
+		return 0
+	}
+	return n
+}
+
 // runMerge is the sequential merge/branch/PR step. The control loop never
 // runs two of these concurrently -- RunOnce/pollRunning call it in a plain
 // for loop with no goroutines, which is itself the mutex the task asks for
@@ -453,6 +601,7 @@ func (l *Loop) runMerge(ctx context.Context, rec *fleetstate.RunRecord) error {
 			rec.Spec.ID, len(needsCommit), rec.OutDir)
 	}
 
+	rec.Status = fleetstate.StatusDone
 	if len(accepted) > 0 {
 		if err := l.Runner.GitPush(ctx, mergeRepo, branch); err != nil {
 			l.logf("run %s: git push %s failed: %v", rec.Spec.ID, branch, err)
@@ -465,7 +614,16 @@ func (l *Loop) runMerge(ctx context.Context, rec *fleetstate.RunRecord) error {
 				l.logf("run %s: gh pr create failed: %v", rec.Spec.ID, err)
 			} else {
 				rec.PRURL = url
+				rec.PRNumber = prNumberFromURL(url)
 				l.logf("run %s: opened PR %s for %d matched owner(s)", rec.Spec.ID, url, len(accepted))
+				// With --auto-merge (the default), the PR is not "done" yet
+				// -- pollPRs takes it from here (sec 2). Without it, this
+				// matches the pre-self-merge behavior: the PR is left open
+				// for a human, and this run is done as far as fleetctl is
+				// concerned.
+				if l.autoMergeEnabled() && rec.PRNumber != 0 {
+					rec.Status = fleetstate.StatusPROpen
+				}
 			}
 		}
 	} else {
@@ -475,8 +633,6 @@ func (l *Loop) runMerge(ctx context.Context, rec *fleetstate.RunRecord) error {
 	if err := l.Runner.GitCheckout(ctx, mergeRepo, l.IntegrationBranch); err != nil {
 		l.logf("run %s: checkout back to %s failed: %v", rec.Spec.ID, l.IntegrationBranch, err)
 	}
-
-	rec.Status = fleetstate.StatusDone
 
 	// An owner needing a manual commit already has its candidate installed
 	// in the merge repo's working tree -- requeueing it would re-probe a
@@ -501,6 +657,354 @@ func (l *Loop) runMerge(ctx context.Context, rec *fleetstate.RunRecord) error {
 		l.logf("run %s: %d unmatched owner(s) requeued as %s with fresh seeds", rec.Spec.ID, len(unmatched), newID)
 	}
 	return nil
+}
+
+// pollPRs is the self-merge poll (docs/FLEET_CONTROLLER.md sec 2): for
+// every run currently StatusPROpen, check its PR's CI checks and, once they
+// all report SUCCESS, merge it -- FAILURE instead moves it to
+// StatusGateFailed (left open, alerted, never auto-retried). Runs are
+// visited in id order for deterministic test assertions and logs.
+//
+// If a prior pass's post-merge fast-forward failed, State.MergeBlocked
+// gates every further `gh pr merge` until a fast-forward retry (tried once
+// at the top of this pass) succeeds -- "stop merging until fixed" (sec 1).
+func (l *Loop) pollPRs(ctx context.Context) error {
+	if l.State.MergeBlocked {
+		if err := l.fastForwardBase(ctx); err != nil {
+			l.alert(ctx, "ff_failed", "",
+				fmt.Sprintf("fleetctl: fast-forward of %s is still failing", l.IntegrationBranch),
+				fmt.Sprintf("Self-merge is paused until this is fixed by hand in %s: %v", l.mergeRepo(), err))
+			return nil
+		}
+		l.logf("merge repo %s: fast-forward of %s recovered; resuming self-merge", l.mergeRepo(), l.IntegrationBranch)
+		l.State.MergeBlocked = false
+		l.State.MergeBlockedReason = ""
+	}
+
+	ids := make([]string, 0, len(l.State.Runs))
+	for id, rec := range l.State.Runs {
+		if rec.Status == fleetstate.StatusPROpen {
+			ids = append(ids, id)
+		}
+	}
+	sort.Strings(ids)
+
+	for _, id := range ids {
+		rec := l.State.Runs[id]
+		if rec.PRNumber == 0 {
+			continue
+		}
+		result, err := l.Runner.GhPRChecks(ctx, l.mergeRepo(), rec.PRNumber)
+		if err != nil {
+			l.logf("run %s: gh pr checks %d failed: %v", id, rec.PRNumber, err)
+			continue
+		}
+		switch result.State {
+		case "SUCCESS":
+			if err := l.Runner.GhPRMerge(ctx, l.mergeRepo(), rec.PRNumber); err != nil {
+				l.logf("run %s: gh pr merge %d failed: %v", id, rec.PRNumber, err)
+				continue
+			}
+			rec.Status = fleetstate.StatusMerged
+			rec.MergedAt = l.now()
+			l.logf("run %s: PR #%d merged", id, rec.PRNumber)
+			if err := l.fastForwardBase(ctx); err != nil {
+				l.State.MergeBlocked = true
+				l.State.MergeBlockedReason = err.Error()
+				l.alert(ctx, "ff_failed", "",
+					fmt.Sprintf("fleetctl: fast-forward of %s failed after merging PR #%d", l.IntegrationBranch, rec.PRNumber),
+					fmt.Sprintf("%v\nSelf-merge is paused until %s is fixed by hand in %s -- fleetctl retries the fast-forward at the top of every poll pass.",
+						err, l.IntegrationBranch, l.mergeRepo()))
+				// "stop merging until fixed" -- do not evaluate any other
+				// StatusPROpen run this pass.
+				return nil
+			}
+			l.State.LastMergeAt = l.now()
+			if sha, err := l.Runner.GitRevParse(ctx, l.mergeRepo(), "HEAD"); err == nil {
+				rec.MergeCommitSHA = sha
+			} else {
+				l.logf("run %s: git rev-parse HEAD failed: %v", id, err)
+			}
+			if err := l.Replan(ctx); err != nil {
+				l.logf("run %s: replan after merge failed: %v", id, err)
+			}
+		case "FAILURE":
+			rec.Status = fleetstate.StatusGateFailed
+			l.logf("run %s: PR #%d gate failed; left open for manual triage", id, rec.PRNumber)
+			l.alert(ctx, "gate_failed", id,
+				fmt.Sprintf("Container gate failed: run %s", id),
+				fmt.Sprintf("PR %s (run %s) failed its checks and was left open. See `fleetctl status`.", rec.PRURL, id))
+		default:
+			// PENDING (or an unrecognised state) -- recheck next pass.
+		}
+	}
+	return nil
+}
+
+// fastForwardBase is "fast-forward the merge repo's local base branch"
+// (sec 1): checkout IntegrationBranch, then a plain `git pull --ff-only`.
+func (l *Loop) fastForwardBase(ctx context.Context) error {
+	mergeRepo := l.mergeRepo()
+	if err := l.Runner.GitCheckout(ctx, mergeRepo, l.IntegrationBranch); err != nil {
+		return fmt.Errorf("checkout %s: %w", l.IntegrationBranch, err)
+	}
+	if err := l.Runner.GitPullFF(ctx, mergeRepo); err != nil {
+		return fmt.Errorf("pull --ff-only: %w", err)
+	}
+	return nil
+}
+
+// Replan re-runs the ranking against the merge repo and rebuilds the queue
+// of pending partitions (sec 2): after every merge, and at startup with
+// --replan. It is a no-op when no plan has ever been persisted into State
+// (PersistedPlan returns false) -- nothing to rebuild from.
+func (l *Loop) Replan(ctx context.Context) error {
+	plan, ok := l.PersistedPlan()
+	if !ok {
+		return nil
+	}
+	opts, err := plan.ToOptions()
+	if err != nil {
+		return fmt.Errorf("replan: %w", err)
+	}
+	// "against the merge repo" (sec 2) -- current post-merge ranking/targets,
+	// not the (possibly different) launch --repo.
+	opts.Repo = l.mergeRepo()
+	// "rank-files --exclude-recent 0" (sec 2) -- a fresh replan always
+	// considers every file, including one just touched by our own merge.
+	opts.ExcludeRecentHours = 0
+
+	fresh, err := planpkg.Build(ctx, l.Runner, opts)
+	if err != nil {
+		return fmt.Errorf("replan: rank/targets: %w", err)
+	}
+	l.reconcileQueue(fresh)
+	if data, err := json.Marshal(fresh); err == nil {
+		l.State.PlanJSON = data
+	}
+	l.logf("replan: %d fresh partition(s) considered, queue now has %d entr(y/ies)", len(fresh.Queue), len(l.State.Queue))
+	return nil
+}
+
+// keepAcrossReplan reports whether a still-queued run must survive a
+// Replan untouched: either it has already been launched at least once
+// (StartedAt set -- a --resume retry of in-progress work, sec 2 "keep
+// running runs untouched" extended to its queued-for-relaunch state), or it
+// carries SeedDirs (a post-merge reseed of a partition's unmatched owners,
+// sec 2 "keep per-file seeding" -- dropping it would discard the seed
+// continuity runMerge just built for it, even though it has Attempt==0 and
+// has never itself been launched).
+func keepAcrossReplan(rec *fleetstate.RunRecord) bool {
+	return !rec.StartedAt.IsZero() || len(rec.Spec.SeedDirs) > 0
+}
+
+// reconcileQueue rebuilds State.Queue from fresh's candidate partitions:
+// every not-yet-launched, not-seeded queue entry is dropped and replaced
+// wholesale ("runs already queued but not launched are replaced by the
+// fresh plan", sec 2); every run this pass keeps (queued survivors, plus
+// every run already running/merging/pr_open) reserves its own owners, and a
+// fresh candidate partition has those owners subtracted out so a live
+// attempt is never duplicated by a fresh one for the same file+owner.
+func (l *Loop) reconcileQueue(fresh *planpkg.Plan) {
+	inFlight := map[string]map[string]bool{}
+	reserve := func(file string, owners []string) {
+		m := inFlight[file]
+		if m == nil {
+			m = map[string]bool{}
+			inFlight[file] = m
+		}
+		for _, o := range owners {
+			m[o] = true
+		}
+	}
+
+	kept := make([]string, 0, len(l.State.Queue))
+	for _, id := range l.State.Queue {
+		rec := l.State.Runs[id]
+		if rec == nil {
+			continue
+		}
+		if keepAcrossReplan(rec) {
+			kept = append(kept, id)
+			reserve(rec.Spec.File, rec.Spec.Owners)
+		} else {
+			delete(l.State.Runs, id)
+		}
+	}
+	for _, rec := range l.State.Runs {
+		switch rec.Status {
+		case fleetstate.StatusRunning, fleetstate.StatusMerging, fleetstate.StatusPROpen:
+			reserve(rec.Spec.File, rec.Spec.Owners)
+		}
+	}
+
+	for _, spec := range fresh.Queue {
+		var owners []string
+		for _, o := range spec.Owners {
+			if !inFlight[spec.File][o] {
+				owners = append(owners, o)
+			}
+		}
+		if len(owners) == 0 {
+			continue
+		}
+		if _, exists := l.State.Runs[spec.ID]; exists {
+			// An id collision with a run reconcileQueue just kept (or one
+			// still running/merging/pr_open under the same id, e.g. the
+			// fresh partition numbering restarting at p0 for a file whose
+			// p0 is still active) -- never overwrite it. The remaining
+			// (genuinely unclaimed) owners still deserve a queue entry, so
+			// give them the next free requeue suffix rather than dropping
+			// them silently.
+			spec.ID = l.State.NextRequeueID(spec.ID)
+		}
+		spec.Owners = owners
+		l.State.Runs[spec.ID] = &fleetstate.RunRecord{Spec: spec, Status: fleetstate.StatusQueued}
+		kept = append(kept, spec.ID)
+	}
+	l.State.Queue = kept
+}
+
+// Notifier is fleetctl's alerting seam (sec 4): every configured Notifier
+// receives every rate-limited alert event's title/body. IssueNotifier and
+// MacOSNotifier are ExecRunner-backed implementations behind
+// --alert-issue/--alert-macos; tests substitute their own.
+type Notifier interface {
+	Notify(ctx context.Context, title, body string) error
+}
+
+// IssueNotifier posts `gh issue comment <Issue> --body ...` (--alert-issue
+// N) -- rate-limited by Loop.alert like every other Notifier, plus it is
+// the only kind Loop.maybeDailySummary posts to.
+type IssueNotifier struct {
+	Runner runner.Runner
+	Repo   string // the merge repo -- gh's cwd, so it infers the right remote
+	Issue  int
+}
+
+func (n *IssueNotifier) Notify(ctx context.Context, title, body string) error {
+	return n.Runner.GhIssueComment(ctx, n.Repo, n.Issue, title+"\n\n"+body)
+}
+
+// MacOSNotifier runs `osascript -e 'display notification ...'`
+// (--alert-macos).
+type MacOSNotifier struct {
+	Runner runner.Runner
+}
+
+func (n *MacOSNotifier) Notify(ctx context.Context, title, body string) error {
+	return n.Runner.OsascriptNotify(ctx, title, body)
+}
+
+// alert fires every configured Notifier for one event occurrence,
+// rate-limited (sec 4) to at most once per hour per "event" (key == "") or
+// per "event:key" (e.g. one gate_failed per run id, one agent_exhausted per
+// agent, but a single shared bucket for ff_failed/controller_error, which
+// have no natural per-occurrence key).
+func (l *Loop) alert(ctx context.Context, event, key, title, body string) {
+	rateKey := event
+	if key != "" {
+		rateKey = event + ":" + key
+	}
+	now := l.now()
+	if l.State.AlertSent == nil {
+		l.State.AlertSent = map[string]time.Time{}
+	}
+	if last, ok := l.State.AlertSent[rateKey]; ok && now.Sub(last) < time.Hour {
+		return
+	}
+	l.State.AlertSent[rateKey] = now
+	for _, n := range l.Notifiers {
+		if err := n.Notify(ctx, title, body); err != nil {
+			l.logf("alert %s: notifier error: %v", event, err)
+		}
+	}
+}
+
+// maybeDailySummary posts one runs-launched/finished/merged/pr_open/
+// cooldown/stall summary (plus a `fleetctl status --json` machine section)
+// to DailySummaryNotifier, at most once per UTC calendar day, at
+// DailySummaryHourUTC.
+func (l *Loop) maybeDailySummary(ctx context.Context) {
+	if l.DailySummaryNotifier == nil {
+		return
+	}
+	now := l.now()
+	if now.UTC().Hour() != l.DailySummaryHourUTC {
+		return
+	}
+	if !l.State.LastDailySummary.IsZero() && sameUTCDate(l.State.LastDailySummary, now) {
+		return
+	}
+	if err := l.DailySummaryNotifier.Notify(ctx, "fleetctl daily summary", l.buildDailySummaryBody()); err != nil {
+		l.logf("daily summary: %v", err)
+		return
+	}
+	l.State.LastDailySummary = now
+}
+
+func sameUTCDate(a, b time.Time) bool {
+	ay, am, ad := a.UTC().Date()
+	by, bm, bd := b.UTC().Date()
+	return ay == by && am == bm && ad == bd
+}
+
+// buildDailySummaryBody is "runs launched/finished, matches merged with
+// commit shas, PRs open, agents on cooldown, stalls" (sec 4) plus an
+// embedded `fleetctl status --json` block ("Include fleetctl status --json
+// for machines", sec 4).
+func (l *Loop) buildDailySummaryBody() string {
+	now := l.now()
+	var launched, finished, merged, prOpen, gateFailed, stalled int
+	var mergedLines []string
+	for _, rec := range l.State.Runs {
+		if !rec.StartedAt.IsZero() {
+			launched++
+		}
+		switch rec.Status {
+		case fleetstate.StatusDone, fleetstate.StatusMerged, fleetstate.StatusGateFailed:
+			finished++
+		}
+		switch rec.Status {
+		case fleetstate.StatusMerged:
+			merged++
+			mergedLines = append(mergedLines, fmt.Sprintf("- %s: %s (%s)",
+				rec.Spec.ID, strings.Join(rec.MatchedOwners, ", "), rec.MergeCommitSHA))
+		case fleetstate.StatusPROpen:
+			prOpen++
+		case fleetstate.StatusGateFailed:
+			gateFailed++
+		case fleetstate.StatusRunning:
+			if !rec.BestSimilarityAt.IsZero() && now.Sub(rec.BestSimilarityAt) >= l.stallAfter() {
+				stalled++
+			}
+		}
+	}
+	sort.Strings(mergedLines)
+
+	var cooldownAgents []string
+	for agent, until := range l.State.Cooldowns {
+		if until.After(now) {
+			cooldownAgents = append(cooldownAgents, agent)
+		}
+	}
+	sort.Strings(cooldownAgents)
+
+	var b strings.Builder
+	fmt.Fprintf(&b, "runs launched=%d finished=%d merged=%d pr_open=%d gate_failed=%d stalled=%d cooldown_agents=%s\n",
+		launched, finished, merged, prOpen, gateFailed, stalled, strings.Join(cooldownAgents, ","))
+	if len(mergedLines) > 0 {
+		b.WriteString("\nMerged:\n")
+		for _, line := range mergedLines {
+			b.WriteString(line + "\n")
+		}
+	}
+	if data, err := json.MarshalIndent(BuildStatus(l.State), "", "  "); err == nil {
+		b.WriteString("\n`fleetctl status --json`:\n```json\n")
+		b.Write(data)
+		b.WriteString("\n```\n")
+	}
+	return b.String()
 }
 
 // launchEligible walks the queue in order, launching every entry whose
@@ -555,6 +1059,22 @@ func (l *Loop) launch(ctx context.Context, rec *fleetstate.RunRecord) error {
 	if err != nil {
 		return err
 	}
+
+	// Stale-image awareness (docs/FLEET_CONTROLLER.md sec 6): skipped
+	// entirely under --src-overlay -- an overlay makes the image's own
+	// baked-in sources irrelevant, so there is nothing to warn about.
+	if l.SrcOverlay == "" {
+		if id, created, err := l.Runner.DockerImageID(ctx, l.imageRef()); err != nil {
+			l.logf("run %s: docker image inspect %s failed: %v", rec.Spec.ID, l.imageRef(), err)
+		} else {
+			rec.ImageID = id
+			if !l.State.LastMergeAt.IsZero() && created.Before(l.State.LastMergeAt) {
+				l.logf("run %s: WARNING: %s was built %s, before the last merge (%s) -- rebuild it or pass --src-overlay",
+					rec.Spec.ID, l.imageRef(), created.Format(time.RFC3339), l.State.LastMergeAt.Format(time.RFC3339))
+			}
+		}
+	}
+
 	spec := runner.LaunchSpec{
 		SourceFile:    rec.Spec.File,
 		OutDir:        outDir,
@@ -565,6 +1085,7 @@ func (l *Loop) launch(ctx context.Context, rec *fleetstate.RunRecord) error {
 		Agent:         rec.Spec.Agent,
 		Model:         rec.Spec.Model,
 		Effort:        rec.Spec.Effort,
+		SrcOverlay:    l.SrcOverlay,
 	}
 	id, err := l.Runner.LaunchContainer(ctx, spec)
 	if err != nil {

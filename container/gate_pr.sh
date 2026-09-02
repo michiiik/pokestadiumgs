@@ -100,24 +100,17 @@ trap cleanup EXIT
 start_ts=$(date +%s)
 
 # In-container steps:
-#  1. Fully replace /work/disasm/src and /work/disasm/include with the
-#     checkout's copies (rm+cp, not an in-place overwrite) so a file the PR
-#     deletes doesn't silently keep linking the image's old .o for it.
-#  2. Overlay (never delete-sync) the checkout's disasm/linker_scripts onto
-#     the image's -- a plain checkout never contains the gitignored
-#     linker_scripts/<version>/auto/ splat output, so there is nothing to
-#     accidentally delete there even without --delete; this only ever adds
-#     or updates the handful of tracked .ld/.txt files.
-#  3. Run the exact gate command container_agent.py's own driver uses,
+#  1. Overlay the checkout's disasm/src, disasm/include, and
+#     disasm/linker_scripts onto /work/disasm (container/overlay_src.sh --
+#     run out of the mounted checkout itself, /src/container/overlay_src.sh,
+#     never a copy baked into the image; see that script's own header for
+#     why, and container/entrypoint.sh's SRC_OVERLAY handling for the other
+#     caller of the same script).
+#  2. Run the exact gate command container_agent.py's own driver uses,
 #     `make -C disasm COMPARE=1 -j2`.
-# No rsync in this image (checked: only cp/md5sum/make/git/python3 are
-# guaranteed) -- plain cp -a covers both cases.
 in_container_script='
 set -euo pipefail
-rm -rf /work/disasm/src /work/disasm/include
-cp -a /src/disasm/src /work/disasm/src
-cp -a /src/disasm/include /work/disasm/include
-cp -a /src/disasm/linker_scripts/. /work/disasm/linker_scripts/
+bash /src/container/overlay_src.sh /src
 cd /work
 make -C disasm COMPARE=1 -j2
 '

@@ -400,7 +400,15 @@ void func_860037D8(u8 *arg0, u8 *arg1, s32 *arg2, f64 *arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_246640/func_86003A0C.s")
+extern u8 D_8600D5DC[];
+extern void func_87C01E98(void *, f32, f32);
+extern void func_87C01E30(void *, void *, s32);
+void func_86003A0C(u8 *arg0) {
+    *(s32 *)(arg0 + 0x1868) = 0;
+    *(s32 *)(arg0 + 0x186C) = 0;
+    func_87C01E30((u8 *)arg0 + 0x17A0, (u8 *)D_8600D5DC + (MathUtil_Random_ZeroOne() > 0.5f) * 0xA, 0);
+    func_87C01E98((u8 *)arg0 + 0x17A0, MathUtil_Random_ZeroOne(), MathUtil_Random_ZeroOne());
+}
 #endif
 
 #ifdef VERSION_US

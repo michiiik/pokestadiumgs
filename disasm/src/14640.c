@@ -4,7 +4,28 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80013A40.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80013A8C.s")
+extern u8 D_800D13B8[];
+extern u8 D_8011E0F0[];
+extern u8 D_8011E208[];
+extern void func_80015584(void *, s32, s32, s32, s32, s32, void *, s32, void *);
+extern u8 D_8011BE90[];
+void func_80013A8C(void) {
+    static const char buffer_name[8] = {66, 85, 70, 70, 69, 82, 0, 0};
+    static const char error_message[36] = {84, 89, 80, 69, 32, 37, 100, 58, 73, 68, 32, 37, 100, 32, 105, 115, 32, 110, 111, 116, 32, 69, 120, 116, 101, 114, 110, 97, 108, 32, 77, 97, 112, 46, 10, 0};
+    s32 *row;
+    s32 *output;
+    u32 i;
+    i = 0;
+    if (*(s32 *)(D_8011BE90 + 0x2C34) != 0) {
+        do {
+            row = (s32 *)D_800D13B8 + i * 4;
+            output = (s32 *)D_8011E208 + i * 6;
+            func_80015584(output, 0, 0, row[0], row[1], row[2], D_8011E0F0, row[3], buffer_name);
+            i += 1;
+        } while (i < *(s32 *)(D_8011BE90 + 0x2C34));
+    }
+    *(s32 *)(D_8011BE90 + 0x2C34) = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80013B54.s")
 

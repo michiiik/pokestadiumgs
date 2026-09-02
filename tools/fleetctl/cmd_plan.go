@@ -27,7 +27,7 @@ func runPlanCmd(args []string) error {
 	fs.Var(&agentConcurrency, "agent-concurrency", "agent=N per-agent concurrency cap (repeatable)")
 	budgetSeconds := fs.Int("budget-seconds", 3600, "--budget-seconds passed to every launched run")
 	maxInstructions := fs.Int("max-instructions", 0, "forwarded to rank-files --max-instructions (0 = tool default)")
-	excludeRecent := fs.Float64("exclude-recent", 0, "forwarded to rank-files --exclude-recent HOURS (0 = omit)")
+	excludeRecent := fs.Float64("exclude-recent", -1, "forwarded to rank-files --exclude-recent HOURS (negative = omit the flag entirely; 0 still applies rank-files' own dirty-working-tree exclusion, just with no commit-recency window)")
 	out := fs.String("out", "plan.json", "where to write the plan JSON")
 	pythonBin := fs.String("python", "", "override the python3 binary (default: python3 on PATH)")
 	if err := fs.Parse(args); err != nil {
