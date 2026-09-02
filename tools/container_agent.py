@@ -280,6 +280,21 @@ def _tried_body_key(body: str | None, declarations: str | None) -> str:
     return f"{body_hash}:{decl_hash}"
 
 
+def _owner_candidate_count(batch: dict | None, owner: str) -> int:
+    """Count ``batch["candidates"]`` entries whose "function" is ``owner``.
+
+    Used to decide whether a generator that timed out (or otherwise looked
+    like it failed) still left something worth probing: a batch file with
+    zero candidates for this owner is treated the same as no batch at all.
+    """
+    if not isinstance(batch, dict):
+        return 0
+    candidates = batch.get("candidates")
+    if not isinstance(candidates, list):
+        return 0
+    return sum(1 for c in candidates if isinstance(c, dict) and c.get("function") == owner)
+
+
 def filter_batch(batch: dict, owner_state: dict) -> tuple[dict, list[dict]]:
     """Drop candidates whose ``(body, declarations)`` key was already probed
     this run (``owner_state["tried_bodies"]``), plus exact duplicates within
@@ -921,6 +936,10 @@ PROBE_TOOL_RULE_ON = """\
   be, not a bare statement block. The working directory is the repo root, so
   "{source_rel}" and any relative paths you pass resolve from there. Do NOT
   run make, fleet_probe.py, the permuter, or write into disasm/src yourself.
+- Time budget: about {budget_minutes} minutes. Write a first batch file to
+  {batch_path} within the first few minutes (even 8 rough candidates), then
+  keep improving and OVERWRITE it whenever you have a better set. If you run
+  out of time, whatever is in the file is what gets probed.
 """
 
 PROBE_TOOL_RULE_OFF = """\
@@ -932,6 +951,10 @@ PROBE_TOOL_RULE_OFF = """\
 
 BATCH_CONTRACT = """\
 Write a JSON batch file to the path given below (create or overwrite it).
+Time budget: about {budget_minutes} minutes. Write a first batch file to
+{batch_path} within the first few minutes (even 8 rough candidates), then
+keep improving and OVERWRITE it whenever you have a better set. If you run
+out of time, whatever is in the file is what gets probed.
 Schema:
 
 {{
@@ -1075,10 +1098,12 @@ def build_prompt(
     m2c_draft: str | None = None,
     probe_tool: bool = True,
     type_conflicts: list[dict] | None = None,
+    generator_timeout_minutes: int = round(DEFAULT_GENERATOR_TIMEOUT / 60),
 ) -> str:
     extern_names = _extern_block_symbol_names(file_brief)
+    budget_minutes = max(1, generator_timeout_minutes)
     probe_rule = (PROBE_TOOL_RULE_ON if probe_tool else PROBE_TOOL_RULE_OFF).format(
-        source_rel=source_rel, owner=owner,
+        source_rel=source_rel, owner=owner, batch_path=batch_path, budget_minutes=budget_minutes,
     )
 
     def _assemble(full_diff_count: int) -> str:
@@ -1142,6 +1167,7 @@ def build_prompt(
         parts.append("")
         parts.append(BATCH_CONTRACT.format(
             source_rel=source_rel, owner=owner, batch_path=batch_path, probe_rule=probe_rule,
+            budget_minutes=budget_minutes,
         ))
         return "\n".join(parts)
 
@@ -2305,12 +2331,20 @@ def process_owner(
         batch_path.parent.mkdir(parents=True, exist_ok=True)
         prompt_path.parent.mkdir(parents=True, exist_ok=True)
 
+        # Computed before build_prompt so the prompt's "time budget" line
+        # reflects the timeout that will actually bound this iteration's
+        # invoke_generator call below (the configured --generator-timeout
+        # clamped by whatever's left of the run's overall deadline).
+        remaining_budget = max(1.0, deadline - time.monotonic())
+        gen_timeout = max(10.0, min(generator_timeout, remaining_budget))
+
         prompt_text = build_prompt(
             owner=owner, source_rel=source_rel, file_brief=file_brief, asm_text=asm_text,
             best_candidates=owner_state["best_candidates"],
             permuter_seed=owner_state.get("permuter_seed"), batch_path=batch_path,
             tried_labels=owner_state.get("tried_labels"), m2c_draft=m2c_draft,
             probe_tool=probe_tool, type_conflicts=owner_state.get("type_conflicts"),
+            generator_timeout_minutes=max(1, round(gen_timeout / 60.0)),
         )
         prompt_path.write_text(prompt_text, encoding="utf-8")
 
@@ -2319,8 +2353,6 @@ def process_owner(
             owner_state["status"] = "terminated"
             return "terminated"
 
-        remaining_budget = max(1.0, deadline - time.monotonic())
-        gen_timeout = max(10.0, min(generator_timeout, remaining_budget))
         command = render_generator_command(generator_cmd, prompt_path, batch_path)
         timed_out = False
         timeout_stderr = ""
@@ -2368,7 +2400,16 @@ def process_owner(
             )
 
         batch = load_json(batch_path)
-        gen_ok = (not timed_out) and gen_result is not None and gen_result.returncode == 0 and batch is not None
+        timeout_candidate_count = _owner_candidate_count(batch, owner) if timed_out else 0
+        timeout_with_batch = timed_out and timeout_candidate_count >= 1
+        if timeout_with_batch:
+            logger.log(
+                f"{owner}: iter {iteration}: generator timed out but left a batch with "
+                f"{timeout_candidate_count} candidate(s); probing it"
+            )
+        gen_ok = timeout_with_batch or (
+            (not timed_out) and gen_result is not None and gen_result.returncode == 0 and batch is not None
+        )
         if not gen_ok:
             if batch is None:
                 logger.log(f"{owner}: iter {iteration}: no valid batch JSON at {batch_path}")

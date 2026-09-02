@@ -1345,6 +1345,28 @@ class BuildPromptTests(unittest.TestCase):
         )
         self.assertNotIn("labels already tried this run", prompt)
 
+    def test_time_budget_sentence_reflects_generator_timeout_minutes(self) -> None:
+        prompt = container_agent.build_prompt(
+            owner="func_1", source_rel="disasm/src/X.c", file_brief="brief", asm_text="asm",
+            best_candidates=[], permuter_seed=None, batch_path=Path("/tmp/batch.json"),
+            generator_timeout_minutes=25,
+        )
+        self.assertIn("Time budget: about 25 minutes.", prompt)
+        self.assertIn("Write a first batch file to", prompt)
+        self.assertIn("/tmp/batch.json", prompt)
+        self.assertIn("within the first few minutes", prompt)
+        self.assertIn("whatever is in the file is what gets probed", prompt)
+
+    def test_time_budget_sentence_defaults_to_generator_timeout_default(self) -> None:
+        prompt = container_agent.build_prompt(
+            owner="func_1", source_rel="disasm/src/X.c", file_brief="brief", asm_text="asm",
+            best_candidates=[], permuter_seed=None, batch_path=Path("/tmp/batch.json"),
+        )
+        self.assertIn(
+            f"Time budget: about {round(container_agent.DEFAULT_GENERATOR_TIMEOUT / 60)} minutes.",
+            prompt,
+        )
+
     def _candidate_with_feedback(self, label, **feedback_overrides):
         feedback = {
             "expected_size": 336, "actual_size": 340,
@@ -1891,6 +1913,73 @@ class GeneratorTimeoutAndQuotaClassificationTests(unittest.TestCase):
         self.assertEqual(status, "max_iterations")
         self.assertEqual(gen_failures["consecutive"], 1)
         self.assertNotIn("quota", log_text.lower())
+        # No batch file was ever written by the stub, so this must fall
+        # through to the plain hard-failure path, not the soft-failure
+        # (timed out but left a probeable batch) path.
+        self.assertNotIn("probing it", log_text)
+
+    def test_timeout_with_valid_batch_is_probed_as_soft_failure(self) -> None:
+        """A generator that times out but still left a valid batch file (the
+        fix for the Kimi K3 incident: probe_one.py iterations eating the
+        whole budget without ever reaching the final batch write) must be
+        probed like a normal iteration, and must reset -- not increment --
+        the consecutive-failure counter, since it did produce output."""
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            repo_dir.mkdir()
+            out_dir = Path(tmp) / "out"
+            owner = "func_1"
+            source_rel = "disasm/src/X.c"
+            owner_state = container_agent._new_owner_state()
+            state = {owner: owner_state}
+            state_path = out_dir / "state.json"
+            logger = container_agent.Logger(out_dir / "log.txt")
+            # Start with a nonzero counter to prove a soft failure resets it
+            # rather than merely not incrementing it.
+            gen_failures = {"consecutive": 3}
+
+            def timeout_generator_with_batch(command, *, cwd, timeout):
+                batch_path = _extract_path_arg(command, "--batch")
+                batch_path.parent.mkdir(parents=True, exist_ok=True)
+                container_agent.save_json(batch_path, {
+                    "source": source_rel,
+                    "candidates": [{"function": owner, "label": "a", "body": "void func_1(void) {}"}],
+                })
+                raise subprocess.TimeoutExpired(cmd=command, timeout=timeout, output="", stderr="")
+
+            probe_calls = {"n": 0}
+
+            def probe_stub(repo_dir_arg, batch_path, result_path, *, timeout):
+                probe_calls["n"] += 1
+                container_agent.save_json(result_path, {
+                    "batch_status": "no_candidate_accepted", "accepted": [],
+                    "attempts": [{
+                        "function": owner, "label": "a", "status": "rejected", "similarity_score": 0.1,
+                    }],
+                })
+                return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+            with mock.patch.object(container_agent, "file_brief_text", return_value="brief"), \
+                 mock.patch.object(container_agent, "owner_asm_text", return_value="asm"), \
+                 mock.patch.object(container_agent, "get_m2c_draft", return_value=None), \
+                 mock.patch.object(container_agent, "invoke_generator", side_effect=timeout_generator_with_batch), \
+                 mock.patch.object(container_agent, "invoke_probe", side_effect=probe_stub):
+                status = container_agent.process_owner(
+                    repo_dir=repo_dir, out_dir=out_dir, source_rel=source_rel, owner=owner,
+                    owner_state=owner_state, state=state, state_path=state_path,
+                    deadline=time.monotonic() + 60.0, max_iterations=1, plateau=100,
+                    permuter_seconds=0.0, generator_cmd="generator --prompt {prompt} --batch {batch}",
+                    logger=logger, gen_failures=gen_failures, max_generator_failures=5,
+                )
+            log_text = (out_dir / "log.txt").read_text(encoding="utf-8")
+
+        self.assertEqual(status, "max_iterations")
+        self.assertEqual(probe_calls["n"], 1)
+        self.assertEqual(gen_failures["consecutive"], 0)
+        self.assertEqual(owner_state["iterations"], 1)
+        self.assertIn(
+            "generator timed out but left a batch with 1 candidate(s); probing it", log_text,
+        )
 
     def test_nonzero_exit_with_rate_limit_stderr_counts_two_failures(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
