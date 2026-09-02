@@ -1518,6 +1518,25 @@ def extract_installed_function(source_text: str, function: str) -> str | None:
     return None
 
 
+def _find_batch_candidate_body(batch: dict, function: str, label: str | None) -> str | None:
+    """Look up ``label``'s exact ``body`` among ``batch["candidates"]``.
+
+    Matches on ``label`` (and ``function``, as a sanity check) so the body
+    returned is the VERBATIM text that was actually probed -- a candidate's
+    body may itself contain several helper function definitions (e.g. a
+    ``<owner>_padding`` companion) that a regex re-extraction of the
+    installed source would truncate to just the first one. Returns ``None``
+    when ``label`` is missing or no candidate matches it.
+    """
+    if not label:
+        return None
+    for candidate in batch.get("candidates") or []:
+        if candidate.get("label") == label and candidate.get("function") == function:
+            body = candidate.get("body")
+            return body if isinstance(body, str) and body else None
+    return None
+
+
 def capture_accepted(
     repo_dir: Path,
     out_dir: Path,
@@ -1529,17 +1548,41 @@ def capture_accepted(
     source_rel_fallback: str,
     logger: Logger,
 ) -> None:
+    """Record the accepted candidate under ``<out_dir>/accepted/<function>.json``.
+
+    The body stored is the VERBATIM text from ``batch["candidates"]`` (looked
+    up by the accepted attempt's ``label``) whenever that lookup succeeds --
+    this is the exact text ``fleet_probe.py`` already link-verified, so a
+    later host re-gate (``tools/container_merge.py``) probes the identical
+    candidate rather than a re-derived approximation of it. Only when the
+    label can't be found in the batch (should not normally happen) does this
+    fall back to regex-extracting the installed function from the source
+    file -- which returns only the FIRST function definition, so a candidate
+    body with padding helpers or other companion definitions after the main
+    function would be silently truncated. ``captured_from`` in the written
+    JSON records which path was taken.
+    """
     source_rel = batch.get("source") or source_rel_fallback
-    source_path = repo_dir / source_rel
-    try:
-        source_text = source_path.read_text(encoding="utf-8", errors="replace")
-    except OSError as exc:
-        logger.log(f"{owner}: WARNING could not read {source_rel} after acceptance: {exc}")
-        source_text = ""
-    body = extract_installed_function(source_text, function) if source_text else None
+    label = accepted_attempt.get("label")
+
+    body = _find_batch_candidate_body(batch, function, label)
+    captured_from = "batch"
     if body is None:
-        logger.log(f"{owner}: WARNING could not extract installed body for {function} from {source_rel}")
-        body = ""
+        captured_from = "source"
+        logger.log(
+            f"{owner}: WARNING accepted label {label!r} not found in batch candidates for "
+            f"{function}; falling back to source extraction (may truncate a multi-function body)"
+        )
+        source_path = repo_dir / source_rel
+        try:
+            source_text = source_path.read_text(encoding="utf-8", errors="replace")
+        except OSError as exc:
+            logger.log(f"{owner}: WARNING could not read {source_rel} after acceptance: {exc}")
+            source_text = ""
+        body = extract_installed_function(source_text, function) if source_text else None
+        if body is None:
+            logger.log(f"{owner}: WARNING could not extract installed body for {function} from {source_rel}")
+            body = ""
 
     accepted_batch = {
         "source": source_rel,
@@ -1547,9 +1590,16 @@ def capture_accepted(
         "companion_edits": batch.get("companion_edits") or [],
         "candidates": [{
             "function": function,
-            "label": accepted_attempt.get("label") or "accepted",
+            "label": label or "accepted",
             "body": body,
         }],
+        "label": label or "accepted",
+        "captured_from": captured_from,
+        "probe_result": {
+            "similarity": accepted_attempt.get("similarity_score"),
+            "raw": accepted_attempt.get("raw_similarity_score"),
+            "link_verified": accepted_attempt.get("link_verified"),
+        },
     }
     accepted_dir = out_dir / "accepted"
     save_json(accepted_dir / f"{function}.json", accepted_batch)

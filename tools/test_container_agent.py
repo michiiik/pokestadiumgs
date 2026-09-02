@@ -284,6 +284,107 @@ class ExtractInstalledFunctionTests(unittest.TestCase):
 
 
 # ---------------------------------------------------------------------------
+# capture_accepted
+# ---------------------------------------------------------------------------
+
+class CaptureAcceptedTests(unittest.TestCase):
+    def test_multi_function_body_stored_verbatim_from_batch(self) -> None:
+        # The bug this guards against: extract_installed_function only
+        # returns the FIRST function definition in the installed source, so
+        # a candidate body carrying padding helpers after the main function
+        # (a real accepted shape) would be silently truncated if
+        # capture_accepted re-derived the body from source instead of using
+        # the batch's own text verbatim.
+        multi_body = (
+            "f32 func_860004C8(void *arg0, void *arg1) {\n"
+            "    u8 value[0x18];\n"
+            "    func_87C00160(value, arg1, arg0);\n"
+            "    return (f32)func_87C00D14(*(f64 *)value, *(f64 *)(value + 0x10));\n"
+            "}\n"
+            "void func_860004C8_padding(void) {}\n"
+            "void func_860004C8_padding2(void) {}\n"
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            source_rel = "disasm/src/X.c"
+            source_path = repo_dir / source_rel
+            source_path.parent.mkdir(parents=True)
+            # The installed source only shows the first definition -- a
+            # correct capture must NOT rely on re-extracting from this text.
+            source_path.write_text(multi_body, encoding="utf-8")
+            out_dir = Path(tmp) / "out"
+            owner = "func_860004C8"
+            function = "func_860004C8"
+            batch = {
+                "source": source_rel,
+                "declarations": "",
+                "companion_edits": [],
+                "candidates": [{"function": function, "label": "cast:padding:h", "body": multi_body}],
+            }
+            accepted_attempt = {
+                "label": "cast:padding:h", "status": "accepted",
+                "similarity_score": 1.0, "raw_similarity_score": 0.98, "link_verified": True,
+            }
+            logger = container_agent.Logger(out_dir / "log.txt")
+
+            with _git_diff_stub():
+                container_agent.capture_accepted(
+                    repo_dir, out_dir, owner, function, batch, accepted_attempt,
+                    source_rel_fallback=source_rel, logger=logger,
+                )
+
+            data = json.loads((out_dir / "accepted" / f"{function}.json").read_text(encoding="utf-8"))
+            self.assertEqual(data["candidates"][0]["body"], multi_body)
+            self.assertIn("func_860004C8_padding2", data["candidates"][0]["body"])
+            self.assertEqual(data["captured_from"], "batch")
+            self.assertEqual(data["label"], "cast:padding:h")
+            self.assertEqual(
+                data["probe_result"],
+                {"similarity": 1.0, "raw": 0.98, "link_verified": True},
+            )
+            log_path = out_dir / "log.txt"
+            log_text = log_path.read_text(encoding="utf-8") if log_path.exists() else ""
+            self.assertNotIn("WARNING", log_text)
+
+    def test_falls_back_to_source_extraction_when_label_missing(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            source_rel = "disasm/src/X.c"
+            source_path = repo_dir / source_rel
+            source_path.parent.mkdir(parents=True)
+            source_path.write_text("void func_1(void) {\n    return;\n}\n", encoding="utf-8")
+            out_dir = Path(tmp) / "out"
+            owner = "func_1"
+            function = "func_1"
+            batch = {
+                "source": source_rel,
+                "declarations": "",
+                "companion_edits": [],
+                # No candidate carries the accepted label -- forces fallback.
+                "candidates": [{"function": function, "label": "other:label", "body": "void func_1(void) { return; }"}],
+            }
+            accepted_attempt = {
+                "label": "label:not:in:batch", "status": "accepted",
+                "similarity_score": 1.0, "raw_similarity_score": 1.0, "link_verified": True,
+            }
+            logger = container_agent.Logger(out_dir / "log.txt")
+
+            with _git_diff_stub():
+                container_agent.capture_accepted(
+                    repo_dir, out_dir, owner, function, batch, accepted_attempt,
+                    source_rel_fallback=source_rel, logger=logger,
+                )
+
+            data = json.loads((out_dir / "accepted" / f"{function}.json").read_text(encoding="utf-8"))
+            self.assertEqual(data["candidates"][0]["body"], "void func_1(void) {\n    return;\n}\n")
+            self.assertEqual(data["captured_from"], "source")
+            self.assertEqual(data["label"], "label:not:in:batch")
+            log_text = (out_dir / "log.txt").read_text(encoding="utf-8")
+            self.assertIn("WARNING", log_text)
+            self.assertIn("label:not:in:batch", log_text)
+
+
+# ---------------------------------------------------------------------------
 # run_permuter (invoke_permuter / poll_permuter stubbed directly)
 # ---------------------------------------------------------------------------
 
@@ -490,6 +591,10 @@ class RunIterationTests(unittest.TestCase):
             self.assertEqual(data["declarations"], "extern int g;")
             self.assertEqual(data["companion_edits"], [{"function": "func_2", "old": "a", "new": "b"}])
             self.assertEqual(data["candidates"][0]["function"], owner)
+            self.assertEqual(data["candidates"][0]["body"], "void func_1(void) { return; }")
+            self.assertEqual(data["captured_from"], "batch")
+            self.assertEqual(data["label"], "fam:shape:h")
+            self.assertEqual(data["probe_result"]["similarity"], 1.0)
             self.assertEqual(owner_state["best_similarity"], 1.0)
             self.assertEqual(owner_state["plateau_count"], 0)
 
