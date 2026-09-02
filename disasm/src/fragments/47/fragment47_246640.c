@@ -153,7 +153,22 @@ void func_86001DBC(u8 *arg0) { arg0[0x1639] &= 0xFFFE; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_246640/func_86001F44.s")
+extern f32 __sinf(f32);
+extern f32 __cosf(f32);
+extern f64 D_8600DED8;
+void func_86001F44(u8 *arg0) {
+    struct Temp {
+        u8 pad[8];
+        f64 value;
+    };
+    struct Temp *temp;
+
+    temp = (struct Temp *)(*(u8 **)(arg0 + 0x1870) + 0x6668);
+    *(f64 *)arg0 = (f64)__sinf((f32)*(f64 *)(arg0 + 0x17D8)) *
+        (temp->value + D_8600DED8);
+    *(f64 *)(arg0 + 0x10) = (f64)__cosf((f32)*(f64 *)(arg0 + 0x17D8)) *
+        (temp->value + D_8600DED8);
+}
 #endif
 
 #ifdef VERSION_US
