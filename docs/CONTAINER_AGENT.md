@@ -425,8 +425,10 @@ Everything lands under the mounted `--out` directory:
 |---|---|
 | `merge-results/<owner>.json` | the raw `fleet_probe --gate --json` result for each owner, kept (not deleted) so a failed re-gate can be inspected |
 | `merge-results/<owner>.commit.log` | only when the host re-gate accepted but `git commit --only` then failed: the full combined stdout+stderr of that failed commit (§9's "commit failures" below) |
-| `merge-report.json` | `owner -> status` for the run, plus `cc_check_bypassed` / `fresh_history` flags (§9.2/§9.3); an owner whose commit failed or succeeded maps to an object instead of a bare status string (below); cumulative across runs against the same `<out>` (§9.4) |
+| `merge-report.json` | `owner -> status` for the run, plus `cc_check_bypassed` / `fresh_history` flags (§9.2/§9.3); an owner whose commit failed or succeeded maps to an object instead of a bare status string (below); cumulative across runs against the same `<out>` (§9.4); also carries this run's own (never cumulative) `notes_applied` (§9.5) and `names` (§9.6) |
 | `merge-history.jsonl` | only with `--fresh-history`: this run's own probe-stats history (§9.3) |
+
+`merge` also *reads* `<out>/region-notes/<source with "/" replaced by "__">.md`, if the container driver wrote any, when folding notes into `docs/regions/` (§9.5).
 
 ## 8. Why the container never commits
 
@@ -462,7 +464,8 @@ in a shared checkout would sweep in whatever another session has staged.
 Useful flags: `--repo PATH` (host checkout to re-gate/commit against,
 default `.`); `--dry-run` (re-gate every owner and print the table, but
 never commit, even with `--commit`); `--no-cc-check` (§9.2); `--fresh-history`
-(§9.3); `--owners a,b,c` (limit this run to those owners; §9.4).
+(§9.3); `--owners a,b,c` (limit this run to those owners; §9.4); `--no-notes`
+(§9.5); `--no-naming` (§9.6).
 
 The command prints a table (owner, source, host-re-gate status, whether it
 committed, detail) and exits non-zero if any container-accepted candidate
@@ -654,6 +657,74 @@ fixing whatever made its commit fail) without re-touching everything else
 in a large `--out` directory:
 
     python3 tools/container_merge.py merge /abs/out --commit --owners func_A
+
+### 9.5 Applying container region notes
+
+    python3 tools/container_merge.py merge /abs/out --commit
+    python3 tools/container_merge.py merge /abs/out --commit --no-notes
+
+The container driver can write file-specific knowledge (skip lists, proven
+spellings, unsolved shapes -- see `tools/region_notes.py`'s own module
+docstring) as it works a source file, one file per owner's `source`, to
+`<out>/region-notes/<source with "/" replaced by "__">.md` (e.g.
+`disasm/src/4AC10.c` -> `<out>/region-notes/disasm__src__4AC10.c.md`) in the
+same on-disk shape `region_notes.py append` itself produces (a `# Region
+notes -- ...` header, then dated `## ...` sections). `merge` never trusts
+that copy directly, the same "redo it against this checkout" spirit as the
+re-gate itself: for every such file it finds, it extracts each note line
+(skipping the structural markdown) and replays only the ones not already on
+record, verbatim, in this checkout's own `docs/regions/<source>.md`, via
+
+    python3 tools/region_notes.py append <source> --text "<line>"
+
+so a re-run over the same `<out>`, or two different `<out>` dirs that
+happened to record the same note, never double-writes it.
+
+This runs **regardless of whether any owner was accepted this run** -- a
+run where every candidate was rejected can still carry useful notes for the
+next attempt. With `--commit`, a `source` this run also committed at least
+one owner for gets its notes folded into that owner's own land commit
+(`git commit --only <source> docs/regions/<source>.md`, reusing "Land
+container match for `<owner>`"); a `source` with new notes but no accept
+this run gets its own commit instead, "Record container run notes for
+`<source>`", with `--only` on just the notes file. Without `--commit` (or
+with `--dry-run`), notes are still folded into the working tree, just never
+committed. Disable entirely with `--no-notes`. Every run records this run's
+own `notes_applied` in `merge-report.json` (`source -> newly appended
+lines`, omitting a source with nothing new) -- never cumulative across runs,
+unlike `owners` (§9.4).
+
+### 9.6 Naming a function on accept
+
+    python3 tools/container_merge.py merge /abs/out --commit
+    python3 tools/container_merge.py merge /abs/out --commit --no-naming
+
+`tools/try_pragma_compare.py`'s own `PRAGMA_NAME_ON_ACCEPT` opt-in already
+renames a just-accepted winner in-container, immediately, if
+`tools/name_decompiled.py` already has an evidence-backed name for it and
+no other pragma owner remains (see that tool's own module docstring). This
+does the host-side equivalent, deliberately, right after an owner is
+accepted **and committed** by this `merge` run: it offers the owner's
+function to
+
+    python3 tools/name_decompiled.py plan --only <function> --repo-root <repo>
+
+and, only if that proposes an evidence-backed name, actually lands it with
+
+    python3 tools/name_decompiled.py apply --only <function> --repo-root <repo>
+
+`apply` can still refuse a plan-proposed name (a collision with an existing
+symbol), in which case nothing is renamed. A rename that does land gets its
+own follow-up commit, "Name `<owner>` -> `<name>`", over every
+`disasm/src`/`disasm/include` file `apply` actually touched -- found via
+`git status --porcelain` (filtered to those two trees) rather than asking
+`apply` for a file list, since it reports only counts. Nothing here amends
+an existing commit. A failure at any step (the subprocess itself, or a
+refused/unconfirmed rename) is only logged, never fails the `merge` run --
+naming is a bonus, not a gate. Disable entirely with `--no-naming`. Every
+run records this run's own `names` in `merge-report.json` (`owner -> new
+name`, only for owners actually renamed this run) -- never cumulative
+across runs, unlike `owners` (§9.4).
 
 IDO's compiler passes (`as0`, `as1`, `ugen`) create `ctm*` temp files that
 honour `$TMPDIR` and only get removed on a normal exit. decomp-permuter

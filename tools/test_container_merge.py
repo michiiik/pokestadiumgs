@@ -720,6 +720,20 @@ class BuildGateEnvTests(unittest.TestCase):
 
 
 class MergeTests(unittest.TestCase):
+    def setUp(self) -> None:
+        # Notes/naming (below) are new merge() features, on by default.
+        # Neither has anything to do in any of these existing tests (no
+        # out_dir/region-notes -- apply_region_notes() no-ops on its own --
+        # and no tools/name_decompiled.py under these tests' throwaway
+        # repo_root tempdirs), but naming's own subprocess seam would still
+        # get invoked once per committed row unless stubbed, so keep it
+        # inert here; NotesTests / NamingTests below cover the real seams.
+        patcher = mock.patch.object(
+            container_merge, "name_after_commit", return_value=(None, "")
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
     def _run_merge(self, out_dir: Path, **kwargs) -> tuple[int, str]:
         buffer = io.StringIO()
         with contextlib.redirect_stdout(buffer):
@@ -1287,6 +1301,30 @@ class MergeTests(unittest.TestCase):
             container_merge.main(["merge", "/abs/out"])
         self.assertIsNone(captured["owners"])
 
+    def test_cli_no_notes_and_no_naming_default_false(self) -> None:
+        captured: dict[str, object] = {}
+
+        def fake_merge(out_dir, **kwargs):
+            captured.update(kwargs)
+            return 0
+
+        with mock.patch.object(container_merge, "merge", side_effect=fake_merge):
+            container_merge.main(["merge", "/abs/out"])
+        self.assertFalse(captured["no_notes"])
+        self.assertFalse(captured["no_naming"])
+
+    def test_cli_parses_no_notes_and_no_naming_flags(self) -> None:
+        captured: dict[str, object] = {}
+
+        def fake_merge(out_dir, **kwargs):
+            captured.update(kwargs)
+            return 0
+
+        with mock.patch.object(container_merge, "merge", side_effect=fake_merge):
+            container_merge.main(["merge", "/abs/out", "--no-notes", "--no-naming"])
+        self.assertTrue(captured["no_notes"])
+        self.assertTrue(captured["no_naming"])
+
 
 class ImportStatsTests(unittest.TestCase):
     """tools/container_merge.py import-stats: fold <out>/probe-stats/probe-stats.jsonl
@@ -1508,6 +1546,798 @@ class ImportFreshHistoryAfterAcceptTests(unittest.TestCase):
                 )
         self.assertIsNotNone(status_line)
         self.assertIn("disabled", status_line)
+
+
+class GitCommitOnlyPathsTests(unittest.TestCase):
+    """``git_commit_only_paths``: the multi-path generalisation of
+    ``git_commit_only`` (which is now just its single-path case)."""
+
+    def test_git_commit_only_delegates_to_paths_form(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            with mock.patch.object(
+                container_merge, "git_commit_only_paths", return_value=(True, "ok")
+            ) as paths_mock:
+                ok, output = container_merge.git_commit_only(
+                    "disasm/src/X.c", "msg", repo_root=repo_root
+                )
+            self.assertTrue(ok)
+            self.assertEqual(output, "ok")
+            paths_mock.assert_called_once_with(
+                ["disasm/src/X.c"], "msg", repo_root=repo_root
+            )
+
+    def test_git_commit_only_paths_builds_multi_path_cmd(self) -> None:
+        calls: list[list[str]] = []
+
+        def fake_run(cmd, *, cwd, capture_output, text, env):
+            calls.append(list(cmd))
+            return _FakeGateProc(0, "committed", "")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            with mock.patch.object(container_merge.subprocess, "run", side_effect=fake_run):
+                ok, output = container_merge.git_commit_only_paths(
+                    ["disasm/src/X.c", "docs/regions/X.md"], "msg", repo_root=repo_root
+                )
+        self.assertTrue(ok)
+        self.assertEqual(output, "committed")
+        self.assertEqual(
+            calls[0],
+            ["git", "commit", "--only", "disasm/src/X.c", "docs/regions/X.md", "-m", "msg"],
+        )
+
+
+class RegionNotesHelperTests(unittest.TestCase):
+    """Pure helpers used by ``apply_region_notes``: filename<->source
+    mapping, note-line extraction, and the docs/regions/<source>.md path
+    computation (mirroring tools/region_notes.py's own path_for(), but
+    parameterised on a throwaway repo_root)."""
+
+    def test_source_from_filename_round_trips_slashes(self) -> None:
+        self.assertEqual(
+            container_merge.region_notes_source_from_filename(
+                Path("disasm__src__4AC10.c.md")
+            ),
+            "disasm/src/4AC10.c",
+        )
+
+    def test_source_from_filename_top_level_source(self) -> None:
+        self.assertEqual(
+            container_merge.region_notes_source_from_filename(Path("X.c.md")), "X.c"
+        )
+
+    def test_region_notes_lines_skips_headers_and_blank_lines(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "notes.md"
+            path.write_text(
+                "# Region notes -- disasm/src/X.c\n\n"
+                "Some intro.\n\n"
+                "## 2026-09-02\n\n"
+                "skip permuter on this one; offset math\n\n"
+                "## 2026-09-02\n\n"
+                "second note here\n",
+                encoding="utf-8",
+            )
+            lines = container_merge.region_notes_lines(path)
+        self.assertEqual(
+            lines,
+            ["Some intro.", "skip permuter on this one; offset math", "second note here"],
+        )
+
+    def test_region_notes_lines_missing_file_is_empty(self) -> None:
+        self.assertEqual(
+            container_merge.region_notes_lines(Path("/no/such/notes.md")), []
+        )
+
+    def test_target_path_relative_to_disasm_src(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp).resolve()
+            target = container_merge.region_notes_target_path(repo_root, "disasm/src/4AC10.c")
+        self.assertEqual(target, (repo_root / "docs" / "regions" / "4AC10.c").with_suffix(".md"))
+
+    def test_target_path_falls_back_to_repo_relative(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp).resolve()
+            target = container_merge.region_notes_target_path(repo_root, "other/place/X.c")
+        self.assertEqual(
+            target, (repo_root / "docs" / "regions" / "other" / "place" / "X.c").with_suffix(".md")
+        )
+
+    def test_target_relpath_is_repo_relative_string(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            rel = container_merge.region_notes_target_relpath(repo_root, "disasm/src/4AC10.c")
+        self.assertEqual(rel, "docs/regions/4AC10.md")
+
+    def test_existing_region_notes_text_missing_file_is_empty_string(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            self.assertEqual(
+                container_merge.existing_region_notes_text(repo_root, "disasm/src/X.c"), ""
+            )
+
+    def test_existing_region_notes_text_reads_current_content(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            target = repo_root / "docs" / "regions" / "X.md"
+            target.parent.mkdir(parents=True)
+            target.write_text("existing note\n", encoding="utf-8")
+            self.assertEqual(
+                container_merge.existing_region_notes_text(repo_root, "disasm/src/X.c"),
+                "existing note\n",
+            )
+
+
+class RunRegionNotesAppendTests(unittest.TestCase):
+    """``run_region_notes_append``'s own subprocess call shape."""
+
+    def test_builds_expected_command(self) -> None:
+        calls: list[list[str]] = []
+
+        def fake_run(cmd, *, cwd, capture_output, text, timeout, env):
+            calls.append(list(cmd))
+            return _FakeGateProc(0, "appended to docs/regions/X.md", "")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            with mock.patch.object(container_merge.subprocess, "run", side_effect=fake_run):
+                ok, output = container_merge.run_region_notes_append(
+                    "disasm/src/X.c", "note text", repo_root=repo_root
+                )
+        self.assertTrue(ok)
+        self.assertIn("appended", output)
+        self.assertEqual(
+            calls[0],
+            [
+                sys.executable,
+                str(repo_root / "tools" / "region_notes.py"),
+                "append",
+                "disasm/src/X.c",
+                "--text",
+                "note text",
+            ],
+        )
+
+    def test_nonzero_exit_is_reported_as_failure(self) -> None:
+        def fake_run(cmd, *, cwd, capture_output, text, timeout, env):
+            return _FakeGateProc(1, "", "boom")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            with mock.patch.object(container_merge.subprocess, "run", side_effect=fake_run):
+                ok, output = container_merge.run_region_notes_append(
+                    "disasm/src/X.c", "note text", repo_root=repo_root
+                )
+        self.assertFalse(ok)
+        self.assertIn("boom", output)
+
+
+class ApplyRegionNotesTests(unittest.TestCase):
+    """``apply_region_notes``: dedupe against docs/regions/<source>.md,
+    commit grouping (folded into an owner's land commit vs. its own
+    "Record container run notes" commit), --no-notes / dry-run behaviour.
+    ``run_region_notes_append`` / ``git_commit_only_paths`` are stubbed
+    throughout -- this never runs the real tools or touches real git.
+    """
+
+    def _write_notes(self, out_dir: Path, source: str, lines: list[str]) -> Path:
+        notes_dir = out_dir / "region-notes"
+        notes_dir.mkdir(parents=True, exist_ok=True)
+        filename = source.replace("/", "__") + ".md"
+        path = notes_dir / filename
+        body = "\n\n".join(f"## 2026-09-02\n\n{line}" for line in lines)
+        path.write_text(f"# Region notes -- {source}\n\n{body}\n", encoding="utf-8")
+        return path
+
+    def test_no_region_notes_dir_is_a_clean_noop(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            out_dir = Path(tmp) / "out"
+            out_dir.mkdir()
+            results = container_merge.apply_region_notes(
+                out_dir, repo_root=Path(tmp), commit=False, dry_run=False,
+            )
+        self.assertEqual(results, [])
+
+    def test_appends_new_lines_and_skips_already_present(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp) / "repo"
+            out_dir = Path(tmp) / "out"
+            repo_root.mkdir()
+            out_dir.mkdir()
+            target = repo_root / "docs" / "regions" / "X.md"
+            target.parent.mkdir(parents=True)
+            target.write_text("already known note\n", encoding="utf-8")
+
+            self._write_notes(
+                out_dir, "disasm/src/X.c", ["already known note", "brand new note"]
+            )
+
+            appended_calls: list[tuple[str, str]] = []
+
+            def fake_append(source, text, *, repo_root):
+                appended_calls.append((source, text))
+                return True, "appended"
+
+            with mock.patch.object(
+                container_merge, "run_region_notes_append", side_effect=fake_append
+            ):
+                results = container_merge.apply_region_notes(
+                    out_dir, repo_root=repo_root, commit=False, dry_run=False,
+                )
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].source, "disasm/src/X.c")
+        self.assertEqual(results[0].appended, ["brand new note"])
+        self.assertEqual(appended_calls, [("disasm/src/X.c", "brand new note")])
+
+    def test_duplicate_line_within_notes_file_appended_once(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp) / "repo"
+            out_dir = Path(tmp) / "out"
+            repo_root.mkdir()
+            out_dir.mkdir()
+            self._write_notes(out_dir, "disasm/src/X.c", ["same note", "same note"])
+
+            with mock.patch.object(
+                container_merge, "run_region_notes_append", return_value=(True, "appended")
+            ) as append_mock:
+                results = container_merge.apply_region_notes(
+                    out_dir, repo_root=repo_root, commit=False, dry_run=False,
+                )
+        self.assertEqual(results[0].appended, ["same note"])
+        append_mock.assert_called_once()
+
+    def test_append_failure_is_logged_and_skipped(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp) / "repo"
+            out_dir = Path(tmp) / "out"
+            repo_root.mkdir()
+            out_dir.mkdir()
+            self._write_notes(out_dir, "disasm/src/X.c", ["a note"])
+
+            with mock.patch.object(
+                container_merge, "run_region_notes_append", return_value=(False, "boom")
+            ):
+                buffer = io.StringIO()
+                with contextlib.redirect_stderr(buffer):
+                    results = container_merge.apply_region_notes(
+                        out_dir, repo_root=repo_root, commit=False, dry_run=False,
+                    )
+        self.assertEqual(results[0].appended, [])
+        self.assertIn("boom", buffer.getvalue())
+
+    def test_dry_run_never_calls_append_or_commit(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp) / "repo"
+            out_dir = Path(tmp) / "out"
+            repo_root.mkdir()
+            out_dir.mkdir()
+            self._write_notes(out_dir, "disasm/src/X.c", ["a note"])
+
+            with mock.patch.object(
+                container_merge, "run_region_notes_append"
+            ) as append_mock, mock.patch.object(
+                container_merge, "git_commit_only_paths"
+            ) as commit_mock:
+                results = container_merge.apply_region_notes(
+                    out_dir, repo_root=repo_root, commit=True, dry_run=True,
+                )
+        append_mock.assert_not_called()
+        commit_mock.assert_not_called()
+        self.assertEqual(results[0].appended, ["a note"])
+        self.assertFalse(results[0].committed)
+
+    def test_notes_folded_into_owners_land_commit_when_source_was_committed(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp) / "repo"
+            out_dir = Path(tmp) / "out"
+            repo_root.mkdir()
+            out_dir.mkdir()
+            self._write_notes(out_dir, "disasm/src/X.c", ["a note"])
+            rows = [
+                container_merge.MergeRow(
+                    owner="func_1", source="disasm/src/X.c", function="func_1",
+                    status="accepted", detail="", committed=True, commit_detail="committed",
+                )
+            ]
+
+            with mock.patch.object(
+                container_merge, "run_region_notes_append", return_value=(True, "appended")
+            ), mock.patch.object(
+                container_merge, "git_commit_only_paths", return_value=(True, "committed")
+            ) as commit_mock:
+                results = container_merge.apply_region_notes(
+                    out_dir, repo_root=repo_root, commit=True, dry_run=False, rows=rows,
+                )
+        self.assertTrue(results[0].committed)
+        commit_mock.assert_called_once_with(
+            ["disasm/src/X.c", "docs/regions/X.md"],
+            "Land container match for func_1",
+            repo_root=repo_root,
+        )
+
+    def test_notes_get_own_commit_when_no_accept_for_source_this_run(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp) / "repo"
+            out_dir = Path(tmp) / "out"
+            repo_root.mkdir()
+            out_dir.mkdir()
+            self._write_notes(out_dir, "disasm/src/X.c", ["a note"])
+
+            with mock.patch.object(
+                container_merge, "run_region_notes_append", return_value=(True, "appended")
+            ), mock.patch.object(
+                container_merge, "git_commit_only_paths", return_value=(True, "committed")
+            ) as commit_mock:
+                results = container_merge.apply_region_notes(
+                    out_dir, repo_root=repo_root, commit=True, dry_run=False, rows=[],
+                )
+        self.assertTrue(results[0].committed)
+        commit_mock.assert_called_once_with(
+            ["docs/regions/X.md"],
+            "Record container run notes for disasm/src/X.c",
+            repo_root=repo_root,
+        )
+
+    def test_no_commit_flag_appends_but_never_commits(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp) / "repo"
+            out_dir = Path(tmp) / "out"
+            repo_root.mkdir()
+            out_dir.mkdir()
+            self._write_notes(out_dir, "disasm/src/X.c", ["a note"])
+
+            with mock.patch.object(
+                container_merge, "run_region_notes_append", return_value=(True, "appended")
+            ), mock.patch.object(container_merge, "git_commit_only_paths") as commit_mock:
+                results = container_merge.apply_region_notes(
+                    out_dir, repo_root=repo_root, commit=False, dry_run=False,
+                )
+        self.assertFalse(results[0].committed)
+        commit_mock.assert_not_called()
+
+    def test_no_new_lines_never_commits(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp) / "repo"
+            out_dir = Path(tmp) / "out"
+            repo_root.mkdir()
+            out_dir.mkdir()
+            target = repo_root / "docs" / "regions" / "X.md"
+            target.parent.mkdir(parents=True)
+            target.write_text("already known\n", encoding="utf-8")
+            self._write_notes(out_dir, "disasm/src/X.c", ["already known"])
+
+            with mock.patch.object(
+                container_merge, "run_region_notes_append"
+            ) as append_mock, mock.patch.object(
+                container_merge, "git_commit_only_paths"
+            ) as commit_mock:
+                results = container_merge.apply_region_notes(
+                    out_dir, repo_root=repo_root, commit=True, dry_run=False,
+                )
+        self.assertEqual(results[0].appended, [])
+        append_mock.assert_not_called()
+        commit_mock.assert_not_called()
+
+    def test_merge_no_notes_flag_skips_region_notes_entirely(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1", source="disasm/src/X.c")
+            self._write_notes(out_dir, "disasm/src/X.c", ["a note"])
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", return_value=_accepted_result("func_1")
+            ), mock.patch.object(
+                container_merge, "apply_region_notes"
+            ) as apply_mock, mock.patch.object(
+                container_merge, "name_after_commit", return_value=(None, "")
+            ):
+                buffer = io.StringIO()
+                with contextlib.redirect_stdout(buffer):
+                    container_merge.merge(
+                        out_dir, repo_root=out_dir, commit=False, dry_run=False, no_notes=True,
+                    )
+        apply_mock.assert_not_called()
+
+    def test_merge_records_notes_applied_in_report(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1", source="disasm/src/X.c")
+            self._write_notes(out_dir, "disasm/src/X.c", ["a note"])
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", return_value=_accepted_result("func_1")
+            ), mock.patch.object(
+                container_merge, "run_region_notes_append", return_value=(True, "appended")
+            ), mock.patch.object(
+                container_merge, "name_after_commit", return_value=(None, "")
+            ):
+                buffer = io.StringIO()
+                with contextlib.redirect_stdout(buffer):
+                    container_merge.merge(
+                        out_dir, repo_root=out_dir, commit=False, dry_run=False,
+                    )
+            report = json.loads((out_dir / "merge-report.json").read_text(encoding="utf-8"))
+        self.assertEqual(report["notes_applied"], {"disasm/src/X.c": ["a note"]})
+
+
+class NameDecompiledSubprocessTests(unittest.TestCase):
+    """``run_name_decompiled_plan`` / ``run_name_decompiled_apply``'s own
+    subprocess call shape, and the stdout parsers layered on top of them."""
+
+    def test_plan_builds_expected_command(self) -> None:
+        calls: list[list[str]] = []
+
+        def fake_run(cmd, *, cwd, capture_output, text, timeout, env):
+            calls.append(list(cmd))
+            return _FakeGateProc(0, "function ...\n", "")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            with mock.patch.object(container_merge.subprocess, "run", side_effect=fake_run):
+                result = container_merge.run_name_decompiled_plan(
+                    "func_80012345", repo_root=repo_root
+                )
+        self.assertEqual(result["returncode"], 0)
+        self.assertEqual(
+            calls[0],
+            [
+                sys.executable,
+                str(repo_root / "tools" / "name_decompiled.py"),
+                "plan",
+                "--only",
+                "func_80012345",
+                "--repo-root",
+                str(repo_root),
+            ],
+        )
+
+    def test_apply_builds_expected_command(self) -> None:
+        calls: list[list[str]] = []
+
+        def fake_run(cmd, *, cwd, capture_output, text, timeout, env):
+            calls.append(list(cmd))
+            return _FakeGateProc(0, "renamed 1 function(s)\n  func_1 -> Real\n", "")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            with mock.patch.object(container_merge.subprocess, "run", side_effect=fake_run):
+                result = container_merge.run_name_decompiled_apply(
+                    "func_1", repo_root=repo_root
+                )
+        self.assertEqual(result["returncode"], 0)
+        self.assertEqual(
+            calls[0],
+            [
+                sys.executable,
+                str(repo_root / "tools" / "name_decompiled.py"),
+                "apply",
+                "--only",
+                "func_1",
+                "--repo-root",
+                str(repo_root),
+            ],
+        )
+
+    def test_parse_planned_name_finds_matching_row(self) -> None:
+        stdout = (
+            f"{'function':<16} {'new name':<40} {'source':<18} def file\n"
+            f"{'func_80012345':<16} {'Audio_DoThing':<40} {'gs_names.json':<18} disasm/src/foo.c\n"
+            "\n1 function(s) ready to rename (evidence-backed, decompiled, still func_-named)\n"
+        )
+        self.assertEqual(
+            container_merge.parse_planned_name("func_80012345", stdout), "Audio_DoThing"
+        )
+
+    def test_parse_planned_name_no_row_returns_none(self) -> None:
+        stdout = (
+            f"{'function':<16} {'new name':<40} {'source':<18} def file\n"
+            "\n0 function(s) ready to rename (evidence-backed, decompiled, still func_-named)\n"
+        )
+        self.assertIsNone(container_merge.parse_planned_name("func_80012345", stdout))
+
+    def test_parse_planned_name_header_alone_is_not_mistaken_for_a_row(self) -> None:
+        """The header line's first column is the literal string "function"
+        -- never a real ``func_...`` name -- so querying for a real function
+        name against header-only output (no matching data row) is None,
+        exactly like the "not proposed at all" case."""
+        stdout = f"{'function':<16} {'new name':<40} {'source':<18} def file\n"
+        self.assertIsNone(container_merge.parse_planned_name("func_80099999", stdout))
+
+    def test_parse_applied_name_finds_matching_row(self) -> None:
+        stdout = "renamed 1 function(s)\n  func_1 -> Audio_DoThing\n"
+        self.assertEqual(
+            container_merge.parse_applied_name("func_1", stdout), "Audio_DoThing"
+        )
+
+    def test_parse_applied_name_refused_row_returns_none(self) -> None:
+        stdout = (
+            "would rename 0 function(s)\n"
+            "refused 1 collision(s):\n"
+            "  func_1 -> Audio_DoThing: 'Audio_DoThing' already exists\n"
+        )
+        self.assertIsNone(container_merge.parse_applied_name("func_1", stdout))
+
+    def test_parse_applied_name_no_match_returns_none(self) -> None:
+        self.assertIsNone(container_merge.parse_applied_name("func_1", "renamed 0 function(s)\n"))
+
+
+class NameAfterCommitTests(unittest.TestCase):
+    """``name_after_commit``: plan-then-apply, never fatal on failure."""
+
+    def test_no_evidence_backed_name_returns_none(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            with mock.patch.object(
+                container_merge, "run_name_decompiled_plan",
+                return_value={"returncode": 0, "stdout": "function ...\n", "stderr": ""},
+            ), mock.patch.object(
+                container_merge, "run_name_decompiled_apply"
+            ) as apply_mock:
+                new_name, detail = container_merge.name_after_commit(
+                    "func_1", repo_root=repo_root
+                )
+        self.assertIsNone(new_name)
+        self.assertEqual(detail, "no evidence-backed name proposed")
+        apply_mock.assert_not_called()
+
+    def test_proposed_name_applied_successfully(self) -> None:
+        plan_stdout = (
+            f"{'function':<16} {'new name':<40} {'source':<18} def file\n"
+            f"{'func_1':<16} {'Real_Name':<40} {'gs_names.json':<18} disasm/src/foo.c\n"
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            with mock.patch.object(
+                container_merge, "run_name_decompiled_plan",
+                return_value={"returncode": 0, "stdout": plan_stdout, "stderr": ""},
+            ), mock.patch.object(
+                container_merge, "run_name_decompiled_apply",
+                return_value={
+                    "returncode": 0, "stdout": "renamed 1 function(s)\n  func_1 -> Real_Name\n",
+                    "stderr": "",
+                },
+            ):
+                new_name, detail = container_merge.name_after_commit(
+                    "func_1", repo_root=repo_root
+                )
+        self.assertEqual(new_name, "Real_Name")
+        self.assertIn("Real_Name", detail)
+
+    def test_proposed_name_refused_by_apply_returns_none(self) -> None:
+        plan_stdout = (
+            f"{'function':<16} {'new name':<40} {'source':<18} def file\n"
+            f"{'func_1':<16} {'Real_Name':<40} {'gs_names.json':<18} disasm/src/foo.c\n"
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            with mock.patch.object(
+                container_merge, "run_name_decompiled_plan",
+                return_value={"returncode": 0, "stdout": plan_stdout, "stderr": ""},
+            ), mock.patch.object(
+                container_merge, "run_name_decompiled_apply",
+                return_value={
+                    "returncode": 1,
+                    "stdout": (
+                        "would rename 0 function(s)\nrefused 1 collision(s):\n"
+                        "  func_1 -> Real_Name: 'Real_Name' already exists\n"
+                    ),
+                    "stderr": "",
+                },
+            ):
+                new_name, detail = container_merge.name_after_commit(
+                    "func_1", repo_root=repo_root
+                )
+        self.assertIsNone(new_name)
+        self.assertIn("func_1", detail)
+
+    def test_plan_subprocess_failure_is_never_fatal(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            with mock.patch.object(
+                container_merge, "run_name_decompiled_plan",
+                side_effect=OSError("no such file"),
+            ):
+                new_name, detail = container_merge.name_after_commit(
+                    "func_1", repo_root=repo_root
+                )
+        self.assertIsNone(new_name)
+        self.assertIn("failed to run", detail)
+
+    def test_apply_subprocess_failure_is_never_fatal(self) -> None:
+        plan_stdout = (
+            f"{'function':<16} {'new name':<40} {'source':<18} def file\n"
+            f"{'func_1':<16} {'Real_Name':<40} {'gs_names.json':<18} disasm/src/foo.c\n"
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            with mock.patch.object(
+                container_merge, "run_name_decompiled_plan",
+                return_value={"returncode": 0, "stdout": plan_stdout, "stderr": ""},
+            ), mock.patch.object(
+                container_merge, "run_name_decompiled_apply",
+                side_effect=OSError("no such file"),
+            ):
+                new_name, detail = container_merge.name_after_commit(
+                    "func_1", repo_root=repo_root
+                )
+        self.assertIsNone(new_name)
+        self.assertIn("failed to run", detail)
+
+
+class GitStatusPathsTests(unittest.TestCase):
+    def test_filters_to_given_prefixes(self) -> None:
+        porcelain = (
+            " M disasm/src/X.c\n"
+            "?? disasm/include/Y.h\n"
+            " M disasm/linker_scripts/us/symbol_addrs_code.txt\n"
+            " M docs/regions/X.md\n"
+        )
+
+        def fake_run(cmd, *, cwd, capture_output, text, env):
+            return _FakeGateProc(0, porcelain, "")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            with mock.patch.object(container_merge.subprocess, "run", side_effect=fake_run):
+                paths = container_merge.git_status_paths(
+                    repo_root, prefixes=("disasm/src", "disasm/include")
+                )
+        self.assertEqual(paths, ["disasm/include/Y.h", "disasm/src/X.c"])
+
+    def test_handles_rename_lines(self) -> None:
+        porcelain = "R  disasm/src/Old.c -> disasm/src/New.c\n"
+
+        def fake_run(cmd, *, cwd, capture_output, text, env):
+            return _FakeGateProc(0, porcelain, "")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            with mock.patch.object(container_merge.subprocess, "run", side_effect=fake_run):
+                paths = container_merge.git_status_paths(repo_root, prefixes=("disasm/src",))
+        self.assertEqual(paths, ["disasm/src/New.c"])
+
+    def test_nonzero_exit_returns_empty_list(self) -> None:
+        def fake_run(cmd, *, cwd, capture_output, text, env):
+            return _FakeGateProc(1, "", "fatal: not a git repo")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            with mock.patch.object(container_merge.subprocess, "run", side_effect=fake_run):
+                paths = container_merge.git_status_paths(repo_root, prefixes=("disasm/src",))
+        self.assertEqual(paths, [])
+
+
+class MergeNamingIntegrationTests(unittest.TestCase):
+    """``merge()``'s naming-on-accept step end to end: only committed
+    accepts are offered, the follow-up commit uses the file list
+    ``git_status_paths`` reports, --no-naming disables it, and a naming
+    failure never affects merge()'s own exit code."""
+
+    def _run_merge(self, out_dir: Path, **kwargs) -> tuple[int, str]:
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            code = container_merge.merge(out_dir, repo_root=out_dir, **kwargs)
+        return code, buffer.getvalue()
+
+    def test_committed_accept_gets_named_and_committed(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1", source="disasm/src/X.c")
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", return_value=_accepted_result("func_1")
+            ), mock.patch.object(
+                container_merge, "git_commit_only", return_value=(True, "committed")
+            ), mock.patch.object(
+                container_merge, "name_after_commit", return_value=("Real_Name", "renamed")
+            ), mock.patch.object(
+                container_merge, "git_status_paths", return_value=["disasm/src/X.c"]
+            ), mock.patch.object(
+                container_merge, "git_commit_only_paths", return_value=(True, "committed")
+            ) as naming_commit_mock:
+                code, out = self._run_merge(out_dir, commit=True, dry_run=False)
+            report = json.loads((out_dir / "merge-report.json").read_text(encoding="utf-8"))
+        self.assertEqual(code, 0)
+        naming_commit_mock.assert_called_once_with(
+            ["disasm/src/X.c"], "Name func_1 -> Real_Name", repo_root=out_dir
+        )
+        self.assertEqual(report["names"], {"func_1": "Real_Name"})
+        self.assertIn("named func_1 -> Real_Name", out)
+
+    def test_uncommitted_accept_is_never_offered_for_naming(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1", source="disasm/src/X.c")
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", return_value=_accepted_result("func_1")
+            ), mock.patch.object(
+                container_merge, "name_after_commit"
+            ) as name_mock:
+                # commit=False: row.committed is always False.
+                self._run_merge(out_dir, commit=False, dry_run=False)
+        name_mock.assert_not_called()
+
+    def test_rejected_owner_is_never_offered_for_naming(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1", source="disasm/src/X.c")
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", return_value=_rejected_result()
+            ), mock.patch.object(
+                container_merge, "name_after_commit"
+            ) as name_mock:
+                self._run_merge(out_dir, commit=True, dry_run=False)
+        name_mock.assert_not_called()
+
+    def test_no_naming_flag_skips_naming_entirely(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1", source="disasm/src/X.c")
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", return_value=_accepted_result("func_1")
+            ), mock.patch.object(
+                container_merge, "git_commit_only", return_value=(True, "committed")
+            ), mock.patch.object(
+                container_merge, "name_after_commit"
+            ) as name_mock:
+                self._run_merge(out_dir, commit=True, dry_run=False, no_naming=True)
+        name_mock.assert_not_called()
+
+    def test_naming_failure_is_logged_but_never_fatal(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1", source="disasm/src/X.c")
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", return_value=_accepted_result("func_1")
+            ), mock.patch.object(
+                container_merge, "git_commit_only", return_value=(True, "committed")
+            ), mock.patch.object(
+                container_merge, "name_after_commit",
+                return_value=(None, "name_decompiled plan failed to run: boom"),
+            ):
+                buffer_err = io.StringIO()
+                with contextlib.redirect_stderr(buffer_err):
+                    code, _out = self._run_merge(out_dir, commit=True, dry_run=False)
+            report = json.loads((out_dir / "merge-report.json").read_text(encoding="utf-8"))
+        self.assertEqual(code, 0)
+        self.assertIn("boom", buffer_err.getvalue())
+        self.assertEqual(report["names"], {})
+
+    def test_naming_commit_failure_leaves_names_empty_but_not_fatal(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1", source="disasm/src/X.c")
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", return_value=_accepted_result("func_1")
+            ), mock.patch.object(
+                container_merge, "git_commit_only", return_value=(True, "committed")
+            ), mock.patch.object(
+                container_merge, "name_after_commit", return_value=("Real_Name", "renamed")
+            ), mock.patch.object(
+                container_merge, "git_status_paths", return_value=["disasm/src/X.c"]
+            ), mock.patch.object(
+                container_merge, "git_commit_only_paths", return_value=(False, "nothing staged")
+            ):
+                buffer_err = io.StringIO()
+                with contextlib.redirect_stderr(buffer_err):
+                    code, _out = self._run_merge(out_dir, commit=True, dry_run=False)
+            report = json.loads((out_dir / "merge-report.json").read_text(encoding="utf-8"))
+        self.assertEqual(code, 0)
+        self.assertEqual(report["names"], {})
+        self.assertIn("nothing staged", buffer_err.getvalue())
+
+    def test_naming_with_no_changed_files_is_logged_but_not_fatal(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1", source="disasm/src/X.c")
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", return_value=_accepted_result("func_1")
+            ), mock.patch.object(
+                container_merge, "git_commit_only", return_value=(True, "committed")
+            ), mock.patch.object(
+                container_merge, "name_after_commit", return_value=("Real_Name", "renamed")
+            ), mock.patch.object(
+                container_merge, "git_status_paths", return_value=[]
+            ), mock.patch.object(
+                container_merge, "git_commit_only_paths"
+            ) as commit_mock:
+                buffer_err = io.StringIO()
+                with contextlib.redirect_stderr(buffer_err):
+                    code, _out = self._run_merge(out_dir, commit=True, dry_run=False)
+            report = json.loads((out_dir / "merge-report.json").read_text(encoding="utf-8"))
+        self.assertEqual(code, 0)
+        commit_mock.assert_not_called()
+        self.assertEqual(report["names"], {})
+        self.assertIn("no changed files", buffer_err.getvalue())
 
 
 class SummaryTests(unittest.TestCase):

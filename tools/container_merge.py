@@ -54,6 +54,31 @@ talk its way past this.
                                     probe-stats history (see --fresh-history
                                     below)
 
+Two more, on by default, each read from ``<out>`` and never cumulative
+across runs (unlike ``owners`` above):
+
+* Region notes -- ``<out>/region-notes/<source with "/" replaced by
+  "__">.md``, written by the container driver, is folded into this
+  checkout's ``docs/regions/<source>.md`` via ``tools/region_notes.py
+  append`` (deduped, only new lines), regardless of whether any owner was
+  accepted this run. With ``--commit``, a source this run also committed an
+  owner for gets its notes folded into that same land commit
+  (``git commit --only <source> docs/regions/<source>.md``); a source with
+  new notes but no accept this run gets its own commit, "Record container
+  run notes for <source>". Disable with ``--no-notes``. Recorded in
+  ``merge-report.json`` as ``notes_applied`` (source -> newly appended
+  lines).
+* Naming on accept -- after an owner is accepted and committed this run,
+  its function is offered to ``tools/name_decompiled.py`` (``plan`` then
+  ``apply``, the same evidence-backed rename
+  ``tools/try_pragma_compare.py``'s ``PRAGMA_NAME_ON_ACCEPT`` applies
+  in-container, done here host-side instead); a successful rename gets its
+  own commit, "Name <owner> -> <name>", over whichever ``disasm/src`` /
+  ``disasm/include`` files ``apply`` touched (found via ``git status
+  --porcelain``, since ``apply`` itself reports only counts). Never fatal --
+  a failure is only logged. Disable with ``--no-naming``. Recorded in
+  ``merge-report.json`` as ``names`` (owner -> new name).
+
 Idempotency: a second ``merge --commit`` run against the same ``<out>``
 must never re-gate (and try to re-install/re-commit) an owner that already
 landed. Before re-gating, each owner is checked against two signals and
@@ -100,6 +125,7 @@ Usage:
     python3 tools/container_merge.py merge /abs/out --repo . --dry-run
     python3 tools/container_merge.py merge /abs/out --commit --no-cc-check --fresh-history
     python3 tools/container_merge.py merge /abs/out --commit --owners func_A,func_B
+    python3 tools/container_merge.py merge /abs/out --commit --no-notes --no-naming
     python3 tools/container_merge.py summary /abs/out
     python3 tools/container_merge.py import-stats /abs/out
     python3 tools/container_merge.py import-stats /abs/out --repo . --dry-run
@@ -269,16 +295,20 @@ def run_fleet_probe_gate(
             managed_result_path.unlink(missing_ok=True)
 
 
-def git_commit_only(source: str, message: str, *, repo_root: Path) -> tuple[bool, str]:
-    """``git commit --only <source> -m <message>`` in ``repo_root``.
-
-    AGENTS.md Sec 1.3: the git index is shared by every process in a
-    checkout, so a plain ``git add && git commit`` would also commit
-    whatever another session has staged. ``--only`` builds a temporary index
-    from HEAD plus the named path and leaves everything else untouched.
+def git_commit_only_paths(paths: list[str], message: str, *, repo_root: Path) -> tuple[bool, str]:
+    """``git commit --only <p1> <p2> ... -m <message>`` in ``repo_root`` --
+    the general form of ``git_commit_only`` for more than one explicit path
+    (the region-notes commit needs ``<source>`` alongside
+    ``docs/regions/<source>.md``; the naming follow-up commit needs every
+    ``disasm/src``/``disasm/include`` file ``tools/name_decompiled.py
+    apply`` just touched). AGENTS.md Sec 1.3: the git index is shared by
+    every process in a checkout, so a plain ``git add && git commit`` would
+    also commit whatever another session has staged -- ``--only`` builds a
+    temporary index from HEAD plus exactly the named paths and leaves
+    everything else untouched.
     """
     proc = subprocess.run(
-        ["git", "commit", "--only", source, "-m", message],
+        ["git", "commit", "--only", *paths, "-m", message],
         cwd=repo_root,
         capture_output=True,
         text=True,
@@ -286,6 +316,13 @@ def git_commit_only(source: str, message: str, *, repo_root: Path) -> tuple[bool
     )
     output = ((proc.stdout or "") + (proc.stderr or "")).strip()
     return proc.returncode == 0, output
+
+
+def git_commit_only(source: str, message: str, *, repo_root: Path) -> tuple[bool, str]:
+    """``git commit --only <source> -m <message>`` in ``repo_root`` -- the
+    single-path case of ``git_commit_only_paths``, kept as its own function
+    since it is ``process_owner``'s own commit seam."""
+    return git_commit_only_paths([source], message, repo_root=repo_root)
 
 
 def git_rev_parse_head(repo_root: Path) -> str | None:
@@ -386,6 +423,395 @@ def previous_entry_marks_committed(entry: object) -> bool:
     if isinstance(entry, dict):
         return bool(entry.get("committed"))
     return False
+
+
+# ---------------------------------------------------------------------------
+# Region notes: fold <out>/region-notes/<source>.md (written by the
+# container driver -- see docs/CONTAINER_AGENT.md Sec 9.5) into this
+# checkout's docs/regions/<source>.md, the same "never trust the container,
+# redo it against this checkout" spirit as the re-gate itself. Applied after
+# every merge run, regardless of whether any owner was accepted this run
+# (rejected-everything runs can still carry useful notes), unless
+# --no-notes.
+# ---------------------------------------------------------------------------
+
+
+@dataclasses.dataclass
+class NotesResult:
+    source: str
+    appended: list[str] = dataclasses.field(default_factory=list)
+    committed: bool = False
+    commit_detail: str = ""
+
+
+def region_notes_source_from_filename(path: Path) -> str:
+    """Invert the container driver's own ``<out>/region-notes/<source with
+    "/" replaced by "__">.md`` naming back to a source path, e.g.
+    ``disasm__src__4AC10.c.md`` -> ``disasm/src/4AC10.c``. ``Path.stem``
+    strips exactly one (the trailing ``.md``) suffix, so the real source's
+    own ``.c`` survives intact.
+    """
+    return path.stem.replace("__", "/")
+
+
+def region_notes_lines(path: Path) -> list[str]:
+    """Candidate note lines from a driver-written region-notes file: every
+    non-blank line that isn't ``tools/region_notes.py``'s own structural
+    markdown (the ``# Region notes -- ...`` file header, or a ``##
+    <heading>`` section heading -- see its ``append()``/``load()``), so each
+    survivor is one atomic note ready to replay through ``region_notes.py
+    append --text``. Returns ``[]`` for a missing or unreadable file.
+    """
+    try:
+        text = path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return []
+    lines = []
+    for raw in text.splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        lines.append(line)
+    return lines
+
+
+def region_notes_target_path(repo_root: Path, source: str) -> Path:
+    """``docs/regions/<rel>.md`` for ``source``, mirroring
+    ``tools/region_notes.py``'s own ``path_for()``/``_relative_source()``:
+    ``source`` relative to ``<repo_root>/disasm/src`` when possible, else
+    relative to ``repo_root``, else just its filename -- computed against
+    the given ``repo_root`` (never ``region_notes.py``'s own hardcoded
+    ``REPO_ROOT``), so a test can point this at a throwaway checkout.
+    """
+    repo_root = repo_root.resolve()
+    src_root = repo_root / "disasm" / "src"
+    path = Path(source)
+    if not path.is_absolute():
+        path = repo_root / path
+    try:
+        resolved = path.resolve()
+    except OSError:
+        resolved = path
+    for root in (src_root, repo_root):
+        try:
+            rel = resolved.relative_to(root)
+            return (repo_root / "docs" / "regions" / rel).with_suffix(".md")
+        except ValueError:
+            continue
+    return (repo_root / "docs" / "regions" / Path(resolved.name)).with_suffix(".md")
+
+
+def region_notes_target_relpath(repo_root: Path, source: str) -> str:
+    """``region_notes_target_path`` as a ``repo_root``-relative POSIX
+    string, ready for ``git commit --only``."""
+    target = region_notes_target_path(repo_root, source)
+    return target.relative_to(repo_root.resolve()).as_posix()
+
+
+def existing_region_notes_text(repo_root: Path, source: str) -> str:
+    """Current ``docs/regions/<source>.md`` content in ``repo_root`` (``""``
+    if it doesn't exist yet or can't be read) -- read once per source before
+    appending, so a line already on record is never replayed.
+    """
+    path = region_notes_target_path(repo_root, source)
+    if not path.is_file():
+        return ""
+    try:
+        return path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return ""
+
+
+def run_region_notes_append(
+    source: str,
+    text: str,
+    *,
+    repo_root: Path,
+    python_bin: str = sys.executable,
+    timeout: int = 60,
+) -> tuple[bool, str]:
+    """``python3 tools/region_notes.py append <source> --text <text>`` in
+    ``repo_root`` -- the same small, single-purpose subprocess seam as
+    ``git_commit_only``, so tests can stub it independently. Returns ``(ok,
+    combined stdout+stderr)``.
+    """
+    proc = subprocess.run(
+        [
+            python_bin,
+            str(repo_root / "tools" / "region_notes.py"),
+            "append",
+            source,
+            "--text",
+            text,
+        ],
+        cwd=repo_root,
+        capture_output=True,
+        text=True,
+        timeout=timeout,
+        env=_clean_env(),
+    )
+    output = ((proc.stdout or "") + (proc.stderr or "")).strip()
+    return proc.returncode == 0, output
+
+
+def apply_region_notes(
+    out_dir: Path,
+    *,
+    repo_root: Path,
+    commit: bool,
+    dry_run: bool,
+    rows: list[MergeRow] | None = None,
+) -> list[NotesResult]:
+    """Fold every ``<out>/region-notes/<source>.md`` the container driver
+    wrote into this checkout's ``docs/regions/<source>.md`` -- see this
+    module's own "Region notes" section above and
+    docs/CONTAINER_AGENT.md Sec 9.5. Runs regardless of whether any owner in
+    ``rows`` was accepted this run.
+
+    For a ``source`` this run actually committed at least one owner for
+    (``rows`` has a ``committed`` entry naming it), the notes file lands
+    alongside that same land commit's message (``git commit --only <source>
+    docs/regions/<source>.md``, reusing "Land container match for
+    <owner>"). Otherwise, if there is at least one new line to record, it
+    gets its own commit, ``"Record container run notes for <source>"``,
+    with ``--only`` on just the notes file.
+
+    ``dry_run`` never calls ``region_notes.py append`` or commits anything,
+    but still reports what would be appended (same convention as
+    ``append_history_lines``).
+    """
+    notes_dir = out_dir / "region-notes"
+    if not notes_dir.is_dir():
+        return []
+
+    committed_owner_for_source: dict[str, str] = {}
+    for row in rows or []:
+        if row.committed and row.source and row.source not in committed_owner_for_source:
+            committed_owner_for_source[row.source] = row.owner
+
+    results: list[NotesResult] = []
+    for path in sorted(p for p in notes_dir.glob("*.md") if p.is_file()):
+        source = region_notes_source_from_filename(path)
+        lines = region_notes_lines(path)
+        if not lines:
+            continue
+
+        existing = existing_region_notes_text(repo_root, source)
+        appended: list[str] = []
+        for line in lines:
+            if line in existing or line in appended:
+                continue
+            if dry_run:
+                appended.append(line)
+                continue
+            ok, output = run_region_notes_append(source, line, repo_root=repo_root)
+            if not ok:
+                print(
+                    f"container_merge: region notes: append failed for {source}: "
+                    f"{_first_line(output)}",
+                    file=sys.stderr,
+                )
+                continue
+            appended.append(line)
+
+        result = NotesResult(source=source, appended=appended)
+        results.append(result)
+
+        if not appended or not commit or dry_run:
+            continue
+
+        notes_rel = region_notes_target_relpath(repo_root, source)
+        owner = committed_owner_for_source.get(source)
+        if owner:
+            message = f"Land container match for {owner}"
+            ok, output = git_commit_only_paths([source, notes_rel], message, repo_root=repo_root)
+        else:
+            message = f"Record container run notes for {source}"
+            ok, output = git_commit_only_paths([notes_rel], message, repo_root=repo_root)
+        result.committed = ok
+        result.commit_detail = output if not ok else "committed"
+        if not ok:
+            print(
+                f"container_merge: region notes: commit failed for {source}: "
+                f"{_first_line(output)}",
+                file=sys.stderr,
+            )
+
+    return results
+
+
+# ---------------------------------------------------------------------------
+# Naming on accept: after an owner is accepted and committed, offer its
+# function to tools/name_decompiled.py -- the same evidence-backed rename
+# tools/try_pragma_compare.py's own PRAGMA_NAME_ON_ACCEPT applies inside the
+# container's runner, done here host-side instead, deliberately: plan first
+# (does an evidence-backed name exist?), then apply (does it actually land,
+# or refuse on a collision?) -- see docs/CONTAINER_AGENT.md Sec 9.6.
+# ---------------------------------------------------------------------------
+
+_NAME_PLAN_ROW_RE = re.compile(r"^(\S+)\s+(\S+)\s")
+_NAME_APPLY_ROW_RE = re.compile(r"^\s*(\S+)\s+->\s+(\S+)\s*$")
+
+
+def run_name_decompiled_plan(
+    function: str,
+    *,
+    repo_root: Path,
+    python_bin: str = sys.executable,
+    timeout: int = 300,
+) -> dict[str, object]:
+    """``python3 tools/name_decompiled.py plan --only <function> --repo-root
+    <repo_root>`` -- the same small, stubbable subprocess seam as
+    ``run_fleet_probe_gate``. Returns ``{"returncode", "stdout", "stderr"}``.
+    """
+    proc = subprocess.run(
+        [
+            python_bin,
+            str(repo_root / "tools" / "name_decompiled.py"),
+            "plan",
+            "--only",
+            function,
+            "--repo-root",
+            str(repo_root),
+        ],
+        cwd=repo_root,
+        capture_output=True,
+        text=True,
+        timeout=timeout,
+        env=_clean_env(),
+    )
+    return {"returncode": proc.returncode, "stdout": proc.stdout or "", "stderr": proc.stderr or ""}
+
+
+def run_name_decompiled_apply(
+    function: str,
+    *,
+    repo_root: Path,
+    python_bin: str = sys.executable,
+    timeout: int = 300,
+) -> dict[str, object]:
+    """``python3 tools/name_decompiled.py apply --only <function>
+    --repo-root <repo_root>`` -- actually mutates ``disasm/src`` etc, so it
+    is only ever called after ``run_name_decompiled_plan`` has already found
+    an evidence-backed name to offer. Same return shape as
+    ``run_name_decompiled_plan``.
+    """
+    proc = subprocess.run(
+        [
+            python_bin,
+            str(repo_root / "tools" / "name_decompiled.py"),
+            "apply",
+            "--only",
+            function,
+            "--repo-root",
+            str(repo_root),
+        ],
+        cwd=repo_root,
+        capture_output=True,
+        text=True,
+        timeout=timeout,
+        env=_clean_env(),
+    )
+    return {"returncode": proc.returncode, "stdout": proc.stdout or "", "stderr": proc.stderr or ""}
+
+
+def parse_planned_name(function: str, stdout: str) -> str | None:
+    """Extract the proposed new name for ``function`` from
+    ``name_decompiled.py plan``'s table (its ``print_plan``): the header
+    row's first column is always the literal string ``"function"``, never a
+    real ``func_...`` name, so it never accidentally matches.
+    """
+    for line in stdout.splitlines():
+        m = _NAME_PLAN_ROW_RE.match(line)
+        if m and m.group(1) == function:
+            return m.group(2)
+    return None
+
+
+def parse_applied_name(function: str, stdout: str) -> str | None:
+    """Extract the new name actually applied for ``function`` from
+    ``name_decompiled.py apply``'s own output (``"  old -> new"`` lines --
+    see its ``main()``). Returns ``None`` if ``function`` was refused (a
+    collision) or not applied at all -- a refused line carries a trailing
+    ``": <reason>"`` and so never matches this pattern.
+    """
+    for line in stdout.splitlines():
+        m = _NAME_APPLY_ROW_RE.match(line)
+        if m and m.group(1) == function:
+            return m.group(2)
+    return None
+
+
+def name_after_commit(function: str, *, repo_root: Path) -> tuple[str | None, str]:
+    """After ``function``'s owner has been accepted and committed this run,
+    offer it to ``tools/name_decompiled.py``: ``plan`` (does it already have
+    an evidence-backed name and no other pragma owner?) then, only if so,
+    ``apply`` (does it actually land -- no collision?). Never raises: a
+    subprocess failure at either step is reported in the returned detail
+    string, exactly like ``PRAGMA_NAME_ON_ACCEPT``'s own ``except
+    Exception`` in ``tools/try_pragma_compare.py`` -- naming is a bonus, not
+    something that can fail the merge run.
+
+    Returns ``(new_name, detail)``; ``new_name`` is ``None`` whenever no
+    rename happened (nothing proposed, or apply refused it), and ``detail``
+    is always a human-readable reason.
+    """
+    try:
+        plan = run_name_decompiled_plan(function, repo_root=repo_root)
+    except (OSError, subprocess.SubprocessError) as exc:
+        return None, f"name_decompiled plan failed to run: {exc}"
+
+    proposed = parse_planned_name(function, str(plan.get("stdout") or ""))
+    if not proposed:
+        return None, "no evidence-backed name proposed"
+
+    try:
+        applied = run_name_decompiled_apply(function, repo_root=repo_root)
+    except (OSError, subprocess.SubprocessError) as exc:
+        return None, f"name_decompiled apply failed to run: {exc}"
+
+    new_name = parse_applied_name(function, str(applied.get("stdout") or ""))
+    if not new_name:
+        detail = f"apply did not confirm a rename for {function} (proposed {proposed})"
+        stderr_line = _first_line(str(applied.get("stderr") or ""))
+        if stderr_line:
+            detail += f"; {stderr_line}"
+        return None, detail
+
+    return new_name, f"renamed {function} -> {new_name}"
+
+
+def git_status_paths(repo_root: Path, *, prefixes: tuple[str, ...]) -> list[str]:
+    """``git status --porcelain`` in ``repo_root``, filtered to entries
+    whose path starts with any of ``prefixes`` (repo-relative, POSIX-style)
+    -- used to discover exactly which files ``tools/name_decompiled.py
+    apply`` just changed (it reports only counts, never paths) so they can
+    be named explicitly to ``git commit --only``. Returns ``[]`` (never
+    raises) if ``git status`` itself fails.
+    """
+    try:
+        proc = subprocess.run(
+            ["git", "status", "--porcelain"],
+            cwd=repo_root,
+            capture_output=True,
+            text=True,
+            env=_clean_env(),
+        )
+    except OSError:
+        return []
+    if proc.returncode != 0:
+        return []
+    paths: set[str] = set()
+    for line in (proc.stdout or "").splitlines():
+        if len(line) <= 3:
+            continue
+        entry = line[3:].strip()
+        if " -> " in entry:
+            entry = entry.split(" -> ", 1)[1]
+        entry = entry.strip().strip('"')
+        if entry and any(entry.startswith(prefix) for prefix in prefixes):
+            paths.add(entry)
+    return sorted(paths)
 
 
 # ---------------------------------------------------------------------------
@@ -564,9 +990,17 @@ def write_merge_report(
     *,
     no_cc_check: bool,
     fresh_history: bool,
+    notes_results: list[NotesResult] | None = None,
+    names: dict[str, str] | None = None,
 ) -> Path:
     """Write ``<out>/merge-report.json``: owner -> status, plus the flags
-    that shaped this run. ``cc_check_bypassed: true`` is the durable record
+    that shaped this run, plus this run's own ``notes_applied`` (source ->
+    list of newly appended region-notes lines, omitting any source with
+    nothing new) and ``names`` (owner -> new name, for every owner
+    ``name_after_commit`` actually renamed this run) -- neither is
+    cumulative across runs, exactly like ``cc_check_bypassed`` /
+    ``fresh_history`` above them. ``cc_check_bypassed: true`` is the durable
+    record
     that every accepted candidate in this run was NOT verified to compile
     cleanly by the host's own clang syntax check -- read this back before
     trusting a ``--no-cc-check`` run's results.
@@ -620,11 +1054,17 @@ def write_merge_report(
         else:
             owners[row.owner] = row.status
 
+    notes_applied = {
+        nr.source: nr.appended for nr in (notes_results or []) if nr.appended
+    }
+
     report_path = out_dir / "merge-report.json"
     payload = {
         "cc_check_bypassed": bool(no_cc_check),
         "fresh_history": bool(fresh_history),
         "owners": owners,
+        "notes_applied": notes_applied,
+        "names": dict(names or {}),
     }
     report_path.write_text(
         json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
@@ -641,6 +1081,8 @@ def merge(
     no_cc_check: bool = False,
     fresh_history: bool = False,
     owners: set[str] | None = None,
+    no_notes: bool = False,
+    no_naming: bool = False,
 ) -> int:
     accepted_dir = out_dir / "accepted"
     json_paths = (
@@ -721,8 +1163,60 @@ def merge(
             )
             print(row.commit_error_tail)
 
+    notes_results: list[NotesResult] = []
+    if not no_notes:
+        notes_results = apply_region_notes(
+            out_dir, repo_root=repo_root, commit=commit, dry_run=dry_run, rows=rows,
+        )
+        appended_total = sum(len(nr.appended) for nr in notes_results)
+        if appended_total:
+            print()
+            for nr in notes_results:
+                if not nr.appended:
+                    continue
+                note_state = "committed" if nr.committed else "not committed"
+                print(
+                    f"container_merge: region notes: {len(nr.appended)} new line(s) for "
+                    f"{nr.source} ({note_state})"
+                )
+
+    names: dict[str, str] = {}
+    if not no_naming:
+        for row in rows:
+            if not (row.status == "accepted" and row.committed):
+                continue
+            new_name, detail = name_after_commit(row.function, repo_root=repo_root)
+            if not new_name:
+                if detail != "no evidence-backed name proposed":
+                    print(f"container_merge: naming {row.function}: {detail}", file=sys.stderr)
+                continue
+            if not commit or dry_run:
+                # Should not happen (row.committed already implies commit and
+                # not dry_run), kept as a defensive guard.
+                continue
+            changed = git_status_paths(repo_root, prefixes=("disasm/src", "disasm/include"))
+            if not changed:
+                print(
+                    f"container_merge: naming {row.function} -> {new_name}: apply "
+                    "reported a rename but no changed files were found under "
+                    "disasm/src or disasm/include", file=sys.stderr,
+                )
+                continue
+            ok, output = git_commit_only_paths(
+                changed, f"Name {row.function} -> {new_name}", repo_root=repo_root
+            )
+            if ok:
+                names[row.owner] = new_name
+                print(f"container_merge: named {row.function} -> {new_name}")
+            else:
+                print(
+                    f"container_merge: naming {row.function} -> {new_name}: commit "
+                    f"failed: {_first_line(output)}", file=sys.stderr,
+                )
+
     report_path = write_merge_report(
-        out_dir, rows, no_cc_check=no_cc_check, fresh_history=fresh_history
+        out_dir, rows, no_cc_check=no_cc_check, fresh_history=fresh_history,
+        notes_results=notes_results, names=names,
     )
     print()
     print(f"container_merge: wrote {report_path}")
@@ -1080,6 +1574,21 @@ def main(argv: list[str] | None = None) -> int:
             "merge-report.json entry, if any, is carried forward unchanged"
         ),
     )
+    p_merge.add_argument(
+        "--no-notes", action="store_true",
+        help=(
+            "skip folding <out>/region-notes/*.md into docs/regions/*.md "
+            "(on by default; see docs/CONTAINER_AGENT.md Sec 9.5)"
+        ),
+    )
+    p_merge.add_argument(
+        "--no-naming", action="store_true",
+        help=(
+            "skip offering each committed owner's function to "
+            "tools/name_decompiled.py plan/apply (on by default; see "
+            "docs/CONTAINER_AGENT.md Sec 9.6)"
+        ),
+    )
 
     p_summary = sub.add_parser(
         "summary", help="print summary.json / state.json from a container output directory"
@@ -1115,6 +1624,8 @@ def main(argv: list[str] | None = None) -> int:
             no_cc_check=args.no_cc_check,
             fresh_history=args.fresh_history,
             owners=owners,
+            no_notes=args.no_notes,
+            no_naming=args.no_naming,
         )
     if args.command == "summary":
         return summary_command(args.out_dir)
