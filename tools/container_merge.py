@@ -41,10 +41,38 @@ talk its way past this.
                                     (an owner whose commit failed maps to
                                     {"status", "committed": false,
                                     "commit_error": <last 15 lines>} instead
-                                    of a bare status string)
+                                    of a bare status string; an owner whose
+                                    commit succeeded maps to {"status":
+                                    "accepted", "committed": true, "commit":
+                                    <sha>} -- see "Idempotency" below).
+                                    Cumulative across runs against the same
+                                    <out>: an owner not touched this run
+                                    (skipped via --owners, or simply not
+                                    re-processed) keeps whatever entry a
+                                    prior run recorded for it.
     <out>/merge-history.jsonl      only with --fresh-history: this run's own
                                     probe-stats history (see --fresh-history
                                     below)
+
+Idempotency: a second ``merge --commit`` run against the same ``<out>``
+must never re-gate (and try to re-install/re-commit) an owner that already
+landed. Before re-gating, each owner is checked against two signals and
+skipped with status "already_landed" (neither accepted nor rejected, and
+never committed again) if either one fires:
+
+* its batch's ``source`` file, read from *this* checkout, no longer
+  contains that owner's ``#pragma GLOBAL_ASM(".../<owner>.s")`` line (the
+  same shape ``tools/container_agent.py``'s ``PRAGMA_RE`` matches) -- i.e.
+  the candidate is already installed in the tree; or
+* the previous ``merge-report.json`` in ``<out>`` (if any) already marks
+  this owner committed -- either the plain ``"accepted"`` string (the form
+  a committed owner got before this fix existed, kept for backward
+  compatibility) or an object entry with ``"committed": true``.
+
+``--owners a,b,c`` limits a run to only those owners (by
+``accepted/<owner>.json`` stem); every other owner's ``accepted/*.json`` is
+left untouched and its prior report entry (if any) is carried forward
+unchanged.
 
 Two flags work around problems seen on the first real merge (see the
 "merge" section of ``docs/CONTAINER_AGENT.md`` for the full story):
@@ -71,6 +99,7 @@ Usage:
     python3 tools/container_merge.py merge /abs/out --commit
     python3 tools/container_merge.py merge /abs/out --repo . --dry-run
     python3 tools/container_merge.py merge /abs/out --commit --no-cc-check --fresh-history
+    python3 tools/container_merge.py merge /abs/out --commit --owners func_A,func_B
     python3 tools/container_merge.py summary /abs/out
     python3 tools/container_merge.py import-stats /abs/out
     python3 tools/container_merge.py import-stats /abs/out --repo . --dry-run
@@ -82,6 +111,7 @@ import argparse
 import dataclasses
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -114,6 +144,11 @@ class MergeRow:
     # records in ``merge-report.json``, and mirrors into
     # ``<out>/merge-results/<owner>.commit.log`` in full.
     commit_error_tail: str = ""
+    # ``git rev-parse HEAD`` in ``repo_root`` right after a successful
+    # ``git commit --only``, set only when that commit succeeded and the
+    # hash could be read back. Recorded in ``merge-report.json`` as this
+    # owner's ``"commit"`` field.
+    commit_sha: str = ""
 
 
 def load_accepted_batch(path: Path) -> dict[str, object]:
@@ -253,6 +288,106 @@ def git_commit_only(source: str, message: str, *, repo_root: Path) -> tuple[bool
     return proc.returncode == 0, output
 
 
+def git_rev_parse_head(repo_root: Path) -> str | None:
+    """``git rev-parse HEAD`` in ``repo_root``, run immediately after a
+    successful ``git_commit_only`` to capture the hash of the commit that
+    just landed -- the same small, single-purpose subprocess seam as
+    ``git_commit_only`` itself, so tests can stub it independently.
+
+    Returns ``None`` (never raises) if the hash can't be read back for any
+    reason -- a missing ``git`` binary, a non-repo ``repo_root``, a non-zero
+    exit -- so a hash-recording hiccup never blocks the merge or the commit
+    that already succeeded.
+    """
+    try:
+        proc = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=repo_root,
+            capture_output=True,
+            text=True,
+            env=_clean_env(),
+        )
+    except OSError:
+        return None
+    if proc.returncode != 0:
+        return None
+    sha = (proc.stdout or "").strip()
+    return sha or None
+
+
+# ---------------------------------------------------------------------------
+# Idempotency: has this owner already landed?
+# ---------------------------------------------------------------------------
+
+
+def owner_pragma_pattern(owner: str) -> re.Pattern[str]:
+    """Same shape as ``tools/container_agent.py``'s ``PRAGMA_RE``, pinned to
+    one owner: matches ``#pragma GLOBAL_ASM(".../<owner>.s")``."""
+    return re.compile(r'#pragma\s+GLOBAL_ASM\("[^"]*/' + re.escape(owner) + r'\.s"\)')
+
+
+def source_still_has_pragma(repo_root: Path, source: str, owner: str) -> bool:
+    """True iff ``<repo_root>/<source>`` still contains the GLOBAL_ASM
+    pragma naming ``owner`` -- i.e. this owner's candidate has not yet been
+    installed into this checkout. A missing or unreadable source file is
+    treated as "no longer has the pragma": the safer read for idempotency,
+    since a merge that can't even find the file to check has nothing left
+    to re-gate against it.
+    """
+    path = repo_root / source
+    if not path.is_file():
+        return False
+    try:
+        text = path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return False
+    return bool(owner_pragma_pattern(owner).search(text))
+
+
+def load_previous_report_owners(out_dir: Path) -> dict[str, object]:
+    """The ``"owners"`` map of a prior ``<out>/merge-report.json`` run, or
+    ``{}`` if there isn't one / it isn't parseable -- the baseline
+    ``write_merge_report`` builds this run's report on top of (so an owner
+    not touched this run keeps its prior entry), and what
+    ``previous_entry_marks_committed`` below reads to decide whether an
+    owner has already landed.
+    """
+    path = out_dir / "merge-report.json"
+    if not path.is_file():
+        return {}
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    owners = payload.get("owners") if isinstance(payload, dict) else None
+    return dict(owners) if isinstance(owners, dict) else {}
+
+
+def previous_entry_marks_committed(entry: object) -> bool:
+    """Does one owner's entry in a prior ``merge-report.json`` mean that
+    owner is already committed?
+
+    * the plain ``"accepted"`` string -- before this fix, that was written
+      both for "host re-gate accepted, commit succeeded" and (with
+      ``--commit`` not passed) "host re-gate accepted, commit never
+      attempted"; treating it as already-committed is the conservative
+      read for the bug this fixes (a repeat ``--commit`` run against an
+      ``<out>`` that already landed everything), and a genuinely
+      never-committed owner is still caught independently by
+      ``source_still_has_pragma``.
+    * this fix's own ``"already_landed"`` string, so a third run over the
+      same ``<out>`` stays a no-op too.
+    * an object entry with ``"committed": true`` (this fix's own form for a
+      successful commit; the pre-existing failed-commit object form always
+      has ``committed: false`` and so is naturally excluded here).
+    """
+    if entry in ("accepted", "already_landed"):
+        return True
+    if isinstance(entry, dict):
+        return bool(entry.get("committed"))
+    return False
+
+
 # ---------------------------------------------------------------------------
 # merge
 # ---------------------------------------------------------------------------
@@ -267,6 +402,7 @@ def process_owner(
     out_dir: Path | None = None,
     extra_env: dict[str, str] | None = None,
     fresh_history: bool = False,
+    previous_report: dict[str, object] | None = None,
 ) -> MergeRow:
     owner = json_path.stem
     try:
@@ -276,6 +412,24 @@ def process_owner(
 
     source = batch_source(payload)
     function = owner_function_name(owner, payload)
+
+    # Idempotency: never re-gate (and try to re-install/re-commit) an owner
+    # that has already landed -- see this module's docstring and
+    # previous_entry_marks_committed's own docstring for why each signal is
+    # sufficient on its own.
+    if source and not source_still_has_pragma(repo_root, source, owner):
+        return MergeRow(
+            owner, source, function, "already_landed",
+            f"{source} no longer has the GLOBAL_ASM pragma for {owner}; already landed",
+            False, "",
+        )
+    if previous_report is not None:
+        prev_entry = previous_report.get(owner)
+        if prev_entry is not None and previous_entry_marks_committed(prev_entry):
+            return MergeRow(
+                owner, source, function, "already_landed",
+                "already committed per a previous merge-report.json", False, "",
+            )
 
     result_path = out_dir / "merge-results" / f"{owner}.json" if out_dir is not None else None
     gate = run_fleet_probe_gate(
@@ -318,9 +472,10 @@ def process_owner(
     ok, commit_output = git_commit_only(source, message, repo_root=repo_root)
 
     if ok:
+        commit_sha = git_rev_parse_head(repo_root) or ""
         return MergeRow(
             owner, source, function, "accepted", "host re-gate accepted",
-            True, commit_output or "committed",
+            True, commit_output or "committed", commit_sha=commit_sha,
         )
 
     tail = _tail_lines(commit_output, 15)
@@ -416,23 +571,52 @@ def write_merge_report(
     cleanly by the host's own clang syntax check -- read this back before
     trusting a ``--no-cc-check`` run's results.
 
-    An owner whose host re-gate accepted but whose ``git commit --only``
-    then failed is recorded as an object rather than a bare status string --
-    ``{"status": "accepted", "committed": false, "commit_error": "<last 15
-    line(s) of combined stdout+stderr>"}`` -- so the failure is visible
-    without re-running anything; the full output is also kept at
-    ``<out>/merge-results/<owner>.commit.log``. Every other owner (rejected,
-    error, or accepted and successfully committed / never attempted) still
-    maps to its plain status string.
+    Cumulative: this run's ``owners`` map is built on top of whatever a
+    prior ``merge-report.json`` in ``out_dir`` already recorded (see
+    ``load_previous_report_owners``), so an owner not in ``rows`` at all --
+    filtered out by ``--owners``, say -- keeps its prior entry rather than
+    disappearing from the report.
+
+    Per-owner entry shapes (``rows`` always wins over a prior entry for the
+    same owner):
+
+    * an owner whose host re-gate accepted and ``git commit --only`` then
+      succeeded maps to an object, ``{"status": "accepted", "committed":
+      true, "commit": "<sha>"}`` -- the ``git rev-parse HEAD`` read back
+      right after that commit (``process_owner``'s ``commit_sha``); the
+      ``"commit"`` key is omitted if the hash couldn't be read back, but
+      ``committed`` is still ``true``. A plain ``"accepted"`` string (no
+      ``"commit"`` field at all) means the host re-gate accepted but no
+      commit was attempted (``--commit`` not passed, ``--dry-run``, or a
+      missing ``source`` to commit) -- readers must not treat a bare
+      ``"accepted"`` string as proof of a commit having happened; only
+      before this fix could it also (ambiguously) mean "committed".
+    * an owner whose host re-gate accepted but whose ``git commit --only``
+      then failed is recorded as an object,
+      ``{"status": "accepted", "committed": false, "commit_error": "<last
+      15 line(s) of combined stdout+stderr>"}`` -- so the failure is
+      visible without re-running anything; the full output is also kept at
+      ``<out>/merge-results/<owner>.commit.log``.
+    * an owner skipped this run because it had already landed (see this
+      module's docstring / ``previous_entry_marks_committed``) maps to the
+      plain string ``"already_landed"``.
+    * every other owner (rejected, error) maps to its plain status string.
     """
-    owners: dict[str, object] = {}
+    owners: dict[str, object] = dict(load_previous_report_owners(out_dir))
     for row in rows:
-        if row.commit_error_tail:
+        if row.status == "already_landed":
+            owners[row.owner] = "already_landed"
+        elif row.commit_error_tail:
             owners[row.owner] = {
                 "status": row.status,
                 "committed": row.committed,
                 "commit_error": row.commit_error_tail,
             }
+        elif row.committed:
+            entry: dict[str, object] = {"status": row.status, "committed": True}
+            if row.commit_sha:
+                entry["commit"] = row.commit_sha
+            owners[row.owner] = entry
         else:
             owners[row.owner] = row.status
 
@@ -456,6 +640,7 @@ def merge(
     dry_run: bool,
     no_cc_check: bool = False,
     fresh_history: bool = False,
+    owners: set[str] | None = None,
 ) -> int:
     accepted_dir = out_dir / "accepted"
     json_paths = (
@@ -467,6 +652,15 @@ def merge(
         print(f"container_merge: no accepted candidates under {accepted_dir}")
         return 0
 
+    if owners is not None:
+        json_paths = [p for p in json_paths if p.stem in owners]
+        if not json_paths:
+            print(
+                f"container_merge: no accepted candidates under {accepted_dir} "
+                f"match --owners {','.join(sorted(owners))}"
+            )
+            return 0
+
     if no_cc_check:
         print(
             "container_merge: *** WARNING --no-cc-check: the host clang syntax "
@@ -476,18 +670,21 @@ def merge(
         )
 
     extra_env = build_gate_env(out_dir, no_cc_check=no_cc_check, fresh_history=fresh_history)
+    previous_report = load_previous_report_owners(out_dir)
 
     rows = [
         process_owner(
             path, repo_root=repo_root, commit=commit, dry_run=dry_run,
             out_dir=out_dir, extra_env=extra_env, fresh_history=fresh_history,
+            previous_report=previous_report,
         )
         for path in json_paths
     ]
 
     print(format_table(rows))
 
-    rejected = [row for row in rows if row.status != "accepted"]
+    already_landed_rows = [row for row in rows if row.status == "already_landed"]
+    rejected = [row for row in rows if row.status not in ("accepted", "already_landed")]
     accepted_rows = [row for row in rows if row.status == "accepted"]
     commit_failures = [
         row for row in accepted_rows
@@ -495,7 +692,10 @@ def merge(
     ]
 
     print()
-    print(f"accepted {len(accepted_rows)}/{len(rows)}, rejected {len(rejected)}/{len(rows)}")
+    print(
+        f"accepted {len(accepted_rows)}/{len(rows)}, rejected {len(rejected)}/{len(rows)}, "
+        f"already_landed {len(already_landed_rows)}/{len(rows)}"
+    )
     if commit and not dry_run:
         committed = sum(1 for row in rows if row.committed)
         print(f"committed {committed}/{len(accepted_rows)} accepted owner(s)")
@@ -872,6 +1072,14 @@ def main(argv: list[str] | None = None) -> int:
             "into the host's real probe-stats history"
         ),
     )
+    p_merge.add_argument(
+        "--owners", type=str, default=None,
+        help=(
+            "comma-separated list of owner names (accepted/<owner>.json stems) to "
+            "limit this run to; every other owner is left untouched and its prior "
+            "merge-report.json entry, if any, is carried forward unchanged"
+        ),
+    )
 
     p_summary = sub.add_parser(
         "summary", help="print summary.json / state.json from a container output directory"
@@ -896,6 +1104,9 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     if args.command == "merge":
+        owners = None
+        if args.owners:
+            owners = {name.strip() for name in args.owners.split(",") if name.strip()}
         return merge(
             args.out_dir,
             repo_root=args.repo.resolve(),
@@ -903,6 +1114,7 @@ def main(argv: list[str] | None = None) -> int:
             dry_run=args.dry_run,
             no_cc_check=args.no_cc_check,
             fresh_history=args.fresh_history,
+            owners=owners,
         )
     if args.command == "summary":
         return summary_command(args.out_dir)

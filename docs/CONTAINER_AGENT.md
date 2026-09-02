@@ -382,7 +382,7 @@ Everything lands under the mounted `--out` directory:
 |---|---|
 | `merge-results/<owner>.json` | the raw `fleet_probe --gate --json` result for each owner, kept (not deleted) so a failed re-gate can be inspected |
 | `merge-results/<owner>.commit.log` | only when the host re-gate accepted but `git commit --only` then failed: the full combined stdout+stderr of that failed commit (§9's "commit failures" below) |
-| `merge-report.json` | `owner -> status` for the run, plus `cc_check_bypassed` / `fresh_history` flags (§9.2/§9.3); an owner whose commit failed maps to an object instead of a bare status string (below) |
+| `merge-report.json` | `owner -> status` for the run, plus `cc_check_bypassed` / `fresh_history` flags (§9.2/§9.3); an owner whose commit failed or succeeded maps to an object instead of a bare status string (below); cumulative across runs against the same `<out>` (§9.4) |
 | `merge-history.jsonl` | only with `--fresh-history`: this run's own probe-stats history (§9.3) |
 
 ## 8. Why the container never commits
@@ -419,12 +419,14 @@ in a shared checkout would sweep in whatever another session has staged.
 Useful flags: `--repo PATH` (host checkout to re-gate/commit against,
 default `.`); `--dry-run` (re-gate every owner and print the table, but
 never commit, even with `--commit`); `--no-cc-check` (§9.2); `--fresh-history`
-(§9.3).
+(§9.3); `--owners a,b,c` (limit this run to those owners; §9.4).
 
 The command prints a table (owner, source, host-re-gate status, whether it
 committed, detail) and exits non-zero if any container-accepted candidate
 fails the host re-gate, so it is safe to gate a script or CI step on its
-exit code. Every run also writes `<out>/merge-report.json`
+exit code (an owner skipped as `already_landed`, §9.4, counts as neither
+accepted nor rejected and never affects the exit code). Every run also
+writes `<out>/merge-report.json`
 (`owner -> status`, plus the `--no-cc-check` / `--fresh-history` flags for
 that run) and keeps each owner's raw `fleet_probe --gate --json` output at
 `<out>/merge-results/<owner>.json` rather than deleting it, so a rejected
@@ -442,6 +444,19 @@ same 15-line tail in `merge-report.json` as
 `{"status": "accepted", "committed": false, "commit_error": "<tail>"}` in
 place of the plain status string every other owner gets -- so a commit
 failure is visible without re-running anything.
+
+**Commit successes.** When `git commit --only <source>` succeeds, `merge`
+immediately reads the hash back (`git rev-parse HEAD` in `--repo`) and
+records it in `merge-report.json` as
+`{"status": "accepted", "committed": true, "commit": "<sha>"}` -- the
+`"commit"` key is omitted if the hash couldn't be read back for some
+reason, but `committed` stays `true`. A bare `"accepted"` string means the
+host re-gate accepted but no commit was ever attempted (`--commit` not
+passed, `--dry-run`, or a batch with no `source` to commit) -- see §9.4 for
+why a *reader* must still treat a bare `"accepted"` string from an older
+run as possibly meaning "committed" (`tools/fleetctl` already handles both
+the plain-string and object shapes of an owner's entry; the `"commit"`
+field is new and simply ignored by a reader that doesn't look for it).
 
 To read a run's own progress without merging anything:
 `python3 tools/container_merge.py summary /abs/out` prints `summary.json`
@@ -546,7 +561,56 @@ automatically as part of `merge` itself -- no separate `import-stats` step
 is needed for `--fresh-history`'s own history file (see §9's note on the
 reminder `merge` still prints for the *ordinary* probe-stats copy).
 
-## Temp-file leak bounding
+### 9.4 Idempotency: re-running `merge` safely
+
+    python3 tools/container_merge.py merge /abs/out --commit
+    python3 tools/container_merge.py merge /abs/out --commit   # run again: safe
+
+`merge` is safe to re-run against the same `--out` directory, including
+with `--commit`, without re-doing (or re-attempting to commit) work an
+earlier run already landed. This was found the hard way: running `merge
+<out> --fresh-history --commit` a second time on an out dir whose
+`accepted/func_A.json` had already been merged and committed earlier
+re-gated `func_A` again -- which reinstalled the same body into an
+already-matched source and then `git commit --only` failed with nothing to
+commit, reporting "accepted / commit failed" for an owner that had, in
+fact, already landed cleanly.
+
+Before re-gating an owner, `merge` checks two independent signals and, if
+either fires, skips it entirely -- never calling `fleet_probe --gate` or
+`git commit --only` for it at all -- with status `"already_landed"`:
+
+* the owner's batch `source` file, read from **this** checkout (`--repo`),
+  no longer contains that owner's `#pragma GLOBAL_ASM(".../<owner>.s")`
+  line (the same pattern `tools/container_agent.py`'s `PRAGMA_RE` matches)
+  -- i.e. the candidate is already installed in the tree, regardless of
+  what any report says; or
+* the previous `merge-report.json` in `--out` (if any) already marks this
+  owner committed -- either the plain `"accepted"` string (ambiguous
+  before this fix -- it could mean "committed" or "accepted but never
+  committed" -- so a bare `"accepted"` string from *any* run, old or new,
+  is read conservatively as already-committed) or an object entry with
+  `"committed": true`.
+
+`already_landed` counts as neither accepted nor rejected: it never makes
+`merge`'s exit code non-zero, and the table's STATUS column shows it
+plainly so a run's output still names every owner it looked at.
+
+`merge-report.json` is cumulative across runs against the same `--out`: an
+owner not present in this run's `rows` at all (skipped via `--owners`,
+below) keeps whatever entry an earlier run recorded for it, rather than
+disappearing. An owner this run *did* touch -- including one resolved as
+`already_landed` -- always gets this run's own entry, overwriting whatever
+an earlier run recorded for it.
+
+**`--owners a,b,c`** limits a `merge` run to just those owners (matched
+against `accepted/<owner>.json` stems); every other owner's accepted batch
+is left completely untouched this run. Combined with the cumulative report
+above, this makes it possible to retry a single stuck owner (say, after
+fixing whatever made its commit fail) without re-touching everything else
+in a large `--out` directory:
+
+    python3 tools/container_merge.py merge /abs/out --commit --owners func_A
 
 IDO's compiler passes (`as0`, `as1`, `ugen`) create `ctm*` temp files that
 honour `$TMPDIR` and only get removed on a normal exit. decomp-permuter

@@ -26,7 +26,19 @@ if str(TOOLS) not in sys.path:
 import container_merge  # noqa: E402
 
 
-def _write_batch(directory: Path, owner: str, *, source: str = "disasm/src/X.c") -> Path:
+def _write_batch(
+    directory: Path, owner: str, *, source: str = "disasm/src/X.c", write_source: bool = True
+) -> Path:
+    """Write ``<directory>/<owner>.json``. By default this also writes (or
+    appends to -- several owners commonly share one ``source`` file) the
+    ``source`` file itself (relative to ``directory.parent``, which is the
+    ``repo_root`` every test in this module passes -- ``out_dir``) with a
+    ``#pragma GLOBAL_ASM`` line naming ``owner``, so ``process_owner``'s
+    "already landed" pragma-presence check (``source_still_has_pragma``)
+    sees the un-landed state most tests assume. Pass ``write_source=False``
+    to simulate an owner whose source has already had the pragma removed
+    (the "skip via missing pragma" idempotency case).
+    """
     path = directory / f"{owner}.json"
     path.write_text(
         json.dumps(
@@ -40,6 +52,14 @@ def _write_batch(directory: Path, owner: str, *, source: str = "disasm/src/X.c")
         ),
         encoding="utf-8",
     )
+    if write_source and source:
+        src_path = directory.parent / source
+        src_path.parent.mkdir(parents=True, exist_ok=True)
+        pragma_line = f'#pragma GLOBAL_ASM("asm/nonmatchings/x/{owner}.s")\n'
+        existing = src_path.read_text(encoding="utf-8") if src_path.is_file() else ""
+        if pragma_line not in existing:
+            with src_path.open("a", encoding="utf-8") as handle:
+                handle.write(pragma_line)
     return path
 
 
@@ -340,6 +360,223 @@ class ProcessOwnerTests(unittest.TestCase):
         self.assertEqual(row.commit_error_tail, "")
         self.assertFalse((out_dir / "merge-results" / "func_1.commit.log").exists())
 
+    def test_commit_success_records_commit_sha(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            path = _write_batch(out_dir / "accepted", "func_1", source="disasm/src/Y.c")
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", return_value=_accepted_result("func_1")
+            ), mock.patch.object(
+                container_merge, "git_commit_only", return_value=(True, "committed")
+            ), mock.patch.object(
+                container_merge, "git_rev_parse_head", return_value="deadbeef"
+            ) as rev_parse_mock:
+                row = container_merge.process_owner(
+                    path, repo_root=out_dir, commit=True, dry_run=False,
+                )
+        self.assertTrue(row.committed)
+        self.assertEqual(row.commit_sha, "deadbeef")
+        rev_parse_mock.assert_called_once_with(out_dir)
+
+    def test_commit_success_without_readable_sha_leaves_commit_sha_empty(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            path = _write_batch(out_dir / "accepted", "func_1", source="disasm/src/Y.c")
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", return_value=_accepted_result("func_1")
+            ), mock.patch.object(
+                container_merge, "git_commit_only", return_value=(True, "committed")
+            ), mock.patch.object(
+                container_merge, "git_rev_parse_head", return_value=None
+            ):
+                row = container_merge.process_owner(
+                    path, repo_root=out_dir, commit=True, dry_run=False,
+                )
+        self.assertTrue(row.committed)
+        self.assertEqual(row.commit_sha, "")
+
+    def test_rejected_owner_never_calls_rev_parse(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            path = _write_batch(out_dir / "accepted", "func_1", source="disasm/src/Y.c")
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", return_value=_rejected_result()
+            ), mock.patch.object(
+                container_merge, "git_rev_parse_head"
+            ) as rev_parse_mock:
+                container_merge.process_owner(
+                    path, repo_root=out_dir, commit=True, dry_run=False,
+                )
+        rev_parse_mock.assert_not_called()
+
+
+class AlreadyLandedTests(unittest.TestCase):
+    """Idempotency: a second ``merge --commit`` over the same ``<out>``
+    must not re-gate (and try to re-install/re-commit) an owner that has
+    already landed -- the bug this fixes (see this module's own module
+    docstring reference and tools/container_merge.py's module docstring):
+    a repeat run re-installed an already-merged body into an
+    already-matched source and then ``git commit --only`` failed with
+    nothing to commit."""
+
+    # -- skip via missing pragma --------------------------------------------
+
+    def test_missing_pragma_is_already_landed_and_never_regated(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            path = _write_batch(
+                out_dir / "accepted", "func_1", source="disasm/src/Y.c", write_source=False,
+            )
+            # The source file exists (as it would in a real checkout after a
+            # prior merge landed this owner) but no longer carries the
+            # pragma for func_1 -- some other function's, say.
+            src_path = out_dir / "disasm" / "src" / "Y.c"
+            src_path.parent.mkdir(parents=True, exist_ok=True)
+            src_path.write_text("void already_landed_body(void) {}\n", encoding="utf-8")
+
+            with mock.patch.object(container_merge, "run_fleet_probe_gate") as gate_mock:
+                row = container_merge.process_owner(
+                    path, repo_root=out_dir, commit=True, dry_run=False,
+                )
+        self.assertEqual(row.status, "already_landed")
+        self.assertFalse(row.committed)
+        gate_mock.assert_not_called()
+
+    def test_missing_source_file_entirely_is_already_landed(self) -> None:
+        """A source file that no longer exists at all (e.g. removed as part
+        of the same landing) is also read as "no longer has the pragma"."""
+        with _tmp_out_dir() as out_dir:
+            path = _write_batch(
+                out_dir / "accepted", "func_1", source="disasm/src/gone.c", write_source=False,
+            )
+            with mock.patch.object(container_merge, "run_fleet_probe_gate") as gate_mock:
+                row = container_merge.process_owner(
+                    path, repo_root=out_dir, commit=True, dry_run=False,
+                )
+        self.assertEqual(row.status, "already_landed")
+        gate_mock.assert_not_called()
+
+    def test_pragma_still_present_is_regated_normally(self) -> None:
+        """Sanity check for the fixture itself: with the pragma still
+        present (the default from _write_batch), an owner is regated as
+        before -- not short-circuited to already_landed."""
+        with _tmp_out_dir() as out_dir:
+            path = _write_batch(out_dir / "accepted", "func_1", source="disasm/src/Y.c")
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", return_value=_accepted_result("func_1")
+            ) as gate_mock:
+                row = container_merge.process_owner(
+                    path, repo_root=out_dir, commit=False, dry_run=False,
+                )
+        self.assertEqual(row.status, "accepted")
+        gate_mock.assert_called_once()
+
+    # -- skip via prior merge-report.json ------------------------------------
+
+    def test_prior_report_bare_accepted_string_is_already_landed(self) -> None:
+        """Reports written before this fix recorded a bare "accepted"
+        string for a committed owner -- reading one back must still treat
+        it as already landed."""
+        with _tmp_out_dir() as out_dir:
+            path = _write_batch(out_dir / "accepted", "func_1", source="disasm/src/Y.c")
+            with mock.patch.object(container_merge, "run_fleet_probe_gate") as gate_mock:
+                row = container_merge.process_owner(
+                    path, repo_root=out_dir, commit=True, dry_run=False,
+                    previous_report={"func_1": "accepted"},
+                )
+        self.assertEqual(row.status, "already_landed")
+        gate_mock.assert_not_called()
+
+    def test_prior_report_object_committed_true_is_already_landed(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            path = _write_batch(out_dir / "accepted", "func_1", source="disasm/src/Y.c")
+            with mock.patch.object(container_merge, "run_fleet_probe_gate") as gate_mock:
+                row = container_merge.process_owner(
+                    path, repo_root=out_dir, commit=True, dry_run=False,
+                    previous_report={
+                        "func_1": {"status": "accepted", "committed": True, "commit": "abc123"}
+                    },
+                )
+        self.assertEqual(row.status, "already_landed")
+        gate_mock.assert_not_called()
+
+    def test_prior_report_committed_false_object_is_not_already_landed(self) -> None:
+        """A previously *failed* commit (committed: false) must still be
+        re-gated -- only committed: true means already landed."""
+        with _tmp_out_dir() as out_dir:
+            path = _write_batch(out_dir / "accepted", "func_1", source="disasm/src/Y.c")
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", return_value=_accepted_result("func_1")
+            ) as gate_mock:
+                row = container_merge.process_owner(
+                    path, repo_root=out_dir, commit=False, dry_run=False,
+                    previous_report={
+                        "func_1": {
+                            "status": "accepted", "committed": False, "commit_error": "boom",
+                        }
+                    },
+                )
+        self.assertEqual(row.status, "accepted")
+        gate_mock.assert_called_once()
+
+    def test_prior_report_rejected_is_not_already_landed(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            path = _write_batch(out_dir / "accepted", "func_1", source="disasm/src/Y.c")
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", return_value=_accepted_result("func_1")
+            ) as gate_mock:
+                row = container_merge.process_owner(
+                    path, repo_root=out_dir, commit=False, dry_run=False,
+                    previous_report={"func_1": "rejected"},
+                )
+        self.assertEqual(row.status, "accepted")
+        gate_mock.assert_called_once()
+
+    def test_no_previous_report_is_not_already_landed(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            path = _write_batch(out_dir / "accepted", "func_1", source="disasm/src/Y.c")
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", return_value=_accepted_result("func_1")
+            ) as gate_mock:
+                row = container_merge.process_owner(
+                    path, repo_root=out_dir, commit=False, dry_run=False, previous_report=None,
+                )
+        self.assertEqual(row.status, "accepted")
+        gate_mock.assert_called_once()
+
+    # -- owner_pragma_pattern / source_still_has_pragma / helpers -----------
+
+    def test_owner_pragma_pattern_matches_real_pragma_line(self) -> None:
+        pattern = container_merge.owner_pragma_pattern("func_1")
+        self.assertTrue(
+            pattern.search('#pragma GLOBAL_ASM("asm/nonmatchings/x/func_1.s")')
+        )
+        self.assertFalse(
+            pattern.search('#pragma GLOBAL_ASM("asm/nonmatchings/x/func_1_helper.s")')
+        )
+
+    def test_source_still_has_pragma_true_when_present(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            src = repo_root / "disasm" / "src" / "X.c"
+            src.parent.mkdir(parents=True)
+            src.write_text('#pragma GLOBAL_ASM("asm/nonmatchings/x/func_1.s")\n', encoding="utf-8")
+            self.assertTrue(
+                container_merge.source_still_has_pragma(repo_root, "disasm/src/X.c", "func_1")
+            )
+
+    def test_source_still_has_pragma_false_when_missing_file(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            self.assertFalse(
+                container_merge.source_still_has_pragma(repo_root, "disasm/src/gone.c", "func_1")
+            )
+
+    def test_previous_entry_marks_committed(self) -> None:
+        marks = container_merge.previous_entry_marks_committed
+        self.assertTrue(marks("accepted"))
+        self.assertTrue(marks("already_landed"))
+        self.assertTrue(marks({"status": "accepted", "committed": True}))
+        self.assertFalse(marks({"status": "accepted", "committed": False}))
+        self.assertFalse(marks("rejected"))
+        self.assertFalse(marks("error"))
+
 
 class RunFleetProbeGateTests(unittest.TestCase):
     """``run_fleet_probe_gate``'s own subprocess call: env handling and
@@ -629,7 +866,7 @@ class MergeTests(unittest.TestCase):
                 {"status": "accepted", "committed": False, "commit_error": output},
             )
 
-    def test_commit_success_report_entry_stays_a_plain_string(self) -> None:
+    def test_commit_success_report_entry_records_committed_and_sha(self) -> None:
         with _tmp_out_dir() as out_dir:
             _write_batch(out_dir / "accepted", "func_1")
             with mock.patch.object(
@@ -637,10 +874,45 @@ class MergeTests(unittest.TestCase):
                 return_value=_accepted_result("func_1"),
             ), mock.patch.object(
                 container_merge, "git_commit_only", return_value=(True, "committed")
+            ), mock.patch.object(
+                container_merge, "git_rev_parse_head", return_value="abc123"
             ):
                 self._run_merge(out_dir, commit=True, dry_run=False)
             report = json.loads((out_dir / "merge-report.json").read_text(encoding="utf-8"))
+            self.assertEqual(
+                report["owners"]["func_1"],
+                {"status": "accepted", "committed": True, "commit": "abc123"},
+            )
+
+    def test_commit_success_never_committed_stays_a_plain_string(self) -> None:
+        """An owner whose host re-gate accepted but where --commit was never
+        passed (no commit attempted at all) keeps the pre-existing plain
+        "accepted" string -- only an owner that was actually committed gets
+        the new object form."""
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1")
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate",
+                return_value=_accepted_result("func_1"),
+            ):
+                self._run_merge(out_dir, commit=False, dry_run=False)
+            report = json.loads((out_dir / "merge-report.json").read_text(encoding="utf-8"))
             self.assertEqual(report["owners"]["func_1"], "accepted")
+
+    def test_commit_success_without_readable_sha_omits_commit_field(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1")
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate",
+                return_value=_accepted_result("func_1"),
+            ), mock.patch.object(
+                container_merge, "git_commit_only", return_value=(True, "committed")
+            ), mock.patch.object(
+                container_merge, "git_rev_parse_head", return_value=None
+            ):
+                self._run_merge(out_dir, commit=True, dry_run=False)
+            report = json.loads((out_dir / "merge-report.json").read_text(encoding="utf-8"))
+            self.assertEqual(report["owners"]["func_1"], {"status": "accepted", "committed": True})
 
     def test_fresh_history_import_happens_before_commit_within_merge(self) -> None:
         """End-to-end (merge(), not just process_owner()) version of the
@@ -831,6 +1103,189 @@ class MergeTests(unittest.TestCase):
                 self._run_merge(out_dir, commit=False, dry_run=False)
             self.assertTrue((out_dir / "merge-results" / "func_1.json").is_file())
             self.assertTrue((out_dir / "merge-results" / "func_2.json").is_file())
+
+    # -- idempotency: a second merge over the same <out> -------------------
+
+    def test_second_run_skips_already_committed_owner_without_regating(self) -> None:
+        """The bug this fixes: running merge --fresh-history --commit a
+        second time on an out dir whose accepted/func_A.json had already
+        landed used to re-gate it again (re-installing the same body into
+        an already-matched source) and then fail to commit. A second
+        merge() call must instead skip it as already_landed and never call
+        the gate at all."""
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1", source="disasm/src/Y.c")
+
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", return_value=_accepted_result("func_1"),
+            ), mock.patch.object(
+                container_merge, "git_commit_only", return_value=(True, "committed"),
+            ), mock.patch.object(
+                container_merge, "git_rev_parse_head", return_value="sha1",
+            ):
+                first_code, _out = self._run_merge(out_dir, commit=True, dry_run=False)
+            self.assertEqual(first_code, 0)
+
+            with mock.patch.object(container_merge, "run_fleet_probe_gate") as gate_mock, \
+                 mock.patch.object(container_merge, "git_commit_only") as commit_mock:
+                second_code, second_out = self._run_merge(out_dir, commit=True, dry_run=False)
+
+            self.assertEqual(second_code, 0)
+            self.assertIn("already_landed 1/1", second_out)
+            gate_mock.assert_not_called()
+            commit_mock.assert_not_called()
+            report = json.loads((out_dir / "merge-report.json").read_text(encoding="utf-8"))
+        # This run's own status ("already_landed") wins for a touched
+        # owner, per write_merge_report -- a prior run's entry is only
+        # ever carried forward untouched for an owner NOT in this run's
+        # rows at all (see test_report_is_cumulative_across_owners_filter_touch).
+        self.assertEqual(report["owners"]["func_1"], "already_landed")
+
+    def test_already_landed_does_not_affect_exit_code(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1", source="disasm/src/A.c")
+
+            def fake_gate(path, *, repo_root, **_kw):
+                return _accepted_result(path.stem)
+
+            with mock.patch.object(container_merge, "run_fleet_probe_gate", side_effect=fake_gate):
+                code, _out = self._run_merge(out_dir, commit=False, dry_run=False)
+            self.assertEqual(code, 0)
+
+            with mock.patch.object(container_merge, "run_fleet_probe_gate") as gate_mock:
+                code, out = self._run_merge(out_dir, commit=False, dry_run=False)
+        self.assertEqual(code, 0)
+        self.assertIn("already_landed", out)
+        gate_mock.assert_not_called()
+
+    # -- cumulative merge-report.json ---------------------------------------
+
+    def test_report_is_cumulative_across_owners_filter_touch(self) -> None:
+        """An owner not touched this run (filtered out via --owners) keeps
+        its prior report entry rather than disappearing, and a touched
+        owner is still re-gated fresh regardless of what the untouched
+        owner's entry looks like."""
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1", source="disasm/src/A.c")
+            _write_batch(out_dir / "accepted", "func_2", source="disasm/src/B.c")
+
+            # Simulate a prior run's report for both owners.
+            (out_dir / "merge-report.json").write_text(
+                json.dumps(
+                    {
+                        "cc_check_bypassed": False,
+                        "fresh_history": False,
+                        "owners": {
+                            "func_1": {
+                                "status": "accepted", "committed": True, "commit": "sha0",
+                            },
+                            "func_2": "rejected",
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            # A run limited to func_2 only via --owners must leave func_1's
+            # entry untouched (process_owner is never even called for it --
+            # its accepted/func_1.json is filtered out before the loop) and
+            # must re-gate func_2 fresh (its prior status was "rejected",
+            # not landed).
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", return_value=_accepted_result("func_2"),
+            ) as gate_mock:
+                code, _out = self._run_merge(
+                    out_dir, commit=False, dry_run=False, owners={"func_2"}
+                )
+            self.assertEqual(code, 0)
+            gate_mock.assert_called_once()
+            report2 = json.loads((out_dir / "merge-report.json").read_text(encoding="utf-8"))
+        self.assertEqual(
+            report2["owners"]["func_1"],
+            {"status": "accepted", "committed": True, "commit": "sha0"},
+        )
+        self.assertEqual(report2["owners"]["func_2"], "accepted")
+
+    def test_report_preserves_prior_commit_object_entry_untouched(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1", source="disasm/src/A.c")
+            _write_batch(out_dir / "accepted", "func_2", source="disasm/src/B.c")
+
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", return_value=_accepted_result("func_1"),
+            ), mock.patch.object(
+                container_merge, "git_commit_only", return_value=(True, "committed"),
+            ), mock.patch.object(
+                container_merge, "git_rev_parse_head", return_value="cafef00d",
+            ):
+                self._run_merge(out_dir, commit=True, dry_run=False, owners={"func_1"})
+
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", return_value=_rejected_result(),
+            ):
+                self._run_merge(out_dir, commit=True, dry_run=False, owners={"func_2"})
+
+            report = json.loads((out_dir / "merge-report.json").read_text(encoding="utf-8"))
+        self.assertEqual(
+            report["owners"]["func_1"],
+            {"status": "accepted", "committed": True, "commit": "cafef00d"},
+        )
+        self.assertEqual(report["owners"]["func_2"], "rejected")
+
+    # -- --owners -------------------------------------------------------
+
+    def test_owners_filter_limits_which_batches_are_processed(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1", source="disasm/src/A.c")
+            _write_batch(out_dir / "accepted", "func_2", source="disasm/src/B.c")
+
+            def fake_gate(path, *, repo_root, **_kw):
+                return _accepted_result(path.stem)
+
+            with mock.patch.object(container_merge, "run_fleet_probe_gate", side_effect=fake_gate):
+                code, out = self._run_merge(
+                    out_dir, commit=False, dry_run=False, owners={"func_1"}
+                )
+        self.assertEqual(code, 0)
+        self.assertIn("func_1", out)
+        self.assertNotIn("func_2", out)
+        self.assertIn("accepted 1/1", out)
+
+    def test_owners_filter_matching_nothing_is_a_clean_noop(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1", source="disasm/src/A.c")
+            with mock.patch.object(container_merge, "run_fleet_probe_gate") as gate_mock:
+                code, out = self._run_merge(
+                    out_dir, commit=False, dry_run=False, owners={"no_such_owner"}
+                )
+        self.assertEqual(code, 0)
+        self.assertIn("--owners", out)
+        gate_mock.assert_not_called()
+
+    def test_cli_parses_owners_flag_into_a_set(self) -> None:
+        captured: dict[str, object] = {}
+
+        def fake_merge(out_dir, **kwargs):
+            captured.update(kwargs)
+            return 0
+
+        with mock.patch.object(container_merge, "merge", side_effect=fake_merge):
+            code = container_merge.main(
+                ["merge", "/abs/out", "--owners", "func_1, func_2,func_3"]
+            )
+        self.assertEqual(code, 0)
+        self.assertEqual(captured["owners"], {"func_1", "func_2", "func_3"})
+
+    def test_cli_omits_owners_filter_when_flag_absent(self) -> None:
+        captured: dict[str, object] = {}
+
+        def fake_merge(out_dir, **kwargs):
+            captured.update(kwargs)
+            return 0
+
+        with mock.patch.object(container_merge, "merge", side_effect=fake_merge):
+            container_merge.main(["merge", "/abs/out"])
+        self.assertIsNone(captured["owners"])
 
 
 class ImportStatsTests(unittest.TestCase):
