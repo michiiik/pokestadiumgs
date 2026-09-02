@@ -71,7 +71,23 @@ loop_1:
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80057C74.s")
+s32 func_80057C74(s8 *arg0) {
+    s32 i = 0;
+    if (*arg0++ == 0x50) return 1;
+    i += 1;
+    if (*arg0++ == 0x50) return 1;
+    i += 1;
+    if (*arg0++ == 0x50) return 1;
+    i = 3;
+    while (i != 0xB) {
+        i += 4;
+        if (*arg0++ == 0x50) return 1;
+        if (*arg0++ == 0x50) return 1;
+        if (*arg0++ == 0x50) return 1;
+        if (*arg0++ == 0x50) return 1;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
