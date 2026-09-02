@@ -31,8 +31,17 @@ talk its way past this.
                                     the raw fleet_probe --gate --json result
                                     for each owner, kept (not deleted) so a
                                     failed re-gate can be inspected
+    <out>/merge-results/<owner>.commit.log
+                                    only when a host re-gate accepted but
+                                    ``git commit --only`` then failed: the
+                                    full combined stdout+stderr of that
+                                    failed commit
     <out>/merge-report.json        owner -> status, plus cc_check_bypassed
                                     and fresh_history flags for this run
+                                    (an owner whose commit failed maps to
+                                    {"status", "committed": false,
+                                    "commit_error": <last 15 lines>} instead
+                                    of a bare status string)
     <out>/merge-history.jsonl      only with --fresh-history: this run's own
                                     probe-stats history (see --fresh-history
                                     below)
@@ -47,9 +56,15 @@ Two flags work around problems seen on the first real merge (see the
   ``merge-report.json``.
 * ``--fresh-history`` points ``PRAGMA_PROBE_STATS`` at a per-run history
   file so a prior host attempt on record can never trip the runner's own
-  "already rejected" preflight; a successful accept is then folded into
-  the host's real probe-stats history so the provenance pre-commit hook
-  still sees it.
+  "already rejected" preflight. For each owner, as soon as its re-gate
+  accepts -- and *before* that owner's own ``git commit --only`` is even
+  attempted -- the accepted line(s) are folded into the host's real
+  probe-stats history, because ``tools/check_decomp_provenance.py``'s
+  pre-commit hook requires an accepted attempt on record in that real
+  history and would otherwise refuse the very commit this merge just
+  earned (seen on a real merge: the re-gate accepted, but the commit step
+  reported "committed 0/1 accepted owner(s)" because the import only ran
+  after every owner's commit had already been attempted).
 
 Usage:
     python3 tools/container_merge.py merge /abs/out
@@ -92,6 +107,13 @@ class MergeRow:
     detail: str
     committed: bool
     commit_detail: str
+    # Last 15 lines of ``git commit --only``'s combined stdout+stderr, set
+    # only when a commit was actually attempted and failed -- distinguishes
+    # "accepted but never attempted to commit" (dry-run, missing source,
+    # commit=False) from "attempted and failed", and is what ``merge`` prints,
+    # records in ``merge-report.json``, and mirrors into
+    # ``<out>/merge-results/<owner>.commit.log`` in full.
+    commit_error_tail: str = ""
 
 
 def load_accepted_batch(path: Path) -> dict[str, object]:
@@ -121,6 +143,11 @@ def owner_function_name(owner: str, payload: dict[str, object]) -> str:
 
 def _first_line(text: str) -> str:
     return text.strip().splitlines()[0] if text and text.strip() else ""
+
+
+def _tail_lines(text: str, count: int) -> str:
+    lines = text.strip("\n").splitlines() if text else []
+    return "\n".join(lines[-count:])
 
 
 # ---------------------------------------------------------------------------
@@ -239,6 +266,7 @@ def process_owner(
     dry_run: bool,
     out_dir: Path | None = None,
     extra_env: dict[str, str] | None = None,
+    fresh_history: bool = False,
 ) -> MergeRow:
     owner = json_path.stem
     try:
@@ -276,11 +304,36 @@ def process_owner(
             False, "commit skipped: missing source",
         )
 
+    if fresh_history and out_dir is not None:
+        # Fold this run's --fresh-history accepted line(s) into the host's
+        # real probe-stats history BEFORE attempting to commit this owner:
+        # tools/check_decomp_provenance.py's pre-commit hook requires an
+        # accepted attempt on record in that real history, and with
+        # --fresh-history the re-gate above only ever recorded its accept
+        # into the private <out>/merge-history.jsonl (see build_gate_env),
+        # never the host's real history on its own.
+        import_fresh_history_after_accept(out_dir, repo_root=repo_root)
+
     message = f"Land container match for {owner}"
-    ok, commit_detail = git_commit_only(source, message, repo_root=repo_root)
+    ok, commit_output = git_commit_only(source, message, repo_root=repo_root)
+
+    if ok:
+        return MergeRow(
+            owner, source, function, "accepted", "host re-gate accepted",
+            True, commit_output or "committed",
+        )
+
+    tail = _tail_lines(commit_output, 15)
+    commit_detail = "commit failed"
+    if out_dir is not None:
+        log_dir = out_dir / "merge-results"
+        log_dir.mkdir(parents=True, exist_ok=True)
+        log_path = log_dir / f"{owner}.commit.log"
+        log_path.write_text((commit_output or "") + "\n", encoding="utf-8")
+        commit_detail = f"commit failed (see merge-results/{owner}.commit.log)"
     return MergeRow(
         owner, source, function, "accepted", "host re-gate accepted",
-        ok, commit_detail or ("committed" if ok else "commit failed"),
+        False, commit_detail, commit_error_tail=tail,
     )
 
 
@@ -289,7 +342,11 @@ COLUMNS = [
     ("SOURCE", 32),
     ("STATUS", 10),
     ("COMMITTED", 9),
-    ("DETAIL", 60),
+    # Wide enough to hold "host re-gate accepted [commit failed (see
+    # merge-results/<owner>.commit.log)]" for a reasonably long owner name
+    # without truncating away the log path the DETAIL column is meant to
+    # surface.
+    ("DETAIL", 90),
 ]
 
 
@@ -358,12 +415,32 @@ def write_merge_report(
     that every accepted candidate in this run was NOT verified to compile
     cleanly by the host's own clang syntax check -- read this back before
     trusting a ``--no-cc-check`` run's results.
+
+    An owner whose host re-gate accepted but whose ``git commit --only``
+    then failed is recorded as an object rather than a bare status string --
+    ``{"status": "accepted", "committed": false, "commit_error": "<last 15
+    line(s) of combined stdout+stderr>"}`` -- so the failure is visible
+    without re-running anything; the full output is also kept at
+    ``<out>/merge-results/<owner>.commit.log``. Every other owner (rejected,
+    error, or accepted and successfully committed / never attempted) still
+    maps to its plain status string.
     """
+    owners: dict[str, object] = {}
+    for row in rows:
+        if row.commit_error_tail:
+            owners[row.owner] = {
+                "status": row.status,
+                "committed": row.committed,
+                "commit_error": row.commit_error_tail,
+            }
+        else:
+            owners[row.owner] = row.status
+
     report_path = out_dir / "merge-report.json"
     payload = {
         "cc_check_bypassed": bool(no_cc_check),
         "fresh_history": bool(fresh_history),
-        "owners": {row.owner: row.status for row in rows},
+        "owners": owners,
     }
     report_path.write_text(
         json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
@@ -403,7 +480,7 @@ def merge(
     rows = [
         process_owner(
             path, repo_root=repo_root, commit=commit, dry_run=dry_run,
-            out_dir=out_dir, extra_env=extra_env,
+            out_dir=out_dir, extra_env=extra_env, fresh_history=fresh_history,
         )
         for path in json_paths
     ]
@@ -433,6 +510,16 @@ def merge(
             f"container_merge: {len(commit_failures)} accepted candidate(s) "
             "failed to commit", file=sys.stderr,
         )
+        for row in commit_failures:
+            if not row.commit_error_tail:
+                continue
+            print()
+            print(
+                f"container_merge: {row.owner}: git commit --only failed "
+                "(last 15 line(s) of combined stdout+stderr; full copy at "
+                f"merge-results/{row.owner}.commit.log):"
+            )
+            print(row.commit_error_tail)
 
     report_path = write_merge_report(
         out_dir, rows, no_cc_check=no_cc_check, fresh_history=fresh_history

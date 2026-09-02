@@ -222,6 +222,124 @@ class ProcessOwnerTests(unittest.TestCase):
         self.assertFalse(row.committed)
         commit_mock.assert_not_called()
 
+    # -- --fresh-history import ordering relative to commit ----------------
+
+    def test_fresh_history_imports_before_commit_for_that_owner(self) -> None:
+        """The bug this fixes: a prior run imported the accepted evidence
+        only after every owner's commit had already been attempted, so
+        tools/check_decomp_provenance.py's pre-commit hook never saw it in
+        time and silently refused the commit. Assert call order directly."""
+        with _tmp_out_dir() as out_dir:
+            path = _write_batch(out_dir / "accepted", "func_1", source="disasm/src/Y.c")
+            order: list[str] = []
+
+            def fake_import(out, *, repo_root):
+                order.append("import")
+                return "imported"
+
+            def fake_commit(source, message, *, repo_root):
+                order.append("commit")
+                return True, "committed"
+
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", return_value=_accepted_result("func_1")
+            ), mock.patch.object(
+                container_merge, "import_fresh_history_after_accept", side_effect=fake_import
+            ) as import_mock, mock.patch.object(
+                container_merge, "git_commit_only", side_effect=fake_commit
+            ):
+                row = container_merge.process_owner(
+                    path, repo_root=out_dir, commit=True, dry_run=False,
+                    out_dir=out_dir, fresh_history=True,
+                )
+        self.assertEqual(order, ["import", "commit"])
+        import_mock.assert_called_once_with(out_dir, repo_root=out_dir)
+        self.assertTrue(row.committed)
+
+    def test_fresh_history_not_imported_when_commit_never_attempted(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            path = _write_batch(out_dir / "accepted", "func_1")
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", return_value=_accepted_result("func_1")
+            ), mock.patch.object(
+                container_merge, "import_fresh_history_after_accept"
+            ) as import_mock:
+                container_merge.process_owner(
+                    path, repo_root=out_dir, commit=False, dry_run=False,
+                    out_dir=out_dir, fresh_history=True,
+                )
+        import_mock.assert_not_called()
+
+    def test_fresh_history_not_imported_on_dry_run(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            path = _write_batch(out_dir / "accepted", "func_1")
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", return_value=_accepted_result("func_1")
+            ), mock.patch.object(
+                container_merge, "import_fresh_history_after_accept"
+            ) as import_mock:
+                container_merge.process_owner(
+                    path, repo_root=out_dir, commit=True, dry_run=True,
+                    out_dir=out_dir, fresh_history=True,
+                )
+        import_mock.assert_not_called()
+
+    # -- commit failure diagnostics -----------------------------------------
+
+    def test_commit_failure_captures_tail_and_writes_log(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            path = _write_batch(out_dir / "accepted", "func_1", source="disasm/src/Y.c")
+            lines = [f"line {i}" for i in range(1, 21)]  # 20 lines, > 15
+            output = "\n".join(lines)
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", return_value=_accepted_result("func_1")
+            ), mock.patch.object(
+                container_merge, "git_commit_only", return_value=(False, output)
+            ):
+                row = container_merge.process_owner(
+                    path, repo_root=out_dir, commit=True, dry_run=False, out_dir=out_dir,
+                )
+            self.assertFalse(row.committed)
+            self.assertEqual(row.status, "accepted")
+            tail_lines = row.commit_error_tail.splitlines()
+            self.assertEqual(tail_lines, lines[-15:])
+            self.assertNotIn("line 5", tail_lines)  # earliest lines dropped, tail keeps line 6..20
+            self.assertIn("commit failed (see merge-results/func_1.commit.log)", row.commit_detail)
+
+            log_path = out_dir / "merge-results" / "func_1.commit.log"
+            self.assertTrue(log_path.is_file())
+            self.assertEqual(log_path.read_text(encoding="utf-8").strip(), output)
+
+    def test_commit_failure_without_out_dir_skips_log_but_keeps_tail(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            path = _write_batch(out_dir / "accepted", "func_1", source="disasm/src/Y.c")
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", return_value=_accepted_result("func_1")
+            ), mock.patch.object(
+                container_merge, "git_commit_only", return_value=(False, "boom")
+            ):
+                row = container_merge.process_owner(
+                    path, repo_root=out_dir, commit=True, dry_run=False, out_dir=None,
+                )
+        self.assertFalse(row.committed)
+        self.assertEqual(row.commit_error_tail, "boom")
+        self.assertEqual(row.commit_detail, "commit failed")
+
+    def test_commit_success_does_not_set_error_tail(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            path = _write_batch(out_dir / "accepted", "func_1", source="disasm/src/Y.c")
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", return_value=_accepted_result("func_1")
+            ), mock.patch.object(
+                container_merge, "git_commit_only", return_value=(True, "committed")
+            ):
+                row = container_merge.process_owner(
+                    path, repo_root=out_dir, commit=True, dry_run=False, out_dir=out_dir,
+                )
+        self.assertTrue(row.committed)
+        self.assertEqual(row.commit_error_tail, "")
+        self.assertFalse((out_dir / "merge-results" / "func_1.commit.log").exists())
+
 
 class RunFleetProbeGateTests(unittest.TestCase):
     """``run_fleet_probe_gate``'s own subprocess call: env handling and
@@ -450,6 +568,113 @@ class MergeTests(unittest.TestCase):
             ):
                 code, _out = self._run_merge(out_dir, commit=True, dry_run=False)
         self.assertEqual(code, 1)
+
+    def test_commit_failure_table_mentions_log_file(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1")
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate",
+                return_value=_accepted_result("func_1"),
+            ), mock.patch.object(
+                container_merge, "git_commit_only", return_value=(False, "nothing to commit")
+            ):
+                _code, out = self._run_merge(out_dir, commit=True, dry_run=False)
+        self.assertIn("commit failed (see merge-results/func_1.commit.log)", out)
+
+    def test_commit_failure_prints_last_15_lines_in_merge_output(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1")
+            lines = [f"line {i}" for i in range(1, 21)]
+            output = "\n".join(lines)
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate",
+                return_value=_accepted_result("func_1"),
+            ), mock.patch.object(
+                container_merge, "git_commit_only", return_value=(False, output)
+            ):
+                _code, out = self._run_merge(out_dir, commit=True, dry_run=False)
+        self.assertIn("line 20", out)
+        self.assertIn("line 6", out)
+        self.assertNotIn("line 5", out)
+
+    def test_commit_failure_writes_full_log_under_merge_results(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1")
+            output = "boom: something went wrong\nsecond line"
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate",
+                return_value=_accepted_result("func_1"),
+            ), mock.patch.object(
+                container_merge, "git_commit_only", return_value=(False, output)
+            ):
+                self._run_merge(out_dir, commit=True, dry_run=False)
+            log_path = out_dir / "merge-results" / "func_1.commit.log"
+            self.assertTrue(log_path.is_file())
+            self.assertEqual(log_path.read_text(encoding="utf-8").strip(), output)
+
+    def test_commit_failure_recorded_in_report_as_object(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1")
+            output = "boom: something went wrong"
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate",
+                return_value=_accepted_result("func_1"),
+            ), mock.patch.object(
+                container_merge, "git_commit_only", return_value=(False, output)
+            ):
+                self._run_merge(out_dir, commit=True, dry_run=False)
+            report = json.loads((out_dir / "merge-report.json").read_text(encoding="utf-8"))
+            self.assertEqual(
+                report["owners"]["func_1"],
+                {"status": "accepted", "committed": False, "commit_error": output},
+            )
+
+    def test_commit_success_report_entry_stays_a_plain_string(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1")
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate",
+                return_value=_accepted_result("func_1"),
+            ), mock.patch.object(
+                container_merge, "git_commit_only", return_value=(True, "committed")
+            ):
+                self._run_merge(out_dir, commit=True, dry_run=False)
+            report = json.loads((out_dir / "merge-report.json").read_text(encoding="utf-8"))
+            self.assertEqual(report["owners"]["func_1"], "accepted")
+
+    def test_fresh_history_import_happens_before_commit_within_merge(self) -> None:
+        """End-to-end (merge(), not just process_owner()) version of the
+        ordering fix: with --fresh-history --commit, the accepted line must
+        land in the host's real history before that owner's commit is
+        attempted -- otherwise check_decomp_provenance.py's pre-commit hook
+        refuses the commit even though the re-gate accepted it."""
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1", source="disasm/src/Y.c")
+            order: list[str] = []
+
+            def fake_import(out, *, repo_root):
+                order.append("import")
+                return "imported"
+
+            def fake_commit(source, message, *, repo_root):
+                order.append("commit")
+                return True, "committed"
+
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate",
+                return_value=_accepted_result("func_1"),
+            ), mock.patch.object(
+                container_merge, "import_fresh_history_after_accept", side_effect=fake_import
+            ), mock.patch.object(
+                container_merge, "git_commit_only", side_effect=fake_commit
+            ):
+                code, _out = self._run_merge(
+                    out_dir, commit=True, dry_run=False, fresh_history=True
+                )
+        self.assertEqual(code, 0)
+        self.assertEqual(order[0], "import")
+        self.assertIn("commit", order)
+        self.assertLess(order.index("import"), order.index("commit"))
 
     def test_rejected_batch_is_never_committed_in_a_merge_run(self) -> None:
         with _tmp_out_dir() as out_dir:

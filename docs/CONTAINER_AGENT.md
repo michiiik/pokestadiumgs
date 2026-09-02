@@ -381,7 +381,8 @@ Everything lands under the mounted `--out` directory:
 | Path | Contents |
 |---|---|
 | `merge-results/<owner>.json` | the raw `fleet_probe --gate --json` result for each owner, kept (not deleted) so a failed re-gate can be inspected |
-| `merge-report.json` | `owner -> status` for the run, plus `cc_check_bypassed` / `fresh_history` flags (§9.2/§9.3) |
+| `merge-results/<owner>.commit.log` | only when the host re-gate accepted but `git commit --only` then failed: the full combined stdout+stderr of that failed commit (§9's "commit failures" below) |
+| `merge-report.json` | `owner -> status` for the run, plus `cc_check_bypassed` / `fresh_history` flags (§9.2/§9.3); an owner whose commit failed maps to an object instead of a bare status string (below) |
 | `merge-history.jsonl` | only with `--fresh-history`: this run's own probe-stats history (§9.3) |
 
 ## 8. Why the container never commits
@@ -428,6 +429,19 @@ exit code. Every run also writes `<out>/merge-report.json`
 that run) and keeps each owner's raw `fleet_probe --gate --json` output at
 `<out>/merge-results/<owner>.json` rather than deleting it, so a rejected
 owner can be inspected after the fact without re-running anything.
+
+**Commit failures.** A host re-gate accepting a candidate does not
+guarantee `git commit --only <source>` then succeeds (a concurrent session
+touched the same path, `--only` found nothing staged for it, etc). When
+that happens the owner's row stays `accepted` / `committed: no`, and the
+table's DETAIL column names the log file to check: `commit failed (see
+merge-results/<owner>.commit.log)`. `merge` also prints the last 15 lines
+of that commit's combined stdout+stderr directly in its own output, keeps
+the full copy at `<out>/merge-results/<owner>.commit.log`, and records the
+same 15-line tail in `merge-report.json` as
+`{"status": "accepted", "committed": false, "commit_error": "<tail>"}` in
+place of the plain status string every other owner gets -- so a commit
+failure is visible without re-running anything.
 
 To read a run's own progress without merging anything:
 `python3 tools/container_merge.py summary /abs/out` prints `summary.json`
@@ -510,17 +524,27 @@ shared history. That real history is also exactly what
 `tools/check_decomp_provenance.py`'s pre-commit hook checks for an
 "accepted attempt on record" before it allows a `disasm/src` file's removal
 to be committed, so re-gating against a private history file alone would
-make a `--fresh-history` merge's own commit step fail that hook. `merge`
-closes this gap itself: whenever `--fresh-history` produced at least one
-owner the host re-gate accepted, it folds `<out>/merge-history.jsonl`'s
-accepted line(s) (only lines with at least one `attempts[].status ==
-"accepted"` entry -- never the rejected-attempt noise from the rest of the
-run) into the host's real probe-stats history, using the same
-verbatim-dedup logic as `import-stats` (§9.1), so the pre-commit hook still
-finds the accepted attempt it requires. This happens automatically as part
-of `merge` itself -- no separate `import-stats` step is needed for
-`--fresh-history`'s own history file (see §9's note on the reminder
-`merge` still prints for the *ordinary* probe-stats copy).
+make a `--fresh-history` merge's own commit step fail that hook.
+
+**Ordering matters here.** `merge` closes this gap per owner, immediately
+after that owner's re-gate accepts and *before* `git commit --only` is even
+attempted for it: it folds `<out>/merge-history.jsonl`'s accepted line(s)
+(only lines with at least one `attempts[].status == "accepted"` entry --
+never the rejected-attempt noise from the rest of the run) into the host's
+real probe-stats history, using the same verbatim-dedup logic as
+`import-stats` (§9.1), so the pre-commit hook already finds the accepted
+attempt it requires by the time it runs. This was found the hard way on a
+real merge with `--fresh-history --commit`: the host re-gate accepted the
+owner, but the commit step reported "committed 0/1 accepted owner(s)" with
+no error recorded anywhere in `merge-report.json`, because the import back
+then only ran once, after *every* owner's commit had already been
+attempted -- so the pre-commit hook never saw an accepted attempt on record
+and silently refused every commit. (With `commit=False`/`--dry-run`, where
+no commit is ever attempted, the same import still runs once at the end of
+the run so the accepted evidence is still on record.) This happens
+automatically as part of `merge` itself -- no separate `import-stats` step
+is needed for `--fresh-history`'s own history file (see §9's note on the
+reminder `merge` still prints for the *ordinary* probe-stats copy).
 
 ## Temp-file leak bounding
 
