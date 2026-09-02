@@ -77,6 +77,7 @@ from __future__ import annotations
 
 import argparse
 import collections
+import hashlib
 import json
 import os
 import re
@@ -1216,12 +1217,19 @@ def _near_miss_sort_key(attempt: dict[str, object]) -> tuple[float, str]:
     )
 
 
+def _candidate_digest(candidate: object, declarations: object = None) -> str:
+    """Identify a candidate body together with the declarations it needs."""
+    body = candidate if isinstance(candidate, str) else ""
+    decls = declarations if isinstance(declarations, str) else ""
+    return hashlib.sha256((decls + "\x00" + body).encode("utf-8")).hexdigest()
+
+
 def near_miss(
     *,
     stats_path: Path | None = None,
     minimum_similarity: float = 0.8,
     seconds: float = 45.0,
-    kind_seconds: float | None = 120.0,
+    kind_seconds: float | None = 300.0,
     threads: int = 4,
     workers: int | None = None,
     limit: int | None = None,
@@ -1234,9 +1242,11 @@ def near_miss(
 
     ``label_prefixes`` selects which recorded labels are eligible; ``None``
     (the default) considers any label with a recorded candidate and
-    similarity score, not only ``m2c:`` drafts.  ``skip_permuted`` excludes
-    owners that already have a ``permute:``-labeled attempt on file (a
-    previous near-miss run over the same candidate).  ``parallel`` (default
+    similarity score, not only ``m2c:`` drafts.  ``skip_permuted`` skips only
+    candidate identities already searched by a ``permute:``-labeled attempt;
+    a newer body for the same owner remains eligible.  Among equal scores the
+    newest candidate is preferred, so a stale body cannot mask a later
+    hypothesis.  ``parallel`` (default
     2) runs that many ``decomp-permuter`` budgets concurrently; gating a
     score-0 output still happens on the main thread as each permute job
     completes, since it holds the runner's cross-process transaction lock.
@@ -1249,18 +1259,22 @@ def near_miss(
     full-gate acceptance from a different run solved it since these stats
     were recorded) is skipped before it ever reaches the permuter and is
     counted in the result's ``skipped_solved``.  ``kind_seconds`` (default
-    120, versus the plain ``seconds`` default of 45) gives a longer budget
+    300, versus the plain ``seconds`` default of 45) gives a longer budget
     than ``seconds`` to owners whose recorded best attempt is
     ``register_allocation_only`` or ``immediate_drift`` -- these are cases
     where the permuter is reordering declarations/temporaries rather than
-    searching a real semantic gap, so a longer budget tends to pay off.
+    searching a real semantic gap, so the default 300-second budget tends to
+    pay off.
     ``minimum_similarity`` defaults to 0.8.  The permute-then-gate loop
     itself is ``permute_and_gate``, shared with ``--large`` mode.
     """
-    grouped: dict[str, dict[str, object]] = {}
-    permuted_functions: set[str] = set()
+    candidates_by_function: dict[str, list[dict[str, object]]] = collections.defaultdict(list)
+    solved_functions: set[str] = set()
+    permuted_digests: dict[str, set[str]] = collections.defaultdict(set)
+    sequence = 0
     for record in _stats_records(stats_path):
         source = record.get("source")
+        timestamp = str(record.get("timestamp") or "")
         for attempt in record.get("attempts", []):
             if not isinstance(attempt, dict):
                 continue
@@ -1269,9 +1283,21 @@ def near_miss(
             status = str(attempt.get("status") or "")
             score = attempt.get("similarity_score")
             candidate = attempt.get("candidate")
-            if isinstance(function, str) and label.startswith("permute:"):
-                permuted_functions.add(function)
             if not isinstance(function, str):
+                continue
+            if status == "accepted":
+                solved_functions.add(function)
+            if label.startswith("permute:"):
+                # New permute rows carry the original input digest. Older
+                # rows only carried the candidate field, so use it as a
+                # conservative fallback for those stats files.
+                input_digest = attempt.get("permute_input_digest")
+                if not isinstance(input_digest, str) or not input_digest:
+                    input_digest = _candidate_digest(candidate, attempt.get("declarations"))
+                permuted_digests[function].add(input_digest)
+                # A permuter result is not a fresh source hypothesis. The
+                # originating probe row remains eligible below if its body
+                # has not already been searched.
                 continue
             if label_prefixes is not None:
                 if not any(label.startswith(prefix) for prefix in label_prefixes):
@@ -1286,7 +1312,8 @@ def near_miss(
                 continue
             if float(score) < minimum_similarity or not isinstance(candidate, str) or not candidate.strip():
                 continue
-            row = grouped.setdefault(function, {
+            sequence += 1
+            candidates_by_function[function].append({
                 "function": function,
                 "source": source,
                 "candidate": candidate,
@@ -1296,43 +1323,42 @@ def near_miss(
                 "best_status": status,
                 "mismatch_kind": attempt.get("mismatch_kind"),
                 "family": attempt.get("family"),
-                "statuses": set(),
+                "raw_similarity_score": attempt.get("raw_similarity_score"),
+                "timestamp": timestamp,
+                "_sequence": sequence,
             })
-            statuses = row["statuses"]
-            assert isinstance(statuses, set)
-            statuses.add(status)
-            current_score = float(row["similarity_score"])
-            current_status = str(row.get("best_status"))
-            if (
-                float(score) > current_score
-                or (
-                    float(score) == current_score
-                    and status == "accepted"
-                    and current_status != "accepted"
-                )
-            ):
-                row.update({
-                    "source": source,
-                    "candidate": candidate,
-                    "declarations": attempt.get("declarations"),
-                    "label": label,
-                    "similarity_score": float(score),
-                    "best_status": status,
-                    "mismatch_kind": attempt.get("mismatch_kind"),
-                    "family": attempt.get("family") or row.get("family"),
-                })
+    candidates: list[dict[str, object]] = []
+    skipped_permuted = 0
+    for function, rows in candidates_by_function.items():
+        if function in solved_functions:
+            continue
 
-    candidates = [
-        row for row in grouped.values()
-        if str(row.get("best_status")) != "accepted"
-    ]
+        def pool_key(row: dict[str, object]) -> tuple[float, float, str, int]:
+            raw = row.get("raw_similarity_score")
+            raw_score = float(raw) if isinstance(raw, (int, float)) else -1.0
+            return (
+                float(row["similarity_score"]),
+                raw_score,
+                str(row.get("timestamp") or ""),
+                int(row.get("_sequence") or 0),
+            )
+
+        selected: dict[str, object] | None = None
+        for row in sorted(rows, key=pool_key, reverse=True):
+            if skip_permuted and _candidate_digest(
+                row.get("candidate"), row.get("declarations")
+            ) in permuted_digests.get(function, set()):
+                continue
+            selected = row
+            break
+        if selected is None:
+            if skip_permuted and permuted_digests.get(function):
+                skipped_permuted += 1
+            continue
+        selected.pop("_sequence", None)
+        candidates.append(selected)
     if target_functions is not None:
         candidates = [row for row in candidates if str(row["function"]) in target_functions]
-    skipped_permuted = 0
-    if skip_permuted:
-        before = len(candidates)
-        candidates = [row for row in candidates if str(row["function"]) not in permuted_functions]
-        skipped_permuted = before - len(candidates)
     candidates.sort(key=lambda row: (-float(row["similarity_score"]), str(row["function"])))
 
     # A stats row can outlive the pragma it was recorded against: a later
@@ -1454,6 +1480,9 @@ def permute_and_gate(
                 permutation.get("already_matching")
             ) if isinstance(permutation, dict) else False,
             "permute_error": error,
+            "permute_input_digest": _candidate_digest(
+                row.get("candidate"), row.get("declarations")
+            ),
         }
         runner._record_probe_stats(
             source_path,
@@ -2151,12 +2180,12 @@ def main() -> int:
         help="minimum recorded similarity score to consider a candidate (default 0.8)",
     )
     parser.add_argument(
-        "--near-miss-kind-seconds", type=float, default=120.0,
+        "--near-miss-kind-seconds", type=float, default=300.0,
         help=(
             "permuter budget for owners whose best recorded attempt is "
             "register_allocation_only or immediate_drift, instead of "
             "--near-miss-seconds; these mismatch kinds tend to need more search "
-            "time than a real semantic gap (default 120)"
+            "time than a real semantic gap (default 300)"
         ),
     )
     parser.add_argument("--near-miss-threads", type=int, default=4)

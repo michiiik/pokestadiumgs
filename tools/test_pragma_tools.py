@@ -4301,6 +4301,10 @@ class SweepTests(unittest.TestCase):
         self.assertEqual(recorded["status"], "permute_rejected")
         self.assertEqual(recorded["permute_score"], 0.25)
         self.assertEqual(recorded["permute_budget_seconds"], 120.0)
+        self.assertEqual(
+            recorded["permute_input_digest"],
+            sweep_targets._candidate_digest(row["candidate"], row.get("declarations")),
+        )
 
     def test_near_miss_skip_permuted_excludes_prior_permute_attempts(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -4334,6 +4338,38 @@ class SweepTests(unittest.TestCase):
             self.assertEqual(result["skipped_solved"], 0)
             permute.assert_called_once()
             self.assertEqual(permute.call_args.args[0], "func_b")
+
+    def test_near_miss_requeues_new_candidate_after_prior_permute(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            stats = Path(directory) / "stats.jsonl"
+            stats.write_text("\n".join([
+                json.dumps({"timestamp": "2026-09-01T00:00:00Z", "attempts": [{
+                    "function": "func_a", "label": "m2c:old", "status": "probe_rejected",
+                    "similarity_score": 0.95, "candidate": "void func_a(void) { int old; }",
+                }]}),
+                json.dumps({"timestamp": "2026-09-01T00:01:00Z", "attempts": [{
+                    "function": "func_a", "label": "permute:m2c:old", "status": "permute_rejected",
+                    "similarity_score": 0.95, "candidate": "void func_a(void) { int old; }",
+                }]}),
+                json.dumps({"timestamp": "2026-09-01T00:02:00Z", "attempts": [{
+                    "function": "func_a", "label": "m2c:new", "status": "probe_rejected",
+                    "similarity_score": 0.95, "candidate": "void func_a(void) { int new_body; }",
+                }]}),
+            ]) + "\n")
+            with mock.patch.object(
+                targets, "require_owner", return_value=mock.MagicMock()
+            ), mock.patch.object(
+                sweep_targets.permute_candidate, "permute", return_value={"outputs": []}
+            ) as permute:
+                result = sweep_targets.near_miss(
+                    stats_path=stats, label_prefixes=("m2c:",), seconds=10.0
+                )
+            self.assertEqual(result["candidates"], 1)
+            permute.assert_called_once()
+            self.assertEqual(
+                permute.call_args.args[:2],
+                ("func_a", "void func_a(void) { int new_body; }"),
+            )
 
     def test_near_miss_skips_function_after_full_gate_acceptance(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
