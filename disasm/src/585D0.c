@@ -450,7 +450,23 @@ u8 func_8005A8EC(u8 arg0, u8 *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005AD58.s")
+extern s8 func_80059B08(s32);
+extern void func_8005D964(s32);
+extern s32 func_8005989C(s32);
+extern void func_8005ACE8(s32);
+extern u8 D_80128570[];
+void func_8005AD58(s32 arg0) {
+    u8 *record = D_80128570 + arg0 * 112;
+    s8 result;
+    *(s32 *)record &= 0xFF0000FF;
+    result = func_80059B08(arg0);
+    record[5] = result;
+    if ((result & 0xFF) == 0) {
+        func_8005D964(arg0);
+        func_8005989C(arg0);
+        func_8005ACE8(arg0);
+    }
+}
 #endif
 
 #ifdef VERSION_US
