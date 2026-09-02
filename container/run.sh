@@ -144,9 +144,18 @@ fi
 # loudly (ENOSPC/inode exhaustion) instead of silently growing the host
 # image; entrypoint.sh also sweeps stray ctm* files periodically so a
 # long run never gets close to the cap.
+# RUN_DETACHED=1 (default) starts the container detached so it outlives this
+# shell and the terminal session that launched it; the container id is
+# printed. RUN_DETACHED=0 keeps the old attached behaviour (logs on stdout).
+detach_args=()
+if [ "${RUN_DETACHED:-1}" != "0" ]; then
+    detach_args=(-d)
+fi
+
 docker run \
     --platform linux/amd64 \
     --rm \
+    ${detach_args[@]+"${detach_args[@]}"} \
     --tmpfs /tmp:size=2g,nr_inodes=4m \
     --tmpfs /work/disasm/scratch:size=2g,nr_inodes=4m \
     -e SOURCE="$source_file" \
