@@ -134,6 +134,49 @@ Every field is read with a safe default, so an older out dir's `state.json`
 missing `tried_bodies`/`tried_labels`/`feedback`/`normalized_only` (a schema
 predating those additions) seeds cleanly with whatever it does have.
 
+### 2.2 Keeping a stale image's owners current: `SRC_OVERLAY`
+
+The image's `disasm/src`/`disasm/include`/`disasm/linker_scripts` (and the
+full matching build baked from them, §0) are frozen at whatever the
+checkout looked like when `container/build.sh` last ran. A container
+launched from an older image still discovers every `GLOBAL_ASM` owner that
+was in `disasm/src` *at build time* -- including ones some other run has
+since matched and merged to master -- and the driver has no way to tell
+those apart from a genuinely unmatched owner: it just sees the pragma.
+Rebuilding the image before every run is the correct fix but expensive
+(§0's "several minutes"); `SRC_OVERLAY` is the cheap one for the common
+case of "the image is a few merges behind, but otherwise fine."
+
+    SRC_OVERLAY=/abs/path/to/checkout container/run.sh disasm/src/4AC10.c /abs/out ...
+
+`container/run.sh` mounts `$SRC_OVERLAY` read-only at `/src` and passes
+the container the fixed in-container path (`SRC_OVERLAY=/src`) that
+`container/entrypoint.sh` checks for. When set, `entrypoint.sh`:
+
+1. Runs `container/overlay_src.sh` -- read live out of `/src` itself
+   (`/src/container/overlay_src.sh /src`), **never** a copy baked into the
+   image, so this keeps working even for an image built before
+   `overlay_src.sh` existed at all. It fully replaces `/work/disasm/src`
+   and `/work/disasm/include` with `$SRC_OVERLAY`'s copies (so a file the
+   overlay checkout deletes doesn't silently keep linking the image's
+   stale `.o`), and overlays (never delete-syncs) `$SRC_OVERLAY`'s
+   `disasm/linker_scripts` onto the image's own.
+2. Runs one incremental `make -C disasm rom` (no explicit `COMPARE` --
+   see the "ROM gate note" above for why passing `COMPARE=1` here would be
+   wrong) so the baked build tree is consistent with the overlaid sources
+   *before* the driver's own gate calls run. Prints the combined
+   overlay+rebuild time to stderr.
+
+`container/gate_pr.sh` (the PR gate, see its own header) uses the exact
+same `container/overlay_src.sh`, invoked the same way -- out of the
+checkout mounted at `/src`, never a baked copy -- so both callers share
+one implementation of "what files matter to a `make rom` build" (see that
+script's own header for exactly which three directories and why).
+
+Unset/empty `SRC_OVERLAY` (the default): no `/src` mount, no overlay --
+`container/run.sh`/`entrypoint.sh` behave exactly as they did before this
+existed.
+
 ## 3. Choosing the coding agent
 
 By default (no `--generator-cmd`, no `--candidate-file`), `entrypoint.sh`

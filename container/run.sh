@@ -49,6 +49,22 @@
 #                     claude_via(custom): any other Anthropic-compatible
 #                     endpoint's base URL + token
 #
+# SRC_OVERLAY       stale-image fix (issue #39 follow-up), optional: a HOST
+#                     checkout directory. When set, this script mounts it
+#                     read-only at /src and passes the container-side
+#                     SRC_OVERLAY=/src that entrypoint.sh checks for --
+#                     entrypoint.sh then overlays that checkout's
+#                     disasm/src, disasm/include, and disasm/linker_scripts
+#                     onto /work/disasm (container/overlay_src.sh) and runs
+#                     one incremental `make -C disasm rom` before the
+#                     driver starts, so a container launched from an image
+#                     built before some GLOBAL_ASM owners landed on master
+#                     doesn't still discover and treat them as owners. Set
+#                     it to the same checkout this script itself is run
+#                     from unless you deliberately want a different one.
+#                     Unset/empty (default): no mount, no overlay --
+#                     unchanged from before this existed.
+#
 # alibaba key resolution: when AGENT is alibaba (or claude_via with
 # CLAUDE_VIA=alibaba) and the caller has not exported ALIBABA_API_KEY or
 # ANTHROPIC_AUTH_TOKEN themselves, this script reads the matching Bailian
@@ -132,6 +148,23 @@ except Exception:
     if [ -n "$resolved_token" ]; then
         export ANTHROPIC_AUTH_TOKEN="$resolved_token"
     fi
+fi
+
+# SRC_OVERLAY (stale-image fix, issue #39 follow-up): a HOST checkout
+# directory to mount read-only at /src. The in-container SRC_OVERLAY that
+# entrypoint.sh checks is always the fixed container path (/src), not this
+# host directory -- entrypoint.sh only tests it for non-empty and then
+# reads exclusively from /src (see its own comment for why: staying
+# correct even against an image built before this existed at all).
+if [ -n "${SRC_OVERLAY:-}" ]; then
+    case "$SRC_OVERLAY" in
+        /*) : ;;
+        *)
+            echo "run.sh: \$SRC_OVERLAY must be an absolute path (got: $SRC_OVERLAY)" >&2
+            exit 1
+            ;;
+    esac
+    extra_args+=(-v "$SRC_OVERLAY:/src:ro" -e SRC_OVERLAY=/src)
 fi
 
 # --tmpfs bounds two IDO temp-file leak sinks in RAM instead of the

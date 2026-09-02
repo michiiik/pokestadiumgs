@@ -252,7 +252,90 @@ re-plan.
 `fleetctl run` without `--once` already loops forever (poll, handle exits,
 launch, sleep `--poll-interval`) until the queue and every run drain, so
 the simplest launchd job just keeps the process alive across machine
-reboots/crashes rather than driving individual passes itself:
+reboots/crashes rather than driving individual passes itself.
+
+### 4.1 Scripted install: `container/install_fleetctl_service.sh`
+
+    container/install_fleetctl_service.sh [--repo <path>] [--dry-run] [--uninstall]
+
+Builds `tools/fleetctl` (`go build -o ~/.local/bin/fleetctl .` run with cwd
+`<repo>/tools/fleetctl` -- that directory's own `go.mod`, not a repo-root
+one, is why a plain `go build ./tools/fleetctl` from the repo root doesn't
+work; same invocation as this doc's own "Build it once" line above, just
+with an absolute `-o`), writes
+`~/Library/LaunchAgents/com.gs-decomp.fleetctl.plist`, and
+`launchctl bootstrap gui/$UID` it (the modern, non-deprecated replacement
+for `launchctl load` -- booting out first if a prior instance is already
+loaded, so re-running the installer is idempotent). `--repo` defaults to
+the checkout the script itself lives in. The plist it writes runs:
+
+    fleetctl run --plan <state-dir>/plan.json --state-dir <state-dir> \
+        --runs-dir ~/projects/gs-container-runs --repo <repo> \
+        --src-overlay <repo> --max-concurrent 4 --alert-macos
+
+where `<state-dir>` is `~/projects/gs-container-runs/fleet-state`, with
+`KeepAlive`/`RunAtLoad` both true, both stdout and stderr redirected to
+`~/Library/Logs/gs-decomp/fleetctl.log`, and an explicit `PATH` (launchd
+agents don't inherit an interactive shell's) built from `docker`'s and
+`gh`'s resolved directories plus the usual Homebrew/system locations, so
+the containers, `git`, and `gh pr create` `fleetctl run` shells out to are
+all reachable.
+
+**`--plan` is still required.** `fleetctl run` (as of this writing) has no
+fallback when `--plan` is omitted -- there is no default plan path it
+reads on its own. The installer always passes
+`--plan <state-dir>/plan.json`, so generate that file once *before*
+installing (or after changing the file set fleetctl should work on):
+
+    fleetctl plan --repo <repo> --files N --slots 4 --agent claude:sonnet \
+        --out ~/projects/gs-container-runs/fleet-state/plan.json
+
+`fleetctl run` only ever reads `--plan` to seed `state.json`; re-loading
+the same plan on every launchd restart is a no-op for any run id
+`state.json` already knows (sec 3), so this is a one-time step per plan,
+not a per-restart chore. The installer checks whether the file exists and
+prints this same reminder if it doesn't.
+
+**`--src-overlay` and `--alert-macos` contract, for whoever is implementing
+them on `fleetctl run`:** neither flag exists yet as of this writing (see
+`tools/fleetctl/cmd_run.go`'s current flag set) -- the installer only
+*invokes* `fleetctl` with them, matching this doc's own rule (sec 0) that
+`fleetctl` never touches `container/*`/`disasm/*`/`.github/*` itself, only
+invokes them.
+- `--src-overlay <dir>`: forward it as `SRC_OVERLAY=<dir>` in the
+  environment of every `container/run.sh` invocation `fleetctl run`
+  launches (`tools/fleetctl/internal/runner`) -- exactly as if a human had
+  exported `SRC_OVERLAY=<dir>` before running `container/run.sh` by hand.
+  See `docs/CONTAINER_AGENT.md` sec 2.2 for the full contract: `run.sh`
+  mounts `<dir>` read-only at `/src` and passes the container's
+  `entrypoint.sh` the fixed in-container path (`SRC_OVERLAY=/src`);
+  `entrypoint.sh` then overlays `<dir>`'s `disasm/src`/`disasm/include`/
+  `disasm/linker_scripts` onto the image's build tree and runs one
+  incremental `make -C disasm rom` before the driver starts, so a fleet
+  running against an image that predates some already-merged owners
+  doesn't keep rediscovering them. Passing `--repo`'s own value is the
+  common case (the fleet's own checkout is exactly the source of truth for
+  what has landed) -- `fleetctl plan`'s doc note about `--merge-repo`
+  differing from `--repo` (sec 6) applies here too, if that setup is ever
+  used.
+- `--alert-macos`: `tools/fleetctl/internal/runner/runner.go` already
+  carries a comment naming this flag's one effect -- an
+  `osascript -e 'display notification ...'` call, presumably on a run
+  reaching `merging`/`done`/an operator-actionable `stopped_reason` so a
+  human working elsewhere on the same Mac notices without tailing
+  `fleetctl status` or the log file.
+
+`--dry-run` prints the composed plist body and every command the installer
+would otherwise run (`mkdir`, `go build`, `launchctl bootout`/`bootstrap`)
+without creating a directory, building anything, writing a file, or
+invoking `launchctl` -- safe to run against a real `--repo`.
+`--uninstall` (`--dry-run` also works with it) runs
+`launchctl bootout gui/$UID/com.gs-decomp.fleetctl` (if loaded) and removes
+the plist; like unloading by hand, it does **not** stop already-launched
+containers -- run `fleetctl stop --state-dir <state-dir> --all` first if
+you want that too.
+
+### 4.2 Manual plist, if you'd rather not use the installer
 
 ```xml
 <!-- ~/Library/LaunchAgents/com.local.fleetctl.plist -->
