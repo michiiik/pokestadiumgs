@@ -76,7 +76,24 @@ void func_86001838(s32 arg0, u8 *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_246640/func_860018A8.s")
+extern void func_86007AF8(void *, f64);
+extern void func_87F06430(f32 *, s32);
+extern f32 D_8600D638;
+void func_860018A8(void *arg0) {
+    f32 values[3];
+    f32 constant;
+
+    *(s32 *)((u8 *)arg0 + 0x194) = 0;
+    func_86007AF8((u8 *)arg0 + 0x198, 14.0);
+    func_87F06430(values, *(s32 *)arg0);
+    constant = D_8600D638;
+    *(f64 *)((u8 *)arg0 + 0x198) = (f64)values[0];
+    *(f64 *)((u8 *)arg0 + 0x1A0) = (f64)values[1];
+    *(f64 *)((u8 *)arg0 + 0x1A8) = (f64)values[2];
+    *(f32 *)((u8 *)arg0 + 0x34) = constant;
+    *(f32 *)((u8 *)arg0 + 0x38) = constant;
+    *(f32 *)((u8 *)arg0 + 0x3C) = constant;
+}
 #endif
 
 #ifdef VERSION_US
