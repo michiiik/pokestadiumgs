@@ -126,6 +126,13 @@ type Loop struct {
 	Now func() time.Time
 	// Log receives one line per structured log event; nil uses fmt.Println.
 	Log func(string)
+
+	// lastMergeFailure de-dupes pollPRs' "gh pr merge N failed" log line
+	// (docs/FLEET_CONTROLLER.md sec 7): keyed by PR number, holds the most
+	// recently logged error message so an unresolved failure is logged
+	// once, then again only when the message itself changes -- not once
+	// per poll pass, forever.
+	lastMergeFailure map[int]string
 }
 
 func (l *Loop) now() time.Time {
@@ -413,27 +420,56 @@ func loadSummary(outDir string) (*summaryDoc, error) {
 	return &s, nil
 }
 
+// vanishBackoff is how long a vanish-triggered requeue's launch is deferred
+// (docs/FLEET_CONTROLLER.md sec 2, "vanished container storm") -- long
+// enough that a one-off environmental problem (e.g. an image that fails at
+// container startup) can't relaunch the same run dozens of times a minute.
+const vanishBackoff = 10 * time.Minute
+
+// maxConsecutiveVanishes is how many vanishes in a row (see
+// fleetstate.RunRecord.VanishCount) move a run to StatusFailed instead of
+// requeueing it again.
+const maxConsecutiveVanishes = 3
+
 // handleExit is the exit-handling switch described in
 // docs/CONTAINER_AGENT.md's output contract and the fleetctl task: a
 // container that vanished without a readable summary.json is requeued with
 // --resume, same as generator_exhausted (after also cooling that agent
-// down); every other stopped_reason (budget_expired, plateau, a normal
+// down), unless it has now vanished maxConsecutiveVanishes times in a row,
+// in which case it is left StatusFailed for an operator instead (sec 2);
+// every other stopped_reason (budget_expired, plateau, a normal
 // completion, no_owners, ...) hands off to the sequential merge step.
 func (l *Loop) handleExit(ctx context.Context, rec *fleetstate.RunRecord) error {
 	rec.EndedAt = l.now()
 	summary, err := loadSummary(rec.OutDir)
 	if err != nil {
-		l.logf("run %s: no readable summary.json (%v); requeueing with --resume", rec.Spec.ID, err)
+		rec.VanishCount++
+		if rec.VanishCount >= maxConsecutiveVanishes {
+			rec.Status = fleetstate.StatusFailed
+			rec.StoppedReason = ""
+			rec.Note = "vanished 3x; needs operator"
+			l.logf("run %s: vanished %d times in a row (no readable summary.json); marking failed, needs operator",
+				rec.Spec.ID, rec.VanishCount)
+			l.alert(ctx, "container_vanished_repeatedly", rec.Spec.ID,
+				fmt.Sprintf("run %s: vanished %d times in a row", rec.Spec.ID, rec.VanishCount),
+				fmt.Sprintf("Run %s (file %s, agent %s:%s) has had no readable summary.json %d consecutive times; marked failed instead of requeued again. This usually means an environmental problem (e.g. every container failing at startup), not this run's own work -- needs an operator.",
+					rec.Spec.ID, rec.Spec.File, rec.Spec.Agent, rec.Spec.Model, rec.VanishCount))
+			return nil
+		}
+		l.logf("run %s: no readable summary.json (%v); requeueing with --resume (vanish %d/%d, backoff %s)",
+			rec.Spec.ID, err, rec.VanishCount, maxConsecutiveVanishes, vanishBackoff)
 		rec.Status = fleetstate.StatusRequeued
 		rec.StoppedReason = ""
 		rec.Note = "vanished without summary.json"
+		rec.NotBefore = l.now().Add(vanishBackoff)
 		l.requeueResume(rec)
 		l.alert(ctx, "container_vanished", rec.Spec.ID,
 			fmt.Sprintf("run %s: container vanished", rec.Spec.ID),
-			fmt.Sprintf("Run %s (file %s, agent %s:%s) had no readable summary.json; requeued with --resume (attempt %d).",
-				rec.Spec.ID, rec.Spec.File, rec.Spec.Agent, rec.Spec.Model, rec.Spec.Attempt))
+			fmt.Sprintf("Run %s (file %s, agent %s:%s) had no readable summary.json; requeued with --resume (attempt %d), held back at least %s.",
+				rec.Spec.ID, rec.Spec.File, rec.Spec.Agent, rec.Spec.Model, rec.Spec.Attempt, vanishBackoff))
 		return nil
 	}
+	rec.VanishCount = 0
 	rec.StoppedReason = summary.StoppedReason
 
 	if summary.StoppedReason == "generator_exhausted" {
@@ -477,7 +513,15 @@ func (l *Loop) requeueResume(rec *fleetstate.RunRecord) {
 	l.State.Queue = append(l.State.Queue, rec.Spec.ID)
 }
 
-func branchName(spec fleetstate.RunSpec) string {
+// branchName is a run's throwaway branch: "container/<id>", or
+// "container/<id>-m<mergeRound+1>" once mergeRound > 0 -- a PR conflict
+// replay (sec 2/7, pollPRs' replayConflictedPR) increments
+// RunRecord.MergeRound and needs a fresh branch name each time, since the
+// old one's PR was just closed and its remote branch (best-effort) deleted.
+func branchName(spec fleetstate.RunSpec, mergeRound int) string {
+	if mergeRound > 0 {
+		return fmt.Sprintf("container/%s-m%d", spec.ID, mergeRound+1)
+	}
 	return "container/" + spec.ID
 }
 
@@ -713,7 +757,7 @@ func dirtyMergePath(porcelain string) string {
 // for loop with no goroutines, which is itself the mutex the task asks for
 // (see docs/FLEET_CONTROLLER.md).
 func (l *Loop) runMerge(ctx context.Context, rec *fleetstate.RunRecord) error {
-	branch := branchName(rec.Spec)
+	branch := branchName(rec.Spec, rec.MergeRound)
 	mergeRepo := l.mergeRepo()
 	baseRef := l.baseRef()
 
@@ -926,28 +970,11 @@ func (l *Loop) pollPRs(ctx context.Context) error {
 		}
 		switch result.State {
 		case "SUCCESS":
-			if err := l.Runner.GhPRMerge(ctx, l.mergeRepo(), rec.PRNumber); err != nil {
-				l.logf("run %s: gh pr merge %d failed: %v", id, rec.PRNumber, err)
-				continue
-			}
-			rec.Status = fleetstate.StatusMerged
-			rec.MergedAt = l.now()
-			l.logf("run %s: PR #%d merged", id, rec.PRNumber)
-			if err := l.fastForwardBase(ctx); err != nil {
-				l.State.MergeBlocked = true
-				l.State.MergeBlockedReason = err.Error()
-				l.alert(ctx, "ff_failed", "",
-					fmt.Sprintf("fleetctl: fast-forward of %s failed after merging PR #%d", l.IntegrationBranch, rec.PRNumber),
-					fmt.Sprintf("%v\nSelf-merge is paused until %s is fixed by hand in %s -- fleetctl retries the fast-forward at the top of every poll pass.",
-						err, l.IntegrationBranch, l.mergeRepo()))
+			if l.attemptMerge(ctx, id, rec) {
 				// "stop merging until fixed" -- do not evaluate any other
-				// StatusPROpen run this pass.
+				// StatusPROpen run this pass (finishMerge's own fast-forward
+				// failed).
 				return nil
-			}
-			l.State.LastMergeAt = l.now()
-			l.recordMergeCommit(ctx, id, rec)
-			if err := l.Replan(ctx); err != nil {
-				l.logf("run %s: replan after merge failed: %v", id, err)
 			}
 		case "FAILURE":
 			rec.Status = fleetstate.StatusGateFailed
@@ -960,6 +987,153 @@ func (l *Loop) pollPRs(ctx context.Context) error {
 		}
 	}
 	return nil
+}
+
+// attemptMerge is pollPRs' per-run merge attempt for a PR whose checks all
+// report SUCCESS. Before ever calling `gh pr merge`, it queries GhPRState
+// (sec 2/7):
+//
+//   - state == MERGED already -- idempotent recovery (bug: the merge repo
+//     is always detached HEAD, so a PAST `gh pr merge` call could have
+//     landed the merge on GitHub and then still returned an error --
+//     "could not determine current branch" -- from its own now-removed
+//     --delete-branch step; without this check pollPRs would retry forever,
+//     logging "already merged" every pass). finishMerge runs exactly as if
+//     GhPRMerge had just succeeded.
+//   - mergeable == CONFLICTING -- another PR touching the same file (or
+//     files) landed first, or this PR's base has simply moved on: `gh pr
+//     merge` would fail every pass forever, so replayConflictedPR closes it
+//     and re-runs the merge step against a freshly fetched base instead.
+//
+// Otherwise it calls GhPRMerge as before; a GhPRMerge error is given the
+// same idempotent-recovery check (gh may have merged before erroring) before
+// being logged (de-duplicated by logMergeFailure).
+//
+// Returns true when pollPRs must stop evaluating any further StatusPROpen
+// run this pass (see finishMerge).
+func (l *Loop) attemptMerge(ctx context.Context, id string, rec *fleetstate.RunRecord) bool {
+	mergeRepo := l.mergeRepo()
+	state, err := l.Runner.GhPRState(ctx, mergeRepo, rec.PRNumber)
+	if err != nil {
+		l.logf("run %s: gh pr view %d --json state,mergeable failed: %v", id, rec.PRNumber, err)
+	} else {
+		if state.State == "MERGED" {
+			l.logf("run %s: PR #%d is already MERGED on GitHub (idempotent recovery)", id, rec.PRNumber)
+			return l.finishMerge(ctx, id, rec)
+		}
+		if state.Mergeable == "CONFLICTING" {
+			l.replayConflictedPR(ctx, id, rec)
+			return false
+		}
+	}
+	if err := l.Runner.GhPRMerge(ctx, mergeRepo, rec.PRNumber); err != nil {
+		if state2, err2 := l.Runner.GhPRState(ctx, mergeRepo, rec.PRNumber); err2 == nil && state2.State == "MERGED" {
+			l.logf("run %s: PR #%d was already merged despite a gh pr merge error (idempotent recovery): %v", id, rec.PRNumber, err)
+			return l.finishMerge(ctx, id, rec)
+		}
+		l.logMergeFailure(id, rec.PRNumber, err)
+		return false
+	}
+	return l.finishMerge(ctx, id, rec)
+}
+
+// finishMerge lands a merge pollPRs now considers successful -- either
+// GhPRMerge itself just succeeded, or GhPRState reported the PR already
+// MERGED (idempotent recovery, see attemptMerge). It marks the run merged,
+// best-effort deletes its remote branch (GhPRMerge no longer passes
+// --delete-branch -- see its own doc -- since that fails outright from the
+// merge repo's always-detached HEAD), fast-forwards the base ref, and
+// replans. Returns true when pollPRs must stop evaluating any further
+// StatusPROpen run this pass (a fast-forward failure sets
+// State.MergeBlocked, "stop merging until fixed", sec 1).
+func (l *Loop) finishMerge(ctx context.Context, id string, rec *fleetstate.RunRecord) bool {
+	rec.Status = fleetstate.StatusMerged
+	rec.MergedAt = l.now()
+	l.logf("run %s: PR #%d merged", id, rec.PRNumber)
+	if rec.Branch != "" {
+		if err := l.Runner.GitDeleteRemoteBranch(ctx, l.mergeRepo(), rec.Branch); err != nil {
+			l.logf("run %s: delete remote branch %s failed (best-effort): %v", id, rec.Branch, err)
+		}
+	}
+	if err := l.fastForwardBase(ctx); err != nil {
+		l.State.MergeBlocked = true
+		l.State.MergeBlockedReason = err.Error()
+		l.alert(ctx, "ff_failed", "",
+			fmt.Sprintf("fleetctl: fast-forward of %s failed after merging PR #%d", l.IntegrationBranch, rec.PRNumber),
+			fmt.Sprintf("%v\nSelf-merge is paused until %s is fixed by hand in %s -- fleetctl retries the fast-forward at the top of every poll pass.",
+				err, l.IntegrationBranch, l.mergeRepo()))
+		return true
+	}
+	l.State.LastMergeAt = l.now()
+	l.recordMergeCommit(ctx, id, rec)
+	if err := l.Replan(ctx); err != nil {
+		l.logf("run %s: replan after merge failed: %v", id, err)
+	}
+	return false
+}
+
+// replayConflictedPR handles a PR pollPRs found CONFLICTING against the
+// current base (docs/FLEET_CONTROLLER.md sec 2/7, "PR conflict replay") --
+// e.g. another PR touching the same file(s) landed first, or this PR was
+// simply opened from a now-stale base. `gh pr merge` would fail on it every
+// pass forever, so instead: close the stale PR, best-effort delete its
+// remote branch, clear the run's PR bookkeeping, bump MergeRound (so
+// branchName cuts a fresh branch rather than reusing the closed PR's one),
+// fetch the base ref, and re-run the merge step. container_merge.py's own
+// re-gate is idempotent (an owner already landed on master is reported
+// already_landed), so this only ever re-gates what is still actually
+// missing -- runMerge's own no-accepted-owners path (StatusDone, no PR)
+// applies cleanly if nothing is left.
+func (l *Loop) replayConflictedPR(ctx context.Context, id string, rec *fleetstate.RunRecord) {
+	mergeRepo := l.mergeRepo()
+	prNumber := rec.PRNumber
+	l.logf("run %s: PR #%d is CONFLICTING with %s; replaying the run against a fresh base",
+		id, prNumber, l.IntegrationBranch)
+
+	comment := fmt.Sprintf(
+		"Closing: this PR's base has moved on (e.g. another PR touching the same file merged first) and it now conflicts. fleetctl is replaying run %s against the current base.",
+		id)
+	if err := l.Runner.GhPRClose(ctx, mergeRepo, prNumber, comment); err != nil {
+		l.logf("run %s: gh pr close %d failed: %v", id, prNumber, err)
+	}
+	if rec.Branch != "" {
+		if err := l.Runner.GitDeleteRemoteBranch(ctx, mergeRepo, rec.Branch); err != nil {
+			l.logf("run %s: delete remote branch %s failed (best-effort): %v", id, rec.Branch, err)
+		}
+	}
+	rec.PRURL = ""
+	rec.PRNumber = 0
+	rec.Branch = ""
+	rec.MergeRound++
+
+	if err := l.Runner.GitFetch(ctx, mergeRepo); err != nil {
+		l.logf("run %s: git fetch before replay failed: %v", id, err)
+	}
+
+	rec.Status = fleetstate.StatusMerging
+	if err := l.runMerge(ctx, rec); err != nil {
+		l.logf("run %s: replay merge error: %v", id, err)
+	}
+	l.alert(ctx, "pr_conflict_replayed", id,
+		fmt.Sprintf("fleetctl: PR conflict replayed for run %s", id),
+		fmt.Sprintf("Run %s's PR #%d conflicted with %s and was closed; replayed as merge round %d.",
+			id, prNumber, l.IntegrationBranch, rec.MergeRound))
+}
+
+// logMergeFailure logs "gh pr merge N failed" once per distinct error
+// message per PR number: pollPRs runs every pass, and an unresolved failure
+// (an auth hiccup, a not-yet-detected conflict, ...) would otherwise print
+// the identical line forever.
+func (l *Loop) logMergeFailure(id string, prNumber int, err error) {
+	msg := err.Error()
+	if l.lastMergeFailure == nil {
+		l.lastMergeFailure = map[int]string{}
+	}
+	if l.lastMergeFailure[prNumber] == msg {
+		return
+	}
+	l.lastMergeFailure[prNumber] = msg
+	l.logf("run %s: gh pr merge %d failed: %v", id, prNumber, err)
 }
 
 // fastForwardBase is the post-merge "fast-forward" (sec 2/7): `git fetch
@@ -1279,6 +1453,13 @@ func (l *Loop) launchEligible(ctx context.Context) error {
 			continue
 		}
 		switch {
+		// A vanish-triggered requeue (handleExit, sec 2) is held back at
+		// least vanishBackoff regardless of capacity/cooldown -- checked
+		// first so it is never masked by (and never counted against) the
+		// concurrency/cooldown cases below.
+		case !rec.NotBefore.IsZero() && now.Before(rec.NotBefore):
+			rec.WaitReason = fmt.Sprintf("backoff until %s", rec.NotBefore.Format(time.RFC3339))
+			remaining = append(remaining, id)
 		case totalRunning >= max:
 			rec.WaitReason = "concurrency"
 			remaining = append(remaining, id)
@@ -1382,6 +1563,7 @@ func (l *Loop) launch(ctx context.Context, rec *fleetstate.RunRecord) error {
 	rec.EndedAt = time.Time{}
 	rec.StoppedReason = ""
 	rec.WaitReason = ""
+	rec.NotBefore = time.Time{}
 	// Quota-window bookkeeping (sec 12): stamps this agent's window start
 	// the first time it launches since a cooldown (or ever) -- a no-op once
 	// already stamped for the current window.

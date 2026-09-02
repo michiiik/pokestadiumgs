@@ -362,8 +362,10 @@ func (r *ExecRunner) GhPRChecks(ctx context.Context, repoRoot string, prNumber i
 	return PRChecksResult{State: agg}, nil
 }
 
+// GhPRMerge runs `gh pr merge <prNumber> --merge` -- see the Runner
+// interface doc for why --delete-branch is deliberately never passed.
 func (r *ExecRunner) GhPRMerge(ctx context.Context, repoRoot string, prNumber int) error {
-	argv := []string{"gh", "pr", "merge", strconv.Itoa(prNumber), "--merge", "--delete-branch"}
+	argv := []string{"gh", "pr", "merge", strconv.Itoa(prNumber), "--merge"}
 	result, err := r.runOrDryRun(ctx, repoRoot, nil, argv...)
 	if err != nil {
 		return fmt.Errorf("gh pr merge %d: %w", prNumber, err)
@@ -398,6 +400,50 @@ func (r *ExecRunner) GhPRView(ctx context.Context, repoRoot string, prNumber int
 		return "", fmt.Errorf("gh pr view %d: mergeCommit not yet reported", prNumber)
 	}
 	return payload.MergeCommit.Oid, nil
+}
+
+// GhPRState is a read-only query (never gated by DryRun, same as
+// GhPRChecks/GhPRView): `gh pr view <prNumber> --json
+// state,mergeable,mergeStateStatus`.
+func (r *ExecRunner) GhPRState(ctx context.Context, repoRoot string, prNumber int) (PRStateResult, error) {
+	result, err := run(ctx, repoRoot, nil, "gh", "pr", "view", strconv.Itoa(prNumber),
+		"--json", "state,mergeable,mergeStateStatus")
+	if err != nil {
+		return PRStateResult{}, fmt.Errorf("gh pr view %d --json state,mergeable,mergeStateStatus: %w", prNumber, err)
+	}
+	if result.ExitCode != 0 {
+		return PRStateResult{}, fmt.Errorf("gh pr view %d --json state,mergeable,mergeStateStatus: exit %d: %s",
+			prNumber, result.ExitCode, strings.TrimSpace(result.Stderr))
+	}
+	var payload struct {
+		State            string `json:"state"`
+		Mergeable        string `json:"mergeable"`
+		MergeStateStatus string `json:"mergeStateStatus"`
+	}
+	if err := json.Unmarshal([]byte(result.Stdout), &payload); err != nil {
+		return PRStateResult{}, fmt.Errorf("gh pr view %d: parse output: %w", prNumber, err)
+	}
+	return PRStateResult{State: payload.State, Mergeable: payload.Mergeable, MergeStateStatus: payload.MergeStateStatus}, nil
+}
+
+// GhPRClose runs `gh pr close <prNumber> --comment <comment>`.
+func (r *ExecRunner) GhPRClose(ctx context.Context, repoRoot string, prNumber int, comment string) error {
+	argv := []string{"gh", "pr", "close", strconv.Itoa(prNumber), "--comment", comment}
+	result, err := r.runOrDryRun(ctx, repoRoot, nil, argv...)
+	if err != nil {
+		return fmt.Errorf("gh pr close %d: %w", prNumber, err)
+	}
+	if !r.DryRun && result.ExitCode != 0 {
+		return fmt.Errorf("gh pr close %d: exit %d: %s", prNumber, result.ExitCode, strings.TrimSpace(result.Stderr))
+	}
+	return nil
+}
+
+// GitDeleteRemoteBranch runs `git -C repoRoot push origin --delete branch`
+// -- see the Runner interface doc: callers only log its error.
+func (r *ExecRunner) GitDeleteRemoteBranch(ctx context.Context, repoRoot, branch string) error {
+	result, err := r.runOrDryRun(ctx, r.RepoRoot, nil, "git", "-C", repoRoot, "push", "origin", "--delete", branch)
+	return gitErr(result, err, "git push origin --delete "+branch, r.DryRun)
 }
 
 func (r *ExecRunner) GhIssueComment(ctx context.Context, repoRoot string, issueNumber int, body string) error {

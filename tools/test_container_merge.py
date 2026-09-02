@@ -2216,6 +2216,23 @@ class MergeNamingIntegrationTests(unittest.TestCase):
             code = container_merge.merge(out_dir, repo_root=out_dir, **kwargs)
         return code, buffer.getvalue()
 
+    @staticmethod
+    def _status_side_effect(src_paths):
+        """A `git_status_paths` side_effect: `[]` for the
+        disasm/linker_scripts-only query (the symtab-revert check), else
+        `src_paths` (the disasm/src|include|aliases.ld naming-commit query)
+        -- distinguishing the two calls `merge()`'s naming step now makes,
+        since a plain `return_value=` would (wrongly) return the same list
+        for both.
+        """
+
+        def fn(repo_root, *, prefixes):
+            if prefixes == ("disasm/linker_scripts",):
+                return []
+            return src_paths
+
+        return fn
+
     def test_committed_accept_gets_named_and_committed(self) -> None:
         with _tmp_out_dir() as out_dir:
             _write_batch(out_dir / "accepted", "func_1", source="disasm/src/X.c")
@@ -2226,7 +2243,10 @@ class MergeNamingIntegrationTests(unittest.TestCase):
             ), mock.patch.object(
                 container_merge, "name_after_commit", return_value=("Real_Name", "renamed")
             ), mock.patch.object(
-                container_merge, "git_status_paths", return_value=["disasm/src/X.c"]
+                container_merge, "git_status_paths",
+                side_effect=self._status_side_effect(["disasm/src/X.c"]),
+            ), mock.patch.object(
+                container_merge, "append_name_alias", return_value=True
             ), mock.patch.object(
                 container_merge, "git_commit_only_paths", return_value=(True, "committed")
             ) as naming_commit_mock:
@@ -2304,7 +2324,10 @@ class MergeNamingIntegrationTests(unittest.TestCase):
             ), mock.patch.object(
                 container_merge, "name_after_commit", return_value=("Real_Name", "renamed")
             ), mock.patch.object(
-                container_merge, "git_status_paths", return_value=["disasm/src/X.c"]
+                container_merge, "git_status_paths",
+                side_effect=self._status_side_effect(["disasm/src/X.c"]),
+            ), mock.patch.object(
+                container_merge, "append_name_alias", return_value=True
             ), mock.patch.object(
                 container_merge, "git_commit_only_paths", return_value=(False, "nothing staged")
             ):
@@ -2326,7 +2349,9 @@ class MergeNamingIntegrationTests(unittest.TestCase):
             ), mock.patch.object(
                 container_merge, "name_after_commit", return_value=("Real_Name", "renamed")
             ), mock.patch.object(
-                container_merge, "git_status_paths", return_value=[]
+                container_merge, "git_status_paths", side_effect=self._status_side_effect([])
+            ), mock.patch.object(
+                container_merge, "append_name_alias", return_value=True
             ), mock.patch.object(
                 container_merge, "git_commit_only_paths"
             ) as commit_mock:
@@ -2338,6 +2363,167 @@ class MergeNamingIntegrationTests(unittest.TestCase):
         commit_mock.assert_not_called()
         self.assertEqual(report["names"], {})
         self.assertIn("no changed files", buffer_err.getvalue())
+
+    def test_rename_reverts_symtab_but_extends_and_commits_aliases_ld(self) -> None:
+        """The 2026-09-02 incident: `tools/name_decompiled.py apply` renamed
+        a matched owner's entry in symbol_addrs_code.txt, but `merge()` only
+        ever committed disasm/src/disasm/include -- the symtab rename was
+        left dirty in the merge repo, and a container's pre-extracted asm
+        tree (which still calls the function by its old name) failed to
+        link. The fix: revert the symtab (and anything else under
+        disasm/linker_scripts except aliases.ld), append an `old = new;`
+        alias to aliases.ld instead, and commit aliases.ld alongside
+        disasm/src -- mirroring PR #58's hand-applied fix.
+        """
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1", source="disasm/src/X.c")
+            aliases_path = out_dir / container_merge._ALIASES_LD_PATH
+            aliases_path.parent.mkdir(parents=True, exist_ok=True)
+            aliases_path.write_text(
+                "/* header */\nAudio_ThreadEntry = func_80035174;\n", encoding="utf-8"
+            )
+
+            def status_side_effect(repo_root, *, prefixes):
+                if prefixes == ("disasm/linker_scripts",):
+                    return [
+                        "disasm/linker_scripts/us/symbol_addrs_code.txt",
+                        container_merge._ALIASES_LD_PATH,
+                    ]
+                return ["disasm/src/X.c", container_merge._ALIASES_LD_PATH]
+
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", return_value=_accepted_result("func_1")
+            ), mock.patch.object(
+                container_merge, "git_commit_only", return_value=(True, "committed")
+            ), mock.patch.object(
+                container_merge, "name_after_commit", return_value=("Real_Name", "renamed")
+            ), mock.patch.object(
+                container_merge, "git_status_paths", side_effect=status_side_effect
+            ), mock.patch.object(
+                container_merge, "git_checkout_paths", return_value=True
+            ) as checkout_mock, mock.patch.object(
+                container_merge, "git_commit_only_paths", return_value=(True, "committed")
+            ) as naming_commit_mock:
+                code, out = self._run_merge(out_dir, commit=True, dry_run=False)
+            report = json.loads((out_dir / "merge-report.json").read_text(encoding="utf-8"))
+            # Read back before the tmp dir is torn down (_tmp_out_dir's own
+            # scope, not this test's).
+            alias_lines = aliases_path.read_text(encoding="utf-8").splitlines()
+
+        self.assertEqual(code, 0)
+        # symbol_addrs_code.txt is checked out (reverted) -- aliases.ld is
+        # deliberately excluded from that revert.
+        checkout_mock.assert_called_once_with(
+            ["disasm/linker_scripts/us/symbol_addrs_code.txt"], repo_root=out_dir
+        )
+        # The alias line was actually appended (append_name_alias itself is
+        # not mocked in this test).
+        self.assertIn("func_1 = Real_Name;", alias_lines)
+        self.assertIn("Audio_ThreadEntry = func_80035174;", alias_lines)  # untouched
+        # aliases.ld rides along in the same naming commit as disasm/src.
+        naming_commit_mock.assert_called_once_with(
+            ["disasm/src/X.c", container_merge._ALIASES_LD_PATH],
+            "Name func_1 -> Real_Name",
+            repo_root=out_dir,
+        )
+        self.assertEqual(report["names"], {"func_1": "Real_Name"})
+        self.assertIn("aliased func_1 -> Real_Name", out)
+
+
+class GitCheckoutPathsTests(unittest.TestCase):
+    def test_builds_checkout_cmd_and_returns_true_on_success(self) -> None:
+        calls: list[list[str]] = []
+
+        def fake_run(cmd, *, cwd, capture_output, text, env):
+            calls.append(list(cmd))
+            return _FakeGateProc(0)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            with mock.patch.object(container_merge.subprocess, "run", side_effect=fake_run):
+                ok = container_merge.git_checkout_paths(
+                    ["disasm/linker_scripts/us/symbol_addrs_code.txt"], repo_root=repo_root
+                )
+        self.assertTrue(ok)
+        self.assertEqual(
+            calls[0],
+            ["git", "checkout", "--", "disasm/linker_scripts/us/symbol_addrs_code.txt"],
+        )
+
+    def test_empty_paths_is_a_noop_success(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            with mock.patch.object(container_merge.subprocess, "run") as run_mock:
+                ok = container_merge.git_checkout_paths([], repo_root=repo_root)
+        self.assertTrue(ok)
+        run_mock.assert_not_called()
+
+    def test_nonzero_exit_returns_false(self) -> None:
+        def fake_run(cmd, *, cwd, capture_output, text, env):
+            return _FakeGateProc(1, "", "error: pathspec did not match")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            with mock.patch.object(container_merge.subprocess, "run", side_effect=fake_run):
+                ok = container_merge.git_checkout_paths(["disasm/src/X.c"], repo_root=repo_root)
+        self.assertFalse(ok)
+
+    def test_oserror_returns_false(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            with mock.patch.object(container_merge.subprocess, "run", side_effect=OSError("no git")):
+                ok = container_merge.git_checkout_paths(["disasm/src/X.c"], repo_root=repo_root)
+        self.assertFalse(ok)
+
+
+class AppendNameAliasTests(unittest.TestCase):
+    def test_appends_line_to_existing_file(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            path = repo_root / container_merge._ALIASES_LD_PATH
+            path.parent.mkdir(parents=True)
+            path.write_text("/* header */\nAudio_ThreadEntry = func_80035174;\n", encoding="utf-8")
+
+            appended = container_merge.append_name_alias(
+                "func_8005805C", "GbSave_IdentifyFormat", repo_root=repo_root
+            )
+            lines = path.read_text(encoding="utf-8").splitlines()
+        self.assertTrue(appended)
+        self.assertEqual(lines[-1], "func_8005805C = GbSave_IdentifyFormat;")
+        self.assertIn("Audio_ThreadEntry = func_80035174;", lines)
+
+    def test_creates_missing_trailing_newline_before_appending(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            path = repo_root / container_merge._ALIASES_LD_PATH
+            path.parent.mkdir(parents=True)
+            path.write_text("Audio_ThreadEntry = func_80035174;", encoding="utf-8")  # no trailing \n
+
+            container_merge.append_name_alias("old_fn", "New_Fn", repo_root=repo_root)
+            text = path.read_text(encoding="utf-8")
+        self.assertEqual(
+            text, "Audio_ThreadEntry = func_80035174;\nold_fn = New_Fn;\n"
+        )
+
+    def test_skips_identical_existing_line(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            path = repo_root / container_merge._ALIASES_LD_PATH
+            path.parent.mkdir(parents=True)
+            path.write_text("func_8005805C = GbSave_IdentifyFormat;\n", encoding="utf-8")
+
+            appended = container_merge.append_name_alias(
+                "func_8005805C", "GbSave_IdentifyFormat", repo_root=repo_root
+            )
+            count = path.read_text(encoding="utf-8").count("func_8005805C = GbSave_IdentifyFormat;")
+        self.assertFalse(appended)
+        self.assertEqual(count, 1)
+
+    def test_missing_parent_directory_returns_false(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)  # disasm/linker_scripts/us doesn't exist
+            appended = container_merge.append_name_alias("old_fn", "New_Fn", repo_root=repo_root)
+        self.assertFalse(appended)
 
 
 class SummaryTests(unittest.TestCase):

@@ -138,6 +138,28 @@ type RunRecord struct {
 	// operator can see a run is being retried automatically (sec 2), not
 	// stuck waiting on a restart.
 	MergeBlockedRetries int `json:"merge_blocked_retries,omitempty"`
+	// VanishCount counts consecutive handleExit passes that found no
+	// readable summary.json for this run id (docs/FLEET_CONTROLLER.md sec
+	// 2, "vanished container storm") -- incremented on each such vanish,
+	// reset to 0 the next time a summary.json IS read (whatever its
+	// stopped_reason). Three in a row moves the run to StatusFailed instead
+	// of requeueing it again (an environmental problem, not this run's own
+	// fault, needs an operator).
+	VanishCount int `json:"vanish_count,omitempty"`
+	// NotBefore, when set and still in the future, tells launchEligible to
+	// leave this queued run alone for now (wait_reason
+	// "backoff until <t>") rather than relaunch it -- set to now+10m by a
+	// vanish-triggered requeue so a spell of environmental badness (e.g. an
+	// image that fails at container startup) can't relaunch every run tens
+	// of times a minute (sec 2).
+	NotBefore time.Time `json:"not_before,omitempty"`
+	// MergeRound counts PR-conflict replays of this run's merge step (sec
+	// 2, "PR conflict replay"): 0 for the original attempt, incremented
+	// each time pollPRs finds this run's open PR CONFLICTING against the
+	// base and replays it. branchName folds it into the throwaway branch
+	// name once > 0 (container/<id>-m2, -m3, ...) so a replay always cuts a
+	// fresh branch rather than force-pushing over the closed PR's old one.
+	MergeRound int `json:"merge_round,omitempty"`
 }
 
 // State is the full persisted control-loop state.
