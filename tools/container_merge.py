@@ -652,6 +652,11 @@ def apply_region_notes(
 _NAME_PLAN_ROW_RE = re.compile(r"^(\S+)\s+(\S+)\s")
 _NAME_APPLY_ROW_RE = re.compile(r"^\s*(\S+)\s+->\s+(\S+)\s*$")
 
+# The hand-written, splat-preserved linker script aliases.ld's own header
+# comment describes (repo-relative, POSIX-style, matching git_status_paths'
+# own path convention) -- see append_name_alias below.
+_ALIASES_LD_PATH = "disasm/linker_scripts/us/aliases.ld"
+
 
 def run_name_decompiled_plan(
     function: str,
@@ -812,6 +817,69 @@ def git_status_paths(repo_root: Path, *, prefixes: tuple[str, ...]) -> list[str]
         if entry and any(entry.startswith(prefix) for prefix in prefixes):
             paths.add(entry)
     return sorted(paths)
+
+
+def git_checkout_paths(paths: list[str], *, repo_root: Path) -> bool:
+    """``git checkout -- <p1> <p2> ...`` in ``repo_root`` -- discards any
+    working-tree modification to each path, restoring it to HEAD's committed
+    version. Used to discard ``tools/name_decompiled.py apply``'s rewrite of
+    ``disasm/linker_scripts`` (other than ``aliases.ld``, see
+    append_name_alias) after a naming rename -- see the caller in
+    ``merge()``. Returns False (never raises) on any subprocess failure; the
+    caller only logs it, same as every other naming-follow-up step.
+    """
+    if not paths:
+        return True
+    try:
+        proc = subprocess.run(
+            ["git", "checkout", "--", *paths],
+            cwd=repo_root,
+            capture_output=True,
+            text=True,
+            env=_clean_env(),
+        )
+    except OSError:
+        return False
+    return proc.returncode == 0
+
+
+def append_name_alias(old: str, new: str, *, repo_root: Path) -> bool:
+    """Append ``"<old> = <new>;"`` to ``_ALIASES_LD_PATH``
+    (``disasm/linker_scripts/us/aliases.ld``), unless an identical line is
+    already there.
+
+    This is the hand-written, splat-preserved compatibility script
+    aliases.ld's own header comment describes -- it is what keeps a
+    just-renamed function's old name resolvable for a container's
+    pre-extracted asm tree, which still calls it by that name until the
+    tree itself is regenerated. `tools/name_decompiled.py apply` renames
+    ``old``'s entry in ``disasm/linker_scripts/us/symbol_addrs_code.txt``
+    too, but `merge()`'s naming step deliberately discards that (see its
+    caller): a matched/decompiled owner's symtab entry is never fed to the
+    linker, so renaming it there is a no-op at best and, left as an
+    uncommitted leftover, was exactly what broke every container launch on
+    2026-09-02 -- this alias line is the actual, committed fix, mirroring
+    PR #58's hand-applied one.
+
+    Returns whether a line was actually appended (False if it was already
+    present, or the file couldn't be read/written). Never raises.
+    """
+    path = repo_root / _ALIASES_LD_PATH
+    line = f"{old} = {new};"
+    try:
+        existing = path.read_text(encoding="utf-8") if path.is_file() else ""
+    except OSError:
+        return False
+    if any(existing_line.strip() == line for existing_line in existing.splitlines()):
+        return False
+    try:
+        with path.open("a", encoding="utf-8") as f:
+            if existing and not existing.endswith("\n"):
+                f.write("\n")
+            f.write(line + "\n")
+    except OSError:
+        return False
+    return True
 
 
 # ---------------------------------------------------------------------------
@@ -1190,11 +1258,47 @@ def merge(
                 if detail != "no evidence-backed name proposed":
                     print(f"container_merge: naming {row.function}: {detail}", file=sys.stderr)
                 continue
+
+            # `tools/name_decompiled.py apply` also rewrote disasm/linker_scripts
+            # in this working tree: row.function's own entry in
+            # symbol_addrs_code.txt, and possibly other .ld/.txt files that
+            # named it. Discard all of that except aliases.ld (apply's own
+            # rewrite of *it* is worth keeping -- e.g. an existing alias whose
+            # RHS named row.function now correctly points at new_name
+            # instead): a matched/decompiled owner's symtab entry is never fed
+            # to the linker, so committing its rename there is pointless, and
+            # leaving it uncommitted (the naming commit below only ever
+            # touches disasm/src/disasm/include) is exactly what broke every
+            # container launch on 2026-09-02 -- a container's pre-extracted
+            # asm tree still calls row.function by its old name, and the
+            # overlay copies disasm/linker_scripts verbatim.
+            linker_changed = git_status_paths(repo_root, prefixes=("disasm/linker_scripts",))
+            to_revert = [p for p in linker_changed if p != _ALIASES_LD_PATH]
+            if to_revert and not git_checkout_paths(to_revert, repo_root=repo_root):
+                print(
+                    f"container_merge: naming {row.function} -> {new_name}: failed to "
+                    "revert splat-generated symbol table edit(s) under "
+                    f"disasm/linker_scripts ({', '.join(to_revert)}); left as-is",
+                    file=sys.stderr,
+                )
+            # ... and add the alias a container's pre-extracted asm tree
+            # actually needs: old name -> new name, the same fix PR #58
+            # applied by hand.
+            if append_name_alias(row.function, new_name, repo_root=repo_root):
+                print(
+                    f"container_merge: aliased {row.function} -> {new_name} in "
+                    f"{_ALIASES_LD_PATH} (symbol_addrs_code.txt is intentionally "
+                    "left unrenamed for a matched owner; a container's "
+                    "pre-extracted asm tree still calls the old name)"
+                )
+
             if not commit or dry_run:
                 # Should not happen (row.committed already implies commit and
                 # not dry_run), kept as a defensive guard.
                 continue
-            changed = git_status_paths(repo_root, prefixes=("disasm/src", "disasm/include"))
+            changed = git_status_paths(
+                repo_root, prefixes=("disasm/src", "disasm/include", _ALIASES_LD_PATH)
+            )
             if not changed:
                 print(
                     f"container_merge: naming {row.function} -> {new_name}: apply "

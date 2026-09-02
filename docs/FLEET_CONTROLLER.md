@@ -217,8 +217,17 @@ launched and recorded.
 
                      stopped_reason missing/unreadable (container vanished)
                                               |
-                                              v
-                    requeued (--resume, same out dir, Attempt+1)
+                          vanish_count (consecutive, resets on any
+                           readable summary.json) >= 3?
+                              |                                  |
+                             yes                                 no
+                              |                                  |
+                              v                                  v
+                            failed                requeued (--resume, same
+                    ("vanished 3x; needs           out dir, Attempt+1),
+                     operator"; alert,             not_before = now+10m
+                     never auto-retried)           (launchEligible skips it
+                                                    until then, sec 6)
 
                           any other stopped_reason
                      (budget_expired, plateau, a normal completion, ...)
@@ -273,7 +282,22 @@ finished run (never `--resume` and `--seed-from` together, matching
 onto the same queue and may be relaunched in the very same control-loop
 pass that requeued them, if capacity and cooldowns allow -- `state.json`'s
 `status` field always reflects the *latest* attempt, and `attempt` counts
-how many times a `--resume` id has been relaunched.
+how many times a `--resume` id has been relaunched. The one exception is a
+**vanish**-triggered requeue (missing/unreadable `summary.json`, above): its
+`not_before` is set to (that pass's) now + 10 minutes, and the launch
+scheduler (sec 6, `launchEligible`) skips any queued run whose `not_before`
+is still in the future -- `fleetctl status`'s note column then reads
+`waiting: backoff until <t>` instead of `waiting: concurrency`/`cooldown`.
+This exists because an environmental problem (a bad image, a startup crash
+affecting every container) otherwise causes a storm: every affected run
+vanishes, gets requeued, relaunches next pass, vanishes again, forever, tens
+of times a minute. `vanish_count` (`state.json`, per run) counts consecutive
+vanishes -- reset to 0 the moment a `summary.json` IS read, for any
+`stopped_reason` -- and three in a row moves the run straight to `failed`
+(note `vanished 3x; needs operator`, a `container_vanished_repeatedly`
+alert, sec 9) instead of requeueing a fourth time: like `gate_failed`, this
+is never auto-retried, since the actual problem is very unlikely to be this
+one run's own fault.
 
 `merging` never runs concurrently with itself: `run`'s control loop is a
 single goroutine with no concurrent merge dispatch, so "one merge at a
@@ -527,6 +551,11 @@ plan's own run id: `<fileslug>-p<N>` for an original partition (e.g.
 reseed of that partition (e.g. `container/14640-p0-r1`). `<fileslug>` is
 the source file's basename without `.c`
 (`disasm/src/fragments/79/fragment79_3BF4C0.c` -> `fragment79_3BF4C0`).
+Once a run's PR has been replayed at least once (sec 7, "PR conflict
+replay" -- `state.json`'s `merge_round` > 0), the branch instead gets an
+`-m<merge_round+1>` suffix, e.g. `container/14640-p0-m2` for the first
+replay, `-m3` for the second: a fresh name each time, since the previous
+attempt's PR is closed and its branch (best-effort) deleted, not reused.
 
 A PR is opened only when a run has at least one **matched** owner (sec 2 --
 accepted and committed), titled `Container match: <owner1>, <owner2>, ...`
@@ -567,11 +596,17 @@ also, from here, self-merged on green -- sec 7.
   requeued (the candidate is already applied in the merge repo's working
   tree) nor dropped (it is surfaced in `fleetctl status` and the PR body;
   see sec 2's "Reading the merge report").
-- **No automatic backoff on repeated `--resume` failures.** A run that
-  keeps coming back `generator_exhausted` is requeued and retried every
-  time its agent's cooldown lapses, forever -- there is no cap on
-  `Attempt` or escalating cooldown. `fleetctl status`'s `ATTEMPT` column is
-  the signal an operator would watch to notice one spinning.
+- **No automatic backoff on repeated `generator_exhausted` `--resume`
+  failures.** A run that keeps coming back `generator_exhausted` is
+  requeued and retried every time its agent's cooldown lapses, forever --
+  there is no cap on `Attempt` or escalating cooldown for that
+  `stopped_reason`. `fleetctl status`'s `ATTEMPT` column is the signal an
+  operator would watch to notice one spinning. A **vanished** container
+  (no readable `summary.json`) is different: it gets a flat 10-minute
+  `not_before` backoff every time, and a hard cap after 3 consecutive
+  vanishes (`failed`, sec 2) -- deliberately more aggressive, since a vanish
+  usually means an environmental problem affecting every run, not this run's
+  own generator quota.
 - **A shared 1-hour rate-limit bucket across every configured notifier.**
   `Loop.alert` (sec 9) rate-limits once per `"event[:key]"` regardless of
   which of `--alert-issue`/`--alert-macos` is configured -- a macOS
@@ -611,8 +646,49 @@ Every pass, for every run currently `pr_open` (sorted by run id, so a
    `FAILURE`/`ERROR`/`CANCELLED`/`TIMED_OUT`/`ACTION_REQUIRED`/`STALE`), or
    `PENDING` (still running, or no checks reported yet) -- rechecked next
    pass.
-2. **`SUCCESS`:** `gh pr merge <n> --merge --delete-branch`. On success the
-   run moves to `merged` (`merged_at` recorded), then:
+2. **`SUCCESS`:** before ever calling `gh pr merge`, `attemptMerge` queries
+   `gh pr view <n> --json state,mergeable,mergeStateStatus` (`GhPRState`, a
+   read-only query like `gh pr checks` above):
+   - **`state == MERGED`** -- the PR is already merged on GitHub.
+     **Idempotent recovery**: skip straight to the post-merge steps below as
+     if `gh pr merge` had just succeeded. This covers a past pass where `gh
+     pr merge` actually landed the merge but then still returned an error
+     (see the `--delete-branch` note just below) -- without this check,
+     `pollPRs` would retry forever, logging `gh pr merge ... failed: ...
+     already merged` every pass and never advancing the run past `pr_open`.
+   - **`mergeable == CONFLICTING`** -- another PR touching the same file(s)
+     merged first, or this PR was simply opened from a base that has since
+     moved on. `gh pr merge` would fail on this every pass forever, so
+     **PR conflict replay** runs instead: `gh pr close <n> --comment ...`,
+     best-effort `git -C <merge-repo> push origin --delete <branch>`, clear
+     `pr_url`/`pr_number`/`branch`, increment `merge_round` (sec 5's branch
+     naming), `git -C <merge-repo> fetch origin` so `<base-ref>` is current,
+     then re-run the merge step (sec 2) from scratch. `tools/container_merge.py`'s
+     re-gate is idempotent (an owner already landed on master, e.g. via the
+     PR that caused the conflict, comes back `already_landed`), so the
+     replay only ever re-gates what is genuinely still missing -- it opens a
+     fresh PR on the fresh `-m<N>` branch if anything is, or ends the run
+     `done` with no PR (runMerge's ordinary no-accepted-owners path) if
+     nothing is. A rate-limited `pr_conflict_replayed` alert fires once per
+     replay (sec 9); `pollPRs` moves on to the next `pr_open` run without
+     touching this one further this pass.
+   - **Otherwise**, `gh pr merge <n> --merge` runs as before -- deliberately
+     **without** `--delete-branch`: `--merge-repo` is always detached HEAD
+     (sec 1, sec 2), and gh's own post-merge branch-delete step there fails
+     outright ("could not determine current branch: failed to run git: not
+     on any branch") even though the merge itself already landed on GitHub.
+     If this call errors, `GhPRState` is queried once more before giving up
+     -- the same idempotent-recovery check as above, since that detached-HEAD
+     failure is exactly the "merge actually landed, call still errored"
+     case. A genuine, still-unresolved failure is logged once, then again
+     only once its message changes (not every identical pass forever).
+
+   Once a merge is confirmed (fresh or recovered), the run moves to
+   `merged` (`merged_at` recorded); its remote branch is then deleted
+   best-effort (`git push origin --delete <branch>`, errors only logged --
+   this is what `--delete-branch` used to do, now done as a separate call
+   so a detached-HEAD failure here never masks the merge's own success);
+   then:
    - **fast-forward `<base-ref>`** in `--merge-repo`: `git fetch origin`
      -- and *only* that. `<merge-repo>`'s local `--pr-base` branch is never
      checked out or pulled here (sec 1, sec 2), so there is no local branch
@@ -697,7 +773,7 @@ without needing the plan file again.
 
 ## 9. Alerting
 
-Six events, each posted through every configured `Notifier`
+Eight events, each posted through every configured `Notifier`
 (`--alert-issue N`: `gh issue comment N --body ...` against `--merge-repo`;
 `--alert-macos`: `osascript -e 'display notification ...'`), rate-limited
 by `Loop.alert` to at most one post per `"event[:key]"` per hour (`key` is
@@ -711,6 +787,8 @@ alerts don't share a bucket, but `ff_failed` -- with no natural per-run key
 | `ff_failed` | the post-merge (or retry) fetch of `<base-ref>` failed (sec 7) | (none) |
 | `merge_blocked_dirty` | a run's merge step found `--merge-repo` dirty in a way that conflicts with the merge (sec 2) | run id |
 | `container_vanished` | a running container's id is no longer known to `docker inspect` (sec 2) | run id |
+| `container_vanished_repeatedly` | a run vanished 3 consecutive times (`vanish_count`) and was moved to `failed` instead of requeued again (sec 2) | run id |
+| `pr_conflict_replayed` | a `pr_open` run's PR was found `CONFLICTING` against its base and its merge step was replayed (sec 7) | run id |
 | `agent_exhausted` | a run stopped `generator_exhausted` (sec 2) | agent name |
 | `no_progress_stall` | a still-`running` run's best similarity (read from `<out>/state.json`, the same per-owner `best_similarity` `docs/CONTAINER_AGENT.md` documents) hasn't improved for `--stall-after` (default 3h) | run id |
 | `controller_error` | `RunOnce` returned an error (`Run`'s loop, before it exits) | (none) |

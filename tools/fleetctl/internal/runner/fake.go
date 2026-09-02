@@ -76,6 +76,17 @@ type Fake struct {
 
 	GhPRMergeErr error
 
+	// GhPRStateFunc, when set, overrides GhPRStateResult/GhPRStateErr for
+	// full control keyed by PR number (e.g. distinguishing several open
+	// PRs' conflict/idempotent-recovery states in one test).
+	GhPRStateFunc   func(prNumber int) (PRStateResult, error)
+	GhPRStateResult PRStateResult
+	GhPRStateErr    error
+
+	GhPRCloseErr error
+
+	GitDeleteRemoteBranchErr error
+
 	GhIssueCommentErr error
 
 	DockerImageIDResult  string
@@ -215,6 +226,24 @@ func (f *Fake) GhPRMerge(_ context.Context, repoRoot string, prNumber int) error
 func (f *Fake) GhPRView(_ context.Context, repoRoot string, prNumber int) (string, error) {
 	f.record(Call{Method: "GhPRView", Strings: []string{repoRoot, fmt.Sprintf("%d", prNumber)}})
 	return f.GhPRViewResult, f.GhPRViewErr
+}
+
+func (f *Fake) GhPRState(_ context.Context, repoRoot string, prNumber int) (PRStateResult, error) {
+	f.record(Call{Method: "GhPRState", Strings: []string{repoRoot, fmt.Sprintf("%d", prNumber)}})
+	if f.GhPRStateFunc != nil {
+		return f.GhPRStateFunc(prNumber)
+	}
+	return f.GhPRStateResult, f.GhPRStateErr
+}
+
+func (f *Fake) GhPRClose(_ context.Context, repoRoot string, prNumber int, comment string) error {
+	f.record(Call{Method: "GhPRClose", Strings: []string{repoRoot, fmt.Sprintf("%d", prNumber), comment}})
+	return f.GhPRCloseErr
+}
+
+func (f *Fake) GitDeleteRemoteBranch(_ context.Context, repoRoot, branch string) error {
+	f.record(Call{Method: "GitDeleteRemoteBranch", Strings: []string{repoRoot, branch}})
+	return f.GitDeleteRemoteBranchErr
 }
 
 func (f *Fake) GhIssueComment(_ context.Context, repoRoot string, issueNumber int, body string) error {

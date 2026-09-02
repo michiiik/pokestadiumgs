@@ -90,6 +90,16 @@ type PRChecksResult struct {
 	State string
 }
 
+// PRStateResult is the outcome of `gh pr view <n> --json
+// state,mergeable,mergeStateStatus` (see GhPRState): State is gh's own
+// "OPEN"/"CLOSED"/"MERGED"; Mergeable is "MERGEABLE"/"CONFLICTING"/
+// "UNKNOWN" (gh has not finished computing it yet).
+type PRStateResult struct {
+	State            string
+	Mergeable        string
+	MergeStateStatus string
+}
+
 // FileRank is one row of `tools/pragma_targets.py rank-files --json`.
 type FileRank struct {
 	File            string `json:"file"`
@@ -174,13 +184,39 @@ type Runner interface {
 	// GhPRChecks runs `gh pr checks <prNumber> --json name,state` and rolls
 	// every reported check up into one PRChecksResult.
 	GhPRChecks(ctx context.Context, repoRoot string, prNumber int) (PRChecksResult, error)
-	// GhPRMerge runs `gh pr merge <prNumber> --merge --delete-branch`.
+	// GhPRMerge runs `gh pr merge <prNumber> --merge`. It deliberately does
+	// NOT pass --delete-branch: the merge repo is always detached HEAD, and
+	// gh's own post-merge branch-delete step there fails with "could not
+	// determine current branch" even though the merge itself already
+	// landed on GitHub -- see GitDeleteRemoteBranch, which callers use
+	// instead, best-effort, after a merge succeeds.
 	GhPRMerge(ctx context.Context, repoRoot string, prNumber int) error
 	// GhPRView runs `gh pr view <prNumber> --json mergeCommit` and returns
 	// the merge commit's sha -- a read-only query (never gated by DryRun,
 	// same as GhPRChecks) used to record a just-merged PR's landed commit
 	// without ever checking out or rev-parsing a local base branch.
 	GhPRView(ctx context.Context, repoRoot string, prNumber int) (mergeCommitSHA string, err error)
+	// GhPRState runs `gh pr view <prNumber> --json
+	// state,mergeable,mergeStateStatus` -- a read-only query (never gated
+	// by DryRun, same as GhPRChecks/GhPRView) used both for idempotent
+	// merge recovery (gh already reports MERGED even though a prior
+	// GhPRMerge/GhPRClose call errored -- e.g. the detached-HEAD "could not
+	// determine current branch" failure GhPRMerge's own doc describes) and
+	// to detect a PR that has fallen CONFLICTING with its base (another PR
+	// touching the same file landed first, or this PR's base has simply
+	// moved on) so pollPRs can replay the run instead of retrying a merge
+	// that will never succeed.
+	GhPRState(ctx context.Context, repoRoot string, prNumber int) (PRStateResult, error)
+	// GhPRClose runs `gh pr close <prNumber> --comment <comment>` -- used to
+	// close out a PR pollPRs is replaying after finding it CONFLICTING
+	// (docs/FLEET_CONTROLLER.md sec 2/7, "PR conflict replay").
+	GhPRClose(ctx context.Context, repoRoot string, prNumber int, comment string) error
+	// GitDeleteRemoteBranch runs `git -C repoRoot push origin --delete
+	// branch` -- best-effort cleanup of a run's throwaway branch, called
+	// after a self-merge (GhPRMerge no longer passes --delete-branch, see
+	// its own doc) or a PR conflict replay's close. Callers only log its
+	// error; a leftover remote branch is cosmetic, never fatal.
+	GitDeleteRemoteBranch(ctx context.Context, repoRoot, branch string) error
 	// GhIssueComment runs `gh issue comment <issueNumber> --body ...` --
 	// the --alert-issue notifier's one effect.
 	GhIssueComment(ctx context.Context, repoRoot string, issueNumber int, body string) error

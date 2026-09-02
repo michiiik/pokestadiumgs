@@ -219,7 +219,7 @@ func TestExitHandlingTriggersMerge(t *testing.T) {
 	}
 }
 
-func TestExitHandlingVanishedRequeues(t *testing.T) {
+func TestExitHandlingVanishedRequeuesWithBackoff(t *testing.T) {
 	fake := &runner.Fake{InspectResults: map[string][]runner.InspectResult{"cid": {{Found: false}}}}
 	loop, dir := newTestLoop(t, fake)
 	outDir := filepath.Join(dir, "out-no-summary") // never written
@@ -229,22 +229,115 @@ func TestExitHandlingVanishedRequeues(t *testing.T) {
 	if _, err := loop.RunOnce(context.Background()); err != nil {
 		t.Fatal(err)
 	}
-	// Nothing else was queued and this agent has no cooldown, so the same
-	// pass that requeues it also relaunches it immediately (capacity is
-	// free) -- the end-of-pass state is StatusRunning again, with Attempt
-	// bumped and --resume on the relaunch.
+	// Requeued (with --resume, Attempt bumped) but held back at least 10m
+	// (sec 2, "vanished container storm") -- unlike a generator_exhausted
+	// requeue, this must NOT relaunch in the same pass even though capacity
+	// and cooldowns allow it.
 	if rec.Spec.Attempt != 1 {
 		t.Fatalf("attempt = %d, want 1", rec.Spec.Attempt)
 	}
+	if rec.Status != fleetstate.StatusRequeued {
+		t.Fatalf("status = %s, want requeued (backed off, not relaunched)", rec.Status)
+	}
+	if rec.VanishCount != 1 {
+		t.Fatalf("vanish count = %d, want 1", rec.VanishCount)
+	}
+	wantNotBefore := testNow.Add(10 * time.Minute)
+	if !rec.NotBefore.Equal(wantNotBefore) {
+		t.Fatalf("not_before = %v, want %v", rec.NotBefore, wantNotBefore)
+	}
+	if rec.WaitReason != "backoff until "+wantNotBefore.Format(time.RFC3339) {
+		t.Fatalf("wait_reason = %q", rec.WaitReason)
+	}
+	if findCall(fake, "LaunchContainer") != nil {
+		t.Fatal("must not relaunch within the backoff window")
+	}
+	if findCall(fake, "Merge") != nil {
+		t.Fatal("merge must not run when summary.json is missing")
+	}
+
+	// Once the backoff elapses, the next pass relaunches it with --resume.
+	loop.Now = func() time.Time { return wantNotBefore.Add(time.Second) }
+	if _, err := loop.RunOnce(context.Background()); err != nil {
+		t.Fatal(err)
+	}
 	if rec.Status != fleetstate.StatusRunning {
-		t.Fatalf("status = %s, want running (relaunched same pass)", rec.Status)
+		t.Fatalf("status = %s, want running once the backoff has elapsed", rec.Status)
 	}
 	launchCall := findCall(fake, "LaunchContainer")
 	if launchCall == nil || !launchCall.Launch.Resume {
 		t.Fatalf("the relaunch after a vanished run must pass --resume: %+v", launchCall)
 	}
-	if findCall(fake, "Merge") != nil {
-		t.Fatal("merge must not run when summary.json is missing")
+	if !rec.NotBefore.IsZero() {
+		t.Fatalf("not_before should be cleared once relaunched, got %v", rec.NotBefore)
+	}
+}
+
+// TestVanishCountResetsOnReadableSummary checks that a run which vanishes
+// once and then, on its next attempt, actually produces a readable
+// summary.json has its VanishCount reset to 0 -- so a single flaky vanish
+// followed by normal completions never creeps toward the
+// maxConsecutiveVanishes cap.
+func TestVanishCountResetsOnReadableSummary(t *testing.T) {
+	loop, dir := newTestLoop(t, &runner.Fake{})
+	outDir := filepath.Join(dir, "out")
+	rec := runningRec("x-p0", "cid", outDir, "codex")
+	rec.VanishCount = 2
+	loop.State.Runs["x-p0"] = rec
+
+	mustWriteFile(t, filepath.Join(outDir, "summary.json"), `{"stopped_reason":"completed"}`)
+	if err := loop.handleExit(context.Background(), rec); err != nil {
+		t.Fatal(err)
+	}
+	if rec.VanishCount != 0 {
+		t.Fatalf("vanish count = %d, want reset to 0 once a summary.json is read", rec.VanishCount)
+	}
+}
+
+// TestExitHandlingVanishedThreeTimesMarksFailed checks the
+// maxConsecutiveVanishes cap (sec 2): three vanishes of the same run id in a
+// row, with no readable summary.json ever seen in between, mark it
+// StatusFailed with a container_vanished_repeatedly alert instead of
+// requeueing it a third time.
+func TestExitHandlingVanishedThreeTimesMarksFailed(t *testing.T) {
+	loop, dir := newTestLoop(t, &runner.Fake{})
+	notifier := &fakeNotifier{}
+	loop.Notifiers = []Notifier{notifier}
+	outDir := filepath.Join(dir, "out-no-summary") // never written
+	rec := runningRec("x-p0", "cid", outDir, "codex")
+	loop.State.Runs["x-p0"] = rec
+
+	ctx := context.Background()
+	if err := loop.handleExit(ctx, rec); err != nil {
+		t.Fatal(err)
+	}
+	if rec.VanishCount != 1 || rec.Status != fleetstate.StatusRequeued {
+		t.Fatalf("after 1st vanish: count=%d status=%s", rec.VanishCount, rec.Status)
+	}
+	if err := loop.handleExit(ctx, rec); err != nil {
+		t.Fatal(err)
+	}
+	if rec.VanishCount != 2 || rec.Status != fleetstate.StatusRequeued {
+		t.Fatalf("after 2nd vanish: count=%d status=%s", rec.VanishCount, rec.Status)
+	}
+	if len(notifier.calls) != 1 {
+		t.Fatalf("notifier calls after 2 vanishes = %d, want 1 (container_vanished)", len(notifier.calls))
+	}
+
+	if err := loop.handleExit(ctx, rec); err != nil {
+		t.Fatal(err)
+	}
+	if rec.VanishCount != 3 {
+		t.Fatalf("vanish count = %d, want 3", rec.VanishCount)
+	}
+	if rec.Status != fleetstate.StatusFailed {
+		t.Fatalf("status = %s, want failed after 3 consecutive vanishes", rec.Status)
+	}
+	if rec.Note != "vanished 3x; needs operator" {
+		t.Fatalf("note = %q", rec.Note)
+	}
+	if len(notifier.calls) != 2 {
+		t.Fatalf("notifier calls after 3 vanishes = %d, want 2 (container_vanished_repeatedly is a distinct rate-limit key)", len(notifier.calls))
 	}
 }
 
@@ -417,6 +510,19 @@ func TestMergeSequencingAndPRConstruction(t *testing.T) {
 	}
 	if len(newRec.Spec.SeedDirs) != 1 || newRec.Spec.SeedDirs[0] != outDir {
 		t.Fatalf("seed dirs = %v, want [%s]", newRec.Spec.SeedDirs, outDir)
+	}
+}
+
+func TestBranchNameFoldsInMergeRound(t *testing.T) {
+	spec := fleetstate.RunSpec{ID: "x-p0"}
+	if got := branchName(spec, 0); got != "container/x-p0" {
+		t.Fatalf("round 0: branchName = %q, want container/x-p0", got)
+	}
+	if got := branchName(spec, 1); got != "container/x-p0-m2" {
+		t.Fatalf("round 1: branchName = %q, want container/x-p0-m2", got)
+	}
+	if got := branchName(spec, 2); got != "container/x-p0-m3" {
+		t.Fatalf("round 2: branchName = %q, want container/x-p0-m3", got)
 	}
 }
 

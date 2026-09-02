@@ -80,3 +80,60 @@ func TestLaunchContainerDryRunOrdinaryRunStillPassesBudgetSeconds(t *testing.T) 
 		t.Fatalf("expected GENERATOR_MODEL=gpt-5.6-luna in %v", lines)
 	}
 }
+
+// TestGhPRMergeNeverPassesDeleteBranch is the regression guard for bug 1
+// (docs/FLEET_CONTROLLER.md sec 7): the merge repo is always detached HEAD,
+// so `gh pr merge --delete-branch` there fails with "could not determine
+// current branch" even though the merge itself already landed -- GhPRMerge
+// must never pass --delete-branch; GitDeleteRemoteBranch is the caller's
+// separate, best-effort cleanup instead.
+func TestGhPRMergeNeverPassesDeleteBranch(t *testing.T) {
+	var lines []string
+	r := &ExecRunner{RepoRoot: "/repo", DryRun: true, Log: func(s string) { lines = append(lines, s) }}
+
+	if err := r.GhPRMerge(context.Background(), "/merge-repo", 42); err != nil {
+		t.Fatal(err)
+	}
+	if len(lines) != 1 {
+		t.Fatalf("expected exactly one logged line, got %v", lines)
+	}
+	if strings.Contains(lines[0], "--delete-branch") {
+		t.Fatalf("GhPRMerge must never pass --delete-branch: %s", lines[0])
+	}
+	wantCmd := "gh pr merge 42 --merge"
+	if !strings.Contains(lines[0], wantCmd) {
+		t.Fatalf("logged command = %q, want it to contain %q", lines[0], wantCmd)
+	}
+}
+
+func TestGhPRCloseBuildsCommentArgv(t *testing.T) {
+	var lines []string
+	r := &ExecRunner{RepoRoot: "/repo", DryRun: true, Log: func(s string) { lines = append(lines, s) }}
+
+	if err := r.GhPRClose(context.Background(), "/merge-repo", 54, "closing: conflicting"); err != nil {
+		t.Fatal(err)
+	}
+	if len(lines) != 1 {
+		t.Fatalf("expected exactly one logged line, got %v", lines)
+	}
+	wantCmd := `gh pr close 54 --comment "closing: conflicting"`
+	if !strings.Contains(lines[0], wantCmd) {
+		t.Fatalf("logged command = %q, want it to contain %q", lines[0], wantCmd)
+	}
+}
+
+func TestGitDeleteRemoteBranchBuildsPushDeleteArgv(t *testing.T) {
+	var lines []string
+	r := &ExecRunner{RepoRoot: "/repo", DryRun: true, Log: func(s string) { lines = append(lines, s) }}
+
+	if err := r.GitDeleteRemoteBranch(context.Background(), "/merge-repo", "container/x-p0"); err != nil {
+		t.Fatal(err)
+	}
+	if len(lines) != 1 {
+		t.Fatalf("expected exactly one logged line, got %v", lines)
+	}
+	wantCmd := "git -C /merge-repo push origin --delete container/x-p0"
+	if !strings.Contains(lines[0], wantCmd) {
+		t.Fatalf("logged command = %q, want it to contain %q", lines[0], wantCmd)
+	}
+}

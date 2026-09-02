@@ -836,7 +836,25 @@ own follow-up commit, "Name `<owner>` -> `<name>`", over every
 `disasm/src`/`disasm/include` file `apply` actually touched -- found via
 `git status --porcelain` (filtered to those two trees) rather than asking
 `apply` for a file list, since it reports only counts. Nothing here amends
-an existing commit. A failure at any step (the subprocess itself, or a
+an existing commit.
+
+`apply` also rewrites `disasm/linker_scripts` (the function's own entry in
+`disasm/linker_scripts/us/symbol_addrs_code.txt`, and any other `.ld`/`.txt`
+file that named it). `merge` deliberately discards that rename in
+`symbol_addrs_code.txt` (`git checkout --`) rather than committing it --
+a matched/decompiled owner's symtab entry is never fed to the linker, so
+committing the rename there is pointless, and leaving it as an uncommitted
+leftover is exactly what broke every container launch on 2026-09-02 (a
+container's pre-extracted asm tree, and the PR gate's own rebuild, still
+call the function by its old name; the old symtab entry disappearing broke
+the link). Instead `merge` appends `<old> = <new>;` to the hand-written,
+splat-preserved `disasm/linker_scripts/us/aliases.ld` (skipping it if an
+identical line is already there) -- the same fix PR #58 ("Fix master link
+after PR #57 renames; make the PR gate fail on error") applied by hand --
+and folds that file into the same follow-up commit alongside
+`disasm/src`/`disasm/include`.
+
+A failure at any step (the subprocess itself, or a
 refused/unconfirmed rename) is only logged, never fails the `merge` run --
 naming is a bonus, not a gate. Disable entirely with `--no-naming`. Every
 run records this run's own `names` in `merge-report.json` (`owner -> new

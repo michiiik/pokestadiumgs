@@ -3,6 +3,8 @@ package control
 import (
 	"context"
 	"fmt"
+	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -207,6 +209,222 @@ func TestSelfMergeFastForwardFailureBlocksFurtherMergesUntilFixed(t *testing.T) 
 	}
 	if recB.Status != fleetstate.StatusMerged {
 		t.Fatalf("b status = %s, want merged once unblocked", recB.Status)
+	}
+}
+
+// --- idempotent merge recovery / PR conflict replay (bugs 1, 2, 4) --------
+
+// TestSelfMergeIdempotentRecoveryWhenAlreadyMergedOnGitHub covers bug 1: the
+// merge repo is always detached HEAD, so a PAST `gh pr merge --delete-branch`
+// call could have landed the merge on GitHub and then still errored ("could
+// not determine current branch") -- state.json would then be stuck pr_open
+// forever, retried every pass, logging "already merged" from gh itself.
+// GhPRState reporting MERGED before pollPRs ever calls GhPRMerge again must
+// be treated exactly like a fresh successful merge.
+func TestSelfMergeIdempotentRecoveryWhenAlreadyMergedOnGitHub(t *testing.T) {
+	fake := &runner.Fake{
+		GhPRChecksResult:  runner.PRChecksResult{State: "SUCCESS"},
+		GhPRStateResult:   runner.PRStateResult{State: "MERGED", Mergeable: "UNKNOWN"},
+		GhPRViewResult:    "deadbeef",
+		GitRevParseResult: "deadbeef",
+	}
+	loop, _ := newTestLoop(t, fake)
+	rec := prOpenRec("x-p0", "https://github.com/o/r/pull/42", 42)
+	rec.Branch = "container/x-p0"
+	loop.State.Runs["x-p0"] = rec
+
+	if err := loop.pollPRs(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if rec.Status != fleetstate.StatusMerged {
+		t.Fatalf("status = %s, want merged (idempotent recovery)", rec.Status)
+	}
+	if findCall(fake, "GhPRMerge") != nil {
+		t.Fatal("must not call gh pr merge when GhPRState already reports MERGED")
+	}
+	deleteCall := findCall(fake, "GitDeleteRemoteBranch")
+	if deleteCall == nil || deleteCall.Strings[1] != "container/x-p0" {
+		t.Fatalf("GitDeleteRemoteBranch call = %+v, want branch container/x-p0", deleteCall)
+	}
+	if findCall(fake, "GitFetch") == nil {
+		t.Fatal("the post-merge fast-forward should still run")
+	}
+}
+
+// TestSelfMergeIdempotentRecoveryAfterMergeErrorButAlreadyMerged covers the
+// other half of bug 1: GhPRState reports OPEN/MERGEABLE beforehand (so
+// pollPRs does attempt GhPRMerge as usual), GhPRMerge itself errors (the
+// detached-HEAD --delete-branch failure), but a second GhPRState query
+// right after shows the merge landed anyway.
+func TestSelfMergeIdempotentRecoveryAfterMergeErrorButAlreadyMerged(t *testing.T) {
+	calls := 0
+	fake := &runner.Fake{
+		GhPRChecksResult: runner.PRChecksResult{State: "SUCCESS"},
+		GhPRMergeErr:     fmt.Errorf("could not determine current branch: failed to run git: not on any branch"),
+	}
+	fake.GhPRStateFunc = func(prNumber int) (runner.PRStateResult, error) {
+		calls++
+		if calls == 1 {
+			return runner.PRStateResult{State: "OPEN", Mergeable: "MERGEABLE"}, nil
+		}
+		return runner.PRStateResult{State: "MERGED"}, nil
+	}
+	loop, _ := newTestLoop(t, fake)
+	rec := prOpenRec("x-p0", "https://github.com/o/r/pull/42", 42)
+	loop.State.Runs["x-p0"] = rec
+
+	if err := loop.pollPRs(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if rec.Status != fleetstate.StatusMerged {
+		t.Fatalf("status = %s, want merged (idempotent recovery after a gh pr merge error)", rec.Status)
+	}
+	if findCall(fake, "GhPRMerge") == nil {
+		t.Fatal("gh pr merge should still have been attempted once")
+	}
+	if calls != 2 {
+		t.Fatalf("GhPRState calls = %d, want 2 (before, and after the merge error)", calls)
+	}
+}
+
+// TestPRConflictReplayClosesStaleBranchAndReplaysWithFreshBranch covers bug
+// 2: GhPRState reporting Mergeable == CONFLICTING (another PR touching the
+// same file landed first, or this PR's base moved on) must never be handed
+// to `gh pr merge` -- it would fail every pass forever. Instead pollPRs
+// closes the stale PR, best-effort deletes its remote branch, bumps
+// MergeRound, and replays the merge step, which (container_merge.py's
+// re-gate being idempotent) opens a fresh PR on a fresh -m2 branch.
+func TestPRConflictReplayClosesStaleBranchAndReplaysWithFreshBranch(t *testing.T) {
+	fake := &runner.Fake{
+		GhPRChecksResult: runner.PRChecksResult{State: "SUCCESS"},
+		GhPRStateResult:  runner.PRStateResult{State: "OPEN", Mergeable: "CONFLICTING"},
+		GhPRURL:          "https://github.com/o/r/pull/99",
+	}
+	loop, dir := newTestLoop(t, fake)
+	notifier := &fakeNotifier{}
+	loop.Notifiers = []Notifier{notifier}
+
+	outDir := filepath.Join(dir, "out")
+	rec := prOpenRec("x-p0", "https://github.com/o/r/pull/54", 54)
+	rec.Branch = "container/x-p0"
+	rec.OutDir = outDir
+	loop.State.Runs["x-p0"] = rec
+
+	fake.MergeFunc = func(spec runner.MergeSpec) (runner.ProcessResult, error) {
+		mustWriteFile(t, filepath.Join(spec.OutDir, "merge-report.json"),
+			`{"owners":{"func_1":"accepted"}}`)
+		return runner.ProcessResult{}, nil
+	}
+
+	if err := loop.pollPRs(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+
+	closeCall := findCall(fake, "GhPRClose")
+	if closeCall == nil || closeCall.Strings[1] != "54" {
+		t.Fatalf("GhPRClose call = %+v, want PR 54 closed", closeCall)
+	}
+	deleteCall := findCall(fake, "GitDeleteRemoteBranch")
+	if deleteCall == nil || deleteCall.Strings[1] != "container/x-p0" {
+		t.Fatalf("GitDeleteRemoteBranch call = %+v, want the old branch container/x-p0", deleteCall)
+	}
+	if rec.MergeRound != 1 {
+		t.Fatalf("merge round = %d, want 1", rec.MergeRound)
+	}
+	if rec.Branch != "container/x-p0-m2" {
+		t.Fatalf("branch = %s, want container/x-p0-m2 (fresh branch for the replay)", rec.Branch)
+	}
+	if rec.PRNumber != 99 || rec.PRURL != fake.GhPRURL {
+		t.Fatalf("replay should have opened a fresh PR: number=%d url=%s", rec.PRNumber, rec.PRURL)
+	}
+	if rec.Status != fleetstate.StatusPROpen {
+		t.Fatalf("status = %s, want pr_open (fresh PR opened by the replay)", rec.Status)
+	}
+	if findCall(fake, "GhPRMerge") != nil {
+		t.Fatal("must never attempt gh pr merge on a CONFLICTING PR")
+	}
+	if len(notifier.calls) != 1 {
+		t.Fatalf("notifier calls = %d, want 1 (pr_conflict_replayed)", len(notifier.calls))
+	}
+}
+
+// TestPRConflictReplayEndsRunDoneWhenNothingIsLeftToMerge checks that a
+// replay whose re-gate finds nothing left to merge (every owner already
+// landed on master via a sibling PR, container_merge.py reporting
+// already_landed) follows runMerge's ordinary no-accepted-owners path:
+// StatusDone, no new PR opened.
+func TestPRConflictReplayEndsRunDoneWhenNothingIsLeftToMerge(t *testing.T) {
+	fake := &runner.Fake{
+		GhPRChecksResult: runner.PRChecksResult{State: "SUCCESS"},
+		GhPRStateResult:  runner.PRStateResult{State: "OPEN", Mergeable: "CONFLICTING"},
+	}
+	loop, dir := newTestLoop(t, fake)
+	outDir := filepath.Join(dir, "out")
+	rec := prOpenRec("x-p0", "https://github.com/o/r/pull/54", 54)
+	rec.Branch = "container/x-p0"
+	rec.OutDir = outDir
+	loop.State.Runs["x-p0"] = rec
+
+	fake.MergeFunc = func(spec runner.MergeSpec) (runner.ProcessResult, error) {
+		mustWriteFile(t, filepath.Join(spec.OutDir, "merge-report.json"),
+			`{"owners":{"func_1":"already_landed"}}`)
+		return runner.ProcessResult{}, nil
+	}
+
+	if err := loop.pollPRs(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if rec.Status != fleetstate.StatusDone {
+		t.Fatalf("status = %s, want done (nothing left to merge)", rec.Status)
+	}
+	if rec.PRNumber != 0 || rec.PRURL != "" {
+		t.Fatalf("no fresh PR should have opened: number=%d url=%s", rec.PRNumber, rec.PRURL)
+	}
+	if findCall(fake, "GhPRCreate") != nil {
+		t.Fatal("must not open a PR when nothing matched the replay")
+	}
+}
+
+// TestPollPRsLogsRepeatedMergeFailureOnlyOnce covers bug 4: an unresolved
+// `gh pr merge` failure must not be logged every single pass forever --
+// only once, then again only once its message actually changes.
+func TestPollPRsLogsRepeatedMergeFailureOnlyOnce(t *testing.T) {
+	fake := &runner.Fake{
+		GhPRChecksResult: runner.PRChecksResult{State: "SUCCESS"},
+		GhPRStateResult:  runner.PRStateResult{State: "OPEN", Mergeable: "MERGEABLE"},
+		GhPRMergeErr:     fmt.Errorf("boom"),
+	}
+	var logs []string
+	loop, _ := newTestLoop(t, fake)
+	loop.Log = func(s string) { logs = append(logs, s) }
+	rec := prOpenRec("x-p0", "https://github.com/o/r/pull/42", 42)
+	loop.State.Runs["x-p0"] = rec
+
+	for i := 0; i < 3; i++ {
+		if err := loop.pollPRs(context.Background()); err != nil {
+			t.Fatal(err)
+		}
+	}
+	count := func(needle string) int {
+		n := 0
+		for _, l := range logs {
+			if strings.Contains(l, needle) {
+				n++
+			}
+		}
+		return n
+	}
+	if n := count("gh pr merge 42 failed"); n != 1 {
+		t.Fatalf("logged the identical failure %d times across 3 passes, want 1", n)
+	}
+
+	// A different error message logs again.
+	fake.GhPRMergeErr = fmt.Errorf("a different failure")
+	if err := loop.pollPRs(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if n := count("gh pr merge 42 failed"); n != 2 {
+		t.Fatalf("logged count after the message changed = %d, want 2", n)
 	}
 }
 
