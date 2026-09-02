@@ -5119,7 +5119,12 @@ s32 func_80041F60(s16 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80041FA0.s")
+typedef union { s32 word; s8 bytes[4]; } Func80041FA0State;
+typedef Func80041FA0State Func80041FA0Packed;
+extern s32 func_80041FD0(s32, u16, Func80041FA0State, s32);
+void func_80041FA0(s32 arg0, u16 arg1, Func80041FA0State arg2) {
+    func_80041FD0(arg0, arg1, arg2, 0);
+}
 #endif
 
 #ifdef VERSION_US
