@@ -78,6 +78,61 @@ container as the output directory. The driver
 | `--generator-timeout` | cap in seconds on a single generator invocation (default 1800, raised from 600 -- see §4.1); still bounded further by the run's remaining budget. Kimi K3 at high effort can exceed 10 minutes per batch on its own -- raise this further rather than letting it time out |
 | `--probe-tool {on,off}` | toggle the `BATCH_CONTRACT` paragraph telling an agentic generator it may/should call `tools/probe_one.py` to iterate before writing the batch (see §4.1). Default: the `PROBE_TOOL` env var if set, else `on` |
 | `--candidate-file` | test mode: use a fixed batch file once for the first owner, then exit -- no generator/model call at all |
+| `--seed-from DIR[,DIR...]` | seed a **fresh** run (not `--resume`) from one or more earlier `--out` dirs' own `state.json` -- see §2.1 |
+
+### 2.1 Seeding a fresh run from earlier output dirs
+
+`--seed-from /abs/out1,/abs/out2` warms up a brand-new run (never combined
+with `--resume`; a resumed owner already has its own real state, and
+`--seed-from` is silently ignored -- with a log line saying so -- when both
+are passed) from one or more earlier `--out` directories, this run's own
+past attempts or another run's (a different generator/model against the
+same file, or the same generator retried). Owner names are unique function
+symbols, not scoped to any one source file, so this looks at *every* owner
+mentioned in any of the given dirs' `state.json`, not just this run's
+current file's owners.
+
+Per owner, `seed_owner_states()` in `tools/container_agent.py`:
+
+- merges `best_candidates` from every seed dir that has that owner: ranked
+  by the same `attempt_rank` the normal loop uses, deduplicated by
+  normalised body text, and capped at `BEST_CANDIDATES_KEPT` (5) -- but
+  always keeping at least the single best candidate from *every*
+  contributing source, even past the cap, so one source's several
+  near-misses can never fully crowd out another source's one good lead;
+- unions `tried_bodies`/`tried_labels` across every seed dir, so a body or
+  hypothesis already probed in any of them is never resent this run (the
+  usual within-run dedup in `filter_batch` just inherits a bigger seed set);
+- takes the first `m2c_draft` found (and marks it fetched, so this run
+  never re-runs `pragma_targets.py draft` for that owner);
+- takes the best (lowest-score; 0 is instruction-exact) `permuter_seed`
+  across every seed dir that has one.
+
+`status`/`iterations`/`plateau_count`/`history` are **never** imported --
+a seeded owner still starts exactly like a normal pending owner (status
+`in_progress`, `iterations` 0, empty `history`) to `process_owner`/`main`;
+it just has a warm `best_candidates` pool, tried-body/label memory, an m2c
+draft, and a permuter seed already in hand, so the very first prompt built
+for it naturally shows those seeded bodies (with their diagnostics) instead
+of a blank slate. The owner's `state.json` entry also records
+`seeded_from` (the contributing seed dir paths) and `seed_best_similarity`
+(the best similarity among what was actually imported, or `null` if
+nothing scored), and one log line per owner: `"<owner>: seeded N
+candidate(s), best X from <dir>"`.
+
+An owner a seed dir already marked `accepted` is not skipped -- its exact
+installed body (`accepted/<owner>.json`'s first candidate, the same file
+`capture_accepted` writes) is imported as one more `best_candidates` entry
+with `similarity_score` 1.0, and the driver logs loudly that the owner was
+already matched elsewhere: **the host merge (§9) decides** whether it
+actually lands, never the seed step itself. A seed dir that marks an owner
+`accepted` but has no readable `accepted/<owner>.json` (e.g. a hand-built
+fixture) still gets the owner recorded (with a WARNING logged) -- there is
+just nothing to show for the accept itself.
+
+Every field is read with a safe default, so an older out dir's `state.json`
+missing `tried_bodies`/`tried_labels`/`feedback`/`normalized_only` (a schema
+predating those additions) seeds cleanly with whatever it does have.
 
 ## 3. Choosing the coding agent
 
@@ -319,6 +374,7 @@ Everything lands under the mounted `--out` directory:
 | `accepted/<owner>.patch` | the same accepted change as a patch, for inspection without re-running anything |
 | `log.txt` | the run's diagnostics log |
 | `summary.json` | owners attempted, owners matched, best similarity per owner, iteration counts, wall time for the run |
+| `probe-stats/probe-stats.jsonl` | a copy of the runner's own probe-stats history (see §9.1) |
 
 ## 8. Why the container never commits
 
@@ -364,6 +420,33 @@ To read a run's own progress without merging anything:
 `python3 tools/container_merge.py summary /abs/out` prints `summary.json`
 and `state.json` as readable tables (per-owner status, best similarity,
 iteration/history counts).
+
+`merge` always ends by printing a reminder to also run `import-stats`
+(§9.1) -- probe-stats history is a separate import from accepted
+candidates, and easy to forget since `merge` never does it for you.
+
+### 9.1 Importing probe-stats history
+
+    python3 tools/container_merge.py import-stats /abs/out
+    python3 tools/container_merge.py import-stats /abs/out --repo . --dry-run
+
+The container's own runner (`tools/fleet_probe.py`/
+`tools/try_pragma_compare.py`, via `tools/probe_stats.py`) records every
+attempt it probes into a `PRAGMA_PROBE_STATS`-resolved JSONL history --
+inside the container's own checkout, so it would be lost once the container
+exits. `tools/container_agent.py` copies it out to
+`<out>/probe-stats/probe-stats.jsonl` on every state save and at finalize
+(resolved the same way the runner resolves it: the `PRAGMA_PROBE_STATS` env
+var if set -- empty disables it entirely -- else
+`<repo>/disasm/probe-stats/probe-stats.jsonl`). `import-stats` folds that
+copy into *this* checkout's own probe-stats history (resolved the same
+way), appending only lines not already present verbatim -- a safe, careful
+line-level dedupe rather than a blind concatenation, so re-running
+`import-stats` on the same out dir, or importing the same run from two
+different out dirs, never double-counts. It prints how many lines were
+read, how many were new, and how many were already present; `--dry-run`
+counts without writing. Like `merge`, this never runs automatically -- it
+is its own deliberate host-side step.
 
 ## Temp-file leak bounding
 

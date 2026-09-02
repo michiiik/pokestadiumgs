@@ -13,6 +13,7 @@ shells out to a real generator, probe, permuter, or git.
 from __future__ import annotations
 
 import json
+import os
 import shlex
 import subprocess
 import sys
@@ -156,6 +157,102 @@ class DiscoverOwnersTests(unittest.TestCase):
             ):
                 owners = container_agent.discover_owners(repo_dir, source_rel)
         self.assertEqual(owners, ["func_a"])
+
+    def test_command_never_passes_the_nonexistent_json_flag(self) -> None:
+        # `pragma_targets.py targets` has no `--json` flag (see its own
+        # --help): passing one is an argparse error (exit 2) that used to
+        # make this function silently fall back to the regex scan on every
+        # single call, permanently losing size ordering/--max-instructions.
+        # The command already prints JSON unconditionally.
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp)
+            fake_stdout = json.dumps({"targets": [{"function": "func_a"}]})
+            with mock.patch.object(
+                container_agent.subprocess, "run",
+                return_value=SimpleNamespace(returncode=0, stdout=fake_stdout, stderr=""),
+            ) as run_mock:
+                container_agent.discover_owners(repo_dir, "disasm/src/X.c")
+            command = run_mock.call_args[0][0]
+        self.assertNotIn("--json", command)
+
+    def test_parses_a_real_shaped_targets_payload(self) -> None:
+        # The exact shape `list_targets()`/`main()` in tools/pragma_targets.py
+        # print for `targets` (trimmed to two rows) -- captured from a real
+        # `python3 tools/pragma_targets.py targets --source disasm/src/14640.c
+        # --limit 5` invocation, not a hand-simplified fixture.
+        real_shaped_stdout = json.dumps({
+            "matched": 60,
+            "family_counts": {"state_field_access": 9, "call_sequence": 36},
+            "targets": [
+                {
+                    "function": "func_8001644C",
+                    "source": "disasm/src/14640.c",
+                    "asm": "disasm/asm/us/nonmatchings/14640/func_8001644C.s",
+                    "family": "state_field_access",
+                    "confidence": 0.78,
+                    "instructions": 12,
+                    "branches": 1,
+                    "loops": False,
+                    "calls": [],
+                    "globals": ["D_8011BE90", "D_8011C990"],
+                    "jump_tables": [],
+                    "notes": ["global field access with explicit stores"],
+                    "jump_table_ready": False,
+                    "jump_table_unready": False,
+                    "jump_table_status": "not_applicable",
+                    "prior_attempts": 0,
+                    "best_similarity": None,
+                    "best_mismatch_kind": None,
+                    "best_raw_similarity": None,
+                    "last_attempt": None,
+                    "hardness": "fresh",
+                },
+                {
+                    "function": "func_8001874C",
+                    "source": "disasm/src/14640.c",
+                    "instructions": 12,
+                    "family": "call_sequence",
+                },
+            ],
+            "truncated": False,
+        })
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp)
+            with mock.patch.object(
+                container_agent.subprocess, "run",
+                return_value=SimpleNamespace(returncode=0, stdout=real_shaped_stdout, stderr=""),
+            ):
+                owners = container_agent.discover_owners(repo_dir, "disasm/src/14640.c")
+        self.assertEqual(owners, ["func_8001644C", "func_8001874C"])
+
+    def test_logs_loudly_on_nonzero_exit(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp)
+            out_dir = Path(tmp) / "out"
+            logger = container_agent.Logger(out_dir / "log.txt")
+            with mock.patch.object(
+                container_agent.subprocess, "run",
+                return_value=SimpleNamespace(returncode=2, stdout="", stderr="unrecognized arguments: --json"),
+            ):
+                container_agent.discover_owners(repo_dir, "disasm/src/X.c", logger=logger)
+            log_text = (out_dir / "log.txt").read_text(encoding="utf-8")
+        self.assertIn("falling back to a regex scan", log_text)
+        self.assertIn("exited 2", log_text)
+
+    def test_logs_loudly_on_no_rows(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp)
+            out_dir = Path(tmp) / "out"
+            logger = container_agent.Logger(out_dir / "log.txt")
+            fake_stdout = json.dumps({"targets": []})
+            with mock.patch.object(
+                container_agent.subprocess, "run",
+                return_value=SimpleNamespace(returncode=0, stdout=fake_stdout, stderr=""),
+            ):
+                container_agent.discover_owners(repo_dir, "disasm/src/X.c", logger=logger)
+            log_text = (out_dir / "log.txt").read_text(encoding="utf-8")
+        self.assertIn("falling back to a regex scan", log_text)
+        self.assertIn("no remaining owners", log_text)
 
 
 # ---------------------------------------------------------------------------
@@ -2394,6 +2491,484 @@ class TerminateAllPermutersTests(unittest.TestCase):
             with mock.patch.object(container_agent, "terminate_all_permuters") as terminate_mock:
                 container_agent._finalize_run(summary, out_dir, "completed", time.monotonic())
             terminate_mock.assert_called_once()
+
+
+# ---------------------------------------------------------------------------
+# Probe-stats export: <out>/probe-stats/probe-stats.jsonl, copied from the
+# runner's own PRAGMA_PROBE_STATS-resolved file on every state save and at
+# finalize.
+# ---------------------------------------------------------------------------
+
+class ProbeStatsExportTests(unittest.TestCase):
+    def test_copies_default_repo_stats_file_into_out_dir(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            out_dir = Path(tmp) / "out"
+            source = repo_dir / "disasm" / "probe-stats" / "probe-stats.jsonl"
+            source.parent.mkdir(parents=True)
+            source.write_text('{"batch_id": "a"}\n{"batch_id": "b"}\n', encoding="utf-8")
+
+            with mock.patch.dict(os.environ, {}, clear=False):
+                os.environ.pop("PRAGMA_PROBE_STATS", None)
+                container_agent.export_probe_stats(repo_dir, out_dir)
+
+            dest = out_dir / "probe-stats" / "probe-stats.jsonl"
+            self.assertTrue(dest.is_file())
+            self.assertEqual(dest.read_text(encoding="utf-8"), source.read_text(encoding="utf-8"))
+
+    def test_honours_pragma_probe_stats_env_override(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            out_dir = Path(tmp) / "out"
+            custom = Path(tmp) / "custom-stats.jsonl"
+            custom.write_text('{"batch_id": "custom"}\n', encoding="utf-8")
+
+            with mock.patch.dict(os.environ, {"PRAGMA_PROBE_STATS": str(custom)}):
+                container_agent.export_probe_stats(repo_dir, out_dir)
+
+            dest = out_dir / "probe-stats" / "probe-stats.jsonl"
+            self.assertTrue(dest.is_file())
+            self.assertEqual(dest.read_text(encoding="utf-8"), '{"batch_id": "custom"}\n')
+
+    def test_empty_env_var_disables_export(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            out_dir = Path(tmp) / "out"
+            source = repo_dir / "disasm" / "probe-stats" / "probe-stats.jsonl"
+            source.parent.mkdir(parents=True)
+            source.write_text('{"batch_id": "a"}\n', encoding="utf-8")
+
+            with mock.patch.dict(os.environ, {"PRAGMA_PROBE_STATS": ""}):
+                container_agent.export_probe_stats(repo_dir, out_dir)
+
+            dest = out_dir / "probe-stats" / "probe-stats.jsonl"
+            self.assertFalse(dest.exists())
+
+    def test_missing_source_file_is_a_noop(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            out_dir = Path(tmp) / "out"
+            with mock.patch.dict(os.environ, {}, clear=False):
+                os.environ.pop("PRAGMA_PROBE_STATS", None)
+                container_agent.export_probe_stats(repo_dir, out_dir)  # must not raise
+            dest = out_dir / "probe-stats" / "probe-stats.jsonl"
+            self.assertFalse(dest.exists())
+
+    def test_save_state_exports_probe_stats(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            out_dir = Path(tmp) / "out"
+            with mock.patch.object(container_agent, "export_probe_stats") as export_mock:
+                container_agent._save_state({"a": 1}, out_dir / "state.json", repo_dir=repo_dir, out_dir=out_dir)
+            export_mock.assert_called_once_with(repo_dir, out_dir)
+            self.assertTrue((out_dir / "state.json").exists())
+
+    def test_finalize_run_exports_probe_stats_when_repo_dir_given(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            out_dir = Path(tmp) / "out"
+            summary = {"runs": []}
+            with mock.patch.object(container_agent, "export_probe_stats") as export_mock:
+                container_agent._finalize_run(
+                    summary, out_dir, "completed", time.monotonic(), repo_dir=repo_dir,
+                )
+            export_mock.assert_called_once_with(repo_dir, out_dir)
+
+    def test_finalize_run_skips_export_without_repo_dir(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            out_dir = Path(tmp)
+            summary = {"runs": []}
+            with mock.patch.object(container_agent, "export_probe_stats") as export_mock:
+                container_agent._finalize_run(summary, out_dir, "completed", time.monotonic())
+            export_mock.assert_not_called()
+
+    def test_end_to_end_candidate_file_run_copies_probe_stats(self) -> None:
+        # A full --candidate-file run: the runner (invoke_probe, stubbed here)
+        # never really writes disasm/probe-stats/probe-stats.jsonl, but the
+        # export path only ever copies whatever is there -- simulate the
+        # runner having already written it before the driver's own finalize
+        # export snapshot runs.
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            source_rel = "disasm/src/X.c"
+            source_path = repo_dir / source_rel
+            source_path.parent.mkdir(parents=True)
+            source_path.write_text("void func_1(void) {\n    return;\n}\n", encoding="utf-8")
+            stats_source = repo_dir / "disasm" / "probe-stats" / "probe-stats.jsonl"
+            stats_source.parent.mkdir(parents=True)
+            stats_source.write_text('{"batch_id": "real-run"}\n', encoding="utf-8")
+
+            out_dir = Path(tmp) / "out"
+            candidate_file = Path(tmp) / "batch.json"
+            candidate_file.write_text(
+                json.dumps({
+                    "source": source_rel,
+                    "candidates": [{"function": "func_1", "label": "a", "body": "void func_1(void) { return; }"}],
+                }),
+                encoding="utf-8",
+            )
+
+            def result_for_call(_n, _batch):
+                return {
+                    "batch_status": "no_candidate_accepted", "accepted": [],
+                    "attempts": [{"function": "func_1", "label": "a", "status": "rejected", "similarity_score": 0.5}],
+                }
+
+            with mock.patch.object(container_agent, "invoke_probe", side_effect=make_invoke_probe(result_for_call)), \
+                 mock.patch.dict(os.environ, {}, clear=False):
+                os.environ.pop("PRAGMA_PROBE_STATS", None)
+                exit_code = container_agent.main([
+                    "--source", source_rel, "--out", str(out_dir), "--repo", str(repo_dir),
+                    "--candidate-file", str(candidate_file),
+                ])
+
+            self.assertEqual(exit_code, 0)
+            dest = out_dir / "probe-stats" / "probe-stats.jsonl"
+            self.assertTrue(dest.is_file())
+            self.assertEqual(dest.read_text(encoding="utf-8"), '{"batch_id": "real-run"}\n')
+
+
+# ---------------------------------------------------------------------------
+# --seed-from: fresh-run seeding from earlier --out dirs
+# ---------------------------------------------------------------------------
+
+def _write_seed_state(seed_dir: Path, state: dict) -> None:
+    container_agent.save_json(seed_dir / "state.json", state)
+
+
+def _write_seed_accepted(seed_dir: Path, owner: str, body: str, *, label: str = "accepted") -> None:
+    container_agent.save_json(
+        seed_dir / "accepted" / f"{owner}.json",
+        {
+            "source": "disasm/src/X.c",
+            "declarations": "",
+            "candidates": [{"function": owner, "label": label, "body": body}],
+        },
+    )
+
+
+def _candidate(label: str, similarity: float, *, raw: float | None = None, body: str = "") -> dict:
+    return {
+        "label": label,
+        "similarity_score": similarity,
+        "raw_similarity_score": raw if raw is not None else similarity,
+        "mismatch_kind": None,
+        "futility": None,
+        "diagnostic": None,
+        "body": body or f"body-for-{label}",
+        "normalized_only": False,
+        "feedback": {},
+    }
+
+
+class SeedOwnerStatesTests(unittest.TestCase):
+    def test_new_schema_basic_import(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            seed_dir = Path(tmp) / "seed1"
+            _write_seed_state(seed_dir, {
+                "func_a": {
+                    "status": "in_progress",
+                    "iterations": 4,
+                    "plateau_count": 2,
+                    "history": [{"iteration": 0}],
+                    "best_candidates": [
+                        _candidate("hyp:one", 0.95, body="body_one"),
+                        _candidate("hyp:two", 0.80, body="body_two"),
+                    ],
+                    "tried_bodies": ["hash1:decl1", "hash2:decl1"],
+                    "tried_labels": ["hyp:one", "hyp:two"],
+                    "m2c_draft": "f64 func_a(void) { return 0; }",
+                    "permuter_seed": {"score": 3, "body": "permuted body", "iteration": 2, "label": "hyp:one"},
+                },
+            })
+            out_dir = Path(tmp) / "out"
+            logger = container_agent.Logger(out_dir / "log.txt")
+
+            seeded = container_agent.seed_owner_states([seed_dir], logger=logger)
+            log_text = (out_dir / "log.txt").read_text(encoding="utf-8")
+
+        self.assertIn("func_a", seeded)
+        owner_state = seeded["func_a"]
+        # status/iterations/plateau/history are never imported.
+        self.assertEqual(owner_state["status"], "in_progress")
+        self.assertEqual(owner_state["iterations"], 0)
+        self.assertEqual(owner_state["plateau_count"], 0)
+        self.assertEqual(owner_state["history"], [])
+        self.assertEqual(len(owner_state["best_candidates"]), 2)
+        self.assertEqual(owner_state["best_candidates"][0]["label"], "hyp:one")
+        self.assertEqual(owner_state["tried_bodies"], ["hash1:decl1", "hash2:decl1"])
+        self.assertEqual(owner_state["tried_labels"], ["hyp:one", "hyp:two"])
+        self.assertEqual(owner_state["m2c_draft"], "f64 func_a(void) { return 0; }")
+        self.assertTrue(owner_state["m2c_draft_fetched"])
+        self.assertEqual(owner_state["permuter_seed"]["score"], 3)
+        self.assertEqual(owner_state["seeded_from"], [str(seed_dir)])
+        self.assertEqual(owner_state["seed_best_similarity"], 0.95)
+        self.assertIn("func_a: seeded 2 candidate(s), best 0.95", log_text)
+
+    def test_old_schema_missing_tried_bodies_and_feedback(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            seed_dir = Path(tmp) / "seed_old"
+            # Mirrors a real older out dir: best_candidates entries have no
+            # "feedback"/"normalized_only" keys, and the owner has no
+            # "tried_bodies"/"tried_labels" keys at all.
+            _write_seed_state(seed_dir, {
+                "func_b": {
+                    "status": "plateau",
+                    "best_similarity": 1.0,
+                    "best_label": "x",
+                    "iterations": 12,
+                    "plateau_count": 6,
+                    "history": [],
+                    "best_candidates": [
+                        {
+                            "label": "x", "similarity_score": 0.93, "raw_similarity_score": 0.90,
+                            "mismatch_kind": "register_allocation_only", "futility": None,
+                            "diagnostic": None, "body": "old_body",
+                        },
+                    ],
+                    "permuter_runs": [],
+                },
+            })
+            out_dir = Path(tmp) / "out"
+            logger = container_agent.Logger(out_dir / "log.txt")
+
+            seeded = container_agent.seed_owner_states([seed_dir], logger=logger)
+
+        self.assertIn("func_b", seeded)
+        owner_state = seeded["func_b"]
+        self.assertEqual(owner_state["tried_bodies"], [])
+        self.assertEqual(owner_state["tried_labels"], [])
+        self.assertIsNone(owner_state["m2c_draft"])
+        self.assertNotIn("permuter_seed", owner_state)
+        self.assertEqual(len(owner_state["best_candidates"]), 1)
+        self.assertEqual(owner_state["best_candidates"][0]["body"], "old_body")
+        self.assertEqual(owner_state["status"], "in_progress")
+        self.assertEqual(owner_state["iterations"], 0)
+
+    def test_merge_of_two_seeds_keeps_best_of_each(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            seed_a = Path(tmp) / "seed_a"
+            seed_b = Path(tmp) / "seed_b"
+            # seed_a alone fills the whole BEST_CANDIDATES_KEPT cap with
+            # higher-scoring candidates than seed_b's single lower one.
+            a_candidates = [
+                _candidate(f"a:{i}", 0.9 - i * 0.01, body=f"a_body_{i}")
+                for i in range(container_agent.BEST_CANDIDATES_KEPT)
+            ]
+            _write_seed_state(seed_a, {"func_c": {"status": "in_progress", "best_candidates": a_candidates}})
+            _write_seed_state(seed_b, {
+                "func_c": {
+                    "status": "in_progress",
+                    "best_candidates": [_candidate("b:only", 0.10, body="b_body_only")],
+                },
+            })
+            out_dir = Path(tmp) / "out"
+            logger = container_agent.Logger(out_dir / "log.txt")
+
+            seeded = container_agent.seed_owner_states([seed_a, seed_b], logger=logger)
+
+        owner_state = seeded["func_c"]
+        bodies = {c["body"] for c in owner_state["best_candidates"]}
+        # seed_b's one lead survives even though it ranks below every one of
+        # seed_a's candidates and the cap alone would have dropped it.
+        self.assertIn("b_body_only", bodies)
+        for candidate in a_candidates:
+            self.assertIn(candidate["body"], bodies)
+        self.assertEqual(sorted(owner_state["seeded_from"]), sorted([str(seed_a), str(seed_b)]))
+        # Ranked best-first overall.
+        scores = [c["similarity_score"] for c in owner_state["best_candidates"]]
+        self.assertEqual(scores, sorted(scores, reverse=True))
+
+    def test_merge_dedupes_identical_bodies_across_sources(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            seed_a = Path(tmp) / "seed_a"
+            seed_b = Path(tmp) / "seed_b"
+            _write_seed_state(seed_a, {
+                "func_d": {"status": "in_progress", "best_candidates": [_candidate("a:1", 0.7, body="  same body  ")]},
+            })
+            _write_seed_state(seed_b, {
+                "func_d": {"status": "in_progress", "best_candidates": [_candidate("b:1", 0.6, body="same body")]},
+            })
+            out_dir = Path(tmp) / "out"
+            logger = container_agent.Logger(out_dir / "log.txt")
+
+            seeded = container_agent.seed_owner_states([seed_a, seed_b], logger=logger)
+
+        owner_state = seeded["func_d"]
+        self.assertEqual(len(owner_state["best_candidates"]), 1)
+        # The higher-scoring source's copy wins the dedupe.
+        self.assertEqual(owner_state["best_candidates"][0]["label"], "a:1")
+
+    def test_accepted_owner_imports_body_as_candidate_and_logs_loudly(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            seed_dir = Path(tmp) / "seed_accepted"
+            _write_seed_state(seed_dir, {
+                "func_e": {"status": "accepted", "best_similarity": 1.0, "best_candidates": []},
+            })
+            _write_seed_accepted(seed_dir, "func_e", "f64 func_e(void) { return 1.0; }")
+            out_dir = Path(tmp) / "out"
+            logger = container_agent.Logger(out_dir / "log.txt")
+
+            seeded = container_agent.seed_owner_states([seed_dir], logger=logger)
+            log_text = (out_dir / "log.txt").read_text(encoding="utf-8")
+
+        self.assertIn("func_e", seeded)
+        owner_state = seeded["func_e"]
+        self.assertEqual(owner_state["status"], "in_progress")  # not skipped/auto-accepted
+        self.assertEqual(len(owner_state["best_candidates"]), 1)
+        best = owner_state["best_candidates"][0]
+        self.assertEqual(best["similarity_score"], 1.0)
+        self.assertEqual(best["body"], "f64 func_e(void) { return 1.0; }")
+        self.assertIn("ACCEPTED", log_text)
+        self.assertIn("func_e", log_text)
+
+    def test_accepted_owner_without_accepted_json_is_not_skipped(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            seed_dir = Path(tmp) / "seed_accepted_missing"
+            _write_seed_state(seed_dir, {
+                "func_f": {"status": "accepted", "best_similarity": 1.0, "best_candidates": []},
+            })
+            # No accepted/func_f.json written -- simulates a hand-built or
+            # incomplete fixture.
+            out_dir = Path(tmp) / "out"
+            logger = container_agent.Logger(out_dir / "log.txt")
+
+            seeded = container_agent.seed_owner_states([seed_dir], logger=logger)
+            log_text = (out_dir / "log.txt").read_text(encoding="utf-8")
+
+        # Still recorded (do not skip it; the host merge decides), just with
+        # nothing to show for the accept itself.
+        self.assertIn("func_f", seeded)
+        owner_state = seeded["func_f"]
+        self.assertEqual(owner_state["best_candidates"], [])
+        self.assertEqual(owner_state["seeded_from"], [str(seed_dir)])
+        self.assertIn("WARNING", log_text)
+        self.assertIn("func_f", log_text)
+
+    def test_owner_absent_from_every_seed_dir_is_not_returned(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            seed_dir = Path(tmp) / "seed"
+            _write_seed_state(seed_dir, {"func_g": {"status": "in_progress", "best_candidates": []}})
+            out_dir = Path(tmp) / "out"
+            logger = container_agent.Logger(out_dir / "log.txt")
+
+            seeded = container_agent.seed_owner_states([seed_dir], logger=logger)
+
+        self.assertNotIn("func_nowhere", seeded)
+
+
+class SeedFromCLITests(unittest.TestCase):
+    def test_seed_from_wired_into_fresh_test_mode_run(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            source_rel = "disasm/src/X.c"
+            source_path = repo_dir / source_rel
+            source_path.parent.mkdir(parents=True)
+            source_path.write_text("void func_1(void) {\n    return;\n}\n", encoding="utf-8")
+
+            seed_dir = Path(tmp) / "seed"
+            _write_seed_state(seed_dir, {
+                "func_1": {
+                    "status": "in_progress",
+                    "best_candidates": [_candidate("seed:one", 0.77, body="seeded_body")],
+                    "tried_labels": ["seed:one"],
+                },
+            })
+
+            out_dir = Path(tmp) / "out"
+            candidate_file = Path(tmp) / "batch.json"
+            candidate_file.write_text(
+                json.dumps({
+                    "source": source_rel,
+                    "candidates": [{"function": "func_1", "label": "a", "body": "void func_1(void) { return; }"}],
+                }),
+                encoding="utf-8",
+            )
+
+            def result_for_call(_n, _batch):
+                return {
+                    "batch_status": "no_candidate_accepted", "accepted": [],
+                    "attempts": [{"function": "func_1", "label": "a", "status": "rejected", "similarity_score": 0.5}],
+                }
+
+            with mock.patch.object(container_agent, "invoke_probe", side_effect=make_invoke_probe(result_for_call)):
+                exit_code = container_agent.main([
+                    "--source", source_rel, "--out", str(out_dir), "--repo", str(repo_dir),
+                    "--seed-from", str(seed_dir), "--candidate-file", str(candidate_file),
+                ])
+
+            self.assertEqual(exit_code, 0)
+            log_text = (out_dir / "log.txt").read_text(encoding="utf-8")
+            state = json.loads((out_dir / "state.json").read_text(encoding="utf-8"))
+
+        self.assertIn("func_1: seeded 1 candidate(s), best 0.77", log_text)
+        self.assertEqual(state["func_1"]["seeded_from"], [str(seed_dir)])
+        self.assertEqual(state["func_1"]["seed_best_similarity"], 0.77)
+        # The seeded candidate survives into the merged/deduped pool
+        # run_iteration built from this run's own attempt too.
+        seeded_bodies = {c["body"] for c in state["func_1"]["best_candidates"]}
+        self.assertIn("seeded_body", seeded_bodies)
+
+    def test_seed_from_accepts_comma_separated_dirs(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            repo_dir.mkdir()
+            seed_a = Path(tmp) / "seed_a"
+            seed_b = Path(tmp) / "seed_b"
+            _write_seed_state(seed_a, {"func_x": {"status": "in_progress", "best_candidates": []}})
+            _write_seed_state(seed_b, {"func_y": {"status": "in_progress", "best_candidates": []}})
+
+            with mock.patch.object(
+                container_agent, "seed_owner_states", wraps=container_agent.seed_owner_states
+            ) as seed_mock:
+                container_agent.main([
+                    "--source", "disasm/src/X.c",
+                    "--out", str(Path(tmp) / "out"),
+                    "--repo", str(repo_dir),
+                    "--seed-from", f"{seed_a}, {seed_b}",
+                    "--generator-cmd", "generator --prompt {prompt} --batch {batch}",
+                    "--owners", "func_none",
+                ])
+            called_dirs = seed_mock.call_args[0][0]
+        self.assertEqual([str(d) for d in called_dirs], [str(seed_a), str(seed_b)])
+
+    def test_seed_from_ignored_under_resume(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            repo_dir.mkdir()
+            out_dir = Path(tmp) / "out"
+            out_dir.mkdir()
+            container_agent.save_json(out_dir / "state.json", {
+                "func_a": {**container_agent._new_owner_state(), "status": "plateau", "iterations": 5},
+            })
+
+            seed_dir = Path(tmp) / "seed"
+            _write_seed_state(seed_dir, {
+                "func_a": {"status": "in_progress", "best_candidates": [_candidate("seed:one", 0.9, body="x")]},
+                "func_never_resumed": {"status": "in_progress", "best_candidates": []},
+            })
+
+            with mock.patch.object(container_agent, "invoke_generator") as gen_mock:
+                exit_code = container_agent.main([
+                    "--source", "disasm/src/X.c", "--out", str(out_dir), "--repo", str(repo_dir),
+                    "--owners", "func_a", "--seed-from", str(seed_dir),
+                    "--generator-cmd", "generator --prompt {prompt} --batch {batch}",
+                    "--resume", "--skip-status", "accepted,plateau",
+                ])
+
+            self.assertEqual(exit_code, 0)
+            gen_mock.assert_not_called()
+            log_text = (out_dir / "log.txt").read_text(encoding="utf-8")
+            state = json.loads((out_dir / "state.json").read_text(encoding="utf-8"))
+
+        self.assertIn("--seed-from ignored", log_text)
+        # The resumed owner's own real state is untouched by the seed dir.
+        self.assertNotIn("seeded_from", state["func_a"])
+        self.assertEqual(state["func_a"]["status"], "plateau")
+        self.assertEqual(state["func_a"]["iterations"], 5)
+        # An owner that only exists in the seed dir is never introduced
+        # under --resume.
+        self.assertNotIn("func_never_resumed", state)
 
 
 if __name__ == "__main__":

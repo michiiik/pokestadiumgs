@@ -13,6 +13,10 @@ results to a mounted output directory:
     <out>/log.txt
     <out>/summary.json             owners attempted, matched, best per
                                     owner, iteration counts, wall time
+    <out>/probe-stats/probe-stats.jsonl
+                                    a copy of the probe-stats history the
+                                    container's own runner wrote during the
+                                    run (see "import-stats" below)
 
 This script is the "separate, deliberate step" the issue asks for: it never
 trusts the container's own verdict. For each ``<out>/accepted/<owner>.json``
@@ -26,6 +30,8 @@ Usage:
     python3 tools/container_merge.py merge /abs/out --commit
     python3 tools/container_merge.py merge /abs/out --repo . --dry-run
     python3 tools/container_merge.py summary /abs/out
+    python3 tools/container_merge.py import-stats /abs/out
+    python3 tools/container_merge.py import-stats /abs/out --repo . --dry-run
 """
 
 from __future__ import annotations
@@ -296,7 +302,105 @@ def merge(out_dir: Path, *, repo_root: Path, commit: bool, dry_run: bool) -> int
             "failed to commit", file=sys.stderr,
         )
 
+    print()
+    print(
+        "container_merge: reminder: run "
+        f"'python3 tools/container_merge.py import-stats {out_dir}' to fold this run's "
+        "probe-stats history into the host's"
+    )
+
     return 1 if (rejected or commit_failures) else 0
+
+
+# ---------------------------------------------------------------------------
+# import-stats
+#
+# The container's runner (tools/fleet_probe.py / tools/try_pragma_compare.py,
+# via tools/probe_stats.py) records every attempt it probes into a
+# PRAGMA_PROBE_STATS-resolved JSONL history -- inside the container's own
+# checkout, so it is lost once the container exits. tools/container_agent.py
+# copies it out on every state save (see its own "Probe-stats export"
+# section) to <out>/probe-stats/probe-stats.jsonl. This command folds that
+# copy into *this* checkout's own history, the same way ``merge`` folds an
+# accepted candidate into the tree: a deliberate, host-side step, never
+# automatic.
+#
+# tools/probe_stats.py has no "merge two arbitrary JSONL files" helper (its
+# own ``migrate_legacy`` is specific to one fixed legacy path) -- so this is
+# a careful line-level append: read the host's current history once, skip
+# any source line already present verbatim, and append only the rest. Exact
+# duplicate lines are common (probe_stats.append_batch writes semantically
+# stable ``json.dumps(row, sort_keys=True)`` rows, and re-running
+# import-stats on the same out dir, or importing the same run twice from two
+# out dirs, must not double-count).
+# ---------------------------------------------------------------------------
+
+
+def _host_probe_stats_path(repo_root: Path) -> Path | None:
+    """Resolve the host's probe-stats file the same way the runner does
+    (``tools/probe_stats.py``'s ``stats_path()`` / ``tools/container_agent.py``'s
+    ``_probe_stats_source_path``): ``PRAGMA_PROBE_STATS`` if set (``""``
+    disables it), else ``<repo_root>/disasm/probe-stats/probe-stats.jsonl``.
+    """
+    value = os.environ.get("PRAGMA_PROBE_STATS")
+    if value == "":
+        return None
+    if value is not None:
+        return Path(os.path.expandvars(value)).expanduser()
+    return repo_root / "disasm" / "probe-stats" / "probe-stats.jsonl"
+
+
+def import_stats(out_dir: Path, *, repo_root: Path, dry_run: bool) -> int:
+    source_path = out_dir / "probe-stats" / "probe-stats.jsonl"
+    if not source_path.is_file():
+        print(f"container_merge: no probe-stats file at {source_path}; nothing to import")
+        return 0
+
+    target_path = _host_probe_stats_path(repo_root)
+    if target_path is None:
+        print(
+            "container_merge: host probe-stats is disabled (PRAGMA_PROBE_STATS=\"\"); "
+            "nothing to import"
+        )
+        return 0
+
+    existing_lines: set[str] = set()
+    if target_path.is_file():
+        for line in target_path.read_text(encoding="utf-8", errors="replace").splitlines():
+            line = line.strip()
+            if line:
+                existing_lines.add(line)
+
+    total = 0
+    new_lines: list[str] = []
+    for line in source_path.read_text(encoding="utf-8", errors="replace").splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        total += 1
+        if line in existing_lines:
+            continue
+        new_lines.append(line)
+        existing_lines.add(line)  # a duplicate within the source file itself only counts once
+
+    duplicates = total - len(new_lines)
+    print(
+        f"container_merge: {source_path}: {total} line(s), {len(new_lines)} new, "
+        f"{duplicates} already present in {target_path}"
+    )
+
+    if dry_run:
+        print("container_merge: --dry-run, not writing")
+        return 0
+    if not new_lines:
+        return 0
+
+    target_path.parent.mkdir(parents=True, exist_ok=True)
+    with target_path.open("a", encoding="utf-8") as handle:
+        for line in new_lines:
+            handle.write(line + "\n")
+    print(f"container_merge: appended {len(new_lines)} line(s) to {target_path}")
+    return 0
 
 
 # ---------------------------------------------------------------------------
@@ -429,6 +533,21 @@ def main(argv: list[str] | None = None) -> int:
     )
     p_summary.add_argument("out_dir", type=Path)
 
+    p_import_stats = sub.add_parser(
+        "import-stats",
+        help="append this run's <out>/probe-stats/probe-stats.jsonl into the host's probe-stats history",
+    )
+    p_import_stats.add_argument(
+        "out_dir", type=Path,
+        help="container output directory (contains probe-stats/probe-stats.jsonl)",
+    )
+    p_import_stats.add_argument(
+        "--repo", type=Path, default=Path("."), help="host checkout whose probe-stats history to append to"
+    )
+    p_import_stats.add_argument(
+        "--dry-run", action="store_true", help="count lines only; never write to the host history"
+    )
+
     args = parser.parse_args(argv)
 
     if args.command == "merge":
@@ -440,6 +559,8 @@ def main(argv: list[str] | None = None) -> int:
         )
     if args.command == "summary":
         return summary_command(args.out_dir)
+    if args.command == "import-stats":
+        return import_stats(args.out_dir, repo_root=args.repo.resolve(), dry_run=args.dry_run)
 
     parser.error(f"unknown command {args.command!r}")
     return 2

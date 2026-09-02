@@ -48,6 +48,7 @@ import json
 import os
 import re
 import shlex
+import shutil
 import signal
 import subprocess
 import sys
@@ -135,16 +136,23 @@ def save_json(path: Path, data: object) -> None:
     tmp.replace(path)
 
 
-def _finalize_run(summary: dict, out_dir: Path, stopped_reason: str, started: float) -> None:
+def _finalize_run(
+    summary: dict, out_dir: Path, stopped_reason: str, started: float, *, repo_dir: Path | None = None,
+) -> None:
     """Stamp ``summary`` with its stop reason/timing and close out its current
     ``runs`` entry (if any), then write ``<out_dir>/summary.json``.
 
     Also terminates every still-registered background permuter process
     (Part D) -- the run's single finalize path, so no permuter subprocess a
     background job launched can outlive the run, whichever owner's job is
-    still mid-flight when it ends.
+    still mid-flight when it ends. When ``repo_dir`` is given, also takes a
+    last probe-stats export snapshot (see ``export_probe_stats``) so a run
+    that stops between iterations still leaves the freshest copy under
+    ``<out_dir>/probe-stats/``.
     """
     terminate_all_permuters()
+    if repo_dir is not None:
+        export_probe_stats(repo_dir, out_dir)
     summary["stopped_reason"] = stopped_reason
     summary["ended_at"] = now_iso()
     summary["wall_seconds"] = round(time.monotonic() - started, 1)
@@ -152,6 +160,63 @@ def _finalize_run(summary: dict, out_dir: Path, stopped_reason: str, started: fl
         summary["runs"][-1]["ended"] = summary["ended_at"]
         summary["runs"][-1]["stop_reason"] = stopped_reason
     save_json(out_dir / "summary.json", summary)
+
+
+# ---------------------------------------------------------------------------
+# Probe-stats export (mirrors the host merge-side import in
+# tools/container_merge.py's "import-stats" command): the container writes
+# its own probe-stats history the same way the host runner does (see
+# tools/probe_stats.py / tools/try_pragma_compare.py's
+# ``_probe_stats_target``) -- ``PRAGMA_PROBE_STATS`` if set (empty string
+# disables it entirely), else ``<repo>/disasm/probe-stats/probe-stats.jsonl``.
+# That file lives inside the container's own checkout and is lost once the
+# container exits, so every state save (and the run's finalize path) copies
+# it out to the mounted ``<out>/probe-stats/probe-stats.jsonl`` -- cheap
+# (``shutil.copyfile``), append-only from the host's point of view (the
+# source file itself only ever grows within one run).
+# ---------------------------------------------------------------------------
+
+def _probe_stats_source_path(repo_dir: Path) -> Path | None:
+    """Resolve the probe-stats file the runner would write to, the same way
+    it does (``tools/probe_stats.py``'s ``stats_path()``/
+    ``tools/try_pragma_compare.py``'s ``_probe_stats_target``):
+    ``PRAGMA_PROBE_STATS`` if set (``""`` disables it, ``None`` back means
+    "don't export"), else ``<repo_dir>/disasm/probe-stats/probe-stats.jsonl``.
+    """
+    value = os.environ.get("PRAGMA_PROBE_STATS")
+    if value == "":
+        return None
+    if value is not None:
+        return Path(os.path.expandvars(value)).expanduser()
+    return repo_dir / "disasm" / "probe-stats" / "probe-stats.jsonl"
+
+
+def export_probe_stats(repo_dir: Path, out_dir: Path) -> None:
+    """Copy the runner's probe-stats file into ``<out_dir>/probe-stats/``.
+
+    A no-op when probe-stats is disabled (``PRAGMA_PROBE_STATS=""``) or the
+    source file doesn't exist yet (no probe has run). Safe to call as often
+    as every state save -- it's just a ``cp``, and any ``OSError`` is
+    swallowed the same way ``save_json``'s sibling metrics calls are: this
+    must never turn a successful iteration into a failure.
+    """
+    source = _probe_stats_source_path(repo_dir)
+    if source is None or not source.is_file():
+        return
+    dest = out_dir / "probe-stats" / "probe-stats.jsonl"
+    try:
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(source, dest)
+    except OSError:
+        pass
+
+
+def _save_state(state: dict, state_path: Path, *, repo_dir: Path, out_dir: Path) -> None:
+    """``save_json(state_path, state)`` plus a probe-stats export snapshot --
+    the "every state save" half of the probe-stats export contract (the
+    other half is ``_finalize_run``)."""
+    save_json(state_path, state)
+    export_probe_stats(repo_dir, out_dir)
 
 
 def _new_owner_state() -> dict:
@@ -390,47 +455,79 @@ def discover_owners(
 ) -> list[str]:
     """Return the file's remaining GLOBAL_ASM owners.
 
-    ``owner_order="size"`` (default) keeps ``pragma_targets.py targets
-    --json``'s own smallest-instructions-first ranking; ``owner_order="file"``
-    reorders those same owners (after any ``max_instructions`` filtering) to
-    the order they appear in the source instead, using
+    ``owner_order="size"`` (default) keeps ``pragma_targets.py targets``'s
+    own smallest-instructions-first ranking; ``owner_order="file"`` reorders
+    those same owners (after any ``max_instructions`` filtering) to the
+    order they appear in the source instead, using
     ``discover_owners_fallback`` purely as an ordering key here (not as its
     usual missing-tool fallback). ``max_instructions`` drops any owner whose
     instruction count exceeds it (unlimited when ``None``); pass it through
     to ``pragma_targets.py targets`` rather than filtering client-side so its
     own accounting (``matched``/``truncated``) stays correct.
 
+    ``pragma_targets.py targets`` always prints a JSON object (``{"matched",
+    "family_counts", "targets": [...], "truncated"}``) on stdout -- there is
+    no ``--json`` flag (passing one is an argparse error, exit 2, which used
+    to make this function silently fall back to the regex scan on every
+    call, losing size ordering and ``--max-instructions`` filtering
+    entirely; see ``python3 tools/pragma_targets.py targets --help``).
+
     Falls back to a regex scan of the source (file order, no instruction
     counts, ``max_instructions`` ignored) when ``pragma_targets.py`` is
     unavailable or reports nothing -- e.g. a synthetic test file outside the
-    tracked ``disasm/src`` tree.
+    tracked ``disasm/src`` tree -- logging loudly (when a logger is given)
+    about exactly why, so a silent loss of size ordering is never invisible
+    again.
     """
+    command = [
+        "python3", "tools/pragma_targets.py", "targets",
+        "--source", source_rel, "--limit", "100000",
+    ]
+    if max_instructions is not None:
+        command += ["--max-instructions", str(int(max_instructions))]
+
+    def _fallback(reason: str) -> list[str]:
+        if logger is not None:
+            logger.log(
+                f"discover_owners: falling back to a regex scan of {source_rel} ({reason}); "
+                "size ordering and --max-instructions do NOT apply to this owner list"
+            )
+        return discover_owners_fallback(repo_dir, source_rel)
+
     try:
-        command = [
-            "python3", "tools/pragma_targets.py", "targets",
-            "--source", source_rel, "--json", "--limit", "100000",
-        ]
-        if max_instructions is not None:
-            command += ["--max-instructions", str(int(max_instructions))]
         proc = subprocess.run(command, cwd=repo_dir, capture_output=True, text=True, timeout=timeout)
-        if proc.returncode == 0 and proc.stdout.strip():
-            data = json.loads(proc.stdout)
-            rows = [row for row in data.get("targets", []) if row.get("function")]
-            if rows:
-                if owner_order == "file":
-                    file_order = discover_owners_fallback(repo_dir, source_rel)
-                    rank = {name: index for index, name in enumerate(file_order)}
-                    rows = sorted(rows, key=lambda row: rank.get(row["function"], len(file_order)))
-                if logger is not None:
-                    logger.log(
-                        f"owner order ({owner_order}): " + ", ".join(
-                            f"{row['function']}({row.get('instructions', '?')})" for row in rows
-                        )
-                    )
-                return [row["function"] for row in rows]
-    except (subprocess.TimeoutExpired, json.JSONDecodeError, OSError, KeyError, ValueError):
-        pass
-    return discover_owners_fallback(repo_dir, source_rel)
+    except subprocess.TimeoutExpired:
+        return _fallback(f"`{' '.join(command)}` timed out after {timeout:.0f}s")
+    except OSError as exc:
+        return _fallback(f"`{' '.join(command)}` failed to launch: {exc}")
+
+    if proc.returncode != 0:
+        return _fallback(
+            f"`{' '.join(command)}` exited {proc.returncode}: {(proc.stderr or '').strip()[:300]}"
+        )
+    if not proc.stdout.strip():
+        return _fallback(f"`{' '.join(command)}` produced no stdout")
+
+    try:
+        data = json.loads(proc.stdout)
+        rows = [row for row in data.get("targets", []) if row.get("function")]
+    except (json.JSONDecodeError, AttributeError, KeyError, ValueError) as exc:
+        return _fallback(f"could not parse `{' '.join(command)}` output as JSON: {exc}")
+
+    if not rows:
+        return _fallback(f"`{' '.join(command)}` reported no remaining owners for {source_rel}")
+
+    if owner_order == "file":
+        file_order = discover_owners_fallback(repo_dir, source_rel)
+        rank = {name: index for index, name in enumerate(file_order)}
+        rows = sorted(rows, key=lambda row: rank.get(row["function"], len(file_order)))
+    if logger is not None:
+        logger.log(
+            f"owner order ({owner_order}): " + ", ".join(
+                f"{row['function']}({row.get('instructions', '?')})" for row in rows
+            )
+        )
+    return [row["function"] for row in rows]
 
 
 def discover_owners_fallback(repo_dir: Path, source_rel: str) -> list[str]:
@@ -1865,7 +1962,7 @@ def process_owner(
             )
             owner_state["iterations"] += 1
             owner_state["plateau_count"] += 1
-            save_json(state_path, state)
+            _save_state(state, state_path, repo_dir=repo_dir, out_dir=out_dir)
             if exhausted:
                 logger.log(
                     f"{owner}: generator exhausted after {gen_failures['consecutive']} consecutive "
@@ -1891,7 +1988,7 @@ def process_owner(
         )
         owner_state["iterations"] += 1
         poll_permuter_jobs(permuter_jobs, owner_state, logger=logger)
-        save_json(state_path, state)
+        _save_state(state, state_path, repo_dir=repo_dir, out_dir=out_dir)
 
         if status == "accepted":
             owner_state["status"] = "accepted"
@@ -1905,6 +2002,210 @@ def process_owner(
 
     owner_state["status"] = "max_iterations"
     return "max_iterations"
+
+
+# ---------------------------------------------------------------------------
+# --seed-from: seed a FRESH run's owner_state from one or more earlier
+# --out dirs' state.json (this run's own past attempts, or another run's --
+# e.g. a different generator/model against the same file). Only ever used
+# before an owner's first iteration: status/iterations/plateau_count/history
+# are never imported, so a seeded owner still looks exactly like a normal
+# pending owner to process_owner/main -- it just starts with a warm
+# best_candidates pool, tried-body/label memory, an m2c draft, and a
+# permuter seed already in hand, so the very first prompt built for it shows
+# those seeded bodies (with their diagnostics) instead of a blank slate.
+# Ignored entirely under --resume (see main()): a resumed owner already has
+# its own real state, which must never be clobbered by an older run's.
+# ---------------------------------------------------------------------------
+
+def _load_seed_state(seed_dir: Path) -> dict:
+    state = load_json(seed_dir / "state.json")
+    return state if isinstance(state, dict) else {}
+
+
+def _load_seed_accepted_body(seed_dir: Path, owner: str) -> str | None:
+    """The exact installed body ``capture_accepted`` wrote for ``owner`` in
+    ``seed_dir`` (``accepted/<owner>.json``'s first candidate), or ``None``
+    when that file is missing/unreadable -- an owner marked ``accepted`` in
+    ``state.json`` without a matching ``accepted/<owner>.json`` (e.g. a
+    hand-built fixture) has nothing to import for the accept itself, though
+    it is still recorded loudly (see ``seed_owner_states``)."""
+    payload = load_json(seed_dir / "accepted" / f"{owner}.json")
+    if not isinstance(payload, dict):
+        return None
+    candidates = payload.get("candidates")
+    if isinstance(candidates, list) and candidates:
+        first = candidates[0]
+        if isinstance(first, dict):
+            body = first.get("body")
+            if isinstance(body, str) and body:
+                return body
+    return None
+
+
+def _merge_seed_candidates(
+    per_source_candidates: list[tuple[str, list[dict]]], *, cap: int,
+) -> list[dict]:
+    """Merge each source's (already best-first) ``best_candidates`` list into
+    one ranked, deduped-by-body pool, capped at ``cap`` -- but always keeping
+    at least the single best entry from every contributing source, even past
+    the cap, so one source's five near-misses can never fully crowd out
+    another source's one good lead.
+    """
+    seen_bodies: set[str] = set()
+    ranked: list[dict] = []
+    best_per_source: dict[str, dict] = {}
+    for source_label, candidates in per_source_candidates:
+        for entry in candidates:
+            body = entry.get("body")
+            if not body:
+                continue
+            key = _normalize_body_for_dedup(body)
+            if key in seen_bodies:
+                continue
+            seen_bodies.add(key)
+            tagged = dict(entry)
+            tagged["seed_source"] = source_label
+            ranked.append(tagged)
+            best_per_source.setdefault(source_label, tagged)
+    ranked.sort(key=attempt_rank, reverse=True)
+    kept = ranked[:cap]
+    kept_bodies = {_normalize_body_for_dedup(entry.get("body")) for entry in kept}
+    for best in best_per_source.values():
+        if _normalize_body_for_dedup(best.get("body")) not in kept_bodies:
+            kept.append(best)
+            kept_bodies.add(_normalize_body_for_dedup(best.get("body")))
+    kept.sort(key=attempt_rank, reverse=True)
+    return kept
+
+
+def seed_owner_states(seed_dirs: list[Path], *, logger: Logger) -> dict[str, dict]:
+    """Build fresh ``owner_state`` dicts seeded from ``seed_dirs``' own
+    ``state.json`` files, keyed by owner.
+
+    Owner names are unique function symbols, not scoped to any one source
+    file, so every owner mentioned by any seed dir's ``state.json`` is
+    considered -- this does not need (and does not take) the current run's
+    own discovered owner list. Only owners with something to import are
+    returned; each returned ``owner_state`` starts from ``_new_owner_state()``
+    (status ``in_progress``, ``iterations`` 0, empty ``history``) with
+    ``best_candidates``/``tried_bodies``/``tried_labels``/``m2c_draft``/
+    ``permuter_seed`` merged in from every seed dir that had that owner, plus
+    ``seeded_from`` (the contributing seed dir paths) and
+    ``seed_best_similarity`` (the best similarity among what was imported, or
+    ``None`` if nothing scored). Tolerates older schemas missing
+    ``tried_bodies``/``tried_labels``/``feedback``/``normalized_only`` --
+    every field is read with ``.get`` and a safe default.
+    """
+    seed_states = [(str(seed_dir), _load_seed_state(seed_dir)) for seed_dir in seed_dirs]
+
+    owners: list[str] = []
+    seen_owners: set[str] = set()
+    for _, state in seed_states:
+        for owner in state:
+            if owner not in seen_owners:
+                seen_owners.add(owner)
+                owners.append(owner)
+
+    result: dict[str, dict] = {}
+    for owner in owners:
+        per_source_candidates: list[tuple[str, list[dict]]] = []
+        contributing_dirs: list[str] = []
+        tried_bodies: set[str] = set()
+        tried_labels: list[str] = []
+        seen_tried_labels: set[str] = set()
+        m2c_draft: str | None = None
+        permuter_seed: dict | None = None
+
+        for source_label, state in seed_states:
+            entry = state.get(owner)
+            if not isinstance(entry, dict) or not entry:
+                continue
+            contributing_dirs.append(source_label)
+
+            candidates = [c for c in (entry.get("best_candidates") or []) if isinstance(c, dict)]
+            candidates.sort(key=attempt_rank, reverse=True)
+
+            if entry.get("status") == "accepted":
+                seed_dir = Path(source_label)
+                accepted_body = _load_seed_accepted_body(seed_dir, owner)
+                logger.log(
+                    f"{owner}: seed dir {source_label} already has this owner ACCEPTED -- "
+                    "importing its body as a candidate (similarity 1.0); the host merge "
+                    "decides whether it actually lands"
+                )
+                if accepted_body:
+                    candidates = [{
+                        "label": f"seeded-accepted:{seed_dir.name}",
+                        "body": accepted_body,
+                        "similarity_score": 1.0,
+                        "raw_similarity_score": 1.0,
+                        "mismatch_kind": None,
+                        "futility": None,
+                        "diagnostic": None,
+                        "normalized_only": False,
+                        "feedback": {},
+                    }] + candidates
+                else:
+                    logger.log(
+                        f"{owner}: WARNING seed dir {source_label} marks this owner accepted "
+                        f"but has no readable accepted/{owner}.json -- nothing to import for "
+                        "the accept itself"
+                    )
+            if candidates:
+                per_source_candidates.append((source_label, candidates))
+
+            for key in entry.get("tried_bodies") or []:
+                if isinstance(key, str):
+                    tried_bodies.add(key)
+            for label in entry.get("tried_labels") or []:
+                if isinstance(label, str) and label not in seen_tried_labels:
+                    seen_tried_labels.add(label)
+                    tried_labels.append(label)
+
+            if m2c_draft is None:
+                draft = entry.get("m2c_draft")
+                if isinstance(draft, str) and draft:
+                    m2c_draft = draft
+
+            seed = entry.get("permuter_seed")
+            if isinstance(seed, dict) and isinstance(seed.get("score"), (int, float)):
+                if permuter_seed is None or seed["score"] < permuter_seed["score"]:
+                    permuter_seed = seed
+
+        if not contributing_dirs:
+            continue
+
+        merged = _merge_seed_candidates(per_source_candidates, cap=BEST_CANDIDATES_KEPT)
+
+        owner_state = _new_owner_state()
+        owner_state["best_candidates"] = merged
+        owner_state["tried_bodies"] = sorted(tried_bodies)
+        owner_state["tried_labels"] = tried_labels
+        if m2c_draft is not None:
+            owner_state["m2c_draft"] = m2c_draft
+            owner_state["m2c_draft_fetched"] = True
+        if permuter_seed is not None:
+            owner_state["permuter_seed"] = permuter_seed
+        owner_state["seeded_from"] = contributing_dirs
+
+        if merged:
+            best_entry = max(merged, key=attempt_rank)
+            best_similarity = best_entry.get("similarity_score")
+            best_source = best_entry.get("seed_source") or contributing_dirs[0]
+            owner_state["seed_best_similarity"] = best_similarity
+            logger.log(
+                f"{owner}: seeded {len(merged)} candidate(s), best {best_similarity} "
+                f"from {best_source}"
+            )
+        else:
+            owner_state["seed_best_similarity"] = None
+            logger.log(
+                f"{owner}: seeded 0 candidates (tried-bodies/labels only) from {contributing_dirs}"
+            )
+
+        result[owner] = owner_state
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -1926,7 +2227,7 @@ def run_test_mode(
     batch = load_json(candidate_file)
     if batch is None:
         logger.log(f"error: could not read candidate file {candidate_file}")
-        _finalize_run(summary, out_dir, "invalid_candidate_file", started)
+        _finalize_run(summary, out_dir, "invalid_candidate_file", started, repo_dir=repo_dir)
         return 2
 
     functions = []
@@ -1937,7 +2238,7 @@ def run_test_mode(
     owner = functions[0] if functions else None
     if owner is None:
         logger.log(f"error: {candidate_file} has no candidates with a function name")
-        _finalize_run(summary, out_dir, "invalid_candidate_file", started)
+        _finalize_run(summary, out_dir, "invalid_candidate_file", started, repo_dir=repo_dir)
         return 2
 
     batch_source = batch.get("source") or source_rel
@@ -1955,13 +2256,13 @@ def run_test_mode(
     )
     owner_state["iterations"] = 1
     owner_state["status"] = "accepted" if status == "accepted" else "test_mode_done"
-    save_json(state_path, state)
+    _save_state(state, state_path, repo_dir=repo_dir, out_dir=out_dir)
 
     summary["iteration_counts"][owner] = owner_state["iterations"]
     summary["best_per_owner"][owner] = owner_state["best_similarity"]
     if status == "accepted":
         summary["matched"].append(owner)
-    _finalize_run(summary, out_dir, "test_mode_exit", started)
+    _finalize_run(summary, out_dir, "test_mode_exit", started, repo_dir=repo_dir)
     logger.log(f"test mode complete: status={status}")
     return 0
 
@@ -2045,6 +2346,18 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--skip-status", default="accepted",
         help="comma-separated owner statuses to skip when resuming (default: accepted)",
     )
+    parser.add_argument(
+        "--seed-from",
+        help=(
+            "comma-separated list of earlier --out dirs (from this or another run) to seed a "
+            "FRESH run from: per owner, merges best_candidates (ranked, deduped by normalised "
+            "body, capped at BEST_CANDIDATES_KEPT but keeping at least the best from each "
+            "source), unions tried_bodies/tried_labels, takes the first m2c_draft found and the "
+            "best (lowest-score) permuter_seed. status/iterations/history are never imported -- "
+            "the owner still starts pending. Ignored (with a log line) when --resume is also "
+            "passed, since a resumed owner already has its own real state."
+        ),
+    )
     return parser.parse_args(argv)
 
 
@@ -2087,6 +2400,17 @@ def main(argv: list[str] | None = None) -> int:
     else:
         state = {}
 
+    if args.seed_from:
+        if args.resume:
+            logger.log("--seed-from ignored: --resume was passed, and a resumed owner keeps its own state")
+        else:
+            seed_dirs = [Path(item.strip()) for item in args.seed_from.split(",") if item.strip()]
+            seeded = seed_owner_states(seed_dirs, logger=logger)
+            for owner, owner_state in seeded.items():
+                state[owner] = owner_state
+            if seeded:
+                _save_state(state, state_path, repo_dir=repo_dir, out_dir=out_dir)
+
     prior_summary = load_json(summary_path) if args.resume else None
     runs: list[dict] = list((prior_summary or {}).get("runs") or [])
     generator_desc = args.generator_cmd or (
@@ -2115,7 +2439,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if not args.generator_cmd:
         logger.log("error: --generator-cmd is required (or use --candidate-file for a one-shot test)")
-        _finalize_run(summary, out_dir, "no_generator", started)
+        _finalize_run(summary, out_dir, "no_generator", started, repo_dir=repo_dir)
         return 2
 
     if args.owners:
@@ -2158,7 +2482,7 @@ def main(argv: list[str] | None = None) -> int:
         summary["best_per_owner"][owner] = owner_state["best_similarity"]
         if status == "accepted":
             summary["matched"].append(owner)
-        save_json(state_path, state)
+        _save_state(state, state_path, repo_dir=repo_dir, out_dir=out_dir)
         if status == "budget_expired":
             stopped_reason = "budget_expired"
             break
@@ -2166,7 +2490,7 @@ def main(argv: list[str] | None = None) -> int:
             stopped_reason = "generator_exhausted"
             break
 
-    _finalize_run(summary, out_dir, stopped_reason, started)
+    _finalize_run(summary, out_dir, stopped_reason, started, repo_dir=repo_dir)
     logger.log(f"done: matched={summary['matched']} stopped_reason={stopped_reason}")
     return 3 if stopped_reason == "generator_exhausted" else 0
 

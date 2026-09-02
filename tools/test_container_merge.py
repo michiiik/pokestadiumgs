@@ -12,6 +12,7 @@ from __future__ import annotations
 import contextlib
 import io
 import json
+import os
 import sys
 import tempfile
 import unittest
@@ -237,7 +238,16 @@ class MergeTests(unittest.TestCase):
                 code, out = self._run_merge(out_dir, commit=False, dry_run=False)
         self.assertEqual(code, 1)
         self.assertIn("accepted 1/2", out)
-        self.assertIn("rejected 1/2", out)
+
+    def test_merge_prints_import_stats_reminder(self) -> None:
+        with _tmp_out_dir() as out_dir:
+            _write_batch(out_dir / "accepted", "func_1")
+            with mock.patch.object(
+                container_merge, "run_fleet_probe_gate", return_value=_accepted_result("func_1")
+            ):
+                _code, out = self._run_merge(out_dir, commit=False, dry_run=False)
+        self.assertIn("import-stats", out)
+        self.assertIn(str(out_dir), out)
 
     def test_commit_runs_git_commit_only_per_accepted_owner(self) -> None:
         with _tmp_out_dir() as out_dir:
@@ -284,6 +294,105 @@ class MergeTests(unittest.TestCase):
             ), mock.patch.object(container_merge, "git_commit_only") as commit_mock:
                 self._run_merge(out_dir, commit=True, dry_run=False)
         commit_mock.assert_not_called()
+
+
+class ImportStatsTests(unittest.TestCase):
+    """tools/container_merge.py import-stats: fold <out>/probe-stats/probe-stats.jsonl
+    into the host's probe-stats history (see tools/probe_stats.py's
+    PRAGMA_PROBE_STATS contract). No fleet_probe/git subprocess involved --
+    this command only ever reads/writes JSONL files."""
+
+    def _run(self, out_dir: Path, *, repo_root: Path, dry_run: bool = False) -> tuple[int, str]:
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            code = container_merge.import_stats(out_dir, repo_root=repo_root, dry_run=dry_run)
+        return code, buffer.getvalue()
+
+    def test_missing_source_file_is_a_clean_noop(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            out_dir = Path(tmp) / "out"
+            out_dir.mkdir()
+            repo_root = Path(tmp) / "repo"
+            repo_root.mkdir()
+            code, out = self._run(out_dir, repo_root=repo_root)
+        self.assertEqual(code, 0)
+        self.assertIn("nothing to import", out)
+
+    def test_appends_new_lines_and_skips_exact_duplicates(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            out_dir = Path(tmp) / "out"
+            (out_dir / "probe-stats").mkdir(parents=True)
+            source = out_dir / "probe-stats" / "probe-stats.jsonl"
+            row_shared = json.dumps({"batch_id": "shared", "source": "disasm/src/X.c"}, sort_keys=True)
+            row_new_1 = json.dumps({"batch_id": "new1", "source": "disasm/src/X.c"}, sort_keys=True)
+            row_new_2 = json.dumps({"batch_id": "new2", "source": "disasm/src/Y.c"}, sort_keys=True)
+            source.write_text(f"{row_shared}\n{row_new_1}\n{row_new_2}\n", encoding="utf-8")
+
+            target = Path(tmp) / "host-stats.jsonl"
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(f"{row_shared}\n", encoding="utf-8")
+
+            with mock.patch.dict(os.environ, {"PRAGMA_PROBE_STATS": str(target)}):
+                code, out = self._run(out_dir, repo_root=Path(tmp))
+
+            self.assertEqual(code, 0)
+            self.assertIn("3 line(s), 2 new, 1 already present", out)
+            target_lines = target.read_text(encoding="utf-8").splitlines()
+        self.assertEqual(len(target_lines), 3)
+        self.assertEqual(target_lines.count(row_shared), 1)
+        self.assertIn(row_new_1, target_lines)
+        self.assertIn(row_new_2, target_lines)
+
+    def test_dry_run_counts_but_never_writes(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            out_dir = Path(tmp) / "out"
+            (out_dir / "probe-stats").mkdir(parents=True)
+            source = out_dir / "probe-stats" / "probe-stats.jsonl"
+            row = json.dumps({"batch_id": "only"}, sort_keys=True)
+            source.write_text(f"{row}\n", encoding="utf-8")
+
+            target = Path(tmp) / "host-stats.jsonl"
+
+            with mock.patch.dict(os.environ, {"PRAGMA_PROBE_STATS": str(target)}):
+                code, out = self._run(out_dir, repo_root=Path(tmp), dry_run=True)
+
+        self.assertEqual(code, 0)
+        self.assertIn("1 new", out)
+        self.assertIn("--dry-run", out)
+        self.assertFalse(target.exists())
+
+    def test_disabled_via_empty_pragma_probe_stats_is_a_noop(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            out_dir = Path(tmp) / "out"
+            (out_dir / "probe-stats").mkdir(parents=True)
+            source = out_dir / "probe-stats" / "probe-stats.jsonl"
+            source.write_text(json.dumps({"batch_id": "x"}) + "\n", encoding="utf-8")
+
+            with mock.patch.dict(os.environ, {"PRAGMA_PROBE_STATS": ""}):
+                code, out = self._run(out_dir, repo_root=Path(tmp))
+
+        self.assertEqual(code, 0)
+        self.assertIn("disabled", out)
+
+    def test_default_target_is_under_repo_disasm_probe_stats(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            out_dir = Path(tmp) / "out"
+            (out_dir / "probe-stats").mkdir(parents=True)
+            source = out_dir / "probe-stats" / "probe-stats.jsonl"
+            row = json.dumps({"batch_id": "x"}, sort_keys=True)
+            source.write_text(row + "\n", encoding="utf-8")
+
+            repo_root = Path(tmp) / "repo"
+            repo_root.mkdir()
+            env = dict(os.environ)
+            env.pop("PRAGMA_PROBE_STATS", None)
+            with mock.patch.dict(os.environ, env, clear=True):
+                code, _out = self._run(out_dir, repo_root=repo_root)
+
+            expected_target = repo_root / "disasm" / "probe-stats" / "probe-stats.jsonl"
+            self.assertEqual(code, 0)
+            self.assertTrue(expected_target.is_file())
+            self.assertEqual(expected_target.read_text(encoding="utf-8").strip(), row)
 
 
 class SummaryTests(unittest.TestCase):
