@@ -130,6 +130,38 @@ def _strip_other_functions(source: str, function: str, permuter_root: Path) -> s
     ) + "\n"
 
 
+def _compose_candidate(
+    owner: targets.Owner, code: str, declarations: str | None, baseline_source: str
+) -> str:
+    """Prepend shared declarations plus any fallback callee prototypes.
+
+    ``try_pragma_compare``'s probe path never hands IDO a candidate that
+    calls a callee with no declaration in scope: before probing,
+    ``_augment_blocks_with_callee_declarations`` scans the owner's whole file
+    for a real signature of every callee the candidate references but
+    neither the shared ``declarations`` block nor the candidate's own
+    leading lines already declare, and injects it. Skipping that step here
+    let a candidate call an undeclared callee (e.g. ``func_87C00160``),
+    which IDO's cfe implicitly declares at the call site; when the file's
+    *own* prototype for that callee (declared further down, ahead of a
+    sibling owner) was later reached by the permuter's flattened base.c, the
+    two conflicting declarations of the same name failed with "redeclaration
+    ... Incompatible function return type" and the whole base was
+    unusable ("Unable to compile"). Reusing the exact probe-path helper here
+    keeps the permuter's composition consistent with the probe that already
+    validated this candidate.
+    """
+    prefix = runner._declaration_prefix(declarations)
+    body = code.rstrip() + "\n"
+    augmented = runner._augment_blocks_with_callee_declarations(
+        [(owner.function, body)],
+        prefix,
+        baseline_source,
+        runner._repo_root_for_path(owner.source_path),
+    )
+    return augmented[0][1]
+
+
 def build_work_directory(
     owner: targets.Owner,
     code: str,
@@ -147,8 +179,9 @@ def build_work_directory(
     if recipes["compile"] is None or recipes["check"] is None:
         raise RuntimeError("could not capture the Makefile probe recipes with make -n")
 
-    candidate = runner._declaration_prefix(declarations) + code.rstrip() + "\n"
-    substituted = runner._replace_candidate_text(owner.source_path.read_text(), owner.function, candidate)
+    baseline_source = owner.source_path.read_text()
+    candidate = _compose_candidate(owner, code, declarations, baseline_source)
+    substituted = runner._replace_candidate_text(baseline_source, owner.function, candidate)
     if substituted is None:
         raise ValueError(f"{owner.source} does not contain exactly one pragma for {owner.function}")
 

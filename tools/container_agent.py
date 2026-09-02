@@ -43,6 +43,7 @@ Test mode (no generator; exercise the loop once with a fixed batch):
 from __future__ import annotations
 
 import argparse
+import functools
 import hashlib
 import json
 import os
@@ -211,12 +212,24 @@ def export_probe_stats(repo_dir: Path, out_dir: Path) -> None:
         pass
 
 
-def _save_state(state: dict, state_path: Path, *, repo_dir: Path, out_dir: Path) -> None:
+def _save_state(
+    state: dict, state_path: Path, *, repo_dir: Path, out_dir: Path, summary: dict | None = None,
+) -> None:
     """``save_json(state_path, state)`` plus a probe-stats export snapshot --
     the "every state save" half of the probe-stats export contract (the
-    other half is ``_finalize_run``)."""
+    other half is ``_finalize_run``).
+
+    When ``summary`` is given, also rewrites ``<out_dir>/summary.json`` from
+    it -- so an abrupt kill between iterations (see ``request_stop``) still
+    leaves a current summary on disk, not just whatever ``_finalize_run``
+    last wrote (which, before this, only ever ran on a normal exit path).
+    ``_finalize_run`` still does the final rewrite that fills in
+    ``ended_at``/``stopped_reason``.
+    """
     save_json(state_path, state)
     export_probe_stats(repo_dir, out_dir)
+    if summary is not None:
+        save_json(out_dir / "summary.json", summary)
 
 
 def _new_owner_state() -> dict:
@@ -1153,10 +1166,14 @@ def render_generator_command(template: str, prompt_path: Path, batch_path: Path)
 
 
 def invoke_generator(command: str, *, cwd: Path, timeout: float) -> subprocess.CompletedProcess:
-    """Run the external generator command once. Isolated so tests can stub it."""
-    return subprocess.run(
-        command, shell=True, cwd=cwd, capture_output=True, text=True, timeout=timeout,
-    )
+    """Run the external generator command once. Isolated so tests can stub it.
+
+    Runs via ``_run_bounded`` (not a bare ``subprocess.run``) so a
+    termination signal that arrives while this call is blocking (up to
+    ``--generator-timeout``, 30 minutes by default) can kill it immediately
+    -- see ``request_stop``.
+    """
+    return _run_bounded(command, cwd=cwd, timeout=timeout, shell=True)
 
 
 # ---------------------------------------------------------------------------
@@ -1235,10 +1252,14 @@ def _record_generator_outcome(
 def invoke_probe(
     repo_dir: Path, batch_path: Path, result_path: Path, *, timeout: float
 ) -> subprocess.CompletedProcess:
-    """Run ``tools/fleet_probe.py`` once. Isolated so tests can stub it."""
-    return subprocess.run(
+    """Run ``tools/fleet_probe.py`` once. Isolated so tests can stub it.
+
+    Runs via ``_run_bounded`` (see ``invoke_generator``) so a termination
+    signal that arrives while the probe is running can kill it immediately.
+    """
+    return _run_bounded(
         ["python3", "tools/fleet_probe.py", str(batch_path), "--json", str(result_path)],
-        cwd=repo_dir, capture_output=True, text=True, timeout=timeout,
+        cwd=repo_dir, timeout=timeout,
     )
 
 
@@ -1349,6 +1370,115 @@ def _terminate_process_group(process: subprocess.Popen, *, grace: float = 5.0) -
             process.wait(timeout=grace)
         except subprocess.TimeoutExpired:
             pass
+
+
+# ---------------------------------------------------------------------------
+# Graceful termination (SIGTERM/SIGINT)
+#
+# A ``docker run`` attached to a terminal session that ends sends SIGTERM to
+# the container's process; the driver used to just die mid-``subprocess.run``
+# (up to a 30-minute generator call), leaving state.json (saved every
+# iteration -- see _save_state) intact but summary.json never written at all
+# (it was only ever written by _finalize_run, on a normal exit path).
+#
+# main() installs ``request_stop`` as the handler for both signals. It sets
+# the module-level ``_STOP_REQUESTED`` flag (checked by main()'s owner loop,
+# process_owner's per-iteration loop, and run_iteration -- see each of their
+# "before starting a new generator call"/"before starting a probe"/"before
+# launching a permuter" checks) and, if a generator or probe subprocess is
+# currently blocking the driver (launched via ``_run_bounded``, registered
+# for exactly as long as it runs), terminates it immediately so the driver
+# never has to wait out that call's own timeout before reaching the next
+# stop_requested() check. A background permuter job's subprocess is handled
+# separately: it is already tracked in _ACTIVE_PERMUTER_PROCESSES and swept
+# by terminate_all_permuters() inside _finalize_run.
+# ---------------------------------------------------------------------------
+
+_STOP_REQUESTED = threading.Event()
+
+_BOUNDED_PROCESS_LOCK = threading.Lock()
+_ACTIVE_BOUNDED_PROCESS: subprocess.Popen | None = None
+
+
+def stop_requested() -> bool:
+    return _STOP_REQUESTED.is_set()
+
+
+def _register_bounded_process(process: subprocess.Popen) -> None:
+    global _ACTIVE_BOUNDED_PROCESS
+    with _BOUNDED_PROCESS_LOCK:
+        _ACTIVE_BOUNDED_PROCESS = process
+
+
+def _unregister_bounded_process(process: subprocess.Popen) -> None:
+    global _ACTIVE_BOUNDED_PROCESS
+    with _BOUNDED_PROCESS_LOCK:
+        if _ACTIVE_BOUNDED_PROCESS is process:
+            _ACTIVE_BOUNDED_PROCESS = None
+
+
+def _terminate_active_bounded_process() -> None:
+    """Terminate whatever generator/probe subprocess ``_run_bounded`` has
+    currently registered as running, if any. Safe to call any time
+    (idempotent, tolerates none registered or one that already exited)."""
+    with _BOUNDED_PROCESS_LOCK:
+        process = _ACTIVE_BOUNDED_PROCESS
+    if process is not None and process.poll() is None:
+        _terminate_process_group(process)
+
+
+def request_stop(signum: int, frame=None, *, logger: "Logger | None" = None) -> None:
+    """SIGTERM/SIGINT handler (installed by main(), optionally bound to the
+    run's logger via ``functools.partial``). Idempotent -- only the first
+    call logs; every call re-attempts terminating the active bounded
+    subprocess (harmless if there isn't one, or it already exited)."""
+    first = not _STOP_REQUESTED.is_set()
+    _STOP_REQUESTED.set()
+    if first:
+        try:
+            name = signal.Signals(signum).name
+        except ValueError:
+            name = str(signum)
+        message = f"termination requested ({name}); finishing current step"
+        if logger is not None:
+            logger.log(message)
+        else:
+            print(f"[{now_iso()}] {message}")
+    _terminate_active_bounded_process()
+
+
+def _run_bounded(
+    args, *, cwd: Path, timeout: float, shell: bool = False,
+) -> subprocess.CompletedProcess:
+    """``subprocess.run``-alike (captures text stdout/stderr, honors
+    ``timeout``, raises ``subprocess.TimeoutExpired`` on expiry) used by
+    ``invoke_generator``/``invoke_probe`` in place of a bare
+    ``subprocess.run`` call.
+
+    Runs the child in its own process group (``start_new_session=True``) and
+    registers it as the run's current "active bounded process" for as long
+    as it is alive -- see ``_terminate_active_bounded_process``, called from
+    ``request_stop`` -- so a termination signal that arrives while this call
+    is blocking kills the whole subprocess tree (including anything a
+    ``shell=True`` command spawned) immediately, instead of leaving the
+    driver to wait out the call's full timeout.
+    """
+    process = subprocess.Popen(
+        args, shell=shell, cwd=cwd,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+        start_new_session=True,
+    )
+    _register_bounded_process(process)
+    try:
+        try:
+            stdout, stderr = process.communicate(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            _terminate_process_group(process)
+            stdout, stderr = process.communicate()
+            raise subprocess.TimeoutExpired(args, timeout, output=stdout, stderr=stderr)
+    finally:
+        _unregister_bounded_process(process)
+    return subprocess.CompletedProcess(args, process.returncode, stdout, stderr)
 
 
 def _extract_function_body(code: str, function: str) -> str:
@@ -1889,6 +2019,10 @@ def run_iteration(
         owner_state["plateau_count"] = owner_state.get("plateau_count", 0) + 1
         return "continue"
 
+    if stop_requested():
+        logger.log(f"{owner}: iter {iteration}: termination requested; skipping probe")
+        return "terminated"
+
     remaining_budget = max(1.0, deadline - time.monotonic())
     probe_timeout = max(10.0, min(PROBE_TIMEOUT_CAP, remaining_budget))
     try:
@@ -1901,6 +2035,15 @@ def run_iteration(
         logger.log(f"{owner}: iter {iteration}: probe failed to launch: {exc}")
         owner_state["plateau_count"] += 1
         return "continue"
+
+    if stop_requested():
+        # The probe may have been killed mid-flight by the termination
+        # handler (see _run_bounded/_terminate_active_bounded_process): its
+        # returncode/output here reflect that kill, not a real probe
+        # failure, so this must never count as a plateau/generator-failure
+        # signal -- go straight to the run's normal finalize path instead.
+        logger.log(f"{owner}: iter {iteration}: termination requested during probe; stopping")
+        return "terminated"
 
     if probe_proc.returncode == 2 and "preflight failed" in (probe_proc.stderr or "").lower():
         indices = _parse_preflight_indices(probe_proc.stderr)
@@ -1920,6 +2063,9 @@ def run_iteration(
                 logger.log(f"{owner}: iter {iteration}: no candidates remain after preflight retry filtering")
                 owner_state["plateau_count"] = owner_state.get("plateau_count", 0) + 1
                 return "continue"
+            if stop_requested():
+                logger.log(f"{owner}: iter {iteration}: termination requested; skipping probe retry")
+                return "terminated"
             remaining_budget = max(1.0, deadline - time.monotonic())
             probe_timeout = max(10.0, min(PROBE_TIMEOUT_CAP, remaining_budget))
             try:
@@ -1932,6 +2078,9 @@ def run_iteration(
                 logger.log(f"{owner}: iter {iteration}: probe retry failed to launch: {exc}")
                 owner_state["plateau_count"] += 1
                 return "continue"
+            if stop_requested():
+                logger.log(f"{owner}: iter {iteration}: termination requested during probe retry; stopping")
+                return "terminated"
 
     result = load_json(result_path)
     if result is None:
@@ -2076,7 +2225,11 @@ def run_iteration(
             bodies = _select_permuter_bodies(scored, candidate_bodies, limit=permuter_bodies)
             if bodies:
                 budget = min(permuter_seconds, max(0.0, deadline - time.monotonic()))
-                if budget >= 10.0:
+                if stop_requested():
+                    logger.log(
+                        f"{owner}: iter {iteration}: termination requested; not launching a permuter job"
+                    )
+                elif budget >= 10.0:
                     job = start_permuter_job(
                         repo_dir, out_dir, owner, iteration, bodies, batch.get("declarations"),
                         permuter_seconds=budget, logger=logger,
@@ -2117,6 +2270,7 @@ def process_owner(
     generator_timeout: float = DEFAULT_GENERATOR_TIMEOUT,
     permuter_bodies: int = DEFAULT_PERMUTER_BODIES,
     probe_tool: bool = True,
+    summary: dict | None = None,
 ) -> str:
     if gen_failures is None:
         gen_failures = {"consecutive": 0}
@@ -2129,10 +2283,19 @@ def process_owner(
     # iteration's probe, never blocking the generate/probe cycle in between.
     permuter_jobs: list[PermuterJob] = []
 
+    def _record_iteration_progress() -> None:
+        if summary is not None:
+            summary["iteration_counts"][owner] = owner_state["iterations"]
+            summary["best_per_owner"][owner] = owner_state["best_similarity"]
+
     while owner_state["iterations"] < max_iterations:
         if time.monotonic() >= deadline:
             owner_state["status"] = "budget_expired"
             return "budget_expired"
+        if stop_requested():
+            logger.log(f"{owner}: termination requested; stopping before the next iteration")
+            owner_state["status"] = "terminated"
+            return "terminated"
 
         poll_permuter_jobs(permuter_jobs, owner_state, logger=logger)
 
@@ -2150,6 +2313,11 @@ def process_owner(
             probe_tool=probe_tool, type_conflicts=owner_state.get("type_conflicts"),
         )
         prompt_path.write_text(prompt_text, encoding="utf-8")
+
+        if stop_requested():
+            logger.log(f"{owner}: iter {iteration}: termination requested; skipping generator call")
+            owner_state["status"] = "terminated"
+            return "terminated"
 
         remaining_budget = max(1.0, deadline - time.monotonic())
         gen_timeout = max(10.0, min(generator_timeout, remaining_budget))
@@ -2181,6 +2349,17 @@ def process_owner(
                 owner_state["status"] = "generator_failed"
                 return "generator_exhausted"
             return "generator_failed"
+
+        if stop_requested():
+            # The generator may have been killed mid-flight by the
+            # termination handler (see _run_bounded/
+            # _terminate_active_bounded_process): its exit status/output
+            # here reflect that kill, not a real generator failure, so this
+            # must never count against max-generator-failures -- go
+            # straight to the run's normal finalize path instead.
+            logger.log(f"{owner}: iter {iteration}: termination requested during generator call; stopping")
+            owner_state["status"] = "terminated"
+            return "terminated"
 
         if gen_result is not None and gen_result.returncode != 0:
             logger.log(
@@ -2216,7 +2395,8 @@ def process_owner(
             )
             owner_state["iterations"] += 1
             owner_state["plateau_count"] += 1
-            _save_state(state, state_path, repo_dir=repo_dir, out_dir=out_dir)
+            _record_iteration_progress()
+            _save_state(state, state_path, repo_dir=repo_dir, out_dir=out_dir, summary=summary)
             if exhausted:
                 logger.log(
                     f"{owner}: generator exhausted after {gen_failures['consecutive']} consecutive "
@@ -2242,11 +2422,15 @@ def process_owner(
         )
         owner_state["iterations"] += 1
         poll_permuter_jobs(permuter_jobs, owner_state, logger=logger)
-        _save_state(state, state_path, repo_dir=repo_dir, out_dir=out_dir)
+        _record_iteration_progress()
+        _save_state(state, state_path, repo_dir=repo_dir, out_dir=out_dir, summary=summary)
 
         if status == "accepted":
             owner_state["status"] = "accepted"
             return "accepted"
+        if status == "terminated":
+            owner_state["status"] = "terminated"
+            return "terminated"
         if status == "budget_expired":
             owner_state["status"] = "budget_expired"
             return "budget_expired"
@@ -2510,12 +2694,11 @@ def run_test_mode(
     )
     owner_state["iterations"] = 1
     owner_state["status"] = "accepted" if status == "accepted" else "test_mode_done"
-    _save_state(state, state_path, repo_dir=repo_dir, out_dir=out_dir)
-
     summary["iteration_counts"][owner] = owner_state["iterations"]
     summary["best_per_owner"][owner] = owner_state["best_similarity"]
     if status == "accepted":
         summary["matched"].append(owner)
+    _save_state(state, state_path, repo_dir=repo_dir, out_dir=out_dir, summary=summary)
     _finalize_run(summary, out_dir, "test_mode_exit", started, repo_dir=repo_dir)
     logger.log(f"test mode complete: status={status}")
     return 0
@@ -2632,6 +2815,17 @@ def main(argv: list[str] | None = None) -> int:
     out_dir.mkdir(parents=True, exist_ok=True)
     logger = Logger(out_dir / "log.txt")
 
+    # Graceful termination: a `docker run` attached to a terminal session
+    # that ends sends SIGTERM to this process (SIGINT covers a plain
+    # Ctrl-C). request_stop sets _STOP_REQUESTED (checked at every safe
+    # point below/in process_owner/run_iteration) and terminates whatever
+    # generator/probe subprocess is currently blocking the driver, so the
+    # run reaches its normal finalize path instead of dying mid-call with
+    # summary.json never written.
+    termination_handler = functools.partial(request_stop, logger=logger)
+    signal.signal(signal.SIGTERM, termination_handler)
+    signal.signal(signal.SIGINT, termination_handler)
+
     source_rel = _resolve_source_rel(repo_dir, args.source)
     # --probe-tool wins when passed explicitly; otherwise fall back to the
     # PROBE_TOOL env var (entrypoint.sh sets it to "off" for the HTTP-only
@@ -2683,6 +2877,12 @@ def main(argv: list[str] | None = None) -> int:
         "stopped_reason": None,
         "runs": runs,
     }
+    # Persist the new "runs" entry (and the rest of the summary skeleton)
+    # right away, before any generator/probe call: on --resume in
+    # particular, this is what leaves a current summary.json in place from
+    # the very start of the run rather than only after _finalize_run (or an
+    # in-loop _save_state, see below) next writes one.
+    save_json(summary_path, summary)
 
     if args.candidate_file:
         return run_test_mode(
@@ -2714,6 +2914,9 @@ def main(argv: list[str] | None = None) -> int:
         if time.monotonic() >= deadline:
             stopped_reason = "budget_expired"
             break
+        if stop_requested():
+            stopped_reason = "terminated"
+            break
         owner_state = state.setdefault(owner, _new_owner_state())
         if owner_state.get("status") in skip_statuses:
             logger.log(f"{owner}: resume: skipping (status={owner_state.get('status')})")
@@ -2730,22 +2933,27 @@ def main(argv: list[str] | None = None) -> int:
             permuter_seconds=args.permuter_seconds, generator_cmd=args.generator_cmd, logger=logger,
             gen_failures=gen_failures, max_generator_failures=args.max_generator_failures,
             generator_timeout=args.generator_timeout, permuter_bodies=args.permuter_bodies,
-            probe_tool=probe_tool,
+            probe_tool=probe_tool, summary=summary,
         )
         summary["iteration_counts"][owner] = owner_state["iterations"]
         summary["best_per_owner"][owner] = owner_state["best_similarity"]
         if status == "accepted":
             summary["matched"].append(owner)
-        _save_state(state, state_path, repo_dir=repo_dir, out_dir=out_dir)
+        _save_state(state, state_path, repo_dir=repo_dir, out_dir=out_dir, summary=summary)
         if status == "budget_expired":
             stopped_reason = "budget_expired"
             break
         if status == "generator_exhausted":
             stopped_reason = "generator_exhausted"
             break
+        if status == "terminated":
+            stopped_reason = "terminated"
+            break
 
     _finalize_run(summary, out_dir, stopped_reason, started, repo_dir=repo_dir)
     logger.log(f"done: matched={summary['matched']} stopped_reason={stopped_reason}")
+    if stopped_reason == "terminated":
+        return 143
     return 3 if stopped_reason == "generator_exhausted" else 0
 
 

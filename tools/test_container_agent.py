@@ -15,9 +15,11 @@ from __future__ import annotations
 import json
 import os
 import shlex
+import signal
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 import unittest
 from pathlib import Path
@@ -2966,6 +2968,315 @@ class TerminateAllPermutersTests(unittest.TestCase):
             with mock.patch.object(container_agent, "terminate_all_permuters") as terminate_mock:
                 container_agent._finalize_run(summary, out_dir, "completed", time.monotonic())
             terminate_mock.assert_called_once()
+
+
+# ---------------------------------------------------------------------------
+# Graceful termination (SIGTERM/SIGINT): request_stop/_STOP_REQUESTED, the
+# bounded-process registry _run_bounded uses, and the safe-point checks in
+# process_owner/run_iteration/main() that route a termination request to the
+# run's normal finalize path (stopped_reason "terminated", exit code 143)
+# instead of letting the driver wait out a 30-minute generator cap.
+# ---------------------------------------------------------------------------
+
+class _StopFlagTestCase(unittest.TestCase):
+    """Base class that resets the module-level termination flag/registry
+    around every test, so one test's SIGTERM simulation can never bleed into
+    another (mirrors how _ACTIVE_PERMUTER_PROCESSES tests clean up).
+
+    Also saves/restores the process's real SIGTERM/SIGINT handlers: a test
+    that calls container_agent.main() installs real handlers via
+    signal.signal(), which -- unlike everything else here -- is genuine
+    process-wide state that would otherwise leak into every test that runs
+    afterwards in the same `unittest discover` process (including other
+    test_*.py files' subprocess-using tests)."""
+
+    def setUp(self) -> None:
+        container_agent._STOP_REQUESTED.clear()
+        container_agent._ACTIVE_BOUNDED_PROCESS = None
+        self._prior_sigterm = signal.getsignal(signal.SIGTERM)
+        self._prior_sigint = signal.getsignal(signal.SIGINT)
+
+    def tearDown(self) -> None:
+        container_agent._STOP_REQUESTED.clear()
+        container_agent._ACTIVE_BOUNDED_PROCESS = None
+        signal.signal(signal.SIGTERM, self._prior_sigterm)
+        signal.signal(signal.SIGINT, self._prior_sigint)
+
+
+class RequestStopTests(_StopFlagTestCase):
+    def test_sets_stop_requested_flag(self) -> None:
+        self.assertFalse(container_agent.stop_requested())
+        container_agent.request_stop(signal.SIGTERM)
+        self.assertTrue(container_agent.stop_requested())
+
+    def test_terminates_registered_active_bounded_process(self) -> None:
+        fake_process = mock.Mock()
+        fake_process.poll.return_value = None
+        container_agent._register_bounded_process(fake_process)
+        with mock.patch.object(container_agent, "_terminate_process_group") as terminate_mock:
+            container_agent.request_stop(signal.SIGTERM)
+        terminate_mock.assert_called_once_with(fake_process)
+
+    def test_skips_already_exited_active_bounded_process(self) -> None:
+        fake_process = mock.Mock()
+        fake_process.poll.return_value = 0
+        container_agent._register_bounded_process(fake_process)
+        with mock.patch.object(container_agent, "_terminate_process_group") as terminate_mock:
+            container_agent.request_stop(signal.SIGTERM)
+        terminate_mock.assert_not_called()
+
+    def test_noop_when_nothing_registered(self) -> None:
+        with mock.patch.object(container_agent, "_terminate_process_group") as terminate_mock:
+            container_agent.request_stop(signal.SIGTERM)
+        terminate_mock.assert_not_called()
+        self.assertTrue(container_agent.stop_requested())
+
+    def test_logs_once_via_logger_with_signal_name_and_message(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            logger = container_agent.Logger(Path(tmp) / "log.txt")
+            container_agent.request_stop(signal.SIGTERM, logger=logger)
+            container_agent.request_stop(signal.SIGTERM, logger=logger)
+            log_text = (Path(tmp) / "log.txt").read_text(encoding="utf-8")
+        self.assertEqual(log_text.count("termination requested"), 1)
+        self.assertIn("SIGTERM", log_text)
+        self.assertIn("finishing current step", log_text)
+
+
+class RunBoundedTests(_StopFlagTestCase):
+    def test_returns_completed_process_and_unregisters(self) -> None:
+        result = container_agent._run_bounded(
+            [sys.executable, "-c", "print('hi')"], cwd=Path.cwd(), timeout=10.0,
+        )
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(result.stdout.strip(), "hi")
+        self.assertIsNone(container_agent._ACTIVE_BOUNDED_PROCESS)
+
+    def test_active_process_is_killed_when_termination_requested_mid_call(self) -> None:
+        """A Popen standing in for a running generator/probe call is
+        terminated once the stop flag/registry-based termination fires --
+        the driver must not wait out the child's full timeout."""
+        with tempfile.TemporaryDirectory() as tmp:
+            marker = Path(tmp) / "started"
+            script = (
+                "import pathlib, time; "
+                f"pathlib.Path({str(marker)!r}).write_text('1'); time.sleep(30)"
+            )
+
+            def trigger_termination() -> None:
+                deadline = time.monotonic() + 5.0
+                while not marker.exists() and time.monotonic() < deadline:
+                    time.sleep(0.02)
+                container_agent.request_stop(signal.SIGTERM)
+
+            trigger = threading.Thread(target=trigger_termination)
+            trigger.start()
+            started = time.monotonic()
+            result = container_agent._run_bounded(
+                [sys.executable, "-c", script], cwd=Path(tmp), timeout=25.0,
+            )
+            trigger.join(timeout=5.0)
+
+        self.assertLess(time.monotonic() - started, 15.0)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIsNone(container_agent._ACTIVE_BOUNDED_PROCESS)
+
+
+class SaveStateSummaryRewriteTests(_StopFlagTestCase):
+    def test_save_state_writes_summary_json_when_given(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            out_dir = Path(tmp) / "out"
+            state_path = out_dir / "state.json"
+            summary = {"stopped_reason": None, "matched": ["func_1"]}
+            container_agent._save_state(
+                {"func_1": {}}, state_path, repo_dir=repo_dir, out_dir=out_dir, summary=summary,
+            )
+            written = json.loads((out_dir / "summary.json").read_text(encoding="utf-8"))
+        self.assertEqual(written, summary)
+
+    def test_save_state_does_not_write_summary_json_when_omitted(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            out_dir = Path(tmp) / "out"
+            state_path = out_dir / "state.json"
+            container_agent._save_state({"func_1": {}}, state_path, repo_dir=repo_dir, out_dir=out_dir)
+            self.assertFalse((out_dir / "summary.json").exists())
+
+    def test_process_owner_rewrites_summary_json_on_every_iteration_save(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            repo_dir.mkdir()
+            out_dir = Path(tmp) / "out"
+            owner = "func_1"
+            source_rel = "disasm/src/X.c"
+
+            def batch_for_iteration(_n):
+                return {"source": source_rel, "candidates": [{"function": owner, "label": "a", "body": "b"}]}
+
+            def result_for_call(_n, _batch):
+                return {
+                    "batch_status": "no_candidate_accepted", "accepted": [],
+                    "attempts": [{"function": owner, "label": "a", "status": "rejected", "similarity_score": 0.3}],
+                }
+
+            owner_state = container_agent._new_owner_state()
+            state = {owner: owner_state}
+            state_path = out_dir / "state.json"
+            logger = container_agent.Logger(out_dir / "log.txt")
+            summary = {"iteration_counts": {}, "best_per_owner": {}, "matched": [], "stopped_reason": None}
+
+            with mock.patch.object(container_agent, "file_brief_text", return_value="brief"), \
+                 mock.patch.object(container_agent, "owner_asm_text", return_value="asm"), \
+                 mock.patch.object(container_agent, "get_m2c_draft", return_value=None), \
+                 mock.patch.object(container_agent, "invoke_generator", side_effect=make_invoke_generator(batch_for_iteration)), \
+                 mock.patch.object(container_agent, "invoke_probe", side_effect=make_invoke_probe(result_for_call)):
+                status = container_agent.process_owner(
+                    repo_dir=repo_dir, out_dir=out_dir, source_rel=source_rel, owner=owner,
+                    owner_state=owner_state, state=state, state_path=state_path,
+                    deadline=time.monotonic() + 60.0, max_iterations=1, plateau=100,
+                    permuter_seconds=0.0, generator_cmd="generator --prompt {prompt} --batch {batch}",
+                    logger=logger, summary=summary,
+                )
+
+            self.assertEqual(status, "max_iterations")
+            written = json.loads((out_dir / "summary.json").read_text(encoding="utf-8"))
+            # Written mid-run (process_owner never calls _finalize_run
+            # itself), so stopped_reason is still None here -- proof this
+            # came from the in-loop _save_state rewrite, not the run's
+            # final write.
+            self.assertIsNone(written["stopped_reason"])
+            self.assertEqual(written["iteration_counts"][owner], 1)
+
+
+class ProcessOwnerTerminationTests(_StopFlagTestCase):
+    def _base_kwargs(self, tmp, *, owner="func_1", source_rel="disasm/src/X.c"):
+        repo_dir = Path(tmp) / "repo"
+        repo_dir.mkdir()
+        out_dir = Path(tmp) / "out"
+        owner_state = container_agent._new_owner_state()
+        state = {owner: owner_state}
+        state_path = out_dir / "state.json"
+        logger = container_agent.Logger(out_dir / "log.txt")
+        return dict(
+            repo_dir=repo_dir, out_dir=out_dir, source_rel=source_rel, owner=owner,
+            owner_state=owner_state, state=state, state_path=state_path,
+            deadline=time.monotonic() + 60.0, max_iterations=50, plateau=6,
+            permuter_seconds=0.0, generator_cmd="generator --prompt {prompt} --batch {batch}",
+            logger=logger,
+        ), owner_state
+
+    def test_stop_flag_set_before_loop_skips_generator_entirely(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            kwargs, owner_state = self._base_kwargs(tmp)
+            with mock.patch.object(container_agent, "file_brief_text", return_value="brief"), \
+                 mock.patch.object(container_agent, "owner_asm_text", return_value="asm"), \
+                 mock.patch.object(container_agent, "get_m2c_draft", return_value=None), \
+                 mock.patch.object(container_agent, "invoke_generator") as gen_mock, \
+                 mock.patch.object(container_agent, "invoke_probe") as probe_mock:
+                container_agent._STOP_REQUESTED.set()
+                status = container_agent.process_owner(**kwargs)
+        self.assertEqual(status, "terminated")
+        self.assertEqual(owner_state["status"], "terminated")
+        gen_mock.assert_not_called()
+        probe_mock.assert_not_called()
+
+    def test_stop_flag_set_during_generator_call_stops_without_counting_a_failure(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            kwargs, owner_state = self._base_kwargs(tmp)
+
+            def gen_stub(command, *, cwd, timeout):
+                # Simulate the signal arriving while this call was "in
+                # flight": by the time it returns, the flag is set.
+                container_agent._STOP_REQUESTED.set()
+                return SimpleNamespace(returncode=-15, stdout="", stderr="")
+
+            with mock.patch.object(container_agent, "file_brief_text", return_value="brief"), \
+                 mock.patch.object(container_agent, "owner_asm_text", return_value="asm"), \
+                 mock.patch.object(container_agent, "get_m2c_draft", return_value=None), \
+                 mock.patch.object(container_agent, "invoke_generator", side_effect=gen_stub), \
+                 mock.patch.object(container_agent, "invoke_probe") as probe_mock:
+                status = container_agent.process_owner(**kwargs)
+        self.assertEqual(status, "terminated")
+        self.assertEqual(owner_state["status"], "terminated")
+        probe_mock.assert_not_called()
+
+    def test_stop_flag_set_during_probe_call_stops_without_incrementing_plateau(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            kwargs, owner_state = self._base_kwargs(tmp)
+            source_rel = kwargs["source_rel"]
+            owner = kwargs["owner"]
+
+            def gen_stub(command, *, cwd, timeout):
+                batch_path = _extract_path_arg(command, "--batch")
+                batch_path.parent.mkdir(parents=True, exist_ok=True)
+                container_agent.save_json(batch_path, {
+                    "source": source_rel,
+                    "candidates": [{"function": owner, "label": "a", "body": "b"}],
+                })
+                return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+            def probe_stub(repo_dir, batch_path, result_path, *, timeout):
+                container_agent._STOP_REQUESTED.set()
+                return SimpleNamespace(returncode=-15, stdout="", stderr="")
+
+            with mock.patch.object(container_agent, "file_brief_text", return_value="brief"), \
+                 mock.patch.object(container_agent, "owner_asm_text", return_value="asm"), \
+                 mock.patch.object(container_agent, "get_m2c_draft", return_value=None), \
+                 mock.patch.object(container_agent, "invoke_generator", side_effect=gen_stub), \
+                 mock.patch.object(container_agent, "invoke_probe", side_effect=probe_stub):
+                status = container_agent.process_owner(**kwargs)
+        self.assertEqual(status, "terminated")
+        self.assertEqual(owner_state["status"], "terminated")
+        self.assertEqual(owner_state["plateau_count"], 0)
+
+
+class MainTerminationTests(_StopFlagTestCase):
+    def test_stop_flag_before_owner_loop_yields_terminated_summary_and_exit_143(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            out_dir = Path(tmp) / "out"
+            source_rel = "disasm/src/X.c"
+
+            with mock.patch.object(container_agent, "discover_owners", return_value=["func_1"]), \
+                 mock.patch.object(container_agent, "invoke_generator") as gen_mock, \
+                 mock.patch.object(container_agent, "invoke_probe") as probe_mock:
+                container_agent._STOP_REQUESTED.set()
+                exit_code = container_agent.main([
+                    "--source", source_rel, "--out", str(out_dir), "--repo", str(repo_dir),
+                    "--generator-cmd", "fake-gen --prompt {prompt} --batch {batch}",
+                ])
+
+            gen_mock.assert_not_called()
+            probe_mock.assert_not_called()
+            self.assertEqual(exit_code, 143)
+            summary = json.loads((out_dir / "summary.json").read_text(encoding="utf-8"))
+            self.assertEqual(summary["stopped_reason"], "terminated")
+            self.assertEqual(summary["runs"][-1]["stop_reason"], "terminated")
+
+    def test_summary_json_written_immediately_on_startup(self) -> None:
+        """Even before any owner is processed (before _finalize_run ever
+        runs), main() must leave a current summary.json with this run's
+        fresh "runs" entry on disk -- the fix for the original bug: a run
+        killed before _finalize_run used to leave no summary.json at all.
+        Simulate a crash right after owner discovery (before the owner
+        loop/_finalize_run) to observe that intermediate write."""
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            out_dir = Path(tmp) / "out"
+            source_rel = "disasm/src/X.c"
+
+            with mock.patch.object(
+                container_agent, "discover_owners", side_effect=RuntimeError("simulated crash"),
+            ):
+                with self.assertRaises(RuntimeError):
+                    container_agent.main([
+                        "--source", source_rel, "--out", str(out_dir), "--repo", str(repo_dir),
+                        "--generator-cmd", "fake-gen --prompt {prompt} --batch {batch}",
+                    ])
+            summary = json.loads((out_dir / "summary.json").read_text(encoding="utf-8"))
+            self.assertEqual(len(summary["runs"]), 1)
+            self.assertIsNone(summary["runs"][0]["stop_reason"])
+            self.assertIsNone(summary["runs"][0]["ended"])
 
 
 # ---------------------------------------------------------------------------
