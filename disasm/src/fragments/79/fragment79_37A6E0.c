@@ -1409,7 +1409,14 @@ void func_84112EAC(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_84112FD0.s")
+typedef union {
+    s32 word;
+    s8 bytes[4];
+} F12State;
+extern s32 func_80041FD0(u8 *, u16, F12State, s32);
+void func_84112FD0(u8 *arg0, u16 arg1, F12State arg2, s32 arg3) {
+    func_80041FD0(arg0, arg1, arg2, arg3);
+}
 #endif
 
 #ifdef VERSION_US
