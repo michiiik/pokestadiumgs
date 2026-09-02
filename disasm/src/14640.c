@@ -106,7 +106,8 @@ void func_80014784(s32 arg0, s32 arg1, s32 arg2, s32 arg3) { func_80014708(2, ar
 
 void func_800147C8(s32 arg0, s32 arg1, s32 arg2, s32 arg3) { func_80014708(1, arg0, 0, arg2, arg3); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_8001480C.s")
+extern u8 D_8011BE90[];
+s32 func_8001480C(arg0, arg1) s32 arg0; s32 *arg1; { s32 offset; offset = ((u16 *)((struct { u8 pad[0x2BD0]; u8 *base; } *)D_8011BE90)->base)[arg0]; *arg1 = ((u8 *)offset)[(s32)((struct { u8 pad[0x2BD0]; u8 *base; } *)D_8011BE90)->base]; offset++; if (*arg1 == 0) { return 0; } return (s32)((struct { u8 pad[0x2BD0]; u8 *base; } *)D_8011BE90)->base + offset; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80014850.s")
 
