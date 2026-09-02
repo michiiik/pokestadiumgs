@@ -130,8 +130,12 @@ def _strip_other_functions(source: str, function: str, permuter_root: Path) -> s
     ) + "\n"
 
 
-def _compose_candidate(
-    owner: targets.Owner, code: str, declarations: str | None, baseline_source: str
+def _augment_candidate_declarations(
+    function: str,
+    code: str,
+    declarations: str | None,
+    baseline_source: str,
+    repo_root: Path | None,
 ) -> str:
     """Prepend shared declarations plus any fallback callee prototypes.
 
@@ -154,12 +158,45 @@ def _compose_candidate(
     prefix = runner._declaration_prefix(declarations)
     body = code.rstrip() + "\n"
     augmented = runner._augment_blocks_with_callee_declarations(
-        [(owner.function, body)],
+        [(function, body)],
         prefix,
+        baseline_source,
+        repo_root,
+    )
+    return augmented[0][1]
+
+
+def _compose_candidate(
+    owner: targets.Owner, code: str, declarations: str | None, baseline_source: str
+) -> str:
+    """``_augment_candidate_declarations`` bound to a known owner's repo root."""
+    return _augment_candidate_declarations(
+        owner.function,
+        code,
+        declarations,
         baseline_source,
         runner._repo_root_for_path(owner.source_path),
     )
-    return augmented[0][1]
+
+
+def _candidate_source(
+    source: str,
+    function: str,
+    code: str,
+    *,
+    declarations: str | None = None,
+    companion_edits: list[dict[str, str]] | None = None,
+    repo_root: Path | None = None,
+) -> str:
+    """Compose a candidate (with callee-declaration synthesis), then apply its paired source transaction."""
+    candidate = _augment_candidate_declarations(function, code, declarations, source, repo_root)
+    substituted = runner._replace_candidate_text(source, function, candidate)
+    if substituted is None:
+        raise ValueError(f"source does not contain exactly one pragma for {function}")
+    substituted, companion_error = runner.apply_companion_edits(substituted, companion_edits)
+    if companion_error is not None:
+        raise ValueError(companion_error)
+    return substituted
 
 
 def build_work_directory(
@@ -167,6 +204,7 @@ def build_work_directory(
     code: str,
     *,
     declarations: str | None = None,
+    companion_edits: list[dict[str, str]] | None = None,
     work_root: Path | None = None,
 ) -> Path:
     """Materialize base.c, compile.sh, target.o, and function.txt for the permuter."""
@@ -179,11 +217,17 @@ def build_work_directory(
     if recipes["compile"] is None or recipes["check"] is None:
         raise RuntimeError("could not capture the Makefile probe recipes with make -n")
 
-    baseline_source = owner.source_path.read_text()
-    candidate = _compose_candidate(owner, code, declarations, baseline_source)
-    substituted = runner._replace_candidate_text(baseline_source, owner.function, candidate)
-    if substituted is None:
-        raise ValueError(f"{owner.source} does not contain exactly one pragma for {owner.function}")
+    try:
+        substituted = _candidate_source(
+            owner.source_path.read_text(),
+            owner.function,
+            code,
+            declarations=declarations,
+            companion_edits=companion_edits,
+            repo_root=runner._repo_root_for_path(owner.source_path),
+        )
+    except ValueError as error:
+        raise ValueError(f"{owner.source}: {error}") from error
 
     work_root = work_root or WORK_ROOT
     work_root.mkdir(parents=True, exist_ok=True)
@@ -305,13 +349,19 @@ def permute(
     seconds: float = 60.0,
     threads: int = 4,
     declarations: str | None = None,
+    companion_edits: list[dict[str, str]] | None = None,
     stop_on_zero: bool = True,
     keep: bool = False,
     limit: int = 5,
 ) -> dict[str, object]:
     """Run the permuter for at most ``seconds`` and return the best outputs."""
     owner = targets.require_owner(function)
-    work_dir = build_work_directory(owner, code, declarations=declarations)
+    work_dir = build_work_directory(
+        owner,
+        code,
+        declarations=declarations,
+        companion_edits=companion_edits,
+    )
     permuter_root = _permuter_root()
     command = [
         _permuter_python(),
@@ -362,6 +412,9 @@ def permute(
         "outputs": outputs,
         "timed_out": timed_out,
         "elapsed_seconds": round(time.monotonic() - started, 1),
+        "companion_edits": [
+            edit.get("function") for edit in companion_edits or []
+        ],
         "work_dir": str(work_dir.relative_to(REPO_ROOT)) if keep else None,
         "log_tail": log_lines[-20:],
     }
@@ -375,17 +428,28 @@ def main() -> int:
     parser.add_argument("function")
     parser.add_argument("candidate", type=Path, help="file containing the C body (and its externs)")
     parser.add_argument("--declarations", type=Path, help="file with shared extern/prototype lines")
+    parser.add_argument(
+        "--companion-edits",
+        type=Path,
+        help="JSON file containing the same companion_edits list accepted by the runner",
+    )
     parser.add_argument("--seconds", type=float, default=60.0)
     parser.add_argument("--threads", type=int, default=4)
     parser.add_argument("--keep", action="store_true", help="keep the work directory under disasm/build/permuter")
     parser.add_argument("--no-stop-on-zero", action="store_true")
     args = parser.parse_args()
+    companion_edits = None
+    if args.companion_edits:
+        companion_edits = json.loads(args.companion_edits.read_text())
+        if not isinstance(companion_edits, list) or not companion_edits:
+            parser.error("--companion-edits must contain a non-empty JSON list")
     result = permute(
         args.function,
         args.candidate.read_text(),
         seconds=args.seconds,
         threads=args.threads,
         declarations=args.declarations.read_text() if args.declarations else None,
+        companion_edits=companion_edits,
         stop_on_zero=not args.no_stop_on_zero,
         keep=args.keep,
     )

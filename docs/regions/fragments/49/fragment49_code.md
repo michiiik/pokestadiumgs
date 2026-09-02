@@ -62,3 +62,7 @@ requeue: fresh 107-instruction call-chain owner, prior_attempts=0. Assembly reco
 ## Coordinator replay after wave 46 (2026-09-02)
 
 Direct replay of the worker batch of nine candidates reached the full-fragment compile but was terminated before scoring; batch status probe_unavailable, no installation or gate. A bounded retry also terminated while compiling, so this is tooling-blocked for the current large candidate family. Requeue with simpler bodies or a smaller source-local probe.
+
+## 2026-09-02 wave 53 (2026-09-02)
+
+- requeue `func_86107208`: sixteen fresh semantic, global-pointer-lifetime, and stage-address/value variants compiled in the isolated worktree. Best normalized similarity stayed 0.7073; raw similarity improved to 0.4878. The closest body was 160 versus expected 164 bytes, with first difference at instruction 1: expected the stage global address in `a1` (`lui a1, ...`), while candidates place it in `t6` or `v1`. Explicit pointer/value liveness variants shortened the body to 136-148 bytes and moved farther away. Next action: model the global as a call argument or formal-lifetime alias that directly reserves `a1`, preserving the 160-byte semantic body; do not repeat explicit local pointer holders.

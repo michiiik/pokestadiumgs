@@ -313,6 +313,9 @@ semantics), merged into the tree with `tools/container_merge.py`.
   omitted when every candidate resolves to one owner), `find_owner`,
   `get_function_asm`, `list_targets`, `draft_candidates` (m2c drafts plus
   `similar_solved`), `permute_candidate`.
+  `permute_candidate` accepts the same `companion_edits` transaction as the
+  runner; use it when a near-match only compiles after retyping its stale
+  prototype or updating an accepted caller.
 - Probe compiles bypass `make`: the recipe is captured once per Makefile
   revision and asm-processor/IDO run directly (~0.3–0.7 s per probe; the ROM
   gate is ~2 s incremental). Probe sources live under ignored `disasm/probes/`.

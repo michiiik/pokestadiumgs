@@ -3359,6 +3359,35 @@ class DedupeExternTests(unittest.TestCase):
 
 
 class PermuterWrapperTests(unittest.TestCase):
+    def test_candidate_source_applies_companions_after_owner_substitution(self) -> None:
+        source = (
+            "extern void func_a(void);\n"
+            '#pragma GLOBAL_ASM("asm/us/nonmatchings/x/func_a.s")\n'
+            "void caller(u8 *arg0) { func_a(); }\n"
+        )
+        candidate = "s32 func_a(u8 *arg0) { return arg0[0]; }"
+        result = permute_candidate._candidate_source(
+            source,
+            "func_a",
+            candidate,
+            companion_edits=[
+                {
+                    "function": "func_a",
+                    "old": "extern void func_a(void);",
+                    "new": "extern s32 func_a(u8 *);",
+                },
+                {
+                    "function": "caller",
+                    "old": "void caller(u8 *arg0) { func_a(); }",
+                    "new": "void caller(u8 *arg0) { func_a(arg0); }",
+                },
+            ],
+        )
+        self.assertNotIn("GLOBAL_ASM", result)
+        self.assertIn("extern s32 func_a(u8 *);", result)
+        self.assertIn(candidate, result)
+        self.assertIn("void caller(u8 *arg0) { func_a(arg0); }", result)
+
     def test_timed_out_permuter_group_gets_bounded_sigkill_fallback(self) -> None:
         class TimedProcess:
             pid = 12345
@@ -3520,6 +3549,26 @@ class McpDispatchTests(unittest.TestCase):
         self.assertEqual(captured["source"], owner.source_path)
         self.assertEqual(captured["declarations"], "extern u8 D_1;")
         self.assertEqual(json.loads(response["content"][0]["text"])["source"], "disasm/src/synthetic.c")
+
+    def test_permuter_forwards_companion_edits(self) -> None:
+        edits = [{
+            "function": "caller",
+            "old": "void caller(void) { func_a(); }",
+            "new": "void caller(void) { (void)func_a(); }",
+        }]
+        with mock.patch.object(
+            permute_candidate,
+            "permute",
+            return_value={"function": "func_a", "outputs": [], "best_score": 1},
+        ) as permute:
+            response = mcp.call_tool("permute_candidate", {
+                "function": "func_a",
+                "code": "s32 func_a(void) { return 0; }",
+                "companion_edits": edits,
+                "seconds": 5,
+            })
+        self.assertFalse(response["isError"])
+        self.assertEqual(permute.call_args.kwargs["companion_edits"], edits)
 
 
 class SweepTests(unittest.TestCase):
