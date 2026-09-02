@@ -84,9 +84,21 @@ elif [ -n "${KIMI_CODE_HOME:-}" ]; then
     extra_args+=(-e KIMI_CODE_HOME="$KIMI_CODE_HOME")
 fi
 
+# --tmpfs bounds two IDO temp-file leak sinks in RAM instead of the
+# container's writable layer: /tmp (the default) and /work/disasm/scratch
+# (tools/try_pragma_compare.py, imported by the permuter driver, redirects
+# TMPDIR there for runner-driven compiles). IDO's as0/as1/ugen create ctm*
+# temp files honouring $TMPDIR and only clean up on a normal exit;
+# decomp-permuter kills unpromising compiles constantly, stranding one each
+# time (~7.5M files/hour measured). Bounding by size+inodes here fails
+# loudly (ENOSPC/inode exhaustion) instead of silently growing the host
+# image; entrypoint.sh also sweeps stray ctm* files periodically so a
+# long run never gets close to the cap.
 docker run \
     --platform linux/amd64 \
     --rm \
+    --tmpfs /tmp:size=2g,nr_inodes=4m \
+    --tmpfs /work/disasm/scratch:size=2g,nr_inodes=4m \
     -e SOURCE="$source_file" \
     -e AGENT \
     -e GENERATOR_MODEL \

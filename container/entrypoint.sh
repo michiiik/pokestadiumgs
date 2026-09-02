@@ -41,6 +41,15 @@
 # (issue #39).
 set -euo pipefail
 
+# TMPDIR=/tmp: explicit rather than relying on the unset-var fallback, so
+# anything that checks whether $TMPDIR is set (not just where it points)
+# behaves the same as everything else here. container/run.sh mounts /tmp as
+# a bounded tmpfs; a runner-driven compile independently redirects TMPDIR to
+# /work/disasm/scratch (tools/try_pragma_compare.py, at import), which
+# run.sh also tmpfs-bounds -- see the sweeper below and run.sh's --tmpfs
+# comment for why both need bounding.
+export TMPDIR=/tmp
+
 # --- run-time symlink setup that could not be baked into the image --------
 # The image bakes /usr/lib symlinks for IDO's compiler phases and for
 # include/src/assets/build/lib under /work/disasm at build time (see
@@ -136,5 +145,36 @@ if [ "$have_candidate_file" -eq 0 ] && [ "$have_generator_cmd" -eq 0 ]; then
 fi
 
 mkdir -p /out
+
+# --- background sweeper for stranded IDO ctm* temp files -------------------
+# IDO's compiler passes (as0, as1, ugen) create ctm* temp files honouring
+# $TMPDIR and only remove them on a normal exit. decomp-permuter kills
+# unpromising candidate compiles by design, so a pass gets killed constantly
+# and strands its file -- ~7.5M files/hour measured during an active run.
+# container/run.sh's --tmpfs flags bound both sinks (/tmp and
+# /work/disasm/scratch) by size/inodes so that's a hard, loud failure mode
+# rather than silent disk growth, but this sweep keeps a long session from
+# ever getting close: every 120s, delete ctm* files idle for 5+ minutes --
+# far above a live compile's lifetime (seconds) -- in each directory. Silent
+# unless a sweep itself errors.
+#
+# This entrypoint execs the driver below, replacing this shell's program
+# image without changing its PID -- so the sweeper, backgrounded here as a
+# child of that same PID, remains a child of the driver process afterward.
+# Docker container PID 1 is also its PID-namespace init: when the driver
+# (now PID 1) exits, the kernel tears down the namespace and kills every
+# remaining process in it, including the sweeper, so it can't outlive the
+# container or hold it open. It also can't be killed before the driver
+# starts: it's backgrounded and running well before the exec below.
+sweep_stray_tmpfiles() {
+    while true; do
+        sleep 120
+        for dir in /tmp /work/disasm/scratch; do
+            err="$(find "$dir" -maxdepth 1 -name 'ctm*' -mmin +5 -delete 2>&1 1>/dev/null)"
+            [ -n "$err" ] && echo "entrypoint: ctm* sweep of $dir failed: $err" >&2
+        done
+    done
+}
+sweep_stray_tmpfiles &
 
 exec python3 /work/tools/container_agent.py --source "$SOURCE" --out /out "${args[@]}"

@@ -231,3 +231,36 @@ To read a run's own progress without merging anything:
 `python3 tools/container_merge.py summary /abs/out` prints `summary.json`
 and `state.json` as readable tables (per-owner status, best similarity,
 iteration/history counts).
+
+## Temp-file leak bounding
+
+IDO's compiler passes (`as0`, `as1`, `ugen`) create `ctm*` temp files that
+honour `$TMPDIR` and only get removed on a normal exit. decomp-permuter
+kills unpromising candidate compiles by design (that's how it works), so a
+pass gets killed constantly and strands its file -- ~7.5M files/hour
+measured during an active run (issue: IDO temp-file leak in the container).
+There are two sinks, not one: plain `/tmp`, and `/work/disasm/scratch`
+(`tools/try_pragma_compare.py` redirects `TMPDIR` there at import for any
+runner-driven compile, e.g. via `tools/permute_candidate.py`).
+
+`container/run.sh` mounts both as bounded tmpfs (`--tmpfs /tmp:size=2g,
+nr_inodes=4m` and the same for `/work/disasm/scratch`), so a leak fails
+loudly (ENOSPC / inode exhaustion) instead of silently growing the
+container's writable layer -- and, since neither is a bind mount, never
+touches host disk either way. `container/entrypoint.sh` also runs a
+background sweeper for the life of the container: every 120s it deletes
+`ctm*` files idle 5+ minutes (far above a live compile's lifetime of
+seconds) from both directories, so a long session never gets close to the
+cap.
+
+To verify a leak isn't accumulating during a run:
+
+    docker exec <container> sh -c \
+        "find /tmp /work/disasm/scratch -maxdepth 1 -name 'ctm*' | wc -l"
+
+This should stay bounded (tens to low hundreds, not climbing into the
+thousands/millions), not grow unbounded. Count files, not bytes: on
+APFS/overlay, a directory's on-disk size is a high-water mark of entries
+it has ever held and never shrinks, so `du`/`stat` on the directory itself
+looks the same whether cleanup is working or not -- only a file count
+reflects it.
