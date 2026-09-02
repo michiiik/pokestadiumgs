@@ -20,6 +20,7 @@ import (
 	"strings"
 	"time"
 
+	"fleetctl/internal/agentspec"
 	"fleetctl/internal/fleetstate"
 	"fleetctl/internal/planpkg"
 	"fleetctl/internal/runner"
@@ -69,6 +70,27 @@ type Loop struct {
 	CooldownDefaults map[string]time.Duration
 	DefaultCooldown  time.Duration
 	PollInterval     time.Duration
+
+	// Agents is the plan's own agent roster (planpkg.Plan.Agents, one entry
+	// per distinct --agent spec `plan` was given), adopted from LoadPlan
+	// unless the caller already set it. It is the pool
+	// quota-window-aware scheduling (sec 12) reassigns a cooling-down
+	// agent's queued partition to -- a plan with only one agent behaves
+	// exactly as before (nothing else to reassign to).
+	Agents []agentspec.Spec
+	// WindowDurations is the known quota-window length per agent (--window,
+	// e.g. kimi=5h), adopted from the plan unless the caller already set
+	// it. Read by BuildMetrics (sec 11) to normalize accepts-per-window;
+	// falls back to CooldownDefaults, then a 24h default -- see
+	// quotaWindowFor.
+	WindowDurations map[string]time.Duration
+	// WindowBudget is the optional expected-batches-per-window per agent
+	// (--window-budget), adopted from the plan unless the caller already
+	// set it -- informational only (sec 11).
+	WindowBudget map[string]int
+	// PermuterSeconds is `--permuter-seconds` forwarded to every
+	// permuter-lane launch (sec 13); <=0 defaults to 1200.
+	PermuterSeconds int
 
 	// DisableAutoMerge turns off self-merge-on-green (sec 2): a PR is left
 	// at StatusDone once opened, same as before self-merge existed, and
@@ -208,6 +230,23 @@ func (l *Loop) LoadPlan(p *planpkg.Plan) error {
 			parsed[agent] = d
 		}
 		l.CooldownDefaults = parsed
+	}
+	if l.WindowDurations == nil && len(p.Windows) > 0 {
+		parsed := make(map[string]time.Duration, len(p.Windows))
+		for agent, s := range p.Windows {
+			d, err := time.ParseDuration(s)
+			if err != nil {
+				return fmt.Errorf("control: plan window %s=%q: %w", agent, s, err)
+			}
+			parsed[agent] = d
+		}
+		l.WindowDurations = parsed
+	}
+	if l.WindowBudget == nil && len(p.WindowBudget) > 0 {
+		l.WindowBudget = p.WindowBudget
+	}
+	if len(l.Agents) == 0 && len(p.Agents) > 0 {
+		l.Agents = p.Agents
 	}
 	for _, spec := range p.Queue {
 		if _, exists := l.State.Runs[spec.ID]; exists {
@@ -389,8 +428,19 @@ func (l *Loop) handleExit(ctx context.Context, rec *fleetstate.RunRecord) error 
 	rec.StoppedReason = summary.StoppedReason
 
 	if summary.StoppedReason == "generator_exhausted" {
+		// The permuter-lane agent has no generator/model to exhaust and is
+		// never subject to cooldown (sec 13) -- if this somehow fires for
+		// it anyway, just requeue with --resume, no cooldown/window bookkeeping.
+		if rec.Spec.Agent == permuterAgent {
+			l.logf("run %s: permuter-lane run reported generator_exhausted (unexpected); requeueing with --resume, no cooldown applied", rec.Spec.ID)
+			rec.Status = fleetstate.StatusRequeued
+			rec.Note = "generator_exhausted"
+			l.requeueResume(rec)
+			return nil
+		}
 		until := l.now().Add(l.cooldownFor(rec.Spec.Agent))
 		l.State.Cooldowns[rec.Spec.Agent] = until
+		l.recordWindowExhausted(rec.Spec.Agent, l.now())
 		l.logf("run %s: agent %s generator_exhausted; cooldown until %s, requeueing with --resume",
 			rec.Spec.ID, rec.Spec.Agent, until.Format(time.RFC3339))
 		rec.Status = fleetstate.StatusRequeued
@@ -673,6 +723,12 @@ func (l *Loop) runMerge(ctx context.Context, rec *fleetstate.RunRecord) error {
 	report := loadMergeReport(rec.OutDir)
 	accepted := matchedOwners(report.Owners)
 	rec.MatchedOwners = accepted
+	// Collect this run's own tie-pool.json (any run, permuter-lane or not,
+	// can plateau into one) into the file's persisted tie-pool store, and
+	// drop every owner this run just matched (sec 13, "owners removed once
+	// matched") -- before requeueing unmatched owners below, so a matched
+	// owner is never both dropped from the pool and left in it.
+	l.updateTiePool(rec)
 	needsCommit, commitTails := needsManualCommitOwners(report.Owners)
 	if len(needsCommit) > 0 {
 		rec.NeedsManualCommit = commitTails
@@ -884,6 +940,10 @@ func (l *Loop) Replan(ctx context.Context) error {
 	if data, err := json.Marshal(fresh); err == nil {
 		l.State.PlanJSON = data
 	}
+	// One permuter-lane partition per file with pending tie-pool owners
+	// (sec 13) -- after reconcileQueue, so it sees the just-rebuilt queue
+	// when checking for an already in-flight permuter run per file.
+	l.enqueuePermuterLane()
 	l.logf("replan: %d fresh partition(s) considered, queue now has %d entr(y/ies)", len(fresh.Queue), len(l.State.Queue))
 	return nil
 }
@@ -1132,7 +1192,28 @@ func (l *Loop) launchEligible(ctx context.Context) error {
 		case totalRunning >= max:
 			rec.WaitReason = "concurrency"
 			remaining = append(remaining, id)
-		case l.State.OnCooldown(rec.Spec.Agent, now):
+		// permuterAgent is never subject to cooldown (sec 13), so this case
+		// can never fire for it regardless of what State.Cooldowns holds.
+		case rec.Spec.Agent != permuterAgent && l.State.OnCooldown(rec.Spec.Agent, now):
+			// Quota-window-aware scheduling (sec 12): rather than leave the
+			// slot idle, hand this partition to the next eligible agent
+			// (round-robin over the plan's own roster, preferring one whose
+			// window just reopened) instead of waiting out rec's own
+			// agent's cooldown.
+			if alt, ok := l.reassignAgent(rec.Spec.Agent, now, byAgent); ok {
+				l.logf("run %s: agent %s on cooldown; reassigning to %s:%s%s (sec 12)",
+					id, rec.Spec.Agent, alt.Agent, alt.Model, effortSuffix(alt.Effort))
+				rec.Note = appendReassignNote(rec.Note, rec.Spec.Agent, alt.Agent)
+				rec.Spec.Agent, rec.Spec.Model, rec.Spec.Effort = alt.Agent, alt.Model, alt.Effort
+				if err := l.launch(ctx, rec); err != nil {
+					l.logf("run %s: launch failed: %v", id, err)
+					remaining = append(remaining, id)
+					continue
+				}
+				totalRunning++
+				byAgent[alt.Agent]++
+				continue
+			}
 			rec.WaitReason = "cooldown"
 			remaining = append(remaining, id)
 		case l.AgentConcurrency[rec.Spec.Agent] > 0 && byAgent[rec.Spec.Agent] >= l.AgentConcurrency[rec.Spec.Agent]:
@@ -1162,6 +1243,14 @@ func (l *Loop) launch(ctx context.Context, rec *fleetstate.RunRecord) error {
 		return err
 	}
 
+	var tiePoolFile string
+	if rec.Spec.Mode == "permuter-only" {
+		tiePoolFile, err = preparePermuterTiePool(l.RunsDir, outDir, rec.Spec.File)
+		if err != nil {
+			return err
+		}
+	}
+
 	// Stale-image awareness (docs/FLEET_CONTROLLER.md sec 6): skipped
 	// entirely under --src-overlay -- an overlay makes the image's own
 	// baked-in sources irrelevant, so there is nothing to warn about.
@@ -1178,16 +1267,19 @@ func (l *Loop) launch(ctx context.Context, rec *fleetstate.RunRecord) error {
 	}
 
 	spec := runner.LaunchSpec{
-		SourceFile:    rec.Spec.File,
-		OutDir:        outDir,
-		BudgetSeconds: rec.Spec.BudgetSeconds,
-		Owners:        rec.Spec.Owners,
-		SeedFrom:      seedFrom,
-		Resume:        rec.Spec.Attempt > 0,
-		Agent:         rec.Spec.Agent,
-		Model:         rec.Spec.Model,
-		Effort:        rec.Spec.Effort,
-		SrcOverlay:    l.SrcOverlay,
+		SourceFile:      rec.Spec.File,
+		OutDir:          outDir,
+		BudgetSeconds:   rec.Spec.BudgetSeconds,
+		Owners:          rec.Spec.Owners,
+		SeedFrom:        seedFrom,
+		Resume:          rec.Spec.Attempt > 0,
+		Agent:           rec.Spec.Agent,
+		Model:           rec.Spec.Model,
+		Effort:          rec.Spec.Effort,
+		SrcOverlay:      l.SrcOverlay,
+		Mode:            rec.Spec.Mode,
+		TiePoolFile:     tiePoolFile,
+		PermuterSeconds: rec.Spec.PermuterSeconds,
 	}
 	id, err := l.Runner.LaunchContainer(ctx, spec)
 	if err != nil {
@@ -1200,6 +1292,10 @@ func (l *Loop) launch(ctx context.Context, rec *fleetstate.RunRecord) error {
 	rec.EndedAt = time.Time{}
 	rec.StoppedReason = ""
 	rec.WaitReason = ""
+	// Quota-window bookkeeping (sec 12): stamps this agent's window start
+	// the first time it launches since a cooldown (or ever) -- a no-op once
+	// already stamped for the current window.
+	l.recordWindowStart(rec.Spec.Agent, rec.StartedAt)
 	l.logf("run %s: launched container %s (agent=%s:%s owners=%d resume=%v seeds=%d)",
 		rec.Spec.ID, id, rec.Spec.Agent, rec.Spec.Model, len(rec.Spec.Owners), spec.Resume, len(seedFrom))
 	return nil

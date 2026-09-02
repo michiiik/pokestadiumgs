@@ -31,6 +31,22 @@ type LaunchSpec struct {
 	// without rebuilding the gs-decomp-agent image (docs/FLEET_CONTROLLER.md
 	// sec 6, "stale-image awareness").
 	SrcOverlay string
+
+	// Mode is "" (the ordinary run) or "permuter-only" (the permuter-only
+	// lane, docs/FLEET_CONTROLLER.md sec 13): passed as `--mode permuter-
+	// only`, and switches this LaunchSpec to the TiePoolFile/PermuterSeconds
+	// fields below instead of BudgetSeconds -- no --budget-seconds is
+	// passed at all for this mode (container_agent.py's own default
+	// applies, unused since the permuter-only driver stops on
+	// PermuterSeconds/plateau, not a wall-clock budget).
+	Mode string
+	// TiePoolFile is the in-container path (e.g. "/out/tie-pool-input.json")
+	// to a copy of this file's collected tie-pool entries, passed as
+	// `--tie-pool-file` -- only set when Mode == "permuter-only".
+	TiePoolFile string
+	// PermuterSeconds is `--permuter-seconds` -- only set when Mode ==
+	// "permuter-only".
+	PermuterSeconds int
 }
 
 // InspectResult is the outcome of a `docker inspect` poll.

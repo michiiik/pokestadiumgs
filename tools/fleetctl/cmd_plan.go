@@ -25,6 +25,10 @@ func runPlanCmd(args []string) error {
 	fs.Var(&cooldowns, "cooldown", "agent=duration, e.g. kimi=5h (repeatable)")
 	var agentConcurrency stringSlice
 	fs.Var(&agentConcurrency, "agent-concurrency", "agent=N per-agent concurrency cap (repeatable)")
+	var windows stringSlice
+	fs.Var(&windows, "window", "agent=duration known quota-window length, e.g. kimi=5h (repeatable); baked into the plan and read by `run`'s per-agent throughput metrics (sec 11) and quota-window-aware scheduling (sec 12); an agent with no entry here falls back to its --cooldown entry, then a 24h default")
+	var windowBudget stringSlice
+	fs.Var(&windowBudget, "window-budget", "agent=N expected batches per quota window (repeatable, optional; informational only, surfaced in `status`'s METRICS table, sec 11)")
 	budgetSeconds := fs.Int("budget-seconds", 3600, "--budget-seconds passed to every launched run")
 	maxInstructions := fs.Int("max-instructions", 0, "forwarded to rank-files --max-instructions (0 = tool default)")
 	excludeRecent := fs.Float64("exclude-recent", -1, "forwarded to rank-files --exclude-recent HOURS (negative = omit the flag entirely; 0 still applies rank-files' own dirty-working-tree exclusion, just with no commit-recency window)")
@@ -53,6 +57,14 @@ func runPlanCmd(args []string) error {
 	if err != nil {
 		return err
 	}
+	windowMap, err := planpkg.ParseWindows(windows)
+	if err != nil {
+		return err
+	}
+	windowBudgetMap, err := planpkg.ParseWindowBudget(windowBudget)
+	if err != nil {
+		return err
+	}
 
 	r := &runner.ExecRunner{RepoRoot: *repo, PythonBin: *pythonBin}
 	p, err := planpkg.Build(context.Background(), r, planpkg.Options{
@@ -67,6 +79,8 @@ func runPlanCmd(args []string) error {
 		BudgetSeconds:      *budgetSeconds,
 		MaxInstructions:    *maxInstructions,
 		ExcludeRecentHours: *excludeRecent,
+		Windows:            windowMap,
+		WindowBudget:       windowBudgetMap,
 	})
 	if err != nil {
 		return err

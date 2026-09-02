@@ -36,6 +36,19 @@ type Options struct {
 	AgentConcurrency map[string]int
 	BudgetSeconds    int
 
+	// Windows is the known quota-window length per agent (e.g. kimi=5h,
+	// --window on `plan`/`run`) -- read by control.BuildMetrics to
+	// normalize accepts-per-window (docs/FLEET_CONTROLLER.md sec 11) and by
+	// control.Loop's quota-window-aware scheduling (sec 12). An agent with
+	// no entry here falls back to its own Cooldowns entry, then a 24h
+	// default -- see control.quotaWindowFor.
+	Windows map[string]time.Duration
+	// WindowBudget is the optional expected-batches-per-window per agent
+	// (--window-budget) -- informational only, surfaced in `status`'s
+	// METRICS table/`status --json` (sec 11); it does not itself gate
+	// scheduling.
+	WindowBudget map[string]int
+
 	// Forwarded to `rank-files` when Files is used. ExcludeRecentHours < 0
 	// omits --exclude-recent entirely (no filtering at all); >= 0 (0
 	// included) passes it through explicitly -- see ExecRunner.RankFiles.
@@ -57,15 +70,19 @@ type Plan struct {
 	// Files/FileList mirror Options: Files > 0 means the plan ranked its
 	// own top-N files (a Replan reranks fresh); FileList means an explicit
 	// --file list was used (a Replan reuses that exact list).
-	Files              int                  `json:"files,omitempty"`
-	FileList           []string             `json:"file_list,omitempty"`
-	Agents             []agentspec.Spec     `json:"agents,omitempty"`
-	MaxInstructions    int                  `json:"max_instructions,omitempty"`
-	ExcludeRecentHours float64              `json:"exclude_recent_hours,omitempty"`
-	BudgetSeconds      int                  `json:"budget_seconds,omitempty"`
-	Cooldowns          map[string]string    `json:"cooldowns,omitempty"`
-	AgentConcurrency   map[string]int       `json:"agent_concurrency,omitempty"`
-	Queue              []fleetstate.RunSpec `json:"queue"`
+	Files              int               `json:"files,omitempty"`
+	FileList           []string          `json:"file_list,omitempty"`
+	Agents             []agentspec.Spec  `json:"agents,omitempty"`
+	MaxInstructions    int               `json:"max_instructions,omitempty"`
+	ExcludeRecentHours float64           `json:"exclude_recent_hours,omitempty"`
+	BudgetSeconds      int               `json:"budget_seconds,omitempty"`
+	Cooldowns          map[string]string `json:"cooldowns,omitempty"`
+	AgentConcurrency   map[string]int    `json:"agent_concurrency,omitempty"`
+	// Windows/WindowBudget mirror Options.Windows/WindowBudget, durations
+	// rendered as strings the same way Cooldowns is (sec 11/12).
+	Windows      map[string]string    `json:"windows,omitempty"`
+	WindowBudget map[string]int       `json:"window_budget,omitempty"`
+	Queue        []fleetstate.RunSpec `json:"queue"`
 }
 
 // ToOptions reconstructs the Options a Plan was Build-ed with, so it can be
@@ -79,6 +96,14 @@ func (p *Plan) ToOptions() (Options, error) {
 		}
 		cooldowns[agent] = d
 	}
+	windows := make(map[string]time.Duration, len(p.Windows))
+	for agent, s := range p.Windows {
+		d, err := time.ParseDuration(s)
+		if err != nil {
+			return Options{}, fmt.Errorf("planpkg: window %s=%q: %w", agent, s, err)
+		}
+		windows[agent] = d
+	}
 	return Options{
 		Repo:               p.Repo,
 		Files:              p.Files,
@@ -91,13 +116,17 @@ func (p *Plan) ToOptions() (Options, error) {
 		BudgetSeconds:      p.BudgetSeconds,
 		MaxInstructions:    p.MaxInstructions,
 		ExcludeRecentHours: p.ExcludeRecentHours,
+		Windows:            windows,
+		WindowBudget:       p.WindowBudget,
 	}, nil
 }
 
-// fileSlug turns "disasm/src/fragments/79/fragment79_3BF4C0.c" into
+// FileSlug turns "disasm/src/fragments/79/fragment79_3BF4C0.c" into
 // "fragment79_3BF4C0" -- unique enough for run ids because splat's per-file
-// basenames already are (fragment numbers, function-address names).
-func fileSlug(file string) string {
+// basenames already are (fragment numbers, function-address names). Also
+// used by control.tiePoolStorePath to name a file's collected tie-pool
+// store (docs/FLEET_CONTROLLER.md sec 13).
+func FileSlug(file string) string {
 	base := filepath.Base(file)
 	return strings.TrimSuffix(base, filepath.Ext(base))
 }
@@ -150,7 +179,7 @@ func Build(ctx context.Context, r runner.Runner, opts Options) (*Plan, error) {
 		for i, o := range owners {
 			names[i] = o.Function
 		}
-		slug := fileSlug(file)
+		slug := FileSlug(file)
 		part := 0
 		for start := 0; start < len(names); start += ownersPerRun {
 			end := min(start+ownersPerRun, len(names))
@@ -173,6 +202,10 @@ func Build(ctx context.Context, r runner.Runner, opts Options) (*Plan, error) {
 	for agent, d := range opts.Cooldowns {
 		cooldowns[agent] = d.String()
 	}
+	windows := make(map[string]string, len(opts.Windows))
+	for agent, d := range opts.Windows {
+		windows[agent] = d.String()
+	}
 
 	return &Plan{
 		GeneratedAt:        time.Now().UTC(),
@@ -187,6 +220,8 @@ func Build(ctx context.Context, r runner.Runner, opts Options) (*Plan, error) {
 		BudgetSeconds:      opts.BudgetSeconds,
 		Cooldowns:          cooldowns,
 		AgentConcurrency:   opts.AgentConcurrency,
+		Windows:            windows,
+		WindowBudget:       opts.WindowBudget,
 		Queue:              queue,
 	}, nil
 }
@@ -236,6 +271,34 @@ func ParseCooldowns(values []string) (map[string]time.Duration, error) {
 
 // ParseAgentConcurrency parses repeated "agent=N" flag values.
 func ParseAgentConcurrency(values []string) (map[string]int, error) {
+	out := map[string]int{}
+	for _, v := range values {
+		agent, n, err := agentspec.ParseKeyInt(v)
+		if err != nil {
+			return nil, err
+		}
+		out[agent] = n
+	}
+	return out, nil
+}
+
+// ParseWindows parses repeated "agent=duration" --window flag values (e.g.
+// "kimi=5h") -- the known quota-window length per agent, docs sec 11/12.
+func ParseWindows(values []string) (map[string]time.Duration, error) {
+	out := map[string]time.Duration{}
+	for _, v := range values {
+		agent, d, err := agentspec.ParseKeyDuration(v)
+		if err != nil {
+			return nil, err
+		}
+		out[agent] = d
+	}
+	return out, nil
+}
+
+// ParseWindowBudget parses repeated "agent=N" --window-budget flag values --
+// the optional expected-batches-per-window per agent, docs sec 11.
+func ParseWindowBudget(values []string) (map[string]int, error) {
 	out := map[string]int{}
 	for _, v := range values {
 		agent, n, err := agentspec.ParseKeyInt(v)

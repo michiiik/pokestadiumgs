@@ -31,6 +31,7 @@ func runRunCmd(args []string) error {
 	defaultCooldown := fs.Duration("default-cooldown", time.Hour, "cooldown applied to an agent with no --cooldown entry in the plan")
 	pollInterval := fs.Duration("poll-interval", 30*time.Second, "how often to poll running containers")
 	pythonBin := fs.String("python", "", "override the python3 binary (default: python3 on PATH)")
+	permuterSeconds := fs.Int("permuter-seconds", 0, "--permuter-seconds passed to every permuter-lane launch (sec 13); 0 = the built-in default (1200)")
 
 	autoMerge := fs.Bool("auto-merge", true, "once a run's PR's checks are all green, `gh pr merge --merge --delete-branch` it automatically (see docs sec 2, self-merge on green)")
 	replan := fs.Bool("replan", false, "re-run the ranking against --merge-repo and rebuild the pending queue once at startup, before entering the control loop (see docs sec 2, replanning)")
@@ -74,6 +75,7 @@ func runRunCmd(args []string) error {
 		SrcOverlay:          *srcOverlay,
 		StallAfter:          *stallAfter,
 		DailySummaryHourUTC: *dailySummaryHour,
+		PermuterSeconds:     *permuterSeconds,
 	}
 
 	mergeRepoPath := *mergeRepo

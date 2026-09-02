@@ -133,12 +133,22 @@ fi
 # --- detect whether the caller already handles candidate generation --------
 have_generator_cmd=0
 have_candidate_file=0
+have_permuter_only=0
+prev=""
 for arg in "$@"; do
     case "$arg" in
         --generator-cmd|--generator-cmd=*) have_generator_cmd=1 ;;
         --candidate-file|--candidate-file=*) have_candidate_file=1 ;;
+        --mode=permuter-only) have_permuter_only=1 ;;
+        permuter-only) [ "$prev" = "--mode" ] && have_permuter_only=1 ;;
     esac
+    prev="$arg"
 done
+# A permuter-only run (AGENT=permuter) never calls a model: no generator
+# command, no API key.
+if [ "$have_permuter_only" -eq 1 ]; then
+    have_generator_cmd=1
+fi
 
 # --- default --generator-cmd to the container/generators/ dispatcher -------
 args=("$@")

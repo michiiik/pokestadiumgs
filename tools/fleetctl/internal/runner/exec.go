@@ -102,8 +102,21 @@ func (r *ExecRunner) runOrDryRun(ctx context.Context, dir string, env []string, 
 }
 
 func (r *ExecRunner) LaunchContainer(ctx context.Context, spec LaunchSpec) (string, error) {
-	argv := []string{"bash", "container/run.sh", spec.SourceFile, spec.OutDir,
-		"--budget-seconds", strconv.Itoa(spec.BudgetSeconds)}
+	argv := []string{"bash", "container/run.sh", spec.SourceFile, spec.OutDir}
+	if spec.Mode != "" {
+		// Permuter-only lane (docs/FLEET_CONTROLLER.md sec 13): no
+		// --budget-seconds (the permuter-only driver stops on
+		// --permuter-seconds/plateau, not a wall-clock budget).
+		argv = append(argv, "--mode", spec.Mode)
+		if spec.TiePoolFile != "" {
+			argv = append(argv, "--tie-pool-file", spec.TiePoolFile)
+		}
+		if spec.PermuterSeconds > 0 {
+			argv = append(argv, "--permuter-seconds", strconv.Itoa(spec.PermuterSeconds))
+		}
+	} else {
+		argv = append(argv, "--budget-seconds", strconv.Itoa(spec.BudgetSeconds))
+	}
 	if len(spec.Owners) > 0 {
 		argv = append(argv, "--owners", strings.Join(spec.Owners, ","))
 	}

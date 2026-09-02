@@ -25,6 +25,7 @@ Everything below assumes that binary is on your `PATH` or invoked by path.
         --agent SPEC [--agent SPEC ...] \
         [--owners-per-run 12] [--budget-seconds 3600] \
         [--cooldown AGENT=DURATION ...] [--agent-concurrency AGENT=N ...] \
+        [--window AGENT=DURATION ...] [--window-budget AGENT=N ...] \
         [--max-instructions N] [--exclude-recent HOURS] \
         [--out plan.json]
 
@@ -52,9 +53,20 @@ a `generator_exhausted` exit puts that agent on cooldown for its configured
 duration (default one hour, `run`'s own `--default-cooldown`, for an agent
 with no `--cooldown` entry); an agent at its `--agent-concurrency` cap is
 skipped when `run` looks for the next queue entry to launch, independent of
-the global `--max-concurrent`. `--slots K` is recorded as the plan's
-suggested fleet size and becomes `run`'s default `--max-concurrent` when
-`run` isn't given its own.
+the global `--max-concurrent`. Rather than leave a slot idle while its
+assigned agent cools down, `run` reassigns that queued partition to another
+agent from this same `--agent` roster instead -- see sec 12. `--slots K` is
+recorded as the plan's suggested fleet size and becomes `run`'s default
+`--max-concurrent` when `run` isn't given its own.
+
+`--window AGENT=DURATION` (e.g. `--window kimi=5h` -- a known quota-window
+length, distinct from `--cooldown`'s generator-exhaustion backoff duration,
+though the two are commonly the same number) and `--window-budget
+AGENT=N` (an optional expected-batches-per-window, informational only) are
+also baked into the plan. Both are read by `fleetctl status`'s per-agent
+METRICS table (sec 11) and by `run`'s quota-window-aware scheduling (sec
+12); an agent with no `--window` entry falls back to its own `--cooldown`
+entry, then a 24h default.
 
 `plan` only ever runs `tools/pragma_targets.py` (read-only queries) -- it
 never touches docker, git, or GitHub, so there is no `--dry-run` for it.
@@ -66,6 +78,7 @@ never touches docker, git, or GitHub, so there is no `--dry-run` for it.
         [--base-ref REF] \
         [--once] [--dry-run] [--default-cooldown 1h] [--poll-interval 30s] \
         [--auto-merge] [--replan] [--src-overlay DIR] [--stall-after 3h] \
+        [--permuter-seconds 1200] \
         [--alert-issue N] [--alert-macos] [--daily-summary-hour 9]
 
 The control loop. Loads `--plan`'s queue into `<state-dir>/state.json`
@@ -80,8 +93,14 @@ The control loop. Loads `--plan`'s queue into `<state-dir>/state.json`
    `pr_open`, check its PR's CI checks and merge it on green -- sec 7.
 4. **Launch.** Fill free concurrency slots (global `--max-concurrent`, and
    each agent's own `--agent-concurrency` cap from the plan) from the front
-   of the queue, skipping (not dropping) any entry whose agent is currently
-   on cooldown.
+   of the queue. An entry whose agent is currently on cooldown is not just
+   skipped: it is reassigned to the next eligible agent from the plan's own
+   roster instead, so the slot is not left idle (sec 12) -- only a
+   single-agent plan (or every other agent also unavailable) falls back to
+   waiting. Replanning (sec 8) also enqueues one permuter-lane partition per
+   file with owners still pending in its tie-pool store (sec 13); those
+   count toward `--max-concurrent` like any other launch but are exempt
+   from every per-agent cap and cooldown.
 5. **Persist.** `state.json` is rewritten atomically (temp file + rename)
    after every pass.
 
@@ -141,8 +160,10 @@ URL (so a run can never reach `pr_open` under `--dry-run`, since there is
 no real PR number to poll) -- a `--dry-run --once` run is safe to point at
 the real `--repo`/`--merge-repo` and a real plan, `--replan` included.
 
-See sec 7 (self-merge), sec 8 (replanning), sec 9 (alerting), and sec 10
-(stale-image awareness) for the rest of this section's flags.
+See sec 7 (self-merge), sec 8 (replanning), sec 9 (alerting), sec 10
+(stale-image awareness), sec 12 (quota-window-aware scheduling), and sec 13
+(the permuter-only lane, including `--permuter-seconds`) for the rest of
+this section's flags.
 
 ### `fleetctl status`
 
@@ -153,15 +174,19 @@ count, note/stopped-reason/wait-reason/needs-manual-commit owners/PR URL), a
 `NEEDS MANUAL COMMIT` section (one line per owner still awaiting a manual
 `git commit --only`, with its run id, branch, out dir, and the first line
 of the recorded commit error -- see sec 2's "Reading the merge report"),
-a cooldowns table, a `MERGE BLOCKED: <reason>` line when a post-merge
-fast-forward has failed (sec 7), and a `running=N queued=M (agent=n ...)`
-summary line. A run whose merge step found `--merge-repo` dirty in a way
-that would conflict with the merge (sec 2) shows status
-`merge_blocked_dirty`, with the conflicting path in its note column --
-distinct from `MERGE BLOCKED`, which is global (every run), not per-run.
-`--json` prints the same information as one
-`control.BuildStatus` JSON document instead -- for scripting, and what the
-`--alert-issue` daily summary (sec 9) embeds for machines.
+a cooldowns table, a `METRICS` table (one row per agent spec seen in
+`state.json`'s runs -- runs/iterations/accepts, accepts per wall-hour,
+accepts per configured quota window, mean iterations-to-accept, and current
+cooldown state; see sec 11), a `MERGE BLOCKED: <reason>` line when a
+post-merge fast-forward has failed (sec 7), and a
+`running=N queued=M (agent=n ...)` summary line. A run whose merge step
+found `--merge-repo` dirty in a way that would conflict with the merge (sec
+2) shows status `merge_blocked_dirty`, with the conflicting path in its
+note column -- distinct from `MERGE BLOCKED`, which is global (every run),
+not per-run. `--json` prints the same information as one
+`control.BuildStatus` JSON document instead (its `metrics` field is the
+METRICS table) -- for scripting, and what the `--alert-issue` daily summary
+(sec 9) embeds for machines.
 
 ### `fleetctl stop`
 
@@ -676,9 +701,10 @@ alerts don't share a bucket, but `ff_failed` -- with no natural per-run key
 `--alert-issue N` additionally posts one **daily summary** -- runs
 launched/finished, matches merged (with their `merge_commit_sha`), PRs
 open, gate-failed count, stalled-run count, agents currently on cooldown,
-plus an embedded `fleetctl status --json` block "for machines" -- at most
-once per UTC calendar day, at `--daily-summary-hour` (default 9, 0-23
-UTC). `--alert-macos` does not post a daily summary (an ephemeral
+plus an embedded `fleetctl status --json` block "for machines" (its
+`metrics` field is the same per-agent throughput table sec 11 describes) --
+at most once per UTC calendar day, at `--daily-summary-hour` (default 9,
+0-23 UTC). `--alert-macos` does not post a daily summary (an ephemeral
 notification isn't the right shape for a multi-paragraph report).
 
 ## 10. Stale-image awareness
@@ -698,3 +724,214 @@ are the two ways to clear the warning.
 This only tracks merges `fleetctl run` performed itself (`--auto-merge`);
 a commit landed by a human merging a PR by hand isn't reflected in
 `last_merge_at`.
+
+## 11. Per-agent throughput metrics
+
+`control.BuildMetrics` computes one `AgentMetrics` row per distinct agent
+spec seen in `state.json`'s runs -- shown as `fleetctl status`'s `METRICS`
+table, `status --json`'s `metrics` field, and embedded in the `--alert-issue`
+daily summary (sec 9). Nothing new is persisted for this: every input is
+already on disk -- `state.json` itself (run records, `cooldowns`, the
+persisted plan's `--cooldown`/`--window`/`--window-budget` maps) plus each
+run's own `<out>/summary.json` and `<out>/state.json` (the per-owner record
+`docs/CONTAINER_AGENT.md` documents: `status` -- `"accepted"` once matched --
+and a cumulative `iterations` count, with a timestamped `history` entry per
+generator batch).
+
+Per agent:
+
+- **`runs`** -- how many `state.json` run records have this agent.
+- **`iterations`** -- the sum, across every one of those runs' own
+  `<out>/state.json`, of every owner's `iterations` count.
+- **`accepts`** -- how many of those owners have `status == "accepted"`.
+- **`accepts_per_wall_hour`** -- `accepts` divided by summed wall-clock
+  hours, one run's own contribution read from its `<out>/summary.json`'s
+  `wall_seconds` (`tools/container_agent.py`'s `_finalize_run`) when
+  present, else `ended_at - started_at` (`now` in place of `ended_at` for a
+  run still `running`). Like `summary.json`'s own `wall_seconds`, this is
+  only the *current* attempt's process lifetime -- a repeatedly `--resume`d
+  run's wall-clock time from earlier attempts is not summed in (the same
+  simplification sec 6 already notes for `Attempt`/cooldown accounting).
+- **`quota_window`** / **`accepts_per_window`** -- `quota_window` is this
+  agent's configured window length: its own `--window` entry if the plan
+  has one, else its own `--cooldown` entry (the task's own "e.g. kimi=5h"
+  example -- a `--cooldown`-only agent's window defaults to the same
+  duration its generator-exhaustion backoff uses), else a 24h default.
+  `accepts_per_window` is `accepts` normalized to that window length:
+  `accepts / (wall_seconds / quota_window_seconds)`.
+- **`window_budget`** -- this agent's `--window-budget` entry, if the plan
+  has one; informational only (0/omitted otherwise), not read by any
+  scheduling decision.
+- **`mean_iterations_to_accept`** -- the mean, over every owner this
+  agent's runs accepted, of that owner's own `iterations` count at
+  acceptance (0/omitted with no accepts yet).
+- **`on_cooldown`** / **`cooldown_until`** -- from `state.json`'s
+  `cooldowns` map, exactly like the `COOLDOWNS` table.
+
+`fleetctl status` (no `--json`) reads live (`time.Now()`); `status --json`
+and the daily summary do the same. There is no injectable clock for this
+path the way the control loop itself has one (`Loop.Now`, tests only) --
+`accepts_per_wall_hour`/`accepts_per_window` for a still-`running` run
+change slightly between two `status` calls a moment apart, same as the
+`COOLDOWNS` table's own "remaining" column already does.
+
+## 12. Quota-window-aware scheduling
+
+An agent commonly has a real quota window shorter than how long a fleet
+runs (e.g. a subscription plan that resets every 5h) -- `--cooldown` alone
+already reacts to hitting that limit (`generator_exhausted` -> cool down ->
+resume), but every queued partition assigned to that agent still just sits
+idle for the whole cooldown even when another configured agent has spare
+capacity right now. `--window AGENT=DURATION` (sec 1) names each agent's
+known window length, and `run`'s control loop uses it (together with
+`state.json`'s own tracked window start/exhaustion, `window_state`) to keep
+those partitions moving instead:
+
+- **Window start.** The first time an agent launches anything (fresh, or
+  its first launch after a cooldown), `state.json`'s `window_state[agent]`
+  records `window_start = now`.
+- **Exhaustion.** A `generator_exhausted` exit (sec 2) still cools that
+  agent down exactly as before, and additionally zeroes
+  `window_state[agent].window_start` and stamps `last_exhausted = now` --
+  its window has ended.
+- **Reassignment instead of idling.** `launchEligible` (sec 1 step 4), on
+  reaching a queued partition whose agent is currently on cooldown, no
+  longer just leaves it queued: it looks for another agent from the plan's
+  own `--agent` roster (deduplicated by agent name) that is itself neither
+  on cooldown nor at its own `--agent-concurrency` cap, and launches the
+  partition under that agent instead -- `RunSpec.Agent`/`Model`/`Effort` are
+  rewritten to the reassigned agent, and the run's `note` records the
+  reassignment (`"reassigned kimi->codex (cooldown)"`), so `fleetctl
+  status`'s NOTE column shows it. Every reassignment is also logged. A plan
+  with only one configured agent (or one where every other agent is
+  likewise unavailable) has nothing to reassign to, so it falls back to
+  exactly the pre-sec-12 behaviour: `wait_reason: "cooldown"`, retried next
+  pass.
+- **Rebalancing once a window reopens.** Among agents with spare capacity,
+  one whose window has *just* reopened -- its cooldown has lapsed since it
+  was last exhausted, but it has not yet been relaunched (`window_start`
+  still zero) -- is preferred first, so the fleet swings load back onto it
+  rather than leaving it starved by an ordinary round robin that happens to
+  keep landing on other agents. Otherwise, eligible agents are walked
+  round-robin from `state.json`'s persisted `reassign_cursor`, which
+  advances past whichever agent is picked (and survives a restart).
+
+None of this changes what `--agent-concurrency`/`--cooldown` themselves
+mean -- a reassigned partition still counts against its *new* agent's own
+cap once launched, and a cooling-down agent is still genuinely unavailable
+for new work of its own until its cooldown lapses. `--window`/
+`--window-budget` are otherwise inert for scheduling beyond feeding this
+reassignment preference and sec 11's metrics -- they do not, for instance,
+cap how much work an agent is handed within a window.
+
+## 13. The permuter-only lane
+
+Some owners plateau at a *register tie* or a normalized-only match: the
+generator-driven loop (`docs/CONTAINER_AGENT.md`) cannot close the gap with
+another prompted batch, but `decomp-permuter` grinding on the tied
+candidate for a while longer sometimes can. `tools/container_agent.py`
+(`--mode permuter-only`, another change) writes every such owner, whichever
+run it happened on, to that run's own `<out>/tie-pool.json` --
+`{owner: {source, body, declarations, raw, label}}`. `fleetctl run` collects
+these across every run of a file and periodically launches a dedicated,
+generator-free container against just that file's pending pool.
+
+**Collection.** At the end of every run's merge step (`runMerge`, sec 2,
+after `matched_owners` is known -- any run, permuter-lane or not, can
+plateau into a `tie-pool.json`), `updateTiePool` merges that run's own
+`<out>/tie-pool.json` (if it wrote one) into
+`<runs-dir>/tie-pools/<fileslug>.json` -- one persisted store per source
+file, `<fileslug>` the same `disasm/src/fragments/79/fragment79_3BF4C0.c` ->
+`fragment79_3BF4C0` mapping sec 5 already uses for branch names. Any owner
+that run's own `matched_owners` just landed is then dropped from the store
+("owners removed once matched") -- a tie a later run actually resolves
+never lingers in the pool forever.
+
+**Enqueueing.** `Replan` (sec 8), after reconciling the queue, enqueues one
+fresh permuter-only partition per `<runs-dir>/tie-pools/*.json` store that
+still has at least one pending owner and no permuter-lane run already
+active for that file (queued/running/merging/`pr_open`/requeued/
+`merge_blocked_dirty`) -- so a store is never given two overlapping
+partitions. The new `RunSpec` covers every owner currently in that store,
+with `agent: "permuter"` and `mode: "permuter-only"`.
+
+**Launch.** `launch()` copies the file's tie-pool store into
+`<out>/tie-pool-input.json` and passes it to `container/run.sh` as:
+
+    RUN_DETACHED=1 AGENT=permuter bash container/run.sh <file> <out> \
+        --mode permuter-only --tie-pool-file /out/tie-pool-input.json \
+        --permuter-seconds 1200 --owners <owner1,owner2,...>
+
+`--permuter-seconds` is `run`'s own `--permuter-seconds` flag (default
+1200) -- unlike an ordinary launch, **no `--budget-seconds` is passed at
+all**: the permuter-only driver stops on `--permuter-seconds`/plateau, not
+a wall-clock budget. The `permuter` agent spec carries no model and no API
+key (`AGENT=permuter`, no `GENERATOR_MODEL`) -- it is never a target
+`fleetctl plan --agent` accepts on the command line; `enqueuePermuterLane`
+is the only code path that ever creates one. From here a permuter-lane run
+is an ordinary `RunRecord`: it is polled, its exit still hands off to the
+same merge/branch/PR step (sec 2) for whatever it managed to land, and any
+still-plateaued owner it reports lands right back in the tie-pool store via
+the collection step above.
+
+**Never subject to cooldown, never counts against a model agent's cap.**
+`launchEligible` never evaluates the on-cooldown case for `agent ==
+"permuter"` at all (sec 12's reassignment logic also never treats it as a
+candidate target); a `generator_exhausted` exit for it (which should never
+happen -- there is no generator to exhaust) is requeued with `--resume` and
+skips the cooldown/window bookkeeping entirely, defensively. A permuter-lane
+run counts toward the global `--max-concurrent` cap exactly like any other
+launch, but toward no agent's own `--agent-concurrency` cap except its own
+(`byAgent["permuter"]`, which nothing else ever shares) -- a fleet that
+never configures `--agent-concurrency permuter=N` leaves it uncapped
+per-agent by construction.
+
+**`container/entrypoint.sh` needs one more case for this to actually run
+key-free.** `entrypoint.sh`'s auth guard (its `case "$AGENT" in ...`
+block) already has no case for `AGENT=permuter` and falls through the
+default `*)` branch, which does not demand a key -- so the guard itself
+does not block this launch. But the block just above it,
+
+    if [ "$have_generator_cmd" -eq 0 ] && [ "$have_candidate_file" -eq 0 ]; then
+        args=(--generator-cmd "/work/container/generators/run_generator.sh {prompt} {batch}" "${args[@]}")
+    fi
+
+unconditionally defaults `--generator-cmd` onto the args whenever neither
+`--generator-cmd` nor `--candidate-file` was passed -- which is exactly the
+permuter-lane launch's shape (sec 13 passes neither). That silently hands
+`container_agent.py --mode permuter-only` a `--generator-cmd` it never
+asked for. `container/entrypoint.sh` was intentionally left untouched by
+this change (out of scope -- `container/agent.py`'s own `--mode
+permuter-only` support is a separate, concurrent change); it needs a third
+"caller already handles this" detector alongside `have_generator_cmd`/
+`have_candidate_file`, guarding *both* the default-`--generator-cmd`
+injection above and the auth-guard block right after it:
+
+    have_permuter_only=0
+    prev=""
+    for arg in "$@"; do
+        case "$arg" in
+            --generator-cmd|--generator-cmd=*) have_generator_cmd=1 ;;
+            --candidate-file|--candidate-file=*) have_candidate_file=1 ;;
+            --mode=permuter-only) have_permuter_only=1 ;;
+        esac
+        case "$prev $arg" in
+            "--mode permuter-only") have_permuter_only=1 ;;
+        esac
+        prev="$arg"
+    done
+
+    args=("$@")
+    if [ "$have_generator_cmd" -eq 0 ] && [ "$have_candidate_file" -eq 0 ] && [ "$have_permuter_only" -eq 0 ]; then
+        args=(--generator-cmd "/work/container/generators/run_generator.sh {prompt} {batch}" "${args[@]}")
+    fi
+
+    if [ "$have_candidate_file" -eq 0 ] && [ "$have_generator_cmd" -eq 0 ] && [ "$have_permuter_only" -eq 0 ]; then
+        AGENT="${AGENT:-claude}"
+        ...
+    fi
+
+(the auth-guard `if` already happens to be harmless for `AGENT=permuter`
+today, but gating it on `have_permuter_only` too keeps it that way
+deliberately, rather than by accident of `permuter` matching no known
+`case` arm.)

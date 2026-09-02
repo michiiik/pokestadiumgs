@@ -1203,7 +1203,9 @@ PROBE_TOOL_RULE_ON = """\
   parameter list, braces) -- the same shape a batch candidate's "body" must
   be, not a bare statement block. The working directory is the repo root, so
   "{source_rel}" and any relative paths you pass resolve from there. Do NOT
-  run make, fleet_probe.py, the permuter, or write into disasm/src yourself.
+  run make, fleet_probe.py, the permuter, import tools/try_pragma_compare.py or
+  call its Python API directly, or write into disasm/src yourself. probe_one.py is
+  the only sanctioned way to compile or compare.
 - Time budget: about {budget_minutes} minutes. Write a first batch file to
   {batch_path} within the first few minutes (even 8 rough candidates), then
   keep improving and OVERWRITE it whenever you have a better set. If you run
