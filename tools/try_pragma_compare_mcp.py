@@ -115,6 +115,7 @@ TOOLS = [
             "function": {"type": "string"},
             "code": {"type": "string", "description": "C body including its externs, as it would be sent to try_pragma_candidates."},
             "declarations": {"type": "string"},
+            "companion_edits": COMPANION_EDIT_ITEMS,
             "seconds": {"type": "number", "minimum": 5, "default": 60},
             "threads": {"type": "integer", "minimum": 1, "default": 4},
             "stop_on_zero": {"type": "boolean", "default": True},
@@ -259,6 +260,7 @@ def tool_permute_candidate(args):
             seconds=float(args.get("seconds", 60)),
             threads=int(args.get("threads", 4)),
             declarations=args.get("declarations"),
+            companion_edits=args.get("companion_edits"),
             stop_on_zero=bool(args.get("stop_on_zero", True)),
         )
     except (KeyError, FileNotFoundError, RuntimeError, ValueError) as error:
