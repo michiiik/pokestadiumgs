@@ -97,8 +97,14 @@ if [ "$have_candidate_file" -eq 0 ] && [ "$have_generator_cmd" -eq 0 ]; then
         claude)
             [ -n "${ANTHROPIC_API_KEY:-}" ] || fail_missing_key ANTHROPIC_API_KEY
             ;;
-        codex|openai_compat)
+        openai_compat)
             [ -n "${OPENAI_API_KEY:-}" ] || fail_missing_key OPENAI_API_KEY
+            ;;
+        codex)
+            if [ -z "${OPENAI_API_KEY:-}" ] && [ ! -f "${CODEX_HOME:-$HOME/.codex}/auth.json" ]; then
+                echo "entrypoint: AGENT=codex needs \$OPENAI_API_KEY or an auth.json under \${CODEX_HOME:-~/.codex} (container/run.sh mounts the host's copy)." >&2
+                exit 1
+            fi
             ;;
         qwen)
             if [ -z "${OPENAI_API_KEY:-}" ] && [ -z "${DASHSCOPE_API_KEY:-}" ]; then
