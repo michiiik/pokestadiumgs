@@ -249,6 +249,10 @@ def _new_owner_state() -> dict:
         "m2c_draft": None,
         "m2c_draft_fetched": False,
         "type_conflicts": [],
+        "examples": [],
+        "examples_fetched": False,
+        "tie_pool": False,
+        "last_declarations": "",
     }
 
 
@@ -669,6 +673,270 @@ def get_m2c_draft(
 
 
 # ---------------------------------------------------------------------------
+# Family worked examples
+#
+# AGENTS.md §2.5 step 2: "Start from the closest accepted winner's spelling,
+# not from m2c, when similarity is high and the length matches. Check the
+# neighbouring solved functions in the same file." A human agent gets this
+# for free from `draft_candidates`/`similar_solved`; a generator only sees
+# whatever this driver puts in the prompt. ``collect_family_examples``
+# fetches (once per owner per run, like ``get_m2c_draft``) up to
+# ``--examples`` already-matched functions of the same family and caches
+# them in ``owner_state["examples"]`` so ``--resume``/``--seed-from`` do not
+# refetch; ``build_prompt`` renders them as worked examples ahead of the
+# m2c draft and best-candidates feedback.
+# ---------------------------------------------------------------------------
+
+DEFAULT_EXAMPLES = 3
+# Total bytes of rendered example definitions kept per owner -- cheap
+# insurance against one huge accepted neighbour (a `large_mixed` owner, or a
+# candidate body with several helper definitions after it) blowing out the
+# prompt on its own; see build_prompt's own PROMPT_SIZE_CAP for the
+# whole-prompt guard this sits inside of.
+EXAMPLES_BYTE_CAP = 12_000
+
+# Same shape as tools/file_brief.py's own FUNCTION_DEF_RE/parse_functions:
+# a separate non-greedy "return type" group and a "name" group, anchored at
+# column 0 (no leading whitespace -- real top-level definitions in this
+# codebase are never indented). A single combined "prefix.*(name)" capture
+# would greedily prefer the LAST "name(" it can find on the line, which for
+# something like "    if (helper()) {" captures "helper" (a call inside the
+# condition), not "if" -- this two-group shape avoids that trap instead of
+# trying to deny-list control-flow keywords after the fact.
+_FUNC_DEF_HEADER_RE = re.compile(
+    r"^(?P<ret>[A-Za-z_][\w\s\*]*?)\s+(?P<name>[A-Za-z_]\w*)\s*\((?P<params>[^;{}]*)\)\s*\{", re.M,
+)
+
+
+def invoke_similar_solved(
+    repo_dir: Path, function: str, *, limit: int, timeout: float = MISC_TIMEOUT,
+) -> subprocess.CompletedProcess:
+    """Run ``tools/pragma_targets.py similar`` once. Isolated so tests can
+    stub it. ``function`` must currently own a pragma (``similar`` calls
+    ``require_owner`` internally and raises/exits non-zero otherwise) --
+    true for the owner this driver is actively working."""
+    return subprocess.run(
+        ["python3", "tools/pragma_targets.py", "similar", function, "--limit", str(limit)],
+        cwd=repo_dir, capture_output=True, text=True, timeout=timeout,
+    )
+
+
+def invoke_owner_family_row(
+    repo_dir: Path, source_rel: str, *, timeout: float = MISC_TIMEOUT,
+) -> subprocess.CompletedProcess:
+    """Run ``tools/pragma_targets.py targets --source <source_rel>`` once,
+    scoped to one file so ``collect_family_examples`` can read the active
+    owner's own ``family``/``asm`` row. Isolated so tests can stub it."""
+    return subprocess.run(
+        ["python3", "tools/pragma_targets.py", "targets", "--source", source_rel, "--limit", "100000"],
+        cwd=repo_dir, capture_output=True, text=True, timeout=timeout,
+    )
+
+
+def _owner_family_and_asm_dir(
+    repo_dir: Path, source_rel: str, owner: str, *, logger: Logger,
+) -> tuple[str | None, Path | None]:
+    """Best-effort ``(family, asm_dir)`` for ``owner`` from
+    ``pragma_targets.py targets --source <source_rel>``'s own row for it.
+    ``asm_dir`` is the ``disasm/asm/...`` directory ``owner``'s own ``.s``
+    lives in -- the same directory every other GLOBAL_ASM owner split from
+    that source file landed in, used as a cheap "same family cluster" proxy
+    for an already-matched sibling that no longer has a pragma row (and so
+    no ``family`` classification) of its own. ``(None, None)`` on any
+    failure -- this must never raise."""
+    try:
+        proc = invoke_owner_family_row(repo_dir, source_rel)
+    except (subprocess.TimeoutExpired, OSError) as exc:
+        logger.log(f"{owner}: family lookup failed: {exc}")
+        return None, None
+    if proc.returncode != 0:
+        return None, None
+    try:
+        rows = json.loads(proc.stdout).get("targets") or []
+    except (json.JSONDecodeError, AttributeError):
+        return None, None
+    for row in rows:
+        if isinstance(row, dict) and row.get("function") == owner:
+            family = row.get("family")
+            asm = row.get("asm")
+            asm_dir = Path(asm).parent if isinstance(asm, str) else None
+            return family, asm_dir
+    return None, None
+
+
+def _iter_defined_function_names(source_text: str, *, exclude: set[str]) -> list[str]:
+    """Names of top-level function definitions in ``source_text``
+    (``_FUNC_DEF_HEADER_RE``), in file order, excluding anything in
+    ``exclude`` (typically the file's still-pragma owners)."""
+    names: list[str] = []
+    seen: set[str] = set()
+    for match in _FUNC_DEF_HEADER_RE.finditer(source_text):
+        name = match.group("name")
+        if name in exclude or name in seen:
+            continue
+        seen.add(name)
+        names.append(name)
+    return names
+
+
+def _render_family_examples(examples: list[dict]) -> list[str]:
+    if not examples:
+        return []
+    lines = [
+        "== worked examples: already-matched functions of the same family "
+        "(study their spelling -- declaration order, types, control shape "
+        "-- before drafting; never resend one of these bodies verbatim) =="
+    ]
+    for example in examples:
+        family = example.get("family") or "unknown"
+        lines.append(f"== matched example (family {family}): {example.get('name')} ==")
+        size = example.get("size")
+        if size:
+            lines.append(f"   (.s size: {size} bytes)")
+        lines.append(example.get("definition") or "")
+    return lines
+
+
+def collect_family_examples(
+    repo_dir: Path,
+    owner: str,
+    source_rel: str,
+    owner_state: dict,
+    *,
+    count: int = DEFAULT_EXAMPLES,
+    logger: Logger,
+) -> list[dict]:
+    """Fetch (once per owner per run) and cache up to ``count`` already-
+    matched functions of ``owner``'s family, for ``build_prompt``'s worked-
+    examples section.
+
+    Prefers ``tools/pragma_targets.py similar <owner>`` (opcode-shape
+    similarity against every previously accepted candidate -- AGENTS.md
+    §2.5 step 2); each returned row's ``code`` is already a complete C
+    definition, taken verbatim. When that returns nothing usable, falls
+    back to other already-defined (non-pragma) functions in the same source
+    file -- preferring ones whose ``.s`` still lives in the owner's own
+    nonmatchings directory (the cheap "same family" signal: that is exactly
+    where ``list_targets``'s own family classification comes from) -- and,
+    only if that is still short of ``count``, other source files in the
+    same directory (e.g. a `fragments/NN/` overlay).
+
+    ``owner_state["examples_fetched"]`` remembers the attempt happened (even
+    a zero-result one) so this is never retried every iteration of the same
+    owner; ``owner_state["examples"]`` carries the cached list through
+    ``--resume``/``--seed-from``. Returns ``[]`` without marking the fetch
+    done when ``count <= 0`` (``--examples 0`` disables the feature
+    entirely, including the one-time lookups).
+    """
+    if owner_state.get("examples_fetched"):
+        return owner_state.get("examples") or []
+    if count <= 0:
+        return []
+    owner_state["examples_fetched"] = True
+    owner_state["examples"] = []
+
+    examples: list[dict] = []
+    budget = EXAMPLES_BYTE_CAP
+
+    def _add(name: str, family: str | None, definition: str, size: int | None) -> bool:
+        nonlocal budget
+        if budget <= 0:
+            return False
+        text = definition.strip() + "\n"
+        if len(text) > budget:
+            text = text[:budget].rstrip() + "\n/* ... truncated ... */\n"
+        examples.append({"name": name, "family": family, "definition": text, "size": size})
+        budget -= len(text)
+        return True
+
+    family, asm_dir = _owner_family_and_asm_dir(repo_dir, source_rel, owner, logger=logger)
+
+    try:
+        proc = invoke_similar_solved(repo_dir, owner, limit=count)
+    except (subprocess.TimeoutExpired, OSError) as exc:
+        logger.log(f"{owner}: `similar` lookup failed: {exc}; falling back to file/directory siblings")
+        proc = None
+
+    if proc is not None and proc.returncode == 0:
+        try:
+            rows = json.loads(proc.stdout)
+        except json.JSONDecodeError:
+            rows = []
+        for row in rows if isinstance(rows, list) else []:
+            if len(examples) >= count:
+                break
+            if not isinstance(row, dict):
+                continue
+            name, code = row.get("function"), row.get("code")
+            if not name or not code:
+                continue
+            if not _add(name, family, code, None):
+                break
+        if examples:
+            logger.log(f"{owner}: {len(examples)} family example(s) via `pragma_targets.py similar`")
+            owner_state["examples"] = examples
+            return examples
+
+    # Fallback: siblings already defined in the same source file, then (if
+    # still short) other files in the same directory.
+    try:
+        source_text = (repo_dir / source_rel).read_text(encoding="utf-8", errors="replace")
+    except OSError as exc:
+        logger.log(f"{owner}: could not read {source_rel} for family examples: {exc}")
+        owner_state["examples"] = examples
+        return examples
+
+    pragma_owners = {match.group(1) for match in PRAGMA_RE.finditer(source_text)}
+    pragma_owners.add(owner)
+    for name in _iter_defined_function_names(source_text, exclude=pragma_owners):
+        if len(examples) >= count:
+            break
+        definition = extract_installed_function(source_text, name)
+        if not definition:
+            continue
+        size = None
+        if asm_dir is not None:
+            candidate_asm = repo_dir / asm_dir / f"{name}.s"
+            try:
+                if candidate_asm.is_file():
+                    size = candidate_asm.stat().st_size
+            except OSError:
+                size = None
+        _add(name, family, definition, size)
+
+    if len(examples) < count:
+        directory = (repo_dir / source_rel).parent
+        try:
+            siblings = sorted(p for p in directory.glob("*.c") if p != (repo_dir / source_rel))
+        except OSError:
+            siblings = []
+        seen_names = {example["name"] for example in examples}
+        for sibling_path in siblings:
+            if len(examples) >= count:
+                break
+            try:
+                sibling_text = sibling_path.read_text(encoding="utf-8", errors="replace")
+            except OSError:
+                continue
+            sibling_pragma_owners = {match.group(1) for match in PRAGMA_RE.finditer(sibling_text)}
+            for name in _iter_defined_function_names(sibling_text, exclude=sibling_pragma_owners):
+                if len(examples) >= count:
+                    break
+                if name in seen_names:
+                    continue
+                definition = extract_installed_function(sibling_text, name)
+                if not definition:
+                    continue
+                seen_names.add(name)
+                _add(name, family, definition, None)
+
+    if examples:
+        logger.log(f"{owner}: {len(examples)} family example(s) from file/directory siblings")
+    owner_state["examples"] = examples
+    return examples
+
+
+# ---------------------------------------------------------------------------
 # Declaration hygiene (Part B)
 #
 # A generator often repeats a same-file callee's prototype in the batch's
@@ -935,7 +1203,9 @@ PROBE_TOOL_RULE_ON = """\
   parameter list, braces) -- the same shape a batch candidate's "body" must
   be, not a bare statement block. The working directory is the repo root, so
   "{source_rel}" and any relative paths you pass resolve from there. Do NOT
-  run make, fleet_probe.py, the permuter, or write into disasm/src yourself.
+  run make, fleet_probe.py, the permuter, import tools/try_pragma_compare.py or
+  call its Python API directly, or write into disasm/src yourself. probe_one.py is
+  the only sanctioned way to compile or compare.
 - Time budget: about {budget_minutes} minutes. Write a first batch file to
   {batch_path} within the first few minutes (even 8 rough candidates), then
   keep improving and OVERWRITE it whenever you have a better set. If you run
@@ -1096,6 +1366,7 @@ def build_prompt(
     batch_path: Path,
     tried_labels: list[str] | None = None,
     m2c_draft: str | None = None,
+    examples: list[dict] | None = None,
     probe_tool: bool = True,
     type_conflicts: list[dict] | None = None,
     generator_timeout_minutes: int = round(DEFAULT_GENERATOR_TIMEOUT / 60),
@@ -1119,6 +1390,9 @@ def build_prompt(
             f"== target assembly: {owner} ==",
             asm_text.strip(),
         ]
+        if examples:
+            parts.append("")
+            parts.extend(_render_family_examples(examples))
         if m2c_draft:
             parts.append("")
             parts.append("== m2c draft (structure hint, not a match; retype/reshape freely) ==")
@@ -2040,6 +2314,12 @@ def run_iteration(
             batch = decl_filtered_batch
             save_json(batch_path, batch)
 
+    # The most recent iteration's shared declarations -- an approximation
+    # (batches often keep the same file-level declarations across a run)
+    # used by record_tie_pool to seed a --mode permuter-only pass later,
+    # since a best_candidates entry only ever carries its own "body".
+    owner_state["last_declarations"] = batch.get("declarations") or ""
+
     if not (batch.get("candidates") or []):
         logger.log(f"{owner}: iter {iteration}: no candidates remain after dedup filtering; skipping probe")
         owner_state["plateau_count"] = owner_state.get("plateau_count", 0) + 1
@@ -2273,6 +2553,172 @@ def run_iteration(
 
 
 # ---------------------------------------------------------------------------
+# Tie pool: an owner that plateaus with a register-allocation tie or a
+# normalized-only best (raw well below the near-perfect normalized score --
+# see _is_normalized_only_match/docs/REGISTER_TIES.md) is not a source-shape
+# gap a generator is likely to close by writing more C; it is exactly what
+# --mode permuter-only (below) is for. record_tie_pool is called once an
+# owner's status has actually settled to "plateau" (main()'s owner loop) and
+# writes a cumulative <out>/tie-pool.json a later permuter-only pass (this
+# run's own --tie-pool-file, or another run's) reads back.
+# ---------------------------------------------------------------------------
+
+def _best_is_tie(entry: dict | None) -> bool:
+    """Whether a ``best_candidates``-shaped ``entry`` (the owner's own top
+    entry, already best-first) is a register-allocation tie worth handing to
+    the permuter: a normalized-only match (``normalized_only`` -- similarity
+    score near-1.0, raw similarity well below 0.95, see
+    ``_is_normalized_only_match``) or a runner-reported register-tie
+    futility (``futility`` starting with ``"register-tie"``, the same check
+    ``run_iteration``'s own permuter trigger uses)."""
+    if not entry:
+        return False
+    if entry.get("normalized_only"):
+        return True
+    return str(entry.get("futility") or "").startswith("register-tie")
+
+
+def record_tie_pool(out_dir: Path, owner: str, source_rel: str, owner_state: dict, *, logger: Logger) -> None:
+    """When ``owner``'s best plateaued attempt is a tie (``_best_is_tie``),
+    mark ``owner_state["tie_pool"] = True`` and append its best body/
+    declarations/raw/label to a cumulative ``<out_dir>/tie-pool.json``
+    (``{owner: {source, body, declarations, raw, label}}``) -- a later
+    ``--mode permuter-only`` pass's ``--tie-pool-file`` input. A no-op (and
+    ``tie_pool`` left at its default ``False``) when the owner's best is not
+    a tie, or it has no best_candidates entry at all (e.g. every batch this
+    run failed to generate)."""
+    best = (owner_state.get("best_candidates") or [None])[0]
+    if not _best_is_tie(best) or not best.get("body"):
+        return
+    owner_state["tie_pool"] = True
+    entry = {
+        "source": source_rel,
+        "body": best.get("body"),
+        "declarations": owner_state.get("last_declarations") or "",
+        "raw": best.get("raw_similarity_score"),
+        "label": best.get("label"),
+    }
+    path = out_dir / "tie-pool.json"
+    pool = load_json(path)
+    if not isinstance(pool, dict):
+        pool = {}
+    pool[owner] = entry
+    save_json(path, pool)
+    logger.log(f"{owner}: recorded to tie-pool.json (raw={entry['raw']}, label={entry['label']})")
+
+
+# ---------------------------------------------------------------------------
+# Region notes: a short, dated line appended to
+# <out_dir>/region-notes/<source path, "/" -> "__">.md on every accept and
+# every plateau -- in the exact section format tools/region_notes.py's own
+# append() produces (see that tool's docstring) -- so a later host-side step
+# (tools/container_merge.py) can fold it into docs/regions/<source_rel>.md
+# verbatim. Written under --out, never into the tracked docs/regions/ tree
+# directly: a container's checkout has no business editing that tree itself
+# (AGENTS.md's shared-checkout rules are a host-only concern).
+# ---------------------------------------------------------------------------
+
+def _region_note_section(text: str) -> str:
+    """Mirror ``tools/region_notes.py``'s ``append()`` section format: a
+    dated ``## YYYY-MM-DD`` heading followed by the note text."""
+    date = datetime.now(timezone.utc).date().isoformat()
+    return f"## {date}\n\n{text.strip()}\n"
+
+
+def append_region_note(out_dir: Path, source_rel: str, text: str) -> Path:
+    """Append ``text`` as one dated section to
+    ``<out_dir>/region-notes/<source_rel, "/" -> "__">.md``, creating it
+    with the same header ``tools/region_notes.py``'s own ``append()`` writes
+    for a brand-new file. Never rewrites existing content -- always adds
+    after it, exactly like the host-side tool."""
+    path = out_dir / "region-notes" / (source_rel.replace("/", "__") + ".md")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    section = _region_note_section(text)
+    if not path.exists():
+        header = (
+            f"# Region notes -- {source_rel}\n\n"
+            "Per-file spellings, skip lists, and unsolved shapes for this "
+            "source file. Delivered to agents by `tools/file_brief.py`; "
+            "extend it with `tools/region_notes.py append`.\n\n"
+        )
+        path.write_text(header + section, encoding="utf-8")
+    else:
+        with path.open("a", encoding="utf-8") as handle:
+            handle.write("\n" + section)
+    return path
+
+
+def _read_accepted_label(out_dir: Path, owner: str) -> str | None:
+    data = load_json(out_dir / "accepted" / f"{owner}.json")
+    if isinstance(data, dict):
+        label = data.get("label")
+        if isinstance(label, str) and label:
+            return label
+    return None
+
+
+def _type_conflict_note_lines(owner_state: dict) -> list[str]:
+    """One line per companion-edit TYPE CONFLICT recorded this run (see
+    ``filter_declarations``/``run_iteration``): ``"<callee> is <new sig>,
+    not <old sig>"``. A conflict where the name was itself a still-pragma
+    owner (no companion edit made -- see ``filter_declarations``) is not
+    included; there is nothing to hand the host a retype for."""
+    lines = []
+    for conflict in owner_state.get("type_conflicts") or []:
+        if not conflict.get("companion_edit"):
+            continue
+        lines.append(
+            f"TYPE CONFLICT: {conflict.get('name')} is {conflict.get('batch_signature')}, "
+            f"not {conflict.get('file_signature')}"
+        )
+    return lines
+
+
+def _accept_region_note_text(owner: str, out_dir: Path, owner_state: dict) -> str:
+    label = _read_accepted_label(out_dir, owner) or owner_state.get("best_label") or "accepted"
+    agent = os.environ.get("AGENT", "unknown")
+    lines = [f"{owner}: matched ({label}), {owner_state.get('iterations', 0)} iterations, agent {agent}"]
+    lines.extend(_type_conflict_note_lines(owner_state))
+    return "\n".join(lines)
+
+
+def _plateau_region_note_text(owner: str, owner_state: dict) -> str:
+    best = owner_state.get("best_similarity")
+    raw = owner_state.get("best_raw_similarity")
+    top = (owner_state.get("best_candidates") or [None])[0] or {}
+    kind = top.get("mismatch_kind") or "unknown"
+    families = sorted({
+        (label.split(":", 1)[0] if ":" in label else label)
+        for label in owner_state.get("tried_labels") or []
+    })
+    tie_pool = "tie-pool yes" if owner_state.get("tie_pool") else "tie-pool no"
+    lines = [
+        f"{owner}: plateau at {best} (raw {raw}), mismatch {kind}; "
+        f"tried families: {', '.join(families) if families else '(none)'}; {tie_pool}"
+    ]
+    lines.extend(_type_conflict_note_lines(owner_state))
+    return "\n".join(lines)
+
+
+def record_region_note(
+    out_dir: Path, source_rel: str, owner: str, owner_state: dict, *, status: str, logger: Logger,
+) -> None:
+    """Append a region note for an owner that just ended in ``"accepted"``
+    or ``"plateau"`` this run (see ``_accept_region_note_text``/
+    ``_plateau_region_note_text``); a no-op for any other terminal status
+    (``budget_expired``, ``max_iterations``, ``generator_failed``, ...) --
+    those are run/box bookkeeping, not durable knowledge about the file."""
+    if status == "accepted":
+        text = _accept_region_note_text(owner, out_dir, owner_state)
+    elif status == "plateau":
+        text = _plateau_region_note_text(owner, owner_state)
+    else:
+        return
+    path = append_region_note(out_dir, source_rel, text)
+    logger.log(f"{owner}: region note appended to {path}")
+
+
+# ---------------------------------------------------------------------------
 # Per-owner loop: generate -> probe -> react, until a terminal state
 # ---------------------------------------------------------------------------
 
@@ -2297,12 +2743,16 @@ def process_owner(
     permuter_bodies: int = DEFAULT_PERMUTER_BODIES,
     probe_tool: bool = True,
     summary: dict | None = None,
+    examples_count: int = DEFAULT_EXAMPLES,
 ) -> str:
     if gen_failures is None:
         gen_failures = {"consecutive": 0}
     file_brief = file_brief_text(repo_dir, source_rel)
     asm_text = owner_asm_text(repo_dir, owner)
     m2c_draft = get_m2c_draft(repo_dir, owner, owner_state, logger=logger)
+    examples = collect_family_examples(
+        repo_dir, owner, source_rel, owner_state, count=examples_count, logger=logger,
+    )
     # In-flight background permuter jobs (Part D), local to this owner's
     # loop: started right after a triggering probe result, polled at the
     # start of the next iteration's prompt build and again after that
@@ -2342,7 +2792,7 @@ def process_owner(
             owner=owner, source_rel=source_rel, file_brief=file_brief, asm_text=asm_text,
             best_candidates=owner_state["best_candidates"],
             permuter_seed=owner_state.get("permuter_seed"), batch_path=batch_path,
-            tried_labels=owner_state.get("tried_labels"), m2c_draft=m2c_draft,
+            tried_labels=owner_state.get("tried_labels"), m2c_draft=m2c_draft, examples=examples,
             probe_tool=probe_tool, type_conflicts=owner_state.get("type_conflicts"),
             generator_timeout_minutes=max(1, round(gen_timeout / 60.0)),
         )
@@ -2481,6 +2931,217 @@ def process_owner(
 
     owner_state["status"] = "max_iterations"
     return "max_iterations"
+
+
+# ---------------------------------------------------------------------------
+# --mode permuter-only: skip the generator entirely and run the permuter
+# straight off whatever best body an owner already has in state (imported
+# via --seed-from and/or --tie-pool-file below). Meant to run overnight over
+# a tie pool a normal run's plateaus already flagged (docs/REGISTER_TIES.md:
+# "coordinators run the permuter overnight ... instead of looping agents
+# through the same class of diff") -- there is no next generator call to
+# overlap with here, so (unlike Part D's background jobs) this runs the
+# permuter in the foreground, one body at a time.
+# ---------------------------------------------------------------------------
+
+DEFAULT_PERMUTER_ONLY_SECONDS = 1200.0
+
+
+def load_tie_pool_file(path: Path) -> dict:
+    """Load a ``--tie-pool-file`` (the same shape ``record_tie_pool`` writes
+    to ``<out>/tie-pool.json``: ``{owner: {source, body, declarations, raw,
+    label}}``). ``{}`` for a missing/unreadable/wrong-shaped file."""
+    data = load_json(path)
+    return data if isinstance(data, dict) else {}
+
+
+def seed_state_from_tie_pool(state: dict, tie_pool: dict, *, logger: Logger) -> None:
+    """Merge a ``--tie-pool-file``'s entries into ``state`` as a seed
+    ``best_candidates`` entry for ``--mode permuter-only``, for any owner
+    ``--seed-from`` did not already supply a (presumably better-tracked)
+    ``best_candidates`` pool for. Mutates ``state`` in place."""
+    for owner, entry in tie_pool.items():
+        if not isinstance(entry, dict):
+            continue
+        body = entry.get("body")
+        if not body:
+            continue
+        owner_state = state.setdefault(owner, _new_owner_state())
+        if owner_state.get("best_candidates"):
+            continue
+        owner_state["best_candidates"] = [{
+            "label": entry.get("label") or "tie-pool",
+            "similarity_score": None,
+            "raw_similarity_score": entry.get("raw"),
+            "mismatch_kind": None,
+            "futility": None,
+            "diagnostic": "seeded from --tie-pool-file",
+            "body": body,
+            "normalized_only": False,
+            "feedback": {},
+        }]
+        if entry.get("declarations"):
+            owner_state["last_declarations"] = entry["declarations"]
+        logger.log(f"{owner}: seeded permuter-only body from tie-pool file (raw={entry.get('raw')})")
+
+
+def _permuter_only_seed_bodies(owner_state: dict, *, limit: int) -> list[tuple[str, str]]:
+    """Up to ``limit`` distinct ``(label, body)`` pairs from
+    ``owner_state["best_candidates"]`` (already best-first), the material a
+    ``--mode permuter-only`` pass runs the permuter on."""
+    selected: list[tuple[str, str]] = []
+    seen: set[str] = set()
+    for entry in owner_state.get("best_candidates") or []:
+        body = entry.get("body")
+        if not body:
+            continue
+        key = _normalize_body_for_dedup(body)
+        if key in seen:
+            continue
+        seen.add(key)
+        selected.append((entry.get("label") or "seed", body))
+        if len(selected) >= limit:
+            break
+    return selected
+
+
+def process_owner_permuter_only(
+    *,
+    repo_dir: Path,
+    out_dir: Path,
+    source_rel: str,
+    owner: str,
+    owner_state: dict,
+    state: dict,
+    state_path: Path,
+    deadline: float,
+    permuter_seconds: float,
+    permuter_bodies: int,
+    logger: Logger,
+    summary: dict | None = None,
+) -> str:
+    """One owner's pass under ``--mode permuter-only``: never calls the
+    generator. Takes up to ``permuter_bodies`` distinct seed bodies from
+    ``owner_state["best_candidates"]`` (``_permuter_only_seed_bodies`` --
+    populated by ``--seed-from`` and/or ``seed_state_from_tie_pool``) and
+    runs the permuter on each in turn. The first output with score 0 is
+    probed as a one-candidate batch (label ``"permuter:zero"``) through
+    ``run_iteration`` -- the same probe/gate path a normal run uses, so an
+    actual accept writes ``accepted/<owner>.json`` exactly as it always
+    does. When no body produced a score-0 output, the lowest-scoring output
+    across every body tried is recorded as a new (unprobed)
+    ``best_candidates[0]`` entry -- the seed a *later* permuter-only pass
+    over this same ``--out`` (or a fresh one seeded from it) starts closer
+    from -- and this owner is done for the pass.
+
+    Returns ``"accepted"``, ``"plateau"`` (ran but did not gate, or nothing
+    to try), ``"budget_expired"``, or ``"terminated"``.
+    """
+    if time.monotonic() >= deadline:
+        owner_state["status"] = "budget_expired"
+        return "budget_expired"
+    if stop_requested():
+        owner_state["status"] = "terminated"
+        return "terminated"
+
+    bodies = _permuter_only_seed_bodies(owner_state, limit=max(1, permuter_bodies))
+    if not bodies:
+        logger.log(
+            f"{owner}: permuter-only: no seed body in best_candidates (--seed-from/"
+            "--tie-pool-file supplied nothing for this owner); skipping"
+        )
+        owner_state["status"] = "plateau"
+        return "plateau"
+
+    declarations = owner_state.get("last_declarations") or ""
+    best_output: dict | None = None
+    zero_output: dict | None = None
+    tried = 0
+    for index, (label, body) in enumerate(bodies):
+        if stop_requested():
+            owner_state["status"] = "terminated"
+            return "terminated"
+        remaining = deadline - time.monotonic()
+        if remaining < 10.0:
+            owner_state["status"] = "budget_expired"
+            return "budget_expired"
+        budget = min(permuter_seconds, remaining)
+        logger.log(
+            f"{owner}: permuter-only: running permuter on body {index + 1}/{len(bodies)} "
+            f"(label={label}, budget={budget:.0f}s)"
+        )
+        result = run_permuter(
+            repo_dir, out_dir, owner, owner_state.get("iterations", 0), body, declarations,
+            permuter_seconds=budget, logger=logger, label_suffix=f"_po{index}",
+        )
+        tried += 1
+        if result is None:
+            continue
+        for output in result.get("outputs") or []:
+            if best_output is None or output["score"] < best_output["score"]:
+                best_output = output
+            if output["score"] == 0 and zero_output is None:
+                zero_output = output
+        if zero_output is not None:
+            logger.log(f"{owner}: permuter-only: body {index + 1} produced a score-0 output; probing it")
+            break
+
+    if zero_output is not None:
+        batch = {
+            "source": source_rel,
+            "declarations": declarations,
+            "candidates": [{"function": owner, "label": "permuter:zero", "body": zero_output["code"]}],
+        }
+        iteration = owner_state.get("iterations", 0)
+        batch_path = out_dir / "batches" / f"{owner}_permuter_only_iter{iteration}.json"
+        save_json(batch_path, batch)
+        status = run_iteration(
+            repo_dir=repo_dir, out_dir=out_dir, source_rel=source_rel, owner=owner,
+            iteration=iteration, batch=batch, batch_path=batch_path, owner_state=owner_state,
+            deadline=deadline, permuter_seconds=0.0, logger=logger,
+        )
+        owner_state["iterations"] = iteration + 1
+        if summary is not None:
+            summary["iteration_counts"][owner] = owner_state["iterations"]
+            summary["best_per_owner"][owner] = owner_state["best_similarity"]
+        _save_state(state, state_path, repo_dir=repo_dir, out_dir=out_dir, summary=summary)
+        if status == "accepted":
+            owner_state["status"] = "accepted"
+            logger.log(f"{owner}: permuter-only: ACCEPTED via permuter:zero")
+            return "accepted"
+        if status == "terminated":
+            owner_state["status"] = "terminated"
+            return "terminated"
+        if status == "budget_expired":
+            owner_state["status"] = "budget_expired"
+            return "budget_expired"
+        logger.log(f"{owner}: permuter-only: permuter:zero candidate did not gate (status={status})")
+        owner_state["status"] = "plateau"
+        return "plateau"
+
+    if best_output is not None:
+        logger.log(
+            f"{owner}: permuter-only: no score-0 output across {tried} body/bodies tried; "
+            f"recording best output (score={best_output['score']}) as the new seed body"
+        )
+        owner_state.setdefault("best_candidates", []).insert(0, {
+            "label": "permuter-only:best",
+            "similarity_score": None,
+            "raw_similarity_score": None,
+            "mismatch_kind": None,
+            "futility": None,
+            "diagnostic": f"permuter-only best output, score={best_output['score']} (not probed)",
+            "body": best_output["code"],
+            "normalized_only": False,
+            "feedback": {},
+        })
+        owner_state["best_candidates"] = owner_state["best_candidates"][:BEST_CANDIDATES_KEPT]
+    else:
+        logger.log(f"{owner}: permuter-only: permuter produced no outputs for any of {tried} body/bodies tried")
+
+    owner_state["status"] = "plateau"
+    _save_state(state, state_path, repo_dir=repo_dir, out_dir=out_dir, summary=summary)
+    return "plateau"
 
 
 # ---------------------------------------------------------------------------
@@ -2760,11 +3421,46 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--plateau", type=int, default=6,
         help="stop an owner after N consecutive iterations with no best-similarity improvement",
     )
-    parser.add_argument("--permuter-seconds", type=float, default=300.0)
+    parser.add_argument(
+        "--permuter-seconds", type=float, default=None,
+        help=(
+            "default: 300 in --mode full, 1200 in --mode permuter-only (a foreground pass "
+            "over a tie pool warrants a longer budget than a background job squeezed "
+            "between generator calls)"
+        ),
+    )
     parser.add_argument(
         "--permuter-bodies", type=int, default=DEFAULT_PERMUTER_BODIES,
-        help="on a trigger, run the permuter on up to this many distinct bodies from that "
-             "iteration, each its own background process (default: 3)",
+        help="on a trigger (--mode full) or every owner (--mode permuter-only), run the "
+             "permuter on up to this many distinct bodies (default: 3)",
+    )
+    parser.add_argument(
+        "--examples", type=int, default=DEFAULT_EXAMPLES,
+        help=(
+            "up to this many already-matched functions of the active owner's family, "
+            "rendered as worked examples in the prompt (see collect_family_examples); "
+            "0 disables the feature entirely (default: 3)"
+        ),
+    )
+    parser.add_argument(
+        "--mode", choices=["full", "permuter-only"], default="full",
+        help=(
+            "'full' (default): the normal generate/probe/permuter loop. "
+            "'permuter-only': never calls the generator -- for each owner, runs the "
+            "permuter directly on its best known body (from --seed-from and/or "
+            "--tie-pool-file) and probes a score-0 output through the normal gate path; "
+            "meant for an overnight pass over a tie pool a prior --mode full run flagged "
+            "(docs/REGISTER_TIES.md)"
+        ),
+    )
+    parser.add_argument(
+        "--tie-pool-file", type=Path,
+        help=(
+            "in --mode permuter-only, a JSON file shaped like tie-pool.json "
+            "({owner: {source, body, declarations, raw, label}}, see record_tie_pool) to "
+            "seed owners' best_candidates from, for any owner --seed-from did not already "
+            "supply a pool for"
+        ),
     )
     parser.add_argument("--owners", help="comma-separated subset/order of owners to work (default: all, discovered)")
     parser.add_argument(
@@ -2875,6 +3571,13 @@ def main(argv: list[str] | None = None) -> int:
     probe_tool = probe_tool_arg != "off"
     started = time.monotonic()
     deadline = started + args.budget_seconds
+    # --permuter-seconds' default depends on --mode (see parse_args): a
+    # foreground permuter-only pass over a tie pool warrants a longer budget
+    # than a background job squeezed between two generator calls.
+    permuter_seconds = (
+        args.permuter_seconds if args.permuter_seconds is not None
+        else (DEFAULT_PERMUTER_ONLY_SECONDS if args.mode == "permuter-only" else 300.0)
+    )
 
     state_path = out_dir / "state.json"
     summary_path = out_dir / "summary.json"
@@ -2899,6 +3602,14 @@ def main(argv: list[str] | None = None) -> int:
                 state[owner] = owner_state
             if seeded:
                 _save_state(state, state_path, repo_dir=repo_dir, out_dir=out_dir)
+
+    if args.tie_pool_file:
+        tie_pool = load_tie_pool_file(args.tie_pool_file)
+        if tie_pool:
+            seed_state_from_tie_pool(state, tie_pool, logger=logger)
+            _save_state(state, state_path, repo_dir=repo_dir, out_dir=out_dir)
+        else:
+            logger.log(f"--tie-pool-file {args.tie_pool_file}: empty or unreadable, nothing seeded")
 
     prior_summary = load_json(summary_path) if args.resume else None
     runs: list[dict] = list((prior_summary or {}).get("runs") or [])
@@ -2932,7 +3643,7 @@ def main(argv: list[str] | None = None) -> int:
             summary=summary, started=started, logger=logger,
         )
 
-    if not args.generator_cmd:
+    if args.mode != "permuter-only" and not args.generator_cmd:
         logger.log("error: --generator-cmd is required (or use --candidate-file for a one-shot test)")
         _finalize_run(summary, out_dir, "no_generator", started, repo_dir=repo_dir)
         return 2
@@ -2967,19 +3678,37 @@ def main(argv: list[str] | None = None) -> int:
                 summary["matched"].append(owner)
             continue
         summary["owners_attempted"].append(owner)
-        status = process_owner(
-            repo_dir=repo_dir, out_dir=out_dir, source_rel=source_rel, owner=owner,
-            owner_state=owner_state, state=state, state_path=state_path, deadline=deadline,
-            max_iterations=args.max_iterations, plateau=args.plateau,
-            permuter_seconds=args.permuter_seconds, generator_cmd=args.generator_cmd, logger=logger,
-            gen_failures=gen_failures, max_generator_failures=args.max_generator_failures,
-            generator_timeout=args.generator_timeout, permuter_bodies=args.permuter_bodies,
-            probe_tool=probe_tool, summary=summary,
-        )
+        if args.mode == "permuter-only":
+            status = process_owner_permuter_only(
+                repo_dir=repo_dir, out_dir=out_dir, source_rel=source_rel, owner=owner,
+                owner_state=owner_state, state=state, state_path=state_path, deadline=deadline,
+                permuter_seconds=permuter_seconds, permuter_bodies=args.permuter_bodies,
+                logger=logger, summary=summary,
+            )
+        else:
+            status = process_owner(
+                repo_dir=repo_dir, out_dir=out_dir, source_rel=source_rel, owner=owner,
+                owner_state=owner_state, state=state, state_path=state_path, deadline=deadline,
+                max_iterations=args.max_iterations, plateau=args.plateau,
+                permuter_seconds=permuter_seconds, generator_cmd=args.generator_cmd, logger=logger,
+                gen_failures=gen_failures, max_generator_failures=args.max_generator_failures,
+                generator_timeout=args.generator_timeout, permuter_bodies=args.permuter_bodies,
+                probe_tool=probe_tool, summary=summary, examples_count=args.examples,
+            )
         summary["iteration_counts"][owner] = owner_state["iterations"]
         summary["best_per_owner"][owner] = owner_state["best_similarity"]
         if status == "accepted":
             summary["matched"].append(owner)
+        # Tie pool (docs/REGISTER_TIES.md) and region notes (AGENTS.md §2
+        # rule 11/§4): both keyed off the owner's actual terminal status
+        # this run, not which mode produced it, so a permuter-only pass
+        # over a tie pool records/updates the same durable knowledge a full
+        # run's plateau does. Tie pool first: the plateau note's own
+        # "tie-pool yes/no" line reads owner_state["tie_pool"].
+        if status == "plateau":
+            record_tie_pool(out_dir, owner, source_rel, owner_state, logger=logger)
+        if status in ("accepted", "plateau"):
+            record_region_note(out_dir, source_rel, owner, owner_state, status=status, logger=logger)
         _save_state(state, state_path, repo_dir=repo_dir, out_dir=out_dir, summary=summary)
         if status == "budget_expired":
             stopped_reason = "budget_expired"

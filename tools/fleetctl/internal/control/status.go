@@ -31,8 +31,8 @@ type RunStatus struct {
 }
 
 // StatusJSON is `fleetctl status --json`'s whole document: one row per run,
-// the cooldowns table, and the same running/queued summary the table's
-// last line prints.
+// the cooldowns table, the per-agent-spec METRICS table (sec 11), and the
+// same running/queued summary the table's last line prints.
 type StatusJSON struct {
 	Runs           []RunStatus          `json:"runs"`
 	Cooldowns      map[string]time.Time `json:"cooldowns,omitempty"`
@@ -40,6 +40,7 @@ type StatusJSON struct {
 	Running        int                  `json:"running"`
 	Queued         int                  `json:"queued"`
 	RunningByAgent map[string]int       `json:"running_by_agent,omitempty"`
+	Metrics        []AgentMetrics       `json:"metrics,omitempty"`
 }
 
 // BuildStatus renders state into StatusJSON -- shared by `fleetctl status
@@ -89,5 +90,6 @@ func BuildStatus(state *fleetstate.State) StatusJSON {
 		Running:        total,
 		Queued:         len(state.Queue),
 		RunningByAgent: byAgent,
+		Metrics:        BuildMetrics(state, time.Now()),
 	}
 }

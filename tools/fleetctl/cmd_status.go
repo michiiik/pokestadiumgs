@@ -104,6 +104,8 @@ func printStatusTable(w *os.File, state *fleetstate.State) {
 		}
 	}
 
+	printMetricsTable(w, control.BuildMetrics(state, time.Now()))
+
 	total, byAgent := state.RunningCount()
 	agentSummary := make([]string, 0, len(byAgent))
 	for a, n := range byAgent {
@@ -111,6 +113,30 @@ func printStatusTable(w *os.File, state *fleetstate.State) {
 	}
 	sort.Strings(agentSummary)
 	fmt.Fprintf(w, "\nrunning=%d queued=%d (%s)\n", total, len(state.Queue), strings.Join(agentSummary, " "))
+}
+
+// printMetricsTable prints `fleetctl status`'s METRICS table (docs sec 11):
+// one row per agent spec seen in state.Runs, with its throughput and mean
+// iterations-to-accept, plus a trailing COOLDOWN column mirroring the
+// COOLDOWNS section above but scoped to this one table.
+func printMetricsTable(w *os.File, metrics []control.AgentMetrics) {
+	if len(metrics) == 0 {
+		return
+	}
+	fmt.Fprintf(w, "\nMETRICS:\n%-12s %-6s %-8s %-8s %-10s %-10s %-10s %-12s %s\n",
+		"AGENT", "RUNS", "ITERS", "ACCEPTS", "ACC/HR", "WINDOW", "ACC/WIN", "MEAN-ITER", "COOLDOWN")
+	for _, m := range metrics {
+		cooldown := "-"
+		if m.OnCooldown {
+			cooldown = m.CooldownUntil.Format(time.RFC3339)
+		}
+		meanIter := "-"
+		if m.MeanIterationsToAccept > 0 {
+			meanIter = fmt.Sprintf("%.2f", m.MeanIterationsToAccept)
+		}
+		fmt.Fprintf(w, "%-12s %-6d %-8d %-8d %-10.2f %-10s %-10.2f %-12s %s\n",
+			m.Agent, m.Runs, m.Iterations, m.Accepts, m.AcceptsPerWallHour, m.QuotaWindow, m.AcceptsPerWindow, meanIter, cooldown)
+	}
 }
 
 // appendNote joins an additional clause onto note with "; ", the same

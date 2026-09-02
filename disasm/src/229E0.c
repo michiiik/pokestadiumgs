@@ -3422,7 +3422,20 @@ void GraphNode_RemoveChild(GraphNode38FD4 *root, GraphNodeLink *node) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003936C.s")
+extern u8 D_80124F68;
+void *func_8003936C(s32 arg0) {
+    void *var_v1;
+    struct PoolBase {
+        u8 pad[0x10A0];
+        s32 count;
+    };
+
+    var_v1 = NULL;
+    if (arg0 <= 0) {
+        var_v1 = (void *)((u8 *)&D_80124F68 + (((struct PoolBase *)&D_80124F68)->count << 6) + (arg0 << 6));
+    }
+    return var_v1;
+}
 #endif
 
 #ifdef VERSION_US

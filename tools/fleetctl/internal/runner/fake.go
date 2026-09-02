@@ -50,15 +50,20 @@ type Fake struct {
 	ImportStatsResult ProcessResult
 	ImportStatsErr    error
 
-	GitCheckoutNewBranchErr error
-	GitCheckoutErr          error
-	GitPushErr              error
-	GitPullFFErr            error
-	GitRevParseResult       string
-	GitRevParseErr          error
+	GitFetchErr              error
+	GitCheckoutNewBranchErr  error
+	GitCheckoutDetachErr     error
+	GitStatusPorcelainResult string
+	GitStatusPorcelainErr    error
+	GitPushErr               error
+	GitRevParseResult        string
+	GitRevParseErr           error
 
 	GhPRURL string
 	GhPRErr error
+
+	GhPRViewResult string
+	GhPRViewErr    error
 
 	// GhPRChecksFunc, when set, overrides GhPRChecksResult/GhPRChecksErr for
 	// full control keyed by PR number (e.g. a test driving one PR through
@@ -147,24 +152,29 @@ func (f *Fake) ImportStats(_ context.Context, outDir, repoRoot string) (ProcessR
 	return f.ImportStatsResult, f.ImportStatsErr
 }
 
+func (f *Fake) GitFetch(_ context.Context, repoRoot string) error {
+	f.record(Call{Method: "GitFetch", Strings: []string{repoRoot}})
+	return f.GitFetchErr
+}
+
 func (f *Fake) GitCheckoutNewBranch(_ context.Context, repoRoot, branch, from string) error {
 	f.record(Call{Method: "GitCheckoutNewBranch", Strings: []string{repoRoot, branch, from}})
 	return f.GitCheckoutNewBranchErr
 }
 
-func (f *Fake) GitCheckout(_ context.Context, repoRoot, ref string) error {
-	f.record(Call{Method: "GitCheckout", Strings: []string{repoRoot, ref}})
-	return f.GitCheckoutErr
+func (f *Fake) GitCheckoutDetach(_ context.Context, repoRoot, ref string) error {
+	f.record(Call{Method: "GitCheckoutDetach", Strings: []string{repoRoot, ref}})
+	return f.GitCheckoutDetachErr
+}
+
+func (f *Fake) GitStatusPorcelain(_ context.Context, repoRoot string) (string, error) {
+	f.record(Call{Method: "GitStatusPorcelain", Strings: []string{repoRoot}})
+	return f.GitStatusPorcelainResult, f.GitStatusPorcelainErr
 }
 
 func (f *Fake) GitPush(_ context.Context, repoRoot, branch string) error {
 	f.record(Call{Method: "GitPush", Strings: []string{repoRoot, branch}})
 	return f.GitPushErr
-}
-
-func (f *Fake) GitPullFF(_ context.Context, repoRoot string) error {
-	f.record(Call{Method: "GitPullFF", Strings: []string{repoRoot}})
-	return f.GitPullFFErr
 }
 
 func (f *Fake) GitRevParse(_ context.Context, repoRoot, ref string) (string, error) {
@@ -188,6 +198,11 @@ func (f *Fake) GhPRChecks(_ context.Context, repoRoot string, prNumber int) (PRC
 func (f *Fake) GhPRMerge(_ context.Context, repoRoot string, prNumber int) error {
 	f.record(Call{Method: "GhPRMerge", Strings: []string{repoRoot, fmt.Sprintf("%d", prNumber)}})
 	return f.GhPRMergeErr
+}
+
+func (f *Fake) GhPRView(_ context.Context, repoRoot string, prNumber int) (string, error) {
+	f.record(Call{Method: "GhPRView", Strings: []string{repoRoot, fmt.Sprintf("%d", prNumber)}})
+	return f.GhPRViewResult, f.GhPRViewErr
 }
 
 func (f *Fake) GhIssueComment(_ context.Context, repoRoot string, issueNumber int, body string) error {

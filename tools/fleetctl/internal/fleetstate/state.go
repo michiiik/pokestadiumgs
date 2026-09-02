@@ -35,6 +35,13 @@ const (
 	// StatusGateFailed is a StatusPROpen run whose PR's checks reported a
 	// FAILURE -- left open for manual triage, never auto-retried.
 	StatusGateFailed Status = "gate_failed"
+	// StatusMergeBlockedDirty is a run whose merge step found the merge
+	// repo already carrying uncommitted changes to a path the merge itself
+	// would touch (disasm/src/, COVERAGE.md, docs/regions/ -- see
+	// docs/FLEET_CONTROLLER.md sec 2, "the merge repo must be clean") and
+	// refused to branch or commit anything -- left exactly as-is, like
+	// StatusGateFailed, for an operator to resolve by hand.
+	StatusMergeBlockedDirty Status = "merge_blocked_dirty"
 )
 
 // RunSpec is one queued unit of work: one file, one partition of that
@@ -58,6 +65,16 @@ type RunSpec struct {
 	// matching container_agent.py's own rule that --seed-from is ignored
 	// together with --resume.
 	SeedDirs []string `json:"seed_dirs,omitempty"`
+	// Mode is "" (the ordinary generator-driven driver loop) or
+	// "permuter-only" (the permuter-only lane, docs/FLEET_CONTROLLER.md sec
+	// 13): a partition whose Agent is "permuter", launched with `--mode
+	// permuter-only --tie-pool-file ... --permuter-seconds N` instead of a
+	// generator/model, working owners collected from tie-pool.json across
+	// prior runs of this file rather than freshly-discovered pragma owners.
+	Mode string `json:"mode,omitempty"`
+	// PermuterSeconds is `--permuter-seconds` for a Mode == "permuter-only"
+	// partition; 0 means "use the control loop's own default" (sec 13).
+	PermuterSeconds int `json:"permuter_seconds,omitempty"`
 }
 
 // RunRecord is what fleetctl knows about one RunSpec's lifetime.
@@ -88,10 +105,11 @@ type RunRecord struct {
 	// MergedAt is when `gh pr merge` succeeded for this run's PR (Status ==
 	// StatusMerged).
 	MergedAt time.Time `json:"merged_at,omitempty"`
-	// MergeCommitSHA is the merge repo's base-branch HEAD immediately after
-	// the post-merge fast-forward (docs/FLEET_CONTROLLER.md sec 2,
-	// "self-merge on green") -- the commit this run's matched owners landed
-	// as.
+	// MergeCommitSHA is this run's PR's merge commit sha, from `gh pr view
+	// --json mergeCommit` once the post-merge fetch of --base-ref (sec 2,
+	// "self-merge on green") has run -- the commit this run's matched
+	// owners landed as. The merge repo's local base branch is never
+	// checked out to learn this.
 	MergeCommitSHA string `json:"merge_commit_sha,omitempty"`
 	// ImageID is the gs-decomp-agent image id (docker image inspect
 	// --format {{.Id}}) this run's container was launched from; empty when
@@ -151,6 +169,29 @@ type State struct {
 	// LastDailySummary is when the --alert-issue daily summary last posted,
 	// so it fires at most once per UTC calendar day (sec 4).
 	LastDailySummary time.Time `json:"last_daily_summary,omitempty"`
+
+	// WindowState tracks, per agent, quota-window-aware scheduling
+	// (docs/FLEET_CONTROLLER.md sec 12): when its current window started and
+	// when it was last exhausted (generator_exhausted) -- used to prefer a
+	// just-cooled-down agent's next launches once its window reopens, and
+	// to normalize control.BuildMetrics' accepts-per-window (sec 11).
+	WindowState map[string]*AgentWindowState `json:"window_state,omitempty"`
+	// ReassignCursor is the round-robin position control.Loop.reassignAgent
+	// resumes from when it next has to hand a cooling-down agent's queued
+	// partition to another agent (sec 12) -- persisted so the rotation
+	// survives a restart instead of always starting over at the same agent.
+	ReassignCursor int `json:"reassign_cursor,omitempty"`
+}
+
+// AgentWindowState is one agent's quota-window bookkeeping
+// (docs/FLEET_CONTROLLER.md sec 12). WindowStart is zeroed on a
+// generator_exhausted exit and stamped again on that agent's next launch
+// (whichever partition it is); the window is considered "just reopened" --
+// and that agent preferred for reassignment -- for as long as its cooldown
+// has lapsed (State.OnCooldown false) but WindowStart is still zero.
+type AgentWindowState struct {
+	WindowStart   time.Time `json:"window_start,omitempty"`
+	LastExhausted time.Time `json:"last_exhausted,omitempty"`
 }
 
 // New returns an empty State ready to have a plan's queue loaded into it.

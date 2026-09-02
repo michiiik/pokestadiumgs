@@ -175,8 +175,8 @@ func TestFileSlug(t *testing.T) {
 		"disasm/src/fragments/79/fragment79_3BF4C0.c": "fragment79_3BF4C0",
 	}
 	for in, want := range cases {
-		if got := fileSlug(in); got != want {
-			t.Fatalf("fileSlug(%q) = %q, want %q", in, got, want)
+		if got := FileSlug(in); got != want {
+			t.Fatalf("FileSlug(%q) = %q, want %q", in, got, want)
 		}
 	}
 }

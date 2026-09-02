@@ -20,6 +20,7 @@ import (
 	"strings"
 	"time"
 
+	"fleetctl/internal/agentspec"
 	"fleetctl/internal/fleetstate"
 	"fleetctl/internal/planpkg"
 	"fleetctl/internal/runner"
@@ -48,14 +49,48 @@ type Loop struct {
 	// worktree (docs/FLEET_CONTROLLER.md sec 6, "Merge-repo == launch-repo").
 	MergeRepo string
 	// IntegrationBranch is the branch a run's throwaway container/<id>
-	// branch is created from and, on a matched owner, PR'd back into.
+	// branch is created from and, on a matched owner, PR'd back into (`gh
+	// pr create --base`/`gh pr merge`'s target -- a branch *name*, not a
+	// ref, since gh operates on GitHub's own branch, never a local one).
 	IntegrationBranch string
+	// BaseRef is the ref the merge repo's throwaway branch is force-created
+	// from (`git checkout -B`) and left detached at afterward, and the ref
+	// a post-merge fetch verifies has advanced -- "" defaults to
+	// "origin/<IntegrationBranch>" (see baseRef()). It is deliberately a
+	// remote-tracking ref, never IntegrationBranch's own local branch: the
+	// merge repo is commonly a linked worktree, and that local branch may
+	// already be checked out elsewhere (e.g. the main checkout) -- `git
+	// checkout <local-branch>` there fails outright ("already checked
+	// out"), so the merge flow never checks out or otherwise touches it
+	// (docs/FLEET_CONTROLLER.md sec 2).
+	BaseRef string
 
 	MaxConcurrent    int
 	AgentConcurrency map[string]int
 	CooldownDefaults map[string]time.Duration
 	DefaultCooldown  time.Duration
 	PollInterval     time.Duration
+
+	// Agents is the plan's own agent roster (planpkg.Plan.Agents, one entry
+	// per distinct --agent spec `plan` was given), adopted from LoadPlan
+	// unless the caller already set it. It is the pool
+	// quota-window-aware scheduling (sec 12) reassigns a cooling-down
+	// agent's queued partition to -- a plan with only one agent behaves
+	// exactly as before (nothing else to reassign to).
+	Agents []agentspec.Spec
+	// WindowDurations is the known quota-window length per agent (--window,
+	// e.g. kimi=5h), adopted from the plan unless the caller already set
+	// it. Read by BuildMetrics (sec 11) to normalize accepts-per-window;
+	// falls back to CooldownDefaults, then a 24h default -- see
+	// quotaWindowFor.
+	WindowDurations map[string]time.Duration
+	// WindowBudget is the optional expected-batches-per-window per agent
+	// (--window-budget), adopted from the plan unless the caller already
+	// set it -- informational only (sec 11).
+	WindowBudget map[string]int
+	// PermuterSeconds is `--permuter-seconds` forwarded to every
+	// permuter-lane launch (sec 13); <=0 defaults to 1200.
+	PermuterSeconds int
 
 	// DisableAutoMerge turns off self-merge-on-green (sec 2): a PR is left
 	// at StatusDone once opened, same as before self-merge existed, and
@@ -125,6 +160,16 @@ func (l *Loop) mergeRepo() string {
 	return l.Repo
 }
 
+// baseRef is BaseRef if the caller set one, else "origin/<IntegrationBranch>"
+// -- see the Loop.BaseRef doc for why this is a remote-tracking ref, never
+// IntegrationBranch's own local branch.
+func (l *Loop) baseRef() string {
+	if l.BaseRef != "" {
+		return l.BaseRef
+	}
+	return "origin/" + l.IntegrationBranch
+}
+
 func (l *Loop) pollInterval() time.Duration {
 	if l.PollInterval > 0 {
 		return l.PollInterval
@@ -185,6 +230,23 @@ func (l *Loop) LoadPlan(p *planpkg.Plan) error {
 			parsed[agent] = d
 		}
 		l.CooldownDefaults = parsed
+	}
+	if l.WindowDurations == nil && len(p.Windows) > 0 {
+		parsed := make(map[string]time.Duration, len(p.Windows))
+		for agent, s := range p.Windows {
+			d, err := time.ParseDuration(s)
+			if err != nil {
+				return fmt.Errorf("control: plan window %s=%q: %w", agent, s, err)
+			}
+			parsed[agent] = d
+		}
+		l.WindowDurations = parsed
+	}
+	if l.WindowBudget == nil && len(p.WindowBudget) > 0 {
+		l.WindowBudget = p.WindowBudget
+	}
+	if len(l.Agents) == 0 && len(p.Agents) > 0 {
+		l.Agents = p.Agents
 	}
 	for _, spec := range p.Queue {
 		if _, exists := l.State.Runs[spec.ID]; exists {
@@ -366,8 +428,19 @@ func (l *Loop) handleExit(ctx context.Context, rec *fleetstate.RunRecord) error 
 	rec.StoppedReason = summary.StoppedReason
 
 	if summary.StoppedReason == "generator_exhausted" {
+		// The permuter-lane agent has no generator/model to exhaust and is
+		// never subject to cooldown (sec 13) -- if this somehow fires for
+		// it anyway, just requeue with --resume, no cooldown/window bookkeeping.
+		if rec.Spec.Agent == permuterAgent {
+			l.logf("run %s: permuter-lane run reported generator_exhausted (unexpected); requeueing with --resume, no cooldown applied", rec.Spec.ID)
+			rec.Status = fleetstate.StatusRequeued
+			rec.Note = "generator_exhausted"
+			l.requeueResume(rec)
+			return nil
+		}
 		until := l.now().Add(l.cooldownFor(rec.Spec.Agent))
 		l.State.Cooldowns[rec.Spec.Agent] = until
+		l.recordWindowExhausted(rec.Spec.Agent, l.now())
 		l.logf("run %s: agent %s generator_exhausted; cooldown until %s, requeueing with --resume",
 			rec.Spec.ID, rec.Spec.Agent, until.Format(time.RFC3339))
 		rec.Status = fleetstate.StatusRequeued
@@ -565,6 +638,41 @@ func prNumberFromURL(url string) int {
 	return n
 }
 
+// touchesMergePaths reports whether a git-status path (already stripped of
+// its leading two-character XY code) falls inside a tree the merge step
+// itself writes to -- disasm/src/, COVERAGE.md, docs/regions/ (see
+// tools/container_merge.py's own writes). Everything else -- another
+// session's own uncommitted edits elsewhere in the checkout, e.g.
+// disasm/Makefile or tools/try_pragma_compare.py -- is tolerated; see
+// dirtyMergePath and docs/FLEET_CONTROLLER.md sec 2.
+func touchesMergePaths(path string) bool {
+	return path == "COVERAGE.md" ||
+		strings.HasPrefix(path, "disasm/src/") ||
+		strings.HasPrefix(path, "docs/regions/")
+}
+
+// dirtyMergePath scans `git status --porcelain` output for the first
+// tracked (non "??") entry under touchesMergePaths, returning its path, or
+// "" if the merge repo is clean everywhere the merge step itself would
+// write. Untracked files are always tolerated -- only a *modification* to
+// one of these paths is a real conflict, and porcelain's rename lines
+// ("R  old -> new") are checked by their destination.
+func dirtyMergePath(porcelain string) string {
+	for _, line := range strings.Split(porcelain, "\n") {
+		if len(line) < 4 || line[:2] == "??" {
+			continue
+		}
+		path := strings.TrimSpace(line[3:])
+		if idx := strings.Index(path, " -> "); idx >= 0 {
+			path = path[idx+4:]
+		}
+		if touchesMergePaths(path) {
+			return path
+		}
+	}
+	return ""
+}
+
 // runMerge is the sequential merge/branch/PR step. The control loop never
 // runs two of these concurrently -- RunOnce/pollRunning call it in a plain
 // for loop with no goroutines, which is itself the mutex the task asks for
@@ -572,12 +680,33 @@ func prNumberFromURL(url string) int {
 func (l *Loop) runMerge(ctx context.Context, rec *fleetstate.RunRecord) error {
 	branch := branchName(rec.Spec)
 	mergeRepo := l.mergeRepo()
+	baseRef := l.baseRef()
 
-	if err := l.Runner.GitCheckout(ctx, mergeRepo, l.IntegrationBranch); err != nil {
-		return fmt.Errorf("checkout %s before branching: %w", l.IntegrationBranch, err)
+	// The merge repo is shared (often a linked worktree of the same
+	// checkout other sessions/tools use), so it may already carry
+	// uncommitted changes when a run's merge step reaches it. Refuse to
+	// branch/commit over anything the merge itself would touch -- see
+	// dirtyMergePath's doc for exactly which paths that is and which are
+	// tolerated (docs/FLEET_CONTROLLER.md sec 2, "the merge repo must be
+	// clean").
+	porcelain, err := l.Runner.GitStatusPorcelain(ctx, mergeRepo)
+	if err != nil {
+		return fmt.Errorf("git status --porcelain %s: %w", mergeRepo, err)
 	}
-	if err := l.Runner.GitCheckoutNewBranch(ctx, mergeRepo, branch, l.IntegrationBranch); err != nil {
-		return fmt.Errorf("create branch %s: %w", branch, err)
+	if conflict := dirtyMergePath(porcelain); conflict != "" {
+		rec.Status = fleetstate.StatusMergeBlockedDirty
+		rec.Note = fmt.Sprintf("merge repo %s has uncommitted changes to %s (a path this merge would touch); refusing to branch/commit until it is clean", mergeRepo, conflict)
+		l.logf("run %s: %s", rec.Spec.ID, rec.Note)
+		l.alert(ctx, "merge_blocked_dirty", rec.Spec.ID,
+			fmt.Sprintf("fleetctl: merge repo dirty, run %s blocked", rec.Spec.ID), rec.Note)
+		return nil
+	}
+
+	if err := l.Runner.GitFetch(ctx, mergeRepo); err != nil {
+		return fmt.Errorf("fetch origin before branching: %w", err)
+	}
+	if err := l.Runner.GitCheckoutNewBranch(ctx, mergeRepo, branch, baseRef); err != nil {
+		return fmt.Errorf("create branch %s from %s: %w", branch, baseRef, err)
 	}
 	rec.Branch = branch
 
@@ -594,6 +723,12 @@ func (l *Loop) runMerge(ctx context.Context, rec *fleetstate.RunRecord) error {
 	report := loadMergeReport(rec.OutDir)
 	accepted := matchedOwners(report.Owners)
 	rec.MatchedOwners = accepted
+	// Collect this run's own tie-pool.json (any run, permuter-lane or not,
+	// can plateau into one) into the file's persisted tie-pool store, and
+	// drop every owner this run just matched (sec 13, "owners removed once
+	// matched") -- before requeueing unmatched owners below, so a matched
+	// owner is never both dropped from the pool and left in it.
+	l.updateTiePool(rec)
 	needsCommit, commitTails := needsManualCommitOwners(report.Owners)
 	if len(needsCommit) > 0 {
 		rec.NeedsManualCommit = commitTails
@@ -630,8 +765,8 @@ func (l *Loop) runMerge(ctx context.Context, rec *fleetstate.RunRecord) error {
 		l.logf("run %s: no owners matched this run", rec.Spec.ID)
 	}
 
-	if err := l.Runner.GitCheckout(ctx, mergeRepo, l.IntegrationBranch); err != nil {
-		l.logf("run %s: checkout back to %s failed: %v", rec.Spec.ID, l.IntegrationBranch, err)
+	if err := l.Runner.GitCheckoutDetach(ctx, mergeRepo, baseRef); err != nil {
+		l.logf("run %s: checkout --detach %s failed: %v", rec.Spec.ID, baseRef, err)
 	}
 
 	// An owner needing a manual commit already has its candidate installed
@@ -720,11 +855,7 @@ func (l *Loop) pollPRs(ctx context.Context) error {
 				return nil
 			}
 			l.State.LastMergeAt = l.now()
-			if sha, err := l.Runner.GitRevParse(ctx, l.mergeRepo(), "HEAD"); err == nil {
-				rec.MergeCommitSHA = sha
-			} else {
-				l.logf("run %s: git rev-parse HEAD failed: %v", id, err)
-			}
+			l.recordMergeCommit(ctx, id, rec)
 			if err := l.Replan(ctx); err != nil {
 				l.logf("run %s: replan after merge failed: %v", id, err)
 			}
@@ -741,17 +872,44 @@ func (l *Loop) pollPRs(ctx context.Context) error {
 	return nil
 }
 
-// fastForwardBase is "fast-forward the merge repo's local base branch"
-// (sec 1): checkout IntegrationBranch, then a plain `git pull --ff-only`.
+// fastForwardBase is the post-merge "fast-forward" (sec 2/7): `git fetch
+// origin` in the merge repo, so its --base-ref remote-tracking ref (e.g.
+// origin/master) picks up whatever a self-merge (or anything else) just
+// pushed to the real base branch. This is now the merge repo's *only*
+// mutating call for this -- its local base branch is never checked out or
+// pulled here (see Loop.BaseRef's doc), so fetch failure (network, auth,
+// ...) is the only failure mode left, and State.MergeBlocked is set only
+// when it returns an error.
 func (l *Loop) fastForwardBase(ctx context.Context) error {
-	mergeRepo := l.mergeRepo()
-	if err := l.Runner.GitCheckout(ctx, mergeRepo, l.IntegrationBranch); err != nil {
-		return fmt.Errorf("checkout %s: %w", l.IntegrationBranch, err)
-	}
-	if err := l.Runner.GitPullFF(ctx, mergeRepo); err != nil {
-		return fmt.Errorf("pull --ff-only: %w", err)
+	if err := l.Runner.GitFetch(ctx, l.mergeRepo()); err != nil {
+		return fmt.Errorf("fetch origin: %w", err)
 	}
 	return nil
+}
+
+// recordMergeCommit sets rec.MergeCommitSHA from `gh pr view --json
+// mergeCommit` and logs a (non-blocking) warning if --base-ref's freshly
+// fetched sha does not yet match it -- e.g. GitHub's merge-commit metadata
+// lagging the fetch by a beat. Never sets State.MergeBlocked: fetch itself
+// already succeeded (fastForwardBase's only failure mode), and this is
+// just a best-effort verification/record of what landed.
+func (l *Loop) recordMergeCommit(ctx context.Context, id string, rec *fleetstate.RunRecord) {
+	mergeSHA, err := l.Runner.GhPRView(ctx, l.mergeRepo(), rec.PRNumber)
+	if err != nil {
+		l.logf("run %s: gh pr view %d --json mergeCommit failed: %v", id, rec.PRNumber, err)
+		return
+	}
+	rec.MergeCommitSHA = mergeSHA
+	baseRef := l.baseRef()
+	baseSHA, err := l.Runner.GitRevParse(ctx, l.mergeRepo(), baseRef)
+	if err != nil {
+		l.logf("run %s: git rev-parse %s failed: %v", id, baseRef, err)
+		return
+	}
+	if baseSHA != mergeSHA {
+		l.logf("run %s: WARNING: %s (%s) has not advanced to merge commit %s of PR #%d yet",
+			id, baseRef, baseSHA, mergeSHA, rec.PRNumber)
+	}
 }
 
 // Replan re-runs the ranking against the merge repo and rebuilds the queue
@@ -782,6 +940,10 @@ func (l *Loop) Replan(ctx context.Context) error {
 	if data, err := json.Marshal(fresh); err == nil {
 		l.State.PlanJSON = data
 	}
+	// One permuter-lane partition per file with pending tie-pool owners
+	// (sec 13) -- after reconcileQueue, so it sees the just-rebuilt queue
+	// when checking for an already in-flight permuter run per file.
+	l.enqueuePermuterLane()
 	l.logf("replan: %d fresh partition(s) considered, queue now has %d entr(y/ies)", len(fresh.Queue), len(l.State.Queue))
 	return nil
 }
@@ -1030,7 +1192,28 @@ func (l *Loop) launchEligible(ctx context.Context) error {
 		case totalRunning >= max:
 			rec.WaitReason = "concurrency"
 			remaining = append(remaining, id)
-		case l.State.OnCooldown(rec.Spec.Agent, now):
+		// permuterAgent is never subject to cooldown (sec 13), so this case
+		// can never fire for it regardless of what State.Cooldowns holds.
+		case rec.Spec.Agent != permuterAgent && l.State.OnCooldown(rec.Spec.Agent, now):
+			// Quota-window-aware scheduling (sec 12): rather than leave the
+			// slot idle, hand this partition to the next eligible agent
+			// (round-robin over the plan's own roster, preferring one whose
+			// window just reopened) instead of waiting out rec's own
+			// agent's cooldown.
+			if alt, ok := l.reassignAgent(rec.Spec.Agent, now, byAgent); ok {
+				l.logf("run %s: agent %s on cooldown; reassigning to %s:%s%s (sec 12)",
+					id, rec.Spec.Agent, alt.Agent, alt.Model, effortSuffix(alt.Effort))
+				rec.Note = appendReassignNote(rec.Note, rec.Spec.Agent, alt.Agent)
+				rec.Spec.Agent, rec.Spec.Model, rec.Spec.Effort = alt.Agent, alt.Model, alt.Effort
+				if err := l.launch(ctx, rec); err != nil {
+					l.logf("run %s: launch failed: %v", id, err)
+					remaining = append(remaining, id)
+					continue
+				}
+				totalRunning++
+				byAgent[alt.Agent]++
+				continue
+			}
 			rec.WaitReason = "cooldown"
 			remaining = append(remaining, id)
 		case l.AgentConcurrency[rec.Spec.Agent] > 0 && byAgent[rec.Spec.Agent] >= l.AgentConcurrency[rec.Spec.Agent]:
@@ -1060,6 +1243,14 @@ func (l *Loop) launch(ctx context.Context, rec *fleetstate.RunRecord) error {
 		return err
 	}
 
+	var tiePoolFile string
+	if rec.Spec.Mode == "permuter-only" {
+		tiePoolFile, err = preparePermuterTiePool(l.RunsDir, outDir, rec.Spec.File)
+		if err != nil {
+			return err
+		}
+	}
+
 	// Stale-image awareness (docs/FLEET_CONTROLLER.md sec 6): skipped
 	// entirely under --src-overlay -- an overlay makes the image's own
 	// baked-in sources irrelevant, so there is nothing to warn about.
@@ -1076,16 +1267,19 @@ func (l *Loop) launch(ctx context.Context, rec *fleetstate.RunRecord) error {
 	}
 
 	spec := runner.LaunchSpec{
-		SourceFile:    rec.Spec.File,
-		OutDir:        outDir,
-		BudgetSeconds: rec.Spec.BudgetSeconds,
-		Owners:        rec.Spec.Owners,
-		SeedFrom:      seedFrom,
-		Resume:        rec.Spec.Attempt > 0,
-		Agent:         rec.Spec.Agent,
-		Model:         rec.Spec.Model,
-		Effort:        rec.Spec.Effort,
-		SrcOverlay:    l.SrcOverlay,
+		SourceFile:      rec.Spec.File,
+		OutDir:          outDir,
+		BudgetSeconds:   rec.Spec.BudgetSeconds,
+		Owners:          rec.Spec.Owners,
+		SeedFrom:        seedFrom,
+		Resume:          rec.Spec.Attempt > 0,
+		Agent:           rec.Spec.Agent,
+		Model:           rec.Spec.Model,
+		Effort:          rec.Spec.Effort,
+		SrcOverlay:      l.SrcOverlay,
+		Mode:            rec.Spec.Mode,
+		TiePoolFile:     tiePoolFile,
+		PermuterSeconds: rec.Spec.PermuterSeconds,
 	}
 	id, err := l.Runner.LaunchContainer(ctx, spec)
 	if err != nil {
@@ -1098,6 +1292,10 @@ func (l *Loop) launch(ctx context.Context, rec *fleetstate.RunRecord) error {
 	rec.EndedAt = time.Time{}
 	rec.StoppedReason = ""
 	rec.WaitReason = ""
+	// Quota-window bookkeeping (sec 12): stamps this agent's window start
+	// the first time it launches since a cooldown (or ever) -- a no-op once
+	// already stamped for the current window.
+	l.recordWindowStart(rec.Spec.Agent, rec.StartedAt)
 	l.logf("run %s: launched container %s (agent=%s:%s owners=%d resume=%v seeds=%d)",
 		rec.Spec.ID, id, rec.Spec.Agent, rec.Spec.Model, len(rec.Spec.Owners), spec.Resume, len(seedFrom))
 	return nil

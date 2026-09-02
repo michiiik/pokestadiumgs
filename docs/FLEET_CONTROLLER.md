@@ -25,6 +25,7 @@ Everything below assumes that binary is on your `PATH` or invoked by path.
         --agent SPEC [--agent SPEC ...] \
         [--owners-per-run 12] [--budget-seconds 3600] \
         [--cooldown AGENT=DURATION ...] [--agent-concurrency AGENT=N ...] \
+        [--window AGENT=DURATION ...] [--window-budget AGENT=N ...] \
         [--max-instructions N] [--exclude-recent HOURS] \
         [--out plan.json]
 
@@ -52,9 +53,20 @@ a `generator_exhausted` exit puts that agent on cooldown for its configured
 duration (default one hour, `run`'s own `--default-cooldown`, for an agent
 with no `--cooldown` entry); an agent at its `--agent-concurrency` cap is
 skipped when `run` looks for the next queue entry to launch, independent of
-the global `--max-concurrent`. `--slots K` is recorded as the plan's
-suggested fleet size and becomes `run`'s default `--max-concurrent` when
-`run` isn't given its own.
+the global `--max-concurrent`. Rather than leave a slot idle while its
+assigned agent cools down, `run` reassigns that queued partition to another
+agent from this same `--agent` roster instead -- see sec 12. `--slots K` is
+recorded as the plan's suggested fleet size and becomes `run`'s default
+`--max-concurrent` when `run` isn't given its own.
+
+`--window AGENT=DURATION` (e.g. `--window kimi=5h` -- a known quota-window
+length, distinct from `--cooldown`'s generator-exhaustion backoff duration,
+though the two are commonly the same number) and `--window-budget
+AGENT=N` (an optional expected-batches-per-window, informational only) are
+also baked into the plan. Both are read by `fleetctl status`'s per-agent
+METRICS table (sec 11) and by `run`'s quota-window-aware scheduling (sec
+12); an agent with no `--window` entry falls back to its own `--cooldown`
+entry, then a 24h default.
 
 `plan` only ever runs `tools/pragma_targets.py` (read-only queries) -- it
 never touches docker, git, or GitHub, so there is no `--dry-run` for it.
@@ -63,8 +75,10 @@ never touches docker, git, or GitHub, so there is no `--dry-run` for it.
 
     fleetctl run [--plan P] --state-dir S --runs-dir D --repo R \
         [--merge-repo M] [--max-concurrent 4] [--pr-base master] \
+        [--base-ref REF] \
         [--once] [--dry-run] [--default-cooldown 1h] [--poll-interval 30s] \
         [--auto-merge] [--replan] [--src-overlay DIR] [--stall-after 3h] \
+        [--permuter-seconds 1200] \
         [--alert-issue N] [--alert-macos] [--daily-summary-hour 9]
 
 The control loop. Loads `--plan`'s queue into `<state-dir>/state.json`
@@ -79,20 +93,38 @@ The control loop. Loads `--plan`'s queue into `<state-dir>/state.json`
    `pr_open`, check its PR's CI checks and merge it on green -- sec 7.
 4. **Launch.** Fill free concurrency slots (global `--max-concurrent`, and
    each agent's own `--agent-concurrency` cap from the plan) from the front
-   of the queue, skipping (not dropping) any entry whose agent is currently
-   on cooldown.
+   of the queue. An entry whose agent is currently on cooldown is not just
+   skipped: it is reassigned to the next eligible agent from the plan's own
+   roster instead, so the slot is not left idle (sec 12) -- only a
+   single-agent plan (or every other agent also unavailable) falls back to
+   waiting. Replanning (sec 8) also enqueues one permuter-lane partition per
+   file with owners still pending in its tie-pool store (sec 13); those
+   count toward `--max-concurrent` like any other launch but are exempt
+   from every per-agent cap and cooldown.
 5. **Persist.** `state.json` is rewritten atomically (temp file + rename)
    after every pass.
 
-`--merge-repo M` points the merge/branch/PR/self-merge step -- `git
-checkout`, `git checkout -b`, `tools/container_merge.py
-merge`/`import-stats`, `git push`/`pull --ff-only`, `gh pr
-create`/`checks`/`merge` -- at a different checkout than `--repo`
+`--merge-repo M` points the merge/branch/PR/self-merge step -- `git fetch`,
+`git checkout -B`/`checkout --detach`, `tools/container_merge.py
+merge`/`import-stats`, `git push`, `gh pr
+create`/`checks`/`merge`/`view` -- at a different checkout than `--repo`
 (`container/run.sh`'s cwd and `tools/pragma_targets.py`'s target, including
 the ranking `--replan` re-runs -- sec 8). Defaults to `--repo` when omitted,
 the common case of one shared checkout; set it when the merge/branch/PR
 step should run against a dedicated merge worktree instead (see sec 2 for
 exactly which calls this affects).
+
+**`--merge-repo` never checks out, force-resets, or pulls `--pr-base`'s own
+local branch.** If `--merge-repo` is a linked worktree of the same
+checkout `--repo` (or another session) uses, that local branch may already
+be checked out elsewhere -- `git checkout master` there fails outright
+("already checked out"), and even when it wouldn't fail, that local branch
+copy is commonly stale. Instead, every merge-repo git call sec 2/7
+describes below works against `--base-ref` (default
+`origin/<pr-base>`) -- a remote-tracking ref -- and the merge repo is left
+**detached** at it between runs, never on a named local base branch.
+`git fetch origin` is the merge repo's only call that touches that
+remote-tracking ref at all.
 
 **`--plan` is required only the first time `--state-dir` has no plan
 persisted in `state.json` yet.** `LoadPlan` now persists the whole plan
@@ -115,11 +147,12 @@ the loop from an external scheduler (sec 4) instead of its own sleep.
 `--dry-run` prints every `docker`/`git`/`gh pr create`/`gh pr merge`/`gh
 issue comment`/`osascript` command instead of running it
 (`container/run.sh` and `tools/container_merge.py`/`tools/pragma_targets.py`
-invocations, plus the read-only `gh pr checks`/`docker image inspect`
-queries sec 7/10 use, are still real subprocess constructions, logged
-verbatim; only the process that would actually start a container, move a
-branch, commit, push, merge a PR, comment on an issue, or open a PR is
-suppressed). **No real container is ever started under `--dry-run`, and
+invocations, plus the read-only `gh pr checks`/`gh pr view`/`git status
+--porcelain`/`docker image inspect` queries sec 2/7/10 use, are still real
+subprocess constructions, logged verbatim; only the process that would
+actually start a container, move a branch, commit, push, merge a PR,
+comment on an issue, or open a PR is suppressed). **No real container is
+ever started under `--dry-run`, and
 `gh pr merge`/`gh issue comment` never run for real** -- `LaunchContainer`
 returns a synthetic `dryrun-<run-id>` id and the poll loop treats it as
 already exited-cleanly on the next pass, and `GhPRCreate` returns an empty
@@ -127,8 +160,10 @@ URL (so a run can never reach `pr_open` under `--dry-run`, since there is
 no real PR number to poll) -- a `--dry-run --once` run is safe to point at
 the real `--repo`/`--merge-repo` and a real plan, `--replan` included.
 
-See sec 7 (self-merge), sec 8 (replanning), sec 9 (alerting), and sec 10
-(stale-image awareness) for the rest of this section's flags.
+See sec 7 (self-merge), sec 8 (replanning), sec 9 (alerting), sec 10
+(stale-image awareness), sec 12 (quota-window-aware scheduling), and sec 13
+(the permuter-only lane, including `--permuter-seconds`) for the rest of
+this section's flags.
 
 ### `fleetctl status`
 
@@ -139,11 +174,19 @@ count, note/stopped-reason/wait-reason/needs-manual-commit owners/PR URL), a
 `NEEDS MANUAL COMMIT` section (one line per owner still awaiting a manual
 `git commit --only`, with its run id, branch, out dir, and the first line
 of the recorded commit error -- see sec 2's "Reading the merge report"),
-a cooldowns table, a `MERGE BLOCKED: <reason>` line when a post-merge
-fast-forward has failed (sec 7), and a `running=N queued=M (agent=n ...)`
-summary line. `--json` prints the same information as one
-`control.BuildStatus` JSON document instead -- for scripting, and what the
-`--alert-issue` daily summary (sec 9) embeds for machines.
+a cooldowns table, a `METRICS` table (one row per agent spec seen in
+`state.json`'s runs -- runs/iterations/accepts, accepts per wall-hour,
+accepts per configured quota window, mean iterations-to-accept, and current
+cooldown state; see sec 11), a `MERGE BLOCKED: <reason>` line when a
+post-merge fast-forward has failed (sec 7), and a
+`running=N queued=M (agent=n ...)` summary line. A run whose merge step
+found `--merge-repo` dirty in a way that would conflict with the merge (sec
+2) shows status `merge_blocked_dirty`, with the conflicting path in its
+note column -- distinct from `MERGE BLOCKED`, which is global (every run),
+not per-run. `--json` prints the same information as one
+`control.BuildStatus` JSON document instead (its `metrics` field is the
+METRICS table) -- for scripting, and what the `--alert-issue` daily summary
+(sec 9) embeds for machines.
 
 ### `fleetctl stop`
 
@@ -182,9 +225,17 @@ launched and recorded.
                                               v
                                           merging
                                               |
-                (sequential: branch -> merge --commit -> import-stats ->
-                 push+PR if any owner matched -> checkout back)
-                                              v
+             dirty? (git status --porcelain finds a conflicting path, sec 2)
+                              |                                  |
+                             yes                                 no
+                              |                                  |
+                              v                                  v
+                    merge_blocked_dirty          (sequential: fetch -> branch -B
+                    (alert, left open,             <base-ref> -> merge --commit ->
+                    never auto-retried)             import-stats -> push+PR if any
+                                                      owner matched -> checkout
+                                                      --detach <base-ref>)
+                                                                   v
                        no owner matched --------------- >=1 owner matched
                               |                                  |
                               v                                  v
@@ -201,7 +252,7 @@ launched and recorded.
                               |                |                |
                               |                v                v
                               |     gh pr merge, then      gate_failed
-                              |     fast-forward <pr-base>  (alert, left
+                              |     fetch <base-ref>       (alert, left
                               |     (sec 7); on success:    open, never
                               |     merged + Replan (sec 8) auto-retried)
                               |                |
@@ -228,10 +279,25 @@ single goroutine with no concurrent merge dispatch, so "one merge at a
 time" (required because the git index is shared -- `AGENTS.md` sec 1.3) is
 structural, not a separate lock. The merge step itself is:
 
-1. `git -C <merge-repo> checkout <pr-base>`
-2. `git -C <merge-repo> checkout -b container/<run-id> <pr-base>` --
-   created *before* the merge commit so any commit `merge --commit` makes
-   lands on this throwaway branch, not the base branch.
+0. `git -C <merge-repo> status --porcelain` -- if any **tracked** entry
+   (not `??` untracked) names a path under `disasm/src/`, `COVERAGE.md`, or
+   `docs/regions/` (the trees the merge step itself writes to), abort
+   immediately: no fetch, no branch, no commit. The run moves to
+   `merge_blocked_dirty` (its note names the conflicting path) and a
+   rate-limited `merge_blocked_dirty` alert fires (sec 9) -- left exactly
+   as-is, like `gate_failed`, for an operator to resolve by hand. Anything
+   else -- untracked files anywhere, or tracked modifications outside those
+   three paths (e.g. another session's own uncommitted edits to
+   `disasm/Makefile` or `tools/try_pragma_compare.py`) -- is tolerated:
+   `<merge-repo>` is commonly a checkout other tools/sessions share, and
+   only the paths this merge would actually touch need to be clean.
+1. `git -C <merge-repo> fetch origin`
+2. `git -C <merge-repo> checkout -B container/<run-id> <base-ref>` --
+   force-created (`-B`, not `-b`) *before* the merge commit, from
+   `<base-ref>` fresh off the fetch, so any commit `merge --commit` makes
+   lands on this throwaway branch, not the base branch, and always starts
+   from current remote state rather than wherever the branch was left last
+   time.
 3. `python3 tools/container_merge.py merge <out> --repo <merge-repo> --fresh-history --commit`
 4. `python3 tools/container_merge.py import-stats <out> --repo <merge-repo>`
 5. Read `<out>/merge-report.json`'s `owners` map (see "Reading the merge
@@ -245,14 +311,20 @@ structural, not a separate lock. The merge step itself is:
      run's status becomes `pr_open` instead of `done` -- see sec 7 for what
      happens next. `--auto-merge=false` restores the pre-self-merge
      behavior: `done`, PR left open for a human.
-6. `git -C <merge-repo> checkout <pr-base>` regardless of whether anything
-   was accepted, so the checkout is never left on a throwaway branch
-   between runs.
+6. `git -C <merge-repo> checkout --detach <base-ref>` regardless of whether
+   anything was accepted, so the merge repo is never left on a throwaway
+   branch between runs -- and never on a named local base branch either
+   (see sec 1's "`--merge-repo` never checks out ... `--pr-base`'s own
+   local branch").
 
 `<merge-repo>` is `--merge-repo` if set, else `--repo` (sec 1). `<pr-base>`
-is `--pr-base` (sec 1; default `master`) -- it replaces the earlier
-`--integration-branch` flag name now that the same branch is also
-self-merge's target (sec 7), not just where a throwaway branch is cut from.
+is `--pr-base` (sec 1; default `master`) -- the branch name `gh pr
+create --base`/`gh pr merge` operate on. `<base-ref>` is `--base-ref` (sec
+1; default `origin/<pr-base>`) -- the ref every merge-repo git call above
+actually branches from, verifies against, and detaches onto; it replaces
+the earlier `--integration-branch` flag name now that the same branch is
+also self-merge's target (sec 7), not just where a throwaway branch is cut
+from.
 
 `--fresh-history` and `--commit` are always passed to `merge` (sec 9.3 of
 `docs/CONTAINER_AGENT.md` -- a prior host re-gate on record must never trip
@@ -489,6 +561,18 @@ also, from here, self-merged on green -- sec 7.
   notification and an issue comment for the same event share one clock,
   rather than each notifier tracking its own. Simpler, and in practice the
   two are usually both on or both off.
+- **Why `--base-ref` (a remote-tracking ref) instead of `--pr-base`'s own
+  local branch.** `--merge-repo` is frequently a linked worktree of the
+  same checkout `--repo` (or an entirely separate session/tool) already
+  has checked out -- and git refuses to check out a branch that is already
+  checked out in another worktree ("already checked out"), so a plain
+  `git -C <merge-repo> checkout master` fails outright whenever the main
+  checkout has `master` checked out, which is the common case. A local
+  branch there can also simply be stale even when it isn't already
+  checked out elsewhere. `--base-ref` (sec 1, sec 2, sec 7) sidesteps
+  both: the merge repo only ever fetches, branches from, and detaches onto
+  a remote-tracking ref, and never checks out, force-resets, or pulls the
+  local branch of the same name.
 
 ## 7. Self-merge on green
 
@@ -512,23 +596,29 @@ Every pass, for every run currently `pr_open` (sorted by run id, so a
    pass.
 2. **`SUCCESS`:** `gh pr merge <n> --merge --delete-branch`. On success the
    run moves to `merged` (`merged_at` recorded), then:
-   - **fast-forward `--pr-base`** in `--merge-repo`: `git checkout
-     <pr-base>` + `git pull --ff-only`. On success, `state.json`'s
-     `last_merge_at` is updated (sec 10's stale-image awareness) and
-     `git rev-parse HEAD` is recorded as the run's `merge_commit_sha`, then
-     **`Replan` runs** (sec 8) -- so the very next launch already sees
-     whatever this merge just landed.
-   - **On failure**, `state.json`'s `merge_blocked`/`merge_blocked_reason`
-     are set, a rate-limited `ff_failed` alert fires (sec 9), and *no
-     further `pr_open` run is evaluated this pass* -- "stop merging until
-     fixed" is deliberately global, not per-run, since every self-merge
-     shares the same `--pr-base` and a stuck fast-forward means the local
-     checkout genuinely needs a human's attention (a merge/rebase
-     conflict, most likely) before any more of them can land cleanly. The
-     *next* pass retries the fast-forward once, at the top of `pollPRs`,
-     before touching any `pr_open` run -- if it now succeeds,
-     `merge_blocked` clears and merging resumes automatically; no restart
-     or flag needed to recover.
+   - **fast-forward `<base-ref>`** in `--merge-repo`: `git fetch origin`
+     -- and *only* that. `<merge-repo>`'s local `--pr-base` branch is never
+     checked out or pulled here (sec 1, sec 2), so there is no local branch
+     left to fast-forward or rebase -- fetching is enough to bring
+     `<base-ref>` (e.g. `origin/master`) up to date with whatever `gh pr
+     merge` just pushed. On success, `state.json`'s `last_merge_at` is
+     updated (sec 10's stale-image awareness), `gh pr view <n> --json
+     mergeCommit` is recorded as the run's `merge_commit_sha` (logging a
+     non-blocking warning if a `git rev-parse <base-ref>` right after the
+     fetch doesn't yet match it -- GitHub's own merge-commit metadata can
+     lag the fetch by a beat), then **`Replan` runs** (sec 8) -- so the
+     very next launch already sees whatever this merge just landed.
+   - **On failure** (the fetch itself failed -- network, auth, ...),
+     `state.json`'s `merge_blocked`/`merge_blocked_reason` are set, a
+     rate-limited `ff_failed` alert fires (sec 9), and *no further
+     `pr_open` run is evaluated this pass* -- "stop merging until fixed" is
+     deliberately global, not per-run, since every self-merge shares the
+     same `<base-ref>` and a stuck fetch usually means the merge repo (or
+     its network access) genuinely needs a human's attention before any
+     more of them can land cleanly. The *next* pass retries the fetch once,
+     at the top of `pollPRs`, before touching any `pr_open` run -- if it
+     now succeeds, `merge_blocked` clears and merging resumes
+     automatically; no restart or flag needed to recover.
 3. **`FAILURE`:** the run moves to `gate_failed`, a rate-limited
    `gate_failed` alert fires (sec 9), and it is left exactly as-is --
    `fleetctl status` (its PR URL is in the note column) and the PR itself
@@ -590,7 +680,7 @@ without needing the plan file again.
 
 ## 9. Alerting
 
-Five events, each posted through every configured `Notifier`
+Six events, each posted through every configured `Notifier`
 (`--alert-issue N`: `gh issue comment N --body ...` against `--merge-repo`;
 `--alert-macos`: `osascript -e 'display notification ...'`), rate-limited
 by `Loop.alert` to at most one post per `"event[:key]"` per hour (`key` is
@@ -601,7 +691,8 @@ alerts don't share a bucket, but `ff_failed` -- with no natural per-run key
 | Event | Fired when | Key |
 |---|---|---|
 | `gate_failed` | a PR's checks reported `FAILURE` (sec 7) | run id |
-| `ff_failed` | the post-merge (or retry) fast-forward of `--pr-base` failed (sec 7) | (none) |
+| `ff_failed` | the post-merge (or retry) fetch of `<base-ref>` failed (sec 7) | (none) |
+| `merge_blocked_dirty` | a run's merge step found `--merge-repo` dirty in a way that conflicts with the merge (sec 2) | run id |
 | `container_vanished` | a running container's id is no longer known to `docker inspect` (sec 2) | run id |
 | `agent_exhausted` | a run stopped `generator_exhausted` (sec 2) | agent name |
 | `no_progress_stall` | a still-`running` run's best similarity (read from `<out>/state.json`, the same per-owner `best_similarity` `docs/CONTAINER_AGENT.md` documents) hasn't improved for `--stall-after` (default 3h) | run id |
@@ -610,9 +701,10 @@ alerts don't share a bucket, but `ff_failed` -- with no natural per-run key
 `--alert-issue N` additionally posts one **daily summary** -- runs
 launched/finished, matches merged (with their `merge_commit_sha`), PRs
 open, gate-failed count, stalled-run count, agents currently on cooldown,
-plus an embedded `fleetctl status --json` block "for machines" -- at most
-once per UTC calendar day, at `--daily-summary-hour` (default 9, 0-23
-UTC). `--alert-macos` does not post a daily summary (an ephemeral
+plus an embedded `fleetctl status --json` block "for machines" (its
+`metrics` field is the same per-agent throughput table sec 11 describes) --
+at most once per UTC calendar day, at `--daily-summary-hour` (default 9,
+0-23 UTC). `--alert-macos` does not post a daily summary (an ephemeral
 notification isn't the right shape for a multi-paragraph report).
 
 ## 10. Stale-image awareness
@@ -632,3 +724,214 @@ are the two ways to clear the warning.
 This only tracks merges `fleetctl run` performed itself (`--auto-merge`);
 a commit landed by a human merging a PR by hand isn't reflected in
 `last_merge_at`.
+
+## 11. Per-agent throughput metrics
+
+`control.BuildMetrics` computes one `AgentMetrics` row per distinct agent
+spec seen in `state.json`'s runs -- shown as `fleetctl status`'s `METRICS`
+table, `status --json`'s `metrics` field, and embedded in the `--alert-issue`
+daily summary (sec 9). Nothing new is persisted for this: every input is
+already on disk -- `state.json` itself (run records, `cooldowns`, the
+persisted plan's `--cooldown`/`--window`/`--window-budget` maps) plus each
+run's own `<out>/summary.json` and `<out>/state.json` (the per-owner record
+`docs/CONTAINER_AGENT.md` documents: `status` -- `"accepted"` once matched --
+and a cumulative `iterations` count, with a timestamped `history` entry per
+generator batch).
+
+Per agent:
+
+- **`runs`** -- how many `state.json` run records have this agent.
+- **`iterations`** -- the sum, across every one of those runs' own
+  `<out>/state.json`, of every owner's `iterations` count.
+- **`accepts`** -- how many of those owners have `status == "accepted"`.
+- **`accepts_per_wall_hour`** -- `accepts` divided by summed wall-clock
+  hours, one run's own contribution read from its `<out>/summary.json`'s
+  `wall_seconds` (`tools/container_agent.py`'s `_finalize_run`) when
+  present, else `ended_at - started_at` (`now` in place of `ended_at` for a
+  run still `running`). Like `summary.json`'s own `wall_seconds`, this is
+  only the *current* attempt's process lifetime -- a repeatedly `--resume`d
+  run's wall-clock time from earlier attempts is not summed in (the same
+  simplification sec 6 already notes for `Attempt`/cooldown accounting).
+- **`quota_window`** / **`accepts_per_window`** -- `quota_window` is this
+  agent's configured window length: its own `--window` entry if the plan
+  has one, else its own `--cooldown` entry (the task's own "e.g. kimi=5h"
+  example -- a `--cooldown`-only agent's window defaults to the same
+  duration its generator-exhaustion backoff uses), else a 24h default.
+  `accepts_per_window` is `accepts` normalized to that window length:
+  `accepts / (wall_seconds / quota_window_seconds)`.
+- **`window_budget`** -- this agent's `--window-budget` entry, if the plan
+  has one; informational only (0/omitted otherwise), not read by any
+  scheduling decision.
+- **`mean_iterations_to_accept`** -- the mean, over every owner this
+  agent's runs accepted, of that owner's own `iterations` count at
+  acceptance (0/omitted with no accepts yet).
+- **`on_cooldown`** / **`cooldown_until`** -- from `state.json`'s
+  `cooldowns` map, exactly like the `COOLDOWNS` table.
+
+`fleetctl status` (no `--json`) reads live (`time.Now()`); `status --json`
+and the daily summary do the same. There is no injectable clock for this
+path the way the control loop itself has one (`Loop.Now`, tests only) --
+`accepts_per_wall_hour`/`accepts_per_window` for a still-`running` run
+change slightly between two `status` calls a moment apart, same as the
+`COOLDOWNS` table's own "remaining" column already does.
+
+## 12. Quota-window-aware scheduling
+
+An agent commonly has a real quota window shorter than how long a fleet
+runs (e.g. a subscription plan that resets every 5h) -- `--cooldown` alone
+already reacts to hitting that limit (`generator_exhausted` -> cool down ->
+resume), but every queued partition assigned to that agent still just sits
+idle for the whole cooldown even when another configured agent has spare
+capacity right now. `--window AGENT=DURATION` (sec 1) names each agent's
+known window length, and `run`'s control loop uses it (together with
+`state.json`'s own tracked window start/exhaustion, `window_state`) to keep
+those partitions moving instead:
+
+- **Window start.** The first time an agent launches anything (fresh, or
+  its first launch after a cooldown), `state.json`'s `window_state[agent]`
+  records `window_start = now`.
+- **Exhaustion.** A `generator_exhausted` exit (sec 2) still cools that
+  agent down exactly as before, and additionally zeroes
+  `window_state[agent].window_start` and stamps `last_exhausted = now` --
+  its window has ended.
+- **Reassignment instead of idling.** `launchEligible` (sec 1 step 4), on
+  reaching a queued partition whose agent is currently on cooldown, no
+  longer just leaves it queued: it looks for another agent from the plan's
+  own `--agent` roster (deduplicated by agent name) that is itself neither
+  on cooldown nor at its own `--agent-concurrency` cap, and launches the
+  partition under that agent instead -- `RunSpec.Agent`/`Model`/`Effort` are
+  rewritten to the reassigned agent, and the run's `note` records the
+  reassignment (`"reassigned kimi->codex (cooldown)"`), so `fleetctl
+  status`'s NOTE column shows it. Every reassignment is also logged. A plan
+  with only one configured agent (or one where every other agent is
+  likewise unavailable) has nothing to reassign to, so it falls back to
+  exactly the pre-sec-12 behaviour: `wait_reason: "cooldown"`, retried next
+  pass.
+- **Rebalancing once a window reopens.** Among agents with spare capacity,
+  one whose window has *just* reopened -- its cooldown has lapsed since it
+  was last exhausted, but it has not yet been relaunched (`window_start`
+  still zero) -- is preferred first, so the fleet swings load back onto it
+  rather than leaving it starved by an ordinary round robin that happens to
+  keep landing on other agents. Otherwise, eligible agents are walked
+  round-robin from `state.json`'s persisted `reassign_cursor`, which
+  advances past whichever agent is picked (and survives a restart).
+
+None of this changes what `--agent-concurrency`/`--cooldown` themselves
+mean -- a reassigned partition still counts against its *new* agent's own
+cap once launched, and a cooling-down agent is still genuinely unavailable
+for new work of its own until its cooldown lapses. `--window`/
+`--window-budget` are otherwise inert for scheduling beyond feeding this
+reassignment preference and sec 11's metrics -- they do not, for instance,
+cap how much work an agent is handed within a window.
+
+## 13. The permuter-only lane
+
+Some owners plateau at a *register tie* or a normalized-only match: the
+generator-driven loop (`docs/CONTAINER_AGENT.md`) cannot close the gap with
+another prompted batch, but `decomp-permuter` grinding on the tied
+candidate for a while longer sometimes can. `tools/container_agent.py`
+(`--mode permuter-only`, another change) writes every such owner, whichever
+run it happened on, to that run's own `<out>/tie-pool.json` --
+`{owner: {source, body, declarations, raw, label}}`. `fleetctl run` collects
+these across every run of a file and periodically launches a dedicated,
+generator-free container against just that file's pending pool.
+
+**Collection.** At the end of every run's merge step (`runMerge`, sec 2,
+after `matched_owners` is known -- any run, permuter-lane or not, can
+plateau into a `tie-pool.json`), `updateTiePool` merges that run's own
+`<out>/tie-pool.json` (if it wrote one) into
+`<runs-dir>/tie-pools/<fileslug>.json` -- one persisted store per source
+file, `<fileslug>` the same `disasm/src/fragments/79/fragment79_3BF4C0.c` ->
+`fragment79_3BF4C0` mapping sec 5 already uses for branch names. Any owner
+that run's own `matched_owners` just landed is then dropped from the store
+("owners removed once matched") -- a tie a later run actually resolves
+never lingers in the pool forever.
+
+**Enqueueing.** `Replan` (sec 8), after reconciling the queue, enqueues one
+fresh permuter-only partition per `<runs-dir>/tie-pools/*.json` store that
+still has at least one pending owner and no permuter-lane run already
+active for that file (queued/running/merging/`pr_open`/requeued/
+`merge_blocked_dirty`) -- so a store is never given two overlapping
+partitions. The new `RunSpec` covers every owner currently in that store,
+with `agent: "permuter"` and `mode: "permuter-only"`.
+
+**Launch.** `launch()` copies the file's tie-pool store into
+`<out>/tie-pool-input.json` and passes it to `container/run.sh` as:
+
+    RUN_DETACHED=1 AGENT=permuter bash container/run.sh <file> <out> \
+        --mode permuter-only --tie-pool-file /out/tie-pool-input.json \
+        --permuter-seconds 1200 --owners <owner1,owner2,...>
+
+`--permuter-seconds` is `run`'s own `--permuter-seconds` flag (default
+1200) -- unlike an ordinary launch, **no `--budget-seconds` is passed at
+all**: the permuter-only driver stops on `--permuter-seconds`/plateau, not
+a wall-clock budget. The `permuter` agent spec carries no model and no API
+key (`AGENT=permuter`, no `GENERATOR_MODEL`) -- it is never a target
+`fleetctl plan --agent` accepts on the command line; `enqueuePermuterLane`
+is the only code path that ever creates one. From here a permuter-lane run
+is an ordinary `RunRecord`: it is polled, its exit still hands off to the
+same merge/branch/PR step (sec 2) for whatever it managed to land, and any
+still-plateaued owner it reports lands right back in the tie-pool store via
+the collection step above.
+
+**Never subject to cooldown, never counts against a model agent's cap.**
+`launchEligible` never evaluates the on-cooldown case for `agent ==
+"permuter"` at all (sec 12's reassignment logic also never treats it as a
+candidate target); a `generator_exhausted` exit for it (which should never
+happen -- there is no generator to exhaust) is requeued with `--resume` and
+skips the cooldown/window bookkeeping entirely, defensively. A permuter-lane
+run counts toward the global `--max-concurrent` cap exactly like any other
+launch, but toward no agent's own `--agent-concurrency` cap except its own
+(`byAgent["permuter"]`, which nothing else ever shares) -- a fleet that
+never configures `--agent-concurrency permuter=N` leaves it uncapped
+per-agent by construction.
+
+**`container/entrypoint.sh` needs one more case for this to actually run
+key-free.** `entrypoint.sh`'s auth guard (its `case "$AGENT" in ...`
+block) already has no case for `AGENT=permuter` and falls through the
+default `*)` branch, which does not demand a key -- so the guard itself
+does not block this launch. But the block just above it,
+
+    if [ "$have_generator_cmd" -eq 0 ] && [ "$have_candidate_file" -eq 0 ]; then
+        args=(--generator-cmd "/work/container/generators/run_generator.sh {prompt} {batch}" "${args[@]}")
+    fi
+
+unconditionally defaults `--generator-cmd` onto the args whenever neither
+`--generator-cmd` nor `--candidate-file` was passed -- which is exactly the
+permuter-lane launch's shape (sec 13 passes neither). That silently hands
+`container_agent.py --mode permuter-only` a `--generator-cmd` it never
+asked for. `container/entrypoint.sh` was intentionally left untouched by
+this change (out of scope -- `container/agent.py`'s own `--mode
+permuter-only` support is a separate, concurrent change); it needs a third
+"caller already handles this" detector alongside `have_generator_cmd`/
+`have_candidate_file`, guarding *both* the default-`--generator-cmd`
+injection above and the auth-guard block right after it:
+
+    have_permuter_only=0
+    prev=""
+    for arg in "$@"; do
+        case "$arg" in
+            --generator-cmd|--generator-cmd=*) have_generator_cmd=1 ;;
+            --candidate-file|--candidate-file=*) have_candidate_file=1 ;;
+            --mode=permuter-only) have_permuter_only=1 ;;
+        esac
+        case "$prev $arg" in
+            "--mode permuter-only") have_permuter_only=1 ;;
+        esac
+        prev="$arg"
+    done
+
+    args=("$@")
+    if [ "$have_generator_cmd" -eq 0 ] && [ "$have_candidate_file" -eq 0 ] && [ "$have_permuter_only" -eq 0 ]; then
+        args=(--generator-cmd "/work/container/generators/run_generator.sh {prompt} {batch}" "${args[@]}")
+    fi
+
+    if [ "$have_candidate_file" -eq 0 ] && [ "$have_generator_cmd" -eq 0 ] && [ "$have_permuter_only" -eq 0 ]; then
+        AGENT="${AGENT:-claude}"
+        ...
+    fi
+
+(the auth-guard `if` already happens to be harmless for `AGENT=permuter`
+today, but gating it on `have_permuter_only` too keeps it that way
+deliberately, rather than by accident of `permuter` matching no known
+`case` arm.)
