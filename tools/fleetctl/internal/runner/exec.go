@@ -255,6 +255,16 @@ func (r *ExecRunner) GitStatusPorcelain(ctx context.Context, repoRoot string) (s
 	return result.Stdout, nil
 }
 
+func (r *ExecRunner) GitResetPath(ctx context.Context, repoRoot, path string) error {
+	result, err := r.runOrDryRun(ctx, r.RepoRoot, nil, "git", "-C", repoRoot, "reset", "-q", "--", path)
+	return gitErr(result, err, "git reset -q -- "+path, r.DryRun)
+}
+
+func (r *ExecRunner) GitCheckoutPath(ctx context.Context, repoRoot, path string) error {
+	result, err := r.runOrDryRun(ctx, r.RepoRoot, nil, "git", "-C", repoRoot, "checkout", "--", path)
+	return gitErr(result, err, "git checkout -- "+path, r.DryRun)
+}
+
 func (r *ExecRunner) GitPush(ctx context.Context, repoRoot, branch string) error {
 	result, err := r.runOrDryRun(ctx, r.RepoRoot, nil, "git", "-C", repoRoot, "push", "-u", "origin", branch)
 	return gitErr(result, err, "git push -u origin "+branch, r.DryRun)

@@ -284,6 +284,9 @@ func (l *Loop) PersistedPlan() (*planpkg.Plan, bool) {
 // runs up to the concurrency caps. It reports whether there is still work
 // left (something running or queued) so Run knows whether to keep looping.
 func (l *Loop) RunOnce(ctx context.Context) (bool, error) {
+	if err := l.retryBlockedMergeRuns(ctx); err != nil {
+		return false, err
+	}
 	if err := l.pollRunning(ctx); err != nil {
 		return false, err
 	}
@@ -298,7 +301,13 @@ func (l *Loop) RunOnce(ctx context.Context) (bool, error) {
 	}
 	total, _ := l.State.RunningCount()
 	prOpen := l.State.CountByStatus(fleetstate.StatusPROpen)
-	return total > 0 || len(l.State.Queue) > 0 || prOpen > 0, nil
+	// A merge_blocked_dirty run counts as "still work" too -- it is retried
+	// at the top of every pass (retryBlockedMergeRuns above), so `run`'s
+	// loop must keep polling instead of exiting once it is the only run
+	// left, exactly like a stuck MergeBlocked fast-forward already keeps
+	// pollPRs (and thus the loop) alive.
+	blocked := l.State.CountByStatus(fleetstate.StatusMergeBlockedDirty)
+	return total > 0 || len(l.State.Queue) > 0 || prOpen > 0 || blocked > 0, nil
 }
 
 // Run drives RunOnce to completion: repeatedly, persisting state after
@@ -640,15 +649,41 @@ func prNumberFromURL(url string) int {
 
 // touchesMergePaths reports whether a git-status path (already stripped of
 // its leading two-character XY code) falls inside a tree the merge step
-// itself writes to -- disasm/src/, COVERAGE.md, docs/regions/ (see
+// itself writes to -- disasm/src/, docs/regions/ (see
 // tools/container_merge.py's own writes). Everything else -- another
 // session's own uncommitted edits elsewhere in the checkout, e.g.
 // disasm/Makefile or tools/try_pragma_compare.py -- is tolerated; see
 // dirtyMergePath and docs/FLEET_CONTROLLER.md sec 2.
+//
+// COVERAGE.md is deliberately NOT here even though the merge step writes
+// it too: .githooks/pre-commit.d/10-coverage.sh regenerates and stages it
+// on *every* commit, so `git commit --only <file>` (tools/container_merge.py's
+// own commit path) routinely leaves a fresh, uncommitted COVERAGE.md behind
+// in the merge repo -- a leftover from the merge step's own last success,
+// never another session's conflicting work. resetGeneratedFiles discards
+// it outright before the dirty check runs, so it is never a real conflict.
 func touchesMergePaths(path string) bool {
-	return path == "COVERAGE.md" ||
-		strings.HasPrefix(path, "disasm/src/") ||
+	return strings.HasPrefix(path, "disasm/src/") ||
 		strings.HasPrefix(path, "docs/regions/")
+}
+
+// resetGeneratedFiles discards any uncommitted state in files the merge
+// repo's own tooling regenerates as a side effect of committing -- today
+// just COVERAGE.md (see touchesMergePaths' doc) -- before runMerge's dirty
+// check runs, so a leftover regenerated-but-uncommitted copy from a prior
+// commit never blocks a run that is otherwise clean. `git reset -q --
+// COVERAGE.md` unstages it and `git checkout -- COVERAGE.md` discards any
+// working-tree modification, restoring it to HEAD's committed version --
+// safe to do unconditionally since the pre-commit hook regenerates it from
+// scratch on the next real commit anyway.
+func (l *Loop) resetGeneratedFiles(ctx context.Context, repoRoot string) error {
+	if err := l.Runner.GitResetPath(ctx, repoRoot, "COVERAGE.md"); err != nil {
+		return fmt.Errorf("git reset COVERAGE.md: %w", err)
+	}
+	if err := l.Runner.GitCheckoutPath(ctx, repoRoot, "COVERAGE.md"); err != nil {
+		return fmt.Errorf("git checkout COVERAGE.md: %w", err)
+	}
+	return nil
 }
 
 // dirtyMergePath scans `git status --porcelain` output for the first
@@ -681,6 +716,19 @@ func (l *Loop) runMerge(ctx context.Context, rec *fleetstate.RunRecord) error {
 	branch := branchName(rec.Spec)
 	mergeRepo := l.mergeRepo()
 	baseRef := l.baseRef()
+
+	// Cleared up front so a retryBlockedMergeRuns attempt that succeeds (or
+	// blocks on a *different* path than last time) never leaves a stale
+	// note from a prior blocked attempt behind.
+	rec.Note = ""
+
+	// Discard any leftover uncommitted COVERAGE.md before checking
+	// cleanliness -- see resetGeneratedFiles' doc -- so the pre-commit
+	// hook's own regeneration of it never masquerades as another session's
+	// conflicting dirt.
+	if err := l.resetGeneratedFiles(ctx, mergeRepo); err != nil {
+		return fmt.Errorf("reset generated files in %s: %w", mergeRepo, err)
+	}
 
 	// The merge repo is shared (often a linked worktree of the same
 	// checkout other sessions/tools use), so it may already carry
@@ -790,6 +838,48 @@ func (l *Loop) runMerge(ctx context.Context, rec *fleetstate.RunRecord) error {
 		l.State.Runs[newID] = &fleetstate.RunRecord{Spec: newSpec, Status: fleetstate.StatusQueued}
 		l.State.Queue = append(l.State.Queue, newID)
 		l.logf("run %s: %d unmatched owner(s) requeued as %s with fresh seeds", rec.Spec.ID, len(unmatched), newID)
+	}
+	return nil
+}
+
+// retryBlockedMergeRuns re-attempts, at the top of every poll pass (called
+// first thing from RunOnce, before anything else touches the merge repo),
+// every run currently StatusMergeBlockedDirty -- mirroring how pollPRs
+// retries a stuck fast-forward once at the top of its own pass (sec 7). The
+// merge repo's conflicting dirt (disasm/src/, docs/regions/) may have been
+// cleaned up by hand since the run first blocked, or (COVERAGE.md, no
+// longer even a conflicting path -- see touchesMergePaths) by this retry's
+// own runMerge call -- either way there is no reason to wait for a human to
+// notice and re-run fleetctl. Runs are visited in id order for
+// deterministic logs/tests.
+//
+// A retry that finds the merge repo still dirty leaves the run exactly
+// where it was (runMerge sets StatusMergeBlockedDirty and its note again),
+// re-firing the merge_blocked_dirty alert -- rate-limited to once per hour
+// per run by Loop.alert's own "event:key" bucket (key is rec.Spec.ID), so a
+// run stuck for days does not spam. MergeBlockedRetries counts every
+// attempt made (fleetctl status), successful or not.
+func (l *Loop) retryBlockedMergeRuns(ctx context.Context) error {
+	ids := make([]string, 0, len(l.State.Runs))
+	for id, rec := range l.State.Runs {
+		if rec.Status == fleetstate.StatusMergeBlockedDirty {
+			ids = append(ids, id)
+		}
+	}
+	sort.Strings(ids)
+	for _, id := range ids {
+		rec := l.State.Runs[id]
+		rec.MergeBlockedRetries++
+		l.logf("run %s: retrying blocked merge (attempt %d)", id, rec.MergeBlockedRetries)
+		rec.Status = fleetstate.StatusMerging
+		if err := l.runMerge(ctx, rec); err != nil {
+			l.logf("run %s: blocked-merge retry error: %v", id, err)
+			rec.Status = fleetstate.StatusMergeBlockedDirty
+			continue
+		}
+		if rec.Status != fleetstate.StatusMergeBlockedDirty {
+			l.logf("run %s: blocked merge recovered on retry %d", id, rec.MergeBlockedRetries)
+		}
 	}
 	return nil
 }

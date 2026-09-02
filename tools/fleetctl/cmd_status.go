@@ -65,6 +65,9 @@ func printStatusTable(w *os.File, state *fleetstate.State) {
 		if rec.WaitReason != "" {
 			note = appendNote(note, "waiting: "+rec.WaitReason)
 		}
+		if rec.Status == fleetstate.StatusMergeBlockedDirty && rec.MergeBlockedRetries > 0 {
+			note = appendNote(note, fmt.Sprintf("retried %dx", rec.MergeBlockedRetries))
+		}
 		if len(rec.NeedsManualCommit) > 0 {
 			note = appendNote(note, "needs_manual_commit: "+strings.Join(sortedKeys(rec.NeedsManualCommit), ","))
 		}

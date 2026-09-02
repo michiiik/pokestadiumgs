@@ -182,8 +182,9 @@ post-merge fast-forward has failed (sec 7), and a
 `running=N queued=M (agent=n ...)` summary line. A run whose merge step
 found `--merge-repo` dirty in a way that would conflict with the merge (sec
 2) shows status `merge_blocked_dirty`, with the conflicting path in its
-note column -- distinct from `MERGE BLOCKED`, which is global (every run),
-not per-run. `--json` prints the same information as one
+note column, plus (once at least one retry has run) `retried Nx` -- distinct
+from `MERGE BLOCKED`, which is global (every run), not per-run. `--json`
+prints the same information as one
 `control.BuildStatus` JSON document instead (its `metrics` field is the
 METRICS table) -- for scripting, and what the `--alert-issue` daily summary
 (sec 9) embeds for machines.
@@ -231,9 +232,9 @@ launched and recorded.
                               |                                  |
                               v                                  v
                     merge_blocked_dirty          (sequential: fetch -> branch -B
-                    (alert, left open,             <base-ref> -> merge --commit ->
-                    never auto-retried)             import-stats -> push+PR if any
-                                                      owner matched -> checkout
+                    (alert, retried at the         <base-ref> -> merge --commit ->
+                    top of every pass until          import-stats -> push+PR if any
+                    clean)                            owner matched -> checkout
                                                       --detach <base-ref>)
                                                                    v
                        no owner matched --------------- >=1 owner matched
@@ -279,15 +280,31 @@ single goroutine with no concurrent merge dispatch, so "one merge at a
 time" (required because the git index is shared -- `AGENTS.md` sec 1.3) is
 structural, not a separate lock. The merge step itself is:
 
-0. `git -C <merge-repo> status --porcelain` -- if any **tracked** entry
-   (not `??` untracked) names a path under `disasm/src/`, `COVERAGE.md`, or
-   `docs/regions/` (the trees the merge step itself writes to), abort
-   immediately: no fetch, no branch, no commit. The run moves to
-   `merge_blocked_dirty` (its note names the conflicting path) and a
-   rate-limited `merge_blocked_dirty` alert fires (sec 9) -- left exactly
-   as-is, like `gate_failed`, for an operator to resolve by hand. Anything
-   else -- untracked files anywhere, or tracked modifications outside those
-   three paths (e.g. another session's own uncommitted edits to
+0a. `git -C <merge-repo> reset -q -- COVERAGE.md` then
+   `git -C <merge-repo> checkout -- COVERAGE.md` -- unconditionally discards
+   any uncommitted state in COVERAGE.md before the dirty check below ever
+   runs. `.githooks/pre-commit.d/10-coverage.sh` regenerates and stages
+   COVERAGE.md on *every* commit, so a prior `git commit --only <file>` in
+   this same merge repo (this merge step's own commit path, sec 2 step 3)
+   routinely leaves a fresh, uncommitted COVERAGE.md behind -- a leftover
+   from the merge step's own last success, never another session's
+   conflicting work, and safe to discard outright since the hook
+   regenerates it from scratch on the next real commit anyway.
+0b. `git -C <merge-repo> status --porcelain` -- if any **tracked** entry
+   (not `??` untracked) names a path under `disasm/src/` or `docs/regions/`
+   (the trees the merge step itself writes to, besides COVERAGE.md, which
+   step 0a above already made harmless), abort immediately: no fetch, no
+   branch, no commit. The run moves to `merge_blocked_dirty` (its note
+   names the conflicting path) and a rate-limited `merge_blocked_dirty`
+   alert fires (sec 9). Unlike `gate_failed`, this is not "never
+   auto-retried": the *next* pass (and every pass after that, at the very
+   top, before anything else touches the merge repo) redoes step 0a and
+   this check, so a run left `merge_blocked_dirty` recovers on its own as
+   soon as an operator cleans up the conflicting path -- no restart needed.
+   `fleetctl status`'s note column shows `retried Nx` once at least one
+   retry has run (`state.json`'s `merge_blocked_retries`). Anything else --
+   untracked files anywhere, or tracked modifications outside those two
+   paths (e.g. another session's own uncommitted edits to
    `disasm/Makefile` or `tools/try_pragma_compare.py`) -- is tolerated:
    `<merge-repo>` is commonly a checkout other tools/sessions share, and
    only the paths this merge would actually touch need to be clean.

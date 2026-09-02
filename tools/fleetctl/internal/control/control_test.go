@@ -804,10 +804,9 @@ func TestRunMergeAbortsWhenMergeRepoHasConflictingDirtyFiles(t *testing.T) {
 }
 
 // TestRunMergeToleratesUnrelatedDirtyFiles checks that modifications
-// outside disasm/src/, COVERAGE.md, and docs/regions/ (e.g. another
-// session's own uncommitted edits to disasm/Makefile and
-// tools/try_pragma_compare.py) -- and any untracked file, anywhere -- do
-// not block the merge.
+// outside disasm/src/ and docs/regions/ (e.g. another session's own
+// uncommitted edits to disasm/Makefile and tools/try_pragma_compare.py) --
+// and any untracked file, anywhere -- do not block the merge.
 func TestRunMergeToleratesUnrelatedDirtyFiles(t *testing.T) {
 	fake := &runner.Fake{
 		InspectResults: map[string][]runner.InspectResult{"cid": {{Found: true, Running: false}}},
@@ -833,6 +832,175 @@ func TestRunMergeToleratesUnrelatedDirtyFiles(t *testing.T) {
 	}
 	if findCall(fake, "GitFetch") == nil || findCall(fake, "GitCheckoutNewBranch") == nil {
 		t.Fatal("the merge should have proceeded past the dirty check")
+	}
+}
+
+// TestRunMergeResetsCoverageMdBeforeDirtyCheck checks that runMerge discards
+// COVERAGE.md's uncommitted state -- `git reset -q -- COVERAGE.md` then
+// `git checkout -- COVERAGE.md` -- before running `git status --porcelain`,
+// matching the observed failure: .githooks/pre-commit.d/10-coverage.sh
+// regenerates and stages COVERAGE.md on every commit, so a prior
+// `git commit --only <file>` in the merge repo routinely leaves a fresh,
+// uncommitted COVERAGE.md behind that must never be mistaken for another
+// session's conflicting dirt.
+func TestRunMergeResetsCoverageMdBeforeDirtyCheck(t *testing.T) {
+	fake := &runner.Fake{
+		InspectResults: map[string][]runner.InspectResult{"cid": {{Found: true, Running: false}}},
+	}
+	loop, dir := newTestLoop(t, fake)
+	outDir := filepath.Join(dir, "out")
+	mustWriteFile(t, filepath.Join(outDir, "summary.json"), `{"stopped_reason":"completed"}`)
+	fake.MergeFunc = func(spec runner.MergeSpec) (runner.ProcessResult, error) {
+		mustWriteFile(t, filepath.Join(spec.OutDir, "merge-report.json"), `{"owners":{}}`)
+		return runner.ProcessResult{}, nil
+	}
+	rec := runningRec("x-p0", "cid", outDir, "codex")
+	loop.State.Runs["x-p0"] = rec
+
+	if _, err := loop.RunOnce(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+
+	seq := methodSequence(fake)
+	idx := func(method string) int {
+		for i, m := range seq {
+			if m == method {
+				return i
+			}
+		}
+		return -1
+	}
+	resetIdx, checkoutIdx, statusIdx := idx("GitResetPath"), idx("GitCheckoutPath"), idx("GitStatusPorcelain")
+	if resetIdx == -1 || checkoutIdx == -1 || statusIdx == -1 {
+		t.Fatalf("expected GitResetPath, GitCheckoutPath, and GitStatusPorcelain to all run; sequence=%v", seq)
+	}
+	if resetIdx > statusIdx || checkoutIdx > statusIdx {
+		t.Fatalf("COVERAGE.md reset/checkout must precede the dirty check; sequence=%v", seq)
+	}
+	if call := findCall(fake, "GitResetPath"); call == nil || call.Strings[1] != "COVERAGE.md" {
+		t.Fatalf("GitResetPath call = %+v, want its path arg to be COVERAGE.md", call)
+	}
+	if call := findCall(fake, "GitCheckoutPath"); call == nil || call.Strings[1] != "COVERAGE.md" {
+		t.Fatalf("GitCheckoutPath call = %+v, want its path arg to be COVERAGE.md", call)
+	}
+}
+
+// TestRunMergeToleratesCoverageMdOnlyDirt checks that a tracked modification
+// to COVERAGE.md alone -- once the repo's regenerate-on-commit hook has
+// left one behind -- never blocks the merge: COVERAGE.md is no longer a
+// conflicting path at all (touchesMergePaths), on top of being reset
+// outright before the check runs.
+func TestRunMergeToleratesCoverageMdOnlyDirt(t *testing.T) {
+	fake := &runner.Fake{
+		InspectResults:           map[string][]runner.InspectResult{"cid": {{Found: true, Running: false}}},
+		GitStatusPorcelainResult: " M COVERAGE.md\n",
+	}
+	loop, dir := newTestLoop(t, fake)
+	outDir := filepath.Join(dir, "out")
+	mustWriteFile(t, filepath.Join(outDir, "summary.json"), `{"stopped_reason":"completed"}`)
+	fake.MergeFunc = func(spec runner.MergeSpec) (runner.ProcessResult, error) {
+		mustWriteFile(t, filepath.Join(spec.OutDir, "merge-report.json"), `{"owners":{"func_1":"accepted","func_2":"accepted"}}`)
+		return runner.ProcessResult{}, nil
+	}
+	rec := runningRec("x-p0", "cid", outDir, "codex")
+	loop.State.Runs["x-p0"] = rec
+
+	if _, err := loop.RunOnce(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if rec.Status == fleetstate.StatusMergeBlockedDirty {
+		t.Fatalf("status = %s, COVERAGE.md-only dirt must not block the merge", rec.Status)
+	}
+	if findCall(fake, "GitFetch") == nil || findCall(fake, "GitCheckoutNewBranch") == nil {
+		t.Fatal("the merge should have proceeded past the dirty check")
+	}
+}
+
+// TestBlockedMergeRunRetriedAndRecoversWhenClean checks the fix for the
+// observed cycle bug end to end: a run blocked merge_blocked_dirty is
+// re-attempted at the top of the very next RunOnce pass (retryBlockedMergeRuns),
+// with no restart and no operator action beyond cleaning up the conflicting
+// path -- and MergeBlockedRetries tracks how many attempts were made.
+func TestBlockedMergeRunRetriedAndRecoversWhenClean(t *testing.T) {
+	fake := &runner.Fake{
+		InspectResults:           map[string][]runner.InspectResult{"cid": {{Found: true, Running: false}}},
+		GitStatusPorcelainResult: " M disasm/src/x.c\n",
+	}
+	loop, dir := newTestLoop(t, fake)
+	outDir := filepath.Join(dir, "out")
+	mustWriteFile(t, filepath.Join(outDir, "summary.json"), `{"stopped_reason":"completed"}`)
+	notifier := &fakeNotifier{}
+	loop.Notifiers = []Notifier{notifier}
+	rec := runningRec("x-p0", "cid", outDir, "codex")
+	loop.State.Runs["x-p0"] = rec
+
+	if _, err := loop.RunOnce(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if rec.Status != fleetstate.StatusMergeBlockedDirty {
+		t.Fatalf("status = %s, want merge_blocked_dirty", rec.Status)
+	}
+	if rec.MergeBlockedRetries != 0 {
+		t.Fatalf("MergeBlockedRetries = %d, want 0 before any retry pass has run", rec.MergeBlockedRetries)
+	}
+
+	// An operator (or this pass's own COVERAGE.md reset, for a real
+	// conflict it would be a human) cleans up the conflicting path; drive
+	// one more pass and expect retryBlockedMergeRuns to pick this run back
+	// up with no InspectContainer/exit involved at all.
+	fake.GitStatusPorcelainResult = ""
+	fake.MergeFunc = func(spec runner.MergeSpec) (runner.ProcessResult, error) {
+		mustWriteFile(t, filepath.Join(spec.OutDir, "merge-report.json"), `{"owners":{"func_1":"accepted","func_2":"accepted"}}`)
+		return runner.ProcessResult{}, nil
+	}
+	if _, err := loop.RunOnce(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if rec.Status == fleetstate.StatusMergeBlockedDirty {
+		t.Fatalf("status = %s, retry against a clean repo should have unblocked the run", rec.Status)
+	}
+	if rec.MergeBlockedRetries != 1 {
+		t.Fatalf("MergeBlockedRetries = %d, want 1", rec.MergeBlockedRetries)
+	}
+	if findCall(fake, "GitFetch") == nil {
+		t.Fatal("the retry should have proceeded past the dirty check once clean")
+	}
+	if len(notifier.calls) != 1 {
+		t.Fatalf("notifier calls = %d, want exactly 1 (the initial block; the recovered retry must not alert again)", len(notifier.calls))
+	}
+}
+
+// TestBlockedMergeRunStillBlockedIsRetriedAndReAlerted checks that a run
+// still dirty on retry stays merge_blocked_dirty, keeps counting attempts,
+// and is left exactly as-is for an operator -- no fetch/branch/commit --
+// same as the very first block.
+func TestBlockedMergeRunStillBlockedIsRetriedAndReAlerted(t *testing.T) {
+	fake := &runner.Fake{
+		InspectResults:           map[string][]runner.InspectResult{"cid": {{Found: true, Running: false}}},
+		GitStatusPorcelainResult: " M disasm/src/x.c\n",
+	}
+	loop, dir := newTestLoop(t, fake)
+	outDir := filepath.Join(dir, "out")
+	mustWriteFile(t, filepath.Join(outDir, "summary.json"), `{"stopped_reason":"completed"}`)
+	rec := runningRec("x-p0", "cid", outDir, "codex")
+	loop.State.Runs["x-p0"] = rec
+
+	if _, err := loop.RunOnce(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := loop.RunOnce(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if rec.Status != fleetstate.StatusMergeBlockedDirty {
+		t.Fatalf("status = %s, want merge_blocked_dirty (still dirty on retry)", rec.Status)
+	}
+	if rec.MergeBlockedRetries != 1 {
+		t.Fatalf("MergeBlockedRetries = %d, want 1 after one retry pass", rec.MergeBlockedRetries)
+	}
+	for _, method := range []string{"GitFetch", "GitCheckoutNewBranch", "Merge", "GitPush"} {
+		if findCall(fake, method) != nil {
+			t.Fatalf("%s must not run while the merge repo is still dirty", method)
+		}
 	}
 }
 

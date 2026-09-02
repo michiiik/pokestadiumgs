@@ -151,6 +151,17 @@ type Runner interface {
 	// DockerImageID/GitRevParse) used to confirm the merge repo is clean
 	// of conflicting changes before a run's merge step branches it.
 	GitStatusPorcelain(ctx context.Context, repoRoot string) (string, error)
+	// GitResetPath runs `git -C repoRoot reset -q -- path` -- unstages path
+	// without touching the working tree.
+	GitResetPath(ctx context.Context, repoRoot, path string) error
+	// GitCheckoutPath runs `git -C repoRoot checkout -- path` -- discards
+	// any working-tree modification to path, restoring it to the index's
+	// version. Used together with GitResetPath to discard a generated
+	// file's uncommitted state (e.g. COVERAGE.md, regenerated and staged by
+	// .githooks/pre-commit.d/10-coverage.sh on every commit) before the
+	// merge repo's dirty check, so a leftover regenerated-but-uncommitted
+	// copy from a prior `git commit --only` never trips it.
+	GitCheckoutPath(ctx context.Context, repoRoot, path string) error
 	// GitPush runs `git -C repoRoot push -u origin branch`.
 	GitPush(ctx context.Context, repoRoot, branch string) error
 	// GitRevParse runs `git -C repoRoot rev-parse ref` and returns the
