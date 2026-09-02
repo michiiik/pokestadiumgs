@@ -2814,7 +2814,16 @@ void func_84138364(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841385A8.s")
+extern s32 D_8419527C;
+extern void * D_841951F0;
+void func_841385A8(u8 arg0, u8 arg1) {
+    struct State { u8 pad[0x9D8]; u8 *items; };
+    if (D_8419527C < 0x67) {
+        u8 field = (((struct State *)D_841951F0)->items + D_8419527C)[4];
+        u8 high = arg1 << 4;
+        (((struct State *)D_841951F0)->items + D_8419527C)[4] = arg0 ? ((field & 0xF0) | (arg1 & 0xF)) : ((field & 0xF) | high);
+    }
+}
 #endif
 
 #ifdef VERSION_US
