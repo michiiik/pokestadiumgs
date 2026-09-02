@@ -22,6 +22,7 @@ on:
     paths:
       - 'disasm/src/**'
       - 'disasm/include/**'
+      - 'disasm/linker_scripts/**'
       - 'container/**'
       - 'tools/**'
   workflow_dispatch: {}
@@ -47,6 +48,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run container ROM gate
+        # shell: bash makes GitHub run this with `-eo pipefail`, so the
+        # `| tee` below cannot mask a failing gate_pr.sh (it did once: PR #57
+        # merged with a broken link because the step exited with tee's 0).
+        shell: bash
         run: |
           container/gate_pr.sh "$GITHUB_WORKSPACE" 2>&1 | tee "$RUNNER_TEMP/container-gate-compare.log"
 
