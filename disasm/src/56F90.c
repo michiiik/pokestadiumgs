@@ -57,7 +57,7 @@ s32 GbPak_DetectRam(s32 arg0, u8* arg1) {
 extern u8 D_80128550[];
 extern s32 func_80056F7C(s32);
 extern s32 func_8005D92C(s32);
-extern s32 func_8005805C(s32);
+extern s32 GbSave_IdentifyFormat(s32);
 extern s32 GbTower_VerifyPakStillInserted(s32, u8 *);
 extern void Game_ShutdownAndLoadFragment(s32, s32);
 s32 GbPak_ValidateAndRefresh(s32 arg0, u8 *arg1, u8 *arg2) {
@@ -74,7 +74,7 @@ s32 GbPak_ValidateAndRefresh(s32 arg0, u8 *arg1, u8 *arg2) {
     if (func_80056F7C(arg0) != 0) {
         if (arg2 != NULL) {
             local.previous = func_8005D92C(arg0);
-            if ((func_8005805C(arg0) == local.previous) && (GbTower_VerifyPakStillInserted(arg0, arg2) != 0)) {
+            if ((GbSave_IdentifyFormat(arg0) == local.previous) && (GbTower_VerifyPakStillInserted(arg0, arg2) != 0)) {
                 local.result = GbPak_DetectRam(arg0, arg2);
             }
             if (local.result == 0) Game_ShutdownAndLoadFragment(arg0, 1);

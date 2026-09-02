@@ -141,7 +141,7 @@ extern u8 D_800A4A2C[];
 extern u8 D_800A4A30[];
 extern u8 D_800A4A34[];
 extern u8 D_800A4A38[];
-s32 func_8005805C(s32 arg0) {
+s32 GbSave_IdentifyFormat(s32 arg0) {
     OSGbpakId id;
     u8 status;
     s32 result = 0;
@@ -440,7 +440,7 @@ extern s32 GbPak_IsCartOff(s32);
 extern s32 GbPak_IsCartOn(s32);
 extern s32 func_80056F7C(s32);
 extern s32 GbTower_VerifyPakStillInserted(s32, u8 *);
-extern s32 func_8005805C(s32 arg0);
+extern s32 GbSave_IdentifyFormat(s32 arg0);
 extern u8 D_80128570[];
 s32 func_8005A228(s32 arg0) {
     s32 result = 0;
@@ -463,7 +463,7 @@ s32 func_8005A228(s32 arg0) {
     case 3:
         if (func_80056F7C(arg0) != 0) {
             result = 3;
-            if (func_8005805C(arg0) == *(u8 *)(D_80128570 + arg0 * 0x70 + 4)) {
+            if (GbSave_IdentifyFormat(arg0) == *(u8 *)(D_80128570 + arg0 * 0x70 + 4)) {
                 if (GbTower_VerifyPakStillInserted(arg0, D_80128570 + arg0 * 0x70 + 0x28) != 0) {
                     result = 2;
                 }
