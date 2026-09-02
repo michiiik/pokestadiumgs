@@ -195,11 +195,15 @@ Schema:
     {{"function": "func_...", "old": "exact old text", "new": "new text"}}
   ],
   "candidates": [
-    {{"function": "{owner}", "label": "family:shape:hypothesis", "body": "<C source>"}}
+    {{"function": "{owner}", "label": "family:shape:hypothesis",
+     "body": "<COMPLETE function definition: return type, name, parameter list and braces>"}}
   ]
 }}
 
 Rules:
+- "body" is the whole function definition that replaces the #pragma line,
+  e.g. "f64 {owner}(void *arg0, void *arg1) {{ ... }}" on one or more lines. A bare brace
+  block with no signature is a compile failure, not a candidate.
 - Every candidate's "function" must be exactly "{owner}".
 - Provide between 8 and 16 candidates; each candidate tests exactly ONE
   hypothesis (declaration order, temp widths, index-vs-pointer form,
