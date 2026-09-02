@@ -22,7 +22,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROMPT="$1"
 BATCH="$2"
 
-require_env ANTHROPIC_API_KEY
+require_any_env ANTHROPIC_API_KEY CLAUDE_CODE_OAUTH_TOKEN
 
 claude -p "$(cat "$PROMPT")" \
   --output-format text \

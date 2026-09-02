@@ -106,7 +106,10 @@ if [ "$have_candidate_file" -eq 0 ] && [ "$have_generator_cmd" -eq 0 ]; then
 
     case "$AGENT" in
         claude)
-            [ -n "${ANTHROPIC_API_KEY:-}" ] || fail_missing_key ANTHROPIC_API_KEY
+            if [ -z "${ANTHROPIC_API_KEY:-}" ] && [ -z "${CLAUDE_CODE_OAUTH_TOKEN:-}" ]; then
+                echo "entrypoint: AGENT=claude needs \$ANTHROPIC_API_KEY or \$CLAUDE_CODE_OAUTH_TOKEN (from 'claude setup-token')." >&2
+                exit 1
+            fi
             ;;
         openai_compat)
             [ -n "${OPENAI_API_KEY:-}" ] || fail_missing_key OPENAI_API_KEY

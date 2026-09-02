@@ -20,7 +20,7 @@
 #   GENERATOR_EFFORT  codex reasoning effort (low|medium|high|xhigh); also
 #                     forwarded to kimi as KIMI_MODEL_THINKING_EFFORT
 #                     (low|high|max for the default kimi-code/k3)
-#   ANTHROPIC_API_KEY claude
+#   ANTHROPIC_API_KEY claude (or CLAUDE_CODE_OAUTH_TOKEN from `claude setup-token`)
 #   OPENAI_API_KEY    codex, qwen (or DASHSCOPE_API_KEY), openai_compat
 #   OPENAI_BASE_URL   openai_compat (required), qwen (optional)
 #   DASHSCOPE_API_KEY qwen, alternate to OPENAI_API_KEY
@@ -101,6 +101,7 @@ docker run \
     -e GENERATOR_MODEL \
     -e GENERATOR_EFFORT \
     -e ANTHROPIC_API_KEY \
+    -e CLAUDE_CODE_OAUTH_TOKEN \
     -e OPENAI_API_KEY \
     -e OPENAI_BASE_URL \
     -e DASHSCOPE_API_KEY \
