@@ -51,6 +51,7 @@ import shlex
 import signal
 import subprocess
 import sys
+import threading
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -66,6 +67,20 @@ PROBE_TIMEOUT_CAP = 300.0
 MISC_TIMEOUT = 60.0
 BEST_CANDIDATES_KEPT = 5
 TRIED_LABELS_SHOWN = 30
+
+# Part A: m2c draft seed.
+M2C_DRAFT_TIMEOUT = 120.0
+
+# Part D: permuter trigger thresholds/concurrency.
+PERMUTER_TRIGGER = 0.95
+PERMUTER_LOWERED_TRIGGER = 0.90
+# "raw well below normalized": how far raw_similarity_score must trail the
+# effective (normalized) similarity for a register_allocation_only best
+# attempt to count as the lowered-threshold "register-only tie" case (see
+# docs/REGISTER_TIES.md: similarity_score near 1.0, exact_similarity_score
+# visibly lower, is the tell).
+REGISTER_TIE_RAW_GAP = 0.05
+DEFAULT_PERMUTER_BODIES = 3
 
 # feedback["diff_excerpt"] rendering (see _build_feedback): how many
 # non-exact-match assembly_diff entries to keep, and a byte cap so one
@@ -122,7 +137,14 @@ def save_json(path: Path, data: object) -> None:
 
 def _finalize_run(summary: dict, out_dir: Path, stopped_reason: str, started: float) -> None:
     """Stamp ``summary`` with its stop reason/timing and close out its current
-    ``runs`` entry (if any), then write ``<out_dir>/summary.json``."""
+    ``runs`` entry (if any), then write ``<out_dir>/summary.json``.
+
+    Also terminates every still-registered background permuter process
+    (Part D) -- the run's single finalize path, so no permuter subprocess a
+    background job launched can outlive the run, whichever owner's job is
+    still mid-flight when it ends.
+    """
+    terminate_all_permuters()
     summary["stopped_reason"] = stopped_reason
     summary["ended_at"] = now_iso()
     summary["wall_seconds"] = round(time.monotonic() - started, 1)
@@ -146,6 +168,8 @@ def _new_owner_state() -> dict:
         "permuter_runs": [],
         "tried_bodies": [],
         "tried_labels": [],
+        "m2c_draft": None,
+        "m2c_draft_fetched": False,
     }
 
 
@@ -355,23 +379,55 @@ def _build_feedback(attempt: dict) -> dict:
 # Owner discovery
 # ---------------------------------------------------------------------------
 
-def discover_owners(repo_dir: Path, source_rel: str, *, timeout: float = MISC_TIMEOUT) -> list[str]:
-    """Return the file's remaining GLOBAL_ASM owners, in pragma_targets order.
+def discover_owners(
+    repo_dir: Path,
+    source_rel: str,
+    *,
+    timeout: float = MISC_TIMEOUT,
+    owner_order: str = "size",
+    max_instructions: float | None = None,
+    logger: "Logger | None" = None,
+) -> list[str]:
+    """Return the file's remaining GLOBAL_ASM owners.
 
-    Falls back to a regex scan of the source (in file order) when
-    ``pragma_targets.py`` is unavailable or reports nothing -- e.g. a
-    synthetic test file outside the tracked ``disasm/src`` tree.
+    ``owner_order="size"`` (default) keeps ``pragma_targets.py targets
+    --json``'s own smallest-instructions-first ranking; ``owner_order="file"``
+    reorders those same owners (after any ``max_instructions`` filtering) to
+    the order they appear in the source instead, using
+    ``discover_owners_fallback`` purely as an ordering key here (not as its
+    usual missing-tool fallback). ``max_instructions`` drops any owner whose
+    instruction count exceeds it (unlimited when ``None``); pass it through
+    to ``pragma_targets.py targets`` rather than filtering client-side so its
+    own accounting (``matched``/``truncated``) stays correct.
+
+    Falls back to a regex scan of the source (file order, no instruction
+    counts, ``max_instructions`` ignored) when ``pragma_targets.py`` is
+    unavailable or reports nothing -- e.g. a synthetic test file outside the
+    tracked ``disasm/src`` tree.
     """
     try:
-        proc = subprocess.run(
-            ["python3", "tools/pragma_targets.py", "targets", "--source", source_rel, "--json"],
-            cwd=repo_dir, capture_output=True, text=True, timeout=timeout,
-        )
+        command = [
+            "python3", "tools/pragma_targets.py", "targets",
+            "--source", source_rel, "--json", "--limit", "100000",
+        ]
+        if max_instructions is not None:
+            command += ["--max-instructions", str(int(max_instructions))]
+        proc = subprocess.run(command, cwd=repo_dir, capture_output=True, text=True, timeout=timeout)
         if proc.returncode == 0 and proc.stdout.strip():
             data = json.loads(proc.stdout)
-            owners = [row["function"] for row in data.get("targets", []) if row.get("function")]
-            if owners:
-                return owners
+            rows = [row for row in data.get("targets", []) if row.get("function")]
+            if rows:
+                if owner_order == "file":
+                    file_order = discover_owners_fallback(repo_dir, source_rel)
+                    rank = {name: index for index, name in enumerate(file_order)}
+                    rows = sorted(rows, key=lambda row: rank.get(row["function"], len(file_order)))
+                if logger is not None:
+                    logger.log(
+                        f"owner order ({owner_order}): " + ", ".join(
+                            f"{row['function']}({row.get('instructions', '?')})" for row in rows
+                        )
+                    )
+                return [row["function"] for row in rows]
     except (subprocess.TimeoutExpired, json.JSONDecodeError, OSError, KeyError, ValueError):
         pass
     return discover_owners_fallback(repo_dir, source_rel)
@@ -413,6 +469,192 @@ def owner_asm_text(repo_dir: Path, function: str, *, timeout: float = MISC_TIMEO
         return f"(pragma_targets.py asm failed: {proc.stderr.strip()[:500]})"
     except (subprocess.TimeoutExpired, OSError) as exc:
         return f"(pragma_targets.py asm unavailable: {exc})"
+
+
+# ---------------------------------------------------------------------------
+# m2c draft seed (Part A)
+#
+# ``tools/pragma_targets.py draft <function>`` runs m2c over the owner's
+# assembly, with the same host-preprocessed context cache pragma_targets
+# itself uses for candidate drafting (AGENTS.md §2.5 step 2). One draft per
+# owner is enough: it is a structural hint (unknown-struct fields, guessed
+# types), never a match, so it is fetched once per run and cached in
+# ``owner_state["m2c_draft"]`` (persisted through state.json for --resume).
+# ---------------------------------------------------------------------------
+
+def invoke_m2c_draft(repo_dir: Path, function: str, *, timeout: float) -> subprocess.CompletedProcess:
+    """Run ``tools/pragma_targets.py draft`` once. Isolated so tests can stub it."""
+    return subprocess.run(
+        ["python3", "tools/pragma_targets.py", "draft", function, "--variant", "m2c"],
+        cwd=repo_dir, capture_output=True, text=True, timeout=timeout,
+    )
+
+
+def _parse_m2c_draft_output(stdout: str) -> str | None:
+    """Extract the drafted C body from ``pragma_targets.py draft``'s stdout.
+
+    Its output is ``/* <label> */\\n<code, or "/* error: ... */">`` per
+    variant; requesting a single ``--variant m2c`` gives exactly one block.
+    ``None`` when m2c itself failed (the body is an error comment) or stdout
+    was empty.
+    """
+    lines = stdout.splitlines()
+    if not lines:
+        return None
+    body = "\n".join(lines[1:]).strip()
+    if not body or body.startswith("/* error:"):
+        return None
+    return body
+
+
+def get_m2c_draft(
+    repo_dir: Path, owner: str, owner_state: dict, *, timeout: float = M2C_DRAFT_TIMEOUT, logger: Logger,
+) -> str | None:
+    """Fetch (once per run) and cache an m2c structural draft for ``owner``.
+
+    ``owner_state["m2c_draft_fetched"]`` remembers that the attempt already
+    happened, including a failed/timed-out one, so a draft that couldn't be
+    produced is never retried every iteration; ``owner_state["m2c_draft"]``
+    carries the cached text through ``--resume``.
+    """
+    if owner_state.get("m2c_draft_fetched"):
+        return owner_state.get("m2c_draft")
+    owner_state["m2c_draft_fetched"] = True
+    try:
+        proc = invoke_m2c_draft(repo_dir, owner, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        logger.log(f"{owner}: m2c draft timed out after {timeout:.0f}s; continuing without it")
+        return None
+    except OSError as exc:
+        logger.log(f"{owner}: m2c draft failed to launch: {exc}; continuing without it")
+        return None
+    if proc.returncode != 0:
+        logger.log(
+            f"{owner}: m2c draft failed (exit {proc.returncode}): "
+            f"{(proc.stderr or '').strip()[:300]}; continuing without it"
+        )
+        return None
+    draft = _parse_m2c_draft_output(proc.stdout)
+    if draft is None:
+        logger.log(f"{owner}: m2c draft produced no usable code; continuing without it")
+        return None
+    owner_state["m2c_draft"] = draft
+    return draft
+
+
+# ---------------------------------------------------------------------------
+# Declaration hygiene (Part B)
+#
+# A generator often repeats a same-file callee's prototype in the batch's
+# shared "declarations" blob even though the source already declares (or
+# defines) it -- IDO accepts the redundant redeclaration, but it is noise a
+# generator keeps re-deriving every iteration, and an inconsistent repeat can
+# quietly disagree with the real signature. Drop only exact top-level
+# "declarations" statements that name something the file already declares or
+# defines; a nested extern inside a candidate's own body is left alone (the
+# runner will report a real conflict) -- see the prompt-side rule line
+# instead (_extern_block_symbol_names / build_prompt).
+# ---------------------------------------------------------------------------
+
+_DECL_TRAILING_NAME_RE = re.compile(r"([A-Za-z_]\w*)\s*$")
+_DECL_FUNC_PTR_NAME_RE = re.compile(r"\(\s*\*\s*([A-Za-z_]\w*)\s*\)")
+
+
+def _split_declaration_statements(declarations: str) -> list[str]:
+    """Split a batch's ``declarations`` blob into individual ``...;`` statements."""
+    if not declarations:
+        return []
+    statements: list[str] = []
+    for chunk in re.split(r"(?<=;)", declarations):
+        statement = chunk.strip()
+        if statement:
+            statements.append(statement)
+    return statements
+
+
+def _declaration_statement_name(statement: str) -> str | None:
+    """Best-effort extraction of the symbol name one declaration statement declares.
+
+    Handles ``extern RET name(params);`` / ``RET name(params);`` (the name
+    right before the first ``(``, or inside ``(*name)`` for a function-
+    pointer declarator) and plain data declarations, ``extern TYPE name;`` /
+    ``extern TYPE name[N];`` (the identifier before ``;``/``[``).
+    """
+    text = statement.strip().rstrip(";").strip()
+    paren = text.find("(")
+    if paren != -1:
+        head = text[: text.find(")", paren) + 1] if ")" in text[paren:] else text
+        ptr_match = _DECL_FUNC_PTR_NAME_RE.search(head)
+        if ptr_match:
+            return ptr_match.group(1)
+        match = _DECL_TRAILING_NAME_RE.search(text[:paren].rstrip())
+        return match.group(1) if match else None
+    bracket = text.find("[")
+    if bracket != -1:
+        text = text[:bracket].rstrip()
+    match = _DECL_TRAILING_NAME_RE.search(text)
+    return match.group(1) if match else None
+
+
+def _name_declared_in_source(name: str, source_text: str) -> bool:
+    """Whether ``name`` already has a declaration, definition, or data symbol
+    in ``source_text``: a call/prototype/definition context (``name(``), an
+    existing ``extern ...;`` naming it, or an array declaration (``name[``)."""
+    escaped = re.escape(name)
+    if re.search(rf"\b{escaped}\s*\(", source_text):
+        return True
+    if re.search(rf"\bextern\b[^;{{}}]*\b{escaped}\b[^;{{}}]*;", source_text):
+        return True
+    if re.search(rf"\b{escaped}\s*\[", source_text):
+        return True
+    return False
+
+
+def filter_declarations(batch: dict, source_text: str) -> tuple[dict, list[str]]:
+    """Drop top-level ``declarations`` statements that redeclare a name the
+    source file already declares or defines.
+
+    Returns ``(filtered_batch, dropped_statements)``; ``filtered_batch`` is a
+    shallow copy of ``batch`` with a (possibly empty) ``declarations`` string
+    when anything was dropped, or ``batch`` unchanged when nothing was.
+    """
+    statements = _split_declaration_statements(batch.get("declarations") or "")
+    if not statements:
+        return batch, []
+    kept: list[str] = []
+    dropped: list[str] = []
+    for statement in statements:
+        name = _declaration_statement_name(statement)
+        if name and _name_declared_in_source(name, source_text):
+            dropped.append(statement)
+            continue
+        kept.append(statement)
+    if not dropped:
+        return batch, []
+    filtered = dict(batch)
+    filtered["declarations"] = "\n".join(kept)
+    return filtered, dropped
+
+
+_EXTERN_BLOCK_SECTION_RE = re.compile(
+    r"== extern/prototype block \(deduplicated\) ==\n(.*?)(?=\n==|\Z)", re.S
+)
+_EXTERN_BLOCK_SYMBOL_RE = re.compile(r"\b(?:func_[0-9A-Fa-f]+|D_[0-9A-Fa-f]+)\b")
+
+
+def _extern_block_symbol_names(file_brief: str) -> list[str]:
+    """Extract func_/D_ symbol names from ``file_brief_text``'s "extern/
+    prototype block (deduplicated)" section, in first-seen order."""
+    match = _EXTERN_BLOCK_SECTION_RE.search(file_brief)
+    if not match:
+        return []
+    names: list[str] = []
+    seen: set[str] = set()
+    for name in _EXTERN_BLOCK_SYMBOL_RE.findall(match.group(1)):
+        if name not in seen:
+            seen.add(name)
+            names.append(name)
+    return names
 
 
 # ---------------------------------------------------------------------------
@@ -565,7 +807,10 @@ def build_prompt(
     permuter_seed: dict | None,
     batch_path: Path,
     tried_labels: list[str] | None = None,
+    m2c_draft: str | None = None,
 ) -> str:
+    extern_names = _extern_block_symbol_names(file_brief)
+
     def _assemble(full_diff_count: int) -> str:
         parts = [
             f"You are generating candidate C function bodies for one GLOBAL_ASM",
@@ -579,6 +824,10 @@ def build_prompt(
             f"== target assembly: {owner} ==",
             asm_text.strip(),
         ]
+        if m2c_draft:
+            parts.append("")
+            parts.append("== m2c draft (structure hint, not a match; retype/reshape freely) ==")
+            parts.append(m2c_draft.strip())
         if best_candidates:
             parts.append("")
             parts.extend(_render_best_candidates(best_candidates, full_diff_count=full_diff_count))
@@ -606,6 +855,12 @@ def build_prompt(
                 "submit it close to verbatim as one candidate) =="
             )
             parts.append(permuter_seed.get("body") or "")
+        if extern_names:
+            parts.append("")
+            parts.append(
+                "The file already declares these callees/data (do not redeclare): "
+                + ", ".join(extern_names)
+            )
         parts.append("")
         parts.append(BATCH_CONTRACT.format(source_rel=source_rel, owner=owner, batch_path=batch_path))
         return "\n".join(parts)
@@ -736,6 +991,40 @@ def _snapshot_permuter_dirs(repo_dir: Path, function: str) -> set[str]:
     return {entry.name for entry in root.iterdir() if entry.is_dir() and entry.name.startswith(prefix)}
 
 
+# Every permuter subprocess ``invoke_permuter`` launches is registered here
+# until ``poll_permuter`` confirms it has exited (normally or by force); the
+# run's finalize path (see ``_finalize_run``) sweeps whatever is left so a
+# background permuter job (Part D) can never outlive the whole run, even one
+# still mid-``run_permuter`` inside its worker thread when the run ends.
+_PERMUTER_PROCESS_LOCK = threading.Lock()
+_ACTIVE_PERMUTER_PROCESSES: set[subprocess.Popen] = set()
+
+
+def _register_permuter_process(process: subprocess.Popen) -> None:
+    with _PERMUTER_PROCESS_LOCK:
+        _ACTIVE_PERMUTER_PROCESSES.add(process)
+
+
+def _unregister_permuter_process(process: subprocess.Popen) -> None:
+    with _PERMUTER_PROCESS_LOCK:
+        _ACTIVE_PERMUTER_PROCESSES.discard(process)
+
+
+def terminate_all_permuters() -> None:
+    """Terminate every still-registered permuter subprocess.
+
+    Safe to call any time (idempotent, tolerates an already-exited process).
+    Called from ``_finalize_run`` so a run never leaves a permuter process
+    behind, regardless of which owner's background job launched it.
+    """
+    with _PERMUTER_PROCESS_LOCK:
+        processes = list(_ACTIVE_PERMUTER_PROCESSES)
+    for process in processes:
+        if process.poll() is None:
+            _terminate_process_group(process)
+        _unregister_permuter_process(process)
+
+
 def invoke_permuter(
     repo_dir: Path,
     function: str,
@@ -761,12 +1050,14 @@ def invoke_permuter(
     log_path.parent.mkdir(parents=True, exist_ok=True)
     log_handle = log_path.open("w", encoding="utf-8")
     try:
-        return subprocess.Popen(
+        process = subprocess.Popen(
             command, cwd=repo_dir, stdout=log_handle, stderr=subprocess.STDOUT,
             text=True, start_new_session=True,
         )
     finally:
         log_handle.close()
+    _register_permuter_process(process)
+    return process
 
 
 def _terminate_process_group(process: subprocess.Popen, *, grace: float = 5.0) -> None:
@@ -876,6 +1167,7 @@ def poll_permuter(
     if work_dir is not None and work_dir.is_dir():
         outputs = _collect_permuter_outputs(work_dir, function)
 
+    _unregister_permuter_process(process)
     return {
         "timed_out": timed_out,
         "work_dir": str(work_dir) if work_dir else None,
@@ -894,19 +1186,27 @@ def run_permuter(
     *,
     permuter_seconds: float,
     logger: Logger,
+    label_suffix: str = "",
 ) -> dict | None:
-    """Write the permuter's input files, launch it, and poll for a result."""
+    """Write the permuter's input files, launch it, and poll for a result.
+
+    ``label_suffix`` (default ``""``, unchanged filenames) distinguishes
+    multiple bodies run for the same owner/iteration -- see
+    ``_permuter_job_worker`` (Part D), which runs up to ``--permuter-bodies``
+    of them sequentially in one background thread.
+    """
     tmp_dir = out_dir / "tmp" / "permuter"
     tmp_dir.mkdir(parents=True, exist_ok=True)
-    candidate_path = tmp_dir / f"{owner}_iter{iteration}_candidate.c"
+    stem = f"{owner}_iter{iteration}{label_suffix}"
+    candidate_path = tmp_dir / f"{stem}_candidate.c"
     candidate_path.write_text(body, encoding="utf-8")
     declarations_path = None
     if declarations:
-        declarations_path = tmp_dir / f"{owner}_iter{iteration}_declarations.h"
+        declarations_path = tmp_dir / f"{stem}_declarations.h"
         declarations_path.write_text(declarations, encoding="utf-8")
 
     before = _snapshot_permuter_dirs(repo_dir, owner)
-    log_path = tmp_dir / f"{owner}_iter{iteration}_permuter.log"
+    log_path = tmp_dir / f"{stem}_permuter.log"
     try:
         process = invoke_permuter(
             repo_dir, owner, candidate_path, declarations_path,
@@ -918,10 +1218,154 @@ def run_permuter(
 
     result = poll_permuter(repo_dir, owner, process, before, budget_seconds=permuter_seconds + 30.0)
     logger.log(
-        f"{owner}: permuter iter {iteration} finished timed_out={result['timed_out']} "
+        f"{owner}: permuter iter {iteration}{label_suffix} finished timed_out={result['timed_out']} "
         f"outputs={len(result['outputs'])} best_score={(result['best'] or {}).get('score')}"
     )
     return result
+
+
+# ---------------------------------------------------------------------------
+# Background permuter jobs (Part D): the permuter runs concurrently with the
+# *next* generator call instead of blocking the driver. A job is a single
+# background thread that runs ``run_permuter`` sequentially over up to
+# ``--permuter-bodies`` distinct candidate bodies from one iteration (never
+# blocking the caller); the driver polls it (``poll_permuter_jobs``) at the
+# start of the next iteration's prompt build and again after that
+# iteration's probe, folding any newly-finished body's result into
+# ``owner_state`` as it appears. Reuses ``run_permuter``/``invoke_permuter``/
+# ``poll_permuter`` unchanged -- only the scheduling is new.
+# ---------------------------------------------------------------------------
+
+class PermuterJob:
+    """One background permuter pass over up to ``permuter_bodies`` bodies.
+
+    ``results`` is only ever appended to by the worker thread; a poller
+    reads it under ``lock`` and tracks how much of it (``consumed``) it has
+    already folded into ``owner_state``.
+    """
+
+    def __init__(self, thread: threading.Thread, owner: str, iteration: int, labels: list[str]) -> None:
+        self.thread = thread
+        self.owner = owner
+        self.iteration = iteration
+        self.labels = labels
+        self.lock = threading.Lock()
+        self.results: list[dict] = []
+        self.consumed = 0
+
+
+def _permuter_job_worker(
+    repo_dir: Path,
+    out_dir: Path,
+    owner: str,
+    iteration: int,
+    bodies: list[tuple[str, str]],
+    declarations: str | None,
+    permuter_seconds: float,
+    logger: Logger,
+    job: PermuterJob,
+) -> None:
+    for index, (label, body) in enumerate(bodies):
+        result = run_permuter(
+            repo_dir, out_dir, owner, iteration, body, declarations,
+            permuter_seconds=permuter_seconds, logger=logger, label_suffix=f"_b{index}",
+        )
+        if result is not None:
+            with job.lock:
+                job.results.append({"label": label, **result})
+
+
+def start_permuter_job(
+    repo_dir: Path,
+    out_dir: Path,
+    owner: str,
+    iteration: int,
+    bodies: list[tuple[str, str]],
+    declarations: str | None,
+    *,
+    permuter_seconds: float,
+    logger: Logger,
+) -> PermuterJob:
+    """Launch a background thread running the permuter over ``bodies``
+    (``[(label, body), ...]``) one at a time; never blocks the caller."""
+    labels = [label for label, _ in bodies]
+    job = PermuterJob(thread=None, owner=owner, iteration=iteration, labels=labels)  # type: ignore[arg-type]
+    thread = threading.Thread(
+        target=_permuter_job_worker,
+        args=(repo_dir, out_dir, owner, iteration, bodies, declarations, permuter_seconds, logger, job),
+        daemon=True,
+        name=f"permuter-{owner}-iter{iteration}",
+    )
+    job.thread = thread
+    thread.start()
+    return job
+
+
+def poll_permuter_jobs(jobs: list[PermuterJob], owner_state: dict, *, logger: Logger) -> None:
+    """Fold newly-finished bodies from background permuter jobs into
+    ``owner_state`` (``permuter_runs`` history, ``permuter_seed`` -- lower
+    score is better, 0 is instruction-exact). Safe to call repeatedly;
+    already-folded results are never re-applied. Mutates ``jobs`` in place,
+    dropping jobs whose thread has finished."""
+    still_running: list[PermuterJob] = []
+    for job in jobs:
+        with job.lock:
+            new_results = list(job.results[job.consumed:])
+            job.consumed = len(job.results)
+        for entry in new_results:
+            best_output = entry.get("best")
+            owner_state.setdefault("permuter_runs", []).append({
+                "iteration": job.iteration,
+                "label": entry.get("label"),
+                "timed_out": entry.get("timed_out"),
+                "best_score": (best_output or {}).get("score"),
+            })
+            if best_output is not None:
+                current_seed = owner_state.get("permuter_seed")
+                current_score = current_seed.get("score") if current_seed else None
+                new_score = best_output.get("score")
+                if current_score is None or (isinstance(new_score, (int, float)) and new_score < current_score):
+                    owner_state["permuter_seed"] = {
+                        "score": new_score,
+                        "body": best_output.get("code"),
+                        "iteration": job.iteration,
+                        "label": entry.get("label"),
+                    }
+                    logger.log(
+                        f"{job.owner}: permuter job iter {job.iteration} label={entry.get('label')} "
+                        f"produced a new seed (score={new_score})"
+                    )
+        if job.thread.is_alive():
+            still_running.append(job)
+    jobs[:] = still_running
+
+
+def _select_permuter_bodies(
+    scored: list[dict], candidate_bodies: dict[str, str | None], *, limit: int,
+) -> list[tuple[str, str]]:
+    """Rank this iteration's scored attempts best-first (``attempt_rank``),
+    excluding normalized-only matches, and return up to ``limit`` distinct
+    ``(label, body)`` pairs -- the material a background permuter job runs
+    on (Part D: up to the top 3 distinct bodies by default)."""
+    ranked = sorted(
+        (attempt for attempt in scored if not _is_normalized_only_match(attempt)),
+        key=attempt_rank, reverse=True,
+    )
+    selected: list[tuple[str, str]] = []
+    seen_bodies: set[str] = set()
+    for attempt in ranked:
+        label = attempt.get("label")
+        body = candidate_bodies.get(label)
+        if not body:
+            continue
+        key = _normalize_body_for_dedup(body)
+        if key in seen_bodies:
+            continue
+        seen_bodies.add(key)
+        selected.append((label, body))
+        if len(selected) >= limit:
+            break
+    return selected
 
 
 # ---------------------------------------------------------------------------
@@ -1009,11 +1453,24 @@ def run_iteration(
     deadline: float,
     permuter_seconds: float,
     logger: Logger,
+    permuter_jobs: list | None = None,
+    permuter_bodies: int = DEFAULT_PERMUTER_BODIES,
 ) -> str:
     """Probe one batch and update ``owner_state`` in place.
 
     Returns one of ``"accepted"``, ``"continue"``, ``"budget_expired"``.
+
+    ``permuter_jobs`` (Part D), when given, is the caller's persistent list
+    of in-flight ``PermuterJob``s for this owner: a strong near-miss/register
+    tie appends a newly-started background job to it rather than blocking
+    here. The caller (``process_owner``) polls that list with
+    ``poll_permuter_jobs`` at the start of the next iteration's prompt build
+    and again after that iteration's probe. Omitting it (``None``) starts a
+    job that is simply never polled -- fine for a one-shot caller (test mode)
+    that has nowhere to feed a later seed anyway.
     """
+    if permuter_jobs is None:
+        permuter_jobs = []
     result_path = out_dir / "results" / f"{owner}_iter{iteration}.json"
     result_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -1023,6 +1480,27 @@ def run_iteration(
     if dropped:
         batch = filtered_batch
         save_json(batch_path, batch)
+
+    # Declaration hygiene: a generator often repeats a same-file callee's
+    # prototype in "declarations" even though the source already declares
+    # or defines it. Drop those statements before probing (see
+    # filter_declarations) -- a nested extern inside a candidate's own body
+    # is left for the runner to report.
+    try:
+        source_text = (repo_dir / (batch.get("source") or source_rel)).read_text(
+            encoding="utf-8", errors="replace"
+        )
+    except OSError:
+        source_text = None
+    if source_text is not None:
+        decl_filtered_batch, dropped_declarations = filter_declarations(batch, source_text)
+        for statement in dropped_declarations:
+            logger.log(
+                f"{owner}: iter {iteration}: dropping already-declared statement: {statement!r}"
+            )
+        if dropped_declarations:
+            batch = decl_filtered_batch
+            save_json(batch_path, batch)
 
     if not (batch.get("candidates") or []):
         logger.log(f"{owner}: iter {iteration}: no candidates remain after dedup filtering; skipping probe")
@@ -1190,39 +1668,43 @@ def run_iteration(
 
     # A strong near-miss or a runner-reported register tie is worth a permuter pass.
     # A normalized-only match never triggers it, no matter how close its
-    # capped effective similarity gets to the threshold.
+    # capped effective similarity gets to the threshold. The bar is 0.95,
+    # lowered to 0.90 when the shape is likely to yield to a random-restart
+    # search rather than more hand variants: operand_or_scheduling_drift, or
+    # a register-allocation tie whose raw score already trails its
+    # normalized one by a wide margin (the docs/REGISTER_TIES.md tell,
+    # short of the stricter >=0.99/register-tie-futility case below, which
+    # always triggers regardless of the bar).
     if iteration_best is not None and permuter_seconds > 0 and time.monotonic() < deadline:
         futility = str(iteration_best.get("futility") or "")
         is_register_tie = futility.startswith("register-tie")
-        effective_similarity, _ = attempt_rank(iteration_best)
+        effective_similarity, raw_similarity = attempt_rank(iteration_best)
         is_normalized_only = _is_normalized_only_match(iteration_best)
-        if not is_normalized_only and (effective_similarity >= 0.95 or is_register_tie):
-            label = iteration_best.get("label")
-            body = candidate_bodies.get(label)
-            if body:
+        mismatch_kind = str(iteration_best.get("mismatch_kind") or "")
+        is_register_only_tie = (
+            mismatch_kind == "register_allocation_only"
+            and effective_similarity - raw_similarity >= REGISTER_TIE_RAW_GAP
+        )
+        threshold = (
+            PERMUTER_LOWERED_TRIGGER
+            if mismatch_kind == "operand_or_scheduling_drift" or is_register_only_tie
+            else PERMUTER_TRIGGER
+        )
+        if not is_normalized_only and (effective_similarity >= threshold or is_register_tie):
+            bodies = _select_permuter_bodies(scored, candidate_bodies, limit=permuter_bodies)
+            if bodies:
                 budget = min(permuter_seconds, max(0.0, deadline - time.monotonic()))
                 if budget >= 10.0:
-                    permuter_result = run_permuter(
-                        repo_dir, out_dir, owner, iteration, body, batch.get("declarations"),
+                    job = start_permuter_job(
+                        repo_dir, out_dir, owner, iteration, bodies, batch.get("declarations"),
                         permuter_seconds=budget, logger=logger,
                     )
-                    if permuter_result is not None:
-                        owner_state["permuter_runs"].append({
-                            "iteration": iteration,
-                            "label": label,
-                            "similarity_score": iteration_best.get("similarity_score") or 0.0,
-                            "effective_similarity": effective_similarity,
-                            "is_register_tie": is_register_tie,
-                            "timed_out": permuter_result.get("timed_out"),
-                            "best_score": (permuter_result.get("best") or {}).get("score"),
-                        })
-                        best_output = permuter_result.get("best")
-                        if best_output is not None:
-                            owner_state["permuter_seed"] = {
-                                "score": best_output.get("score"),
-                                "body": best_output.get("code"),
-                                "iteration": iteration,
-                            }
+                    permuter_jobs.append(job)
+                    logger.log(
+                        f"{owner}: iter {iteration}: started background permuter job "
+                        f"(threshold={threshold}) on {len(bodies)} body/bodies: "
+                        f"{[label for label, _ in bodies]}"
+                    )
 
     if time.monotonic() >= deadline:
         return "budget_expired"
@@ -1251,16 +1733,25 @@ def process_owner(
     gen_failures: dict | None = None,
     max_generator_failures: int = 3,
     generator_timeout: float = DEFAULT_GENERATOR_TIMEOUT,
+    permuter_bodies: int = DEFAULT_PERMUTER_BODIES,
 ) -> str:
     if gen_failures is None:
         gen_failures = {"consecutive": 0}
     file_brief = file_brief_text(repo_dir, source_rel)
     asm_text = owner_asm_text(repo_dir, owner)
+    m2c_draft = get_m2c_draft(repo_dir, owner, owner_state, logger=logger)
+    # In-flight background permuter jobs (Part D), local to this owner's
+    # loop: started right after a triggering probe result, polled at the
+    # start of the next iteration's prompt build and again after that
+    # iteration's probe, never blocking the generate/probe cycle in between.
+    permuter_jobs: list[PermuterJob] = []
 
     while owner_state["iterations"] < max_iterations:
         if time.monotonic() >= deadline:
             owner_state["status"] = "budget_expired"
             return "budget_expired"
+
+        poll_permuter_jobs(permuter_jobs, owner_state, logger=logger)
 
         iteration = owner_state["iterations"]
         batch_path = out_dir / "batches" / f"{owner}_iter{iteration}.json"
@@ -1272,7 +1763,7 @@ def process_owner(
             owner=owner, source_rel=source_rel, file_brief=file_brief, asm_text=asm_text,
             best_candidates=owner_state["best_candidates"],
             permuter_seed=owner_state.get("permuter_seed"), batch_path=batch_path,
-            tried_labels=owner_state.get("tried_labels"),
+            tried_labels=owner_state.get("tried_labels"), m2c_draft=m2c_draft,
         )
         prompt_path.write_text(prompt_text, encoding="utf-8")
 
@@ -1363,8 +1854,10 @@ def process_owner(
             repo_dir=repo_dir, out_dir=out_dir, source_rel=source_rel, owner=owner,
             iteration=iteration, batch=batch, batch_path=batch_path, owner_state=owner_state,
             deadline=deadline, permuter_seconds=permuter_seconds, logger=logger,
+            permuter_jobs=permuter_jobs, permuter_bodies=permuter_bodies,
         )
         owner_state["iterations"] += 1
+        poll_permuter_jobs(permuter_jobs, owner_state, logger=logger)
         save_json(state_path, state)
 
         if status == "accepted":
@@ -1456,7 +1949,22 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="stop an owner after N consecutive iterations with no best-similarity improvement",
     )
     parser.add_argument("--permuter-seconds", type=float, default=300.0)
+    parser.add_argument(
+        "--permuter-bodies", type=int, default=DEFAULT_PERMUTER_BODIES,
+        help="on a trigger, run the permuter on up to this many distinct bodies from that "
+             "iteration, each its own background process (default: 3)",
+    )
     parser.add_argument("--owners", help="comma-separated subset/order of owners to work (default: all, discovered)")
+    parser.add_argument(
+        "--owner-order", choices=["size", "file"], default="size",
+        help="discovery order for owners when --owners is not given: smallest-instructions-"
+             "first (default) or the order they appear in the source",
+    )
+    parser.add_argument(
+        "--max-instructions", type=int, default=None,
+        help="skip discovered owners with more instructions than this (default: unlimited); "
+             "ignored when --owners is given explicitly",
+    )
     parser.add_argument(
         "--generator-cmd",
         help='shell command template; "{prompt}" and "{batch}" are substituted with absolute paths',
@@ -1561,7 +2069,10 @@ def main(argv: list[str] | None = None) -> int:
     if args.owners:
         owners = [name.strip() for name in args.owners.split(",") if name.strip()]
     else:
-        owners = discover_owners(repo_dir, source_rel)
+        owners = discover_owners(
+            repo_dir, source_rel, owner_order=args.owner_order,
+            max_instructions=args.max_instructions, logger=logger,
+        )
 
     logger.log(f"discovered {len(owners)} owner(s) for {source_rel}: {', '.join(owners) or '(none)'}")
 
@@ -1588,7 +2099,7 @@ def main(argv: list[str] | None = None) -> int:
             max_iterations=args.max_iterations, plateau=args.plateau,
             permuter_seconds=args.permuter_seconds, generator_cmd=args.generator_cmd, logger=logger,
             gen_failures=gen_failures, max_generator_failures=args.max_generator_failures,
-            generator_timeout=args.generator_timeout,
+            generator_timeout=args.generator_timeout, permuter_bodies=args.permuter_bodies,
         )
         summary["iteration_counts"][owner] = owner_state["iterations"]
         summary["best_per_owner"][owner] = owner_state["best_similarity"]

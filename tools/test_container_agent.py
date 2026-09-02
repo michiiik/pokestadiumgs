@@ -332,22 +332,36 @@ class BuildFeedbackTests(unittest.TestCase):
 
 
 class RunIterationTests(unittest.TestCase):
-    def _run(self, out_dir, repo_dir, owner, batch, result, owner_state, *, iteration=0, permuter_seconds=0.0):
+    def _run(
+        self, out_dir, repo_dir, owner, batch, result, owner_state, *,
+        iteration=0, permuter_seconds=0.0, permuter_jobs=None,
+    ):
         logger = container_agent.Logger(out_dir / "log.txt")
         batch_path = out_dir / "batches" / f"{owner}_iter{iteration}.json"
         container_agent.save_json(batch_path, batch)
+        if permuter_jobs is None:
+            permuter_jobs = []
 
         def fake_probe(repo_dir_arg, batch_path_arg, result_path, *, timeout):
             if result is not None:
                 container_agent.save_json(result_path, result)
             return SimpleNamespace(returncode=0, stdout="", stderr="")
 
-        with mock.patch.object(container_agent, "invoke_probe", side_effect=fake_probe):
-            return container_agent.run_iteration(
-                repo_dir=repo_dir, out_dir=out_dir, source_rel="disasm/src/X.c", owner=owner,
-                iteration=iteration, batch=batch, batch_path=batch_path, owner_state=owner_state,
-                deadline=time.monotonic() + 60.0, permuter_seconds=permuter_seconds, logger=logger,
-            )
+        try:
+            with mock.patch.object(container_agent, "invoke_probe", side_effect=fake_probe):
+                return container_agent.run_iteration(
+                    repo_dir=repo_dir, out_dir=out_dir, source_rel="disasm/src/X.c", owner=owner,
+                    iteration=iteration, batch=batch, batch_path=batch_path, owner_state=owner_state,
+                    deadline=time.monotonic() + 60.0, permuter_seconds=permuter_seconds, logger=logger,
+                    permuter_jobs=permuter_jobs,
+                )
+        finally:
+            # A triggered permuter job runs in a background thread (Part D);
+            # join it before the caller's tempdir goes away, or a real,
+            # unmocked run_permuter/invoke_permuter can still be reading/
+            # writing under it when rmtree runs.
+            for job in permuter_jobs:
+                job.thread.join(timeout=5.0)
 
     def test_accepted_result_captures_declarations_and_companion_edits(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -513,6 +527,14 @@ class RunIterationTests(unittest.TestCase):
                 reloaded[owner]["best_candidates"][0]["feedback"]["first_diff_offset"], 3,
             )
 
+    # Part D: the permuter is triggered from run_iteration as a background
+    # job (a started thread appended to the caller's `permuter_jobs` list)
+    # rather than blocking inline; `run_permuter` (reused unchanged by the
+    # job's worker thread) is stubbed so no real subprocess runs, the
+    # thread is joined so the job has actually finished, and
+    # `poll_permuter_jobs` is what folds its result into `owner_state` --
+    # exactly the two call sites `process_owner` uses in production.
+
     def test_permuter_triggered_by_high_similarity(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             repo_dir = Path(tmp) / "repo"
@@ -532,6 +554,7 @@ class RunIterationTests(unittest.TestCase):
             logger = container_agent.Logger(out_dir / "log.txt")
             batch_path = out_dir / "batches" / "func_1_iter0.json"
             container_agent.save_json(batch_path, batch)
+            jobs: list = []
 
             def fake_probe(repo_dir_arg, batch_path_arg, result_path, *, timeout):
                 container_agent.save_json(result_path, result)
@@ -543,9 +566,15 @@ class RunIterationTests(unittest.TestCase):
                     repo_dir=repo_dir, out_dir=out_dir, source_rel="disasm/src/X.c", owner=owner,
                     iteration=0, batch=batch, batch_path=batch_path, owner_state=owner_state,
                     deadline=time.monotonic() + 60.0, permuter_seconds=30.0, logger=logger,
+                    permuter_jobs=jobs,
                 )
+                self.assertEqual(len(jobs), 1)
+                jobs[0].thread.join(timeout=5.0)
+                self.assertFalse(jobs[0].thread.is_alive())
+            container_agent.poll_permuter_jobs(jobs, owner_state, logger=logger)
         run_permuter_mock.assert_called_once()
         self.assertEqual(owner_state["permuter_seed"]["score"], 0)
+        self.assertEqual(jobs, [])
 
     def test_permuter_triggered_by_register_tie_below_threshold(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -566,6 +595,7 @@ class RunIterationTests(unittest.TestCase):
             logger = container_agent.Logger(out_dir / "log.txt")
             batch_path = out_dir / "batches" / "func_1_iter0.json"
             container_agent.save_json(batch_path, batch)
+            jobs: list = []
 
             def fake_probe(repo_dir_arg, batch_path_arg, result_path, *, timeout):
                 container_agent.save_json(result_path, result)
@@ -577,9 +607,95 @@ class RunIterationTests(unittest.TestCase):
                     repo_dir=repo_dir, out_dir=out_dir, source_rel="disasm/src/X.c", owner=owner,
                     iteration=0, batch=batch, batch_path=batch_path, owner_state=owner_state,
                     deadline=time.monotonic() + 60.0, permuter_seconds=30.0, logger=logger,
+                    permuter_jobs=jobs,
                 )
+                jobs[0].thread.join(timeout=5.0)
+            container_agent.poll_permuter_jobs(jobs, owner_state, logger=logger)
         run_permuter_mock.assert_called_once()
         self.assertEqual(owner_state["permuter_seed"]["score"], 5)
+
+    def test_permuter_lowered_threshold_on_operand_or_scheduling_drift(self) -> None:
+        # Part D.2: 0.90 (not 0.95) is enough to trigger when mismatch_kind
+        # is operand_or_scheduling_drift.
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            repo_dir.mkdir()
+            out_dir = Path(tmp) / "out"
+            owner = "func_1"
+            owner_state = container_agent._new_owner_state()
+            batch = {"source": "disasm/src/X.c", "candidates": [{"function": owner, "label": "a", "body": "body_a"}]}
+            result = {
+                "batch_status": "no_candidate_accepted", "accepted": [],
+                "attempts": [{
+                    "function": owner, "label": "a", "status": "near_miss",
+                    "similarity_score": 0.91, "raw_similarity_score": 0.91,
+                    "mismatch_kind": "operand_or_scheduling_drift", "futility": None,
+                }],
+            }
+            permuter_result = {"timed_out": False, "outputs": [], "best": {"score": 1, "code": "void func_1(void) {}"}}
+            logger = container_agent.Logger(out_dir / "log.txt")
+            batch_path = out_dir / "batches" / "func_1_iter0.json"
+            container_agent.save_json(batch_path, batch)
+            jobs: list = []
+
+            def fake_probe(repo_dir_arg, batch_path_arg, result_path, *, timeout):
+                container_agent.save_json(result_path, result)
+                return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+            with mock.patch.object(container_agent, "invoke_probe", side_effect=fake_probe), \
+                 mock.patch.object(container_agent, "run_permuter", return_value=permuter_result) as run_permuter_mock:
+                container_agent.run_iteration(
+                    repo_dir=repo_dir, out_dir=out_dir, source_rel="disasm/src/X.c", owner=owner,
+                    iteration=0, batch=batch, batch_path=batch_path, owner_state=owner_state,
+                    deadline=time.monotonic() + 60.0, permuter_seconds=30.0, logger=logger,
+                    permuter_jobs=jobs,
+                )
+                jobs[0].thread.join(timeout=5.0)
+            container_agent.poll_permuter_jobs(jobs, owner_state, logger=logger)
+        run_permuter_mock.assert_called_once()
+        self.assertEqual(owner_state["permuter_seed"]["score"], 1)
+
+    def test_permuter_lowered_threshold_on_register_only_tie_gap(self) -> None:
+        # register_allocation_only with raw well below effective/normalized
+        # also gets the 0.90 bar, even without a runner-reported
+        # "register-tie" futility string.
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            repo_dir.mkdir()
+            out_dir = Path(tmp) / "out"
+            owner = "func_1"
+            owner_state = container_agent._new_owner_state()
+            batch = {"source": "disasm/src/X.c", "candidates": [{"function": owner, "label": "a", "body": "body_a"}]}
+            result = {
+                "batch_status": "no_candidate_accepted", "accepted": [],
+                "attempts": [{
+                    "function": owner, "label": "a", "status": "near_miss",
+                    "similarity_score": 0.92, "raw_similarity_score": 0.80,
+                    "mismatch_kind": "register_allocation_only", "futility": None,
+                }],
+            }
+            permuter_result = {"timed_out": False, "outputs": [], "best": {"score": 2, "code": "void func_1(void) {}"}}
+            logger = container_agent.Logger(out_dir / "log.txt")
+            batch_path = out_dir / "batches" / "func_1_iter0.json"
+            container_agent.save_json(batch_path, batch)
+            jobs: list = []
+
+            def fake_probe(repo_dir_arg, batch_path_arg, result_path, *, timeout):
+                container_agent.save_json(result_path, result)
+                return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+            with mock.patch.object(container_agent, "invoke_probe", side_effect=fake_probe), \
+                 mock.patch.object(container_agent, "run_permuter", return_value=permuter_result) as run_permuter_mock:
+                container_agent.run_iteration(
+                    repo_dir=repo_dir, out_dir=out_dir, source_rel="disasm/src/X.c", owner=owner,
+                    iteration=0, batch=batch, batch_path=batch_path, owner_state=owner_state,
+                    deadline=time.monotonic() + 60.0, permuter_seconds=30.0, logger=logger,
+                    permuter_jobs=jobs,
+                )
+                jobs[0].thread.join(timeout=5.0)
+            container_agent.poll_permuter_jobs(jobs, owner_state, logger=logger)
+        run_permuter_mock.assert_called_once()
+        self.assertEqual(owner_state["permuter_seed"]["score"], 2)
 
     def test_permuter_not_triggered_below_threshold(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -599,6 +715,7 @@ class RunIterationTests(unittest.TestCase):
             logger = container_agent.Logger(out_dir / "log.txt")
             batch_path = out_dir / "batches" / "func_1_iter0.json"
             container_agent.save_json(batch_path, batch)
+            jobs: list = []
 
             def fake_probe(repo_dir_arg, batch_path_arg, result_path, *, timeout):
                 container_agent.save_json(result_path, result)
@@ -610,8 +727,10 @@ class RunIterationTests(unittest.TestCase):
                     repo_dir=repo_dir, out_dir=out_dir, source_rel="disasm/src/X.c", owner=owner,
                     iteration=0, batch=batch, batch_path=batch_path, owner_state=owner_state,
                     deadline=time.monotonic() + 60.0, permuter_seconds=30.0, logger=logger,
+                    permuter_jobs=jobs,
                 )
         run_permuter_mock.assert_not_called()
+        self.assertEqual(jobs, [])
         self.assertNotIn("permuter_seed", owner_state)
 
     def test_missing_result_json_increments_plateau_and_continues(self) -> None:
@@ -693,19 +812,30 @@ class RunIterationTests(unittest.TestCase):
                     "diagnostic": "normalized_only_match: hiding register/field differences",
                 }],
             }
-            self._run(out_dir, repo_dir, owner, batch0, normalized_only_result, owner_state, iteration=0, permuter_seconds=30.0)
-            self.assertEqual(owner_state["plateau_count"], 1)
-            self.assertEqual(owner_state["best_similarity"], 0.0)
+            # run_permuter is stubbed (not just joined) so the trigger below
+            # never spawns a real subprocess: plateau/best-similarity
+            # tracking is the point of this test, not the permuter itself.
+            no_permuter_result = {"timed_out": False, "outputs": [], "best": None}
+            with mock.patch.object(container_agent, "run_permuter", return_value=no_permuter_result):
+                self._run(
+                    out_dir, repo_dir, owner, batch0, normalized_only_result, owner_state,
+                    iteration=0, permuter_seconds=30.0,
+                )
+                self.assertEqual(owner_state["plateau_count"], 1)
+                self.assertEqual(owner_state["best_similarity"], 0.0)
 
-            batch1 = {"source": "disasm/src/X.c", "candidates": [{"function": owner, "label": "b", "body": "body_b"}]}
-            genuine_result = {
-                "batch_status": "no_candidate_accepted", "accepted": [],
-                "attempts": [{
-                    "function": owner, "label": "b", "status": "near_miss",
-                    "similarity_score": 0.96, "raw_similarity_score": 0.95,
-                }],
-            }
-            self._run(out_dir, repo_dir, owner, batch1, genuine_result, owner_state, iteration=1, permuter_seconds=30.0)
+                batch1 = {"source": "disasm/src/X.c", "candidates": [{"function": owner, "label": "b", "body": "body_b"}]}
+                genuine_result = {
+                    "batch_status": "no_candidate_accepted", "accepted": [],
+                    "attempts": [{
+                        "function": owner, "label": "b", "status": "near_miss",
+                        "similarity_score": 0.96, "raw_similarity_score": 0.95,
+                    }],
+                }
+                self._run(
+                    out_dir, repo_dir, owner, batch1, genuine_result, owner_state,
+                    iteration=1, permuter_seconds=30.0,
+                )
 
         self.assertEqual(owner_state["best_similarity"], 0.96)
         self.assertEqual(owner_state["best_effective_similarity"], 0.96)
@@ -1096,6 +1226,7 @@ class ProcessOwnerTests(unittest.TestCase):
 
             with mock.patch.object(container_agent, "file_brief_text", return_value="brief"), \
                  mock.patch.object(container_agent, "owner_asm_text", return_value="asm"), \
+                 mock.patch.object(container_agent, "get_m2c_draft", return_value=None), \
                  mock.patch.object(container_agent, "invoke_generator", side_effect=make_invoke_generator(batch_for_iteration)), \
                  mock.patch.object(container_agent, "invoke_probe", side_effect=make_invoke_probe(result_for_call)):
                 status = container_agent.process_owner(
@@ -1132,6 +1263,7 @@ class ProcessOwnerTests(unittest.TestCase):
 
             with mock.patch.object(container_agent, "file_brief_text", return_value="brief"), \
                  mock.patch.object(container_agent, "owner_asm_text", return_value="asm"), \
+                 mock.patch.object(container_agent, "get_m2c_draft", return_value=None), \
                  mock.patch.object(container_agent, "invoke_generator", side_effect=make_invoke_generator(batch_for_iteration)), \
                  mock.patch.object(container_agent, "invoke_probe", side_effect=make_invoke_probe(result_for_call)):
                 status = container_agent.process_owner(
@@ -1158,6 +1290,7 @@ class ProcessOwnerTests(unittest.TestCase):
 
             with mock.patch.object(container_agent, "file_brief_text", return_value="brief"), \
                  mock.patch.object(container_agent, "owner_asm_text", return_value="asm"), \
+                 mock.patch.object(container_agent, "get_m2c_draft", return_value=None), \
                  mock.patch.object(container_agent, "invoke_generator") as gen_mock, \
                  mock.patch.object(container_agent, "invoke_probe") as probe_mock:
                 status = container_agent.process_owner(
@@ -1197,6 +1330,7 @@ class ProcessOwnerTests(unittest.TestCase):
 
             with mock.patch.object(container_agent, "file_brief_text", return_value="brief"), \
                  mock.patch.object(container_agent, "owner_asm_text", return_value="asm"), \
+                 mock.patch.object(container_agent, "get_m2c_draft", return_value=None), \
                  mock.patch.object(container_agent, "invoke_generator", side_effect=make_invoke_generator(batch_for_iteration)), \
                  mock.patch.object(container_agent, "invoke_probe", side_effect=make_invoke_probe(result_for_call)), \
                  _git_diff_stub():
@@ -1224,6 +1358,7 @@ class ProcessOwnerTests(unittest.TestCase):
 
             with mock.patch.object(container_agent, "file_brief_text", return_value="brief"), \
                  mock.patch.object(container_agent, "owner_asm_text", return_value="asm"), \
+                 mock.patch.object(container_agent, "get_m2c_draft", return_value=None), \
                  mock.patch.object(container_agent, "invoke_generator", side_effect=make_invoke_generator(lambda _n: None)), \
                  mock.patch.object(container_agent, "invoke_probe") as probe_mock:
                 status = container_agent.process_owner(
@@ -1308,6 +1443,7 @@ class GeneratorExhaustionTests(unittest.TestCase):
 
             with mock.patch.object(container_agent, "file_brief_text", return_value="brief"), \
                  mock.patch.object(container_agent, "owner_asm_text", return_value="asm"), \
+                 mock.patch.object(container_agent, "get_m2c_draft", return_value=None), \
                  mock.patch.object(container_agent, "invoke_generator", side_effect=failing_generator), \
                  mock.patch.object(container_agent, "invoke_probe") as probe_mock:
                 exit_code = container_agent.main([
@@ -1346,6 +1482,7 @@ class GeneratorExhaustionTests(unittest.TestCase):
 
             with mock.patch.object(container_agent, "file_brief_text", return_value="brief"), \
                  mock.patch.object(container_agent, "owner_asm_text", return_value="asm"), \
+                 mock.patch.object(container_agent, "get_m2c_draft", return_value=None), \
                  mock.patch.object(container_agent, "invoke_generator", side_effect=quota_generator), \
                  mock.patch.object(container_agent, "invoke_probe") as probe_mock:
                 exit_code = container_agent.main([
@@ -1398,6 +1535,7 @@ class GeneratorExhaustionTests(unittest.TestCase):
 
             with mock.patch.object(container_agent, "file_brief_text", return_value="brief"), \
                  mock.patch.object(container_agent, "owner_asm_text", return_value="asm"), \
+                 mock.patch.object(container_agent, "get_m2c_draft", return_value=None), \
                  mock.patch.object(container_agent, "invoke_generator", side_effect=make_invoke_generator(batch_for_iteration)), \
                  mock.patch.object(container_agent, "invoke_probe", side_effect=make_invoke_probe(result_for_call)):
                 status = container_agent.process_owner(
@@ -1440,6 +1578,7 @@ class GeneratorTimeoutAndQuotaClassificationTests(unittest.TestCase):
 
         with mock.patch.object(container_agent, "file_brief_text", return_value="brief"), \
              mock.patch.object(container_agent, "owner_asm_text", return_value="asm"), \
+             mock.patch.object(container_agent, "get_m2c_draft", return_value=None), \
              mock.patch.object(container_agent, "invoke_generator", side_effect=invoke_generator_stub):
             status = container_agent.process_owner(
                 repo_dir=repo_dir, out_dir=out_dir, source_rel=source_rel, owner=owner,
@@ -1517,6 +1656,7 @@ class GeneratorTimeoutAndQuotaClassificationTests(unittest.TestCase):
 
             with mock.patch.object(container_agent, "file_brief_text", return_value="brief"), \
                  mock.patch.object(container_agent, "owner_asm_text", return_value="asm"), \
+                 mock.patch.object(container_agent, "get_m2c_draft", return_value=None), \
                  mock.patch.object(container_agent, "invoke_generator") as gen_mock:
                 gen_mock.side_effect = subprocess.TimeoutExpired(cmd="x", timeout=1)
                 container_agent.process_owner(
@@ -1548,6 +1688,7 @@ class GeneratorTimeoutAndQuotaClassificationTests(unittest.TestCase):
 
             with mock.patch.object(container_agent, "file_brief_text", return_value="brief"), \
                  mock.patch.object(container_agent, "owner_asm_text", return_value="asm"), \
+                 mock.patch.object(container_agent, "get_m2c_draft", return_value=None), \
                  mock.patch.object(container_agent, "invoke_generator") as gen_mock:
                 gen_mock.side_effect = subprocess.TimeoutExpired(cmd="x", timeout=1)
                 container_agent.process_owner(
@@ -1645,6 +1786,7 @@ class ResumeTests(unittest.TestCase):
 
             with mock.patch.object(container_agent, "file_brief_text", return_value="brief"), \
                  mock.patch.object(container_agent, "owner_asm_text", return_value="asm"), \
+                 mock.patch.object(container_agent, "get_m2c_draft", return_value=None), \
                  mock.patch.object(container_agent, "invoke_generator", side_effect=gen_stub), \
                  mock.patch.object(container_agent, "invoke_probe", side_effect=make_invoke_probe(result_for_call)):
                 exit_code = container_agent.main([
@@ -1696,6 +1838,499 @@ class ResumeTests(unittest.TestCase):
             summary = json.loads((out_dir / "summary.json").read_text(encoding="utf-8"))
             self.assertNotIn("func_a", summary["owners_attempted"])
             self.assertEqual(summary["stopped_reason"], "completed")
+
+
+# ---------------------------------------------------------------------------
+# Part A: m2c draft seed
+# ---------------------------------------------------------------------------
+
+class ParseM2cDraftOutputTests(unittest.TestCase):
+    def test_extracts_body_after_label_comment(self) -> None:
+        stdout = "/* m2c */\nf64 func_1(void) {\n    return 0;\n}\n"
+        self.assertEqual(
+            container_agent._parse_m2c_draft_output(stdout),
+            "f64 func_1(void) {\n    return 0;\n}",
+        )
+
+    def test_returns_none_on_error_comment(self) -> None:
+        stdout = "/* m2c */\n/* error: m2c crashed */\n"
+        self.assertIsNone(container_agent._parse_m2c_draft_output(stdout))
+
+    def test_returns_none_on_empty_stdout(self) -> None:
+        self.assertIsNone(container_agent._parse_m2c_draft_output(""))
+
+
+class GetM2cDraftTests(unittest.TestCase):
+    def test_fetches_once_and_caches_in_owner_state(self) -> None:
+        owner_state = container_agent._new_owner_state()
+        logger = container_agent.Logger(Path(tempfile.mkdtemp()) / "log.txt")
+        proc = SimpleNamespace(returncode=0, stdout="/* m2c */\nvoid func_1(void) {}\n", stderr="")
+        with mock.patch.object(container_agent, "invoke_m2c_draft", return_value=proc) as draft_mock:
+            draft1 = container_agent.get_m2c_draft(Path("/repo"), "func_1", owner_state, logger=logger)
+            draft2 = container_agent.get_m2c_draft(Path("/repo"), "func_1", owner_state, logger=logger)
+        draft_mock.assert_called_once()
+        self.assertEqual(draft1, "void func_1(void) {}")
+        self.assertEqual(draft2, "void func_1(void) {}")
+        self.assertEqual(owner_state["m2c_draft"], "void func_1(void) {}")
+        self.assertTrue(owner_state["m2c_draft_fetched"])
+
+    def test_resume_reuses_cached_draft_without_refetching(self) -> None:
+        owner_state = container_agent._new_owner_state()
+        owner_state["m2c_draft"] = "cached body"
+        owner_state["m2c_draft_fetched"] = True
+        logger = container_agent.Logger(Path(tempfile.mkdtemp()) / "log.txt")
+        with mock.patch.object(container_agent, "invoke_m2c_draft") as draft_mock:
+            draft = container_agent.get_m2c_draft(Path("/repo"), "func_1", owner_state, logger=logger)
+        draft_mock.assert_not_called()
+        self.assertEqual(draft, "cached body")
+
+    def test_timeout_is_logged_and_cached_as_no_draft(self) -> None:
+        owner_state = container_agent._new_owner_state()
+        logger = container_agent.Logger(Path(tempfile.mkdtemp()) / "log.txt")
+        with mock.patch.object(
+            container_agent, "invoke_m2c_draft",
+            side_effect=subprocess.TimeoutExpired(cmd="x", timeout=120),
+        ) as draft_mock:
+            draft1 = container_agent.get_m2c_draft(Path("/repo"), "func_1", owner_state, logger=logger)
+            draft2 = container_agent.get_m2c_draft(Path("/repo"), "func_1", owner_state, logger=logger)
+        draft_mock.assert_called_once()
+        self.assertIsNone(draft1)
+        self.assertIsNone(draft2)
+        self.assertIsNone(owner_state["m2c_draft"])
+
+    def test_nonzero_exit_returns_none_without_raising(self) -> None:
+        owner_state = container_agent._new_owner_state()
+        logger = container_agent.Logger(Path(tempfile.mkdtemp()) / "log.txt")
+        proc = SimpleNamespace(returncode=1, stdout="", stderr="m2c not installed")
+        with mock.patch.object(container_agent, "invoke_m2c_draft", return_value=proc):
+            draft = container_agent.get_m2c_draft(Path("/repo"), "func_1", owner_state, logger=logger)
+        self.assertIsNone(draft)
+
+
+class BuildPromptM2cDraftTests(unittest.TestCase):
+    def test_m2c_draft_rendered_before_best_candidates_section(self) -> None:
+        prompt = container_agent.build_prompt(
+            owner="func_1", source_rel="disasm/src/X.c", file_brief="brief", asm_text="asm",
+            best_candidates=[{"label": "a", "similarity_score": 0.5, "body": "body_a"}],
+            permuter_seed=None, batch_path=Path("/tmp/batch.json"),
+            m2c_draft="f64 func_1(void) { return 0; }",
+        )
+        marker = "== m2c draft (structure hint, not a match; retype/reshape freely) =="
+        self.assertIn(marker, prompt)
+        self.assertIn("f64 func_1(void) { return 0; }", prompt)
+        self.assertLess(prompt.index(marker), prompt.index("== best candidates tried so far"))
+
+    def test_no_m2c_section_when_draft_absent(self) -> None:
+        prompt = container_agent.build_prompt(
+            owner="func_1", source_rel="disasm/src/X.c", file_brief="brief", asm_text="asm",
+            best_candidates=[], permuter_seed=None, batch_path=Path("/tmp/batch.json"),
+        )
+        self.assertNotIn("m2c draft", prompt)
+
+
+# ---------------------------------------------------------------------------
+# Part B: declaration hygiene
+# ---------------------------------------------------------------------------
+
+class DeclarationStatementParsingTests(unittest.TestCase):
+    def test_splits_multiple_statements(self) -> None:
+        statements = container_agent._split_declaration_statements(
+            "extern s32 func_A(void *arg0);\nextern u8 D_80328E00;\n"
+        )
+        self.assertEqual(statements, ["extern s32 func_A(void *arg0);", "extern u8 D_80328E00;"])
+
+    def test_empty_declarations_yields_no_statements(self) -> None:
+        self.assertEqual(container_agent._split_declaration_statements(""), [])
+        self.assertEqual(container_agent._split_declaration_statements(None), [])
+
+    def test_declared_name_from_function_prototype(self) -> None:
+        self.assertEqual(
+            container_agent._declaration_statement_name("extern s32 func_A(void *arg0);"), "func_A",
+        )
+
+    def test_declared_name_from_plain_data_symbol(self) -> None:
+        self.assertEqual(container_agent._declaration_statement_name("extern u8 D_80328E00;"), "D_80328E00")
+
+    def test_declared_name_from_data_array(self) -> None:
+        self.assertEqual(container_agent._declaration_statement_name("extern u8 D_80328E00[16];"), "D_80328E00")
+
+    def test_declared_name_from_function_pointer(self) -> None:
+        self.assertEqual(
+            container_agent._declaration_statement_name("extern void (*callback)(s32);"), "callback",
+        )
+
+
+class NameDeclaredInSourceTests(unittest.TestCase):
+    def test_function_definition_counts_as_declared(self) -> None:
+        source = "void func_A(void) {\n    return;\n}\n"
+        self.assertTrue(container_agent._name_declared_in_source("func_A", source))
+
+    def test_extern_line_counts_as_declared(self) -> None:
+        source = "extern s32 func_A(void *arg0);\n"
+        self.assertTrue(container_agent._name_declared_in_source("func_A", source))
+
+    def test_array_data_symbol_counts_as_declared(self) -> None:
+        source = "u8 D_80328E00[16] = {0};\n"
+        self.assertTrue(container_agent._name_declared_in_source("D_80328E00", source))
+
+    def test_unrelated_name_is_not_declared(self) -> None:
+        source = "void func_A(void) {\n    return;\n}\n"
+        self.assertFalse(container_agent._name_declared_in_source("func_B", source))
+
+
+class FilterDeclarationsTests(unittest.TestCase):
+    def test_drops_statement_for_name_already_defined_in_source(self) -> None:
+        source = "void func_A(void) {\n    return;\n}\n"
+        batch = {
+            "declarations": "extern void func_A(void);\nextern u8 D_80328E00;",
+            "candidates": [],
+        }
+        filtered, dropped = container_agent.filter_declarations(batch, source)
+        self.assertEqual(dropped, ["extern void func_A(void);"])
+        self.assertEqual(filtered["declarations"], "extern u8 D_80328E00;")
+
+    def test_keeps_declarations_for_names_not_in_source(self) -> None:
+        source = "void func_A(void) {\n    return;\n}\n"
+        batch = {"declarations": "extern u8 D_80328E00;", "candidates": []}
+        filtered, dropped = container_agent.filter_declarations(batch, source)
+        self.assertEqual(dropped, [])
+        self.assertIs(filtered, batch)
+
+    def test_no_declarations_field_is_a_noop(self) -> None:
+        filtered, dropped = container_agent.filter_declarations({"candidates": []}, "void func_A(void) {}")
+        self.assertEqual(dropped, [])
+
+
+class ExternBlockSymbolNamesTests(unittest.TestCase):
+    def test_extracts_names_in_first_seen_order(self) -> None:
+        file_brief = (
+            "== extern/prototype block (deduplicated) ==\n"
+            "  extern s32 func_A(void *arg0);\n"
+            "  extern u8 D_80328E00;\n"
+            "\n"
+            "== func_/D_ symbols referenced, by solved-body count ==\n"
+            "  func_Z used in 3 solved bodies\n"
+        )
+        self.assertEqual(container_agent._extern_block_symbol_names(file_brief), ["func_A", "D_80328E00"])
+
+    def test_none_found_when_section_absent(self) -> None:
+        self.assertEqual(container_agent._extern_block_symbol_names("no sections here"), [])
+
+    def test_none_found_section(self) -> None:
+        file_brief = "== extern/prototype block (deduplicated) ==\n  (none found)\n"
+        self.assertEqual(container_agent._extern_block_symbol_names(file_brief), [])
+
+
+class BuildPromptDoNotRedeclareRuleTests(unittest.TestCase):
+    def test_rule_line_lists_extern_block_names(self) -> None:
+        file_brief = (
+            "== extern/prototype block (deduplicated) ==\n"
+            "  extern s32 func_A(void *arg0);\n"
+        )
+        prompt = container_agent.build_prompt(
+            owner="func_1", source_rel="disasm/src/X.c", file_brief=file_brief, asm_text="asm",
+            best_candidates=[], permuter_seed=None, batch_path=Path("/tmp/batch.json"),
+        )
+        self.assertIn("The file already declares these callees/data (do not redeclare): func_A", prompt)
+
+    def test_no_rule_line_when_extern_block_empty(self) -> None:
+        file_brief = "== extern/prototype block (deduplicated) ==\n  (none found)\n"
+        prompt = container_agent.build_prompt(
+            owner="func_1", source_rel="disasm/src/X.c", file_brief=file_brief, asm_text="asm",
+            best_candidates=[], permuter_seed=None, batch_path=Path("/tmp/batch.json"),
+        )
+        self.assertNotIn("do not redeclare", prompt)
+
+
+class RunIterationDeclarationHygieneTests(unittest.TestCase):
+    def test_drops_already_declared_statement_before_probing(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            source_path = repo_dir / "disasm" / "src" / "X.c"
+            source_path.parent.mkdir(parents=True)
+            source_path.write_text(
+                "void func_A(void) {\n    return;\n}\n\nvoid func_1(void) {\n    return;\n}\n",
+                encoding="utf-8",
+            )
+            out_dir = Path(tmp) / "out"
+            owner = "func_1"
+            owner_state = container_agent._new_owner_state()
+            batch = {
+                "source": "disasm/src/X.c",
+                "declarations": "extern void func_A(void);\nextern u8 D_NEW;",
+                "candidates": [{"function": owner, "label": "a", "body": "void func_1(void) { return; }"}],
+            }
+            result = {
+                "batch_status": "no_candidate_accepted", "accepted": [],
+                "attempts": [{"function": owner, "label": "a", "status": "rejected", "similarity_score": 0.1}],
+            }
+            seen_batches: list[dict] = []
+            logger = container_agent.Logger(out_dir / "log.txt")
+            batch_path = out_dir / "batches" / "func_1_iter0.json"
+            container_agent.save_json(batch_path, batch)
+
+            def fake_probe(repo_dir_arg, batch_path_arg, result_path, *, timeout):
+                seen_batches.append(container_agent.load_json(batch_path_arg))
+                container_agent.save_json(result_path, result)
+                return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+            with mock.patch.object(container_agent, "invoke_probe", side_effect=fake_probe):
+                container_agent.run_iteration(
+                    repo_dir=repo_dir, out_dir=out_dir, source_rel="disasm/src/X.c", owner=owner,
+                    iteration=0, batch=batch, batch_path=batch_path, owner_state=owner_state,
+                    deadline=time.monotonic() + 60.0, permuter_seconds=0.0, logger=logger,
+                )
+
+            self.assertEqual(len(seen_batches), 1)
+            self.assertEqual(seen_batches[0]["declarations"], "extern u8 D_NEW;")
+            log_text = (out_dir / "log.txt").read_text(encoding="utf-8")
+            self.assertIn("dropping already-declared statement", log_text)
+            self.assertIn("extern void func_A(void);", log_text)
+
+
+# ---------------------------------------------------------------------------
+# Part C: owner ordering / --max-instructions
+# ---------------------------------------------------------------------------
+
+class OwnerOrderingTests(unittest.TestCase):
+    def test_owner_order_file_reorders_by_source_appearance(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp)
+            source_rel = "disasm/src/X.c"
+            source_path = repo_dir / source_rel
+            source_path.parent.mkdir(parents=True)
+            source_path.write_text(
+                '#pragma GLOBAL_ASM("asm/nonmatchings/X/func_b.s")\n'
+                "void func_b(void);\n\n"
+                '#pragma GLOBAL_ASM("asm/nonmatchings/X/func_a.s")\n'
+                "void func_a(void);\n",
+                encoding="utf-8",
+            )
+            # pragma_targets ranks func_a (10 instructions) before func_b (50)
+            # by size; --owner-order file must instead follow the source,
+            # where func_b appears first.
+            fake_stdout = json.dumps({"targets": [
+                {"function": "func_a", "instructions": 10},
+                {"function": "func_b", "instructions": 50},
+            ]})
+            with mock.patch.object(
+                container_agent.subprocess, "run",
+                return_value=SimpleNamespace(returncode=0, stdout=fake_stdout, stderr=""),
+            ):
+                size_order = container_agent.discover_owners(repo_dir, source_rel, owner_order="size")
+                file_order = container_agent.discover_owners(repo_dir, source_rel, owner_order="file")
+        self.assertEqual(size_order, ["func_a", "func_b"])
+        self.assertEqual(file_order, ["func_b", "func_a"])
+
+    def test_max_instructions_forwarded_to_pragma_targets_command(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp)
+            fake_stdout = json.dumps({"targets": [{"function": "func_a", "instructions": 10}]})
+            with mock.patch.object(
+                container_agent.subprocess, "run",
+                return_value=SimpleNamespace(returncode=0, stdout=fake_stdout, stderr=""),
+            ) as run_mock:
+                container_agent.discover_owners(repo_dir, "disasm/src/X.c", max_instructions=64)
+            command = run_mock.call_args[0][0]
+        self.assertIn("--max-instructions", command)
+        self.assertEqual(command[command.index("--max-instructions") + 1], "64")
+
+    def test_logs_owner_order_with_instruction_counts(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp)
+            out_dir = Path(tmp) / "out"
+            logger = container_agent.Logger(out_dir / "log.txt")
+            fake_stdout = json.dumps({"targets": [
+                {"function": "func_a", "instructions": 10},
+                {"function": "func_b", "instructions": 50},
+            ]})
+            with mock.patch.object(
+                container_agent.subprocess, "run",
+                return_value=SimpleNamespace(returncode=0, stdout=fake_stdout, stderr=""),
+            ):
+                container_agent.discover_owners(repo_dir, "disasm/src/X.c", logger=logger)
+            log_text = (out_dir / "log.txt").read_text(encoding="utf-8")
+        self.assertIn("func_a(10)", log_text)
+        self.assertIn("func_b(50)", log_text)
+
+    def test_no_logging_when_logger_omitted(self) -> None:
+        # Existing callers (and DiscoverOwnersTests) rely on the logger-less
+        # default not raising and not requiring a Logger instance.
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp)
+            fake_stdout = json.dumps({"targets": [{"function": "func_a", "instructions": 10}]})
+            with mock.patch.object(
+                container_agent.subprocess, "run",
+                return_value=SimpleNamespace(returncode=0, stdout=fake_stdout, stderr=""),
+            ):
+                owners = container_agent.discover_owners(repo_dir, "disasm/src/X.c")
+        self.assertEqual(owners, ["func_a"])
+
+
+class ArgParsingTests(unittest.TestCase):
+    def test_defaults(self) -> None:
+        args = container_agent.parse_args([
+            "--source", "disasm/src/X.c", "--out", "/tmp/out",
+        ])
+        self.assertEqual(args.owner_order, "size")
+        self.assertIsNone(args.max_instructions)
+        self.assertEqual(args.permuter_bodies, container_agent.DEFAULT_PERMUTER_BODIES)
+
+    def test_overrides(self) -> None:
+        args = container_agent.parse_args([
+            "--source", "disasm/src/X.c", "--out", "/tmp/out",
+            "--owner-order", "file", "--max-instructions", "48", "--permuter-bodies", "5",
+        ])
+        self.assertEqual(args.owner_order, "file")
+        self.assertEqual(args.max_instructions, 48)
+        self.assertEqual(args.permuter_bodies, 5)
+
+
+# ---------------------------------------------------------------------------
+# Part D: background permuter jobs
+# ---------------------------------------------------------------------------
+
+class SelectPermuterBodiesTests(unittest.TestCase):
+    def test_ranks_best_first_dedupes_and_caps_at_limit(self) -> None:
+        scored = [
+            {"label": "a", "similarity_score": 0.90},
+            {"label": "b", "similarity_score": 0.99},
+            {"label": "c", "similarity_score": 0.95},
+            # duplicate body of "b" (whitespace-different) must be skipped
+            {"label": "d", "similarity_score": 0.97},
+        ]
+        candidate_bodies = {
+            "a": "body_a", "b": "body_b", "c": "body_c", "d": "  body_b  ",
+        }
+        selected = container_agent._select_permuter_bodies(scored, candidate_bodies, limit=2)
+        self.assertEqual([label for label, _ in selected], ["b", "c"])
+
+    def test_excludes_normalized_only_matches(self) -> None:
+        scored = [{
+            "label": "a", "status": "probe_rejected",
+            "similarity_score": 1.0, "raw_similarity_score": 0.5,
+        }]
+        candidate_bodies = {"a": "body_a"}
+        selected = container_agent._select_permuter_bodies(scored, candidate_bodies, limit=3)
+        self.assertEqual(selected, [])
+
+    def test_skips_attempts_with_no_body(self) -> None:
+        scored = [{"label": "missing", "similarity_score": 0.9}]
+        selected = container_agent._select_permuter_bodies(scored, {}, limit=3)
+        self.assertEqual(selected, [])
+
+
+class PollPermuterJobsTests(unittest.TestCase):
+    def _finished_job(self, owner, iteration, results) -> "container_agent.PermuterJob":
+        job = container_agent.PermuterJob(thread=None, owner=owner, iteration=iteration, labels=[r["label"] for r in results])
+        job.results = results
+        job.thread = SimpleNamespace(is_alive=lambda: False)
+        return job
+
+    def test_folds_new_results_and_keeps_lowest_score_as_seed(self) -> None:
+        owner_state = container_agent._new_owner_state()
+        logger = container_agent.Logger(Path(tempfile.mkdtemp()) / "log.txt")
+        job = self._finished_job("func_1", 0, [
+            {"label": "a", "timed_out": False, "best": {"score": 5, "code": "body_a"}},
+            {"label": "b", "timed_out": False, "best": {"score": 1, "code": "body_b"}},
+        ])
+        jobs = [job]
+        container_agent.poll_permuter_jobs(jobs, owner_state, logger=logger)
+        self.assertEqual(owner_state["permuter_seed"]["score"], 1)
+        self.assertEqual(owner_state["permuter_seed"]["body"], "body_b")
+        self.assertEqual(len(owner_state["permuter_runs"]), 2)
+        self.assertEqual(jobs, [])  # thread not alive -> dropped
+
+    def test_does_not_regress_seed_with_a_worse_score(self) -> None:
+        owner_state = container_agent._new_owner_state()
+        owner_state["permuter_seed"] = {"score": 0, "body": "best_body", "iteration": 0}
+        logger = container_agent.Logger(Path(tempfile.mkdtemp()) / "log.txt")
+        job = self._finished_job("func_1", 1, [
+            {"label": "a", "timed_out": False, "best": {"score": 3, "code": "worse_body"}},
+        ])
+        container_agent.poll_permuter_jobs([job], owner_state, logger=logger)
+        self.assertEqual(owner_state["permuter_seed"]["score"], 0)
+        self.assertEqual(owner_state["permuter_seed"]["body"], "best_body")
+
+    def test_already_consumed_results_are_not_reapplied(self) -> None:
+        owner_state = container_agent._new_owner_state()
+        logger = container_agent.Logger(Path(tempfile.mkdtemp()) / "log.txt")
+        job = self._finished_job("func_1", 0, [
+            {"label": "a", "timed_out": False, "best": {"score": 4, "code": "body_a"}},
+        ])
+        # still running -> kept in the jobs list across two polls
+        job.thread = SimpleNamespace(is_alive=lambda: True)
+        jobs = [job]
+        container_agent.poll_permuter_jobs(jobs, owner_state, logger=logger)
+        self.assertEqual(len(owner_state["permuter_runs"]), 1)
+        container_agent.poll_permuter_jobs(jobs, owner_state, logger=logger)
+        self.assertEqual(len(owner_state["permuter_runs"]), 1)  # not doubled
+        self.assertEqual(jobs, [job])  # still tracked (thread still alive)
+
+    def test_none_best_output_records_run_without_seed(self) -> None:
+        owner_state = container_agent._new_owner_state()
+        logger = container_agent.Logger(Path(tempfile.mkdtemp()) / "log.txt")
+        job = self._finished_job("func_1", 0, [
+            {"label": "a", "timed_out": True, "best": None},
+        ])
+        container_agent.poll_permuter_jobs([job], owner_state, logger=logger)
+        self.assertNotIn("permuter_seed", owner_state)
+        self.assertEqual(len(owner_state["permuter_runs"]), 1)
+
+
+class StartPermuterJobTests(unittest.TestCase):
+    def test_runs_bodies_sequentially_via_run_permuter(self) -> None:
+        calls: list[str] = []
+
+        def fake_run_permuter(repo_dir, out_dir, owner, iteration, body, declarations, *, permuter_seconds, logger, label_suffix=""):
+            calls.append(body)
+            return {"timed_out": False, "outputs": [], "best": {"score": 0, "code": body}}
+
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            out_dir = Path(tmp) / "out"
+            logger = container_agent.Logger(out_dir / "log.txt")
+            with mock.patch.object(container_agent, "run_permuter", side_effect=fake_run_permuter):
+                job = container_agent.start_permuter_job(
+                    repo_dir, out_dir, "func_1", 0,
+                    [("a", "body_a"), ("b", "body_b")], None,
+                    permuter_seconds=5.0, logger=logger,
+                )
+                job.thread.join(timeout=5.0)
+        self.assertFalse(job.thread.is_alive())
+        self.assertEqual(calls, ["body_a", "body_b"])
+        self.assertEqual([entry["label"] for entry in job.results], ["a", "b"])
+
+
+class TerminateAllPermutersTests(unittest.TestCase):
+    def test_terminates_registered_running_processes(self) -> None:
+        fake_process = mock.Mock()
+        fake_process.poll.return_value = None
+        container_agent._register_permuter_process(fake_process)
+        try:
+            with mock.patch.object(container_agent, "_terminate_process_group") as terminate_mock:
+                container_agent.terminate_all_permuters()
+            terminate_mock.assert_called_once_with(fake_process)
+        finally:
+            container_agent._unregister_permuter_process(fake_process)
+        self.assertNotIn(fake_process, container_agent._ACTIVE_PERMUTER_PROCESSES)
+
+    def test_skips_already_exited_processes(self) -> None:
+        fake_process = mock.Mock()
+        fake_process.poll.return_value = 0
+        container_agent._register_permuter_process(fake_process)
+        with mock.patch.object(container_agent, "_terminate_process_group") as terminate_mock:
+            container_agent.terminate_all_permuters()
+        terminate_mock.assert_not_called()
+        self.assertNotIn(fake_process, container_agent._ACTIVE_PERMUTER_PROCESSES)
+
+    def test_finalize_run_terminates_permuters(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            out_dir = Path(tmp)
+            summary = {"runs": []}
+            with mock.patch.object(container_agent, "terminate_all_permuters") as terminate_mock:
+                container_agent._finalize_run(summary, out_dir, "completed", time.monotonic())
+            terminate_mock.assert_called_once()
 
 
 if __name__ == "__main__":

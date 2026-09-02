@@ -69,8 +69,11 @@ container as the output directory. The driver
 | `--budget-seconds` | overall wall-clock budget for the run |
 | `--max-iterations` | overall iteration cap, independent of the time budget |
 | `--plateau N` | stop an owner after `N` consecutive iterations with no best-similarity improvement |
-| `--permuter-seconds` | budget per permuter invocation |
+| `--permuter-seconds` | budget per permuter invocation (default 300) |
+| `--permuter-bodies N` | on a trigger, run the permuter on up to `N` distinct bodies from that iteration, each its own background process (default 3) |
 | `--owners` | restrict the run to an explicit owner list instead of every pragma in the file |
+| `--owner-order {size,file}` | discovery order when `--owners` is not given: smallest-instructions-first (default) or the order owners appear in the source |
+| `--max-instructions N` | skip discovered owners with more instructions than `N` (default: unlimited); ignored when `--owners` is given explicitly |
 | `--generator-cmd` | shell template for candidate generation; `{prompt}` and `{batch}` are substituted |
 | `--generator-timeout` | cap in seconds on a single generator invocation (default 600); still bounded further by the run's remaining budget. Kimi K3 at high effort can exceed 10 minutes per batch -- raise this rather than letting it time out |
 | `--candidate-file` | test mode: use a fixed batch file once for the first owner, then exit -- no generator/model call at all |
@@ -149,6 +152,32 @@ valid JSON afterward. Passing `--generator-cmd` yourself overrides the
 default dispatcher entirely -- `entrypoint.sh` forwards your command as-is
 and does not gate on any API key (it's your command, your auth).
 
+### What the prompt contains
+
+`build_prompt()` assembles each iteration's prompt, in this order (a
+section is omitted entirely when it has nothing to show):
+
+1. **File brief** (`tools/file_brief.py`) -- already-decompiled functions,
+   the extern/prototype block, symbol usage, stride/SDK-macro hints, and the
+   remaining-owners table.
+2. **Target assembly** for the active owner (`tools/pragma_targets.py asm`).
+3. **m2c draft** -- a structural hint from `tools/pragma_targets.py draft`
+   (unknown-struct fields, guessed types; retype/reshape freely, never a
+   match). Fetched once per owner per run and cached in
+   `state.json` (`m2c_draft`), so `--resume` does not re-run it.
+4. **Best candidates tried so far this run** -- up to 5, highest similarity
+   first, with diagnostics/frame/instruction-count/diff-excerpt feedback and
+   the static diff-reading guide.
+5. **Labels already tried this run** -- the last 30, so a generator does not
+   resend a hypothesis under a new name.
+6. **decomp-permuter output**, when a background job (§6 step 3) has
+   produced one -- submit it close to verbatim as one candidate.
+7. **"The file already declares these callees/data (do not redeclare)"** --
+   names pulled from the file brief's extern/prototype block, as an explicit
+   rule alongside the declaration-hygiene filtering already applied to the
+   previous batch's shared `declarations` (see §6 step 1).
+8. The batch JSON contract/rules (`BATCH_CONTRACT`) and the exact output path.
+
 ## 5. Test mode
 
     container/run.sh disasm/src/X.c /abs/out --candidate-file /out/batch.json
@@ -162,19 +191,32 @@ skips `entrypoint.sh`'s API-key check.
 
 ## 6. Loop semantics
 
-Per owner, until a terminal state:
+Owners are discovered once per run (`--owner-order`, `--max-instructions`,
+§2) and then worked one at a time, each until a terminal state:
 
 1. Generate a batch of candidates via `--generator-cmd` (or `--candidate-file`
-   in test mode).
+   in test mode). Before probing, a `declarations` statement that redeclares
+   a name the source file already declares or defines is dropped (logged),
+   the same way an already-tried body is filtered.
 2. Probe the batch (isolated object compare), then gate a link-verified hit
    through the full ROM compare -- the same runner fleet agents use
    (`tools/fleet_probe.py`, AGENTS.md §3.1).
-3. On a near-miss, launch the permuter for up to `--permuter-seconds` and
-   **poll its output directory** (`disasm/build/permuter/<function>-<suffix>/`)
-   rather than waiting on any notification -- the fix for the exact failure
-   #38 measured (three of five fleet trees stalled waiting on a permuter
+3. On a near-miss (effective similarity >= 0.95, or >= 0.90 when
+   `mismatch_kind` is `operand_or_scheduling_drift` or a register-allocation
+   tie whose raw score trails its normalized one, or any runner-reported
+   register tie regardless of score), launch the permuter as a **background
+   job** on up to `--permuter-bodies` distinct bodies from that iteration
+   (each its own process, run sequentially in one thread) rather than
+   blocking the loop -- it runs concurrently with the *next* generator call.
+   The driver **polls its output directory**
+   (`disasm/build/permuter/<function>-<suffix>/`) at the start of the next
+   iteration's prompt build and again after that iteration's probe, rather
+   than waiting on any notification -- the fix for the exact failure #38
+   measured (three of five fleet trees stalled waiting on a permuter
    notification a subagent cannot receive). A container has no orchestrator
-   to notify it either, so it must poll on its own clock.
+   to notify it either, so it must poll on its own clock. Every permuter
+   process still running when the run ends is terminated in the finalize
+   path -- none outlives the run.
 4. Repeat until one of: the owner gates (`accepted`, move to the next
    owner); `--plateau N` iterations pass with no best-similarity improvement
    (stop this owner, record its plateaued state); or `--max-iterations` /
