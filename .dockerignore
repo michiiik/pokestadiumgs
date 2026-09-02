@@ -24,3 +24,9 @@ fallback/
 disasm/build/
 disasm/scratch/
 disasm/probe-stats/
+
+# Host-side venvs and tool clones (recreated inside the image)
+disasm/.venv/
+disasm/tools/decomp-venv/
+disasm/tools/m2c/
+disasm/tools/decomp-permuter/
