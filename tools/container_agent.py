@@ -65,6 +65,13 @@ PRAGMA_RE = re.compile(r'#pragma\s+GLOBAL_ASM\("[^"]*/([A-Za-z_]\w*)\.s"\)')
 OUTPUT_DIR_RE = re.compile(r"^output-(\d+)-(\d+)$")
 
 DEFAULT_GENERATOR_TIMEOUT = 1800.0
+# Per-owner wall-clock cap (--owner-seconds): with an agentic generator that
+# explores via tools/probe_one.py before converging, a single iteration can
+# run 12-17 minutes without improving -- long enough that the plateau rule
+# (default 6 non-improving iterations) is far too slow a stop, and a run's
+# whole --budget-seconds can be eaten by one or two owners. See
+# process_owner/process_owner_permuter_only and _owner_elapsed_seconds.
+DEFAULT_OWNER_SECONDS = 2400.0
 PROBE_TIMEOUT_CAP = 300.0
 MISC_TIMEOUT = 60.0
 BEST_CANDIDATES_KEPT = 5
@@ -253,7 +260,55 @@ def _new_owner_state() -> dict:
         "examples_fetched": False,
         "tie_pool": False,
         "last_declarations": "",
+        # --owner-seconds bookkeeping (see _owner_elapsed_seconds below):
+        # "started_at" is a time.monotonic() reading, set the moment this
+        # run's timer is running (None when it isn't); "elapsed_seconds" is
+        # the total already folded in from earlier runs/attempts.
+        "started_at": None,
+        "elapsed_seconds": 0.0,
     }
+
+
+# ---------------------------------------------------------------------------
+# --owner-seconds: a per-owner wall-clock cap, independent of --plateau,
+# measured from the owner's first generator call (--mode full) or first
+# permuter job (--mode permuter-only) in this run. Time already spent on the
+# owner in an earlier --resume run counts too -- state.json's
+# "elapsed_seconds" carries it forward. Checked only at safe points (never
+# while a generator/probe/permuter call is actually running).
+# ---------------------------------------------------------------------------
+
+def _owner_mark_started(owner_state: dict) -> None:
+    """Start this run's --owner-seconds timer for ``owner_state``, the first
+    time this run is about to make a generator call or a permuter job for
+    it. Idempotent -- a no-op once the timer is already running this run."""
+    if owner_state.get("started_at") is None:
+        owner_state["started_at"] = time.monotonic()
+
+
+def _owner_elapsed_seconds(owner_state: dict) -> float:
+    """Total wall-clock time spent on this owner toward --owner-seconds:
+    the total already carried over from earlier runs (``elapsed_seconds``,
+    folded in by ``_owner_freeze_elapsed`` -- see --resume) plus, if this
+    run's timer is currently running (``started_at`` set), the time elapsed
+    since it started."""
+    total = owner_state.get("elapsed_seconds", 0.0) or 0.0
+    started_at = owner_state.get("started_at")
+    if started_at is not None:
+        total += max(0.0, time.monotonic() - started_at)
+    return total
+
+
+def _owner_freeze_elapsed(owner_state: dict) -> None:
+    """Fold this run's running timer (if any) into the persisted
+    ``elapsed_seconds`` total and stop it. Called once an owner's attempt
+    this run ends (whatever the status), so state.json always holds a
+    self-contained total that a later --resume (a fresh process) can keep
+    accumulating correctly. Idempotent -- a no-op if the timer was never
+    started, or already frozen."""
+    if owner_state.get("started_at") is not None:
+        owner_state["elapsed_seconds"] = _owner_elapsed_seconds(owner_state)
+        owner_state["started_at"] = None
 
 
 # ---------------------------------------------------------------------------
@@ -2700,18 +2755,44 @@ def _plateau_region_note_text(owner: str, owner_state: dict) -> str:
     return "\n".join(lines)
 
 
+def _time_cap_region_note_text(owner: str, owner_state: dict) -> str:
+    """Like ``_plateau_region_note_text``, but for an owner that hit
+    ``--owner-seconds`` rather than genuinely plateauing on similarity --
+    worth a distinct lead-in so a later pass knows this owner may still have
+    headroom, it just ran out of this run's per-owner wall-clock budget."""
+    best = owner_state.get("best_similarity")
+    raw = owner_state.get("best_raw_similarity")
+    elapsed = owner_state.get("elapsed_seconds") or 0.0
+    top = (owner_state.get("best_candidates") or [None])[0] or {}
+    kind = top.get("mismatch_kind") or "unknown"
+    families = sorted({
+        (label.split(":", 1)[0] if ":" in label else label)
+        for label in owner_state.get("tried_labels") or []
+    })
+    tie_pool = "tie-pool yes" if owner_state.get("tie_pool") else "tie-pool no"
+    lines = [
+        f"{owner}: time cap at {best} (raw {raw}) after {elapsed:.0f}s, mismatch {kind}; "
+        f"tried families: {', '.join(families) if families else '(none)'}; {tie_pool}"
+    ]
+    lines.extend(_type_conflict_note_lines(owner_state))
+    return "\n".join(lines)
+
+
 def record_region_note(
     out_dir: Path, source_rel: str, owner: str, owner_state: dict, *, status: str, logger: Logger,
 ) -> None:
-    """Append a region note for an owner that just ended in ``"accepted"``
-    or ``"plateau"`` this run (see ``_accept_region_note_text``/
-    ``_plateau_region_note_text``); a no-op for any other terminal status
+    """Append a region note for an owner that just ended in ``"accepted"``,
+    ``"plateau"``, or ``"time_cap"`` this run (see
+    ``_accept_region_note_text``/``_plateau_region_note_text``/
+    ``_time_cap_region_note_text``); a no-op for any other terminal status
     (``budget_expired``, ``max_iterations``, ``generator_failed``, ...) --
     those are run/box bookkeeping, not durable knowledge about the file."""
     if status == "accepted":
         text = _accept_region_note_text(owner, out_dir, owner_state)
     elif status == "plateau":
         text = _plateau_region_note_text(owner, owner_state)
+    elif status == "time_cap":
+        text = _time_cap_region_note_text(owner, owner_state)
     else:
         return
     path = append_region_note(out_dir, source_rel, text)
@@ -2744,6 +2825,7 @@ def process_owner(
     probe_tool: bool = True,
     summary: dict | None = None,
     examples_count: int = DEFAULT_EXAMPLES,
+    owner_seconds: float = DEFAULT_OWNER_SECONDS,
 ) -> str:
     if gen_failures is None:
         gen_failures = {"consecutive": 0}
@@ -2773,9 +2855,27 @@ def process_owner(
             owner_state["status"] = "terminated"
             return "terminated"
 
+        iteration = owner_state["iterations"]
+
+        # --owner-seconds: a safe point (no generator/probe/permuter call is
+        # in flight) to check this owner's total wall-clock spend before
+        # starting another generator call. Checked before marking the timer
+        # started, so an owner resumed with elapsed_seconds already at or
+        # past the cap ends immediately, without a wasted generator call.
+        owner_elapsed = _owner_elapsed_seconds(owner_state)
+        if owner_elapsed >= owner_seconds:
+            logger.log(
+                f"{owner}: iter {iteration}: owner-seconds cap reached "
+                f"({owner_elapsed:.0f}s >= {owner_seconds:.0f}s); ending owner as time_cap "
+                "before starting another generator call"
+            )
+            _owner_freeze_elapsed(owner_state)
+            owner_state["status"] = "time_cap"
+            return "time_cap"
+        _owner_mark_started(owner_state)
+
         poll_permuter_jobs(permuter_jobs, owner_state, logger=logger)
 
-        iteration = owner_state["iterations"]
         batch_path = out_dir / "batches" / f"{owner}_iter{iteration}.json"
         prompt_path = out_dir / "prompts" / f"{owner}_iter{iteration}.txt"
         batch_path.parent.mkdir(parents=True, exist_ok=True)
@@ -2784,9 +2884,16 @@ def process_owner(
         # Computed before build_prompt so the prompt's "time budget" line
         # reflects the timeout that will actually bound this iteration's
         # invoke_generator call below (the configured --generator-timeout
-        # clamped by whatever's left of the run's overall deadline).
+        # clamped by whatever's left of the run's overall deadline, and by
+        # whatever's left of this owner's --owner-seconds budget).
         remaining_budget = max(1.0, deadline - time.monotonic())
-        gen_timeout = max(10.0, min(generator_timeout, remaining_budget))
+        remaining_owner_budget = max(1.0, owner_seconds - _owner_elapsed_seconds(owner_state))
+        gen_timeout = max(10.0, min(generator_timeout, remaining_budget, remaining_owner_budget))
+        if remaining_owner_budget < generator_timeout and remaining_owner_budget <= remaining_budget:
+            logger.log(
+                f"{owner}: iter {iteration}: generator timeout shrunk to {gen_timeout:.0f}s "
+                f"({remaining_owner_budget:.0f}s left of --owner-seconds {owner_seconds:.0f}s)"
+            )
 
         prompt_text = build_prompt(
             owner=owner, source_rel=source_rel, file_brief=file_brief, asm_text=asm_text,
@@ -3019,6 +3126,7 @@ def process_owner_permuter_only(
     permuter_bodies: int,
     logger: Logger,
     summary: dict | None = None,
+    owner_seconds: float = DEFAULT_OWNER_SECONDS,
 ) -> str:
     """One owner's pass under ``--mode permuter-only``: never calls the
     generator. Takes up to ``permuter_bodies`` distinct seed bodies from
@@ -3035,7 +3143,8 @@ def process_owner_permuter_only(
     from -- and this owner is done for the pass.
 
     Returns ``"accepted"``, ``"plateau"`` (ran but did not gate, or nothing
-    to try), ``"budget_expired"``, or ``"terminated"``.
+    to try), ``"time_cap"`` (--owner-seconds reached before a body could be
+    started), ``"budget_expired"``, or ``"terminated"``.
     """
     if time.monotonic() >= deadline:
         owner_state["status"] = "budget_expired"
@@ -3043,6 +3152,18 @@ def process_owner_permuter_only(
     if stop_requested():
         owner_state["status"] = "terminated"
         return "terminated"
+    # --owner-seconds: an owner resumed with elapsed_seconds already at or
+    # past the cap (e.g. a --mode full run that already spent its budget on
+    # this owner) is done before even picking a seed body.
+    owner_elapsed = _owner_elapsed_seconds(owner_state)
+    if owner_elapsed >= owner_seconds:
+        logger.log(
+            f"{owner}: permuter-only: owner-seconds cap reached "
+            f"({owner_elapsed:.0f}s >= {owner_seconds:.0f}s); ending owner as time_cap"
+        )
+        _owner_freeze_elapsed(owner_state)
+        owner_state["status"] = "time_cap"
+        return "time_cap"
 
     bodies = _permuter_only_seed_bodies(owner_state, limit=max(1, permuter_bodies))
     if not bodies:
@@ -3061,11 +3182,27 @@ def process_owner_permuter_only(
         if stop_requested():
             owner_state["status"] = "terminated"
             return "terminated"
+        # Re-checked per body (not just once above): a safe point, since no
+        # permuter job is in flight here yet, and this run may already have
+        # spent several bodies' worth of time on this owner by the time we
+        # reach a later one.
+        owner_elapsed = _owner_elapsed_seconds(owner_state)
+        if owner_elapsed >= owner_seconds:
+            logger.log(
+                f"{owner}: permuter-only: owner-seconds cap reached "
+                f"({owner_elapsed:.0f}s >= {owner_seconds:.0f}s) before body {index + 1}/"
+                f"{len(bodies)}; ending owner as time_cap"
+            )
+            _owner_freeze_elapsed(owner_state)
+            owner_state["status"] = "time_cap"
+            return "time_cap"
+        _owner_mark_started(owner_state)
         remaining = deadline - time.monotonic()
         if remaining < 10.0:
             owner_state["status"] = "budget_expired"
             return "budget_expired"
-        budget = min(permuter_seconds, remaining)
+        remaining_owner = max(0.0, owner_seconds - owner_elapsed)
+        budget = min(permuter_seconds, remaining, remaining_owner)
         logger.log(
             f"{owner}: permuter-only: running permuter on body {index + 1}/{len(bodies)} "
             f"(label={label}, budget={budget:.0f}s)"
@@ -3422,6 +3559,23 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="stop an owner after N consecutive iterations with no best-similarity improvement",
     )
     parser.add_argument(
+        "--owner-seconds", type=float, default=DEFAULT_OWNER_SECONDS,
+        help=(
+            "per-owner wall-clock cap in seconds (default: 2400), measured from the owner's "
+            "first generator call (--mode full) or first permuter job (--mode permuter-only) "
+            "in this run; time already spent on the owner in an earlier --resume run counts "
+            "too (state.json's elapsed_seconds). An agentic generator that explores via "
+            "tools/probe_one.py before converging can make one iteration take 12-17 minutes "
+            "-- long enough that --plateau alone is too slow a stop. Checked only at safe "
+            "points (before starting a new generator call or permuter job; a running probe "
+            "or permuter job is never cut). Exceeding it ends the owner with status "
+            "'time_cap', recorded exactly like a plateau (region note, tie-pool check, best "
+            "candidates kept for seeding), and the run moves on to the next owner. "
+            "--generator-timeout is also shrunk by whatever's left of this budget, alongside "
+            "the run's overall --budget-seconds."
+        ),
+    )
+    parser.add_argument(
         "--permuter-seconds", type=float, default=None,
         help=(
             "default: 300 in --mode full, 1200 in --mode permuter-only (a foreground pass "
@@ -3683,7 +3837,7 @@ def main(argv: list[str] | None = None) -> int:
                 repo_dir=repo_dir, out_dir=out_dir, source_rel=source_rel, owner=owner,
                 owner_state=owner_state, state=state, state_path=state_path, deadline=deadline,
                 permuter_seconds=permuter_seconds, permuter_bodies=args.permuter_bodies,
-                logger=logger, summary=summary,
+                logger=logger, summary=summary, owner_seconds=args.owner_seconds,
             )
         else:
             status = process_owner(
@@ -3694,7 +3848,16 @@ def main(argv: list[str] | None = None) -> int:
                 gen_failures=gen_failures, max_generator_failures=args.max_generator_failures,
                 generator_timeout=args.generator_timeout, permuter_bodies=args.permuter_bodies,
                 probe_tool=probe_tool, summary=summary, examples_count=args.examples,
+                owner_seconds=args.owner_seconds,
             )
+        # Belt-and-braces: process_owner/process_owner_permuter_only already
+        # fold a "time_cap" owner's running timer into elapsed_seconds on
+        # that path, but every other terminal status (accepted, plateau,
+        # budget_expired, terminated, ...) also ends this run's attempt at
+        # the owner -- freeze here unconditionally so a later --resume
+        # always adds to a self-contained total regardless of which status
+        # actually stopped it.
+        _owner_freeze_elapsed(owner_state)
         summary["iteration_counts"][owner] = owner_state["iterations"]
         summary["best_per_owner"][owner] = owner_state["best_similarity"]
         if status == "accepted":
@@ -3703,11 +3866,14 @@ def main(argv: list[str] | None = None) -> int:
         # rule 11/§4): both keyed off the owner's actual terminal status
         # this run, not which mode produced it, so a permuter-only pass
         # over a tie pool records/updates the same durable knowledge a full
-        # run's plateau does. Tie pool first: the plateau note's own
-        # "tie-pool yes/no" line reads owner_state["tie_pool"].
-        if status == "plateau":
+        # run's plateau does. "time_cap" (--owner-seconds) is recorded the
+        # same way as "plateau" -- region note, tie-pool check, best
+        # candidates already kept for seeding. Tie pool first: the
+        # plateau/time-cap note's own "tie-pool yes/no" line reads
+        # owner_state["tie_pool"].
+        if status in ("plateau", "time_cap"):
             record_tie_pool(out_dir, owner, source_rel, owner_state, logger=logger)
-        if status in ("accepted", "plateau"):
+        if status in ("accepted", "plateau", "time_cap"):
             record_region_note(out_dir, source_rel, owner, owner_state, status=status, logger=logger)
         _save_state(state, state_path, repo_dir=repo_dir, out_dir=out_dir, summary=summary)
         if status == "budget_expired":

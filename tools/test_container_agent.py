@@ -4601,5 +4601,247 @@ class MainTiePoolAndRegionNotesTests(unittest.TestCase):
         self.assertIn("func_1: matched (fam:shape:h)", note_text)
 
 
+# ---------------------------------------------------------------------------
+# --owner-seconds: per-owner wall-clock cap (process_owner /
+# process_owner_permuter_only), independent of --plateau -- see
+# _owner_elapsed_seconds/_owner_mark_started/_owner_freeze_elapsed.
+# ---------------------------------------------------------------------------
+
+class _FakeClock:
+    """A controllable ``time.monotonic()`` stand-in: starts at ``start`` and
+    only moves when ``advance()`` is called -- from inside a stubbed
+    generator/permuter call, simulating wall-clock time actually spent in
+    it, so a test can make "12-17 minutes per iteration" deterministic and
+    fast without a real sleep."""
+
+    def __init__(self, start: float = 0.0) -> None:
+        self.t = start
+
+    def __call__(self) -> float:
+        return self.t
+
+    def advance(self, seconds: float) -> None:
+        self.t += seconds
+
+
+class OwnerSecondsCapTests(unittest.TestCase):
+    def test_cap_triggers_after_owner_seconds_with_fake_clock(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            repo_dir.mkdir()
+            out_dir = Path(tmp) / "out"
+            owner = "func_1"
+            source_rel = "disasm/src/X.c"
+            clock = _FakeClock(start=0.0)
+
+            def batch_for_iteration(_n):
+                return {"source": source_rel, "candidates": [{"function": owner, "label": "a", "body": "b"}]}
+
+            def result_for_call(_n, _batch):
+                return {
+                    "batch_status": "no_candidate_accepted", "accepted": [],
+                    "attempts": [{"function": owner, "label": "a", "status": "rejected", "similarity_score": 0.0}],
+                }
+
+            gen_stub = make_invoke_generator(batch_for_iteration)
+
+            def gen_stub_with_clock(command, *, cwd, timeout):
+                # Simulate a slow, 400s-per-call agentic generator (the
+                # observed 12-17 minute iterations) before returning.
+                result = gen_stub(command, cwd=cwd, timeout=timeout)
+                clock.advance(400.0)
+                return result
+
+            owner_state = container_agent._new_owner_state()
+            state = {owner: owner_state}
+            state_path = out_dir / "state.json"
+            logger = container_agent.Logger(out_dir / "log.txt")
+
+            with mock.patch.object(container_agent.time, "monotonic", side_effect=clock), \
+                 mock.patch.object(container_agent, "file_brief_text", return_value="brief"), \
+                 mock.patch.object(container_agent, "owner_asm_text", return_value="asm"), \
+                 mock.patch.object(container_agent, "get_m2c_draft", return_value=None), \
+                 mock.patch.object(container_agent, "invoke_generator", side_effect=gen_stub_with_clock) as gen_mock, \
+                 mock.patch.object(container_agent, "invoke_probe", side_effect=make_invoke_probe(result_for_call)):
+                status = container_agent.process_owner(
+                    repo_dir=repo_dir, out_dir=out_dir, source_rel=source_rel, owner=owner,
+                    owner_state=owner_state, state=state, state_path=state_path,
+                    deadline=100000.0, max_iterations=50, plateau=100,
+                    permuter_seconds=0.0, generator_cmd="generator --prompt {prompt} --batch {batch}",
+                    logger=logger, owner_seconds=1000.0,
+                )
+
+        # 400s/call: after 3 calls the clock reads 1200s >= 1000s, caught at
+        # the top of the 4th iteration before a 4th call is ever made.
+        self.assertEqual(status, "time_cap")
+        self.assertEqual(owner_state["status"], "time_cap")
+        self.assertEqual(gen_mock.call_count, 3)
+        self.assertIsNone(owner_state["started_at"])
+        self.assertGreaterEqual(owner_state["elapsed_seconds"], 1000.0)
+
+    def test_resume_carries_elapsed_from_earlier_run(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            repo_dir.mkdir()
+            out_dir = Path(tmp) / "out"
+            owner = "func_1"
+            source_rel = "disasm/src/X.c"
+
+            owner_state = container_agent._new_owner_state()
+            # As if an earlier --resume run already spent 2500s on this
+            # owner and _owner_freeze_elapsed folded it in on exit.
+            owner_state["elapsed_seconds"] = 2500.0
+            owner_state["started_at"] = None
+            state = {owner: owner_state}
+            state_path = out_dir / "state.json"
+            logger = container_agent.Logger(out_dir / "log.txt")
+
+            with mock.patch.object(container_agent, "file_brief_text", return_value="brief"), \
+                 mock.patch.object(container_agent, "owner_asm_text", return_value="asm"), \
+                 mock.patch.object(container_agent, "get_m2c_draft", return_value=None), \
+                 mock.patch.object(container_agent, "invoke_generator") as gen_mock:
+                status = container_agent.process_owner(
+                    repo_dir=repo_dir, out_dir=out_dir, source_rel=source_rel, owner=owner,
+                    owner_state=owner_state, state=state, state_path=state_path,
+                    deadline=time.monotonic() + 60.0, max_iterations=50, plateau=100,
+                    permuter_seconds=0.0, generator_cmd="generator --prompt {prompt} --batch {batch}",
+                    logger=logger, owner_seconds=2400.0,
+                )
+
+        # Carried-over elapsed_seconds alone already exceeds the cap, so the
+        # owner ends as time_cap before ever calling the generator this run.
+        self.assertEqual(status, "time_cap")
+        gen_mock.assert_not_called()
+        self.assertEqual(owner_state["elapsed_seconds"], 2500.0)
+
+    def test_resume_carried_elapsed_adds_to_this_runs_time(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            repo_dir.mkdir()
+            out_dir = Path(tmp) / "out"
+            owner = "func_1"
+            source_rel = "disasm/src/X.c"
+            clock = _FakeClock(start=0.0)
+
+            def batch_for_iteration(_n):
+                return {"source": source_rel, "candidates": [{"function": owner, "label": "a", "body": "b"}]}
+
+            def result_for_call(_n, _batch):
+                return {
+                    "batch_status": "no_candidate_accepted", "accepted": [],
+                    "attempts": [{"function": owner, "label": "a", "status": "rejected", "similarity_score": 0.0}],
+                }
+
+            gen_stub = make_invoke_generator(batch_for_iteration)
+
+            def gen_stub_with_clock(command, *, cwd, timeout):
+                result = gen_stub(command, cwd=cwd, timeout=timeout)
+                clock.advance(300.0)
+                return result
+
+            owner_state = container_agent._new_owner_state()
+            owner_state["elapsed_seconds"] = 2000.0  # carried from an earlier run
+            state = {owner: owner_state}
+            state_path = out_dir / "state.json"
+            logger = container_agent.Logger(out_dir / "log.txt")
+
+            with mock.patch.object(container_agent.time, "monotonic", side_effect=clock), \
+                 mock.patch.object(container_agent, "file_brief_text", return_value="brief"), \
+                 mock.patch.object(container_agent, "owner_asm_text", return_value="asm"), \
+                 mock.patch.object(container_agent, "get_m2c_draft", return_value=None), \
+                 mock.patch.object(container_agent, "invoke_generator", side_effect=gen_stub_with_clock) as gen_mock, \
+                 mock.patch.object(container_agent, "invoke_probe", side_effect=make_invoke_probe(result_for_call)):
+                status = container_agent.process_owner(
+                    repo_dir=repo_dir, out_dir=out_dir, source_rel=source_rel, owner=owner,
+                    owner_state=owner_state, state=state, state_path=state_path,
+                    deadline=100000.0, max_iterations=50, plateau=100,
+                    permuter_seconds=0.0, generator_cmd="generator --prompt {prompt} --batch {batch}",
+                    logger=logger, owner_seconds=2400.0,
+                )
+
+        # 2000s carried + 300s/call: the 2nd call pushes total to 2600s >=
+        # 2400s, caught before a 3rd call.
+        self.assertEqual(status, "time_cap")
+        self.assertEqual(gen_mock.call_count, 2)
+        self.assertEqual(owner_state["elapsed_seconds"], 2600.0)
+
+    def test_generator_timeout_shrinks_near_owner_cap(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            repo_dir.mkdir()
+            out_dir = Path(tmp) / "out"
+            owner = "func_1"
+            source_rel = "disasm/src/X.c"
+            owner_state = container_agent._new_owner_state()
+            # Only 50s left of a 2400s --owner-seconds budget -- tighter
+            # than both --generator-timeout (1800s) and the run's remaining
+            # --budget-seconds (3600s), so it alone should bound the call.
+            owner_state["elapsed_seconds"] = 2350.0
+            state = {owner: owner_state}
+            state_path = out_dir / "state.json"
+            logger = container_agent.Logger(out_dir / "log.txt")
+
+            with mock.patch.object(container_agent, "file_brief_text", return_value="brief"), \
+                 mock.patch.object(container_agent, "owner_asm_text", return_value="asm"), \
+                 mock.patch.object(container_agent, "get_m2c_draft", return_value=None), \
+                 mock.patch.object(container_agent, "invoke_generator") as gen_mock:
+                gen_mock.side_effect = subprocess.TimeoutExpired(cmd="x", timeout=1)
+                container_agent.process_owner(
+                    repo_dir=repo_dir, out_dir=out_dir, source_rel=source_rel, owner=owner,
+                    owner_state=owner_state, state=state, state_path=state_path,
+                    deadline=time.monotonic() + 3600.0, max_iterations=1, plateau=100,
+                    permuter_seconds=0.0, generator_cmd="generator --prompt {prompt} --batch {batch}",
+                    logger=logger, gen_failures={"consecutive": 0}, max_generator_failures=10,
+                    generator_timeout=1800.0, owner_seconds=2400.0,
+                )
+
+            self.assertEqual(gen_mock.call_count, 1)
+            _, kwargs = gen_mock.call_args
+            self.assertLessEqual(kwargs["timeout"], 50.0)
+            self.assertGreater(kwargs["timeout"], 10.0)
+
+    def test_permuter_only_mode_honours_owner_seconds_cap(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            repo_dir.mkdir()
+            out_dir = Path(tmp) / "out"
+            logger = container_agent.Logger(out_dir / "log.txt")
+            state: dict = {}
+            owner_state = container_agent._new_owner_state()
+            owner_state["best_candidates"] = [
+                _candidate("seed_a", 0.9, body="void func_1(void) { return 1; }"),
+                _candidate("seed_b", 0.8, body="void func_1(void) { return 2; }"),
+                _candidate("seed_c", 0.7, body="void func_1(void) { return 3; }"),
+            ]
+            clock = _FakeClock(start=0.0)
+
+            def fake_run_permuter(repo_dir_arg, out_dir_arg, owner, iteration, body, declarations, *,
+                                   permuter_seconds, logger, label_suffix=""):
+                clock.advance(60.0)
+                return {
+                    "timed_out": False,
+                    "outputs": [{"score": 7, "code": body}],
+                    "best": {"score": 7, "code": body},
+                }
+
+            with mock.patch.object(container_agent.time, "monotonic", side_effect=clock), \
+                 mock.patch.object(container_agent, "run_permuter", side_effect=fake_run_permuter) as permuter_mock:
+                status = container_agent.process_owner_permuter_only(
+                    repo_dir=repo_dir, out_dir=out_dir, source_rel="disasm/src/X.c", owner="func_1",
+                    owner_state=owner_state, state=state, state_path=out_dir / "state.json",
+                    deadline=100000.0, permuter_seconds=5.0, permuter_bodies=3, logger=logger,
+                    owner_seconds=100.0,
+                )
+
+        # 60s/permuter call: after 2 calls the clock reads 120s >= 100s,
+        # caught before a 3rd body is tried -- never cutting the 2nd call
+        # itself.
+        self.assertEqual(status, "time_cap")
+        self.assertEqual(owner_state["status"], "time_cap")
+        self.assertEqual(permuter_mock.call_count, 2)
+        self.assertIsNone(owner_state["started_at"])
+        self.assertGreaterEqual(owner_state["elapsed_seconds"], 100.0)
+
+
 if __name__ == "__main__":
     unittest.main()

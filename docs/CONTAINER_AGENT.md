@@ -69,6 +69,7 @@ container as the output directory. The driver
 | `--budget-seconds` | overall wall-clock budget for the run |
 | `--max-iterations` | overall iteration cap, independent of the time budget |
 | `--plateau N` | stop an owner after `N` consecutive iterations with no best-similarity improvement |
+| `--owner-seconds N` | per-owner wall-clock cap (default 2400s), measured from the owner's first generator call (`--mode full`) or first permuter job (`--mode permuter-only`) in this run -- time already spent on the owner in an earlier `--resume` run counts too. See §6.2 |
 | `--permuter-seconds` | budget per permuter invocation (default 300 in `--mode full`, 1200 in `--mode permuter-only` -- §6.1) |
 | `--permuter-bodies N` | on a trigger, run the permuter on up to `N` distinct bodies from that iteration, each its own background process (default 3) |
 | `--owners` | restrict the run to an explicit owner list instead of every pragma in the file |
@@ -416,32 +417,40 @@ Owners are discovered once per run (`--owner-order`, `--max-instructions`,
    path -- none outlives the run.
 4. Repeat until one of: the owner gates (`accepted`, move to the next
    owner); `--plateau N` iterations pass with no best-similarity improvement
-   (stop this owner, record its plateaued state); or `--max-iterations` /
-   `--budget-seconds` is exhausted for the run.
+   (stop this owner, record its plateaued state); `--owner-seconds` is
+   exhausted for this owner (§6.2 -- stop this owner, record it exactly like
+   a plateau); or `--max-iterations` / `--budget-seconds` is exhausted for
+   the run.
 
 Every iteration's outcome (similarity, status, diagnostic) is appended to
 that owner's `history[]` in `state.json` as it happens, so a run killed
 mid-owner still leaves a readable trail.
 
-Whenever an owner's run ends in **`accepted`** or **`plateau`** (only those
-two -- not `budget_expired`/`max_iterations`/`generator_failed`, which are
-run/box bookkeeping, not durable knowledge about the file), the driver:
+Whenever an owner's run ends in **`accepted`**, **`plateau`**, or
+**`time_cap`** (only those three -- not `budget_expired`/`max_iterations`/
+`generator_failed`, which are run/box bookkeeping, not durable knowledge
+about the file), the driver:
 
 - appends a short, dated note to `<out>/region-notes/<source path, "/" ->
   "__">.md`, in the exact section format `tools/region_notes.py append`
   itself produces (§7, §9.5 on the host side): `"<owner>: matched (<label>),
-  <N> iterations, agent <AGENT>"` on an accept, or `"<owner>: plateau at
-  <best> (raw <raw>), mismatch <kind>; tried families: <family, ...>;
-  tie-pool yes|no"` on a plateau, plus one `"TYPE CONFLICT: <callee> is <new
-  sig>, not <old sig>"` line per companion-edit type conflict this run
-  recorded (`filter_declarations`/`run_iteration`, AGENTS.md §2 rule 9).
-- on a **plateau** specifically, also checks whether the owner's best
-  attempt was a tie -- a normalized-only match (near-1.0 similarity, raw
-  well below 0.95) or a runner-reported register-allocation tie
-  (`docs/REGISTER_TIES.md`) -- and if so, marks `state.json`'s
+  <N> iterations, agent <AGENT>"` on an accept, `"<owner>: plateau at <best>
+  (raw <raw>), mismatch <kind>; tried families: <family, ...>; tie-pool
+  yes|no"` on a plateau, or `"<owner>: time cap at <best> (raw <raw>) after
+  <elapsed>s, mismatch <kind>; tried families: <family, ...>; tie-pool
+  yes|no"` on a `time_cap`, plus one `"TYPE CONFLICT: <callee> is <new sig>,
+  not <old sig>"` line per companion-edit type conflict this run recorded
+  (`filter_declarations`/`run_iteration`, AGENTS.md §2 rule 9).
+- on a **plateau** or **`time_cap`** specifically, also checks whether the
+  owner's best attempt was a tie -- a normalized-only match (near-1.0
+  similarity, raw well below 0.95) or a runner-reported register-allocation
+  tie (`docs/REGISTER_TIES.md`) -- and if so, marks `state.json`'s
   `tie_pool: true` for that owner and appends its best body/declarations to
   a cumulative `<out>/tie-pool.json`, the input a later `--mode
-  permuter-only` pass (§6.1) reads via `--tie-pool-file`.
+  permuter-only` pass (§6.1) reads via `--tie-pool-file`. Its
+  `best_candidates` pool (kept regardless of status) is also what a later
+  `--resume` or `--seed-from` prompt starts from, so a `time_cap` owner is
+  never starting cold next time.
 
 ### 6.1 `--mode permuter-only`: a permuter-first pass over a tie pool
 
@@ -472,8 +481,45 @@ overlap with, unlike the background jobs in §6 step 3), with
   owner is done for this pass (`plateau`).
 
 Tie-pool recording and region notes (above) apply the same way regardless of
-which mode produced the `plateau`/`accepted` status, so a permuter-only pass
-over a tie pool keeps updating both.
+which mode produced the `plateau`/`accepted`/`time_cap` status, so a
+permuter-only pass over a tie pool keeps updating both.
+
+### 6.2 `--owner-seconds`: a per-owner wall-clock cap
+
+An agentic generator that explores via `tools/probe_one.py` before
+converging (§4.1) does not iterate at a predictable pace: a single call can
+run 12-17 minutes without improving. `--plateau N` alone is too slow a stop
+in that regime -- a whole `--budget-seconds` run can be eaten by one or two
+owners, each burning its non-improving iterations at that pace before
+`--plateau` finally trips. `--owner-seconds N` (default 2400) is a second,
+independent stop: a wall-clock cap on one owner, checked *in addition to*
+`--plateau`, whichever trips first.
+
+- The timer starts the moment this run is about to make the owner's first
+  generator call (`--mode full`) or first permuter job (`--mode
+  permuter-only`) -- not when the owner's turn simply begins (prompt/example
+  gathering before that first call doesn't count against it).
+- It is only ever checked at a **safe point** -- before starting another
+  generator call or permuter job -- never while one is actually running,
+  so a running probe, generator call, or permuter job is never cut short by
+  it.
+- `state.json` tracks it per owner as `elapsed_seconds` (a running total,
+  frozen and persisted every time the owner's attempt this run ends,
+  whatever the terminal status) and a transient `started_at` (set only
+  while this run's timer is actively running). A `--resume`d owner keeps
+  accumulating onto its own `elapsed_seconds` -- time already spent on it in
+  an earlier run of the same `--out` counts toward this run's cap too, so an
+  owner that already burned most of its budget across several resumed runs
+  stops quickly rather than getting a fresh 2400s every time.
+- Exceeding the cap ends the owner with status `"time_cap"`, recorded
+  exactly like a `"plateau"` (region note, tie-pool check, `best_candidates`
+  kept for seeding -- §6 above); the run then moves on to the next owner.
+- `--generator-timeout` (§2, §4.1) is also shrunk by whatever's left of an
+  owner's `--owner-seconds` budget, on top of the run's remaining
+  `--budget-seconds` -- so as an owner's cap nears, its next generator call
+  is given correspondingly less time rather than being allowed to overrun it
+  before the *following* iteration's safe-point check would otherwise catch
+  it.
 
 ## 7. Output contract
 
@@ -481,11 +527,11 @@ Everything lands under the mounted `--out` directory:
 
 | Path | Contents |
 |---|---|
-| `state.json` | `owner -> {best_similarity, iterations, history[], status, ...}` for every owner attempted this run; also carries per-owner `examples` (§4 item 3) and `tie_pool` (§6.1) |
+| `state.json` | `owner -> {best_similarity, iterations, history[], status, ...}` for every owner attempted this run; also carries per-owner `examples` (§4 item 3), `tie_pool` (§6.1), and `elapsed_seconds`/`started_at` (§6.2) |
 | `accepted/<owner>.json` | a `fleet_probe` batch JSON (`source`, `declarations`, one `candidates[]` entry, optional `companion_edits`) for each owner that reached a gated accept |
 | `accepted/<owner>.patch` | the same accepted change as a patch, for inspection without re-running anything |
-| `tie-pool.json` | `owner -> {source, body, declarations, raw, label}`, cumulative across this run, for every owner whose plateaued best was a register-allocation tie (§6, §6.1); the `--tie-pool-file` input to a later `--mode permuter-only` pass |
-| `region-notes/<source, "/" -> "__">.md` | dated notes appended on every accept/plateau (§6), in the exact shape `tools/region_notes.py append` produces; folded into `docs/regions/<source>.md` by the host merge step (§9.5) |
+| `tie-pool.json` | `owner -> {source, body, declarations, raw, label}`, cumulative across this run, for every owner whose plateaued or time-capped best was a register-allocation tie (§6, §6.1, §6.2); the `--tie-pool-file` input to a later `--mode permuter-only` pass |
+| `region-notes/<source, "/" -> "__">.md` | dated notes appended on every accept/plateau/time_cap (§6, §6.2), in the exact shape `tools/region_notes.py append` produces; folded into `docs/regions/<source>.md` by the host merge step (§9.5) |
 | `log.txt` | the run's diagnostics log |
 | `summary.json` | owners attempted, owners matched, best similarity per owner, iteration counts, wall time for the run |
 | `probe-stats/probe-stats.jsonl` | a copy of the runner's own probe-stats history (see §9.1) |
