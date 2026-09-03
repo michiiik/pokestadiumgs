@@ -4138,6 +4138,32 @@ def _install_incrementally(
     return kept, False
 
 
+def _is_recordable_source(source_path: Path) -> bool:
+    """Whether a probed source belongs in the shared probe-stats history.
+
+    That history is keyed to real tracked sources under ``disasm/src/``. A
+    synthetic file -- a unit test's temp-dir source, or a scratch copy under
+    ``disasm/scratch/`` -- teaches a later run nothing, and appending it to
+    the primary checkout's ledger pollutes history shared by every worktree.
+    227 such rows had accumulated before this guard (225 of them ``func_a``,
+    one per run of a single test that mocked the whole gate but left the real
+    stats writer in place).
+
+    This guards the *shared default* ledger only. When ``PRAGMA_PROBE_STATS``
+    names a destination the caller has chosen one deliberately -- that is how
+    ``container_merge --fresh-history`` isolates a run, and how the runner's
+    own tests exercise row shaping -- so anything is recordable there.
+    """
+    if os.environ.get("PRAGMA_PROBE_STATS") is not None:
+        return True
+    candidates = [source_path.as_posix()]
+    try:
+        candidates.append(source_path.resolve().as_posix())
+    except OSError:
+        pass
+    return any("/disasm/src/" in c or c.startswith("disasm/src/") for c in candidates)
+
+
 def _record_probe_stats(
     source_path: Path,
     attempts: list[dict[str, object]],
@@ -4162,7 +4188,12 @@ def _record_probe_stats(
     best-effort sources for a per-attempt ``family`` when the attempt dict
     does not already carry one -- see ``sweep_targets.py``, which sets
     ``family_lookup`` from the listing it already has.
+
+    A source that is not a real tracked one is not recorded at all; see
+    ``_is_recordable_source``.
     """
+    if not _is_recordable_source(source_path):
+        return
     try:
         counts: dict[str, int] = {}
         rows: list[dict[str, object]] = []

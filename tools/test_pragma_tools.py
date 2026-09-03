@@ -1193,6 +1193,50 @@ class RunnerTests(unittest.TestCase):
         self.assertNotIn("gate_environment_broken", runner._REJECTED_ATTEMPT_STATUSES)
         self.assertNotIn("gate_environment_broken", runner._DUPLICATE_BLOCKING_STATUSES)
 
+    def test_synthetic_sources_never_reach_the_shared_probe_stats_ledger(self) -> None:
+        # A test's temp-dir source, and a scratch copy, teach a later run
+        # nothing. 227 such rows had accumulated in the primary checkout's
+        # shared ledger before this guard.
+        with mock.patch.dict(os.environ, {}, clear=False):
+            os.environ.pop("PRAGMA_PROBE_STATS", None)
+            self.assertFalse(runner._is_recordable_source(Path("/var/folders/x/T/tmp1/synthetic.c")))
+            self.assertFalse(
+                runner._is_recordable_source(
+                    Path("/repo/disasm/scratch/tmpabcd/synthetic.c")
+                )
+            )
+            self.assertTrue(runner._is_recordable_source(Path("/repo/disasm/src/585D0.c")))
+            self.assertTrue(runner._is_recordable_source(Path("disasm/src/585D0.c")))
+
+    def test_an_explicit_stats_destination_accepts_any_source(self) -> None:
+        # container_merge --fresh-history and the runner's own row-shaping
+        # tests both point PRAGMA_PROBE_STATS at a file they own; the guard
+        # protects the shared default ledger, not a chosen destination.
+        with mock.patch.dict(os.environ, {"PRAGMA_PROBE_STATS": "/tmp/history.jsonl"}):
+            self.assertTrue(
+                runner._is_recordable_source(Path("/var/folders/x/T/tmp1/synthetic.c"))
+            )
+
+    def test_record_probe_stats_writes_nothing_for_a_synthetic_source(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.c"
+            source.write_text("void func_a(void) {}\n")
+            ledger = Path(directory) / "shared" / "probe-stats.jsonl"
+            attempts = [{"index": 0, "function": "func_a", "status": "compare_rejected"}]
+            with mock.patch.dict(os.environ, {}, clear=False):
+                os.environ.pop("PRAGMA_PROBE_STATS", None)
+                with mock.patch.object(runner, "_probe_stats_target", return_value=ledger):
+                    runner._record_probe_stats(source, attempts, None)
+                    self.assertFalse(
+                        ledger.exists(), "a synthetic source must not reach the ledger"
+                    )
+                    # A real tracked source still records, so the guard has
+                    # not simply disabled the writer.
+                    runner._record_probe_stats(
+                        Path("/repo/disasm/src/585D0.c"), attempts, None
+                    )
+                    self.assertTrue(ledger.exists())
+
     def test_worktree_gate_prerequisites_are_built_privately(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             main = Path(directory) / "main"
