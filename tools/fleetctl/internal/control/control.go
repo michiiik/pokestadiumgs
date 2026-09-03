@@ -731,6 +731,53 @@ func touchesMergePaths(path string) bool {
 		strings.HasPrefix(path, "docs/regions/")
 }
 
+// blockingDirtyPath returns the first locally-modified tracked file that a
+// `git checkout -B <branch> <baseRef>` would have to overwrite, or "".
+//
+// touchesMergePaths alone is not enough for this. It names the paths the
+// *merge* writes, but the checkout that precedes the merge rewrites every
+// file differing between HEAD and baseRef -- so a modification anywhere in
+// that set makes git refuse, whatever the path. That gap stranded run
+// 585D0-p11-r1: uncommitted disasm/Makefile and tools/try_pragma_compare.py
+// passed the two-prefix check, then aborted the checkout.
+//
+// Dirt outside the set is still tolerated, which matters: the merge repo is
+// a shared worktree that routinely carries unrelated edits, and blocking on
+// those would stall merges that git would have allowed.
+func blockingDirtyPath(porcelain string, rewritten []string) string {
+	if len(rewritten) == 0 {
+		return ""
+	}
+	set := make(map[string]bool, len(rewritten))
+	for _, name := range rewritten {
+		set[name] = true
+	}
+	for _, path := range modifiedTrackedPaths(porcelain) {
+		if set[path] {
+			return path
+		}
+	}
+	return ""
+}
+
+// modifiedTrackedPaths lists every tracked (non "??") path in `git status
+// --porcelain` output, resolving rename lines ("R  old -> new") to their
+// destination.
+func modifiedTrackedPaths(porcelain string) []string {
+	var out []string
+	for _, line := range strings.Split(porcelain, "\n") {
+		if len(line) < 4 || line[:2] == "??" {
+			continue
+		}
+		path := strings.TrimSpace(line[3:])
+		if idx := strings.Index(path, " -> "); idx >= 0 {
+			path = path[idx+4:]
+		}
+		out = append(out, path)
+	}
+	return out
+}
+
 // resetGeneratedFiles discards any uncommitted state in files the merge
 // repo's own tooling regenerates as a side effect of committing -- today
 // just COVERAGE.md (see touchesMergePaths' doc) -- before runMerge's dirty
@@ -772,6 +819,17 @@ func dirtyMergePath(porcelain string) string {
 	return ""
 }
 
+// blockDirty puts rec into the retryable blocked-dirty state with note as
+// its reason: logged, alerted (rate-limited per run by Loop.alert), and
+// collected by retryBlockedMergeRuns on every later pass.
+func (l *Loop) blockDirty(ctx context.Context, rec *fleetstate.RunRecord, note string) {
+	rec.Status = fleetstate.StatusMergeBlockedDirty
+	rec.Note = note
+	l.logf("run %s: %s", rec.Spec.ID, rec.Note)
+	l.alert(ctx, "merge_blocked_dirty", rec.Spec.ID,
+		fmt.Sprintf("fleetctl: merge repo dirty, run %s blocked", rec.Spec.ID), rec.Note)
+}
+
 // runMerge is the sequential merge/branch/PR step. The control loop never
 // runs two of these concurrently -- RunOnce/pollRunning call it in a plain
 // for loop with no goroutines, which is itself the mutex the task asks for
@@ -806,19 +864,35 @@ func (l *Loop) runMerge(ctx context.Context, rec *fleetstate.RunRecord) error {
 		return fmt.Errorf("git status --porcelain %s: %w", mergeRepo, err)
 	}
 	if conflict := dirtyMergePath(porcelain); conflict != "" {
-		rec.Status = fleetstate.StatusMergeBlockedDirty
-		rec.Note = fmt.Sprintf("merge repo %s has uncommitted changes to %s (a path this merge would touch); refusing to branch/commit until it is clean", mergeRepo, conflict)
-		l.logf("run %s: %s", rec.Spec.ID, rec.Note)
-		l.alert(ctx, "merge_blocked_dirty", rec.Spec.ID,
-			fmt.Sprintf("fleetctl: merge repo dirty, run %s blocked", rec.Spec.ID), rec.Note)
+		l.blockDirty(ctx, rec, fmt.Sprintf("merge repo %s has uncommitted changes to %s (a path this merge would touch); refusing to branch/commit until it is clean", mergeRepo, conflict))
 		return nil
 	}
 
 	if err := l.Runner.GitFetch(ctx, mergeRepo); err != nil {
 		return fmt.Errorf("fetch origin before branching: %w", err)
 	}
+
+	// Fetch first, so the HEAD..baseRef comparison is against the ref the
+	// checkout will actually use.
+	rewritten, err := l.Runner.GitDiffNames(ctx, mergeRepo, baseRef)
+	if err != nil {
+		l.logf("run %s: could not list files %s would rewrite (%v); attempting the checkout anyway", rec.Spec.ID, baseRef, err)
+	} else if conflict := blockingDirtyPath(porcelain, rewritten); conflict != "" {
+		l.blockDirty(ctx, rec, fmt.Sprintf("merge repo %s has uncommitted changes to %s, which checking out %s would overwrite; refusing to branch until it is clean", mergeRepo, conflict, baseRef))
+		return nil
+	}
+
 	if err := l.Runner.GitCheckoutNewBranch(ctx, mergeRepo, branch, baseRef); err != nil {
-		return fmt.Errorf("create branch %s from %s: %w", branch, baseRef, err)
+		// Defect: this used to return a bare error, leaving the run in
+		// StatusMerging -- which pollRunning skips and
+		// retryBlockedMergeRuns does not collect, so it never advanced
+		// again, while still reserving its owners as in-flight (see
+		// reserve() in reconcileQueue) and so silently withholding them
+		// from every future run. Block retryably instead: whatever the
+		// cause, the next pass retries and it heals once the repo is
+		// clean.
+		l.blockDirty(ctx, rec, fmt.Sprintf("create branch %s from %s failed: %v", branch, baseRef, err))
+		return nil
 	}
 	rec.Branch = branch
 

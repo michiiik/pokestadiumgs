@@ -1174,3 +1174,92 @@ func TestRejectedOwnersSeparatesGateRejectionsFromFindingNothing(t *testing.T) {
 		t.Fatalf("all-accepted report should yield no rejections, got %d", n)
 	}
 }
+
+// Defect A: the dirty precheck only knew disasm/src/ and docs/regions/, but
+// `git checkout -B` refuses over ANY locally-modified file it must rewrite.
+// Uncommitted disasm/Makefile + tools/try_pragma_compare.py passed the
+// two-prefix check and then aborted the checkout, stranding run
+// 585D0-p11-r1.
+func TestBlockingDirtyPathCatchesAnyFileTheCheckoutWouldRewrite(t *testing.T) {
+	porcelain := " M disasm/Makefile\n M tools/try_pragma_compare.py\n"
+	if got := dirtyMergePath(porcelain); got != "" {
+		t.Fatalf("precondition: old check should not fire, got %q", got)
+	}
+	rewritten := []string{"disasm/Makefile", "tools/fleetctl/main.go"}
+	if got := blockingDirtyPath(porcelain, rewritten); got != "disasm/Makefile" {
+		t.Fatalf("blockingDirtyPath = %q, want disasm/Makefile", got)
+	}
+}
+
+// Dirt the checkout would NOT rewrite stays tolerated: the merge repo is a
+// shared worktree that routinely carries unrelated edits, and blocking on
+// those would stall merges git would have allowed.
+func TestBlockingDirtyPathToleratesDirtOutsideTheRewriteSet(t *testing.T) {
+	porcelain := " M disasm/Makefile\n?? scratch/notes.txt\n"
+	if got := blockingDirtyPath(porcelain, []string{"tools/other.go"}); got != "" {
+		t.Fatalf("unrelated dirt should not block, got %q", got)
+	}
+	if got := blockingDirtyPath(porcelain, nil); got != "" {
+		t.Fatalf("empty rewrite set should not block, got %q", got)
+	}
+	// Untracked files are never blocking.
+	if got := blockingDirtyPath("?? disasm/Makefile\n", []string{"disasm/Makefile"}); got != "" {
+		t.Fatalf("untracked file should not block, got %q", got)
+	}
+}
+
+func TestModifiedTrackedPathsResolvesRenamesToDestination(t *testing.T) {
+	got := modifiedTrackedPaths("R  old/a.c -> new/b.c\n M keep.c\n?? skip.c\n")
+	want := []string{"new/b.c", "keep.c"}
+	if len(got) != len(want) {
+		t.Fatalf("modifiedTrackedPaths = %v, want %v", got, want)
+	}
+	for i := range want {
+		if got[i] != want[i] {
+			t.Fatalf("modifiedTrackedPaths = %v, want %v", got, want)
+		}
+	}
+}
+
+// Defect B: a checkout failure used to return a bare error, leaving the run
+// in StatusMerging -- which pollRunning skips and retryBlockedMergeRuns does
+// not collect, so it never advanced again while still reserving its owners
+// as in-flight. Run 585D0-p11-r1 sat there with four owners of 585D0.c
+// withheld from every future run. It must land in the retryable blocked
+// state instead.
+func TestCheckoutFailureBlocksRetryablyInsteadOfStrandingTheRun(t *testing.T) {
+	fake := &runner.Fake{
+		InspectResults:          map[string][]runner.InspectResult{"cid": {{Found: true, Running: false}}},
+		GitCheckoutNewBranchErr: fmt.Errorf("Your local changes to the following files would be overwritten by checkout: disasm/Makefile"),
+	}
+	loop, dir := newTestLoop(t, fake)
+	outDir := filepath.Join(dir, "out")
+	mustWriteFile(t, filepath.Join(outDir, "summary.json"), `{"stopped_reason":"completed"}`)
+	loop.Notifiers = []Notifier{&fakeNotifier{}}
+	rec := runningRec("x-p0", "cid", outDir, "codex")
+	loop.State.Runs["x-p0"] = rec
+
+	if _, err := loop.RunOnce(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if rec.Status == fleetstate.StatusMerging {
+		t.Fatal("run left in StatusMerging: it will never advance and keeps reserving its owners")
+	}
+	if rec.Status != fleetstate.StatusMergeBlockedDirty {
+		t.Fatalf("status = %s, want merge_blocked_dirty", rec.Status)
+	}
+	if !strings.Contains(rec.Note, "disasm/Makefile") {
+		t.Fatalf("note = %q, want it to carry git's reason", rec.Note)
+	}
+
+	// And the retry path must now collect it, so it heals on a later pass.
+	collected := false
+	for id, r := range loop.State.Runs {
+		if r.Status == fleetstate.StatusMergeBlockedDirty && id == "x-p0" {
+			collected = true
+		}
+	}
+	if !collected {
+		t.Fatal("blocked run not in a state retryBlockedMergeRuns collects")
+	}
+}
