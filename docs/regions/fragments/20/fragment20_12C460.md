@@ -137,3 +137,23 @@ func_82604628: matched (constant-map:switch:inline-mask-temp), 3 iterations, age
 ## 2026-09-03
 
 func_82610E34: time cap at 0.9556 (raw 0.8444) after 2412s, mismatch instruction_drift; tried families: call-sequence, permuter; tie-pool no
+
+## 2026-09-04
+
+func_82604C08: time cap at 0.9286 (raw 0.6429) after 1214s, mismatch operand_or_scheduling_drift; tried families: constant-map; tie-pool no
+
+## 2026-09-04
+
+func_82606E90: time cap at 0.9286 (raw 0.5714) after 1214s, mismatch operand_or_scheduling_drift; tried families: constant-map; tie-pool no
+
+## 2026-09-04
+
+func_826119A4: time cap at 0.875 (raw 0.5625) after 1213s, mismatch instruction_drift; tried families: constant-map; tie-pool no
+
+## 2026-09-04
+
+func_8260F49C: matched (call_sequence:record-offset:three-arg-stepcast), 1 iterations, agent codex
+
+## 2026-09-04
+
+func_82608270: time cap at 0.95 (raw 0.15) after 1212s, mismatch operand_or_scheduling_drift; tried families: state_field_access; tie-pool no
