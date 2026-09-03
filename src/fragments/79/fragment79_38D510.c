@@ -25,15 +25,26 @@ void func_8411DCCC(u8 *arg0, f32 *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411DD8C.s")
 
+#ifdef CC_CHECK
+extern void func_8411DD8C(void *, void *);
+#else
 extern void func_8411DD8C(void);
+#endif
+#ifdef CC_CHECK
+void func_8411E084(void *arg0, void *arg1) {
+    func_8411DD8C(arg0, arg1);
+#else
 void func_8411E084(void) {
     func_8411DD8C();
+#endif
 }
 
 extern f32 D_80087E50[];
 extern f32 D_80088E50[];
 void func_8411E0A4(void *arg0, void *arg1, void *arg2) {
+#ifndef CC_CHECK
     extern void func_8411DD8C();
+#endif
     func_8411DD8C(arg0, arg1);
     *(f32 *)((u8 *)arg1 + 4) += *(f32 *)((u8 *)arg2 + 0x7C);
     *(f32 *)((u8 *)arg1 + 0) += *(f32 *)((u8 *)arg2 + 0x78) * D_80087E50[*(u16 *)((u8 *)arg0 + 0x20) >> 4];
@@ -165,10 +176,16 @@ s32 func_8411EF64(s32 arg0) {
     return D_84190418;
 }
 
+#ifdef CC_CHECK
+extern void func_8411E084(void *, void *);
+#else
 extern void func_8411E084(void);
+#endif
 extern f32 func_8411E1CC(u8 *arg0);
 f32 func_8411EF90(u8 *arg0) {
+#ifndef CC_CHECK
     extern void func_8411E084();
+#endif
     f32 values[2];
     f32 temp_fv1;
     f32 var_fa0;

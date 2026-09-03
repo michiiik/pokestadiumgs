@@ -41,11 +41,11 @@ void DisplayTask_Initialize(S1_UnkStruct80001380* arg0) {
 
 #ifdef VERSION_US
 
-extern void func_800055F4(void *, s32);
+extern void Sched_SubmitTask(void *, s32);
 void func_80001684(void *arg0, void *arg1, s32 arg2) {
     *(u32 *)((u8 *)arg0 + 0x50) = *(u32 *)((u8 *)arg1 + 4);
     *(u32 *)((u8 *)arg0 + 0x54) = *(u32 *)((u8 *)arg1 + 8);
-    func_800055F4(arg0, arg2);
+    Sched_SubmitTask(arg0, arg2);
 }
 #endif
 

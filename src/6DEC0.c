@@ -17,7 +17,7 @@ extern u8 fragment4_ROM_START[]; extern u8 fragment5_ROM_START[]; extern u8 frag
 extern u8 fragment29_ROM_START[]; extern u8 fragment30_ROM_START[]; extern u8 fragment40_ROM_START[]; extern u8 fragment41_ROM_START[]; extern u8 fragment88_ROM_START[];
 void main_pool_push_state(s32); void main_pool_pop_state(s32); void Fragment_Load(s32, void *, void *);
 s32 Fragment_LoadAndCall(s32, void *, void *, s32, void *); void func_80064C94(s32); s32 func_80064C88(void);
-void func_8006DACC(void) {
+void Game_State19_Run(void) {
     s32 result;
     main_pool_push_state(0x4353454C);
     Fragment_Load((((u32)D_81600000 & 0x0FF00000) >> 20) - 0x10, fragment11_ROM_START, fragment12_ROM_START);

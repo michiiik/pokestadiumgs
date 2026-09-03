@@ -99,7 +99,7 @@ s32 main_pool_try_free(s32 arg0) {
 extern s32 main_pool_alloc_from_pool(s32, s32);
 extern u8 *main_pool_set_func(u8 *, s32, s32);
 extern s32 func_800027F0(s32, s32);
-u8 *func_80002A40(u8 *arg0, u32 arg1)
+u8 *main_pool_realloc(u8 *arg0, u32 arg1)
 {
   PoolBlock3280 *prior = (PoolBlock3280 *) (((u8 *) arg0) - 0x10);
   u8 *newaddr = 0;

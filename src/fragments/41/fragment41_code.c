@@ -69,7 +69,7 @@ void MathUtil_BuildTransformMtx_fragment41(Mtx* arg0, f32 arg1, f32 arg2, f32 ar
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/41/fragment41_code/func_88C0107C.s")
 
 extern s32 func_80001FF0(void);
-extern void func_80007AEC(s32);
+extern void StageFade_StartFromOpaque(s32);
 extern void func_80064D28(void);
 extern void func_88C0107C(s32);
 extern f32 D_88C01A50;
@@ -77,7 +77,7 @@ void func_88C01398(void) {
     u16 count;
     s32 i;
     count = (u16)((f32)func_80001FF0() * D_88C01A50 / 2);
-    func_80007AEC(count);
+    StageFade_StartFromOpaque(count);
     if (count != 0) {
         i = 0;
         do {
@@ -121,7 +121,7 @@ void func_88C014D8(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/41/fragment41_code/func_88C015DC.s")
 
-extern void func_80006CD0(s32, s32);
+extern void Gfx_InitDisplayListBuffers(s32, s32);
 s32 func_800082E0(s32, s32, s32, s32, s32, s32);
 extern void func_80008514(s32);
 extern void func_80008574();
@@ -132,7 +132,7 @@ s32 fragment41_main(s32 arg0, s32 arg1) {
     s32 sp24;
 
     main_pool_push_state(0x434C4544);
-    func_80006CD0(0x10000, 0);
+    Gfx_InitDisplayListBuffers(0x10000, 0);
     sp24 = func_800082E0(1, 0, 2, 0, 2, 1);
     func_8004C09C(3);
     func_80047588(0x18, 0);

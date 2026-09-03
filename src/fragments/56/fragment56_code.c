@@ -132,7 +132,7 @@ void func_86803EA4(void) {
 
 extern s32 D_8682F2A8;
 extern s32 func_87F02104(void);
-extern void func_800088A4(s32);
+extern void StageContext_SetClearColor(s32);
 extern void StageFade_StartFromTransparent(s32);
 void func_86805C88(void) {
     s32 temp_v0;
@@ -141,21 +141,21 @@ void func_86805C88(void) {
     case 1:
         *(s32 *)((u8 *)&D_8682F2A8 + 0x10) = 2;
         *(s32 *)((u8 *)&D_8682F2A8 + 0x0) = 0xC;
-        func_800088A4(1);
+        StageContext_SetClearColor(1);
         StageFade_StartFromTransparent(0xA);
         return;
     case 2:
         *(s32 *)((u8 *)&D_8682F2A8 + 0x8) = 0;
         *(s32 *)((u8 *)&D_8682F2A8 + 0x0) = 9;
         *(s32 *)((u8 *)&D_8682F2A8 + 0x10) = 2;
-        func_800088A4(0xFFFF);
+        StageContext_SetClearColor(0xFFFF);
         StageFade_StartFromTransparent(0xA);
         return;
     case 3:
         *(s32 *)((u8 *)&D_8682F2A8 + 0x8) = 1;
         *(s32 *)((u8 *)&D_8682F2A8 + 0x0) = 9;
         *(s32 *)((u8 *)&D_8682F2A8 + 0x10) = 2;
-        func_800088A4(0xFFFF);
+        StageContext_SetClearColor(0xFFFF);
         StageFade_StartFromTransparent(0xA);
         return;
     }
@@ -166,7 +166,7 @@ extern s32 D_8682F2A8;
 void func_86805D50(void) {
     if (StageContext_GetFadeMode() == 0) {
         if ((*(u8 *)((u8 *)(D_86808590) + (0x2180))) == 4) {
-            func_80007AEC(0x14);
+            StageFade_StartFromOpaque(0x14);
             func_87F00688();
             D_8682F2A8 = 5;
             return;
@@ -187,7 +187,7 @@ void func_86805D50(void) {
 
 extern s32 D_8682F2A8;
 extern s32 func_87F01A40(void);
-extern void func_800088A4(s32);
+extern void StageContext_SetClearColor(s32);
 extern void StageFade_StartFromTransparent(s32);
 void func_8680660C(void) {
     s32 temp_v0;
@@ -202,14 +202,14 @@ void func_8680660C(void) {
         *(s32 *)((u8 *)&D_8682F2A8 + 0x8) = 0;
         *(s32 *)((u8 *)&D_8682F2A8 + 0x0) = 9;
         *(s32 *)((u8 *)&D_8682F2A8 + 0x10) = 3;
-        func_800088A4(0xFFFF);
+        StageContext_SetClearColor(0xFFFF);
         StageFade_StartFromTransparent(0xA);
         return;
     case 4:
         *(s32 *)((u8 *)&D_8682F2A8 + 0x8) = 1;
         *(s32 *)((u8 *)&D_8682F2A8 + 0x0) = 9;
         *(s32 *)((u8 *)&D_8682F2A8 + 0x10) = 3;
-        func_800088A4(0xFFFF);
+        StageContext_SetClearColor(0xFFFF);
         StageFade_StartFromTransparent(0xA);
         return;
     }

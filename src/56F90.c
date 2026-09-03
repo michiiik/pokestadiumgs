@@ -57,9 +57,9 @@ s32 GbPak_DetectRam(s32 arg0, u8* arg1) {
 extern u8 D_80128550[];
 extern s32 func_80056F7C(s32);
 extern s32 func_8005D92C(s32);
-extern s32 func_8005805C(s32);
+extern s32 GbSave_IdentifyFormat(s32);
 extern s32 GbTower_VerifyPakStillInserted(s32, u8 *);
-extern void func_80064D58(s32, s32);
+extern void Game_ShutdownAndLoadFragment(s32, s32);
 s32 GbPak_ValidateAndRefresh(s32 arg0, u8 *arg1, u8 *arg2) {
     u8 *state;
     struct {
@@ -74,13 +74,13 @@ s32 GbPak_ValidateAndRefresh(s32 arg0, u8 *arg1, u8 *arg2) {
     if (func_80056F7C(arg0) != 0) {
         if (arg2 != NULL) {
             local.previous = func_8005D92C(arg0);
-            if ((func_8005805C(arg0) == local.previous) && (GbTower_VerifyPakStillInserted(arg0, arg2) != 0)) {
+            if ((GbSave_IdentifyFormat(arg0) == local.previous) && (GbTower_VerifyPakStillInserted(arg0, arg2) != 0)) {
                 local.result = GbPak_DetectRam(arg0, arg2);
             }
-            if (local.result == 0) func_80064D58(arg0, 1);
+            if (local.result == 0) Game_ShutdownAndLoadFragment(arg0, 1);
         }
     } else {
-        func_80064D58(arg0, 1);
+        Game_ShutdownAndLoadFragment(arg0, 1);
     }
     *state = 1;
     return local.result;
@@ -100,7 +100,7 @@ s32 GbTower_CheckPakRemoved(s32 arg0, u8 arg1) {
     OSPfs *pfs;
     pfs = (arg0 * 0x68) + &D_801283B0;
     if (osGbpakGetStatus(pfs, &status) != 0) {
-        func_80064D58(arg0, 1);
+        Game_ShutdownAndLoadFragment(arg0, 1);
     }
     sp20 = ((status & 4) != 0) == 0;
     if (arg1 == 0) {
@@ -156,7 +156,7 @@ s32 GbPak_IsCartOff(s32 arg0) {
     s32 result;
     result = osGbpakGetStatus((arg0 * 0x68) + &D_801283B0, &local[11]);
     if ((result == 1) || (result == 0xB) || (result == 4)) {
-        func_80064D58(arg0, 1);
+        Game_ShutdownAndLoadFragment(arg0, 1);
     }
     return ((local[11] & 0x80) != 0) == 0;
 }
@@ -167,7 +167,7 @@ s32 GbPak_IsCartOn(s32 arg0) {
 
     temp_v0 = osGbpakGetStatus((arg0 * 0x68) + &D_801283B0, &sp1F);
     if ((temp_v0 == 1) || (temp_v0 == 0xB) || (temp_v0 == 4)) {
-        func_80064D58(arg0, 1);
+        Game_ShutdownAndLoadFragment(arg0, 1);
     }
     return (sp1F & 0x80) != 0;
 }

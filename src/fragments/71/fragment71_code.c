@@ -55,7 +55,7 @@ void func_8F300770(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/71/fragment71_code/func_8F300AD0.s")
 
-extern void func_80007AEC(s32);
+extern void StageFade_StartFromOpaque(s32);
 extern void func_800086A4(s32);
 extern void func_80064D28();
 s32 func_8F300AD0(s32);
@@ -65,7 +65,7 @@ void func_8F300CAC(void) {
 
     var_s0 = 0;
     func_800086A4(2);
-    func_80007AEC(5);
+    StageFade_StartFromOpaque(5);
     do {
         func_80064D28();
         func_8F300770();
@@ -76,7 +76,7 @@ void func_8F300CAC(void) {
 
 extern void main_pool_push_state(s32);
 extern void main_pool_pop_state(s32);
-extern void func_80006CD0(s32, s32);
+extern void Gfx_InitDisplayListBuffers(s32, s32);
 extern s32 func_800082E0(s32, s32, s32, s32, s32, s32);
 extern void func_8004C09C(s32);
 extern void func_8004C4B0(s32);
@@ -95,10 +95,10 @@ extern void Gfx_FreeDisplayListBuffers(void);
 extern u8 D_1000000[];
 extern u8 D_446E30[];
 extern u8 D_447D00[];
-s32 func_8F300D08(s32 arg0, s32 arg1) {
+s32 fragment71_main(s32 arg0, s32 arg1) {
     s32 sp24;
     main_pool_push_state(0x424B4544);
-    func_80006CD0(0x10000, 0);
+    Gfx_InitDisplayListBuffers(0x10000, 0);
     sp24 = func_800082E0(1, 0, 2, 0, 2, 1);
     func_8004C09C(3);
     func_8004C4B0(0x42);

@@ -122,7 +122,7 @@ void func_88400284(s32 arg0) {
 
 extern s32 func_80001FF0(void);
 extern void func_800086A4(s32);
-extern void func_80007AEC(s32);
+extern void StageFade_StartFromOpaque(s32);
 extern void func_80064D28(void);
 extern void func_88400610(void);
 extern f32 D_884017D0;
@@ -132,7 +132,7 @@ void func_88400F48(void) {
 
     count = (u32) (((f32)func_80001FF0() * D_884017D0) / 2) & 0xFFFF;
     func_800086A4(2);
-    func_80007AEC(count);
+    StageFade_StartFromOpaque(count);
     i = 0;
     if (count != 0) {
         do {
@@ -181,7 +181,7 @@ void func_88401200(void) {
 
 extern void main_pool_push_state(s32);
 extern void main_pool_pop_state(s32);
-extern void func_80006CD0(s32, s32);
+extern void Gfx_InitDisplayListBuffers(s32, s32);
 extern s32 func_800082E0(s32, s32, s32, s32, s32, s32);
 extern void func_8004C09C(s32);
 extern s32 func_80047588(s32, s32);
@@ -198,11 +198,11 @@ extern void Util_Free(void *);
 extern void func_80047610(void);
 extern void func_8004C398(void);
 extern void Gfx_FreeDisplayListBuffers(void);
-s32 func_88401658(s32 arg0, s32 arg1) {
+s32 fragment33_main(s32 arg0, s32 arg1) {
     s32 sp24;
 
     main_pool_push_state(0x5A4F4F4D);
-    func_80006CD0(0x14000, 0);
+    Gfx_InitDisplayListBuffers(0x14000, 0);
     sp24 = func_800082E0(0, 1, 3, 1, 2, 1);
     func_8004C09C(3);
     D_8800687C = func_80047588(1, 0);

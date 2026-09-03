@@ -72,7 +72,43 @@ f64 func_86007F50(void *arg0, s32 arg1, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_86007F6C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_86008038.s")
+extern f64 D_8600DE78;
+extern void func_87C003BC(void *, void *, void *);
+extern void func_87C00718(void *, void *, f64);
+extern void *func_87C002DC(void *, void *);
+extern f64 func_86007F6C(void *, void *, s32, s32, void *, s32, f64);
+extern void func_86007E4C(u8 *arg0, s32 arg1, s32 arg2);
+extern void * func_87C00160(u8 *, s32, u8 *);
+extern void func_87C00198();
+extern s32 func_87C00238(u8 *, u8 *, s32);
+extern void * func_87C002A8(void *, void *, f64);
+f64 func_86008038(u8 *arg0, u8 *arg1, void *arg2, s32 arg3, f64 arg4, s32 arg5, s32 arg6, f64 arg7) {
+    f64 result;
+    u8 sp100[0x18];
+    u8 spE8[0x18];
+    u8 spD0[0x18];
+    u8 spB8[0x18];
+    u8 spA0[0x18];
+    u8 sp88[0x18];
+    u8 sp70[0x18];
+    u8 sp58[0x18];
+    u8 sp40[0x18];
+    func_87C00120(sp40, 0.0, D_8600DE78, 0.0);
+    func_87C00238(sp70, sp40, func_87C00160(spE8, arg3, arg0 + 0xB0));
+    func_87C00198(sp70, sp70, arg0 + 0x18);
+    func_87C00238(sp58, sp40, func_87C00160(spE8, arg3, arg1 + 0xB0));
+    func_87C00198(sp58, sp58, arg1 + 0x18);
+    func_87C00160(spA0, (s32)sp58, sp70);
+    func_87C003BC(sp100, spA0, arg2);
+    func_87C00718(sp100, sp100, 1.0);
+    result = func_86007F6C(arg0, arg1, arg5, arg6, arg2, arg3, arg4);
+    if (result < *(f64 *)(D_8600DE30 + 0x20)) result = *(f64 *)(D_8600DE30 + 0x20);
+    if ((0.0 < *(f64 *)(D_8600DE30 + 0x30)) && (*(f64 *)(D_8600DE30 + 0x30) < result)) result = *(f64 *)(D_8600DE30 + 0x30);
+    func_87C00198(sp88, func_87C002A8(spD0, arg2, result), func_87C002A8(spB8, sp100, arg7 * result));
+    func_86007E4C(arg0, arg3, (s32)sp88);
+    func_86007E4C(arg1, arg3, func_87C002DC(spE8, sp88));
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_86008224.s")
 
@@ -80,7 +116,30 @@ f64 func_86007F50(void *arg0, s32 arg1, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_860086A4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_86008820.s")
+extern f64 func_87C00664(void *);
+extern f64 func_87C00208(void *, void *);
+s32 func_86008820(f64 *arg0, f64 *arg1, void *arg2, void *arg3, void *arg4) {
+    volatile u8 frame_pad[8];
+    f64 sp38;
+    f64 sp30;
+    f64 sp28;
+    f64 denominator;
+    f64 temp_fv0;
+    f64 temp_fs1;
+
+    temp_fs1 = func_87C00664(arg2);
+    sp38 = func_87C00664(arg3);
+    sp30 = func_87C00208(arg2, arg3);
+    sp28 = func_87C00208(arg3, arg4);
+    temp_fv0 = func_87C00208(arg4, arg2);
+    denominator = temp_fs1 * sp38 - sp30 * sp30;
+    if (denominator == 0.0) {
+        return 0;
+    }
+    *arg0 = ((sp30 * temp_fv0) - (temp_fs1 * sp28)) / denominator;
+    *arg1 = ((sp30 * sp28) - (sp38 * temp_fv0)) / denominator;
+    return 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_86008904.s")
 
@@ -190,11 +249,43 @@ s32 func_86009FB8(void *arg0, void *arg1, void *arg2) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_8600A04C.s")
+typedef struct Copy8600A04C {
+    s32 a;
+    s32 b;
+    s32 c;
+    s32 d;
+    s32 e;
+    s32 f;
+} Copy8600A04C;
+extern Copy8600A04C D_8600D970;
+extern void func_87C010AC(void *, void *, void *);
+extern s32 func_86009FB8(void *arg0, void *arg1, void *arg2);
+s32 func_8600A04C(void *arg0, void *arg1, void *arg2) {
+    Copy8600A04C sp30;
+    Copy8600A04C sp18;
+
+    if (func_86009FB8(arg0, arg1, &sp30) != 0) {
+        sp18 = D_8600D970;
+        func_87C010AC(arg2, &sp18, &sp30);
+        return 1;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_8600A0C8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_8600A144.s")
+f64 func_8600A144(u8 *arg0) {
+    f64 ratio;
+    f64 base;
+    s32 flag;
+    s32 sign;
+    flag = *(s32 *)(arg0 + 0x48);
+    if (flag != 0) return *(f64 *)arg0 + *(f64 *)(arg0 + 0x18);
+    base = *(f64 *)arg0;
+    ratio = *(f64 *)(arg0 + 8) / base;
+    if (flag != 0) sign = 1; else sign = -1;
+    return *(f64 *)(arg0 + 0x18) + ((f64)sqrtf((f32)(1.0 - ratio * ratio)) * ((f64)sign * base));
+}
 
 extern f32 D_8600D9DC;
 s32 func_8600A1C0(f32 arg0) {
@@ -206,7 +297,25 @@ s32 func_8600A1C0(f32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_8600A20C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_8600A5B0.s")
+extern u8 *func_8004CA60(u8 *);
+extern s32 func_8004CA38(u8 *);
+extern s32 func_8004CA4C(u8 *);
+extern void func_8600A20C(s16, s16, u16, u16, s32, s32, u8 *, s32, s32, s32);
+extern s32 func_8004CA10(void *);
+extern s32 func_8004CA24(void *);
+void func_8600A5B0(s16 arg0, s16 arg1, u16 arg2, u16 arg3, void *arg4) {
+    s32 sp44;
+    s32 sp40;
+    s32 sp3C;
+    s32 sp24 = 1;
+    u8 *sp34;
+
+    sp44 = func_8004CA10((u16 *)arg4);
+    sp40 = func_8004CA24((u16 *)arg4);
+    sp34 = func_8004CA60((u8 *)arg4);
+    sp3C = func_8004CA38((u8 *)arg4);
+    func_8600A20C(arg0, arg1, arg2, arg3, sp44, sp40, sp34, sp3C, func_8004CA4C((u8 *)arg4), sp24);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_8600A650.s")
 
@@ -271,5 +380,29 @@ void func_8600B474(void *arg0, void *arg1) {
     func_8600ACC4(arg0, 0x86, 0x10, D_8600D440, D_8600D43C);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_8600B51C.s")
+extern s32 func_8004C990(s32, s32);
+extern void func_8004D1FC(void *);
+extern s32 func_8004CA10(void *);
+extern s32 func_8004CA24(void *);
+extern void func_8600A650(f32, f32, f32, f32, s32, s32, f32, f32);
+void func_8600B51C(s32 arg0, s32 arg1) {
+    volatile u8 frame_pad[8];
+    s32 sp3C;
+    s32 sp38;
+    s32 sp34;
+    u8 *temp_v0;
+
+    temp_v0 = func_8004C990(0x191, 0);
+    func_8004D1FC(temp_v0);
+    sp34 = func_8004CA10(temp_v0);
+    sp38 = func_8004CA24(temp_v0);
+    sp3C = func_8004CA10(temp_v0);
+    func_8600A650(
+        (f32)(arg0 - sp34 / 2),
+        (f32)(arg1 - sp38 / 2),
+        (f32)sp3C,
+        (f32)func_8004CA24(temp_v0),
+        0, 0, 1.0f, 1.0f
+    );
+}
 #endif

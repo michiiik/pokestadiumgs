@@ -33,7 +33,13 @@ void func_8FC000F4_padding(void) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/84/fragment84_code/func_8FC00138.s")
+extern u8 D_80094DE0[];
+void func_8FC00138(s32 arg0, s32 arg1, s32 arg2) {
+    gSPDisplayList(D_800D0510++, D_80094DE0);
+    gDPPipeSync(D_800D0510++);
+    gDPSetFillColor(D_800D0510++, 0xFFC7FFC1);
+    gDPFillRectangle(D_800D0510++, arg0, arg1, arg0 + arg2, arg1 + 2);
+}
 #endif
 
 #ifdef VERSION_US
@@ -54,7 +60,16 @@ void func_8FC001E8_padding5(void) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/84/fragment84_code/func_8FC00558.s")
+extern void func_8FC003F8(s32, s32, s32, s32, s32, s32, s32);
+void func_8FC00558(void) {
+    func_8FC003F8(0x3C, 0x4B, 0x91, 0x7D, 0x50, 0x50, 0xFF);
+    func_8FC003F8(0xC8, 0x4B, 0x190, 0x7D, 0x50, 0x50, 0xFF);
+    func_8FC003F8(0x8C, 0xC3, 0x168, 0x32, 0x50, 0x50, 0xFF);
+    func_8FC003F8(0x3C, 0xF0, 0x109, 0xC8, 0x5A, 0x96, 0xFF);
+    func_8FC003F8(0x140, 0xF0, 0x109, 0xC8, 0, 0xFF, 0x64);
+    func_8FC003F8(0x82, 0xFF, 0x6E, 0x3C, 0xA, 0x78, 0xEB);
+    func_8FC003F8(0x186, 0xFF, 0x6E, 0x3C, 0, 0xE1, 0x50);
+}
 #endif
 
 #ifdef VERSION_US
@@ -172,11 +187,52 @@ void func_8FC00FD0(void) { func_80060358(0, &D_8FC0C2D8); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/84/fragment84_code/func_8FC01288.s")
+extern s32 func_8005D92C(s32);
+extern u8 D_8FC02830;
+extern s8 D_8FC0243C;
+extern u8 D_8FC0C6FB;
+void func_8FC01288(void) {
+    if ((func_8005D92C(0) != 0xD) &&
+        (*(u8 *)((u8 *)&D_8FC0243C + 0) != 0)) {
+        *(u8 *)((u8 *)&D_8FC02830 + 1) = 2;
+        return;
+    }
+    if (D_8FC0C6FB == 0) {
+        *(u8 *)((u8 *)&D_8FC02830 + 1) = 3;
+        return;
+    }
+    if (*(s8 *)((u8 *)&D_8FC02830 + 3) == 0) {
+        *(u8 *)((u8 *)&D_8FC02830 + 1) = 5;
+        return;
+    }
+    if ((*(s8 *)((u8 *)&D_8FC02830 + 0x35) == 0) ||
+        (*(s8 *)((u8 *)&D_8FC02830 + 0x4D75) == 0)) {
+        *(u8 *)((u8 *)&D_8FC02830 + 1) = 6;
+        return;
+    }
+    if ((*(u8 *)((u8 *)&D_8FC02830 + 0x28) == 0) ||
+        (*(u8 *)((u8 *)&D_8FC02830 + 0x4D68) == 0)) {
+        *(u8 *)((u8 *)&D_8FC02830 + 1) = 7;
+        return;
+    }
+    *(u8 *)((u8 *)&D_8FC02830 + 1) = 0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/84/fragment84_code/func_8FC0135C.s")
+extern u8 D_8FC02831; extern u8 D_8FC0C6FB; extern u8 func_8005D8CC(s32); extern s32 func_8005D92C(s32); extern void func_8FC00FD0(void); extern void func_80057908(u8); extern void func_8FC0117C(void); extern void func_8FC01288(void);
+void func_8FC0135C(void) {
+    s32 result;
+    D_8FC02831 = 4;
+    result = func_8005D8CC(0);
+    if (result != 0) {
+        if (result == 2) D_8FC02831 = 1;
+    } else if (func_8005D92C(0) == 0xD) {
+        func_8FC00FD0();
+        func_80057908(0);
+        if ((s32)D_8FC0C6FB > 0) { func_8FC0117C(); func_8FC01288(); } else D_8FC02831 = 3;
+    } else D_8FC02831 = 2;
+}
 #endif
 
 #ifdef VERSION_US
@@ -268,7 +324,27 @@ void func_8FC015AC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/84/fragment84_code/func_8FC01E28.s")
+extern s32 func_8FC019B8(void);
+extern void func_8FC00B68(void);
+extern void func_8FC01530(void);
+extern void func_8FC01288(void);
+extern void func_800226C0(s32);
+extern u8 D_8FC02830;
+s32 func_8FC01E28(void) {
+    s32 sp1C;
+
+    sp1C = func_8FC019B8();
+    func_8FC00B68();
+    if (sp1C == 1) {
+        func_8FC01530();
+        func_8FC01288();
+        *(u8 *)&D_8FC02830 = 0;
+    } else if (sp1C == 2) {
+        func_800226C0(3);
+        *(u8 *)&D_8FC02830 = 0;
+    }
+    return 1;
+}
 #endif
 
 #ifdef VERSION_US
@@ -287,7 +363,7 @@ void func_8FC01FBC(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8FC01E28();
+extern s32 func_8FC01E28(void);
 extern void func_8FC01E9C();
 extern void func_8FC02074();
 extern u8 D_8FC02830;
@@ -372,5 +448,37 @@ void func_8FC0231C(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/84/fragment84_code/func_8FC02368.s")
+extern void main_pool_push_state(s32);
+extern void main_pool_pop_state(s32);
+extern s32 func_800082E0(s32, s32, s32, s32, s32, s32);
+extern void Gfx_InitDisplayListBuffers(s32, s32);
+extern void func_80047588(s32, s32);
+extern void func_8004C09C(s32);
+extern void func_80008514(s32);
+extern void func_800086A4(s32);
+extern void StageFade_StartFromOpaque(s32);
+extern void func_80008574(void);
+extern void func_80047610(void);
+extern void Gfx_FreeDisplayListBuffers(void);
+extern void func_8FC02248(void);
+extern void func_8FC0231C(s32 arg0);
+s32 fragment84_main(s32 arg0, s32 arg1) {
+    s32 sp24;
+
+    main_pool_push_state(0x52434544);
+    sp24 = func_800082E0(1, 0, 2, 0, 2, 1);
+    Gfx_InitDisplayListBuffers(0x10000, 0);
+    func_80047588(0x1C, 0);
+    func_8004C09C(0xB);
+    func_8FC0231C(0);
+    func_80008514(sp24);
+    func_800086A4(2);
+    StageFade_StartFromOpaque(0xA);
+    func_8FC02248();
+    func_80008574();
+    func_80047610();
+    Gfx_FreeDisplayListBuffers();
+    main_pool_pop_state(0x52434544);
+    return 0;
+}
 #endif

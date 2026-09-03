@@ -333,7 +333,7 @@ void func_8006F658(u8 *arg0, u8 *arg1, f32 arg2) {
 
 #ifdef VERSION_US
 extern u32 Memmap_GetSegmentVaddr(u32);
-void func_8006F720(u8 *arg0, u8 *arg1, f32 arg2) {
+void Model_OffsetVertexHeightsByClass(u8 *arg0, u8 *arg1, f32 arg2) {
     s16 *classes;
     s16 *indices;
     s32 cls1;
@@ -392,7 +392,7 @@ void func_8006F720(u8 *arg0, u8 *arg1, f32 arg2) {
 extern u32 Memmap_GetSegmentVaddr(u32);
 extern void func_8006FF80(void *, s32);
 extern Mtx D_80129038;
-Gfx *func_8007065C(Gfx *arg0, void *arg1, s32 arg2) {
+Gfx *Model_Draw(Gfx *arg0, void *arg1, s32 arg2) {
     void *segment;
     segment = (void *)(u32)Memmap_GetSegmentVaddr(*(u32 *)((u8 *)arg1 + 4));
     if (*(u16 *)segment >= 0xF) {
@@ -479,9 +479,9 @@ void func_8007087C(void) {
 #endif
 
 #ifdef VERSION_US
-extern Gfx *func_80006DEC(s32);
+extern Gfx *Gfx_AllocDisplayList(s32);
 extern Gfx *func_80070A4C(Gfx *);
-extern Gfx *func_8007065C(Gfx *, void *, s32);
+extern Gfx *Model_Draw(Gfx *, void *, s32);
 extern u8 D_8009F3D0[];
 extern u8 D_8009F410[];
 Gfx *func_80070974(Gfx *arg0) {
@@ -495,10 +495,10 @@ Gfx *func_80070974(Gfx *arg0) {
         return arg0;
     }
     entry = ((void **)state)[(s16)*state + 3];
-    matrix = func_80006DEC(0xA0);
+    matrix = Gfx_AllocDisplayList(0xA0);
     gSPMatrix(arg0++, D_8009F3D0, G_MTX_LOAD | G_MTX_PUSH);
     gfx = func_80070A4C(arg0);
-    gfx = func_8007065C(gfx, entry, matrix);
+    gfx = Model_Draw(gfx, entry, matrix);
     gSPPopMatrixN(gfx++, G_MTX_MODELVIEW, 1);
     gSPDisplayList(gfx++, D_8009F410);
     (*state)++;

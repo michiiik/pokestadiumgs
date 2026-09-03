@@ -43,11 +43,17 @@ void BattleAnim_EffectTertiaryOwnerBonePosition(void) { func_841098C0(); }
 #endif
 
 #ifdef VERSION_US
-void BattleAnim_EffectSecondaryOwnerBonePosition(void) { func_84109884(); }
+void BattleAnim_EffectSecondaryOwnerBonePosition(s32 arg0) {
+    extern void func_84109884(s32);
+    func_84109884(arg0);
+  }
 #endif
 
 #ifdef VERSION_US
-void BattleAnim_EffectTertiaryOwnerModelScale(void) { func_84109590(); }
+f32 BattleAnim_EffectTertiaryOwnerModelScale(void) {
+    extern f32 func_84109590(void);
+    return func_84109590();
+  }
 #endif
 
 #ifdef VERSION_US
@@ -55,7 +61,10 @@ void BattleAnim_EffectSecondaryOwnerModelScale(void) { func_84109544(); }
 #endif
 
 #ifdef VERSION_US
-void func_84156940(void) { func_841094F8(); }
+f32 func_84156940(void) {
+    extern f32 func_841094F8(void);
+    return func_841094F8();
+  }
 #endif
 
 #ifdef VERSION_US
@@ -63,15 +72,24 @@ void func_84156960(void) { func_8410971C(); }
 #endif
 
 #ifdef VERSION_US
-void func_84156980(void) { func_84109848(); }
+void func_84156980(s32 arg0) {
+    extern void func_84109848(s32);
+    func_84109848(arg0);
+  }
 #endif
 
 #ifdef VERSION_US
-void func_841569A0(void) { func_841095DC(); }
+f32 func_841569A0(void) {
+    extern f32 func_841095DC(void);
+    return func_841095DC();
+  }
 #endif
 
 #ifdef VERSION_US
-void func_841569C0(void) { func_84109B1C(); }
+void func_841569C0(s32 arg0) {
+    extern void func_84109B1C(s32);
+    func_84109B1C(arg0);
+  }
 #endif
 
 #ifdef VERSION_US
@@ -91,7 +109,19 @@ void BattleAnim_ResetSharedEffectMatrix(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84156BD4.s")
+extern void func_8415A9E4(s32, s32, s32);
+void BattleAnim_StartEffect34TerrainGrid_Init(void) {
+    u8 pad[8];
+    f32 sp1C;
+
+    BattleAnim_EffectSecondaryOwnerAnchorPosition(&sp1C);
+    BattleAnim_ResetSharedEffectMatrix();
+    if ((f64)sp1C < 0.0) {
+        func_8415A9E4(1, 0, 0x4650);
+        return;
+    }
+    func_8415A9E4(-1, 0, 0x4650);
+}
 #endif
 
 #ifdef VERSION_US
@@ -170,7 +200,19 @@ void func_84156EFC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84156F50.s")
+extern void func_8415BBA0(f32, f32, s32, s32, s32, s32, s32, s32, s32, s32);
+void func_84156F50(void) {
+    s32 sp3C;
+    f32 sp38;
+    f32 sp34;
+    f32 sp30;
+
+    BattleAnim_ResetSharedEffectMatrix();
+    func_84156980((s32)(u32)&sp34);
+    sp30 = func_84156940();
+    BattleAnim_ResetSharedEffectMatrix();
+    func_8415BBA0(sp34, sp38, sp3C, *(s32 *)&sp30, 0x64, 0xC8, 0xFF, 0, 0x64, 0xC8);
+}
 #endif
 
 #ifdef VERSION_US
@@ -187,7 +229,19 @@ void func_84156FE8(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_8415703C.s")
+extern void func_8415BBA0(f32, f32, s32, s32, s32, s32, s32, s32, s32, s32);
+void func_8415703C(void) {
+    s32 sp3C;
+    f32 sp38;
+    f32 sp34;
+    f32 sp30;
+
+    BattleAnim_ResetSharedEffectMatrix();
+    func_841569C0((s32)(u32)&sp34);
+    sp30 = func_841569A0();
+    BattleAnim_ResetSharedEffectMatrix();
+    func_8415BBA0(sp34, sp38, sp3C, *(s32 *)&sp30, 0x64, 0xC8, 0xFF, 0, 0x64, 0xC8);
+}
 #endif
 
 #ifdef VERSION_US
@@ -274,7 +328,19 @@ void BattleAnim_StartEffect33Radial20_Draw(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84157650.s")
+extern void func_8415BBA0(f32, f32, s32, s32, s32, s32, s32, s32, s32, s32);
+void BattleAnim_EndEffect32Radial20_Init(void) {
+    s32 sp3C;
+    f32 sp38;
+    f32 sp34;
+    f32 sp30;
+
+    BattleAnim_ResetSharedEffectMatrix();
+    BattleAnim_EffectSecondaryOwnerBonePosition((s32)(u32)&sp34);
+    sp30 = BattleAnim_EffectTertiaryOwnerModelScale();
+    BattleAnim_ResetSharedEffectMatrix();
+    func_8415BBA0(sp34, sp38, sp3C, *(s32 *)&sp30, 0xFF, 0xFF, 0xFF, 0x64, 0x96, 0x96);
+}
 #endif
 
 #ifdef VERSION_US
@@ -289,7 +355,19 @@ void BattleAnim_EndEffect32Radial20_Draw(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84157740.s")
+extern void func_8415BBA0(f32, f32, s32, s32, s32, s32, s32, s32, s32, s32);
+void BattleAnim_EndEffect33Radial20_Init(void) {
+    s32 sp3C;
+    f32 sp38;
+    f32 sp34;
+    f32 sp30;
+
+    BattleAnim_ResetSharedEffectMatrix();
+    BattleAnim_EffectSecondaryOwnerBonePosition((s32)(u32)&sp34);
+    sp30 = BattleAnim_EffectTertiaryOwnerModelScale();
+    BattleAnim_ResetSharedEffectMatrix();
+    func_8415BBA0(sp34, sp38, sp3C, *(s32 *)&sp30, 0xFF, 0xFF, 0x64, 0x96, 0x96, 0);
+}
 #endif
 
 #ifdef VERSION_US

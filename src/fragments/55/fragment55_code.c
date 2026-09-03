@@ -53,7 +53,31 @@ void func_867000C8(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/55/fragment55_code/func_867006C4.s")
+extern Gfx *D_800D0510;
+extern void *D_8009491C;
+extern s32 func_8004C990(s32, s32);
+extern u8 *func_8004CA60(u8 *);
+extern void func_8003CD84(void);
+extern s32 D_8670AB90[];
+extern s32 D_8670C97C;
+extern void *D_8670C978;
+/* function: func_867006C4 */
+void func_867006C4(s32 arg0, s32 arg1) {
+    void *context;
+    s32 index;
+
+    if (arg0 == 5) {
+        context = D_8009491C;
+        index = *(s32 *)((u8 *)context + 0x14);
+        D_8670C97C = func_8004C990(0x1B2, D_8670AB90[index]);
+        gDPPipeSync(D_800D0510++);
+        gDPSetCombine(D_800D0510++, 0xFFFFFF, 0xFFFCF238);
+        gSPSegment(D_800D0510++, 0xF,
+                   func_8004CA60((u8 *)D_8670C97C));
+        gSPDisplayList(D_800D0510++, D_8670C978);
+        func_8003CD84();
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -149,7 +173,12 @@ void func_867000C8(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/55/fragment55_code/func_86706A30.s")
+typedef struct { u8 pad38[0x38]; s32 index; u8 pad3C[0x0C]; f32 out48; f32 out4C; f32 out50; f32 in54; f32 out58; } State86706A30;
+typedef struct { u8 pad24[0x24]; f32 x; f32 y; f32 z; u8 tail[0x138]; } Row86706A30;
+extern State86706A30 *D_87F119DC;
+extern f32 D_8670C974;
+extern Row86706A30 D_86710C20[];
+void func_86706A30(void) { f32 temp_fv0; temp_fv0 = D_87F119DC->in54; D_87F119DC->out58 = temp_fv0; D_8670C974 = temp_fv0; D_87F119DC->out48 = D_86710C20[D_87F119DC->index].x; D_87F119DC->out4C = D_86710C20[D_87F119DC->index].y + 120.0f; D_87F119DC->out50 = D_86710C20[D_87F119DC->index].z - 50.0f; }
 #endif
 
 #ifdef VERSION_US
@@ -207,7 +236,7 @@ extern s32 D_8670BB48;
 extern void *D_8670FEB0;
 void func_86709040(void) {
     if ((*(u8 *)((u8 *)(D_8670FEB0) + (0x2180))) == 4) {
-        func_80007AEC(0x14);
+        StageFade_StartFromOpaque(0x14);
         func_87F00688();
         D_8670BB48 = 0xD;
         return;
@@ -247,14 +276,14 @@ void func_8670972C(void) {
         (*(s32 *)((u8 *)(&D_8670BB48) + (0x48))) = 0;
         (*(s32 *)((u8 *)(&D_8670BB48) + (0))) = 2;
         (*(s32 *)((u8 *)(&D_8670BB48) + (0x30))) = 3;
-        func_800088A4(0xFFFF);
+        StageContext_SetClearColor(0xFFFF);
         StageFade_StartFromTransparent(0xA);
         return;
     case 4:
         (*(s32 *)((u8 *)(&D_8670BB48) + (0x48))) = 1;
         (*(s32 *)((u8 *)(&D_8670BB48) + (0))) = 2;
         (*(s32 *)((u8 *)(&D_8670BB48) + (0x30))) = 3;
-        func_800088A4(0xFFFF);
+        StageContext_SetClearColor(0xFFFF);
         StageFade_StartFromTransparent(0xA);
         return;
     }

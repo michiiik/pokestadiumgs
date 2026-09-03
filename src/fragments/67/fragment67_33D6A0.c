@@ -261,11 +261,99 @@ void func_82901BA8(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33D6A0/func_82901DD4.s")
+extern u8 D_82918868[];
+extern s16 D_829188B0[];
+extern f32 Math_StepToF(f32, f32, f32, f32);
+void func_82901DD4(void) {
+    f32 temp_fv0;
+    f32 target;
+    f32 step;
+
+    switch (*(u8 *)(D_82918868 + 0x32)) {
+    case 1:
+        temp_fv0 = (f32)D_829188B0[0];
+        *(f32 *)(D_82918868 + 4) = temp_fv0;
+        *(u8 *)(D_82918868 + 0x32) = 2;
+        *(f32 *)(D_82918868 + 0x10) = temp_fv0;
+        return;
+    case 2:
+        target = (f32)D_829188B0[5];
+        step = (f32)((s32)(D_829188B0[0] - D_829188B0[5]) / 4);
+        *(f32 *)(D_82918868 + 4) = Math_StepToF(*(f32 *)(D_82918868 + 4), target, step, step);
+        target = (f32)D_829188B0[6];
+        step = (f32)((s32)(D_829188B0[0] - D_829188B0[5]) / 4);
+        *(f32 *)(D_82918868 + 0x10) = Math_StepToF(*(f32 *)(D_82918868 + 0x10), target, step, step);
+        if (*(f32 *)(D_82918868 + 4) == (f32)D_829188B0[5]) {
+            *(u8 *)(D_82918868 + 0x32) = 3;
+            do { } while (0);
+            return;
+        }
+        return;
+    case 4:
+        *(f32 *)(D_82918868 + 4) = (f32)D_829188B0[5];
+        *(f32 *)(D_82918868 + 0x10) = (f32)D_829188B0[6];
+        *(u8 *)(D_82918868 + 0x32) = 5;
+        return;
+    case 5:
+        target = (f32)(D_829188B0[0] + 5);
+        step = (f32)((s32)(D_829188B0[0] - D_829188B0[5]) / 4);
+        *(f32 *)(D_82918868 + 4) = Math_StepToF(*(f32 *)(D_82918868 + 4), target, step, step);
+        target = (f32)(D_829188B0[0] - 5);
+        step = (f32)((s32)(D_829188B0[0] - D_829188B0[5]) / 4);
+        *(f32 *)(D_82918868 + 0x10) = Math_StepToF(*(f32 *)(D_82918868 + 0x10), target, step, step);
+        if (*(f32 *)(D_82918868 + 4) == (f32)(D_829188B0[0] + 5)) {
+            *(u8 *)(D_82918868 + 0x32) = 6;
+        }
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33D6A0/func_82902024.s")
+void func_82902024(void) {
+    f32 temp_fv0;
+    f32 target;
+    f32 step_first;
+    f32 step;
+
+    switch (*(u8 *)(D_82918868 + 0x32)) {
+    case 1:
+        temp_fv0 = (f32)D_829188B0[0];
+        *(f32 *)(D_82918868 + 4) = temp_fv0;
+        *(u8 *)(D_82918868 + 0x32) = 2;
+        *(f32 *)(D_82918868 + 0x10) = temp_fv0;
+        return;
+    case 2:
+        target = (f32)D_829188B0[5];
+        step_first = (f32)((s32)(D_829188B0[0] - D_829188B0[5]) / 4);
+        *(f32 *)(D_82918868 + 4) = Math_StepToF(*(f32 *)(D_82918868 + 4), target, step_first, step_first);
+        target = (f32)D_829188B0[6];
+        step = (f32)((s32)(D_829188B0[6] - D_829188B0[0]) / 4);
+        *(f32 *)(D_82918868 + 0x10) = Math_StepToF(*(f32 *)(D_82918868 + 0x10), target, step, step);
+        if (*(f32 *)(D_82918868 + 4) == (f32)D_829188B0[5]) {
+            *(u8 *)(D_82918868 + 0x32) = 3;
+            do { } while (0);
+            return;
+        }
+        return;
+    case 4:
+        *(f32 *)(D_82918868 + 4) = (f32)D_829188B0[5];
+        *(f32 *)(D_82918868 + 0x10) = (f32)D_829188B0[6];
+        *(u8 *)(D_82918868 + 0x32) = 5;
+        return;
+    case 5:
+        target = (f32)D_829188B0[0];
+        step_first = (f32)((s32)(D_829188B0[0] - D_829188B0[5]) / 4);
+        *(f32 *)(D_82918868 + 4) = Math_StepToF(*(f32 *)(D_82918868 + 4), target, step_first, step_first);
+        target = (f32)D_829188B0[0];
+        step = (f32)((s32)(D_829188B0[6] - D_829188B0[0]) / 4);
+        *(f32 *)(D_82918868 + 0x10) = Math_StepToF(*(f32 *)(D_82918868 + 0x10), target, step, step);
+        if (*(f32 *)(D_82918868 + 4) == (f32)D_829188B0[0]) {
+            *(u8 *)(D_82918868 + 0x32) = 6;
+        }
+        break;
+    }
+}
 #endif
 
 void func_82902260(void) {
@@ -315,15 +403,15 @@ void func_82902634(void) {
 }
 
 #ifdef VERSION_US
-extern void func_80007AEC(s32);
-extern void func_800088A4(s32);
+extern void StageFade_StartFromOpaque(s32);
+extern void StageContext_SetClearColor(s32);
 extern void func_80064D28();
 extern void func_82901BA8();
 void func_8290263C(void) {
     s32 var_s0;
 
-    func_800088A4(1);
-    func_80007AEC(0x10);
+    StageContext_SetClearColor(1);
+    StageFade_StartFromOpaque(0x10);
     var_s0 = 0;
     do {
         func_80064D28();
@@ -359,7 +447,7 @@ void func_82902694(void) {
 void func_82902714(void) {
     s32 var_s0;
 
-    func_800088A4(1);
+    StageContext_SetClearColor(1);
     StageFade_StartFromTransparent(0xA);
     var_s0 = 0;
     do {

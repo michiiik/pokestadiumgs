@@ -4,25 +4,83 @@
 #ifdef VERSION_US
 extern void func_800226C0();
 
-void func_8AE00020(void) {
+void func_8AE00020() {
     func_800226C0();
 }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE00040.s")
+typedef struct {
+    u32 x;
+    u32 y;
+    u32 z;
+} Triple32;
+extern Triple32 D_8AE078F4;
+extern Triple32 D_8AE07900;
+extern void *D_8AE084BC;
+extern void *D_8AE084C4;
+extern s16 D_8AE084E0;
+extern void *D_8AE084E4;
+extern void *D_8AE098A8;
+extern s16 D_8AE098B0;
+extern Triple32 D_8AE098B8;
+extern Triple32 D_8AE098C8;
+void func_8AE00040(void) {
+    D_8AE098B0 = 1;
+    D_8AE084E4 = D_8AE098A8;
+    D_8AE084BC = D_8AE084C4;
+    D_8AE098B8 = D_8AE078F4;
+    D_8AE098C8 = D_8AE07900;
+    D_8AE084E0 = 0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE000C8.s")
+extern Triple32 D_8AE078DC;
+extern Triple32 D_8AE078E8;
+extern void *D_8AE084C0;
+extern void *D_8AE098A4;
+extern s16 D_8AE098B0;
+extern Triple32 D_8AE098B8;
+extern Triple32 D_8AE098C8;
+extern Triple32 D_8AE0790C;
+extern Triple32 D_8AE07918;
+extern void *D_8AE084C8;
+extern void *D_8AE098AC;
+void func_8AE000C8(void) {
+    D_8AE098B0 = 0;
+    D_8AE084E4 = D_8AE098A4;
+    D_8AE084BC = D_8AE084C0;
+    D_8AE098B8 = D_8AE078DC;
+    D_8AE098C8 = D_8AE078E8;
+    D_8AE084E0 = 0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE0014C.s")
+void func_8AE0014C(void) {
+    D_8AE098B0 = 2;
+    D_8AE084E4 = D_8AE098AC;
+    D_8AE084BC = D_8AE084C8;
+    D_8AE098B8 = D_8AE0790C;
+    D_8AE098C8 = D_8AE07918;
+    D_8AE084E0 = 0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE001D4.s")
+extern s32 D_8AE09B44;
+extern s16 D_8AE09B48;
+extern s16 D_8AE09B54;
+extern s32 func_8004C874(s32, s32);
+extern s16 func_80049148(s32, s32, s32);
+extern void func_8AE00020();
+void func_8AE001D4(void) {
+    D_8AE09B54 = 1;
+    D_8AE09B44 = func_8004C874(0x2B, 6);
+    D_8AE09B48 = func_80049148(1, 0, D_8AE09B44);
+    func_8AE00020(0x47);
+}
 #endif
 
 #ifdef VERSION_US
@@ -107,7 +165,20 @@ void func_8AE00CBC(f32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE00E54.s")
+typedef struct { s16 key; u8 pad2[2]; s32 value; u8 pad8[8]; } Fragment46LookupEntry;
+extern Fragment46LookupEntry D_8AE08508[];
+Fragment46LookupEntry *func_8AE00E54(s16 arg0) {
+    Fragment46LookupEntry *entry;
+    s32 i;
+
+    entry = D_8AE08508;
+    for (i = 0; i < 0x38; i++) {
+        if (entry->key == -1) return NULL;
+        if (arg0 == entry->key) return entry;
+        entry++;
+    }
+    return NULL;
+}
 #endif
 
 #ifdef VERSION_US
@@ -214,7 +285,48 @@ void func_8AE015C4(s16 arg0, s16 arg1) { s32 pad; u8 sp1C[0x50]; _bzero(sp1C, 0x
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE01EA4.s")
+typedef struct {
+    s16 unk0;
+    u8 pad_2[2];
+    s32 unk4;
+    s32 unk8;
+    s32 unkC;
+    s32 unk10;
+    s32 unk14;
+    s32 unk18;
+    s32 unk1C;
+    s32 unk20;
+    u8 pad_24[4];
+} Record28;
+extern s16 D_8AE09E68;
+extern void *D_8AE084E4;
+extern void func_8AE018C4(s16, s32);
+extern void func_8AE019A0(s16, s32);
+extern void func_8AE01A90(s16, s32);
+extern void func_8AE01B88(s16, s32);
+extern void func_8AE01CCC(s16, s32);
+extern void func_8AE01DC0(s16, s32);
+void func_8AE01EA4(void) {
+    Record28 *record = D_8AE084E4;
+
+    for (;;) {
+        if (record->unk0 == -1) {
+            break;
+        }
+        func_8AE018C4(record->unk0, record->unk4);
+        func_8AE019A0(record->unk0, record->unk8);
+        if (D_8AE09E68 == 6) {
+            func_8AE01A90(record->unk0, record->unkC);
+            func_8AE01B88(record->unk0, record->unk14);
+        } else {
+            func_8AE01A90(record->unk0, record->unk10);
+            func_8AE01B88(record->unk0, record->unk18);
+        }
+        func_8AE01CCC(record->unk0, record->unk1C);
+        func_8AE01DC0(record->unk0, record->unk20);
+        record++;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -270,7 +382,47 @@ s32 func_8AE028B0(s32 arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE028F8.s")
+typedef struct { u8 pad0[0x20]; void *unk20; u8 pad24[4]; u8 unk28; u8 pad29[3]; u32 unk2C; } Fragment46Owner028F8;
+typedef struct { u16 unk0; u8 pad2[2]; void *unk4; } State028F8;
+extern u8 D_8AE07A9C[];
+extern u8 D_8AE07AB4[];
+extern State028F8 D_8AE07ACC;
+extern s16 D_8AE084F4;
+extern s16 D_8AE084F6;
+s32 func_8AE028F8(s32 arg0, Fragment46Owner028F8 *arg1) {
+    Fragment46Owner028F8 *temp_v0;
+    temp_v0 = arg1->unk20;
+    switch (arg0) {
+    case 0:
+        D_8AE07ACC.unk0 = 1;
+        D_8AE07ACC.unk4 = D_8AE07A9C;
+        temp_v0->unk2C = 0xC8C8FAC8;
+        temp_v0->unk28 = 1;
+        break;
+    case 1:
+        switch (D_8AE084F4) {
+        case 1:
+            D_8AE07ACC.unk0 = 0;
+            D_8AE07ACC.unk4 = D_8AE07AB4;
+            break;
+        case 2:
+            D_8AE07ACC.unk0 = 0;
+            D_8AE07ACC.unk4 = D_8AE07A9C;
+            break;
+        default:
+            D_8AE07ACC.unk0 = 1;
+            break;
+        }
+        break;
+    }
+    if (D_8AE084F6 > 0) {
+        D_8AE084F6 -= 1;
+    }
+    if (D_8AE084F6 == 0) {
+        D_8AE084F4 = 0;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -378,7 +530,17 @@ void func_8AE04478(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE04EB8.s")
+extern Gfx *D_800D0510;
+extern u8 D_8AE07268[];
+extern u8 *D_8AE0993C;
+extern s32 func_8004D1FC(u8 *);
+void func_8AE04EB8(s32 arg0, s32 arg1) {
+    gSPDisplayList(D_800D0510++, D_8AE07268);
+    arg0 *= 4;
+    arg1 *= 4;
+    func_8004D1FC(D_8AE0993C);
+    gSPTextureRectangle(D_800D0510++, arg0, arg1, arg0 + 0x30, arg1 + 0x30, 0, -0x10, -0x10, 0x800, 0x800);
+}
 #endif
 
 #ifdef VERSION_US
@@ -386,7 +548,19 @@ void func_8AE04478(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE050AC.s")
+extern s32 D_8AE09944;
+extern void func_8004D19C(s32, s32, s32, s32, s32);
+extern s16 D_8AE084E0;
+void func_8AE050AC(s32 arg0, s16 arg1, s16 arg2) {
+    s16 *record;
+    s16 x;
+    s16 y;
+
+    record = (s16 *)((u8 *)(D_8AE084E0 * 4 + arg0) - 4);
+    x = record[0];
+    y = record[1];
+    func_8004D19C(x + arg1 - 4, y + arg2 - 4, D_8AE09944, 0, 0);
+}
 #endif
 
 #ifdef VERSION_US
@@ -398,7 +572,55 @@ void func_8AE04478(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE0566C.s")
+extern Fragment46LookupEntry D_8AE08508[];
+s16 func_8AE0566C(s16 arg0) {
+    Fragment46LookupEntry *entry;
+    s16 key;
+    s16 sentinel;
+    s32 index;
+
+    entry = D_8AE08508;
+    index = 0;
+    sentinel = -1;
+loop_1:
+    key = entry->key;
+    if (sentinel == key) {
+        return -1;
+    }
+    if (arg0 == key) {
+        return (s16)index;
+    }
+    entry++;
+    key = entry->key;
+    if (sentinel == key) {
+        return -1;
+    }
+    if (arg0 == key) {
+        return (s16)(index + 1);
+    }
+    entry++;
+    key = entry->key;
+    if (sentinel == key) {
+        return -1;
+    }
+    if (arg0 == key) {
+        return (s16)(index + 2);
+    }
+    entry++;
+    key = entry->key;
+    if (sentinel == key) {
+        return -1;
+    }
+    if (arg0 == key) {
+        return (s16)(index + 3);
+    }
+    index += 4;
+    entry++;
+    if (index == 0x38) {
+        return -1;
+    }
+    goto loop_1;
+}
 #endif
 
 #ifdef VERSION_US
@@ -450,7 +672,52 @@ void func_8AE05B1C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE05BF0.s")
+typedef struct {
+    s32 unk0;
+    s32 unk4;
+} Fragment46Entry;
+typedef struct {
+    u8 pad0[2];
+    s16 saved;
+    u8 pad4[4];
+    Fragment46Entry *result;
+    u8 tail[4];
+} Fragment46SearchLocals16;
+extern s16 D_8AE084E0;
+extern s16 D_8AE084E2;
+extern s32 D_8AE084E8;
+extern Fragment46Entry *func_8AE0559C(s16);
+extern s16 func_8AE017A4(s16);
+extern void func_8AE01738(void);
+extern s32 func_8AE00F24(void);
+Fragment46Entry *func_8AE05BF0(void) {
+    volatile Fragment46SearchLocals16 locals;
+    s32 var_s0;
+    Fragment46Entry *temp_v0;
+
+    var_s0 = 0;
+    locals.saved = D_8AE084E0;
+    do {
+        D_8AE084E0 -= 1;
+        if (D_8AE084E0 <= 0) {
+            D_8AE084E0 = 0x38;
+        }
+        temp_v0 = func_8AE0559C(D_8AE084E0);
+        if (temp_v0 == NULL || temp_v0->unk4 == 0) {
+            var_s0 += 1;
+        } else {
+            break;
+        }
+    } while (var_s0 != 0x38);
+    if (locals.saved != D_8AE084E0) {
+        locals.result = temp_v0;
+        D_8AE084E2 = func_8AE017A4(D_8AE084E0);
+        func_8AE01738();
+        D_8AE084E8 = func_8AE00F24();
+        temp_v0 = locals.result;
+    }
+    return temp_v0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -462,7 +729,7 @@ void func_8AE05B1C(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_80007AEC(s32);
+extern void StageFade_StartFromOpaque(s32);
 extern void func_800086A4(s32);
 extern void func_80064D28();
 extern void func_8AE00380();
@@ -476,7 +743,7 @@ void func_8AE06118(void) {
 
     var_s0 = 0;
     func_800086A4(2);
-    func_80007AEC(5);
+    StageFade_StartFromOpaque(5);
     do {
         func_80064D28();
         if (var_s0 == 1) {

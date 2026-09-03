@@ -54,7 +54,39 @@ void func_8AF21EE0(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20F140/func_8AF21FBC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20F140/func_8AF220E8.s")
+extern u8 *D_8AF2BDD8;
+extern u8 D_8AF279F0[];
+extern u8 D_8AF27BCC[];
+extern u8 D_8AF27D20[];
+extern u8 *D_8AF3A198;
+extern s16 D_8AF3A19C;
+extern void func_8AF00504(s32);
+extern s32 func_8AF003A8(s32);
+s32 func_8AF220E8(void) {
+    s32 sp1C;
+    u8 temp_v0 = *D_8AF2BDD8;
+    switch (temp_v0) {
+    case 0:
+        D_8AF3A19C = 7;
+        D_8AF3A198 = D_8AF279F0;
+        func_8AF00504(0x51);
+        sp1C = func_8AF003A8(0x51);
+        break;
+    case 1:
+        D_8AF3A19C = 5;
+        D_8AF3A198 = D_8AF27BCC;
+        func_8AF00504(0x47);
+        sp1C = func_8AF003A8(0x47);
+        break;
+    case 2:
+        D_8AF3A19C = 4;
+        D_8AF3A198 = D_8AF27D20;
+        func_8AF00504(0x3C);
+        sp1C = func_8AF003A8(0x3C);
+        break;
+    }
+    return sp1C;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20F140/func_8AF221C4.s")
 

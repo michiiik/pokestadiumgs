@@ -275,7 +275,7 @@ void func_86508A14(void) {
     temp_v0 = func_87F08208(&D_8650DAD8);
     switch (temp_v0) {                              /* irregular */
     case 1:
-        func_800088A4(0xFFFF);
+        StageContext_SetClearColor(0xFFFF);
         StageFade_StartFromTransparent(0x14);
         func_86501280();
         (*(s32 *)((u8 *)(&D_8650C5E0) + (0xC))) = 5;
@@ -286,7 +286,7 @@ void func_86508A14(void) {
         (*(s32 *)((u8 *)(&D_8650C5E0) + (0xC))) = 2;
         (*(s32 *)((u8 *)(&D_8650C5E0) + (0x4C))) = 1;
         (*(s32 *)((u8 *)(&D_8650C5E0) + (0x58))) = 0;
-        func_800088A4(0xFFFF);
+        StageContext_SetClearColor(0xFFFF);
         StageFade_StartFromTransparent(0xA);
         func_800226C0(3);
         return;
@@ -300,7 +300,7 @@ extern void *D_8650DB10;
 void func_86508ABC(void) {
     if (StageContext_GetFadeMode() == 0) {
         if ((*(u8 *)((u8 *)(D_8650DB10) + (0x2180))) == 4) {
-            func_80007AEC(0x14);
+            StageFade_StartFromOpaque(0x14);
             func_87F00688();
             D_8650C5EC = 6;
             return;
@@ -339,14 +339,14 @@ void func_86509480(void) {
         (*(s32 *)((u8 *)(&D_8650C5E0) + (0x58))) = 0;
         (*(s32 *)((u8 *)(&D_8650C5E0) + (0xC))) = 2;
         (*(s32 *)((u8 *)(&D_8650C5E0) + (0x4C))) = 3;
-        func_800088A4(0xFFFF);
+        StageContext_SetClearColor(0xFFFF);
         StageFade_StartFromTransparent(0xA);
         return;
     case 4:
         (*(s32 *)((u8 *)(&D_8650C5E0) + (0x58))) = 1;
         (*(s32 *)((u8 *)(&D_8650C5E0) + (0xC))) = 2;
         (*(s32 *)((u8 *)(&D_8650C5E0) + (0x4C))) = 3;
-        func_800088A4(0xFFFF);
+        StageContext_SetClearColor(0xFFFF);
         StageFade_StartFromTransparent(0xA);
         return;
     }
@@ -358,7 +358,35 @@ void func_86509480(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/53/fragment53_code/func_86509D8C.s")
+extern s32 func_87F02104(void);
+void func_86509D8C(void) {
+    s32 temp_v0;
+
+    temp_v0 = func_87F02104();
+    switch (temp_v0) {
+    case 1:
+        StageContext_SetClearColor(1);
+        *(s32 *)((u8 *)&D_8650C5E0 + 0xC) = 0xC;
+        *(s32 *)((u8 *)&D_8650C5E0 + 0x4C) = 2;
+        StageFade_StartFromTransparent(0xA);
+        *(s32 *)((u8 *)&D_8650C5E0 + 0x8) = 0;
+        return;
+    case 2:
+        *(s32 *)((u8 *)&D_8650C5E0 + 0x58) = 0;
+        *(s32 *)((u8 *)&D_8650C5E0 + 0xC) = 2;
+        *(s32 *)((u8 *)&D_8650C5E0 + 0x4C) = 2;
+        StageContext_SetClearColor(0xFFFF);
+        StageFade_StartFromTransparent(0xA);
+        return;
+    case 3:
+        *(s32 *)((u8 *)&D_8650C5E0 + 0x58) = 1;
+        *(s32 *)((u8 *)&D_8650C5E0 + 0xC) = 2;
+        *(s32 *)((u8 *)&D_8650C5E0 + 0x4C) = 2;
+        StageContext_SetClearColor(0xFFFF);
+        StageFade_StartFromTransparent(0xA);
+        return;
+    }
+}
 #endif
 
 #ifdef VERSION_US

@@ -55,7 +55,7 @@ extern void func_82700604(void);
 extern void func_80008624(void);
 extern s32 StageContext_GetFadeMode(void);
 extern void func_800086A4(s32);
-extern void func_80007AEC(s32);
+extern void StageFade_StartFromOpaque(s32);
 extern void func_80064D28(void);
 extern void func_82702658(void);
 extern void func_827000B8(void);
@@ -71,7 +71,7 @@ void func_82700AF4(void) {
     func_80008624();
     if (StageContext_GetFadeMode() != 0) {
         func_800086A4(2);
-        func_80007AEC(5);
+        StageFade_StartFromOpaque(5);
     }
     do {
         func_80064D28();

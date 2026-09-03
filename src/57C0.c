@@ -23,7 +23,7 @@ s32 func_80004BEC(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-s32 func_80004CF4(u32 arg0) {
+s32 Sched_RequestTaskYield(u32 arg0) {
     u32 temp_v0;
     s32 var_v1;
 
@@ -41,8 +41,8 @@ s32 func_80004CF4(u32 arg0) {
 #endif
 
 #ifdef VERSION_US
-extern s32 func_8000A1E8(s32);
-s32 func_80004D4C(u8 *arg0) {
+extern s32 profiler_log_gfx_time(s32);
+s32 Sched_HandleRspCompletion(u8 *arg0) {
     s32 result;
     u32 taskType;
     u16 state;
@@ -55,7 +55,7 @@ s32 func_80004D4C(u8 *arg0) {
             *(u16 *)(arg0 + 0x1C) = 3;
             switch (taskType) {
             case 1:
-                func_8000A1E8(1);
+                profiler_log_gfx_time(1);
                 if (*(u16 *)(arg0 + 0x1E) == 2) {
                     osSendMesg((OSMesgQueue *)(arg0 + 4), (OSMesg)0x444F4E45, 0);
                 }
@@ -71,12 +71,12 @@ s32 func_80004D4C(u8 *arg0) {
         switch (taskType) {
         case 2:
             if (state == 1) {
-                func_8000A28C();
+                profiler_log_vblank_time();
                 osSendMesg((OSMesgQueue *)(arg0 + 4), (OSMesg)0x444F4E45, 0);
             }
             break;
         case 1:
-            func_8000A1E8(1);
+            profiler_log_gfx_time(1);
             if (*(u16 *)(arg0 + 0x1E) == 2) {
                 osSendMesg((OSMesgQueue *)(arg0 + 4), (OSMesg)0x444F4E45, 0);
             }
@@ -92,10 +92,10 @@ s32 func_80004D4C(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-extern s32 func_8000A1E8(s32);
+extern s32 profiler_log_gfx_time(s32);
 
 void Sched_HandleRdpCompletion(u8 *arg0) {
-    func_8000A1E8(2);
+    profiler_log_gfx_time(2);
     if (*(u16 *)(arg0 + 0x1C) == 3) {
         osSendMesg((OSMesgQueue *)(arg0 + 4), (OSMesg)0x444F4E45, 0);
     }
@@ -225,7 +225,7 @@ typedef struct SchedState57C0 {
     u8 padA14[0x24];
     s16 shutdownCounter;
 } SchedState57C0;
-void func_80004FFC(u32 arg0) {
+void Sched_NotifyClients(u32 arg0) {
     S1_unk_D_800AA660 *var_s0 = *(S1_unk_D_800AA660 **)((u8 *)D_800CD020 + 0xA10);
     if (var_s0 != NULL) {
         do {
@@ -262,14 +262,14 @@ void Sched_StartPendingTask(void) {
 #endif
 
 #ifdef VERSION_US
-s32 func_80004CF4(u32);
+s32 Sched_RequestTaskYield(u32);
 
 s32 Sched_TryYieldActiveTask(void) {
     s32 var_v1;
 
     var_v1 = 0;
     if (D_800CDA34 != 0) {
-        var_v1 = func_80004CF4(D_800CDA34);
+        var_v1 = Sched_RequestTaskYield(D_800CDA34);
     }
     return var_v1;
 }
@@ -280,7 +280,7 @@ extern S1_unk_D_800AA660 *D_800CDA30;
 extern s16 D_800CDA58;
 extern void func_80064DF4(void);
 extern void Audio_StopProcessing(void);
-void func_80005148(void) {
+void Sched_HandlePreNMI(void) {
     S1_unk_D_800AA660 *var_s0;
     var_s0 = D_800CDA30;
     if (var_s0 != NULL) {
@@ -361,7 +361,7 @@ void func_80005568(S1_unk_D_800AA660 *arg0) {
 
 #ifdef VERSION_US
 extern OSMesgQueue D_800CDA10;
-void func_800055F4(void *arg0, s32 arg1) {
+void Sched_SubmitTask(void *arg0, s32 arg1) {
     s32 taskType;
 
     if (arg0 != NULL) {

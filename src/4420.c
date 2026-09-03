@@ -195,7 +195,7 @@ s32 Jpeg_DecodeImage(u32 addr, s32 arg1, u8 *arg2)
         return 0;
       }
       sp90.unk_00 = addr & 0x1FFFFFFF;
-      func_800055F4(&sp318, 1);
+      Sched_SubmitTask(&sp318, 1);
       var_s4 = 1;
       func_80004BEC(&sp318);
       addr += 0x200;
@@ -258,11 +258,11 @@ void Dma_ReadChunks(u8 *arg0, s32 arg1, s32 arg2, s32 arg3) {
     }
 }
 
-extern void func_80006C40(s32, s32, s16, OSMesgQueue *, s32);
+extern void Storage_QueueFlashTransfer(s32, s32, s16, OSMesgQueue *, s32);
 s32 func_80003E84(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     OSMesg message;
     while (arg2 > 0) {
-        func_80006C40(arg3, arg0, (s16)arg1, &D_800CD000, 0);
+        Storage_QueueFlashTransfer(arg3, arg0, (s16)arg1, &D_800CD000, 0);
         osRecvMesg(&D_800CD000, &message, 1);
         if (arg3 == 1 && osFlashWriteArray(arg1) != 0) {
             return -1;
@@ -446,12 +446,12 @@ void func_80004718(s32 arg0, u8 *arg1) {
     main_pool_set_func(arg1, arg0 + 0x81000000, (void *)func_800046C0);
     sizeInRam = *(u32 *)(arg1 + 0x1C);
     if ((u32)allocationSize < sizeInRam) {
-        func_80002A40(arg1, sizeInRam);
+        main_pool_realloc(arg1, sizeInRam);
         Memmap_RelocateFragment(arg0, arg1);
         return;
     }
     Memmap_RelocateFragment(arg0, arg1);
-    func_80002A40(arg1, *(u32 *)(arg1 + 0x1C));
+    main_pool_realloc(arg1, *(u32 *)(arg1 + 0x1C));
 }
 
 #define RELOCATIONS_SIZE 1

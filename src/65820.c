@@ -84,7 +84,7 @@ extern void Display_WaitForFrames(s32);
 extern void main_pool_pop_state(s32);
 extern s32 Fragment_LoadAndCall(s32, u8 *, u8 *, u32, u32);
 extern void func_80064DF4(void);
-void func_80064D58(s32 arg0, s32 arg1) {
+void Game_ShutdownAndLoadFragment(s32 arg0, s32 arg1) {
     osViBlack(1U);
     GbTower_PowerOffAllPaks();
     Audio_StopProcessing();

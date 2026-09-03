@@ -90,7 +90,7 @@ void func_813032B0(u8 *arg0) {
 }
 
 extern f32 func_816092FC(void);
-extern s32 func_8160A9CC(void);
+extern s32 func_8160A9CC();
 void func_813032D0(void *arg0) {
     f32 delta;
     f32 temp_fv1;
@@ -197,7 +197,23 @@ s32 func_81303A38(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FAD40/func_81303A88.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FAD40/func_81303BF4.s")
+extern u8 D_81311DA8[];
+extern s32 func_81302290(void *);
+extern void func_81302E58(void *arg0, s32 arg1);
+extern s32 func_81311C70(s32, s32 *, u8, s32);
+void func_81303BF4(u8 *arg0) {
+    u8 *table;
+    table = &D_81311DA8[func_81302BB0(arg0) * 36];
+    if (func_81311C70(*(s32 *)(arg0 + 0x4DA0) + 0x74, (s32 *)table, arg0[0xA], -1) != 0) {
+        if ((func_81302BB0(arg0) != 0) && (func_81302290(*(void **)(arg0 + 0x4DA0)) < 10)) {
+            arg0[0x4DBD] = 0xB;
+            return;
+        }
+        func_8130A570(*(s32 *)(arg0 + 0x4DA0) + 0xDA8, 0);
+        arg0[0x4DBD] = 3;
+        func_81302E58(arg0, 0);
+    }
+}
 
 extern s32 func_813022F4(void *arg0, void *arg1);
 extern void func_81311C18(s32 arg0);
@@ -293,7 +309,39 @@ s32 func_81304248(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FAD40/func_8130437C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FAD40/func_81304444.s")
+extern void func_8160B8E0(u8 *, s32, s32, s32);
+extern s32 func_81303A38(void *arg0);
+extern void func_81311C18(s32 arg0);
+extern s32 func_8160A920(void);
+extern void func_8160A928(u8 *, s32);
+extern s32 func_8160A9CC();
+s32 func_81304444(u8 *arg0, s32 arg1, s32 arg2) {
+    s32 sp24;
+    s32 var_a2;
+
+    sp24 = func_8160A920();
+    if (arg0[0x4DBD] != 0xD) {
+        return 0;
+    }
+    *(s32 *)(arg0 + 0x4DAC) = 1;
+    func_8160B8E0(arg0, arg1, sp24, 0);
+    ((u8 *)arg0 + (sp24 * 0xCE8))[0x21] = (s8)arg2;
+    if (func_8160A9CC(arg0) != 0) {
+        func_81311C18(*(s32 *)(arg0 + 0x4DA0) + 0x74);
+        if (func_81303A38(arg0) != 0) {
+            arg0[0x4DBD] = 7;
+        } else {
+            arg0[0x4DBD] = 4;
+        }
+    } else {
+        do {
+            sp24 = (sp24 + 1) % 6;
+        } while (((u8 *)arg0 + (sp24 * 0xCE8))[0x20] != 0);
+        func_8160A928(arg0, sp24);
+        arg0[0x4DBD] = 0xC;
+    }
+    return 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FAD40/func_8130456C.s")
 

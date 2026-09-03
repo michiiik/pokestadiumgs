@@ -274,11 +274,172 @@ s32 func_81404CA4(void *arg0)
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81404E68.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_814050EC.s")
+extern s32 func_81403938(s32 arg0);
+extern s32 func_8140463C(void *arg0, s32 arg1, s32 arg2);
+extern void func_814046C4(void *arg0);
+extern s32 func_81404D00(void);
+s32 func_814050EC(void *arg0) {
+    typedef struct {
+        u8 pad0[4];
+        u16 unk4;
+        u8 unk6;
+        u8 unk7;
+        u8 pad8[8];
+        s8 unk10;
+        s8 unk11;
+        s8 unk12;
+        s8 unk13;
+        s32 unk14;
+        s32 unk18;
+        u8 pad1c[8];
+        u8 unk24[0x18];
+        s32 unk3c;
+    } State;
+    State *state;
+    s32 sp28;
+    s32 sp24;
+    void *temp_v0;
+    s32 result;
+    s32 mode;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81405208.s")
+    state = arg0;
+    sp28 = func_81404D00();
+    sp24 = state->unk18;
+    temp_v0 = func_814049CC(state);
+    if (sp28 < state->unk12) {
+        state->unk6 = 2;
+        func_814046C4(state->unk24);
+        return 0;
+    }
+    if (state->unk14 != 0) {
+        mode = 1;
+    } else {
+        mode = 0;
+    }
+    result = func_8140463C(state->unk24, mode, 0);
+    state->unk10 = -1;
+    if ((temp_v0 != NULL) && ((*(u16 *)((u8 *)temp_v0 + 6) & 0x10) != 0)) {
+        state->unk18 = 1;
+    } else {
+        state->unk18 = 0;
+    }
+    if (result < 0 || result == 2) {
+        func_81403938(state->unk3c);
+        state->unk6 = 2;
+    } else if (result == 1) {
+        state->unk6 = 5;
+    }
+    mode = (state->unk14 == 0);
+    if (mode == 0) {
+        mode = (sp24 != state->unk18);
+    }
+    return mode;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_814052F4.s")
+extern s32 func_81403938(s32 arg0);
+extern s32 func_8140463C(void *arg0, s32 arg1, s32 arg2);
+extern void func_814046C4(void *arg0);
+extern s32 func_81404D00(void);
+
+s32 func_81405208(void *arg0) {
+    typedef struct {
+        u8 pad0[4]; u16 unk4; u8 unk6; u8 unk7; u8 pad8[8];
+        s8 unk10; s8 unk11; s8 unk12; s8 unk13;
+        s32 unk14; s32 unk18; u8 pad1c[8]; u8 unk24[0x18]; s32 unk3c;
+    } State;
+    State *state;
+    s32 sp28;
+    s32 sp24;
+    void *temp_v0;
+    s32 temp_v0_2;
+    s32 var_v1;
+
+    state = arg0;
+    sp28 = func_81404D00();
+    sp24 = state->unk18;
+    temp_v0 = func_814049CC(state);
+    if (sp28 < state->unk12) {
+        state->unk6 = 2;
+        func_814046C4(state->unk24);
+        return 0;
+    }
+    if ((temp_v0 != NULL) && ((*(u16 *)((u8 *)temp_v0 + 0x6) & 0x10) != 0))
+        state->unk18 = 1;
+    else
+        state->unk18 = 0;
+    temp_v0_2 = func_8140463C(state->unk24, 2, 0);
+    state->unk10 = -1;
+    if (temp_v0_2 < 0) {
+        func_81403938(state->unk3c);
+        state->unk6 = 2;
+    } else if (temp_v0_2 > 0) {
+        state->unk6 = 6;
+    }
+    var_v1 = (state->unk14 == 0);
+    if (var_v1 == 0)
+        var_v1 = (sp24 != state->unk18);
+    return var_v1;
+}
+
+extern s32 func_81403938(s32 arg0);
+extern void func_814046C4(void *arg0);
+extern s32 func_81404D00(void);
+extern s32 func_8140463C(void *arg0, s32 arg1, s32 arg2);
+s32 func_814052F4(void *arg0) {
+    typedef struct {
+        u8 pad0[4];
+        u16 unk4;
+        u8 unk6;
+        u8 unk7;
+        u8 pad8[8];
+        s8 unk10;
+        s8 unk11;
+        s8 unk12;
+        s8 unk13;
+        s32 unk14;
+        s32 unk18;
+        u8 pad1c[8];
+        u8 unk24[0x18];
+        s32 unk3c;
+    } State;
+    State *state;
+    s32 sp28;
+    s32 sp24;
+    void *temp_v0;
+    s32 temp_v0_2;
+    s32 mode;
+
+    state = arg0;
+    sp28 = func_81404D00();
+    sp24 = state->unk18;
+    temp_v0 = func_814049CC(state);
+    if (sp28 < state->unk12) {
+        state->unk6 = 2;
+        func_814046C4(state->unk24);
+        return 0;
+    }
+    if ((temp_v0 != NULL) && ((*(u16 *)((u8 *)temp_v0 + 6) & 0x10) != 0)) {
+        state->unk18 = 1;
+    } else {
+        state->unk18 = 0;
+    }
+    if (state->unk14 != 0) {
+        mode = 4;
+    } else {
+        mode = 3;
+    }
+    temp_v0_2 = func_8140463C(state->unk24, mode, state->unk4);
+    state->unk10 = -1;
+    if (temp_v0_2 != 0) {
+        func_81403938(state->unk3c);
+        state->unk6 = 2;
+    }
+    mode = (state->unk14 == 0);
+    if (mode == 0) {
+        mode = (sp24 != state->unk18);
+    }
+    return mode;
+}
 
 extern void func_81404724(void *arg0, void *arg1);
 extern void func_814047C0(void *arg0, void *arg1);

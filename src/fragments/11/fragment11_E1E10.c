@@ -27,7 +27,29 @@ void *func_8160A360(void *arg0, s32 arg1) {
     return arg0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E1E10/func_8160A384.s")
+void func_8160A384(void *arg0, s32 arg1, s32 arg2, s32 arg3) {
+    u8 pad[4];
+    u8 buffer[0x180];
+    u8 *src;
+    u8 *dst;
+    u8 *end;
+
+    func_80055A74(arg1);
+    _bzero(buffer, 0x180);
+    src = (u8 *)arg0 + 0x20;
+    dst = buffer + 0x10;
+    end = buffer + 0x178;
+    while (dst != end) {
+        func_80051864(src, dst);
+        dst += 0x3C;
+        src += 0xCE8;
+    }
+    buffer[0x178] = (u8)arg3;
+    func_80055B14(buffer, arg2);
+    func_800535D4(0x10, arg2, (u8 *)arg0 + 0x11, (u8 *)arg0 + 0x11,
+                  *(u16 *)((u8 *)arg0 + 0x4D90));
+    func_80051D64(0x10, arg2);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E1E10/func_8160A438.s")
 
@@ -60,7 +82,29 @@ void func_8160A72C(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E1E10/func_8160A780.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E1E10/func_8160A844.s")
+s32 func_8160A844(u8 *arg0, s32 arg1, s32 arg2, s32 arg3) {
+    u8 pad[4];
+    u8 buffer[0x180];
+    u8 *src;
+    u8 *dst;
+    u8 *zero_dst;
+
+    func_80055A74(arg2);
+    func_80055A9C(buffer, arg3);
+    func_80053440(0x10, arg3, arg1);
+    src = arg0;
+    zero_dst = arg0;
+    arg0 = buffer + 0x178;
+    dst = buffer + 0x10;
+    while (dst != arg0) {
+        func_80051830(src, dst);
+        dst += 0x3C;
+        src += 0x60;
+        zero_dst += 0x60;
+        *(s32 *)(zero_dst - 8) = 0;
+    }
+    return buffer[0x178];
+}
 
 s32 func_8160A8DC(arg0)
 u8 *arg0;
@@ -94,10 +138,18 @@ void func_8160A928(u8 *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E1E10/func_8160A994.s")
 
+#ifdef CC_CHECK
+s32 func_8160A8DC(u8 *);
+#else
 s32 func_8160A8DC();
+#endif
 
 s32 func_8160A9CC(void) {
+#ifdef CC_CHECK
+    return func_8160A8DC((u8 *)0) >= 6;
+#else
     return func_8160A8DC() >= 6;
+#endif
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E1E10/func_8160A9F0.s")
@@ -137,7 +189,35 @@ void func_8160B8A8(u8 *arg0, s32 arg1, s32 arg2) {
     func_8160A6AC(arg0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E1E10/func_8160B8E0.s")
+s32 func_8160B8E0(u8 *arg0, u8 *arg1, s32 arg2, s32 arg3) {
+    struct Record { u32 words[826]; };
+    u8 *entry;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E1E10/func_8160B9A0.s")
+    entry = (u8 *)((u32)arg0 + arg2 * 0xCE8);
+    if (*(s32 *)(entry + 0x78) == 0 ||
+        *(s32 *)(arg1 + 0x58) != *(s32 *)(entry + 0x78) ||
+        arg1[0] != entry[0x20]) {
+        *(struct Record *)(entry + 0x20) = *(struct Record *)arg1;
+        arg0[arg2 + 0xB] = 1;
+        if (arg3 != 0) {
+            func_800226C0(0x98);
+        }
+        return 1;
+    }
+    return 0;
+}
+
+s32 func_8160B9A0(u8 *arg0, s32 arg1, s32 arg2) {
+    u8 *entry = (u8 *)((u32)arg0 + arg1 * 0xCE8);
+    if (entry[0x20] != 0) {
+        entry[0x20] = 0;
+        *(s32 *)(entry + 0x78) = 0;
+        arg0[arg1 + 0xB] = 1;
+        if (arg2 != 0) {
+            func_800226C0(0x98);
+        }
+        return 1;
+    }
+    return 0;
+}
 #endif
