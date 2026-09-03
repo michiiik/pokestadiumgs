@@ -240,7 +240,25 @@ void func_80058D98_padding2(void) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80058FD0.s")
+s32 func_80058FD0(s32 arg0) {
+    s32 result = 0;
+    switch (func_8005D92C(arg0)) {
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+        result = func_80058DE4(arg0);
+        break;
+    case 5:
+    case 6:
+        result = func_80058E60(arg0);
+        break;
+    case 7:
+        result = func_80058F18(arg0);
+        break;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
