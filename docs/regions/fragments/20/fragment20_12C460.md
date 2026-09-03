@@ -181,3 +181,27 @@ func_8260E03C: time cap at 0.0 (raw None) after 1200s, mismatch unknown; tried f
 ## 2026-09-04
 
 func_82605110: time cap at 0.9545 (raw 0.8788) after 1215s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-04
+
+func_82610FF8: time cap at 0.9899 (raw 0.7071) after 1200s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-04
+
+func_82604A78: matched (call_sequence:dispatcher:exact-next-goto-lt-exit), 1 iterations, agent codex
+
+## 2026-09-04
+
+func_826063AC: time cap at 0.9029 (raw 0.4757) after 1213s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-04
+
+func_82606CE8: time cap at 0.9808 (raw 0.9038) after 1214s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-04
+
+func_8260BBA8: matched (call_sequence:gfx:struct-color:exact-layout), 1 iterations, agent codex
+
+## 2026-09-04
+
+func_826065B0: time cap at 1.0 (raw 1.0) after 1210s, mismatch section_layout_drift; tried families: dispatcher; tie-pool no
