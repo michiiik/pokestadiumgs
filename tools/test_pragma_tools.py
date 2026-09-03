@@ -1255,6 +1255,73 @@ class RunnerTests(unittest.TestCase):
         # the next candidate's attempt record.
         self.assertIsNone(runner._GATE_ENVIRONMENT_FAILURES.pop("func_a", None))
 
+    def _diverged_worktree(self, directory: str, same_yaml: bool):
+        """A linked worktree plus a primary, with matching or diverging yamls."""
+        main = Path(directory) / "main"
+        worktree = Path(directory) / "worktree"
+        git_dir = main / ".git" / "worktrees" / "lane"
+        git_dir.mkdir(parents=True)
+        for root, text in ((main, "A"), (worktree, "A" if same_yaml else "B")):
+            y = root / "disasm" / "yamls" / "us"
+            y.mkdir(parents=True)
+            (y / "rom.yaml").write_text(text)
+        shared = main / "disasm" / "asm" / "us" / "nonmatchings" / "owner"
+        shared.mkdir(parents=True)
+        (shared / "func_a.s").write_text("primary version\n")
+        (worktree / "disasm" / "asm" / "us" / "nonmatchings").mkdir(parents=True)
+        source = worktree / "disasm" / "src" / "owner.c"
+        source.parent.mkdir(parents=True)
+        source.write_text('#pragma GLOBAL_ASM("asm/us/nonmatchings/owner/func_a.s")\n')
+        (worktree / ".git").write_text(f"gitdir: {git_dir}\n")
+        return worktree
+
+    def test_oracles_are_not_imported_from_a_differently_split_primary(self) -> None:
+        # A single accepted candidate deletes its .s; the next probe used to
+        # symlink the primary's copy back in. When the two trees were split
+        # from different yamls that copy describes another .rodata layout, so
+        # the live pragma silently resolved to the wrong assembly.
+        with tempfile.TemporaryDirectory() as directory:
+            worktree = self._diverged_worktree(directory, same_yaml=False)
+            source = worktree / "disasm" / "src" / "owner.c"
+            runner._ensure_worktree_oracles(worktree, source)
+            local = worktree / "disasm" / "asm" / "us" / "nonmatchings" / "owner"
+            self.assertFalse(
+                os.path.lexists(local),
+                "must not import oracles from a primary split from different yamls",
+            )
+
+    def test_oracles_are_still_imported_when_the_split_inputs_match(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            worktree = self._diverged_worktree(directory, same_yaml=True)
+            source = worktree / "disasm" / "src" / "owner.c"
+            runner._ensure_worktree_oracles(worktree, source)
+            local = worktree / "disasm" / "asm" / "us" / "nonmatchings" / "owner"
+            self.assertTrue(local.is_symlink(), "matching yamls should still overlay")
+
+    def test_backfill_refuses_a_differently_split_primary(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            worktree = self._diverged_worktree(directory, same_yaml=False)
+            self.assertEqual(
+                runner._backfill_missing_private_oracles(worktree),
+                ["owner/func_a.s"],
+                "a diverged primary must be reported unresolved, never copied",
+            )
+
+    def test_split_inputs_conflict_needs_positive_evidence(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            a, b = Path(directory) / "a", Path(directory) / "b"
+            # Nothing to compare -> no conflict, historical behaviour kept.
+            self.assertFalse(runner._split_inputs_conflict(a, b))
+            for r in (a, b):
+                (r / "disasm" / "yamls").mkdir(parents=True)
+                (r / "disasm" / "yamls" / "rom.yaml").write_text("same")
+            self.assertFalse(runner._split_inputs_conflict(a, b))
+            (b / "disasm" / "yamls" / "rom.yaml").write_text("different")
+            self.assertTrue(runner._split_inputs_conflict(a, b))
+            (b / "disasm" / "yamls" / "rom.yaml").write_text("same")
+            (b / "disasm" / "yamls" / "extra.yaml").write_text("x")
+            self.assertTrue(runner._split_inputs_conflict(a, b))
+
     def test_worktree_gate_prerequisites_are_built_privately(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             main = Path(directory) / "main"
