@@ -1237,6 +1237,24 @@ class RunnerTests(unittest.TestCase):
                     )
                     self.assertTrue(ledger.exists())
 
+    def test_gate_environment_failure_records_the_offending_targets(self) -> None:
+        # The status alone said "not this candidate's fault" but never which
+        # file broke, and merge-results is all anyone has after the fact --
+        # the tree often builds again by the time the rejection is noticed.
+        runner._GATE_ENVIRONMENT_FAILURES.clear()
+        output = (
+            "src/fragments/22/x.c:1:1: error: boom\n"
+            "make: *** [build/src/fragments/22/x.o] Error 1\n"
+        )
+        unrelated = runner._unrelated_build_failures(output, "build/src/585D0.o")
+        self.assertEqual(unrelated, ["build/src/fragments/22/x.o"])
+        runner._GATE_ENVIRONMENT_FAILURES["func_a"] = unrelated
+        drained = runner._GATE_ENVIRONMENT_FAILURES.pop("func_a", None)
+        self.assertEqual(drained, ["build/src/fragments/22/x.o"])
+        # Draining is destructive, so one function's failure cannot leak into
+        # the next candidate's attempt record.
+        self.assertIsNone(runner._GATE_ENVIRONMENT_FAILURES.pop("func_a", None))
+
     def test_worktree_gate_prerequisites_are_built_privately(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             main = Path(directory) / "main"

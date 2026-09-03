@@ -1263,3 +1263,37 @@ func TestCheckoutFailureBlocksRetryablyInsteadOfStrandingTheRun(t *testing.T) {
 		t.Fatal("blocked run not in a state retryBlockedMergeRuns collects")
 	}
 }
+
+// A run reaches only budget/owner-seconds owners (3, at the 7200s/2400s
+// default) but a spec carries 12, and the requeue used to preserve order --
+// so an owner only left the head by matching, and a partition with hard
+// leading owners re-ground the same few forever. 173 of 252 planned owners
+// (68%) had never been attempted once.
+func TestRotateAttemptedToTailGivesUntriedOwnersTheirTurn(t *testing.T) {
+	owners := []string{"a", "b", "c", "d", "e"}
+	got := rotateAttemptedToTail(owners, []string{"a", "b", "c"})
+	want := []string{"d", "e", "a", "b", "c"}
+	for i := range want {
+		if got[i] != want[i] {
+			t.Fatalf("rotateAttemptedToTail = %v, want %v", got, want)
+		}
+	}
+}
+
+func TestRotateAttemptedToTailPreservesOrderAndHandlesEdges(t *testing.T) {
+	owners := []string{"a", "b", "c"}
+	// No attempt information (missing summary.json): unchanged.
+	if got := rotateAttemptedToTail(owners, nil); got[0] != "a" || got[2] != "c" {
+		t.Fatalf("nil attempted should be a no-op, got %v", got)
+	}
+	// Everything attempted: order preserved, nothing lost.
+	got := rotateAttemptedToTail(owners, []string{"a", "b", "c"})
+	if len(got) != 3 || got[0] != "a" || got[2] != "c" {
+		t.Fatalf("all-attempted should preserve order, got %v", got)
+	}
+	// An attempted owner no longer in the list (it matched) is ignored.
+	got = rotateAttemptedToTail([]string{"b", "c"}, []string{"a", "b"})
+	if len(got) != 2 || got[0] != "c" || got[1] != "b" {
+		t.Fatalf("got %v, want [c b]", got)
+	}
+}
