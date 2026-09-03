@@ -157,3 +157,27 @@ func_8260F49C: matched (call_sequence:record-offset:three-arg-stepcast), 1 itera
 ## 2026-09-04
 
 func_82608270: time cap at 0.95 (raw 0.15) after 1212s, mismatch operand_or_scheduling_drift; tried families: state_field_access; tie-pool no
+
+## 2026-09-04
+
+func_826049A0: time cap at 1.0 (raw 1.0) after 1210s, mismatch section_layout_drift; tried families: dispatcher_switch; tie-pool no
+
+## 2026-09-04
+
+func_82605E04: time cap at 0.95 (raw 0.1833) after 1215s, mismatch operand_or_scheduling_drift; tried families: state-field; tie-pool no
+
+## 2026-09-04
+
+func_82605EF4: time cap at 0.7167 (raw 0.1167) after 1209s, mismatch operand_or_scheduling_drift; tried families: bounded_lookup; tie-pool no
+
+## 2026-09-04
+
+func_82613C64: matched (call_sequence:switch-dispatch:temp-a2-before-clear), 1 iterations, agent codex
+
+## 2026-09-04
+
+func_8260E03C: time cap at 0.0 (raw None) after 1200s, mismatch unknown; tried families: dispatcher_switch; tie-pool no
+
+## 2026-09-04
+
+func_82605110: time cap at 0.9545 (raw 0.8788) after 1215s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
