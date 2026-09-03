@@ -185,10 +185,7 @@ void func_87E0C4B4(void *arg0) {
 }
 
 extern void func_87E0BB5C(); extern void func_87E0BFFC(s32, s32, s32);
-void func_87E0C590(s32 arg0, s32 arg1) {
-    func_87E0BB5C();
-    func_87E0BFFC(arg0, arg1, 1);
-}
+void func_87E0C590(s32 arg0, s32 arg1) { func_87E0BB5C(); func_87E0BFFC(arg0, arg1, 1); }
 
 void WidgetTree_RunMessagePanelSilent_fragment63(s32 arg0, s32 arg1) {
     func_87E0BFFC(arg0, arg1, 0);

@@ -173,8 +173,7 @@ void func_87E06CB4(void *arg0) {
     *(s32 *)(state + 0x10) = func_87F08DF8(*(s32 *)(state + 0xC), 0x41000000, 0xC1180000, 0x0F000000);
 }
 
-void func_87E06D84(u8* arg0) {
-}
+void func_87E06D84(u8 *arg0) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E06D8C.s")
 

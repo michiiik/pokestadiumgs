@@ -17,8 +17,7 @@ void func_86200020(s32 arg0) {
     StageContext_SetClearColor(0xFFFF);
     StageFade_StartFromTransparent(0xA);
 }
-void func_86200020_padding(void) {
-}
+void func_86200020_padding(void) {}
 #endif
 
 #ifdef VERSION_US
@@ -139,8 +138,7 @@ s32 func_862007FC(s32 arg0, void *arg1) {
     }
     return 0;
 }
-void func_862007FC_padding(void) {
-}
+void func_862007FC_padding(void) {}
 #endif
 
 #ifdef VERSION_US

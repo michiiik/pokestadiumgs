@@ -3,10 +3,7 @@
 
 #ifdef VERSION_US
 extern u8 D_8800ED40; extern u8 D_8800ED41;
-void func_880022F0(void) {
-    D_8800ED40 = 10;
-    D_8800ED41 = 1;
-}
+void func_880022F0(void) { D_8800ED40 = 10; D_8800ED41 = 1; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_8800230C.s")
 

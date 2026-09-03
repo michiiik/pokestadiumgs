@@ -368,10 +368,7 @@ void func_82B038BC(void *arg0) {
 #ifdef VERSION_US
 extern s32 func_8004C990(s32, s32);
 extern void func_8004B35C(s32, s32, s32, s32, s32);
-void func_82B03934(s32 arg0, s32 arg1) {
-    s32 temp = func_8004C990(0x156, 0);
-    func_8004B35C(arg0, arg1, 0x78, 0x20, temp);
-}
+void func_82B03934(s32 arg0, s32 arg1) { s32 temp = func_8004C990(0x156, 0); func_8004B35C(arg0, arg1, 0x78, 0x20, temp); }
 #endif
 
 #ifdef VERSION_US

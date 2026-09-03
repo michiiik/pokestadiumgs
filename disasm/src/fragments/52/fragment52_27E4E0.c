@@ -333,13 +333,7 @@ void func_8640377C(void *arg0, void *arg1) {
 
 #ifdef VERSION_US
 extern u8 *D_86416C00;
-void func_86403CB4(void) {
-    void* node;
-    node = *(void**)(D_86416C00 + 0xE0C);
-    while (node != NULL) {
-        node = *(void**)((u8*)node + 4);
-    }
-}
+void func_86403CB4(void) { void *node; node = *(void **)(D_86416C00 + 0xE0C); while (node != NULL) { node = *(void **)((u8 *)node + 4); } }
 #endif
 
 #ifdef VERSION_US

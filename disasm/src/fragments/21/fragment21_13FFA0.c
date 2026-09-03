@@ -17,18 +17,7 @@ s32 func_82500020(s32 arg0, void *arg1) {
 
 #ifdef VERSION_US
 extern s32 D_82508F80;
-s32 func_82500064(s32 arg0, s32 arg1) {
-    switch (arg0) {
-        case 0:
-            D_82508F80 = arg1;
-            break;
-        case 1:
-            break;
-        default:
-            break;
-    }
-    return 0;
-}
+s32 func_82500064(s32 arg0, s32 arg1) { switch (arg0) { case 0: D_82508F80 = arg1; break; case 1: break; default: break; } return 0; }
 #endif
 
 #ifdef VERSION_US
@@ -101,20 +90,7 @@ s32 func_825001B4(s32 arg0, void *arg1) {
 extern u16 D_82508F88;
 extern s16 D_82508F96;
 extern s16 D_82508F98;
-s32 func_82501244(s32 arg0, void* arg1) {
-    s32 index;
-    u8* entry;
-    index = *(s32*)((u8*)arg1 + 0x20);
-    if ((arg0 != 0) && (arg0 == 1)) {
-        entry = (u8*)&D_82508F88 + index * 2;
-        if ((*(s16*)(entry + 0x34) == D_82508F96) && (*(s16*)(entry + 0x38) == D_82508F98)) {
-            *(u16*)((u8*)arg1 + 2) |= 2;
-        } else {
-            *(u16*)((u8*)arg1 + 2) &= 0xFFFD;
-        }
-    }
-    return 0;
-}
+s32 func_82501244(s32 arg0, void *arg1) { s32 index; u8 *entry; index = *(s32 *)((u8 *)arg1 + 0x20); if ((arg0 != 0) && (arg0 == 1)) { entry = (u8 *)&D_82508F88 + index * 2; if ((*(s16 *)(entry + 0x34) == D_82508F96) && (*(s16 *)(entry + 0x38) == D_82508F98)) { *(u16 *)((u8 *)arg1 + 2) |= 2; } else { *(u16 *)((u8 *)arg1 + 2) &= 0xFFFD; } } return 0; }
 #endif
 
 #ifdef VERSION_US
@@ -184,16 +160,7 @@ extern s32 D_82508F9C[];
 extern void func_8250850C(void);
 extern s32 func_8250865C(void);
 extern void func_800503A4(s32);
-void func_825020A8(void) {
-    u32 index;
-    if (D_82508F8C != 0) {
-        func_8250850C();
-        if (func_8250865C() != 0) {
-            index = D_82508F88 & 0xFF;
-            func_800503A4(D_82508F9C[index]);
-        }
-    }
-}
+void func_825020A8(void) { u32 index; if (D_82508F8C != 0) { func_8250850C(); if (func_8250865C() != 0) { index = D_82508F88 & 0xFF; func_800503A4(D_82508F9C[index]); } } }
 #endif
 
 #ifdef VERSION_US
@@ -360,18 +327,7 @@ s32 func_82503DDC(void)
 #ifdef VERSION_US
 extern s32 func_82502104(void);
 extern s32 func_82502114(void);
-s32 func_82503E50(void) {
-    s32 result;
-    result = 0;
-    if (func_82502104() != 0) {
-        if (func_82502114() == 0x201) {
-            result = 2;
-        } else {
-            result = 1;
-        }
-    }
-    return result;
-}
+s32 func_82503E50(void) { s32 result; result = 0; if (func_82502104() != 0) { if (func_82502114() == 0x201) { result = 2; } else { result = 1; } } return result; }
 #endif
 
 #ifdef VERSION_US

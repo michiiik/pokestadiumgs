@@ -28,26 +28,7 @@ extern s32 func_80064800(u8); extern void func_88902CF0(void *, void *, s8); voi
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D8160/func_88902E8C.s")
 
-u8 func_88903084(u8 arg0) {
-    u8 result = 0;
-    switch (arg0) {
-        case 0x1e:
-            result = 0x1f;
-            break;
-        case 0x21:
-            result = 0x22;
-            break;
-        case 0x23:
-            result = 0x24;
-            break;
-        case 0x27:
-            result = 0x28;
-            break;
-        default:
-            break;
-    }
-    return result;
-}
+u8 func_88903084(u8 arg0) { u8 result = 0; switch (arg0) { case 0x1e: result=0x1f; break; case 0x21: result=0x22; break; case 0x23: result=0x24; break; case 0x27: result=0x28; break; default: break; } return result; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D8160/func_889030D8.s")
 
@@ -67,20 +48,7 @@ u8 func_8890311C(u8 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D8160/func_889031A4.s")
 
-u8 func_889031EC(u8 arg0) {
-    u8 result = 0;
-    switch (arg0) {
-        case 0x2c:
-            result = 0xb6;
-            break;
-        case 0xbf:
-            result = 0xc0;
-            break;
-        default:
-            break;
-    }
-    return result;
-}
+u8 func_889031EC(u8 arg0) { u8 result = 0; switch (arg0) { case 0x2c: result=0xb6; break; case 0xbf: result=0xc0; break; default: break; } return result; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D8160/func_88903220.s")
 #endif

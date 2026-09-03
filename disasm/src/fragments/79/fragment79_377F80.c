@@ -247,8 +247,7 @@ void func_84109B1C(s32 arg0) {
 void func_84109B88(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
 }
 
-void func_84109B9C(u8* arg0) {
-}
+void func_84109B9C(u8 *arg0) {}
 
 void func_84109BA4(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
 }

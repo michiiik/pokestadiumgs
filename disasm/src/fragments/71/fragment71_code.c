@@ -34,8 +34,7 @@ void func_8F300020(void) {
     func_80055EF0(D_8F300F48, 0);
     func_80055EF0(D_8F300F60, 1);
 }
-void func_8F300020_padding(void) {
-}
+void func_8F300020_padding(void) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/71/fragment71_code/func_8F3000E8.s")
 

@@ -157,21 +157,15 @@ void func_810034C0(s32 arg0, Func810034C0StateD *state) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_15EA30/func_81003510.s")
 
-void func_81003524(s32 arg0, s32 arg1) {
-    if (arg0 == 5) {
-        arg1 = arg1;
-    }
-}
+void func_81003524(s32 arg0, s32 arg1) { if (arg0 == 5) { arg1 = arg1; } }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_15EA30/func_8100352C.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_15EA30/func_81003680.s")
 
-void func_81003750(u8* arg0, s32 arg1) {
-}
+void func_81003750(u8 *arg0, s32 arg1) {}
 
-void func_8100375C(u8* arg0, s32 arg1) {
-}
+void func_8100375C(u8 *arg0, s32 arg1) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_15EA30/func_81003768.s")
 #endif

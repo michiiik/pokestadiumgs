@@ -68,10 +68,7 @@ void func_88230A38(void) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A3960/func_88230A88.s")
 
 extern void func_889033A0(s32);
-void func_88230B2C(void) {
-    func_889033A0((D_882349B0 + 236));
-    func_8821D930((D_882349B0 + 8));
-}
+void func_88230B2C(void) { func_889033A0((D_882349B0 + 236)); func_8821D930((D_882349B0 + 8)); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A3960/func_88230B64.s")
 

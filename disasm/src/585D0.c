@@ -17,14 +17,10 @@ void func_800579E8(u8 *arg0, u16 arg1)
 #endif
 
 #ifdef VERSION_US
-void func_800579FC(void) {
-}
-void func_800579FC_padding(void) {
-}
-void func_800579FC_padding2(void) {
-}
-void func_800579FC_padding3(void) {
-}
+void func_800579FC(void) {}
+void func_800579FC_padding(void) {}
+void func_800579FC_padding2(void) {}
+void func_800579FC_padding3(void) {}
 #endif
 
 #ifdef VERSION_US
@@ -216,10 +212,8 @@ extern u8 D_801285D8[];
 void func_80058D98(s32 arg0) {
     func_80057BCC(arg0, *(s32 *)(D_801285D8 + arg0 * 112), 0x600, 0x640);
 }
-void func_80058D98_padding(void) {
-}
-void func_80058D98_padding2(void) {
-}
+void func_80058D98_padding(void) {}
+void func_80058D98_padding2(void) {}
 #endif
 
 #ifdef VERSION_US
@@ -1136,11 +1130,7 @@ u8 func_8005E03C(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-void func_8005E07C(s32 arg0, u8 arg1) {
-    u8* entry = D_80128570 + arg0 * 0x70;
-    if ((*(u32*)entry & 2) != 0)
-        *(u8*)(*(u8**)(entry + 0x68) + 0x5E5) = arg1;
-}
+void func_8005E07C(s32 arg0, u8 arg1) { u8 *entry = D_80128570 + arg0 * 0x70; if ((*(u32 *)entry & 2) != 0) *(u8 *)(*(u8 **)(entry + 0x68) + 0x5E5) = arg1; }
 #endif
 
 #ifdef VERSION_US

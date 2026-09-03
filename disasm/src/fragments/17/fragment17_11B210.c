@@ -116,10 +116,7 @@ void func_8220C42C(u8 *arg0, u8 *arg1, s16 *arg2) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_11B210/func_8220D630.s")
 
 extern s16 D_82210C38;
-s32 func_8220D670(void) {
-    s32 result = D_82210C38;
-    return result;
-}
+s32 func_8220D670(void) { s32 result = D_82210C38; return result; }
 
 extern s16 D_82210C30;
 extern s16 D_82210C32;

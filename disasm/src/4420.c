@@ -210,11 +210,7 @@ s32 Jpeg_DecodeImage(u32 addr, s32 arg1, u8 *arg2)
   return var_s2;
 }
 
-void Dma_InitializeCompletionQueue(void) {
-    extern OSMesgQueue D_800CD000;
-    extern OSMesg D_800CD018[];
-    osCreateMesgQueue(&D_800CD000, D_800CD018, 1);
-}
+void Dma_InitializeCompletionQueue(void) { extern OSMesgQueue D_800CD000; extern OSMesg D_800CD018[]; osCreateMesgQueue(&D_800CD000, D_800CD018, 1); }
 
 typedef struct S1_PERSSZP S1_PERSSZP;
 struct S1_PERSSZP {
@@ -278,9 +274,7 @@ s32 func_80003E84(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     return 0;
 }
 
-s32 func_80003F54(s32 arg0) {
-    return osFlashSectorErase(arg0 << 7);
-}
+s32 func_80003F54(s32 arg0) { return osFlashSectorErase(arg0 << 7); }
 
 extern void Dma_QueueRomRead(s32, u8 *, u8 *, s32, OSMesgQueue *, s32);
 void func_80003F74(u8 *arg0, u8 *arg1, u8 *arg2, s32 arg3) {

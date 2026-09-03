@@ -171,27 +171,17 @@ s32 func_8000D0CC(s32 arg0, u8 *arg1, s16 arg2)
 #endif
 
 #ifdef VERSION_US
-void func_8000D880(u8* arg0, s32 arg1, s32 arg2) {
-    *(u32*)(arg0 + 0) = ((u32)arg1 & 0x00FFFFFF) | 0x02000000;
-    *(u32*)(arg0 + 4) = arg2;
-}
+void func_8000D880(u8 *arg0, s32 arg1, s32 arg2) { *(u32 *)(arg0 + 0) = ((u32)arg1 & 0x00FFFFFF) | 0x02000000; *(u32 *)(arg0 + 4) = arg2; }
 #endif
 
 #ifdef VERSION_US
-void func_8000D8A0(void) {
-}
-void func_8000D8A0_padding(void) {
-}
-void func_8000D8A0_padding2(void) {
-}
-void func_8000D8A0_padding3(void) {
-}
-void func_8000D8A0_padding4(void) {
-}
-void func_8000D8A0_padding5(void) {
-}
-void func_8000D8A0_padding6(void) {
-}
+void func_8000D8A0(void) {}
+void func_8000D8A0_padding(void) {}
+void func_8000D8A0_padding2(void) {}
+void func_8000D8A0_padding3(void) {}
+void func_8000D8A0_padding4(void) {}
+void func_8000D8A0_padding5(void) {}
+void func_8000D8A0_padding6(void) {}
 #endif
 
 #ifdef VERSION_US
@@ -204,10 +194,8 @@ void func_8000D8D8(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4)
 #endif
 
 #ifdef VERSION_US
-void func_8000D90C(void) {
-}
-void func_8000D90C_padding(void) {
-}
+void func_8000D90C(void) {}
+void func_8000D90C_padding(void) {}
 #endif
 
 #ifdef VERSION_US
@@ -219,14 +207,10 @@ void func_8000D91C(void *arg0, s32 arg1, s32 arg2, s32 arg3)
 #endif
 
 #ifdef VERSION_US
-void func_8000D948(void) {
-}
-void func_8000D948_padding(void) {
-}
-void func_8000D948_padding2(void) {
-}
-void func_8000D948_padding3(void) {
-}
+void func_8000D948(void) {}
+void func_8000D948_padding(void) {}
+void func_8000D948_padding2(void) {}
+void func_8000D948_padding3(void) {}
 #endif
 
 #ifdef VERSION_US
@@ -269,19 +253,13 @@ void func_8000D9F8(void *arg0, s32 arg1, s32 arg2)
 #endif
 
 #ifdef VERSION_US
-void func_8000DA14(void) {
-}
-void func_8000DA14_padding(void) {
-}
-void func_8000DA14_padding2(void) {
-}
+void func_8000DA14(void) {}
+void func_8000DA14_padding(void) {}
+void func_8000DA14_padding2(void) {}
 #endif
 
 #ifdef VERSION_US
-void func_8000DA2C(u8* arg0, s32 arg1, s32 arg2) {
-    *(u32*)(arg0 + 0) = 0x17000000 | (((u32)arg1 & 0xFF) << 16);
-    *(u32*)(arg0 + 4) = arg2;
-}
+void func_8000DA2C(u8 *arg0, s32 arg1, s32 arg2) { *(u32 *)(arg0 + 0) = 0x17000000 | (((u32)arg1 & 0xFF) << 16); *(u32 *)(arg0 + 4) = arg2; }
 #endif
 
 #ifdef VERSION_US
@@ -301,36 +279,22 @@ void func_8000DA7C(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4)
 #endif
 
 #ifdef VERSION_US
-void ParticleGfx_NoopStub2(void) {
-}
-void func_8000DAA8_padding(void) {
-}
-void func_8000DAA8_padding2(void) {
-}
-void func_8000DAA8_padding3(void) {
-}
-void func_8000DAA8_padding4(void) {
-}
-void func_8000DAA8_padding5(void) {
-}
-void func_8000DAA8_padding6(void) {
-}
-void func_8000DAA8_padding7(void) {
-}
+void ParticleGfx_NoopStub2(void) {}
+void func_8000DAA8_padding(void) {}
+void func_8000DAA8_padding2(void) {}
+void func_8000DAA8_padding3(void) {}
+void func_8000DAA8_padding4(void) {}
+void func_8000DAA8_padding5(void) {}
+void func_8000DAA8_padding6(void) {}
+void func_8000DAA8_padding7(void) {}
 #endif
 
 #ifdef VERSION_US
-void func_8000DAE8(u8* arg0, s32 arg1, s32 arg2, s32 arg3) {
-    *(u32*)(arg0 + 0) = 0x07000000 | (((u32)arg1 & 0xFF) << 16) | ((u32)arg2 & 0xFFFF);
-    *(u32*)(arg0 + 4) = arg3;
-}
+void func_8000DAE8(u8 *arg0, s32 arg1, s32 arg2, s32 arg3) { *(u32 *)(arg0 + 0) = 0x07000000 | (((u32)arg1 & 0xFF) << 16) | ((u32)arg2 & 0xFFFF); *(u32 *)(arg0 + 4) = arg3; }
 #endif
 
 #ifdef VERSION_US
-void func_8000DB0C(u8* arg0, s32 arg1, s32 arg2) {
-    *(u32*)(arg0 + 0) = 0x07020000 | ((u32)arg1 & 0xFFFF);
-    *(u32*)(arg0 + 4) = arg2;
-}
+void func_8000DB0C(u8 *arg0, s32 arg1, s32 arg2) { *(u32 *)(arg0 + 0) = 0x07020000 | ((u32)arg1 & 0xFFFF); *(u32 *)(arg0 + 4) = arg2; }
 #endif
 
 #ifdef VERSION_US

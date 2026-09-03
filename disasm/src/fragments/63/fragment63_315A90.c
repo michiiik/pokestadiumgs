@@ -357,10 +357,7 @@ void func_87E13458(void) {
     func_8003C6B8(*(s32*)(D_87E1EBD8 + 0x28));
 }
 
-void func_87E13480(u8* arg0) {
-    extern u8* D_87E1EBD8;
-    *(u8**)(D_87E1EBD8 + 4) = arg0;
-}
+void func_87E13480(u8 *arg0) { extern u8 *D_87E1EBD8; *(u8 **)(D_87E1EBD8 + 4) = arg0; }
 
 void func_87E13490(void) {
     *(u32 *)D_87E1EBD8 |= 1;

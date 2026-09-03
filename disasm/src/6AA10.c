@@ -2,16 +2,11 @@
 
 
 #ifdef VERSION_US
-void func_80069E10(void) {
-}
-void func_80069E10_padding(void) {
-}
-void func_80069E10_padding2(void) {
-}
-void func_80069E10_padding3(void) {
-}
-void func_80069E10_padding4(void) {
-}
+void func_80069E10(void) {}
+void func_80069E10_padding(void) {}
+void func_80069E10_padding2(void) {}
+void func_80069E10_padding3(void) {}
+void func_80069E10_padding4(void) {}
 
 extern void _bzero(void *, s32);
 extern void main_pool_push_state(s32);

@@ -14,14 +14,7 @@ s32 func_80064C88(void) {
 #endif
 
 #ifdef VERSION_US
-s32 func_80064C94(s32 value) {
-    s32 result = 0;
-    if (value >= 0 && value < 4) {
-        D_80128BE0 = value;
-        result = 1;
-    }
-    return result;
-}
+s32 func_80064C94(s32 value) { s32 result = 0; if (value >= 0 && value < 4) { D_80128BE0 = value; result = 1; } return result; }
 #endif
 
 #ifdef VERSION_US
@@ -76,11 +69,7 @@ s32 Fragment_LoadAndCall(s32 arg0, u8* romStart, u8* romEnd, u32 arg3, u32 arg4)
 extern void Cont_StartReadInputs();
 extern void func_80005F0C();
 extern void func_80049ED0();
-void func_80064D28(void) {
-    Cont_StartReadInputs();
-    func_80005F0C();
-    func_80049ED0();
-}
+void func_80064D28(void) { Cont_StartReadInputs(); func_80005F0C(); func_80049ED0(); }
 #endif
 
 #ifdef VERSION_US
@@ -115,15 +104,7 @@ void func_80064DF4(void) {
 #ifdef VERSION_US
 extern s32 D_8009DE94;
 extern s32 D_80128BE4;
-s32 Game_SetState(s32 value) {
-    s32 result = 0;
-    if (value != D_8009DE94) {
-        D_80128BE4 = D_8009DE94;
-        D_8009DE94 = value;
-        result = 1;
-    }
-    return result;
-}
+s32 Game_SetState(s32 value) { s32 result = 0; if (value != D_8009DE94) { D_80128BE4 = D_8009DE94; D_8009DE94 = value; result = 1; } return result; }
 #endif
 
 #ifdef VERSION_US
@@ -209,6 +190,5 @@ void func_80064F54(void) {
 #endif
 
 #ifdef VERSION_US
-void func_80065210(s32 arg0) {
-}
+void func_80065210(s32 arg0) { }
 #endif

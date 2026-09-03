@@ -371,11 +371,7 @@ extern void func_80024F20(void); void func_8AB00BA4(void) { func_80024F20(); }
 extern s16 D_8AB12692;
 extern s16 D_8AB12694;
 extern s16 D_8AB12698;
-void func_8AB01288(void) {
-    D_8AB12692 = 0;
-    D_8AB12694 = 0;
-    D_8AB12698 = 0;
-}
+void func_8AB01288(void) { D_8AB12692 = 0; D_8AB12694 = 0; D_8AB12698 = 0; }
 #endif
 
 #ifdef VERSION_US
@@ -705,10 +701,8 @@ extern void func_8AB01288(void); extern void func_8AB02D14(void); void func_8AB0
 #endif
 
 #ifdef VERSION_US
-void func_8AB04ED8(void) {
-}
-void func_8AB04ED8_padding(void) {
-}
+void func_8AB04ED8(void) {}
+void func_8AB04ED8_padding(void) {}
 #endif
 
 #ifdef VERSION_US

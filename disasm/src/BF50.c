@@ -52,11 +52,7 @@ s16 MathUtil_Atan2s(f32 y, f32 x) {
     return ret;
 }
 
-s32 MathUtil_Random16(void) {
-    return guRandom() & 0xFFFF;
-}
+s32 MathUtil_Random16(void) { return guRandom() & 0xFFFF; }
 
-f32 MathUtil_Random_ZeroOne(void) {
-    return (f32)MathUtil_Random16() / 65536.0f;
-}
+f32 MathUtil_Random_ZeroOne(void) { return (f32)MathUtil_Random16() / 65536.0f; }
 #endif

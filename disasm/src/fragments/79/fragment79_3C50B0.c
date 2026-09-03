@@ -153,6 +153,5 @@ void func_8415680C(void) {
 }
 
 #ifdef VERSION_US
-void func_84156814(void) {
-}
+void func_84156814(void) {}
 #endif

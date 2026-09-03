@@ -362,8 +362,7 @@ void func_8600AAD4(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_8600B328.s")
 
-void func_8600B468(u8* arg0, s32 arg1) {
-}
+void func_8600B468(u8 *arg0, s32 arg1) {}
 
 extern Gfx *D_800D0510;
 extern u8 D_80094E38[];

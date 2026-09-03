@@ -256,11 +256,7 @@ void func_82908CF4(f32 *arg0, f32 *arg1, f32 *arg2, s16 arg3) {
 #endif
 
 #ifdef VERSION_US
-void func_82908E50(f32* arg0, f32* arg1) {
-    arg0[0] = arg1[0];
-    arg0[1] = arg1[1];
-    arg0[2] = arg1[2];
-}
+void func_82908E50(f32 *arg0, f32 *arg1) { arg0[0] = arg1[0]; arg0[1] = arg1[1]; arg0[2] = arg1[2]; }
 #endif
 
 #ifdef VERSION_US
@@ -776,31 +772,7 @@ void BattleAnim_Fragment67Dispatch_037(void) {
 
 #ifdef VERSION_US
 extern s16 D_8291B828; extern s32 D_8291A380; extern s16 D_8291B85C; extern s16 D_8291B85E; extern s16 D_8291B860; extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32); extern void func_800371B4(s32, s32, f32, s16, s32);
-void BattleAnim_Fragment67Dispatch_041(void) {
-    s16 mode;
-    mode = D_8291B828;
-    switch (mode) {
-        case 0x24:
-            Vec3f_SetComponentsDuplicate(D_8291A380 + 0xB4, 0.0f, 30.0f, 0.0f);
-            D_8291B85C = -0x400;
-            D_8291B85E = 0x3A00;
-            D_8291B860 = 0x78;
-            break;
-        case 0x25:
-            Vec3f_SetComponentsDuplicate(D_8291A380 + 0xB4, 0.0f, 30.0f, 0.0f);
-            D_8291B85C = -0x800;
-            D_8291B85E = 0x4500;
-            D_8291B860 = 0x96;
-            break;
-        case 0x26:
-            Vec3f_SetComponentsDuplicate(D_8291A380 + 0xB4, 0.0f, 30.0f, 0.0f);
-            D_8291B85C = -0x400;
-            D_8291B85E = 0x3700;
-            D_8291B860 = 0x96;
-            break;
-    }
-    func_800371B4(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E);
-}
+void BattleAnim_Fragment67Dispatch_041(void) { s16 mode; mode = D_8291B828; switch (mode) { case 0x24: Vec3f_SetComponentsDuplicate(D_8291A380 + 0xB4, 0.0f, 30.0f, 0.0f); D_8291B85C = -0x400; D_8291B85E = 0x3A00; D_8291B860 = 0x78; break; case 0x25: Vec3f_SetComponentsDuplicate(D_8291A380 + 0xB4, 0.0f, 30.0f, 0.0f); D_8291B85C = -0x800; D_8291B85E = 0x4500; D_8291B860 = 0x96; break; case 0x26: Vec3f_SetComponentsDuplicate(D_8291A380 + 0xB4, 0.0f, 30.0f, 0.0f); D_8291B85C = -0x400; D_8291B85E = 0x3700; D_8291B860 = 0x96; break; } func_800371B4(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E); }
 #endif
 
 #ifdef VERSION_US

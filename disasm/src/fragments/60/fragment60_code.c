@@ -491,8 +491,7 @@ void func_86A0C8DC(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-void func_86A0C9AC(u8* arg0) {
-}
+void func_86A0C9AC(u8 *arg0) {}
 #endif
 
 #ifdef VERSION_US

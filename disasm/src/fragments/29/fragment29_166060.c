@@ -59,12 +59,7 @@ void func_88000488(s32 *arg0, s32 arg1) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_166060/func_88000578.s")
 
 extern u8 D_8800ED28[];
-void func_880006BC(u8* arg0) {
-    struct S {
-        u8 a, b, c;
-    };
-    *(struct S*)&D_8800ED28 = *(struct S*)arg0;
-}
+void func_880006BC(u8 *arg0) { struct S { u8 a,b,c; }; *(struct S *)&D_8800ED28 = *(struct S *)arg0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_166060/func_880006E0.s")
 

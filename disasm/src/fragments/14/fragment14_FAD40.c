@@ -63,15 +63,13 @@ void func_81302E58(void *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FAD40/func_813031D8.s")
 
-void func_81303228(u8* arg0) {
-}
+void func_81303228(u8 *arg0) {}
 
 void func_81303230(u8 *arg0) {
     arg0[0x4DC4] += 1;
 }
 
-void func_81303240(u8* arg0) {
-}
+void func_81303240(u8 *arg0) {}
 
 extern s32 func_8160A920(void);
 extern s32 func_8130A708(u8 *arg0);

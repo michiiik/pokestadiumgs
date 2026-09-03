@@ -5,10 +5,7 @@
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_32C420/func_87F097B0.s")
 
 extern void _bzero(void *, s32);
-void func_87F09870(s32* arg0) {
-    _bzero(arg0, 0x1C);
-    *arg0 = 0;
-}
+void func_87F09870(s32 *arg0) { _bzero(arg0, 0x1C); *arg0 = 0; }
 
 extern void func_800279C4(s32);
 void func_87F0989C(void *arg0) {

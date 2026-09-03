@@ -13,13 +13,11 @@ void func_862055E8(void) {
 #endif
 
 #ifdef VERSION_US
-void func_86205724(u8* arg0) {
-}
+void func_86205724(u8 *arg0) {}
 #endif
 
 #ifdef VERSION_US
-void func_8620572C(u8* arg0, s32 arg1, s32 arg2) {
-}
+void func_8620572C(u8 *arg0, s32 arg1, s32 arg2) {}
 #endif
 
 #ifdef VERSION_US

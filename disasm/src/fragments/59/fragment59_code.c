@@ -37,8 +37,7 @@ s32 func_86900138(s32 arg0, void *arg1) {
     }
     return 0;
 }
-void func_86900138_padding(void) {
-}
+void func_86900138_padding(void) {}
 #endif
 
 #ifdef VERSION_US

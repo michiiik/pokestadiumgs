@@ -18,17 +18,7 @@ s32 func_82905EE4(s32 arg0, u8 *arg1) {
 }
 
 extern s16 D_829199F8;
-s32 func_82905F00(s32 arg0, u8* arg1) {
-    if (arg0 == 0)
-        *(s16*)(arg1 + 0x1A) = 0;
-    if (arg0 == 2) {
-        if (D_829199F8 >= 7)
-            *(s16*)(arg1 + 0x1A) = 1;
-        else
-            *(s16*)(arg1 + 0x1A) = 0;
-    }
-    return 0;
-}
+s32 func_82905F00(s32 arg0, u8 *arg1) { if (arg0 == 0) *(s16 *)(arg1 + 0x1A) = 0; if (arg0 == 2) { if (D_829199F8 >= 7) *(s16 *)(arg1 + 0x1A) = 1; else *(s16 *)(arg1 + 0x1A) = 0; } return 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_3422F0/func_82905F40.s")
 

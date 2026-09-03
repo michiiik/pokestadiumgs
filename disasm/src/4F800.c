@@ -246,16 +246,7 @@ void func_8005053C(void *arg0, u8 *arg1) {
 #endif
 
 #ifdef VERSION_US
-void func_80050578(u8* arg0, s32 arg1) {
-    if (arg0 != NULL) {
-        u8* value = *(u8**)(arg0 + 0x34);
-        if (value != NULL) {
-            *(s16*)(value + 0) = -1;
-            *(s16*)(value + 2) = 0;
-            *(s32*)(value + 8) = arg1;
-        }
-    }
-}
+void func_80050578(u8 *arg0, s32 arg1) { if (arg0 != NULL) { u8 *value = *(u8 **)(arg0 + 0x34); if (value != NULL) { *(s16 *)(value + 0) = -1; *(s16 *)(value + 2) = 0; *(s32 *)(value + 8) = arg1; } } }
 #endif
 
 #ifdef VERSION_US

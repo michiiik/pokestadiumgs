@@ -92,10 +92,8 @@ void func_8AF00620(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1EE290/func_8AF00690.s")
 
-void func_8AF00760(void) {
-}
-void func_8AF00760_padding(void) {
-}
+void func_8AF00760(void) {}
+void func_8AF00760_padding(void) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1EE290/func_8AF00770.s")
 
@@ -160,9 +158,7 @@ s32 func_8AF013D8(s32 mode, void *record) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1EE290/func_8AF01530.s")
 
 extern s16 D_8AF263F0[];
-s16 Trade_GetSelectedBox(s16 arg0) {
-    return D_8AF263F0[arg0];
-}
+s16 Trade_GetSelectedBox(s16 arg0) { return D_8AF263F0[arg0]; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1EE290/func_8AF01618.s")
 
@@ -176,8 +172,7 @@ void func_8AF016BC(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
     gSPDisplayList(D_800D0510++, D_80094E38);
     Ui_DrawGradientPanel(arg0, arg1, arg2, arg3, arg4, arg5);
 }
-void func_8AF016BC_padding(void) {
-}
+void func_8AF016BC_padding(void) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1EE290/func_8AF01718.s")
 
@@ -190,11 +185,7 @@ void func_8AF01750(void) {
 
 extern Gfx *D_800D0510;
 extern u8 D_8AF26418[];
-void Font_EndTexturedTextRendering_fragment44(void) {
-    Gfx* temp_v1 = D_800D0510++;
-    temp_v1->words.w0 = 0xDE000000;
-    temp_v1->words.w1 = (u32)D_8AF26418;
-}
+void Font_EndTexturedTextRendering_fragment44(void) { Gfx *temp_v1 = D_800D0510++; temp_v1->words.w0 = 0xDE000000; temp_v1->words.w1 = (u32)D_8AF26418; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1EE290/func_8AF017A4.s")
 

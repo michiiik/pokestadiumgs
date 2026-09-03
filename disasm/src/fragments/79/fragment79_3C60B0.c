@@ -9,10 +9,8 @@ void func_84156820(void) {
     func_84169B80();
     _bzero(D_8419F070, 0x5C90);
 }
-void func_84156820_padding(void) {
-}
-void func_84156820_padding2(void) {
-}
+void func_84156820_padding(void) {}
+void func_84156820_padding2(void) {}
 #endif
 
 #ifdef VERSION_US
@@ -28,10 +26,8 @@ s32 func_84156868(void) {
 #endif
 
 #ifdef VERSION_US
-void func_84156870(void) {
-}
-void func_84156870_padding(void) {
-}
+void func_84156870(void) {}
+void func_84156870_padding(void) {}
 #endif
 
 #ifdef VERSION_US

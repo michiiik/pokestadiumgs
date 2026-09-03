@@ -352,23 +352,12 @@ void func_82C034C8(void) {
 
 #ifdef VERSION_US
 extern void func_8004C8C0(s32);
-void func_82C03524(void) {
-    func_8004C8C0(0x101);
-    func_8004C8C0(0x102);
-    func_8004C8C0(0x33);
-    func_8004C8C0(0x79);
-    func_8004C8C0(0x1B);
-    func_8004C8C0(0x1C);
-    func_8004C8C0(0x123);
-}
+void func_82C03524(void) { func_8004C8C0(0x101); func_8004C8C0(0x102); func_8004C8C0(0x33); func_8004C8C0(0x79); func_8004C8C0(0x1B); func_8004C8C0(0x1C); func_8004C8C0(0x123); }
 #endif
 
 #ifdef VERSION_US
 extern void func_8004C4B0();
-void func_82C03574(void) {
-    func_8004C4B0(21);
-    func_8004C4B0(19);
-}
+void func_82C03574(void) { func_8004C4B0(21); func_8004C4B0(19); }
 #endif
 
 #ifdef VERSION_US

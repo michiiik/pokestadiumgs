@@ -159,11 +159,7 @@ s32 func_8001CB5C(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1CDC0/func_8001CB9C.s")
 
-u8 func_8001CC3C(u8** arg0) {
-    u8 result = **arg0;
-    (*arg0)++;
-    return result;
-}
+u8 func_8001CC3C(u8 **arg0) { u8 result = **arg0; (*arg0)++; return result; }
 
 s16 func_8001CC50(u8 **arg0) {
     s16 value;

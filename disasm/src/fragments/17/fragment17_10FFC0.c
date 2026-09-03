@@ -27,14 +27,7 @@ void func_82200CB4(void) {
     func_8004C8C0(0x93);
 }
 
-s32 func_82200CEC(s32 a0) {
-    s32 v1 = 0;
-    volatile s32* p = &a0;
-    a0 &= 0xFF;
-    if (a0 == 1 || a0 == 2 || a0 == 3 || a0 == 4)
-        v1 = 1;
-    return v1;
-}
+s32 func_82200CEC(s32 a0){s32 v1=0;volatile s32 *p=&a0;a0&=0xFF;if(a0==1||a0==2||a0==3||a0==4)v1=1;return v1;}
 
 void func_82200D28(void *arg0, s32 arg1)
 {
@@ -224,11 +217,7 @@ s32 func_82202B80(s32 arg0, u8 *arg1) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82203210.s")
 
 extern Gfx *D_800D0510;
-s32 func_8220336C(s32 arg0, s32 arg1) {
-    gDPPipeSync(D_800D0510++);
-    gDPSetEnvColor(D_800D0510++, 0xFF, 0xFF, 0, 0xFF);
-    return 0;
-}
+s32 func_8220336C(s32 arg0, s32 arg1) { gDPPipeSync(D_800D0510++); gDPSetEnvColor(D_800D0510++, 0xFF, 0xFF, 0, 0xFF); return 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_822033BC.s")
 
@@ -246,17 +235,7 @@ void func_82203A84(void) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82203A98.s")
 
 extern void *D_80087200; extern void func_800226C0(s32);
-s32 func_82203B3C(void) {
-    s32 result = 0;
-    if ((*(u16*)((u8*)D_80087200 + 8) & 0x8000) != 0) {
-        func_800226C0(0x33);
-        result = 1;
-    } else if ((*(u16*)((u8*)D_80087200 + 8) & 0x4000) != 0) {
-        func_800226C0(3);
-        result = -1;
-    }
-    return result;
-}
+s32 func_82203B3C(void) { s32 result = 0; if ((*(u16 *)((u8 *)D_80087200 + 8) & 0x8000) != 0) { func_800226C0(0x33); result = 1; } else if ((*(u16 *)((u8 *)D_80087200 + 8) & 0x4000) != 0) { func_800226C0(3); result = -1; } return result; }
 
 extern s32 D_8220D784;
 extern s32 D_8220E4BC;
@@ -275,11 +254,7 @@ void func_82203B98(void) {
 extern void func_822014D8();
 extern void StageFade_StartFromTransparent();
 extern void func_80035424();
-void func_82203E40(void) {
-    func_822014D8();
-    StageFade_StartFromTransparent(5);
-    func_80035424(15);
-}
+void func_82203E40(void) { func_822014D8(); StageFade_StartFromTransparent(5); func_80035424(15); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82203E70.s")
 

@@ -28,9 +28,7 @@ void func_8004C088(s32 arg0, s32 arg1) {
 
 extern s32 D_80097120; void func_8004C398(void) { D_80097120 = 0; }
 
-void func_8004C3A4(s32 unused, u8* arg1) {
-    *(s32*)arg1 = 0;
-}
+void func_8004C3A4(s32 unused, u8 *arg1) { *(s32 *)arg1 = 0; }
 
 s32 func_8004C3B0(s32 arg0, s32 arg1) {
     s32 result;
@@ -154,37 +152,13 @@ s32 func_8004C990(s32 arg0, s32 arg1) {
     return var_v1;
 }
 
-u16 func_8004CA10(u16* arg0) {
-    u16 value = 0;
-    if (arg0 != NULL) {
-        value = *arg0;
-    }
-    return value;
-}
+u16 func_8004CA10(u16 *arg0) { u16 value = 0; if (arg0 != NULL) { value = *arg0; } return value; }
 
-u16 func_8004CA24(u16* arg0) {
-    u16 value = 0;
-    if (arg0 != NULL) {
-        value = arg0[1];
-    }
-    return value;
-}
+u16 func_8004CA24(u16 *arg0) { u16 value = 0; if (arg0 != NULL) { value = arg0[1]; } return value; }
 
-s32 func_8004CA38(u8* arg0) {
-    s32 value = -1;
-    if (arg0 != NULL) {
-        value = arg0[4];
-    }
-    return value;
-}
+s32 func_8004CA38(u8 *arg0) { s32 value = -1; if (arg0 != NULL) { value = arg0[4]; } return value; }
 
-s32 func_8004CA4C(u8* arg0) {
-    s32 value = -1;
-    if (arg0 != NULL) {
-        value = arg0[5];
-    }
-    return value;
-}
+s32 func_8004CA4C(u8 *arg0) { s32 value = -1; if (arg0 != NULL) { value = arg0[5]; } return value; }
 
 u8 *func_8004CA60(u8 *arg0) { u8 *value = NULL; if (arg0 != NULL) { value = arg0 + 8; } return value; }
 
@@ -257,12 +231,7 @@ s32 func_8004D27C(u8 *arg0, s32 arg1, s32 arg2) {
     return sp54;
 }
 
-s32 func_8004D314(s32 arg0, s32 arg1) {
-    s32 result = -1;
-    if (arg0 == 0xEF && arg1 == 0)
-        result = 0;
-    return result;
-}
+s32 func_8004D314(s32 arg0, s32 arg1) { s32 result = -1; if (arg0 == 0xEF && arg1 == 0) result = 0; return result; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D334.s")
 
@@ -303,22 +272,10 @@ s32 func_8004D43C(s32 arg0, s32 arg1)
 
 extern s32 D_80097120;
 extern s32 func_8004C3EC(s32, s32, s32);
-s32 func_8004D690(s32 value) {
-    s32 result = 0;
-    s32 ptr = D_80097120;
-    if (ptr != 0 && *(s32*)((u8*)(u32)ptr + 0xC) != 0)
-        result = func_8004C3EC(*(s32*)((u8*)(u32)ptr + 0xC), value, 1);
-    return result;
-}
+s32 func_8004D690(s32 value) { s32 result = 0; s32 ptr = D_80097120; if (ptr != 0 && *(s32 *)((u8 *)(u32)ptr + 0xC) != 0) result = func_8004C3EC(*(s32 *)((u8 *)(u32)ptr + 0xC), value, 1); return result; }
 
 extern s32 func_8004C468(s32, s32);
-s32 func_8004D6D8(s32 value) {
-    s32 result = 0;
-    s32 ptr = D_80097120;
-    if (ptr != 0 && *(s32*)((u8*)(u32)ptr + 0xC) != 0)
-        result = func_8004C468(*(s32*)((u8*)(u32)ptr + 0xC), value);
-    return result;
-}
+s32 func_8004D6D8(s32 value) { s32 result = 0; s32 ptr = D_80097120; if (ptr != 0 && *(s32 *)((u8 *)(u32)ptr + 0xC) != 0) result = func_8004C468(*(s32 *)((u8 *)(u32)ptr + 0xC), value); return result; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D720.s")
 

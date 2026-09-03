@@ -284,22 +284,12 @@ void func_8004EA60(void) {
     D_80128098 += 0x24;
 }
 
-s32 func_8004EB1C(s32 value) {
-    s32 result = value;
-    if (value > 0)
-        result = 1 << (value + 31);
-    return result;
-}
+s32 func_8004EB1C(s32 value) { s32 result = value; if (value > 0) result = 1 << (value + 31); return result; }
 
-u16 func_8004EB38(u16* arg0) {
-    return *arg0;
-}
+u16 func_8004EB38(u16 *arg0) { return *arg0; }
 
 extern u8 D_80097154[];
-s32 func_8004EB40(u16* arg0) {
-    u16 index = *arg0;
-    return *(s32*)(D_80097154 + (index * 8));
-}
+s32 func_8004EB40(u16 *arg0) { u16 index = *arg0; return *(s32 *)(D_80097154 + (index * 8)); }
 
 extern u8 D_80097150[];
 s32 func_8004EB58(s32 arg0, s32 arg1) {

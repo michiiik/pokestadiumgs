@@ -38,17 +38,7 @@ s8 *func_8000B5B0(s8 *arg0, s8 *arg1) {
     return arg0;
 }
 
-s32 HAL_Strcmp(const s8* a, const s8* b) {
-    s8 ca = *a;
-    s8 cb = *b;
-    while (ca == cb) {
-        if (ca == 0)
-            return 0;
-        ca = *++a;
-        cb = *++b;
-    }
-    return ca - cb;
-}
+s32 HAL_Strcmp(const s8 *a, const s8 *b) { s8 ca = *a; s8 cb = *b; while (ca == cb) { if (ca == 0) return 0; ca = *++a; cb = *++b; } return ca - cb; }
 
 char *HAL_Memset(char *dest, s32 c, u32 nsize) {
     char *newDest = dest;

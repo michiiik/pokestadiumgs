@@ -2,37 +2,29 @@
 
 
 #ifdef VERSION_US
-void func_84105CA0(u8* arg0) {
-}
+void func_84105CA0(u8 *arg0) {}
 #endif
 
 void func_84105CA8(void) {
 }
 
 #ifdef VERSION_US
-void func_84105CB0(u8* arg0) {
-}
+void func_84105CB0(u8 *arg0) {}
 #endif
 
 #ifdef VERSION_US
-void func_84105CB8(u8* arg0) {
-}
+void func_84105CB8(u8 *arg0) {}
 #endif
 
 #ifdef VERSION_US
-void func_84105CC0(u8* arg0) {
-}
+void func_84105CC0(u8 *arg0) {}
 #endif
 
 #ifdef VERSION_US
-void func_84105CC8(void) {
-}
-void func_84105CC8_padding(void) {
-}
-void func_84105CC8_padding2(void) {
-}
-void func_84105CC8_padding3(void) {
-}
+void func_84105CC8(void) {}
+void func_84105CC8_padding(void) {}
+void func_84105CC8_padding2(void) {}
+void func_84105CC8_padding3(void) {}
 #endif
 
 void func_84105CE8(void) {
@@ -42,8 +34,7 @@ void func_84105CF0(void) {
 }
 
 #ifdef VERSION_US
-void func_84105CF8(u8* arg0) {
-}
+void func_84105CF8(u8 *arg0) {}
 #endif
 
 #ifdef VERSION_US

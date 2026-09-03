@@ -9,28 +9,17 @@ s32 func_8006DC50(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-s32 func_8006DC78(s32 arg0) {
-    u8 local[1];
-    return (local + (arg0 << 4)) - local;
-}
+s32 func_8006DC78(s32 arg0) { u8 local[1]; return (local + (arg0 << 4)) - local; }
 #endif
 
 #ifdef VERSION_US
-f32 Math_FAbs(f32 arg0) {
-    if (arg0 < 0.0f) {
-        arg0 = -arg0;
-    }
-    return arg0;
-}
+f32 Math_FAbs(f32 arg0) { if (arg0 < 0.0f) { arg0 = -arg0; } return arg0; }
 #endif
 
 #ifdef VERSION_US
-void func_8006DCB8(void) {
-}
-void func_8006DCB8_padding(void) {
-}
-void func_8006DCB8_padding2(void) {
-}
+void func_8006DCB8(void) {}
+void func_8006DCB8_padding(void) {}
+void func_8006DCB8_padding2(void) {}
 #endif
 
 #ifdef VERSION_US
@@ -72,12 +61,7 @@ s16 func_8006DDE8(s16 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-s16 func_8006DE08(s16* arg0, s32 arg1) {
-    s16 index = arg0[arg1];
-    u16* table = D_8009E3C8 + index;
-    s16 result = (s16)(*table - 1);
-    return result;
-}
+s16 func_8006DE08(s16 *arg0, s32 arg1) { s16 index = arg0[arg1]; u16 *table = D_8009E3C8 + index; s16 result = (s16)(*table - 1); return result; }
 #endif
 
 #ifdef VERSION_US
@@ -171,8 +155,7 @@ typedef struct Copy60 { s32 words[15]; } Copy60;
 void Model_CopyPositionBuffer(void *arg0, void *arg1) {
     *(Copy60 *)arg1 = *(Copy60 *)arg0;
 }
-void func_8006EB14_padding(void) {
-}
+void func_8006EB14_padding(void) {}
 #endif
 
 #ifdef VERSION_US
@@ -528,12 +511,7 @@ Gfx *func_80070974(Gfx *arg0) {
 #endif
 
 #ifdef VERSION_US
-f32 Math_AbsF32(f32 arg0) {
-    if ((f64)arg0 < 0.0) {
-        arg0 = -arg0;
-    }
-    return arg0;
-}
+f32 Math_AbsF32(f32 arg0) { if ((f64)arg0 < 0.0) { arg0 = -arg0; } return arg0; }
 #endif
 
 #ifdef VERSION_US
@@ -546,20 +524,7 @@ void Vec3f_CrossProductComponents(f32 a0, f32 a1, f32 a2, f32 a3, f32 a4, f32 a5
 #endif
 
 #ifdef VERSION_US
-void func_80070C14(f32* arg0, f32* arg1, f32* arg2) {
-    f32 x = *arg0;
-    f32 y = *arg1;
-    f32 z = *arg2;
-    f32 length = sqrtf(x * x + y * y + z * z);
-    if (length > 0.0f) {
-        x /= length;
-        y /= length;
-        z /= length;
-    }
-    *arg0 = x;
-    *arg1 = y;
-    *arg2 = z;
-}
+void func_80070C14(f32 *arg0, f32 *arg1, f32 *arg2) { f32 x = *arg0; f32 y = *arg1; f32 z = *arg2; f32 length = sqrtf(x * x + y * y + z * z); if (length > 0.0f) { x /= length; y /= length; z /= length; } *arg0 = x; *arg1 = y; *arg2 = z; }
 #endif
 
 #ifdef VERSION_US
@@ -715,9 +680,7 @@ void func_800711A8(void) {
 }
 
 #ifdef VERSION_US
-s32 func_800711B0(void) {
-    return 0;
-}
+s32 func_800711B0(void) { return 0; }
 #endif
 
 #ifdef VERSION_US

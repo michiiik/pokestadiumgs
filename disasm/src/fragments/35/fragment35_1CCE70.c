@@ -22,29 +22,9 @@ void func_88600270(void) {
 }
 
 extern u8 D_88601510[];
-s32 func_8860043C(s32 arg0) {
-    u8* table = D_88601510;
-    s32 i = 0;
-    do {
-        if (table[i] == arg0)
-            return i;
-        i++;
-        i &= 0xFF;
-    } while (i < 0x12);
-}
+s32 func_8860043C(s32 arg0) { u8 *table = D_88601510; s32 i = 0; do { if (table[i] == arg0) return i; i++; i &= 0xFF; } while (i < 0x12); }
 
-void func_8860047C(void) {
-    extern u8 D_88601914[];
-    extern f32 D_886018D0[];
-    extern f32 D_886018E0[];
-    extern u8 D_88601918[];
-    D_886018D0[0] = D_88601914[0];
-    D_886018D0[1] = D_88601914[1];
-    D_886018D0[2] = D_88601914[2];
-    D_886018E0[0] = D_88601918[0];
-    D_886018E0[1] = D_88601918[1];
-    D_886018E0[2] = D_88601918[2];
-}
+void func_8860047C(void) { extern u8 D_88601914[]; extern f32 D_886018D0[]; extern f32 D_886018E0[]; extern u8 D_88601918[]; D_886018D0[0] = D_88601914[0]; D_886018D0[1] = D_88601914[1]; D_886018D0[2] = D_88601914[2]; D_886018E0[0] = D_88601918[0]; D_886018E0[1] = D_88601918[1]; D_886018E0[2] = D_88601918[2]; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/35/fragment35_1CCE70/func_88600578.s")
 

@@ -11,8 +11,7 @@ s32 func_82400530(s32 arg0, s32 arg1) {
     return 1;
 }
 
-void func_82400578(u8* arg0, s32 arg1) {
-}
+void func_82400578(u8 *arg0, s32 arg1) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EE5B0/func_82400584.s")
 
