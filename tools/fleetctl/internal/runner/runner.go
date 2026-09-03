@@ -161,6 +161,12 @@ type Runner interface {
 	// DockerImageID/GitRevParse) used to confirm the merge repo is clean
 	// of conflicting changes before a run's merge step branches it.
 	GitStatusPorcelain(ctx context.Context, repoRoot string) (string, error)
+	// GitDiffNames runs `git -C repoRoot diff --name-only HEAD <ref>` --
+	// the files whose content differs between the current checkout and
+	// ref. Read-only. A `git checkout -B <branch> <ref>` must rewrite
+	// exactly these, so a locally-modified file in this set is what makes
+	// the checkout refuse; one outside it is harmless dirt.
+	GitDiffNames(ctx context.Context, repoRoot, ref string) ([]string, error)
 	// GitResetPath runs `git -C repoRoot reset -q -- path` -- unstages path
 	// without touching the working tree.
 	GitResetPath(ctx context.Context, repoRoot, path string) error

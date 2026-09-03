@@ -255,6 +255,25 @@ func (r *ExecRunner) GitStatusPorcelain(ctx context.Context, repoRoot string) (s
 	return result.Stdout, nil
 }
 
+// GitDiffNames is a read-only query (never gated by DryRun, same reasoning
+// as GitStatusPorcelain) naming the files a checkout of ref would rewrite.
+func (r *ExecRunner) GitDiffNames(ctx context.Context, repoRoot, ref string) ([]string, error) {
+	result, err := run(ctx, r.RepoRoot, nil, "git", "-C", repoRoot, "diff", "--name-only", "HEAD", ref)
+	if err != nil {
+		return nil, fmt.Errorf("git diff --name-only HEAD %s: %w", ref, err)
+	}
+	if result.ExitCode != 0 {
+		return nil, fmt.Errorf("git diff --name-only HEAD %s: exit %d: %s", ref, result.ExitCode, strings.TrimSpace(result.Stderr))
+	}
+	var names []string
+	for _, line := range strings.Split(result.Stdout, "\n") {
+		if line = strings.TrimSpace(line); line != "" {
+			names = append(names, line)
+		}
+	}
+	return names, nil
+}
+
 func (r *ExecRunner) GitResetPath(ctx context.Context, repoRoot, path string) error {
 	result, err := r.runOrDryRun(ctx, r.RepoRoot, nil, "git", "-C", repoRoot, "reset", "-q", "--", path)
 	return gitErr(result, err, "git reset -q -- "+path, r.DryRun)

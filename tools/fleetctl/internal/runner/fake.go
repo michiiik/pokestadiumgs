@@ -55,6 +55,8 @@ type Fake struct {
 	GitCheckoutDetachErr     error
 	GitStatusPorcelainResult string
 	GitStatusPorcelainErr    error
+	GitDiffNamesResult       []string
+	GitDiffNamesErr          error
 	GitResetPathErr          error
 	GitCheckoutPathErr       error
 	GitPushErr               error
@@ -183,6 +185,11 @@ func (f *Fake) GitCheckoutDetach(_ context.Context, repoRoot, ref string) error 
 func (f *Fake) GitStatusPorcelain(_ context.Context, repoRoot string) (string, error) {
 	f.record(Call{Method: "GitStatusPorcelain", Strings: []string{repoRoot}})
 	return f.GitStatusPorcelainResult, f.GitStatusPorcelainErr
+}
+
+func (f *Fake) GitDiffNames(_ context.Context, repoRoot, ref string) ([]string, error) {
+	f.record(Call{Method: "GitDiffNames", Strings: []string{repoRoot, ref}})
+	return f.GitDiffNamesResult, f.GitDiffNamesErr
 }
 
 func (f *Fake) GitResetPath(_ context.Context, repoRoot, path string) error {
