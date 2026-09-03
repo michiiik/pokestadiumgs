@@ -298,7 +298,11 @@ s32 arg1;
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14B090/func_82702CD8.s")
 
+#ifdef CC_CHECK
+extern void func_82702954(void *, s32);
+#else
 extern void func_82702954();
+#endif
 extern void func_82702A2C();
 #ifdef CC_CHECK
 extern void func_82702BC8(void *, s32);
@@ -312,7 +316,11 @@ void func_82702DF8(s16 *arg0) {
     temp_v0 = *arg0;
     switch (temp_v0) {                              /* irregular */
     case 1:
+#ifdef CC_CHECK
+        func_82702954((void *)0, 0);
+#else
         func_82702954();
+#endif
         return;
     case 2:
         func_82702A2C();

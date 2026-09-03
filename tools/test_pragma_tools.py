@@ -1056,6 +1056,102 @@ class RunnerTests(unittest.TestCase):
             runner._ensure_worktree_oracles(worktree, full_tree=True)
             self.assertFalse((local / "primary_only").exists())
 
+    def _oracle_worktree(self, directory: str):
+        """A worktree with a private oracle tree plus a primary checkout."""
+        main = Path(directory) / "main"
+        worktree = Path(directory) / "worktree"
+        git_dir = main / ".git" / "worktrees" / "lane"
+        git_dir.mkdir(parents=True)
+        shared = main / "disasm" / "asm" / "us" / "nonmatchings" / "owner"
+        shared.mkdir(parents=True)
+        (shared / "func_a.s").write_text("glabel func_a\n")
+        (shared / "func_b.s").write_text("glabel func_b\n")
+        local = worktree / "disasm" / "asm" / "us" / "nonmatchings" / "owner"
+        local.mkdir(parents=True)
+        # The private extraction produced func_a but never produced func_b.
+        (local / "func_a.s").write_text("glabel func_a\n")
+        source = worktree / "disasm" / "src" / "owner.c"
+        source.parent.mkdir(parents=True)
+        source.write_text(
+            '#pragma GLOBAL_ASM("asm/us/nonmatchings/owner/func_a.s")\n'
+            '#pragma GLOBAL_ASM("asm/us/nonmatchings/owner/func_b.s")\n'
+        )
+        (worktree / ".git").write_text(f"gitdir: {git_dir}\n")
+        return main, worktree, source
+
+    def test_marker_rejects_a_dependency_the_extraction_never_produced(self) -> None:
+        # Regression: a required oracle that is missing on disk is also absent
+        # from the manifest, so `recorded.get(key) != _file_fingerprint(path)`
+        # compared None against None and the marker validated a tree that
+        # cannot compile.
+        with tempfile.TemporaryDirectory() as directory:
+            _, worktree, source = self._oracle_worktree(directory)
+            marker = {
+                "schema": 2,
+                "outputs": {"asm_oracles": runner._private_asm_manifest(worktree)},
+            }
+            recorded = marker["outputs"]["asm_oracles"]
+            self.assertNotIn(
+                "disasm/asm/us/nonmatchings/owner/func_b.s", recorded,
+                "fixture must model an oracle the extraction never produced",
+            )
+            self.assertFalse(
+                runner._private_asm_marker_usable(
+                    worktree, marker, source_path=source, full_tree=False
+                )
+            )
+
+    def test_marker_still_accepts_a_complete_private_extraction(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            _, worktree, source = self._oracle_worktree(directory)
+            local = worktree / "disasm" / "asm" / "us" / "nonmatchings" / "owner"
+            (local / "func_b.s").write_text("glabel func_b\n")
+            marker = {
+                "schema": 2,
+                "outputs": {"asm_oracles": runner._private_asm_manifest(worktree)},
+            }
+            self.assertTrue(
+                runner._private_asm_marker_usable(
+                    worktree, marker, source_path=source, full_tree=False
+                )
+            )
+
+    def test_missing_oracle_is_backfilled_from_primary_as_a_real_file(self) -> None:
+        # The bootstrap must not record an extraction that cannot compile.
+        # The backfilled file has to be a real file: _private_asm_manifest
+        # skips symlinks and _remove_shared_asm_overlays deletes them.
+        with tempfile.TemporaryDirectory() as directory:
+            _, worktree, _ = self._oracle_worktree(directory)
+            unresolved = runner._backfill_missing_private_oracles(worktree)
+            self.assertEqual(unresolved, [])
+            restored = worktree / "disasm" / "asm" / "us" / "nonmatchings" / "owner" / "func_b.s"
+            self.assertTrue(restored.is_file())
+            self.assertFalse(restored.is_symlink())
+            self.assertEqual(restored.read_text(), "glabel func_b\n")
+            # ... and it is now recorded, so the marker validates.
+            recorded = runner._private_asm_manifest(worktree)
+            self.assertIn("disasm/asm/us/nonmatchings/owner/func_b.s", recorded)
+
+    def test_backfill_reports_an_oracle_the_primary_cannot_supply(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            main, worktree, _ = self._oracle_worktree(directory)
+            (main / "disasm" / "asm" / "us" / "nonmatchings" / "owner" / "func_b.s").unlink()
+            self.assertEqual(
+                runner._backfill_missing_private_oracles(worktree),
+                ["owner/func_b.s"],
+            )
+
+    def test_backfill_replaces_a_symlinked_oracle_with_a_real_file(self) -> None:
+        # A symlink overlay does not survive the next bootstrap, so it must be
+        # materialised rather than left in place.
+        with tempfile.TemporaryDirectory() as directory:
+            main, worktree, _ = self._oracle_worktree(directory)
+            local = worktree / "disasm" / "asm" / "us" / "nonmatchings" / "owner" / "func_b.s"
+            local.symlink_to(main / "disasm" / "asm" / "us" / "nonmatchings" / "owner" / "func_b.s")
+            self.assertEqual(runner._backfill_missing_private_oracles(worktree), [])
+            self.assertFalse(local.is_symlink())
+            self.assertTrue(local.is_file())
+
     def test_worktree_gate_prerequisites_are_built_privately(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             main = Path(directory) / "main"

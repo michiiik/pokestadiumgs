@@ -831,9 +831,76 @@ def _private_asm_marker_usable(
     for relative in dependencies:
         path = root / relative
         key = path.relative_to(repo_root).as_posix()
-        if recorded.get(key) != _file_fingerprint(path):
+        fingerprint = _file_fingerprint(path)
+        # An oracle this source actually includes must be present as a real
+        # recorded file. Comparing the two sides alone is not enough: a
+        # dependency that the extraction never produced is missing from
+        # ``recorded`` *and* fingerprints as None, so ``None != None`` was
+        # False and the marker validated a tree that cannot compile. That
+        # silently pinned a broken oracle tree -- the marker kept reporting
+        # "usable", so ``_ensure_worktree_oracles`` never backfilled the file
+        # from the primary checkout, and every probe on the source failed with
+        # ``baseline_object_unavailable`` until someone restored it by hand.
+        if fingerprint is None or recorded.get(key) != fingerprint:
             return False
     return True
+
+
+def _required_asm_oracles(repo_root: Path) -> set[str]:
+    """Every ``asm/us/nonmatchings`` oracle a live GLOBAL_ASM pragma includes.
+
+    Returned as paths relative to that root, so they can be joined onto either
+    this worktree's tree or the primary checkout's.
+    """
+    required: set[str] = set()
+    source_root = repo_root / "disasm" / "src"
+    pattern = re.compile(r'GLOBAL_ASM\("asm/us/nonmatchings/([^"\n]+\.s)"\)')
+    for path in source_root.rglob("*.c"):
+        try:
+            text = path.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        required.update(pattern.findall(text))
+    return required
+
+
+def _backfill_missing_private_oracles(repo_root: Path) -> list[str]:
+    """Copy oracles the private extraction owed us but did not produce.
+
+    ``make extract`` is not guaranteed to emit an oracle for every pragma still
+    live in the tree, and the bootstrap used to accept whatever it produced: it
+    checked only that *some* manifest existed. One un-extracted file is enough
+    to make its whole source uncompilable, and because
+    ``_remove_shared_asm_overlays`` has already deleted the primary-checkout
+    symlink that used to cover the gap, nothing puts it back.
+
+    Copy each missing oracle from the primary checkout as a *real* file --
+    never a symlink, which ``_private_asm_manifest`` skips and the next
+    bootstrap would delete again -- so it is recorded in the manifest and
+    survives. Returns the relative paths that could not be sourced at all.
+    """
+    root = repo_root / "disasm" / "asm" / "us" / "nonmatchings"
+    if root.is_symlink() or not root.is_dir():
+        return []
+    primary = _primary_worktree_root(repo_root)
+    shared_root = None if primary is None else primary / "disasm" / "asm" / "us" / "nonmatchings"
+    unresolved: list[str] = []
+    for relative in sorted(_required_asm_oracles(repo_root)):
+        path = root / relative
+        if _regular_nonempty_file(path) and not path.is_symlink():
+            continue
+        source = None if shared_root is None else shared_root / relative
+        if source is None or not _regular_nonempty_file(source):
+            unresolved.append(relative)
+            continue
+        try:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            if path.is_symlink() or path.exists():
+                path.unlink()
+            shutil.copy2(source, path)
+        except OSError:
+            unresolved.append(relative)
+    return unresolved
 
 
 def _remove_shared_asm_overlays(repo_root: Path) -> None:
@@ -1046,6 +1113,16 @@ def _ensure_worktree_gate_prerequisites(repo_root: Path) -> None:
             raise RuntimeError(
                 "isolated gate bootstrap extraction did not create required files:\n"
                 + "\n".join(missing)
+            )
+        # Extraction is not trusted to have covered every live pragma; fill any
+        # gap from the primary checkout before the manifest is taken, so the
+        # recorded tree is one that can actually compile.
+        unresolved = _backfill_missing_private_oracles(repo_root)
+        if unresolved:
+            raise RuntimeError(
+                "isolated gate bootstrap has no assembly oracle for these live "
+                "GLOBAL_ASM pragmas, and the primary checkout could not supply "
+                "them:\n" + "\n".join(unresolved)
             )
         if _private_asm_manifest(repo_root) is None:
             raise RuntimeError(
