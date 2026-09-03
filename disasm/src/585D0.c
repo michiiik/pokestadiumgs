@@ -957,7 +957,29 @@ void func_8005C988(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005CB38.s")
+s32 func_8005CB38(s32 arg0, s32 arg1) {
+    s32 result = 0;
+    switch ((s32)arg1) {
+    case 0x21:
+        if (func_80057A80(arg0) != 0) {
+            result = 0xC;
+        } else {
+            result = 0xE;
+        }
+        break;
+    case 0x20:
+    case 0x22:
+    case 0x23:
+    case 0x24:
+    case 0x25:
+    case 0x26:
+    case 0x27:
+    case 0x28:
+        result = 1;
+        break;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
