@@ -292,7 +292,24 @@ s32 func_8005910C(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005914C.s")
+s32 func_8005914C(s32 arg0) {
+    s32 result;
+    result = 0x0;
+    switch ((u16)func_8005D92C(arg0)) {
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+        result = func_800590CC(arg0);
+        break;
+    case 5:
+    case 6:
+    case 7:
+        result = func_8005910C(arg0);
+        break;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
