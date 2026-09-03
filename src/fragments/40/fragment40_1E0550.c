@@ -4,45 +4,197 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/40/fragment40_1E0550/func_88B04380.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/40/fragment40_1E0550/func_88B043B8.s")
+extern u8 D_88B05BE3[];
+extern s32 *func_800635E0(u8);
+void func_88B043B8(u8 arg0) {
+    func_800635E0(D_88B05BE3[arg0 * 4]);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/40/fragment40_1E0550/func_88B043EC.s")
+extern u8 D_88B05CF8[];
+extern void func_8004C874(s32, s32);
+void func_88B043EC(u8 arg0) {
+    func_8004C874(0x3C, D_88B05CF8[arg0]);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/40/fragment40_1E0550/func_88B04420.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/40/fragment40_1E0550/func_88B04468.s")
+extern u8 D_88B05BE0[];
+s32 func_88B04468(void) {
+    u8 *ptr = D_88B05BE0;
+    s32 i = 0;
+    s32 limit = 0x22;
+    do {
+        if (*ptr < 3) break;
+        i++;
+        ptr += 4;
+    } while (i != limit);
+    return i & 0xFF;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/40/fragment40_1E0550/func_88B0449C.s")
+extern u8 D_88B05C68[];
+s32 func_88B0449C(void) {
+    u8 *ptr = D_88B05C68;
+    s32 i = 0;
+    s32 limit = 0x24;
+    do {
+        if (*ptr < 3) break;
+        i++;
+        ptr += 4;
+    } while (i != limit);
+    return i & 0xFF;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/40/fragment40_1E0550/func_88B044D0.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/40/fragment40_1E0550/func_88B04698.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/40/fragment40_1E0550/func_88B046F0.s")
+extern s32 func_88B04698(void);
+s32 func_88B046F0(void) {
+    s32 result;
+    if (func_88B04698() < 3) result = 1;
+    else result = 0;
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/40/fragment40_1E0550/func_88B04724.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/40/fragment40_1E0550/func_88B048C4.s")
+extern u8 D_88006868[];
+extern u16 D_88B05D1C;
+extern void func_88B043EC(u8 arg0);
+s32 func_88B048C4(void)
+{
+  s32 result;
+  u16 *ptr;
+  s32 i;
+  result = 0;
+ do { ptr = &D_88B05D1C; i = 0; do { if (func_8005F9A4(*((s8 *) D_88006868), *ptr) != 0) { func_88B043EC(i); result = (result + 1) & 0xFF; } i += 1; ptr += 1; } while (i != 0x24); return result; } while (0);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/40/fragment40_1E0550/func_88B04950.s")
+extern s32 HAL_Strcmp(s8 *, s8 *);
+extern s8 D_8800686D[];
+extern u8 D_88B05F80[];
+extern u8 D_88B05F82[];
+s32 func_88B04950(void) {
+    s32 result;
+    u8 *ptr;
+    u32 i;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/40/fragment40_1E0550/func_88B04A08.s")
+    result = 1;
+    ptr = D_88B05F82;
+    i = 0;
+    if (D_88B05F80[0] != 0) {
+        do {
+            if ((*(u16 *)(D_88006868 + 2) == *(u16 *)(ptr + 4)) &&
+                (HAL_Strcmp((s8 *)(ptr + 8), D_8800686D) == 0)) {
+                result = 0;
+                break;
+            }
+            i += 1;
+            ptr += 0x14;
+        } while (i < D_88B05F80[0]);
+    }
+    return result;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/40/fragment40_1E0550/func_88B04ADC.s")
+s32 func_88B04A08(u16 arg0) {
+    s32 result;
+    u8 *ptr;
+    u32 i;
+
+    result = 0;
+    ptr = D_88B05F82;
+    i = 0;
+    if (D_88B05F80[0] != 0) {
+        do {
+            if ((arg0 == *(u16 *)ptr) && (*(u16 *)(D_88006868 + 2) == *(u16 *)(ptr + 4)) &&
+                (HAL_Strcmp((s8 *)(ptr + 8), D_8800686D) == 0)) {
+                result = 1;
+                break;
+            }
+            i += 1;
+            ptr += 0x14;
+        } while (i < D_88B05F80[0]);
+    }
+    return result;
+}
+
+extern u8 D_88B0636C[];
+s32 func_88B04ADC(u16 arg0) {
+    s32 result;
+    u8 *ptr;
+    u32 i;
+
+    result = 1;
+    ptr = D_88B0636C;
+    i = 0;
+    if (D_88B05F80[0x3EA] != 0) {
+        do {
+            if ((arg0 == *(u16 *)ptr) && (*(u16 *)(D_88006868 + 2) == *(u16 *)(ptr + 2)) &&
+                (HAL_Strcmp((s8 *)(ptr + 4), D_8800686D) == 0)) {
+                result = 0;
+                break;
+            }
+            i += 1;
+            ptr += 0x10;
+        } while (i < D_88B05F80[0x3EA]);
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/40/fragment40_1E0550/func_88B04BB4.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/40/fragment40_1E0550/func_88B04C38.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/40/fragment40_1E0550/func_88B04F70.s")
+extern s8 *HAL_Strcpy(s8 *, s8 *);
+extern u16 D_8800686A;
+extern u8 D_88B05868[];
+extern u16 D_88B05F6E;
+extern s32 func_88B04380(u8);
+void func_88B04F70(s8 *arg0, s16 arg1) {
+    *(s16 *)(arg0 + 0) = arg1;
+    *(s16 *)(arg0 + 2) = D_8800686A;
+    HAL_Strcpy(arg0 + 4, D_8800686D);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/40/fragment40_1E0550/func_88B04FB0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/40/fragment40_1E0550/func_88B05250.s")
+void func_88B05250(s8 *arg0, s16 arg1) {
+    *(s16 *)(arg0 + 0) = arg1;
+    *(s16 *)(arg0 + 4) = D_8800686A;
+    HAL_Strcpy(arg0 + 8, D_8800686D);
+    {
+        u16 value = *(u16 *)(arg0 + 2);
+        if (value != 0xFFFF) {
+            *(u16 *)(arg0 + 2) = value + 1;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/40/fragment40_1E0550/func_88B052B0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/40/fragment40_1E0550/func_88B05494.s")
+extern u8 D_88B069AC[];
+extern u8 D_88B069CE[];
+extern s32 D_88B069F4;
+void func_88B05494(u16 arg0) {
+    s32 result;
+    u8 index;
+
+    if (arg0 >= 0x100) {
+        result = arg0;
+        index = result - 0x100;
+        if (D_88B069CE[index] == 0) {
+            D_88B069F4 = 1;
+            func_80055E54(index, 1);
+        }
+    } else {
+        result = func_88B04380(arg0);
+        index = result;
+        if (D_88B069AC[result] == 0) {
+            D_88B069F4 = 1;
+            func_80055DC4(index, 1);
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/40/fragment40_1E0550/func_88B0552C.s")
 

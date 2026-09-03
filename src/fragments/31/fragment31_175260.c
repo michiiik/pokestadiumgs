@@ -20,7 +20,12 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_175260/func_88202F0C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_175260/func_88202FA0.s")
+extern void func_88202F0C(u8 *);
+void func_88202FA0(void *a0, u8 *a1) {
+    *(u8 *)((u8 *)a0 + 9) = *(u8 *)a1;
+    *(s32 *)((u8 *)*(void **)a0 + 0xC) = 1;
+    func_88202F0C(a1);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_175260/func_88202FD4.s")
 
