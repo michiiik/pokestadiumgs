@@ -1144,3 +1144,33 @@ func TestStopSafety(t *testing.T) {
 		t.Fatal("want error stopping a run with no running container")
 	}
 }
+
+// A run whose container-accepted owners were all thrown out by the host
+// re-gate must not read as "found nothing" -- that is what hid the
+// 2026-09-02/03 drought, where six real matches were discarded silently.
+func TestRejectedOwnersSeparatesGateRejectionsFromFindingNothing(t *testing.T) {
+	report := map[string]ownerResult{
+		"func_8005B848": {Status: "rejected"},
+		"func_8005B924": {Status: "rejected"},
+		"func_8005E524": {Status: "accepted", Committed: true},
+		"func_dead0000": {Status: "already_landed"},
+	}
+	got := rejectedOwners(report)
+	want := []string{"func_8005B848", "func_8005B924"}
+	if len(got) != len(want) {
+		t.Fatalf("rejectedOwners() = %v, want %v", got, want)
+	}
+	for i := range want {
+		if got[i] != want[i] {
+			t.Fatalf("rejectedOwners() = %v, want %v", got, want)
+		}
+	}
+	if n := len(rejectedOwners(map[string]ownerResult{})); n != 0 {
+		t.Fatalf("empty report should yield no rejections, got %d", n)
+	}
+	// A genuinely empty run (nothing accepted, nothing rejected) stays quiet.
+	only := map[string]ownerResult{"func_x": {Status: "accepted", Committed: true}}
+	if n := len(rejectedOwners(only)); n != 0 {
+		t.Fatalf("all-accepted report should yield no rejections, got %d", n)
+	}
+}

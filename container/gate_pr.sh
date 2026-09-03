@@ -112,6 +112,12 @@ in_container_script='
 set -euo pipefail
 bash /src/container/overlay_src.sh /src
 cd /work
+# Whole-tree host syntax check first. The ROM build below is incremental
+# against the image, so it only re-runs the per-object CC_CHECK for sources
+# this PR actually changed -- a host-check break in an untouched file slips
+# through here and then surfaces much later, failing an unrelated candidate
+# at re-gate time (see PR #57 / func_82702954). ~18s for the full tree.
+make -C disasm cc-check RUN_CC_CHECK=1
 make -C disasm COMPARE=1 -j2
 '
 

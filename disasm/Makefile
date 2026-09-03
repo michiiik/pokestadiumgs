@@ -344,7 +344,21 @@ ifeq ($(N64_EMULATOR),)
 endif
 	$(N64_EMULATOR) $<
 
-.PHONY: all rom clean libclean distclean venv setup extract lib diff-init init run
+# Syntax-check every C source with the host compiler, without building
+# objects. The normal build runs this check per-object, so an incremental
+# build silently skips it for any file it does not rebuild -- which is how a
+# host-check break can land in an untouched file and only surface much later,
+# on whatever unrelated candidate happens to trigger a full rebuild.
+# `make cc-check` is the whole-tree pass that catches it at PR time.
+cc-check:
+	$(V)set -e; for f in $(C_FILES); do \
+	  $(CC_CHECK) $(filter-out -MMD -MP,$(CC_CHECK_FLAGS)) $(IINC) -I $$(dirname $$f) \
+	    $(CHECK_WARNINGS) $(BUILD_DEFINES) $(COMMON_DEFINES) $(RELEASE_DEFINES) \
+	    $(GBI_DEFINES) $(LIBULTRA_DEFINES) $(C_DEFINES) $(MIPS_BUILTIN_DEFS) $$f || exit 1; \
+	done
+	@echo "cc-check: all $(words $(C_FILES)) C source(s) pass the host syntax check"
+
+.PHONY: all rom clean libclean distclean venv setup extract lib diff-init init run cc-check
 .DEFAULT_GOAL := rom
 # Prevent removing intermediate files
 .SECONDARY:

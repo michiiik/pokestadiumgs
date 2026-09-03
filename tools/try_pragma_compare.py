@@ -831,9 +831,76 @@ def _private_asm_marker_usable(
     for relative in dependencies:
         path = root / relative
         key = path.relative_to(repo_root).as_posix()
-        if recorded.get(key) != _file_fingerprint(path):
+        fingerprint = _file_fingerprint(path)
+        # An oracle this source actually includes must be present as a real
+        # recorded file. Comparing the two sides alone is not enough: a
+        # dependency that the extraction never produced is missing from
+        # ``recorded`` *and* fingerprints as None, so ``None != None`` was
+        # False and the marker validated a tree that cannot compile. That
+        # silently pinned a broken oracle tree -- the marker kept reporting
+        # "usable", so ``_ensure_worktree_oracles`` never backfilled the file
+        # from the primary checkout, and every probe on the source failed with
+        # ``baseline_object_unavailable`` until someone restored it by hand.
+        if fingerprint is None or recorded.get(key) != fingerprint:
             return False
     return True
+
+
+def _required_asm_oracles(repo_root: Path) -> set[str]:
+    """Every ``asm/us/nonmatchings`` oracle a live GLOBAL_ASM pragma includes.
+
+    Returned as paths relative to that root, so they can be joined onto either
+    this worktree's tree or the primary checkout's.
+    """
+    required: set[str] = set()
+    source_root = repo_root / "disasm" / "src"
+    pattern = re.compile(r'GLOBAL_ASM\("asm/us/nonmatchings/([^"\n]+\.s)"\)')
+    for path in source_root.rglob("*.c"):
+        try:
+            text = path.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        required.update(pattern.findall(text))
+    return required
+
+
+def _backfill_missing_private_oracles(repo_root: Path) -> list[str]:
+    """Copy oracles the private extraction owed us but did not produce.
+
+    ``make extract`` is not guaranteed to emit an oracle for every pragma still
+    live in the tree, and the bootstrap used to accept whatever it produced: it
+    checked only that *some* manifest existed. One un-extracted file is enough
+    to make its whole source uncompilable, and because
+    ``_remove_shared_asm_overlays`` has already deleted the primary-checkout
+    symlink that used to cover the gap, nothing puts it back.
+
+    Copy each missing oracle from the primary checkout as a *real* file --
+    never a symlink, which ``_private_asm_manifest`` skips and the next
+    bootstrap would delete again -- so it is recorded in the manifest and
+    survives. Returns the relative paths that could not be sourced at all.
+    """
+    root = repo_root / "disasm" / "asm" / "us" / "nonmatchings"
+    if root.is_symlink() or not root.is_dir():
+        return []
+    primary = _primary_worktree_root(repo_root)
+    shared_root = None if primary is None else primary / "disasm" / "asm" / "us" / "nonmatchings"
+    unresolved: list[str] = []
+    for relative in sorted(_required_asm_oracles(repo_root)):
+        path = root / relative
+        if _regular_nonempty_file(path) and not path.is_symlink():
+            continue
+        source = None if shared_root is None else shared_root / relative
+        if source is None or not _regular_nonempty_file(source):
+            unresolved.append(relative)
+            continue
+        try:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            if path.is_symlink() or path.exists():
+                path.unlink()
+            shutil.copy2(source, path)
+        except OSError:
+            unresolved.append(relative)
+    return unresolved
 
 
 def _remove_shared_asm_overlays(repo_root: Path) -> None:
@@ -1046,6 +1113,16 @@ def _ensure_worktree_gate_prerequisites(repo_root: Path) -> None:
             raise RuntimeError(
                 "isolated gate bootstrap extraction did not create required files:\n"
                 + "\n".join(missing)
+            )
+        # Extraction is not trusted to have covered every live pragma; fill any
+        # gap from the primary checkout before the manifest is taken, so the
+        # recorded tree is one that can actually compile.
+        unresolved = _backfill_missing_private_oracles(repo_root)
+        if unresolved:
+            raise RuntimeError(
+                "isolated gate bootstrap has no assembly oracle for these live "
+                "GLOBAL_ASM pragmas, and the primary checkout could not supply "
+                "them:\n" + "\n".join(unresolved)
             )
         if _private_asm_manifest(repo_root) is None:
             raise RuntimeError(
@@ -1344,6 +1421,37 @@ def try_candidate(source_path: Path, function: str, candidate: str) -> int:
     return result
 
 
+_MAKE_FAILED_TARGET_RE = re.compile(r"^make(?:\[\d+\])?: \*\*\* \[([^\]]+)\] Error", re.MULTILINE)
+
+
+def _failed_make_targets(output: str) -> list[str]:
+    """Every target ``make`` reported as failing, in the order it printed them."""
+    return _MAKE_FAILED_TARGET_RE.findall(output or "")
+
+
+def _unrelated_build_failures(output: str, own_object_rel: str) -> list[str]:
+    """Failing object targets that are not this candidate's own object.
+
+    The gate compiles the whole tree, so a source the candidate never touched
+    can fail to build -- most often the host clang check (``RUN_CC_CHECK``)
+    tripping over a pre-existing arity or prototype problem that make had been
+    skipping while the object was up to date. That is an environment failure,
+    not a verdict on the candidate, and reporting it as ``compare_rejected``
+    blames the wrong code: it hides the real breakage, and it writes a
+    rejection into probe-stats that blocks the body from ever being re-sent.
+    """
+    failures = []
+    for target in _failed_make_targets(output):
+        if not target.endswith(".o"):
+            # The final ROM/ELF target fails as a consequence of any of these;
+            # it says nothing about which source was at fault.
+            continue
+        if target == own_object_rel:
+            continue
+        failures.append(target)
+    return failures
+
+
 def _try_candidate_detailed(
     source_path: Path,
     function: str,
@@ -1379,6 +1487,21 @@ def _try_candidate_detailed(
         print(output, end="")
 
         if result != 0:
+            own_object_rel = (
+                source_path.resolve()
+                .relative_to(repo_root / "disasm")
+                .with_suffix(".o")
+            )
+            unrelated = _unrelated_build_failures(
+                output, (Path("build") / own_object_rel).as_posix()
+            )
+            if unrelated:
+                print(
+                    f"GATE ENVIRONMENT BROKEN (not {function}'s fault): the tree "
+                    f"failed to build at {', '.join(unrelated)}; restored GLOBAL_ASM",
+                    file=sys.stderr,
+                )
+                return result, "gate_environment_broken"
             print(f"REJECTED {function}: restored GLOBAL_ASM")
             return result, "compare_rejected"
 
@@ -4015,6 +4138,32 @@ def _install_incrementally(
     return kept, False
 
 
+def _is_recordable_source(source_path: Path) -> bool:
+    """Whether a probed source belongs in the shared probe-stats history.
+
+    That history is keyed to real tracked sources under ``disasm/src/``. A
+    synthetic file -- a unit test's temp-dir source, or a scratch copy under
+    ``disasm/scratch/`` -- teaches a later run nothing, and appending it to
+    the primary checkout's ledger pollutes history shared by every worktree.
+    227 such rows had accumulated before this guard (225 of them ``func_a``,
+    one per run of a single test that mocked the whole gate but left the real
+    stats writer in place).
+
+    This guards the *shared default* ledger only. When ``PRAGMA_PROBE_STATS``
+    names a destination the caller has chosen one deliberately -- that is how
+    ``container_merge --fresh-history`` isolates a run, and how the runner's
+    own tests exercise row shaping -- so anything is recordable there.
+    """
+    if os.environ.get("PRAGMA_PROBE_STATS") is not None:
+        return True
+    candidates = [source_path.as_posix()]
+    try:
+        candidates.append(source_path.resolve().as_posix())
+    except OSError:
+        pass
+    return any("/disasm/src/" in c or c.startswith("disasm/src/") for c in candidates)
+
+
 def _record_probe_stats(
     source_path: Path,
     attempts: list[dict[str, object]],
@@ -4039,7 +4188,12 @@ def _record_probe_stats(
     best-effort sources for a per-attempt ``family`` when the attempt dict
     does not already carry one -- see ``sweep_targets.py``, which sets
     ``family_lookup`` from the listing it already has.
+
+    A source that is not a real tracked one is not recorded at all; see
+    ``_is_recordable_source``.
     """
+    if not _is_recordable_source(source_path):
+        return
     try:
         counts: dict[str, int] = {}
         rows: list[dict[str, object]] = []

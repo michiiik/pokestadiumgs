@@ -445,9 +445,18 @@ def attempt_rank(attempt: dict) -> tuple[float, float]:
 
     Ordinarily ``effective`` is just ``similarity_score``. But a
     normalized-only match (see ``_is_normalized_only_match``) has its
-    ``effective`` capped at ``0.9 + 0.1 * raw`` so it can never rank above,
-    or tie with, a genuine near-miss -- it always stays below the 0.95
-    permuter threshold unless raw itself is already high.
+    ``effective`` capped at ``0.9 + 0.1 * raw``, which pulls it below a
+    genuine near-miss scoring above that cap.
+
+    The cap alone is NOT enough to demote one, and callers must not treat it
+    as if it were: ``0.9 + 0.1 * raw`` only falls under the 0.95 permuter
+    threshold when ``raw < 0.5``, so a normalized-only match with, say, raw
+    0.85 still ranks 0.985 and would outrank a genuine 0.96 near-miss. Every
+    consumer that must exclude one therefore tests
+    ``_is_normalized_only_match`` explicitly -- the permuter trigger and the
+    improvement test in ``run_iteration``, ``_select_permuter_bodies``, and
+    ``attempt_sort_key``, which is what actually orders attempts and
+    candidate pools.
     """
     similarity = attempt.get("similarity_score") or 0.0
     raw = attempt.get("raw_similarity_score")
@@ -456,6 +465,31 @@ def attempt_rank(attempt: dict) -> tuple[float, float]:
     if _is_normalized_only_match(attempt):
         effective = min(similarity, 0.9 + 0.1 * raw_value)
     return (effective, raw_value)
+
+
+def attempt_sort_key(entry: dict) -> tuple[bool, float, float]:
+    """Ordering key for attempts and ``best_candidates`` entries: every genuine
+    near-miss ahead of every normalized-only match, then by ``attempt_rank``.
+
+    Use this, not ``attempt_rank``, to pick a best or sort a pool.
+    ``attempt_rank``'s cap does not order these on its own (see its
+    docstring), and both things it feeds are load-bearing:
+
+    * ``run_iteration``'s ``iteration_best`` drives "best" tracking, the
+      permuter trigger and the iteration log. Ranked by ``attempt_rank``
+      alone, one normalized-only match outranks a genuine near-miss in the
+      same batch and then fails every ``_is_normalized_only_match`` guard
+      downstream -- so the genuine candidate is silently swallowed: no
+      improvement recorded, no permuter pass.
+    * ``best_candidates[0]`` is the candidate rendered first in the next
+      prompt, the ``mismatch_kind`` written into the region notes, and the
+      body ``record_tie_pool`` seeds the tie pool with.
+
+    A pool that is entirely normalized-only still keeps its best entry first,
+    so the tie-pool path is unaffected. Sorted or maximised with
+    ``reverse=True``/``max``, ``True`` (genuine) precedes ``False``."""
+    effective, raw_value = attempt_rank(entry)
+    return (not _is_normalized_only_match(entry), effective, raw_value)
 
 
 # ---------------------------------------------------------------------------
@@ -2458,7 +2492,7 @@ def run_iteration(
 
     attempts = result.get("attempts") or []
     scored = [a for a in attempts if isinstance(a.get("similarity_score"), (int, float))]
-    iteration_best = max(scored, key=attempt_rank) if scored else None
+    iteration_best = max(scored, key=attempt_sort_key) if scored else None
 
     owner_state["history"].append({
         "iteration": iteration,
@@ -2480,9 +2514,23 @@ def run_iteration(
             for a in attempts
         ],
     })
+    # Report the effective (capped) similarity, and say so when the best
+    # attempt was only a normalized-only match -- logging the bare
+    # ``similarity_score`` there reads as a perfect match ("best_similarity=1.0")
+    # for a candidate the driver scored lower and refused to act on.
+    if iteration_best is None:
+        best_similarity_text = "None"
+    elif _is_normalized_only_match(iteration_best):
+        best_similarity_text = (
+            f"{attempt_rank(iteration_best)[0]:.4g} (normalized-only: "
+            f"normalized={iteration_best.get('similarity_score')} "
+            f"raw={iteration_best.get('raw_similarity_score')})"
+        )
+    else:
+        best_similarity_text = f"{attempt_rank(iteration_best)[0]:.4g}"
     logger.log(
         f"{owner}: iter {iteration}: {len(attempts)} attempt(s) "
-        f"best_similarity={iteration_best.get('similarity_score') if iteration_best else None} "
+        f"best_similarity={best_similarity_text} "
         f"accepted={result.get('accepted')}"
     )
 
@@ -2522,7 +2570,7 @@ def run_iteration(
             "normalized_only": _is_normalized_only_match(attempt),
             "feedback": _build_feedback(attempt),
         })
-    owner_state["best_candidates"].sort(key=attempt_rank, reverse=True)
+    owner_state["best_candidates"].sort(key=attempt_sort_key, reverse=True)
     seen_labels: set[str] = set()
     deduped: list[dict] = []
     for entry in owner_state["best_candidates"]:
@@ -3345,14 +3393,14 @@ def _merge_seed_candidates(
             tagged["seed_source"] = source_label
             ranked.append(tagged)
             best_per_source.setdefault(source_label, tagged)
-    ranked.sort(key=attempt_rank, reverse=True)
+    ranked.sort(key=attempt_sort_key, reverse=True)
     kept = ranked[:cap]
     kept_bodies = {_normalize_body_for_dedup(entry.get("body")) for entry in kept}
     for best in best_per_source.values():
         if _normalize_body_for_dedup(best.get("body")) not in kept_bodies:
             kept.append(best)
             kept_bodies.add(_normalize_body_for_dedup(best.get("body")))
-    kept.sort(key=attempt_rank, reverse=True)
+    kept.sort(key=attempt_sort_key, reverse=True)
     return kept
 
 
@@ -3401,7 +3449,7 @@ def seed_owner_states(seed_dirs: list[Path], *, logger: Logger) -> dict[str, dic
             contributing_dirs.append(source_label)
 
             candidates = [c for c in (entry.get("best_candidates") or []) if isinstance(c, dict)]
-            candidates.sort(key=attempt_rank, reverse=True)
+            candidates.sort(key=attempt_sort_key, reverse=True)
 
             if entry.get("status") == "accepted":
                 seed_dir = Path(source_label)
@@ -3467,12 +3515,17 @@ def seed_owner_states(seed_dirs: list[Path], *, logger: Logger) -> dict[str, dic
         owner_state["seeded_from"] = contributing_dirs
 
         if merged:
-            best_entry = max(merged, key=attempt_rank)
+            best_entry = max(merged, key=attempt_sort_key)
             best_similarity = best_entry.get("similarity_score")
             best_source = best_entry.get("seed_source") or contributing_dirs[0]
             owner_state["seed_best_similarity"] = best_similarity
+            best_text = f"{best_similarity}"
+            if _is_normalized_only_match(best_entry):
+                best_text += (
+                    f" (normalized-only: raw {best_entry.get('raw_similarity_score')})"
+                )
             logger.log(
-                f"{owner}: seeded {len(merged)} candidate(s), best {best_similarity} "
+                f"{owner}: seeded {len(merged)} candidate(s), best {best_text} "
                 f"from {best_source}"
             )
         else:

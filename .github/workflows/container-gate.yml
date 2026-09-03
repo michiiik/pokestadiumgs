@@ -1,5 +1,5 @@
 # Container ROM gate: rebuilds the ROM from a PR's disasm/src,
-# disasm/include, and disasm/linker_scripts inside the prebuilt
+# disasm/include, disasm/linker_scripts and disasm/Makefile inside the prebuilt
 # gs-decomp-agent:latest image (see docs/CONTAINER_AGENT.md) and only
 # passes if the checksum matches the retail ROM. Replaces a human manually
 # re-gating a container-produced match before it merges.
@@ -23,6 +23,7 @@ on:
       - 'disasm/src/**'
       - 'disasm/include/**'
       - 'disasm/linker_scripts/**'
+      - 'disasm/Makefile'
       - 'container/**'
       - 'tools/**'
   workflow_dispatch: {}

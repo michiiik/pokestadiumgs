@@ -1056,6 +1056,180 @@ class RunIterationTests(unittest.TestCase):
         self.assertEqual(owner_state["best_effective_similarity"], 0.0)
         self.assertTrue(owner_state["best_candidates"][0]["normalized_only"])
 
+    def test_normalized_only_match_ranks_below_a_lower_scoring_genuine_near_miss(self) -> None:
+        # Regression: attempt_rank caps a normalized-only match at
+        # 0.9 + 0.1 * raw, which only drops under 0.95 when raw < 0.5. The
+        # real func_8005CCD8 attempt (normalized 1.0, raw 0.8462, every
+        # branch target collapsed to the epilogue) therefore caps at 0.9846
+        # and outranks a genuine 0.96 near-miss under attempt_rank alone.
+        # attempt_sort_key must demote it regardless.
+        normalized_only = {
+            "label": "dispatcher:switch:output-local:pointer-fields",
+            "similarity_score": 1.0, "raw_similarity_score": 0.8462,
+            "status": "probe_rejected", "normalized_only": True,
+        }
+        genuine = {
+            "label": "genuine", "similarity_score": 0.96,
+            "raw_similarity_score": 0.96, "status": "probe_rejected",
+            "normalized_only": False,
+        }
+        self.assertTrue(container_agent._is_normalized_only_match(normalized_only))
+        # The cap alone does not order these -- this is why the sort key exists.
+        self.assertGreater(
+            container_agent.attempt_rank(normalized_only)[0],
+            container_agent.attempt_rank(genuine)[0],
+        )
+        ranked = sorted(
+            [normalized_only, genuine],
+            key=container_agent.attempt_sort_key, reverse=True,
+        )
+        self.assertEqual([entry["label"] for entry in ranked], ["genuine", normalized_only["label"]])
+
+    def test_all_normalized_only_pool_still_keeps_its_best_first(self) -> None:
+        # Demotion must not scramble a pool that is entirely normalized-only
+        # (the live func_8005CCD8 shape): record_tie_pool seeds the tie pool
+        # from best_candidates[0], which still has to be the best body.
+        high = {"label": "high", "similarity_score": 1.0,
+                "raw_similarity_score": 0.8462, "normalized_only": True}
+        low = {"label": "low", "similarity_score": 1.0,
+               "raw_similarity_score": 0.80, "normalized_only": True}
+        ranked = sorted([low, high], key=container_agent.attempt_sort_key, reverse=True)
+        self.assertEqual([entry["label"] for entry in ranked], ["high", "low"])
+        self.assertTrue(container_agent._best_is_tie(ranked[0]))
+
+    def test_best_candidates_puts_genuine_near_miss_ahead_of_normalized_only(self) -> None:
+        # The same inversion, end to end through run_iteration: the pool that
+        # feeds the next prompt, the region-note mismatch_kind and the
+        # tie-pool seed must lead with the genuine candidate.
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            repo_dir.mkdir()
+            out_dir = Path(tmp) / "out"
+            owner = "func_1"
+            owner_state = container_agent._new_owner_state()
+            batch = {"source": "disasm/src/X.c", "candidates": [
+                {"function": owner, "label": "norm_only", "body": "body_norm"},
+                {"function": owner, "label": "genuine", "body": "body_genuine"},
+            ]}
+            result = {
+                "batch_status": "no_candidate_accepted", "accepted": [],
+                "attempts": [
+                    {"function": owner, "label": "norm_only", "status": "probe_rejected",
+                     "similarity_score": 1.0, "raw_similarity_score": 0.8462,
+                     "mismatch_kind": "section_layout_drift"},
+                    {"function": owner, "label": "genuine", "status": "probe_rejected",
+                     "similarity_score": 0.96, "raw_similarity_score": 0.96,
+                     "mismatch_kind": "operand_or_scheduling_drift"},
+                ],
+            }
+            logger = container_agent.Logger(out_dir / "log.txt")
+            batch_path = out_dir / "batches" / "func_1_iter0.json"
+            container_agent.save_json(batch_path, batch)
+
+            def fake_probe(repo_dir_arg, batch_path_arg, result_path, *, timeout):
+                container_agent.save_json(result_path, result)
+                return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+            with mock.patch.object(container_agent, "invoke_probe", side_effect=fake_probe), \
+                 mock.patch.object(container_agent, "run_permuter"):
+                container_agent.run_iteration(
+                    repo_dir=repo_dir, out_dir=out_dir, source_rel="disasm/src/X.c", owner=owner,
+                    iteration=0, batch=batch, batch_path=batch_path, owner_state=owner_state,
+                    deadline=time.monotonic() + 60.0, permuter_seconds=0.0, logger=logger,
+                )
+            log_text = (out_dir / "log.txt").read_text()
+
+        self.assertEqual(owner_state["best_candidates"][0]["label"], "genuine")
+        self.assertFalse(owner_state["best_candidates"][0]["normalized_only"])
+        # The genuine attempt is the one "best" tracking follows, too.
+        self.assertEqual(owner_state["best_similarity"], 0.96)
+        # ... and the log reports the effective score, never a bare "1.0".
+        self.assertIn("best_similarity=0.96", log_text)
+        self.assertNotIn("best_similarity=1.0", log_text)
+
+    def test_genuine_near_miss_still_triggers_permuter_beside_a_normalized_only_match(self) -> None:
+        # Regression for the worst form of the inversion: ranked by
+        # attempt_rank alone, the normalized-only 1.0/0.8462 attempt becomes
+        # iteration_best (capped 0.9846 > 0.96), and every downstream
+        # _is_normalized_only_match guard then suppresses the permuter -- so
+        # the genuine 0.96 near-miss sharing its batch is swallowed whole.
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            repo_dir.mkdir()
+            out_dir = Path(tmp) / "out"
+            owner = "func_1"
+            owner_state = container_agent._new_owner_state()
+            batch = {"source": "disasm/src/X.c", "candidates": [
+                {"function": owner, "label": "norm_only", "body": "body_norm"},
+                {"function": owner, "label": "genuine", "body": "body_genuine"},
+            ]}
+            result = {
+                "batch_status": "no_candidate_accepted", "accepted": [],
+                "attempts": [
+                    {"function": owner, "label": "norm_only", "status": "probe_rejected",
+                     "similarity_score": 1.0, "raw_similarity_score": 0.8462,
+                     "mismatch_kind": "section_layout_drift"},
+                    {"function": owner, "label": "genuine", "status": "probe_rejected",
+                     "similarity_score": 0.96, "raw_similarity_score": 0.96,
+                     "mismatch_kind": "operand_or_scheduling_drift"},
+                ],
+            }
+            jobs = []
+            permuter_result = {"timed_out": False, "outputs": [], "best": None}
+            with mock.patch.object(container_agent, "run_permuter", return_value=permuter_result) as run_permuter_mock:
+                self._run(
+                    out_dir, repo_dir, owner, batch, result, owner_state,
+                    permuter_seconds=30.0, permuter_jobs=jobs,
+                )
+
+        run_permuter_mock.assert_called()
+        # It must permute the genuine body, never the normalized-only one.
+        self.assertEqual(jobs[0].labels, ["genuine"])
+        permuted_bodies = [call.args[4] for call in run_permuter_mock.call_args_list]
+        self.assertEqual(permuted_bodies, ["body_genuine"])
+
+    def test_iteration_log_annotates_a_normalized_only_best(self) -> None:
+        # When the best attempt IS normalized-only, the log must say so
+        # rather than printing "best_similarity=1.0" for a candidate the
+        # driver scored lower and refused to act on.
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            repo_dir.mkdir()
+            out_dir = Path(tmp) / "out"
+            owner = "func_1"
+            owner_state = container_agent._new_owner_state()
+            batch = {"source": "disasm/src/X.c", "candidates": [
+                {"function": owner, "label": "a", "body": "body_a"}]}
+            result = {
+                "batch_status": "no_candidate_accepted", "accepted": [],
+                "attempts": [{
+                    "function": owner, "label": "a", "status": "probe_rejected",
+                    "similarity_score": 1.0, "raw_similarity_score": 0.8462,
+                    "mismatch_kind": "section_layout_drift",
+                }],
+            }
+            logger = container_agent.Logger(out_dir / "log.txt")
+            batch_path = out_dir / "batches" / "func_1_iter0.json"
+            container_agent.save_json(batch_path, batch)
+
+            def fake_probe(repo_dir_arg, batch_path_arg, result_path, *, timeout):
+                container_agent.save_json(result_path, result)
+                return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+            with mock.patch.object(container_agent, "invoke_probe", side_effect=fake_probe), \
+                 mock.patch.object(container_agent, "run_permuter"):
+                container_agent.run_iteration(
+                    repo_dir=repo_dir, out_dir=out_dir, source_rel="disasm/src/X.c", owner=owner,
+                    iteration=0, batch=batch, batch_path=batch_path, owner_state=owner_state,
+                    deadline=time.monotonic() + 60.0, permuter_seconds=0.0, logger=logger,
+                )
+            log_text = (out_dir / "log.txt").read_text()
+
+        self.assertIn("normalized-only", log_text)
+        self.assertIn("normalized=1.0", log_text)
+        self.assertIn("raw=0.8462", log_text)
+        self.assertNotIn("best_similarity=1.0 ", log_text)
+
     def test_later_genuine_improvement_counts_over_normalized_only_match(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             repo_dir = Path(tmp) / "repo"

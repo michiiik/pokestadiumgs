@@ -1056,6 +1056,187 @@ class RunnerTests(unittest.TestCase):
             runner._ensure_worktree_oracles(worktree, full_tree=True)
             self.assertFalse((local / "primary_only").exists())
 
+    def _oracle_worktree(self, directory: str):
+        """A worktree with a private oracle tree plus a primary checkout."""
+        main = Path(directory) / "main"
+        worktree = Path(directory) / "worktree"
+        git_dir = main / ".git" / "worktrees" / "lane"
+        git_dir.mkdir(parents=True)
+        shared = main / "disasm" / "asm" / "us" / "nonmatchings" / "owner"
+        shared.mkdir(parents=True)
+        (shared / "func_a.s").write_text("glabel func_a\n")
+        (shared / "func_b.s").write_text("glabel func_b\n")
+        local = worktree / "disasm" / "asm" / "us" / "nonmatchings" / "owner"
+        local.mkdir(parents=True)
+        # The private extraction produced func_a but never produced func_b.
+        (local / "func_a.s").write_text("glabel func_a\n")
+        source = worktree / "disasm" / "src" / "owner.c"
+        source.parent.mkdir(parents=True)
+        source.write_text(
+            '#pragma GLOBAL_ASM("asm/us/nonmatchings/owner/func_a.s")\n'
+            '#pragma GLOBAL_ASM("asm/us/nonmatchings/owner/func_b.s")\n'
+        )
+        (worktree / ".git").write_text(f"gitdir: {git_dir}\n")
+        return main, worktree, source
+
+    def test_marker_rejects_a_dependency_the_extraction_never_produced(self) -> None:
+        # Regression: a required oracle that is missing on disk is also absent
+        # from the manifest, so `recorded.get(key) != _file_fingerprint(path)`
+        # compared None against None and the marker validated a tree that
+        # cannot compile.
+        with tempfile.TemporaryDirectory() as directory:
+            _, worktree, source = self._oracle_worktree(directory)
+            marker = {
+                "schema": 2,
+                "outputs": {"asm_oracles": runner._private_asm_manifest(worktree)},
+            }
+            recorded = marker["outputs"]["asm_oracles"]
+            self.assertNotIn(
+                "disasm/asm/us/nonmatchings/owner/func_b.s", recorded,
+                "fixture must model an oracle the extraction never produced",
+            )
+            self.assertFalse(
+                runner._private_asm_marker_usable(
+                    worktree, marker, source_path=source, full_tree=False
+                )
+            )
+
+    def test_marker_still_accepts_a_complete_private_extraction(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            _, worktree, source = self._oracle_worktree(directory)
+            local = worktree / "disasm" / "asm" / "us" / "nonmatchings" / "owner"
+            (local / "func_b.s").write_text("glabel func_b\n")
+            marker = {
+                "schema": 2,
+                "outputs": {"asm_oracles": runner._private_asm_manifest(worktree)},
+            }
+            self.assertTrue(
+                runner._private_asm_marker_usable(
+                    worktree, marker, source_path=source, full_tree=False
+                )
+            )
+
+    def test_missing_oracle_is_backfilled_from_primary_as_a_real_file(self) -> None:
+        # The bootstrap must not record an extraction that cannot compile.
+        # The backfilled file has to be a real file: _private_asm_manifest
+        # skips symlinks and _remove_shared_asm_overlays deletes them.
+        with tempfile.TemporaryDirectory() as directory:
+            _, worktree, _ = self._oracle_worktree(directory)
+            unresolved = runner._backfill_missing_private_oracles(worktree)
+            self.assertEqual(unresolved, [])
+            restored = worktree / "disasm" / "asm" / "us" / "nonmatchings" / "owner" / "func_b.s"
+            self.assertTrue(restored.is_file())
+            self.assertFalse(restored.is_symlink())
+            self.assertEqual(restored.read_text(), "glabel func_b\n")
+            # ... and it is now recorded, so the marker validates.
+            recorded = runner._private_asm_manifest(worktree)
+            self.assertIn("disasm/asm/us/nonmatchings/owner/func_b.s", recorded)
+
+    def test_backfill_reports_an_oracle_the_primary_cannot_supply(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            main, worktree, _ = self._oracle_worktree(directory)
+            (main / "disasm" / "asm" / "us" / "nonmatchings" / "owner" / "func_b.s").unlink()
+            self.assertEqual(
+                runner._backfill_missing_private_oracles(worktree),
+                ["owner/func_b.s"],
+            )
+
+    def test_backfill_replaces_a_symlinked_oracle_with_a_real_file(self) -> None:
+        # A symlink overlay does not survive the next bootstrap, so it must be
+        # materialised rather than left in place.
+        with tempfile.TemporaryDirectory() as directory:
+            main, worktree, _ = self._oracle_worktree(directory)
+            local = worktree / "disasm" / "asm" / "us" / "nonmatchings" / "owner" / "func_b.s"
+            local.symlink_to(main / "disasm" / "asm" / "us" / "nonmatchings" / "owner" / "func_b.s")
+            self.assertEqual(runner._backfill_missing_private_oracles(worktree), [])
+            self.assertFalse(local.is_symlink())
+            self.assertTrue(local.is_file())
+
+    def test_unrelated_build_failure_is_not_the_candidate_s_fault(self) -> None:
+        # The real output that made every re-gate report compare_rejected:
+        # the gate builds the whole tree, an untouched file failed the host
+        # clang check, and the candidate under test was blamed for it.
+        output = (
+            "src/fragments/22/fragment22_14B090.c:315:23: error: too few "
+            "arguments to function call, expected 2, have 0\n"
+            "make: *** [build/src/fragments/22/fragment22_14B090.o] Error 1\n"
+            "make: *** Waiting for unfinished jobs....\n"
+        )
+        self.assertEqual(
+            runner._unrelated_build_failures(output, "build/src/585D0.o"),
+            ["build/src/fragments/22/fragment22_14B090.o"],
+        )
+
+    def test_candidate_s_own_object_failing_is_still_its_fault(self) -> None:
+        output = "make: *** [build/src/585D0.o] Error 1\n"
+        self.assertEqual(runner._unrelated_build_failures(output, "build/src/585D0.o"), [])
+
+    def test_rom_target_failure_alone_is_not_an_unrelated_failure(self) -> None:
+        # The ROM/ELF target fails as a consequence of anything upstream and
+        # names no source, so it must not be read as an unrelated breakage.
+        output = "make: *** [build/pokestadiumgs-us.z64] Error 1\n"
+        self.assertEqual(runner._unrelated_build_failures(output, "build/src/585D0.o"), [])
+
+    def test_failed_make_targets_handles_sub_make_prefixes(self) -> None:
+        output = (
+            "make[1]: *** [build/src/a.o] Error 1\n"
+            "make: *** [build/src/b.o] Error 2\n"
+        )
+        self.assertEqual(
+            runner._failed_make_targets(output), ["build/src/a.o", "build/src/b.o"]
+        )
+
+    def test_gate_environment_broken_is_not_a_rejection_or_a_resend_block(self) -> None:
+        # The whole point of the distinct status: it must not poison the
+        # futility fingerprints, and must not stop the body being re-sent
+        # once the environment is repaired.
+        self.assertNotIn("gate_environment_broken", runner._REJECTED_ATTEMPT_STATUSES)
+        self.assertNotIn("gate_environment_broken", runner._DUPLICATE_BLOCKING_STATUSES)
+
+    def test_synthetic_sources_never_reach_the_shared_probe_stats_ledger(self) -> None:
+        # A test's temp-dir source, and a scratch copy, teach a later run
+        # nothing. 227 such rows had accumulated in the primary checkout's
+        # shared ledger before this guard.
+        with mock.patch.dict(os.environ, {}, clear=False):
+            os.environ.pop("PRAGMA_PROBE_STATS", None)
+            self.assertFalse(runner._is_recordable_source(Path("/var/folders/x/T/tmp1/synthetic.c")))
+            self.assertFalse(
+                runner._is_recordable_source(
+                    Path("/repo/disasm/scratch/tmpabcd/synthetic.c")
+                )
+            )
+            self.assertTrue(runner._is_recordable_source(Path("/repo/disasm/src/585D0.c")))
+            self.assertTrue(runner._is_recordable_source(Path("disasm/src/585D0.c")))
+
+    def test_an_explicit_stats_destination_accepts_any_source(self) -> None:
+        # container_merge --fresh-history and the runner's own row-shaping
+        # tests both point PRAGMA_PROBE_STATS at a file they own; the guard
+        # protects the shared default ledger, not a chosen destination.
+        with mock.patch.dict(os.environ, {"PRAGMA_PROBE_STATS": "/tmp/history.jsonl"}):
+            self.assertTrue(
+                runner._is_recordable_source(Path("/var/folders/x/T/tmp1/synthetic.c"))
+            )
+
+    def test_record_probe_stats_writes_nothing_for_a_synthetic_source(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.c"
+            source.write_text("void func_a(void) {}\n")
+            ledger = Path(directory) / "shared" / "probe-stats.jsonl"
+            attempts = [{"index": 0, "function": "func_a", "status": "compare_rejected"}]
+            with mock.patch.dict(os.environ, {}, clear=False):
+                os.environ.pop("PRAGMA_PROBE_STATS", None)
+                with mock.patch.object(runner, "_probe_stats_target", return_value=ledger):
+                    runner._record_probe_stats(source, attempts, None)
+                    self.assertFalse(
+                        ledger.exists(), "a synthetic source must not reach the ledger"
+                    )
+                    # A real tracked source still records, so the guard has
+                    # not simply disabled the writer.
+                    runner._record_probe_stats(
+                        Path("/repo/disasm/src/585D0.c"), attempts, None
+                    )
+                    self.assertTrue(ledger.exists())
+
     def test_worktree_gate_prerequisites_are_built_privately(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             main = Path(directory) / "main"
