@@ -93,7 +93,51 @@ s32 func_826047C4(s32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_826049A0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82604A78.s")
+extern s16 D_82615542[];
+extern s32 func_8004C990(s32, s32);
+s32 func_82604A78(s32 *arg0, s32 arg1, s32 arg2, s32 arg3) {
+    s32 result;
+    s32 next;
+
+    result = 0;
+    switch (arg1) {
+    case 15:
+        arg0[0] = func_8004C990(0x72, 1);
+        result = 1;
+        break;
+    case 11:
+        arg0[0] = func_8004C990(0x6B, 0);
+        result = result + 1;
+        arg0[result] = func_8004C990(0x65, D_82615542[arg2]);
+        result = result + 1;
+        break;
+    case 14:
+        arg0[0] = func_8004C990(0x6F, 1);
+        result = result + 1;
+        arg0[result] = func_8004C990(0x65, D_82615542[arg2]);
+        result = result + 1;
+        break;
+    case 24:
+        arg0[0] = func_8004C990(0x6A, 1);
+        result = 1;
+        break;
+    default:
+        next = arg2 + 1;
+        if (arg3 != next) goto indexed_default;
+        arg0[0] = func_8004C990(0x6F, 0);
+        result = 1;
+        break;
+indexed_default:
+        if (arg2 >= 6) goto done_default;
+        arg0[0] = func_8004C990(0x6F, 2);
+        result = result + 1;
+        arg0[result] = func_8004C990(0x65, D_82615542[arg2]);
+        result = result + 1;
+done_default:
+        break;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82604C08.s")
 
