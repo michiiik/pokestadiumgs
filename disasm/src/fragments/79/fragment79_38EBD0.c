@@ -46,7 +46,8 @@ void func_8411F5F4(s32 arg0, s32 arg1) {
     func_8411F4F4(arg1, D_8419120C);
 }
 
-void func_8411F688(u8 *arg0, s32 arg1) {}
+void func_8411F688(u8* arg0, s32 arg1) {
+}
 
 extern void func_8411F598(void);
 extern void func_8411F5F4(s32, s32);

@@ -210,7 +210,11 @@ s32 Jpeg_DecodeImage(u32 addr, s32 arg1, u8 *arg2)
   return var_s2;
 }
 
-void Dma_InitializeCompletionQueue(void) { extern OSMesgQueue D_800CD000; extern OSMesg D_800CD018[]; osCreateMesgQueue(&D_800CD000, D_800CD018, 1); }
+void Dma_InitializeCompletionQueue(void) {
+    extern OSMesgQueue D_800CD000;
+    extern OSMesg D_800CD018[];
+    osCreateMesgQueue(&D_800CD000, D_800CD018, 1);
+}
 
 typedef struct S1_PERSSZP S1_PERSSZP;
 struct S1_PERSSZP {
@@ -274,7 +278,9 @@ s32 func_80003E84(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     return 0;
 }
 
-s32 func_80003F54(s32 arg0) { return osFlashSectorErase(arg0 << 7); }
+s32 func_80003F54(s32 arg0) {
+    return osFlashSectorErase(arg0 << 7);
+}
 
 extern void Dma_QueueRomRead(s32, u8 *, u8 *, s32, OSMesgQueue *, s32);
 void func_80003F74(u8 *arg0, u8 *arg1, u8 *arg2, s32 arg3) {
@@ -563,7 +569,9 @@ S1_BinArchive* BinArchive_Open(u8* romStart, u8* romEnd, s32 arg2, s32 arg3) {
     return ret;
 }
 
-void func_800049B8(void) { main_pool_try_free(); }
+void func_800049B8(void) {
+    main_pool_try_free();
+}
 
 struct S1_BinArchive;
 struct S1_BinArchiveFile4420;
@@ -623,9 +631,13 @@ s32 file_number;
     return result;
 }
 
-void func_80004B4C(s32 arg0,s32 arg1){func_80004A40(0,arg0,arg1);}
+void func_80004B4C(s32 arg0, s32 arg1) {
+    func_80004A40(0, arg0, arg1);
+}
 
-void func_80004B78(void) { func_80004A40(); }
+void func_80004B78(void) {
+    func_80004A40();
+}
 
 typedef struct { u32 offset; u32 size; s32 cachedPtr; u32 pad; } BinFile;
 typedef struct { u32 raw0; u32 romStart; u32 total_size; u32 num_files; BinFile files[1]; } BinArchive;

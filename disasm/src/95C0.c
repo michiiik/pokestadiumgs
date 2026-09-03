@@ -4,7 +4,51 @@
 #ifdef VERSION_US
 extern Gfx *D_800D05A0;
 extern u8 D_80087320[];
-void TextRenderer_SetupGlyphState(void) { Gfx *a,*b,*c,*d,*e,*f,*g,*h,*i,*j,*k,*l,*m,*n; a=D_800D05A0++; a->words.w0=0xE7000000; a->words.w1=0; b=D_800D05A0++; b->words.w0=0xE3000A01; b->words.w1=0; c=D_800D05A0++; c->words.w0=0xE3000C00; c->words.w1=0; d=D_800D05A0++; d->words.w0=0xE3001201; d->words.w1=0; e=D_800D05A0++; e->words.w0=0xFA000000; e->words.w1=0xFFFFFFFF; f=D_800D05A0++; f->words.w0=0xE200001C; f->words.w1=0x0F0A7008; g=D_800D05A0++; g->words.w0=0xFC119623; g->words.w1=0xFF2FFFFF; h=D_800D05A0++; h->words.w0=0xFD700000; h->words.w1=((u32)&D_80087320&0x1FFFFFFF); i=D_800D05A0++; i->words.w0=0xF5700000; i->words.w1=0x07018070; j=D_800D05A0++; j->words.w0=0xE6000000; j->words.w1=0; k=D_800D05A0++; k->words.w0=0xF3000000; k->words.w1=0x0747F156; l=D_800D05A0++; l->words.w0=0xE7000000; l->words.w1=0; m=D_800D05A0++; m->words.w0=0xF5600C00; m->words.w1=0x00018070; n=D_800D05A0++; n->words.w0=0xF2000000; n->words.w1=0x0017C0BC; }
+void TextRenderer_SetupGlyphState(void) {
+    Gfx *a, *b, *c, *d, *e, *f, *g, *h, *i, *j, *k, *l, *m, *n;
+    a = D_800D05A0++;
+    a->words.w0 = 0xE7000000;
+    a->words.w1 = 0;
+    b = D_800D05A0++;
+    b->words.w0 = 0xE3000A01;
+    b->words.w1 = 0;
+    c = D_800D05A0++;
+    c->words.w0 = 0xE3000C00;
+    c->words.w1 = 0;
+    d = D_800D05A0++;
+    d->words.w0 = 0xE3001201;
+    d->words.w1 = 0;
+    e = D_800D05A0++;
+    e->words.w0 = 0xFA000000;
+    e->words.w1 = 0xFFFFFFFF;
+    f = D_800D05A0++;
+    f->words.w0 = 0xE200001C;
+    f->words.w1 = 0x0F0A7008;
+    g = D_800D05A0++;
+    g->words.w0 = 0xFC119623;
+    g->words.w1 = 0xFF2FFFFF;
+    h = D_800D05A0++;
+    h->words.w0 = 0xFD700000;
+    h->words.w1 = ((u32)&D_80087320 & 0x1FFFFFFF);
+    i = D_800D05A0++;
+    i->words.w0 = 0xF5700000;
+    i->words.w1 = 0x07018070;
+    j = D_800D05A0++;
+    j->words.w0 = 0xE6000000;
+    j->words.w1 = 0;
+    k = D_800D05A0++;
+    k->words.w0 = 0xF3000000;
+    k->words.w1 = 0x0747F156;
+    l = D_800D05A0++;
+    l->words.w0 = 0xE7000000;
+    l->words.w1 = 0;
+    m = D_800D05A0++;
+    m->words.w0 = 0xF5600C00;
+    m->words.w1 = 0x00018070;
+    n = D_800D05A0++;
+    n->words.w0 = 0xF2000000;
+    n->words.w1 = 0x0017C0BC;
+}
 
 extern Gfx *D_800D05A0;
 void TextRenderer_RestoreState(void) {

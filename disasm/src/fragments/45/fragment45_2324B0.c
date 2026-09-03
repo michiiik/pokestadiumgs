@@ -15,7 +15,9 @@ extern s16 D_8AB17238; void func_8AB0D4A4(void) { D_8AB17238 += 1; }
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2324B0/func_8AB0E0F4.s")
 
 extern void func_8AB0E21C(s32);
-void func_8AB0E1FC(void) { func_8AB0E21C(0); }
+void func_8AB0E1FC(void) {
+    func_8AB0E21C(0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2324B0/func_8AB0E21C.s")
 

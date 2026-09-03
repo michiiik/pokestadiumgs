@@ -71,7 +71,10 @@ extern s16 D_8AC08514;
 extern s16 D_8AC08516;
 extern s16 D_8AC08518;
 extern s16 D_8AC0851A;
-void func_8AC005D8(void) { gDPPipeSync(D_800D0510++); gDPSetScissor(D_800D0510++, G_SC_NON_INTERLACE, D_8AC08514, D_8AC08516, D_8AC08518, D_8AC0851A); }
+void func_8AC005D8(void) {
+    gDPPipeSync(D_800D0510++);
+    gDPSetScissor(D_800D0510++, G_SC_NON_INTERLACE, D_8AC08514, D_8AC08516, D_8AC08518, D_8AC0851A);
+}
 #endif
 
 #ifdef VERSION_US

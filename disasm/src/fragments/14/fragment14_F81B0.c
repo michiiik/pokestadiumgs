@@ -32,7 +32,8 @@ void func_813000BC(void *arg0, s32 arg1) {
     state->value = 1;
 }
 
-void func_813000DC(u8 *arg0) {}
+void func_813000DC(u8* arg0) {
+}
 
 s32 func_813000E4(void *arg0) {
     s32 var_v1;
@@ -81,7 +82,17 @@ void func_81300244(s32 arg0, s32 arg1, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_813002D0.s")
 
-s32 func_81300314(void *arg0, s32 arg1, s32 arg2) { u8 *base = (u8 *)arg0 + 0x18000; do { arg1 += arg2; if (arg1 < 0 || arg1 >= 4) break; if (*(s8 *)(*(u8 **)(base + 0x2148) + arg1 + 0x900) >= -1) break; } while (1); return arg1; }
+s32 func_81300314(void* arg0, s32 arg1, s32 arg2) {
+    u8* base = (u8*)arg0 + 0x18000;
+    do {
+        arg1 += arg2;
+        if (arg1 < 0 || arg1 >= 4)
+            break;
+        if (*(s8*)(*(u8**)(base + 0x2148) + arg1 + 0x900) >= -1)
+            break;
+    } while (1);
+    return arg1;
+}
 
 extern void func_80057944(s32);
 
@@ -103,14 +114,19 @@ void func_81300350(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_81300830.s")
 
-void func_81300B48(u8 *arg0) {}
+void func_81300B48(u8* arg0) {
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_81300B50.s")
 
 extern void func_8130A570(s32, s32);
 extern void func_81304208(s32);
 extern void func_81311C18(s32);
-void func_81300BA0(s32 arg0) { func_8130A570(arg0 + 0xDA8, 0); func_81304208(arg0 + 0x15370); func_81311C18(arg0 + 0x74); }
+void func_81300BA0(s32 arg0) {
+    func_8130A570(arg0 + 0xDA8, 0);
+    func_81304208(arg0 + 0x15370);
+    func_81311C18(arg0 + 0x74);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_81300BE8.s")
 
@@ -203,9 +219,11 @@ void func_81301C54(s32 arg0, s32 arg1) {
     }
 }
 
-void func_81301CCC(u8 *arg0, s32 arg1) {}
+void func_81301CCC(u8* arg0, s32 arg1) {
+}
 
-void func_81301CD8(u8 *arg0, s32 arg1) {}
+void func_81301CD8(u8* arg0, s32 arg1) {
+}
 
 extern void func_81311030(s32);
 extern void func_8130F7B8(s32, s32);
@@ -277,9 +295,11 @@ void func_81301F08(s32 arg0, s32 arg1) {
     func_8130DEB8(arg0, arg1);
 }
 
-void func_81301F4C(u8 *arg0, s32 arg1) {}
+void func_81301F4C(u8* arg0, s32 arg1) {
+}
 
-void func_81301F58(u8 *arg0, s32 arg1) {}
+void func_81301F58(u8* arg0, s32 arg1) {
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_81301F64.s")
 

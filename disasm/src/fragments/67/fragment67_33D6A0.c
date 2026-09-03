@@ -199,7 +199,8 @@ void func_82901628(s16 arg0, s16 arg1, s16 arg2, s16 arg3) {
     gSPDisplayList(D_800D0510++, D_80094D90);
     Gfx_FillRectRgb(arg0, arg1, arg2, arg3, 0, 0, 0);
 }
-void func_82901628_padding(void) {}
+void func_82901628_padding(void) {
+}
 #endif
 
 #ifdef VERSION_US

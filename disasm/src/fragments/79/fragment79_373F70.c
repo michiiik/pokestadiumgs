@@ -51,9 +51,17 @@ void BattleAnim_BindModelAnimReversed(u8 *arg0, s16 arg1) {
     ModelAnim_SetFrame(arg0, (s16)(*(u16 *)(*(u8 **)(arg0 + 0x44) + 0xA) - 1));
 }
 
-void func_841049B4(u8 *arg0) { ModelAnim_SetFrame(arg0, (s16)(*(u16 *)(*(u8 **)(arg0 + 0x44) + 0xA) - 1)); }
+void func_841049B4(u8* arg0) {
+    ModelAnim_SetFrame(arg0, (s16)(*(u16*)(*(u8**)(arg0 + 0x44) + 0xA) - 1));
+}
 
-s32 BattleAnim_IsModelAnimComplete(u8 *arg0) { s32 result = 0; if (*(s32 *)(arg0 + 0x48) == 0) { result = 1; } return result; }
+s32 BattleAnim_IsModelAnimComplete(u8* arg0) {
+    s32 result = 0;
+    if (*(s32*)(arg0 + 0x48) == 0) {
+        result = 1;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_373F70/func_84104A00.s")
 

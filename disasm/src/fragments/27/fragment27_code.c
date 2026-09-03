@@ -14,9 +14,21 @@ void func_81100044(u32 *arg0, u32 arg1) {
     *arg0 ^= arg1;
 }
 
-s32 ParticleMath_HasBits(s32 *arg0, s32 arg1) { s32 result = 0; if (*arg0 & arg1) { result = 1; } return result; }
+s32 ParticleMath_HasBits(s32* arg0, s32 arg1) {
+    s32 result = 0;
+    if (*arg0 & arg1) {
+        result = 1;
+    }
+    return result;
+}
 
-s32 ParticleMath_LacksBits(u32 *arg0, u32 arg1) { s32 result = 0; if (!(*arg0 & arg1)) { result = 1; } return result; }
+s32 ParticleMath_LacksBits(u32* arg0, u32 arg1) {
+    s32 result = 0;
+    if (!(*arg0 & arg1)) {
+        result = 1;
+    }
+    return result;
+}
 
 extern u32 D_80128C00;
 s32 ParticleMath_RandomRange(s32 arg0) {
@@ -72,7 +84,11 @@ f32 *ParticleMath_RotateVec3fY(f32 *arg0, Frag27FloatBits arg1, Frag27FloatBits 
     return arg0;
 }
 
-void ParticleMath_CopyVec3f(f32 *arg0, f32 *arg1) { arg0[0] = arg1[0]; arg0[1] = arg1[1]; arg0[2] = arg1[2]; }
+void ParticleMath_CopyVec3f(f32* arg0, f32* arg1) {
+    arg0[0] = arg1[0];
+    arg0[1] = arg1[1];
+    arg0[2] = arg1[2];
+}
 
 void func_81100228(s16 *arg0, const s16 *arg1) {
     arg0[0] = arg1[0];

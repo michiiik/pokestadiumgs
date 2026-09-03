@@ -22,8 +22,10 @@ void func_8630500C(void *a) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/51/fragment51_27AC10/func_86305694.s")
 
-void func_86305790(void) {}
-void func_86305790_padding(void) {}
+void func_86305790(void) {
+}
+void func_86305790_padding(void) {
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/51/fragment51_27AC10/func_863057A0.s")
 

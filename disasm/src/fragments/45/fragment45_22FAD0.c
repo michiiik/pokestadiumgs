@@ -9,7 +9,9 @@
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22FAD0/func_8AB0B3F4.s")
 
 extern s32 func_8AB0B67C(s32);
-void func_8AB0B52C(void) { func_8AB0B67C(0); }
+void func_8AB0B52C(void) {
+    func_8AB0B67C(0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22FAD0/func_8AB0B54C.s")
 

@@ -8,8 +8,10 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_860049B8.s")
 
-void func_86004BC4(void) {}
-void func_86004BC4_padding(void) {}
+void func_86004BC4(void) {
+}
+void func_86004BC4_padding(void) {
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_86004BD4.s")
 
@@ -53,7 +55,8 @@ s32 func_860062E0(s32 arg0, u16 arg1) {
     }
     return 0;
 }
-void func_860062E0_padding(void) {}
+void func_860062E0_padding(void) {
+}
 
 extern void func_86001AFC(s32);
 void func_86006318(s32 arg0) {
@@ -160,9 +163,13 @@ void func_860075E4(void *arg0) {
 }
 
 extern void StageContext_SetClearColor(s32); extern void StageFade_StartFromTransparent(s32);
-void func_86007614(void *arg0) { StageContext_SetClearColor(1); StageFade_StartFromTransparent(0xA); }
+void func_86007614(void* arg0) {
+    StageContext_SetClearColor(1);
+    StageFade_StartFromTransparent(0xA);
+}
 
-void func_86007640(u8 *arg0) {}
+void func_86007640(u8* arg0) {
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_86007648.s")
 

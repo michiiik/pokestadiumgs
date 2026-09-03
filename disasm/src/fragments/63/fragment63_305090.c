@@ -64,7 +64,8 @@ void func_87E01EB0(void *arg0) {
     func_87E0168C(3, 0x8C, 0x2D);
 }
 
-void func_87E01F04(u8 *arg0) {}
+void func_87E01F04(u8* arg0) {
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_305090/func_87E01F0C.s")
 

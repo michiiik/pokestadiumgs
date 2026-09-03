@@ -5,7 +5,11 @@
 extern s32 D_882346F0;
 extern void func_800226C0();
 extern void func_88001900();
-void func_88231430(void) { func_800226C0(94); func_88001900(); D_882346F0 = 0; }
+void func_88231430(void) {
+    func_800226C0(94);
+    func_88001900();
+    D_882346F0 = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A46B0/func_8823145C.s")
 

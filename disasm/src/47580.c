@@ -183,7 +183,9 @@ void Font_FreeSetAsset(s32 arg0, s32 arg1)
 extern u32 D_437750;
 extern u32 D_446E30;
 extern void BinArchive_Open(void *, void *, s32, s32);
-void func_80047524(void) { BinArchive_Open(&D_437750, &D_446E30, 1, 1); }
+void func_80047524(void) {
+    BinArchive_Open(&D_437750, &D_446E30, 1, 1);
+}
 
 extern void func_80004B4C(s32, s32);
 s32 func_80047104(s32);
@@ -197,7 +199,9 @@ void func_80047558(s32 arg0, s32 arg1) {
 extern u8 *D_80126F50; void func_80047610(void) { main_pool_try_free(D_80126F50); }
 
 extern u16 D_80094FB4;
-void func_80047634(u16 arg0) { D_80094FB4 |= arg0; }
+void func_80047634(u16 arg0) {
+    D_80094FB4 |= arg0;
+}
 
 extern u16 D_80094FB4; void func_80047650(u16 arg0) { D_80094FB4 &= ~arg0; }
 
@@ -206,11 +210,21 @@ void func_80047670(void) {
     D_80126F50[0x7A] |= 4;
 }
 
-void Font_EnableLineBreak(void) { D_80126F50[0x7A] = (u8)(D_80126F50[0x7A] & ~4); }
+void Font_EnableLineBreak(void) {
+    D_80126F50[0x7A] = (u8)(D_80126F50[0x7A] & ~4);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800476A0.s")
 
-s32 func_800476FC(s32 arg0, s32 arg1) { s32 result = 0; if (arg1 > 0 && arg1 < 0x100 && D_80126F50 != NULL) { *(s32 *)(D_80126F50 + 0x50) = arg0; D_80126F50[0x7F] = arg1; result = 1; } return result; }
+s32 func_800476FC(s32 arg0, s32 arg1) {
+    s32 result = 0;
+    if (arg1 > 0 && arg1 < 0x100 && D_80126F50 != NULL) {
+        *(s32*)(D_80126F50 + 0x50) = arg0;
+        D_80126F50[0x7F] = arg1;
+        result = 1;
+    }
+    return result;
+}
 
 s32 func_80047738(s32 arg0, s32 arg1, s32 arg2, s32 arg3)
 {
@@ -265,13 +279,26 @@ s32 func_80047790(s32 arg0) {
 extern void func_800477C4(void *);
 extern s32 func_80047BD4(void *);
 extern void func_80046F2C(u8 *, s32);
-void func_80048188(u8 *arg0) { u8 temp[0x20]; func_800477C4(temp); func_80046F2C(arg0, func_80047BD4(temp)); }
+void func_80048188(u8* arg0) {
+    u8 temp[0x20];
+    func_800477C4(temp);
+    func_80046F2C(arg0, func_80047BD4(temp));
+}
 
 extern s32 func_8003514C(void);
-s32 func_800481C0(u8 *arg0, s32 value) { if (func_8003514C() != 0) value = 0; arg0[0x78] = value; return 1; }
+s32 func_800481C0(u8* arg0, s32 value) {
+    if (func_8003514C() != 0)
+        value = 0;
+    arg0[0x78] = value;
+    return 1;
+}
 
 extern s32 func_800481C0(u8 *, s32);
-s32 func_800481FC(u8 *arg0) { u8 temp[0x20]; func_800477C4(temp); return func_800481C0(arg0, func_80047BD4(temp)); }
+s32 func_800481FC(u8* arg0) {
+    u8 temp[0x20];
+    func_800477C4(temp);
+    return func_800481C0(arg0, func_80047BD4(temp));
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80048234.s")
 
@@ -303,11 +330,19 @@ void func_80049628(s32 arg0, s32 arg1, s32 arg2) {
     func_80048830(D_80126F50, arg0, arg1, arg2, 1);
 }
 
-s32 func_80049668(s32 value) { s32 result=0; if (D_80126F50 != NULL) result=func_800481C0(D_80126F50,value); return result; }
+s32 func_80049668(s32 value) {
+    s32 result = 0;
+    if (D_80126F50 != NULL)
+        result = func_800481C0(D_80126F50, value);
+    return result;
+}
 
 extern void func_800496D8(s32, s32);
 extern s32 func_80049668(s32);
-void func_800496A4(s32 a0, s32 a1) { func_800496D8(0, a0); func_80049668(a1); }
+void func_800496A4(s32 a0, s32 a1) {
+    func_800496D8(0, a0);
+    func_80049668(a1);
+}
 
 extern void func_80046B2C(u8 *, s32, s32);
 
@@ -327,7 +362,9 @@ void func_80049770(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
 extern u8 *D_80126F50; void func_800497C0(void) { func_80046C18(D_80126F50); }
 
 extern void func_80049828(s32, s32, s32, s32, s32);
-void func_800497E4(s32 arg0, s32 arg1, s32 arg2, s32 arg3) { func_80049828(0, arg0, arg1, arg2, arg3); }
+void func_800497E4(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    func_80049828(0, arg0, arg1, arg2, arg3);
+}
 
 extern void func_80046E64(u8 *, s32, s32, s32, s32, s32);
 void func_80049828(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
@@ -352,13 +389,20 @@ void Font_EnableTwoCycleTexturing(void) {
 }
 
 extern u8 D_80095040[]; extern Gfx *D_800D0510;
-void Font_DisableTwoCycleTexturing(void) { D_80126F50[0x7A] &= 0xFFFC; gSPDisplayList(D_800D0510++, D_80095040); }
+void Font_DisableTwoCycleTexturing(void) {
+    D_80126F50[0x7A] &= 0xFFFC;
+    gSPDisplayList(D_800D0510++, D_80095040);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80049BDC.s")
 
 extern Gfx *D_800D0510;
 extern u8 D_80095098[];
-void Font_EndTexturedTextRendering(void) { Gfx *temp_v1 = D_800D0510++; temp_v1->words.w0 = 0xDE000000; temp_v1->words.w1 = (u32)D_80095098; }
+void Font_EndTexturedTextRendering(void) {
+    Gfx* temp_v1 = D_800D0510++;
+    temp_v1->words.w0 = 0xDE000000;
+    temp_v1->words.w1 = (u32)D_80095098;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80049C70.s")
 

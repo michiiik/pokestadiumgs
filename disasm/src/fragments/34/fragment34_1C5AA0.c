@@ -56,7 +56,15 @@ void func_88508BEC(u8 *arg0) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C5AA0/func_88509290.s")
 
 extern u8 D_88523050[];
-void func_885093F0(void) { s32 i = 0; u8 *ptr = D_88523050; do { i += 1; ptr += 0x50; *(s32 *)(ptr - 0x50) = 0; } while (i != 2); }
+void func_885093F0(void) {
+    s32 i = 0;
+    u8* ptr = D_88523050;
+    do {
+        i += 1;
+        ptr += 0x50;
+        *(s32*)(ptr - 0x50) = 0;
+    } while (i != 2);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C5AA0/func_88509418.s")
 

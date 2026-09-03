@@ -83,7 +83,9 @@ void func_8002390C(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-void func_80023954(void) { func_8001874C(0x06010005, 1); }
+void func_80023954(void) {
+    func_8001874C(0x06010005, 1);
+}
 #endif
 
 #ifdef VERSION_US
@@ -597,7 +599,13 @@ void func_80028300(void) {
 #endif
 
 #ifdef VERSION_US
-void Audio_SwapSoundCandidates(u8 *arg0, u8 *arg1) { if (*arg0 != *arg1) { u8 temp = *arg0; *arg0 = *arg1; *arg1 = temp; } }
+void Audio_SwapSoundCandidates(u8* arg0, u8* arg1) {
+    if (*arg0 != *arg1) {
+        u8 temp = *arg0;
+        *arg0 = *arg1;
+        *arg1 = temp;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -640,8 +648,10 @@ void func_80028CA8(void) {
         func_800314D4(masked);
     }
 }
-void func_80028CA8_padding(void) {}
-void func_80028CA8_padding2(void) {}
+void func_80028CA8_padding(void) {
+}
+void func_80028CA8_padding2(void) {
+}
 #endif
 
 #ifdef VERSION_US
@@ -657,7 +667,10 @@ void func_80028CA8_padding2(void) {}
 #endif
 
 #ifdef VERSION_US
-void func_80028EA8(void) { extern u8 D_80091B90[]; func_80028D9C(D_80091B90); }
+void func_80028EA8(void) {
+    extern u8 D_80091B90[];
+    func_80028D9C(D_80091B90);
+}
 #endif
 
 #ifdef VERSION_US
@@ -675,7 +688,17 @@ void func_80028EA8(void) { extern u8 D_80091B90[]; func_80028D9C(D_80091B90); }
 #ifdef VERSION_US
 extern u16 D_80090BA0;
 extern u8 D_800D2650[];
-void func_8002A7A8(s32 arg0, s32 arg1) { D_800D2650[0] = arg0; D_800D2650[1] = arg1; D_800D2650[3] = D_80090BA0; if (D_80090BA0 == 1) D_800D2650[2] = 1; else D_800D2650[2] = 0; D_800D2650[4] = 0; *(u32 *)(D_800D2650 + 8) = 0; }
+void func_8002A7A8(s32 arg0, s32 arg1) {
+    D_800D2650[0] = arg0;
+    D_800D2650[1] = arg1;
+    D_800D2650[3] = D_80090BA0;
+    if (D_80090BA0 == 1)
+        D_800D2650[2] = 1;
+    else
+        D_800D2650[2] = 0;
+    D_800D2650[4] = 0;
+    *(u32*)(D_800D2650 + 8) = 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -744,7 +767,10 @@ void func_8002AAD0(u8 arg0) {
 #ifdef VERSION_US
 extern void func_8002A25C();
 extern void func_80024180();
-void func_8002B1A0(void) { func_8002A25C(); func_80024180(0, 0); }
+void func_8002B1A0(void) {
+    func_8002A25C();
+    func_80024180(0, 0);
+}
 #endif
 
 #ifdef VERSION_US
@@ -827,7 +853,8 @@ void func_80031530(u16 a) {
     func_800314D4(a | 0x10000000);
 }
 
-void func_80031530_padding(void) {}
+void func_80031530_padding(void) {
+}
 #endif
 
 #ifdef VERSION_US
@@ -844,7 +871,17 @@ void func_80031530_padding(void) {}
 
 #ifdef VERSION_US
 extern u8 D_800D1B90[];
-void func_80031844(s32 arg0, s32 arg1) { s32 *p0 = &arg0; *p0 = arg0; arg0 &= 0xFF; if (arg0 < 2) { if (arg1 <= 0) D_800D1B90[arg0] = 0; else D_800D1B90[arg0] = arg1; } }
+void func_80031844(s32 arg0, s32 arg1) {
+    s32* p0 = &arg0;
+    *p0 = arg0;
+    arg0 &= 0xFF;
+    if (arg0 < 2) {
+        if (arg1 <= 0)
+            D_800D1B90[arg0] = 0;
+        else
+            D_800D1B90[arg0] = arg1;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -964,7 +1001,10 @@ extern u8 D_800D2B41; void func_800331C8(void) { D_800D2B41 = 0; }
 extern void func_80033670(s32);
 extern void func_80033864(s32);
 extern void func_80033890(s32);
-void func_8003364C(s32 arg0) { s32 *p = &arg0; func_80033670(arg0 & 0xFF); }
+void func_8003364C(s32 arg0) {
+    s32* p = &arg0;
+    func_80033670(arg0 & 0xFF);
+}
 #endif
 
 #ifdef VERSION_US
@@ -972,7 +1012,10 @@ void func_8003364C(s32 arg0) { s32 *p = &arg0; func_80033670(arg0 & 0xFF); }
 #endif
 
 #ifdef VERSION_US
-void func_800337D8(s32 arg0) { s32 *p = &arg0; func_80033864(arg0 & 0xFF); }
+void func_800337D8(s32 arg0) {
+    s32* p = &arg0;
+    func_80033864(arg0 & 0xFF);
+}
 #endif
 
 #ifdef VERSION_US
@@ -991,11 +1034,15 @@ void func_800337FC(void) {
 #endif
 
 #ifdef VERSION_US
-void func_80033864(s32 arg0) {}
+void func_80033864(s32 arg0) {
+}
 #endif
 
 #ifdef VERSION_US
-void func_8003386C(s32 arg0) { s32 *p = &arg0; func_80033890(arg0 & 0xFF); }
+void func_8003386C(s32 arg0) {
+    s32* p = &arg0;
+    func_80033890(arg0 & 0xFF);
+}
 #endif
 
 #ifdef VERSION_US
@@ -1007,7 +1054,8 @@ void func_8003386C(s32 arg0) { s32 *p = &arg0; func_80033890(arg0 & 0xFF); }
 #endif
 
 #ifdef VERSION_US
-void func_800339DC(s32 arg0) {}
+void func_800339DC(s32 arg0) {
+}
 #endif
 
 void func_800339E4(void) {
@@ -1036,15 +1084,18 @@ void func_80033ACC(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-void func_80033C40(s32 arg0) {}
+void func_80033C40(s32 arg0) {
+}
 #endif
 
 #ifdef VERSION_US
-void func_80033C48(s32 arg0) {}
+void func_80033C48(s32 arg0) {
+}
 #endif
 
 #ifdef VERSION_US
-void func_80033C50(s32 arg0) {}
+void func_80033C50(s32 arg0) {
+}
 #endif
 
 #ifdef VERSION_US
@@ -1080,7 +1131,8 @@ void func_80033ED8(u8 a, u8 b) {
 #endif
 
 #ifdef VERSION_US
-void func_80033F14(s32 arg0, s32 arg1) {}
+void func_80033F14(s32 arg0, s32 arg1) {
+}
 #endif
 
 #ifdef VERSION_US
@@ -1094,11 +1146,13 @@ void func_80033F20(u8 arg0, u8 arg1) {
 #endif
 
 #ifdef VERSION_US
-void func_80033F5C(s32 arg0, s32 arg1) {}
+void func_80033F5C(s32 arg0, s32 arg1) {
+}
 #endif
 
 #ifdef VERSION_US
-void func_80033F68(s32 arg0, s32 arg1) {}
+void func_80033F68(s32 arg0, s32 arg1) {
+}
 #endif
 
 #ifdef VERSION_US
@@ -1115,11 +1169,13 @@ void func_80034058(u8 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-void func_80034098(s32 arg0, s32 arg1) {}
+void func_80034098(s32 arg0, s32 arg1) {
+}
 #endif
 
 #ifdef VERSION_US
-void func_800340A4(s32 arg0, s32 arg1) {}
+void func_800340A4(s32 arg0, s32 arg1) {
+}
 #endif
 
 #ifdef VERSION_US
@@ -1138,7 +1194,8 @@ void func_800340B0(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-void func_800341BC(s32 arg0, s32 arg1) {}
+void func_800341BC(s32 arg0, s32 arg1) {
+}
 #endif
 
 #ifdef VERSION_US
@@ -1262,11 +1319,13 @@ void func_800347BC(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-void func_800347D0(s32 arg0, s32 arg1) { }
+void func_800347D0(s32 arg0, s32 arg1) {
+}
 #endif
 
 #ifdef VERSION_US
-void func_800347DC(s32 arg0, s32 arg1) { }
+void func_800347DC(s32 arg0, s32 arg1) {
+}
 #endif
 
 #ifdef VERSION_US
@@ -1314,11 +1373,13 @@ void func_80034A94(u16 arg0) {
 #endif
 
 #ifdef VERSION_US
-void func_80034C48(s32 arg0) { }
+void func_80034C48(s32 arg0) {
+}
 #endif
 
 #ifdef VERSION_US
-void func_80034C50(s32 arg0) { }
+void func_80034C50(s32 arg0) {
+}
 #endif
 
 #ifdef VERSION_US
@@ -1326,7 +1387,9 @@ void func_80034C50(s32 arg0) { }
 #endif
 
 #ifdef VERSION_US
-u8 func_80034CF8(const u8 *arg0) { return arg0[0]; }
+u8 func_80034CF8(const u8* arg0) {
+    return arg0[0];
+}
 #endif
 
 #ifdef VERSION_US
@@ -1334,7 +1397,9 @@ u8 func_80034CF8(const u8 *arg0) { return arg0[0]; }
 #endif
 
 #ifdef VERSION_US
-u8 func_80034D98(const u8 *arg0) { return arg0[0]; }
+u8 func_80034D98(const u8* arg0) {
+    return arg0[0];
+}
 #endif
 
 #ifdef VERSION_US
@@ -1350,7 +1415,9 @@ extern void func_800331D4(void); void func_80034DF0(void) { func_800331D4(); }
 #endif
 
 #ifdef VERSION_US
-u8 func_80034E10(const u8 *arg0, s32 unused) { return arg0[0]; }
+u8 func_80034E10(const u8* arg0, s32 unused) {
+    return arg0[0];
+}
 #endif
 
 #ifdef VERSION_US
@@ -1370,11 +1437,15 @@ void func_80034E1C(u16 arg0) {
 #endif
 
 #ifdef VERSION_US
-void func_80034EA4(void) { D_800D2B49 = 0x77; }
+void func_80034EA4(void) {
+    D_800D2B49 = 0x77;
+}
 #endif
 
 #ifdef VERSION_US
-void func_80034EB4(void) { D_800D2B49 = 0x33; }
+void func_80034EB4(void) {
+    D_800D2B49 = 0x33;
+}
 #endif
 
 #ifdef VERSION_US
@@ -1382,11 +1453,15 @@ extern u8 D_800D2B49; void func_80034EC4(void) { D_800D2B49 = 0; }
 #endif
 
 #ifdef VERSION_US
-void func_80034ED0(void) { D_800D2B59 = 4; }
+void func_80034ED0(void) {
+    D_800D2B59 = 4;
+}
 #endif
 
 #ifdef VERSION_US
-void func_80034EE0(void) { D_800D2B59 = 0x84; }
+void func_80034EE0(void) {
+    D_800D2B59 = 0x84;
+}
 #endif
 
 #ifdef VERSION_US
@@ -1445,13 +1520,17 @@ extern s32 D_80094850; void func_80035140(s32 value) { D_80094850 = value; }
 #endif
 
 #ifdef VERSION_US
-s32 func_8003514C(void) { return (s32)D_80094850; }
+s32 func_8003514C(void) {
+    return (s32)D_80094850;
+}
 #pragma C_FUNCTION_PADDING(8)
 #endif
 
 #ifdef VERSION_US
 extern s32 D_80094870[];
-s32 func_80035160(s32 index) { return D_80094870[index]; }
+s32 func_80035160(s32 index) {
+    return D_80094870[index];
+}
 #endif
 
 #ifdef VERSION_US
@@ -1470,7 +1549,9 @@ void Thread4_CreateThread(void) {
 
 #ifdef VERSION_US
 extern void func_80021BBC(void);
-void func_8003539C(void) { func_80021BBC(); }
+void func_8003539C(void) {
+    func_80021BBC();
+}
 #endif
 
 #ifdef VERSION_US
@@ -1500,7 +1581,9 @@ s32 Audio_WaitForPendingTasks(void) {
 #endif
 
 #ifdef VERSION_US
-void Audio_SetProcessingEnabled(s32 enabled) { D_80122A40 = enabled ? 0 : 1; }
+void Audio_SetProcessingEnabled(s32 enabled) {
+    D_80122A40 = enabled ? 0 : 1;
+}
 #endif
 
 #ifdef VERSION_US
@@ -1537,7 +1620,12 @@ void Audio_ResetRequestId(void) {
 #endif
 
 #ifdef VERSION_US
-s32 func_800356CC(s32 arg0) { s32 result = 0; if (arg0 >= 0 && arg0 < 19) result = *((s32 *)((u8 *)D_80124D00 + arg0 * 4)); return result; }
+s32 func_800356CC(s32 arg0) {
+    s32 result = 0;
+    if (arg0 >= 0 && arg0 < 19)
+        result = *((s32*)((u8*)D_80124D00 + arg0 * 4));
+    return result;
+}
 #pragma C_FUNCTION_PADDING(12)
 #endif
 
@@ -3635,7 +3723,8 @@ void Geo_NodeType3Pass(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-void func_8003AC84(s32 arg0) {}
+void func_8003AC84(s32 arg0) {
+}
 #endif
 
 #ifdef VERSION_US
@@ -3647,7 +3736,8 @@ void func_8003AC84(s32 arg0) {}
 #endif
 
 #ifdef VERSION_US
-void func_8003B03C(s32 arg0) {}
+void func_8003B03C(s32 arg0) {
+}
 #endif
 
 #ifdef VERSION_US
@@ -3753,18 +3843,28 @@ extern void func_8003A2C8(void *, ...); void Geo_NodeGroup(void *arg0) { func_80
 
 #ifdef VERSION_US
 extern s32 D_80094900;
-void func_8003C964(s32 value) { D_80094900 = value; }
+void func_8003C964(s32 value) {
+    D_80094900 = value;
+}
 #endif
 
 #ifdef VERSION_US
 extern u16 D_80094904;
-void GeoRender_AdvanceFrameCounter(void) { D_80094904++; }
+void GeoRender_AdvanceFrameCounter(void) {
+    D_80094904++;
+}
 #endif
 
 #ifdef VERSION_US
 typedef struct { char pad[0x1A]; u16 unk_1A; } ModelFrame;
 extern ModelFrame *D_80094910; extern u16 D_80094904;
-s32 GeoRender_IsModelFrameCurrent(void) { s32 var_v1 = 1; if (D_80094910 != NULL) { var_v1 = D_80094910->unk_1A == D_80094904; } return var_v1; }
+s32 GeoRender_IsModelFrameCurrent(void) {
+    s32 var_v1 = 1;
+    if (D_80094910 != NULL) {
+        var_v1 = D_80094910->unk_1A == D_80094904;
+    }
+    return var_v1;
+}
 #endif
 
 #ifdef VERSION_US
@@ -3813,7 +3913,15 @@ void func_8003CA30(Gfx* arg0, S1_arg1_func_81407874_014_000_010* arg1) {
 #endif
 
 #ifdef VERSION_US
-s32 func_8003CD58(s32 arg0) { s32 var_v1; if ((arg0 != 0) && (arg0 != 5) && (arg0 != 0xA)) { var_v1 = 0; } else { var_v1 = 1; } return var_v1; }
+s32 func_8003CD58(s32 arg0) {
+    s32 var_v1;
+    if ((arg0 != 0) && (arg0 != 5) && (arg0 != 0xA)) {
+        var_v1 = 0;
+    } else {
+        var_v1 = 1;
+    }
+    return var_v1;
+}
 #endif
 
 #ifdef VERSION_US
@@ -4174,7 +4282,10 @@ extern s32 D_801263E0; void ModelAnim_EndCurveContext(void) { if (D_801263E0 >= 
 #endif
 
 #ifdef VERSION_US
-void ModelAnim_ClearTransformChannel(u8 *arg0) { *(s16 *)(arg0 + 0x40) = -1; *(s32 *)(arg0 + 0x44) = 0; }
+void ModelAnim_ClearTransformChannel(u8* arg0) {
+    *(s16*)(arg0 + 0x40) = -1;
+    *(s32*)(arg0 + 0x44) = 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -4194,36 +4305,78 @@ s32 ModelAnim_BindTransformCurve(S1_unk_D_86002F58_004_000* arg0, s16 arg1, void
 #endif
 
 #ifdef VERSION_US
-s32 ModelAnim_SetSpeed(u8 *arg0, s32 arg1) { *(s32 *)(arg0 + 0x4C) = arg1; return *(s32 *)(arg0 + 0x48) >> 16; }
+s32 ModelAnim_SetSpeed(u8* arg0, s32 arg1) {
+    *(s32*)(arg0 + 0x4C) = arg1;
+    return *(s32*)(arg0 + 0x48) >> 16;
+}
 #endif
 
 #ifdef VERSION_US
-void ModelAnim_SetFrame(u8 *arg0, s16 value) { *(s32 *)(arg0 + 0x48) = ((s32)value << 16) - *(s32 *)(arg0 + 0x4C); }
+void ModelAnim_SetFrame(u8* arg0, s16 value) {
+    *(s32*)(arg0 + 0x48) = ((s32)value << 16) - *(s32*)(arg0 + 0x4C);
+}
 #endif
 
 #ifdef VERSION_US
 typedef struct { char pad[0x40]; struct { s16 pad0; void *data; s32 frame; s32 speed; } curve; } ModelAnim;
-s32 ModelAnim_HasCrossedFrame(ModelAnim *arg0, s16 arg1) { struct { s16 pad0; void *data; s32 frame; s32 speed; } *ptr = &arg0->curve; s32 temp_v0 = ptr->frame + ptr->speed; s32 arg = arg1 << 16; s32 var_a2; s32 v = ptr->speed; if (v >= 0) { var_a2 = ptr->frame < arg; if (var_a2 != 0) var_a2 = temp_v0 >= arg; } else { var_a2 = arg < ptr->frame; if (var_a2 != 0) var_a2 = arg >= temp_v0; } return var_a2; }
+s32 ModelAnim_HasCrossedFrame(ModelAnim* arg0, s16 arg1) {
+    struct {
+        s16 pad0;
+        void* data;
+        s32 frame;
+        s32 speed;
+    }* ptr = &arg0->curve;
+    s32 temp_v0 = ptr->frame + ptr->speed;
+    s32 arg = arg1 << 16;
+    s32 var_a2;
+    s32 v = ptr->speed;
+    if (v >= 0) {
+        var_a2 = ptr->frame < arg;
+        if (var_a2 != 0)
+            var_a2 = temp_v0 >= arg;
+    } else {
+        var_a2 = arg < ptr->frame;
+        if (var_a2 != 0)
+            var_a2 = arg >= temp_v0;
+    }
+    return var_a2;
+}
 #endif
 
 #ifdef VERSION_US
 typedef struct { s16 flags; char pad2[4]; s16 fallback; char pad8[2]; u16 frameCount; } EventData;
-s32 ModelAnim_IsAnimationDone(ModelAnim *arg0) { return ModelAnim_HasCrossedFrame(arg0, ((EventData *)arg0->curve.data)->frameCount - 1); }
+s32 ModelAnim_IsAnimationDone(ModelAnim* arg0) {
+    return ModelAnim_HasCrossedFrame(arg0, ((EventData*)arg0->curve.data)->frameCount - 1);
+}
 #endif
 
 #ifdef VERSION_US
 typedef struct { u8 pad[0x44]; u8 *value44; s32 value48; } Func3EC34;
-s32 ModelAnim_IsFinished(Func3EC34 *arg0) { return arg0->value48 >= ((*(u16 *)(arg0->value44 + 0xA) - 1) << 16); }
+s32 ModelAnim_IsFinished(Func3EC34* arg0) {
+    return arg0->value48 >= ((*(u16*)(arg0->value44 + 0xA) - 1) << 16);
+}
 #endif
 
 #ifdef VERSION_US
 typedef struct { u8 pad[0x48]; s32 value48; s32 value4C; } Func3EC54;
-s32 func_8003EC54(Func3EC54 *arg0) { s32 value = arg0->value48 + arg0->value4C; return (s16)(value >> 16); }
+s32 func_8003EC54(Func3EC54* arg0) {
+    s32 value = arg0->value48 + arg0->value4C;
+    return (s16)(value >> 16);
+}
 #endif
 
 #ifdef VERSION_US
 typedef struct { u16 keyCount; u16 baseIndex; } EventIndex;
-s32 ModelAnim_ResolveEventIndex(s32 arg0, EventIndex* arg1, s32 arg2) { EventIndex* temp_v0 = &arg1[arg2]; s32 ret; if (arg0 < temp_v0->keyCount) { ret = arg0 + temp_v0->baseIndex; } else { ret = (temp_v0->baseIndex + temp_v0->keyCount) - 1; } return ret; }
+s32 ModelAnim_ResolveEventIndex(s32 arg0, EventIndex* arg1, s32 arg2) {
+    EventIndex* temp_v0 = &arg1[arg2];
+    s32 ret;
+    if (arg0 < temp_v0->keyCount) {
+        ret = arg0 + temp_v0->baseIndex;
+    } else {
+        ret = (temp_v0->baseIndex + temp_v0->keyCount) - 1;
+    }
+    return ret;
+}
 #endif
 
 #ifdef VERSION_US
@@ -4265,7 +4418,10 @@ extern s32 D_80126410; void ModelAnim_EndEventContext(void) { if (D_80126410 >= 
 #endif
 
 #ifdef VERSION_US
-void ModelAnim_ClearEventTrack(u8 *arg0) { *(s16 *)(arg0 + 0x54) = -1; *(s32 *)(arg0 + 0x58) = 0; }
+void ModelAnim_ClearEventTrack(u8* arg0) {
+    *(s16*)(arg0 + 0x54) = -1;
+    *(s32*)(arg0 + 0x58) = 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -4284,27 +4440,39 @@ s16 ModelAnim_BindEventTrack(S1_unk_D_86002F58_004_000* arg0, s16 arg1, s32 arg2
 #endif
 
 #ifdef VERSION_US
-void ModelAnim_SetEventFrame(u8 *arg0, s16 value) { *(s16 *)(arg0 + 0x5C) = value - 1; }
+void ModelAnim_SetEventFrame(u8* arg0, s16 value) {
+    *(s16*)(arg0 + 0x5C) = value - 1;
+}
 #endif
 
 #ifdef VERSION_US
-void func_8003EF60(u8 *arg0) { *(u16 *)(arg0 + 0x56) |= 1; }
+void func_8003EF60(u8* arg0) {
+    *(u16*)(arg0 + 0x56) |= 1;
+}
 #endif
 
 #ifdef VERSION_US
-void func_8003EF70(u8 *arg0) { *(u16 *)(arg0 + 0x56) &= (u16)~1; }
+void func_8003EF70(u8* arg0) {
+    *(u16*)(arg0 + 0x56) &= (u16)~1;
+}
 #endif
 
 #ifdef VERSION_US
-s32 ModelAnim_IsEventFrame(u8 *arg0, s16 value) { return value == *(s16 *)(arg0 + 0x5C) + 1; }
+s32 ModelAnim_IsEventFrame(u8* arg0, s16 value) {
+    return value == *(s16*)(arg0 + 0x5C) + 1;
+}
 #endif
 
 #ifdef VERSION_US
-s32 ModelAnim_IsEventTrackNearEnd(u8 *arg0) { return *(u16 *)(*(s32 *)(arg0 + 0x58) + 0xA) == *(s16 *)(arg0 + 0x5C) + 2; }
+s32 ModelAnim_IsEventTrackNearEnd(u8* arg0) {
+    return *(u16*)(*(s32*)(arg0 + 0x58) + 0xA) == *(s16*)(arg0 + 0x5C) + 2;
+}
 #endif
 
 #ifdef VERSION_US
-s32 ModelAnim_IsEventTrackDone(u8 *arg0) { return *(u16 *)(*(s32 *)(arg0 + 0x58) + 0xA) == *(s16 *)(arg0 + 0x5C) + 1; }
+s32 ModelAnim_IsEventTrackDone(u8* arg0) {
+    return *(u16*)(*(s32*)(arg0 + 0x58) + 0xA) == *(s16*)(arg0 + 0x5C) + 1;
+}
 #pragma C_FUNCTION_PADDING(8)
 #endif
 
@@ -4320,7 +4488,9 @@ void ModelRenderer_InitDisplayRoots(void) {
 
 #ifdef VERSION_US
 extern void func_8003F03C(s32, void *);
-void func_8003F018(s32 arg0) { func_8003F03C(arg0, D_80126420); }
+void func_8003F018(s32 arg0) {
+    func_8003F03C(arg0, D_80126420);
+}
 #endif
 
 #ifdef VERSION_US
@@ -4380,11 +4550,15 @@ void func_8003F498(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u8 arg4) {
 #endif
 
 #ifdef VERSION_US
-void func_8003F4DC(u8 *arg0, u8 value) { arg0[0x1D] = value; }
+void func_8003F4DC(u8* arg0, u8 value) {
+    arg0[0x1D] = value;
+}
 #endif
 
 #ifdef VERSION_US
-void func_8003F4E8(u8 *arg0, u8 value) { arg0[0x1C] = value; }
+void func_8003F4E8(u8* arg0, u8 value) {
+    arg0[0x1C] = value;
+}
 #endif
 
 #ifdef VERSION_US
@@ -4426,11 +4600,17 @@ void func_8003F818(s32 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-void func_8003F84C(u8 *arg0, u32 value1, u32 value2) { arg0[4] |= 0x80; *(u32 *)(arg0 + 8) = value1; *(u32 *)(arg0 + 0xC) = value2; }
+void func_8003F84C(u8* arg0, u32 value1, u32 value2) {
+    arg0[4] |= 0x80;
+    *(u32*)(arg0 + 8) = value1;
+    *(u32*)(arg0 + 0xC) = value2;
+}
 #endif
 
 #ifdef VERSION_US
-void func_8003F864(u8 *arg0) { arg0[4] = (u8)(arg0[4] & ~0x10); }
+void func_8003F864(u8* arg0) {
+    arg0[4] = (u8)(arg0[4] & ~0x10);
+}
 #endif
 
 #ifdef VERSION_US
@@ -4442,7 +4622,9 @@ void func_8003F864(u8 *arg0) { arg0[4] = (u8)(arg0[4] & ~0x10); }
 #endif
 
 #ifdef VERSION_US
-s32 func_8003F954(u16 value) { return value % 9; }
+s32 func_8003F954(u16 value) {
+    return value % 9;
+}
 #endif
 
 #ifdef VERSION_US
@@ -5213,7 +5395,9 @@ void func_800429A0(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-s32 func_80042A64(s32 arg0) { return 0; }
+s32 func_80042A64(s32 arg0) {
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -5239,5 +5423,10 @@ S1_arg1_func_80019420 *BattleAnim_LoadResourceTable(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-s32 func_80042ADC(u8 *arg0) { s32 result = -1; if (arg0 != NULL) result = arg0[2] & 0xF; return result; }
+s32 func_80042ADC(u8* arg0) {
+    s32 result = -1;
+    if (arg0 != NULL)
+        result = arg0[2] & 0xF;
+    return result;
+}
 #endif

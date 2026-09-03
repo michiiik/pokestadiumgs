@@ -454,7 +454,31 @@ void func_83006FDC(s32 arg0, s32 arg1, s32 arg2) {
 #ifdef VERSION_US
 extern s32 _bcmp(void *, void *, s32);
 extern void func_800226C0(s32);
-void func_83007318(void *arg0, s32 arg1) { switch (arg1) { case -1: if (_bcmp((u8 *)(u32)arg0 + 0x39E48, (u8 *)(u32)arg0 + 0x34130, 0x5D18) != 0) { *(u8 *)((u8 *)(u32)arg0 + 0x1E) = 7; func_800226C0(3); return; } *(u8 *)((u8 *)(u32)arg0 + 0x1E) = 1; func_800226C0(3); return; case 1: *(u8 *)((u8 *)(u32)arg0 + 0x1E) = 0x14; func_800226C0(0xA3); return; case 2: *(u8 *)((u8 *)(u32)arg0 + 0x1E) = 0x1C; func_800226C0(0xA3); return; case 3: *(u8 *)((u8 *)(u32)arg0 + 0x1E) = 0x23; func_800226C0(0xA3); return; } }
+void func_83007318(void* arg0, s32 arg1) {
+    switch (arg1) {
+        case -1:
+            if (_bcmp((u8*)(u32)arg0 + 0x39E48, (u8*)(u32)arg0 + 0x34130, 0x5D18) != 0) {
+                *(u8*)((u8*)(u32)arg0 + 0x1E) = 7;
+                func_800226C0(3);
+                return;
+            }
+            *(u8*)((u8*)(u32)arg0 + 0x1E) = 1;
+            func_800226C0(3);
+            return;
+        case 1:
+            *(u8*)((u8*)(u32)arg0 + 0x1E) = 0x14;
+            func_800226C0(0xA3);
+            return;
+        case 2:
+            *(u8*)((u8*)(u32)arg0 + 0x1E) = 0x1C;
+            func_800226C0(0xA3);
+            return;
+        case 3:
+            *(u8*)((u8*)(u32)arg0 + 0x1E) = 0x23;
+            func_800226C0(0xA3);
+            return;
+    }
+}
 #endif
 
 #ifdef VERSION_US

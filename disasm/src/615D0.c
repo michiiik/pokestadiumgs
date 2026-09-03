@@ -25,11 +25,18 @@ void func_800609D0(void) {
     }
 }
 
-u16 func_80060A4C(const u8 *arg0) { return (u16)((arg0[0] << 8) | arg0[1]); }
+u16 func_80060A4C(const u8* arg0) {
+    return (u16)((arg0[0] << 8) | arg0[1]);
+}
 
-u32 GbData_ReadU24BE(const u8 *arg0) { return ((u32)arg0[0] << 16) | ((u32)arg0[1] << 8) | arg0[2]; }
+u32 GbData_ReadU24BE(const u8* arg0) {
+    return ((u32)arg0[0] << 16) | ((u32)arg0[1] << 8) | arg0[2];
+}
 
-void func_80060A84(u8* arg0, s32 arg1) { arg0[0] = (arg1 >> 8) & 0xFF; arg0[1] = arg1 & 0xFF; }
+void func_80060A84(u8* arg0, s32 arg1) {
+    arg0[0] = (arg1 >> 8) & 0xFF;
+    arg0[1] = arg1 & 0xFF;
+}
 
 void GbData_WriteU24BE(u8 *arg0, s32 arg1) {
     arg0[0] = (arg1 >> 16) & 0xFF;
@@ -37,7 +44,10 @@ void GbData_WriteU24BE(u8 *arg0, s32 arg1) {
     arg0[2] = arg1 & 0xFF;
 }
 
-u8 func_80060AAC(u8 arg0) { extern u8 *D_80097680; return D_80097680[arg0]; }
+u8 func_80060AAC(u8 arg0) {
+    extern u8* D_80097680;
+    return D_80097680[arg0];
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060AC8.s")
 
@@ -135,9 +145,13 @@ void func_80060F38(void *arg0, void *arg1) {
 
 extern char *HAL_Strcpy(char *, char *); char *func_80060F68(char *arg0, char *arg1) { return HAL_Strcpy(arg0, arg1); }
 
-s32 func_80060F88(void) { return 0x46; }
+s32 func_80060F88(void) {
+    return 0x46;
+}
 
-s32 func_80060F90(void) { return 0; }
+s32 func_80060F90(void) {
+    return 0;
+}
 
 extern u8 D_80097684[];
 u8 func_80060F98(u8 arg0) {
@@ -332,7 +346,14 @@ void func_800616BC(u8 *arg0, u8 *arg1) {
     func_80060A84(arg0 + 0x2E, *(u16 *)(arg1 + 0x32));
 }
 
-u16 StatExpSqrt(u16 arg0) { u16 i; for (i = 1; i < 255; i++) { if ((i * i) >= arg0) break; } return i; }
+u16 StatExpSqrt(u16 arg0) {
+    u16 i;
+    for (i = 1; i < 255; i++) {
+        if ((i * i) >= arg0)
+            break;
+    }
+    return i;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_8006179C.s")
 
@@ -398,12 +419,24 @@ extern s32 _bcmp(const void *, const void *, s32); s32 GbSave_PlayerIdentityMatc
 extern u8 D_800976A0[]; u8 func_80061FD0(s32 index) { return D_800976A0[index]; }
 
 extern u8 D_800976D7[];
-s32 Species_ToInternalIndex(s32 index) { if (index <= 0 || index >= 0x98) return 0; return D_800976D7[index]; }
+s32 Species_ToInternalIndex(s32 index) {
+    if (index <= 0 || index >= 0x98)
+        return 0;
+    return D_800976D7[index];
+}
 
 extern u8 D_8009776F[];
-s32 func_80062008(s32 index) { if (index <= 0 || index >= 0xBF) return 0xFC; return D_8009776F[index]; }
+s32 func_80062008(s32 index) {
+    if (index <= 0 || index >= 0xBF)
+        return 0xFC;
+    return D_8009776F[index];
+}
 
-s32 func_80062030(s32 value) { if (value > 0 && value < 0xFC) return value; return 0xFC; }
+s32 func_80062030(s32 value) {
+    if (value > 0 && value < 0xFC)
+        return value;
+    return 0xFC;
+}
 
 extern void func_80053808(s32, s32, s32);
 extern s32 func_800532F0(s32);
@@ -504,13 +537,36 @@ S1_DeckHandle* Deck_OpenAndSetName(s32 arg0, s32 arg1, s32 arg2, s32 arg3, char*
 }
 
 extern void func_80052150(s32, s32); extern void Util_Free(void *);
-s32 func_8006229C(u8 *arg0) { s32 result = 0; if ((arg0[1] & 0x10) && (arg0[4] & 1)) { func_80052150(arg0[1], arg0[3]); result = 1; } Util_Free(arg0); return result; }
+s32 func_8006229C(u8* arg0) {
+    s32 result = 0;
+    if ((arg0[1] & 0x10) && (arg0[4] & 1)) {
+        func_80052150(arg0[1], arg0[3]);
+        result = 1;
+    }
+    Util_Free(arg0);
+    return result;
+}
 
 extern s32 func_80051D64(s32, s32);
 extern void Util_Free(void *);
-s32 func_80062304(u8 *arg0) { s32 result = 0; if ((arg0[1] & 0x10) && (arg0[4] & 1)) { func_80051D64(arg0[1], arg0[3]); result = 1; } Util_Free(arg0); return result; }
+s32 func_80062304(u8* arg0) {
+    s32 result = 0;
+    if ((arg0[1] & 0x10) && (arg0[4] & 1)) {
+        func_80051D64(arg0[1], arg0[3]);
+        result = 1;
+    }
+    Util_Free(arg0);
+    return result;
+}
 
-s32 func_8006236C(u8 *arg0, s32 arg1) { s32 result = 0; if (arg0[5] >= arg1) { *(u16 *)(arg0 + 10) = arg1; result = 1; } return result; }
+s32 func_8006236C(u8* arg0, s32 arg1) {
+    s32 result = 0;
+    if (arg0[5] >= arg1) {
+        *(u16*)(arg0 + 10) = arg1;
+        result = 1;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80062390.s")
 
@@ -537,9 +593,11 @@ void func_8006276C(s32 arg0, s32 arg1) {
     (*(u8 *)((u8 *)(arg0) + (0x2E))) = (u8) (*(u8 *)((u8 *)(arg1) + (0x75)));
 }
 
-void func_800627F0(s32 arg0, s32 arg1) {}
+void func_800627F0(s32 arg0, s32 arg1) {
+}
 
-void func_800627FC(s32 arg0, s32 arg1) {}
+void func_800627FC(s32 arg0, s32 arg1) {
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80062808.s")
 
@@ -549,9 +607,13 @@ void func_800627FC(s32 arg0, s32 arg1) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80062BD4.s")
 
-s32 func_80062C18(s32 arg0) { return 1; }
+s32 func_80062C18(s32 arg0) {
+    return 1;
+}
 
-s32 func_80062C24(s32 arg0) { return 1; }
+s32 func_80062C24(s32 arg0) {
+    return 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80062C30.s")
 #endif

@@ -9,8 +9,10 @@ void func_84156820(void) {
     func_84169B80();
     _bzero(D_8419F070, 0x5C90);
 }
-void func_84156820_padding(void) {}
-void func_84156820_padding2(void) {}
+void func_84156820_padding(void) {
+}
+void func_84156820_padding2(void) {
+}
 #endif
 
 #ifdef VERSION_US
@@ -26,20 +28,28 @@ s32 func_84156868(void) {
 #endif
 
 #ifdef VERSION_US
-void func_84156870(void) {}
-void func_84156870_padding(void) {}
+void func_84156870(void) {
+}
+void func_84156870_padding(void) {
+}
 #endif
 
 #ifdef VERSION_US
-void func_84156880(void) { func_841098C0(); }
+void func_84156880(void) {
+    func_841098C0();
+}
 #endif
 
 #ifdef VERSION_US
-void BattleAnim_EffectSecondaryOwnerAnchorPosition() { func_84109780(); }
+void BattleAnim_EffectSecondaryOwnerAnchorPosition() {
+    func_84109780();
+}
 #endif
 
 #ifdef VERSION_US
-void BattleAnim_EffectTertiaryOwnerBonePosition(void) { func_841098C0(); }
+void BattleAnim_EffectTertiaryOwnerBonePosition(void) {
+    func_841098C0();
+}
 #endif
 
 #ifdef VERSION_US
@@ -57,7 +67,9 @@ f32 BattleAnim_EffectTertiaryOwnerModelScale(void) {
 #endif
 
 #ifdef VERSION_US
-void BattleAnim_EffectSecondaryOwnerModelScale(void) { func_84109544(); }
+  void BattleAnim_EffectSecondaryOwnerModelScale(void) {
+      func_84109544();
+  }
 #endif
 
 #ifdef VERSION_US
@@ -68,7 +80,9 @@ f32 func_84156940(void) {
 #endif
 
 #ifdef VERSION_US
-void func_84156960(void) { func_8410971C(); }
+  void func_84156960(void) {
+      func_8410971C();
+  }
 #endif
 
 #ifdef VERSION_US
@@ -217,7 +231,9 @@ void func_84156F50(void) {
 
 #ifdef VERSION_US
 extern void func_8415BD48(s32);
-void func_84156FC8(void) { func_8415BD48(0); }
+void func_84156FC8(void) {
+    func_8415BD48(0);
+}
 #endif
 
 #ifdef VERSION_US
@@ -245,7 +261,9 @@ void func_8415703C(void) {
 #endif
 
 #ifdef VERSION_US
-void func_841570B4(void) { func_8415BD48(1); }
+void func_841570B4(void) {
+    func_8415BD48(1);
+}
 #endif
 
 #ifdef VERSION_US
@@ -344,7 +362,9 @@ void BattleAnim_EndEffect32Radial20_Init(void) {
 #endif
 
 #ifdef VERSION_US
-void func_841576CC(void) { func_8415BD48(0); }
+void func_841576CC(void) {
+    func_8415BD48(0);
+}
 #endif
 
 #ifdef VERSION_US
@@ -371,7 +391,9 @@ void BattleAnim_EndEffect33Radial20_Init(void) {
 #endif
 
 #ifdef VERSION_US
-void func_841577B8(void) { func_8415BD48(0); }
+void func_841577B8(void) {
+    func_8415BD48(0);
+}
 #endif
 
 #ifdef VERSION_US

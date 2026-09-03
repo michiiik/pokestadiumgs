@@ -68,7 +68,8 @@ f32 func_81804AE8(f32 arg0) {
     }
     return (__sinf((arg0 * D_81805F98) - D_81805F9C, arg0) * 0.5f) + 0.5f;
 }
-void func_81804AE8_padding(void) {}
+void func_81804AE8_padding(void) {
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_B2D00/func_81804B74.s")
 
@@ -97,7 +98,9 @@ void func_81805474(void *arg0, u8 *arg1, void *arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_B2D00/func_81805524.s")
 
-s32 func_81805594(u8 *arg0, u8 *arg1) { return 1; }
+s32 func_81805594(u8* arg0, u8* arg1) {
+    return 1;
+}
 
 s32 StageContext_GetFadeMode(s32);
 s32 func_81805524();

@@ -9,9 +9,13 @@
 extern u8 *D_863075D8;
 extern void func_87F02684(void *);
 extern void func_87F0277C(void *);
-void func_8630487C(void) { func_87F02684(D_863075D8 + 0x88DC); }
+void func_8630487C(void) {
+    func_87F02684(D_863075D8 + 0x88DC);
+}
 
-void func_863048A8(void) { func_87F0277C(D_863075D8 + 0x88DC); }
+void func_863048A8(void) {
+    func_87F0277C(D_863075D8 + 0x88DC);
+}
 
 extern u8 D_87F15B70[];
 extern void func_87F0252C(void *, void *, void *, s32);

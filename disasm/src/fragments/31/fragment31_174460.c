@@ -13,7 +13,9 @@
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_174460/func_88201420.s")
 
 extern void func_88201420(s32, s32);
-void func_88201608(s32 arg0) { func_88201420(arg0, 1); }
+void func_88201608(s32 arg0) {
+    func_88201420(arg0, 1);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_174460/func_88201628.s")
 

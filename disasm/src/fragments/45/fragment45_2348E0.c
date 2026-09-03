@@ -22,7 +22,9 @@ void func_8AB0FE08(void) {
 
 #ifdef VERSION_US
 extern void func_8AB1007C(s32);
-void func_8AB1005C(void) { func_8AB1007C(0); }
+void func_8AB1005C(void) {
+    func_8AB1007C(0);
+}
 #endif
 
 #ifdef VERSION_US

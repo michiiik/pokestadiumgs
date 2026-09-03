@@ -90,7 +90,10 @@ void func_8820F74C(s16 arg0, s16 arg1, u8 *arg2, u8 arg3) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820FC78.s")
 
 extern void func_8820FC78();
-void func_8820FD58(void) { func_8820FC78(0); func_8820FC78(1); }
+void func_8820FD58(void) {
+    func_8820FC78(0);
+    func_8820FC78(1);
+}
 
 extern void func_80049064(s32, s32, s32, s32);
 extern void func_800496A4(s32, s32);

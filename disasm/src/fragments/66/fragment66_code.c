@@ -179,7 +179,11 @@ void func_82E028D0(void) {
 #ifdef VERSION_US
 extern Gfx *D_800D0510;
 extern u8 D_82E05450[];
-void Font_EndTexturedTextRendering_fragment66(void) { Gfx *temp_v1 = D_800D0510++; temp_v1->words.w0 = 0xDE000000; temp_v1->words.w1 = (u32)D_82E05450; }
+void Font_EndTexturedTextRendering_fragment66(void) {
+    Gfx* temp_v1 = D_800D0510++;
+    temp_v1->words.w0 = 0xDE000000;
+    temp_v1->words.w1 = (u32)D_82E05450;
+}
 #endif
 
 void func_82E02A9C(void) {
@@ -210,9 +214,12 @@ void func_82E02EB0(s32 arg0, s32 arg1, s32 arg2) {
     Font_EndTexturedTextRendering_fragment66();
     func_82E02CCC(arg0, arg1, arg2);
 }
-void func_82E02EB0_padding(void) {}
-void func_82E02EB0_padding2(void) {}
-void func_82E02EB0_padding3(void) {}
+void func_82E02EB0_padding(void) {
+}
+void func_82E02EB0_padding2(void) {
+}
+void func_82E02EB0_padding3(void) {
+}
 #endif
 
 #ifdef VERSION_US

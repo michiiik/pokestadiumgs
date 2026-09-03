@@ -45,7 +45,8 @@ void func_82D00444(void) {
     func_8006249C(D_82D2393C, D_82D23938, sp1C);
     func_80062304(sp1C);
 }
-void func_82D00444_padding(void) {}
+void func_82D00444_padding(void) {
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_420EA0/func_82D0049C.s")
 

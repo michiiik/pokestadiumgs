@@ -678,7 +678,11 @@ s32 func_84127140(u8 a) {
 
 #ifdef VERSION_US
 extern u8 D_841951C3; extern u8 D_841951D2;
-void func_84128298(void) { if (D_841951C3 != 0x2D) D_841951C8 = 0; D_841951D2 = 1; }
+void func_84128298(void) {
+    if (D_841951C3 != 0x2D)
+        D_841951C8 = 0;
+    D_841951D2 = 1;
+}
 #endif
 
 #ifdef VERSION_US
@@ -1373,15 +1377,21 @@ void BattleAnim_Table_84186004_010(void) {
 #endif
 
 #ifdef VERSION_US
-void BattleAnim_Table_84186004_012(void) { func_8412F49C(); }
+void BattleAnim_Table_84186004_012(void) {
+    func_8412F49C();
+}
 #endif
 
 #ifdef VERSION_US
-void BattleAnim_Table_84186004_013(void) { func_8412F49C(); }
+void BattleAnim_Table_84186004_013(void) {
+    func_8412F49C();
+}
 #endif
 
 #ifdef VERSION_US
-void BattleAnim_Table_84186004_014(void) { func_8412F49C(); }
+void BattleAnim_Table_84186004_014(void) {
+    func_8412F49C();
+}
 #endif
 
 #ifdef VERSION_US
@@ -1827,7 +1837,9 @@ extern u8 D_841951BC; extern u8 *D_84195208[]; void BattleAnim_Table_84186004_07
 #endif
 
 #ifdef VERSION_US
-void BattleAnim_Table_84186004_075(void) { D_84195208[D_841951BC][0xE] |= 1; }
+void BattleAnim_Table_84186004_075(void) {
+    D_84195208[D_841951BC][0xE] |= 1;
+}
 #endif
 
 #ifdef VERSION_US
@@ -2146,15 +2158,24 @@ void func_841348C0(void) {
 #endif
 
 #ifdef VERSION_US
-void func_84134920(void) { extern OSThread D_84193FB0; osStartThread(&D_84193FB0); }
+void func_84134920(void) {
+    extern OSThread D_84193FB0;
+    osStartThread(&D_84193FB0);
+}
 #endif
 
 #ifdef VERSION_US
-void func_84134944(void) { extern OSThread D_84193FB0; osDestroyThread(&D_84193FB0); }
+void func_84134944(void) {
+    extern OSThread D_84193FB0;
+    osDestroyThread(&D_84193FB0);
+}
 #endif
 
 #ifdef VERSION_US
-s32 func_84134968(void) { extern OSMesgQueue D_84195164; return osRecvMesg(&D_84195164, NULL, 1); }
+s32 func_84134968(void) {
+    extern OSMesgQueue D_84195164;
+    return osRecvMesg(&D_84195164, NULL, 1);
+}
 #endif
 
 #ifdef VERSION_US
@@ -2164,7 +2185,11 @@ void Display_QueueFramebufferRequest_fragment79(OSMesg arg0) {
 #endif
 
 #ifdef VERSION_US
-s32 func_841349C0(f32 arg0) { s32 value = (s32)arg0; f64 fraction = (f64)(arg0 - (f32)value); return fraction >= 0.5 ? value + 1 : value; }
+s32 func_841349C0(f32 arg0) {
+    s32 value = (s32)arg0;
+    f64 fraction = (f64)(arg0 - (f32)value);
+    return fraction >= 0.5 ? value + 1 : value;
+}
 #endif
 
 #ifdef VERSION_US
@@ -2353,8 +2378,10 @@ void func_841352DC(u8 arg0) {
     }
     func_841351EC(D_84195280 + idx * 0x280, arg0);
 }
-void func_841352DC_padding1(void) {}
-void func_841352DC_padding2(void) {}
+void func_841352DC_padding1(void) {
+}
+void func_841352DC_padding2(void) {
+}
 #endif
 
 #ifdef VERSION_US

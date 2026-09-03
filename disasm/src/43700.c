@@ -55,19 +55,39 @@ void func_80042BC0(u8 *arg0, s16 arg1, s16 arg2, s16 arg3, s32 arg4) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_80042C68.s")
 
-s32 func_80042D54(u8 *arg0, u16 arg1) { s32 result = 0; if (arg0 != NULL) { *(u16 *)(arg0 + 2) = arg1; result = 1; } return result; }
+s32 func_80042D54(u8* arg0, u16 arg1) {
+    s32 result = 0;
+    if (arg0 != NULL) {
+        *(u16*)(arg0 + 2) = arg1;
+        result = 1;
+    }
+    return result;
+}
 
-s32 func_80042D74(u8 *arg0, s32 arg1) { s32 result = 0; if (arg0 != NULL) { *(s32 *)(arg0 + 8) = arg1; result = 1; } return result; }
+s32 func_80042D74(u8* arg0, s32 arg1) {
+    s32 result = 0;
+    if (arg0 != NULL) {
+        *(s32*)(arg0 + 8) = arg1;
+        result = 1;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_80042D8C.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_80042EB8.s")
 
-void func_80042F94(void *arg0, void *arg1) { func_80042EB8(arg0, 1, arg1, 1); }
+void func_80042F94(void* arg0, void* arg1) {
+    func_80042EB8(arg0, 1, arg1, 1);
+}
 
-void func_80042FBC(void *arg0, void *arg1) { func_80042EB8(arg0, 0, arg1, 1); }
+void func_80042FBC(void* arg0, void* arg1) {
+    func_80042EB8(arg0, 0, arg1, 1);
+}
 
-void func_80042FE4(void *arg0, void *arg1) { func_80042EB8(arg0, 0, arg1, 0); }
+void func_80042FE4(void* arg0, void* arg1) {
+    func_80042EB8(arg0, 0, arg1, 0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_8004300C.s")
 
@@ -123,7 +143,9 @@ s32 func_8004335C(s32 arg0, u8 *arg1) {
     return result;
 }
 
-s32 func_80043444(u8 *arg0) { return 0; }
+s32 func_80043444(u8* arg0) {
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_80043450.s")
 
@@ -194,8 +216,10 @@ s32 func_80043678(u8 *arg0) {
     return *(s32 *)((u8 *)(u32)*(u32 *)(arg0 + 0x20) + 8);
 }
 
-void func_800436CC(s32 value) { if (value >= 0 && value < 7) D_80094C60 = value; }
-
+void func_800436CC(s32 value) {
+    if (value >= 0 && value < 7)
+        D_80094C60 = value;
+}
 
 s32 func_800436E8(void) {
     return D_80094C60;

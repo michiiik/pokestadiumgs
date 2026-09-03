@@ -88,7 +88,11 @@ u32 func_8001FFB0(u8 *arg0, u32 arg1) {
     return 0;
 }
 
-void func_80020018(u8 *arg0) { if (*(s8 *)(arg0 + 0x25D1) == 2) { arg0[0x25D1] = 3; } }
+void func_80020018(u8* arg0) {
+    if (*(s8*)(arg0 + 0x25D1) == 2) {
+        arg0[0x25D1] = 3;
+    }
+}
 
 void func_80020038(u8 *arg0) {
     arg0[0x25D1] = 4;

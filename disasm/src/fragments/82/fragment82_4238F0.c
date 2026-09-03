@@ -29,7 +29,9 @@ void func_82D02C98(void) {
     func_8004C8C0(0xAF);
 }
 
-void func_82D02D00(void) { func_8004C4B0(0x43); }
+void func_82D02D00(void) {
+    func_8004C4B0(0x43);
+}
 
 void func_82D02D20(s32 arg0, s32 arg1)
 {
@@ -397,7 +399,9 @@ void func_82D06AFC(void *arg0, s32 arg1)
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D06B34.s")
 
 extern u8 D_82D06FC4[];
-void func_82D06C9C(u8 arg0, s32 arg1) { *(s32 *)(D_82D06FC4 + (arg0 * 0x28)) = arg1; }
+void func_82D06C9C(u8 arg0, s32 arg1) {
+    *(s32*)(D_82D06FC4 + (arg0 * 0x28)) = arg1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D06CC0.s")
 

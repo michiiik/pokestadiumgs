@@ -93,7 +93,12 @@ f32 func_816002E8(f32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D7BC0/func_81600340.s")
 
-void func_816003B0(u8 *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) { *(u16 *)(arg0 + 0) = arg1; *(u16 *)(arg0 + 2) = arg2; *(u16 *)(arg0 + 4) = arg3; *(u16 *)(arg0 + 6) = arg4; }
+void func_816003B0(u8* arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+    *(u16*)(arg0 + 0) = arg1;
+    *(u16*)(arg0 + 2) = arg2;
+    *(u16*)(arg0 + 4) = arg3;
+    *(u16*)(arg0 + 6) = arg4;
+}
 
 void func_816003C8(u8 *arg0) {
     (*(s32 *)((u8 *)(arg0) + (0x10))) = 0;
@@ -262,11 +267,23 @@ void *func_81600780(void *arg0, s32 arg1) {
     return result;
 }
 
-s32 func_816007BC(void *arg0) { u8 *base = *(u8 **)((u8 *)arg0 + 0x28); u8 *next = *(u8 **)(base + 8); s32 result; if (next != NULL) result = *(s32 *)(next + 0x14); else result = *(s32 *)base; return result; }
+s32 func_816007BC(void* arg0) {
+    u8* base = *(u8**)((u8*)arg0 + 0x28);
+    u8* next = *(u8**)(base + 8);
+    s32 result;
+    if (next != NULL)
+        result = *(s32*)(next + 0x14);
+    else
+        result = *(s32*)base;
+    return result;
+}
 
-void func_816007E0(void) {}
-void func_816007E0_padding(void) {}
-void func_816007E0_padding2(void) {}
+void func_816007E0(void) {
+}
+void func_816007E0_padding(void) {
+}
+void func_816007E0_padding2(void) {
+}
 
 extern s32 func_816007BC(void *arg0);
 s32 func_816007F8(void *arg0, s32 arg1) {

@@ -48,7 +48,9 @@ void func_88220F4C(void) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_193D50/func_88220FB8.s")
 
 extern void func_889033A0(s32);
-void func_8822100C(void) { func_889033A0((D_88234810 + 4)); }
+void func_8822100C(void) {
+    func_889033A0((D_88234810 + 4));
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_193D50/func_88221034.s")
 #endif

@@ -48,7 +48,10 @@ void func_84202294(void *arg0, u8 arg1, u8 arg2, u8 arg3, u8 arg4) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_84202EE4.s")
 
-void func_84202FE4(void *arg0) { func_84202BD0(arg0); func_84202EE4(arg0); }
+void func_84202FE4(void* arg0) {
+    func_84202BD0(arg0);
+    func_84202EE4(arg0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_8420300C.s")
 

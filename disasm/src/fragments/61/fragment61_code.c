@@ -70,7 +70,8 @@ void func_86B00994(void) {
         return;
     }
 }
-void func_86B00994_padding(void) {}
+void func_86B00994_padding(void) {
+}
 #endif
 
 #ifdef VERSION_US

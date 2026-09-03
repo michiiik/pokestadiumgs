@@ -18,7 +18,10 @@ void Gfx_InitDisplayListBuffers(s32 arg0, s32 arg1) {
 extern void *D_800D0518;
 extern void *D_800D051C;
 extern void main_pool_try_free();
-void Gfx_FreeDisplayListBuffers(void) { main_pool_try_free(D_800D051C); main_pool_try_free(D_800D0518); }
+void Gfx_FreeDisplayListBuffers(void) {
+    main_pool_try_free(D_800D051C);
+    main_pool_try_free(D_800D0518);
+}
 
 void Gfx_SwapDisplayListBuffer(void) {
     struct DisplayListState {
@@ -60,5 +63,7 @@ u32 Gfx_AllocDisplayList(s32 arg0) {
 
 extern s32 D_800D0520;
 extern s32 D_800D0510;
-s32 Gfx_GetDisplayListRemaining(void) { return D_800D0520 - D_800D0510; }
+s32 Gfx_GetDisplayListRemaining(void) {
+    return D_800D0520 - D_800D0510;
+}
 #endif

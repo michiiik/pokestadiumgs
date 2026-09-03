@@ -29,7 +29,8 @@ void func_8FC000F4(s32 arg0, s32 arg1) {
     temp_a3 = arg1 & new_var;
     func_8004D1FC(func_8004C990(temp_a2, temp_a3, temp_a2, temp_a3));
 }
-void func_8FC000F4_padding(void) {}
+void func_8FC000F4_padding(void) {
+}
 #endif
 
 #ifdef VERSION_US
@@ -43,12 +44,18 @@ void func_8FC00138(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-void func_8FC001E8(void) {}
-void func_8FC001E8_padding(void) {}
-void func_8FC001E8_padding2(void) {}
-void func_8FC001E8_padding3(void) {}
-void func_8FC001E8_padding4(void) {}
-void func_8FC001E8_padding5(void) {}
+void func_8FC001E8(void) {
+}
+void func_8FC001E8_padding(void) {
+}
+void func_8FC001E8_padding2(void) {
+}
+void func_8FC001E8_padding3(void) {
+}
+void func_8FC001E8_padding4(void) {
+}
+void func_8FC001E8_padding5(void) {
+}
 #endif
 
 #ifdef VERSION_US
@@ -171,7 +178,9 @@ void func_8FC00F88(void) {
 
 #ifdef VERSION_US
 extern void func_80060358(s32, void *);
-void func_8FC00FD0(void) { func_80060358(0, &D_8FC0C2D8); }
+void func_8FC00FD0(void) {
+    func_80060358(0, &D_8FC0C2D8);
+}
 #endif
 
 #ifdef VERSION_US
@@ -431,7 +440,10 @@ void func_8FC0229C(void) {
 
 #ifdef VERSION_US
 extern void func_8004C4B0();
-void func_8FC022F4(void) { func_8004C4B0(6); func_8004C4B0(75); }
+void func_8FC022F4(void) {
+    func_8004C4B0(6);
+    func_8004C4B0(75);
+}
 #endif
 
 #ifdef VERSION_US

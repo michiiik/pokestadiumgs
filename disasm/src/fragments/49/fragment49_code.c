@@ -83,7 +83,8 @@ void func_86100A58(void) {
         }
     }
 }
-void func_86100A58_padding(void) {}
+void func_86100A58_padding(void) {
+}
 
 extern void func_80037120(s32, s32, s32 *, s16 *, s16 *);
 extern s32 D_80094908;
@@ -191,7 +192,8 @@ void func_86101558(f32 *arg0, f32 *arg1) {
         *arg1 /= temp_fv0;
     }
 }
-void func_86101558_padding(void) {}
+void func_86101558_padding(void) {
+}
 
 extern f32 D_8610AADC;
 extern s32 D_8610AD20;
@@ -225,7 +227,26 @@ f32 func_861015AC(f32 arg0, f32 arg1) {
 extern f32 D_8610AAF0;
 extern f32 D_8610AAF4;
 extern void * D_87F119DC;
-s32 func_861018D8(f32 arg0, f32 arg1) { f32 *coord; f32 y; f32 dx; f32 dy; s32 result = 1; coord = &arg1; if (arg0 < D_8610AAF0) { result = 0; } else { y = *(f32 *)((u8 *)D_87F119DC + 0x48); if (arg0 < y) { dx = y - arg0; dy = *(f32 *)((u8 *)D_87F119DC + 0x4C) - *coord; if ((arg0 - D_8610AAF4) * 2.0f < sqrtf(dx * dx + dy * dy)) result = 0; } } return result; }
+s32 func_861018D8(f32 arg0, f32 arg1) {
+    f32* coord;
+    f32 y;
+    f32 dx;
+    f32 dy;
+    s32 result = 1;
+    coord = &arg1;
+    if (arg0 < D_8610AAF0) {
+        result = 0;
+    } else {
+        y = *(f32*)((u8*)D_87F119DC + 0x48);
+        if (arg0 < y) {
+            dx = y - arg0;
+            dy = *(f32*)((u8*)D_87F119DC + 0x4C) - *coord;
+            if ((arg0 - D_8610AAF4) * 2.0f < sqrtf(dx * dx + dy * dy))
+                result = 0;
+        }
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86101964.s")
 
@@ -435,7 +456,18 @@ void func_861054B0(void) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_861056C0.s")
 
 extern f32 D_8610AC50;
-void func_86105928(f32 *arg0) { f32 zero; f32 value; zero = 0.0f; value = D_8610AC50; arg0[4] = zero; arg0[5] = zero; arg0[6] = zero; arg0[23] = value; arg0[22] = value; arg0[21] = value; }
+void func_86105928(f32* arg0) {
+    f32 zero;
+    f32 value;
+    zero = 0.0f;
+    value = D_8610AC50;
+    arg0[4] = zero;
+    arg0[5] = zero;
+    arg0[6] = zero;
+    arg0[23] = value;
+    arg0[22] = value;
+    arg0[21] = value;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86105950.s")
 
@@ -497,7 +529,10 @@ void func_86106688(void) {
 
 extern void func_86106688();
 extern void func_86106504();
-void func_86106C28(void) { func_86106688(); func_86106504(D_87F119DC); }
+void func_86106C28(void) {
+    func_86106688();
+    func_86106504(D_87F119DC);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86106C54.s")
 
@@ -515,8 +550,10 @@ void func_86106C28(void) { func_86106688(); func_86106504(D_87F119DC); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_861075DC.s")
 
-void func_86107A10(void) {}
-void func_86107A10_padding(void) {}
+void func_86107A10(void) {
+}
+void func_86107A10_padding(void) {
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86107A20.s")
 

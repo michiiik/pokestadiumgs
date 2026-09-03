@@ -113,7 +113,10 @@ s32 func_80046540(s32 arg0, s32 arg1) {
 
 extern void func_8004657C(void);
 extern void func_80046634(s32);
-void func_800468A0(s32 arg0) { func_8004657C(); func_80046634(arg0); }
+void func_800468A0(s32 arg0) {
+    func_8004657C();
+    func_80046634(arg0);
+}
 
 void Gfx_SetVertexAttributes(Vtx* arg0, s16 arg1, s16 arg2, s16 arg3, s16 arg4, s16 arg5, u8 arg6, u8 arg7, u8 arg8, u8 arg9) {
     arg0->v.ob[0] = arg1;

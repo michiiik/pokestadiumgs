@@ -194,7 +194,9 @@ u8 *main_pool_set_func(u8 *arg0, s32 arg1, s32 arg2) {
     return arg0;
 }
 
-s32 MainPool_GetAllocationSize(u8 *arg0) { return *(s32 *)(arg0 - 0xC) - (s32)arg0; }
+s32 MainPool_GetAllocationSize(u8* arg0) {
+    return *(s32*)(arg0 - 0xC) - (s32)arg0;
+}
 
 extern u8 D_800CCDB0[]; u8 *func_80002DF0(void) { return D_800CCDB0; }
 #endif

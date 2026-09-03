@@ -72,7 +72,10 @@ void func_87F0EDDC(void *arg0, u8 arg1) {
 extern u32 D_87F15BB0;
 extern void fragment3_main(void *);
 extern void func_81A005F0(void *);
-void func_87F0EECC(void) { fragment3_main(&D_87F15BB0); func_81A005F0(&D_87F15BB0); }
+void func_87F0EECC(void) {
+    fragment3_main(&D_87F15BB0);
+    func_81A005F0(&D_87F15BB0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_3312D0/func_87F0EEFC.s")
 
@@ -143,7 +146,9 @@ void func_87F0F3E4(void *arg0) {
 }
 
 extern void func_81A0022C(void *);
-void StageLoader_UpdateSegments(void) { func_81A0022C(&D_87F15BB0); }
+void StageLoader_UpdateSegments(void) {
+    func_81A0022C(&D_87F15BB0);
+}
 
 extern u32 D_87F15BB8;
 u32 func_87F0F468(void) {

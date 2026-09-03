@@ -396,7 +396,18 @@ s32 func_80053230(s32 arg0) {
     return result;
 }
 
-s32 func_800532C4(s32 arg0){s32 result=0;switch(arg0){case 0x10:result=1;break;case 0x11:result=0xE;break;}return result;}
+s32 func_800532C4(s32 arg0) {
+    s32 result = 0;
+    switch (arg0) {
+        case 0x10:
+            result = 1;
+            break;
+        case 0x11:
+            result = 0xE;
+            break;
+    }
+    return result;
+}
 
 s32 func_800532F0(s32 arg0) {
     s32 result = 0;
@@ -418,7 +429,9 @@ s32 func_800532F0(s32 arg0) {
     return result;
 }
 
-s32 Deck_IsSaveEntryPresent(void *arg0, void *arg1) { return func_80051A8C(arg0, arg1, 1); }
+s32 Deck_IsSaveEntryPresent(void* arg0, void* arg1) {
+    return func_80051A8C(arg0, arg1, 1);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800533A4.s")
 
@@ -468,9 +481,18 @@ void func_80053A30(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80053A50.s")
 
-void func_80053AC8(u16 *a0,u16 *a1){a0[0]=a1[0];a0[1]=a1[1];a0[2]=a1[2];func_80060C08(a0+4,a1+4);}
+void func_80053AC8(u16* a0, u16* a1) {
+    a0[0] = a1[0];
+    a0[1] = a1[1];
+    a0[2] = a1[2];
+    func_80060C08(a0 + 4, a1 + 4);
+}
 
-void func_80053B04(u16 *a0,u16 *a1){a0[0]=a1[0];a0[1]=a1[1];func_80060C08(a0+2,a1+2);}
+void func_80053B04(u16* a0, u16* a1) {
+    a0[0] = a1[0];
+    a0[1] = a1[1];
+    func_80060C08(a0 + 2, a1 + 2);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80053B38.s")
 
@@ -884,7 +906,13 @@ void func_80055A34(void) {
     } while (var_s0 != 4);
 }
 
-s32 func_80055A74(s32 arg0) { extern s32 D_800972C0; s32 old = D_800972C0; if (arg0 >= 0 && arg0 < 6) D_800972C0 = arg0; return old; }
+s32 func_80055A74(s32 arg0) {
+    extern s32 D_800972C0;
+    s32 old = D_800972C0;
+    if (arg0 >= 0 && arg0 < 6)
+        D_800972C0 = arg0;
+    return old;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055A9C.s")
 
@@ -943,7 +971,72 @@ void func_80055DC4(s32 arg0, u8 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055F6C.s")
 
-s32 func_80056024(s32 arg0) { s32 result = 0; switch (arg0) { case 5: result = 1; break; case 6: result = 2; break; case 7: result = 4; break; case 8: result = 8; break; case 9: result = 0x10; break; case 10: result = 0x20; break; case 11: result = 0x40; break; case 12: result = 0x80; break; case 13: result = 0x100; break; case 14: result = 1; break; case 15: result = 2; break; case 16: result = 1; break; case 17: result = 2; break; case 18: result = 4; break; case 19: result = 8; break; case 20: result = 0x10; break; case 21: result = 0x20; break; case 22: result = 0x40; break; case 23: result = 0x80; break; case 24: result = 0x100; break; } return result; }
+s32 func_80056024(s32 arg0) {
+    s32 result = 0;
+    switch (arg0) {
+        case 5:
+            result = 1;
+            break;
+        case 6:
+            result = 2;
+            break;
+        case 7:
+            result = 4;
+            break;
+        case 8:
+            result = 8;
+            break;
+        case 9:
+            result = 0x10;
+            break;
+        case 10:
+            result = 0x20;
+            break;
+        case 11:
+            result = 0x40;
+            break;
+        case 12:
+            result = 0x80;
+            break;
+        case 13:
+            result = 0x100;
+            break;
+        case 14:
+            result = 1;
+            break;
+        case 15:
+            result = 2;
+            break;
+        case 16:
+            result = 1;
+            break;
+        case 17:
+            result = 2;
+            break;
+        case 18:
+            result = 4;
+            break;
+        case 19:
+            result = 8;
+            break;
+        case 20:
+            result = 0x10;
+            break;
+        case 21:
+            result = 0x20;
+            break;
+        case 22:
+            result = 0x40;
+            break;
+        case 23:
+            result = 0x80;
+            break;
+        case 24:
+            result = 0x100;
+            break;
+    }
+    return result;
+}
 
 extern void func_80055EF0(void *, s32);
 s32 func_800560F0(s32 arg0) {

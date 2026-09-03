@@ -28,8 +28,10 @@ f32 func_860004C8(void *arg0, void *arg1) {
     func_87C00160(value, arg1, arg0);
     return (f32)func_87C00D14(*(f64 *)value, *(f64 *)(value + 0x10));
 }
-void func_860004C8_padding(void) {}
-void func_860004C8_padding2(void) {}
+void func_860004C8_padding(void) {
+}
+void func_860004C8_padding2(void) {
+}
 #endif
 
 #ifdef VERSION_US
@@ -129,7 +131,9 @@ void func_86001A60(u8 *arg0, s32 *arg1) {
 
 #ifdef VERSION_US
 extern void func_87C01A90(s32);
-void func_86001AFC(s32 arg0) { func_87C01A90(arg0 + 364); }
+void func_86001AFC(s32 arg0) {
+    func_87C01A90(arg0 + 364);
+}
 #endif
 
 #ifdef VERSION_US
@@ -145,7 +149,9 @@ void func_86001AFC(s32 arg0) { func_87C01A90(arg0 + 364); }
 #endif
 
 #ifdef VERSION_US
-void func_86001DBC(u8 *arg0) { arg0[0x1639] &= 0xFFFE; }
+void func_86001DBC(u8* arg0) {
+    arg0[0x1639] &= 0xFFFE;
+}
 #endif
 
 #ifdef VERSION_US
@@ -200,7 +206,13 @@ extern f32 MathUtil_Random_ZeroOne(void);
 extern f32 D_8600D668;
 extern f32 D_8600D66C;
 extern void func_87C01F6C(void *, f32);
-void func_860021C4(u8 *arg0, s32 arg1, f32 arg2, void *arg3, void *arg4) { f32 random; func_86002070(arg0, arg1, arg2, arg3, arg4); func_86003EFC(arg0, 0); random = MathUtil_Random_ZeroOne(); func_87C01F6C(arg0 + 0x17A0, random * D_8600D668 + D_8600D66C); }
+void func_860021C4(u8* arg0, s32 arg1, f32 arg2, void* arg3, void* arg4) {
+    f32 random;
+    func_86002070(arg0, arg1, arg2, arg3, arg4);
+    func_86003EFC(arg0, 0);
+    random = MathUtil_Random_ZeroOne();
+    func_87C01F6C(arg0 + 0x17A0, random * D_8600D668 + D_8600D66C);
+}
 #endif
 
 #ifdef VERSION_US
@@ -261,7 +273,8 @@ s32 func_8600297C(s32 arg0, u8 *arg1) {
     func_860043B4(state, arg1 + 0x60);
     return 1;
 }
-void func_8600297C_padding(void) {}
+void func_8600297C_padding(void) {
+}
 #endif
 
 #ifdef VERSION_US
@@ -375,7 +388,8 @@ void func_860032DC(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-void func_86003754(u8 *arg0) {}
+void func_86003754(u8* arg0) {
+}
 #endif
 
 #ifdef VERSION_US

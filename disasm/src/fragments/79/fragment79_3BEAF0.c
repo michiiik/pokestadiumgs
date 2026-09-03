@@ -98,7 +98,9 @@ void func_8414F6D0(void *arg0) {
 
 #ifdef VERSION_US
 extern void func_8414F4A0(s32, s32);
-void func_8414F894(s32 arg0) { func_8414F4A0(arg0, 83); }
+void func_8414F894(s32 arg0) {
+    func_8414F4A0(arg0, 83);
+}
 #endif
 
 #ifdef VERSION_US

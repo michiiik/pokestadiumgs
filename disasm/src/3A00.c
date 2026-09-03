@@ -181,7 +181,12 @@ s32 MainPool_AllocAligned(MainPoolState *state, s32 arg1, s32 arg2) {
     return ret;
 }
 
-void MainPool_ResetStateToOffset(u8 *arg0, s32 arg1) { if (*(s32 *)(arg0 + 0) >= arg1) { *(s32 *)(arg0 + 4) = arg1; *(s32 *)(arg0 + 0xC) = *(s32 *)(arg0 + 8) + arg1; } }
+void MainPool_ResetStateToOffset(u8* arg0, s32 arg1) {
+    if (*(s32*)(arg0 + 0) >= arg1) {
+        *(s32*)(arg0 + 4) = arg1;
+        *(s32*)(arg0 + 0xC) = *(s32*)(arg0 + 8) + arg1;
+    }
+}
 
 void MainPool_ResetState(u8 *arg0) {
     u8 *ptr = arg0 + 0x10;

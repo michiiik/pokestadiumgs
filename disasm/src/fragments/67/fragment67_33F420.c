@@ -16,8 +16,10 @@ void func_82902920(void) {
     D_82918904 = func_8004C990(2, 6);
 }
 
-void func_8290298C(void) {}
-void func_8290298C_padding(void) {}
+void func_8290298C(void) {
+}
+void func_8290298C_padding(void) {
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33F420/func_8290299C.s")
 

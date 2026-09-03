@@ -309,7 +309,9 @@ void func_80057908(u8 arg0) {
     }
 }
 
-void func_80057944(u8 arg0) { D_80128558 &= ~(1 << arg0); }
+void func_80057944(u8 arg0) {
+    D_80128558 &= ~(1 << arg0);
+}
 
 void func_80057970(u8 arg0) {
     s32 mask;

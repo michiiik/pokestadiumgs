@@ -27,7 +27,8 @@ extern void func_8FD00074(u8, u8, u8, u8);
 void func_8FD000E4(u8 *arg0, u8 arg1) {
     func_8FD00074(arg0[0], arg0[1], arg0[2], arg1);
 }
-void func_8FD000E4_padding(void) {}
+void func_8FD000E4_padding(void) {
+}
 #endif
 
 #ifdef VERSION_US
