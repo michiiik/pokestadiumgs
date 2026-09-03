@@ -6,7 +6,37 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_826043F8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82604628.s")
+void func_82604628(s16 *arg0, s32 arg1, s32 arg2) {
+    s16 result;
+    s32 type;
+    s32 value;
+
+    result = -1;
+    type = arg1 & 0xFF00;
+    switch (type) {
+    case 0:
+        result = 0x57;
+        break;
+    case 0x100:
+    case 0x200:
+    case 0x700:
+        value = arg1 & 0xFF;
+        switch (value) {
+        case 0x10: result = 0x5B; break;
+        case 0x20: result = 0x64; break;
+        default: result = 0x6E; break;
+        }
+        break;
+    case 0x300:
+        switch (arg2) {
+        case 0xF: result = 0x72; break;
+        case 0x18: result = 0x6A; break;
+        default: result = 0x6F; break;
+        }
+        break;
+    }
+    if (arg0 != NULL) *arg0 = result;
+}
 
 extern void func_826043F8(s16 *, s16 *, s32, s32);
 extern s32 func_8004C8C0(s32);
@@ -22,7 +52,27 @@ s32 func_826046D0(s32 arg0, s32 arg1) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82604720.s")
+extern s32 func_8004C990(s32, s32);
+extern void func_826043F8(s16 *, s16 *, s32, s32);
+s32 func_82604720(s32 *arg0, s32 arg1, s32 arg2, s32 arg3) {
+    s32 result;
+    s16 value2;
+    s16 value1;
+
+    result = 0;
+    func_826043F8(&value2, &value1, arg1, arg2);
+    if (value2 >= 0) {
+        if (value1 >= 0) {
+            if (arg3 != 0) {
+                arg0[0] = func_8004C990(0x71, 0);
+                result = 1;
+            }
+            arg0[result] = func_8004C990((s32)value2, (s32)value1);
+            result += 1;
+        }
+    }
+    return result;
+}
 
 extern void func_82604628(s16 *, s32, s32);
 extern s32 func_8004C8C0(s32);
@@ -315,7 +365,16 @@ s32 func_8260D3F4(s32 arg0, s32 arg1, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260E03C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260E140.s")
+extern void Ui_DrawAnimatedTextureMarker(s16, s16);
+extern s16 D_8261A4AE;
+void func_8260E140(u8 *arg0, s32 arg1) {
+    s16 x;
+    s16 y;
+
+    x = *(s16 *)(arg0 + 0x14) + *(s16 *)(arg0 + 0x10);
+    y = *(s16 *)(arg0 + 0x16) + *(s16 *)(arg0 + 0x12);
+    Ui_DrawAnimatedTextureMarker((s16)(x + 0x3C), (s16)(y + D_8261A4AE * 0x1F + 0xBC));
+}
 
 extern void func_800498C4(void);
 extern void func_800499EC(void);
@@ -466,7 +525,30 @@ s32 func_8260F7C4(s32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_826101B4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82610C84.s")
+extern void _bzero(void *, s32);
+extern s32 D_8261A5A0;
+extern s32 func_8260F7FC(s32);
+extern s32 func_826101B4(s32);
+extern s16 D_8261A490;
+s32 func_82610C84(s32 arg0, s32 arg1) {
+    s32 result;
+    s32 mode;
+
+    result = 1;
+    _bzero((void *)&D_8261A490, 0x35DC);
+    D_8261A5A0 = arg0;
+    mode = *(s16 *)((u8 *)&arg1 + 2);
+    D_8261A490 = mode;
+    switch (mode) {
+    case 0:
+        result = func_8260F7FC(arg0);
+        break;
+    case 1:
+        result = func_826101B4(arg0);
+        break;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82610D14.s")
 
