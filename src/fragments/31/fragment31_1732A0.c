@@ -12,11 +12,29 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1732A0/func_882001E8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1732A0/func_882002F8.s")
+u8 func_882002F8(u8 *arg0, u8 *arg1) {
+    u8 value = *arg0;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1732A0/func_8820030C.s")
+    *arg0 = *arg1;
+    *arg1 = value;
+    return value;
+}
+
+u32 func_8820030C(u32 *arg0, u32 *arg1) {
+    u32 value = *arg0;
+
+    *arg0 = *arg1;
+    *arg1 = value;
+    return value;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1732A0/func_88200320.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1732A0/func_88200458.s")
+u32 func_88200458(u32 *arg0, u32 *arg1) {
+    u32 value = *arg0;
+
+    *arg0 = *arg1;
+    *arg1 = value;
+    return value;
+}
 #endif
