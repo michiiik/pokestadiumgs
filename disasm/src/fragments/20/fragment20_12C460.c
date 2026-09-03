@@ -365,7 +365,16 @@ s32 func_8260D3F4(s32 arg0, s32 arg1, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260E03C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260E140.s")
+extern void Ui_DrawAnimatedTextureMarker(s16, s16);
+extern s16 D_8261A4AE;
+void func_8260E140(u8 *arg0, s32 arg1) {
+    s16 x;
+    s16 y;
+
+    x = *(s16 *)(arg0 + 0x14) + *(s16 *)(arg0 + 0x10);
+    y = *(s16 *)(arg0 + 0x16) + *(s16 *)(arg0 + 0x12);
+    Ui_DrawAnimatedTextureMarker((s16)(x + 0x3C), (s16)(y + D_8261A4AE * 0x1F + 0xBC));
+}
 
 extern void func_800498C4(void);
 extern void func_800499EC(void);
