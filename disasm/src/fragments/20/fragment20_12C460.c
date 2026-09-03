@@ -6,7 +6,37 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_826043F8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82604628.s")
+void func_82604628(s16 *arg0, s32 arg1, s32 arg2) {
+    s16 result;
+    s32 type;
+    s32 value;
+
+    result = -1;
+    type = arg1 & 0xFF00;
+    switch (type) {
+    case 0:
+        result = 0x57;
+        break;
+    case 0x100:
+    case 0x200:
+    case 0x700:
+        value = arg1 & 0xFF;
+        switch (value) {
+        case 0x10: result = 0x5B; break;
+        case 0x20: result = 0x64; break;
+        default: result = 0x6E; break;
+        }
+        break;
+    case 0x300:
+        switch (arg2) {
+        case 0xF: result = 0x72; break;
+        case 0x18: result = 0x6A; break;
+        default: result = 0x6F; break;
+        }
+        break;
+    }
+    if (arg0 != NULL) *arg0 = result;
+}
 
 extern void func_826043F8(s16 *, s16 *, s32, s32);
 extern s32 func_8004C8C0(s32);
