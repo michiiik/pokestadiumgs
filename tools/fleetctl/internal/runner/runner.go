@@ -14,9 +14,14 @@ import (
 // LaunchSpec is everything needed to start one container run via
 // container/run.sh (docs/CONTAINER_AGENT.md sec 2).
 type LaunchSpec struct {
-	SourceFile       string   // repo-relative disasm/src/<file>.c
-	OutDir           string   // absolute host out dir, bind-mounted at /out
-	BudgetSeconds    int      // --budget-seconds
+	SourceFile    string // repo-relative disasm/src/<file>.c
+	OutDir        string // absolute host out dir, bind-mounted at /out
+	BudgetSeconds int    // --budget-seconds
+	// OwnerSeconds is the per-owner wall-clock cap (--owner-seconds); 0
+	// leaves container_agent.py's own default. budget/owner-seconds is how
+	// many owners a run can reach at all, so this is the knob that decides
+	// coverage per run, not just per-owner patience.
+	OwnerSeconds     int
 	Owners           []string // --owners a,b,c ; empty = every pragma in the file
 	SeedFrom         []string // in-container paths, e.g. /out/seeds/<name>
 	Resume           bool     // --resume

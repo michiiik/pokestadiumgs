@@ -1424,6 +1424,12 @@ def try_candidate(source_path: Path, function: str, candidate: str) -> int:
 _MAKE_FAILED_TARGET_RE = re.compile(r"^make(?:\[\d+\])?: \*\*\* \[([^\]]+)\] Error", re.MULTILINE)
 
 
+# function -> the unrelated build targets that failed its most recent gate.
+# Written by _try_candidate_detailed and drained into the attempt dict by the
+# caller, so the reason survives into merge-results/merge-history.
+_GATE_ENVIRONMENT_FAILURES: dict[str, list[str]] = {}
+
+
 def _failed_make_targets(output: str) -> list[str]:
     """Every target ``make`` reported as failing, in the order it printed them."""
     return _MAKE_FAILED_TARGET_RE.findall(output or "")
@@ -1496,6 +1502,12 @@ def _try_candidate_detailed(
                 output, (Path("build") / own_object_rel).as_posix()
             )
             if unrelated:
+                # Record the offending targets, not just print them: a run's
+                # merge-results/merge-history is all anyone has after the
+                # fact, and the tree may well build again by the time the
+                # rejection is noticed. Without this the status says "not the
+                # candidate's fault" but nothing says whose.
+                _GATE_ENVIRONMENT_FAILURES[function] = list(unrelated)
                 print(
                     f"GATE ENVIRONMENT BROKEN (not {function}'s fault): the tree "
                     f"failed to build at {', '.join(unrelated)}; restored GLOBAL_ASM",
@@ -4618,6 +4630,18 @@ def _try_candidates_detailed_unlocked(
             "exit_code": result,
             "probe_status": attempt.get("probe_status", attempt.get("status")),
         })
+        unrelated = _GATE_ENVIRONMENT_FAILURES.pop(function, None)
+        if unrelated:
+            # Carry the offending targets into the attempt so a later reader
+            # of merge-results/merge-history can see which file broke the
+            # build, rather than only that it was not this candidate.
+            attempt["unrelated_build_failures"] = unrelated
+            attempt["diagnostic"] = (
+                "gate_environment_broken: the tree failed to build at "
+                + ", ".join(unrelated)
+                + " -- an object this candidate does not own, so the verdict is "
+                "about the tree, not the candidate"
+            )
         if result == 0:
             accepted[function] = candidate
             accepted_indices[function] = index

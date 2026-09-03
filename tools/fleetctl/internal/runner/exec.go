@@ -116,6 +116,9 @@ func (r *ExecRunner) LaunchContainer(ctx context.Context, spec LaunchSpec) (stri
 		}
 	} else {
 		argv = append(argv, "--budget-seconds", strconv.Itoa(spec.BudgetSeconds))
+		if spec.OwnerSeconds > 0 {
+			argv = append(argv, "--owner-seconds", strconv.Itoa(spec.OwnerSeconds))
+		}
 	}
 	if len(spec.Owners) > 0 {
 		argv = append(argv, "--owners", strings.Join(spec.Owners, ","))

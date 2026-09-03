@@ -92,6 +92,12 @@ type Loop struct {
 	// permuter-lane launch (sec 13); <=0 defaults to 1200.
 	PermuterSeconds int
 
+	// OwnerSeconds is `--owner-seconds` forwarded to every ordinary launch;
+	// 0 leaves container_agent.py's own default (2400s). budget/owner-seconds
+	// bounds how many owners a run can reach: at the 7200s default budget,
+	// 2400s reaches 3 of a 12-owner spec and 1200s reaches 6.
+	OwnerSeconds int
+
 	// DisableAutoMerge turns off self-merge-on-green (sec 2): a PR is left
 	// at StatusDone once opened, same as before self-merge existed, and
 	// pollPRs is never called. The zero value (false) matches --auto-merge's
@@ -649,6 +655,56 @@ func rejectedOwners(report map[string]ownerResult) []string {
 	return out
 }
 
+// rotateAttemptedToTail moves the owners this run actually attempted to the
+// end of the requeued list, keeping never-attempted ones at the front.
+//
+// A run covers only budget/owner-seconds owners -- 3, for the 7200s/2400s
+// default -- but a spec carries 12, and the requeue used to preserve order.
+// An owner therefore only left the head by *matching*, so a partition whose
+// first owners were hard re-ground those same few every cycle and never
+// reached the rest: 173 of 252 planned owners (68%) had never been attempted
+// once. Rotating gives every owner a turn, which matters because a
+// never-tried owner matches at ~23% against ~15% for a retry.
+//
+// Order within each group is preserved, so the plan's own ranking still
+// decides who goes first among the untried.
+func rotateAttemptedToTail(owners, attempted []string) []string {
+	if len(attempted) == 0 || len(owners) == 0 {
+		return owners
+	}
+	tried := make(map[string]bool, len(attempted))
+	for _, o := range attempted {
+		tried[o] = true
+	}
+	fresh := make([]string, 0, len(owners))
+	used := make([]string, 0, len(owners))
+	for _, o := range owners {
+		if tried[o] {
+			used = append(used, o)
+		} else {
+			fresh = append(fresh, o)
+		}
+	}
+	return append(fresh, used...)
+}
+
+// summaryOwnersAttempted reads owners_attempted from a finished run's
+// summary.json, or nil when it is missing/unreadable (in which case the
+// requeue keeps its original order, exactly as before).
+func summaryOwnersAttempted(outDir string) []string {
+	data, err := os.ReadFile(filepath.Join(outDir, "summary.json"))
+	if err != nil {
+		return nil
+	}
+	var doc struct {
+		OwnersAttempted []string `json:"owners_attempted"`
+	}
+	if err := json.Unmarshal(data, &doc); err != nil {
+		return nil
+	}
+	return doc.OwnersAttempted
+}
+
 func subtract(all, remove []string) []string {
 	skip := make(map[string]bool, len(remove))
 	for _, o := range remove {
@@ -967,7 +1023,10 @@ func (l *Loop) runMerge(ctx context.Context, rec *fleetstate.RunRecord) error {
 	// duplicate against a tree that (once committed by hand) will already
 	// contain it. Only owners neither matched nor awaiting a manual commit
 	// go back on the queue for a fresh attempt.
-	unmatched := subtract(subtract(rec.Spec.Owners, accepted), needsCommit)
+	unmatched := rotateAttemptedToTail(
+		subtract(subtract(rec.Spec.Owners, accepted), needsCommit),
+		summaryOwnersAttempted(rec.OutDir),
+	)
 	if len(unmatched) > 0 {
 		newID := l.State.NextRequeueID(rec.Spec.ID)
 		newSpec := fleetstate.RunSpec{
@@ -1652,6 +1711,7 @@ func (l *Loop) launch(ctx context.Context, rec *fleetstate.RunRecord) error {
 		Mode:            rec.Spec.Mode,
 		TiePoolFile:     tiePoolFile,
 		PermuterSeconds: rec.Spec.PermuterSeconds,
+		OwnerSeconds:    l.OwnerSeconds,
 	}
 	id, err := l.Runner.LaunchContainer(ctx, spec)
 	if err != nil {
