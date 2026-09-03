@@ -459,7 +459,20 @@ void func_8260F0DC(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260F108.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260F49C.s")
+extern s32 func_8004E0F0(s32, s32, s32);
+s32 func_8260F49C(s32 arg0, s32 arg1) {
+    s32 value;
+    s32 result;
+    void *record;
+
+    record = (void *)((u8 *)(u32)arg0 + (arg1 * 4));
+    value = *(s16 *)((u8 *)record + 0x58);
+    result = 0;
+    if (value != -1) {
+        result = func_8004E0F0(0, value, *(s16 *)((u8 *)record + 0x5A));
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260F4E4.s")
 
