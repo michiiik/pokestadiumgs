@@ -335,7 +335,23 @@ void func_82609730(void *arg0, s32 arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82609868.s")
+extern s16 D_826156C0[];
+extern s16 D_826156C4[];
+void func_82609868(void *arg0, s32 arg1, s32 arg2) {
+    s16 temp_s6;
+    s16 temp_s5;
+    s32 index;
+    if (arg2 != 0) {
+        if (arg1 != 0) {
+            gSPDisplayList(D_800D0510++, D_80094E38);
+            gDPSetRenderMode(D_800D0510++, 0x0F0A4000, 0);
+        }
+        index = *(s16 *)((u8 *)arg0 + 2) * 2;
+        temp_s5 = *(s16 *)((u8 *)arg0 + 0x14) + *(s16 *)((u8 *)arg0 + 0x10);
+        temp_s6 = *(s16 *)((u8 *)arg0 + 0x16) + *(s16 *)((u8 *)arg0 + 0x12);
+        func_82609584(*(s16 *)((u8 *)D_826156C0 + index) + temp_s5, *(s16 *)((u8 *)D_826156C4 + index) + temp_s6, arg2, 1);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82609938.s")
 
@@ -887,7 +903,7 @@ void func_82613BE0(void *arg0) {
     } while (var_s1 != 0x33E0);
 }
 
-extern s32 func_82609868(void *, s32, s32);
+extern void func_82609868(void *, s32, s32);
 extern void func_82609730(void *arg0, s32 arg1);
 void func_82613C64(void *arg0) {
     s32 temp_a1;
