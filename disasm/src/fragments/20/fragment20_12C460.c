@@ -93,7 +93,51 @@ s32 func_826047C4(s32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_826049A0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82604A78.s")
+extern s16 D_82615542[];
+extern s32 func_8004C990(s32, s32);
+s32 func_82604A78(s32 *arg0, s32 arg1, s32 arg2, s32 arg3) {
+    s32 result;
+    s32 next;
+
+    result = 0;
+    switch (arg1) {
+    case 15:
+        arg0[0] = func_8004C990(0x72, 1);
+        result = 1;
+        break;
+    case 11:
+        arg0[0] = func_8004C990(0x6B, 0);
+        result = result + 1;
+        arg0[result] = func_8004C990(0x65, D_82615542[arg2]);
+        result = result + 1;
+        break;
+    case 14:
+        arg0[0] = func_8004C990(0x6F, 1);
+        result = result + 1;
+        arg0[result] = func_8004C990(0x65, D_82615542[arg2]);
+        result = result + 1;
+        break;
+    case 24:
+        arg0[0] = func_8004C990(0x6A, 1);
+        result = 1;
+        break;
+    default:
+        next = arg2 + 1;
+        if (arg3 != next) goto indexed_default;
+        arg0[0] = func_8004C990(0x6F, 0);
+        result = 1;
+        break;
+indexed_default:
+        if (arg2 >= 6) goto done_default;
+        arg0[0] = func_8004C990(0x6F, 2);
+        result = result + 1;
+        arg0[result] = func_8004C990(0x65, D_82615542[arg2]);
+        result = result + 1;
+done_default:
+        break;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82604C08.s")
 
@@ -309,7 +353,38 @@ void func_82609730(void *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260B8CC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260BBA8.s")
+extern s32 func_8004D1FC(u8 *);
+extern void func_82607BF4(s16, u8 *, u8 *, s16, s32);
+extern void func_8260B8CC(s32, s32, s32, s32);
+extern u8 D_80094E78[];
+extern s32 func_8004C990(s32, s32);
+extern Gfx * D_800D0510;
+void func_8260BBA8(void *arg0, s32 arg1) {
+    s32 temp_v0;
+    s16 sp4A;
+    s16 sp48;
+    struct Color { u8 r; u8 g; u8 b; u8 a; } sp44;
+    struct Color2 { u8 r; u8 g; u8 b; u8 a; } sp40;
+
+    temp_v0 = func_8004C990(0x51, 0);
+    if (temp_v0 != 0) {
+        sp48 = *(s16 *)((u8 *)arg0 + 0x14) + *(s16 *)((u8 *)arg0 + 0x10);
+        sp4A = *(s16 *)((u8 *)arg0 + 0x16) + *(s16 *)((u8 *)arg0 + 0x12);
+        if (arg1 != 0) {
+            gSPDisplayList(D_800D0510++, D_80094E78);
+            gDPSetRenderMode(D_800D0510++, 0x0F0A4000, 0);
+            func_8004D1FC((u8 *)temp_v0);
+        }
+        func_82607BF4(*(s16 *)arg0, (u8 *)&sp44, (u8 *)&sp40,
+                      *(s16 *)((u8 *)arg0 + 0xC),
+                      (*(u16 *)((u8 *)arg0 + 4) & 8) != 0);
+        gDPPipeSync(D_800D0510++);
+        gDPSetEnvColor(D_800D0510++, sp44.r, sp44.g, sp44.b, 0xFF);
+        gDPSetPrimColor(D_800D0510++, 0, 0, sp40.r, sp40.g, sp40.b, 0xFF);
+        func_8260B8CC(sp48 + 0x36, sp4A + 0x24, 0x12C, 0x61);
+        func_8260B8CC(sp48 + 0x36, sp4A + 0xAC, 0x12C, 0x52);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260BD50.s")
 
