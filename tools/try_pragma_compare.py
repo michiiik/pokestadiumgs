@@ -298,6 +298,34 @@ def _object_build_environment(repo_root: Path | None = None) -> dict[str, str]:
     return environment
 
 
+def _split_inputs_conflict(repo_root: Path, other: Path) -> bool:
+    """Whether ``other`` was demonstrably split from different splat inputs.
+
+    An oracle tree is only meaningful for the yaml that produced it. When a
+    worktree changes ``yamls/`` -- moving a jump-table run into a per-file
+    ``.rodata`` subsegment, say -- the primary checkout's asm/ describes a
+    *different* layout, and importing entries from it yields assembly that
+    contradicts this tree's own linker script.
+
+    Deliberately positive-evidence only: this reports a conflict just when
+    both trees have readable ``yamls/`` that actually differ. If either is
+    absent or unreadable there is nothing to go on, and the historical
+    overlay behaviour is kept rather than blocking a worktree that needs it.
+    """
+    a = repo_root / "disasm" / "yamls"
+    b = other / "disasm" / "yamls"
+    if not a.is_dir() or not b.is_dir():
+        return False
+    try:
+        names_a = sorted(x.relative_to(a).as_posix() for x in a.rglob("*") if x.is_file())
+        names_b = sorted(x.relative_to(b).as_posix() for x in b.rglob("*") if x.is_file())
+        if names_a != names_b:
+            return True
+        return any((a / n).read_bytes() != (b / n).read_bytes() for n in names_a)
+    except OSError:
+        return False
+
+
 def _link_missing_oracle_entries(local: Path, shared: Path) -> None:
     """Overlay missing oracle entries with symlinks without replacing tracked ones."""
     try:
@@ -324,6 +352,16 @@ def _ensure_worktree_oracles(
     """
     primary = _primary_worktree_root(repo_root)
     if primary is None:
+        return
+    # The primary's asm/ only describes this tree's layout when both were split
+    # from the same yamls. Once they diverge, importing its entries is actively
+    # wrong: a live GLOBAL_ASM pragma silently resolves to assembly built for a
+    # different .rodata layout, and every probe and gate on that source is then
+    # measuring the wrong file. Observed after 585D0 gained its own subsegment:
+    # a single accepted candidate deleted its .s, the next probe symlinked the
+    # primary's stale copy back in, and 108 entries in one owner directory came
+    # from the old split.
+    if _split_inputs_conflict(repo_root, primary):
         return
     # Once this worktree has completed a private extraction, that local oracle
     # is authoritative. Do not fill any of its gaps with primary-worktree
@@ -883,6 +921,10 @@ def _backfill_missing_private_oracles(repo_root: Path) -> list[str]:
     if root.is_symlink() or not root.is_dir():
         return []
     primary = _primary_worktree_root(repo_root)
+    # Same rule as _ensure_worktree_oracles: a primary split from different
+    # yamls cannot supply oracles for this one.
+    if primary is not None and _split_inputs_conflict(repo_root, primary):
+        primary = None
     shared_root = None if primary is None else primary / "disasm" / "asm" / "us" / "nonmatchings"
     unresolved: list[str] = []
     for relative in sorted(_required_asm_oracles(repo_root)):
