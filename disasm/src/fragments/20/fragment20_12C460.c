@@ -525,7 +525,30 @@ s32 func_8260F7C4(s32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_826101B4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82610C84.s")
+extern void _bzero(void *, s32);
+extern s32 D_8261A5A0;
+extern s32 func_8260F7FC(s32);
+extern s32 func_826101B4(s32);
+extern s16 D_8261A490;
+s32 func_82610C84(s32 arg0, s32 arg1) {
+    s32 result;
+    s32 mode;
+
+    result = 1;
+    _bzero((void *)&D_8261A490, 0x35DC);
+    D_8261A5A0 = arg0;
+    mode = *(s16 *)((u8 *)&arg1 + 2);
+    D_8261A490 = mode;
+    switch (mode) {
+    case 0:
+        result = func_8260F7FC(arg0);
+        break;
+    case 1:
+        result = func_826101B4(arg0);
+        break;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82610D14.s")
 
