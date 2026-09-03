@@ -187,7 +187,9 @@ void func_86009318(void *arg0, void *arg1, s32 arg2) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_860093AC.s")
 
 extern void func_86007EB4(void *);
-void func_860095B8(void *arg0, f64 arg1) { func_86007EB4(arg0); }
+void func_860095B8(void* arg0, f64 arg1) {
+    func_86007EB4(arg0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_860095DC.s")
 

@@ -129,7 +129,9 @@ void func_86001A60(u8 *arg0, s32 *arg1) {
 
 #ifdef VERSION_US
 extern void func_87C01A90(s32);
-void func_86001AFC(s32 arg0) { func_87C01A90(arg0 + 364); }
+void func_86001AFC(s32 arg0) {
+    func_87C01A90(arg0 + 364);
+}
 #endif
 
 #ifdef VERSION_US

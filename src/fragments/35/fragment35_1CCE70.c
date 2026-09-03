@@ -106,5 +106,7 @@ void func_886013BC(s32 arg0, s32 arg1) {
 }
 
 extern void func_886013BC(s32, s32);
-void func_886014D8(s32 arg0) { func_886013BC(arg0, 0); }
+void func_886014D8(s32 arg0) {
+    func_886013BC(arg0, 0);
+}
 #endif

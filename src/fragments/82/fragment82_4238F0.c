@@ -29,7 +29,9 @@ void func_82D02C98(void) {
     func_8004C8C0(0xAF);
 }
 
-void func_82D02D00(void) { func_8004C4B0(0x43); }
+void func_82D02D00(void) {
+    func_8004C4B0(0x43);
+}
 
 void func_82D02D20(s32 arg0, s32 arg1)
 {

@@ -83,7 +83,9 @@ void func_8002390C(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-void func_80023954(void) { func_8001874C(0x06010005, 1); }
+void func_80023954(void) {
+    func_8001874C(0x06010005, 1);
+}
 #endif
 
 #ifdef VERSION_US
@@ -1470,7 +1472,9 @@ void Thread4_CreateThread(void) {
 
 #ifdef VERSION_US
 extern void func_80021BBC(void);
-void func_8003539C(void) { func_80021BBC(); }
+void func_8003539C(void) {
+    func_80021BBC();
+}
 #endif
 
 #ifdef VERSION_US
@@ -4320,7 +4324,9 @@ void ModelRenderer_InitDisplayRoots(void) {
 
 #ifdef VERSION_US
 extern void func_8003F03C(s32, void *);
-void func_8003F018(s32 arg0) { func_8003F03C(arg0, D_80126420); }
+void func_8003F018(s32 arg0) {
+    func_8003F03C(arg0, D_80126420);
+}
 #endif
 
 #ifdef VERSION_US

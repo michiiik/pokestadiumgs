@@ -85,9 +85,13 @@ extern s32 D_80097120; s32 func_8004C594(s32 index,s32 value){s32 result=0; s32 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C7A0.s")
 
 extern void func_8004C7A0();
-void func_8004C874(s32 arg0, s32 arg1) { func_8004C7A0(0, 0, arg0, arg1); }
+void func_8004C874(s32 arg0, s32 arg1) {
+    func_8004C7A0(0, 0, arg0, arg1);
+}
 
-void func_8004C8A0(void) { func_8004C7A0(); }
+void func_8004C8A0(void) {
+    func_8004C7A0();
+}
 
 extern s32 func_8004C3EC(s32 arg0, s32 arg1, s32 arg2);
 #ifdef CC_CHECK
@@ -194,9 +198,13 @@ void func_8004D150(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
 }
 
 extern void func_8004D150(s32, s32, s32, s32, s32, s32);
-void func_8004D19C(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4) { func_8004D150(a0, a1, a2, a3, 0, a4); }
+void func_8004D19C(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4) {
+    func_8004D150(a0, a1, a2, a3, 0, a4);
+}
 
-void func_8004D1C4(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6) { func_8004CB7C(a0, a1, a2, a3, a4, a5, 0, a6); }
+void func_8004D1C4(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6) {
+    func_8004CB7C(a0, a1, a2, a3, a4, a5, 0, a6);
+}
 
 s32 func_8004D1FC(u8 *arg0) {
     s32 sp4C;
@@ -381,7 +389,9 @@ s32 func_8004DCB4(s32 arg0) {
     return var_v1;
 }
 
-void func_8004DCFC(void) { func_8004DB5C(); }
+void func_8004DCFC(void) {
+    func_8004DB5C();
+}
 
 s32 func_8004DD1C(s32 arg0) {
     s32 temp_a0;
@@ -475,9 +485,13 @@ s32 func_8004DE84(s32 arg0, s32 arg1) {
     return var_v1;
 }
 
-void func_8004DEF8(s32 arg0) { func_8004DE84(arg0, 0); }
+void func_8004DEF8(s32 arg0) {
+    func_8004DE84(arg0, 0);
+}
 
-void WidgetTree_RunMessagePanelSilent(s32 arg0, s32 arg1) { func_8004DF38(arg0, arg1, 0); }
+void WidgetTree_RunMessagePanelSilent(s32 arg0, s32 arg1) {
+    func_8004DF38(arg0, arg1, 0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004DF38.s")
 

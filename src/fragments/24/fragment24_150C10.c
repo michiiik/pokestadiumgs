@@ -701,7 +701,9 @@ void func_82B07AB4(void) {
 #endif
 
 #ifdef VERSION_US
-void func_82B084AC(void) { func_82B060A0(0); }
+void func_82B084AC(void) {
+    func_82B060A0(0);
+}
 #endif
 
 #ifdef VERSION_US

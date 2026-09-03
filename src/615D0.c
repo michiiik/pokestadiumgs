@@ -25,7 +25,9 @@ void func_800609D0(void) {
     }
 }
 
-u16 func_80060A4C(const u8 *arg0) { return (u16)((arg0[0] << 8) | arg0[1]); }
+u16 func_80060A4C(const u8* arg0) {
+    return (u16)((arg0[0] << 8) | arg0[1]);
+}
 
 u32 GbData_ReadU24BE(const u8 *arg0) { return ((u32)arg0[0] << 16) | ((u32)arg0[1] << 8) | arg0[2]; }
 

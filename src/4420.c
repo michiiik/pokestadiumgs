@@ -563,7 +563,9 @@ S1_BinArchive* BinArchive_Open(u8* romStart, u8* romEnd, s32 arg2, s32 arg3) {
     return ret;
 }
 
-void func_800049B8(void) { main_pool_try_free(); }
+void func_800049B8(void) {
+    main_pool_try_free();
+}
 
 struct S1_BinArchive;
 struct S1_BinArchiveFile4420;
@@ -623,9 +625,13 @@ s32 file_number;
     return result;
 }
 
-void func_80004B4C(s32 arg0,s32 arg1){func_80004A40(0,arg0,arg1);}
+void func_80004B4C(s32 arg0, s32 arg1) {
+    func_80004A40(0, arg0, arg1);
+}
 
-void func_80004B78(void) { func_80004A40(); }
+void func_80004B78(void) {
+    func_80004A40();
+}
 
 typedef struct { u32 offset; u32 size; s32 cachedPtr; u32 pad; } BinFile;
 typedef struct { u32 raw0; u32 romStart; u32 total_size; u32 num_files; BinFile files[1]; } BinArchive;

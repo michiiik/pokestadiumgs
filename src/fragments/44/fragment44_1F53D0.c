@@ -3,7 +3,9 @@
 
 #ifdef VERSION_US
 extern void func_8AF00504(s32);
-void func_8AF07160(void) { func_8AF00504(27); }
+void func_8AF07160(void) {
+    func_8AF00504(27);
+}
 
 extern void *D_8AF263C0;
 

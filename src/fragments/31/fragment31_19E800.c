@@ -28,7 +28,9 @@ void func_8822B63C(void) {
 
 extern u32 D_88234910;
 extern void func_8821D930(s32);
-void func_8822B7E4(void) { func_8821D930((D_88234910 + 88)); }
+void func_8822B7E4(void) {
+    func_8821D930((D_88234910 + 88));
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_19E800/func_8822B80C.s")
 

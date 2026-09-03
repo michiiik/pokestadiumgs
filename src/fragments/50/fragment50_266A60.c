@@ -172,7 +172,9 @@ void func_862012F8(void) {
 extern void *D_87F119D8;
 extern void *D_87F119DC;
 extern void func_87F026E8(void *, void *);
-void func_8620148C(void) { func_87F026E8(D_87F119D8, D_87F119DC); }
+void func_8620148C(void) {
+    func_87F026E8(D_87F119D8, D_87F119DC);
+}
 #endif
 
 #ifdef VERSION_US

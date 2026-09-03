@@ -171,7 +171,9 @@ void func_8FC00F88(void) {
 
 #ifdef VERSION_US
 extern void func_80060358(s32, void *);
-void func_8FC00FD0(void) { func_80060358(0, &D_8FC0C2D8); }
+void func_8FC00FD0(void) {
+    func_80060358(0, &D_8FC0C2D8);
+}
 #endif
 
 #ifdef VERSION_US
