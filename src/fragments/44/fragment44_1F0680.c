@@ -24,7 +24,9 @@
 
 extern void func_8AF02C28(s32, s32, void *, s32);
 extern s32 D_8AF2BE10;
-void func_8AF02DA4(s32 arg0, s32 arg1) { func_8AF02C28(arg0, arg1, &D_8AF2BE10, 0x4943414C); }
+void func_8AF02DA4(s32 arg0, s32 arg1) {
+    func_8AF02C28(arg0, arg1, &D_8AF2BE10, 0x4943414C);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F0680/func_8AF02DD0.s")
 

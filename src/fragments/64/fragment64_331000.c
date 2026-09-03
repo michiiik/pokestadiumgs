@@ -12,7 +12,9 @@ void func_87F0E390(u8 *arg0, s32 arg1) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_331000/func_87F0E420.s")
 
 extern void func_87F0E420(u8 *, u8 *, s32);
-void func_87F0E504(u8 *arg0, u8 *arg1) { func_87F0E420(arg0, arg1, 1); }
+void func_87F0E504(u8* arg0, u8* arg1) {
+    func_87F0E420(arg0, arg1, 1);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_331000/func_87F0E524.s")
 

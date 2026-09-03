@@ -34,7 +34,9 @@ void func_87F02388(void *arg0) {
 
 extern u32 D_87F119C0;
 extern void func_80037E9C(s32, void *);
-void func_87F024CC(void) { func_80037E9C(0, &D_87F119C0); }
+void func_87F024CC(void) {
+    func_80037E9C(0, &D_87F119C0);
+}
 
 extern void func_87F0252C(void *, void *, s32, s32);
 

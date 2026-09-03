@@ -53,7 +53,9 @@ void func_8822C6AC(void) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_19F570/func_8822C6D8.s")
 
 extern void * D_80087200;
-void func_8822C8E0(void) { Input_SetRepeatController(D_80087200); }
+void func_8822C8E0(void) {
+    Input_SetRepeatController(D_80087200);
+}
 
 extern void func_88001900();
 extern s32 D_88234930;

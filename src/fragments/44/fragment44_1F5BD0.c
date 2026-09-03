@@ -21,5 +21,7 @@ void func_8AF07A90(void) {
 
 extern void *D_8AF26560;
 extern void func_8AF06EA4(void *);
-void func_8AF07C84(void) { func_8AF06EA4(D_8AF26560); }
+void func_8AF07C84(void) {
+    func_8AF06EA4(D_8AF26560);
+}
 #endif

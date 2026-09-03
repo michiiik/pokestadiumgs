@@ -205,7 +205,9 @@ s32 arg1;
 #endif
 
 #ifdef VERSION_US
-void func_8005049C(void) { func_80050428(); }
+void func_8005049C(void) {
+    func_80050428();
+}
 #endif
 
 #ifdef VERSION_US

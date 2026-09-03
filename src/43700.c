@@ -63,11 +63,17 @@ s32 func_80042D74(u8 *arg0, s32 arg1) { s32 result = 0; if (arg0 != NULL) { *(s3
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_80042EB8.s")
 
-void func_80042F94(void *arg0, void *arg1) { func_80042EB8(arg0, 1, arg1, 1); }
+void func_80042F94(void* arg0, void* arg1) {
+    func_80042EB8(arg0, 1, arg1, 1);
+}
 
-void func_80042FBC(void *arg0, void *arg1) { func_80042EB8(arg0, 0, arg1, 1); }
+void func_80042FBC(void* arg0, void* arg1) {
+    func_80042EB8(arg0, 0, arg1, 1);
+}
 
-void func_80042FE4(void *arg0, void *arg1) { func_80042EB8(arg0, 0, arg1, 0); }
+void func_80042FE4(void* arg0, void* arg1) {
+    func_80042EB8(arg0, 0, arg1, 0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_8004300C.s")
 

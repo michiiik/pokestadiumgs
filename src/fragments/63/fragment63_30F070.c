@@ -59,7 +59,9 @@ void func_87E0B834(void *arg0) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30F070/func_87E0BB5C.s")
 
 extern void func_87F02684(s32);
-void func_87E0BE28(s32 arg0) { func_87F02684(arg0 + 12); }
+void func_87E0BE28(s32 arg0) {
+    func_87F02684(arg0 + 12);
+}
 
 void func_87E0BE48(void *arg0) {
     void *var_v0;
@@ -185,9 +187,13 @@ void func_87E0C4B4(void *arg0) {
 extern void func_87E0BB5C(); extern void func_87E0BFFC(s32, s32, s32);
 void func_87E0C590(s32 arg0, s32 arg1) { func_87E0BB5C(); func_87E0BFFC(arg0, arg1, 1); }
 
-void WidgetTree_RunMessagePanelSilent_fragment63(s32 arg0, s32 arg1) { func_87E0BFFC(arg0, arg1, 0); }
+void WidgetTree_RunMessagePanelSilent_fragment63(s32 arg0, s32 arg1) {
+    func_87E0BFFC(arg0, arg1, 0);
+}
 
-void func_87E0C5E4(s32 arg0) { func_87E0BFFC(arg0, -1, 0); }
+void func_87E0C5E4(s32 arg0) {
+    func_87E0BFFC(arg0, -1, 0);
+}
 
 extern void func_87E0C290(void);
 void func_87E0C608(void) {
@@ -229,5 +235,7 @@ s32 func_87E0C664(s32 *arg0) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30F070/func_87E0C6CC.s")
 
 extern void func_87F0AF4C(s32);
-void func_87E0C8DC(s32 arg0) { func_87F0AF4C(arg0 + 12); }
+void func_87E0C8DC(s32 arg0) {
+    func_87F0AF4C(arg0 + 12);
+}
 #endif
