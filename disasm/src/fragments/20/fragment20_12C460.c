@@ -353,7 +353,25 @@ void func_82609868(void *arg0, s32 arg1, s32 arg2) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82609938.s")
+extern void func_80044270(s16, s16, s16, s16, s32, s32, s32, s32, s32);
+extern void func_80046204(s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
+void func_82609938(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
+    s32 temp_v0;
+    s32 var_s0;
+    s32 var_s1;
+
+    var_s1 = 0;
+    if (arg4 > 0) {
+        do {
+            temp_v0 = arg4 - var_s1;
+            if (temp_v0 < arg5) var_s0 = temp_v0;
+            else var_s0 = arg5;
+            func_80046204((arg3 * var_s1 * 2) + arg2, 0, 2, arg3, var_s0, 0, 0, arg3, var_s0 - 1, 0, 2, 2, 0, 0, 0, 0);
+            func_80044270((s16)arg0, (s16)(arg1 + var_s1), (s16)arg3, (s16)var_s0, 0, 0, 0x400, 0x400, 0);
+            var_s1 += arg5;
+        } while (var_s1 < arg4);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82609A88.s")
 
@@ -1110,9 +1128,43 @@ void func_826144EC(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82614630.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8261479C.s")
+extern s32 func_8004D19C(s32, s32, s32, s32, s32);
+extern void func_82607E40(u8 *, u8 *, u8 *, u8 *, s32);
+extern u8 D_80094E78[];
+extern u8 D_8261551C[];
+extern u8 D_82615520[];
+void func_8261479C(void *arg0) {
+    struct State { u8 pad[0xA]; s16 index; s16 alpha; };
+    s32 result;
+    struct Color { u8 r; u8 g; u8 b; } color1;
+    struct Color color2;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_826148D4.s")
+    result = func_8004C990(0x53, 3);
+    gSPDisplayList(D_800D0510++, D_80094E78);
+    func_82607E40(&color1.r, &color2.r, D_8261551C, D_82615520, ((struct State *)arg0)->index);
+    gDPPipeSync(D_800D0510++);
+    gDPSetEnvColor(D_800D0510++, color1.r, color1.g, color1.b, ((struct State *)arg0)->alpha);
+    gDPSetPrimColor(D_800D0510++, 0, 0, color2.r, color2.g, color2.b, 0xFF);
+    func_8004D19C(0x141, 0xD0, result, 1, 0);
+}
+
+extern u8 D_82615524;
+extern u8 D_82615528;
+void func_826148D4(void *arg0) {
+    struct State { u8 pad[0xE]; s16 index; s16 alpha; };
+    struct Color { u8 r; u8 g; u8 b; };
+    s32 result;
+    struct Color color1;
+    struct Color color2;
+
+    result = func_8004C990(0x5F, 0);
+    gSPDisplayList(D_800D0510++, D_80094E78);
+    func_82607E40(&color1.r, &color2.r, &D_82615524, &D_82615528, ((struct State *)arg0)->index);
+    gDPPipeSync(D_800D0510++);
+    gDPSetEnvColor(D_800D0510++, color1.r, color1.g, color1.b, ((struct State *)arg0)->alpha);
+    gDPSetPrimColor(D_800D0510++, 0, 0, color2.r, color2.g, color2.b, 0xFF);
+    func_8004D19C(0x141, 0xD4, result, 1, 0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82614A0C.s")
 
