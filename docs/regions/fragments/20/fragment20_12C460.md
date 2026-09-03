@@ -117,3 +117,23 @@ func_8260BD50: time cap at 0.0 (raw None) after 2409s, mismatch unknown; tried f
 ## 2026-09-03
 
 func_8260E2C4: matched (call_sequence:record-overlay:typed-base), 1 iterations, agent codex
+
+## 2026-09-03
+
+func_8260E140: matched (init_sequence:abi:byte-pointer-s32-home), 1 iterations, agent codex
+
+## 2026-09-03
+
+func_82610C84: matched (call_sequence:stack-home:cast-bzero), 1 iterations, agent codex
+
+## 2026-09-03
+
+func_82604720: matched (call_sequence:arguments:halfword-casts), 1 iterations, agent codex
+
+## 2026-09-03
+
+func_82604628: matched (constant-map:switch:inline-mask-temp), 3 iterations, agent codex
+
+## 2026-09-03
+
+func_82610E34: time cap at 0.9556 (raw 0.8444) after 2412s, mismatch instruction_drift; tried families: call-sequence, permuter; tie-pool no
