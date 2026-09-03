@@ -120,6 +120,21 @@ if [ -n "${SRC_OVERLAY:-}" ]; then
     fi
     echo "entrypoint: SRC_OVERLAY set -- overlaying /src onto /work/disasm and rebuilding" >&2
     overlay_start=$(date +%s)
+    # Re-split first when the overlaid checkout changed splat's inputs. The
+    # image bakes a completed asm/ tree; overlaying sources built from a
+    # different split links against jump tables that reference labels the new
+    # sources no longer define, and `make rom` fails before the driver ever
+    # starts -- the container exits with no summary.json and fleetctl records
+    # it as vanished. That took the whole fleet down once: every run hit
+    # "vanished 3 times in a row" after 585D0 gained its own .rodata
+    # subsegment while the image still had the old blob. container/gate_pr.sh
+    # does the same check for the PR gate.
+    if ! diff -qr /src/disasm/yamls /work/disasm/yamls >/dev/null 2>&1; then
+        echo "entrypoint: split inputs changed -- re-running extraction" >&2
+        rm -rf /work/disasm/yamls
+        cp -a /src/disasm/yamls /work/disasm/yamls
+        make -C /work/disasm extract
+    fi
     bash /src/container/overlay_src.sh /src
     # Incremental, no explicit COMPARE (see the "ROM gate note" above) --
     # brings the baked build tree in sync with the overlaid sources before
