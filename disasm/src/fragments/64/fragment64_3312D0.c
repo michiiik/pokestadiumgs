@@ -143,7 +143,9 @@ void func_87F0F3E4(void *arg0) {
 }
 
 extern void func_81A0022C(void *);
-void StageLoader_UpdateSegments(void) { func_81A0022C(&D_87F15BB0); }
+void StageLoader_UpdateSegments(void) {
+    func_81A0022C(&D_87F15BB0);
+}
 
 extern u32 D_87F15BB8;
 u32 func_87F0F468(void) {

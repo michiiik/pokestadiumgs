@@ -1373,15 +1373,21 @@ void BattleAnim_Table_84186004_010(void) {
 #endif
 
 #ifdef VERSION_US
-void BattleAnim_Table_84186004_012(void) { func_8412F49C(); }
+void BattleAnim_Table_84186004_012(void) {
+    func_8412F49C();
+}
 #endif
 
 #ifdef VERSION_US
-void BattleAnim_Table_84186004_013(void) { func_8412F49C(); }
+void BattleAnim_Table_84186004_013(void) {
+    func_8412F49C();
+}
 #endif
 
 #ifdef VERSION_US
-void BattleAnim_Table_84186004_014(void) { func_8412F49C(); }
+void BattleAnim_Table_84186004_014(void) {
+    func_8412F49C();
+}
 #endif
 
 #ifdef VERSION_US

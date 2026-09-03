@@ -26,7 +26,9 @@ void func_80069E80(void) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_80069F20.s")
 
 extern void func_80069F20();
-void BattleScene_ResetParticipantModelFlags(s32 arg0) { func_80069F20(arg0, 0, 0); }
+void BattleScene_ResetParticipantModelFlags(s32 arg0) {
+    func_80069F20(arg0, 0, 0);
+}
 
 extern void func_80069F20(void); void func_8006A160(void) { func_80069F20(); }
 

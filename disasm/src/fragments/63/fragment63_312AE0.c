@@ -143,7 +143,9 @@ void func_87E10628(void) { func_8004C8C0(0x164); func_8004C8C0(0x165); func_8004
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E10670.s")
 
 extern void func_87F02684(s32);
-void func_87E1078C(void) { func_87F02684(D_87E1EBB8 + 712); }
+void func_87E1078C(void) {
+    func_87F02684(D_87E1EBB8 + 712);
+}
 
 extern s32 D_87E1AA4C;
 extern u8 D_87E1EBA0;
@@ -260,7 +262,9 @@ void func_87E113C8(void) {
 }
 
 extern void func_8004C4B0(s32);
-void func_87E1142C(void) { func_8004C4B0(50); }
+void func_87E1142C(void) {
+    func_8004C4B0(50);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E1144C.s")
 
@@ -398,6 +402,8 @@ void func_87E11E18(s32 arg0, s32 arg1) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E12070.s")
 
 extern void func_87F0277C(void);
-void func_87E120F8(void) { func_87F0277C(); }
+void func_87E120F8(void) {
+    func_87F0277C();
+}
 #pragma C_FUNCTION_PADDING(8)
 #endif

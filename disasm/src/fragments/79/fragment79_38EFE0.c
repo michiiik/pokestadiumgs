@@ -95,19 +95,33 @@ void func_8411FB2C(s32 arg0, s32 arg1) {
 }
 void func_8411FB2C_padding(void) {}
 
-void func_8411FB60(s32 arg0, s32 arg1) { func_841125F4(func_8411F750(arg0), 0x10); }
+void func_8411FB60(s32 arg0, s32 arg1) {
+    func_841125F4(func_8411F750(arg0), 0x10);
+}
 
-void func_8411FB8C(s32 arg0, s32 arg1) { func_841125F4(func_8411F750(arg0), 0x11); }
+void func_8411FB8C(s32 arg0, s32 arg1) {
+    func_841125F4(func_8411F750(arg0), 0x11);
+}
 
-void func_8411FBB8(s32 arg0, s32 arg1) { func_841125F4(func_8411F750(arg0), 4); }
+void func_8411FBB8(s32 arg0, s32 arg1) {
+    func_841125F4(func_8411F750(arg0), 4);
+}
 
-void func_8411FBE4(s32 arg0, s32 arg1) { func_841125F4(func_8411F750(arg0), 5); }
+void func_8411FBE4(s32 arg0, s32 arg1) {
+    func_841125F4(func_8411F750(arg0), 5);
+}
 
-void func_8411FC10(s32 arg0, s32 arg1) { func_841125F4(func_8411F750(arg0), 0x13); }
+void func_8411FC10(s32 arg0, s32 arg1) {
+    func_841125F4(func_8411F750(arg0), 0x13);
+}
 
-void func_8411FC3C(s32 arg0, s32 arg1) { func_841125F4(func_8411F750(arg0), 0x17); }
+void func_8411FC3C(s32 arg0, s32 arg1) {
+    func_841125F4(func_8411F750(arg0), 0x17);
+}
 
-void func_8411FC68(s32 arg0, s32 arg1) { func_841125F4(func_8411F750(arg0), 3); }
+void func_8411FC68(s32 arg0, s32 arg1) {
+    func_841125F4(func_8411F750(arg0), 3);
+}
 
 extern u8 D_841911F9;
 void func_8411FC94(s32 arg0, s32 arg1) {
@@ -118,23 +132,41 @@ void func_8411FC94(s32 arg0, s32 arg1) {
     }
 }
 
-void func_8411FCF4(s32 arg0, s32 arg1) { func_841125F4(func_8411F750(arg0), 0xC); }
+void func_8411FCF4(s32 arg0, s32 arg1) {
+    func_841125F4(func_8411F750(arg0), 0xC);
+}
 
-void func_8411FD20(s32 arg0, s32 arg1) { func_841125F4(func_8411F750(arg0), 0x19); }
+void func_8411FD20(s32 arg0, s32 arg1) {
+    func_841125F4(func_8411F750(arg0), 0x19);
+}
 
-void func_8411FD4C(s32 arg0, s32 arg1) { func_841125F4(func_8411F750(arg0), 0x12); }
+void func_8411FD4C(s32 arg0, s32 arg1) {
+    func_841125F4(func_8411F750(arg0), 0x12);
+}
 
-void func_8411FD78(s32 arg0, s32 arg1) { func_841125F4(func_8411F750(arg0), 0x14); }
+void func_8411FD78(s32 arg0, s32 arg1) {
+    func_841125F4(func_8411F750(arg0), 0x14);
+}
 
-void func_8411FDA4(s32 arg0, s32 arg1) { func_841125F4(func_8411F750(arg0), 9); }
+void func_8411FDA4(s32 arg0, s32 arg1) {
+    func_841125F4(func_8411F750(arg0), 9);
+}
 
-void func_8411FDD0(s32 arg0, s32 arg1) { func_841125F4(func_8411F750(arg0), 0xB); }
+void func_8411FDD0(s32 arg0, s32 arg1) {
+    func_841125F4(func_8411F750(arg0), 0xB);
+}
 
-void func_8411FDFC(s32 arg0, s32 arg1) { func_841125F4(func_8411F750(arg0), 0xD); }
+void func_8411FDFC(s32 arg0, s32 arg1) {
+    func_841125F4(func_8411F750(arg0), 0xD);
+}
 
-void func_8411FE28(s32 arg0, s32 arg1) { func_841125F4(func_8411F750(arg0), 0x15); }
+void func_8411FE28(s32 arg0, s32 arg1) {
+    func_841125F4(func_8411F750(arg0), 0x15);
+}
 
-void func_8411FE54(s32 arg0, s32 arg1) { func_841125F4(func_8411F750(arg0), 0x1C); }
+void func_8411FE54(s32 arg0, s32 arg1) {
+    func_841125F4(func_8411F750(arg0), 0x1C);
+}
 
 s32 func_8411FE80(void) {
     if ((*(u8 *)((u8 *)(D_84193DD0) + (2))) == 0) {

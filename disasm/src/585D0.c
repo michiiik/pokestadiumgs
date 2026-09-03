@@ -2,7 +2,9 @@
 
 
 #ifdef VERSION_US
-u16 func_800579D0(const u8 *arg0) { return (u16)((arg0[1] << 8) | arg0[0]); }
+u16 func_800579D0(const u8* arg0) {
+    return (u16)((arg0[1] << 8) | arg0[0]);
+}
 #endif
 
 #ifdef VERSION_US
@@ -298,7 +300,9 @@ void func_80059274(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-void func_80059468(s32 arg0) { func_80059320(arg0, 4); }
+void func_80059468(s32 arg0) {
+    func_80059320(arg0, 4);
+}
 #endif
 
 #ifdef VERSION_US
@@ -381,23 +385,33 @@ extern u8 D_80128570[]; s32 func_80059AE0(s32 index) { return (*(u32 *)(D_801285
 #endif
 
 #ifdef VERSION_US
-void func_8005A014(s32 arg0) { func_80059EF8(arg0, 1); }
+void func_8005A014(s32 arg0) {
+    func_80059EF8(arg0, 1);
+}
 #endif
 
 #ifdef VERSION_US
-void func_8005A034(s32 arg0) { func_80059EF8(arg0, 2); }
+void func_8005A034(s32 arg0) {
+    func_80059EF8(arg0, 2);
+}
 #endif
 
 #ifdef VERSION_US
-void func_8005A054(s32 arg0) { func_80059EF8(arg0, 5); }
+void func_8005A054(s32 arg0) {
+    func_80059EF8(arg0, 5);
+}
 #endif
 
 #ifdef VERSION_US
-void func_8005A074(s32 arg0) { func_80059EF8(arg0, 8); }
+void func_8005A074(s32 arg0) {
+    func_80059EF8(arg0, 8);
+}
 #endif
 
 #ifdef VERSION_US
-void func_8005A094(s32 arg0) { func_80059EF8(arg0, 16); }
+void func_8005A094(s32 arg0) {
+    func_80059EF8(arg0, 16);
+}
 #endif
 
 #ifdef VERSION_US
@@ -565,7 +579,9 @@ void func_8005AD58(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-void func_8005B058(s32 arg0) { func_80059320(arg0, 1); }
+void func_8005B058(s32 arg0) {
+    func_80059320(arg0, 1);
+}
 #endif
 
 #ifdef VERSION_US
@@ -599,7 +615,9 @@ s32 func_8005B0E8(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-void func_8005B120(s32 arg0) { func_80059320(arg0, 0xFF); }
+void func_8005B120(s32 arg0) {
+    func_80059320(arg0, 0xFF);
+}
 #endif
 
 #ifdef VERSION_US
@@ -613,7 +631,10 @@ void func_8005B140(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-void GbSave_RequirePakPresent(s32 arg0) { if (GbTower_CheckPakRemoved(arg0, 0) == 0) Game_ShutdownAndLoadFragment(arg0, 2); }
+void GbSave_RequirePakPresent(s32 arg0) {
+    if (GbTower_CheckPakRemoved(arg0, 0) == 0)
+        Game_ShutdownAndLoadFragment(arg0, 2);
+}
 #endif
 
 #ifdef VERSION_US

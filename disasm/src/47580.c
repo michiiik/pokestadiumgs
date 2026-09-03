@@ -183,7 +183,9 @@ void Font_FreeSetAsset(s32 arg0, s32 arg1)
 extern u32 D_437750;
 extern u32 D_446E30;
 extern void BinArchive_Open(void *, void *, s32, s32);
-void func_80047524(void) { BinArchive_Open(&D_437750, &D_446E30, 1, 1); }
+void func_80047524(void) {
+    BinArchive_Open(&D_437750, &D_446E30, 1, 1);
+}
 
 extern void func_80004B4C(s32, s32);
 s32 func_80047104(s32);
@@ -327,7 +329,9 @@ void func_80049770(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
 extern u8 *D_80126F50; void func_800497C0(void) { func_80046C18(D_80126F50); }
 
 extern void func_80049828(s32, s32, s32, s32, s32);
-void func_800497E4(s32 arg0, s32 arg1, s32 arg2, s32 arg3) { func_80049828(0, arg0, arg1, arg2, arg3); }
+void func_800497E4(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    func_80049828(0, arg0, arg1, arg2, arg3);
+}
 
 extern void func_80046E64(u8 *, s32, s32, s32, s32, s32);
 void func_80049828(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {

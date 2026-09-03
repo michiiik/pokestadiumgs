@@ -1088,7 +1088,9 @@ void func_84111C44(void) {
 #endif
 
 #ifdef VERSION_US
-void func_84111C6C(void) { func_841089D8(0); }
+void func_84111C6C(void) {
+    func_841089D8(0);
+}
 #endif
 
 #ifdef VERSION_US

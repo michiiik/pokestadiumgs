@@ -140,7 +140,9 @@ void func_87E03CEC(void *arg0) {
 }
 
 extern void func_87F02684(s32);
-void func_87E03D28(s32 arg0) { func_87F02684(arg0 + 8); }
+void func_87E03D28(s32 arg0) {
+    func_87F02684(arg0 + 8);
+}
 
 s32 func_87E03D48(s32 arg0) {
     u8 *p;

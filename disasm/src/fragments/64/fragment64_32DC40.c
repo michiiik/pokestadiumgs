@@ -22,7 +22,9 @@ void func_87F0B18C(u8 *arg0) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_32DC40/func_87F0B4AC.s")
 
 extern void func_8004C8C0(s32);
-void func_87F0BD10(void) { func_8004C8C0(447); }
+void func_87F0BD10(void) {
+    func_8004C8C0(447);
+}
 
 void func_87F0BD30(u8 *arg0, u16 arg1, u16 arg2, s32 arg3) {
     *(u16 *)(arg0 + 0) = arg1;

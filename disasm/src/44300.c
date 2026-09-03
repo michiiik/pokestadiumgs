@@ -62,9 +62,13 @@ s32 func_80043950(void *arg0, s32 arg1, s32 arg2, s32 arg3) {
     return var_v1;
 }
 
-void func_80043A0C(void *arg0, void *arg1, s32 arg2) { func_80043950(arg0, arg1, 0, arg2); }
+void func_80043A0C(void* arg0, void* arg1, s32 arg2) {
+    func_80043950(arg0, arg1, 0, arg2);
+}
 
-void func_80043A30(void *arg0, void *arg1, s32 arg2) { func_80043950(arg0, arg1, 1, arg2); }
+void func_80043A30(void* arg0, void* arg1, s32 arg2) {
+    func_80043950(arg0, arg1, 1, arg2);
+}
 
 s32 func_80043A54(void *arg0, s32 arg1, s16 arg2)
 {

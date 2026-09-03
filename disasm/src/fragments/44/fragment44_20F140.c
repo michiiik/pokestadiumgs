@@ -119,7 +119,9 @@ void func_8AF22594(void) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20F140/func_8AF233B4.s")
 
 extern void func_8AC006B8(s32, s32, s32, s32);
-void func_8AF23B38(void) { func_8AC006B8(56, 26, 584, 454); }
+void func_8AF23B38(void) {
+    func_8AC006B8(56, 26, 584, 454);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20F140/func_8AF23B64.s")
 
