@@ -105,3 +105,15 @@ requeue: fresh owner (prior_attempts=0), no probe run in this worker. Assembly i
 ## Coordinator replay after wave 46 (2026-09-02)
 
 Direct replay of the worker batch scored two candidates and compile-failed the rest. Best normalized/raw similarity 0.8182/0.2828; expected 396 versus actual 364 and a stable -40 expected versus -48 actual frame drift. No link verification or gate. Requeue with a new frame/lifetime model and corrected declarations.
+
+## 2026-09-03
+
+func_82607AA0: time cap at 0.0 (raw None) after 2408s, mismatch unknown; tried families: state_field_access; tie-pool no
+
+## 2026-09-03
+
+func_8260BD50: time cap at 0.0 (raw None) after 2409s, mismatch unknown; tried families: call_sequence; tie-pool no
+
+## 2026-09-03
+
+func_8260E2C4: matched (call_sequence:record-overlay:typed-base), 1 iterations, agent codex
