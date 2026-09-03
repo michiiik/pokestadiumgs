@@ -110,6 +110,21 @@ start_ts=$(date +%s)
 #     `make -C disasm COMPARE=1 -j2`.
 in_container_script='
 set -euo pipefail
+# Re-split first when the PR changes splat'"'"'s inputs. The image bakes a
+# completed asm/ tree, and the overlay only refreshes sources -- so a PR that
+# moves a subsegment in yamls/ would otherwise be built against the OLD split
+# and fail with a wrong ROM checksum that says nothing about the change (that
+# is exactly how PR #64 first failed: its strings were emitted both from the
+# new C literals and from the stale shared rodata blob). The image venv has
+# the pinned spimdisasm, so `make extract` here is the same split the repo
+# documents. Skipped entirely when yamls/ is unchanged, which is the common
+# case, because extract wipes asm/ and forces a full rebuild.
+if ! diff -qr /src/disasm/yamls /work/disasm/yamls >/dev/null 2>&1; then
+    echo "gate_pr.sh: split inputs changed -- re-running extraction" >&2
+    rm -rf /work/disasm/yamls
+    cp -a /src/disasm/yamls /work/disasm/yamls
+    make -C disasm extract
+fi
 bash /src/container/overlay_src.sh /src
 cd /work
 # Whole-tree host syntax check first. The ROM build below is incremental

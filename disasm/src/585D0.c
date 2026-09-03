@@ -135,31 +135,23 @@ void GbSave_ComputeChecksumRange(u8 *arg0, u8 *arg1, u8 *arg2) {
 #ifdef VERSION_US
 extern s32 func_80057294(u8, OSGbpakId *, u8 *);
 extern s32 HAL_Strcmp(const s8 *, const s8 *);
-extern u8 D_800A4A10[];
-extern u8 D_800A4A18[];
-extern u8 D_800A4A1C[];
-extern u8 D_800A4A24[];
-extern u8 D_800A4A2C[];
-extern u8 D_800A4A30[];
-extern u8 D_800A4A34[];
-extern u8 D_800A4A38[];
 s32 GbSave_IdentifyFormat(s32 arg0) {
     OSGbpakId id;
     u8 status;
     s32 result = 0;
     if (func_80057294(arg0 & 0xFF, &id, &status) == 0 && id.company_code == 0x3031 && id.country_code != 0) {
         id.game_title[7] = 0;
-        if (HAL_Strcmp(id.game_title, D_800A4A10) == 0) {
-            if (HAL_Strcmp(id.game_title + 8, D_800A4A18) == 0) result = 1;
-            else if (HAL_Strcmp(id.game_title + 8, D_800A4A1C) == 0) result = 2;
-            else if (HAL_Strcmp(id.game_title + 8, D_800A4A24) == 0) result = 3;
+        if (HAL_Strcmp(id.game_title, (const s8 *)"POKEMON") == 0) {
+            if (HAL_Strcmp(id.game_title + 8, (const s8 *)"RED") == 0) result = 1;
+            else if (HAL_Strcmp(id.game_title + 8, (const s8 *)"GREEN") == 0) result = 2;
+            else if (HAL_Strcmp(id.game_title + 8, (const s8 *)"BLUE") == 0) result = 3;
             else {
                 id.game_title[9] = 0;
-                if (HAL_Strcmp(id.game_title + 8, D_800A4A2C) == 0) result = 4;
-                else if (HAL_Strcmp(id.game_title + 8, D_800A4A30) == 0) result = 5;
-                else if (HAL_Strcmp(id.game_title + 8, D_800A4A34) == 0) result = 6;
+                if (HAL_Strcmp(id.game_title + 8, (const s8 *)"Y") == 0) result = 4;
+                else if (HAL_Strcmp(id.game_title + 8, (const s8 *)"G") == 0) result = 5;
+                else if (HAL_Strcmp(id.game_title + 8, (const s8 *)"S") == 0) result = 6;
             }
-        } else if (HAL_Strcmp(id.game_title, D_800A4A38) == 0) result = 7;
+        } else if (HAL_Strcmp(id.game_title, (const s8 *)"PM_CRYS") == 0) result = 7;
     }
     return result;
 }
@@ -1460,10 +1452,8 @@ s32 func_80060358(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern u8 D_800A4A40[];
-
 u8 *func_800606D8(u8 *arg0) {
-    return D_800A4A40;
+    return (u8 *)"";
 }
 #endif
 
