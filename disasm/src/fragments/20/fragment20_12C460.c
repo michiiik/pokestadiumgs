@@ -52,7 +52,27 @@ s32 func_826046D0(s32 arg0, s32 arg1) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82604720.s")
+extern s32 func_8004C990(s32, s32);
+extern void func_826043F8(s16 *, s16 *, s32, s32);
+s32 func_82604720(s32 *arg0, s32 arg1, s32 arg2, s32 arg3) {
+    s32 result;
+    s16 value2;
+    s16 value1;
+
+    result = 0;
+    func_826043F8(&value2, &value1, arg1, arg2);
+    if (value2 >= 0) {
+        if (value1 >= 0) {
+            if (arg3 != 0) {
+                arg0[0] = func_8004C990(0x71, 0);
+                result = 1;
+            }
+            arg0[result] = func_8004C990((s32)value2, (s32)value1);
+            result += 1;
+        }
+    }
+    return result;
+}
 
 extern void func_82604628(s16 *, s32, s32);
 extern s32 func_8004C8C0(s32);
