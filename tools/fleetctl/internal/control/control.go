@@ -629,6 +629,26 @@ func needsManualCommitOwners(report map[string]ownerResult) (owners []string, ta
 	return owners, tails
 }
 
+// rejectedOwners returns, sorted, every owner the container accepted that the
+// host re-gate then threw out. These are matches the run really did find, so
+// reporting the run as "no owners matched" hides them: the drought of
+// 2026-09-02/03 was six such rejections that read as the fleet simply finding
+// nothing, when the gate was failing on an unrelated broken build.
+func rejectedOwners(report map[string]ownerResult) []string {
+	var out []string
+	for owner, r := range report {
+		if r.matched() || r.needsManualCommit() {
+			continue
+		}
+		if r.Status == "already_landed" {
+			continue
+		}
+		out = append(out, owner)
+	}
+	sort.Strings(out)
+	return out
+}
+
 func subtract(all, remove []string) []string {
 	skip := make(map[string]bool, len(remove))
 	for _, o := range remove {
@@ -853,6 +873,13 @@ func (l *Loop) runMerge(ctx context.Context, rec *fleetstate.RunRecord) error {
 				}
 			}
 		}
+	} else if rejected := rejectedOwners(report.Owners); len(rejected) > 0 {
+		// Distinguish "found nothing" from "found something the host re-gate
+		// refused" -- the two look identical in the log otherwise, and only
+		// the second one means something is wrong with the gate.
+		l.logf("run %s: no owners matched this run: %d container-accepted owner(s) "+
+			"REJECTED by the host re-gate (%s); see %s/merge-results/",
+			rec.Spec.ID, len(rejected), strings.Join(rejected, ", "), rec.OutDir)
 	} else {
 		l.logf("run %s: no owners matched this run", rec.Spec.ID)
 	}

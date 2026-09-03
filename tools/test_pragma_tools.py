@@ -1152,6 +1152,47 @@ class RunnerTests(unittest.TestCase):
             self.assertFalse(local.is_symlink())
             self.assertTrue(local.is_file())
 
+    def test_unrelated_build_failure_is_not_the_candidate_s_fault(self) -> None:
+        # The real output that made every re-gate report compare_rejected:
+        # the gate builds the whole tree, an untouched file failed the host
+        # clang check, and the candidate under test was blamed for it.
+        output = (
+            "src/fragments/22/fragment22_14B090.c:315:23: error: too few "
+            "arguments to function call, expected 2, have 0\n"
+            "make: *** [build/src/fragments/22/fragment22_14B090.o] Error 1\n"
+            "make: *** Waiting for unfinished jobs....\n"
+        )
+        self.assertEqual(
+            runner._unrelated_build_failures(output, "build/src/585D0.o"),
+            ["build/src/fragments/22/fragment22_14B090.o"],
+        )
+
+    def test_candidate_s_own_object_failing_is_still_its_fault(self) -> None:
+        output = "make: *** [build/src/585D0.o] Error 1\n"
+        self.assertEqual(runner._unrelated_build_failures(output, "build/src/585D0.o"), [])
+
+    def test_rom_target_failure_alone_is_not_an_unrelated_failure(self) -> None:
+        # The ROM/ELF target fails as a consequence of anything upstream and
+        # names no source, so it must not be read as an unrelated breakage.
+        output = "make: *** [build/pokestadiumgs-us.z64] Error 1\n"
+        self.assertEqual(runner._unrelated_build_failures(output, "build/src/585D0.o"), [])
+
+    def test_failed_make_targets_handles_sub_make_prefixes(self) -> None:
+        output = (
+            "make[1]: *** [build/src/a.o] Error 1\n"
+            "make: *** [build/src/b.o] Error 2\n"
+        )
+        self.assertEqual(
+            runner._failed_make_targets(output), ["build/src/a.o", "build/src/b.o"]
+        )
+
+    def test_gate_environment_broken_is_not_a_rejection_or_a_resend_block(self) -> None:
+        # The whole point of the distinct status: it must not poison the
+        # futility fingerprints, and must not stop the body being re-sent
+        # once the environment is repaired.
+        self.assertNotIn("gate_environment_broken", runner._REJECTED_ATTEMPT_STATUSES)
+        self.assertNotIn("gate_environment_broken", runner._DUPLICATE_BLOCKING_STATUSES)
+
     def test_worktree_gate_prerequisites_are_built_privately(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             main = Path(directory) / "main"

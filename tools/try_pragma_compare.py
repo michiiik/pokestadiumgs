@@ -1421,6 +1421,37 @@ def try_candidate(source_path: Path, function: str, candidate: str) -> int:
     return result
 
 
+_MAKE_FAILED_TARGET_RE = re.compile(r"^make(?:\[\d+\])?: \*\*\* \[([^\]]+)\] Error", re.MULTILINE)
+
+
+def _failed_make_targets(output: str) -> list[str]:
+    """Every target ``make`` reported as failing, in the order it printed them."""
+    return _MAKE_FAILED_TARGET_RE.findall(output or "")
+
+
+def _unrelated_build_failures(output: str, own_object_rel: str) -> list[str]:
+    """Failing object targets that are not this candidate's own object.
+
+    The gate compiles the whole tree, so a source the candidate never touched
+    can fail to build -- most often the host clang check (``RUN_CC_CHECK``)
+    tripping over a pre-existing arity or prototype problem that make had been
+    skipping while the object was up to date. That is an environment failure,
+    not a verdict on the candidate, and reporting it as ``compare_rejected``
+    blames the wrong code: it hides the real breakage, and it writes a
+    rejection into probe-stats that blocks the body from ever being re-sent.
+    """
+    failures = []
+    for target in _failed_make_targets(output):
+        if not target.endswith(".o"):
+            # The final ROM/ELF target fails as a consequence of any of these;
+            # it says nothing about which source was at fault.
+            continue
+        if target == own_object_rel:
+            continue
+        failures.append(target)
+    return failures
+
+
 def _try_candidate_detailed(
     source_path: Path,
     function: str,
@@ -1456,6 +1487,21 @@ def _try_candidate_detailed(
         print(output, end="")
 
         if result != 0:
+            own_object_rel = (
+                source_path.resolve()
+                .relative_to(repo_root / "disasm")
+                .with_suffix(".o")
+            )
+            unrelated = _unrelated_build_failures(
+                output, (Path("build") / own_object_rel).as_posix()
+            )
+            if unrelated:
+                print(
+                    f"GATE ENVIRONMENT BROKEN (not {function}'s fault): the tree "
+                    f"failed to build at {', '.join(unrelated)}; restored GLOBAL_ASM",
+                    file=sys.stderr,
+                )
+                return result, "gate_environment_broken"
             print(f"REJECTED {function}: restored GLOBAL_ASM")
             return result, "compare_rejected"
 
