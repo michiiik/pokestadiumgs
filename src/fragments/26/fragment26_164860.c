@@ -2,15 +2,22 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_164860/func_81005FB0.s")
+void func_81005FB0(u8 *arg0, s32 arg1) {}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_164860/func_81005FBC.s")
+void func_81005FBC(u8 *arg0, s32 arg1) {}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_164860/func_81005FC8.s")
+extern u32 D_81100254;
+void func_81005FC8(u8 *arg0, s32 arg1) {
+    D_81100254 = 0x7B;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_164860/func_81005FE0.s")
+void func_81005FE0(u8 *arg0, s32 arg1) {
+    D_81100254 = 0x1C8;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_164860/func_81005FF8.s")
+void func_81005FF8(u8 *arg0, s32 arg1) {
+    D_81100254 = 0;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_164860/func_8100600C.s")
+void func_8100600C(u8 *arg0, s32 arg1) { arg0 = arg0; arg1 = arg1; }
 #endif

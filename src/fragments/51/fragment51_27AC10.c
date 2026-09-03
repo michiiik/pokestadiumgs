@@ -4,7 +4,13 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/51/fragment51_27AC10/func_86304DF0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/51/fragment51_27AC10/func_8630500C.s")
+void func_8630500C(void *a) {
+    func_86305C48(
+        *(s32 *)((u8 *)a + 0xC),
+        (u8 *)a + 0x80,
+        *(s32 *)((u8 *)a + 0x74)
+    );
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/51/fragment51_27AC10/func_86305038.s")
 
@@ -16,7 +22,8 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/51/fragment51_27AC10/func_86305694.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/51/fragment51_27AC10/func_86305790.s")
+void func_86305790(void) {}
+void func_86305790_padding(void) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/51/fragment51_27AC10/func_863057A0.s")
 

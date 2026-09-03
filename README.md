@@ -1,6 +1,9 @@
 # Pokemon Stadium 2 (US)
 A WIP decomp of Pokemon Stadium 2 (US/JP).
 
+Current US decompilation progress, including a per-source-file breakdown, is
+documented in [COVERAGE.md](COVERAGE.md).
+
 It builds the following ROMs:
 
 * pokestadiumgs-us.z64: `md5: 1561c75d11cedf356a8ddb1a4a5f9d5d`

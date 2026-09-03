@@ -325,6 +325,40 @@
     
     # .rodata
     - [0xA23F0, rodata]
+    - [0xA2460, .rodata, 4420] # jtbl_800A1860
+    - [0xA24D0, .rodata, 57C0] # jtbl_800A18D0
+    - [0xA24F0, .rodata, 7140] # jtbl_800A18F0
+    - [0xA2510, rodata]
+    - [0xA2900, .rodata, CE80] # jtbl_800A1D00
+    - [0xA2930, .rodata, 10BB0] # jtbl_800A1D3C (+1 more)
+    - [0xA2980, .rodata, 14640] # jtbl_800A1DD8 (+2 more)
+    - [0xA2B60, rodata]
+    - [0xA2B80, .rodata, 1C2D0] # jtbl_800A1F80 (+1 more)
+    - [0xA2BD0, .rodata, 1CDC0] # jtbl_800A1FD0 (+2 more)
+    - [0xA3260, rodata]
+    - [0xA4EC0, .rodata, 43700] # jtbl_800A42C0
+    - [0xA4EE0, .rodata, 47580] # jtbl_800A43C0 (+2 more)
+    - [0xA5120, rodata]
+    - [0xA5130, .rodata, 4EE50] # jtbl_800A4530
+    - [0xA51B0, .rodata, 517E0] # jtbl_800A45B0 (+2 more)
+    - [0xA55B0, rodata]
+    - [0xA5BF0, .rodata, 615D0] # jtbl_800A4FF0 (+2 more)
+    - [0xA5C80, rodata]
+    - [0xA5EA0, rodata] # 654A0 jtbl_800A52A0 (+2 more): mixed 4/8 late_rodata alignment skews asm-processor text by +4; keep in the blob
+    - [0xA5FD0, .rodata, 65820] # jtbl_800A53D0
+    - [0xA6020, .rodata, 65E20] # jtbl_800A5420
+    - [0xA6070, .rodata, 667B0] # jtbl_800A5470
+    - [0xA6090, .rodata, 66990] # jtbl_800A5490
+    - [0xA60C0, .rodata, 66DF0] # jtbl_800A54C0
+    - [0xA60E0, .rodata, 674D0] # jtbl_800A54E0 (+1 more)
+    - [0xA6120, .rodata, 67F00] # jtbl_800A5520 (+2 more)
+    - [0xA61F0, .rodata, 68F90] # jtbl_800A55F0
+    - [0xA6210, .rodata, 69650] # jtbl_800A5610 (+1 more)
+    - [0xA6270, .rodata, 69F70] # jtbl_800A5670
+    - [0xA62B0, .rodata, 6AA80] # jtbl_800A56B0 (+2 more)
+    - [0xA64E0, .rodata, 6DEC0] # jtbl_800A58E0
+    - [0xA6500, rodata]
+    - [0xA6750, .rodata, 74020] # jtbl_800A5B50
     - [0xA6860, lib, libultra, setintmask, .rodata]
     - [0xA68E0, lib, libultra, sinf, .rodata]
     - [0xA6930, lib, libultra, exceptasm, .rodata]

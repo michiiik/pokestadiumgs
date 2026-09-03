@@ -2,15 +2,18 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/86/fragment86_code/func_84400020.s")
+extern u8 D_84400B3F[];
+s32 fragment86_main(u8 arg0) { s32 result = 0xA0; if (arg0 > 0 && arg0 < 0xFC) { result = (D_84400B3F[arg0] & 0xE0) & 0xFF; } return result; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/86/fragment86_code/func_84400058.s")
+s32 func_84400058(u8 arg0) { s32 result = 0; if (arg0 > 0 && arg0 < 0xFC) { result = (D_84400B3F[arg0] & 0x1F) & 0xFF; } return result; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/86/fragment86_code/func_84400090.s")
+void func_84400090(u8 *arg0) {
+    *arg0 = 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -26,7 +29,9 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/86/fragment86_code/func_84400338.s")
+u8 func_84400338(u8 *arg0) {
+    return *arg0;
+}
 #endif
 
 void func_84400340(void) {
