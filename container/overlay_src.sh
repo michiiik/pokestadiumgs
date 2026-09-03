@@ -52,5 +52,10 @@ rm -rf /work/disasm/src /work/disasm/include
 cp -a "$checkout_dir/disasm/src" /work/disasm/src
 cp -a "$checkout_dir/disasm/include" /work/disasm/include
 cp -a "$checkout_dir/disasm/linker_scripts/." /work/disasm/linker_scripts/
+# The Makefile too: without it the gate builds a PR's sources with the
+# image's baked-in Makefile, so a PR that changes build rules is not
+# actually gated -- and a target the PR adds is simply missing, which is
+# how this PR first failed with "No rule to make target 'cc-check'".
+cp -a "$checkout_dir/disasm/Makefile" /work/disasm/Makefile
 
-echo "overlay_src.sh: overlaid $checkout_dir/disasm/{src,include,linker_scripts} onto /work/disasm" >&2
+echo "overlay_src.sh: overlaid $checkout_dir/disasm/{src,include,linker_scripts,Makefile} onto /work/disasm" >&2
