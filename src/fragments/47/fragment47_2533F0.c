@@ -34,7 +34,7 @@ void func_8600CE2C(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_2533F0/func_8600CE80.s")
 
-extern void func_80007AEC(s32);
+extern void StageFade_StartFromOpaque(s32);
 extern void func_800086A4(s32);
 extern void func_80064D28();
 s32 func_8600CE80(s32);
@@ -45,7 +45,7 @@ void func_8600CF80(void) {
 
     var_s0 = 0;
     func_800086A4(2);
-    func_80007AEC(0xA);
+    StageFade_StartFromOpaque(0xA);
     do {
         func_80064D28();
         func_8600CE2C(var_s0);

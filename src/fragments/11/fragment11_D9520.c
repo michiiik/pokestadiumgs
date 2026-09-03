@@ -14,7 +14,13 @@ void func_81601A78(s32 arg0, s32 arg1) { func_816019C0(arg0, 0xAD, arg1); func_8
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81601B00.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81601D24.s")
+void func_81601D24(s32 arg0, s32 arg1) {
+    if (arg1 != 0x19) func_816019C0(arg0, 0xA3, 1);
+    if (arg1 != 0x71) func_816019C0(arg0, 0x1E, 1);
+    if (arg1 != 0x53) func_816019C0(arg0, 0x69, 1);
+    if (arg1 != 0x84) func_816019C0(arg0, 0x23, 1);
+    if ((arg1 != 0x68) && (arg1 != 0x69)) func_816019C0(arg0, 0x76, 1);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81601DE8.s")
 
@@ -22,7 +28,21 @@ void func_81601A78(s32 arg0, s32 arg1) { func_816019C0(arg0, 0xAD, arg1); func_8
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81601FA0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_816020BC.s")
+extern s32 func_8004C874(s32, s32);
+extern u8 D_8160C010[];
+s32 *func_816020BC(u8 arg0) {
+    s32 *result;
+    s32 *temp_v0;
+
+    result = (s32 *)&D_8160C010;
+    if (arg0 > 0) {
+        temp_v0 = (s32 *)func_8004C874(9, arg0 - 1);
+        if (temp_v0 != NULL) {
+            result = temp_v0;
+        }
+    }
+    return result;
+}
 
 extern u8 D_8160BD30[];
 void *func_81602108(s32 arg0) { s32 index = arg0 & 0xFF; s32 *p = &arg0; *p = arg0; if (index >= 6) index = 0; return &D_8160BD30[index * 3]; }
@@ -296,7 +316,9 @@ f32 func_816092FC(void) {
     return ((f32) sp1C * 60.0f) / (f32) func_80001FF0();
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81609344.s")
+extern void func_816028E4(void *, s32, s32, s32, s32);
+extern u32 D_800D0510;
+void func_81609344(s32 arg0,s32 arg1,s32 arg2,s32 arg3,s32 arg4){s32 width=arg4?0x280:0x140; s32 height=arg4?0x1E0:0xF0; if(arg0<0){arg2+=arg0;arg0=0;} if(arg1<0){arg3+=arg1;arg1=0;} if(arg0+arg2>=width)arg2=width-arg0; if(arg1+arg3>=height)arg3=height-arg1; if(arg2<=0||arg3<=0||arg0>=width||arg1>=height||arg0+arg2<=0||arg1+arg3<=0)func_816028E4(&D_800D0510,0,0,0,0); func_816028E4(&D_800D0510,(s16)arg0,(s16)arg1,(s16)arg2,arg3);}
 
 void func_8160945C(s16 *arg0, s16 *arg1, s16 *arg2, f32 arg3) { arg0[0] = arg1[0] + (arg2[0] - arg1[0]) * arg3; arg0[1] = arg1[1] + (arg2[1] - arg1[1]) * arg3; arg0[2] = arg1[2] + (arg2[2] - arg1[2]) * arg3; arg0[3] = arg1[3] + (arg2[3] - arg1[3]) * arg3; }
 

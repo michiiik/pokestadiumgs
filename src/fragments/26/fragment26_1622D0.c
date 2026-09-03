@@ -16,13 +16,13 @@ typedef struct {
     u32 *addresses;
     Gfx *gfx;
 } Func81003A74State;
-extern Gfx *func_80006DEC();
+extern Gfx *Gfx_AllocDisplayList();
 void func_81003A74(s32 arg0, Func81003A74State *state) {
     Gfx *gfx;
     u32 *addresses;
     if (arg0 == 2) {
         addresses = state->addresses;
-        gfx = func_80006DEC(0x50);
+        gfx = Gfx_AllocDisplayList(0x50);
         state->gfx = gfx;
         DisplayList_BuildOptionalPlusSegment(gfx, addresses);
     }

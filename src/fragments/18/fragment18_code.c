@@ -4,12 +4,12 @@
 #ifdef VERSION_US
 extern void _bzero(void *, s32);
 extern s32 func_8004C8C0(s32);
-extern void func_81700020(u8 *);
+extern void fragment18_main(u8 *);
 extern s32 func_8170031C(u8 *);
 extern s32 D_81700DA0;
 extern u8 D_81700DB0[];
 extern u8 D_81700E40[];
-void func_81700020(u8 *arg0) {
+void fragment18_main(u8 *arg0) {
     _bzero(arg0, 0x24);
     *(s16 *)(arg0 + 0x00) = -1;
     *(s16 *)(arg0 + 0x02) = -1;

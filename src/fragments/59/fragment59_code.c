@@ -54,7 +54,7 @@ extern s32 D_8690E11C;
 extern s32 func_87F08208(void *);
 extern void func_8003F210(void *, s32);
 extern void ModelAnim_SetFrame(u8 *, s16);
-extern void func_800088A4(s32);
+extern void StageContext_SetClearColor(s32);
 extern void StageFade_StartFromTransparent(s32);
 extern void func_800225C4(s32);
 extern void func_800279C4(s32);
@@ -74,7 +74,7 @@ void func_869003C8(void) {
             ModelAnim_SetFrame(var_s0, 0xB);
             var_s0 += 0x168;
         } while (var_s0 != &D_869195E0);
-        func_800088A4(0xFFFF);
+        StageContext_SetClearColor(0xFFFF);
         StageFade_StartFromTransparent(0x14);
         *(s32 *)D_8691AD58 = 2;
         func_800225C4(0x28);
@@ -111,13 +111,13 @@ void func_869004A4(void) {
 
 #ifdef VERSION_US
 extern u8 *D_8691AD58;
-extern void func_800088A4(s32);
+extern void StageContext_SetClearColor(s32);
 extern void StageFade_StartFromTransparent(s32);
 void func_869015F0(s32 arg0) {
     *(s32 *)(D_8691AD58 + 0x10) = arg0;
     *(s32 *)D_8691AD58 = 0xB;
     *(s32 *)(D_8691AD58 + 4) = 0xC;
-    func_800088A4((u16)0xFFFF);
+    StageContext_SetClearColor((u16)0xFFFF);
     StageFade_StartFromTransparent(0xA);
 }
 #endif
@@ -132,13 +132,13 @@ void func_869015F0(s32 arg0) {
 
 #ifdef VERSION_US
 extern void func_800086A4(s32);
-extern void func_80007AEC(s32);
+extern void StageFade_StartFromOpaque(s32);
 extern void func_80064D28(void);
 extern void func_86901AA8(void);
 extern void func_86901414(void);
 void func_869020CC(void) {
     func_800086A4(2);
-    func_80007AEC(0xA);
+    StageFade_StartFromOpaque(0xA);
     do {
         func_80064D28();
         func_86901AA8();

@@ -97,7 +97,15 @@ void func_84151DD4(void *arg0, u8 arg1) { void *state; s32 base; state = func_84
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84152308.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_841523BC.s")
+extern void *D_841951F8[];
+void func_841523BC(void *arg0, u8 arg1) {
+    s32 base;
+    base = (s32)(u32)arg0 + 4;
+    if (((u8 *)D_841951F8[arg1])[9] >= 2) {
+        *(u8 *)((u8 *)(u32)base + arg1 + 8) = 0xFF;
+        *(u8 *)((u8 *)(u32)base) |= 2;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84152408.s")
 

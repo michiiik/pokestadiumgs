@@ -355,7 +355,21 @@ void func_800619E8(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80061ADC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80061B88.s")
+extern u8 func_80063A04(u8);
+s32 func_80061B88(s32 arg0, u16 arg1) {
+    s32 sp1C;
+    u8 temp_v0;
+    temp_v0 = func_80063A04(arg0 & 0xFF);
+    switch (temp_v0) {
+    case 0: sp1C = arg1 * arg1 * arg1; break;
+    case 1: sp1C = (((s32)(arg1 * arg1 * arg1 * 3) / 4) + (arg1 * 0xA * arg1)) - 0x1E; break;
+    case 2: sp1C = (((s32)(arg1 * arg1 * arg1 * 3) / 4) + (arg1 * 0x14 * arg1)) - 0x46; break;
+    case 3: sp1C = ((((s32)(arg1 * arg1 * arg1 * 6) / 5) - (arg1 * 0xF * arg1)) + (arg1 * 0x64)) - 0x8C; break;
+    case 4: sp1C = (s32)(arg1 * arg1 * arg1 * 4) / 5; break;
+    case 5: sp1C = (s32)(arg1 * arg1 * arg1 * 5) / 4; break;
+    }
+    return sp1C;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80061D8C.s")
 

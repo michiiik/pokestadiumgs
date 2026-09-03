@@ -70,7 +70,7 @@ s32 func_82504BA0(s32 *arg0, s32 arg1) {
     func_80008624();
     if (StageContext_GetFadeMode() != 0) {
         func_800086A4(2);
-        func_80007AEC(5);
+        StageFade_StartFromOpaque(5);
     }
     do {
         func_80064D28();

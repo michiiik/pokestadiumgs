@@ -44,7 +44,12 @@ void func_82C002B8(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C002EC.s")
+void func_82C002EC(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
+    s32 right = (arg0 + arg2) - 1;
+    s32 bottom = (arg1 + arg3) - 1;
+
+    gDPScisFillRectangle(D_800D0510++, arg0, arg1, right, bottom);
+}
 #endif
 
 void func_82C003B4(void) {
@@ -129,7 +134,17 @@ void func_82C00A70(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C01FE4.s")
+extern u8 D_82C04C39;
+extern s16 D_82C04C44;
+extern s16 D_82C04C46;
+extern u8 D_80094E38[];
+extern void func_82C003F8(s16 arg0, s16 arg1, u16 arg2, u16 arg3);
+void func_82C01FE4(void) {
+    if ((D_82C04C39 == 1) || (D_82C04C39 == 2) || (D_82C04C39 == 4)) {
+        gSPDisplayList(D_800D0510++, D_80094E38);
+        func_82C003F8((s16)(D_82C04C44 + 0x14), (s16)(D_82C04C46 + 0x13D), 0x33, 0);
+    }
+}
 #endif
 
 #ifdef VERSION_US

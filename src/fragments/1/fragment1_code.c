@@ -141,7 +141,7 @@ s32 func_83503678(s32 arg0) {
 extern void func_83502EF0();
 s32 func_83503720(s32);
 extern void func_800086A4(s32);
-extern void func_80007AEC(s32);
+extern void StageFade_StartFromOpaque(s32);
 void func_80064D28(void);
 void func_835038BC(void) {
     s32 temp_v0;
@@ -149,7 +149,7 @@ void func_835038BC(void) {
 
     var_s0 = 0;
     func_800086A4(2);
-    func_80007AEC(0x1E);
+    StageFade_StartFromOpaque(0x1E);
     do {
         func_80064D28();
         func_83502EF0();

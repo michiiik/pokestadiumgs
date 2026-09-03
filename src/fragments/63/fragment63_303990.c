@@ -201,7 +201,7 @@ s32 func_87E0132C(s32 arg0) {
 extern void func_87E00A84();
 s32 func_87E0132C(s32);
 extern void func_800086A4(s32);
-extern void func_80007AEC(s32);
+extern void StageFade_StartFromOpaque(s32);
 u32 func_87F0F468(void);
 void func_80064D28(void);
 void func_87E013AC(void) {
@@ -209,7 +209,7 @@ void func_87E013AC(void) {
 
     var_s0 = 0;
     func_800086A4(2);
-    func_80007AEC(5);
+    StageFade_StartFromOpaque(5);
     do {
         if (func_87F0F468() == -1U) {
             func_80064D28();

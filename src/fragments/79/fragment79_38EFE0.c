@@ -224,7 +224,7 @@ void func_841203B4(f32 *arg0, f32 arg1, f32 arg2) {
 
 extern f32 D_80087E50[];
 extern f32 D_80088E50[0x1000];
-void func_8412041C(void *arg0, f32 arg1, s16 arg2) {
+void BattleAnim_Vec3fSetPolarXZ(void *arg0, f32 arg1, s16 arg2) {
     s32 index;
 
     index = ((u16) arg2) >> 4;
@@ -468,7 +468,8 @@ void func_841210CC(s32 arg0) {
     func_84120464(arg0, D_84183C90, 0x4000);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84121130.s")
+extern void func_841204BC(void *, s32, s32, s32, f32);
+void func_84121130(void *arg0) { f32 d = *(f32 *)((u8 *)arg0 + 0x28) - *(f32 *)((u8 *)arg0 + 0x650); if (((*(f32 *)((u8 *)arg0 + 0x28) - *(f32 *)((u8 *)arg0 + 0x650))) >= 200.0f) { *(f32 *)((u8 *)arg0 + 0x28) = *(f32 *)((u8 *)arg0 + 0x650) + 200.0f; return; } func_841204BC(arg0, 0x3FB9999A, 0x3C75C28F, 0x4000, 18.0f); ; if (((*(f32 *)((u8 *)arg0 + 0x28) - *(f32 *)((u8 *)arg0 + 0x650))) >= 200.0f) { *(f32 *)((u8 *)arg0 + 0x28) = *(f32 *)((u8 *)arg0 + 0x650) + 200.0f; } }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_841211CC.s")
 
@@ -517,7 +518,21 @@ void func_841217C8(u8 *arg0) {
     *(s16 *)(arg0 + 0x604) = *(s16 *)(arg0 + 0x20);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_841217E4.s")
+extern s32 func_841211CC(void *, s16, s16);
+void func_841217E4(u8 *arg0) {
+    extern f32 func_8411E1B4(u8 *);
+    if (*(s8 *)(arg0 + 0x623) < 3) {
+        *(s16 *)(arg0 + 0x5FE) = Math_StepToS32(*(s16 *)(arg0 + 0x5FE), 0x3FFC, 0x16C, 0x16C);
+        if (func_841211CC(arg0, *(s16 *)(arg0 + 0x5FE), (s16)(func_8411E1D4((s32)arg0) << 14)) != 0) {
+            *(s8 *)(arg0 + 0x623) = *(s8 *)(arg0 + 0x623) + 1;
+        }
+    }
+    if (*(s8 *)(arg0 + 0x623) >= 3) {
+        func_841211CC(arg0, *(s16 *)(arg0 + 0x5FE), (s16)(func_8411E1D4((s32)arg0) << 14));
+        *(f32 *)(arg0 + 0x28) = (f32)Math_StepToS32((s32)*(f32 *)(arg0 + 0x28), (s32)((f64)(-func_8411E1B4(arg0)) * 3.5), 5, 5);
+    }
+    *(s16 *)(arg0 + 0x20) = *(s16 *)(arg0 + 0x604);
+}
 
 extern void func_84120E7C(u8 *);
 void func_841218EC(u8 *arg0) {

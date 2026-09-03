@@ -189,7 +189,7 @@ s32 Storage_QueueSramTransfer(s32 arg0, void* arg1, s32 arg2, s32 arg3, s32 arg4
 
 extern void Dma_QueueRequestMessage(void *, s32);
 typedef struct { u8 unk0; u8 filler[0x18]; s32 unk1C; s32 unk20; s32 unk24; s32 unk28; } Req;
-s32 func_80006C40(s32 arg0, s32 arg1, s16 arg2, void *arg3, s32 arg4) {
+s32 Storage_QueueFlashTransfer(s32 arg0, s32 arg1, s16 arg2, void *arg3, s32 arg4) {
     Req *p = Util_Malloc(0x2C);
     if (p != NULL) {
         if (arg0 == 0) {

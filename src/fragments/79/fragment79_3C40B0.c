@@ -171,9 +171,47 @@ void func_84155574(u8 *arg0, u8 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C40B0/func_8415565C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C40B0/func_841556C4.s")
+extern u8 func_80062D20(u8);
+s32 func_841556C4(u8 *arg0, u8 arg1)
+{
+    s32 var_s0;
+    u8 *var_s1;
+    u8 var_s3;
+    s32 var_s4;
+    s32 var_s5;
+    u8 temp_a0;
+
+    var_s3 = arg1;
+    var_s0 = 0;
+    var_s1 = arg0;
+    var_s4 = 0xFF;
+    var_s5 = 4;
+loop_1:
+    temp_a0 = var_s1[4];
+    if (temp_a0 != var_s4) {
+        if (var_s3 == func_80062D20(temp_a0)) {
+            return 1;
+        }
+        var_s0 += 1;
+        var_s1 += 1;
+        if (var_s0 == var_s5) {
+            goto block_5;
+        }
+        goto loop_1;
+    }
+block_5:
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C40B0/func_84155750.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C40B0/func_841557B0.s")
+extern u8 D_8419E920[];
+extern u8 D_8419E780[];
+extern void _bcopy(void *, u8 *, s32);
+void func_841557B0(void)
+{
+  u8 temp_v0;
+  temp_v0 = ((*D_8419E920) - 1) & 0xFF;
+ *D_8419E920 = temp_v0; _bcopy((D_8419E920 + (temp_v0 * 0x19C)) + 4, D_8419E780, 0x19C);
+}
 #endif

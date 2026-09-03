@@ -25,7 +25,29 @@ void func_8AF00130(void) {
 
 extern u8 D_8AF2BE98[]; extern s32 D_8AF2BF10; void func_8AF00150(void) { _bzero(D_8AF2BE98, 0x78); D_8AF2BF10 = 0; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1EE290/func_8AF0017C.s")
+extern s16 D_8AF2BE9A;
+u8 *func_8AF0017C(s16 arg0) {
+    s32 i;
+    u8 *entry;
+    entry = D_8AF2BE98;
+    if (arg0 == D_8AF2BE9A) {
+        return entry;
+    }
+    entry += 0xC;
+    if (arg0 == *(s16 *)(entry + 2)) {
+        return entry;
+    }
+    entry += 0xC;
+    i = 2;
+    do {
+        if (arg0 == *(s16 *)(entry + 2)) {
+            return entry;
+        }
+        i++;
+        entry += 0xC;
+    } while (i != 0xA);
+    return NULL;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1EE290/func_8AF00240.s")
 
@@ -108,7 +130,28 @@ void func_8AF00D90(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1EE290/func_8AF0118C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1EE290/func_8AF013D8.s")
+extern void func_800504BC(s16 *);
+extern void func_8AF0118C(s16, s16, void *);
+s32 func_8AF013D8(s32 mode, void *record) {
+    s16 values[2];
+    s16 first;
+    s16 second;
+    void *preserved;
+
+    preserved = record;
+    switch (mode) {
+    case 0:
+        *(u16 *)((u8 *)preserved + 2) = *(u16 *)((u8 *)preserved + 2) & 0xFFFD;
+        break;
+    case 1:
+        func_800504BC(values);
+        first = *(s16 *)((u8 *)preserved + 8) + values[0];
+        second = *(s16 *)((u8 *)preserved + 0xA) + values[1];
+        func_8AF0118C(first, second, preserved);
+        break;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1EE290/func_8AF0145C.s")
 
@@ -124,10 +167,10 @@ s16 Trade_GetSelectedBox(s16 arg0) { return D_8AF263F0[arg0]; }
 extern u8 D_8AF28760[];
 extern Gfx *D_800D0510;
 extern u8 D_80094E38[];
-extern void func_8004AD00(s32, s32, s32, s32, s32, s32);
+extern void Ui_DrawGradientPanel(s32, s32, s32, s32, s32, s32);
 void func_8AF016BC(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
     gSPDisplayList(D_800D0510++, D_80094E38);
-    func_8004AD00(arg0, arg1, arg2, arg3, arg4, arg5);
+    Ui_DrawGradientPanel(arg0, arg1, arg2, arg3, arg4, arg5);
 }
 void func_8AF016BC_padding(void) {}
 

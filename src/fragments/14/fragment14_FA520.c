@@ -28,12 +28,12 @@ void func_81302634(void) {
 }
 
 extern s32 func_8006CBB8(u16);
-extern void func_800088A4(s32);
+extern void StageContext_SetClearColor(s32);
 void func_8130267C(u8 *arg0) {
     if (*(s16 *)(*(u8 **)(arg0 + 0x940) + 0x34) == 6) {
         s32 result = func_8006CBB8(*(u16 *)(arg0 + 0x952));
         if (result == 0 || result == 1 || result == 2)
-            func_800088A4(1);
+            StageContext_SetClearColor(1);
     }
 }
 

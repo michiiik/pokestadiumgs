@@ -172,8 +172,8 @@ void func_83402F08(void) {
 extern void func_80055948(s32);
 extern void func_80054A24(s32, s32);
 extern void func_800086A4(s32);
-extern void func_800088A4(s32);
-extern void func_80007AEC(s32);
+extern void StageContext_SetClearColor(s32);
+extern void StageFade_StartFromOpaque(s32);
 extern void func_80064D28(void);
 extern void func_8340295C(void);
 extern s32 func_83402FE8(s32);
@@ -190,8 +190,8 @@ void func_834034CC(void) {
     }
     func_80054A24(var_s1, 1);
     func_800086A4(2);
-    func_800088A4(1);
-    func_80007AEC(0x14);
+    StageContext_SetClearColor(1);
+    StageFade_StartFromOpaque(0x14);
     var_s1 = 8;
     do {
         func_80064D28();

@@ -628,7 +628,20 @@ void Audio_RemoveRecentSoundAt(u16 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80028CA8.s")
+extern void func_800314D4(s32);
+extern s32 func_80028ADC(void);
+void func_80028CA8(void) {
+    s32 v0;
+    s32 masked;
+
+    v0 = func_80028ADC();
+    masked = v0 & 0xFFFF;
+    if (v0 != 0) {
+        func_800314D4(masked);
+    }
+}
+void func_80028CA8_padding(void) {}
+void func_80028CA8_padding2(void) {}
 #endif
 
 #ifdef VERSION_US
@@ -835,7 +848,21 @@ void func_80031844(s32 arg0, s32 arg1) { s32 *p0 = &arg0; *p0 = arg0; arg0 &= 0x
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80031880.s")
+void func_80031880(s32 arg0, s32 arg1) {
+    switch (arg1) {
+        case 1:
+            arg0 |= 0x3000;
+            break;
+        case 2:
+            arg0 |= 0x2000;
+            break;
+        case 0:
+            break;
+        default:
+            return;
+    }
+    func_800314D4(arg0);
+}
 #endif
 
 #ifdef VERSION_US
@@ -1327,7 +1354,15 @@ u8 func_80034E10(const u8 *arg0, s32 unused) { return arg0[0]; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80034E1C.s")
+extern void func_80032F0C(void);
+extern void func_80034A94(u16 arg0);
+void func_80034E1C(u16 arg0) {
+    if (arg0 & 0xFF) {
+        func_80034A94(arg0);
+    } else {
+        func_80032F0C();
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -3387,7 +3422,20 @@ void GraphNode_RemoveChild(GraphNode38FD4 *root, GraphNodeLink *node) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003936C.s")
+extern u8 D_80124F68;
+void *func_8003936C(s32 arg0) {
+    void *var_v1;
+    struct PoolBase {
+        u8 pad[0x10A0];
+        s32 count;
+    };
+
+    var_v1 = NULL;
+    if (arg0 <= 0) {
+        var_v1 = (void *)((u8 *)&D_80124F68 + (((struct PoolBase *)&D_80124F68)->count << 6) + (arg0 << 6));
+    }
+    return var_v1;
+}
 #endif
 
 #ifdef VERSION_US
@@ -3554,10 +3602,10 @@ void GeoOverlay_Draw(S1_unk_D_86002F34_00C_0CC* arg0, S1_unk_D_86002F34_00C_040*
 
 #ifdef VERSION_US
 extern s32 D_8009490C;
-extern void func_8003A2C8(void);
+extern void func_8003A2C8(void *, ...);
 void Geo_NodeType3Pass(s32 arg0) {
     D_8009490C = arg0;
-    func_8003A2C8();
+    func_8003A2C8((void *)arg0);
     D_8009490C = 0;
 }
 #endif
@@ -3679,11 +3727,16 @@ void func_8003B690(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003C344.s")
+extern void func_8003C2D8(s16);
+extern void func_8003A2C8(void *, ...);
+void Geo_NodeAnchor(void *arg0) {
+    func_8003C2D8(*(s16 *)((u8 *)arg0 + 0x18));
+    func_8003A2C8(arg0);
+}
 #endif
 
 #ifdef VERSION_US
-extern void func_8003A2C8(void); void Geo_NodeGroup(void) { func_8003A2C8(); }
+extern void func_8003A2C8(void *, ...); void Geo_NodeGroup(void *arg0) { func_8003A2C8(arg0); }
 #endif
 
 #ifdef VERSION_US
@@ -4339,7 +4392,21 @@ void func_8003F4E8(u8 *arg0, u8 value) { arg0[0x1C] = value; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003F54C.s")
+extern void *func_80003240();
+void *func_8003F54C(void *arg0) {
+    void *result = NULL;
+    void *entry;
+    void *value;
+
+    entry = *(void **)((u8 *)arg0 + 0xC);
+    if (entry != NULL) {
+        value = (*(void *(**)(s32, s32))((u8 *)entry + 0x2C))(0, 0);
+        if (*(void **)((u8 *)value + 0x18) != NULL) {
+            result = func_80003240(*(void **)((u8 *)value + 0x18));
+        }
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
@@ -4393,11 +4460,46 @@ s32 func_8003F970(s32 arg0, u16 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FA00.s")
+extern void func_80027E30(s32);
+extern void func_80027F4C(void);
+extern s16 D_8012651A;
+extern s32 D_80126458[];
+extern s16 D_8012651E;
+extern s16 D_80126518;
+extern s32 D_80126520;
+extern void *func_80003240();
+void geo_layout_cmd_branch_and_link(void)
+{
+  s32 p = D_80126520;
+  s32 i = D_8012651A;
+  if (D_8012651A)
+  {
+  }
+  D_80126458[i] = p + 8;
+  D_8012651A = i + 1;
+  D_80126458[D_8012651A] = (D_80126518 << 16) + D_8012651E;
+  D_8012651A = D_8012651A + 1;
+  D_8012651E = D_8012651A;
+  D_80126520 = (s32) func_80003240(*((s32 *) (((u8 *) p) + 4)));
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FA94.s")
+void geo_layout_cmd_2A(void) {
+    s32 new_var;
+    s32 p = D_80126520;
+    s32 i = D_8012651A;
+    if (D_8012651A)
+    {
+    }
+    new_var = p;
+    D_80126458[i] = p + 8;
+    D_8012651A = i + 1;
+    D_80126458[D_8012651A] = (D_80126518 << 16) + D_8012651E;
+    D_8012651A = D_8012651A + 1;
+    D_8012651E = D_8012651A;
+    D_80126520 = (s32)func_80003240(*((s32 *) (*((s32 **) (new_var + 4)))));
+}
 #endif
 
 #ifdef VERSION_US
@@ -4417,7 +4519,22 @@ void geo_layout_cmd_jump(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FC34.s")
+extern s16 D_8012651A;
+extern s32 D_80126458[];
+extern void * func_80003240();
+void geo_layout_cmd_27(void)
+{
+    s32 new_var;
+    s32 i = D_8012651A;
+    s32 p = D_80126520;
+    new_var = p;
+    D_80126458[i] = p + 8;
+    if (D_80126520)
+    {
+    }
+    D_8012651A = i + 1;
+    D_80126520 = (s32)func_80003240(*((s32 *) (*((s32 **) (new_var + 4)))));
+}
 #endif
 
 #ifdef VERSION_US
@@ -4825,11 +4942,42 @@ void geo_layout_cmd_create_group(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800411F0.s")
+extern void Yay0_DecompressAndRelocate(u8 *, u8 *);
+u8 *func_800411F0(void *arg0, u8 *arg1, s32 arg2, u8 *arg3) {
+    u8 *var_a1;
+    u8 *sp1C;
+
+    if (arg1 == NULL) {
+        var_a1 = MainPool_AllocAligned(arg0, *(u32 *)((u8 *)arg3 + 0x10), 0x10);
+    } else {
+        var_a1 = arg1;
+    }
+    if (var_a1 != NULL) {
+        sp1C = var_a1;
+        Yay0_DecompressAndRelocate(arg3, var_a1);
+    }
+    return var_a1;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8004124C.s")
+extern void Util_Memcpy(u32 *, const u32 *, s32);
+extern void *MainPool_AllocAligned(void *, size_t, s32);
+void *func_8004124C(void *arg0, void *arg1, s32 arg2, s32 arg3, u32 arg4) {
+    void *var_a0;
+    void *sp1C;
+
+    if (arg1 == NULL) {
+        var_a0 = MainPool_AllocAligned(arg0, arg4, 0x10);
+    } else {
+        var_a0 = arg1;
+    }
+    if (var_a0 != NULL) {
+        sp1C = var_a0;
+        Util_Memcpy(var_a0, arg2 + arg3, arg4 >> 2);
+    }
+    return var_a0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -4855,7 +5003,12 @@ void func_800413A0(S1_MainPoolState* arg0, u32 arg1, S1_Fragment* arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800413E8.s")
+extern void func_800412B0(s32, s32, s32, s32, s32, s32);
+void func_800413E8(s32 arg0, s32 arg1, s32 *arg2, s32 *arg3, s32 arg4, s32 arg5) {
+    s32 sum1 = arg3[0] + arg2[1];
+    s32 sum2 = sum1 + arg3[1];
+    func_800412B0(arg0, arg1, sum1, sum2, arg4, arg5);
+}
 #endif
 
 #ifdef VERSION_US
@@ -4966,7 +5119,12 @@ s32 func_80041F60(s16 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80041FA0.s")
+typedef union { s32 word; s8 bytes[4]; } Func80041FA0State;
+typedef Func80041FA0State Func80041FA0Packed;
+extern s32 func_80041FD0(s32, u16, Func80041FA0State, s32);
+void func_80041FA0(s32 arg0, u16 arg1, Func80041FA0State arg2) {
+    func_80041FD0(arg0, arg1, arg2, 0);
+}
 #endif
 
 #ifdef VERSION_US
@@ -5059,7 +5217,25 @@ s32 func_80042A64(s32 arg0) { return 0; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80042A70.s")
+extern void *func_80004B4C(void *arg0, s32 arg1);
+extern S1_MemoryBlock *MainPool_AllocState(s32 arg0, s32 arg1);
+extern s32 main_pool_get_available(void);
+extern void MainPool_FinalizeAllocation(S1_MemoryBlock *arg0);
+extern s32 D_80126F24;
+S1_arg1_func_80019420 *BattleAnim_LoadResourceTable(s32 arg0) {
+    s32 sp24;
+    S1_arg1_func_80019420 *sp20;
+    S1_MemoryBlock *sp1C;
+    sp20 = NULL;
+    sp24 = (s32)func_80004B4C((void *)D_80126F24, arg0);
+    if (sp24 != 0) {
+        sp1C = MainPool_AllocState(main_pool_get_available(), 0);
+        sp20 = (S1_arg1_func_80019420 *)(sp24 + 0x20);
+        Fragment_ProcessGeoLayoutList(sp1C, sp20);
+        MainPool_FinalizeAllocation(sp1C);
+    }
+    return sp20;
+}
 #endif
 
 #ifdef VERSION_US

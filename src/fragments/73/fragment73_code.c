@@ -14,7 +14,7 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/73/fragment73_code/func_8F500774.s")
 
-extern void func_80007AEC(s32);
+extern void StageFade_StartFromOpaque(s32);
 extern void func_800086A4(s32);
 extern void func_80064D28();
 extern void func_8F500414();
@@ -25,7 +25,7 @@ void func_8F500810(void) {
 
     var_s0 = 0;
     func_800086A4(2);
-    func_80007AEC(5);
+    StageFade_StartFromOpaque(5);
     do {
         func_80064D28();
         func_8F500414();

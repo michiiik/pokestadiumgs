@@ -288,14 +288,14 @@ void func_81301F58(u8 *arg0, s32 arg1) {}
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_813021B4.s")
 
 extern s32 func_80055A74(s32);
-extern s32 func_80055BA8(void);
+extern s32 Deck_FindFirstFreeTeamSlot(void);
 s32 func_81302290(void *arg0) {
     s8 value = *(s8 *)((u8 *)(*(void **)((u8 *)arg0 + 0x1A148)) + 0x944);
     if (value < 0) {
         return 0;
     }
     func_80055A74(value);
-    return func_80055BA8();
+    return Deck_FindFirstFreeTeamSlot();
 }
 
 s32 func_813022D8(void *arg0) {

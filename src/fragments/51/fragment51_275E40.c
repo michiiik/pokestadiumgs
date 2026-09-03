@@ -3,13 +3,13 @@
 
 #ifdef VERSION_US
 extern void StageFade_StartFromTransparent(s32);
-extern void func_800088A4(s32);
+extern void StageContext_SetClearColor(s32);
 extern void *D_863075D8;
 void func_86300020(s32 arg0) {
     (*(s32 *)((u8 *)(D_863075D8) + (0x8F58))) = arg0;
     (*(s32 *)((u8 *)(D_863075D8) + (0))) = 7;
     (*(s32 *)((u8 *)(D_863075D8) + (4))) = 8;
-    func_800088A4(0xFFFF);
+    StageContext_SetClearColor(0xFFFF);
     StageFade_StartFromTransparent(0xA);
 }
 #endif
@@ -176,7 +176,7 @@ void func_86301E14(void) {
 extern void *D_863075D8;
 extern void func_863048A8(void);
 extern s32 func_87F08208(void *);
-extern void func_800088A4(s32);
+extern void StageContext_SetClearColor(s32);
 extern void StageFade_StartFromTransparent(s32);
 extern void func_800225C4(s32);
 extern void func_800279C4(s32);
@@ -189,7 +189,7 @@ void func_86303110(void) {
     temp_v0 = func_87F08208((u8 *)D_863075D8 + 0x44);
     switch (temp_v0) {
     case 1:
-        func_800088A4(0xFFFF);
+        StageContext_SetClearColor(0xFFFF);
         StageFade_StartFromTransparent(0x14);
         *(s32 *)D_863075D8 = 2;
         func_800225C4(0x28);
@@ -238,14 +238,14 @@ extern void func_863048A8(void);
 extern s32 StageContext_GetFadeMode(void);
 extern void func_8630487C(void);
 extern void func_86301E14(void);
-extern void func_80007AEC(s32);
+extern void StageFade_StartFromOpaque(s32);
 extern void func_87F00688(void);
 void func_863035B0(void) {
     func_863048A8();
     if (StageContext_GetFadeMode() == 1) {
         func_8630487C();
         func_86301E14();
-        func_80007AEC(0x14);
+        StageFade_StartFromOpaque(0x14);
         *(s32 *)D_863075D8 = 3;
         func_87F00688();
     }
@@ -253,7 +253,42 @@ void func_863035B0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/51/fragment51_275E40/func_86303610.s")
+extern s32 func_87F01A40(void);
+extern u32 func_87F006AC(void);
+extern void func_80021ED8(s32);
+extern void func_87F0277C(void *);
+extern void func_800279C4(s32);
+extern void func_86300020(s32 arg0);
+void func_86303610(void) {
+    s32 state;
+
+    if (StageContext_GetFadeMode() == 0) {
+        state = func_87F01A40();
+    } else {
+        state = 2;
+    }
+    switch (state) {
+    case 0:
+    case 2:
+        if (func_87F006AC() == 1) {
+            func_800279C4(0x2F00);
+        }
+        if (func_87F006AC() == 2) {
+            *(s32 *)D_863075D8 = 4;
+            func_800279C4(0x2F01);
+            func_80021ED8(0x23);
+        }
+        break;
+    case 3:
+        func_86300020(0);
+        break;
+    case 4:
+        func_86300020(1);
+        break;
+    }
+    func_87F0277C((u8 *)D_863075D8 + 0x12C);
+    func_87F0277C((u8 *)D_863075D8 + 0x770);
+}
 #endif
 
 #ifdef VERSION_US
@@ -263,13 +298,13 @@ void func_863035B0(void) {
 #ifdef VERSION_US
 extern void *D_863075D8;
 extern void func_800086A4(s32);
-extern void func_80007AEC(s32);
+extern void StageFade_StartFromOpaque(s32);
 extern void func_80064D28(void);
 extern void func_863036FC(void);
 extern void func_86302F9C(void);
 void func_86303974(void) {
     func_800086A4(2);
-    func_80007AEC(0xA);
+    StageFade_StartFromOpaque(0xA);
     do {
         func_80064D28();
         func_863036FC();

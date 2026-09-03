@@ -6,7 +6,7 @@ extern f64 D_87C03D90;
 extern f64 D_87C03D98;
 extern f64 D_87C03DA0;
 extern f64 D_87C03DA8;
-f64 func_87C00020(f64 arg0) {
+f64 fragment48_main(f64 arg0) {
     f64 upper;
     f64 step;
     while (D_87C03D90 <= arg0) {
@@ -32,9 +32,9 @@ f64 func_87C00090(f64 arg0, f64 arg1, f64 arg4) {
     return arg1;
 }
 
-extern f64 func_87C00020(f64);
+extern f64 fragment48_main(f64);
 void func_87C000E4(f64 arg0, f64 arg1) {
-    func_87C00020(func_87C00020(arg1) - func_87C00020(arg0));
+    fragment48_main(fragment48_main(arg1) - fragment48_main(arg0));
 }
 
 void *func_87C00120(void *arg0, f64 arg1, f64 arg2, f64 arg3) {

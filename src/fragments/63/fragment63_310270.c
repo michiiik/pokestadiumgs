@@ -119,7 +119,26 @@ void func_87E0D500(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_310270/func_87E0D520.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_310270/func_87E0D6BC.s")
+extern void func_87F0B1A4(u8 *, u8 *, f32, f32, f32, s32, s32);
+typedef struct D6BCNode {
+    u8 pad0[4];
+    struct D6BCNode *next;
+    u8 pad1[0x30];
+    u8 *child;
+    u8 pad2[0xC];
+    f32 values[3];
+} D6BCNode;
+void func_87E0D6BC(void *arg0) {
+    D6BCNode *var_s0;
+    var_s0 = *(D6BCNode **)((u8 *)arg0 + 0x1C);
+    if (var_s0 != NULL) {
+        do {
+            func_87F0B1A4(*(u8 **)(var_s0->child + 0xC), (u8 *)var_s0 + 0x48,
+                var_s0->values[0], var_s0->values[1] - -120.0f, var_s0->values[2], 30, 0x3000);
+            var_s0 = var_s0->next;
+        } while (var_s0 != NULL);
+    }
+}
 
 void func_87E0D73C(void) {
     func_87E0D278();

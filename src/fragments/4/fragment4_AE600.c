@@ -93,11 +93,11 @@ s32 func_8180128C(u8 *arg0) {
 
 #ifdef VERSION_US
 extern s32 StageContext_GetFadeMode(void);
-extern void func_80007AEC(s32);
+extern void StageFade_StartFromOpaque(s32);
 s32 func_8180132C(s32 arg0) {
     switch (StageContext_GetFadeMode()) {
     case 1:
-        func_80007AEC(arg0);
+        StageFade_StartFromOpaque(arg0);
     case 2:
     case 3:
         return 0;

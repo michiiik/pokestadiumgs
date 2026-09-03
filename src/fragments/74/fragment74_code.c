@@ -76,7 +76,7 @@ s32 func_8F600948(s32 arg0) {
 
 extern s32 main_pool_push_state(s32);
 extern void main_pool_pop_state(s32);
-extern void func_80006CD0(s32, s32);
+extern void Gfx_InitDisplayListBuffers(s32, s32);
 extern s32 func_8004C09C(s32);
 extern void func_8004C4B0(s32);
 extern void func_80047588(s32, s32);
@@ -89,10 +89,10 @@ extern void Gfx_FreeDisplayListBuffers(void);
 extern u8 D_1000000[];
 extern u8 D_446E30[];
 extern u8 D_447D00[];
-s32 func_8F600AF8(s32 arg0, s32 arg1) {
+s32 fragment74_main(s32 arg0, s32 arg1) {
     s32 sp1C;
     main_pool_push_state(0x54524E56);
-    func_80006CD0(0x10000, 0);
+    Gfx_InitDisplayListBuffers(0x10000, 0);
     sp1C = func_8004C09C(0x43);
     func_8004C4B0(0x42);
     func_80047588(0x3F, 0);

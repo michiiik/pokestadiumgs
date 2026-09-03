@@ -111,13 +111,13 @@ void func_86006538(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_86006C30.s")
 
-extern void func_80007AEC(s32);
+extern void StageFade_StartFromOpaque(s32);
 s32 StageContext_GetFadeMode();
 extern void func_86007648(s32, s32);
 
 void func_86006D24(s32 arg0) {
     if (StageContext_GetFadeMode() == 1) {
-        func_80007AEC(0xA);
+        StageFade_StartFromOpaque(0xA);
         func_86007648(arg0, 0);
     }
 }
@@ -159,8 +159,8 @@ void func_860075E4(void *arg0) {
     func_87F02328();
 }
 
-extern void func_800088A4(s32); extern void StageFade_StartFromTransparent(s32);
-void func_86007614(void *arg0) { func_800088A4(1); StageFade_StartFromTransparent(0xA); }
+extern void StageContext_SetClearColor(s32); extern void StageFade_StartFromTransparent(s32);
+void func_86007614(void *arg0) { StageContext_SetClearColor(1); StageFade_StartFromTransparent(0xA); }
 
 void func_86007640(u8 *arg0) {}
 

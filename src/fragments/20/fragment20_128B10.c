@@ -143,7 +143,7 @@ s32 func_82602930(s32 arg0) {
     case 2:
         if (func_82614F0C() != 0) {
             result = 3;
-            func_800088A4(1);
+            StageContext_SetClearColor(1);
             StageFade_StartFromTransparent(5);
             func_800226C0(0x65);
         }
@@ -156,7 +156,7 @@ s32 func_82602930(s32 arg0) {
 }
 
 extern void func_800086A4(s32);
-extern void func_80007AEC(s32);
+extern void StageFade_StartFromOpaque(s32);
 extern void func_80064D28(void);
 extern void func_82604170(void);
 extern void func_82613814(void);
@@ -174,7 +174,7 @@ void func_82602A0C(void) {
     sp22 = sp24->unk_08 & 0xFF00;
     if (StageContext_GetFadeMode() != 0) {
         func_800086A4(2);
-        func_80007AEC(5);
+        StageFade_StartFromOpaque(5);
     }
     do {
         func_80064D28();

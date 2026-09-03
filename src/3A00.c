@@ -147,7 +147,7 @@ u8 *MainPool_AllocState(s32 arg0, s32 arg1) {
 void MainPool_FinalizeAllocation(struct S1_MemoryBlock* block) {
     s32 size = ALIGN16(block->size + 0x10);
 
-    func_80002A40(block, size);
+    main_pool_realloc(block, size);
     block->next = (void*)(size - 0x10);
 }
 

@@ -7,6 +7,7 @@
  * extra `-T` script from the Makefile, the same way hardware_regs.ld,
  * undefined_syms.ld, and the other hand-written scripts are.
  */
-Audio_BuildSchedulerTask = func_80021B74;
 Audio_ThreadEntry = func_80035174;
 Audio_RequestEvent = func_800355E4;
+func_8005805C = GbSave_IdentifyFormat;
+func_8005A228 = GbTower_PollPortState;
