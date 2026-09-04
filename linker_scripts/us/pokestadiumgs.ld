@@ -586,8 +586,8 @@ SECTIONS
         build/src/4F800.o(.rodata);
         build/src/517E0.o(.rodata);
         build/src/56F90.o(.rodata);
-        build/src/585D0.o(.rodata);
         build/asm/us/data/A55B0.rodata.o(.rodata);
+        build/src/585D0.o(.rodata);
         build/src/615D0.o(.rodata);
         build/src/638E0.o(.rodata);
         build/src/63CF0.o(.rodata);
@@ -1703,6 +1703,7 @@ SECTIONS
         build/src/fragments/20/fragment20_128B10.o(.rodata);
         build/src/fragments/20/fragment20_12BB60.o(.rodata);
         build/src/fragments/20/fragment20_12C460.o(.rodata);
+        build/asm/us/data/13DB50.rodata.o(.rodata);
         fragment20_RODATA_END = .;
         fragment20_RODATA_SIZE = ABSOLUTE(fragment20_RODATA_END - fragment20_RODATA_START);
     }

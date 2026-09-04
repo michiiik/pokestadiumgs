@@ -9,7 +9,7 @@ extern void func_88A01990(void);
 extern void func_8005DFD4(s32, s32);
 extern s32 func_8005B120(s32);
 extern void GbSave_RequirePakPresent(s32);
-extern void func_8005ADD8(s8);
+extern void GbTower_StartPortSession(s8);
 extern void func_80052ECC(s32);
 extern void func_80054E48(s32);
 extern void func_881000B8(void);
@@ -27,7 +27,7 @@ s32 func_88102F60(void) {
         GbSave_RequirePakPresent(D_88006868);
     }
     if (result != 0) {
-        func_8005ADD8(D_88006868);
+        GbTower_StartPortSession(D_88006868);
     }
     if ((*(s32 *)((u8 *)D_88104E90 + 0xCC) != 0) &&
         (*(s16 *)((u8 *)D_88104E90 + 0x2C) == 2)) {

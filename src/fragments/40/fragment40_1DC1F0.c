@@ -193,7 +193,7 @@ extern void func_88B039E4(void);
 extern void func_88B03A70(void);
 extern void func_80008574(void);
 extern void func_88B0552C(u16, s32, s32, s32);
-extern void func_8005ADD8(s8, s32);
+extern void GbTower_StartPortSession(s8, s32);
 extern void Util_Free(void *);
 extern void func_80047610(void);
 extern void func_8004C398(void);
@@ -225,7 +225,7 @@ s32 fragment40_main(s32 arg0, s32 arg1) {
         func_88B0552C(*(u16 *)((u8 *)var_s0 + 0x1C), temp_a1, *(s32 *)((u8 *)var_s0 + 0x464), *(s32 *)((u8 *)var_s0 + 0x468));
         var_s0 = D_88B05F60;
     } else if (D_88B05F68 != 0) {
-        func_8005ADD8(D_88006868, temp_a1);
+        GbTower_StartPortSession(D_88006868, temp_a1);
         var_s0 = D_88B05F60;
     }
     Util_Free(var_s0);
