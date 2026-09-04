@@ -222,7 +222,8 @@ u8 *func_8AE00F84(u8 *arg0, u8 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE01334.s")
+extern s16 D_8AE0A15C;
+s32 func_8AE01334(void *arg0, u8 *arg1) { volatile s16 *key; struct Copy4 { u8 b[4]; }; key = &D_8AE0A15C; if (arg1 == 0) return 0; loop: if (*arg1 == 0xFF) return 0; if (*key == *arg1) { *(struct Copy4 *)((u8 *)arg0 + 0x4C) = *(struct Copy4 *)arg1; return 1; } arg1 += 4; goto loop; }
 #endif
 
 #ifdef VERSION_US
