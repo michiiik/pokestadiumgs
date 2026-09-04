@@ -50,7 +50,16 @@ void func_83000E38(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83000F98.s")
+extern void func_83000F04(s32, s32, s32);
+extern void func_83000CB4(s32, s32);
+void func_83000F98(s32 arg0, s32 arg1, s32 arg2) {
+    func_83000F04(arg1, arg0, arg2);
+    if (arg2 != 0) {
+        func_83000CB4(arg0, arg1);
+    } else {
+        _bzero((u8 *)(u32)arg0 + 0x3FF20, 8);
+    }
+}
 #endif
 
 #ifdef VERSION_US
