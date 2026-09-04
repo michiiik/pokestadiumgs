@@ -297,3 +297,19 @@ func_82608054: matched (state-field:interpolate:permuter-dead-check-after-fourth
 ## 2026-09-05
 
 func_826129AC: plateau at 0.8613 (raw 0.4088), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-05
+
+func_8260F084: plateau at 0.0 (raw None), mismatch unknown; tried families: initializer; tie-pool no
+
+## 2026-09-05
+
+func_826119A4: matched (constant-map:scan:compare-inverted-continue), 1 iterations, agent codex
+
+## 2026-09-05
+
+func_82608270: time cap at 0.95 (raw 0.15) after 2400s, mismatch operand_or_scheduling_drift; tried families: state_field_access; tie-pool no
+
+## 2026-09-05
+
+func_82610D14: plateau at 0.0 (raw None), mismatch operand_or_scheduling_drift; tried families: predicate; tie-pool no
