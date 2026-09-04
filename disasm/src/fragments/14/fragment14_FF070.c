@@ -374,7 +374,27 @@ s32 func_8130AA54(u8 *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130B06C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130B0E0.s")
+extern void func_8130AEF4(void *, void *, u8);
+void func_8130B0E0(void *arg0) {
+    u8 *new_var;
+    u8 *base = ((u8 *)arg0) + 0x8000;
+    u8 *store_base = ((u8 *)arg0) + ((0, 0x7FFF));
+    u8 count;
+    u8 *new_var3;
+    u8 *new_var4;
+    void *node;
+    u8 new_var2;
+    new_var4 = base;
+    new_var = store_base + 0x68E9;
+    count = new_var4[0x6911];
+    if (count > 0) {
+        store_base[0x6912] = (count & 0xFFFFFFFF) - 1;
+        ;
+        *((void **)new_var) = *((void **)(((u8 *)(*((void **)(base + 0x68E8)))) + 0x4D94));
+        new_var2 = new_var4[0x6911];
+        func_8130AEF4(arg0, *((void **)(new_var3 = new_var4 + 0x68E8)), new_var2);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130B12C.s")
 
