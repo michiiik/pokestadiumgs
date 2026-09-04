@@ -496,7 +496,26 @@ void func_82607B74(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82607BF4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82607E40.s")
+extern u8 D_82615628;
+extern u8 D_82615629;
+extern u8 D_8261562A;
+extern u8 D_8261562C;
+extern u8 D_8261562D;
+extern u8 D_8261562E;
+void func_82607E40(u8 *arg0, u8 *arg1, u8 *arg2, u8 *arg3, s32 arg4) {
+    register s32 b0;
+    register s32 b1;
+    register s32 b2;
+    register s32 b3;
+
+    b0 = D_82615628;
+    arg0[0] = (((arg2[0] - b0) * arg4) / 255) + b0;
+    arg0[1] = (((arg2[1] - (b1 = D_82615629)) * arg4) / 255) + b1;
+    arg0[2] = (((arg2[2] - (b2 = D_8261562A)) * arg4) / 255) + b2;
+    arg1[0] = (((arg3[0] - (b3 = D_8261562C)) * arg4) / 255) + b3;
+    arg1[1] = (((arg3[1] - D_8261562D) * arg4) / 255) + D_8261562D;
+    arg1[2] = (((arg3[2] - D_8261562E) * arg4) / 255) + D_8261562E;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82608054.s")
 
