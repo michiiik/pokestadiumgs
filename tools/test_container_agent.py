@@ -2178,6 +2178,44 @@ class GeneratorTimeoutAndQuotaClassificationTests(unittest.TestCase):
         self.assertEqual(gen_failures["consecutive"], 1)
         self.assertNotIn("quota", log_text.lower())
 
+    def test_stdout_only_error_is_surfaced_and_classified_as_quota(self) -> None:
+        # Reproduces the real failure this driver went dark on: `claude -p`
+        # writes its error to stdout, stderr empty, confirmed locally for
+        # both a bad --model and a genuine "You've hit your session limit"
+        # message. Reading only .stderr meant this logged nothing at all
+        # ("generator exited 1: " with an empty tail) and, critically, never
+        # reached _looks_like_quota -- so a real session/rate limit degraded
+        # the run at the ordinary +1-per-failure rate instead of the
+        # intended +2 quota escalation, taking 3x longer than it should to
+        # give up and let fleetctl's own agent-level cooldown take over.
+        def stdout_only_failure(command, *, cwd, timeout):
+            return SimpleNamespace(
+                returncode=1, stdout="You've hit your session limit \u00b7 resets 4:30am (UTC)", stderr="",
+            )
+
+        with tempfile.TemporaryDirectory() as tmp:
+            status, gen_failures, log_text = self._run_owner(tmp, invoke_generator_stub=stdout_only_failure)
+
+        self.assertIn("You've hit your session limit", log_text)
+        self.assertIn("generator output looks like a quota/rate-limit signal", log_text)
+        # Quota failures count double (see _record_generator_outcome).
+        self.assertEqual(gen_failures["consecutive"], 2)
+
+    def test_stderr_takes_precedence_over_stdout_when_both_are_present(self) -> None:
+        # The fallback must not paper over a generator that already follows
+        # the documented stderr convention: stdout noise must never bury a
+        # real stderr diagnostic.
+        def both_streams(command, *, cwd, timeout):
+            return SimpleNamespace(
+                returncode=1, stdout="unrelated progress chatter", stderr="the real error",
+            )
+
+        with tempfile.TemporaryDirectory() as tmp:
+            status, gen_failures, log_text = self._run_owner(tmp, invoke_generator_stub=both_streams)
+
+        self.assertIn("the real error", log_text)
+        self.assertNotIn("unrelated progress chatter", log_text)
+
     def test_stdout_quota_word_with_exit_zero_and_missing_batch_is_not_quota(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             def missing_batch_generator(command, *, cwd, timeout):
@@ -2189,8 +2227,16 @@ class GeneratorTimeoutAndQuotaClassificationTests(unittest.TestCase):
 
             status, gen_failures, log_text = self._run_owner(tmp, invoke_generator_stub=missing_batch_generator)
 
+        # An exit-0-but-no-batch failure has no non-zero exit to attribute a
+        # quota signal to at all -- classification must stay non-quota (a
+        # plain +1, not the +2 quota escalation) even though the surfaced
+        # text happens to contain the word "quota" for unrelated reasons.
         self.assertEqual(gen_failures["consecutive"], 1)
-        self.assertNotIn("quota", log_text.lower())
+        # The text itself SHOULD now appear in the log (_generator_error_text
+        # falls back to stdout when stderr is empty, so a human reading the
+        # log sees why the generator "succeeded" yet produced no batch) --
+        # it just must not be misread as a quota signal by the classifier.
+        self.assertIn("checking my quota of remaining tool calls", log_text)
 
     def test_generator_timeout_flag_bounds_the_invocation_timeout(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

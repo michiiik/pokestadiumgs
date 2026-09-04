@@ -1576,6 +1576,7 @@ QUOTA_SIGNATURES = (
     r"\brate[ -]limit\b",
     r"\bquota\b",
     r"\busage limit\b",
+    r"\bsession limit\b",
     r"\btoo many requests\b",
     r"\b429\b",
 )
@@ -1593,6 +1594,30 @@ def _decode(text: object) -> str:
 def _looks_like_quota(*texts: object) -> bool:
     combined = " ".join(_decode(t) for t in texts)
     return bool(_QUOTA_RE.search(combined))
+
+
+def _generator_error_text(result: subprocess.CompletedProcess | None) -> str:
+    """The real diagnostic text for a failed generator call.
+
+    Every wrapper's failure path was assumed to write to stderr, but that is
+    not how ``claude -p`` behaves: an error -- including a session/rate-limit
+    message -- prints to *stdout*, with stderr left empty (confirmed
+    locally: a bad --model and a real "You've hit your session limit" both
+    landed on stdout, never stderr). Reading only ``.stderr`` therefore
+    logged nothing at all for those failures (``generator exited 1: `` with
+    an empty tail) and, worse, meant ``_looks_like_quota`` never saw the
+    quota text to classify it, so a rate limit degraded a run at the normal
+    1-per-failure rate rather than the intended 2-per-failure quota
+    escalation. Prefer stderr (the documented convention every other
+    wrapper follows) and fall back to stdout only when stderr is empty, so a
+    genuinely stderr-writing generator is unaffected.
+    """
+    if result is None:
+        return ""
+    stderr = (result.stderr or "").strip()
+    if stderr:
+        return stderr
+    return (result.stdout or "").strip()
 
 
 def _record_generator_outcome(
@@ -3001,7 +3026,7 @@ def process_owner(
         if gen_result is not None and gen_result.returncode != 0:
             logger.log(
                 f"{owner}: iter {iteration}: generator exited {gen_result.returncode}: "
-                f"{(gen_result.stderr or '').strip()[:500]}"
+                f"{_generator_error_text(gen_result)[:500]}"
             )
 
         batch = load_json(batch_path)
@@ -3029,12 +3054,12 @@ def process_owner(
                 quota = False
                 stderr_tail = timeout_stderr
             elif gen_result is not None and gen_result.returncode != 0:
-                stderr_text = gen_result.stderr or ""
+                stderr_text = _generator_error_text(gen_result)
                 quota = _looks_like_quota(stderr_text)
                 stderr_tail = stderr_text
             else:
                 quota = False
-                stderr_tail = (gen_result.stderr or "") if gen_result is not None else ""
+                stderr_tail = _generator_error_text(gen_result)
             exhausted = _record_generator_outcome(
                 gen_failures, ok=False, quota=quota, stderr_tail=stderr_tail,
                 owner=owner, iteration=iteration, max_failures=max_generator_failures, logger=logger,
