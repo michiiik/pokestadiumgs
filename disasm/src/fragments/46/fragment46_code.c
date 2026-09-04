@@ -88,7 +88,9 @@ void func_8AE001D4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE002AC.s")
+extern void func_80037120(void *, void *, s32 *, s16 *, s16 *);
+extern void * D_80094908;
+s32 func_8AE002AC(s32 arg0, void *arg1) { u8 out[12]; if (arg0 == 2) { func_80037120((u8 *)D_80094908 + 0xB4, (u8 *)D_80094908 + 0xA8, (s32 *)(out + 4), (s16 *)(out + 2), (s16 *)out); *(s16 *)((u8 *)arg1 + 0x1C) = *(s16 *)(out + 2) + 0x2000; *(s16 *)((u8 *)arg1 + 0x1E) = *(s16 *)out - 0x2000; } return 0; }
 #endif
 
 #ifdef VERSION_US
