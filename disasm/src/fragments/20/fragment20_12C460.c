@@ -702,7 +702,20 @@ s32 func_82610C84(s32 arg0, s32 arg1) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82610D14.s")
+extern s16 D_8261A490;
+s32 func_82610D14(void) {
+    u8 *base = (u8 *)&D_8261A490;
+    s32 result = 1;
+    s32 i;
+
+    for (i = 0; i < *(s16 *)(base + 0x18); i++) {
+        if (((s16 **)(base + 0x34F4))[i][3] != 0) {
+            result = 0;
+            break;
+        }
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82610D6C.s")
 
