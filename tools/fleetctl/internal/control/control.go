@@ -253,10 +253,12 @@ func (l *Loop) stopSiblingRuns(ctx context.Context, exhausted *fleetstate.RunRec
 // bare agent name (unchanged behaviour) when model is empty -- the
 // permuter lane and any caller that genuinely has no model -- else
 // "agent:model", so one model's exhaustion cannot leak into a sibling
-// model's cooldown status. reassignAgent's cross-*provider* roster
-// (agentRoster, windowReopened, eligibleForReassignment) deliberately stays
-// keyed by bare agent name: it answers "should we try a wholly different
-// CLI", a coarser question this key does not need to answer.
+// model's cooldown status. reassignAgent's roster-eligibility checks
+// (windowReopened, eligibleForReassignment) check both this key and the
+// bare-agent one: a roster entry (agentRoster) pins one specific model, so
+// reassigning to it launches exactly that model -- checking only the bare
+// key there let a queued run get reassigned right back into a model that
+// was, in fact, still on cooldown (see those functions' own comments).
 func cooldownKey(agent, model string) string {
 	if model == "" {
 		return agent
