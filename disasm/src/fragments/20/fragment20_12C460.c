@@ -235,7 +235,55 @@ s32 func_826047C4(s32 arg0, s32 arg1) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82604814.s")
+extern s16 D_82615532[];
+extern s32 func_8004C990(s32, s32);
+s32 func_82604814(s32 *arg0, s32 arg1, s32 arg2, s32 arg3) {
+    s32 result;
+
+    result = 0;
+    switch (arg1) {
+    case 1:
+        arg0[0] = func_8004C990(0x57, 1);
+        result = 1;
+        break;
+    case 2:
+        arg0[0] = func_8004C990(0x57, 3);
+        result = 1;
+        break;
+    case 3:
+        arg0[0] = func_8004C990(0x57, 0);
+        result = 1;
+        break;
+    case 4:
+        arg0[0] = func_8004C990(0x57, 2);
+        result = 1;
+        break;
+    }
+
+    arg1 = arg2 + 1;
+    if (arg3 != arg1) goto block_1;
+    arg0[result] = func_8004C990(0x6E, 3);
+    result = result + 1;
+    goto end;
+
+block_1:
+    arg1 = arg2 + 2;
+    if (arg3 != arg1) goto block_2;
+    arg0[result] = func_8004C990(0x6E, 5);
+    result = result + 1;
+    goto end;
+
+block_2:
+    if (arg2 < 6) {
+        arg0[result] = func_8004C990(0x6E, 0);
+        result = result + 1;
+        arg0[result] = func_8004C990(0x65, D_82615532[arg2]);
+        result = result + 1;
+    }
+
+end:
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_826049A0.s")
 
