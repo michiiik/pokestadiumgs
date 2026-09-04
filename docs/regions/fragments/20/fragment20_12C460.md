@@ -273,3 +273,27 @@ func_82604C08: matched (constant-map:scan:permuter-exact-new-var), 3 iterations,
 ## 2026-09-05
 
 func_82604C98: time cap at 0.9545 (raw 0.5909) after 2532s, mismatch operand_or_scheduling_drift; tried families: constant-map; tie-pool no
+
+## 2026-09-05
+
+func_82607528: plateau at 0.0 (raw None), mismatch unknown; tried families: (none); tie-pool no
+
+## 2026-09-05
+
+func_826112CC: matched (call_sequence:inline_var_v1:swapped_mul_add), 3 iterations, agent gemini
+
+## 2026-09-05
+
+func_82607E40: matched (call_sequence:register-locals:inline-assign-chain), 1 iterations, agent gemini
+
+## 2026-09-05
+
+func_82607528: time cap at 0.9048 (raw 0.4365) after 2400s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-05
+
+func_82608054: matched (state-field:interpolate:permuter-dead-check-after-fourth), 3 iterations, agent codex
+
+## 2026-09-05
+
+func_826129AC: plateau at 0.8613 (raw 0.4088), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
