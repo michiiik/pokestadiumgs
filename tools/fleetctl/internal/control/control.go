@@ -1391,6 +1391,19 @@ func (l *Loop) finishMerge(ctx context.Context, id string, rec *fleetstate.RunRe
 // already_landed), so this only ever re-gates what is still actually
 // missing -- runMerge's own no-accepted-owners path (StatusDone, no PR)
 // applies cleanly if nothing is left.
+// discardStaleMergeReport removes <outDir>/merge-report.json, if any. A
+// missing file is not an error (a run that never merged before, or whose
+// out_dir was already cleaned up, has none to discard).
+func discardStaleMergeReport(outDir string) error {
+	if outDir == "" {
+		return nil
+	}
+	if err := os.Remove(filepath.Join(outDir, "merge-report.json")); err != nil && !os.IsNotExist(err) {
+		return err
+	}
+	return nil
+}
+
 func (l *Loop) replayConflictedPR(ctx context.Context, id string, rec *fleetstate.RunRecord) {
 	mergeRepo := l.mergeRepo()
 	prNumber := rec.PRNumber
@@ -1415,6 +1428,25 @@ func (l *Loop) replayConflictedPR(ctx context.Context, id string, rec *fleetstat
 
 	if err := l.Runner.GitFetch(ctx, mergeRepo); err != nil {
 		l.logf("run %s: git fetch before replay failed: %v", id, err)
+	}
+
+	// Round N's own merge-report.json in rec.OutDir marks these owners
+	// "accepted" (or an object with committed:true) because round N really
+	// did commit them -- to the branch just closed and deleted above.
+	// container_merge.py's idempotency check (process_owner,
+	// previous_entry_marks_committed) reads exactly this file and, left in
+	// place, reads that stale "accepted" as proof the owner already landed
+	// on IntegrationBranch, silently reporting already_landed and never
+	// re-committing it -- the re-gate this replay exists to do never
+	// actually re-gates anything. That check is correct for its designed
+	// case (re-running merge --commit against an <out> whose PR really did
+	// merge); it just cannot tell a merged branch from a closed one. Since
+	// this replay just discarded round N's branch/PR, its report is stale
+	// evidence and must not carry forward. Observed live: three PRs closed
+	// this way (five accepted functions total) were never recreated and
+	// had to be recovered by hand from each PR's own still-live git ref.
+	if err := discardStaleMergeReport(rec.OutDir); err != nil {
+		l.logf("run %s: discard stale merge-report.json failed (best-effort): %v", id, err)
 	}
 
 	rec.Status = fleetstate.StatusMerging
