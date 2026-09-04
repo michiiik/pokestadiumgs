@@ -76,3 +76,15 @@ func_84126064: plateau at 0.9655 (raw 0.5862), mismatch operand_or_scheduling_dr
 ## 2026-09-05
 
 func_841362E4: time cap at 0.9643 (raw 0.8929) after 2606s, mismatch operand_or_scheduling_drift; tried families: state-field; tie-pool no
+
+## 2026-09-05
+
+func_8412CBE8: time cap at 0.8559 (raw 0.4144) after 2400s, mismatch instruction_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-05
+
+func_841284A4: matched (call-sequence:guards:combined-assignment), 3 iterations, agent codex
+
+## 2026-09-05
+
+func_84132778: plateau at 0.9292 (raw 0.8142), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
