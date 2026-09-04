@@ -2,6 +2,7 @@ package control
 
 import (
 	"context"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -203,5 +204,107 @@ func TestPermuterAgentNeverGetsReassignedToOrCooledDown(t *testing.T) {
 	alt, ok := loop.reassignAgent("codex", testNow, map[string]int{})
 	if ok {
 		t.Fatalf("reassignAgent must never offer permuterAgent as a target, got %+v", alt)
+	}
+}
+
+// TestSiblingModelUnderSameAgentIsNotBlockedByAnotherModelsCooldown
+// reproduces the real incident end to end -- through the actual write path
+// (a genuine luna exhaustion via RunOnce, not a hand-set cooldown key), so
+// this fails on pre-fix code for the right reason (the bare-agent write
+// really did block spark), not by accident.
+//
+// gpt-5.6-luna and gpt-5.3-codex-spark are both AGENT=codex, but confirmed
+// live to draw from separate usage-limit pools -- luna genuinely exhausted
+// (a multi-day cooldown) while spark succeeded immediately after, on the
+// same auth. A bare-agent cooldown key made luna's exhaustion block spark
+// too, even though spark had quota to spare.
+func TestSiblingModelUnderSameAgentIsNotBlockedByAnotherModelsCooldown(t *testing.T) {
+	fake := &runner.Fake{InspectResults: map[string][]runner.InspectResult{
+		"luna-cid": {{Found: true, Running: false, ExitCode: 3}},
+	}}
+	loop, dir := newTestLoop(t, fake)
+	outDir := filepath.Join(dir, "out")
+	mustWriteFile(t, filepath.Join(outDir, "summary.json"), `{"stopped_reason":"generator_exhausted"}`)
+	loop.CooldownDefaults = map[string]time.Duration{"codex": 72 * time.Hour}
+
+	// luna exhausts for real, through the same code path that wrote the
+	// bare "codex" key in the actual incident.
+	loop.State.Runs["luna-run"] = &fleetstate.RunRecord{
+		Spec: fleetstate.RunSpec{
+			ID: "luna-run", File: "disasm/src/x.c", Owners: []string{"func_1"},
+			Agent: "codex", Model: "gpt-5.6-luna",
+		},
+		Status: fleetstate.StatusRunning, ContainerID: "luna-cid", OutDir: outDir,
+	}
+	// spark is queued under the same agent, a different model, never run yet.
+	loop.State.Runs["spark-run"] = &fleetstate.RunRecord{
+		Spec: fleetstate.RunSpec{
+			ID: "spark-run", File: "disasm/src/a.c", Owners: []string{"f1"},
+			Agent: "codex", Model: "gpt-5.3-codex-spark",
+		},
+		Status: fleetstate.StatusQueued,
+	}
+	loop.State.Queue = []string{"spark-run"}
+
+	if _, err := loop.RunOnce(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+
+	rec := loop.State.Runs["spark-run"]
+	if rec.Status != fleetstate.StatusRunning {
+		t.Fatalf("status = %s, want running (spark has its own quota, luna's exhaustion must not block it)", rec.Status)
+	}
+	if rec.Spec.Model != "gpt-5.3-codex-spark" {
+		t.Fatalf("spec model = %s, want gpt-5.3-codex-spark (must launch as itself, not a sec-12 reassignment)", rec.Spec.Model)
+	}
+}
+
+// TestExhaustedModelStillBlocksItselfAndOnlyItself is the write-side half
+// of the same fix: an exhausted run must still requeue and wait, and a
+// second queued run under the SAME agent+model must still be blocked by
+// that cooldown (the fix narrows the key, it does not remove enforcement).
+func TestExhaustedModelStillBlocksItselfAndOnlyItself(t *testing.T) {
+	fake := &runner.Fake{InspectResults: map[string][]runner.InspectResult{
+		"cid": {{Found: true, Running: false, ExitCode: 3}},
+	}}
+	loop, dir := newTestLoop(t, fake)
+	outDir := filepath.Join(dir, "out")
+	mustWriteFile(t, filepath.Join(outDir, "summary.json"), `{"stopped_reason":"generator_exhausted"}`)
+
+	rec := &fleetstate.RunRecord{
+		Spec: fleetstate.RunSpec{
+			ID: "x-p0", File: "disasm/src/x.c", Owners: []string{"func_1"},
+			Agent: "codex", Model: "gpt-5.6-luna",
+		},
+		Status: fleetstate.StatusRunning, ContainerID: "cid", OutDir: outDir,
+	}
+	loop.State.Runs["x-p0"] = rec
+	loop.CooldownDefaults = map[string]time.Duration{"codex": 5 * time.Hour}
+
+	if _, err := loop.RunOnce(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+
+	until, ok := loop.State.CooldownUntil("codex:gpt-5.6-luna")
+	if !ok || !until.Equal(testNow.Add(5*time.Hour)) {
+		t.Fatalf("cooldown = %v, ok=%v", until, ok)
+	}
+
+	// A second, later run under the identical agent+model must still be
+	// held back by that same cooldown -- the fix must not have accidentally
+	// stopped enforcing it altogether.
+	loop.State.Runs["x-p1"] = &fleetstate.RunRecord{
+		Spec: fleetstate.RunSpec{
+			ID: "x-p1", File: "disasm/src/x.c", Owners: []string{"func_2"},
+			Agent: "codex", Model: "gpt-5.6-luna",
+		},
+		Status: fleetstate.StatusQueued,
+	}
+	loop.State.Queue = []string{"x-p1"}
+	if _, err := loop.RunOnce(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if loop.State.Runs["x-p1"].Status != fleetstate.StatusQueued {
+		t.Fatalf("x-p1 status = %s, want still queued (blocked by its own model's cooldown)", loop.State.Runs["x-p1"].Status)
 	}
 }
