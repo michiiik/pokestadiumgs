@@ -734,7 +734,31 @@ s32 func_841283FC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841284A4.s")
+extern s32 func_84128354(void);
+extern void func_84128438(void);
+extern s32 D_84187020;
+extern s32 func_80063660(u8);
+extern u8 func_80063690(u8);
+extern s32 func_84125080();
+extern void func_84128298(void);
+extern s32 func_841283FC(void);
+extern u8 D_841951BC;
+extern u8 D_841951BD;
+extern u8 D_841951C3;
+extern u8 D_841951C4;
+extern u8 D_841951C6;
+extern u8 * D_84195200[];
+extern u8 * D_84195208[];
+void func_841284A4(void) {
+    unsigned short value;
+    if ((D_841951C3 == 8 && !(D_84195200[D_841951BD][0x24] & 7)) || (D_84195208[D_841951BD][0xD] & 4) || ((D_84195208[D_841951BD][0x10] & 0x10) && (D_841951C3 == 3 || D_841951C3 == 8))) { func_84128298(); return; }
+    if (func_841282C0() != 0) return;
+    if (func_84128354() != 0) { func_84128298(); return; }
+    if (func_841283FC() != 0 || (D_84195208[D_841951BC][0x10] & 1) || D_841951C3 == 0x11 || D_84187020 != 0) return;
+    func_84128438();
+    if (func_80063660(D_841951C6) == 0x4D) { value = func_80063690(D_841951C6); if (D_841951C4 >= value) D_841951C4 -= value; else D_841951C4 = 0; }
+    if (D_841951C4 != 0xFF && func_84125080() >= D_841951C4) func_84128298();
+}
 #endif
 
 #ifdef VERSION_US
