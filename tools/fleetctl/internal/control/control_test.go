@@ -184,9 +184,16 @@ func TestExitHandlingGeneratorExhausted(t *testing.T) {
 	if len(loop.State.Queue) != 1 || loop.State.Queue[0] != "x-p0" {
 		t.Fatalf("queue = %v, want [x-p0]", loop.State.Queue)
 	}
-	until, ok := loop.State.CooldownUntil("kimi")
+	// Written under the agent:model key (rec.Spec.Model is "m" here, see
+	// runningRec), not bare "kimi" -- confirmed live that gpt-5.6-luna and
+	// gpt-5.3-codex-spark draw from separate usage-limit pools, so a real
+	// exhaustion must not block every model under the same CLI.
+	until, ok := loop.State.CooldownUntil("kimi:m")
 	if !ok || !until.Equal(testNow.Add(5*time.Hour)) {
 		t.Fatalf("cooldown = %v, ok=%v", until, ok)
+	}
+	if _, ok := loop.State.CooldownUntil("kimi"); ok {
+		t.Fatal("must not also write the bare-agent key -- that would still block every model")
 	}
 	if findCall(fake, "Merge") != nil {
 		t.Fatal("merge must not run on generator_exhausted")

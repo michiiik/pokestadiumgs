@@ -208,6 +208,21 @@ func (l *Loop) imageRef() string {
 	return "gs-decomp-agent:latest"
 }
 
+// cooldownKey is the fine-grained key State.Cooldowns is written under: the
+// bare agent name (unchanged behaviour) when model is empty -- the
+// permuter lane and any caller that genuinely has no model -- else
+// "agent:model", so one model's exhaustion cannot leak into a sibling
+// model's cooldown status. reassignAgent's cross-*provider* roster
+// (agentRoster, windowReopened, eligibleForReassignment) deliberately stays
+// keyed by bare agent name: it answers "should we try a wholly different
+// CLI", a coarser question this key does not need to answer.
+func cooldownKey(agent, model string) string {
+	if model == "" {
+		return agent
+	}
+	return agent + ":" + model
+}
+
 func (l *Loop) cooldownFor(agent string) time.Duration {
 	if d, ok := l.CooldownDefaults[agent]; ok {
 		return d
@@ -490,10 +505,17 @@ func (l *Loop) handleExit(ctx context.Context, rec *fleetstate.RunRecord) error 
 			return nil
 		}
 		until := l.now().Add(l.cooldownFor(rec.Spec.Agent))
-		l.State.Cooldowns[rec.Spec.Agent] = until
+		// Keyed by agent+model, not just agent: confirmed directly (two
+		// live codex calls, same auth) that gpt-5.6-luna and
+		// gpt-5.3-codex-spark draw from separate usage-limit pools -- luna
+		// hit "You've hit your usage limit ... try again at Sep 7th" while
+		// spark succeeded immediately after. The old bare-agent key made
+		// one model's real, multi-day exhaustion block every other model
+		// under the same CLI, including one with quota to spare.
+		l.State.Cooldowns[cooldownKey(rec.Spec.Agent, rec.Spec.Model)] = until
 		l.recordWindowExhausted(rec.Spec.Agent, l.now())
-		l.logf("run %s: agent %s generator_exhausted; cooldown until %s, requeueing with --resume",
-			rec.Spec.ID, rec.Spec.Agent, until.Format(time.RFC3339))
+		l.logf("run %s: agent %s:%s generator_exhausted; cooldown until %s, requeueing with --resume",
+			rec.Spec.ID, rec.Spec.Agent, rec.Spec.Model, until.Format(time.RFC3339))
 		rec.Status = fleetstate.StatusRequeued
 		rec.Note = "generator_exhausted"
 		l.requeueResume(rec)
@@ -1625,7 +1647,12 @@ func (l *Loop) launchEligible(ctx context.Context) error {
 			remaining = append(remaining, id)
 		// permuterAgent is never subject to cooldown (sec 13), so this case
 		// can never fire for it regardless of what State.Cooldowns holds.
-		case rec.Spec.Agent != permuterAgent && l.State.OnCooldown(rec.Spec.Agent, now):
+		// Checks both the model-specific key a real exhaustion now writes
+		// (cooldownKey) and the bare-agent key (kept for a coarse/manual
+		// provider-wide cooldown, and for existing callers/tests that set
+		// one directly) -- either blocks this run.
+		case rec.Spec.Agent != permuterAgent &&
+			(l.State.OnCooldown(rec.Spec.Agent, now) || l.State.OnCooldown(cooldownKey(rec.Spec.Agent, rec.Spec.Model), now)):
 			// Quota-window-aware scheduling (sec 12): rather than leave the
 			// slot idle, hand this partition to the next eligible agent
 			// (round-robin over the plan's own roster, preferring one whose
