@@ -558,6 +558,39 @@ func TestMergeNoAcceptedOwnersSkipsPR(t *testing.T) {
 	}
 }
 
+// TestOwnersAlreadyResolvedAreDroppedNotRequeued reproduces the real
+// 585D0-p5-r2 incident: container_agent.py reports (via summary.json's
+// owners_already_resolved, written when its own live-GLOBAL_ASM-stub check
+// drops a stale --owners entry before ever reaching the generator) that
+// func_1 was already matched and merged by some other run while this one
+// sat queued. func_1 never appears in merge-report.json at all -- it was
+// never attempted -- so before this fix it would fall straight into
+// "unmatched" and get requeued right back into a run that could only ever
+// fail the exact same way again, forever. func_2 was genuinely attempted
+// and rejected, so it belongs in the normal requeue.
+func TestOwnersAlreadyResolvedAreDroppedNotRequeued(t *testing.T) {
+	fake := &runner.Fake{InspectResults: map[string][]runner.InspectResult{"cid": {{Found: true, Running: false}}}}
+	loop, dir := newTestLoop(t, fake)
+	outDir := filepath.Join(dir, "out")
+	mustWriteFile(t, filepath.Join(outDir, "summary.json"),
+		`{"stopped_reason":"completed","owners_already_resolved":["func_1"]}`)
+	fake.MergeFunc = func(spec runner.MergeSpec) (runner.ProcessResult, error) {
+		mustWriteFile(t, filepath.Join(spec.OutDir, "merge-report.json"), `{"owners":{"func_2":"rejected"}}`)
+		return runner.ProcessResult{ExitCode: 1}, nil
+	}
+	rec := runningRec("x-p0", "cid", outDir, "codex")
+	loop.State.Runs["x-p0"] = rec
+
+	if _, err := loop.RunOnce(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	newID := onlyOtherRunID(t, loop.State.Runs, "x-p0")
+	newRec := loop.State.Runs[newID]
+	if len(newRec.Spec.Owners) != 1 || newRec.Spec.Owners[0] != "func_2" {
+		t.Fatalf("requeued owners = %v, want [func_2] (func_1 already resolved elsewhere, must not loop back into the queue)", newRec.Spec.Owners)
+	}
+}
+
 // --- merge-report.json owner-entry shapes ------------------------------------
 //
 // tools/container_merge.py's write_merge_report emits, per owner, either a

@@ -3855,6 +3855,7 @@ def main(argv: list[str] | None = None) -> int:
         "started_at": now_iso(),
         "budget_seconds": args.budget_seconds,
         "owners_attempted": [],
+        "owners_already_resolved": [],
         "matched": [],
         "best_per_owner": {},
         "iteration_counts": {},
@@ -3882,6 +3883,41 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.owners:
         owners = [name.strip() for name in args.owners.split(",") if name.strip()]
+        # A run's --owners list is fixed at enqueue time (fleetctl's
+        # RunSpec.Owners), but this container may not actually start until
+        # much later -- queued behind other work, requeued after a prior
+        # attempt, reassigned across a cooldown. Some other run can easily
+        # match and merge one of these same owners in the meantime (see the
+        # live incident this filter fixes: 585D0-p5-r2's two owners were
+        # both already merged, via PR #83, over an hour before this
+        # container ever discovered them). Checking against
+        # discover_owners_fallback's live regex scan of the already-current
+        # (SRC_OVERLAY-refreshed) checkout catches that up front, before
+        # spending a full budget window hammering a target that can never
+        # succeed -- validate_candidate_batch (try_pragma_compare.py) would
+        # eventually reject each attempt the same way, but only after a full
+        # generator round-trip per attempt, not before the first one.
+        #
+        # Only acts when the scan actually finds something: an empty result
+        # means either a genuinely fully-decompiled file (rare) or -- far
+        # more likely for anything reaching this branch with owners still
+        # unresolved -- an unreadable/missing source_rel (a synthetic test
+        # fixture with no such file, --repo pointed somewhere unusual). An
+        # empty scan can't distinguish those, and treating it as "every
+        # explicit owner is stale" would be a much stronger, more
+        # consequential claim than "the file could not be read" supports --
+        # so this fails open and leaves owners exactly as passed, same as
+        # before this filter existed.
+        live = set(discover_owners_fallback(repo_dir, source_rel))
+        stale = [name for name in owners if name not in live] if live else []
+        if stale:
+            logger.log(
+                f"{len(stale)} explicitly-passed owner(s) are no longer active GLOBAL_ASM "
+                f"stubs in {source_rel} (already matched/merged elsewhere since this run "
+                f"was queued) -- dropping: {', '.join(stale)}"
+            )
+            owners = [name for name in owners if name in live]
+            summary["owners_already_resolved"] = stale
     else:
         owners = discover_owners(
             repo_dir, source_rel, owner_order=args.owner_order,
