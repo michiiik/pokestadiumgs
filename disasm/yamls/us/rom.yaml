@@ -651,6 +651,8 @@
     - [0x12BB60, c,       fragments/20/fragment20_12BB60]
     - [0x12C460, c,       fragments/20/fragment20_12C460]
     - [0x13D3F0, data,    fragments/20/fragment20_data]
+    - [0x13D8B0, .rodata, fragments/20/fragment20_12C460] # jtbl_826157E0 (+2 more)
+    - [0x13DB50, rodata]
 
   - name: fragment21
     type: code
