@@ -22,10 +22,21 @@ from __future__ import annotations
 import argparse
 import datetime
 import json
+import select
 import shutil
 import subprocess
 import sys
 import time
+
+try:
+    import termios
+    import tty
+except ImportError:  # pragma: no cover -- Windows has neither; the loop
+    # still works there via KeyboardInterrupt/Ctrl+C, just without the
+    # single-keypress "q" shortcut (_wait_for_quit_or_timeout falls back to
+    # a plain sleep whenever termios/tty aren't importable).
+    termios = None
+    tty = None
 
 DEFAULT_INTERVAL = 10.0
 
@@ -144,6 +155,33 @@ def _clear_screen() -> None:
     sys.stdout.write("\033[2J\033[H")
 
 
+def _wait_for_quit_or_timeout(seconds: float, stdin=sys.stdin) -> bool:
+    """Sleep up to `seconds`, waking early if a key arrives on stdin.
+    Returns True iff that key was 'q'/'Q' -- the caller's cue to stop
+    looping instead of rendering another frame. False covers both "the
+    full interval elapsed with no input" and "some other key was
+    pressed" (anything else is silently ignored, not queued -- the next
+    frame just redraws early). stdin not being a real TTY (piped input,
+    a test's fake stream with no fileno) falls back to a plain sleep;
+    Ctrl+C still works either way since cbreak mode leaves ISIG (the
+    terminal's own SIGINT-on-^C handling) enabled -- only raw mode would
+    disable it.
+    """
+    if termios is None or tty is None or not stdin.isatty():
+        time.sleep(seconds)
+        return False
+    fd = stdin.fileno()
+    old_settings = termios.tcgetattr(fd)
+    try:
+        tty.setcbreak(fd)
+        ready, _, _ = select.select([stdin], [], [], seconds)
+        if not ready:
+            return False
+        return stdin.read(1).lower() == "q"
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--state-dir", required=True, help="fleetctl --state-dir (holding state.json)")
@@ -179,8 +217,9 @@ def main(argv: list[str] | None = None) -> int:
                 last_good = f"{last_good}\n\n{error_line}" if last_good else error_line
             _clear_screen()
             print(last_good)
-            print(f"\n(refreshing every {args.interval:g}s -- Ctrl+C to exit)")
-            time.sleep(args.interval)
+            print(f"\n(refreshing every {args.interval:g}s -- press q or Ctrl+C to exit)")
+            if _wait_for_quit_or_timeout(args.interval):
+                return 0
     except KeyboardInterrupt:
         return 0
 

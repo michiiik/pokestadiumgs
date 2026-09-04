@@ -1,14 +1,17 @@
-"""Tests for tools/fleet_dashboard.py's rendering.
+"""Tests for tools/fleet_dashboard.py's rendering and quit-key handling.
 
-render_dashboard is the only piece worth pinning: a pure function of a
-parsed `fleetctl status --json` document and an injected "now" (never the
-real clock, so every test is deterministic). The live refresh loop around
-it is a thin, hard-to-usefully-unit-test wrapper (subprocess + sleep) --
-this is why the formatting logic is split out as its own function at all.
+render_dashboard is a pure function of a parsed `fleetctl status --json`
+document and an injected "now" (never the real clock, so every test is
+deterministic). _wait_for_quit_or_timeout is exercised with a fake stdin
+and mocked termios/tty/select, so these run without a real TTY or an
+actual wait. The live refresh loop around both (subprocess + the real
+terminal) is a thin wrapper not worth unit-testing itself -- this is why
+both pieces of real logic are split out as their own functions.
 """
 
 import datetime
 import unittest
+from unittest import mock
 
 import fleet_dashboard as dashboard
 
@@ -113,6 +116,78 @@ class RenderDashboardTests(unittest.TestCase):
         # unbounded -- _truncate caps it well below that.
         longest_line = max(len(line) for line in out.splitlines())
         self.assertLess(longest_line, 200)
+
+
+class _FakeStdin:
+    """Minimal stdin stand-in: isatty()/fileno() so
+    _wait_for_quit_or_timeout takes its TTY branch, and a scripted read()
+    return value for whatever key select claims is ready."""
+
+    def __init__(self, key: str = "") -> None:
+        self._key = key
+
+    def isatty(self) -> bool:
+        return True
+
+    def fileno(self) -> int:
+        return 99  # never a real fd -- termios/tty/select are mocked below.
+
+    def read(self, _n: int) -> str:
+        return self._key
+
+
+class WaitForQuitOrTimeoutTests(unittest.TestCase):
+    def test_non_tty_stdin_falls_back_to_a_plain_sleep(self) -> None:
+        stdin = mock.Mock()
+        stdin.isatty.return_value = False
+        with mock.patch.object(dashboard.time, "sleep") as sleep_mock:
+            result = dashboard._wait_for_quit_or_timeout(5.0, stdin=stdin)
+        sleep_mock.assert_called_once_with(5.0)
+        self.assertFalse(result)
+
+    def test_q_keypress_returns_true(self) -> None:
+        stdin = _FakeStdin(key="q")
+        with mock.patch.object(dashboard, "termios") as termios_mock, \
+             mock.patch.object(dashboard, "tty"), \
+             mock.patch.object(dashboard.select, "select", return_value=([stdin], [], [])):
+            result = dashboard._wait_for_quit_or_timeout(5.0, stdin=stdin)
+        self.assertTrue(result)
+        # Terminal settings must always be restored, whatever key came in.
+        termios_mock.tcsetattr.assert_called_once()
+
+    def test_uppercase_q_also_quits(self) -> None:
+        stdin = _FakeStdin(key="Q")
+        with mock.patch.object(dashboard, "termios"), \
+             mock.patch.object(dashboard, "tty"), \
+             mock.patch.object(dashboard.select, "select", return_value=([stdin], [], [])):
+            result = dashboard._wait_for_quit_or_timeout(5.0, stdin=stdin)
+        self.assertTrue(result)
+
+    def test_other_keypress_does_not_quit(self) -> None:
+        stdin = _FakeStdin(key="x")
+        with mock.patch.object(dashboard, "termios"), \
+             mock.patch.object(dashboard, "tty"), \
+             mock.patch.object(dashboard.select, "select", return_value=([stdin], [], [])):
+            result = dashboard._wait_for_quit_or_timeout(5.0, stdin=stdin)
+        self.assertFalse(result)
+
+    def test_timeout_with_no_input_does_not_quit_or_read(self) -> None:
+        stdin = _FakeStdin()
+        stdin.read = mock.Mock(side_effect=AssertionError("must not read when select timed out"))
+        with mock.patch.object(dashboard, "termios"), \
+             mock.patch.object(dashboard, "tty"), \
+             mock.patch.object(dashboard.select, "select", return_value=([], [], [])):
+            result = dashboard._wait_for_quit_or_timeout(5.0, stdin=stdin)
+        self.assertFalse(result)
+
+    def test_terminal_settings_restored_even_if_select_raises(self) -> None:
+        stdin = _FakeStdin()
+        with mock.patch.object(dashboard, "termios") as termios_mock, \
+             mock.patch.object(dashboard, "tty"), \
+             mock.patch.object(dashboard.select, "select", side_effect=RuntimeError("boom")):
+            with self.assertRaises(RuntimeError):
+                dashboard._wait_for_quit_or_timeout(5.0, stdin=stdin)
+        termios_mock.tcsetattr.assert_called_once()
 
 
 if __name__ == "__main__":
