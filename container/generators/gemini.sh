@@ -32,6 +32,17 @@
 #   --effort                  Reasoning effort (low|medium|high) -- optional,
 #                              orthogonal to an effort-suffixed model id
 #   --output-format            text | json | stream-json
+#   --print-timeout            Timeout for print mode wait, default 5m0s --
+#                              far shorter than tools/container_agent.py's
+#                              own DEFAULT_GENERATOR_TIMEOUT (30m), which
+#                              already enforces the real per-call budget.
+#                              A real decompilation prompt with probe_one.py
+#                              tool round-trips reliably exceeds 5 minutes
+#                              (confirmed: two consecutive real attempts each
+#                              hit "Error: timeout waiting for response" at
+#                              the 5m mark). Raised to match the driver's own
+#                              budget so agy's internal timeout is never the
+#                              thing that cuts an attempt short.
 #   --dangerously-skip-permissions
 #                              Auto-approve all tool permission requests
 #                              without prompting -- this always runs inside
@@ -61,6 +72,7 @@ agy \
   -p "$(cat "$PROMPT")" \
   --model "${GENERATOR_MODEL:-gemini-3.8-flash-medium}" \
   --output-format text \
+  --print-timeout "${GENERATOR_PRINT_TIMEOUT:-25m}" \
   --dangerously-skip-permissions \
   "${effort_args[@]}"
 
