@@ -4,7 +4,153 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82604390.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_826043F8.s")
+void func_826043F8(s16 *arg0, s16 *arg1, s32 arg2, s32 arg3) {
+    s16 result;
+    s16 subresult;
+    s32 type;
+    s32 value;
+
+    result = -1;
+    subresult = -1;
+    type = arg2 & 0xFF00;
+    switch (type) {
+    case 0x0:
+        value = arg2 & 0xFF;
+        switch (value) {
+        case 0:
+            result = 0x6E;
+            subresult = 1;
+            break;
+        case 1:
+            result = 0x6E;
+            subresult = 4;
+            break;
+        case 2:
+            result = 0x6E;
+            subresult = 2;
+            break;
+        case 3:
+            result = 0x6E;
+            subresult = 6;
+            break;
+        }
+        break;
+    case 0x100:
+        result = 0x5C;
+        subresult = 0;
+        break;
+    case 0x700:
+        result = 0x63;
+        subresult = 0;
+        break;
+    case 0x200:
+        result = 0x5D;
+        subresult = 0;
+        break;
+    case 0x300:
+        switch (arg3) {
+        case 5:
+            result = 0x60;
+            subresult = 5;
+            break;
+        case 6:
+            result = 0x60;
+            subresult = 4;
+            break;
+        case 7:
+            result = 0x60;
+            subresult = 6;
+            break;
+        case 8:
+            result = 0x60;
+            subresult = 2;
+            break;
+        case 9:
+            result = 0x60;
+            subresult = 7;
+            break;
+        case 10:
+            result = 0x60;
+            subresult = 0;
+            break;
+        case 11:
+            result = 0x6B;
+            subresult = 1;
+            break;
+        case 12:
+            result = 0x60;
+            subresult = 1;
+            break;
+        case 13:
+            result = 0x60;
+            subresult = 3;
+            break;
+        case 14:
+            result = 0x5E;
+            subresult = 0;
+            break;
+        case 15:
+            result = 0x72;
+            subresult = 0;
+            break;
+        case 16:
+            result = 0x62;
+            subresult = 2;
+            break;
+        case 17:
+            result = 0x62;
+            subresult = 7;
+            break;
+        case 18:
+            result = 0x62;
+            subresult = 1;
+            break;
+        case 19:
+            result = 0x62;
+            subresult = 5;
+            break;
+        case 20:
+            result = 0x62;
+            subresult = 4;
+            break;
+        case 21:
+            result = 0x62;
+            subresult = 3;
+            break;
+        case 22:
+            result = 0x62;
+            subresult = 0;
+            break;
+        case 23:
+            result = 0x62;
+            subresult = 6;
+            break;
+        case 24:
+            result = 0x6A;
+            subresult = 0;
+            break;
+        }
+        break;
+    case 0x400:
+        result = 0x6C;
+        subresult = 0;
+        break;
+    case 0x500:
+        result = 0x70;
+        subresult = 1;
+        break;
+    case 0x600:
+        result = 0x69;
+        subresult = 0;
+        break;
+    }
+    if (arg0 != NULL) {
+        *arg0 = result;
+    }
+    if (arg1 != NULL) {
+        *arg1 = subresult;
+    }
+}
 
 void func_82604628(s16 *arg0, s32 arg1, s32 arg2) {
     s16 result;
