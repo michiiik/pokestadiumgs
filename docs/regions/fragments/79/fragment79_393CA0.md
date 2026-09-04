@@ -64,3 +64,15 @@ func_841351EC (state-field table-copy, D_84195208/D_84195200 record fields into 
 ## 2026-09-02 wave 53 (2026-09-02)
 
 - requeue `func_84126850`: sixteen fresh explicit-width, declaration-order, mask-reuse, and lifetime variants all preserved the exact 80-byte size. Best normalized/raw similarity was 0.9000/0.4500. The first difference is instruction 29: expected `andi a1, a1, 0xffff`, while variants allocate the masked value in `a2` or `a3`. The body shape and size are stable; this is a formal/local register-allocation tie. Next action: seed the permuter from `state-clamp:explicit-s32:old-low-first`, or materially alter the second formal's width/old-value lifetime to make IDO reuse `a1`; do not repeat declaration-order-only variants.
+
+## 2026-09-05
+
+func_84126568: matched (state-field:three-guards:u8-pointer), 3 iterations, agent codex
+
+## 2026-09-05
+
+func_84126064: plateau at 0.9655 (raw 0.5862), mismatch operand_or_scheduling_drift; tried families: state-field; tie-pool no
+
+## 2026-09-05
+
+func_841362E4: time cap at 0.9643 (raw 0.8929) after 2606s, mismatch operand_or_scheduling_drift; tried families: state-field; tie-pool no
