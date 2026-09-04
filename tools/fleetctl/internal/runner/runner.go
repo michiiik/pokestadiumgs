@@ -116,11 +116,32 @@ type FileRank struct {
 }
 
 // TargetOwner is one row of `tools/pragma_targets.py targets`'s
-// "targets" array: an owner ranked smallest-instructions-first.
+// "targets" array: an owner ranked smallest-instructions-first, carrying
+// both a static structural-shape guess and (once any exist) real
+// probe-attempt history -- see control.difficultyTierFor, which combines
+// them into a routing hint.
 type TargetOwner struct {
 	Function         string `json:"function"`
 	Source           string `json:"source"`
 	InstructionCount int    `json:"instructions"`
+	// Family is tools/scan_asm_families.py's classify() shape label (e.g.
+	// "direct_wrapper", "loop_or_state_machine", "unclassified") -- a
+	// static guess at structural difficulty, available even for an owner
+	// that has never been attempted. Empty only if pragma_targets.py's
+	// output is from before this field existed or the owner's .s file was
+	// unreadable when classified.
+	Family string `json:"family"`
+	// Hardness is pragma_targets.py's OwnerHardness.label: one of
+	// fresh/drift/tie/stuck, built from REAL probe-attempt history
+	// (tools/pragma_targets.py:load_owner_hardness) when any exists.
+	// "fresh" is also the default for an owner with too few attempts to
+	// judge -- in that case Family is the only real difficulty evidence.
+	Hardness string `json:"hardness"`
+	// BestSimilarity is the highest similarity_score any recorded attempt
+	// for this owner has reached, or nil if it has never been attempted.
+	BestSimilarity *float64 `json:"best_similarity"`
+	// PriorAttempts is how many probe attempts this owner has on record.
+	PriorAttempts int `json:"prior_attempts"`
 }
 
 // Runner is the interface fleetctl's control loop programs against.
