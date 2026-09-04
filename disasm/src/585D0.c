@@ -619,7 +619,7 @@ extern void func_80054E48(s32);
 extern void func_8005AD58(s32 arg0);
 extern u8 D_80128570[];
 extern s32 D_80128748;
-void func_8005ADD8(s32 arg0) {
+void GbTower_StartPortSession(s32 arg0) {
     u8 flag;
     if (D_80128748 & (1 << arg0)) {
         func_80055948(3);
