@@ -205,3 +205,11 @@ func_8260BBA8: matched (call_sequence:gfx:struct-color:exact-layout), 1 iteratio
 ## 2026-09-04
 
 func_826065B0: time cap at 1.0 (raw 1.0) after 1210s, mismatch section_layout_drift; tried families: dispatcher; tie-pool no
+
+## 2026-09-04
+
+func_8260F084: matched (call_sequence:struct-overlay:internal-state-ptr), 1 iterations, agent gemini
+
+## 2026-09-04
+
+func_82610D14: matched (predicate:indexed_array:inline_item_u8_base), 1 iterations, agent gemini
