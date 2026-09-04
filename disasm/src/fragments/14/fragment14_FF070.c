@@ -466,7 +466,16 @@ s32 func_8130B88C(void *arg0) {
     return 1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130B91C.s")
+extern void func_800226C0(s32);
+void func_8130B91C(void *arg0) {
+    struct S { u8 pad[0xE912]; u8 state; u8 gap[2]; u8 value; };
+    u8 temp_v0 = ((struct S *)arg0)->value;
+    if ((s32)temp_v0 > 0) {
+        ((struct S *)arg0)->value = temp_v0 - 1;
+        ((struct S *)arg0)->state = 5;
+        func_800226C0(1);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130B95C.s")
 
