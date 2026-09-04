@@ -48,3 +48,23 @@ requeue: prepared 8 distinct constant-map candidates in /private/tmp/gs46_func_8
 ## Coordinator pointer-family repair after wave 46 (2026-09-02)
 
 The worker batch was preflight-refused as duplicate history. A new eight-body pointer-construction batch derived from the assembly scored best normalized/raw 0.7174/0.1304, with pointer-register drift; five candidates timed out compiling and no candidate link-verified. The target stores computed addresses, not table values. Requeue with simpler pointer temporaries and an explicit signed loop-bound model.
+
+## 2026-09-05
+
+func_8130C334: time cap at 0.9231 (raw 0.6364) after 2401s, mismatch section_layout_drift; tried families: dispatcher_switch; tie-pool no
+
+## 2026-09-05
+
+func_8130B91C: matched (call_sequence:counter:u8-temp-struct), 1 iterations, agent codex
+
+## 2026-09-05
+
+func_8130B95C: matched (call_sequence:counter:struct-overlay-u8-temp), 1 iterations, agent codex
+
+## 2026-09-05
+
+func_8130B0E0: matched (call_sequence:permuter:exact-pointer-aliases), 3 iterations, agent codex
+
+## 2026-09-05
+
+func_8130A708: matched (call-sequence:permuter:exact-local-shape), 5 iterations, agent codex
