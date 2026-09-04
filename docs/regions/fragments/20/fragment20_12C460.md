@@ -213,3 +213,31 @@ func_8260F084: matched (call_sequence:struct-overlay:internal-state-ptr), 1 iter
 ## 2026-09-04
 
 func_82610D14: matched (predicate:indexed_array:inline_item_u8_base), 1 iterations, agent gemini
+
+## 2026-09-04
+
+func_82613D60: matched (call_sequence:fixed-stride:switch-exact-probe-match), 1 iterations, agent codex
+
+## 2026-09-04
+
+func_82613EA4: matched (call_sequence:stride-switch:shared-pointer-exact), 2 iterations, agent codex
+
+## 2026-09-04
+
+func_82614190: plateau at 0.0 (raw None), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-04
+
+func_82614190: matched (call_sequence:record-scan:permuter-score-zero), 10 iterations, agent codex
+
+## 2026-09-04
+
+func_82614324: plateau at 0.9792 (raw 0.9792), mismatch instruction_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-04
+
+func_82614570: time cap at 0.9792 (raw 0.8958) after 2400s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-04
+
+func_82610D6C: plateau at 0.98 (raw 0.8), mismatch instruction_drift; tried families: call_sequence; tie-pool no
