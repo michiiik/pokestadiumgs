@@ -208,6 +208,47 @@ func (l *Loop) imageRef() string {
 	return "gs-decomp-agent:latest"
 }
 
+// stopSiblingRuns proactively stops every OTHER currently-running run under
+// the exact agent+model that just reported generator_exhausted, instead of
+// leaving them to burn their own remaining budget on calls almost certain
+// to hit the identical, already-confirmed rate limit. Observed live: five
+// concurrent spark containers each independently exhausted within seconds
+// of each other, each paying its own full failure-detection cost, when the
+// first one to fail already told fleetctl everything the rest needed to
+// know. A stopped sibling loses no work -- generator calls are stateless
+// per iteration -- only the wall-clock it would have spent failing; it
+// requeues with --resume against its own out dir, same as a genuine
+// generator_exhausted of its own, and is picked up again once this
+// agent+model's cooldown lifts or sec 12 reassigns it. Runs already past
+// StatusRunning (merging, pr_open, ...) are never touched.
+func (l *Loop) stopSiblingRuns(ctx context.Context, exhausted *fleetstate.RunRecord) {
+	ids := make([]string, 0, len(l.State.Runs))
+	for id := range l.State.Runs {
+		ids = append(ids, id)
+	}
+	sort.Strings(ids)
+	for _, id := range ids {
+		rec := l.State.Runs[id]
+		if rec == exhausted || rec.Status != fleetstate.StatusRunning {
+			continue
+		}
+		if rec.Spec.Agent != exhausted.Spec.Agent || rec.Spec.Model != exhausted.Spec.Model {
+			continue
+		}
+		if err := l.Runner.StopContainer(ctx, rec.ContainerID); err != nil {
+			l.logf("run %s: stop after sibling %s's generator_exhausted failed: %v", rec.Spec.ID, exhausted.Spec.ID, err)
+			continue
+		}
+		rec.Status = fleetstate.StatusRequeued
+		rec.StoppedReason = ""
+		rec.Note = fmt.Sprintf("stopped: sibling run %s just confirmed %s:%s is rate-limited", exhausted.Spec.ID, rec.Spec.Agent, rec.Spec.Model)
+		rec.EndedAt = l.now()
+		l.requeueResume(rec)
+		l.logf("run %s: stopped (sibling %s's generator_exhausted just confirmed %s:%s is rate-limited); requeueing with --resume",
+			rec.Spec.ID, exhausted.Spec.ID, rec.Spec.Agent, rec.Spec.Model)
+	}
+}
+
 // cooldownKey is the fine-grained key State.Cooldowns is written under: the
 // bare agent name (unchanged behaviour) when model is empty -- the
 // permuter lane and any caller that genuinely has no model -- else
@@ -516,6 +557,7 @@ func (l *Loop) handleExit(ctx context.Context, rec *fleetstate.RunRecord) error 
 		l.recordWindowExhausted(rec.Spec.Agent, l.now())
 		l.logf("run %s: agent %s:%s generator_exhausted; cooldown until %s, requeueing with --resume",
 			rec.Spec.ID, rec.Spec.Agent, rec.Spec.Model, until.Format(time.RFC3339))
+		l.stopSiblingRuns(ctx, rec)
 		rec.Status = fleetstate.StatusRequeued
 		rec.Note = "generator_exhausted"
 		l.requeueResume(rec)

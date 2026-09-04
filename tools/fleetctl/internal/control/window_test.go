@@ -308,3 +308,128 @@ func TestExhaustedModelStillBlocksItselfAndOnlyItself(t *testing.T) {
 		t.Fatalf("x-p1 status = %s, want still queued (blocked by its own model's cooldown)", loop.State.Runs["x-p1"].Status)
 	}
 }
+
+// TestGeneratorExhaustionStopsSiblingRunsUnderTheSameAgentModel reproduces
+// the scenario observed live: five concurrent spark containers each
+// independently exhausted within seconds of each other, each paying its
+// own full failure-detection wall-clock cost, when the first failure
+// already told fleetctl everything the rest needed to know. A sibling run
+// under the identical agent+model should be stopped and requeued the
+// moment the first one's generator_exhausted confirms the rate limit,
+// rather than left to fail on its own.
+func TestGeneratorExhaustionStopsSiblingRunsUnderTheSameAgentModel(t *testing.T) {
+	fake := &runner.Fake{InspectResults: map[string][]runner.InspectResult{
+		"exhausted-cid": {{Found: true, Running: false, ExitCode: 3}},
+		// Still genuinely running as far as pollRunning's own exit-check is
+		// concerned -- an id with no InspectResults entry looks "vanished"
+		// to that unrelated path, which would confound this test with the
+		// pre-existing vanish-handling logic instead of isolating
+		// stopSiblingRuns.
+		"sibling-same-cid":        {{Found: true, Running: true}},
+		"sibling-other-model-cid": {{Found: true, Running: true}},
+	}}
+	loop, dir := newTestLoop(t, fake)
+	outDir := filepath.Join(dir, "out")
+	mustWriteFile(t, filepath.Join(outDir, "summary.json"), `{"stopped_reason":"generator_exhausted"}`)
+	loop.CooldownDefaults = map[string]time.Duration{"codex": time.Hour}
+
+	loop.State.Runs["exhausted"] = &fleetstate.RunRecord{
+		Spec: fleetstate.RunSpec{
+			ID: "exhausted", File: "disasm/src/x.c", Owners: []string{"func_1"},
+			Agent: "codex", Model: "gpt-5.3-codex-spark",
+		},
+		Status: fleetstate.StatusRunning, ContainerID: "exhausted-cid", OutDir: outDir,
+	}
+	// Same agent+model, still mid-flight: must be stopped.
+	loop.State.Runs["sibling-same"] = &fleetstate.RunRecord{
+		Spec: fleetstate.RunSpec{
+			ID: "sibling-same", File: "disasm/src/y.c", Owners: []string{"func_2"},
+			Agent: "codex", Model: "gpt-5.3-codex-spark",
+		},
+		Status: fleetstate.StatusRunning, ContainerID: "sibling-same-cid",
+	}
+	// Same agent, DIFFERENT model: must be left alone (that is luna/spark's
+	// whole point -- separate quota pools).
+	loop.State.Runs["sibling-other-model"] = &fleetstate.RunRecord{
+		Spec: fleetstate.RunSpec{
+			ID: "sibling-other-model", File: "disasm/src/z.c", Owners: []string{"func_3"},
+			Agent: "codex", Model: "gpt-5.6-luna",
+		},
+		Status: fleetstate.StatusRunning, ContainerID: "sibling-other-model-cid",
+	}
+	// Same agent+model, but already past StatusRunning: must be left alone.
+	loop.State.Runs["sibling-merging"] = &fleetstate.RunRecord{
+		Spec: fleetstate.RunSpec{
+			ID: "sibling-merging", File: "disasm/src/w.c", Owners: []string{"func_4"},
+			Agent: "codex", Model: "gpt-5.3-codex-spark",
+		},
+		Status: fleetstate.StatusMerging, ContainerID: "sibling-merging-cid",
+	}
+
+	if _, err := loop.RunOnce(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+
+	same := loop.State.Runs["sibling-same"]
+	if same.Status != fleetstate.StatusRequeued {
+		t.Fatalf("sibling-same status = %s, want requeued", same.Status)
+	}
+	if same.Spec.Attempt != 1 {
+		t.Fatalf("sibling-same attempt = %d, want 1 (requeueResume must have run)", same.Spec.Attempt)
+	}
+	if same.Note == "" {
+		t.Fatal("sibling-same must record why it was stopped")
+	}
+	stopCall := findCall(fake, "StopContainer")
+	if stopCall == nil || stopCall.Strings[0] != "sibling-same-cid" {
+		t.Fatalf("StopContainer call = %+v, want sibling-same-cid", stopCall)
+	}
+	// Exactly one StopContainer call: the other-model and merging siblings
+	// must not have been touched.
+	n := 0
+	for _, c := range fake.Calls {
+		if c.Method == "StopContainer" {
+			n++
+		}
+	}
+	if n != 1 {
+		t.Fatalf("StopContainer called %d times, want exactly 1", n)
+	}
+
+	other := loop.State.Runs["sibling-other-model"]
+	if other.Status != fleetstate.StatusRunning {
+		t.Fatalf("sibling-other-model status = %s, want still running (separate quota pool)", other.Status)
+	}
+	merging := loop.State.Runs["sibling-merging"]
+	if merging.Status != fleetstate.StatusMerging {
+		t.Fatalf("sibling-merging status = %s, want untouched", merging.Status)
+	}
+}
+
+// TestGeneratorExhaustionWithNoSiblingsIsANoOp guards against a panic or
+// spurious StopContainer call when the exhausted run has no siblings at
+// all -- the common case.
+func TestGeneratorExhaustionWithNoSiblingsIsANoOp(t *testing.T) {
+	fake := &runner.Fake{InspectResults: map[string][]runner.InspectResult{
+		"cid": {{Found: true, Running: false, ExitCode: 3}},
+	}}
+	loop, dir := newTestLoop(t, fake)
+	outDir := filepath.Join(dir, "out")
+	mustWriteFile(t, filepath.Join(outDir, "summary.json"), `{"stopped_reason":"generator_exhausted"}`)
+	loop.CooldownDefaults = map[string]time.Duration{"codex": time.Hour}
+
+	loop.State.Runs["solo"] = &fleetstate.RunRecord{
+		Spec: fleetstate.RunSpec{
+			ID: "solo", File: "disasm/src/x.c", Owners: []string{"func_1"},
+			Agent: "codex", Model: "gpt-5.3-codex-spark",
+		},
+		Status: fleetstate.StatusRunning, ContainerID: "cid", OutDir: outDir,
+	}
+
+	if _, err := loop.RunOnce(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if findCall(fake, "StopContainer") != nil {
+		t.Fatal("no sibling exists; StopContainer must not be called")
+	}
+}
