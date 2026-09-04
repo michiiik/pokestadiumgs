@@ -1703,6 +1703,7 @@ SECTIONS
         build/src/fragments/20/fragment20_128B10.o(.rodata);
         build/src/fragments/20/fragment20_12BB60.o(.rodata);
         build/src/fragments/20/fragment20_12C460.o(.rodata);
+        build/asm/us/data/13DB50.rodata.o(.rodata);
         fragment20_RODATA_END = .;
         fragment20_RODATA_SIZE = ABSOLUTE(fragment20_RODATA_END - fragment20_RODATA_START);
     }
