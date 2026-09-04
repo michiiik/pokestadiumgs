@@ -1072,7 +1072,41 @@ void func_82613E20(void *arg0) {
     } while (var_s1 != 0x33E0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82613EA4.s")
+extern void func_8260BE24(u8 *arg0, s32 arg1);
+void func_82613EA4(void *arg0) {
+    s32 temp_a1;
+    s32 var_s2;
+    s32 var_s1;
+    s16 temp_v0;
+    u8 *temp_a0;
+    u8 *var_s0;
+
+    var_s1 = 1;
+    var_s0 = arg0;
+    var_s2 = 0;
+    do {
+        temp_v0 = *(s16 *)(var_s0 + 0x114);
+        temp_a0 = var_s0 + 0x114;
+        switch (temp_v0) {
+        case 8:
+            temp_a1 = var_s1;
+            if (*(s16 *)(temp_a0 + 6) != 0) {
+                var_s1 = 0;
+                func_8260BD50(temp_a0, temp_a1);
+            }
+            break;
+        case 0xB:
+            temp_a1 = var_s1;
+            if (*(s16 *)(temp_a0 + 6) != 0) {
+                var_s1 = 0;
+                func_8260BE24(temp_a0, temp_a1);
+            }
+            break;
+        }
+        var_s2 += 0x298;
+        var_s0 += 0x298;
+    } while (var_s2 != 0x33E0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82613F64.s")
 
