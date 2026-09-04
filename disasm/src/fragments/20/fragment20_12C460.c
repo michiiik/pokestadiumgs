@@ -1043,7 +1043,73 @@ void func_82611184(u8 *arg0)
   }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_826112CC.s")
+extern s32 D_826153C4;
+extern void *D_80087200;
+extern void func_826078B4(void *);
+extern void func_800226C0(s32);
+extern void * func_82604C40(s32 arg0, s32 arg1, void *arg2, s32 arg3);
+extern void func_82606784(u8*a0,s32 a1,s32 a2,s32 a3);
+void func_826112CC(u8 *arg0) {
+    s32 pad;
+    u8 *sp28;
+    s16 temp_t1;
+    s32 var_s0;
+    u8 *temp_s1;
+    u8 *temp_v0;
+    u8 *var_s1;
+    u8 *var_t0;
+    u8 *var_v1;
+
+    temp_s1 = arg0 + 0x114;
+    sp28 = func_82604C40(5, 0, temp_s1, 0x14);
+    var_t0 = NULL;
+    var_v1 = NULL;
+    var_s0 = 0;
+    if (*(s16 *)(arg0 + 0x12) > 0) {
+        do {
+            temp_v0 = func_82604C40(1, var_s0, temp_s1, 0x14);
+            var_t0 = temp_v0;
+            var_v1 = temp_v0 + 0x30;
+            if (*(s16 *)(temp_v0 + 0x32) != -1) {
+                break;
+            }
+            var_s0++;
+        } while (var_s0 < *(s16 *)(arg0 + 0x12));
+    }
+    switch (*(s16 *)(sp28 + 6)) {
+    case 0:
+        if (*(s16 *)(var_v1 + 2) != -1 && *(s16 *)(var_t0 + 6) == 2) {
+            func_82606784(sp28,
+                          (*(s16 *)(var_v1 + 2) * 0x86) + *(s16 *)(var_t0 + 0x14) + 0xB,
+                          ((*(s16 *)(var_t0 + 0x24) - *(s16 *)(sp28 + 0x24)) / 2) + *(s16 *)(var_t0 + 0x14),
+                          *(s16 *)(var_t0 + 0x26) + *(s16 *)(var_t0 + 0x16));
+        }
+        break;
+    case 2:
+        *(s16 *)(arg0 + 6) += 1;
+        if ((*(s16 *)(arg0 + 6) >= D_826153C4) || (*(u16 *)((u8 *)D_80087200 + 8) & 0x8000)) {
+            *(s16 *)(arg0 + 0x18) = 0;
+            *(s16 *)(arg0 + 2) = 5;
+            *(s16 *)(arg0 + 6) = 0;
+            *(s16 *)(arg0 + 8) = 0;
+            *(u8 **)(arg0 + 0x34F4 + (*(s16 *)(arg0 + 0x18)) * 4) = var_t0;
+            *(s16 *)(arg0 + 0x18) += 1;
+            *(u8 **)(arg0 + 0x34F4 + (*(s16 *)(arg0 + 0x18)) * 4) = sp28;
+            *(s16 *)(arg0 + 0x18) += 1;
+            var_s0 = 0;
+            var_s1 = arg0;
+            if (*(s16 *)(arg0 + 0x18) > 0) {
+                do {
+                    func_826078B4(*(void **)(var_s1 + 0x34F4));
+                    var_s0++;
+                    var_s1 += 4;
+                } while (var_s0 < *(s16 *)(arg0 + 0x18));
+            }
+            func_800226C0(0x69);
+        }
+        break;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_826114DC.s")
 
