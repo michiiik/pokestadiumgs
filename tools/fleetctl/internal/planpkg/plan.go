@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
@@ -55,15 +56,6 @@ type Options struct {
 	// included) passes it through explicitly -- see ExecRunner.RankFiles.
 	MaxInstructions    int
 	ExcludeRecentHours float64
-
-	// MaxDifficulty, when set, drops any owner whose difficulty.TierFor
-	// ranks above it before partitioning a file's owners into runs (e.g.
-	// Easy: only the most templatable shapes are ever queued). Empty (the
-	// zero value) means no filtering at all -- every owner Targets returns
-	// is queued, exactly as before this field existed. A file left with
-	// zero owners after filtering is skipped for this build, same as a
-	// file Targets itself returned nothing for.
-	MaxDifficulty difficulty.Tier
 }
 
 // Plan is the JSON document `fleetctl plan` writes and `fleetctl run` reads.
@@ -90,14 +82,9 @@ type Plan struct {
 	AgentConcurrency   map[string]int    `json:"agent_concurrency,omitempty"`
 	// Windows/WindowBudget mirror Options.Windows/WindowBudget, durations
 	// rendered as strings the same way Cooldowns is (sec 11/12).
-	Windows      map[string]string `json:"windows,omitempty"`
-	WindowBudget map[string]int    `json:"window_budget,omitempty"`
-	// MaxDifficulty mirrors Options.MaxDifficulty -- persisted so a
-	// control.Loop.Replan rebuild (which reruns Build via ToOptions, not a
-	// fresh `fleetctl plan` invocation) keeps honoring whatever ceiling
-	// the plan was originally built with.
-	MaxDifficulty difficulty.Tier      `json:"max_difficulty,omitempty"`
-	Queue         []fleetstate.RunSpec `json:"queue"`
+	Windows      map[string]string    `json:"windows,omitempty"`
+	WindowBudget map[string]int       `json:"window_budget,omitempty"`
+	Queue        []fleetstate.RunSpec `json:"queue"`
 }
 
 // ToOptions reconstructs the Options a Plan was Build-ed with, so it can be
@@ -133,7 +120,6 @@ func (p *Plan) ToOptions() (Options, error) {
 		ExcludeRecentHours: p.ExcludeRecentHours,
 		Windows:            windows,
 		WindowBudget:       p.WindowBudget,
-		MaxDifficulty:      p.MaxDifficulty,
 	}, nil
 }
 
@@ -188,18 +174,23 @@ func Build(ctx context.Context, r runner.Runner, opts Options) (*Plan, error) {
 		if err != nil {
 			return nil, fmt.Errorf("plan: targets --source %s: %w", file, err)
 		}
-		if opts.MaxDifficulty != "" {
-			allowed := make([]runner.TargetOwner, 0, len(owners))
-			for _, o := range owners {
-				if difficulty.Allowed(o, opts.MaxDifficulty) {
-					allowed = append(allowed, o)
-				}
-			}
-			owners = allowed
-		}
 		if len(owners) == 0 {
 			continue
 		}
+		// Easiest-first within this file, on top of (not instead of)
+		// targets's own smallest-instructions-first ranking -- a stable
+		// sort keeps that relative order inside each tier. This never
+		// drops an owner, just resequences it: a file's medium/hard
+		// owners still get queued eventually (later partitions), so a
+		// tier that happens to be scarce or empty in a given file (e.g.
+		// classify()'s Easy wrapper shapes are largely already claimed
+		// across this codebase's remaining backlog) never starves the
+		// fleet the way an exclude-above-a-ceiling filter would -- see
+		// internal/difficulty's package doc for why that was tried first
+		// and reverted.
+		sort.SliceStable(owners, func(i, j int) bool {
+			return difficulty.Rank(difficulty.TierFor(owners[i])) < difficulty.Rank(difficulty.TierFor(owners[j]))
+		})
 		names := make([]string, len(owners))
 		for i, o := range owners {
 			names[i] = o.Function
@@ -247,7 +238,6 @@ func Build(ctx context.Context, r runner.Runner, opts Options) (*Plan, error) {
 		AgentConcurrency:   opts.AgentConcurrency,
 		Windows:            windows,
 		WindowBudget:       opts.WindowBudget,
-		MaxDifficulty:      opts.MaxDifficulty,
 		Queue:              queue,
 	}, nil
 }

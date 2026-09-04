@@ -1,6 +1,7 @@
 package difficulty
 
 import (
+	"sort"
 	"testing"
 
 	"fleetctl/internal/runner"
@@ -91,55 +92,43 @@ func TestTierFor(t *testing.T) {
 	}
 }
 
-func TestAllowed(t *testing.T) {
-	easyOwner := runner.TargetOwner{Family: "direct_wrapper", Hardness: "fresh"}
-	mediumOwner := runner.TargetOwner{Family: "jump_table_map", Hardness: "fresh"}
-	hardOwner := runner.TargetOwner{Family: "unclassified", Hardness: "fresh"}
-
-	cases := []struct {
-		name  string
-		owner runner.TargetOwner
-		max   Tier
-		want  bool
-	}{
-		{"no ceiling allows easy", easyOwner, "", true},
-		{"no ceiling allows medium", mediumOwner, "", true},
-		{"no ceiling allows hard", hardOwner, "", true},
-
-		{"easy ceiling allows an easy owner", easyOwner, Easy, true},
-		{"easy ceiling rejects a medium owner", mediumOwner, Easy, false},
-		{"easy ceiling rejects a hard owner", hardOwner, Easy, false},
-
-		{"medium ceiling allows an easy owner", easyOwner, Medium, true},
-		{"medium ceiling allows a medium owner", mediumOwner, Medium, true},
-		{"medium ceiling rejects a hard owner", hardOwner, Medium, false},
-
-		{"hard ceiling allows everything", easyOwner, Hard, true},
-		{"hard ceiling allows a hard owner", hardOwner, Hard, true},
+func TestRank(t *testing.T) {
+	if !(Rank(Easy) < Rank(Medium)) {
+		t.Fatalf("Rank(Easy)=%d must be < Rank(Medium)=%d", Rank(Easy), Rank(Medium))
 	}
-	for _, c := range cases {
-		t.Run(c.name, func(t *testing.T) {
-			got := Allowed(c.owner, c.max)
-			if got != c.want {
-				t.Fatalf("Allowed(%+v, %q) = %v, want %v", c.owner, c.max, got, c.want)
-			}
-		})
+	if !(Rank(Medium) < Rank(Hard)) {
+		t.Fatalf("Rank(Medium)=%d must be < Rank(Hard)=%d", Rank(Medium), Rank(Hard))
 	}
 }
 
-func TestParseTier(t *testing.T) {
-	for _, s := range []string{"easy", "medium", "hard"} {
-		got, err := ParseTier(s)
-		if err != nil {
-			t.Fatalf("ParseTier(%q) = %v, want no error", s, err)
-		}
-		if string(got) != s {
-			t.Fatalf("ParseTier(%q) = %q", s, got)
-		}
+// TestRankSortsOwnersEasiestFirst exercises Rank the way a real caller
+// does -- sort.SliceStable, the exact pattern documented on Rank -- and
+// confirms it's stable: two owners in the same tier keep their original
+// relative order (mirroring `targets`'s own smallest-instructions-first
+// ranking, which callers sort by tier on top of, not instead of).
+func TestRankSortsOwnersEasiestFirst(t *testing.T) {
+	owners := []runner.TargetOwner{
+		{Function: "hard_1", Family: "unclassified", Hardness: "fresh"},
+		{Function: "medium_1", Family: "jump_table_map", Hardness: "fresh"},
+		{Function: "easy_1", Family: "direct_wrapper", Hardness: "fresh"},
+		{Function: "medium_2", Family: "constant_map", Hardness: "fresh"},
+		{Function: "easy_2", Family: "multi_call_wrapper", Hardness: "fresh"},
+		{Function: "hard_2", Family: "large_mixed", Hardness: "fresh"},
 	}
-	for _, s := range []string{"", "EASY", "trivial", "impossible"} {
-		if _, err := ParseTier(s); err == nil {
-			t.Fatalf("ParseTier(%q) = nil error, want an error", s)
+	sort.SliceStable(owners, func(i, j int) bool {
+		return Rank(TierFor(owners[i])) < Rank(TierFor(owners[j]))
+	})
+	var got []string
+	for _, o := range owners {
+		got = append(got, o.Function)
+	}
+	want := []string{"easy_1", "easy_2", "medium_1", "medium_2", "hard_1", "hard_2"}
+	if len(got) != len(want) {
+		t.Fatalf("got %v, want %v", got, want)
+	}
+	for i := range want {
+		if got[i] != want[i] {
+			t.Fatalf("order = %v, want %v", got, want)
 		}
 	}
 }

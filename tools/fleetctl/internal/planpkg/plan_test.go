@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"fleetctl/internal/agentspec"
-	"fleetctl/internal/difficulty"
 	"fleetctl/internal/runner"
 )
 
@@ -107,69 +106,45 @@ func TestBuildExplicitFileList(t *testing.T) {
 	}
 }
 
-// TestBuildFiltersOwnersByMaxDifficulty exercises the actual "let agents
-// only work the easy targets for now" use case end to end: a file mixing
-// easy/medium/hard owners only contributes its easy ones to the queue
-// when MaxDifficulty is set, and a file with no easy owners at all is
-// skipped entirely -- same as a file Targets returns nothing for.
-func TestBuildFiltersOwnersByMaxDifficulty(t *testing.T) {
+// TestBuildOrdersOwnersEasiestFirstWithinAFile is the actual "let agents
+// work the easy targets first, graduate to harder ones once those run
+// out" use case end to end: a file mixing easy/medium/hard owners queues
+// ALL of them (nothing is ever dropped -- see internal/difficulty's
+// package doc for why a hard --max-difficulty ceiling was tried first and
+// reverted, live, when it left the fleet with nothing to do the moment
+// one ranked file's easy owners ran out), but easy owners fill the
+// earlier partitions and hard owners the later ones, so they're worked
+// first without needing every medium/hard owner cleared out first.
+func TestBuildOrdersOwnersEasiestFirstWithinAFile(t *testing.T) {
 	fake := &runner.Fake{
 		TargetsResult: map[string][]runner.TargetOwner{
 			"disasm/src/mixed.c": {
-				{Function: "mixed_easy", Source: "disasm/src/mixed.c", Family: "direct_wrapper", Hardness: "fresh"},
 				{Function: "mixed_hard", Source: "disasm/src/mixed.c", Family: "unclassified", Hardness: "fresh"},
+				{Function: "mixed_easy", Source: "disasm/src/mixed.c", Family: "direct_wrapper", Hardness: "fresh"},
 				{Function: "mixed_stuck", Source: "disasm/src/mixed.c", Family: "direct_wrapper", Hardness: "stuck"},
-			},
-			"disasm/src/allhard.c": {
-				{Function: "allhard_1", Source: "disasm/src/allhard.c", Family: "loop_or_state_machine", Hardness: "fresh"},
+				{Function: "mixed_medium", Source: "disasm/src/mixed.c", Family: "jump_table_map", Hardness: "fresh"},
 			},
 		},
 	}
 	plan, err := Build(context.Background(), fake, Options{
-		Repo: "/repo", FileList: []string{"disasm/src/mixed.c", "disasm/src/allhard.c"},
-		Agents:        []agentspec.Spec{{Agent: "claude", Model: "haiku"}},
-		MaxDifficulty: difficulty.Easy,
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	// allhard.c contributes nothing -- its one owner is Hard, filtered out,
-	// leaving it with zero owners, same as an empty Targets result.
-	if len(plan.Queue) != 1 {
-		t.Fatalf("len(Queue) = %d, want 1 (only mixed.c's easy owner)", len(plan.Queue))
-	}
-	if len(plan.Queue[0].Owners) != 1 || plan.Queue[0].Owners[0] != "mixed_easy" {
-		t.Fatalf("Queue[0].Owners = %v, want exactly [mixed_easy]", plan.Queue[0].Owners)
-	}
-	if plan.MaxDifficulty != difficulty.Easy {
-		t.Fatalf("plan.MaxDifficulty = %q, want %q", plan.MaxDifficulty, difficulty.Easy)
-	}
-}
-
-// TestBuildWithoutMaxDifficultyQueuesEverything is an explicit regression
-// guard: the zero-value MaxDifficulty ("") must keep queueing every owner
-// Targets returns, unfiltered -- the exact pre-existing behavior every
-// other test in this file (which never sets MaxDifficulty at all) already
-// relies on implicitly.
-func TestBuildWithoutMaxDifficultyQueuesEverything(t *testing.T) {
-	fake := &runner.Fake{
-		TargetsResult: map[string][]runner.TargetOwner{
-			"disasm/src/mixed.c": {
-				{Function: "a", Source: "disasm/src/mixed.c", Family: "direct_wrapper", Hardness: "fresh"},
-				{Function: "b", Source: "disasm/src/mixed.c", Family: "unclassified", Hardness: "fresh"},
-				{Function: "c", Source: "disasm/src/mixed.c", Family: "unclassified", Hardness: "stuck"},
-			},
-		},
-	}
-	plan, err := Build(context.Background(), fake, Options{
-		Repo: "/repo", FileList: []string{"disasm/src/mixed.c"},
+		Repo: "/repo", FileList: []string{"disasm/src/mixed.c"}, OwnersPerRun: 2,
 		Agents: []agentspec.Spec{{Agent: "claude", Model: "haiku"}},
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(plan.Queue) != 1 || len(plan.Queue[0].Owners) != 3 {
-		t.Fatalf("Queue = %+v, want all 3 owners in one partition", plan.Queue)
+	// All 4 owners are still queued -- ordering resequences, never drops.
+	if len(plan.Queue) != 2 || len(plan.Queue[0].Owners)+len(plan.Queue[1].Owners) != 4 {
+		t.Fatalf("Queue = %+v, want all 4 owners across 2 partitions of 2", plan.Queue)
+	}
+	// mixed_easy (Easy) sorts before mixed_medium (Medium), which sorts
+	// before both mixed_hard and mixed_stuck (Hard, Hardness=fresh vs
+	// stuck doesn't change their relative order -- both rank Hard).
+	if plan.Queue[0].Owners[0] != "mixed_easy" {
+		t.Fatalf("Queue[0].Owners = %v, want mixed_easy first", plan.Queue[0].Owners)
+	}
+	if plan.Queue[0].Owners[1] != "mixed_medium" {
+		t.Fatalf("Queue[0].Owners = %v, want mixed_medium second", plan.Queue[0].Owners)
 	}
 }
 
@@ -210,7 +185,6 @@ func TestSaveLoad(t *testing.T) {
 		Agents:           []agentspec.Spec{{Agent: "kimi", Model: "kimi-code/k3", Effort: "high"}},
 		Cooldowns:        cooldowns,
 		AgentConcurrency: concurrency,
-		MaxDifficulty:    difficulty.Easy,
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -234,20 +208,6 @@ func TestSaveLoad(t *testing.T) {
 	}
 	if loaded.Slots != 4 {
 		t.Fatalf("round trip slots: %d", loaded.Slots)
-	}
-	if loaded.MaxDifficulty != difficulty.Easy {
-		t.Fatalf("round trip max difficulty: %q, want %q", loaded.MaxDifficulty, difficulty.Easy)
-	}
-	// ToOptions must carry MaxDifficulty back out too -- this is the exact
-	// path control.Loop.Replan uses to rebuild Options from a persisted
-	// plan (not a fresh CLI invocation), so a replan after a restart keeps
-	// honoring the original ceiling without needing --max-difficulty again.
-	opts, err := loaded.ToOptions()
-	if err != nil {
-		t.Fatal(err)
-	}
-	if opts.MaxDifficulty != difficulty.Easy {
-		t.Fatalf("ToOptions().MaxDifficulty = %q, want %q", opts.MaxDifficulty, difficulty.Easy)
 	}
 }
 
