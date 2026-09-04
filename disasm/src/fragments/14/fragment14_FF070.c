@@ -284,7 +284,21 @@ void func_8130A5D0(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130A5E4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130A708.s")
+s32 func_8130A708(u8 *arg0) {
+  u8 *new_var;
+  int new_var2;
+  u8 *state = arg0 + 0x137F5;
+  int new_var3;
+  new_var3 = 0x137FA;
+  new_var = state;
+  if ((*new_var) == 4) {
+    func_8130A5E4();
+    arg0[new_var3] = 3;
+    new_var2 = 1;
+    return new_var2;
+  }
+  return 0;
+}
 
 s32 func_8130A760(const u8 *arg0) {
     return ((arg0[0x137F5] ^ 2) == 0);
