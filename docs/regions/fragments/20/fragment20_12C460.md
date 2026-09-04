@@ -241,3 +241,35 @@ func_82614570: time cap at 0.9792 (raw 0.8958) after 2400s, mismatch operand_or_
 ## 2026-09-04
 
 func_82610D6C: plateau at 0.98 (raw 0.8), mismatch instruction_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-05
+
+func_82604390: plateau at 0.0 (raw None), mismatch unknown; tried families: (none); tie-pool no
+
+## 2026-09-05
+
+func_82604390: plateau at 0.0 (raw None), mismatch immediate_drift; tried families: call_sequence; tie-pool yes
+
+## 2026-09-05
+
+func_826043F8: matched (jump_table_map:switch:idiomatic-result-subresult), 7 iterations, agent gemini
+
+## 2026-09-05
+
+func_82604814: matched (call_chain:arg1-reuse:goto-block-chain-addone), 1 iterations, agent gemini
+
+## 2026-09-05
+
+func_82604390: time cap at 0.9231 (raw 0.8462) after 2400s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool yes
+
+## 2026-09-05
+
+func_826049A0: time cap at 0.0 (raw None) after 31638s, mismatch unknown; tried families: dispatcher_switch; tie-pool no
+
+## 2026-09-05
+
+func_82604C08: matched (constant-map:scan:permuter-exact-new-var), 3 iterations, agent codex
+
+## 2026-09-05
+
+func_82604C98: time cap at 0.9545 (raw 0.5909) after 2532s, mismatch operand_or_scheduling_drift; tried families: constant-map; tie-pool no
