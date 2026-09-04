@@ -517,7 +517,27 @@ void func_82607E40(u8 *arg0, u8 *arg1, u8 *arg2, u8 *arg3, s32 arg4) {
     arg1[2] = (((arg3[2] - D_8261562E) * arg4) / 255) + D_8261562E;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82608054.s")
+extern u8 D_82615630;
+extern u8 D_82615631;
+extern u8 D_82615632;
+extern u8 D_82615634;
+extern u8 D_82615635;
+extern u8 D_82615636;
+extern u8 D_82615638;
+extern u8 D_82615639;
+extern u8 D_8261563A;
+extern u8 D_8261563C;
+extern u8 D_8261563D;
+extern u8 D_8261563E;
+void func_82608054(u8 *arg0, u8 *arg1, s32 arg2) {
+    arg0[0] = (((D_82615638 - D_82615630) * arg2) / 255) + D_82615630;
+    arg0[1] = (((D_82615639 - D_82615631) * arg2) / 255) + D_82615631;
+    arg0[2] = (((D_8261563A - D_82615632) * arg2) / 255) + D_82615632;
+    arg1[0] = (((D_8261563C - D_82615634) * arg2) / 255) + D_82615634;
+    if (0) { }
+    arg1[1] = (((D_8261563D - D_82615635) * arg2) / 255) + D_82615635;
+    arg1[2] = (((D_8261563E - D_82615636) * arg2) / 255) + D_82615636;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82608270.s")
 
