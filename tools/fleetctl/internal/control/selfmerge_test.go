@@ -3,6 +3,7 @@ package control
 import (
 	"context"
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -382,6 +383,61 @@ func TestPRConflictReplayEndsRunDoneWhenNothingIsLeftToMerge(t *testing.T) {
 	}
 	if findCall(fake, "GhPRCreate") != nil {
 		t.Fatal("must not open a PR when nothing matched the replay")
+	}
+}
+
+// TestPRConflictReplayDiscardsStaleMergeReportBeforeRegating reproduces the
+// live incident: round N's own out_dir/merge-report.json genuinely marks
+// owners "accepted" because round N really did commit them -- to the
+// branch just closed above. Left in place, container_merge.py's
+// idempotency check reads that stale entry as proof the owner already
+// landed on the integration branch and silently skips re-committing it, so
+// the replay's re-gate never actually re-gates anything and no fresh PR is
+// opened -- exactly what happened live to three closed PRs (five accepted
+// functions) before this fix. The report must be gone by the time Merge
+// runs.
+func TestPRConflictReplayDiscardsStaleMergeReportBeforeRegating(t *testing.T) {
+	fake := &runner.Fake{
+		GhPRChecksResult: runner.PRChecksResult{State: "SUCCESS"},
+		GhPRStateResult:  runner.PRStateResult{State: "OPEN", Mergeable: "CONFLICTING"},
+		GhPRURL:          "https://github.com/o/r/pull/99",
+	}
+	loop, dir := newTestLoop(t, fake)
+
+	outDir := filepath.Join(dir, "out")
+	rec := prOpenRec("x-p0", "https://github.com/o/r/pull/54", 54)
+	rec.Branch = "container/x-p0"
+	rec.OutDir = outDir
+	loop.State.Runs["x-p0"] = rec
+
+	// Round 1's report: func_1 was genuinely committed to the just-closed
+	// branch.
+	mustWriteFile(t, filepath.Join(outDir, "merge-report.json"),
+		`{"owners":{"func_1":"accepted"}}`)
+
+	sawStaleReport := false
+	fake.MergeFunc = func(spec runner.MergeSpec) (runner.ProcessResult, error) {
+		if _, err := os.Stat(filepath.Join(spec.OutDir, "merge-report.json")); err == nil {
+			sawStaleReport = true
+		}
+		// The real re-gate, run without the stale report, would find
+		// func_1 genuinely still missing and re-commit it.
+		mustWriteFile(t, filepath.Join(spec.OutDir, "merge-report.json"),
+			`{"owners":{"func_1":"accepted"}}`)
+		return runner.ProcessResult{}, nil
+	}
+
+	if err := loop.pollPRs(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if sawStaleReport {
+		t.Fatal("merge-report.json from the closed round must be gone before the replay's re-gate runs")
+	}
+	if rec.Status != fleetstate.StatusPROpen {
+		t.Fatalf("status = %s, want pr_open (the replay's re-gate found real work and opened a fresh PR)", rec.Status)
+	}
+	if rec.PRNumber != 99 {
+		t.Fatalf("PRNumber = %d, want 99 (a fresh PR, not skipped as already_landed)", rec.PRNumber)
 	}
 }
 
