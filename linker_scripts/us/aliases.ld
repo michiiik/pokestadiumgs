@@ -11,3 +11,4 @@ Audio_ThreadEntry = func_80035174;
 Audio_RequestEvent = func_800355E4;
 func_8005805C = GbSave_IdentifyFormat;
 func_8005A228 = GbTower_PollPortState;
+func_8005ADD8 = GbTower_StartPortSession;

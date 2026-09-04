@@ -342,6 +342,7 @@
     - [0xA5130, .rodata, 4EE50] # jtbl_800A4530
     - [0xA51B0, .rodata, 517E0] # jtbl_800A45B0 (+2 more)
     - [0xA55B0, rodata]
+    - [0xA5610, .rodata, 585D0] # jtbl_800A4AB4 (+44 more)
     - [0xA5BF0, .rodata, 615D0] # jtbl_800A4FF0 (+2 more)
     - [0xA5C80, rodata]
     - [0xA5EA0, rodata] # 654A0 jtbl_800A52A0 (+2 more): mixed 4/8 late_rodata alignment skews asm-processor text by +4; keep in the blob
@@ -650,6 +651,8 @@
     - [0x12BB60, c,       fragments/20/fragment20_12BB60]
     - [0x12C460, c,       fragments/20/fragment20_12C460]
     - [0x13D3F0, data,    fragments/20/fragment20_data]
+    - [0x13D8B0, .rodata, fragments/20/fragment20_12C460] # jtbl_826157E0 (+2 more)
+    - [0x13DB50, rodata]
 
   - name: fragment21
     type: code
