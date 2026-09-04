@@ -3406,7 +3406,10 @@ void GraphNode_RemoveChild(GraphNode38FD4 *root, GraphNodeLink *node) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80039070.s")
+extern Gfx *Gfx_AllocDisplayList(s32);
+extern void func_80036F0C(void *);
+extern u8 D_80124F68;
+void func_80039070(s32 arg0) { *(s32 *)((u8 *)&D_80124F68 + 0x10A0) = 0; *((u8 *)&D_80124F68 + 0x1080) = 0; MtxF_Identity((f32 *)&D_80124F68); if (arg0 == 0) { *(s32 *)((u8 *)&D_80124F68 + 0x1000) = (s32)Gfx_AllocDisplayList(0x40); } else { *(s32 *)((u8 *)&D_80124F68 + 0x1000) = arg0; } func_80036F0C((void *)*(s32 *)((u8 *)&D_80124F68 + 0x1000)); }
 #endif
 
 #ifdef VERSION_US
