@@ -81,3 +81,19 @@ Owner func_8AE00CC8 (call_sequence), prior_attempts=4, best normalized=0.9612. E
 ## Coordinator replay after wave 45 (2026-09-02)
 
 Direct replay of /private/tmp/gs45_func_8AE00CC8.json reached the runner, but all eight candidates compile_failed before scoring because the batch duplicated existing declarations and used invalid struct member typing for D_8AE084BC. Tooling is healthy; requeue after correcting the batch declarations and pointer overlay.
+
+## 2026-09-05
+
+func_8AE01334: matched (scan:volatile-key:struct-copy-inline), 1 iterations, agent codex
+
+## 2026-09-05
+
+func_8AE002AC: matched (callseq:guard:packed-outs), 1 iterations, agent codex
+
+## 2026-09-05
+
+func_8AE00314: plateau at 0.0 (raw None), mismatch unknown; tried families: callseq; tie-pool no
+
+## 2026-09-05
+
+func_8AE01738: time cap at 0.8929 (raw 0.6786) after 2400s, mismatch operand_or_scheduling_drift; tried families: callseq; tie-pool no
