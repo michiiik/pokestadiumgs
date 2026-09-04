@@ -162,6 +162,80 @@ func TestEnqueuePermuterLaneSkipsWhenAlreadyInFlight(t *testing.T) {
 	}
 }
 
+// TestEnqueuePermuterLaneSkipsOwnersAlreadyClaimedByAnOrdinaryRun
+// reproduces the real gap this closes: func_1 sits in the tie-pool store
+// (from an earlier plateau) but an ORDINARY, non-permuter run already has
+// a live, kept-across-replan claim on it right now (the same owner's own
+// unmatched-owner reseed, in practice) -- the permuter lane must not also
+// launch a container onto it. func_2, with no such claim, must still go
+// out normally.
+func TestEnqueuePermuterLaneSkipsOwnersAlreadyClaimedByAnOrdinaryRun(t *testing.T) {
+	fake := &runner.Fake{}
+	loop, dir := newTestLoop(t, fake)
+	loop.RunsDir = dir
+
+	mustWriteFile(t, tiePoolStorePath(dir, "disasm/src/x.c"), `{
+		"func_1": {"source": "disasm/src/x.c", "body": "b1"},
+		"func_2": {"source": "disasm/src/x.c", "body": "b2"}
+	}`)
+	// An ordinary (non-permuter) reseed of func_1, kept across a replan
+	// because it carries SeedDirs -- exactly how runMerge's own
+	// unmatched-owner requeue looks.
+	loop.State.Runs["x-p0-r1"] = &fleetstate.RunRecord{
+		Spec: fleetstate.RunSpec{
+			ID: "x-p0-r1", File: "disasm/src/x.c", Owners: []string{"func_1"},
+			Agent: "codex", Model: "m", SeedDirs: []string{"/out/seeds/x-p0"},
+		},
+		Status: fleetstate.StatusQueued,
+	}
+	loop.State.Queue = []string{"x-p0-r1"}
+
+	loop.enqueuePermuterLane()
+
+	var permuterRec *fleetstate.RunRecord
+	for _, rec := range loop.State.Runs {
+		if rec.Spec.Agent == permuterAgent {
+			permuterRec = rec
+		}
+	}
+	if permuterRec == nil {
+		t.Fatalf("expected a permuter-lane run for func_2; runs = %v", runIDs(loop.State.Runs))
+	}
+	if len(permuterRec.Spec.Owners) != 1 || permuterRec.Spec.Owners[0] != "func_2" {
+		t.Fatalf("permuter owners = %v, want exactly [func_2] -- func_1 is already claimed by x-p0-r1", permuterRec.Spec.Owners)
+	}
+}
+
+// TestEnqueuePermuterLaneSkipsEntirelyWhenEveryOwnerIsAlreadyClaimed checks
+// the all-claimed case: no permuter-lane run is created at all when every
+// pending tie-pool owner already has a live ordinary claim, rather than
+// enqueueing an empty/zero-owner partition.
+func TestEnqueuePermuterLaneSkipsEntirelyWhenEveryOwnerIsAlreadyClaimed(t *testing.T) {
+	fake := &runner.Fake{}
+	loop, dir := newTestLoop(t, fake)
+	loop.RunsDir = dir
+
+	mustWriteFile(t, tiePoolStorePath(dir, "disasm/src/x.c"), `{
+		"func_1": {"source": "disasm/src/x.c", "body": "b1"}
+	}`)
+	loop.State.Runs["x-p0-r1"] = &fleetstate.RunRecord{
+		Spec: fleetstate.RunSpec{
+			ID: "x-p0-r1", File: "disasm/src/x.c", Owners: []string{"func_1"},
+			Agent: "codex", Model: "m", SeedDirs: []string{"/out/seeds/x-p0"},
+		},
+		Status: fleetstate.StatusQueued,
+	}
+	loop.State.Queue = []string{"x-p0-r1"}
+
+	loop.enqueuePermuterLane()
+
+	for _, rec := range loop.State.Runs {
+		if rec.Spec.Agent == permuterAgent {
+			t.Fatalf("no permuter-lane run should be created when its only pending owner is already claimed: %+v", rec)
+		}
+	}
+}
+
 // TestEnqueuePermuterLaneSkipsEmptyPool checks that a tie-pool store with
 // zero remaining entries (every owner already matched and pruned) does not
 // enqueue anything.
