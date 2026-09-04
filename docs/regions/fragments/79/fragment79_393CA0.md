@@ -88,3 +88,19 @@ func_841284A4: matched (call-sequence:guards:combined-assignment), 3 iterations,
 ## 2026-09-05
 
 func_84132778: plateau at 0.9292 (raw 0.8142), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-05
+
+func_84128B4C: matched (call-sequence:prologue:status-address-first), 9 iterations, agent codex
+
+## 2026-09-05
+
+TYPE CONFLICT: D_841951BF is extern u8 D_841951BD, D_841951BF, not extern u8 D_841951E6, D_841951BF
+
+## 2026-09-05
+
+TYPE CONFLICT: D_841951BF is extern s32 D_841951BF, not extern u8 D_841951E6, D_841951BF
+
+## 2026-09-05
+
+func_8413B468: time cap at 0.9783 (raw 0.837) after 2631s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
