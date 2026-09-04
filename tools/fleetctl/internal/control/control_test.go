@@ -1337,3 +1337,130 @@ func TestRotateAttemptedToTailPreservesOrderAndHandlesEdges(t *testing.T) {
 		t.Fatalf("got %v, want [c b]", got)
 	}
 }
+
+// --- launch-time owner-overlap backstop --------------------------------
+//
+// Reproduces a real incident live on 2026-09-04: two independently-named
+// queue entries for the same file (NextRequeueID's counter is keyed by a
+// plain string shared by two different callers -- reconcileQueue's own
+// ID-collision rename, and runMerge's genuine unmatched-owner reseed --
+// so the same base run id can end up with two unrelated children) ended
+// up sharing several owners, and both launched concurrently onto the
+// identical functions. reconcileQueue/enqueuePermuterLane only dedup at
+// replan time; these tests cover the launch-time backstop that closes the
+// gap regardless of how the two queue entries came to overlap.
+
+func TestLaunchEligiblePrunesOwnerAlreadyClaimedByAnotherQueuedRun(t *testing.T) {
+	fake := &runner.Fake{}
+	loop, _ := newTestLoop(t, fake)
+
+	loop.State.Runs["x-p1-r1"] = &fleetstate.RunRecord{
+		Spec: fleetstate.RunSpec{
+			ID: "x-p1-r1", File: "disasm/src/x.c", Owners: []string{"func_1", "func_2"},
+			Agent: "codex", Model: "m",
+		},
+		Status: fleetstate.StatusQueued,
+	}
+	loop.State.Runs["x-p1-r2"] = &fleetstate.RunRecord{
+		Spec: fleetstate.RunSpec{
+			// func_2 overlaps with x-p1-r1 above; func_3 is genuinely
+			// unique to this one.
+			ID: "x-p1-r2", File: "disasm/src/x.c", Owners: []string{"func_2", "func_3"},
+			Agent: "gemini", Model: "m",
+		},
+		Status: fleetstate.StatusQueued,
+	}
+	loop.State.Queue = []string{"x-p1-r1", "x-p1-r2"}
+
+	if _, err := loop.RunOnce(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+
+	calls := fake.Calls
+	var launches []runner.LaunchSpec
+	for _, c := range calls {
+		if c.Method == "LaunchContainer" {
+			launches = append(launches, c.Launch)
+		}
+	}
+	if len(launches) != 2 {
+		t.Fatalf("got %d launches, want 2: %+v", len(launches), launches)
+	}
+	byOwners := map[string][]string{}
+	for _, ls := range launches {
+		byOwners[ls.SourceFile] = append(byOwners[ls.SourceFile], ls.Owners...)
+	}
+	// x-p1-r1 (processed first, in queue order) must keep both of its
+	// owners; x-p1-r2 must have lost func_2 to it and kept only func_3.
+	r1 := loop.State.Runs["x-p1-r1"]
+	r2 := loop.State.Runs["x-p1-r2"]
+	if len(r1.Spec.Owners) != 2 {
+		t.Fatalf("x-p1-r1 owners = %v, want both func_1 and func_2 (it went first)", r1.Spec.Owners)
+	}
+	if len(r2.Spec.Owners) != 1 || r2.Spec.Owners[0] != "func_3" {
+		t.Fatalf("x-p1-r2 owners = %v, want exactly [func_3] (func_2 already claimed by x-p1-r1)", r2.Spec.Owners)
+	}
+}
+
+func TestLaunchEligibleDiscardsRunWhenAllOwnersAlreadyClaimed(t *testing.T) {
+	fake := &runner.Fake{}
+	loop, _ := newTestLoop(t, fake)
+
+	loop.State.Runs["x-p1-r1"] = &fleetstate.RunRecord{
+		Spec: fleetstate.RunSpec{
+			ID: "x-p1-r1", File: "disasm/src/x.c", Owners: []string{"func_1", "func_2"},
+			Agent: "codex", Model: "m",
+		},
+		Status: fleetstate.StatusQueued,
+	}
+	loop.State.Runs["x-p1-r2"] = &fleetstate.RunRecord{
+		Spec: fleetstate.RunSpec{
+			// Both owners are a strict subset of x-p1-r1's -- nothing of
+			// its own left once pruned.
+			ID: "x-p1-r2", File: "disasm/src/x.c", Owners: []string{"func_1", "func_2"},
+			Agent: "gemini", Model: "m",
+		},
+		Status: fleetstate.StatusQueued,
+	}
+	loop.State.Queue = []string{"x-p1-r1", "x-p1-r2"}
+
+	if _, err := loop.RunOnce(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+
+	count := 0
+	for _, c := range fake.Calls {
+		if c.Method == "LaunchContainer" {
+			count++
+		}
+	}
+	if count != 1 {
+		t.Fatalf("LaunchContainer called %d time(s), want exactly 1 (x-p1-r2 has nothing left to attempt)", count)
+	}
+	if len(loop.State.Queue) != 0 {
+		t.Fatalf("queue = %v, want empty (x-p1-r2 discarded, not left waiting)", loop.State.Queue)
+	}
+}
+
+func TestRunningOwnersUsesMatchedOwnersNotSpecOwnersForPROpen(t *testing.T) {
+	loop, _ := newTestLoop(t, &runner.Fake{})
+	loop.State.Runs["x-p0"] = &fleetstate.RunRecord{
+		Spec: fleetstate.RunSpec{
+			ID: "x-p0", File: "disasm/src/x.c", Owners: []string{"func_1", "func_2", "func_3"},
+			Agent: "codex", Model: "m",
+		},
+		Status: fleetstate.StatusPROpen,
+		// Only func_1 is still genuinely tied up in the open PR -- func_2
+		// and func_3 (unmatched) were already handed off to a fresh
+		// sibling by this same run's own runMerge call.
+		MatchedOwners: []string{"func_1"},
+	}
+
+	claimed := loop.runningOwners()
+	if !claimed["disasm/src/x.c"]["func_1"] {
+		t.Fatal("func_1 (still open in the PR) must be claimed")
+	}
+	if claimed["disasm/src/x.c"]["func_2"] || claimed["disasm/src/x.c"]["func_3"] {
+		t.Fatalf("func_2/func_3 (unmatched, already handed to a sibling) must NOT be claimed: %+v", claimed["disasm/src/x.c"])
+	}
+}

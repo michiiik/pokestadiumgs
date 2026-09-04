@@ -1497,31 +1497,98 @@ func keepAcrossReplan(rec *fleetstate.RunRecord) bool {
 // and vice versa (permuterInFlight already keeps two permuter-lane runs
 // for the same file from coexisting; this is the complementary,
 // owner-level check across the two lanes).
-func (l *Loop) inFlightOwners() map[string]map[string]bool {
-	inFlight := map[string]map[string]bool{}
-	reserve := func(file string, owners []string) {
-		m := inFlight[file]
-		if m == nil {
-			m = map[string]bool{}
-			inFlight[file] = m
-		}
-		for _, o := range owners {
-			m[o] = true
+// reserveOwners records file's owners as claimed in claimed, the shared
+// per-file owner-reservation shape inFlightOwners builds and
+// launchEligible keeps live for the rest of its own pass.
+func reserveOwners(claimed map[string]map[string]bool, file string, owners []string) {
+	m := claimed[file]
+	if m == nil {
+		m = map[string]bool{}
+		claimed[file] = m
+	}
+	for _, o := range owners {
+		m[o] = true
+	}
+}
+
+// runningOwners returns, per file, the owners already claimed by a run
+// that's genuinely active right now, independent of State.Queue entirely:
+// Running/Merging (its full Spec.Owners -- nothing about it has been
+// resolved yet) or PROpen (MatchedOwners only, not Spec.Owners -- by the
+// time a run reaches StatusPROpen, its own runMerge call has already
+// split any unmatched remainder off into a fresh sibling spec via its own
+// unmatched-owner reseed, so Spec.Owners is stale; MatchedOwners is the
+// accurate "still genuinely tied up in this open PR" set. Reserving the
+// full Spec.Owners here would wrongly claim the unmatched owners against
+// their own just-created sibling, which needs them free to attempt).
+func (l *Loop) runningOwners() map[string]map[string]bool {
+	claimed := map[string]map[string]bool{}
+	for _, rec := range l.State.Runs {
+		switch rec.Status {
+		case fleetstate.StatusRunning, fleetstate.StatusMerging:
+			reserveOwners(claimed, rec.Spec.File, rec.Spec.Owners)
+		case fleetstate.StatusPROpen:
+			reserveOwners(claimed, rec.Spec.File, rec.MatchedOwners)
 		}
 	}
+	return claimed
+}
+
+// inFlightOwners extends runningOwners with every currently queued run
+// that would survive reconcileQueue (keepAcrossReplan) -- for checking a
+// brand new candidate that is not itself already a member of State.Queue
+// (a fresh Build() partition, or an enqueuePermuterLane partition), so
+// there's no risk of a queue entry claiming against itself. launchEligible
+// deliberately uses runningOwners instead, NOT this: it iterates
+// State.Queue itself and reserves each entry's owners only once that
+// entry has actually launched (see reserveOwners's call sites there), so
+// pre-seeding from the whole queue here would make every keepAcrossReplan
+// entry claim against its own unlaunched self.
+func (l *Loop) inFlightOwners() map[string]map[string]bool {
+	claimed := l.runningOwners()
 	for _, id := range l.State.Queue {
 		rec := l.State.Runs[id]
 		if rec != nil && keepAcrossReplan(rec) {
-			reserve(rec.Spec.File, rec.Spec.Owners)
+			reserveOwners(claimed, rec.Spec.File, rec.Spec.Owners)
 		}
 	}
-	for _, rec := range l.State.Runs {
-		switch rec.Status {
-		case fleetstate.StatusRunning, fleetstate.StatusMerging, fleetstate.StatusPROpen:
-			reserve(rec.Spec.File, rec.Spec.Owners)
+	return claimed
+}
+
+// pruneClaimedOwners removes from rec.Spec.Owners any owner already
+// claimed per `claimed` (see inFlightOwners/reserveOwners) -- the
+// launch-time backstop for reconcileQueue/enqueuePermuterLane's own
+// replan-time dedup, closing the gap regardless of how two queue entries
+// ended up sharing an owner in the first place. Observed live: two
+// independent codex/gemini runs launched onto the identical owner at the
+// same time, because NextRequeueID's counter is keyed by a plain string
+// shared across two semantically different callers -- reconcileQueue's
+// own ID-collision rename (a brand new partition that happens to compute
+// the same "<file>-p<N>" id as an old, already-finished run) and
+// runMerge's genuine unmatched-owner reseed (a specific run's own actual
+// leftover work) -- so the same base run id can silently end up with two
+// unrelated children, each carrying its own, potentially-overlapping
+// owner list, with nothing before launch time ever cross-checking them
+// against each other again. Mutates rec.Spec.Owners only when something
+// was actually dropped; returns the dropped owners, for logging.
+func pruneClaimedOwners(rec *fleetstate.RunRecord, claimed map[string]map[string]bool) []string {
+	already := claimed[rec.Spec.File]
+	if len(already) == 0 {
+		return nil
+	}
+	var kept, dropped []string
+	for _, o := range rec.Spec.Owners {
+		if already[o] {
+			dropped = append(dropped, o)
+		} else {
+			kept = append(kept, o)
 		}
 	}
-	return inFlight
+	if len(dropped) == 0 {
+		return nil
+	}
+	rec.Spec.Owners = kept
+	return dropped
 }
 
 // reconcileQueue rebuilds State.Queue from fresh's candidate partitions:
@@ -1723,6 +1790,19 @@ func (l *Loop) buildDailySummaryBody() string {
 // the global concurrency cap is reached. An ineligible entry is left in
 // the queue (in place) rather than skipped permanently, so it is retried
 // on the next pass once capacity frees up.
+//
+// Before anything else, every entry is pruned against claimed (seeded from
+// runningOwners -- NOT inFlightOwners, which also pre-reserves every
+// keepAcrossReplan queue entry and would make each one claim against its
+// own unlaunched self here -- kept live for the rest of this pass -- see
+// pruneClaimedOwners): a queue entry whose owner already has a live claim
+// elsewhere has that owner dropped before it's ever considered for launch,
+// and a successful launch immediately reserves its own (possibly-just-
+// pruned) owners so a *later* entry in this same pass can't claim them
+// either. This is the launch-time backstop for reconcileQueue/
+// enqueuePermuterLane's own replan-time dedup -- see pruneClaimedOwners's
+// own comment for the real incident (two independent runs launched onto
+// the identical owner at once) this closes.
 func (l *Loop) launchEligible(ctx context.Context) error {
 	if len(l.State.Queue) == 0 {
 		return nil
@@ -1730,12 +1810,21 @@ func (l *Loop) launchEligible(ctx context.Context) error {
 	totalRunning, byAgent := l.State.RunningCount()
 	now := l.now()
 	max := l.maxConcurrent()
+	claimed := l.runningOwners()
 
 	remaining := l.State.Queue[:0:0]
 	for _, id := range l.State.Queue {
 		rec := l.State.Runs[id]
 		if rec == nil {
 			continue
+		}
+		if dropped := pruneClaimedOwners(rec, claimed); len(dropped) > 0 {
+			l.logf("run %s: dropped %d owner(s) already claimed by another live run for %s: %s",
+				id, len(dropped), rec.Spec.File, strings.Join(dropped, ", "))
+			if len(rec.Spec.Owners) == 0 {
+				l.logf("run %s: nothing left after dropping already-claimed owners; discarding", id)
+				continue
+			}
 		}
 		switch {
 		// A vanish-triggered requeue (handleExit, sec 2) is held back at
@@ -1771,6 +1860,7 @@ func (l *Loop) launchEligible(ctx context.Context) error {
 					remaining = append(remaining, id)
 					continue
 				}
+				reserveOwners(claimed, rec.Spec.File, rec.Spec.Owners)
 				totalRunning++
 				byAgent[alt.Agent]++
 				continue
@@ -1786,6 +1876,7 @@ func (l *Loop) launchEligible(ctx context.Context) error {
 				remaining = append(remaining, id)
 				continue
 			}
+			reserveOwners(claimed, rec.Spec.File, rec.Spec.Owners)
 			totalRunning++
 			byAgent[rec.Spec.Agent]++
 		}
