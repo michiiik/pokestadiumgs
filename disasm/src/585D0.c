@@ -1023,7 +1023,28 @@ s32 func_8005CB38(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005CFE8.s")
+extern s32 func_8005CF20(s32, s32, s32);
+extern u8 D_801285D0[];
+void func_8005CFE8(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    s32 record = *(s32 *)(D_801285D0 + arg1 * 112);
+    if (arg3 < func_8005CF20(arg0, arg1, arg2)) {
+        switch (arg0) {
+        case 0x20:
+            *(u8 *)(record + 0x9AC) = arg3;
+            *(u8 *)(record + arg3 + 0x9AD) = 0xFF;
+            break;
+        case 0x21:
+            func_8005C060(arg1, arg2, arg3);
+            break;
+        case 0x22:
+            *(u8 *)(record + 0x266) = arg3;
+            *(u8 *)(record + arg3 * 2 + 0x267) = 0xFF;
+            break;
+        case 0x23:
+            break;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
