@@ -24,6 +24,7 @@ func runRunCmd(args []string) error {
 	repo := fs.String("repo", "", "checkout to launch containers from, and tools/pragma_targets.py runs against (required)")
 	mergeRepo := fs.String("merge-repo", "", "checkout the merge/branch/PR/self-merge step (git fetch/checkout -B/checkout --detach/push, tools/container_merge.py, gh pr create/checks/merge/view) operates on (default: --repo)")
 	maxConcurrent := fs.Int("max-concurrent", -1, "max containers running at once (default: the plan's --slots, else 4)")
+	maxPerFile := fs.Int("max-per-file", 0, "max containers running at once against the same target source file, regardless of agent (0 = unlimited); too many just race each other into PR-merge conflicts instead of adding real parallelism")
 	prBase := fs.String("pr-base", "master", "branch a run's throwaway branch is PR'd into, and (with --auto-merge) merged into")
 	baseRef := fs.String("base-ref", "", "ref the merge repo's throwaway branch is force-created from (git checkout -B) and left detached at afterward -- default origin/<pr-base>. Deliberately a remote-tracking ref, never --pr-base's own local branch: the merge repo may be a linked worktree whose local base branch is already checked out elsewhere (e.g. the main checkout), so the merge flow never checks that branch out itself")
 	once := fs.Bool("once", false, "perform a single control-loop pass and exit, instead of looping until the queue drains")
@@ -78,6 +79,7 @@ func runRunCmd(args []string) error {
 		DailySummaryHourUTC: *dailySummaryHour,
 		PermuterSeconds:     *permuterSeconds,
 		OwnerSeconds:        *ownerSeconds,
+		MaxPerFile:          *maxPerFile,
 	}
 
 	mergeRepoPath := *mergeRepo

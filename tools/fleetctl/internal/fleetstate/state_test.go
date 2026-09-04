@@ -85,6 +85,47 @@ func TestRunningCount(t *testing.T) {
 	}
 }
 
+func TestAgentModelKey(t *testing.T) {
+	if got := AgentModelKey("codex", "gpt-5.3-codex-spark"); got != "codex:gpt-5.3-codex-spark" {
+		t.Fatalf("AgentModelKey with model = %q", got)
+	}
+	if got := AgentModelKey("codex", ""); got != "codex" {
+		t.Fatalf("AgentModelKey with no model = %q, want bare agent", got)
+	}
+}
+
+func TestRunningCountByAgentModel(t *testing.T) {
+	s := New()
+	s.Runs["a"] = &RunRecord{Spec: RunSpec{Agent: "codex", Model: "gpt-5.3-codex-spark"}, Status: StatusRunning}
+	s.Runs["b"] = &RunRecord{Spec: RunSpec{Agent: "codex", Model: "gpt-5.3-codex-spark"}, Status: StatusRunning}
+	s.Runs["c"] = &RunRecord{Spec: RunSpec{Agent: "codex", Model: "gpt-5.6-luna"}, Status: StatusRunning}
+	s.Runs["d"] = &RunRecord{Spec: RunSpec{Agent: "codex", Model: "gpt-5.3-codex-spark"}, Status: StatusQueued}
+
+	byAgentModel := s.RunningCountByAgentModel()
+	if byAgentModel["codex:gpt-5.3-codex-spark"] != 2 {
+		t.Fatalf("byAgentModel = %+v, want codex:gpt-5.3-codex-spark=2", byAgentModel)
+	}
+	if byAgentModel["codex:gpt-5.6-luna"] != 1 {
+		t.Fatalf("byAgentModel = %+v, want codex:gpt-5.6-luna=1", byAgentModel)
+	}
+}
+
+func TestRunningCountByFile(t *testing.T) {
+	s := New()
+	s.Runs["a"] = &RunRecord{Spec: RunSpec{Agent: "codex", File: "disasm/src/big.c"}, Status: StatusRunning}
+	s.Runs["b"] = &RunRecord{Spec: RunSpec{Agent: "gemini", File: "disasm/src/big.c"}, Status: StatusRunning}
+	s.Runs["c"] = &RunRecord{Spec: RunSpec{Agent: "codex", File: "disasm/src/other.c"}, Status: StatusRunning}
+	s.Runs["d"] = &RunRecord{Spec: RunSpec{Agent: "codex", File: "disasm/src/big.c"}, Status: StatusQueued}
+
+	byFile := s.RunningCountByFile()
+	if byFile["disasm/src/big.c"] != 2 {
+		t.Fatalf("byFile = %+v, want disasm/src/big.c=2", byFile)
+	}
+	if byFile["disasm/src/other.c"] != 1 {
+		t.Fatalf("byFile = %+v, want disasm/src/other.c=1", byFile)
+	}
+}
+
 func TestNextRequeueID(t *testing.T) {
 	s := New()
 	if got := s.NextRequeueID("14640-p0"); got != "14640-p0-r1" {

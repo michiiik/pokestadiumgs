@@ -201,7 +201,7 @@ func TestPermuterAgentNeverGetsReassignedToOrCooledDown(t *testing.T) {
 	}
 
 	// Also: the roster excludes permuterAgent as a reassignment target.
-	alt, ok := loop.reassignAgent("codex", testNow, map[string]int{})
+	alt, ok := loop.reassignAgent("codex", testNow, map[string]int{}, map[string]int{})
 	if ok {
 		t.Fatalf("reassignAgent must never offer permuterAgent as a target, got %+v", alt)
 	}
@@ -406,6 +406,57 @@ func TestGeneratorExhaustionStopsSiblingRunsUnderTheSameAgentModel(t *testing.T)
 	}
 }
 
+// TestGeneratorExhaustionStopsSiblingAlreadyExitedIsQuiet reproduces the
+// other half of the same live incident: siblings under an identical
+// agent+model routinely self-exit from hitting the very same quota limit
+// before stopSiblingRuns' own StopContainer call lands (observed live at
+// roughly 85% of attempts). That race must resolve as a quiet requeue --
+// via InspectContainer confirming the container is already gone -- rather
+// than a StopContainer call that only ever fails with "no such container"
+// on every occurrence.
+func TestGeneratorExhaustionStopsSiblingAlreadyExitedIsQuiet(t *testing.T) {
+	fake := &runner.Fake{InspectResults: map[string][]runner.InspectResult{
+		"exhausted-cid": {{Found: true, Running: false, ExitCode: 3}},
+		// No entry for "sibling-gone-cid" -- Fake's InspectContainer
+		// returns Found:false for an unconfigured id, exactly like a real
+		// `docker inspect` on a container that already vanished.
+	}}
+	loop, dir := newTestLoop(t, fake)
+	outDir := filepath.Join(dir, "out")
+	mustWriteFile(t, filepath.Join(outDir, "summary.json"), `{"stopped_reason":"generator_exhausted"}`)
+	loop.CooldownDefaults = map[string]time.Duration{"codex": time.Hour}
+
+	loop.State.Runs["exhausted"] = &fleetstate.RunRecord{
+		Spec: fleetstate.RunSpec{
+			ID: "exhausted", File: "disasm/src/x.c", Owners: []string{"func_1"},
+			Agent: "codex", Model: "gpt-5.3-codex-spark",
+		},
+		Status: fleetstate.StatusRunning, ContainerID: "exhausted-cid", OutDir: outDir,
+	}
+	loop.State.Runs["sibling-gone"] = &fleetstate.RunRecord{
+		Spec: fleetstate.RunSpec{
+			ID: "sibling-gone", File: "disasm/src/y.c", Owners: []string{"func_2"},
+			Agent: "codex", Model: "gpt-5.3-codex-spark",
+		},
+		Status: fleetstate.StatusRunning, ContainerID: "sibling-gone-cid",
+	}
+
+	if _, err := loop.RunOnce(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+
+	gone := loop.State.Runs["sibling-gone"]
+	if gone.Status != fleetstate.StatusRequeued {
+		t.Fatalf("sibling-gone status = %s, want requeued", gone.Status)
+	}
+	if gone.Spec.Attempt != 1 {
+		t.Fatalf("sibling-gone attempt = %d, want 1 (requeueResume must have run)", gone.Spec.Attempt)
+	}
+	if findCall(fake, "StopContainer") != nil {
+		t.Fatal("container was already gone; StopContainer must not have been called")
+	}
+}
+
 // TestGeneratorExhaustionWithNoSiblingsIsANoOp guards against a panic or
 // spurious StopContainer call when the exhausted run has no siblings at
 // all -- the common case.
@@ -457,7 +508,7 @@ func TestReassignmentSkipsRosterCandidateStillOnItsOwnCompositeCooldown(t *testi
 	// exit writes it (control.go's handleExit) -- no bare "codex" entry.
 	loop.State.Cooldowns["codex:gpt-5.3-codex-spark"] = testNow.Add(time.Hour)
 
-	alt, ok := loop.reassignAgent("claude", testNow, map[string]int{})
+	alt, ok := loop.reassignAgent("claude", testNow, map[string]int{}, map[string]int{})
 	if !ok {
 		t.Fatal("reassignAgent found no candidate, want gemini (genuinely idle)")
 	}
@@ -490,7 +541,7 @@ func TestReassignmentWindowPreferenceDoesNotOverrideARealCompositeCooldown(t *te
 		"codex": {LastExhausted: testNow.Add(-6 * time.Hour)},
 	}
 
-	alt, ok := loop.reassignAgent("claude", testNow, map[string]int{})
+	alt, ok := loop.reassignAgent("claude", testNow, map[string]int{}, map[string]int{})
 	if ok {
 		t.Fatalf("reassignAgent picked %+v, want no candidate (codex's only roster model is still really on cooldown)", alt)
 	}

@@ -410,6 +410,81 @@ func TestAgentConcurrencyCap(t *testing.T) {
 	}
 }
 
+// TestPerModelConcurrencyCap reproduces the observed live pattern: several
+// codex:gpt-5.3-codex-spark containers launch together, all racing the
+// same shared spark quota and exhausting in a burst, while
+// codex:gpt-5.6-luna (a separate quota pool, same bare agent) has spare
+// headroom. A cap set under the "codex:gpt-5.3-codex-spark" composite key
+// must throttle spark specifically without also capping luna, which has no
+// cap of its own here.
+func TestPerModelConcurrencyCap(t *testing.T) {
+	fake := &runner.Fake{}
+	loop, _ := newTestLoop(t, fake)
+	loop.AgentConcurrency = map[string]int{"codex:gpt-5.3-codex-spark": 1}
+
+	loop.State.Runs["spark-a"] = &fleetstate.RunRecord{
+		Spec: fleetstate.RunSpec{ID: "spark-a", File: "disasm/src/a.c", Owners: []string{"f1"}, Agent: "codex", Model: "gpt-5.3-codex-spark"}, Status: fleetstate.StatusQueued,
+	}
+	loop.State.Runs["spark-b"] = &fleetstate.RunRecord{
+		Spec: fleetstate.RunSpec{ID: "spark-b", File: "disasm/src/b.c", Owners: []string{"f2"}, Agent: "codex", Model: "gpt-5.3-codex-spark"}, Status: fleetstate.StatusQueued,
+	}
+	loop.State.Runs["luna"] = &fleetstate.RunRecord{
+		Spec: fleetstate.RunSpec{ID: "luna", File: "disasm/src/c.c", Owners: []string{"f3"}, Agent: "codex", Model: "gpt-5.6-luna"}, Status: fleetstate.StatusQueued,
+	}
+	loop.State.Queue = []string{"spark-a", "spark-b", "luna"}
+
+	if _, err := loop.RunOnce(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if loop.State.Runs["spark-a"].Status != fleetstate.StatusRunning {
+		t.Fatal("spark-a should have launched (first under the spark cap)")
+	}
+	if loop.State.Runs["spark-b"].Status != fleetstate.StatusQueued || loop.State.Runs["spark-b"].WaitReason != "concurrency" {
+		t.Fatalf("spark-b should remain queued/concurrency: spark is capped at 1, got status=%s wait_reason=%q",
+			loop.State.Runs["spark-b"].Status, loop.State.Runs["spark-b"].WaitReason)
+	}
+	if loop.State.Runs["luna"].Status != fleetstate.StatusRunning {
+		t.Fatal("luna should have launched: it has its own quota pool and no cap of its own, so spark's cap must not block it")
+	}
+}
+
+// TestMaxPerFileConcurrencyCap reproduces the other observed live pattern:
+// many partitions of the same large source file launch concurrently across
+// different agents, which mostly just produces PR-merge conflicts as they
+// land rather than useful parallelism. MaxPerFile must cap concurrent runs
+// per file regardless of which agent each one is under, and must not
+// throttle a different file that is nowhere near the cap.
+func TestMaxPerFileConcurrencyCap(t *testing.T) {
+	fake := &runner.Fake{}
+	loop, _ := newTestLoop(t, fake)
+	loop.MaxPerFile = 1
+
+	loop.State.Runs["a"] = &fleetstate.RunRecord{
+		Spec: fleetstate.RunSpec{ID: "a", File: "disasm/src/big.c", Owners: []string{"f1"}, Agent: "codex"}, Status: fleetstate.StatusQueued,
+	}
+	loop.State.Runs["b"] = &fleetstate.RunRecord{
+		Spec: fleetstate.RunSpec{ID: "b", File: "disasm/src/big.c", Owners: []string{"f2"}, Agent: "gemini"}, Status: fleetstate.StatusQueued,
+	}
+	loop.State.Runs["c"] = &fleetstate.RunRecord{
+		Spec: fleetstate.RunSpec{ID: "c", File: "disasm/src/other.c", Owners: []string{"f3"}, Agent: "codex"}, Status: fleetstate.StatusQueued,
+	}
+	loop.State.Queue = []string{"a", "b", "c"}
+
+	if _, err := loop.RunOnce(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if loop.State.Runs["a"].Status != fleetstate.StatusRunning {
+		t.Fatal("a should have launched (first onto big.c)")
+	}
+	if loop.State.Runs["b"].Status != fleetstate.StatusQueued || loop.State.Runs["b"].WaitReason != "file-concurrency" {
+		t.Fatalf("b should remain queued/file-concurrency: big.c is capped at 1 regardless of agent, got status=%s wait_reason=%q",
+			loop.State.Runs["b"].Status, loop.State.Runs["b"].WaitReason)
+	}
+	if loop.State.Runs["c"].Status != fleetstate.StatusRunning {
+		t.Fatal("c should have launched: other.c is a different file and nowhere near the cap")
+	}
+}
+
 // TestGlobalConcurrencyWaitReason checks that a run left queued because the
 // global --max-concurrent cap (not a per-agent cap or a cooldown) is full
 // is recorded with wait_reason "concurrency" too, per

@@ -328,6 +328,48 @@ func (s *State) RunningCount() (total int, byAgent map[string]int) {
 	return total, byAgent
 }
 
+// AgentModelKey is the composite key used wherever a per-agent behaviour
+// (cooldowns, concurrency caps) needs to be narrowed to one specific model
+// instead of the whole agent: "agent:model", or bare "agent" when model is
+// empty (a coarse/manual, provider-wide setting, or a caller -- like the
+// permuter lane -- that genuinely has no model).
+func AgentModelKey(agent, model string) string {
+	if model == "" {
+		return agent
+	}
+	return agent + ":" + model
+}
+
+// RunningCountByAgentModel mirrors RunningCount, keyed by AgentModelKey
+// instead of the bare agent name -- so a per-model concurrency cap (e.g.
+// capping one codex model that bursts through a shared quota, without also
+// capping a sibling model under the same agent that has its own separate
+// quota) can be enforced independently of the coarser per-agent cap.
+func (s *State) RunningCountByAgentModel() map[string]int {
+	byAgentModel := map[string]int{}
+	for _, rec := range s.Runs {
+		if rec.Status == StatusRunning {
+			byAgentModel[AgentModelKey(rec.Spec.Agent, rec.Spec.Model)]++
+		}
+	}
+	return byAgentModel
+}
+
+// RunningCountByFile mirrors RunningCount, keyed by the target source file
+// instead of the agent -- so a global per-file concurrency cap can keep
+// too many containers (any agent) from working the same file at once,
+// which just produces PR-merge conflicts as they land (docs sec 2's
+// conflict-replay path) rather than useful parallelism.
+func (s *State) RunningCountByFile() map[string]int {
+	byFile := map[string]int{}
+	for _, rec := range s.Runs {
+		if rec.Status == StatusRunning {
+			byFile[rec.Spec.File]++
+		}
+	}
+	return byFile
+}
+
 // CountByStatus returns how many runs currently have exactly this status.
 func (s *State) CountByStatus(status Status) int {
 	n := 0
