@@ -1484,14 +1484,20 @@ func keepAcrossReplan(rec *fleetstate.RunRecord) bool {
 	return !rec.StartedAt.IsZero() || len(rec.Spec.SeedDirs) > 0
 }
 
-// reconcileQueue rebuilds State.Queue from fresh's candidate partitions:
-// every not-yet-launched, not-seeded queue entry is dropped and replaced
-// wholesale ("runs already queued but not launched are replaced by the
-// fresh plan", sec 2); every run this pass keeps (queued survivors, plus
-// every run already running/merging/pr_open) reserves its own owners, and a
-// fresh candidate partition has those owners subtracted out so a live
-// attempt is never duplicated by a fresh one for the same file+owner.
-func (l *Loop) reconcileQueue(fresh *planpkg.Plan) {
+// inFlightOwners returns, per file, the set of owners already claimed by a
+// run that a replan must never duplicate: every currently queued run that
+// would survive reconcileQueue (keepAcrossReplan -- already launched at
+// least once, or carrying seed dirs from a post-merge reseed), plus every
+// run already Running/Merging/PROpen. Shared by reconcileQueue (so a fresh
+// ordinary partition never re-claims a live attempt's owner) and
+// enqueuePermuterLane (so a permuter-lane partition never does either --
+// see that function's own comment for the gap this closes). Deliberately
+// agent-agnostic: an ordinary run's owner is off-limits to a fresh
+// permuter-lane partition exactly as much as another ordinary run's is,
+// and vice versa (permuterInFlight already keeps two permuter-lane runs
+// for the same file from coexisting; this is the complementary,
+// owner-level check across the two lanes).
+func (l *Loop) inFlightOwners() map[string]map[string]bool {
 	inFlight := map[string]map[string]bool{}
 	reserve := func(file string, owners []string) {
 		m := inFlight[file]
@@ -1503,6 +1509,32 @@ func (l *Loop) reconcileQueue(fresh *planpkg.Plan) {
 			m[o] = true
 		}
 	}
+	for _, id := range l.State.Queue {
+		rec := l.State.Runs[id]
+		if rec != nil && keepAcrossReplan(rec) {
+			reserve(rec.Spec.File, rec.Spec.Owners)
+		}
+	}
+	for _, rec := range l.State.Runs {
+		switch rec.Status {
+		case fleetstate.StatusRunning, fleetstate.StatusMerging, fleetstate.StatusPROpen:
+			reserve(rec.Spec.File, rec.Spec.Owners)
+		}
+	}
+	return inFlight
+}
+
+// reconcileQueue rebuilds State.Queue from fresh's candidate partitions:
+// every not-yet-launched, not-seeded queue entry is dropped and replaced
+// wholesale ("runs already queued but not launched are replaced by the
+// fresh plan", sec 2); every run this pass keeps (queued survivors, plus
+// every run already running/merging/pr_open) reserves its own owners
+// (inFlightOwners, computed before any deletion below -- a dropped entry is
+// by definition never kept-or-active, so it was never reserved either), and
+// a fresh candidate partition has those owners subtracted out so a live
+// attempt is never duplicated by a fresh one for the same file+owner.
+func (l *Loop) reconcileQueue(fresh *planpkg.Plan) {
+	inFlight := l.inFlightOwners()
 
 	kept := make([]string, 0, len(l.State.Queue))
 	for _, id := range l.State.Queue {
@@ -1512,15 +1544,8 @@ func (l *Loop) reconcileQueue(fresh *planpkg.Plan) {
 		}
 		if keepAcrossReplan(rec) {
 			kept = append(kept, id)
-			reserve(rec.Spec.File, rec.Spec.Owners)
 		} else {
 			delete(l.State.Runs, id)
-		}
-	}
-	for _, rec := range l.State.Runs {
-		switch rec.Status {
-		case fleetstate.StatusRunning, fleetstate.StatusMerging, fleetstate.StatusPROpen:
-			reserve(rec.Spec.File, rec.Spec.Owners)
 		}
 	}
 

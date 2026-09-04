@@ -137,7 +137,21 @@ func (l *Loop) permuterInFlight(file string) bool {
 // enqueuePermuterLane is Replan's last step (sec 13): for every
 // <runs-dir>/tie-pools/*.json store with at least one still-pending owner
 // and no permuter-lane run already in flight for it, enqueue one fresh
-// permuter-only partition covering every pending owner in that store.
+// permuter-only partition covering every pending owner in that store --
+// except any owner inFlightOwners says an ordinary (non-permuter) run
+// already has a live claim on right now.
+//
+// Without that check, this used to build the permuter partition straight
+// from the tie-pool store with no cross-check against ordinary runs at
+// all: a run's own plateau/tie result feeds BOTH the tie-pool store
+// (updateTiePool, in runMerge) AND that same run's own unmatched-owner
+// reseed (a fresh ordinary partition with SeedDirs) for another normal
+// attempt -- from the very same runMerge call. permuterInFlight only ever
+// asked "is there already a permuter-lane run for this file", never
+// "does some *ordinary* run already have this exact owner" -- so the next
+// replan could launch a permuter-only container onto an owner an ordinary
+// reseeded partition was already actively attempting, two containers
+// burning real work on the identical function at the same time.
 func (l *Loop) enqueuePermuterLane() {
 	if l.RunsDir == "" {
 		return
@@ -155,6 +169,8 @@ func (l *Loop) enqueuePermuterLane() {
 	}
 	sort.Strings(names)
 
+	inFlight := l.inFlightOwners()
+
 	for _, name := range names {
 		pool := loadTiePoolStore(filepath.Join(dir, name))
 		if len(pool) == 0 {
@@ -164,6 +180,20 @@ func (l *Loop) enqueuePermuterLane() {
 		if file == "" || l.permuterInFlight(file) {
 			continue
 		}
+		var available []string
+		for _, o := range owners {
+			if !inFlight[file][o] {
+				available = append(available, o)
+			}
+		}
+		if len(available) == 0 {
+			// Every pending tie-pool owner already has a live claim
+			// elsewhere (most likely that same owner's own ordinary
+			// reseed) -- nothing left for the permuter lane to add right
+			// now; it'll be reconsidered on the next replan.
+			continue
+		}
+		owners = available
 		slug := planpkg.FileSlug(file)
 		id := slug + "-permuter"
 		if _, exists := l.State.Runs[id]; exists {
