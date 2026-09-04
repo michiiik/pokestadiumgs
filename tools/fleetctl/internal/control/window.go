@@ -74,12 +74,18 @@ func (l *Loop) recordWindowStart(agent string, now time.Time) {
 // been relaunched (WindowStart still zero). reassignAgent prefers such an
 // agent first ("prefer the cooled-down agent for the next launches to
 // rebalance", sec 12).
-func (l *Loop) windowReopened(agent string, now time.Time) bool {
+//
+// Checks both the bare-agent cooldown key and model's own cooldownKey, same
+// as eligibleForReassignment: a roster entry pins one specific model (sec
+// 12's roster is one spec per agent), so "the window reopened" has to mean
+// that model's own cooldown lapsed, not just the bare-agent key that a real
+// per-model exhaustion (control.go's handleExit) no longer ever writes.
+func (l *Loop) windowReopened(agent, model string, now time.Time) bool {
 	ws := l.State.WindowState[agent]
 	if ws == nil || ws.LastExhausted.IsZero() {
 		return false
 	}
-	if l.State.OnCooldown(agent, now) {
+	if l.State.OnCooldown(agent, now) || l.State.OnCooldown(cooldownKey(agent, model), now) {
 		return false
 	}
 	return ws.WindowStart.IsZero()
@@ -109,8 +115,20 @@ func (l *Loop) agentRoster() []agentspec.Spec {
 // spare capacity to take on a reassigned partition: not on cooldown, and
 // under its own --agent-concurrency cap (if any), accounting for byAgent's
 // already-decided launches this pass.
-func (l *Loop) eligibleForReassignment(agent string, now time.Time, byAgent map[string]int) bool {
-	if l.State.OnCooldown(agent, now) {
+//
+// Checks both the bare-agent cooldown key and the candidate's own
+// cooldownKey(agent, model). A roster entry (agentRoster) is one fixed
+// (agent, model) spec, so reassigning to it launches that exact model --
+// checking only the bare key here (which a real per-model exhaustion, sec
+// 12's own control.go:handleExit, no longer ever writes: cooldownKey is
+// bare only when the model is empty) meant this always read "not on
+// cooldown" and could send a queued run right back into a model that was,
+// in fact, still rate-limited: observed live, spread across dozens of
+// consecutive relaunches, each one immediately re-exhausting and pushing
+// its own cooldown a little further out, while agents with real spare
+// capacity elsewhere in the roster went untried.
+func (l *Loop) eligibleForReassignment(agent, model string, now time.Time, byAgent map[string]int) bool {
+	if l.State.OnCooldown(agent, now) || l.State.OnCooldown(cooldownKey(agent, model), now) {
 		return false
 	}
 	if limit := l.AgentConcurrency[agent]; limit > 0 && byAgent[agent] >= limit {
@@ -136,7 +154,7 @@ func (l *Loop) reassignAgent(original string, now time.Time, byAgent map[string]
 
 	var reopened []agentspec.Spec
 	for _, spec := range roster {
-		if spec.Agent != original && l.eligibleForReassignment(spec.Agent, now, byAgent) && l.windowReopened(spec.Agent, now) {
+		if spec.Agent != original && l.eligibleForReassignment(spec.Agent, spec.Model, now, byAgent) && l.windowReopened(spec.Agent, spec.Model, now) {
 			reopened = append(reopened, spec)
 		}
 	}
@@ -152,7 +170,7 @@ func (l *Loop) reassignAgent(original string, now time.Time, byAgent map[string]
 		if spec.Agent == original {
 			continue
 		}
-		if l.eligibleForReassignment(spec.Agent, now, byAgent) {
+		if l.eligibleForReassignment(spec.Agent, spec.Model, now, byAgent) {
 			l.State.ReassignCursor = (idx + 1) % n
 			return spec, true
 		}

@@ -433,3 +433,65 @@ func TestGeneratorExhaustionWithNoSiblingsIsANoOp(t *testing.T) {
 		t.Fatal("no sibling exists; StopContainer must not be called")
 	}
 }
+
+// TestReassignmentSkipsRosterCandidateStillOnItsOwnCompositeCooldown
+// reproduces a real incident live on 2026-09-04: gpt-5.3-codex-spark was
+// deep in its own composite-keyed cooldown (codex:gpt-5.3-codex-spark), but
+// eligibleForReassignment only ever checked the bare "codex" key -- which a
+// real per-model exhaustion (handleExit) never writes -- so it always read
+// "not on cooldown" and reassignAgent kept sending queued runs right back
+// into codex, over and over, each one re-exhausting within moments and
+// pushing codex's own cooldown a little further out every time, while
+// gemini and alibaba (both genuinely idle, with real spare capacity) never
+// got a single one of these runs.
+func TestReassignmentSkipsRosterCandidateStillOnItsOwnCompositeCooldown(t *testing.T) {
+	fake := &runner.Fake{}
+	loop, _ := newTestLoop(t, fake)
+	loop.Agents = []agentspec.Spec{
+		{Agent: "codex", Model: "gpt-5.3-codex-spark"},
+		{Agent: "claude", Model: "sonnet"},
+		{Agent: "gemini", Model: "gemini-3.8-flash-medium"},
+		{Agent: "alibaba", Model: "qwen3.6-flash"},
+	}
+	// Only the fine-grained key is set, exactly as a real generator_exhausted
+	// exit writes it (control.go's handleExit) -- no bare "codex" entry.
+	loop.State.Cooldowns["codex:gpt-5.3-codex-spark"] = testNow.Add(time.Hour)
+
+	alt, ok := loop.reassignAgent("claude", testNow, map[string]int{})
+	if !ok {
+		t.Fatal("reassignAgent found no candidate, want gemini (genuinely idle)")
+	}
+	if alt.Agent == "codex" {
+		t.Fatalf("reassigned to %s:%s, which is still on cooldown by its own composite key", alt.Agent, alt.Model)
+	}
+	if alt.Agent != "gemini" {
+		t.Fatalf("reassigned to %s, want gemini (next idle roster entry after codex is correctly skipped)", alt.Agent)
+	}
+}
+
+// TestReassignmentWindowPreferenceDoesNotOverrideARealCompositeCooldown
+// covers the same bug in windowReopened's "prefer the just-reopened agent"
+// fast path (sec 12): codex's bare-agent WindowState looks reopened (it was
+// exhausted a while ago and never relaunched since), but its one roster
+// model is still genuinely on cooldown by its own composite key -- that
+// must not be read as "reopened", or this fast path would keep preferring
+// codex over a real cooldown, same as the bare round-robin bug above. With
+// no other roster agent to fall back to, the run is left queued instead of
+// wrongly relaunched.
+func TestReassignmentWindowPreferenceDoesNotOverrideARealCompositeCooldown(t *testing.T) {
+	fake := &runner.Fake{}
+	loop, _ := newTestLoop(t, fake)
+	loop.Agents = []agentspec.Spec{
+		{Agent: "codex", Model: "gpt-5.3-codex-spark"},
+		{Agent: "claude", Model: "sonnet"},
+	}
+	loop.State.Cooldowns["codex:gpt-5.3-codex-spark"] = testNow.Add(time.Hour)
+	loop.State.WindowState = map[string]*fleetstate.AgentWindowState{
+		"codex": {LastExhausted: testNow.Add(-6 * time.Hour)},
+	}
+
+	alt, ok := loop.reassignAgent("claude", testNow, map[string]int{})
+	if ok {
+		t.Fatalf("reassignAgent picked %+v, want no candidate (codex's only roster model is still really on cooldown)", alt)
+	}
+}
