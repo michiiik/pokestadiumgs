@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"fleetctl/internal/agentspec"
-	"fleetctl/internal/difficulty"
 	"fleetctl/internal/planpkg"
 	"fleetctl/internal/runner"
 )
@@ -33,7 +32,6 @@ func runPlanCmd(args []string) error {
 	budgetSeconds := fs.Int("budget-seconds", 3600, "--budget-seconds passed to every launched run")
 	maxInstructions := fs.Int("max-instructions", 0, "forwarded to rank-files --max-instructions (0 = tool default)")
 	excludeRecent := fs.Float64("exclude-recent", -1, "forwarded to rank-files --exclude-recent HOURS (negative = omit the flag entirely; 0 still applies rank-files' own dirty-working-tree exclusion, just with no commit-recency window)")
-	maxDifficulty := fs.String("max-difficulty", "", "only queue owners at or below this difficulty tier (easy|medium|hard; empty = no ceiling, every owner is queued). Persisted into the plan, so a later --replan keeps honoring it without needing this flag again.")
 	out := fs.String("out", "plan.json", "where to write the plan JSON")
 	pythonBin := fs.String("python", "", "override the python3 binary (default: python3 on PATH)")
 	if err := fs.Parse(args); err != nil {
@@ -67,13 +65,6 @@ func runPlanCmd(args []string) error {
 	if err != nil {
 		return err
 	}
-	var difficultyTier difficulty.Tier
-	if *maxDifficulty != "" {
-		difficultyTier, err = difficulty.ParseTier(*maxDifficulty)
-		if err != nil {
-			return err
-		}
-	}
 
 	r := &runner.ExecRunner{RepoRoot: *repo, PythonBin: *pythonBin}
 	p, err := planpkg.Build(context.Background(), r, planpkg.Options{
@@ -90,7 +81,6 @@ func runPlanCmd(args []string) error {
 		ExcludeRecentHours: *excludeRecent,
 		Windows:            windowMap,
 		WindowBudget:       windowBudgetMap,
-		MaxDifficulty:      difficultyTier,
 	})
 	if err != nil {
 		return err

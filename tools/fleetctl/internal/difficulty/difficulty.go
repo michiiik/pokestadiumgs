@@ -1,19 +1,23 @@
 // Package difficulty combines a runner.TargetOwner's static shape (tools/
 // scan_asm_families.py's classify()) with its real probe-attempt history
 // (tools/pragma_targets.py's OwnerHardness) into one coarse routing hint,
-// and offers a --max-difficulty-style filter callers can apply against it.
+// and offers Rank so callers can order owners easiest-first.
 //
 // Originally control.DifficultyTier/difficultyTierFor (fleetctl PR #94,
 // unused outside its own tests); moved into its own package so
 // planpkg.Build -- which control already imports, so control could never
-// import it back -- can filter owners by tier at plan-build/replan time.
+// import it back -- can order owners by tier at plan-build/replan time
+// (PR #95 first tried a hard --max-difficulty ceiling that DROPPED
+// anything above it; live deployment against the real backlog showed the
+// Easy family bucket is nearly empty across the whole codebase -- the
+// obviously-trivial wrapper shapes were mostly already claimed earlier in
+// the project's history -- so a ceiling just starved the fleet the moment
+// its one ranked file's Easy owners ran out. Ordering instead of dropping
+// self-adjusts: once a file's easy owners are gone, its medium ones
+// simply sort to the front next, with zero operator intervention needed).
 package difficulty
 
-import (
-	"fmt"
-
-	"fleetctl/internal/runner"
-)
+import "fleetctl/internal/runner"
 
 // Tier is a coarse, three-bucket routing hint for one owner -- how much
 // genuine reasoning difficulty it's likely to take a generator to close,
@@ -44,8 +48,7 @@ const (
 	Hard   Tier = "hard"
 )
 
-// rank orders the three tiers for Allowed's "at or below a ceiling"
-// comparison -- lower is easier.
+// rank orders the three tiers for Rank -- lower is easier.
 var rank = map[Tier]int{Easy: 0, Medium: 1, Hard: 2}
 
 // driftCloseSimilarityThreshold: a "drift" owner (real gap, but not a
@@ -136,27 +139,16 @@ func TierFor(owner runner.TargetOwner) Tier {
 	return Medium
 }
 
-// Allowed reports whether owner's tier is at or below max -- Easy <=
-// Medium <= Hard. An empty max means "no ceiling": every owner passes,
-// the zero-value/default behavior a caller gets by simply not setting a
-// --max-difficulty-style option.
-func Allowed(owner runner.TargetOwner, max Tier) bool {
-	if max == "" {
-		return true
-	}
-	return rank[TierFor(owner)] <= rank[max]
-}
-
-// ParseTier validates a --max-difficulty-style flag value against the
-// three known tiers. Deliberately does NOT accept "" as valid -- an empty
-// string means "the flag was never set" to Allowed, a distinct thing from
-// "the user typed an empty value"; callers should only call ParseTier once
-// they already know the raw flag string is non-empty.
-func ParseTier(s string) (Tier, error) {
-	switch Tier(s) {
-	case Easy, Medium, Hard:
-		return Tier(s), nil
-	default:
-		return "", fmt.Errorf("difficulty: unknown tier %q (want: easy, medium, or hard)", s)
-	}
+// Rank orders t for an easiest-first sort -- Easy < Medium < Hard. Callers
+// order a slice of owners with e.g.
+//
+//	sort.SliceStable(owners, func(i, j int) bool {
+//	    return difficulty.Rank(difficulty.TierFor(owners[i])) < difficulty.Rank(difficulty.TierFor(owners[j]))
+//	})
+//
+// -- a stable sort so owners already ordered some other way (e.g. `targets`'s
+// own smallest-instructions-first ranking) keep that relative order within
+// each tier.
+func Rank(t Tier) int {
+	return rank[t]
 }
