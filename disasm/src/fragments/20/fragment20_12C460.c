@@ -558,7 +558,37 @@ void func_8260E2C4(void *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260ED40.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260F084.s")
+void func_8260F084(void *arg0, s32 arg1) {
+    struct Vec2s {
+        s16 x;
+        s16 y;
+    };
+    struct State {
+        s16 unk0;
+        s16 unk2;
+        s16 unk4;
+        s16 unk6;
+        s16 unk8;
+        s16 padA;
+        s32 unkC;
+        s32 unk10;
+        struct Vec2s unk14;
+        struct Vec2s unk18;
+        struct Vec2s unk1C;
+    } *ptr = (struct State *)arg0;
+
+    ptr->unk0 = 0;
+    ptr->unk2 = 0;
+    ptr->unk4 = 0;
+    ptr->unk6 = arg1;
+    ptr->unk8 = 0;
+    ptr->unkC = 0;
+    ptr->unk10 = 0x40000;
+    ptr->unk14.x = 0x110;
+    ptr->unk14.y = 0xC0;
+    ptr->unk18 = ptr->unk14;
+    ptr->unk1C = ptr->unk14;
+}
 
 void func_8260F0DC(u8 *arg0) {
     *(s16 *)(arg0 + 0) = 1;
