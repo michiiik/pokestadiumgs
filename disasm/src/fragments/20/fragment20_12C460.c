@@ -333,7 +333,31 @@ done_default:
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82604C08.s")
+s16 *func_82604C08(s16 *arg0, s32 arg1)
+{
+    s16 *new_var;
+    s16 *current;
+    s16 *result;
+    s32 index;
+    result = 0;
+    index = 0;
+    if (arg1 > 0)
+    {
+        current = (new_var = arg0);
+        do
+        {
+            index += 1;
+            if ((*current) == 0)
+            {
+                result = current;
+                break;
+            }
+            current += 0x14C;
+        }
+        while (index != arg1);
+    }
+    return result;
+}
 
 void *func_82604C40(s32 arg0, s32 arg1, void *arg2, s32 arg3) {
     s32 var_v0;
