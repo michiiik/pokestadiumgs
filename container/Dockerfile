@@ -56,6 +56,18 @@ RUN curl -fsSL https://code.kimi.com/kimi-code/install.sh \
         | KIMI_VERSION="$KIMI_CODE_VERSION" KIMI_INSTALL_DIR=/usr/local bash \
     && kimi --version
 
+# Google Antigravity CLI (container/generators/gemini.sh): a standalone
+# native binary, not an npm/pip package. The installer has no version-pin or
+# install-dir override (checked its source: no VERSION/INSTALL_DIR env var
+# handling), so this always picks up whatever is current at build time,
+# unlike Kimi above -- rebuild the image to pick up a new release. It places
+# the binary at ~/.local/bin/agy (root's HOME here, i.e. /root/.local/bin)
+# and is not on PATH by default; symlink it onto PATH directly rather than
+# rely on a login-shell rc file, matching Kimi's reasoning above.
+RUN curl -fsSL https://antigravity.google/cli/install.sh | bash \
+    && ln -s /root/.local/bin/agy /usr/local/bin/agy \
+    && agy --version
+
 WORKDIR /work
 COPY . /work
 

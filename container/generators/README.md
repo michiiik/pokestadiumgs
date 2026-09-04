@@ -26,12 +26,12 @@ final batch. That only works for a wrapper that actually gives the model
 tool/shell access:
 
 - `claude.sh`, `codex.sh`, `qwen.sh`, `kimi.sh`, `claude_via.sh` (and its
-  `alibaba`/`zai` shorthands) are all agentic (the model writes `$BATCH`
-  itself via a file tool) and, as of this doc, all run with auto-approved
-  tool calls -- no interactive confirmation prompt that could never be
-  answered in a non-interactive container -- so the model can also shell out
-  to `probe_one.py` mid-turn: `claude.sh`'s `--allowedTools Read Write Bash`
-  already includes `Bash` (`claude_via.sh` uses the identical
+  `alibaba`/`zai` shorthands), `gemini.sh` are all agentic (the model writes
+  `$BATCH` itself via a file tool) and, as of this doc, all run with
+  auto-approved tool calls -- no interactive confirmation prompt that could
+  never be answered in a non-interactive container -- so the model can also
+  shell out to `probe_one.py` mid-turn: `claude.sh`'s `--allowedTools Read
+  Write Bash` already includes `Bash` (`claude_via.sh` uses the identical
   `--allowedTools` invocation, just against a different endpoint); `codex.sh`'s
   `--dangerously-bypass-approvals-and-sandbox` skips both approvals and the
   default read-only sandbox; `kimi.sh`'s `-p` mode runs under the CLI's own
@@ -40,7 +40,10 @@ tool/shell access:
   without it, `-p` mode does *not* auto-approve tool calls at all per
   [qwen-code's headless-mode docs](https://qwenlm.github.io/qwen-code-docs/en/users/features/headless/),
   and the model would sit waiting for an approval prompt that can never
-  arrive).
+  arrive); `gemini.sh` needs `--dangerously-skip-permissions`, the same
+  blanket-auto-approve shape as `codex.sh`/`qwen.sh` (verified locally: with
+  it omitted, a Write-tool call is exactly what a plain prompt-and-print
+  cannot get approval for non-interactively).
 - `openai_compat.sh`/`kimi_api.sh` are plain HTTP calls with no tool access
   whatsoever, so the probe-tool paragraph would be pure noise for them.
   `container/entrypoint.sh` sets `PROBE_TOOL=off` for `AGENT=openai_compat`
@@ -68,6 +71,7 @@ Select which coding agent generates candidates with the `AGENT` env var
 | `claude_via`     | `@anthropic-ai/claude-code` (`claude`), pointed at a third-party Anthropic-compatible endpoint | `CLAUDE_VIA` (`alibaba`\|`zai`\|`custom`) + that provider's token, `GENERATOR_MODEL` | (none -- must be set) |
 | `alibaba`        | shorthand for `claude_via` `CLAUDE_VIA=alibaba`   | `ANTHROPIC_AUTH_TOKEN` (`container/run.sh` reads this from `~/.qwen/settings.json`, or set `ALIBABA_API_KEY` directly), `GENERATOR_MODEL` | (none -- must be set) |
 | `zai`            | shorthand for `claude_via` `CLAUDE_VIA=zai`       | `ZAI_API_KEY`, `GENERATOR_MODEL`                 | (none -- must be set)              |
+| `gemini`         | Google Antigravity CLI (`agy`, native binary)     | a mounted Antigravity/Google login (`~/.gemini/antigravity-cli/antigravity-oauth-token`) -- no API-key auth path exists for this CLI | `gemini-3.8-flash-medium` |
 
 Install lines for the Dockerfile (the other agent copies these; not added
 here):
@@ -80,6 +84,7 @@ npm install -g @qwen-code/qwen-code
 # kimi_api and openai_compat need only python3, already required by the repo's tooling
 # claude_via (and its alibaba/zai shorthands) reuse the same @anthropic-ai/claude-code
 # install as claude.sh -- no separate package
+curl -fsSL https://antigravity.google/cli/install.sh | bash   # gemini: agy, native binary, no version pin available
 ```
 
 ## claude.sh
@@ -172,6 +177,42 @@ config entry declares `support_efforts = [low, high, max]`) is forwarded as
 thinking-effort level on the wire (only takes effect while Thinking is on,
 which the default profile has enabled).
 
+
+## gemini.sh
+
+`agy -p "$(cat "$PROMPT")" --model "${GENERATOR_MODEL:-gemini-3.8-flash-medium}"
+--output-format text --dangerously-skip-permissions`
+
+Agentic, same shape as claude.sh/qwen.sh. Flags verified against `agy --help`
+locally (agy 1.1.25): `-p/--print` runs one prompt non-interactively and
+prints the response. `--dangerously-skip-permissions` auto-approves every
+tool call, the same reasoning as `codex.sh`'s
+`--dangerously-bypass-approvals-and-sandbox` -- this only ever runs inside
+the already-sandboxed `gs-decomp-agent` container.
+
+No API-key auth path exists for this CLI (`agy --help`'s subcommand list has
+no `login`/`auth`/token-export command). On macOS the real credential is
+Keychain-bound (`security dump-keychain` shows service `gemini` / account
+`antigravity`), not a portable file, so a one-time interactive login has to
+happen on Linux instead, where the OAuth flow lands in a plain file:
+
+```
+curl -fsSL https://antigravity.google/cli/install.sh | bash
+~/.local/bin/agy -p "reply with exactly: OK" --model gemini-3.8-flash-medium \
+  --output-format text --dangerously-skip-permissions
+# prints a Google OAuth URL; open it, grant consent, paste the resulting
+# authorization code back when prompted
+```
+
+That persists a long-lived Google OAuth refresh token (`access_type=offline`
+in the auth URL; confirmed two independent copies of it both authenticate
+successfully, unlike Kimi's single-use-rotating token) at
+`~/.gemini/antigravity-cli/antigravity-oauth-token`, portable by copy --
+`container/run.sh` mounts a throwaway copy of it plus the three other files
+`agy` reads (`antigravity-cli/installation_id`,
+`config/config.json`, `config/projects/default-cli-project.json`), same
+pattern as `codex.sh`'s `auth.json` mount, not the whole ~180MB
+`antigravity-cli/` directory (cache, conversation history, logs).
 ## kimi_api.sh
 
 Thin wrapper over `openai_compat.sh` and a plain Moonshot Open Platform API

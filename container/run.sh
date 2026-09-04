@@ -121,6 +121,30 @@ elif [ -n "${KIMI_CODE_HOME:-}" ]; then
     extra_args+=(-e KIMI_CODE_HOME="$KIMI_CODE_HOME")
 fi
 
+# Google Antigravity CLI (AGENT=gemini): mount a throwaway copy of the
+# host's ~/.gemini antigravity-cli/config login state, same pattern as codex
+# above (copy, not the kimi read-write mount) -- confirmed the credential is
+# a standard long-lived Google OAuth refresh token (access_type=offline),
+# not single-use-rotating like Kimi's, so two independent copies used
+# back-to-back both worked. Copies only the specific files agy reads for
+# auth (antigravity-oauth-token, installation_id, config.json,
+# projects/default-cli-project.json), not the whole directory (which also
+# holds ~180MB of CLI cache, conversation history, logs). There is no
+# API-key auth path for this CLI: on macOS the real credential is
+# Keychain-bound (security dump-keychain shows service "gemini" / account
+# "antigravity"), not a portable file, so the one-time OAuth login has to
+# happen on Linux -- see container/generators/gemini.sh's header for how.
+gemini_home_src="${GEMINI_HOME:-$HOME/.gemini}"
+if [ "${AGENT:-claude}" = "gemini" ] && [ -f "$gemini_home_src/antigravity-cli/antigravity-oauth-token" ]; then
+    gemini_home="$(mktemp -d)"
+    mkdir -p "$gemini_home/antigravity-cli" "$gemini_home/config/projects"
+    cp "$gemini_home_src/antigravity-cli/antigravity-oauth-token" "$gemini_home/antigravity-cli/"
+    [ -f "$gemini_home_src/antigravity-cli/installation_id" ] &&         cp "$gemini_home_src/antigravity-cli/installation_id" "$gemini_home/antigravity-cli/"
+    [ -f "$gemini_home_src/config/config.json" ] &&         cp "$gemini_home_src/config/config.json" "$gemini_home/config/"
+    [ -f "$gemini_home_src/config/projects/default-cli-project.json" ] &&         cp "$gemini_home_src/config/projects/default-cli-project.json" "$gemini_home/config/projects/"
+    extra_args+=(-v "$gemini_home:/root/.gemini")
+fi
+
 # Alibaba Cloud Model Studio (AGENT=alibaba, or AGENT=claude_via
 # CLAUDE_VIA=alibaba): resolve the matching plan's dedicated API key out of
 # ~/.qwen/settings.json's "env" block into ANTHROPIC_AUTH_TOKEN for the
