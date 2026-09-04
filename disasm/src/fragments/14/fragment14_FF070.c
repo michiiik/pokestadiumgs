@@ -396,7 +396,20 @@ void func_8130B0E0(void *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130B12C.s")
+extern void func_8130AF94(void *arg0);
+void func_8130B12C(void *arg0) {
+    u8 *base=(u8 *)arg0+0x8000;
+    s32 value=(s32)*(f32 *)(base+0x68F8);
+    s32 state=base[0x6911];
+    s32 difference; s32 amount;
+    if(value!=state){
+        difference=value-state; amount=-difference;
+        if(difference>0){amount=difference;}else{amount=-difference;}
+        if(amount>=3){func_8130AF94(arg0);return;}
+        if(state<value) { do{func_8130B06C(arg0);state=base[0x6911];}while(state<value); }
+        if(value<state) { do{func_8130B0E0(arg0);state=base[0x6911];}while(value<base[0x6911]); }
+    }
+}
 
 extern s32 func_8160A33C(s32 arg0, u8 arg1);
 s32 func_8130B1F4(u8 *arg0) {

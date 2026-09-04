@@ -68,3 +68,15 @@ func_8130B0E0: matched (call_sequence:permuter:exact-pointer-aliases), 3 iterati
 ## 2026-09-05
 
 func_8130A708: matched (call-sequence:permuter:exact-local-shape), 5 iterations, agent codex
+
+## 2026-09-05
+
+func_8130B12C: matched (call_sequence:base:explicit-else-renamed-temps), 6 iterations, agent codex
+
+## 2026-09-05
+
+func_8130BFF0: time cap at 0.7414 (raw 0.6379) after 2400s, mismatch operand_or_scheduling_drift; tried families: call-sequence; tie-pool no
+
+## 2026-09-05
+
+func_8130AF94: time cap at 0.8889 (raw 0.7222) after 2400s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
