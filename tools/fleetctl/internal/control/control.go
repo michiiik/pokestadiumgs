@@ -65,8 +65,21 @@ type Loop struct {
 	// (docs/FLEET_CONTROLLER.md sec 2).
 	BaseRef string
 
-	MaxConcurrent    int
+	MaxConcurrent int
+	// AgentConcurrency caps how many runs may be Running at once under one
+	// key -- either a bare agent name or the fleetstate.AgentModelKey
+	// composite ("agent:model"), so one specific model sharing an agent's
+	// name can be capped independently of its siblings (e.g.
+	// "codex:gpt-5.3-codex-spark" without also capping
+	// "codex:gpt-5.6-luna"). agentConcurrencyExceeded checks both forms.
 	AgentConcurrency map[string]int
+	// MaxPerFile caps how many runs may be Running at once against the
+	// same target source file, regardless of agent -- 0 means unlimited.
+	// Too many concurrent containers on one file don't add real
+	// parallelism; they mostly just race each other into PR-merge
+	// conflicts (docs sec 2's conflict-replay path), each conflict paying
+	// for a full redo of that PR's owners against the new base.
+	MaxPerFile       int
 	CooldownDefaults map[string]time.Duration
 	DefaultCooldown  time.Duration
 	PollInterval     time.Duration
@@ -235,6 +248,24 @@ func (l *Loop) stopSiblingRuns(ctx context.Context, exhausted *fleetstate.RunRec
 		if rec.Spec.Agent != exhausted.Spec.Agent || rec.Spec.Model != exhausted.Spec.Model {
 			continue
 		}
+		// The sibling very often self-exits from hitting the identical
+		// quota limit before this Stop lands -- observed live, that race
+		// is the common case (roughly 85% of attempts), not the
+		// exception. Inspect first so it resolves as a quiet no-op
+		// instead of a docker-stop error every single time it happens;
+		// InspectContainer already treats "no such object" as
+		// Found:false (already reaped), the same signal pollRunning uses
+		// elsewhere for a container that vanished out of band.
+		if info, err := l.Runner.InspectContainer(ctx, rec.ContainerID); err == nil && !info.Found {
+			rec.Status = fleetstate.StatusRequeued
+			rec.StoppedReason = ""
+			rec.Note = fmt.Sprintf("stopped: sibling run %s just confirmed %s:%s is rate-limited (container had already exited)", exhausted.Spec.ID, rec.Spec.Agent, rec.Spec.Model)
+			rec.EndedAt = l.now()
+			l.requeueResume(rec)
+			l.logf("run %s: sibling %s's generator_exhausted confirmed %s:%s is rate-limited (container already exited); requeueing with --resume",
+				rec.Spec.ID, exhausted.Spec.ID, rec.Spec.Agent, rec.Spec.Model)
+			continue
+		}
 		if err := l.Runner.StopContainer(ctx, rec.ContainerID); err != nil {
 			l.logf("run %s: stop after sibling %s's generator_exhausted failed: %v", rec.Spec.ID, exhausted.Spec.ID, err)
 			continue
@@ -260,10 +291,26 @@ func (l *Loop) stopSiblingRuns(ctx context.Context, exhausted *fleetstate.RunRec
 // key there let a queued run get reassigned right back into a model that
 // was, in fact, still on cooldown (see those functions' own comments).
 func cooldownKey(agent, model string) string {
-	if model == "" {
-		return agent
+	return fleetstate.AgentModelKey(agent, model)
+}
+
+// agentConcurrencyExceeded reports whether launching agent/model now would
+// break either the coarse per-agent --agent-concurrency cap or a
+// finer-grained one set under the model-specific cooldownKey/
+// fleetstate.AgentModelKey composite -- e.g. capping
+// "codex:gpt-5.3-codex-spark" specifically without also capping codex's
+// other models. byAgent and byAgentModel must both already account for any
+// launches decided earlier in the same reconcile pass (mirroring how
+// byAgent alone was threaded through before this existed).
+func (l *Loop) agentConcurrencyExceeded(agent, model string, byAgent, byAgentModel map[string]int) bool {
+	if limit := l.AgentConcurrency[agent]; limit > 0 && byAgent[agent] >= limit {
+		return true
 	}
-	return agent + ":" + model
+	key := fleetstate.AgentModelKey(agent, model)
+	if limit := l.AgentConcurrency[key]; limit > 0 && byAgentModel[key] >= limit {
+		return true
+	}
+	return false
 }
 
 func (l *Loop) cooldownFor(agent string) time.Duration {
@@ -1808,6 +1855,8 @@ func (l *Loop) launchEligible(ctx context.Context) error {
 		return nil
 	}
 	totalRunning, byAgent := l.State.RunningCount()
+	byAgentModel := l.State.RunningCountByAgentModel()
+	byFile := l.State.RunningCountByFile()
 	now := l.now()
 	max := l.maxConcurrent()
 	claimed := l.runningOwners()
@@ -1837,6 +1886,13 @@ func (l *Loop) launchEligible(ctx context.Context) error {
 		case totalRunning >= max:
 			rec.WaitReason = "concurrency"
 			remaining = append(remaining, id)
+		// A file already at MaxPerFile concurrent runs is left queued
+		// regardless of agent -- checked before cooldown/reassignment
+		// below, since reassigning this run to a different agent would
+		// not relieve a cap that is keyed on the file, not the agent.
+		case l.MaxPerFile > 0 && byFile[rec.Spec.File] >= l.MaxPerFile:
+			rec.WaitReason = "file-concurrency"
+			remaining = append(remaining, id)
 		// permuterAgent is never subject to cooldown (sec 13), so this case
 		// can never fire for it regardless of what State.Cooldowns holds.
 		// Checks both the model-specific key a real exhaustion now writes
@@ -1850,7 +1906,7 @@ func (l *Loop) launchEligible(ctx context.Context) error {
 			// (round-robin over the plan's own roster, preferring one whose
 			// window just reopened) instead of waiting out rec's own
 			// agent's cooldown.
-			if alt, ok := l.reassignAgent(rec.Spec.Agent, now, byAgent); ok {
+			if alt, ok := l.reassignAgent(rec.Spec.Agent, now, byAgent, byAgentModel); ok {
 				l.logf("run %s: agent %s on cooldown; reassigning to %s:%s%s (sec 12)",
 					id, rec.Spec.Agent, alt.Agent, alt.Model, effortSuffix(alt.Effort))
 				rec.Note = appendReassignNote(rec.Note, rec.Spec.Agent, alt.Agent)
@@ -1863,11 +1919,13 @@ func (l *Loop) launchEligible(ctx context.Context) error {
 				reserveOwners(claimed, rec.Spec.File, rec.Spec.Owners)
 				totalRunning++
 				byAgent[alt.Agent]++
+				byAgentModel[fleetstate.AgentModelKey(alt.Agent, alt.Model)]++
+				byFile[rec.Spec.File]++
 				continue
 			}
 			rec.WaitReason = "cooldown"
 			remaining = append(remaining, id)
-		case l.AgentConcurrency[rec.Spec.Agent] > 0 && byAgent[rec.Spec.Agent] >= l.AgentConcurrency[rec.Spec.Agent]:
+		case l.agentConcurrencyExceeded(rec.Spec.Agent, rec.Spec.Model, byAgent, byAgentModel):
 			rec.WaitReason = "concurrency"
 			remaining = append(remaining, id)
 		default:
@@ -1879,6 +1937,8 @@ func (l *Loop) launchEligible(ctx context.Context) error {
 			reserveOwners(claimed, rec.Spec.File, rec.Spec.Owners)
 			totalRunning++
 			byAgent[rec.Spec.Agent]++
+			byAgentModel[fleetstate.AgentModelKey(rec.Spec.Agent, rec.Spec.Model)]++
+			byFile[rec.Spec.File]++
 		}
 	}
 	l.State.Queue = remaining

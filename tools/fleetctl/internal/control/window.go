@@ -127,11 +127,11 @@ func (l *Loop) agentRoster() []agentspec.Spec {
 // consecutive relaunches, each one immediately re-exhausting and pushing
 // its own cooldown a little further out, while agents with real spare
 // capacity elsewhere in the roster went untried.
-func (l *Loop) eligibleForReassignment(agent, model string, now time.Time, byAgent map[string]int) bool {
+func (l *Loop) eligibleForReassignment(agent, model string, now time.Time, byAgent, byAgentModel map[string]int) bool {
 	if l.State.OnCooldown(agent, now) || l.State.OnCooldown(cooldownKey(agent, model), now) {
 		return false
 	}
-	if limit := l.AgentConcurrency[agent]; limit > 0 && byAgent[agent] >= limit {
+	if l.agentConcurrencyExceeded(agent, model, byAgent, byAgentModel) {
 		return false
 	}
 	return true
@@ -146,7 +146,7 @@ func (l *Loop) eligibleForReassignment(agent, model string, now time.Time, byAge
 // if no other roster agent currently has spare capacity -- launchEligible
 // then falls back to leaving the partition queued with wait_reason
 // "cooldown", exactly as before sec 12.
-func (l *Loop) reassignAgent(original string, now time.Time, byAgent map[string]int) (agentspec.Spec, bool) {
+func (l *Loop) reassignAgent(original string, now time.Time, byAgent, byAgentModel map[string]int) (agentspec.Spec, bool) {
 	roster := l.agentRoster()
 	if len(roster) == 0 {
 		return agentspec.Spec{}, false
@@ -154,7 +154,7 @@ func (l *Loop) reassignAgent(original string, now time.Time, byAgent map[string]
 
 	var reopened []agentspec.Spec
 	for _, spec := range roster {
-		if spec.Agent != original && l.eligibleForReassignment(spec.Agent, spec.Model, now, byAgent) && l.windowReopened(spec.Agent, spec.Model, now) {
+		if spec.Agent != original && l.eligibleForReassignment(spec.Agent, spec.Model, now, byAgent, byAgentModel) && l.windowReopened(spec.Agent, spec.Model, now) {
 			reopened = append(reopened, spec)
 		}
 	}
@@ -170,7 +170,7 @@ func (l *Loop) reassignAgent(original string, now time.Time, byAgent map[string]
 		if spec.Agent == original {
 			continue
 		}
-		if l.eligibleForReassignment(spec.Agent, spec.Model, now, byAgent) {
+		if l.eligibleForReassignment(spec.Agent, spec.Model, now, byAgent, byAgentModel) {
 			l.State.ReassignCursor = (idx + 1) % n
 			return spec, true
 		}
