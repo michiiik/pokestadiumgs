@@ -1113,7 +1113,20 @@ void func_826112CC(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_826114DC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_826119A4.s")
+s32 func_826119A4(s32 arg0, s32 arg1, s16 *arg2) {
+    s32 result;
+    s32 i;
+
+    result = -1;
+    for (i = 0; i < arg1; i++) {
+        if (arg0 != arg2[i]) {
+            continue;
+        }
+        result = i;
+        break;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_826119DC.s")
 
