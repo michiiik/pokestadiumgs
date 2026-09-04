@@ -613,7 +613,27 @@ void func_8005AD58(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005ADD8.s")
+extern void func_80055948(s32);
+extern s32 func_80056870(s32, u8 *, void *);
+extern void func_80054E48(s32);
+extern void func_8005AD58(s32 arg0);
+extern u8 D_80128570[];
+extern s32 D_80128748;
+void GbTower_StartPortSession(s32 arg0) {
+    u8 flag;
+    if (D_80128748 & (1 << arg0)) {
+        func_80055948(3);
+        if (func_80056870(arg0, &flag, (s32 *)(D_80128570 + arg0 * 112) + 10) == 0) {
+            Game_ShutdownAndLoadFragment(arg0, 2);
+        }
+        *(s32 *)(D_80128570 + arg0 * 112) |= 0x80000000;
+        func_8005AD58(arg0);
+        if (GbTower_CheckPakRemoved(arg0, flag) == 0) {
+            Game_ShutdownAndLoadFragment(arg0, 2);
+        }
+        func_80054E48(3);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1003,7 +1023,28 @@ s32 func_8005CB38(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005CFE8.s")
+extern s32 func_8005CF20(s32, s32, s32);
+extern u8 D_801285D0[];
+void func_8005CFE8(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    s32 record = *(s32 *)(D_801285D0 + arg1 * 112);
+    if (arg3 < func_8005CF20(arg0, arg1, arg2)) {
+        switch (arg0) {
+        case 0x20:
+            *(u8 *)(record + 0x9AC) = arg3;
+            *(u8 *)(record + arg3 + 0x9AD) = 0xFF;
+            break;
+        case 0x21:
+            func_8005C060(arg1, arg2, arg3);
+            break;
+        case 0x22:
+            *(u8 *)(record + 0x266) = arg3;
+            *(u8 *)(record + arg3 * 2 + 0x267) = 0xFF;
+            break;
+        case 0x23:
+            break;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
