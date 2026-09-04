@@ -1634,9 +1634,22 @@ def _record_generator_outcome(
     """Update the run's consecutive-generator-failure counter.
 
     A successful iteration (generator exited zero AND produced a valid batch)
-    resets the counter to zero. Otherwise the counter is incremented by 2 when
-    the failure looks like a quota/rate-limit signature, else by 1. Returns
-    True once ``max_failures`` is reached, meaning the whole run should stop.
+    resets the counter to zero. Otherwise the counter is incremented by 1 for
+    an ordinary failure -- but a failure that looks like a quota/rate-limit
+    signature jumps the counter straight to ``max_failures`` (never lower
+    than its current value), so ONE confirmed quota signal always exhausts
+    the run immediately, on whatever iteration it first appears -- including
+    the very first, "as soon as [the container] enters" a model that's
+    already at its limit. A quota/rate-limit error is a deterministic,
+    account-wide condition, not a transient generator glitch: retrying a
+    second or third time before giving up (the old +2-per-quota-failure
+    escalation, which needed two consecutive quota signals to reach the
+    default limit of 3) can only waste wall-clock confirming what the first
+    attempt already proved -- fleetctl's own agent+model cooldown and sec-12
+    reassignment (docs/FLEET_CONTROLLER.md sec 12) take over the instant this
+    function returns True, handing the partition to another agent instead.
+    Returns True once ``max_failures`` is reached, meaning the whole run
+    should stop.
     """
     if ok:
         gen_failures["consecutive"] = 0
@@ -1644,9 +1657,16 @@ def _record_generator_outcome(
 
     if quota:
         logger.log(f"{owner}: iter {iteration}: generator output looks like a quota/rate-limit signal")
-
-    increment = 2 if quota else 1
-    gen_failures["consecutive"] = gen_failures.get("consecutive", 0) + increment
+        if max_failures > 0:
+            gen_failures["consecutive"] = max(gen_failures.get("consecutive", 0), max_failures)
+        else:
+            # max_failures <= 0 means exhaustion is disabled entirely --
+            # keep some signal in the counter (the old fixed +2) rather
+            # than a silent no-op, without ever being able to trip the
+            # (permanently False) return below.
+            gen_failures["consecutive"] = gen_failures.get("consecutive", 0) + 2
+    else:
+        gen_failures["consecutive"] = gen_failures.get("consecutive", 0) + 1
 
     tail = stderr_tail.strip()
     if tail:

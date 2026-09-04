@@ -2165,6 +2165,78 @@ class GeneratorExhaustionTests(unittest.TestCase):
 
 
 # ---------------------------------------------------------------------------
+# _record_generator_outcome: direct unit coverage of the failure counter
+# ---------------------------------------------------------------------------
+
+class RecordGeneratorOutcomeTests(unittest.TestCase):
+    """Direct coverage of the counter logic, independent of process_owner's
+    surrounding machinery: an ordinary failure still costs exactly 1, a
+    confirmed quota/rate-limit signal jumps straight to max_failures (so one
+    is always enough to exhaust, whatever max_failures is configured to),
+    and a successful iteration still resets to 0."""
+
+    def _logger(self, tmp: str) -> "container_agent.Logger":
+        return container_agent.Logger(Path(tmp) / "log.txt")
+
+    def test_ordinary_failure_increments_by_one(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            gen_failures = {"consecutive": 0}
+            exhausted = container_agent._record_generator_outcome(
+                gen_failures, ok=False, quota=False, stderr_tail="boom",
+                owner="func_1", iteration=0, max_failures=3, logger=self._logger(tmp),
+            )
+        self.assertFalse(exhausted)
+        self.assertEqual(gen_failures["consecutive"], 1)
+
+    def test_quota_failure_exhausts_on_the_very_first_appearance(self) -> None:
+        # A low max_failures (3, the driver's own default) proves this
+        # isn't just "eventually reaches a big number" -- one confirmed
+        # quota signal on iteration 0 is immediately enough, regardless of
+        # what max_failures is configured to.
+        with tempfile.TemporaryDirectory() as tmp:
+            gen_failures = {"consecutive": 0}
+            exhausted = container_agent._record_generator_outcome(
+                gen_failures, ok=False, quota=True, stderr_tail="Error: rate limit exceeded",
+                owner="func_1", iteration=0, max_failures=3, logger=self._logger(tmp),
+            )
+        self.assertTrue(exhausted)
+        self.assertEqual(gen_failures["consecutive"], 3)
+
+    def test_quota_failure_never_lowers_an_already_higher_counter(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            gen_failures = {"consecutive": 5}
+            exhausted = container_agent._record_generator_outcome(
+                gen_failures, ok=False, quota=True, stderr_tail="quota exceeded",
+                owner="func_1", iteration=2, max_failures=3, logger=self._logger(tmp),
+            )
+        self.assertTrue(exhausted)
+        self.assertEqual(gen_failures["consecutive"], 5)
+
+    def test_quota_failure_with_exhaustion_disabled_falls_back_to_plus_two(self) -> None:
+        # max_failures <= 0 means "never exhaust" -- there is no sensible
+        # value to jump the counter to, so it keeps the old flat +2 purely
+        # to leave some signal in the counter rather than a silent no-op.
+        with tempfile.TemporaryDirectory() as tmp:
+            gen_failures = {"consecutive": 0}
+            exhausted = container_agent._record_generator_outcome(
+                gen_failures, ok=False, quota=True, stderr_tail="rate limit",
+                owner="func_1", iteration=0, max_failures=0, logger=self._logger(tmp),
+            )
+        self.assertFalse(exhausted)
+        self.assertEqual(gen_failures["consecutive"], 2)
+
+    def test_success_resets_counter_to_zero(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            gen_failures = {"consecutive": 7}
+            exhausted = container_agent._record_generator_outcome(
+                gen_failures, ok=True, quota=False, stderr_tail="",
+                owner="func_1", iteration=3, max_failures=3, logger=self._logger(tmp),
+            )
+        self.assertFalse(exhausted)
+        self.assertEqual(gen_failures["consecutive"], 0)
+
+
+# ---------------------------------------------------------------------------
 # Generator timeout handling / quota classification scoping
 # ---------------------------------------------------------------------------
 
@@ -2285,14 +2357,21 @@ class GeneratorTimeoutAndQuotaClassificationTests(unittest.TestCase):
             "generator timed out but left a batch with 1 candidate(s); probing it", log_text,
         )
 
-    def test_nonzero_exit_with_rate_limit_stderr_counts_two_failures(self) -> None:
+    def test_nonzero_exit_with_rate_limit_stderr_exhausts_immediately(self) -> None:
+        # A confirmed quota/rate-limit signal jumps straight to
+        # max_generator_failures on its very first appearance -- it no
+        # longer takes a second one to actually stop the run (see
+        # _record_generator_outcome).
         with tempfile.TemporaryDirectory() as tmp:
             def failing_generator(command, *, cwd, timeout):
                 return SimpleNamespace(returncode=1, stdout="", stderr="Error: Rate limit exceeded, try later")
 
-            status, gen_failures, log_text = self._run_owner(tmp, invoke_generator_stub=failing_generator)
+            status, gen_failures, log_text = self._run_owner(
+                tmp, invoke_generator_stub=failing_generator, max_generator_failures=10,
+            )
 
-        self.assertEqual(gen_failures["consecutive"], 2)
+        self.assertEqual(gen_failures["consecutive"], 10)
+        self.assertEqual(status, "generator_exhausted")
         self.assertIn("quota", log_text.lower())
 
     def test_nonzero_exit_with_hex_offset_in_stderr_is_not_quota(self) -> None:
@@ -2315,21 +2394,26 @@ class GeneratorTimeoutAndQuotaClassificationTests(unittest.TestCase):
         # message. Reading only .stderr meant this logged nothing at all
         # ("generator exited 1: " with an empty tail) and, critically, never
         # reached _looks_like_quota -- so a real session/rate limit degraded
-        # the run at the ordinary +1-per-failure rate instead of the
-        # intended +2 quota escalation, taking 3x longer than it should to
-        # give up and let fleetctl's own agent-level cooldown take over.
+        # the run at the ordinary +1-per-failure rate instead of exhausting
+        # immediately (see _record_generator_outcome), taking far longer
+        # than it should to give up and let fleetctl's own agent-level
+        # cooldown take over.
         def stdout_only_failure(command, *, cwd, timeout):
             return SimpleNamespace(
                 returncode=1, stdout="You've hit your session limit \u00b7 resets 4:30am (UTC)", stderr="",
             )
 
         with tempfile.TemporaryDirectory() as tmp:
-            status, gen_failures, log_text = self._run_owner(tmp, invoke_generator_stub=stdout_only_failure)
+            status, gen_failures, log_text = self._run_owner(
+                tmp, invoke_generator_stub=stdout_only_failure, max_generator_failures=10,
+            )
 
         self.assertIn("You've hit your session limit", log_text)
         self.assertIn("generator output looks like a quota/rate-limit signal", log_text)
-        # Quota failures count double (see _record_generator_outcome).
-        self.assertEqual(gen_failures["consecutive"], 2)
+        # A confirmed quota signal exhausts on its first appearance now --
+        # jumps straight to max_generator_failures, not a flat +2.
+        self.assertEqual(gen_failures["consecutive"], 10)
+        self.assertEqual(status, "generator_exhausted")
 
     def test_stderr_takes_precedence_over_stdout_when_both_are_present(self) -> None:
         # The fallback must not paper over a generator that already follows
