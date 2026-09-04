@@ -613,7 +613,27 @@ void func_8005AD58(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005ADD8.s")
+extern void func_80055948(s32);
+extern s32 func_80056870(s32, u8 *, void *);
+extern void func_80054E48(s32);
+extern void func_8005AD58(s32 arg0);
+extern u8 D_80128570[];
+extern s32 D_80128748;
+void func_8005ADD8(s32 arg0) {
+    u8 flag;
+    if (D_80128748 & (1 << arg0)) {
+        func_80055948(3);
+        if (func_80056870(arg0, &flag, (s32 *)(D_80128570 + arg0 * 112) + 10) == 0) {
+            Game_ShutdownAndLoadFragment(arg0, 2);
+        }
+        *(s32 *)(D_80128570 + arg0 * 112) |= 0x80000000;
+        func_8005AD58(arg0);
+        if (GbTower_CheckPakRemoved(arg0, flag) == 0) {
+            Game_ShutdownAndLoadFragment(arg0, 2);
+        }
+        func_80054E48(3);
+    }
+}
 #endif
 
 #ifdef VERSION_US
