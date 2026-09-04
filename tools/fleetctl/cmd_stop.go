@@ -11,6 +11,20 @@ import (
 	"fleetctl/internal/runner"
 )
 
+// validateStopFlags reports the "exactly one of --run/--all" error when the
+// two agree -- both given, or neither given -- since run == "" ("run was
+// NOT given") is the opposite of what "run given" == "all given" needs.
+// The previous inline check compared *run == "" directly against *all,
+// which is that opposite, backwards in all four cases: a single valid flag
+// (the ordinary case) always errored, while neither or both -- the two
+// actually invalid combinations -- always passed silently.
+func validateStopFlags(run string, all bool) error {
+	if (run != "") == all {
+		return fmt.Errorf("stop: exactly one of --run ID or --all is required")
+	}
+	return nil
+}
+
 func runStopCmd(args []string) error {
 	fs := flag.NewFlagSet("stop", flag.ContinueOnError)
 	stateDir := fs.String("state-dir", "", "directory holding state.json (required)")
@@ -23,8 +37,8 @@ func runStopCmd(args []string) error {
 	if *stateDir == "" {
 		return fmt.Errorf("stop: --state-dir is required")
 	}
-	if (*run == "") == *all {
-		return fmt.Errorf("stop: exactly one of --run ID or --all is required")
+	if err := validateStopFlags(*run, *all); err != nil {
+		return err
 	}
 
 	statePath := filepath.Join(*stateDir, "state.json")
