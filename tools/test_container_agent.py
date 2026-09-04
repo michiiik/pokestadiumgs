@@ -1909,6 +1909,136 @@ class MainEndToEndTests(unittest.TestCase):
             self.assertEqual(state["func_1"]["status"], "accepted")
 
 
+class MainOwnersLivenessFilterTests(unittest.TestCase):
+    """A run's --owners list is fixed when fleetctl enqueues it, but the
+    container may not start until much later; another run can match and
+    merge one of those same owners in the meantime (the real incident this
+    filter fixes: two owners already merged over an hour before their
+    container even started, see container_agent.py's own comment at the
+    filter). These exercise the fix: main() drops any --owners entry that
+    is no longer an active GLOBAL_ASM stub in the live source file, before
+    ever reaching the generator, instead of burning a full budget window
+    on a target that can never succeed.
+    """
+
+    def _write_source(self, repo_dir: Path, source_rel: str, live_owners: list[str]) -> None:
+        source_path = repo_dir / source_rel
+        source_path.parent.mkdir(parents=True, exist_ok=True)
+        source_path.write_text(
+            "".join(f'#pragma GLOBAL_ASM("asm/us/nonmatchings/X/{name}.s")\n' for name in live_owners),
+            encoding="utf-8",
+        )
+
+    def test_stale_owner_dropped_live_owner_still_attempted(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            out_dir = Path(tmp) / "out"
+            source_rel = "disasm/src/X.c"
+            # func_stale is NOT in the live source -- already matched and
+            # merged elsewhere, exactly like the real incident.
+            self._write_source(repo_dir, source_rel, ["func_live"])
+
+            def result_for_call(_n, _batch):
+                return {
+                    "batch_status": "accepted", "accepted": ["func_live"],
+                    "attempts": [{"function": "func_live", "label": "a", "status": "accepted", "similarity_score": 1.0}],
+                }
+
+            def gen_stub(command, *, cwd, timeout):
+                return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+            with mock.patch.object(container_agent, "file_brief_text", return_value="brief"), \
+                 mock.patch.object(container_agent, "owner_asm_text", return_value="asm"), \
+                 mock.patch.object(container_agent, "get_m2c_draft", return_value=None), \
+                 mock.patch.object(container_agent, "invoke_generator", side_effect=gen_stub), \
+                 mock.patch.object(container_agent, "invoke_probe", side_effect=make_invoke_probe(result_for_call)):
+                exit_code = container_agent.main([
+                    "--source", source_rel,
+                    "--out", str(out_dir),
+                    "--repo", str(repo_dir),
+                    "--owners", "func_stale,func_live",
+                    "--generator-cmd", "generator --prompt {prompt} --batch {batch}",
+                    "--max-iterations", "1",
+                ])
+
+            self.assertEqual(exit_code, 0)
+            summary = json.loads((out_dir / "summary.json").read_text(encoding="utf-8"))
+            self.assertEqual(summary["owners_already_resolved"], ["func_stale"])
+            self.assertIn("func_live", summary["owners_attempted"])
+            self.assertNotIn("func_stale", summary["owners_attempted"])
+
+            state = json.loads((out_dir / "state.json").read_text(encoding="utf-8"))
+            self.assertNotIn("func_stale", state)
+
+    def test_all_owners_stale_exits_immediately_without_a_generator_call(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            out_dir = Path(tmp) / "out"
+            source_rel = "disasm/src/X.c"
+            # Neither requested owner is in the live source -- both already
+            # resolved elsewhere, same as the real 585D0-p5-r2 incident
+            # where both of the run's two owners had already been merged.
+            self._write_source(repo_dir, source_rel, ["func_someone_else"])
+
+            with mock.patch.object(container_agent, "invoke_generator") as gen_mock:
+                exit_code = container_agent.main([
+                    "--source", source_rel,
+                    "--out", str(out_dir),
+                    "--repo", str(repo_dir),
+                    "--owners", "func_a,func_b",
+                    "--generator-cmd", "generator --prompt {prompt} --batch {batch}",
+                ])
+
+            self.assertEqual(exit_code, 0)
+            gen_mock.assert_not_called()
+            summary = json.loads((out_dir / "summary.json").read_text(encoding="utf-8"))
+            self.assertEqual(summary["stopped_reason"], "no_owners")
+            self.assertEqual(sorted(summary["owners_already_resolved"]), ["func_a", "func_b"])
+            self.assertEqual(summary["owners_attempted"], [])
+
+    def test_unreadable_source_fails_open_and_keeps_the_full_owners_list(self) -> None:
+        # No source file is written at all (repo_dir has no disasm/src/X.c)
+        # -- discover_owners_fallback can only return an empty scan here,
+        # which is indistinguishable from "the file genuinely has zero
+        # remaining owners". Treating that as "every explicit owner is
+        # stale" would be a much stronger claim than an unreadable file
+        # supports, so the filter must not fire at all in this case --
+        # exactly the existing test suite's own fixture shape (repo_dir.
+        # mkdir() with no source file), which this test pins directly.
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_dir = Path(tmp) / "repo"
+            repo_dir.mkdir()
+            out_dir = Path(tmp) / "out"
+            source_rel = "disasm/src/X.c"
+
+            def failing_generator(command, *, cwd, timeout):
+                return SimpleNamespace(returncode=1, stdout="", stderr="boom")
+
+            with mock.patch.object(container_agent, "file_brief_text", return_value="brief"), \
+                 mock.patch.object(container_agent, "owner_asm_text", return_value="asm"), \
+                 mock.patch.object(container_agent, "get_m2c_draft", return_value=None), \
+                 mock.patch.object(container_agent, "invoke_generator", side_effect=failing_generator), \
+                 mock.patch.object(container_agent, "invoke_probe") as probe_mock:
+                exit_code = container_agent.main([
+                    "--source", source_rel,
+                    "--out", str(out_dir),
+                    "--repo", str(repo_dir),
+                    "--owners", "func_1,func_2",
+                    "--generator-cmd", "generator --prompt {prompt} --batch {batch}",
+                    "--max-generator-failures", "2",
+                    "--plateau", "100",
+                    "--max-iterations", "100",
+                ])
+
+            self.assertEqual(exit_code, 3)
+            probe_mock.assert_not_called()
+            summary = json.loads((out_dir / "summary.json").read_text(encoding="utf-8"))
+            self.assertEqual(summary["stopped_reason"], "generator_exhausted")
+            self.assertEqual(summary["owners_already_resolved"], [])
+            state = json.loads((out_dir / "state.json").read_text(encoding="utf-8"))
+            self.assertEqual(state["func_1"]["status"], "generator_failed")
+
+
 # ---------------------------------------------------------------------------
 # Generator exhaustion (quota/rate-limit early stop)
 # ---------------------------------------------------------------------------

@@ -771,6 +771,28 @@ func summaryOwnersAttempted(outDir string) []string {
 	return doc.OwnersAttempted
 }
 
+// summaryOwnersAlreadyResolved reads owners_already_resolved from a
+// finished run's summary.json: owners container_agent.py dropped before
+// its main loop even started because they were no longer active
+// GLOBAL_ASM stubs in the (SRC_OVERLAY-current) checkout -- some other run
+// matched and merged them while this one sat queued/requeued/reassigned.
+// nil when the field is missing/unreadable (an older summary.json, or a
+// run that never wrote one), in which case nothing extra is dropped from
+// the requeue, exactly as before this field existed.
+func summaryOwnersAlreadyResolved(outDir string) []string {
+	data, err := os.ReadFile(filepath.Join(outDir, "summary.json"))
+	if err != nil {
+		return nil
+	}
+	var doc struct {
+		OwnersAlreadyResolved []string `json:"owners_already_resolved"`
+	}
+	if err := json.Unmarshal(data, &doc); err != nil {
+		return nil
+	}
+	return doc.OwnersAlreadyResolved
+}
+
 func subtract(all, remove []string) []string {
 	skip := make(map[string]bool, len(remove))
 	for _, o := range remove {
@@ -1087,10 +1109,22 @@ func (l *Loop) runMerge(ctx context.Context, rec *fleetstate.RunRecord) error {
 	// An owner needing a manual commit already has its candidate installed
 	// in the merge repo's working tree -- requeueing it would re-probe a
 	// duplicate against a tree that (once committed by hand) will already
-	// contain it. Only owners neither matched nor awaiting a manual commit
-	// go back on the queue for a fresh attempt.
+	// contain it. An owner container_agent.py reported as already resolved
+	// (owners_already_resolved: dropped before its main loop even started,
+	// because some other run matched and merged it while this one sat
+	// queued/requeued/reassigned) would just fail the same live check on
+	// its next attempt too -- requeueing it again would loop forever,
+	// relaunching a whole container each time only to have it drop the
+	// same owner in under a second. Only owners neither matched, awaiting
+	// a manual commit, nor already resolved elsewhere go back on the queue
+	// for a fresh attempt.
+	alreadyResolved := summaryOwnersAlreadyResolved(rec.OutDir)
+	if len(alreadyResolved) > 0 {
+		l.logf("run %s: %d owner(s) already resolved elsewhere before this run's own generator ever ran, dropping from requeue: %s",
+			rec.Spec.ID, len(alreadyResolved), strings.Join(alreadyResolved, ", "))
+	}
 	unmatched := rotateAttemptedToTail(
-		subtract(subtract(rec.Spec.Owners, accepted), needsCommit),
+		subtract(subtract(subtract(rec.Spec.Owners, accepted), needsCommit), alreadyResolved),
 		summaryOwnersAttempted(rec.OutDir),
 	)
 	if len(unmatched) > 0 {
