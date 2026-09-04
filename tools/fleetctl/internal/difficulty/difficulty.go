@@ -1,10 +1,23 @@
-package control
+// Package difficulty combines a runner.TargetOwner's static shape (tools/
+// scan_asm_families.py's classify()) with its real probe-attempt history
+// (tools/pragma_targets.py's OwnerHardness) into one coarse routing hint,
+// and offers a --max-difficulty-style filter callers can apply against it.
+//
+// Originally control.DifficultyTier/difficultyTierFor (fleetctl PR #94,
+// unused outside its own tests); moved into its own package so
+// planpkg.Build -- which control already imports, so control could never
+// import it back -- can filter owners by tier at plan-build/replan time.
+package difficulty
 
-import "fleetctl/internal/runner"
+import (
+	"fmt"
 
-// DifficultyTier is a coarse, three-bucket routing hint for one owner --
-// how much genuine reasoning difficulty it's likely to take a generator to
-// close, combining runner.TargetOwner's two independent signals:
+	"fleetctl/internal/runner"
+)
+
+// Tier is a coarse, three-bucket routing hint for one owner -- how much
+// genuine reasoning difficulty it's likely to take a generator to close,
+// combining runner.TargetOwner's two independent signals:
 //
 //  1. Family: tools/scan_asm_families.py's classify() shape label, a
 //     static structural guess available even for an owner that has never
@@ -14,25 +27,26 @@ import "fleetctl/internal/runner"
 //     any exists.
 //
 // Real evidence always wins over a static guess: an owner with a
-// hard-looking Hardness label is DifficultyHard regardless of how simple
-// its Family looked before anyone tried it. Family only decides the tier
-// for a genuinely fresh owner (Hardness == "fresh" or empty), which is
-// exactly the "before it's ever been analyzed" case a static classifier
-// can actually speak to.
+// hard-looking Hardness label is Hard regardless of how simple its Family
+// looked before anyone tried it. Family only decides the tier for a
+// genuinely fresh owner (Hardness == "fresh" or empty), which is exactly
+// the "before it's ever been analyzed" case a static classifier can
+// actually speak to.
 //
 // This is a routing HINT, not a verdict -- thresholds and family buckets
 // below are a reasonable starting point, not a tuned model of any
-// particular generator's real strengths. Nothing in fleetctl reads this
-// tier yet (see docs/FLEET_CONTROLLER.md sec 12's reassignAgent for where
-// a future tier-aware pass would plug in); this file exists to make the
-// signal available and testable on its own first.
-type DifficultyTier string
+// particular generator's real strengths.
+type Tier string
 
 const (
-	DifficultyEasy   DifficultyTier = "easy"
-	DifficultyMedium DifficultyTier = "medium"
-	DifficultyHard   DifficultyTier = "hard"
+	Easy   Tier = "easy"
+	Medium Tier = "medium"
+	Hard   Tier = "hard"
 )
+
+// rank orders the three tiers for Allowed's "at or below a ceiling"
+// comparison -- lower is easier.
+var rank = map[Tier]int{Easy: 0, Medium: 1, Hard: 2}
 
 // driftCloseSimilarityThreshold: a "drift" owner (real gap, but not a
 // register-allocation-only tie) whose best recorded attempt still cleared
@@ -71,27 +85,27 @@ var hardFamilies = map[string]bool{
 	"unclassified":          true,
 }
 
-// difficultyTierFor combines owner's static Family with any real Hardness
-// evidence into one DifficultyTier. See the DifficultyTier doc comment for
-// the precedence rule (real evidence beats a guess) and each family/
-// threshold constant's own comment for why it's bucketed that way.
-func difficultyTierFor(owner runner.TargetOwner) DifficultyTier {
+// TierFor combines owner's static Family with any real Hardness evidence
+// into one Tier. See the Tier doc comment for the precedence rule (real
+// evidence beats a guess) and each family/threshold constant's own
+// comment for why it's bucketed that way.
+func TierFor(owner runner.TargetOwner) Tier {
 	switch owner.Hardness {
 	case "stuck", "tie":
 		// Heavily attempted with nothing close (stuck), or a
 		// register-allocation-only near-miss no rewrite has closed (tie,
 		// the 585D0.c pattern) -- real evidence this owner resists
 		// whatever's been thrown at it so far.
-		return DifficultyHard
+		return Hard
 	case "drift":
 		// A genuine semantic gap, but with room already proven: how close
 		// the best attempt got is the more informative signal here than
 		// Family, which describes a shape that (by definition, drift
 		// excludes tie/stuck) hasn't fully resisted every attempt.
 		if owner.BestSimilarity != nil && *owner.BestSimilarity >= driftCloseSimilarityThreshold {
-			return DifficultyMedium
+			return Medium
 		}
-		return DifficultyHard
+		return Hard
 	}
 
 	// Hardness is "fresh" (too few attempts to judge) or empty (no
@@ -99,13 +113,13 @@ func difficultyTierFor(owner runner.TargetOwner) DifficultyTier {
 	// available, which is exactly the pre-analysis case this tier exists
 	// to answer.
 	if owner.InstructionCount > largeInstructionThreshold {
-		return DifficultyHard
+		return Hard
 	}
 	if hardFamilies[owner.Family] {
-		return DifficultyHard
+		return Hard
 	}
 	if easyFamilies[owner.Family] {
-		return DifficultyEasy
+		return Easy
 	}
 	// Every other family (constant_map, state_field_access,
 	// bounded_lookup, bounded_state_mutator, jump_table_map,
@@ -119,5 +133,30 @@ func difficultyTierFor(owner runner.TargetOwner) DifficultyTier {
 	// this repo's link layout -- see AGENTS.md's section_layout_drift
 	// probe rejection) rather than a raw-reasoning-difficulty case, so it
 	// doesn't belong in either extreme bucket.
-	return DifficultyMedium
+	return Medium
+}
+
+// Allowed reports whether owner's tier is at or below max -- Easy <=
+// Medium <= Hard. An empty max means "no ceiling": every owner passes,
+// the zero-value/default behavior a caller gets by simply not setting a
+// --max-difficulty-style option.
+func Allowed(owner runner.TargetOwner, max Tier) bool {
+	if max == "" {
+		return true
+	}
+	return rank[TierFor(owner)] <= rank[max]
+}
+
+// ParseTier validates a --max-difficulty-style flag value against the
+// three known tiers. Deliberately does NOT accept "" as valid -- an empty
+// string means "the flag was never set" to Allowed, a distinct thing from
+// "the user typed an empty value"; callers should only call ParseTier once
+// they already know the raw flag string is non-empty.
+func ParseTier(s string) (Tier, error) {
+	switch Tier(s) {
+	case Easy, Medium, Hard:
+		return Tier(s), nil
+	default:
+		return "", fmt.Errorf("difficulty: unknown tier %q (want: easy, medium, or hard)", s)
+	}
 }

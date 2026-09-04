@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"fleetctl/internal/agentspec"
+	"fleetctl/internal/difficulty"
 	"fleetctl/internal/fleetstate"
 	"fleetctl/internal/runner"
 )
@@ -54,6 +55,15 @@ type Options struct {
 	// included) passes it through explicitly -- see ExecRunner.RankFiles.
 	MaxInstructions    int
 	ExcludeRecentHours float64
+
+	// MaxDifficulty, when set, drops any owner whose difficulty.TierFor
+	// ranks above it before partitioning a file's owners into runs (e.g.
+	// Easy: only the most templatable shapes are ever queued). Empty (the
+	// zero value) means no filtering at all -- every owner Targets returns
+	// is queued, exactly as before this field existed. A file left with
+	// zero owners after filtering is skipped for this build, same as a
+	// file Targets itself returned nothing for.
+	MaxDifficulty difficulty.Tier
 }
 
 // Plan is the JSON document `fleetctl plan` writes and `fleetctl run` reads.
@@ -80,9 +90,14 @@ type Plan struct {
 	AgentConcurrency   map[string]int    `json:"agent_concurrency,omitempty"`
 	// Windows/WindowBudget mirror Options.Windows/WindowBudget, durations
 	// rendered as strings the same way Cooldowns is (sec 11/12).
-	Windows      map[string]string    `json:"windows,omitempty"`
-	WindowBudget map[string]int       `json:"window_budget,omitempty"`
-	Queue        []fleetstate.RunSpec `json:"queue"`
+	Windows      map[string]string `json:"windows,omitempty"`
+	WindowBudget map[string]int    `json:"window_budget,omitempty"`
+	// MaxDifficulty mirrors Options.MaxDifficulty -- persisted so a
+	// control.Loop.Replan rebuild (which reruns Build via ToOptions, not a
+	// fresh `fleetctl plan` invocation) keeps honoring whatever ceiling
+	// the plan was originally built with.
+	MaxDifficulty difficulty.Tier      `json:"max_difficulty,omitempty"`
+	Queue         []fleetstate.RunSpec `json:"queue"`
 }
 
 // ToOptions reconstructs the Options a Plan was Build-ed with, so it can be
@@ -118,6 +133,7 @@ func (p *Plan) ToOptions() (Options, error) {
 		ExcludeRecentHours: p.ExcludeRecentHours,
 		Windows:            windows,
 		WindowBudget:       p.WindowBudget,
+		MaxDifficulty:      p.MaxDifficulty,
 	}, nil
 }
 
@@ -172,6 +188,15 @@ func Build(ctx context.Context, r runner.Runner, opts Options) (*Plan, error) {
 		if err != nil {
 			return nil, fmt.Errorf("plan: targets --source %s: %w", file, err)
 		}
+		if opts.MaxDifficulty != "" {
+			allowed := make([]runner.TargetOwner, 0, len(owners))
+			for _, o := range owners {
+				if difficulty.Allowed(o, opts.MaxDifficulty) {
+					allowed = append(allowed, o)
+				}
+			}
+			owners = allowed
+		}
 		if len(owners) == 0 {
 			continue
 		}
@@ -222,6 +247,7 @@ func Build(ctx context.Context, r runner.Runner, opts Options) (*Plan, error) {
 		AgentConcurrency:   opts.AgentConcurrency,
 		Windows:            windows,
 		WindowBudget:       opts.WindowBudget,
+		MaxDifficulty:      opts.MaxDifficulty,
 		Queue:              queue,
 	}, nil
 }
