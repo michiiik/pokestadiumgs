@@ -2809,7 +2809,16 @@ void func_84135CD4(u8 arg0, s16 arg1, u16 arg2, u16 arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84135DD8.s")
+s32 func_84135DD8(u8 arg0, u8 arg1, u8 arg2) {
+    u8 *p = &arg0;
+    s32 result = 0;
+    if (arg0 == 6) {
+        if (arg1 == 0) {
+            if (arg2 != 0xE && arg2 != 0xF && arg2 != 0x10) result = 1;
+        } else if (arg1 == arg2) result = 1;
+    } else if (arg1 == arg2) result = 1;
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
