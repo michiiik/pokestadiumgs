@@ -202,7 +202,25 @@ loop_5:
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800251F8.s")
+extern void func_80018704(s32, s32);
+void func_800251F8(s32 arg0) {
+    switch (arg0) {
+    case 0:
+        func_80018728(0x82040700U, 0);
+        func_80018704(0x41040000, 0x3F2147AE);
+        return;
+    case 1:
+        func_80018728(0x83040000U, 0);
+        return;
+    case 2:
+        func_80018728(0x83040000U, 0);
+        func_80018728(0x82040700U, 0);
+        func_80018704(0x41040000, 0x3F2147AE);
+        return;
+    default:
+        return;
+    }
+}
 #endif
 
 #ifdef VERSION_US
