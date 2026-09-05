@@ -12,19 +12,21 @@ import (
 
 	"fleetctl/internal/control"
 	"fleetctl/internal/fleetstate"
+	"fleetctl/internal/projectreg"
 )
 
 func runStatusCmd(args []string) error {
 	fs := flag.NewFlagSet("status", flag.ContinueOnError)
-	stateDir := fs.String("state-dir", "", "directory holding state.json (required)")
+	stateDir := fs.String("state-dir", "", "directory holding state.json; alternatively pass a name registered with `fleetctl projects set` as a positional arg")
 	asJSON := fs.Bool("json", false, "print control.StatusJSON instead of the table (for scripting, and what alerts embed for machines)")
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
-	if *stateDir == "" {
-		return fmt.Errorf("status: --state-dir is required")
+	dir, err := resolveStateDir(*stateDir, fs.Args())
+	if err != nil {
+		return err
 	}
-	state, err := fleetstate.Load(filepath.Join(*stateDir, "state.json"))
+	state, err := fleetstate.Load(filepath.Join(dir, "state.json"))
 	if err != nil {
 		return err
 	}
@@ -35,6 +37,24 @@ func runStatusCmd(args []string) error {
 	}
 	printStatusTable(os.Stdout, state)
 	return nil
+}
+
+// resolveStateDir prefers an explicit --state-dir flag; otherwise a lone
+// positional argument is looked up in the projectreg registry (`fleetctl
+// projects set NAME state-dir`), so a command can be run as either
+// `fleetctl status --state-dir /long/path` or the shorter `fleetctl status
+// NAME` once NAME has been registered once.
+func resolveStateDir(flagValue string, positional []string) (string, error) {
+	if flagValue != "" {
+		return flagValue, nil
+	}
+	if len(positional) == 1 {
+		return projectreg.Resolve(positional[0])
+	}
+	if len(positional) > 1 {
+		return "", fmt.Errorf("status: want at most one positional project name, got %d", len(positional))
+	}
+	return "", fmt.Errorf("status: --state-dir or a registered project name is required (see `fleetctl projects list`)")
 }
 
 func printStatusTable(w *os.File, state *fleetstate.State) {

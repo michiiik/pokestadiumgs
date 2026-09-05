@@ -26,6 +26,8 @@ func main() {
 		err = runStatusCmd(os.Args[2:])
 	case "stop":
 		err = runStopCmd(os.Args[2:])
+	case "projects":
+		err = runProjectsCmd(os.Args[2:])
 	case "-h", "--help", "help":
 		usage()
 		return
@@ -46,8 +48,9 @@ func usage() {
 Usage:
   fleetctl plan --repo R (--files N | --file F...) --slots K --agent SPEC... [flags]
   fleetctl run --plan P --state-dir S --runs-dir D --repo R [flags]
-  fleetctl status --state-dir S [--json]
+  fleetctl status (--state-dir S | NAME) [--json]
   fleetctl stop --state-dir S (--run ID | --all)
+  fleetctl projects (set NAME S | list | remove NAME)
 
 --plan is required only the first time --state-dir has no plan persisted in
 state.json yet; a restart reuses it (see docs sec 3). "run" also
