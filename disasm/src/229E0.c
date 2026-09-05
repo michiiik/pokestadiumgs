@@ -137,7 +137,14 @@ s32 func_80023A10(u8 arg0, u8 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80024864.s")
+s32 func_80024864(void) {
+    extern s32 func_80019230(s32, s32, s32);
+    if (func_80019230(4, 0, 0) != 0) {
+        return 1;
+    }
+    return 0;
+}
+#pragma C_FUNCTION_PADDING(8)
 #endif
 
 #ifdef VERSION_US
