@@ -97,3 +97,23 @@ func_8AE00314: plateau at 0.0 (raw None), mismatch unknown; tried families: call
 ## 2026-09-05
 
 func_8AE01738: time cap at 0.8929 (raw 0.6786) after 2400s, mismatch operand_or_scheduling_drift; tried families: callseq; tie-pool no
+
+## 2026-09-05
+
+func_8AE00230: matched (callseq:guard:nested-positive), 1 iterations, agent codex
+
+## 2026-09-05
+
+func_8AE012B0: time cap at 0.9697 (raw 0.8182) after 2409s, mismatch operand_or_scheduling_drift; tried families: state-machine; tie-pool no
+
+## 2026-09-05
+
+func_8AE0605C: matched (callseq:switch:permuter-padding), 3 iterations, agent codex
+
+## 2026-09-05
+
+func_8AE05B24: plateau at 0.0 (raw None), mismatch unknown; tried families: callseq; tie-pool no
+
+## 2026-09-05
+
+TYPE CONFLICT: Fragment46Entry is } Fragment46Entry, not extern Fragment46Entry *func_8AE0559C(s16)
