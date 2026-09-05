@@ -482,7 +482,16 @@ void BattleAnim_StopOwnerCategoryParticles(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841264F0.s")
+extern void * D_841951F8[];
+extern u8 * D_84195208[];
+void func_841264F0(u8 arg0) {
+    D_84195208[arg0][0xD] &= 0xFFBF;
+    D_84195208[arg0][0xF] &= 0xFFEC;
+    if (((u8 *)D_841951F8[arg0])[1] == 0x13 || ((u8 *)D_841951F8[arg0])[1] == 0x5B) {
+        D_84195208[arg0][0xF] &= 0xFF9F;
+    }
+    D_84195208[arg0][0x18] = 0;
+}
 #endif
 
 #ifdef VERSION_US
