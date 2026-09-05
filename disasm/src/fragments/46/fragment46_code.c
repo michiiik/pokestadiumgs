@@ -84,7 +84,14 @@ void func_8AE001D4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE00230.s")
+extern s16 D_8AE084EC;
+extern s16 func_80049148(s32, s32, s32);
+extern s32 func_8004C874(s32, s32);
+extern void func_8AE00020();
+extern s32 D_8AE09B44;
+extern s16 D_8AE09B48;
+extern s16 D_8AE09B54;
+void func_8AE00230(s32 arg0) { if (arg0 != 0) { if ((D_8AE084EC != 1) && (D_8AE09B54 == 1)) { func_8AE00020(0x48); } } D_8AE09B54 = 0; D_8AE09B44 = func_8004C874(0x2B, 5); D_8AE09B48 = func_80049148(1, 0, D_8AE09B44); }
 #endif
 
 #ifdef VERSION_US
@@ -728,7 +735,38 @@ Fragment46Entry *func_8AE05BF0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE0605C.s")
+extern s32 StageContext_GetFadeMode(void);
+extern void StageFade_StartFromTransparent(s32);
+extern void *D_80087200;
+extern s32 D_8AE084A0;
+extern void func_8AE00020();
+extern s16 D_8AE084EC;
+s32 func_8AE0605C(s32 arg0) {
+    s32 sp1C;
+    sp1C = arg0;
+    switch (arg0) {
+    case 0:
+        if (StageContext_GetFadeMode() == 0) {
+            sp1C = 1;
+        }
+        break;
+    case 1:
+        if ((((*(u16 *)((u8 *)D_80087200 + 8)) & 0x4000) != 0) && (D_8AE084EC == 0)) {
+            sp1C = 2;
+            StageFade_StartFromTransparent(5);
+            func_8AE00020(0x48);
+        }
+        break;
+    if (1) { } if (1) { } if (1) { } if (1) { } if (1) { } if (1) { }
+    case 2:
+        if (StageContext_GetFadeMode() == 1) {
+            sp1C = 3;
+        }
+        break;
+    }
+    D_8AE084A0 = sp1C;
+    return sp1C;
+}
 #endif
 
 #ifdef VERSION_US
