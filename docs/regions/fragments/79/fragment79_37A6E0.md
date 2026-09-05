@@ -103,3 +103,15 @@ func_8411A964: time cap at 0.963 (raw 0.5741) after 2400s, mismatch operand_or_s
 ## 2026-09-05
 
 func_84115E28: matched (call_sequence:guard-return:direct-fields), 1 iterations, agent codex
+
+## 2026-09-06
+
+func_84112464: time cap at 1.0 (raw 0.9844) after 2400s, mismatch immediate_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-06
+
+func_8411283C: time cap at 0.9531 (raw 0.8281) after 2409s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-06
+
+func_84113D7C: matched (call_sequence:flag-chain:cast-table), 1 iterations, agent codex
