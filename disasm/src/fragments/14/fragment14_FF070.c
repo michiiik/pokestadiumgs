@@ -55,7 +55,20 @@ void *func_81307204(void *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_813074E4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_81307570.s")
+extern s32 func_81600DA8(void *, void *);
+extern void func_81606FE0(s32, s32, s32, s32);
+void func_81307570(void *arg0, void *arg1, s32 arg2, s32 arg3) {
+    s32 offset = (*(s32 *)((u8 *)arg0 + 0x137E8) != 0) ? 0x30 : 0x57;
+    if (*(f32 *)((u8 *)arg0 + 0x137D0) < 16.0f) {
+        return;
+    }
+    arg2 += offset;
+    arg3 -= 0x20;
+    if (func_81600DA8(arg1, arg0) == 0) {
+        return;
+    }
+    func_81606FE0(arg2, arg3, *(s32 *)((u8 *)arg0 + 0x137BC), *(s32 *)((u8 *)arg0 + 0x137E8));
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_81307600.s")
 

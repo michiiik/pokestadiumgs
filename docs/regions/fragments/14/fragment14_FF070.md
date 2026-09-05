@@ -80,3 +80,15 @@ func_8130BFF0: time cap at 0.7414 (raw 0.6379) after 2400s, mismatch operand_or_
 ## 2026-09-05
 
 func_8130AF94: time cap at 0.8889 (raw 0.7222) after 2400s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-05
+
+func_8130B06C: time cap at 0.9333 (raw 0.7667) after 2402s, mismatch operand_or_scheduling_drift; tried families: call-sequence; tie-pool no
+
+## 2026-09-05
+
+func_81307570: matched (call_sequence:guarded-call:early-return), 1 iterations, agent codex
+
+## 2026-09-05
+
+func_81309820: plateau at 0.9231 (raw 0.7179), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
