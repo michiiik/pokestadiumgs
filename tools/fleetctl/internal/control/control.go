@@ -130,6 +130,20 @@ type Loop struct {
 	// 3h.
 	StallAfter time.Duration
 
+	// HardBudgetGrace is how far past its own --budget-seconds a running
+	// container may go before pollRunning force-stops it directly, rather
+	// than waiting indefinitely on the in-container timeout
+	// (container_agent.py's own --generator-timeout/--owner-seconds
+	// enforcement) to notice and self-terminate. That in-container
+	// enforcement is normally reliable, but is not an absolute guarantee --
+	// observed live under Rosetta (amd64-on-arm64 emulation, required by
+	// the vendored x86_64 IDO compiler): a single generator subprocess call
+	// sat blocked past its 30-minute cap for over two hours, holding a
+	// concurrency/file slot the whole time with nothing to show for it.
+	// <=0 defaults to 30m. A run with Spec.BudgetSeconds<=0 is exempt (no
+	// budget to overrun).
+	HardBudgetGrace time.Duration
+
 	// Notifiers receive every rate-limited alert event (sec 4): gate_failed,
 	// ff_failed, container_vanished, agent_exhausted, no_progress_stall,
 	// controller_error.
@@ -212,6 +226,13 @@ func (l *Loop) stallAfter() time.Duration {
 		return l.StallAfter
 	}
 	return 3 * time.Hour
+}
+
+func (l *Loop) hardBudgetGrace() time.Duration {
+	if l.HardBudgetGrace > 0 {
+		return l.HardBudgetGrace
+	}
+	return 30 * time.Minute
 }
 
 func (l *Loop) imageRef() string {
@@ -467,6 +488,9 @@ func (l *Loop) pollRunning(ctx context.Context) error {
 			continue
 		}
 		if res.Found && res.Running {
+			if l.forceStopIfBudgetOverrun(ctx, rec) {
+				continue
+			}
 			l.checkStall(ctx, rec)
 			continue
 		}
@@ -475,6 +499,38 @@ func (l *Loop) pollRunning(ctx context.Context) error {
 		}
 	}
 	return nil
+}
+
+// forceStopIfBudgetOverrun docker-stops rec's container directly once it
+// has run more than hardBudgetGrace() past its own --budget-seconds,
+// instead of waiting indefinitely on the in-container timeout to notice
+// and self-terminate (see HardBudgetGrace's doc). docker stop sends
+// SIGTERM first, which container_agent.py's own signal handler
+// (request_stop) already treats as a graceful-shutdown request -- the same
+// finalize path a normal in-container timeout takes, writing a real
+// summary.json and preserving any already-accepted candidates -- so the
+// next pollRunning pass's handleExit call proceeds exactly as it would for
+// a container that timed out on its own. Reports true (the caller must not
+// also checkStall this pass) iff a stop was attempted.
+func (l *Loop) forceStopIfBudgetOverrun(ctx context.Context, rec *fleetstate.RunRecord) bool {
+	if rec.Spec.BudgetSeconds <= 0 || rec.StartedAt.IsZero() {
+		return false
+	}
+	budget := time.Duration(rec.Spec.BudgetSeconds) * time.Second
+	elapsed := l.now().Sub(rec.StartedAt)
+	if elapsed < budget+l.hardBudgetGrace() {
+		return false
+	}
+	l.logf("run %s: still running %s after a %s budget (%s past it); force-stopping -- the in-container timeout did not fire",
+		rec.Spec.ID, elapsed.Round(time.Second), budget, (elapsed - budget).Round(time.Second))
+	if err := l.Runner.StopContainer(ctx, rec.ContainerID); err != nil {
+		l.logf("run %s: force-stop after budget overrun failed: %v", rec.Spec.ID, err)
+	}
+	l.alert(ctx, "budget_overrun_killed", rec.Spec.ID,
+		fmt.Sprintf("fleetctl: run %s force-stopped, budget overrun", rec.Spec.ID),
+		fmt.Sprintf("Run %s (file %s, agent %s:%s) was still running %s after its %s budget; force-stopped because the in-container timeout did not fire on its own.",
+			rec.Spec.ID, rec.Spec.File, rec.Spec.Agent, rec.Spec.Model, elapsed.Round(time.Second), budget))
+	return true
 }
 
 // checkStall reads <rec.OutDir>/state.json (container_agent.py's own
