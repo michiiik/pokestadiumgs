@@ -213,6 +213,17 @@ successfully, unlike Kimi's single-use-rotating token) at
 `config/config.json`, `config/projects/default-cli-project.json`), same
 pattern as `codex.sh`'s `auth.json` mount, not the whole ~180MB
 `antigravity-cli/` directory (cache, conversation history, logs).
+
+On macOS, `gemini_login_macos.command` in this directory automates all of
+the above except the actual OAuth consent step (which is a real
+human-in-the-loop step and can't be automated): double-click it, or run it
+directly, and it runs the login inside the same image `container/run.sh`
+launches gemini containers from, opens the printed consent URL in your
+browser automatically, and copies the resulting files into place once you
+paste the authorization code back. Re-run it whenever gemini containers
+start failing immediately with `antigravity-oauth-token missing` or
+`generator_exhausted` on their very first attempt -- that means this
+credential expired or was never set up on this machine.
 ## kimi_api.sh
 
 Thin wrapper over `openai_compat.sh` and a plain Moonshot Open Platform API
