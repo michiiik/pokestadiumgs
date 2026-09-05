@@ -3314,7 +3314,11 @@ void func_8413BD94(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8413BF58.s")
+extern void func_841397FC(u8,u8);
+extern void func_84139528(u8,u8);
+extern void func_84139618(u8,u8);
+extern u8 D_84195248[];
+void func_8413BF58(s32 arg0){u8 *ptr=D_84195248+arg0*24;switch(ptr[0xD]){case 1:if(ptr[0xF]==0)ptr[0xF]=(ptr[0x12]&0xF)*3+3;else if(--ptr[0xF]==0)func_841397FC(arg0,(ptr[0x12]&0xF0)>>4);break;case 2:if(ptr[0xF]==0)ptr[0xF]=(ptr[0x13]&0xF)*3+3;else if(--ptr[0xF]==0)func_84139528(arg0,(ptr[0x13]&0xF0)>>4);break;case 5:if(ptr[0xF]==0)ptr[0xF]=(ptr[0x13]&0xF)*4+4;else if(--ptr[0xF]==0)func_84139618(arg0,(ptr[0x13]&0xF0)>>4);break;}}
 #endif
 
 #ifdef VERSION_US
