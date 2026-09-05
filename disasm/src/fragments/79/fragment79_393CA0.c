@@ -3179,7 +3179,8 @@ void func_84138364(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84138530.s")
+extern u8 D_84195218[];
+void func_84138530(u8 arg0, u8 *arg1) { struct Record { void *ptr; f32 value; u16 field8; u16 fieldA; u16 fieldC; u8 fieldE; u8 fieldF; u8 pad[8]; }; struct Record *record = (struct Record *)D_84195218 + arg0; record->ptr = arg1 + 0x34; record->value = *(u16 *)(arg1 + 0x26); record->field8 = *(u16 *)(arg1 + 0x28); record->fieldA = arg1[0x24]; record->fieldC = *(u16 *)(arg1 + 0x16); record->fieldF = arg1[0]; record->fieldE = arg1[0x1D]; }
 #endif
 
 #ifdef VERSION_US
