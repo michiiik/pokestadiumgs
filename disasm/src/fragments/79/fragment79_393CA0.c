@@ -2786,7 +2786,16 @@ void func_84136D40(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84136D84.s")
+extern u8 *D_84186164, *D_84186168, *D_8418616C;
+extern u8 * D_84186160[];
+#pragma COALESCE_AT_LUI(func_84136D84)
+void func_84136D84(void) {
+    extern u8 *D_84186160[];
+    D_84186160[0] = 0;
+    D_84186164 = 0;
+    D_84186168 = 0;
+    D_8418616C = 0;
+}
 #endif
 
 #ifdef VERSION_US

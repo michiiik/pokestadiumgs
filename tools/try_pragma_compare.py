@@ -1920,6 +1920,27 @@ _REL_RELOCATION_FIELD_MASKS = {
 }
 
 
+def _candidate_coalesces_lui(source_path: Path, function: str, candidate: str) -> bool:
+    """Whether this candidate opts ``function`` into lui-coalescing.
+
+    ``disasm/tools/coalesce_lui.py`` owns the marker syntax; ask it rather
+    than re-deriving it here. An unimportable module (or any other surprise)
+    answers "no", which only means the candidate is compared exactly as
+    before.
+    """
+    try:
+        import importlib
+        import sys as _sys
+
+        tools_dir = _repo_root_for_path(source_path) / "disasm" / "tools"
+        if str(tools_dir) not in _sys.path:
+            _sys.path.insert(0, str(tools_dir))
+        coalesce_lui = importlib.import_module("coalesce_lui")
+        return function in coalesce_lui.find_coalesce_markers(candidate)
+    except Exception:
+        return False
+
+
 def _relocation_fields_only_match(
     expected_shape: dict[str, object] | None,
     actual_shape: dict[str, object] | None,
@@ -1927,6 +1948,7 @@ def _relocation_fields_only_match(
     actual_symbol: tuple[int, int] | None,
     expected: bytes,
     actual: bytes,
+    allow_dropped_sites: bool = False,
 ) -> bool:
     """Return whether complete equal spans differ only in identical REL fields.
 
@@ -1934,6 +1956,17 @@ def _relocation_fields_only_match(
     targets and addends may explain different instruction immediates, but the
     result remains only a probe promotion and must still pass the full ROM
     gate. Any unavailable or malformed ELF view fails closed.
+
+    ``allow_dropped_sites`` relaxes the topology check in exactly one
+    direction, for a candidate that opted into ``#pragma COALESCE_AT_LUI``:
+    the actual object may carry *fewer* relocations than the expected one, as
+    long as every site it does have matches. That fold deliberately resolves
+    all but the first ``%lo`` of a same-page run to plain immediates (see
+    ``coalesce_lui``'s "Assembler quirk" note), so the object legitimately has
+    no relocation where the ground-truth ``.s`` has one, while the *linked*
+    bytes are identical. The difference is still confined to the expected
+    relocation's own field, and the result is still only permission to run the
+    authoritative full-ROM gate -- a wrong immediate is caught there.
     """
     if (
         expected_shape is None
@@ -1999,10 +2032,21 @@ def _relocation_fields_only_match(
     actual_sites = topology(actual_shape, actual_start, actual)
     if expected_sites is None or actual_sites is None:
         return False
-    if [(offset, kind) for offset, kind, _ in expected_sites] != [
-        (offset, kind) for offset, kind, _ in actual_sites
-    ]:
-        return False
+    expected_topology = [(offset, kind) for offset, kind, _ in expected_sites]
+    actual_topology = [(offset, kind) for offset, kind, _ in actual_sites]
+    if expected_topology != actual_topology:
+        if not allow_dropped_sites:
+            return False
+        # A subset, in order: every relocation the actual object kept must be
+        # one the expected object has at the same offset and of the same kind.
+        # Never the reverse -- an extra relocation is a real difference.
+        remaining = list(expected_topology)
+        for site in actual_topology:
+            while remaining and remaining[0] != site:
+                remaining.pop(0)
+            if not remaining:
+                return False
+            remaining.pop(0)
 
     allowed = bytearray(len(expected))
     for offset, _, mask in expected_sites:
@@ -3731,6 +3775,9 @@ def _probe_one_uncounted(
                     actual_span,
                     expected,
                     actual,
+                    allow_dropped_sites=_candidate_coalesces_lui(
+                        source_path, function, candidate
+                    ),
                 ):
                     return {
                         "status": "probe_match",

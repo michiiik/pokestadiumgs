@@ -41,6 +41,18 @@ class Section:
     # it cannot be recovered from `len(data)` the way every other section's
     # size can. Ignored for every other section type.
     nobits_size: int = 0
+    # File offset this section had when parsed (0 for sections built from
+    # scratch). ``build`` keeps a section at this offset whenever the layout
+    # still allows it, so that anything in the file holding *absolute file
+    # offsets* into another section survives a rewrite. IRIX ``.mdebug``
+    # does exactly that -- its header's cbFdOffset/cbSymOffset/cbSsOffset
+    # are absolute file offsets, and asm-processor reads them back out of
+    # the object (``--convert-statics``) after this module has rewritten it.
+    # Letting a shrunk .text slide every later section down leaves those
+    # pointers aimed at the wrong bytes: silently mis-named converted
+    # statics, or a bare ``symbol_name_offset_end != -1`` assert inside
+    # asm_processor.
+    file_offset: int = 0
 
 
 @dataclass
@@ -171,6 +183,7 @@ class Elf32Object:
             addralign=old.addralign,
             entsize=old.entsize,
             nobits_size=old.nobits_size,
+            file_offset=old.file_offset,
             data=blob,
         )
 
@@ -190,6 +203,7 @@ class Elf32Object:
             addralign=old.addralign,
             entsize=old.entsize,
             nobits_size=old.nobits_size,
+            file_offset=old.file_offset,
             data=blob,
         )
 
@@ -208,6 +222,7 @@ class Elf32Object:
             addralign=old.addralign,
             entsize=old.entsize,
             nobits_size=old.nobits_size,
+            file_offset=old.file_offset,
             data=data,
         )
 
@@ -280,6 +295,7 @@ def parse(data: bytes) -> Elf32Object:
                 entsize=sh_entsize,
                 data=body,
                 nobits_size=sh_size if sh_type == SHT_NOBITS else 0,
+                file_offset=sh_offset,
             )
         )
 
@@ -316,12 +332,19 @@ def build(obj: Elf32Object) -> bytes:
             offsets[i] = 0
             continue
         if sec.type == SHT_NOBITS:
-            offsets[i] = header_size + len(body)  # conventional; NOBITS occupies no file space
+            # NOBITS occupies no file space, so its offset is conventional
+            # only; keep whatever it had rather than inventing a new one.
+            offsets[i] = sec.file_offset or header_size + len(body)
             continue
         align = sec.addralign or 1
         pad = (-(header_size + len(body))) % align
-        body.extend(b"\x00" * pad)
-        offsets[i] = header_size + len(body)
+        target = header_size + len(body) + pad
+        # Keep the section where it was if the (only ever shrinking) sections
+        # ahead of it left room -- see Section.file_offset.
+        if sec.file_offset >= target and sec.file_offset % align == 0:
+            target = sec.file_offset
+        body.extend(b"\x00" * (target - header_size - len(body)))
+        offsets[i] = target
         body.extend(sec.data)
 
     align = 4

@@ -76,19 +76,27 @@ def _strtab(names: list[str]) -> tuple[bytes, dict[str, int]]:
     return bytes(blob), offsets
 
 
-def make_object(functions: list[tuple[str, bytes]], relocations: dict[str, list[tuple[int, str, int]]]):
+def make_object(
+    functions: list[tuple[str, bytes]],
+    relocations: dict[str, list[tuple[int, str, int]]],
+    text_padding: int = 0,
+):
     """Build a minimal one-.text-section MIPS ELF32 object.
 
     ``functions``: ordered list of (name, text_bytes) placed back to back in
     .text. ``relocations``: function name -> list of (offset_within_function,
     symbol_name, reloc_type); the symbol may or may not be one of the
     functions (external data symbols get a synthetic UNDEF entry).
+    ``text_padding``: zero bytes appended past the last function, belonging
+    to no symbol -- what a real assembler leaves behind when it rounds .text
+    up to the section's own alignment.
     """
     text = bytearray()
     func_layout = {}
     for name, body in functions:
         func_layout[name] = (len(text), len(body))
         text.extend(body)
+    text.extend(b"\x00" * text_padding)
 
     extra_syms = set()
     for name, refs in relocations.items():
@@ -167,6 +175,29 @@ class RoundTripTest(unittest.TestCase):
         self.assertEqual(relocs[0].type, R_MIPS_HI16)
         self.assertEqual(relocs[1].offset, 4)
         self.assertEqual(relocs[1].type, R_MIPS_LO16)
+
+    def test_rebuild_keeps_section_file_offsets(self):
+        """Sections must not slide when an earlier one shrinks.
+
+        IRIX ``.mdebug`` addresses its own sub-tables by *absolute file
+        offset* (cbFdOffset/cbSymOffset/cbSsOffset in its header), and
+        asm-processor reads them back out of the object after this module
+        has rewritten it (``--convert-statics``, which every C file in this
+        repo is built with). Repacking sections tightly after a fold shrinks
+        .text would leave those pointers aimed at the wrong bytes -- either
+        mis-naming every converted static or tripping asm_processor's own
+        ``symbol_name_offset_end != -1`` assert mid-build.
+        """
+        original = _MAIN_O.read_bytes()
+        obj = elf32.parse(original)
+        text = obj.section(".text").data
+        obj.set_section_data(".text", text[:-16])
+
+        rebuilt = elf32.parse(elf32.build(obj))
+        before = {s.name: s.file_offset for s in elf32.parse(original).sections}
+        after = {s.name: s.file_offset for s in rebuilt.sections}
+        self.assertEqual(before, after)
+        self.assertEqual(len(rebuilt.section(".text").data), len(text) - 16)
 
     def test_readelf_accepts_the_output(self):
         import shutil
@@ -269,6 +300,93 @@ class SpliceShrinkTest(unittest.TestCase):
         self.assertEqual(relocs, [(0, R_MIPS_HI16), (4, R_MIPS_LO16), (16, R_MIPS_HI16)])
         by_offset = {r.offset: r for r in result.relocations(".rel.text")}
         self.assertEqual(result.symbols()[by_offset[16].sym_index].name, "D_4000")
+
+    def test_shrink_across_an_alignment_boundary_retrims_trailing_padding(self):
+        """The bug that kept func_84136D84 from landing, at small scale.
+
+        IDO rounds .text up to the section's own alignment, so its length is
+        ``align_up(content_end, 16)`` -- here 28 bytes of functions plus 4
+        bytes of padding. Folding func_a from 24 to 12 bytes moves the
+        content end back across the 16-byte boundary, so the section has to
+        end up 16 bytes long, not ``32 - 12 = 20``: carrying the old padding
+        along unchanged leaves a section 4 bytes too long, attributable to no
+        symbol at all, which silently shifts every later object in the link
+        and fails the whole-ROM compare.
+        """
+        outer = make_object(
+            [("func_a", b"\xAA" * 24), ("func_b", b"\xBB" * 4)],
+            {"func_a": [(0, "D_1000", R_MIPS_HI16), (4, "D_1000", R_MIPS_LO16)]},
+            text_padding=4,
+        )
+        self.assertEqual(len(outer.section(".text").data), 32)
+        inner = make_object([("func_a", b"\xCC" * 12)], {})
+
+        result = elf32.parse(
+            coalesce_splice.splice_function(elf32.build(outer), elf32.build(inner), "func_a")
+        )
+
+        text = result.section(".text").data
+        self.assertEqual(len(text), 16)
+        self.assertEqual(text, b"\xCC" * 12 + b"\xBB" * 4)
+        symbols = {s.name: s for s in result.symbols()}
+        self.assertEqual(symbols["func_b"].value, 12)
+
+    def test_shrink_within_an_alignment_boundary_keeps_the_section_length(self):
+        """Same layout, a fold too small to cross the boundary.
+
+        28 bytes of content plus 4 of padding, func_a 24 -> 20: the content
+        end moves to 24, which still rounds up to 32, so the section keeps
+        its length and simply pads more.
+        """
+        outer = make_object(
+            [("func_a", b"\xAA" * 24), ("func_b", b"\xBB" * 4)],
+            {"func_a": [(0, "D_1000", R_MIPS_HI16), (4, "D_1000", R_MIPS_LO16)]},
+            text_padding=4,
+        )
+        inner = make_object([("func_a", b"\xCC" * 20)], {})
+
+        result = elf32.parse(
+            coalesce_splice.splice_function(elf32.build(outer), elf32.build(inner), "func_a")
+        )
+
+        text = result.section(".text").data
+        self.assertEqual(len(text), 32)
+        self.assertEqual(text, b"\xCC" * 20 + b"\xBB" * 4 + b"\x00" * 8)
+
+    def test_non_zero_trailing_bytes_are_never_retrimmed_away(self):
+        """Only zero padding is padding; anything else is a hard stop."""
+        outer = make_object(
+            [("func_a", b"\xAA" * 24), ("func_b", b"\xBB" * 4)],
+            {"func_a": [(0, "D_1000", R_MIPS_HI16), (4, "D_1000", R_MIPS_LO16)]},
+            text_padding=4,
+        )
+        patched = bytearray(outer.section(".text").data)
+        patched[-1] = 0x99
+        outer.set_section_data(".text", bytes(patched))
+        inner = make_object([("func_a", b"\xCC" * 12)], {})
+
+        with self.assertRaises(coalesce_splice.SpliceError):
+            coalesce_splice.splice_function(elf32.build(outer), elf32.build(inner), "func_a")
+
+    def test_unpadded_sections_are_left_exactly_as_they_were(self):
+        """A section whose length is not ``align_up(content, align)``.
+
+        Nothing this project's toolchain emits, but the retrim rule must not
+        invent padding for an object it was not written for -- it falls back
+        to the plain head+folded+tail length instead.
+        """
+        outer = make_object(
+            [("func_a", b"\xAA" * 24), ("func_b", b"\xBB" * 4)],
+            {"func_a": [(0, "D_1000", R_MIPS_HI16), (4, "D_1000", R_MIPS_LO16)]},
+        )
+        self.assertEqual(len(outer.section(".text").data), 28)  # not a multiple of 16
+        inner = make_object([("func_a", b"\xCC" * 12)], {})
+
+        result = elf32.parse(
+            coalesce_splice.splice_function(elf32.build(outer), elf32.build(inner), "func_a")
+        )
+
+        self.assertEqual(result.section(".text").data, b"\xCC" * 12 + b"\xBB" * 4)
 
 
 class SpliceErrorTest(unittest.TestCase):

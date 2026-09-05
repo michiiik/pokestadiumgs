@@ -2635,6 +2635,85 @@ class LinkShapeTests(unittest.TestCase):
                     )
                 )
 
+    def test_relocation_fields_only_allows_dropped_sites_for_a_coalesced_fold(self) -> None:
+        """A COALESCE_AT_LUI fold legitimately drops relocations.
+
+        ``coalesce_lui`` keeps only the first ``%lo`` of a same-page run
+        symbolic and resolves the rest to plain immediates (its documented
+        workaround for this project's IDO assembler), so the candidate object
+        has no relocation where the ground-truth ``.s`` has one, while the
+        *linked* bytes are identical. The difference stays inside the expected
+        relocation's own field, and the promotion still only buys a run of the
+        authoritative full-ROM gate.
+        """
+        expected = bytes.fromhex("3c010000 ac200000 ac200000")
+        actual = bytes.fromhex("3c010000 ac200000 ac206164")
+        expected_relocations = [
+            (0, "R_MIPS_HI16", 5),
+            (4, "R_MIPS_LO16", 5),
+            (8, "R_MIPS_LO16", 6),
+        ]
+        kept_relocations = [(0, "R_MIPS_HI16", 5), (4, "R_MIPS_LO16", 5)]
+        baseline = _relocation_shape(expected, expected_relocations, target_value=0)
+        candidate = _relocation_shape(actual, kept_relocations, target_value=0)
+
+        self.assertFalse(
+            runner._relocation_fields_only_match(
+                baseline, candidate, (0, 12), (0, 12), expected, actual
+            )
+        )
+        self.assertTrue(
+            runner._relocation_fields_only_match(
+                baseline,
+                candidate,
+                (0, 12),
+                (0, 12),
+                expected,
+                actual,
+                allow_dropped_sites=True,
+            )
+        )
+
+    def test_relocation_fields_only_never_allows_added_or_moved_sites(self) -> None:
+        """The relaxation is one-directional: fewer, never more or different."""
+        expected = bytes.fromhex("3c010000 ac200000")
+        actual = bytes.fromhex("3c010000 ac206164")
+        baseline = _relocation_shape(
+            expected, [(0, "R_MIPS_HI16", 5), (4, "R_MIPS_LO16", 5)], target_value=0
+        )
+        variants = (
+            # an extra site the ground truth does not have
+            [(0, "R_MIPS_HI16", 5), (4, "R_MIPS_LO16", 5), (4, "R_MIPS_GPREL16", 5)],
+            # a site of a different kind at a kept offset
+            [(0, "R_MIPS_HI16", 5), (4, "R_MIPS_GPREL16", 5)],
+            # a site at an offset the ground truth has none at
+            [(4, "R_MIPS_HI16", 5)],
+        )
+        for relocations in variants:
+            with self.subTest(relocations=relocations):
+                candidate = _relocation_shape(actual, relocations, target_value=0)
+                self.assertFalse(
+                    runner._relocation_fields_only_match(
+                        baseline,
+                        candidate,
+                        (0, 8),
+                        (0, 8),
+                        expected,
+                        actual,
+                        allow_dropped_sites=True,
+                    )
+                )
+
+    def test_candidate_coalesces_lui_reads_the_pragma(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.c"
+            marked = "#pragma COALESCE_AT_LUI(func_a)\nvoid func_a(void) {}\n"
+            self.assertTrue(runner._candidate_coalesces_lui(source, "func_a", marked))
+            self.assertFalse(runner._candidate_coalesces_lui(source, "func_b", marked))
+            self.assertFalse(
+                runner._candidate_coalesces_lui(source, "func_a", "void func_a(void) {}\n")
+            )
+
     def test_relocation_fields_only_rejects_unknown_rela_and_missing_shape(self) -> None:
         expected = bytes.fromhex("3c080000")
         actual = bytes.fromhex("3c080001")

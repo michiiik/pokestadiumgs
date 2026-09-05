@@ -64,6 +64,68 @@ def _lo16_field(value: int) -> int:
     return value & 0xFFFF
 
 
+def _align_up(value: int, alignment: int) -> int:
+    if alignment <= 1:
+        return value
+    return (value + alignment - 1) // alignment * alignment
+
+
+def _text_content_end(symbols, text_index: int) -> int:
+    """Highest offset any named ``.text`` symbol reaches.
+
+    Everything past this in the section is the assembler's own end-of-section
+    alignment padding (see ``_retrim_trailing_padding``), not content.
+    """
+    end = 0
+    for sym in symbols:
+        if sym.shndx != text_index or (sym.info & 0xF) == STT_SECTION:
+            continue
+        end = max(end, sym.value + sym.size)
+    return end
+
+
+def _retrim_trailing_padding(
+    new_text: bytes, old_content_end: int, old_len: int, delta: int, alignment: int
+) -> bytes:
+    """Re-pad a spliced ``.text`` to the length the assembler would have emitted.
+
+    IDO pads ``.text`` up to a multiple of the section's own alignment (16
+    here), so a section's length is ``align_up(content_end, 16)`` and NOT the
+    length of its content. Splicing in a shorter function moves the content
+    end down by ``-delta``, which can move it across an alignment boundary --
+    but the naive ``head + folded + tail`` concatenation carries the *old*
+    padding along unchanged, leaving a section whose length is
+    ``align_up(old_content_end, 16) + delta``. That is 4 bytes too long (and
+    no longer 16-aligned at all) whenever the fold crosses a boundary, which
+    silently shifts every later object in the link and fails the ROM compare
+    -- with the extra bytes attributable to no symbol at all, so nothing else
+    in the build notices.
+
+    Recompute the padding from the new content end instead -- but only when
+    the input section actually was padded that way (``old_len`` is exactly
+    ``align_up(old_content_end, alignment)``). Anything else is a section
+    this rule was not written for (a hand-built object, a toolchain that
+    pads differently), and gets the old, length-preserving behavior rather
+    than a guess.
+    """
+    if old_len != _align_up(old_content_end, alignment):
+        return new_text
+    new_content_end = old_content_end + delta
+    desired_len = _align_up(new_content_end, alignment)
+    if desired_len < new_content_end:  # pragma: no cover - arithmetic guard
+        raise SpliceError("computed a .text length shorter than its own content")
+    # Everything past the (new) content end is padding by construction, so it
+    # must be zeroes. Anything else means content this function cannot see --
+    # stop rather than drop or keep bytes that turn out to matter.
+    if new_text[new_content_end:].strip(b"\0"):
+        raise SpliceError(
+            ".text trailing padding is not zero-filled; refusing to retrim it"
+        )
+    if desired_len <= len(new_text):
+        return new_text[:desired_len]
+    return new_text + b"\0" * (desired_len - len(new_text))
+
+
 def splice_function(outer_bytes: bytes, inner_bytes: bytes, function_name: str) -> bytes:
     """Return ``outer_bytes`` with ``function_name``'s bytes replaced from ``inner_bytes``.
 
@@ -125,8 +187,15 @@ def splice_function(outer_bytes: bytes, inner_bytes: bytes, function_name: str) 
         raise SpliceError(f"{function_name}'s inner range runs past the end of .text")
 
     new_text = outer_text_sec.data[:lo] + inner_text_sec.data[ilo:ihi] + outer_text_sec.data[hi:]
-    outer.set_section_data(".text", new_text)
     delta = new_size - old_size
+    new_text = _retrim_trailing_padding(
+        new_text,
+        _text_content_end(outer_symbols, text_index),
+        len(outer_text_sec.data),
+        delta,
+        outer_text_sec.addralign,
+    )
+    outer.set_section_data(".text", new_text)
 
     # Shift every other symbol placed in .text after the replaced range, and
     # update this function's own size (its own value/offset does not move).
