@@ -106,3 +106,35 @@ func_8AC03F64: matched (state_field_access:rectangle:nonflipped-dtdy), 1 iterati
 ## 2026-09-06
 
 func_8AC016A8: plateau at 0.9848 (raw 0.8333), mismatch instruction_drift; tried families: init_sequence; tie-pool no
+
+## 2026-09-06
+
+func_8AC04154: matched (state_field_access:direct_macros:s32_corners_405c), 1 iterations, agent gemini
+
+## 2026-09-06
+
+func_8AC04418: matched (call_sequence:direct:s32_formal_parameters), 1 iterations, agent gemini
+
+## 2026-09-06
+
+func_8AC043A8: plateau at 0.0 (raw None), mismatch unknown; tried families: call_sequence; tie-pool no
+
+## 2026-09-06
+
+func_8AC043E0: matched (call_sequence:forward-rvalue:typed-aggregate), 3 iterations, agent codex
+
+## 2026-09-06
+
+func_8AC01574: matched (call_sequence:wrapper:s16-fourth-s32-middle), 1 iterations, agent codex
+
+## 2026-09-06
+
+func_8AC06D8C: plateau at 0.9375 (raw 0.875), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-06
+
+func_8AC00270: plateau at 0.9231 (raw 0.8077), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-06
+
+func_8AC00FFC: plateau at 0.9259 (raw 0.9259), mismatch instruction_drift; tried families: call_sequence; tie-pool no
