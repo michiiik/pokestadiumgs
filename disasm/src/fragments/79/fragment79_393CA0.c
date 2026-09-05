@@ -1182,7 +1182,18 @@ void BattleAnim_Table_84185F10_034(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412CFE4.s")
+extern u8 func_80063454(u8, u8, u8, s32);
+extern u8 D_841951BD;
+extern u8 * D_84195208[];
+s32 func_8412CFE4(u8 arg0, u8 arg1) {
+    u8 value = arg1;
+    if ((value < 10) || ((value >= 20) && (value < 28))) {
+        if (func_80063454(arg0, value, value, (D_84195208[D_841951BD][0xD] & 8) != 0) < 10) {
+            return 1;
+        }
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
