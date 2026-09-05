@@ -986,7 +986,7 @@ extern void func_84135B40(s32);
 extern void func_841366C4(u8, s32);
 extern u8 D_841951BC;
 extern u8 * D_84195208[];
-void func_8412A9F4(void) {
+void BattleAnim_Table_84185F10_009(void) {
     u8 *ptr = D_84195208[D_841951BC];
     if (ptr[0x10] & 2) {
         func_841366C4(D_841951BC, -1);
