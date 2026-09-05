@@ -1555,7 +1555,44 @@ void func_82614190(void *arg0) {
     } while (var_s2 != 0x33E0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82614250.s")
+void func_82614250(void *arg0) {
+    unsigned short state1;
+    s16 state2;
+    s32 index;
+    void *entry;
+    u8 *new_var;
+    void *record;
+    unsigned int one;
+    state1 = 1;
+    entry = arg0;
+    index = 0;
+    one = 1;
+    do {
+        record = ((u8 *)entry) + 0x114;
+        new_var = ((u8 *)entry) + 0x114;
+        if ((*((s16 *)new_var)) == one) {
+            if (1) {
+                if ((*((s16 *)(((u8 *)record) + 6))) != 0) {
+                    func_8260CC24(record, 0, state1);
+                    state1 = 0;
+                }
+            }
+        }
+        index += 0x298;
+        entry = ((u8 *)entry) - -0x298;
+    } while (index < 0x33E0);
+    entry = arg0;
+    state2 = 1;
+    index = 0; do { record = ((u8 *)entry) + 0x114; if ((*((s16 *)(((u8 *)entry) + 0x114))) == one) {
+        if ((*((s16 *)(((u8 *)record) + 6))) != 0) {
+            func_8260CC24(record, one, state2);
+            state2 = 0;
+        }
+      }
+      index += 0x298;
+      entry = ((u8 *)entry) + 0x298;
+    } while (index != 0x33E0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82614324.s")
 
