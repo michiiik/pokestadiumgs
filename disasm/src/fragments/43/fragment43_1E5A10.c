@@ -600,7 +600,28 @@ void func_8AC03334(s32 arg0, s32 arg1, s32 arg2, void *arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC03C28.s")
+typedef struct {
+    s32 value;
+} Fragment43Word;
+s32 func_8AC03C28(s32 arg0, void *arg1) {
+    struct Word {
+        s32 value;
+    };
+    void *temp_v0;
+
+    temp_v0 = *(void **)((u8 *)arg1 + 0x20);
+    switch (arg0) {
+    case 0:
+        *(struct Word *)((u8 *)arg1 + 0x2C) = *(struct Word *)((u8 *)temp_v0 + 0x28);
+        *(struct Word *)((u8 *)arg1 + 0x30) = *(struct Word *)((u8 *)temp_v0 + 0x2C);
+        break;
+    case 1:
+        *(struct Word *)((u8 *)arg1 + 0x2C) = *(struct Word *)((u8 *)temp_v0 + 0x28);
+        *(struct Word *)((u8 *)arg1 + 0x30) = *(struct Word *)((u8 *)temp_v0 + 0x2C);
+        break;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
