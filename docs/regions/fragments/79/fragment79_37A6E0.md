@@ -75,3 +75,31 @@ func_84116604: matched (call_sequence:guard:direct-fields), 1 iterations, agent 
 ## 2026-09-05
 
 func_8411A310: time cap at 0.9796 (raw 0.9796) after 2401s, mismatch instruction_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-05
+
+func_84117DC4: plateau at 0.0 (raw None), mismatch unknown; tried families: call_sequence; tie-pool no
+
+## 2026-09-05
+
+func_84117CEC: plateau at 0.0 (raw None), mismatch unknown; tried families: call_sequence; tie-pool no
+
+## 2026-09-05
+
+func_8411862C: plateau at 0.0 (raw None), mismatch unknown; tried families: (none); tie-pool no
+
+## 2026-09-05
+
+TYPE CONFLICT: func_8411E164 is extern s32 func_8411E164(s32), not extern s32 func_8411E164()
+
+## 2026-09-05
+
+TYPE CONFLICT: func_8411E164 is extern s32 func_8411E164(u8 *), not extern s32 func_8411E164()
+
+## 2026-09-05
+
+func_8411A964: time cap at 0.963 (raw 0.5741) after 2400s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-05
+
+func_84115E28: matched (call_sequence:guard-return:direct-fields), 1 iterations, agent codex
