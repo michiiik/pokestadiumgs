@@ -115,3 +115,23 @@ func_8411283C: time cap at 0.9531 (raw 0.8281) after 2409s, mismatch operand_or_
 ## 2026-09-06
 
 func_84113D7C: matched (call_sequence:flag-chain:cast-table), 1 iterations, agent codex
+
+## 2026-09-06
+
+func_8411D594: matched (call_sequence:setup:direct-fields), 1 iterations, agent codex
+
+## 2026-09-06
+
+func_84116AC4: plateau at 1.0 (raw 0.9677), mismatch immediate_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-06
+
+func_84116B40: time cap at 0.9688 (raw 0.8125) after 2410s, mismatch operand_or_scheduling_drift; tried families: call-sequence; tie-pool no
+
+## 2026-09-06
+
+func_84116A3C: plateau at 0.0 (raw None), mismatch unknown; tried families: call_sequence; tie-pool no
+
+## 2026-09-06
+
+func_841137F8: matched (call_sequence:periodic:canonical), 1 iterations, agent codex
