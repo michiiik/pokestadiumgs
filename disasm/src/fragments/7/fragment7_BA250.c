@@ -2,7 +2,7 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83000020.s")
+void func_83000020(s32 arg0) { struct State { u8 pad[0x4E038]; u8 f0; u8 f1; u8 pad2[2]; f32 f2; }; struct State *p0 = (struct State *)(u32)arg0; struct State *p1 = (struct State *)(u32)arg0; p0->f1 = 0; p1->f0 = p1->f1; p0->f2 = 0.0f; }
 #endif
 
 #ifdef VERSION_US
