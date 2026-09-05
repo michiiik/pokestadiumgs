@@ -50,3 +50,15 @@ tooling-blocked: Wave 45 box. Preflight confirmed call_sequence owner func_8AC01
 ## Coordinator replay after wave 45 (2026-09-02)
 
 Directly replayed /private/tmp/gs45_func_8AC01574.json without the host nice wrapper. All eight candidates were probe_rejected; best normalized/raw similarity 0.7778/0.6111, with stack frame drift (-32 expected, -24 actual) and one instruction_drift candidate. Requeue with a frame/declaration-order hypothesis.
+
+## 2026-09-05
+
+func_8AC06DC8: matched (call_sequence:recursive:permuter-exact-limit-expression), 6 iterations, agent codex
+
+## 2026-09-05
+
+func_8AC0672C: plateau at 1.0 (raw 0.9811), mismatch register_allocation_only; tried families: call_sequence; tie-pool no
+
+## 2026-09-05
+
+func_8AC0686C: time cap at 0.0 (raw None) after 2636s, mismatch unknown; tried families: (none); tie-pool no
