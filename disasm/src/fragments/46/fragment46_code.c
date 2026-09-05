@@ -214,7 +214,8 @@ u8 *func_8AE00F84(u8 *arg0, u8 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE01164.s")
+extern s16 D_8AE0A15C;
+s32 func_8AE01164(void *arg0, u8 *arg1, s32 arg2) { typedef struct { u8 b[6]; } Copy6; if (arg1 == 0) return 0; for (;;) { if (arg1[4] == 0xFF) return 0; if (arg1[0] == arg2 && D_8AE0A15C == arg1[4]) { *(Copy6 *)arg0 = *(Copy6 *)arg1; return 1; } arg1 += 6; } }
 #endif
 
 #ifdef VERSION_US
