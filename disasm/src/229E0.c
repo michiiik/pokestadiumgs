@@ -3861,7 +3861,15 @@ void func_8003CA30(Gfx* arg0, S1_arg1_func_81407874_014_000_010* arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003CB3C.s")
+extern S1_arg1_func_81407874_014_000_010 D_80094AAC[];
+void func_8003CB3C(Gfx *arg0, u8 arg1, u8 arg2) {
+    S1_arg1_func_81407874_014_000_010 local;
+    local = D_80094AAC[arg1];
+    if (arg2 == 0xFF) {
+        local.unk_0C = 7; local.unk_0D = 7; local.unk_0E = 7; local.unk_0F = 0;
+    }
+    func_8003CA30(arg0, &local);
+}
 #endif
 
 #ifdef VERSION_US
