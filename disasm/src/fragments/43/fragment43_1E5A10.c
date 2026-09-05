@@ -633,7 +633,13 @@ s32 func_8AC03C28(s32 arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC03F64.s")
+extern Gfx * D_800D0510;
+extern u8 D_8AC07D90[];
+void func_8AC03F64(s32 arg0, s32 arg1, s32 arg2, struct { u8 r; u8 g; u8 b; u8 a; } color) {
+    gSPDisplayList(D_800D0510++, D_8AC07D90);
+    gDPSetPrimColor(D_800D0510++, 0, 0, color.r, color.g, color.b, color.a);
+    gSPTextureRectangle(D_800D0510++, arg0 << 2, arg1 << 2, (arg0 + arg2) << 2, (arg1 + 2) << 2, 0, 0, 0, 0, 0x400);
+}
 #endif
 
 #ifdef VERSION_US
