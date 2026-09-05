@@ -313,3 +313,23 @@ func_82608270: time cap at 0.95 (raw 0.15) after 2400s, mismatch operand_or_sche
 ## 2026-09-05
 
 func_82610D14: plateau at 0.0 (raw None), mismatch operand_or_scheduling_drift; tried families: predicate; tie-pool no
+
+## 2026-09-05
+
+func_8260E398: plateau at 0.0 (raw None), mismatch unknown; tried families: (none); tie-pool no
+
+## 2026-09-05
+
+func_8260E398: matched (call_sequence:permuter-zero:outer-do-noop), 11 iterations, agent codex
+
+## 2026-09-05
+
+func_82607AA0: plateau at 0.0 (raw None), mismatch unknown; tried families: state_field_access; tie-pool no
+
+## 2026-09-05
+
+func_8260BD50: time cap at 0.8947 (raw 0.5789) after 2400s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-05
+
+func_82614250: matched (call-sequence:record-scan:permuter-zero), 3 iterations, agent codex
