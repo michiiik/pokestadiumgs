@@ -3064,7 +3064,7 @@ extern void func_84111DB4(u8 *arg0, s32 arg1);
 extern void func_84111E80(void *arg0, s16 arg1);
 extern s32 D_84183D50;
 extern s32 D_841911F4;
-void func_8411D594(u8 *arg0) {
+void BattleAnim_Dispatch_246(u8 *arg0) {
     *(s16 *)(arg0 + 0x7E8) = 0;
     func_84111E50(arg0, -1);
     func_84111D64(arg0, *(s8 *)(D_84193FA0 + 0x7C));
