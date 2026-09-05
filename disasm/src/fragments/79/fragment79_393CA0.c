@@ -2889,7 +2889,16 @@ s32 func_84136194(u8 arg0, u8 arg1, s16 arg2, u16 arg3, u8 arg4, u8 arg5) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84136218.s")
+extern void * D_841951F8[];
+extern u32 D_8419A020[];
+void func_84136218(u8 arg0, u8 arg1) {
+    u8 *ptr = (u8 *)D_841951F8[arg0];
+    u32 *base = D_8419A020 + arg0 * 0x10;
+    u32 mask = 1 << arg1;
+    if (ptr[0x49A] != 0 && ptr[0x49A] != 0xFF && ptr[0x11] == 0 && (base[0] & mask) != 0) {
+        base[1] |= mask;
+    }
+}
 #endif
 
 #ifdef VERSION_US
