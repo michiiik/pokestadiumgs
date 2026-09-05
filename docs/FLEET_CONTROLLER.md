@@ -40,6 +40,18 @@ run spec, with an agent spec assigned round-robin across the whole queue in
 file order. The result is written as JSON to `--out` (default `plan.json`);
 `fleetctl run` reads that file, it never re-ranks anything itself.
 
+Before partitioning, `plan` drops any owner `targets`'s own `schedulable`
+field reports `false` for -- a jump-table owner whose file still lacks its
+`.rodata` subsegment, or one whose ground truth depends on an interleaved
+shared-`$at` `lui` run (AGENTS.md rules 7/12/13; the field is
+`pragma_targets.py`'s `_jump_table_readiness`/`_coalesce_readiness`, live
+signals over current repo state, never a static list). Both are provably
+unsolvable by any C spelling today, so this drops them from a fresh plan's
+queue entirely rather than merely deprioritizing them (contrast
+`internal/difficulty`, which only reorders); a file left with zero
+schedulable owners is skipped, not queued with an empty partition. Nothing
+here changes an already-running container.
+
 **Agent spec format:** `agent:model[:effort]`, e.g.
 `codex:gpt-5.6-luna:high`, `kimi:kimi-code/k3:high`, `alibaba:qwen3.7-max`,
 `claude:sonnet` -- the same `AGENT`/`GENERATOR_MODEL`/`GENERATOR_EFFORT`

@@ -15,6 +15,16 @@
 // its one ranked file's Easy owners ran out. Ordering instead of dropping
 // self-adjusts: once a file's easy owners are gone, its medium ones
 // simply sort to the front next, with zero operator intervention needed).
+//
+// This package never drops an owner -- only planpkg.schedulableOwners does,
+// on a different, narrower signal (runner.TargetOwner.Schedulable) that PR
+// #95's reverted ceiling did not have: a *guess* at reasoning difficulty
+// (Family/Hardness, what this package ranks by) can always turn out wrong,
+// so excluding on it starves the fleet of real, solvable work the moment a
+// guess is off; Schedulable instead reports a *proven* dead end (no C
+// spelling can pass the gate today, regardless of candidate quality) that
+// self-corrects the instant the underlying repo gap closes. Excluding on
+// the latter is safe in a way excluding on a difficulty tier never was.
 package difficulty
 
 import "fleetctl/internal/runner"
@@ -135,7 +145,14 @@ func TierFor(owner runner.TargetOwner) Tier {
 	// known repo-specific correctness trap (a plain C switch cannot match
 	// this repo's link layout -- see AGENTS.md's section_layout_drift
 	// probe rejection) rather than a raw-reasoning-difficulty case, so it
-	// doesn't belong in either extreme bucket.
+	// doesn't belong in either extreme bucket. An owner whose file still
+	// lacks its rodata subsegment never reaches this ranking at all --
+	// planpkg.schedulableOwners drops it from the queue outright, on
+	// runner.TargetOwner.Schedulable (pragma_targets.py's live
+	// jump_table_unready/coalesce_unready signals). This tier only orders
+	// the ones that DID make it through that filter -- either genuinely
+	// ready (the file already has its subsegment) or not yet known to be
+	// blocked -- among each other, not around the unschedulable ones.
 	return Medium
 }
 

@@ -181,6 +181,9 @@ _INDEX_SNAPSHOT: tuple[tuple[str, int], ...] | None = None
 _INDEX: dict[str, Owner] = {}
 _CLASSIFICATION_CACHE: dict[tuple[str, int], dict[str, object]] = {}
 _RODATA_OWNER_CACHE: dict[tuple[str, int], set[str]] = {}
+_COALESCE_MODULE_CACHE: dict[str, tuple[object, object] | None] = {}  # key "modules"
+_COALESCE_ADDR_CACHE: dict[tuple[str, tuple[tuple[str, int], ...]], dict[str, int]] = {}
+_COALESCE_CACHE: dict[tuple[str, int], dict[str, object]] = {}
 
 
 def _rodata_subsegment_owners(*, repo_root: Path | None = None) -> set[str]:
@@ -229,6 +232,149 @@ def _jump_table_readiness(
     source_key = owner.source.removeprefix("disasm/src/").removesuffix(".c")
     has_subsegment = source_key in _rodata_subsegment_owners(repo_root=repo_root)
     return (has_jump_table and has_subsegment, has_jump_table and not has_subsegment)
+
+
+def _coalesce_modules():
+    """Best-effort dynamic import of ``disasm/tools``' coalescing helpers.
+
+    Mirrors ``try_pragma_compare.py``'s ``_candidate_coalesces_lui``: dynamic
+    ``sys.path`` import rather than a package import across the
+    ``disasm/tools`` <-> top-level ``tools`` boundary, failing safe to
+    ``None`` on any import problem rather than raising -- a caller must then
+    treat every owner as "no known interleaved sites", never the reverse, so
+    an unimportable module can only under-report exclusions, never invent
+    one.
+
+    Always resolved against *this file's own* checkout -- recomputed from
+    ``__file__`` rather than read off the module-level ``REPO_ROOT`` name,
+    so a test that ``mock.patch``es ``REPO_ROOT`` to a synthetic fixture
+    tree (as the jump-table-readiness tests already do) cannot redirect this
+    import at a fixture with no ``disasm/tools`` of its own -- in every real
+    invocation the two are the same path anyway (``REPO_ROOT`` is defined
+    the same way at module scope). Unlike ``rom.yaml``/the owner's ``.s``
+    (data, read via the caller's ``repo_root`` argument so a fixture *can*
+    point those at a synthetic tree), ``coalesce_lui.py``/
+    ``scan_coalesce_sites.py`` are ordinary tracked *code* living at a fixed
+    location relative to this file, present in every checkout/worktree
+    (unlike the gitignored ``disasm/tools/m2c`` clone ``readonly_tool_path``
+    exists for).
+    """
+    if "modules" in _COALESCE_MODULE_CACHE:
+        return _COALESCE_MODULE_CACHE["modules"]
+    result = None
+    try:
+        import importlib
+
+        tools_dir = Path(__file__).resolve().parent.parent / "disasm" / "tools"
+        if str(tools_dir) not in sys.path:
+            sys.path.insert(0, str(tools_dir))
+        coalesce_lui = importlib.import_module("coalesce_lui")
+        scan_coalesce_sites = importlib.import_module("scan_coalesce_sites")
+        result = (coalesce_lui, scan_coalesce_sites)
+    except Exception:
+        result = None
+    _COALESCE_MODULE_CACHE["modules"] = result
+    return result
+
+
+def _coalesce_address_map(repo_root: Path, coalesce_lui) -> dict[str, int]:
+    """Cache ``coalesce_lui.resolve_repo_addresses`` by its own input files.
+
+    Fingerprinted the same way ``_rodata_subsegment_owners`` fingerprints
+    ``rom.yaml`` -- by path + mtime of every file the resolver would read --
+    so a re-split or a freshly landed ``.map`` is picked up automatically
+    rather than baking in a snapshot for the life of the process.
+    """
+    linker_scripts = repo_root / "disasm" / "linker_scripts"
+    paths = sorted(linker_scripts.glob("*/symbol_addrs*.txt"))
+    try:
+        for map_path in coalesce_lui.candidate_map_paths(repo_root):
+            if map_path.is_file():
+                paths.append(map_path)
+                break
+    except Exception:
+        pass
+    try:
+        fingerprint = tuple((p.as_posix(), p.stat().st_mtime_ns) for p in paths)
+    except OSError:
+        fingerprint = ()
+    cache_key = (str(repo_root), fingerprint)
+    cached = _COALESCE_ADDR_CACHE.get(cache_key)
+    if cached is not None:
+        return cached
+    try:
+        addrs = coalesce_lui.resolve_repo_addresses(repo_root)
+    except Exception:
+        addrs = {}
+    _COALESCE_ADDR_CACHE[cache_key] = addrs
+    return addrs
+
+
+def _coalesce_classification(owner: Owner, *, repo_root: Path) -> dict[str, object]:
+    """Classify an owner's ground-truth ``.s`` for shared-``$at`` lui runs.
+
+    Reuses ``disasm/tools/scan_coalesce_sites.py``'s own site-finding
+    helpers (``extract_function_lines``/``parse_instrs``/
+    ``find_shared_at_runs``) -- the exact same pattern match the scanner's
+    CLI uses to tell "contiguous" (foldable by ``coalesce_lui.fold_source``)
+    from "interleaved" (foldable by nothing today) -- rather than
+    reimplementing it here, so this can never silently drift from what
+    ``scan_coalesce_sites.py --interleaved`` itself reports.
+    """
+    try:
+        mtime = owner.asm_path.stat().st_mtime_ns
+    except OSError:
+        mtime = -1
+    key = (owner.asm, mtime)
+    cached = _COALESCE_CACHE.get(key)
+    if cached is not None:
+        return cached
+    result: dict[str, object] = {"interleaved": False, "contiguous": False, "sites": 0}
+    modules = _coalesce_modules()
+    if modules is not None and mtime != -1:
+        coalesce_lui, scan_coalesce_sites = modules
+        try:
+            asm_text = owner.asm_path.read_text(encoding="latin1")
+            lines = scan_coalesce_sites.extract_function_lines(asm_text, owner.function)
+            if lines is not None:
+                parsed = scan_coalesce_sites.parse_instrs(lines)
+                addr_map = _coalesce_address_map(repo_root, coalesce_lui)
+                sites = scan_coalesce_sites.find_shared_at_runs(parsed, owner.function, addr_map)
+                for site in sites:
+                    if not (site["resolved"] and site["same_page"]):
+                        continue
+                    result["sites"] = int(result["sites"]) + 1
+                    if site["contiguous"]:
+                        result["contiguous"] = True
+                    else:
+                        result["interleaved"] = True
+        except Exception:
+            pass
+    _COALESCE_CACHE[key] = result
+    return result
+
+
+def _coalesce_readiness(owner: Owner, *, repo_root: Path | None = None) -> tuple[bool, bool]:
+    """Return ``(ready, unready)`` for an owner's lui-coalescing shape.
+
+    ``unready`` (excluded from scheduling) means the ground-truth asm has at
+    least one shared-``$at``, distinct-symbol, same-``%hi``-page run that
+    ``scan_coalesce_sites.py`` classifies ``interleaved``: IDO's scheduler
+    hoisted the ``lui`` away from its stores, a shape
+    ``disasm/tools/coalesce_lui.py``'s ``fold_source`` cannot fold under any
+    C spelling today (see that scanner's module docstring, and AGENTS.md
+    rule 12). ``ready`` means at least one such run exists and every one is
+    contiguous (foldable via ``#pragma COALESCE_AT_LUI``); no matching
+    shared-``$at`` run at all is neither -- ``not_applicable``, same as an
+    ordinary owner with no jump table.
+    """
+    root = repo_root or REPO_ROOT
+    classification = _coalesce_classification(owner, repo_root=root)
+    if classification["interleaved"]:
+        return (False, True)
+    if classification["contiguous"]:
+        return (True, False)
+    return (False, False)
 
 
 def _source_files(source_root: Path) -> list[Path]:
@@ -374,6 +520,18 @@ def list_targets(
         row["jump_table_ready"] = ready
         row["jump_table_unready"] = unready
         row["jump_table_status"] = "ready" if ready else ("unready" if unready else "not_applicable")
+        c_ready, c_unready = _coalesce_readiness(owner, repo_root=repo_root)
+        row["coalesce_ready"] = c_ready
+        row["coalesce_unready"] = c_unready
+        row["coalesce_status"] = "ready" if c_ready else ("unready" if c_unready else "not_applicable")
+        # The single field fleetctl's plan-building filters scheduling on:
+        # false means a provably-unsolvable-today shape (see AGENTS.md
+        # rules 7/12/13), not a hard-but-solvable one -- neither signal ever
+        # fires for an ordinary owner, so this stays True except for the
+        # two known dead ends, and flips back automatically the moment the
+        # underlying repo state (a rodata subsegment lands, a fold gains
+        # interleaved support) does, with nothing to maintain by hand.
+        row["schedulable"] = not (unready or c_unready)
         h = hardness.get(owner.function, _EMPTY_HARDNESS)
         if skip_ties and h.is_tie:
             continue
@@ -1337,12 +1495,15 @@ def rank_files(
     ``OwnerHardness.is_fresh``), ``drift`` (``OwnerHardness.is_drift``), and
     ``ties`` (``OwnerHardness.is_tie``).  Jump-table owners are split into
     ``jump_table_ready`` and ``jump_table_unready`` based on the per-file
-    rodata subsegment in ``rom.yaml``.  ``actionable_fresh`` and
-    ``actionable_drift`` exclude only the latter; ordinary owners remain
-    actionable.  ``score = fresh + drift`` remains available for comparison.
-    Rows are sorted by actionable fresh owners first, then total fresh owners,
-    so a large file whose fresh pool is mostly layout-blocked cannot displace
-    a smaller file with work an agent can actually probe.
+    rodata subsegment in ``rom.yaml``; ``coalesce_unready`` similarly counts
+    owners whose ground-truth asm contains an ``interleaved`` shared-``$at``
+    lui run (see ``_coalesce_readiness``).  ``actionable_fresh`` and
+    ``actionable_drift`` exclude an owner unready for either reason;
+    ordinary owners remain actionable.  ``score = fresh + drift`` remains
+    available for comparison. Rows are sorted by actionable fresh owners
+    first, then total fresh owners, so a large file whose fresh pool is
+    mostly layout-blocked cannot displace a smaller file with work an agent
+    can actually probe.
 
     ``exclude_recent_hours``, when given, drops any file touched by a commit
     in that many hours (``git log --since``) or currently dirty in the
@@ -1371,20 +1532,25 @@ def rank_files(
             owner.source,
             {"file": owner.source, "remaining": 0, "fresh": 0, "drift": 0, "ties": 0,
              "jump_table_ready": 0, "jump_table_unready": 0,
+             "coalesce_ready": 0, "coalesce_unready": 0,
              "actionable_fresh": 0, "actionable_drift": 0},
         )
         entry["remaining"] = int(entry["remaining"]) + 1
         ready, unready = _jump_table_readiness(owner, row, repo_root=repo_root)
         entry["jump_table_ready"] = int(entry["jump_table_ready"]) + int(ready)
         entry["jump_table_unready"] = int(entry["jump_table_unready"]) + int(unready)
+        c_ready, c_unready = _coalesce_readiness(owner, repo_root=repo_root)
+        entry["coalesce_ready"] = int(entry["coalesce_ready"]) + int(c_ready)
+        entry["coalesce_unready"] = int(entry["coalesce_unready"]) + int(c_unready)
+        blocked = unready or c_unready
         h = hardness.get(owner.function, _EMPTY_HARDNESS)
         if h.is_fresh:
             entry["fresh"] = int(entry["fresh"]) + 1
-            if not unready:
+            if not blocked:
                 entry["actionable_fresh"] = int(entry["actionable_fresh"]) + 1
         if h.is_drift:
             entry["drift"] = int(entry["drift"]) + 1
-            if not unready:
+            if not blocked:
                 entry["actionable_drift"] = int(entry["actionable_drift"]) + 1
         if h.is_tie:
             entry["ties"] = int(entry["ties"]) + 1
@@ -1398,7 +1564,7 @@ def rank_files(
             -int(entry["fresh"]),
             -int(entry["actionable_drift"]),
             -int(entry["score"]),
-            int(entry["jump_table_unready"]),
+            int(entry["jump_table_unready"]) + int(entry["coalesce_unready"]),
             -int(entry["remaining"]),
             str(entry["file"]),
         )
@@ -1477,7 +1643,7 @@ def draft_candidates(
 
 def _print_rank_files_table(rows: list[dict[str, object]]) -> None:
     header = (
-        "FILE", "REMAINING", "READY_FRESH", "FRESH", "DRIFT", "JT_UNREADY", "TIES", "SCORE",
+        "FILE", "REMAINING", "READY_FRESH", "FRESH", "DRIFT", "JT_UNREADY", "COALESCE_UNREADY", "TIES", "SCORE",
     )
     lines = [header] + [
         (
@@ -1487,6 +1653,7 @@ def _print_rank_files_table(rows: list[dict[str, object]]) -> None:
             str(row["fresh"]),
             str(row["drift"]),
             str(row["jump_table_unready"]),
+            str(row["coalesce_unready"]),
             str(row["ties"]),
             str(row["score"]),
         )

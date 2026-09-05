@@ -51,6 +51,36 @@ def _write_jump_table_asm(path: Path, function: str, table: str) -> None:
     path.write_text("".join(lines))
 
 
+def _write_coalesce_asm(path: Path, function: str, sym1: str, sym2: str, *, interleaved: bool) -> None:
+    """A shared-``$at`` lui run for ``coalesce_lui``/``scan_coalesce_sites``.
+
+    ``lui $at, %hi(sym1)`` feeding ``sw ..., %lo(sym1)($at)`` then
+    ``sw ..., %lo(sym2)($at)`` -- the shape ``scan_coalesce_sites.py``'s
+    ``find_shared_at_runs`` looks for. ``interleaved=True`` inserts an
+    unrelated instruction between each step, which is exactly what makes
+    the run's line indices non-consecutive (``contiguous=False``).
+    """
+    gap = ["    /* 0 0 0 */  addiu $t2, $t2, 1\n"] if interleaved else []
+    lines = [
+        f"glabel {function}\n",
+        f"    /* 0 0 0 */  lui $at, %hi({sym1})\n",
+        *gap,
+        f"    /* 0 0 0 */  sw $t0, %lo({sym1})($at)\n",
+        *gap,
+        f"    /* 0 0 0 */  sw $t1, %lo({sym2})($at)\n",
+        "    /* 0 0 0 */  jr $ra\n",
+    ]
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("".join(lines))
+
+
+def _write_symbol_addrs(root: Path, addrs: dict[str, int]) -> None:
+    """A minimal ``symbol_addrs*.txt`` fixture ``coalesce_lui.resolve_repo_addresses`` reads."""
+    path = root / "disasm" / "linker_scripts" / "us" / "symbol_addrs_code.txt"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("".join(f"{name} = 0x{addr:X};\n" for name, addr in addrs.items()))
+
+
 def _attempt(
     function: str,
     *,
@@ -260,6 +290,7 @@ class ListTargetsHardnessTests(unittest.TestCase):
         with mock.patch.object(targets, "REPO_ROOT", self.root), \
              mock.patch.object(targets, "owner_index", return_value=index), \
              mock.patch.object(targets, "_CLASSIFICATION_CACHE", {}), \
+             mock.patch.object(targets, "_COALESCE_CACHE", {}), \
              mock.patch.object(targets, "_HARDNESS_CACHE", {}):
             return targets.list_targets(stats_paths=self.stats, **kwargs)
 
@@ -371,6 +402,7 @@ class RankFilesTests(unittest.TestCase):
         with mock.patch.object(targets, "REPO_ROOT", self.root), \
              mock.patch.object(targets, "owner_index", return_value=index), \
              mock.patch.object(targets, "_CLASSIFICATION_CACHE", {}), \
+             mock.patch.object(targets, "_COALESCE_CACHE", {}), \
              mock.patch.object(targets, "_HARDNESS_CACHE", {}):
             return targets.rank_files(stats_paths=self.stats, repo_root=self.root, **kwargs)
 
@@ -451,6 +483,139 @@ class RankFilesTests(unittest.TestCase):
         )
 
 
+class CoalesceReadinessTests(unittest.TestCase):
+    """The ``coalesce_unready``/``schedulable`` signal added alongside jump-table
+    readiness: an owner whose ground-truth asm has an *interleaved*
+    shared-``$at`` lui run (``scan_coalesce_sites.py``'s own classification,
+    reused rather than reimplemented) must never be schedulable, a
+    *contiguous* run must not be excluded, and an owner with no such
+    pattern at all must be unaffected (``not_applicable``).
+    """
+
+    def setUp(self) -> None:
+        self._tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmp.cleanup)
+        self.root = Path(self._tmp.name)
+        self.source_root = self.root / "disasm" / "src"
+        self.asm_root = self.root / "disasm" / "asm" / "us" / "nonmatchings"
+        self.source_root.mkdir(parents=True)
+
+        # Two same-%hi-page symbols every fixture below reuses.
+        _write_symbol_addrs(self.root, {"D_80100000": 0x80100000, "D_80100004": 0x80100004})
+
+        (self.source_root / "plain.c").write_text(_pragma("func_plain"))
+        _write_asm(self.asm_root / "x" / "func_plain.s", "func_plain", 6)
+
+        (self.source_root / "contiguous.c").write_text(_pragma("func_contiguous"))
+        _write_coalesce_asm(
+            self.asm_root / "x" / "func_contiguous.s", "func_contiguous",
+            "D_80100000", "D_80100004", interleaved=False,
+        )
+
+        (self.source_root / "interleaved.c").write_text(_pragma("func_interleaved"))
+        _write_coalesce_asm(
+            self.asm_root / "x" / "func_interleaved.s", "func_interleaved",
+            "D_80100000", "D_80100004", interleaved=True,
+        )
+
+        self.stats = self.root / "probe-stats.jsonl"
+        _write_stats(self.stats, [])
+
+    def _list(self, **kwargs):
+        index = targets.owner_index(self.source_root, repo_root=self.root, refresh=True)
+        with mock.patch.object(targets, "REPO_ROOT", self.root), \
+             mock.patch.object(targets, "owner_index", return_value=index), \
+             mock.patch.object(targets, "_CLASSIFICATION_CACHE", {}), \
+             mock.patch.object(targets, "_COALESCE_CACHE", {}), \
+             mock.patch.object(targets, "_HARDNESS_CACHE", {}):
+            return targets.list_targets(stats_paths=self.stats, **kwargs)
+
+    def _rank(self, **kwargs):
+        index = targets.owner_index(self.source_root, repo_root=self.root, refresh=True)
+        with mock.patch.object(targets, "REPO_ROOT", self.root), \
+             mock.patch.object(targets, "owner_index", return_value=index), \
+             mock.patch.object(targets, "_CLASSIFICATION_CACHE", {}), \
+             mock.patch.object(targets, "_COALESCE_CACHE", {}), \
+             mock.patch.object(targets, "_HARDNESS_CACHE", {}):
+            return targets.rank_files(stats_paths=self.stats, repo_root=self.root, **kwargs)
+
+    def test_interleaved_owner_is_unready_and_unschedulable(self) -> None:
+        rows = {row["function"]: row for row in self._list()["targets"]}
+        row = rows["func_interleaved"]
+        self.assertEqual(row["coalesce_status"], "unready")
+        self.assertTrue(row["coalesce_unready"])
+        self.assertFalse(row["coalesce_ready"])
+        self.assertFalse(row["schedulable"])
+
+    def test_contiguous_owner_is_ready_and_schedulable(self) -> None:
+        # A genuinely-foldable run must never be caught by the same filter
+        # that excludes an interleaved one -- a false exclusion here would
+        # silently stop real, solvable work.
+        rows = {row["function"]: row for row in self._list()["targets"]}
+        row = rows["func_contiguous"]
+        self.assertEqual(row["coalesce_status"], "ready")
+        self.assertTrue(row["coalesce_ready"])
+        self.assertFalse(row["coalesce_unready"])
+        self.assertTrue(row["schedulable"])
+
+    def test_owner_with_no_coalesce_pattern_is_unaffected(self) -> None:
+        rows = {row["function"]: row for row in self._list()["targets"]}
+        row = rows["func_plain"]
+        self.assertEqual(row["coalesce_status"], "not_applicable")
+        self.assertFalse(row["coalesce_unready"])
+        self.assertTrue(row["schedulable"])
+
+    def test_rank_files_counts_and_orders_by_coalesce_readiness(self) -> None:
+        result = self._rank(max_instructions=128)
+        by_file = {row["file"]: row for row in result["files"]}
+
+        contiguous = by_file["disasm/src/contiguous.c"]
+        interleaved = by_file["disasm/src/interleaved.c"]
+        self.assertEqual(contiguous["coalesce_ready"], 1)
+        self.assertEqual(contiguous["coalesce_unready"], 0)
+        self.assertEqual(contiguous["actionable_fresh"], 1)
+        self.assertEqual(interleaved["coalesce_ready"], 0)
+        self.assertEqual(interleaved["coalesce_unready"], 1)
+        self.assertEqual(interleaved["actionable_fresh"], 0)
+
+        files_in_order = [row["file"] for row in result["files"]]
+        self.assertLess(
+            files_in_order.index("disasm/src/contiguous.c"),
+            files_in_order.index("disasm/src/interleaved.c"),
+        )
+
+    def test_self_correcting_once_the_site_stops_being_interleaved(self) -> None:
+        # The task's core requirement: this is never a static snapshot.
+        # Nothing but the ground-truth asm's own shape decides the verdict,
+        # so rewriting the same owner's .s to close the gap between the
+        # lui and its stores (e.g. a coordinator's real re-split moving the
+        # scheduled lui back) flips it schedulable again with no code or
+        # list changes -- the same live-computed property
+        # _rodata_subsegment_owners already gives the jump-table signal.
+        blocked = {row["function"]: row for row in self._list()["targets"]}["func_interleaved"]
+        self.assertFalse(blocked["schedulable"])
+
+        _write_coalesce_asm(
+            self.asm_root / "x" / "func_interleaved.s", "func_interleaved",
+            "D_80100000", "D_80100004", interleaved=False,
+        )
+
+        fixed = {row["function"]: row for row in self._list()["targets"]}["func_interleaved"]
+        self.assertTrue(fixed["schedulable"])
+        self.assertEqual(fixed["coalesce_status"], "ready")
+
+    def test_missing_symbol_addrs_degrades_to_not_applicable_never_a_false_exclusion(self) -> None:
+        # An owner whose addresses cannot be resolved at all (e.g. this
+        # checkout has not generated the symbol map yet) must never be
+        # reported unready -- an unresolved signal fails open, exactly like
+        # an unimportable disasm/tools module does.
+        (self.root / "disasm" / "linker_scripts" / "us" / "symbol_addrs_code.txt").unlink()
+        rows = {row["function"]: row for row in self._list()["targets"]}
+        row = rows["func_interleaved"]
+        self.assertFalse(row["coalesce_unready"])
+        self.assertTrue(row["schedulable"])
+
+
 class RankFilesFragmentsAndRecentTests(unittest.TestCase):
     """``--no-fragments`` and ``--exclude-recent`` against a real git fixture."""
 
@@ -516,6 +681,7 @@ class RankFilesFragmentsAndRecentTests(unittest.TestCase):
         with mock.patch.object(targets, "REPO_ROOT", self.root), \
              mock.patch.object(targets, "owner_index", return_value=index), \
              mock.patch.object(targets, "_CLASSIFICATION_CACHE", {}), \
+             mock.patch.object(targets, "_COALESCE_CACHE", {}), \
              mock.patch.object(targets, "_HARDNESS_CACHE", {}):
             return targets.rank_files(stats_paths=self.stats, repo_root=self.root, **kwargs)
 

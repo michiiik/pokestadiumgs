@@ -148,6 +148,130 @@ func TestBuildOrdersOwnersEasiestFirstWithinAFile(t *testing.T) {
 	}
 }
 
+func boolPtr(b bool) *bool { return &b }
+
+// TestBuildExcludesUnschedulableOwners is the primary-goal regression: an
+// owner pragma_targets.py reports Schedulable=false (a jump-table owner
+// whose file lacks its rodata subsegment, or one whose ground truth depends
+// on an interleaved shared-$at lui run -- see runner.TargetOwner's
+// Schedulable doc) must never be queued into a fresh plan, while an
+// ordinary schedulable owner in the same file still is.
+func TestBuildExcludesUnschedulableOwners(t *testing.T) {
+	fake := &runner.Fake{
+		TargetsResult: map[string][]runner.TargetOwner{
+			"disasm/src/mixed.c": {
+				{Function: "func_ready", Source: "disasm/src/mixed.c", Family: "direct_wrapper", Hardness: "fresh", Schedulable: boolPtr(true)},
+				{Function: "func_jt_blocked", Source: "disasm/src/mixed.c", Family: "dispatcher_switch", Hardness: "fresh", Schedulable: boolPtr(false), JumpTableUnready: true},
+				{Function: "func_coalesce_blocked", Source: "disasm/src/mixed.c", Family: "call_sequence", Hardness: "fresh", Schedulable: boolPtr(false), CoalesceUnready: true},
+			},
+		},
+	}
+	plan, err := Build(context.Background(), fake, Options{
+		Repo: "/repo", FileList: []string{"disasm/src/mixed.c"}, OwnersPerRun: 12,
+		Agents: []agentspec.Spec{{Agent: "claude", Model: "haiku"}},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(plan.Queue) != 1 {
+		t.Fatalf("Queue = %+v, want exactly 1 partition", plan.Queue)
+	}
+	if got := plan.Queue[0].Owners; len(got) != 1 || got[0] != "func_ready" {
+		t.Fatalf("Queue[0].Owners = %v, want only [func_ready]", got)
+	}
+}
+
+// TestBuildExcludesUnschedulableFileEntirely covers the edge where every
+// owner remaining in a file is unschedulable: the file must be dropped from
+// the queue instead of producing an empty-owners run.
+func TestBuildExcludesUnschedulableFileEntirely(t *testing.T) {
+	fake := &runner.Fake{
+		TargetsResult: map[string][]runner.TargetOwner{
+			"disasm/src/all_blocked.c": {
+				{Function: "func_a", Source: "disasm/src/all_blocked.c", Schedulable: boolPtr(false), JumpTableUnready: true},
+				{Function: "func_b", Source: "disasm/src/all_blocked.c", Schedulable: boolPtr(false), CoalesceUnready: true},
+			},
+		},
+	}
+	plan, err := Build(context.Background(), fake, Options{
+		Repo: "/repo", FileList: []string{"disasm/src/all_blocked.c"}, OwnersPerRun: 12,
+		Agents: []agentspec.Spec{{Agent: "claude", Model: "haiku"}},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(plan.Queue) != 0 {
+		t.Fatalf("Queue = %+v, want empty -- every owner in the file was unschedulable", plan.Queue)
+	}
+}
+
+// TestBuildKeepsOwnerWithNilSchedulable proves the fail-open contract: a
+// TargetOwner whose Schedulable pointer is nil (a payload from before this
+// field existed, or any other decode surprise) is scheduled exactly as
+// before this change -- a false exclusion would silently drop real,
+// solvable work forever, which is worse than the wasted budget this
+// feature exists to prevent.
+func TestBuildKeepsOwnerWithNilSchedulable(t *testing.T) {
+	fake := &runner.Fake{
+		TargetsResult: map[string][]runner.TargetOwner{
+			"disasm/src/old.c": {
+				{Function: "func_old", Source: "disasm/src/old.c"}, // Schedulable left nil
+			},
+		},
+	}
+	plan, err := Build(context.Background(), fake, Options{
+		Repo: "/repo", FileList: []string{"disasm/src/old.c"}, OwnersPerRun: 12,
+		Agents: []agentspec.Spec{{Agent: "claude", Model: "haiku"}},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(plan.Queue) != 1 || len(plan.Queue[0].Owners) != 1 || plan.Queue[0].Owners[0] != "func_old" {
+		t.Fatalf("Queue = %+v, want func_old scheduled (nil Schedulable fails open)", plan.Queue)
+	}
+}
+
+// TestBuildUnschedulableOwnerBecomesSchedulableAgain is the self-correcting
+// property the task calls for: nothing here is a static snapshot -- the
+// exact same owner, reported schedulable again by a later Targets call (the
+// live signal flipping once its file gets a rodata subsegment, or once
+// coalesce_lui.py gains interleaved-fold support), is queued on the next
+// plan build with zero code changes.
+func TestBuildUnschedulableOwnerBecomesSchedulableAgain(t *testing.T) {
+	fake := &runner.Fake{
+		TargetsResult: map[string][]runner.TargetOwner{
+			"disasm/src/x.c": {
+				{Function: "func_x", Source: "disasm/src/x.c", Schedulable: boolPtr(false), JumpTableUnready: true},
+			},
+		},
+	}
+	opts := Options{
+		Repo: "/repo", FileList: []string{"disasm/src/x.c"}, OwnersPerRun: 12,
+		Agents: []agentspec.Spec{{Agent: "claude", Model: "haiku"}},
+	}
+	blockedPlan, err := Build(context.Background(), fake, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(blockedPlan.Queue) != 0 {
+		t.Fatalf("Queue = %+v, want empty while func_x is jump-table-unready", blockedPlan.Queue)
+	}
+
+	// The file's rodata subsegment lands (or the coalesce site resolves
+	// contiguous) -- pragma_targets.py now reports the same owner
+	// schedulable, with no code or plan change on fleetctl's side.
+	fake.TargetsResult["disasm/src/x.c"][0].Schedulable = boolPtr(true)
+	fake.TargetsResult["disasm/src/x.c"][0].JumpTableUnready = false
+
+	readyPlan, err := Build(context.Background(), fake, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(readyPlan.Queue) != 1 || len(readyPlan.Queue[0].Owners) != 1 || readyPlan.Queue[0].Owners[0] != "func_x" {
+		t.Fatalf("Queue = %+v, want func_x scheduled once its readiness signal flips", readyPlan.Queue)
+	}
+}
+
 func TestBuildRequiresAgentAndFiles(t *testing.T) {
 	fake := &runner.Fake{}
 	if _, err := Build(context.Background(), fake, Options{Repo: "/repo", Files: 1}); err == nil {

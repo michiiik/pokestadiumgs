@@ -227,6 +227,22 @@ Coordinator rules:
     function whose byte-match also depends on an interleaved shared-`lui`
     elsewhere in its own body cannot land through this mechanism at all
     today, regardless of how the targeted site is written.
+13. Known dead ends are excluded from fresh fleet scheduling
+    (`tools/pragma_targets.py`'s `jump_table_unready`/`coalesce_unready`/
+    `schedulable` fields, filtered by `fleetctl plan`), but an owner can
+    still reach you from an already-in-flight run, an explicit `--file`/
+    `--owners` override, or a hand-picked slot. `tools/file_brief.py`'s
+    banner surfaces the file's region notes before you write anything --
+    read them first. If a note already tags this owner (or the file's
+    jump-table/coalescing shape in general) `layout-prerequisite` or
+    `tooling-blocked` with rule 7's `section_layout_drift` (no `.rodata`
+    subsegment yet) or rule 12's `interleaved` shared-`$at` pattern, that is
+    not a hypothesis to re-litigate: run at most one confirming probe (a
+    note can be stale -- the subsegment may have landed, or the site may
+    have resolved differently on a re-scan), and if it reproduces the same
+    rejection, stop after that one iteration. Leave the existing handoff in
+    place (or refresh its evidence) rather than spending the rest of the box
+    on candidate spellings no C rewrite can fix.
 
 ## 2.5 The hand-decompilation loop
 

@@ -133,6 +133,29 @@ func FileSlug(file string) string {
 	return strings.TrimSuffix(base, filepath.Ext(base))
 }
 
+// schedulableOwners drops any owner runner.TargetOwner.Schedulable reports
+// as false -- a jump-table owner whose file still lacks its rodata
+// subsegment, or an owner whose ground truth depends on an interleaved
+// shared-$at lui run (see the Schedulable field's own doc). Both are
+// provably unsolvable by today's tooling regardless of candidate quality,
+// so excluding them here (never scheduled into a run at all) is strictly
+// better than letting a container burn its budget discovering the same
+// rejection a fresh box would have hit anyway. A nil Schedulable (an owner
+// from a payload that predates this field, or any other decode surprise)
+// is kept -- failing open, since silently dropping real work is worse than
+// the waste this filter exists to prevent. This never changes an
+// already-running container's behavior; it only affects what a fresh
+// planpkg.Build queues.
+func schedulableOwners(owners []runner.TargetOwner) []runner.TargetOwner {
+	kept := owners[:0]
+	for _, o := range owners {
+		if o.Schedulable == nil || *o.Schedulable {
+			kept = append(kept, o)
+		}
+	}
+	return kept
+}
+
 // Build ranks/selects files, partitions each file's owners (already
 // smallest-instructions-first from `targets`) into chunks of at most
 // OwnersPerRun, and assigns agent specs round-robin across the resulting
@@ -174,6 +197,7 @@ func Build(ctx context.Context, r runner.Runner, opts Options) (*Plan, error) {
 		if err != nil {
 			return nil, fmt.Errorf("plan: targets --source %s: %w", file, err)
 		}
+		owners = schedulableOwners(owners)
 		if len(owners) == 0 {
 			continue
 		}

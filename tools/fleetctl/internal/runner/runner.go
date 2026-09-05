@@ -142,6 +142,29 @@ type TargetOwner struct {
 	BestSimilarity *float64 `json:"best_similarity"`
 	// PriorAttempts is how many probe attempts this owner has on record.
 	PriorAttempts int `json:"prior_attempts"`
+	// Schedulable is pragma_targets.py's own verdict on whether this owner
+	// can possibly be closed by today's tooling at all -- false for a
+	// jump-table owner whose file lacks its rodata subsegment
+	// (jump_table_unready: any plain C switch gets rejected with
+	// section_layout_drift regardless of candidate quality, AGENTS.md rule
+	// 7) or an owner whose ground-truth asm contains an "interleaved"
+	// shared-$at lui run (coalesce_unready: disasm/tools/coalesce_lui.py's
+	// fold_source cannot fold it under any C spelling today, AGENTS.md rule
+	// 12) -- see pragma_targets.py's _jump_table_readiness/
+	// _coalesce_readiness. Both signals are computed live from current repo
+	// state, so this flips back to schedulable on its own once the
+	// underlying gap closes, with nothing to maintain by hand.
+	//
+	// A pointer so a JSON payload from a version of pragma_targets.py that
+	// predates this field (or any other parse surprise) decodes to nil,
+	// which planpkg.Build treats as schedulable -- failing open, since a
+	// false exclusion silently drops real, solvable work forever, which is
+	// worse than the wasted budget this field exists to prevent.
+	Schedulable *bool `json:"schedulable"`
+	// JumpTableUnready/CoalesceUnready are the two signals Schedulable
+	// combines, surfaced individually for status/debug output.
+	JumpTableUnready bool `json:"jump_table_unready"`
+	CoalesceUnready  bool `json:"coalesce_unready"`
 }
 
 // Runner is the interface fleetctl's control loop programs against.
