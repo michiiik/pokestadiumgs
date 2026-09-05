@@ -78,7 +78,17 @@ void func_8413E7A8(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_8413E840.s")
+s32 func_8413E840(f32 arg0) {
+    s32 temp_v0;
+    s32 temp_v1;
+    temp_v0 = (s32)arg0;
+    if ((f64)(arg0 - (f32)temp_v0) >= 0.5) {
+        temp_v1 = temp_v0 + 1;
+    } else {
+        temp_v1 = temp_v0;
+    }
+    return temp_v1;
+}
 #endif
 
 #ifdef VERSION_US
