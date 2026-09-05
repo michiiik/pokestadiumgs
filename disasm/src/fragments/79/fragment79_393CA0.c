@@ -988,7 +988,7 @@ extern u8 D_841951BC;
 extern u8 D_841951BD;
 extern s32 D_841951C8;
 extern u8 * D_84195200[];
-void func_8412A934(void) {
+void BattleAnim_Table_84185F10_008(void) {
     s32 amount;
     s32 value;
     if (func_84126320(D_841951BD) > 0) {
