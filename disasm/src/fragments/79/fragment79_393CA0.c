@@ -1692,7 +1692,7 @@ extern u8 D_841951BD;
 extern u8 D_841951BF;
 extern u8 D_841951D3;
 extern u8 * D_84195208[];
-void func_8413005C(void) {
+void BattleAnim_Table_84186004_050(void) {
     u8 value;
 
     D_841951D3 = 0;

@@ -14,3 +14,4 @@ func_8005A228 = GbTower_PollPortState;
 func_8005ADD8 = GbTower_StartPortSession;
 func_8410F6AC = BattleAnim_ModelDispatch_148;
 func_8412A9F4 = BattleAnim_Table_84185F10_009;
+func_8413005C = BattleAnim_Table_84186004_050;
