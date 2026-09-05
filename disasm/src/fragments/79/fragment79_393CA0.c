@@ -3066,7 +3066,20 @@ s32 func_8413882C(u8 arg0, u8 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841392E0.s")
+extern void func_84138EA4(u8, u8);
+extern u8 * D_84195208[];
+void func_841392E0(u8 arg0) {
+    u8 index = arg0;
+    u8 *base = D_84195208[index];
+    s32 i;
+    for (i = 0; i < 4; i++) {
+        u8 *ptr = base + i;
+        if (ptr[5] != 0 && ptr[5] != base[0x25] && (ptr[9] & 0x3F) > 0) {
+            func_84138EA4(index, i);
+            return;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
