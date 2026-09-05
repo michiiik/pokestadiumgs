@@ -202,7 +202,25 @@ loop_5:
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800251F8.s")
+extern void func_80018704(s32, s32);
+void func_800251F8(s32 arg0) {
+    switch (arg0) {
+    case 0:
+        func_80018728(0x82040700U, 0);
+        func_80018704(0x41040000, 0x3F2147AE);
+        return;
+    case 1:
+        func_80018728(0x83040000U, 0);
+        return;
+    case 2:
+        func_80018728(0x83040000U, 0);
+        func_80018728(0x82040700U, 0);
+        func_80018704(0x41040000, 0x3F2147AE);
+        return;
+    default:
+        return;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -2573,7 +2591,14 @@ void MtxF_BuildTransform(S1_MtxF *arg0, s32 arg1, s32 arg2, S1_Vec3f *arg3, s32 
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80037120.s")
+extern s16 MathUtil_Atan2s(f32 y, f32 x);
+void func_80037120(S1_Vec3f *arg0, S1_Vec3f *arg1, f32 *arg2, s16 *arg3, s16 *arg4) {
+    f32 dx; f32 dy; f32 dz;
+    dx = arg1->x - arg0->x; dy = arg1->y - arg0->y; dz = arg1->z - arg0->z;
+    *arg2 = sqrtf(dx * dx + dy * dy + dz * dz);
+    *arg3 = MathUtil_Atan2s(sqrtf(dx * dx + dz * dz), dy);
+    *arg4 = MathUtil_Atan2s(dz, dx);
+}
 #endif
 
 #ifdef VERSION_US
