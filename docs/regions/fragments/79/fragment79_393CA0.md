@@ -104,3 +104,7 @@ TYPE CONFLICT: D_841951BF is extern s32 D_841951BF, not extern u8 D_841951E6, D_
 ## 2026-09-05
 
 func_8413B468: time cap at 0.9783 (raw 0.837) after 2631s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## func_84136D84 assembler-artifact plateau (2026-09-05)
+
+func_84136D84: plateau at 0.8571 (raw 0.1429) across iterations 0-5 on array-indexing/struct-field/pointer-cast families, then 0.6667 (raw 0.6667) on the separate-symbol family at iter 6; requeued. Ground truth is a genuine assembler artifact: one lui $at shared across four %lo relocations to distinct symbols (D_84186160/64/68/6C), a shape found in only 2 functions in the whole ROM (here and func_80031564, neither solved) and not reproduced by any C spelling tried under this file's current IDO flags (array indexing, typed struct fields, separate externs, raw pointer casts). Do not retry array-indexing/struct-field spellings first -- despite scoring highest similarity (0.8571) they are the worst raw/structural match (0.1429); the separate-symbol family scores lower similarity but far higher raw match (0.6667) and is the right starting point. Next action: investigate whether $at-sharing across distinct relocations is a build-flag/scheduling issue rather than a pure C-source issue (e.g. per-file IDO flags), or defer as an assembler-limitation skip.
