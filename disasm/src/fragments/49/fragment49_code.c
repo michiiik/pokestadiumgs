@@ -708,7 +708,29 @@ void func_86109D64(s32 arg0, s32 arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86109EAC.s")
+extern void *func_87F025B8(void *, void *);
+extern void func_80037E3C(void *, void *, void *);
+extern void func_8003F1DC(void *);
+extern void func_8003F114(void *, s32, s32, s32);
+extern void func_86109AE0(void);
+void func_86109EAC(void *arg0, s32 arg1, s32 arg2) {
+    u8 *result;
+    u8 *entry;
+    s32 table_value;
+
+    result = func_87F025B8(arg0, NULL);
+    if (result == NULL) return;
+    table_value = arg1 * 20;
+    entry = (u8 *)arg0 + table_value;
+    entry[0x654] = arg1;
+    *(s32 *)(entry + 0x64C) = arg2;
+    func_80037E3C(result + 0x24, func_86109AE0, entry + 0x644);
+    func_8003F1DC(result + 0x24);
+    func_8003F114(result + 0x24, 0, -1, *(s32 *)((u8 *)arg0 + 0x694));
+    *(f32 *)(result + 0x5C) = 2.25f;
+    *(f32 *)(result + 0x58) = 2.25f;
+    *(f32 *)(result + 0x54) = 2.25f;
+}
 
 extern void func_87F02684(void);
 void func_86109F58(void) {

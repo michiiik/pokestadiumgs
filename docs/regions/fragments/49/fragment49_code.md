@@ -66,3 +66,19 @@ Direct replay of the worker batch of nine candidates reached the full-fragment c
 ## 2026-09-02 wave 53 (2026-09-02)
 
 - requeue `func_86107208`: sixteen fresh semantic, global-pointer-lifetime, and stage-address/value variants compiled in the isolated worktree. Best normalized similarity stayed 0.7073; raw similarity improved to 0.4878. The closest body was 160 versus expected 164 bytes, with first difference at instruction 1: expected the stage global address in `a1` (`lui a1, ...`), while candidates place it in `t6` or `v1`. Explicit pointer/value liveness variants shortened the body to 136-148 bytes and moved farther away. Next action: model the global as a call argument or formal-lifetime alias that directly reserves `a1`, preserving the 160-byte semantic body; do not repeat explicit local pointer holders.
+
+## 2026-09-06
+
+func_86100120: time cap at 0.9375 (raw 0.3125) after 2400s, mismatch operand_or_scheduling_drift; tried families: bounded_lookup; tie-pool no
+
+## 2026-09-06
+
+func_86100020: plateau at 0.9737 (raw 0.9737), mismatch instruction_drift; tried families: constant-map; tie-pool no
+
+## 2026-09-06
+
+func_86105C30: plateau at 0.9286 (raw 0.9286), mismatch operand_or_scheduling_drift; tried families: call-chain; tie-pool no
+
+## 2026-09-06
+
+func_86109EAC: matched (call_chain:entry-data:result-and-entry), 2 iterations, agent codex
