@@ -268,3 +268,19 @@ func_841365F4: plateau at 0.8788 (raw 0.5455), mismatch instruction_drift; tried
 ## 2026-09-06
 
 func_8412D8C8: matched (state-field:compare:direct-u16-assigned-result), 2 iterations, agent codex
+
+## 2026-09-06
+
+func_841324EC: matched (call_sequence:decrement:switch:state-field-casts), 6 iterations, agent codex
+
+## 2026-09-06
+
+func_8413AD98: time cap at 0.9895 (raw 0.9) after 2400s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-06
+
+func_8412B65C: plateau at 0.0 (raw None), mismatch unknown; tried families: call_sequence; tie-pool no
+
+## 2026-09-06
+
+TYPE CONFLICT: D_841951BF is extern u8 D_841951BF, not extern u8 D_841951E6, D_841951BF
