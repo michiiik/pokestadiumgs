@@ -62,9 +62,15 @@ from pathlib import Path
 
 # A bare macro-form memory op: no base register, just a symbol. This is what
 # IDO emits for `*(&SYM) = value;`-shaped statements before the assembler
-# expands it into an explicit lui/op pair.
+# expands it into an explicit lui/op pair. IDO's `-S` output spells a
+# floating-point load/store as the pseudo-mnemonic `l.s`/`s.s`/`l.d`/`s.d`
+# rather than `lwc1`/`swc1`/`ldc1`/`sdc1` directly; GNU as accepts both
+# spellings identically (confirmed: `l.s`/`s.s` assemble to plain
+# `lwc1`/`swc1`, `l.d`/`s.d` to `ldc1`/`sdc1`), so the float spellings are
+# just as foldable as the integer ones and are included here for the same
+# reason `swc1`/`lwc1` already were.
 _MACRO_MEM_OP = re.compile(
-    r'^\t(?P<op>sw|sh|sb|lw|lh|lhu|lb|lbu|swc1|lwc1)\t(?P<reg>\$\w+),\s*'
+    r'^\t(?P<op>sw|sh|sb|lw|lh|lhu|lb|lbu|swc1|lwc1|s\.s|l\.s|s\.d|l\.d)\t(?P<reg>\$\w+),\s*'
     r'(?P<sym>[A-Za-z_.$][\w.$]*)\s*$'
 )
 
@@ -265,14 +271,27 @@ def extract_function_block(asm_text: str, function_name: str) -> str | None:
 # own live-register annotation, and function metadata GNU as does not use
 # the same way). Mirrors the strip list from the original hand-verified
 # prototype (see the PR description for the exact command sequence).
+#
+# ``.alias``/``.noalias`` are a later addition: IDO emits them around any
+# pair of register-valued loads it cannot statically prove don't alias (seen
+# on a plain `if (global == a || global == b) { ...write several other
+# globals... }` shape, unrelated to lui-coalescing) to hint its own optimizer
+# -- register operands only (``.noalias $2,$3``), never a symbol -- so they
+# carry no information relevant to the machine bytes GNU as would emit and
+# are safe to drop the same way ``.livereg`` already is. Without stripping
+# them GNU as rejects the snippet outright with "unknown pseudo-op", which
+# made every opted-in function whose body IDO decorates with them
+# uncompilable through this mechanism regardless of whether a fold even
+# applies to it.
 _GNU_AS_INCOMPATIBLE = re.compile(
-    r'^\s*(\.loc\b|\.file\b|\.verstamp\b|\.livereg\b|\.option\b|\.ent\b|\.end\b|\.frame\b|\s*#)'
+    r'^\s*(\.loc\b|\.file\b|\.verstamp\b|\.livereg\b|\.option\b|\.ent\b|\.end\b|'
+    r'\.frame\b|\.alias\b|\.noalias\b|\s*#)'
 )
 
 _EXTERN_LINE = re.compile(r'^\s*\.extern\s+([A-Za-z_.$][\w.$]*)\s+(\d+)')
 _BARE_SYMBOL_OPERAND = re.compile(
     r'%(?:hi|lo)\(([A-Za-z_.$][\w.$]*)\)'
-    r'|^\t(?:sw|sh|sb|lw|lh|lhu|lb|lbu|swc1|lwc1)\t\$\w+,\s*([A-Za-z_.$][\w.$]*)\s*$'
+    r'|^\t(?:sw|sh|sb|lw|lh|lhu|lb|lbu|swc1|lwc1|s\.s|l\.s|s\.d|l\.d)\t\$\w+,\s*([A-Za-z_.$][\w.$]*)\s*$'
 )
 
 

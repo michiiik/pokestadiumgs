@@ -463,5 +463,115 @@ class AddressResolutionTest(unittest.TestCase):
         self.assertEqual(addrs["D_MAP_ONLY"], 0x84186160)
 
 
+class FloatMacroMemOpTest(unittest.TestCase):
+    """``l.s``/``s.s`` (and ``l.d``/``s.d``) are IDO's `-S` spelling for a
+    floating-point macro-form load/store -- the same shape ``sw``/``lw`` get
+    for an integer global, just via the pseudo-mnemonic IDO always uses for
+    FP memory ops. GNU as accepts both spellings identically (`l.s`/`s.s`
+    assemble to plain `lwc1`/`swc1`; confirmed directly with
+    mips-linux-gnu-as), so a run of these should fold exactly like the
+    integer case. Reproduces the func_86600E00 shape: a computed `f32` value
+    broadcast to two adjacent globals sharing one `%hi` page."""
+
+    BLOCK = (
+        "\t.ent\tfunc_float_broadcast 2\n"
+        "func_float_broadcast:\n"
+        "\tl.s\t$f0, D_86606750\n"
+        "\ts.s\t$f0, D_86607444\n"
+        "\ts.s\t$f0, D_86607440\n"
+        "\tj\t$31\n"
+        "\t.end\tfunc_float_broadcast\n"
+    )
+    ADDRESS_MAP = {
+        "D_86606750": 0x86606750,
+        "D_86607444": 0x86607444,
+        "D_86607440": 0x86607440,
+    }
+
+    def test_float_store_run_folds(self):
+        folded, count = coalesce_lui.fold_source(
+            self.BLOCK, {"func_float_broadcast"}, self.ADDRESS_MAP
+        )
+        # All three ops (the load and both stores) resolve to the same %hi
+        # page, so this is one run of three -- two folds saved, matching
+        # fold_source's existing counting convention (len(ops) - 1).
+        self.assertEqual(count, 2)
+        self.assertIn("\tlui\t$at, %hi(D_86606750)\n", folded)
+        self.assertIn("\tl.s\t$f0, %lo(D_86606750)($at)\n", folded)
+        self.assertIn("D_86607444", folded)
+        self.assertIn("D_86607440", folded)
+
+    @unittest.skipUnless(shutil.which("mips-linux-gnu-as"), "no MIPS GNU as available")
+    def test_folded_float_snippet_actually_assembles(self):
+        folded, count = coalesce_lui.fold_source(
+            self.BLOCK, {"func_float_broadcast"}, self.ADDRESS_MAP
+        )
+        self.assertEqual(count, 2)
+        snippet = coalesce_lui.prepare_snippet_for_gnu_as(folded, {})
+        with tempfile.TemporaryDirectory() as tmp:
+            snippet_path = Path(tmp) / "func_float_broadcast.s"
+            snippet_path.write_text(snippet)
+            result = subprocess.run(
+                ["mips-linux-gnu-as", "-march=vr4300", "-32", "-G0", "-EB",
+                 "-o", str(Path(tmp) / "func_float_broadcast.o"), str(snippet_path)],
+                capture_output=True, text=True, timeout=30,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+
+
+class PrepareSnippetForGnuAsTest(unittest.TestCase):
+    """``.alias``/``.noalias`` (register-only IDO optimizer hints) must be
+    stripped like the rest of ``_GNU_AS_INCOMPATIBLE``, or GNU as rejects the
+    snippet outright with "unknown pseudo-op" for any opted-in function whose
+    body IDO decorates with them -- independent of whether a fold even
+    applies. Reproduces the func_82507BFC/func_82507C48 shape (an `if (g ==
+    a || g == b) { ...write several other globals... }` guard, which IDO
+    brackets with alias hints around the final read-modify-write)."""
+
+    BLOCK = (
+        "\t.ent\tfunc_alias_shape 2\n"
+        "func_alias_shape:\n"
+        "\t.option\tO2\n"
+        "\t.frame\t$sp, 0, $31\n"
+        "\t.noalias\t$3,$sp\n"
+        "\tlh\t$2, 0($3)\n"
+        "\tsw\t$0, D_84186160\n"
+        "\tsw\t$0, D_84186164\n"
+        "\t.noalias\t$2,$3\n"
+        "\t.noalias\t$2,$sp\n"
+        "\tlhu\t$15, 0($2)\n"
+        "\t.alias\t$2,$3\n"
+        "\t.alias\t$2,$sp\n"
+        "\t.alias\t$3,$sp\n"
+        "\tj\t$31\n"
+        "\t.end\tfunc_alias_shape\n"
+    )
+
+    def test_alias_and_noalias_lines_are_stripped(self):
+        snippet = coalesce_lui.prepare_snippet_for_gnu_as(self.BLOCK, {})
+        self.assertNotIn(".alias", snippet)
+        self.assertNotIn(".noalias", snippet)
+        # The real instructions around them survive untouched.
+        self.assertIn("\tlh\t$2, 0($3)\n", snippet)
+        self.assertIn("\tlhu\t$15, 0($2)\n", snippet)
+
+    @unittest.skipUnless(shutil.which("mips-linux-gnu-as"), "no MIPS GNU as available")
+    def test_alias_shape_snippet_actually_assembles(self):
+        folded, count = coalesce_lui.fold_source(
+            self.BLOCK, {"func_alias_shape"}, ADDRESS_MAP
+        )
+        self.assertEqual(count, 1)
+        snippet = coalesce_lui.prepare_snippet_for_gnu_as(folded, {})
+        with tempfile.TemporaryDirectory() as tmp:
+            snippet_path = Path(tmp) / "func_alias_shape.s"
+            snippet_path.write_text(snippet)
+            result = subprocess.run(
+                ["mips-linux-gnu-as", "-march=vr4300", "-32", "-G0", "-EB",
+                 "-o", str(Path(tmp) / "func_alias_shape.o"), str(snippet_path)],
+                capture_output=True, text=True, timeout=30,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+
+
 if __name__ == "__main__":
     unittest.main()

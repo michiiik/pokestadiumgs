@@ -202,6 +202,31 @@ Coordinator rules:
    pre-commit hook rejects.
 11. Document a recurring pattern in §4 only with its evidence count and its
     limits; use it to order candidates, never to skip the gate.
+12. Shared-`$at` `lui` runs: a ground-truth owner occasionally has one
+    `lui $at, %hi(S1)` feeding `sw`/`sh`/`sb`/`lw`/`lh`/`lb`/`swc1`/`lwc1`
+    (also the `l.s`/`s.s`/`l.d`/`s.d` float pseudo-ops) to *several distinct*
+    symbols `S1, S2, ...` that happen to share a page -- an assembler
+    artifact neither IDO's compiler nor GNU `as` reproduces from ordinary,
+    independent per-statement C (each statement gets its own `lui`). This ROM
+    is a matching decompilation with every data symbol's address already
+    fixed, so `#pragma COALESCE_AT_LUI(function_name)` (see
+    `disasm/tools/coalesce_lui.py`'s module docstring; landed via #133/#137,
+    `func_84136D84` is the worked example,
+    `docs/regions/fragments/79/fragment79_393CA0.md` the full trail)
+    post-processes the compiled object to fold the redundant `lui`s back to
+    one, matching ground truth. Write each symbol as its own independent
+    store/load -- **not** array indexing, which materializes a base register
+    instead of reusing `$at` and produces a completely different, wrong
+    shape (an existing array-typed declaration can still be reused via a
+    compile-time-constant `arr[0]` index, which costs no extra instruction).
+    Only reach for this when the `lui` and its uses are truly *contiguous* in
+    ground truth (no unrelated instruction between them --
+    `python3 disasm/tools/scan_coalesce_sites.py` finds and classifies every
+    such site in the ROM, `contiguous` vs `interleaved`); the current fold
+    logic cannot handle a scheduler-hoisted, interleaved `lui`, and a
+    function whose byte-match also depends on an interleaved shared-`lui`
+    elsewhere in its own body cannot land through this mechanism at all
+    today, regardless of how the targeted site is written.
 
 ## 2.5 The hand-decompilation loop
 
