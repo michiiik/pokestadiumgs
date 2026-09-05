@@ -116,3 +116,47 @@ The lui-coalescing mechanism (tools/coalesce_cc.py, coalesce_lui.py, coalesce_sp
 ## func_84136D84 landed: the 4-byte .text drift was the splice's stale section padding, not asm-processor (2026-09-05)
 
 Resolves the "landing blocked by a separate file-level issue" note above: func_84136D84 is accepted, gate-verified, ROM MD5 1561c75d11cedf356a8ddb1a4a5f9d5d, via label state-field:ptr-table:coalesce-at-lui:one-line-decls. The 4-byte .text growth was never an asm-processor late-rodata/prelude accounting problem (asm-processor's own output is identical either way, and the growth is already present in the phase-1 object, before the post-process step runs). It was two bugs in the coalescing mechanism's own object surgery, both only reachable when a fold actually shrinks a function: (1) coalesce_splice.py spliced .text as head+folded+tail and carried the OLD end-of-section alignment padding along unchanged. IDO pads .text up to a multiple of the section's alignment (16), so a section's length is align_up(content_end, 16), not the length of its content; folding func_84136D84 from 36 to 24 bytes moved the content end from 0x1a00c back to 0x1a000, across the boundary, so the section had to become 0x1a000 and not 0x1a010-12 = 0x1a004. Those 4 bytes belong to no symbol, which is why every named function still measured identical -- the fix recomputes the padding from the new content end (_retrim_trailing_padding). (2) elf32.build repacked sections tightly, so shrinking .text slid every later section down; IRIX .mdebug addresses its own sub-tables by ABSOLUTE FILE OFFSET, and asm-processor reads them back (--convert-statics, used by every C file here) after the splice has rewritten the object -- surfacing as a bare `symbol_name_offset_end != -1` AssertionError mid-build once (1) was fixed, and silently mis-naming converted statics before that. elf32.Section now records its parsed file offset and build() keeps each section there when the (only ever shrinking) sections ahead of it leave room. Separately, the acceptance path needed one narrow relaxation: coalesce_lui deliberately resolves all but the first %lo of a folded run to plain immediates, so a folded object legitimately carries FEWER relocations than the ground-truth .s, which _relocation_fields_only_match rejected as topology drift -- probe_rejected before the ROM gate ever ran. It now accepts a strict subset of the expected sites, and only for a candidate whose own text carries #pragma COALESCE_AT_LUI; the result is still only a probe promotion that must pass the authoritative full-ROM gate. Note for isolated worktrees: the runner's gate bootstrap owns disasm/lib/ultralib/build, asm/, assets/ and the auto linker scripts itself and refuses ("found an unowned libultra build tree") if you hand-copy or hand-build them first -- let it derive them.
+
+## 2026-09-05
+
+func_8412A9F4: matched (call-sequence:flag-branch:pointer-temp-direct-load), 4 iterations, agent codex
+
+## 2026-09-05
+
+func_8413005C: matched (call_sequence:combined-condition:short-circuit-exact), 1 iterations, agent codex
+
+## 2026-09-05
+
+func_8413D2E4: matched (call-sequence:overlay-u8:explicit-u16-fields), 1 iterations, agent codex
+
+## 2026-09-05
+
+func_8413BBEC: matched (call_sequence:dispatch:s32:address-formal), 2 iterations, agent codex
+
+## 2026-09-05
+
+func_841341D8: matched (call-sequence:indexed:direct-byte-pointer:store-after-index), 2 iterations, agent codex
+
+## 2026-09-05
+
+func_84136194: matched (call-sequence:status-fallthrough:ptr-local), 3 iterations, agent codex
+
+## 2026-09-05
+
+func_841392E0: matched (call_sequence:scan:for-bound:positive-mask), 1 iterations, agent codex
+
+## 2026-09-05
+
+func_8412CFE4: matched (call-sequence:range-guard:s32-u8-baseline), 1 iterations, agent codex
+
+## 2026-09-05
+
+func_84126440: plateau at 0.0 (raw None), mismatch unknown; tried families: (none); tie-pool no
+
+## 2026-09-05
+
+func_84131538: matched (call_sequence:nibble-dispatch:permuter-int-low), 3 iterations, agent codex
+
+## 2026-09-05
+
+func_84139770: matched (call-sequence:record-scan:u8-index-base-pointer), 1 iterations, agent codex
