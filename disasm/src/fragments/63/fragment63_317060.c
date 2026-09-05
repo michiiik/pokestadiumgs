@@ -114,7 +114,7 @@ void func_87E14458(void) {
 
 extern s32 ModelAnim_IsEventTrackDone(u8 *);
 extern u32 func_8003570C(void);
-extern void func_8003F3BC(u8 *, s32);
+extern void ModelAnim_SetEventTrack(u8 *, s32);
 void func_87E14984(void *arg0) {
     s32 sp1C;
     s32 sp18;
@@ -133,12 +133,12 @@ void func_87E14984(void *arg0) {
     if (ModelAnim_IsEventTrackDone(global + 0x24) != 0) {
         if (sp1C != 0) {
             if ((func_8003570C() % 31U) < 2U) {
-                func_8003F3BC((u8 *)D_87F119DC + 0x24, -1);
-                func_8003F3BC((u8 *)D_87F119DC + 0x24, sp18);
+                ModelAnim_SetEventTrack((u8 *)D_87F119DC + 0x24, -1);
+                ModelAnim_SetEventTrack((u8 *)D_87F119DC + 0x24, sp18);
             }
         } else {
-            func_8003F3BC((u8 *)D_87F119DC + 0x24, -1);
-            func_8003F3BC((u8 *)D_87F119DC + 0x24, sp18);
+            ModelAnim_SetEventTrack((u8 *)D_87F119DC + 0x24, -1);
+            ModelAnim_SetEventTrack((u8 *)D_87F119DC + 0x24, sp18);
         }
     }
 }

@@ -423,7 +423,7 @@ extern void *D_80087200;
 extern u8 D_8F1DECA8;
 extern s32 D_8F1DEE38;
 extern s32 D_8F1DEE3C;
-extern void func_8003F3BC(u8 *, s32);
+extern void ModelAnim_SetEventTrack(u8 *, s32);
 void func_8F102394(void) {
     void *object;
     void *temp_v0;
@@ -440,8 +440,8 @@ void func_8F102394(void) {
         }
         if ((*(u16 *)((u8 *)D_80087200 + 8)) & 0x8000) {
             D_8F1DEE38 = D_8F1DEE3C;
-            func_8003F3BC(&D_8F1DECA8, -1);
-            func_8003F3BC(&D_8F1DECA8, D_8F1DEE38);
+            ModelAnim_SetEventTrack(&D_8F1DECA8, -1);
+            ModelAnim_SetEventTrack(&D_8F1DECA8, D_8F1DEE38);
         }
     }
 }
