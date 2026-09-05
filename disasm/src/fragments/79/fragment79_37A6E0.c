@@ -505,7 +505,7 @@ extern u8 * func_8410B330(u8 *);
 extern s32 D_84184148;
 extern u8 * D_841911E8;
 extern s32 D_841911EC;
-void func_8410F6AC(u8 *arg0, s32 arg1) {
+void BattleAnim_ModelDispatch_148(u8 *arg0, s32 arg1) {
     u8 *temp_v0;
     temp_v0 = func_8410B330(arg0);
     D_841911E8 = temp_v0;
