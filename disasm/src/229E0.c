@@ -102,7 +102,15 @@ void func_800239B4(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800239C8.s")
+void func_800239C8(void) {
+    if (D_80090224 >= 0) {
+        D_80090224--;
+        if (D_80090224 < 0) {
+            func_8002390C(D_80090228);
+            D_80090228 = 0;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
