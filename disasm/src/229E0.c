@@ -3861,7 +3861,15 @@ void func_8003CA30(Gfx* arg0, S1_arg1_func_81407874_014_000_010* arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003CB3C.s")
+extern S1_arg1_func_81407874_014_000_010 D_80094AAC[];
+void func_8003CB3C(Gfx *arg0, u8 arg1, u8 arg2) {
+    S1_arg1_func_81407874_014_000_010 local;
+    local = D_80094AAC[arg1];
+    if (arg2 == 0xFF) {
+        local.unk_0C = 7; local.unk_0D = 7; local.unk_0E = 7; local.unk_0F = 0;
+    }
+    func_8003CA30(arg0, &local);
+}
 #endif
 
 #ifdef VERSION_US
@@ -4426,7 +4434,7 @@ void func_8003F1DC(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003F3BC.s")
+s32 ModelAnim_SetEventTrack(void *arg0, s32 arg1) { struct CallbackData { char pad[0x2C]; void *(*callback)(s32, s32); } *data; void *result; data = *(struct CallbackData **)((u8 *)arg0 + 0x0C); result = data->callback(0, 0); if (arg1 == -1) { ModelAnim_ClearEventTrack(arg0); } else if (arg1 < *(u8 *)((u8 *)result + 5)) { ModelAnim_BindEventTrack(arg0, (s16)arg1, ((s32 *)*(void **)((u8 *)result + 0x10))[arg1]); return 1; } return 0; }
 #endif
 
 #ifdef VERSION_US

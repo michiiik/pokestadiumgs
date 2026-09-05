@@ -1137,12 +1137,12 @@ void func_84111DB4(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8003F3BC();
+extern void ModelAnim_SetEventTrack();
 void func_84111E50(arg0)
 u8 *arg0;
 {
     if ((*(u16 *)(arg0 + 0x56) & 1) == 0) {
-        func_8003F3BC();
+        ModelAnim_SetEventTrack();
     }
 }
 #endif
@@ -1236,7 +1236,7 @@ void func_84112158(s32 arg0, s32 arg1) { func_84111D64((u8 *)arg0, *(u8 *)((u8 *
 void func_84112290(u8 *arg0) {
     func_8003EF70(arg0);
     *(u8 *)(arg0 + 2) = *(u8 *)(arg0 + 2) | 0x20;
-    func_8003F3BC(arg0, -1);
+    ModelAnim_SetEventTrack(arg0, -1);
     ModelAnim_SetEventFrame(arg0, 0);
 }
 #endif
