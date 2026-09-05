@@ -159,7 +159,8 @@ void func_8AE0043C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE00C94.s")
+extern f32 D_80128C54[];
+void func_8AE00C94(u8 arg0, u8 arg1, u8 arg2) { volatile u8 *state; state = (volatile u8 *)D_80128C54; state += 8; state[0] = arg0; state[1] = arg1; state[2] = arg2; state[3] = 0; }
 #endif
 
 #ifdef VERSION_US
