@@ -805,7 +805,26 @@ void func_8260E2C4(void *arg0, s32 arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260E398.s")
+extern s32 func_8004C874(s32, s32);
+extern void func_800495F8(s32, s32, s32, s32);
+extern u8 D_82615744[];
+extern void func_800496A4(s32 a0, s32 a1);
+extern void func_8004972C(s32 a0, s32 a1, s32 a2, s32 a3);
+extern void func_800498C4(void);
+extern void func_800499EC(void);
+void func_8260E398(void *arg0, s32 arg1) {
+    s16 y;
+    s16 x;
+    s32 index;
+    s32 table_index;
+    s32 offset;
+    u8 *entry;
+    x = (*((s16 *) (((u8 *) arg0) + 0x14))) + (*((s16 *) (((u8 *) arg0) + 0x10)));
+    y = (*((s16 *) (((u8 *) arg0) + 0x16))) + (*((s16 *) (((u8 *) arg0) + 0x12)));
+    func_800498C4();
+    do { func_800496A4(8, 0); index = 0; offset = x + 0x4B; do { table_index = ((*((s16 *) (((u8 *) arg0) + 2))) * 4) + index; entry = D_82615744 + (table_index * 3); func_8004972C(entry[0], entry[1], entry[2], 0xFF); func_800495F8(offset, y + 0x9E, 1, func_8004C874(0x12, table_index)); index++; offset += 0x87; } while (index != 4); } while (0);
+    func_800499EC();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260E4A8.s")
 
@@ -1536,7 +1555,44 @@ void func_82614190(void *arg0) {
     } while (var_s2 != 0x33E0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82614250.s")
+void func_82614250(void *arg0) {
+    unsigned short state1;
+    s16 state2;
+    s32 index;
+    void *entry;
+    u8 *new_var;
+    void *record;
+    unsigned int one;
+    state1 = 1;
+    entry = arg0;
+    index = 0;
+    one = 1;
+    do {
+        record = ((u8 *)entry) + 0x114;
+        new_var = ((u8 *)entry) + 0x114;
+        if ((*((s16 *)new_var)) == one) {
+            if (1) {
+                if ((*((s16 *)(((u8 *)record) + 6))) != 0) {
+                    func_8260CC24(record, 0, state1);
+                    state1 = 0;
+                }
+            }
+        }
+        index += 0x298;
+        entry = ((u8 *)entry) - -0x298;
+    } while (index < 0x33E0);
+    entry = arg0;
+    state2 = 1;
+    index = 0; do { record = ((u8 *)entry) + 0x114; if ((*((s16 *)(((u8 *)entry) + 0x114))) == one) {
+        if ((*((s16 *)(((u8 *)record) + 6))) != 0) {
+            func_8260CC24(record, one, state2);
+            state2 = 0;
+        }
+      }
+      index += 0x298;
+      entry = ((u8 *)entry) + 0x298;
+    } while (index != 0x33E0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82614324.s")
 
