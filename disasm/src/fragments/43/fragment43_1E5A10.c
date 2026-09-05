@@ -833,7 +833,20 @@ void func_8AC060E4(Fragment43Motion602C *arg0, u16 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC063AC.s")
+extern f32 D_8AC08190;
+extern f32 D_80088E50[];
+void func_8AC063AC(Fragment43Motion602C *arg0, u16 arg1) {
+    f32 *temp_v0;
+    f32 temp_fv0;
+
+    arg1 <<= 12;
+    temp_v0 = &D_80088E50[arg1 >> 4];
+    temp_fv0 = D_8AC08190;
+    if (arg0) {
+    }
+    arg0->unk40 = (*temp_v0 * temp_fv0) + 1.0f;
+    arg0->unk44 = (*temp_v0 * temp_fv0) + 1.0f;
+}
 #endif
 
 #ifdef VERSION_US
