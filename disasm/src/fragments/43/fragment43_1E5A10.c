@@ -657,7 +657,16 @@ void func_8AC0405C(s32 arg0, s32 arg1, s32 arg2, Fragment43Color405C color) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC04154.s")
+extern Gfx * D_800D0510;
+extern u8 D_8AC07D90[];
+void func_8AC04154(s32 arg0, s32 arg1, s32 arg2, s32 arg3, Fragment43Color405C color) {
+    gSPDisplayList(D_800D0510++, D_8AC07D90);
+    gDPSetPrimColor(D_800D0510++, 0, 0, color.r, color.g, color.b, color.a);
+    gSPTextureRectangle(D_800D0510++, arg0 << 2, arg1 << 2, arg2 << 2, (arg1 + 2) << 2, 0, 0, 0, 0, 0x400);
+    gSPTextureRectangle(D_800D0510++, arg0 << 2, arg3 << 2, arg2 << 2, (arg3 + 2) << 2, 0, 0, 0, 0, 0x400);
+    gSPTextureRectangleFlip(D_800D0510++, arg0 << 2, arg1 << 2, (arg0 + 2) << 2, arg3 << 2, 0, 0, 0, 0x400, 0);
+    gSPTextureRectangleFlip(D_800D0510++, arg2 << 2, arg1 << 2, (arg2 + 2) << 2, arg3 << 2, 0, 0, 0, 0x400, 0);
+}
 #endif
 
 #ifdef VERSION_US
@@ -702,7 +711,7 @@ s32 func_8AC044DC(s32 arg0, void *arg1) {
 #ifdef VERSION_US
 typedef struct Fragment43Color { u8 bytes[4]; } Fragment43Color;
 extern void func_800504BC(s16 *);
-extern void func_8AC04154(s16, s16, s32, s32, Fragment43Color);
+extern void func_8AC04154(s32, s32, s32, s32, Fragment43Color405C);
 s32 func_8AC0456C(s32 arg0, void *arg1) {
     struct { s32 pad[2]; s16 angles[2]; } scratch;
     if ((arg0 != 0) && (arg0 == 1)) {
@@ -710,14 +719,14 @@ s32 func_8AC0456C(s32 arg0, void *arg1) {
         {
             s16 x;
             s16 y;
-            Fragment43Color color;
+            Fragment43Color405C color;
             s16 z;
             s16 w;
             x = *(s16 *)((u8 *)arg1 + 8) + scratch.angles[0];
             y = *(s16 *)((u8 *)arg1 + 0xA) + scratch.angles[1];
             z = *(s16 *)((u8 *)arg1 + 0xC);
             w = *(s16 *)((u8 *)arg1 + 0xE);
-            color = *(Fragment43Color *)((u8 *)arg1 + 0x28);
+            color = *(Fragment43Color405C *)((u8 *)arg1 + 0x28);
             func_8AC04154(x, y, x + z, y + w, color);
         }
     }
