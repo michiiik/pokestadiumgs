@@ -5225,7 +5225,32 @@ void func_80041FA0(s32 arg0, u16 arg1, Func80041FA0State arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800421E0.s")
+extern void *Util_Malloc(s32);
+extern OSMesgQueue D_80126F00;
+s32 func_800421E0(u8 *arg0, s32 arg1, s32 arg2) {
+    s32 result = 0;
+    u8 *msg;
+    if ((arg0[0] & 2) != 0) {
+        if ((arg0[1] & 2) == 0) {
+            msg = Util_Malloc(0x20);
+            if (msg != NULL) {
+                *(s16 *)(msg + 0) = 2;
+                *(s16 *)(msg + 2) = 0;
+                *(s16 *)(msg + 4) = 0;
+                msg[6] = 0;
+                *(void **)(msg + 8) = arg0 + 0x70;
+                *(s32 *)(msg + 0xC) = arg2;
+                *(s32 *)(msg + 0x10) = arg1;
+                *(s32 *)(msg + 0x14) = *(s32 *)(arg0 + 0xC);
+                *(s32 *)(msg + 0x18) = 0x18000;
+                osSendMesg(&D_80126F00, (OSMesg)msg, 1);
+                arg0[1] |= 2;
+                result = 1;
+            }
+        }
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
