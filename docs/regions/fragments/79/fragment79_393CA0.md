@@ -160,3 +160,35 @@ func_84131538: matched (call_sequence:nibble-dispatch:permuter-int-low), 3 itera
 ## 2026-09-05
 
 func_84139770: matched (call-sequence:record-scan:u8-index-base-pointer), 1 iterations, agent codex
+
+## 2026-09-06
+
+func_8412A934: matched (call-sequence:indexed-pointer:clamp-signed-value), 3 iterations, agent codex
+
+## 2026-09-06
+
+func_8412BFEC: matched (call-sequence:reset-loop:direct-global-index), 1 iterations, agent codex
+
+## 2026-09-06
+
+func_8412D20C: matched (call-sequence:ptr-table:global-index:probe-match), 1 iterations, agent codex
+
+## 2026-09-06
+
+func_84130B40: matched (call_sequence:for:done-init-counter-declared:matched), 5 iterations, agent codex
+
+## 2026-09-06
+
+func_84137BD4: plateau at 0.8772 (raw 0.2632), mismatch operand_or_scheduling_drift; tried families: call-sequence; tie-pool no
+
+## 2026-09-06
+
+func_8412E680: plateau at 0.0 (raw None), mismatch unknown; tried families: call_sequence; tie-pool no
+
+## 2026-09-06
+
+TYPE CONFLICT: D_841951BD is extern u8 D_841951BD, not extern u8 D_841951D1, D_841951BC, D_841951BD
+
+## 2026-09-06
+
+TYPE CONFLICT: func_84136124 is extern s32 func_84136124(u8, s16, u16, u8, u8), not extern void func_84136124(u8, s16, u16, u8, u8)
