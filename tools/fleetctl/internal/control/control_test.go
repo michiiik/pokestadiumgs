@@ -1539,3 +1539,78 @@ func TestRunningOwnersUsesMatchedOwnersNotSpecOwnersForPROpen(t *testing.T) {
 		t.Fatalf("func_2/func_3 (unmatched, already handed to a sibling) must NOT be claimed: %+v", claimed["disasm/src/x.c"])
 	}
 }
+
+// TestPollRunningForceStopsContainerPastBudgetPlusGrace reproduces the live
+// incident: a container's own in-container timeout (container_agent.py's
+// --generator-timeout/--owner-seconds enforcement) did not fire -- observed
+// under Rosetta emulation, a single generator call sat blocked for over two
+// hours against a 30-minute cap -- leaving it running well past its own
+// --budget-seconds with nothing to show for it. pollRunning must not wait
+// on that forever: past budget+grace, it force-stops the container itself.
+func TestPollRunningForceStopsContainerPastBudgetPlusGrace(t *testing.T) {
+	fake := &runner.Fake{InspectResults: map[string][]runner.InspectResult{
+		"cid": {{Found: true, Running: true}},
+	}}
+	loop, _ := newTestLoop(t, fake)
+	loop.HardBudgetGrace = 10 * time.Minute
+
+	rec := runningRec("x-p0", "cid", "", "codex")
+	rec.Spec.BudgetSeconds = 7200 // 2h
+	rec.StartedAt = testNow.Add(-2*time.Hour - 11*time.Minute)
+	loop.State.Runs["x-p0"] = rec
+
+	if err := loop.pollRunning(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	stopCall := findCall(fake, "StopContainer")
+	if stopCall == nil || stopCall.Strings[0] != "cid" {
+		t.Fatalf("StopContainer call = %+v, want cid force-stopped", stopCall)
+	}
+}
+
+// TestPollRunningLeavesContainerRunningWithinBudgetPlusGrace checks the
+// negative: a container still inside budget+grace (even if already past
+// its bare --budget-seconds) must be left alone -- the in-container
+// timeout gets its full grace window before pollRunning intervenes.
+func TestPollRunningLeavesContainerRunningWithinBudgetPlusGrace(t *testing.T) {
+	fake := &runner.Fake{InspectResults: map[string][]runner.InspectResult{
+		"cid": {{Found: true, Running: true}},
+	}}
+	loop, _ := newTestLoop(t, fake)
+	loop.HardBudgetGrace = 30 * time.Minute
+
+	rec := runningRec("x-p0", "cid", "", "codex")
+	rec.Spec.BudgetSeconds = 7200 // 2h
+	rec.StartedAt = testNow.Add(-2*time.Hour - 5*time.Minute)
+	loop.State.Runs["x-p0"] = rec
+
+	if err := loop.pollRunning(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if findCall(fake, "StopContainer") != nil {
+		t.Fatal("still within budget+grace; StopContainer must not be called")
+	}
+}
+
+// TestPollRunningNeverForceStopsWhenNoBudgetSet checks that a run with no
+// --budget-seconds (BudgetSeconds<=0 -- nothing to overrun) is exempt
+// regardless of how long it has been running.
+func TestPollRunningNeverForceStopsWhenNoBudgetSet(t *testing.T) {
+	fake := &runner.Fake{InspectResults: map[string][]runner.InspectResult{
+		"cid": {{Found: true, Running: true}},
+	}}
+	loop, _ := newTestLoop(t, fake)
+	loop.HardBudgetGrace = time.Minute
+
+	rec := runningRec("x-p0", "cid", "", "codex")
+	rec.Spec.BudgetSeconds = 0
+	rec.StartedAt = testNow.Add(-48 * time.Hour)
+	loop.State.Runs["x-p0"] = rec
+
+	if err := loop.pollRunning(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if findCall(fake, "StopContainer") != nil {
+		t.Fatal("BudgetSeconds<=0 means no budget to overrun; StopContainer must not be called")
+	}
+}

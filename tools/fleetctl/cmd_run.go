@@ -39,6 +39,7 @@ func runRunCmd(args []string) error {
 	replan := fs.Bool("replan", false, "re-run the ranking against --merge-repo and rebuild the pending queue once at startup, before entering the control loop (see docs sec 2, replanning)")
 	srcOverlay := fs.String("src-overlay", "", "when set, forwarded to every launch as env SRC_OVERLAY=DIR (container/run.sh + entrypoint.sh overlay these sources into the container at start, so a launch after a merge does not need a rebuilt image); also suppresses the stale-image warning")
 	stallAfter := fs.Duration("stall-after", 3*time.Hour, "alert when a running run's best similarity has not improved for this long")
+	budgetGrace := fs.Duration("budget-grace", 30*time.Minute, "force-stop a container still running this long past its own --budget-seconds, instead of waiting indefinitely on the in-container timeout to notice and self-terminate")
 
 	alertIssue := fs.Int("alert-issue", 0, "post alerts as comments on this GitHub issue number (gh issue comment), rate-limited to one per event type per hour, plus a daily summary (see --daily-summary-hour)")
 	alertMacOS := fs.Bool("alert-macos", false, "post alerts as macOS notifications (osascript display notification)")
@@ -76,6 +77,7 @@ func runRunCmd(args []string) error {
 		DisableAutoMerge:    !*autoMerge,
 		SrcOverlay:          *srcOverlay,
 		StallAfter:          *stallAfter,
+		HardBudgetGrace:     *budgetGrace,
 		DailySummaryHourUTC: *dailySummaryHour,
 		PermuterSeconds:     *permuterSeconds,
 		OwnerSeconds:        *ownerSeconds,
