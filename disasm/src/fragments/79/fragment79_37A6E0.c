@@ -1630,7 +1630,7 @@ extern s32 D_84183D50;
 extern s32 D_841911F4;
 extern u8 D_841911FA;
 extern u8 * D_84193DD0;
-void func_84113D7C(u8 *arg0) {
+void BattleAnim_Dispatch_218(u8 *arg0) {
     s32 index;
     if (D_841911FA == 0) { func_84111C1C(); }
     if (D_841911FA == 0) {

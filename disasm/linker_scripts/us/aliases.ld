@@ -21,3 +21,4 @@ func_8412A934 = BattleAnim_Table_84185F10_008;
 func_8412BFEC = BattleAnim_Table_84185F10_021;
 func_8412D20C = BattleAnim_Table_84185F10_036;
 func_84130B40 = BattleAnim_Table_84186004_068;
+func_84113D7C = BattleAnim_Dispatch_218;
