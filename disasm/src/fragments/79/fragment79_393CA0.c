@@ -1379,7 +1379,7 @@ extern u16 D_841951E8;
 extern u8 D_841951BD;
 extern s32 D_841951C8;
 extern u8 * D_84195200[];
-void func_8412D8C8(void) {
+void BattleAnim_Table_84185F10_042(void) {
     if (D_841951C8 < *(u16 *)(D_84195200[D_841951BD] + 0x26)) {
         D_841951D4 = 0;
     } else {

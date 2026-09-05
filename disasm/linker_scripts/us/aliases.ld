@@ -25,3 +25,4 @@ func_84113D7C = BattleAnim_Dispatch_218;
 func_8412D06C = BattleAnim_Table_84185F10_035;
 func_8003F3BC = ModelAnim_SetEventTrack;
 func_8411D594 = BattleAnim_Dispatch_246;
+func_8412D8C8 = BattleAnim_Table_84185F10_042;
