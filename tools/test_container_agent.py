@@ -1314,6 +1314,98 @@ class RunIterationTests(unittest.TestCase):
 
 
 # ---------------------------------------------------------------------------
+# Generalized normalized-only match detection: a moderate-similarity
+# candidate whose raw score is disproportionately (ratio) and absolutely low
+# is also a normalized-only match, not just the near-1.0 case above.
+# Regression for the func_84136D84 array-indexing plateau (similarity
+# 0.8571/raw 0.1429, a ~6x ratio) that the narrow >=0.999 gate never caught.
+# ---------------------------------------------------------------------------
+
+class GeneralizedNormalizedOnlyMatchTests(unittest.TestCase):
+    def test_moderate_similarity_low_raw_ratio_is_flagged(self) -> None:
+        # The exact regression shape: similarity_score=0.8571,
+        # raw_similarity_score=0.1429 (~6x ratio), never accepted.
+        attempt = {
+            "label": "array-indexing", "status": "probe_rejected",
+            "similarity_score": 0.8571, "raw_similarity_score": 0.1429,
+        }
+        self.assertTrue(container_agent._is_normalized_only_match(attempt))
+
+    def test_legitimate_near_miss_ratio_under_1_5x_is_not_flagged(self) -> None:
+        # docs/regions/fragments/79/fragment79_393CA0.md: func_841255AC
+        # requeue, sim 0.9250/raw 0.6500 (~1.42x ratio) -- a genuine
+        # hard-function near-miss, not a normalization artifact.
+        attempt = {
+            "label": "ratio:return-u8:reverse:temp-pointer", "status": "probe_rejected",
+            "similarity_score": 0.9250, "raw_similarity_score": 0.6500,
+        }
+        self.assertFalse(container_agent._is_normalized_only_match(attempt))
+
+    def test_legitimate_near_miss_high_raw_is_not_flagged(self) -> None:
+        # docs/regions/fragments/79/fragment79_393CA0.md: func_841362E4 time
+        # cap, sim 0.9643/raw 0.8929 (~1.08x ratio).
+        attempt = {
+            "label": "state-field", "status": "probe_rejected",
+            "similarity_score": 0.9643, "raw_similarity_score": 0.8929,
+        }
+        self.assertFalse(container_agent._is_normalized_only_match(attempt))
+
+    def test_legitimate_near_miss_moderate_gap_is_not_flagged(self) -> None:
+        # docs/regions/fragments/79/fragment79_393CA0.md: func_84132778
+        # plateau, sim 0.9292/raw 0.8142 (~1.14x ratio).
+        attempt = {
+            "label": "call_sequence", "status": "probe_rejected",
+            "similarity_score": 0.9292, "raw_similarity_score": 0.8142,
+        }
+        self.assertFalse(container_agent._is_normalized_only_match(attempt))
+
+    def test_existing_near_1_case_unchanged(self) -> None:
+        # Unchanged coverage for the original near-1.0/well-below-raw case
+        # (see RunIterationTests.test_normalized_only_match_ranks_below_a_
+        # lower_scoring_genuine_near_miss for the full end-to-end version).
+        attempt = {
+            "label": "dispatcher", "status": "probe_rejected",
+            "similarity_score": 1.0, "raw_similarity_score": 0.8462,
+        }
+        self.assertTrue(container_agent._is_normalized_only_match(attempt))
+
+    def test_low_similarity_low_raw_is_not_flagged(self) -> None:
+        # A candidate that is just weak all around (low similarity *and* low
+        # raw) is not a "normalization hiding a real diff" -- the
+        # NORMALIZED_ONLY_MIN_SIMILARITY floor keeps the ratio check off it.
+        attempt = {
+            "label": "weak", "status": "probe_rejected",
+            "similarity_score": 0.4, "raw_similarity_score": 0.1,
+        }
+        self.assertFalse(container_agent._is_normalized_only_match(attempt))
+
+    def test_accepted_status_is_never_flagged(self) -> None:
+        attempt = {
+            "label": "accepted-case", "status": "accepted",
+            "similarity_score": 0.8571, "raw_similarity_score": 0.1429,
+        }
+        self.assertFalse(container_agent._is_normalized_only_match(attempt))
+
+    def test_attempt_sort_key_ranks_genuine_near_miss_above_bad_array_family(self) -> None:
+        # End-to-end: a pool with both the bad array-indexing candidate
+        # (high-ish similarity, terrible raw) and a genuine lower-similarity/
+        # higher-raw candidate must sort the genuine one first.
+        bad_array_family = {
+            "label": "array-indexing", "status": "probe_rejected",
+            "similarity_score": 0.8571, "raw_similarity_score": 0.1429,
+        }
+        genuine = {
+            "label": "genuine-structural-match", "status": "probe_rejected",
+            "similarity_score": 0.6667, "raw_similarity_score": 0.6667,
+        }
+        ranked = sorted(
+            [bad_array_family, genuine],
+            key=container_agent.attempt_sort_key, reverse=True,
+        )
+        self.assertEqual([entry["label"] for entry in ranked], ["genuine-structural-match", "array-indexing"])
+
+
+# ---------------------------------------------------------------------------
 # filter_batch / tried-body dedup (a generator resending an already-probed
 # body -- or two identical candidates in one batch -- makes fleet_probe's
 # own preflight reject the WHOLE batch; this driver must catch it first)

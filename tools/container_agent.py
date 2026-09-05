@@ -89,6 +89,20 @@ PERMUTER_LOWERED_TRIGGER = 0.90
 # docs/REGISTER_TIES.md: similarity_score near 1.0, exact_similarity_score
 # visibly lower, is the tell).
 REGISTER_TIE_RAW_GAP = 0.05
+# Generalized normalized-only detection (see _is_normalized_only_match): a
+# candidate whose raw_similarity_score sits well under NORMALIZED_ONLY_MAX_RAW
+# *and* trails similarity_score by at least NORMALIZED_ONLY_RATIO is treated
+# as normalized-only even when similarity_score is nowhere near 1.0. Real
+# hard-function near-misses documented in docs/regions/fragments/79/
+# fragment79_393CA0.md keep that ratio under ~1.5x with raw >= ~0.65 (e.g.
+# sim 0.9250/raw 0.6500, sim 0.9643/raw 0.8929); the func_84136D84
+# array-indexing plateau this generalizes for was sim 0.8571/raw 0.1429, a
+# ~6x ratio with raw far below 0.5. NORMALIZED_ONLY_MIN_SIMILARITY keeps the
+# check from firing on candidates that are simply weak all around (low
+# similarity *and* low raw are not "normalization hiding a real diff").
+NORMALIZED_ONLY_RATIO = 3.0
+NORMALIZED_ONLY_MIN_SIMILARITY = 0.5
+NORMALIZED_ONLY_MAX_RAW = 0.5
 DEFAULT_PERMUTER_BODIES = 3
 
 # feedback["diff_excerpt"] rendering (see _build_feedback): how many
@@ -419,6 +433,20 @@ def _parse_preflight_indices(stderr: str | None) -> list[int]:
 # "normalized-only match": it must never be allowed to look like a genuine
 # near-miss to the driver (best-candidate selection, the improvement test,
 # or the permuter trigger).
+#
+# The same inflation shows up away from the near-1.0 corner too: a candidate
+# can sit at a merely moderate similarity_score while its raw_similarity_score
+# is disproportionately -- not just somewhat -- lower, e.g. the observed
+# func_84136D84 plateau at similarity 0.8571/raw 0.1429 (a ~6x ratio). A
+# genuine hard-function near-miss also runs a real similarity/raw gap, but
+# historically keeps that ratio under ~1.5x with raw well above
+# NORMALIZED_ONLY_MAX_RAW (see docs/regions/fragments/79/
+# fragment79_393CA0.md for examples); NORMALIZED_ONLY_RATIO and
+# NORMALIZED_ONLY_MAX_RAW are picked to separate the two. This generalized
+# check is gated on both the ratio and an absolute raw floor (not the ratio
+# alone) so it doesn't fire on candidates that are just weak all around, and
+# on NORMALIZED_ONLY_MIN_SIMILARITY so it doesn't fire on low-similarity
+# candidates where a large similarity/raw ratio carries no such signal.
 # ---------------------------------------------------------------------------
 
 def _is_normalized_only_match(attempt: dict) -> bool:
@@ -430,10 +458,22 @@ def _is_normalized_only_match(attempt: dict) -> bool:
     similarity = attempt.get("similarity_score")
     raw = attempt.get("raw_similarity_score")
     status = attempt.get("status")
-    if (
-        isinstance(similarity, (int, float)) and similarity >= 0.999
+    if not (
+        isinstance(similarity, (int, float)) and isinstance(raw, (int, float))
         and status != "accepted"
-        and isinstance(raw, (int, float)) and raw < 0.95
+    ):
+        return False
+    # Near-1.0 case: a (near-)perfect normalized score with a raw score well
+    # below it, regardless of ratio -- at this altitude even a modest
+    # absolute gap means the normalization is masking something.
+    if similarity >= 0.999 and raw < 0.95:
+        return True
+    # Generalized case: a moderate-or-better similarity whose raw score is
+    # both far below it (ratio) and low in absolute terms.
+    if (
+        similarity >= NORMALIZED_ONLY_MIN_SIMILARITY
+        and raw < NORMALIZED_ONLY_MAX_RAW
+        and similarity >= NORMALIZED_ONLY_RATIO * raw
     ):
         return True
     return False
@@ -444,9 +484,13 @@ def attempt_rank(attempt: dict) -> tuple[float, float]:
     similarity, raw similarity)``.
 
     Ordinarily ``effective`` is just ``similarity_score``. But a
-    normalized-only match (see ``_is_normalized_only_match``) has its
-    ``effective`` capped at ``0.9 + 0.1 * raw``, which pulls it below a
-    genuine near-miss scoring above that cap.
+    normalized-only match (see ``_is_normalized_only_match`` -- both the
+    near-1.0 case and the generalized moderate-similarity/low-raw-ratio
+    case) has its ``effective`` capped at ``0.9 + 0.1 * raw``, which pulls it
+    below a genuine near-miss scoring above that cap. For the generalized
+    case ``similarity_score`` itself is already under that cap (it only ever
+    bites above 0.9 similarity), so the cap is a no-op there and does
+    nothing to order it -- exactly why the boolean below exists.
 
     The cap alone is NOT enough to demote one, and callers must not treat it
     as if it were: ``0.9 + 0.1 * raw`` only falls under the 0.95 permuter
