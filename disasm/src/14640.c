@@ -66,7 +66,7 @@ void func_80014328(s32 arg0, s32 arg1) { if (arg0 != 0xFF) { u8 *ptr = D_8011BE9
 
 void func_800143B8(s32 arg0, s32 arg1) { if (arg0 != 0xFF) { u8 *ptr = D_8011BE90 + arg0; if (ptr[0x3300] != 5) ptr[0x3300] = arg1; } }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_800143E8.s")
+void func_800143E8(void *arg0, s32 arg1, u16 arg2) { s32 i; u8 *entry; *(s32 *)((u8 *)arg0 + 4) = arg1; *(u16 *)((u8 *)arg0 + 2) = arg2; i = 0; while (i < *(s16 *)arg0) { entry = (u8 *)arg0 + i * 0x10; if (*(s32 *)(entry + 0x14) != 0 && *(s8 *)(entry + 0x18) == 2) { *(s32 *)(entry + 0x10) += arg1; } i++; } }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80014448.s")
 
