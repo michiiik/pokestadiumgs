@@ -600,7 +600,28 @@ void func_8AC03334(s32 arg0, s32 arg1, s32 arg2, void *arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC03C28.s")
+typedef struct {
+    s32 value;
+} Fragment43Word;
+s32 func_8AC03C28(s32 arg0, void *arg1) {
+    struct Word {
+        s32 value;
+    };
+    void *temp_v0;
+
+    temp_v0 = *(void **)((u8 *)arg1 + 0x20);
+    switch (arg0) {
+    case 0:
+        *(struct Word *)((u8 *)arg1 + 0x2C) = *(struct Word *)((u8 *)temp_v0 + 0x28);
+        *(struct Word *)((u8 *)arg1 + 0x30) = *(struct Word *)((u8 *)temp_v0 + 0x2C);
+        break;
+    case 1:
+        *(struct Word *)((u8 *)arg1 + 0x2C) = *(struct Word *)((u8 *)temp_v0 + 0x28);
+        *(struct Word *)((u8 *)arg1 + 0x30) = *(struct Word *)((u8 *)temp_v0 + 0x2C);
+        break;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -812,7 +833,20 @@ void func_8AC060E4(Fragment43Motion602C *arg0, u16 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC063AC.s")
+extern f32 D_8AC08190;
+extern f32 D_80088E50[];
+void func_8AC063AC(Fragment43Motion602C *arg0, u16 arg1) {
+    f32 *temp_v0;
+    f32 temp_fv0;
+
+    arg1 <<= 12;
+    temp_v0 = &D_80088E50[arg1 >> 4];
+    temp_fv0 = D_8AC08190;
+    if (arg0) {
+    }
+    arg0->unk40 = (*temp_v0 * temp_fv0) + 1.0f;
+    arg0->unk44 = (*temp_v0 * temp_fv0) + 1.0f;
+}
 #endif
 
 #ifdef VERSION_US

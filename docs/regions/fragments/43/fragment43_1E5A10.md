@@ -62,3 +62,23 @@ func_8AC0672C: plateau at 1.0 (raw 0.9811), mismatch register_allocation_only; t
 ## 2026-09-05
 
 func_8AC0686C: time cap at 0.0 (raw None) after 2636s, mismatch unknown; tried families: (none); tie-pool no
+
+## 2026-09-05
+
+func_8AC03C28: matched (constant_map:struct_copy:local_struct_s32), 1 iterations, agent gemini
+
+## 2026-09-05
+
+func_8AC063AC: matched (state_field_access:motion_struct:baseline_arg0_if_u16), 1 iterations, agent gemini
+
+## 2026-09-05
+
+func_8AC06EC0: time cap at 0.9231 (raw 0.7308) after 82357s, mismatch instruction_drift; tried families: constant_map; tie-pool no
+
+## 2026-09-05
+
+func_8AC0619C: time cap at 0.9697 (raw 0.7576) after 2400s, mismatch instruction_drift; tried families: state-field; tie-pool no
+
+## 2026-09-05
+
+func_8AC06220: time cap at 0.9697 (raw 0.7576) after 2400s, mismatch instruction_drift; tried families: state_field; tie-pool yes
