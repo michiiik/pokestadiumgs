@@ -117,3 +117,23 @@ func_8AE05B24: plateau at 0.0 (raw None), mismatch unknown; tried families: call
 ## 2026-09-05
 
 TYPE CONFLICT: Fragment46Entry is } Fragment46Entry, not extern Fragment46Entry *func_8AE0559C(s16)
+
+## 2026-09-06
+
+func_8AE00C94: matched (state:volatile-lvalue:u8:separate-pointer), 6 iterations, agent codex
+
+## 2026-09-06
+
+func_8AE01564: matched (state-field:typed-record:branch-likely-sentinel), 1 iterations, agent codex
+
+## 2026-09-06
+
+func_8AE011E0: plateau at 0.963 (raw 0.6667), mismatch operand_or_scheduling_drift; tried families: branch-likely, state-field; tie-pool no
+
+## 2026-09-06
+
+func_8AE01248: plateau at 0.963 (raw 0.6667), mismatch operand_or_scheduling_drift; tried families: branch-likely, state; tie-pool no
+
+## 2026-09-06
+
+func_8AE01164: matched (state-field:scan:exact-typed-s32), 1 iterations, agent codex
