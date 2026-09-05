@@ -1003,7 +1003,29 @@ void func_8AC06D70(void *arg0, s32 arg1, s32 arg2, u16 arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC06DC8.s")
+extern u8 D_8AC08798[];
+extern s16 D_8AC08790;
+void func_8AC06DC8(void *arg0, void *arg1) {
+  u8 *slot;
+  s32 i;
+  unsigned long long limit;
+  slot = ((u8 *) D_8AC08798) + (D_8AC08790 * 8);
+  D_8AC08790++;
+  if (arg0 == 0) return;
+  slot[4] = 0;
+  *((s32 *) slot) = *((s32 *) (((u8 *) arg0) + 4));
+  limit = D_8AC08790 - 1;
+  i = 0;
+  while (i < (D_8AC08790 - 1)) { i++; }
+  if ((*((s32 *) (((u8 *) arg0) + 4))) != 0) *((s32 *) slot) = *((s32 *) (((u8 *) arg0) + (4 & 0xFFFFu)));
+  if (*((void **) (((u8 *) arg0) + 0x18))) {
+    func_8AC06DC8(*((void **) (((u8 *) arg0) + 0x18)), *((void **) (((u8 *) arg0) + 0x18)));
+  }
+  if ((*((void **) (((u8 *) arg0) + 0x14))) != arg1) {
+    func_8AC06DC8(*((void **) (((u8 *) arg0) + 0x14)), arg1);
+  }
+  D_8AC08790--;
+}
 #endif
 
 #ifdef VERSION_US
