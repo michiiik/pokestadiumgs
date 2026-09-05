@@ -902,6 +902,64 @@ def _required_asm_oracles(repo_root: Path) -> set[str]:
     return required
 
 
+def _private_oracle_root(repo_root: Path) -> Path | None:
+    """The tree's own extracted oracle directory, or None when it is shared.
+
+    A symlinked (or absent) ``asm/us/nonmatchings`` is the primary checkout's
+    tree, not a private extraction, so there is nothing here to repair.
+    """
+    root = repo_root / "disasm" / "asm" / "us" / "nonmatchings"
+    if root.is_symlink() or not root.is_dir():
+        return None
+    return root
+
+
+def _usable_oracle_file(path: Path) -> bool:
+    """Whether an oracle is present enough for the compiler to include it.
+
+    Deliberately laxer than ``_regular_nonempty_file``: a symlink placed by
+    ``_ensure_worktree_oracles`` compiles perfectly well, and treating it as
+    missing would force a pointless re-extraction on every overlaid worktree.
+    """
+    try:
+        return path.is_file() and path.stat().st_size > 0
+    except OSError:
+        return False
+
+
+def _missing_required_oracles(repo_root: Path) -> list[str]:
+    """Oracles a live GLOBAL_ASM pragma needs that this tree does not hold."""
+    root = _private_oracle_root(repo_root)
+    if root is None:
+        return []
+    return sorted(
+        relative
+        for relative in _required_asm_oracles(repo_root)
+        if not _usable_oracle_file(root / relative)
+    )
+
+
+def _missing_source_oracles(source_path: Path) -> list[str]:
+    """The same check for one source, without walking every ``disasm/src``."""
+    try:
+        repo_root = _repo_root_for_path(source_path)
+    except (ValueError, RuntimeError):
+        return []
+    root = _private_oracle_root(repo_root)
+    if root is None:
+        return []
+    try:
+        text = source_path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return []
+    pattern = re.compile(r'GLOBAL_ASM\("asm/us/nonmatchings/([^"\n]+\.s)"\)')
+    return sorted(
+        relative
+        for relative in set(pattern.findall(text))
+        if not _usable_oracle_file(root / relative)
+    )
+
+
 def _backfill_missing_private_oracles(repo_root: Path) -> list[str]:
     """Copy oracles the private extraction owed us but did not produce.
 
@@ -1089,7 +1147,22 @@ def _ensure_worktree_gate_prerequisites(repo_root: Path) -> None:
     lib_matches = identity_matches and recorded_outputs.get("libultra") == _output_manifest(
         repo_root, lib_output
     )
-    needs_extract = not auto_sources_match or not asm_oracles_match
+    # A matching manifest can still describe a tree that cannot compile. The
+    # manifest records what the last extraction produced, and that extraction
+    # ran against the sources as they stood *then*: a gate that accepted a
+    # candidate extracts with the pragma already replaced, so the function's
+    # oracle is legitimately absent and legitimately unrecorded. Revert that
+    # source afterwards -- fleetctl's PR-conflict replay resets the checkout
+    # to a fresh base and re-gates -- and the restored pragma has no oracle,
+    # yet the manifest still matches, so nothing re-extracted and every probe
+    # on the whole file failed with ``baseline_object_unavailable``
+    # indefinitely. Completeness against the *current* sources is the
+    # condition that actually matters.
+    needs_extract = (
+        not auto_sources_match
+        or not asm_oracles_match
+        or bool(_missing_required_oracles(repo_root))
+    )
     needs_lib_build = not lib_matches
     needs_auto_preprocess = needs_extract or not auto_outputs_match
     if lib_build.exists() and not _runner_owns_lib_build(lib_build):
@@ -1446,8 +1519,19 @@ def _make_object(source_path: Path, *, capture: bool = False) -> tuple[int, Path
     return returncode, object_path, output
 
 
-def rebuild_source_object(source_path: Path) -> int:
-    result, _, _ = _make_object(source_path)
+# source -> the tail of the last captured failing baseline compile, so a
+# ``baseline_object_unavailable`` result can say *why* instead of nothing.
+_BASELINE_BUILD_OUTPUT: dict[Path, str] = {}
+
+
+def rebuild_source_object(source_path: Path, *, capture: bool = False) -> int:
+    result, _, output = _make_object(source_path, capture=capture)
+    if capture:
+        key = source_path.resolve()
+        if result == 0:
+            _BASELINE_BUILD_OUTPUT.pop(key, None)
+        else:
+            _BASELINE_BUILD_OUTPUT[key] = output or ""
     return result
 
 
@@ -3896,8 +3980,11 @@ def probe_candidates(
         return results
 
     if not _ensure_baseline_object(source_path, baseline_object):
+        diagnostic = _baseline_failure_diagnostic(source_path)
         for result in results:
             result["probe_reason"] = "baseline_object_unavailable"
+            if diagnostic:
+                result["diagnostic"] = diagnostic
         return results
     expected = {
         function: _function_bytes(baseline_object, function)
@@ -3964,6 +4051,71 @@ def probe_candidates(
 _BASELINE_OBJECT_STATE: dict[Path, tuple[int, int]] = {}
 _BASELINE_OBJECT_LOCK = threading.Lock()
 
+# Sources this process has already tried to repair, so a genuinely broken
+# tree costs one re-extraction rather than one per probe pass.
+_ORACLE_REPAIR_ATTEMPTED: set[Path] = set()
+
+
+def _repair_missing_source_oracles(source_path: Path) -> bool:
+    """Re-derive the private oracle tree when this source's assembly vanished.
+
+    Accepting a candidate leaves the worktree's extracted
+    ``asm/us/nonmatchings`` without that function's oracle -- correctly, since
+    the pragma is gone. Reverting the source afterwards (fleetctl's
+    PR-conflict replay resets to a fresh base and re-gates the same candidate)
+    restores a pragma whose oracle no longer exists, and nothing puts it back:
+    ``_ensure_worktree_oracles`` refuses a primary checkout split from
+    different yamls, and the bootstrap only runs from the *full* gate, which
+    this probe never reaches because it dies first. Observed live: one landed
+    match poisoned its whole source file for every later run.
+
+    Returns whether a repair actually happened and left nothing missing.
+    """
+    if not _missing_source_oracles(source_path):
+        return False
+    key = source_path.resolve()
+    with _BASELINE_OBJECT_LOCK:
+        if key in _ORACLE_REPAIR_ATTEMPTED:
+            return False
+        _ORACLE_REPAIR_ATTEMPTED.add(key)
+    try:
+        repo_root = _repo_root_for_path(source_path)
+    except (ValueError, RuntimeError):
+        return False
+    if _primary_worktree_root(repo_root) is None:
+        # A primary checkout owns its own extraction; there is no private
+        # bootstrap here to re-run.
+        return False
+    try:
+        _ensure_worktree_gate_prerequisites(repo_root)
+    except (RuntimeError, OSError) as error:
+        print(
+            f"baseline oracle repair for {source_path} failed: {error}",
+            file=sys.stderr,
+        )
+        return False
+    return not _missing_source_oracles(source_path)
+
+
+def _baseline_failure_diagnostic(source_path: Path) -> str:
+    """A one-shot explanation for ``baseline_object_unavailable``.
+
+    The status used to be reported bare, so a failure that is fully explained
+    by a missing oracle read as an unexplained infrastructure hiccup.
+    """
+    parts: list[str] = []
+    missing = _missing_source_oracles(source_path)
+    if missing:
+        shown = ", ".join(missing[:5])
+        if len(missing) > 5:
+            shown += f", ... (+{len(missing) - 5} more)"
+        parts.append(f"missing assembly oracle(s): {shown}")
+    output = _BASELINE_BUILD_OUTPUT.get(source_path.resolve(), "")
+    tail = [line for line in output.splitlines() if line.strip()][-8:]
+    if tail:
+        parts.append(" | ".join(tail))
+    return "; ".join(parts)
+
 
 def _ensure_baseline_object(source_path: Path, object_path: Path) -> bool:
     """Rebuild the tracked baseline object unless this process already did so.
@@ -3983,10 +4135,19 @@ def _ensure_baseline_object(source_path: Path, object_path: Path) -> bool:
     with _BASELINE_OBJECT_LOCK:
         if current is not None and _BASELINE_OBJECT_STATE.get(key) == current:
             return True
-    if rebuild_source_object(source_path) != 0:
-        with _BASELINE_OBJECT_LOCK:
-            _BASELINE_OBJECT_STATE.pop(key, None)
-        return False
+    if rebuild_source_object(source_path, capture=True) != 0:
+        # One vanished oracle makes the whole source uncompilable, and the
+        # probe path never reaches the bootstrap that could re-derive it.
+        # Repair it here, once, then give the compile a second chance.
+        if _repair_missing_source_oracles(source_path):
+            if rebuild_source_object(source_path, capture=True) != 0:
+                with _BASELINE_OBJECT_LOCK:
+                    _BASELINE_OBJECT_STATE.pop(key, None)
+                return False
+        else:
+            with _BASELINE_OBJECT_LOCK:
+                _BASELINE_OBJECT_STATE.pop(key, None)
+            return False
     try:
         fresh = (source_path.stat().st_mtime_ns, object_path.stat().st_mtime_ns)
     except OSError:

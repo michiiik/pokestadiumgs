@@ -3001,6 +3001,95 @@ class LinkShapeTests(unittest.TestCase):
             finally:
                 runner._BASELINE_OBJECT_STATE.pop(key, None)
 
+    def test_missing_source_oracles_reports_reverted_pragma(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory) / "repo"
+            (repo / ".git").mkdir(parents=True)
+            source = repo / "disasm" / "src" / "thing.c"
+            source.parent.mkdir(parents=True)
+            source.write_text(
+                '#pragma GLOBAL_ASM("asm/us/nonmatchings/thing/func_a.s")\n'
+                '#pragma GLOBAL_ASM("asm/us/nonmatchings/thing/func_b.s")\n'
+            )
+            oracles = repo / "disasm" / "asm" / "us" / "nonmatchings" / "thing"
+            oracles.mkdir(parents=True)
+            (oracles / "func_a.s").write_text("oracle\n")
+            self.assertEqual(
+                runner._missing_source_oracles(source), ["thing/func_b.s"]
+            )
+            self.assertEqual(
+                runner._missing_required_oracles(repo), ["thing/func_b.s"]
+            )
+            # A symlinked oracle still compiles and must not read as missing.
+            shared = repo / "shared_func_b.s"
+            shared.write_text("oracle\n")
+            (oracles / "func_b.s").symlink_to(shared)
+            self.assertEqual(runner._missing_source_oracles(source), [])
+            self.assertEqual(runner._missing_required_oracles(repo), [])
+
+    def test_ensure_baseline_object_repairs_missing_oracle_and_retries(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.c"
+            object_path = Path(directory) / "synthetic.o"
+            source.write_text("void synthetic(void) {}\n")
+            object_path.write_bytes(b"stub")
+            key = source.resolve()
+            runner._BASELINE_OBJECT_STATE.pop(key, None)
+            try:
+                with mock.patch.object(
+                    runner, "rebuild_source_object", side_effect=[1, 0]
+                ) as rebuild, mock.patch.object(
+                    runner, "_repair_missing_source_oracles", return_value=True
+                ) as repair:
+                    self.assertTrue(runner._ensure_baseline_object(source, object_path))
+                    self.assertEqual(rebuild.call_count, 2)
+                    self.assertEqual(repair.call_count, 1)
+            finally:
+                runner._BASELINE_OBJECT_STATE.pop(key, None)
+
+    def test_repair_missing_source_oracles_runs_bootstrap_once(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.c"
+            source.write_text("void synthetic(void) {}\n")
+            runner._ORACLE_REPAIR_ATTEMPTED.discard(source.resolve())
+            try:
+                with mock.patch.object(
+                    runner, "_missing_source_oracles", side_effect=[["a.s"], []]
+                ), mock.patch.object(
+                    runner, "_primary_worktree_root", return_value=Path(directory)
+                ), mock.patch.object(
+                    runner, "_ensure_worktree_gate_prerequisites"
+                ) as bootstrap:
+                    self.assertTrue(runner._repair_missing_source_oracles(source))
+                    self.assertEqual(bootstrap.call_count, 1)
+                # A second call for the same source does not pay for it again.
+                with mock.patch.object(
+                    runner, "_missing_source_oracles", return_value=["a.s"]
+                ), mock.patch.object(
+                    runner, "_ensure_worktree_gate_prerequisites"
+                ) as bootstrap:
+                    self.assertFalse(runner._repair_missing_source_oracles(source))
+                    self.assertEqual(bootstrap.call_count, 0)
+            finally:
+                runner._ORACLE_REPAIR_ATTEMPTED.discard(source.resolve())
+
+    def test_baseline_failure_diagnostic_names_the_missing_oracle(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.c"
+            source.write_text("void synthetic(void) {}\n")
+            runner._BASELINE_BUILD_OUTPUT[source.resolve()] = (
+                "cfe: Cannot open file GLOBAL_ASM:...\nmake: *** Error 55\n"
+            )
+            try:
+                with mock.patch.object(
+                    runner, "_missing_source_oracles", return_value=["thing/func_b.s"]
+                ):
+                    diagnostic = runner._baseline_failure_diagnostic(source)
+                self.assertIn("thing/func_b.s", diagnostic)
+                self.assertIn("Error 55", diagnostic)
+            finally:
+                runner._BASELINE_BUILD_OUTPUT.pop(source.resolve(), None)
+
     def test_ensure_baseline_object_failed_rebuild_is_not_cached(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             source = Path(directory) / "synthetic.c"
