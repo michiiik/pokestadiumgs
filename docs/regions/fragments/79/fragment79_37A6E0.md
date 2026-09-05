@@ -59,3 +59,19 @@ func_84112158: matched (call_sequence:table_stride:s32-index-expression), 3 iter
 ## 2026-09-05
 
 func_8410F6AC: matched (call_sequence:stack-fifth:global-base), 2 iterations, agent codex
+
+## 2026-09-05
+
+func_84110718: time cap at 0.9796 (raw 0.9592) after 2401s, mismatch instruction_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-05
+
+TYPE CONFLICT: func_8410E73C is extern void func_8410E73C(u8 *, void *), not extern void func_8410E73C()
+
+## 2026-09-05
+
+func_84116604: matched (call_sequence:guard:direct-fields), 1 iterations, agent codex
+
+## 2026-09-05
+
+func_8411A310: time cap at 0.9796 (raw 0.9796) after 2401s, mismatch instruction_drift; tried families: call_sequence; tie-pool no
