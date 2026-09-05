@@ -1964,7 +1964,7 @@ extern void func_84136CA8(void);
 extern u8 D_841951BC;
 extern u8 D_841951D2;
 extern u8 D_841951D8;
-void func_84130B40(void) {
+void BattleAnim_Table_84186004_068(void) {
     s32 done = 0;
     s32 i;
     for (i = 0; i < 5; i = (i + 1) & 0xFF) {
