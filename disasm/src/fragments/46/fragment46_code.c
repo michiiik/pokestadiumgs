@@ -252,7 +252,20 @@ void func_8AE01394(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE01564.s")
+extern void * D_8AE084E4;
+void *func_8AE01564(s16 arg0, s16 arg1) {
+    typedef struct { s16 x; s16 y; u8 pad4[0x24]; } Entry;
+    Entry *entry;
+    entry = (Entry *)D_8AE084E4;
+    for (;;) {
+        if (entry->x != -1) {
+            if (entry->x == arg0 && entry->y == arg1) return entry;
+        } else {
+            return 0;
+        }
+        entry++;
+    }
+}
 #endif
 
 #ifdef VERSION_US
