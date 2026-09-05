@@ -192,3 +192,23 @@ TYPE CONFLICT: D_841951BD is extern u8 D_841951BD, not extern u8 D_841951D1, D_8
 ## 2026-09-06
 
 TYPE CONFLICT: func_84136124 is extern s32 func_84136124(u8, s16, u16, u8, u8), not extern void func_84136124(u8, s16, u16, u8, u8)
+
+## 2026-09-06
+
+func_84124798: plateau at 0.0 (raw None), mismatch unknown; tried families: (none); tie-pool no
+
+## 2026-09-06
+
+TYPE CONFLICT: D_841951E4 is extern u8 D_841951E4, not extern u8 D_841951E4, D_841951E5
+
+## 2026-09-06
+
+func_84129180: time cap at 0.9753 (raw 0.679) after 2411s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-06
+
+func_84135E4C: plateau at 0.8659 (raw 0.2317), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-06
+
+func_8413BF58: matched (call_sequence:state-switch:stride-mul24:probe-match), 3 iterations, agent codex
