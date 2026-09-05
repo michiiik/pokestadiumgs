@@ -1250,7 +1250,7 @@ extern u8 D_841951BC;
 extern u8 D_841951BD;
 extern u8 D_841951D2;
 extern u8 * D_84195208[];
-void func_8412D06C(void) {
+void BattleAnim_Table_84185F10_035(void) {
     u8 status = D_84195208[D_841951BD][0x26];
     u8 result = func_80062D98(status);
     if (status == 0 || result == 0x13) {
