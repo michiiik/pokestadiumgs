@@ -102,7 +102,15 @@ void func_800239B4(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800239C8.s")
+void func_800239C8(void) {
+    if (D_80090224 >= 0) {
+        D_80090224--;
+        if (D_80090224 < 0) {
+            func_8002390C(D_80090228);
+            D_80090228 = 0;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -129,7 +137,14 @@ s32 func_80023A10(u8 arg0, u8 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80024864.s")
+s32 func_80024864(void) {
+    extern s32 func_80019230(s32, s32, s32);
+    if (func_80019230(4, 0, 0) != 0) {
+        return 1;
+    }
+    return 0;
+}
+#pragma C_FUNCTION_PADDING(8)
 #endif
 
 #ifdef VERSION_US
@@ -299,7 +314,14 @@ s32 func_80025D44(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025D64.s")
+void func_80025D64(u8 arg0) {
+    if (arg0 != 0) {
+        func_80018728(0xF1FF0000U, 0);
+    } else {
+        func_80018728(0xF2FF0000U, 0);
+    }
+}
+#pragma C_FUNCTION_PADDING(8)
 #endif
 
 #ifdef VERSION_US
