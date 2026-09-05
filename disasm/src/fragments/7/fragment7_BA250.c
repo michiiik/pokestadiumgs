@@ -2,7 +2,7 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83000020.s")
+void func_83000020(s32 arg0) { struct State { u8 pad[0x4E038]; u8 f0; u8 f1; u8 pad2[2]; f32 f2; }; struct State *p0 = (struct State *)(u32)arg0; struct State *p1 = (struct State *)(u32)arg0; p0->f1 = 0; p1->f0 = p1->f1; p0->f2 = 0.0f; }
 #endif
 
 #ifdef VERSION_US
@@ -449,7 +449,16 @@ void func_83006FDC(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83007100.s")
+extern u8 D_8300DBE4[];
+extern void func_818036D8(s32, s32, s32, s32);
+extern void func_81805644(s32, s32, s32);
+void func_83007100(s32 arg0, void *arg1, void *arg2) {
+    void *state = arg1;
+    func_81805644(arg0, (s32)arg1, (s32)arg2);
+    if (((u8 *)state)[0x3D] > 0 && ((u8 *)state)[0x3D] < 5) {
+        func_818036D8((u8 *)D_8300DBE4 + ((((u8 *)state)[0x3D] << 5) - 0x20), (s32)arg2, *(s32 *)((u8 *)state + 0x28), 0);
+    }
+}
 #endif
 
 #ifdef VERSION_US
