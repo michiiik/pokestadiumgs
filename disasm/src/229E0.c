@@ -314,7 +314,14 @@ s32 func_80025D44(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025D64.s")
+void func_80025D64(u8 arg0) {
+    if (arg0 != 0) {
+        func_80018728(0xF1FF0000U, 0);
+    } else {
+        func_80018728(0xF2FF0000U, 0);
+    }
+}
+#pragma C_FUNCTION_PADDING(8)
 #endif
 
 #ifdef VERSION_US
