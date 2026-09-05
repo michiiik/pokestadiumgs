@@ -137,7 +137,12 @@ $(error Unable to find $(MIPS_BINUTILS_PREFIX)ld. Please install or build MIPS b
 endif
 
 
-CC              := $(shell pwd)/tools/ido/$(DETECTED_OS)/7.1/cc
+# coalesce_cc.py is a thin, strictly opt-in wrapper around the real IDO `cc`
+# below: for any file with no `#pragma COALESCE_AT_LUI(...)` marker -- i.e.
+# every file in the tree today -- it execs the real compiler with the
+# original arguments completely unmodified. See disasm/tools/coalesce_cc.py
+# and disasm/tools/coalesce_lui.py for the mechanism and its tests.
+CC              := $(shell pwd)/tools/coalesce_cc.py
 CC_OLD          := $(shell pwd)/tools/ido/$(DETECTED_OS)/5.3/cc
 
 AS              := $(MIPS_BINUTILS_PREFIX)as
