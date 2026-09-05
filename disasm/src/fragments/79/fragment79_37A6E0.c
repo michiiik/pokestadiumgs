@@ -1218,7 +1218,10 @@ void func_841120AC(u8 *arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_84112158.s")
+extern void func_84111D64(u8 *, s32);
+extern void func_84111DB4(u8 *arg0, s32 arg1);
+extern void func_84111E80(void *arg0, s16 arg1);
+void func_84112158(s32 arg0, s32 arg1) { func_84111D64((u8 *)arg0, *(u8 *)((u8 *)(u32)*(u32 *)(arg0 + 0x2D4) + arg1 * 0x14)); func_84111E50((u8 *)arg0, *(s8 *)((u8 *)(u32)*(u32 *)(arg0 + 0x2D4) + arg1 * 0x14 + 1)); func_84111DB4((u8 *)arg0, 0); func_84111E80((void *)arg0, 0); }
 #endif
 
 #ifdef VERSION_US
