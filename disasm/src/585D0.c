@@ -1309,14 +1309,37 @@ s32 func_8005E304(s32 arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005E524.s")
+extern void func_8005E350(s32, u8, s32, s32);
+extern u8 D_801285D4[];
+void func_8005E524(u8 arg0, s32 arg1) {
+    u8 *base;
+    s32 offset;
+    s32 saved_arg1;
+    s32 limit;
+    s32 address1;
+    s32 address2;
+
+    base = *(u8 **)(D_801285D4 + arg0 * 112);
+    offset = 0;
+    saved_arg1 = arg1;
+    limit = 0x1E30;
+    address1 = (s32)base + 1;
+    address2 = (s32)base + 0x2001;
+    do {
+        func_8005E350(saved_arg1, *(u8 *)(base + offset), address1, 1);
+        func_8005E350(saved_arg1, *(u8 *)(base + offset + 0x2000), address2, 1);
+        offset += 0x450;
+        address1 += 0x450;
+        address2 += 0x450;
+    } while (offset != limit);
+}
 #endif
 
 #ifdef VERSION_US
 extern u8 D_80128570[];
 extern void _bzero(s32, s32);
 extern void func_8005E350(s32, u8, s32, s32);
-extern void func_8005E524(s32, s32);
+extern void func_8005E524(u8, s32);
 void func_8005E5D8(s32 arg0) {
     s32 sp1C;
     s32 sp20;
