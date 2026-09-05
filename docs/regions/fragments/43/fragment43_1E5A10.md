@@ -82,3 +82,27 @@ func_8AC0619C: time cap at 0.9697 (raw 0.7576) after 2400s, mismatch instruction
 ## 2026-09-05
 
 func_8AC06220: time cap at 0.9697 (raw 0.7576) after 2400s, mismatch instruction_drift; tried families: state_field; tie-pool yes
+
+## 2026-09-06
+
+func_8AC03C74: time cap at 0.9111 (raw 0.8667) after 90697s, mismatch instruction_drift; tried families: constant_map; tie-pool no
+
+## 2026-09-06
+
+func_8AC06C10: time cap at 0.9783 (raw 0.9348) after 2400s, mismatch instruction_drift; tried families: arithmetic, cast, direct, group, lifetime, loads, locals, ptrabi, raw, sequencing, shift, struct, volatile, width; tie-pool no
+
+## 2026-09-06
+
+func_8AC05F38: plateau at 0.0 (raw None), mismatch unknown; tried families: (none); tie-pool no
+
+## 2026-09-06
+
+TYPE CONFLICT: Fragment43Motion602C is struct Fragment43Motion602C, not extern void func_8AC05F38(Fragment43Motion602C *)
+
+## 2026-09-06
+
+func_8AC03F64: matched (state_field_access:rectangle:nonflipped-dtdy), 1 iterations, agent codex
+
+## 2026-09-06
+
+func_8AC016A8: plateau at 0.9848 (raw 0.8333), mismatch instruction_drift; tried families: init_sequence; tie-pool no
