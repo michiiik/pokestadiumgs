@@ -5118,7 +5118,30 @@ void func_80041A18(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80041A78.s")
+extern void __osSetFpcCsr(s32);
+extern void func_800416C8(void *);
+extern void func_80041780(void *);
+extern void func_8004186C(void *);
+extern void func_80041A18(void *arg0);
+extern OSMesgQueue D_80126F00;
+void func_80041A78(void *arg0) {
+    OSMesg msg;
+    OSMesgQueue *queue;
+    queue = &D_80126F00;
+    __osSetFpcCsr(0x1000C01);
+    for (;;) {
+        osRecvMesg(queue, &msg, 1);
+        switch (*(s16 *)msg) {
+        case 1: func_800416C8(msg); break;
+        case 2: func_80041780(msg); break;
+        case 4: func_8004186C(msg); break;
+        case 8: func_80041A18(msg); break;
+        }
+        if (*(OSMesgQueue **)((u8 *)msg + 8) != NULL) {
+            osSendMesg(*(OSMesgQueue **)((u8 *)msg + 8), msg, 1);
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
