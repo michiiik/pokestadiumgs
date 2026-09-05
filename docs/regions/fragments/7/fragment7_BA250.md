@@ -21,3 +21,19 @@ func_830074C8: plateau at 0.0 (raw None), mismatch unknown; tried families: disp
 ## 2026-09-05
 
 func_830080AC: plateau at 1.0 (raw 0.95), mismatch immediate_drift; tried families: call-chain; tie-pool no
+
+## 2026-09-05
+
+func_83006798: time cap at 0.4953 (raw 0.1589) after 2400s, mismatch section_layout_drift; tried families: dispatcher_switch; tie-pool no
+
+## 2026-09-05
+
+func_83000020: matched (unclassified:init:struct-distinct-rhs-pointer), 3 iterations, agent codex
+
+## 2026-09-05
+
+func_83007100: matched (call_sequence:abi-pointers:local-state), 2 iterations, agent codex
+
+## 2026-09-05
+
+func_83000F04: plateau at 0.9474 (raw 0.9474), mismatch instruction_drift; tried families: call_sequence; tie-pool no
