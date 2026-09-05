@@ -2264,7 +2264,16 @@ void func_84133ACC(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841341D8.s")
+extern s32 func_8006A48C(void);
+extern void * D_841951F8[];
+void func_841341D8(void) {
+    s32 i; s32 flag;
+    for (i = 0; i < 2; i++) {
+        flag = ((u8 *)D_841951F8[i])[2] == 2;
+        if (flag != 0) flag = func_8006A48C() != 5;
+        ((u8 *)D_841951F8[i])[0x12] = flag;
+    }
+}
 #endif
 
 #ifdef VERSION_US
