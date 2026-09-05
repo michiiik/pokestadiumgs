@@ -212,3 +212,27 @@ func_84135E4C: plateau at 0.8659 (raw 0.2317), mismatch operand_or_scheduling_dr
 ## 2026-09-06
 
 func_8413BF58: matched (call_sequence:state-switch:stride-mul24:probe-match), 3 iterations, agent codex
+
+## 2026-09-06
+
+func_8412C0AC: plateau at 0.0 (raw None), mismatch unknown; tried families: (none); tie-pool no
+
+## 2026-09-06
+
+TYPE CONFLICT: D_841951D2 is extern u8 D_841951BC, D_841951BD, D_841951BF, D_841951D2, not extern u8 D_841951D2
+
+## 2026-09-06
+
+func_84132350: time cap at 0.8738 (raw 0.5049) after 2407s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-06
+
+TYPE CONFLICT: D_841951E7 is extern u8 D_841951D2, D_841951D5, D_841951E4, D_841951E5, D_841951E6, D_841951E7, not extern u8 D_841951E7
+
+## 2026-09-06
+
+func_8412D06C: matched (call-sequence:direct-index:status-u8), 1 iterations, agent codex
+
+## 2026-09-06
+
+func_8412EE5C: time cap at 0.9479 (raw 0.9271) after 2411s, mismatch operand_or_scheduling_drift; tried families: call-sequence; tie-pool no
