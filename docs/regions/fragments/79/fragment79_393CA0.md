@@ -236,3 +236,35 @@ func_8412D06C: matched (call-sequence:direct-index:status-u8), 1 iterations, age
 ## 2026-09-06
 
 func_8412EE5C: time cap at 0.9479 (raw 0.9271) after 2411s, mismatch operand_or_scheduling_drift; tried families: call-sequence; tie-pool no
+
+## 2026-09-06
+
+func_84135DD8: matched (constant-map:address-of-first:commuted-equality), 4 iterations, agent codex
+
+## 2026-09-06
+
+func_841264F0: matched (state-field:direct-index:repeated-record-address), 1 iterations, agent codex
+
+## 2026-09-06
+
+func_84138530: matched (state-field:record24:typed-fields), 1 iterations, agent codex
+
+## 2026-09-06
+
+func_84136218: matched (state-field:bit-guard:base-pointer-temp), 1 iterations, agent codex
+
+## 2026-09-06
+
+func_84124514: plateau at 0.9688 (raw 0.6875), mismatch operand_or_scheduling_drift; tried families: quotient-scan, state-field; tie-pool no
+
+## 2026-09-06
+
+func_84134018: matched (state-field:flag-clear:direct-table-reload), 1 iterations, agent codex
+
+## 2026-09-06
+
+func_841365F4: plateau at 0.8788 (raw 0.5455), mismatch instruction_drift; tried families: state-field; tie-pool no
+
+## 2026-09-06
+
+func_8412D8C8: matched (state-field:compare:direct-u16-assigned-result), 2 iterations, agent codex
