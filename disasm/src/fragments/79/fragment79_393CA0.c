@@ -2404,7 +2404,14 @@ void func_84133ACC(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84134018.s")
+extern u8 * D_84195208[];
+s32 func_84134018(u8 arg0) {
+    if (D_84195208[arg0][0x10] & 0x20) return 0;
+    D_84195208[arg0][0xF] &= 0xFFF7;
+    if (D_84195208[arg0][0xF] & 0x12) return 0;
+    if (D_84195208[arg0][0xD] & 0x40) return 0;
+    return 1;
+}
 #endif
 
 #ifdef VERSION_US
