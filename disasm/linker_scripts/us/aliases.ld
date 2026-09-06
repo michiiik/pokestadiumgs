@@ -31,3 +31,5 @@ func_84110910 = BattleAnim_ModelDispatch_184;
 func_84115FAC = BattleAnim_Dispatch_057;
 func_84115A64 = BattleAnim_Dispatch_051;
 func_8003AB68 = Geo_NodeBackground;
+func_8412DBC0 = BattleAnim_Table_84185F10_045;
+func_8412EFFC = BattleAnim_Table_84186004_005;

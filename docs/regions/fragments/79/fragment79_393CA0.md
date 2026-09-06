@@ -336,3 +336,31 @@ func_84133924: matched (state-field:clear-three-tables:offset-shift-negate), 1 i
 ## 2026-09-06
 
 func_84128CB8: matched (call_sequence:pointer-local:direct-field-increment:probe-match), 1 iterations, agent codex
+
+## 2026-09-06
+
+func_8412676C: matched (state-clamp:u16-pointer:s32-result:mask-clamp), 2 iterations, agent codex
+
+## 2026-09-06
+
+func_8412DBC0: matched (state-field:scale-clamp:direct-global), 1 iterations, agent codex
+
+## 2026-09-06
+
+func_8412EFFC: matched (state-field:formula:direct-index-negated-parentheses), 1 iterations, agent codex
+
+## 2026-09-06
+
+func_84126804: time cap at 0.8947 (raw 0.7368) after 2400s, mismatch instruction_drift; tried families: state-field; tie-pool no
+
+## 2026-09-06
+
+func_84134E30: matched (state-field:home-spill:address-of-arg-decl-then-assign), 2 iterations, agent codex
+
+## 2026-09-06
+
+func_84134E7C: matched (bounded_lookup:guard-offset8:precomputed-field-mask16), 1 iterations, agent codex
+
+## 2026-09-06
+
+func_84136678: plateau at 0.8947 (raw 0.7895), mismatch instruction_drift; tried families: init; tie-pool no

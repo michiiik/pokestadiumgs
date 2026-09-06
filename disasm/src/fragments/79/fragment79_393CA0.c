@@ -537,7 +537,18 @@ void func_841265EC(void) { s32 offset = D_841951BC * 4; u8 *src = *(u8 **)((u8 *
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412676C.s")
+extern u8 * D_84195200[];
+s32 func_8412676C(u8 arg0, u8 arg1) {
+    u16 *ptr = (u16 *)D_84195200[arg0];
+    s32 result;
+    u16 limit;
+    result = (u16)(ptr[0x14] >> arg1);
+    limit = ptr[0x13];
+    if (result > limit) {
+        result = limit & 0xFFFF;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
@@ -1446,7 +1457,14 @@ void BattleAnim_Table_84185F10_044(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412DBC0.s")
+extern s32 D_841951C8;
+extern u8 D_841951D7;
+void BattleAnim_Table_84185F10_045(void) {
+    if (D_841951D7 != 0) {
+        D_841951C8 *= D_841951D7 + 1;
+        if (D_841951C8 >= 0x10000) D_841951C8 = 0xFFFF;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1586,7 +1604,12 @@ void BattleAnim_Table_84186004_002(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412EFFC.s")
+extern u8 D_841951BC;
+extern s8 D_841951C2;
+extern u8 * D_84195200[];
+void BattleAnim_Table_84186004_005(void) {
+    D_841951C2 = ((-(s32)D_84195200[D_841951BC][0x1C] * 10) + 0x9F6) / 25;
+}
 #endif
 
 #ifdef VERSION_US
@@ -2679,11 +2702,27 @@ void func_84134E00(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84134E30.s")
+extern u8 D_84195280[];
+void func_84134E30(s32 arg0) {
+    s32 *home;
+    home = &arg0;
+    D_84195280[D_84195280[0x4D81] * 0x280 + 9] &= 0xFFF8;
+    D_84195280[D_84195280[0x4D81] * 0x280 + 9] |= arg0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84134E7C.s")
+extern u8 * D_84186160[];
+void func_84134E7C(u8 arg0, u8 arg1) {
+    if (arg0 < 4) {
+        u8 *ptr = D_84186160[arg0];
+        u8 *field = ptr + 8;
+        if (ptr) {
+            field[1] &= 0xFFF8;
+            field[1] |= arg1;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
