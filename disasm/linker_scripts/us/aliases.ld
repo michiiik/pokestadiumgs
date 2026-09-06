@@ -34,3 +34,4 @@ func_8003AB68 = Geo_NodeBackground;
 func_8412DBC0 = BattleAnim_Table_84185F10_045;
 func_8412EFFC = BattleAnim_Table_84186004_005;
 func_8003ABFC = Geo_NodeClearDepth;
+func_861098CC = fragment49_main;

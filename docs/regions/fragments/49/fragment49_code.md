@@ -82,3 +82,27 @@ func_86105C30: plateau at 0.9286 (raw 0.9286), mismatch operand_or_scheduling_dr
 ## 2026-09-06
 
 func_86109EAC: matched (call_chain:entry-data:result-and-entry), 2 iterations, agent codex
+
+## 2026-09-06
+
+func_861034A8: matched (call_sequence:struct-overlay:scale-hoist-match), 4 iterations, agent gemini
+
+## 2026-09-06
+
+func_861098CC: matched (call_sequence:comma_loop:ptr_end_vars), 4 iterations, agent gemini
+
+## 2026-09-06
+
+func_86101BD8: plateau at 0.838 (raw 0.2958), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-06
+
+func_861021A8: time cap at 0.8014 (raw 0.3404) after 2400s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-06
+
+func_8610880C: time cap at 0.5931 (raw 0.1931) after 2400s, mismatch section_layout_drift; tried families: call-sequence; tie-pool no
+
+## 2026-09-06
+
+TYPE CONFLICT: func_87F026E8 is extern void func_87F026E8(void *, void *), not extern void func_87F026E8(s32, s32)
