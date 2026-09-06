@@ -357,3 +357,19 @@ func_82606B28: plateau at 0.8 (raw 0.4273), mismatch operand_or_scheduling_drift
 ## 2026-09-06
 
 TYPE CONFLICT: func_800226C0 is \nextern void func_800226C0(s32), not extern void func_800226C0(s32)
+
+## 2026-09-07
+
+func_82607734: matched (constant_map:pair16-copy:stores-first-inline-div (link_verified probe hit)), 7 iterations, agent kimi
+
+## 2026-09-07
+
+func_826137B8: matched (constant_map:pointer-walk:u8-base-plus-34F4), 1 iterations, agent kimi
+
+## 2026-09-07
+
+func_82606548: matched (state_field_access:raw-offsets:mask-between-stores), 1 iterations, agent kimi
+
+## 2026-09-07
+
+func_82606E90: time cap at 0.8571 (raw 0.2857) after 2403s, mismatch operand_or_scheduling_drift; tried families: constant-map; tie-pool no
