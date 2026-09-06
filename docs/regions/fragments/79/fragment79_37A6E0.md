@@ -232,3 +232,23 @@ func_84115A64: matched (call_sequence:init-guard:store-before-call), 1 iteration
 ## 2026-09-06
 
 func_8410F78C: time cap at 0.913 (raw 0.8913) after 2400s, mismatch instruction_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-06
+
+func_84112324: plateau at 0.9077 (raw 0.8154), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-06
+
+func_84112EDC: matched (call_sequence:chain:all-s32-expressions), 1 iterations, agent codex
+
+## 2026-09-06
+
+func_8410B60C: plateau at 0.0 (raw None), mismatch unknown; tried families: call_sequence; tie-pool no
+
+## 2026-09-06
+
+TYPE CONFLICT: func_800371B4 is extern void func_800371B4(u8 *, u8 *, f32, s16, s32), not extern void func_800371B4(u8 *, u8 *, s32, s16, s32)
+
+## 2026-09-06
+
+func_8410EA58: time cap at 0.9365 (raw 0.4921) after 2418s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
