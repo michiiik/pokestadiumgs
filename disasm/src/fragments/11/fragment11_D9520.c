@@ -281,7 +281,19 @@ void *func_81607680(u16 arg0, u16 arg1, u16 arg2) {
     return (arg1 & (1 << arg0)) ? &D_8160BE60 : &D_8160BE64;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_8160771C.s")
+extern u32 D_8160BE70;
+extern u32 D_8160BE74;
+extern u32 D_8160BE78;
+extern u32 D_8160BE7C;
+void *func_8160771C(u16 arg0, u16 arg1, u16 arg2) {
+    if (arg0 <= 0) {
+        return (arg1 & 1) ? &D_8160BE7C : &D_8160BE74;
+    }
+    if (arg0 >= arg2) {
+        return (arg1 & 0x400) ? &D_8160BE78 : &D_8160BE74;
+    }
+    return (arg1 & (1 << arg0)) ? &D_8160BE70 : &D_8160BE74;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_816077B8.s")
 
