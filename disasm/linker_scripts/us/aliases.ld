@@ -45,3 +45,5 @@ func_8410FB0C = BattleAnim_ModelDispatch_204;
 func_8003FC8C = geo_layout_cmd_return;
 func_80040D9C = geo_layout_cmd_set_node_flag4;
 func_80040244 = geo_layout_cmd_create_light;
+func_84110860 = BattleAnim_ModelDispatch_191;
+func_841109FC = BattleAnim_ModelDispatch_113;
