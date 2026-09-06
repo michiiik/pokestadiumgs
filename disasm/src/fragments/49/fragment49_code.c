@@ -173,7 +173,10 @@ void func_86100DA8(void *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86100E20.s")
+extern void func_8003F210(void *, s32);
+extern void ModelAnim_SetFrame(u8 *, s16);
+extern u32 func_8003570C(void);
+void func_86100E20(void *arg0, s32 arg1) { if ((arg1 & 0x80000000) != 0) { if ((*(s32 *)((u8 *)arg0+12)<<1)>=0) { *(s32 *)((u8 *)arg0+12)|=arg1; *(s32 *)((u8 *)arg0+28)=0; } } else if ((arg1 & 0x40000000) != 0) { *(s32 *)((u8 *)arg0+12)&=0x7EFFFFFF; *(s32 *)((u8 *)arg0+12)|=arg1; *(s32 *)((u8 *)arg0+28)=0; } else if ((arg1 & 0x00400000) != 0) { *(s32 *)((u8 *)arg0+28)=0; *(s32 *)((u8 *)arg0+12)|=arg1; func_8003F210((u8 *)arg0+36,5); ModelAnim_SetFrame((u8 *)arg0+36,(s16)(func_8003570C()%12)); } else if ((arg1 & 0x01000000) != 0) { *(s32 *)((u8 *)arg0+196)=0xFF0000AF; *(s32 *)((u8 *)arg0+12)|=arg1; *(s32 *)((u8 *)arg0+28)=0; } else { *(s32 *)((u8 *)arg0+28)=0; *(s32 *)((u8 *)arg0+12)|=arg1; } }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86100F1C.s")
 
