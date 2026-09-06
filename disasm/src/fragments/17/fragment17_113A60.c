@@ -113,7 +113,23 @@ s32 func_82205A48(s32 arg0, void *arg1) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82205A8C.s")
+extern void * D_8220DA08;
+extern s32 D_8220DA10;
+s32 func_82205A8C(s32 arg0, void *arg1) {
+    if (arg0 != 0 && arg0 == 1) {
+        if (D_8220DA10 != 0) {
+            *(u16 *)((u8 *)arg1 + 2) |= 2;
+            if (*(s16 *)*(u8 **)((u8 *)D_8220DA08 + 0x20) == 0) {
+                *(u16 *)((u8 *)arg1 + 0x32) = 0x44;
+            } else {
+                *(u16 *)((u8 *)arg1 + 0x32) = 0x45;
+            }
+        } else {
+            *(u16 *)((u8 *)arg1 + 2) &= 0xFFFD;
+        }
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82205B00.s")
 
