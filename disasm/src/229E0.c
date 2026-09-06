@@ -4287,7 +4287,35 @@ extern s32 D_801263E0; void ModelAnim_EndCurveContext(void) { if (D_801263E0 >= 
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003E8C8.s")
+extern S1_unk_D_800ABCC0 D_801263B0[2];
+void func_8003E8C8(S1_Vec3f *arg0, S1_Vec3s *arg1, S1_Vec3f *arg2, s32 arg3) {
+    if (D_801263E0 >= 0 && D_801263E0 < 2) {
+        S1_unk_D_800ABCC0 *ctx = &D_801263B0[D_801263E0];
+        if (ctx->isActive == 1 && arg3 >= 0 && arg3 + 2 < ctx->curveData->unk_08) {
+            if (ctx->flags & 8) {
+                arg0->x = ModelAnim_EvaluateScaleCurve(ctx, arg3);
+                arg0->y = ModelAnim_EvaluateScaleCurve(ctx, arg3 + 1);
+                arg0->z = ModelAnim_EvaluateScaleCurve(ctx, arg3 + 2);
+                arg1->x = ModelAnim_EvaluateRotationCurve(ctx, arg3);
+                arg1->y = ModelAnim_EvaluateRotationCurve(ctx, arg3 + 1);
+                arg1->z = ModelAnim_EvaluateRotationCurve(ctx, arg3 + 2);
+                arg2->x = ModelAnim_EvaluateTranslationCurve(ctx, arg3);
+                arg2->y = ModelAnim_EvaluateTranslationCurve(ctx, arg3 + 1);
+                arg2->z = ModelAnim_EvaluateTranslationCurve(ctx, arg3 + 2);
+            } else {
+                arg0->x = ModelAnim_EvaluateScaleChannel(ctx, arg3);
+                arg0->y = ModelAnim_EvaluateScaleChannel(ctx, arg3 + 1);
+                arg0->z = ModelAnim_EvaluateScaleChannel(ctx, arg3 + 2);
+                arg1->x = ModelAnim_EvaluateRotationChannel(ctx, arg3);
+                arg1->y = ModelAnim_EvaluateRotationChannel(ctx, arg3 + 1);
+                arg1->z = ModelAnim_EvaluateRotationChannel(ctx, arg3 + 2);
+                arg2->x = ModelAnim_EvaluateTranslationChannel(ctx, arg3);
+                arg2->y = ModelAnim_EvaluateTranslationChannel(ctx, arg3 + 1);
+                arg2->z = ModelAnim_EvaluateTranslationChannel(ctx, arg3 + 2);
+            }
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
