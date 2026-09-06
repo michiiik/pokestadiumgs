@@ -665,6 +665,31 @@ reaches an agent through `tools/file_brief.py`, not here.
   `text_layout_drift`. Keep one-function persistence, but select only owners
   with a valid first hypothesis and serialize runner work in a shared checkout.
 
+- Generators (2026-09-06): no candidate family emits a **`for` loop**, so any
+  owner IDO's `copt` unrolled is unreachable no matter how many iterations the
+  fleet spends. Signature to look for in the target `.s`: a straight-line
+  store/load ladder at a constant stride where a *prefix* of the accesses uses
+  folded literal offsets and the *remainder* switches to `addu` against a
+  register loaded by `addiu $vN,$zero,K` + `sll`. That is copt peeling
+  `trip % 4` remainder iterations (constant-folded) and then emitting one
+  unrolled body of 4 with the induction variable still live at `i == K`. The
+  live induction variable also displaces the `%hi`/`%lo` base addresses one
+  register class up, so the *first* instruction mismatches and raw similarity
+  collapses (0.125) while normalized similarity stays moderate (0.8125) --
+  a high normalized/low raw plateau on a repetitive ladder is a loop hint,
+  not just a spelling gap. Verified on `func_84111248`/`func_841112C8`
+  (`fragments/79/fragment79_37A6E0.c`), which plateaued at exactly
+  0.8125/0.125 for every hand-unrolled `state_field_access` variant and both
+  matched on the first `for (i = 0; i < 7; i++)` probe.
+
+- Tooling (2026-09-06): `check_decomp_provenance.py` resolves the probe-stats
+  history through `probe_stats.stats_path()`, which is worktree-local, while
+  `try_pragma_compare.py` *writes* the accepted batch to the **primary**
+  worktree (`_probe_stats_target` -> `_primary_worktree_root`). In a linked
+  worktree the checker therefore cannot see the batch the gate just recorded
+  and reports a genuine accept as missing provenance. Workaround until the two
+  agree: `PRAGMA_PROBE_STATS=<primary>/disasm/probe-stats/probe-stats.jsonl`.
+
 Skip lists and unsolved shapes that are specific to one function or file
 live in that file's notes under `docs/regions/` and reach an agent through
 `tools/file_brief.py`, not here.

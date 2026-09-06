@@ -163,3 +163,27 @@ func_84111248: plateau at 0.8125 (raw 0.125), mismatch operand_or_scheduling_dri
 ## 2026-09-06
 
 func_841112C8: plateau at 0.8125 (raw 0.125), mismatch operand_or_scheduling_drift; tried families: state_field_access; tie-pool no
+
+## 2026-09-06 (plateau resolved) (2026-09-06)
+
+func_84111248 / func_841112C8: MATCHED. Both were the same function modulo the destination pointer (D_841911E0 vs D_841911E4); the identical 0.8125/0.125 plateau was one root cause, not a coincidence.
+
+Root cause: the ROM function is a **loop that IDO's copt unrolled**, not a straight-line store ladder. Every `state_field_access` candidate spelled the seven stores out by hand, which lets IDO constant-fold `index * 8` into the `sw` immediates -- 26 instructions instead of the target's 32, and the first instruction already differs (`lui $v0` vs `lui $a0`), hence raw 0.125.
+
+Winning spelling (exact, full-ROM gated):
+
+    extern u8 *D_841911E0;
+    extern u8 D_84184144;
+    void func_84111248(void) {
+        s32 i;
+
+        for (i = 0; i < 7; i++) {
+            *(s32 *)(D_841911E0 + (i * 8) + 8) = *(s32 *)((u8 *)&D_84184144 + 4);
+        }
+    }
+
+func_841112C8 is identical with D_841911E4.
+
+How to recognise the shape next time: a straight-line store ladder at a constant stride where a *prefix* of the stores uses folded literal offsets and the *remainder* switches to `addu` against a register holding `li N; sll k` is IDO's unroller. copt peels `trip % 4` remainder iterations first (folded, i = 0,1,2 -> offsets 8/0x10/0x18) and then emits one unrolled body of 4 with the induction variable still live (i == 3 -> `addiu $v0,$zero,3; sll $v1,$v0,3`, then `base + $v1 + {8,0x10,0x18,0x20}`). The live induction variable also pushes the two `%hi/%lo` base addresses up from $v0/$v1 to $a0/$a1, which is why the very first instruction mismatched.
+
+Dead ends already burned (do not repeat): unrolled straight-line stores with a literal index; `s32 offset = index << 3` hoisted to a local; `dst = &D_841911E0` / `src = D_84184144` pointer locals; `register` on the index; narrow index types (s16/u8/u16/unsigned/long); post-increment of the index between stores; struct-array overlays (these also lose the per-store reload of the pointer global). All of them fold to the same 26-instruction, 0.8125/0.125 object. -O1/-O0 are also excluded: they add an `addiu $sp` frame the target does not have.
