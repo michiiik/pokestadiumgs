@@ -494,7 +494,37 @@ void func_86105928(f32 *arg0) { f32 zero; f32 value; zero = 0.0f; value = D_8610
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86105950.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86105AD8.s")
+extern u8 D_8610A0D0[];
+extern Gfx D_8610A970[];
+extern void func_8003CD84(void);
+extern s32 func_8004C990(s32, s32);
+extern u8 * func_8004CA60(u8 *);
+extern void * D_8009491C;
+extern Gfx * D_800D0510;
+void func_86105AD8(s32 arg0, s32 arg1) {
+    void *context;
+    void *temp_v0;
+    s32 *countPtr;
+    s32 divisor;
+    s32 idx;
+
+    if (arg0 == 5) {
+        context = D_8009491C;
+        temp_v0 = *(void **)((u8 *)context + 0x14);
+        countPtr = *(s32 **)((u8 *)temp_v0 + 0x20);
+        if (*(s32 *)((u8 *)temp_v0 + 0xC) & 0x10000000) {
+            divisor = 1;
+        } else {
+            divisor = 3;
+        }
+        idx = (*countPtr % (divisor * 8)) / divisor;
+        gDPPipeSync(D_800D0510++);
+        gDPSetEnvColor(D_800D0510++, 0xFF, 0xFF, 0xFF, 0xFF);
+        gSPSegment(D_800D0510++, 0xF, func_8004CA60((u8 *)func_8004C990(0x45, D_8610A0D0[idx])));
+        gSPDisplayList(D_800D0510++, D_8610A970);
+        func_8003CD84();
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86105C30.s")
 
