@@ -2712,7 +2712,17 @@ void func_84134E30(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84134E7C.s")
+extern u8 * D_84186160[];
+void func_84134E7C(u8 arg0, u8 arg1) {
+    if (arg0 < 4) {
+        u8 *ptr = D_84186160[arg0];
+        u8 *field = ptr + 8;
+        if (ptr) {
+            field[1] &= 0xFFF8;
+            field[1] |= arg1;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
