@@ -177,7 +177,9 @@ void func_83001788(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83001DAC.s")
+extern s32 func_8300B31C(void *arg0);
+extern void func_800226C0(s32);
+void func_83001DAC(void *arg0, s32 arg1) { u8 *p = (u8 *)arg0; volatile s32 *status; if (arg1 == -1) { p[0x1E] = 0x14; func_800226C0(3); } else if (arg1 > 0) { if (arg1 < (s32)((u8 *)(u32)arg0)[0x3A291] + 1) { if (p[0x46] == 1) { status = (volatile s32 *)(p + 0x4E040); *status = func_8300B31C((u8 *)(u32)arg0 + 0x3BDF4); status = (volatile s32 *)((u8 *)(u32)arg0 + 0x4E040); if (*status != 0) p[0x1E] = 0x19; else p[0x1E] = 0x1A; func_800226C0(0x90); } } else { func_800226C0(5); } } }
 #endif
 
 #ifdef VERSION_US
