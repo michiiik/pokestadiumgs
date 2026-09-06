@@ -1021,7 +1021,7 @@ extern void func_84135B40(s32);
 extern void func_841366C4(u8, s32);
 extern u8 D_841951BC;
 extern u8 * D_84195208[];
-void func_84129D8C(void) {
+void BattleAnim_Table_84185F10_000(void) {
     u8 var;
 
     if (func_84129D3C() != 0) {
