@@ -604,7 +604,7 @@ void func_83008700(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83008844.s")
+s32 func_83008844(s32 arg0, u8 arg1) { s32 selector; s32 result = 0; selector = arg1; if (arg0 == 13) { switch (selector) { case 1: result = 1; break; case 2: result = 2; break; case 3: case 4: case 6: case 7: result = 3; break; case 5: result = 4; break; } } return result; }
 #endif
 
 #ifdef VERSION_US
