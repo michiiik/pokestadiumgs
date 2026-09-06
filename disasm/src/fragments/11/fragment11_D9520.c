@@ -365,7 +365,25 @@ void *func_81609530(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_816098B0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_816099E0.s")
+extern f32 D_8160C2D4;
+extern f32 D_8160C2D8;
+extern u16 D_8160C188[];
+extern s32 func_8004C990(s32, s32);
+extern void func_8004D19C(s32, s32, void *, s32, s32);
+extern void func_8004D1FC(void *);
+void func_816099E0(s32 arg0, s32 arg1, s32 arg2, f32 arg3) {
+    void *temp;
+
+    if (arg3 > 1.0f) {
+        arg3 = D_8160C2D4;
+    }
+    if (arg3 < 0.0f) {
+        arg3 = 0.0f;
+    }
+    temp = (void *)func_8004C990(0x9F, D_8160C188[(s32)(arg3 * D_8160C2D8)]);
+    func_8004D1FC(temp);
+    func_8004D19C(arg0 - 0x10, arg1 - 0x10, temp, 0, 0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81609A90.s")
 
