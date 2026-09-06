@@ -2202,7 +2202,7 @@ void BattleAnim_Table_84186004_071(void) {
 
 #ifdef VERSION_US
 extern s32 func_84125080();
-void func_84130CE8(void) {
+void BattleAnim_Table_84186004_072(void) {
     u8 val;
 
     func_8413005C();
