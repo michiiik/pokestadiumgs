@@ -126,3 +126,27 @@ func_861024C8: time cap at 0.9222 (raw 0.8889) after 2411s, mismatch instruction
 ## 2026-09-07
 
 func_8610320C: time cap at 0.9043 (raw 0.4255) after 2408s, mismatch operand_or_scheduling_drift; tried families: state-field; tie-pool no
+
+## 2026-09-07
+
+func_86109404: matched (call_chain:split-vs-merged-cast:exact-match), 5 iterations, agent claude
+
+## 2026-09-07
+
+func_86108A50: matched (bounded_lookup:inline-node-deref:do-while-zero-plus-forloop), 1 iterations, agent claude
+
+## 2026-09-07
+
+func_8610167C: time cap at 0.9636 (raw 0.9455) after 2400s, mismatch instruction_drift; tried families: constant-map; tie-pool no
+
+## 2026-09-07
+
+func_86109510: matched (call-chain:mode-switch:explicit-else-scoped), 2 iterations, agent codex
+
+## 2026-09-07
+
+func_861023D4: plateau at 0.9355 (raw 0.7258), mismatch operand_or_scheduling_drift; tried families: float; tie-pool no
+
+## 2026-09-07
+
+func_86100E20: matched (call_chain:expression-shape:masked-flag-tests), 8 iterations, agent codex
