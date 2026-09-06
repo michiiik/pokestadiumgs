@@ -2579,7 +2579,11 @@ void MtxF_ScaleRows(S1_MtxF* dest, S1_MtxF* mtx, S1_Vec3f* s) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80036D8C.s")
+void func_80036D8C(f32 *arg0, f32 *arg1) {
+    arg1[0] = sqrtf(arg0[0] * arg0[0] + arg0[1] * arg0[1] + arg0[2] * arg0[2]);
+    arg1[1] = sqrtf(arg0[4] * arg0[4] + arg0[5] * arg0[5] + arg0[6] * arg0[6]);
+    arg1[2] = sqrtf(arg0[8] * arg0[8] + arg0[9] * arg0[9] + arg0[10] * arg0[10]);
+}
 #endif
 
 #ifdef VERSION_US
@@ -3681,7 +3685,10 @@ void Geo_NodeType3Pass(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003AB68.s")
+extern void *D_80094908;
+extern void func_80007444(Gfx **, s16, s16, s16, s16, s32);
+extern Gfx* D_800D0510;
+void Geo_NodeBackground(u8 *arg0) { u8 *state = (u8 *)D_80094908 + 0x18; func_80007444(&D_800D0510, *(s16 *)(state + 4), *(s16 *)(state + 6), *(s16 *)(state + 8), *(s16 *)(state + 10), *(s32 *)(arg0 + 0x18)); gDPPipeSync(D_800D0510++); gSPSetOtherMode(D_800D0510++, G_SETOTHERMODE_H, 20, 2, 0x100000); }
 #endif
 
 #ifdef VERSION_US
