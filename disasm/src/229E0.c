@@ -5380,7 +5380,34 @@ s32 func_800422B4(u8 *arg0, s32 arg1, u16 arg2, u16 arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8004239C.s")
+extern OSMesgQueue D_80126F00;
+s32 func_8004239C(u8 *arg0, s32 arg1) {
+    s32 result = 0;
+    u8 *msg;
+    s32 index;
+    u32 base;
+    if ((arg0[0] & 0x10) && !(arg0[1] & 8)) {
+        msg = Util_Malloc(0x20);
+        if (msg != NULL) {
+            index = arg0[2];
+            if (arg0[0] & 4) { index ^= 1; }
+            *(u16 *)(msg + 0) = 8;
+            *(u16 *)(msg + 2) = arg1;
+            *(u16 *)(msg + 4) = index;
+            msg[6] = 0;
+            base = (u32)arg0 + 0xB0;
+            *(void **)(msg + 8) = (void *)base;
+            *(s32 *)(msg + 0xC) = 0;
+            *(s32 *)(msg + 0x10) = 0;
+            *(s32 *)(msg + 0x14) = *(s32 *)((u8 *)arg0 + (index << 2) + 0x18);
+            *(s32 *)(msg + 0x18) = 0x25C00;
+            osSendMesg(&D_80126F00, msg, 1);
+            arg0[1] |= 8;
+            result = 1;
+        }
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
