@@ -674,7 +674,27 @@ void func_86107150(s32 arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86107208.s")
+extern void func_86107150(s32 arg0);
+extern s32 D_8610AD20;
+extern void * D_87F119DC;
+void func_86107208(void) {
+    void *obj;
+    s32 state;
+    s32 cond;
+
+    obj = D_87F119DC;
+    *(f32 *)((u8 *)obj + 0x48) += *(f32 *)((u8 *)(u32)D_8610AD20 + 0x9774) * 0.5f;
+    state = *(s32 *)((u8 *)obj + 0x6C) >> 16;
+    cond = 0;
+    if ((state == 8) || (state == 0x2F)) {
+        if (*(f32 *)((u8 *)(u32)D_8610AD20 + 0x9774) == 0.0f) {
+            cond = 1;
+        }
+    }
+    if (cond != 0) {
+        func_86107150(0);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_861072AC.s")
 
