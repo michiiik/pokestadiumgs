@@ -804,7 +804,36 @@ void func_8300A71C(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_8300A754.s")
+s32 Fragment_LoadAndCall(s32, void *, void *, s32, void *);
+extern u8 fragment10_ROM_START[];
+extern u8 fragment11_ROM_START[];
+extern u8 D_82800000[];
+s32 func_8300A754(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    s32 ret;
+    struct {
+        s16 unk0;
+        s16 unk2;
+        s32 unk4;
+    } sp24;
+    s32 var_a3;
+
+    sp24.unk0 = 0x11;
+    if (arg2 != 0) {
+        sp24.unk4 = 0x6C610404;
+    } else {
+        sp24.unk4 = 0x7C610404;
+    }
+    sp24.unk2 = 0;
+    main_pool_push_state(0x4D534353);
+    if ((arg3 >= 0) && (arg3 < 4)) {
+        var_a3 = arg3;
+    } else {
+        var_a3 = 0;
+    }
+    ret = Fragment_LoadAndCall((((u32)D_82800000 & 0x0FF00000) >> 20) - 0x10, fragment10_ROM_START, fragment11_ROM_START, var_a3, &sp24);
+    main_pool_pop_state(0x4D534353);
+    return ret;
+}
 #endif
 
 #ifdef VERSION_US
