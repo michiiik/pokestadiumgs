@@ -337,3 +337,23 @@ func_82614250: matched (call-sequence:record-scan:permuter-zero), 3 iterations, 
 ## Stale section_layout_drift: both jump-table owners landed (2026-09-06) (2026-09-06)
 
 accepted: func_826049A0 (dispatcher_switch) and func_826065B0 (dispatcher:switch:arg3-before-zero). Their recorded 1.0/1.0 'section_layout_drift' rejections are STALE: every one was probed on 2026-09-03 at git head 355a938, before 00786bf6 ('Give fragment20_12C460.c its own .rodata subsegment') landed on 2026-09-04. Re-running the same candidates against current master needs no layout work at all -- the object's .rodata stays 0x2A0 bytes and IDO drops the C switch's table into exactly the slot the asm .late_rodata block used. Two real fixes were still needed. (1) func_826049A0: the recorded 1.0/1.0 candidate had the wrong case labels, 'case 14'/'case 28' instead of 'case 16'/'case 32' (plus a bogus empty 'case 32'). Case labels never touch the function text -- only jtbl_82615830's contents -- so the probe scores a perfect 1.0/1.0 while the full ROM differs in exactly 4 bytes (entries 14/16 and 28/32 swapped, ROM 0x13D93B/0x13D943/0x13D973/0x13D983). Always read case values off the jump-table targets, not off a plausible-looking decimal. (2) func_826065B0: the recorded candidate is byte-exact as written, but it calls _bzero with no prototype while the same TU declares 'extern void _bzero(void *, s32);' further down (near line 987), so IDO fails the live file with 'redeclaration of _bzero'. Prepend that same extern to the candidate and it gates. Both verified with make -C disasm COMPARE=1 (md5 1561c75d11cedf356a8ddb1a4a5f9d5d).
+
+## 2026-09-06
+
+func_826065B0: plateau at 0.0 (raw None), mismatch section_layout_drift; tried families: dispatcher; tie-pool no
+
+## 2026-09-06
+
+func_82609584: time cap at 0.9167 (raw 0.4167) after 2417s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-06
+
+func_8260C7D4: matched (call_sequence:gfx:cached-stride-exact-probe-duplicate), 1 iterations, agent codex
+
+## 2026-09-06
+
+func_82606B28: plateau at 0.8 (raw 0.4273), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-06
+
+TYPE CONFLICT: func_800226C0 is \nextern void func_800226C0(s32), not extern void func_800226C0(s32)
