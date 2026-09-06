@@ -135,3 +135,31 @@ func_84116A3C: plateau at 0.0 (raw None), mismatch unknown; tried families: call
 ## 2026-09-06
 
 func_841137F8: matched (call_sequence:periodic:canonical), 1 iterations, agent codex
+
+## 2026-09-06
+
+func_841121CC: time cap at 0.9474 (raw 0.9474) after 2401s, mismatch instruction_drift; tried families: multi_call_wrapper; tie-pool no
+
+## 2026-09-06
+
+func_841125A4: time cap at 1.0 (raw 0.95) after 2400s, mismatch register_allocation_only; tried families: loop; tie-pool no
+
+## 2026-09-06
+
+func_84115FAC: matched (init_sequence:permuter:direct-store-order), 5 iterations, agent codex
+
+## 2026-09-06
+
+func_84110910: matched (call_chain:global-assignment:exact-probe-match), 1 iterations, agent codex
+
+## 2026-09-06
+
+func_8410B8FC: time cap at 0.9355 (raw 0.6452) after 2400s, mismatch operand_or_scheduling_drift; tried families: state_field; tie-pool no
+
+## 2026-09-06
+
+func_84111248: plateau at 0.8125 (raw 0.125), mismatch operand_or_scheduling_drift; tried families: state_field_access; tie-pool no
+
+## 2026-09-06
+
+func_841112C8: plateau at 0.8125 (raw 0.125), mismatch operand_or_scheduling_drift; tried families: state_field_access; tie-pool no
