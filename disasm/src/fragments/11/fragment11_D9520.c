@@ -387,7 +387,10 @@ void func_816099E0(s32 arg0, s32 arg1, s32 arg2, f32 arg3) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81609A90.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81609CB8.s")
+extern u32 D_8160BDF4;
+extern void func_800226C0(s32);
+extern void _bzero(void *, s32);
+void func_81609CB8(void) { if ((D_8160BDF4 >> 31) != 0) func_800226C0(0xA5); if (((D_8160BDF4 << 1) >> 31) != 0) func_800226C0(0xA6); if (((D_8160BDF4 << 2) >> 31) != 0) func_800226C0(0xA9); if (((D_8160BDF4 << 3) >> 31) != 0) func_800226C0(0xA7); if (((D_8160BDF4 << 4) >> 31) != 0) func_800226C0(0xA8); if (((D_8160BDF4 << 5) >> 31) != 0) func_800226C0(0xAA); if (((D_8160BDF4 << 6) >> 31) != 0) func_800226C0(0xAC); if (*(u8 *)&D_8160BDF4 & 1) func_800226C0(0xAB); _bzero(&D_8160BDF4, 4); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81609DC0.s")
 #endif
