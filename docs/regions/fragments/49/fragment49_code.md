@@ -150,3 +150,23 @@ func_861023D4: plateau at 0.9355 (raw 0.7258), mismatch operand_or_scheduling_dr
 ## 2026-09-07
 
 func_86100E20: matched (call_chain:expression-shape:masked-flag-tests), 8 iterations, agent codex
+
+## 2026-09-07
+
+func_861001A0: time cap at 0.7752 (raw 0.3798) after 2409s, mismatch operand_or_scheduling_drift; tried families: callchain; tie-pool no
+
+## 2026-09-07
+
+func_86106E7C: matched (call_chain:gdl-alpha:root-local-ifelse), 1 iterations, agent kimi
+
+## 2026-09-07
+
+func_86102908: plateau at 0.7464 (raw 0.3768), mismatch instruction_drift; tried families: call-chain; tie-pool no
+
+## 2026-09-07
+
+func_86106C54: time cap at 0.6159 (raw 0.3333) after 2400s, mismatch instruction_drift; tried families: call-chain; tie-pool no
+
+## 2026-09-07
+
+func_86108C90: time cap at 0.9463 (raw 0.8255) after 2410s, mismatch operand_or_scheduling_drift; tried families: call_chain; tie-pool no
