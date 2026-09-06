@@ -341,7 +341,8 @@ void func_83002F50(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83004218.s")
+extern void func_81801CB8(u8 *, u8 *, u8 *, s32);
+void func_83004218(s32 a,u8 *b,u8 *c){extern u8 *func_818054D0(s32,u8);extern void func_81801CB8(u8 *,u8 *,u8 *,s32);extern u8 D_8300CD00[];extern u8 D_8300F8C0[];struct L{s32 x;s32 y;};struct L l;u8 *p;u8 *q;l.x=0;p=func_818054D0(a,b[0x1C])+0x10;q=func_818054D0(a,b[0x1D])+0x10;if(((a-(s32)D_8300CD00)/0x34)+1==b[0x43]){switch(b[0x1C]){case 0x11:case 0x12:case 0x13:p=D_8300F8C0;break;}switch(b[0x1D]){case 0x11:case 0x12:case 0x13:q=D_8300F8C0;break;}}func_81801CB8(c,p,q,*(s32 *)(b+0x2C));}
 #endif
 
 #ifdef VERSION_US
