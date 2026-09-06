@@ -252,7 +252,20 @@ s32 func_80047790(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047864.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047B4C.s")
+
+extern s32 HAL_Strcmp(const s8 *, const s8 *);
+
+s32 func_80047B4C(const s8 *arg0) {
+    s32 result = -1;
+    if (HAL_Strcmp(arg0, "LOAD") == 0) {
+        result = 0;
+    } else if (HAL_Strcmp(arg0, "PUSH") == 0) {
+        result = 1;
+    } else if (HAL_Strcmp(arg0, "POP") == 0) {
+        result = 10;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047BD4.s")
 

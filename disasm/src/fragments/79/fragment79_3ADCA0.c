@@ -539,15 +539,108 @@ void func_84140F1C(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84140F98.s")
+void func_84140F98(void *arg0) {
+    u8 flags = *(u8 *)((u8 *)arg0 + 8);
+    if (!(flags & 1) && !(flags & 0x10)) {
+        switch (*(u8 *)((u8 *)arg0 + 0)) {
+        case 0:
+        case 1:
+        case 10:
+        case 11:
+        case 12:
+        case 13:
+        case 14:
+        case 15:
+        case 16:
+        case 17:
+        case 19:
+        case 20:
+        case 21:
+        case 22:
+        case 28:
+            ParticleGfx_SetPrimColor_fragment79(*(u8 *)((u8 *)arg0 + 0x22), *(u8 *)((u8 *)arg0 + 0x23), *(u8 *)((u8 *)arg0 + 0x24), *(u8 *)((u8 *)arg0 + 0x25));
+            func_8413F060(*(s16 *)((u8 *)arg0 + 0xA), *(s16 *)((u8 *)arg0 + 0xC), *(u16 *)((u8 *)arg0 + 0xE), *(u16 *)((u8 *)arg0 + 0x10));
+            break;
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+        case 8:
+        case 9:
+        case 18:
+        case 23:
+        case 24:
+        case 25:
+        case 26:
+        case 27:
+            break;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84141020.s")
+void func_84141020(void *arg0) {
+    u8 *p = (u8 *)arg0;
+    if (!(p[8] & 1)) {
+        switch (p[0]) {
+        case 0:
+        case 1:
+        case 2:
+        case 10:
+        case 11:
+        case 12:
+        case 13:
+        case 14:
+        case 15:
+        case 16:
+        case 17:
+        case 19:
+        case 20:
+        case 21:
+        case 22:
+        case 28:
+            ParticleGfx_SetPrimColor_fragment79(p[0x22], p[0x23], p[0x24], p[0x25]);
+            func_8413EDF8(*(s16 *)(p + 10), *(s16 *)(p + 12), *(u16 *)(p + 14), *(u16 *)(p + 16));
+            break;
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+        case 8:
+        case 9:
+        case 18:
+        case 23:
+        case 24:
+        case 25:
+        case 26:
+        case 27:
+        default:
+            break;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_841410A0.s")
+void func_841410A0(void *arg0) {
+    u8 *p = arg0;
+    if ((p[8] & 1) == 0) {
+        switch (p[0]) {
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+        case 8:
+            ParticleGfx_SetPrimColor_fragment79(p[0x22], p[0x23], p[0x24], p[0x25]);
+            func_8413F224(*(s16 *)(p + 0xA), *(s16 *)(p + 0xC));
+            break;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -898,7 +991,35 @@ void func_84145B24(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84145B2C.s")
+void func_84145B2C(void *arg0) {
+    if (((u8 *)arg0)[8] & 1) return;
+    switch (((u8 *)arg0)[0]) {
+    case 0:
+    case 1:
+    case 2:
+    case 10:
+    case 11:
+    case 12:
+    case 13:
+    case 14:
+    case 15:
+    case 16:
+    case 17:
+    case 18:
+        func_84145830();
+        break;
+    case 9:
+        func_84145AB4();
+        break;
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+        func_841459E8();
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1253,7 +1374,41 @@ void func_84146AF0(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84146B0C.s")
+void func_84146B0C(u8 *arg0, s32 arg1) {
+    switch (arg0[0]) {
+    case 0: func_8414640C(arg0); break;
+    case 1: func_84146450(arg0); break;
+    case 2: func_84146494(arg0); break;
+    case 3: func_841464D8(arg0); break;
+    case 4: func_84146504(arg0, 0); break;
+    case 5: func_84146504(arg0, 1); break;
+    case 6: func_84146504(arg0, 2); break;
+    case 7: func_84146504(arg0, arg0[1]); break;
+    case 8: func_84146504(arg0, arg0[1] ? 2 : (arg1 ? 0 : 1)); break;
+    case 9: func_84146540(arg0); break;
+    case 10: func_841465CC(arg0); break;
+    case 11: func_84146610(arg0); break;
+    case 12: func_841466B0(arg0); break;
+    case 13: func_84146704(arg0); break;
+    case 14:
+    case 15:
+        func_84146748(arg0);
+        break;
+    case 16:
+    case 17:
+        func_841467D4(arg0);
+        break;
+    case 19: func_84146808(arg0); break;
+    case 20: func_84146884(arg0); break;
+    case 21: func_84146A00(arg0); break;
+    case 22: func_841469BC(arg0); break;
+    case 18: func_84146A34(arg0); break;
+    case 28: func_84146A74(arg0); break;
+    case 25: func_84146AB8(arg0); break;
+    case 26: func_84146AD4(arg0); break;
+    case 27: func_84146AF0(arg0); break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
