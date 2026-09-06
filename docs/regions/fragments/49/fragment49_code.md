@@ -170,3 +170,31 @@ func_86106C54: time cap at 0.6159 (raw 0.3333) after 2400s, mismatch instruction
 ## 2026-09-07
 
 func_86108C90: time cap at 0.9463 (raw 0.8255) after 2410s, mismatch operand_or_scheduling_drift; tried families: call_chain; tie-pool no
+
+## 2026-09-07
+
+func_861007D8: plateau at 0.0 (raw None), mismatch unknown; tried families: (none); tie-pool no
+
+## 2026-09-07
+
+func_861007D8: matched (call_sequence:address-alias:reread-guard-return), 7 iterations, agent claude
+
+## 2026-09-07
+
+func_86107208: matched (call_sequence:fused-compound:obj-first-inline-mul), 2 iterations, agent claude
+
+## 2026-09-07
+
+func_86107150: matched (float_random:base-ptr:angle-before-base), 2 iterations, agent claude
+
+## 2026-09-07
+
+func_86108B28: time cap at 0.9783 (raw 0.9348) after 2400s, mismatch instruction_drift; tried families: call-sequence; tie-pool no
+
+## 2026-09-07
+
+func_86103B74: plateau at 0.9245 (raw 0.434), mismatch operand_or_scheduling_drift; tried families: call-sequence; tie-pool no
+
+## 2026-09-07
+
+func_86101AEC: plateau at 0.8871 (raw 0.5806), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no

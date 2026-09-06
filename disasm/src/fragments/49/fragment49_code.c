@@ -64,7 +64,23 @@ void func_86100728(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86100790.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_861007D8.s")
+extern s32 func_87F0C930(s32);
+extern s32 func_87F0A098(void *, void *, s32, u32, u32, u32, u32);
+extern s32 D_8610AD20;
+void func_861007D8(void) {
+    s32 v0 = *(s32 *)&D_8610AD20;
+    if (*(u8 *)((u8 *)(u32)*(s32 *)((u8 *)(u32)v0) + 0x2180) == 4) {
+        func_87F0C930(v0 + 0x2C);
+        return;
+    }
+    *(s32 *)((u8 *)(u32)v0 + 0x97DC) = 1;
+    v0 = *(s32 *)&D_8610AD20;
+    func_87F0A098((void *)((u8 *)(u32)v0 + 0x9704), (void *)*(s32 *)((u8 *)(u32)v0), 0,
+                  *(u32 *)((u8 *)(u32)v0 + 0x708) & 0x100000,
+                  *(u32 *)((u8 *)(u32)v0 + 0x894) & 0x100000,
+                  *(u32 *)((u8 *)(u32)v0 + 0xA20) & 0x100000,
+                  *(u32 *)((u8 *)(u32)v0 + 0xBAC) & 0x100000);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86100874.s")
 
@@ -640,9 +656,45 @@ void func_86106E7C(s32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86107098.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86107150.s")
+extern f32 D_80088E50[];
+extern void func_86107098(s32, s32, s32, s32, f32, f32, f32, f32);
+extern u32 func_8003570C(void);
+extern f32 D_80087E50[];
+extern s32 D_8610AD20;
+extern void * D_87F119DC;
+void func_86107150(s32 arg0) {
+    u32 rand = func_8003570C();
+    u32 rem = rand % 0xA000;
+    s16 angle = (s16)(rem - 0x1FFF);
+    u8 *base = (u8 *)D_87F119DC + 0xD0;
+    if (*(s32 *)((u8 *)D_8610AD20 + 0x3C) == 5) {
+        u32 idx = (u16)angle >> 4;
+        func_86107098((s32)0x80000000, arg0, *(s32 *)(base + 0), *(s32 *)(base + 4),
+                      *(f32 *)(base + 8), D_80088E50[idx] * 10.0f, D_80087E50[idx] * 10.0f, 0.0f);
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86107208.s")
+extern void func_86107150(s32 arg0);
+extern s32 D_8610AD20;
+extern void * D_87F119DC;
+void func_86107208(void) {
+    void *obj;
+    s32 state;
+    s32 cond;
+
+    obj = D_87F119DC;
+    *(f32 *)((u8 *)obj + 0x48) += *(f32 *)((u8 *)(u32)D_8610AD20 + 0x9774) * 0.5f;
+    state = *(s32 *)((u8 *)obj + 0x6C) >> 16;
+    cond = 0;
+    if ((state == 8) || (state == 0x2F)) {
+        if (*(f32 *)((u8 *)(u32)D_8610AD20 + 0x9774) == 0.0f) {
+            cond = 1;
+        }
+    }
+    if (cond != 0) {
+        func_86107150(0);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_861072AC.s")
 
