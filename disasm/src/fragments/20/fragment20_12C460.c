@@ -773,7 +773,22 @@ void func_8260BE24(u8 *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260C2B0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260C7D4.s")
+extern void func_8004D150(s32, s32, s32, s32, s32, s32);
+extern s32 func_8004C990(s32, s32);
+extern u8 D_80094E78[];
+extern Gfx * D_800D0510;
+void func_8260C7D4(void *arg0, s32 arg1) {
+    s16 y; s16 x; s32 result; void *base; s32 index; s32 stride;
+    base = (u8 *)arg0 + 0x30; stride = 0x86; result = func_8004C990(0x58, 1);
+    x = *(s16 *)((u8 *)arg0 + 0x14) + *(s16 *)((u8 *)arg0 + 0x10);
+    y = *(s16 *)((u8 *)arg0 + 0x16) + *(s16 *)((u8 *)arg0 + 0x12);
+    if (arg1 != 0) { gSPDisplayList(D_800D0510++, D_80094E78); gDPSetRenderMode(D_800D0510++, 0x0F0A7008, 0); }
+    gDPPipeSync(D_800D0510++); gDPSetEnvColor(D_800D0510++, 255,255,255,255); gDPSetPrimColor(D_800D0510++,0,0,0x32,0,0,255);
+    index = 0; if (*(s16 *)((u8 *)base + 4) > 0) do {
+        if (*(s16 *)((u8 *)base + index * 2 + 0x54) != 0 && *(s16 *)((u8 *)base + index * 2 + 0xA) < 0xFF) func_8004D150(x + stride * index + 0x1B, y + 0x1B, result, 0, 0x100, 0);
+        index++;
+    } while (index < *(s16 *)((u8 *)base + 4));
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260C988.s")
 
