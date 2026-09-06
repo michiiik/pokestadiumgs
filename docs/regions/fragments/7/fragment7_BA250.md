@@ -73,3 +73,27 @@ TYPE CONFLICT: StageLoader_WaitForRetrace is extern void StageLoader_WaitForRetr
 ## func_83007044: stored candidate genuinely wrong, not a stale-fix replay (2026-09-06) (2026-09-06)
 
 Flagged as section_layout_drift 'stale_past_fix' at raw 0.9787 (the lowest score in this triage batch, and notably not 1.0 like its peers). The file's .rodata subsegment split (0xC9D30, covering jtbl_8300FBC4/FB00/FB18/FB6C/FB84/FBA8/D_8300FBA4) IS complete and correctly places jtbl_8300FB6C when spat auto-migrates it into func_83007044's own .s (confirmed via objdump: the dispatcher and all five case bodies' instruction sequences match the oracle exactly). Replayed the fleet's stored 0.9787 candidate ('dispatcher_switch:full-range:case-zero-s32-cast') unmodified through a from-scratch make COMPARE=1 gate: it compiles and links cleanly but the ROM does not match (deterministic, reproduced twice). Given the sub-1.0 raw score already flagged this as the shakiest of the batch, the candidate is simply wrong somewhere the isolated probe didn't catch -- do not replay it again without re-deriving the case values from jtbl_8300FB6C's actual words.
+
+## 2026-09-07
+
+func_8300A754: matched (call_sequence:struct_ret_first:canonical), 3 iterations, agent gemini
+
+## 2026-09-07
+
+func_830009D8: matched (call_sequence:substate_s32_pad5:typed_substate_s32_args), 1 iterations, agent gemini
+
+## 2026-09-07
+
+func_830016BC: time cap at 0.9608 (raw 0.8039) after 2415s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-07
+
+func_83001DAC: matched (call_sequence:nested-status:pointer-reload-nonzero), 5 iterations, agent codex
+
+## 2026-09-07
+
+func_830073F8: time cap at 0.9808 (raw 0.7308) after 2409s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-07
+
+func_83004218: matched (call_sequence:lookup:compare-switch), 7 iterations, agent codex
