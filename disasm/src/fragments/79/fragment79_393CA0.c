@@ -1607,7 +1607,7 @@ void BattleAnim_Table_84186004_002(void) {
 extern u8 D_841951BC;
 extern s8 D_841951C2;
 extern u8 * D_84195200[];
-void func_8412EFFC(void) {
+void BattleAnim_Table_84186004_005(void) {
     D_841951C2 = ((-(s32)D_84195200[D_841951BC][0x1C] * 10) + 0x9F6) / 25;
 }
 #endif
