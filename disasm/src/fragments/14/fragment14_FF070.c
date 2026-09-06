@@ -242,7 +242,17 @@ void func_81309D00(u32 arg0)
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_81309D34.s")
+extern f32 func_816092FC(void);
+void func_81309D34(void *arg0) {
+    struct S { u8 pad[0x137D0]; f32 value; };
+    struct T { u8 pad[0x137F5]; u8 state; };
+    struct U { u8 pad[0x137E4]; s32 flag; };
+    struct S *s = (struct S *)arg0;
+    s->value += func_816092FC();
+    if (s->value <= 0.0f) s->value = 0.0f;
+    else if (s->value >= 16.0f) { s->value = 16.0f; ((struct T *)arg0)->state = 4; }
+    ((struct U *)arg0)->flag = 1;
+}
 
 extern f32 func_816092FC(void);
 void func_81309DD8(void *arg0) {
