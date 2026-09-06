@@ -1949,7 +1949,19 @@ void BattleAnim_Dispatch_108(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_84115FAC.s")
+extern void func_84111C44(void);
+extern void func_841134A0(u8 *arg0);
+extern s32 D_84183D50;
+extern s32 D_841911F4;
+extern u8 * D_84193DD0;
+void func_84115FAC(u8 *arg0) {
+    *((u8 *) (((u8 *) arg0) + 0x618)) = (u8) (*((u8 *) (((u8 *) D_84193DD0) + 8)));
+    *((s16 *) (((u8 *) arg0) + 0x7E8)) = 0;
+    *((s8 *) (((u8 *) arg0) + 0x7F6)) = 5;
+    func_84111C44();
+    func_841134A0(arg0);
+    *((s32 *) (((u8 *) (arg0 + (D_841911F4 * 4))) + 0x5C8)) = (s32) D_84183D50;
+}
 #endif
 
 #ifdef VERSION_US
