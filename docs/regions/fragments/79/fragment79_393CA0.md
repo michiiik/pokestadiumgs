@@ -540,3 +540,27 @@ TYPE CONFLICT: func_84147228 is extern void func_84147228(u8, u8, u8, u8, u8), n
 ## 2026-09-07
 
 func_8413C18C: matched (call-sequence:switch:direct-pointer), 1 iterations, agent codex
+
+## 2026-09-07
+
+func_84138EA4: plateau at 0.0 (raw None), mismatch unknown; tried families: (none); tie-pool no
+
+## 2026-09-07
+
+func_84136B60: matched (record:offset:direct-u8-s16-u16), 5 iterations, agent codex
+
+## 2026-09-07
+
+func_84131AB8: matched (call-sequence:lookup-subtract:direct-index), 1 iterations, agent codex
+
+## 2026-09-07
+
+func_84135B00: time cap at 0.875 (raw 0.5625) after 2417s, mismatch operand_or_scheduling_drift; tried families: call-sequence; tie-pool no
+
+## 2026-09-07
+
+func_84135B40: time cap at 0.9474 (raw 0.8421) after 2408s, mismatch operand_or_scheduling_drift; tried families: call-sequence; tie-pool no
+
+## 2026-09-07
+
+func_84126E88: plateau at 0.9524 (raw 0.8095), mismatch operand_or_scheduling_drift; tried families: pack; tie-pool no
