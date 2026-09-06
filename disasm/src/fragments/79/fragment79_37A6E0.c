@@ -848,7 +848,7 @@ extern u8 * func_8410B330(u8 *);
 extern void func_8410DFC4(u8 *, void *);
 extern void func_841203B4(u8 *, f32, f32);
 extern u8 * D_841911E8;
-void func_84110910(u8 *arg0, void *arg1) {
+void BattleAnim_ModelDispatch_184(u8 *arg0, void *arg1) {
     D_841911E8 = func_8410B330(arg0);
     func_841203B4(arg0 + 0x2C, *(f32 *)(D_841911E8 + 0x88), 0.05f);
     func_8410DFC4(arg0, arg1);
