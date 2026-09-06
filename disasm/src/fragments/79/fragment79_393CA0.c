@@ -1459,7 +1459,7 @@ void BattleAnim_Table_84185F10_044(void) {
 #ifdef VERSION_US
 extern s32 D_841951C8;
 extern u8 D_841951D7;
-void func_8412DBC0(void) {
+void BattleAnim_Table_84185F10_045(void) {
     if (D_841951D7 != 0) {
         D_841951C8 *= D_841951D7 + 1;
         if (D_841951C8 >= 0x10000) D_841951C8 = 0xFFFF;
