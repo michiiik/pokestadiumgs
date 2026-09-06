@@ -4841,7 +4841,13 @@ void geo_layout_cmd_create_fog(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80040244.s")
+extern void *func_800382E4(S1_MainPoolState *, void *, s16, s16, u8, u8, u8, u8);
+extern void func_8003FD34(void *);
+void geo_layout_cmd_create_light(void) {
+    S1_unk_D_800ABE00_cmd14 *cmd = (S1_unk_D_800ABE00_cmd14 *)(u32)D_80126520;
+    func_8003FD34(func_800382E4(D_80126450, NULL, (cmd->pitch << 15) / 180, (cmd->yaw << 15) / 180, cmd->r, cmd->g, cmd->b, cmd->a));
+    D_80126520 += 12;
+}
 #endif
 
 #ifdef VERSION_US
@@ -5348,11 +5354,60 @@ s32 func_800421E0(u8 *arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800422B4.s")
+extern OSMesgQueue D_80126F00;
+s32 func_800422B4(u8 *arg0, s32 arg1, u16 arg2, u16 arg3) {
+    s32 result = 0;
+    u8 *msg;
+    if ((arg0[0] & 1) && !(arg0[1] & 4) && arg1 < 2 && *(s32 *)(((u8 (*)[4])arg0)[arg1] + 0x10)) {
+        msg = Util_Malloc(0x20);
+        if (msg != NULL) {
+            *(u16 *)(msg + 0) = 4;
+            *(u16 *)(msg + 2) = arg2;
+            *(u16 *)(msg + 4) = arg3;
+            msg[6] = 0;
+            *(void **)(msg + 8) = arg0 + 0x90;
+            *(s32 *)(msg + 0xC) = 0;
+            *(s32 *)(msg + 0x10) = 0;
+            *(s32 *)(msg + 0x14) = *(s32 *)(((u8 (*)[4])arg0)[arg1] + 0x10);
+            *(s32 *)(msg + 0x18) = *(s32 *)(((u8 (*)[4])arg0)[arg1] + 0x24);
+            osSendMesg(&D_80126F00, msg, 1);
+            arg0[1] |= 4;
+            result = 1;
+        }
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8004239C.s")
+extern OSMesgQueue D_80126F00;
+s32 func_8004239C(u8 *arg0, s32 arg1) {
+    s32 result = 0;
+    u8 *msg;
+    s32 index;
+    u32 base;
+    if ((arg0[0] & 0x10) && !(arg0[1] & 8)) {
+        msg = Util_Malloc(0x20);
+        if (msg != NULL) {
+            index = arg0[2];
+            if (arg0[0] & 4) { index ^= 1; }
+            *(u16 *)(msg + 0) = 8;
+            *(u16 *)(msg + 2) = arg1;
+            *(u16 *)(msg + 4) = index;
+            msg[6] = 0;
+            base = (u32)arg0 + 0xB0;
+            *(void **)(msg + 8) = (void *)base;
+            *(s32 *)(msg + 0xC) = 0;
+            *(s32 *)(msg + 0x10) = 0;
+            *(s32 *)(msg + 0x14) = *(s32 *)((u8 *)arg0 + (index << 2) + 0x18);
+            *(s32 *)(msg + 0x18) = 0x25C00;
+            osSendMesg(&D_80126F00, msg, 1);
+            arg0[1] |= 8;
+            result = 1;
+        }
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
