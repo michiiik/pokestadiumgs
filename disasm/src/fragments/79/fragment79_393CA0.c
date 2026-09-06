@@ -283,7 +283,18 @@ void func_84125508(u8 *arg0, u16 arg1, u8 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841255AC.s")
+extern u8 D_84185410[];
+void func_841255AC(u8 *arg0, u16 arg1, u8 arg2) {
+    if (arg2 != 0) {
+        *(u16 *)arg0 = (arg1 * D_84185410[(arg2 - 1) * 2 + 1]) / D_84185410[(arg2 - 1) * 2];
+        if (*(u16 *)arg0 == 0) {
+            *(u16 *)arg0 = 1;
+        }
+        if (*(u16 *)arg0 >= 1000) {
+            *(u16 *)arg0 = 999;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
