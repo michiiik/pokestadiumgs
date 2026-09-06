@@ -3263,7 +3263,7 @@ S1_unk_D_86002F34_alt7* GeoNode_CreateDisplayListPart(S1_MainPoolState* arg0, S1
 
 #ifdef VERSION_US
 extern void func_8003899C(s32, s32, s32, s32, void *);
-void GeoNode_CreateDisplayListMatrixFromTransform(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
+void *GeoNode_CreateDisplayListMatrixFromTransform(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
     s32 temp[16];
     func_8003614C(temp, arg4, arg5);
     func_8003899C(arg0, arg1, arg2, arg3, temp);
@@ -4962,7 +4962,18 @@ void geo_layout_cmd_create_model_part(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80040A9C.s")
+extern void func_8003FD34(void *);
+void geo_layout_cmd_create_display_list_matrix(void) {
+    S1_Vec3f sp34;
+    S1_Vec3s sp2C;
+    void *node;
+    S1_unk_D_800ABE00_cmd20 *cmd = (S1_unk_D_800ABE00_cmd20 *)D_80126520;
+    Vec3f_FromVec3s(&sp34, &cmd->position);
+    Vec3s_SetComponents(&sp2C, (cmd->rotX << 15) / 180, (cmd->rotY << 15) / 180, (cmd->rotZ << 15) / 180);
+    node = GeoNode_CreateDisplayListMatrixFromTransform((s32)D_80126450, 0, cmd->partIndex, (s32)cmd->displayList, (s32)&sp34, (s32)&sp2C);
+    func_8003FD34(node);
+    D_80126520 += sizeof(S1_unk_D_800ABE00_cmd20);
+}
 #endif
 
 #ifdef VERSION_US
