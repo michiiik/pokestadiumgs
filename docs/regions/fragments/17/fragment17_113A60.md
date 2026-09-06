@@ -57,3 +57,23 @@ func_82205A8C: matched (state-field:nested-if:direct-offsets), 1 iterations, age
 ## 2026-09-07
 
 func_82206124: matched (state-field:early-return:switch-goto-done), 5 iterations, agent codex
+
+## 2026-09-07
+
+func_82204744: plateau at 0.9375 (raw 0.875), mismatch operand_or_scheduling_drift; tried families: call-sequence; tie-pool no
+
+## 2026-09-07
+
+func_822089C0: matched (call-sequence:result-before-limit:guard), 5 iterations, agent codex
+
+## 2026-09-07
+
+func_822068E0: plateau at 0.0 (raw None), mismatch unknown; tried families: call-sequence; tie-pool no
+
+## 2026-09-07
+
+func_822069A4: matched (call-sequence:count-pointer:macro), 3 iterations, agent codex
+
+## 2026-09-07
+
+func_822085EC: matched (call-sequence:state-pointer:result-before-pointer), 6 iterations, agent codex
