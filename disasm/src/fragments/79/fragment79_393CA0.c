@@ -1169,7 +1169,19 @@ extern u8 D_841951BC; extern u8 *D_84195208[]; void BattleAnim_Table_84185F10_01
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412BD3C.s")
+extern u8 D_841951BC;
+extern u8 D_841951BD;
+extern u8 D_841951D2;
+extern u8 * D_84195208[];
+s32 func_8412BD3C(void) {
+    u8 value; u8 i;
+    if (D_841951D2 != 0) return 0;
+    if ((D_84195208[D_841951BD][0xF] & 0x60) != 0) return 0;
+    value = D_84195208[D_841951BD][0x26];
+    if (value == 0 || value == 0xA5) return 0;
+    for (i = 0; i < 4; i++) if (D_84195208[D_841951BC][((unsigned long)i) + 5] == value) return 0;
+    return 1;
+}
 #endif
 
 #ifdef VERSION_US
