@@ -3029,19 +3029,33 @@ void func_84135B8C(u8 arg0, u16 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84135BDC.s")
+extern void * D_841951F8[];
+void func_84135BDC(void *arg0, u8 arg1, s16 arg2, u16 arg3, u16 arg4) {
+    s32 sp2C;
+    s32 sp28;
+    u8 *s0 = (u8 *)arg0 + 0x1F6;
+
+    func_8004C8A0(s0, 0x80, ((u8 *)D_841951F8[arg1])[0x49B] + 0x4C, arg4);
+    func_80049C70(&sp2C, &sp28, s0);
+    s0[0x80] = arg1;
+    s0[0x81] = arg1;
+    s0[0x82] = sp2C;
+    s0[0x83] = sp28;
+    *(s16 *)&s0[0x84] = arg2;
+    *(u16 *)&s0[0x86] = arg3;
+}
 #endif
 
 #ifdef VERSION_US
 extern u8 D_84195280[];
-extern void func_84135BDC(void *, u8, s16, u16, s32);
+extern void func_84135BDC(void *, u8, s16, u16, u16);
 void func_84135C78(u8 arg0, s16 arg1, u16 arg2, u16 arg3) {
     func_84135BDC(&D_84195280[D_84195280[0x4D81] * 0x280], arg0, arg1, arg2, arg3);
 }
 #endif
 
 #ifdef VERSION_US
-extern void func_84135BDC(void *, u8, s16, u16, s32);
+extern void func_84135BDC(void *, u8, s16, u16, u16);
 void func_84135CD4(u8 arg0, s16 arg1, u16 arg2, u16 arg3) {
     s32 var_v0;
 
