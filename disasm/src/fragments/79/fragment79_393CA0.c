@@ -2050,7 +2050,33 @@ void BattleAnim_Table_84186004_052(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84130284.s")
+extern s32 func_84125B88(u8, u8, u8);
+extern s32 func_8412676C(u8 arg0, u8 arg1);
+extern s32 func_84126804(u8, u16);
+extern void func_84134CBC(u8 arg0, u8 arg1);
+extern void func_84135B00(u8);
+extern void func_84136678(u8, s32);
+extern void func_84136A9C(u8 arg0, s16 arg1, s16 arg2, u8 arg3);
+extern void func_84136CA8(void);
+extern u8 D_841951BC;
+extern u8 * D_84195200[];
+extern u8 * D_84195208[];
+void func_84130284(void) {
+    if (func_84125B88(D_841951BC, 0, 0) == 0 || (((u16 *)D_84195200[D_841951BC])[0x14] >> 1) >= ((u16 *)D_84195200[D_841951BC])[0x13]) {
+        func_84126BFC(D_841951BC);
+        return;
+    }
+    {
+        s32 value = func_84126804(D_841951BC, (u16)func_8412676C(D_841951BC, 1));
+        func_84136A9C(D_841951BC, -1, (s16)-value, 1);
+        D_84195208[D_841951BC][0x1E] = 0xD;
+        func_841256E0(D_841951BC, 0);
+        func_84136678(D_841951BC, -1);
+        func_84135B00(0x39);
+        func_84134CBC(D_841951BC, 0x41);
+        func_84136CA8();
+    }
+}
 #endif
 
 #ifdef VERSION_US
