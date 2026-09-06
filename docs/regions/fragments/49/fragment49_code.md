@@ -106,3 +106,23 @@ func_8610880C: time cap at 0.5931 (raw 0.1931) after 2400s, mismatch section_lay
 ## 2026-09-06
 
 TYPE CONFLICT: func_87F026E8 is extern void func_87F026E8(void *, void *), not extern void func_87F026E8(s32, s32)
+
+## 2026-09-07
+
+func_86102C08: plateau at 0.0 (raw None), mismatch unknown; tried families: call_chain; tie-pool no
+
+## 2026-09-07
+
+func_86105AD8: matched (call_chain:exact:context-then-countptr-then-flags-branch-idx), 1 iterations, agent claude
+
+## 2026-09-07
+
+func_86101E04: plateau at 1.0 (raw 0.977), mismatch register_allocation_only; tried families: float_math; tie-pool no
+
+## 2026-09-07
+
+func_861024C8: time cap at 0.9222 (raw 0.8889) after 2411s, mismatch instruction_drift; tried families: abi, abi-addresses, call-chain; tie-pool no
+
+## 2026-09-07
+
+func_8610320C: time cap at 0.9043 (raw 0.4255) after 2408s, mismatch operand_or_scheduling_drift; tried families: state-field; tie-pool no
