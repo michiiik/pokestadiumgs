@@ -77,7 +77,45 @@ s32 func_823052FC(s32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_124E40/func_8230570C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_124E40/func_8230583C.s")
+extern void func_800226C0(s32);
+void func_8230583C(u8 *arg0)
+{
+  s32 var_s2;
+  s32 var_s6;
+  u8 *var_s0;
+  u8 *var_s1;
+  var_s6 = 1;
+  *((s16 *) (arg0 + 6)) = (*((s16 *) (arg0 + 6))) + 1;
+  var_s0 = arg0 + 8;
+  var_s1 = arg0;
+  var_s2 = 0;
+  do
+  {
+    if ((*((s16 *) (var_s1 + 0x2DC))) == 2)
+    {
+      *((s16 *) (var_s0 + 0x2D4)) = 4;
+      *((s16 *) (var_s0 + 0x2D6)) = 0;
+      if ((*((s16 *) (var_s0 + 0x2DC))) == 0)
+      {
+        func_800226C0(0xB2);
+      }
+ dummy_label_437240: ;
+    }
+    var_s2 += 0x2F0;
+    var_s1 += 0x2F0;
+    if ((*((s16 *) (var_s0 + 0x2D4))) != 0)
+    {
+      var_s6 = 0;
+    }
+    var_s0 += 0x2F0;
+  }
+  while (var_s2 != 0xBC0);
+  if (var_s6 != 0)
+  {
+    *((s16 *) (arg0 + 2)) = 0;
+    *((s16 *) (arg0 + 6)) = 0;
+  }
+}
 
 extern void func_823055DC(u8 *);
 extern void func_8230570C(u8 *);

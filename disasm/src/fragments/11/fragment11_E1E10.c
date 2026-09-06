@@ -136,7 +136,14 @@ void func_8160A928(u8 *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E1E10/func_8160A94C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_E1E10/func_8160A994.s")
+extern void func_8160A94C(void *);
+extern volatile u8 D_8160C2E0;
+void func_8160A994(u8 *arg0)
+{
+  func_8160A94C(arg0);
+  *((u16 *) (arg0 + 0x4D90)) = 0;
+  arg0[0x11] = D_8160C2E0 & 0xFFFFu;
+}
 
 #ifdef CC_CHECK
 s32 func_8160A8DC(u8 *);

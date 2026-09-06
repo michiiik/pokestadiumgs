@@ -29,3 +29,7 @@ requeue: func_8220A098 (47 instructions, call_sequence). Two CC_CHECK=1 probe-on
 ## 2026-09-02 func_822088FC acceptance (2026-09-02)
 
 accepted: func_822088FC. Nine distinct CC_CHECK=1 candidates were submitted through the runner; hypothesis-2 produced link_verified=true with exact 22/22 instructions, expected_size=actual_size=88, and the combined full-ROM gate accepted it. Best rejected diagnostics included normalized/raw 1.0/0.9091 immediate_drift at first_diff_instruction=3 (expected sw zero,28(sp), actual sw zero,24(sp)); other variants had operand_or_scheduling_drift or instruction_drift. Installed spelling uses result initialized before the helper call, a separate value temporary, and explicit s16 pointer stores through D_8220DA08. Do not touch historical jump-table-unready func_822072D0 or func_822075D0.
+
+## Accepted owner: func_822071E8 (register tie closed) (2026-09-06)
+
+Closed a register_allocation_only tie (11 prior attempts at similarity >=0.99, no permuter attempt on record). tools/permute_candidate.py found a score-0 variant: inlining the 'index' local (used once) directly into the array-subscript expression instead of computing it as a separate assignment first. Verified with tools/fleet_probe.py --gate: accepted, link-verified, full-ROM COMPARE=1 gate MD5 1561c75d11cedf356a8ddb1a4a5f9d5d.

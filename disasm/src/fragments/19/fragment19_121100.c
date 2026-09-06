@@ -125,7 +125,36 @@ s32 func_82301434(s32 arg0, u8 *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_823015B0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82301638.s")
+extern s16 D_82305E6A;
+extern f32 D_82305EE0;
+extern u8 D_82305A78[];
+s32 func_82301638(s32 arg0, u8 *arg1)
+{
+  s16 index;
+  index = D_82305E6A;
+  switch (arg0)
+  {
+    case 0:
+      break;
+
+    case 1:
+      if (D_82305EE0 < 1.0f)
+    {
+      *((u16 *) (arg1 + 2)) &= (((0xFFFD ^ 0) & 0xFFFF) & 0xFFFF) & 0xFFFF;
+      break;
+    }
+      *((u16 *) (arg1 + 2)) |= 2;
+      *((u16 *) (arg1 + 0x30)) = 0x2E;
+      *((s16 *) (arg1 + 0x32)) = *((s16 *) (D_82305A78 + (index * 36)));
+      break;
+
+    default:
+      break;
+
+  }
+
+  return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_823016B4.s")
 

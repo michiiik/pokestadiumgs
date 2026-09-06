@@ -193,7 +193,40 @@ s32 func_82206B64(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82206FBC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_822071E8.s")
+extern u8 D_8220DAB8[];
+extern s16 D_8220DA94;
+extern f32 D_80087E50[];
+extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
+s32 func_822071E8(s32 arg0, void *arg1)
+{
+  s32 temp_v1;
+  u16 angle;
+  s32 index;
+  temp_v1 = *((s32 *) (((u8 *) arg1) + 0x14));
+  switch (arg0)
+  {
+    case 0:
+    {
+      s16 *entry;
+      entry = (s16 *) (((u8 *) D_8220DAB8) + (temp_v1 << 2));
+      Vec3f_SetComponentsDuplicate((f32 *) (((u8 *) arg1) + 0x24), ((f32) entry[0]) - 320.0f, 240.0f - ((f32) entry[1]), -579.0f);
+      break;
+    }
+
+    case 2:
+      angle = D_8220DA94;
+      ;
+      *((s16 *) (((u8 *) arg1) + 0x22)) = (s16) (D_80087E50[((u16) D_8220DA94) >> 4] * 6144.0f);
+      if (temp_v1 >= 2)
+    {
+      *((s16 *) (((u8 *) arg1) + 0x22)) = -(*((s16 *) (((u8 *) arg1) + 0x22)));
+    }
+      break;
+
+  }
+
+  return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_822072D0.s")
 

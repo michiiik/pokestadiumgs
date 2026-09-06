@@ -108,3 +108,7 @@ func_8130C334: plateau at 0.9371 (raw 0.7063), mismatch section_layout_drift; tr
 ## 2026-09-06
 
 func_81308014: plateau at 0.9615 (raw 0.8846), mismatch operand_or_scheduling_drift; tried families: call-sequence; tie-pool no
+
+## Accepted owners: func_813074E4, func_8130A5E4 (register ties closed) (2026-09-06)
+
+Two register_allocation_only ties in this file closed together. func_813074E4 (6 prior attempts at similarity >=0.99): tools/permute_candidate.py found a score-0 variant adding a dead 'if (0) {}' statement plus wrapping the arg3 addend in a no-op comma expression '(0, arg3)', which shifts IDO's register allocation without changing behavior. func_8130A5E4: the recorded near-miss candidate cached 'arg0' in a local struct pointer 's'; re-deriving '(struct S *)arg0' at every field access instead of reading through the cached pointer closes the tie (permute_candidate.py's own extraction regex mis-bounded the K&R-style function signature here -- read the diff, not the printed 'code', when re-deriving this kind of candidate). Verified with tools/fleet_probe.py --gate: both accepted, link-verified, full-ROM COMPARE=1 gate MD5 1561c75d11cedf356a8ddb1a4a5f9d5d.

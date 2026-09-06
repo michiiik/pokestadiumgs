@@ -32,7 +32,13 @@ void func_80064A10(u8 arg0, u8 arg1) {
     D_80128B50 = (u8)D_80128B50 + 1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/654A0/func_80064A7C.s")
+extern u8 D_80128BD8;
+extern u8 D_80128B58;
+u8 func_80064A7C(u8 arg0)
+{
+ do { register u8 *ptr = &D_80128B58; loop: if ((*ptr) != 0) { if (arg0 == (*ptr)) { return ptr[3]; } ptr += 4; if (ptr != (&D_80128BD8)) { goto loop; } } } while (0);
+  return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/654A0/func_80064AC8.s")
 

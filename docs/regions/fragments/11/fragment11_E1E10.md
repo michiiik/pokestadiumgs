@@ -27,3 +27,7 @@ Explicit skip list for this box:
 - An explicit-prototype batch was tooling-invalid because the runner already injected duplicate fallback declarations; it was not installed and should not be repeated without fixing the declaration-preflight path.
 
 All accepted results were installed only through the runner after link verification and the combined full-ROM gate.
+
+## Accepted owner: func_8160A994 (register tie closed) (2026-09-06)
+
+Closed a register_allocation_only tie (27 prior attempts at similarity >=0.99, no permuter attempt on record). tools/permute_candidate.py found a score-0 variant: masking the volatile u8 global read with a redundant '& 0xFFFFu' (numerically a no-op on a u8 value) before the byte store, which changes IDO's register allocation for the load/mask sequence enough to match. Verified with tools/fleet_probe.py --gate: accepted, link-verified, full-ROM COMPARE=1 gate MD5 1561c75d11cedf356a8ddb1a4a5f9d5d.
