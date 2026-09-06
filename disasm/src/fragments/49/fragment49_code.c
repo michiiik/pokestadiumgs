@@ -727,7 +727,84 @@ void func_86109864(void) {
     } while ((*(s32 *)((u8 *)(D_8610AD20) + (0x3C))) != 8);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_861098CC.s")
+extern s64 main_pool_push_state(s32);
+extern void main_pool_pop_state(s32);
+extern u8 D_8610AD28[];
+extern void func_80027EE0(s32);
+extern u8 D_800CE060[];
+extern u8 D_800CE100[];
+extern void func_80006148(void *);
+extern void Gfx_InitDisplayListBuffers(s32, s32);
+extern s32 func_800082E0(s32, s32, s32, s32, s32, s32);
+extern void func_8004C09C(s32);
+extern void func_87F09EBC(void *, s32);
+extern void func_87F06EAC(s32, void *, s32);
+extern void func_8004C8C0(s32);
+extern void func_87F061D0(void);
+extern void func_80047588(s32, s32);
+extern u8 D_1000000[];
+extern u8 D_446E30[];
+extern u8 D_447D00[];
+extern void Asset_LoadToSegment(s32, void *, void *, s32);
+extern void func_86107A20(void);
+extern void func_80008514(s32);
+extern void func_80008574(void);
+extern void func_80006158(void);
+extern void func_80047610(void);
+extern void func_8004C398(void);
+extern void Gfx_FreeDisplayListBuffers(void);
+extern void func_87F0F480(s32);
+extern void func_86109864(void);
+extern s32 D_8610AD20;
+s32 func_861098CC(s32 arg0, s32 arg1) {
+    u8 *ptr;
+    u8 *end;
+    s32 stage;
+
+    main_pool_push_state(0x4D59524D);
+    D_8610AD20 = (s32)D_8610AD28;
+    *(s32 *)D_8610AD20 = arg1;
+
+    if (*(u8 *)(*(s32 *)D_8610AD20 + 0x2182) == 15) {
+        *(s8 *)((u8 *)D_8610AD20 + 0x97E4) = 1;
+    } else {
+        *(s8 *)((u8 *)D_8610AD20 + 0x97E4) = *(s8 *)(*(s32 *)D_8610AD20 + 0x2181);
+    }
+
+    if (*(u8 *)(*(s32 *)D_8610AD20 + 0x2180) == 4) {
+        func_80027EE0(0xFFF);
+    }
+
+    ptr = D_800CE060, end = D_800CE100;
+    do {
+        func_80006148(ptr);
+        ptr += 0x28;
+    } while (ptr != end);
+
+    Gfx_InitDisplayListBuffers(0x20000, 0);
+    stage = func_800082E0(0, 0, 2, 1, 2, 1);
+    func_8004C09C(0x123);
+    func_87F09EBC((u8 *)D_8610AD20 + 0x9704, *(s32 *)D_8610AD20);
+    func_87F06EAC(0x61, (u8 *)D_8610AD20 + 0x44, *(s32 *)D_8610AD20);
+    func_8004C8C0(0x45);
+    func_8004C8C0(0xDD);
+    func_8004C8C0(0xDE);
+    func_87F061D0();
+    func_80047588(*(s32 *)((u8 *)D_8610AD20 + 0x9724) | (*(s32 *)((u8 *)D_8610AD20 + 0x4C) | 0x28), 0);
+    Asset_LoadToSegment(((u32)&D_1000000 & 0x0F000000) >> 24, &D_446E30, D_447D00, 0);
+    func_86107A20();
+    func_80008514(stage);
+    func_86109864();
+    func_80008574();
+    func_80006158();
+    func_80047610();
+    func_8004C398();
+    Gfx_FreeDisplayListBuffers();
+    main_pool_pop_state(0x4D59524D);
+    func_87F0F480(*(s32 *)D_8610AD20);
+    func_80027EE0(0xFFE);
+    return *(s32 *)((u8 *)D_8610AD20 + 0x97E8);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86109AE0.s")
 
