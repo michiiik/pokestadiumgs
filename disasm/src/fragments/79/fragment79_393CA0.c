@@ -2585,7 +2585,21 @@ s32 func_841349C0(f32 arg0) { s32 value = (s32)arg0; f64 fraction = (f64)(arg0 -
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84134A10.s")
+s32 func_84134A10(u16 arg0, s16 *arg1, u16 *arg2) {
+    if (arg0 == 0xFFFF) {
+        return 0;
+    }
+    if (*arg2 > 0) {
+        if (*arg1 == 0) {
+            *arg2 = *arg2 - 1;
+            return 1;
+        }
+        if (*arg1 > 0) {
+            *arg1 = *arg1 - 1;
+        }
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
