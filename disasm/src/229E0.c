@@ -4843,7 +4843,7 @@ void geo_layout_cmd_create_fog(void) {
 #ifdef VERSION_US
 extern void *func_800382E4(S1_MainPoolState *, void *, s16, s16, u8, u8, u8, u8);
 extern void func_8003FD34(void *);
-void func_80040244(void) {
+void geo_layout_cmd_create_light(void) {
     S1_unk_D_800ABE00_cmd14 *cmd = (S1_unk_D_800ABE00_cmd14 *)(u32)D_80126520;
     func_8003FD34(func_800382E4(D_80126450, NULL, (cmd->pitch << 15) / 180, (cmd->yaw << 15) / 180, cmd->r, cmd->g, cmd->b, cmd->a));
     D_80126520 += 12;
