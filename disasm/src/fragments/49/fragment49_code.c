@@ -306,7 +306,62 @@ void func_86103194(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86103384.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_861034A8.s")
+extern f32 D_8610AB5C;
+extern f32 D_8610AB60;
+extern f32 D_8610AB64;
+extern f32 D_8610AB68;
+extern f32 D_8610AB6C;
+
+typedef struct {
+    char pad0[0x10];
+    f32 unk10;
+    f32 unk14;
+    f32 unk18;
+    char pad1C[0x28];
+    s16 unk44;
+    char pad46[2];
+    f32 unk48;
+    f32 unk4C;
+    f32 unk50;
+    f32 unk54;
+    f32 unk58;
+    f32 unk5C;
+} Struct861034A8;
+extern u32 func_8003570C(void);
+extern s32 D_8610AD20;
+void func_861034A8(Struct861034A8 *arg0, s32 arg1) {
+    f32 scale;
+
+    arg0->unk10 = ((f32)func_8003570C() / 4294967296.0f) * 100.0f;
+    arg0->unk14 = ((f32)func_8003570C() / 4294967296.0f) * 100.0f;
+    arg0->unk18 = 0.0f;
+
+    switch (arg1) {
+    case 0:
+        arg0->unk48 = 0.0f;
+        arg0->unk4C = D_8610AB5C;
+        break;
+    case 1:
+        arg0->unk48 = D_8610AB60;
+        arg0->unk4C = 0.0f;
+        break;
+    case 2:
+        arg0->unk48 = 0.0f;
+        arg0->unk4C = D_8610AB64;
+        break;
+    case 3:
+        arg0->unk48 = D_8610AB68;
+        arg0->unk4C = 0.0f;
+        break;
+    }
+
+    scale = D_8610AB6C;
+    arg0->unk50 = 1200.0f;
+    arg0->unk54 = (*(f32 *)((u8 *)D_8610AD20 + 0x9768)) * scale;
+    arg0->unk5C = (*(f32 *)((u8 *)D_8610AD20 + 0x9768)) * scale;
+    arg0->unk58 = (*(f32 *)((u8 *)D_8610AD20 + 0x9768)) * scale;
+    arg0->unk44 = 0x3FFF;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_8610362C.s")
 
