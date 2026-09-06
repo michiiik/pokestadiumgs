@@ -928,7 +928,16 @@ void func_8AC0651C(void *arg0, s16 arg1, s16 arg2, s16 arg3, s16 arg4) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC06570.s")
+void func_8AC06570(void *arg0, s16 arg1, s16 arg2, s16 arg3, s16 arg4, s16 arg5) {
+    s16 difference = arg1 - arg3;
+    s16 quotient = difference / arg3;
+    s32 remainder = difference % arg3;
+    if (remainder > 0) quotient++;
+    *(s16 *)((u8 *)arg0 + 6) = quotient;
+    *(s16 *)((u8 *)arg0 + 8) = arg2;
+    *(s16 *)((u8 *)arg0 + 10) = arg4;
+    *(s16 *)((u8 *)arg0 + 12) = arg5;
+}
 #endif
 
 #ifdef VERSION_US
