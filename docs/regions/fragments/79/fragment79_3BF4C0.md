@@ -9,3 +9,15 @@ Declare only the parameters the body reads (`a3` was caller garbage); the fourth
 ## Unsolved shape: table pointer kept in $t7 (AGENTS.md §5) (2026-08-28)
 
 `u8 *p = arg0 + 4; p[arg1 + 8] = 0xFF; p[0] |= 2;` -- IDO keeps the table pointer in `$t7`; no declaration-order/pointer-form variant reproduced it (`func_841523BC`, `func_84151CD8`, likely `func_84151DD4`). Needs a dedicated variant family.
+
+## 2026-09-06
+
+func_84151D3C: matched (call_sequence:guard:u8-value:callee-table-temp), 2 iterations, agent codex
+
+## 2026-09-06
+
+func_841526CC: plateau at 0.9231 (raw 0.8974), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-06
+
+func_84152C34: plateau at 0.9286 (raw 0.4048), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
