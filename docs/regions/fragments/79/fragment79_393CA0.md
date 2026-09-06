@@ -496,3 +496,47 @@ func_84126C3C: time cap at 0.9459 (raw 0.9459) after 2400s, mismatch instruction
 ## 2026-09-07
 
 func_84128204: plateau at 0.9429 (raw 0.7714), mismatch unaligned_data_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-07
+
+func_84124CC4: matched (call_sequence:nested_if:baseline), 3 iterations, agent gemini
+
+## 2026-09-07
+
+func_841280D8: plateau at 0.0 (raw None), mismatch unknown; tried families: call_sequence; tie-pool no
+
+## 2026-09-07
+
+func_84129B60: matched (call_sequence:direct_subscript:baseline), 1 iterations, agent gemini
+
+## 2026-09-07
+
+func_84127C88: plateau at 0.0 (raw None), mismatch unknown; tried families: (none); tie-pool no
+
+## 2026-09-07
+
+TYPE CONFLICT: D_841951C2 is extern u8 D_841951C2, not extern s8 D_841951C2
+
+## 2026-09-07
+
+TYPE CONFLICT: D_841951D1 is extern u8 D_841951D1, not extern u8 D_841951D1, D_841951BC, D_841951BD
+
+## 2026-09-07
+
+func_8412A804: plateau at 0.9868 (raw 0.9605), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-07
+
+TYPE CONFLICT: D_841951E4 is extern u8 D_841951D5, D_841951BC, D_841951BD, D_841951BF, D_841951D1, D_841951D2, D_841951E4, not extern u8 D_841951E4, D_841951E5
+
+## 2026-09-07
+
+func_8413BC64: time cap at 0.9091 (raw 0.4805) after 2400s, mismatch instruction_drift; tried families: call-sequence; tie-pool no
+
+## 2026-09-07
+
+TYPE CONFLICT: func_84147228 is extern void func_84147228(u8, u8, u8, u8, u8), not extern void func_84147228(s32, u8, s32, s32, s32)
+
+## 2026-09-07
+
+func_8413C18C: matched (call-sequence:switch:direct-pointer), 1 iterations, agent codex
