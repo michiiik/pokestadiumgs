@@ -2702,7 +2702,13 @@ void func_84134E00(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84134E30.s")
+extern u8 D_84195280[];
+void func_84134E30(s32 arg0) {
+    s32 *home;
+    home = &arg0;
+    D_84195280[D_84195280[0x4D81] * 0x280 + 9] &= 0xFFF8;
+    D_84195280[D_84195280[0x4D81] * 0x280 + 9] |= arg0;
+}
 #endif
 
 #ifdef VERSION_US
