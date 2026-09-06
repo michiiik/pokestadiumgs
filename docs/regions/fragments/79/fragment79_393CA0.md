@@ -444,3 +444,35 @@ func_84124E44: time cap at 0.9583 (raw 0.6875) after 2409s, mismatch operand_or_
 ## 2026-09-06
 
 func_841246AC: plateau at 0.9574 (raw 0.9362), mismatch operand_or_scheduling_drift; tried families: call-sequence; tie-pool no
+
+## 2026-09-06
+
+func_84129D8C: matched (call_sequence:do_while_u8:single_temp), 3 iterations, agent gemini
+
+## 2026-09-06
+
+func_841350F4: time cap at 0.9254 (raw 0.7015) after 2405s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-06
+
+func_84130284: matched (call-sequence:guard-return:s32-result-u16-arg), 5 iterations, agent codex
+
+## 2026-09-06
+
+func_84131664: time cap at 0.7778 (raw 0.3492) after 2400s, mismatch operand_or_scheduling_drift; tried families: call-sequence; tie-pool no
+
+## 2026-09-06
+
+TYPE CONFLICT: D_841951D6 is extern u8 D_841951BC, D_841951BD, D_841951C5, D_841951C6, D_841951D6, not extern u8 D_841951D6
+
+## 2026-09-06
+
+TYPE CONFLICT: D_841951D6 is extern u8 D_841951BC,D_841951BD,D_841951C5,D_841951C6,D_841951D6, not extern u8 D_841951D6
+
+## 2026-09-06
+
+func_84132D44: matched (call_sequence:loop:for-index:direct-table-access), 5 iterations, agent codex
+
+## 2026-09-06
+
+func_841339D0: plateau at 0.9841 (raw 0.9048), mismatch instruction_drift; tried families: call_sequence; tie-pool no
