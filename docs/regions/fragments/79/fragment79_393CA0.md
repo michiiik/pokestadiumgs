@@ -316,3 +316,19 @@ func_84125B88: time cap at 0.7857 (raw 0.3929) after 2416s, mismatch operand_or_
 ## 2026-09-06
 
 func_8413C0A4: time cap at 1.0 (raw 1.0) after 2400s, mismatch section_layout_drift; tried families: dispatcher-goto, dispatcher-if, dispatcher-if-chain, dispatcher-switch; tie-pool no
+
+## 2026-09-06
+
+func_84125484: time cap at 0.9583 (raw 0.2083) after 2403s, mismatch operand_or_scheduling_drift; tried families: state-field; tie-pool no
+
+## 2026-09-06
+
+func_84134A10: matched (constant-map:counter-update:u16-fallthrough-count-guard), 1 iterations, agent codex
+
+## 2026-09-06
+
+func_84125424: plateau at 0.875 (raw 0.3333), mismatch operand_or_scheduling_drift; tried families: state-field; tie-pool no
+
+## 2026-09-06
+
+func_84133924: matched (state-field:clear-three-tables:offset-shift-negate), 1 iterations, agent codex
