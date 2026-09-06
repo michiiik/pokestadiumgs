@@ -469,7 +469,26 @@ s32 func_826058CC(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_826063AC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82606548.s")
+typedef struct { s16 a; s16 b; } Pair16_6548;
+extern s16 D_82615504[];
+typedef struct {
+    s16 f0; s16 f2; u16 f4; s16 f6; s16 f8; s16 fA; s16 fC; s16 fE;
+    Pair16_6548 f10; Pair16_6548 f14; Pair16_6548 f18;
+    s16 f1C; s16 f1E; s16 f20; s16 f22; s16 f24; s16 f26;
+} Rec6548;
+void func_82606548(void *arg0, void *arg1) {
+    u8 *p = arg1;
+    *(s16 *)(p + 0x10) = 0;
+    *(u16 *)(p + 4) &= 0xFFFE;
+    *(s16 *)(p + 0x12) = -0x1E0;
+    *(Pair16_6548 *)(p + 0x18) = *(Pair16_6548 *)(p + 0x10);
+    *(s16 *)(p + 0x14) = 0;
+    *(s16 *)(p + 0x16) = 0;
+    *(s16 *)(p + 0x24) = 0x197;
+    *(s16 *)(p + 0x26) = D_82615504[*(s16 *)(p + 0)];
+    *(s16 *)(p + 0x14) = 0x74;
+    *(s16 *)(p + 0x16) = 0x4B;
+}
 
 extern s32 func_82604C98(s32, s32, s32, s32);
 
