@@ -6,7 +6,7 @@ void func_83000020(s32 arg0) { struct State { u8 pad[0x4E038]; u8 f0; u8 f1; u8 
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83000058.s")
+s32 func_83000058(void *arg0) { struct Record { u8 pad[0x1D]; u8 value; u8 tail[0x3A]; }; s32 best = 0; s32 count = 0; s32 i; s32 j; s32 k; struct Record *p = (struct Record *)arg0; while (count < 6) { if (p->pad[0] == 0) break; best += p->value; count++; p++; } for (i = 0; i < count; i++) for (j = i + 1; j < count; j++) for (k = j + 1; k < count; k++) { struct Record *q = (struct Record *)arg0; s32 sum = q[i].value + q[j].value + q[k].value; if (best >= sum) best = sum; } return best; }
 #endif
 
 #ifdef VERSION_US
@@ -563,7 +563,10 @@ void func_83008070(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_830080AC.s")
+extern void func_830034C8(void *, void *, void *, f32);
+extern f32 func_818055E0();
+extern void func_818057D0(s32, void *, void *);
+void func_830080AC(s32 arg0, void *arg1, void *arg2) { struct Locals { void *ptr; u32 pad; f32 value; }; struct Locals local; void *base = arg1; u8 index; local.value = func_818055E0(); index = *((u8 *)base + 0x48); if (index >= 2) local.ptr = (u8 *)base + index * 0x220 + 0x3E620; else local.ptr = (u8 *)base + 0x3D95C; func_818057D0(arg0, base, arg2); func_830034C8(base, local.ptr, arg2, local.value); }
 #endif
 
 #ifdef VERSION_US
