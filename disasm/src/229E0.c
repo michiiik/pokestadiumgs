@@ -5047,7 +5047,7 @@ void geo_layout_cmd_create_anchor(void) {
 
 #ifdef VERSION_US
 extern s16 D_80126518;
-void func_80040D9C(void) {
+void geo_layout_cmd_set_node_flag4(void) {
     u8 *entry = (u8 *)D_80126498[D_80126518];
     if (entry != 0) { entry[2] |= 4; }
     D_80126520 += 4;
