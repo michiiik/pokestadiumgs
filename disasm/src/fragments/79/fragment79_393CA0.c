@@ -2503,7 +2503,11 @@ void BattleAnim_Table_84186004_082(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84131AB8.s")
+extern void func_841318C0(u8, u8);
+extern void * D_841951F8[];
+void func_84131AB8(u8 arg0) {
+    func_841318C0(arg0, ((u8 *) D_841951F8[arg0])[0] - 4);
+}
 #endif
 
 #ifdef VERSION_US
