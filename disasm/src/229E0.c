@@ -687,7 +687,18 @@ void func_80028CA8_padding2(void) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80028CE8.s")
+s32 func_80028CE8(void *arg0, s32 arg1) {
+    struct Node { u32 a; u32 b; struct Node *next; };
+    struct Root { u32 a; struct Node *next; };
+    struct Node *node = ((struct Root *)arg0)->next;
+    s32 i = 0;
+    while (i != arg1) {
+        if (node->next == 0) return (s32)node;
+        node = node->next;
+        i++;
+    }
+    return (s32)node;
+}
 #endif
 
 #ifdef VERSION_US
