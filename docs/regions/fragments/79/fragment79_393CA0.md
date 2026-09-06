@@ -424,3 +424,23 @@ func_841306AC: plateau at 0.0 (raw None), mismatch unknown; tried families: call
 ## 2026-09-06
 
 TYPE CONFLICT: D_841951BF is extern u8 D_841951BC, D_841951BF, not extern u8 D_841951E6, D_841951BF
+
+## 2026-09-06
+
+func_84124C10: matched (call_sequence:record-pointer:direct-fields), 1 iterations, agent codex
+
+## 2026-09-06
+
+func_8412DD0C: matched (call-sequence:combined-guard:direct-index), 1 iterations, agent codex
+
+## 2026-09-06
+
+func_84137D04: plateau at 1.0 (raw 0.9556), mismatch immediate_drift; tried families: call-sequence; tie-pool no
+
+## 2026-09-06
+
+func_84124E44: time cap at 0.9583 (raw 0.6875) after 2409s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool yes
+
+## 2026-09-06
+
+func_841246AC: plateau at 0.9574 (raw 0.9362), mismatch operand_or_scheduling_drift; tried families: call-sequence; tie-pool no
