@@ -2,11 +2,63 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_82908270.s")
+typedef struct {
+    u8 unk0;
+    u8 unk1;
+    u8 unk2;
+    u8 unk3;
+    u8 unk4;
+    u8 unk5;
+    u8 unk6[4];
+    s16 unkA;
+    s16 unkC;
+    s16 unkE;
+    s16 unk10;
+} Fragment67Entry;
+
+extern Fragment67Entry D_82916B80[];
+extern u8 D_8291A7C0;
+extern void *D_80094908;
+extern void func_80037120(void *, void *, s16 *, s16 *, s16 *);
+s32 func_82908270(s32 arg0, u8 *arg1) {
+    s16 pad0;
+    s16 pad1;
+    s16 pad2;
+    s16 sp30;
+    s16 sp2E;
+    s16 sp2C;
+
+    if (arg0 == 2) {
+        *(u8 *)(arg1 + 0x18) = D_82916B80[*(s16 *)(&D_8291A7C0 + 0x1068)].unk0;
+        *(u8 *)(arg1 + 0x19) = D_82916B80[*(s16 *)(&D_8291A7C0 + 0x1068)].unk1;
+        *(u8 *)(arg1 + 0x1A) = D_82916B80[*(s16 *)(&D_8291A7C0 + 0x1068)].unk2;
+        func_80037120((u8 *)D_80094908 + 0xB4, (u8 *)D_80094908 + 0xA8, &sp30, &sp2E, &sp2C);
+        *(s16 *)(arg1 + 0x1C) = D_82916B80[*(s16 *)(&D_8291A7C0 + 0x1068)].unkA + sp2E;
+        *(s16 *)(arg1 + 0x1E) = D_82916B80[*(s16 *)(&D_8291A7C0 + 0x1068)].unkC + sp2C;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_82908370.s")
+s32 func_82908370(s32 arg0, u8 *arg1) {
+    s16 pad0;
+    s16 pad1;
+    s16 pad2;
+    s16 sp30;
+    s16 sp2E;
+    s16 sp2C;
+
+    if (arg0 == 2) {
+        *(u8 *)(arg1 + 0x18) = D_82916B80[*(s16 *)(&D_8291A7C0 + 0x1068)].unk3;
+        *(u8 *)(arg1 + 0x19) = D_82916B80[*(s16 *)(&D_8291A7C0 + 0x1068)].unk4;
+        *(u8 *)(arg1 + 0x1A) = D_82916B80[*(s16 *)(&D_8291A7C0 + 0x1068)].unk5;
+        func_80037120((u8 *)D_80094908 + 0xB4, (u8 *)D_80094908 + 0xA8, &sp30, &sp2E, &sp2C);
+        *(s16 *)(arg1 + 0x1C) = D_82916B80[*(s16 *)(&D_8291A7C0 + 0x1068)].unkE + sp2E;
+        *(s16 *)(arg1 + 0x1E) = D_82916B80[*(s16 *)(&D_8291A7C0 + 0x1068)].unk10 + sp2C;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
