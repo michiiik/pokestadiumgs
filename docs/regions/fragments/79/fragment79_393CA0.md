@@ -404,3 +404,23 @@ func_84138960: matched (state-field:pair-scan:result-before-base-gt-zero), 3 ite
 ## 2026-09-06
 
 func_8412BD3C: matched (bounded_lookup:guard-loop:no-pointer-local-ulong-offset), 5 iterations, agent codex
+
+## 2026-09-06
+
+func_8413C2C0: time cap at 0.8276 (raw 0.5517) after 2430s, mismatch instruction_drift; tried families: call-sequence; tie-pool no
+
+## 2026-09-06
+
+func_8412C870: matched (call-sequence:early-return:direct-index), 2 iterations, agent codex
+
+## 2026-09-06
+
+func_8412DC20: plateau at 0.0 (raw None), mismatch unknown; tried families: call-sequence; tie-pool no
+
+## 2026-09-06
+
+func_841306AC: plateau at 0.0 (raw None), mismatch unknown; tried families: call_sequence; tie-pool no
+
+## 2026-09-06
+
+TYPE CONFLICT: D_841951BF is extern u8 D_841951BC, D_841951BF, not extern u8 D_841951E6, D_841951BF
