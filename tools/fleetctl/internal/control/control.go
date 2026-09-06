@@ -1920,9 +1920,28 @@ func (l *Loop) buildDailySummaryBody() string {
 	return b.String()
 }
 
-// launchEligible walks the queue in order, launching every entry whose
-// agent is neither on cooldown nor at its per-agent concurrency cap, until
-// the global concurrency cap is reached. An ineligible entry is left in
+// isLowPriorityFallback reports whether (agent, model) is the queue's one
+// designated low-priority fallback: codex:gpt-5.6-luna. launchEligible
+// gives every other queued run a chance to launch first each pass -- luna
+// only fills whatever slots remain once every currently-eligible non-luna
+// partition has already been considered this pass (luna partitions vastly
+// outnumber every other provider in the queue, historically, and would
+// otherwise fill most/all open slots by sheer numerical majority rather
+// than any deliberate preference). Named once here, rather than the magic
+// string scattered through launchEligible, so the "fallback" identity is a
+// single edit if it ever changes.
+func isLowPriorityFallback(agent, model string) bool {
+	return agent == "codex" && model == "gpt-5.6-luna"
+}
+
+// launchEligible walks the queue in two passes -- every entry that is not
+// isLowPriorityFallback first (in their existing relative order), then
+// every isLowPriorityFallback entry (in their existing relative order) --
+// launching each one whose agent is neither on cooldown nor at its
+// per-agent concurrency cap, until the global concurrency cap is reached.
+// The two-pass split is recomputed fresh from l.State.Queue at the start
+// of every call -- there is no persistent priority ordering carried across
+// calls, just this one pass's walk order. An ineligible entry is left in
 // the queue (in place) rather than skipped permanently, so it is retried
 // on the next pass once capacity frees up.
 //
@@ -1934,10 +1953,11 @@ func (l *Loop) buildDailySummaryBody() string {
 // elsewhere has that owner dropped before it's ever considered for launch,
 // and a successful launch immediately reserves its own (possibly-just-
 // pruned) owners so a *later* entry in this same pass can't claim them
-// either. This is the launch-time backstop for reconcileQueue/
-// enqueuePermuterLane's own replan-time dedup -- see pruneClaimedOwners's
-// own comment for the real incident (two independent runs launched onto
-// the identical owner at once) this closes.
+// either (this now also means a non-luna entry wins a contested owner over
+// a luna one, per the priority split above). This is the launch-time
+// backstop for reconcileQueue/enqueuePermuterLane's own replan-time dedup
+// -- see pruneClaimedOwners's own comment for the real incident (two
+// independent runs launched onto the identical owner at once) this closes.
 func (l *Loop) launchEligible(ctx context.Context) error {
 	if len(l.State.Queue) == 0 {
 		return nil
@@ -1949,8 +1969,25 @@ func (l *Loop) launchEligible(ctx context.Context) error {
 	max := l.maxConcurrent()
 	claimed := l.runningOwners()
 
-	remaining := l.State.Queue[:0:0]
+	// Two-pass priority split (see isLowPriorityFallback): every non-luna
+	// entry, in original relative order, then every luna entry, in
+	// original relative order. This ordering is used both for the launch
+	// walk below and for remaining's rebuild, so an unlaunched queue keeps
+	// the same non-luna-first grouping into the next pass.
+	order := make([]string, 0, len(l.State.Queue))
+	var fallback []string
 	for _, id := range l.State.Queue {
+		rec := l.State.Runs[id]
+		if rec != nil && isLowPriorityFallback(rec.Spec.Agent, rec.Spec.Model) {
+			fallback = append(fallback, id)
+		} else {
+			order = append(order, id)
+		}
+	}
+	order = append(order, fallback...)
+
+	remaining := l.State.Queue[:0:0]
+	for _, id := range order {
 		rec := l.State.Runs[id]
 		if rec == nil {
 			continue

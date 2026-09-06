@@ -1517,6 +1517,134 @@ func TestLaunchEligibleDiscardsRunWhenAllOwnersAlreadyClaimed(t *testing.T) {
 	}
 }
 
+// --- agent-priority: codex:gpt-5.6-luna is a low-priority fallback ---------
+
+// TestLaunchEligibleNonLunaLaunchesBeforeLuna reproduces the live pattern
+// the priority split fixes: codex:gpt-5.6-luna partitions vastly outnumber
+// every other provider in the queue and, under plain FIFO order, fill most
+// of the fleet's concurrent slots by sheer numerical majority. With four
+// otherwise-eligible queued runs (two luna, two not) but only three open
+// slots, every non-luna run must launch before luna is given a slot, even
+// though a luna run is queued ahead of some of them.
+func TestLaunchEligibleNonLunaLaunchesBeforeLuna(t *testing.T) {
+	fake := &runner.Fake{}
+	loop, _ := newTestLoop(t, fake)
+	loop.MaxConcurrent = 3
+
+	loop.State.Runs["luna-a"] = &fleetstate.RunRecord{
+		Spec: fleetstate.RunSpec{ID: "luna-a", File: "disasm/src/a.c", Owners: []string{"f_a"}, Agent: "codex", Model: "gpt-5.6-luna"}, Status: fleetstate.StatusQueued,
+	}
+	loop.State.Runs["spark"] = &fleetstate.RunRecord{
+		Spec: fleetstate.RunSpec{ID: "spark", File: "disasm/src/b.c", Owners: []string{"f_b"}, Agent: "codex", Model: "gpt-5.3-codex-spark"}, Status: fleetstate.StatusQueued,
+	}
+	loop.State.Runs["luna-b"] = &fleetstate.RunRecord{
+		Spec: fleetstate.RunSpec{ID: "luna-b", File: "disasm/src/c.c", Owners: []string{"f_c"}, Agent: "codex", Model: "gpt-5.6-luna"}, Status: fleetstate.StatusQueued,
+	}
+	loop.State.Runs["claude"] = &fleetstate.RunRecord{
+		Spec: fleetstate.RunSpec{ID: "claude", File: "disasm/src/d.c", Owners: []string{"f_d"}, Agent: "claude", Model: "sonnet"}, Status: fleetstate.StatusQueued,
+	}
+	// Queue order deliberately puts both luna runs ahead of one of the
+	// non-luna runs, so a plain FIFO walk would let luna-a and luna-b both
+	// claim a slot before claude ever got a look.
+	loop.State.Queue = []string{"luna-a", "spark", "luna-b", "claude"}
+
+	if _, err := loop.RunOnce(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+
+	if loop.State.Runs["spark"].Status != fleetstate.StatusRunning {
+		t.Fatal("spark (non-luna) should have launched")
+	}
+	if loop.State.Runs["claude"].Status != fleetstate.StatusRunning {
+		t.Fatal("claude (non-luna) should have launched, ahead of luna despite queuing behind luna-b")
+	}
+	if loop.State.Runs["luna-a"].Status != fleetstate.StatusRunning {
+		t.Fatal("luna-a should have launched: it's luna's turn once every non-luna run got a slot, and one slot remained")
+	}
+	if loop.State.Runs["luna-b"].Status != fleetstate.StatusQueued {
+		t.Fatalf("luna-b should remain queued: only 3 slots and every non-luna run (2) plus luna-a already filled them, got %s",
+			loop.State.Runs["luna-b"].Status)
+	}
+	if loop.State.Runs["luna-b"].WaitReason != "concurrency" {
+		t.Fatalf("luna-b wait_reason = %q, want %q", loop.State.Runs["luna-b"].WaitReason, "concurrency")
+	}
+	if len(loop.State.Queue) != 1 || loop.State.Queue[0] != "luna-b" {
+		t.Fatalf("queue = %v, want [luna-b]", loop.State.Queue)
+	}
+}
+
+// TestLaunchEligibleLunaOnlyQueueStillLaunches checks that luna is only
+// deprioritized when something else is competing for the same slot -- a
+// queue made up entirely of luna partitions, with open capacity, launches
+// normally, exactly as before this change.
+func TestLaunchEligibleLunaOnlyQueueStillLaunches(t *testing.T) {
+	fake := &runner.Fake{}
+	loop, _ := newTestLoop(t, fake)
+	loop.MaxConcurrent = 4
+
+	loop.State.Runs["luna-a"] = &fleetstate.RunRecord{
+		Spec: fleetstate.RunSpec{ID: "luna-a", File: "disasm/src/a.c", Owners: []string{"f_a"}, Agent: "codex", Model: "gpt-5.6-luna"}, Status: fleetstate.StatusQueued,
+	}
+	loop.State.Runs["luna-b"] = &fleetstate.RunRecord{
+		Spec: fleetstate.RunSpec{ID: "luna-b", File: "disasm/src/b.c", Owners: []string{"f_b"}, Agent: "codex", Model: "gpt-5.6-luna"}, Status: fleetstate.StatusQueued,
+	}
+	loop.State.Queue = []string{"luna-a", "luna-b"}
+
+	if _, err := loop.RunOnce(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+
+	if loop.State.Runs["luna-a"].Status != fleetstate.StatusRunning {
+		t.Fatal("luna-a should have launched: no non-luna competition for the open slots")
+	}
+	if loop.State.Runs["luna-b"].Status != fleetstate.StatusRunning {
+		t.Fatal("luna-b should have launched: no non-luna competition for the open slots")
+	}
+	if len(loop.State.Queue) != 0 {
+		t.Fatalf("queue = %v, want empty", loop.State.Queue)
+	}
+}
+
+// TestLaunchEligibleNonLunaRelativeOrderPreserved checks that the two-pass
+// priority split does not further re-sort non-luna runs among themselves
+// beyond pulling luna to the back -- their own original queue order (FIFO)
+// still governs which of them launches first when capacity is scarce.
+func TestLaunchEligibleNonLunaRelativeOrderPreserved(t *testing.T) {
+	fake := &runner.Fake{}
+	loop, _ := newTestLoop(t, fake)
+	loop.MaxConcurrent = 2
+
+	loop.State.Runs["gemini"] = &fleetstate.RunRecord{
+		Spec: fleetstate.RunSpec{ID: "gemini", File: "disasm/src/a.c", Owners: []string{"f_a"}, Agent: "gemini", Model: "m"}, Status: fleetstate.StatusQueued,
+	}
+	loop.State.Runs["claude"] = &fleetstate.RunRecord{
+		Spec: fleetstate.RunSpec{ID: "claude", File: "disasm/src/b.c", Owners: []string{"f_b"}, Agent: "claude", Model: "sonnet"}, Status: fleetstate.StatusQueued,
+	}
+	loop.State.Runs["kimi"] = &fleetstate.RunRecord{
+		Spec: fleetstate.RunSpec{ID: "kimi", File: "disasm/src/c.c", Owners: []string{"f_c"}, Agent: "kimi", Model: "m"}, Status: fleetstate.StatusQueued,
+	}
+	// None of these are luna, so the priority split leaves this order
+	// untouched -- the first two in original queue order should launch.
+	loop.State.Queue = []string{"gemini", "claude", "kimi"}
+
+	if _, err := loop.RunOnce(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+
+	if loop.State.Runs["gemini"].Status != fleetstate.StatusRunning {
+		t.Fatal("gemini should have launched (first in queue order)")
+	}
+	if loop.State.Runs["claude"].Status != fleetstate.StatusRunning {
+		t.Fatal("claude should have launched (second in queue order)")
+	}
+	if loop.State.Runs["kimi"].Status != fleetstate.StatusQueued {
+		t.Fatalf("kimi should remain queued (third in queue order, capacity exhausted): got %s", loop.State.Runs["kimi"].Status)
+	}
+	if len(loop.State.Queue) != 1 || loop.State.Queue[0] != "kimi" {
+		t.Fatalf("queue = %v, want [kimi]", loop.State.Queue)
+	}
+}
+
 func TestRunningOwnersUsesMatchedOwnersNotSpecOwnersForPROpen(t *testing.T) {
 	loop, _ := newTestLoop(t, &runner.Fake{})
 	loop.State.Runs["x-p0"] = &fleetstate.RunRecord{
