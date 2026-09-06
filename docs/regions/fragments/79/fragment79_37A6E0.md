@@ -187,3 +187,24 @@ func_841112C8 is identical with D_841911E4.
 How to recognise the shape next time: a straight-line store ladder at a constant stride where a *prefix* of the stores uses folded literal offsets and the *remainder* switches to `addu` against a register holding `li N; sll k` is IDO's unroller. copt peels `trip % 4` remainder iterations first (folded, i = 0,1,2 -> offsets 8/0x10/0x18) and then emits one unrolled body of 4 with the induction variable still live (i == 3 -> `addiu $v0,$zero,3; sll $v1,$v0,3`, then `base + $v1 + {8,0x10,0x18,0x20}`). The live induction variable also pushes the two `%hi/%lo` base addresses up from $v0/$v1 to $a0/$a1, which is why the very first instruction mismatched.
 
 Dead ends already burned (do not repeat): unrolled straight-line stores with a literal index; `s32 offset = index << 3` hoisted to a local; `dst = &D_841911E0` / `src = D_84184144` pointer locals; `register` on the index; narrow index types (s16/u8/u16/unsigned/long); post-increment of the index between stores; struct-array overlays (these also lose the per-store reload of the pointer global). All of them fold to the same 26-instruction, 0.8125/0.125 object. -O1/-O0 are also excluded: they add an `addiu $sp` frame the target does not have.
+
+## Accepted owner: func_841125A4 (register tie closed) (2026-09-06)
+
+Closed the `register_allocation_only` tie recorded above (time cap at 1.0 / raw 0.95, family `loop`, tie-pool no). Winning family `loop:for:array-subscript-on-cast-base`:
+
+```c
+extern s32 D_84183D50;
+void func_841125A4(s32 arg0) {
+    s32 i;
+
+    for (i = 0; i < 7; i++) {
+        ((s32 *)(arg0 + 0x5C8))[i] = D_84183D50;
+    }
+}
+```
+
+Shape: IDO unrolls the 7-iteration constant-trip loop by 4, so the target assembly is a 3-store remainder prologue off `$a0` followed by `addiu $v0, $zero, 3` / `sll $t9, $v0, 2` / `addu $v1, $a0, $t9` and 4 more stores off `$v1`. The unrolled shape is not a hint to write the stores out by hand -- the plain loop produces it.
+
+The tie was **operand order on a commutative `addu`**, not a register-allocator coin flip. Every `(i * 4) + arg0 + 0x5C8` spelling emits `addu $v1, $t9, $a0` at instruction 7 where the target has `addu $v1, $a0, $t9` -- raw 0.95, normalized 1.0, `register_allocation_only`. Putting the base first fixes the operand order. The array-subscript spelling `((s32 *)(base))[i]` is the reliable way to get it: it makes the pointer base unambiguously the left operand. This is worth trying first on any future `register_allocation_only` tie whose first diff is an `addu`/`addiu` with swapped source registers.
+
+Provenance: the score-0 body came from a `tools/permute_candidate.py` pass already run in fleet run `fragment79_37A6E0-p0` (`tmp/permuter/func_841125A4_iter1_b1_permuter.log`, base score 385 -> 0 in 4.4s). It was never landed because every gate attempt in that run returned `gate_environment_broken`. Verified here with `tools/try_pragma_compare.py`: near-miss reproduced at similarity 1.0 / raw 0.95, first diff instruction 7 (expected `addu $v1, $a0, $t9`, actual `addu $v1, $t9, $a0`); winner accepted with `link_verified: true` and a full-ROM COMPARE=1 gate, MD5 1561c75d11cedf356a8ddb1a4a5f9d5d.

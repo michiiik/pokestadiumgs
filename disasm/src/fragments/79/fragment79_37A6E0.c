@@ -1302,7 +1302,14 @@ void func_8411259C(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_841125A4.s")
+extern s32 D_84183D50;
+void func_841125A4(s32 arg0) {
+    s32 i;
+
+    for (i = 0; i < 7; i++) {
+        ((s32 *)(arg0 + 0x5C8))[i] = D_84183D50;
+    }
+}
 #endif
 
 #ifdef VERSION_US
