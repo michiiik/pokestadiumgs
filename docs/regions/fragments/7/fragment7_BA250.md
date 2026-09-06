@@ -37,3 +37,35 @@ func_83007100: matched (call_sequence:abi-pointers:local-state), 2 iterations, a
 ## 2026-09-05
 
 func_83000F04: plateau at 0.9474 (raw 0.9474), mismatch instruction_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-06
+
+func_83000058: matched (constant-map:record-struct:reverse-compare), 4 iterations, agent codex
+
+## 2026-09-06
+
+func_830080AC: matched (call-chain:stack-layout:struct-pair), 1 iterations, agent codex
+
+## 2026-09-06
+
+func_8300A50C: plateau at 0.0 (raw None), mismatch unknown; tried families: call_chain; tie-pool no
+
+## 2026-09-06
+
+func_8300A208: plateau at 0.0 (raw None), mismatch unknown; tried families: call_chain; tie-pool no
+
+## 2026-09-06
+
+TYPE CONFLICT: func_800088DC is extern void func_800088DC(void), not extern void func_800088DC()
+
+## 2026-09-06
+
+TYPE CONFLICT: func_818017A8 is extern void func_818017A8(void), not extern void func_818017A8()
+
+## 2026-09-06
+
+TYPE CONFLICT: func_80008648 is extern void func_80008648(void), not extern void func_80008648()
+
+## 2026-09-06
+
+TYPE CONFLICT: StageLoader_WaitForRetrace is extern void StageLoader_WaitForRetrace(void), not extern void StageLoader_WaitForRetrace()
