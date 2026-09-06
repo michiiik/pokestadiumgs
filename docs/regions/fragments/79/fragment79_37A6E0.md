@@ -252,3 +252,19 @@ TYPE CONFLICT: func_800371B4 is extern void func_800371B4(u8 *, u8 *, f32, s16, 
 ## 2026-09-06
 
 func_8410EA58: time cap at 0.9365 (raw 0.4921) after 2418s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-06
+
+func_8411C8A0: time cap at 0.9818 (raw 0.8182) after 2400s, mismatch instruction_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-06
+
+func_84111EC4: time cap at 0.9483 (raw 0.6034) after 2410s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-06
+
+func_8411854C: matched (call_sequence:direct:u8-pointer), 3 iterations, agent codex
+
+## 2026-09-06
+
+TYPE CONFLICT: func_8411E164 is extern s32 func_8411E164(void *), not extern s32 func_8411E164()
