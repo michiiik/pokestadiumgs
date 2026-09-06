@@ -1495,7 +1495,23 @@ void func_8411281C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8411293C.s")
+extern void func_8003F018(void *);
+extern void func_8003F3BC(void *, u8);
+extern void func_8003F114(u8 *, s32, s16, s32);
+extern void func_8003F1DC(u8 *);
+extern void func_8003F2C4(s32, s32, s32);
+extern void func_8003F9AC(u8 *, s16, u16);
+extern u8 * D_84193DD0;
+void func_8411293C(u8 *arg0, u8 *arg1, s16 arg2) {
+    s32 index;
+    func_8003F018(arg1);
+    func_8003F1DC(arg1);
+    func_8003F114(arg1, arg2, *(s16 *)(arg0 + 0x658), **(s32 **)(*(s32 *)(*(s32 *)(arg0 + 0x5C0) + 0x38) + 8));
+    index = func_8411E1F8((s32)arg0);
+    func_8003F9AC(arg1, *(s16 *)(arg1 + 0x1A), *(u16 *)((u8 *)D_84193DD0 + (index << 4) + 0x14));
+    func_8003F2C4(*(void **)(arg0 + 0x5C0), arg1, *(u8 *)(*(u8 **)(arg0 + 0x2D4) + 0x139C));
+    func_8003F3BC(arg1, *(u8 *)(*(u8 **)(arg0 + 0x2D4) + 0x139D));
+}
 #endif
 
 #ifdef VERSION_US
