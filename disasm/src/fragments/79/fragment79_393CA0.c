@@ -3475,7 +3475,12 @@ void func_84136AF8(u8 arg0, s16 arg1, s16 arg2, u8 arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84136B60.s")
+void func_84136B60(void *arg0, u8 arg1, s16 arg2, u16 arg3) {
+    u8 *ptr = (u8 *)arg0 + arg1 * 6;
+    *(s16 *)(ptr + 0x5C) = arg2;
+    *(u16 *)(ptr + 0x60) = arg3;
+    *(u16 *)(ptr + 0x5E) = 1;
+}
 #endif
 
 #ifdef VERSION_US
