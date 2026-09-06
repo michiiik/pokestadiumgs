@@ -469,7 +469,26 @@ s32 func_826058CC(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_826063AC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82606548.s")
+typedef struct { s16 a; s16 b; } Pair16_6548;
+extern s16 D_82615504[];
+typedef struct {
+    s16 f0; s16 f2; u16 f4; s16 f6; s16 f8; s16 fA; s16 fC; s16 fE;
+    Pair16_6548 f10; Pair16_6548 f14; Pair16_6548 f18;
+    s16 f1C; s16 f1E; s16 f20; s16 f22; s16 f24; s16 f26;
+} Rec6548;
+void func_82606548(void *arg0, void *arg1) {
+    u8 *p = arg1;
+    *(s16 *)(p + 0x10) = 0;
+    *(u16 *)(p + 4) &= 0xFFFE;
+    *(s16 *)(p + 0x12) = -0x1E0;
+    *(Pair16_6548 *)(p + 0x18) = *(Pair16_6548 *)(p + 0x10);
+    *(s16 *)(p + 0x14) = 0;
+    *(s16 *)(p + 0x16) = 0;
+    *(s16 *)(p + 0x24) = 0x197;
+    *(s16 *)(p + 0x26) = D_82615504[*(s16 *)(p + 0)];
+    *(s16 *)(p + 0x14) = 0x74;
+    *(s16 *)(p + 0x16) = 0x4B;
+}
 
 extern s32 func_82604C98(s32, s32, s32, s32);
 
@@ -535,7 +554,17 @@ void func_82606784(u8*a0,s32 a1,s32 a2,s32 a3){if(*(s16*)(a0+6)==0){*(s16*)(a0+6
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82607528.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82607734.s")
+typedef struct { s16 a; s16 b; } Pair16_7734;
+void func_82607734(void *arg0, s32 arg1) {
+    u8 *p = arg0;
+    if (*(s16 *)(p + 6) == 2) {
+        *(s16 *)(p + 6) = 3;
+        *(s16 *)(p + 8) = 0;
+        *(Pair16_7734 *)(p + 0x1C) = *(Pair16_7734 *)(p + 0x14);
+        *(s16 *)(p + 0x20) = *(s16 *)(p + 0x14);
+        *(s16 *)(p + 0x22) = (s16)(((0x1E0 - *(s16 *)(p + 0x26)) / 2) - arg1);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82607790.s")
 
@@ -1270,7 +1299,31 @@ void func_82613764(void *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_826137B8.s")
+void func_826137B8(s16 *arg0) {
+    s32 found;
+    s32 i;
+    u8 *ptr;
+    s16 *entry;
+
+    found = 1;
+    i = 0;
+    if (arg0[0xC] > 0) {
+        ptr = (u8 *)arg0;
+        do {
+            entry = *(s16 **)(ptr + 0x34F4);
+            i++;
+            if (entry != NULL && entry[3] != 0) {
+                found = 0;
+                break;
+            }
+            ptr += 4;
+        } while (i < arg0[0xC]);
+    }
+    if (found != 0) {
+        arg0[1] = 0;
+        arg0[3] = 0;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82613814.s")
 
