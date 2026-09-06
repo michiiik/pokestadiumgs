@@ -379,7 +379,15 @@ void func_8290A0B0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290A358.s")
+typedef union { s32 word; s8 bytes[4]; } Func80041FA0State;
+extern s32 D_82912F10;
+extern void func_8003F1DC(void *);
+extern void func_80041FA0(s32, u16, Func80041FA0State);
+extern u8 D_8291A7C0;
+void func_8290A358(s32 arg0, u16 arg1) {
+    func_8003F1DC((u8 *)&D_8291A7C0 + arg0 * 0x1A4 + 4);
+    func_80041FA0(*(s32 *)((u8 *)&D_8291A7C0 + arg0 * 0x1A4), (u16)arg1, *(Func80041FA0State *)(&D_82912F10));
+}
 #endif
 
 #ifdef VERSION_US
