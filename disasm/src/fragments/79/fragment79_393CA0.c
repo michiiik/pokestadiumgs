@@ -2454,7 +2454,19 @@ void func_84133440(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84133924.s")
+extern u8 *D_8419520C[];
+extern void * D_841951F8[];
+extern u8 * D_84195208[];
+void func_84133924(u8 arg0) {
+    s32 offset;
+    offset = arg0 << 2;
+    offset = -offset;
+    D_84195208[arg0][0x26] = 0;
+    (*(u8 **)((u8 *)D_8419520C + offset))[0x26] = 0;
+    (*(u8 **)((u8 *)D_8419520C + offset))[0x27] = 0;
+    D_84195208[arg0][0x1B] = 0;
+    ((u8 *)D_841951F8[arg0])[1] = 0;
+}
 #endif
 
 #ifdef VERSION_US
