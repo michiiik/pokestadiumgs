@@ -757,7 +757,24 @@ void func_86109394(void) {
     func_87F0277C(D_8610AD20 + 0x8C40);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86109404.s")
+extern void func_800225C4(s32);
+extern void func_86109318(void);
+extern void func_86109394(void);
+extern s32 D_8610AD20;
+void func_86109404(void) {
+    func_86109318();
+    if (((u32)(*(u8 *)(D_8610AD20 + 0x97D9)) >> 7) != 0) {
+        func_86100418();
+    }
+    func_86109394();
+    *(s32 *)((u8 *)(u32)D_8610AD20 + 0x97B4) = *(s32 *)(D_8610AD20 + 0x97B4) - 1;
+    if (*(f32 *)(D_8610AD20 + 0x9774) == 0.0f) {
+        *(s32 *)(D_8610AD20 + 0x3C) = 5;
+        *(s32 *)(D_8610AD20 + 0x8F20) = 0;
+        func_800225C4(0x28);
+        func_861008E8();
+    }
+}
 
 extern void StageFade_StartFromTransparent(s32);
 extern void StageContext_SetClearColor(s32);
