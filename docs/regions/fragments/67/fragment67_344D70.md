@@ -31,3 +31,23 @@ func_80037120((u8 *)D_80094908 + 0xB4, (u8 *)D_80094908 + 0xA8, &sp30, &sp2E, &s
 ```
 
 `D_8291A7C0 + 0x1068` (the entry index, an `s16`) is deliberately left as raw byte arithmetic: the ROM materialises that address separately from the table base, so typing it as a struct is not required and was not probed.
+
+## 2026-09-07
+
+func_82908470: matched (state_field_access:guard:indexed-member), 1 iterations, agent codex
+
+## 2026-09-07
+
+func_82908520: plateau at 0.8621 (raw 0.7586), mismatch instruction_drift; tried families: bounded_lookup; tie-pool no
+
+## 2026-09-07
+
+func_82908594: matched (call_chain:pointer_walk:store-then-increment), 2 iterations, agent codex
+
+## 2026-09-07
+
+func_8290867C: plateau at 0.8621 (raw 0.7586), mismatch instruction_drift; tried families: bounded_lookup; tie-pool no
+
+## 2026-09-07
+
+func_82908B60: time cap at 0.9062 (raw 0.25) after 2408s, mismatch operand_or_scheduling_drift; tried families: state_field_access; tie-pool no
