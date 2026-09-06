@@ -718,7 +718,22 @@ void GbSave_RequirePakPresent(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005B1C4.s")
+extern s32 func_8005DB84(s32 arg0);
+extern u8 D_80128570[];
+s32 func_8005B1C4(s32 arg0, s32 arg1) {
+    s32 result = 0;
+    u32 state = (u32)func_8005DB84(arg0);
+    u8 *record = D_80128570 + arg0 * 112;
+    s32 base = *(s32 *)(record + 0x60);
+    s32 field = *(s32 *)(record + 0x64);
+    s32 product = arg1 * 0x462;
+    if ((s32)state > 0) {
+        if ((u32)(arg1 + 1) == state) result = base + 0xB40;
+        else if (arg1 < 6) result = field + product;
+        else result = field + product + 0x14;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
