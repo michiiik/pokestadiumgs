@@ -1954,7 +1954,7 @@ extern void func_841134A0(u8 *arg0);
 extern s32 D_84183D50;
 extern s32 D_841911F4;
 extern u8 * D_84193DD0;
-void func_84115FAC(u8 *arg0) {
+void BattleAnim_Dispatch_057(u8 *arg0) {
     *((u8 *) (((u8 *) arg0) + 0x618)) = (u8) (*((u8 *) (((u8 *) D_84193DD0) + 8)));
     *((s16 *) (((u8 *) arg0) + 0x7E8)) = 0;
     *((s8 *) (((u8 *) arg0) + 0x7F6)) = 5;
