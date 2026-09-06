@@ -208,3 +208,27 @@ Shape: IDO unrolls the 7-iteration constant-trip loop by 4, so the target assemb
 The tie was **operand order on a commutative `addu`**, not a register-allocator coin flip. Every `(i * 4) + arg0 + 0x5C8` spelling emits `addu $v1, $t9, $a0` at instruction 7 where the target has `addu $v1, $a0, $t9` -- raw 0.95, normalized 1.0, `register_allocation_only`. Putting the base first fixes the operand order. The array-subscript spelling `((s32 *)(base))[i]` is the reliable way to get it: it makes the pointer base unambiguously the left operand. This is worth trying first on any future `register_allocation_only` tie whose first diff is an `addu`/`addiu` with swapped source registers.
 
 Provenance: the score-0 body came from a `tools/permute_candidate.py` pass already run in fleet run `fragment79_37A6E0-p0` (`tmp/permuter/func_841125A4_iter1_b1_permuter.log`, base score 385 -> 0 in 4.4s). It was never landed because every gate attempt in that run returned `gate_environment_broken`. Verified here with `tools/try_pragma_compare.py`: near-miss reproduced at similarity 1.0 / raw 0.95, first diff instruction 7 (expected `addu $v1, $a0, $t9`, actual `addu $v1, $t9, $a0`); winner accepted with `link_verified: true` and a full-ROM COMPARE=1 gate, MD5 1561c75d11cedf356a8ddb1a4a5f9d5d.
+
+## 2026-09-06
+
+func_8410B104: matched (call_sequence:flag_guard:direct-fields), 1 iterations, agent codex
+
+## 2026-09-06
+
+func_84113590: time cap at 0.82 (raw 0.46) after 2407s, mismatch operand_or_scheduling_drift; tried families: call-sequence; tie-pool no
+
+## 2026-09-06
+
+func_84116EB4: matched (call_sequence:timer:s16-height:typed-call-forced-narrow), 3 iterations, agent codex
+
+## 2026-09-06
+
+func_84117880: matched (call_sequence:reload:direct-byte-expression), 1 iterations, agent codex
+
+## 2026-09-06
+
+func_84115A64: matched (call_sequence:init-guard:store-before-call), 1 iterations, agent codex
+
+## 2026-09-06
+
+func_8410F78C: time cap at 0.913 (raw 0.8913) after 2400s, mismatch instruction_drift; tried families: call_sequence; tie-pool no
