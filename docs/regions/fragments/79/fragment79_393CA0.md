@@ -284,3 +284,35 @@ func_8412B65C: plateau at 0.0 (raw None), mismatch unknown; tried families: call
 ## 2026-09-06
 
 TYPE CONFLICT: D_841951BF is extern u8 D_841951BF, not extern u8 D_841951E6, D_841951BF
+
+## 2026-09-06
+
+func_84131EAC: matched (call_chain:nested-if:u16-v0-s16-result), 4 iterations, agent claude
+
+## 2026-09-06
+
+func_8413888C: matched (bounded_lookup:guard-return:decl-init-ptr), 1 iterations, agent claude
+
+## 2026-09-06
+
+func_8413BE84: time cap at 1.0 (raw 1.0) after 2401s, mismatch section_layout_drift; tried families: dispatcher_switch; tie-pool no
+
+## 2026-09-06
+
+func_84125080: time cap at 0.8276 (raw 0.5172) after 2400s, mismatch operand_or_scheduling_drift; tried families: bounded_lookup; tie-pool no
+
+## 2026-09-06
+
+func_841265EC: matched (bounded_lookup:record-update:offset-first-direct-loads), 4 iterations, agent codex
+
+## 2026-09-06
+
+func_8412E94C: matched (bounded_lookup:direct-index:early-return), 1 iterations, agent codex
+
+## 2026-09-06
+
+func_84125B88: time cap at 0.7857 (raw 0.3929) after 2416s, mismatch operand_or_scheduling_drift; tried families: bounded_lookup; tie-pool no
+
+## 2026-09-06
+
+func_8413C0A4: time cap at 1.0 (raw 1.0) after 2400s, mismatch section_layout_drift; tried families: dispatcher-goto, dispatcher-if, dispatcher-if-chain, dispatcher-switch; tie-pool no
