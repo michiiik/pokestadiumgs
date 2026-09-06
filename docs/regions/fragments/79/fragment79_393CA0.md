@@ -368,3 +368,39 @@ func_84136678: plateau at 0.8947 (raw 0.7895), mismatch instruction_drift; tried
 ## func_84126FA0/func_84135808/func_84138D74: readiness is a false positive here (2026-09-06)
 
 tools/triage_investigations.py flags these three as section_layout_drift 'stale_past_fix' with jump_table_status 'ready', but this file has NO .rodata subsegment split covering their tables (jtbl_8418ADAC, jtbl_8418AFB0, jtbl_8418B0D8) -- the file's only .rodata line (0x3FA9E0, covering jtbl_8418B150/174/194) starts AFTER all three addresses. pragma_targets._jump_table_readiness reports 'ready' anyway because splat auto-migrates a single-owner jump table straight into its referencing function's own generated .s (a .late_rodata dlabel block) even with no yaml split at all -- readiness apparently doesn't check whether the table's address actually falls inside a declared .rodata subsegment window, just whether it CAN auto-migrate. Verified: each candidate's own object code is byte-exact in isolation (confirmed via objdump -dr against the oracle .s), but landing any of the three still breaks the full ROM -- once the table is pulled out of the file's 'data' subsegment (fragments/79/fragment79_data, 0x3D9A00-0x3FA9E0) into the now-C function's object, the data segment's generated content no longer accounts for the removed bytes and every subsequent absolute address in the ROM shifts (confirmed via cmp -l against baseroms/us/baserom.z64: a real, deterministic, non-zero byte diff cascading from a shifted lui/addiu immediate elsewhere in the ROM, not from these functions' own code). Needs an actual yaml fix -- extend the .rodata split to also start covering jtbl_8418ADAC (or add an earlier split line), verify alignment and that no other single-owner symbol between 0x3D9A00 and 0x8418B150 shares the same fate -- before any of these three can be replayed. Left as GLOBAL_ASM; do not replay their stored 1.0/1.0 candidates as-is.
+
+## 2026-09-06
+
+func_84130CE8: matched (call_chain:switch-do-while:u8-temp:break), 4 iterations, agent gemini
+
+## 2026-09-06
+
+func_84125C68: matched (state_field_access:guard-return:direct-index-s32), 1 iterations, agent gemini
+
+## 2026-09-06
+
+func_84135BDC: matched (init_sequence:direct-record-field:inline-lookup), 1 iterations, agent gemini
+
+## 2026-09-06
+
+func_841315C4: plateau at 0.0 (raw None), mismatch unknown; tried families: (none); tie-pool no
+
+## 2026-09-06
+
+TYPE CONFLICT: void is extern void(*D_84185EB0[])(void), not extern void func_84134CBC(u8, u8)
+
+## 2026-09-06
+
+func_84125508: matched (bounded_lookup:scale:output-reread-inline), 4 iterations, agent codex
+
+## 2026-09-06
+
+func_841255AC: matched (bounded_lookup:table-order:memory-result), 1 iterations, agent codex
+
+## 2026-09-06
+
+func_84138960: matched (state-field:pair-scan:result-before-base-gt-zero), 3 iterations, agent codex
+
+## 2026-09-06
+
+func_8412BD3C: matched (bounded_lookup:guard-loop:no-pointer-local-ulong-offset), 5 iterations, agent codex
