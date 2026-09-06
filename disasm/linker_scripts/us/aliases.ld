@@ -40,3 +40,4 @@ func_80040A9C = geo_layout_cmd_create_display_list_matrix;
 func_8412C870 = BattleAnim_Table_84185F10_029;
 func_8412DD0C = BattleAnim_Table_84185F10_048;
 func_84129D8C = BattleAnim_Table_84185F10_000;
+func_84130284 = BattleAnim_Table_84186004_053;

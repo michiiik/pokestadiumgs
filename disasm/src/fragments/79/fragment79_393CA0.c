@@ -2061,7 +2061,7 @@ extern void func_84136CA8(void);
 extern u8 D_841951BC;
 extern u8 * D_84195200[];
 extern u8 * D_84195208[];
-void func_84130284(void) {
+void BattleAnim_Table_84186004_053(void) {
     if (func_84125B88(D_841951BC, 0, 0) == 0 || (((u16 *)D_84195200[D_841951BC])[0x14] >> 1) >= ((u16 *)D_84195200[D_841951BC])[0x13]) {
         func_84126BFC(D_841951BC);
         return;
