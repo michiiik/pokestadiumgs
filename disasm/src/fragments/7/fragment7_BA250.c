@@ -23,7 +23,40 @@ void func_8300021C(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_830009D8.s")
+extern void func_8300021C(s32 arg0);
+void func_830009D8(s32 arg0, void *arg1, void *arg2) {
+    typedef struct {
+        void *ptr;
+        u8 status;
+        u8 pad5[3];
+    } SubState;
+    typedef struct {
+        u8 pad_00[0x3FB60];
+        u8 unk_3FB60[0x3B8];
+        SubState unk_3FF18;
+        SubState unk_3FF20;
+        s32 unk_3FF28;
+    } State;
+    State *state = (State *)(u32)arg0;
+    SubState *sp20;
+    s32 pad[5];
+
+    func_8300021C(arg0);
+    sp20 = &state->unk_3FF18;
+    func_83000274(sp20, arg1, state->unk_3FB60);
+    if (arg2 != NULL) {
+        func_83000274(&state->unk_3FF20, arg1, (u8 *)arg2 + 0x10);
+    }
+    func_8004C594(1, *(u16 *)((u8 *)arg1 + 0x38));
+    if (sp20->status != 0) {
+        state->unk_3FF28 = 2;
+    }
+    if (arg2 != NULL) {
+        if (state->unk_3FF20.status != 0) {
+            state->unk_3FF28 = 2;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
