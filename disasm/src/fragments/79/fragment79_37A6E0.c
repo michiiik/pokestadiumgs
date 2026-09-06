@@ -520,7 +520,7 @@ extern s32 D_84184148;
 extern u8 * D_841911E8;
 extern s32 D_841911EC;
 extern u8 * D_84193DD0;
-void func_8410F1A8(u8 *arg0, u8 *arg1) {
+void BattleAnim_ModelDispatch_127(u8 *arg0, u8 *arg1) {
     f32 sp3C[3];
     f32 sp30[3];
     f32 sp24[3];
