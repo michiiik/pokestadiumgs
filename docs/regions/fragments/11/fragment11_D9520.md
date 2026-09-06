@@ -17,3 +17,35 @@ tooling-blocked: Prepared and validated /private/tmp/gs45_func_81609344.json wit
 ## Coordinator replay after wave 45 (2026-09-02)
 
 Directly replayed /private/tmp/gs45_func_81609344.json without the host nice wrapper. callseq:s32:explicit-bounds was accepted and full-ROM-gated in the same transaction; baseline md5 1561c75d11cedf356a8ddb1a4a5f9d5d. The accepted owner is installed in fragment11_D9520.c. Other candidates were skipped after the acceptance.
+
+## 2026-09-07
+
+func_81607680: matched (state_field_access:guard_ternary:direct_return_void_ptr), 3 iterations, agent gemini
+
+## 2026-09-07
+
+func_8160771C: matched (state_field_access:guard_ternary:idiomatic_matched), 1 iterations, agent gemini
+
+## 2026-09-07
+
+func_816099E0: matched (call_chain:exact:match_void_ptr_temp), 1 iterations, agent gemini
+
+## 2026-09-07
+
+func_81606800: time cap at 0.9583 (raw 0.9167) after 2400s, mismatch operand_or_scheduling_drift; tried families: state_field_access; tie-pool no
+
+## 2026-09-07
+
+func_81601DE8: matched (constant-map:byte-params:corrected-independent-guards), 2 iterations, agent codex
+
+## 2026-09-07
+
+func_81608918: plateau at 0.96 (raw 0.78), mismatch operand_or_scheduling_drift; tried families: callchain; tie-pool no
+
+## 2026-09-07
+
+func_81609CB8: matched (callchain:reload-shifts:unsigned-right-final-byte), 2 iterations, agent codex
+
+## 2026-09-07
+
+func_81606694: time cap at 0.5604 (raw 0.1538) after 2409s, mismatch operand_or_scheduling_drift; tried families: state_field_access; tie-pool no
