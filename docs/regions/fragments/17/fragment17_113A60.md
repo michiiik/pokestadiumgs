@@ -33,3 +33,27 @@ accepted: func_822088FC. Nine distinct CC_CHECK=1 candidates were submitted thro
 ## Accepted owner: func_822071E8 (register tie closed) (2026-09-06)
 
 Closed a register_allocation_only tie (11 prior attempts at similarity >=0.99, no permuter attempt on record). tools/permute_candidate.py found a score-0 variant: inlining the 'index' local (used once) directly into the array-subscript expression instead of computing it as a separate assignment first. Verified with tools/fleet_probe.py --gate: accepted, link-verified, full-ROM COMPARE=1 gate MD5 1561c75d11cedf356a8ddb1a4a5f9d5d.
+
+## 2026-09-07
+
+func_8220AC38: plateau at 0.9167 (raw 0.75), mismatch operand_or_scheduling_drift; tried families: state-field; tie-pool no
+
+## 2026-09-07
+
+func_82205A14: matched (state-field:switch:cases-zero-one), 2 iterations, agent codex
+
+## 2026-09-07
+
+func_82206950: plateau at 0.9048 (raw 0.619), mismatch operand_or_scheduling_drift; tried families: state-field; tie-pool no
+
+## 2026-09-07
+
+func_8220A154: matched (call_chain:switch:typed-s32), 2 iterations, agent codex
+
+## 2026-09-07
+
+func_82205A8C: matched (state-field:nested-if:direct-offsets), 1 iterations, agent codex
+
+## 2026-09-07
+
+func_82206124: matched (state-field:early-return:switch-goto-done), 5 iterations, agent codex
