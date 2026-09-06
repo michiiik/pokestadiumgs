@@ -631,7 +631,17 @@ s32 func_8290B3E4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290B40C.s")
+extern u8 D_82913210[];
+extern s32 func_8290B3BC(void);
+extern u8 D_8291A7C0;
+s32 func_8290B40C(void) {
+    if (*(u16 *)((u8 *)D_82913210 + (*(u8 *)(&D_8291A7C0 + 0x1071) * 2) + (*(s16 *)(&D_8291A7C0 + 0x1068) * 0x22)) != 0) {
+        if (func_8290B3BC() == 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
