@@ -256,7 +256,17 @@ void func_8004BEEC(s32 arg0, s32 arg1, s16 arg2) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4C2E0/func_8004BF3C.s")
+extern s32 func_8004B754(s32 a);
+void func_8004BF3C(s32 arg0, s32 arg1, s32 arg2) {
+    s32 value = func_8004B754(arg1);
+    struct { FleetVec3s4C2E0 vec; s16 pad[3]; } storage;
+    if ((arg0 != 0) && (value >= 0)) {
+        Vec3s_FromVec3f(&storage.vec, (FleetVec3f4C2E0 *)(u32)arg2);
+        *((s32 *)((value * 0xC) + (u8 *)(u32)arg0 + 4)) =
+            ((((unsigned short)(storage.vec.x ^ 0)) << 22) |
+             ((storage.vec.y & 0xFFF) << 10)) | (storage.vec.z & 0x3FF);
+    }
+}
 
 void func_8004BFC4(s32 arg0, s32 arg1, s16 arg2) {
     s32 temp_v0;

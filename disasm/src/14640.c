@@ -62,7 +62,31 @@ void func_800142F8(s32 arg0, s32 arg1) { if (arg0 != 0xFF) { u8 *ptr = D_8011BE9
 
 void func_80014328(s32 arg0, s32 arg1) { if (arg0 != 0xFF) { u8 *ptr = D_8011BE90 + arg0; if (ptr[0x33C8] != 5) ptr[0x33C8] = arg1; } }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80014358.s")
+extern void func_80012ED8(s32);
+extern u8 D_8011BE90[];
+void func_80014358(s32 arg0, s32 arg1)
+{
+  int new_var2;
+  u8 *ptr;
+  s32 value;
+  u8 *new_var;
+  new_var2 = 5;
+  new_var = D_8011BE90 + arg0;
+  if (arg0 != 0xFF)
+  {
+    ptr = new_var;
+    value = ptr[0x3300];
+    if (0, value != new_var2)
+    {
+      ptr[0x3300] = arg1;
+      value = arg1 & 0xFF;
+    }
+    if ((value == new_var2) || (value == 2))
+    {
+      func_80012ED8(arg0);
+    }
+  }
+}
 
 void func_800143B8(s32 arg0, s32 arg1) { if (arg0 != 0xFF) { u8 *ptr = D_8011BE90 + arg0; if (ptr[0x3300] != 5) ptr[0x3300] = arg1; } }
 
