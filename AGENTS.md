@@ -587,12 +587,9 @@ reaches an agent through `tools/file_brief.py`, not here.
 
 ## 5. Tooling backlog and recurring unsolved shapes
 
-- Runner (fixed 2026-08-30): raw object comparison previously rejected exact
-  source spellings when equivalent symbol-plus-addend forms changed only
-  relocatable immediate fields. The runner now promotes same-topology,
-  recognized relocation-field-only differences to an unverified sequential
-  full-ROM gate. An audit found seven high-similarity owners worth replaying;
-  `relocation_masked` must never be treated as `link_verified`.
+Resolved historical entries (bug + fix, no remaining open caveat) have moved
+to `docs/AGENTS_CHANGELOG.md`; they are not deleted, just out of the way.
+
 - Runner: `probe_unavailable` / `list index out of range` also reproduces on
   `func_82C04880` (`fragment83_code.c`) — same last-owner diagnostics bug,
   now five recorded instances.
@@ -635,10 +632,6 @@ reaches an agent through `tools/file_brief.py`, not here.
   `probe_rejected` can still leave the winning candidate's bodies installed in
   the tracked source (observed with the `517E0.c` switch batch above); check
   `git diff` after a failed gate before re-probing the same owners.
-- Runner (fixed 2026-09-02): `companion_edits` now substitutes candidate
-  owners before applying same-file extern/prototype edits, so a stale callee
-  signature can be corrected in the same candidate transaction while the
-  no-add/remove-pragma guard remains active.
 - Build (2026-08-30): `make -C disasm COMPARE=1` fails in the host clang
   syntax check on committed, unmodified code
   (`fragments/44/fragment44_1F1850.c`: old-style definitions + a
