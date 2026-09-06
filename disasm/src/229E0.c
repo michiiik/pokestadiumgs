@@ -4657,7 +4657,8 @@ void geo_layout_cmd_27(void)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FC8C.s")
+extern s16 D_8012651A;
+void geo_layout_cmd_return(void) { s16 temp_v0; temp_v0 = D_8012651A - 1; D_8012651A = temp_v0; D_80126520 = D_80126458[temp_v0]; }
 #endif
 
 #ifdef VERSION_US
@@ -5045,7 +5046,12 @@ void geo_layout_cmd_create_anchor(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80040D9C.s")
+extern s16 D_80126518;
+void geo_layout_cmd_set_node_flag4(void) {
+    u8 *entry = (u8 *)D_80126498[D_80126518];
+    if (entry != 0) { entry[2] |= 4; }
+    D_80126520 += 4;
+}
 #endif
 
 #ifdef VERSION_US
