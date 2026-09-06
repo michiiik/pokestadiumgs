@@ -3312,7 +3312,36 @@ s32 func_8413882C(u8 arg0, u8 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8413888C.s")
+extern u8 * D_84195208[];
+s32 func_8413888C(u8 arg0) {
+    u8 *ptr = D_84195208[arg0];
+
+    if (ptr[5] == 0) {
+        return 0;
+    }
+    if ((ptr[9] & 0x3F) > 0) {
+        return 1;
+    }
+    if (ptr[6] == 0) {
+        return 0;
+    }
+    if ((ptr[0xA] & 0x3F) > 0) {
+        return 1;
+    }
+    if (ptr[7] == 0) {
+        return 0;
+    }
+    if ((ptr[0xB] & 0x3F) > 0) {
+        return 1;
+    }
+    if (ptr[8] == 0) {
+        return 0;
+    }
+    if ((ptr[0xC] & 0x3F) > 0) {
+        return 1;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
