@@ -8,7 +8,16 @@ extern Vtx *func_800398F8();
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80021DE0.s")
+extern unsigned char D_80090137[0x100];
+extern unsigned char D_800917F8[0x100];
+f32 func_80021DE0(s32 arg0) {
+    u8 value = D_80090137[arg0];
+    if (value >= 0x80) {
+        value = D_800917F8[value & 0x7F];
+        value = (u32)(f32)value;
+    }
+    return (f32)value / 127.0f;
+}
 #endif
 
 #ifdef VERSION_US
@@ -970,7 +979,16 @@ u8 GbAudio_GetRegisterValue(char arg0)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80032E40.s")
+extern u8 D_800D2B78;
+void func_80032E40(u8 arg0) {
+    u8 *p = &D_800D2B78 + (arg0 * 3 * 4 * 5);
+    *(u16 *)(p + 0) = 0; p[2] = 0; p[3] = 0; p[4] = 0; p[5] = 0;
+    *(s32 *)(p + 8) = 0; *(s32 *)(p + 12) = 0; *(s32 *)(p + 16) = 0;
+    p[20] = 0; p[21] = 0; p[22] = 0; p[23] = 0; *(u16 *)(p + 24) = 0;
+    p[26] = 0; p[27] = 0; p[28] = 0; p[29] = 0; p[30] = 0; p[31] = 0; p[32] = 0; *(u16 *)(p + 34) = 0;
+    p[36] = 0; p[37] = 0; p[38] = 0; p[39] = 0; p[40] = 0; p[41] = 0; p[42] = 0; p[43] = 0; p[44] = 0; p[45] = 0; p[46] = 0; p[47] = 0;
+    *(u16 *)(p + 48) = 0; p[50] = 0; p[51] = 0; p[52] = 0; p[53] = 0; p[54] = 0; p[55] = 0; p[56] = 0; p[57] = 0;
+}
 #endif
 
 #ifdef VERSION_US
