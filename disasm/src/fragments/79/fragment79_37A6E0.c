@@ -2215,7 +2215,11 @@ void BattleAnim_Dispatch_114(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_84116EB4.s")
+extern void func_84116B40(u8 *, s16);
+extern void func_841120AC(u8 *arg0, s32 arg1, s32 arg2);
+extern void func_84112158(s32 arg0, s32 arg1);
+extern u8 * D_84193DD0;
+void func_84116EB4(u8 *arg0) { s16 height; s32 timer; if (*(s8 *)(arg0 + 0x619) <= 0) timer = *(s8 *)(arg0 + 0x619) - 1; func_84112158(arg0, 0xFE); height = *(s16 *)(*(u8 **)(arg0 + 0x44) + 0xA); if (timer < 0) func_841120AC(arg0, 0xFB, -timer); else func_841120AC(arg0, 0xFB, *(s16 *)(arg0 + 0x7E8)); if (height < 0x50) height = 0x50; if ((D_84193DD0[9] & 7) == 2 || (D_84193DD0[9] & 7) == 5) height = (s16)0x3C; func_84116B40(arg0, height); }
 #endif
 
 #ifdef VERSION_US
