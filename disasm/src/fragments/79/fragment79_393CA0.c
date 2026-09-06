@@ -521,7 +521,15 @@ void func_841265D4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841265EC.s")
+extern u16 D_841951CC, D_841951CE;
+extern u8 D_841951D0;
+extern u8 D_841951BC;
+extern s8 D_841951C2;
+extern s32 D_841951C8;
+extern void * D_841951F8[];
+extern u8 * D_84195200[];
+extern u8 * D_84195208[];
+void func_841265EC(void) { s32 offset = D_841951BC * 4; u8 *src = *(u8 **)((u8 *)D_84195208 + offset); D_841951C8 = 0; D_841951CC = *(u16 *)(src + 0x3C); D_841951CE = *(u16 *)(src + 0x3E); if (((u8 *)*(void **)((u8 *)D_841951F8 + offset))[0xB] & 0x10) D_841951CE = D_841951CE << 1; if (D_841951CC >= 0x100 || D_841951CE >= 0x100) { D_841951CC >>= 2; if (!D_841951CC) D_841951CC = 1; D_841951CE >>= 2; if (!D_841951CE) D_841951CE = 1; } D_841951C2 = 0x28; D_841951D0 = (*(u8 **)((u8 *)D_84195200 + offset))[0x1D]; }
 #endif
 
 #ifdef VERSION_US
