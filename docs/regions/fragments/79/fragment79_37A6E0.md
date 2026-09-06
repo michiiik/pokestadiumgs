@@ -312,3 +312,11 @@ func_8410CF80: plateau at 0.0 (raw None), mismatch unknown; tried families: (non
 ## 2026-09-07
 
 TYPE CONFLICT: func_80037120 is extern void func_80037120(), not extern void func_80037120(s32, s32, s32 *, s16 *, s16 *)
+
+## 2026-09-07
+
+func_8411388C: matched (call_sequence:combined-guard:direct-short-circuit), 2 iterations, agent codex
+
+## 2026-09-07
+
+func_8411DA4C: plateau at 0.0 (raw None), mismatch unknown; tried families: call_sequence; tie-pool no

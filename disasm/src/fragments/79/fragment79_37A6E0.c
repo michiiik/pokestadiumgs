@@ -1680,7 +1680,10 @@ void func_841137F8(u8 *arg0) { if ((*(s16 *)(arg0 + 0x7E8) % 0xC8) == 0) { func_
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8411388C.s")
+extern void func_84111D64(u8 *, s32);
+extern void func_84111DB4(u8 *arg0, s32 arg1);
+extern void func_84111E80(void *arg0, s16 arg1);
+void func_8411388C(u8 *arg0) { if ((*(s16 *)(arg0 + 0x7E8) % 0xC8) == 0) { func_84111E50(arg0, (*(u8 **)(arg0 + 0x2D4))[0x1479]); func_84111E80(arg0, 0); } if (ModelAnim_IsFinished(arg0) != 0 || *(s16 *)(arg0 + 0x40) != (*(u8 **)(arg0 + 0x2D4))[0x1478]) { func_84111D64(arg0, (*(u8 **)(arg0 + 0x2D4))[0x1478]); func_84111DB4(arg0, 0); } }
 #endif
 
 #ifdef VERSION_US
