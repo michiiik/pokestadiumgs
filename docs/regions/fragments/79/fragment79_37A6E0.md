@@ -320,3 +320,27 @@ func_8411388C: matched (call_sequence:combined-guard:direct-short-circuit), 2 it
 ## 2026-09-07
 
 func_8411DA4C: plateau at 0.0 (raw None), mismatch unknown; tried families: call_sequence; tie-pool no
+
+## 2026-09-07
+
+func_8410F1A8: matched (call_sequence:three_vectors:f32_arrays), 3 iterations, agent gemini
+
+## 2026-09-07
+
+func_8410CD3C: time cap at 0.9586 (raw 0.4966) after 2405s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-07
+
+func_84117E94: plateau at 0.0 (raw None), mismatch unknown; tried families: (none); tie-pool no
+
+## 2026-09-07
+
+func_8410F3E8: time cap at 0.6836 (raw 0.209) after 2400s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-07
+
+func_841114A8: plateau at 0.7263 (raw 0.2682), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-07
+
+func_8410ED98: plateau at 0.0 (raw None), mismatch unknown; tried families: call_sequence; tie-pool no
