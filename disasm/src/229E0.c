@@ -4963,7 +4963,7 @@ void geo_layout_cmd_create_model_part(void) {
 
 #ifdef VERSION_US
 extern void func_8003FD34(void *);
-void func_80040A9C(void) {
+void geo_layout_cmd_create_display_list_matrix(void) {
     S1_Vec3f sp34;
     S1_Vec3s sp2C;
     void *node;

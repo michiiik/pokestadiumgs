@@ -36,3 +36,4 @@ func_8412EFFC = BattleAnim_Table_84186004_005;
 func_8003ABFC = Geo_NodeClearDepth;
 func_861098CC = fragment49_main;
 func_84130CE8 = BattleAnim_Table_84186004_072;
+func_80040A9C = geo_layout_cmd_create_display_list_matrix;
