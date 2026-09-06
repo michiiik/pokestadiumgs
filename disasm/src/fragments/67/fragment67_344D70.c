@@ -62,7 +62,15 @@ s32 func_82908370(s32 arg0, u8 *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_82908470.s")
+extern u8 D_8291A7C0;
+s32 func_82908470(s32 arg0, u8 *arg1) {
+    if (arg0 == 2) {
+        *(u8 *)(arg1 + 0x18) = D_82916B80[*(s16 *)(&D_8291A7C0 + 0x1068)].unk6[0];
+        *(u8 *)(arg1 + 0x19) = D_82916B80[*(s16 *)(&D_8291A7C0 + 0x1068)].unk6[1];
+        *(u8 *)(arg1 + 0x1A) = D_82916B80[*(s16 *)(&D_8291A7C0 + 0x1068)].unk6[2];
+    }
+    return 0;
+}
 #endif
 
 void func_829084DC(void) {
