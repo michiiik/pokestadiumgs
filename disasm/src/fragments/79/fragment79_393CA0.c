@@ -1299,7 +1299,7 @@ extern void func_84125424(s32);
 extern u8 D_841951BC;
 extern void * D_841951F8[];
 extern u8 * D_84195208[];
-void func_8412C870(void) {
+void BattleAnim_Table_84185F10_029(void) {
     if ((D_84195208[D_841951BC][0xF] & 2) == 0) {
         return;
     }
