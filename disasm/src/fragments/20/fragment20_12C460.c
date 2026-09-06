@@ -1299,7 +1299,31 @@ void func_82613764(void *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_826137B8.s")
+void func_826137B8(s16 *arg0) {
+    s32 found;
+    s32 i;
+    u8 *ptr;
+    s16 *entry;
+
+    found = 1;
+    i = 0;
+    if (arg0[0xC] > 0) {
+        ptr = (u8 *)arg0;
+        do {
+            entry = *(s16 **)(ptr + 0x34F4);
+            i++;
+            if (entry != NULL && entry[3] != 0) {
+                found = 0;
+                break;
+            }
+            ptr += 4;
+        } while (i < arg0[0xC]);
+    }
+    if (found != 0) {
+        arg0[1] = 0;
+        arg0[3] = 0;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82613814.s")
 
