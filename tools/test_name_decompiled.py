@@ -144,11 +144,12 @@ class FixtureTestCase(unittest.TestCase):
         return nd.build_plan(repo_root=self.tmp, names_files=[str(self.names_path)],
                               src_dir=self.src_dir, symtab_path=self.symtab_path)
 
-    def apply(self, rows, dry_run=False):
+    def apply(self, rows, dry_run=False, hard_rename=False):
         return nd.apply_plan(rows, repo_root=self.tmp, src_dir=self.src_dir,
                               include_dir=self.include_dir, symtab_path=self.symtab_path,
                               asm_root=self.asm_root, renames_log=self.renames_log,
-                              dry_run=dry_run)
+                              aliases_ld_path=self.aliases_ld_path,
+                              dry_run=dry_run, hard_rename=hard_rename)
 
 
 class PlanTests(FixtureTestCase):
@@ -193,19 +194,60 @@ class ApplyTests(FixtureTestCase):
         self.assertFalse(self.renames_log.exists())
         self.assertTrue(result.applied)  # still reports what *would* apply
 
-    def test_symtab_rewrite_and_redundant_comment_dropped(self):
+    def test_default_leaves_symtab_untouched(self):
+        # Safe by default (PR #58/#59 convention, see the module docstring):
+        # the address-keyed entry must never be rewritten in place, or a
+        # stale reference to the old name (another checkout, a container's
+        # pre-extracted asm tree, ...) loses its definition entirely.
         plan = self.build_plan()
         rows = [r for r in plan.rows if r.old == "func_80004000"]
-        self.apply(rows)
+        before = self.symtab_path.read_text()
+        result = self.apply(rows)
+        self.assertEqual(self.symtab_path.read_text(), before)
+        self.assertEqual(result.symtab_lines_changed, 0)
+
+    def test_default_appends_compatibility_alias(self):
+        plan = self.build_plan()
+        rows = [r for r in plan.rows if r.old == "func_80002222"]
+        result = self.apply(rows)
+        self.assertEqual(result.aliases_added, [("func_80002222", "RealName")])
+        text = self.aliases_ld_path.read_text()
+        self.assertIn("func_80002222 = RealName;\n", text)
+
+    def test_append_alias_lines_skips_exact_duplicate(self):
+        # Unit-level: _append_alias_lines is the piece apply_plan's safe
+        # mode calls after its own linker-script rewrite step, so this
+        # exercises its dedup directly rather than through the whole-word
+        # rewrite (which would otherwise touch a pre-seeded `old = new;`
+        # line the same way it touches any other `old`-shaped reference).
+        self.aliases_ld_path.write_text(
+            self.aliases_ld_path.read_text() + "func_80002222 = RealName;\n", encoding="utf-8"
+        )
+        added = nd._append_alias_lines([("func_80002222", "RealName")], self.aliases_ld_path)
+        self.assertEqual(added, [])
+        text = self.aliases_ld_path.read_text()
+        self.assertEqual(text.count("func_80002222 = RealName;"), 1)
+
+    def test_append_alias_lines_adds_new_pair(self):
+        added = nd._append_alias_lines([("func_80002222", "RealName")], self.aliases_ld_path)
+        self.assertEqual(added, [("func_80002222", "RealName")])
+        self.assertIn("func_80002222 = RealName;\n", self.aliases_ld_path.read_text())
+
+    def test_hard_rename_opt_out_rewrites_symtab_and_skips_alias(self):
+        plan = self.build_plan()
+        rows = [r for r in plan.rows if r.old == "func_80004000"]
+        result = self.apply(rows, hard_rename=True)
         text = self.symtab_path.read_text()
         self.assertIn("Foo4000 = 0x80004000; // type:func\n", text)
         self.assertNotIn("Foo4000 = 0x80004000; // type:func Foo4000", text)
         self.assertNotIn("func_80004000", text)
+        self.assertEqual(result.aliases_added, [])
+        self.assertNotIn("func_80004000", self.aliases_ld_path.read_text())
 
-    def test_symtab_rewrite_keeps_bare_type_func_tag(self):
+    def test_hard_rename_keeps_bare_type_func_tag(self):
         plan = self.build_plan()
         rows = [r for r in plan.rows if r.old == "func_80002222"]
-        self.apply(rows)
+        self.apply(rows, hard_rename=True)
         text = self.symtab_path.read_text()
         self.assertIn("RealName = 0x80002222; // type:func\n", text)
 
@@ -302,13 +344,17 @@ class LinkerScriptTests(FixtureTestCase):
     def test_self_alias_removed_after_rename(self):
         # ALIASES_LD's `RealName = func_80002222;` becomes
         # `RealName = RealName;` once func_80002222 is renamed to RealName --
-        # a self-alias, which must be dropped.
+        # a self-alias, which must be dropped. The safe-mode compatibility
+        # alias `func_80002222 = RealName;` this apply() call also appends
+        # (see test_default_appends_compatibility_alias) is the ONLY
+        # remaining `func_80002222` reference left in the file.
         plan = self.build_plan()
         rows = [r for r in plan.rows if r.old == "func_80002222"]
         result = self.apply(rows)
         text = self.aliases_ld_path.read_text()
         self.assertNotIn("RealName = RealName;", text)
-        self.assertNotIn("func_80002222", text)
+        self.assertIn("func_80002222 = RealName;", text)
+        self.assertEqual(text.count("func_80002222"), 1)
         removed = [(old, new) for old, new, _line in result.removed_aliases]
         self.assertIn(("func_80002222", "RealName"), removed)
 
@@ -325,13 +371,16 @@ class LinkerScriptTests(FixtureTestCase):
         # `some_symbol = func_80002222 + 4;` is not a bare alias line (there
         # is a `+ 4` between the RHS identifier and the semicolon), so it is
         # whole-word rewritten like any other linker-script reference, not
-        # treated as an alias to drop.
+        # treated as an alias to drop. The safe-mode compatibility alias
+        # `func_80002222 = RealName;` this apply() call also appends is the
+        # only remaining `func_80002222` reference.
         plan = self.build_plan()
         rows = [r for r in plan.rows if r.old == "func_80002222"]
         self.apply(rows)
         text = self.aliases_ld_path.read_text()
         self.assertIn("some_symbol = RealName + 4;", text)
-        self.assertNotIn("func_80002222", text)
+        self.assertIn("func_80002222 = RealName;", text)
+        self.assertEqual(text.count("func_80002222"), 1)
 
     def test_removed_alias_logged_in_renames_jsonl(self):
         plan = self.build_plan()
@@ -401,10 +450,17 @@ class HookTests(FixtureTestCase):
         # name_after_accept uses default paths under repo_root, matching the
         # fixture layout (disasm/src, disasm/include, disasm/linker_scripts/us).
         self.assertEqual(renamed, [("func_80002222", "RealName")])
-        text = self.symtab_path.read_text() if False else (
+        # apply_plan is safe by default: the symtab entry stays untouched
+        # (still func_80002222), and the compatibility alias is what
+        # actually carries the rename for the linker's purposes.
+        symtab_text = (
             self.tmp / "disasm" / "linker_scripts" / "us" / "symbol_addrs_code.txt"
         ).read_text()
-        self.assertIn("RealName = 0x80002222", text)
+        self.assertIn("func_80002222 = 0x80002222", symtab_text)
+        aliases_text = (
+            self.tmp / "disasm" / "linker_scripts" / "us" / "aliases.ld"
+        ).read_text()
+        self.assertIn("func_80002222 = RealName;", aliases_text)
 
     def test_name_after_accept_no_match_returns_empty(self):
         renamed = nd.name_after_accept(

@@ -1259,16 +1259,21 @@ def merge(
                     print(f"container_merge: naming {row.function}: {detail}", file=sys.stderr)
                 continue
 
-            # `tools/name_decompiled.py apply` also rewrote disasm/linker_scripts
-            # in this working tree: row.function's own entry in
-            # symbol_addrs_code.txt, and possibly other .ld/.txt files that
-            # named it. Discard all of that except aliases.ld (apply's own
-            # rewrite of *it* is worth keeping -- e.g. an existing alias whose
-            # RHS named row.function now correctly points at new_name
-            # instead): a matched/decompiled owner's symtab entry is never fed
-            # to the linker, so committing its rename there is pointless, and
-            # leaving it uncommitted (the naming commit below only ever
-            # touches disasm/src/disasm/include) is exactly what broke every
+            # Defense in depth: `tools/name_decompiled.py apply` is now safe
+            # by default (it never rewrites symbol_addrs_code.txt's
+            # address-keyed entry, and appends the compatibility alias
+            # itself -- see its module docstring), so this revert/re-append
+            # is normally a no-op. Kept anyway in case `apply` was ever
+            # invoked with its `--hard-rename` opt-out: row.function's own
+            # entry in symbol_addrs_code.txt, and possibly other .ld/.txt
+            # files that named it, would then need discarding (except
+            # aliases.ld -- its own rewrite is worth keeping, e.g. an
+            # existing alias whose RHS named row.function now correctly
+            # points at new_name instead): a matched/decompiled owner's
+            # symtab entry is never fed to the linker, so committing its
+            # rename there is pointless, and leaving it uncommitted (the
+            # naming commit below only ever touches
+            # disasm/src/disasm/include) is exactly what broke every
             # container launch on 2026-09-02 -- a container's pre-extracted
             # asm tree still calls row.function by its old name, and the
             # overlay copies disasm/linker_scripts verbatim.

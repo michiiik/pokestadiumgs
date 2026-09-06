@@ -40,6 +40,24 @@ owners: `name_after_accept(functions) -> list[(old, new)]`.  See
 counts as `plan`, but against a committed git revision (like
 `update_coverage.py`'s `committed_counts`) rather than the working tree, so a
 future coverage report can fold it in without racing concurrent MCP edits.
+
+Safe by default (the PR #58/#59 convention): `apply` never hard-renames the
+address-keyed entry in `disasm/linker_scripts/us/symbol_addrs_code.txt`.
+Renaming that entry in place breaks the link for anything -- another
+checkout, a container's pre-extracted asm tree, another translation unit's
+still-`GLOBAL_ASM` stub -- that still references the old name by a
+hard-coded relocation until it is regenerated; that is exactly what broke a
+real container link (`undefined reference to 'func_84115E28'`) when a hard
+rename landed with no compatibility alias. So by default `apply` leaves the
+symtab entry untouched and appends a `<old> = <new>;` compatibility alias to
+`disasm/linker_scripts/us/aliases.ld` instead -- the same fix
+`tools/container_merge.py`'s `merge()` applies by hand (see its
+`append_name_alias`). `tools/check_alias_rename.py`'s pre-commit hook
+enforces this convention at commit time for any tool (or hand edit) that
+still manages to bypass it. Pass `apply --hard-rename` (or
+`apply_plan(..., hard_rename=True)`) to actually rewrite the symtab entry
+too -- only for a caller who has confirmed nothing else can still reference
+the old name, and who will add any needed alias itself.
 """
 from __future__ import annotations
 
@@ -93,6 +111,7 @@ def _default_paths(repo_root: Path):
         "linker_scripts_root": disasm / "linker_scripts",
         "asm_root": disasm / "asm" / "us",
         "renames_log": disasm / "probe-stats" / "renames.jsonl",
+        "aliases_ld_path": disasm / "linker_scripts" / "us" / "aliases.ld",
     }
 
 
@@ -362,6 +381,44 @@ def _rewrite_linker_scripts(paths, mapping, reverse_mapping):
     return changed, total, removed
 
 
+def _append_alias_lines(pairs, aliases_ld_path: Path) -> list:
+    """Append `"<old> = <new>;"` to `aliases_ld_path` for every (old, new) in
+    `pairs` not already present there verbatim -- the PR #58/#59 compatibility
+    convention `tools/container_merge.py`'s own `append_name_alias` applies by
+    hand; this is the same fix, done here so `apply`'s default (safe) mode
+    never has to rely on a caller remembering to do it separately. Returns the
+    subset of `pairs` actually appended (skips exact duplicates). Never raises
+    -- an unreadable/unwritable aliases.ld is reported as nothing appended,
+    same as `append_name_alias`.
+    """
+    if not pairs:
+        return []
+    try:
+        existing = aliases_ld_path.read_text(encoding="utf-8") if aliases_ld_path.exists() else ""
+    except OSError:
+        return []
+    existing_lines = {line.strip() for line in existing.splitlines()}
+    to_add = []
+    for old, new in pairs:
+        line = f"{old} = {new};"
+        if line in existing_lines:
+            continue
+        existing_lines.add(line)
+        to_add.append((old, new, line))
+    if not to_add:
+        return []
+    try:
+        aliases_ld_path.parent.mkdir(parents=True, exist_ok=True)
+        with aliases_ld_path.open("a", encoding="utf-8") as fh:
+            if existing and not existing.endswith("\n"):
+                fh.write("\n")
+            for _old, _new, line in to_add:
+                fh.write(line + "\n")
+    except OSError:
+        return []
+    return [(old, new) for old, new, _line in to_add]
+
+
 IDENT_RE = re.compile(r"[A-Za-z_]\w*")
 
 
@@ -459,6 +516,7 @@ class ApplyResult:
     linker_files_changed: int = 0
     linker_replacements: int = 0
     removed_aliases: list = field(default_factory=list)  # [(old, new, line_text)]
+    aliases_added: list = field(default_factory=list)     # [(old, new)]
 
 
 def _rewrite_symtab_line(line: str, old: str, new: str):
@@ -495,7 +553,16 @@ def _rewrite_files(paths, mapping):
 
 def apply_plan(rows, *, repo_root: Path = ROOT, src_dir=None, include_dir=None,
                 symtab_path=None, asm_root=None, linker_scripts_root=None,
-                renames_log=None, dry_run=False) -> ApplyResult:
+                aliases_ld_path=None, renames_log=None, dry_run=False,
+                hard_rename: bool = False) -> ApplyResult:
+    """Apply `rows` (from `build_plan`). Safe by default (`hard_rename=False`,
+    see the module docstring): the symtab entry for each `row.old` is left
+    completely unchanged, and a `<old> = <new>;` compatibility alias is
+    appended to `aliases_ld_path` instead. Pass `hard_rename=True` to rewrite
+    `symtab_path`'s address-keyed entry in place instead (the pre-#58/#59
+    behavior) -- only when the caller has confirmed nothing else can still
+    reference the old name, and will add any needed alias itself.
+    """
     repo_root = Path(repo_root)
     defaults = _default_paths(repo_root)
     src_dir = Path(src_dir) if src_dir else defaults["src_dir"]
@@ -504,6 +571,8 @@ def apply_plan(rows, *, repo_root: Path = ROOT, src_dir=None, include_dir=None,
     linker_us_dir = symtab_path.parent
     linker_scripts_root = (Path(linker_scripts_root) if linker_scripts_root
                             else defaults["linker_scripts_root"])
+    aliases_ld_path = (Path(aliases_ld_path) if aliases_ld_path
+                        else defaults["aliases_ld_path"])
     asm_root = Path(asm_root) if asm_root else defaults["asm_root"]
     renames_log = Path(renames_log) if renames_log else defaults["renames_log"]
 
@@ -547,8 +616,12 @@ def apply_plan(rows, *, repo_root: Path = ROOT, src_dir=None, include_dir=None,
         result.applied = [(r.old, r.new) for r in accepted]
         return result
 
-    # 1. symbol_addrs_code.txt
-    if symtab_path.exists():
+    # 1. symbol_addrs_code.txt -- skipped entirely unless hard_rename: see
+    #    the module docstring and apply_plan's own docstring for why a hard
+    #    rename here is the dangerous shape (PR #58/#59). The compatibility
+    #    alias appended below (step 4.5) is what keeps `row.old` resolvable
+    #    instead.
+    if hard_rename and symtab_path.exists():
         lines = symtab_path.read_text(encoding="utf-8", errors="replace").splitlines(keepends=True)
         out_lines = []
         changed = 0
@@ -590,6 +663,19 @@ def apply_plan(rows, *, repo_root: Path = ROOT, src_dir=None, include_dir=None,
     for old, _new, line_text in result.removed_aliases:
         removed_aliases_by_old[old].append(line_text)
 
+    # 4.5. Safe-mode compatibility alias: append `<old> = <new>;` to
+    # aliases_ld_path for every accepted rename, unless hard_rename asked for
+    # the legacy in-place symtab rewrite instead (see step 1's comment). Done
+    # AFTER step 4's whole-word linker-script rewrite so this freshly
+    # appended line is never itself caught by that rewrite's own `old ->
+    # new` substitution.
+    if not hard_rename:
+        added = _append_alias_lines([(r.old, r.new) for r in accepted], aliases_ld_path)
+        result.aliases_added = added
+        added_set = set(added)
+    else:
+        added_set = set()
+
     # Log.
     renames_log.parent.mkdir(parents=True, exist_ok=True)
     now = datetime.datetime.now(datetime.timezone.utc).isoformat()
@@ -598,6 +684,8 @@ def apply_plan(rows, *, repo_root: Path = ROOT, src_dir=None, include_dir=None,
             fh.write(json.dumps({
                 "old": r.old, "new": r.new, "evidence": r.evidence,
                 "removed_aliases": removed_aliases_by_old.get(r.old, []),
+                "hard_rename": hard_rename,
+                "alias_added": (r.old, r.new) in added_set,
                 "timestamp": now,
             }) + "\n")
 
@@ -681,6 +769,9 @@ def _add_common_args(ap):
     ap.add_argument("--linker-scripts-root", type=Path, default=None,
                      help="disasm/linker_scripts root (recursed over every "
                           "version dir for *.ld/*.txt rewrites)")
+    ap.add_argument("--aliases-ld", type=Path, default=None,
+                     help="disasm/linker_scripts/us/aliases.ld path (safe-mode "
+                          "compatibility alias target; ignored with --hard-rename)")
 
 
 def main(argv=None):
@@ -700,6 +791,14 @@ def main(argv=None):
     apply_ap.add_argument("--dry-run", action="store_true")
     apply_ap.add_argument("--verify", action="store_true",
                            help="run `make -C disasm COMPARE=1` after applying")
+    apply_ap.add_argument(
+        "--hard-rename", action="store_true",
+        help="rewrite symbol_addrs_code.txt's address-keyed entry in place "
+             "instead of the safe default (leave it untouched and append a "
+             "compatibility alias to aliases.ld). Dangerous: only use this "
+             "when nothing else can still reference the old name by a "
+             "hard-coded relocation, and add any needed alias yourself "
+             "(see the module docstring and PR #58/#59).")
 
     debt_ap = sub.add_parser("debt", help="naming_debt() against a git revision")
     debt_ap.add_argument("--repo-root", type=Path, default=ROOT)
@@ -736,7 +835,8 @@ def main(argv=None):
                          include_dir=args.include_dir, symtab_path=args.symtab,
                          asm_root=args.asm_root,
                          linker_scripts_root=args.linker_scripts_root,
-                         dry_run=args.dry_run)
+                         aliases_ld_path=args.aliases_ld,
+                         dry_run=args.dry_run, hard_rename=args.hard_rename)
 
     verb = "would rename" if args.dry_run else "renamed"
     print(f"{verb} {len(result.applied)} function(s)")
@@ -747,7 +847,9 @@ def main(argv=None):
         for old, new, reason in result.refused:
             print(f"  {old} -> {new}: {reason}")
     if not args.dry_run:
-        print(f"symtab lines changed: {result.symtab_lines_changed}")
+        print(f"symtab lines changed: {result.symtab_lines_changed}"
+              + ("" if args.hard_rename else " (0 by design -- safe mode; "
+                                              "see aliases added below)"))
         print(f"src files changed: {result.src_files_changed} "
               f"({result.src_replacements} replacements)")
         print(f"asm files changed: {result.asm_files_changed} "
@@ -758,6 +860,11 @@ def main(argv=None):
             print(f"removed {len(result.removed_aliases)} self-alias line(s):")
             for old, new, line_text in result.removed_aliases:
                 print(f"  {old} -> {new}: {line_text}")
+        if result.aliases_added:
+            print(f"added {len(result.aliases_added)} compatibility alias(es) to "
+                  f"{args.aliases_ld or _default_paths(args.repo_root)['aliases_ld_path']}:")
+            for old, new in result.aliases_added:
+                print(f"  {old} = {new};")
 
     if args.verify and not args.dry_run:
         rc = run_verify(args.repo_root)

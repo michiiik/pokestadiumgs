@@ -838,21 +838,28 @@ own follow-up commit, "Name `<owner>` -> `<name>`", over every
 `apply` for a file list, since it reports only counts. Nothing here amends
 an existing commit.
 
-`apply` also rewrites `disasm/linker_scripts` (the function's own entry in
-`disasm/linker_scripts/us/symbol_addrs_code.txt`, and any other `.ld`/`.txt`
-file that named it). `merge` deliberately discards that rename in
-`symbol_addrs_code.txt` (`git checkout --`) rather than committing it --
-a matched/decompiled owner's symtab entry is never fed to the linker, so
-committing the rename there is pointless, and leaving it as an uncommitted
-leftover is exactly what broke every container launch on 2026-09-02 (a
-container's pre-extracted asm tree, and the PR gate's own rebuild, still
-call the function by its old name; the old symtab entry disappearing broke
-the link). Instead `merge` appends `<old> = <new>;` to the hand-written,
-splat-preserved `disasm/linker_scripts/us/aliases.ld` (skipping it if an
-identical line is already there) -- the same fix PR #58 ("Fix master link
-after PR #57 renames; make the PR gate fail on error") applied by hand --
-and folds that file into the same follow-up commit alongside
-`disasm/src`/`disasm/include`.
+`apply` is safe by default (see its own module docstring): it never rewrites
+`disasm/linker_scripts/us/symbol_addrs_code.txt`'s address-keyed entry for
+the function being renamed -- a matched/decompiled owner's symtab entry is
+never fed to the linker, so rewriting it there is pointless, and doing so
+with no compatibility alias is exactly what broke every container launch on
+2026-09-02 (a container's pre-extracted asm tree, and the PR gate's own
+rebuild, still call the function by its old name; the old symtab entry
+disappearing broke the link). Instead `apply` itself appends `<old> =
+<new>;` to the hand-written, splat-preserved
+`disasm/linker_scripts/us/aliases.ld` (skipping it if an identical line is
+already there) -- the same fix PR #58 ("Fix master link after PR #57
+renames; make the PR gate fail on error") applied by hand. `merge` then
+folds that file into the same follow-up commit alongside
+`disasm/src`/`disasm/include`; its own `git checkout --`/`append_name_alias`
+post-processing (kept for defense in depth) is now normally a no-op, since
+`apply` never touched `symbol_addrs_code.txt` or duplicated the alias line
+in the first place. A caller that really needs the old, dangerous
+in-place symtab rewrite can pass `apply --hard-rename`, but nothing in this
+repo does; `tools/check_alias_rename.py`'s pre-commit hook
+(`.githooks/pre-commit.d/16-alias-rename.sh`) refuses any commit -- from
+this tool or a hand edit -- that renames an address-keyed symtab entry
+without a matching `aliases.ld` line in the same commit.
 
 A failure at any step (the subprocess itself, or a
 refused/unconfirmed rename) is only logged, never fails the `merge` run --

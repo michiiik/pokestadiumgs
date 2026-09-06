@@ -110,8 +110,14 @@ Coordinator rules:
   bare-`$PPID` identities only warn); `15-provenance.sh` blocks removing a
   `GLOBAL_ASM` pragma that has no `accepted` runner attempt on file
   (`DECOMP_PROVENANCE_SKIP=1` bypasses, only with a stated justification);
-  `20-tests.sh` runs `tools/run_tests.sh` when `tools/*.py` is staged
-  (`SKIP_TOOL_TESTS=1` bypasses). There is no post-commit hook any more.
+  `16-alias-rename.sh` blocks renaming an existing address-keyed entry in
+  `disasm/linker_scripts/us/symbol_addrs_code.txt` unless the same commit
+  also adds a matching `<old> = <new>;` line to `aliases.ld` (the PR #58/#59
+  convention `tools/container_merge.py`'s `merge()` and
+  `tools/name_decompiled.py apply` both implement; `ALIAS_RENAME_SKIP=1`
+  bypasses with a stated justification); `20-tests.sh` runs
+  `tools/run_tests.sh` when `tools/*.py` is staged (`SKIP_TOOL_TESTS=1`
+  bypasses). There is no post-commit hook any more.
 - Commit verified batches per source file or per sweep run, not one function
   per commit. A commit message names the subsystem or family, not a single
   helper.
