@@ -2201,7 +2201,26 @@ void BattleAnim_Table_84186004_071(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84130CE8.s")
+extern s32 func_84125080();
+void func_84130CE8(void) {
+    u8 val;
+
+    func_8413005C();
+    do {
+        val = func_841251B0(func_84125080()) & 3;
+    } while (val == 0);
+    switch (val) {
+    case 1:
+        func_84129900();
+        break;
+    case 2:
+        func_8412955C();
+        break;
+    case 3:
+        func_84129374();
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
