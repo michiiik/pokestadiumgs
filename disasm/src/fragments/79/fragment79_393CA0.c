@@ -3531,7 +3531,38 @@ void func_8413BF58(s32 arg0){u8 *ptr=D_84195248+arg0*24;switch(ptr[0xD]){case 1:
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8413C0A4.s")
+extern s32 func_84138960(u8);
+extern void func_841392E0(u8);
+extern void func_84139244(u8);
+extern void func_84139958(u8, u8);
+extern void func_84139770(u8);
+extern void func_84139D94(u8);
+extern void func_84138D74(u8);
+void func_8413C0A4(u8 arg0) {
+    switch (D_84195248[arg0 * 24 + 0xD] - 1) {
+    case 0:
+        func_841397FC(arg0, 2);
+        break;
+    case 1:
+    case 2:
+    case 3:
+        if (func_84138960(arg0)) func_841392E0(arg0);
+        else func_84139244(arg0);
+        break;
+    case 4:
+    case 5:
+    case 6:
+        if (D_84195248[arg0 * 24 + 0xE] < 5) func_84139958(arg0, 1);
+        else func_84139770(arg0);
+        break;
+    case 7:
+        func_84139D94(arg0);
+        break;
+    case 8:
+        func_84138D74(arg0);
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US

@@ -238,6 +238,18 @@ def cmd_for_jtbl(args):
                 if hi < seg_end:
                     tail = "rodata" if not is_data else "rodata"
                     print("    - [0x%X, %s]" % (hi, tail))
+                if lo != rs or hi != re_:
+                    print("\n!! WARNING: the run had to be widened to a 16-byte boundary, so"
+                          "\n   the subsegment covers bytes 0x%X..0x%X / 0x%X..0x%X that belong to"
+                          "\n   NO referenced symbol.  splat only emits *referenced* symbols into"
+                          "\n   a C-owned `.rodata` subsegment, so those leading/trailing bytes are"
+                          "\n   silently DROPPED and every following byte in the segment shifts --"
+                          "\n   `make COMPARE=1` then fails with a wrong ROM checksum that says"
+                          "\n   nothing about the cause.  Use this yaml only if the run's own start"
+                          "\n   and end are already 16-aligned; otherwise pick a later jump table in"
+                          "\n   the same object whose rom offset IS 16-aligned and cut there,"
+                          "\n   leaving the earlier tables in the shared blob."
+                          % (lo, rs, re_, hi))
                 if is_data:
                     print("\nNOTE: the bytes came out of a `data` subsegment.  The tail"
                           "\n      subsegment MUST be typed `rodata` (not `data`) or it"

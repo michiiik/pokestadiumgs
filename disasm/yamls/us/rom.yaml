@@ -1469,6 +1469,8 @@
     - [0x3D7DD0, c,       fragments/79/fragment79_3D7DD0]
     - [0x3D99F0, c,       fragments/79/fragment79_3D99F0]
     - [0x3D9A00, data,    fragments/79/fragment79_data]
+    - [0x3FA9E0, .rodata, fragments/79/fragment79_393CA0] # jtbl_8418B150, jtbl_8418B174, jtbl_8418B194
+    - [0x3FAA50, rodata]
   
   - name: fragment80
     type: code
