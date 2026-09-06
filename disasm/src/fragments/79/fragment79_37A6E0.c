@@ -513,7 +513,56 @@ void BattleAnim_ModelDispatch_072(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8410F1A8.s")
+extern void func_8410B8FC(f32 *, u8 *, s16);
+extern void func_8411E0A4(void *, void *, void *);
+extern u8 * func_8410B330(u8 *);
+extern s32 D_84184148;
+extern u8 * D_841911E8;
+extern s32 D_841911EC;
+extern u8 * D_84193DD0;
+void BattleAnim_ModelDispatch_127(u8 *arg0, u8 *arg1) {
+    f32 sp3C[3];
+    f32 sp30[3];
+    f32 sp24[3];
+    s32 index;
+
+    D_841911E8 = func_8410B330(arg0);
+    *(s16 *)(D_841911E8 + 0x94) = 0;
+    *(s16 *)(D_841911E8 + 0xA2) = 0;
+    index = func_8411E1F8(arg1);
+    if (*(u16 *)((u8 *)D_84193DD0 + (index << 4) + 0x10) == 0x20) {
+        *(s16 *)(D_841911E8 + 0x98) = 0x26;
+    } else {
+        *(s16 *)(D_841911E8 + 0x98) = 0x24;
+    }
+    *(f32 *)(D_841911E8 + 0x44) = 0.0f;
+    *(f32 *)(D_841911E8 + 0x48) = 0.0f;
+    *(f32 *)(D_841911E8 + 0x84) = *(f32 *)(arg1 + 0x644);
+    *(f32 *)(D_841911E8 + 0x80) = *(f32 *)(arg1 + 0x640);
+    *(f32 *)(D_841911E8 + 0x7C) = *(f32 *)(arg1 + 0x654);
+    *(f32 *)(D_841911E8 + 0x74) = *(f32 *)(arg1 + 0x64C);
+    *(f32 *)(D_841911E8 + 0x78) = 0.0f;
+    func_8410B8FC(sp3C, arg1 + 0x634, *(s16 *)(arg1 + 0x20));
+    sp3C[0] += *(f32 *)(arg1 + 0x24);
+    sp3C[2] += *(f32 *)(arg1 + 0x2C);
+    Vec3f_SetComponentsDuplicate((f32 *)(D_841911E8 + 0x5C), sp3C[0], *(f32 *)(arg1 + 0x638), sp3C[2]);
+    Vec3f_SetComponentsDuplicate((f32 *)(D_841911E8 + 0x50), sp3C[0], *(f32 *)(arg1 + 0x638), sp3C[2]);
+    index = func_8411E1F8(arg1);
+    if ((*(u16 *)((u8 *)D_84193DD0 + (index << 4) + 0x12) & 2) != 0) {
+        func_8411E0A4(arg1, sp30, D_841911E8);
+        Vec3f_SetComponentsDuplicate((f32 *)(D_841911E8 + 0x5C), sp3C[0], sp30[1], sp3C[2]);
+        Vec3f_SetComponentsDuplicate((f32 *)(D_841911E8 + 0x50), sp3C[0], sp30[1], sp3C[2]);
+    }
+    index = func_8411E1F8(arg1);
+    if (((*(u16 *)((u8 *)D_84193DD0 + (index << 4) + 0x12) & 4) != 0) ||
+        ((*(u16 *)(arg1 + 0x7F4) & 0x10) != 0)) {
+        *(f32 *)(D_841911E8 + 0x60) = 30.0f;
+        *(f32 *)(D_841911E8 + 0x54) = 30.0f;
+    }
+    Vec3f_SetComponentsDuplicate((f32 *)(D_841911E8 + 0x68), *(f32 *)(arg0 + 0xA8), *(f32 *)(arg0 + 0xAC), *(f32 *)(arg0 + 0xB0));
+    *(s32 *)(D_841911E8 + (D_841911EC * 8) + 8) = D_84184148;
+    *(f32 *)(D_841911E8 + 0x88) = 80.0f;
+}
 #endif
 
 #ifdef VERSION_US
