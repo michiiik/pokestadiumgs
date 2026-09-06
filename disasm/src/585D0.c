@@ -1094,7 +1094,28 @@ void func_8005D0B0(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005D2BC.s")
+extern u8 func_8005D92C(s32 index);
+
+extern void func_8005CFE8(s32, s32, s32, s32);
+extern void func_8005D0B0(s32, s32, s32, s32);
+extern void func_8005D194(s32, s32, s32, s32);
+void func_8005D2BC(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    switch (func_8005D92C(arg1)) {
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+        func_8005CFE8(arg0, arg1, arg2, arg3);
+        break;
+    case 5:
+    case 6:
+        func_8005D0B0(arg0, arg1, arg2, arg3);
+        break;
+    case 7:
+        func_8005D194(arg0, arg1, arg2, arg3);
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1110,7 +1131,29 @@ void func_8005D0B0(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005D610.s")
+extern u8 func_8005D92C(s32 index);
+
+extern void func_8005D348(s32, s32, s32);
+extern void func_8005D418(s32, s32, s32);
+extern void func_8005D4FC(s32, s32, s32);
+void func_8005D610(s32 arg0, s32 arg1, s32 arg2) {
+    s32 state = func_8005D92C(arg1);
+    switch (state) {
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+        func_8005D348(arg0, arg1, arg2);
+        break;
+    case 5:
+    case 6:
+        func_8005D418(arg0, arg1, arg2);
+        break;
+    case 7:
+        func_8005D4FC(arg0, arg1, arg2);
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1174,7 +1217,11 @@ void func_8005D9E0(s32 arg0, s32 *arg1) { u8 *record = D_80128570 + arg0 * 112; 
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005DB84.s")
+extern u8 func_8005D92C(s32 index);
+extern u16 func_80060A4C(const u8* arg0);
+extern u8 D_80128570[];
+
+s32 func_8005DB84(s32 arg0) { s32 result = -1; if ((*(s32 *)(D_80128570 + arg0 * 112) & 1) != 0) { switch (func_8005D92C(arg0)) { case 1: case 2: case 3: case 4: result = func_80060A4C(*(u8 **)(D_80128570 + arg0 * 112 + 0x60) + 0x2CC) >> 8; if ((result & 0x80) != 0) result = (result & 0x7F) + 1; else result = 0; break; case 5: case 6: result = (*(u8 **)(D_80128570 + arg0 * 112 + 0x60))[0x724] + 1; break; case 7: result = (*(u8 **)(D_80128570 + arg0 * 112 + 0x60))[0x700] + 1; break; } } return result; }
 #endif
 
 #ifdef VERSION_US
@@ -1425,7 +1472,34 @@ void func_8005E648(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005ED78.s")
+extern u8 func_8005D92C(s32 index);
+extern u8 D_801285D0[];
+
+void func_8005ED78(s32 arg0) {
+    extern void func_8005EB3C(void *, s32);
+    s32 address;
+    u8 value;
+
+    switch (func_8005D92C(arg0)) {
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+        address = *(s32 *)(D_801285D0 + arg0 * 112) + 0x23;
+        value = 0x97;
+        break;
+    case 5:
+    case 6:
+        address = *(s32 *)(D_801285D0 + arg0 * 112) + 0xA4C;
+        value = 0xFB;
+        break;
+    case 7:
+        address = *(s32 *)(D_801285D0 + arg0 * 112) + 0xA27;
+        value = 0xFB;
+        break;
+    }
+    func_8005EB3C((void *)address, value);
+}
 #endif
 
 #ifdef VERSION_US

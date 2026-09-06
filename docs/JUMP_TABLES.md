@@ -379,3 +379,45 @@ edit. The reproducible sequence is: apply the yaml hunk → `cat
 yamls/us/header.yaml yamls/us/rom.yaml > pokestadiumgs-us.yaml` → `python3 -m
 splat split pokestadiumgs-us.yaml` → re-insert the alias block → apply the C
 hunk → `make COMPARE=1`.
+
+---
+
+## 8. After a split lands: replay the stale `section_layout_drift` evidence (2026-09-06)
+
+A `section_layout_drift` rejection is a statement about the repo state the
+probe ran in, not about the candidate.  Once a file gets its `.rodata`
+subsegment, every drift row recorded for that file **before** the split
+commit is void — exactly the way `func_82610E34`'s permuter rows were void
+for the window the permuter was dead.
+
+Nothing re-queues those owners automatically: `pragma_targets.py`'s
+`_jump_table_readiness` reports the file as `ready` the moment the yaml line
+lands, so the owner no longer looks blocked, but the fleet still sees a long
+run of rejected attempts and treats it as a hard owner.  The perfect
+candidate is already sitting in `probe-stats`.
+
+Cheap sweep — for every attempt with `link_mismatch == "section_layout_drift"`
+and `raw_similarity_score == 1.0`, compare the batch timestamp against
+`git log -1 -S"<file>" -- disasm/yamls/us/rom.yaml`.  If the batch is older,
+replay the stored `candidate` verbatim through
+`tools/try_pragma_compare.py --bundle`.  Six owners landed this way in one
+pass (2026-09-06): `func_8005D2BC`, `func_8005D610`, `func_8005DB84`,
+`func_8005ED78` in `585D0.c`, and `func_826049A0`, `func_826065B0` in
+`fragments/20/fragment20_12C460.c`.
+
+Two traps the replay exposes, both invisible to the isolated probe:
+
+* **Case labels do not appear in the function text.**  A dispatcher whose
+  `case` values are wrong still assembles to byte-identical instructions —
+  the error lives only in the jump table's `.rodata` words.  So the probe
+  reports a flawless 1.0/1.0 and the full ROM gate fails on a handful of
+  bytes inside `jtbl_*`.  `func_826049A0`'s stored candidate used
+  `case 14`/`case 28` where the table demanded `case 16`/`case 32`, and the
+  whole ROM diff was 4 bytes.  Read case values off the table's target
+  addresses, never off a plausible decimal.
+* **The probe compiles the candidate alone; the gate compiles it inside the
+  TU.**  `func_826065B0`'s stored candidate calls `_bzero` with no
+  prototype, which is fine on its own but collides with the file's own
+  `extern void _bzero(void *, s32);` several hundred lines later
+  (`redeclaration of '_bzero'`).  Prepending the matching extern to the
+  candidate is enough.

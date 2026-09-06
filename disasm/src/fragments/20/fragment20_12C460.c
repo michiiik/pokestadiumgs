@@ -285,7 +285,40 @@ end:
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_826049A0.s")
+extern s32 func_8004C990(s32, s32);
+
+s32 func_826049A0(s32 *arg0, s32 arg1) {
+    s32 result;
+
+    result = 0;
+    switch (arg1 & 0xFF) {
+    case 0:
+        *arg0 = func_8004C990(0x6E, 1);
+        result = 1;
+        break;
+    case 1:
+        *arg0 = func_8004C990(0x6E, 4);
+        result = 1;
+        break;
+    case 2:
+        *arg0 = func_8004C990(0x6E, 2);
+        result = 1;
+        break;
+    case 3:
+        *arg0 = func_8004C990(0x6E, 6);
+        result = 1;
+        break;
+    case 16:
+        *arg0 = func_8004C990(0x5B, 0);
+        result = 1;
+        break;
+    case 32:
+        *arg0 = func_8004C990(0x64, 0);
+        result = 1;
+        break;
+    }
+    return result;
+}
 
 extern s16 D_82615542[];
 extern s32 func_8004C990(s32, s32);
@@ -438,7 +471,47 @@ s32 func_826058CC(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82606548.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_826065B0.s")
+extern s32 func_82604C98(s32, s32, s32, s32);
+
+extern void _bzero(void *, s32);
+extern void func_82604D40(void *, void *);
+extern void func_82605110(void *, void *);
+extern void func_82605218(void *, void *);
+extern void func_826053A4(void *, void *);
+extern void func_826057A8(void *, void *);
+extern void func_82605908(void *, void *);
+extern void func_82605E04(void *, void *);
+extern void func_82605EF4(void *, void *);
+extern void func_82605FE4(void *, void *);
+extern void func_826063AC(void *, void *);
+extern void func_82606548(void *, void *);
+void func_826065B0(void *arg0, void *arg1, s32 arg2, s32 arg3) {
+    u8 *pool;
+    pool = *(u8 **)(*(u8 **)((u8 *)arg0 + 0x110));
+    _bzero(arg1, 0x298);
+    *(s16 *)((u8 *)arg1 + 0) = arg2;
+    *(u16 *)((u8 *)arg1 + 4) |= 1;
+    *(u16 *)((u8 *)arg1 + 4) |= 2;
+    *(u16 *)((u8 *)arg1 + 4) |= 4;
+    if (*(s8 *)(pool + 0xF) != 0) *(u16 *)((u8 *)arg1 + 4) |= 8;
+    *(s16 *)((u8 *)arg1 + 2) = arg3;
+    *(s16 *)((u8 *)arg1 + 6) = 0;
+    *(s16 *)((u8 *)arg1 + 0xA) = func_82604C98((s32)((u8 *)arg0 + 0x3544), *(s16 *)((u8 *)arg0 + 0x14), *(s16 *)((u8 *)arg1 + 0), *(s16 *)((u8 *)arg1 + 2));
+
+    switch (*(s16 *)((u8 *)arg1 + 0)) {
+    case 1: func_82604D40(arg0, arg1); break;
+    case 2: func_82605110(arg0, arg1); break;
+    case 3: func_82605218(arg0, arg1); break;
+    case 4: func_826053A4(arg0, arg1); break;
+    case 5: func_826057A8(arg0, arg1); break;
+    case 6: func_82605908(arg0, arg1); break;
+    case 7: func_82605E04(arg0, arg1); break;
+    case 8: func_82605EF4(arg0, arg1); break;
+    case 9: func_82605FE4(arg0, arg1); break;
+    case 10: func_826063AC(arg0, arg1); break;
+    case 11: func_82606548(arg0, arg1); break;
+    }
+}
 
 void func_8260675C(u8 *arg0) {
     if (arg0 != NULL && *(s16 *)(arg0 + 6) == 0) {
