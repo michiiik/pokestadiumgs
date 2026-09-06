@@ -284,3 +284,31 @@ func_841153DC: plateau at 0.0 (raw None), mismatch unknown; tried families: call
 ## 2026-09-06
 
 func_8410C720: time cap at 0.9863 (raw 0.9041) after 2414s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-07
+
+func_841109FC: plateau at 0.0 (raw None), mismatch unknown; tried families: (none); tie-pool no
+
+## 2026-09-07
+
+func_841109FC: matched (call_chain:compare:reversed-operands), 7 iterations, agent codex
+
+## 2026-09-07
+
+func_8410CC90: plateau at 0.907 (raw 0.7442), mismatch operand_or_scheduling_drift; tried families: call_chain; tie-pool no
+
+## 2026-09-07
+
+func_84110860: matched (call_chain:float-init:canonical), 1 iterations, agent codex
+
+## 2026-09-07
+
+func_8410F92C: plateau at 0.9783 (raw 0.8478), mismatch operand_or_scheduling_drift; tried families: call_chain; tie-pool no
+
+## 2026-09-07
+
+func_8410CF80: plateau at 0.0 (raw None), mismatch unknown; tried families: (none); tie-pool no
+
+## 2026-09-07
+
+TYPE CONFLICT: func_80037120 is extern void func_80037120(), not extern void func_80037120(s32, s32, s32 *, s16 *, s16 *)
