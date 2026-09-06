@@ -268,3 +268,19 @@ func_8411854C: matched (call_sequence:direct:u8-pointer), 3 iterations, agent co
 ## 2026-09-06
 
 TYPE CONFLICT: func_8411E164 is extern s32 func_8411E164(void *), not extern s32 func_8411E164()
+
+## 2026-09-06
+
+func_8411DAE0: plateau at 0.0 (raw None), mismatch unknown; tried families: call_sequence; tie-pool no
+
+## 2026-09-06
+
+func_8410FB0C: matched (call_sequence:direct:canonical), 1 iterations, agent codex
+
+## 2026-09-06
+
+func_841153DC: plateau at 0.0 (raw None), mismatch unknown; tried families: call_sequence; tie-pool no
+
+## 2026-09-06
+
+func_8410C720: time cap at 0.9863 (raw 0.9041) after 2414s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
