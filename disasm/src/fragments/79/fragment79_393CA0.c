@@ -537,7 +537,18 @@ void func_841265EC(void) { s32 offset = D_841951BC * 4; u8 *src = *(u8 **)((u8 *
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412676C.s")
+extern u8 * D_84195200[];
+s32 func_8412676C(u8 arg0, u8 arg1) {
+    u16 *ptr = (u16 *)D_84195200[arg0];
+    s32 result;
+    u16 limit;
+    result = (u16)(ptr[0x14] >> arg1);
+    limit = ptr[0x13];
+    if (result > limit) {
+        result = limit & 0xFFFF;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
