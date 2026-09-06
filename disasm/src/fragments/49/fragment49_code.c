@@ -589,7 +589,54 @@ void func_86106C28(void) { func_86106688(); func_86106504(D_87F119DC); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86106C54.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86106E7C.s")
+extern u8 D_8610A890[];
+extern void func_8003CD84(void);
+extern s32 func_8004C990(s32, s32);
+extern u8 * func_8004CA60(u8 *);
+extern void * D_8009491C;
+extern Gfx * D_800D0510;
+void func_86106E7C(s32 arg0, s32 arg1) {
+    u8 *root;
+    u8 *temp_a1;
+    u8 *temp_a2;
+    s32 temp;
+    u8 alpha;
+
+    if (arg0 != 5) {
+        return;
+    }
+    root = D_8009491C;
+    temp_a1 = *(u8 **)(root + 0x14);
+    temp_a2 = *(u8 **)(temp_a1 + 0x20);
+    gDPPipeSync(D_800D0510++);
+    if ((*(s32 *)(temp_a1 + 0xC) << 1) < 0) {
+        alpha = (u8)((1.0f - ((f32)*(s32 *)(temp_a1 + 0x1C) / 6.0f)) * 255.0f);
+    } else {
+        alpha = 0xFF;
+    }
+    if (temp_a2 == NULL) {
+        temp = 0;
+    } else {
+        switch (*(s32 *)(temp_a2 + 0x20)) {
+        case 0:
+            temp = 1;
+            break;
+        case 1:
+            temp = 2;
+            break;
+        case 2:
+            temp = 3;
+            break;
+        case 3:
+            temp = 4;
+            break;
+        }
+    }
+    gDPSetEnvColor(D_800D0510++, 255, 255, 255, alpha);
+    gSPSegment(D_800D0510++, 0xF, func_8004CA60(func_8004C990(0xDE, temp)));
+    gSPDisplayList(D_800D0510++, D_8610A890);
+    func_8003CD84();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86107098.s")
 
