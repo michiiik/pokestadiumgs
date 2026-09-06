@@ -3688,7 +3688,7 @@ void Geo_NodeType3Pass(s32 arg0) {
 extern void *D_80094908;
 extern void func_80007444(Gfx **, s16, s16, s16, s16, s32);
 extern Gfx* D_800D0510;
-void func_8003AB68(u8 *arg0) { u8 *state = (u8 *)D_80094908 + 0x18; func_80007444(&D_800D0510, *(s16 *)(state + 4), *(s16 *)(state + 6), *(s16 *)(state + 8), *(s16 *)(state + 10), *(s32 *)(arg0 + 0x18)); gDPPipeSync(D_800D0510++); gSPSetOtherMode(D_800D0510++, G_SETOTHERMODE_H, 20, 2, 0x100000); }
+void Geo_NodeBackground(u8 *arg0) { u8 *state = (u8 *)D_80094908 + 0x18; func_80007444(&D_800D0510, *(s16 *)(state + 4), *(s16 *)(state + 6), *(s16 *)(state + 8), *(s16 *)(state + 10), *(s32 *)(arg0 + 0x18)); gDPPipeSync(D_800D0510++); gSPSetOtherMode(D_800D0510++, G_SETOTHERMODE_H, 20, 2, 0x100000); }
 #endif
 
 #ifdef VERSION_US
