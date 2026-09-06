@@ -8,7 +8,16 @@ extern Vtx *func_800398F8();
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80021DE0.s")
+extern unsigned char D_80090137[0x100];
+extern unsigned char D_800917F8[0x100];
+f32 func_80021DE0(s32 arg0) {
+    u8 value = D_80090137[arg0];
+    if (value >= 0x80) {
+        value = D_800917F8[value & 0x7F];
+        value = (u32)(f32)value;
+    }
+    return (f32)value / 127.0f;
+}
 #endif
 
 #ifdef VERSION_US
