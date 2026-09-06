@@ -4657,7 +4657,8 @@ void geo_layout_cmd_27(void)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FC8C.s")
+extern s16 D_8012651A;
+void func_8003FC8C(void) { s16 temp_v0; temp_v0 = D_8012651A - 1; D_8012651A = temp_v0; D_80126520 = D_80126458[temp_v0]; }
 #endif
 
 #ifdef VERSION_US
