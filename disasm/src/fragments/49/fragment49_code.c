@@ -663,7 +663,32 @@ void func_861086AC(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_8610880C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86108A50.s")
+extern s32 D_8610AD20;
+s32 func_86108A50(s32 *arg0) {
+    s32 count;
+    s32 *p;
+    s32 i;
+    void *slot;
+
+    count = 0;
+    p = arg0;
+    i = 0;
+    do {
+        i++;
+        p++;
+        p[-1] = 0;
+    } while (i < 4);
+
+    slot = (void *)((u8 *)(u32)D_8610AD20 + 0x8DE0);
+    for (i = 0; i < 4; i++) {
+        if (*(s32 *)((u8 *)(*(void **)slot) + 0xC) & 0x20000000) {
+            *arg0++ = (s32)slot;
+            count++;
+        }
+        slot = (void *)((u8 *)slot + 0x2C);
+    }
+    return count;
+}
 
 void func_86108B14(s32 *arg0, s32 *arg1) {
     s32 temp_v0;
