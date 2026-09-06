@@ -5046,7 +5046,12 @@ void geo_layout_cmd_create_anchor(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80040D9C.s")
+extern s16 D_80126518;
+void func_80040D9C(void) {
+    u8 *entry = (u8 *)D_80126498[D_80126518];
+    if (entry != 0) { entry[2] |= 4; }
+    D_80126520 += 4;
+}
 #endif
 
 #ifdef VERSION_US
