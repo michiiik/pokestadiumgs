@@ -493,6 +493,8 @@
     - [0xBA250, c,       fragments/7/fragment7_BA250]
     - [0xC4C10, c,       fragments/7/fragment7_C4C10]
     - [0xC5BD0, data,    fragments/7/fragment7_data]
+    - [0xC9D30, .rodata, fragments/7/fragment7_BA250] # jtbl_8300FBC4 (also covers jtbl_8300FB00/FB18/FB6C/FB84/FBA8, D_8300FBA4)
+    - [0xC9E10, rodata]
 
   # unk fragment
   - name: fragment8
@@ -1469,7 +1471,11 @@
     - [0x3D7DD0, c,       fragments/79/fragment79_3D7DD0]
     - [0x3D99F0, c,       fragments/79/fragment79_3D99F0]
     - [0x3D9A00, data,    fragments/79/fragment79_data]
-  
+    - [0x3FA9E0, .rodata, fragments/79/fragment79_393CA0] # jtbl_8418B150, jtbl_8418B174, jtbl_8418B194
+    - [0x3FAA50, rodata]
+    - [0x3FAA60, .rodata, fragments/79/fragment79_3ADCA0] # jtbl_8418B1D0 (+13 more, incl. jtbl_8418B738/jtbl_8418B74C)
+    - [0x3FB010, rodata]
+
   - name: fragment80
     type: code
     bss_size: 0x0
