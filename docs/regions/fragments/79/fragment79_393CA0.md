@@ -476,3 +476,23 @@ func_84132D44: matched (call_sequence:loop:for-index:direct-table-access), 5 ite
 ## 2026-09-06
 
 func_841339D0: plateau at 0.9841 (raw 0.9048), mismatch instruction_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-07
+
+func_84135778: plateau at 0.0 (raw None), mismatch unknown; tried families: (none); tie-pool no
+
+## 2026-09-07
+
+func_84135778: matched (call-sequence:guard-clause:u8-global-u16-cast), 7 iterations, agent codex
+
+## 2026-09-07
+
+func_84136564: matched (call-sequence:for-indexed:offset-base), 2 iterations, agent codex
+
+## 2026-09-07
+
+func_84126C3C: time cap at 0.9459 (raw 0.9459) after 2400s, mismatch instruction_drift; tried families: call-sequence; tie-pool no
+
+## 2026-09-07
+
+func_84128204: plateau at 0.9429 (raw 0.7714), mismatch unaligned_data_drift; tried families: call_sequence; tie-pool no
