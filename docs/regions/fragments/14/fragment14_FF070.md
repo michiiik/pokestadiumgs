@@ -92,3 +92,19 @@ func_81307570: matched (call_sequence:guarded-call:early-return), 1 iterations, 
 ## 2026-09-05
 
 func_81309820: plateau at 0.9231 (raw 0.7179), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-06
+
+func_8130BA48: plateau at 0.8649 (raw 0.6486), mismatch operand_or_scheduling_drift; tried families: call-sequence; tie-pool no
+
+## 2026-09-06
+
+func_81309D34: matched (call-sequence:clamp:typed-byte-state), 1 iterations, agent codex
+
+## 2026-09-06
+
+func_8130C334: plateau at 0.9371 (raw 0.7063), mismatch section_layout_drift; tried families: dispatcher_switch; tie-pool no
+
+## 2026-09-06
+
+func_81308014: plateau at 0.9615 (raw 0.8846), mismatch operand_or_scheduling_drift; tried families: call-sequence; tie-pool no
