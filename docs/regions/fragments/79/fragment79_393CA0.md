@@ -332,3 +332,7 @@ func_84125424: plateau at 0.875 (raw 0.3333), mismatch operand_or_scheduling_dri
 ## 2026-09-06
 
 func_84133924: matched (state-field:clear-three-tables:offset-shift-negate), 1 iterations, agent codex
+
+## 2026-09-06
+
+func_84128CB8: matched (call_sequence:pointer-local:direct-field-increment:probe-match), 1 iterations, agent codex
