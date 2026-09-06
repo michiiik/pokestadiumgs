@@ -137,3 +137,15 @@ func_8AE01248: plateau at 0.963 (raw 0.6667), mismatch operand_or_scheduling_dri
 ## 2026-09-06
 
 func_8AE01164: matched (state-field:scan:exact-typed-s32), 1 iterations, agent codex
+
+## 2026-09-06
+
+func_8AE02398: time cap at 0.7636 (raw 0.3818) after 2400s, mismatch operand_or_scheduling_drift; tried families: callseq, state-update; tie-pool no
+
+## 2026-09-06
+
+func_8AE018C4: plateau at 0.9636 (raw 0.9636), mismatch instruction_drift; tried families: callseq; tie-pool no
+
+## 2026-09-06
+
+func_8AE00314: matched (callseq:buffer:array-element-addresses), 2 iterations, agent codex

@@ -101,7 +101,8 @@ s32 func_8AE002AC(s32 arg0, void *arg1) { u8 out[12]; if (arg0 == 2) { func_8003
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE00314.s")
+extern void * D_80094908;
+s32 func_8AE00314(s32 arg0, void *arg1) { u8 out[3][4]; if (arg0 == 2) { func_80037120((u8 *)D_80094908 + 0xB4, (u8 *)D_80094908 + 0xA8, (s32 *)&out[1][0], (s16 *)&out[0][2], (s16 *)&out[0][0]); *(s16 *)((u8 *)arg1 + 0x1C) = -0x2000 - *(s16 *)&out[0][2]; *(s16 *)((u8 *)arg1 + 0x1E) = *(s16 *)&out[0][0] + 0x6000; } return 0; }
 #endif
 
 #ifdef VERSION_US
