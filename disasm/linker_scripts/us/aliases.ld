@@ -42,3 +42,4 @@ func_8412DD0C = BattleAnim_Table_84185F10_048;
 func_84129D8C = BattleAnim_Table_84185F10_000;
 func_84130284 = BattleAnim_Table_84186004_053;
 func_8410FB0C = BattleAnim_ModelDispatch_204;
+func_8003FC8C = geo_layout_cmd_return;
