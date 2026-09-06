@@ -1574,7 +1574,7 @@ extern u8 D_841951BC;
 extern u8 D_841951BD;
 extern u8 D_841951BF;
 extern u8 * D_84195208[];
-void func_8412DD0C(void) {
+void BattleAnim_Table_84185F10_048(void) {
     if ((D_84195208[D_841951BD][0xF] & 0x60) != 0 || (D_84195208[D_841951BC][0x11] & 0x80) != 0) {
         func_84126BA8(D_841951BC);
     } else {
