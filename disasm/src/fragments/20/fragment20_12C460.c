@@ -554,7 +554,17 @@ void func_82606784(u8*a0,s32 a1,s32 a2,s32 a3){if(*(s16*)(a0+6)==0){*(s16*)(a0+6
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82607528.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82607734.s")
+typedef struct { s16 a; s16 b; } Pair16_7734;
+void func_82607734(void *arg0, s32 arg1) {
+    u8 *p = arg0;
+    if (*(s16 *)(p + 6) == 2) {
+        *(s16 *)(p + 6) = 3;
+        *(s16 *)(p + 8) = 0;
+        *(Pair16_7734 *)(p + 0x1C) = *(Pair16_7734 *)(p + 0x14);
+        *(s16 *)(p + 0x20) = *(s16 *)(p + 0x14);
+        *(s16 *)(p + 0x22) = (s16)(((0x1E0 - *(s16 *)(p + 0x26)) / 2) - arg1);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82607790.s")
 
