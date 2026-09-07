@@ -82,7 +82,23 @@ u8 func_843007BC(u8 arg0, u8 arg1) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_84300858.s")
+extern u8 *D_84302C80;
+extern u8 D_84302C88[];
+s32 func_84300858(u8 arg0) {
+    u8 *p;
+    s32 i;
+
+    p = D_84302C80;
+    i = 0;
+    while (i < D_84302C88[0]) {
+        if (*p != 0 && *p == arg0) {
+            return 0;
+        }
+        i++;
+        p += 0x58;
+    }
+    return 1;
+}
 
 s32 func_800630F0(s32);
 extern s32 D_84302C98;
