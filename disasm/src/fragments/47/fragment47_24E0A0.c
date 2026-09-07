@@ -255,7 +255,9 @@ void func_86009D7C(void *arg0, f64 arg1, f64 arg2, f64 arg3, s32 arg4) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_86009E54.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_86009EF8.s")
+s32 func_86009EF8(void *arg0, f64 arg1) {
+    return (arg1 < *(f64 *)((u8 *)arg0 + 0x18)) ^ *(s32 *)((u8 *)arg0 + 0x48);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_86009F28.s")
 
