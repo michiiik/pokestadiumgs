@@ -53,3 +53,19 @@ requeue; 8 pointer-v0 candidates compared with no link verification. Best reache
 ## 2026-09-02 Wave 51 (2026-09-02)
 
 func_86A05AAC requeue. Wave 51 tried eight variants; best 0.9512 normalized / 0.7805 raw, expected 160 bytes and actual 164. The late durable fingerprint is op 0x31 using expected $v0 versus actual $t2. A dedicated 180-second permuter run stayed at score 365 with no output. Next action: change the IR/operand hypothesis around the final load/store lifetime before another 300-second permuter run; declaration-order-only variants are exhausted.
+
+## 2026-09-07
+
+func_86A066F4: matched (constant_map:s16-args:inverted-guard), 1 iterations, agent codex
+
+## 2026-09-07
+
+func_86A0B5CC: matched (call-chain:late-result:direct-membership), 6 iterations, agent codex
+
+## 2026-09-07
+
+func_86A0405C: time cap at 0.9756 (raw 0.7073) after 2402s, mismatch operand_or_scheduling_drift; tried families: bounded_lookup; tie-pool yes
+
+## 2026-09-07
+
+func_86A0B6F8: time cap at 0.9524 (raw 0.7619) after 2400s, mismatch instruction_drift; tried families: call_chain; tie-pool no
