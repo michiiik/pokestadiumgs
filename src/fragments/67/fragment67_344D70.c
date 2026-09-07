@@ -2,15 +2,75 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_82908270.s")
+typedef struct {
+    u8 unk0;
+    u8 unk1;
+    u8 unk2;
+    u8 unk3;
+    u8 unk4;
+    u8 unk5;
+    u8 unk6[4];
+    s16 unkA;
+    s16 unkC;
+    s16 unkE;
+    s16 unk10;
+} Fragment67Entry;
+
+extern Fragment67Entry D_82916B80[];
+extern u8 D_8291A7C0;
+extern void *D_80094908;
+extern void func_80037120(void *, void *, s16 *, s16 *, s16 *);
+s32 func_82908270(s32 arg0, u8 *arg1) {
+    s16 pad0;
+    s16 pad1;
+    s16 pad2;
+    s16 sp30;
+    s16 sp2E;
+    s16 sp2C;
+
+    if (arg0 == 2) {
+        *(u8 *)(arg1 + 0x18) = D_82916B80[*(s16 *)(&D_8291A7C0 + 0x1068)].unk0;
+        *(u8 *)(arg1 + 0x19) = D_82916B80[*(s16 *)(&D_8291A7C0 + 0x1068)].unk1;
+        *(u8 *)(arg1 + 0x1A) = D_82916B80[*(s16 *)(&D_8291A7C0 + 0x1068)].unk2;
+        func_80037120((u8 *)D_80094908 + 0xB4, (u8 *)D_80094908 + 0xA8, &sp30, &sp2E, &sp2C);
+        *(s16 *)(arg1 + 0x1C) = D_82916B80[*(s16 *)(&D_8291A7C0 + 0x1068)].unkA + sp2E;
+        *(s16 *)(arg1 + 0x1E) = D_82916B80[*(s16 *)(&D_8291A7C0 + 0x1068)].unkC + sp2C;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_82908370.s")
+s32 func_82908370(s32 arg0, u8 *arg1) {
+    s16 pad0;
+    s16 pad1;
+    s16 pad2;
+    s16 sp30;
+    s16 sp2E;
+    s16 sp2C;
+
+    if (arg0 == 2) {
+        *(u8 *)(arg1 + 0x18) = D_82916B80[*(s16 *)(&D_8291A7C0 + 0x1068)].unk3;
+        *(u8 *)(arg1 + 0x19) = D_82916B80[*(s16 *)(&D_8291A7C0 + 0x1068)].unk4;
+        *(u8 *)(arg1 + 0x1A) = D_82916B80[*(s16 *)(&D_8291A7C0 + 0x1068)].unk5;
+        func_80037120((u8 *)D_80094908 + 0xB4, (u8 *)D_80094908 + 0xA8, &sp30, &sp2E, &sp2C);
+        *(s16 *)(arg1 + 0x1C) = D_82916B80[*(s16 *)(&D_8291A7C0 + 0x1068)].unkE + sp2E;
+        *(s16 *)(arg1 + 0x1E) = D_82916B80[*(s16 *)(&D_8291A7C0 + 0x1068)].unk10 + sp2C;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_82908470.s")
+extern u8 D_8291A7C0;
+s32 func_82908470(s32 arg0, u8 *arg1) {
+    if (arg0 == 2) {
+        *(u8 *)(arg1 + 0x18) = D_82916B80[*(s16 *)(&D_8291A7C0 + 0x1068)].unk6[0];
+        *(u8 *)(arg1 + 0x19) = D_82916B80[*(s16 *)(&D_8291A7C0 + 0x1068)].unk6[1];
+        *(u8 *)(arg1 + 0x1A) = D_82916B80[*(s16 *)(&D_8291A7C0 + 0x1068)].unk6[2];
+    }
+    return 0;
+}
 #endif
 
 void func_829084DC(void) {
@@ -36,7 +96,14 @@ void func_829084E4(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_82908594.s")
+extern void func_80041E2C(void);
+extern void func_8003F018(s32);
+extern s32 func_80041C98(s32);
+extern u8 D_8291B82C;
+extern u8 D_8291AE50;
+extern u8 D_8291A7C0;
+extern u8 D_8291A7C4;
+void func_82908594(void) { u8 *temp_s0; u8 *temp_s1; func_80041E2C(); temp_s0 = &D_8291A7C4; temp_s1 = &D_8291B82C; do { func_8003F018((s32)temp_s0); temp_s0 += 0x1A4; } while (temp_s0 < temp_s1); temp_s0 = &D_8291A7C0; temp_s1 = &D_8291AE50; do { *(s32 *)temp_s0 = func_80041C98(5); temp_s0 += 0x1A4; } while (temp_s0 != temp_s1); }
 #endif
 
 #ifdef VERSION_US
@@ -312,7 +379,15 @@ void func_8290A0B0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290A358.s")
+typedef union { s32 word; s8 bytes[4]; } Func80041FA0State;
+extern s32 D_82912F10;
+extern void func_8003F1DC(void *);
+extern void func_80041FA0(s32, u16, Func80041FA0State);
+extern u8 D_8291A7C0;
+void func_8290A358(s32 arg0, u16 arg1) {
+    func_8003F1DC((u8 *)&D_8291A7C0 + arg0 * 0x1A4 + 4);
+    func_80041FA0(*(s32 *)((u8 *)&D_8291A7C0 + arg0 * 0x1A4), (u16)arg1, *(Func80041FA0State *)(&D_82912F10));
+}
 #endif
 
 #ifdef VERSION_US
@@ -556,7 +631,17 @@ s32 func_8290B3E4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290B40C.s")
+extern u8 D_82913210[];
+extern s32 func_8290B3BC(void);
+extern u8 D_8291A7C0;
+s32 func_8290B40C(void) {
+    if (*(u16 *)((u8 *)D_82913210 + (*(u8 *)(&D_8291A7C0 + 0x1071) * 2) + (*(s16 *)(&D_8291A7C0 + 0x1068) * 0x22)) != 0) {
+        if (func_8290B3BC() == 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US

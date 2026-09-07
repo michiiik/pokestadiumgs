@@ -62,15 +62,40 @@ void func_800142F8(s32 arg0, s32 arg1) { if (arg0 != 0xFF) { u8 *ptr = D_8011BE9
 
 void func_80014328(s32 arg0, s32 arg1) { if (arg0 != 0xFF) { u8 *ptr = D_8011BE90 + arg0; if (ptr[0x33C8] != 5) ptr[0x33C8] = arg1; } }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80014358.s")
+extern void func_80012ED8(s32);
+extern u8 D_8011BE90[];
+void func_80014358(s32 arg0, s32 arg1)
+{
+  int new_var2;
+  u8 *ptr;
+  s32 value;
+  u8 *new_var;
+  new_var2 = 5;
+  new_var = D_8011BE90 + arg0;
+  if (arg0 != 0xFF)
+  {
+    ptr = new_var;
+    value = ptr[0x3300];
+    if (0, value != new_var2)
+    {
+      ptr[0x3300] = arg1;
+      value = arg1 & 0xFF;
+    }
+    if ((value == new_var2) || (value == 2))
+    {
+      func_80012ED8(arg0);
+    }
+  }
+}
 
 void func_800143B8(s32 arg0, s32 arg1) { if (arg0 != 0xFF) { u8 *ptr = D_8011BE90 + arg0; if (ptr[0x3300] != 5) ptr[0x3300] = arg1; } }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_800143E8.s")
+void func_800143E8(void *arg0, s32 arg1, u16 arg2) { s32 i; u8 *entry; *(s32 *)((u8 *)arg0 + 4) = arg1; *(u16 *)((u8 *)arg0 + 2) = arg2; i = 0; while (i < *(s16 *)arg0) { entry = (u8 *)arg0 + i * 0x10; if (*(s32 *)(entry + 0x14) != 0 && *(s8 *)(entry + 0x18) == 2) { *(s32 *)(entry + 0x10) += arg1; } i++; } }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80014448.s")
+extern u8 D_8011BE90[];
+s32 func_80014448(s32 arg0, void *arg1) { s32 index; s32 count; s32 value; s32 result; index = *(u16 *)(*(u8 **)(D_8011BE90 + 0x2BD0) + arg0 * 2); count = (*(u8 **)(D_8011BE90 + 0x2BD0))[index++]; value = 0xFF; if (count > 0) { do { value = (*(u8 **)(D_8011BE90 + 0x2BD0))[index++]; result = func_80014D64(value); --count; } while (count > 0); } *(s32 *)arg1 = value; return result; }
 
-extern void func_80014448(s32, void *);
+extern s32 func_80014448(s32, void *);
 extern s32 func_80014BD4(s32);
 void func_800144E4(s32 arg0, s32 arg1, s32 arg2, OSMesgQueue *arg3) {
     s32 temp[2];
@@ -115,7 +140,12 @@ void func_800147C8(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
 extern u8 D_8011BE90[];
 s32 func_8001480C(arg0, arg1) s32 arg0; s32 *arg1; { s32 offset; offset = ((u16 *)((struct { u8 pad[0x2BD0]; u8 *base; } *)D_8011BE90)->base)[arg0]; *arg1 = ((u8 *)offset)[(s32)((struct { u8 pad[0x2BD0]; u8 *base; } *)D_8011BE90)->base]; offset++; if (*arg1 == 0) { return 0; } return (s32)((struct { u8 pad[0x2BD0]; u8 *base; } *)D_8011BE90)->base + offset; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80014850.s")
+extern void func_80014900(s32);
+extern s32 func_8001244C();
+extern void func_800142F8(s32 arg0, s32 arg1);
+extern s32 func_8001510C(s32 arg0, s32 arg1);
+extern u8 D_8011BE90[];
+void func_80014850(s32 arg0) { s32 index; s32 count; s32 value; s32 result; index = *(u16 *)(*(u8 **)(D_8011BE90 + 0x2BD0) + arg0 * 2); count = (*(u8 **)(D_8011BE90 + 0x2BD0))[index++]; if (count > 0) { do { --count; value = (*(u8 **)(D_8011BE90 + 0x2BD0))[index++]; result = func_8001510C(1, value); if (func_8001244C(1, result) == 0) { func_80014900(result); func_800142F8(result, 0); } } while (count > 0); } }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80014900.s")
 

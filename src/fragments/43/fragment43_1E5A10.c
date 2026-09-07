@@ -290,7 +290,10 @@ s32 func_8AC010D4(u8 *arg0, u16 arg1, u16 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC01574.s")
+extern s32 func_8AC013FC(s16, s16, s32, s32, s16);
+void func_8AC01574(s16 arg0, s16 arg1, s32 arg2, s32 arg3, s16 arg4) {
+    func_8AC013FC(arg0, arg1, arg2, arg3, arg4);
+}
 #endif
 
 #ifdef VERSION_US
@@ -600,7 +603,28 @@ void func_8AC03334(s32 arg0, s32 arg1, s32 arg2, void *arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC03C28.s")
+typedef struct {
+    s32 value;
+} Fragment43Word;
+s32 func_8AC03C28(s32 arg0, void *arg1) {
+    struct Word {
+        s32 value;
+    };
+    void *temp_v0;
+
+    temp_v0 = *(void **)((u8 *)arg1 + 0x20);
+    switch (arg0) {
+    case 0:
+        *(struct Word *)((u8 *)arg1 + 0x2C) = *(struct Word *)((u8 *)temp_v0 + 0x28);
+        *(struct Word *)((u8 *)arg1 + 0x30) = *(struct Word *)((u8 *)temp_v0 + 0x2C);
+        break;
+    case 1:
+        *(struct Word *)((u8 *)arg1 + 0x2C) = *(struct Word *)((u8 *)temp_v0 + 0x28);
+        *(struct Word *)((u8 *)arg1 + 0x30) = *(struct Word *)((u8 *)temp_v0 + 0x2C);
+        break;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -612,7 +636,13 @@ void func_8AC03334(s32 arg0, s32 arg1, s32 arg2, void *arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC03F64.s")
+extern Gfx * D_800D0510;
+extern u8 D_8AC07D90[];
+void func_8AC03F64(s32 arg0, s32 arg1, s32 arg2, struct { u8 r; u8 g; u8 b; u8 a; } color) {
+    gSPDisplayList(D_800D0510++, D_8AC07D90);
+    gDPSetPrimColor(D_800D0510++, 0, 0, color.r, color.g, color.b, color.a);
+    gSPTextureRectangle(D_800D0510++, arg0 << 2, arg1 << 2, (arg0 + arg2) << 2, (arg1 + 2) << 2, 0, 0, 0, 0, 0x400);
+}
 #endif
 
 #ifdef VERSION_US
@@ -627,7 +657,16 @@ void func_8AC0405C(s32 arg0, s32 arg1, s32 arg2, Fragment43Color405C color) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC04154.s")
+extern Gfx * D_800D0510;
+extern u8 D_8AC07D90[];
+void func_8AC04154(s32 arg0, s32 arg1, s32 arg2, s32 arg3, Fragment43Color405C color) {
+    gSPDisplayList(D_800D0510++, D_8AC07D90);
+    gDPSetPrimColor(D_800D0510++, 0, 0, color.r, color.g, color.b, color.a);
+    gSPTextureRectangle(D_800D0510++, arg0 << 2, arg1 << 2, arg2 << 2, (arg1 + 2) << 2, 0, 0, 0, 0, 0x400);
+    gSPTextureRectangle(D_800D0510++, arg0 << 2, arg3 << 2, arg2 << 2, (arg3 + 2) << 2, 0, 0, 0, 0, 0x400);
+    gSPTextureRectangleFlip(D_800D0510++, arg0 << 2, arg1 << 2, (arg0 + 2) << 2, arg3 << 2, 0, 0, 0, 0x400, 0);
+    gSPTextureRectangleFlip(D_800D0510++, arg2 << 2, arg1 << 2, (arg2 + 2) << 2, arg3 << 2, 0, 0, 0, 0x400, 0);
+}
 #endif
 
 #ifdef VERSION_US
@@ -635,7 +674,10 @@ void func_8AC0405C(s32 arg0, s32 arg1, s32 arg2, Fragment43Color405C color) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC043E0.s")
+extern u8 D_8AC07DD8[];
+void func_8AC043E0(s32 arg0, s32 arg1, s32 arg2) {
+    func_8AC0405C(arg0, arg1, arg2, *(Fragment43Color405C *)D_8AC07DD8);
+}
 #endif
 
 #ifdef VERSION_US
@@ -672,7 +714,7 @@ s32 func_8AC044DC(s32 arg0, void *arg1) {
 #ifdef VERSION_US
 typedef struct Fragment43Color { u8 bytes[4]; } Fragment43Color;
 extern void func_800504BC(s16 *);
-extern void func_8AC04154(s16, s16, s32, s32, Fragment43Color);
+extern void func_8AC04154(s32, s32, s32, s32, Fragment43Color405C);
 s32 func_8AC0456C(s32 arg0, void *arg1) {
     struct { s32 pad[2]; s16 angles[2]; } scratch;
     if ((arg0 != 0) && (arg0 == 1)) {
@@ -680,14 +722,14 @@ s32 func_8AC0456C(s32 arg0, void *arg1) {
         {
             s16 x;
             s16 y;
-            Fragment43Color color;
+            Fragment43Color405C color;
             s16 z;
             s16 w;
             x = *(s16 *)((u8 *)arg1 + 8) + scratch.angles[0];
             y = *(s16 *)((u8 *)arg1 + 0xA) + scratch.angles[1];
             z = *(s16 *)((u8 *)arg1 + 0xC);
             w = *(s16 *)((u8 *)arg1 + 0xE);
-            color = *(Fragment43Color *)((u8 *)arg1 + 0x28);
+            color = *(Fragment43Color405C *)((u8 *)arg1 + 0x28);
             func_8AC04154(x, y, x + z, y + w, color);
         }
     }
@@ -812,7 +854,20 @@ void func_8AC060E4(Fragment43Motion602C *arg0, u16 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC063AC.s")
+extern f32 D_8AC08190;
+extern f32 D_80088E50[];
+void func_8AC063AC(Fragment43Motion602C *arg0, u16 arg1) {
+    f32 *temp_v0;
+    f32 temp_fv0;
+
+    arg1 <<= 12;
+    temp_v0 = &D_80088E50[arg1 >> 4];
+    temp_fv0 = D_8AC08190;
+    if (arg0) {
+    }
+    arg0->unk40 = (*temp_v0 * temp_fv0) + 1.0f;
+    arg0->unk44 = (*temp_v0 * temp_fv0) + 1.0f;
+}
 #endif
 
 #ifdef VERSION_US
@@ -873,7 +928,16 @@ void func_8AC0651C(void *arg0, s16 arg1, s16 arg2, s16 arg3, s16 arg4) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC06570.s")
+void func_8AC06570(void *arg0, s16 arg1, s16 arg2, s16 arg3, s16 arg4, s16 arg5) {
+    s16 difference = arg1 - arg3;
+    s16 quotient = difference / arg3;
+    s32 remainder = difference % arg3;
+    if (remainder > 0) quotient++;
+    *(s16 *)((u8 *)arg0 + 6) = quotient;
+    *(s16 *)((u8 *)arg0 + 8) = arg2;
+    *(s16 *)((u8 *)arg0 + 10) = arg4;
+    *(s16 *)((u8 *)arg0 + 12) = arg5;
+}
 #endif
 
 #ifdef VERSION_US
@@ -1003,7 +1067,29 @@ void func_8AC06D70(void *arg0, s32 arg1, s32 arg2, u16 arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC06DC8.s")
+extern u8 D_8AC08798[];
+extern s16 D_8AC08790;
+void func_8AC06DC8(void *arg0, void *arg1) {
+  u8 *slot;
+  s32 i;
+  unsigned long long limit;
+  slot = ((u8 *) D_8AC08798) + (D_8AC08790 * 8);
+  D_8AC08790++;
+  if (arg0 == 0) return;
+  slot[4] = 0;
+  *((s32 *) slot) = *((s32 *) (((u8 *) arg0) + 4));
+  limit = D_8AC08790 - 1;
+  i = 0;
+  while (i < (D_8AC08790 - 1)) { i++; }
+  if ((*((s32 *) (((u8 *) arg0) + 4))) != 0) *((s32 *) slot) = *((s32 *) (((u8 *) arg0) + (4 & 0xFFFFu)));
+  if (*((void **) (((u8 *) arg0) + 0x18))) {
+    func_8AC06DC8(*((void **) (((u8 *) arg0) + 0x18)), *((void **) (((u8 *) arg0) + 0x18)));
+  }
+  if ((*((void **) (((u8 *) arg0) + 0x14))) != arg1) {
+    func_8AC06DC8(*((void **) (((u8 *) arg0) + 0x14)), arg1);
+  }
+  D_8AC08790--;
+}
 #endif
 
 #ifdef VERSION_US

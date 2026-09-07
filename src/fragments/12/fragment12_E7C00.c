@@ -270,7 +270,37 @@ s32 func_81404CA4(void *arg0)
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81404D44.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81404DA0.s")
+s32 func_81404DA0(void *arg0, s32 arg1)
+{
+  s8 limit;
+  s32 result;
+  u8 *ptr;
+  result = 0;
+  limit = *((s8 *) (((u8 *) arg0) + 0x12));
+  ptr = (u8 *) arg0;
+  if (limit <= 0)
+  {
+    goto done;
+  }
+  loop:
+  result += 1;
+
+  if (arg1 != (*((s8 *) (ptr + 0xA))))
+  {
+    goto next;
+  }
+  return 1;
+  next:
+  ptr += 1;
+
+  if (result < limit)
+  {
+    goto loop;
+  }
+  done:
+  return 0;
+
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81404DE4.s")
 
