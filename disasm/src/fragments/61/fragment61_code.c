@@ -328,7 +328,18 @@ s16 func_86B07D58(f32 arg0, f32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/61/fragment61_code/func_86B08088.s")
+s32 func_86B08088(s16 arg0, s16 arg1) {
+    s32 diff;
+    if (arg0 >= arg1) {
+        diff = arg0 - arg1;
+    } else {
+        diff = arg1 - arg0;
+    }
+    if (diff >= 0x8000) {
+        diff = 0xFFFF - diff;
+    }
+    return (s16)diff;
+}
 #endif
 
 #ifdef VERSION_US
