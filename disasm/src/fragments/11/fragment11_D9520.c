@@ -8,7 +8,14 @@ s32 func_81601980(s32 *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_816019C0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81601A38.s")
+void func_81601A38(s32 *arg0, s32 arg1) {
+    s32 value;
+    s32 i;
+    value = arg1 ? -1 : 0;
+    for (i = 0; i < 8; i++) {
+        arg0[i] = value;
+    }
+}
 
 void func_81601A78(s32 arg0, s32 arg1) { func_816019C0(arg0, 0xAD, arg1); func_816019C0(arg0, 0x4F, arg1); func_816019C0(arg0, 0x4E, arg1); func_816019C0(arg0, 0x50, arg1); func_816019C0(arg0, 0x54, arg1); func_816019C0(arg0, 0x53, arg1); }
 
