@@ -8,7 +8,7 @@ s32 func_814028F0(void) {
     return (s32) ((MathUtil_Random_ZeroOne() * 15.0f) + 6.0f);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81402930.s")
+void func_81402930(void *arg0, f32 arg1, s32 arg2, s32 arg3) { s32 limit=0x80; s32 i=0; u8 *ptr=arg0; loop: i+=4; *(f32 *)(ptr+4)=arg1; *(f32 *)(ptr+8)=arg1; *(f32 *)(ptr+0xC)=arg1; ptr+=0x10; *(f32 *)(ptr-0x10)=arg1; if(i!=limit) goto loop; *(s16 *)((u8 *)arg0+0x208)=arg2; *(s32 *)((u8 *)arg0+0x20C)=0; *(u8 *)((u8 *)arg0+0x20B)=arg3; *(f32 *)((u8 *)arg0+0x200)=0.0f; *(f32 *)((u8 *)arg0+0x204)=0.0f; }
 
 void func_81402978(void *arg0, f32 arg1, s32 arg2) {
     *(s16 *)((u8 *)arg0 + 8) = arg2;
