@@ -227,7 +227,18 @@ void func_86A06400(s32 arg0, f32 arg1, f32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/60/fragment60_code/func_86A066F4.s")
+s32 func_86A066F4(s16 arg0, s16 arg1) {
+    s32 diff;
+    if (arg0 >= arg1) {
+        diff = arg0 - arg1;
+    } else {
+        diff = arg1 - arg0;
+    }
+    if (diff >= 0x8000) {
+        diff = 0xFFFF - diff;
+    }
+    return (s16)diff;
+}
 #endif
 
 #ifdef VERSION_US
