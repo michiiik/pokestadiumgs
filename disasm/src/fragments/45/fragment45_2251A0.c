@@ -642,7 +642,24 @@ void func_8AB0318C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB0322C.s")
+extern s32 func_8AB023EC(u32 arg0);
+extern s16 D_8AB13F30[];
+extern s16 D_8AB1466A;
+void func_8AB0322C(void) {
+    s32 i;
+    s16 x;
+    s16 y;
+    s16 t;
+    s16 *table;
+    table = D_8AB13F30;
+    for (i = 0; i < D_8AB1466A * 5; i++) {
+        y = (s16)func_8AB023EC(D_8AB1466A);
+        x = (s16)func_8AB023EC(D_8AB1466A);
+        t = table[y];
+        table[y] = table[x];
+        table[x] = t;
+    }
+}
 #endif
 
 #ifdef VERSION_US
