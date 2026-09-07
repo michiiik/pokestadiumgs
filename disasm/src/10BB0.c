@@ -267,7 +267,17 @@ void func_80011A48(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_80011E7C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_8001244C.s")
+extern u8 D_8011BE90[];
+extern s32 D_8011EF8C;
+s32 func_8001244C(s32 arg0, s32 arg1) {
+    s32 i;
+    for (i = 0; i < D_8011EF8C; i++) {
+        if (arg0 == *(s16 *)(D_8011BE90 + i * 0xC + 0x3108) && arg1 == *(s16 *)(D_8011BE90 + i * 0xC + 0x310A)) {
+            return *(s32 *)(D_8011BE90 + i * 0xC + 0x3100);
+        }
+    }
+    return 0;
+}
 
 extern S1_unk_func_81206FA0 D_8011EF80;
 extern s32 D_8011EF8C;
