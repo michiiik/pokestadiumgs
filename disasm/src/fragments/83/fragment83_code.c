@@ -198,7 +198,22 @@ void func_82C02390(void *arg0, void *arg1, s8 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C02664.s")
+s32 func_82C02664(u8 *arg0, u8 arg1) {
+    s32 zero;
+    s32 index;
+    s32 bit;
+    u8 *value;
+    zero = ((u32)arg1 < 1);
+    arg1--;
+    if (zero) {
+        return 0;
+    }
+    index = arg1;
+    bit = index % 8;
+    value = arg0;
+    value += index / 8;
+    return (*value & (1 << (7 - bit))) != 0;
+}
 #endif
 
 #ifdef VERSION_US
