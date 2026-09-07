@@ -21,3 +21,15 @@ requeue. Two probe-only batches (16 candidates) on func_84122DD8, prior fresh at
 ## Accepted: func_84121130 permuter zero-score register tie (2026-09-02) (2026-09-02)
 
 Accepted. Nine distinct probe candidates all compiled; seven exact-size variants remained normalized 1.0000/raw 0.6410 register_allocation_only with stable first-diff fingerprint at offset 22: expected mtc1 $at,4096, actual mtc1 $at,24576; two variants drifted scheduling/size. Repaired permuter on the strongest exact-size body: base score 95, best score 0. Zero-score body inlined both threshold comparisons while retaining the initial d local and call. Runner replay was link_verified=true and combined full-ROM gate passed (build/pokestadiumgs-us.z64: OK), installed as accepted. Futility then reported register-tie: 7 prior attempts at >=0.99; no further work needed.
+
+## 2026-09-07
+
+func_8412142C: plateau at 0.9189 (raw 0.5946), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-07
+
+func_84122DD8: matched (call_sequence:clamp:direct-offset-match), 1 iterations, agent codex
+
+## 2026-09-07
+
+func_84123858: time cap at 0.9787 (raw 0.8936) after 2409s, mismatch operand_or_scheduling_drift; tried families: call-sequence; tie-pool no

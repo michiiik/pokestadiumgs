@@ -638,7 +638,17 @@ void func_84122D74(s32 arg0) {
     func_84120464(arg0, D_84183C90, 0x4000);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84122DD8.s")
+extern void func_841204BC(void *, s32, s32, s32, f32);
+void func_84122DD8(void *arg0) {
+    if (*(f32 *)((u8 *)arg0 + 0x28) - *(f32 *)((u8 *)arg0 + 0x650) >= 90.0f) {
+        *(f32 *)((u8 *)arg0 + 0x28) = *(f32 *)((u8 *)arg0 + 0x650) + 90.0f;
+        return;
+    }
+    func_841204BC(arg0, 0x40000000, 0x3B03126F, 0x4000, 18.0f);
+    if (*(f32 *)((u8 *)arg0 + 0x28) - *(f32 *)((u8 *)arg0 + 0x650) >= 90.0f) {
+        *(f32 *)((u8 *)arg0 + 0x28) = *(f32 *)((u8 *)arg0 + 0x650) + 90.0f;
+    }
+}
 
 typedef struct S1_Vec3f S1_Vec3f;
 struct S1_Vec3f {
