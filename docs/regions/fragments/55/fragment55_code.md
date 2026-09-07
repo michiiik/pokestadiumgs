@@ -57,3 +57,19 @@ requeue: Fresh owner with 0 prior attempts. Prepared /private/tmp/gs47_func_8670
 ## Wave 47 coordinator replay (2026-09-02)
 
 requeue; declaration repair removed the guRandom and D_86710C20 redeclarations and added D_86727CB0, allowing 8 call-chain candidates to compare. Best call-chain:indexed-arrays:for-inner reached similarity 0.8333 raw 0.5083, expected 468 bytes versus actual 480, with prologue frame drift from expected -136 to actual -144. Tried typed pointers, raw addresses, explicit temporaries, indexed arrays, separate initialization, float literals, struct-like loops, and explicit base forms. Next action: match the compiler local lifetime and 0x168 stride using a declaration-order or loop-counter repair; keep the corrected declarations and use fresh candidate identities.
+
+## 2026-09-07
+
+func_867090A8: matched (call_chain:early-return:fallthrough-s32), 1 iterations, agent codex
+
+## 2026-09-07
+
+func_86703DF4: time cap at 0.881 (raw 0.619) after 2405s, mismatch instruction_drift; tried families: state_field_access; tie-pool no
+
+## 2026-09-07
+
+func_86700318: matched (call_chain:macro:temp-second-store-best), 1 iterations, agent codex
+
+## 2026-09-07
+
+func_86703E9C: time cap at 0.6094 (raw 0.2344) after 2400s, mismatch operand_or_scheduling_drift; tried families: call_chain; tie-pool no
