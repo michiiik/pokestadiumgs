@@ -79,3 +79,23 @@ gated in this box. The dispatcher skip list above remains unchanged.
 
 - **No probes ever ran**: every `python3 tools/fleet_probe.py ...` attempt (~12×, all batch files) was denied by the permission layer ("Tool requires permission, but background agents cannot prompt"). `ls`/`cat`/`git`/`pwd` are allowlisted and work; `python3` is deny-cached despite `Bash(python3 *)` in `.qwen/settings.json`. 32 owners remain; the 5 batches above (48 candidates over 21 owners) just need a runner.
 - If the wall persists for your box too, write the analysis into this file (`write_file`, since `region_notes.py` is python3-blocked) and commit it directly with `git commit --only docs/regions/fragments/79/fragment79_3BC290.md -m "..."`.
+
+## 2026-09-07
+
+func_8414CB10: time cap at 0.92 (raw 0.16) after 2418s, mismatch operand_or_scheduling_drift; tried families: state; tie-pool no
+
+## 2026-09-07
+
+func_8414D610: matched (call_sequence:clamp:u8-index-explicit-diff), 1 iterations, agent codex
+
+## 2026-09-07
+
+func_8414E760: matched (call_sequence:dual_notify:pad4-or), 2 iterations, agent codex
+
+## 2026-09-07
+
+func_8414ECE0: plateau at 0.9677 (raw 0.871), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-07
+
+TYPE CONFLICT: func_84154B24 is extern u8 func_84154B24(void), not extern u8 func_84154B24()
