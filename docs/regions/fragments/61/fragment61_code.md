@@ -45,3 +45,27 @@ requeue func_86B04870 (2026-09-02 wave 47): fresh owner, 0 prior attempts; prepa
 ## Wave 47 coordinator replay (2026-09-02)
 
 requeue; the original batch conflicted with the existing two-argument func_87F026E8 declaration, so a cast-based repair was replayed with 8 novel bodies. Best reached similarity 0.7313 raw 0.3134; the first fingerprint is the global base load expected in  but emitted in . Tried raw global reloads, signed count divide and remainder forms, and an explicit function-pointer cast for the one-argument call. Next action: resolve the one-argument ABI through an accepted companion prototype or a caller-local function-pointer declaration, then retest the initial global load shape.
+
+## 2026-09-07
+
+func_86B08088: matched (constant-map:s16:neighbor-exact), 1 iterations, agent codex
+
+## 2026-09-07
+
+func_86B02180: matched (call_chain:poll-loop:address-plus-zero), 4 iterations, agent codex
+
+## 2026-09-07
+
+func_86B0952C: matched (call-chain:object-base:direct-globals), 1 iterations, agent codex
+
+## 2026-09-07
+
+func_86B0B9A0: matched (call_chain:object-base:accepted-pattern), 1 iterations, agent codex
+
+## 2026-09-07
+
+func_86B08120: time cap at 0.973 (raw 0.4595) after 2401s, mismatch operand_or_scheduling_drift; tried families: float_math; tie-pool yes
+
+## 2026-09-07
+
+func_86B0B608: time cap at 0.9796 (raw 0.898) after 2400s, mismatch instruction_drift; tried families: call_chain; tie-pool no
