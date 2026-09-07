@@ -13,3 +13,15 @@ requeue: func_81302CB4 (fresh, prior_attempts=0; 105 instructions, expected fram
 ## Wave handoff (2026-09-02) (2026-09-02)
 
 requeue: func_81303D60 (48 instructions; initially fresh, prior_attempts now 16). Three batches / 24 distinct candidates were probed with host CC checks enabled; no link_verified hit and no full-ROM gate. Batch 1 used 6-argument tail hypotheses and produced frame drift (best normalized/raw 0.8333/0.4792, expected addiu sp,-96 vs actual -56). Batch 2 corrected the tail to eight arguments (four registers plus stack args) and reached best normalized/raw 0.9792/0.8333, expected frame -96 vs actual -72. Batch 3 added an explicit 0x18-byte local gap, producing expected 192-byte size/frame; best normalized/raw remained 0.9792/0.8333, mismatch_kind operand_or_scheduling_drift, first-diff fingerprint at offset 23: expected addiu $a1,$sp,52 but actual addiu $a1,$sp,68 (pad placement variants produced $sp+92). Tried families: raw/index and pointer record arithmetic; six- vs eight-argument helper ABI; state temporary vs conditional expression; declaration-order, explicit pointers, array indexing; explicit 0x18-byte byte/word padding and pad placement. Concrete next action: model the two 8-byte buffers as a typed local overlay or separate fields forced to offsets sp+0x34 and sp+0x3c, while reserving the 0x18 gap after them and keeping saved index at sp+0x5c; then submit a fresh >=8 batch varying only overlay/member offset and declaration order. Do not gate current candidates.
+
+## 2026-09-08
+
+func_81304788: plateau at 0.9841 (raw 0.9683), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-08
+
+func_8130456C: time cap at 0.9552 (raw 0.6119) after 2400s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-08
+
+func_81304884: matched (call_sequence:scan:do-while-record-before-global), 1 iterations, agent codex

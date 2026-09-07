@@ -349,7 +349,8 @@ s32 func_81304444(u8 *arg0, s32 arg1, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FAD40/func_81304788.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FAD40/func_81304884.s")
+extern s32 func_80071230(u8 *arg0);
+s32 func_81304884(u8 *arg0, s32 arg1) { u8 *record; s32 count; record = arg0 + 0x20; if (func_80071230(*(u8 **)(*(u8 **)((u8 *)(u32)(*(s32 *)(arg0 + 0x4DA0) + 0x20000) - 0x5EB8) + 0x940)) != 0) return 0; count = 6; do { if (record[0] != 0 && record[1] == arg1) return 1; record += 0xCE8; count--; } while (count != 0); return 0; }
 
 extern void func_81302CB4(u8 *arg0, s16 *arg1);
 extern void func_8160B5BC(void *arg0, s16 *arg1);
