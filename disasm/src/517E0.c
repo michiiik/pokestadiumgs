@@ -770,7 +770,22 @@ s32 func_80054AA0(s32 arg0) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80054AF4.s")
+extern void * func_80051138(s32 arg0);
+extern void func_80051BF0(s32, void *, s32);
+void func_80054AF4(s32 arg0) {
+    void *temp_v0;
+    s32 flags;
+    temp_v0 = func_80051138(0);
+    flags = *(s32 *)((u8 *)temp_v0 + 0xC);
+    if ((arg0 >= 0) && (arg0 < 0x20)) {
+        flags |= 1 << arg0;
+        if (flags != *(s32 *)((u8 *)func_80051138(0) + 0xC)) {
+            temp_v0 = func_80051138(0);
+            *(s32 *)((u8 *)temp_v0 + 0xC) = flags;
+            func_80051BF0(0x14, 0, 2);
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80054B7C.s")
 
