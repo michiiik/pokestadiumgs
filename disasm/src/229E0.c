@@ -433,7 +433,15 @@ s32 func_80026298(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80026ED8.s")
+#pragma pack(1)
+typedef struct { s32 w0; s32 w4; } PackedRecord;
+#pragma pack(0)
+extern PackedRecord D_80090C84[];
+extern PackedRecord D_80090CFC;
+void func_80026ED8(u8 arg0) {
+    func_8001874C(0x06020000 | (((u8 *) &D_80090C84[arg0])[1] << 8), 0);
+    D_80090C84[arg0] = D_80090CFC;
+}
 #endif
 
 #ifdef VERSION_US
