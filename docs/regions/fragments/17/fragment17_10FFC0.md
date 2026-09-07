@@ -13,3 +13,19 @@ Accepted func_82202B80 with label state-field:switch-cases:raw-u8-ptr. Exact spe
 ## 2026-09-01 Wave 27 requeue: func_82201960 (2026-09-01)
 
 requeue: 47 new probe candidates plus one diagnostic retry were run after the fresh-owner preflight (runner stats now report 55 attempts total; no source edit or gate). Best spelling was bounded/direct-field with a raw u8 pointer, direct post-increment of the s16 count field, direct field comparison, explicit f32 temporaries, sign-selected D_8220D77C, and Pair16_82201960 fallback copy: exact 384-byte span, normalized similarity 0.8542, raw similarity 0.6562, mismatch_kind operand_or_scheduling_drift. Stable first-diff fingerprint is offset 66/instruction 16: expected mtc1 v0,$f8 but actual mtc1 v0,$f4; subsequent differences are FPU register/lifetime and load scheduling from expected lwc1 D_8220D77C through the x/y calculations. Earlier source forms also showed initial count/global ordering drift (expected lh t6, then D_8220D778 lw t8, then lh v0), branch-length drift, and exact-size 372-396-byte variants. Tried raw-pointer and direct-field forms, preincrement versus explicit count assignment, m2c temp names/order, formula/operand/sign and rounding variants, declaration permutations, explicit limit locals, a typed record overlay, and Pair16 fallback spelling; no link_verified match. The permuter was tooling-blocked by ModuleNotFoundError: No module named 'toml'. Next action: requeue with a genuinely new ABI/global/layout model (derive the original typed record/float temporary shape or a proven packed-record spelling) and do not repeat the direct-field FPU schedule; gate only link_verified candidates with full COMPARE=1.
+
+## 2026-09-07
+
+func_82200694: time cap at 0.9286 (raw 0.9286) after 2400s, mismatch operand_or_scheduling_drift; tried families: constant-map; tie-pool no
+
+## 2026-09-07
+
+func_822031D0: matched (state-field:switch:raw-u8-pointer), 1 iterations, agent codex
+
+## 2026-09-07
+
+func_82201518: matched (constant-map:all-results:single-local), 1 iterations, agent codex
+
+## 2026-09-07
+
+func_822017B0: time cap at 0.9706 (raw 0.3824) after 2400s, mismatch operand_or_scheduling_drift; tried families: state-field; tie-pool yes

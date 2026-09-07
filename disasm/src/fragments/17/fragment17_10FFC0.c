@@ -66,7 +66,7 @@ void func_822014FC(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     *(u16 *)(D_8220E4C8 + 6) = arg3;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82201518.s")
+s32 func_82201518(u8 *arg0) { s32 result; if (arg0[1] != 0) { if (arg0[0] == 0) { if (arg0[3] != 0) result = 0; else result = 3; } else result = 4; } else if (arg0[0] == 2) result = 5; else if (arg0[4] != 0) result = 1; else result = 2; return result; }
 
 s32 func_8220158C(void *arg0) {
     s32 var_v1;
@@ -212,7 +212,19 @@ s32 func_82202B80(s32 arg0, u8 *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_822030BC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_822031D0.s")
+extern u8 *D_8220E4D0[];
+s32 func_822031D0(s32 arg0, u8 *arg1) {
+    s32 temp_v0 = *(s32 *)(arg1 + 0x20);
+    switch (arg0) {
+    case 0:
+        *(u16 *)(arg1 + 2) &= 0xFFFD;
+        D_8220E4D0[temp_v0] = arg1;
+        break;
+    case 1:
+        break;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82203210.s")
 
