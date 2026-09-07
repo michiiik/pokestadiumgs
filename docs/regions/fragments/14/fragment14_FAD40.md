@@ -25,3 +25,23 @@ func_8130456C: time cap at 0.9552 (raw 0.6119) after 2400s, mismatch operand_or_
 ## 2026-09-08
 
 func_81304884: matched (call_sequence:scan:do-while-record-before-global), 1 iterations, agent codex
+
+## 2026-09-08
+
+func_813031D8: plateau at 0.0 (raw None), mismatch unknown; tried families: call_chain; tie-pool no
+
+## 2026-09-08
+
+func_81304678: matched (constant-map:direct-guard:gotos-inline), 3 iterations, agent codex
+
+## 2026-09-08
+
+func_81302CB4: plateau at 0.819 (raw 0.5429), mismatch operand_or_scheduling_drift; tried families: state_field_access; tie-pool no
+
+## 2026-09-08
+
+func_813033DC: matched (call_sequence:stack-struct:u32-prefix-buffer), 8 iterations, agent codex
+
+## 2026-09-08
+
+func_81304178: matched (call_sequence:field-init:arg1-before-state), 2 iterations, agent codex
