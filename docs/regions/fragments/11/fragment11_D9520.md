@@ -49,3 +49,27 @@ func_81609CB8: matched (callchain:reload-shifts:unsigned-right-final-byte), 2 it
 ## 2026-09-07
 
 func_81606694: time cap at 0.5604 (raw 0.1538) after 2409s, mismatch operand_or_scheduling_drift; tried families: state_field_access; tie-pool no
+
+## 2026-09-07
+
+func_816049BC: matched (multi_call_wrapper:two_calls:correct-index-direct), 4 iterations, agent codex
+
+## 2026-09-07
+
+func_81601A38: matched (constant-map:index-loop:ternary-s32), 1 iterations, agent codex
+
+## 2026-09-07
+
+func_8160762C: plateau at 0.9524 (raw 0.6667), mismatch operand_or_scheduling_drift; tried families: constant-map; tie-pool no
+
+## 2026-09-07
+
+func_816021E8: matched (constant-map:byte-scan:u8-direct-bound), 1 iterations, agent codex
+
+## 2026-09-07
+
+func_81606F88: plateau at 0.9545 (raw 0.9545), mismatch instruction_drift; tried families: init_sequence; tie-pool no
+
+## 2026-09-07
+
+func_81606E14: matched (float_math:lookup:product-plus-base), 2 iterations, agent codex
