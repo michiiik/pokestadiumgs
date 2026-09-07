@@ -433,7 +433,15 @@ s32 func_80026298(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80026ED8.s")
+#pragma pack(1)
+typedef struct { s32 w0; s32 w4; } PackedRecord;
+#pragma pack(0)
+extern PackedRecord D_80090C84[];
+extern PackedRecord D_80090CFC;
+void func_80026ED8(u8 arg0) {
+    func_8001874C(0x06020000 | (((u8 *) &D_80090C84[arg0])[1] << 8), 0);
+    D_80090C84[arg0] = D_80090CFC;
+}
 #endif
 
 #ifdef VERSION_US
@@ -1233,11 +1241,35 @@ void func_800341BC(s32 arg0, s32 arg1) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80034394.s")
+extern u8 D_800D2B56;
+extern u8 D_800D2B78;
+void func_80034394(u8 arg0, s32 arg1) {
+    u8 *entry;
+
+    entry = &D_800D2B78 + (arg0 * 0x3C);
+    if (entry[3] & 0x10) {
+        entry[3] = entry[3] & 0xFFEF;
+    } else {
+        entry[3] = entry[3] & 0xFFEF;
+        D_800D2B56 = func_800347E8(arg0);
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800343FC.s")
+extern u8 D_800D2B57;
+extern u8 D_800D2B78;
+void func_800343FC(u8 arg0, s32 arg1) {
+    u8 *entry;
+
+    entry = &D_800D2B78 + (arg0 * 0x3C);
+    if (entry[3] & 0x10) {
+        entry[3] = entry[3] & 0xFFEF;
+    } else {
+        entry[3] = entry[3] & 0xFFEF;
+        D_800D2B57 = func_800347E8(arg0);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -3966,11 +3998,24 @@ void GeoRender_RestoreRenderMode(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003D188.s")
+extern void func_8003CBD4(void);
+extern void func_8003D188_batch_decl_marker(void);
+extern void func_8003CB3C(Gfx *arg0, u8 arg1, u8 arg2);
+extern Gfx* D_800D0510;
+extern void * D_801263A8;
+void func_8003D188(u8 *arg0) {
+    if (((u8 *)D_801263A8)[0x25] != arg0[0]) {
+        func_8003CBD4();
+        func_8003CB3C(D_800D0510++, arg0[0], arg0[1]);
+        ((u8 *)D_801263A8)[0x25] = arg0[0];
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003D1F8.s")
+extern Gfx* D_800D0510;
+extern void * D_801263A8;
+void func_8003D1F8(s32 arg0) { if (func_8003CD58(((u8 *)D_801263A8)[0x25]) == 0) { Gfx *command = D_800D0510++; command->words.w0 = 0xD7000000; command->words.w1 = 0xFFFFFFFF; } *(s32 *)((u8 *)D_801263A8 + 0x18) = 0; *(s32 *)((u8 *)D_801263A8 + 0x1C) = 0; *(s32 *)((u8 *)D_801263A8 + 0x20) = 0; }
 #endif
 
 #ifdef VERSION_US
