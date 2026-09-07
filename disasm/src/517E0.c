@@ -976,7 +976,20 @@ void func_80055DC4(s32 arg0, u8 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055EF0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055F6C.s")
+extern s32 _bcmp(const void *, const void *, s32);
+extern void * func_80051138(s32 arg0);
+extern void func_80051BF0(s32, void *, s32);
+void func_80055F6C(void *arg0, s32 arg1) {
+    struct Record { s32 a, b, c, d, e, f; };
+    if (arg1 < 0 || arg1 >= 2) {
+        return;
+    }
+    if (_bcmp(arg0, (u8 *)func_80051138(0) + arg1 * 0x18 + 0x1C, 0x18) == 0) {
+        return;
+    }
+    *(struct Record *)((u8 *)func_80051138(0) + arg1 * 0x18 + 0x1C) = *(struct Record *)arg0;
+    func_80051BF0(0x14, 0, 2);
+}
 
 s32 func_80056024(s32 arg0) { s32 result = 0; switch (arg0) { case 5: result = 1; break; case 6: result = 2; break; case 7: result = 4; break; case 8: result = 8; break; case 9: result = 0x10; break; case 10: result = 0x20; break; case 11: result = 0x40; break; case 12: result = 0x80; break; case 13: result = 0x100; break; case 14: result = 1; break; case 15: result = 2; break; case 16: result = 1; break; case 17: result = 2; break; case 18: result = 4; break; case 19: result = 8; break; case 20: result = 0x10; break; case 21: result = 0x20; break; case 22: result = 0x40; break; case 23: result = 0x80; break; case 24: result = 0x100; break; } return result; }
 
