@@ -176,7 +176,14 @@ void func_8250684C(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_144790/func_825069F0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_144790/func_82506AA4.s")
+extern s16 D_82508FF0;
+void func_82506AA4(s16 *arg0, s32 arg1, s32 arg2) {
+    *(s16 *)((u8 *)&D_82508FF0 + 0x28) = arg0[0];
+    *(s16 *)((u8 *)&D_82508FF0 + 0x2A) = arg0[1];
+    *(s16 *)((u8 *)&D_82508FF0 + 0x2C) = arg1;
+    *(s16 *)((u8 *)&D_82508FF0 + 0x2E) = arg2;
+    *(u16 *)((u8 *)&D_82508FF0 + 6) |= 4;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_144790/func_82506AD4.s")
 
