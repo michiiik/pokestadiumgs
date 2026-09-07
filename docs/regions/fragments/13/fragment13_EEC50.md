@@ -15,3 +15,15 @@ Deferred after probe-only batches: func_82404230 best normalized 1.0/raw 0.963 r
 ## Wave 10 handoff (2026-08-31)
 
 No accepted owner. func_82406CDC received 7 serial CC_CHECK=1 probes across raw-offset, typed-overlay, field-branch, and switch-local shapes. Best was call-chain:switch-reuse-local:direct at normalized/raw similarity 0.9500/0.9125; the frame matched, but the branch target drifted and size was 320 versus 312. The latest 0.9487/0.9231 result first differed at offset 60 (beq versus the expected branch-likely). Next hypothesis should target branch-likely/switch lowering and epilogue shape. No link_verified candidate or ROM gate.
+
+## 2026-09-07
+
+func_82404990: plateau at 0.9375 (raw 0.875), mismatch instruction_drift; tried families: constant-map; tie-pool no
+
+## 2026-09-07
+
+func_82405BAC: matched (state-field:preload-guard:float-local), 3 iterations, agent codex
+
+## 2026-09-07
+
+func_82404230: time cap at 0.8571 (raw 0.7857) after 2401s, mismatch instruction_drift; tried families: state-field; tie-pool no
