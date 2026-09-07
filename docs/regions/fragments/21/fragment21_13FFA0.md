@@ -33,3 +33,23 @@ tooling-blocked: func_825003DC was fresh (prior_attempts=0); EMFILE occurred bef
 ## func_82502528 requeue (2026-09-02) (2026-09-02)
 
 requeue: func_82502528 (67 instructions, prior_attempts=0 before this box) received 8 distinct CC_CHECK-enabled runner candidates after one initial 8-candidate preflight batch was rejected for redundant typedef declarations (process/tooling evidence; no source hypothesis counted). Corrected batch attempted raw-pointer while/for forms, explicit count, post-increment loop, typed count/base, guard-loop, s32 selector, and switch selector families. All 8 probe_rejected; no link_verified candidate and no ROM gate. Best normalized/raw score 0.6571/0.1714 (call-sequence:raw:explicit-count), expected/actual size 268/280 bytes. Stable first-diff fingerprint: operand_or_scheduling_drift at offset 3, expected addiu $sp,$sp,-64, actual addiu $sp,$sp,-72; other candidates produced 280-296 byte bodies. The candidate declarations included exact func_82502404(u8 *, u8 *, s16, s32, s32, s32, s32), globals D_82508F68/D_82508F84/D_82508D10/D_82508D12 and selector globals. Attempted hypothesis families: raw pointer arithmetic, declaration/lifetime order, explicit count, typed base/count, if polarity, selector width, switch. Next materially different action: reconstruct the 0x40 frame with compiler-faithful fixed-size local overlays/arrays (likely four stack-passed arguments at 0x10/0x14/0x18 plus saved registers), then vary only local declaration order and callee formal types; do not repeat pointer-heavy bodies.
+
+## 2026-09-07
+
+func_82500CF0: matched (state_field_access:hoisted-index:inner-neq-empty), 3 iterations, agent codex
+
+## 2026-09-07
+
+func_82502E20: plateau at 0.9375 (raw 0.6875), mismatch operand_or_scheduling_drift; tried families: constant_map; tie-pool no
+
+## 2026-09-07
+
+func_82500D24: matched (state-field:switch:index-before-switch), 1 iterations, agent codex
+
+## 2026-09-07
+
+func_82502DDC: time cap at 0.9412 (raw 0.5294) after 2411s, mismatch operand_or_scheduling_drift; tried families: constant_map; tie-pool no
+
+## 2026-09-07
+
+func_82502E60: matched (constant-map:result:offset-plus-base), 1 iterations, agent codex
