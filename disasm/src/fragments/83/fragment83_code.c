@@ -526,7 +526,7 @@ extern void func_80008624(void);
 extern void StageLoader_WaitForRetrace(void);
 extern void func_800226C0(s32);
 extern void func_82C034C8(void);
-s32 func_82C04880(void *arg0, s32 arg1) {
+s32 fragment83_main(void *arg0, s32 arg1) {
     if (arg1 == 0) {
         return 0;
     }
