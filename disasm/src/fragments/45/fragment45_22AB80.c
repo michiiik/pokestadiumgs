@@ -195,5 +195,7 @@ void func_8AB0A1A4(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22AB80/func_8AB0A720.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22AB80/func_8AB0A8D4.s")
+extern s16 D_8AB16CE6;
+extern s32 func_8AB0A2D8(s32);
+s32 func_8AB0A8D4(s32 arg0) { s32 result = 0x21; s16 *count = &D_8AB16CE6; switch (arg0) { case 0: *count = 0; break; case 1: if (*count >= 0x1F) result = func_8AB0A2D8(0); *count = *count + 1; break; } return result; }
 #endif
