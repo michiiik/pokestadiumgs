@@ -260,7 +260,10 @@ void func_823030A4(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82303308.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82303488.s")
+extern s32 func_82300AB4(void);
+extern s32 func_82300F4C(void);
+extern s16 D_82305E68[];
+s32 func_82303488(void) { s32 result = 0; s16 *counter = D_82305E68; if (func_82300AB4()) result = 1; if (func_82300F4C()) result |= 2; if (result == 3) { if (++counter[0] < 2) result = 0; } else result = 0; return result; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82303508.s")
 
