@@ -375,7 +375,16 @@ s32 func_81304444(u8 *arg0, s32 arg1, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FAD40/func_8130456C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FAD40/func_81304678.s")
+s32 func_81304678(u8 *arg0, u8 *arg1) {
+    u8 *entry; entry = arg0 + 0x20;
+    if (arg1[0] == 0) return 0;
+    if (entry[0] == 0) goto n1; if (*(s32 *)(arg1+0x58) == *(s32 *)(entry+0x58)) return 1;
+n1: entry += 0xCE8; if (entry[0] == 0) goto n2; if (*(s32 *)(arg1+0x58) == *(s32 *)(entry+0x58)) return 1;
+n2: entry += 0xCE8; if (entry[0] == 0) goto n3; if (*(s32 *)(arg1+0x58) == *(s32 *)(entry+0x58)) return 1;
+n3: entry += 0xCE8; if (entry[0] == 0) goto n4; if (*(s32 *)(arg1+0x58) == *(s32 *)(entry+0x58)) return 1;
+n4: entry += 0xCE8; if (entry[0] == 0) goto n5; if (*(s32 *)(arg1+0x58) == *(s32 *)(entry+0x58)) return 1;
+n5: entry += 0xCE8; if (entry[0] != 0 && *(s32 *)(arg1+0x58) == *(s32 *)(entry+0x58)) return 1; return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FAD40/func_81304788.s")
 
