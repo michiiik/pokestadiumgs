@@ -72,3 +72,15 @@ comes out `0x20` instead of `0x28`. The file already uses this idiom (`volatile 
 General lesson for this file: when a candidate is short by exactly the instructions of one
 constant materialisation and the surrounding schedule is shuffled, suspect IDO's FP-constant CSE
 before suspecting the calling convention.
+
+## 2026-09-08
+
+func_86009EF8: matched (predicate:expression:compare-xor-value), 2 iterations, agent codex
+
+## 2026-09-08
+
+func_8600A0C8: plateau at 0.9032 (raw 0.3871), mismatch operand_or_scheduling_drift; tried families: constant-map; tie-pool no
+
+## 2026-09-08
+
+func_860098A8: time cap at 0.9714 (raw 0.8) after 2400s, mismatch operand_or_scheduling_drift; tried families: call_chain; tie-pool no
