@@ -23,3 +23,23 @@ Deferred:
 - `func_82C03F40`: existing register-allocation tie; skip.
 - `func_82C04880`: known runner `probe_unavailable`/list-index diagnostics defect; skip.
 - `func_82C047C4` and larger/dispatcher owners: deferred for a later box.
+
+## 2026-09-08
+
+func_82C02664: matched (constant-map:bit-test:base-temp:post-index), 3 iterations, agent codex
+
+## 2026-09-08
+
+func_82C03F40: plateau at 0.9655 (raw 0.8966), mismatch instruction_drift; tried families: call-chain; tie-pool yes
+
+## 2026-09-08
+
+func_82C04880: matched (call-chain:guard-return:void-pointer-s32), 1 iterations, agent codex
+
+## 2026-09-08
+
+func_82C0359C: plateau at 0.0 (raw None), mismatch unknown; tried families: call-chain; tie-pool no
+
+## 2026-09-08
+
+func_82C03DC0: plateau at 0.9861 (raw 0.8056), mismatch instruction_drift; tried families: call-chain; tie-pool no
