@@ -349,6 +349,102 @@ class FoldGapToleranceTest(unittest.TestCase):
         self.assertEqual(count, 3)
 
 
+class PartialFoldTest(unittest.TestCase):
+    """A pragma symbol list folds only part of a same-page run.
+
+    ``func_82300A78`` (fragments/19) is the motivating ground truth: it stores
+    to D_82305EB4, then D_82305EC4/EC6/EC2, then D_82305EC8 -- every one of
+    them on the same ``%hi`` page -- yet reuses one ``$at`` for only the
+    middle three and reloads it for D_82305EC8. A greedy maximal-run fold
+    collapses all five into one ``lui`` and produces a function two
+    instructions shorter than ground truth.
+    """
+
+    SOURCE = (
+        "\t.ent\tfunc_part 2\n"
+        "func_part:\n"
+        "\tsh\t$15, D_82305EB4\n"
+        "\tsh\t$0, D_82305EC4\n"
+        "\tsh\t$0, D_82305EC6\n"
+        "\tsh\t$0, D_82305EC2\n"
+        "\tsh\t$0, D_82305EC8\n"
+        "\tj\t$31\n"
+        "\t.end\tfunc_part\n"
+    )
+    ADDRS = {
+        "D_82305EB4": 0x82305EB4,
+        "D_82305EC2": 0x82305EC2,
+        "D_82305EC4": 0x82305EC4,
+        "D_82305EC6": 0x82305EC6,
+        "D_82305EC8": 0x82305EC8,
+    }
+
+    def test_bare_marker_folds_the_whole_run(self):
+        folded, count = coalesce_lui.fold_source(
+            self.SOURCE, {"func_part"}, self.ADDRS
+        )
+        self.assertEqual(count, 4)
+        self.assertEqual(folded.count("lui\t$at"), 1)
+
+    def test_symbol_list_folds_only_the_named_symbols(self):
+        folded, count = coalesce_lui.fold_source(
+            self.SOURCE,
+            {"func_part": frozenset({"D_82305EC4", "D_82305EC6", "D_82305EC2"})},
+            self.ADDRS,
+        )
+        self.assertEqual(count, 2)
+        self.assertEqual(folded.count("lui\t$at"), 1)
+        # The two ops outside the list keep their own macro form, so the
+        # assembler still emits a lui for each of them.
+        self.assertIn("\tsh\t$15, D_82305EB4\n", folded)
+        self.assertIn("\tsh\t$0, D_82305EC8\n", folded)
+
+    def test_symbol_list_of_one_symbol_folds_nothing(self):
+        folded, count = coalesce_lui.fold_source(
+            self.SOURCE, {"func_part": frozenset({"D_82305EC4"})}, self.ADDRS
+        )
+        self.assertEqual(count, 0)
+        self.assertEqual(folded, self.SOURCE)
+
+
+class UndefinedSymsAddressMapTest(unittest.TestCase):
+    """splat's ``undefined_syms_auto.ld`` is a first-class address source.
+
+    A data page referenced only from still-``GLOBAL_ASM`` code often has no
+    ``symbol_addrs`` entry at all, and the linked map lists it only as an
+    ld assignment row that ``parse_linker_map`` deliberately does not match.
+    Missing it made ``fold_source`` silently decline the run (and
+    ``scan_coalesce_sites.py`` not report the site at all).
+    """
+
+    def test_resolve_reads_undefined_syms_auto(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            auto = root / "disasm" / "linker_scripts" / "us" / "auto"
+            auto.mkdir(parents=True)
+            (auto / "undefined_syms_auto.ld").write_text(
+                "D_82305EC2 = 0x82305EC2;\nD_82305EC6 = 0x82305EC6;\n",
+                encoding="utf-8",
+            )
+            addrs = coalesce_lui.resolve_repo_addresses(root)
+        self.assertEqual(addrs["D_82305EC2"], 0x82305EC2)
+        self.assertEqual(addrs["D_82305EC6"], 0x82305EC6)
+
+    def test_symbol_addrs_wins_over_undefined_syms(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            us = root / "disasm" / "linker_scripts" / "us"
+            (us / "auto").mkdir(parents=True)
+            (us / "symbol_addrs.txt").write_text(
+                "D_DUP = 0x80001000;\n", encoding="utf-8"
+            )
+            (us / "auto" / "undefined_syms_auto.ld").write_text(
+                "D_DUP = 0x80002000;\n", encoding="utf-8"
+            )
+            addrs = coalesce_lui.resolve_repo_addresses(root)
+        self.assertEqual(addrs["D_DUP"], 0x80001000)
+
+
 class MarkerAndIntrospectionTest(unittest.TestCase):
     def test_find_coalesce_markers(self):
         source = (
@@ -370,6 +466,41 @@ class MarkerAndIntrospectionTest(unittest.TestCase):
         )
         self.assertEqual(
             coalesce_lui.find_coalesce_markers(source), {"func_a", "func_b"}
+        )
+
+    def test_find_coalesce_markers_ignores_a_symbol_list(self):
+        # The narrowed form still opts the function in; callers that only
+        # need the name set must not have to know about the extra argument.
+        source = (
+            "#pragma COALESCE_AT_LUI(func_a, D_1, D_2)\n"
+            "void func_a(void) {}\n"
+        )
+        self.assertEqual(coalesce_lui.find_coalesce_markers(source), {"func_a"})
+
+    def test_symbol_filters_bare_marker_is_none(self):
+        source = "#pragma COALESCE_AT_LUI(func_a)\nvoid func_a(void) {}\n"
+        self.assertEqual(
+            coalesce_lui.find_coalesce_symbol_filters(source), {"func_a": None}
+        )
+
+    def test_symbol_filters_parses_a_list(self):
+        source = (
+            "#pragma COALESCE_AT_LUI(func_a, D_82305EC4, D_82305EC6 , D_82305EC2)\n"
+            "void func_a(void) {}\n"
+        )
+        self.assertEqual(
+            coalesce_lui.find_coalesce_symbol_filters(source),
+            {"func_a": frozenset({"D_82305EC4", "D_82305EC6", "D_82305EC2"})},
+        )
+
+    def test_symbol_filters_bare_marker_wins_over_a_narrowed_one(self):
+        source = (
+            "#pragma COALESCE_AT_LUI(func_a, D_1)\n"
+            "#pragma COALESCE_AT_LUI(func_a)\n"
+            "void func_a(void) {}\n"
+        )
+        self.assertEqual(
+            coalesce_lui.find_coalesce_symbol_filters(source), {"func_a": None}
         )
 
     def test_functions_defined(self):

@@ -27,9 +27,25 @@ s32 func_823000F8(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_8230099C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82300A78.s")
-
 extern s16 D_82305EB4;
+extern s16 D_82305EC2;
+extern s16 D_82305EC4;
+extern s16 D_82305EC6;
+extern s16 D_82305EC8;
+/* Ground truth reuses one `lui $at` for the D_82305EC4/EC6/EC2 stores and
+   reloads $at for the equally same-page D_82305EC8, so the fold is narrowed
+   to those three symbols (AGENTS.md rule 12). */
+#pragma COALESCE_AT_LUI(func_82300A78, D_82305EC4, D_82305EC6, D_82305EC2)
+void func_82300A78(void) {
+    s16 *state = &D_82305EB4;
+    if (*state != 2) return;
+    *state = 3;
+    D_82305EC4 = 0;
+    D_82305EC6 = 0;
+    D_82305EC2 = 0;
+    D_82305EC8 = 0;
+}
+
 s32 func_82300AB4(void) {
     s32 result = 0;
     if (D_82305EB4 == 0) result = 1;

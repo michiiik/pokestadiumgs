@@ -220,7 +220,11 @@ Coordinator rules:
     `func_84136D84` is the worked example,
     `docs/regions/fragments/79/fragment79_393CA0.md` the full trail)
     post-processes the compiled object to fold the redundant `lui`s back to
-    one, matching ground truth. Write each symbol as its own independent
+    one, matching ground truth. Ground truth does not always fold a *whole*
+    same-page run -- `func_82300A78` reuses one `$at` for three of its five
+    same-page stores and reloads it for the others -- so the pragma also
+    takes an optional symbol list, `#pragma COALESCE_AT_LUI(f, S1, S2, S3)`,
+    which folds only those symbols and cuts the run at anything else. Write each symbol as its own independent
     store/load -- **not** array indexing, which materializes a base register
     instead of reusing `$at` and produces a completely different, wrong
     shape (an existing array-typed declaration can still be reused via a
@@ -593,6 +597,63 @@ to `docs/AGENTS_CHANGELOG.md`; they are not deleted, just out of the way.
 - Runner: `probe_unavailable` / `list index out of range` also reproduces on
   `func_82C04880` (`fragment83_code.c`) — same last-owner diagnostics bug,
   now five recorded instances.
+- `COALESCE_AT_LUI` (rule 12) folds the **compiled object**, not assembly
+  text (`disasm/tools/coalesce_object.py`). The earlier implementation
+  recompiled with `-S`, folded the extracted assembly, and re-assembled it;
+  that round trip silently discarded IDO's own `cc -c` scheduling, because
+  its `-S` text is emitted before delay slots are filled. Measured on
+  `func_82300A78` (`fragments/19/fragment19_121100.c`): from C, `cc -c`
+  hoists `li $t7, 3` above the `bne` and fills the delay slot with the next
+  macro store's `lui $at`; feeding IDO's own `-S` text back through GNU `as`
+  *or* through IDO's own assembler (both checked, with and without `-O2`)
+  gives `bne` + `nop` instead — one extra instruction, every time. The
+  mechanism therefore used to work only for a straight-line function, which
+  is why `func_84136D84` (no branch) never exposed it. The object fold
+  deletes the redundant `lui` words from the normally compiled object,
+  rewrites the orphaned `%lo` displacements to plain immediates, drops the
+  relocations they no longer need, and repairs every PC-relative branch the
+  deletion moved. It refuses rather than guesses on an unresolvable symbol, a
+  branch that leaves the function or targets a removed word, a `lui` in a
+  delay slot, or a word carrying more than one relocation. Note that a `lui`
+  need not be adjacent to its own memory op: IDO hoists one above a control
+  transfer and leaves the store in the delay slot (`func_84136D84`'s last
+  store), and dropping that pair folds one `lui` short of ground truth.
+- `COALESCE_AT_LUI`: the fold's correctness rests entirely on the address
+  map, because it replaces a relocation with a literal displacement — a wrong
+  address becomes wrong bytes with no relocation left for the linker to catch.
+  `resolve_repo_addresses` falls back to a sibling checkout's linked `.map`
+  when this checkout has not been built, and that map can be from a *different
+  ELF*: a +0x10-skewed one silently produced a ROM 16 bytes long here. The
+  fold now cross-checks splat's address-derived names (`D_82305EC2` must
+  resolve to 0x82305EC2) and refuses a map that disagrees. If you hit that
+  refusal, your `disasm/build/pokestadiumgs-us.map` is stale or foreign — do
+  not work around it.
+- `COALESCE_AT_LUI`: ground truth does not always fold a whole same-page run
+  — `func_82300A78` shares one `$at` across three of its five same-page
+  stores and reloads it for the rest — so the pragma takes an optional symbol
+  list, `COALESCE_AT_LUI(f, S1, S2, S3)`, which folds only those symbols and
+  cuts the run at anything else.
+- `coalesce_lui.fold_source` / `prepare_snippet_for_gnu_as` and
+  `coalesce_splice.splice_function` are no longer on the build path (the
+  object fold replaced them). They stay as the text-level statement of the
+  fold's semantics — `scan_coalesce_sites.py` defines "contiguous" in terms
+  of `fold_source`, and their tests cover
+  `coalesce_splice.replace_function_bytes`, which *is* live. Retiring them is
+  a follow-up, not a blocker.
+- Runner: an **isolated-worktree gate bootstrap failure is recorded as
+  `compare_rejected`**, i.e. as if the candidate itself were wrong, and
+  `_DUPLICATE_BLOCKING_STATUSES` then bans that exact body forever. Hit while
+  landing `func_82300A78`: the bootstrap refused a symlinked
+  `linker_scripts/<version>/auto` (a legitimate refusal — see §1.2), the gate
+  never ran, and a body that provably produces a byte-identical ROM is now
+  un-resendable in that checkout's history. An infrastructure failure should
+  record as `probe_unavailable`/tooling-blocked, not as a rejection.
+- Runner: `_compare_link_shape` has no `COALESCE_AT_LUI` relaxation (only
+  `_relocation_fields_only_match` does), so every coalesced candidate reports
+  `link_verified: false` / `relocation_drift`. That is advisory and the
+  sequential ROM gate still runs, so it is correct today — but combined with
+  the entry above it means one infrastructure hiccup permanently bans the
+  body.
 - Runner (cosmetic): a `companion_edits` install can leave a redundant
   forward prototype next to the retyped declaration it just fixed (the
   callee-declaration scan injects one, the companion edit corrects the
