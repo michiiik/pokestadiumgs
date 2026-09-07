@@ -17,3 +17,27 @@ Flagged as section_layout_drift 'new_occurrence' (jump_table_status: not_applica
 ## Accepted owner: func_81404DA0 (register tie closed) (2026-09-06)
 
 Closed a register_allocation_only tie (25 prior rejected attempts sharing one first-diff fingerprint, no permuter attempt on record). tools/permute_candidate.py found a score-0 variant: swapping the declaration-order-adjacent 'result = 0;' assignment to come before the 'limit = ...' load instead of after, changing which register IDO assigns to each. Verified with tools/fleet_probe.py --gate: accepted, link-verified, full-ROM COMPARE=1 gate MD5 1561c75d11cedf356a8ddb1a4a5f9d5d.
+
+## 2026-09-08
+
+func_81404700: plateau at 0.0 (raw None), mismatch unknown; tried families: (none); tie-pool no
+
+## 2026-09-08
+
+func_81404700: plateau at 0.8889 (raw 0.6667), mismatch operand_or_scheduling_drift; tried families: constant-map; tie-pool no
+
+## 2026-09-08
+
+func_814038D4: matched (constant-map:scan:indexed-pointer-array), 2 iterations, agent codex
+
+## 2026-09-08
+
+func_81404D00: plateau at 0.7059 (raw 0.1765), mismatch operand_or_scheduling_drift; tried families: constant-map; tie-pool no
+
+## 2026-09-08
+
+func_81402930: matched (init-sequence:goto:limit-first), 4 iterations, agent codex
+
+## 2026-09-08
+
+func_81403710: plateau at 0.85 (raw 0.5), mismatch operand_or_scheduling_drift; tried families: constant-map; tie-pool no

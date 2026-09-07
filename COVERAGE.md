@@ -85,7 +85,7 @@
 | `disasm/src/fragments/11/fragment11_D9520.c` | 55 | 97 | 43.3% |
 | `disasm/src/fragments/11/fragment11_E1E10.c` | 13 | 30 | 56.7% |
 | `disasm/src/fragments/12/fragment12_E5330.c` | 14 | 25 | 44.0% |
-| `disasm/src/fragments/12/fragment12_E7C00.c` | 41 | 72 | 43.1% |
+| `disasm/src/fragments/12/fragment12_E7C00.c` | 39 | 72 | 45.8% |
 | `disasm/src/fragments/13/fragment13_EE0A0.c` | 3 | 6 | 50.0% |
 | `disasm/src/fragments/13/fragment13_EE5B0.c` | 5 | 10 | 50.0% |
 | `disasm/src/fragments/13/fragment13_EEC50.c` | 46 | 79 | 41.8% |
