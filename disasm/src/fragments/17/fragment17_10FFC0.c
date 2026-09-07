@@ -212,7 +212,19 @@ s32 func_82202B80(s32 arg0, u8 *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_822030BC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_822031D0.s")
+extern u8 *D_8220E4D0[];
+s32 func_822031D0(s32 arg0, u8 *arg1) {
+    s32 temp_v0 = *(s32 *)(arg1 + 0x20);
+    switch (arg0) {
+    case 0:
+        *(u16 *)(arg1 + 2) &= 0xFFFD;
+        D_8220E4D0[temp_v0] = arg1;
+        break;
+    case 1:
+        break;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82203210.s")
 
