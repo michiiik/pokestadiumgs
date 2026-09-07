@@ -594,9 +594,45 @@ reaches an agent through `tools/file_brief.py`, not here.
 Resolved historical entries (bug + fix, no remaining open caveat) have moved
 to `docs/AGENTS_CHANGELOG.md`; they are not deleted, just out of the way.
 
+- Runner (fixed 2026-09-07): **`_function_mismatch_details` scored two
+  different index spaces against each other, and every score it derived from a
+  function containing a `nop` run was wrong.** `objdump` collapses a run of two
+  or more zero words into a single `...` line, and zero is `nop` on MIPS, so
+  `_instruction_texts` returned fewer entries than the byte stream had words —
+  while the raw `SequenceMatcher` still ran over the words. Dividing that
+  word-space match count by the *text*-space length produced **similarity
+  scores above 1.0**; it also produced a false normalised 1.0 that hid a real
+  mismatch, an inflated `register_allocation_only` classification, and
+  `assembly_diff` rows attributed to the wrong instruction offset. Measured on
+  `func_80047BD4` (`47580.c`, three nop pairs): 84 words disassembled to 78
+  texts and the runner reported raw **1.0513** at normalised 1.0. A raw score
+  above 1.0 is impossible and is the tell. `_disassemble_bytes` now passes
+  `-z`, and `_instruction_texts` falls back to the 1:1 local decoder whenever
+  the disassembler's line count disagrees with the word count
+  (`test_runner_diagnostics.InstructionTextAlignmentTests`). Any near-miss or
+  `best_prior` score recorded before 2026-09-07 for a `nop`-run owner —
+  multiply-heavy code and `copt`-unrolled loops especially — is unreliable and
+  is worth re-probing rather than trusted; `func_80047BD4` was recorded as a
+  register tie at 2400 s and turned out to be an unattempted `for` loop that
+  closed in three batches once the scores were real.
+- Runner: `companion_edits` refuses any target that is still a `GLOBAL_ASM`
+  owner ("resolve that owner separately before using a companion edit"), but
+  the §4 case the mechanism exists for — "callee prototyped as `void`" — is
+  most often exactly a still-assembly callee whose stale extern breaks every
+  caller that consumes its `$v0` or passes its real argument count. In
+  `47580.c` this blocked `func_80047EC4` and `func_8004803C` across four
+  documented waves: each recorded a `tooling-blocked` handoff for what was
+  only ever a one-line declaration defect. Until the runner allows it, repair
+  such an extern (and any paired caller signature) as a separate
+  **declaration-only** change proved by a full `make -C disasm COMPARE=1`,
+  commit that, and probe the callers afterwards — a stale-prototype repair is
+  §2 rule 3 cleanup, not a candidate hypothesis. Worked example: `47580.c`'s
+  `u8 *func_800477C4(u8 *, u8 *)`, landed byte-identical on 2026-09-07.
 - Runner: `probe_unavailable` / `list index out of range` also reproduces on
   `func_82C04880` (`fragment83_code.c`) — same last-owner diagnostics bug,
-  now five recorded instances.
+  now five recorded instances. Note this is a *separate* defect from the
+  score-alignment bug fixed above; the `-z` fix removes the wrong-score class
+  but was not observed to raise or clear this `IndexError`.
 - `COALESCE_AT_LUI` (rule 12) folds the **compiled object**, not assembly
   text (`disasm/tools/coalesce_object.py`). The earlier implementation
   recompiled with `-S`, folded the extracted assembly, and re-assembled it;

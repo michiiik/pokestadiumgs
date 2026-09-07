@@ -505,6 +505,96 @@ class FunctionMismatchDetailsTests(unittest.TestCase):
         )
 
 
+class InstructionTextAlignmentTests(unittest.TestCase):
+    """One instruction text per word, or every derived number is wrong.
+
+    ``objdump`` collapses a run of two or more zero words into a single
+    ``...`` line, and zero is ``nop`` on MIPS.  The scores divide a
+    word-space match count by a text-space length, so a dropped line used to
+    produce raw similarity above 1.0 and a normalised 1.0 that hid a genuine
+    mismatch (``func_80047BD4`` in ``disasm/src/47580.c`` reported raw
+    1.0513 at normalised 1.0).
+    """
+
+    # ``nop`` runs surrounded by real instructions: the exact shape objdump
+    # elides.  ``addiu $sp, $sp, -8`` / nop / nop / ``jr $ra`` / nop / nop.
+    _NOP_RUN_BODY = (
+        b"\x27\xbd\xff\xf8"
+        b"\x00\x00\x00\x00"
+        b"\x00\x00\x00\x00"
+        b"\x03\xe0\x00\x08"
+        b"\x00\x00\x00\x00"
+        b"\x00\x00\x00\x00"
+    )
+
+    def test_disassembler_is_told_not_to_elide_zero_words(self) -> None:
+        with mock.patch.object(
+            runner, "_run_binutils", return_value=(0, "")
+        ) as run_binutils:
+            runner._disassemble_bytes(self._NOP_RUN_BODY)
+        argv = run_binutils.call_args.args[0]
+        self.assertIn("-z", argv)
+
+    def test_instruction_texts_are_one_per_word_over_a_nop_run(self) -> None:
+        texts = runner._instruction_texts(self._NOP_RUN_BODY)
+        self.assertEqual(len(texts), len(self._NOP_RUN_BODY) // 4)
+
+    def test_short_disassembly_falls_back_to_the_one_to_one_decoder(self) -> None:
+        with mock.patch.object(
+            runner, "_disassemble_bytes", return_value=["addiu sp,sp,-8", "jr ra"]
+        ):
+            texts = runner._instruction_texts(self._NOP_RUN_BODY)
+        self.assertEqual(len(texts), len(self._NOP_RUN_BODY) // 4)
+        # The fallback decoder, not the truncated objdump output.
+        self.assertNotIn("addiu sp,sp,-8", texts)
+
+    def test_similarity_scores_stay_within_the_unit_range(self) -> None:
+        expected = self._NOP_RUN_BODY
+        variants = {
+            "identical": expected,
+            "one_word_changed": expected[:12] + b"\x03\xe0\x00\x09" + expected[16:],
+            "shorter": expected[:-8],
+            "longer": expected + b"\x00\x00\x00\x00" * 2,
+        }
+        for name, actual in variants.items():
+            with self.subTest(variant=name):
+                details = runner._function_mismatch_details(
+                    Path("unused.o"),
+                    "func_synthetic",
+                    expected,
+                    actual,
+                    actual_symbol_size=len(actual),
+                )
+                for key in (
+                    "raw_similarity_score",
+                    "similarity_score",
+                    "register_only_similarity_score",
+                    "exact_similarity_score",
+                ):
+                    self.assertLessEqual(details[key], 1.0, msg=f"{name}/{key}")
+                    self.assertGreaterEqual(details[key], 0.0, msg=f"{name}/{key}")
+                self.assertEqual(
+                    details["expected_instruction_count"], len(expected) // 4
+                )
+                self.assertEqual(
+                    details["actual_instruction_count"], len(actual) // 4
+                )
+
+    def test_a_real_difference_is_not_masked_by_an_elided_nop_run(self) -> None:
+        expected = self._NOP_RUN_BODY
+        # Change the instruction that sits *after* the elided nop run.
+        actual = expected[:12] + b"\x03\xe0\x00\x09" + expected[16:]
+        details = runner._function_mismatch_details(
+            Path("unused.o"),
+            "func_synthetic",
+            expected,
+            actual,
+            actual_symbol_size=len(actual),
+        )
+        self.assertLess(details["raw_similarity_score"], 1.0)
+        self.assertEqual(details["first_diff_instruction"], 3)
+
+
 class PrototypeScannerTests(unittest.TestCase):
     """Deliverable C: scan_source_for_callee_signature and friends."""
 

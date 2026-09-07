@@ -2287,6 +2287,12 @@ def _disassemble_bytes(data: bytes, repo_root: Path | None = None) -> list[str]:
             [
                 _binutils_tool("objdump"),
                 "-D",
+                # By default objdump collapses a run of two or more zero words
+                # into a single ``...`` line.  Zero *is* ``nop`` on MIPS, so
+                # without this the disassembly silently loses one line per
+                # elided nop and every index derived from it slips out of
+                # step with the raw word stream (see ``_instruction_texts``).
+                "-z",
                 "-EB",
                 "-b",
                 "binary",
@@ -2313,9 +2319,25 @@ def _disassemble_bytes(data: bytes, repo_root: Path | None = None) -> list[str]:
 
 
 def _instruction_texts(data: bytes, *, repo_root: Path | None = None) -> list[str]:
-    """Return objdump text, falling back to the local compact decoder."""
+    """Return one instruction text per 4-byte word of ``data``.
+
+    The one-text-per-word invariant is load bearing, not cosmetic. Callers
+    score the *word* stream with one ``SequenceMatcher`` and the *text*
+    stream with another, then divide the word-space match count by the
+    text-space length and index one list with the other's offsets. Any
+    disassembler that returns a different number of lines than there are
+    words therefore yields impossible similarity scores (raw > 1.0), a
+    false normalised 1.0 that hides a real mismatch, and instruction texts
+    attributed to the wrong offset.
+
+    ``objdump`` does exactly that when left to its own devices: it elides a
+    run of zero words to ``...``, and zero is ``nop``. ``-z`` suppresses the
+    elision, and this guard is the backstop for any other version-specific
+    line the regex may drop -- the local decoder is 1:1 by construction.
+    """
+    expected_words = max(len(data) // 4, 0)
     instructions = _disassemble_bytes(data, repo_root=repo_root)
-    if instructions:
+    if len(instructions) == expected_words:
         return instructions
     return [
         _mips_instruction_description(
