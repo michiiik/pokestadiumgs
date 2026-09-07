@@ -40,8 +40,26 @@ def _write_asm(path: Path, function: str, instruction_count: int) -> None:
     path.write_text("".join(lines))
 
 
-def _write_jump_table_asm(path: Path, function: str, table: str) -> None:
-    lines = [
+def _write_jump_table_asm(
+    path: Path, function: str, table: str, *, migrated: bool = False
+) -> None:
+    """An owner referencing ``table``.
+
+    ``migrated=True`` also emits the ``.late_rodata`` block splat writes
+    into the owner's own ``.s`` once a ``.rodata`` subsegment actually
+    covers that table's address -- the shape ``_jump_table_readiness``
+    requires before calling the owner ready.
+    """
+    lines = []
+    if migrated:
+        lines += [
+            ".section .late_rodata\n",
+            f"dlabel {table}\n",
+            "    /* 0 0 0 */ .word .L00000000\n",
+            "\n",
+            ".section .text\n",
+        ]
+    lines += [
         f"glabel {function}\n",
         f"    /* 0 0 0 */  lui $at, %hi({table})\n",
         "    /* 0 0 0 */  addiu $t0, $t0, 1\n",
@@ -363,6 +381,7 @@ class RankFilesTests(unittest.TestCase):
         (self.source_root / "ready.c").write_text(_pragma("func_ready"))
         _write_jump_table_asm(
             self.asm_root / "x" / "func_ready.s", "func_ready", "jtbl_80020000",
+            migrated=True,
         )
         (self.source_root / "blocked.c").write_text(_pragma("func_blocked"))
         _write_jump_table_asm(

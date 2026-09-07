@@ -42,8 +42,28 @@ def _write_asm(path: Path, function: str, instruction_count: int = 6) -> None:
     path.write_text("".join(lines))
 
 
-def _write_jump_table_asm(path: Path, function: str, table: str) -> None:
-    lines = [
+def _write_jump_table_asm(
+    path: Path, function: str, table: str, *, migrated: bool = True
+) -> None:
+    """An owner referencing ``table``.
+
+    ``migrated=True`` (the default, matching every already-split fixture
+    here) also writes the ``.late_rodata`` block splat migrates into the
+    owner's own ``.s`` once a ``.rodata`` subsegment covers the table.
+    ``migrated=False`` is the ``jtbl_8418ADAC``/``func_84126FA0`` case: the
+    file has a subsegment, but this particular table's address falls
+    outside its window, so the table stays in the shared data blob.
+    """
+    lines = []
+    if migrated:
+        lines += [
+            ".section .late_rodata\n",
+            f"dlabel {table}\n",
+            "    /* 0 0 0 */ .word .L00000000\n",
+            "\n",
+            ".section .text\n",
+        ]
+    lines += [
         f"glabel {function}\n",
         f"    /* 0 0 0 */  lui $at, %hi({table})\n",
         "    /* 0 0 0 */  addiu $t0, $t0, 1\n",
@@ -119,11 +139,15 @@ class _RepoFixture:
         path.write_text(existing + _pragma(function))
         _write_asm(self.asm_root / "x" / f"{function}.s", function)
 
-    def add_jump_table_owner(self, function: str, table: str, source_name: str) -> None:
+    def add_jump_table_owner(
+        self, function: str, table: str, source_name: str, *, migrated: bool = True
+    ) -> None:
         path = self.source_root / source_name
         existing = path.read_text() if path.exists() else ""
         path.write_text(existing + _pragma(function))
-        _write_jump_table_asm(self.asm_root / "x" / f"{function}.s", function, table)
+        _write_jump_table_asm(
+            self.asm_root / "x" / f"{function}.s", function, table, migrated=migrated
+        )
 
     def write_rom_yaml(self, ready_source_keys: list[str]) -> None:
         yaml_path = self.root / "disasm" / "yamls" / "us" / "rom.yaml"
@@ -316,6 +340,34 @@ class JumpTableStaleRejectionTests(_RepoFixtureTestCase):
         }
         patches = self._patches(index)
         with patches[0], patches[1], patches[2]:
+            findings = ti.detect_jump_table_stale_rejections(
+                owners_attempts, find_owner=index.get, repo_root=self.fixture.root,
+            )
+        self.assertEqual(findings, [])
+
+    def test_owner_outside_its_files_subsegment_window_is_not_flagged(self) -> None:
+        """The ``func_84126FA0`` case: file split, this table still isn't.
+
+        ``fragment79_393CA0.c`` has a ``.rodata`` subsegment, but its window
+        starts after ``jtbl_8418ADAC``, so that table stays in the shared
+        data blob and splat never migrates it into the owner's ``.s``.
+        Flagging the owner ``stale_past_fix`` off the file-level yaml line
+        alone sent a perfect candidate to a gate that could only fail.
+        """
+        self.fixture.add_jump_table_owner(
+            "func_gap", "jtbl_80020000", "ready.c", migrated=False
+        )
+        self.fixture.write_rom_yaml(["ready"])
+        index = self.fixture.owner_index()
+        owners_attempts = {
+            "func_gap": [
+                {"function": "func_gap", "similarity_score": 1.0, "raw_similarity_score": 1.0,
+                 "mismatch_kind": "section_layout_drift", "label": "m2c:switch", "status": "probe_rejected",
+                 "timestamp": None, "source": None, "is_permuter": False, "_order": 0},
+            ],
+        }
+        patches = self._patches(index)
+        with patches[0], patches[1], patches[2], mock.patch.object(targets, "owner_index", return_value=index):
             findings = ti.detect_jump_table_stale_rejections(
                 owners_attempts, find_owner=index.get, repo_root=self.fixture.root,
             )

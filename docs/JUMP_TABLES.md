@@ -421,3 +421,61 @@ Two traps the replay exposes, both invisible to the isolated probe:
   `extern void _bzero(void *, s32);` several hundred lines later
   (`redeclaration of '_bzero'`).  Prepending the matching extern to the
   candidate is enough.
+
+---
+
+## 9. A file-level split is not a per-table split (2026-09-07)
+
+`fragment79_393CA0.c` had a `.rodata` subsegment from `0x3FA9E0` and five
+owners still failing the ROM gate with `section_layout_drift` at 1.0/1.0.
+The subsegment was real; it just started *after* their tables.  A file's
+`jtbl_*` symbols can sit on both sides of one window, and everything before
+it is still emitted by the shared `fragments/NN/fragmentNN_data` blob — so
+pulling such a table into the C object adds bytes the blob still emits and
+shifts every following address in the segment.
+
+### 9.1 Picking the cut point
+
+Two hard constraints, both verified here:
+
+1. **16-byte alignment (`SUBALIGN(16)`).**  The window must *start* at a
+   16-aligned ROM offset.  `add_rodata_subsegments.py for-jtbl` reports the
+   owner's whole run and then offers a start "widened to a 16-byte
+   boundary" — take that only when the run's own start is already aligned.
+   Widening backwards grabs bytes belonging to a *different file's* symbol
+   (here `jtbl_84189DA0`, owned by `fragment79_38EFE0`, whose span swallows
+   ~4 KB of unlabelled debug strings).  The fix is to move the cut
+   *forward*, to the next 16-aligned symbol, and leave the earlier tables
+   in the blob.
+2. **IDO's early/late `.rodata` order.**  Within one object IDO emits
+   string/const rodata first and jump tables plus float literals last, each
+   in source order.  splat migrates a table into its owner's `.s` as
+   `.section .late_rodata` and a string as `.section .rodata`, so the
+   window's contents must come out in that order once re-sorted by
+   *defining function position in the C file*.  In `fragment79_393CA0.c`
+   the strings `D_8418AF68`/`D_8418AF70`/`D_8418AF78` ("Satoru", "Pokemon",
+   "Stadium") are referenced by `func_8413D7AC`/`func_8413DE28`, near the
+   end of the file, while sitting *before* `jtbl_8418AF80` in the ROM.  A
+   window starting at or before them cannot reproduce the ROM order.
+
+`0x3FA810` (`jtbl_8418AF80`) is the only offset in this file satisfying
+both: 16-aligned, and from there to the old `0x3FA9E0` boundary every
+symbol is a singly-referenced jump table whose owner order matches ROM
+order.  It unblocked 12 owners.  The four tables below it
+(`jtbl_8418AD94`, `jtbl_8418ADAC`, `jtbl_8418ADCC`, `jtbl_8418AECC` —
+`func_84125778`, `func_84126FA0`, `func_8413146C`, `func_841343FC`) stay
+blocked: none of their offsets is 16-aligned, and `jtbl_8418AECC`'s symbol
+span runs on into unlabelled format strings.  Unblocking them needs the
+`.c` file split at the real translation-unit boundary
+(`func_841343FC`/`func_8413543C`), not another subsegment line.
+
+### 9.2 Readiness is now per-table
+
+`pragma_targets._jump_table_readiness` used to answer "does this *file*
+have a `.rodata` line in `rom.yaml`", which reported all five gap owners
+`ready` and sent their perfect candidates to a gate that could only fail.
+It now also requires that every table the owner references is *defined* in
+the owner's own `.s` (`dlabel jtbl_…` inside a `.section .late_rodata`
+block) — i.e. that splat actually migrated it, which is only true when the
+window covers its address.  No address arithmetic, and a stale, not-yet-
+re-split `asm/` tree reports `unready` instead of inviting a doomed run.

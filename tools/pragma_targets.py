@@ -221,17 +221,53 @@ def _rodata_subsegment_owners(*, repo_root: Path | None = None) -> set[str]:
     return owners
 
 
+def _defines_symbol(asm_text: str, symbol: str) -> bool:
+    """True when ``asm_text`` *defines* ``symbol`` rather than referencing it.
+
+    splat writes a migrated rodata symbol into the referencing function's
+    own ``.s`` as ``dlabel <name>`` (occasionally ``glabel``/``jlabel``);
+    an unmigrated one only ever appears inside a ``%hi``/``%lo`` operand.
+    """
+    return re.search(
+        rf"^\s*(?:d|g|j)label\s+{re.escape(symbol)}\s*$", asm_text, re.MULTILINE
+    ) is not None
+
+
 def _jump_table_readiness(
     owner: Owner,
     row: dict[str, object],
     *,
     repo_root: Path | None = None,
 ) -> tuple[bool, bool]:
-    """Return ``(ready, unready)`` for an owner's jump-table layout."""
-    has_jump_table = bool(row.get("jump_tables"))
+    """Return ``(ready, unready)`` for an owner's jump-table layout.
+
+    A file-level ``.rodata`` subsegment is necessary but *not* sufficient.
+    A subsegment covers one address window, and a file's tables can live
+    on both sides of it: ``fragment79_393CA0.c``'s window started at
+    ``jtbl_8418AF80`` while ``jtbl_8418ADAC`` (``func_84126FA0``) stayed
+    behind in the shared ``fragments/79/fragment79_data`` blob.  Reporting
+    that owner ``ready`` off the file-level flag alone sent perfect 1.0/1.0
+    candidates to a full-ROM gate that could only ever fail
+    (``section_layout_drift``): the table's bytes are still emitted by the
+    shared blob, so pulling them into the C object shifts every following
+    address in the segment.
+
+    The check that actually distinguishes the two is per-table and needs no
+    address arithmetic: splat migrates a covered table into the owner's own
+    ``.s`` as a ``.section .late_rodata``/``.rodata`` block, so the table is
+    *defined* there (``dlabel jtbl_…``) instead of merely referenced.  An
+    owner is ready only when every table it references has been migrated
+    that way -- which also means a stale, not-yet-re-split ``asm/`` tree
+    reports ``unready`` rather than inviting a doomed gate run.
+    """
+    tables = list(row.get("jump_tables") or [])
+    has_jump_table = bool(tables)
     source_key = owner.source.removeprefix("disasm/src/").removesuffix(".c")
     has_subsegment = source_key in _rodata_subsegment_owners(repo_root=repo_root)
-    return (has_jump_table and has_subsegment, has_jump_table and not has_subsegment)
+    migrated = set(row.get("jump_tables_migrated") or ())
+    all_migrated = all(table in migrated for table in tables)
+    ready = has_jump_table and has_subsegment and all_migrated
+    return (ready, has_jump_table and not ready)
 
 
 def _coalesce_modules():
@@ -469,6 +505,13 @@ def _classify_owner(owner: Owner) -> dict[str, object]:
         "calls": calls,
         "globals": globals_,
         "jump_tables": jump_tables,
+        # Tables splat has already migrated into this owner's own .s (a
+        # ``.late_rodata``/``.rodata`` block ending up in the C object),
+        # as opposed to ones it still only references from the shared data
+        # blob.  See _jump_table_readiness.
+        "jump_tables_migrated": [
+            table for table in jump_tables if _defines_symbol(text, table)
+        ],
         "notes": notes,
     }
     _CLASSIFICATION_CACHE[key] = row
