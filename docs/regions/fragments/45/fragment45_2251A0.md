@@ -29,3 +29,15 @@ requeue func_8AB01140: 60 probe-only candidates across fill-vs-env opcode correc
 ## 2026-09-02 worker requeue: func_8AB0234C (2026-09-02)
 
 register-tie requeue: submitted 8 distinct compiling call_sequence candidates varying declaration order, formal/local widths, branch order, explicit temporaries, and constant staging. All had expected=actual 160 bytes, 40 instructions, normal_return, and no link_verified candidate or ROM gate. Best normalized/raw similarity was 1.0000/0.8500 (variant 1), mismatch_kind register_allocation_only, first-diff fingerprint [register_allocation_only,25,6,0x24050002,0x24030002]: expected instruction 6 addiu $a1,$zero,2 but actual addiu $v1,$zero,2; subsequent differences kept $v1 where target uses $a1, plus expected beq $v0,$a1 versus actual $v1,$v0. Other variants reached at most 0.75 normalized/0.625 raw and introduced operand_or_scheduling_drift from reordered control flow or earlier register choices. Repaired permuter ran 45 seconds on the strongest compiling body, timed out at score 40 with no improvement. Next action: materially different permuter/ABI model that preserves the original nested control-flow shape while forcing the compiler to allocate the second discriminator in $a1 (possibly exact callee declaration/call-site staging or a verified permuter rewrite); then resubmit any score-0 body through the runner for automatic full-ROM gating.
+
+## 2026-09-07
+
+func_8AB01ED4: time cap at 0.9767 (raw 0.8372) after 2400s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool yes
+
+## 2026-09-07
+
+func_8AB0178C: time cap at 0.88 (raw 0.72) after 2410s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-07
+
+func_8AB0322C: matched (call_sequence:shuffle:table-s16-swapped-calls), 3 iterations, agent codex
