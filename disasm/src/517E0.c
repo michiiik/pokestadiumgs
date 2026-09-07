@@ -26,7 +26,27 @@ s32 func_80050CAC(s32 arg0, s32 arg1) {
 
 extern s32 D_800972B0[]; s32 func_80050CF8(s32 arg0){s32 result=0;if(arg0>=0&&arg0<4)result=D_800972B0[arg0];return result;}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80050D20.s")
+s32 func_80050D20(s32 arg0, s32 arg1) {
+    s32 result = -1;
+    switch (arg0) {
+    case 0x10: result = arg1 / 4; break;
+    case 0x11: result = (arg1 > 0) ? 2 : 1; break;
+    case 0x12: result = 3; break;
+    case 0x13: result = 3; break;
+    case 0x14: result = 3; break;
+    case 0x15: result = 3; break;
+    case 0x16: result = 1; break;
+    case 0x17: result = 1; break;
+    case 0x18: result = 3; break;
+    case 0x19: result = 3; break;
+    case 0x1A: result = 3; break;
+    case 0x1B: result = 3; break;
+    case 0x1C: result = 3; break;
+    case 0x1D: result = 3; break;
+    case 0x1E: result = 3; break;
+    }
+    return result;
+}
 
 s32 func_80050DE4(s32 arg0) {
     s32 result = 0;
