@@ -196,7 +196,34 @@ u8 func_84300BE8(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_84301094.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_843013A4.s")
+extern u8 func_84300350(u8 *, u8);
+extern s32 func_8430049C(u8);
+extern u8 D_84302CA2[];
+extern u8 D_84302FAE[];
+extern u8 D_84302FD2[];
+extern u8 func_8430022C(u8 *);
+extern u8 func_84300348(u8 *arg0);
+extern s32 func_84300928(u8 arg0);
+u8 func_843013A4(u8 *arg0) {
+    u8 result;
+
+    result = 0;
+    if (func_84300348(D_84302CA2) > 0) {
+        result = func_8430022C(D_84302CA2);
+        func_84300350(D_84302CA2, result);
+    } else if (func_84300348(D_84302FAE) > 0) {
+        result = func_8430022C(D_84302FAE);
+        if (func_84300928(result) == 0) {
+            result = func_8430022C(D_84302FAE);
+        }
+        func_84300350(D_84302FAE, result);
+    } else if (func_84300348(D_84302FD2) > 0) {
+        result = func_8430022C(D_84302FD2);
+        func_84300350(D_84302FD2, result);
+    }
+    func_8430049C(result);
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_84301490.s")
 
