@@ -196,7 +196,25 @@ void func_862014B8(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_266A60/func_8620157C.s")
+extern void *func_87F025B8(void *, void *);
+extern void func_8003F1DC(void *);
+extern void func_8003F114(void *, s32, s32, s32);
+extern void func_8620148C(void);
+extern void * D_8620E198;
+s32 func_8620157C(s32 arg0) {
+    void *result; void *ptr; f32 scale;
+    result = func_87F025B8((u8 *)D_8620E198 + 0xED88, (void *)func_8620148C);
+    if (result != NULL) {
+        ptr = (u8 *)result + 0x24;
+        func_8003F1DC(ptr);
+        func_8003F114(ptr, 0, -1, *(s32 *)((u8 *)D_8620E198 + 0x13C));
+        scale = *(f32 *)((u8 *)arg0 + 0x34) * (*(f32 *)((u8 *)D_8620E198 + 0x64) * 0.75f);
+        *(f32 *)((u8 *)result + 0x5C) = scale;
+        *(f32 *)((u8 *)result + 0x58) = scale;
+        *(f32 *)((u8 *)result + 0x54) = scale;
+    }
+    return (s32)result;
+}
 #endif
 
 #ifdef VERSION_US
