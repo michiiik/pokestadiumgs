@@ -24,7 +24,16 @@ u8 func_84300348(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_84300350.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_843003E0.s")
+s32 func_843003E0(u8 *arg0, u8 arg1) {
+    s32 i;
+
+    for (i = 1; i <= arg0[0]; i++) {
+        if (arg0[i] == arg1) {
+            return (u8)i;
+        }
+    }
+    return 0;
+}
 
 extern void func_84300200(u8 *, u8);
 extern s32 func_843003E0(u8 *, u8);
