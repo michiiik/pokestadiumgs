@@ -380,7 +380,25 @@ void func_87E16488(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E16894.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E16AA4.s")
+extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
+extern void func_80035A10(f32 *);
+extern void Vec3f_CrossProduct(f32 *, f32 *, f32 *);
+extern void func_87E1643C(void *arg0, void *arg1, void *arg2, void *arg3);
+void func_87E16AA4(void *arg0) {
+    f32 v0[3];
+    f32 v1[3];
+    f32 v2[3];
+    u8 pad[72];
+    Vec3f_SetComponentsDuplicate(v0, *(f32 *)((u8 *)arg0 + 0), *(f32 *)((u8 *)arg0 + 4), *(f32 *)((u8 *)arg0 + 8));
+    Vec3f_SetComponentsDuplicate(v1, *(f32 *)((u8 *)arg0 + 0x10), *(f32 *)((u8 *)arg0 + 0x14), *(f32 *)((u8 *)arg0 + 0x18));
+    Vec3f_SetComponentsDuplicate(v2, *(f32 *)((u8 *)arg0 + 0x20), *(f32 *)((u8 *)arg0 + 0x24), *(f32 *)((u8 *)arg0 + 0x28));
+    func_80035A10(v0);
+    Vec3f_CrossProduct(v1, v2, v0);
+    func_80035A10(v1);
+    Vec3f_CrossProduct(v2, v0, v1);
+    func_80035A10(v2);
+    func_87E1643C(arg0, v0, v1, v2);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E16B50.s")
 
