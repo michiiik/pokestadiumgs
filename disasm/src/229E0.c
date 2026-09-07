@@ -3998,7 +3998,18 @@ void GeoRender_RestoreRenderMode(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003D188.s")
+extern void func_8003CBD4(void);
+extern void func_8003D188_batch_decl_marker(void);
+extern void func_8003CB3C(Gfx *arg0, u8 arg1, u8 arg2);
+extern Gfx* D_800D0510;
+extern void * D_801263A8;
+void func_8003D188(u8 *arg0) {
+    if (((u8 *)D_801263A8)[0x25] != arg0[0]) {
+        func_8003CBD4();
+        func_8003CB3C(D_800D0510++, arg0[0], arg0[1]);
+        ((u8 *)D_801263A8)[0x25] = arg0[0];
+    }
+}
 #endif
 
 #ifdef VERSION_US
