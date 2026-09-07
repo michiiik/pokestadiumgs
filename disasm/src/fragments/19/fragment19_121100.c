@@ -123,7 +123,29 @@ s32 func_82301434(s32 arg0, u8 *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_823014EC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_823015B0.s")
+extern u16 D_82305E72;
+extern f32 D_82305EE0;
+s32 func_823015B0(s32 arg0, u8 *arg1) {
+    switch (arg0) {
+    case 0:
+        break;
+    case 1:
+        if (D_82305EE0 < 1.0f) {
+            *(u16 *)(arg1 + 2) &= 0xFFFD;
+        } else {
+            *(u16 *)(arg1 + 2) |= 2;
+            if (D_82305E72 & 1) {
+                *(u16 *)(arg1 + 2) |= 2;
+            } else {
+                *(u16 *)(arg1 + 2) &= 0xFFFD;
+            }
+        }
+        break;
+    default:
+        break;
+    }
+    return 0;
+}
 
 extern s16 D_82305E6A;
 extern f32 D_82305EE0;
