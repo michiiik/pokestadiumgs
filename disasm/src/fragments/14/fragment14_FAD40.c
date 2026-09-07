@@ -131,7 +131,23 @@ void func_81303364(void *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FAD40/func_813033DC.s")
+extern s32 func_8130F578(u8 *, u8 *);
+extern s32 func_8130A708(u8 *arg0);
+extern s32 func_8160A920(void);
+void func_813033DC(u8 *arg0) {
+    struct { u32 prefix; u8 buffer[8]; } local;
+    s32 result;
+    func_8160A920();
+    result = func_8130F578(*(u8 **)(arg0 + 0x4DA0), local.buffer);
+    if (result == 1) {
+        func_8130A708(*(u8 **)(arg0 + 0x4DA0) + 0xDA8);
+        *(s32 *)(arg0 + 0x4DAC) = 1;
+        arg0[0x4DBD] = 0xD;
+    } else if ((s16)result == 2) {
+        arg0[0x4DBD] = 0x11;
+        *(f32 *)(arg0 + 0x4DA4) = 16.0f;
+    }
+}
 
 extern void func_81302E58(void *, s32);
 s32 func_81311C70(s32, s32 *, u8, s32);
