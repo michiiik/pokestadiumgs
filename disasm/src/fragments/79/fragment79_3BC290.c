@@ -149,7 +149,21 @@ s32 func_8414D680(u8 arg0, u8 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414E658.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414E760.s")
+extern s32 func_841556C4(u8 *, u8);
+extern u8 func_84154B24();
+extern u8 * func_84154B64(u8);
+void func_8414E760(s32 arg0) {
+    u8 side;
+    u8 other;
+    u8 pad[4];
+    u8 *rec;
+    side = func_84154B24();
+    other = 1 - side;
+    func_84154B64(side);
+    rec = func_84154B64(other);
+    if (func_841556C4(rec, 0x6F) != 0 || func_841556C4(rec, 0x74) != 0)
+        *(u8 *)((u8 *)(u32)arg0 + side + 0xA) = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414E7D8.s")
 
