@@ -53,3 +53,7 @@ func_82502DDC: time cap at 0.9412 (raw 0.5294) after 2411s, mismatch operand_or_
 ## 2026-09-07
 
 func_82502E60: matched (constant-map:result:offset-plus-base), 1 iterations, agent codex
+
+## 2026-09-07
+
+func_8250008C: MATCHED (register-tie permuter sweep, batch 3). Stored tie candidate 'state_field_access:state-pointer:local' sat at normalized 1.0 / raw 0.6486, register_allocation_only, first diff at offset 17 (expected 'lhu $v0, $v0, 0', actual 'lhu $v1, $v0, 0') after 65 hand attempts. permute_candidate.py round 1 (420s) took the score 75 -> 30; round 2 re-based on that body reached 0. Two permuter artifacts in the landed body are load-bearing register-allocation levers, NOT dead code -- do not 'clean them up': the redundant 'if ((arg0 != 0) && (arg0 == 1))' guard, and the comma-operator store '*((0, state)) = new_var2 + 0x100'. Only whitespace/indent was normalised after the permuter; every token is as the permuter emitted it. Verified with tools/fleet_probe.py (accepted, link_verified=true) and container/gate_pr.sh: MD5 1561c75d11cedf356a8ddb1a4a5f9d5d, OK.

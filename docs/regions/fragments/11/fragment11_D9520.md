@@ -73,3 +73,7 @@ func_81606F88: plateau at 0.9545 (raw 0.9545), mismatch instruction_drift; tried
 ## 2026-09-07
 
 func_81606E14: matched (float_math:lookup:product-plus-base), 2 iterations, agent codex
+
+## 2026-09-07
+
+func_8160762C: near-miss after a register-tie permuter sweep (batch 3). Stored tie candidate 'constant-map:direct-output:next-denom-order', register_allocation_only, normalized 1.0 / raw 0.6667, first diff at offset 9 (expected 'addiu $t6, $a1, -1' vs actual 'addiu $t0, $a1, -1') after 116 attempts. permute_candidate.py round 1 (420s) took score 40 -> 10; round 2 re-based on the score-10 body stalled there for the full 900s (10, 10). The closest of the three unclosed ties in this batch -- worth one more escalation with a longer budget or a hand variant of the denominator/next ordering, but the current base is exhausted. tie-pool: yes, 1320s spent.

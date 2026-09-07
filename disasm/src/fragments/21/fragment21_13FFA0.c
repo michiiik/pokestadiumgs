@@ -21,7 +21,36 @@ s32 func_82500064(s32 arg0, s32 arg1) { switch (arg0) { case 0: D_82508F80 = arg
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_13FFA0/func_8250008C.s")
+extern u16 D_82508790;
+extern f32 D_80088E50[];
+s32 func_8250008C(s32 arg0, u8 *arg1) {
+    u16 *state;
+    u16 value;
+    unsigned int new_var2;
+    f32 sample;
+    f32 square;
+    f32 scaled;
+    f32 bias;
+    float new_var;
+    s32 result;
+    if ((arg0 != 0) && (arg0 == 1))
+    {
+        state = &D_82508790;
+        value = *state;
+        scaled = D_80088E50[value >> 4];
+        sample = scaled;
+        new_var = 255.0f;
+        square = sample * sample;
+        scaled = square * new_var;
+        bias = (scaled > 0.0f) ? (0.5f) : (-0.5f);
+        result = (s32) (bias + scaled);
+        arg1[0x33] = result;
+        arg1[0x2F] = result;
+        new_var2 = value;
+        *((0, state)) = new_var2 + 0x100;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US

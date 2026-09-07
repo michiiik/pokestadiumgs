@@ -49,3 +49,7 @@ func_84123E74: plateau at 0.9333 (raw 0.2667), mismatch operand_or_scheduling_dr
 ## 2026-09-07
 
 func_84122A78: time cap at 0.9375 (raw 0.9375) after 2416s, mismatch instruction_drift; tried families: state_field_access; tie-pool yes
+
+## 2026-09-07
+
+func_8412142C: triage flagged this as a register-tie permuter candidate (batch 3); it is NOT one, and it was NOT re-run. Best record is operand_or_scheduling_drift at normalized 0.9189 / raw 0.5946, under the 0.99 tie threshold, matching the plateau already noted above today. Its first diff (offset 13, expected 'lh $t6, $a0, 32' vs actual 'lh $v0, $a0, 32') looks register-shaped but sits on top of a scheduling difference, so the register choice is a symptom. No coalesce site for this owner either. Do not re-file as a tie.

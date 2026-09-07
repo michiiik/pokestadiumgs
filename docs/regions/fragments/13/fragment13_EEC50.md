@@ -27,3 +27,7 @@ func_82405BAC: matched (state-field:preload-guard:float-local), 3 iterations, ag
 ## 2026-09-07
 
 func_82404230: time cap at 0.8571 (raw 0.7857) after 2401s, mismatch instruction_drift; tried families: state-field; tie-pool no
+
+## 2026-09-07
+
+func_82404230: MATCHED (register-tie permuter sweep, batch 3). Stored tie candidate 'state-field:expr:division-f32' sat at normalized 1.0 / raw 0.8148, register_allocation_only, first diff at offset 70 (expected 'op/0x11 $t7, $a0, 16384', actual '... -32768') after 118 hand attempts. tools/permute_candidate.py round 1 (420s, 8 threads) cut the permuter score from 45 to 10; feeding that round-1 body back as the new base (round 2) reached score 0 in ~9s. The winning shape collapses the whole computation into a single return expression, with the negated s16 at +6 recomputed inline in both terms rather than held in a local. Verified with tools/fleet_probe.py (accepted, link_verified=true) and container/gate_pr.sh: build/pokestadiumgs-us.z64 MD5 1561c75d11cedf356a8ddb1a4a5f9d5d, OK.
