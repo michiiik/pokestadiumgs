@@ -10,7 +10,11 @@ extern u8 D_843023A8[]; u8 func_8430009C(void) { return D_843023A8[(func_8003570
 
 extern u8 D_843023AC[]; u8 func_843001CC(void) { u32 value = func_8003570C(); u32 remainder = value % 10; return D_843023AC[remainder]; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_84300200.s")
+void func_84300200(u8 *arg0, u8 arg1) {
+    if (arg0 != 0) {
+        arg0[(u8)++arg0[0]] = arg1;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_8430022C.s")
 
