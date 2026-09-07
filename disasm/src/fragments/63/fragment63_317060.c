@@ -293,7 +293,37 @@ void func_87E15A78(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E1614C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E16200.s")
+extern void Vec3f_CrossProduct(f32 *, f32 *, f32 *);
+extern void func_80035A10(f32 *);
+void func_87E16200(f32 *arg0, f32 *arg1, f32 *arg2) {
+    f32 v64[3];
+    f32 v58[3];
+    f32 v4C[3];
+    f32 v40[3];
+    f32 v34[3];
+    f32 v28[3];
+    Vec3f_CrossProduct(v40, arg2, arg0);
+    func_80035A10(v40);
+    Vec3f_CrossProduct(v28, arg0, arg1);
+    func_80035A10(v28);
+    Vec3f_CrossProduct(v58, arg1, arg2);
+    func_80035A10(v58);
+    Vec3f_CrossProduct(v34, arg0, arg1);
+    func_80035A10(v34);
+    Vec3f_CrossProduct(v64, arg1, arg2);
+    func_80035A10(v64);
+    Vec3f_CrossProduct(v4C, arg2, arg0);
+    func_80035A10(v4C);
+    arg0[0] += v58[0] + v64[0]; arg0[1] += v58[1] + v64[1]; arg0[2] += v58[2] + v64[2];
+    arg0[0] /= 3.0f; arg0[1] /= 3.0f; arg0[2] /= 3.0f;
+    func_80035A10(arg0);
+    arg1[0] += v40[0] + v4C[0]; arg1[1] += v40[1] + v4C[1]; arg1[2] += v40[2] + v4C[2];
+    arg1[0] /= 3.0f; arg1[1] /= 3.0f; arg1[2] /= 3.0f;
+    func_80035A10(arg1);
+    arg2[0] += v28[0] + v34[0]; arg2[1] += v28[1] + v34[1]; arg2[2] += v28[2] + v34[2];
+    arg2[0] /= 3.0f; arg2[1] /= 3.0f; arg2[2] /= 3.0f;
+    func_80035A10(arg2);
+}
 
 void func_87E1643C(void *arg0, void *arg1, void *arg2, void *arg3) {
     (*(f32 *)((u8 *)(arg0) + (0))) = (f32) (*(f32 *)((u8 *)(arg1) + (0)));
