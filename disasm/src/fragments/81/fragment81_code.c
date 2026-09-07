@@ -114,7 +114,29 @@ s32 func_843008B0(u8 arg0) {
     return var_v1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_84300928.s")
+extern u8 * D_84302C80;
+extern u8 D_84302C88[];
+s32 func_84300928(u8 arg0) {
+    u8 *p;
+    u8 *q;
+    s32 i;
+    s32 j;
+    p = D_84302C80;
+    i = 0;
+    while (i < D_84302C88[0]) {
+        j = 0;
+        q = p;
+        while (j < 4) {
+            if (q[2] == 0) { break; }
+            if (q[2] == arg0) { return 0; }
+            j++;
+            q++;
+        }
+        i++;
+        p += 0x58;
+    }
+    return 1;
+}
 
 typedef struct {
     u16 value;
