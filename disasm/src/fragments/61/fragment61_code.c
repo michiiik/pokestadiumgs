@@ -507,7 +507,30 @@ void func_86B0B6CC(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/61/fragment61_code/func_86B0B9A0.s")
+extern void func_86B0B7B4(void);
+extern s32 D_86B0E99C;
+extern void func_8003F114(u8 *, s32, s32, s32);
+extern void func_8003F1DC(u8 *);
+extern u8 * func_87F025B8(u8 *, void (*)(void));
+extern u8 D_86B0E7F8;
+void func_86B0B9A0(void) {
+    u8 *object;
+    u8 *base;
+    object = func_87F025B8(&D_86B0E7F8, func_86B0B7B4);
+    if (object != NULL) {
+        *(s16 *)(object + 0x42) = -0x4001;
+        *(s32 *)(object + 0x38) = 0x40;
+        base = object + 0x24;
+        *(f32 *)(object + 0x48) = 0.0f;
+        *(f32 *)(object + 0x4C) = 0.0f;
+        *(f32 *)(object + 0x50) = 0.0f;
+        *(f32 *)(object + 0x5C) = 3.5f;
+        *(f32 *)(object + 0x58) = 3.5f;
+        *(f32 *)(object + 0x54) = 3.5f;
+        func_8003F1DC(base);
+        func_8003F114(base, 0, -1, D_86B0E99C);
+    }
+}
 #endif
 
 #ifdef VERSION_US
