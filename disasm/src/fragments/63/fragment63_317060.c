@@ -337,7 +337,40 @@ void func_87E1643C(void *arg0, void *arg1, void *arg2, void *arg3) {
     (*(f32 *)((u8 *)(arg0) + (0x28))) = (f32) (*(f32 *)((u8 *)(arg3) + (8)));
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E16488.s")
+extern void func_87E1614C(f32 *, f32 *, s32 *, s32, s32 *, s32);
+extern s32 D_87E1B3A4[4];
+extern s32 D_87E1B3B4[4];
+extern s32 D_87E1B3C4[4];
+extern s32 D_87E1B3D4[4];
+extern s32 D_87E1B3E4[4];
+extern s32 D_87E1B3F4[4];
+void func_87E16488(void *arg0) {
+    f32 *p;
+    s32 i;
+    f32 v4C[3];
+    f32 v40[3];
+    f32 v34[3];
+    f32 count = 8.0f;
+
+    *(f32 *)((u8 *)arg0 + 0x30) = 0.0f;
+    *(f32 *)((u8 *)arg0 + 0x34) = 0.0f;
+    *(f32 *)((u8 *)arg0 + 0x38) = 0.0f;
+    p = (f32 *)((u8 *)arg0 + 0x40);
+    for (i = 0; i < 8; i++) {
+        *(f32 *)((u8 *)arg0 + 0x30) += p[0];
+        *(f32 *)((u8 *)arg0 + 0x34) += p[1];
+        *(f32 *)((u8 *)arg0 + 0x38) += p[2];
+        p += 6;
+    }
+    *(f32 *)((u8 *)arg0 + 0x30) /= count;
+    *(f32 *)((u8 *)arg0 + 0x34) /= count;
+    *(f32 *)((u8 *)arg0 + 0x38) /= count;
+    func_87E1614C(v4C, (f32 *)((u8 *)arg0 + 0x40), D_87E1B3A4, 4, D_87E1B3B4, 4);
+    func_87E1614C(v40, (f32 *)((u8 *)arg0 + 0x40), D_87E1B3C4, 4, D_87E1B3D4, 4);
+    func_87E1614C(v34, (f32 *)((u8 *)arg0 + 0x40), D_87E1B3E4, 4, D_87E1B3F4, 4);
+    func_87E16200(v4C, v40, v34);
+    func_87E1643C(arg0, v4C, v40, v34);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E16738.s")
 
