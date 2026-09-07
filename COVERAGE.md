@@ -3,8 +3,8 @@
 # Decompilation coverage
 
 <!-- AUTO_COVERAGE:START -->
-- US functions with C implementations: **5,075 / 10,532 (48.2%)**
-- Remaining `GLOBAL_ASM` owners: **5,457**
+- US functions with C implementations: **5,081 / 10,532 (48.2%)**
+- Remaining `GLOBAL_ASM` owners: **5,451**
 - Baseline: `f477acf` (vendored US pragma snapshot)
 <!-- AUTO_COVERAGE:END -->
 
@@ -88,7 +88,7 @@
 | `disasm/src/fragments/12/fragment12_E7C00.c` | 41 | 72 | 43.1% |
 | `disasm/src/fragments/13/fragment13_EE0A0.c` | 3 | 6 | 50.0% |
 | `disasm/src/fragments/13/fragment13_EE5B0.c` | 5 | 10 | 50.0% |
-| `disasm/src/fragments/13/fragment13_EEC50.c` | 47 | 79 | 40.5% |
+| `disasm/src/fragments/13/fragment13_EEC50.c` | 46 | 79 | 41.8% |
 | `disasm/src/fragments/14/fragment14_104FC0.c` | 15 | 26 | 42.3% |
 | `disasm/src/fragments/14/fragment14_1077C0.c` | 15 | 28 | 46.4% |
 | `disasm/src/fragments/14/fragment14_109280.c` | 8 | 14 | 42.9% |
@@ -114,7 +114,7 @@
 | `disasm/src/fragments/20/fragment20_128B10.c` | 23 | 35 | 34.3% |
 | `disasm/src/fragments/20/fragment20_12BB60.c` | 7 | 8 | 12.5% |
 | `disasm/src/fragments/20/fragment20_12C460.c` | 83 | 146 | 43.2% |
-| `disasm/src/fragments/21/fragment21_13FFA0.c` | 34 | 56 | 39.3% |
+| `disasm/src/fragments/21/fragment21_13FFA0.c` | 33 | 56 | 41.1% |
 | `disasm/src/fragments/21/fragment21_144790.c` | 32 | 46 | 30.4% |
 | `disasm/src/fragments/21/fragment21_147D10.c` | 7 | 11 | 36.4% |
 | `disasm/src/fragments/22/fragment22_14A2E0.c` | 7 | 12 | 41.7% |
@@ -288,7 +288,7 @@
 | `disasm/src/fragments/59/fragment59_code.c` | 35 | 44 | 20.5% |
 | `disasm/src/fragments/6/fragment6_code.c` | 9 | 39 | 76.9% |
 | `disasm/src/fragments/60/fragment60_code.c` | 48 | 67 | 28.4% |
-| `disasm/src/fragments/61/fragment61_code.c` | 45 | 57 | 21.1% |
+| `disasm/src/fragments/61/fragment61_code.c` | 41 | 57 | 28.1% |
 | `disasm/src/fragments/62/fragment62_code.c` | 3 | 6 | 50.0% |
 | `disasm/src/fragments/63/fragment63_303990.c` | 16 | 40 | 60.0% |
 | `disasm/src/fragments/63/fragment63_305090.c` | 11 | 21 | 47.6% |
