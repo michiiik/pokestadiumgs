@@ -233,7 +233,18 @@ void func_82507AF4(void)
   }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_144790/func_82507B18.s")
+extern void func_82504C50(void *arg0, s32 arg1);
+extern void * func_825068C4(s32, s32);
+extern u16 D_82508FF6;
+void func_82507B18(void) {
+    u16 *flag;
+    void *temp_v0;
+
+    flag = &D_82508FF6;
+    temp_v0 = func_825068C4(1, 1);
+    func_82504C50(temp_v0, 1);
+    *flag = *flag | 8;
+}
 
 
 s32 func_82507B58(void) {
