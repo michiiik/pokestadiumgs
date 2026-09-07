@@ -4013,7 +4013,9 @@ void func_8003D188(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003D1F8.s")
+extern Gfx* D_800D0510;
+extern void * D_801263A8;
+void func_8003D1F8(s32 arg0) { if (func_8003CD58(((u8 *)D_801263A8)[0x25]) == 0) { Gfx *command = D_800D0510++; command->words.w0 = 0xD7000000; command->words.w1 = 0xFFFFFFFF; } *(s32 *)((u8 *)D_801263A8 + 0x18) = 0; *(s32 *)((u8 *)D_801263A8 + 0x1C) = 0; *(s32 *)((u8 *)D_801263A8 + 0x20) = 0; }
 #endif
 
 #ifdef VERSION_US
