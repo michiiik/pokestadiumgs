@@ -93,7 +93,25 @@ void func_80046F2C(u8 *arg0, s32 arg1) {
     arg0[0x79] = (u8)arg1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80046F34.s")
+extern u8 *D_80126F5C;
+extern u8 *D_80126F60;
+extern u8 *D_80126F64;
+s32 func_80046F34(u16 arg0) {
+    s32 result;
+    s32 index;
+    result = 0;
+    arg0 &= 0x7F7F;
+    arg0 &= 0xFFFF;
+    if (arg0 >= 0x20 && arg0 < 0x80) { index = arg0 - 0x20; result = D_80126F5C[index]; }
+    else if (arg0 >= 0x2120 && arg0 < 0x2180) { index = arg0 - 0x2120; result = D_80126F60[index]; }
+    else if (arg0 >= 0x2330 && arg0 < 0x233A) result = arg0 - 0x2320;
+    else if (arg0 >= 0x2341 && arg0 < 0x235B) result = arg0 - 0x2327;
+    else if (arg0 >= 0x2361 && arg0 < 0x237B) result = arg0 - 0x22CC;
+    else if (arg0 >= 0x2421 && arg0 < 0x2474) { index = arg0 - 0x2421; result = D_80126F64[index] + 0xAF; }
+    else if (arg0 >= 0x2521 && arg0 < 0x2574) { index = arg0 - 0x2521; result = D_80126F64[index] + 0x45; }
+    else if (arg0 == 0x2574) result = 0xFF;
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047058.s")
 
