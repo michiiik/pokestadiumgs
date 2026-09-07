@@ -17,3 +17,19 @@ requeue: global-state initializer remains unresolved after volatile base/raw u32
 ## Requeue: func_87E11A5C (2026-08-30)
 
 requeue: fixed-record call-sequence owner remains unresolved after typed/raw pointer locals, typed formal pointer with an accepted-caller prototype edit, and direct formal/raw pointer variants. Best recorded result remains similarity 0.9565, raw 0.9565, mismatch_kind operand_or_scheduling_drift; prior stable mismatch was the pointer/index register assignment around the 0x28 frame and loop. Next action: materially change the live-range/declaration shape to place the record pointer in s0 and the index in s1 while preserving the branch-likely increment delay slot. Do not gate the near miss.
+
+## 2026-09-08
+
+func_87E110E4: matched (call_sequence:conditional-result:unsigned-index), 8 iterations, agent codex
+
+## 2026-09-08
+
+func_87E12070: matched (call_sequence:temp-reuse:direct-mask), 1 iterations, agent codex
+
+## 2026-09-08
+
+func_87E11924: time cap at 0.8913 (raw 0.5652) after 2400s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-08
+
+func_87E10094: time cap at 0.8125 (raw 0.7292) after 2400s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
