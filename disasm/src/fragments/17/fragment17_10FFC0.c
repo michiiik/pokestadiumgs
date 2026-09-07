@@ -66,7 +66,7 @@ void func_822014FC(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     *(u16 *)(D_8220E4C8 + 6) = arg3;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82201518.s")
+s32 func_82201518(u8 *arg0) { s32 result; if (arg0[1] != 0) { if (arg0[0] == 0) { if (arg0[3] != 0) result = 0; else result = 3; } else result = 4; } else if (arg0[0] == 2) result = 5; else if (arg0[4] != 0) result = 1; else result = 2; return result; }
 
 s32 func_8220158C(void *arg0) {
     s32 var_v1;
