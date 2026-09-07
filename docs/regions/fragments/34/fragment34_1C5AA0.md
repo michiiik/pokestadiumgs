@@ -21,3 +21,15 @@ Requeue: func_8850A2F4. Best probe similarity 0.9118 normalized / 0.5294 raw; fl
 Requeue: func_8850AAA8 and func_8850A988. Both clamped-float variants retain constant-load scheduling drift around the divisor and threshold constants. Next action: use a materially different source evaluation/lifetime hypothesis.
 
 Register-tie skip list for this box: func_88508B98, func_88508490, func_88508B10, func_88509538, func_8850A614, func_885087D4, func_88508D34. Layout-prerequisite deferred list: func_8850AEA8, func_88508E34, func_8850CED8, func_8850A0EC, func_885084EC.
+
+## 2026-09-07
+
+func_88508B98: plateau at 0.9524 (raw 0.2857), mismatch operand_or_scheduling_drift; tried families: bounded_lookup; tie-pool no
+
+## 2026-09-07
+
+func_88508490: matched (state-init:ptr-loop:s32-index), 1 iterations, agent codex
+
+## 2026-09-07
+
+func_885096E0: plateau at 0.963 (raw 0.4815), mismatch operand_or_scheduling_drift; tried families: constant-map; tie-pool no
