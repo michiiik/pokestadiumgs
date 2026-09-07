@@ -226,7 +226,15 @@ void func_81605CDC(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) { func_8160
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81606B5C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81606E14.s")
+extern s16 D_8160C0F0[];
+f32 func_81606E14(f32 arg0, s32 arg1) {
+    s32 index;
+    if (arg1) {
+        return 28.0f * arg0;
+    }
+    index = (s32)arg0;
+    return ((f32)D_8160C0F0[index + 1] - (f32)D_8160C0F0[index]) * (arg0 - (f32)index) + (f32)D_8160C0F0[index];
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81606E84.s")
 
