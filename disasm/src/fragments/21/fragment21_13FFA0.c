@@ -68,7 +68,9 @@ s32 func_82500CF0(s32 arg0, void *arg1) { s32 index = *(s32 *)((u8 *)arg1 + 0x20
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_13FFA0/func_82500D24.s")
+extern s16 D_82508F94;
+extern void *D_82508FAC[];
+s32 func_82500D24(s32 arg0, void *arg1) { s32 index = *(s32 *)((u8 *)arg1 + 0x20); switch (arg0) { case 0: D_82508FAC[index] = arg1; break; case 1: *(u8 *)((u8 *)arg1 + 0x2F) = D_82508F94; break; } return 0; }
 #endif
 
 #ifdef VERSION_US
