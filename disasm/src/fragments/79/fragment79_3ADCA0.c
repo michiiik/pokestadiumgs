@@ -1459,7 +1459,34 @@ void func_84146D98(u8 *arg0, u8 *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84147008.s")
+extern u8 D_84186F0C;
+extern u8 D_84186F10;
+
+void func_84147008(u8 *arg0, u8 arg1) {
+    s32 var0;
+    s32 var1;
+
+    var0 = (arg1 == 0xF) ? 1 : -1;
+    var1 = (arg0[1] != 0) ? 1 : -1;
+    switch (arg0[0]) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+    case 16:
+    case 17:
+    case 18:
+        *(s16 *)(arg0 + 0xA) += D_84186F0C * var0 * var1;
+        break;
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+        *(s16 *)(arg0 + 0xC) += D_84186F10 * var0 * var1;
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
