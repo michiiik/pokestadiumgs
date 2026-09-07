@@ -318,7 +318,21 @@ void func_86A06E0C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/60/fragment60_code/func_86A0B5CC.s")
+extern s32 D_86A44578[];
+extern s32 func_86A0405C(s32);
+extern void func_86A03B10();
+extern void func_8002781C(s32, s32, void *);
+extern u8 D_86A443F0[];
+void func_86A0B5CC(s32 arg0) {
+    if (D_86A44578[arg0] == 8 || D_86A44578[arg0] == 0xF || D_86A44578[arg0] == 0x16 || D_86A44578[arg0] == 0x1D || D_86A44578[arg0] == 0x24) {
+        s32 result;
+        result = func_86A0405C(arg0);
+        if (result != -1) {
+            func_86A03B10(arg0, result);
+            func_8002781C(0x8F0B, arg0 & 0xFF, &D_86A443F0[0xE48 + arg0 * 2]);
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
