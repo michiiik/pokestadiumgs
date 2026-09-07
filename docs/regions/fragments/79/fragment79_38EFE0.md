@@ -33,3 +33,19 @@ func_84122DD8: matched (call_sequence:clamp:direct-offset-match), 1 iterations, 
 ## 2026-09-07
 
 func_84123858: time cap at 0.9787 (raw 0.8936) after 2409s, mismatch operand_or_scheduling_drift; tried families: call-sequence; tie-pool no
+
+## 2026-09-07
+
+func_8412060C: matched (constant_map:oldstyle:counter-mask-ptr-do), 7 iterations, agent codex
+
+## 2026-09-07
+
+TYPE CONFLICT: func_8410B104 is extern void func_8410B104(void), not extern void func_8410B104()
+
+## 2026-09-07
+
+func_84123E74: plateau at 0.9333 (raw 0.2667), mismatch operand_or_scheduling_drift; tried families: state_field_access; tie-pool yes
+
+## 2026-09-07
+
+func_84122A78: time cap at 0.9375 (raw 0.9375) after 2416s, mismatch instruction_drift; tried families: state_field_access; tie-pool yes
