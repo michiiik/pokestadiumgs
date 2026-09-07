@@ -1257,7 +1257,19 @@ void func_80034394(u8 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800343FC.s")
+extern u8 D_800D2B57;
+extern u8 D_800D2B78;
+void func_800343FC(u8 arg0, s32 arg1) {
+    u8 *entry;
+
+    entry = &D_800D2B78 + (arg0 * 0x3C);
+    if (entry[3] & 0x10) {
+        entry[3] = entry[3] & 0xFFEF;
+    } else {
+        entry[3] = entry[3] & 0xFFEF;
+        D_800D2B57 = func_800347E8(arg0);
+    }
+}
 #endif
 
 #ifdef VERSION_US
