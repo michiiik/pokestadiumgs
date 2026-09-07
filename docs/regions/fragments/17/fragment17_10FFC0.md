@@ -29,3 +29,15 @@ func_82201518: matched (constant-map:all-results:single-local), 1 iterations, ag
 ## 2026-09-07
 
 func_822017B0: time cap at 0.9706 (raw 0.3824) after 2400s, mismatch operand_or_scheduling_drift; tried families: state-field; tie-pool yes
+
+## 2026-09-08
+
+func_82200C60: plateau at 0.9524 (raw 0.619), mismatch operand_or_scheduling_drift; tried families: scan; tie-pool no
+
+## 2026-09-08
+
+func_82200D8C: matched (call-sequence:store-before-guard:raw-u8-pointer), 8 iterations, agent codex
+
+## 2026-09-08
+
+func_82201460: plateau at 1.0 (raw 0.9667), mismatch register_allocation_only; tried families: call-sequence; tie-pool no
