@@ -143,7 +143,7 @@ extern s32 D_834047F0;
 extern s32 ModelAnim_IsFinished(u8 *);
 extern void func_80024480(s32, s32);
 extern void func_8003F2C4(s32, u8 *, s32);
-extern void func_8003F3BC(u8 *, s32);
+extern void ModelAnim_SetEventTrack(u8 *, s32);
 extern void func_83400038(s32);
 void func_83402F08(void) {
     if (ModelAnim_IsFinished(&D_83404250) == 1) {
@@ -151,13 +151,13 @@ void func_83402F08(void) {
         case 0:
             func_80024480(D_834047F0, 4);
             func_8003F2C4(D_8340424C, &D_83404250, D_8340419C);
-            func_8003F3BC(&D_83404250, D_834041A0);
+            ModelAnim_SetEventTrack(&D_83404250, D_834041A0);
             D_834041B0 = 1;
             return;
         case 1:
             func_83400038(0);
             func_8003F2C4(D_8340424C, &D_83404250, 0);
-            func_8003F3BC(&D_83404250, 0);
+            ModelAnim_SetEventTrack(&D_83404250, 0);
             D_834041B0 = 2;
             break;
         case 2:

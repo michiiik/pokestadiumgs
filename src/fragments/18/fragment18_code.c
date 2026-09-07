@@ -76,7 +76,19 @@ void func_817001E0(void *arg0)
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/18/fragment18_code/func_8170031C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/18/fragment18_code/func_81700908.s")
+extern void _bzero(void *, s32);
+extern s32 func_8004C8C0(s32);
+extern void func_81700020(u8 *);
+extern s32 func_8170031C(u8 *);
+extern s32 D_81700DA0;
+extern u8 D_81700DB0[];
+extern u8 D_81700E40[];
+s32 func_81700908(void)
+{
+  s32 temp_v1;
+  u8 *var_s0;
+ do { temp_v1 = D_81700DA0; if (temp_v1 != 0) { var_s0 = D_81700DB0; do { if ((*((s16 *) (var_s0 + 4))) != 0) { func_8170031C(var_s0); } var_s0 += 0x24; } while (var_s0 != D_81700E40); temp_v1 = D_81700DA0; } return temp_v1; } while (0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/18/fragment18_code/func_81700974.s")
 

@@ -139,9 +139,46 @@ void func_813061E8(u8 *arg0) {
     *(f32 *)(arg0 + 0x78) = 4.0f;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FD770/func_81306208.s")
+extern void func_800226C0(s32);
+#pragma pack(1)
+struct Fragment14PackedWord { s32 value; };
+#pragma pack(0)
+void func_81306208(void *arg0)
+{
+  if ((*((s16 *) (((u8 *) arg0) + 8))) > 0)
+  {
+    *((struct Fragment14PackedWord *) (((u8 *) arg0) + 0xC)) = *((struct Fragment14PackedWord *) (((u8 *) arg0) + 8));
+    *((s16 *) (((u8 *) arg0) + 8)) = (*((s16 *) (((u8 *) arg0) + 8))) - 1;
+    *((u8 *) (((u8 *) arg0) + 0x87)) = 2;
+    *((u8 *) (((u8 *) arg0) + 0x83)) = 0;
+    *((u8 *) (((u8 *) arg0) + 0x85)) = 4;
+    func_800226C0(1);
+  }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FD770/func_81306264.s")
+extern void func_800226C0(s32);
+#pragma pack(1)
+struct Fragment14CounterWordE { s32 value; };
+#pragma pack(0)
+void func_81306264(void *arg0)
+{
+  s16 *new_var;
+  u8 *base = (u8 *) arg0;
+  if ((*((s16 *) (((u8 *) arg0) + 8))) > 0)
+  {
+    return;
+  }
+  else
+  {
+    new_var = (s16 *) (base + 8);
+    *((struct Fragment14CounterWordE *) (((u8 *) arg0) + 0xC)) = *((struct Fragment14CounterWordE *) (base + 8));
+    *new_var = (*new_var) + 1;
+    *((u8 *) (((u8 *) arg0) + 0x87)) = 2;
+    *((u8 *) (base + 0x83)) = 0;
+    *((u8 *) (base + 0x85)) = 4;
+    func_800226C0(1);
+  }
+}
 
 extern void func_800226C0(s32);
 extern f32 D_81311F70;

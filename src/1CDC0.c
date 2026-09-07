@@ -183,7 +183,26 @@ s16 func_8001CC50(u8 **arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1CDC0/func_8001DA54.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/1CDC0/func_8001DE58.s")
+void func_8001DE58(u8 *arg0, u8 arg1) {
+    s32 value;
+    s32 low;
+    s32 high;
+    value = arg1 & 0xFF;
+    low = value & 0xF;
+    if (low != 0) {
+        arg0[5] = low;
+    }
+    high = (value >> 4) & 0xFF;
+    if (high != 0) {
+        arg0[6] = high;
+    }
+    if (arg0[5] < 2) {
+        arg0[5] = 2;
+    }
+    if (arg0[6] <= (low * 0)) {
+        arg0[5] = 1;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1CDC0/func_8001DEB0.s")
 

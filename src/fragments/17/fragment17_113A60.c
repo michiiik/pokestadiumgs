@@ -86,7 +86,20 @@ s32 func_822047BC(s32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_822056C0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82205A14.s")
+extern void *D_8220EB88;
+s32 func_82205A14(s32 arg0, void *arg1) {
+    switch (arg0) {
+    case 0:
+        D_8220EB88 = arg1;
+        *(u16 *)((u8 *)arg1 + 2) &= 0xFFFD;
+        break;
+    case 1:
+        break;
+    default:
+        break;
+    }
+    return 0;
+}
 
 extern s32 D_8220DA10;
 s32 func_82205A48(s32 arg0, void *arg1) {
@@ -100,7 +113,23 @@ s32 func_82205A48(s32 arg0, void *arg1) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82205A8C.s")
+extern void * D_8220DA08;
+extern s32 D_8220DA10;
+s32 func_82205A8C(s32 arg0, void *arg1) {
+    if (arg0 != 0 && arg0 == 1) {
+        if (D_8220DA10 != 0) {
+            *(u16 *)((u8 *)arg1 + 2) |= 2;
+            if (*(s16 *)*(u8 **)((u8 *)D_8220DA08 + 0x20) == 0) {
+                *(u16 *)((u8 *)arg1 + 0x32) = 0x44;
+            } else {
+                *(u16 *)((u8 *)arg1 + 0x32) = 0x45;
+            }
+        } else {
+            *(u16 *)((u8 *)arg1 + 2) &= 0xFFFD;
+        }
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82205B00.s")
 
@@ -138,7 +167,8 @@ s32 func_82205D78(s32 arg0, void *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82205F2C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82206124.s")
+extern s32 D_8220EC38;
+s32 func_82206124(s32 arg0, void *arg1) { s32 value; s32 result; value = *(s32 *)((u8 *)arg1 + 0x20); result = 0; if (arg0 == 0) goto done; if (arg0 != 1) goto done; switch (D_8220EC38) { case 1: if (value == 0) result = 1; break; case 2: if (value == 1) result = 1; break; default: break; } if (result != 0) *(u16 *)((u8 *)arg1 + 2) |= 2; else *(u16 *)((u8 *)arg1 + 2) &= 0xFFFD; done: return 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_822061A8.s")
 
@@ -179,7 +209,12 @@ void func_82206804(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82206950.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_822069A4.s")
+extern s16 D_8220EC44;
+extern Gfx *D_800D0510;
+extern u8 D_8220DBC8[];
+extern void func_80046634();
+extern void * D_8220DA08;
+void func_822069A4(void) { s16 *count_ptr = &D_8220EC44; if (*count_ptr > 0) { gSPDisplayList(D_800D0510++, D_8220DBC8); gDPSetEnvColor(D_800D0510++, 0xFF, 0xFF, 0xFF, *count_ptr); func_80046634(((s32 *)D_8220DA08)[1]); } }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82206A2C.s")
 
@@ -193,7 +228,40 @@ s32 func_82206B64(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82206FBC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_822071E8.s")
+extern u8 D_8220DAB8[];
+extern s16 D_8220DA94;
+extern f32 D_80087E50[];
+extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
+s32 func_822071E8(s32 arg0, void *arg1)
+{
+  s32 temp_v1;
+  u16 angle;
+  s32 index;
+  temp_v1 = *((s32 *) (((u8 *) arg1) + 0x14));
+  switch (arg0)
+  {
+    case 0:
+    {
+      s16 *entry;
+      entry = (s16 *) (((u8 *) D_8220DAB8) + (temp_v1 << 2));
+      Vec3f_SetComponentsDuplicate((f32 *) (((u8 *) arg1) + 0x24), ((f32) entry[0]) - 320.0f, 240.0f - ((f32) entry[1]), -579.0f);
+      break;
+    }
+
+    case 2:
+      angle = D_8220DA94;
+      ;
+      *((s16 *) (((u8 *) arg1) + 0x22)) = (s16) (D_80087E50[((u16) D_8220DA94) >> 4] * 6144.0f);
+      if (temp_v1 >= 2)
+    {
+      *((s16 *) (((u8 *) arg1) + 0x22)) = -(*((s16 *) (((u8 *) arg1) + 0x22)));
+    }
+      break;
+
+  }
+
+  return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_822072D0.s")
 
@@ -268,7 +336,9 @@ void func_82208954(s32 arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_822089C0.s")
+extern s16 D_8220EB80[];
+extern s32 func_8220D67C(void);
+s32 func_822089C0(void) { s32 result = 0; s32 limit; if (func_8220D67C()) limit = 15; else limit = 30; D_8220EB80[2] = D_8220EB80[2] + 1; if (D_8220EB80[2] >= limit) result = 1; return result; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82208A1C.s")
 
@@ -343,7 +413,11 @@ void func_82209E90(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_8220A098.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_8220A154.s")
+extern s32 func_82208EB0(void *);
+extern s32 func_82209EA8(void);
+extern s32 func_82209F50(void *);
+extern s32 func_8220A098(void *);
+s32 func_8220A154(s32 arg0, void *arg1) { s32 flag = *(s32 *)((u8 *)arg1 + 0x14); switch (arg0) { case 0: func_82208EB0(arg1); break; case 2: if (flag == 0) { func_82209EA8(); func_82209F50(arg1); } else { func_8220A098(arg1); } break; } return 0; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_8220A1C4.s")
 

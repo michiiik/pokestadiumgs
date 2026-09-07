@@ -2,11 +2,11 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83000020.s")
+void func_83000020(s32 arg0) { struct State { u8 pad[0x4E038]; u8 f0; u8 f1; u8 pad2[2]; f32 f2; }; struct State *p0 = (struct State *)(u32)arg0; struct State *p1 = (struct State *)(u32)arg0; p0->f1 = 0; p1->f0 = p1->f1; p0->f2 = 0.0f; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83000058.s")
+s32 func_83000058(void *arg0) { struct Record { u8 pad[0x1D]; u8 value; u8 tail[0x3A]; }; s32 best = 0; s32 count = 0; s32 i; s32 j; s32 k; struct Record *p = (struct Record *)arg0; while (count < 6) { if (p->pad[0] == 0) break; best += p->value; count++; p++; } for (i = 0; i < count; i++) for (j = i + 1; j < count; j++) for (k = j + 1; k < count; k++) { struct Record *q = (struct Record *)arg0; s32 sum = q[i].value + q[j].value + q[k].value; if (best >= sum) best = sum; } return best; }
 #endif
 
 #ifdef VERSION_US
@@ -23,7 +23,40 @@ void func_8300021C(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_830009D8.s")
+extern void func_8300021C(s32 arg0);
+void func_830009D8(s32 arg0, void *arg1, void *arg2) {
+    typedef struct {
+        void *ptr;
+        u8 status;
+        u8 pad5[3];
+    } SubState;
+    typedef struct {
+        u8 pad_00[0x3FB60];
+        u8 unk_3FB60[0x3B8];
+        SubState unk_3FF18;
+        SubState unk_3FF20;
+        s32 unk_3FF28;
+    } State;
+    State *state = (State *)(u32)arg0;
+    SubState *sp20;
+    s32 pad[5];
+
+    func_8300021C(arg0);
+    sp20 = &state->unk_3FF18;
+    func_83000274(sp20, arg1, state->unk_3FB60);
+    if (arg2 != NULL) {
+        func_83000274(&state->unk_3FF20, arg1, (u8 *)arg2 + 0x10);
+    }
+    func_8004C594(1, *(u16 *)((u8 *)arg1 + 0x38));
+    if (sp20->status != 0) {
+        state->unk_3FF28 = 2;
+    }
+    if (arg2 != NULL) {
+        if (state->unk_3FF20.status != 0) {
+            state->unk_3FF28 = 2;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -50,7 +83,16 @@ void func_83000E38(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83000F98.s")
+extern void func_83000F04(s32, s32, s32);
+extern void func_83000CB4(s32, s32);
+void func_83000F98(s32 arg0, s32 arg1, s32 arg2) {
+    func_83000F04(arg1, arg0, arg2);
+    if (arg2 != 0) {
+        func_83000CB4(arg0, arg1);
+    } else {
+        _bzero((u8 *)(u32)arg0 + 0x3FF20, 8);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -135,7 +177,9 @@ void func_83001788(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83001DAC.s")
+extern s32 func_8300B31C(void *arg0);
+extern void func_800226C0(s32);
+void func_83001DAC(void *arg0, s32 arg1) { u8 *p = (u8 *)arg0; volatile s32 *status; if (arg1 == -1) { p[0x1E] = 0x14; func_800226C0(3); } else if (arg1 > 0) { if (arg1 < (s32)((u8 *)(u32)arg0)[0x3A291] + 1) { if (p[0x46] == 1) { status = (volatile s32 *)(p + 0x4E040); *status = func_8300B31C((u8 *)(u32)arg0 + 0x3BDF4); status = (volatile s32 *)((u8 *)(u32)arg0 + 0x4E040); if (*status != 0) p[0x1E] = 0x19; else p[0x1E] = 0x1A; func_800226C0(0x90); } } else { func_800226C0(5); } } }
 #endif
 
 #ifdef VERSION_US
@@ -297,7 +341,8 @@ void func_83002F50(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83004218.s")
+extern void func_81801CB8(u8 *, u8 *, u8 *, s32);
+void func_83004218(s32 a,u8 *b,u8 *c){extern u8 *func_818054D0(s32,u8);extern void func_81801CB8(u8 *,u8 *,u8 *,s32);extern u8 D_8300CD00[];extern u8 D_8300F8C0[];struct L{s32 x;s32 y;};struct L l;u8 *p;u8 *q;l.x=0;p=func_818054D0(a,b[0x1C])+0x10;q=func_818054D0(a,b[0x1D])+0x10;if(((a-(s32)D_8300CD00)/0x34)+1==b[0x43]){switch(b[0x1C]){case 0x11:case 0x12:case 0x13:p=D_8300F8C0;break;}switch(b[0x1D]){case 0x11:case 0x12:case 0x13:q=D_8300F8C0;break;}}func_81801CB8(c,p,q,*(s32 *)(b+0x2C));}
 #endif
 
 #ifdef VERSION_US
@@ -440,7 +485,16 @@ void func_83006FDC(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83007100.s")
+extern u8 D_8300DBE4[];
+extern void func_818036D8(s32, s32, s32, s32);
+extern void func_81805644(s32, s32, s32);
+void func_83007100(s32 arg0, void *arg1, void *arg2) {
+    void *state = arg1;
+    func_81805644(arg0, (s32)arg1, (s32)arg2);
+    if (((u8 *)state)[0x3D] > 0 && ((u8 *)state)[0x3D] < 5) {
+        func_818036D8((u8 *)D_8300DBE4 + ((((u8 *)state)[0x3D] << 5) - 0x20), (s32)arg2, *(s32 *)((u8 *)state + 0x28), 0);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -545,7 +599,10 @@ void func_83008070(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_830080AC.s")
+extern void func_830034C8(void *, void *, void *, f32);
+extern f32 func_818055E0();
+extern void func_818057D0(s32, void *, void *);
+void func_830080AC(s32 arg0, void *arg1, void *arg2) { struct Locals { void *ptr; u32 pad; f32 value; }; struct Locals local; void *base = arg1; u8 index; local.value = func_818055E0(); index = *((u8 *)base + 0x48); if (index >= 2) local.ptr = (u8 *)base + index * 0x220 + 0x3E620; else local.ptr = (u8 *)base + 0x3D95C; func_818057D0(arg0, base, arg2); func_830034C8(base, local.ptr, arg2, local.value); }
 #endif
 
 #ifdef VERSION_US
@@ -583,7 +640,7 @@ void func_83008700(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83008844.s")
+s32 func_83008844(s32 arg0, u8 arg1) { s32 selector; s32 result = 0; selector = arg1; if (arg0 == 13) { switch (selector) { case 1: result = 1; break; case 2: result = 2; break; case 3: case 4: case 6: case 7: result = 3; break; case 5: result = 4; break; } } return result; }
 #endif
 
 #ifdef VERSION_US
@@ -747,7 +804,36 @@ void func_8300A71C(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_8300A754.s")
+s32 Fragment_LoadAndCall(s32, void *, void *, s32, void *);
+extern u8 fragment10_ROM_START[];
+extern u8 fragment11_ROM_START[];
+extern u8 D_82800000[];
+s32 func_8300A754(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    s32 ret;
+    struct {
+        s16 unk0;
+        s16 unk2;
+        s32 unk4;
+    } sp24;
+    s32 var_a3;
+
+    sp24.unk0 = 0x11;
+    if (arg2 != 0) {
+        sp24.unk4 = 0x6C610404;
+    } else {
+        sp24.unk4 = 0x7C610404;
+    }
+    sp24.unk2 = 0;
+    main_pool_push_state(0x4D534353);
+    if ((arg3 >= 0) && (arg3 < 4)) {
+        var_a3 = arg3;
+    } else {
+        var_a3 = 0;
+    }
+    ret = Fragment_LoadAndCall((((u32)D_82800000 & 0x0FF00000) >> 20) - 0x10, fragment10_ROM_START, fragment11_ROM_START, var_a3, &sp24);
+    main_pool_pop_state(0x4D534353);
+    return ret;
+}
 #endif
 
 #ifdef VERSION_US
