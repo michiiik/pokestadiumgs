@@ -1574,7 +1574,16 @@ s32 Audio_WaitForPendingTasks(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035424.s")
+extern void *func_80008494();
+void func_80035424(s32 arg0) {
+    s32 value = arg0;
+    void *entry = func_80008494();
+    if (entry != 0) {
+        value = arg0;
+        value *= *(s8 *)((u8 *)entry + 0x10);
+    }
+    func_80025CBC(value);
+}
 #endif
 
 #ifdef VERSION_US
