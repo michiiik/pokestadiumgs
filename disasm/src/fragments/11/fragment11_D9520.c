@@ -56,7 +56,18 @@ void *func_81602108(s32 arg0) { s32 index = arg0 & 0xFF; s32 *p = &arg0; *p = ar
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81602134.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_816021E8.s")
+s32 func_816021E8(u8 *arg0, u8 arg1) {
+    s32 i;
+    if (arg1 == 0) {
+        return 0;
+    }
+    for (i = 0; i < *(u16 *)(arg0 + 0x40); i++) {
+        if (arg0[i] == arg1) {
+            return i;
+        }
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81602240.s")
 
