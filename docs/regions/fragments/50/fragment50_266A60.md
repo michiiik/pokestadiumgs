@@ -29,3 +29,15 @@ func_86201418: time cap at 0.9667 (raw 0.7667) after 2430s, mismatch operand_or_
 ## 2026-09-07
 
 func_86203D50: matched (call-sequence:raw-fields:direct-global-exact), 1 iterations, agent codex
+
+## 2026-09-07
+
+func_86203BA8: plateau at 0.8947 (raw 0.3684), mismatch operand_or_scheduling_drift; tried families: state-field; tie-pool no
+
+## 2026-09-07
+
+func_86201790: time cap at 0.9231 (raw 0.5) after 2423s, mismatch operand_or_scheduling_drift; tried families: state-field; tie-pool no
+
+## 2026-09-07
+
+func_8620157C: matched (call-chain:resource-scale:arg-first-product), 2 iterations, agent codex
