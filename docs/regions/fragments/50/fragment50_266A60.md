@@ -13,3 +13,19 @@ Accepted func_862005B4 with call-sequence:vector-record-loop:hybrid-offset-pad-e
 ## 2026-08-31 wave 18 requeue (2026-08-31)
 
 Requeue func_86203F50 after 60 runner probes plus a 120-second, 2-thread permuter pass (score 180 to 170, no zero). The semantic twin is fragment49 func_86107EBC. Use real gbi.h gDPSetPrimColor/gDPSetEnvColor macros, byte formals arg3..arg8, and extern void func_87F06240(s32, s32, f32, f32, s32). Critical ABI finding: arg3 must be u8 (u16 produces the same code; color semantics favor u8); s32 arg3 delays the prologue and yields 344 bytes. Best spelling adds s32 temp_a2 = arg2 beside the separate sp24 spill: expected/actual size 348, normalized similarity 1.0000, raw 0.7816, immediate_drift only; every opcode and register matches but the candidate frame is -0x38 instead of oracle -0x30, incoming homes are all +8, and candidate sp24 is sp+0x20 instead of oracle sp+0x24. Direct u8-arg3/sp24 form has frame -0x28 and 0.9540/0.7126 but different else-call scheduling. Tried declaration-order/formal-copy subsets, volatile/array/address-taken locals, pad locals, temp reuse/lifetime forms, old-style callee prototype, K&R definition, and permuter. Reusing temp_a2 removes the spill; volatile pointer reaches -0x30 but expands/reorders to 372 bytes. Next action: start from gbi:number-draw:u8-arg3-copy-a2-only and find a compiler-faithful single-spill layout that shifts sp24 from +0x20 to +0x24 while reducing the frame from 0x38 to 0x30; inspect IDO local allocation or a sibling winner before more broad variants. No probe hit, link verification, gate, or source install. Tooling note: isolated worktree oracle symlink bootstrap succeeded and all probe descriptors were healthy with zero EMFILE/Too many open files errors; draft/permuter additionally required ignored read-only links for disasm/tools/m2c, decomp-permuter, and decomp-venv, which the worktree bootstrap did not create automatically.
+
+## 2026-09-07
+
+func_8620218C: time cap at 0.652 (raw 0.228) after 2400s, mismatch instruction_drift; tried families: call-chain; tie-pool no
+
+## 2026-09-07
+
+func_86202574: matched (call-sequence:nested-list:raw-byte-offset), 1 iterations, agent codex
+
+## 2026-09-07
+
+func_86201418: time cap at 0.9667 (raw 0.7667) after 2430s, mismatch operand_or_scheduling_drift; tried families: call-sequence; tie-pool no
+
+## 2026-09-07
+
+func_86203D50: matched (call-sequence:raw-fields:direct-global-exact), 1 iterations, agent codex
