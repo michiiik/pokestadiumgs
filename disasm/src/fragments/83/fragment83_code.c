@@ -198,7 +198,22 @@ void func_82C02390(void *arg0, void *arg1, s8 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C02664.s")
+s32 func_82C02664(u8 *arg0, u8 arg1) {
+    s32 zero;
+    s32 index;
+    s32 bit;
+    u8 *value;
+    zero = ((u32)arg1 < 1);
+    arg1--;
+    if (zero) {
+        return 0;
+    }
+    index = arg1;
+    bit = index % 8;
+    value = arg0;
+    value += index / 8;
+    return (*value & (1 << (7 - bit))) != 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -504,5 +519,24 @@ void func_82C04778(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C04880.s")
+extern void main_pool_push_state(s32);
+extern void main_pool_pop_state(s32);
+extern s32 func_82C047C4(s32, s32);
+extern void func_80008624(void);
+extern void StageLoader_WaitForRetrace(void);
+extern void func_800226C0(s32);
+extern void func_82C034C8(void);
+s32 fragment83_main(void *arg0, s32 arg1) {
+    if (arg1 == 0) {
+        return 0;
+    }
+    main_pool_push_state(0x524C5649);
+    func_82C047C4((s32)arg0, arg1);
+    func_80008624();
+    func_800226C0(4);
+    func_82C034C8();
+    StageLoader_WaitForRetrace();
+    main_pool_pop_state(0x524C5649);
+    return 0;
+}
 #endif

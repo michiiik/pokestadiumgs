@@ -48,3 +48,4 @@ func_80040244 = geo_layout_cmd_create_light;
 func_84110860 = BattleAnim_ModelDispatch_191;
 func_841109FC = BattleAnim_ModelDispatch_113;
 func_8410F1A8 = BattleAnim_ModelDispatch_127;
+func_82C04880 = fragment83_main;
