@@ -3950,7 +3950,22 @@ void func_84139770(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84139D94.s")
+extern void func_800226C0(s32);
+extern void func_84147228(s32, u8, s32, s32, s32);
+extern u8 D_84195255[];
+void func_84139D94(u8 arg0) {
+    u8 index = arg0;
+    D_84195255[index * 24] = 1;
+    func_800226C0(3);
+    func_84147228(4, index, 0, 0xA, 0);
+    func_84147228(5, index, 0, 0xA, 0);
+    func_84147228(6, index, 0, 0xA, 0);
+    func_84147228(4, index, 0, 4, 4);
+    func_84147228(5, index, 0, 4, 4);
+    func_84147228(6, index, 0, 4, 4);
+    func_84147228(0xE, index, 0, 0xB, 0);
+    func_84147228(0xE, index, 0, 4, 4);
+}
 #endif
 
 #ifdef VERSION_US
