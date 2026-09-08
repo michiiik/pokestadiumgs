@@ -386,7 +386,33 @@ n4: entry += 0xCE8; if (entry[0] == 0) goto n5; if (*(s32 *)(arg1+0x58) == *(s32
 n5: entry += 0xCE8; if (entry[0] != 0 && *(s32 *)(arg1+0x58) == *(s32 *)(entry+0x58)) return 1; return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FAD40/func_81304788.s")
+extern void func_81601A38(s32 *, s32);
+extern s32 func_80071230(u8 *);
+extern void func_81601D24(s32, s32);
+extern void func_816019C0(s32, s32, s32);
+
+void func_81304788(u8 *arg0, s32 *arg1, s32 arg2) {
+    s32 i;
+    u8 *record;
+    func_81601A38(arg1, 0);
+    if (func_80071230(*(void **)(*(u8 **)((u8 *)(*(s32 *)(arg0 + 0x4DA0) + 0x20000) - 0x5EB8) + 0x940)) != 0) return;
+    if (arg2 >= 0 && arg2 < 6) {
+        i = arg2 * 0xCE8;
+        record = arg0 + i;
+        if (record[0x20] <= 0) {
+            record = arg0;
+        } else {
+            func_81601D24(arg1, record[0x20]);
+        }
+    }
+    record = arg0;
+    for (i = 0; i != 6; i++) {
+        if (record[0x20] != 0 && record[0x21] != 0 && i != arg2) {
+            func_816019C0(arg1, record[0x21], 1);
+        }
+        record += 0xCE8;
+    }
+}
 
 extern s32 func_80071230(u8 *arg0);
 s32 func_81304884(u8 *arg0, s32 arg1) { u8 *record; s32 count; record = arg0 + 0x20; if (func_80071230(*(u8 **)(*(u8 **)((u8 *)(u32)(*(s32 *)(arg0 + 0x4DA0) + 0x20000) - 0x5EB8) + 0x940)) != 0) return 0; count = 6; do { if (record[0] != 0 && record[1] == arg1) return 1; record += 0xCE8; count--; } while (count != 0); return 0; }
