@@ -73,3 +73,19 @@ func_82B010BC: plateau at 0.0 (raw None), mismatch unknown; tried families: call
 ## 2026-09-09
 
 func_82B07BEC: matched (call_sequence:switch:braced-cases-four-halfwords), 2 iterations, agent codex
+
+## 2026-09-09
+
+func_82B029B8: plateau at 0.9677 (raw 0.5161), mismatch operand_or_scheduling_drift; tried families: state_field_access; tie-pool no
+
+## 2026-09-09
+
+func_82B02EDC: plateau at 0.8205 (raw 0.1538), mismatch operand_or_scheduling_drift; tried families: state_field_access; tie-pool no
+
+## 2026-09-09
+
+func_82B02D84: matched (state_field_access:switch:limit-before-increment), 2 iterations, agent codex
+
+## 2026-09-09
+
+func_82B00E10: time cap at 0.9 (raw 0.4) after 2404s, mismatch operand_or_scheduling_drift; tried families: state_field_access; tie-pool no
