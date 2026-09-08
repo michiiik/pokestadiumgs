@@ -62,3 +62,35 @@ func_8413FBC4: plateau at 0.9655 (raw 0.931), mismatch instruction_drift; tried 
 ## 2026-09-09
 
 func_84142DCC: matched (call_sequence:alias-before-index:pointer-increment:reverse-args), 6 iterations, agent codex
+
+## 2026-09-09
+
+func_84146610: matched (state_field_access:table-select:direct-index-2x), 2 iterations, agent codex
+
+## 2026-09-09
+
+func_8413F5A8: plateau at 0.8421 (raw 0.8421), mismatch instruction_drift; tried families: init_sequence; tie-pool no
+
+## 2026-09-09
+
+func_84147FF4: plateau at 0.0 (raw None), mismatch section_layout_drift; tried families: dispatcher_switch; tie-pool no
+
+## 2026-09-09
+
+func_84148054: plateau at 0.0 (raw None), mismatch section_layout_drift; tried families: dispatcher_switch; tie-pool no
+
+## 2026-09-09
+
+func_84145AB4: matched (state_field_access:gfx-postinc:oldstyle-struct-local), 2 iterations, agent codex
+
+## 2026-09-09
+
+func_84145B2C: plateau at 0.0 (raw None), mismatch section_layout_drift; tried families: dispatcher_switch; tie-pool no
+
+## 2026-09-09
+
+func_841410A0: plateau at 0.0 (raw None), mismatch section_layout_drift; tried families: dispatcher_switch; tie-pool no
+
+## 2026-09-09
+
+func_84141020: plateau at 0.0 (raw None), mismatch section_layout_drift; tried families: dispatcher_switch; tie-pool no
