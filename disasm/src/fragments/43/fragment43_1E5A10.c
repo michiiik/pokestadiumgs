@@ -651,7 +651,8 @@ s32 func_8AC03C28(s32 arg0, void *arg1) {
 #ifdef VERSION_US
 extern Gfx * D_800D0510;
 extern u8 D_8AC07D90[];
-void func_8AC03F64(s32 arg0, s32 arg1, s32 arg2, struct { u8 r; u8 g; u8 b; u8 a; } color) {
+typedef struct { u8 r; u8 g; u8 b; u8 a; } Fragment43Color405C;
+void func_8AC03F64(s32 arg0, s32 arg1, s32 arg2, Fragment43Color405C color) {
     gSPDisplayList(D_800D0510++, D_8AC07D90);
     gDPSetPrimColor(D_800D0510++, 0, 0, color.r, color.g, color.b, color.a);
     gSPTextureRectangle(D_800D0510++, arg0 << 2, arg1 << 2, (arg0 + arg2) << 2, (arg1 + 2) << 2, 0, 0, 0, 0, 0x400);
@@ -661,7 +662,6 @@ void func_8AC03F64(s32 arg0, s32 arg1, s32 arg2, struct { u8 r; u8 g; u8 b; u8 a
 #ifdef VERSION_US
 extern Gfx *D_800D0510;
 extern u8 D_8AC07D90[];
-typedef struct { u8 r; u8 g; u8 b; u8 a; } Fragment43Color405C;
 void func_8AC0405C(s32 arg0, s32 arg1, s32 arg2, Fragment43Color405C color) {
     gSPDisplayList(D_800D0510++, D_8AC07D90);
     gDPSetPrimColor(D_800D0510++, 0, 0, color.r, color.g, color.b, color.a);
@@ -701,7 +701,26 @@ void func_8AC04418(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC0444C.s")
+extern void func_800504BC(s16 *);
+extern void func_8AC03F64(s32, s32, s32, Fragment43Color405C);
+s32 func_8AC0444C(s32 arg0, void *arg1) {
+    struct { s32 pad[2]; s16 angles[2]; } scratch;
+    if ((arg0 != 0) && (arg0 == 1)) {
+        func_800504BC(scratch.angles);
+        {
+            s16 x;
+            Fragment43Color405C color;
+            s16 y;
+            s16 z;
+            x = *(s16 *)((u8 *)arg1 + 8) + scratch.angles[0];
+            y = *(s16 *)((u8 *)arg1 + 0xA) + scratch.angles[1];
+            z = *(s16 *)((u8 *)arg1 + 0xC);
+            color = *(Fragment43Color405C *)((u8 *)arg1 + 0x28);
+            func_8AC03F64(x, y, z, color);
+        }
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
