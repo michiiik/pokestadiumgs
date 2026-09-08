@@ -1730,7 +1730,23 @@ void func_841134D8(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_841136E8.s")
+extern void func_84108AF8(u8 *);
+extern u8 * D_84193DD0;
+void func_841136E8(u8 *arg0) {
+    s32 index;
+    if ((*(u16 *)(arg0 + 0x7F4) & 0x10) != 0) {
+        index = func_8411E1F8((s32)arg0);
+        if ((*(u16 *)((u8 *)D_84193DD0 + (index << 4) + 0x12) & 4) == 0) { *(u16 *)(arg0 + 0x7F4) &= 0xFFEF; func_84108AF8(arg0); }
+    }
+    if ((*(u16 *)(arg0 + 0x7F4) & 0x20) != 0) {
+        index = func_8411E1F8((s32)arg0);
+        if (*(u16 *)((u8 *)D_84193DD0 + (index << 4) + 0x10) != 0x20) { *(u16 *)(arg0 + 0x7F4) &= 0xFFDF; func_84108AF8(arg0); }
+    }
+    if ((*(u16 *)(arg0 + 0x7F4) & 0x40) != 0) {
+        index = func_8411E1F8((s32)arg0);
+        if ((*(u16 *)((u8 *)D_84193DD0 + (index << 4) + 0x10) & 7) == 0) { *(u16 *)(arg0 + 0x7F4) &= 0xFFBF; func_84108AF8(arg0); }
+    }
+}
 #endif
 
 #ifdef VERSION_US
