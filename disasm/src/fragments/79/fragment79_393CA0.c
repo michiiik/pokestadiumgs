@@ -3173,7 +3173,17 @@ void func_841352DC_padding2(void) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84135338.s")
+extern void func_84147228(s32, u8, s32, s32, s32);
+void func_84135338(u8 arg0) {
+    func_84147228(0, arg0, 0, 0xB, 3);
+    func_84147228(1, arg0, 0, 0xB, 2);
+    func_84147228(2, arg0, 0, 0xB, 1);
+    func_84147228(3, arg0, 0, 0xB, 0);
+    func_84147228(0, arg0, 0, 4, 4);
+    func_84147228(1, arg0, 0, 4, 4);
+    func_84147228(2, arg0, 0, 4, 4);
+    func_84147228(3, arg0, 0, 4, 4);
+}
 #endif
 
 #ifdef VERSION_US
