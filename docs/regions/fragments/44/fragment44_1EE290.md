@@ -33,3 +33,15 @@ requeue func_8AF00410 (Wave 47 fresh box): prepared 8 distinct call-sequence can
 ## Wave 47 coordinator replay (2026-09-02)
 
 requeue; corrected declarations allowed all 8 call-chain candidates to compare. Best call-chain candidate reached similarity 0.8197 raw 0.6066, expected 244 bytes versus actual 228, with expected frame -56 versus actual -48. Tried typed call sequence, explicit temporaries, result-discard, and loop or straight-line variants. Next action: preserve the exact call order and recover the missing 8-byte frame shape through declaration order and temporary widths before another batch.
+
+## 2026-09-08
+
+func_8AF01718: matched (constant-map:outer-do:typed-value-inner), 10 iterations, agent codex
+
+## 2026-09-08
+
+func_8AF01618: matched (constant-map:shared-success:short-circuit-or), 4 iterations, agent codex
+
+## 2026-09-08
+
+func_8AF00360: time cap at 0.9444 (raw 0.8333) after 2400s, mismatch instruction_drift; tried families: init_sequence; tie-pool yes
