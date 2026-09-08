@@ -3436,7 +3436,19 @@ void func_841362C8(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841362E4.s")
+extern u32 D_8419A020[];
+void func_841362E4(u8 arg0, u8 arg1, u8 arg2, u8 arg3, s32 arg4) {
+    u8 *p = (u8 *)D_8419A020 + (arg0 << 6);
+    u8 *entry = p;
+    entry += p[8] << 2;
+    *(u32 *)p |= 1 << arg1;
+    entry[9] = arg1;
+    entry[10] = arg2;
+    entry[11] = arg3;
+    entry += 9;
+    entry[3] = ((u8 *)&arg4)[3];
+    p[8] = p[8] + 1;
+}
 #endif
 
 #ifdef VERSION_US
