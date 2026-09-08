@@ -193,7 +193,23 @@ Fragment46LookupEntry *func_8AE00E54(s16 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE00F24.s")
+extern s16 D_8AE084E0;
+extern s16 D_8AE084E2;
+extern void * D_8AE084E4;
+s32 func_8AE00F24(void) {
+    s16 *entry;
+    entry = (s16 *)D_8AE084E4;
+loop:
+    if (entry[0] == -1) goto done;
+    if (D_8AE084E0 != entry[0]) goto next;
+    if (D_8AE084E2 != entry[1]) goto next;
+    return (s32)entry;
+next:
+    entry = (s16 *)((u8 *)entry + 0x28);
+    goto loop;
+done:
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
