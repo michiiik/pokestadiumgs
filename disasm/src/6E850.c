@@ -183,11 +183,73 @@ f32 func_8006EF04(f32 *arg0, f32 *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_8006EFF0.s")
+extern f32 D_800A599C;
+void func_8006EFF0(f32 *src, f32 *dst, f32 totalTime, f32 elapsed, f32 stiffness) {
+    f32 dx;
+    f32 dy;
+    f32 dz;
+    s32 pad;
+
+    if (elapsed < D_800A599C) {
+        return;
+    }
+
+    dx = dst[3] - src[3];
+    dy = dst[4] - src[4];
+    dz = dst[5] - src[5];
+
+    stiffness *= (totalTime - elapsed) / elapsed;
+    if (elapsed < totalTime) {
+        stiffness /= 2.0f;
+    }
+
+    dst[3] += dx * stiffness;
+    dst[4] += dy * stiffness;
+    dst[5] += dz * stiffness;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_8006F0A8.s")
+extern f32 D_800A59A0;
+extern f32 D_800A59A4;
+extern f32 D_800A59A8;
+extern f32 D_800A59AC;
+void func_8006F0A8(f32 *src, f32 *dst, f32 totalTime, f32 elapsed, f32 stiffness) {
+    f32 dx;
+    f32 dy;
+    f32 dz;
+    s32 pad;
+
+    if (elapsed < D_800A59A0) {
+        return;
+    }
+
+    if (Math_FAbs(dst[3]) < D_800A59A4) {
+        dst[3] = 0.0f;
+    }
+    if (Math_FAbs(dst[4]) < D_800A59A8) {
+        dst[4] = 0.0f;
+    }
+    if (Math_FAbs(dst[5]) < D_800A59AC) {
+        dst[5] = 0.0f;
+    }
+
+    dx = dst[3] - src[3];
+    dy = dst[4] - src[4];
+    dz = dst[5] - src[5];
+
+    stiffness *= (totalTime - elapsed) / elapsed;
+    if (elapsed < totalTime) {
+        stiffness /= 2.0f;
+    }
+
+    dst[3] += dx * stiffness;
+    dst[4] += dy * stiffness;
+    dst[5] += dz * stiffness;
+    dst[6] += dx * stiffness;
+    dst[7] += dy * stiffness;
+    dst[8] += dz * stiffness;
+}
 #endif
 
 #ifdef VERSION_US

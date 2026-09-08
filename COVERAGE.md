@@ -61,7 +61,7 @@
 | `disasm/src/6AA80.c` | 16 | 74 | 78.4% |
 | `disasm/src/6DDA0.c` | 1 | 3 | 66.7% |
 | `disasm/src/6DEC0.c` | 2 | 6 | 66.7% |
-| `disasm/src/6E850.c` | 18 | 55 | 67.3% |
+| `disasm/src/6E850.c` | 16 | 55 | 70.9% |
 | `disasm/src/7140.c` | 2 | 12 | 83.3% |
 | `disasm/src/71E10.c` | 2 | 11 | 81.8% |
 | `disasm/src/728D0.c` | 4 | 5 | 20.0% |
