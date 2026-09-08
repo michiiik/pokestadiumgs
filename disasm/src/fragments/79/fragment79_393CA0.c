@@ -4094,7 +4094,37 @@ void func_8413C18C(u8 arg0) { u8 *ptr = D_84195248 + arg0 * 24; switch (ptr[0xD]
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8413C3A8.s")
+extern s32 D_84186154;
+extern u8 D_8419A0A0[];
+extern void func_8413C2C0(u8);
+extern void func_8413BE84(s32 arg0);
+extern void func_8413BF58(s32 arg0);
+extern void func_8413C0A4(u8 arg0);
+extern void func_8413C18C(u8 arg0);
+extern void * D_841951F0;
+extern void * D_841951F8[];
+extern u8 D_84195210[];
+extern u8 D_84195248[];
+extern u8 D_84195278;
+void func_8413C3A8(void) {
+    s32 mode;
+    s32 i;
+    s32 active;
+    mode = ((u8 *)D_841951F0)[0x9C2] == 2;
+    if (D_84195278 == 1) {
+        for (i = 0; i < 2; i++) {
+            if (D_84195248[i * 24 + 0xC] != 0) {
+                active = D_84195210[i] != 0;
+                if (active) active = ((u8 **)D_841951F8)[i][0x49A] != 0;
+                if (mode) func_8413C18C((u8)i);
+                else if (D_8419A0A0[0] != 0) func_8413C2C0((u8)i);
+                else if (D_84186154 != 0) func_8413C0A4((u8)i);
+                else if (active) func_8413BF58(i);
+                else func_8413BE84(i);
+            }
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
