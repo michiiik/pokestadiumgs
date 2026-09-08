@@ -207,7 +207,9 @@ void func_87E10E64(s32 arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E10EA8.s")
+extern void func_87E1078C(void);
+extern u32 D_87E1EBB8;
+void func_87E10EA8(s32 arg0) { if (arg0 >= -1 && arg0 < 50) { s32 sentinel = 5; s32 current = *(s32 *)((u8 *)(u32)D_87E1EBB8 + 0xC); if (arg0 != current) { if (arg0 == sentinel) { if (sentinel == current) { sentinel = current; } else { func_87E10670(); } } else { func_87E1078C(); } *(s32 *)((u8 *)(u32)D_87E1EBB8 + 0xC) = arg0; func_87E0F170(); } } }
 
 void func_87E10F2C(s32 arg0) {
     if ((arg0 >= -1) && (arg0 < 4)) {

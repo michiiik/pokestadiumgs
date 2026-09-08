@@ -33,3 +33,15 @@ func_87E11924: time cap at 0.8913 (raw 0.5652) after 2400s, mismatch operand_or_
 ## 2026-09-08
 
 func_87E10094: time cap at 0.8125 (raw 0.7292) after 2400s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-08
+
+func_87E10598: plateau at 0.8 (raw 0.36), mismatch operand_or_scheduling_drift; tried families: constant_map; tie-pool no
+
+## 2026-09-08
+
+func_87E10EA8: matched (call_chain:sentinel-local:before-state-load), 6 iterations, agent codex
+
+## 2026-09-08
+
+func_87E11C38: plateau at 0.9706 (raw 0.7353), mismatch operand_or_scheduling_drift; tried families: call_chain; tie-pool no
