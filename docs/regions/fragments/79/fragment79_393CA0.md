@@ -631,3 +631,23 @@ func_841312E8: matched (call_sequence:guard-switch:lh-lhu-direct), 1 iterations,
 ## 2026-09-09
 
 func_84127B00: plateau at 0.9796 (raw 0.8265), mismatch operand_or_scheduling_drift; tried families: call-sequence; tie-pool no
+
+## 2026-09-09
+
+func_84135338: matched (call-chain:eight-forwards:u8-direct-arg), 1 iterations, agent codex
+
+## 2026-09-09
+
+func_84139D94: matched (call-chain:direct:u8-local-exact), 1 iterations, agent codex
+
+## 2026-09-09
+
+func_8412E82C: plateau at 0.9583 (raw 0.8889), mismatch operand_or_scheduling_drift; tried families: bounded_lookup; tie-pool no
+
+## 2026-09-09
+
+func_84125080: plateau at 0.8621 (raw 0.5172), mismatch operand_or_scheduling_drift; tried families: bounded_lookup; tie-pool no
+
+## 2026-09-09
+
+func_84125B88: matched (bounded_lookup:dual-path:raw-pointer-arithmetic-match), 5 iterations, agent codex
