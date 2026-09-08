@@ -65,7 +65,21 @@ void func_87E059F4(s32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E05BF0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E05CE4.s")
+typedef union { s32 word; s8 bytes[4]; } Func80041FA0State;
+extern Func80041FA0State D_87E1A174;
+extern void func_80041FA0(s32, u16, Func80041FA0State);
+extern void func_800428F8(s32);
+extern void func_8003F114(void *, s32, s32, s32);
+extern void func_8003F2C4(s32, s32, s32);
+extern void func_8003F3BC(s32, s32);
+void func_87E05CE4(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+    Func80041FA0State temp_a2 = D_87E1A174;
+    func_80041FA0(arg0, (u16)arg1, temp_a2);
+    func_800428F8(arg0);
+    func_8003F114((void *)arg2, 0, 0, *(s32 *)((u8 *)*(void **)((u8 *)*(void **)((u8 *)arg0 + 0x38) + 8)));
+    func_8003F2C4(arg0, arg2, arg3);
+    func_8003F3BC(arg2, arg4);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E05D74.s")
 
