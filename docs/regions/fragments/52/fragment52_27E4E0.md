@@ -20,3 +20,19 @@ requeue: func_8640633C (prior_attempts=2). A typed overlay reached normalized/ra
 ## func_86400804 box handoff (2026-09-02) (2026-09-02)
 
 requeue: func_86400804 (2026-09-02, fresh box; 8 candidates submitted, prior_attempts=0). No link_verified hit or full-ROM acceptance. Compiling best: normalized/raw similarity 0.7759/0.5000, 90/116 normalized instructions, 360/464 bytes, labels callseq:locals:block-scope and callseq:float:split-y. Other compiling best was 0.7328/0.4741; several were 0.7069/0.3879. Shared first-diff fingerprint: [instruction_drift,20,5,0xafb00018,0x24a50000], expected instruction 5 sw s0,24(sp), actual addiu a1,a1,0; expected frame/local save ordering is not reproduced. Later drift includes stack arguments (expected 36/44(sp), candidates 32/40 or 40/48), floating setup and branch scheduling, while tail field offsets are mostly aligned. Attempted hypothesis families: raw u8 offset overlay; pointer/address casts; block-scope local lifetime; hoisted vs repeated random seed; split/hoisted float expression; explicit global base; explicit mask/load; guard-return and helper function-pointer spellings. One candidate had an IDO syntax preflight failure from compressed conditional-expression syntax; no source was installed. Next materially different action: reconstruct the exact formal ABI and force the 0x38 frame with an explicit 12-byte local/stack staging model before the object pointer, then vary declaration order so s0 is saved at 0x18 and preserve incoming float words at 0x38/0x3c and a2/a3 at 0x40/0x44; separately model the random rounding branch with three explicit f32 temporaries and exact call-result spill lifetime. Keep host CC checks enabled and submit a new >=8-candidate batch.
+
+## 2026-09-09
+
+func_86405BEC: matched (callchain:float-temp:descending-stores), 2 iterations, agent codex
+
+## 2026-09-09
+
+func_864001E0: time cap at 0.9667 (raw 0.9333) after 2409s, mismatch operand_or_scheduling_drift; tried families: constant-map; tie-pool no
+
+## 2026-09-09
+
+func_864068A4: matched (callchain:switch:index-loop:s32-state), 1 iterations, agent codex
+
+## 2026-09-09
+
+func_86405CB4: time cap at 0.9176 (raw 0.8) after 2400s, mismatch operand_or_scheduling_drift; tried families: call_chain, typed-overlay; tie-pool no
