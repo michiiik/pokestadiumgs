@@ -154,3 +154,19 @@ func_8AC06570: matched (constant-map:ceil-div:narrow-quotient-wide-remainder), 2
 ## 2026-09-06
 
 func_8AC01F8C: plateau at 0.95 (raw 0.425), mismatch operand_or_scheduling_drift; tried families: state-field; tie-pool no
+
+## 2026-09-08
+
+func_8AC04418: matched (call_sequence:color_access:explicit_pointer_cast), 1 iterations, agent codex
+
+## 2026-09-08
+
+func_8AC015B0: matched (call_sequence:result-narrowing:precompute-s16), 1 iterations, agent codex
+
+## 2026-09-08
+
+func_8AC0444C: plateau at 0.0 (raw None), mismatch unknown; tried families: call_sequence; tie-pool no
+
+## 2026-09-08
+
+func_8AC0665C: plateau at 0.9808 (raw 0.9615), mismatch instruction_drift; tried families: call_sequence; tie-pool no
