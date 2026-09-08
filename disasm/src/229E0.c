@@ -3194,7 +3194,29 @@ s32 func_80038474(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800384C0.s")
+S1_GraphNode *func_800384C0(void *arg0, S1_GraphNode *arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6, s32 arg7, u16 arg8) {
+    S1_GraphNode *new_var;
+    u8 *new_var2;
+    if (arg0 != 0) {
+        arg1 = MainPool_AllocAligned(arg0, 0x30, 4);
+    }
+    if (arg1 != 0) {
+        ((s32 *)(((u8 *)arg1) + 0x18))[0] = arg3;
+        ((s32 *)(((u8 *)arg1) + 0x1C))[0] = arg5;
+        ((s32 *)(((u8 *)arg1) + 0x20))[0] = arg7;
+        ((u8 *)arg1)[0x24] = (u8)arg2;
+        ((u8 *)arg1)[0x25] = (u8)arg4;
+        ((u16 *)(((u8 *)arg1) + 0x26))[0] = (u16)arg6;
+        new_var2 = (u8 *)arg1;
+        ((u16 *)(((u8 *)arg1) + 0x28))[0] = arg8;
+        ((s32 *)(new_var2 + 0x2C))[0] = 0;
+        GeoNode_Init(arg1, 0xE);
+    }
+    if (1) {
+        new_var = arg1;
+    }
+    return new_var;
+}
 #endif
 
 #ifdef VERSION_US
