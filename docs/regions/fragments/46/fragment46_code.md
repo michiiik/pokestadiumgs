@@ -149,3 +149,19 @@ func_8AE018C4: plateau at 0.9636 (raw 0.9636), mismatch instruction_drift; tried
 ## 2026-09-06
 
 func_8AE00314: matched (callseq:buffer:array-element-addresses), 2 iterations, agent codex
+
+## 2026-09-09
+
+func_8AE0559C: plateau at 0.9808 (raw 0.9808), mismatch instruction_drift; tried families: lookup; tie-pool no
+
+## 2026-09-09
+
+func_8AE059A8: matched (call-chain:vector-overlay:direct-arguments), 1 iterations, agent codex
+
+## 2026-09-09
+
+func_8AE032C8: plateau at 0.9565 (raw 0.9565), mismatch unaligned_data_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-09
+
+func_8AE00F24: matched (lookup:branch-likely:goto-separate-guards), 6 iterations, agent codex
