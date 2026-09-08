@@ -152,7 +152,23 @@ void func_8AF123C0(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF127E8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF129F8.s")
+extern u8 D_8AF26F34[];
+s32 func_8AF129F8(u8 arg0) {
+    u8 *ptr;
+    s32 index;
+    ptr = &D_8AF26F34;
+    index = 0;
+    for (;;) {
+        if (*ptr != 0xFF) {
+            if (arg0 == *ptr) return index;
+            ptr++;
+            index++;
+            index = (s16)index;
+        } else {
+            return -1;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF12A4C.s")
 
