@@ -50,3 +50,15 @@ Accepted spelling (dispatcher_switch:sign-temps-then-switch):
   switch (arg0[0]) { case 0..3,16,17,18: *(s16 *)(arg0+0xA) += D_84186F0C * var0 * var1; break;
                      case 4..8:          *(s16 *)(arg0+0xC) += D_84186F10 * var0 * var1; break; }
 No default label (the tail block is just the epilogue; adding 'default: break;' also gates, but the no-default form matches the file's sibling func_84148054 style). D_84186F0C/D_84186F10 declared as file-local externs immediately above the body, matching func_84147FF4/func_84148054 in this file. Verified end to end with container/gate_pr.sh: build/pokestadiumgs-us.z64 md5 1561c75d11cedf356a8ddb1a4a5f9d5d, OK (495s).
+
+## 2026-09-09
+
+func_841450B4: plateau at 0.0 (raw None), mismatch unknown; tried families: init_sequence; tie-pool no
+
+## 2026-09-09
+
+func_8413FBC4: plateau at 0.9655 (raw 0.931), mismatch instruction_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-09
+
+func_84142DCC: matched (call_sequence:alias-before-index:pointer-increment:reverse-args), 6 iterations, agent codex
