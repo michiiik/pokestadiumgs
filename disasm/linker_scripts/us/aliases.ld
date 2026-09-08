@@ -50,3 +50,4 @@ func_841109FC = BattleAnim_ModelDispatch_113;
 func_8410F1A8 = BattleAnim_ModelDispatch_127;
 func_82C04880 = fragment83_main;
 func_8412A300 = BattleAnim_Table_84185F10_004;
+func_8003A440 = Geo_NodeReference;

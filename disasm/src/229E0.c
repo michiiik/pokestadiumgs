@@ -3751,7 +3751,7 @@ void GeoOverlay_Draw(S1_unk_D_86002F34_00C_0CC* arg0, S1_unk_D_86002F34_00C_040*
 extern s32 D_80124D60;
 extern void *D_80094924[];
 extern void func_8003A2C8(void *, ...);
-void func_8003A440(void *arg0) {
+void Geo_NodeReference(void *arg0) {
     s32 (*callback)(s32, void *);
     void *child;
     callback = 0;
