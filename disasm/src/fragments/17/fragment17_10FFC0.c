@@ -184,7 +184,34 @@ s32 func_82201EB4(s32 arg0, u8 *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82202718.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82202A84.s")
+extern void func_800504BC(s16 *arg0);
+extern u8 D_8220E315[];
+extern u8 D_8220E36A[];
+
+s32 func_82202A84(s32 arg0, u8 *arg1) {
+    void *sp1C; s32 temp_v1; void *temp_v0; s32 sp30; s32 pad0; s32 pad1;
+    temp_v1 = *(s32 *)(arg1 + 0x20);
+    if (arg0 != 0) {
+        if (arg0 == 1) {
+            if (D_8220E315[temp_v1 * 0x14] != 2) {
+                temp_v0 = (u8 *)&D_8220E378 + (temp_v1 * 0x3C);
+                sp1C = temp_v0;
+                sp30 = temp_v1;
+                func_800504BC((s16 *)((u8 *)temp_v0 + 0x30));
+                *(s16 *)((u8 *)temp_v0 + 0x30) = *(s16 *)((u8 *)arg1 + 8) + *(s16 *)((u8 *)temp_v0 + 0x30) + 9;
+                *(s16 *)((u8 *)temp_v0 + 0x32) = *(s16 *)((u8 *)arg1 + 0xA) + *(s16 *)((u8 *)temp_v0 + 0x32) + 0xE;
+                if (D_8220D788 < *(s16 *)(D_8220E36A + (sp30 * 4))) {
+                    *(u16 *)((u8 *)arg1 + 2) = *(u16 *)((u8 *)arg1 + 2) | 2;
+                } else {
+                    *(u16 *)((u8 *)arg1 + 2) = *(u16 *)((u8 *)arg1 + 2) & 0xFFFD;
+                }
+            } else {
+                *(u16 *)((u8 *)arg1 + 2) = *(u16 *)((u8 *)arg1 + 2) & 0xFFFD;
+            }
+        }
+    }
+    return 0;
+}
 
 extern u16 D_8220E4C0;
 s32 func_82202B80(s32 arg0, u8 *arg1) {
