@@ -579,3 +579,19 @@ func_84134098: matched (call_sequence:record-clear:u8-result-u16-index), 5 itera
 ## 2026-09-08
 
 func_8413D6D4: matched (call-sequence:loop:u8-index-postincrement), 6 iterations, agent codex
+
+## 2026-09-08
+
+func_8412A300: matched (call_sequence:startup-loop:positive-guard-u8-value), 1 iterations, agent codex
+
+## 2026-09-08
+
+func_8413293C: plateau at 0.907 (raw 0.7326), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-08
+
+func_84139618: time cap at 0.9535 (raw 0.7326) after 2400s, mismatch operand_or_scheduling_drift; tried families: call-sequence; tie-pool no
+
+## 2026-09-08
+
+func_8413C3A8: matched (call-sequence:two-entry:direct-pointer-s32-flag), 3 iterations, agent codex
