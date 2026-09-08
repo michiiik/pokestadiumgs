@@ -180,7 +180,17 @@ void func_8AF016BC(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
 }
 void func_8AF016BC_padding(void) {}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1EE290/func_8AF01718.s")
+s16 *func_8AF01718(s16 *arg0, s32 arg1) {
+    s16 value;
+    if (arg1 == 0) return arg0;
+    do {
+        do {
+            value = *arg0++;
+        } while (value != -1);
+        arg1--;
+    } while (arg1 != 0);
+    return arg0;
+}
 
 extern void func_8AC00824(void);
 extern void func_8AF00D90(void);
