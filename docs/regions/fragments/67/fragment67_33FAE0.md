@@ -13,3 +13,19 @@ Accepted func_82903BA4 with the compiler-faithful GBI macro spelling: gSPDisplay
 ## Fleet box 2026-09-02: func_82902FE0 requeued (2026-09-02)
 
 requeue: func_82902FE0 remains unresolved after 9 distinct state_field_access candidates plus one permuter-derived candidate. Best initial batch normalized=0.9355, raw=0.6129 (state:raw:tables-reversed), operand_or_scheduling_drift, first diff offset 34/instruction 8: expected addu $v1,$v0,$t6, actual addu $a3,$v0,$t6; expected size 120/30 instructions, common actual size 124/31. Permuter: base_score=395, best_score=65 at 60s timeout; its best commute candidate reached normalized=1.0, raw=0.8, 30/30 instructions but was rejected as immediate_drift at offset 43/instruction 10: expected lwc1 $f6,8($a1), actual lwc1 $f6,0($a1), with later field/register differences. Attempted families: raw offset access, typed vector overlay, signed/unsigned s16 index, table pointer declaration order, explicit table offsets, hoisted input temporaries, commuted second add, and permuter randomization. link_verified=false; no full-ROM gate or install occurred. Next materially different action: use the score-65 table-order body as baseline, explicitly materialize input z at offset 8 before table/candidate expressions and separately materialize x at offset 0 only at the assembly-indicated later point; vary temp declaration/lifetime to force expected first z load and v1/a3 pointer allocation. Do not treat normalized 1.0 as acceptance.
+
+## 2026-09-08
+
+func_82905488: matched (call_chain:fixed-loop:counter-first), 5 iterations, agent codex
+
+## 2026-09-08
+
+func_82902FE0: time cap at 0.9677 (raw 0.5484) after 2400s, mismatch instruction_drift; tried families: state; tie-pool no
+
+## 2026-09-08
+
+func_8290351C: time cap at 0.9762 (raw 0.8095) after 2400s, mismatch operand_or_scheduling_drift; tried families: init_sequence; tie-pool yes
+
+## 2026-09-08
+
+func_82904160: matched (call_chain:stride:decl-end-p1-p2-p3-do), 3 iterations, agent codex
