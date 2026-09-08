@@ -2830,7 +2830,10 @@ s32 func_84134018(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84134098.s")
+extern s32 func_84134018(u8 arg0);
+extern void * D_841951F8[];
+extern u8 * D_84195208[];
+u8 func_84134098(u8 arg0) { u8 result; u16 index; result = 1; index = arg0 * 4; ((u8 *)D_841951F8[arg0])[0] = 0xFF; if (func_84134018(arg0)) { if (D_84195208[arg0][0xF] & 1) { D_84195208[arg0][0x18] = 0; D_84195208[arg0][0x19] = 0; D_84195208[arg0][0x1D] = 0; D_84195208[arg0][0x10] &= 0xFFBF; } } else { result = 0xC; D_84195208[arg0][0x18] = 0; D_84195208[arg0][0x19] = 0; D_84195208[arg0][0x1D] = 0; D_84195208[arg0][0x10] &= 0xFFBF; } return result; }
 #endif
 
 #ifdef VERSION_US
