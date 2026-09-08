@@ -29,3 +29,15 @@ func_8290351C: time cap at 0.9762 (raw 0.8095) after 2400s, mismatch operand_or_
 ## 2026-09-08
 
 func_82904160: matched (call_chain:stride:decl-end-p1-p2-p3-do), 3 iterations, agent codex
+
+## 2026-09-08
+
+func_82903298: time cap at 0.9506 (raw 0.716) after 2400s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-08
+
+func_829056A4: matched (call_sequence:abi:pointer-second), 3 iterations, agent codex
+
+## 2026-09-08
+
+func_82904C28: plateau at 0.0 (raw None), mismatch unknown; tried families: callseq; tie-pool no
