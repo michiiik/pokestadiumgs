@@ -994,7 +994,26 @@ s32 func_8AC06630(s16 arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC0665C.s")
+s32 func_8AC0665C(s16 *arg0, s16 arg1) {
+    s32 result = 0;
+    s16 index = arg1;
+    s16 count = arg0[1];
+    if (func_8AC0660C(arg1)) {
+        while (1) {
+            index--;
+            if (func_8AC06464(index, arg0)) {
+                s16 temp;
+                count--;
+                if (func_8AC064C4((s16)(arg0[4] * (temp = count)), arg0)) {
+                    result = 1;
+                    break;
+                }
+            }
+            if (!func_8AC0660C(index)) break;
+        }
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
