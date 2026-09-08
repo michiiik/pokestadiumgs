@@ -2830,7 +2830,10 @@ s32 func_84134018(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84134098.s")
+extern s32 func_84134018(u8 arg0);
+extern void * D_841951F8[];
+extern u8 * D_84195208[];
+u8 func_84134098(u8 arg0) { u8 result; u16 index; result = 1; index = arg0 * 4; ((u8 *)D_841951F8[arg0])[0] = 0xFF; if (func_84134018(arg0)) { if (D_84195208[arg0][0xF] & 1) { D_84195208[arg0][0x18] = 0; D_84195208[arg0][0x19] = 0; D_84195208[arg0][0x1D] = 0; D_84195208[arg0][0x10] &= 0xFFBF; } } else { result = 0xC; D_84195208[arg0][0x18] = 0; D_84195208[arg0][0x19] = 0; D_84195208[arg0][0x1D] = 0; D_84195208[arg0][0x10] &= 0xFFBF; } return result; }
 #endif
 
 #ifdef VERSION_US
@@ -4161,7 +4164,13 @@ f32 func_8413D358(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8413D6D4.s")
+extern void _bcopy(void *, void *, s32);
+extern s32 func_80064728(void *);
+extern u8 func_8006397C(u8);
+extern u8 func_800639C0(u8);
+extern void func_8003F5AC(void *, void *);
+extern void _bzero(void *, s32);
+void func_8413D6D4(u8 *arg0, u8 *arg1) { u8 i; _bzero(arg0, 0x54); arg0[0] = arg1[0]; *(u16 *)(arg0 + 0x2C) = func_80064728(arg1); arg0[1] = func_8006397C(arg0[0]); arg0[2] = func_800639C0(arg0[0]); _bcopy(arg1 + 2, arg0 + 5, 4); _bcopy(arg1 + 0x18, arg0 + 9, 4); *(u16 *)(arg0 + 0x2E) = *(u16 *)(arg1 + 0x16); _bcopy(arg1 + 0x2A, arg0 + 0x32, 0xA); _bcopy(arg1 + 0x2A, arg0 + 0x3C, 0xA); for (i = 0; i < 7; ++i) *(arg0 + i + 0x1E) = 7; func_8003F5AC(arg0 + 0x50, arg1); }
 #endif
 
 #ifdef VERSION_US
