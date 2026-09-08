@@ -708,7 +708,15 @@ void func_841420A4(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84142DCC.s")
+void func_84142DCC(void *arg0) {
+    u8 *base = (u8 *)arg0;
+    u8 index = base[7];
+    u8 *entry = base;
+    entry += index << 2;
+    if ((base[8] & 1) == 0 && (base[8] & 2) == 0 && base[0] == 14) {
+        func_8413FAE4(*(s16 *)(base + 10) + *(s16 *)(entry + 18), *(s16 *)(base + 12) + *(s16 *)(entry + 20));
+    }
+}
 #endif
 
 #ifdef VERSION_US
