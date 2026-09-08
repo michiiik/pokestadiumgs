@@ -19,3 +19,23 @@ register-tie/stuck skip: func_841032F0, func_841005E0, func_8410291C, func_84101
 ## 2026-09-02 fleet box handoff (2026-09-02)
 
 requeue func_84100B3C (fresh owner, 8 candidates attempted). All candidates were probe_rejected with link_verified unset; mismatch_kind operand_or_scheduling_drift and identical first-diff fingerprint at instruction 3: expected addiu $sp,$sp,-64, actual frames -40 (chain:structural:direct; sim 0.6329 raw 0.3544, size 316), -48 (chain:structural:assign; sim 0.8375 raw 0.3125, size 320; best normalized), -40 (chain:abi:void-temp; sim 0.8025 raw 0.3580, size 324; best raw), -40 (chain:types:s32-index; sim 0.8077 raw 0.1923, size 312), -56 (chain:control:guarded; sim 0.7308 raw 0.2436, size 312), -48 (chain:decl-order:locals; sim 0.7778 raw 0.3086, size 324), -24 (chain:copy:explicit-u8; sim 0.7632 raw 0.3158, size 304), -56 (chain:cast:address; sim 0.7564 raw 0.2821, size 312). Expected size 300 for every attempt; no futility/register-tie or layout prerequisite. Attempted structural chain, assign-then-return, void-temp ABI, s32 index, guarded control flow, declaration order, explicit u8 copy, and address casts. Next materially different action: use a compiler-shaped local scratch overlay/padding arrangement that forces the exact 0x40 frame and stack slots at sp+0x28/sp+0x34/sp+0x38/sp+0x40, then submit a fresh 8+ batch; preserve exact func_8410A4F8(u8,u8,u8,u8) and func_84100710(u8*,s32) declarations.
+
+## 2026-09-08
+
+func_841005E0: time cap at 0.9524 (raw 0.6667) after 2400s, mismatch operand_or_scheduling_drift; tried families: float_math; tie-pool yes
+
+## 2026-09-08
+
+func_8410291C: matched (call-chain:direct-expression:late-reload-anim), 1 iterations, agent codex
+
+## 2026-09-08
+
+func_84100174: time cap at 0.9322 (raw 0.6271) after 2400s, mismatch operand_or_scheduling_drift; tried families: float_math; tie-pool no
+
+## 2026-09-08
+
+func_84101A08: matched (constant-map:bounds-float:u8-arg-guard), 1 iterations, agent codex
+
+## 2026-09-08
+
+func_84101AF4: plateau at 0.0 (raw None), mismatch unknown; tried families: call-chain; tie-pool no
