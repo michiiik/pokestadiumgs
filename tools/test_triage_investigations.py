@@ -567,6 +567,7 @@ class ScoreClusteringTests(unittest.TestCase):
                 "function": row["function"],
                 "similarity_score": row.get("similarity_score"),
                 "raw_similarity_score": row.get("raw_similarity_score"),
+                "expected_size": row.get("expected_size"),
                 "mismatch_kind": row.get("mismatch_kind", "operand_or_scheduling_drift"),
                 "label": row.get("label", "family:test"),
                 "status": row.get("status", "probe_rejected"),
@@ -660,6 +661,81 @@ class ScoreClusteringTests(unittest.TestCase):
             find_owner=lambda function: _StubOwner() if function == "func_A" else None,
         )
         self.assertEqual(findings, [])
+
+    def test_short_function_near_miss_collision_is_flagged_as_quantization_artifact(self) -> None:
+        # The real func_800533A4/func_82B07BEC/func_8300ADA4/func_86300120
+        # precedent: four unrelated 156-byte (39-instruction) functions each
+        # independently landed 2 raw words off, colliding on (1.0, 0.9487).
+        # Hand-verified per-function diffs (a branch-offset drift, a
+        # stack-frame-size drift, and two unrelated register swaps) plus a
+        # genuine non-closing decomp-permuter run showed no shared cause --
+        # the cluster is fully explained by there being only 40 achievable
+        # raw_similarity_score bins at instruction_count == 39.
+        owners_attempts = self._owners_attempts([
+            dict(function="func_800533A4", similarity_score=1.0, raw_similarity_score=0.9487, expected_size=156),
+            dict(function="func_82B07BEC", similarity_score=1.0, raw_similarity_score=0.9487, expected_size=156),
+            dict(function="func_8300ADA4", similarity_score=1.0, raw_similarity_score=0.9487, expected_size=156),
+            dict(function="func_86300120", similarity_score=1.0, raw_similarity_score=0.9487, expected_size=156),
+        ])
+        findings = ti.detect_score_clustering(owners_attempts, find_owner=_always_live)
+        self.assertEqual(len(findings), 1)
+        evidence = findings[0]["evidence"]
+        self.assertTrue(evidence["likely_quantization_artifact"])
+        self.assertEqual(evidence["instruction_counts"], [39])
+        self.assertEqual(
+            evidence["raw_mismatch_words_by_owner"],
+            {
+                "func_800533A4": 2,
+                "func_82B07BEC": 2,
+                "func_8300ADA4": 2,
+                "func_86300120": 2,
+            },
+        )
+        self.assertIn("quantization", findings[0]["next_action"])
+
+    def test_large_function_near_miss_collision_is_not_a_quantization_artifact(self) -> None:
+        # Same near-1.0 trigger (similarity >= 0.999, raw < 0.95), but on
+        # much larger functions: 20 raw words off out of 200 is a real
+        # double-digit chunk of diverging code, not a coarse-bin coincidence
+        # -- must still read as a genuine shared-cause candidate.
+        owners_attempts = self._owners_attempts([
+            dict(function="func_C", similarity_score=1.0, raw_similarity_score=0.9, expected_size=800),
+            dict(function="func_D", similarity_score=1.0, raw_similarity_score=0.9, expected_size=800),
+        ])
+        findings = ti.detect_score_clustering(owners_attempts, find_owner=_always_live)
+        self.assertEqual(len(findings), 1)
+        evidence = findings[0]["evidence"]
+        self.assertFalse(evidence["likely_quantization_artifact"])
+        self.assertEqual(evidence["raw_mismatch_words_by_owner"], {"func_C": 20, "func_D": 20})
+        self.assertNotIn("quantization", findings[0]["next_action"])
+
+    def test_missing_expected_size_is_not_flagged_as_quantization_artifact(self) -> None:
+        # No expected_size on record for either owner -- must fail safe
+        # (never claim a coincidence it cannot actually verify) rather than
+        # silently downgrading a real near-1.0 cluster to a non-finding.
+        owners_attempts = self._owners_attempts([
+            dict(function="func_E", similarity_score=1.0, raw_similarity_score=0.9),
+            dict(function="func_F", similarity_score=1.0, raw_similarity_score=0.9),
+        ])
+        findings = ti.detect_score_clustering(owners_attempts, find_owner=_always_live)
+        self.assertEqual(len(findings), 1)
+        evidence = findings[0]["evidence"]
+        self.assertFalse(evidence["likely_quantization_artifact"])
+        self.assertEqual(evidence["raw_mismatch_words_by_owner"], {"func_E": None, "func_F": None})
+
+    def test_generalized_branch_precedent_is_unaffected_by_quantization_check(self) -> None:
+        # The real func_84111248/func_841112C8 precedent again, this time
+        # confirming the quantization check never masks it: similarity is
+        # well under the 0.999 near-1.0 trigger, so
+        # likely_quantization_artifact must be unconditionally False even
+        # though no expected_size is on record.
+        owners_attempts = self._owners_attempts([
+            dict(function="func_84111248", similarity_score=0.8125, raw_similarity_score=0.125),
+            dict(function="func_841112C8", similarity_score=0.8125, raw_similarity_score=0.125),
+        ])
+        findings = ti.detect_score_clustering(owners_attempts, find_owner=_always_live)
+        self.assertEqual(len(findings), 1)
+        self.assertFalse(findings[0]["evidence"]["likely_quantization_artifact"])
 
 
 # ---------------------------------------------------------------------------

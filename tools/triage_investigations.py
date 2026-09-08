@@ -118,6 +118,31 @@ _PERMUTER_LABEL_PREFIX = "permute:"
 # (e.g. 0.1 + 0.2), not to implement a real tolerance window.
 _CLUSTER_ROUND_NDIGITS = 6
 
+# A follow-up investigation (func_800533A4 / func_82B07BEC / func_8300ADA4 /
+# func_86300120, all sharing (1.0, 0.9487)) found a false-positive class the
+# generic _is_normalized_only_match near-1.0 branch cannot see: that branch
+# fires on similarity >= 0.999 and raw < 0.95 "regardless of ratio" (see its
+# docstring in tools/container_agent.py), which is the right call for a
+# large function -- a 5% raw gap there is a real chunk of diverging code --
+# but for a SHORT function it can be crossed by a single wrong register or
+# immediate. raw_similarity_score is round(raw_matches / instruction_count,
+# 4), so a function with instruction_count words only has instruction_count
+# + 1 distinct achievable values; at instruction_count == 39 (all four owners
+# above were exactly 156-byte/39-instruction functions), being off by just 2
+# raw words already lands at 37/39 == 0.9487 < 0.95. All four owners' best
+# attempts really were independent near-misses (a branch-offset drift, a
+# stack-frame-size drift, and two unrelated register swaps -- confirmed by
+# hand and by a genuine (non-closing) decomp-permuter run against the two
+# register_allocation_only owners) that collided on the same coarse bin, not
+# evidence of one shared cause. SCORE_CLUSTER_QUANTIZATION_MAX_RAW_MISMATCH
+# is the absolute raw-word gap (not a percentage) below which that collision
+# stops being surprising; 2 is exactly the observed case. This only touches
+# the near-1.0 trigger: the generalized branch's real precedent
+# (func_84111248/func_841112C8 at (0.8125, 0.125), ratio 6.5x) has a raw gap
+# far larger than any instruction count could make coincidental, so it is
+# untouched by this constant.
+SCORE_CLUSTER_QUANTIZATION_MAX_RAW_MISMATCH = 2
+
 _REGION_NOTE_LINE_RE = re.compile(
     r"^(?P<function>[A-Za-z_][A-Za-z0-9_]*): (?:plateau at|time cap at) "
     r"(?P<similarity>\S+) \(raw (?P<raw>[^)]+)\)(?: after \d+s)?, "
@@ -207,6 +232,7 @@ def load_owner_attempts(stats_paths: "list[Path] | tuple[Path, ...]") -> dict[st
                 "function": function,
                 "similarity_score": _coerce_float(raw_attempt.get("similarity_score")),
                 "raw_similarity_score": _coerce_float(raw_attempt.get("raw_similarity_score")),
+                "expected_size": _coerce_float(raw_attempt.get("expected_size")),
                 "mismatch_kind": mismatch_kind if isinstance(mismatch_kind, str) else None,
                 "label": label if isinstance(label, str) else None,
                 "status": status if isinstance(status, str) else None,
@@ -498,6 +524,49 @@ def _best_attempt(attempts: list[dict]) -> "dict | None":
     return max(candidates, key=lambda attempt: (attempt["similarity_score"], attempt["raw_similarity_score"]))
 
 
+def _quantization_artifact_evidence(
+    similarity: float,
+    raw: float,
+    functions: list[str],
+    latest_by_owner: dict[str, dict],
+) -> dict[str, object]:
+    """Per-owner raw-word-mismatch counts, and whether the cluster is fully
+    explained by short-function score quantization rather than a shared
+    cause (see ``SCORE_CLUSTER_QUANTIZATION_MAX_RAW_MISMATCH`` above).
+
+    Only meaningful for the near-1.0 ``_is_normalized_only_match`` trigger
+    (``similarity >= 0.999``): that is the branch whose threshold is a fixed
+    percentage regardless of function size. Below that similarity, a raw gap
+    this small cannot occur by construction, so this always reports
+    ``is_likely`` False without needing to re-derive the branch condition.
+    """
+    per_owner_words: dict[str, "int | None"] = {}
+    instruction_counts: set[int] = set()
+    all_known = similarity >= 0.999
+    for function in functions:
+        expected_size = latest_by_owner[function].get("expected_size")
+        instruction_count = (
+            int(expected_size) // 4
+            if isinstance(expected_size, (int, float)) and expected_size and expected_size > 0
+            else None
+        )
+        if instruction_count is None:
+            per_owner_words[function] = None
+            all_known = False
+            continue
+        instruction_counts.add(instruction_count)
+        per_owner_words[function] = round((1.0 - raw) * instruction_count)
+    is_likely = all_known and all(
+        (words is not None and words <= SCORE_CLUSTER_QUANTIZATION_MAX_RAW_MISMATCH)
+        for words in per_owner_words.values()
+    )
+    return {
+        "raw_mismatch_words_by_owner": per_owner_words,
+        "instruction_counts": sorted(instruction_counts),
+        "likely_quantization_artifact": is_likely,
+    }
+
+
 def detect_score_clustering(
     owners_attempts: dict[str, list[dict]],
     *,
@@ -544,6 +613,28 @@ def detect_score_clustering(
                 "timestamp": latest_by_owner[function]["timestamp"],
                 "label": latest_by_owner[function]["label"],
             }
+        quantization = _quantization_artifact_evidence(similarity, raw, functions, latest_by_owner)
+        if quantization["likely_quantization_artifact"]:
+            next_action = (
+                f"{len(functions)} distinct owners ({', '.join(functions)}) share the "
+                f"identical (similarity={similarity}, raw={raw}) pair, but this looks "
+                f"like short-function score quantization, not a shared cause: every "
+                f"owner is only {SCORE_CLUSTER_QUANTIZATION_MAX_RAW_MISMATCH} or fewer "
+                f"raw instruction-words off (instruction_counts="
+                f"{quantization['instruction_counts']}), and at that size there are too "
+                f"few achievable raw_similarity_score bins for the collision to be "
+                f"surprising by itself -- verify each owner's real assembly_diff before "
+                f"assuming a common bug (see SCORE_CLUSTER_QUANTIZATION_MAX_RAW_MISMATCH "
+                f"in this file)."
+            )
+        else:
+            next_action = (
+                f"{len(functions)} distinct owners ({', '.join(functions)}) share the "
+                f"identical (similarity={similarity}, raw={raw}) pair (ratio "
+                f"{ratio if ratio is not None else 'inf'}x) -- the normalized metric "
+                f"may be hiding a shared systemic cause rather than {len(functions)} "
+                f"independent near-misses; investigate together, not one at a time."
+            )
         findings.append(make_finding(
             "score_clustering",
             functions,
@@ -554,14 +645,9 @@ def detect_score_clustering(
                 "ratio": ratio,
                 "owner_count": len(functions),
                 "per_owner": per_owner,
+                **quantization,
             },
-            next_action=(
-                f"{len(functions)} distinct owners ({', '.join(functions)}) share the "
-                f"identical (similarity={similarity}, raw={raw}) pair (ratio "
-                f"{ratio if ratio is not None else 'inf'}x) -- the normalized metric "
-                f"may be hiding a shared systemic cause rather than {len(functions)} "
-                f"independent near-misses; investigate together, not one at a time."
-            ),
+            next_action=next_action,
         ))
     return findings
 
