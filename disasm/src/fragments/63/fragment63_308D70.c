@@ -157,7 +157,19 @@ void func_87E06B18(void *arg0) {
     (*(s32 *)((u8 *)(arg0) + (0x5C))) = func_800071A4(0, 2, 0x102, 0x17, 0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E06B54.s")
+extern s32 func_80041C98(s32);
+void func_87E06B54(s32 arg0) {
+    s32 i;
+    void *entry;
+
+    entry = main_pool_alloc(0x128, 0);
+    *(s32 *)((u8 *)arg0 + 0x154) = (s32)entry;
+    for (i = 0; i != 2; i += 1, entry = (void *)((u8 *)entry + 0x94)) {
+        *(s32 *)((u8 *)entry + 0) = -1;
+        *(s32 *)((u8 *)entry + 4) = i;
+        *(s32 *)((u8 *)entry + 0x90) = func_80041C98(5);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E06BCC.s")
 
