@@ -3791,7 +3791,11 @@ void Geo_NodeType3Pass(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003A9CC.s")
+extern s32 D_80094914;
+extern void func_8003A960(void *, void *, Gfx **);
+extern void * D_80094908;
+extern Gfx* D_800D0510;
+void func_8003A9CC(void *arg0, void *arg1) { Gfx *cmd; if (D_80094914 == 0 && *((s32 *)((u8 *)arg0 + 0xC)) != 0) { cmd = D_800D0510; D_800D0510 = cmd + 1; cmd->words.w0 = 0xDB0E0000; cmd->words.w1 = 0xFFFF; cmd = D_800D0510; D_800D0510 = cmd + 1; cmd->words.w0 = 0xDA380007; cmd->words.w1 = *((u32 *)((u8 *)D_80094908 + 0x40)) & 0x1FFFFFFF; func_8003A960(arg0, arg1, &D_800D0510); } }
 #endif
 
 #ifdef VERSION_US
