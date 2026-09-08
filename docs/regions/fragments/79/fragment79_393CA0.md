@@ -595,3 +595,15 @@ func_84139618: time cap at 0.9535 (raw 0.7326) after 2400s, mismatch operand_or_
 ## 2026-09-08
 
 func_8413C3A8: matched (call-sequence:two-entry:direct-pointer-s32-flag), 3 iterations, agent codex
+
+## 2026-09-09
+
+func_841362E4: matched (state-field:live-pointer:increment-entry-and-slot), 1 iterations, agent codex
+
+## 2026-09-09
+
+func_84126F2C: time cap at 0.9655 (raw 0.5862) after 2404s, mismatch operand_or_scheduling_drift; tried families: state-scan; tie-pool no
+
+## 2026-09-09
+
+func_84124514: time cap at 0.9688 (raw 0.75) after 2400s, mismatch operand_or_scheduling_drift; tried families: quotient-scan, state-field; tie-pool no
