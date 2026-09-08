@@ -225,7 +225,21 @@ s32 func_87E06E48(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E06EC0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E07040.s")
+extern void func_87F0B1A4(s32, void *, f32, f32, f32, s32, s32);
+extern void func_87F0B2F4(s32, void *, f32, f32, f32, s32, s32);
+extern u32 func_8003570C(void);
+void func_87E07040(s32 arg0, void *arg1, s32 arg2) {
+    u8 *temp_s0;
+    u32 temp_v0;
+    u32 temp_v1;
+    u32 temp_a0;
+    temp_s0 = (u8 *)arg1;
+    func_87F0B1A4(arg0, temp_s0 + 0x48, *(f32 *)(temp_s0 + 0x48), *(f32 *)(temp_s0 + 0x4C) + -360.0f, *(f32 *)(temp_s0 + 0x50), arg2, 0x2000);
+    temp_v1 = func_8003570C();
+    temp_v0 = func_8003570C();
+    temp_a0 = func_8003570C();
+    func_87F0B2F4(arg0, (void *)(temp_s0 + 0x42), (f32)temp_v1 / 4294967296.0f * 90.0f - 45.0f, (f32)temp_v0 / 4294967296.0f * 90.0f - 45.0f, (f32)temp_a0 / 4294967296.0f * 360.0f - 180.0f, arg2, 0);
+}
 
 extern void func_87E07040(s32, void *, s32);
 extern void func_87F0B24C(s32, u8 *, f32, f32, f32, s32, s32);
