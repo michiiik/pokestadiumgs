@@ -992,7 +992,8 @@ void func_841457C4(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84145AB4.s")
+extern Gfx* D_800D0510;
+void func_84145AB4(arg0) void *arg0; { Gfx *temp_v1; struct { s16 pad0[5]; s16 x; s16 y; } *state; state = arg0; temp_v1 = D_800D0510++; temp_v1->words.w0 = ((((state->x + 0xDC) & 0x3FF) << 14) | 0xF6000000) | (((state->y + 0x3C) & 0x3FF) << 2); temp_v1->words.w1 = (((state->x - 0x14) & 0x3FF) << 14) | (((state->y - 0xA) & 0x3FF) << 2); }
 #endif
 
 void func_84145B24(void) {
@@ -1153,7 +1154,26 @@ void func_841465CC(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84146610.s")
+extern u16 D_84186CD8[];
+extern u16 D_84186CDE;
+extern u16 D_84186CE8;
+extern u16 D_84186CD4[];
+extern u16 D_84186CE4;
+extern u8 * D_841951F8;
+void func_84146610(u8 *arg0) {
+    u8 index = arg0[1];
+    u8 subindex = arg0[2];
+    *(u16 *)(arg0 + 0xA) = D_84186CD4[index];
+    if (index == 1 && subindex == 0 && ((u8 **)&D_841951F8)[index][2] == 1) {
+        *(u16 *)(arg0 + 0xC) = D_84186CDE;
+    } else {
+        *(u16 *)(arg0 + 0xC) = D_84186CD8[index * 2 + subindex];
+    }
+    *(s16 *)(arg0 + 0x12) = *(s16 *)(arg0 + 0xA);
+    *(s16 *)(arg0 + 0x14) = *(s16 *)(arg0 + 0xC);
+    *(u16 *)(arg0 + 0xE) = D_84186CE4;
+    *(u16 *)(arg0 + 0x10) = D_84186CE8;
+}
 #endif
 
 #ifdef VERSION_US
