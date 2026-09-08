@@ -607,3 +607,27 @@ func_84126F2C: time cap at 0.9655 (raw 0.5862) after 2404s, mismatch operand_or_
 ## 2026-09-09
 
 func_84124514: time cap at 0.9688 (raw 0.75) after 2400s, mismatch operand_or_scheduling_drift; tried families: quotient-scan, state-field; tie-pool no
+
+## 2026-09-09
+
+func_84129900: plateau at 0.0 (raw None), mismatch unknown; tried families: call-sequence; tie-pool no
+
+## 2026-09-09
+
+TYPE CONFLICT: D_841951BC is extern u8 D_841951BD, D_841951D5, D_841951C6, D_841951D3, D_841951BC, not extern u8 D_841951BC
+
+## 2026-09-09
+
+TYPE CONFLICT: func_84136124 is extern void func_84136124(u8, s16, u16, u8, u16), not extern void func_84136124(u8, s16, u16, u8, u8)
+
+## 2026-09-09
+
+func_84132F34: plateau at 0.9796 (raw 0.7653), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-09
+
+func_841312E8: matched (call_sequence:guard-switch:lh-lhu-direct), 1 iterations, agent codex
+
+## 2026-09-09
+
+func_84127B00: plateau at 0.9796 (raw 0.8265), mismatch operand_or_scheduling_drift; tried families: call-sequence; tie-pool no
