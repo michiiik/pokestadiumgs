@@ -558,7 +558,14 @@ void func_800627FC(s32 arg0, s32 arg1) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80062978.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80062BD4.s")
+extern void func_80062808(void *, s32);
+extern void func_80062884(void *, s32);
+extern void func_80062978(void *, s32);
+void func_80062BD4(void *arg0, s32 arg1, void *arg2) {
+    func_80062808(arg0, arg1 & 0xFF);
+    func_80062884(arg0, arg1 & 0xFF);
+    func_80062978(arg0, arg2);
+}
 
 s32 func_80062C18(s32 arg0) { return 1; }
 
