@@ -16,7 +16,14 @@ s32 func_82D00030(u8 *arg0, u8 arg1) {
     return (arg0[byteIndex] & (1 << (7 - bitIndex))) != 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_420EA0/func_82D000A0.s")
+void func_82D000A0(u8 *arg0, u8 arg1) {
+    s32 byteIndex;
+    s32 bitIndex;
+    if (arg1-- == 0) return;
+    byteIndex = arg1 / 8;
+    bitIndex = arg1 % 8;
+    arg0[byteIndex] ^= 1 << (7 - bitIndex);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_420EA0/func_82D00108.s")
 
