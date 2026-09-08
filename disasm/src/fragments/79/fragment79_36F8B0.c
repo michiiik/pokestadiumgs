@@ -157,7 +157,30 @@ s16 func_84100688(Func84100688Table *arg0, u32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_84101888.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_84101A08.s")
+void func_84101A08(f32 *arg0, u8 *arg1, u8 arg2) {
+    f32 value;
+    if (*(s16 *)(arg1 + 4) != 0 && arg2 >= *(s16 *)(arg1 + 4)) {
+        return;
+    }
+    if (arg2 < *(s16 *)(arg1 + 2)) {
+        return;
+    }
+    value = (f32)*(s16 *)(arg1 + 8);
+    if (value == *arg0) {
+        return;
+    }
+    if (value < *arg0) {
+        *arg0 -= (f32)*(s16 *)(arg1 + 0xA);
+        if (*arg0 < (f32)*(s16 *)(arg1 + 8)) {
+            *arg0 = (f32)*(s16 *)(arg1 + 8);
+        }
+    } else {
+        *arg0 += (f32)*(s16 *)(arg1 + 0xA);
+        if ((f32)*(s16 *)(arg1 + 8) < *arg0) {
+            *arg0 = (f32)*(s16 *)(arg1 + 8);
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_84101AF4.s")
 
