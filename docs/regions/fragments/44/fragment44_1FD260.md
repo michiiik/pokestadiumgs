@@ -21,3 +21,19 @@ Status: requeue. Kept func_8AF133C0 as the sole active owner; no source candidat
 ## 2026-09-01
 
 Fleet box 2026-09-01 structural dispatch probe (requeue/tooling-blocked): func_8AF133C0 remained the sole active owner; 8 candidates were submitted in one probe-only batch with auto-gating enabled, but none scored and no source candidate was installed. Candidate 1 compile_failed in IDO due to the inline typedef/block-scope declaration form (Empty declaration specifiers and follow-on parser/type errors); candidates 2-8 were probe_unavailable after the worker compile failure. No link_verified hit, probe_match, acceptance, or full-ROM gate. Owner totals remain 149 prior attempts before this batch, 0 accepted. Existing best remains normalized/raw 0.9674/0.4651, 860-byte/215-instruction record-cast:ulong-mask:permuter-2005; exact-shape base remains 0.9533/0.4766 at 856/214. Runner advisory: repeated-drift, 63 prior rejected attempts share fingerprint [operand_or_scheduling_drift,3,0,0x27bdffc8,0x27bdffd0] (frame mismatch); no terminal register-tie futility. Attempted family: assigned do-once/break dispatch with direct D_8AF263C0 status first and separately scoped motion/base block, preserving scalar 0x38 pad and whole-record MenuRecord assignment. Next materially different action: keep the same control-flow hypothesis but express all declarations at function scope using repository-supported typedef/prototype syntax, then submit a fresh 8+ candidate batch varying only legal block structure and status/base lifetime; do not repeat exhausted pad/declaration/record-copy/retained-pointer families.
+
+## 2026-09-08
+
+func_8AF12E30: plateau at 0.8421 (raw 0.6842), mismatch operand_or_scheduling_drift; tried families: state-field; tie-pool no
+
+## 2026-09-08
+
+func_8AF123C0: matched (bounded_lookup:global-pointer:for-exact), 7 iterations, agent codex
+
+## 2026-09-08
+
+func_8AF129F8: matched (state_field_access:scan:nested-else:u8-parameter), 3 iterations, agent codex
+
+## 2026-09-08
+
+func_8AF10840: plateau at 0.7742 (raw 0.3871), mismatch instruction_drift; tried families: state-field-access; tie-pool no
