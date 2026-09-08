@@ -1,16 +1,17 @@
 # Runtime snapshot (macOS native build)
 
-Verbatim copies of the files under `/Users/michaegg/ps2-recomp-build/runtime`
-that the macOS build depends on and that carry GS-specific fixes.
+Verbatim copies of the runtime and launcher files that carry the GS-specific
+macOS fixes recovered from the August boot sessions.
 
-**Why this exists:** that runtime tree is *not* a git repository, so every fix
-below lives on one machine with no history. `tools/mac_build_native.sh` builds
-against the live tree, not against this directory — these copies are here so the
-work is recoverable and reviewable, nothing more.
+**Why this exists:** the original runtime tree is *not* a git repository, so
+the fixes below used to live on one machine with no history. The native build
+now copies its baseline runtime into the private `build-mac/source` staging
+tree and overlays these tracked files. The external checkout is read-only
+input for dependencies and is never modified by the build.
 
-This is a snapshot, not a patch series. It will drift from the live tree; treat
-`/Users/michaegg/ps2-recomp-build/runtime` as authoritative and refresh these
-copies when you change it.
+This is a snapshot, not a patch series. It can drift from the baseline runtime;
+refresh the copies deliberately when a newer fix is validated. Set
+`PS2_RUNTIME_SNAPSHOT_ROOT` to use another checked-in snapshot when testing.
 
 ## What each file carries
 
@@ -25,5 +26,11 @@ copies when you change it.
 | `ultramodern/src/mesgqueue.cpp` | `PSR_QTRACE=1` first-touch queue tracing: one line the first time a queue is sent to, one the first time a thread blocks on it. This is what identified the never-written queues during the deadlock hunt. |
 | `ultramodern/src/{threads,threadqueue,scheduler_tick,scheduling}.cpp` | Scheduler/starvation work from earlier sessions (`PSR_STARVATION_US`, running-queue wait tracking, liveness guards). |
 | `mac-regen-game.toml` | N64Recomp config used to regenerate `generated-mac` from the ROM-matching ELF. Note the `frag_83F00000` `decompressed_section_pattern` block in it is INERT (`found 0 wrappers in ROM`) — kept only so nobody retries that dead end. |
+
+The recovered overlay fixes are intentionally kept together: entry JAL
+decoding uses the fragment's link-time PC; residency and eviction use the
+FRAGMENT header's `sizeInRam` instead of generated relocation/padding tails;
+the resolver returns immediately for ordinary addresses; and the default
+starvation checkpoint is 50 ms.
 
 See `../MACOS_BOOT_HANDOFF.md` for the full diagnosis behind each of these.

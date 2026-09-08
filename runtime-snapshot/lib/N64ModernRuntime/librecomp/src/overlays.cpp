@@ -87,10 +87,17 @@ static std::vector<char> patch_data;
 struct LoadedSection {
     int32_t loaded_ram_addr;
     size_t section_table_index;
+    // Bytes actually resident in the guest allocation. Generated sections
+    // include relocation tables and alignment tails which may extend beyond
+    // the FRAGMENT header's sizeInRam; using section.size for overlap tests
+    // incorrectly evicts an adjacent live fragment.
+    uint32_t resident_size;
 
-    LoadedSection(int32_t loaded_ram_addr_, size_t section_table_index_) {
+    LoadedSection(int32_t loaded_ram_addr_, size_t section_table_index_,
+                  uint32_t resident_size_ = 0) {
         loaded_ram_addr = loaded_ram_addr_;
         section_table_index = section_table_index_;
+        resident_size = resident_size_;
     }
 
     bool operator<(const LoadedSection& rhs) {
@@ -653,7 +660,8 @@ void load_overlay(size_t section_table_index, int32_t ram) {
         pc_index_register(func.func, section_table_index);
     }
 
-    loaded_sections.emplace_back(ram, section_table_index);
+    loaded_sections.emplace_back(ram, section_table_index,
+                                 (uint32_t)section.size);
     secaddr_set(section.index, ram, "load");
     record_load_order(section_table_index);
 }
@@ -1075,11 +1083,16 @@ static void scan_fragment_section_trampolines(uint8_t* rdram, size_t section_ind
     // drops into the interpreter for every model instance; with several
     // simultaneously resident copies this is both very slow and loses the
     // concrete relocation context needed by the model code.
+    // Decode against the fragment's link-time PC, not its loaded RDRAM
+    // address. MIPS J/JAL copies the high nibble from the delay-slot PC;
+    // a decompressed fragment commonly lives at 0x80xxxxxx while its target
+    // is linked at 0x83xxxxxx. Using runtime_base here therefore produces a
+    // non-existent 0x80xxxxxx target and leaves the entry callback unmapped.
     const uint32_t entry_instr = read_rdram_u32_be(rdram, runtime_base);
     const uint32_t entry_delay = read_rdram_u32_be(rdram, runtime_base + 4);
     if (entry_delay == 0) {
         const uint32_t entry_target =
-            decode_jal_target(entry_instr, (uint32_t)runtime_base + 4u);
+            decode_jal_target(entry_instr, decode_base + 4u);
         if (entry_target != 0) {
             int32_t runtime_target = 0;
             FragmentDispatchTarget resolved_target{};
@@ -1390,7 +1403,9 @@ void recomp::overlays::register_runtime_fragment(uint8_t* rdram, uint32_t id, in
             // cleanup below only knows about generated function offsets and
             // therefore cannot remove those aliases reliably when two pattern
             // variants share a reused runtime buffer.
-            frag_range_erase((uint32_t)fragment_ptr, (uint32_t)old_section.size);
+            const uint32_t old_extent = evict_it->resident_size != 0
+                ? evict_it->resident_size : (uint32_t)old_section.size;
+            frag_range_erase((uint32_t)fragment_ptr, old_extent);
 
             for (size_t fi = 0; fi < old_section.num_funcs; fi++) {
                 const FuncEntry& fe = old_section.funcs[fi];
@@ -1934,10 +1949,13 @@ void recomp::overlays::register_runtime_fragment(uint8_t* rdram, uint32_t id, in
             return s.section_table_index == found_index &&
                    s.loaded_ram_addr == fragment_ptr;
         });
+    const uint32_t resident_extent =
+        frag_size_in_ram != 0 ? frag_size_in_ram : (uint32_t)section.size;
     if (find_existing == loaded_sections.end()) {
-        loaded_sections.emplace_back(fragment_ptr, found_index);
+        loaded_sections.emplace_back(fragment_ptr, found_index, resident_extent);
     } else {
         find_existing->loaded_ram_addr = fragment_ptr;
+        find_existing->resident_size = resident_extent;
     }
     // Remember which section this id mapped to so the game's
     // Memmap_ClearFragmentMemmap(id) can release exactly this section
@@ -2045,8 +2063,11 @@ extern "C" void load_overlays(uint32_t rom, int32_t ram_addr, uint32_t size) {
 
                 const SectionTableEntry& old_section =
                     sections_info.code_sections[loaded.section_table_index];
-                if (!runtime_ranges_overlap(implied_base, new_section.size,
-                                            loaded.loaded_ram_addr, old_section.size)) {
+                const uint32_t new_extent = (uint32_t)new_section.size;
+                const uint32_t old_extent = loaded.resident_size != 0
+                    ? loaded.resident_size : (uint32_t)old_section.size;
+                if (!runtime_ranges_overlap(implied_base, new_extent,
+                                            loaded.loaded_ram_addr, old_extent)) {
                     continue;
                 }
 
@@ -2150,8 +2171,10 @@ static void unload_overlay_by_section_index(uint32_t section_table_index) {
         // Also range-erase trampoline slots, interior aliases, and the
         // instance-dispatch records not represented by section.funcs.
         if (frag_unreg_enabled()) {
+            const uint32_t resident_extent = it->resident_size != 0
+                ? it->resident_size : (uint32_t)section.size;
             frag_range_erase((uint32_t)it->loaded_ram_addr,
-                             (uint32_t)section.size);
+                             resident_extent);
         }
         it = loaded_sections.erase(it);
         removed = true;
@@ -2190,9 +2213,13 @@ extern "C" void unload_overlays(int32_t ram_addr, uint32_t size) {
         const auto& section = sections_info.code_sections[it->section_table_index];
 
         // Check if the unloaded region overlaps with the loaded section
-        if (ram_addr < (it->loaded_ram_addr + section.size) && (ram_addr + size) >= it->loaded_ram_addr) {
+        const uint32_t resident_extent = it->resident_size != 0
+            ? it->resident_size : (uint32_t)section.size;
+        if (ram_addr < (it->loaded_ram_addr + resident_extent) &&
+            (ram_addr + size) >= it->loaded_ram_addr) {
             // Check if the section isn't entirely in the loaded region
-            if (ram_addr > it->loaded_ram_addr || (ram_addr + size) < (it->loaded_ram_addr + section.size)) {
+            if (ram_addr > it->loaded_ram_addr ||
+                (ram_addr + size) < (it->loaded_ram_addr + resident_extent)) {
                 fprintf(stderr,
                     "Cannot partially unload section\n"
                     "  rom: 0x%08X size: 0x%08X loaded_addr: 0x%08X\n"
@@ -2208,7 +2235,9 @@ extern "C" void unload_overlays(int32_t ram_addr, uint32_t size) {
                 erase_section_func_aliases(section, it->loaded_ram_addr, func);
             }
             // Issue #9 Phase 1: range-erase the whole runtime extent (trampolines + interior aliases).
-            if (frag_unreg_enabled()) frag_range_erase((uint32_t)it->loaded_ram_addr, (uint32_t)section.size);
+            if (frag_unreg_enabled()) {
+                frag_range_erase((uint32_t)it->loaded_ram_addr, resident_extent);
+            }
             // Reset the section's address in the address table
             secaddr_set(section.index, section.ram_addr, "unload-rng");
             // Remove the section from the loaded section map
@@ -5180,6 +5209,16 @@ extern "C" uint32_t librecomp_fragment_resolve_exit(
 {
     const uint32_t input = librecomp_fragment_input_pop();
 
+    // The resolver is reached for every fragment-space lookup, but only the
+    // synthetic pool and the known-ambiguous 0x8FF00000 bucket need native
+    // disambiguation. Keep the common path to one mask and branch: calling
+    // the two synthetic helpers (and their loaded-section walk) for ordinary
+    // 0x80xxxxxx addresses made the generated entry hook needlessly hot.
+    const bool synthetic = is_synthetic_addr(input);
+    if (!synthetic && (input & 0xFFF00000u) != 0x8FF00000u) {
+        return game_result;
+    }
+
     // Step 1: synthetic-fragment pool (highest priority). Prefer the active
     // fragment instance because several variants can share one synthetic
     // bucket. The global slot table remains the fallback for calls made
@@ -6040,11 +6079,14 @@ extern "C" void recomp_debug_dump_loaded_sections(void) {
         for (const auto& ls : loaded_sections) {
             const SectionTableEntry& sec = sections_info.code_sections[ls.section_table_index];
             uint32_t runtime_base = (uint32_t)ls.loaded_ram_addr;
+            uint32_t resident_extent = ls.resident_size != 0
+                ? ls.resident_size : (uint32_t)sec.size;
 
             // A guaranteed-interior, non-4-aligned offset: cannot be a
             // (4-aligned) function start and cannot match a (4-aligned)
             // reloc offset -> probing it yields a "code-entry" miss.
-            uint32_t code_off = (sec.size > 8) ? (((sec.size / 2) & ~3u) | 1u) : 1u;
+            uint32_t code_off = (resident_extent > 8)
+                ? (((resident_extent / 2) & ~3u) | 1u) : 1u;
 
             // The first reloc offset that is NOT a function start: probing
             // it yields a "pointer-site" miss (reloc present, but the
@@ -6057,7 +6099,7 @@ extern "C" void recomp_debug_dump_loaded_sections(void) {
             uint32_t ptr_off = 0xFFFFFFFFu;
             for (size_t i = 0; i < sec.num_relocs; i++) {
                 uint32_t off = sec.relocs[i].offset;
-                if (off < sec.size && func_starts.find(off) == func_starts.end()) {
+                if (off < resident_extent && func_starts.find(off) == func_starts.end()) {
                     ptr_off = off;
                     break;
                 }
@@ -6071,11 +6113,11 @@ extern "C" void recomp_debug_dump_loaded_sections(void) {
             }
             fprintf(f,
                 "%s  {\"index\":%zu,\"runtime_base\":\"0x%08X\",\"link_base\":\"0x%08X\","
-                "\"size\":\"0x%X\",\"content_hash\":\"0x%016llX\",\"num_funcs\":%zu,"
+                "\"size\":\"0x%X\",\"resident_size\":\"0x%X\",\"content_hash\":\"0x%016llX\",\"num_funcs\":%zu,"
                 "\"num_relocs\":%zu,\"probe_code_addr\":\"0x%08X\",\"probe_pointer_addr\":%s}",
                 first ? "" : ",\n",
                 ls.section_table_index, runtime_base, sec.ram_addr,
-                sec.size, (unsigned long long)sec.content_hash, sec.num_funcs,
+                sec.size, resident_extent, (unsigned long long)sec.content_hash, sec.num_funcs,
                 sec.num_relocs, runtime_base + code_off, ptr_field);
             first = false;
         }
