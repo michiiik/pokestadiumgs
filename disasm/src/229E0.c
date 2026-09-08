@@ -3910,7 +3910,7 @@ void func_8003BEF0(void *arg0) { s32 *counter = &D_80126008; func_80039204((u8 *
 #ifdef VERSION_US
 extern void func_8003A2C8(void *, ...);
 extern u8 D_80124F68;
-void func_8003C080(void *arg0) {
+void Geo_NodeDisplayList(void *arg0) {
     void *root = arg0;
     s32 callback;
     if (*(s32 *)((u8 *)root + 0x18) != 0 || *(s32 *)((u8 *)root + 0x10) != 0) {
