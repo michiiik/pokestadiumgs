@@ -605,7 +605,23 @@ void func_829053F8(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33FAE0/func_82905488.s")
+extern void StageFade_StartFromTransparent(s32);
+extern void func_800225C4(s32);
+extern void func_80064D28(void);
+extern void func_82904208(void);
+extern void func_829050C8(void *);
+extern u8 D_82918990[];
+void func_82905488(void) {
+    s32 i;
+
+    StageFade_StartFromTransparent(0x20);
+    func_800225C4(0x20);
+    for (i = 0; i < 0x20; i++) {
+        func_80064D28();
+        func_829050C8(&D_82918990);
+        func_82904208();
+    }
+}
 #endif
 
 #ifdef VERSION_US
