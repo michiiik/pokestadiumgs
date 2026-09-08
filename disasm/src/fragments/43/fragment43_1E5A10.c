@@ -694,7 +694,10 @@ void func_8AC043E0(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC04418.s")
+extern u8 D_8AC07DD8[];
+void func_8AC04418(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    func_8AC04154(arg0, arg1, arg2, arg3, *(Fragment43Color405C *)(void *)D_8AC07DD8);
+}
 #endif
 
 #ifdef VERSION_US
