@@ -203,7 +203,25 @@ void func_87E06D84(u8 *arg0) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E06D8C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E06E48.s")
+s32 func_87E06E48(void *arg0) {
+    s32 result;
+    s32 i;
+    void *entry;
+
+    result = 1;
+    entry = *(void **)((u8 *)arg0 + 0x150);
+    for (i = 0; i < 12; i++) {
+        if (*(s32 *)((u8 *)entry + 0x84)) { result = 0; i = 0; break; }
+        entry = (void *)((u8 *)entry + 0x9C);
+    }
+    if (*(s32 *)((u8 *)arg0 + 0xE4)) result = 0;
+    entry = *(void **)((u8 *)arg0 + 0x154);
+    for (i = 0; i < 2; i++) {
+        if (*(s32 *)((u8 *)entry + 0x8C)) { result = 0; break; }
+        entry = (void *)((u8 *)entry + 0x94);
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E06EC0.s")
 
