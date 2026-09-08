@@ -3194,7 +3194,29 @@ s32 func_80038474(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800384C0.s")
+S1_GraphNode *func_800384C0(void *arg0, S1_GraphNode *arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6, s32 arg7, u16 arg8) {
+    S1_GraphNode *new_var;
+    u8 *new_var2;
+    if (arg0 != 0) {
+        arg1 = MainPool_AllocAligned(arg0, 0x30, 4);
+    }
+    if (arg1 != 0) {
+        ((s32 *)(((u8 *)arg1) + 0x18))[0] = arg3;
+        ((s32 *)(((u8 *)arg1) + 0x1C))[0] = arg5;
+        ((s32 *)(((u8 *)arg1) + 0x20))[0] = arg7;
+        ((u8 *)arg1)[0x24] = (u8)arg2;
+        ((u8 *)arg1)[0x25] = (u8)arg4;
+        ((u16 *)(((u8 *)arg1) + 0x26))[0] = (u16)arg6;
+        new_var2 = (u8 *)arg1;
+        ((u16 *)(((u8 *)arg1) + 0x28))[0] = arg8;
+        ((s32 *)(new_var2 + 0x2C))[0] = 0;
+        GeoNode_Init(arg1, 0xE);
+    }
+    if (1) {
+        new_var = arg1;
+    }
+    return new_var;
+}
 #endif
 
 #ifdef VERSION_US
@@ -3726,7 +3748,24 @@ void GeoOverlay_Draw(S1_unk_D_86002F34_00C_0CC* arg0, S1_unk_D_86002F34_00C_040*
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003A440.s")
+extern s32 D_80124D60;
+extern void *D_80094924[];
+extern void func_8003A2C8(void *, ...);
+void Geo_NodeReference(void *arg0) {
+    s32 (*callback)(s32, void *);
+    void *child;
+    callback = 0;
+    child = *(void **)((u8 *)arg0 + 0x18);
+    if (child != 0 && (*(u8 *)((u8 *)child + 1) & 1) != 0) {
+        D_80124D60 = 0;
+        callback = *(s32 (**)(s32, void *))((u8 *)child + 0x10);
+        if (callback != 0) {
+            D_80124D60 = callback(2, child);
+        }
+        ((void (*)(void *))((void **)D_80094924)[*(u8 *)child])(child);
+    }
+    func_8003A2C8(arg0);
+}
 #endif
 
 #ifdef VERSION_US
@@ -3752,7 +3791,11 @@ void Geo_NodeType3Pass(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003A9CC.s")
+extern s32 D_80094914;
+extern void func_8003A960(void *, void *, Gfx **);
+extern void * D_80094908;
+extern Gfx* D_800D0510;
+void Geo_NodeOrtho(void *arg0, void *arg1) { Gfx *cmd; if (D_80094914 == 0 && *((s32 *)((u8 *)arg0 + 0xC)) != 0) { cmd = D_800D0510; D_800D0510 = cmd + 1; cmd->words.w0 = 0xDB0E0000; cmd->words.w1 = 0xFFFF; cmd = D_800D0510; D_800D0510 = cmd + 1; cmd->words.w0 = 0xDA380007; cmd->words.w1 = *((u32 *)((u8 *)D_80094908 + 0x40)) & 0x1FFFFFFF; func_8003A960(arg0, arg1, &D_800D0510); } }
 #endif
 
 #ifdef VERSION_US
@@ -3865,7 +3908,19 @@ void func_8003BEF0(void *arg0) { s32 *counter = &D_80126008; func_80039204((u8 *
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003C080.s")
+extern void func_8003A2C8(void *, ...);
+extern u8 D_80124F68;
+void Geo_NodeDisplayList(void *arg0) {
+    void *root = arg0;
+    s32 callback;
+    if (*(s32 *)((u8 *)root + 0x18) != 0 || *(s32 *)((u8 *)root + 0x10) != 0) {
+        func_8003D888(*(u8 *)((u8 *)root + 3), ((s32 *)((u8 *)&D_80124F68 + 0x1000))[*(s32 *)((u8 *)&D_80124F68 + 0x10A0)]);
+        callback = *(s32 *)((u8 *)root + 0x10);
+        if (callback != 0) ((void (*)(s32, void *))callback)(5, root);
+        func_8003DA20(*(s32 *)((u8 *)root + 0x18), (*(u8 *)((u8 *)root + 2) & 4) != 0);
+    }
+    func_8003A2C8(root);
+}
 #endif
 
 #ifdef VERSION_US
