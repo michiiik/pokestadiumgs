@@ -3908,7 +3908,19 @@ void func_8003BEF0(void *arg0) { s32 *counter = &D_80126008; func_80039204((u8 *
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003C080.s")
+extern void func_8003A2C8(void *, ...);
+extern u8 D_80124F68;
+void func_8003C080(void *arg0) {
+    void *root = arg0;
+    s32 callback;
+    if (*(s32 *)((u8 *)root + 0x18) != 0 || *(s32 *)((u8 *)root + 0x10) != 0) {
+        func_8003D888(*(u8 *)((u8 *)root + 3), ((s32 *)((u8 *)&D_80124F68 + 0x1000))[*(s32 *)((u8 *)&D_80124F68 + 0x10A0)]);
+        callback = *(s32 *)((u8 *)root + 0x10);
+        if (callback != 0) ((void (*)(s32, void *))callback)(5, root);
+        func_8003DA20(*(s32 *)((u8 *)root + 0x18), (*(u8 *)((u8 *)root + 2) & 4) != 0);
+    }
+    func_8003A2C8(root);
+}
 #endif
 
 #ifdef VERSION_US
