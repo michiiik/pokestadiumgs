@@ -410,7 +410,15 @@ void func_86405778(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/52/fragment52_27E4E0/func_86405BEC.s")
+extern void func_8003F03C(void *, void *);
+extern void func_8003F018(void *);
+extern f32 D_86409B78;
+extern f32 D_86409B84;
+extern u8 D_86409C70[];
+extern void func_8003F114(u8 *, s32, s32, s32);
+extern void func_8003F1DC(u8 *);
+extern u8 * D_86416C00;
+void func_86405BEC(void) { u8 *obj; f32 value; obj = D_86416C00 + 0xC8BC; func_8003F03C(obj, D_86409C70); func_8003F1DC(obj); func_8003F114(obj, 0, -1, *(s32 *)(D_86416C00 + 0x7A8)); value = D_86409B78; *(f32 *)(obj + 0x38) = value; *(f32 *)(obj + 0x34) = value; *(f32 *)(obj + 0x30) = value; obj = D_86416C00 + 0xCA24; func_8003F018(obj); func_8003F1DC(obj); func_8003F114(obj, 0, -1, *(s32 *)(D_86416C00 + 0x7AC)); value = D_86409B84; *(f32 *)(obj + 0x38) = value; *(f32 *)(obj + 0x34) = value; *(f32 *)(obj + 0x30) = value; }
 #endif
 
 #ifdef VERSION_US
