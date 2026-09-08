@@ -57,3 +57,19 @@ tooling-blocked; fresh owner func_82B05F60 (66 instructions, prior_attempts=0) r
 ## Coordinator replay after wave 45 (2026-09-02)
 
 Directly replayed /private/tmp/gs45_func_82B05F60_batch_validated.json without the host nice wrapper. All eight candidates were probe_rejected; best normalized/raw similarity 0.7750/0.6750, expected 320 versus actual 288, stable operand_or_scheduling_drift at the stack frame (-40 expected, -56 actual). Requeue with a materially different frame/ABI hypothesis.
+
+## 2026-09-09
+
+func_82B062BC: plateau at 0.9375 (raw 0.875), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-09
+
+func_82B07A5C: plateau at 0.9565 (raw 0.8696), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-09
+
+func_82B010BC: plateau at 0.0 (raw None), mismatch unknown; tried families: call_sequence; tie-pool no
+
+## 2026-09-09
+
+func_82B07BEC: matched (call_sequence:switch:braced-cases-four-halfwords), 2 iterations, agent codex

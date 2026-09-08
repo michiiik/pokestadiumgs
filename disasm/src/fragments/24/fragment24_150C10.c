@@ -681,7 +681,33 @@ void func_82B07AB4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B07BEC.s")
+extern s16 D_82B12458;
+extern s16 D_82B12694;
+extern void func_8004B314(s32, s32, s32, s32);
+extern s16 D_82B12450;
+void func_82B07BEC(void) {
+    void *var_s0;
+    s16 sp24[4];
+    var_s0 = NULL;
+    switch (D_82B12450) {
+    case 2:
+    {
+        var_s0 = *(void **)((u8 *)&D_82B12450 + (D_82B12458 << 2) + 0xB68);
+        break;
+    }
+    case 6:
+    {
+        var_s0 = func_82B02800(9, D_82B12694);
+        break;
+    }
+    default:
+        break;
+    }
+    if (var_s0 != NULL) {
+        func_82B0284C((u8 *)var_s0, (u8 *)&sp24[0]);
+        func_8004B314(sp24[0], sp24[1], *(s16 *)((u8 *)var_s0 + 0x48), *(s16 *)((u8 *)var_s0 + 0x4A));
+    }
+}
 #endif
 
 #ifdef VERSION_US
