@@ -395,7 +395,7 @@
 | `disasm/src/fragments/80/fragment80_41A5F0.c` | 8 | 10 | 20.0% |
 | `disasm/src/fragments/80/fragment80_41AC50.c` | 23 | 34 | 32.4% |
 | `disasm/src/fragments/81/fragment81_code.c` | 21 | 36 | 41.7% |
-| `disasm/src/fragments/82/fragment82_420EA0.c` | 24 | 39 | 38.5% |
+| `disasm/src/fragments/82/fragment82_420EA0.c` | 22 | 39 | 43.6% |
 | `disasm/src/fragments/82/fragment82_4238F0.c` | 28 | 58 | 51.7% |
 | `disasm/src/fragments/83/fragment83_code.c` | 33 | 64 | 48.4% |
 | `disasm/src/fragments/84/fragment84_code.c` | 16 | 42 | 61.9% |
