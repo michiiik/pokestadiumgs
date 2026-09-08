@@ -364,3 +364,35 @@ func_8411388C: matched (call_sequence:anim-update:compound-finished-implicit), 1
 ## func_8411DA4C dropped from this batch (2026-09-06)
 
 The stored candidate called `func_8411DA2C` with an argument (`func_8411DA2C(*(u8 **)&D_84191208)` etc., via a local `extern void func_8411DA2C();` K&R-style redeclaration bypassing the strict prototype check), but `func_8411DA2C` landed elsewhere as `void(void)` in the meantime -- stale relative to current master, and the host cc-check correctly rejects it. Reverted to `#pragma GLOBAL_ASM` here rather than force a fix without re-verifying against the real current signature; the fleet will re-attempt this owner fresh.
+
+## 2026-09-09
+
+func_841136E8: matched (call_sequence:flag-chain:local-index-s32), 1 iterations, agent codex
+
+## 2026-09-09
+
+func_841156D0: plateau at 0.0 (raw None), mismatch unknown; tried families: call_sequence; tie-pool no
+
+## 2026-09-09
+
+TYPE CONFLICT: func_841206D0 is extern void func_841206D0(void *), not extern void func_841206D0(u8 *)
+
+## 2026-09-09
+
+TYPE CONFLICT: func_84112158 is extern void func_84112158(u8 *, s32), not extern void func_84112158(s32, s32)
+
+## 2026-09-09
+
+TYPE CONFLICT: func_84112564 is extern void func_84112564(u8 *), not extern void func_84112564(s32)
+
+## 2026-09-09
+
+TYPE CONFLICT: func_800231A0 is extern void func_800231A0(s32, s16, s32, ...), not extern void func_800231A0(u8, s16, s32, ...)
+
+## 2026-09-09
+
+func_8411A620: plateau at 0.0 (raw None), mismatch unknown; tried families: call-sequence; tie-pool no
+
+## 2026-09-09
+
+func_8411C310: plateau at 0.0 (raw None), mismatch unknown; tried families: call-sequence; tie-pool no
