@@ -413,7 +413,17 @@ s32 func_84125AB8(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84125B88.s")
+extern u8 * D_84195208[];
+s32 func_84125B88(u8 arg0, u8 arg1, u8 arg2) {
+    if (arg2 == 0) {
+        if (*(D_84195208[arg0] + arg1 + 0x1E) >= 0xD) return 0;
+        if (arg1 != 5 && arg1 != 6 && *(u16 *)(D_84195208[arg0] + 0x3C + arg1 * 2) >= 0x3E7) return 0;
+    } else {
+        if (*(D_84195208[arg0] + arg1 + 0x1E) < 2) return 0;
+        if (arg1 != 5 && arg1 != 6 && *(u16 *)(D_84195208[arg0] + 0x3C + arg1 * 2) < 2) return 0;
+    }
+    return 1;
+}
 #endif
 
 #ifdef VERSION_US
