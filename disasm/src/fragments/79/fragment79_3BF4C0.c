@@ -30,7 +30,18 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_8415132C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84151420.s")
+extern u8 func_80062D98(u8);
+extern u8 func_84155544(void *, u8);
+s32 func_84151420(u8 *arg0, u8 arg1) {
+    u8 value;
+    u8 result;
+    value = *(u8 *)((s32)(u32)arg0 + arg1 + 4);
+    if (value == 0) return 0;
+    result = func_80062D98(value);
+    if (result == 0x13) return 0;
+    if (func_84155544(arg0, result) != 0) return 0;
+    return 1;
+}
 
 extern s32 func_84151420(u8 *, u8);
 
