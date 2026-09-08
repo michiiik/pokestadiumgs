@@ -291,7 +291,30 @@ void func_82B02A34(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B02D84.s")
+extern s32 D_82B085EC;
+extern s16 D_82B12458;
+void func_82B02D84(void *arg0) {
+    s32 count;
+    s32 limit;
+    s16 mode;
+    s16 *p;
+    mode = *(s16 *)((u8 *)arg0 + 0x50);
+    *(s16 *)((u8 *)arg0 + 0x54) = D_82B12458;
+    p = (s16 *)((u8 *)arg0 + 0x50);
+    switch (mode) {
+    case 0:
+        if (p[3] != p[2]) { p[0] = 1; p[1] = 0; }
+        p[4] = 0;
+        break;
+    case 1:
+        limit = D_82B085EC;
+        p[1] = p[1] + 1;
+        count = p[1];
+        if (count < limit) p[4] = (s16)((count * 0xFF) / limit);
+        else { p[0] = 0; p[4] = 0; p[3] = p[2]; }
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
