@@ -703,7 +703,29 @@ void func_8AE05964(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE059A8.s")
+extern f32 Math_AbsF32(f32);
+extern s16 D_8AE084EE;
+extern f32 D_8AE084F0;
+void func_8AE059A8(void *arg0, void *arg1) {
+    typedef struct { f32 x; f32 y; f32 z; } Vec3F;
+    f32 dx;
+    f32 dy;
+    f32 dz;
+    f32 ax;
+    f32 ay;
+    f32 az;
+    dx = ((Vec3F *)arg1)->x - ((Vec3F *)arg0)->x;
+    dy = ((Vec3F *)arg1)->y - ((Vec3F *)arg0)->y;
+    dz = ((Vec3F *)arg1)->z - ((Vec3F *)arg0)->z;
+    ax = Math_AbsF32(dx);
+    ay = Math_AbsF32(dy);
+    az = Math_AbsF32(dz);
+    func_8AE05964();
+    if (ax < 1.0f) ((Vec3F *)arg0)->x = ((Vec3F *)arg1)->x; else ((Vec3F *)arg0)->x += dx / D_8AE084F0;
+    if (ay < 1.0f) ((Vec3F *)arg0)->y = ((Vec3F *)arg1)->y; else ((Vec3F *)arg0)->y += dy / D_8AE084F0;
+    if (az < 1.0f) ((Vec3F *)arg0)->z = ((Vec3F *)arg1)->z; else ((Vec3F *)arg0)->z += dz / D_8AE084F0;
+    if (ax < 50.0f && ay < 50.0f && az < 50.0f) D_8AE084EE = 0;
+}
 #endif
 
 void func_8AE05B1C(void) {
