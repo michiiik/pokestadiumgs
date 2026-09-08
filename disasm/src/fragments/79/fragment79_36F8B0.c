@@ -207,7 +207,21 @@ void func_84102750(s32 arg0, void *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_841027B4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_8410291C.s")
+extern s32 ParticleMath_LacksBits(void *arg0, s32 arg1);
+extern s32 ParticleMath_HasBits(void *arg0, s32 arg1);
+extern s32 ModelAnim_IsFinished(void *arg0);
+extern void func_84100094(u8 *arg0);
+void func_8410291C(u8 *arg0) {
+    u8 *state = *(u8 **)(arg0 + 0x10);
+    if (*(u8 **)(arg0 + 0xC) == NULL) return;
+    if (state == NULL) return;
+    if (*(u8 **)(*(u8 **)(arg0 + 0xC) + 0x44) == NULL) return;
+    if ((*(s16 *)*(u8 **)(*(u8 **)(arg0 + 0xC) + 0x44) & 2) == 0) return;
+    if (ParticleMath_LacksBits(state + 4, 0x2000) == 0) return;
+    if (ParticleMath_HasBits(state + 4, 0x4000) != 0) {
+        if (*(u8 **)(*(u8 **)(arg0 + 0xC) + 0x48) == NULL) func_84100094(arg0);
+    } else if (ModelAnim_IsFinished(*(u8 **)(arg0 + 0xC)) != 0) func_84100094(arg0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_841029DC.s")
 
