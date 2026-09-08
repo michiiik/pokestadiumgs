@@ -419,7 +419,24 @@ extern u8 D_80128570[]; s32 func_80059AE0(s32 index) { return (*(u32 *)(D_801285
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80059D00.s")
+extern s32 main_pool_alloc_with_func(s32, s32, s32, void (*)(s32, u32));
+extern s32 main_pool_try_free(s32);
+extern s32 func_80058880(s32);
+extern void func_800596D0(s32 arg0, u32 arg1);
+extern u8 D_80128570[];
+s32 func_80059D00(s32 arg0) {
+    s32 result = 0;
+    if ((*(s32 *)(D_80128570 + arg0 * 112) & 2) != 0) return 1;
+    *(s32 *)(D_80128570 + arg0 * 112 + 0x68) = main_pool_alloc_with_func(0x640, 0, arg0 + 0x44543230, (s32)func_800596D0);
+    if (*(s32 *)(D_80128570 + arg0 * 112 + 0x68) != 0) {
+        *(s32 *)(D_80128570 + arg0 * 112) |= 2;
+        result = func_80058880(arg0);
+        if (result == 0) main_pool_try_free(*(s32 *)(D_80128570 + arg0 * 112 + 0x68));
+    }
+    return result;
+}
+void func_80059D00_padding(void) {}
+void func_80059D00_padding2(void) {}
 #endif
 
 #ifdef VERSION_US
