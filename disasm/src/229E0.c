@@ -3748,7 +3748,24 @@ void GeoOverlay_Draw(S1_unk_D_86002F34_00C_0CC* arg0, S1_unk_D_86002F34_00C_040*
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003A440.s")
+extern s32 D_80124D60;
+extern void *D_80094924[];
+extern void func_8003A2C8(void *, ...);
+void func_8003A440(void *arg0) {
+    s32 (*callback)(s32, void *);
+    void *child;
+    callback = 0;
+    child = *(void **)((u8 *)arg0 + 0x18);
+    if (child != 0 && (*(u8 *)((u8 *)child + 1) & 1) != 0) {
+        D_80124D60 = 0;
+        callback = *(s32 (**)(s32, void *))((u8 *)child + 0x10);
+        if (callback != 0) {
+            D_80124D60 = callback(2, child);
+        }
+        ((void (*)(void *))((void **)D_80094924)[*(u8 *)child])(child);
+    }
+    func_8003A2C8(arg0);
+}
 #endif
 
 #ifdef VERSION_US
