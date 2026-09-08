@@ -281,7 +281,39 @@ void func_82D0284C(void) {
     } while (D_82D23D84 != 0xD);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_420EA0/func_82D028B8.s")
+extern void func_82D06C9C(s32, u8 *);
+extern u8 D_82D23837;
+extern void func_82D0034C(void);
+extern void func_82D06B34(s32, s32, s32);
+extern u8 D_82D07420[];
+extern u8 D_82D07428[];
+extern u8 D_82D23828;
+extern u8 D_82D2382A;
+extern u8 D_82D23830;
+extern u8 D_82D23938;
+extern u8 D_82D23D84;
+void func_82D028B8(void) {
+    s8 anchor;
+    D_82D23D84 = 1;
+    D_82D2382A = 0x17;
+    func_82D06C9C(2, D_82D07420);
+    func_82D06C9C(3, D_82D07420);
+    func_82D06C9C(4, D_82D07420);
+    func_82D06C9C(5, D_82D07420);
+    func_82D06C9C(6, D_82D07420);
+    func_82D06C9C(9, D_82D07428);
+    func_82D06C9C(7, &D_82D23828);
+    func_82D06C9C(8, &D_82D23830);
+    func_82D06B34(2, 1, 0);
+    func_82D06B34(3, 1, 3);
+    func_82D06B34(4, 1, 6);
+    func_82D06B34(5, 1, 9);
+    func_82D06B34(6, 1, 0xC);
+    func_82D06B34(7, 1, 0);
+    func_82D06B34(8, 1, 0);
+    func_82D0034C();
+    D_82D23837 = D_82D23938;
+}
 
 extern u8 D_82D23B60[];
 extern void main_pool_push_state(s32);
