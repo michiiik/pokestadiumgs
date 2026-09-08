@@ -992,7 +992,8 @@ void func_841457C4(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84145AB4.s")
+extern Gfx* D_800D0510;
+void func_84145AB4(arg0) void *arg0; { Gfx *temp_v1; struct { s16 pad0[5]; s16 x; s16 y; } *state; state = arg0; temp_v1 = D_800D0510++; temp_v1->words.w0 = ((((state->x + 0xDC) & 0x3FF) << 14) | 0xF6000000) | (((state->y + 0x3C) & 0x3FF) << 2); temp_v1->words.w1 = (((state->x - 0x14) & 0x3FF) << 14) | (((state->y - 0xA) & 0x3FF) << 2); }
 #endif
 
 void func_84145B24(void) {
