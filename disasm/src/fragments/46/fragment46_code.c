@@ -871,7 +871,8 @@ void func_8AE06118(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE06198.s")
+extern void *func_80004B4C(s32, s32);
+void *func_8AE06198(s32 arg0, s32 arg1, u16 arg2) { void *base; void *result; u8 *entry; s32 offset; s32 sentinel; base = func_80004B4C(arg0, arg1); offset = *(s32 *)((u8 *)base + arg2 * 4); result = (void *)(offset + (s32)base); entry = (u8 *)result; sentinel = -1; for (;;) { if (*(s16 *)entry == sentinel) break; if (*(s32 *)(entry + 4)) *(s32 *)(entry + 4) += (s32)base; if (*(s32 *)(entry + 8)) *(s32 *)(entry + 8) += (s32)base; if (*(s32 *)(entry + 0xC)) *(s32 *)(entry + 0xC) += (s32)base; if (*(s32 *)(entry + 0x10)) *(s32 *)(entry + 0x10) += (s32)base; if (*(s32 *)(entry + 0x14)) *(s32 *)(entry + 0x14) += (s32)base; if (*(s32 *)(entry + 0x18)) *(s32 *)(entry + 0x18) += (s32)base; if (*(s32 *)(entry + 0x1C)) *(s32 *)(entry + 0x1C) += (s32)base; if (*(s32 *)(entry + 0x20)) *(s32 *)(entry + 0x20) += (s32)base; entry += 0x28; } return result; }
 #endif
 
 #ifdef VERSION_US
