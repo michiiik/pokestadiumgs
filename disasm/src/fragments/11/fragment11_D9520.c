@@ -359,7 +359,23 @@ void func_8160877C(s32 arg0, s32 arg1, s32 arg2, s32 arg3, f32 arg4) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_816087C8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81608890.s")
+extern s32 func_80064474(u8, u16);
+extern void func_800495BC(s32, s32, s32);
+extern s32 func_8004C874(s32, s32);
+void func_81608890(s32 arg0, s32 arg1, u8 *arg2) {
+    s32 status;
+    status = func_80064474(arg2[0], *(u16 *)(arg2 + 0x16));
+    switch (status) {
+    case 0:
+        return;
+    case 1:
+        func_800495BC(arg0, arg1, func_8004C874(0xD, 0x1D));
+        break;
+    case 2:
+        func_800495BC(arg0, arg1, func_8004C874(0xD, 0x1E));
+        break;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81608918.s")
 
