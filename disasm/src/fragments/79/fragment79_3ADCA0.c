@@ -988,7 +988,8 @@ void func_841457C4(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_841459E8.s")
+extern Gfx* D_800D0510;
+void func_841459E8(arg0) void *arg0; { struct { s16 pad[5]; s16 x; s16 y; } *state=arg0; gDPFillRectangle(D_800D0510++,state->x-1,state->y-1,state->x+0x40,state->y); gDPFillRectangle(D_800D0510++,state->x-1,state->y+0xE,state->x+0x40,state->y+0x10); }
 #endif
 
 #ifdef VERSION_US
