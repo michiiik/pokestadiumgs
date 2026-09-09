@@ -651,3 +651,19 @@ func_84125080: plateau at 0.8621 (raw 0.5172), mismatch operand_or_scheduling_dr
 ## 2026-09-09
 
 func_84125B88: matched (bounded_lookup:dual-path:raw-pointer-arithmetic-match), 5 iterations, agent codex
+
+## 2026-09-09
+
+func_84134170: matched (state-field:table-slot:u8-pointer-pointer:u8-arg), 1 iterations, agent codex
+
+## 2026-09-09
+
+func_841267B4: matched (state-clamp:record-struct:direct-fields), 4 iterations, agent codex
+
+## 2026-09-09
+
+func_84126850: plateau at 0.95 (raw 0.7), mismatch operand_or_scheduling_drift; tried families: state-clamp; tie-pool no
+
+## 2026-09-09
+
+func_84126EDC: time cap at 0.95 (raw 0.75) after 2428s, mismatch operand_or_scheduling_drift; tried families: constant-map; tie-pool no

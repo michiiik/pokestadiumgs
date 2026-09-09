@@ -646,7 +646,8 @@ s32 func_8412676C(u8 arg0, u8 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841267B4.s")
+extern u8 * D_84195200[];
+s32 func_841267B4(u8 arg0, u8 arg1) { struct Record { u8 pad[0x26]; u16 b; u16 a; }; struct Record *record = (struct Record *)D_84195200[arg0]; s32 result = (record->a >> arg1) & 0xFFFF; if (record->a < record->b + result) result = (record->a - record->b) & 0xFFFF; return result; }
 #endif
 
 #ifdef VERSION_US
@@ -2891,7 +2892,19 @@ u8 func_84134098(u8 arg0) { u8 result; u16 index; result = 1; index = arg0 * 4; 
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84134170.s")
+extern void * D_841951F8[];
+void func_84134170(u8 arg0) {
+    u8 **ptr = (u8 **)&D_841951F8[arg0];
+    (*ptr)[0] = 0xFF;
+    (*ptr)[1] = 0;
+    (*ptr)[6] = 0;
+    (*ptr)[0xB] = 0;
+    (*ptr)[0xC] = 0;
+    (*ptr)[0xD] = 0;
+    (*ptr)[0xE] = 0;
+    (*ptr)[0xF] = 0;
+    (*ptr)[0x10] = 0;
+}
 #endif
 
 #ifdef VERSION_US
