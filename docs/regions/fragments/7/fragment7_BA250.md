@@ -97,3 +97,7 @@ func_830073F8: time cap at 0.9808 (raw 0.7308) after 2409s, mismatch operand_or_
 ## 2026-09-07
 
 func_83004218: matched (call_sequence:lookup:compare-switch), 7 iterations, agent codex
+
+## Accepted owner: func_83007044 (jump-table readiness re-probe) (2026-09-09)
+
+Rejected historically as section_layout_drift (best raw 0.9787, 30 attempts) before this file's .rodata jump-table subsegment existed in rom.yaml (jtbl_8300FBC4 etc., see fragment7_BA250 rom.yaml entries). tools/triage_investigations.py flagged it as jump_table_stale_rejection/stale_past_fix once the subsegment landed. Re-probed as a plain switch(arg1) over the dense range -1..4 (case 0 empty, matching the range-check-false fallthrough target in the jump table); matched on the first attempt with a full-ROM link-verified gate, MD5 1561c75d11cedf356a8ddb1a4a5f9d5d. Style mirrors sibling func_83007318 (same file, same func_800226C0(...) call + byte-field-at-0x1E idiom).
