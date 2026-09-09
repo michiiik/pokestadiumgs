@@ -1960,7 +1960,20 @@ void BattleAnim_Table_84186004_005(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412F044.s")
+extern void func_84134CBC(u8 arg0, u8 arg1);
+extern void func_84134DD8(u8 arg0);
+extern void func_84135B00(u8);
+extern void func_84136678(u8, s32);
+extern void func_84136CA8(void);
+extern u8 D_841951BC;
+extern u8 D_841951BF;
+extern void * D_841951F8[];
+void func_8412F044(void) {
+    if ((((u8 *)D_841951F8[D_841951BC])[0xB] & 4) != 0) { func_84126BFC(D_841951BC); return; }
+    ((u8 *)D_841951F8[D_841951BC])[0xB] = ((u8 *)D_841951F8[D_841951BC])[0xB] | 4; ((u8 *)D_841951F8[D_841951BC])[0xC] = 5;
+    func_84136678(D_841951BC, -1); func_84135B00(0xA3); func_84134DD8(D_841951BF);
+    func_84134CBC(D_841951BC, 0); func_84136CA8();
+}
 #endif
 
 #ifdef VERSION_US
