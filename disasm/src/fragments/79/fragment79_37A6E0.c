@@ -2614,7 +2614,15 @@ s32 func_84117CAC(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_841182E0.s")
+extern s32 D_84183A50[];
+extern void func_8410890C(s32, s32);
+extern void func_84108E00(u8 *, s32);
+extern void func_84112158(s32 arg0, s32 arg1);
+extern void func_84117648(u8 *arg0);
+extern void func_84117AA0(u8 *);
+extern s32 func_8411DC80(u16, s32 *, s32);
+extern u8 * D_84193DD0;
+void func_841182E0(u8 *a){s32 i;if(*(s16*)(a+0x7E8)==0)func_84112158((s32)a,0xFE);if(func_84117CAC(a)){func_84117AA0(a);func_80023A3C(9,0,0);*(u16*)(a+0x7F4)|=0x20;}func_84117C18(a);if(*(s8*)(a+0x619)+10==*(s16*)(a+0x7E8))func_84112580((s32)a);if(func_8411DC80(*(u16*)(a+0x1A),D_84183A50,10)){if((*(s32*)(a+0x48)>>16)==0)func_84112464(a);}else if((*(s32*)(a+0x48)>>16)==6)func_84112464(a);if(*(s16*)(a+0x7E8)==8)func_8410890C(0xFE,(s32)a);if(*(s16*)(a+0x7E8)==9){i=func_8411E1F8((s32)a);if((*(u16*)((u8*)D_84193DD0+(i<<4)+0x12)&2)||(i=func_8411E1F8((s32)a),(*(u16*)((u8*)D_84193DD0+(i<<4)+0x12)&4)))func_84108E00(a,1);}func_841139D0(a);func_84117648(a);} 
 #endif
 
 #ifdef VERSION_US
