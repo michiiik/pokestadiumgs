@@ -33,3 +33,7 @@ requeue func_86300C74: fresh 88-instruction call_sequence owner; no runner invok
 ## Wave 48 coordinator replay (2026-09-02)
 
 requeue; 8 call-sequence candidates compared with no link verification. Best call-sequence:clamp:single-result-temp reached similarity 0.7727 raw 0.3295, expected 352 bytes versus actual 328, with the stable mismatch at instruction 24: expected sll ,,0 but candidates emitted a malformed or wrong shift operation using . Baseline, interpolation, clamp, branch, random, field-access, and control-flow families were attempted. Next action: recover the source width and constant expression that produces the target no-op shift before changing call order.
+
+## 2026-09-09
+
+func_86300120: matched (call_sequence:if-do-while:explicit-p1-p2-u8ptr-temps-matched), 1 iterations, agent antigravity
