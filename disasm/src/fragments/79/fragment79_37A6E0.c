@@ -3443,7 +3443,7 @@ extern s32 func_8411E164(s32 arg0);
 extern void func_8411FEE8(s32);
 extern s32 D_84183D50;
 extern s32 D_841911F4;
-void func_8411D2E4(u8 *arg0) {
+void BattleAnim_Dispatch_211(u8 *arg0) {
     u8 *result;
     *(s16 *)(arg0 + 0x7E8) = 0;
     arg0[0x7F6] = 0;
