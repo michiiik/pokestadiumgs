@@ -428,3 +428,24 @@ func_8411D388: time cap at 0.9661 (raw 0.9661) after 2406s, mismatch instruction
 ## 2026-09-09
 
 TYPE CONFLICT: func_84111348 is extern void func_84111348(u8 *, s32), not extern void func_84111348(s32, s32)
+func_8410F9FC: matched (call_sequence:dispatch:exact-direct-global), 1 iterations, agent codex
+
+## 2026-09-09
+
+func_84110718: matched (call_sequence:dispatch:permuter-exact:do-while), 1 iterations, agent codex
+
+## 2026-09-09
+
+func_8411A310: plateau at 0.9796 (raw 0.9796), mismatch instruction_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-09
+
+func_8411AEA8: plateau at 0.9796 (raw 0.8571), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-09
+
+func_84113590: time cap at 0.8 (raw 0.58) after 2400s, mismatch operand_or_scheduling_drift; tried families: call-sequence; tie-pool no
+
+## 2026-09-09
+
+func_8410F78C: matched (call_sequence:direct:correct-second-call-addresses), 1 iterations, agent codex
