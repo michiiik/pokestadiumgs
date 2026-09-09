@@ -2892,7 +2892,7 @@ extern s32 func_8411DC80(u16, s32 *, s32);
 extern void func_8411FEE8(s32);
 extern s32 D_84183D50;
 extern s32 D_841911F4;
-void func_8411A4AC(u8 *arg0) {
+void BattleAnim_Dispatch_037(u8 *arg0) {
     if (*(s16 *)(arg0 + 0x7E8) >= 2) {
         *(u8 *)(arg0 + 0x7F6) = 5;
         func_8411FEE8(0x258);
