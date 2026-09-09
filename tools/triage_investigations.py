@@ -6,7 +6,7 @@ Several human triage passes over ``docs/regions/**/*.md`` and
 manually pattern-matching a handful of shapes in the fleet's plateaued and
 rejected owners (a toolchain-level ``lui $at``-coalescing limitation, a
 jump-table ``.rodata`` layout backlog, a host-side probe-infrastructure bug
-that silently discarded correct candidates).  This tool codifies three of
+that silently discarded correct candidates).  This tool codifies four of
 those shapes so a human -- or an orchestrating Claude session -- does not
 have to manually re-derive them from the raw ledger every time:
 
@@ -14,10 +14,20 @@ have to manually re-derive them from the raw ledger every time:
    ``mismatch_kind == "section_layout_drift"`` at a high raw similarity
    whose jump-table layout is *not* (or is no longer) excluded by the known
    backlog (``tools/pragma_targets.py``'s ``_jump_table_readiness``).
-2. ``register_tie_permuter_candidate`` -- an owner whose best recorded
+2. ``jump_table_ready_unattempted`` -- an owner with a real jump table
+   whose ``.rodata`` subsegment fix has already landed (``ready`` per
+   ``_jump_table_readiness``) but that has *zero* probe-stats attempts on
+   record at all -- not merely rejected, never even tried.  Sibling to
+   signature 1, but invisible to it: that detector only re-examines owners
+   that already have a qualifying rejected attempt to re-examine, so a
+   file whose jump-table fix unblocked several owners at once but whose
+   fleet queue only reached one of them leaves the rest silently
+   unexplored (found landing PR #364: 8 of 9 sibling jump-table owners in
+   the same file had never been attempted at all).
+3. ``register_tie_permuter_candidate`` -- an owner whose best recorded
    attempt is a near-1.0 ``register_allocation_only`` tie that has never
    been escalated to the tie pool or run through the permuter.
-3. ``score_clustering`` -- two or more distinct owners whose best recorded
+4. ``score_clustering`` -- two or more distinct owners whose best recorded
    attempt shares an identical ``(similarity_score,
    raw_similarity_score)`` pair that ``tools/container_agent.py``'s own
    ``_is_normalized_only_match`` would flag as suspicious.
@@ -438,7 +448,69 @@ def detect_jump_table_stale_rejections(
     return findings
 
 
-# --- Signature 2: register-allocation tie needing permuter escalation ------
+# --- Signature 2: jump-table-ready owner never attempted at all ------------
+
+
+def detect_jump_table_ready_unattempted(
+    owners_attempts: dict[str, list[dict]],
+    *,
+    owners: "dict[str, object] | None" = None,
+    repo_root: "Path | None" = None,
+) -> list[dict]:
+    """Owners whose jump-table fix is ``ready`` but have zero attempts on record.
+
+    ``detect_jump_table_stale_rejections`` only re-examines owners that
+    already have a qualifying *rejected* attempt -- a never-attempted owner
+    has nothing for it to re-examine, so it is invisible to that detector
+    even though "ready" is exactly the signal that a plain C switch is
+    likely to match cleanly (see PR #364 for a worked example: matched on
+    the first attempt once the owning file's subsegment existed). This
+    walks every live pragma owner directly instead of the attempt ledger,
+    so it is the one detector here that can find a function with no
+    history at all.
+    """
+    root = repo_root or targets.REPO_ROOT
+    index = (
+        owners
+        if owners is not None
+        else targets.owner_index(root / "disasm" / "src", repo_root=root)
+    )
+    findings: list[dict] = []
+    for function, owner in sorted(index.items()):
+        if owners_attempts.get(function):
+            continue  # already attempted at least once; not this signature's job
+        try:
+            if not owner.asm_path.exists():
+                continue
+            row = targets._classify_owner(owner)
+        except OSError:
+            continue
+        ready, _unready = targets._jump_table_readiness(owner, row, repo_root=root)
+        if not ready:
+            continue
+        findings.append(make_finding(
+            "jump_table_ready_unattempted",
+            [function],
+            source=owner.source,
+            evidence={
+                "jump_table_status": "ready",
+                "jump_tables": list(row.get("jump_tables") or []),
+                "instructions": row.get("instructions"),
+            },
+            next_action=(
+                f"{function} references a jump table whose .rodata subsegment "
+                f"has already landed (see disasm/yamls/us/rom.yaml) but has "
+                f"zero probe-stats attempts on record -- never actually tried "
+                f"as a C switch. Check whether a sibling owner in the same "
+                f"file already matched a dispatcher-switch shape (same helper "
+                f"call idiom is a strong hint); otherwise read the .s and "
+                f"reconstruct the switch directly."
+            ),
+        ))
+    return findings
+
+
+# --- Signature 3: register-allocation tie needing permuter escalation ------
 
 
 def detect_register_tie_permuter_candidates(
@@ -495,7 +567,7 @@ def detect_register_tie_permuter_candidates(
     return findings
 
 
-# --- Signature 3: suspicious cross-owner score clustering ------------------
+# --- Signature 4: suspicious cross-owner score clustering ------------------
 
 
 def _best_attempt(attempts: list[dict]) -> "dict | None":
@@ -746,6 +818,9 @@ def run_scan(
     findings: list[dict] = []
     findings.extend(detect_jump_table_stale_rejections(
         owners_attempts, find_owner=find_owner, repo_root=root,
+    ))
+    findings.extend(detect_jump_table_ready_unattempted(
+        owners_attempts, repo_root=root,
     ))
     findings.extend(detect_register_tie_permuter_candidates(
         owners_attempts, region_tie_pool_status=region_tie_pool_status, find_owner=find_owner,

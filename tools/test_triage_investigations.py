@@ -453,7 +453,70 @@ class JumpTableStaleRejectionTests(_RepoFixtureTestCase):
 
 
 # ---------------------------------------------------------------------------
-# Signature 2: register-allocation tie needing permuter escalation
+# Signature 2: jump-table-ready owner never attempted at all
+# ---------------------------------------------------------------------------
+
+
+class JumpTableReadyUnattemptedTests(_RepoFixtureTestCase):
+    def test_ready_owner_with_zero_attempts_is_flagged(self) -> None:
+        self.fixture.add_jump_table_owner("func_never_tried", "jtbl_80020000", "ready.c")
+        self.fixture.write_rom_yaml(["ready"])
+        index = self.fixture.owner_index()
+        patches = self._patches(index)
+        with patches[0], patches[1], patches[2]:
+            findings = ti.detect_jump_table_ready_unattempted(
+                {}, owners=index, repo_root=self.fixture.root,
+            )
+        self.assertEqual(len(findings), 1)
+        finding = findings[0]
+        self.assertEqual(finding["owners"], ["func_never_tried"])
+        self.assertEqual(finding["signature"], "jump_table_ready_unattempted")
+        self.assertEqual(finding["evidence"]["jump_table_status"], "ready")
+
+    def test_owner_with_an_existing_attempt_is_not_flagged(self) -> None:
+        # Has history -- signature 1 (stale-rejection) owns re-examining
+        # this owner, not this detector.
+        self.fixture.add_jump_table_owner("func_tried", "jtbl_80020000", "ready.c")
+        self.fixture.write_rom_yaml(["ready"])
+        index = self.fixture.owner_index()
+        owners_attempts = {
+            "func_tried": [
+                {"function": "func_tried", "similarity_score": 0.5, "raw_similarity_score": 0.4,
+                 "mismatch_kind": "instruction_drift", "label": "m2c:x", "status": "probe_rejected",
+                 "timestamp": None, "source": None, "is_permuter": False, "_order": 0},
+            ],
+        }
+        patches = self._patches(index)
+        with patches[0], patches[1], patches[2]:
+            findings = ti.detect_jump_table_ready_unattempted(
+                owners_attempts, owners=index, repo_root=self.fixture.root,
+            )
+        self.assertEqual(findings, [])
+
+    def test_unready_owner_is_not_flagged(self) -> None:
+        self.fixture.add_jump_table_owner("func_blocked", "jtbl_80021000", "blocked.c")
+        self.fixture.write_rom_yaml([])  # no subsegment -> unready
+        index = self.fixture.owner_index()
+        patches = self._patches(index)
+        with patches[0], patches[1], patches[2]:
+            findings = ti.detect_jump_table_ready_unattempted(
+                {}, owners=index, repo_root=self.fixture.root,
+            )
+        self.assertEqual(findings, [])
+
+    def test_plain_owner_with_no_jump_table_is_not_flagged(self) -> None:
+        self.fixture.add_plain_owner("func_plain", "plain.c")
+        index = self.fixture.owner_index()
+        patches = self._patches(index)
+        with patches[0], patches[1], patches[2]:
+            findings = ti.detect_jump_table_ready_unattempted(
+                {}, owners=index, repo_root=self.fixture.root,
+            )
+        self.assertEqual(findings, [])
+
+
+# ---------------------------------------------------------------------------
+# Signature 3: register-allocation tie needing permuter escalation
 # ---------------------------------------------------------------------------
 
 
@@ -555,7 +618,7 @@ class RegisterTiePermuterCandidateTests(unittest.TestCase):
 
 
 # ---------------------------------------------------------------------------
-# Signature 3: suspicious cross-owner score clustering
+# Signature 4: suspicious cross-owner score clustering
 # ---------------------------------------------------------------------------
 
 
