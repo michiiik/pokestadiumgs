@@ -412,3 +412,19 @@ func_84113658: plateau at 0.973 (raw 0.4054), mismatch instruction_drift; tried 
 ## 2026-09-09
 
 func_84110A98: matched (call_chain:global-pointer:s32-direct), 1 iterations, agent codex
+
+## 2026-09-09
+
+func_8410D088: plateau at 0.0 (raw None), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-09
+
+func_8411B3B8: matched (call_sequence:switch:case1-negative-guard-store-before-call), 7 iterations, agent codex
+
+## 2026-09-09
+
+func_8411D388: time cap at 0.9661 (raw 0.9661) after 2406s, mismatch instruction_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-09
+
+TYPE CONFLICT: func_84111348 is extern void func_84111348(u8 *, s32), not extern void func_84111348(s32, s32)

@@ -3104,7 +3104,38 @@ void BattleAnim_Dispatch_079(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8411B3B8.s")
+extern void func_84111348(s32 arg0, s32 arg1);
+extern void func_84112564(s32);
+extern void func_8411EFE4(s32);
+extern void func_8411FEE8(s32);
+extern s32 D_84183D50;
+extern u8 * D_841911E0;
+extern s32 D_841911F4;
+void BattleAnim_Dispatch_080(u8 *arg0) {
+    switch (*(s8 *)(arg0 + 0x7F6)) {
+    case 1:
+        if (*(s16 *)(arg0 + 0x7E8) != 30) break;
+        *(s8 *)(arg0 + 0x7F6) = 2;
+        func_84114600(arg0);
+        break;
+    case 2:
+        *(s16 *)(arg0 + 0x7E8) = 0;
+        func_84112B64((s32)arg0);
+        func_8411EFE4((s32)arg0);
+        *(s16 *)(D_841911E0 + 0x98) = 0;
+        func_84111348((s32)arg0, 0);
+        *(s16 *)(arg0 + 0x7EA) = 0;
+        *(s8 *)(arg0 + 0x7F6) = 3;
+        func_84112564((s32)arg0);
+        break;
+    case 3:
+        if (*(s16 *)(arg0 + 0x7E8) == 40) {
+            func_8411FEE8(0);
+            ((s32 *)(arg0 + 0x5C8))[D_841911F4] = D_84183D50;
+        }
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
