@@ -675,3 +675,43 @@ func_84126994: matched (state-field:reset-records:post-prefix-offset-local), 3 i
 ## 2026-09-09
 
 func_8412A23C: plateau at 0.9796 (raw 0.6939), mismatch operand_or_scheduling_drift; tried families: state-field; tie-pool no
+
+## 2026-09-09
+
+func_8412D390: plateau at 0.9286 (raw 0.6), mismatch operand_or_scheduling_drift; tried families: call-sequence; tie-pool no
+
+## 2026-09-09
+
+func_84137DB8: matched (call-sequence:guard:direct-byte-baseline), 1 iterations, agent codex
+
+## 2026-09-09
+
+func_8412EB10: plateau at 0.0 (raw None), mismatch unknown; tried families: call_sequence; tie-pool no
+
+## 2026-09-09
+
+TYPE CONFLICT: D_841951BF is extern u8 D_841951BC, D_841951BD, D_841951BF, not extern u8 D_841951E6, D_841951BF
+
+## 2026-09-09
+
+func_841347A0: matched (call-sequence:loop:explicit-u8-casts), 1 iterations, agent codex
+
+## 2026-09-09
+
+func_84124A7C: matched (call-sequence:status-chain:repeated-global-read), 1 iterations, agent codex
+
+## 2026-09-09
+
+func_841252D0: plateau at 0.0 (raw None), mismatch unknown; tried families: call-sequence; tie-pool no
+
+## 2026-09-09
+
+TYPE CONFLICT: D_841951C4 is extern u8 D_841951C0, D_841951C3, D_841951C4, not extern u8 D_841951C4
+
+## 2026-09-09
+
+TYPE CONFLICT: D_841951C2 is extern s8 D_841951C1, D_841951C2, not extern s8 D_841951C2
+
+## 2026-09-09
+
+TYPE CONFLICT: D_841951C4 is extern u8 D_841951C0, D_841951C1, D_841951C2, D_841951C3, D_841951C4, not extern u8 D_841951C4
