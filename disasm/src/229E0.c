@@ -4114,7 +4114,20 @@ void func_8003D7B8(s16 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003D808.s")
+extern u8 D_801261B1;
+s16 func_8003D808(s16 arg0) {
+    s16 value = arg0 & 0xF;
+    s16 result = value;
+    if (D_801261B1 < 0xFF) {
+        switch (value) {
+        case 1: result = 5; break;
+        case 2: result = 7; break;
+        case 3: result = 8; break;
+        case 4: result = 6; break;
+        }
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
