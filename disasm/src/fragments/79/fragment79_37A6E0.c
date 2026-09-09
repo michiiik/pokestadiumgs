@@ -1996,7 +1996,7 @@ extern void func_8411FEE8(s32);
 extern s32 D_84183D50;
 extern u8 * D_841911E0;
 extern s32 D_841911F4;
-void func_841155E8(u8 *arg0) {
+void BattleAnim_Dispatch_044(u8 *arg0) {
     if (func_84113430((s32)arg0) == 0) return;
     func_84112EAC((void *)arg0);
     func_841155B0(arg0);
