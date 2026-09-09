@@ -56,3 +56,4 @@ func_8003C080 = Geo_NodeDisplayList;
 func_841312E8 = BattleAnim_Table_84186004_080;
 func_84110A98 = BattleAnim_ModelDispatch_141;
 func_8411B3B8 = BattleAnim_Dispatch_080;
+func_841155E8 = BattleAnim_Dispatch_044;
