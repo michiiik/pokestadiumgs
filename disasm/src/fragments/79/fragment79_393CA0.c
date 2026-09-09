@@ -122,7 +122,19 @@ void func_84124A14(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84124A7C.s")
+extern u8 func_80062D20(u8);
+extern void func_84134E30(s32 arg0);
+extern void func_84134E7C(u8 arg0, u8 arg1);
+extern u8 D_841951BF;
+extern u8 D_841951E5;
+void func_84124A7C(void) {
+    if (D_841951E4 == 1 || D_841951E4 == 2) { func_84134E30(4); func_84134E7C(0, 4); }
+    else if (D_841951E5 >= 0xB) { func_84134E30(3); func_84134E7C(0, 3); }
+    else if (D_841951E5 < 0xA) { func_84134E30(2); func_84134E7C(0, 2); }
+    else { func_84134E30(0); func_84134E7C(0, 0); }
+    if (D_841951BF == 0x14 || D_841951BF == 0x23 || D_841951BF == 0x84) { func_84134E30(5); func_84134E7C(0, 5); }
+    if (func_80062D20(D_841951BF) == 0x75) { func_84134E30(5); func_84134E7C(0, 5); }
+}
 #endif
 
 #ifdef VERSION_US
