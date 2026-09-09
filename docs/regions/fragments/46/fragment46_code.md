@@ -165,3 +165,19 @@ func_8AE032C8: plateau at 0.9565 (raw 0.9565), mismatch unaligned_data_drift; tr
 ## 2026-09-09
 
 func_8AE00F24: matched (lookup:branch-likely:goto-separate-guards), 6 iterations, agent codex
+
+## 2026-09-09
+
+func_8AE00C1C: plateau at 0.9667 (raw 0.8), mismatch operand_or_scheduling_drift; tried families: callseq; tie-pool no
+
+## 2026-09-09
+
+func_8AE012B0: matched (state-machine:packed-copy:guard-lifetime-exact), 2 iterations, agent codex
+
+## 2026-09-09
+
+func_8AE06198: matched (callseq:exact:offset-plus-base), 4 iterations, agent codex
+
+## 2026-09-09
+
+func_8AE02398: plateau at 0.8889 (raw 0.6852), mismatch instruction_drift; tried families: callseq, state-update; tie-pool no
