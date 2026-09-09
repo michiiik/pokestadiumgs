@@ -86,15 +86,18 @@ constexpr uint64_t kStuckThresholdMs = 200;
 // Not zero, though: at zero this fires on *every* loop backedge that has
 // anything queued, turning the scheduler into a full context switch per
 // backedge. That still makes forward progress but is pathologically slow.
-// A few hundred microseconds is far below the ~150 ms window in which the
-// corrupting write was observed, while leaving normal execution alone.
+// Give normally queued work at least a full frame before overriding the
+// priority scheduler. 250 us is shorter than ordinary host scheduling jitter
+// and made the checkpoint force a context switch during normal preview and
+// battle setup. 50 ms still leaves a wide margin before the earliest observed
+// corrupting write (~150 ms).
 // Env-tunable so the starvation check can be isolated from the rest of
 // voluntary preemption: PSR_STARVATION_US=0 disables only this check and
 // leaves the original stuck-thread monitor untouched.
 static uint64_t starvation_threshold_us() {
     static const uint64_t v = []() -> uint64_t {
         const char* e = std::getenv("PSR_STARVATION_US");
-        return e ? (uint64_t)std::strtoull(e, nullptr, 10) : 250ull;
+        return e ? (uint64_t)std::strtoull(e, nullptr, 10) : 50000ull;
     }();
     return v;
 }
