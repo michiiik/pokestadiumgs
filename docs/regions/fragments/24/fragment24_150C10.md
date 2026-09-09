@@ -89,3 +89,15 @@ func_82B02D84: matched (state_field_access:switch:limit-before-increment), 2 ite
 ## 2026-09-09
 
 func_82B00E10: time cap at 0.9 (raw 0.4) after 2404s, mismatch operand_or_scheduling_drift; tried families: state_field_access; tie-pool no
+
+## 2026-09-09
+
+func_82B042D8: matched (call_sequence:gfx-macros:env-color-standard), 1 iterations, agent codex
+
+## 2026-09-09
+
+func_82B07E18: time cap at 0.9231 (raw 0.4396) after 2413s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-09
+
+func_82B072DC: time cap at 0.9681 (raw 0.9468) after 2400s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
