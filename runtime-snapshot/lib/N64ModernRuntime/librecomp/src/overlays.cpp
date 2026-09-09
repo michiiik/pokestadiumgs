@@ -5211,7 +5211,7 @@ extern "C" uint32_t librecomp_fragment_resolve_exit(
 
     // The resolver is reached for every fragment-space lookup, but only the
     // synthetic pool and the known-ambiguous 0x8FF00000 bucket need native
-    // disambiguation. Keep the common path to one mask and branch: calling
+    // disambiguation.  Keep the common path to one mask and branch: calling
     // the two synthetic helpers (and their loaded-section walk) for ordinary
     // 0x80xxxxxx addresses made the generated entry hook needlessly hot.
     const bool synthetic = is_synthetic_addr(input);

@@ -110,6 +110,8 @@ patch -s "$source_root/CMakeLists.txt" \
     < "$repo_root/patches/mac-native-pi-runtime-source.patch"
 patch -s "$source_root/CMakeLists.txt" \
     < "$repo_root/patches/mac-native-mesgqueue-source.patch"
+patch -s "$source_root/CMakeLists.txt" \
+    < "$repo_root/patches/mac-native-runtime-opt.patch"
 # (matching *-funcs-{76,21,189}-source.patch hunks intentionally dropped; see above)
 
 # The staged runtime is shared with Stadium 1, but this project must present
@@ -117,8 +119,11 @@ patch -s "$source_root/CMakeLists.txt" \
 sed -i '' 's/PokemonStadiumRecomp/PokemonStadiumGSRecomp/g' \
     "$source_root/CMakeLists.txt"
 
-# NDEBUG is defined even though this is a Debug build (we still want -O0 and
-# full symbols for lldb). The recompiled sources and the runtime carry asserts
+# NDEBUG is defined even though this keeps a debuggable build configuration.
+# The generated game C remains at -O0 so the huge unity translation units stay
+# buildable on the Mac mini; the C++ runtime is optimized because its scheduler
+# and queue paths are the dominant intro-time cost. The recompiled sources and
+# runtime carry asserts
 # that are porting AIDS, not correctness guarantees, and each one aborts the
 # whole process on a condition real N64 hardware simply tolerates:
 #   - funcs_166.c guLookAtReflectF: assert(ctx->f10.fl == ctx->f10.fl) is a NaN

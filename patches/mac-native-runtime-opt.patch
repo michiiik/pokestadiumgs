@@ -1,0 +1,17 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -120,3 +120,8 @@
+ target_include_directories(rt64 PRIVATE ${CMAKE_BINARY_DIR}/rt64/src)
+ 
++# The generated game C stays at -O0 for build-time memory, but the host
++# scheduler, queues and fragment resolver must be optimized for a usable boot.
++target_compile_options(librecomp PRIVATE -O2)
++target_compile_options(ultramodern PRIVATE -O2)
++
+ # ---- ares-bridge (oracle for divergence diff against Ares) -----------------
+@@ -260,4 +260,5 @@
+ target_compile_options(PokemonStadiumGSRecomp PRIVATE
++    -O2
+     -fno-strict-aliasing
+     -fms-extensions
+ )
