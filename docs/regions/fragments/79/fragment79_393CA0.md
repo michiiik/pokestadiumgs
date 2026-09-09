@@ -715,3 +715,23 @@ TYPE CONFLICT: D_841951C2 is extern s8 D_841951C1, D_841951C2, not extern s8 D_8
 ## 2026-09-09
 
 TYPE CONFLICT: D_841951C4 is extern u8 D_841951C0, D_841951C1, D_841951C2, D_841951C3, D_841951C4, not extern u8 D_841951C4
+
+## 2026-09-09
+
+func_84139528: plateau at 0.0 (raw None), mismatch unknown; tried families: call-sequence; tie-pool no
+
+## 2026-09-09
+
+func_84132E40: plateau at 0.9344 (raw 0.6393), mismatch operand_or_scheduling_drift; tried families: call-sequence; tie-pool no
+
+## 2026-09-09
+
+func_841259D4: plateau at 0.918 (raw 0.6885), mismatch operand_or_scheduling_drift; tried families: call-sequence; tie-pool no
+
+## 2026-09-09
+
+func_8412CB00: matched (call_sequence:state-update:direct-record-fields), 1 iterations, agent codex
+
+## 2026-09-09
+
+func_8412E220: matched (call-sequence:poll-reset:frame8:count-value-u8mask), 2 iterations, agent codex

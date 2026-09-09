@@ -1475,7 +1475,26 @@ void BattleAnim_Table_84185F10_029(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412CB00.s")
+extern u8 func_80062D5C(u8);
+extern u8 func_80063454(u8, u8, u8, s32);
+extern s32 func_841251CC(u8 arg0);
+extern s32 func_84126374(void);
+extern u8 D_841951BD;
+extern s32 D_841951C8;
+extern u8 D_841951D2;
+extern u8 D_841951D5;
+extern u8 D_841951E5;
+extern u8 * D_84195208[];
+void BattleAnim_Table_84185F10_031(void) {
+    u8 field = D_84195208[D_841951BD][0x26];
+    D_841951D2 = 1;
+    if (field != 0 && field != 0x44) {
+        if (func_80063454(0, D_84195208[D_841951BD][1], D_84195208[D_841951BD][2], (D_84195208[D_841951BD][0xD] & 8) != 0) == 0) { D_841951D5 = 0; D_841951E5 = 0; return; }
+        if (func_84126374() == 0 && func_80062D5C(field) != 0 && func_841251CC(field) != 1) {
+            if (D_841951C8 != 0) { D_841951C8 *= 2; if (D_841951C8 >= 0x10000) D_841951C8 = 0xFFFF; D_841951D2 = 0; }
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1736,7 +1755,33 @@ void BattleAnim_Table_84185F10_048(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412E220.s")
+extern s32 func_84125080();
+extern s32 func_84126374(void);
+extern u8 D_841951BC;
+extern u8 * D_84195208[];
+s32 func_8412E220(void) {
+    u8 pad[8];
+    s32 count;
+    s32 value;
+    if (func_84126374() != 0) {
+        if (!(D_84195208[D_841951BC][0x10] & 0x10)) {
+            count = (0xFF >> D_84195208[D_841951BC][0x19]) & 0xFF;
+            if (count > 0) {
+                do {
+                    value = func_84125080();
+                } while (value == 0);
+                value = (value - 1) & 0xFF;
+                if (value < count) {
+                    D_84195208[D_841951BC][0x19]++;
+                    return 1;
+                }
+            }
+        }
+    }
+    D_84195208[D_841951BC][0x19] = 0;
+    func_84126BFC(D_841951BC);
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
