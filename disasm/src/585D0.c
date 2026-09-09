@@ -782,11 +782,39 @@ s32 func_8005B1C4(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005B848.s")
+extern void func_800616BC(u8 *, u8 *);
+extern void func_80060EC8(void *, void *);
+extern void _bcopy(s32, s32, s32);
+extern u8 D_801285D0[];
+void func_8005B848(u8 *arg0, s32 arg1, s32 arg2) {
+    s32 base;
+    s32 record;
+    base = *(s32 *)(D_801285D0 + arg1 * 112);
+    record = base + 0x88A;
+    func_800616BC((u8 *)base + arg2 * 48 + 0x892, arg0);
+    _bcopy(arg0 + 0x4C, (u8 *)record + arg2 * 11 + 0x128, 11);
+    func_80060EC8((u8 *)record + arg2 * 11 + 0x16A, arg0 + 0x34);
+    if ((arg0[0x1E] & 1) != 0) *(u8 *)(record + arg2 + 1) = 0xFD;
+    else *(u8 *)(record + arg2 + 1) = arg0[0];
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005B924.s")
+extern void _bcopy(s32, s32, s32);
+extern void func_80060EC8(void *, void *);
+extern void func_800616BC(u8 *arg0, u8 *arg1);
+extern u8 D_801285D0[];
+void func_8005B924(u8 *arg0, s32 arg1, s32 arg2) {
+    s32 base;
+    s32 record;
+    base = *(s32 *)(D_801285D0 + arg1 * 0x70);
+    record = base + 0x865;
+    func_800616BC((u8 *)base + arg2 * 0x30 + 0x86D, arg0);
+    _bcopy(arg0 + 0x4C, (u8 *)record + arg2 * 0xB + 0x128, 0xB);
+    func_80060EC8((u8 *)record + arg2 * 0xB + 0x16A, arg0 + 0x34);
+    if ((arg0[0x1E] & 1) != 0) *(u8 *)(record + arg2 + 1) = 0xFD;
+    else *(u8 *)(record + arg2 + 1) = arg0[0];
+}
 #endif
 
 #ifdef VERSION_US
