@@ -124,3 +124,31 @@ func_8130BA48: matched (call-sequence:split-offset:saved-base-switch), 3 iterati
 ## 2026-09-09
 
 func_8130C334: time cap at 0.965 (raw 0.8601) after 2400s, mismatch section_layout_drift; tried families: dispatcher_switch; tie-pool no
+
+## 2026-09-09
+
+func_81309EB0: plateau at 0.9604 (raw 0.7822), mismatch instruction_drift; tried families: call-chain; tie-pool no
+
+## 2026-09-09
+
+func_81306F20: plateau at 0.7917 (raw 0.5), mismatch instruction_drift; tried families: state-field; tie-pool no
+
+## 2026-09-09
+
+TYPE CONFLICT: D_8160BD1C is extern f32(*D_8160BD1C)(f32), not extern void(*D_8160BD1C)(f32)
+
+## 2026-09-09
+
+func_8130CDD4: matched (constant-map:shared-tail:condition-orientation), 1 iterations, agent codex
+
+## 2026-09-09
+
+func_813074E4: plateau at 0.0 (raw None), mismatch operand_or_scheduling_drift; tried families: call-chain; tie-pool yes
+
+## 2026-09-09
+
+func_8130AEF4: plateau at 0.975 (raw 0.675), mismatch operand_or_scheduling_drift; tried families: call-chain; tie-pool no
+
+## 2026-09-09
+
+TYPE CONFLICT: func_81302290 is extern void *func_81302290(void *), not extern s32 func_81302290(void *)
