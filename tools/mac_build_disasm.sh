@@ -7,6 +7,12 @@ set -euo pipefail
 # container only.
 cd /work
 
+# IDO honours TMPDIR and strands ctm* temp files when a pass is killed. This
+# runs in a disposable container, so leaks here are discarded with it -- the
+# export just keeps behaviour identical to a host build.
+export TMPDIR=/work/scratch
+mkdir -p "$TMPDIR"
+
 if ! command -v wget >/dev/null 2>&1; then
     export DEBIAN_FRONTEND=noninteractive
     apt-get update

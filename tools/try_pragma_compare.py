@@ -214,6 +214,17 @@ def _cleanup_stale_probe_dirs(repo_root: Path) -> None:
                 except OSError:
                     continue
 
+    # IDO's as0/as1/ugen strand ctm* files (see _redirect_tmpdir) under the
+    # scratch root rather than a subdirectory, so they need their own sweep:
+    # the loop above only ever removes directories.
+    for leftover in _scratch_root(repo_root).glob("ctm*"):
+        try:
+            if not leftover.is_file() or now - leftover.stat().st_mtime < stale_after:
+                continue
+            leftover.unlink()
+        except OSError:
+            continue
+
 
 def _command_timeout(environment_name: str, default: float) -> float:
     """Read a positive subprocess timeout without making it mandatory."""
@@ -438,6 +449,34 @@ def _private_output_path(repo_root: Path, path: Path, description: str) -> None:
             raise RuntimeError(
                 f"isolated gate bootstrap refused symlinked {description}: {current}"
             )
+
+
+def _redirect_tmpdir() -> None:
+    """Point child processes at an in-repo scratch dir instead of ``$TMPDIR``.
+
+    The IDO compiler passes (``as0``, ``as1``, ``ugen``) create ``ctm*`` temp
+    files and honour ``TMPDIR``, removing them only on a normal exit. This
+    runner invokes the compiler in tight loops and a killed/timed-out/OOM'd
+    pass strands its file, so the per-user ``/var/folders`` temp directory
+    grows until ``dirhelper`` can no longer walk it -- stalling that
+    synchronous launchd boot task and hanging startup. This has happened
+    twice on the host running this pipeline under fleet load.
+
+    Redirecting to ``_scratch_root`` keeps stranded files in-repo,
+    gitignored, and swept by ``_cleanup_stale_probe_dirs`` below. This is the
+    same directory ``container/run.sh`` bounds with a tmpfs and
+    ``docs/CONTAINER_AGENT.md`` already documents this redirect as targeting
+    -- applied here at import so both the CLI and the MCP server inherit it,
+    matching what the container-side docs assume the host side already does.
+    """
+    try:
+        root = _scratch_root(RUNNER_REPO_ROOT)
+    except (OSError, RuntimeError):
+        return
+    os.environ["TMPDIR"] = f"{root}{os.sep}"
+
+
+_redirect_tmpdir()
 
 
 def _regular_nonempty_file(path: Path) -> bool:
