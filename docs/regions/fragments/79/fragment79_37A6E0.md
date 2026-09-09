@@ -481,3 +481,15 @@ func_8411D2E4: matched (call_sequence:state-init:typed-result-pointer), 1 iterat
 ## 2026-09-09
 
 func_8411A7D8: plateau at 0.0 (raw None), mismatch unknown; tried families: call_sequence; tie-pool no
+
+## 2026-09-09
+
+func_8410E8E4: plateau at 0.0 (raw None), mismatch unknown; tried families: call_sequence; tie-pool no
+
+## 2026-09-09
+
+func_84117AA0: plateau at 0.0 (raw None), mismatch unknown; tried families: call_sequence; tie-pool no
+
+## 2026-09-09
+
+func_841182E0: matched (call_sequence:table:second-index-assignment), 2 iterations, agent codex
