@@ -1485,7 +1485,7 @@ extern u8 D_841951D2;
 extern u8 D_841951D5;
 extern u8 D_841951E5;
 extern u8 * D_84195208[];
-void func_8412CB00(void) {
+void BattleAnim_Table_84185F10_031(void) {
     u8 field = D_84195208[D_841951BD][0x26];
     D_841951D2 = 1;
     if (field != 0 && field != 0x44) {
