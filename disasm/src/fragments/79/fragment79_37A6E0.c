@@ -2462,7 +2462,25 @@ void func_841175D4(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_84117648.s")
+extern void func_84111BEC(u8 *arg0);
+void func_84117648(u8 *arg0) {
+    s32 state;
+    func_841175D4((s32)arg0);
+    state = *(u8 *)(arg0 + 0x61A);
+    if (state == 0xF) {
+        if (*(s16 *)(arg0 + 0x7E8) == state) {
+            func_84111BEC(arg0);
+            *(s16 *)(arg0 + 0x7E8) = 0x12C;
+            arg0[0x7F6] = 1;
+        }
+    } else if (*(s16 *)(arg0 + 0x7E8) == state) {
+        *(u16 *)(arg0 + 0x7F4) &= 0xFFFE;
+        *(u16 *)(arg0 + 0x7F4) &= 0xFFFD;
+        func_84111BEC(arg0);
+        *(s16 *)(arg0 + 0x7E8) = 0x12C;
+        arg0[0x7F6] = 1;
+    }
+}
 #endif
 
 #ifdef VERSION_US
