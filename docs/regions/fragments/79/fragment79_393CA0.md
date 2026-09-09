@@ -667,3 +667,11 @@ func_84126850: plateau at 0.95 (raw 0.7), mismatch operand_or_scheduling_drift; 
 ## 2026-09-09
 
 func_84126EDC: time cap at 0.95 (raw 0.75) after 2428s, mismatch operand_or_scheduling_drift; tried families: constant-map; tie-pool no
+
+## 2026-09-09
+
+func_84126994: matched (state-field:reset-records:post-prefix-offset-local), 3 iterations, agent codex
+
+## 2026-09-09
+
+func_8412A23C: plateau at 0.9796 (raw 0.6939), mismatch operand_or_scheduling_drift; tried families: state-field; tie-pool no
