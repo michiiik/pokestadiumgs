@@ -735,3 +735,31 @@ func_8412CB00: matched (call_sequence:state-update:direct-record-fields), 1 iter
 ## 2026-09-09
 
 func_8412E220: matched (call-sequence:poll-reset:frame8:count-value-u8mask), 2 iterations, agent codex
+
+## 2026-09-09
+
+func_841266C4: plateau at 0.0 (raw None), mismatch unknown; tried families: call-sequence; tie-pool no
+
+## 2026-09-09
+
+func_84128354: matched (state-machine:local-state:s32-record-load), 1 iterations, agent codex
+
+## 2026-09-09
+
+func_8412F044: matched (call_sequence:direct-table:explicit-nonzero), 1 iterations, agent codex
+
+## 2026-09-09
+
+func_84131F80: time cap at 0.9767 (raw 0.6279) after 2400s, mismatch operand_or_scheduling_drift; tried families: call-sequence; tie-pool no
+
+## 2026-09-09
+
+func_84136014: plateau at 0.0 (raw None), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-09
+
+func_841292C4: matched (call_sequence:clamp:direct-index:delta-first-casts), 1 iterations, agent codex
+
+## 2026-09-09
+
+func_84129C8C: matched (call-sequence:direct-index:explicit-u8-result), 1 iterations, agent codex
