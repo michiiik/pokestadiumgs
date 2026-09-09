@@ -244,7 +244,25 @@ s32 func_8AE01164(void *arg0, u8 *arg1, s32 arg2) { typedef struct { u8 b[6]; } 
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE012B0.s")
+extern s16 D_8AE0A15C;
+s32 func_8AE012B0(s32 arg0, u8 *arg1) {
+    struct Copy4 { u8 b[4]; };
+    s32 count;
+    s32 found;
+    found = 0;
+    if (arg1 == 0) return 0;
+    count = 0;
+    for (;;) {
+        if (arg1[1] == 0xFF) return found;
+        if (arg1[1] == D_8AE0A15C) {
+            *(struct Copy4 *)((u8 *)arg0 + 0x40 + count * 4) = *(struct Copy4 *)arg1;
+            count++;
+            found = 1;
+            if (count == 3) return 1;
+        }
+        arg1 += 4;
+    }
+}
 #endif
 
 #ifdef VERSION_US
