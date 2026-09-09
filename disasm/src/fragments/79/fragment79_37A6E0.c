@@ -3074,7 +3074,7 @@ void BattleAnim_Dispatch_101(u8 *arg0) {
 #ifdef VERSION_US
 extern s32 func_8006456C(s32);
 extern u8 * D_84193DD0;
-void func_8411AE08(u8 *arg0) { s32 first; s32 second; u8 saved; s32 result; first = func_8411E1F8((s32)arg0); *(u16 *)(arg0 + 0x65C) = *(u16 *)((u8 *)D_84193DD0 + (first << 4) + 0xC); saved = (u8)func_8411E1F8((s32)arg0); second = func_8411E1F8((s32)arg0); result = func_8006456C(*(u16 *)((u8 *)D_84193DD0 + (second << 4) + 0x14)); func_84112FD0(*(u8 **)(arg0 + 0x5C0), *(u16 *)(arg0 + 0x65C), *(F12State *)((u8 *)D_84193DD0 + (saved << 4) + 0x18), result); *(u8 *)(arg0 + 0x7F6) = 3; }
+void BattleAnim_Dispatch_099(u8 *arg0) { s32 first; s32 second; u8 saved; s32 result; first = func_8411E1F8((s32)arg0); *(u16 *)(arg0 + 0x65C) = *(u16 *)((u8 *)D_84193DD0 + (first << 4) + 0xC); saved = (u8)func_8411E1F8((s32)arg0); second = func_8411E1F8((s32)arg0); result = func_8006456C(*(u16 *)((u8 *)D_84193DD0 + (second << 4) + 0x14)); func_84112FD0(*(u8 **)(arg0 + 0x5C0), *(u16 *)(arg0 + 0x65C), *(F12State *)((u8 *)D_84193DD0 + (saved << 4) + 0x18), result); *(u8 *)(arg0 + 0x7F6) = 3; }
 #endif
 
 #ifdef VERSION_US

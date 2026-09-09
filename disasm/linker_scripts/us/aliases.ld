@@ -58,3 +58,4 @@ func_84110A98 = BattleAnim_ModelDispatch_141;
 func_8411B3B8 = BattleAnim_Dispatch_080;
 func_841155E8 = BattleAnim_Dispatch_044;
 func_8411A4AC = BattleAnim_Dispatch_037;
+func_8411AE08 = BattleAnim_Dispatch_099;
