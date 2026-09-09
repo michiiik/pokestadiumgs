@@ -695,5 +695,17 @@ s32 func_8130C270(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130CB5C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130CDD4.s")
+s32 func_8130CDD4(void *arg0) {
+    u8 *base = (u8 *)arg0 + 0x8000;
+    s32 result;
+    if (base[0x6912] != 13) {
+        return 0;
+    }
+    if (*(s32 *)(base + 0x690C) != 0) {
+        result = -1;
+    } else {
+        result = base[0x6914] + base[0x6911] + 1;
+    }
+    return result;
+}
 #endif
