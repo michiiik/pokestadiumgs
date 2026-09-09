@@ -186,7 +186,59 @@ void func_80064F54(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/Game_Thread.s")
+extern s32 func_80064C20(s32);
+extern void func_800354B4(s32, s32, s32);
+extern void func_800355E4(s32);
+extern void func_80065A18(void);
+extern void Game_State02_Run(void);
+extern void func_80065D9C(void);
+extern void func_80065F50(void);
+extern void func_800661F0(void);
+extern void func_8006D440(void);
+extern void func_800666F0(void);
+extern void func_80066D24(void);
+extern void func_80067B8C(void);
+extern void func_800727D4(s32);
+extern void Audio_ResetRequestId(void);
+extern void Game_State12_Nop(void);
+extern void func_800684F0(void);
+extern void func_80069370(void);
+extern void func_80069900(void);
+extern void func_80068E14(void);
+extern void Game_State17_Boot(void);
+extern void Game_State18_Run(void);
+extern void Game_State19_Run(void);
+extern void Game_State18_Run(void);
+void Game_Thread(s32 arg0) {
+    s32 state;
+
+    Game_ThreadInit();
+loop:
+    state = func_80064C20(D_8009DE94);
+    switch (state) {
+    case 17: func_800354B4(0, 0, 0); Game_State17_Boot(); break;
+    case 1: func_80065A18(); break;
+    case 2: func_800354B4(2, 0, 0); func_800355E4(0x25); Game_State02_Run(); break;
+    case 3: func_800354B4(2, 0, 0); func_800355E4(0x25); func_80065D9C(); break;
+    case 4: func_80065F50(); break;
+    case 5: func_800354B4(3, 0, 0); func_800355E4(8); func_8006D440(); Game_SetState(3); break;
+    case 6: func_800661F0(); break;
+    case 7: func_800354B4(5, 0, 0); func_800355E4(0x29); func_800666F0(); break;
+    case 8: func_80066D24(); break;
+    case 9: func_80067B8C(); break;
+    case 10: func_800354B4(6, 0, 0); func_800727D4(0); Game_SetState(3); Audio_ResetRequestId(); break;
+    case 11: func_800354B4(2, 0, 0); func_800355E4(0x2A); Game_State11_Options(); break;
+    case 12: func_800354B4(0x1E, 0, 0); Game_State12_Nop(); break;
+    case 13: func_800684F0(); break;
+    case 14: func_80069370(); break;
+    case 15: func_80069900(); break;
+    case 16: func_80068E14(); break;
+    case 18: Game_State18_Run(); break;
+    case 19: func_800355E4(0x44); Game_State19_Run(); Game_SetState(2); break;
+    default: break;
+    }
+    goto loop;
+}
 #endif
 
 #ifdef VERSION_US
