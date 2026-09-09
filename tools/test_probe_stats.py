@@ -17,6 +17,7 @@ if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
 
 import probe_stats  # noqa: E402
+import variant_policy  # noqa: E402
 import check_decomp_provenance as provenance  # noqa: E402
 
 
@@ -535,14 +536,24 @@ class ProvenanceStagedIntegrationTests(unittest.TestCase):
             source.write_text("void func_8000ABCD(void) {\n}\n")
             subprocess.run(["git", "add", "disasm/src/x.c"], cwd=root, check=True, env=_clean_git_env())
 
-            stats_path = root / "probe-stats" / "probe-stats.jsonl"
+            # accepted_functions()'s default resolution now goes through
+            # try_pragma_compare._probe_stats_history_paths(root) (see PR
+            # #364's provenance-hook fix), which only honors a repo_root
+            # different from the real checkout's when variant_policy's own
+            # STATS_PATH_CURRENT/STATS_PATH_LEGACY are patched away from
+            # their real-repo defaults -- the same dependency-injection
+            # hook test_runner_diagnostics.py/test_variant_policy.py
+            # already use -- otherwise it falls back to the real project's
+            # ledger regardless of root. A bare probe_stats.DEFAULT_STATS_PATH
+            # patch (this test's old approach) no longer has any effect.
+            stats_path = root / "disasm" / "probe-stats" / "probe-stats.jsonl"
             stats_path.parent.mkdir(parents=True)
             stats_path.write_text(json.dumps({"attempts": [
                 {"function": "func_8000ABCD", "status": "accepted", "candidate": "void func_8000ABCD(void) {}"},
             ]}) + "\n")
 
-            with mock.patch.object(probe_stats, "DEFAULT_STATS_PATH", stats_path), mock.patch.object(
-                probe_stats, "LEGACY_STATS_PATH", root / "build" / "probe-stats.jsonl"
+            with mock.patch.object(variant_policy, "STATS_PATH_CURRENT", stats_path), mock.patch.object(
+                variant_policy, "STATS_PATH_LEGACY", root / "disasm" / "build" / "probe-stats.jsonl"
             ):
                 missing = provenance.check_staged(root)
             self.assertEqual(missing, [])

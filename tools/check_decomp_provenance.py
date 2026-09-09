@@ -38,6 +38,7 @@ import sys
 from pathlib import Path
 
 import probe_stats
+import try_pragma_compare
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
@@ -94,7 +95,9 @@ def staged_diff(repo_root: Path) -> str:
     return result.stdout
 
 
-def accepted_functions(paths: list[Path] | None = None) -> set[str]:
+def accepted_functions(
+    paths: list[Path] | None = None, repo_root: Path | None = None
+) -> set[str]:
     """Functions with at least one ``accepted`` attempt on file.
 
     Scans every resolved stats file (active + legacy + rotated, unless
@@ -102,9 +105,24 @@ def accepted_functions(paths: list[Path] | None = None) -> set[str]:
     before ``json.loads``-ing a line: most lines in a large history are not
     an accepted attempt at all, and skipping the parse for them is what
     keeps this fast on a 50 MB file.
+
+    ``paths=None`` resolves through ``try_pragma_compare``'s own
+    ``_probe_stats_history_paths`` -- the same primary-checkout-first
+    resolution the runner itself writes through -- rather than
+    ``probe_stats.resolve_paths(None)``'s plain local-worktree default.  A
+    linked worktree (``git worktree add``) has no local
+    ``disasm/probe-stats/``, since new accepted attempts land in the
+    primary checkout's shared ledger; reading through the plain default
+    here made this check unsatisfiable from any linked worktree, even for
+    a real MCP-verified accept (see PR #364's history).
     """
     accepted: set[str] = set()
-    for path in probe_stats.resolve_paths(paths):
+    resolved_paths = (
+        list(try_pragma_compare._probe_stats_history_paths(repo_root))
+        if paths is None
+        else probe_stats.resolve_paths(paths)
+    )
+    for path in resolved_paths:
         try:
             text = path.read_text(encoding="utf-8", errors="replace")
         except OSError:
@@ -138,7 +156,7 @@ def check_staged(repo_root: Path) -> list[str]:
     removed = removed_pragma_functions(diff_text)
     if not removed:
         return []
-    accepted = accepted_functions()
+    accepted = accepted_functions(repo_root=repo_root)
     return [function for function in removed if function not in accepted]
 
 
