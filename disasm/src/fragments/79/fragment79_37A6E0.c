@@ -3435,7 +3435,31 @@ void BattleAnim_Dispatch_205(u8 *arg0) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8411D2E4.s")
+extern void func_84108A10(u8 *);
+extern void func_84111348(s32 arg0, s32 arg1);
+extern void func_84111C44(void);
+extern void func_841126C8(s32 arg0);
+extern s32 func_8411E164(s32 arg0);
+extern void func_8411FEE8(s32);
+extern s32 D_84183D50;
+extern s32 D_841911F4;
+void func_8411D2E4(u8 *arg0) {
+    u8 *result;
+    *(s16 *)(arg0 + 0x7E8) = 0;
+    arg0[0x7F6] = 0;
+    func_8411FEE8(0x154);
+    func_841126C8(arg0);
+    arg0[1] |= 1;
+    result = (u8 *)func_8411E164((s32)arg0);
+    result[1] = (u8)(result[1] & 0xFFFE);
+    func_84111C44();
+    func_84112290(arg0);
+    func_84108A10(arg0);
+    *(s16 *)(arg0 + 0x7EA) = 0;
+    func_84111348((s32)arg0, 0x18);
+    func_8002B2FC();
+    *(s32 *)(arg0 + D_841911F4 * 4 + 0x5C8) = D_84183D50;
+}
 #endif
 
 #ifdef VERSION_US
