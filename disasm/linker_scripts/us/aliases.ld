@@ -54,3 +54,4 @@ func_8003A440 = Geo_NodeReference;
 func_8003A9CC = Geo_NodeOrtho;
 func_8003C080 = Geo_NodeDisplayList;
 func_841312E8 = BattleAnim_Table_84186004_080;
+func_84110A98 = BattleAnim_ModelDispatch_141;

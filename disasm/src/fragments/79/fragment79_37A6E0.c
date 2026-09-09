@@ -1013,7 +1013,7 @@ extern s32 D_84184148;
 extern u8 * D_841911E0;
 extern u8 * D_841911E8;
 extern s32 D_841911EC;
-void func_84110A98(u8 *arg0, s32 arg1) {
+void BattleAnim_ModelDispatch_141(u8 *arg0, s32 arg1) {
     D_841911E8 = func_8410B330(arg0);
     if (D_841911E8 == D_841911E0) {
         func_8411EF08((u8 *)arg1);
