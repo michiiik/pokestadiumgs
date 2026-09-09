@@ -114,6 +114,25 @@ RUN cp disasm/linker_scripts/us/pokestadiumgs.ld /tmp/pokestadiumgs.ld.orig \
     && cp /tmp/pokestadiumgs.ld.orig disasm/linker_scripts/us/pokestadiumgs.ld \
     && rm /tmp/pokestadiumgs.ld.orig
 
+# disasm/tools/coalesce_cc.py's COALESCE_AT_LUI fold (see disasm/tools/
+# coalesce_lui.py's resolve_repo_addresses) needs a linker map to resolve
+# some opted-in functions' data addresses, and .dockerignore excludes
+# disasm/build/ from this build context (so the RUN below, which runs before
+# any build of its own has produced one, would otherwise have none to read --
+# a linked worktree building natively doesn't hit this, since it falls back
+# to a primary checkout's already-built map, but this flattened build
+# context has no .git at all for that fallback to use either). container/
+# build.sh stages whichever map is available on the host build machine at
+# container/.map-cache/ (a path .dockerignore does not exclude) before
+# invoking `docker build`; copy it into place here if present. Best-effort --
+# a build invoked some other way than build.sh (no staged file) just hits
+# the RUN below's normal, loud coalesce_cc.py failure if an opted-in
+# function's address genuinely isn't resolvable, same as before this existed.
+RUN mkdir -p disasm/build \
+    && if [ -f container/.map-cache/pokestadiumgs-us.map ]; then \
+         cp container/.map-cache/pokestadiumgs-us.map disasm/build/pokestadiumgs-us.map; \
+       fi
+
 # Bake a full initial matching build into the image. This is required, not
 # just an optimization: tools/try_pragma_compare.py (the host-side gate
 # runner container_agent.py drives) invokes the ROM gate as exactly

@@ -145,6 +145,27 @@ if [ "${AGENT:-claude}" = "gemini" ] && [ -f "$gemini_home_src/antigravity-cli/a
     extra_args+=(-v "$gemini_home:/root/.gemini")
 fi
 
+# Google Antigravity CLI, Claude-model variant (AGENT=antigravity, see
+# container/generators/antigravity.sh): same mount shape as the AGENT=gemini
+# block just above, but sourced from a SEPARATE Antigravity account/login
+# (ANTIGRAVITY_SONNET_HOME, default ~/.gs-fleet-agy-creds) so its usage is
+# tracked against an independent quota from AGENT=gemini's ~/.gemini login,
+# not just a differently-bucketed view of the same account. agy itself has
+# no AGENT-awareness -- it always reads /root/.gemini inside the container
+# regardless of which host directory got mounted there, so this and the
+# AGENT=gemini block are mutually exclusive per container by construction
+# (fleetctl only ever sets one AGENT per container).
+antigravity_home_src="${ANTIGRAVITY_SONNET_HOME:-$HOME/.gs-fleet-agy-creds}"
+if [ "${AGENT:-claude}" = "antigravity" ] && [ -f "$antigravity_home_src/antigravity-cli/antigravity-oauth-token" ]; then
+    antigravity_home="$(mktemp -d)"
+    mkdir -p "$antigravity_home/antigravity-cli" "$antigravity_home/config/projects"
+    cp "$antigravity_home_src/antigravity-cli/antigravity-oauth-token" "$antigravity_home/antigravity-cli/"
+    [ -f "$antigravity_home_src/antigravity-cli/installation_id" ] &&         cp "$antigravity_home_src/antigravity-cli/installation_id" "$antigravity_home/antigravity-cli/"
+    [ -f "$antigravity_home_src/config/config.json" ] &&         cp "$antigravity_home_src/config/config.json" "$antigravity_home/config/"
+    [ -f "$antigravity_home_src/config/projects/default-cli-project.json" ] &&         cp "$antigravity_home_src/config/projects/default-cli-project.json" "$antigravity_home/config/projects/"
+    extra_args+=(-v "$antigravity_home:/root/.gemini")
+fi
+
 # Alibaba Cloud Model Studio (AGENT=alibaba, or AGENT=claude_via
 # CLAUDE_VIA=alibaba): resolve the matching plan's dedicated API key out of
 # ~/.qwen/settings.json's "env" block into ANTHROPIC_AUTH_TOKEN for the

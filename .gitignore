@@ -9,6 +9,11 @@ disasm/probes/
 disasm/scratch/
 generated/
 
+# container/build.sh's staged coalesce-lui reference map (see its own
+# comment) -- a host-local copy of a generated build artifact, regenerated
+# fresh before every image build, never meant to be tracked.
+container/.map-cache/
+
 # Durable probe-stats history (see tools/probe_stats.py) -- deliberately
 # outside disasm/build/ so a build clean cannot wipe candidate-runner history
 # No trailing slash: a fleet clone replaces this with a SYMLINK to the primary
