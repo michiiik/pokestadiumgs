@@ -449,3 +449,11 @@ func_84113590: time cap at 0.8 (raw 0.58) after 2400s, mismatch operand_or_sched
 ## 2026-09-09
 
 func_8410F78C: matched (call_sequence:direct:correct-second-call-addresses), 1 iterations, agent codex
+
+## 2026-09-09
+
+func_841155E8: matched (call_sequence:guard-return:canonical), 1 iterations, agent codex
+
+## 2026-09-09
+
+func_84116460: time cap at 0.8966 (raw 0.6034) after 2462s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
