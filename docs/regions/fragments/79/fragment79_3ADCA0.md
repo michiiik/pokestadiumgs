@@ -94,3 +94,19 @@ func_841410A0: plateau at 0.0 (raw None), mismatch section_layout_drift; tried f
 ## 2026-09-09
 
 func_84141020: plateau at 0.0 (raw None), mismatch section_layout_drift; tried families: dispatcher_switch; tie-pool no
+
+## 2026-09-09
+
+func_8413FD04: plateau at 0.9535 (raw 0.5581), mismatch operand_or_scheduling_drift; tried families: state_field_access; tie-pool no
+
+## 2026-09-09
+
+func_841459E8: matched (state_field_access:fillrect:struct-correct-order), 2 iterations, agent codex
+
+## 2026-09-09
+
+func_84147270: matched (constant_map:positive-negative:mask-complement), 1 iterations, agent codex
+
+## 2026-09-09
+
+func_84147BA4: time cap at 0.4933 (raw 0.1067) after 2400s, mismatch operand_or_scheduling_drift; tried families: bounded_lookup; tie-pool no
