@@ -1531,7 +1531,15 @@ void func_84147228(u8 arg0, u8 arg1, u8 arg2, u8 arg3, s32 arg4) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84147270.s")
+void func_84147270(u8 *arg0, u8 arg1, s16 arg2) {
+    if (arg2 > 0) {
+        arg0[0x25] = ((arg1 - arg0[9]) * 0xFF + 0xFF) / arg1;
+        if (arg2 == arg0[9]) arg0[8] &= ~2;
+    } else if (arg2 < 0) {
+        arg0[0x25] = (arg0[9] * 0xFF) / arg1;
+        if (-arg2 == arg0[9]) arg0[8] |= 2;
+    } else arg0[8] &= ~2;
+}
 #endif
 
 #ifdef VERSION_US
