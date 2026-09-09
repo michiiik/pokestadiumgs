@@ -457,3 +457,27 @@ func_841155E8: matched (call_sequence:guard-return:canonical), 1 iterations, age
 ## 2026-09-09
 
 func_84116460: time cap at 0.8966 (raw 0.6034) after 2462s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-09
+
+func_84117648: matched (call_sequence:state-switch:explicit-u8-load), 1 iterations, agent codex
+
+## 2026-09-09
+
+func_8411A4AC: matched (call_sequence:guard:if-else-duplicate), 1 iterations, agent codex
+
+## 2026-09-09
+
+func_84115988: plateau at 0.9744 (raw 0.9231), mismatch instruction_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-09
+
+func_8411AE08: matched (call_sequence:table-index:direct-byte-table-cast), 1 iterations, agent codex
+
+## 2026-09-09
+
+func_8411D2E4: matched (call_sequence:state-init:typed-result-pointer), 1 iterations, agent codex
+
+## 2026-09-09
+
+func_8411A7D8: plateau at 0.0 (raw None), mismatch unknown; tried families: call_sequence; tie-pool no
