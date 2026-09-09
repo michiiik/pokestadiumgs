@@ -396,3 +396,19 @@ func_8411A620: plateau at 0.0 (raw None), mismatch unknown; tried families: call
 ## 2026-09-09
 
 func_8411C310: plateau at 0.0 (raw None), mismatch unknown; tried families: call-sequence; tie-pool no
+
+## 2026-09-09
+
+func_8411DBF4: plateau at 1.0 (raw 1.0), mismatch section_layout_drift; tried families: dispatcher_switch; tie-pool no
+
+## 2026-09-09
+
+func_8410AE8C: matched (call-chain:abi-home:high-half-direct), 7 iterations, agent codex
+
+## 2026-09-09
+
+func_84113658: plateau at 0.973 (raw 0.4054), mismatch instruction_drift; tried families: init; tie-pool no
+
+## 2026-09-09
+
+func_84110A98: matched (call_chain:global-pointer:s32-direct), 1 iterations, agent codex

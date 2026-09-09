@@ -11,7 +11,10 @@ void func_8410AE50(u8 *arg0, s16 a1, s16 a2, s16 a3, s16 a4) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8410AE8C.s")
+extern void GeoCamera_SetViewport(u8 *, s16, s16, s16, s16);
+extern void GeoCamera_SetPerspective(u8 *, s32, f32, f32);
+extern void func_80038E14(u8 *, s32, s32, s32, f32, f32, f32, s32);
+void func_8410AE8C(u8 *arg0, s16 arg1, s16 arg2, s16 arg3, s32 arg4) { GeoCamera_SetViewport(arg0, arg1, arg2, arg3, *(s16 *)((u8 *)&arg4 + 2)); GeoCamera_SetPerspective(arg0, *(s32 *)(arg0 + 0x2C), 20.0f, 6400.0f); func_80038E14(arg0, *(s32 *)(arg0 + 0xA8), *(s32 *)(arg0 + 0xAC), *(s32 *)(arg0 + 0xB0), *(f32 *)(arg0 + 0xB4), *(f32 *)(arg0 + 0xB8), *(f32 *)(arg0 + 0xBC), 0); }
 #endif
 
 #ifdef VERSION_US
@@ -1002,7 +1005,24 @@ void BattleAnim_ModelDispatch_113(u8 *arg0, u8 *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_84110A98.s")
+extern u8 * func_8410B330(u8 *);
+extern void func_8410C934(u8 *arg0, s32 arg1, s16 arg2);
+extern void func_8411EF08(u8 *arg0);
+extern void func_8411EF20(u8 *arg0);
+extern s32 D_84184148;
+extern u8 * D_841911E0;
+extern u8 * D_841911E8;
+extern s32 D_841911EC;
+void BattleAnim_ModelDispatch_141(u8 *arg0, s32 arg1) {
+    D_841911E8 = func_8410B330(arg0);
+    if (D_841911E8 == D_841911E0) {
+        func_8411EF08((u8 *)arg1);
+    } else {
+        func_8411EF20((u8 *)arg1);
+    }
+    func_8410C934(arg0, arg1, *(s16 *)(D_841911E8 + 0x98));
+    *(s32 *)(D_841911E8 + (D_841911EC * 8) + 8) = D_84184148;
+}
 #endif
 
 #ifdef VERSION_US
