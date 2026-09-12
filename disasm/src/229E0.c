@@ -532,7 +532,23 @@ void func_800277F0(u16 resource_id, void *context) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80027EE0.s")
+// credit to https://decomp.me/scratch/eFWz0
+void func_80027EE0(u16 arg0) {
+    switch (arg0) {
+        case 0xFFF:
+            func_80027E30();
+            return;
+        case 0xFFE:
+            func_80027F4C();
+            return;
+        case 0xFFD:
+            func_80027F4C();
+            func_80027E30();
+            return;
+        default:
+            return;
+    }
+}
 #endif
 
 #ifdef VERSION_US
