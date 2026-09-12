@@ -533,7 +533,7 @@ void func_800277F0(u16 resource_id, void *context) {
 
 #ifdef VERSION_US
 // credit to https://decomp.me/scratch/eFWz0
-void func_80027EE0(u16 arg0) {
+void func_80027EE0(s32 arg0) {
     switch (arg0) {
         case 0xFFF:
             func_80027E30();
