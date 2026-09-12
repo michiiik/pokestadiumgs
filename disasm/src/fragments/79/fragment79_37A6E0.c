@@ -2268,7 +2268,7 @@ extern void func_8411FEE8(s32);
 extern s32 D_84183D50;
 extern u8 * D_841911E0;
 extern s32 D_841911F4;
-void func_84116138(u8 *arg0) {
+void BattleAnim_Dispatch_058(u8 *arg0) {
     if (func_84113430((s32)arg0) == 0) return;
     func_84112EAC((void *)arg0);
     func_841126C8((s32)arg0);
