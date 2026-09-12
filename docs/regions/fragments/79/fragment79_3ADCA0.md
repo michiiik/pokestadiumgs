@@ -110,3 +110,15 @@ func_84147270: matched (constant_map:positive-negative:mask-complement), 1 itera
 ## 2026-09-09
 
 func_84147BA4: time cap at 0.4933 (raw 0.1067) after 2400s, mismatch operand_or_scheduling_drift; tried families: bounded_lookup; tie-pool no
+
+## 2026-09-13
+
+func_8413E514: time cap at 0.8519 (raw 0.3889) after 2448s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-13
+
+func_8413FC34: plateau at 0.0 (raw None), mismatch unknown; tried families: call_sequence; tie-pool no
+
+## 2026-09-13
+
+func_8414760C: matched (call_sequence:flags:compound-and-fffe), 4 iterations, agent codex
