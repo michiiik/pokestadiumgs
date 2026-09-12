@@ -3,8 +3,8 @@
 # Decompilation coverage
 
 <!-- AUTO_COVERAGE:START -->
-- US functions with C implementations: **5,202 / 10,532 (49.4%)**
-- Remaining `GLOBAL_ASM` owners: **5,330**
+- US functions with C implementations: **5,199 / 10,532 (49.4%)**
+- Remaining `GLOBAL_ASM` owners: **5,333**
 - Baseline: `f477acf` (vendored US pragma snapshot)
 <!-- AUTO_COVERAGE:END -->
 
@@ -22,7 +22,7 @@
 | `disasm/src/208A0.c` | 1 | 5 | 80.0% |
 | `disasm/src/20C50.c` | 2 | 4 | 50.0% |
 | `disasm/src/226C0.c` | 1 | 5 | 80.0% |
-| `disasm/src/229E0.c` | 232 | 571 | 59.4% |
+| `disasm/src/229E0.c` | 233 | 571 | 59.2% |
 | `disasm/src/2CA0.c` | 1 | 13 | 92.3% |
 | `disasm/src/3280.c` | 2 | 14 | 85.7% |
 | `disasm/src/3E40.c` | 1 | 11 | 90.9% |
@@ -365,19 +365,19 @@
 | `disasm/src/fragments/79/fragment79_377F80.c` | 18 | 45 | 60.0% |
 | `disasm/src/fragments/79/fragment79_379450.c` | 5 | 12 | 58.3% |
 | `disasm/src/fragments/79/fragment79_379E90.c` | 3 | 7 | 57.1% |
-| `disasm/src/fragments/79/fragment79_37A6E0.c` | 125 | 330 | 62.1% |
+| `disasm/src/fragments/79/fragment79_37A6E0.c` | 124 | 330 | 62.4% |
 | `disasm/src/fragments/79/fragment79_38D510.c` | 9 | 36 | 75.0% |
 | `disasm/src/fragments/79/fragment79_38EBD0.c` | 2 | 8 | 75.0% |
 | `disasm/src/fragments/79/fragment79_38EFE0.c` | 33 | 109 | 69.7% |
-| `disasm/src/fragments/79/fragment79_393CA0.c` | 187 | 461 | 59.4% |
-| `disasm/src/fragments/79/fragment79_3ADCA0.c` | 62 | 166 | 62.7% |
+| `disasm/src/fragments/79/fragment79_393CA0.c` | 188 | 461 | 59.2% |
+| `disasm/src/fragments/79/fragment79_3ADCA0.c` | 63 | 166 | 62.0% |
 | `disasm/src/fragments/79/fragment79_3B7DB0.c` | 1 | 3 | 66.7% |
 | `disasm/src/fragments/79/fragment79_3B7EA0.c` | 14 | 49 | 71.4% |
 | `disasm/src/fragments/79/fragment79_3B9B80.c` | 17 | 28 | 39.3% |
 | `disasm/src/fragments/79/fragment79_3BC290.c` | 27 | 36 | 25.0% |
 | `disasm/src/fragments/79/fragment79_3BE6B0.c` | 2 | 4 | 50.0% |
 | `disasm/src/fragments/79/fragment79_3BEAF0.c` | 8 | 15 | 46.7% |
-| `disasm/src/fragments/79/fragment79_3BF4C0.c` | 56 | 66 | 15.2% |
+| `disasm/src/fragments/79/fragment79_3BF4C0.c` | 57 | 66 | 13.6% |
 | `disasm/src/fragments/79/fragment79_3C40B0.c` | 9 | 23 | 60.9% |
 | `disasm/src/fragments/79/fragment79_3C50B0.c` | 9 | 25 | 64.0% |
 | `disasm/src/fragments/79/fragment79_3C60B0.c` | 25 | 110 | 77.3% |

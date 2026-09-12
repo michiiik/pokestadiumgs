@@ -1422,7 +1422,13 @@ s32 func_84112418(u8 *arg0) { if (func_84111C8C()) { if (ModelAnim_IsFinished(ar
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_84112464.s")
+extern void func_84111D64(u8 *, s32);
+extern void func_84111DB4(u8 *arg0, s32 arg1);
+extern void func_84111E80(void *arg0, s16 arg1);
+extern void func_84111FEC(void);
+extern s32 func_8411DC80(u16, s32 *, s32);
+extern s32 D_84183A50[];
+void func_84112464(u8 *arg0) { extern void func_84111FEC(); u8 *self = arg0; if (*(s16 *)(self + 0x1A) == 0xFC) { func_84111D64(self, (*(u8 **)(self + 0x2D4))[0x139C]); func_84111DB4(self, 0); self[2] &= 0xFFDF; func_84111FEC((u8 *)arg0); *(u16 *)(self + 0x7F4) |= 2; return; } func_84111D64(self, (*(u8 **)(self + 0x2D4))[0x13D8]); func_84111E50(self, (*(u8 **)(self + 0x2D4))[0x13D9]); if (func_8411DC80(*(u16 *)(self + 0x1A), D_84183A50, 10) != 0) { func_84111DB4(self, 0); func_84111E80(self, 0); } else { func_84111DB4(self, 6); func_84111E80(self, 6); } self[2] &= 0xFFDF; func_84111FEC((u8 *)arg0); *(u16 *)(self + 0x7F4) |= 2; }
 #endif
 
 #ifdef VERSION_US
