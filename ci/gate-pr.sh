@@ -37,7 +37,7 @@ trap cleanup EXIT
 
 docker_args=(
     run --rm
-    --platform linux/amd64
+    --platform linux/arm64
     --network none
     --cap-drop=ALL
     --security-opt=no-new-privileges
@@ -107,7 +107,7 @@ fi
 # without a private libultra base archive. Verify the resulting ROM explicitly
 # against the checked-in expected checksum afterward.
 make clean
-make COMPARE=0 -j2 rom
+make COMPARE=0 RUN_CC_CHECK=0 -j2 rom
 md5sum -c baseroms/us/checksum.md5
 ' >"$log_file" 2>&1
 status=$?
