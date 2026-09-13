@@ -928,7 +928,7 @@ void func_86109864(void) {
 extern s64 main_pool_push_state(s32);
 extern void main_pool_pop_state(s32);
 extern u8 D_8610AD28[];
-extern void func_80027EE0(s32);
+extern void func_80027EE0(u16);
 extern u8 D_800CE060[];
 extern u8 D_800CE100[];
 extern void func_80006148(void *);

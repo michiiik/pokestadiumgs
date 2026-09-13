@@ -532,8 +532,11 @@ void func_800277F0(u16 resource_id, void *context) {
 #endif
 
 #ifdef VERSION_US
+extern void func_80027E30(void);
+extern void func_80027F4C(void);
+
 // credit to https://decomp.me/scratch/eFWz0
-void func_80027EE0(s32 arg0) {
+void func_80027EE0(u16 arg0) {
     switch (arg0) {
         case 0xFFF:
             func_80027E30();
@@ -568,7 +571,7 @@ void func_80027F4C(void) {
 
 #ifdef VERSION_US
 extern u8 D_8011F300;
-extern void func_80027EE0(s32);
+extern void func_80027EE0(u16);
 extern void func_800279C4(s32);
 
 void func_80028014(void) {
@@ -4762,7 +4765,7 @@ s32 func_8003F970(s32 arg0, u16 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_80027E30(s32);
+extern void func_80027E30(void);
 extern void func_80027F4C(void);
 extern s16 D_8012651A;
 extern s32 D_80126458[];
