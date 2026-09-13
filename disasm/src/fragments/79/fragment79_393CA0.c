@@ -1221,7 +1221,8 @@ s32 func_8412A200(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412A23C.s")
+extern void * D_841951F8[];
+s32 func_8412A23C(u8 arg0,u8 arg1){s32 result=arg1;u8 *ptr=D_841951F8[arg0];u8 *record=ptr;record+=(u32)arg1*0x58;if(result==ptr[0xA])return 1;if(result>=ptr[8])return 1;if(*(u16 *)(record+0x3E)==0)return 1;if(ptr[0x12]!=0){if(ptr[0xA]<ptr[3]){if(result<ptr[3])return 1;}else if(result>=ptr[3])return 1;}return 0;}
 #endif
 
 #ifdef VERSION_US
