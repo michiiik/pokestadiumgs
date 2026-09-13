@@ -23,6 +23,8 @@ func runRunCmd(args []string) error {
 	runsDir := fs.String("runs-dir", "", "directory each run's --out dir is created under (required)")
 	repo := fs.String("repo", "", "checkout to launch containers from, and tools/pragma_targets.py runs against (required)")
 	mergeRepo := fs.String("merge-repo", "", "checkout the merge/branch/PR/self-merge step (git fetch/checkout -B/checkout --detach/push, tools/container_merge.py, gh pr create/checks/merge/view) operates on (default: --repo)")
+	var mergePathPrefixes stringSlice
+	fs.Var(&mergePathPrefixes, "merge-path-prefix", "a git-status path prefix the merge step itself writes to in this target repo (repeatable; default: disasm/src/ and docs/regions/, this repo's own layout -- a flat src/ layout repo with no docs/regions/ convention should pass --merge-path-prefix src/ instead)")
 	maxConcurrent := fs.Int("max-concurrent", -1, "max containers running at once (default: the plan's --slots, else 4)")
 	maxPerFile := fs.Int("max-per-file", 0, "max containers running at once against the same target source file, regardless of agent (0 = unlimited); too many just race each other into PR-merge conflicts instead of adding real parallelism")
 	prBase := fs.String("pr-base", "master", "branch a run's throwaway branch is PR'd into, and (with --auto-merge) merged into")
@@ -70,6 +72,7 @@ func runRunCmd(args []string) error {
 		RunsDir:             *runsDir,
 		Repo:                *repo,
 		MergeRepo:           *mergeRepo,
+		MergePathPrefixes:   []string(mergePathPrefixes),
 		IntegrationBranch:   *prBase,
 		BaseRef:             *baseRef,
 		DefaultCooldown:     *defaultCooldown,

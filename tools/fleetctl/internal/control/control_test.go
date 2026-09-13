@@ -1297,7 +1297,7 @@ func TestRejectedOwnersSeparatesGateRejectionsFromFindingNothing(t *testing.T) {
 // 585D0-p11-r1.
 func TestBlockingDirtyPathCatchesAnyFileTheCheckoutWouldRewrite(t *testing.T) {
 	porcelain := " M disasm/Makefile\n M tools/try_pragma_compare.py\n"
-	if got := dirtyMergePath(porcelain); got != "" {
+	if got := dirtyMergePath(porcelain, defaultMergePathPrefixes); got != "" {
 		t.Fatalf("precondition: old check should not fire, got %q", got)
 	}
 	rewritten := []string{"disasm/Makefile", "tools/fleetctl/main.go"}

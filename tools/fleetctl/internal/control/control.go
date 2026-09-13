@@ -48,6 +48,17 @@ type Loop struct {
 	// should run against a different checkout, e.g. a dedicated merge
 	// worktree (docs/FLEET_CONTROLLER.md sec 6, "Merge-repo == launch-repo").
 	MergeRepo string
+	// MergePathPrefixes are the git-status path prefixes the merge step
+	// itself writes to in this target repo (touchesMergePaths), so the
+	// control loop can tell "another session's own conflicting edit" apart
+	// from "the merge step's own last output, safe to overwrite". Empty
+	// (the default zero value) falls back to defaultMergePathPrefixes --
+	// this repo's own disasm/src/, docs/regions/ layout -- so an existing
+	// caller that never sets this field keeps its current behavior
+	// unchanged. A different target repo (e.g. a flat src/ layout, no
+	// docs/regions/ convention) must set this explicitly; see
+	// --merge-path-prefix in cmd_run.go and docs/FLEET_CONTROLLER.md sec 2.
+	MergePathPrefixes []string
 	// IntegrationBranch is the branch a run's throwaway container/<id>
 	// branch is created from and, on a matched owner, PR'd back into (`gh
 	// pr create --base`/`gh pr merge`'s target -- a branch *name*, not a
@@ -198,6 +209,16 @@ func (l *Loop) mergeRepo() string {
 		return l.MergeRepo
 	}
 	return l.Repo
+}
+
+// mergePathPrefixes is MergePathPrefixes if the caller set any, else
+// defaultMergePathPrefixes (this repo's own disasm/src/, docs/regions/
+// layout) -- see MergePathPrefixes' doc.
+func (l *Loop) mergePathPrefixes() []string {
+	if len(l.MergePathPrefixes) > 0 {
+		return l.MergePathPrefixes
+	}
+	return defaultMergePathPrefixes
 }
 
 // baseRef is BaseRef if the caller set one, else "origin/<IntegrationBranch>"
@@ -958,24 +979,38 @@ func prNumberFromURL(url string) int {
 	return n
 }
 
+// defaultMergePathPrefixes is touchesMergePaths' fallback when a caller
+// leaves Loop.MergePathPrefixes unset -- this repo's own layout
+// (disasm/src/, docs/regions/), preserved exactly so an existing caller
+// that never sets the field keeps its current behavior unchanged. A
+// different target repo (a flat src/ layout, no docs/regions/ convention)
+// must set MergePathPrefixes explicitly -- see docs/FLEET_CONTROLLER.md
+// sec 2 and --merge-path-prefix in cmd_run.go.
+var defaultMergePathPrefixes = []string{"disasm/src/", "docs/regions/"}
+
 // touchesMergePaths reports whether a git-status path (already stripped of
 // its leading two-character XY code) falls inside a tree the merge step
-// itself writes to -- disasm/src/, docs/regions/ (see
-// tools/container_merge.py's own writes). Everything else -- another
-// session's own uncommitted edits elsewhere in the checkout, e.g.
-// disasm/Makefile or tools/try_pragma_compare.py -- is tolerated; see
-// dirtyMergePath and docs/FLEET_CONTROLLER.md sec 2.
+// itself writes to (see tools/container_merge.py's own writes, or that
+// target repo's equivalent). Everything else -- another session's own
+// uncommitted edits elsewhere in the checkout, e.g. disasm/Makefile or
+// tools/try_pragma_compare.py -- is tolerated; see dirtyMergePath and
+// docs/FLEET_CONTROLLER.md sec 2.
 //
-// COVERAGE.md is deliberately NOT here even though the merge step writes
-// it too: .githooks/pre-commit.d/10-coverage.sh regenerates and stages it
-// on *every* commit, so `git commit --only <file>` (tools/container_merge.py's
-// own commit path) routinely leaves a fresh, uncommitted COVERAGE.md behind
-// in the merge repo -- a leftover from the merge step's own last success,
-// never another session's conflicting work. resetGeneratedFiles discards
-// it outright before the dirty check runs, so it is never a real conflict.
-func touchesMergePaths(path string) bool {
-	return strings.HasPrefix(path, "disasm/src/") ||
-		strings.HasPrefix(path, "docs/regions/")
+// COVERAGE.md is deliberately never included even though the merge step
+// writes it too: .githooks/pre-commit.d/10-coverage.sh regenerates and
+// stages it on *every* commit, so `git commit --only <file>`
+// (tools/container_merge.py's own commit path) routinely leaves a fresh,
+// uncommitted COVERAGE.md behind in the merge repo -- a leftover from the
+// merge step's own last success, never another session's conflicting work.
+// resetGeneratedFiles discards it outright before the dirty check runs, so
+// it is never a real conflict.
+func touchesMergePaths(path string, prefixes []string) bool {
+	for _, prefix := range prefixes {
+		if strings.HasPrefix(path, prefix) {
+			return true
+		}
+	}
+	return false
 }
 
 // blockingDirtyPath returns the first locally-modified tracked file that a
@@ -1050,7 +1085,7 @@ func (l *Loop) resetGeneratedFiles(ctx context.Context, repoRoot string) error {
 // write. Untracked files are always tolerated -- only a *modification* to
 // one of these paths is a real conflict, and porcelain's rename lines
 // ("R  old -> new") are checked by their destination.
-func dirtyMergePath(porcelain string) string {
+func dirtyMergePath(porcelain string, prefixes []string) string {
 	for _, line := range strings.Split(porcelain, "\n") {
 		if len(line) < 4 || line[:2] == "??" {
 			continue
@@ -1059,7 +1094,7 @@ func dirtyMergePath(porcelain string) string {
 		if idx := strings.Index(path, " -> "); idx >= 0 {
 			path = path[idx+4:]
 		}
-		if touchesMergePaths(path) {
+		if touchesMergePaths(path, prefixes) {
 			return path
 		}
 	}
@@ -1110,7 +1145,7 @@ func (l *Loop) runMerge(ctx context.Context, rec *fleetstate.RunRecord) error {
 	if err != nil {
 		return fmt.Errorf("git status --porcelain %s: %w", mergeRepo, err)
 	}
-	if conflict := dirtyMergePath(porcelain); conflict != "" {
+	if conflict := dirtyMergePath(porcelain, l.mergePathPrefixes()); conflict != "" {
 		l.blockDirty(ctx, rec, fmt.Sprintf("merge repo %s has uncommitted changes to %s (a path this merge would touch); refusing to branch/commit until it is clean", mergeRepo, conflict))
 		return nil
 	}
