@@ -40,5 +40,9 @@ RUN make venv \
 # explicitly. The PR gate overlays only PR-controlled build inputs onto this
 # disposable image and never needs the baserom from the PR checkout.
 RUN make extract \
-    && make -j"$(nproc)" COMPARE=0 rom \
+    && make -j"$(nproc)" COMPARE=0 rom
+
+# Keep the expensive baseline build layer cacheable even when the checksum
+# check reports a repository/input mismatch.
+RUN md5sum build/pokestadiumgs-us.z64 baseroms/us/baserom.z64 \
     && md5sum -c baseroms/us/checksum.md5
