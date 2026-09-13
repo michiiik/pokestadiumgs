@@ -124,6 +124,19 @@ if ! diff -qr /src/disasm/yamls /work/disasm/yamls >/dev/null 2>&1; then
     rm -rf /work/disasm/yamls
     cp -a /src/disasm/yamls /work/disasm/yamls
     make -C disasm extract
+    # `extract` regenerates the asm/ *source* tree but does not clean
+    # build/ -- a subsegment that changes type (e.g. data -> rodata) or
+    # name renames the generated .s file, but the OLD compiled .o from
+    # the image'"'"'s baked-in build/ stays on disk with nothing to ever
+    # remove it, since make has no rule saying a file that no longer
+    # exists should delete its old output. The stale object then links
+    # in alongside the freshly-built one and fails as a duplicate
+    # symbol definition -- a real bug found on PR #390 (fragment9,
+    # `.data` -> `.rodata`), same root cause as the PR #64 case above,
+    # just manifesting as "multiple definition" instead of a silent
+    # wrong checksum. A full rebuild when the split changes is the only
+    # way to guarantee no such orphan survives.
+    rm -rf /work/disasm/build
 fi
 bash /src/container/overlay_src.sh /src
 cd /work
