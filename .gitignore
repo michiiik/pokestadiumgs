@@ -107,3 +107,6 @@ probe[0-9]*.json
 
 # Timestamped hand backups left beside a tool during an edit
 *.bak-[0-9]*
+
+# worklist has source assembly in it
+asm_worklist.html
