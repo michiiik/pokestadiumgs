@@ -160,8 +160,14 @@ extern void func_80009EB4(void *, u16, s32);
 extern void func_8000A080(s32);
 extern s32 Display_GetFramebufferClearColor(void);
 
+/* A local `ctx` variable holding this cast (computed once) makes IDO
+ * spill/rematerialize the pointer across calls instead of keeping it live
+ * in one register the way retail does. A macro that re-expands the same
+ * cast expression at every use site gets IDO to treat it the same way
+ * retail's compiler did. */
+#define ctx ((ProvisionalContext *)(void *)leoDiskID)
+
 s32 func_800017F8(void) {
-    ProvisionalContext *ctx = (ProvisionalContext *)(void *)leoDiskID;
     s32 index;
     s32 retraceCount;
     s32 pendingStateCopied;
@@ -243,6 +249,8 @@ s32 func_800017F8(void) {
 
     return retraceCount;
 }
+
+#undef ctx
 #endif
 
 #ifdef VERSION_US
