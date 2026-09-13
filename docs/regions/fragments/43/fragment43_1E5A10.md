@@ -170,3 +170,11 @@ func_8AC0444C: plateau at 0.0 (raw None), mismatch unknown; tried families: call
 ## 2026-09-08
 
 func_8AC0665C: plateau at 0.9808 (raw 0.9615), mismatch instruction_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-13
+
+func_8AC062A4: plateau at 0.9697 (raw 0.7576), mismatch instruction_drift; tried families: state_field_access; tie-pool yes
+
+## 2026-09-13
+
+func_8AC05E40: matched (call_chain:aggregate-copy:named-14-word-block), 5 iterations, agent codex
