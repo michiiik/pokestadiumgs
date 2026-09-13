@@ -18,7 +18,6 @@ RUN apt-get update \
         build-essential \
         binutils-mips-linux-gnu \
         ca-certificates \
-        gcc-multilib \
         git \
         make \
         python3 \
