@@ -1,0 +1,5 @@
+# CI and merge automation must be reviewed by the repository owner.
+/.github/workflows/ @michiiik
+/.github/CODEOWNERS @michiiik
+/ci/ @michiiik
+/COVERAGE.md @michiiik
