@@ -237,7 +237,10 @@ void func_824041F8(void) {
     func_82404150();
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82404230.s")
+extern f32 (*D_8160BD08)(f32);
+s32 func_82404230(void *arg0) {
+    return (s32) (((f32) (-((s32) (*((s16 *) (6 + ((u8 *) arg0))))))) + (((f32) ((*((s16 *) (((u8 *) arg0) + 2))) - (-((s32) (*((s16 *) (((u8 *) arg0) + 6))))))) * D_8160BD08((*((f32 *) (((u8 *) arg0) + 0x1C))) / ((f32) 8))));
+}
 
 extern s32 func_8004C874(s32, s32);
 extern s32 func_800472E0(s32);
@@ -435,7 +438,14 @@ void func_82405A58(s32 arg0, void *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82405B24.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82405BAC.s")
+extern f32 D_82409074;
+void func_82405BAC(s32 arg0, void *arg1) {
+    u8 *ptr = *(u8 **)((u8 *)arg1 + 0x14);
+    if (arg0 == 2) {
+        f32 value = (f32)ptr[8];
+        *(s16 *)((u8 *)arg1 + 0x22) = (s16)(-(value * D_82409074 / 60.0f));
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82405C0C.s")
 

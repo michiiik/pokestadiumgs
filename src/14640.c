@@ -450,7 +450,10 @@ void func_80018A74(void) {
 
 void func_80018A94(s32 arg0, s32 *arg1, s32 *arg2) { s32 offset = arg0 * 0x14; *arg1 = (*(u8 **)(D_8011BE90 + 0x2BD8))[offset + 2]; *arg2 = (*(u8 **)(D_8011BE90 + 0x2BD8))[offset + 3]; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80018ACC.s")
+extern OSMesgQueue *D_801221B4;
+extern u8 D_8011F2E5;
+typedef unsigned char AccByte;
+s32 func_80018ACC(void) { struct { s32 msg; s32 spare; } local; if (osRecvMesg(D_801221B4, (OSMesg *)&local.msg, 0) == -1) return 0; if (local.msg != D_8011F2E5) return -1; return 1; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80018B24.s")
 
@@ -485,7 +488,20 @@ s32 func_80018B78(s32 arg0) {
     func_800187AC();
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80018C14.s")
+extern s32 D_8008FA78;
+extern s32 func_80018B78(s32 arg0);
+extern u8 D_8011BE90[];
+void func_80018C14(void) {
+    volatile s32 *word_ptr;
+    volatile u8 *byte_ptr;
+    word_ptr = (s32 *)D_8011BE90;
+    word_ptr[0xB45] = 1;
+    if (D_8008FA78 != 0) {
+        func_80018B78(0);
+        byte_ptr = D_8011BE90;
+        byte_ptr[0x3454] = 0;
+    }
+}
 
 s8 func_80018C60(s32 arg0, s32 arg1, s32 arg2)
 {

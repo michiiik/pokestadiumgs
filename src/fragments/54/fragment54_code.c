@@ -321,7 +321,7 @@ extern s32 D_86606814;
 extern u8 D_86607320;
 extern s32 D_86607328;
 extern s32 D_86607378;
-extern void func_80027EE0(s32);
+extern void func_80027EE0(u16);
 extern void func_8004C09C(s32 arg0);
 extern s32 func_80047588(s32 arg0, s32 arg1);
 u8 *Asset_LoadToSegment(s32 id, u8 *rom_start, u8 *rom_end, s32 arg3);

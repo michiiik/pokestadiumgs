@@ -38,7 +38,7 @@ s32 func_8411F878(s32 arg0) {
 extern u8 *D_84193DD0; extern void func_8411FEE8(u16);
 s32 func_8411F8C4(s32 arg0) { if ((*(u16 *)((u8 *)(u32)D_84193DD0 + (arg0 << 4) + 0xE)) == 0) { func_8411FEE8(0); return 1; } return 0; }
 
-extern void func_8410B104();
+extern void func_8410B104(void);
 extern void func_800238C4(void);
 extern s32 func_8411F750(s32);
 extern void func_841125F4(s32, s32);
@@ -268,7 +268,9 @@ void BattleAnim_Vec3fSetPolarXZ(void *arg0, f32 arg1, s16 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_841204BC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_8412060C.s")
+void func_8412060C(arg0)
+void *arg0;
+{ s32 i; s32 mask; u8 *ptr; i = 0; mask = -2; ptr = (u8 *)arg0; do { ptr[0x2D9] &= mask; i++; ptr += 0x170; } while (i != 2); }
 
 extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
 extern void func_8411EFE4(s32);
@@ -638,7 +640,17 @@ void func_84122D74(s32 arg0) {
     func_84120464(arg0, D_84183C90, 0x4000);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84122DD8.s")
+extern void func_841204BC(void *, s32, s32, s32, f32);
+void func_84122DD8(void *arg0) {
+    if (*(f32 *)((u8 *)arg0 + 0x28) - *(f32 *)((u8 *)arg0 + 0x650) >= 90.0f) {
+        *(f32 *)((u8 *)arg0 + 0x28) = *(f32 *)((u8 *)arg0 + 0x650) + 90.0f;
+        return;
+    }
+    func_841204BC(arg0, 0x40000000, 0x3B03126F, 0x4000, 18.0f);
+    if (*(f32 *)((u8 *)arg0 + 0x28) - *(f32 *)((u8 *)arg0 + 0x650) >= 90.0f) {
+        *(f32 *)((u8 *)arg0 + 0x28) = *(f32 *)((u8 *)arg0 + 0x650) + 90.0f;
+    }
+}
 
 typedef struct S1_Vec3f S1_Vec3f;
 struct S1_Vec3f {

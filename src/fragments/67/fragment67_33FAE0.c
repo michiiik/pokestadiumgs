@@ -267,7 +267,31 @@ void func_82904070(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33FAE0/func_82904160.s")
+extern void func_82906808(void);
+extern s16 D_829199F8;
+extern u8 D_82919BD8[];
+extern void func_82903CDC(void *arg0);
+extern void func_82903DC0(void *arg0);
+extern void func_82903E70(void *arg0);
+extern void func_82903F54(void *arg0);
+extern void func_82904070(void);
+extern u8 D_82919A88[];
+extern u8 D_82919AF8[];
+extern u8 D_82919B68[];
+void func_82904160(void) {
+    u8 *end;
+    u8 *p1;
+    u8 *p2;
+    u8 *p3;
+    func_82906808();
+    if (D_829199F8 == 10) { func_82904070(); }
+    p1 = D_82919A88; p2 = D_82919AF8; p3 = D_82919B68; end = D_82919BD8;
+    do {
+        func_82903CDC(p1); func_82903E70(p2); func_82903F54(p3);
+        p3 += 0x1C; p1 += 0x1C; p2 += 0x1C;
+    } while (p3 != end);
+    func_82903DC0(end);
+}
 #endif
 
 #ifdef VERSION_US
@@ -581,7 +605,23 @@ void func_829053F8(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33FAE0/func_82905488.s")
+extern void StageFade_StartFromTransparent(s32);
+extern void func_800225C4(s32);
+extern void func_80064D28(void);
+extern void func_82904208(void);
+extern void func_829050C8(void *);
+extern u8 D_82918990[];
+void func_82905488(void) {
+    s32 i;
+
+    StageFade_StartFromTransparent(0x20);
+    func_800225C4(0x20);
+    for (i = 0; i < 0x20; i++) {
+        func_80064D28();
+        func_829050C8(&D_82918990);
+        func_82904208();
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -589,5 +629,52 @@ void func_829053F8(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33FAE0/func_829056A4.s")
+extern void Gfx_InitDisplayListBuffers(s32, s32);
+extern s32 func_800082E0(s32, s32, s32, s32, s32, s32);
+extern void func_80008514(s32);
+extern void func_80008574(void);
+extern void func_80047588(s32, s32);
+extern s32 func_800356CC(s32);
+extern s32 BinArchive_Open(s32, s32, s32, s32);
+extern void func_8004C09C(s32);
+extern void func_8004C8C0(s32);
+extern void func_8004C4B0(s32);
+extern void Asset_LoadToSegment(s32, u8 *, u8 *, s32);
+extern void Gfx_FreeDisplayListBuffers(void);
+extern void func_80047610(void);
+extern void func_8004C398(void);
+extern void main_pool_pop_state(s32);
+extern void func_829054F8(void);
+extern void func_829051AC(void);
+extern u8 D_1000000[];
+extern u8 D_446E30[];
+extern u8 D_447D00[];
+extern void func_829053F8(void);
+extern void func_82905488(void);
+extern void * D_82919C14;
+s32 func_829056A4(void *arg0, void *arg1) {
+    s32 sp24;
+    main_pool_push_state(0x434150);
+    Gfx_InitDisplayListBuffers(0x18000, 0);
+    sp24 = func_800082E0(0, 1, 3, 1, 2, 1);
+    func_80047588(0x13, 0);
+    D_82919D14 = BinArchive_Open(func_800356CC(0x10), 0, 1, 1);
+    D_82919C14 = (void *)arg1;
+    func_8004C09C(0x23);
+    func_8004C8C0(0x43);
+    func_8004C8C0(0x93);
+    func_8004C4B0(0x33);
+    Asset_LoadToSegment(((u32)&D_1000000 & 0x0F000000) >> 24, &D_446E30, &D_447D00, 0);
+    func_829054F8();
+    func_80008514(sp24);
+    func_829051AC();
+    func_829053F8();
+    func_82905488();
+    func_80008574();
+    func_80047610();
+    func_8004C398();
+    Gfx_FreeDisplayListBuffers();
+    main_pool_pop_state(0x434150);
+    return 0;
+}
 #endif

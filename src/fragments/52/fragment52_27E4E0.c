@@ -410,7 +410,15 @@ void func_86405778(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/52/fragment52_27E4E0/func_86405BEC.s")
+extern void func_8003F03C(void *, void *);
+extern void func_8003F018(void *);
+extern f32 D_86409B78;
+extern f32 D_86409B84;
+extern u8 D_86409C70[];
+extern void func_8003F114(u8 *, s32, s32, s32);
+extern void func_8003F1DC(u8 *);
+extern u8 * D_86416C00;
+void func_86405BEC(void) { u8 *obj; f32 value; obj = D_86416C00 + 0xC8BC; func_8003F03C(obj, D_86409C70); func_8003F1DC(obj); func_8003F114(obj, 0, -1, *(s32 *)(D_86416C00 + 0x7A8)); value = D_86409B78; *(f32 *)(obj + 0x38) = value; *(f32 *)(obj + 0x34) = value; *(f32 *)(obj + 0x30) = value; obj = D_86416C00 + 0xCA24; func_8003F018(obj); func_8003F1DC(obj); func_8003F114(obj, 0, -1, *(s32 *)(D_86416C00 + 0x7AC)); value = D_86409B84; *(f32 *)(obj + 0x38) = value; *(f32 *)(obj + 0x34) = value; *(f32 *)(obj + 0x30) = value; }
 #endif
 
 #ifdef VERSION_US
@@ -579,7 +587,56 @@ void func_864066B4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/52/fragment52_27E4E0/func_864068A4.s")
+extern u8 D_800CE060[];
+extern s32 func_87F01A40(void);
+extern s32 func_87F006AC(void);
+extern void func_86408CA0(s32, s32);
+extern void func_87F0CA30(void);
+extern void func_86408148(void);
+extern void func_800279C4(s32);
+extern void func_86406660(s32 arg0);
+extern void func_864066B4(void);
+extern u8 * D_86416C00;
+void func_864068A4(void) {
+    s32 state;
+    s32 i;
+    u8 *record;
+    u8 *object;
+    if (StageContext_GetFadeMode() == 0) {
+        state = func_87F01A40();
+    } else {
+        state = 2;
+    }
+    switch (state) {
+    case 0:
+    case 2:
+        func_864066B4();
+        record = D_800CE060;
+        object = D_86416C00 + 0x7D0;
+        for (i = 0; i < 4; i++, record += 0x28, object += 0x18C) {
+            if (*(u16 *)(record + 8) & 0x8000) {
+                *(s32 *)(object + 0xC) &= 0xFDFFFFFF;
+            }
+        }
+        if (func_87F006AC() == 1) {
+            func_800279C4(0x5F07);
+        }
+        if (func_87F006AC() == 2) {
+            *(s32 *)(D_86416C00 + 0x10) = 4;
+            func_800279C4(0x5F08);
+            func_86408CA0(0x22, 0x1E);
+            func_87F0CA30();
+            func_86408148();
+        }
+        break;
+    case 3:
+        func_86406660(0);
+        break;
+    case 4:
+        func_86406660(1);
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US

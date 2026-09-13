@@ -481,7 +481,35 @@ void func_83006FDC(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83007044.s")
+
+extern void func_800226C0(s32);
+void func_83007044(void *arg0, s32 arg1) {
+    switch (arg1) {
+        case -1:
+            *(u8 *)((u8 *)(u32)arg0 + 0x3FECD) = 1;
+            *(u8 *)((u8 *)(u32)arg0 + 0x1E) = 0;
+            func_800226C0(3);
+            return;
+        case 0:
+            return;
+        case 1:
+            *(u8 *)((u8 *)(u32)arg0 + 0x1E) = 2;
+            func_800226C0(0xA3);
+            return;
+        case 2:
+            *(u8 *)((u8 *)(u32)arg0 + 0x1E) = 3;
+            func_800226C0(0xA3);
+            return;
+        case 3:
+            *(u8 *)((u8 *)(u32)arg0 + 0x1E) = 4;
+            func_800226C0(0xA3);
+            return;
+        case 4:
+            *(u8 *)((u8 *)(u32)arg0 + 0x1E) = 5;
+            func_800226C0(0xA3);
+            return;
+    }
+}
 #endif
 
 #ifdef VERSION_US

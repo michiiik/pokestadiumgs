@@ -193,7 +193,23 @@ Fragment46LookupEntry *func_8AE00E54(s16 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE00F24.s")
+extern s16 D_8AE084E0;
+extern s16 D_8AE084E2;
+extern void * D_8AE084E4;
+s32 func_8AE00F24(void) {
+    s16 *entry;
+    entry = (s16 *)D_8AE084E4;
+loop:
+    if (entry[0] == -1) goto done;
+    if (D_8AE084E0 != entry[0]) goto next;
+    if (D_8AE084E2 != entry[1]) goto next;
+    return (s32)entry;
+next:
+    entry = (s16 *)((u8 *)entry + 0x28);
+    goto loop;
+done:
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -228,7 +244,25 @@ s32 func_8AE01164(void *arg0, u8 *arg1, s32 arg2) { typedef struct { u8 b[6]; } 
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE012B0.s")
+extern s16 D_8AE0A15C;
+s32 func_8AE012B0(s32 arg0, u8 *arg1) {
+    struct Copy4 { u8 b[4]; };
+    s32 count;
+    s32 found;
+    found = 0;
+    if (arg1 == 0) return 0;
+    count = 0;
+    for (;;) {
+        if (arg1[1] == 0xFF) return found;
+        if (arg1[1] == D_8AE0A15C) {
+            *(struct Copy4 *)((u8 *)arg0 + 0x40 + count * 4) = *(struct Copy4 *)arg1;
+            count++;
+            found = 1;
+            if (count == 3) return 1;
+        }
+        arg1 += 4;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -687,7 +721,29 @@ void func_8AE05964(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE059A8.s")
+extern f32 Math_AbsF32(f32);
+extern s16 D_8AE084EE;
+extern f32 D_8AE084F0;
+void func_8AE059A8(void *arg0, void *arg1) {
+    typedef struct { f32 x; f32 y; f32 z; } Vec3F;
+    f32 dx;
+    f32 dy;
+    f32 dz;
+    f32 ax;
+    f32 ay;
+    f32 az;
+    dx = ((Vec3F *)arg1)->x - ((Vec3F *)arg0)->x;
+    dy = ((Vec3F *)arg1)->y - ((Vec3F *)arg0)->y;
+    dz = ((Vec3F *)arg1)->z - ((Vec3F *)arg0)->z;
+    ax = Math_AbsF32(dx);
+    ay = Math_AbsF32(dy);
+    az = Math_AbsF32(dz);
+    func_8AE05964();
+    if (ax < 1.0f) ((Vec3F *)arg0)->x = ((Vec3F *)arg1)->x; else ((Vec3F *)arg0)->x += dx / D_8AE084F0;
+    if (ay < 1.0f) ((Vec3F *)arg0)->y = ((Vec3F *)arg1)->y; else ((Vec3F *)arg0)->y += dy / D_8AE084F0;
+    if (az < 1.0f) ((Vec3F *)arg0)->z = ((Vec3F *)arg1)->z; else ((Vec3F *)arg0)->z += dz / D_8AE084F0;
+    if (ax < 50.0f && ay < 50.0f && az < 50.0f) D_8AE084EE = 0;
+}
 #endif
 
 void func_8AE05B1C(void) {
@@ -815,7 +871,8 @@ void func_8AE06118(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE06198.s")
+extern void *func_80004B4C(s32, s32);
+void *func_8AE06198(s32 arg0, s32 arg1, u16 arg2) { void *base; void *result; u8 *entry; s32 offset; s32 sentinel; base = func_80004B4C(arg0, arg1); offset = *(s32 *)((u8 *)base + arg2 * 4); result = (void *)(offset + (s32)base); entry = (u8 *)result; sentinel = -1; for (;;) { if (*(s16 *)entry == sentinel) break; if (*(s32 *)(entry + 4)) *(s32 *)(entry + 4) += (s32)base; if (*(s32 *)(entry + 8)) *(s32 *)(entry + 8) += (s32)base; if (*(s32 *)(entry + 0xC)) *(s32 *)(entry + 0xC) += (s32)base; if (*(s32 *)(entry + 0x10)) *(s32 *)(entry + 0x10) += (s32)base; if (*(s32 *)(entry + 0x14)) *(s32 *)(entry + 0x14) += (s32)base; if (*(s32 *)(entry + 0x18)) *(s32 *)(entry + 0x18) += (s32)base; if (*(s32 *)(entry + 0x1C)) *(s32 *)(entry + 0x1C) += (s32)base; if (*(s32 *)(entry + 0x20)) *(s32 *)(entry + 0x20) += (s32)base; entry += 0x28; } return result; }
 #endif
 
 #ifdef VERSION_US

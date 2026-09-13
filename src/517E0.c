@@ -26,7 +26,27 @@ s32 func_80050CAC(s32 arg0, s32 arg1) {
 
 extern s32 D_800972B0[]; s32 func_80050CF8(s32 arg0){s32 result=0;if(arg0>=0&&arg0<4)result=D_800972B0[arg0];return result;}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80050D20.s")
+s32 func_80050D20(s32 arg0, s32 arg1) {
+    s32 result = -1;
+    switch (arg0) {
+    case 0x10: result = arg1 / 4; break;
+    case 0x11: result = (arg1 > 0) ? 2 : 1; break;
+    case 0x12: result = 3; break;
+    case 0x13: result = 3; break;
+    case 0x14: result = 3; break;
+    case 0x15: result = 3; break;
+    case 0x16: result = 1; break;
+    case 0x17: result = 1; break;
+    case 0x18: result = 3; break;
+    case 0x19: result = 3; break;
+    case 0x1A: result = 3; break;
+    case 0x1B: result = 3; break;
+    case 0x1C: result = 3; break;
+    case 0x1D: result = 3; break;
+    case 0x1E: result = 3; break;
+    }
+    return result;
+}
 
 s32 func_80050DE4(s32 arg0) {
     s32 result = 0;
@@ -750,7 +770,22 @@ s32 func_80054AA0(s32 arg0) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80054AF4.s")
+extern void * func_80051138(s32 arg0);
+extern void func_80051BF0(s32, void *, s32);
+void func_80054AF4(s32 arg0) {
+    void *temp_v0;
+    s32 flags;
+    temp_v0 = func_80051138(0);
+    flags = *(s32 *)((u8 *)temp_v0 + 0xC);
+    if ((arg0 >= 0) && (arg0 < 0x20)) {
+        flags |= 1 << arg0;
+        if (flags != *(s32 *)((u8 *)func_80051138(0) + 0xC)) {
+            temp_v0 = func_80051138(0);
+            *(s32 *)((u8 *)temp_v0 + 0xC) = flags;
+            func_80051BF0(0x14, 0, 2);
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80054B7C.s")
 
@@ -941,7 +976,20 @@ void func_80055DC4(s32 arg0, u8 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055EF0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055F6C.s")
+extern s32 _bcmp(const void *, const void *, s32);
+extern void * func_80051138(s32 arg0);
+extern void func_80051BF0(s32, void *, s32);
+void func_80055F6C(void *arg0, s32 arg1) {
+    struct Record { s32 a, b, c, d, e, f; };
+    if (arg1 < 0 || arg1 >= 2) {
+        return;
+    }
+    if (_bcmp(arg0, (u8 *)func_80051138(0) + arg1 * 0x18 + 0x1C, 0x18) == 0) {
+        return;
+    }
+    *(struct Record *)((u8 *)func_80051138(0) + arg1 * 0x18 + 0x1C) = *(struct Record *)arg0;
+    func_80051BF0(0x14, 0, 2);
+}
 
 s32 func_80056024(s32 arg0) { s32 result = 0; switch (arg0) { case 5: result = 1; break; case 6: result = 2; break; case 7: result = 4; break; case 8: result = 8; break; case 9: result = 0x10; break; case 10: result = 0x20; break; case 11: result = 0x40; break; case 12: result = 0x80; break; case 13: result = 0x100; break; case 14: result = 1; break; case 15: result = 2; break; case 16: result = 1; break; case 17: result = 2; break; case 18: result = 4; break; case 19: result = 8; break; case 20: result = 0x10; break; case 21: result = 0x20; break; case 22: result = 0x40; break; case 23: result = 0x80; break; case 24: result = 0x100; break; } return result; }
 

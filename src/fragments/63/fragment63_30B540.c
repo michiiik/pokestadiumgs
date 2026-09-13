@@ -123,7 +123,14 @@ s32 func_87E0835C(void *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E085CC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E087B0.s")
+extern void func_87E0ADA8(u8 *, s32, s32 *, s32, s32);
+extern void func_87E0AC8C(u8 *);
+void func_87E087B0(void *arg0) {
+    main_pool_push_state(0x434D5456);
+    func_87E0ADA8((u8 *)arg0 + 0x24, 0, (s32 *)(*(s32 *)((u8 *)arg0 + 0x20) + 0x2188), 9, 5);
+    *(s32 *)((u8 *)arg0 + 4) = 0;
+    func_87E0AC8C((u8 *)arg0 + 0x24);
+}
 
 extern void func_87E01628();
 extern void func_87E0AC6C(s32);

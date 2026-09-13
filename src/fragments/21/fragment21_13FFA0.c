@@ -21,7 +21,36 @@ s32 func_82500064(s32 arg0, s32 arg1) { switch (arg0) { case 0: D_82508F80 = arg
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_13FFA0/func_8250008C.s")
+extern u16 D_82508790;
+extern f32 D_80088E50[];
+s32 func_8250008C(s32 arg0, u8 *arg1) {
+    u16 *state;
+    u16 value;
+    unsigned int new_var2;
+    f32 sample;
+    f32 square;
+    f32 scaled;
+    f32 bias;
+    float new_var;
+    s32 result;
+    if ((arg0 != 0) && (arg0 == 1))
+    {
+        state = &D_82508790;
+        value = *state;
+        scaled = D_80088E50[value >> 4];
+        sample = scaled;
+        new_var = 255.0f;
+        square = sample * sample;
+        scaled = square * new_var;
+        bias = (scaled > 0.0f) ? (0.5f) : (-0.5f);
+        result = (s32) (bias + scaled);
+        arg1[0x33] = result;
+        arg1[0x2F] = result;
+        new_var2 = value;
+        *((0, state)) = new_var2 + 0x100;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -63,11 +92,14 @@ s32 func_825001B4(s32 arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_13FFA0/func_82500CF0.s")
+extern void *D_82508FA4[];
+s32 func_82500CF0(s32 arg0, void *arg1) { s32 index = *(s32 *)((u8 *)arg1 + 0x20); if (arg0 != 0) { if (arg0 != 1) { } } else { D_82508FA4[index] = arg1; } return 0; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_13FFA0/func_82500D24.s")
+extern s16 D_82508F94;
+extern void *D_82508FAC[];
+s32 func_82500D24(s32 arg0, void *arg1) { s32 index = *(s32 *)((u8 *)arg1 + 0x20); switch (arg0) { case 0: D_82508FAC[index] = arg1; break; case 1: *(u8 *)((u8 *)arg1 + 0x2F) = D_82508F94; break; } return 0; }
 #endif
 
 #ifdef VERSION_US
@@ -241,7 +273,15 @@ s16 func_82502924(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_13FFA0/func_82502E60.s")
+s32 func_82502E60(s32 arg0, s32 arg1, s32 arg2, void *arg3, u16 arg4) {
+    s32 result = 0;
+    if (arg0 == 1 && arg2 != -1) {
+        if (arg1 < 9) {
+            if (*(s16 *)((u8 *)(arg1 * 0x3C + 0x3C) + (u32)arg3) == 0) result = 1;
+        } else if ((arg4 & 1) == 0) { result = 1; }
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US

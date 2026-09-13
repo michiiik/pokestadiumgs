@@ -433,7 +433,15 @@ s32 func_80026298(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80026ED8.s")
+#pragma pack(1)
+typedef struct { s32 w0; s32 w4; } PackedRecord;
+#pragma pack(0)
+extern PackedRecord D_80090C84[];
+extern PackedRecord D_80090CFC;
+void func_80026ED8(u8 arg0) {
+    func_8001874C(0x06020000 | (((u8 *) &D_80090C84[arg0])[1] << 8), 0);
+    D_80090C84[arg0] = D_80090CFC;
+}
 #endif
 
 #ifdef VERSION_US
@@ -524,7 +532,26 @@ void func_800277F0(u16 resource_id, void *context) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80027EE0.s")
+extern void func_80027E30(void);
+extern void func_80027F4C(void);
+
+// credit to https://decomp.me/scratch/eFWz0
+void func_80027EE0(u16 arg0) {
+    switch (arg0) {
+        case 0xFFF:
+            func_80027E30();
+            return;
+        case 0xFFE:
+            func_80027F4C();
+            return;
+        case 0xFFD:
+            func_80027F4C();
+            func_80027E30();
+            return;
+        default:
+            return;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -544,7 +571,7 @@ void func_80027F4C(void) {
 
 #ifdef VERSION_US
 extern u8 D_8011F300;
-extern void func_80027EE0(s32);
+extern void func_80027EE0(u16);
 extern void func_800279C4(s32);
 
 void func_80028014(void) {
@@ -1233,11 +1260,35 @@ void func_800341BC(s32 arg0, s32 arg1) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80034394.s")
+extern u8 D_800D2B56;
+extern u8 D_800D2B78;
+void func_80034394(u8 arg0, s32 arg1) {
+    u8 *entry;
+
+    entry = &D_800D2B78 + (arg0 * 0x3C);
+    if (entry[3] & 0x10) {
+        entry[3] = entry[3] & 0xFFEF;
+    } else {
+        entry[3] = entry[3] & 0xFFEF;
+        D_800D2B56 = func_800347E8(arg0);
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800343FC.s")
+extern u8 D_800D2B57;
+extern u8 D_800D2B78;
+void func_800343FC(u8 arg0, s32 arg1) {
+    u8 *entry;
+
+    entry = &D_800D2B78 + (arg0 * 0x3C);
+    if (entry[3] & 0x10) {
+        entry[3] = entry[3] & 0xFFEF;
+    } else {
+        entry[3] = entry[3] & 0xFFEF;
+        D_800D2B57 = func_800347E8(arg0);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1574,7 +1625,16 @@ s32 Audio_WaitForPendingTasks(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035424.s")
+extern void *func_80008494();
+void func_80035424(s32 arg0) {
+    s32 value = arg0;
+    void *entry = func_80008494();
+    if (entry != 0) {
+        value = arg0;
+        value *= *(s8 *)((u8 *)entry + 0x10);
+    }
+    func_80025CBC(value);
+}
 #endif
 
 #ifdef VERSION_US
@@ -3153,7 +3213,29 @@ s32 func_80038474(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800384C0.s")
+S1_GraphNode *func_800384C0(void *arg0, S1_GraphNode *arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6, s32 arg7, u16 arg8) {
+    S1_GraphNode *new_var;
+    u8 *new_var2;
+    if (arg0 != 0) {
+        arg1 = MainPool_AllocAligned(arg0, 0x30, 4);
+    }
+    if (arg1 != 0) {
+        ((s32 *)(((u8 *)arg1) + 0x18))[0] = arg3;
+        ((s32 *)(((u8 *)arg1) + 0x1C))[0] = arg5;
+        ((s32 *)(((u8 *)arg1) + 0x20))[0] = arg7;
+        ((u8 *)arg1)[0x24] = (u8)arg2;
+        ((u8 *)arg1)[0x25] = (u8)arg4;
+        ((u16 *)(((u8 *)arg1) + 0x26))[0] = (u16)arg6;
+        new_var2 = (u8 *)arg1;
+        ((u16 *)(((u8 *)arg1) + 0x28))[0] = arg8;
+        ((s32 *)(new_var2 + 0x2C))[0] = 0;
+        GeoNode_Init(arg1, 0xE);
+    }
+    if (1) {
+        new_var = arg1;
+    }
+    return new_var;
+}
 #endif
 
 #ifdef VERSION_US
@@ -3685,7 +3767,24 @@ void GeoOverlay_Draw(S1_unk_D_86002F34_00C_0CC* arg0, S1_unk_D_86002F34_00C_040*
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003A440.s")
+extern s32 D_80124D60;
+extern void *D_80094924[];
+extern void func_8003A2C8(void *, ...);
+void Geo_NodeReference(void *arg0) {
+    s32 (*callback)(s32, void *);
+    void *child;
+    callback = 0;
+    child = *(void **)((u8 *)arg0 + 0x18);
+    if (child != 0 && (*(u8 *)((u8 *)child + 1) & 1) != 0) {
+        D_80124D60 = 0;
+        callback = *(s32 (**)(s32, void *))((u8 *)child + 0x10);
+        if (callback != 0) {
+            D_80124D60 = callback(2, child);
+        }
+        ((void (*)(void *))((void **)D_80094924)[*(u8 *)child])(child);
+    }
+    func_8003A2C8(arg0);
+}
 #endif
 
 #ifdef VERSION_US
@@ -3711,7 +3810,11 @@ void Geo_NodeType3Pass(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003A9CC.s")
+extern s32 D_80094914;
+extern void func_8003A960(void *, void *, Gfx **);
+extern void * D_80094908;
+extern Gfx* D_800D0510;
+void Geo_NodeOrtho(void *arg0, void *arg1) { Gfx *cmd; if (D_80094914 == 0 && *((s32 *)((u8 *)arg0 + 0xC)) != 0) { cmd = D_800D0510; D_800D0510 = cmd + 1; cmd->words.w0 = 0xDB0E0000; cmd->words.w1 = 0xFFFF; cmd = D_800D0510; D_800D0510 = cmd + 1; cmd->words.w0 = 0xDA380007; cmd->words.w1 = *((u32 *)((u8 *)D_80094908 + 0x40)) & 0x1FFFFFFF; func_8003A960(arg0, arg1, &D_800D0510); } }
 #endif
 
 #ifdef VERSION_US
@@ -3820,11 +3923,40 @@ void func_8003BEF0(void *arg0) { s32 *counter = &D_80126008; func_80039204((u8 *
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003BF9C.s")
+extern void func_80039158(void *, s32);
+extern void func_8003A2C8(void *, ...);
+extern void * D_80094908;
+extern u8 D_80124F68;
+void func_8003BF9C(void *arg0) {
+    S1_MtxF sp30;
+    u8 (*pool)[0x40] = (u8 (*)[0x40])(void *)&D_80124F68;
+    func_80036714(&sp30, (s32)((u8 *)D_80094908 + 0x64), (s32)pool[*(s32 *)((u8 *)&D_80124F68 + 0x10A0)], (s32)((u8 *)arg0 + 0x1C), *(f32 *)((u8 *)arg0 + 0x28));
+    (*(s32 *)((u8 *)&D_80124F68 + 0x10A0))++;
+    func_80039158(&sp30, 0);
+    if (*(s32 *)((u8 *)arg0 + 0x18) != 0 || *(s32 *)((u8 *)arg0 + 0x10) != 0) {
+        func_8003D888(*((u8 *)arg0 + 3), ((s32 *)&D_80124F68)[*(s32 *)((u8 *)&D_80124F68 + 0x10A0) + 0x400]);
+        if (*(void **)((u8 *)arg0 + 0x10) != 0) ((void (*)(s32, void *))(*(void **)((u8 *)arg0 + 0x10)))(5, arg0);
+        func_8003DA20(*(s32 *)((u8 *)arg0 + 0x18), (*((u8 *)arg0 + 2) & 4) != 0);
+    }
+    func_8003A2C8(arg0);
+    (*(s32 *)((u8 *)&D_80124F68 + 0x10A0))--;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003C080.s")
+extern void func_8003A2C8(void *, ...);
+extern u8 D_80124F68;
+void Geo_NodeDisplayList(void *arg0) {
+    void *root = arg0;
+    s32 callback;
+    if (*(s32 *)((u8 *)root + 0x18) != 0 || *(s32 *)((u8 *)root + 0x10) != 0) {
+        func_8003D888(*(u8 *)((u8 *)root + 3), ((s32 *)((u8 *)&D_80124F68 + 0x1000))[*(s32 *)((u8 *)&D_80124F68 + 0x10A0)]);
+        callback = *(s32 *)((u8 *)root + 0x10);
+        if (callback != 0) ((void (*)(s32, void *))callback)(5, root);
+        func_8003DA20(*(s32 *)((u8 *)root + 0x18), (*(u8 *)((u8 *)root + 2) & 4) != 0);
+    }
+    func_8003A2C8(root);
+}
 #endif
 
 #ifdef VERSION_US
@@ -3957,11 +4089,24 @@ void GeoRender_RestoreRenderMode(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003D188.s")
+extern void func_8003CBD4(void);
+extern void func_8003D188_batch_decl_marker(void);
+extern void func_8003CB3C(Gfx *arg0, u8 arg1, u8 arg2);
+extern Gfx* D_800D0510;
+extern void * D_801263A8;
+void func_8003D188(u8 *arg0) {
+    if (((u8 *)D_801263A8)[0x25] != arg0[0]) {
+        func_8003CBD4();
+        func_8003CB3C(D_800D0510++, arg0[0], arg0[1]);
+        ((u8 *)D_801263A8)[0x25] = arg0[0];
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003D1F8.s")
+extern Gfx* D_800D0510;
+extern void * D_801263A8;
+void func_8003D1F8(s32 arg0) { if (func_8003CD58(((u8 *)D_801263A8)[0x25]) == 0) { Gfx *command = D_800D0510++; command->words.w0 = 0xD7000000; command->words.w1 = 0xFFFFFFFF; } *(s32 *)((u8 *)D_801263A8 + 0x18) = 0; *(s32 *)((u8 *)D_801263A8 + 0x1C) = 0; *(s32 *)((u8 *)D_801263A8 + 0x20) = 0; }
 #endif
 
 #ifdef VERSION_US
@@ -3988,7 +4133,20 @@ void func_8003D7B8(s16 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003D808.s")
+extern u8 D_801261B1;
+s16 func_8003D808(s16 arg0) {
+    s16 value = arg0 & 0xF;
+    s16 result = value;
+    if (D_801261B1 < 0xFF) {
+        switch (value) {
+        case 1: result = 5; break;
+        case 2: result = 7; break;
+        case 3: result = 8; break;
+        case 4: result = 6; break;
+        }
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
@@ -4607,7 +4765,7 @@ s32 func_8003F970(s32 arg0, u16 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_80027E30(s32);
+extern void func_80027E30(void);
 extern void func_80027F4C(void);
 extern s16 D_8012651A;
 extern s32 D_80126458[];

@@ -19,7 +19,38 @@ void func_86300020(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/51/fragment51_275E40/func_86300120.s")
+extern void func_87D00648(void *, void *, void *);
+extern void func_87D0059C(void *, void *);
+extern u8 D_863071F0[];
+extern s32 D_863072B4;
+
+typedef struct {
+    char unk00[8];
+    u8 unk08;
+    u8 unk09;
+    char unk0A[2];
+} Unk_86307254;
+
+extern Unk_86307254 D_86307254[];
+void func_86300120(void) {
+    Unk_86307254 *entry;
+    s32 i;
+    u8 *p1;
+    u8 *p2;
+
+    entry = D_86307254;
+    i = 0;
+    if (D_863072B4 > 0) {
+        do {
+            p1 = D_863071F0 + entry->unk08 * 8;
+            p2 = D_863071F0 + entry->unk09 * 8;
+            func_87D00648(entry, p1, p2);
+            func_87D0059C(entry, (u8 *)entry + 4);
+            i += 1;
+            entry = (Unk_86307254 *)((u8 *)entry + 0xC);
+        } while (i < D_863072B4);
+    }
+}
 #endif
 
 #ifdef VERSION_US

@@ -121,7 +121,22 @@ u8 *func_88216D54(s32 arg0) { switch (arg0) { case 0: case 1: return D_88234740 
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_88216D98.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_88216E28.s")
+extern u8 * D_88234740;
+s32 func_88216E28(s8 arg0, s8 arg1) {
+    s32 result;
+    switch (arg1) {
+    case 0:
+        result = 0x1E;
+        break;
+    case 1:
+        result = 0x58;
+        break;
+    default:
+        result = ((u8 *)D_88234740)[arg0 * 7 + arg1 + 3];
+        break;
+    }
+    return result;
+}
 
 s32 func_88200D04(s32);
 s32 func_88201F0C();
