@@ -771,3 +771,15 @@ TYPE CONFLICT: void is extern void(*D_84185EB0[0x1B])(void), not extern void fun
 ## 2026-09-13
 
 func_8412A23C: matched (state-field:allocation:result-first-record-increment-zero-guard), 4 iterations, agent codex
+
+## 2026-09-13
+
+func_8412E38C: matched (call-sequence:flag-guard:pointer-local-u8), 2 iterations, agent codex
+
+## 2026-09-13
+
+func_84139EB0: plateau at 0.0 (raw None), mismatch unknown; tried families: call_sequence; tie-pool no
+
+## 2026-09-13
+
+func_8413DD94: time cap at 0.8649 (raw 0.4865) after 2400s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
