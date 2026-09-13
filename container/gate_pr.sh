@@ -134,9 +134,22 @@ if ! diff -qr /src/disasm/yamls /work/disasm/yamls >/dev/null 2>&1; then
     # symbol definition -- a real bug found on PR #390 (fragment9,
     # `.data` -> `.rodata`), same root cause as the PR #64 case above,
     # just manifesting as "multiple definition" instead of a silent
-    # wrong checksum. A full rebuild when the split changes is the only
-    # way to guarantee no such orphan survives.
-    rm -rf /work/disasm/build
+    # wrong checksum.
+    #
+    # Scoped to build/asm/us/data/** only (splat'"'"'s generated data/rodata
+    # region objects -- the only outputs whose *source path/type* a yaml
+    # subsegment edit can actually change) rather than the whole build/
+    # tree: a first attempt wiped everything, which also deletes
+    # build/pokestadiumgs-us.map before the single-pass build regenerates
+    # it, and coalesce_cc.py'"'"'s address-folding step falls back to that
+    # linked map for symbols not in the tracked symbol_addrs*.txt/
+    # undefined_syms*.ld files (see coalesce_lui.candidate_map_paths) --
+    # deleting it broke an unrelated opted-in function (func_84136D84 in
+    # fragment79_393CA0.c) with "no fold applied ... address map is
+    # missing a symbol". build/src/**.o never goes stale this way (those
+    # objects are named after persistent .c files, unaffected by a
+    # subsegment retype), so leaving them (and the map) alone is safe.
+    rm -rf /work/disasm/build/asm/us/data
 fi
 bash /src/container/overlay_src.sh /src
 cd /work
