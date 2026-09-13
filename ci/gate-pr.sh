@@ -60,7 +60,6 @@ set -euo pipefail
 # overlay baseroms: the baseline image owns the known retail reference.
 library_changed=0
 split_changed=0
-force_wrapper_rebuild=0
 if ! diff -qr /src/lib /work/lib >/dev/null 2>&1; then
     library_changed=1
 fi
@@ -97,16 +96,16 @@ fi
 
 # Rebuild a direct-IDO seed when extraction or libclean removed the baked map.
 # The coalescing wrapper needs that map to resolve dlabels before it can safely
-# apply an opted-in fold. A forced wrapper pass follows the seed build so every
-# object is rebuilt with the PR-controlled compiler wrapper.
+# apply an opted-in fold. The final ROM build is always forced after the PR
+# overlay: the image contains a retail seed ROM, and timestamp-based make
+# decisions must never be allowed to accept that seed without compiling the
+# checked-out sources.
 if [ "${split_changed}" -eq 1 ]; then
     rm -rf /work/build
-    force_wrapper_rebuild=1
 fi
 if [ ! -f /work/build/pokestadiumgs-us.map ]; then
     echo "gate-pr.sh: linked map missing; rebuilding direct-IDO seed" >&2
     make CC=tools/ido/linux/7.1/cc COMPARE=0 -j2 rom
-    force_wrapper_rebuild=1
 fi
 
 # Produce the proposed coverage snapshot even when the ROM build later
@@ -124,11 +123,7 @@ fi
 # without a private libultra base archive. Verify the resulting ROM explicitly
 # against the checked-in expected checksum afterward.
 make cc-check RUN_CC_CHECK=1
-if [ "${force_wrapper_rebuild}" -eq 1 ]; then
-    make -B COMPARE=0 -j2 rom
-else
-    make COMPARE=0 -j2 rom
-fi
+make -B COMPARE=0 -j2 rom
 md5sum -c baseroms/us/checksum.md5
 ' >"$log_file" 2>&1
 status=$?
