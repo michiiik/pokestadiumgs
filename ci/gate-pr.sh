@@ -59,6 +59,8 @@ set -euo pipefail
 # Overlay all tracked inputs that can affect the public root build. Never
 # overlay baseroms: the baseline image owns the known retail reference.
 library_changed=0
+split_changed=0
+force_wrapper_rebuild=0
 if ! diff -qr /src/lib /work/lib >/dev/null 2>&1; then
     library_changed=1
 fi
@@ -80,6 +82,7 @@ fi
 
 # A YAML change changes the split. Re-extract before compiling against it.
 if ! diff -qr /src/yamls /work/yamls >/dev/null 2>&1; then
+    split_changed=1
     echo "gate-pr.sh: split inputs changed; re-running extraction" >&2
     rm -rf /work/yamls
     cp -a /src/yamls /work/yamls
@@ -90,6 +93,20 @@ fi
 # disposable container and does not touch the host checkout.
 if [ "${library_changed}" -eq 1 ]; then
     make libclean
+fi
+
+# Rebuild a direct-IDO seed when extraction or libclean removed the baked map.
+# The coalescing wrapper needs that map to resolve dlabels before it can safely
+# apply an opted-in fold. A forced wrapper pass follows the seed build so every
+# object is rebuilt with the PR-controlled compiler wrapper.
+if [ "${split_changed}" -eq 1 ]; then
+    rm -rf /work/build
+    force_wrapper_rebuild=1
+fi
+if [ ! -f /work/build/pokestadiumgs-us.map ]; then
+    echo "gate-pr.sh: linked map missing; rebuilding direct-IDO seed" >&2
+    make CC=tools/ido/linux/7.1/cc COMPARE=0 -j2 rom
+    force_wrapper_rebuild=1
 fi
 
 # Produce the proposed coverage snapshot even when the ROM build later
@@ -106,8 +123,12 @@ fi
 # Makefile; disabling the nested archive comparison lets that source build run
 # without a private libultra base archive. Verify the resulting ROM explicitly
 # against the checked-in expected checksum afterward.
-make clean
-make COMPARE=0 -j2 rom
+make cc-check RUN_CC_CHECK=1
+if [ "${force_wrapper_rebuild}" -eq 1 ]; then
+    make -B COMPARE=0 -j2 rom
+else
+    make COMPARE=0 -j2 rom
+fi
 md5sum -c baseroms/us/checksum.md5
 ' >"$log_file" 2>&1
 status=$?
