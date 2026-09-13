@@ -763,3 +763,11 @@ func_841292C4: matched (call_sequence:clamp:direct-index:delta-first-casts), 1 i
 ## 2026-09-09
 
 func_84129C8C: matched (call-sequence:direct-index:explicit-u8-result), 1 iterations, agent codex
+
+## 2026-09-13
+
+TYPE CONFLICT: void is extern void(*D_84185EB0[0x1B])(void), not extern void func_84134CBC(u8, u8)
+
+## 2026-09-13
+
+func_8412A23C: matched (state-field:allocation:result-first-record-increment-zero-guard), 4 iterations, agent codex
