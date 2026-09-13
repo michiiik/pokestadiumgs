@@ -1,6 +1,15 @@
 #!/usr/bin/env python3
 """Object-level splice: replace one function's compiled bytes in an ``.o``.
 
+``replace_function_bytes`` is the live entry point: it installs a shorter
+function body into an object and fixes up everything that implies (end-of
+-section padding, later symbols' values, later relocations' offsets,
+section-relative addends). ``coalesce_object`` calls it with a body it
+derived from the object's own machine code. ``splice_function`` is the older
+two-object form -- it gets the replacement from a separately assembled inner
+object -- and is no longer on the build path, but its tests are what cover
+``replace_function_bytes``.
+
 Why this exists (see ``coalesce_lui.py``'s module docstring for the full
 story): folding a shared-page ``lui $at`` run requires re-assembling the
 *whole* changed compilation unit's ``.s`` output, and this project's IDO port
@@ -148,45 +157,103 @@ def splice_function(outer_bytes: bytes, inner_bytes: bytes, function_name: str) 
     build has never had reason to reference is treated as a hard stop, not
     a guess).
     """
-    outer = elf32.parse(outer_bytes)
     inner = elf32.parse(inner_bytes)
-
-    text_index = outer.section_index(".text")
-    if text_index is None or inner.section_index(".text") is None:
+    if inner.section_index(".text") is None:
         raise SpliceError("both objects must have a .text section")
 
-    outer_symbols = outer.symbols()
     inner_symbols = inner.symbols()
-
-    outer_func_index = _find_symbol_index(outer_symbols, function_name, text_index)
     inner_func_index = _find_symbol_index(inner_symbols, function_name, None)
-    if outer_func_index is None:
-        raise SpliceError(f"{function_name} not found (or undefined) in the outer object")
     if inner_func_index is None:
         raise SpliceError(f"{function_name} not found (or undefined) in the inner object")
 
-    outer_sym = outer_symbols[outer_func_index]
     inner_sym = inner_symbols[inner_func_index]
-    old_size = outer_sym.size
     new_size = inner_sym.size
-    if old_size <= 0:
-        raise SpliceError(f"{function_name} has non-positive outer size {old_size}")
     if new_size <= 0:
         raise SpliceError(
             f"{function_name}'s folded form has non-positive size {new_size} "
             "-- the GNU as snippet is missing a `.size` directive?"
         )
-
-    outer_text_sec = outer.section(".text")
     inner_text_sec = inner.section(".text")
-    lo, hi = outer_sym.value, outer_sym.value + old_size
-    if hi > len(outer_text_sec.data):
-        raise SpliceError(f"{function_name}'s outer range runs past the end of .text")
     ilo, ihi = inner_sym.value, inner_sym.value + new_size
     if ihi > len(inner_text_sec.data):
         raise SpliceError(f"{function_name}'s inner range runs past the end of .text")
 
-    new_text = outer_text_sec.data[:lo] + inner_text_sec.data[ilo:ihi] + outer_text_sec.data[hi:]
+    named_relocations = []
+    for rel in inner.relocations(".rel.text"):
+        if not (ilo <= rel.offset < ihi):
+            continue  # cannot happen in a single-function inner object; skip
+            # defensively rather than let it leak into the wrong place.
+        if rel.sym_index >= len(inner_symbols):
+            raise SpliceError(f"{function_name}: inner relocation has an out-of-range symbol index")
+        target_symbol = inner_symbols[rel.sym_index]
+        if not target_symbol.name or (target_symbol.info & 0xF) == STT_SECTION:
+            raise SpliceError(
+                f"{function_name}: a folded relocation references an unnamed "
+                "or section-relative symbol -- e.g. a self-contained jump "
+                "table or literal pool inside the folded function itself -- "
+                "which this mechanism cannot safely re-target by name"
+            )
+        named_relocations.append(
+            (rel.offset - ilo, target_symbol.name, rel.type)
+        )
+
+    return replace_function_bytes(
+        outer_bytes,
+        function_name,
+        inner_text_sec.data[ilo:ihi],
+        named_relocations,
+    )
+
+
+def replace_function_bytes(
+    outer_bytes: bytes,
+    function_name: str,
+    new_func_bytes: bytes,
+    named_relocations,
+) -> bytes:
+    """Replace one function's ``.text`` bytes and relocations inside an object.
+
+    This is the object-surgery half of :func:`splice_function`, factored out
+    so it can serve *both* producers of a folded function body:
+
+    * :func:`splice_function`, which gets the replacement from a separately
+      compiled and assembled inner object (the original text-level path), and
+    * ``coalesce_object.fold_function_in_object``, which rewrites the outer
+      object's own already-correctly-scheduled machine code in place and so
+      never involves a second assembler pass at all.
+
+    ``named_relocations`` is ``[(offset_within_new_func_bytes, symbol_name,
+    reloc_type)]``; every named symbol must already exist in the outer
+    object's symbol table, which it always does for a fold (a fold only ever
+    *drops* relocations, never invents a reference the normal build did not
+    already have).
+    """
+    outer = elf32.parse(outer_bytes)
+
+    text_index = outer.section_index(".text")
+    if text_index is None:
+        raise SpliceError("both objects must have a .text section")
+
+    outer_symbols = outer.symbols()
+
+    outer_func_index = _find_symbol_index(outer_symbols, function_name, text_index)
+    if outer_func_index is None:
+        raise SpliceError(f"{function_name} not found (or undefined) in the outer object")
+
+    outer_sym = outer_symbols[outer_func_index]
+    old_size = outer_sym.size
+    new_size = len(new_func_bytes)
+    if old_size <= 0:
+        raise SpliceError(f"{function_name} has non-positive outer size {old_size}")
+    if new_size <= 0:
+        raise SpliceError(f"{function_name}'s folded form has non-positive size {new_size}")
+
+    outer_text_sec = outer.section(".text")
+    lo, hi = outer_sym.value, outer_sym.value + old_size
+    if hi > len(outer_text_sec.data):
+        raise SpliceError(f"{function_name}'s outer range runs past the end of .text")
+
+    new_text = outer_text_sec.data[:lo] + new_func_bytes + outer_text_sec.data[hi:]
     delta = new_size - old_size
     new_text = _retrim_trailing_padding(
         new_text,
@@ -243,20 +310,11 @@ def splice_function(outer_bytes: bytes, inner_bytes: bytes, function_name: str) 
     }
 
     translated = []
-    for rel in inner.relocations(".rel.text"):
-        if not (ilo <= rel.offset < ihi):
-            continue  # cannot happen in a single-function inner object; skip
-            # defensively rather than let it leak into the wrong place.
-        if rel.sym_index >= len(inner_symbols):
-            raise SpliceError(f"{function_name}: inner relocation has an out-of-range symbol index")
-        target_symbol = inner_symbols[rel.sym_index]
-        target_name = target_symbol.name
-        if not target_name or (target_symbol.info & 0xF) == STT_SECTION:
+    for func_offset, target_name, rel_type in named_relocations:
+        if not (0 <= func_offset < new_size):
             raise SpliceError(
-                f"{function_name}: a folded relocation references an unnamed "
-                "or section-relative symbol -- e.g. a self-contained jump "
-                "table or literal pool inside the folded function itself -- "
-                "which this mechanism cannot safely re-target by name"
+                f"{function_name}: a replacement relocation at {func_offset:#x} "
+                "falls outside the function's own new byte range"
             )
         outer_index = outer_name_to_index.get(target_name)
         if outer_index is None:
@@ -266,9 +324,7 @@ def splice_function(outer_bytes: bytes, inner_bytes: bytes, function_name: str) 
                 "symbol table entry for -- refusing to guess"
             )
         translated.append(
-            elf32.Relocation(
-                offset=lo + (rel.offset - ilo), sym_index=outer_index, type=rel.type
-            )
+            elf32.Relocation(offset=lo + func_offset, sym_index=outer_index, type=rel_type)
         )
 
     for sec in outer.sections:

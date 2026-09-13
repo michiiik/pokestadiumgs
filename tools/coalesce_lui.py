@@ -8,8 +8,8 @@ symbols on the same page, because at assembly time relocation addresses are
 unresolved and the assembler cannot prove two distinct symbols share a page.
 
 This ROM is a *matching* decompilation: every data symbol's final address is
-already fixed (see ``linker_scripts/us/symbol_addrs*.txt`` and the linked
-``build/pokestadiumgs-us.map``), so a small, strictly opt-in,
+already fixed (see ``linker_scripts/us/symbol_addrs*.txt`` and the
+linked ``build/pokestadiumgs-us.map``), so a small, strictly opt-in,
 post-compile text transform can prove same-page-ness and fold the redundant
 ``lui`` -- reproducing an assembler artifact that occurs in the ground-truth
 ROM but that no C spelling alone can make either compiler emit.
@@ -38,6 +38,21 @@ gates must both agree before any bytes are folded:
    ``$at``) is left completely alone; the opt-in pragma alone is not
    sufficient to change output.
 
+Not on the build path any more
+------------------------------
+``coalesce_cc.py`` folds the *compiled object* now
+(``coalesce_object.fold_function_in_object``), because this text-level route
+had to re-assemble what it folded and that round trip does not preserve
+IDO's own ``cc -c`` scheduling -- see ``coalesce_object``'s module docstring
+for the measurement. What stays live here is the address map
+(``resolve_repo_addresses``/``hi16``/``lo16``) and the pragma parsing
+(``find_coalesce_markers``/``find_coalesce_symbol_filters``), all of which
+the object fold uses directly. ``fold_source`` and
+``prepare_snippet_for_gnu_as`` are retained as the text-level statement of
+the fold's semantics -- ``scan_coalesce_sites.py`` defines "contiguous" in
+terms of ``fold_source`` -- and remain unit-tested, but nothing compiles
+through them.
+
 Assembler quirk this module works around
 -----------------------------------------
 The naive fold -- repeating ``%lo(OTHER_SYMBOL)($at)`` for every symbol in
@@ -58,6 +73,7 @@ the full empirical trail.
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping
 from pathlib import Path
 
 # A bare macro-form memory op: no base register, just a symbol. This is what
@@ -89,8 +105,16 @@ _SYMBOL_ADDR_LINE = re.compile(r'^\s*([A-Za-z_.$][\w.$]*)\s*=\s*0x([0-9A-Fa-f]+)
 # extra columns (a section name, a size, a path) and must not be matched.
 _MAP_SYMBOL_LINE = re.compile(r'^\s{2,}0x([0-9A-Fa-f]{6,16})\s+([A-Za-z_.$][\w.$]*)\s*$')
 
+# ``#pragma COALESCE_AT_LUI(func)`` folds every foldable run in ``func``.
+# The optional trailing symbol list -- ``COALESCE_AT_LUI(func, S1, S2, S3)`` --
+# narrows that to the named symbols: an op addressing anything else is left
+# alone *and* cuts the run there. Ground truth sometimes reuses one ``$at``
+# for part of a same-page group and then reloads it (``func_82300A78`` folds
+# D_82305EC4/EC6/EC2 but keeps a second ``lui`` for the equally same-page
+# D_82305EC8), which a greedy maximal-run fold cannot express.
 _COALESCE_PRAGMA = re.compile(
-    r'^[ \t]*#pragma\s+COALESCE_AT_LUI\s*\(\s*([A-Za-z_]\w*)\s*\)[ \t]*$',
+    r'^[ \t]*#pragma\s+COALESCE_AT_LUI\s*\(\s*([A-Za-z_]\w*)\s*'
+    r'((?:,\s*[A-Za-z_.$][\w.$]*\s*)*)\)[ \t]*$',
     re.MULTILINE,
 )
 
@@ -164,8 +188,9 @@ def _primary_worktree_root(repo_root: Path) -> Path | None:
     """Return the primary checkout for a linked Git worktree, if known.
 
     A small local copy of the same lookup ``tools/try_pragma_compare.py``
-    already performs: kept independent since it is a handful of lines with
-    no other dependency.
+    already performs: kept independent (rather than imported across the
+    top-level tools boundary) since it is a handful of
+    lines with no other dependency.
     """
     git_file = repo_root / ".git"
     try:
@@ -195,23 +220,35 @@ def candidate_map_paths(repo_root: Path):
     read-only reference for a linked worktree.
     """
     repo_root = Path(repo_root)
-    yield repo_root / "build" / "pokestadiumgs-us.map"
+    yield repo_root / "disasm" / "build" / "pokestadiumgs-us.map"
     primary = _primary_worktree_root(repo_root)
     if primary is not None:
-        yield primary / "build" / "pokestadiumgs-us.map"
+        yield primary / "disasm" / "build" / "pokestadiumgs-us.map"
 
 
 def resolve_repo_addresses(repo_root: Path) -> dict[str, int]:
     """Best-effort authoritative ``{symbol: address}`` map for this checkout.
 
     ``symbol_addrs*.txt`` is preferred (tracked, always available, no build
-    required). A linked ``.map`` fills in fixed dlabel-only addresses that
-    ``symbol_addrs`` does not carry (this project's convention keeps most
-    ``dlabel``s out of ``symbol_addrs*.txt`` entirely).
+    required), then the tracked ``undefined_syms*.ld`` scripts -- splat writes
+    every symbol it could not attach to a segment there in the very same
+    ``NAME = 0xADDR;`` form, and for a data page referenced only from still-
+    ``GLOBAL_ASM`` code that file is usually the *only* tracked place the
+    address appears (``D_82305EC2``/``D_82305EC6`` in
+    ``fragments/19/fragment19_121100`` are the worked example). A linked
+    ``.map`` then fills in fixed dlabel-only addresses that neither carries
+    (this project's convention keeps most ``dlabel``s out of
+    ``symbol_addrs*.txt`` entirely); note it only lists such an alias in ld's
+    ``PROVIDE``-assignment shape, which ``parse_linker_map`` deliberately does
+    not match, so the ``.ld`` scripts are not redundant with it.
     """
     repo_root = Path(repo_root)
     linker_scripts = repo_root / "linker_scripts"
-    addrs = parse_symbol_addrs(sorted(linker_scripts.glob("*/symbol_addrs*.txt")))
+    addrs = parse_symbol_addrs(
+        sorted(linker_scripts.glob("*/symbol_addrs*.txt"))
+        + sorted(linker_scripts.glob("*/undefined_syms*.ld"))
+        + sorted(linker_scripts.glob("*/auto/undefined_syms*.ld"))
+    )
     for map_path in candidate_map_paths(repo_root):
         if not map_path.is_file():
             continue
@@ -229,7 +266,34 @@ def find_coalesce_markers(source_text: str) -> set[str]:
     build-behavior-altering markers: this is opt-in one function at a time,
     and the marker sits textually with the function it applies to.
     """
-    return set(_COALESCE_PRAGMA.findall(source_text))
+    return {match[0] for match in _COALESCE_PRAGMA.findall(source_text)}
+
+
+def find_coalesce_symbol_filters(source_text: str) -> dict:
+    """``{function: frozenset(symbols) | None}`` for every opted-in function.
+
+    ``None`` means the bare ``COALESCE_AT_LUI(func)`` form: fold every run
+    the address map proves shares a page (the original, and still the common,
+    spelling). A frozenset is the narrowed form described on
+    ``_COALESCE_PRAGMA``: only ops addressing one of those symbols may fold,
+    and one that does not also *ends* the run it appears in, which is how a
+    ground-truth partial fold is spelled.
+
+    Repeating the pragma for one function unions the listed symbols; a bare
+    marker anywhere for that function wins outright (it is the wider request).
+    """
+    filters: dict = {}
+    for name, symbol_text in _COALESCE_PRAGMA.findall(source_text):
+        symbols = [part.strip() for part in symbol_text.split(',') if part.strip()]
+        if not symbols:
+            filters[name] = None
+            continue
+        if name in filters:
+            if filters[name] is None:
+                continue
+            symbols.extend(filters[name])
+        filters[name] = frozenset(symbols)
+    return filters
 
 
 def functions_defined(asm_text: str) -> set[str]:
@@ -353,6 +417,15 @@ def prepare_snippet_for_gnu_as(
     return ''.join(externs) + preamble + ''.join(kept_lines) + trailer
 
 
+def _symbol_allowed(op_match, symbol_filter) -> bool:
+    """Whether a matched macro mem-op may take part in a fold.
+
+    ``symbol_filter`` of ``None`` (the bare pragma) allows everything; a
+    frozenset restricts folding to the symbols the pragma named.
+    """
+    return symbol_filter is None or op_match.group('sym') in symbol_filter
+
+
 def fold_source(
     text: str, allowed_functions, address_map: dict[str, int]
 ) -> tuple[str, int]:
@@ -375,7 +448,10 @@ def fold_source(
     docstring); the literal-immediate form was verified byte-identical
     against the linked ROM with IDO's own assembler.
     """
-    allowed = set(allowed_functions)
+    if isinstance(allowed_functions, Mapping):
+        allowed = dict(allowed_functions)
+    else:
+        allowed = {name: None for name in allowed_functions}
     lines = text.splitlines(keepends=True)
     out: list[str] = []
     current_function: str | None = None
@@ -392,9 +468,12 @@ def fold_source(
             current_function = None
 
         stripped = line.rstrip('\n')
+        symbol_filter = allowed.get(current_function) if current_function in allowed else None
         op_match = (
             _MACRO_MEM_OP.match(stripped) if current_function in allowed else None
         )
+        if op_match is not None and not _symbol_allowed(op_match, symbol_filter):
+            op_match = None
         if op_match is None:
             out.append(line)
             i += 1
@@ -407,6 +486,8 @@ def fold_source(
         while j < n:
             candidate = lines[j].rstrip('\n')
             mm = _MACRO_MEM_OP.match(candidate)
+            if mm is not None and not _symbol_allowed(mm, symbol_filter):
+                break
             if mm is not None:
                 run.append(('op', mm))
                 j += 1
