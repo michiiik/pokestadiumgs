@@ -37,3 +37,15 @@ func_84151420: matched (call_sequence:guard:integer-base), 2 iterations, agent c
 ## 2026-09-09
 
 func_84150330: plateau at 0.9688 (raw 0.8438), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-13
+
+func_84152088: time cap at 0.9362 (raw 0.4468) after 2400s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-13
+
+func_84151838: matched (call_sequence:table-update:entry-table-amount-decl-order), 1 iterations, agent codex
+
+## 2026-09-13
+
+func_84151A5C: plateau at 0.925 (raw 0.6), mismatch instruction_drift; tried families: call_sequence; tie-pool no
