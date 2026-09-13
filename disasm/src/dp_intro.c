@@ -98,13 +98,165 @@ void func_8000177C(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_800017F8.s")
+
+typedef struct FramebufferInfo {
+    u8 padding00[4];
+    u16 unk4;
+    u8 padding06[2];
+    void *unk8;
+} FramebufferInfo;
+
+typedef struct ProvisionalContext {
+    u8 padding000[0x1C8];
+    s32 unk1C8;
+
+    u8 padding1CC[0x814];
+    FramebufferInfo *unk9E0;
+
+    u8 padding9E4[0xA8];
+    f32 unkA8C;
+
+    u8 paddingA90[3];
+    u8 unkA93;
+    s32 unkA94;
+
+    u8 paddingA98[4];
+    s32 unkA9C;
+
+    u8 unkAA0;
+    u8 unkAA1;
+    u8 unkAA2;
+    u8 paddingAA3;
+    s32 unkAA4;
+
+    u8 paddingAA8[4];
+    FramebufferInfo *unkAAC;
+
+    u8 unkAB0;
+    u8 unkAB1;
+    u8 unkAB2;
+    u8 unkAB3;
+
+    u8 paddingAB4[8];
+    s32 unkABC;
+} ProvisionalContext;
+
+typedef struct FourWords {
+    u32 word0;
+    u32 word4;
+    u32 word8;
+    u32 wordC;
+} FourWords;
+
+extern u8 D_800AB400;
+extern FourWords D_800AB470;
+extern FourWords D_800AB480;
+extern FourWords D_800AB490;
+extern s32 D_800871D0;
+extern void func_80004BEC(void *);
+extern s32 func_80004F34(void *);
+extern s32 Sched_TryReceiveClientQueue(void *);
+extern void func_80009EB4(void *, u16, s32);
+extern void func_8000A080(s32);
+extern s32 Display_GetFramebufferClearColor(void);
+
+/* A local `ctx` variable holding this cast (computed once) makes IDO
+ * spill/rematerialize the pointer across calls instead of keeping it live
+ * in one register the way retail does. A macro that re-expands the same
+ * cast expression at every use site gets IDO to treat it the same way
+ * retail's compiler did. */
+#define ctx ((ProvisionalContext *)(void *)leoDiskID)
+
+s32 func_800017F8(void) {
+    s32 index;
+    s32 retraceCount;
+    s32 pendingStateCopied;
+
+    retraceCount = 0;
+    pendingStateCopied = 0;
+
+    if (ctx->unkAA4 != 0) {
+        func_80004BEC(&D_800AB400);
+    }
+
+    if ((ctx->unkA94 != 0) &&
+        (ctx->unkABC != ctx->unkA9C) &&
+        (ctx->unkAB3 != ctx->unkA93)) {
+        func_80001684(&D_800AB400, &D_800AB470, 1);
+        pendingStateCopied = 1;
+    }
+
+    for (index = 1; index < (s32)ctx->unkAB0; index++) {
+        if (func_80004F34(ctx) == 0x56545245) {
+            retraceCount++;
+        }
+    }
+
+    if (ctx->unk1C8 > 0) {
+        do {
+            if (Sched_TryReceiveClientQueue(ctx) == 0x56545245) {
+                retraceCount++;
+            }
+        } while (ctx->unk1C8 > 0);
+    }
+
+    if (ctx->unkAAC != NULL) {
+        osViSwapBuffer(ctx->unkAAC->unk8);
+        osViRepeatLine(0);
+
+        if ((ctx->unkAA1 != ctx->unkAB1) ||
+            (ctx->unkAA2 != ctx->unkAB2)) {
+            Vi_SelectMode((s8)ctx->unkAA1, (s8)ctx->unkAA2);
+        }
+
+        if (D_800871D0 != 0) {
+            osViBlack(1);
+            osViSetYScale(1.0f);
+        } else {
+            osViBlack(0);
+            osViSetYScale(ctx->unkA8C);
+        }
+
+        func_80009EB4(ctx->unkAAC->unk8, ctx->unkAAC->unk4, 0x10);
+    } else {
+        if (((Display_GetFramebufferClearColor() | 1) & 0xFFFF) != 1) {
+            osViRepeatLine(1);
+        } else {
+            osViBlack(1);
+            osViSetYScale(1.0f);
+        }
+
+        osViSwapBuffer(ctx->unk9E0->unk8);
+
+        if ((ctx->unkAA1 != ctx->unkAB1) ||
+            (ctx->unkAA2 != ctx->unkAB2)) {
+            Vi_SelectMode((s8)ctx->unkAA1, (s8)ctx->unkAA2);
+        }
+    }
+
+    if ((pendingStateCopied == 0) && (ctx->unkA94 != 0)) {
+        func_80001684(&D_800AB400, &D_800AB470, 0);
+    }
+
+    D_800AB490 = D_800AB480;
+    D_800AB480 = D_800AB470;
+
+    func_8000A080(3);
+
+    if (func_80004F34(ctx) == 0x56545245) {
+        retraceCount++;
+    }
+
+    return retraceCount;
+}
+
+#undef ctx
 #endif
 
 #ifdef VERSION_US
 
-extern void func_80004F34(void *);
-extern void Sched_TryReceiveClientQueue(void *);
+extern s32 func_80004F34(void *);
+extern s32 Sched_TryReceiveClientQueue(void *);
 
 void DisplayWorker_DrainEvents(void) {
     func_80004F34(leoDiskID);

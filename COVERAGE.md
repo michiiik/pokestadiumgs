@@ -77,7 +77,7 @@
 | `disasm/src/C380.c` | 8 | 8 | 0.0% |
 | `disasm/src/C890.c` | 4 | 4 | 0.0% |
 | `disasm/src/CE80.c` | 20 | 48 | 58.3% |
-| `disasm/src/dp_intro.c` | 2 | 26 | 92.3% |
+| `disasm/src/dp_intro.c` | 1 | 26 | 96.2% |
 | `disasm/src/fragments/1/fragment1_code.c` | 18 | 24 | 25.0% |
 | `disasm/src/fragments/10/fragment10_D4C50.c` | 5 | 5 | 0.0% |
 | `disasm/src/fragments/10/fragment10_D5250.c` | 18 | 27 | 33.3% |
