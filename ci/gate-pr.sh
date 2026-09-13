@@ -102,9 +102,13 @@ if [ -d /out ]; then
 fi
 
 # Force the complete source tree through the same host syntax check performed
-# by each C-object recipe, then compare the resulting ROM byte-for-byte.
+# by each C-object recipe. libultra is rebuilt with FIXUPS by the root
+# Makefile; disabling the nested archive comparison lets that source build run
+# without a private libultra base archive. Verify the resulting ROM explicitly
+# against the checked-in expected checksum afterward.
 make clean
-make COMPARE=1 -j2 rom
+make COMPARE=0 -j2 rom
+md5sum -c baseroms/us/checksum.md5
 ' >"$log_file" 2>&1
 status=$?
 set -e

@@ -35,7 +35,10 @@ RUN make venv \
     && make setup
 
 # Generate the ignored asm/assets trees from the local baserom, then bake a
-# matching baseline. The PR gate overlays only PR-controlled build inputs onto
-# this disposable image and never needs the baserom from the PR checkout.
+# matching baseline. libultra is built with FIXUPS by the root Makefile, so the
+# top-level build must disable archive comparison and verify the final ROM
+# explicitly. The PR gate overlays only PR-controlled build inputs onto this
+# disposable image and never needs the baserom from the PR checkout.
 RUN make extract \
-    && make -j"$(nproc)" COMPARE=1 rom
+    && make -j"$(nproc)" COMPARE=0 rom \
+    && md5sum -c baseroms/us/checksum.md5
