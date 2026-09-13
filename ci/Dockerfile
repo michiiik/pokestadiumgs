@@ -35,12 +35,13 @@ RUN make venv \
     && make setup
 
 # The public repository is a partial decompilation, so it cannot be required
-# to build before the gate has had a chance to validate the PR-controlled
-# source. Seed the disposable image with the verified retail reference and a
-# map sentinel; ci/gate-pr.sh always overlays the checkout and performs the
-# real compile/link/checksum gate. The ROM is supplied outside Git and is
-# removed from the isolated checkout by ci/build-baseline.sh after the build.
-RUN mkdir -p build \
+# to link before the gate has had a chance to validate the PR-controlled
+# source. Extraction is still required to provide the generated asm/assets
+# inputs; ci/gate-pr.sh always overlays the checkout and forces the real
+# compile/link/checksum gate. The ROM is supplied outside Git and is removed
+# from the isolated checkout by ci/build-baseline.sh after the build.
+RUN make extract \
+    && mkdir -p build \
     && cp baseroms/us/baserom.z64 build/pokestadiumgs-us.z64 \
     && : > build/pokestadiumgs-us.map \
     && md5sum build/pokestadiumgs-us.z64 baseroms/us/baserom.z64
