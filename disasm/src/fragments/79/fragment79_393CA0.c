@@ -2067,7 +2067,7 @@ extern u8 D_841951BD;
 extern u8 D_841951BF;
 extern u8 * D_84195200[];
 extern u8 * D_84195208[];
-void func_8412F208(void) {
+void BattleAnim_Table_84186004_009(void) {
     u8 *record;
     if (func_841262C4(D_841951BC) != 0) {
         func_84134DD8(D_841951BF);
