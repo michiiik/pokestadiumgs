@@ -783,3 +783,19 @@ func_84139EB0: plateau at 0.0 (raw None), mismatch unknown; tried families: call
 ## 2026-09-13
 
 func_8413DD94: time cap at 0.8649 (raw 0.4865) after 2400s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-13
+
+func_84133304: time cap at 0.9747 (raw 0.7848) after 2426s, mismatch operand_or_scheduling_drift; tried families: call-sequence; tie-pool no
+
+## 2026-09-13
+
+func_8412B51C: matched (call_sequence:two-branches:typed-pointer-direct-table), 1 iterations, agent codex
+
+## 2026-09-13
+
+func_8412F208: matched (call_sequence:direct-record:raw-global-index), 1 iterations, agent codex
+
+## 2026-09-13
+
+func_84139C54: plateau at 0.0 (raw None), mismatch unknown; tried families: call-sequence; tie-pool no
