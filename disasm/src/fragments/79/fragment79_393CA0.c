@@ -1369,7 +1369,7 @@ extern void func_84136CA8(void);
 extern u8 D_841951BC;
 extern u8 D_841951C3;
 extern void * D_841951F8[];
-void func_8412B51C(void) {
+void BattleAnim_Table_84185F10_015(void) {
     u8 *ptr;
     u8 flags;
     if (D_841951C3 == 0x23) {
