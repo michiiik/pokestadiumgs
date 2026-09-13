@@ -812,7 +812,24 @@ void func_8002A9CC(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002A9D8.s")
+extern signed char D_800A3A60;
+extern signed char D_800A3A6C;
+extern signed char D_800A3A84;
+extern signed char D_800A3A94;
+extern signed char D_800A3AA4;
+extern unsigned char *D_800D1B78[];
+extern unsigned char *D_800D1B80[];
+extern void osSyncPrintf(const char *, ...);
+void func_8002A9D8(void) {
+    s32 i;
+    for (i = 0; i != 2; i++) {
+        osSyncPrintf(&D_800A3A60, i);
+        osSyncPrintf(&D_800A3A6C, D_800D1B78[i][1]);
+        osSyncPrintf(&D_800A3A84, D_800D1B80[i][0]);
+        osSyncPrintf(&D_800A3A94, D_800D1B80[i][3]);
+        osSyncPrintf(&D_800A3AA4, D_800D1B80[i][4]);
+    }
+}
 #endif
 
 #ifdef VERSION_US
