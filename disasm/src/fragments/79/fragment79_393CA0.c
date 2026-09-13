@@ -1868,7 +1868,7 @@ extern u8 D_841951BC;
 extern u8 D_841951BD;
 extern u8 D_841951BF;
 extern void * D_841951F8[];
-void func_8412E38C(void) {
+void BattleAnim_Table_84185FDC_002(void) {
     u8 *ptr = (u8 *)D_841951F8[D_841951BD];
     if (ptr[0xB] & 1) {
         func_84126C3C(D_841951BC);
