@@ -799,7 +799,10 @@ void func_8AC04744(s32 *arg0, s32 arg1, s32 arg2, s32 arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC05E40.s")
+extern void func_8AC049A8(void);
+extern void func_8004E308(s32, s32 *, s32 *);
+extern s32 func_8AC06D8C(s32, s32);
+void func_8AC05E40(s32 arg0, s32 arg1, s32 arg2) { typedef struct { s32 w[14]; } CopyBlock; CopyBlock *src; CopyBlock *dst; s32 *result; _bzero((void *)arg2, 0x78); result = func_8AC06D8C(arg0, arg1); src = (void *)result; dst = (void *)arg2; *dst = *src; *(s16 *)((u8 *)arg2 + 0x70) = 0; func_8004E308((s32)result, (s32 *)&func_8AC049A8, (s32 *)arg2); }
 #endif
 
 #ifdef VERSION_US
