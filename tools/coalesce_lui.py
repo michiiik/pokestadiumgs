@@ -220,10 +220,10 @@ def candidate_map_paths(repo_root: Path):
     read-only reference for a linked worktree.
     """
     repo_root = Path(repo_root)
-    yield repo_root / "disasm" / "build" / "pokestadiumgs-us.map"
+    yield repo_root / "build" / "pokestadiumgs-us.map"
     primary = _primary_worktree_root(repo_root)
     if primary is not None:
-        yield primary / "disasm" / "build" / "pokestadiumgs-us.map"
+        yield primary / "build" / "pokestadiumgs-us.map"
 
 
 def resolve_repo_addresses(repo_root: Path) -> dict[str, int]:
