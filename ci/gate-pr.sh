@@ -63,47 +63,69 @@ split_changed=0
 headers_changed=0
 tools_changed=0
 makefile_changed=0
-# The baseline image contains generated lib/ultralib/build and extracted
-# objects. They are not PR-controlled inputs and must not make the gate throw
-# away the baked linker map before compiling the public checkout.
-if ! diff -qr --exclude=build --exclude=extracted /src/lib /work/lib >/dev/null 2>&1; then
-    library_changed=1
-fi
-if ! diff -qr /src/include /work/include >/dev/null 2>&1; then
-    headers_changed=1
-fi
-if ! diff -qr --exclude=__pycache__ /src/tools /work/tools >/dev/null 2>&1; then
-    tools_changed=1
-fi
+
 # Keep the baked source/object timestamps for unchanged files. A plain
 # recursive copy makes every checkout file newer than the baked objects,
 # which defeats the image cache and turns every PR into a full build.
-# Content comparison also handles Git checkout timestamp differences.
+# Use one native diff scan per tree, then overlay only reported changes.
 sync_tree() {
     local source_dir="$1"
     local target_dir="$2"
+    shift 2
+    local diff_file
+    local diff_status=0
+    local line
+    local relative
+    local source_file
+    local target_file
+
+    diff_file="$(mktemp)"
+    if ! diff -qr "$@" "$source_dir" "$target_dir" >"$diff_file" 2>&1; then
+        diff_status=1
+    fi
+    if [ "${diff_status}" -eq 0 ]; then
+        rm -f "$diff_file"
+        return 1
+    fi
+
     mkdir -p "$target_dir"
-    while IFS= read -r -d "" source_file; do
-        local relative="${source_file#"$source_dir"/}"
-        local target_file="$target_dir/$relative"
-        if [ ! -f "$target_file" ] || ! cmp -s "$source_file" "$target_file"; then
+    while IFS= read -r line || [ -n "$line" ]; do
+        case "$line" in
+        Files\ *\ and\ *\ differ)
+            source_file="${line#Files }"
+            source_file="${source_file% and * differ}"
+            target_file="${line#* and }"
+            target_file="${target_file% differ}"
             mkdir -p "$(dirname "$target_file")"
             cp -p "$source_file" "$target_file"
-        fi
-    done < <(find "$source_dir" -type f -print0)
-    while IFS= read -r -d "" target_file; do
-        local relative="${target_file#"$target_dir"/}"
-        if [ ! -f "$source_dir/$relative" ]; then
-            rm -f "$target_file"
-        fi
-    done < <(find "$target_dir" -type f -print0)
+            ;;
+        "Only in ${source_dir}:"*)
+            relative="${line#Only in ${source_dir}: }"
+            source_file="$source_dir/$relative"
+            target_file="$target_dir/$relative"
+            if [ -d "$source_file" ]; then
+                mkdir -p "$target_file"
+                cp -pR "$source_file/." "$target_file/"
+            else
+                mkdir -p "$(dirname "$target_file")"
+                cp -p "$source_file" "$target_file"
+            fi
+            ;;
+        "Only in ${target_dir}:"*)
+            relative="${line#Only in ${target_dir}: }"
+            rm -rf "$target_dir/$relative"
+            ;;
+        esac
+    done <"$diff_file"
+    rm -f "$diff_file"
+    return 0
 }
 
-sync_tree /src/src /work/src
-sync_tree /src/include /work/include
-sync_tree /src/tools /work/tools
-sync_tree /src/linker_scripts /work/linker_scripts
-sync_tree /src/lib /work/lib
+if sync_tree /src/src /work/src; then :; fi
+if sync_tree /src/include /work/include; then headers_changed=1; fi
+if sync_tree /src/tools /work/tools --exclude=__pycache__ --exclude=vtxdis; then tools_changed=1; fi
+if sync_tree /src/linker_scripts /work/linker_scripts --exclude=auto; then :; fi
+if sync_tree /src/lib /work/lib --exclude=build --exclude=extracted; then library_changed=1; fi
 makefile_changed=0
 if [ ! -f /work/Makefile ] || ! cmp -s /src/Makefile /work/Makefile; then
     makefile_changed=1
@@ -120,11 +142,9 @@ if ! cmp -s /src/requirements.txt /work/requirements.txt; then
 fi
 
 # A YAML change changes the split. Re-extract before compiling against it.
-if ! diff -qr /src/yamls /work/yamls >/dev/null 2>&1; then
+if sync_tree /src/yamls /work/yamls; then
     split_changed=1
     echo "gate-pr.sh: split inputs changed; re-running extraction" >&2
-    rm -rf /work/yamls
-    cp -a /src/yamls /work/yamls
     make extract
 fi
 
