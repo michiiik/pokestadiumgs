@@ -129,7 +129,7 @@ fi
 # runner contention without weakening the gate.
 build_jobs="${GS_DECOMP_JOBS:-$(nproc)}"
 case "${build_jobs}" in
-    ''|*[!0-9]*|0)
+    ""|*[!0-9]*|0)
         echo "gate-pr.sh: GS_DECOMP_JOBS must be a positive integer" >&2
         exit 2
         ;;
