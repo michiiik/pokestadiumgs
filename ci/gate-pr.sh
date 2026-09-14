@@ -62,6 +62,7 @@ library_changed=0
 split_changed=0
 headers_changed=0
 tools_changed=0
+linker_changed=0
 makefile_changed=0
 
 # Keep the baked source/object timestamps for unchanged files. A plain
@@ -124,7 +125,7 @@ sync_tree() {
 if sync_tree /src/src /work/src; then :; fi
 if sync_tree /src/include /work/include; then headers_changed=1; fi
 if sync_tree /src/tools /work/tools --exclude=__pycache__ --exclude=vtxdis; then tools_changed=1; fi
-if sync_tree /src/linker_scripts /work/linker_scripts --exclude=auto; then :; fi
+if sync_tree /src/linker_scripts /work/linker_scripts --exclude=auto; then linker_changed=1; fi
 if sync_tree /src/lib /work/lib --exclude=build --exclude=extracted; then library_changed=1; fi
 makefile_changed=0
 if [ ! -f /work/Makefile ] || ! cmp -s /src/Makefile /work/Makefile; then
@@ -162,6 +163,10 @@ fi
 # checked-out sources.
 if [ "${split_changed}" -eq 1 ]; then
     rm -rf /work/build
+elif [ "${linker_changed}" -eq 1 ]; then
+    rm -f /work/build/pokestadiumgs-us.map \
+        /work/build/pokestadiumgs-us.elf \
+        /work/build/pokestadiumgs-us.z64
 fi
 if [ ! -f /work/build/pokestadiumgs-us.map ]; then
     echo "gate-pr.sh: linked map missing; rebuilding direct-IDO seed" >&2
