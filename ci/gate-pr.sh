@@ -77,7 +77,7 @@ if ! diff -qr /src/tools /work/tools >/dev/null 2>&1; then
 fi
 # Keep the baked source/object timestamps for unchanged files. A plain
 # recursive copy makes every checkout file newer than the baked objects,
-# which defeats the image's build cache and turns every PR into a full build.
+# which defeats the image cache and turns every PR into a full build.
 # Content comparison also handles Git checkout timestamp differences.
 sync_tree() {
     local source_dir="$1"
