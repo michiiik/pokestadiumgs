@@ -152,7 +152,11 @@ if [ "$status" -ne 0 ]; then
     exit "$status"
 fi
 
-if ! grep -q '^build/pokestadiumgs-us\.z64: OK$' "$log_file"; then
+# Make's colored output can leave an ANSI reset sequence immediately before
+# md5sum's result. The md5sum exit status above is authoritative; this check
+# is only a readable-log sanity check and therefore must not require the line
+# to start at column zero.
+if ! grep -q 'build/pokestadiumgs-us\.z64: OK' "$log_file"; then
     echo "gate-pr.sh: FAIL -- expected checksum acceptance line was absent" >&2
     exit 1
 fi
