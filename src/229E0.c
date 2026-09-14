@@ -4942,7 +4942,20 @@ void geo_layout_cmd_create_reference(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FEB8.s")
+extern S1_unk_D_86002F34_00C *func_80037F40(S1_MainPoolState *, S1_unk_D_86002F34_00C *, s16, s16, s16, s16);
+extern void func_800371B4(S1_Vec3f *, S1_Vec3f *, f32, s16, s16);
+extern void func_8003FD34(void *);
+void func_8003FEB8(void) {
+    S1_unk_D_800ABE00_cmdB *cmd = (S1_unk_D_800ABE00_cmdB *)(u32)D_80126520;
+    S1_unk_D_86002F34_00C *node = func_80037F40(D_80126450, NULL, (s16)cmd->viewportX, (s16)cmd->viewportY, cmd->viewportWidth, cmd->viewportHeight);
+    if (node != NULL) {
+        node->unk_24.fovy = (f32)cmd->fovy;
+        Vec3f_FromVec3s(&node->unk_60.at, &cmd->lookAt);
+        func_800371B4(&node->unk_60.at, &node->unk_60.eye, (f32)cmd->eyeDistance, (cmd->yaw << 15) / 180, (cmd->pitch << 15) / 180);
+    }
+    func_8003FD34(node);
+    D_80126520 += 0x18;
+}
 #endif
 
 #ifdef VERSION_US
