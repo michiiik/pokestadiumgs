@@ -393,6 +393,10 @@ s32 func_80047BD4(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047D24.s")
 
+extern u8 *func_800477C4(u8 *, u8 *);
+extern void func_80046CA8(u8 *, s32, s32, s32, s32, s32);
+extern void func_80046C18(u8 *);
+
 void func_80047DC4(u8 *arg0, u8 *arg1) {
     u8 buffer[0x20];
     s32 type;
@@ -429,7 +433,6 @@ void func_80047DC4(u8 *arg0, u8 *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_8004803C.s")
 
-extern u8 *func_800477C4(u8 *, u8 *);
 extern s32 func_80047BD4(u8 *);
 extern void func_80046F2C(u8 *, s32);
 void func_80048188(u8 *arg0, u8 *arg1) { u8 temp[0x20]; func_800477C4(temp, arg1); func_80046F2C(arg0, func_80047BD4(temp)); }
@@ -486,7 +489,6 @@ extern u8 *D_80126F50; void func_80049708(void) { func_80046B14(D_80126F50); }
 
 extern void func_80049770(s32,s32,s32,s32,s32); void func_8004972C(s32 a0,s32 a1,s32 a2,s32 a3){func_80049770(0,a0,a1,a2,a3);}
 
-extern void func_80046CA8(u8 *, s32, s32, s32, s32, s32);
 void func_80049770(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
     func_80046CA8(D_80126F50, arg0, arg1, arg2, arg3, arg4);
 }
