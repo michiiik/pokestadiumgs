@@ -365,7 +365,7 @@
 | `src/fragments/79/fragment79_377F80.c` | 18 | 45 | 60.0% |
 | `src/fragments/79/fragment79_379450.c` | 5 | 12 | 58.3% |
 | `src/fragments/79/fragment79_379E90.c` | 3 | 7 | 57.1% |
-| `src/fragments/79/fragment79_37A6E0.c` | 123 | 330 | 62.7% |
+| `src/fragments/79/fragment79_37A6E0.c` | 122 | 330 | 63.0% |
 | `src/fragments/79/fragment79_38D510.c` | 9 | 36 | 75.0% |
 | `src/fragments/79/fragment79_38EBD0.c` | 2 | 8 | 75.0% |
 | `src/fragments/79/fragment79_38EFE0.c` | 33 | 109 | 69.7% |
