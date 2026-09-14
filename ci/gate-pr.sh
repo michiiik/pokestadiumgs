@@ -60,20 +60,80 @@ set -euo pipefail
 # overlay baseroms: the baseline image owns the known retail reference.
 library_changed=0
 split_changed=0
-# The baseline image contains generated lib/ultralib/build and extracted
-# objects. They are not PR-controlled inputs and must not make the gate throw
-# away the baked linker map before compiling the public checkout.
-if ! diff -qr --exclude=build --exclude=extracted /src/lib /work/lib >/dev/null 2>&1; then
-    library_changed=1
+headers_changed=0
+tools_changed=0
+linker_changed=0
+makefile_changed=0
+
+# Keep the baked source/object timestamps for unchanged files. A plain
+# recursive copy makes every checkout file newer than the baked objects,
+# which defeats the image cache and turns every PR into a full build.
+# Use one native diff scan per tree, then overlay only reported changes.
+sync_tree() {
+    local source_dir="$1"
+    local target_dir="$2"
+    shift 2
+    local diff_file
+    local diff_status=0
+    local line
+    local relative
+    local source_file
+    local target_file
+
+    diff_file="$(mktemp)"
+    if ! diff -qr "$@" "$source_dir" "$target_dir" >"$diff_file" 2>&1; then
+        diff_status=1
+    fi
+    if [ "${diff_status}" -eq 0 ]; then
+        rm -f "$diff_file"
+        return 1
+    fi
+
+    mkdir -p "$target_dir"
+    while IFS= read -r line || [ -n "$line" ]; do
+        case "$line" in
+        Files\ *\ and\ *\ differ)
+            source_file="${line#Files }"
+            source_file="${source_file% and * differ}"
+            target_file="${line#* and }"
+            target_file="${target_file% differ}"
+            mkdir -p "$(dirname "$target_file")"
+            cp -p "$source_file" "$target_file"
+            ;;
+        "Only in ${source_dir}:"*)
+            relative="${line#Only in ${source_dir}: }"
+            source_file="$source_dir/$relative"
+            target_file="$target_dir/$relative"
+            if [ -d "$source_file" ]; then
+                mkdir -p "$target_file"
+                cp -pR "$source_file/." "$target_file/"
+            else
+                mkdir -p "$(dirname "$target_file")"
+                cp -p "$source_file" "$target_file"
+            fi
+            ;;
+        "Only in ${target_dir}:"*)
+            relative="${line#Only in ${target_dir}: }"
+            rm -rf "$target_dir/$relative"
+            ;;
+        esac
+    done <"$diff_file"
+    rm -f "$diff_file"
+    return 0
+}
+
+if sync_tree /src/src /work/src; then :; fi
+if sync_tree /src/include /work/include; then headers_changed=1; fi
+if sync_tree /src/tools /work/tools --exclude=__pycache__ --exclude=vtxdis; then tools_changed=1; fi
+if sync_tree /src/linker_scripts /work/linker_scripts --exclude=auto; then linker_changed=1; fi
+if sync_tree /src/lib /work/lib --exclude=build --exclude=extracted; then library_changed=1; fi
+makefile_changed=0
+if [ ! -f /work/Makefile ] || ! cmp -s /src/Makefile /work/Makefile; then
+    makefile_changed=1
 fi
-rm -rf /work/src /work/include /work/tools /work/linker_scripts /work/lib
-cp -a /src/src /work/src
-cp -a /src/include /work/include
-cp -a /src/tools /work/tools
-mkdir -p /work/linker_scripts
-cp -a /src/linker_scripts/. /work/linker_scripts/
-cp -a /src/lib /work/lib
-cp -a /src/Makefile /work/Makefile
+if [ "${makefile_changed}" -eq 1 ]; then
+    cp -p /src/Makefile /work/Makefile
+fi
 
 # The baked venv must match the checked-in requirements. Rebuilding it would
 # require network access, so force a baseline rebuild for dependency changes.
@@ -83,11 +143,9 @@ if ! cmp -s /src/requirements.txt /work/requirements.txt; then
 fi
 
 # A YAML change changes the split. Re-extract before compiling against it.
-if ! diff -qr /src/yamls /work/yamls >/dev/null 2>&1; then
+if sync_tree /src/yamls /work/yamls; then
     split_changed=1
     echo "gate-pr.sh: split inputs changed; re-running extraction" >&2
-    rm -rf /work/yamls
-    cp -a /src/yamls /work/yamls
     make extract
 fi
 
@@ -105,6 +163,10 @@ fi
 # checked-out sources.
 if [ "${split_changed}" -eq 1 ]; then
     rm -rf /work/build
+elif [ "${linker_changed}" -eq 1 ]; then
+    rm -f /work/build/pokestadiumgs-us.map \
+        /work/build/pokestadiumgs-us.elf \
+        /work/build/pokestadiumgs-us.z64
 fi
 if [ ! -f /work/build/pokestadiumgs-us.map ]; then
     echo "gate-pr.sh: linked map missing; rebuilding direct-IDO seed" >&2
@@ -135,7 +197,17 @@ case "${build_jobs}" in
         ;;
 esac
 echo "gate-pr.sh: building with ${build_jobs} parallel job(s); per-object host syntax checks enabled"
-make -B COMPARE=0 -j"${build_jobs}" rom
+full_build=0
+if [ "${split_changed}" -eq 1 ] || [ "${headers_changed}" -eq 1 ] || [ "${tools_changed}" -eq 1 ] || [ "${makefile_changed}" -eq 1 ]; then
+    full_build=1
+fi
+if [ "${full_build}" -eq 1 ]; then
+    echo "gate-pr.sh: forcing a full rebuild because split, header, tool, or Makefile inputs changed"
+    make -B COMPARE=0 -j"${build_jobs}" rom
+else
+    echo "gate-pr.sh: reusing cached objects and rebuilding changed source inputs"
+    make COMPARE=0 -j"${build_jobs}" rom
+fi
 md5sum -c baseroms/us/checksum.md5
 ' >"$log_file" 2>&1
 status=$?
