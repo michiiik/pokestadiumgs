@@ -60,20 +60,57 @@ set -euo pipefail
 # overlay baseroms: the baseline image owns the known retail reference.
 library_changed=0
 split_changed=0
+headers_changed=0
+tools_changed=0
+makefile_changed=0
 # The baseline image contains generated lib/ultralib/build and extracted
 # objects. They are not PR-controlled inputs and must not make the gate throw
 # away the baked linker map before compiling the public checkout.
 if ! diff -qr --exclude=build --exclude=extracted /src/lib /work/lib >/dev/null 2>&1; then
     library_changed=1
 fi
-rm -rf /work/src /work/include /work/tools /work/linker_scripts /work/lib
-cp -a /src/src /work/src
-cp -a /src/include /work/include
-cp -a /src/tools /work/tools
-mkdir -p /work/linker_scripts
-cp -a /src/linker_scripts/. /work/linker_scripts/
-cp -a /src/lib /work/lib
-cp -a /src/Makefile /work/Makefile
+if ! diff -qr /src/include /work/include >/dev/null 2>&1; then
+    headers_changed=1
+fi
+if ! diff -qr /src/tools /work/tools >/dev/null 2>&1; then
+    tools_changed=1
+fi
+if [ ! -f /work/Makefile ] || ! cmp -s /src/Makefile /work/Makefile; then
+    makefile_changed=1
+fi
+
+# Keep the baked source/object timestamps for unchanged files. A plain
+# recursive copy makes every checkout file newer than the baked objects,
+# which defeats the image's build cache and turns every PR into a full build.
+# Content comparison also handles Git checkout timestamp differences.
+sync_tree() {
+    local source_dir="$1"
+    local target_dir="$2"
+    mkdir -p "$target_dir"
+    while IFS= read -r -d "" source_file; do
+        local relative="${source_file#"$source_dir"/}"
+        local target_file="$target_dir/$relative"
+        if [ ! -f "$target_file" ] || ! cmp -s "$source_file" "$target_file"; then
+            mkdir -p "$(dirname "$target_file")"
+            cp -p "$source_file" "$target_file"
+        fi
+    done < <(find "$source_dir" -type f -print0)
+    while IFS= read -r -d "" target_file; do
+        local relative="${target_file#"$target_dir"/}"
+        if [ ! -f "$source_dir/$relative" ]; then
+            rm -f "$target_file"
+        fi
+    done < <(find "$target_dir" -type f -print0)
+}
+
+sync_tree /src/src /work/src
+sync_tree /src/include /work/include
+sync_tree /src/tools /work/tools
+sync_tree /src/linker_scripts /work/linker_scripts
+sync_tree /src/lib /work/lib
+if [ "${makefile_changed}" -eq 1 ]; then
+    cp -p /src/Makefile /work/Makefile
+fi
 
 # The baked venv must match the checked-in requirements. Rebuilding it would
 # require network access, so force a baseline rebuild for dependency changes.
@@ -135,7 +172,17 @@ case "${build_jobs}" in
         ;;
 esac
 echo "gate-pr.sh: building with ${build_jobs} parallel job(s); per-object host syntax checks enabled"
-make -B COMPARE=0 -j"${build_jobs}" rom
+full_build=0
+if [ "${split_changed}" -eq 1 ] || [ "${headers_changed}" -eq 1 ] || [ "${tools_changed}" -eq 1 ] || [ "${makefile_changed}" -eq 1 ]; then
+    full_build=1
+fi
+if [ "${full_build}" -eq 1 ]; then
+    echo "gate-pr.sh: forcing a full rebuild because split, header, tool, or Makefile inputs changed"
+    make -B COMPARE=0 -j"${build_jobs}" rom
+else
+    echo "gate-pr.sh: reusing cached objects and rebuilding changed source inputs"
+    make COMPARE=0 -j"${build_jobs}" rom
+fi
 md5sum -c baseroms/us/checksum.md5
 ' >"$log_file" 2>&1
 status=$?

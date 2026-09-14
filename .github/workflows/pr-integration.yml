@@ -270,21 +270,41 @@ jobs:
               return;
             }
 
-            const result = await github.graphql(
-              `mutation($pullRequestId: ID!, $mergeMethod: PullRequestMergeMethod!) {
-                enablePullRequestAutoMerge(input: {
-                  pullRequestId: $pullRequestId,
-                  mergeMethod: $mergeMethod
-                }) {
-                  pullRequest {
-                    number
-                    autoMergeRequest { enabledAt }
+            try {
+              const result = await github.graphql(
+                `mutation($pullRequestId: ID!, $mergeMethod: PullRequestMergeMethod!) {
+                  enablePullRequestAutoMerge(input: {
+                    pullRequestId: $pullRequestId,
+                    mergeMethod: $mergeMethod
+                  }) {
+                    pullRequest {
+                      number
+                      autoMergeRequest { enabledAt }
+                    }
                   }
-                }
-              }`,
-              {
-                pullRequestId: pr.node_id,
-                mergeMethod: 'SQUASH',
-              },
-            );
-            core.info(`Squash auto-merge enabled for PR #${result.enablePullRequestAutoMerge.pullRequest.number}.`);
+                }`,
+                {
+                  pullRequestId: pr.node_id,
+                  mergeMethod: 'SQUASH',
+                },
+              );
+              core.info(`Squash auto-merge enabled for PR #${result.enablePullRequestAutoMerge.pullRequest.number}.`);
+            } catch (error) {
+              if (!String(error.message).includes('Pull request is in clean status')) {
+                throw error;
+              }
+
+              core.info('PR is already clean; merging immediately with the same trusted head SHA.');
+              const merged = await github.rest.pulls.merge({
+                owner,
+                repo,
+                pull_number: number,
+                sha: expectedHead,
+                merge_method: 'squash',
+              });
+              if (!merged.data.merged) {
+                core.setFailed(`Immediate squash merge was not completed: ${merged.data.message || 'unknown error'}`);
+                return;
+              }
+              core.info(`PR #${number} merged immediately because it was already clean.`);
+            }
