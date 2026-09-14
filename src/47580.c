@@ -393,14 +393,6 @@ s32 func_80047BD4(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047D24.s")
 
-extern s32 func_80046E64(u8 *, s32, s32, s32, s32, s32);
-void func_80049828(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
-    func_80046E64(D_80126F50, arg0, arg1, arg2, arg3, arg4);
-}
-
-extern void func_80046DD4(u8 *);
-extern u8 *D_80126F50; void func_80049878(void) { func_80046DD4(D_80126F50); }
-
 void func_80047DC4(u8 *arg0, u8 *arg1) {
     u8 buffer[0x20];
     s32 type;
