@@ -1893,6 +1893,7 @@ SECTIONS
         build/asm/us/data/fragments/24/fragment24_header.o(.rodata);
         build/src/fragments/24/fragment24_14FE20.o(.rodata);
         build/src/fragments/24/fragment24_150C10.o(.rodata);
+        build/asm/us/data/1585C0.rodata.o(.rodata);
         fragment24_RODATA_END = .;
         fragment24_RODATA_SIZE = ABSOLUTE(fragment24_RODATA_END - fragment24_RODATA_START);
     }

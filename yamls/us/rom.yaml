@@ -701,6 +701,8 @@
     - [0x14FE20, c,       fragments/24/fragment24_14FE20]
     - [0x150C10, c,       fragments/24/fragment24_150C10]
     - [0x158320, data,    fragments/24/fragment24_data]
+    - [0x158490, .rodata, fragments/24/fragment24_150C10] # D_82B08690, jtbl_82B08698 (+7 more)
+    - [0x1585C0, rodata]
   
   - name: fragment25
     type: code
