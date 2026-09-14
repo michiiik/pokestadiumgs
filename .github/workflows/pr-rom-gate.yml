@@ -35,10 +35,19 @@ jobs:
     runs-on: [self-hosted, macOS, ARM64, gs-decomp-public]
     timeout-minutes: 30
     steps:
+      - name: Mask self-hosted runner paths
+        shell: bash
+        run: |
+          echo "::add-mask::${HOME}"
+          echo "::add-mask::${GITHUB_WORKSPACE}"
+          echo "::add-mask::${RUNNER_TEMP}"
+
       - name: Checkout the PR merge ref or selected branch
         uses: actions/checkout@v4
         with:
           ref: ${{ inputs.pr_number && format('refs/pull/{0}/merge', inputs.pr_number) || inputs.ref }}
+          persist-credentials: false
+          set-safe-directory: false
 
       - name: Build and compare against the retail checksum
         shell: bash
