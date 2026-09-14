@@ -393,13 +393,46 @@ s32 func_80047BD4(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047D24.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047DC4.s")
+extern u8 *func_800477C4(u8 *, u8 *);
+extern void func_80046CA8(u8 *, s32, s32, s32, s32, s32);
+extern void func_80046C18(u8 *);
+
+void func_80047DC4(u8 *arg0, u8 *arg1) {
+    u8 buffer[0x20];
+    s32 type;
+    u8 value3;
+    u8 value2;
+    u8 value1;
+
+    arg1 = func_800477C4(buffer, arg1);
+    type = func_80047B4C(buffer);
+
+    switch (type) {
+        case 0:
+        case 1:
+            arg1 = func_800477C4(buffer, arg1);
+            value3 = func_80047BD4(buffer);
+
+            arg1 = func_800477C4(buffer, arg1);
+            value2 = func_80047BD4(buffer);
+
+            arg1 = func_800477C4(buffer, arg1);
+            value1 = func_80047BD4(buffer);
+
+            arg1 = func_800477C4(buffer, arg1);
+            func_80046CA8(arg0, type, value3, value2, value1, func_80047BD4(buffer) & 0xFF);
+            break;
+
+        case 10:
+            func_80046C18(arg0);
+            break;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047EC4.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_8004803C.s")
 
-extern u8 *func_800477C4(u8 *, u8 *);
 extern s32 func_80047BD4(u8 *);
 extern void func_80046F2C(u8 *, s32);
 void func_80048188(u8 *arg0, u8 *arg1) { u8 temp[0x20]; func_800477C4(temp, arg1); func_80046F2C(arg0, func_80047BD4(temp)); }
@@ -456,7 +489,6 @@ extern u8 *D_80126F50; void func_80049708(void) { func_80046B14(D_80126F50); }
 
 extern void func_80049770(s32,s32,s32,s32,s32); void func_8004972C(s32 a0,s32 a1,s32 a2,s32 a3){func_80049770(0,a0,a1,a2,a3);}
 
-extern void func_80046CA8(u8 *, s32, s32, s32, s32, s32);
 void func_80049770(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
     func_80046CA8(D_80126F50, arg0, arg1, arg2, arg3, arg4);
 }
