@@ -120,13 +120,22 @@ if [ -d /out ]; then
         --output /out/COVERAGE.md
 fi
 
-# Force the complete source tree through the same host syntax check performed
-# by each C-object recipe. libultra is rebuilt with FIXUPS by the root
-# Makefile; disabling the nested archive comparison lets that source build run
-# without a private libultra base archive. Verify the resulting ROM explicitly
-# against the checked-in expected checksum afterward.
-make cc-check RUN_CC_CHECK=1
-make -B COMPARE=0 -j2 rom
+# Force every root object through its recipe. Each C-object recipe performs the
+# host syntax check before invoking IDO, so this forced build covers the whole
+# C tree without running a second serial cc-check pass. libultra is rebuilt
+# with FIXUPS by the root Makefile; disabling the nested archive comparison
+# lets that source build run without a private libultra base archive. Use all
+# available container CPUs by default; the override is useful for diagnosing
+# runner contention without weakening the gate.
+build_jobs="${GS_DECOMP_JOBS:-$(nproc)}"
+case "${build_jobs}" in
+    ''|*[!0-9]*|0)
+        echo "gate-pr.sh: GS_DECOMP_JOBS must be a positive integer" >&2
+        exit 2
+        ;;
+esac
+echo "gate-pr.sh: building with ${build_jobs} parallel job(s); per-object host syntax checks enabled"
+make -B COMPARE=0 -j"${build_jobs}" rom
 md5sum -c baseroms/us/checksum.md5
 ' >"$log_file" 2>&1
 status=$?
