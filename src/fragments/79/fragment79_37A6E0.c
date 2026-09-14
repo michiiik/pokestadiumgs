@@ -700,8 +700,6 @@ extern u8 *func_8410B330(u8 *);
 extern void func_84120960(u8 *, s32);
 extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
 extern void func_800371B4(u8 *, u8 *, s32, s16, s32);
-extern f32 D_84188F90;
-extern f32 D_84188F94;
 void BattleAnim_ModelDispatch_029(u8 *arg0, s32 arg1) {
     D_841911E8 = func_8410B330(arg0);
     *(f32 *)(arg0 + 0x2C) = 45.0f;
@@ -745,7 +743,7 @@ void BattleAnim_ModelDispatch_057(u8 *arg0, s32 arg1) {
     func_84120960(arg0, arg1);
     *(s16 *)((u8 *)D_841911E8 + 0x90) = 0x1C70;
     *(s16 *)((u8 *)D_841911E8 + 0x92) = 0;
-    *(f32 *)((u8 *)D_841911E8 + 0x74) = D_84188F90;
+    *(f32 *)((u8 *)D_841911E8 + 0x74) = 550.0f;
     if ((*(u16 *)((u8 *)D_84193DD0 + 0x12) & 2) || (*(u16 *)((u8 *)D_84193DD0 + 0x22) & 2)) {
         Vec3f_SetComponentsDuplicate((f32 *)(arg0 + 0xB4), 0.0f, 180.0f, 0.0f);
     } else {
@@ -777,7 +775,7 @@ void BattleAnim_ModelDispatch_064(u8 *arg0, s32 arg1) {
     func_84120960(arg0, arg1);
     *(s16 *)((u8 *)D_841911E8 + 0x90) = 0x9F4;
     *(s16 *)((u8 *)D_841911E8 + 0x92) = 0;
-    *(f32 *)((u8 *)D_841911E8 + 0x74) = D_84188F94;
+    *(f32 *)((u8 *)D_841911E8 + 0x74) = 550.0f;
     if ((*(u16 *)((u8 *)D_84193DD0 + 0x12) & 2) || (*(u16 *)((u8 *)D_84193DD0 + 0x22) & 2)) {
         Vec3f_SetComponentsDuplicate((f32 *)(arg0 + 0xB4), 0.0f, 180.0f, 0.0f);
         *(s16 *)((u8 *)D_841911E8 + 0x90) = (s16)-0x9F4;
@@ -793,7 +791,6 @@ void BattleAnim_ModelDispatch_064(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern f64 D_84188F98;
 void BattleAnim_ModelDispatch_065(u8 *arg0, s32 arg1) {
     u8 *temp_v0;
 
@@ -801,7 +798,7 @@ void BattleAnim_ModelDispatch_065(u8 *arg0, s32 arg1) {
     D_841911E8 = temp_v0;
     (*(s16 *)((u8 *)(temp_v0) + (0x92))) = (s16) ((*(s16 *)((u8 *)(temp_v0) + (0x92))) + 0xE8);
     func_800371B4(arg0 + 0xB4, arg0 + 0xA8, (*(s32 *)((u8 *)(D_841911E8) + (0x74))), (*(s16 *)((u8 *)(D_841911E8) + (0x90))), (s32) (*(s16 *)((u8 *)(D_841911E8) + (0x92))));
-    (*(f32 *)((u8 *)(arg0) + (0xB0))) = (f32) ((f64) (*(f32 *)((u8 *)(arg0) + (0xB0))) * D_84188F98);
+    (*(f32 *)((u8 *)(arg0) + (0xB0))) = (f32) ((f64) (*(f32 *)((u8 *)(arg0) + (0xB0))) * 0.599999999999999978);
 }
 #endif
 
@@ -1845,7 +1842,6 @@ void BattleAnim_Dispatch_001(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-extern f32 D_84188FEC;
 extern void func_84112158(s32, s32);
 extern void func_841136E8(u8 *);
 void BattleAnim_Dispatch_190(u8 *arg0) {
@@ -1858,7 +1854,7 @@ void BattleAnim_Dispatch_190(u8 *arg0) {
     index = func_8411E1F8((s32)arg0);
     if ((*(u16 *)((u8 *)(u32)D_84193DD0 + (index << 4) + 0x12) & 8) != 0) {
         Vec3f_SetComponentsDuplicate((f32 *)(arg0 + 0x30),
-            D_84188FEC, D_84188FEC, D_84188FEC);
+            0.8000000119f, 0.8000000119f, 0.8000000119f);
     }
     *(s32 *)((u8 *)((arg0 + (D_841911F4 * 4))) + 0x5C8) = (s32)D_84183D50;
 }
@@ -2799,7 +2795,6 @@ void BattleAnim_Dispatch_197(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-extern f32 D_84188FEC;
 extern void func_84111348(s32 arg0, s32 arg1);
 extern s32 func_84113430(s32 arg0);
 extern void func_8411FEE8(s32);
@@ -3629,5 +3624,22 @@ void func_8411DA2C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8411DBF4.s")
+extern void func_841118E0(void);
+extern void func_8411DA4C(void);
+extern void func_8411DAE0(void);
+extern s32 n_alResampleParam(void);
+s32 func_8411DBF4(s32 arg0) {
+    /* Case bodies are emitted in *source* order, not case-value order --
+     * recovered from jtbl_841893D4's actual call targets: retail's switch
+     * declares case 30 before case 3 and case 5. */
+    switch (arg0) {
+    case 0: func_841118E0(); break;
+    case 1:
+    case 2: func_8411DA4C(); break;
+    case 30: func_8411DAE0(); break;
+    case 3: func_8411D9B4(); break;
+    case 5: n_alResampleParam(); break;
+    }
+    return 0;
+}
 #endif
