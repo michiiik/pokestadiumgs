@@ -547,7 +547,28 @@ void func_82B0504C(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B05494.s")
+extern void func_82B03538(void);
+extern void func_82B03688(void);
+extern void func_82B0373C(void);
+extern void func_82B03978(void);
+extern void func_82B03F38(void);
+extern void func_82B04008(void);
+extern void func_82B04718(void);
+extern void func_82B050E8(void);
+void func_82B05494(void *arg0) {
+    switch (*(s16 *)arg0) {
+    case 1: func_82B03538(); break;
+    case 2: func_82B03688(); break;
+    case 3: func_82B0373C(); break;
+    case 4: func_82B038BC(arg0); break;
+    case 5: func_82B03978(); break;
+    case 6: func_82B03F38(); break;
+    case 7: func_82B04008(); break;
+    case 8: func_82B04718(); break;
+    case 9: func_82B0504C(arg0); break;
+    case 10: func_82B050E8(); break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
