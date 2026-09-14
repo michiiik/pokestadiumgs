@@ -4154,7 +4154,28 @@ s16 func_8003D808(s16 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003DA20.s")
+extern u32 Memmap_GetFragmentVaddr(Gfx **);
+extern void func_8003CD84(void);
+extern s32 D_800949A0;
+extern s32 D_801261A4;
+extern Gfx* D_800D0510;
+extern u8 D_801261B1;
+void func_8003DA20(s32 arg0, s32 arg1) {
+    if (D_800949A0 != 0 && !(D_801261A4 & 2) && D_801261B1 > 0) {
+        if (arg0 != 0) {
+            if ((u32)arg0 >= 0x81000000U && (u32)arg0 < 0x90000000U) {
+                Gfx *command = D_800D0510++;
+                command->words.w0 = 0xDE000000;
+                command->words.w1 = Memmap_GetFragmentVaddr((Gfx **)arg0);
+            } else {
+                Gfx *command = D_800D0510++;
+                command->words.w1 = arg0;
+                command->words.w0 = 0xDE000000;
+            }
+        }
+        if (arg1 != 0) func_8003CD84();
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -4564,7 +4585,19 @@ extern s32 D_80126410; void ModelAnim_EndEventContext(void) { if (D_80126410 >= 
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003EE20.s")
+extern u8 D_801263F0[];
+void func_8003EE20(s32 *arg0, s32 arg1, s32 arg2) {
+    u8 *record;
+    s32 index;
+    if (D_80126410 < 0) { return; }
+    if (D_80126410 >= 2) { return; }
+    record = D_801263F0 + (D_80126410 * 0x10);
+    if (record[0] != 1) { return; }
+    if (arg2 < 0) { return; }
+    if (arg2 >= (*((u16 *) ((*((u32 *) (record + 4))) + 8)))) { return; }
+    ;
+    *arg0 = ((*((u8 *) ((*((u32 *) (record + 0xC))) + ModelAnim_ResolveEventIndex(*((s16 *) (record + 2)), (void *) (*((u32 *) (record + 8))), arg2)))) * 12) + arg1;
+}
 #endif
 
 #ifdef VERSION_US
