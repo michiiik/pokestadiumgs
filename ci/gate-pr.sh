@@ -75,10 +75,6 @@ fi
 if ! diff -qr /src/tools /work/tools >/dev/null 2>&1; then
     tools_changed=1
 fi
-if [ ! -f /work/Makefile ] || ! cmp -s /src/Makefile /work/Makefile; then
-    makefile_changed=1
-fi
-
 # Keep the baked source/object timestamps for unchanged files. A plain
 # recursive copy makes every checkout file newer than the baked objects,
 # which defeats the image's build cache and turns every PR into a full build.
@@ -108,6 +104,10 @@ sync_tree /src/include /work/include
 sync_tree /src/tools /work/tools
 sync_tree /src/linker_scripts /work/linker_scripts
 sync_tree /src/lib /work/lib
+makefile_changed=0
+if [ ! -f /work/Makefile ] || ! cmp -s /src/Makefile /work/Makefile; then
+    makefile_changed=1
+fi
 if [ "${makefile_changed}" -eq 1 ]; then
     cp -p /src/Makefile /work/Makefile
 fi
