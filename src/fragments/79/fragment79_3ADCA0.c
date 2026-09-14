@@ -708,7 +708,15 @@ void func_841420A4(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84142DCC.s")
+void func_84142DCC(void *arg0) {
+    u8 *base = (u8 *)arg0;
+    u8 index = base[7];
+    u8 *entry = base;
+    entry += index << 2;
+    if ((base[8] & 1) == 0 && (base[8] & 2) == 0 && base[0] == 14) {
+        func_8413FAE4(*(s16 *)(base + 10) + *(s16 *)(entry + 18), *(s16 *)(base + 12) + *(s16 *)(entry + 20));
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -980,11 +988,13 @@ void func_841457C4(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_841459E8.s")
+extern Gfx* D_800D0510;
+void func_841459E8(arg0) void *arg0; { struct { s16 pad[5]; s16 x; s16 y; } *state=arg0; gDPFillRectangle(D_800D0510++,state->x-1,state->y-1,state->x+0x40,state->y); gDPFillRectangle(D_800D0510++,state->x-1,state->y+0xE,state->x+0x40,state->y+0x10); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84145AB4.s")
+extern Gfx* D_800D0510;
+void func_84145AB4(arg0) void *arg0; { Gfx *temp_v1; struct { s16 pad0[5]; s16 x; s16 y; } *state; state = arg0; temp_v1 = D_800D0510++; temp_v1->words.w0 = ((((state->x + 0xDC) & 0x3FF) << 14) | 0xF6000000) | (((state->y + 0x3C) & 0x3FF) << 2); temp_v1->words.w1 = (((state->x - 0x14) & 0x3FF) << 14) | (((state->y - 0xA) & 0x3FF) << 2); }
 #endif
 
 void func_84145B24(void) {
@@ -1145,7 +1155,26 @@ void func_841465CC(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84146610.s")
+extern u16 D_84186CD8[];
+extern u16 D_84186CDE;
+extern u16 D_84186CE8;
+extern u16 D_84186CD4[];
+extern u16 D_84186CE4;
+extern u8 * D_841951F8;
+void func_84146610(u8 *arg0) {
+    u8 index = arg0[1];
+    u8 subindex = arg0[2];
+    *(u16 *)(arg0 + 0xA) = D_84186CD4[index];
+    if (index == 1 && subindex == 0 && ((u8 **)&D_841951F8)[index][2] == 1) {
+        *(u16 *)(arg0 + 0xC) = D_84186CDE;
+    } else {
+        *(u16 *)(arg0 + 0xC) = D_84186CD8[index * 2 + subindex];
+    }
+    *(s16 *)(arg0 + 0x12) = *(s16 *)(arg0 + 0xA);
+    *(s16 *)(arg0 + 0x14) = *(s16 *)(arg0 + 0xC);
+    *(u16 *)(arg0 + 0xE) = D_84186CE4;
+    *(u16 *)(arg0 + 0x10) = D_84186CE8;
+}
 #endif
 
 #ifdef VERSION_US
@@ -1459,7 +1488,34 @@ void func_84146D98(u8 *arg0, u8 *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84147008.s")
+extern u8 D_84186F0C;
+extern u8 D_84186F10;
+
+void func_84147008(u8 *arg0, u8 arg1) {
+    s32 var0;
+    s32 var1;
+
+    var0 = (arg1 == 0xF) ? 1 : -1;
+    var1 = (arg0[1] != 0) ? 1 : -1;
+    switch (arg0[0]) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+    case 16:
+    case 17:
+    case 18:
+        *(s16 *)(arg0 + 0xA) += D_84186F0C * var0 * var1;
+        break;
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+        *(s16 *)(arg0 + 0xC) += D_84186F10 * var0 * var1;
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1475,7 +1531,15 @@ void func_84147228(u8 arg0, u8 arg1, u8 arg2, u8 arg3, s32 arg4) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84147270.s")
+void func_84147270(u8 *arg0, u8 arg1, s16 arg2) {
+    if (arg2 > 0) {
+        arg0[0x25] = ((arg1 - arg0[9]) * 0xFF + 0xFF) / arg1;
+        if (arg2 == arg0[9]) arg0[8] &= ~2;
+    } else if (arg2 < 0) {
+        arg0[0x25] = (arg0[9] * 0xFF) / arg1;
+        if (-arg2 == arg0[9]) arg0[8] |= 2;
+    } else arg0[8] &= ~2;
+}
 #endif
 
 #ifdef VERSION_US
@@ -1487,7 +1551,21 @@ void func_84147228(u8 arg0, u8 arg1, u8 arg2, u8 arg3, s32 arg4) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_8414760C.s")
+extern u8 D_84186F24[];
+extern u8 D_84186F2C[];
+extern s16 D_84186C34;
+extern s16 D_84186C3C;
+void func_8414760C(void *arg0, s16 arg1, u8 arg2, s16 arg3) {
+    u8 index;
+    if (arg2 < ((u8 *)arg0)[9]) return;
+    index = (arg1 > 0) ? (arg2 - ((u8 *)arg0)[9]) : (((u8 *)arg0)[9] - 1);
+    *(s16 *)((u8 *)arg0 + 0x12) = D_84186C34 + D_84186F2C[index];
+    *(s16 *)((u8 *)arg0 + 0x18) = ((s16 *)&D_84186C3C)[1] + D_84186F24[index];
+    *(s16 *)((u8 *)arg0 + 0x1A) = ((s16 *)&D_84186C34)[2] - D_84186F2C[index];
+    *(s16 *)((u8 *)arg0 + 0x20) = ((s16 *)&D_84186C3C)[3] - D_84186F24[index];
+    ((u8 *)arg0)[8] &= 0xFFFE;
+    func_84147270(arg0, arg2, arg3);
+}
 #endif
 
 #ifdef VERSION_US

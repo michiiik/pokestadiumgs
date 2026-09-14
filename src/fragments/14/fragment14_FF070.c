@@ -578,7 +578,30 @@ void func_8130B9F4(void *arg0) {
     func_8130B95C(arg0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130BA48.s")
+extern void func_800226C0(s32);
+extern s32 func_8130B1F4(u8 *arg0);
+void func_8130BA48(void *arg0) {
+    u8 *record = (u8 *)func_8130B1F4((u8 *)arg0);
+    u8 *saved = (u8 *)arg0;
+    u8 *base;
+    u8 state;
+    if (record[0x20] == 0) {
+        func_800226C0(5);
+        return;
+    }
+    func_800226C0(0x90);
+    base = saved + 0x7FFF;
+    state = base[0x6914];
+    switch (state) {
+    case 0:
+    case 1:
+        base[0x6913] = 4;
+        break;
+    case 2:
+        base[0x6913] = 6;
+        break;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130BADC.s")
 
@@ -631,7 +654,17 @@ s32 func_8130BFCC(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130BFF0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130C0BC.s")
+extern s32 func_81311C70();
+extern u8 D_8131200C[];
+extern void func_8130A8E0(void *arg0, s32 arg1);
+s32 func_8130C0BC(void *arg0) {
+    u8 *new_var;
+    u8 *status = ((u8 *)arg0) + 0xE912;
+    s32 result = func_81311C70(*(s32 *)((u8 *)arg0 + 0xE8EC) + 0x74, (void *)((u8 *)D_8131200C + *(u8 *)((u8 *)arg0 + 0xE914) * 0x24), *(u8 *)((u8 *)arg0 + 0xE910), -1);
+    if (result != -1) { if (result == 1) *(u8 *)(new_var = status) = 2; }
+    else { *status = 0xC; func_8130A8E0(arg0, 0); }
+    return 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130C14C.s")
 
@@ -662,5 +695,17 @@ s32 func_8130C270(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130CB5C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130CDD4.s")
+s32 func_8130CDD4(void *arg0) {
+    u8 *base = (u8 *)arg0 + 0x8000;
+    s32 result;
+    if (base[0x6912] != 13) {
+        return 0;
+    }
+    if (*(s32 *)(base + 0x690C) != 0) {
+        result = -1;
+    } else {
+        result = base[0x6914] + base[0x6911] + 1;
+    }
+    return result;
+}
 #endif

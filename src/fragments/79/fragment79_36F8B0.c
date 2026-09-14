@@ -157,7 +157,30 @@ s16 func_84100688(Func84100688Table *arg0, u32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_84101888.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_84101A08.s")
+void func_84101A08(f32 *arg0, u8 *arg1, u8 arg2) {
+    f32 value;
+    if (*(s16 *)(arg1 + 4) != 0 && arg2 >= *(s16 *)(arg1 + 4)) {
+        return;
+    }
+    if (arg2 < *(s16 *)(arg1 + 2)) {
+        return;
+    }
+    value = (f32)*(s16 *)(arg1 + 8);
+    if (value == *arg0) {
+        return;
+    }
+    if (value < *arg0) {
+        *arg0 -= (f32)*(s16 *)(arg1 + 0xA);
+        if (*arg0 < (f32)*(s16 *)(arg1 + 8)) {
+            *arg0 = (f32)*(s16 *)(arg1 + 8);
+        }
+    } else {
+        *arg0 += (f32)*(s16 *)(arg1 + 0xA);
+        if ((f32)*(s16 *)(arg1 + 8) < *arg0) {
+            *arg0 = (f32)*(s16 *)(arg1 + 8);
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_84101AF4.s")
 
@@ -184,7 +207,21 @@ void func_84102750(s32 arg0, void *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_841027B4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_8410291C.s")
+extern s32 ParticleMath_LacksBits(void *arg0, s32 arg1);
+extern s32 ParticleMath_HasBits(void *arg0, s32 arg1);
+extern s32 ModelAnim_IsFinished(void *arg0);
+extern void func_84100094(u8 *arg0);
+void func_8410291C(u8 *arg0) {
+    u8 *state = *(u8 **)(arg0 + 0x10);
+    if (*(u8 **)(arg0 + 0xC) == NULL) return;
+    if (state == NULL) return;
+    if (*(u8 **)(*(u8 **)(arg0 + 0xC) + 0x44) == NULL) return;
+    if ((*(s16 *)*(u8 **)(*(u8 **)(arg0 + 0xC) + 0x44) & 2) == 0) return;
+    if (ParticleMath_LacksBits(state + 4, 0x2000) == 0) return;
+    if (ParticleMath_HasBits(state + 4, 0x4000) != 0) {
+        if (*(u8 **)(*(u8 **)(arg0 + 0xC) + 0x48) == NULL) func_84100094(arg0);
+    } else if (ModelAnim_IsFinished(*(u8 **)(arg0 + 0xC)) != 0) func_84100094(arg0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_841029DC.s")
 

@@ -291,7 +291,30 @@ void func_82B02A34(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B02D84.s")
+extern s32 D_82B085EC;
+extern s16 D_82B12458;
+void func_82B02D84(void *arg0) {
+    s32 count;
+    s32 limit;
+    s16 mode;
+    s16 *p;
+    mode = *(s16 *)((u8 *)arg0 + 0x50);
+    *(s16 *)((u8 *)arg0 + 0x54) = D_82B12458;
+    p = (s16 *)((u8 *)arg0 + 0x50);
+    switch (mode) {
+    case 0:
+        if (p[3] != p[2]) { p[0] = 1; p[1] = 0; }
+        p[4] = 0;
+        break;
+    case 1:
+        limit = D_82B085EC;
+        p[1] = p[1] + 1;
+        count = p[1];
+        if (count < limit) p[4] = (s16)((count * 0xFF) / limit);
+        else { p[0] = 0; p[4] = 0; p[3] = p[2]; }
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -388,7 +411,20 @@ void func_82B03934(s32 arg0, s32 arg1) { s32 temp = func_8004C990(0x156, 0); fun
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B042D8.s")
+extern Gfx *D_800D0510;
+extern void func_80044270(s16, s16, s16, s16, s32, s32, s32, s32, s32);
+void func_82B042D8(s16 arg0, s16 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
+    s32 var_a1; Gfx *gfx; s16 *coords;
+    gfx = (Gfx *)func_8004C990(0x9A, 0);
+    if (gfx != NULL && arg2 != 0) {
+        var_a1 = (arg4 & 8) ? arg5 : 0xFF;
+        gDPPipeSync(D_800D0510++);
+        if (var_a1 == 0xFF) { gDPSetRenderMode(D_800D0510++, 0x0F0A7008, 0); } else { gDPSetRenderMode(D_800D0510++, 0x00504240, 0); }
+        if (arg3 != 0) { gDPSetEnvColor(D_800D0510++, 0xFF, 0xAA, 0, var_a1); } else { gDPSetEnvColor(D_800D0510++, 0x82, 0x82, 0x82, var_a1); }
+        coords = (s16 *)gfx;
+        func_80044270(arg0, arg1, coords[0], coords[1], 0, 0, 0x400, 0x400, 0);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -681,7 +717,33 @@ void func_82B07AB4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B07BEC.s")
+extern s16 D_82B12458;
+extern s16 D_82B12694;
+extern void func_8004B314(s32, s32, s32, s32);
+extern s16 D_82B12450;
+void func_82B07BEC(void) {
+    void *var_s0;
+    s16 sp24[4];
+    var_s0 = NULL;
+    switch (D_82B12450) {
+    case 2:
+    {
+        var_s0 = *(void **)((u8 *)&D_82B12450 + (D_82B12458 << 2) + 0xB68);
+        break;
+    }
+    case 6:
+    {
+        var_s0 = func_82B02800(9, D_82B12694);
+        break;
+    }
+    default:
+        break;
+    }
+    if (var_s0 != NULL) {
+        func_82B0284C((u8 *)var_s0, (u8 *)&sp24[0]);
+        func_8004B314(sp24[0], sp24[1], *(s16 *)((u8 *)var_s0 + 0x48), *(s16 *)((u8 *)var_s0 + 0x4A));
+    }
+}
 #endif
 
 #ifdef VERSION_US

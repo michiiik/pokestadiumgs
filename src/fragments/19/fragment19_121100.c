@@ -27,9 +27,25 @@ s32 func_823000F8(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_8230099C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82300A78.s")
-
 extern s16 D_82305EB4;
+extern s16 D_82305EC2;
+extern s16 D_82305EC4;
+extern s16 D_82305EC6;
+extern s16 D_82305EC8;
+/* Ground truth reuses one `lui $at` for the D_82305EC4/EC6/EC2 stores and
+   reloads $at for the equally same-page D_82305EC8, so the fold is narrowed
+   to those three symbols (AGENTS.md rule 12). */
+#pragma COALESCE_AT_LUI(func_82300A78, D_82305EC4, D_82305EC6, D_82305EC2)
+void func_82300A78(void) {
+    s16 *state = &D_82305EB4;
+    if (*state != 2) return;
+    *state = 3;
+    D_82305EC4 = 0;
+    D_82305EC6 = 0;
+    D_82305EC2 = 0;
+    D_82305EC8 = 0;
+}
+
 s32 func_82300AB4(void) {
     s32 result = 0;
     if (D_82305EB4 == 0) result = 1;
@@ -123,7 +139,29 @@ s32 func_82301434(s32 arg0, u8 *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_823014EC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_823015B0.s")
+extern u16 D_82305E72;
+extern f32 D_82305EE0;
+s32 func_823015B0(s32 arg0, u8 *arg1) {
+    switch (arg0) {
+    case 0:
+        break;
+    case 1:
+        if (D_82305EE0 < 1.0f) {
+            *(u16 *)(arg1 + 2) &= 0xFFFD;
+        } else {
+            *(u16 *)(arg1 + 2) |= 2;
+            if (D_82305E72 & 1) {
+                *(u16 *)(arg1 + 2) |= 2;
+            } else {
+                *(u16 *)(arg1 + 2) &= 0xFFFD;
+            }
+        }
+        break;
+    default:
+        break;
+    }
+    return 0;
+}
 
 extern s16 D_82305E6A;
 extern f32 D_82305EE0;
@@ -260,7 +298,10 @@ void func_823030A4(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82303308.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82303488.s")
+extern s32 func_82300AB4(void);
+extern s32 func_82300F4C(void);
+extern s16 D_82305E68[];
+s32 func_82303488(void) { s32 result = 0; s16 *counter = D_82305E68; if (func_82300AB4()) result = 1; if (func_82300F4C()) result |= 2; if (result == 3) { if (++counter[0] < 2) result = 0; } else result = 0; return result; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82303508.s")
 

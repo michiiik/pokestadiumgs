@@ -93,7 +93,25 @@ void func_80046F2C(u8 *arg0, s32 arg1) {
     arg0[0x79] = (u8)arg1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80046F34.s")
+extern u8 *D_80126F5C;
+extern u8 *D_80126F60;
+extern u8 *D_80126F64;
+s32 func_80046F34(u16 arg0) {
+    s32 result;
+    s32 index;
+    result = 0;
+    arg0 &= 0x7F7F;
+    arg0 &= 0xFFFF;
+    if (arg0 >= 0x20 && arg0 < 0x80) { index = arg0 - 0x20; result = D_80126F5C[index]; }
+    else if (arg0 >= 0x2120 && arg0 < 0x2180) { index = arg0 - 0x2120; result = D_80126F60[index]; }
+    else if (arg0 >= 0x2330 && arg0 < 0x233A) result = arg0 - 0x2320;
+    else if (arg0 >= 0x2341 && arg0 < 0x235B) result = arg0 - 0x2327;
+    else if (arg0 >= 0x2361 && arg0 < 0x237B) result = arg0 - 0x22CC;
+    else if (arg0 >= 0x2421 && arg0 < 0x2474) { index = arg0 - 0x2421; result = D_80126F64[index] + 0xAF; }
+    else if (arg0 >= 0x2521 && arg0 < 0x2574) { index = arg0 - 0x2521; result = D_80126F64[index] + 0x45; }
+    else if (arg0 == 0x2574) result = 0xFF;
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047058.s")
 
@@ -250,7 +268,86 @@ s32 func_80047790(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800477C4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047864.s")
+extern s32 HAL_Strcmp(const s8 *, const s8 *);
+s32 func_80047864(const s8 * arg0) {
+    s32 result = 25;
+    if (HAL_Strcmp(arg0, "FONT") == 0) {
+        result = 0;
+    }
+    else if (HAL_Strcmp(arg0, "COL1") == 0) {
+        result = 1;
+    }
+    else if (HAL_Strcmp(arg0, "COL2") == 0) {
+        result = 2;
+    }
+    else if (HAL_Strcmp(arg0, "TEX") == 0) {
+        result = 3;
+    }
+    else if (HAL_Strcmp(arg0, "LINE") == 0) {
+        result = 4;
+    }
+    else if (HAL_Strcmp(arg0, "FACE") == 0) {
+        result = 5;
+    }
+    else if (HAL_Strcmp(arg0, "DIST") == 0) {
+        result = 6;
+    }
+    else if (HAL_Strcmp(arg0, "WAZA") == 0) {
+        result = 7;
+    }
+    else if (HAL_Strcmp(arg0, "KOKA") == 0) {
+        result = 8;
+    }
+    else if (HAL_Strcmp(arg0, "NEMURI") == 0) {
+        result = 9;
+    }
+    else if (HAL_Strcmp(arg0, "DOKU") == 0) {
+        result = 10;
+    }
+    else if (HAL_Strcmp(arg0, "DOKUDOKU") == 0) {
+        result = 11;
+    }
+    else if (HAL_Strcmp(arg0, "YAKEDO") == 0) {
+        result = 12;
+    }
+    else if (HAL_Strcmp(arg0, "KOHRI") == 0) {
+        result = 13;
+    }
+    else if (HAL_Strcmp(arg0, "MAHI") == 0) {
+        result = 14;
+    }
+    else if (HAL_Strcmp(arg0, "HIRUMI") == 0) {
+        result = 15;
+    }
+    else if (HAL_Strcmp(arg0, "SHIBARI") == 0) {
+        result = 16;
+    }
+    else if (HAL_Strcmp(arg0, "KONRAN") == 0) {
+        result = 17;
+    }
+    else if (HAL_Strcmp(arg0, "MEROMERO") == 0) {
+        result = 18;
+    }
+    else if (HAL_Strcmp(arg0, "NOROI") == 0) {
+        result = 19;
+    }
+    else if (HAL_Strcmp(arg0, "AKUMU") == 0) {
+        result = 20;
+    }
+    else if (HAL_Strcmp(arg0, "YADORIGI") == 0) {
+        result = 21;
+    }
+    else if (HAL_Strcmp(arg0, "HARE") == 0) {
+        result = 22;
+    }
+    else if (HAL_Strcmp(arg0, "AME") == 0) {
+        result = 23;
+    }
+    else if (HAL_Strcmp(arg0, "SUNA") == 0) {
+        result = 24;
+    }
+    return result;
+}
 
 
 extern s32 HAL_Strcmp(const s8 *, const s8 *);
@@ -267,7 +364,32 @@ s32 func_80047B4C(const s8 *arg0) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047BD4.s")
+s32 func_80047BD4(u8 *arg0) {
+    u8 *p;
+    u8 *start;
+    s32 total;
+    s32 place;
+
+    total = 0;
+    place = 1;
+    p = arg0;
+    start = arg0;
+    while (*p != 0) {
+        p++;
+    }
+    p--;
+    while (start != p) {
+        total += place * (*p - '0');
+        place *= 10;
+        p--;
+    }
+    if (*p == '-') {
+        total = -total;
+    } else {
+        total += place * (*p - '0');
+    }
+    return total;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047D24.s")
 
@@ -277,16 +399,16 @@ s32 func_80047B4C(const s8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_8004803C.s")
 
-extern void func_800477C4(void *);
-extern s32 func_80047BD4(void *);
+extern u8 *func_800477C4(u8 *, u8 *);
+extern s32 func_80047BD4(u8 *);
 extern void func_80046F2C(u8 *, s32);
-void func_80048188(u8 *arg0) { u8 temp[0x20]; func_800477C4(temp); func_80046F2C(arg0, func_80047BD4(temp)); }
+void func_80048188(u8 *arg0, u8 *arg1) { u8 temp[0x20]; func_800477C4(temp, arg1); func_80046F2C(arg0, func_80047BD4(temp)); }
 
 extern s32 func_8003514C(void);
 s32 func_800481C0(u8 *arg0, s32 value) { if (func_8003514C() != 0) value = 0; arg0[0x78] = value; return 1; }
 
 extern s32 func_800481C0(u8 *, s32);
-s32 func_800481FC(u8 *arg0) { u8 temp[0x20]; func_800477C4(temp); return func_800481C0(arg0, func_80047BD4(temp)); }
+s32 func_800481FC(u8 *arg0, u8 *arg1) { u8 temp[0x20]; func_800477C4(temp, arg1); return func_800481C0(arg0, func_80047BD4(temp)); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80048234.s")
 
@@ -346,7 +468,7 @@ void func_800497E4(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     func_80049828(0, arg0, arg1, arg2, arg3);
 }
 
-extern void func_80046E64(u8 *, s32, s32, s32, s32, s32);
+extern s32 func_80046E64(u8 *, s32, s32, s32, s32, s32);
 void func_80049828(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
     func_80046E64(D_80126F50, arg0, arg1, arg2, arg3, arg4);
 }

@@ -28,3 +28,6 @@ ctx.c.m2c
 !.vscode/c_cpp_properties.json
 .DS_Store
 tools/vtxdis
+
+# Local-only CI migration notes
+/.ignore/

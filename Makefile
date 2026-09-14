@@ -137,7 +137,10 @@ $(error Unable to find $(MIPS_BINUTILS_PREFIX)ld. Please install or build MIPS b
 endif
 
 
-CC              := $(shell pwd)/tools/ido/$(DETECTED_OS)/7.1/cc
+# Some matching functions opt into a small post-compile transform that
+# reproduces an IDO linker/assembler artifact. The wrapper delegates to the
+# real compiler and leaves all non-opted-in sources unchanged.
+CC              := $(shell pwd)/tools/coalesce_cc.py
 CC_OLD          := $(shell pwd)/tools/ido/$(DETECTED_OS)/5.3/cc
 
 AS              := $(MIPS_BINUTILS_PREFIX)as
@@ -344,7 +347,18 @@ ifeq ($(N64_EMULATOR),)
 endif
 	$(N64_EMULATOR) $<
 
-.PHONY: all rom clean libclean distclean venv setup extract lib diff-init init run
+# Syntax-check every C source with the host compiler, without building
+# objects. The normal build checks only files that are rebuilt, so this whole
+# tree pass is useful at PR time.
+cc-check:
+	$(V)set -e; for f in $(C_FILES); do \
+	  $(CC_CHECK) $(filter-out -MMD -MP,$(CC_CHECK_FLAGS)) $(IINC) -I $$(dirname $$f) \
+	    $(CHECK_WARNINGS) $(BUILD_DEFINES) $(COMMON_DEFINES) $(RELEASE_DEFINES) \
+	    $(GBI_DEFINES) $(LIBULTRA_DEFINES) $(C_DEFINES) $(MIPS_BUILTIN_DEFS) $$f || exit 1; \
+	done
+	@echo "cc-check: all $(words $(C_FILES)) C source(s) pass the host syntax check"
+
+.PHONY: all rom clean libclean distclean venv setup extract lib diff-init init run cc-check
 .DEFAULT_GOAL := rom
 # Prevent removing intermediate files
 .SECONDARY:

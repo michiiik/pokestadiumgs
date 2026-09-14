@@ -297,7 +297,20 @@ void func_8AC01574(s16 arg0, s16 arg1, s32 arg2, s32 arg3, s16 arg4) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC015B0.s")
+extern s16 D_8AC099B8;
+extern s16 D_8AC099BA;
+extern void func_8004B314(s32, s32, s32, s32);
+void func_8AC015B0(s16 arg0, s16 arg1, s32 arg2, s32 arg3, s16 arg4) {
+    s32 temp_v0;
+    s16 temp_a2;
+    temp_v0 = func_8AC013FC(arg0, arg1, arg2, arg3, arg4);
+    temp_a2 = (s16) temp_v0;
+    if (temp_v0 > 0) {
+        func_8004B314(D_8AC099B8, D_8AC099BA, temp_a2, 0x1E);
+        return;
+    }
+    func_8004B314(D_8AC099B8, D_8AC099BA, 0x1E, 0x1E);
+}
 #endif
 
 #ifdef VERSION_US
@@ -638,7 +651,8 @@ s32 func_8AC03C28(s32 arg0, void *arg1) {
 #ifdef VERSION_US
 extern Gfx * D_800D0510;
 extern u8 D_8AC07D90[];
-void func_8AC03F64(s32 arg0, s32 arg1, s32 arg2, struct { u8 r; u8 g; u8 b; u8 a; } color) {
+typedef struct { u8 r; u8 g; u8 b; u8 a; } Fragment43Color405C;
+void func_8AC03F64(s32 arg0, s32 arg1, s32 arg2, Fragment43Color405C color) {
     gSPDisplayList(D_800D0510++, D_8AC07D90);
     gDPSetPrimColor(D_800D0510++, 0, 0, color.r, color.g, color.b, color.a);
     gSPTextureRectangle(D_800D0510++, arg0 << 2, arg1 << 2, (arg0 + arg2) << 2, (arg1 + 2) << 2, 0, 0, 0, 0, 0x400);
@@ -648,7 +662,6 @@ void func_8AC03F64(s32 arg0, s32 arg1, s32 arg2, struct { u8 r; u8 g; u8 b; u8 a
 #ifdef VERSION_US
 extern Gfx *D_800D0510;
 extern u8 D_8AC07D90[];
-typedef struct { u8 r; u8 g; u8 b; u8 a; } Fragment43Color405C;
 void func_8AC0405C(s32 arg0, s32 arg1, s32 arg2, Fragment43Color405C color) {
     gSPDisplayList(D_800D0510++, D_8AC07D90);
     gDPSetPrimColor(D_800D0510++, 0, 0, color.r, color.g, color.b, color.a);
@@ -681,11 +694,33 @@ void func_8AC043E0(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC04418.s")
+extern u8 D_8AC07DD8[];
+void func_8AC04418(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    func_8AC04154(arg0, arg1, arg2, arg3, *(Fragment43Color405C *)(void *)D_8AC07DD8);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC0444C.s")
+extern void func_800504BC(s16 *);
+extern void func_8AC03F64(s32, s32, s32, Fragment43Color405C);
+s32 func_8AC0444C(s32 arg0, void *arg1) {
+    struct { s32 pad[2]; s16 angles[2]; } scratch;
+    if ((arg0 != 0) && (arg0 == 1)) {
+        func_800504BC(scratch.angles);
+        {
+            s16 x;
+            Fragment43Color405C color;
+            s16 y;
+            s16 z;
+            x = *(s16 *)((u8 *)arg1 + 8) + scratch.angles[0];
+            y = *(s16 *)((u8 *)arg1 + 0xA) + scratch.angles[1];
+            z = *(s16 *)((u8 *)arg1 + 0xC);
+            color = *(Fragment43Color405C *)((u8 *)arg1 + 0x28);
+            func_8AC03F64(x, y, z, color);
+        }
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -764,7 +799,10 @@ void func_8AC04744(s32 *arg0, s32 arg1, s32 arg2, s32 arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC05E40.s")
+extern void func_8AC049A8(void);
+extern void func_8004E308(s32, s32 *, s32 *);
+extern s32 func_8AC06D8C(s32, s32);
+void func_8AC05E40(s32 arg0, s32 arg1, s32 arg2) { typedef struct { s32 w[14]; } CopyBlock; CopyBlock *src; CopyBlock *dst; s32 *result; _bzero((void *)arg2, 0x78); result = func_8AC06D8C(arg0, arg1); src = (void *)result; dst = (void *)arg2; *dst = *src; *(s16 *)((u8 *)arg2 + 0x70) = 0; func_8004E308((s32)result, (s32 *)&func_8AC049A8, (s32 *)arg2); }
 #endif
 
 #ifdef VERSION_US
@@ -959,7 +997,26 @@ s32 func_8AC06630(s16 arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC0665C.s")
+s32 func_8AC0665C(s16 *arg0, s16 arg1) {
+    s32 result = 0;
+    s16 index = arg1;
+    s16 count = arg0[1];
+    if (func_8AC0660C(arg1)) {
+        while (1) {
+            index--;
+            if (func_8AC06464(index, arg0)) {
+                s16 temp;
+                count--;
+                if (func_8AC064C4((s16)(arg0[4] * (temp = count)), arg0)) {
+                    result = 1;
+                    break;
+                }
+            }
+            if (!func_8AC0660C(index)) break;
+        }
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US

@@ -196,7 +196,25 @@ void func_862014B8(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_266A60/func_8620157C.s")
+extern void *func_87F025B8(void *, void *);
+extern void func_8003F1DC(void *);
+extern void func_8003F114(void *, s32, s32, s32);
+extern void func_8620148C(void);
+extern void * D_8620E198;
+s32 func_8620157C(s32 arg0) {
+    void *result; void *ptr; f32 scale;
+    result = func_87F025B8((u8 *)D_8620E198 + 0xED88, (void *)func_8620148C);
+    if (result != NULL) {
+        ptr = (u8 *)result + 0x24;
+        func_8003F1DC(ptr);
+        func_8003F114(ptr, 0, -1, *(s32 *)((u8 *)D_8620E198 + 0x13C));
+        scale = *(f32 *)((u8 *)arg0 + 0x34) * (*(f32 *)((u8 *)D_8620E198 + 0x64) * 0.75f);
+        *(f32 *)((u8 *)result + 0x5C) = scale;
+        *(f32 *)((u8 *)result + 0x58) = scale;
+        *(f32 *)((u8 *)result + 0x54) = scale;
+    }
+    return (s32)result;
+}
 #endif
 
 #ifdef VERSION_US
@@ -265,7 +283,23 @@ void func_86201DE4(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_266A60/func_86202574.s")
+extern void func_8620218C(void *, void *);
+extern void * D_8620E198;
+void func_86202574(void) {
+    void *outer;
+    void *inner;
+    outer = *(void **)((u8 *)D_8620E198 + 0x180);
+    while (outer != NULL) {
+        inner = *(void **)((u8 *)outer + 4);
+        while (inner != NULL) {
+            if (outer != inner) {
+                func_8620218C(outer, inner);
+            }
+            inner = *(void **)((u8 *)inner + 4);
+        }
+        outer = *(void **)((u8 *)outer + 4);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -331,7 +365,11 @@ void func_86203BEC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_266A60/func_86203D50.s")
+extern f32 D_80087E50[];
+extern f32 D_80088E50[];
+extern void func_87F0C000(f32 *);
+extern void * D_8620E198;
+void func_86203D50(void) { if (*(s32 *)((u8 *)D_8620E198 + 0x90) == 0) { *(s16 *)((u8 *)D_8620E198 + 0x8E) += 0x2E; *(f32 *)((u8 *)D_8620E198 + 0x7C) = D_80087E50[(*(u16 *)((u8 *)D_8620E198 + 0x8E)) >> 4] * -400.0f; *(f32 *)((u8 *)D_8620E198 + 0x84) = D_80088E50[(*(u16 *)((u8 *)D_8620E198 + 0x8E)) >> 4] * -400.0f; func_87F0C000((f32 *)((u8 *)D_8620E198 + 0x70)); } }
 #endif
 
 #ifdef VERSION_US

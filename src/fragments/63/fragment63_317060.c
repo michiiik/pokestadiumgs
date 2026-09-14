@@ -210,9 +210,43 @@ s32 func_87E15698(u8 *arg0) {
     return *(s32 *)(arg0 + 0x164);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E156A0.s")
+extern f32 D_87E1B8F0;
+extern f32 D_87E1B8F4;
+extern f32 D_87E1B8F8;
+extern f32 D_87E1B8FC;
+extern void func_87F0455C(void);
+extern void func_87F04314(s32, s32, s32, void *, s32, s32, s32, s32, s32, void *, void *, void *);
+extern u8 D_87E1B8D0;
+extern u8 D_87E1B8D8;
+extern u8 D_87E1B8E0;
+extern u8 D_87E1B8E8;
+extern u8 D_87F0FB6C;
+extern u8 D_87F0FB70;
+void func_87E156A0(void *arg0) {
+    void *p0;
+    void *p1;
+    void *p2;
+    void *p3;
+    p0 = (u8 *)arg0 + 0x10C8;
+    p1 = (u8 *)arg0 + 0x10CC;
+    p2 = (u8 *)arg0 + 0x10D0;
+    p3 = (u8 *)arg0 + 0x10D4;
+    *(f32 *)p0 = D_87E1B8F0;
+    *(f32 *)p1 = D_87E1B8F4;
+    *(f32 *)p2 = D_87E1B8F8;
+    *(f32 *)p3 = D_87E1B8FC;
+    func_87F0455C();
+    func_87F04314(0, 0, 0, &D_87E1B8D0, 12, 0, 10, 3, 3, p0, &D_87F0FB6C, &D_87F0FB70);
+    func_87F04314(0, 0, 1, &D_87E1B8D8, 12, 1, 10, 3, 7, p1, &D_87F0FB6C, &D_87F0FB70);
+    func_87F04314(0, 0, 2, &D_87E1B8E0, 12, 2, 10, 3, 3, p2, &D_87F0FB6C, &D_87F0FB70);
+    func_87F04314(0, 0, 3, &D_87E1B8E8, 12, 3, 10, 3, 3, p3, &D_87F0FB6C, &D_87F0FB70);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E15874.s")
+void func_87E15874(f32 *arg0, f32 *arg1, f32 *arg2) {
+    arg0[0] = arg1[0] * arg2[0] + arg1[1] * arg2[4] + arg1[2] * arg2[8] + arg2[12];
+    arg0[1] = arg1[0] * arg2[1] + arg1[1] * arg2[5] + arg1[2] * arg2[9] + arg2[13];
+    arg0[2] = arg1[0] * arg2[2] + arg1[1] * arg2[6] + arg1[2] * arg2[10] + arg2[14];
+}
 
 extern Gfx *D_800D0510;
 extern void *D_8009491C;
@@ -263,7 +297,37 @@ void func_87E15A78(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E1614C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E16200.s")
+extern void Vec3f_CrossProduct(f32 *, f32 *, f32 *);
+extern void func_80035A10(f32 *);
+void func_87E16200(f32 *arg0, f32 *arg1, f32 *arg2) {
+    f32 v64[3];
+    f32 v58[3];
+    f32 v4C[3];
+    f32 v40[3];
+    f32 v34[3];
+    f32 v28[3];
+    Vec3f_CrossProduct(v40, arg2, arg0);
+    func_80035A10(v40);
+    Vec3f_CrossProduct(v28, arg0, arg1);
+    func_80035A10(v28);
+    Vec3f_CrossProduct(v58, arg1, arg2);
+    func_80035A10(v58);
+    Vec3f_CrossProduct(v34, arg0, arg1);
+    func_80035A10(v34);
+    Vec3f_CrossProduct(v64, arg1, arg2);
+    func_80035A10(v64);
+    Vec3f_CrossProduct(v4C, arg2, arg0);
+    func_80035A10(v4C);
+    arg0[0] += v58[0] + v64[0]; arg0[1] += v58[1] + v64[1]; arg0[2] += v58[2] + v64[2];
+    arg0[0] /= 3.0f; arg0[1] /= 3.0f; arg0[2] /= 3.0f;
+    func_80035A10(arg0);
+    arg1[0] += v40[0] + v4C[0]; arg1[1] += v40[1] + v4C[1]; arg1[2] += v40[2] + v4C[2];
+    arg1[0] /= 3.0f; arg1[1] /= 3.0f; arg1[2] /= 3.0f;
+    func_80035A10(arg1);
+    arg2[0] += v28[0] + v34[0]; arg2[1] += v28[1] + v34[1]; arg2[2] += v28[2] + v34[2];
+    arg2[0] /= 3.0f; arg2[1] /= 3.0f; arg2[2] /= 3.0f;
+    func_80035A10(arg2);
+}
 
 void func_87E1643C(void *arg0, void *arg1, void *arg2, void *arg3) {
     (*(f32 *)((u8 *)(arg0) + (0))) = (f32) (*(f32 *)((u8 *)(arg1) + (0)));
@@ -277,13 +341,64 @@ void func_87E1643C(void *arg0, void *arg1, void *arg2, void *arg3) {
     (*(f32 *)((u8 *)(arg0) + (0x28))) = (f32) (*(f32 *)((u8 *)(arg3) + (8)));
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E16488.s")
+extern void func_87E1614C(f32 *, f32 *, s32 *, s32, s32 *, s32);
+extern s32 D_87E1B3A4[4];
+extern s32 D_87E1B3B4[4];
+extern s32 D_87E1B3C4[4];
+extern s32 D_87E1B3D4[4];
+extern s32 D_87E1B3E4[4];
+extern s32 D_87E1B3F4[4];
+void func_87E16488(void *arg0) {
+    f32 *p;
+    s32 i;
+    f32 v4C[3];
+    f32 v40[3];
+    f32 v34[3];
+    f32 count = 8.0f;
+
+    *(f32 *)((u8 *)arg0 + 0x30) = 0.0f;
+    *(f32 *)((u8 *)arg0 + 0x34) = 0.0f;
+    *(f32 *)((u8 *)arg0 + 0x38) = 0.0f;
+    p = (f32 *)((u8 *)arg0 + 0x40);
+    for (i = 0; i < 8; i++) {
+        *(f32 *)((u8 *)arg0 + 0x30) += p[0];
+        *(f32 *)((u8 *)arg0 + 0x34) += p[1];
+        *(f32 *)((u8 *)arg0 + 0x38) += p[2];
+        p += 6;
+    }
+    *(f32 *)((u8 *)arg0 + 0x30) /= count;
+    *(f32 *)((u8 *)arg0 + 0x34) /= count;
+    *(f32 *)((u8 *)arg0 + 0x38) /= count;
+    func_87E1614C(v4C, (f32 *)((u8 *)arg0 + 0x40), D_87E1B3A4, 4, D_87E1B3B4, 4);
+    func_87E1614C(v40, (f32 *)((u8 *)arg0 + 0x40), D_87E1B3C4, 4, D_87E1B3D4, 4);
+    func_87E1614C(v34, (f32 *)((u8 *)arg0 + 0x40), D_87E1B3E4, 4, D_87E1B3F4, 4);
+    func_87E16200(v4C, v40, v34);
+    func_87E1643C(arg0, v4C, v40, v34);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E16738.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E16894.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E16AA4.s")
+extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
+extern void func_80035A10(f32 *);
+extern void Vec3f_CrossProduct(f32 *, f32 *, f32 *);
+extern void func_87E1643C(void *arg0, void *arg1, void *arg2, void *arg3);
+void func_87E16AA4(void *arg0) {
+    f32 v0[3];
+    f32 v1[3];
+    f32 v2[3];
+    u8 pad[72];
+    Vec3f_SetComponentsDuplicate(v0, *(f32 *)((u8 *)arg0 + 0), *(f32 *)((u8 *)arg0 + 4), *(f32 *)((u8 *)arg0 + 8));
+    Vec3f_SetComponentsDuplicate(v1, *(f32 *)((u8 *)arg0 + 0x10), *(f32 *)((u8 *)arg0 + 0x14), *(f32 *)((u8 *)arg0 + 0x18));
+    Vec3f_SetComponentsDuplicate(v2, *(f32 *)((u8 *)arg0 + 0x20), *(f32 *)((u8 *)arg0 + 0x24), *(f32 *)((u8 *)arg0 + 0x28));
+    func_80035A10(v0);
+    Vec3f_CrossProduct(v1, v2, v0);
+    func_80035A10(v1);
+    Vec3f_CrossProduct(v2, v0, v1);
+    func_80035A10(v2);
+    func_87E1643C(arg0, v0, v1, v2);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E16B50.s")
 

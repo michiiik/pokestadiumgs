@@ -2,7 +2,8 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C5AA0/func_88508490.s")
+extern u8 D_88523100[];
+void func_88508490(void){s32 i=0;u8 *p=D_88523100;do{i++;p+=0x24;*(s32 *)(p-0x24)=0;*(s16 *)(p-0x20)=0;*(s16 *)(p-0x1E)=0;*(s16 *)(p-0x1C)=0;*(s16 *)(p-0x1A)=0;*(s16 *)(p-0x18)=0;*(s16 *)(p-0x16)=0;*(s16 *)(p-0x14)=0;*(s16 *)(p-0x12)=0;*(s16 *)(p-0x10)=0;*(f32 *)(p-0xC)=0.0f;*(f32 *)(p-8)=0.0f;*(f32 *)(p-4)=0.0f;}while(i!=2);}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C5AA0/func_885084EC.s")
 
