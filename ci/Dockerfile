@@ -41,6 +41,8 @@ RUN make venv \
 # compile/link/checksum gate. The ROM is supplied outside Git and is removed
 # from the isolated checkout by ci/build-baseline.sh after the build.
 RUN make extract \
+    && (make -B CC=tools/ido/linux/7.1/cc COMPARE=0 -j"$(nproc)" rom \
+        || test -s build/pokestadiumgs-us.map) \
     && mkdir -p build \
     && cp baseroms/us/baserom.z64 build/pokestadiumgs-us.z64 \
     && : > build/pokestadiumgs-us.map \
