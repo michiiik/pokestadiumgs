@@ -42,8 +42,8 @@ RUN make venv \
 # from the isolated checkout by ci/build-baseline.sh after the build.
 RUN make extract \
     && (make -B CC=tools/ido/linux/7.1/cc COMPARE=0 -j"$(nproc)" rom \
-        || test -s build/pokestadiumgs-us.map) \
-    && mkdir -p build \
+        || test -s build/pokestadiumgs-us.map)
+
+RUN mkdir -p build \
     && cp baseroms/us/baserom.z64 build/pokestadiumgs-us.z64 \
-    && : > build/pokestadiumgs-us.map \
     && md5sum build/pokestadiumgs-us.z64 baseroms/us/baserom.z64
