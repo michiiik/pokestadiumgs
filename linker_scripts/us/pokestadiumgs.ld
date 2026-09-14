@@ -1409,6 +1409,7 @@ SECTIONS
         build/src/fragments/14/fragment14_104FC0.o(.rodata);
         build/src/fragments/14/fragment14_1077C0.o(.rodata);
         build/src/fragments/14/fragment14_109280.o(.rodata);
+        build/asm/us/data/10A8C0.rodata.o(.rodata);
         fragment14_RODATA_END = .;
         fragment14_RODATA_SIZE = ABSOLUTE(fragment14_RODATA_END - fragment14_RODATA_START);
     }
@@ -1892,6 +1893,7 @@ SECTIONS
         build/asm/us/data/fragments/24/fragment24_header.o(.rodata);
         build/src/fragments/24/fragment24_14FE20.o(.rodata);
         build/src/fragments/24/fragment24_150C10.o(.rodata);
+        build/asm/us/data/1585C0.rodata.o(.rodata);
         fragment24_RODATA_END = .;
         fragment24_RODATA_SIZE = ABSOLUTE(fragment24_RODATA_END - fragment24_RODATA_START);
     }
@@ -5197,6 +5199,7 @@ SECTIONS
         build/src/fragments/79/fragment79_38EFE0.o(.rodata);
         build/src/fragments/79/fragment79_393B40.o(.rodata);
         build/src/fragments/79/fragment79_393BF0.o(.rodata);
+        build/asm/us/data/3F8CE0.rodata.o(.rodata);
         build/src/fragments/79/fragment79_393CA0.o(.rodata);
         build/asm/us/data/3FAA50.rodata.o(.rodata);
         build/src/fragments/79/fragment79_3ADCA0.o(.rodata);

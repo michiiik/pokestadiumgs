@@ -584,6 +584,8 @@
     - [0x1077C0, c,       fragments/14/fragment14_1077C0]
     - [0x109280, c,       fragments/14/fragment14_109280]
     - [0x109EC0, data,    fragments/14/fragment14_data]
+    - [0x10A7D0, .rodata, fragments/14/fragment14_FF070] # jtbl_81312648, jtbl_81312680 (+2 more)
+    - [0x10A8C0, rodata]
 
   - name: fragment15
     type: code
@@ -699,6 +701,8 @@
     - [0x14FE20, c,       fragments/24/fragment24_14FE20]
     - [0x150C10, c,       fragments/24/fragment24_150C10]
     - [0x158320, data,    fragments/24/fragment24_data]
+    - [0x158490, .rodata, fragments/24/fragment24_150C10] # D_82B08690, jtbl_82B08698 (+7 more)
+    - [0x1585C0, rodata]
   
   - name: fragment25
     type: code
@@ -1471,6 +1475,8 @@
     - [0x3D7DD0, c,       fragments/79/fragment79_3D7DD0]
     - [0x3D99F0, c,       fragments/79/fragment79_3D99F0]
     - [0x3D9A00, data,    fragments/79/fragment79_data]
+    - [0x3F86C0, .rodata, fragments/79/fragment79_37A6E0] # floats, jtbl_84188FA0 (+19 more)
+    - [0x3F8CE0, rodata]
     - [0x3FA810, .rodata, fragments/79/fragment79_393CA0] # jtbl_8418AF80, jtbl_8418AFB0, jtbl_8418AFEC, jtbl_8418B008, jtbl_8418B020, jtbl_8418B0C0, jtbl_8418B0D8, jtbl_8418B0F4, jtbl_8418B10C, jtbl_8418B124, jtbl_8418B150, jtbl_8418B174, jtbl_8418B194
     - [0x3FAA50, rodata]
     - [0x3FAA60, .rodata, fragments/79/fragment79_3ADCA0] # jtbl_8418B1D0 (+13 more, incl. jtbl_8418B738/jtbl_8418B74C)
