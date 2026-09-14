@@ -584,6 +584,8 @@
     - [0x1077C0, c,       fragments/14/fragment14_1077C0]
     - [0x109280, c,       fragments/14/fragment14_109280]
     - [0x109EC0, data,    fragments/14/fragment14_data]
+    - [0x10A7D0, .rodata, fragments/14/fragment14_FF070] # jtbl_81312648, jtbl_81312680 (+2 more)
+    - [0x10A8C0, rodata]
 
   - name: fragment15
     type: code

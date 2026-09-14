@@ -398,9 +398,78 @@ s32 func_8130A9C8(u8 *arg0) {
     return arg0[0xE912] == 7;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130A9DC.s")
+/* Not referenced by any still-GLOBAL_ASM function's relocations picked up by
+ * the rodata-ownership scan; it's a single-owner symbol used only by
+ * func_8130C570 (still GLOBAL_ASM) elsewhere in this file, but splat's
+ * per-function .late_rodata migration only folds jump tables and floats into
+ * a function's .s -- plain data taken by address (lui/addiu, not lw/lwc1) is
+ * dropped silently. Literal-ized by hand from the retail bytes at 0x10A7D0
+ * so the still-assembly func_8130C570.s (which references it externally)
+ * keeps linking. */
+const u8 D_81312640[8] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00};
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130AA18.s")
+s32 func_8130A9DC(void *arg0) {
+    switch (((u8 *)arg0)[0xE912]) {
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 11:
+        return 1;
+    case 0:
+    case 1:
+    case 6:
+    case 7:
+    case 8:
+    case 10:
+    case 12:
+    case 13:
+        return 0;
+    case 9:
+        break;
+    default:
+        /* Retail's default case falls through without setting $v0; IDO
+         * accepts a valueless `return` from a non-void function here, but
+         * GCC's stricter cc-check does not. The CC_CHECK branch is never
+         * seen by the real IDO build, so it can't affect the matched bytes. */
+#ifdef CC_CHECK
+        return 0;
+#else
+        return;
+#endif
+    }
+}
+
+s32 func_8130AA18(u8 *arg0) {
+    /* Case values recovered from jtbl_81312680's actual target addresses
+     * (retail table entries, not the positionally-plausible grouping): index
+     * 7 targets the "return 1" body (.L8130AA40), and index 9 targets the
+     * bare epilogue (.L8130AA4C) directly, skipping the "return 0" body
+     * (.L8130AA48) -- i.e. it falls off the switch without setting a value,
+     * same as func_8130A9DC's case 9. */
+    switch (arg0[0xE912]) {
+    case 2:
+    case 3:
+    case 5:
+    case 7:
+        return 1;
+    case 0:
+    case 1:
+    case 4:
+    case 6:
+    case 8:
+    case 10:
+    case 11:
+    case 12:
+    case 13:
+        return 0;
+    case 9:
+        break;
+    }
+#ifdef CC_CHECK
+    return 0;
+#endif
+}
 
 
 s32 func_8130AA54(u8 *arg0, s32 arg1) {
