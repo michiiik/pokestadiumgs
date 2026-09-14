@@ -147,6 +147,13 @@ if sync_tree /src/yamls /work/yamls; then
     split_changed=1
     echo "gate-pr.sh: split inputs changed; re-running extraction" >&2
     make extract
+    # extract regenerates linker_scripts/us/*.ld from whatever /work/asm the
+    # baked image already had, which can predate this split and disagree
+    # with the linker script already synced from /src above and already
+    # verified with a real build. Re-sync on top so that already-verified
+    # version is what actually gets built, not a second, possibly
+    # different regeneration against a stale local tree.
+    sync_tree /src/linker_scripts /work/linker_scripts --exclude=auto || true
 fi
 
 # A library change invalidates the baked lib objects. This remains inside the
@@ -170,7 +177,16 @@ elif [ "${linker_changed}" -eq 1 ]; then
 fi
 if [ ! -f /work/build/pokestadiumgs-us.map ]; then
     echo "gate-pr.sh: linked map missing; rebuilding direct-IDO seed" >&2
-    make CC=tools/ido/linux/7.1/cc COMPARE=0 -j2 rom
+    # CC= on the make command line overrides every target-specific CC
+    # assignment in the Makefile, including the one that routes
+    # still-unmatched GLOBAL_ASM files through asm-processor. That turns
+    # those files into empty stubs for this seed build, which can fail to
+    # link if anything (for example an aliases.ld entry) references one of
+    # the now-missing symbols. This seed build only exists to hand the
+    # coalescing wrapper a reference map; it is not the gate verdict, and
+    # the real, correctly-compiled build always runs next regardless of
+    # whether this step produced a map. Tolerate its failure here.
+    make CC=tools/ido/linux/7.1/cc COMPARE=0 -j2 rom || true
 fi
 
 # Produce the proposed coverage snapshot even when the ROM build later
@@ -213,7 +229,22 @@ md5sum -c baseroms/us/checksum.md5
 status=$?
 set -e
 
-cat "$log_file"
+# The build emits one "Binning object:"/"Assembling:" line per file --
+# hundreds of them on a full build, never diagnostic on their own. Drop
+# just those from the console; the full, unfiltered log is still saved
+# below when a coverage_output_dir is given, so nothing is actually lost,
+# only what floods a routine run's console view. On failure, still show
+# every remaining (non-per-file) line so the real error surrounding
+# context is visible; on success, only the tail (the checksum result)
+# actually matters.
+quiet_log() {
+    grep -Ev '^(\x1b\[[0-9;]*m)?(Binning object|Assembling):' "$1"
+}
+if [ "$status" -ne 0 ]; then
+    quiet_log "$log_file"
+else
+    quiet_log "$log_file" | tail -15
+fi
 if [ -n "$coverage_output_dir" ]; then
     cp "$log_file" "$coverage_output_dir/gate.log"
 fi
