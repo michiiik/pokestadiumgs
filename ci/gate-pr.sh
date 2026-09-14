@@ -60,10 +60,10 @@ set -euo pipefail
 # overlay baseroms: the baseline image owns the known retail reference.
 library_changed=0
 split_changed=0
-# The baseline image contains generated lib/ultralib/build objects. They are
-# not PR-controlled inputs and must not make the gate throw away the baked
-# linker map before compiling the public checkout.
-if ! diff -qr --exclude=build /src/lib /work/lib >/dev/null 2>&1; then
+# The baseline image contains generated lib/ultralib/build and extracted
+# objects. They are not PR-controlled inputs and must not make the gate throw
+# away the baked linker map before compiling the public checkout.
+if ! diff -qr --exclude=build --exclude=extracted /src/lib /work/lib >/dev/null 2>&1; then
     library_changed=1
 fi
 rm -rf /work/src /work/include /work/tools /work/linker_scripts /work/lib
