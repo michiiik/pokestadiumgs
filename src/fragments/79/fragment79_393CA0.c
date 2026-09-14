@@ -887,7 +887,18 @@ s32 func_841283FC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84128438.s")
+extern void func_84124410();
+extern u8 D_841951BC;
+extern u8 D_841951BD;
+extern u8 D_841951C4;
+extern u8 * D_84195208[];
+void func_84128438(void) {
+    u8 *temp_v0;
+    temp_v0 = D_84195208[D_841951BD];
+    if (!(temp_v0[0xD] & 8)) {
+        func_84124410(&D_841951C4, D_84195208[D_841951BC][0x23], temp_v0[0x24]);
+    }
+}
 #endif
 
 #ifdef VERSION_US
