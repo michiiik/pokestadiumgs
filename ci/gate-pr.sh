@@ -72,7 +72,7 @@ fi
 if ! diff -qr /src/include /work/include >/dev/null 2>&1; then
     headers_changed=1
 fi
-if ! diff -qr /src/tools /work/tools >/dev/null 2>&1; then
+if ! diff -qr --exclude=__pycache__ /src/tools /work/tools >/dev/null 2>&1; then
     tools_changed=1
 fi
 # Keep the baked source/object timestamps for unchanged files. A plain
