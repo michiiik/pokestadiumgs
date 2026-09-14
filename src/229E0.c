@@ -4585,7 +4585,19 @@ extern s32 D_80126410; void ModelAnim_EndEventContext(void) { if (D_80126410 >= 
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003EE20.s")
+extern u8 D_801263F0[];
+void func_8003EE20(s32 *arg0, s32 arg1, s32 arg2) {
+    u8 *record;
+    s32 index;
+    if (D_80126410 < 0) { return; }
+    if (D_80126410 >= 2) { return; }
+    record = D_801263F0 + (D_80126410 * 0x10);
+    if (record[0] != 1) { return; }
+    if (arg2 < 0) { return; }
+    if (arg2 >= (*((u16 *) ((*((u32 *) (record + 4))) + 8)))) { return; }
+    ;
+    *arg0 = ((*((u8 *) ((*((u32 *) (record + 0xC))) + ModelAnim_ResolveEventIndex(*((s16 *) (record + 2)), (void *) (*((u32 *) (record + 8))), arg2)))) * 12) + arg1;
+}
 #endif
 
 #ifdef VERSION_US
