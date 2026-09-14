@@ -4140,7 +4140,37 @@ void func_84139D94(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8413A340.s")
+void func_80047DC4(u8 *arg0, u8 *arg1) {
+    u8 buffer[0x20];
+    s32 type;
+    u8 value3;
+    u8 value2;
+    u8 value1;
+
+    arg1 = func_800477C4(buffer, arg1);
+    type = func_80047B4C(buffer);
+
+    switch (type) {
+        case 0:
+        case 1:
+            arg1 = func_800477C4(buffer, arg1);
+            value3 = func_80047BD4(buffer);
+
+            arg1 = func_800477C4(buffer, arg1);
+            value2 = func_80047BD4(buffer);
+
+            arg1 = func_800477C4(buffer, arg1);
+            value1 = func_80047BD4(buffer);
+
+            arg1 = func_800477C4(buffer, arg1);
+            func_80046CA8(arg0, type, value3, value2, value1, func_80047BD4(buffer) & 0xFF);
+            break;
+
+        case 10:
+            func_80046C18(arg0);
+            break;
+    }
+}
 #endif
 
 #ifdef VERSION_US

@@ -31,3 +31,4 @@ tools/vtxdis
 
 # Local-only CI migration notes
 /.ignore/
+venv/
