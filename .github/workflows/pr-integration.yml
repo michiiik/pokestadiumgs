@@ -289,6 +289,25 @@ jobs:
               return;
             }
 
+            // required_status_checks.strict is off (see keep-open-prs-current.yml's
+            // own comment for the full reasoning): a "small" PR -- every
+            // changed file is a plain src/*.c body replacement -- may merge
+            // on this already-passing check however stale its base is.
+            // Anything wider still needs this check to have run against the
+            // CURRENT master tip, the guarantee strict used to provide
+            // globally; keep this pattern identical to
+            // keep-open-prs-current.yml's own isSmall check.
+            const smallChangePattern = /^src\/.*\.c$/;
+            const isSmall = files.length > 0 && files.every(({ filename }) => smallChangePattern.test(filename));
+            if (!isSmall) {
+              const { data: masterRef } = await github.rest.git.getRef({ owner, repo, ref: 'heads/master' });
+              if (pr.base.sha !== masterRef.object.sha) {
+                core.info(`PR #${number} is not a small (src/*.c-only) change and its base is stale; waiting for a fresh gate run against current master.`);
+                core.setOutput('eligible', 'false');
+                return;
+              }
+            }
+
             core.setOutput('eligible', 'true');
             core.setOutput('head-ref', pr.head.ref);
             core.info(`PR #${number} is eligible at ${expectedHead}.`);
