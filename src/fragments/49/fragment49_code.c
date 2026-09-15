@@ -390,7 +390,23 @@ void func_861034A8(Struct861034A8 *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_8610362C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86103B74.s")
+extern f32 D_8610AB84;
+extern void func_86100DA8(void *arg0);
+extern s32 D_8610AD20;
+extern void * D_87F119DC;
+void func_86103B74(void) {
+    void *temp_v1 = (void *)((u8 *)D_87F119DC + 0x24);
+    *(f32 *)((u8 *)D_87F119DC + 0x14) += *(f32 *)((u8 *)(u32)D_8610AD20 + 0x97CC);
+    func_86100DA8(D_87F119DC);
+    { f32 scale = D_8610AB84;
+      *(f32 *)((u8 *)temp_v1 + 0x24) += *(f32 *)((u8 *)D_87F119DC + 0x10);
+      *(f32 *)((u8 *)temp_v1 + 0x28) += *(f32 *)((u8 *)D_87F119DC + 0x14);
+      *(f32 *)((u8 *)temp_v1 + 0x2C) += *(f32 *)((u8 *)D_87F119DC + 0x18);
+      *(f32 *)((u8 *)D_87F119DC + 0x10) *= scale;
+      *(f32 *)((u8 *)D_87F119DC + 0x14) *= scale;
+      *(f32 *)((u8 *)D_87F119DC + 0x18) *= scale;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86103C48.s")
 
