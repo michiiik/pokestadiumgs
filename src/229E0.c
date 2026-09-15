@@ -4921,7 +4921,15 @@ void geo_layout_cmd_attach_node(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FDD0.s")
+extern s16 D_80126518;
+void func_8003FDD0(void) {
+    S1_unk_D_800ABE00_cmd8 *cmd = (S1_unk_D_800ABE00_cmd8 *)(u32)D_80126520;
+    S1_GraphNode *node = (S1_GraphNode *)D_80126498[D_80126518];
+    if (node != NULL) {
+        func_80037E3C(node, cmd->callback, cmd->callbackData);
+    }
+    D_80126520 += sizeof(S1_unk_D_800ABE00_cmd8);
+}
 #endif
 
 #ifdef VERSION_US
