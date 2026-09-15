@@ -939,7 +939,27 @@ void func_8005C060(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005C22C.s")
+extern u8 func_8005D92C(s32 index);
+extern void func_8005C0B0(s32, s32, s32);
+extern void func_8005C12C(s32, s32, s32);
+extern void func_8005C1AC(s32, s32, s32);
+void func_8005C22C(s32 arg0, s32 arg1, s32 arg2) {
+    switch (func_8005D92C(arg1)) {
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+        func_8005C0B0(arg0, arg1, arg2);
+        break;
+    case 5:
+    case 6:
+        func_8005C12C(arg0, arg1, arg2);
+        break;
+    case 7:
+        func_8005C1AC(arg0, arg1, arg2);
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
