@@ -438,7 +438,21 @@ void func_8AE01EA4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE027B0.s")
+extern f32 D_80088E50[];
+void func_8AE027B0(s32 arg0, void *arg1, u16 *arg2, void *arg3, s32 arg4) {
+    switch (arg0) {
+    case 0:
+        *arg2 = 0;
+        *(s16 *)arg3 = *(s16 *)((u8 *)arg1 + 8);
+        return;
+    case 1:
+        *(s16 *)((u8 *)arg1 + 8) = (s16)((f32)*(s16 *)arg3 + D_80088E50[*arg2 >> 4] * 5.0f * (f32)arg4);
+        *(u8 *)((u8 *)arg1 + 0x28) = 1;
+        if (*arg2 < 0x8000) *(s32 *)((u8 *)arg1 + 0x2C) = 0x6ED7D7FF;
+        else *(s32 *)((u8 *)arg1 + 0x2C) = 0x96FFFFFF;
+        return;
+    }
+}
 #endif
 
 #ifdef VERSION_US
