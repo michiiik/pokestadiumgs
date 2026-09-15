@@ -258,7 +258,7 @@ void func_87E113C8(void) {
     s32 sp1C;
     s32 temp_v0;
 
-    func_80037E9C(0, &D_87E1EBA0);
+    GeoNode_CreateContainer(0, &D_87E1EBA0);
     temp_v0 = MainPool_AllocState(main_pool_get_available(), 0);
     sp1C = temp_v0;
     (*(s32 *)((u8 *)(D_87E1EBB8) + (0x934))) = func_80040E80(temp_v0, &D_87E1AA80);

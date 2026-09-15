@@ -93,7 +93,28 @@ void func_8350026C(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/1/fragment1_code/func_8350182C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/1/fragment1_code/func_83501D3C.s")
+extern s32 D_83503BB4;
+extern s16 D_83503E82;
+extern void func_835012C8(void);
+extern void func_83500C14(void);
+extern void func_83500708(void);
+extern void func_8350182C(void);
+
+void func_83501D3C(void) {
+    switch (D_83503BB4) {
+        case 2:
+        case 3:
+        case 4:
+            func_835012C8();
+        case 1:
+            func_83500C14();
+        case 0:
+            func_83500708();
+    }
+    if (D_83503BB4 >= 2 && D_83503E82 == 1) {
+        func_8350182C();
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/1/fragment1_code/func_83501DC0.s")
 
