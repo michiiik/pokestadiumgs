@@ -336,6 +336,8 @@
     - [0xA2B80, .rodata, 1C2D0] # jtbl_800A1F80 (+1 more)
     - [0xA2BD0, .rodata, 1CDC0] # jtbl_800A1FD0 (+2 more)
     - [0xA3260, rodata]
+    - [0xA4340, .rodata, 229E0] # jtbl_800A3724 tail (3 words) + jtbl_800A374C + jtbl_800A376C, 16-byte aligned
+    - [0xA43A0, rodata]
     - [0xA4EC0, .rodata, 43700] # jtbl_800A42C0
     - [0xA4EE0, .rodata, 47580] # jtbl_800A43C0 (+2 more)
     - [0xA5120, rodata]
