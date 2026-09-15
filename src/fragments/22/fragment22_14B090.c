@@ -4,7 +4,28 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14B090/func_82700DD0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14B090/func_82700E38.s")
+void *func_82700E38(void *arg0, s32 arg1) {
+    s32 i;
+    u8 *ptr;
+    void *result;
+    void *base;
+
+    result = NULL;
+    i = 0;
+    base = arg0;
+    if (arg1 > 0) {
+        ptr = base;
+        do {
+            i += 1;
+            if (*(s16 *)ptr == 0) {
+                result = ptr;
+                break;
+            }
+            ptr += 0x28;
+        } while (i != arg1);
+    }
+    return result;
+}
 
 void *func_82700E70(s32 arg0, s32 arg1, void *arg2, s32 arg3) {
     s32 i;
