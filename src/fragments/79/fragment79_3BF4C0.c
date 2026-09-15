@@ -102,7 +102,21 @@ void func_84151DD4(void *arg0, u8 arg1) { void *state; s32 base; state = func_84
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84151E44.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84151F20.s")
+extern u8 func_8414A2AC(void);
+extern void * func_8414A3A0(u8);
+void func_84151F20(void *arg0, u8 arg1) {
+    void *table;
+    u32 *entry;
+    u8 amount;
+    s32 base;
+    base = (s32)(u32)arg0 + 4;
+    *(u8 *)((u8 *)(u32)base + arg1 + 8) = 0xFF;
+    amount = func_8414A2AC();
+    table = func_8414A3A0(arg1);
+    entry = (u32 *)((u8 *)(u32)base + (arg1 << 2) + 0x34);
+    *entry += *(u8 *)((u8 *)table + 0x2F) * amount;
+    *(u8 *)(u32)base |= 2;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84151F9C.s")
 
@@ -142,7 +156,10 @@ void func_841523BC(void *arg0, u8 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84152AC0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84152C34.s")
+extern u8 func_8414A2AC(void);
+extern void * func_8414A3A0(u8);
+extern u8 * func_84154B30(u8);
+void func_84152C34(void *arg0, u8 arg1) { s32 base; void *table; u32 *entry; u8 amount; base = (s32)(u32)arg0 + 4; if ((func_84154B30((0x1 - (u32)arg1) & 0xFF)[3] & 1) == 0) { *(u8 *)((u8 *)(u32)base + (u32)arg1 + 8) = 0xFF; amount = func_8414A2AC(); table = func_8414A3A0(arg1); entry = (u32 *)((u8 *)(u32)base + ((u32)arg1 << 2) + 0x34); *entry += *(u8 *)((u8 *)table + 0x38) * amount; *(u8 *)(u32)base |= 2; } }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84152CD8.s")
 

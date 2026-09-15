@@ -26,9 +26,21 @@ concurrency:
 jobs:
   gate:
     name: Validate ROM against master
+    # Required status checks can never be satisfied by a direct push to
+    # master (see refresh-coverage.yml), so that job opens a PR instead.
+    # Its bot has author_association NONE like any GitHub App, so trust it
+    # narrowly: same-repo only, and only on the one fixed branch name that
+    # workflow ever pushes to. Its content is always deterministically
+    # regenerated from master's own already-trusted source, never from
+    # PR-supplied input.
     if: >-
       github.event_name == 'workflow_dispatch' ||
-      contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.pull_request.author_association)
+      contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.pull_request.author_association) ||
+      (
+        github.event.pull_request.user.login == 'pokestadium-public-ci[bot]' &&
+        github.event.pull_request.head.repo.full_name == github.repository &&
+        github.event.pull_request.head.ref == 'ci/refresh-coverage'
+      )
     # This label is intentionally different from the private repository's
     # gs-decomp label. Register it only on a dedicated, credential-free Mac
     # runner after the public baseline image has been built.
@@ -49,24 +61,28 @@ jobs:
           persist-credentials: false
           set-safe-directory: false
 
-      - name: Detect a coverage-only push
+      - name: Detect a coverage-only diff
         id: coverage-only
-        # The integration workflow pushes a "ci: update coverage for #N"
-        # commit straight to the PR branch once this gate passes, touching
-        # only COVERAGE.md. That push re-triggers this same workflow via
-        # `synchronize`, redoing the full build for a file with no effect
-        # on the ROM. Detect that specific case and skip the rebuild --
-        # the job still runs and reports a real status either way, so a
+        # refresh-coverage.yml opens/updates a PR (ci/refresh-coverage) whose
+        # entire diff is always exactly COVERAGE.md, regenerated
+        # deterministically from master's own already-trusted source. That
+        # PR still needs a real "Validate ROM against master" status to
+        # satisfy branch protection, but there is nothing in it that could
+        # ever affect the ROM, so compare the PR's whole base...head diff
+        # (not just this push) and skip the build whenever it is exactly
+        # that one file -- for any pull_request action, not just
+        # synchronize, since a freshly opened PR needs this just as much.
+        # The job still runs and reports a real status either way, so a
         # required-status-check on this workflow is never left pending.
-        if: github.event_name == 'pull_request' && github.event.action == 'synchronize'
+        if: github.event_name == 'pull_request'
         shell: bash
         run: |
           set -euo pipefail
-          git fetch --quiet --depth=1 origin "${{ github.event.before }}" "${{ github.event.after }}"
-          changed="$(git diff --name-only "${{ github.event.before }}" "${{ github.event.after }}")"
+          git fetch --quiet --depth=1 origin "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}"
+          changed="$(git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}")"
           if [ "$changed" = "COVERAGE.md" ]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
-            echo "pr-rom-gate: push only updated COVERAGE.md; skipping the full rebuild" >&2
+            echo "pr-rom-gate: PR diff touches only COVERAGE.md; skipping the full rebuild" >&2
           else
             echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
