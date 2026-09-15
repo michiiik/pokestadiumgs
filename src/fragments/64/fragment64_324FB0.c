@@ -33,9 +33,9 @@ void func_87F02388(void *arg0) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_324FB0/func_87F0242C.s")
 
 extern u32 D_87F119C0;
-extern void func_80037E9C(s32, void *);
+extern void GeoNode_CreateContainer(s32, void *);
 void func_87F024CC(void) {
-    func_80037E9C(0, &D_87F119C0);
+    GeoNode_CreateContainer(0, &D_87F119C0);
 }
 
 extern void func_87F0252C(void *, void *, s32, s32);

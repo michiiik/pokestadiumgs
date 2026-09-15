@@ -336,6 +336,8 @@
     - [0xA2B80, .rodata, 1C2D0] # jtbl_800A1F80 (+1 more)
     - [0xA2BD0, .rodata, 1CDC0] # jtbl_800A1FD0 (+2 more)
     - [0xA3260, rodata]
+    - [0xA4340, .rodata, 229E0] # jtbl_800A3724 tail (3 words) + jtbl_800A374C + jtbl_800A376C, 16-byte aligned
+    - [0xA43A0, rodata]
     - [0xA4EC0, .rodata, 43700] # jtbl_800A42C0
     - [0xA4EE0, .rodata, 47580] # jtbl_800A43C0 (+2 more)
     - [0xA5120, rodata]
@@ -424,6 +426,8 @@
     - [0xA8A80, textbin, fragments/1/fragment1_header]
     - [0xA8AA0, c,       fragments/1/fragment1_code]
     - [0xAC540, data,    fragments/1/fragment1_data]
+    - [0xAC860, .rodata, fragments/1/fragment1_code] # D_83503DE0 (func_8350182C) + jtbl_83503DE8, 16-byte aligned
+    - [0xAC880, rodata]
 
   # unk fragment
   - name: fragment2
@@ -543,7 +547,9 @@
     - [0xE35C0, c,       fragments/11/fragment11_E35C0]
     - [0xE3850, c,       fragments/11/fragment11_E3850]
     - [0xE38A0, data,    fragments/11/fragment11_data]
-  
+    - [0xE3E10, .rodata, fragments/11/fragment11_D9520] # jtbl_8160C20C tail (3 words) + jtbl_8160C27C, 16-byte aligned
+    - [0xE3E50, rodata]
+
   - name: fragment12
     type: code
     bss_size: 0x0
@@ -554,7 +560,9 @@
     - [0xE5330, c,       fragments/12/fragment12_E5330]
     - [0xE7C00, c,       fragments/12/fragment12_E7C00]
     - [0xECAB0, data,    fragments/12/fragment12_data]
-  
+    - [0xECE50, .rodata, fragments/12/fragment12_E7C00] # jtbl_81407B2C tail (3 words) + jtbl_81407B4C + jtbl_81407B6C + D_81407B8C, 16-byte aligned
+    - [0xECEA0, rodata]
+
   - name: fragment13
     type: code
     bss_size: 0x0
@@ -584,8 +592,12 @@
     - [0x1077C0, c,       fragments/14/fragment14_1077C0]
     - [0x109280, c,       fragments/14/fragment14_109280]
     - [0x109EC0, data,    fragments/14/fragment14_data]
+    - [0x10A600, .rodata, fragments/14/fragment14_FCD40] # D_81312470 (tail) + jtbl_81312478
+    - [0x10A620, rodata]
     - [0x10A7D0, .rodata, fragments/14/fragment14_FF070] # jtbl_81312648, jtbl_81312680 (+2 more)
     - [0x10A8C0, rodata]
+    - [0x10ABA0, .rodata, fragments/14/fragment14_109280] # D_81312A10 (jtbl_81311AAC tail) + jtbl_81312A18 + jtbl_81312A2C, 16-byte aligned
+    - [0x10ABD0, rodata]
 
   - name: fragment15
     type: code
@@ -690,7 +702,9 @@
     - [0x14DF30, textbin, fragments/23/fragment23_header]
     - [0x14DF50, c,       fragments/23/fragment23_code]
     - [0x14F760, data,    fragments/23/fragment23_data]
-  
+    - [0x14F880, .rodata, fragments/23/fragment23_code] # jtbl_82A01950 + jtbl_82A0196C (+2-word pad), 16-byte aligned
+    - [0x14F8C0, rodata]
+
   - name: fragment24
     type: code
     bss_size: 0x0
@@ -839,6 +853,8 @@
     - [0x1A60F0, c,       fragments/31/fragment31_1A60F0]
     - [0x1A6360, c,       fragments/31/fragment31_1A6360]
     - [0x1A6980, data,    fragments/31/fragment31_data]
+    - [0x1A6E00, .rodata, fragments/31/fragment31_1736F0] # jtbl_88233B80
+    - [0x1A6E60, rodata]
     - [0x1A7420, .rodata, fragments/31/fragment31_190BB0] # jtbl_882341A0, 16-byte aligned start; ends mid jtbl_882341B8
     - [0x1A7440, rodata]
 
@@ -1246,6 +1262,10 @@
     - [0x31BD80, c,       fragments/63/fragment63_31BD80]
     - [0x31CB20, c,       fragments/63/fragment63_31CB20]
     - [0x31CFE0, data,    fragments/63/fragment63_data]
+    - [0x31EE90, .rodata, fragments/63/fragment63_306150] # D_87E1B520, D_87E1B524, jtbl_87E1B528, D_87E1B548
+    - [0x31EEC0, rodata]
+    - [0x31EFC0, .rodata, fragments/63/fragment63_30B540] # jtbl_87E1B650 + jtbl_87E1B664 (+ its trailing pad word), 16-byte aligned
+    - [0x31F000, rodata]
 
   - name: fragment64
     type: code
@@ -1320,7 +1340,9 @@
     - [0x34B0F0, c,       fragments/67/fragment67_34B0F0]
     - [0x34C8B0, c,       fragments/67/fragment67_34C8B0]
     - [0x34E600, data,    fragments/67/fragment67_data]
-  
+    - [0x353EB0, .rodata, fragments/67/fragment67_33CB20] # jtbl_829173B0
+    - [0x353ED0, rodata]
+
   - name: fragment68
     type: code
     bss_size: 0x0
@@ -1539,6 +1561,8 @@
     - [0x42F160, textbin, fragments/84/fragment84_header]
     - [0x42F180, c,       fragments/84/fragment84_code]
     - [0x431590, data,    fragments/84/fragment84_data]
+    - [0x431930, .rodata, fragments/84/fragment84_code] # D_8FC027D0, D_8FC027D8, jtbl_8FC027DC, jtbl_8FC027F8, jtbl_8FC02814, 16-byte aligned
+    - [0x431990, rodata]
 
   - name: fragment85
     type: code

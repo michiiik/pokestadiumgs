@@ -264,7 +264,32 @@ void func_800251F8(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025ACC.s")
+/* Tail (last 3 entries) of jtbl_800A3724, a jump table used by an earlier,
+ * still-GLOBAL_ASM switch in this file. Not referenced from C: it exists
+ * only so this file's own .rodata subsegment starts at a 16-byte-aligned
+ * ROM address (required by this segment's SUBALIGN(16)) while still
+ * landing func_80025ACC's own jump table (jtbl_800A374C, right below) at
+ * its real retail address. */
+const u32 D_800A3740[3] = {0x80025A50, 0x80025AB8, 0x800259A8};
+
+void func_80025ACC(s32 arg0) {
+    switch (arg0) {
+    case 7:
+        func_8001874C(0x06020405, 1);
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+    case 8:
+        func_8001874C(0x06020000, 2);
+        func_8001874C(0x06020105, 1);
+        func_8001874C(0x06020205, 1);
+        func_8001874C(0x06020305, 1);
+        return;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -3048,7 +3073,7 @@ void func_80037E3C(S1_GraphNode* arg0, S1_func_D_86002F34_000_010 arg1, void* ar
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80037E9C.s")
+S1_GraphNode* GeoNode_CreateContainer(S1_MainPoolState* arg0, S1_GraphNode* arg1) { if (arg0 != NULL) { arg1 = MainPool_AllocAligned(arg0, sizeof(S1_GraphNode), 4); } if (arg1 != NULL) { GeoNode_Init(arg1, 0); } return arg1; }
 #endif
 
 #ifdef VERSION_US
@@ -4645,12 +4670,12 @@ s32 ModelAnim_IsEventTrackDone(u8 *arg0) { return *(u16 *)(*(s32 *)(arg0 + 0x58)
 #endif
 
 #ifdef VERSION_US
-extern void func_80037E9C(s32, void *);
+extern S1_GraphNode* GeoNode_CreateContainer(S1_MainPoolState*, S1_GraphNode*);
 extern u8 D_80126420[];
 extern u8 D_80126438[];
 void ModelRenderer_InitDisplayRoots(void) {
-    func_80037E9C(0, D_80126420);
-    func_80037E9C(0, D_80126438);
+    GeoNode_CreateContainer(0, D_80126420);
+    GeoNode_CreateContainer(0, D_80126438);
 }
 #endif
 
