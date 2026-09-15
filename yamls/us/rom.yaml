@@ -1543,6 +1543,8 @@
     - [0x42F160, textbin, fragments/84/fragment84_header]
     - [0x42F180, c,       fragments/84/fragment84_code]
     - [0x431590, data,    fragments/84/fragment84_data]
+    - [0x431930, .rodata, fragments/84/fragment84_code] # D_8FC027D0, D_8FC027D8, jtbl_8FC027DC, jtbl_8FC027F8, jtbl_8FC02814, 16-byte aligned
+    - [0x431990, rodata]
 
   - name: fragment85
     type: code
