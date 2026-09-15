@@ -8,8 +8,18 @@ name: Refresh coverage after merge
 # PR's copy conflict with the new master on that file, even when their real
 # source changes touched disjoint fragments (for example
 # https://github.com/michiiik/pokestadiumgs/pull/23). Keeping the refresh out
-# of PR branches entirely and running it exactly once, directly on master,
-# after each merge removes that whole class of self-inflicted conflict.
+# of PR branches entirely removes that whole class of self-inflicted
+# conflict.
+#
+# This still can't push straight to master: master requires the "Validate
+# ROM against master" status check, which only pull_request events ever
+# produce, and branch protection rejects a direct push regardless of who
+# or what makes it (confirmed the hard way -- see the GH006 failures on
+# earlier runs of this workflow). So this opens a PR on a fixed branch
+# instead and lets the normal pipeline take it from there: pr-rom-gate.yml
+# and pr-integration.yml's integrate job both trust this specific bot on
+# this specific branch name (see the comments there) and arm auto-merge
+# exactly as they would for any other eligible PR.
 on:
   push:
     branches: [master]
@@ -33,7 +43,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: master
-          fetch-depth: 0
           persist-credentials: false
 
       - name: Check the integration GitHub App configuration
@@ -57,38 +66,36 @@ jobs:
           owner: ${{ github.repository_owner }}
           repositories: ${{ github.event.repository.name }}
           permission-contents: write
+          permission-pull-requests: write
 
-      - name: Regenerate COVERAGE.md and push if it changed
+      - name: Regenerate COVERAGE.md and open/update its PR
         shell: bash
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           set -euo pipefail
+
+          python3 ci/update_coverage.py --repo-root .
+
+          if git diff --quiet -- COVERAGE.md; then
+            echo 'refresh-coverage: COVERAGE.md is already current on master.'
+            exit 0
+          fi
+
           git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git config user.name 'pokestadiumgs-ci[bot]'
-          git config user.email 'pokestadiumgs-ci[bot]@users.noreply.github.com'
+          git config user.name 'pokestadium-public-ci[bot]'
+          git config user.email 'pokestadium-public-ci[bot]@users.noreply.github.com'
+          git checkout -B ci/refresh-coverage
+          git add COVERAGE.md
+          git commit --quiet -m 'ci: refresh COVERAGE.md'
+          git push --force origin ci/refresh-coverage
 
-          for attempt in 1 2 3; do
-            git fetch --quiet origin master
-            git checkout --quiet -B master origin/master
-
-            python3 ci/update_coverage.py --repo-root .
-
-            if git diff --quiet -- COVERAGE.md; then
-              echo 'refresh-coverage: COVERAGE.md is already current on master.'
-              exit 0
-            fi
-
-            git add COVERAGE.md
-            git commit --quiet -m 'ci: refresh COVERAGE.md'
-
-            if git push origin HEAD:master; then
-              echo 'refresh-coverage: pushed an updated COVERAGE.md.'
-              exit 0
-            fi
-
-            echo "refresh-coverage: push race on attempt $attempt, retrying against the latest master" >&2
-          done
-
-          echo '::error::refresh-coverage: could not push COVERAGE.md after retries; another writer keeps winning the race.'
-          exit 1
+          existing="$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --head ci/refresh-coverage --json number --jq '.[0].number // empty')"
+          if [ -z "$existing" ]; then
+            gh pr create --repo "$GITHUB_REPOSITORY" --base master --head ci/refresh-coverage \
+              --title 'ci: refresh COVERAGE.md' \
+              --body 'Automated, whole-tree coverage regeneration from ci/update_coverage.py. Touches only COVERAGE.md.'
+            echo 'refresh-coverage: opened a new PR; pr-rom-gate.yml and the integrate job take it from here.'
+          else
+            echo "refresh-coverage: updated the existing PR #$existing; its gate will re-run automatically."
+          fi
