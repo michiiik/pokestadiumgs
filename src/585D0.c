@@ -606,7 +606,22 @@ u8 func_8005A8EC(u8 arg0, u8 *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005ACE8.s")
+extern void func_8005A468(s32);
+extern void func_8005A60C(s32);
+extern void func_8005A98C(s32);
+void func_8005ACE8(s32 arg0) {
+    switch (func_8005D92C(arg0)) {
+        case 1: case 2: case 3: case 4:
+            func_8005A468(arg0);
+            break;
+        case 5: case 6:
+            func_8005A60C(arg0);
+            break;
+        case 7:
+            func_8005A98C(arg0);
+            break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
