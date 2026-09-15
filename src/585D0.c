@@ -1308,7 +1308,26 @@ void func_8005D9E0(s32 arg0, s32 *arg1) { u8 *record = D_80128570 + arg0 * 112; 
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005DA1C.s")
+s32 func_8005DA1C(s32 arg0)
+{
+    if ((*(s32 *)(D_80128570 + arg0 * 112) & 1) == 0)
+    {
+        return -1;
+    }
+    switch (func_8005D92C(arg0))
+    {
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+            return func_80060A4C(*(u8 **)(D_80128570 + arg0 * 112 + 0x60) + 0x85);
+        case 5:
+        case 6:
+            return func_80060A4C(*(u8 **)(D_80128570 + arg0 * 112 + 0x60) + 9);
+        case 7:
+            return func_80060A4C(*(u8 **)(D_80128570 + arg0 * 112 + 0x60) + 9);
+    }
+}
 #endif
 
 #ifdef VERSION_US
