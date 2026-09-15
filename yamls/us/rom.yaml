@@ -1244,6 +1244,8 @@
     - [0x31BD80, c,       fragments/63/fragment63_31BD80]
     - [0x31CB20, c,       fragments/63/fragment63_31CB20]
     - [0x31CFE0, data,    fragments/63/fragment63_data]
+    - [0x31EEF0, .rodata, fragments/63/fragment63_30B540] # jtbl_87E1B580, widened to 16-byte boundary (first word of jtbl_87E1B59C)
+    - [0x31EF10, rodata]
 
   - name: fragment64
     type: code
