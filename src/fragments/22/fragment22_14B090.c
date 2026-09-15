@@ -67,7 +67,12 @@ s32 func_827015A4(s32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14B090/func_8270160C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14B090/func_8270174C.s")
+extern void * func_82700E70(s32 arg0, s32 arg1, void *arg2, s32 arg3);
+void func_8270174C(void *arg0) {
+    s32 i; u8 *table; s32 one; s32 mask; void *entry;
+    i=0; table=(u8 *)arg0+0x34; one=1; mask=-2;
+    do { entry=func_82700E70(2,i,table,0x10); switch(i) { case 0: (*(u8 **)((u8 *)arg0+0x20))[0]=*(s16 *)((u8 *)entry+0x20); break; case 1: if(*(s16 *)((u8 *)entry+0x20)==0) (*(u8 **)((u8 *)arg0+0x20))[1]|=1; else (*(u8 **)((u8 *)arg0+0x20))[1]&=mask; break; } i++; } while(i!=5);
+}
 
 extern u16 D_827034EC;
 extern u8 D_82703514[];
