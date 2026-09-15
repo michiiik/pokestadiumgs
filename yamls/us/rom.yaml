@@ -698,7 +698,9 @@
     - [0x14DF30, textbin, fragments/23/fragment23_header]
     - [0x14DF50, c,       fragments/23/fragment23_code]
     - [0x14F760, data,    fragments/23/fragment23_data]
-  
+    - [0x14F880, .rodata, fragments/23/fragment23_code] # jtbl_82A01950 + jtbl_82A0196C (+2-word pad), 16-byte aligned
+    - [0x14F8C0, rodata]
+
   - name: fragment24
     type: code
     bss_size: 0x0
