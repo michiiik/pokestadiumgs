@@ -61,24 +61,28 @@ jobs:
           persist-credentials: false
           set-safe-directory: false
 
-      - name: Detect a coverage-only push
+      - name: Detect a coverage-only diff
         id: coverage-only
-        # The integration workflow pushes a "ci: update coverage for #N"
-        # commit straight to the PR branch once this gate passes, touching
-        # only COVERAGE.md. That push re-triggers this same workflow via
-        # `synchronize`, redoing the full build for a file with no effect
-        # on the ROM. Detect that specific case and skip the rebuild --
-        # the job still runs and reports a real status either way, so a
+        # refresh-coverage.yml opens/updates a PR (ci/refresh-coverage) whose
+        # entire diff is always exactly COVERAGE.md, regenerated
+        # deterministically from master's own already-trusted source. That
+        # PR still needs a real "Validate ROM against master" status to
+        # satisfy branch protection, but there is nothing in it that could
+        # ever affect the ROM, so compare the PR's whole base...head diff
+        # (not just this push) and skip the build whenever it is exactly
+        # that one file -- for any pull_request action, not just
+        # synchronize, since a freshly opened PR needs this just as much.
+        # The job still runs and reports a real status either way, so a
         # required-status-check on this workflow is never left pending.
-        if: github.event_name == 'pull_request' && github.event.action == 'synchronize'
+        if: github.event_name == 'pull_request'
         shell: bash
         run: |
           set -euo pipefail
-          git fetch --quiet --depth=1 origin "${{ github.event.before }}" "${{ github.event.after }}"
-          changed="$(git diff --name-only "${{ github.event.before }}" "${{ github.event.after }}")"
+          git fetch --quiet --depth=1 origin "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}"
+          changed="$(git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}")"
           if [ "$changed" = "COVERAGE.md" ]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
-            echo "pr-rom-gate: push only updated COVERAGE.md; skipping the full rebuild" >&2
+            echo "pr-rom-gate: PR diff touches only COVERAGE.md; skipping the full rebuild" >&2
           else
             echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
