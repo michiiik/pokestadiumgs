@@ -2,7 +2,31 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33CB20/func_82900020.s")
+extern void func_82902808(s32 arg0, s32 arg1);
+extern s32 func_829056A4(void *arg0, void *arg1);
+extern s32 func_82908A54(s32 arg0, s32 arg1);
+extern void func_8290FB3C(s32 arg0, s32 arg1);
+extern void func_8291199C(s32 arg0, s32 arg1);
+
+void func_82900020(s32 arg0, s32 arg1) {
+    switch (arg0) {
+        case 0:
+            func_82902808(arg0, arg1);
+            break;
+        case 1:
+            func_829056A4((void *)arg0, (void *)arg1);
+            break;
+        case 2:
+            func_82908A54(arg0, arg1);
+            break;
+        case 3:
+            func_8290FB3C(arg0, arg1);
+            break;
+        case 4:
+            func_8291199C(arg0, arg1);
+            break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
