@@ -1587,7 +1587,7 @@ void func_841470C4(u8 * arg0, u8 arg1, u32 arg2) {
 
 #ifdef VERSION_US
 extern u8 *func_841460C0(u8, u8, u8);
-extern void func_841470C4(u8 *, u8, s32);
+extern void func_841470C4(u8 *, u8, u32);
 void func_84147228(u8 arg0, u8 arg1, u8 arg2, u8 arg3, s32 arg4) {
     func_841470C4(func_841460C0(arg0, arg1, arg2), arg3, arg4);
 }
