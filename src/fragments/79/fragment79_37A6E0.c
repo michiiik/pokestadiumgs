@@ -2708,7 +2708,37 @@ void func_8411854C(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8411862C.s")
+extern void func_84117744(u8 *);
+extern void func_841087B8(s32 arg0, s32 arg1, s32 arg2);
+extern void func_8410890C(s32, s32);
+extern void func_84112158(s32 arg0, s32 arg1);
+extern s32 func_84112418(u8 *arg0);
+extern void func_84113920(u8 *arg0);
+extern void func_84117648(u8 *arg0);
+extern void func_841176E0(void *arg0);
+extern void func_84117880(u8 *arg0);
+extern void func_84117AA0(u8 *);
+extern s32 func_8411E164(s32 arg0);
+void func_8411862C(u8 *arg0) {
+    func_84117744(arg0);
+    if (func_84117CAC(arg0) != 0) {
+        func_841087B8(arg0[0x618], func_8411E164((s32)arg0), (s32)arg0);
+        func_84112158((s32)arg0, 0x105);
+        func_8410890C(0x100, (s32)arg0);
+        func_80023A3C(0xC, *(s16 *)(arg0 + 0x1A), 0);
+        func_84117AA0(arg0);
+        *(u16 *)(arg0 + 0x7F4) |= 0x40;
+    }
+    func_84117880(arg0);
+    func_84117C18(arg0);
+    func_84112418(arg0);
+    func_841176E0(arg0);
+    if (*(s8 *)(arg0 + 0x619) + 10 == *(s16 *)(arg0 + 0x7E8)) {
+        func_84112580((s32)arg0);
+    }
+    func_84113920(arg0);
+    func_84117648(arg0);
+}
 #endif
 
 #ifdef VERSION_US
@@ -3081,7 +3111,27 @@ void BattleAnim_Dispatch_127(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8411ABAC.s")
+extern u16 D_84183C7C[];
+extern u32 func_8003570C(void);
+extern void func_8410890C(s32, s32);
+extern void func_84108A10(u8 *);
+extern void func_84111348(s32 arg0, s32 arg1);
+extern void func_84111D64(u8 *, s32);
+extern void func_84112564(s32);
+extern void func_841126C8(s32 arg0);
+extern s32 func_84113430(s32 arg0);
+extern void func_8411FEE8(s32);
+extern s32 D_84183D50;
+extern u8 * D_841911E0;
+extern s32 D_841911F4;
+extern u8 * D_84193DD0;
+void func_8411ABAC(u8 *arg0) {
+    if (func_84113430((s32)arg0) == 0) return;
+    func_841126C8((s32)arg0); *(s16 *)(arg0 + 0x7E8) = 0; func_8411FEE8(0x258);
+    *(s16 *)(D_841911E0 + 0x98) = *(u16 *)((u8 *)&D_84183C7C + ((func_8003570C() & 3) << 1)); func_84111348((s32)arg0, 0x1B); func_80023A3C(6, 0, 0);
+    switch (*(u16 *)((u8 *)D_84193DD0 + 4)) { case 0x20: *(s16 *)(D_841911E0 + 0x98) = 0x11; func_84108A10(arg0); func_84112464(arg0); break; case 0x1E: func_84111D64(arg0, *(u8 *)(*(u8 **)(arg0 + 0x2D4) + 0x139C)); break; case 0x1F: func_84108A10(arg0); func_84111D64(arg0, *(u8 *)(*(u8 **)(arg0 + 0x2D4) + 0x139C)); func_84112324(arg0); break; default: break; }
+    func_84112564((s32)arg0); func_8410890C(0x126, (s32)arg0); *(s32 *)((u8 *)arg0 + (D_841911F4 * 4) + 0x5C8) = D_84183D50;
+}
 #endif
 
 #ifdef VERSION_US
