@@ -1519,7 +1519,70 @@ void func_84147008(u8 *arg0, u8 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_841470C4.s")
+extern void func_84146DBC(u8 * , s32);
+extern void func_84146F24(u8 * , s32, u8);
+extern void func_84147008(u8 * , u8);
+extern u8 D_84186F38;
+void func_841470C4(u8 * arg0, u8 arg1, u32 arg2) {
+  if (arg0 == NULL) return;
+  switch (arg1) {
+  case 1:
+    func_84146B0C(arg0, arg2);
+    break;
+  case 2:
+    func_84146D38(arg0);
+    break;
+  case 3:
+    func_84146DBC(arg0, arg2);
+    break;
+  case 4:
+    arg0[8] |= arg2;
+    break;
+  case 5:
+    arg0[8] &= ~arg2;
+    break;
+  case 6:
+    arg0[1] = arg2;
+    break;
+  case 7:
+    * (s32 * )(arg0 + 4) = arg2;
+    break;
+  case 8:
+    arg0[2] = arg2;
+    break;
+  case 9:
+    arg0[9] = 0;
+    arg0[3] = 0;
+    break;
+  case 10:
+  case 13:
+    func_84146F24(arg0, arg2, arg1);
+    arg0[8] &= 0xFFF7;
+    break;
+  case 11:
+  case 12:
+    func_84146F24(arg0, arg2, arg1);
+    arg0[8] |= 8;
+    break;
+  case 14:
+    func_84147008(arg0, arg1);
+    break;
+  case 15:
+    func_84147008(arg0, arg1);
+    break;
+  case 16:
+    arg0[3] = arg1;
+    if (arg2 >= 8) arg0[9] = 7;
+    else arg0[9] = arg2;
+    break;
+  case 17:
+    arg0[3] = arg1;
+    arg0[9] = D_84186F38;
+    break;
+  default:
+    break;
+  }
+}
 #endif
 
 #ifdef VERSION_US
