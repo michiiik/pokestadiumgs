@@ -554,7 +554,9 @@
     - [0xE5330, c,       fragments/12/fragment12_E5330]
     - [0xE7C00, c,       fragments/12/fragment12_E7C00]
     - [0xECAB0, data,    fragments/12/fragment12_data]
-  
+    - [0xECE50, .rodata, fragments/12/fragment12_E7C00] # jtbl_81407B2C tail (3 words) + jtbl_81407B4C + jtbl_81407B6C + D_81407B8C, 16-byte aligned
+    - [0xECEA0, rodata]
+
   - name: fragment13
     type: code
     bss_size: 0x0
