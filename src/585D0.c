@@ -989,7 +989,25 @@ void func_8005C5CC(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005C614.s")
+extern s32 func_8005C41C(s32);
+void func_8005C614(s32 arg0, s32 arg1) {
+    switch (func_8005D92C(arg1)) {
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+            func_8005C52C(arg0, arg1);
+            break;
+        case 5:
+        case 6:
+            func_8005C584(arg0, arg1);
+            break;
+        case 7:
+            func_8005C5CC(arg0, arg1);
+            break;
+    }
+    func_8005C41C(arg0);
+}
 #endif
 
 #ifdef VERSION_US
@@ -1014,7 +1032,29 @@ void func_8005C714(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005C750.s")
+extern void func_8005C41C(s32 arg0, s32 arg1);
+extern u8 func_8005D92C(s32 index);
+
+void func_8005C750(s32 arg0, s32 arg1) {
+    u8 temp_v0;
+    func_8005C41C(arg0, arg1);
+    temp_v0 = func_8005D92C(arg1);
+    switch (temp_v0) {
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+        func_8005C694(arg0, arg1);
+        return;
+    case 5:
+    case 6:
+        func_8005C6D8(arg0, arg1);
+        return;
+    case 7:
+        func_8005C714(arg0, arg1);
+        return;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1590,7 +1630,31 @@ void func_8005EE4C(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005EE88.s")
+extern void func_8004C594(s32, s32);
+extern void func_8004C8A0(void *, s32, s32, s32);
+extern void func_80060EF8(void *, void *);
+void *func_8005EE88(s32 arg0, s32 arg1, void *arg2) {
+    if ((*(s32 *)(D_80128570 + arg0 * 112) & 1) == 0) {
+        return 0;
+    }
+    switch (func_8005D92C(arg0)) {
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+            func_8004C594(2, arg1 + 1);
+            func_8004C8A0(arg2, 0x12, 0x41, 0);
+            break;
+        case 5:
+        case 6:
+            func_80060EF8(arg2, *(u8 **)(D_80128570 + arg0 * 112 + 0x60) + arg1 * 9 + 0x727);
+            break;
+        case 7:
+            func_80060EF8(arg2, *(u8 **)(D_80128570 + arg0 * 112 + 0x60) + arg1 * 9 + 0x703);
+            break;
+    }
+    return arg2;
+}
 #endif
 
 #ifdef VERSION_US
