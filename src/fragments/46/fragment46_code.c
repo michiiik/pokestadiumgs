@@ -666,7 +666,21 @@ void func_8AE050AC(s32 arg0, s16 arg1, s16 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE0559C.s")
+Fragment46LookupEntry *func_8AE0559C(s16 arg0) {
+    Fragment46LookupEntry *entry; s32 index;
+    entry = D_8AE08508; index = 0;
+    for (;;) {
+        if (entry->key == -1) return NULL;
+        if (arg0 == entry->key) return entry; entry++;
+        if (entry->key == -1) return NULL;
+        if (arg0 == entry->key) return entry; entry++;
+        if (entry->key == -1) return NULL;
+        if (arg0 == entry->key) return entry; entry++;
+        if (entry->key == -1) return NULL;
+        if (arg0 == entry->key) return entry; entry++;
+        index += 4; if (index == 0x38) return NULL;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -806,7 +820,7 @@ typedef struct {
 extern s16 D_8AE084E0;
 extern s16 D_8AE084E2;
 extern s32 D_8AE084E8;
-extern Fragment46Entry *func_8AE0559C(s16);
+extern Fragment46LookupEntry *func_8AE0559C(s16);
 extern s16 func_8AE017A4(s16);
 extern void func_8AE01738(void);
 extern s32 func_8AE00F24(void);
