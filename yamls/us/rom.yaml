@@ -924,6 +924,8 @@
     - [0x1D8160, c,       fragments/38/fragment38_1D8160]
     - [0x1D8990, c,       fragments/38/fragment38_1D8990]
     - [0x1D9400, data,    fragments/38/fragment38_data]
+    - [0x1D95D0, .rodata, fragments/38/fragment38_1D8160] # D_88903FE0, jtbl_88904008, jtbl_88904020, jtbl_8890403C
+    - [0x1D9760, rodata]
 
   - name: fragment39
     type: code
