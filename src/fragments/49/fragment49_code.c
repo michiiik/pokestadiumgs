@@ -390,7 +390,23 @@ void func_861034A8(Struct861034A8 *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_8610362C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86103B74.s")
+extern f32 D_8610AB84;
+extern void func_86100DA8(void *arg0);
+extern s32 D_8610AD20;
+extern void * D_87F119DC;
+void func_86103B74(void) {
+    void *temp_v1 = (void *)((u8 *)D_87F119DC + 0x24);
+    *(f32 *)((u8 *)D_87F119DC + 0x14) += *(f32 *)((u8 *)(u32)D_8610AD20 + 0x97CC);
+    func_86100DA8(D_87F119DC);
+    { f32 scale = D_8610AB84;
+      *(f32 *)((u8 *)temp_v1 + 0x24) += *(f32 *)((u8 *)D_87F119DC + 0x10);
+      *(f32 *)((u8 *)temp_v1 + 0x28) += *(f32 *)((u8 *)D_87F119DC + 0x14);
+      *(f32 *)((u8 *)temp_v1 + 0x2C) += *(f32 *)((u8 *)D_87F119DC + 0x18);
+      *(f32 *)((u8 *)D_87F119DC + 0x10) *= scale;
+      *(f32 *)((u8 *)D_87F119DC + 0x14) *= scale;
+      *(f32 *)((u8 *)D_87F119DC + 0x18) *= scale;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86103C48.s")
 
@@ -803,7 +819,34 @@ void func_86108B14(s32 *arg0, s32 *arg1) {
     *arg1 = temp_v0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86108B28.s")
+extern void func_86108B14(s32 *arg0, s32 *arg1);
+void func_86108B28(u8 *arg0, s32 arg1) {
+    u8 *temp_a0;
+    s32 var_s1;
+    s32 var_s2;
+    s32 var_s3;
+    s32 var_s5;
+    void *var_s0;
+    var_s5 = 1;
+    if (arg1 >= 2) {
+        var_s3 = arg1 - 1;
+        do {
+            var_s2 = 0;
+            if (var_s3 > 0) {
+                var_s1 = 0;
+                var_s0 = arg0;
+                do {
+                    temp_a0 = var_s1 + arg0;
+                    if (*(s32 *)((u8 *)((u32 *)var_s0)[0] + 4) < *(s32 *)((u8 *)((u32 *)var_s0)[1] + 4)) {
+                        func_86108B14((s32 *)temp_a0, (s32 *)(temp_a0 + 4));
+                    }
+                    var_s2 += 1; var_s1 += 4; var_s0 = (u8 *)var_s0 + 4;
+                } while (var_s2 != var_s3);
+            }
+            var_s5 += 1; var_s3 -= 1;
+        } while (var_s5 != arg1);
+    }
+}
 
 void func_86108BE0(s32 arg0, u32 arg1)
 {
