@@ -80,6 +80,7 @@ sync_tree() {
     local source_file
     local target_file
 
+    mkdir -p "$target_dir"
     diff_file="$(mktemp)"
     if ! diff -qr "$@" "$source_dir" "$target_dir" >"$diff_file" 2>&1; then
         diff_status=1
@@ -123,6 +124,9 @@ sync_tree() {
 }
 
 if sync_tree /src/src /work/src; then :; fi
+if [ -d /src/hand_asm ]; then
+    if sync_tree /src/hand_asm /work/hand_asm; then :; fi
+fi
 if sync_tree /src/include /work/include; then headers_changed=1; fi
 if sync_tree /src/tools /work/tools --exclude=__pycache__ --exclude=vtxdis; then tools_changed=1; fi
 if sync_tree /src/linker_scripts /work/linker_scripts --exclude=auto; then linker_changed=1; fi
