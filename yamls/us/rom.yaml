@@ -1250,6 +1250,8 @@
     - [0x31CFE0, data,    fragments/63/fragment63_data]
     - [0x31EE90, .rodata, fragments/63/fragment63_306150] # D_87E1B520, D_87E1B524, jtbl_87E1B528, D_87E1B548
     - [0x31EEC0, rodata]
+    - [0x31EFC0, .rodata, fragments/63/fragment63_30B540] # jtbl_87E1B650 + jtbl_87E1B664 (+ its trailing pad word), 16-byte aligned
+    - [0x31F000, rodata]
 
   - name: fragment64
     type: code
