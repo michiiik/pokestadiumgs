@@ -170,7 +170,30 @@ s32 GbSave_IdentifyFormat(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_800587BC.s")
+extern s32 func_8006072C(s32 arg0);
+s32 func_800587BC(s32 arg0)
+{
+    s32 result = 0;
+    switch (func_8005D92C(arg0)) {
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+        result = func_8005818C(arg0);
+        break;
+    case 5:
+    case 6:
+        result = func_80058288(arg0);
+        break;
+    case 7:
+        result = func_80058614(arg0);
+        if (result != 0) {
+            func_8006072C(arg0);
+        }
+        break;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
