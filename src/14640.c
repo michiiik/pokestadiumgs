@@ -346,7 +346,26 @@ s32 func_80017224(void *arg0, s32 arg1, void **arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_8001726C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_800173A0.s")
+extern u8 D_8011BE90[];
+void func_800173A0(void *arg0) {
+    void *entry;
+    u32 value;
+    s32 count;
+    entry = *((void **) arg0);
+    value = *((u32 *) entry);
+    count = 0xFFFFFF;
+    if ((value & count) == 0) {
+        return;
+    }
+    if (((s32) ((value << 5) << 1)) >= 0) {
+        return;
+    }
+    if (((value << 4) >> 30) == 0) {
+        return;
+    }
+    *((void **) ((D_8011BE90 + 0x8B8) + ((*((s32 *) (D_8011BE90 + 0x14B8))) * 4))) = entry;
+    *((s32 *) (D_8011BE90 + 0x14B8)) = (*((s32 *) (D_8011BE90 + 0x14B8))) + 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_800173F8.s")
 
