@@ -50,5 +50,45 @@ u8 func_8890311C(u8 arg0) {
 
 u8 func_889031EC(u8 arg0) { u8 result = 0; switch (arg0) { case 0x2c: result=0xb6; break; case 0xbf: result=0xc0; break; default: break; } return result; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D8160/func_88903220.s")
+extern u8 func_8005D92C(s32 index);
+extern s32 fragment29_main(u8);
+s32 func_88903220(u8 *arg0, s8 arg1) {
+    u8 result = 0;
+
+    if ((arg0[0x1E] & 1) == 0) {
+        if (arg0[1] != 0x70) {
+            switch (arg0[0]) {
+                case 0x40: result = 0x41; break;
+                case 0x43: result = 0x44; break;
+                case 0x4B: result = 0x4C; break;
+                case 0x5D: result = 0x5E; break;
+            }
+            if (result == 0) {
+                if (fragment29_main(func_8005D92C(arg1)) == 0) {
+                    switch (arg0[0]) {
+                        case 0x3D:
+                            if (arg0[1] == 0x52) result = 0xBA;
+                            break;
+                        case 0x4F:
+                            if (arg0[1] == 0x52) result = 0xC7;
+                            break;
+                        case 0x5F:
+                            if (arg0[1] == 0x8F) result = 0xD0;
+                            break;
+                        case 0x7B:
+                            if (arg0[1] == 0x8F) result = 0xD4;
+                            break;
+                        case 0x75:
+                            if (arg0[1] == 0x97) result = 0xE6;
+                            break;
+                        case 0x89:
+                            if (arg0[1] == 0xAC) result = 0xE9;
+                            break;
+                    }
+                }
+            }
+        }
+    }
+    return result;
+}
 #endif
