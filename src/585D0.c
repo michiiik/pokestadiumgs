@@ -818,7 +818,26 @@ void func_8005B924(u8 *arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005BA00.s")
+extern void func_8005B778(u8 *arg0, s32 arg1, s32 arg2);
+extern u8 func_8005D92C(s32 index);
+
+void func_8005BA00(u8 *arg0, s32 arg1, s32 arg2) {
+    switch (func_8005D92C(arg1)) {
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+            func_8005B778(arg0, arg1, arg2);
+            break;
+        case 5:
+        case 6:
+            func_8005B848(arg0, arg1, arg2);
+            break;
+        case 7:
+            func_8005B924(arg0, arg1, arg2);
+            break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
