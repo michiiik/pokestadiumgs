@@ -774,7 +774,19 @@ s32 func_8005B1C4(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005B6F0.s")
+extern s32 func_8005B378(s32, s32, s32);
+extern s32 func_8005B4B8(s32, s32, s32);
+extern s32 func_8005B5D4(s32, s32, s32);
+s32 func_8005B6F0(s32 arg0, s32 arg1, s32 arg2) {
+    switch (func_8005D92C(arg1)) {
+        case 1: case 2: case 3: case 4:
+            return func_8005B378(arg0, arg1, arg2);
+        case 5: case 6:
+            return func_8005B4B8(arg0, arg1, arg2);
+        case 7:
+            return func_8005B5D4(arg0, arg1, arg2);
+    }
+}
 #endif
 
 #ifdef VERSION_US
