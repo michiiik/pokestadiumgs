@@ -592,6 +592,8 @@
     - [0x10A620, rodata]
     - [0x10A7D0, .rodata, fragments/14/fragment14_FF070] # jtbl_81312648, jtbl_81312680 (+2 more)
     - [0x10A8C0, rodata]
+    - [0x10A9E0, .rodata, fragments/14/fragment14_104FC0] # jtbl_81312840 tail (3 words) + jtbl_8131285C, 16-byte aligned
+    - [0x10AA10, rodata]
 
   - name: fragment15
     type: code
