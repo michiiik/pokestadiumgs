@@ -10,7 +10,13 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_861001A0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_861003A4.s")
+extern f32 D_8610AA88;
+extern f32 D_8610AA8C;
+extern void func_86105C30(f32);
+extern s32 D_8610AD20;
+void func_861003A4(void) {
+    func_86105C30(-((f32)*(u8 *)((u8 *)(u32)*(s32 *)((u8 *)(u32)D_8610AD20 + 0x8FD0) + 1) / 255.0f) * D_8610AA88 + D_8610AA8C);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86100418.s")
 
