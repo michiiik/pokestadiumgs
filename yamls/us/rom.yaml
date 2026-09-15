@@ -424,6 +424,8 @@
     - [0xA8A80, textbin, fragments/1/fragment1_header]
     - [0xA8AA0, c,       fragments/1/fragment1_code]
     - [0xAC540, data,    fragments/1/fragment1_data]
+    - [0xAC8D0, .rodata, fragments/1/fragment1_code] # jtbl_83503E50 + jtbl_83503E64 first 3 words, 16-byte aligned
+    - [0xAC8F0, rodata]
 
   # unk fragment
   - name: fragment2
