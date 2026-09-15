@@ -974,7 +974,14 @@ void func_80055DC4(s32 arg0, u8 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055E54.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055EF0.s")
+extern void * func_80051138(s32 arg0);
+void func_80055EF0(void *arg0, s32 arg1) {
+    struct Record { s32 a, b, c, d, e, f; } *temp_v0;
+    if (arg1 >= 0 && arg1 < 2) {
+        temp_v0 = (struct Record *)((u8 *)func_80051138(0) + (arg1 * 0x18) + 0x1C);
+        *(struct Record *)arg0 = *temp_v0;
+    }
+}
 
 extern s32 _bcmp(const void *, const void *, s32);
 extern void * func_80051138(s32 arg0);
