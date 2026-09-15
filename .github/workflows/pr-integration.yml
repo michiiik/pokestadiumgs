@@ -49,10 +49,17 @@ jobs:
               pull_number: number,
             });
 
-            const trustedAuthor = ['OWNER', 'MEMBER', 'COLLABORATOR'].includes(
-              pr.author_association,
-            );
             const sameRepository = pr.head.repo?.full_name === `${owner}/${repo}`;
+            // The coverage-refresh bot (see refresh-coverage.yml) has
+            // author_association NONE like any GitHub App. Trust it
+            // narrowly: same-repo only, and only its one fixed branch name.
+            const trustedBotRefresh =
+              pr.user?.login === 'pokestadium-public-ci[bot]' &&
+              sameRepository &&
+              pr.head.ref === 'ci/refresh-coverage';
+            const trustedAuthor =
+              ['OWNER', 'MEMBER', 'COLLABORATOR'].includes(pr.author_association) ||
+              trustedBotRefresh;
             const current = pr.state === 'open' && pr.head.sha === expectedHead;
             core.setOutput('eligible', String(trustedAuthor && sameRepository && current));
             if (!trustedAuthor || !sameRepository || !current) {
@@ -228,9 +235,16 @@ jobs:
             });
 
             const sameRepository = pr.head.repo?.full_name === `${owner}/${repo}`;
-            const trustedAuthor = ['OWNER', 'MEMBER', 'COLLABORATOR'].includes(
-              pr.author_association,
-            );
+            // The coverage-refresh bot (see refresh-coverage.yml) has
+            // author_association NONE like any GitHub App. Trust it
+            // narrowly: same-repo only, and only its one fixed branch name.
+            const trustedBotRefresh =
+              pr.user?.login === 'pokestadium-public-ci[bot]' &&
+              sameRepository &&
+              pr.head.ref === 'ci/refresh-coverage';
+            const trustedAuthor =
+              ['OWNER', 'MEMBER', 'COLLABORATOR'].includes(pr.author_association) ||
+              trustedBotRefresh;
             const exactRevision = pr.head.sha === expectedHead && pr.base.sha === expectedBase;
 
             if (!exactRevision) {
