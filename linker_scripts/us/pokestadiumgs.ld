@@ -1285,6 +1285,7 @@ SECTIONS
         build/asm/us/data/fragments/12/fragment12_header.o(.rodata);
         build/src/fragments/12/fragment12_E5330.o(.rodata);
         build/src/fragments/12/fragment12_E7C00.o(.rodata);
+        build/asm/us/data/ECEA0.rodata.o(.rodata);
         fragment12_RODATA_END = .;
         fragment12_RODATA_SIZE = ABSOLUTE(fragment12_RODATA_END - fragment12_RODATA_START);
     }
