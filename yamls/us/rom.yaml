@@ -1260,9 +1260,7 @@
     - [0x31CFE0, data,    fragments/63/fragment63_data]
     - [0x31EE90, .rodata, fragments/63/fragment63_306150] # D_87E1B520, D_87E1B524, jtbl_87E1B528, D_87E1B548
     - [0x31EEC0, rodata]
-    - [0x31EEF0, .rodata, fragments/63/fragment63_30B540] # jtbl_87E1B580, widened to 16-byte boundary (first word of jtbl_87E1B59C)
-    - [0x31EF10, rodata]
-    - [0x31EFC0, .rodata, fragments/63/fragment63_30B540] # jtbl_87E1B650 + jtbl_87E1B664 (+ its trailing pad word), 16-byte aligned
+    - [0x31EEF0, .rodata, fragments/63/fragment63_30B540] # jtbl_87E1B580 (func_87E08564) + jtbl_87E1B59C/D_87E1B5A0/jtbl_87E1B5BC/D_87E1B5D4../jtbl_87E1B610/jtbl_87E1B628 (still-unmatched func_87E08EF0/func_87E09654/func_87E09C20/func_87E0A620's own late rodata, auto-extracted by splat into their regenerated .s files now that this subsegment spans them too) + jtbl_87E1B650 + jtbl_87E1B664 (+ trailing pad word) (func_87E0A724/func_87E0A918). Kept as a single subsegment spanning all of it: IDO pools all late rodata for a compilation unit together in declaration order regardless of ordinary code in between, so once func_87E08564 and func_87E0A724/func_87E0A918 are matched C in the same file, fragment63_30B540.o's .rodata can't be split into two separate linker-script placements with unrelated data physically between them (an input section can only be consumed once).
     - [0x31F000, rodata]
 
   - name: fragment64

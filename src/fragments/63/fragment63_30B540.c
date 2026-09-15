@@ -136,18 +136,23 @@ s32 func_87E08564(s32 arg0) {
 }
 
 /* func_87E085CC is still GLOBAL_ASM, but its .s is hand-maintained (not the
- * splat-generated asm/us/nonmatchings/.../func_87E085CC.s) so that it can
- * also carry jtbl_87E1B59C's first entry (4 bytes) in a .late_rodata block
- * ahead of its .text. That word has to land immediately after
- * func_87E08564's own compiler-generated jump table (jtbl_87E1B580) to
- * satisfy this fragment's SUBALIGN(16); a plain C global here would instead
- * be emitted by IDO BEFORE func_87E08564's switch table (IDO always emits
- * named/array rodata ahead of switch-table "late" rodata within one
- * compilation), landing at the wrong address. Placing it in a GLOBAL_ASM
- * .late_rodata block instead makes asm-processor position it correctly:
- * after all first-pass rodata and after func_87E08564's own late-rodata
- * jump table, matching retail. jtbl_87E1B59C's remaining entries keep
- * coming from the unmodified data blob at their real retail addresses. */
+ * splat-generated asm/us/nonmatchings/.../func_87E085CC.s). It used to also
+ * carry a manual .late_rodata word for jtbl_87E1B59C's first entry, needed
+ * to land it immediately after func_87E08564's own compiler-generated jump
+ * table (jtbl_87E1B580): a plain C global here would instead be emitted by
+ * IDO BEFORE func_87E08564's switch table (IDO always emits named/array
+ * rodata ahead of switch-table "late" rodata within one compilation),
+ * landing at the wrong address.
+ *
+ * That manual word is no longer needed: fragment63_30B540's owned .rodata
+ * subsegment in yamls/us/rom.yaml now spans the whole retail gap between
+ * func_87E08564's late rodata and func_87E0A724/func_87E0A918's (rather
+ * than stopping right after jtbl_87E1B59C's first word), so splat's own
+ * extraction attributes the whole of jtbl_87E1B59C (and the other jump
+ * tables/floats in that gap) to the still-unmatched functions that
+ * actually reference them (func_87E08EF0, func_87E09654, func_87E09C20,
+ * func_87E0A620), auto-generating correct `.section .late_rodata` blocks
+ * for them. See the comment on that subsegment in yamls/us/rom.yaml. */
 #pragma GLOBAL_ASM("hand_asm/fragments/63/func_87E085CC_manual.s")
 
 extern void func_87E0ADA8(u8 *, s32, s32 *, s32, s32);
