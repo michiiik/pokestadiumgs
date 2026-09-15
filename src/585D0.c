@@ -1714,7 +1714,34 @@ void func_8005E6B8(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005ECA4.s")
+extern u8 func_8005D92C(s32 index);
+extern u8 D_801285D0[];
+extern void func_8005EB3C(void *, s32);
+
+void func_8005ECA4(s32 arg0) {
+    s32 address;
+    u8 value;
+
+    switch (func_8005D92C(arg0)) {
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+        address = *(s32 *)(D_801285D0 + arg0 * 112) + 0x36;
+        value = 0x97;
+        break;
+    case 5:
+    case 6:
+        address = *(s32 *)(D_801285D0 + arg0 * 112) + 0xA6C;
+        value = 0xFB;
+        break;
+    case 7:
+        address = *(s32 *)(D_801285D0 + arg0 * 112) + 0xA47;
+        value = 0xFB;
+        break;
+    }
+    func_8005EB3C((void *)address, value);
+}
 #endif
 
 #ifdef VERSION_US
