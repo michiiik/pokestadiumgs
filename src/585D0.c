@@ -989,7 +989,7 @@ void func_8005C5CC(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8005C41C(s32, s32);
+extern void func_8005C41C();
 void func_8005C614(s32 arg0, s32 arg1) {
     switch (func_8005D92C(arg1)) {
         case 1:
@@ -1006,7 +1006,7 @@ void func_8005C614(s32 arg0, s32 arg1) {
             func_8005C5CC(arg0, arg1);
             break;
     }
-    func_8005C41C(arg0, arg1);
+    func_8005C41C(arg0);
 }
 #endif
 
@@ -1032,7 +1032,6 @@ void func_8005C714(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8005C41C(s32 arg0, s32 arg1);
 extern u8 func_8005D92C(s32 index);
 
 void func_8005C750(s32 arg0, s32 arg1) {
