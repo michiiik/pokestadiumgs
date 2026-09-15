@@ -543,7 +543,9 @@
     - [0xE35C0, c,       fragments/11/fragment11_E35C0]
     - [0xE3850, c,       fragments/11/fragment11_E3850]
     - [0xE38A0, data,    fragments/11/fragment11_data]
-  
+    - [0xE3E10, .rodata, fragments/11/fragment11_D9520] # jtbl_8160C20C tail (3 words) + jtbl_8160C27C, 16-byte aligned
+    - [0xE3E50, rodata]
+
   - name: fragment12
     type: code
     bss_size: 0x0
@@ -922,6 +924,8 @@
     - [0x1D8160, c,       fragments/38/fragment38_1D8160]
     - [0x1D8990, c,       fragments/38/fragment38_1D8990]
     - [0x1D9400, data,    fragments/38/fragment38_data]
+    - [0x1D95D0, .rodata, fragments/38/fragment38_1D8160] # D_88903FE0, jtbl_88904008, jtbl_88904020, jtbl_8890403C
+    - [0x1D9760, rodata]
 
   - name: fragment39
     type: code
