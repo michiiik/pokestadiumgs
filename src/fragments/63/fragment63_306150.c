@@ -35,8 +35,29 @@ void func_87E02F40(s32 arg0, s32 arg1) {
 
 void D_87E03018(void) {}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_306150/func_87E03020.s")
-
+extern s32 GbSave_GetPortAvailability(s32);
+extern u8 func_8005D92C(s32 index);
+extern s32 func_8004C990(s32, s32);
+extern u8 *func_8004CA60(u8 *);
+void func_87E03020(void *arg0) {
+    s32 result = -1;
+    if (GbSave_GetPortAvailability(*(u8 *)((u8 *)arg0 + 8)) != 1) {
+        switch (func_8005D92C(*(u8 *)((u8 *)arg0 + 8))) {
+            case 1: result = 4; break;
+            case 2: result = 2; break;
+            case 3: result = 0; break;
+            case 4: result = 6; break;
+            case 5: result = 3; break;
+            case 6: result = 5; break;
+            case 7: result = 1; break;
+        }
+    }
+    if (result != -1) {
+        *(void **)((u8 *)arg0 + 4) = func_8004CA60((u8 *)func_8004C990(0x1A3, result));
+    } else {
+        *(s32 *)((u8 *)arg0 + 4) = 0;
+    }
+}
 extern Gfx *D_800D0510;
 extern void *D_8009491C;
 extern void func_87E03020(void *);

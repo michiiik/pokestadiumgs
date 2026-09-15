@@ -502,7 +502,41 @@ void func_814053E4(void *arg0, void *arg1, void *arg2) {
         func_81600A34(arg1, (u8 *)arg0 + 1, arg2, first[0], first[1], first[2], first[3]);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_814054CC.s")
+/* Tail (last 3 entries) of jtbl_81407B2C, a jump table used by an earlier,
+ * still-GLOBAL_ASM switch in this file (func_81404BEC). Not referenced
+ * from C: it exists only so this file's own .rodata subsegment starts at
+ * a 16-byte-aligned ROM address (required by this fragment's SUBALIGN(16))
+ * while still landing func_814054CC's own jump table (jtbl_81407B4C,
+ * right below) at its real retail address. */
+const u32 D_81407B40[3] = {0x81404C24, 0x81404C1C, 0x81404C24};
+/* This file's owned .rodata run is 0xECE50..0xECEA0 (both ends 16-byte
+ * aligned, per this fragment's SUBALIGN(16)): [D_81407B40 tail, 12B] +
+ * [func_814054CC's own switch -> jtbl_81407B4C, compiler-generated, 32B] +
+ * [jtbl_81407B6C, 32B] + [D_81407B8C, 4B] = 80B. The last two are late_rodata
+ * belonging to the still-GLOBAL_ASM func_81405514 and func_81405CC4 below;
+ * asm-processor places their late_rodata content here automatically (no C
+ * needed for them), which is what let the 16-byte-aligned cut land exactly
+ * on real jtbl_81407B6C/D_81407B8C boundaries instead of the middle of one
+ * of IDO's own generated tables. */
+
+void func_814054CC(u8 *arg0, void *arg1)
+{
+    switch (arg0[6])
+    {
+        case 0:
+        case 1:
+            break;
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+            func_8140438C(arg0 + 0x24, arg1);
+            break;
+        case 6:
+        case 7:
+            break;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81405514.s")
 

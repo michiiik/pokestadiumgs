@@ -130,7 +130,46 @@ void func_816031F4(void) {
 
 void func_8160335C(u8 *arg0, s32 arg1) {}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81603368.s")
+/* Tail (last 3 entries) of jtbl_8160C20C, a jump table used by an earlier,
+ * still-GLOBAL_ASM switch in this file. Not referenced from C: it exists
+ * only so this file's own .rodata subsegment starts at a 16-byte-aligned
+ * ROM address (required by this fragment's SUBALIGN(16)) while still
+ * landing func_81603368's own jump table (jtbl_8160C27C, right below) at
+ * its real retail address. */
+const u32 D_8160C270[3] = {0x81602D00, 0x81602C94, 0x81602CAC};
+
+extern s32 GbSave_GetPortAvailability(s32);
+extern u8 func_8005D92C(s32);
+s32 func_81603368(s32 arg0) {
+    if (GbSave_GetPortAvailability(arg0)) {
+        return -1;
+    }
+    switch (func_8005D92C(arg0)) {
+        case 0:
+            return 7;
+        case 1:
+            return 0;
+        case 2:
+            return 1;
+        case 3:
+            return 2;
+        case 4:
+            return 3;
+        case 5:
+            return 4;
+        case 6:
+            return 5;
+        case 7:
+            return 6;
+        case 8:
+        case 9:
+        case 10:
+        case 11:
+        case 12:
+        default:
+            return 7;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81603404.s")
 

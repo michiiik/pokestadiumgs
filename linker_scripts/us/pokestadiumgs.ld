@@ -1235,6 +1235,7 @@ SECTIONS
         build/src/fragments/11/fragment11_E1E10.o(.rodata);
         build/src/fragments/11/fragment11_E35C0.o(.rodata);
         build/src/fragments/11/fragment11_E3850.o(.rodata);
+        build/asm/us/data/E3E50.rodata.o(.rodata);
         fragment11_RODATA_END = .;
         fragment11_RODATA_SIZE = ABSOLUTE(fragment11_RODATA_END - fragment11_RODATA_START);
     }
@@ -1284,6 +1285,7 @@ SECTIONS
         build/asm/us/data/fragments/12/fragment12_header.o(.rodata);
         build/src/fragments/12/fragment12_E5330.o(.rodata);
         build/src/fragments/12/fragment12_E7C00.o(.rodata);
+        build/asm/us/data/ECEA0.rodata.o(.rodata);
         fragment12_RODATA_END = .;
         fragment12_RODATA_SIZE = ABSOLUTE(fragment12_RODATA_END - fragment12_RODATA_START);
     }
@@ -2467,6 +2469,7 @@ SECTIONS
         build/src/fragments/31/fragment31_1A5E10.o(.rodata);
         build/src/fragments/31/fragment31_1A60F0.o(.rodata);
         build/src/fragments/31/fragment31_1A6360.o(.rodata);
+        build/asm/us/data/1A6E60.rodata.o(.rodata);
         fragment31_RODATA_END = .;
         fragment31_RODATA_SIZE = ABSOLUTE(fragment31_RODATA_END - fragment31_RODATA_START);
     }
@@ -4227,6 +4230,7 @@ SECTIONS
         build/src/fragments/63/fragment63_317060.o(.rodata);
         build/src/fragments/63/fragment63_31BD80.o(.rodata);
         build/src/fragments/63/fragment63_31CB20.o(.rodata);
+        build/asm/us/data/31EEC0.rodata.o(.rodata);
         build/asm/us/data/31EF10.rodata.o(.rodata);
         fragment63_RODATA_END = .;
         fragment63_RODATA_SIZE = ABSOLUTE(fragment63_RODATA_END - fragment63_RODATA_START);
@@ -5490,6 +5494,7 @@ SECTIONS
         fragment84_RODATA_START = .;
         build/asm/us/data/fragments/84/fragment84_header.o(.rodata);
         build/src/fragments/84/fragment84_code.o(.rodata);
+        build/asm/us/data/431990.rodata.o(.rodata);
         fragment84_RODATA_END = .;
         fragment84_RODATA_SIZE = ABSOLUTE(fragment84_RODATA_END - fragment84_RODATA_START);
     }
