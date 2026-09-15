@@ -1254,6 +1254,8 @@
     - [0x31EEC0, rodata]
     - [0x31EEF0, .rodata, fragments/63/fragment63_30B540] # jtbl_87E1B580, widened to 16-byte boundary (first word of jtbl_87E1B59C)
     - [0x31EF10, rodata]
+    - [0x31EFC0, .rodata, fragments/63/fragment63_30B540] # jtbl_87E1B650 + jtbl_87E1B664 (+ its trailing pad word), 16-byte aligned
+    - [0x31F000, rodata]
 
   - name: fragment64
     type: code
