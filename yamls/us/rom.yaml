@@ -1326,7 +1326,9 @@
     - [0x34B0F0, c,       fragments/67/fragment67_34B0F0]
     - [0x34C8B0, c,       fragments/67/fragment67_34C8B0]
     - [0x34E600, data,    fragments/67/fragment67_data]
-  
+    - [0x353EB0, .rodata, fragments/67/fragment67_33CB20] # jtbl_829173B0
+    - [0x353ED0, rodata]
+
   - name: fragment68
     type: code
     bss_size: 0x0
