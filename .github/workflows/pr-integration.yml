@@ -305,6 +305,7 @@ jobs:
           private-key: ${{ secrets.PUBLIC_CI_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
           repositories: ${{ github.event.repository.name }}
+          permission-contents: write
           permission-pull-requests: write
 
       - name: Leave auto-merge disabled until repository protection is ready
