@@ -42,11 +42,52 @@ void func_81311A9C(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_109280/func_81311AAC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_109280/func_81311B98.s")
+/* Tail (last 2 entries) of the jump table used by the still-GLOBAL_ASM
+ * func_81311AAC's own switch, immediately above. Not referenced from C: it
+ * exists only so this file's own .rodata subsegment starts at a
+ * 16-byte-aligned ROM address (0x81312A10) while still landing
+ * func_81311B98's own jump table (jtbl_81312A18) at its real retail
+ * address right below. */
+const u32 D_81312A10[2] = {0x81311B14, 0x81311B24};
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_109280/func_81311C18.s")
+extern void func_813110F0(u8 *arg0, void *arg1, s32 arg2, s32 arg3);
+void func_81311B98(u8 *arg0, void *arg1, s32 arg2, s32 arg3) {
+    s32 sp20 = arg2;
 
-extern void func_81311B98();
+    func_813110F0(arg0, arg1, arg3, arg3);
+    switch (arg0[0x18]) {
+        case 2:
+            *(f32 *)(arg0 + 4) = 16.0f;
+            return;
+        case 0:
+        case 4:
+            *(f32 *)(arg0 + 4) = 0.0f;
+            break;
+        case 1:
+        case 3:
+            break;
+    }
+    arg0[0x18] = 1;
+    arg0[0x19] = 0;
+    arg0[0x1A] = sp20;
+}
+
+void func_81311C18(u8 *arg0) {
+    *(s8 *)(arg0 + 0x19) = -1;
+    switch (arg0[0x18]) {
+        case 0:
+        case 4:
+            *(f32 *)(arg0 + 4) = 0.0f;
+            return;
+        case 2:
+            *(f32 *)(arg0 + 4) = 16.0f;
+            break;
+        case 1:
+        case 3:
+            break;
+    }
+    arg0[0x18] = 3;
+}
 
 typedef struct {
     void *owner;
@@ -65,7 +106,7 @@ typedef struct {
     u8 pad1A[6];
     Frag14Entry *entries;
 } Frag14Record;
-s32 func_81311C70(void *arg0, void *arg1) {
+s32 func_81311C70(void *arg0, void *arg1, s32 arg2, s32 arg3) {
     Frag14State *state = arg0;
     Frag14Record *record = arg1;
     s16 result;
@@ -81,7 +122,7 @@ s32 func_81311C70(void *arg0, void *arg1) {
         return (result << 16) >> 16;
     }
     if (state->status != 3) {
-        func_81311B98();
+        func_81311B98(arg0, arg1, arg2, arg3);
     }
     return 0;
 }
