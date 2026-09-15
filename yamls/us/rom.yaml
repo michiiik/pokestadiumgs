@@ -517,6 +517,8 @@
     - [0xD0480, textbin, fragments/9/fragment9_header]
     - [0xD04A0, c,       fragments/9/fragment9_code]
     - [0xD3910, data,    fragments/9/fragment9_data]
+    - [0xD4240, .rodata, fragments/9/fragment9_code] # last word of jtbl_8FB03D2C (func_8FB02A10, hand-carried) + jtbl_8FB03DC4 (func_8FB03164's switch); IDO pads the switch's rodata out to 0xD4260 (2 extra zero words, matching retail here), so this ends there rather than at the table's literal end (0xD4258)
+    - [0xD4260, rodata]
   
   # unk fragment
   - name: fragment10
