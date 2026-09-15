@@ -1996,7 +1996,29 @@ s32 func_80060358(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80060368.s")
+extern u8 func_8005D92C(s32 index);
+extern u16 func_80060A4C(const u8 *arg0);
+extern u8 D_80128570[];
+s32 func_80060368(s32 arg0) {
+    u16 result = 0;
+    u16 value;
+    if ((*(s32 *)(D_80128570 + arg0 * 112) & 1) == 0) {
+        return 0;
+    }
+    switch (func_8005D92C(arg0)) {
+        case 1: case 2: case 3: case 4:
+            value = func_80060A4C(*(u8 **)(D_80128570 + arg0 * 112 + 0x60) + 0x2D0);
+            result = ((value & 0xF000) >> 12) % 10 * 1000 + ((value & 0xF00) >> 8) % 10 * 100 + ((value & 0xF0) >> 4) % 10 * 10 + (value & 0xF) % 10;
+            break;
+        case 5: case 6:
+            result = func_80060A4C(*(u8 **)(D_80128570 + arg0 * 112 + 0x60) + 0x3E2);
+            break;
+        case 7:
+            result = func_80060A4C(*(u8 **)(D_80128570 + arg0 * 112 + 0x60) + 0x3E3);
+            break;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
