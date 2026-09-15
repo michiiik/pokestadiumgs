@@ -495,6 +495,7 @@ void func_8005A094(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
+extern void func_8005E6B8(s32 arg0);
 s32 func_8005A0B4(s32 arg0) {
     s32 result = func_80059EF8(arg0, 5);
     if (result != 0) {
@@ -1602,7 +1603,21 @@ void func_8005E648(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005E6B8.s")
+extern u8 func_8005D92C(s32 index);
+extern void func_8005E420(s32 arg0);
+void func_8005E6B8(s32 arg0) {
+    switch (func_8005D92C(arg0)) {
+        case 1: case 2: case 3: case 4:
+            func_8005E420(arg0);
+            break;
+        case 5: case 6:
+            func_8005E5D8(arg0);
+            break;
+        case 7:
+            func_8005E648(arg0);
+            break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
