@@ -1,9 +1,18 @@
 # Public Pokemon Stadium GS ROM-gate baseline.
 #
-# This image is built locally on the isolated Mac runner from a clean public
-# checkout. The US baserom is supplied outside Git and is never published.
-# The image contains only the build toolchain and generated baseline build
-# state; it is not the workflow's authority to merge code.
+# This image is staged locally on the isolated Mac runner from a persistent,
+# incrementally-maintained host checkout (see ci/build-baseline.sh) rather
+# than compiled inside this Dockerfile. A `COPY . /work` followed by a full
+# `make extract && make rom` inside Docker busts its own build cache on
+# every single change anywhere in the repo (including to this Dockerfile),
+# so every rebuild -- even one triggered by an unrelated one-line source
+# change -- paid the full ~20-30 minute bake from scratch. Building natively
+# on the host instead lets Make's own incremental dependency tracking do its
+# job: a small change rebuilds in a couple of minutes, not from zero.
+#
+# The US baserom is supplied outside Git and is never published. The image
+# contains only the build toolchain and generated baseline build state; it
+# is not the workflow's authority to merge code.
 
 FROM debian:bookworm-slim
 
@@ -28,22 +37,43 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /work
-COPY . /work
 
-# Install the exact pinned Python dependencies and build the repository tools.
+# Git-tracked inputs, copied as their own layer so an unrelated change to
+# generated/derived state (below) never busts this one, and vice versa.
+COPY src ./src
+COPY include ./include
+COPY tools ./tools
+COPY linker_scripts ./linker_scripts
+COPY lib ./lib
+COPY yamls ./yamls
+COPY Makefile requirements.txt ./
+
+# The exact pinned Python dependencies and repository tools. Built inside
+# the image (not staged from the host) since a host-native venv's paths
+# aren't portable into a container.
 RUN make venv \
     && make setup
 
-# The public repository is a partial decompilation, so it cannot be required
-# to link before the gate has had a chance to validate the PR-controlled
-# source. Extraction is still required to provide the generated asm/assets
-# inputs; ci/gate-pr.sh always overlays the checkout and forces the real
-# compile/link/checksum gate. The ROM is supplied outside Git and is removed
-# from the isolated checkout by ci/build-baseline.sh after the build.
-RUN make extract \
-    && (make -B CC=tools/ido/linux/7.1/cc COMPARE=0 -j"$(nproc)" rom \
-        || test -s build/pokestadiumgs-us.map)
+# Pre-built derived state from the host checkout's own incremental build --
+# see ci/build-baseline.sh. Staged as separate layers, each cheap to
+# invalidate on its own: a yaml-only change still busts asm/ (splat's
+# output depends on it) but never touches the already-built lib/ultralib
+# object archive, for example.
+COPY prebuilt/asm ./asm
+COPY prebuilt/assets ./assets
+COPY prebuilt/lib-ultralib-build ./lib/ultralib/build
+COPY prebuilt/build ./build
+COPY baseroms ./baseroms
 
+# The public repository is a partial decompilation, so it cannot be
+# required to link before the gate has had a chance to validate the
+# PR-controlled source; ci/gate-pr.sh always overlays the checkout and
+# forces the real compile/link/checksum gate. Swap the final ROM for the
+# raw retail dump so timestamp-based make decisions in that later gate can
+# never mistake this baked seed for an already-verified build of the
+# checked-out PR source -- it must always recompile for real. The ROM is
+# supplied outside Git and is removed from the isolated checkout by
+# ci/build-baseline.sh after the build.
 RUN mkdir -p build \
     && cp baseroms/us/baserom.z64 build/pokestadiumgs-us.z64 \
     && md5sum build/pokestadiumgs-us.z64 baseroms/us/baserom.z64
