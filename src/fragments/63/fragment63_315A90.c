@@ -305,7 +305,7 @@ void func_87E13268(Func87E13268_State *arg0) {
 s32 func_80040E80(s32, s32 *);
 extern u8 D_87E1AC40;
 extern u8 D_87E1EBC0;
-extern void func_80037E9C(s32, void *);
+extern void GeoNode_CreateContainer(s32, void *);
 extern s32 MainPool_AllocState(s32, s32);
 s32 main_pool_get_available(void);
 extern void MainPool_FinalizeAllocation(s32);
@@ -313,7 +313,7 @@ void func_87E1331C(void *arg0) {
     s32 sp1C;
     s32 temp_v0;
 
-    func_80037E9C(0, &D_87E1EBC0);
+    GeoNode_CreateContainer(0, &D_87E1EBC0);
     temp_v0 = MainPool_AllocState(main_pool_get_available(), 0);
     sp1C = temp_v0;
     (*(s32 *)((u8 *)(arg0) + (0x28))) = func_80040E80(temp_v0, &D_87E1AC40);
