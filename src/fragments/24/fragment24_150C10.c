@@ -279,7 +279,50 @@ void func_82B02A34(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B02ABC.s")
+extern s32 D_82B085E0;
+
+/**
+ * Per-frame animation stepper (fragment 24). Increments the counter at
+ * offset 8; while counter < D_82B085E0 writes shrinking x/y offsets
+ * (x - x*counter/limit to 0xC, y - y*counter/limit to 0xE from the base
+ * values at 0x14/0x16). Once the counter reaches the limit, marks the
+ * state byte at offset 6 as 2 and zeroes the counter and both offsets.
+ *
+ * The dead early `counter` read and the `if (0) { }` boundary below are
+ * load-bearing for register coloring: they freeze counter's pseudo-
+ * register numbering before dead-code elimination so the reload inherits
+ * the earlier color slot. Removing either costs 12 words. Both are
+ * semantically inert.
+ */
+void func_82B02ABC(void *arg0) {
+    s32 result;
+    s32 counter;
+    s32 x;
+    s32 y;
+    s32 limit;
+
+    result = 0;
+    counter = *(s16 *)((u8 *)arg0 + 8);
+    limit = D_82B085E0;
+    *(s16 *)((u8 *)arg0 + 8) = *(s16 *)((u8 *)arg0 + 8) + 1;
+    if (0) {
+    }
+    counter = *(s16 *)((u8 *)arg0 + 8);
+    if (counter < limit) {
+        x = *(s16 *)((u8 *)arg0 + 0x14);
+        y = *(s16 *)((u8 *)arg0 + 0x16);
+        *(s16 *)((u8 *)arg0 + 0xC) = x - (x * counter) / limit;
+        *(s16 *)((u8 *)arg0 + 0xE) = y - (y * counter) / limit;
+    } else {
+        result = 1;
+    }
+    if (result != 0) {
+        *(s16 *)((u8 *)arg0 + 6) = 2;
+        *(s16 *)((u8 *)arg0 + 8) = 0;
+        *(s16 *)((u8 *)arg0 + 0xC) = 0;
+        *(s16 *)((u8 *)arg0 + 0xE) = 0;
+    }
+}
 #endif
 
 #ifdef VERSION_US
