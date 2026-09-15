@@ -264,7 +264,32 @@ void func_800251F8(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025ACC.s")
+/* Tail (last 3 entries) of jtbl_800A3724, a jump table used by an earlier,
+ * still-GLOBAL_ASM switch in this file. Not referenced from C: it exists
+ * only so this file's own .rodata subsegment starts at a 16-byte-aligned
+ * ROM address (required by this segment's SUBALIGN(16)) while still
+ * landing func_80025ACC's own jump table (jtbl_800A374C, right below) at
+ * its real retail address. */
+const u32 D_800A3740[3] = {0x80025A50, 0x80025AB8, 0x800259A8};
+
+void func_80025ACC(s32 arg0) {
+    switch (arg0) {
+    case 7:
+        func_8001874C(0x06020405, 1);
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+    case 8:
+        func_8001874C(0x06020000, 2);
+        func_8001874C(0x06020105, 1);
+        func_8001874C(0x06020205, 1);
+        func_8001874C(0x06020305, 1);
+        return;
+    }
+}
 #endif
 
 #ifdef VERSION_US
