@@ -21,3 +21,11 @@ func_84110B2C: plateau at 0.9625 (raw 0.625), mismatch operand_or_scheduling_dri
 ## 2026-09-15
 
 func_84119908: time cap at 0.9813 (raw 0.7944) after 2543s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-15
+
+func_8410F78C: matched (call_sequence:global-setup:exact-frame-direct-global), 1 iterations, agent codex
+
+## 2026-09-15
+
+func_84110264: time cap at 0.9792 (raw 0.7083) after 2416s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
