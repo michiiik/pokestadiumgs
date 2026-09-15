@@ -22,9 +22,62 @@ extern s32 func_88902B70(u8 *); extern u8 D_889041A0; extern u8 func_80062E10(u8
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D8160/func_88902C3C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D8160/func_88902CF0.s")
+extern s32 func_88902BA0(void *, u8);
+extern u8 func_8005D92C(s32 index);
+s32 func_88902CF0(void *arg0, u8 *arg1, s8 arg2) {
+    s32 dispatch;
+    u8 *p;
+    u8 ret;
 
-extern s32 func_80064800(u8); extern void func_88902CF0(void *, void *, s8); void func_88902E4C(u32 *arg0, u8 *arg1, s8 arg2) { *arg0 = func_80064800(arg1[0]); func_88902CF0(arg0, arg1, arg2); }
+    dispatch = func_8005D92C(arg2) & 0xFF;
+    p = *(u8 **)arg0;
+    while (p[0] != 0 && p[0] <= arg1[0x1D]) {
+        if (arg1[0x1D] == p[0] && func_88902BA0(arg1, p[1]) == 0) {
+            switch (dispatch) {
+                case 1:
+                case 2:
+                case 3:
+                    p = *(u8 **)arg0;
+                    if (p[2] & 1) {
+                        ret = p[1];
+                        *(u8 **)arg0 = p + 3;
+                        return ret;
+                    }
+                    break;
+                case 4:
+                    p = *(u8 **)arg0;
+                    if (p[2] & 2) {
+                        ret = p[1];
+                        *(u8 **)arg0 = p + 3;
+                        return ret;
+                    }
+                    break;
+                case 5:
+                case 6:
+                    p = *(u8 **)arg0;
+                    if (p[2] & 4) {
+                        ret = p[1];
+                        *(u8 **)arg0 = p + 3;
+                        return ret;
+                    }
+                    break;
+                default:
+                    p = *(u8 **)arg0;
+                    if (p[2] & 8) {
+                        ret = p[1];
+                        *(u8 **)arg0 = p + 3;
+                        return ret;
+                    }
+                    break;
+            }
+        }
+        *(u8 **)arg0 = *(u8 **)arg0 + 3;
+        p = *(u8 **)arg0;
+    }
+    return 0;
+}
+
+extern s32 func_80064800(u8); extern s32 func_88902CF0(void *, u8 *, s8); void func_88902E4C(u32 *arg0, u8 *arg1, s8 arg2) { *arg0 = func_80064800(arg1[0]); func_88902CF0(arg0, arg1, arg2); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D8160/func_88902E8C.s")
 
