@@ -1242,6 +1242,8 @@
     - [0x31BD80, c,       fragments/63/fragment63_31BD80]
     - [0x31CB20, c,       fragments/63/fragment63_31CB20]
     - [0x31CFE0, data,    fragments/63/fragment63_data]
+    - [0x31EE90, .rodata, fragments/63/fragment63_306150] # D_87E1B520, D_87E1B524, jtbl_87E1B528, D_87E1B548
+    - [0x31EEC0, rodata]
 
   - name: fragment64
     type: code
