@@ -191,7 +191,21 @@ void func_82506AA4(s16 *arg0, s32 arg1, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_144790/func_82506E98.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_144790/func_82506FB8.s")
+extern s16 D_82508FFC;
+extern void _bzero(s16 *, s32);
+extern void * func_825068C4(s32, s32);
+void func_82506FB8(s32 arg0)
+{
+  void *temp_v0;
+  unsigned short new_var;
+  temp_v0 = func_825068C4(2, arg0);
+  if (temp_v0 != 0)
+  {
+    new_var = 1;
+    _bzero(temp_v0, 0x64);
+    D_82508FFC -= new_var;
+  }
+}
 
 extern void func_82504C50(void *, s32);
 void *func_825068C4(s32, s32);
