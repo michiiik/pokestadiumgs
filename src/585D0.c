@@ -377,7 +377,18 @@ void func_80059468(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80059670.s")
+extern void func_80059488(s32 arg0);
+extern void func_80059578(s32 arg0);
+void func_80059670(s32 arg0) {
+    switch (func_8005D92C(arg0)) {
+        case 1: case 2: case 3: case 4:
+            func_80059488(arg0);
+            break;
+        case 5: case 6: case 7:
+            func_80059578(arg0);
+            break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
