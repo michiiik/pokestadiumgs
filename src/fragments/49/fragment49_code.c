@@ -819,7 +819,34 @@ void func_86108B14(s32 *arg0, s32 *arg1) {
     *arg1 = temp_v0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86108B28.s")
+extern void func_86108B14(s32 *arg0, s32 *arg1);
+void func_86108B28(u8 *arg0, s32 arg1) {
+    u8 *temp_a0;
+    s32 var_s1;
+    s32 var_s2;
+    s32 var_s3;
+    s32 var_s5;
+    void *var_s0;
+    var_s5 = 1;
+    if (arg1 >= 2) {
+        var_s3 = arg1 - 1;
+        do {
+            var_s2 = 0;
+            if (var_s3 > 0) {
+                var_s1 = 0;
+                var_s0 = arg0;
+                do {
+                    temp_a0 = var_s1 + arg0;
+                    if (*(s32 *)((u8 *)((u32 *)var_s0)[0] + 4) < *(s32 *)((u8 *)((u32 *)var_s0)[1] + 4)) {
+                        func_86108B14((s32 *)temp_a0, (s32 *)(temp_a0 + 4));
+                    }
+                    var_s2 += 1; var_s1 += 4; var_s0 = (u8 *)var_s0 + 4;
+                } while (var_s2 != var_s3);
+            }
+            var_s5 += 1; var_s3 -= 1;
+        } while (var_s5 != arg1);
+    }
+}
 
 void func_86108BE0(s32 arg0, u32 arg1)
 {
