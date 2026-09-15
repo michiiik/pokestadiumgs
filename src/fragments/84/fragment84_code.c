@@ -77,7 +77,24 @@ void func_8FC00558(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/84/fragment84_code/func_8FC00774.s")
+extern u8 D_8FC02832;
+extern u8 D_8FC0244C;
+extern void Ui_DrawAnimatedTextureMarker(s16, s16);
+void func_8FC00774(void) {
+    u8 *record = (u8 *)((D_8FC02832 * 0x10) + &D_8FC0244C);
+
+    switch (record[0]) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+        Ui_DrawAnimatedTextureMarker(*(u16 *)(record + 4) - 0x28, *(s16 *)(record + 6));
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
