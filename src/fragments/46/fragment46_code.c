@@ -236,7 +236,19 @@ s32 func_8AE01164(void *arg0, u8 *arg1, s32 arg2) { typedef struct { u8 b[6]; } 
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE011E0.s")
+extern s16 D_8AE0A15C;
+s32 func_8AE011E0(void *arg0, u8 *arg1) {
+    struct Bytes3 { u8 b[3]; };
+    if (arg1 == NULL) return 0;
+    for (;;) {
+        if (arg1[1] == 0xFF) return 0;
+        if (D_8AE0A15C == arg1[1]) {
+            *(struct Bytes3 *)((u8 *)arg0 + 0x3D) = *(struct Bytes3 *)arg1;
+            return 1;
+        }
+        arg1 += 3;
+    }
+}
 #endif
 
 #ifdef VERSION_US
