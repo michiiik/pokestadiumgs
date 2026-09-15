@@ -1,0 +1,94 @@
+name: Refresh coverage after merge
+
+# COVERAGE.md aggregates GLOBAL_ASM ownership across the whole tree, so its
+# content depends on every merged PR, not just one. The old design computed
+# it per-PR and committed it onto each PR branch before allowing auto-merge;
+# since two PRs open at the same time each proposed a different COVERAGE.md
+# against a common ancestor, whichever merged first made every other open
+# PR's copy conflict with the new master on that file, even when their real
+# source changes touched disjoint fragments (for example
+# https://github.com/michiiik/pokestadiumgs/pull/23). Keeping the refresh out
+# of PR branches entirely and running it exactly once, directly on master,
+# after each merge removes that whole class of self-inflicted conflict.
+on:
+  push:
+    branches: [master]
+    paths-ignore:
+      - COVERAGE.md
+
+permissions:
+  contents: read
+
+concurrency:
+  group: public-refresh-coverage
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    name: Regenerate COVERAGE.md
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Check the integration GitHub App configuration
+        shell: bash
+        env:
+          APP_CLIENT_ID: ${{ vars.PUBLIC_CI_APP_ID }}
+          APP_PRIVATE_KEY: ${{ secrets.PUBLIC_CI_APP_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$APP_CLIENT_ID" || -z "$APP_PRIVATE_KEY" ]]; then
+            echo '::error::Configure PUBLIC_CI_APP_ID and PUBLIC_CI_APP_PRIVATE_KEY before refreshing coverage.'
+            exit 1
+          fi
+
+      - name: Create the least-privilege coverage App token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.PUBLIC_CI_APP_ID }}
+          private-key: ${{ secrets.PUBLIC_CI_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }}
+          permission-contents: write
+
+      - name: Regenerate COVERAGE.md and push if it changed
+        shell: bash
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          set -euo pipefail
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git config user.name 'pokestadiumgs-ci[bot]'
+          git config user.email 'pokestadiumgs-ci[bot]@users.noreply.github.com'
+
+          for attempt in 1 2 3; do
+            git fetch --quiet origin master
+            git checkout --quiet -B master origin/master
+
+            python3 ci/update_coverage.py --repo-root .
+
+            if git diff --quiet -- COVERAGE.md; then
+              echo 'refresh-coverage: COVERAGE.md is already current on master.'
+              exit 0
+            fi
+
+            git add COVERAGE.md
+            git commit --quiet -m 'ci: refresh COVERAGE.md'
+
+            if git push origin HEAD:master; then
+              echo 'refresh-coverage: pushed an updated COVERAGE.md.'
+              exit 0
+            fi
+
+            echo "refresh-coverage: push race on attempt $attempt, retrying against the latest master" >&2
+          done
+
+          echo '::error::refresh-coverage: could not push COVERAGE.md after retries; another writer keeps winning the race.'
+          exit 1
