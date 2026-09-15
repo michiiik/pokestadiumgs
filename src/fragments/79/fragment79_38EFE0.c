@@ -613,7 +613,16 @@ void func_84122A04(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84122A0C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84122A78.s")
+extern f32 D_84189CB8;
+void func_84122A78(void *arg0) {
+    (*(s16 *)((u8 *)arg0 + 0x5FC)) = 0x16C; (*(s16 *)((u8 *)arg0 + 0x5FE)) = 0; (*(s16 *)((u8 *)arg0 + 0x600)) = 0;
+    (*(f32 *)((u8 *)arg0 + 0x60C)) = D_84189CB8;
+    (*(f32 *)((u8 *)arg0 + 0x5F0)) = *(f32 *)((u8 *)arg0 + 0x30);
+    (*(f32 *)((u8 *)arg0 + 0x5E4)) = *(f32 *)((u8 *)arg0 + 0x30);
+    (*(f32 *)((u8 *)arg0 + 0x5F4)) = *(f32 *)((u8 *)arg0 + 0x34);
+    (*(f32 *)((u8 *)arg0 + 0x5F8)) = *(f32 *)((u8 *)arg0 + 0x38);
+    (*(u8 *)((u8 *)arg0 + 0x624)) = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84122AB8.s")
 
