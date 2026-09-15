@@ -2656,7 +2656,48 @@ s32 func_84117CAC(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_84118138.s")
+extern void func_84117744(u8 *);
+extern void func_841087B8(s32 arg0, s32 arg1, s32 arg2);
+extern void func_8410890C(s32, s32);
+extern void func_84108E00(u8 *, s32);
+extern void func_84112158(s32 arg0, s32 arg1);
+extern void func_84117648(u8 *arg0);
+extern void func_841176E0(void *arg0);
+extern void func_84117880(u8 *arg0);
+extern void func_84117AA0(u8 *);
+extern s32 func_8411DC80(u16, s32 *, s32);
+extern s32 func_8411E164(s32 arg0);
+extern s32 D_84183A50[];
+extern u8 * D_84193DD0;
+void func_84118138(u8 *arg0) {
+    func_84117744(arg0);
+    if (*(s16 *)(arg0 + 0x7E8) == 0) {
+        func_84112158((s32)arg0, 0xFE);
+    }
+    if (func_84117CAC(arg0) != 0) {
+        func_841087B8(arg0[0x618], func_8411E164((s32)arg0), (s32)arg0);
+        func_84117AA0(arg0);
+        func_80023A3C(9, 0, 0);
+        *(u16 *)(arg0 + 0x7F4) |= 0x20;
+    }
+    func_84117880(arg0);
+    func_84117C18(arg0);
+    func_841176E0(arg0);
+    if (*(s8 *)(arg0 + 0x619) + 10 == *(s16 *)(arg0 + 0x7E8)) {
+        func_84112580((s32)arg0);
+    }
+    if (func_8411DC80(*(u16 *)(arg0 + 0x1A), D_84183A50, 10)) {
+        if ((*(s32 *)(arg0 + 0x48) >> 16) == 0) func_84112464(arg0);
+    } else if ((*(s32 *)(arg0 + 0x48) >> 16) == 6) func_84112464(arg0);
+    if (*(s16 *)(arg0 + 0x7E8) == 8) func_8410890C(0xFE, (s32)arg0);
+    if (*(s16 *)(arg0 + 0x7E8) == 9) {
+        s32 i = func_8411E1F8((s32)arg0);
+        if ((*(u16 *)((u8 *)D_84193DD0 + (i << 4) + 0x12) & 2) ||
+            ((i = func_8411E1F8((s32)arg0)), (*(u16 *)((u8 *)D_84193DD0 + (i << 4) + 0x12) & 4))) func_84108E00(arg0, 1);
+    }
+    func_841139D0(arg0);
+    func_84117648(arg0);
+}
 #endif
 
 #ifdef VERSION_US
@@ -2708,7 +2749,37 @@ void func_8411854C(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8411862C.s")
+extern void func_84117744(u8 *);
+extern void func_841087B8(s32 arg0, s32 arg1, s32 arg2);
+extern void func_8410890C(s32, s32);
+extern void func_84112158(s32 arg0, s32 arg1);
+extern s32 func_84112418(u8 *arg0);
+extern void func_84113920(u8 *arg0);
+extern void func_84117648(u8 *arg0);
+extern void func_841176E0(void *arg0);
+extern void func_84117880(u8 *arg0);
+extern void func_84117AA0(u8 *);
+extern s32 func_8411E164(s32 arg0);
+void func_8411862C(u8 *arg0) {
+    func_84117744(arg0);
+    if (func_84117CAC(arg0) != 0) {
+        func_841087B8(arg0[0x618], func_8411E164((s32)arg0), (s32)arg0);
+        func_84112158((s32)arg0, 0x105);
+        func_8410890C(0x100, (s32)arg0);
+        func_80023A3C(0xC, *(s16 *)(arg0 + 0x1A), 0);
+        func_84117AA0(arg0);
+        *(u16 *)(arg0 + 0x7F4) |= 0x40;
+    }
+    func_84117880(arg0);
+    func_84117C18(arg0);
+    func_84112418(arg0);
+    func_841176E0(arg0);
+    if (*(s8 *)(arg0 + 0x619) + 10 == *(s16 *)(arg0 + 0x7E8)) {
+        func_84112580((s32)arg0);
+    }
+    func_84113920(arg0);
+    func_84117648(arg0);
+}
 #endif
 
 #ifdef VERSION_US
