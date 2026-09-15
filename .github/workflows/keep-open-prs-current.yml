@@ -1,0 +1,105 @@
+name: Keep open PRs current
+
+# GitHub's own auto-merge (enablePullRequestAutoMerge, armed by
+# pr-integration.yml's integrate job) never updates a BEHIND branch on its
+# own -- master's branch protection requires the "Validate ROM against
+# master" check to have run against the CURRENT base (strict: true), so a
+# PR whose check ran before a sibling PR merged just sits BEHIND forever
+# until something pushes a merge of the new base into it. fleetctl's own
+# poll loop already does this for the PRs it tracks (attemptMerge's
+# requestBranchUpdate); this covers every other open, trusted PR too --
+# e.g. one opened by hand via `gh pr create` for a container-agent match
+# fleetctl never tracked, exactly what motivated this workflow.
+#
+# Deliberately keeps strict verification rather than disabling it: this
+# project has a real precedent (see docs/regions and the jump-table/
+# .rodata-subsegment history) of two individually-clean changes combining
+# badly. strict is what catches that; only automating the "someone must
+# click update branch" busywork is in scope here, not weakening the
+# guarantee itself.
+on:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: keep-open-prs-current
+  cancel-in-progress: false
+
+jobs:
+  update-behind:
+    name: Update any open, trusted PR that fell behind
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check the integration GitHub App configuration
+        shell: bash
+        env:
+          APP_CLIENT_ID: ${{ vars.PUBLIC_CI_APP_ID }}
+          APP_PRIVATE_KEY: ${{ secrets.PUBLIC_CI_APP_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$APP_CLIENT_ID" || -z "$APP_PRIVATE_KEY" ]]; then
+            echo '::error::Configure PUBLIC_CI_APP_ID and PUBLIC_CI_APP_PRIVATE_KEY before updating open PR branches.'
+            exit 1
+          fi
+
+      - name: Create the least-privilege branch-update App token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.PUBLIC_CI_APP_ID }}
+          private-key: ${{ secrets.PUBLIC_CI_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }}
+          permission-contents: write
+          permission-pull-requests: write
+
+      - name: Update every open, trusted, BEHIND PR
+        uses: actions/github-script@v7
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        with:
+          github-token: ${{ steps.app-token.outputs.token }}
+          script: |
+            const { owner, repo } = context.repo;
+            const trustedAssociations = ['OWNER', 'MEMBER', 'COLLABORATOR'];
+            // Same narrow allowance pr-rom-gate.yml and pr-integration.yml
+            // already give this one bot on this one fixed branch name --
+            // see refresh-coverage.yml and those workflows' own comments.
+            const trustedBotLogin = 'pokestadium-public-ci[bot]';
+            const trustedBotBranch = 'ci/refresh-coverage';
+
+            const prs = await github.paginate(github.rest.pulls.list, {
+              owner, repo, state: 'open', base: 'master', per_page: 100,
+            });
+
+            for (const pr of prs) {
+              const sameRepository = pr.head.repo?.full_name === `${owner}/${repo}`;
+              const trusted = sameRepository && (
+                trustedAssociations.includes(pr.author_association) ||
+                (pr.user?.login === trustedBotLogin && pr.head.ref === trustedBotBranch)
+              );
+              if (!trusted) {
+                continue; // never touch a fork or untrusted PR's branch
+              }
+
+              const { data: full } = await github.rest.pulls.get({
+                owner, repo, pull_number: pr.number,
+              });
+              if (full.mergeable_state !== 'behind') {
+                continue; // only act on a PR that is genuinely behind right now
+              }
+
+              try {
+                await github.rest.pulls.updateBranch({
+                  owner, repo, pull_number: pr.number,
+                });
+                core.info(`PR #${pr.number}: requested a branch update (was behind master).`);
+              } catch (error) {
+                core.warning(`PR #${pr.number}: update-branch failed: ${error.message}`);
+              }
+            }
