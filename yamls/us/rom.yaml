@@ -839,7 +839,9 @@
     - [0x1A60F0, c,       fragments/31/fragment31_1A60F0]
     - [0x1A6360, c,       fragments/31/fragment31_1A6360]
     - [0x1A6980, data,    fragments/31/fragment31_data]
-  
+    - [0x1A7420, .rodata, fragments/31/fragment31_190BB0] # jtbl_882341A0, 16-byte aligned start; ends mid jtbl_882341B8
+    - [0x1A7440, rodata]
+
   - name: fragment32
     type: code
     bss_size: 0x0
