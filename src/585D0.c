@@ -105,7 +105,29 @@ s32 func_80057C74(s8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80057F58.s")
+typedef struct { s32 x; } Arg1_80057F58;
+extern s32 func_80057D74(s32, Arg1_80057F58);
+extern s32 func_80057E08(s32, Arg1_80057F58);
+extern s32 func_80057EB0(s32, Arg1_80057F58);
+s32 func_80057F58(s32 arg0, Arg1_80057F58 arg1) {
+    s32 result = 0;
+    switch (func_8005D92C(arg0)) {
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+        result = func_80057D74(arg0, arg1);
+        break;
+    case 5:
+    case 6:
+        result = func_80057E08(arg0, arg1);
+        break;
+    case 7:
+        result = func_80057EB0(arg0, arg1);
+        break;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
