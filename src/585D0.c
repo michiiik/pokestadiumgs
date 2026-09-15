@@ -332,13 +332,30 @@ s32 func_80059234(s32 arg0) {
 
 #ifdef VERSION_US
 extern u8 D_801285D4[];
-void func_80059274(s32 arg0) {
+s32 func_80059274(s32 arg0) {
     func_80057BCC(arg0, *(s32 *)(D_801285D4 + arg0 * 112), 0x4000, 0x3E40);
 }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_800592B0.s")
+s32 func_800592B0(s32 arg0) {
+    s32 result;
+    result = 0x0;
+    switch ((u16)func_8005D92C(arg0)) {
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+        result = func_80059234(arg0);
+        break;
+    case 5:
+    case 6:
+    case 7:
+        result = func_80059274(arg0);
+        break;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
