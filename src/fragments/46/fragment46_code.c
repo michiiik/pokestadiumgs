@@ -252,7 +252,19 @@ s32 func_8AE011E0(void *arg0, u8 *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE01248.s")
+extern s16 D_8AE0A15C;
+s32 func_8AE01248(void *arg0, u8 *arg1) {
+    struct Bytes3 { u8 b[3]; };
+    if (arg1 == NULL) return 0;
+    for (;;) {
+        if (arg1[1] == 0xFF) return 0;
+        if (D_8AE0A15C == arg1[1]) {
+            *(struct Bytes3 *)((u8 *)arg0 + 0x3A) = *(struct Bytes3 *)arg1;
+            return 1;
+        }
+        arg1 += 3;
+    }
+}
 #endif
 
 #ifdef VERSION_US
