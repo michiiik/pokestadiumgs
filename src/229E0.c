@@ -3073,7 +3073,7 @@ void func_80037E3C(S1_GraphNode* arg0, S1_func_D_86002F34_000_010 arg1, void* ar
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80037E9C.s")
+S1_GraphNode* GeoNode_CreateContainer(S1_MainPoolState* arg0, S1_GraphNode* arg1) { if (arg0 != NULL) { arg1 = MainPool_AllocAligned(arg0, sizeof(S1_GraphNode), 4); } if (arg1 != NULL) { GeoNode_Init(arg1, 0); } return arg1; }
 #endif
 
 #ifdef VERSION_US
@@ -4670,12 +4670,12 @@ s32 ModelAnim_IsEventTrackDone(u8 *arg0) { return *(u16 *)(*(s32 *)(arg0 + 0x58)
 #endif
 
 #ifdef VERSION_US
-extern void func_80037E9C(s32, void *);
+extern S1_GraphNode* GeoNode_CreateContainer(S1_MainPoolState*, S1_GraphNode*);
 extern u8 D_80126420[];
 extern u8 D_80126438[];
 void ModelRenderer_InitDisplayRoots(void) {
-    func_80037E9C(0, D_80126420);
-    func_80037E9C(0, D_80126438);
+    GeoNode_CreateContainer(0, D_80126420);
+    GeoNode_CreateContainer(0, D_80126438);
 }
 #endif
 
