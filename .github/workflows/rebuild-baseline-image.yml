@@ -1,12 +1,15 @@
 name: Rebuild CI baseline image
 
 # ci/gate-pr.sh overlays each PR onto whatever this image already has baked
-# in (see its own sync_tree comments). Any push to master that changes what
-# that baked state should look like makes every subsequent PR gate pay for
-# the drift: a stale yamls/ in particular forces split_changed=1 on every
-# following PR, which forces a full rebuild regardless of how small that
-# PR's own diff is. Keep the image caught up automatically instead of
-# relying on someone noticing the drift and rebuilding by hand.
+# in (see its own sync_tree comments), and only forces its expensive `make
+# -B` full rebuild when split_changed (yamls/), headers_changed (include/),
+# tools_changed (tools/), or makefile_changed is set -- see gate-pr.sh's own
+# full_build check. A plain src/** change (the overwhelming majority of
+# merges -- one landed function match at a time) is handled by sync_tree
+# alone: it overlays just the differing files and runs a normal incremental
+# make, regardless of how stale this baked image's own src/ tree is. So
+# rebuilding the whole image after every such merge buys nothing; only the
+# paths below actually change what "stale" costs the next PR gate.
 #
 # ci/build-baseline.sh does this incrementally against a persistent host
 # checkout (see that script's own comments) rather than compiling inside
@@ -18,10 +21,7 @@ on:
       - master
     paths:
       - "yamls/**"
-      - "src/**"
       - "include/**"
-      - "linker_scripts/**"
-      - "lib/**"
       - "tools/**"
       - "ci/Dockerfile"
       - "ci/build-baseline.sh"
