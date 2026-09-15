@@ -300,7 +300,27 @@ void func_87E0A5BC(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E0A620.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E0A724.s")
+extern void func_87E0C8DC(s32);
+extern void func_87E0F124(s32);
+extern void func_87E00590(void);
+extern void func_87E17D40(s32);
+
+void func_87E0A724(s32 arg0) {
+    func_87E0C8DC(arg0 + 0x60);
+    func_87E0F124(arg0 + 0x8C);
+    func_87E00590();
+    switch (*(u32 *)((u8 *)arg0 + 8)) {
+        case 2:
+        case 3:
+            func_87E17D40(arg0 + 0x7BC);
+            break;
+        case 4:
+        case 5:
+        case 6:
+            func_87E17D40(arg0 + 0x7BC);
+            break;
+    }
+}
 
 extern void func_87E079FC(s32);
 extern void func_87E00590(void);
@@ -354,5 +374,47 @@ void func_87E0A8E0(s32 arg0) {
     WidgetTree_OpenMessagePanel_fragment63(arg0 + 0x644);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E0A918.s")
+extern void func_87E0B6D4(s32);
+extern void func_87E0A7A0(s32);
+extern void func_87E0A7C8(s32);
+extern void func_87E0A800(s32);
+extern void func_87E0A838(s32);
+extern void func_87E0A870(s32);
+extern void func_87E0A8A8(s32);
+
+void func_87E0A918(s32 arg0) {
+    switch (*(u32 *)((u8 *)arg0 + 4)) {
+        case 0:
+            func_87E0B6D4(arg0 + 0x24);
+            func_87E00590();
+            break;
+        case 1:
+            func_87E0A724(arg0);
+            break;
+        case 2:
+            func_87E0A7A0(arg0);
+            break;
+        case 3:
+            func_87E0A7C8(arg0);
+            break;
+        case 4:
+            func_87E0A800(arg0);
+            break;
+        case 5:
+            func_87E0A838(arg0);
+            break;
+        case 6:
+            func_87E0A870(arg0);
+            break;
+        case 7:
+            func_87E0A8E0(arg0);
+            break;
+        case 8:
+            func_87E0A8A8(arg0);
+            break;
+        case 9:
+            func_87E00590();
+            break;
+    }
+}
 #endif
