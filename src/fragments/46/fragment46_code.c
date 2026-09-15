@@ -236,11 +236,35 @@ s32 func_8AE01164(void *arg0, u8 *arg1, s32 arg2) { typedef struct { u8 b[6]; } 
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE011E0.s")
+extern s16 D_8AE0A15C;
+s32 func_8AE011E0(void *arg0, u8 *arg1) {
+    struct Bytes3 { u8 b[3]; };
+    if (arg1 == NULL) return 0;
+    for (;;) {
+        if (arg1[1] == 0xFF) return 0;
+        if (D_8AE0A15C == arg1[1]) {
+            *(struct Bytes3 *)((u8 *)arg0 + 0x3D) = *(struct Bytes3 *)arg1;
+            return 1;
+        }
+        arg1 += 3;
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE01248.s")
+extern s16 D_8AE0A15C;
+s32 func_8AE01248(void *arg0, u8 *arg1) {
+    struct Bytes3 { u8 b[3]; };
+    if (arg1 == NULL) return 0;
+    for (;;) {
+        if (arg1[1] == 0xFF) return 0;
+        if (D_8AE0A15C == arg1[1]) {
+            *(struct Bytes3 *)((u8 *)arg0 + 0x3A) = *(struct Bytes3 *)arg1;
+            return 1;
+        }
+        arg1 += 3;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -414,7 +438,21 @@ void func_8AE01EA4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE027B0.s")
+extern f32 D_80088E50[];
+void func_8AE027B0(s32 arg0, void *arg1, u16 *arg2, void *arg3, s32 arg4) {
+    switch (arg0) {
+    case 0:
+        *arg2 = 0;
+        *(s16 *)arg3 = *(s16 *)((u8 *)arg1 + 8);
+        return;
+    case 1:
+        *(s16 *)((u8 *)arg1 + 8) = (s16)((f32)*(s16 *)arg3 + D_80088E50[*arg2 >> 4] * 5.0f * (f32)arg4);
+        *(u8 *)((u8 *)arg1 + 0x28) = 1;
+        if (*arg2 < 0x8000) *(s32 *)((u8 *)arg1 + 0x2C) = 0x6ED7D7FF;
+        else *(s32 *)((u8 *)arg1 + 0x2C) = 0x96FFFFFF;
+        return;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -628,7 +666,21 @@ void func_8AE050AC(s32 arg0, s16 arg1, s16 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE0559C.s")
+Fragment46LookupEntry *func_8AE0559C(s16 arg0) {
+    Fragment46LookupEntry *entry; s32 index;
+    entry = D_8AE08508; index = 0;
+    for (;;) {
+        if (entry->key == -1) return NULL;
+        if (arg0 == entry->key) return entry; entry++;
+        if (entry->key == -1) return NULL;
+        if (arg0 == entry->key) return entry; entry++;
+        if (entry->key == -1) return NULL;
+        if (arg0 == entry->key) return entry; entry++;
+        if (entry->key == -1) return NULL;
+        if (arg0 == entry->key) return entry; entry++;
+        index += 4; if (index == 0x38) return NULL;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -768,7 +820,7 @@ typedef struct {
 extern s16 D_8AE084E0;
 extern s16 D_8AE084E2;
 extern s32 D_8AE084E8;
-extern Fragment46Entry *func_8AE0559C(s16);
+extern Fragment46LookupEntry *func_8AE0559C(s16);
 extern s16 func_8AE017A4(s16);
 extern void func_8AE01738(void);
 extern s32 func_8AE00F24(void);
