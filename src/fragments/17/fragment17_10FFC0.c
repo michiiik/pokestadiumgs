@@ -180,7 +180,40 @@ s32 func_82201EB4(s32 arg0, u8 *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82202628.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_8220268C.s")
+extern s32 func_82202628(s32 arg0);
+s32 func_8220268C(s32 arg0, s32 arg1) {
+    s32 sp1C = 4;
+
+    switch (arg0) {
+        case 1:
+            sp1C = 10;
+            break;
+        case 2:
+            sp1C = 6;
+            break;
+        case 3:
+            sp1C = 0;
+            break;
+        case 4:
+            sp1C = 14;
+            break;
+        case 5:
+            sp1C = 8;
+            break;
+        case 6:
+            sp1C = 12;
+            break;
+        case 7:
+            sp1C = 2;
+            break;
+    }
+
+    if (arg1 != 0) {
+        sp1C = func_82202628(arg0);
+    }
+
+    return sp1C;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82202718.s")
 
@@ -296,7 +329,20 @@ extern void StageFade_StartFromTransparent();
 extern void func_80035424();
 void func_82203E40(void) { func_822014D8(); StageFade_StartFromTransparent(5); func_80035424(15); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82203E70.s")
+/* func_82203E70 is still GLOBAL_ASM, but its .s is hand-maintained (not the
+ * splat-generated asm/us/nonmatchings/.../func_82203E70.s) so that it can
+ * also carry jtbl_8220E10C's first entry (4 bytes) in a .late_rodata block
+ * ahead of its .text. That word has to land immediately after
+ * func_8220268C's own compiler-generated jump table (jtbl_8220E0F0) to
+ * satisfy this fragment's SUBALIGN(16); a plain C global here would instead
+ * be emitted by IDO BEFORE func_8220268C's switch table (IDO always emits
+ * named/array rodata ahead of switch-table "late" rodata within one
+ * compilation), landing at the wrong address. Placing it in a GLOBAL_ASM
+ * .late_rodata block instead makes asm-processor position it correctly:
+ * after all first-pass rodata and after func_8220268C's own late-rodata
+ * jump table, matching retail. jtbl_8220E10C's remaining entries keep
+ * coming from the unmodified data blob at their real retail addresses. */
+#pragma GLOBAL_ASM("hand_asm/fragments/17/func_82203E70_manual.s")
 
 extern void StageFade_StartFromOpaque(s32);
 extern void func_800086A4(s32);
