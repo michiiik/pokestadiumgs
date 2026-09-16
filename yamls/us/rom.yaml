@@ -336,7 +336,22 @@
     - [0xA2B80, .rodata, 1C2D0] # jtbl_800A1F80 (+1 more)
     - [0xA2BD0, .rodata, 1CDC0] # jtbl_800A1FD0 (+2 more)
     - [0xA3260, rodata]
-    - [0xA4340, .rodata, 229E0] # jtbl_800A3724 tail (3 words) + jtbl_800A374C + jtbl_800A376C, 16-byte aligned
+    - [0xA3BD0, .rodata, 229E0] # jtbl_800A2FD0 + jtbl_800A2FEC + jtbl_800A3108 +
+                                # jtbl_800A312C + jtbl_800A3150 + jtbl_800A3174 +
+                                # jtbl_800A3198 (all still-GLOBAL_ASM func_80023A3C's own
+                                # jump tables; the whole run is included here, starting at a
+                                # 16-byte-aligned ROM address, because splat can only
+                                # correctly auto-embed a function's own late_rodata into its
+                                # own .s file when the WHOLE table it references falls inside
+                                # this file's owned subsegment -- a partial table produced an
+                                # ld error referencing undefined local labels), then
+                                # jtbl_800A31C4 + jtbl_800A31E0 (func_80024180's own), then a
+                                # gap of still-GLOBAL_ASM siblings' own rodata, then
+                                # jtbl_800A3724 (func_8002596C's own, splat auto-embeds all 10
+                                # entries including what used to be a hand-carved tail) +
+                                # jtbl_800A374C + jtbl_800A376C. Combined into one subsegment
+                                # (not split) because ld can only consume an object's .rodata
+                                # section once.
     - [0xA43A0, rodata]
     - [0xA4EC0, .rodata, 43700] # jtbl_800A42C0
     - [0xA4EE0, .rodata, 47580] # jtbl_800A43C0 (+2 more)
