@@ -46,14 +46,13 @@ void func_8290325C(void *arg0) {
 
 #ifdef VERSION_US
 extern f64 D_82917438;
-extern f64 D_82917440;
 void func_829033DC(f32 *arg0, f32 arg1, f32 arg2) {
     f32 temp_fv0;
     f64 temp_fv1;
     temp_fv0 = *arg0;
     *arg0 = ((arg1 - temp_fv0) * arg2) + temp_fv0;
     temp_fv1 = (f64)*(volatile f32 *)arg0;
-    if ((temp_fv1 < D_82917438) && (D_82917440 < temp_fv1)) {
+    if ((temp_fv1 < D_82917438) && (-0.001 < temp_fv1)) {
         *arg0 = 0.0f;
     }
 }
@@ -328,7 +327,6 @@ void func_82904208(void) {
 #endif
 
 #ifdef VERSION_US
-extern f64 D_82917478;
 extern f64 D_82917480;
 void func_829042A4(f32 *arg0, f32 arg1, f32 arg2) {
     f32 temp_fv0;
@@ -336,7 +334,7 @@ void func_829042A4(f32 *arg0, f32 arg1, f32 arg2) {
     temp_fv0 = *arg0;
     *arg0 = ((arg1 - temp_fv0) * arg2) + temp_fv0;
     temp_fv1 = (f64)*(volatile f32 *)arg0;
-    if ((temp_fv1 < D_82917478) && (D_82917480 < temp_fv1)) {
+    if ((temp_fv1 < 0.001) && (D_82917480 < temp_fv1)) {
         *arg0 = 0.0f;
     }
 }
