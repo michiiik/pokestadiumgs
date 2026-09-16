@@ -174,7 +174,20 @@ void func_8130F270(u8 *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_104FC0/func_8130F2C4.s")
+/* func_8130F2C4 is still GLOBAL_ASM, but its .s is hand-maintained (not the
+ * splat-generated asm/us/nonmatchings/.../func_8130F2C4.s) so that it can
+ * also carry jtbl_81312840's last 3 entries (12 bytes) in a .late_rodata
+ * block ahead of its .text. Those words have to land immediately before
+ * func_8130F5AC's own compiler-generated jump table (jtbl_8131285C) to
+ * satisfy this fragment's SUBALIGN(16); a plain C global here would instead
+ * be emitted by IDO before func_8130F2C4's own late-rodata (which isn't
+ * used here) but, more importantly, can't be positioned relative to a
+ * *later* function's late rodata at all. Placing it in a GLOBAL_ASM
+ * .late_rodata block instead makes asm-processor position it correctly:
+ * after all earlier rodata and immediately before func_8130F5AC's own
+ * late-rodata jump table, matching retail. jtbl_81312840's first 4 entries
+ * keep coming from the unmodified data blob at their real retail address. */
+#pragma GLOBAL_ASM("hand_asm/fragments/14/func_8130F2C4_manual.s")
 
 s16 func_8130F578(u8 *arg0, s32 *arg1) {
     s16 result = 0;
@@ -187,5 +200,27 @@ s16 func_8130F578(u8 *arg0, s32 *arg1) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_104FC0/func_8130F5AC.s")
+extern void func_81306E90(u8 *arg0);
+void func_8130F5AC(u8 *arg0) {
+    u8 *target;
+    switch (arg0[0x34]) {
+        case 4:
+            target = *(u8 **)(arg0 + 0x5C);
+            if (target != NULL) {
+                func_81306E90(target);
+            }
+        case 5:
+        case 6:
+        case 7:
+            *(f32 *)(arg0 + 0x30) = 0.0f;
+        case 1:
+            *(f32 *)(arg0 + 0x2C) = 1.0f;
+        case 2:
+        case 3:
+            arg0[0x34] = 3;
+        case 0:
+        default:
+            break;
+    }
+}
 #endif

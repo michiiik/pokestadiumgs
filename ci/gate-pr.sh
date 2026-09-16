@@ -77,8 +77,10 @@ sync_tree() {
     local diff_status=0
     local line
     local relative
+    local source_parent
     local source_file
     local target_file
+    local target_parent
 
     mkdir -p "$target_dir"
     diff_file="$(mktemp)"
@@ -101,9 +103,11 @@ sync_tree() {
             mkdir -p "$(dirname "$target_file")"
             cp -p "$source_file" "$target_file"
             ;;
-        "Only in ${source_dir}:"*)
-            relative="${line#Only in ${source_dir}: }"
-            source_file="$source_dir/$relative"
+        "Only in ${source_dir}"*)
+            source_parent="${line#Only in }"
+            source_parent="${source_parent%: *}"
+            source_file="$source_parent/${line##*: }"
+            relative="${source_file#${source_dir}/}"
             target_file="$target_dir/$relative"
             if [ -d "$source_file" ]; then
                 mkdir -p "$target_file"
@@ -113,9 +117,11 @@ sync_tree() {
                 cp -p "$source_file" "$target_file"
             fi
             ;;
-        "Only in ${target_dir}:"*)
-            relative="${line#Only in ${target_dir}: }"
-            rm -rf "$target_dir/$relative"
+        "Only in ${target_dir}"*)
+            target_parent="${line#Only in }"
+            target_parent="${target_parent%: *}"
+            target_file="$target_parent/${line##*: }"
+            rm -rf "$target_file"
             ;;
         esac
     done <"$diff_file"

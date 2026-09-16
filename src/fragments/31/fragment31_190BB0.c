@@ -4,9 +4,35 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_190BB0/func_8821D930.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_190BB0/func_8821DA70.s")
+extern u8 *func_88216D54(s32);
+extern u8 *func_88213A3C(s32);
+u8 *func_8821DA70(s32 arg0) {
+    switch (arg0) {
+        case 0:
+        case 1:
+        case 2:
+            return func_88216D54(arg0);
+        case 3:
+        case 4:
+        case 5:
+            return func_88213A3C(arg0);
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_190BB0/func_8821DAC0.s")
+/* func_8821DAC0 is still GLOBAL_ASM, but its .s is hand-maintained (not the
+ * splat-generated asm/us/nonmatchings/.../func_8821DAC0.s) so that it can
+ * also carry jtbl_882341B8's first 2 entries (8 bytes) in a .late_rodata
+ * block ahead of its .text. Those words have to land immediately after
+ * func_8821DA70's own compiler-generated jump table (jtbl_882341A0) to
+ * satisfy this fragment's SUBALIGN(16); a plain C global here would instead
+ * be emitted by IDO BEFORE func_8821DA70's switch table (IDO always emits
+ * named/array rodata ahead of switch-table "late" rodata within one
+ * compilation), landing at the wrong address. Placing it in a GLOBAL_ASM
+ * .late_rodata block instead makes asm-processor position it correctly:
+ * after all first-pass rodata and after func_8821DA70's own late-rodata
+ * jump table, matching retail. jtbl_882341B8's remaining entries keep
+ * coming from the unmodified data blob at their real retail addresses. */
+#pragma GLOBAL_ASM("hand_asm/fragments/31/func_8821DAC0_manual.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_190BB0/func_8821DC48.s")
 

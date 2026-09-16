@@ -238,11 +238,57 @@ loop_5:
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80024E8C.s")
+extern s32 D_80090A80;
+extern void func_80024480(s32, s32);
+
+void func_80024E8C(s32 arg0) {
+    D_80090A80 = arg0;
+    switch (arg0) {
+    case 0:
+    case 1:
+    case 11:
+    case 12:
+    default:
+        return;
+    case 2:
+        arg0 = 0x100;
+        break;
+    case 3:
+        arg0 = 0x107;
+        break;
+    case 4:
+        arg0 = 0x106;
+        break;
+    case 5:
+        arg0 = 0x102;
+        break;
+    case 6:
+        arg0 = 0x103;
+        break;
+    case 7:
+        arg0 = 0x108;
+        break;
+    case 8:
+        arg0 = 0x105;
+        break;
+    case 9:
+        arg0 = 0x109;
+        break;
+    case 10:
+        arg0 = 0x104;
+        break;
+    }
+    func_80024480(arg0, 0xA);
+}
+#pragma C_FUNCTION_PADDING(8)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80024F20.s")
+/* func_80024F20 is still GLOBAL_ASM, but its .s is hand-maintained (not the
+ * splat-generated asm/us/nonmatchings/229E0/func_80024F20.s) so that it can
+ * also carry 3 extra .late_rodata padding words ahead of jtbl_800A32C0. See
+ * the comment in hand_asm/229E0/func_80024F20_manual.s for why. */
+#pragma GLOBAL_ASM("hand_asm/229E0/func_80024F20_manual.s")
 #endif
 
 #ifdef VERSION_US

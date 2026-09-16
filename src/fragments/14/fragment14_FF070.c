@@ -535,7 +535,47 @@ s32 func_8130B1F4(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130B220.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130B320.s")
+extern void func_8130A8E0(void *, s32);
+
+void func_8130B320(void *arg0, void *arg1, s32 arg2, s32 arg3) {
+    struct S {
+        u8 pad0[0xE8F0];
+        f32 value;
+        u8 gap0[0x14];
+        s32 word;
+        u8 gap1[6];
+        u8 state;
+        u8 byte;
+    };
+    typedef struct { u8 raw[8]; } UnalignedCopy8;
+
+    ((struct S *)arg0)->byte = (u8)arg2;
+    ((struct S *)arg0)->word = arg3;
+
+    switch (((struct S *)arg0)->state) {
+    case 0:
+    case 13:
+        ((struct S *)arg0)->value = 0.0f;
+    case 12:
+        ((struct S *)arg0)->state = 1;
+        break;
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+    case 9:
+    case 10:
+    case 11:
+        break;
+    }
+
+    *(UnalignedCopy8 *)arg0 = *(UnalignedCopy8 *)arg1;
+    func_8130A8E0(arg0, 1);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130B3B8.s")
 
