@@ -157,9 +157,43 @@ void func_8FB029B4(void *arg0) {
     func_8FB024BC(arg0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/9/fragment9_code/func_8FB02A10.s")
+/* func_8FB02A10 is still GLOBAL_ASM, but its .s is hand-maintained (not the
+ * splat-generated asm/us/nonmatchings/.../func_8FB02A10.s) so it can also
+ * carry jtbl_8FB03D2C's last entry (4 bytes, the tail of its own switch's
+ * jump table) in a .late_rodata block ahead of its .text. That word has to
+ * land immediately before func_8FB03164's own compiler-generated jump
+ * table (jtbl_8FB03DC4) to satisfy this fragment's SUBALIGN(16); a plain C
+ * global here would instead be emitted by IDO ahead of ALL switch-table
+ * "late" rodata in this compilation (before jtbl_8FB03DC4, which is right
+ * where we want it) -- but ahead of the file's other regular named rodata
+ * too, changing its order and thus its address, since IDO groups named
+ * rodata together in emission order across the whole file. Placing it in a
+ * GLOBAL_ASM .late_rodata block instead makes asm-processor position it
+ * exactly where retail has it: as the last word before jtbl_8FB03DC4,
+ * with nothing else in between. jtbl_8FB03D2C's other 37 entries keep
+ * coming from the unmodified data blob at their real retail addresses. */
+#pragma GLOBAL_ASM("hand_asm/fragments/9/func_8FB02A10_manual.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/9/fragment9_code/func_8FB03164.s")
+extern void func_8FB009C0(void *arg0);
+extern void func_8FB011DC(void *arg0, void *arg1);
+void func_8FB03164(void *arg0) {
+    switch ((*(u16 *)((u8 *)(*(void **)((u8 *)(arg0) + (0x44))) + (2)))) {
+    case 0:
+        func_8FB01EC4((void *)((u8 *)(arg0) + (0x158C)));
+        break;
+    case 1:
+        func_8FB01FCC((void *)((u8 *)(arg0) + (0x158C)));
+        break;
+    case 2:
+        func_8FB009C0((void *)((u8 *)(arg0) + (0x158C)));
+        break;
+    case 3:
+        func_8FB011DC((void *)((u8 *)(arg0) + (0x158C)), arg0);
+        break;
+    case 4:
+        break;
+    }
+}
 
 extern u8 D_8FB03B2C[];
 extern void func_800088DC(void);
