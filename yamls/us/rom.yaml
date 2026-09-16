@@ -1574,6 +1574,8 @@
     - [0x420EA0, c,       fragments/82/fragment82_420EA0]
     - [0x4238F0, c,       fragments/82/fragment82_4238F0]
     - [0x427E00, data,    fragments/82/fragment82_data]
+    - [0x4281B0, .rodata, fragments/82/fragment82_4238F0] # jtbl_82D07330..jtbl_82D07408 pool: jtbl_82D07394 (func_82D06514) + still-unmatched dispatcher siblings' own late rodata, auto-extracted by splat into their regenerated .s files now that this subsegment spans them (see fragment83_code/func_82C0412C precedent)
+    - [0x4282A0, rodata] # trailing D_82D07420.. state vars: NOT compiler-regenerated rodata (no single owning function), stays in the rodata link-order bucket per the fragment83 precedent
 
   - name: fragment83
     type: code
