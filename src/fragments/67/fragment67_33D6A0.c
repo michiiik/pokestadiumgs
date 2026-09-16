@@ -387,11 +387,40 @@ void func_82902268(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33D6A0/func_82902554.s")
+extern s16 D_82918858;
+extern void func_829022E8(s32 arg0);
+
+void func_82902554(void) {
+    switch (D_82918858) {
+        case 0:
+            func_829022E8(0);
+            break;
+        case 1:
+            func_829022E8(1);
+            break;
+        case 2:
+            func_829022E8(2);
+            break;
+        case 3:
+            func_829022E8(3);
+            break;
+        case 4:
+            func_829022E8(4);
+            break;
+        case 5:
+            func_829022E8(5);
+            break;
+        case 6:
+            func_829022E8(6);
+            break;
+        case 7:
+            func_829022E8(7);
+            break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
-extern void func_82902554(void);
 extern void func_82902268(void);
 void func_8290260C(void) {
     func_82902554();

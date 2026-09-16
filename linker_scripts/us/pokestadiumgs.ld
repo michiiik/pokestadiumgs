@@ -4578,9 +4578,10 @@ SECTIONS
         fragment67_RODATA_START = .;
         build/asm/us/data/fragments/67/fragment67_header.o(.rodata);
         build/src/fragments/67/fragment67_33CB20.o(.rodata);
+        build/asm/us/data/353ED0.rodata.o(.rodata);
         build/src/fragments/67/fragment67_33D6A0.o(.rodata);
         build/src/fragments/67/fragment67_33F420.o(.rodata);
-        build/asm/us/data/353ED0.rodata.o(.rodata);
+        build/asm/us/data/353F30.rodata.o(.rodata);
         build/src/fragments/67/fragment67_33FAE0.o(.rodata);
         build/src/fragments/67/fragment67_3422F0.o(.rodata);
         build/src/fragments/67/fragment67_342DB0.o(.rodata);
