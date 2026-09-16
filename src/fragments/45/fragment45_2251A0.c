@@ -744,7 +744,38 @@ void func_8AB04ED8_padding(void) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB051AC.s")
+extern s32 func_8AB062C4(s32);
+extern s32 func_8AB0896C(s32);
+extern s32 func_8AB0B24C(s32);
+extern s32 func_8AB0DFC0(s32);
+extern s32 func_8AB0FE10(s32);
+
+s32 func_8AB051AC(s32 arg0) {
+    switch (D_8AB1269E) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+        arg0 = func_8AB062C4(arg0);
+        break;
+    case 4:
+    case 5:
+        arg0 = func_8AB0896C(arg0);
+        break;
+    case 6:
+        arg0 = func_8AB0B24C(arg0);
+        break;
+    case 8:
+        arg0 = func_8AB0DFC0(arg0);
+        break;
+    case 11:
+        arg0 = func_8AB0FE10(arg0);
+        break;
+    default:
+        arg0 = func_8AB062C4(arg0);
+    }
+    return arg0;
+}
 #endif
 
 #ifdef VERSION_US
