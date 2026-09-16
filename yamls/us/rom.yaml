@@ -656,7 +656,9 @@
     - [0x11B210, c,       fragments/17/fragment17_11B210]
     - [0x11D0B0, data,    fragments/17/fragment17_data]
     - [0x11DAB0, .rodata, fragments/17/fragment17_10FFC0] # jtbl_8220E0F0, widened to 16-byte boundary (first word of jtbl_8220E10C)
-    - [0x11DAD0, rodata]
+    - [0x11DAD0, rodata] # D_8220E110 + "%02d" fmt + jtbl_8220E128 + jtbl_8220E14C + D_8220E170-17C, no local-label relocations owned by this file, stays hand-written
+    - [0x11DB40, .rodata, fragments/17/fragment17_113A60] # D_8220E180-184 (splat auto-attributes to func_82209BA4's own late_rodata) + jtbl_8220E188 (func_82209EA8, now C) + D_8220E1A8-1AC (splat auto-attributes to func_82209F50/func_8220A1C4), widened to 16-byte boundary on both ends
+    - [0x11DB70, rodata]
 
   - name: fragment18
     type: code
@@ -1580,6 +1582,8 @@
     - [0x429850, textbin, fragments/83/fragment83_header]
     - [0x429870, c,       fragments/83/fragment83_code]
     - [0x42E150, data,    fragments/83/fragment83_data]
+    - [0x42E270, .rodata, fragments/83/fragment83_code] # jtbl_82C04A20..jtbl_82C04BE8 pool: jtbl_82C04BB0 (func_82C0412C) + still-unmatched dispatcher siblings' own late rodata, auto-extracted by splat into their regenerated .s files now that this subsegment spans them (see fragment63_30B540 precedent)
+    - [0x42E480, rodata] # trailing D_82C04C30.. state vars: NOT compiler-regenerated rodata (no single owning function, so splat's dotted ".rodata,<path>" auto-embed/skip logic won't emit them - confirmed as undefined references at link time). Bare "rodata" self-splits into its own .s file with real symbol definitions while still landing in the segment's .rodata link-order bucket (data-before-rodata is enforced segment-wide regardless of subsegment declaration order, so this must stay in the rodata bucket, not "data", to link at the correct address)
 
   - name: fragment84
     type: code
