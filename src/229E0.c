@@ -318,7 +318,29 @@ void func_800251F8(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025848.s")
+void func_80025848(s32 arg0) {
+    switch (arg0) {
+    case 42:
+        func_8001874C(0x06020005, 1);
+        return;
+    case 18:
+    case 113:
+    case 114:
+    case 115:
+        func_8001874C(0x06020205, 1);
+        return;
+    case 62:
+        func_8001874C(0x06020305, 1);
+        return;
+    case 65:
+        func_8001874C(0x06020405, 1);
+        return;
+    case 78:
+    case 92:
+        func_8001874C(0x06020505, 1);
+        return;
+    }
+}
 #endif
 
 #ifdef VERSION_US
