@@ -1134,6 +1134,7 @@ SECTIONS
         fragment9_RODATA_START = .;
         build/asm/us/data/fragments/9/fragment9_header.o(.rodata);
         build/src/fragments/9/fragment9_code.o(.rodata);
+        build/asm/us/data/D4260.rodata.o(.rodata);
         fragment9_RODATA_END = .;
         fragment9_RODATA_SIZE = ABSOLUTE(fragment9_RODATA_END - fragment9_RODATA_START);
     }
