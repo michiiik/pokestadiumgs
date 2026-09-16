@@ -295,7 +295,36 @@ void func_82904160(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33FAE0/func_82904208.s")
+extern void func_800088DC(void);
+extern void func_829060BC(void);
+extern void GeoRender_AdvanceFrameCounter(void);
+extern void func_8003C6B8(s32);
+extern void func_82907274(s32);
+extern void func_82904160(void);
+extern void func_80008648(void);
+extern s16 D_829199FC;
+void func_82904208(void) {
+    func_800088DC();
+    func_829060BC();
+    GeoRender_AdvanceFrameCounter();
+    switch (D_829199F8) {
+        case 0:
+        case 1:
+        case 2:
+            func_8003C6B8((s32)D_82919DC4);
+            func_82907274(D_829199FC);
+            func_82903BA4();
+            break;
+        case 7:
+        case 8:
+        case 9:
+        case 10:
+            func_8003C6B8((s32)D_82919DC4);
+            func_82904160();
+            break;
+    }
+    func_80008648();
+}
 #endif
 
 #ifdef VERSION_US
