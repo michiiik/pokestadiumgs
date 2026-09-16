@@ -1371,6 +1371,8 @@
     - [0x34E600, data,    fragments/67/fragment67_data]
     - [0x353EB0, .rodata, fragments/67/fragment67_33CB20] # jtbl_829173B0
     - [0x353ED0, rodata] # D_829173D0 through D_829173D8
+    - [0x353F10, .rodata, fragments/67/fragment67_33D6A0] # jtbl_82917410
+    - [0x353F30, rodata] # D_82917430 through D_82917438
     - [0x353F40, .rodata, fragments/67/fragment67_33FAE0] # D_82917440 through jtbl_8291744C and D_82917478
     - [0x353F80, rodata]
 
