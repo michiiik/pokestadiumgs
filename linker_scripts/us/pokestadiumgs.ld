@@ -788,8 +788,9 @@ SECTIONS
         fragment1_DATA_SIZE = ABSOLUTE(fragment1_DATA_END - fragment1_DATA_START);
         fragment1_RODATA_START = .;
         build/asm/us/data/fragments/1/fragment1_header.o(.rodata);
-        build/src/fragments/1/fragment1_code.o(.rodata);
+        build/asm/us/data/AC860.rodata.o(.rodata);
         build/asm/us/data/AC880.rodata.o(.rodata);
+        build/src/fragments/1/fragment1_code.o(.rodata);
         build/asm/us/data/AC8F0.rodata.o(.rodata);
         fragment1_RODATA_END = .;
         fragment1_RODATA_SIZE = ABSOLUTE(fragment1_RODATA_END - fragment1_RODATA_START);
