@@ -407,14 +407,46 @@ void func_82209E90(void) {
     D_822106B0[6] = 0.0f;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82209EA8.s")
+extern void func_822091F0(void);
+extern void func_82209360(void);
+extern void func_822094C4(void);
+extern void func_8220980C(void);
+extern void func_82209974(void);
+extern void func_82209BA4(void);
+
+s32 func_82209EA8(void) {
+    switch (D_822106B2) {
+        case 0:
+            break;
+        case 1:
+            func_822091F0();
+            break;
+        case 2:
+            func_82209360();
+            break;
+        case 3:
+            func_822094C4();
+            break;
+        case 4:
+            func_8220980C();
+            break;
+        case 5:
+            func_82209974();
+            break;
+        case 6:
+            func_82209BA4();
+            break;
+        case 7:
+            func_82209E90();
+            break;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82209F50.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_8220A098.s")
 
 extern s32 func_82208EB0(void *);
-extern s32 func_82209EA8(void);
 extern s32 func_82209F50(void *);
 extern s32 func_8220A098(void *);
 s32 func_8220A154(s32 arg0, void *arg1) { s32 flag = *(s32 *)((u8 *)arg1 + 0x14); switch (arg0) { case 0: func_82208EB0(arg1); break; case 2: if (flag == 0) { func_82209EA8(); func_82209F50(arg1); } else { func_8220A098(arg1); } break; } return 0; }
