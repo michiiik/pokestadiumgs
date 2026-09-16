@@ -374,7 +374,39 @@ void func_8FC01FBC(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/84/fragment84_code/func_8FC01FC4.s")
+extern void func_8FC01068(void);
+extern void func_8FC01408(void);
+extern void func_80060250(s32);
+extern void func_8FC01288(void);
+extern void func_800226C0(s32);
+extern void func_8FC015AC(void);
+extern u8 D_8FC02830;
+void func_8FC01FC4(u8 *arg0) {
+    switch (arg0[0]) {
+    case 1:
+        func_8FC01068();
+        return;
+    case 2:
+        func_8FC01408();
+        return;
+    case 0:
+        func_80060250(0);
+        func_8FC01288();
+        func_800226C0(2);
+        return;
+    case 4:
+    case 5:
+        func_8FC015AC();
+        D_8FC02830 = 2;
+        break;
+    case 6:
+        D_8FC02830 = 1;
+        break;
+    case 3:
+        D_8FC02830 = 3;
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
