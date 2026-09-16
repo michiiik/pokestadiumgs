@@ -422,7 +422,33 @@ s32 func_82C03904(s32 arg0, s32 arg1, void *arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C03CA8.s")
+extern void func_8004C594(s32, s32);
+extern void func_8004C8A0(s32 *, s32, s32, s32);
+s32 func_82C03CA8(s32 arg0, s32 arg1, void *arg2) {
+    s32 var_v1;
+
+    var_v1 = 0;
+    switch (*(s16 *)((u8 *)(arg2) + (0x34))) {
+    case 7:
+    case 8:
+    case 9:
+    case 10:
+    case 14:
+        arg1 = *(u16 *)((u8 *)(arg2) + 0x38);
+        if (arg1 < (*((u8 *)(arg2) + 0x37) * 3)) {
+            func_8004C594(3, arg1);
+            func_8004C8A0(arg0 + 4, 0x50, 0x15, 0x17);
+            func_8004C8A0(arg0 + 0x54, 0x168, 0x15, 0x34);
+            var_v1 = 1;
+        }
+        break;
+    case 11:
+    case 12:
+    case 13:
+        break;
+    }
+    return var_v1;
+}
 #endif
 
 #ifdef VERSION_US
