@@ -450,7 +450,26 @@ void func_82B03934(s32 arg0, s32 arg1) { s32 temp = func_8004C990(0x156, 0); fun
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B041C8.s")
+extern void func_8004D998(s32, s32, u8 *, s32, s32);
+extern void func_8004D19C(s32, s32, s32, s32, s32);
+extern s32 func_8004C990(s32, s32);
+extern Gfx * D_800D0510;
+void func_82B041C8(s32 arg0, s32 arg1, u8 *arg2, s32 arg3, s32 arg4) {
+    s32 var_a1;
+    var_a1 = (arg3 & 5) ? arg4 : 0xFF;
+    gDPPipeSync(D_800D0510++);
+    if (var_a1 == 0xFF) {
+        gDPSetRenderMode(D_800D0510++, 0x0F0A7008, 0);
+    } else {
+        gDPSetRenderMode(D_800D0510++, 0x00504240, 0);
+    }
+    gDPSetEnvColor(D_800D0510++, 0xFF, 0xFF, 0xFF, var_a1);
+    if (arg2 != NULL) {
+        func_8004D998(arg0, arg1, arg2, 0, 0);
+    } else {
+        func_8004D19C(arg0, arg1, func_8004C990(0x50, 0), 0, 0);
+    }
+}
 #endif
 
 #ifdef VERSION_US
