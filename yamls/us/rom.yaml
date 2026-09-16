@@ -336,7 +336,7 @@
     - [0xA2B80, .rodata, 1C2D0] # jtbl_800A1F80 (+1 more)
     - [0xA2BD0, .rodata, 1CDC0] # jtbl_800A1FD0 (+2 more)
     - [0xA3260, rodata]
-    - [0xA4340, .rodata, 229E0] # jtbl_800A3724 tail (3 words) + jtbl_800A374C + jtbl_800A376C, 16-byte aligned
+    - [0xA3E80, .rodata, 229E0] # jtbl_800A3280 (func_80024E8C) + intervening sibling tables + jtbl_800A3724 tail (3 words) + jtbl_800A374C + jtbl_800A376C; combined into one subsegment with the pre-existing 0xA4340 start (PR #122) since ld can only consume an object's .rodata once. 0xA3E80 is already 16-byte aligned.
     - [0xA43A0, rodata]
     - [0xA4EC0, .rodata, 43700] # jtbl_800A42C0
     - [0xA4EE0, .rodata, 47580] # jtbl_800A43C0 (+2 more)
@@ -425,9 +425,12 @@
     subsegments:
     - [0xA8A80, textbin, fragments/1/fragment1_header]
     - [0xA8AA0, c,       fragments/1/fragment1_code]
+    - [0xAC070, c,       fragments/1/fragment1_tail]
     - [0xAC540, data,    fragments/1/fragment1_data]
     - [0xAC860, .rodata, fragments/1/fragment1_code] # D_83503DE0 (func_8350182C) + jtbl_83503DE8, 16-byte aligned
     - [0xAC880, rodata]
+    - [0xAC8D0, .rodata, fragments/1/fragment1_code] # jtbl_83503E50 + jtbl_83503E64 first 3 words, 16-byte aligned
+    - [0xAC8F0, rodata]
 
   # unk fragment
   - name: fragment2
@@ -521,6 +524,8 @@
     - [0xD0480, textbin, fragments/9/fragment9_header]
     - [0xD04A0, c,       fragments/9/fragment9_code]
     - [0xD3910, data,    fragments/9/fragment9_data]
+    - [0xD4240, .rodata, fragments/9/fragment9_code] # last word of jtbl_8FB03D2C (func_8FB02A10, hand-carried) + jtbl_8FB03DC4 (func_8FB03164's switch); IDO pads the switch's rodata out to 0xD4260 (2 extra zero words, matching retail here), so this ends there rather than at the table's literal end (0xD4258)
+    - [0xD4260, rodata]
   
   # unk fragment
   - name: fragment10
@@ -596,6 +601,8 @@
     - [0x10A620, rodata]
     - [0x10A7D0, .rodata, fragments/14/fragment14_FF070] # jtbl_81312648, jtbl_81312680 (+2 more)
     - [0x10A8C0, rodata]
+    - [0x10A9E0, .rodata, fragments/14/fragment14_104FC0] # jtbl_81312840 tail (3 words) + jtbl_8131285C, 16-byte aligned
+    - [0x10AA10, rodata]
     - [0x10ABA0, .rodata, fragments/14/fragment14_109280] # D_81312A10 (jtbl_81311AAC tail) + jtbl_81312A18 + jtbl_81312A2C, 16-byte aligned
     - [0x10ABD0, rodata]
 
@@ -857,6 +864,8 @@
     - [0x1A6980, data,    fragments/31/fragment31_data]
     - [0x1A6E00, .rodata, fragments/31/fragment31_1736F0] # jtbl_88233B80
     - [0x1A6E60, rodata]
+    - [0x1A7420, .rodata, fragments/31/fragment31_190BB0] # jtbl_882341A0, 16-byte aligned start; ends mid jtbl_882341B8
+    - [0x1A7440, rodata]
 
   - name: fragment32
     type: code
@@ -1343,7 +1352,9 @@
     - [0x34C8B0, c,       fragments/67/fragment67_34C8B0]
     - [0x34E600, data,    fragments/67/fragment67_data]
     - [0x353EB0, .rodata, fragments/67/fragment67_33CB20] # jtbl_829173B0
-    - [0x353ED0, rodata]
+    - [0x353ED0, rodata] # D_829173D0 through D_829173D8
+    - [0x353F40, .rodata, fragments/67/fragment67_33FAE0] # D_82917440 through jtbl_8291744C and D_82917478
+    - [0x353F80, rodata]
 
   - name: fragment68
     type: code

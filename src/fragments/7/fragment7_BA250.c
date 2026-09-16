@@ -546,7 +546,29 @@ void func_83007318(void *arg0, s32 arg1) { switch (arg1) { case -1: if (_bcmp((u
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_830074C8.s")
+extern void func_800226C0(s32);
+extern void main_pool_pop_state(s32);
+extern void func_83009BD0(void *, s32);
+extern s16 D_8300F7BC[][2];
+void func_830074C8(void *arg0, s32 arg1) {
+    switch (arg1) {
+        case -1:
+            *(u8 *)((u8 *)(u32)arg0 + 0x1E) = 1;
+            func_800226C0(3);
+            return;
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+            main_pool_pop_state(0x4D535243);
+            func_83009BD0(arg0, D_8300F7BC[arg1][0]);
+            *(u8 *)((u8 *)(u32)arg0 + 0x1E) = 9;
+            func_800226C0(0xA3);
+            return;
+    }
+}
 #endif
 
 #ifdef VERSION_US

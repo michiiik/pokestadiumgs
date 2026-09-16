@@ -46,14 +46,13 @@ void func_8290325C(void *arg0) {
 
 #ifdef VERSION_US
 extern f64 D_82917438;
-extern f64 D_82917440;
 void func_829033DC(f32 *arg0, f32 arg1, f32 arg2) {
     f32 temp_fv0;
     f64 temp_fv1;
     temp_fv0 = *arg0;
     *arg0 = ((arg1 - temp_fv0) * arg2) + temp_fv0;
     temp_fv1 = (f64)*(volatile f32 *)arg0;
-    if ((temp_fv1 < D_82917438) && (D_82917440 < temp_fv1)) {
+    if ((temp_fv1 < D_82917438) && (-0.001 < temp_fv1)) {
         *arg0 = 0.0f;
     }
 }
@@ -295,11 +294,39 @@ void func_82904160(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33FAE0/func_82904208.s")
+extern void func_800088DC(void);
+extern void func_829060BC(void);
+extern void GeoRender_AdvanceFrameCounter(void);
+extern void func_8003C6B8(s32);
+extern void func_82907274(s32);
+extern void func_82904160(void);
+extern void func_80008648(void);
+extern s16 D_829199FC;
+void func_82904208(void) {
+    func_800088DC();
+    func_829060BC();
+    GeoRender_AdvanceFrameCounter();
+    switch (D_829199F8) {
+        case 0:
+        case 1:
+        case 2:
+            func_8003C6B8((s32)D_82919DC4);
+            func_82907274(D_829199FC);
+            func_82903BA4();
+            break;
+        case 7:
+        case 8:
+        case 9:
+        case 10:
+            func_8003C6B8((s32)D_82919DC4);
+            func_82904160();
+            break;
+    }
+    func_80008648();
+}
 #endif
 
 #ifdef VERSION_US
-extern f64 D_82917478;
 extern f64 D_82917480;
 void func_829042A4(f32 *arg0, f32 arg1, f32 arg2) {
     f32 temp_fv0;
@@ -307,7 +334,7 @@ void func_829042A4(f32 *arg0, f32 arg1, f32 arg2) {
     temp_fv0 = *arg0;
     *arg0 = ((arg1 - temp_fv0) * arg2) + temp_fv0;
     temp_fv1 = (f64)*(volatile f32 *)arg0;
-    if ((temp_fv1 < D_82917478) && (D_82917480 < temp_fv1)) {
+    if ((temp_fv1 < 0.001) && (D_82917480 < temp_fv1)) {
         *arg0 = 0.0f;
     }
 }
