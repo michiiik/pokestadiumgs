@@ -251,8 +251,35 @@ void func_82D06488(Fragment82OffsetState *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D06514.s")
+extern void func_82D05F30(u8 *arg0);
+extern void func_82D0639C(u8 *arg0);
+void func_82D06514(u8 *arg0) {
+    s32 count;
 
+    switch (arg0[0]) {
+    case 2:
+        func_82D05CF4((Fragment82BaseRateState *)arg0);
+        break;
+    case 3:
+        func_82D05E38((Fragment82State *)arg0);
+        break;
+    case 4:
+        func_82D05F30(arg0);
+        break;
+    case 5:
+        func_82D0639C(arg0);
+        break;
+    case 6:
+        func_82D05F30(arg0);
+        break;
+    }
+    count = arg0[0xC];
+    if (count == 0) {
+        arg0[0xB] = 0;
+        return;
+    }
+    arg0[0xC] = count - 1;
+}
 extern void func_82D02B44(s16, s16, u16, u16);
 extern void func_82D05BD8(u8 *);
 extern void func_82D05D74(u8 *);
