@@ -473,7 +473,33 @@ s32 func_82C03FB4(s32 arg0, s32 arg1, void *arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C0412C.s")
+extern s8 *HAL_Strcpy(s8 *, s8 *);
+extern s8 *func_8004C874(s32, s32);
+s32 func_82C0412C(s32 arg0, s32 arg1, void *arg2) {
+    s32 var_v1;
+
+    var_v1 = 0;
+    switch (*(u16 *)((u8 *)(arg2) + (0x34))) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 7:
+    case 8:
+    case 9:
+    case 10:
+    case 12:
+    case 13:
+        if (((arg1 & 0xFF00) != 0x100) && ((arg1 & 0xFF00) != 0x200) && ((arg1 & 0xFF00) != 0x700)) {
+            HAL_Strcpy(arg0 + 4, func_8004C874(0x15, 0x18));
+            HAL_Strcpy(arg0 + 0x54, func_8004C874(0x15, 0x35));
+            var_v1 = 1;
+        }
+        break;
+    }
+    return var_v1;
+}
 #endif
 
 #ifdef VERSION_US
