@@ -1068,7 +1068,9 @@
     - [0x251C30, c,       fragments/47/fragment47_251C30]
     - [0x2533F0, c,       fragments/47/fragment47_2533F0]
     - [0x253770, data,    fragments/47/fragment47_data]
-  
+    - [0x253F30, .rodata, fragments/47/fragment47_24AE60] # jtbl_8600D910 (func_86006F20, still GLOBAL_ASM) + jtbl_8600D92C (func_86007648), widened to 16-byte boundary
+    - [0x253F70, rodata] # 8-byte zero pad before D_8600D950 filled by SUBALIGN(16) linker padding, not literal extraction
+
   - name: fragment48
     type: code
     bss_size: 0x0
