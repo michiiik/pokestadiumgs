@@ -134,7 +134,27 @@ s32 func_80023A10(u8 arg0, u8 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80024180.s")
+void func_80024180(u32 arg0, s32 arg1) {
+    switch (arg0) {
+    case 0:
+    case 26:
+    case 27:
+    case 28:
+    case 100:
+    case 101:
+    case 102:
+    case 103:
+    case 104:
+    case 105:
+    case 106:
+        func_8001874C(0x06020005, 1);
+        return;
+    case 30:
+    case 35:
+        func_8001874C(0x06020105, 1);
+        return;
+    }
+}
 #endif
 
 #ifdef VERSION_US
