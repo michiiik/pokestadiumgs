@@ -164,7 +164,36 @@ void func_86007614(void *arg0) { StageContext_SetClearColor(1); StageFade_StartF
 
 void func_86007640(u8 *arg0) {}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_86007648.s")
+extern void func_86007300(s32);
+extern void func_8600734C(s32);
+extern void func_86007428(s32);
+
+void func_86007648(s32 arg0, s32 arg1) {
+    *(s32 *)(arg0 + 0x7518) = arg1;
+    switch (arg1) {
+        case 0:
+            func_86007300(arg0);
+            break;
+        case 1:
+            func_8600734C(arg0);
+            break;
+        case 2:
+            func_86007428(arg0);
+            break;
+        case 3:
+            func_860075A8((void *)arg0);
+            break;
+        case 4:
+            func_860075E4((void *)arg0);
+            break;
+        case 6:
+            func_86007614((void *)arg0);
+            break;
+        case 5:
+            func_86007640((u8 *)arg0);
+            break;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_860076EC.s")
 #endif
