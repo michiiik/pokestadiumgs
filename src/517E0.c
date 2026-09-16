@@ -394,7 +394,28 @@ void func_800530DC(void) {
 
 extern void func_80052928(s32,s32); extern void func_80051D64(s32,s32); void Save_ResetAndCommitTypedRecord(s32 a0,s32 a1){func_80052928(a0,a1);func_80051D64(a0,a1);}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_8005314C.s")
+extern void func_800555B4(s32);
+extern void func_8005565C(s32);
+extern void func_8005577C(s32 arg0);
+extern void func_800557E4(s32 arg0);
+extern u8 D_801281C0;
+void func_8005314C(void) {
+    u8 *record = (u8 *)&D_801281C0;
+    s32 i = 0;
+    do {
+        if ((*(s32 *)record & 1) != 0) {
+            switch (i) {
+            case 0: func_800555B4(1); break;
+            case 1: func_8005565C(1); break;
+            case 2: func_8005577C(1); break;
+            case 3: func_800557E4(1); break;
+            }
+        }
+        i += 1;
+        record += 0xC;
+    } while (i != 4);
+    { extern s32 D_800972C0; D_800972C0 = 0; }
+}
 
 s32 func_80053230(s32 arg0) {
     s32 result = 0;
