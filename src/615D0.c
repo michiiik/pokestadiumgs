@@ -571,5 +571,30 @@ s32 func_80062C18(s32 arg0) { return 1; }
 
 s32 func_80062C24(s32 arg0) { return 1; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80062C30.s")
+void func_80062C30(u8 *arg0) {
+    s32 temp_v0 = func_8003514C();
+
+    switch (temp_v0) {
+    case 1:
+        arg0[0x42] = 0x84;
+        arg0[0x43] = 0x84;
+        break;
+    case 2:
+        arg0[0x42] = 0x84;
+        arg0[0x43] = 0x85;
+        break;
+    case 3:
+        arg0[0x42] = 0x84;
+        arg0[0x43] = 0x86;
+        break;
+    case 4:
+        arg0[0x42] = 0x84;
+        arg0[0x43] = 0x88;
+        break;
+    case 5:
+        arg0[0x42] = 0x84;
+        arg0[0x43] = 0x92;
+        break;
+    }
+}
 #endif
