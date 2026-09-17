@@ -9,3 +9,7 @@ Per-file spellings, skip lists, and unsolved shapes for this source file. Delive
 ## 2026-09-15
 
 func_830073F8: time cap at 0.9808 (raw 0.7308) after 2712s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-17
+
+func_83007218: matched (call_sequence:carrier:single_pointer_local_exact), 6 iterations, agent codex
