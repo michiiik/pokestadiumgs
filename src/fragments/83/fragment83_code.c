@@ -81,7 +81,8 @@ void func_82C003F8(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C00804.s")
+extern void func_82C003BC(u16 arg0, u16 arg1);
+void func_82C00804(s16 arg0, s16 arg1, u16 arg2, u16 arg3) { s32 inverse; if (arg2 > 0 && arg3 > 0) { inverse = (0x10000 / arg2) & 0xFFFF; func_82C003BC(0x102, 0); func_80044270(arg0, arg1, arg2, arg3, 0, 0, inverse, 0, 0); } }
 #endif
 
 #ifdef VERSION_US
@@ -90,7 +91,7 @@ void func_82C003F8(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
 
 #ifdef VERSION_US
 extern void func_82C00624(s16, s16, u16, u16);
-extern void func_82C00804(s16, s16, s32, s32);
+extern void func_82C00804(s16, s16, u16, u16);
 void func_82C009F8(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
     func_82C00804((s16) (arg0 + 3), (s16) (arg1 + 3), (arg2 - 6) & 0xFFFF, (arg3 - 6) & 0xFFFF);
     func_82C00624(arg0, arg1, arg2, arg3);
