@@ -478,7 +478,20 @@ s32 func_82C03EE0(s8 *arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C03F40.s")
+typedef struct { u8 pad[0x40]; s32 unk40; } Unk82C03F40;
+extern s8 * HAL_Strcpy(s8 *, s8 *);
+extern s8 * func_8004C874(s32, s32);
+s32 func_82C03F40(s32 arg0, s32 arg1, void *arg2) {
+    s32 var_v1;
+
+    var_v1 = 0;
+    if (((*(u32 *)((u8 *)arg2 + 0x40) << 4) >> 31) == 0) {
+        HAL_Strcpy(arg0 + 4, func_8004C874(0x15, 5));
+        HAL_Strcpy(arg0 + 0x54, func_8004C874(0x15, 0x1F));
+        var_v1 = 1;
+    }
+    return var_v1;
+}
 #endif
 
 #ifdef VERSION_US
