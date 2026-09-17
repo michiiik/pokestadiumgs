@@ -218,7 +218,22 @@ void func_82D05CF4(Fragment82BaseRateState *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D05D74.s")
+extern u8 D_82D06F9B;
+extern u8 D_82D07184;
+void func_82D05D74(u8 *arg0) {
+    typedef struct { u8 pad0[6]; s16 value6; u8 pad8[2]; u8 flagsA; u8 valueB; u8 countC; u8 padD[0x16]; u8 output23; u8 pad24[3]; u8 output27; } LocalRateState;
+    LocalRateState *s = (LocalRateState *)arg0;
+
+    if (D_82D07184 >= s->countC) {
+        if (s->countC == 0) {
+            s->output23 = D_82D06F9B;
+            s->output27 = 0xFF;
+            return;
+        }
+        s->output23 = (s->countC * D_82D06F9B) / D_82D07184;
+        s->output27 = (s->countC * 0xFF) / D_82D07184;
+    }
+}
 
 extern u8 D_82D07184;
 extern u8 D_82D07188;
