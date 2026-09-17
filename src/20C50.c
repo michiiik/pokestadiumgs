@@ -80,5 +80,80 @@ void Anim_BuildTransformCurves(S1_unk_arg0_func_80045A80* arg0, S1_unk_arg1_func
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/20C50/func_80020330.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/20C50/func_800205C0.s")
+typedef struct { char pad[0x18A]; s16 unk_18A; s16 unk_18C; s16 unk_18E; } GS_DecodeInner;
+typedef struct { GS_DecodeInner unk_0000; char pad_190[0x1408]; u32 unk_1598[0x400]; char pad_2598[0x24]; u32 unk_25BC; } GS_DecodeState;
+typedef struct { s16 xRotA; s16 xRotB; s16 flag0; s16 yRotA; s16 yRotB; s16 flag1; s16 zRotA; s16 zRotB; s16 flag2; s16 unkA; s16 unkB; s16 unkC; s16 unkD; } GS_XMc;
+extern void _bzero(void *, s32);
+#define GSM_STREAM_WORD(state, pos) (((u32 *)(state)->unk_1598)[((pos) >> 5) & 0x3FF])
+#define READ_BITS(dst, n) if (bitsLeft > (n)) { (dst) = window & ((1 << (n)) - 1); window >>= (n); bitsLeft -= (n); } else { (dst) = window & ((1 << bitsLeft) - 1); pos += 32; window = GSM_STREAM_WORD(state, pos); if (bitsLeft != (n)) { (dst) |= (window & ((1 << ((n) - bitsLeft)) - 1)) << bitsLeft; } window >>= (n) - bitsLeft; bitsLeft += 32 - (n); }
+s32 func_800205C0(GS_DecodeState* state, void* arg1) {
+    s16 LARc[8];
+    s16 Nc[4];
+    s16 Mc[4];
+    s16 bc[4];
+    s16 xmaxc[4];
+    GS_XMc xM[4];
+    s32 unused; // required for the stack layout to match
+    s32 bitsLeft;
+    s32 i;
+    s32 pos;
+    u32 window;
+    s32 bitOffset;
+
+    pos = state->unk_25BC;
+    bitOffset = pos & 0x1F;
+    window = GSM_STREAM_WORD(state, pos) >> bitOffset;
+    bitsLeft = 32 - bitOffset;
+
+    if ((state->unk_0000.unk_18A == 0) && (state->unk_0000.unk_18C == 0)) {
+        READ_BITS(i, 1);
+        if (i != 0) {
+            READ_BITS(state->unk_0000.unk_18C, 4);
+            state->unk_0000.unk_18C++;
+        } else {
+            READ_BITS(state->unk_0000.unk_18A, 7);
+            state->unk_0000.unk_18A++;
+        }
+    }
+
+    if (state->unk_0000.unk_18C != 0) {
+        _bzero(arg1, 160 * sizeof(s16));
+        state->unk_0000.unk_18C--;
+    } else {
+        READ_BITS(LARc[0], 6);
+        READ_BITS(LARc[1], 6);
+        READ_BITS(LARc[2], 5);
+        READ_BITS(LARc[3], 5);
+        READ_BITS(LARc[4], 4);
+        READ_BITS(LARc[5], 4);
+        READ_BITS(LARc[6], 3);
+        READ_BITS(LARc[7], 3);
+
+        for (i = 0; i < 4; i++) {
+            READ_BITS(Nc[i], 7);
+            READ_BITS(bc[i], 2);
+            READ_BITS(Mc[i], 2);
+            READ_BITS(xmaxc[i], 6);
+            READ_BITS(xM[i].xRotA, 3);
+            READ_BITS(xM[i].xRotB, 3);
+            READ_BITS(xM[i].flag0, 3);
+            READ_BITS(xM[i].yRotA, 3);
+            READ_BITS(xM[i].yRotB, 3);
+            READ_BITS(xM[i].flag1, 3);
+            READ_BITS(xM[i].zRotA, 3);
+            READ_BITS(xM[i].zRotB, 3);
+            READ_BITS(xM[i].flag2, 3);
+            READ_BITS(xM[i].unkA, 3);
+            READ_BITS(xM[i].unkB, 3);
+            READ_BITS(xM[i].unkC, 3);
+            READ_BITS(xM[i].unkD, 3);
+        }
+
+        state->unk_0000.unk_18A--;
+        Anim_BuildTransformCurves(state, LARc, Nc, bc, Mc, xmaxc, xM, (s32)arg1);
+    }
+
+    state->unk_25BC = (pos & ~0x1F) - bitsLeft + 32;
+    return 0;
+}
 #endif
