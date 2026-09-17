@@ -1735,7 +1735,35 @@ void func_82614250(void *arg0) {
     } while (index != 0x33E0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82614324.s")
+void func_82614324(void *arg0) {
+    s32 var_s1;
+    s32 var_s2;
+    void *var_s0;
+    s16 temp_v0;
+    void *temp_a0;
+    void *temp_a0_2;
+    s32 temp_a1;
+    var_s1 = 1;
+    var_s0 = arg0;
+    var_s2 = 0;
+    do {
+        temp_v0 = *(s16 *)((u8 *)var_s0 + 0x114);
+        temp_a0 = (u8 *)var_s0 + 0x114;
+        switch (temp_v0) {
+        case 4:
+            temp_a1 = var_s1;
+            if (*(s16 *)((u8 *)temp_a0 + 6) != 0) { var_s1 = 0; func_8260CF84(temp_a0, temp_a1); }
+            break;
+        case 6:
+            temp_a0_2 = temp_a0;
+            temp_a1 = var_s1;
+            if (*(s16 *)((u8 *)temp_a0_2 + 6) != 0) { var_s1 = 0; func_8260D440(temp_a0_2, temp_a1); }
+            break;
+        }
+        var_s2 += 0x298;
+        var_s0 = (u8 *)var_s0 + 0x298;
+    } while (var_s2 != 0x33E0);
+}
 
 void func_826143E4(void *arg0) {
     s32 temp_a1;
