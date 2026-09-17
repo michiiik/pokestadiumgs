@@ -1123,6 +1123,9 @@
     - [0x25A670, textbin, fragments/49/fragment49_header]
     - [0x25A690, c,       fragments/49/fragment49_code]
     - [0x264710, data,    fragments/49/fragment49_data]
+    - [0x265250, .rodata, fragments/49/fragment49_code] # aligned boundary for fragment49_code's pooled constants and jtbl_8610ABEC
+    - [0x2652F0, rodata]
+    - [0x266A40, rodata]
   
   - name: fragment50
     type: code
