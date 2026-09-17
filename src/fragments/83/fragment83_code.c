@@ -130,7 +130,39 @@ void func_82C00A70(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C01E98.s")
+extern void func_80044270(s16, s16, s16, s16, s32, s32, s32, s32, s32);
+extern u8 D_82C04924[];
+extern u8 D_82C04928[];
+extern Gfx D_82C04968[];
+extern void func_82C00078(u8 *arg0, u8 arg1);
+extern void func_82C003BC(u16 arg0, u16 arg1);
+extern Gfx* D_800D0510;
+extern u8 D_82C04C38;
+extern s16 D_82C04C44;
+void func_82C01E98(void) {
+    s32 i;
+    s32 y;
+    s16 *px = &D_82C04C44;
+
+    if ((*(u8 *)((u8 *)&D_82C04C38 + 1) == 1) || (*(u8 *)((u8 *)&D_82C04C38 + 1) == 2) || (*(u8 *)((u8 *)&D_82C04C38 + 1) == 4)) {
+        gSPDisplayList(D_800D0510++, D_82C04968);
+        func_82C003BC(0x123, 0);
+        i = 0;
+        y = 0;
+        if (*(u8 *)((u8 *)&D_82C04C38 + 3) > 0) {
+            do {
+                if (i == *(s8 *)((u8 *)&D_82C04C38 + 2)) {
+                    func_82C00078(D_82C04928, 0xFF);
+                } else {
+                    func_82C00078(D_82C04924, 0xFF);
+                }
+                func_80044270((s16)(px[0] + 0x36), (s16)(px[1] + y + 0x31), 0x18, 0x14, 0, 0, 0x400, 0x400, 0);
+                i++;
+                y += 0x1A;
+            } while (i < *(u8 *)((u8 *)&D_82C04C38 + 3));
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
