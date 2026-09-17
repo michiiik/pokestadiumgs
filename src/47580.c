@@ -429,7 +429,55 @@ void func_80047DC4(u8 *arg0, u8 *arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047EC4.s")
+extern void Font_DisableTwoCycleTexturing(void);
+extern void Font_EnableTwoCycleTexturing(void);
+extern s32 func_80046E64(u8 *, s32, s32, s32, s32, s32);
+extern u8 * func_800477C4(u8 *, u8 *);
+extern s32 func_80047B4C(const s8 *arg0);
+extern s32 func_80047BD4(u8 *arg0);
+void func_80047EC4(u8 *arg0, u8 *arg1) {
+    u8 buffer[0x20];
+    s32 type;
+    u8 red;
+    u8 green;
+    u8 blue;
+    u8 alpha;
+    u32 current;
+    u8 color[4];
+
+    arg1 = func_800477C4(buffer, arg1);
+    type = func_80047B4C((s8 *)buffer);
+    switch (type) {
+        case 0:
+        case 1:
+            arg1 = func_800477C4(buffer, arg1);
+            red = func_80047BD4(buffer);
+            arg1 = func_800477C4(buffer, arg1);
+            green = func_80047BD4(buffer);
+            arg1 = func_800477C4(buffer, arg1);
+            blue = func_80047BD4(buffer);
+            arg1 = func_800477C4(buffer, arg1);
+            alpha = func_80047BD4(buffer);
+            if (func_80046E64(arg0, type, red, green, blue, alpha)) {
+                current = ((u32 *)(arg0 + 0x54))[arg0[0x7C]];
+                color[0] = red;
+                color[1] = green;
+                color[2] = blue;
+                color[3] = alpha;
+                if (arg0[0x7A] & 1) {
+                    if (current == *(u32 *)color) {
+                        Font_DisableTwoCycleTexturing();
+                    }
+                } else if (current != *(u32 *)color) {
+                    Font_EnableTwoCycleTexturing();
+                }
+            }
+            break;
+        case 10:
+            func_80046DD4(arg0);
+            break;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_8004803C.s")
 
@@ -513,7 +561,43 @@ void func_8004989C(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800498C4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800499EC.s")
+extern u8 D_80094E38[];
+extern u8 D_80095000[];
+extern void Util_Free(void *);
+extern void func_8004D19C(s32, s32, s32, s32, s32);
+extern Gfx * D_800D0510;
+extern u8 * D_80126F50;
+void func_800499EC(void) {
+    s32 i;
+    s32 offset;
+    u8 *group;
+    u8 **link;
+    u8 *node;
+    void (*callback)(u8 *, u8 *);
+
+    if (*(u8 **)(D_80126F50 + 0x50) != NULL) {
+        gSPDisplayList(D_800D0510++, D_80094E38);
+        for (i = 0, offset = 0; i < D_80126F50[0x7F]; i++, offset += 0x10) {
+            group = *(u8 **)(D_80126F50 + 0x50) + offset;
+            link = (u8 **)group;
+            while (*link != NULL) {
+                node = *link;
+                if (*(u16 *)(node + 4) & 1) {
+                    callback = *(void (**)(u8 *, u8 *))(group + 8);
+                    if (callback != NULL) {
+                        callback(group, node);
+                    }
+                    if (*(u16 *)(node + 4) & 2) {
+                        func_8004D19C(*(s16 *)node, *(s16 *)(node + 2), *(s32 *)(group + 4), 0, 0);
+                    }
+                }
+                link = (u8 **)(*link + 8);
+                Util_Free(node);
+            }
+        }
+    }
+    gSPDisplayList(D_800D0510++, D_80095000);
+}
 
 extern u8 *D_80126F50; extern Gfx *D_800D0510; extern u8 D_80095018[];
 void Font_EnableTwoCycleTexturing(void) {
