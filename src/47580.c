@@ -561,7 +561,43 @@ void func_8004989C(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800498C4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800499EC.s")
+extern u8 D_80094E38[];
+extern u8 D_80095000[];
+extern void Util_Free(void *);
+extern void func_8004D19C(s32, s32, s32, s32, s32);
+extern Gfx * D_800D0510;
+extern u8 * D_80126F50;
+void func_800499EC(void) {
+    s32 i;
+    s32 offset;
+    u8 *group;
+    u8 **link;
+    u8 *node;
+    void (*callback)(u8 *, u8 *);
+
+    if (*(u8 **)(D_80126F50 + 0x50) != NULL) {
+        gSPDisplayList(D_800D0510++, D_80094E38);
+        for (i = 0, offset = 0; i < D_80126F50[0x7F]; i++, offset += 0x10) {
+            group = *(u8 **)(D_80126F50 + 0x50) + offset;
+            link = (u8 **)group;
+            while (*link != NULL) {
+                node = *link;
+                if (*(u16 *)(node + 4) & 1) {
+                    callback = *(void (**)(u8 *, u8 *))(group + 8);
+                    if (callback != NULL) {
+                        callback(group, node);
+                    }
+                    if (*(u16 *)(node + 4) & 2) {
+                        func_8004D19C(*(s16 *)node, *(s16 *)(node + 2), *(s32 *)(group + 4), 0, 0);
+                    }
+                }
+                link = (u8 **)(*link + 8);
+                Util_Free(node);
+            }
+        }
+    }
+    gSPDisplayList(D_800D0510++, D_80095000);
+}
 
 extern u8 *D_80126F50; extern Gfx *D_800D0510; extern u8 D_80095018[];
 void Font_EnableTwoCycleTexturing(void) {
