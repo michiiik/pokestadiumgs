@@ -376,7 +376,29 @@ void func_82C03574(void) { func_8004C4B0(21); func_8004C4B0(19); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C0359C.s")
+extern s8 * HAL_Strcpy(s8 *, s8 *);
+extern void func_8004C594(s32, s32);
+extern s8 * func_8004C874(s32, s32);
+extern void func_8004C8A0(s32 *, s32, s32, s32);
+extern s32 func_82C026D4(s32 arg0);
+s32 func_82C0359C(s32 *arg0, s32 arg1, u8 *arg2) {
+    s32 result = 0;
+    s16 state = *(s16 *)(arg2 + 0x34);
+    if (state != 1 && state != 2 && state != 3 && state != 4) {
+        s32 value = func_82C026D4((s32)(arg2 + 0x14));
+        u16 masked = (u16)value;
+        if (value < 0xFB) {
+            arg0[0] = 1;
+            func_8004C594(3, masked);
+            func_8004C8A0((s32 *)((u8 *)arg0 + 4), 0x50, 0x15, 0x11);
+        } else {
+            HAL_Strcpy((s8 *)arg0 + 4, func_8004C874(0x15, 0x12));
+            HAL_Strcpy((s8 *)arg0 + 0x54, func_8004C874(0x15, 0x2C));
+        }
+        result = 1;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
