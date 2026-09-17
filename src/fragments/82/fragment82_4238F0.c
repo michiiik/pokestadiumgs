@@ -88,7 +88,23 @@ void func_82D039E4(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
     func_82D03598(arg0, arg1, arg2, arg3);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D03A5C.s")
+extern u8 D_82D07248[];
+extern void ParticleGfx_SetPrimColor_fragment82(u8 r, u8 g, u8 b, u8 a);
+extern void func_82D02D5C(s16 arg0, s16 arg1, u16 arg2, u16 arg3);
+extern void func_82D039E4(s16 arg0, s16 arg1, u16 arg2, u16 arg3);
+extern Gfx* D_800D0510;
+void func_82D03A5C(s16 arg0, s16 arg1, u16 arg2, f32 arg3) {
+    s32 x;
+    if (arg2 < 0x14) {
+        return;
+    }
+    func_82D039E4(arg0, arg1, 0x13, arg2);
+    gSPDisplayList(D_800D0510++, D_82D07248);
+    ParticleGfx_SetPrimColor_fragment82(0xFF, 0xFF, 0, 0xFF);
+    x = (s16)(arg0 + 3);
+    func_82D02D5C(x, arg1 + (u16)((f32)(u16)(arg2 - 0x14) * arg3), 0x101, 1);
+    func_82D02D5C(x, (s16)(arg1 + (u16)((f32)(u16)(arg2 - 0x14) * arg3) + 0xA), 0x101, 2);
+}
 
 extern f32 D_80087E50[];
 extern u16 D_82D07280;
