@@ -526,7 +526,8 @@ s32 func_80026298(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80026BB4.s")
+/* Keep this function's strings in the pooled late-rodata stream. */
+#pragma GLOBAL_ASM("hand_asm/229E0/func_80026BB4_manual.s")
 #endif
 
 #ifdef VERSION_US
@@ -776,7 +777,7 @@ void func_80028300(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80028540.s")
+#pragma GLOBAL_ASM("hand_asm/229E0/func_80028540_manual.s")
 #endif
 
 #ifdef VERSION_US
@@ -917,7 +918,8 @@ void func_8002A9CC(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002A9D8.s")
+/* Its string literals are emitted above in the pooled late-rodata stream. */
+#pragma GLOBAL_ASM("hand_asm/229E0/func_8002A9D8_manual.s")
 #endif
 
 #ifdef VERSION_US
@@ -3113,7 +3115,7 @@ S1_Color_RGBA8_u32* Color_HSVToRGBA8(S1_Color_RGBA8_u32* arg0, S1_Vec3f* arg1, s
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80037B08.s")
+#pragma GLOBAL_ASM("hand_asm/229E0/func_80037B08_manual.s")
 #endif
 
 #ifdef VERSION_US
