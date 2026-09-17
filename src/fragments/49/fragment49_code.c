@@ -471,7 +471,7 @@ void func_86104BEC(void *arg0) {
     (*(f32 *)((u8 *)arg0 + 0x20)) = 0.0f;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86104CAC.s")
+#pragma GLOBAL_ASM("hand_asm/fragments/49/func_86104CAC_rodata_manual.s")
 
 extern s32 D_8610AD20;
 extern void func_87F026E8(s32, s32);
@@ -533,7 +533,7 @@ void func_861054B0(void) {
 extern f32 D_8610AC50;
 void func_86105928(f32 *arg0) { f32 zero; f32 value; zero = 0.0f; value = D_8610AC50; arg0[4] = zero; arg0[5] = zero; arg0[6] = zero; arg0[23] = value; arg0[22] = value; arg0[21] = value; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86105950.s")
+#pragma GLOBAL_ASM("hand_asm/fragments/49/func_86105950_rodata_manual.s")
 
 extern u8 D_8610A0D0[];
 extern Gfx D_8610A970[];
@@ -617,7 +617,7 @@ void func_86106688(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86106710.s")
+#pragma GLOBAL_ASM("hand_asm/fragments/49/func_86106710_rodata_manual.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86106784.s")
 
