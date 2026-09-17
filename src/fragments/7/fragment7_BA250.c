@@ -281,7 +281,39 @@ void func_83001FA4(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83002424.s")
+typedef struct Rect02424 { s16 x, y, w, h; } Rect02424;
+extern Rect02424 D_8300C3EC;
+extern u8 D_8300C29C[];
+extern void func_818006FC(s32, s32, s32, f32);
+extern void func_830020CC(void *, f32, s32, s32, f32);
+extern void func_81801854(void *, void *, void *);
+extern void func_8004B2CC(s32, s32, s32, s32, s32, s32, s32, s32);
+extern f32 D_8300FAB8;
+extern f32 D_8300FABC;
+extern f32 func_818055E0();
+extern void func_8180567C(s32, void *, void *);
+extern void func_818057D0(s32, void *, void *);
+void func_83002424(s32 arg0, void *arg1, void *arg2) {
+    void *state = arg1;
+    s32 pad;
+    Rect02424 rect;
+    f32 alpha;
+    alpha = func_818055E0();
+    func_818057D0(arg0, state, arg2);
+    func_818006FC(((s16 *)arg2)[0] + 0xD, ((s16 *)arg2)[1] + 0x25, 0xE2, alpha);
+    if (alpha > D_8300FAB8) {
+        func_830020CC((u8 *)state + 0x3A290, 0.0f, ((s16 *)arg2)[0], ((s16 *)arg2)[1], alpha);
+    }
+    rect = D_8300C3EC;
+    if (((u8 *)state)[0x46] == 1 && (((u8 *)state)[0x1F] == 0x19 || ((u8 *)state)[0x1F] == 0x1A)) {
+        rect = *(Rect02424 *)(D_8300C29C + ((u8 *)state)[0x4A] * 0x18 - 0x12);
+    }
+    if (alpha > D_8300FABC && rect.w > 0) {
+        func_81801854(&rect, &rect, arg2);
+        func_8004B2CC(rect.x, rect.y, rect.w, rect.h, 0x96, 0x96, 0x5A, 0);
+    }
+    func_8180567C(arg0, state, arg2);
+}
 #endif
 
 #ifdef VERSION_US
