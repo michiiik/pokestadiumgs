@@ -88,7 +88,14 @@ void func_82C00444(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C00624.s")
+extern void func_80044270(s16, s16, s16, s16, s32, s32, s32, s32, s32);
+extern void func_82C003BC(u16 arg0, u16 arg1);
+void func_82C00624(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
+    if (arg2 < 6 || arg3 < 6) return;
+    func_82C003BC(0x101,5);
+    func_80044270(arg0,arg1,3,arg3-3,0,0,0x400,0x400,0); func_80044270(arg0+3,arg1,arg2-6,3,0x40,0,0,0x400,0); func_80044270(arg0+arg2-3,arg1,3,arg3-3,0x60,0,0x400,0x400,0);
+    func_80044270(arg0,arg1+arg3-3,3,3,0xC0,0,0x400,0x400,0); func_80044270(arg0+3,arg1+arg3-3,arg2-6,3,0x100,0,0,0x400,0); func_80044270(arg0+arg2-3,arg1+arg3-3,3,3,0x60,0,0x400,0x400,0);
+}
 #endif
 
 #ifdef VERSION_US
