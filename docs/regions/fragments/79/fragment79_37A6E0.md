@@ -45,3 +45,23 @@ func_841139D0: matched (call_sequence:priority_chain:decl-result-before-index), 
 ## 2026-09-19
 
 TYPE CONFLICT: func_8411EE74 is extern void func_8411EE74(), not extern void func_8411EE74(u8 *)
+
+## 2026-09-19
+
+func_84116B40: matched (call_sequence:byte-deficit:inline-compound-update), 1 iterations, agent unbiased
+
+## 2026-09-19
+
+func_84116A3C: matched (call_sequence:nested:direct-field-access), 1 iterations, agent unbiased
+
+## 2026-09-19
+
+func_8411DA4C: plateau at 0.8333 (raw 0.7857), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool yes
+
+## 2026-09-19
+
+func_84116808: matched (call_sequence:switch:direct-field-access), 1 iterations, agent unbiased
+
+## 2026-09-19
+
+func_84115988: matched (call_sequence:direct:baseline), 1 iterations, agent unbiased
