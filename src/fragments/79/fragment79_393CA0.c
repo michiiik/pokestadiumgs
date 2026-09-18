@@ -3492,7 +3492,17 @@ void func_841350AC(u8 arg0, u8 arg1, u8 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841351EC.s")
+extern u8 * D_84195200[];
+extern u8 * D_84195208[];
+void func_841351EC(void *arg0, u8 arg1) {
+    struct WordCopy { s32 value; };
+    u8 *dst;
+
+    dst = (u8 *)arg0 + arg1 * 0x10;
+    *(u16 *)(dst + 0xC) = *(u16 *)(D_84195208[arg1] + 0x2C);
+    *(u16 *)(dst + 0x14) = *(u16 *)(D_84195200[arg1] + 0x16);
+    *(struct WordCopy *)(dst + 0x18) = *(struct WordCopy *)(D_84195208[arg1] + 0x50);
+}
 #endif
 
 #ifdef VERSION_US
