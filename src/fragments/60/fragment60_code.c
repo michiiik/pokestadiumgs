@@ -2,7 +2,23 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/60/fragment60_code/func_86A00020.s")
+extern void GeoCamera_SetPerspective(void *, f32, f32, f32);
+extern f32 __sinf(f32);
+extern f32 __cosf(f32);
+extern void func_80038E14(void *, s32, f32, f32, f32, f32, f32, s32);
+extern f32 D_86A0D4D8;
+extern f32 D_86A0D4DC;
+extern f32 D_86A0D4E0;
+extern f32 D_86A0D4E4;
+extern f32 D_86A0D4E8;
+#pragma REWRITE_FUNCTION_WORD(func_86A00020, 0x74, 0x00002825, 0x24050000)
+s32 func_86A00020(s32 arg0, void *arg1) {
+    s16 pad;
+
+    GeoCamera_SetPerspective(arg1, D_86A0D4E8, 100.0f, 12800.0f);
+    func_80038E14(arg1, 0, (__sinf(D_86A0D4DC) * D_86A0D4D8) + 400.0f + D_86A0D4E0, (__cosf(D_86A0D4DC) * D_86A0D4D8) + D_86A0D4E4, 0.0f, D_86A0D4E0, D_86A0D4E4, 0);
+    return 1;
+}
 #endif
 
 #ifdef VERSION_US
@@ -374,7 +390,31 @@ void func_86A0B7A0(void)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/60/fragment60_code/func_86A0B7F0.s")
+extern void *func_87F025B8(void *, void *);
+extern void func_8003F1DC(void *);
+extern void func_8003F114(void *, s32, s32, s32);
+extern s32 D_86A104E8;
+extern void func_86A0B7A0(void);
+extern u8 D_86A0FEA0;
+extern u8 D_86A443F0[];
+void func_86A0B7F0(s32 arg0) {
+    u8 *temp_v0;
+
+    temp_v0 = func_87F025B8(&D_86A0FEA0, func_86A0B7A0);
+    if (temp_v0 != NULL) {
+        *(f32 *)(temp_v0 + 0x48) = *(f32 *)((arg0 * 8) + D_86A443F0 + 4);
+        *(f32 *)(temp_v0 + 0x4C) = 1.0f;
+        *(f32 *)(temp_v0 + 0x50) = *(f32 *)((arg0 * 8) + D_86A443F0 + 8);
+        *(s16 *)(temp_v0 + 0x42) = -0x4001;
+        *(s32 *)(temp_v0 + 0x38) = arg0;
+        *(s32 *)(temp_v0 + 0x20) = arg0;
+        *(f32 *)(temp_v0 + 0x54) = 2.5f;
+        *(f32 *)(temp_v0 + 0x58) = 2.5f;
+        *(f32 *)(temp_v0 + 0x5C) = 2.5f;
+        func_8003F1DC(temp_v0 + 0x24);
+        func_8003F114(temp_v0 + 0x24, 0, -1, D_86A104E8);
+    }
+}
 #endif
 
 #ifdef VERSION_US
