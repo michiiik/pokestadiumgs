@@ -2149,7 +2149,21 @@ void func_84115940(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_84115988.s")
+extern f32 func_8411E1B4(u8 *);
+extern void func_84111D64(u8 *arg0, s32 arg1);
+extern void func_8411EE74();
+void func_84115988(u8 *arg0) {
+    if (ModelAnim_IsFinished(arg0)) {
+        func_84111E50(arg0, *(s8 *)(*(u8 **)(arg0 + 0x2D4) + 0x139D));
+        func_84111D64(arg0, *(u8 *)(*(u8 **)(arg0 + 0x2D4) + 0x139C));
+    }
+    if (*(f32 *)(arg0 + 0x28) <= -func_8411E1B4(arg0) * 3.0f) {
+        arg0[2] &= ~2;
+        func_8411EE74(arg0);
+        arg0[0x7F6] = 3;
+        *(s16 *)(arg0 + 0x7E8) = 0;
+    }
+}
 #endif
 
 #ifdef VERSION_US
