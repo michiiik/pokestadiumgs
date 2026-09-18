@@ -144,7 +144,15 @@ void func_82C00A70(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C01E24.s")
+extern void Ui_DrawAnimatedTextureMarker(s16, s16);
+extern u8 D_82C04C38;
+extern s16 D_82C04C44;
+extern s16 D_82C04C46;
+void func_82C01E24(void) {
+    if (((struct { u8 first; u8 active; s8 row; } *)&D_82C04C38)->active == 1) {
+        Ui_DrawAnimatedTextureMarker((s16)(D_82C04C44 + 0x11), (s16)(D_82C04C46 + ((struct { u8 first; u8 active; s8 row; } *)&D_82C04C38)->row * 26 + 0x33));
+    }
+}
 #endif
 
 #ifdef VERSION_US
