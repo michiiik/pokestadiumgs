@@ -324,7 +324,7 @@ s32 func_80012528(s32 arg0, s32 arg1, s32 arg2, s8 arg3, s32 arg4) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_80012A90.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_80012B80.s")
+void func_80012B80(u8 *arg0, u8 *arg1) { if (arg1 != 0) { if ((*((s32 *) (arg0 + 8))) == (*((s32 *) (arg1 + 4)))) { *((s32 *) (arg1 + 4)) = *((s32 *) (arg0 + 0xC)); *arg1 = ((*arg1) & 0xFFF3) | (((*((s8 *)(arg0 + 1)) << 1) << 1) & 0xC); } } }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_80012BC4.s")
 
