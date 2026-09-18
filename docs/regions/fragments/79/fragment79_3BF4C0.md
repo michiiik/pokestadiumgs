@@ -13,3 +13,15 @@ func_841524B4: plateau at 0.9667 (raw 0.5), mismatch operand_or_scheduling_drift
 ## 2026-09-15
 
 func_84152D6C: time cap at 0.9512 (raw 0.9512) after 2678s, mismatch instruction_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-19
+
+func_8415132C: matched (call_sequence:canonical:base_sub_state_mult_var_table), 1 iterations, agent antigravity
+
+## 2026-09-19
+
+func_8415335C: matched (call_sequence:canonical:exact_matching_spelling), 1 iterations, agent antigravity
+
+## 2026-09-19
+
+func_8415220C: matched (call_sequence:nested_if:exact_canonical), 1 iterations, agent antigravity
