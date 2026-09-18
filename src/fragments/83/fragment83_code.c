@@ -636,7 +636,26 @@ s32 func_82C041CC(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C0423C.s")
+extern u8 D_82C04C3B;
+extern u8 D_82C04C88[];
+extern s32 func_800472E0(void *);
+extern u8 D_82C04C38;
+void func_82C0423C(void) {
+    typedef struct { u8 b[8]; } Blob;
+    typedef struct { u8 pad0[0x50]; s32 active; u8 pad1[0x168]; Blob src; Blob dst; u8 pad2[0x40]; s16 x; s16 y; s16 w; s16 h; } Rec;
+    Rec *s1; Rec *s2; Rec *s3; s16 *s0; s32 s4; s32 fp; s32 s7; s32 s6; s32 s5;
+    s4 = 0;
+    if ((s32)D_82C04C3B > 0) {
+        s1 = (Rec *)&D_82C04C38; s2 = (Rec *)&D_82C04C88; fp = 0x106; s7 = 0x1A; s6 = 0x207; s5 = 0x3D;
+        do {
+            s3 = s2; s0 = (s16 *)((u8 *)s1 + 0x20C);
+            if (*(s32 *)((u8 *)s1 + 0x50) == 0) {
+                s0[0] = s5; s0[2] = s6; s0[3] = (s16)(func_800472E0((u8 *)s2 + 0x54) * s7 + 0x3A); s0[1] = (s16)(fp - s0[3] / 2);
+            }
+            s3->dst = s3->src; s4++; s1 = (Rec *)((u8 *)s1 + 0x1CC); s2 = (Rec *)((u8 *)s2 + 0x1CC);
+        } while (s4 < (s32)D_82C04C3B);
+    }
+}
 #endif
 
 #ifdef VERSION_US
