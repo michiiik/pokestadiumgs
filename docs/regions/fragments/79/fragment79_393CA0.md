@@ -13,3 +13,39 @@ TYPE CONFLICT: D_841951BD is extern u8 D_841951BD, not extern u8 D_841951D1, D_8
 ## 2026-09-14
 
 func_84126440: plateau at 0.0 (raw None), mismatch unknown; tried families: call_sequence; tie-pool no
+
+## 2026-09-18
+
+func_8413860C: plateau at 0.9474 (raw 0.5263), mismatch operand_or_scheduling_drift; tried families: bounded_lookup; tie-pool yes
+
+## 2026-09-18
+
+func_84126850: matched (state_field_access:return_width:unsigned_halfword_result), 2 iterations, agent unbiased
+
+## 2026-09-18
+
+func_84126EDC: matched (constant_map:nested:single_u8_local), 1 iterations, agent unbiased
+
+## 2026-09-18
+
+func_841351EC: matched (state_field_access:aggregate_transfer:single_word_struct_assignment), 3 iterations, agent unbiased
+
+## 2026-09-18
+
+func_841256E0: matched (init_sequence:halfword_entry:constant_biased_byte_base), 2 iterations, agent unbiased
+
+## 2026-09-18
+
+func_84130A74: matched (state_field_access:compound_assignment:signed_global_clamp), 1 iterations, agent unbiased
+
+## 2026-09-18
+
+func_84125484: matched (state_field_access:while:direct-global-index), 1 iterations, agent unbiased
+
+## 2026-09-18
+
+func_84125424: matched (state_field_access:global_while:narrow_parameter), 1 iterations, agent unbiased
+
+## 2026-09-18
+
+func_84128B30: plateau at 0.7143 (raw 0.2857), mismatch operand_or_scheduling_drift; tried families: state_field_access; tie-pool yes
