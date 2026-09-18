@@ -22,6 +22,7 @@ SHN_UNDEF = 0
 SHT_NOBITS = 8
 SHT_SYMTAB = 2
 SHT_REL = 9
+SHT_MIPS_DEBUG = 0x70000005
 
 
 @dataclass
@@ -346,6 +347,27 @@ def build(obj: Elf32Object) -> bytes:
         body.extend(b"\x00" * (target - header_size - len(body)))
         offsets[i] = target
         body.extend(sec.data)
+
+    # IRIX .mdebug stores absolute file offsets in its Symbolic HDRR.  A
+    # function-size transform can move this section even though its own
+    # contents are unchanged; keep those pointers valid for asm-processor's
+    # static-symbol conversion.
+    for i, sec in enumerate(obj.sections):
+        if sec.type != SHT_MIPS_DEBUG or not sec.file_offset or offsets[i] == sec.file_offset:
+            continue
+        shift = offsets[i] - sec.file_offset
+        if len(sec.data) < 0x60:
+            raise ValueError("truncated .mdebug symbolic header")
+        fields = list(struct.unpack(">HH" + "I" * 23, sec.data[:0x60]))
+        max_offset_pairs = ((3, 4), (5, 6), (7, 8), (9, 10), (11, 12),
+                            (13, 14), (15, 16), (17, 18), (19, 20),
+                            (21, 22), (23, 24))
+        for max_index, offset_index in max_offset_pairs:
+            if fields[max_index] and fields[offset_index]:
+                fields[offset_index] += shift
+        relocated = struct.pack(">HH" + "I" * 23, *fields)
+        start = offsets[i] - header_size
+        body[start : start + 0x60] = relocated
 
     align = 4
     pad = (-(header_size + len(body))) % align
