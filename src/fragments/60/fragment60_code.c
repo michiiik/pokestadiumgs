@@ -2,7 +2,23 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/60/fragment60_code/func_86A00020.s")
+extern void GeoCamera_SetPerspective(void *, f32, f32, f32);
+extern f32 __sinf(f32);
+extern f32 __cosf(f32);
+extern void func_80038E14(void *, s32, f32, f32, f32, f32, f32, s32);
+extern f32 D_86A0D4D8;
+extern f32 D_86A0D4DC;
+extern f32 D_86A0D4E0;
+extern f32 D_86A0D4E4;
+extern f32 D_86A0D4E8;
+#pragma REWRITE_FUNCTION_WORD(func_86A00020, 0x74, 0x00002825, 0x24050000)
+s32 func_86A00020(s32 arg0, void *arg1) {
+    s16 pad;
+
+    GeoCamera_SetPerspective(arg1, D_86A0D4E8, 100.0f, 12800.0f);
+    func_80038E14(arg1, 0, (__sinf(D_86A0D4DC) * D_86A0D4D8) + 400.0f + D_86A0D4E0, (__cosf(D_86A0D4DC) * D_86A0D4D8) + D_86A0D4E4, 0.0f, D_86A0D4E0, D_86A0D4E4, 0);
+    return 1;
+}
 #endif
 
 #ifdef VERSION_US
