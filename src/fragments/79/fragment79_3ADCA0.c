@@ -379,10 +379,18 @@ void func_8413FB80(s16 arg0, s16 arg1) {
     void *value = func_8004C990(0x22, 1);
     func_8004D19C(arg0, arg1, (s32)value, 0, 0);
 }
+extern void *D_84190414;
+extern void *D_84190418;
+extern void Gfx_DrawTextureRgba16(s16, s16, s16, s16, u8 *, s16, s32);
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_8413FBC4.s")
+void func_8413FBC4(s16 arg0, s16 arg1, u8 arg2) {
+    void *v0;
+
+    v0 = arg2 ? D_84190418 : D_84190414;
+    Gfx_DrawTextureRgba16(arg0, arg1, 0x20, 0x20, *(u8 **)((u8 *)v0 + 8), *(u16 *)((u8 *)v0 + 4), 0);
+}
 #endif
 
 #ifdef VERSION_US
@@ -503,7 +511,7 @@ void func_84140C8C(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8413FBC4(s16, s16, u8, void *);
+extern void func_8413FBC4(s16, s16, u8);
 void func_84140CFC(void *arg0) {
     u8 temp_v0;
     u8 temp_a2;
@@ -514,8 +522,7 @@ void func_84140CFC(void *arg0) {
         func_8413FBC4(
             (s16)(*(s16 *)((u8 *)arg0 + 0xA) + 2),
             (s16)(*(s16 *)((u8 *)arg0 + 0xC) + 2),
-            temp_a2,
-            arg0);
+            temp_a2);
     }
 }
 #endif
