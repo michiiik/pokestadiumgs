@@ -795,7 +795,18 @@ void func_84126BFC(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84126EDC.s")
+s32 func_84126EDC(u16 arg0) {
+    u8 value;
+
+    value = (((arg0 & 0x3000) >> 10) | ((arg0 & 0x300) >> 8)) + 1;
+    if (value >= 6) {
+        value++;
+        if (value >= 10) {
+            value += 10;
+        }
+    }
+    return value;
+}
 #endif
 
 #ifdef VERSION_US
