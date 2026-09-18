@@ -2540,7 +2540,23 @@ void BattleAnim_Dispatch_114(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_84116A3C.s")
+extern void func_8411FEE8(s32);
+extern void func_841206D0(u8 *);
+void func_84116A3C(u8 *arg0) {
+    if (arg0[0x61A] == 0) {
+        if (ModelAnim_IsFinished((void *)arg0)) {
+            func_8411FEE8(0);
+            func_841206D0(arg0);
+            *(s16 *)(arg0 + 0x7E8) = 0;
+            arg0[0x7F6] = 1;
+        }
+    } else if (arg0[0x61A] == *(s16 *)(arg0 + 0x7E8)) {
+        func_841206D0(arg0);
+        *(s16 *)(arg0 + 0x7E8) = 0;
+        arg0[0x7F6] = 1;
+        func_8411FEE8(0);
+    }
+}
 #endif
 
 #ifdef VERSION_US
