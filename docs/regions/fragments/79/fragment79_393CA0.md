@@ -49,3 +49,11 @@ func_84125424: matched (state_field_access:global_while:narrow_parameter), 1 ite
 ## 2026-09-18
 
 func_84128B30: plateau at 0.7143 (raw 0.2857), mismatch operand_or_scheduling_drift; tried families: state_field_access; tie-pool yes
+
+## 2026-09-18
+
+func_84133B14: plateau at 0.9688 (raw 0.75), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool yes
+
+## 2026-09-18
+
+func_8412F39C: matched (call_sequence:direct-index:all-inline-accesses), 4 iterations, agent codex
