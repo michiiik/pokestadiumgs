@@ -29,3 +29,19 @@ func_8410F78C: matched (call_sequence:global-setup:exact-frame-direct-global), 1
 ## 2026-09-15
 
 func_84110264: time cap at 0.9792 (raw 0.7083) after 2416s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-19
+
+func_84114A04: matched (call_sequence:direct_fields:byte-offset-table), 4 iterations, agent codex
+
+## 2026-09-19
+
+func_8411C9DC: matched (call_sequence:switch:direct_state), 3 iterations, agent codex
+
+## 2026-09-19
+
+func_841139D0: matched (call_sequence:priority_chain:decl-result-before-index), 2 iterations, agent codex
+
+## 2026-09-19
+
+TYPE CONFLICT: func_8411EE74 is extern void func_8411EE74(), not extern void func_8411EE74(u8 *)
