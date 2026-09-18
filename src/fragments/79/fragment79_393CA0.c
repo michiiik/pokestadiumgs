@@ -316,7 +316,14 @@ void func_84125424(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84125484.s")
+extern u8 D_84195198[];
+extern s32 D_841951B8;
+void func_84125484(u8 arg0) {
+    while ((D_841951B8 > 0) && (arg0 != D_84195198[D_841951B8])) {
+        D_841951B8--;
+    }
+    D_841951B8--;
+}
 #endif
 
 #ifdef VERSION_US
