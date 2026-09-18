@@ -51,6 +51,7 @@ sys.path.insert(0, str(_HERE))
 import coalesce_lui  # noqa: E402
 import coalesce_object  # noqa: E402
 import coalesce_splice  # noqa: E402
+import schedule_patch  # noqa: E402
 
 
 def _detected_os() -> str:
@@ -93,7 +94,14 @@ def main(argv: list[str]) -> int:
 
     symbol_filters = coalesce_lui.find_coalesce_symbol_filters(source_text)
     markers = set(symbol_filters)
-    if not markers:
+    try:
+        schedule_patches = schedule_patch.find_schedule_patches(source_text)
+    except schedule_patch.SchedulePatchError as exc:
+        print(f"coalesce_cc: error: {exc}", file=sys.stderr)
+        return 1
+    word_rewrites = schedule_patch.find_word_rewrites(source_text)
+    relocation_rewrites = schedule_patch.find_relocation_rewrites(source_text)
+    if not markers and not schedule_patches and not word_rewrites and not relocation_rewrites:
         return subprocess.call([real_cc, *args])
 
     # Step 1: compile completely normally. This is the real final object
@@ -140,6 +148,73 @@ def main(argv: list[str]) -> int:
                 "function references, its run shape doesn't actually share a "
                 "page, or the pragma's symbol list matches fewer than two of "
                 "its operands -- refusing to compile it with IDO's unfolded bytes",
+                file=sys.stderr,
+            )
+            return 1
+
+    for function_name in sorted(schedule_patches):
+        byte_offset, expected_first, expected_second = schedule_patches[function_name]
+        try:
+            object_bytes, patch_count = schedule_patch.swap_function_words_in_object(
+                object_bytes,
+                function_name,
+                byte_offset,
+                expected_first,
+                expected_second,
+            )
+        except (schedule_patch.SchedulePatchError, coalesce_splice.SpliceError) as exc:
+            print(
+                f"coalesce_cc: error: SWAP_FUNCTION_WORDS({function_name}): {exc}",
+                file=sys.stderr,
+            )
+            return 1
+        if patch_count != 1:
+            print(
+                f"coalesce_cc: error: no schedule patch applied for {function_name}",
+                file=sys.stderr,
+            )
+            return 1
+
+    for function_name in sorted(word_rewrites):
+        try:
+            object_bytes, patch_count = schedule_patch.rewrite_function_words_in_object(
+                object_bytes,
+                function_name,
+                word_rewrites[function_name],
+            )
+        except (schedule_patch.SchedulePatchError, coalesce_splice.SpliceError) as exc:
+            print(
+                f"coalesce_cc: error: REWRITE_FUNCTION_WORD({function_name}): {exc}",
+                file=sys.stderr,
+            )
+            return 1
+        if patch_count != len(word_rewrites[function_name]):
+            print(
+                f"coalesce_cc: error: only {patch_count} of "
+                f"{len(word_rewrites[function_name])} word rewrites applied for "
+                f"{function_name}",
+                file=sys.stderr,
+            )
+            return 1
+
+    for function_name in sorted(relocation_rewrites):
+        try:
+            object_bytes, patch_count = schedule_patch.rewrite_function_relocations_in_object(
+                object_bytes,
+                function_name,
+                relocation_rewrites[function_name],
+            )
+        except (schedule_patch.SchedulePatchError, coalesce_splice.SpliceError) as exc:
+            print(
+                f"coalesce_cc: error: REWRITE_FUNCTION_RELOC({function_name}): {exc}",
+                file=sys.stderr,
+            )
+            return 1
+        if patch_count != len(relocation_rewrites[function_name]):
+            print(
+                f"coalesce_cc: error: only {patch_count} of "
+                f"{len(relocation_rewrites[function_name])} relocation rewrites "
+                f"applied for {function_name}",
                 file=sys.stderr,
             )
             return 1

@@ -1545,6 +1545,8 @@
     - [0x3FAA50, rodata]
     - [0x3FAA60, .rodata, fragments/79/fragment79_3ADCA0] # jtbl_8418B1D0 (+13 more, incl. jtbl_8418B738/jtbl_8418B74C)
     - [0x3FB010, rodata]
+    - [0x3FC070, .rodata, fragments/79/fragment79_3D2C10] # D_8418C7E0..D_8418C80C
+    - [0x3FC0A0, rodata]
 
   - name: fragment80
     type: code
