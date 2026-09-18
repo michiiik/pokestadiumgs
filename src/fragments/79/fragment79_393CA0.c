@@ -306,11 +306,24 @@ void func_841253F4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84125424.s")
+extern u8 D_84195198[];
+extern s32 D_841951B8;
+void func_84125424(u8 arg0) {
+    while ((D_84195198[D_841951B8] != 0xFF) && (D_84195198[D_841951B8] != arg0)) {
+        D_841951B8++;
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84125484.s")
+extern u8 D_84195198[];
+extern s32 D_841951B8;
+void func_84125484(u8 arg0) {
+    while ((D_841951B8 > 0) && (arg0 != D_84195198[D_841951B8])) {
+        D_841951B8--;
+    }
+    D_841951B8--;
+}
 #endif
 
 #ifdef VERSION_US
@@ -376,7 +389,16 @@ void func_84125650(u8 *arg0, u8 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841256E0.s")
+extern void func_84125508(u8 *arg0, u16 arg1, u8 arg2);
+extern u8 * D_84195208[];
+void func_841256E0(u8 arg0, u8 arg1) {
+    u8 *base;
+    u16 *entry;
+
+    base = D_84195208[arg0];
+    entry = (u16 *)base + arg1;
+    func_84125508((u8 *)(entry + 0x1E), entry[0x19], (base + 0x1E)[arg1]);
+}
 #endif
 
 #ifdef VERSION_US
@@ -667,7 +689,16 @@ s32 func_841267B4(u8 arg0, u8 arg1) { struct Record { u8 pad[0x26]; u16 b; u16 a
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84126850.s")
+extern u8 * D_84195200[];
+u16 func_84126850(u8 arg0, u16 arg1) {
+    u8 *ptr = D_84195200[arg0];
+
+    if (*(u16 *)(ptr + 0x28) < *(u16 *)(ptr + 0x26) + arg1) {
+        arg1 = *(u16 *)(ptr + 0x28) - *(u16 *)(ptr + 0x26);
+    }
+    *(u16 *)(ptr + 0x26) += arg1;
+    return arg1;
+}
 #endif
 
 #ifdef VERSION_US
@@ -764,7 +795,18 @@ void func_84126BFC(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84126EDC.s")
+s32 func_84126EDC(u16 arg0) {
+    u8 value;
+
+    value = (((arg0 & 0x3000) >> 10) | ((arg0 & 0x300) >> 8)) + 1;
+    if (value >= 6) {
+        value++;
+        if (value >= 10) {
+            value += 10;
+        }
+    }
+    return value;
+}
 #endif
 
 #ifdef VERSION_US
@@ -938,7 +980,7 @@ extern u8 D_841951BC;
 extern u8 D_841951BD;
 extern s32 D_841951C8;
 extern u8 *D_84195208[];
-extern void func_84125424(s32);
+extern void func_84125424(u8);
 void func_841288DC(void) {
     u8 *temp_v0;
 
@@ -1518,7 +1560,7 @@ void BattleAnim_Table_84185F10_023(void) {
 #ifdef VERSION_US
 extern u8 D_841951BC;
 extern u8 *D_84195208[];
-extern void func_84125424(s32);
+extern void func_84125424(u8);
 void BattleAnim_Table_84185F10_026(void) {
     u8 *rec = D_84195208[D_841951BC];
     if (rec[0xF] & 0x10) {
@@ -1556,7 +1598,7 @@ void BattleAnim_Table_84185F10_028(void) {
 
 #ifdef VERSION_US
 extern s32 func_84125080();
-extern void func_84125424(s32);
+extern void func_84125424(u8);
 extern u8 D_841951BC;
 extern void * D_841951F8[];
 extern u8 * D_84195208[];
@@ -1960,7 +2002,7 @@ void BattleAnim_Table_84185FDC_006(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_84125424(s32);
+extern void func_84125424(u8);
 void BattleAnim_Table_84185FDC_007(void) {
     u8 *temp_v0;
 
@@ -2594,7 +2636,15 @@ void BattleAnim_Table_84186004_064(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84130A74.s")
+extern u8 D_841951BC;
+extern s32 D_841951C8;
+extern u8 * D_84195208[];
+void func_84130A74(void) {
+    D_841951C8 *= D_84195208[D_841951BC][0x1D] + 1;
+    if (D_841951C8 >= 0x10000) {
+        D_841951C8 = 0xFFFF;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -3442,7 +3492,17 @@ void func_841350AC(u8 arg0, u8 arg1, u8 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841351EC.s")
+extern u8 * D_84195200[];
+extern u8 * D_84195208[];
+void func_841351EC(void *arg0, u8 arg1) {
+    struct WordCopy { s32 value; };
+    u8 *dst;
+
+    dst = (u8 *)arg0 + arg1 * 0x10;
+    *(u16 *)(dst + 0xC) = *(u16 *)(D_84195208[arg1] + 0x2C);
+    *(u16 *)(dst + 0x14) = *(u16 *)(D_84195200[arg1] + 0x16);
+    *(struct WordCopy *)(dst + 0x18) = *(struct WordCopy *)(D_84195208[arg1] + 0x50);
+}
 #endif
 
 #ifdef VERSION_US
