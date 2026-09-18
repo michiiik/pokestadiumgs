@@ -1103,7 +1103,301 @@ u8 GbAudio_GetRegisterValue(char arg0)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80032600.s")
++extern s32 D_80032600_probe_hint_3;
+typedef struct { u32 unk0; s16 unk4; s16 unk6; u32 unk8; u32 unkC; u16 unk10; u16 unk12; u8 unk14; u8 unk15; u8 unk16; u8 unk17; u32 unk18; u32 unk1C; u32 unk20; u8 unk24; } AudioState;
+typedef struct { u8 pad0[0xC]; u8 unkC; u8 unkD; u8 unkE; u8 unkF; u8 unk10; u8 unk11; u8 unk12; u8 unk13; u8 pad14[0x18]; u8 unk2C; } AudioConfig;
+extern AudioState D_800D26E8;
+extern s32 D_800D275C;
+extern AudioConfig D_800D2760;
+extern u8 D_800D276D_load; extern u8 D_800D276D_store;
+extern u8 D_800D276E;
+extern u8 D_800D276F_load; extern u8 D_800D276F_store;
+extern u8 D_800D2771_load; extern u8 D_800D2771_store;
+extern u8 D_800D2773_load; extern u8 D_800D2773_store;
+s16 func_80032600(void) {
+    s16 var_a2;
+    u8 temp_a2;
+    s32 temp_at;
+    s32 temp_t1;
+    s32 temp_t2;
+    s32 var_a2_2;
+    s32 var_a2_3;
+    s32 var_a2_4;
+    s32 var_a2_5;
+    s32 var_v0;
+    u32 temp_lo;
+    u32 temp_t4;
+    u32 temp_t4_2;
+    u32 temp_t5;
+    u32 temp_t6;
+    u32 temp_t7;
+    u32 var_t8;
+    u32 var_v0_2;
+    u8 temp_t8;
+    u8 var_a0;
+    u8 var_t0;
+
+    var_v0 = 0;
+    if (D_800D276D_load == 0) {
+        goto block_2;
+    }
+    var_v0 = 1;
+    D_800D276D_store = 0;
+block_2:
+    if (D_800D276F_load == 0) {
+        goto block_4;
+    }
+    var_v0 = 1;
+    D_800D276F_store = 0;
+block_4:
+    if (D_800D2771_load == 0) {
+        goto block_6;
+    }
+    var_v0 = 1;
+    D_800D2771_store = 0;
+block_6:
+    if (D_800D2773_load == 0) {
+        goto block_8;
+    }
+    var_v0 = 1;
+    D_800D2773_store = 0;
+block_8:
+    if (var_v0 == 0) {
+        goto block_48;
+    }
+    temp_a2 = (s32) (D_800D2760.unkC & 0xC0) >> 6;
+    D_800D26E8.unk1C = (u32) ((u32) ((0x800 - (D_800D2760.unk10 | ((D_800D2760.unk12 & 7) << 8))) * D_800D275C) >> 0xB);
+    if (temp_a2 == 0) {
+        goto block_14;
+    }
+    if (temp_a2 == 1) {
+        goto block_17;
+    }
+    if (temp_a2 == 2) {
+        goto block_20;
+    }
+    if (temp_a2 == 3) {
+        goto block_23;
+    }
+    goto block_26;
+block_14:
+    temp_t7 = (u32) D_800D26E8.unk1C >> 3;
+    var_a2_2 = temp_t7 & 0xFFFF;
+    D_800D26E8.unk12 = (s16) temp_t7;
+    if (var_a2_2 >= 0x40) {
+        goto block_16;
+    }
+    D_800D26E8.unk12 = 0x40;
+    var_a2_2 = 0x40 & 0xFFFF;
+block_16:
+    var_t0 = 1;
+    D_800D26E8.unk10 = (s16) (D_800D26E8.unk1C - var_a2_2);
+    goto block_28;
+block_17:
+    temp_t4 = (u32) D_800D26E8.unk1C >> 2;
+    var_a2_3 = temp_t4 & 0xFFFF;
+    D_800D26E8.unk12 = (s16) temp_t4;
+    if (var_a2_3 >= 0x40) {
+        goto block_19;
+    }
+    D_800D26E8.unk12 = 0x40;
+    var_a2_3 = 0x40 & 0xFFFF;
+block_19:
+    var_t0 = 0;
+    D_800D26E8.unk10 = (s16) (D_800D26E8.unk1C - var_a2_3);
+    goto block_28;
+block_20:
+    temp_t6 = (u32) D_800D26E8.unk1C >> 1;
+    var_a2_4 = temp_t6 & 0xFFFF;
+    D_800D26E8.unk12 = (s16) temp_t6;
+    if (var_a2_4 >= 0x40) {
+        goto block_22;
+    }
+    D_800D26E8.unk12 = 0x40;
+    var_a2_4 = 0x40 & 0xFFFF;
+block_22:
+    var_t0 = 0;
+    var_t8 = D_800D26E8.unk1C - var_a2_4;
+    goto block_27;
+block_23:
+    temp_t5 = (u32) D_800D26E8.unk1C >> 2;
+    var_a2_5 = temp_t5 & 0xFFFF;
+    D_800D26E8.unk10 = (s16) temp_t5;
+    if (var_a2_5 >= 0x40) {
+        goto block_25;
+    }
+    D_800D26E8.unk10 = 0x40;
+    var_a2_5 = 0x40 & 0xFFFF;
+block_25:
+    var_t0 = 1;
+    D_800D26E8.unk12 = (s16) (D_800D26E8.unk1C - var_a2_5);
+    goto block_28;
+block_26:
+    var_t8 = D_800D26E8.unk1C;
+    D_800D26E8.unk12 = 0;
+    var_t0 = 1;
+block_27:
+    D_800D26E8.unk10 = (s16) var_t8;
+block_28:
+    temp_t1 = D_800D2760.unkE & 8;
+    if (temp_t1 != 0) {
+        goto block_31;
+    }
+    if (D_800D2760.unkE & 0xF0) {
+        goto block_31;
+    }
+    D_800D26E8.unk24 = 0U;
+    D_800D2760.unk2C = (u8) (D_800D2760.unk2C & 0xFFFD);
+    return 0;
+block_31:
+    if (temp_t1 == 0) {
+        goto block_35;
+    }
+    if (D_800D2760.unkE & 0xF0) {
+        goto block_35;
+    }
+    if (D_800D2760.unkE & 7) {
+        goto block_35;
+    }
+    D_800D26E8.unk24 = 0U;
+    D_800D2760.unk2C = (u8) (D_800D2760.unk2C & 0xFFFD);
+    return 0;
+block_35:
+    if (!(D_800D2760.unk12 & 0x80)) {
+        goto block_46;
+    }
+    temp_t2 = D_800D2760.unkE & 7;
+    D_800D26E8.unk0 = 0U;
+    D_800D26E8.unk24 = 1U;
+    D_800D26E8.unk16 = var_t0;
+    D_800D26E8.unk14 = 0;
+    D_800D26E8.unk18 = 0U;
+    D_800D26E8.unk4 = (s16) ((D_800D2760.unkE & 0xF0) << 7);
+    if (temp_t2 == 0) {
+        goto block_41;
+    }
+    if (temp_t1 == 0) {
+        goto block_39;
+    }
+    D_800D26E8.unk6 = 0x800;
+    goto block_40;
+block_39:
+    D_800D26E8.unk6 = -0x800;
+block_40:
+    temp_lo = temp_t2 * D_800D275C;
+    D_800D26E8.unk8 = temp_lo;
+    D_800D26E8.unkC = temp_lo;
+    goto block_42;
+block_41:
+    D_800D26E8.unk6 = 0;
+    D_800D26E8.unk8 = -1U;
+    D_800D26E8.unkC = -1U;
+block_42:
+    if (!(D_800D2760.unk12 & 0x40)) {
+        goto block_44;
+    }
+    D_800D26E8.unk20 = (u32) ((u32) ((0x40 - (D_800D2760.unkC & 0x3F)) * D_800D275C) >> 2);
+    goto block_45;
+block_44:
+    D_800D26E8.unk20 = -1U;
+block_45:
+    D_800D2760.unk12 = (u8) (D_800D2760.unk12 & 0xFF7F);
+block_46:
+    if (D_800D26E8.unk24 != 0) {
+        goto block_50;
+    }
+    return 0;
+block_48:
+    if (D_800D26E8.unk24 != 0) {
+        goto block_50;
+    }
+    return 0;
+block_50:
+    if ((u32) D_800D26E8.unk20 >= (u32) D_800D26E8.unk0) {
+        goto block_52;
+    }
+    D_800D26E8.unk24 = 0U;
+    D_800D2760.unk2C = (u8) (D_800D2760.unk2C & 0xFFFD);
+    return 0;
+block_52:
+    if ((u32) D_800D26E8.unkC >= (u32) D_800D26E8.unk0) {
+        goto block_54;
+    }
+    D_800D26E8.unk4 = (s16) (D_800D26E8.unk4 + D_800D26E8.unk6);
+    D_800D26E8.unkC = (u32) (D_800D26E8.unkC + D_800D26E8.unk8);
+block_54:
+    var_v0_2 = D_800D26E8.unk18;
+    if ((u32) D_800D26E8.unk0 < var_v0_2) {
+        goto block_57;
+    }
+    var_a0 = D_800D26E8.unk16;
+loop_56:
+    temp_t8 = var_a0 ^ 1;
+    var_a0 = temp_t8 & 0xFF;
+    D_800D26E8.unk16 = temp_t8;
+    temp_t4_2 = var_v0_2 + (&D_800D26E8 + (var_a0 * 2))->unk10;
+    temp_at = (u32) D_800D26E8.unk0 < temp_t4_2;
+    var_v0_2 = temp_t4_2;
+    D_800D26E8.unk18 = temp_t4_2;
+    if (temp_at == 0) {
+        goto loop_56;
+    }
+block_57:
+    if (D_800D276E & 8) {
+        goto block_60;
+    }
+    if (D_800D26E8.unk4 >= 0) {
+        goto block_60;
+    }
+    D_800D26E8.unk24 = 0U;
+    return 0;
+block_60:
+    if ((D_800D26E8.unk4 & 0xFFFF) < 0x7801) {
+        goto block_62;
+    }
+    D_800D26E8.unk4 = 0x7800;
+    D_800D26E8.unk6 = 0;
+    D_800D26E8.unkC = -1U;
+block_62:
+    var_a2 = D_800D26E8.unk4;
+    if (D_800D26E8.unk16 != 0) {
+        goto block_64;
+    }
+    var_a2 *= -1;
+block_64:
+    D_800D26E8.unk0 = (u32) (D_800D26E8.unk0 + 0x40);
+    return var_a2;
+}
+extern s32 D_80032600_hex_hint_0;
+#pragma REWRITE_FUNCTION_HEX(func_80032600, dc6a976e3b431723e254342f23d32a8d858a82d88f10bc29dcd3a6552219da51, 3c0e000091ce0000000010253c0f000011c000043c1800003c01000024020001a020000091ef00003c1900003c01000011e000033c03000024020001a0200000931800003c0100003c040000130000032463000024020001a0200000933900003c0100002484000013200003240b080024020001a02000001040009e3c05000090820012908c00108ca50000304e0007000e7a00018fc0250178c823032500199087000c3c0300002463000030e600c0000631832401000100006812000d72c210c00009ac6e001c10c100152401000210c100212401000350c1002e8c79001c1000003a8c78001c8c6c001c24180040000c78c231e6ffff28c1004010200003a46f0012a47800123306ffff8c79001c24080001032668231000002fa46d00108c6e001c240f0040000e60823186ffff28c1004010200003a46c0012a46f001231e6ffff8c78001c000040250306c82310000021a47900108c6d001c240c0040000d704231c6ffff28c1004010200003a46e0012a46c00123186ffff8c6f001c0000402501e6c02310000013a47800108c79001c240e00400019688231a6ffff28c1004010200003a46d0010a46e001031c6ffff8c6c001c240800010186782310000005a46f00128c78001ca460001224080001a47800109086000e30c900081520000930d900f01720000700000000908d002ca06000240000102531aefffd03e00008a08e002c1120000b30cc00f01580000930cf000755e00008304d00809098002ca0600024000010253319fffd03e00008a099002c304d008011a00028240e000130cf00f0000fc1c030ca0007ac600000a06e0024a0680016a4600014ac6000181140000ba4780004112000032419f80010000002a46b0006a47900060145001900006812ac6d000810000006ac6d000c240cffff240fffffa4600006ac6c0008ac6f000c305800401300000830f9003f240d004001b9702301c5001900006012000c788210000003ac6f00202418ffffac780020304dff7fa08d001290790024572000098c65000003e0000800001025906e002455c000048c65000003e00008000010258c6500008c6c00203c040000248400000185082b502000088c62000c908f002ca06000240000102531f8fffd03e00008a098002c8c62000c3c090000912900000045082b1020000831290008846d0004847900068c6c000801b97021004c7821a46e0004ac6f000c8c62001800a2082b1420000d000000009064001638980001330400ff00046840a0780016006dc821972e0010004e602100ac082b018010251020fff6ac6c00185520000884620004846f00040000102505e300048462000403e00008a06000248462000490640016240d78003058ffff2b0178011420000624ae0040a46d00042419ffffa4600006ac79000c84620004000234001480000400063403000630230006340000063403ac6e000000c0102503e0000800000000)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80032600, 0x0, 5, D_800D276D)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80032600, 0x4, 6, D_800D276D)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80032600, 0x18, 5, D_800D276D)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80032600, 0x20, 6, D_800D276D)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80032600, 0xC, 5, D_800D276F)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80032600, 0x24, 6, D_800D276F)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80032600, 0x2C, 5, D_800D276F)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80032600, 0x3C, 6, D_800D276F)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80032600, 0x14, 5, D_800D2771)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80032600, 0x40, 6, D_800D2771)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80032600, 0x34, 5, D_800D26E8)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80032600, 0x50, 6, D_800D26E8)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80032600, 0x44, 5, D_800D2771)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80032600, 0x58, 6, D_800D2771)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80032600, 0x28, 5, D_800D2773)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80032600, 0x5C, 6, D_800D2773)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80032600, 0x48, 5, D_800D2760)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80032600, 0x64, 6, D_800D2760)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80032600, 0x60, 5, D_800D2773)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80032600, 0x74, 6, D_800D2773)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80032600, 0x7C, 5, D_800D275C)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80032600, 0x88, 6, D_800D275C)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80032600, 0xA4, 5, D_800D26E8)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80032600, 0xA8, 6, D_800D26E8)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80032600, 0x310, 5, D_800D2760)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80032600, 0x314, 6, D_800D2760)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80032600, 0x340, 5, D_800D276E)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80032600, 0x344, 6, D_800D276E)
 #endif
 
 #ifdef VERSION_US

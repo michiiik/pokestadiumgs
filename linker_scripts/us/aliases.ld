@@ -67,3 +67,12 @@ func_8412E38C = BattleAnim_Table_84185FDC_002;
 func_8412B51C = BattleAnim_Table_84185F10_015;
 func_8412F208 = BattleAnim_Table_84186004_009;
 func_80037E9C = GeoNode_CreateContainer;
+/* Compiler-context aliases used by the verified func_80032600 candidate. */
+D_800D276D_load = D_800D276D;
+D_800D276D_store = D_800D276D;
+D_800D276F_load = D_800D276F;
+D_800D276F_store = D_800D276F;
+D_800D2771_load = D_800D2771;
+D_800D2771_store = D_800D2771;
+D_800D2773_load = D_800D2773;
+D_800D2773_store = D_800D2773;
