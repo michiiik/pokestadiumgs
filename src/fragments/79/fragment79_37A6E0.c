@@ -2564,7 +2564,22 @@ void func_84116A3C(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_84116B40.s")
+extern void func_8411FEE8(s32);
+extern u8 D_841911F8;
+extern u8 * D_84193DD0;
+void func_84116B40(u8 *arg0, s16 arg1) {
+    arg0[0x61A] = arg1;
+    if (D_84193DD0[9] & 0x10) {
+        if (arg0[0x61A] - arg0[0x620] < 40) {
+            arg0[0x61A] += 40 - (arg0[0x61A] - arg0[0x620]);
+        }
+    }
+    if (*(s8 *)(arg0 + 0x619) <= 0) {
+        *(s16 *)(arg0 + 0x7E8) = *(s8 *)(arg0 + 0x619) - 1;
+    }
+    func_8411FEE8(0x258);
+    D_841911F8 = 0;
+}
 #endif
 
 #ifdef VERSION_US
