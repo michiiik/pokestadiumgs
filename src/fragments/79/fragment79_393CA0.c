@@ -689,7 +689,16 @@ s32 func_841267B4(u8 arg0, u8 arg1) { struct Record { u8 pad[0x26]; u16 b; u16 a
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84126850.s")
+extern u8 * D_84195200[];
+u16 func_84126850(u8 arg0, u16 arg1) {
+    u8 *ptr = D_84195200[arg0];
+
+    if (*(u16 *)(ptr + 0x28) < *(u16 *)(ptr + 0x26) + arg1) {
+        arg1 = *(u16 *)(ptr + 0x28) - *(u16 *)(ptr + 0x26);
+    }
+    *(u16 *)(ptr + 0x26) += arg1;
+    return arg1;
+}
 #endif
 
 #ifdef VERSION_US
