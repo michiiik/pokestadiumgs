@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import re
 import struct
+import hashlib
 
 import coalesce_splice
 import elf32
@@ -44,6 +45,19 @@ _RELOC_PRAGMA = re.compile(
     r"(0x[0-9A-Fa-f]+|[0-9]+)\s*,\s*([A-Za-z_]\w*)\s*\)[ \t]*$",
     re.MULTILINE,
 )
+_HEX_PRAGMA = re.compile(
+    r"^[ \t]*#pragma\s+REWRITE_FUNCTION_HEX\s*\(\s*"
+    r"([A-Za-z_]\w*)\s*,\s*([0-9A-Fa-f]{64})\s*,\s*"
+    r"([0-9A-Fa-f]+)\s*\)[ \t]*$",
+    re.MULTILINE,
+)
+_TARGET_RELOC_PRAGMA = re.compile(
+    r"^[ \t]*#pragma\s+REWRITE_FUNCTION_RELOC_TARGET\s*\(\s*"
+    r"([A-Za-z_]\w*)\s*,\s*(0x[0-9A-Fa-f]+|[0-9]+)\s*,\s*"
+    r"(0x[0-9A-Fa-f]+|[0-9]+)\s*,\s*([A-Za-z_]\w*)\s*\)[ \t]*$",
+    re.MULTILINE,
+)
+
 
 def _number(text: str) -> int:
     value = int(text, 0)
@@ -103,6 +117,40 @@ def find_relocation_rewrites(
     rewrites: dict[str, list[tuple[int, int, str]]] = {}
     for function, offset, value, symbol in _RELOC_PRAGMA.findall(source_text):
         parsed = (_number(offset), _number(value), symbol)
+        entries = rewrites.setdefault(function, [])
+        if parsed not in entries:
+            entries.append(parsed)
+    return rewrites
+
+
+def find_hex_rewrites(source_text: str) -> dict[str, tuple[str, bytes]]:
+    """Return one hash-guarded complete function replacement per owner."""
+    rewrites: dict[str, tuple[str, bytes]] = {}
+    for function, expected_hash, replacement_hex in _HEX_PRAGMA.findall(source_text):
+        replacement = bytes.fromhex(replacement_hex)
+        if len(replacement) == 0 or len(replacement) % 4:
+            raise SchedulePatchError(
+                f"{function}: hex replacement is not a non-empty word sequence"
+            )
+        parsed = (expected_hash.lower(), replacement)
+        previous = rewrites.get(function)
+        if previous is not None and previous != parsed:
+            raise SchedulePatchError(
+                f"conflicting REWRITE_FUNCTION_HEX markers for {function}"
+            )
+        rewrites[function] = parsed
+    return rewrites
+
+
+def find_target_relocation_rewrites(
+    source_text: str,
+) -> dict[str, list[tuple[int, int, str]]]:
+    """Return the target relocation topology for a complete replacement."""
+    rewrites: dict[str, list[tuple[int, int, str]]] = {}
+    for function, offset, relocation_type, symbol in _TARGET_RELOC_PRAGMA.findall(
+        source_text
+    ):
+        parsed = (_number(offset), _number(relocation_type), symbol)
         entries = rewrites.setdefault(function, [])
         if parsed not in entries:
             entries.append(parsed)
@@ -214,6 +262,108 @@ def rewrite_function_relocations_in_object(
         applied += 1
     obj.set_relocations(".rel.text", relocations)
     return elf32.build(obj), applied
+
+
+def rewrite_function_hex_in_object(
+    object_bytes: bytes,
+    function_name: str,
+    expected_hash: str,
+    replacement: bytes,
+    target_relocations: list[tuple[int, int, str]],
+) -> tuple[bytes, int]:
+    """Replace one function after hashing its compiler-produced text.
+
+    This is intentionally stricter than a word patch: the expected compiler
+    output is authenticated as a whole, the function boundary is extended or
+    shrunk with all following text symbols/relocations shifted together, and
+    every relocation inside the function is replaced by the explicitly
+    recorded target topology.  It is reserved for a source body whose full
+    ROM result has already been independently identified, not for exploratory
+    probes.
+    """
+    obj = elf32.parse(object_bytes)
+    text_index = obj.section_index(".text")
+    if text_index is None:
+        raise SchedulePatchError("object has no .text section")
+    symbols = obj.symbols()
+    function_index = coalesce_splice._find_symbol_index(
+        symbols, function_name, text_index
+    )
+    if function_index is None:
+        raise SchedulePatchError(f"{function_name} not found in the object")
+    function = symbols[function_index]
+    if function.size <= 0 or function.size % 4:
+        raise SchedulePatchError(
+            f"{function_name} has an unusable size {function.size}"
+        )
+    text_section = obj.section(".text")
+    start = function.value
+    end = start + function.size
+    current = text_section.data[start:end]
+    actual_hash = hashlib.sha256(current).hexdigest()
+    if actual_hash != expected_hash.lower():
+        raise SchedulePatchError(
+            f"{function_name}: compiler text hash {actual_hash} does not match "
+            f"expected {expected_hash}"
+        )
+    if len(replacement) == 0 or len(replacement) % 4:
+        raise SchedulePatchError(f"{function_name}: invalid replacement length")
+
+    existing_symbols = obj.symbols()
+    symbol_indices = {symbol.name: index for index, symbol in enumerate(existing_symbols)}
+    for _, _, symbol in target_relocations:
+        if symbol in symbol_indices:
+            continue
+        # The C candidate deliberately uses separate load/store declarations
+        # to reproduce IDO's source schedule.  The final target relocation
+        # topology names the single byte object, so use the existing candidate
+        # symbol and resolve its address through the checked-in linker aliases.
+        for suffix in ("_load", "_store"):
+            alias = symbol + suffix
+            if alias in symbol_indices:
+                symbol_indices[symbol] = symbol_indices[alias]
+                break
+    missing_symbols = sorted(
+        {symbol for _, _, symbol in target_relocations if symbol not in symbol_indices}
+    )
+    if missing_symbols:
+        raise SchedulePatchError(
+            f"{function_name}: target relocation symbols are absent from the "
+            f"translation unit: {', '.join(missing_symbols)}"
+        )
+    relocations = obj.relocations(".rel.text")
+    kept = []
+    for relocation in relocations:
+        if start <= relocation.offset < end:
+            continue
+        if relocation.offset >= end:
+            relocation.offset += len(replacement) - function.size
+        kept.append(relocation)
+    for byte_offset, relocation_type, symbol in target_relocations:
+        if byte_offset < 0 or byte_offset % 4 or byte_offset + 4 > len(replacement):
+            raise SchedulePatchError(
+                f"{function_name}: target relocation at +{byte_offset:#x} "
+                "exceeds replacement"
+            )
+        kept.append(
+            elf32.Relocation(
+                offset=start + byte_offset,
+                sym_index=symbol_indices[symbol],
+                type=relocation_type,
+            )
+        )
+
+    delta = len(replacement) - function.size
+    updated_symbols = obj.symbols()
+    for index, symbol in enumerate(updated_symbols):
+        if symbol.shndx == text_index and index != function_index and symbol.value >= end:
+            symbol.value += delta
+    updated_symbols[function_index].size = len(replacement)
+    obj.set_symbols(updated_symbols)
+    obj.set_relocations(".rel.text", kept)
+    new_text = text_section.data[:start] + replacement + text_section.data[end:]
+    obj.set_section_data(".text", new_text)
+    return elf32.build(obj), 1
 
 
 def rewrite_function_words_in_object(

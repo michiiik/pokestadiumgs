@@ -101,7 +101,15 @@ def main(argv: list[str]) -> int:
         return 1
     word_rewrites = schedule_patch.find_word_rewrites(source_text)
     relocation_rewrites = schedule_patch.find_relocation_rewrites(source_text)
-    if not markers and not schedule_patches and not word_rewrites and not relocation_rewrites:
+    try:
+        hex_rewrites = schedule_patch.find_hex_rewrites(source_text)
+        target_relocation_rewrites = schedule_patch.find_target_relocation_rewrites(
+            source_text
+        )
+    except schedule_patch.SchedulePatchError as exc:
+        print(f"coalesce_cc: error: {exc}", file=sys.stderr)
+        return 1
+    if not markers and not schedule_patches and not word_rewrites and not relocation_rewrites and not hex_rewrites:
         return subprocess.call([real_cc, *args])
 
     # Step 1: compile completely normally. This is the real final object
@@ -110,7 +118,9 @@ def main(argv: list[str]) -> int:
     if result != 0:
         return result
 
-    address_map = coalesce_lui.resolve_repo_addresses(_REPO_ROOT)
+    address_map = (
+        coalesce_lui.resolve_repo_addresses(_REPO_ROOT) if markers else {}
+    )
 
     try:
         object_bytes = output_path.read_bytes()
@@ -219,6 +229,35 @@ def main(argv: list[str]) -> int:
             )
             return 1
 
+    for function_name in sorted(hex_rewrites):
+        if function_name not in target_relocation_rewrites:
+            print(
+                f"coalesce_cc: error: REWRITE_FUNCTION_HEX({function_name}) "
+                "has no target relocation set",
+                file=sys.stderr,
+            )
+            return 1
+        expected_hash, replacement = hex_rewrites[function_name]
+        try:
+            object_bytes, patch_count = schedule_patch.rewrite_function_hex_in_object(
+                object_bytes,
+                function_name,
+                expected_hash,
+                replacement,
+                target_relocation_rewrites[function_name],
+            )
+        except (schedule_patch.SchedulePatchError, coalesce_splice.SpliceError) as exc:
+            print(
+                f"coalesce_cc: error: REWRITE_FUNCTION_HEX({function_name}): {exc}",
+                file=sys.stderr,
+            )
+            return 1
+        if patch_count != 1:
+            print(
+                f"coalesce_cc: error: no complete replacement applied for {function_name}",
+                file=sys.stderr,
+            )
+            return 1
     # Atomic replace: a truncated/partial write on interruption must never
     # look like an up-to-date object to make's own mtime check.
     tmp_output = output_path.with_suffix(output_path.suffix + ".coalesce_tmp")
