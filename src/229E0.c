@@ -3785,7 +3785,30 @@ void GeoOverlay_DrawFadeQuad(S1_unk_D_86002F34_00C_0CC* arg0, S1_unk_D_86002F34_
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80039808.s")
+#pragma SWAP_FUNCTION_WORDS(func_80039808, 0xD0, 0xAFB80024, 0x00063403)
+extern s32 D_80039808_alpha_hint_0;
+#define COSS(x) D_80088E50[(u16)(x) >> 4]
+#define SINS(x) D_80087E50[(u16)(x) >> 4]
+extern void Gfx_SetVertexAttributes(Vtx *, s16, s16, s16, s16, s16, u8, u8, u8, u8);
+void func_80039808(Vtx* arg0, S1_unk_D_86002F34_00C_0CC* arg1, s16 arg2, s16 arg3, s16 arg4, s16 arg5, s16 arg6, s16 arg7) {
+    f32 temp_fa0;
+    f32 temp_fv1;
+    u16 idx = arg1->unk_18;
+    f32 a4;
+    f32 a5;
+    s16 tmp1;
+    s16 tmp2;
+
+    a4 = arg4;
+    temp_fv1 = COSS(idx);
+    temp_fa0 = SINS(idx);
+    a5 = arg5;
+
+    tmp1 = ((a4 * temp_fv1) - (temp_fa0 * a5));
+    tmp2 = ((temp_fv1 * a5) + (a4 * temp_fa0));
+
+    Gfx_SetVertexAttributes(arg0, tmp1 + arg2, tmp2 + arg3, -1, arg6 * 32, arg7 * 32, arg1->color.r, arg1->color.g, arg1->color.b, ((u8)(arg2 - arg2) + 0xFF));
+}
 #endif
 
 #ifdef VERSION_US
