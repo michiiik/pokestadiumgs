@@ -57,3 +57,23 @@ func_84133B14: plateau at 0.9688 (raw 0.75), mismatch operand_or_scheduling_drif
 ## 2026-09-18
 
 func_8412F39C: matched (call_sequence:direct-index:all-inline-accesses), 4 iterations, agent codex
+
+## 2026-09-19
+
+func_8412BB9C: matched (call_sequence:direct-index:u8-cast-u16-store), 4 iterations, agent codex
+
+## 2026-09-19
+
+TYPE CONFLICT: D_841951BF is extern u8 D_841951BF, not extern u8 D_841951E6, D_841951BF
+
+## 2026-09-19
+
+func_841383B4: matched (call_sequence:direct_global:exact_probe_match), 5 iterations, agent codex
+
+## 2026-09-19
+
+TYPE CONFLICT: D_84195278 is extern u8 D_8418615C, D_84195278, not extern u8 D_84195278
+
+## 2026-09-19
+
+TYPE CONFLICT: D_8418615C is extern u8 D_8418615C, not extern u8 D_8418615C, D_8419A006, D_8419A007, D_84199D82
