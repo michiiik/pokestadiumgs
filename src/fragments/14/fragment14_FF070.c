@@ -660,6 +660,9 @@ void func_8130B320(void *arg0, void *arg1, s32 arg2, s32 arg3) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130B4E8.s")
 
 extern s32 func_8130B1F4(u8 *arg0);
+extern f32 func_8130AAA8(void *, f32, f32);
+extern void func_8160B5BC(void *, s16 *);
+extern void func_8130EB04(void *, s32, void *, s32, s32, s16 *, s16 *, s32);
 s32 func_8130B620(void *arg0, s32 arg1)
 {
     struct AddressRecord8130B620 {
