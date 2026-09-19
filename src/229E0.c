@@ -1855,7 +1855,16 @@ void func_80034A08(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80034A50.s")
+extern u8 D_800D2B9C[];
+extern u8 * func_80034DA0(void);
+void func_80034A50(u8 arg0) {
+    u8 *table;
+    u8 offset;
+
+    table = func_80034DA0();
+    offset = arg0 & 3;
+    D_800D2B9C[arg0 * 0x3C] = *(offset + table);
+}
 #endif
 
 #ifdef VERSION_US
