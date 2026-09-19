@@ -723,7 +723,27 @@ void GalleryCamera_RotateVecByMatrix(S1_Vec3f* arg0, S1_MtxF* arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84122EEC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84123034.s")
+extern f32 D_84193F90;
+extern f32 D_84193F98;
+extern f32 D_84193F9C;
+void func_84123034(u8 *arg0) {
+    *(f32 *)(arg0 + 0x5F0) *= D_84193F90;
+    *(f32 *)(arg0 + 0x5F8) *= D_84193F90;
+    *(f32 *)(arg0 + 0x5E4) *= D_84193F9C;
+    *(f32 *)(arg0 + 0x5E8) *= D_84193F9C;
+    *(f32 *)(arg0 + 0x5EC) *= D_84193F9C;
+    *(f32 *)(arg0 + 0x5F0) += *(f32 *)(arg0 + 0x5E4);
+    *(f32 *)(arg0 + 0x5F4) += *(f32 *)(arg0 + 0x5E8);
+    *(f32 *)(arg0 + 0x5F8) += *(f32 *)(arg0 + 0x5EC);
+    *(f32 *)(arg0 + 0x5F0) *= D_84193F98;
+    *(f32 *)(arg0 + 0x5F4) *= D_84193F98;
+    *(f32 *)(arg0 + 0x5F8) *= D_84193F98;
+    *(f32 *)(arg0 + 0x5F0) *= D_84193F9C;
+    *(f32 *)(arg0 + 0x5F4) *= D_84193F9C;
+    *(f32 *)(arg0 + 0x5F8) *= D_84193F9C;
+    *(f32 *)(arg0 + 0x24) += *(f32 *)(arg0 + 0x5F0);
+    *(f32 *)(arg0 + 0x2C) += *(f32 *)(arg0 + 0x5F8);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84123150.s")
 
