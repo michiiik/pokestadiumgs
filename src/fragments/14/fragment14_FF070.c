@@ -659,7 +659,28 @@ void func_8130B320(void *arg0, void *arg1, s32 arg2, s32 arg3) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130B4E8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130B620.s")
+extern s32 func_8130B1F4(u8 *arg0);
+s32 func_8130B620(void *arg0, s32 arg1)
+{
+    struct AddressRecord8130B620 {
+        u8 prefix[0x20];
+        u8 payload[0xCC8];
+    };
+    u8 *data;
+    s16 pos[4];
+    u8 *item;
+
+    data = (u8 *)func_8130B1F4((u8 *)arg0);
+    item = ((struct AddressRecord8130B620 *)data)[*(s8 *)(data + 8)].payload;
+    if (arg1 != 0 && item == *(u8 **)((u8 *)*(void **)((u8 *)arg0 + 0xE8EC) + 0x6C)) {
+        return 0;
+    }
+    func_8160B5BC(data, pos);
+    pos[0] += 0x5F;
+    pos[1] += func_8130AAA8(arg0, (f32)(((u8 *)arg0)[0xE914] + ((u8 *)arg0)[0xE911]), 0.0f);
+    func_8130EB04(*(void **)((u8 *)arg0 + 0xE8EC), ((u8 *)arg0)[0xE910], item, 2, 0, pos, pos, 0x98);
+    return 1;
+}
 
 s32 func_8130B74C(void *arg0) {
     struct S { u8 pad[0xE8F0]; f32 x; u8 gap[8]; f32 y; };
@@ -683,7 +704,7 @@ s32 func_8130B770(void *arg0) {
 }
 
 extern f32 func_816092FC(void);
-extern void func_8130B620(void *, s32);
+extern s32 func_8130B620(void *, s32);
 /* function: func_8130B7F8 */
 s32 func_8130B7F8(void *arg0) {
     struct S { u8 pad[0xE8F0]; f32 first; u8 gap[8]; f32 second; u8 gap2[0x12]; u8 mode; };
