@@ -847,7 +847,21 @@ s32 func_8005B1C4(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005B314.s")
+extern s32 func_80062C24(void *);
+extern void func_80060E88(void *, void *);
+extern void _bcopy(s32, s32, s32);
+void func_8005B314(s32 arg0, s32 arg1, s32 arg2)
+{
+    u8 buffer[11];
+
+    _bcopy(arg1, (s32)buffer, 11);
+    buffer[10] = 0x50;
+    if (func_80062C24(buffer) != 0) {
+        func_80060E88((void *)arg0, buffer);
+    } else {
+        HAL_Strcpy((s8 *)arg0, (s8 *)arg2);
+    }
+}
 #endif
 
 #ifdef VERSION_US
