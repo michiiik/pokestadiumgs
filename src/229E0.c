@@ -587,7 +587,27 @@ s32 func_8002738C(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800275E8.s")
+extern f32 D_80090BBC[][3];
+typedef struct Candidate275E8State {
+    u8 unk0;
+    u8 flags;
+    u8 pad02[0x3A];
+    f32 value;
+} Candidate275E8State;
+typedef struct Candidate275E8Bits {
+    u8 unk0;
+    unsigned char active : 1;
+    unsigned char other : 7;
+    u8 pad02[0x3A];
+    f32 value;
+} Candidate275E8Bits;
+s32 func_800275E8(u8 arg0, Candidate275E8Bits *arg1) {
+    arg1->value = D_80090BBC[arg0][0];
+    arg1->active = 1;
+    if (arg1->active == 1) {
+        return arg0;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1655,7 +1675,19 @@ void func_800341BC(s32 arg0, s32 arg1) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80034348.s")
+extern u8 D_800D2B78;
+void func_80034348(u8 arg0, s32 arg1) {
+    u8 *ptr;
+    s32 value;
+
+    ptr = &D_800D2B78 + arg0 * 0x3C;
+    value = ptr[3];
+    if (value & 8) {
+        ptr[3] = value & ~8;
+        return;
+    }
+    ptr[3] = value | 8;
+}
 #endif
 
 #ifdef VERSION_US
@@ -1823,7 +1855,16 @@ void func_80034A08(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80034A50.s")
+extern u8 D_800D2B9C[];
+extern u8 * func_80034DA0(void);
+void func_80034A50(u8 arg0) {
+    u8 *table;
+    u8 offset;
+
+    table = func_80034DA0();
+    offset = arg0 & 3;
+    D_800D2B9C[arg0 * 0x3C] = *(offset + table);
+}
 #endif
 
 #ifdef VERSION_US
@@ -1892,7 +1933,23 @@ void func_80034E1C(u16 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80034E5C.s")
+typedef struct Func80034E5CRecord {
+    u8 unk0;
+    u8 pad1;
+    u16 unk2;
+    u16 unk4;
+} Func80034E5CRecord;
+extern Func80034E5CRecord D_80092620[];
+extern void func_80034ABC(u8, u16, u16, s32);
+void func_80034E5C(s32 arg0, s32 arg1)
+{
+    s32 *input;
+    Func80034E5CRecord *record;
+    input = &arg0;
+    arg1 = *input & 0xFFFF;
+    record = &D_80092620[arg1];
+    func_80034ABC(record->unk0, record->unk2, record->unk4, arg1);
+}
 #endif
 
 #ifdef VERSION_US
@@ -3564,7 +3621,29 @@ S1_unk_D_8690A610* GeoNode_CreateFog(s32 arg0, S1_unk_D_8690A610* arg1, s16 arg2
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80038390.s")
+typedef struct Candidate38390Node {
+    u8 pad00[0x20];
+    S1_Vec3s vector;
+    u8 pad26[2];
+    u8 red;
+    u8 green;
+    u8 blue;
+    u8 enabled;
+} Candidate38390Node;
+typedef struct Candidate38390UnsignedVector {
+    u16 x;
+    u16 y;
+    u16 z;
+} Candidate38390UnsignedVector;
+void func_80038390(void *arg0, S1_Vec3s *arg1, u8 arg2, u8 arg3, u8 arg4) {
+    if (arg0 != NULL) {
+        *(S1_Vec3s *)((u8 *)arg0 + 0x20) = *arg1;
+        ((u8 *)arg0)[0x28] = arg2;
+        ((u8 *)arg0)[0x29] = arg3;
+        ((u8 *)arg0)[0x2A] = arg4;
+        ((u8 *)arg0)[0x2B] = 1;
+    }
+}
 #endif
 
 #ifdef VERSION_US
