@@ -767,7 +767,26 @@ void func_84123828(void *arg0) {
 
 void func_84123914(u8 *arg0) {}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_8412391C.s")
+extern f32 Math_StepToF(f32, f32, f32, f32);
+extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
+void func_8412391C(void *arg0) {
+    extern f32 D_84189D14, D_84189D18, D_84189D1C, D_84189D28;
+    extern f64 D_84189D20;
+    f32 step;
+    f32 result;
+    step = D_84189D14;
+    result = Math_StepToF(*(f32 *)((u8 *)arg0 + 0x30), 0.0f, step, step);
+    step = D_84189D18;
+    *(f32 *)((u8 *)arg0 + 0x30) = result;
+    result = Math_StepToF(*(f32 *)((u8 *)arg0 + 0x34), 0.0f, step, step);
+    step = D_84189D1C;
+    *(f32 *)((u8 *)arg0 + 0x34) = result;
+    result = Math_StepToF(*(f32 *)((u8 *)arg0 + 0x38), 0.0f, step, step);
+    *(f32 *)((u8 *)arg0 + 0x38) = result;
+    if (*(f32 *)((u8 *)arg0 + 0x34) <= D_84189D20) {
+        Vec3f_SetComponentsDuplicate((f32 *)((u8 *)arg0 + 0x30), D_84189D28, D_84189D28, D_84189D28);
+    }
+}
 
 void func_841239E0(u8 *arg0) {}
 
