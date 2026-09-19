@@ -291,7 +291,57 @@ void func_860029D0(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_246640/func_86002BF0.s")
+extern s32 func_86009C08(void *, void *);
+extern f64 fragment48_main(f64);
+extern void func_860032DC(u8 *arg0);
+extern void func_86003EFC(void *, s32);
+extern f64 func_87C00090(f64,f64,f64);
+extern void func_87C01DB8();
+extern u8 D_8600DE30[];
+void func_86002BF0(u8 *arg0) {
+    f64 var_fa1;
+    u8 *temp_v1;
+
+    if (*(f32 *)(arg0 + 0x180C) > 0.0f) {
+        *(f32 *)(arg0 + 0x180C) -= *(f64 *)(*(u8 **)(arg0 + 0x1870) + 0x6890);
+        if (*(f32 *)(arg0 + 0x180C) <= 0.0f) {
+            *(f32 *)(arg0 + 0x180C) = 0.0f;
+        }
+    }
+    if (*(f64 *)(arg0 + 0x17F0) > 0.0) {
+        *(f64 *)(arg0 + 0x17F0) -= *(f64 *)(*(u8 **)(arg0 + 0x1870) + 0x6890);
+    }
+    if (*(f64 *)(arg0 + 0x17F0) < 0.0) {
+        *(f64 *)(arg0 + 0x17F0) = 0.0;
+    }
+    temp_v1 = *(u8 **)(arg0 + 0x1870);
+    if (*(f64 *)(arg0 + 0x17D0) > 0.0) {
+        *(f64 *)(arg0 + 0x17D0) -= *(f64 *)(temp_v1 + 0x6890);
+        *(f64 *)(arg0 + 0x1860) = func_87C00090(
+            *(f64 *)(arg0 + 0x1860),
+            *(f64 *)(D_8600DE30 + 0xA0),
+            *(f64 *)(D_8600DE30 + 0x1F8) * *(f64 *)(temp_v1 + 0x6890));
+    } else {
+        if (*(f64 *)(arg0 + 0x17E0) > 0.0) {
+            var_fa1 = *(f64 *)(D_8600DE30 + 0x98);
+        } else {
+            var_fa1 = *(f64 *)(D_8600DE30 + 0x88) +
+                      (*(f64 *)(arg0 + 0x17E8) / *(f64 *)(D_8600DE30 + 0xC8)) *
+                      (*(f64 *)(D_8600DE30 + 0x98) - *(f64 *)(D_8600DE30 + 0x88));
+        }
+        *(f64 *)(arg0 + 0x17D0) = 0.0;
+        *(f64 *)(arg0 + 0x1860) = func_87C00090(
+            *(f64 *)(arg0 + 0x1860),
+            var_fa1,
+            *(f64 *)(D_8600DE30 + 0x1F8) * *(f64 *)(temp_v1 + 0x6890));
+        func_87C01DB8(arg0 + 0x17A0, 0, 0);
+    }
+    *(f64 *)(arg0 + 0x1858) = fragment48_main(*(f64 *)(arg0 + 0x1860) + *(f64 *)(arg0 + 0x1858));
+    func_860032DC(arg0);
+    if (func_86009C08(*(u8 **)(arg0 + 0x1870) + 0x6668, arg0) == 0) {
+        func_86003EFC(arg0, 4);
+    }
+}
 #endif
 
 #ifdef VERSION_US
