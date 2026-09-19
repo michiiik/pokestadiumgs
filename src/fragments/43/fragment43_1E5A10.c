@@ -773,7 +773,12 @@ s32 func_8AC0456C(s32 arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC04604.s")
+extern s16 D_8AC08508[];
+extern f32 D_80087E50[];
+extern char D_8AC08208[];
+extern char D_8AC07FBC[];
+extern s32 func_8004C54C(s32, s32);
+s32 func_8AC04604(s32 arg0, void *arg1) { s32 red; s16 index; s16 *entry; char *buffer; f32 value; f32 inverse; index=*(s16 *)((u8 *)arg1+0x22); switch(arg0) { case 0: D_8AC08508[index]=0; break; case 1: entry=&D_8AC08508[index]; value=D_80087E50[(u16)*entry>>4]*0.5f+0.5f; inverse=1.0f-value; buffer=D_8AC08208+(index<<7); red=(s32)(240.0f*value+255.0f*inverse); sprintf(buffer,D_8AC07FBC,red,(s32)(155.0f*value+150.0f*inverse),(s32)(100.0f*value+255.0f*inverse),red,(s32)(155.0f*value+150.0f*inverse),(s32)(100.0f*value+255.0f*inverse)); func_8004C54C(0x47,(s32)buffer); *entry+=0x790; } return 0; }
 #endif
 
 #ifdef VERSION_US
