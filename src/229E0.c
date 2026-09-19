@@ -4555,7 +4555,17 @@ void func_8003CB3C(Gfx *arg0, u8 arg1, u8 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003CBD4.s")
+extern s32 D_801261A8;
+extern Gfx* D_800D0510;
+void func_8003CBD4(void) {
+    Gfx *command;
+    if (D_801261A8 == 0) {
+        D_801261A8 = 1;
+        command = D_800D0510++;
+        command->words.w1 = 0;
+        command->words.w0 = 0xE7000000;
+    }
+}
 #endif
 
 #ifdef VERSION_US
