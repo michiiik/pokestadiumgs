@@ -519,7 +519,34 @@ void func_86A0BB40(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/60/fragment60_code/func_86A0C7B4.s")
+typedef struct { f32 x; f32 y; } F60C7Pair;
+extern f32 func_86A0CF80(f32 *, f32 *, s32);
+extern s32 func_86A0C9B4(s32, s32);
+extern void func_86A0CED8(f32 *arg0, f32 *arg1, f32 arg2, f32 arg3);
+extern u8 D_800CE060[];
+extern u8 D_86A0F004[];
+extern u8 D_86A443F0[];
+void func_86A0C7B4(s32 arg0) {
+    F60C7Pair value;
+    f32 delta;
+    u8 *base;
+    base = D_86A443F0 + arg0 * 8;
+    if (func_86A0CF80((f32 *)(base + 0x1684), (f32 *)(base + 0x1688), arg0) > 0.0f) {
+        base = D_86A443F0 + arg0 * 8;
+        delta = *(f32 *)(base + 0x1684) - *(f32 *)(base + 4);
+        *(f32 *)(D_86A0F004 + 0xD8) = delta;
+        *(f32 *)(D_86A0F004 + 0x90) = delta;
+        delta = *(f32 *)(base + 0x1688) - *(f32 *)(base + 8);
+        *(f32 *)(D_86A0F004 + 0xDC) = delta;
+        *(f32 *)(D_86A0F004 + 0x94) = delta;
+        if (*(f32 *)(base + 4) > 0.0f) {
+            value = ((F60C7Pair *)D_86A0F004)[func_86A0C9B4(arg0, 0) + 18];
+        } else {
+            value = ((F60C7Pair *)D_86A0F004)[func_86A0C9B4(arg0, 0) + 27];
+        }
+        func_86A0CED8((f32 *)(D_800CE060 + arg0 * 0x28 + 0x18), (f32 *)(D_800CE060 + arg0 * 0x28 + 0x1C), value.x, value.y);
+    }
+}
 #endif
 
 #ifdef VERSION_US
