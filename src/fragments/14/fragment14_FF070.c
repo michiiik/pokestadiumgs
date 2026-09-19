@@ -108,7 +108,46 @@ void func_81307C94(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130881C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_81308E3C.s")
+extern s32 func_8130F578(void *, s32 *);
+extern s32 func_81304444(void *, void *, s32);
+extern void * func_81307204(void *arg0, s32 arg1);
+void func_81308E3C(void *arg0)
+{
+  struct W
+  {
+    u8 pad[0x137E4];
+    s32 dirty;
+    u8 gap[0xD];
+    u8 state;
+  };
+  s32 value;
+  s16 status;
+  void *record;
+  s32 result;
+  u8 unused[8];
+  result = func_8130F578(*((void **) (((u8 *) arg0) + 0x137AC)), &value);
+  status = result;
+  if (result > 0)
+  {
+    func_81307204(*((void **) (((u8 *) arg0) + 0x137A8)), *((s16 *) (((u8 *) arg0) + 0x137B6)));
+    ((struct W *) arg0)->state = 3;
+  }
+  if (status == 1)
+  {
+    ;
+    if (func_81304444(((u8 *) (*((void **) (((u8 *) arg0) + 0x137AC)))) + 0x15370, ((*((s16 *) (((u8 *) arg0) + 0x137B4))) * 0xCE8) + ((u8 *) func_81307204(*((void **) (((u8 *) arg0) + 0x137A8)), *((s16 *) (((u8 *) arg0) + 0x137B6)))), value) != 0)
+    {
+      ((struct W *) arg0)->dirty = 1;
+      ((struct W *) arg0)->state = 4;
+    }
+    ((struct W *) arg0)->state = 4;
+  }
+  else
+    if (status == 2)
+  {
+    ((struct W *) arg0)->state = 3;
+  }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_81308F54.s")
 
