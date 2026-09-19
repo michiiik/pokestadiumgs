@@ -587,7 +587,27 @@ s32 func_8002738C(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800275E8.s")
+extern f32 D_80090BBC[][3];
+typedef struct Candidate275E8State {
+    u8 unk0;
+    u8 flags;
+    u8 pad02[0x3A];
+    f32 value;
+} Candidate275E8State;
+typedef struct Candidate275E8Bits {
+    u8 unk0;
+    unsigned char active : 1;
+    unsigned char other : 7;
+    u8 pad02[0x3A];
+    f32 value;
+} Candidate275E8Bits;
+s32 func_800275E8(u8 arg0, Candidate275E8Bits *arg1) {
+    arg1->value = D_80090BBC[arg0][0];
+    arg1->active = 1;
+    if (arg1->active == 1) {
+        return arg0;
+    }
+}
 #endif
 
 #ifdef VERSION_US
