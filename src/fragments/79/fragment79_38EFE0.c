@@ -505,7 +505,23 @@ void func_841210CC(s32 arg0) {
 extern void func_841204BC(void *, s32, s32, s32, f32);
 void func_84121130(void *arg0) { f32 d = *(f32 *)((u8 *)arg0 + 0x28) - *(f32 *)((u8 *)arg0 + 0x650); if (((*(f32 *)((u8 *)arg0 + 0x28) - *(f32 *)((u8 *)arg0 + 0x650))) >= 200.0f) { *(f32 *)((u8 *)arg0 + 0x28) = *(f32 *)((u8 *)arg0 + 0x650) + 200.0f; return; } func_841204BC(arg0, 0x3FB9999A, 0x3C75C28F, 0x4000, 18.0f); ; if (((*(f32 *)((u8 *)arg0 + 0x28) - *(f32 *)((u8 *)arg0 + 0x650))) >= 200.0f) { *(f32 *)((u8 *)arg0 + 0x28) = *(f32 *)((u8 *)arg0 + 0x650) + 200.0f; } }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_841211CC.s")
+extern s32 D_84191208;
+s32 func_841211CC(void *arg0, s16 arg1, s16 arg2) {
+    if ((s32)arg0 != D_84191208) {
+        arg2 = -arg2;
+    }
+    *(s16 *)((u8 *)arg0 + 0x604) -= arg1;
+    if (arg1 > 0) {
+        if ((*(s16 *)((u8 *)arg0 + 0x604) <= arg2) && (*(s16 *)((u8 *)arg0 + 0x604) > arg2 - arg1)) {
+            return 1;
+        }
+    } else {
+        if ((*(s16 *)((u8 *)arg0 + 0x604) >= arg2) && (*(s16 *)((u8 *)arg0 + 0x604) < arg2 - arg1)) {
+            return 1;
+        }
+    }
+    return 0;
+}
 
 void func_84121260(void *arg0) {
     (*(s16 *)((u8 *)(arg0) + (0x5FE))) = 0;
@@ -641,7 +657,25 @@ void func_84122C94(void *arg0) {
     (*(f32 *)((u8 *)(arg0) + (0x5F8))) = (f32) (*(f32 *)((u8 *)(arg0) + (0x38)));
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84122CCC.s")
+extern f32 D_84189CC8;
+extern f32 D_84189CCC;
+extern f32 D_80087E50[];
+void func_84122CCC(void *arg0)
+{
+  f32 *sample;
+  f32 base;
+  f32 amplitude;
+  s16 velocity;
+  velocity = *((s16 *) (((u8 *) arg0) + 0x600));
+  do { *((s16 *) (((u8 *) arg0) + 0x5FE)) += velocity; *((s16 *) (((u8 *) arg0) + 0x600)) = velocity + 0x4FA; sample = &D_80087E50[((u16) (*((s16 *) (((u8 *) arg0) + 0x5FE)))) >> 4]; *((f32 *) (((u8 *) arg0) + 0x60C)) *= D_84189CC8; amplitude = *((f32 *) (((u8 *) arg0) + 0x60C)); base = *((f32 *) (((u8 *) arg0) + 0x5E4)); *((f32 *) (((u8 *) arg0) + 0x30)) = base - ((*sample) * amplitude); *((f32 *) (((u8 *) arg0) + 0x34)) = ((*sample) * amplitude) + base; } while (0);
+  *((f32 *) (((u8 *) arg0) + 0x38)) = base - ((*sample) * amplitude);
+  if (amplitude <= D_84189CCC)
+  {
+    *((f32 *) (((u8 *) arg0) + 0x30)) = base;
+    *((f32 *) (((u8 *) arg0) + 0x34)) = base;
+    *((f32 *) (((u8 *) arg0) + 0x38)) = base;
+  }
+}
 
 void func_84122D74(s32 arg0) {
     Vec3f_SetComponentsDuplicate(arg0 + 0x5E4, 0.0f, 0.0f, 0.0f);
@@ -689,7 +723,27 @@ void GalleryCamera_RotateVecByMatrix(S1_Vec3f* arg0, S1_MtxF* arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84122EEC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84123034.s")
+extern f32 D_84193F90;
+extern f32 D_84193F98;
+extern f32 D_84193F9C;
+void func_84123034(u8 *arg0) {
+    *(f32 *)(arg0 + 0x5F0) *= D_84193F90;
+    *(f32 *)(arg0 + 0x5F8) *= D_84193F90;
+    *(f32 *)(arg0 + 0x5E4) *= D_84193F9C;
+    *(f32 *)(arg0 + 0x5E8) *= D_84193F9C;
+    *(f32 *)(arg0 + 0x5EC) *= D_84193F9C;
+    *(f32 *)(arg0 + 0x5F0) += *(f32 *)(arg0 + 0x5E4);
+    *(f32 *)(arg0 + 0x5F4) += *(f32 *)(arg0 + 0x5E8);
+    *(f32 *)(arg0 + 0x5F8) += *(f32 *)(arg0 + 0x5EC);
+    *(f32 *)(arg0 + 0x5F0) *= D_84193F98;
+    *(f32 *)(arg0 + 0x5F4) *= D_84193F98;
+    *(f32 *)(arg0 + 0x5F8) *= D_84193F98;
+    *(f32 *)(arg0 + 0x5F0) *= D_84193F9C;
+    *(f32 *)(arg0 + 0x5F4) *= D_84193F9C;
+    *(f32 *)(arg0 + 0x5F8) *= D_84193F9C;
+    *(f32 *)(arg0 + 0x24) += *(f32 *)(arg0 + 0x5F0);
+    *(f32 *)(arg0 + 0x2C) += *(f32 *)(arg0 + 0x5F8);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84123150.s")
 
@@ -713,7 +767,26 @@ void func_84123828(void *arg0) {
 
 void func_84123914(u8 *arg0) {}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_8412391C.s")
+extern f32 Math_StepToF(f32, f32, f32, f32);
+extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
+void func_8412391C(void *arg0) {
+    extern f32 D_84189D14, D_84189D18, D_84189D1C, D_84189D28;
+    extern f64 D_84189D20;
+    f32 step;
+    f32 result;
+    step = D_84189D14;
+    result = Math_StepToF(*(f32 *)((u8 *)arg0 + 0x30), 0.0f, step, step);
+    step = D_84189D18;
+    *(f32 *)((u8 *)arg0 + 0x30) = result;
+    result = Math_StepToF(*(f32 *)((u8 *)arg0 + 0x34), 0.0f, step, step);
+    step = D_84189D1C;
+    *(f32 *)((u8 *)arg0 + 0x34) = result;
+    result = Math_StepToF(*(f32 *)((u8 *)arg0 + 0x38), 0.0f, step, step);
+    *(f32 *)((u8 *)arg0 + 0x38) = result;
+    if (*(f32 *)((u8 *)arg0 + 0x34) <= D_84189D20) {
+        Vec3f_SetComponentsDuplicate((f32 *)((u8 *)arg0 + 0x30), D_84189D28, D_84189D28, D_84189D28);
+    }
+}
 
 void func_841239E0(u8 *arg0) {}
 
