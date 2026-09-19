@@ -1933,7 +1933,23 @@ void func_80034E1C(u16 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80034E5C.s")
+typedef struct Func80034E5CRecord {
+    u8 unk0;
+    u8 pad1;
+    u16 unk2;
+    u16 unk4;
+} Func80034E5CRecord;
+extern Func80034E5CRecord D_80092620[];
+extern void func_80034ABC(u8, u16, u16, s32);
+void func_80034E5C(s32 arg0, s32 arg1)
+{
+    s32 *input;
+    Func80034E5CRecord *record;
+    input = &arg0;
+    arg1 = *input & 0xFFFF;
+    record = &D_80092620[arg1];
+    func_80034ABC(record->unk0, record->unk2, record->unk4, arg1);
+}
 #endif
 
 #ifdef VERSION_US
