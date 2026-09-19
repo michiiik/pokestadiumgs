@@ -334,7 +334,46 @@ f32 func_81309E80(f32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130A044.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130A460.s")
+extern void func_8130707C(void *arg0, s32 arg1);
+extern void func_81307C94(void *arg0);
+s32 func_8130A460(void *arg0, s32 arg1, s32 arg2, void *arg3) {
+    struct Copy { u8 bytes[8]; };
+    struct State {
+        u8 pad0[0x137B8];
+        f32 b8;
+        f32 bc;
+        f32 c0;
+        f32 c4;
+        f32 c8;
+        f32 cc;
+        f32 d0;
+        u8 padD4[8];
+        s32 dc;
+        s32 e0;
+        u8 padE4[8];
+        s32 ec;
+        s32 f0;
+        u8 f4;
+        u8 f5;
+    };
+
+    ((struct State *)arg0)->f5 = 5;
+    ((struct State *)arg0)->d0 = 0.0f;
+    ((struct State *)arg0)->b8 = 0.0f;
+    ((struct State *)arg0)->bc = (f32)(u32)((struct State *)arg0)->f4;
+    ((struct State *)arg0)->c0 = 0.0f;
+    ((struct State *)arg0)->c8 = 0.0f;
+    ((struct State *)arg0)->c4 = 0.0f;
+    ((struct State *)arg0)->cc = 0.0f;
+    ((struct State *)arg0)->dc = 0;
+    ((struct State *)arg0)->e0 = 0;
+    *(struct Copy *)arg0 = *(struct Copy *)arg3;
+    ((struct State *)arg0)->ec = arg1;
+    ((struct State *)arg0)->f0 = arg2;
+    func_81307C94(arg0);
+    func_8130707C(arg0, 1);
+    return 1;
+}
 
 extern void func_8130707C(void *arg0, s32 arg1);
 s32 func_8130A570(void *arg0, s32 arg1) {
