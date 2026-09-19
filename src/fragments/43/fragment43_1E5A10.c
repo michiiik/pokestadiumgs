@@ -350,7 +350,51 @@ void func_8AC01664(void *arg0)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC01B74.s")
+typedef struct { u8 pad[8]; s16 x, y; } F43_1B74Node;
+typedef struct { u8 pad[0xE]; s16 x, y; } F43_1B74Parent;
+typedef struct { F43_1B74Parent *parent; s16 x, y, left, top, width, height; u8 prim[4]; u8 env[4]; void *texture; } F43_1B74Draw;
+typedef struct { F43_1B74Node *node; u8 pad[0x10]; F43_1B74Draw draw; } F43_1B74Owner;
+extern Gfx D_8AC07C10[];
+extern s16 D_8AC099BE;
+extern void func_8004D1FC(void *);
+extern Gfx * D_800D0510;
+extern u8 D_8AC099BC;
+void func_8AC01B74(void *arg0)
+{
+    F43_1B74Node *node;
+    F43_1B74Draw *p;
+    F43_1B74Parent *parent;
+    s16 x, y, dx, dy;
+    u8 r, g, b, a, er, eg, eb, ea;
+    s32 x1, y1;
+
+    p = &((F43_1B74Owner *)arg0)->draw;
+    node = ((F43_1B74Owner *)arg0)->node;
+    parent = p->parent;
+    x = parent->x;
+    y = parent->y;
+    dx = p->x;
+    dy = p->y;
+    x1 = x + dx;
+    node->x = x1 - *(s16 *)&D_8AC099BC;
+    y1 = y + dy;
+    node->y = y1 - D_8AC099BE;
+    r = p->prim[0];
+    g = p->prim[1];
+    b = p->prim[2];
+    a = p->prim[3];
+    er = p->env[0];
+    eg = p->env[1];
+    eb = p->env[2];
+    ea = p->env[3];
+    gSPDisplayList(D_800D0510++, D_8AC07C10);
+    gDPSetPrimColor(D_800D0510++, 0, 0, r, g, b, a);
+    gDPSetEnvColor(D_800D0510++, er, eg, eb, ea);
+    func_8004D1FC(p->texture);
+    gSPTextureRectangle(D_800D0510++, (x + p->left) << 2, (y + p->top) << 2,
+        ((u32)x1 + p->width) << 2, (y1 + p->height) << 2,
+        0, 0, 0, 0, 0x400);
+}
 #endif
 
 #ifdef VERSION_US
