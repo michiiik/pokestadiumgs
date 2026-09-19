@@ -657,7 +657,25 @@ void func_84122C94(void *arg0) {
     (*(f32 *)((u8 *)(arg0) + (0x5F8))) = (f32) (*(f32 *)((u8 *)(arg0) + (0x38)));
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84122CCC.s")
+extern f32 D_84189CC8;
+extern f32 D_84189CCC;
+extern f32 D_80087E50[];
+void func_84122CCC(void *arg0)
+{
+  f32 *sample;
+  f32 base;
+  f32 amplitude;
+  s16 velocity;
+  velocity = *((s16 *) (((u8 *) arg0) + 0x600));
+  do { *((s16 *) (((u8 *) arg0) + 0x5FE)) += velocity; *((s16 *) (((u8 *) arg0) + 0x600)) = velocity + 0x4FA; sample = &D_80087E50[((u16) (*((s16 *) (((u8 *) arg0) + 0x5FE)))) >> 4]; *((f32 *) (((u8 *) arg0) + 0x60C)) *= D_84189CC8; amplitude = *((f32 *) (((u8 *) arg0) + 0x60C)); base = *((f32 *) (((u8 *) arg0) + 0x5E4)); *((f32 *) (((u8 *) arg0) + 0x30)) = base - ((*sample) * amplitude); *((f32 *) (((u8 *) arg0) + 0x34)) = ((*sample) * amplitude) + base; } while (0);
+  *((f32 *) (((u8 *) arg0) + 0x38)) = base - ((*sample) * amplitude);
+  if (amplitude <= D_84189CCC)
+  {
+    *((f32 *) (((u8 *) arg0) + 0x30)) = base;
+    *((f32 *) (((u8 *) arg0) + 0x34)) = base;
+    *((f32 *) (((u8 *) arg0) + 0x38)) = base;
+  }
+}
 
 void func_84122D74(s32 arg0) {
     Vec3f_SetComponentsDuplicate(arg0 + 0x5E4, 0.0f, 0.0f, 0.0f);
