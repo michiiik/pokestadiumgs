@@ -1579,7 +1579,28 @@ void BattleAnim_Table_84185F10_023(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412C47C.s")
+extern void func_84125424(u8 arg0);
+extern void func_841254E0(void);
+extern void func_84126BA8(u8 arg0);
+extern void func_84134CBC(u8 arg0, u8 arg1);
+extern void func_84134DD8(u8 arg0);
+extern void func_84135B00(u8);
+extern void func_84136678(u8, s32);
+extern void func_84136CA8(void);
+extern u8 D_841951BC;
+extern u8 D_841951BF;
+extern u8 D_841951C3;
+extern s32 D_841951C8;
+extern u8 * D_84195200[];
+extern u8 * D_84195208[];
+void func_8412C47C(void) {
+    if (D_84195200[D_841951BC][0x24] & 7) { func_84126BA8(D_841951BC); func_841254E0(); return; }
+    if (D_84195208[D_841951BC][0x29] == 0) { D_84195208[D_841951BC][0x26] = D_841951BF; D_84195208[D_841951BC][0x27] = D_841951BF; func_84136CA8(); }
+    D_841951C8 = 0; func_84136678(D_841951BC, -1); func_84134DD8(D_841951BF);
+    switch (D_841951BF) { case 0xD: func_84135B00(0x51); func_84134CBC(D_841951BC, 0x16); break; case 0x4C: func_84135B00(0xAA); func_84134CBC(D_841951BC, 0x17); break; case 0x82: func_84135B00(0x9E); func_84134CBC(D_841951BC, 0x18); break; case 0x8F: func_84135B00(0x37); func_84134CBC(D_841951BC, 0x19); break; case 0x13: func_84135B00(0x69); func_84134CBC(D_841951BC, 0x1A); break; case 0x5B: func_84135B00(0x24); func_84134CBC(D_841951BC, 0x1B); break; }
+    D_84195208[D_841951BC][0xF] |= 0x10; switch (D_841951BF) { case 0x13: D_84195208[D_841951BC][0xF] |= 0x40; break; case 0x5B: D_84195208[D_841951BC][0xF] |= 0x20; break; }
+    func_84136CA8(); if (D_841951C3 == 0x91) func_84125424(0xFE); else func_841254E0();
+}
 #endif
 
 #ifdef VERSION_US
