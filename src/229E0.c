@@ -1535,7 +1535,23 @@ void func_800339E4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80033A78.s")
+extern s8 D_800D2B42;
+extern u8 D_800D2B78;
+void func_80033A78(u8 arg0) {
+    s32 value;
+    s32 offset;
+    s32 high;
+
+    offset = arg0 * 0x3C;
+    value = (&D_800D2B78)[offset + 0x25];
+    high = (value & 0xC0) >> 6;
+    value <<= 2;
+    value |= high;
+    (&D_800D2B78)[offset + 0x25] = value;
+    value &= 0xC0;
+    D_800D2B42 = value;
+    (&D_800D2B78)[offset + 0x14] |= 1;
+}
 #endif
 
 #ifdef VERSION_US
@@ -1647,7 +1663,17 @@ void func_800340B0(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800340C8.s")
+extern s8 func_800347E8(u8);
+extern u8 D_800D2B78;
+void func_800340C8(u8 arg0, s32 arg1) {
+    s32 result;
+    u8 *record;
+
+    result = func_800347E8(arg0);
+    record = &D_800D2B78 + arg0 * 0x3C;
+    record[0x35] = result;
+    record[4] |= 8;
+}
 #endif
 
 #ifdef VERSION_US
