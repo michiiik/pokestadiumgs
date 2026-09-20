@@ -200,7 +200,32 @@ extern void ModelAnim_SetFrame(u8 *, s16);
 extern u32 func_8003570C(void);
 void func_86100E20(void *arg0, s32 arg1) { if ((arg1 & 0x80000000) != 0) { if ((*(s32 *)((u8 *)arg0+12)<<1)>=0) { *(s32 *)((u8 *)arg0+12)|=arg1; *(s32 *)((u8 *)arg0+28)=0; } } else if ((arg1 & 0x40000000) != 0) { *(s32 *)((u8 *)arg0+12)&=0x7EFFFFFF; *(s32 *)((u8 *)arg0+12)|=arg1; *(s32 *)((u8 *)arg0+28)=0; } else if ((arg1 & 0x00400000) != 0) { *(s32 *)((u8 *)arg0+28)=0; *(s32 *)((u8 *)arg0+12)|=arg1; func_8003F210((u8 *)arg0+36,5); ModelAnim_SetFrame((u8 *)arg0+36,(s16)(func_8003570C()%12)); } else if ((arg1 & 0x01000000) != 0) { *(s32 *)((u8 *)arg0+196)=0xFF0000AF; *(s32 *)((u8 *)arg0+12)|=arg1; *(s32 *)((u8 *)arg0+28)=0; } else { *(s32 *)((u8 *)arg0+28)=0; *(s32 *)((u8 *)arg0+12)|=arg1; } }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86100F1C.s")
+extern f32 D_8610AAB8;
+extern f32 D_8610AABC;
+extern f32 D_8610AAC0;
+extern f32 D_8610AAC4;
+extern f32 D_8610AAC8;
+extern f32 D_8610AACC;
+extern void func_861000B8(void *, s32);
+typedef union { f32 f; s32 i; } Coord86100F1C;
+typedef struct { u8 pad[0x48]; Coord86100F1C x; Coord86100F1C y; Coord86100F1C z; } Object86100F1C;
+extern u32 func_8003570C(void);
+extern void func_86101558(f32 *arg0, f32 *arg1);
+extern void func_86107098(s32, s32, s32, s32, f32, f32, f32, f32);
+extern s32 D_8610AD20;
+void func_86100F1C(Object86100F1C *arg0, void *arg1, s32 arg2) {
+    f32 x;
+    f32 y;
+
+    if (*(s32 *)((u8 *)arg1 + 4) > 0) {
+        x = ((((f32)func_8003570C() / 4294967296.0f) * D_8610AAB8 + D_8610AABC) * D_8610AAC0) - arg0->x.f;
+        y = ((((f32)func_8003570C() / 4294967296.0f) * D_8610AAC4 + D_8610AAC8) * D_8610AACC) - arg0->y.f;
+        func_86101558(&x, &y);
+        func_86107098(arg2 | 0x20000000, (s32)arg0, arg0->x.i, arg0->y.i, arg0->z.f, x * 15.0f - *(f32 *)((u8 *)(u32)D_8610AD20 + 0x9774), y * 15.0f, 0.0f);
+        (*(s32 *)((u8 *)arg1 + 4))--;
+        func_861000B8(arg0, 0xF05);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_8610109C.s")
 
