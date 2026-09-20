@@ -10,7 +10,21 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_8413E514.s")
+extern void func_8413E410(u8);
+extern u8 * D_841951F8;
+extern u8 * D_84195200[];
+void func_8413E514(void)
+{
+  typedef struct
+  {
+    u8 prefix[0x1A];
+    u8 values[4];
+    u8 suffix[0x3A];
+  } Record;
+  s32 j;
+  s32 i;
+  do { u8 **p; u8 value; p = &D_841951F8; do { for (i = 0; i < (*p)[8]; i++) { for (j = 0; j < 4; j++) { value = ((Record *) (*p))[i].values[j]; if (value == 0) { break; } func_8413E410(value); } } p++; } while (p != D_84195200); } while (0);
+}
 #endif
 
 #ifdef VERSION_US
