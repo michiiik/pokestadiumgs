@@ -1535,7 +1535,23 @@ void func_800339E4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80033A78.s")
+extern s8 D_800D2B42;
+extern u8 D_800D2B78;
+void func_80033A78(u8 arg0) {
+    s32 value;
+    s32 offset;
+    s32 high;
+
+    offset = arg0 * 0x3C;
+    value = (&D_800D2B78)[offset + 0x25];
+    high = (value & 0xC0) >> 6;
+    value <<= 2;
+    value |= high;
+    (&D_800D2B78)[offset + 0x25] = value;
+    value &= 0xC0;
+    D_800D2B42 = value;
+    (&D_800D2B78)[offset + 0x14] |= 1;
+}
 #endif
 
 #ifdef VERSION_US
