@@ -226,7 +226,15 @@ void func_8413F32C(s16 arg0, s16 arg1, u8 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_8413F498.s")
+extern void func_8413F32C(s16 arg0, s16 arg1, u8 arg2);
+void func_8413F498(s16 arg0, s16 arg1, s16 arg2, u16 arg3) {
+    do {
+        arg0 -= 6;
+        func_8413F32C(arg0, arg1, arg3 % 10);
+        arg3 /= 10;
+        arg2--;
+    } while ((arg3 > 0) || (arg2 > 0));
+}
 #endif
 
 #ifdef VERSION_US
