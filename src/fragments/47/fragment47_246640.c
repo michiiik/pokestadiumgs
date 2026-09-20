@@ -51,7 +51,19 @@ s32 func_86000B9C(u8 *arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_246640/func_86000BB0.s")
+void func_86000BB0(u8 *arg0) {
+    s32 i;
+
+    *(s32 *)(arg0 + 0xF0) = 0;
+    for (i = 0; i < 10; i++) {
+        *(f32 *)(arg0 + i * 0x18 + 0x00) = 0.0f;
+        *(f32 *)(arg0 + i * 0x18 + 0x04) = 0.0f;
+        *(f32 *)(arg0 + i * 0x18 + 0x08) = 0.0f;
+        *(f32 *)(arg0 + i * 0x18 + 0x10) = 0.0f;
+        *(f32 *)(arg0 + i * 0x18 + 0x14) = 0.0f;
+        *(s32 *)(arg0 + i * 0x18 + 0x0C) = -1;
+    }
+}
 #endif
 
 #ifdef VERSION_US
