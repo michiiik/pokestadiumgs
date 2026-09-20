@@ -478,7 +478,33 @@ void func_86B0952C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/61/fragment61_code/func_86B0B608.s")
+extern void func_80037E3C(u8 *, void *, s32);
+extern void func_86B0355C(s32, u8 *);
+extern void D_86B0B600(s32, u8 *);
+extern u8 D_86B17A78[];
+extern s32 D_86B0E7F0;
+extern void func_8003F114(u8 *, s32, s32, s32);
+extern void func_8003F1DC(u8 *);
+extern u8 * func_87F025B8(u8 *, void (*)(void));
+extern u8 D_86B0E1A8;
+void func_86B0B608(s32 arg0) {
+    u8 *object;
+    object = func_87F025B8(&D_86B0E1A8, D_86B0B600);
+    if (object != NULL) {
+        func_80037E3C(object + 0x24, func_86B0355C, arg0);
+        *(f32 *)(object + 0x48) = *(f32 *)(D_86B17A78 + (arg0 << 3) + 0x14);
+        *(f32 *)(object + 0x4C) = 0.0f;
+        *(f32 *)(object + 0x50) = *(f32 *)(D_86B17A78 + (arg0 << 3) + 0x18);
+        *(s16 *)(object + 0x42) = -0x4001;
+        *(s32 *)(object + 0x38) = arg0;
+        *(s32 *)(object + 0x20) = arg0;
+        *(f32 *)(object + 0x54) = 2.5f;
+        *(f32 *)(object + 0x58) = 2.5f;
+        *(f32 *)(object + 0x5C) = 2.5f;
+        func_8003F1DC(object + 0x24);
+        func_8003F114(object + 0x24, 0, -1, D_86B0E7F0);
+    }
+}
 #endif
 
 #ifdef VERSION_US
