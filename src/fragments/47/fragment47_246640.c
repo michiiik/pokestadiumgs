@@ -612,7 +612,25 @@ void func_860043B4(register u8 *arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_246640/func_86004494.s")
+extern f64 func_87C006F0(void *, void *);
+s32 func_86004494(void *arg0, f64 arg1) {
+    s32 var_s1;
+    s32 var_s3;
+    s32 var_s4;
+    u8 *temp_s0;
+    var_s1 = 0;
+    if (1) {
+        var_s3 = 0;
+        var_s4 = 4;
+        while (var_s1 != var_s4) {
+            temp_s0 = (*(u8 **)(((u8 *)arg0) + 0x1870)) + var_s3;
+            if ((var_s1 != (*((s32 *)(((u8 *)arg0) + 0x1810)))) && ((((*((f64 *)(((u8 *)arg0) + 0x17C8))) + (*((f64 *)(temp_s0 + 0x17C8)))) + arg1) > func_87C006F0(arg0, temp_s0))) return 0;
+            var_s1 += 1;
+            var_s3 += 0x1998;
+        }
+    }
+    return 1;
+}
 #endif
 
 #ifdef VERSION_US
