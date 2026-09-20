@@ -113,3 +113,11 @@ func_8412C47C: matched (call_sequence:postflag:independent-switch), 2 iterations
 ## 2026-09-20
 
 func_8413794C: time cap at 0.9074 (raw 0.5988) after 2400s, mismatch instruction_drift; tried families: call_sequence; tie-pool no; 1 iteration(s) with a suspicious identical batch-wide failure
+
+## 2026-09-20
+
+func_8413A12C: time cap at 0.0 (raw None) after 2401s, mismatch unknown; tried families: (none); tie-pool no
+
+## 2026-09-20
+
+func_8413B254: matched (call_sequence:switch:cast-index), 1 iterations, agent openrouter
