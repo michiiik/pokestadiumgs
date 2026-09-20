@@ -10,7 +10,21 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_8413E514.s")
+extern void func_8413E410(u8);
+extern u8 * D_841951F8;
+extern u8 * D_84195200[];
+void func_8413E514(void)
+{
+  typedef struct
+  {
+    u8 prefix[0x1A];
+    u8 values[4];
+    u8 suffix[0x3A];
+  } Record;
+  s32 j;
+  s32 i;
+  do { u8 **p; u8 value; p = &D_841951F8; do { for (i = 0; i < (*p)[8]; i++) { for (j = 0; j < 4; j++) { value = ((Record *) (*p))[i].values[j]; if (value == 0) { break; } func_8413E410(value); } } p++; } while (p != D_84195200); } while (0);
+}
 #endif
 
 #ifdef VERSION_US
@@ -402,7 +416,32 @@ void func_8413FBC4(s16 arg0, s16 arg1, u8 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_8413FC34.s")
+extern u16 D_84186DE8;
+extern s32 func_80049148(s32, s32, s32);
+extern s32 func_8004C874(s32, s32);
+extern u16 D_84186DE0;
+extern u16 D_84186DEC;
+extern s16 D_8419D7A4[];
+void func_8413FC34(void)
+{
+    s32 pad;
+    s32 total;
+    s32 first;
+    s32 second;
+    s32 x;
+
+    total = D_84186DEC;
+    total += D_84186DE8;
+    first = func_80049148(2, -2, func_8004C874(0x10, 5));
+    total += first;
+    second = func_80049148(2, -2, func_8004C874(0x10, 6));
+    total += second;
+    x = D_84186DE0 / 2 - total / 2;
+    D_8419D7A4[0] = x;
+    x = x + first + D_84186DE8;
+    x += D_84186DEC;
+    D_8419D7A4[1] = x;
+}
 #endif
 
 #ifdef VERSION_US
