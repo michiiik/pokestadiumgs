@@ -77,3 +77,31 @@ TYPE CONFLICT: D_84195278 is extern u8 D_8418615C, D_84195278, not extern u8 D_8
 ## 2026-09-19
 
 TYPE CONFLICT: D_8418615C is extern u8 D_8418615C, not extern u8 D_8418615C, D_8419A006, D_8419A007, D_84199D82
+
+## 2026-09-20
+
+func_8413C2C0: plateau at 0.9492 (raw 0.8305), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool yes
+
+## 2026-09-20
+
+TYPE CONFLICT: func_8413584C is void func_8413584C(u8), not extern void func_8413584C(u8)
+
+## 2026-09-20
+
+func_8412DC20: matched (call_sequence:nested_guard:u8_argument_temp), 1 iterations, agent unbiased
+
+## 2026-09-20
+
+func_841306AC: matched (call_sequence:indexed:direct-global-access), 1 iterations, agent unbiased
+
+## 2026-09-20
+
+func_8412E420: matched (call_sequence:if_else:pointer_baseline), 1 iterations, agent unbiased
+
+## 2026-09-20
+
+func_84139528: matched (call_sequence:else_chain:direct_indexing), 1 iterations, agent unbiased
+
+## 2026-09-20
+
+func_841350F4: time cap at 0.9516 (raw 0.9516) after 2400s, mismatch instruction_drift; tried families: call_sequence; tie-pool yes

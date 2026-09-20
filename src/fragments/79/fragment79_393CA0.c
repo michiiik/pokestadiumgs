@@ -1893,7 +1893,28 @@ void BattleAnim_Table_84185F10_046(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412DC20.s")
+extern s32 func_80063754(s32);
+extern void func_84134EC8(u8 arg0);
+extern void func_84135B40(s32);
+extern void func_841366C4(u8, s32);
+extern u8 D_841951BC;
+extern u8 D_841951BD;
+extern u8 D_841951D3;
+extern u8 * D_84195200[];
+void func_8412DC20(void) {
+    u8 value;
+
+    if (D_84195200[D_841951BC][1] == 0) {
+        value = D_84195200[D_841951BD][1];
+        if ((value != 0) && (func_80063754(value) == 0) && (D_841951D3 == 0)) {
+            D_84195200[D_841951BC][1] = D_84195200[D_841951BD][1];
+            D_84195200[D_841951BD][1] = 0;
+            func_841366C4(D_841951BD, -1);
+            func_84135B40(0x2D);
+            func_84134EC8(0x20);
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1999,7 +2020,40 @@ void BattleAnim_Table_84185FDC_002(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412E420.s")
+extern void func_84124604(u8 arg0, u8 arg1);
+extern void func_84126B1C(u8 arg0, u8 arg1, u8 arg2);
+extern void func_84126C3C(u8);
+extern void func_84134CBC(u8 arg0, u8 arg1);
+extern void func_84134DD8(u8 arg0);
+extern void func_84134E30(s32 arg0);
+extern void func_84135B00(u8);
+extern void func_84136678(u8, s32);
+extern void func_84136CA8(void);
+extern u8 D_841951BC;
+extern u8 D_841951BD;
+extern u8 D_841951BF;
+extern u8 D_841951D2;
+extern u8 * D_84195208[];
+void func_8412E420(void) {
+    u8 *ptr;
+
+    ptr = D_84195208[D_841951BD];
+    if ((ptr[0xF] & 0x60) || (ptr[0xD] & 8)) {
+        func_84126C3C(D_841951BC);
+    } else if (D_841951D2 != 0) {
+        func_84126B1C(D_841951BC, D_841951BD, 1);
+    } else {
+        ptr[0xD] |= 8;
+        func_84134CBC(D_841951BC, 0);
+        func_84134DD8(D_841951BF);
+        func_84136CA8();
+        func_84136678(D_841951BC, -1);
+        func_84135B00(0x84);
+        func_84134E30(5);
+        func_84124604(D_841951BD, D_841951BF);
+        func_84136CA8();
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -2631,7 +2685,33 @@ void BattleAnim_Table_84186004_059(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841306AC.s")
+extern void BattleAnim_Table_84186004_076(void);
+extern void func_841254E0(void);
+extern void func_84126BA8(u8 arg0);
+extern void func_84135B00(u8);
+extern void func_84136678(u8, s32);
+extern u8 D_841951BC;
+extern u8 D_841951BF;
+extern s32 D_841951C8;
+extern u8 * D_84195208[];
+void func_841306AC(void) {
+    if (D_84195208[D_841951BC][0x29] == 0) {
+        D_84195208[D_841951BC][0x26] = D_841951BF;
+        D_84195208[D_841951BC][0x27] = D_841951BF;
+    }
+    if (D_84195208[D_841951BC][0x1A] != 0) {
+        D_841951C8 = 0;
+        func_84126BA8(D_841951BC);
+    } else {
+        D_84195208[D_841951BC][0x1A] = 4;
+        *(s16 *)(D_84195208[D_841951BC] + 0x30) = D_841951C8;
+        D_841951C8 = 0;
+        func_84136678(D_841951BC, -1);
+        func_84135B00(0x80);
+        BattleAnim_Table_84186004_076();
+    }
+    func_841254E0();
+}
 #endif
 
 #ifdef VERSION_US
@@ -4364,7 +4444,31 @@ void func_841392E0(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84139528.s")
+extern void func_84138A0C(u8, u8, u8);
+extern void func_800226C0(s32);
+extern s32 func_84138960(u8 arg0);
+extern void func_84138EA4(u8, u8);
+extern void func_84139244(u8);
+extern u8 * D_84195208[];
+void func_84139528(u8 arg0, u8 arg1) {
+    if (func_84138960(arg0) != 0) {
+        if (D_84195208[arg0][arg1 + 5] == 0) {
+            func_800226C0(5);
+        } else if ((D_84195208[arg0][arg1 + 9] & 0x3F) == 0) {
+            func_84138A0C(arg0, 0, arg1);
+        } else if (D_84195208[arg0][arg1 + 5] == D_84195208[arg0][0x25]) {
+            func_84138A0C(arg0, 1, arg1);
+        } else {
+            func_84138EA4(arg0, arg1);
+        }
+    } else {
+        if (D_84195208[arg0][arg1 + 5] == 0) {
+            func_800226C0(5);
+        } else {
+            func_84139244(arg0);
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
