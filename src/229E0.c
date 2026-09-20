@@ -2397,7 +2397,7 @@ void MtxF_SetTranslation(f32 *dest, f32 *source) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80036714.s")
+void func_80036714(void *a0,s32 a1,s32 a2,s32 a3,f32 a4){f32 r0,r1,r2; r0=sqrtf(((f32*)a2)[0]*((f32*)a2)[0]+((f32*)a2)[1]*((f32*)a2)[1]+((f32*)a2)[2]*((f32*)a2)[2])*a4;r1=sqrtf(((f32*)a2)[4]*((f32*)a2)[4]+((f32*)a2)[5]*((f32*)a2)[5]+((f32*)a2)[6]*((f32*)a2)[6])*a4;r2=sqrtf(((f32*)a2)[8]*((f32*)a2)[8]+((f32*)a2)[9]*((f32*)a2)[9]+((f32*)a2)[10]*((f32*)a2)[10])*a4;((f32*)a0)[0]=((f32*)a1)[0]*r0;((f32*)a0)[1]=((f32*)a1)[4]*r0;((f32*)a0)[2]=((f32*)a1)[8]*r0;((f32*)a0)[3]=0;((f32*)a0)[4]=((f32*)a1)[1]*r1;((f32*)a0)[5]=((f32*)a1)[5]*r1;((f32*)a0)[6]=((f32*)a1)[9]*r1;((f32*)a0)[7]=0;((f32*)a0)[8]=((f32*)a1)[2]*r2;((f32*)a0)[9]=((f32*)a1)[6]*r2;((f32*)a0)[10]=((f32*)a1)[10]*r2;((f32*)a0)[11]=0;((f32*)a0)[12]=((f32*)a2)[0]*((f32*)a3)[0]+((f32*)a2)[4]*((f32*)a3)[1]+((f32*)a2)[8]*((f32*)a3)[2]+((f32*)a2)[12];((f32*)a0)[13]=((f32*)a2)[1]*((f32*)a3)[0]+((f32*)a2)[5]*((f32*)a3)[1]+((f32*)a2)[9]*((f32*)a3)[2]+((f32*)a2)[13];((f32*)a0)[14]=((f32*)a2)[2]*((f32*)a3)[0]+((f32*)a2)[6]*((f32*)a3)[1]+((f32*)a2)[10]*((f32*)a3)[2]+((f32*)a2)[14];((f32*)a0)[15]=1;}
 #endif
 
 #ifdef VERSION_US
@@ -3179,7 +3179,7 @@ void MtxF_TransformVec3s(S1_MtxF* arg0, S1_Vec3s* arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_80036714(S1_MtxF *, s32, s32, s32, f32);
+extern void func_80036714(void *, s32, s32, s32, f32);
 extern void func_8003614C(void *, s32, s32);
 void MtxF_BuildTransform(S1_MtxF *arg0, s32 arg1, s32 arg2, S1_Vec3f *arg3, s32 arg4, s32 arg5) {
     S1_MtxF sp60;
