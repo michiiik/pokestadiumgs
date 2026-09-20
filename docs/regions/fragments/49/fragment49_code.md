@@ -33,3 +33,11 @@ func_8610320C: matched (state_field_access:stack-offset:unused-word-before-latch
 ## 2026-09-20
 
 func_86100F1C: matched (call_chain:object-representation:typed-union-coordinate-fields), 3 iterations, agent unbiased
+
+## 2026-09-20
+
+func_86107EBC: matched (call_sequence:raw-gfx:decomp-permuter-no-locals), 9 iterations, agent codex
+
+## 2026-09-20
+
+func_86102E8C: matched (call_sequence:verified:cached-floats), 2 iterations, agent codex
