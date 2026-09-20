@@ -711,7 +711,38 @@ s32 func_8290B40C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290B478.s")
+extern u8 D_8291A388;
+extern s32 func_80001FF0(void);
+extern s32 Math_StepToS32(s32, s32, s32, s32);
+extern void func_8290B264(void);
+extern u8 D_8291A7C0;
+void func_8290B478(void) {
+    s32 step;
+    s32 threshold;
+    s32 i;
+    u8 *model;
+    u8 *actor;
+
+    step = 0x1E;
+    if (func_80001FF0() == 0x32) {
+        step = 0x18;
+    }
+    (*(u16 *)(&D_8291A7C0 + 0x1A0))++;
+    for (i = 0; i < 3; i++) {
+        threshold = (i + 1) * step;
+        if (threshold == *(u16 *)(&D_8291A7C0 + 0x1A0)) {
+            model = &D_8291A388 + i * 0x168;
+            model[1] |= 1;
+            actor = &D_8291A7C0 + i * 0x1A4;
+            actor[5] |= 1;
+        }
+        if (threshold < *(u16 *)(&D_8291A7C0 + 0x1A0)) {
+            actor = &D_8291A7C0 + i * 0x1A4;
+            actor[0x21] = Math_StepToS32(actor[0x21], 0xFF, 0x28, 0x28);
+        }
+    }
+    func_8290B264();
+}
 #endif
 
 #ifdef VERSION_US
