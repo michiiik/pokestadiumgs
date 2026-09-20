@@ -390,7 +390,30 @@ void func_86102B64(void *arg0, f32 *arg1, f32 *arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86102D50.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86102E8C.s")
+extern void func_86102720(void *, void *, f32);
+extern void func_86102908(void *, void *);
+extern void func_86102C08(void *, s32);
+extern void func_86102D50(void *);
+extern void * D_87F119DC;
+u16 func_86102E8C(void *arg0) {
+    u16 result = 0;
+    f32 before_x = *(f32 *)((u8 *)D_87F119DC + 0x10);
+    f32 before_y = *(f32 *)((u8 *)D_87F119DC + 0x14);
+    s32 flags = *(s32 *)((u8 *)arg0 + 8);
+    if (flags & 4) { func_86102720(arg0, func_86102D50, 12.0f); }
+    else if (flags & 0x2000) { func_86102720(arg0, func_86102D50, 7.0f); }
+    else if (flags & 2) { func_86102908(arg0, func_86102D50); }
+    else if (flags & 0x1000) { func_86102C08(arg0, 0); }
+    else if (flags & 1) { func_86102C08(arg0, 1); }
+    else { func_86102D50(arg0); }
+    if (*(f32 *)((u8 *)D_87F119DC + 0x10) < before_x) { result = 0x200; }
+    else if (before_x < *(f32 *)((u8 *)D_87F119DC + 0x10)) { result = 0x100; }
+    if (before_y <= *(f32 *)((u8 *)D_87F119DC + 0x14)) {
+        if (*(s16 *)((u8 *)arg0 + 0x26) & 0x8000) *(f32 *)((u8 *)D_87F119DC + 0x14) = before_y;
+        else result |= 0x8000;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86102FF0.s")
 
@@ -854,7 +877,33 @@ void func_86107A10_padding(void) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86107A20.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86107EBC.s")
+extern void func_87F06240(s32, s32, f32, f32, s32);
+extern f32 D_8610ACAC;
+extern f32 D_8610ACB0;
+extern f32 D_8610ACB4;
+extern Gfx * D_800D0510;
+void func_86107EBC(s32 arg0, s32 arg1, s32 arg2, char arg3, u8 arg4, u8 arg5, u8 arg6, u8 arg7, u8 arg8)
+{
+  {
+    Gfx *_g = (Gfx *) (D_800D0510++);
+    _g->words.w0 = (((((unsigned int) 0xfa) & ((0x01 << 8) - 1)) << 24) | ((unsigned int) ((((unsigned int) 0) & ((0x01 << 8) - 1)) << 8))) | ((unsigned int) ((((unsigned int) 0) & ((0x01 << 8) - 1)) << 0));
+    _g->words.w1 = ((((unsigned int) ((((unsigned int) arg3) & ((0x01 << 8) - 1)) << 24)) | ((unsigned int) ((((unsigned int) arg4) & ((0x01 << 8) - 1)) << 16))) | ((unsigned int) ((((unsigned int) arg5) & ((0x01 << 8) - 1)) << 8))) | ((unsigned int) ((((unsigned int) 255) & ((0x01 << 8) - 1)) << 0));
+  }
+  ;
+  {
+    Gfx *_g = (Gfx *) (D_800D0510++);
+    _g->words.w0 = (unsigned int) ((((unsigned int) 0xfb) & ((0x01 << 8) - 1)) << 24);
+    _g->words.w1 = (unsigned int) (((((unsigned int) ((((unsigned int) arg6) & ((0x01 << 8) - 1)) << 24)) | ((unsigned int) ((((unsigned int) arg7) & ((0x01 << 8) - 1)) << 16))) | ((unsigned int) ((((unsigned int) arg8) & ((0x01 << 8) - 1)) << 8))) | ((unsigned int) ((((unsigned int) 255) & ((0x01 << 8) - 1)) << 0)));
+  }
+  ;
+  if (arg0 < 10) {
+    func_87F06240(arg1 + 0x24, arg2 + 2, D_8610ACAC, D_8610ACAC, arg0 % 10);
+    return;
+  }
+  ;
+  func_87F06240(arg1 + 0x1C, arg2 + 2, D_8610ACB0, D_8610ACB0, arg0 / 10);
+  func_87F06240(arg1 + 0x29, arg2 + 2, D_8610ACB4, D_8610ACB4, arg0 % 10);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86108018.s")
 
