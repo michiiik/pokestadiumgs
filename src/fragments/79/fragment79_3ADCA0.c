@@ -226,7 +226,15 @@ void func_8413F32C(s16 arg0, s16 arg1, u8 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_8413F498.s")
+extern void func_8413F32C(s16 arg0, s16 arg1, u8 arg2);
+void func_8413F498(s16 arg0, s16 arg1, s16 arg2, u16 arg3) {
+    do {
+        arg0 -= 6;
+        func_8413F32C(arg0, arg1, arg3 % 10);
+        arg3 /= 10;
+        arg2--;
+    } while ((arg3 > 0) || (arg2 > 0));
+}
 #endif
 
 #ifdef VERSION_US
@@ -667,7 +675,43 @@ void func_841410A0(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84141BE0.s")
+extern u8 *D_84195208[];
+extern s32 func_80062D98(u8);
+extern void ParticleGfx_SetPrimColor_fragment79(u8 r, u8 g, u8 b, u8 a);
+extern s32 func_800630F0(s32);
+extern void func_8413F2A8(s16 arg0, s16 arg1);
+extern u8 D_84186F98[];
+void func_84141BE0(u8 *arg0)
+{
+  s32 color;
+  s32 i;
+  u8 index;
+  int move;
+  u8 *rgb;
+  color = 0;
+  index = arg0[1];
+  if (!(arg0[8] & 1))
+  {
+    if (arg0[0] == 9)
+    {
+      for (i = 0; i < 4; i++)
+      {
+        move = D_84195208[index][i + 5];
+        if ((move != 0) && (color != 0x12))
+        {
+          color = func_800630F0((u8) func_80062D98((u8) move));
+        }
+        else
+        {
+          color = 0x12;
+        }
+        rgb = &D_84186F98[color * 3];
+        ParticleGfx_SetPrimColor_fragment79(rgb[0], rgb[1], rgb[2], arg0[0x25]);
+        func_8413F2A8((*((s16 *) (arg0 + 0xA))) + (*((s16 *) ((arg0 + (i * 4)) + 0x12))), (*((s16 *) (arg0 + 0xC))) + (*((s16 *) ((arg0 + (i * 4)) + 0x14))));
+      }
+    }
+  }
+}
 #endif
 
 #ifdef VERSION_US
