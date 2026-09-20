@@ -105,3 +105,11 @@ func_84139528: matched (call_sequence:else_chain:direct_indexing), 1 iterations,
 ## 2026-09-20
 
 func_841350F4: time cap at 0.9516 (raw 0.9516) after 2400s, mismatch instruction_drift; tried families: call_sequence; tie-pool yes
+
+## 2026-09-20
+
+func_8412C47C: matched (call_sequence:postflag:independent-switch), 2 iterations, agent codex
+
+## 2026-09-20
+
+func_8413794C: time cap at 0.9074 (raw 0.5988) after 2400s, mismatch instruction_drift; tried families: call_sequence; tie-pool no; 1 iteration(s) with a suspicious identical batch-wide failure
