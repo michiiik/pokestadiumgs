@@ -4444,7 +4444,31 @@ void func_841392E0(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84139528.s")
+extern void func_84138A0C(u8, u8, u8);
+extern void func_800226C0(s32);
+extern s32 func_84138960(u8 arg0);
+extern void func_84138EA4(u8, u8);
+extern void func_84139244(u8);
+extern u8 * D_84195208[];
+void func_84139528(u8 arg0, u8 arg1) {
+    if (func_84138960(arg0) != 0) {
+        if (D_84195208[arg0][arg1 + 5] == 0) {
+            func_800226C0(5);
+        } else if ((D_84195208[arg0][arg1 + 9] & 0x3F) == 0) {
+            func_84138A0C(arg0, 0, arg1);
+        } else if (D_84195208[arg0][arg1 + 5] == D_84195208[arg0][0x25]) {
+            func_84138A0C(arg0, 1, arg1);
+        } else {
+            func_84138EA4(arg0, arg1);
+        }
+    } else {
+        if (D_84195208[arg0][arg1 + 5] == 0) {
+            func_800226C0(5);
+        } else {
+            func_84139244(arg0);
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
