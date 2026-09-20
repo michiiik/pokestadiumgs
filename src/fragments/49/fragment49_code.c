@@ -408,7 +408,51 @@ void func_86103194(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_8610320C.s")
+extern u8 D_800CE060[];
+extern s32 D_8610AD20;
+extern void * D_87F119DC;
+s32 func_8610320C(void) {
+    s32 padding;
+    s32 pressed;
+    f32 movement;
+    u16 result;
+    u16 buttons;
+    u8 *controller;
+
+    controller = D_800CE060 + *(s32 *)((u8 *)D_87F119DC + 0x20) * 0x28;
+    result = 0;
+    buttons = *(u16 *)(controller + 6);
+    if (buttons & 0x300) {
+        movement = (f32)(((buttons & 0x100) > 0) - ((buttons & 0x200) > 0)) * 64.0f;
+    } else {
+        movement = *(f32 *)(controller + 0x18);
+        if (movement > 64.0f) {
+            movement = 64.0f;
+        }
+        if (movement < -64.0f) {
+            movement = -64.0f;
+        }
+    }
+    *(f32 *)((u8 *)D_87F119DC + 0x10) += movement * *(f32 *)((u8 *)(u32)D_8610AD20 + 0x9790);
+    switch (*(u8 *)((u8 *)(u32)D_8610AD20 + 0x9780)) {
+    case 1:
+        pressed = *(u16 *)(controller + 6) & 0x8000;
+        break;
+    case 0:
+        pressed = *(u16 *)(controller + 8) & 0x8000;
+        break;
+    }
+    if (pressed != 0) {
+        result = 0x8000;
+        *(f32 *)((u8 *)D_87F119DC + 0x14) += *(f32 *)((u8 *)(u32)D_8610AD20 + 0x9784);
+    }
+    if (movement > 0.0f) {
+        result |= 0x100;
+    } else if (movement < 0.0f) {
+        result |= 0x200;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86103384.s")
 
