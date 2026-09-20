@@ -320,7 +320,34 @@ void func_86101E04(f32 arg0, f32 arg1, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_861023D4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_861024C8.s")
+s32 func_86101F60(f32 *, f32 *, s32);
+void func_861021A8(f32 *, f32 *);
+void func_861023D4(void);
+void func_86102C08(void *, s32);
+extern void func_86101558(f32 *arg0, f32 *arg1);
+extern void func_86101E04(f32 arg0, f32 arg1, s32 arg2);
+extern void * D_87F119DC;
+void func_861024C8(void *arg0, f32 arg1, f32 arg2, f32 arg3, s32 arg4) {
+    *(f32 *)((u8 *)arg0 + 0xC) += arg1;
+    *(f32 *)((u8 *)arg0 + 0x10) += arg2;
+    func_86101558((f32 *)((u8 *)arg0 + 0xC), (f32 *)((u8 *)arg0 + 0x10));
+    if (func_86101F60(&arg1, &arg2, arg4) == 1) {
+        func_86101558(&arg1, &arg2);
+        *(f32 *)((u8 *)arg0 + 0xC) += arg1 * 1.5f;
+        *(f32 *)((u8 *)arg0 + 0x10) += arg2 * 1.5f;
+        func_86101558((f32 *)((u8 *)arg0 + 0xC), (f32 *)((u8 *)arg0 + 0x10));
+        return;
+    }
+    if (arg3 > 0.0f) {
+        func_861021A8(&arg1, &arg2);
+        arg1 += ((*(f32 *)((u8 *)arg0 + 0xC) * arg3) / 5.0f) - *(f32 *)((u8 *)D_87F119DC + 0x10);
+        arg2 += ((*(f32 *)((u8 *)arg0 + 0x10) * arg3) / 5.0f) - *(f32 *)((u8 *)D_87F119DC + 0x14);
+        func_86101E04(arg1, arg2, arg4);
+        func_861023D4();
+        return;
+    }
+    func_86102C08(arg0, 1);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86102630.s")
 
