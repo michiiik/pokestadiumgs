@@ -283,7 +283,36 @@ s32 func_861018D8(f32 arg0, f32 arg1) { f32 *coord; f32 y; f32 dx; f32 dy; s32 r
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86101BD8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86101E04.s")
+extern s32 D_8610AD20;
+extern void * D_87F119DC;
+void func_86101E04(f32 arg0, f32 arg1, s32 arg2) {
+    f32 value;
+    f32 limit;
+
+    value = (arg0 > 0.0f) ? arg0 : -arg0;
+    limit = 64.0f;
+    limit *= *(f32 *)((u8 *)(u32)D_8610AD20 + 0x9790);
+    if (limit < value) {
+        arg0 = ((arg0 > 0.0f) ? 1.0f : -1.0f) * limit;
+    }
+    *(f32 *)((u8 *)D_87F119DC + 0x10) += arg0;
+    if (arg2 != 0) {
+        value = (arg1 > 0.0f) ? arg1 : -arg1;
+        limit = *(f32 *)((u8 *)(u32)D_8610AD20 + 0x9784);
+        if (limit < value) {
+            arg1 = ((arg1 > 0.0f) ? 1.0f : -1.0f) * limit;
+        }
+        *(f32 *)((u8 *)D_87F119DC + 0x14) += arg1;
+        return;
+    }
+    if (arg1 > 0.0f) {
+        limit = *(f32 *)((u8 *)(u32)D_8610AD20 + 0x9784);
+        value = *(f32 *)((u8 *)D_87F119DC + 0x14);
+        if (value < limit) {
+            *(f32 *)((u8 *)D_87F119DC + 0x14) = value + limit;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86101F60.s")
 
