@@ -13,7 +13,29 @@ void fragment43_main(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC00270.s")
+extern void func_8005053C(void *, void *);
+extern void func_80050578(void *, s32);
+extern u8 D_8AC081F8;
+extern u8 D_8AC07C00;
+extern s16 D_8AC07C08;
+s32 func_8AC00270(s32 arg0, u8 *arg1)
+{
+  unsigned int new_var2;
+  u8 *new_var;
+  new_var2 = 0x400;
+  switch (arg0)
+  {
+    case 0:
+      func_8005053C(arg1, &D_8AC081F8);
+      new_var = &D_8AC07C00;
+      func_80050578(arg1, (s32) new_var);
+      break;
+    case 1:
+      break;
+  }
+  D_8AC07C08 += new_var2;
+  return 0;
+}
 #endif
 
 #ifdef VERSION_US
