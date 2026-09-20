@@ -410,7 +410,26 @@ void func_8413FBC4(s16 arg0, s16 arg1, u8 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_8413FDB0.s")
+extern Gfx D_80094DE0[];
+extern void func_8413E63C(u16 arg0, u16 arg1, u16 arg2, u16 arg3);
+extern Gfx* D_800D0510;
+void func_8413FDB0(void *arg0) {
+    struct { s16 pad[5]; s16 x; s16 y; s16 dx; s16 dy; } *s = arg0;
+    gSPDisplayList(D_800D0510++, D_80094DE0);
+    func_8413E63C(0, 0, 0, 1);
+    if (s->x > 0) {
+        if (s->y > 0) gDPScisFillRectangle(D_800D0510++, 0, 0, s->x, s->y);
+        if (s->y + s->dy < 0xF0) gDPScisFillRectangle(D_800D0510++, 0, s->y + s->dy, s->x, 0xF0);
+        gDPScisFillRectangle(D_800D0510++, 0, s->y, s->x, s->y + s->dy);
+    }
+    if (s->x + s->dx < 0x140) {
+        if (s->y > 0) gDPScisFillRectangle(D_800D0510++, s->x + s->dx, 0, 0x140, s->y);
+        if (s->y + s->dy < 0xF0) gDPScisFillRectangle(D_800D0510++, s->x + s->dx, s->y + s->dy, 0x140, 0xF0);
+        gDPScisFillRectangle(D_800D0510++, s->x + s->dx, s->y, 0x140, s->y + s->dy);
+    }
+    if (s->y > 0) gDPScisFillRectangle(D_800D0510++, s->x, 0, s->x + s->dx, s->y);
+    if (s->y + s->dy < 0xF0) gDPScisFillRectangle(D_800D0510++, s->x, s->y + s->dy, s->x + s->dx, 0xF0);
+}
 #endif
 
 #ifdef VERSION_US
