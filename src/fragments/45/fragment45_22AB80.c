@@ -302,7 +302,25 @@ void func_8AB09418(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22AB80/func_8AB09428.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22AB80/func_8AB099BC.s")
+extern u8 D_8AB12CB0[];
+extern s16 D_8AB16CAC;
+extern s32 func_8AB0A074(s32);
+extern u8 * D_8AB11D0C;
+s32 func_8AB099BC(s32 arg0) {
+    s32 i;
+    u8 *ptr;
+
+    ptr = D_8AB12CB0;
+    for (i = 0; i != 4; i++, ptr += 0x94) {
+        if (*(s16 *)(ptr + 2) == 10) {
+            D_8AB16CAC = i;
+            D_8AB11D0C[0xF] = i;
+            arg0 = func_8AB0A074(0);
+            break;
+        }
+    }
+    return arg0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22AB80/func_8AB09A28.s")
 
