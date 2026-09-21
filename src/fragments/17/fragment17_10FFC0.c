@@ -74,7 +74,33 @@ void func_82200D8C(u8 *arg0, u8 arg1) { s32 result = func_82200CEC(arg1); *(u16 
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_822011AC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82201460.s")
+typedef struct Func82201460Record {
+    s16 active;
+    s16 unk02;
+    u16 flags;
+    s16 unk06;
+    s16 unk08;
+    s16 unk0A;
+    s32 unk0C;
+    s32 unk10;
+    s32 unk14;
+    s16 x;
+    s16 y;
+    s16 dx;
+    s16 dy;
+} Func82201460Record;
+extern void func_822011AC(s16, s16, s32, s16, s32);
+extern void func_82200918(void *, u16);
+void func_82201460(Func82201460Record *arg0) {
+    s16 x;
+    s16 y;
+    if (arg0->active != 0) {
+        x = arg0->x + arg0->dx;
+        y = arg0->y + arg0->dy;
+        func_822011AC(x, y, arg0->unk10, arg0->unk0A, arg0->flags);
+        func_82200918(arg0, arg0->flags);
+    }
+}
 
 extern u8 D_8220E4C8[];
 void func_822014D8(void) {
