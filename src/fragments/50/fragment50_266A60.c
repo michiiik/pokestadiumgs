@@ -25,7 +25,24 @@ void func_86200020_padding(void) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_266A60/func_862002A4.s")
+extern void func_86200080(s32, u8 *);
+extern u8 D_8620DF60[];
+extern s32 D_8620DF90;
+extern void * D_8620E198;
+void func_862002A4(void) {
+    s32 i;
+    u8 *p;
+
+    p = D_8620DF60;
+    i = 0;
+    if (D_8620DF90 > 0) {
+        do {
+            func_86200080(*(s32 *)((u8 *)D_8620E198 + i * 4 + 0x72254), p);
+            i += 1;
+            p += 0xC;
+        } while (i < D_8620DF90);
+    }
+}
 #endif
 
 #ifdef VERSION_US
