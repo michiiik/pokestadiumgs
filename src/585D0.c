@@ -2136,11 +2136,38 @@ void func_8005F620(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u8 arg4) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005F668.s")
+extern u8 D_80128570[];
+s32 func_8005F668(s32 arg0, u8 arg1, u8 arg2)
+{
+    u8 *record;
+    u8 *ptr;
+    s32 result;
+
+    record = D_80128570 + arg0 * 112;
+    result = 0;
+    if (!(*(s32 *)record & 2)) {
+        return 0;
+    }
+    if (arg1 < 0x50) {
+        ptr = *(u8 **)(record + 0x68) + (u8)(arg1 / 8) + 0x5F0;
+        switch (arg2) {
+        case 0:
+            return (*ptr & (1 << (u8)(arg1 % 8))) != 0;
+        case 1:
+            *ptr |= 1 << (u8)(arg1 % 8);
+            break;
+        case 2:
+            *ptr &= ~(1 << (u8)(arg1 % 8));
+            break;
+        }
+        result = 1;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
-extern void func_8005F668(s32, s32, s32);
+extern s32 func_8005F668(s32, u8, u8);
 extern void func_8005F808(s32, s32, s32);
 void func_8005F790(s32 arg0, s32 arg1) {
     s32 *p = &arg1;
