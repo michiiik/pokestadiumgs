@@ -25,7 +25,24 @@ void func_86200020_padding(void) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_266A60/func_862002A4.s")
+extern void func_86200080(s32, u8 *);
+extern u8 D_8620DF60[];
+extern s32 D_8620DF90;
+extern void * D_8620E198;
+void func_862002A4(void) {
+    s32 i;
+    u8 *p;
+
+    p = D_8620DF60;
+    i = 0;
+    if (D_8620DF90 > 0) {
+        do {
+            func_86200080(*(s32 *)((u8 *)D_8620E198 + i * 4 + 0x72254), p);
+            i += 1;
+            p += 0xC;
+        } while (i < D_8620DF90);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -165,7 +182,21 @@ void func_862012F8(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_266A60/func_86201418.s")
+extern f32 func_86207EB0();
+void func_86201418(s32 arg0, s32 arg1, void *arg2) {
+    struct Point { f32 x; f32 y; f32 z; };
+    struct Point direction;
+    u8 pad[0x80];
+    f32 distance;
+
+    direction.x = 0.0f;
+    direction.z = 0.0f;
+    direction.y = -1.0f;
+    distance = func_86207EB0(arg0, arg2, &direction);
+    *(f32 *)((u8 *)arg1 + 0x48) = ((struct Point *)arg2)->x;
+    *(f32 *)((u8 *)arg1 + 0x4C) = ((struct Point *)arg2)->y + direction.y * distance;
+    *(f32 *)((u8 *)arg1 + 0x50) = ((struct Point *)arg2)->z;
+}
 #endif
 
 #ifdef VERSION_US
@@ -331,7 +362,48 @@ void func_86202574(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_266A60/func_86203B08.s")
+extern void func_87D00354(void *, f32 *);
+typedef struct F86203B08Node F86203B08Node;
+struct F86203B08Node {
+    u8 pad00[4];
+    F86203B08Node *next;
+    u8 pad08[0x18];
+    f32 *origin;
+    u8 pad24[0x24];
+    f32 x;
+    f32 y;
+    f32 z;
+    u8 pad54[0x30];
+    u8 transform[0x30];
+    f32 savedX;
+    f32 savedY;
+    f32 savedZ;
+};
+typedef union F86203B08AlignedDelta {
+    f32 v[3];
+    f64 alignment;
+} F86203B08AlignedDelta;
+extern void * D_8620E198;
+void func_86203B08(void) {
+    F86203B08Node *p;
+    f32 delta[3];
+    f32 *origin;
+
+    p = *(F86203B08Node **)((u8 *)D_8620E198 + 0x180);
+    if (p != NULL) {
+        do {
+            origin = p->origin;
+            delta[0] = p->x - origin[0];
+            delta[1] = p->y - origin[1];
+            delta[2] = p->z - origin[2];
+            func_87D00354(p->transform, delta);
+            p->savedX = p->x;
+            p->savedY = p->y;
+            p->savedZ = p->z;
+            p = p->next;
+        } while (p != NULL);
+    }
+}
 #endif
 
 #ifdef VERSION_US
