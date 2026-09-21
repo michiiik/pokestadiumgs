@@ -3858,7 +3858,37 @@ void BattleAnim_Dispatch_211(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8411D388.s")
+extern u8 D_841904DC[];
+extern u8 D_841904D0[];
+extern void func_80037120(s32, s32, s32 *, s16 *, s16 *);
+extern void func_800371B4(u8 *, u8 *, s32, s16, s32);
+extern void func_84111348(s32 arg0, s32 arg1);
+extern void func_8411FEE8(s32);
+extern u8 * D_841911E0;
+void func_8411D388(u8 *arg0) {
+    f32 position[3];
+    f32 distance;
+    s16 angleY;
+    s16 angleX;
+
+    switch (*(s8 *)(arg0 + 0x7F6)) {
+    case 0:
+        func_800371B4(D_841904DC, (u8 *)position, *(s32 *)(D_841911E0 + 0x40), *(s16 *)(D_841911E0 + 0x3C), *(s16 *)(D_841911E0 + 0x3E));
+        func_80037120((s32)D_841904D0, (s32)position, (s32 *)&distance, &angleY, &angleX);
+        if ((distance <= 1.75f) && (*(s16 *)(arg0 + 0x7E8) >= 6)) {
+            *(s16 *)(arg0 + 0x7E8) = 0;
+            *(s8 *)(arg0 + 0x7F6) = 1;
+            func_84111348((s32)arg0, 7);
+        }
+        break;
+    case 1:
+        if (*(s16 *)(arg0 + 0x7E8) == 50) {
+            *(s8 *)(arg0 + 0x7F6) = 2;
+            func_8411FEE8(0);
+        }
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
