@@ -121,3 +121,19 @@ func_8413A12C: time cap at 0.0 (raw None) after 2401s, mismatch unknown; tried f
 ## 2026-09-20
 
 func_8413B254: matched (call_sequence:switch:cast-index), 1 iterations, agent openrouter
+
+## 2026-09-21
+
+func_84137D04: matched (call_sequence:nested:repeated-byte-index), 4 iterations, agent unbiased
+
+## 2026-09-21
+
+func_84124E44: plateau at 0.9787 (raw 0.8298), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool yes
+
+## 2026-09-21
+
+func_841246AC: matched (call_sequence:narrow_signature:direct_parameter), 2 iterations, agent unbiased
+
+## 2026-09-21
+
+func_84137BD4: matched (call_sequence:cached_destination:byte_subscript_address), 2 iterations, agent unbiased
