@@ -4255,7 +4255,22 @@ s32 func_8413771C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84137BD4.s")
+typedef struct { u32 words[0xA0]; } Copy84137BD4;
+extern void func_8413794C(u8 *);
+extern u8 D_84195280[];
+extern u8 D_84199D80[];
+void func_84137BD4(void) {
+    u8 *destination = D_84199D80;
+    while (D_84195280[0x4D81] != D_84195280[0x4D80]) {
+        func_8413794C(destination);
+        D_84195280[0x4D80]++;
+        if (D_84195280[0x4D80] >= 0x1E) {
+            D_84195280[0x4D80] = 0;
+        }
+        *(Copy84137BD4 *)destination = *(Copy84137BD4 *)&D_84195280[D_84195280[0x4D80] * 0x280];
+    }
+    func_8413794C(destination);
+}
 #endif
 
 #ifdef VERSION_US
