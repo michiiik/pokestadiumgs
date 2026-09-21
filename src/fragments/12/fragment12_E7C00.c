@@ -279,7 +279,40 @@ s32 func_81404CA4(void *arg0)
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81404D00.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81404D44.s")
+s32 func_81404D44(void *arg0)
+{
+    s32 count;
+    s32 sum;
+    s32 i;
+    u8 *ptr;
+    s32 index;
+    sum = 0;
+    i = 0;
+    count = *((s8 *) (((u8 *) arg0) + 0x12));
+    ;
+    ptr = arg0;
+    if ((count >= (0 + 1)) ^ 0)
+    {
+        if (1)
+        {
+loop:
+            index = *((s8 *) (ptr + 0xA));
+            if (index < 0)
+            {
+                return sum;
+            }
+            sum += *((((u8 *) arg0) + (index * 0x58)) + 0x4B5D);
+            i++;
+            ptr++;
+            index += 0;
+        }
+        if (i < count)
+        {
+            goto loop;
+        }
+    }
+    return sum;
+}
 
 s32 func_81404DA0(void *arg0, s32 arg1)
 {
