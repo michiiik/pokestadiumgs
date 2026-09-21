@@ -137,3 +137,11 @@ func_841246AC: matched (call_sequence:narrow_signature:direct_parameter), 2 iter
 ## 2026-09-21
 
 func_84137BD4: matched (call_sequence:cached_destination:byte_subscript_address), 2 iterations, agent unbiased
+
+## 2026-09-22
+
+func_84139EB0: matched (call_sequence:else_if:pointer_table:s32_flags_exact), 4 iterations, agent codex
+
+## 2026-09-22
+
+func_8413DD94: plateau at 0.8919 (raw 0.4595), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool yes
