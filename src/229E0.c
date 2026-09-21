@@ -5455,7 +5455,25 @@ void geo_layout_cmd_close_node(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FD34.s")
+extern void *D_80126454;
+extern void func_80038F8C(void *arg0, void *arg1);
+extern s16 D_80126518;
+void func_8003FD34(void *arg0) {
+    s32 *entry;
+    s16 index;
+    if (arg0 != NULL) {
+        index = D_80126518;
+        entry = &D_80126498[index];
+        *entry = (s32)arg0;
+        if (index == 0) {
+            if (D_80126454 == NULL) {
+                D_80126454 = arg0;
+            }
+        } else {
+            func_80038F8C(entry[-1], arg0);
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
