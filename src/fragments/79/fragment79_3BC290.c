@@ -76,7 +76,41 @@ void func_8414CF74(s32 arg0, u8 arg1, u8 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414D348.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414D51C.s")
+extern u8 func_80062D20(u8 arg0);
+extern u8 * func_84154B64(u8);
+void func_8414D51C(s32 arg0, u8 arg1) {
+    u8 *value;
+    u8 move;
+
+    value = func_84154B64(arg1);
+    move = *((u8 *)(u32)arg0 + arg1 + 6);
+    switch (func_80062D20(move)) {
+        case 0x27:
+        case 0x4B:
+        case 0x97:
+            if (value[0x17] & 0x10) {
+                value[0x17] &= ~0x10;
+            } else {
+                value[0x17] |= 0x10;
+            }
+            break;
+        case 0x9B:
+            if (value[0x17] & 0x10) {
+                value[0x17] &= ~0x70;
+            } else {
+                value[0x17] |= 0x10;
+                switch (move) {
+                    case 0x13:
+                        value[0x17] |= 0x40;
+                        break;
+                    case 0x5B:
+                        value[0x17] |= 0x20;
+                        break;
+                }
+            }
+            break;
+    }
+}
 
 extern u8 * func_84154B64(u8);
 void func_8414D610(s32 arg0, u8 arg1) {
