@@ -168,7 +168,33 @@ s32 func_82201C14(void) {
     return var_v1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82201C70.s")
+typedef struct { s16 x; s16 y; } F82201C70_Pair;
+typedef struct { s16 x; s16 y; s16 w; s16 h; } F82201C70_Rect;
+typedef struct { s16 mode; s16 flags; F82201C70_Rect current; F82201C70_Rect saved; s16 k0; s16 k1; s16 k2; s16 k3; F82201C70_Pair currentPair; F82201C70_Pair savedPair; s16 z0; s16 z1; } F82201C70_State;
+typedef struct { u8 pad00[8]; F82201C70_Rect rect; u8 pad10[0x18]; F82201C70_Pair pair; } F82201C70_Input;
+typedef struct { F82201C70_Pair origin; s16 w; s16 h; } F82201C70_NestedRect;
+typedef struct { s16 mode; s16 flags; F82201C70_NestedRect current; F82201C70_NestedRect saved; s16 k0; s16 k1; s16 k2; s16 k3; F82201C70_Pair currentPair; F82201C70_Pair savedPair; s16 z0; s16 z1; } F82201C70_NestedState;
+void func_82201C70(F82201C70_State *arg0, F82201C70_Input *arg1) {
+    arg0->mode = 1;
+    arg0->flags = 0;
+    arg0->current.x = arg1->rect.x;
+    arg0->current.y = arg1->rect.y;
+    arg0->current.w = arg1->rect.w;
+    arg0->current.h = arg1->rect.h;
+    *(F82201C70_Pair *)&arg0->saved = *(F82201C70_Pair *)&arg0->current;
+    arg0->saved.w = arg0->current.w;
+    arg0->saved.h = arg0->current.h;
+    arg0->k0 = 0x3B;
+    arg0->k1 = 0x16B;
+    arg0->k2 = 0x1F4;
+    arg0->k3 = 0x55;
+    arg0->currentPair.x = arg1->pair.x;
+    arg0->currentPair.y = arg1->pair.y;
+    arg0->savedPair.x = arg0->currentPair.x;
+    arg0->savedPair.y = arg0->currentPair.y;
+    arg0->z0 = 0;
+    arg0->z1 = 0;
+}
 
 s32 func_82201D08(void *arg0) {
     s32 var_v1;
