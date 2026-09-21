@@ -182,7 +182,21 @@ void func_862012F8(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_266A60/func_86201418.s")
+extern f32 func_86207EB0();
+void func_86201418(s32 arg0, s32 arg1, void *arg2) {
+    struct Point { f32 x; f32 y; f32 z; };
+    struct Point direction;
+    u8 pad[0x80];
+    f32 distance;
+
+    direction.x = 0.0f;
+    direction.z = 0.0f;
+    direction.y = -1.0f;
+    distance = func_86207EB0(arg0, arg2, &direction);
+    *(f32 *)((u8 *)arg1 + 0x48) = ((struct Point *)arg2)->x;
+    *(f32 *)((u8 *)arg1 + 0x4C) = ((struct Point *)arg2)->y + direction.y * distance;
+    *(f32 *)((u8 *)arg1 + 0x50) = ((struct Point *)arg2)->z;
+}
 #endif
 
 #ifdef VERSION_US
