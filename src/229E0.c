@@ -3584,11 +3584,29 @@ S1_unk_D_86002F34_alt1* GeoNode_CreateType4(S1_MemoryBlock* arg0, S1_unk_D_86002
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800380B8.s")
+void *func_800380B8(S1_MainPoolState *arg0, s32 arg1, s16 arg2) {
+    if (arg0 != NULL) {
+        arg1 = (s32)(u32)MainPool_AllocAligned(arg0, 0x18, 4);
+    }
+    if (arg1 != 0) {
+        GeoNode_Init((S1_GraphNode *)arg1, 5U);
+        *(u8 *)(arg1 + 2) = *(u8 *)(arg1 + 2) | (arg2 & 7);
+    }
+    return (void *)arg1;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003811C.s")
+void *func_8003811C(S1_MainPoolState *arg0, s32 arg1, s16 arg2) {
+    if (arg0 != NULL) {
+        arg1 = (s32)(u32)MainPool_AllocAligned(arg0, 0x18, 4);
+    }
+    if (arg1 != 0) {
+        GeoNode_Init((S1_GraphNode *)arg1, 6);
+        *(u8 *)(arg1 + 2) = *(u8 *)(arg1 + 2) | (arg2 & 7);
+    }
+    return (void *)arg1;
+}
 #endif
 
 #ifdef VERSION_US
@@ -5437,7 +5455,25 @@ void geo_layout_cmd_close_node(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FD34.s")
+extern void *D_80126454;
+extern void func_80038F8C(void *arg0, void *arg1);
+extern s16 D_80126518;
+void func_8003FD34(void *arg0) {
+    s32 *entry;
+    s16 index;
+    if (arg0 != NULL) {
+        index = D_80126518;
+        entry = &D_80126498[index];
+        *entry = (s32)arg0;
+        if (index == 0) {
+            if (D_80126454 == NULL) {
+                D_80126454 = arg0;
+            }
+        } else {
+            func_80038F8C(entry[-1], arg0);
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
