@@ -2395,7 +2395,30 @@ void func_84116410(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_84116460.s")
+extern s32 func_8006456C(s32);
+extern void func_84108A10(u8 *);
+extern void func_841126C8(s32 arg0);
+extern void func_8411FEE8(s32);
+extern s32 D_84183D50;
+extern s32 D_841911F4;
+extern u8 * D_84193DD0;
+void func_84116460(u8 *arg0) {
+    f64 reservation;
+    u8 index;
+    s32 value;
+
+    arg0[0x618] = D_84193DD0[8];
+    *(s16 *)(arg0 + 0x7E8) = 0;
+    arg0[0x7F6] = 0;
+    func_8411FEE8(0x258);
+    *(u16 *)(arg0 + 0x65C) = *(u16 *)(((u8 (*)[0x10])D_84193DD0)[func_8411E1F8(arg0)] + 0xC);
+    index = func_8411E1F8(arg0);
+    value = func_8006456C(*(u16 *)(((u8 (*)[0x10])D_84193DD0)[func_8411E1F8(arg0)] + 0x14));
+    func_84112FD0(*(u8 **)(arg0 + 0x5C0), *(u16 *)(arg0 + 0x65C), *(F12State *)(((u8 (*)[0x10])D_84193DD0)[index] + 0x18), value);
+    func_84108A10(arg0);
+    func_841126C8((s32)arg0);
+    *(s32 *)(arg0 + D_841911F4 * 4 + 0x5C8) = D_84183D50;
+}
 #endif
 
 #ifdef VERSION_US
@@ -2825,7 +2848,40 @@ void func_841182E0(u8 *a){s32 i;if(*(s16*)(a+0x7E8)==0)func_84112158((s32)a,0xFE
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8411845C.s")
+extern void func_84124104(u8 *, s32);
+extern void func_841087B8(s32 arg0, s32 arg1, s32 arg2);
+extern void func_84112580(s32 arg0);
+extern void func_84117648(u8 *arg0);
+extern void func_841176E0(void *arg0);
+extern void func_84117744(u8 *);
+extern void func_84117880(u8 *arg0);
+extern void func_84117A24(u8 *arg0);
+extern void func_84117AA0(u8 *);
+extern void func_84117C18(void *arg0);
+extern s32 func_84117CAC(void *arg0);
+extern s32 func_8411E164();
+void func_8411845C(u8 *arg0) {
+    func_84117744(arg0);
+    if (func_84117CAC(arg0)) {
+        func_84117880(arg0);
+        func_841087B8(arg0[0x618], func_8411E164((s32)arg0), (s32)arg0);
+        func_84117AA0(arg0);
+        if (arg0[0x618] != 0xCD) {
+            func_84123F60(arg0, arg0[0x61F]);
+        }
+    }
+    func_84117880(arg0);
+    func_84117A24(arg0);
+    func_84117C18(arg0);
+    if ((arg0[0x618] != 0xCD) && (*(s16 *)(arg0 + 0x7E8) >= *(s8 *)(arg0 + 0x619))) {
+        func_84124104(arg0, arg0[0x61F]);
+    }
+    if (*(s8 *)(arg0 + 0x619) + 10 == *(s16 *)(arg0 + 0x7E8)) {
+        func_84112580((s32)arg0);
+    }
+    func_841176E0(arg0);
+    func_84117648(arg0);
+}
 #endif
 
 #ifdef VERSION_US
@@ -3374,7 +3430,39 @@ void BattleAnim_Dispatch_092(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8411B070.s")
+extern void func_84111348(s32 arg0, s32 arg1);
+extern void func_841119CC(u8 *, u16);
+extern void func_84111D64(u8 *arg0, s32 arg1);
+extern void func_84111DB4(u8 *arg0, s32 arg1);
+extern void func_84111E80(void *arg0, s16 arg1);
+extern s32 func_84113430(s32 arg0);
+extern void func_8411AF6C(u8 *arg0);
+extern void func_8411FEE8(s32);
+extern s32 D_84183D50;
+extern u8 D_841849B6[];
+extern u8 * D_841911E0;
+extern s32 D_841911F4;
+void func_8411B070(u8 *arg0) {
+    if (func_84113430((s32)arg0)) {
+        *(s16 *)(arg0 + 0x7E8) = 0;
+        func_8411AF6C(arg0);
+        func_841119CC(D_841911E0, *(u16 *)(D_841849B6 + arg0[0x618] * 8));
+        func_84111348((s32)arg0, 0);
+        func_84111E50(arg0, *(s8 *)(arg0 + 0x617));
+        func_84111D64(arg0, *(s8 *)(arg0 + 0x616));
+        func_84111DB4(arg0, arg0[0x61B]);
+        func_84111E80(arg0, arg0[0x61B]);
+        if (arg0[0x61A] == 0) {
+            *(s16 *)(arg0 + 0x7E8) = arg0[0x61B] - 1;
+            func_8411FEE8(500);
+        } else {
+            *(s16 *)(arg0 + 0x7E8) = arg0[0x61B];
+            func_8411FEE8(500);
+        }
+        arg0[0x7F6] = 1;
+        *(s32 *)(arg0 + 0x5C8 + D_841911F4 * 4) = D_84183D50;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -3605,7 +3693,24 @@ void BattleAnim_Dispatch_169(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8411C7B8.s")
+extern void func_8410C400(u8 *, void *, f32, f32, f32, s32);
+extern void func_8410B884(u8 *arg0, void *arg1, u8 *arg2, s16 arg3);
+extern s32 D_84191208;
+void func_8411C7B8(void *arg0, void *arg1, s32 arg2) {
+    *(s16 *)((u8 *)arg1 + 0x98) = 0;
+    if (*(s16 *)((u8 *)D_84191208 + 0x7E8) == 1) {
+        func_8410B884(*(u8 **)arg1, arg0, arg1, *(s16 *)((u8 *)arg0 + 0x20));
+        *(s16 *)((u8 *)arg1 + 0x3C) = 0;
+    }
+    if (arg2 == *(s16 *)((u8 *)D_84191208 + 0x7E8)) {
+        *(f32 *)((u8 *)arg1 + 0x44) = 0.0f;
+    }
+    if (*(s16 *)((u8 *)D_84191208 + 0x7E8) < arg2) {
+        func_8410C400(*(u8 **)arg1, arg0, 50.0f, 30.0f, 0.0f, 0);
+    } else {
+        func_8410C400(*(u8 **)arg1, arg0, 80.0f, 30.0f, 0.5f, 0x1C71);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -3753,7 +3858,37 @@ void BattleAnim_Dispatch_211(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8411D388.s")
+extern u8 D_841904DC[];
+extern u8 D_841904D0[];
+extern void func_80037120(s32, s32, s32 *, s16 *, s16 *);
+extern void func_800371B4(u8 *, u8 *, s32, s16, s32);
+extern void func_84111348(s32 arg0, s32 arg1);
+extern void func_8411FEE8(s32);
+extern u8 * D_841911E0;
+void func_8411D388(u8 *arg0) {
+    f32 position[3];
+    f32 distance;
+    s16 angleY;
+    s16 angleX;
+
+    switch (*(s8 *)(arg0 + 0x7F6)) {
+    case 0:
+        func_800371B4(D_841904DC, (u8 *)position, *(s32 *)(D_841911E0 + 0x40), *(s16 *)(D_841911E0 + 0x3C), *(s16 *)(D_841911E0 + 0x3E));
+        func_80037120((s32)D_841904D0, (s32)position, (s32 *)&distance, &angleY, &angleX);
+        if ((distance <= 1.75f) && (*(s16 *)(arg0 + 0x7E8) >= 6)) {
+            *(s16 *)(arg0 + 0x7E8) = 0;
+            *(s8 *)(arg0 + 0x7F6) = 1;
+            func_84111348((s32)arg0, 7);
+        }
+        break;
+    case 1:
+        if (*(s16 *)(arg0 + 0x7E8) == 50) {
+            *(s8 *)(arg0 + 0x7F6) = 2;
+            func_8411FEE8(0);
+        }
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US

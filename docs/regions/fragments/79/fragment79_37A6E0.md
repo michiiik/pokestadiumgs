@@ -65,3 +65,27 @@ func_84116808: matched (call_sequence:switch:direct-field-access), 1 iterations,
 ## 2026-09-19
 
 func_84115988: matched (call_sequence:direct:baseline), 1 iterations, agent unbiased
+
+## 2026-09-21
+
+func_84116460: matched (call_sequence:frame-reservation:leading-doubleword), 3 iterations, agent unbiased
+
+## 2026-09-21
+
+func_8411C7B8: matched (call_sequence:direct-access:baseline), 1 iterations, agent unbiased
+
+## 2026-09-21
+
+func_8410D088: plateau at 0.9667 (raw 0.85), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool yes
+
+## 2026-09-21
+
+func_8411D388: matched (call_sequence:switch:float-vector-baseline), 1 iterations, agent unbiased
+
+## 2026-09-21
+
+func_8411845C: matched (call_sequence:direct:baseline), 1 iterations, agent unbiased
+
+## 2026-09-21
+
+func_8411B070: matched (call_sequence:nested-guard:direct-offsets), 1 iterations, agent unbiased
