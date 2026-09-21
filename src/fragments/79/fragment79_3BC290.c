@@ -181,7 +181,45 @@ s32 func_8414D680(u8 arg0, u8 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414E5B0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414E658.s")
+extern u8 func_84154B24();
+extern u8 * func_84154B64(u8);
+extern s32 func_841556C4(u8 *, u8);
+void func_8414E658(s32 arg0)
+{
+  struct LocalState
+  {
+    u8 pad[0xA];
+    u16 amount[2];
+  };
+  u8 current;
+  u8 other;
+  u8 *value;
+  u8 *opponent;
+  struct LocalState *state;
+  current = func_84154B24();
+  other = 1 - current;
+  value = func_84154B64(current);
+  opponent = func_84154B64(other);
+  state = (struct LocalState *) (((((((u32) arg0) & 0xFFFFFFFF) & 0xFFFFFFFF) & 0xFFFFFFFF) & 0xFFFFFFFF) + 4);
+  if (current == (*(((u8 *) ((u32) arg0)) + 5)))
+  {
+    if (state->amount[other] < (*((u16 *) (value + 0x28))))
+    {
+      if (func_841556C4(opponent, 0x6F) == 0)
+      {
+        state->amount[current] *= 3;
+      }
+    }
+  }
+  else
+    if ((state->amount[other] * 2) < (*((u16 *) (value + 0x28))))
+  {
+    if (func_841556C4(opponent, 0x6F) == 0)
+    {
+      state->amount[current] *= 3;
+    }
+  }
+}
 
 extern s32 func_841556C4(u8 *, u8);
 extern u8 func_84154B24();
