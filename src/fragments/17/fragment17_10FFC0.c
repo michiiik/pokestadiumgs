@@ -6,7 +6,31 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82200694.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_822006CC.s")
+typedef struct F822006CC_Particle {
+    s16 unk0;
+    s16 unk2;
+    f32 unk4;
+    s16 unk8;
+    s16 unkA;
+} F822006CC_Particle;
+extern f32 D_8220E0C8;
+extern f32 D_8220E0CC;
+extern f32 D_80088E50[];
+extern f32 D_80087E50[];
+void func_822006CC(F822006CC_Particle *arg0, s32 arg1, s32 arg2) {
+    u16 angle;
+    f32 radius;
+    s32 index;
+
+    angle = guRandom() & 0xFFFF;
+    radius = (s32)guRandom() % 33;
+    arg0->unk0 = 1;
+    arg0->unk2 = 0;
+    arg0->unk4 = ((f32)((s32)guRandom() % 101) * D_8220E0C8) / 100.0f + D_8220E0CC;
+    index = (s32)angle >> 4;
+    arg0->unk8 = (s16)(s32)(D_80088E50[index] * radius + (f32)arg1);
+    arg0->unkA = (s16)(s32)(D_80087E50[index] * radius + (f32)arg2);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_822007D8.s")
 
@@ -50,7 +74,33 @@ void func_82200D8C(u8 *arg0, u8 arg1) { s32 result = func_82200CEC(arg1); *(u16 
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_822011AC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82201460.s")
+typedef struct Func82201460Record {
+    s16 active;
+    s16 unk02;
+    u16 flags;
+    s16 unk06;
+    s16 unk08;
+    s16 unk0A;
+    s32 unk0C;
+    s32 unk10;
+    s32 unk14;
+    s16 x;
+    s16 y;
+    s16 dx;
+    s16 dy;
+} Func82201460Record;
+extern void func_822011AC(s16, s16, s32, s16, s32);
+extern void func_82200918(void *, u16);
+void func_82201460(Func82201460Record *arg0) {
+    s16 x;
+    s16 y;
+    if (arg0->active != 0) {
+        x = arg0->x + arg0->dx;
+        y = arg0->y + arg0->dy;
+        func_822011AC(x, y, arg0->unk10, arg0->unk0A, arg0->flags);
+        func_82200918(arg0, arg0->flags);
+    }
+}
 
 extern u8 D_8220E4C8[];
 void func_822014D8(void) {
@@ -118,7 +168,33 @@ s32 func_82201C14(void) {
     return var_v1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82201C70.s")
+typedef struct { s16 x; s16 y; } F82201C70_Pair;
+typedef struct { s16 x; s16 y; s16 w; s16 h; } F82201C70_Rect;
+typedef struct { s16 mode; s16 flags; F82201C70_Rect current; F82201C70_Rect saved; s16 k0; s16 k1; s16 k2; s16 k3; F82201C70_Pair currentPair; F82201C70_Pair savedPair; s16 z0; s16 z1; } F82201C70_State;
+typedef struct { u8 pad00[8]; F82201C70_Rect rect; u8 pad10[0x18]; F82201C70_Pair pair; } F82201C70_Input;
+typedef struct { F82201C70_Pair origin; s16 w; s16 h; } F82201C70_NestedRect;
+typedef struct { s16 mode; s16 flags; F82201C70_NestedRect current; F82201C70_NestedRect saved; s16 k0; s16 k1; s16 k2; s16 k3; F82201C70_Pair currentPair; F82201C70_Pair savedPair; s16 z0; s16 z1; } F82201C70_NestedState;
+void func_82201C70(F82201C70_State *arg0, F82201C70_Input *arg1) {
+    arg0->mode = 1;
+    arg0->flags = 0;
+    arg0->current.x = arg1->rect.x;
+    arg0->current.y = arg1->rect.y;
+    arg0->current.w = arg1->rect.w;
+    arg0->current.h = arg1->rect.h;
+    *(F82201C70_Pair *)&arg0->saved = *(F82201C70_Pair *)&arg0->current;
+    arg0->saved.w = arg0->current.w;
+    arg0->saved.h = arg0->current.h;
+    arg0->k0 = 0x3B;
+    arg0->k1 = 0x16B;
+    arg0->k2 = 0x1F4;
+    arg0->k3 = 0x55;
+    arg0->currentPair.x = arg1->pair.x;
+    arg0->currentPair.y = arg1->pair.y;
+    arg0->savedPair.x = arg0->currentPair.x;
+    arg0->savedPair.y = arg0->currentPair.y;
+    arg0->z0 = 0;
+    arg0->z1 = 0;
+}
 
 s32 func_82201D08(void *arg0) {
     s32 var_v1;
@@ -269,7 +345,47 @@ s32 func_82202B80(s32 arg0, u8 *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82202E0C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82202FC8.s")
+extern u8 D_8220E310[];
+extern u8 *func_8004C874(s32, s32);
+extern void func_8004C54C(s32, void *);
+typedef struct F82202FC8_Record { u8 pad0[5]; u8 type; u8 pad6[2]; u8 payload[12]; } F82202FC8_Record;
+extern u16 D_8220E4C0;
+s32 func_82202FC8(s32 arg0, u8 *arg1) {
+    s32 index = *(s32 *)(arg1 + 0x20);
+    u8 *data = NULL;
+    u8 *record;
+    s32 type;
+
+    switch (arg0) {
+        case 0:
+            break;
+        case 1:
+            record = D_8220E310 + index * 0x14;
+            type = record[5];
+            switch (type) {
+                case 0:
+                case 3:
+                    data = record + 8;
+                    break;
+                case 4:
+                case 5:
+                    data = func_8004C874(0x17, 0x40);
+                    break;
+            }
+            if (data != NULL) {
+                func_8004C54C(0x15, data);
+                if (D_8220E4C0 & 8) {
+                    *(u16 *)(arg1 + 2) |= 2;
+                } else {
+                    *(u16 *)(arg1 + 2) &= 0xFFFD;
+                }
+            } else {
+                *(u16 *)(arg1 + 2) &= 0xFFFD;
+            }
+            break;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_822030BC.s")
 
@@ -296,7 +412,35 @@ s32 func_8220336C(s32 arg0, s32 arg1) { gDPPipeSync(D_800D0510++); gDPSetEnvColo
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_822037E4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_822039C8.s")
+extern void *StageContext_GetCurrentImage(void);
+extern void func_800088DC(void);
+extern void func_81600F0C(s32, s16, s16, s16, s32);
+extern void func_80006F70(Gfx **, s32, s32, s16, s32);
+extern void func_800503A4(u8 *);
+extern void func_822037E4(void);
+extern s32 func_80008648(void);
+extern s32 D_8220D770;
+extern void *D_8220E360;
+extern u8 *D_8220E364;
+extern s16 D_8220E4CA;
+extern s16 D_8220E4CC;
+extern s16 D_8220E4CE;
+extern Gfx * D_800D0510;
+extern u8 D_8220E4C8[];
+void func_822039C8(void) {
+    s32 pad;
+    u8 *image;
+
+    image = StageContext_GetCurrentImage();
+    func_800088DC();
+    func_81600F0C(((s32 *)D_8220E360)[1], *(s16 *)D_8220E4C8, D_8220E4CA, D_8220E4CC, D_8220E4CE);
+    func_80006F70(&D_800D0510, 0, 0, *(s16 *)(image + 4), *(u16 *)(image + 6));
+    func_800503A4(D_8220E364);
+    func_800503A4(*(u8 **)((u8 *)D_8220E360 + 0x1C));
+    func_822037E4();
+    func_80008648();
+    D_8220D770 += 1;
+}
 
 extern s32 D_8220E4B8, D_8220D784;
 
@@ -305,7 +449,31 @@ void func_82203A84(void) {
     D_8220D784 = 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82203A98.s")
+extern s32 D_8220D848;
+extern s32 func_82201834(s16 *);
+extern s32 func_82201C14(void);
+extern s16 D_8220E378;
+extern u8 D_8220E468[];
+s32 func_82203A98(void) {
+    s16 *p;
+    s32 result = 0;
+
+    if (D_8220E4B8 < 0x14) {
+        D_8220E4B8++;
+    }
+    p = &D_8220E378;
+    if (D_8220E4B8 == D_8220D848) {
+        do {
+            func_82201834(p);
+            p += 0x1E;
+        } while (p != (s16 *)D_8220E468);
+    } else if (D_8220D848 < D_8220E4B8) {
+        if (func_82201C14() != 0) {
+            result = 1;
+        }
+    }
+    return result;
+}
 
 extern void *D_80087200; extern void func_800226C0(s32);
 s32 func_82203B3C(void) { s32 result = 0; if ((*(u16 *)((u8 *)D_80087200 + 8) & 0x8000) != 0) { func_800226C0(0x33); result = 1; } else if ((*(u16 *)((u8 *)D_80087200 + 8) & 0x4000) != 0) { func_800226C0(3); result = -1; } return result; }
