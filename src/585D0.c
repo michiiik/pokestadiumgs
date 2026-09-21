@@ -414,11 +414,36 @@ void func_80059468(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80059488.s")
+extern u8 D_80128570[];
+void func_80059488(s32 arg0)
+{
+    s32 i;
+    struct Buffer { u8 *data; } buffer;
+
+    buffer = *(struct Buffer *)(D_80128570 + arg0 * 112 + 0x64);
+    HAL_Memset(buffer.data, 0xFF, 0x34C0);
+    for (i = 0; i < 6; i++) {
+        buffer.data[i * 0x462] = 0;
+        buffer.data[i * 0x462 + 0x1A60] = 0;
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80059578.s")
+typedef struct { u8 *data; } Batch59578Buffer;
+extern u8 D_80128570[];
+void func_80059578(s32 arg0)
+{
+    s32 i;
+    Batch59578Buffer buffer;
+
+    buffer = *(Batch59578Buffer *)(D_80128570 + arg0 * 112 + 0x64);
+    HAL_Memset(buffer.data, 0xFF, 0x3E40);
+    for (i = 0; i < 7; i++) {
+        buffer.data[i * 0x450] = 0;
+        buffer.data[i * 0x450 + 0x2000] = 0;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -513,7 +538,51 @@ void func_80059D00_padding2(void) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80059DD0.s")
+extern s32 func_80057A80(s32 arg0);
+extern s32 func_8005914C(s32 arg0);
+extern void func_80059670(s32 arg0);
+extern void func_800596D0(s32 arg0, u32 arg1);
+extern void func_8005AFF4(s32 arg0);
+extern s32 func_8005DB84(s32 arg0);
+extern s32 main_pool_alloc_with_func(s32, s32, s32, void (*)(s32, u32));
+extern s32 main_pool_try_free(s32);
+extern u8 D_80128570[];
+s32 func_80059DD0(s32 arg0)
+{
+    u8 pad[8];
+    s32 result;
+    s32 flags;
+    u8 *p;
+
+    p = D_80128570 + arg0 * 112;
+    flags = *(s32 *)p;
+    result = 0;
+    if (!(flags & 1)) {
+        return 0;
+    }
+    if (flags & 4) {
+        return 1;
+    }
+    if (func_80057A80(arg0) != 0) {
+        *(s32 *)(p + 0x64) = main_pool_alloc_with_func(0x34C0, 0, arg0 + 0x424F5830, func_800596D0);
+    } else {
+        *(s32 *)(p + 0x64) = main_pool_alloc_with_func(0x3E40, 0, arg0 + 0x424F5830, func_800596D0);
+    }
+    if (*(s32 *)(p + 0x64) != 0) {
+        *(s32 *)p |= 4;
+        if (func_8005DB84(arg0) > 0) {
+            result = func_8005914C(arg0);
+            if (result == 0) {
+                main_pool_try_free(*(s32 *)(p + 0x64));
+            }
+        } else {
+            func_8005AFF4(arg0);
+            func_80059670(arg0);
+            result = 1;
+        }
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
@@ -2067,11 +2136,38 @@ void func_8005F620(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u8 arg4) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005F668.s")
+extern u8 D_80128570[];
+s32 func_8005F668(s32 arg0, u8 arg1, u8 arg2)
+{
+    u8 *record;
+    u8 *ptr;
+    s32 result;
+
+    record = D_80128570 + arg0 * 112;
+    result = 0;
+    if (!(*(s32 *)record & 2)) {
+        return 0;
+    }
+    if (arg1 < 0x50) {
+        ptr = *(u8 **)(record + 0x68) + (u8)(arg1 / 8) + 0x5F0;
+        switch (arg2) {
+        case 0:
+            return (*ptr & (1 << (u8)(arg1 % 8))) != 0;
+        case 1:
+            *ptr |= 1 << (u8)(arg1 % 8);
+            break;
+        case 2:
+            *ptr &= ~(1 << (u8)(arg1 % 8));
+            break;
+        }
+        result = 1;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
-extern void func_8005F668(s32, s32, s32);
+extern s32 func_8005F668(s32, u8, u8);
 extern void func_8005F808(s32, s32, s32);
 void func_8005F790(s32 arg0, s32 arg1) {
     s32 *p = &arg1;
