@@ -319,7 +319,22 @@ void func_87E15A78(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E15E18.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E1614C.s")
+extern void func_87E15E18(f32 *, f32 *, s32 *, s32);
+extern void func_80035A10(f32 *);
+void func_87E1614C(f32 *arg0, f32 *arg1, s32 *arg2, s32 arg3, s32 *arg4, s32 arg5) {
+    s32 pad;
+    f32 first[3];
+    f32 second[3];
+
+    func_87E15E18(first, arg1, arg2, arg3);
+    func_87E15E18(second, arg1, arg4, arg5);
+    arg0[0] = second[0] - first[0];
+    arg0[1] = second[1] - first[1];
+    arg0[2] = second[2] - first[2];
+    if ((arg0[0] != 0.0f) || (arg0[1] != 0.0f) || (arg0[2] != 0.0f)) {
+        func_80035A10(arg0);
+    }
+}
 
 extern void Vec3f_CrossProduct(f32 *, f32 *, f32 *);
 extern void func_80035A10(f32 *);
