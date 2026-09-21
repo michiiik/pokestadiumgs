@@ -152,7 +152,41 @@ void func_867006C4(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/55/fragment55_code/func_86703DF4.s")
+typedef struct State86703DF4 {
+    u8 pad00[0x08];
+    s32 unk08;
+    u8 pad0C[0x20];
+    s32 unk2C;
+    u8 pad30[0x08];
+    s32 unk38;
+    u8 pad3C[0x0C];
+    s32 unk48;
+    u8 pad4C[0x60];
+} State86703DF4;
+extern State86703DF4 D_86728408[];
+extern s16 D_86710C40[][0xB4];
+void func_86703DF4(s32 arg0) {
+    s32 count;
+    s32 limit;
+
+    limit = 0;
+    if (D_86728408[arg0].unk38 != 0) {
+        D_86728408[arg0].unk48 = 1;
+        limit = 0x20;
+    }
+    count = ++D_86728408[arg0].unk08;
+    if (limit < count) {
+        D_86728408[arg0].unk08 = 0;
+        D_86728408[arg0].unk2C = 0;
+        D_86728408[arg0].unk38 = 0;
+        D_86728408[arg0].unk48 = 0;
+        return;
+    }
+    D_86710C40[arg0][0] = count << 12;
+}
+
+void func_86703DF4_padding(void) {
+}
 #endif
 
 #ifdef VERSION_US
