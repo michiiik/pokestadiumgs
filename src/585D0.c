@@ -414,7 +414,19 @@ void func_80059468(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80059488.s")
+extern u8 D_80128570[];
+void func_80059488(s32 arg0)
+{
+    s32 i;
+    struct Buffer { u8 *data; } buffer;
+
+    buffer = *(struct Buffer *)(D_80128570 + arg0 * 112 + 0x64);
+    HAL_Memset(buffer.data, 0xFF, 0x34C0);
+    for (i = 0; i < 6; i++) {
+        buffer.data[i * 0x462] = 0;
+        buffer.data[i * 0x462 + 0x1A60] = 0;
+    }
+}
 #endif
 
 #ifdef VERSION_US
