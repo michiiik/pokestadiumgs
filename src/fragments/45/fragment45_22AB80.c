@@ -355,7 +355,39 @@ s32 func_8AB09FBC(void) {
     return 0x1C;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22AB80/func_8AB09FC4.s")
+extern s16 D_8AB16CDA;
+extern s16 D_8AB12698;
+extern s32 D_8AB16CBC;
+extern void func_8AB01FBC(void);
+extern void func_8AB03ED4(void);
+extern void func_8AB012A4(void);
+extern s32 func_8AB090B8(s32);
+s32 func_8AB09FC4(s32 arg0)
+{
+    s32 result;
+    int new_var;
+
+    new_var = 1;
+    result = 0x1D;
+    switch (arg0) {
+        case 0:
+            D_8AB16CDA = 0;
+            func_8AB01FBC();
+            break;
+        case 1:
+            D_8AB16CDA += new_var;
+            func_8AB03ED4();
+            if (D_8AB16CDA >= 0xB) {
+                func_8AB012A4();
+                if (D_8AB12698 > 0) {
+                    D_8AB16CBC = 1;
+                }
+                result = func_8AB090B8(0);
+            }
+            break;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22AB80/func_8AB0A074.s")
 
