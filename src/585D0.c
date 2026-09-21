@@ -538,7 +538,51 @@ void func_80059D00_padding2(void) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80059DD0.s")
+extern s32 func_80057A80(s32 arg0);
+extern s32 func_8005914C(s32 arg0);
+extern void func_80059670(s32 arg0);
+extern void func_800596D0(s32 arg0, u32 arg1);
+extern void func_8005AFF4(s32 arg0);
+extern s32 func_8005DB84(s32 arg0);
+extern s32 main_pool_alloc_with_func(s32, s32, s32, void (*)(s32, u32));
+extern s32 main_pool_try_free(s32);
+extern u8 D_80128570[];
+s32 func_80059DD0(s32 arg0)
+{
+    u8 pad[8];
+    s32 result;
+    s32 flags;
+    u8 *p;
+
+    p = D_80128570 + arg0 * 112;
+    flags = *(s32 *)p;
+    result = 0;
+    if (!(flags & 1)) {
+        return 0;
+    }
+    if (flags & 4) {
+        return 1;
+    }
+    if (func_80057A80(arg0) != 0) {
+        *(s32 *)(p + 0x64) = main_pool_alloc_with_func(0x34C0, 0, arg0 + 0x424F5830, func_800596D0);
+    } else {
+        *(s32 *)(p + 0x64) = main_pool_alloc_with_func(0x3E40, 0, arg0 + 0x424F5830, func_800596D0);
+    }
+    if (*(s32 *)(p + 0x64) != 0) {
+        *(s32 *)p |= 4;
+        if (func_8005DB84(arg0) > 0) {
+            result = func_8005914C(arg0);
+            if (result == 0) {
+                main_pool_try_free(*(s32 *)(p + 0x64));
+            }
+        } else {
+            func_8005AFF4(arg0);
+            func_80059670(arg0);
+            result = 1;
+        }
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
