@@ -607,7 +607,37 @@ void func_87E18034(u8 *arg0, s32 arg1) {
     *(s32 *)arg0 = 1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E18054.s")
+extern s32 func_87E18F08(u8 *);
+extern void func_87E189E8(u8 *);
+extern void func_87E18034(u8 *arg0, s32 arg1);
+s32 func_87E18054(u8 *arg0) {
+    s32 result;
+    s32 state;
+
+    result = 0;
+    state = func_87E18F08(arg0 + 4);
+    if (state != 0) {
+        func_87E189E8(arg0 + 4);
+        switch (state) {
+        case 1:
+            func_87E18034(arg0, 0);
+            result = 2;
+            break;
+        case 2:
+            func_87E18034(arg0, 1);
+            result = 2;
+            break;
+        case 3:
+            func_87E18034(arg0, 2);
+            result = 2;
+            break;
+        case 4:
+            result = 1;
+            break;
+        }
+    }
+    return result;
+}
 
 extern s32 func_87E04114(u8 *);
 extern void func_87E17F14(s32);
