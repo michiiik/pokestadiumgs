@@ -3584,7 +3584,16 @@ S1_unk_D_86002F34_alt1* GeoNode_CreateType4(S1_MemoryBlock* arg0, S1_unk_D_86002
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800380B8.s")
+void *func_800380B8(S1_MainPoolState *arg0, s32 arg1, s16 arg2) {
+    if (arg0 != NULL) {
+        arg1 = (s32)(u32)MainPool_AllocAligned(arg0, 0x18, 4);
+    }
+    if (arg1 != 0) {
+        GeoNode_Init((S1_GraphNode *)arg1, 5U);
+        *(u8 *)(arg1 + 2) = *(u8 *)(arg1 + 2) | (arg2 & 7);
+    }
+    return (void *)arg1;
+}
 #endif
 
 #ifdef VERSION_US
