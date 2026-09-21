@@ -493,7 +493,40 @@ void func_87E176FC_padding(void) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E17928.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E179F4.s")
+extern u8 D_87E1B270;
+extern u8 D_87E1B2DC;
+extern f32 D_87E1B960;
+extern u8 D_87E1EC70;
+extern void func_87F0C094(void *, f32, f32, f32, f32, s32, s32);
+extern void func_87F0252C(void *, void *, void *, s32);
+extern s32 func_80040E80(s32, s32 *);
+extern s32 func_8004C990(s32, s32);
+extern void func_87E156A0(void *arg0);
+extern void func_87E15A08(void *arg0);
+extern s32 func_87F08E3C(s32, s32);
+extern void * D_87E1EC88;
+void func_87E179F4(u8 *arg0, s32 arg1) {
+    void *pool;
+
+    D_87E1EC88 = arg0;
+    *(s32 *)(arg0 + 4) = 0;
+    *(s32 *)(arg0 + 8) = arg1;
+    arg0[1] = 0;
+    func_87E156A0(arg0);
+    func_87F0C094(arg0 + 0x1158, 1274.0f, 945.0f, -1018.0f, D_87E1B960, -0x238E, 0);
+    func_8004C8C0(0x1B2);
+    func_8004DDF4(0x98);
+    pool = (void *)MainPool_AllocState(main_pool_get_available(), 0);
+    *(void **)(arg0 + 0xC) = (void *)func_80040E80(pool, &D_87E1B270);
+    *(void **)(arg0 + 0x10) = (void *)WidgetTree_RunMessagePanelSilent(pool, 0x98);
+    *(void **)(arg0 + 0x14) = (void *)func_80040E80(pool, &D_87E1B2DC);
+    MainPool_FinalizeAllocation(pool);
+    *(void **)(arg0 + 0x18) = (void *)func_87F08E3C(func_8004C990(0x1B2, 6), 0x0F000000);
+    func_80037E9C(0, &D_87E1EC70);
+    func_87F0252C(&D_87E1EC70, arg0 + 0x1C, arg0 + 0x30, 2);
+    func_87F0252C(&D_87E1EC70, arg0 + 0x454, arg0 + 0x468, 8);
+    func_87E15A08(arg0 + 0x348);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E17B34.s")
 
