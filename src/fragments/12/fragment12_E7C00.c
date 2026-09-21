@@ -346,7 +346,20 @@ s32 func_81404DA0(void *arg0, s32 arg1)
 
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81404DE4.s")
+s32 func_81404DE4(u16 arg0) {
+    switch (arg0 & 0xC00F) {
+        case 0x4000: return 0;
+        case 0x2: return 1;
+        case 0x8: return 2;
+        case 0x8000: return 3;
+        case 0x4: return 4;
+        case 0x1: return 5;
+        default: return -1;
+    }
+}
+
+void func_81404DE4_padding(void) {
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81404E68.s")
 
