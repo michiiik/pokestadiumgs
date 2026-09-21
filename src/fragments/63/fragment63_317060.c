@@ -110,7 +110,31 @@ void func_87E14458(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E146DC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E14898.s")
+extern s32 ModelAnim_IsFinished(void *);
+extern void ModelAnim_SetFrame(void *, s32);
+extern void func_8003F2C4(s32, void *, s32);
+extern void func_8003F3BC(void *, s32);
+extern void * D_87F119DC;
+void func_87E14898(void *arg0) {
+    s32 anim;
+    u8 *entry;
+
+    if (ModelAnim_IsFinished((u8 *)D_87F119DC + 0x24) != 0) {
+        if ((((u32 (*)[3])(*(u8 **)((u8 *)arg0 + 4) + 0x90))[*(s32 *)((u8 *)arg0 + 8)][0] >> 31) != 0) {
+            entry = *(u8 **)((u8 *)arg0 + 0xC);
+            anim = *(s32 *)(entry + 4);
+            if (anim == *(s16 *)((u8 *)D_87F119DC + 0x64)) {
+                func_8003F2C4(*(s32 *)arg0, (u8 *)D_87F119DC + 0x24, *(s32 *)(entry + 0x10));
+                func_8003F3BC((u8 *)D_87F119DC + 0x24, -1);
+                func_8003F3BC((u8 *)D_87F119DC + 0x24, *(s32 *)(*(u8 **)((u8 *)arg0 + 0xC) + 0x14));
+                return;
+            }
+            func_8003F2C4(*(s32 *)arg0, (u8 *)D_87F119DC + 0x24, anim);
+            return;
+        }
+        ModelAnim_SetFrame((u8 *)D_87F119DC + 0x24, 0);
+    }
+}
 
 extern s32 ModelAnim_IsEventTrackDone(u8 *);
 extern u32 func_8003570C(void);
