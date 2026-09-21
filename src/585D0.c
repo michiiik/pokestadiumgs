@@ -430,7 +430,20 @@ void func_80059488(s32 arg0)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80059578.s")
+typedef struct { u8 *data; } Batch59578Buffer;
+extern u8 D_80128570[];
+void func_80059578(s32 arg0)
+{
+    s32 i;
+    Batch59578Buffer buffer;
+
+    buffer = *(Batch59578Buffer *)(D_80128570 + arg0 * 112 + 0x64);
+    HAL_Memset(buffer.data, 0xFF, 0x3E40);
+    for (i = 0; i < 7; i++) {
+        buffer.data[i * 0x450] = 0;
+        buffer.data[i * 0x450 + 0x2000] = 0;
+    }
+}
 #endif
 
 #ifdef VERSION_US
