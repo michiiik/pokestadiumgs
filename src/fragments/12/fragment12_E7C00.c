@@ -279,7 +279,40 @@ s32 func_81404CA4(void *arg0)
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81404D00.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81404D44.s")
+s32 func_81404D44(void *arg0)
+{
+    s32 count;
+    s32 sum;
+    s32 i;
+    u8 *ptr;
+    s32 index;
+    sum = 0;
+    i = 0;
+    count = *((s8 *) (((u8 *) arg0) + 0x12));
+    ;
+    ptr = arg0;
+    if ((count >= (0 + 1)) ^ 0)
+    {
+        if (1)
+        {
+loop:
+            index = *((s8 *) (ptr + 0xA));
+            if (index < 0)
+            {
+                return sum;
+            }
+            sum += *((((u8 *) arg0) + (index * 0x58)) + 0x4B5D);
+            i++;
+            ptr++;
+            index += 0;
+        }
+        if (i < count)
+        {
+            goto loop;
+        }
+    }
+    return sum;
+}
 
 s32 func_81404DA0(void *arg0, s32 arg1)
 {
@@ -313,7 +346,20 @@ s32 func_81404DA0(void *arg0, s32 arg1)
 
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81404DE4.s")
+s32 func_81404DE4(u16 arg0) {
+    switch (arg0 & 0xC00F) {
+        case 0x4000: return 0;
+        case 0x2: return 1;
+        case 0x8: return 2;
+        case 0x8000: return 3;
+        case 0x4: return 4;
+        case 0x1: return 5;
+        default: return -1;
+    }
+}
+
+void func_81404DE4_padding(void) {
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81404E68.s")
 
@@ -589,7 +635,24 @@ void func_81407118(void *arg0, void *arg1) {
     func_81403CD0((u8 *)arg0 + 0xCC8, arg1);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_814071C4.s")
+extern void func_81406A30(void *arg0);
+extern void func_81403E2C(void *arg0);
+void func_814071C4(void *arg0) {
+    s32 i;
+    u8 *ptr;
+
+    ptr = (u8 *)arg0 + 0x18000;
+    i = 0;
+    do {
+        if (*(s32 *)(ptr + 0xF48) != 0) {
+            func_81406A30((u8 *)arg0 + i * 0x4D68 + 0x1990);
+        }
+        i++;
+        ptr += 4;
+    } while (i != 4);
+    func_81403E2C(arg0);
+    func_81403E2C((u8 *)arg0 + 0xCC8);
+}
 
 extern s32 func_81406A9C(u8 *arg0);
 s32 func_81407258(void *arg0) {
