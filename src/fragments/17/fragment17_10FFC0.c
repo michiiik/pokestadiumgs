@@ -345,7 +345,47 @@ s32 func_82202B80(s32 arg0, u8 *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82202E0C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82202FC8.s")
+extern u8 D_8220E310[];
+extern u8 *func_8004C874(s32, s32);
+extern void func_8004C54C(s32, void *);
+typedef struct F82202FC8_Record { u8 pad0[5]; u8 type; u8 pad6[2]; u8 payload[12]; } F82202FC8_Record;
+extern u16 D_8220E4C0;
+s32 func_82202FC8(s32 arg0, u8 *arg1) {
+    s32 index = *(s32 *)(arg1 + 0x20);
+    u8 *data = NULL;
+    u8 *record;
+    s32 type;
+
+    switch (arg0) {
+        case 0:
+            break;
+        case 1:
+            record = D_8220E310 + index * 0x14;
+            type = record[5];
+            switch (type) {
+                case 0:
+                case 3:
+                    data = record + 8;
+                    break;
+                case 4:
+                case 5:
+                    data = func_8004C874(0x17, 0x40);
+                    break;
+            }
+            if (data != NULL) {
+                func_8004C54C(0x15, data);
+                if (D_8220E4C0 & 8) {
+                    *(u16 *)(arg1 + 2) |= 2;
+                } else {
+                    *(u16 *)(arg1 + 2) &= 0xFFFD;
+                }
+            } else {
+                *(u16 *)(arg1 + 2) &= 0xFFFD;
+            }
+            break;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_822030BC.s")
 
