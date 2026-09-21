@@ -635,7 +635,24 @@ void func_81407118(void *arg0, void *arg1) {
     func_81403CD0((u8 *)arg0 + 0xCC8, arg1);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_814071C4.s")
+extern void func_81406A30(void *arg0);
+extern void func_81403E2C(void *arg0);
+void func_814071C4(void *arg0) {
+    s32 i;
+    u8 *ptr;
+
+    ptr = (u8 *)arg0 + 0x18000;
+    i = 0;
+    do {
+        if (*(s32 *)(ptr + 0xF48) != 0) {
+            func_81406A30((u8 *)arg0 + i * 0x4D68 + 0x1990);
+        }
+        i++;
+        ptr += 4;
+    } while (i != 4);
+    func_81403E2C(arg0);
+    func_81403E2C((u8 *)arg0 + 0xCC8);
+}
 
 extern s32 func_81406A9C(u8 *arg0);
 s32 func_81407258(void *arg0) {
