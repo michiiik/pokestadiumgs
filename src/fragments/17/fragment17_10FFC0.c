@@ -449,7 +449,31 @@ void func_82203A84(void) {
     D_8220D784 = 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82203A98.s")
+extern s32 D_8220D848;
+extern s32 func_82201834(s16 *);
+extern s32 func_82201C14(void);
+extern s16 D_8220E378;
+extern u8 D_8220E468[];
+s32 func_82203A98(void) {
+    s16 *p;
+    s32 result = 0;
+
+    if (D_8220E4B8 < 0x14) {
+        D_8220E4B8++;
+    }
+    p = &D_8220E378;
+    if (D_8220E4B8 == D_8220D848) {
+        do {
+            func_82201834(p);
+            p += 0x1E;
+        } while (p != (s16 *)D_8220E468);
+    } else if (D_8220D848 < D_8220E4B8) {
+        if (func_82201C14() != 0) {
+            result = 1;
+        }
+    }
+    return result;
+}
 
 extern void *D_80087200; extern void func_800226C0(s32);
 s32 func_82203B3C(void) { s32 result = 0; if ((*(u16 *)((u8 *)D_80087200 + 8) & 0x8000) != 0) { func_800226C0(0x33); result = 1; } else if ((*(u16 *)((u8 *)D_80087200 + 8) & 0x4000) != 0) { func_800226C0(3); result = -1; } return result; }
