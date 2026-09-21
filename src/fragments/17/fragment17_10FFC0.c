@@ -6,7 +6,31 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82200694.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_822006CC.s")
+typedef struct F822006CC_Particle {
+    s16 unk0;
+    s16 unk2;
+    f32 unk4;
+    s16 unk8;
+    s16 unkA;
+} F822006CC_Particle;
+extern f32 D_8220E0C8;
+extern f32 D_8220E0CC;
+extern f32 D_80088E50[];
+extern f32 D_80087E50[];
+void func_822006CC(F822006CC_Particle *arg0, s32 arg1, s32 arg2) {
+    u16 angle;
+    f32 radius;
+    s32 index;
+
+    angle = guRandom() & 0xFFFF;
+    radius = (s32)guRandom() % 33;
+    arg0->unk0 = 1;
+    arg0->unk2 = 0;
+    arg0->unk4 = ((f32)((s32)guRandom() % 101) * D_8220E0C8) / 100.0f + D_8220E0CC;
+    index = (s32)angle >> 4;
+    arg0->unk8 = (s16)(s32)(D_80088E50[index] * radius + (f32)arg1);
+    arg0->unkA = (s16)(s32)(D_80087E50[index] * radius + (f32)arg2);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_822007D8.s")
 
