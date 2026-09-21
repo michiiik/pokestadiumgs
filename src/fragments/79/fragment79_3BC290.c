@@ -245,7 +245,36 @@ void func_8414E760(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414EB90.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414EC18.s")
+extern void func_8414DC58(s32, u8);
+extern void func_8414EA4C(s32);
+extern void func_8414EB90(s32);
+extern u8 func_80062D20(u8 arg0);
+extern u8 func_84154B24();
+extern u8 * func_84154B64(u8);
+void func_8414EC18(s32 arg0) {
+    u8 current;
+    u8 other;
+
+    current = func_84154B24();
+    other = 1 - current;
+    func_84154B64(current);
+    func_84154B64(other);
+    switch (func_80062D20(*((u8 *)(u32)arg0 + other + 6))) {
+    case 0x6F:
+        func_8414EB90(arg0);
+        break;
+    case 0x59:
+    case 0x90:
+        func_8414DC58(arg0, other);
+        break;
+    case 0x30:
+        *(u16 *)((u8 *)(u32)arg0 + other * 2 + 0x1E) = 0;
+        break;
+    case 0x9B:
+        func_8414EA4C(arg0);
+        break;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414ECE0.s")
 
