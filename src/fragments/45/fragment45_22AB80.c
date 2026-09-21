@@ -9,7 +9,20 @@ void func_8AB05A00(void) { s32 i; s32 value; value = -1; i = 2; *(u8 *)(D_8AB11D
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22AB80/func_8AB05B88.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22AB80/func_8AB06270.s")
+extern u8 D_80088E50[];
+extern f32 D_8AB11970;
+extern f32 D_8AB11974;
+void func_8AB06270(void *arg0, u16 arg1) {
+    f32 *temp;
+    f32 scale;
+    f32 offset;
+    arg1 <<= 12;
+    temp = (f32 *)D_80088E50 + (arg1 >> 4);
+    scale = D_8AB11970;
+    offset = D_8AB11974;
+    *(f32 *)((u8 *)arg0 + 0x40) = *temp * scale + offset;
+    *(f32 *)((u8 *)arg0 + 0x44) = *temp * scale + offset;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22AB80/func_8AB062C4.s")
 
