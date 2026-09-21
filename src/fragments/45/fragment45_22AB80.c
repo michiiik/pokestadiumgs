@@ -162,7 +162,35 @@ s32 func_8AB072EC(s32 arg0)
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22AB80/func_8AB07C34.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22AB80/func_8AB07DC4.s")
+extern s16 D_8AB16A36;
+extern s32 func_80025D44(void);
+extern s32 func_8AB07E6C(s32);
+extern void func_80021ED8(s32);
+extern void func_8004C8A0(void *, s32, s32, s32);
+extern u8 D_8AB126A8[];
+s32 func_8AB07DC4(s32 arg0)
+{
+    s32 result;
+    int new_var;
+    new_var = 1;
+    result = 0x10;
+    switch (arg0)
+    {
+        case 0:
+            D_8AB16A36 = 0;
+            func_8004C8A0(D_8AB126A8, 0x100, 0x39, 0x183);
+            func_80021ED8(0x4B);
+            break;
+        case 1:
+            D_8AB16A36 += new_var;
+            if ((((u32) func_80025D44()) < 2U) && (D_8AB16A36 >= 0x3D))
+            {
+                result = func_8AB07E6C(0);
+            }
+            break;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22AB80/func_8AB07E6C.s")
 
