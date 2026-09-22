@@ -145,3 +145,23 @@ func_84139EB0: matched (call_sequence:else_if:pointer_table:s32_flags_exact), 4 
 ## 2026-09-22
 
 func_8413DD94: plateau at 0.8919 (raw 0.4595), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool yes
+
+## 2026-09-22
+
+func_8413860C: plateau at 0.0 (raw None), mismatch operand_or_scheduling_drift; tried families: bounded_lookup; tie-pool yes
+
+## 2026-09-22
+
+func_84128B30: plateau at 0.7143 (raw 0.2857), mismatch operand_or_scheduling_drift; tried families: address_exposed_scalar, aggregate_copy, aggregate_mask, bitfield_narrowing, bitfield_update, boolean_high_bit, complement_extract, destination_alias, idempotent_recurrence, mask_algebra, mask_join, mask_phi, mask_store, masked_dispatch, masked_termination, ordered_bit_partition, ordered_conditional_phi, ordered_extract, ordered_mask, ordered_mask_absorption, ordered_mask_phi, ordered_masked_dispatch, ordered_masked_termination, ordered_modular_difference, ordered_remainder, ordered_xor_cancellation, pointer_loop, quotient_reconstruction, range_normalization, single_iteration, source_array_scalarization, state_field_access, store_forwarding, wide_extract, wide_lane_extract, wide_mask, wide_remainder; tie-pool yes
+
+## 2026-09-22
+
+func_8413860C: matched (bounded_lookup:conditional:permuter-shape), 8 iterations, agent codex
+
+## 2026-09-22
+
+TYPE CONFLICT: D_841951E5 is extern u8 D_841951E5, not extern u8 D_841951E4, D_841951E5
+
+## 2026-09-22
+
+func_84128B04: plateau at 0.9167 (raw 0.75), mismatch operand_or_scheduling_drift; tried families: algebraic_reset, alias_reset, assignment_dispatch, bounded_reset_loop, comparator_lifetime, comparator_materialization, comparison_narrowing, compound_reset, exclusive_arithmetic_reset, label_dispatch, local_phi, loop_dispatch, ordered_reset, permuter_seed, predicate_dispatch, reset_operand, selector_widening, sequential_guards, single_pass_block, state_field_access, store_value_lifetime; tie-pool yes
