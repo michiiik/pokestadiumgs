@@ -576,7 +576,15 @@ void func_83007100(s32 arg0, void *arg1, void *arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83007160.s")
+extern void func_800226C0(s32);
+void func_83007160(void *arg0, s32 arg1) {
+    u8 *p = arg0;
+    s32 a = 10;
+    s32 b = 6;
+    switch (arg1) { case -1: p[0x1E] = 1; func_800226C0(3); return; case 1: case 2:
+        if ((s32)((u8 *)arg0 + arg1 * 0x1B64)[0x3872D] > 0) { p[0x1E] = a; func_800226C0(0xA3); return; }
+        p[0x1E] = b; func_800226C0(5); return; }
+}
 #endif
 
 #ifdef VERSION_US
