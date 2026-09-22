@@ -496,7 +496,23 @@ void func_83006EB0(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83006F30.s")
+typedef struct { s32 x; s32 y; } Pair;
+extern Pair D_8300F918;
+extern void func_81801CB8(u8 *, u8 *, u8 *, s32);
+extern u8 * func_818054D0(s32,u8);
+void func_83006F30(s32 arg0, void *arg1, u8 *arg2) {
+    struct Arg { u8 pad[0x1C]; u8 a; u8 b; u8 pad2[0xE]; s32 c; u8 pad3[0xE]; u8 flag; };
+    u8 *sp28;
+    Pair sp2C;
+    u8 *var_a1; u8 *var_a2;
+    struct Arg *p = arg1;
+    sp2C = D_8300F918;
+    sp28 = func_818054D0(arg0, p->a) + 0x10;
+    var_a1 = sp28;
+    var_a2 = func_818054D0(arg0, p->b) + 0x10;
+    if (p->flag == 1) { if (p->a == 10) var_a1 = (u8 *)&sp2C; if (p->b == 10) var_a2 = (u8 *)&sp2C; }
+    func_81801CB8(arg2, var_a1, var_a2, p->c);
+}
 #endif
 
 #ifdef VERSION_US
