@@ -646,7 +646,39 @@ s32 func_86004494(void *arg0, f64 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_246640/func_86004544.s")
+extern f64 D_8600DEF8;
+extern Gfx *D_800D0510;
+extern Gfx D_80094D90[];
+extern s32 D_8600D208[];
+extern s16 D_8600D20A[];
+extern s32 D_8600D218[];
+extern s16 D_8600D21A[];
+extern void Gfx_FillRectRgb(s16, s16, s16, s16, s32, s32, s32);
+extern f32 __sinf(f32);
+extern s32 func_860047AC(u8 *arg0);
+void func_86004544(u8 *arg0) {
+    u8 pad[4];
+    s32 blue;
+    s32 width;
+    s32 index;
+    s32 flag;
+    Gfx *dl;
+
+    flag = 0;
+    if (*(f64 *)(arg0 + 0x17E8) <= 0.0) {
+        flag = 1;
+    }
+    if (flag != 0) {
+        flag = func_860047AC(arg0) != 0;
+    }
+    blue = (s32)(flag ? __sinf((f32)(*(f64 *)(*(u8 **)(arg0 + 0x1870) + 0x6888) * 50.0)) * 100.0f + 155.0f : 255.0f);
+    width = (s32)(flag ? 48.0 : 48.0 - (*(f64 *)(arg0 + 0x17E8) / D_8600DEF8) * 48.0);
+    gSPDisplayList(D_800D0510++, D_80094D90);
+    index = *(s32 *)(arg0 + 0x1810) * 4;
+    Gfx_FillRectRgb(*(s16 *)((u8 *)D_8600D20A + index), *(s16 *)((u8 *)D_8600D21A + index), 50, 10, 0, 0, 0);
+    index = *(s32 *)(arg0 + 0x1810) * 4;
+    Gfx_FillRectRgb((s16)(*(s32 *)((u8 *)D_8600D208 + index) + 1), (s16)(*(s32 *)((u8 *)D_8600D218 + index) + 1), (s16)width, 8, 255, 255, blue);
+}
 #endif
 
 #ifdef VERSION_US
