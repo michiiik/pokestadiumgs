@@ -4379,7 +4379,24 @@ void func_841385A8(u8 arg0, u8 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8413860C.s")
+extern void * D_841951F0;
+extern s32 D_8419527C;
+s32 func_8413860C(u8 arg0) {
+    s32 selected;
+    s32 result;
+    u8 packed;
+    result = D_8419527C;
+    if (result < 0x67) {
+        packed = (*((u8 **) (((u8 *) D_841951F0) + 0x9D8)))[result + 4];
+        if (arg0) {
+            selected = (unsigned int) (packed & 0xF);
+        } else {
+            selected = (packed & 0xF0) >> 4;
+        }
+        result = selected & 0xFF;
+        return result;
+    }
+}
 #endif
 
 #ifdef VERSION_US
