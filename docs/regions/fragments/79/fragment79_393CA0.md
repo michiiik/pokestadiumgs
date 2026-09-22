@@ -165,3 +165,15 @@ TYPE CONFLICT: D_841951E5 is extern u8 D_841951E5, not extern u8 D_841951E4, D_8
 ## 2026-09-22
 
 func_84128B04: plateau at 0.9167 (raw 0.75), mismatch operand_or_scheduling_drift; tried families: algebraic_reset, alias_reset, assignment_dispatch, bounded_reset_loop, comparator_lifetime, comparator_materialization, comparison_narrowing, compound_reset, exclusive_arithmetic_reset, label_dispatch, local_phi, loop_dispatch, ordered_reset, permuter_seed, predicate_dispatch, reset_operand, selector_widening, sequential_guards, single_pass_block, state_field_access, store_value_lifetime; tie-pool yes
+
+## 2026-09-22
+
+func_84132B9C: plateau at 1.0 (raw 0.9906), mismatch register_allocation_only; tried families: call_sequence; tie-pool yes
+
+## 2026-09-22
+
+func_84128954: matched (call_sequence:global_access:canonical_compound_updates), 2 iterations, agent unbiased
+
+## 2026-09-22
+
+func_84126CD0: time cap at 0.8818 (raw 0.3273) after 2400s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
