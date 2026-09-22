@@ -177,3 +177,11 @@ func_84128954: matched (call_sequence:global_access:canonical_compound_updates),
 ## 2026-09-22
 
 func_84126CD0: time cap at 0.8818 (raw 0.3273) after 2400s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-22
+
+func_841397FC: matched (call_sequence:locals:u8-index-m2c), 1 iterations, agent codex
+
+## 2026-09-22
+
+func_84131760: time cap at 0.9886 (raw 0.9886) after 2400s, mismatch instruction_drift; tried families: call_sequence; tie-pool yes
