@@ -275,7 +275,51 @@ extern s32 D_8008FA74; void func_80015A4C(s32 value) { D_8008FA74 = value; }
 
 extern u8 D_8011BE90[]; void func_80015E58(void) { *(s32 *)(D_8011BE90 + 0x2074) = 0; *(s32 *)(D_8011BE90 + 0x20D8) = 0; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80015E6C.s")
+typedef struct F15E6CEntry { u32 flags; s32 address; u32 unk8; u32 unkC; } F15E6CEntry;
+typedef struct F15E6CSlot { u8 type; u8 id; s16 index; s32 field4; s32 source; s32 buffer; s32 current; s32 state; u32 size; u8 *status; F15E6CEntry data; u8 padding[0x34]; } F15E6CSlot;
+extern s32 func_80012528(u32, s32, s32, s8, s32);
+extern s32 func_8001603C(s32 arg0, s32 arg1);
+extern u8 D_8011BE90[];
+s32 func_80015E6C(s32 arg0, s32 arg1, u8 *arg2) {
+    F15E6CEntry *entry;
+    F15E6CSlot *slot;
+    entry = (F15E6CEntry *)func_8001603C(arg0, arg1);
+    if (entry == 0) {
+        *arg2 = 0;
+        return -1;
+    }
+    if (((entry->flags << 4) >> 30) == 0) {
+        *arg2 = 2;
+        return 0;
+    }
+    slot = (F15E6CSlot *)&D_8011BE90[*(s32 *)(D_8011BE90 + 0x205C) * 0x64 + 0x2060];
+    if (slot->state == 3) {
+        slot->state = 0;
+    }
+    slot->data = *entry;
+    slot->status = arg2;
+    slot->buffer = func_80012528(entry->flags & 0xFFFFFF, arg0, entry->address, (s8)((entry->flags << 4) >> 30), 0);
+    if (slot->buffer == 0) {
+        if (((entry->flags << 4) >> 30) == 1 || ((entry->flags << 1) >> 29) == 2) {
+            *arg2 = 0;
+            return -1;
+        }
+        *arg2 = 3;
+        return -1;
+    }
+    slot->state = 1;
+    slot->size = ((entry->flags & 0xFFFFFF) + 0xF) & ~0xF;
+    slot->current = slot->buffer;
+    slot->source = entry->address;
+    slot->type = (entry->flags << 4) >> 30;
+    slot->id = arg0;
+    slot->index = arg1;
+    if (slot->type == 1) {
+        slot->field4 = *(s16 *)(*(u8 **)(D_8011BE90 + 0x2BC8) + 2);
+    }
+    *(s32 *)(D_8011BE90 + 0x205C) ^= 1;
+    return 0;
+}
 
 s32 func_8001603C(s32 arg0, s32 arg1) { s32 *ptr; s32 value; if (arg1 < 0x80) { ptr = func_8001A308(arg0, arg1); if (ptr == NULL) return 0; value = ptr[4]; goto done; } if (arg1 < 0x100) { ptr = func_8001A3DC(arg0, arg1 - 0x80); if (ptr == NULL) return 0; value = ptr[1]; goto done; } ptr = func_8001A4C0(arg0, arg1 - 0x100); if (ptr == NULL) return 0; value = ptr[0]; done: return value; }
 void func_8001603C_padding(void) {}
