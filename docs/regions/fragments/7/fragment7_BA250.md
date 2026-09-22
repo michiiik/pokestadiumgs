@@ -21,3 +21,31 @@ func_83000CB4: time cap at 1.0 (raw 0.9794) after 2400s, mismatch immediate_drif
 ## 2026-09-18
 
 func_83002424: matched (call_sequence:rectangle_overlay:state_carrier_named_thresholds), 1 iterations, agent openrouter
+
+## 2026-09-22
+
+func_83009EC4: plateau at 0.9043 (raw 0.4258), mismatch operand_or_scheduling_drift; tried families: call_chain; tie-pool yes; 3 iteration(s) with a suspicious identical batch-wide failure
+
+## 2026-09-22
+
+func_83006798: plateau at 0.0 (raw None), mismatch section_layout_drift; tried families: dispatcher_switch; tie-pool yes; 2 iteration(s) with a suspicious identical batch-wide failure; 1 iteration(s) hit section_layout_drift -- needs a rom.yaml fix, not more candidates
+
+## 2026-09-22
+
+func_83006798: time cap at 0.4626 (raw 0.1963) after 2400s, mismatch operand_or_scheduling_drift; tried families: dispatcher_switch; tie-pool yes; 3 iteration(s) with a suspicious identical batch-wide failure; 2 iteration(s) hit section_layout_drift -- needs a rom.yaml fix, not more candidates
+
+## 2026-09-22
+
+TYPE CONFLICT: func_818036D8 is extern void func_818036D8(s32, s32, f32, s32), not extern void func_818036D8(s32, s32, s32, s32)
+
+## 2026-09-22
+
+func_83000F04: plateau at 0.8684 (raw 0.8684), mismatch instruction_drift; tried families: call_sequence; tie-pool yes
+
+## 2026-09-22
+
+func_83006F30: matched (call_sequence:aggregate-copy:pair-declared-after-carrier), 1 iterations, agent codex
+
+## 2026-09-22
+
+func_83007160: matched (call_sequence:switch:multiline-local-constants-exact), 1 iterations, agent codex
