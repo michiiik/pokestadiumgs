@@ -4229,7 +4229,14 @@ void func_80039808(Vtx* arg0, S1_unk_D_86002F34_00C_0CC* arg1, s16 arg2, s16 arg
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800398F8.s")
+Vtx *func_800398F8(S1_unk_D_86002F34_00C_0CC *arg0) {
+    Vtx *out = (Vtx *)Gfx_AllocDisplayList(0x80); Vtx *p; s16 x,y,z,nz;
+    if (out) {
+        x=arg0->unk_10+((arg0->unk_14-arg0->unk_10)*arg0->unk_0A)/arg0->unk_08; y=arg0->unk_12+((arg0->unk_16-arg0->unk_12)*arg0->unk_0A)/arg0->unk_08; z=arg0->unk_0C+((arg0->unk_0E-arg0->unk_0C)*arg0->unk_0A)/arg0->unk_08; nz=-z; p=out;
+        if(arg0->unk_00==2){func_80039808(p++,arg0,x,y,nz,nz,-31,63);func_80039808(p++,arg0,x,y,z,nz,31,63);func_80039808(p++,arg0,x,y,z,z,31,0);func_80039808(p++,arg0,x,y,nz,z,-31,0);}else{func_80039808(p++,arg0,x,y,nz,nz,0,63);func_80039808(p++,arg0,x,y,z,nz,63,63);func_80039808(p++,arg0,x,y,z,z,63,0);func_80039808(p++,arg0,x,y,nz,z,0,0);}
+        func_80039808(p++,arg0,x,y,-2000,-2000,0,0);func_80039808(p++,arg0,x,y,2000,-2000,0,0);func_80039808(p++,arg0,x,y,2000,2000,0,0);func_80039808(p,arg0,x,y,-2000,2000,0,0);
+    } arg0->unk_18+=arg0->unk_1A; return out;
+}
 #endif
 
 #ifdef VERSION_US
