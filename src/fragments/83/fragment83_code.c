@@ -124,7 +124,22 @@ void func_82C00A70(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C00AE8.s")
+extern Gfx D_82C049D8[];
+extern void ParticleGfx_SetPrimColor_fragment83(u8 r, u8 g, u8 b, u8 a);
+extern void func_82C003F8(s16 arg0, s16 arg1, u16 arg2, u16 arg3);
+extern void func_82C00A70(s16 arg0, s16 arg1, u16 arg2, u16 arg3);
+extern Gfx* D_800D0510;
+void func_82C00AE8(s16 arg0, s16 arg1, u16 arg2, f32 arg3) {
+    s16 temp0;
+    s16 temp1;
+    if (arg2 >= 20) {
+        func_82C00A70(arg0, arg1, 19, arg2);
+        gSPDisplayList(D_800D0510++, D_82C049D8);
+        ParticleGfx_SetPrimColor_fragment83(255, 255, 0, 255);
+        func_82C003F8(arg0 + 3, arg1 + (u16)((f32)(u16)(arg2 - 20) * arg3), 257, 1);
+        func_82C003F8(arg0 + 3, arg1 + (u16)((f32)(u16)(arg2 - 20) * arg3) + 10, 257, 2);
+    }
+}
 #endif
 
 #ifdef VERSION_US
