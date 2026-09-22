@@ -496,7 +496,23 @@ void func_83006EB0(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83006F30.s")
+typedef struct { s32 x; s32 y; } Pair;
+extern Pair D_8300F918;
+extern void func_81801CB8(u8 *, u8 *, u8 *, s32);
+extern u8 * func_818054D0(s32,u8);
+void func_83006F30(s32 arg0, void *arg1, u8 *arg2) {
+    struct Arg { u8 pad[0x1C]; u8 a; u8 b; u8 pad2[0xE]; s32 c; u8 pad3[0xE]; u8 flag; };
+    u8 *sp28;
+    Pair sp2C;
+    u8 *var_a1; u8 *var_a2;
+    struct Arg *p = arg1;
+    sp2C = D_8300F918;
+    sp28 = func_818054D0(arg0, p->a) + 0x10;
+    var_a1 = sp28;
+    var_a2 = func_818054D0(arg0, p->b) + 0x10;
+    if (p->flag == 1) { if (p->a == 10) var_a1 = (u8 *)&sp2C; if (p->b == 10) var_a2 = (u8 *)&sp2C; }
+    func_81801CB8(arg2, var_a1, var_a2, p->c);
+}
 #endif
 
 #ifdef VERSION_US
@@ -560,7 +576,15 @@ void func_83007100(s32 arg0, void *arg1, void *arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83007160.s")
+extern void func_800226C0(s32);
+void func_83007160(void *arg0, s32 arg1) {
+    u8 *p = arg0;
+    s32 a = 10;
+    s32 b = 6;
+    switch (arg1) { case -1: p[0x1E] = 1; func_800226C0(3); return; case 1: case 2:
+        if ((s32)((u8 *)arg0 + arg1 * 0x1B64)[0x3872D] > 0) { p[0x1E] = a; func_800226C0(0xA3); return; }
+        p[0x1E] = b; func_800226C0(5); return; }
+}
 #endif
 
 #ifdef VERSION_US
