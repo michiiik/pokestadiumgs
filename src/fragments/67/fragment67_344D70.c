@@ -962,7 +962,26 @@ void BattleAnim_Fragment67Dispatch_041(void) { s16 mode; mode = D_8291B828; swit
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290DF6C.s")
+extern s32 D_8291B870;
+extern s16 D_8291B87A;
+extern s32 func_8004C990(s32, s32);
+extern void func_8004D19C(s32, s32, s32, s32, s32);
+extern u8 D_80094E38[];
+extern u8 D_800D0510;
+extern s16 D_8291B828;
+extern s16 D_8291B874;
+extern s16 D_8291B876;
+void func_8290DF6C(void) {
+    do {
+        if (((D_8291B828 == 0x24) || (D_8291B828 == 0x25)) || (D_8291B828 == 0x26)) {
+            if (D_8291B87A != 0) {
+                D_8291B870 = func_8004C990(0xC1, 0);
+                gSPDisplayList((*(Gfx **)&D_800D0510)++, D_80094E38);
+                func_8004D19C(D_8291B874, D_8291B876, D_8291B870, 0, 0);
+            }
+        }
+    } while (0);
+}
 #endif
 
 #ifdef VERSION_US
