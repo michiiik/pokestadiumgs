@@ -189,3 +189,7 @@ func_84131760: time cap at 0.9886 (raw 0.9886) after 2400s, mismatch instruction
 ## 2026-09-23
 
 func_8412D53C: matched (call_sequence:loop:byte_pointer_arithmetic), 3 iterations, agent openrouter
+
+## 2026-09-24
+
+func_8413A53C: matched (call_sequence:pointer-table:casted-base-expression), 1 iterations, agent openrouter
