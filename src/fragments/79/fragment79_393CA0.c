@@ -4746,7 +4746,27 @@ void func_8413A340(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8413A53C.s")
+extern void func_8413A12C(u8, u8);
+extern void func_84139F44(u8);
+extern void func_84139528(u8 arg0, u8 arg1);
+extern void func_84139958(u8, u8);
+extern void func_8413A340(u8 arg0);
+extern u8 D_84195248[];
+void func_8413A53C(u8 arg0) {
+    u8 *data = ((u8 **)(D_84195248 + arg0 * 24))[(D_84195248 + arg0 * 24)[9]];
+    if (*(u16 *)(data + 6) & 0x800) func_8413A12C(arg0, 0);
+    else if (*(u16 *)(data + 6) & 0x100) func_8413A12C(arg0, 1);
+    else if (*(u16 *)(data + 6) & 0x400) func_8413A12C(arg0, 2);
+    else if (*(u16 *)(data + 6) & 0x200) func_8413A12C(arg0, 3);
+    else if (*(u16 *)(data + 6) & 0x10) func_84139F44(arg0);
+    else func_8413A340(arg0);
+    if (*(u16 *)(data + 8) & 0x20) {
+        if ((D_84195248 + arg0 * 24)[0xE] < 2) func_84139958(arg0, 1);
+    } else if (*(u16 *)(data + 8) & 8) func_84139528(arg0, 0);
+    else if (*(u16 *)(data + 8) & 1) func_84139528(arg0, 1);
+    else if (*(u16 *)(data + 8) & 4) func_84139528(arg0, 2);
+    else if (*(u16 *)(data + 8) & 2) func_84139528(arg0, 3);
+}
 #endif
 
 #ifdef VERSION_US
