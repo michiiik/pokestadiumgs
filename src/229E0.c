@@ -181,7 +181,17 @@ s32 func_80024864(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800248EC.s")
+void func_800248EC(void *arg0) {
+    u8 count = *(u8 *)arg0;
+    u32 *ptr = (u32 *)((u8 *)arg0 + 4);
+    u32 i = 0;
+    while (i < count) {
+        *ptr += (u32)arg0;
+        i++;
+        ptr++;
+    }
+    *((u8 *)arg0 + 1) = 1;
+}
 #endif
 
 #ifdef VERSION_US
