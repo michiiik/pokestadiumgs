@@ -1876,7 +1876,26 @@ void func_800347DC(s32 arg0, s32 arg1) { }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003492C.s")
+extern u8 D_800D2B78;
+void func_8003492C(u8 arg0, u16 arg1) {
+    u32 first;
+    u32 last;
+    u32 i;
+    u8 *record;
+
+    if (arg0 >= 4) {
+        first = 4;
+        last = 7;
+    } else {
+        first = 0;
+        last = 3;
+    }
+    for (i = first; i <= last; i++) {
+        record = (u8 *)&D_800D2B78 + i * 0x3C;
+        *(u16 *)(record + 0x22) = arg1;
+        record[0x1E] = 0;
+    }
+}
 #endif
 
 #ifdef VERSION_US
