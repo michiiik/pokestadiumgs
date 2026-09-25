@@ -150,7 +150,30 @@ void func_84151F20(void *arg0, u8 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84152088.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84152140.s")
+extern u8 func_8414A2A0(void);
+extern void * func_8414A3A0(u8);
+extern void * func_84154B64(s32);
+void func_84152140(void *arg0, u8 arg1) {
+    s32 sp18;
+    s32 base;
+    u8 value;
+    void *table;
+    u8 sp1F;
+
+    table = func_84154B64((1 - (u32)arg1) & 0xFF);
+    value = *(u8 *)((u8 *)table + 0x25);
+    if ((value != 0) && (value != 0xA5) && (value != 0xE3) && (value != 0x77)) {
+        base = (s32)(u32)arg0 + 4;
+        if (!(*(u8 *)((u8 *)table + 0x19) & 0x10)) {
+            *(u8 *)((u8 *)(u32)base + (u32)arg1 + 8) = 0xFF;
+            sp18 = base;
+            sp1F = func_8414A2A0();
+            table = func_8414A3A0(arg1);
+            *(u32 *)((u8 *)(u32)sp18 + ((u32)arg1 << 2) + 0x34) += *(u8 *)((u8 *)table + 0x14) * sp1F;
+            *(u8 *)(u32)sp18 |= 2;
+        }
+    }
+}
 
 extern u8 func_80063454(u8, u8, u8, s32);
 extern u8 func_80062D98(u8);
@@ -210,7 +233,27 @@ void func_841523BC(void *arg0, u8 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84152764.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_841528C4.s")
+extern u8 func_8414A2AC(void);
+extern void * func_8414A3A0(u8);
+extern void * func_84154B64(s32);
+void func_841528C4(void *arg0, u8 arg1) {
+    s32 base;
+    u8 *state;
+    void *table;
+
+    state = func_84154B64((1 - (u32)arg1) & 0xFF);
+    if (!(state[0x18] & 0x10)) {
+        if (*(u16 *)(state + 0x26) & 7) {
+            base = (s32)(u32)arg0 + 4;
+            if (!(state[0x15] & 1)) {
+                *(u8 *)((u8 *)(u32)base + (u32)arg1 + 8) = 0xFF;
+                table = func_8414A3A0(arg1);
+                *(u32 *)((u8 *)(u32)base + ((u32)arg1 << 2) + 0x34) = *(u8 *)((u8 *)table + 0x16) * func_8414A2AC();
+                *(u8 *)(u32)base |= 2;
+            }
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84152980.s")
 

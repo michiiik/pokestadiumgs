@@ -25,3 +25,15 @@ func_8415335C: matched (call_sequence:canonical:exact_matching_spelling), 1 iter
 ## 2026-09-19
 
 func_8415220C: matched (call_sequence:nested_if:exact_canonical), 1 iterations, agent antigravity
+
+## 2026-09-26
+
+func_84151270: time cap at 1.0 (raw 0.9787) after 2400s, mismatch register_allocation_only; tried families: call_sequence; tie-pool yes
+
+## 2026-09-26
+
+func_841528C4: matched (call_sequence:nested_gate:typed_state_pointer), 4 iterations, agent codex
+
+## 2026-09-26
+
+func_84152140: matched (call_sequence:five-local:late-byte-spill), 1 iterations, agent codex
