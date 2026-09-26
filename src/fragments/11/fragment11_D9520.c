@@ -420,7 +420,60 @@ void func_81608890(s32 arg0, s32 arg1, u8 *arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_816089E0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81608A38.s")
+extern u8 D_80094D90[];
+extern u8 D_80094DB8[];
+extern f32 D_8160C2C8;
+extern void Gfx_FillRectRgb(s16, s16, s16, s16, u32, u32, u32);
+extern void Gfx_FillRectRgba(s16, s16, s16, s16, u32, u32, u32, u32);
+extern u32 D_800D0510;
+void func_81608A38(s32 arg0, s32 arg1, u8 arg2, f32 arg3) {
+    Gfx *gfx;
+    if (D_8160C2C8 < arg3) {
+        gfx = (Gfx *)D_800D0510;
+        D_800D0510 += 8;
+        gSPDisplayList(gfx, D_80094D90);
+        if (arg2 & 1) {
+            Gfx_FillRectRgb((s16)(arg0 + 0x9E), (s16)(arg1 + 9), 1, 0x7A, 0, 0, 0);
+        }
+        if (arg2 & 2) {
+            Gfx_FillRectRgb((s16)(arg0 + 0x138), (s16)(arg1 + 9), 1, 0x7A, 0, 0, 0);
+        }
+        if (arg2 & 4) {
+            Gfx_FillRectRgb((s16)(arg0 + 0xD), (s16)(arg1 + 0x45), 0x1BC, 1, 0, 0, 0);
+        }
+        if (arg2 & 1) {
+            Gfx_FillRectRgb((s16)(arg0 + 0x9F), (s16)(arg1 + 9), 1, 0x7A, 0xFF, 0xFF, 0xFF);
+        }
+        if (arg2 & 2) {
+            Gfx_FillRectRgb((s16)(arg0 + 0x139), (s16)(arg1 + 9), 1, 0x7A, 0xFF, 0xFF, 0xFF);
+        }
+        if (arg2 & 4) {
+            Gfx_FillRectRgb((s16)(arg0 + 0xD), (s16)(arg1 + 0x46), 0x1BC, 1, 0xFF, 0xFF, 0xFF);
+        }
+    } else {
+        gfx = (Gfx *)D_800D0510;
+        D_800D0510 += 8;
+        gSPDisplayList(gfx, D_80094DB8);
+        if (arg2 & 1) {
+            Gfx_FillRectRgba((s16)(arg0 + 0x9E), (s16)(arg1 + 9), 1, 0x7A, 0, 0, 0, (u32)(255.0f * arg3));
+        }
+        if (arg2 & 2) {
+            Gfx_FillRectRgba((s16)(arg0 + 0x138), (s16)(arg1 + 9), 1, 0x7A, 0, 0, 0, (u32)(255.0f * arg3));
+        }
+        if (arg2 & 4) {
+            Gfx_FillRectRgba((s16)(arg0 + 0xD), (s16)(arg1 + 0x45), 0x1BC, 1, 0, 0, 0, (u32)(255.0f * arg3));
+        }
+        if (arg2 & 1) {
+            Gfx_FillRectRgba((s16)(arg0 + 0x9F), (s16)(arg1 + 9), 1, 0x7A, 0xFF, 0xFF, 0xFF, (u32)(255.0f * arg3));
+        }
+        if (arg2 & 2) {
+            Gfx_FillRectRgba((s16)(arg0 + 0x139), (s16)(arg1 + 9), 1, 0x7A, 0xFF, 0xFF, 0xFF, (u32)(255.0f * arg3));
+        }
+        if (arg2 & 4) {
+            Gfx_FillRectRgba((s16)(arg0 + 0xD), (s16)(arg1 + 0x46), 0x1BC, 1, 0xFF, 0xFF, 0xFF, (u32)(255.0f * arg3));
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81609170.s")
 
