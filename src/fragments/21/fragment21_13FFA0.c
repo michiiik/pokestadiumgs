@@ -622,7 +622,35 @@ void func_825044D0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_13FFA0/func_82504524.s")
+extern void *D_82508680;
+extern u8 D_82508F68[];
+extern s16 D_82508F6A;
+void func_82504524(void) {
+    u8 *state;
+    u8 *node;
+    u8 *entry;
+    state = D_82508F68;
+    node = *(u8 **)(state + 0x1C);
+    entry = *(s16 *)(state + 2) * 0x30 + *(u8 **)(node + 0x1C);
+    *(s16 *)((u8 *)D_82508680 + 8) = *(s16 *)state;
+    switch (*(s16 *)((u8 *)D_82508680 + 8)) {
+        case 1:
+            *(s16 *)((u8 *)D_82508680 + 0xA) = D_82508F6A;
+            if (*(s16 *)(entry + 0x20) != -1) {
+                *(s16 *)((u8 *)D_82508680 + 0xA) -= 1;
+                if (*(s16 *)((u8 *)D_82508680 + 0xA) < 0) {
+                    *(s16 *)((u8 *)D_82508680 + 0xA) = 0;
+                }
+            }
+            break;
+        case 3:
+            *(s16 *)((u8 *)D_82508680 + 0xC) = D_82508F6A;
+            break;
+        case 2:
+            *(s16 *)((u8 *)D_82508680 + 0xE) = D_82508F6A;
+            break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
