@@ -54,7 +54,35 @@ s32 func_8250008C(s32 arg0, u8 *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_13FFA0/func_82500120.s")
+extern u16 D_82508794;
+extern f32 D_80088E50[];
+s32 func_82500120(s32 arg0, u8 *arg1) {
+    u16 *state;
+    u16 value;
+    unsigned int next;
+    f32 sample;
+    f32 square;
+    f32 scaled;
+    f32 bias;
+    float scale;
+    s32 result;
+    if ((arg0 != 0) && (arg0 == 1)) {
+        state = &D_82508794;
+        value = *state;
+        scaled = D_80088E50[value >> 4];
+        sample = scaled;
+        scale = 255.0f;
+        square = sample * sample;
+        scaled = square * scale;
+        bias = (scaled > 0.0f) ? 0.5f : -0.5f;
+        result = (s32)(bias + scaled);
+        arg1[0x2F] = result;
+        arg1[0x2B] = result;
+        next = value;
+        *((0, state)) = next + 0x100;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
