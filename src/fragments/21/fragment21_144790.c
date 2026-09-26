@@ -9,7 +9,33 @@ void func_82504810(void) {
     *D_825087F0 = func_8004D690(0xD);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_144790/func_8250483C.s")
+extern void func_800498C4(void);
+extern void func_800496A4(s32, s32);
+extern void func_8004972C(s32, s32, s32, s32);
+extern s32 func_8004C874(s32, s32);
+extern void func_800495BC(s32, s32, s32);
+extern void func_800499EC(void);
+extern s32 * D_825087F0;
+void func_8250483C(void) {
+    s32 *temp_s4;
+    s32 var_s0;
+
+    temp_s4 = D_825087F0;
+    func_800498C4();
+    func_800496A4(8, 0);
+    func_8004972C(0xFF, 0xFF, 0xFF, 0xFF);
+    var_s0 = 0;
+    do {
+        if (var_s0 != *(s16 *)((u8 *)temp_s4 + 0xC)) {
+            func_8004972C(0xFF, 0xFF, 0xFF, 0xFF);
+        } else {
+            func_8004972C(0xFF, 0xFF, 0, 0xFF);
+        }
+        func_800495BC(((var_s0 / 11) * 0xA0) + 0x64, ((var_s0 % 11) * 0x14) + 0x64, func_8004C874(0x31, var_s0 + 0x10));
+        var_s0++;
+    } while (var_s0 != 0x14);
+    func_800499EC();
+}
 
 extern void func_80008648();
 extern void func_800088DC();
