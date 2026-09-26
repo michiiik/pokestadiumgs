@@ -167,7 +167,28 @@ void func_862007FC_padding(void) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_266A60/func_86200AD4.s")
+extern f32 D_8620E05C;
+extern void func_800277F0(u32, void *);
+typedef struct Candidate86200AD4Vec { f32 x, y, z; } Candidate86200AD4Vec;
+typedef struct Candidate86200AD4Obj { u8 pad0[0x10]; Candidate86200AD4Vec v; u8 pad1[0x2C]; Candidate86200AD4Vec p; } Candidate86200AD4Obj;
+typedef struct Candidate86200AD4Obj1 { u8 pad0[0x34]; f32 q34; u8 pad38[0x10]; f32 q48; } Candidate86200AD4Obj1;
+extern void * D_8620E198;
+void func_86200AD4(Candidate86200AD4Obj *arg0, Candidate86200AD4Obj1 *arg1, Candidate86200AD4Vec *arg2, Candidate86200AD4Vec *arg3, f32 arg4) {
+    f32 temp_fv0;
+    f32 temp_fv1;
+
+    arg0->p.x = arg0->p.x + arg3->x * arg4;
+    arg0->p.y = arg0->p.y + arg3->y * arg4;
+    arg0->p.z = arg0->p.z + arg3->z * arg4;
+    temp_fv0 = arg3->x;
+    temp_fv1 = *(f32 *)((u8 *)D_8620E198 + 0xC) * -2.0f * (temp_fv0 * arg0->v.x + arg3->y * arg0->v.y + arg3->z * arg0->v.z);
+    arg2->x = arg2->x + temp_fv0 * temp_fv1;
+    arg2->y = arg2->y + arg3->y * temp_fv1;
+    arg2->z = arg2->z + arg3->z * temp_fv1;
+    if (*(f32 *)((u8 *)D_8620E198 + 0x64) * 0.75f * 100.0f * arg1->q34 * D_8620E05C < arg4 && arg1->q48 > 55.0f) {
+        func_800277F0(0xBF03U, (u8 *)arg1 + 0x38);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -178,7 +199,32 @@ void func_862012F8(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_266A60/func_86201300.s")
+extern void func_86200C30(s32, void *, void *, s32 *, f32 *);
+void func_86201300(void *arg0, void *arg1) {
+    s32 i;
+    f32 v[3];
+    s32 count;
+    u8 *p;
+
+    count = 0;
+    v[2] = 0.0f;
+    v[1] = 0.0f;
+    v[0] = 0.0f;
+    p = *(u8 **)((u8 *)arg1 + 4);
+    i = 0;
+    if (*(s32 *)((u8 *)arg1 + 8) > 0) {
+        do {
+            func_86200C30(*(s32 *)arg1, arg0, p, &count, v);
+            i += 1;
+            p += 0x14;
+        } while (i < *(s32 *)((u8 *)arg1 + 8));
+    }
+    if (count > 0) {
+        *(f32 *)((u8 *)arg0 + 0x10) += v[0] / (f32)count;
+        *(f32 *)((u8 *)arg0 + 0x14) += v[1] / (f32)count;
+        *(f32 *)((u8 *)arg0 + 0x18) += v[2] / (f32)count;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -468,7 +514,21 @@ void func_86203ED8(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_266A60/func_86203F50.s")
+extern f32 D_8620E0B8;
+extern f32 D_8620E0BC;
+extern f32 D_8620E0C0;
+extern void func_87F06240(s32, s32, f32, f32, s32);
+extern Gfx * D_800D0510;
+void func_86203F50(s32 n, s32 x, s32 y, u8 r1, u8 g1, u8 b1, u8 r2, u8 g2, u8 b2) {
+    gDPSetPrimColor(D_800D0510++, 0, 0, r1, g1, b1, 0xFF);
+    gDPSetEnvColor(D_800D0510++, r2, g2, b2, 0xFF);
+    if (n < 10) {
+        func_87F06240(x + 0x24, y + 2, D_8620E0B8, D_8620E0B8, n % 10);
+        return;
+    }
+    func_87F06240(x + 0x1C, y + 2, D_8620E0BC, D_8620E0BC, n / 10);
+    func_87F06240(x + 0x29, y + 2, D_8620E0C0, D_8620E0C0, n % 10);
+}
 #endif
 
 #ifdef VERSION_US
