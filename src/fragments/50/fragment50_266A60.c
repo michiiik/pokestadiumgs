@@ -199,7 +199,32 @@ void func_862012F8(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_266A60/func_86201300.s")
+extern void func_86200C30(s32, void *, void *, s32 *, f32 *);
+void func_86201300(void *arg0, void *arg1) {
+    s32 i;
+    f32 v[3];
+    s32 count;
+    u8 *p;
+
+    count = 0;
+    v[2] = 0.0f;
+    v[1] = 0.0f;
+    v[0] = 0.0f;
+    p = *(u8 **)((u8 *)arg1 + 4);
+    i = 0;
+    if (*(s32 *)((u8 *)arg1 + 8) > 0) {
+        do {
+            func_86200C30(*(s32 *)arg1, arg0, p, &count, v);
+            i += 1;
+            p += 0x14;
+        } while (i < *(s32 *)((u8 *)arg1 + 8));
+    }
+    if (count > 0) {
+        *(f32 *)((u8 *)arg0 + 0x10) += v[0] / (f32)count;
+        *(f32 *)((u8 *)arg0 + 0x14) += v[1] / (f32)count;
+        *(f32 *)((u8 *)arg0 + 0x18) += v[2] / (f32)count;
+    }
+}
 #endif
 
 #ifdef VERSION_US
