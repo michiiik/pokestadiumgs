@@ -3631,7 +3631,25 @@ void func_8411B710(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8411B75C.s")
+extern s32 func_8006456C(s32);
+extern void func_8411B710(u8 *arg0);
+extern void func_8411FEE8(s32);
+extern s32 D_84183D50;
+extern s32 D_841911F4;
+extern u8 * D_84193DD0;
+void func_8411B75C(u8 *arg0) {
+    s32 reservation;
+    u8 padding;
+    u8 index;
+    s32 value;
+    func_8411B710((arg0[0x7F6] = 0, arg0));
+    func_8411FEE8(0x12C);
+    *(s16 *)(arg0 + 0x7E8) = 0;
+    index = func_8411E1F8((s32)arg0);
+    value = func_8006456C(*(u16 *)(((u8 (*)[0x10])D_84193DD0)[func_8411E1F8((s32)arg0)] + 0x14));
+    func_84112FD0(*(u8 **)(arg0 + 0x5C0), *(u16 *)(arg0 + 0x65C), *(F12State *)(((u8 (*)[0x10])D_84193DD0)[index] + 0x18), value);
+    *(s32 *)(arg0 + D_841911F4 * 4 + 0x5C8) = D_84183D50;
+}
 #endif
 
 #ifdef VERSION_US
