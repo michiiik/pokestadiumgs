@@ -174,7 +174,23 @@ void func_8250684C(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_144790/func_82506910.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_144790/func_825069F0.s")
+extern s32 D_82509024;
+extern s32 D_82509028;
+extern s32 D_8250902C;
+extern s32 D_82509030;
+extern s32 D_82509034;
+extern s32 D_82509038;
+extern s16 D_82508FF0;
+void func_825069F0(void *arg0, s32 arg1, s32 arg2, void *arg3, void *arg4, void *arg5, void *arg6, void *arg7) {
+    *(struct Fragment21PackedWord *)&D_82509024 = *(struct Fragment21PackedWord *)arg0;
+    *(s16 *)((u8 *)&D_82508FF0 + 0x30) = arg1;
+    *(s16 *)((u8 *)&D_82508FF0 + 0x32) = arg2;
+    *(struct Fragment21PackedWord *)&D_82509028 = *(struct Fragment21PackedWord *)arg3;
+    *(struct Fragment21PackedWord *)&D_8250902C = *(struct Fragment21PackedWord *)arg4;
+    *(struct Fragment21PackedWord *)&D_82509030 = *(struct Fragment21PackedWord *)arg5;
+    *(struct Fragment21PackedWord *)&D_82509034 = *(struct Fragment21PackedWord *)arg6;
+    *(struct Fragment21PackedWord *)&D_82509038 = *(struct Fragment21PackedWord *)arg7;
+}
 
 extern s16 D_82508FF0;
 void func_82506AA4(s16 *arg0, s32 arg1, s32 arg2) {
