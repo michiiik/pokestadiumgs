@@ -1195,7 +1195,16 @@ void func_8005C2FC(s32 arg0, s32 arg1, s32 arg2)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005C348.s")
+extern u8 D_801285D0[];
+void func_8005C348(s32 arg0, s32 arg1, s32 arg2)
+{
+    typedef struct { u8 first; u8 second; } Pair;
+    s32 temp_v0;
+    temp_v0 = *(s32 *)(D_801285D0 + arg1 * 112) + 9;
+    if ((arg2 >= 0) && (arg2 < 50)) {
+        ((Pair *)(temp_v0 + 0x477))[arg2] = *(Pair *)arg0;
+    }
+}
 #endif
 
 #ifdef VERSION_US
