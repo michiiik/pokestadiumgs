@@ -789,7 +789,35 @@ s32 func_83008844(s32 arg0, u8 arg1) { s32 selector; s32 result = 0; selector = 
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83008960.s")
+extern void func_800226C0(s32);
+extern void func_83000F98(s32 arg0, s32 arg1, s32 arg2);
+void func_83008960(void *arg0, s32 arg1) {
+    if (arg1 == -1) {
+        *((u8 *)arg0 + 0x1E) = 0x1C;
+        func_800226C0(3);
+        return;
+    }
+    if (arg1 == 1) {
+        if (*((u8 *)arg0 + 0x3D959) > 0) {
+            *((u8 *)arg0 + 0x1E) = 0x1F;
+            func_83000F98((s32)arg0, (s32)((u8 *)arg0 + 0x3D95C), 0);
+            func_800226C0(0x90);
+            return;
+        }
+        func_800226C0(5);
+        return;
+    }
+    if (arg1 >= 2) {
+        arg1 -= 2;
+        if (arg1 < *((u8 *)arg0 + 0x3EA5D)) {
+            *((u8 *)arg0 + 0x1E) = 0x1F;
+            func_83000F98((s32)arg0, (s32)((u8 *)arg0 + arg1 * 0x220 + 0x3EA60), 0);
+            func_800226C0(0x90);
+            return;
+        }
+        func_800226C0(5);
+    }
+}
 #endif
 
 #ifdef VERSION_US
