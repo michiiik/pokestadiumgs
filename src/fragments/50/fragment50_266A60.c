@@ -514,7 +514,21 @@ void func_86203ED8(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_266A60/func_86203F50.s")
+extern f32 D_8620E0B8;
+extern f32 D_8620E0BC;
+extern f32 D_8620E0C0;
+extern void func_87F06240(s32, s32, f32, f32, s32);
+extern Gfx * D_800D0510;
+void func_86203F50(s32 n, s32 x, s32 y, u8 r1, u8 g1, u8 b1, u8 r2, u8 g2, u8 b2) {
+    gDPSetPrimColor(D_800D0510++, 0, 0, r1, g1, b1, 0xFF);
+    gDPSetEnvColor(D_800D0510++, r2, g2, b2, 0xFF);
+    if (n < 10) {
+        func_87F06240(x + 0x24, y + 2, D_8620E0B8, D_8620E0B8, n % 10);
+        return;
+    }
+    func_87F06240(x + 0x1C, y + 2, D_8620E0BC, D_8620E0BC, n / 10);
+    func_87F06240(x + 0x29, y + 2, D_8620E0C0, D_8620E0C0, n % 10);
+}
 #endif
 
 #ifdef VERSION_US
