@@ -49,3 +49,15 @@ func_83006F30: matched (call_sequence:aggregate-copy:pair-declared-after-carrier
 ## 2026-09-22
 
 func_83007160: matched (call_sequence:switch:multiline-local-constants-exact), 1 iterations, agent codex
+
+## 2026-09-27
+
+func_83008960: matched (call_sequence:guard_returns:mutate_argument_index), 1 iterations, agent unbiased
+
+## 2026-09-27
+
+func_83001000: time cap at 0.9067 (raw 0.6933) after 2420s, mismatch instruction_drift; tried families: call_sequence; tie-pool no
+
+## 2026-09-27
+
+func_830022F0: plateau at 1.0 (raw 0.987), mismatch immediate_drift; tried families: call_sequence; tie-pool yes
