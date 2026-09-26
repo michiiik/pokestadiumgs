@@ -4227,7 +4227,15 @@ void GeoRender_ResetTransformStack(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800393F0.s")
+extern u8 D_80126010;
+void func_800393F0(S1_Vec3f *arg0) {
+    S1_Vec3f *vec = (S1_Vec3f *)&D_80126010;
+    s32 *counter = (s32 *)((u8 *)&D_80126010 + 0x180);
+    vec[*counter + 1].x = vec[*counter].x * arg0->x;
+    vec[*counter + 1].y = vec[*counter].y * arg0->y;
+    vec[*counter + 1].z = vec[*counter].z * arg0->z;
+    (*counter)++;
+}
 #endif
 
 #ifdef VERSION_US
