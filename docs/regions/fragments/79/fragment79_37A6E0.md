@@ -89,3 +89,23 @@ func_8411845C: matched (call_sequence:direct:baseline), 1 iterations, agent unbi
 ## 2026-09-21
 
 func_8411B070: matched (call_sequence:nested-guard:direct-offsets), 1 iterations, agent unbiased
+
+## 2026-09-27
+
+func_8411A544: matched (call_sequence:guard:natural-u8), 2 iterations, agent codex
+
+## 2026-09-27
+
+func_8411C8A0: matched (call_sequence:dispatch-mirror:asymmetric-byte-pointer-add), 1 iterations, agent codex
+
+## 2026-09-27
+
+func_84111EC4: time cap at 0.9643 (raw 0.9464) after 2419s, mismatch instruction_drift; tried families: call_sequence; tie-pool yes; 3 iteration(s) with a suspicious identical batch-wide failure
+
+## 2026-09-27
+
+TYPE CONFLICT: func_8003F3BC is extern void func_8003F3BC(void *, s32), not extern void func_8003F3BC(void *, u8)
+
+## 2026-09-27
+
+TYPE CONFLICT: func_8003F3BC is extern void func_8003F3BC(void *, s16), not extern void func_8003F3BC(void *, u8)
