@@ -553,7 +553,60 @@ s32 func_82503EF8(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_13FFA0/func_825043AC.s")
+extern s16 D_82508F72;
+extern void func_8004C09C();
+extern void func_8004C4B0();
+extern void func_8004C398();
+extern void func_80008624();
+extern void func_800086A4();
+extern s32 StageContext_GetFadeMode(void);
+extern void StageFade_StartFromOpaque();
+extern void StageLoader_WaitForRetrace(void);
+extern void func_80064D28();
+extern void func_8170024C();
+extern void func_825075B0();
+extern void func_82502EBC();
+extern s32 func_82503F28();
+extern void func_8250202C(void);
+extern void func_82503840(void);
+s32 func_825043AC(s32 arg0, s32 arg1) {
+    s32 state = 0;
+    s32 result;
+
+    func_8004C09C(0x147);
+    func_8004C4B0(0x31);
+    func_8004C4B0(0x29);
+    func_8004C4B0(0x2A);
+    func_82502EBC(arg0, arg1);
+    func_80008624();
+    if (StageContext_GetFadeMode() != 0) {
+        func_800086A4(2);
+        StageFade_StartFromOpaque(5);
+    }
+    do {
+        func_80064D28();
+        func_825075B0();
+        func_8170024C();
+        func_8250202C();
+        func_82503840();
+        state = func_82503F28(state, arg1);
+    } while (state != 9);
+    StageLoader_WaitForRetrace();
+    switch (D_82508F72) {
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+            result = D_82508F72;
+            break;
+        default:
+            result = 5;
+            break;
+    }
+    func_8004C398();
+    func_800226C0(0x122);
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
