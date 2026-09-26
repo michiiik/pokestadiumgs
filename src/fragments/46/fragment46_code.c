@@ -642,7 +642,34 @@ void func_8AE04EB8(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE04FA8.s")
+extern s32 D_8AE09940;
+extern s32 D_8AE0A158;
+typedef struct Fragment46CandidatePosition { s16 x; s16 y; } Fragment46CandidatePosition;
+extern void func_8004D19C(s32, s32, s32, s32, s32);
+void func_8AE04FA8(s16 *arg0, s16 arg1, s16 arg2) {
+    Fragment46LookupEntry *entry;
+    s16 *cursor;
+    s32 i;
+    s16 index;
+    s16 *position;
+    s16 x;
+    s16 y;
+
+    entry = D_8AE08508;
+    cursor = arg0;
+    for (i = 0; i < D_8AE0A158; i++, entry++, cursor += 2) {
+        if (*cursor == -1) {
+            break;
+        }
+        if (entry->value != 0) {
+            index = entry->key - 1;
+            position = (s16 *)((u8 *)arg0 + index * 4);
+            x = position[0];
+            y = position[1];
+            func_8004D19C(x + arg1, y + arg2, D_8AE09940, 0, 0);
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
