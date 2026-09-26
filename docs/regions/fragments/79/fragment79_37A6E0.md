@@ -109,3 +109,19 @@ TYPE CONFLICT: func_8003F3BC is extern void func_8003F3BC(void *, s32), not exte
 ## 2026-09-27
 
 TYPE CONFLICT: func_8003F3BC is extern void func_8003F3BC(void *, s16), not extern void func_8003F3BC(void *, u8)
+
+## 2026-09-27
+
+func_84117CEC: time cap at 0.0 (raw None) after 2400s, mismatch unknown; tried families: (none); tie-pool no
+
+## 2026-09-27
+
+func_8411A7D8: time cap at 0.9524 (raw 0.9524) after 2401s, mismatch instruction_drift; tried families: call_sequence; tie-pool yes
+
+## 2026-09-27
+
+func_8411B1F4: plateau at 0.0 (raw None), mismatch unknown; tried families: call_sequence; tie-pool no
+
+## 2026-09-27
+
+func_8411B75C: matched (call_sequence:comma-delay-slot:exact-stack-home), 2 iterations, agent codex
