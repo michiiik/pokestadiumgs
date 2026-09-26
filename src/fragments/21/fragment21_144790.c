@@ -286,7 +286,69 @@ void func_82507000(s16 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_144790/func_82507078.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_144790/func_82507250.s")
+extern void func_82507D04(s32, void *, s32, s32, s32, s32, s32);
+extern void func_82504D40(void *, void *);
+extern void func_82504CC8(void *, s32);
+extern void func_800226C0(s32);
+extern void * func_825068C4(s32, s32);
+extern void func_82506FB8(s32 arg0);
+extern void func_82507B18(void);
+void func_82507250(void *arg0) {
+    s16 temp_a2;
+    s32 temp_a1;
+    s32 temp_s1;
+    s16 temp_v1;
+    s32 var_s0;
+    s32 var_s0_2;
+    void *temp_s0;
+    void *temp_s2;
+
+    temp_s0 = func_825068C4(1, 0);
+    temp_v1 = *(s16 *)((u8 *)arg0 + 2);
+    temp_a1 = *(s16 *)((u8 *)arg0 + 0xE);
+    temp_s1 = *(s16 *)((u8 *)arg0 + 0xC);
+    switch (temp_v1) {
+    case 0:
+        temp_a2 = *(s16 *)((u8 *)temp_s0 + 0x30);
+        func_82507D04(0, (u8 *)temp_s0 + 0x48, temp_a2, 0x31, temp_a2,
+                     *(s16 *)((u8 *)temp_s0 + 0x2E), *(s32 *)((u8 *)temp_s0 + 0x34));
+        temp_s2 = (u8 *)arg0 + 0x18;
+        func_82504D40(temp_s0, temp_s2);
+        func_82507B18();
+        var_s0 = 0;
+        if (temp_s1 > 0) {
+            do {
+                func_82504D40(func_825068C4(2, var_s0), temp_s2);
+                var_s0++;
+            } while (var_s0 != temp_s1);
+        }
+        *(s16 *)((u8 *)arg0 + 2) = 1;
+        break;
+    case 1:
+        if (*(s16 *)((u8 *)temp_s0 + 8) == 2) {
+            func_82504CC8(temp_s0, temp_a1);
+            var_s0_2 = 0;
+            if (temp_s1 > 0) {
+                do {
+                    func_82506FB8(var_s0_2);
+                    var_s0_2++;
+                } while (var_s0_2 != temp_s1);
+            }
+            *(s16 *)((u8 *)arg0 + 2) = 2;
+            if (*(s16 *)((u8 *)arg0 + 0xC) > 0) {
+                func_800226C0(0x112);
+            }
+        }
+        break;
+    case 2:
+        if (*(s16 *)((u8 *)temp_s0 + 8) == 2) {
+            *(s16 *)((u8 *)arg0 + 0) = 2;
+            *(s16 *)((u8 *)arg0 + 4) = 0;
+            *(u16 *)((u8 *)arg0 + 6) &= 0xFFF7;
+        }
+        break;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_144790/func_825073B0.s")
 
