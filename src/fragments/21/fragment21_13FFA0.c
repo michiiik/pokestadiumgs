@@ -399,7 +399,24 @@ s32 func_82502DDC(void *arg0, s32 arg1, u16 arg2)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_13FFA0/func_82502E20.s")
+s32 func_82502E20(void *arg0, s32 arg1, s32 arg2)
+{
+  s32 result = 0;
+  s16 *new_var;
+  s32 i;
+  for (i = 0; i < arg1; i++)
+  {
+    if (1)
+    {
+    }
+    if (arg2 == ((*(new_var = &(*((s16 *) ((((u8 *) arg0) + (i * 0x30)) + 0x26))))) ^ 0))
+    {
+      result = i + 1;
+      break;
+    }
+  }
+  return result;
+}
 #endif
 
 #ifdef VERSION_US
