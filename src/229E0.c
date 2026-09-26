@@ -3927,11 +3927,27 @@ S1_unk_D_86002F34_alt7* GeoNode_CreateDisplayListPart(S1_MainPoolState* arg0, S1
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003899C.s")
+extern void MtxF_Identity(f32 *arg0);
+void *func_8003899C(s32 arg0, s32 arg1, s32 arg2, s32 arg3, void *arg4) {
+    if (arg0 != 0) {
+        arg1 = (s32) MainPool_AllocAligned((void *) arg0, sizeof(S1_unk_D_86002F34_alt8), 4);
+    }
+    if (arg1 != 0) {
+        ((S1_unk_D_86002F34_alt8 *) arg1)->unk_18 = (Gfx *) arg3;
+        if (arg4 == NULL) {
+            MtxF_Identity((f32 *) &((S1_unk_D_86002F34_alt8 *) arg1)->unk_1C);
+        } else {
+            MtxF_Copy((u32 *) &((S1_unk_D_86002F34_alt8 *) arg1)->unk_1C, (u32 *) arg4);
+        }
+        GeoNode_Init((S1_GraphNode *) arg1, 0x17);
+        ((S1_unk_D_86002F34_alt8 *) arg1)->unk_00.unk_03 = (u8) arg2;
+    }
+    return (void *) arg1;
+}
 #endif
 
 #ifdef VERSION_US
-extern void func_8003899C(s32, s32, s32, s32, void *);
+extern void *func_8003899C(s32, s32, s32, s32, void *);
 void *GeoNode_CreateDisplayListMatrixFromTransform(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
     s32 temp[16];
     func_8003614C(temp, arg4, arg5);
