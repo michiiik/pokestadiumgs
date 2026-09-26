@@ -1043,7 +1043,20 @@ void func_8002C2A0(unsigned short arg0)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800314D4.s")
+extern u32 D_80091A24;
+extern s32 D_800D1A90[];
+extern s8 D_80091A0C;
+extern s8 D_80091A10;
+void func_800314D4(s32 arg0) {
+    if ((u8)D_80091A0C != 0) {
+        if ((u8)D_80091A10 != 0) {
+            if (arg0 != 0) {
+                D_800D1A90[D_80091A24 % 10] = arg0;
+                D_80091A24++;
+            }
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
