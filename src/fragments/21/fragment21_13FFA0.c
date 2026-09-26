@@ -369,7 +369,33 @@ s16 func_82502924(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_13FFA0/func_82502DDC.s")
+s32 func_82502DDC(void *arg0, s32 arg1, u16 arg2)
+{
+  void *new_var;
+  s32 result = 0;
+  s32 i = 0;
+  u8 *p;
+  new_var = arg0;
+  if (arg1 > 0)
+  {
+    p = new_var;
+    scan:
+    if (arg2 == (*((s16 *) (p + 0x26))))
+    {
+      result = i;
+      goto done;
+    }
+
+    i++;
+    p += 0x30;
+    if (i != arg1)
+    {
+      goto scan;
+    }
+  }
+  done:
+  return result;
+}
 #endif
 
 #ifdef VERSION_US
