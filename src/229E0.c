@@ -5330,7 +5330,17 @@ void func_8003F4E8(u8 *arg0, u8 value) { arg0[0x1C] = value; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003F4F4.s")
+extern void *D_8009491C;
+s32 func_8003F4F4(void *arg0, s32 arg1) {
+    s32 result = 0;
+    void *entry;
+    if (arg0 == NULL) arg0 = D_8009491C;
+    if (arg0 != NULL) {
+        entry = *(void **)((u8 *)arg0 + 0xC);
+        result = (*(s32 (**)())((u8 *)entry + 0x2C))(arg1, 0);
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
