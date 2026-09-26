@@ -877,7 +877,26 @@ s32 func_80028CE8(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80028E60.s")
+extern u8 D_800D2660[];
+s32 func_80028E60(u32 arg0)
+{
+  u8 *ptr;
+  int value;
+  u32 mask;
+  s32 result;
+  arg0--;
+  ptr = &D_800D2660[arg0 >> 3];
+  value = *ptr;
+  mask = 1U << (arg0 & 7);
+  result = value & mask;
+  value |= mask;
+  if ((mask = result) != 0U)
+  {
+    return 1;
+  }
+  *ptr = value;
+  return mask != (mask = 0);
+}
 #endif
 
 #ifdef VERSION_US
