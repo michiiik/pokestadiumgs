@@ -167,7 +167,28 @@ void func_862007FC_padding(void) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_266A60/func_86200AD4.s")
+extern f32 D_8620E05C;
+extern void func_800277F0(u32, void *);
+typedef struct Candidate86200AD4Vec { f32 x, y, z; } Candidate86200AD4Vec;
+typedef struct Candidate86200AD4Obj { u8 pad0[0x10]; Candidate86200AD4Vec v; u8 pad1[0x2C]; Candidate86200AD4Vec p; } Candidate86200AD4Obj;
+typedef struct Candidate86200AD4Obj1 { u8 pad0[0x34]; f32 q34; u8 pad38[0x10]; f32 q48; } Candidate86200AD4Obj1;
+extern void * D_8620E198;
+void func_86200AD4(Candidate86200AD4Obj *arg0, Candidate86200AD4Obj1 *arg1, Candidate86200AD4Vec *arg2, Candidate86200AD4Vec *arg3, f32 arg4) {
+    f32 temp_fv0;
+    f32 temp_fv1;
+
+    arg0->p.x = arg0->p.x + arg3->x * arg4;
+    arg0->p.y = arg0->p.y + arg3->y * arg4;
+    arg0->p.z = arg0->p.z + arg3->z * arg4;
+    temp_fv0 = arg3->x;
+    temp_fv1 = *(f32 *)((u8 *)D_8620E198 + 0xC) * -2.0f * (temp_fv0 * arg0->v.x + arg3->y * arg0->v.y + arg3->z * arg0->v.z);
+    arg2->x = arg2->x + temp_fv0 * temp_fv1;
+    arg2->y = arg2->y + arg3->y * temp_fv1;
+    arg2->z = arg2->z + arg3->z * temp_fv1;
+    if (*(f32 *)((u8 *)D_8620E198 + 0x64) * 0.75f * 100.0f * arg1->q34 * D_8620E05C < arg4 && arg1->q48 > 55.0f) {
+        func_800277F0(0xBF03U, (u8 *)arg1 + 0x38);
+    }
+}
 #endif
 
 #ifdef VERSION_US
