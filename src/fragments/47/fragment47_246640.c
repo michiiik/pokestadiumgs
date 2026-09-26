@@ -333,7 +333,37 @@ void func_860029D0(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_246640/func_86002B20.s")
+extern f64 D_8600D690;
+extern f64 fragment48_main(f64);
+extern void func_860032DC(u8 *arg0);
+extern void func_86003EFC(void *, s32);
+extern f64 func_87C00090(f64,f64,f64);
+extern f64 func_87C00D14(f64,f64);
+extern u8 D_8600DE30[];
+void func_86002B20(u8 *arg0) {
+    u8 *temp_v0;
+
+    temp_v0 = *(u8 **)(arg0 + 0x1870);
+    *(f64 *)(arg0 + 0x17D0) -= *(f64 *)(temp_v0 + 0x6890);
+    if (*(f64 *)(arg0 + 0x17D0) <= 0.0) {
+        *(f64 *)(arg0 + 0x17D0) = 0.0;
+        func_86003EFC(arg0, 2);
+    } else {
+        if (*(s32 *)(arg0 + 0x17BC) != 0) {
+            *(f64 *)(arg0 + 0x1860) = func_87C00090(
+                *(f64 *)(arg0 + 0x1860),
+                *(f64 *)(D_8600DE30 + 0x88),
+                *(f64 *)(D_8600DE30 + 0x1F8) * *(f64 *)(temp_v0 + 0x6890));
+            *(f64 *)(arg0 + 0x1858) = fragment48_main(
+                *(f64 *)(arg0 + 0x1860) + *(f64 *)(arg0 + 0x1858));
+        } else {
+            *(f64 *)(arg0 + 0x1860) = D_8600D690;
+            *(f64 *)(arg0 + 0x1858) = func_87C00D14(
+                -*(f64 *)(arg0 + 0), -*(f64 *)(arg0 + 0x10));
+        }
+    }
+    func_860032DC(arg0);
+}
 #endif
 
 #ifdef VERSION_US
