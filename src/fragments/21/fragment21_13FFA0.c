@@ -264,7 +264,60 @@ s32 func_82502114(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_13FFA0/func_82502404.s")
+extern void *D_82508680;
+s32 func_82502404(s16 *arg0, s16 *arg1, s32 arg2, u16 arg3, s32 arg4, s32 arg5, s32 arg6) {
+    s32 result;
+    s32 enabled;
+    s32 i;
+    s32 mask;
+    s32 bit;
+
+    result = 0;
+    enabled = 0;
+    switch (arg2) {
+        case 2:
+            if (arg5 == 0) {
+                result = 1;
+            } else if (*(s16 *)((u8 *)D_82508680 + 2) == 0xE) {
+                result = 1;
+            }
+            if (arg6 == 0xE) {
+                enabled = 1;
+            } else {
+                enabled = result;
+            }
+            break;
+        case 3:
+            if (arg6 == 0x18) {
+                result = 1;
+                mask = arg3;
+                for (i = 0; i < 8; i++) {
+                    bit = 1 << i;
+                    if (!(mask & bit)) {
+                        result = 0;
+                        break;
+                    }
+                }
+            } else {
+                result = 1;
+                mask = arg3;
+            }
+            bit = 1 << arg5;
+            enabled = (mask & bit) != 0;
+            break;
+        case 1:
+            if (arg5 == 0) {
+                result = 1;
+            } else {
+                result = (arg3 & (1 << (arg5 - 1))) != 0;
+            }
+            enabled = result;
+            break;
+    }
+    *arg0 = result;
+    *arg1 = enabled;
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
