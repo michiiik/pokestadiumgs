@@ -104,7 +104,30 @@ s32 func_825001B4(s32 arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_13FFA0/func_825003DC.s")
+f32 func_825003DC(u32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 *arg5) {
+    s32 end1;
+    s32 end2;
+    s32 phase;
+    f32 result;
+
+    end1 = arg1 + arg2;
+    end2 = end1 + arg3;
+    *arg5 = 0;
+    phase = arg0 % (u32)(end2 + arg4);
+    if (phase < arg1) {
+        result = (f32)phase / (f32)arg1;
+    } else if (phase < end1) {
+        if (phase == arg1) {
+            *arg5 = 1;
+        }
+        result = 1.0f;
+    } else if (phase < end2) {
+        result = 1.0f - (f32)(phase - arg1 - arg2) / (f32)arg3;
+    } else {
+        result = 0.0f;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
