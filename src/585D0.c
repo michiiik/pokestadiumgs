@@ -273,7 +273,19 @@ void func_80058D98_padding2(void) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80058DE4.s")
+extern void GbSave_ComputeChecksum(u8 *start, u8 *end);
+extern s32 func_80057BCC(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
+extern u8 D_80128570[];
+s32 func_80058DE4(s32 arg0)
+{
+    struct Local { u8 *p; } data;
+    volatile s64 padding;
+
+    data = *(struct Local *)(D_80128570 + arg0 * 112 + 0x60);
+    GbSave_ComputeChecksum(data.p + 0x18, data.p + 0xFA3);
+    data.p[0xFA3] ^= 0xFF;
+    return func_80057BCC(arg0, (s32)(data.p + 0xFA0), 0x3520, 0x20);
+}
 #endif
 
 #ifdef VERSION_US
@@ -1170,11 +1182,29 @@ void func_8005C22C(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005C2FC.s")
+extern u8 D_801285D0[];
+void func_8005C2FC(s32 arg0, s32 arg1, s32 arg2)
+{
+    typedef struct { u8 first; u8 second; } Pair;
+    s32 temp_v0;
+    temp_v0 = *(s32 *)(D_801285D0 + arg1 * 112) + 9;
+    if ((arg2 >= 0) && (arg2 < 50)) {
+        ((Pair *)(temp_v0 + 0x476))[arg2] = *(Pair *)arg0;
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005C348.s")
+extern u8 D_801285D0[];
+void func_8005C348(s32 arg0, s32 arg1, s32 arg2)
+{
+    typedef struct { u8 first; u8 second; } Pair;
+    s32 temp_v0;
+    temp_v0 = *(s32 *)(D_801285D0 + arg1 * 112) + 9;
+    if ((arg2 >= 0) && (arg2 < 50)) {
+        ((Pair *)(temp_v0 + 0x477))[arg2] = *(Pair *)arg0;
+    }
+}
 #endif
 
 #ifdef VERSION_US
