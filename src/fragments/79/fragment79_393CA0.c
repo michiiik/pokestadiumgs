@@ -4608,7 +4608,20 @@ void func_84138D74(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84139244.s")
+extern void func_84138EA4(u8, u8);
+extern u8 * D_84195208[];
+void func_84139244(u8 arg0) {
+    s32 i;
+    u8 *p;
+
+    for (i = 0; i != 4; i++) {
+        p = D_84195208[arg0] + i;
+        if ((p[5] != 0) && ((p[9] & 0x3F) == 0)) {
+            func_84138EA4(arg0, i);
+        }
+    }
+    func_84138EA4(arg0, 0);
+}
 #endif
 
 #ifdef VERSION_US
