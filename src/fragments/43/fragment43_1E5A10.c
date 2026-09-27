@@ -1276,7 +1276,85 @@ void func_8AC06A2C(void *arg0, s32 arg1, s16 arg2, s16 arg3, s16 arg4, s16 arg5,
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC06A94.s")
+typedef struct F43A94Node {
+    u16 unused00;
+    u16 flags;
+    u8 unused04[4];
+    s16 y;
+    u8 unused0A[0x1A];
+    u16 id;
+    u16 index;
+    u8 unused28[8];
+    u16 id30;
+    u16 id32;
+} F43A94Node;
+typedef struct F43A94Owner {
+    F43A94Node *node;
+    s16 unused04;
+    s16 offset;
+    s16 unused08;
+    s16 center;
+} F43A94Owner;
+typedef struct F43A94Sub {
+    F43A94Owner *owner;
+    s16 target;
+    s16 step;
+    s16 current;
+    s16 zeroA;
+    s16 base;
+    s16 zeroE;
+    s16 zero10;
+    s16 limit;
+    void *data;
+} F43A94Sub;
+typedef struct F43A94State {
+    u8 unused00[4];
+    s16 state;
+    s16 offset;
+    u8 unused08[10];
+    s16 kind;
+    F43A94Sub sub;
+} F43A94State;
+extern s32 func_8004C874(s32, s32);
+extern s32 func_80049148(u16, s32, s32);
+extern s32 func_8004C990(s32, s32);
+void func_8AC06A94(F43A94State *a, F43A94Owner *b, F43A94Node *c, void *arg3)
+{
+    s32 unused;
+    u16 *h;
+    s32 r;
+    F43A94Sub *p;
+    s16 d;
+
+    p = &a->sub;
+    a->kind = 5;
+    if (a->state == 0) {
+        h = (u16 *)func_8004C990(b->node->id, b->node->index);
+        r = func_8004C874(c->id30, c->id32);
+        p->owner = b;
+        p->target = *h + func_80049148(c->id, 0, r);
+        p->current = *h;
+        p->zeroA = 0;
+        p->step = (p->target - p->current) / 6;
+        p->base = *h;
+        p->zeroE = 0;
+        p->zero10 = 0;
+        p->limit = ((u16 *)arg3)[1];
+        p->data = arg3;
+        a->state = 1;
+        c->flags &= 0xFFFD;
+    } else {
+        c->flags |= 2;
+        if (p->current < p->target) {
+            p->current += p->step;
+            if (p->current > p->target) {
+                p->current = p->target;
+            }
+        }
+        d = p->current - a->offset + b->offset;
+        b->node->y = b->center - d / 2;
+    }
+}
 #endif
 
 #ifdef VERSION_US
