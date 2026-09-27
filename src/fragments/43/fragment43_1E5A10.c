@@ -360,7 +360,37 @@ void func_8AC01664(void *arg0)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC016A8.s")
+typedef struct F43RectDest16A8 { u8 pad[8]; s16 x; s16 y; } F43RectDest16A8;
+typedef struct F43RectParent16A8 { u8 pad[0xE]; s16 x; s16 y; } F43RectParent16A8;
+typedef struct F43RectOwner16A8 { F43RectDest16A8 *dest; u8 pad[0x10]; F43RectParent16A8 *parent; s16 x; s16 y; s16 left; s16 top; s16 right; s16 bottom; u8 r; u8 g; u8 b; u8 a; } F43RectOwner16A8;
+extern Gfx D_80094DB8[];
+extern void Gfx_FillRectRgba(s16, s16, s16, s16, s32, s32, s32, s32);
+extern Gfx * D_800D0510;
+extern u8 D_8AC099BC;
+extern s16 D_8AC099BE;
+void func_8AC016A8(void *arg0)
+{
+    s16 x, y, dx, dy;
+    F43RectDest16A8 *dest;
+    F43RectParent16A8 *parent;
+    F43RectOwner16A8 *p = arg0;
+    u8 r, g, b, a;
+
+    dest = p->dest;
+    parent = p->parent;
+    x = parent->x;
+    y = parent->y;
+    dx = p->x;
+    dy = p->y;
+    dest->x = x + dx - *(s16 *)&D_8AC099BC;
+    dest->y = y + dy - D_8AC099BE;
+    r = p->r;
+    g = p->g;
+    b = p->b;
+    a = p->a;
+    gSPDisplayList(D_800D0510++, D_80094DB8);
+    Gfx_FillRectRgba((s16)(x + p->left), (s16)(y + p->top), (s16)(dx + p->right), (s16)(dy + p->bottom), r, g, b, a);
+}
 #endif
 
 #ifdef VERSION_US
