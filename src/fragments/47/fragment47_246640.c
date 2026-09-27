@@ -470,7 +470,33 @@ void func_86002FB4(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_246640/func_860031C8.s")
+extern f64 func_86004EA8(void *);
+extern f64 D_8600E018;
+s32 func_860031C8(u8 *arg0) {
+    s32 state;
+    s32 result;
+
+    if (*(f64 *)(arg0 + 0xC8) + D_8600E018 < func_86004EA8(*(void **)(arg0 + 0x1870))) {
+        return 0;
+    }
+    state = *(s32 *)(arg0 + 0x1828);
+    if (state == 6) {
+        return 1;
+    }
+    if (state == 1) {
+        return 0.0 >= *(f64 *)(arg0 + 0x17D0);
+    }
+    if (state == 2) {
+        return 0.0 >= *(f64 *)(arg0 + 0x17D0);
+    }
+    if (state != 3) {
+        return 0;
+    }
+    if (0.0 < *(f64 *)(arg0 + 0x17D0)) {
+        return 0;
+    }
+    return 1;
+}
 #endif
 
 #ifdef VERSION_US
