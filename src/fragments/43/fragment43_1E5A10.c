@@ -757,7 +757,64 @@ s32 func_8AC03C28(s32 arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC03D24.s")
+typedef struct F43D24Color { u8 r, g, b, a; } F43D24Color;
+typedef struct F43D24State {
+    u8 pad00[2];
+    u16 flags;
+    u8 pad04[4];
+    s16 x, y, w, h;
+    u8 pad10[0x14];
+    u16 id, index;
+    u8 pad28[4];
+    F43D24Color prim, env;
+} F43D24State;
+extern u16 func_8AC03C74(s16);
+extern Gfx D_8AC07CD8[];
+extern s32 func_8004C990(s32, s32);
+extern void func_800504BC(s16 *);
+extern s32 func_8AC010D4(u8 *arg0, u16 arg1, u16 arg2);
+extern Gfx * D_800D0510;
+s32 func_8AC03D24(s32 arg0, void *arg1)
+{
+    s16 pos[2];
+    s16 x;
+    s16 y;
+    s16 w;
+    s16 h;
+    s32 unused;
+    u8 *texture;
+    u16 tw;
+    u16 th;
+    F43D24Color prim;
+    F43D24Color env;
+    F43D24State *s = arg1;
+
+    prim = s->prim;
+    env = s->env;
+    switch (arg0) {
+    case 0:
+        s->flags &= ~2;
+        break;
+    case 1:
+        func_800504BC(pos);
+        x = pos[0] + s->x;
+        y = pos[1] + s->y;
+        w = s->w;
+        h = s->h;
+        texture = (u8 *)func_8004C990(s->id, s->index);
+        tw = func_8AC03C74((s16)func_8004CA10((u16 *)texture));
+        th = func_8AC03C74((s16)func_8004CA24((u16 *)texture));
+        gSPDisplayList(D_800D0510++, D_8AC07CD8);
+        gDPSetPrimColor(D_800D0510++, 0, 0, prim.r, prim.g, prim.b, prim.a);
+        gDPSetEnvColor(D_800D0510++, env.r, env.g, env.b, env.a);
+        func_8AC010D4(texture, tw, th);
+        gSPTextureRectangle(D_800D0510++, x * 4, y * 4,
+                            (x + w) * 4, (y + h) * 4,
+                            G_TX_RENDERTILE, 0, 0, 0x400, 0x400);
+        break;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
