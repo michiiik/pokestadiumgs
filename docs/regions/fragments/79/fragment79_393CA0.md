@@ -193,3 +193,23 @@ func_8412D53C: matched (call_sequence:loop:byte_pointer_arithmetic), 3 iteration
 ## 2026-09-24
 
 func_8413A53C: matched (call_sequence:pointer-table:casted-base-expression), 1 iterations, agent openrouter
+
+## 2026-09-27
+
+func_84135A2C: time cap at 0.9444 (raw 0.3704) after 2400s, mismatch operand_or_scheduling_drift; tried families: address_expression, argument_definition, base_dataflow, base_materialization, cache_definition, cache_signedness, cache_storage, call_sequence, copy_address, copy_argument, exit_topology, guard_base, guard_materialization, identifier_store, lexical_lifetime, local_layout, lookup_result, parameter_home, parameter_lifetime, permuter_output, permuter_seed, pointer_storage, promoted_call_boundary, record_representation, result_lifetime, tail_dataflow, tail_increment, tail_materialization, tail_operand_order, tail_statement_order, tail_width; tie-pool yes; 1 iteration(s) with a suspicious identical batch-wide failure
+
+## 2026-09-27
+
+func_8412DDC0: plateau at 0.963 (raw 0.963), mismatch symbol_size_drift; tried families: call_sequence; tie-pool yes
+
+## 2026-09-27
+
+func_84135D3C: matched (call_sequence:guard_returns:direct_byte_indexing), 1 iterations, agent unbiased
+
+## 2026-09-27
+
+func_84139244: matched (call_sequence:for_loop:inequality_termination), 1 iterations, agent unbiased
+
+## 2026-09-27
+
+func_841266C4: matched (call_sequence:direct_index:signed_result), 1 iterations, agent unbiased
