@@ -1230,7 +1230,57 @@ void func_8AC06A2C(void *arg0, s32 arg1, s16 arg2, s16 arg3, s16 arg4, s16 arg5,
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC06C10.s")
+typedef struct F43C10NodeCandidate {
+    s16 pad00[4];
+    s16 unk08;
+} F43C10NodeCandidate;
+typedef struct F43C10LinkCandidate {
+    F43C10NodeCandidate *unk00;
+    s16 unk04;
+    s16 unk06;
+    s16 unk08;
+    s16 unk0A;
+} F43C10LinkCandidate;
+typedef struct F43C10StateCandidate {
+    u8 pad00[4];
+    s16 unk04;
+    s16 unk06;
+    u8 pad08[10];
+    s16 unk12;
+    F43C10LinkCandidate *unk14;
+    s16 unk18;
+    s16 unk1A;
+    s16 unk1C;
+    s16 unk1E;
+    s16 unk20;
+    s16 unk22;
+    s32 unk24;
+    s32 unk28;
+    s32 unk2C;
+} F43C10StateCandidate;
+void func_8AC06C10(void *arg0, void *arg1, s16 arg2, s16 arg3, s16 arg4, s16 arg5, s16 arg6, s16 arg7, s32 arg8, s32 arg9, s32 arg10)
+{
+    F43C10StateCandidate *p = arg0;
+    F43C10LinkCandidate *q = arg1;
+    s16 delta;
+    p->unk12 = 4;
+    p->unk14 = q;
+    p->unk18 = arg2;
+    p->unk1A = arg3;
+    p->unk1C = arg4;
+    p->unk1E = arg5;
+    p->unk20 = arg6;
+    p->unk22 = arg7;
+    p->unk24 = arg8;
+    p->unk28 = arg9;
+    p->unk2C = arg10;
+    if (p->unk04 == 0) {
+        p->unk04 = 1;
+        return;
+    }
+    delta = (arg2 - p->unk06) + q->unk06;
+    q->unk00->unk08 = q->unk0A - delta / 2;
+}
 #endif
 
 #ifdef VERSION_US
