@@ -699,7 +699,35 @@ void func_8AB030BC(u8 *arg0, u16 arg1, u16 arg2, u16 arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB03124.s")
+s32 func_8AB03124(u16 *arg0)
+{
+    s32 count;
+    u16 value;
+    count = 0;
+    do {
+        if (*arg0 == 0xFFFF) {
+            break;
+        }
+        if (*arg0 == 0xFFFE) {
+            u16 *p = arg0;
+            do {
+                if (*p == 0xFFFF) {
+                    break;
+                }
+                p[0] = p[2];
+                p[1] = p[3];
+                p += 2;
+            } while (1);
+            value = *arg0;
+        } else {
+            value = arg0[2];
+            arg0 += 2;
+            count = count;
+            count = (count + 1) & 0xFFFF;
+        }
+    } while (1);
+    return count;
+}
 #endif
 
 void func_8AB0318C(void) {
