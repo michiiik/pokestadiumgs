@@ -592,7 +592,19 @@ s32 func_800481FC(u8 *arg0, u8 *arg1) { u8 temp[0x20]; func_800477C4(temp, arg1)
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800482C0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80048344.s")
+extern s16 D_80094FAC;
+extern u8 * func_800477C4(u8 *, u8 *);
+extern s32 func_80047BD4(u8 *arg0);
+void func_80048344(u8 *arg0) {
+    u8 buffer[0x40];
+
+    func_800477C4(buffer, arg0);
+    if (buffer[0] != 0) {
+        D_80094FAC = func_80047BD4(buffer);
+    } else {
+        D_80094FAC = 0;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80048390.s")
 
