@@ -416,7 +416,15 @@ s32 func_8AB01340(s16 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB01414.s")
+extern u8 D_8AB16548;
+void func_8AB01414(s16 arg0) {
+    void *temp_v0;
+
+    temp_v0 = (arg0 * 0x90) + &D_8AB16548;
+    *(s16 *)((u8 *)temp_v0 + 8) = 1;
+    *(s16 *)((u8 *)temp_v0 + 0x10) = *(s16 *)((u8 *)temp_v0 + 0xC);
+    *(s16 *)((u8 *)temp_v0 + 0x14) = -0xF;
+}
 #endif
 
 #ifdef VERSION_US
@@ -603,7 +611,35 @@ s32 func_8AB02BA8(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB02CB4.s")
+extern u8 * D_8AB11D0C;
+extern s16 D_8AB12696;
+s32 func_8AB02CB4(void) {
+    s32 result;
+    s32 new_var;
+    u8 state;
+    s16 flag;
+
+    flag = 1;
+    state = D_8AB11D0C[3];
+    switch (state) {
+    case 0:
+        result = 0x19E;
+        break;
+    case 1:
+        result = 0x1B2;
+        break;
+    case 2:
+        result = 0x1BD;
+        break;
+    default:
+        result = 0;
+        break;
+    }
+    result += ((s8 *)D_8AB11D0C)[0x15];
+    D_8AB12696 = flag;
+    result--;
+    return result & 0xFFFF;
+}
 #endif
 
 #ifdef VERSION_US
@@ -623,7 +659,22 @@ s32 func_8AB02BA8(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB03064.s")
+extern s16 D_8AB1466A;
+void func_8AB03064(u8 *arg0, u16 arg1, u16 arg2) {
+    arg2 &= 0xFFFF;
+    arg1 &= 0xFFFF;
+    do {
+        if (*(u16 *)arg0 == 0xFFFF) break;
+        arg0 += 4;
+    } while (1);
+    *(u16 *)(arg0 + 0) = arg1;
+    *(u16 *)(arg0 + 2) = arg2;
+    arg0 += 4;
+    *(u16 *)arg0 = 0xFFFF;
+    arg0 += 2;
+    *(u16 *)arg0 = 0xFFFF;
+    D_8AB1466A++;
+}
 #endif
 
 #ifdef VERSION_US
@@ -648,7 +699,35 @@ void func_8AB030BC(u8 *arg0, u16 arg1, u16 arg2, u16 arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB03124.s")
+s32 func_8AB03124(u16 *arg0)
+{
+    s32 count;
+    u16 value;
+    count = 0;
+    do {
+        if (*arg0 == 0xFFFF) {
+            break;
+        }
+        if (*arg0 == 0xFFFE) {
+            u16 *p = arg0;
+            do {
+                if (*p == 0xFFFF) {
+                    break;
+                }
+                p[0] = p[2];
+                p[1] = p[3];
+                p += 2;
+            } while (1);
+            value = *arg0;
+        } else {
+            value = arg0[2];
+            arg0 += 2;
+            count = count;
+            count = (count + 1) & 0xFFFF;
+        }
+    } while (1);
+    return count;
+}
 #endif
 
 void func_8AB0318C(void) {
