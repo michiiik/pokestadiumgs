@@ -360,7 +360,37 @@ void func_8AC01664(void *arg0)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC016A8.s")
+typedef struct F43RectDest16A8 { u8 pad[8]; s16 x; s16 y; } F43RectDest16A8;
+typedef struct F43RectParent16A8 { u8 pad[0xE]; s16 x; s16 y; } F43RectParent16A8;
+typedef struct F43RectOwner16A8 { F43RectDest16A8 *dest; u8 pad[0x10]; F43RectParent16A8 *parent; s16 x; s16 y; s16 left; s16 top; s16 right; s16 bottom; u8 r; u8 g; u8 b; u8 a; } F43RectOwner16A8;
+extern Gfx D_80094DB8[];
+extern void Gfx_FillRectRgba(s16, s16, s16, s16, s32, s32, s32, s32);
+extern Gfx * D_800D0510;
+extern u8 D_8AC099BC;
+extern s16 D_8AC099BE;
+void func_8AC016A8(void *arg0)
+{
+    s16 x, y, dx, dy;
+    F43RectDest16A8 *dest;
+    F43RectParent16A8 *parent;
+    F43RectOwner16A8 *p = arg0;
+    u8 r, g, b, a;
+
+    dest = p->dest;
+    parent = p->parent;
+    x = parent->x;
+    y = parent->y;
+    dx = p->x;
+    dy = p->y;
+    dest->x = x + dx - *(s16 *)&D_8AC099BC;
+    dest->y = y + dy - D_8AC099BE;
+    r = p->r;
+    g = p->g;
+    b = p->b;
+    a = p->a;
+    gSPDisplayList(D_800D0510++, D_80094DB8);
+    Gfx_FillRectRgba((s16)(x + p->left), (s16)(y + p->top), (s16)(dx + p->right), (s16)(dy + p->bottom), r, g, b, a);
+}
 #endif
 
 #ifdef VERSION_US
@@ -753,7 +783,30 @@ s32 func_8AC03C28(s32 arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC03C74.s")
+s32 func_8AC03C74(s16 arg0)
+{
+    s32 result;
+
+    result = 0;
+    if (arg0 < 2) {
+        result = 1;
+    } else if (arg0 < 5) {
+        result = 2;
+    } else if (arg0 < 9) {
+        result = 3;
+    } else if (arg0 < 0x11) {
+        result = 4;
+    } else if (arg0 < 0x21) {
+        result = 5;
+    } else if (arg0 < 0x41) {
+        result = 6;
+    } else if (arg0 < 0x81) {
+        result = 7;
+    } else if (arg0 < 0x101) {
+        result = 8;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
@@ -1358,11 +1411,79 @@ void func_8AC06A94(F43A94State *a, F43A94Owner *b, F43A94Node *c, void *arg3)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC06C10.s")
+typedef struct F43C10NodeCandidate {
+    s16 pad00[4];
+    s16 unk08;
+} F43C10NodeCandidate;
+typedef struct F43C10LinkCandidate {
+    F43C10NodeCandidate *unk00;
+    s16 unk04;
+    s16 unk06;
+    s16 unk08;
+    s16 unk0A;
+} F43C10LinkCandidate;
+typedef struct F43C10StateCandidate {
+    u8 pad00[4];
+    s16 unk04;
+    s16 unk06;
+    u8 pad08[10];
+    s16 unk12;
+    F43C10LinkCandidate *unk14;
+    s16 unk18;
+    s16 unk1A;
+    s16 unk1C;
+    s16 unk1E;
+    s16 unk20;
+    s16 unk22;
+    s32 unk24;
+    s32 unk28;
+    s32 unk2C;
+} F43C10StateCandidate;
+void func_8AC06C10(void *arg0, void *arg1, s16 arg2, s16 arg3, s16 arg4, s16 arg5, s16 arg6, s16 arg7, s32 arg8, s32 arg9, s32 arg10)
+{
+    F43C10StateCandidate *p = arg0;
+    F43C10LinkCandidate *q = arg1;
+    s16 delta;
+    p->unk12 = 4;
+    p->unk14 = q;
+    p->unk18 = arg2;
+    p->unk1A = arg3;
+    p->unk1C = arg4;
+    p->unk1E = arg5;
+    p->unk20 = arg6;
+    p->unk22 = arg7;
+    p->unk24 = arg8;
+    p->unk28 = arg9;
+    p->unk2C = arg10;
+    if (p->unk04 == 0) {
+        p->unk04 = 1;
+        return;
+    }
+    delta = (arg2 - p->unk06) + q->unk06;
+    q->unk00->unk08 = q->unk0A - delta / 2;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC06CC8.s")
+void func_8AC06CC8(void *arg0, void *arg1, s16 arg2, s16 arg3, s16 arg4, s16 arg5, s16 arg6, s16 arg7, s32 arg8)
+{
+    s16 delta;
+    *(s16 *)((u8 *)arg0 + 0x12) = 5;
+    *(void **)((u8 *)arg0 + 0x14) = arg1;
+    *(s16 *)((u8 *)arg0 + 0x1C) = arg2;
+    *(s16 *)((u8 *)arg0 + 0x1E) = arg3;
+    *(s16 *)((u8 *)arg0 + 0x20) = arg4;
+    *(s16 *)((u8 *)arg0 + 0x22) = arg5;
+    *(s16 *)((u8 *)arg0 + 0x24) = arg6;
+    *(s16 *)((u8 *)arg0 + 0x26) = arg7;
+    *(s32 *)((u8 *)arg0 + 0x28) = arg8;
+    if (*(s16 *)((u8 *)arg0 + 4) == 0) {
+        *(s16 *)((u8 *)arg0 + 4) = 1;
+        return;
+    }
+    delta = *(s16 *)((u8 *)arg1 + 6) + ((arg2 - *(s16 *)((u8 *)arg0 + 6)) ^ 0);
+    *(s16 *)((u8 *)*(void **)arg1 + 8) = *(s16 *)((u8 *)arg1 + 0xA) - delta / 2;
+}
 #endif
 
 #ifdef VERSION_US
@@ -1415,11 +1536,29 @@ void func_8AC06E98(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC06EC0.s")
+void func_8AC06EC0(arg0, arg1)
+s32 arg0;
+u32 arg1;
+{
+    s32 count;
+    s32 i;
+    s32 j;
+
+    count = (arg1 >> 4) + 1;
+    if (arg1 != 0) {
+        for (i = 0; i < count; i++) {
+            for (j = 0; j < 16; j++) {
+                if (--arg1 == 0) {
+                    return;
+                }
+            }
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
-extern void func_8AC06EC0(void);
+extern void func_8AC06EC0();
 void func_8AC06F28(void) {
     func_8AC06EC0();
 }
