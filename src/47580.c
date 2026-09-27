@@ -150,7 +150,18 @@ done:
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800470B8.s")
+extern u8 D_80126F58;
+extern s32 func_80047058(u16);
+extern s32 func_80046F34(u16 arg0);
+s32 func_800470B8(u16 arg0) {
+    s32 result;
+    if (D_80126F58 == 0) {
+        result = func_80046F34(arg0);
+    } else {
+        result = func_80047058(arg0);
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047104.s")
 
