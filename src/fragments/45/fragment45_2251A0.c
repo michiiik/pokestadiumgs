@@ -611,7 +611,35 @@ s32 func_8AB02BA8(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB02CB4.s")
+extern u8 * D_8AB11D0C;
+extern s16 D_8AB12696;
+s32 func_8AB02CB4(void) {
+    s32 result;
+    s32 new_var;
+    u8 state;
+    s16 flag;
+
+    flag = 1;
+    state = D_8AB11D0C[3];
+    switch (state) {
+    case 0:
+        result = 0x19E;
+        break;
+    case 1:
+        result = 0x1B2;
+        break;
+    case 2:
+        result = 0x1BD;
+        break;
+    default:
+        result = 0;
+        break;
+    }
+    result += ((s8 *)D_8AB11D0C)[0x15];
+    D_8AB12696 = flag;
+    result--;
+    return result & 0xFFFF;
+}
 #endif
 
 #ifdef VERSION_US
