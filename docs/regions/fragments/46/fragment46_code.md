@@ -29,3 +29,11 @@ func_8AE00AF4: plateau at 0.0 (raw None), mismatch unknown; tried families: call
 ## 2026-09-27
 
 TYPE CONFLICT: D_8AE08508 is extern u8 D_8AE08508[], not extern Fragment46LookupEntry D_8AE08508[]
+
+## 2026-09-27
+
+func_8AE01B88: matched (call_sequence:parameter_for_control:reset_in_increment_clause), 4 iterations, agent unbiased
+
+## 2026-09-27
+
+func_8AE02568: time cap at 0.8295 (raw 0.5114) after 2418s, mismatch instruction_drift; tried families: access_qualification, call_sequence, conversion_spelling, global_dataflow, global_storage, global_value_flow, local_representation; tie-pool no
