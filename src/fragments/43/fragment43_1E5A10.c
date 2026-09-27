@@ -420,7 +420,53 @@ void func_8AC01B74(void *arg0)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC01D88.s")
+typedef struct F43D88COutput { u8 pad00[8]; s16 x; s16 y; } F43D88COutput;
+typedef struct F43D88CParent { u8 pad00[14]; s16 x; s16 y; } F43D88CParent;
+typedef struct F43D88CPayload { F43D88CParent *parent; u8 pad04[4]; s16 dx; s16 dy; s16 left; s16 top; s16 right; s16 bottom; void *texture; } F43D88CPayload;
+typedef struct F43D88COwner { F43D88COutput *output; s16 ready; u8 pad06[14]; F43D88CPayload data; } F43D88COwner;
+extern Gfx D_8AC07C50[];
+extern void func_8004D1FC(void *);
+extern Gfx * D_800D0510;
+extern u8 D_8AC099BC;
+extern s16 D_8AC099C0;
+extern s16 D_8AC099C2;
+extern s16 D_8AC099C4;
+extern s16 D_8AC099C6;
+void func_8AC01D88(void *arg0)
+{
+    F43D88COwner *p = arg0;
+    F43D88COutput *output;
+    F43D88CParent *parent;
+    F43D88CPayload *q;
+    s16 x;
+    s16 y;
+    s16 dx;
+    s16 dy;
+    s16 *origin = (s16 *)&D_8AC099BC;
+
+    output = p->output;
+    parent = p->data.parent;
+    dx = p->data.dx;
+    x = parent->x;
+    dy = p->data.dy;
+    y = parent->y;
+    output->x = x + dx - origin[0];
+    output->y = y + dy - origin[1];
+    q = &p->data;
+    if (p->ready == 0) {
+        p->ready = 1;
+        return;
+    }
+    D_8AC099C0 = x + q->left;
+    D_8AC099C2 = y + q->top;
+    D_8AC099C4 = x + q->right + dx;
+    D_8AC099C6 = y + q->bottom + dy;
+    gSPDisplayList(D_800D0510++, D_8AC07C50);
+    func_8004D1FC(q->texture);
+    gSPTextureRectangle(D_800D0510++, D_8AC099C0 * 4, D_8AC099C2 * 4,
+                        D_8AC099C4 * 4, D_8AC099C6 * 4,
+                        G_TX_RENDERTILE, 0, 0, 0, 0x400);
+}
 #endif
 
 #ifdef VERSION_US
@@ -711,7 +757,64 @@ s32 func_8AC03C28(s32 arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC03D24.s")
+typedef struct F43D24Color { u8 r, g, b, a; } F43D24Color;
+typedef struct F43D24State {
+    u8 pad00[2];
+    u16 flags;
+    u8 pad04[4];
+    s16 x, y, w, h;
+    u8 pad10[0x14];
+    u16 id, index;
+    u8 pad28[4];
+    F43D24Color prim, env;
+} F43D24State;
+extern u16 func_8AC03C74(s16);
+extern Gfx D_8AC07CD8[];
+extern s32 func_8004C990(s32, s32);
+extern void func_800504BC(s16 *);
+extern s32 func_8AC010D4(u8 *arg0, u16 arg1, u16 arg2);
+extern Gfx * D_800D0510;
+s32 func_8AC03D24(s32 arg0, void *arg1)
+{
+    s16 pos[2];
+    s16 x;
+    s16 y;
+    s16 w;
+    s16 h;
+    s32 unused;
+    u8 *texture;
+    u16 tw;
+    u16 th;
+    F43D24Color prim;
+    F43D24Color env;
+    F43D24State *s = arg1;
+
+    prim = s->prim;
+    env = s->env;
+    switch (arg0) {
+    case 0:
+        s->flags &= ~2;
+        break;
+    case 1:
+        func_800504BC(pos);
+        x = pos[0] + s->x;
+        y = pos[1] + s->y;
+        w = s->w;
+        h = s->h;
+        texture = (u8 *)func_8004C990(s->id, s->index);
+        tw = func_8AC03C74((s16)func_8004CA10((u16 *)texture));
+        th = func_8AC03C74((s16)func_8004CA24((u16 *)texture));
+        gSPDisplayList(D_800D0510++, D_8AC07CD8);
+        gDPSetPrimColor(D_800D0510++, 0, 0, prim.r, prim.g, prim.b, prim.a);
+        gDPSetEnvColor(D_800D0510++, env.r, env.g, env.b, env.a);
+        func_8AC010D4(texture, tw, th);
+        gSPTextureRectangle(D_800D0510++, x * 4, y * 4,
+                            (x + w) * 4, (y + h) * 4,
+                            G_TX_RENDERTILE, 0, 0, 0x400, 0x400);
+        break;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -1173,7 +1276,85 @@ void func_8AC06A2C(void *arg0, s32 arg1, s16 arg2, s16 arg3, s16 arg4, s16 arg5,
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC06A94.s")
+typedef struct F43A94Node {
+    u16 unused00;
+    u16 flags;
+    u8 unused04[4];
+    s16 y;
+    u8 unused0A[0x1A];
+    u16 id;
+    u16 index;
+    u8 unused28[8];
+    u16 id30;
+    u16 id32;
+} F43A94Node;
+typedef struct F43A94Owner {
+    F43A94Node *node;
+    s16 unused04;
+    s16 offset;
+    s16 unused08;
+    s16 center;
+} F43A94Owner;
+typedef struct F43A94Sub {
+    F43A94Owner *owner;
+    s16 target;
+    s16 step;
+    s16 current;
+    s16 zeroA;
+    s16 base;
+    s16 zeroE;
+    s16 zero10;
+    s16 limit;
+    void *data;
+} F43A94Sub;
+typedef struct F43A94State {
+    u8 unused00[4];
+    s16 state;
+    s16 offset;
+    u8 unused08[10];
+    s16 kind;
+    F43A94Sub sub;
+} F43A94State;
+extern s32 func_8004C874(s32, s32);
+extern s32 func_80049148(u16, s32, s32);
+extern s32 func_8004C990(s32, s32);
+void func_8AC06A94(F43A94State *a, F43A94Owner *b, F43A94Node *c, void *arg3)
+{
+    s32 unused;
+    u16 *h;
+    s32 r;
+    F43A94Sub *p;
+    s16 d;
+
+    p = &a->sub;
+    a->kind = 5;
+    if (a->state == 0) {
+        h = (u16 *)func_8004C990(b->node->id, b->node->index);
+        r = func_8004C874(c->id30, c->id32);
+        p->owner = b;
+        p->target = *h + func_80049148(c->id, 0, r);
+        p->current = *h;
+        p->zeroA = 0;
+        p->step = (p->target - p->current) / 6;
+        p->base = *h;
+        p->zeroE = 0;
+        p->zero10 = 0;
+        p->limit = ((u16 *)arg3)[1];
+        p->data = arg3;
+        a->state = 1;
+        c->flags &= 0xFFFD;
+    } else {
+        c->flags |= 2;
+        if (p->current < p->target) {
+            p->current += p->step;
+            if (p->current > p->target) {
+                p->current = p->target;
+            }
+        }
+        d = p->current - a->offset + b->offset;
+        b->node->y = b->center - d / 2;
+    }
+}
 #endif
 
 #ifdef VERSION_US
