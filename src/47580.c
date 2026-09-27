@@ -242,7 +242,30 @@ void Font_FreeSetAsset(s32 arg0, s32 arg1)
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047398.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047444.s")
+extern void func_80047398(s32, s32, s32);
+extern u8 * D_80126F50;
+void func_80047444(s32 arg0) {
+    if (D_80126F50 != NULL) {
+        if (arg0 & 0x20) {
+            func_80047398(0x20, 0x10, 0x10);
+        }
+        if (arg0 & 0x10) {
+            func_80047398(0x10, 0x18, 0x18);
+        }
+        if (arg0 & 8) {
+            func_80047398(8, 0x18, 0x14);
+        }
+        if (arg0 & 4) {
+            func_80047398(4, 0x10, 0x10);
+        }
+        if (arg0 & 2) {
+            func_80047398(2, 0x10, 0xC);
+        }
+        if (arg0 & 1) {
+            func_80047398(1, 0x10, 0xA);
+        }
+    }
+}
 
 extern u32 D_437750;
 extern u32 D_446E30;
