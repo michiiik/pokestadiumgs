@@ -620,7 +620,13 @@ void func_80048344(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800493B0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800495BC.s")
+void func_800495BC(s32 arg0, s32 arg1, const char *arg2, ...) {
+    void *args;
+    if (arg2 != 0) {
+        args = (void *)(&arg2 + 1);
+        func_800493B0(arg0, arg1, 0, arg2, args);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800495F8.s")
 
