@@ -659,7 +659,22 @@ s32 func_8AB02CB4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB03064.s")
+extern s16 D_8AB1466A;
+void func_8AB03064(u8 *arg0, u16 arg1, u16 arg2) {
+    arg2 &= 0xFFFF;
+    arg1 &= 0xFFFF;
+    do {
+        if (*(u16 *)arg0 == 0xFFFF) break;
+        arg0 += 4;
+    } while (1);
+    *(u16 *)(arg0 + 0) = arg1;
+    *(u16 *)(arg0 + 2) = arg2;
+    arg0 += 4;
+    *(u16 *)arg0 = 0xFFFF;
+    arg0 += 2;
+    *(u16 *)arg0 = 0xFFFF;
+    D_8AB1466A++;
+}
 #endif
 
 #ifdef VERSION_US
