@@ -131,7 +131,24 @@ s32 func_80046F34(u16 arg0) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047058.s")
+extern u8 * D_80126F5C;
+extern u8 * D_80126F60;
+s32 func_80047058(u16 arg0) {
+    s32 result;
+    s32 code;
+    arg0 &= 0xFF;
+    result = 0;
+    code = arg0;
+    if (arg0 >= 0x20 && arg0 < 0x80) {
+        result = (D_80126F5C - 0x20)[arg0];
+        goto done;
+    }
+    if (code >= 0x90 && code < 0x100) {
+        result = (D_80126F60 - 0x90)[code];
+    }
+done:
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800470B8.s")
 
