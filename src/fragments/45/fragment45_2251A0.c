@@ -416,7 +416,15 @@ s32 func_8AB01340(s16 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB01414.s")
+extern u8 D_8AB16548;
+void func_8AB01414(s16 arg0) {
+    void *temp_v0;
+
+    temp_v0 = (arg0 * 0x90) + &D_8AB16548;
+    *(s16 *)((u8 *)temp_v0 + 8) = 1;
+    *(s16 *)((u8 *)temp_v0 + 0x10) = *(s16 *)((u8 *)temp_v0 + 0xC);
+    *(s16 *)((u8 *)temp_v0 + 0x14) = -0xF;
+}
 #endif
 
 #ifdef VERSION_US
