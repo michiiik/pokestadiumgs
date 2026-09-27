@@ -59,7 +59,16 @@ s32 func_80046BB4(u8 *arg0, s32 arg1, u8 *arg2) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80046C18.s")
+extern Gfx * D_800D0510;
+void func_80046C18(u8 *arg0) {
+    struct { u8 r, g, b, a; } color;
+    if (arg0[0x7C] > 0) {
+        arg0[0x7C]--;
+        *(u32 *)&color = ((u32 *)(arg0 + 0x54))[arg0[0x7C]];
+        gDPPipeSync(D_800D0510++);
+        gDPSetEnvColor(D_800D0510++, color.r, color.g, color.b, color.a);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80046CA8.s")
 
@@ -85,7 +94,16 @@ s32 func_80046D70(u8 *arg0, s32 arg1, u8 *arg2) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80046DD4.s")
+extern Gfx * D_800D0510;
+void func_80046DD4(u8 *arg0) {
+    struct { u8 r, g, b, a; } color;
+    if (arg0[0x7D] > 0) {
+        arg0[0x7D]--;
+        *(u32 *)&color = ((u32 *)(arg0 + 0x64))[arg0[0x7D]];
+        gDPPipeSync(D_800D0510++);
+        gDPSetPrimColor(D_800D0510++, 0, 0, color.r, color.g, color.b, color.a);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80046E64.s")
 
@@ -113,9 +131,37 @@ s32 func_80046F34(u16 arg0) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047058.s")
+extern u8 * D_80126F5C;
+extern u8 * D_80126F60;
+s32 func_80047058(u16 arg0) {
+    s32 result;
+    s32 code;
+    arg0 &= 0xFF;
+    result = 0;
+    code = arg0;
+    if (arg0 >= 0x20 && arg0 < 0x80) {
+        result = (D_80126F5C - 0x20)[arg0];
+        goto done;
+    }
+    if (code >= 0x90 && code < 0x100) {
+        result = (D_80126F60 - 0x90)[code];
+    }
+done:
+    return result;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800470B8.s")
+extern u8 D_80126F58;
+extern s32 func_80047058(u16);
+extern s32 func_80046F34(u16 arg0);
+s32 func_800470B8(u16 arg0) {
+    s32 result;
+    if (D_80126F58 == 0) {
+        result = func_80046F34(arg0);
+    } else {
+        result = func_80047058(arg0);
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047104.s")
 
@@ -196,7 +242,30 @@ void Font_FreeSetAsset(s32 arg0, s32 arg1)
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047398.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047444.s")
+extern void func_80047398(s32, s32, s32);
+extern u8 * D_80126F50;
+void func_80047444(s32 arg0) {
+    if (D_80126F50 != NULL) {
+        if (arg0 & 0x20) {
+            func_80047398(0x20, 0x10, 0x10);
+        }
+        if (arg0 & 0x10) {
+            func_80047398(0x10, 0x18, 0x18);
+        }
+        if (arg0 & 8) {
+            func_80047398(8, 0x18, 0x14);
+        }
+        if (arg0 & 4) {
+            func_80047398(4, 0x10, 0x10);
+        }
+        if (arg0 & 2) {
+            func_80047398(2, 0x10, 0xC);
+        }
+        if (arg0 & 1) {
+            func_80047398(1, 0x10, 0xA);
+        }
+    }
+}
 
 extern u32 D_437750;
 extern u32 D_446E30;
@@ -391,7 +460,35 @@ s32 func_80047BD4(u8 *arg0) {
     return total;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047D24.s")
+extern s32 func_80047158(s32);
+extern void func_80046B14(u8 *arg0);
+extern void func_80046B2C(u8 *, s32, s32);
+extern u8 * func_800477C4(u8 *, u8 *);
+extern s32 func_80047B4C(const s8 *arg0);
+extern s32 func_80047BD4(u8 *arg0);
+void func_80047D24(u8 *arg0, u8 *arg1) {
+    u8 buffer[32];
+    s32 mode;
+    s32 value;
+
+    arg1 = func_800477C4(buffer, arg1);
+    if (arg0 != 0) {
+        mode = func_80047B4C((const s8 *)buffer);
+        switch (mode) {
+        case 0:
+        case 1:
+            func_800477C4(buffer, arg1);
+            value = func_80047158(func_80047BD4(buffer));
+            if (value != 0) {
+                func_80046B2C(arg0, mode, value);
+            }
+            break;
+        case 10:
+            func_80046B14(arg0);
+            break;
+        }
+    }
+}
 
 extern u8 *func_800477C4(u8 *, u8 *);
 extern void func_80046CA8(u8 *, s32, s32, s32, s32, s32);
@@ -495,7 +592,19 @@ s32 func_800481FC(u8 *arg0, u8 *arg1) { u8 temp[0x20]; func_800477C4(temp, arg1)
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800482C0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80048344.s")
+extern s16 D_80094FAC;
+extern u8 * func_800477C4(u8 *, u8 *);
+extern s32 func_80047BD4(u8 *arg0);
+void func_80048344(u8 *arg0) {
+    u8 buffer[0x40];
+
+    func_800477C4(buffer, arg0);
+    if (buffer[0] != 0) {
+        D_80094FAC = func_80047BD4(buffer);
+    } else {
+        D_80094FAC = 0;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80048390.s")
 
@@ -511,7 +620,13 @@ s32 func_800481FC(u8 *arg0, u8 *arg1) { u8 temp[0x20]; func_800477C4(temp, arg1)
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800493B0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800495BC.s")
+void func_800495BC(s32 arg0, s32 arg1, const char *arg2, ...) {
+    void *args;
+    if (arg2 != 0) {
+        args = (void *)(&arg2 + 1);
+        func_800493B0(arg0, arg1, 0, arg2, args);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800495F8.s")
 
