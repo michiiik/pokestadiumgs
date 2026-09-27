@@ -221,3 +221,19 @@ func_84136678: matched (init_sequence:narrow_owner_signature:direct_record), 6 i
 ## 2026-09-27
 
 func_84128B30: plateau at 0.0 (raw None), mismatch operand_or_scheduling_drift; tried families: address_exposed_scalar, aggregate_copy, aggregate_mask, bitfield_narrowing, bitfield_update, boolean_high_bit, complement_extract, control_wrapper, copy_chain, destination_alias, destination_indirection, idempotent_recurrence, loop_wrapper, mask_algebra, mask_join, mask_phi, mask_store, masked_dispatch, masked_termination, ordered_bit_partition, ordered_conditional_phi, ordered_extract, ordered_mask, ordered_mask_absorption, ordered_mask_phi, ordered_masked_dispatch, ordered_masked_termination, ordered_modular_difference, ordered_remainder, ordered_xor_cancellation, pointer_loop, quotient_reconstruction, range_normalization, single_iteration, source_array_scalarization, source_indirection, state_field_access, store_forwarding, wide_extract, wide_lane_extract, wide_mask, wide_remainder; tie-pool yes
+
+## 2026-09-27
+
+func_84136014: matched (call_sequence:early_guard:probed_exact_s32_result), 1 iterations, agent codex
+
+## 2026-09-27
+
+func_84124E44: time cap at 0.9787 (raw 0.8723) after 2400s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool yes
+
+## 2026-09-27
+
+func_8412E680: plateau at 0.0 (raw None), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool yes; 3 iteration(s) with a suspicious identical batch-wide failure
+
+## 2026-09-27
+
+TYPE CONFLICT: func_84136124 is extern s32 func_84136124(u8, s16, u16, u8, u8), not extern void func_84136124(u8, s16, u16, u8, u8)
