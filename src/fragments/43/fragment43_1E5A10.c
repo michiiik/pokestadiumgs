@@ -737,7 +737,30 @@ s32 func_8AC03C28(s32 arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC03C74.s")
+s32 func_8AC03C74(s16 arg0)
+{
+    s32 result;
+
+    result = 0;
+    if (arg0 < 2) {
+        result = 1;
+    } else if (arg0 < 5) {
+        result = 2;
+    } else if (arg0 < 9) {
+        result = 3;
+    } else if (arg0 < 0x11) {
+        result = 4;
+    } else if (arg0 < 0x21) {
+        result = 5;
+    } else if (arg0 < 0x41) {
+        result = 6;
+    } else if (arg0 < 0x81) {
+        result = 7;
+    } else if (arg0 < 0x101) {
+        result = 8;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
