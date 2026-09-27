@@ -5626,7 +5626,12 @@ void func_8003FDD0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FE2C.s")
+extern S1_GraphNode *func_80037E9C(S1_MainPoolState *, S1_GraphNode *);
+extern void func_8003FD34(void *arg0);
+void func_8003FE2C(void) {
+    func_8003FD34(GeoNode_CreateContainer(D_80126450, NULL));
+    D_80126520 += 4;
+}
 #endif
 
 #ifdef VERSION_US
