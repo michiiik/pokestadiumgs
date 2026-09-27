@@ -125,3 +125,19 @@ func_8411B1F4: plateau at 0.0 (raw None), mismatch unknown; tried families: call
 ## 2026-09-27
 
 func_8411B75C: matched (call_sequence:comma-delay-slot:exact-stack-home), 2 iterations, agent codex
+
+## 2026-09-27
+
+func_8410F9FC: matched (call_sequence:branch:s32-offset), 1 iterations, agent codex
+
+## 2026-09-27
+
+func_84110718: plateau at 0.9796 (raw 0.9592), mismatch instruction_drift; tried families: call_sequence; tie-pool yes
+
+## 2026-09-27
+
+TYPE CONFLICT: func_8410E73C is extern void func_8410E73C(u8 *, void *), not extern void func_8410E73C()
+
+## 2026-09-27
+
+func_8411A310: plateau at 1.0 (raw 0.9592), mismatch register_allocation_only; tried families: call_sequence; tie-pool yes
