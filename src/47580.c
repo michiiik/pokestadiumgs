@@ -460,7 +460,35 @@ s32 func_80047BD4(u8 *arg0) {
     return total;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047D24.s")
+extern s32 func_80047158(s32);
+extern void func_80046B14(u8 *arg0);
+extern void func_80046B2C(u8 *, s32, s32);
+extern u8 * func_800477C4(u8 *, u8 *);
+extern s32 func_80047B4C(const s8 *arg0);
+extern s32 func_80047BD4(u8 *arg0);
+void func_80047D24(u8 *arg0, u8 *arg1) {
+    u8 buffer[32];
+    s32 mode;
+    s32 value;
+
+    arg1 = func_800477C4(buffer, arg1);
+    if (arg0 != 0) {
+        mode = func_80047B4C((const s8 *)buffer);
+        switch (mode) {
+        case 0:
+        case 1:
+            func_800477C4(buffer, arg1);
+            value = func_80047158(func_80047BD4(buffer));
+            if (value != 0) {
+                func_80046B2C(arg0, mode, value);
+            }
+            break;
+        case 10:
+            func_80046B14(arg0);
+            break;
+        }
+    }
+}
 
 extern u8 *func_800477C4(u8 *, u8 *);
 extern void func_80046CA8(u8 *, s32, s32, s32, s32, s32);
