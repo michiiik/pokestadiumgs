@@ -3982,7 +3982,22 @@ void func_84135CD4(u8 arg0, s16 arg1, u16 arg2, u16 arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84135D3C.s")
+extern u32 func_8003570C(void);
+s32 func_84135D3C(u8 *arg0, u8 *arg1) {
+    if ((arg0[2] == 0) && (arg1[2] != 0)) {
+        return 1;
+    }
+    if ((arg0[2] != 0) && (arg1[2] == 0)) {
+        return -1;
+    }
+    if (arg0[1] < arg1[1]) {
+        return 1;
+    }
+    if (arg1[1] < arg0[1]) {
+        return -1;
+    }
+    return 1 - ((func_8003570C() & 1) * 2);
+}
 #endif
 
 #ifdef VERSION_US
