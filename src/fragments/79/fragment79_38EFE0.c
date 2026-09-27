@@ -621,7 +621,22 @@ void func_84121AB8(void *arg0) {
 
 void func_84122990(u8 *arg0) {}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84122998.s")
+extern f64 D_84189CA8;
+extern f32 D_84189CB0;
+extern f32 D_84189CB4;
+extern f32 Math_StepToF(f32, f32, f32, f32);
+void func_84122998(void *arg0) {
+    f32 rate;
+    f32 result;
+    if (D_84189CA8 == *(f32 *)((u8 *)arg0 + 0x34)) {
+        return;
+    }
+    rate = D_84189CB0;
+    result = Math_StepToF(*(f32 *)((u8 *)arg0 + 0x30), D_84189CB4, rate, rate);
+    *(f32 *)((u8 *)arg0 + 0x30) = result;
+    *(f32 *)((u8 *)arg0 + 0x34) = result;
+    *(f32 *)((u8 *)arg0 + 0x38) = result;
+}
 
 void func_84122A04(u8 *arg0) {
     arg0[0x623] = 0;
