@@ -420,7 +420,53 @@ void func_8AC01B74(void *arg0)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC01D88.s")
+typedef struct F43D88COutput { u8 pad00[8]; s16 x; s16 y; } F43D88COutput;
+typedef struct F43D88CParent { u8 pad00[14]; s16 x; s16 y; } F43D88CParent;
+typedef struct F43D88CPayload { F43D88CParent *parent; u8 pad04[4]; s16 dx; s16 dy; s16 left; s16 top; s16 right; s16 bottom; void *texture; } F43D88CPayload;
+typedef struct F43D88COwner { F43D88COutput *output; s16 ready; u8 pad06[14]; F43D88CPayload data; } F43D88COwner;
+extern Gfx D_8AC07C50[];
+extern void func_8004D1FC(void *);
+extern Gfx * D_800D0510;
+extern u8 D_8AC099BC;
+extern s16 D_8AC099C0;
+extern s16 D_8AC099C2;
+extern s16 D_8AC099C4;
+extern s16 D_8AC099C6;
+void func_8AC01D88(void *arg0)
+{
+    F43D88COwner *p = arg0;
+    F43D88COutput *output;
+    F43D88CParent *parent;
+    F43D88CPayload *q;
+    s16 x;
+    s16 y;
+    s16 dx;
+    s16 dy;
+    s16 *origin = (s16 *)&D_8AC099BC;
+
+    output = p->output;
+    parent = p->data.parent;
+    dx = p->data.dx;
+    x = parent->x;
+    dy = p->data.dy;
+    y = parent->y;
+    output->x = x + dx - origin[0];
+    output->y = y + dy - origin[1];
+    q = &p->data;
+    if (p->ready == 0) {
+        p->ready = 1;
+        return;
+    }
+    D_8AC099C0 = x + q->left;
+    D_8AC099C2 = y + q->top;
+    D_8AC099C4 = x + q->right + dx;
+    D_8AC099C6 = y + q->bottom + dy;
+    gSPDisplayList(D_800D0510++, D_8AC07C50);
+    func_8004D1FC(q->texture);
+    gSPTextureRectangle(D_800D0510++, D_8AC099C0 * 4, D_8AC099C2 * 4,
+                        D_8AC099C4 * 4, D_8AC099C6 * 4,
+                        G_TX_RENDERTILE, 0, 0, 0, 0x400);
+}
 #endif
 
 #ifdef VERSION_US
