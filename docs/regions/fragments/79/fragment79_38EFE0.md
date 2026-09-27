@@ -26,3 +26,11 @@ func_8412391C: matched (call_chain:load_store_pipeline:next_step_before_pending_
 ## 2026-09-19
 
 func_84123034: matched (float_math:raw_offsets:u8_compound_assignments), 1 iterations, agent unbiased
+
+## 2026-09-27
+
+func_84122AB8: time cap at 0.9 (raw 0.4667) after 2400s, mismatch operand_or_scheduling_drift; tried families: bounded_lookup, state_field_access; tie-pool yes
+
+## 2026-09-27
+
+func_84122998: matched (call_sequence:void_ptr:local_rate_temp_inline_target), 1 iterations, agent claude
