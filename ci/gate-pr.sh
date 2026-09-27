@@ -135,6 +135,23 @@ if [ -d /src/hand_asm ]; then
 fi
 if sync_tree /src/include /work/include; then headers_changed=1; fi
 if sync_tree /src/tools /work/tools --exclude=__pycache__ --exclude=vtxdis; then tools_changed=1; fi
+# yamls/us/header.yaml symbol_addrs_path lists these files as direct splat
+# extraction inputs (address->name resolution baked into asm/ at extract
+# time), same as the yamls themselves -- but they live under linker_scripts/,
+# so a lone rename/add/remove here must also trigger make extract below, not
+# just the full-recompile linker_changed already forces. Checked before the
+# general linker_scripts sync_tree overwrites /work, so this reflects what
+# actually changed, not the post-sync (already-identical) state. Ported from
+# the sibling pokestadium repo, which hit this for real via a plain
+# symbol_addrs_code.txt rename (PR #106/#109 there).
+symbol_addrs_changed=0
+for f in /src/linker_scripts/us/symbol_addrs*.txt; do
+    [ -e "$f" ] || continue
+    rel="${f#/src/}"
+    if ! cmp -s "$f" "/work/$rel" 2>/dev/null; then
+        symbol_addrs_changed=1
+    fi
+done
 if sync_tree /src/linker_scripts /work/linker_scripts --exclude=auto; then linker_changed=1; fi
 if sync_tree /src/lib /work/lib --exclude=build --exclude=extracted; then library_changed=1; fi
 makefile_changed=0
@@ -152,8 +169,14 @@ if ! cmp -s /src/requirements.txt /work/requirements.txt; then
     exit 3
 fi
 
-# A YAML change changes the split. Re-extract before compiling against it.
-if sync_tree /src/yamls /work/yamls; then
+# A YAML or symbol_addrs*.txt change changes the split. Re-extract before
+# compiling against it. A plain, yamls-untouched symbol_addrs_code.txt rename
+# can leave already-baked asm/ disassembly labeling the renamed address under
+# its old name, so a still-unmatched sibling GLOBAL_ASM block elsewhere that
+# calls it fails to link with an undefined reference -- even under the full
+# rebuild linker_changed alone already forces, since that only recompiles
+# existing asm/*.s text, it never regenerates it.
+if sync_tree /src/yamls /work/yamls || [ "${symbol_addrs_changed}" -eq 1 ]; then
     split_changed=1
     echo "gate-pr.sh: split inputs changed; re-running extraction" >&2
     make extract
@@ -223,12 +246,25 @@ case "${build_jobs}" in
         ;;
 esac
 echo "gate-pr.sh: building with ${build_jobs} parallel job(s); per-object host syntax checks enabled"
+# linker_changed alone (above) only forces a fresh LINK of the existing
+# cached objects -- correct when the only thing that moved is where
+# already-correct objects land, but not when the checked-out
+# linker_scripts/symbol table content itself differs from what this baked
+# image was built against. symbol_addrs_code.txt declares symbols for many
+# unrelated functions in one shared file; a still-unmatched owners own
+# .c/.s content can be byte-identical to what the image already has cached
+# (so sync_tree correctly leaves its .o alone) while the symbol it depends
+# on was renamed or removed elsewhere by other, unrelated merges that
+# landed on master since this image was last rebuilt -- that stale cached
+# .o then fails to link against the fresh table with an undefined
+# reference, in files this PR never touched. Ported from the sibling
+# pokestadium repo, which hit exactly this live (PR #94/#95 there).
 full_build=0
-if [ "${split_changed}" -eq 1 ] || [ "${headers_changed}" -eq 1 ] || [ "${tools_changed}" -eq 1 ] || [ "${makefile_changed}" -eq 1 ]; then
+if [ "${split_changed}" -eq 1 ] || [ "${headers_changed}" -eq 1 ] || [ "${tools_changed}" -eq 1 ] || [ "${makefile_changed}" -eq 1 ] || [ "${linker_changed}" -eq 1 ]; then
     full_build=1
 fi
 if [ "${full_build}" -eq 1 ]; then
-    echo "gate-pr.sh: forcing a full rebuild because split, header, tool, or Makefile inputs changed"
+    echo "gate-pr.sh: forcing a full rebuild because split, header, tool, linker-script, or Makefile inputs changed"
     make -B COMPARE=0 -j"${build_jobs}" rom
 else
     echo "gate-pr.sh: reusing cached objects and rebuilding changed source inputs"
