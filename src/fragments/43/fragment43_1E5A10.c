@@ -1284,7 +1284,25 @@ void func_8AC06C10(void *arg0, void *arg1, s16 arg2, s16 arg3, s16 arg4, s16 arg
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC06CC8.s")
+void func_8AC06CC8(void *arg0, void *arg1, s16 arg2, s16 arg3, s16 arg4, s16 arg5, s16 arg6, s16 arg7, s32 arg8)
+{
+    s16 delta;
+    *(s16 *)((u8 *)arg0 + 0x12) = 5;
+    *(void **)((u8 *)arg0 + 0x14) = arg1;
+    *(s16 *)((u8 *)arg0 + 0x1C) = arg2;
+    *(s16 *)((u8 *)arg0 + 0x1E) = arg3;
+    *(s16 *)((u8 *)arg0 + 0x20) = arg4;
+    *(s16 *)((u8 *)arg0 + 0x22) = arg5;
+    *(s16 *)((u8 *)arg0 + 0x24) = arg6;
+    *(s16 *)((u8 *)arg0 + 0x26) = arg7;
+    *(s32 *)((u8 *)arg0 + 0x28) = arg8;
+    if (*(s16 *)((u8 *)arg0 + 4) == 0) {
+        *(s16 *)((u8 *)arg0 + 4) = 1;
+        return;
+    }
+    delta = *(s16 *)((u8 *)arg1 + 6) + ((arg2 - *(s16 *)((u8 *)arg0 + 6)) ^ 0);
+    *(s16 *)((u8 *)*(void **)arg1 + 8) = *(s16 *)((u8 *)arg1 + 0xA) - delta / 2;
+}
 #endif
 
 #ifdef VERSION_US
