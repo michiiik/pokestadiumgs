@@ -213,3 +213,11 @@ func_84139244: matched (call_sequence:for_loop:inequality_termination), 1 iterat
 ## 2026-09-27
 
 func_841266C4: matched (call_sequence:direct_index:signed_result), 1 iterations, agent unbiased
+
+## 2026-09-27
+
+func_84136678: matched (init_sequence:narrow_owner_signature:direct_record), 6 iterations, agent codex
+
+## 2026-09-27
+
+func_84128B30: plateau at 0.0 (raw None), mismatch operand_or_scheduling_drift; tried families: address_exposed_scalar, aggregate_copy, aggregate_mask, bitfield_narrowing, bitfield_update, boolean_high_bit, complement_extract, control_wrapper, copy_chain, destination_alias, destination_indirection, idempotent_recurrence, loop_wrapper, mask_algebra, mask_join, mask_phi, mask_store, masked_dispatch, masked_termination, ordered_bit_partition, ordered_conditional_phi, ordered_extract, ordered_mask, ordered_mask_absorption, ordered_mask_phi, ordered_masked_dispatch, ordered_masked_termination, ordered_modular_difference, ordered_remainder, ordered_xor_cancellation, pointer_loop, quotient_reconstruction, range_normalization, single_iteration, source_array_scalarization, source_indirection, state_field_access, store_forwarding, wide_extract, wide_lane_extract, wide_mask, wide_remainder; tie-pool yes
