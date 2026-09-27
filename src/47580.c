@@ -94,7 +94,16 @@ s32 func_80046D70(u8 *arg0, s32 arg1, u8 *arg2) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80046DD4.s")
+extern Gfx * D_800D0510;
+void func_80046DD4(u8 *arg0) {
+    struct { u8 r, g, b, a; } color;
+    if (arg0[0x7D] > 0) {
+        arg0[0x7D]--;
+        *(u32 *)&color = ((u32 *)(arg0 + 0x64))[arg0[0x7D]];
+        gDPPipeSync(D_800D0510++);
+        gDPSetPrimColor(D_800D0510++, 0, 0, color.r, color.g, color.b, color.a);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80046E64.s")
 
