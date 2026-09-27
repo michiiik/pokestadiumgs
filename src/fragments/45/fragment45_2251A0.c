@@ -356,7 +356,32 @@ extern void func_80024F20(void); void func_8AB00BA4(void) { func_80024F20(); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB00BC4.s")
+extern Gfx D_8AB11168[];
+extern s32 func_8004C990(s32, s32);
+extern Gfx * D_800D0510;
+void func_8AB00BC4(s16 arg0, s16 arg1, s16 arg2, u8 arg3, u8 arg4, u8 arg5) {
+    gSPDisplayList(D_800D0510++, D_8AB11168);
+    gDPSetEnvColor(D_800D0510++, arg3, arg4, arg5, 255);
+    if (arg2 < 0) arg2 = 0;
+    if (arg2 >= 1000) arg2 = 999;
+    if (arg2 >= 100) arg0 += 20;
+    else if (arg2 >= 10) arg0 += 10;
+    arg0 -= 12;
+    func_8004D1FC(func_8004C990(0x118, arg2 % 10));
+    gSPTextureRectangle(D_800D0510++, arg0 << 2, arg1 << 2, (arg0 + 24) << 2, (arg1 + 32) << 2, G_TX_RENDERTILE, 0, 0, 0x400, 0x400);
+    if (arg2 >= 100) {
+        arg0 -= 20;
+        func_8004D1FC(func_8004C990(0x118, (arg2 / 10) % 10));
+        gSPTextureRectangle(D_800D0510++, arg0 << 2, arg1 << 2, (arg0 + 24) << 2, (arg1 + 32) << 2, G_TX_RENDERTILE, 0, 0, 0x400, 0x400);
+        arg0 -= 20;
+        func_8004D1FC(func_8004C990(0x118, (arg2 / 100) % 10));
+        gSPTextureRectangle(D_800D0510++, arg0 << 2, arg1 << 2, (arg0 + 24) << 2, (arg1 + 32) << 2, G_TX_RENDERTILE, 0, 0, 0x400, 0x400);
+    } else if (arg2 >= 10) {
+        arg0 -= 20;
+        func_8004D1FC(func_8004C990(0x118, (arg2 / 10) % 10));
+        gSPTextureRectangle(D_800D0510++, arg0 << 2, arg1 << 2, (arg0 + 24) << 2, (arg1 + 32) << 2, G_TX_RENDERTILE, 0, 0, 0x400, 0x400);
+    }
+}
 #endif
 
 #ifdef VERSION_US
