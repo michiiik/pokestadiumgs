@@ -1355,11 +1355,29 @@ void func_8AC06E98(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC06EC0.s")
+void func_8AC06EC0(arg0, arg1)
+s32 arg0;
+u32 arg1;
+{
+    s32 count;
+    s32 i;
+    s32 j;
+
+    count = (arg1 >> 4) + 1;
+    if (arg1 != 0) {
+        for (i = 0; i < count; i++) {
+            for (j = 0; j < 16; j++) {
+                if (--arg1 == 0) {
+                    return;
+                }
+            }
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
-extern void func_8AC06EC0(void);
+extern void func_8AC06EC0();
 void func_8AC06F28(void) {
     func_8AC06EC0();
 }
