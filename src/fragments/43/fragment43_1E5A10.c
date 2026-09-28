@@ -821,7 +821,6 @@ typedef struct F43D24State {
     u8 pad28[4];
     F43D24Color prim, env;
 } F43D24State;
-extern u16 func_8AC03C74(s16);
 extern Gfx D_8AC07CD8[];
 extern s32 func_8004C990(s32, s32);
 extern void func_800504BC(s16 *);
