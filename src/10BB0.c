@@ -281,7 +281,45 @@ s32 func_80011250(s32 arg0, s32 arg1, s32 arg2) {
     return func_800112A8(arg0, arg1, arg2);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_800112A8.s")
+extern s32 func_80011250(s32 arg0, s32 arg1, s32 arg2);
+extern u8 D_8011EC50;
+extern u8 D_8011ED60;
+extern u8 D_8011EE70;
+s32 func_800112A8(s32 arg0, volatile s32 arg1, s32 arg2)
+{
+    u8 *p;
+    u8 *base;
+    u32 i;
+    u8 *loopBase;
+
+    switch (arg0) {
+    case 0: base = &D_8011EC50; break;
+    case 1: base = &D_8011ED60; break;
+    case 2: base = &D_8011EE70; break;
+    }
+    p = base + 0xD4;
+    if (arg1 == 0) {
+        if (arg2 == *(s16 *)(p + 0x1E)) {
+            *(s32 *)p = 1;
+            return *(s32 *)(p + 0x14);
+        }
+        if (arg2 == *(s16 *)(p + 0x2A)) {
+            *(s32 *)p = 0;
+            return *(s32 *)(p + 0x20);
+        }
+        return 0;
+    }
+    loopBase = base;
+    for (i = 0, p = base; i < *(u32 *)loopBase; i++, p += 0xC) {
+        if (arg2 == *(s16 *)(p + 0x1E)) {
+            return *(s32 *)(p + 0x14);
+        }
+    }
+    if (arg1 == 2) {
+        return func_80011250(arg0, 0, arg2);
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_800113B4.s")
 
