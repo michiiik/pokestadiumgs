@@ -925,7 +925,34 @@ void func_86107208(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_861072AC.s")
+extern f32 D_8610AC94;
+extern f32 D_8610AC98;
+extern void func_8003F114(void *, s32, s32, s32);
+extern void func_8003F1DC(void *);
+extern void func_8003F210(void *, s32);
+extern void func_86107208(void);
+extern void * func_87F025B8(void *, void *);
+extern s32 D_8610AD20;
+void func_861072AC(f32 arg0) {
+    u8 *obj;
+    f32 scale;
+    u8 *node;
+
+    obj = func_87F025B8((u8 *)(u32)D_8610AD20 + 0x8C40, (void *)func_86107208);
+    if (obj != NULL) {
+        node = obj + 0x24;
+        func_8003F1DC(node);
+        func_8003F114(node, 0, -1, *(s32 *)((u8 *)(u32)D_8610AD20 + 0x6DC));
+        scale = (func_8003F210(node, 0), D_8610AC94);
+        *(f32 *)(obj + 0x5C) = scale;
+        *(f32 *)(obj + 0x58) = scale;
+        *(f32 *)(obj + 0x54) = scale;
+        *(f32 *)(obj + 0x48) = arg0;
+        *(f32 *)(obj + 0x4C) = D_8610AC98;
+        *(f32 *)(obj + 0x50) = -100.0f;
+        *(s16 *)(obj + 0x44) = -0xFFF;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86107360.s")
 
