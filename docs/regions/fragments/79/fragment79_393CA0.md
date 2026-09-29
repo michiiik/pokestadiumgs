@@ -249,3 +249,15 @@ func_841260D4: matched (state_field_access:indexed:signed_index_byte_counter), 1
 ## 2026-09-29
 
 func_84124F40: time cap at 0.9875 (raw 0.975) after 2408s, mismatch operand_or_scheduling_drift; tried families: call_chain; tie-pool yes
+
+## 2026-09-30
+
+func_84125EC0: matched (call_sequence:byte_pointer:nonpositive_clamp), 4 iterations, agent codex
+
+## 2026-09-30
+
+TYPE CONFLICT: D_841951D9 is extern u8 D_841951D8, D_841951D9, not extern u8 D_841951D9
+
+## 2026-09-30
+
+func_84129E84: time cap at 0.9811 (raw 0.7925) after 2412s, mismatch instruction_drift; tried families: call_sequence; tie-pool yes; 2 iteration(s) hit section_layout_drift -- needs a rom.yaml fix, not more candidates
