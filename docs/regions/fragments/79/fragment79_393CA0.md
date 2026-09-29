@@ -261,3 +261,27 @@ TYPE CONFLICT: D_841951D9 is extern u8 D_841951D8, D_841951D9, not extern u8 D_8
 ## 2026-09-30
 
 func_84129E84: time cap at 0.9811 (raw 0.7925) after 2412s, mismatch instruction_drift; tried families: call_sequence; tie-pool yes; 2 iteration(s) hit section_layout_drift -- needs a rom.yaml fix, not more candidates
+
+## 2026-09-30
+
+func_841358B0: plateau at 1.0 (raw 0.9828), mismatch register_allocation_only; tried families: call_sequence; tie-pool yes
+
+## 2026-09-30
+
+TYPE CONFLICT: Display_QueueFramebufferRequest_fragment79 is void Display_QueueFramebufferRequest_fragment79(OSMesg), not extern void Display_QueueFramebufferRequest_fragment79(OSMesg)
+
+## 2026-09-30
+
+TYPE CONFLICT: func_84135808 is void func_84135808(u8 *), not extern void func_84135808(u8 *)
+
+## 2026-09-30
+
+func_8413C2C0: matched (initial_narrowing:wide_index:explicit_initializer_mask), 2 iterations, agent unbiased
+
+## 2026-09-30
+
+func_84132E40: matched (call_sequence:direct_index:signed_inequality_loop), 1 iterations, agent unbiased
+
+## 2026-09-30
+
+func_841350F4: plateau at 0.9841 (raw 0.619), mismatch operand_or_scheduling_drift; tried families: aggregate_address_binding, aggregate_destination_bias, aggregate_destination_view, aggregate_member_projection, aggregate_representation, aggregate_result, aggregate_source_bias, aggregate_source_view, aggregate_storage, binding_definition_point, binding_lexical_home, branch_home_representation, call_sequence, local_layout, permuter_address_form, permuter_aggregate_kind, permuter_aggregate_representation, permuter_cleanup, permuter_declaration_order, permuter_home_allocation, permuter_lifetime, permuter_output, permuter_representation, permuter_result, permuter_scope, permuter_source_address, permuter_storage, permuter_transfer_lvalue, permuter_unused_home, result_home_representation, result_home_width, scalar_transfer, scalar_union, source_home_representation, transfer_member_selection, unused_binding_alignment, unused_binding_storage_class; tie-pool yes
