@@ -421,7 +421,69 @@ void func_86102B64(void *arg0, f32 *arg1, f32 *arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86102C08.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86102D50.s")
+extern f32 D_8610AB44;
+extern f32 D_8610AB48;
+extern f32 D_8610AB4C;
+extern s32 func_86101964(f32, s32, f32, f32, f32, f32);
+extern f32 func_86101AEC(s32, f32 *, f32 *);
+extern void func_861024C8(void *arg0, f32 arg1, f32 arg2, f32 arg3, s32 arg4);
+void func_86102D50(void *arg0) {
+    f32 x;
+    f32 y;
+    f32 coefficient;
+    f32 a;
+    f32 b;
+    f32 c;
+    f32 d;
+    s32 enabled;
+    s32 result;
+    s32 mode;
+    f32 z;
+    s32 flags;
+
+    flags = *(s32 *)((u8 *)arg0 + 8);
+    if (flags & 0x100) {
+        coefficient = D_8610AB44;
+    } else if (flags & 0x200) {
+        coefficient = D_8610AB48;
+    } else {
+        coefficient = D_8610AB4C;
+    }
+    if (flags & 0x800) {
+        enabled = 0;
+    } else {
+        enabled = 1;
+    }
+    if (flags & 0x10) {
+        a = 1.0f;
+        b = 0.0f;
+        c = 1.0f;
+        d = 1.0f;
+    } else if (flags & 0x40) {
+        a = 1.0f;
+        b = 1.0f;
+        c = 2.0f;
+        d = 1.0f;
+    } else if (flags & 0x80) {
+        a = 1.0f;
+        b = 1.0f;
+        c = 1.0f;
+        d = 2.0f;
+    } else {
+        a = 1.0f;
+        b = 1.0f;
+        c = 1.0f;
+        d = 1.0f;
+    }
+    if (flags & 8) {
+        mode = 1;
+    } else {
+        mode = 0;
+    }
+    result = func_86101964(coefficient, enabled, a, b, c, d);
+    z = func_86101AEC(result, &x, &y);
+    func_861024C8(arg0, x, y, z, mode);
+}
 
 extern void func_86102720(void *, void *, f32);
 extern void func_86102908(void *, void *);
