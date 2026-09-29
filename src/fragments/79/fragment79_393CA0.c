@@ -517,11 +517,22 @@ s32 func_84125C68(u8 arg0, u8 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841260D4.s")
+extern void * D_841951F8[];
+s32 func_841260D4(u8 arg0, u8 arg1, u8 arg2) {
+    u8 count = 0;
+    s32 i;
+
+    for (i = arg1; i < arg2; i++) {
+        if (*(u16 *)((u8 *)D_841951F8[arg0] + i * 0x58 + 0x3E) > 0) {
+            count++;
+        }
+    }
+    return count;
+}
 #endif
 
 #ifdef VERSION_US
-extern void func_84126200(u8); extern s32 func_84126260(u8); extern s32 func_84126064(u8); extern void func_841260D4(u8, u8, u8); extern s32 func_84129C8C(u8);
+extern void func_84126200(u8); extern s32 func_84126260(u8); extern s32 func_84126064(u8); extern s32 func_841260D4(u8, u8, u8); extern s32 func_84129C8C(u8);
 extern void * D_841951F8[];
 void func_84126200(u8 arg0) {
     u8 *ptr = D_841951F8[arg0];
