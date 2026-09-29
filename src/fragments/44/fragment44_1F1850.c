@@ -14,13 +14,35 @@ void func_8AF035E0(void *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F1850/func_8AF03624.s")
+extern u8 D_8AF2C4F8[];
+extern u32 D_8AF2C548;
+void func_8AF03624(void *arg0) {
+    if (--D_8AF2C548 < 0xA) {
+        *(s32 *)((u8 *)arg0 + 0x4E4) = *(s32 *)(D_8AF2C4F8 + D_8AF2C548 * 8);
+        *(s32 *)((u8 *)arg0 + 0x4E8) = *(s32 *)(D_8AF2C4F8 + D_8AF2C548 * 8 + 4);
+        *(s32 *)((u8 *)arg0 + 0x4EC) = *(s32 *)((u8 *)arg0 + 0x4E8);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F1850/func_8AF03678.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F1850/func_8AF03730.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F1850/func_8AF03798.s")
+extern u16 D_8AF2C560;
+extern u8 D_8AF2C278[];
+extern f32 D_80088E50[];
+extern f32 D_8AF28D4C;
+void func_8AF03798(void) {
+    s32 angle = D_8AF2C560;
+    s32 increment;
+    f32 result = D_80088E50[angle >> 4] * D_8AF28D4C + 1.0f;
+    *(f32 *)(D_8AF2C278 + 0x40) = result;
+    *(f32 *)(D_8AF2C278 + 0x44) = result;
+    if (1) {
+        increment = 0x2000;
+    }
+    D_8AF2C560 = angle + increment;
+}
 
 extern void func_8AC0619C(s32 *, u16);
 extern void func_8AC06220(s32 *, u16);
