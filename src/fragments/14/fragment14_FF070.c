@@ -816,7 +816,43 @@ void func_8130BA48(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130BADC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130BC44.s")
+extern u8 D_800CE060[];
+extern s32 func_8160B6E4(s32 arg0);
+extern void func_8160B828(s32 arg0);
+extern void func_800226C0(s32);
+extern s32 func_8130B1F4(u8 *arg0);
+extern s32 func_8130B620(void *arg0, s32 arg1);
+s32 func_8130BC44(void *arg0) {
+    struct St {
+        u8 pad0[0xE8EC];
+        void *ptr;
+        f32 f1;
+        u8 gap1[8];
+        f32 f2;
+        u8 gap2[0x10];
+        u8 idx;
+        u8 gap3;
+        u8 flag;
+    };
+    u8 *record;
+    s32 p;
+
+    record = D_800CE060 + ((struct St *)arg0)->idx * 0x28;
+    p = func_8130B1F4(arg0);
+    ((struct St *)arg0)->f1 = 16.0f;
+    ((struct St *)arg0)->f2 = 16.0f;
+    if (func_8160B6E4(p) == 0
+        && (*(u16 *)(record + 0xC) & 0x8000) == 0
+        && (*(u16 *)(record + 0xC) & 0x4000) != 0
+        && *(u8 *)((u8 *)((struct St *)arg0)->ptr + 0x34) < 5) {
+        func_800226C0(3);
+        ((struct St *)arg0)->flag = 8;
+        return 1;
+    }
+    func_8160B828(p);
+    func_8130B620(arg0, 1);
+    return 1;
+}
 
 extern f32 func_816092FC(void);
 extern void func_8130F5AC(s32);
