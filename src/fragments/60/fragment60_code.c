@@ -400,7 +400,29 @@ void func_86A0B66C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/60/fragment60_code/func_86A0B6F8.s")
+extern void func_8003F114(void *, s32, s32, s32);
+extern void func_8003F1DC(void *);
+extern void func_86A0B66C(void);
+extern void * func_87F025B8(void *, void *);
+extern s32 D_86A104E8;
+extern u8 D_86A104F0;
+void func_86A0B6F8(f32 arg0, f32 arg1, f32 arg2) {
+    u8 *temp_v0;
+
+    temp_v0 = func_87F025B8(&D_86A104F0, func_86A0B66C);
+    if (temp_v0 != NULL) {
+        *(f32 *)(temp_v0 + 0x48) = arg0;
+        *(f32 *)(temp_v0 + 0x4C) = 1.0f;
+        *(f32 *)(temp_v0 + 0x50) = arg1;
+        *(f32 *)(temp_v0 + 0x10) = arg2;
+        *(s16 *)(temp_v0 + 0x42) = -0x4001;
+        *(f32 *)(temp_v0 + 0x54) = 2.5f;
+        *(f32 *)(temp_v0 + 0x5C) = 2.5f;
+        *(f32 *)(temp_v0 + 0x58) = 1.5f;
+        func_8003F1DC(temp_v0 + 0x24);
+        func_8003F114(temp_v0 + 0x24, 0, -1, D_86A104E8);
+    }
+}
 #endif
 
 #ifdef VERSION_US
