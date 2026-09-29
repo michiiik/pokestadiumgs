@@ -155,7 +155,37 @@ void func_82B01850(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B01BB8.s")
+#pragma pack(1)
+struct PackedWord82B01BB8 { s32 value; };
+#pragma pack(0)
+struct Color82B01BB8 { u8 r, g, b; };
+extern struct Color82B01BB8 D_82B085BC;
+#pragma pack(1)
+struct PackedUnsigned82B01BB8 { u32 value; };
+#pragma pack(0)
+void func_82B01BB8(void *arg0) {
+    *(s16 *)((u8 *)arg0 + 0xC) = -0x280;
+    *(s16 *)((u8 *)arg0 + 0xE) = 0;
+    *(s16 *)((u8 *)arg0 + 0x10) = 0x1A7;
+    *(s16 *)((u8 *)arg0 + 0x12) = 0xF0;
+    *(struct PackedWord82B01BB8 *)((u8 *)arg0 + 0x3C) = *(struct PackedWord82B01BB8 *)((u8 *)arg0 + 0x10);
+    *(struct PackedWord82B01BB8 *)((u8 *)arg0 + 0x14) = *(struct PackedWord82B01BB8 *)((u8 *)arg0 + 0xC);
+    *(s16 *)((u8 *)arg0 + 0x18) = -*(s16 *)((u8 *)arg0 + 0x14);
+    *(s16 *)((u8 *)arg0 + 0x1A) = -*(s16 *)((u8 *)arg0 + 0x16);
+    *(struct PackedWord82B01BB8 *)((u8 *)arg0 + 0x1C) = *(struct PackedWord82B01BB8 *)((u8 *)arg0 + 0x14);
+    *(struct PackedWord82B01BB8 *)((u8 *)arg0 + 0x2C) = *(struct PackedWord82B01BB8 *)((u8 *)arg0 + 0x18);
+    *(struct PackedWord82B01BB8 *)((u8 *)arg0 + 0x20) = *(struct PackedWord82B01BB8 *)((u8 *)arg0 + 0x14);
+    *(struct PackedWord82B01BB8 *)((u8 *)arg0 + 0x30) = *(struct PackedWord82B01BB8 *)((u8 *)arg0 + 0x18);
+    *(struct PackedWord82B01BB8 *)((u8 *)arg0 + 0x24) = *(struct PackedWord82B01BB8 *)((u8 *)arg0 + 0x14);
+    *(struct PackedWord82B01BB8 *)((u8 *)arg0 + 0x34) = *(struct PackedWord82B01BB8 *)((u8 *)arg0 + 0x18);
+    *(struct PackedWord82B01BB8 *)((u8 *)arg0 + 0x28) = *(struct PackedWord82B01BB8 *)((u8 *)arg0 + 0x14);
+    *(struct PackedWord82B01BB8 *)((u8 *)arg0 + 0x38) = *(struct PackedWord82B01BB8 *)((u8 *)arg0 + 0x18);
+    *(s16 *)((u8 *)arg0 + 0x20) = -*(s16 *)((u8 *)arg0 + 0x14);
+    *(s16 *)((u8 *)arg0 + 0x22) = -*(s16 *)((u8 *)arg0 + 0x16);
+    *(s16 *)((u8 *)arg0 + 0x48) = 0x67;
+    *(s16 *)((u8 *)arg0 + 0x4A) = 0x5A;
+    *(struct Color82B01BB8 *)((u8 *)arg0 + 0x4C) = D_82B085BC;
+}
 #endif
 
 #ifdef VERSION_US
