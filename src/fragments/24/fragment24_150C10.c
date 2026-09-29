@@ -189,7 +189,38 @@ void func_82B01BB8(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B01CE0.s")
+extern struct Color82B01BB8 D_82B085D4;
+extern s16 D_82B12458;
+void func_82B01CE0(void *arg0)
+{
+  s16 *tail;
+  struct PackedWord82B01BB8 *new_var;
+  *((s16 *) (((u8 *) arg0) + 0xC)) = 0;
+  *((s16 *) (((u8 *) arg0) + 0xE)) = 0x1E0;
+  *((s16 *) (((u8 *) arg0) + 0x10)) = 0x4C;
+  *((s16 *) (((u8 *) arg0) + 0x12)) = 0x166;
+  *((struct PackedWord82B01BB8 *) (((u8 *) arg0) + 0x3C)) = *((struct PackedWord82B01BB8 *) (((u8 *) arg0) + 0x10));
+  new_var = (struct PackedWord82B01BB8 *) (((u8 *) arg0) + 0x14);
+  *new_var = *((struct PackedWord82B01BB8 *) (((u8 *) arg0) + 0xC));
+  *((struct PackedWord82B01BB8 *) (((u8 *) arg0) + 0x18)) = *new_var;
+  tail = ((u8 *) arg0) + 0x50;
+  *((struct PackedWord82B01BB8 *) (((u8 *) arg0) + 0x1C)) = *new_var;
+  *((struct PackedWord82B01BB8 *) (((u8 *) arg0) + 0x2C)) = *((struct PackedWord82B01BB8 *) (((u8 *) arg0) + 0x18));
+  *((struct PackedWord82B01BB8 *) (((u8 *) arg0) + 0x20)) = *new_var;
+  *((struct PackedWord82B01BB8 *) (((u8 *) arg0) + 0x30)) = *((struct PackedWord82B01BB8 *) (((u8 *) arg0) + 0x18));
+  *((struct PackedWord82B01BB8 *) (((u8 *) arg0) + 0x24)) = *new_var;
+  *((struct PackedWord82B01BB8 *) (((u8 *) arg0) + 0x34)) = *((struct PackedWord82B01BB8 *) (((u8 *) arg0) + 0x18));
+  *((struct PackedWord82B01BB8 *) (((u8 *) arg0) + 0x28)) = *new_var;
+  *((struct PackedWord82B01BB8 *) (((u8 *) arg0) + 0x38)) = *((struct PackedWord82B01BB8 *) (((u8 *) arg0) + 0x18));
+  *((s16 *) (((u8 *) arg0) + 0x48)) = 0x1EB;
+  *((s16 *) (((u8 *) arg0) + 0x4A)) = 0x58;
+  *((struct Color82B01BB8 *) (((u8 *) arg0) + 0x4C)) = D_82B085D4;
+  tail[0] = 0;
+  tail[1] = 0;
+  tail[3] = D_82B12458;
+  tail[4] = 0;
+  tail[2] = tail[3];
+}
 #endif
 
 #ifdef VERSION_US
