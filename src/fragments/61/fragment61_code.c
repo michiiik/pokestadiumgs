@@ -133,7 +133,27 @@ void func_86B02180(void) { s32 mode; u8 **state; func_800086A4(2); StageFade_Sta
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/61/fragment61_code/func_86B04870.s")
+extern void func_87F026E8(s32, void *);
+extern s32 D_87F119D8;
+extern void * D_87F119DC;
+void func_86B04870(void) {
+    s32 result = 0;
+    s32 divisor = 30;
+    u8 *obj;
+    obj = D_87F119DC;
+    *(f32 *)(obj + 0x48) += *(f32 *)(obj + 0x10);
+    obj = D_87F119DC;
+    *(f32 *)(obj + 0x4C) += *(f32 *)(obj + 0x14);
+    obj = D_87F119DC;
+    *(f32 *)(obj + 0x50) += *(f32 *)(obj + 0x18);
+    obj = D_87F119DC;
+    *(f32 *)(obj + 0x14) -= (f32)(*(u32 *)(obj + 0x20) / divisor);
+    obj = D_87F119DC;
+    *(u8 *)(obj + 0x41) -= *(u32 *)(obj + 0x20) % divisor;
+    obj = D_87F119DC;
+    if (*(s32 *)(obj + 0x1C) >= 25) result = 1;
+    if (result) func_87F026E8(D_87F119D8, obj);
+}
 #endif
 
 #ifdef VERSION_US
