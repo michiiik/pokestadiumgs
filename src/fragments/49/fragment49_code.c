@@ -260,7 +260,92 @@ void func_86100F1C(Object86100F1C *arg0, void *arg1, s32 arg2) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_8610109C.s")
+extern f32 D_8610AAD0;
+extern f32 D_8610AAD4;
+extern f32 D_8610AAD8;
+extern void *Vec3f_Subtract(void *, void *, void *);
+extern void func_86100BE0(void *);
+extern void func_861000B8(void *, s32);
+extern void func_86100E20(void *arg0, s32 arg1);
+extern f32 func_87D005E8(f32 *, f32 *, f32 *);
+extern s32 D_8610AD20;
+void func_8610109C(void *arg0, void *arg1) {
+#define a ((u8 *)arg0)
+#define b ((u8 *)arg1)
+    typedef struct { f32 x, y, z; } Vec;
+    Vec delta;
+    f32 dist;
+    Vec normal;
+    Vec vel;
+    f32 dot;
+    Vec aa;
+    Vec bb;
+    s32 flagA;
+    f32 scale;
+    f32 factorA;
+    f32 factorB;
+    f32 limit;
+    scale = *(f32 *)((u8 *)(u32)D_8610AD20 + 0x9768) * D_8610AAD0;
+    limit = ((scale * 700.0f) * 1.75f) * 0.5f;
+    limit *= ((*(f32 *)(a + 0x54) / scale) + (*(f32 *)(b + 0x54) / scale));
+    Vec3f_Subtract(&delta, a + 0x48, b + 0x48);
+    dist = sqrtf(delta.x * delta.x + delta.y * delta.y + delta.z * delta.z);
+    if (!(dist < limit)) return;
+    if (dist != 0.0f) {
+        normal.x = delta.x / dist;
+        normal.y = delta.y / dist;
+        normal.z = delta.z / dist;
+    } else {
+        normal.x = 1.0f;
+        normal.y = 0.0f;
+        normal.z = 0.0f;
+    }
+    Vec3f_Subtract(&vel, a + 0x10, b + 0x10);
+    dot = vel.x * normal.x + vel.y * normal.y + vel.z * normal.z;
+    if (*(s32 *)((u8 *)(u32)D_8610AD20 + 0x3C) == 4) goto special;
+    factorA = D_8610AAD4;
+    factorB = D_8610AAD4;
+    goto done_special;
+special:
+        aa = *(Vec *)(a + 0x10);
+        func_87D005E8((f32 *)&aa, &aa.y, &aa.z);
+        bb = *(Vec *)(b + 0x10);
+        scale = func_87D005E8((f32 *)&bb, &bb.y, &bb.z);
+        factorA = D_8610AAD8;
+        factorB = D_8610AAD8;
+        flagA = *(u32 *)(a + 0xC) & 0x20000;
+        if (flagA != 0) {
+            if ((*(u32 *)(b + 0xC) & 0x20000) == 0) {
+            factorA = 0.5f;
+            func_861000B8(b, 0xF01);
+            func_86100F1C((Object86100F1C *)b, (void *)&((struct { u8 pad[0x8DE0]; u8 rec[][0x2C]; } *)(u32)D_8610AD20)->rec[*(s32 *)(b + 0x20)], 0x1000000);
+            func_86100E20(b, 0x1000000);
+            }
+        } else if ((*(u32 *)(b + 0xC) & 0x20000) != 0) {
+            if (flagA == 0) {
+            factorB = 0.5f;
+            func_861000B8(a, 0xF01);
+            func_86100F1C((Object86100F1C *)a, (void *)&((struct { u8 pad[0x8DE0]; u8 rec[][0x2C]; } *)(u32)D_8610AD20)->rec[*(s32 *)(a + 0x20)], 0x1000000);
+            func_86100E20(a, 0x1000000);
+            }
+        }
+done_special:
+    *(f32 *)(a + 0x48) += ((limit - dist) * normal.x) * 0.5f;
+    *(f32 *)(a + 0x4C) += ((limit - dist) * normal.y) * 0.5f;
+    *(f32 *)(a + 0x50) += ((limit - dist) * normal.z) * 0.5f;
+    *(f32 *)(b + 0x48) -= ((limit - dist) * normal.x) * 0.5f;
+    *(f32 *)(b + 0x4C) -= ((limit - dist) * normal.y) * 0.5f;
+    *(f32 *)(b + 0x50) -= ((limit - dist) * normal.z) * 0.5f;
+    func_86100BE0(b);
+    *(f32 *)(a + 0x10) += ((normal.x * dot) * -(1.0f + *(f32 *)((u8 *)(u32)D_8610AD20 + 0x979C))) * factorA;
+    *(f32 *)(a + 0x14) += ((normal.y * dot) * -(1.0f + *(f32 *)((u8 *)(u32)D_8610AD20 + 0x979C))) * factorA;
+    *(f32 *)(a + 0x18) += ((normal.z * dot) * -(1.0f + *(f32 *)((u8 *)(u32)D_8610AD20 + 0x979C))) * factorA;
+    *(f32 *)(b + 0x10) += ((normal.x * dot) * (1.0f + *(f32 *)((u8 *)(u32)D_8610AD20 + 0x979C))) * factorB;
+    *(f32 *)(b + 0x14) += ((normal.y * dot) * (1.0f + *(f32 *)((u8 *)(u32)D_8610AD20 + 0x979C))) * factorB;
+    *(f32 *)(b + 0x18) += ((normal.z * dot) * (1.0f + *(f32 *)((u8 *)(u32)D_8610AD20 + 0x979C))) * factorB;
+#undef a
+#undef b
+}
 
 void func_86101558(f32 *arg0, f32 *arg1) {
     f32 temp_fa0;
