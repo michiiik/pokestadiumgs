@@ -6083,16 +6083,42 @@ void func_800413A0(S1_MainPoolState* arg0, u32 arg1, S1_Fragment* arg2) {
 #endif
 
 #ifdef VERSION_US
-extern void func_800412B0(s32, s32, s32, s32, s32, s32);
-void func_800413E8(s32 arg0, s32 arg1, s32 *arg2, s32 *arg3, s32 arg4, s32 arg5) {
+extern s32 func_800412B0(s32, s32, s32, s32, s32, s32);
+s32 func_800413E8(s32 arg0, s32 arg1, s32 *arg2, s32 *arg3, s32 arg4, s32 arg5) {
     s32 sum1 = arg3[0] + arg2[1];
     s32 sum2 = sum1 + arg3[1];
-    func_800412B0(arg0, arg1, sum1, sum2, arg4, arg5);
+    return func_800412B0(arg0, arg1, sum1, sum2, arg4, arg5);
 }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80041430.s")
+s32 func_80041430(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
+    s32 base = arg2;
+    s32 result = 0;
+    s32 *entry;
+    if ((u32)arg3 < *(u32 *)((u8 *)base + 0xC)) {
+        if (*(u16 *)base & 1) {
+            result = (arg2 += *(s32 *)((u8 *)base + arg3 * 0x10 + 0x10));
+        } else {
+            if (!(*(u16 *)base & 4)) {
+                if (*(s32 *)((u8 *)base + arg3 * 0x10 + 0x18) != 0) {
+                    result = *(s32 *)((u8 *)base + arg3 * 0x10 + 0x18);
+                    goto done;
+                }
+            }
+            entry = (s32 *)((u8 *)base + arg3 * 0x10 + 0x10);
+            result = func_800413E8(arg0, arg1, (s32 *)base, entry, arg4, arg5);
+            if (result != 0 && arg1 == 0) {
+                if (*(s32 *)(result + 8) == 0x46524147 && *(s32 *)(result + 12) == 0x4D454E54) {
+                    func_800413A0((S1_MainPoolState *)arg0, *(u16 *)((u8 *)base + 2), (S1_Fragment *)result);
+                }
+                entry[2] = result;
+            }
+        }
+    }
+done:
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
@@ -6125,10 +6151,10 @@ void Fragment_ProcessGeoLayoutList(S1_MemoryBlock* arg0, S1_arg1_func_80019420* 
 #endif
 
 #ifdef VERSION_US
-s32 func_80041430(s32, s32, s32, s16, s32, s32);
+s32 func_80041430(s32, s32, s32, s32, s32, s32);
 extern OSThread D_80126530;
 void func_8002B1A0(void);
-s32 func_80041430(s32, s32, s32, s16, s32, s32);
+s32 func_80041430(s32, s32, s32, s32, s32, s32);
 void func_80041A18(void *arg0) {
     s32 temp_v0;
 
