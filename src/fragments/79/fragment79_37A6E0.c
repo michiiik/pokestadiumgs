@@ -3520,7 +3520,33 @@ void func_8411B160(u8 *arg0) { if (*(s8 *)(arg0 + 0x619) == *(s16 *)(arg0 + 0x7E
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8411B1F4.s")
+extern void func_8411AE08(u8 *);
+extern void func_8411AEA8(u8 *);
+extern void func_8411B160(u8 *arg0);
+extern void func_8411FEE8(s32);
+extern void func_841206D0(u8 *);
+void func_8411B1F4(u8 *arg0) {
+    s8 status;
+    status = *(s8 *)(arg0 + 0x7F6);
+    switch (status) {
+    case 1:
+        func_8411B160(arg0);
+        break;
+    case 2:
+        func_8411AE08(arg0);
+        break;
+    case 3:
+        func_8411AEA8(arg0);
+        break;
+    case 4:
+        if (*(s16 *)(arg0 + 0x7E8) == 0x28) {
+            func_841206D0(arg0);
+            func_8411FEE8(0);
+            *(u8 *)(arg0 + 0x7F6) = 5;
+        }
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
