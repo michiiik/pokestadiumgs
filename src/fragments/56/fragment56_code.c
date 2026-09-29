@@ -165,7 +165,31 @@ void func_86803EA4(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/56/fragment56_code/func_86803ED8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/56/fragment56_code/func_868040EC.s")
+extern s32 D_86807C7C;
+extern u8 D_8682CD20[];
+extern u8 D_8682EE18[];
+s32 func_868040EC(s32 arg0, s32 arg1) {
+    s32 value;
+    s32 result = -1;
+    if (D_86807C7C == 0) {
+        return 1;
+    }
+    value = *(s32 *)(&D_8682EE18[arg0 * 0x124] + 0x1C);
+    switch (value) {
+    case 0:
+        break;
+    case 2:
+        if (*(s32 *)&D_8682CD20[(arg0 * 0x640) + (arg1 * 0x28)] == 1) { result = 1; *(s32 *)(&D_8682EE18[arg0 * 0x124] + 0x10) = 1; }
+        break;
+    case 1:
+        if (*(s32 *)&D_8682CD20[(arg0 * 0x640) + (arg1 * 0x28)] == 3) { result = 1; *(s32 *)(&D_8682EE18[arg0 * 0x124] + 0x10) = 3; }
+        break;
+    case 3:
+        if (*(s32 *)&D_8682CD20[(arg0 * 0x640) + (arg1 * 0x28)] == 2) { result = 1; *(s32 *)(&D_8682EE18[arg0 * 0x124] + 0x10) = 2; }
+        break;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/56/fragment56_code/func_8680422C.s")
 
