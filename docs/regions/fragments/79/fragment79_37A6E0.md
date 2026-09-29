@@ -149,3 +149,19 @@ func_8411A7D8: plateau at 0.9524 (raw 0.9524), mismatch instruction_drift; tried
 ## 2026-09-29
 
 func_8411B1F4: matched (call_sequence:switch:s8-status-direct-arg), 1 iterations, agent codex
+
+## 2026-09-29
+
+func_8410C400: time cap at 0.9753 (raw 0.9506) after 2414s, mismatch instruction_drift; tried families: call_sequence; tie-pool yes; 1 iteration(s) with a suspicious identical batch-wide failure
+
+## 2026-09-29
+
+TYPE CONFLICT: func_8410B330 is extern void func_8410B330(u8 *), not extern u8 *func_8410B330(u8 *)
+
+## 2026-09-29
+
+func_841166C4: matched (call_sequence:state-machine:direct-fields), 1 iterations, agent codex
+
+## 2026-09-29
+
+func_84110118: time cap at 0.9405 (raw 0.5119) after 2401s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool yes
