@@ -967,7 +967,20 @@ void BattleAnim_Fragment67Dispatch_041(void) { s16 mode; mode = D_8291B828; swit
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290DED4.s")
+extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
+extern void func_800371B4(s32, s32, f32, s16, s32);
+extern s32 D_8291A380;
+extern s16 D_8291B85C;
+extern s16 D_8291B85E;
+extern s16 D_8291B860;
+void func_8290DED4(void) {
+    Vec3f_SetComponentsDuplicate(D_8291A380 + 0xB4, 0.0f, 0.0f, 0.0f);
+    D_8291B85C = 0;
+    D_8291B85E = 0;
+    D_8291B860 = 0x10E;
+    func_800371B4(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E);
+}
+void func_8290DED4_padding(void) {}
 #endif
 
 #ifdef VERSION_US
