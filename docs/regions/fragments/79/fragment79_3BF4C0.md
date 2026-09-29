@@ -37,3 +37,11 @@ func_841528C4: matched (call_sequence:nested_gate:typed_state_pointer), 4 iterat
 ## 2026-09-26
 
 func_84152140: matched (call_sequence:five-local:late-byte-spill), 1 iterations, agent codex
+
+## 2026-09-29
+
+func_84152408: matched (call_sequence:spill_layout:scratch_table_base_multiplier_guard), 6 iterations, agent unbiased
+
+## 2026-09-29
+
+func_84153A64: matched (call_sequence:constant_offset:permuter_exact), 3 iterations, agent unbiased
