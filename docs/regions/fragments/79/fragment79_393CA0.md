@@ -237,3 +237,15 @@ func_8412E680: plateau at 0.0 (raw None), mismatch operand_or_scheduling_drift; 
 ## 2026-09-27
 
 TYPE CONFLICT: func_84136124 is extern s32 func_84136124(u8, s16, u16, u8, u8), not extern void func_84136124(u8, s16, u16, u8, u8)
+
+## 2026-09-29
+
+func_8412E82C: plateau at 0.9722 (raw 0.9722), mismatch symbol_size_drift; tried families: bounded_lookup; tie-pool yes
+
+## 2026-09-29
+
+func_841260D4: matched (state_field_access:indexed:signed_index_byte_counter), 1 iterations, agent unbiased
+
+## 2026-09-29
+
+func_84124F40: time cap at 0.9875 (raw 0.975) after 2408s, mismatch operand_or_scheduling_drift; tried families: call_chain; tie-pool yes
