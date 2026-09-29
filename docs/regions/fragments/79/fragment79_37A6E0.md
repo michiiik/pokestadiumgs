@@ -141,3 +141,11 @@ TYPE CONFLICT: func_8410E73C is extern void func_8410E73C(u8 *, void *), not ext
 ## 2026-09-27
 
 func_8411A310: plateau at 1.0 (raw 0.9592), mismatch register_allocation_only; tried families: call_sequence; tie-pool yes
+
+## 2026-09-29
+
+func_8411A7D8: plateau at 0.9524 (raw 0.9524), mismatch instruction_drift; tried families: call_sequence; tie-pool yes
+
+## 2026-09-29
+
+func_8411B1F4: matched (call_sequence:switch:s8-status-direct-arg), 1 iterations, agent codex
