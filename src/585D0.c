@@ -1544,7 +1544,36 @@ void func_8005D2BC(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005D348.s")
+extern void func_8005C060(s32 arg0, s32 arg1, s32 arg2);
+extern s32 func_8005CAA4(s32);
+extern s32 func_8005CC14(s32 arg0, s32 arg1, s32 arg2);
+extern u8 D_801285D0[];
+void func_8005D348(s32 arg0, s32 arg1, s32 arg2)
+{
+    u8 *data;
+    s32 count;
+
+    data = *(u8 **)(D_801285D0 + arg1 * 112);
+    count = func_8005CC14(arg0, arg1, arg2);
+    if (count < func_8005CAA4(arg0)) {
+        count++;
+        switch (arg0) {
+            case 0x20:
+                data[0x9AC] = count;
+                data[count + 0x9AD] = 0xFF;
+                break;
+            case 0x21:
+                func_8005C060(arg1, arg2, count);
+                break;
+            case 0x22:
+                data[0x266] = count;
+                data[count * 2 + 0x267] = 0xFF;
+                break;
+            case 0x23:
+                break;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1934,7 +1963,18 @@ s32 func_8005E304(s32 arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005E350.s")
+void func_8005E350(s32 arg0, s32 arg1, s32 arg2, s32 arg3)
+{
+    s32 index;
+
+    while (arg1-- > 0) {
+        index = (arg3 ? *(u8 *)arg2 : func_80062008(*(u8 *)arg2)) - 1;
+        if (index < (arg3 ? 251 : 151)) {
+            ((u8 *)arg0)[index / 8] |= 1 << (index % 8);
+        }
+        arg2++;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1942,7 +1982,7 @@ s32 func_8005E304(s32 arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8005E350(s32, u8, s32, s32);
+extern void func_8005E350(s32, s32, s32, s32);
 extern u8 D_801285D4[];
 void func_8005E524(u8 arg0, s32 arg1) {
     u8 *base;
@@ -1971,7 +2011,7 @@ void func_8005E524(u8 arg0, s32 arg1) {
 #ifdef VERSION_US
 extern u8 D_80128570[];
 extern void _bzero(s32, s32);
-extern void func_8005E350(s32, u8, s32, s32);
+extern void func_8005E350(s32, s32, s32, s32);
 extern void func_8005E524(u8, s32);
 void func_8005E5D8(s32 arg0) {
     s32 sp1C;
