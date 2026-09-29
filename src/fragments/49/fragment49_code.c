@@ -2,7 +2,22 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86100020.s")
+void func_86100020(s8 *arg0, u8 arg1, f32 arg2, f32 arg3, f32 arg4) {
+    s32 value;
+
+    if (arg4 == arg3) {
+        value = 0;
+    } else {
+        value = (s32)(((arg2 - arg3) / (arg4 - arg3)) * (f32)arg1) - (arg1 >> 1) - 1;
+    }
+    if (value >= 0x80) {
+        value = 0x7F;
+    }
+    if (value < -0x80) {
+        value = -0x80;
+    }
+    *arg0 = value;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_861000B8.s")
 
