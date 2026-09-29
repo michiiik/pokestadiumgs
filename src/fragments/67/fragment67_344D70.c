@@ -493,7 +493,16 @@ void func_8290AB10(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290ABB0.s")
+extern void func_8290A3C4(s32);
+extern void func_8290A208(s32);
+extern u8 D_8291A7C0;
+void func_8290ABB0(s32 arg0) {
+    (&D_8291A7C0)[arg0 * 0x1A4 + 0x1A2] = 1;
+    func_8290A3C4(arg0);
+    func_8290A208(arg0);
+    (&D_8291A7C0)[arg0 * 0x1A4 + 6] |= 0x10;
+    (&D_8291A7C0)[0x1071]++;
+}
 #endif
 
 #ifdef VERSION_US
