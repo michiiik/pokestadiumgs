@@ -263,7 +263,22 @@ void func_80011A48(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_80011B0C.s")
+extern u8 D_8011BE90[];
+void func_80011B0C(void)
+{
+    s32 index;
+    s32 i;
+    u8 *slot;
+
+    index = *(s32 *)(D_8011BE90 + 0x2C3C);
+    i = 0;
+    slot = D_8011BE90 + index * 4;
+    *(s16 *)(D_8011BE90 + index * 2 + 0x2D04) = *(s16 *)(D_8011BE90 + 0x2BE6);
+    do {
+        *(s16 *)(*(u8 **)(slot + 0x2CF8) + i * 2) = 0;
+        i++;
+    } while (i != 0x540);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_80011B78.s")
 
