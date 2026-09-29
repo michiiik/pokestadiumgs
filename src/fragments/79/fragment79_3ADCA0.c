@@ -813,7 +813,59 @@ void func_841420A4(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84142B78.s")
+extern s16 D_84186CC0, D_84186CC4;
+extern s16 D_84186EB4, D_84186EB8, D_84186EBC, D_84186EC0;
+typedef struct {
+    u8 kind;
+    u8 pad01[7];
+    u8 flags;
+    u8 pad09;
+    s16 x;
+    s16 y;
+    u8 pad0E[4];
+    s16 x1;
+    s16 y1;
+    s16 x2;
+    s16 y2;
+    u8 pad1A[8];
+    u8 r, g, b, a;
+} Candidate84142B78Record;
+extern void ParticleGfx_SetPrimColor_fragment79(u8 r, u8 g, u8 b, u8 a);
+extern void func_8413F5A8(s32,s32,s32,s32);
+extern void func_8413F700(s16 arg0, s16 arg1);
+extern void func_8413F73C(s16 arg0, s16 arg1);
+extern void func_8413F778(s16 arg0, s16 arg1);
+extern void func_8413F7B4(s16 arg0, s16 arg1);
+extern void func_8413F7F0(s16 arg0, s16 arg1);
+void func_84142B78(void *arg0)
+{
+    Candidate84142B78Record *p = arg0;
+    if (!(p->flags & 1)) {
+        switch (p->kind) {
+        case 10:
+            if (!(p->flags & 2)) {
+                func_8413F5A8((s16)(p->x + D_84186CC0), (s16)(p->y + D_84186CC4), 32, 8);
+                func_8413F5A8((s16)(p->x + D_84186CC0), (s16)(p->y + D_84186CC4 + 11), 32, 0);
+            }
+            break;
+        case 19:
+            ParticleGfx_SetPrimColor_fragment79(p->r, p->g, p->b, p->a);
+            func_8413F700(p->x1 + p->x, p->y1 + p->y);
+            func_8413F73C(p->x2 + p->x, p->y2 + p->y);
+            break;
+        case 20:
+            ParticleGfx_SetPrimColor_fragment79(p->r, p->g, p->b, p->a);
+            func_8413F700(p->x1 + p->x, p->y1 + p->y);
+            func_8413F778(p->x2 + p->x, p->y2 + p->y);
+            break;
+        case 21:
+            ParticleGfx_SetPrimColor_fragment79(p->r, p->g, p->b, p->a);
+            func_8413F7B4(p->x + D_84186EB4, p->y + D_84186EB8);
+            func_8413F7F0(p->x + D_84186EBC, p->y + D_84186EC0);
+            break;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
