@@ -150,7 +150,35 @@ void func_86A01C5C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/60/fragment60_code/func_86A0405C.s")
+extern u8 D_86A0D560[];
+extern u8 D_86A443F0[];
+s32 func_86A0405C(s32 arg0) {
+    s32 count;
+    s32 index;
+    s32 value;
+    u8 *queue;
+    u8 *entry;
+    u8 *state;
+
+    index = *(s32 *)(D_86A443F0 + arg0 * 0x1C + 0x10C);
+    queue = D_86A443F0 + arg0 * 0x1C;
+    count = *(s32 *)(queue + 0x108);
+    if (count == 0) {
+        return -1;
+    }
+    *(s32 *)(queue + 0x108) = count - 1;
+    value = ((s32 *)(queue + 0x110))[index++];
+    if (index < 5) {
+        *(s32 *)(queue + 0x10C) = index;
+    } else {
+        *(s32 *)(queue + 0x10C) = 0;
+    }
+    state = D_86A443F0 + arg0 * 4;
+    entry = D_86A0D560 + value * 0x18;
+    *(s32 *)(state + 0xE8) -= *(s32 *)(entry + 4);
+    *(f32 *)(state + 0xD8) -= *(f32 *)(entry + 8);
+    return value;
+}
 #endif
 
 #ifdef VERSION_US
@@ -372,7 +400,29 @@ void func_86A0B66C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/60/fragment60_code/func_86A0B6F8.s")
+extern void func_8003F114(void *, s32, s32, s32);
+extern void func_8003F1DC(void *);
+extern void func_86A0B66C(void);
+extern void * func_87F025B8(void *, void *);
+extern s32 D_86A104E8;
+extern u8 D_86A104F0;
+void func_86A0B6F8(f32 arg0, f32 arg1, f32 arg2) {
+    u8 *temp_v0;
+
+    temp_v0 = func_87F025B8(&D_86A104F0, func_86A0B66C);
+    if (temp_v0 != NULL) {
+        *(f32 *)(temp_v0 + 0x48) = arg0;
+        *(f32 *)(temp_v0 + 0x4C) = 1.0f;
+        *(f32 *)(temp_v0 + 0x50) = arg1;
+        *(f32 *)(temp_v0 + 0x10) = arg2;
+        *(s16 *)(temp_v0 + 0x42) = -0x4001;
+        *(f32 *)(temp_v0 + 0x54) = 2.5f;
+        *(f32 *)(temp_v0 + 0x5C) = 2.5f;
+        *(f32 *)(temp_v0 + 0x58) = 1.5f;
+        func_8003F1DC(temp_v0 + 0x24);
+        func_8003F114(temp_v0 + 0x24, 0, -1, D_86A104E8);
+    }
+}
 #endif
 
 #ifdef VERSION_US
