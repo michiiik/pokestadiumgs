@@ -361,7 +361,23 @@ f32 func_86B080D4(f32 arg0, f32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/61/fragment61_code/func_86B08120.s")
+extern f32 D_86B0DFB8;
+extern f32 D_86B0DFBC;
+f32 func_86B08120(f32 arg0, f32 arg1) {
+    f32 wrap;
+    f32 delta;
+    f32 result = arg0 - arg1;
+    if (arg0 < 0.0f) { wrap = D_86B0DFB8; arg0 += wrap; }
+    wrap = D_86B0DFBC;
+    if (wrap < arg0) arg0 -= wrap;
+    if (arg1 < 0.0f) arg1 += wrap;
+    if (wrap < arg1) arg1 -= wrap;
+    delta = arg0 - arg1;
+    result = delta;
+    if (arg0 < arg1) result = delta + wrap;
+    if (wrap < result) result -= wrap;
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
