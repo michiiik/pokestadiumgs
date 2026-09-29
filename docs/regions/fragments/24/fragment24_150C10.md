@@ -34,3 +34,11 @@ func_82B01BB8: matched (packed:interleaved:exact-copy-before-second-negations), 
 ## 2026-09-29
 
 func_82B01CE0: matched (state:permuter:exact-pointer-handoff), 3 iterations, agent codex
+
+## 2026-09-30
+
+func_82B0341C: matched (call_sequence:array_layout:exact_match), 1 iterations, agent codex
+
+## 2026-09-30
+
+func_82B05F60: time cap at 0.925 (raw 0.7625) after 2420s, mismatch instruction_drift; tried families: call_sequence; tie-pool no

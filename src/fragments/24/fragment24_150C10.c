@@ -456,7 +456,36 @@ void func_82B02E50(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B0341C.s")
+extern s16 *D_82B085FC[];
+extern s32 D_82B085F8;
+extern s32 func_8004C990(s32, s32);
+extern void func_8004D19C(s32, s32, s32, s32, s32);
+extern void func_82B0284C(u8 *arg0, u8 *arg1);
+extern u8 D_80094E38[];
+extern Gfx * D_800D0510;
+void func_82B0341C(u8 *arg0, s32 arg1) {
+    s16 *table;
+    u8 *tail;
+    s32 value;
+    s16 coords[4];
+    Gfx *gfx;
+    func_82B0284C(arg0, (u8 *)coords);
+    table = D_82B085FC[*(s16 *)(arg0 + 2)];
+    tail = arg0 + 0x50;
+    if (arg1 != 0) {
+        *(u16 *)(tail + 2) = *(u16 *)(tail + 2) + 1;
+        if ((u16)*(u16 *)(tail + 2) % 3 == 0) {
+            *(s16 *)(tail + 0) = *(s16 *)(tail + 0) + 1;
+            if (*(s16 *)(tail + 0) >= D_82B085F8) {
+                *(s16 *)(tail + 0) = 0;
+            }
+        }
+    }
+    value = func_8004C990(0x4F, table[*(s16 *)(tail + 0)]);
+    gSPDisplayList(D_800D0510++, D_80094E38);
+    gDPSetRenderMode(D_800D0510++, 0x0F0A7008, 0);
+    func_8004D19C(coords[0] + 6, coords[1] + 0xE, value, 0, 0);
+}
 #endif
 
 #ifdef VERSION_US
