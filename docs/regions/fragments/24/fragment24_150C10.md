@@ -18,3 +18,19 @@ func_82B025E0: time cap at 0.9848 (raw 0.803) after 2400s, mismatch operand_or_s
 ## 2026-09-17
 
 func_82B041C8: matched (call_chain:macros:ternary-alpha-exact), 1 iterations, agent codex
+
+## 2026-09-29
+
+func_82B01F14: time cap at 0.0 (raw None) after 2400s, mismatch unknown; tried families: (none); tie-pool no
+
+## 2026-09-29
+
+func_82B025E0: time cap at 0.0 (raw None) after 2401s, mismatch unknown; tried families: (none); tie-pool no
+
+## 2026-09-29
+
+func_82B01BB8: matched (packed:interleaved:exact-copy-before-second-negations), 1 iterations, agent codex
+
+## 2026-09-29
+
+func_82B01CE0: matched (state:permuter:exact-pointer-handoff), 3 iterations, agent codex
