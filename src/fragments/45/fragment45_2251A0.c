@@ -612,7 +612,13 @@ s32 func_8AB023EC(u32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB029BC.s")
+extern u8 D_8AB14680[];
+void func_8AB029BC(u16 count, u16 start) {
+    s32 i;
+    for (i = 0; i < count; i++) {
+        ((u16 *)D_8AB14680)[i] = start + i;
+    }
+}
 #endif
 
 #ifdef VERSION_US
