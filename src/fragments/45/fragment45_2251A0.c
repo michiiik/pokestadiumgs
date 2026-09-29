@@ -437,7 +437,26 @@ s32 func_8AB01340(s16 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB01378.s")
+extern void func_8AC05E40(s32, void *, s32);
+extern void func_8AC06400(void *, void *);
+extern u8 D_8AB16548;
+void func_8AB01378(s32 arg0, void *arg1, s16 arg2) {
+    void *temp_v0;
+    void *temp_v1;
+    temp_v0 = (arg2 * 0x90) + &D_8AB16548;
+    *(void **)temp_v0 = arg1;
+    *(s16 *)((u8 *)temp_v0 + 8) = 0;
+    temp_v1 = (u8 *)temp_v0 + 0x18;
+    *(s16 *)((u8 *)temp_v0 + 0xA) = *(s16 *)((u8 *)arg1 + 8);
+    *(s16 *)((u8 *)temp_v0 + 0xC) = *(s16 *)((u8 *)arg1 + 0xA);
+    *(s16 *)((u8 *)temp_v0 + 0x12) = 0;
+    *(s16 *)((u8 *)temp_v0 + 0x14) = 0;
+    *(s16 *)((u8 *)temp_v0 + 0xE) = *(s16 *)((u8 *)temp_v0 + 0xA);
+    *(s16 *)((u8 *)temp_v0 + 0x10) = *(s16 *)((u8 *)temp_v0 + 0xC);
+    func_8AC05E40(arg0, *(void **)((u8 *)arg1 + 4), (s32)temp_v1);
+    func_8AC06400(temp_v1, arg1);
+    *(s32 *)((u8 *)temp_v0 + 0x8C) = 1;
+}
 #endif
 
 #ifdef VERSION_US
@@ -593,7 +612,13 @@ s32 func_8AB023EC(u32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB029BC.s")
+extern u8 D_8AB14680[];
+void func_8AB029BC(u16 count, u16 start) {
+    s32 i;
+    for (i = 0; i < count; i++) {
+        ((u16 *)D_8AB14680)[i] = start + i;
+    }
+}
 #endif
 
 #ifdef VERSION_US
