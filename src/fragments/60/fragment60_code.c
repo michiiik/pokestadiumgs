@@ -150,7 +150,35 @@ void func_86A01C5C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/60/fragment60_code/func_86A0405C.s")
+extern u8 D_86A0D560[];
+extern u8 D_86A443F0[];
+s32 func_86A0405C(s32 arg0) {
+    s32 count;
+    s32 index;
+    s32 value;
+    u8 *queue;
+    u8 *entry;
+    u8 *state;
+
+    index = *(s32 *)(D_86A443F0 + arg0 * 0x1C + 0x10C);
+    queue = D_86A443F0 + arg0 * 0x1C;
+    count = *(s32 *)(queue + 0x108);
+    if (count == 0) {
+        return -1;
+    }
+    *(s32 *)(queue + 0x108) = count - 1;
+    value = ((s32 *)(queue + 0x110))[index++];
+    if (index < 5) {
+        *(s32 *)(queue + 0x10C) = index;
+    } else {
+        *(s32 *)(queue + 0x10C) = 0;
+    }
+    state = D_86A443F0 + arg0 * 4;
+    entry = D_86A0D560 + value * 0x18;
+    *(s32 *)(state + 0xE8) -= *(s32 *)(entry + 4);
+    *(f32 *)(state + 0xD8) -= *(f32 *)(entry + 8);
+    return value;
+}
 #endif
 
 #ifdef VERSION_US
