@@ -21,7 +21,25 @@ void func_86100020(s8 *arg0, u8 arg1, f32 arg2, f32 arg3, f32 arg4) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_861000B8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86100120.s")
+extern s32 D_8610AD20;
+void func_86100120(void) {
+    typedef struct {
+        u8 pad[0x8F24];
+        f32 timer;
+        s32 entries[42];
+        s32 current;
+        s32 index;
+    } Context86100120;
+    s32 index;
+
+    ((Context86100120 *)(u32)D_8610AD20)->timer = 0.0f;
+    ((Context86100120 *)(u32)D_8610AD20)->index += 1;
+    if (((Context86100120 *)(u32)D_8610AD20)->index >= 0x2B) {
+        ((Context86100120 *)(u32)D_8610AD20)->index = 0;
+    }
+    index = ((Context86100120 *)(u32)D_8610AD20)->index;
+    ((Context86100120 *)(u32)D_8610AD20)->current = ((Context86100120 *)(u32)D_8610AD20)->entries[index];
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_861001A0.s")
 
