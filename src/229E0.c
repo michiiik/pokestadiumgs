@@ -643,7 +643,31 @@ void func_800277F0(u16 resource_id, void *context) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002781C.s")
+typedef struct { unsigned char field0, field1; unsigned short field2; unsigned char field4, field5; unsigned short field6; unsigned char field8, field9; unsigned short fieldA; void *context; float gain; unsigned char field14; } Candidate2781C;
+extern void func_80027BD4(u16, u8, Candidate2781C *);
+extern void func_80027E30(void);
+extern void func_80027F4C(void);
+void func_8002781C(u16 resource_id, u8 mode, void *context) {
+    Candidate2781C sound;
+    sound.context = context;
+    sound.gain = 1.0f;
+    if (resource_id == 0xFFD) goto caseFFD;
+    if (resource_id == 0xFFE) goto caseFFE;
+    if (resource_id != 0xFFF) goto normal;
+    func_80027E30();
+    return;
+caseFFE:
+    func_80027F4C();
+    return;
+caseFFD:
+    func_80027F4C();
+    func_80027E30();
+    return;
+normal:
+    sound.field5 = 0;
+    if (mode >= 4) mode = 3;
+    func_80027BD4(resource_id, mode, &sound);
+}
 #endif
 
 #ifdef VERSION_US
