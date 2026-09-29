@@ -102,7 +102,35 @@ void func_86006318(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_86006364.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_86006448.s")
+extern s32 func_87F08208(void *);
+extern void func_800226C0(s32);
+extern s32 StageContext_GetFadeMode(void);
+extern void func_860057D0(s32, f64);
+extern void func_86006318(s32 arg0);
+extern void func_86006364(s32);
+extern void func_86007648(s32 arg0, s32 arg1);
+extern u8 D_8600DE30[];
+void func_86006448(s32 arg0) {
+    typedef struct { unsigned int enabled : 1; unsigned int rest : 7; } Flags;
+    s32 i;
+
+    func_86006318(arg0);
+    func_86006364(arg0);
+    if (StageContext_GetFadeMode() == 0) {
+        switch (func_87F08208((void *)(arg0 + 0x7584))) {
+            case 1:
+                func_86007648(arg0, 1);
+                break;
+            case 2:
+                ((Flags *)(arg0 + 0x75C0))->enabled = 1;
+                func_800226C0(3);
+                break;
+        }
+    }
+    for (i = 0; i < *(s32 *)D_8600DE30; i++) {
+        func_860057D0(arg0, *(f64 *)(arg0 + 0x6890) / *(s32 *)D_8600DE30);
+    }
+}
 
 extern u8 D_8600DE30[];
 extern void func_86006364(s32);
@@ -134,7 +162,30 @@ void func_86006538(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_8600666C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_86006774.s")
+extern void func_860076EC(s32);
+extern s32 func_860065E8(s32);
+extern s32 func_87F00930(void);
+extern void func_87F006BC(void);
+extern void func_86005434(s32);
+extern void func_80028118(s32);
+extern u8 D_8600DE30[];
+void func_86006774(s32 arg0) {
+    s32 count;
+    s32 i;
+    func_860076EC(arg0);
+    if ((func_860065E8(arg0) == 0) && (func_87F00930() == 0)) {
+        func_87F006BC();
+        *(f64 *)(arg0 + 0x6888) += *(f64 *)(arg0 + 0x6890);
+        for (i = 0; i < (count = *(s32 *)D_8600DE30); i++) {
+            func_86005CB4(arg0, *(f64 *)(arg0 + 0x6890) / (f64)count, 1);
+        }
+        func_86005434(arg0);
+        if ((f64)*(s32 *)(D_8600DE30 + 0x20C) - *(f64 *)(arg0 + 0x6888) < 30.0) {
+            func_80028118(4);
+            *(u8 *)(arg0 + 0x75C0) = (*(u8 *)(arg0 + 0x75C0) & 0xFF) | 4;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_8600688C.s")
 
