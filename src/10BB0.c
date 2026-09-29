@@ -150,7 +150,58 @@ void func_8001064C(void *arg0)
 
 void func_8001067C(u8 *arg0) { *(s32 *)(arg0 + 0xC) = 0; *(s32 *)(arg0 + 4) = *(s32 *)arg0; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_8001068C.s")
+extern u8 D_8011F258;
+extern u8 D_8011F1F4;
+extern u8 D_8011F190;
+extern void func_800101D8(s32);
+extern void func_80012EAC(s32 arg0);
+extern u8 D_8011EC50;
+extern u8 D_8011ED60;
+extern u8 D_8011EE70;
+void func_8001068C(s32 arg0)
+{
+    typedef struct {
+        s32 value;
+        s32 other;
+        s16 unused;
+        s16 id;
+    } Record1068C;
+    u8 *state;
+    u32 count;
+    u8 *first;
+    s32 value;
+    u8 *flags;
+
+    switch (arg0) {
+    case 0:
+        state = &D_8011EC50;
+        flags = &D_8011F258;
+        break;
+    case 1:
+        state = &D_8011ED60;
+        flags = &D_8011F1F4;
+        break;
+    case 2:
+        state = &D_8011EE70;
+        flags = &D_8011F190;
+        break;
+    }
+    count = *(s32 *)state;
+    first = state + 4;
+    if (count != 0) {
+        value = *(s32 *)((u32)state + count * 0xC + 8);
+        (*(s32 *)(first + 0xC))--;
+        *(s32 *)(first + 4) = value;
+        if (arg0 == 2) {
+            func_80012EAC(((Record1068C *)(state + 8))[*(s32 *)state].id);
+        }
+        if (arg0 == 1) {
+            func_800101D8(((Record1068C *)(state + 8))[*(s32 *)state].id);
+        }
+        flags[*(s16 *)(state + *(s32 *)state * 0xC + 0x12)] = 0;
+        (*(s32 *)state)--;
+    }
+}
 
 extern u8 D_8011EBC0;
 extern u8 D_8011EBE0;
