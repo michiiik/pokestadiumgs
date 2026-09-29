@@ -198,7 +198,26 @@ void func_8AF0454C(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F1850/func_8AF04A54.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F1850/func_8AF04C50.s")
+extern void func_8AF0455C();
+extern void func_8004E308(s32, void *, s32);
+extern s32 func_8AC06D8C(s32, s32);
+void func_8AF04C50(void *arg0, s32 arg1, u8 *arg2) {
+    void *callback = func_8AF0455C;
+    *(s32 *)((u8 *)arg0 + 0x4E8) = *(s32 *)(arg2 + 0x14);
+    *(u8 **)((u8 *)arg0 + 0x528) = arg2;
+    while (1) {
+        s32 value = *(s32 *)(arg2 + 0x14);
+        s32 found;
+        if (value == 0) {
+            break;
+        }
+        found = func_8AC06D8C(arg1, value);
+        if (found != 0) {
+            func_8004E308(found, callback, (s32)arg2);
+        }
+        arg2 += 0x34;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F1850/func_8AF04CC8.s")
 
