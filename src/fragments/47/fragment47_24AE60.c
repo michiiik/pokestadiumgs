@@ -102,7 +102,35 @@ void func_86006318(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_86006364.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_86006448.s")
+extern s32 func_87F08208(void *);
+extern void func_800226C0(s32);
+extern s32 StageContext_GetFadeMode(void);
+extern void func_860057D0(s32, f64);
+extern void func_86006318(s32 arg0);
+extern void func_86006364(s32);
+extern void func_86007648(s32 arg0, s32 arg1);
+extern u8 D_8600DE30[];
+void func_86006448(s32 arg0) {
+    typedef struct { unsigned int enabled : 1; unsigned int rest : 7; } Flags;
+    s32 i;
+
+    func_86006318(arg0);
+    func_86006364(arg0);
+    if (StageContext_GetFadeMode() == 0) {
+        switch (func_87F08208((void *)(arg0 + 0x7584))) {
+            case 1:
+                func_86007648(arg0, 1);
+                break;
+            case 2:
+                ((Flags *)(arg0 + 0x75C0))->enabled = 1;
+                func_800226C0(3);
+                break;
+        }
+    }
+    for (i = 0; i < *(s32 *)D_8600DE30; i++) {
+        func_860057D0(arg0, *(f64 *)(arg0 + 0x6890) / *(s32 *)D_8600DE30);
+    }
+}
 
 extern u8 D_8600DE30[];
 extern void func_86006364(s32);
