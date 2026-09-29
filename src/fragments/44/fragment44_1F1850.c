@@ -130,7 +130,28 @@ s32 func_8AF03F14(s32 arg0, s32 arg1) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F1850/func_8AF03F4C.s")
+extern s32 D_8AF26470;
+extern s32 D_8AF2BF78;
+extern s32 func_8004C874(u16, u16);
+extern s32 func_800472E0(s32);
+s32 func_8AF03F4C(s32 arg0, void *arg1) {
+    union { s32 i; s32 pad[5]; } width;
+    s32 value;
+    switch (arg0) {
+    case 0:
+        D_8AF26470 = 0x1E0;
+        break;
+    case 1:
+        width.i = *(s8 *)((u8 *)arg1 + 0x26);
+        value = func_800472E0(func_8004C874(*(u16 *)((u8 *)arg1 + 0x30), *(u16 *)((u8 *)arg1 + 0x32)));
+        D_8AF26470 = *(s16 *)((u8 *)arg1 + 0xA) + value * width.i - D_8AF2BF78 - width.i;
+        if (D_8AF26470 <= 0) {
+            D_8AF26470 = 1;
+        }
+        break;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F1850/func_8AF03FF8.s")
 
@@ -177,9 +198,45 @@ void func_8AF0454C(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F1850/func_8AF04A54.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F1850/func_8AF04C50.s")
+extern void func_8AF0455C();
+extern void func_8004E308(s32, void *, s32);
+extern s32 func_8AC06D8C(s32, s32);
+void func_8AF04C50(void *arg0, s32 arg1, u8 *arg2) {
+    void *callback = func_8AF0455C;
+    *(s32 *)((u8 *)arg0 + 0x4E8) = *(s32 *)(arg2 + 0x14);
+    *(u8 **)((u8 *)arg0 + 0x528) = arg2;
+    while (1) {
+        s32 value = *(s32 *)(arg2 + 0x14);
+        s32 found;
+        if (value == 0) {
+            break;
+        }
+        found = func_8AC06D8C(arg1, value);
+        if (found != 0) {
+            func_8004E308(found, callback, (s32)arg2);
+        }
+        arg2 += 0x34;
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F1850/func_8AF04CC8.s")
+extern void func_8004E308(s32, void *, s32);
+extern s32 func_8AC06D8C(s32, s32);
+extern s32 func_8AF044C4(s32 arg0, void *arg1);
+void func_8AF04CC8(void *arg0, s32 arg1, u8 *arg2) {
+    void *callback = func_8AF044C4;
+    u8 *offset;
+    struct Pair {s32 x; s32 y;}; *(struct Pair *)((u8 *)arg0 + 0x4E0) = *(struct Pair *)(arg2 + 4); *(u8 **)((u8 *)arg0 + 0x528) = arg2;
+    while (1) {
+        s32 value = *(s32 *)(arg2 + 4);
+        s32 found;
+        if (value == 0) break;
+        offset = (u8 *)arg0 + 0x28;
+        found = func_8AC06D8C(arg1, value);
+        *(s32 *)(*(u8 **)(offset + 0x500) + 0x30) = found;
+        if (found != 0) func_8004E308(found, callback, (s32)offset);
+        arg2 += 0x34;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F1850/func_8AF04D68.s")
 
