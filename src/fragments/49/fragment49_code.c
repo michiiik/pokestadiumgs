@@ -2,11 +2,44 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86100020.s")
+void func_86100020(s8 *arg0, u8 arg1, f32 arg2, f32 arg3, f32 arg4) {
+    s32 value;
+
+    if (arg4 == arg3) {
+        value = 0;
+    } else {
+        value = (s32)(((arg2 - arg3) / (arg4 - arg3)) * (f32)arg1) - (arg1 >> 1) - 1;
+    }
+    if (value >= 0x80) {
+        value = 0x7F;
+    }
+    if (value < -0x80) {
+        value = -0x80;
+    }
+    *arg0 = value;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_861000B8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86100120.s")
+extern s32 D_8610AD20;
+void func_86100120(void) {
+    typedef struct {
+        u8 pad[0x8F24];
+        f32 timer;
+        s32 entries[42];
+        s32 current;
+        s32 index;
+    } Context86100120;
+    s32 index;
+
+    ((Context86100120 *)(u32)D_8610AD20)->timer = 0.0f;
+    ((Context86100120 *)(u32)D_8610AD20)->index += 1;
+    if (((Context86100120 *)(u32)D_8610AD20)->index >= 0x2B) {
+        ((Context86100120 *)(u32)D_8610AD20)->index = 0;
+    }
+    index = ((Context86100120 *)(u32)D_8610AD20)->index;
+    ((Context86100120 *)(u32)D_8610AD20)->current = ((Context86100120 *)(u32)D_8610AD20)->entries[index];
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_861001A0.s")
 
@@ -738,7 +771,33 @@ void func_86105F68(s32 arg0, s32 arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86106044.s")
+extern u8 D_8610A10C;
+extern void func_86105CD8(void);
+extern void func_8003F114(void *, s32, s32, s32);
+extern void func_8003F1DC(void *);
+extern void * func_87F025B8(void *, void *);
+extern s32 D_8610AD20;
+void func_86106044(f32 arg0) {
+    u8 *obj;
+    s32 *data;
+    void *node;
+
+    obj = func_87F025B8((u8 *)(u32)D_8610AD20 + 0x8914, (void *)func_86105CD8);
+    if (obj != NULL) {
+        data = *(s32 **)(obj + 0x20);
+        *(s32 **)(obj + 0x38) = data;
+        node = obj + 0x24;
+        *(f32 *)(obj + 0x48) = arg0;
+        *(f32 *)(obj + 0x50) = -100.0f;
+        *(f32 *)(obj + 0x4C) = 0.0f;
+        *(f32 *)(obj + 0x54) = 3.375f;
+        *(f32 *)(obj + 0x58) = 3.375f;
+        *(f32 *)(obj + 0x5C) = 3.375f;
+        func_8003F1DC(node);
+        func_8003F114(node, 0, -1, *(s32 *)((u8 *)(u32)D_8610AD20 + 0x6C8));
+        *data = D_8610A10C;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_861060F8.s")
 
@@ -866,7 +925,34 @@ void func_86107208(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_861072AC.s")
+extern f32 D_8610AC94;
+extern f32 D_8610AC98;
+extern void func_8003F114(void *, s32, s32, s32);
+extern void func_8003F1DC(void *);
+extern void func_8003F210(void *, s32);
+extern void func_86107208(void);
+extern void * func_87F025B8(void *, void *);
+extern s32 D_8610AD20;
+void func_861072AC(f32 arg0) {
+    u8 *obj;
+    f32 scale;
+    u8 *node;
+
+    obj = func_87F025B8((u8 *)(u32)D_8610AD20 + 0x8C40, (void *)func_86107208);
+    if (obj != NULL) {
+        node = obj + 0x24;
+        func_8003F1DC(node);
+        func_8003F114(node, 0, -1, *(s32 *)((u8 *)(u32)D_8610AD20 + 0x6DC));
+        scale = (func_8003F210(node, 0), D_8610AC94);
+        *(f32 *)(obj + 0x5C) = scale;
+        *(f32 *)(obj + 0x58) = scale;
+        *(f32 *)(obj + 0x54) = scale;
+        *(f32 *)(obj + 0x48) = arg0;
+        *(f32 *)(obj + 0x4C) = D_8610AC98;
+        *(f32 *)(obj + 0x50) = -100.0f;
+        *(s16 *)(obj + 0x44) = -0xFFF;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86107360.s")
 
