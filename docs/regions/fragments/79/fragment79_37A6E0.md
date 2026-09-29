@@ -165,3 +165,15 @@ func_841166C4: matched (call_sequence:state-machine:direct-fields), 1 iterations
 ## 2026-09-29
 
 func_84110118: time cap at 0.9405 (raw 0.5119) after 2401s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool yes
+
+## 2026-09-30
+
+func_84110718: plateau at 0.0 (raw None), mismatch unknown; tried families: (none); tie-pool no
+
+## 2026-09-30
+
+func_8411A310: matched (call_sequence:two-carriers:v0-v1-limit-order), 1 iterations, agent codex
+
+## 2026-09-30
+
+func_8411AEA8: matched (call_sequence:guard:index-first-pointer-add-exact), 1 iterations, agent codex
