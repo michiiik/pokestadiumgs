@@ -26,7 +26,24 @@ s32 func_86004E84(Func86004E84State *arg0) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_86004EA8.s")
+extern s32 func_86009C08(void *);
+extern s32 func_86009C58(void *, void *);
+extern s32 func_87C007DC(void *, void *);
+s32 func_86004EA8(void *arg0, void *arg1)
+{
+    if (func_86009C08(((u8 *) arg0) + 0x66B8) != 0)
+    {
+        return func_86009C58(((u8 *) arg0) + 0x66B8, arg1);
+    }
+    if (!arg1)
+    {
+    }
+    if (func_86009C08(((u8 *) arg0) + 0x6668) != 0)
+    {
+        return func_86009C58(((u8 *) arg0) + 0x6668, arg1);
+    }
+    return func_87C007DC(((u8 *) arg0) + 0x6848, arg1);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_86004F2C.s")
 
@@ -34,7 +51,21 @@ s32 func_86004E84(Func86004E84State *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_8600520C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_860053F8.s")
+typedef struct Func860053F8Record {
+    u8 pad_0000[0x1814];
+    s32 value;
+    u8 pad_1818[0x180];
+} Func860053F8Record;
+s32 func_860053F8(Func860053F8Record *arg0) {
+    s32 i;
+
+    for (i = 0; i < 3; i++) {
+        if (arg0[i].value != arg0[i + 1].value) {
+            return 0;
+        }
+    }
+    return 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_86005434.s")
 
