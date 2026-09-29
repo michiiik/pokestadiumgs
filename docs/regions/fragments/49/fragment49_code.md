@@ -61,3 +61,11 @@ func_86106044: matched (call_chain:position-first:all-position-stores-before-sca
 ## 2026-09-29
 
 func_861072AC: matched (call_chain:call-result-expression:scale-load-in-call-comma), 7 iterations, agent unbiased
+
+## 2026-09-30
+
+func_86102D50: matched (call_chain:joint-selection:explicit-else-for-both-latches), 2 iterations, agent unbiased
+
+## 2026-09-30
+
+func_86102C08: plateau at 0.0 (raw None), mismatch unknown; tried families: call_chain; tie-pool no; 6 iteration(s) with a suspicious identical batch-wide failure
