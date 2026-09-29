@@ -1072,7 +1072,24 @@ void func_841440B4(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_8414491C.s")
+extern s16 D_84186DF4;
+extern s16 D_8419D7A6;
+extern void *D_8419A0B0;
+extern void func_80048E30(void *, s32, s32, s32, s32);
+extern void func_800495F8(s32, s32, s32, void *);
+extern s32 func_8004C874(s32, s32);
+extern s16 D_84186DF0;
+extern s16 D_84186DF8;
+extern s16 D_8419D7A4[];
+void func_8414491C(struct R { u8 pad[10]; s16 x; s16 y; } *arg0) {
+    s32 image;
+    image = func_8004C874(0x10, 7);
+    func_800495F8(arg0->x + D_84186DF0, arg0->y + D_84186DF4, 1, (void *)image);
+    image = func_8004C874(0x10, 5);
+    func_80048E30(D_8419A0B0, arg0->x + D_8419D7A4[0], arg0->y + D_84186DF8, image, 1);
+    image = func_8004C874(0x10, 6);
+    func_80048E30(D_8419A0B0, (s32)D_8419D7A6 + arg0->x, arg0->y + D_84186DF8, image, 1);
+}
 #endif
 
 #ifdef VERSION_US
