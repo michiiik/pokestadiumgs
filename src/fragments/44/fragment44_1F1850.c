@@ -130,7 +130,28 @@ s32 func_8AF03F14(s32 arg0, s32 arg1) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F1850/func_8AF03F4C.s")
+extern s32 D_8AF26470;
+extern s32 D_8AF2BF78;
+extern s32 func_8004C874(u16, u16);
+extern s32 func_800472E0(s32);
+s32 func_8AF03F4C(s32 arg0, void *arg1) {
+    union { s32 i; s32 pad[5]; } width;
+    s32 value;
+    switch (arg0) {
+    case 0:
+        D_8AF26470 = 0x1E0;
+        break;
+    case 1:
+        width.i = *(s8 *)((u8 *)arg1 + 0x26);
+        value = func_800472E0(func_8004C874(*(u16 *)((u8 *)arg1 + 0x30), *(u16 *)((u8 *)arg1 + 0x32)));
+        D_8AF26470 = *(s16 *)((u8 *)arg1 + 0xA) + value * width.i - D_8AF2BF78 - width.i;
+        if (D_8AF26470 <= 0) {
+            D_8AF26470 = 1;
+        }
+        break;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F1850/func_8AF03FF8.s")
 
