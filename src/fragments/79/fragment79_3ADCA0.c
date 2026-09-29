@@ -903,7 +903,45 @@ void func_84142EB0(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_841430D0.s")
+extern s16 D_84186C4C[];
+extern s16 D_84186C64[];
+extern s16 D_84186C6C[];
+extern s16 D_84186C74[];
+extern u8 D_84186F94[];
+extern s32 func_80062EB0(u8, u8);
+extern void ParticleGfx_SetPrimColor_fragment79(u8 r, u8 g, u8 b, u8 a);
+extern void func_8413F32C(s16 arg0, s16 arg1, u8 arg2);
+extern void func_8413F390(s16, s16, s32, u16);
+extern void func_8413F498(s16 arg0, s16 arg1, s16 arg2, u16 arg3);
+extern u8 * D_84195208[];
+void func_841430D0(u8 *arg0) {
+    u8 **table;
+    u8 index;
+    s32 i;
+    u8 color;
+    u16 y;
+    s16 sy;
+    s16 *x1;
+    s16 *x2;
+    s16 *x3;
+    index = arg0[1];
+    table = &D_84195208[index];
+    i = 0; do {
+        color = (*table)[i + 5];
+        if (color == 0) break;
+        y = *(s16 *)(arg0 + 0xC) + D_84186C4C[i];
+        x1 = &D_84186C64[i];
+        x2 = &D_84186C6C[i];
+        x3 = &D_84186C74[i];
+        ParticleGfx_SetPrimColor_fragment79(D_84186F94[0], D_84186F94[1], D_84186F94[2], 0xFF);
+        sy = y;
+        func_8413F498((s16)(*(s16 *)(arg0 + 0xA) + *x1), sy, 0, (*table)[i + 9] & 0x3F);
+        func_8413F32C((s16)(*(s16 *)(arg0 + 0xA) + *x2), sy, 0xA);
+        func_8413F390((s16)(*(s16 *)(arg0 + 0xA) + *x3), sy, 0, func_80062EB0(color, (*table)[i + 9]) & 0x3F);
+        ParticleGfx_SetPrimColor_fragment79(0xFF, 0xFF, 0xFF, 0xFF);
+        i++;
+    } while (i != 4);
+}
 #endif
 
 #ifdef VERSION_US
