@@ -439,7 +439,24 @@ void func_82503748(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_13FFA0/func_82503750.s")
+extern Gfx *D_800D0510;
+extern Gfx D_82508760[];
+extern s32 D_82508D00;
+extern void func_82502120();
+extern void func_80046634();
+typedef struct { u8 r, g, b, a; } Func82503750RGBA;
+extern u8 D_82508F68[];
+void func_82503750(void) {
+    s32 pad[2];
+    Func82503750RGBA prim;
+    Func82503750RGBA env;
+
+    func_82502120(&prim, &env, *(s16 *)(D_82508F68 + 2), *(s16 *)(D_82508F68 + 0xC), *(s16 *)(*(u8 **)(D_82508F68 + 0x1C) + 0x1A));
+    gSPDisplayList(D_800D0510++, D_82508760);
+    gDPSetPrimColor(D_800D0510++, 0, 0xFF, prim.r, prim.g, prim.b, 0xFF);
+    gDPSetEnvColor(D_800D0510++, env.r, env.g, env.b, 0xFF);
+    func_80046634(D_82508D00);
+}
 #endif
 
 #ifdef VERSION_US
