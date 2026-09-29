@@ -69,3 +69,7 @@ func_86102D50: matched (call_chain:joint-selection:explicit-else-for-both-latche
 ## 2026-09-30
 
 func_86102C08: plateau at 0.0 (raw None), mismatch unknown; tried families: call_chain; tie-pool no; 6 iteration(s) with a suspicious identical batch-wide failure
+
+## 2026-09-30
+
+func_8610109C: matched (large_mixed:collision:flexible-record-index), 1 iterations, agent codex
