@@ -345,7 +345,21 @@ u8 func_84153718(u8 arg0) { u8 *state; u8 result; state = func_84154B30(arg0); r
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84153930.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84153A64.s")
+extern void func_84150B14(void *, u8, s32, s32, s32, s32);
+extern void * func_84154B64(s32);
+void func_84153A64(void *arg0, u8 arg1)
+{
+  u8 *state;
+  int new_var;
+  state = func_84154B64(arg1);
+  new_var = 4;
+  func_84154B64((1 - ((u32) arg1)) & 0xFF);
+  if ((((*((u16 *) (state + 0x28))) >= ((*((u16 *) (state + 0x2A))) >> 1)) && (state[0xD] < 0xD)) && ((*((u16 *) (state + 0x36))) < 0x3E7))
+  {
+    func_84150B14(arg0, arg1, 0xBB, 0xFF, 0, 0xD);
+    *(((u8 *) arg0) + new_var) |= 2;
+  }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84153B10.s")
 
