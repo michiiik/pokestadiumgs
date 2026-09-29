@@ -41,3 +41,23 @@ func_86107EBC: matched (call_sequence:raw-gfx:decomp-permuter-no-locals), 9 iter
 ## 2026-09-20
 
 func_86102E8C: matched (call_sequence:verified:cached-floats), 2 iterations, agent codex
+
+## 2026-09-29
+
+func_86100120: matched (bounded_lookup:typed-merge:reload-index-after-guard), 2 iterations, agent unbiased
+
+## 2026-09-29
+
+func_86100020: matched (constant_map:byte-parameter:direct-expression), 1 iterations, agent unbiased
+
+## 2026-09-29
+
+func_86105C30: plateau at 1.0 (raw 0.9524), mismatch immediate_drift; tried families: call_chain; tie-pool yes
+
+## 2026-09-29
+
+func_86106044: matched (call_chain:position-first:all-position-stores-before-scale), 2 iterations, agent unbiased
+
+## 2026-09-29
+
+func_861072AC: matched (call_chain:call-result-expression:scale-load-in-call-comma), 7 iterations, agent unbiased
