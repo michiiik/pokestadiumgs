@@ -42,7 +42,42 @@ s32 func_8680049C(s32 arg0, void *arg1) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/56/fragment56_code/func_86800508.s")
+extern f32 D_8682F304;
+extern f32 D_86807C60;
+extern f32 D_86807C84;
+extern s32 D_86808698[];
+extern s32 D_868086C0[];
+void func_86800508(void) {
+    s32 index;
+    f32 t;
+    s32 height;
+    s32 (*endpoint)[];
+    f32 threshold;
+    
+    
+    t = 0.0f;
+    threshold = D_8682F304;
+    do {
+        
+        do {
+            do {
+                
+                index = 0;
+                height = 500; do {
+                    t = 0.0f;
+                    for (;;) {
+                        if (((f32)height - D_86807C60 * t * t) <= threshold) {
+                            D_86808698[index++] = t / D_86807C84;
+                            break;
+                        }
+                        t += D_86807C84;
+                    }
+                    height += 10;
+                } while (&D_86808698[index] != *(endpoint = &D_868086C0));
+            } while (0);
+        } while (0);
+    } while (0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/56/fragment56_code/func_86800594.s")
 
