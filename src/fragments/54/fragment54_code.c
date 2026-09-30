@@ -72,7 +72,20 @@ void func_86600C70(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/54/fragment54_code/func_86601398.s")
+extern s32 D_86606730;
+extern u8 D_8660A990[];
+void func_86601398(s32 arg0) {
+    u8 *record = D_8660A990 + arg0 * 0x58;
+    *(s32 *)(record + 0xC) += 1;
+    *(s32 *)(record + 0x10) = 1;
+    *(s32 *)(record + 0x18) += 1;
+    if (*(s32 *)(record + 0x18) >= 0x20) {
+        *(s32 *)(record + 0x18) = 0x20;
+        if (D_86606730 != 0) {
+            *(s32 *)(record + 0xC) += 1;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -221,7 +234,34 @@ void func_86604084(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/54/fragment54_code/func_8660484C.s")
+extern u8 func_87F08208(void *);
+extern void StageContext_SetClearColor(s32);
+extern s32 StageFade_StartFromTransparent(s32);
+extern void func_800225C4(s32);
+extern void func_800226C0(s32);
+extern void func_800279C4(s32);
+extern u8 D_86606788;
+extern u8 D_86607320;
+void func_8660484C(void) {
+    u8 state = func_87F08208(&D_86607320);
+    switch (state ? state : state) {
+    case 1:
+        StageContext_SetClearColor(0xFFFF);
+        StageFade_StartFromTransparent(0x14);
+        *(s32 *)(&D_86606788 + 4) = 0xB;
+        func_800225C4(0x28);
+        func_800279C4(0xCF0B);
+        break;
+    case 2:
+        *(s32 *)(&D_86606788 + 4) = 2;
+        *(s32 *)(&D_86606788 + 0x78) = 1;
+        *(s32 *)(&D_86606788 + 0x8C) = 0;
+        StageContext_SetClearColor(0xFFFF);
+        StageFade_StartFromTransparent(0xA);
+        func_800226C0(3);
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -287,7 +327,18 @@ s32 func_86604954(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/54/fragment54_code/func_86605D5C.s")
+extern s32 D_8660A9B8;
+extern s32 D_8660AA10;
+extern s32 D_8660AA68;
+extern s32 D_8660AAC0;
+extern s16 D_8660746C;
+extern s16 D_866075D4;
+extern s16 D_8660773C;
+extern s16 D_866078A4;
+void func_86605D5C(void) {
+ s16 value = 0x17;
+if (D_8660A9B8 == 8) { D_8660746C = value; } if (D_8660AA10 == 8) { D_866075D4 = value; } if (D_8660AA68 == 8) { D_8660773C = value; } if (D_8660AAC0 == 8) { D_866078A4 = value; }
+}
 #endif
 
 #ifdef VERSION_US
