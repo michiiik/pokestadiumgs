@@ -100,7 +100,78 @@ void func_81307C94(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_81307D08.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_81307DC0.s")
+extern void func_81307D08(void *);
+extern s32 func_81307600(void *, s32);
+void func_81307DC0(void *arg0, s32 arg1, s32 arg2, s32 arg3, void *arg4) {
+    u8 *p;
+    struct State {
+    u8 pad0[0x137A8];
+    void * fA8;
+    s32 fAC;
+    void * fB0;
+    s16 fB4;
+    s16 fB6;
+    u8 pad137B8[0x8];
+    f32 fC0;
+    f32 fC4;
+    f32 fC8;
+    f32 fCC;
+    f32 fD0;
+    s16 fD4;
+    s16 fD6;
+    u16 fD8;
+    u8 pad137DA[0xE];
+    s32 fE8;
+    u8 pad137EC[0x8];
+    u8 fF4;
+    u8 fF5;
+    u8 pad137F6[0x1];
+    u8 fF7;
+    u8 fF8;
+    u8 fF9;
+    u8 fFA;
+    u8 fFB;
+    };
+
+    s32 i;
+    s32 j;
+    u8 *q;
+    ((struct State *)arg0)->fF9 = 0;
+    ((struct State *)arg0)->fAC = arg1;
+    ((struct State *)arg0)->fF7 = arg2;
+    ((struct State *)arg0)->fF5 = 1;
+    ((struct State *)arg0)->fB4 = 0;
+    ((struct State *)arg0)->fB6 = 0;
+    ((struct State *)arg0)->fF8 = arg3;
+    ((struct State *)arg0)->fA8 = (u8 *)arg0 + 0x188;
+    ((struct State *)arg0)->fD4 = 0;
+    ((struct State *)arg0)->fD6 = 1;
+    ((struct State *)arg0)->fD0 = 0.0f;
+    ((struct State *)arg0)->fB0 = arg4;
+    ((struct State *)arg0)->fC0 = 0.0f;
+    ((struct State *)arg0)->fC8 = 0.0f;
+    ((struct State *)arg0)->fC4 = 0.0f;
+    ((struct State *)arg0)->fCC = 0.0f;
+    ((struct State *)arg0)->fD8 = 0;
+    ((struct State *)arg0)->fFA = 0;
+    ((struct State *)arg0)->fE8 = 1;
+    p = (u8 *)arg0;
+    if (*(s32 *)(p + 0x137E8)) ((struct State *)arg0)->fFB = 15;
+    else ((struct State *)arg0)->fFB = 10;
+    q = p;
+    for (i = 0; i < 6; i++) {
+        *(void **)(q + 0x33B0 + 0x178) = p + 0x188 + ((i + 1) % 6) * 0x33B0;
+        *(void **)(q + 0x33B0 + 0x17C) = p + 0x188 + ((i + 5) % 6) * 0x33B0;
+        q += 0x33B0;
+    }
+    func_81307D08(arg0);
+    for (i = 15; i >= 0; i--) {
+        if (func_81307600(arg0, i) > 0) {
+            ((struct State *)arg0)->fF4 = i;
+            ((struct State *)arg0)->fD8 |= 1 << i;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_81308014.s")
 
