@@ -330,7 +330,34 @@ f32 func_81309E80(f32 arg0) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_81309EB0.s")
+extern f32 D_81311F90;
+extern f32 D_81311F9C;
+extern f32 func_81309E80(f32 arg0);
+extern f32 func_816092FC(void);
+void func_81309EB0(void *arg0) {
+    struct S { u8 pad[0x137C0]; f32 x; u8 pad4[4]; f32 y; u8 pad10[0x10]; s32 fy; s32 fx; };
+    struct S *s = arg0;
+    f32 dummy, tx, ty, step;
+    tx = s->fx ? D_81311F90 : 0.0f;
+    ty = s->fy ? D_81311F90 : 0.0f;
+    step = func_816092FC() * D_81311F9C;
+    if (func_81309E80(s->y - ty) < step) {
+        s->y = ty;
+        s->fy = 0;
+    } else if (ty < s->y) {
+        s->y -= step;
+    } else {
+        s->y += step;
+    }
+    if (func_81309E80(s->x - tx) < step) {
+        s->x = tx;
+        s->fx = 0;
+    } else if (tx < s->x) {
+        s->x -= step;
+    } else {
+        s->x += step;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130A044.s")
 
