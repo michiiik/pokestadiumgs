@@ -2,7 +2,26 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82200600.s")
+extern u8 D_8220D79C[];
+extern u8 D_8220D7A0[];
+extern u8 D_8220D7A4[];
+extern u8 D_8220D7A8[];
+s32 func_82200600(u8 *arg0, u16 arg1) {
+    typedef struct { u8 a, b, c; } Color;
+    u8 *src = NULL;
+    s32 result = 0;
+    switch (arg1) {
+    case 1: src = D_8220D79C; break;
+    case 2: src = D_8220D7A0; break;
+    case 3: src = D_8220D7A4; break;
+    case 4: src = D_8220D7A8; break;
+    }
+    if (src != NULL) {
+        *(Color *)arg0 = *(Color *)src;
+        result = 1;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82200694.s")
 
