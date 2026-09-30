@@ -872,7 +872,26 @@ extern void func_8AB01288(void); extern void func_8AB02D14(void); void func_8AB0
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB04AE4.s")
+extern u8 D_8AB141C8[];
+extern u8 D_8AB14458[];
+extern u8 D_8AB14268[];
+extern u8 D_8AB12668[];
+extern u8 D_8AB12678[];
+extern u8 D_8AB12CB0[];
+extern u8 D_8AB12F00[];
+void func_8AB04AE4(void) {
+    s32 i = 0;
+    s32 mask = -2;
+    do {
+        if (((void **)D_8AB12668)[i]) { ((u16 *)((void **)D_8AB12668)[i])[1] &= mask; }
+        if (((void **)D_8AB141C8)[i]) { ((u16 *)((void **)D_8AB141C8)[i])[1] &= mask; }
+        if (((void **)D_8AB12678)[i]) { ((u16 *)((void **)D_8AB12678)[i])[1] &= mask; }
+        if (((void **)D_8AB14458)[i]) { ((u16 *)((void **)D_8AB14458)[i])[1] &= mask; }
+        if (((void **)D_8AB14268)[i]) { ((u16 *)((void **)D_8AB14268)[i])[1] &= mask; }
+        if (*(void **)(D_8AB12CB0 + i * 0x94 + 0x14)) { ((u16 *)*(void **)(D_8AB12CB0 + i * 0x94 + 0x14))[1] &= mask; }
+        i++;
+    } while (D_8AB12F00 != D_8AB12CB0 + i * 0x94);
+}
 #endif
 
 #ifdef VERSION_US
