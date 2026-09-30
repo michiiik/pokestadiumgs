@@ -399,7 +399,17 @@ void func_8AB00FF8(s16 arg0, s16 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB01140.s")
+extern s32 func_8004C990(s32, s32);
+extern Gfx * D_800D0510;
+extern Gfx D_8AB11168[];
+void func_8AB01140(s16 arg0, s16 arg1) {
+    u8 color[8];
+    *(u32 *)color = 0x1E82FF80;
+    gSPDisplayList(D_800D0510++, D_8AB11168);
+    gDPSetEnvColor(D_800D0510++, ((struct {u8 r,g,b,a;} *)color)->r, ((struct {u8 r,g,b,a;} *)color)->g, ((struct {u8 r,g,b,a;} *)color)->b, ((struct {u8 r,g,b,a;} *)color)->a);
+    func_8004D1FC(func_8004C990(0x115, 1));
+    gSPTextureRectangle(D_800D0510++, arg0 << 2, arg1 << 2, (arg0 + 0x30) << 2, (arg1 + 0x30) << 2, G_TX_RENDERTILE, 0, 0, 0x400, 0x400);
+}
 #endif
 
 #ifdef VERSION_US
