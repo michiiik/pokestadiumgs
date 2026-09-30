@@ -394,7 +394,17 @@ s32 func_86604954(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/54/fragment54_code/func_866055C8.s")
+extern s32 D_8660679C;
+extern s32 D_8660A980[];
+extern u32 func_8003570C(void);
+void func_866055C8(void) {
+    s32 value;
+    D_8660A980[0] = D_8660679C / 1800;
+    value = D_8660679C - D_8660A980[0] * 1800;
+    D_8660A980[1] = value / 30;
+    value -= D_8660A980[1] * 30;
+    D_8660A980[2] = func_8003570C() % 3 + value * 100 / 30;
+}
 #endif
 
 #ifdef VERSION_US
