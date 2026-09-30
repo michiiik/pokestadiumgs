@@ -85,7 +85,7 @@ f64 func_86007F6C(void *arg0, void *arg1, s32 arg2, s32 arg3, void *arg4, s32 ar
 
 extern f64 D_8600DE78;
 extern void func_87C003BC(void *, void *, void *);
-extern void func_87C00718(void *, void *, f64);
+extern s32 func_87C00718(void *, void *, f64);
 extern void *func_87C002DC(void *, void *);
 extern f64 func_86007F6C(void *, void *, s32, s32, void *, s32, f64);
 extern void func_86007E4C(u8 *arg0, s32 arg1, s32 arg2);
@@ -121,7 +121,53 @@ f64 func_86008038(u8 *arg0, u8 *arg1, void *arg2, s32 arg3, f64 arg4, s32 arg5, 
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_86008224.s")
+extern void func_86007EB4(void *arg0);
+extern f64 func_86008038(u8 *arg0, u8 *arg1, void *arg2, s32 arg3, f64 arg4, s32 arg5, s32 arg6, f64 arg7);
+extern void * func_87C00160(u8 *, s32, u8 *);
+extern void func_87C00198();
+extern f64 func_87C00208(void *, void *);
+extern void * func_87C002A8(void *, void *, f64);
+extern f64 func_87C0068C(void *);
+extern s32 func_87C00718(void *, void *, f64);
+extern u8 D_8600DE30[];
+f64 func_86008224(u8 *arg0, u8 *arg1, f64 arg2, void *arg3) {
+    extern f64 func_86008038();
+    struct Vec24 { s32 x[6]; };
+    f64 dot;
+    f64 distance;
+    f64 result;
+    u8 spB0[0x18];
+    u8 sp98[0x18];
+    u8 sp80[0x18];
+    u8 sp68[0x18];
+    f64 delta;
+    u8 *axis = arg0 + 0x48;
+    func_87C00160(spB0, (s32)arg1, arg0);
+    dot = func_87C00208(spB0, axis);
+    func_87C00160(sp98, (s32)spB0, func_87C002A8(sp80, axis, dot));
+    distance = func_87C0068C(sp98);
+    if (*(f64 *)(arg1 + 0xC8) < distance) return 0.0;
+    if ((*(f64 *)(arg0 + 0xC8) < dot) && (dot < *(f64 *)(arg0 + 0xD0))) {
+        delta = distance - *(f64 *)(arg1 + 0xC8);
+        func_87C00198(arg3, arg0, func_87C002A8(sp80, axis, dot));
+        func_87C00160(sp68, (s32)arg3, arg1);
+        func_87C00718(sp68, sp68, 1.0);
+        result = (f64)func_86008038(arg0, arg1, sp68, arg3, arg2, *(f64 *)(D_8600DE30 + 0x248), *(f64 *)(D_8600DE30 + 0x280));
+        func_87C00160(arg1, (s32)arg1, func_87C002A8(sp80, sp68, -delta * *(f64 *)(arg0 + 0xE0) / (*(f64 *)(arg0 + 0xE0) + *(f64 *)(arg1 + 0xE0))));
+        func_87C00160(arg0, (s32)arg0, func_87C002A8(sp80, sp68, *(f64 *)(arg1 + 0xE0) * delta / (*(f64 *)(arg0 + 0xE0) + *(f64 *)(arg1 + 0xE0))));
+        func_86007EB4(arg0);
+        func_86007EB4(arg1);
+        return result;
+    }
+    if (*(f64 *)(arg1 + 0xC8) * *(f64 *)(arg1 + 0xC8) < func_87C006B4(arg0 + 0x98, arg1)) return 0.0;
+    *(struct Vec24 *)arg3 = *(struct Vec24 *)(arg0 + 0x98);
+    func_87C00160(sp68, (s32)arg3, arg1);
+    func_87C00718(sp68, sp68, 1.0);
+    result = (f64)func_86008038(arg0, arg1, sp68, arg3, arg2, *(f64 *)(D_8600DE30 + 0x248), *(f64 *)(D_8600DE30 + 0x280));
+    func_87C00160(arg1, (s32)arg1, func_87C002A8(sp80, sp68, *(f64 *)(arg1 + 0xC8) - func_87C006F0(arg3, arg1)));
+    func_86007EB4(arg1);
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_8600853C.s")
 
@@ -261,7 +307,7 @@ s32 func_86009EF8(void *arg0, f64 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_86009F28.s")
 
-extern void func_87C00718(void *, void *, f64);
+extern s32 func_87C00718(void *, void *, f64);
 extern s32 func_86009C08(void *arg0, void *arg1);
 extern void * func_87C00160(u8 *, s32, u8 *);
 s32 func_86009FB8(void *arg0, void *arg1, void *arg2) {
