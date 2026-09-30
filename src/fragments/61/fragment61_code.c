@@ -2,7 +2,25 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/61/fragment61_code/func_86B00020.s")
+extern void GeoCamera_SetPerspective(void *, f32, f32, f32);
+extern f32 __sinf(f32);
+extern f32 __cosf(f32);
+extern void func_80038E14(void *, s32, f32, f32, f32, f32, f32, s32);
+extern void func_87C037C0(void *, void *);
+extern f32 D_86B0D168;
+extern f32 D_86B0D16C;
+extern f32 D_86B0D170;
+extern f32 D_86B0D174;
+extern s32 D_86B17EAC;
+extern u8 D_86B17E2C;
+#pragma REWRITE_FUNCTION_WORD(func_86B00020, 0x70, 0x00002825, 0x24050000)
+s32 func_86B00020(s32 arg0, void *arg1) {
+    s16 pad;
+    GeoCamera_SetPerspective(arg1, D_86B0D174, 100.0f, 12800.0f);
+    func_80038E14(arg1, 0, (__sinf(D_86B0D16C) * D_86B0D168) + 400.0f + D_86B0D170, __cosf(D_86B0D16C) * D_86B0D168, 0.0f, D_86B0D170, 0.0f, 0);
+    if (D_86B17EAC == 0) { func_87C037C0(&D_86B17E2C, arg1); }
+    return 1;
+}
 #endif
 
 #ifdef VERSION_US
@@ -441,7 +459,36 @@ void func_86B08E08(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/61/fragment61_code/func_86B08E10.s")
+extern f64 D_86B0DFD0;
+extern f32 D_86B0DFD8;
+extern void func_86B057B0(void);
+extern void func_87F02684(void *);
+extern u8 D_86B0E9A0;
+extern u8 D_86B0EE60;
+extern u8 D_86B17A78[];
+extern u8 * D_86B181C0;
+void func_86B08E10(void) {
+    s32 old;
+    *(f32 *)(D_86B17A78 + 0xF8) = (f32)((f64)*(f32 *)(D_86B17A78 + 0xF8) - D_86B0DFD0);
+    if (*(f32 *)(D_86B17A78 + 0xF8) < 0.0f) {
+        *(f32 *)(D_86B17A78 + 0xF8) += D_86B0DFD8;
+    }
+    func_86B057B0();
+    old = *(s32 *)D_86B17A78;
+    *(s32 *)(D_86B17A78 + 0x284) = 0;
+    if ((*(s32 *)D_86B17A78)++ < 4) {
+        *(s32 *)D_86B181C0 = 4;
+    } else if (*(s32 *)(D_86B17A78 + 0x354) != 0) {
+        *(s32 *)(D_86B17A78 + 0x44) = 1;
+        *(s32 *)D_86B181C0 = 8;
+    } else if (*(s32 *)(D_86B17A78 + 0x44) == 0) {
+        func_87F02684(&D_86B0E9A0);
+        func_87F02684(&D_86B0EE60);
+        *(s32 *)(D_86B17A78 + 0x354) = 1;
+    } else {
+        *(s32 *)(D_86B17A78 + 0x44) = 2;
+    }
+}
 #endif
 
 void func_86B08F18(void) {
@@ -596,7 +643,31 @@ void func_86B0B9A0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/61/fragment61_code/func_86B0BA28.s")
+extern u8 *D_8009491C;
+extern void func_8003CD84(void);
+extern s32 func_8004C990(s32, s32);
+extern u8 * func_8004CA60(u8 *);
+extern Gfx * D_800D0510;
+extern s32 D_86B0E7F4;
+void func_86B0BA28(s32 arg0, s32 arg1) {
+    s32 pad0[2];
+    s32 alpha;
+    s32 temp_v0;
+    s32 pad2[2];
+    Gfx *pkt;
+    if (arg0 == 5) {
+        temp_v0 = (s32)D_8009491C;
+        alpha = *(s32 *)(temp_v0 + 0x14);
+        temp_v0 = func_8004C990(0x133, 0);
+        gDPPipeSync(D_800D0510++);
+        gDPSetEnvColor(D_800D0510++, 0, 0, 0, alpha);
+        gDPSetCombine(D_800D0510++, 0xFCFFD3FF, 0xFFFEFE38);
+        pkt = D_800D0510++;
+        gSPSegment(pkt, 0xF, func_8004CA60((u8 *)temp_v0));
+        gSPDisplayList(D_800D0510++, D_86B0E7F4);
+        func_8003CD84();
+    }
+}
 #endif
 
 #ifdef VERSION_US
