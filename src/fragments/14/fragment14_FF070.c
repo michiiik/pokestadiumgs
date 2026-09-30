@@ -380,7 +380,68 @@ void func_81309ACC(u8 *arg0) {
     *(f32 *)(arg0 + 0x137D0) = 0.0f;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_81309AE0.s")
+extern void func_8130924C(void *);
+extern void func_81309394(void *);
+extern void func_813095C4(void *, s32, s32);
+extern void func_81309740(void *, s32, s32);
+extern f32 func_816092FC(void);
+extern u8 D_800CE060[];
+void func_81309AE0(void *arg0) {
+    struct State {
+        u8 pad0[0x137D4];
+        s16 current;
+        s16 target;
+        u8 padD8[0xC];
+        s32 dirty;
+        u8 padE8[0xD];
+        u8 mode;
+        u8 padF6;
+        u8 index;
+    };
+    u8 *record;
+    s32 mode;
+
+    record = D_800CE060 + ((struct State *)arg0)->index * 0x28;
+    mode = ((struct State *)arg0)->mode;
+    if (((struct State *)arg0)->target > 0) {
+        ((struct State *)arg0)->current += func_816092FC();
+        if (((struct State *)arg0)->current >= ((struct State *)arg0)->target) {
+            ((struct State *)arg0)->mode = 3;
+            if (mode == 8) {
+                
+                if ((*(u16 *)(record + 0xC)) & 4) {
+                    func_81309740(arg0, 2, 1);
+                } else if ((*(u16 *)(record + 0xC)) & 0x400) {
+                    func_81309740(arg0, 8, 1);
+                }
+            }
+            if (mode == 7) {
+                if (*(u16 *)(record + 6) & 0x10) {
+                    func_8130924C(arg0);
+                }
+            }
+        }
+    } else {
+        ((struct State *)arg0)->current = ((struct State *)arg0)->current - func_816092FC();
+        if (((struct State *)arg0)->current <= ((struct State *)arg0)->target) {
+            ((struct State *)arg0)->mode = 3;
+            if (mode == 8) {
+                
+                if ((*(u16 *)(record + 0xC)) & 8) {
+                    func_813095C4(arg0, 2, 1);
+                } else if ((*(u16 *)(record + 0xC)) & 0x800) {
+                    func_813095C4(arg0, 8, 1);
+                }
+            }
+            if (mode == 7) {
+                if (*(u16 *)(record + 6) & 0x20) {
+                    func_81309394(arg0);
+                }
+            }
+        }
+    }
+    ((struct State *)arg0)->dirty = 1;
+}
 
 void func_81309D00(u32 arg0)
 {
