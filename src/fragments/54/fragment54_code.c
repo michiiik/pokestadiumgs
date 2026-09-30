@@ -327,7 +327,18 @@ s32 func_86604954(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/54/fragment54_code/func_86605D5C.s")
+extern s32 D_8660A9B8;
+extern s32 D_8660AA10;
+extern s32 D_8660AA68;
+extern s32 D_8660AAC0;
+extern s16 D_8660746C;
+extern s16 D_866075D4;
+extern s16 D_8660773C;
+extern s16 D_866078A4;
+void func_86605D5C(void) {
+ s16 value = 0x17;
+if (D_8660A9B8 == 8) { D_8660746C = value; } if (D_8660AA10 == 8) { D_866075D4 = value; } if (D_8660AA68 == 8) { D_8660773C = value; } if (D_8660AAC0 == 8) { D_866078A4 = value; }
+}
 #endif
 
 #ifdef VERSION_US
