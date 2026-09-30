@@ -113,7 +113,86 @@ void func_86601398(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/54/fragment54_code/func_86601F70.s")
+extern u8 D_866098A0[];
+extern u8 D_86607410[];
+extern s32 D_86606B80[][4];
+extern s32 D_86606BC0[][4];
+extern s32 D_86606B84[];
+extern s32 D_86606BC4[];
+extern f32 D_86606718;
+extern void func_8003F210(void *, s32);
+extern void ModelAnim_SetEventFrame(void *, s32);
+extern void func_8003F3BC(void *, s32);
+extern void func_80027A28(u16, u8);
+extern u8 D_8660A990[];
+void func_86601F70(void *arg0, s32 arg1) {
+    u8 *record;
+    u8 *position;
+
+    record = D_8660A990 + arg1 * 0x58;
+    *(s32 *)(record + 0x4C) = 1;
+    position = D_866098A0 + arg1 * 0x168;
+    *(f32 *)(position + 0x24) = (f32)D_86606B80[arg1][*(s32 *)(record + 8)];
+    *(f32 *)(position + 0x28) = (f32)D_86606BC0[arg1][*(s32 *)(record + 8)];
+    *(f32 *)(position + 0x34) = D_86606718;
+    *(f32 *)(position + 0x30) = D_86606718;
+    switch (*(s32 *)(record + 8)) {
+    case 1:
+        if (*(s32 *)(record + 0x28) == 1) {
+            break;
+        }
+        *(s32 *)(record + 0x28) = 1;
+        func_8003F210(D_86607410 + arg1 * 0x168, 3);
+        ModelAnim_SetEventFrame(arg0, 0);
+        func_8003F3BC(arg0, 3);
+        *(f32 *)(position + 0x24) = (f32)*(s32 *)((u8 *)D_86606B84 + arg1 * 0x10);
+        *(f32 *)(position + 0x28) = (f32)*(s32 *)((u8 *)D_86606BC4 + arg1 * 0x10);
+        func_80027A28((u16)(arg1 + 0x2F04), (u8)arg1);
+        break;
+    case 2:
+        if (*(s32 *)(record + 0x28) == 2) {
+            break;
+        }
+        *(s32 *)(record + 0x28) = 2;
+        func_8003F210(D_86607410 + arg1 * 0x168, 4);
+        ModelAnim_SetEventFrame(arg0, 0);
+        func_8003F3BC(arg0, 4);
+        func_80027A28((u16)(arg1 + 0x2F04), (u8)arg1);
+        break;
+    case 3:
+        if (*(s32 *)(record + 0x28) == 3) {
+            break;
+        }
+        *(s32 *)(record + 0x28) = 3;
+        func_8003F210(D_86607410 + arg1 * 0x168, 1);
+        ModelAnim_SetEventFrame(arg0, 0);
+        func_8003F3BC(arg0, 1);
+        func_80027A28((u16)(arg1 + 0x2F04), (u8)arg1);
+        break;
+    case 4:
+        if (*(s32 *)(record + 0x28) == 4) {
+            break;
+        }
+        *(s32 *)(record + 0x28) = 4;
+        func_8003F210(D_86607410 + arg1 * 0x168, 2);
+        ModelAnim_SetEventFrame(arg0, 0);
+        func_8003F3BC(arg0, 2);
+        func_80027A28((u16)(arg1 + 0x2F04), (u8)arg1);
+        break;
+    default:
+        *(s32 *)(record + 0x4C) = 0;
+        *(f32 *)(position + 0x34) = 0.0f;
+        *(f32 *)(position + 0x30) = 0.0f;
+        break;
+    }
+    if (*(s32 *)(record + 0x10) == -1) {
+        *(s32 *)(record + 0x38) = 1;
+        *(s32 *)(record + 0x4C) = 0;
+        *(f32 *)(position + 0x34) = 0.0f;
+        *(f32 *)(position + 0x30) = 0.0f;
+        *(s32 *)(record + 0x28) = -1;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -315,7 +394,17 @@ s32 func_86604954(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/54/fragment54_code/func_866055C8.s")
+extern s32 D_8660679C;
+extern s32 D_8660A980[];
+extern u32 func_8003570C(void);
+void func_866055C8(void) {
+    s32 value;
+    D_8660A980[0] = D_8660679C / 1800;
+    value = D_8660679C - D_8660A980[0] * 1800;
+    D_8660A980[1] = value / 30;
+    value -= D_8660A980[1] * 30;
+    D_8660A980[2] = func_8003570C() % 3 + value * 100 / 30;
+}
 #endif
 
 #ifdef VERSION_US
