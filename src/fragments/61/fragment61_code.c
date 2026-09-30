@@ -643,7 +643,31 @@ void func_86B0B9A0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/61/fragment61_code/func_86B0BA28.s")
+extern u8 *D_8009491C;
+extern void func_8003CD84(void);
+extern s32 func_8004C990(s32, s32);
+extern u8 * func_8004CA60(u8 *);
+extern Gfx * D_800D0510;
+extern s32 D_86B0E7F4;
+void func_86B0BA28(s32 arg0, s32 arg1) {
+    s32 pad0[2];
+    s32 alpha;
+    s32 temp_v0;
+    s32 pad2[2];
+    Gfx *pkt;
+    if (arg0 == 5) {
+        temp_v0 = (s32)D_8009491C;
+        alpha = *(s32 *)(temp_v0 + 0x14);
+        temp_v0 = func_8004C990(0x133, 0);
+        gDPPipeSync(D_800D0510++);
+        gDPSetEnvColor(D_800D0510++, 0, 0, 0, alpha);
+        gDPSetCombine(D_800D0510++, 0xFCFFD3FF, 0xFFFEFE38);
+        pkt = D_800D0510++;
+        gSPSegment(pkt, 0xF, func_8004CA60((u8 *)temp_v0));
+        gSPDisplayList(D_800D0510++, D_86B0E7F4);
+        func_8003CD84();
+    }
+}
 #endif
 
 #ifdef VERSION_US
