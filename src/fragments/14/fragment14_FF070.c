@@ -100,7 +100,78 @@ void func_81307C94(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_81307D08.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_81307DC0.s")
+extern void func_81307D08(void *);
+extern s32 func_81307600(void *, s32);
+void func_81307DC0(void *arg0, s32 arg1, s32 arg2, s32 arg3, void *arg4) {
+    u8 *p;
+    struct State {
+    u8 pad0[0x137A8];
+    void * fA8;
+    s32 fAC;
+    void * fB0;
+    s16 fB4;
+    s16 fB6;
+    u8 pad137B8[0x8];
+    f32 fC0;
+    f32 fC4;
+    f32 fC8;
+    f32 fCC;
+    f32 fD0;
+    s16 fD4;
+    s16 fD6;
+    u16 fD8;
+    u8 pad137DA[0xE];
+    s32 fE8;
+    u8 pad137EC[0x8];
+    u8 fF4;
+    u8 fF5;
+    u8 pad137F6[0x1];
+    u8 fF7;
+    u8 fF8;
+    u8 fF9;
+    u8 fFA;
+    u8 fFB;
+    };
+
+    s32 i;
+    s32 j;
+    u8 *q;
+    ((struct State *)arg0)->fF9 = 0;
+    ((struct State *)arg0)->fAC = arg1;
+    ((struct State *)arg0)->fF7 = arg2;
+    ((struct State *)arg0)->fF5 = 1;
+    ((struct State *)arg0)->fB4 = 0;
+    ((struct State *)arg0)->fB6 = 0;
+    ((struct State *)arg0)->fF8 = arg3;
+    ((struct State *)arg0)->fA8 = (u8 *)arg0 + 0x188;
+    ((struct State *)arg0)->fD4 = 0;
+    ((struct State *)arg0)->fD6 = 1;
+    ((struct State *)arg0)->fD0 = 0.0f;
+    ((struct State *)arg0)->fB0 = arg4;
+    ((struct State *)arg0)->fC0 = 0.0f;
+    ((struct State *)arg0)->fC8 = 0.0f;
+    ((struct State *)arg0)->fC4 = 0.0f;
+    ((struct State *)arg0)->fCC = 0.0f;
+    ((struct State *)arg0)->fD8 = 0;
+    ((struct State *)arg0)->fFA = 0;
+    ((struct State *)arg0)->fE8 = 1;
+    p = (u8 *)arg0;
+    if (*(s32 *)(p + 0x137E8)) ((struct State *)arg0)->fFB = 15;
+    else ((struct State *)arg0)->fFB = 10;
+    q = p;
+    for (i = 0; i < 6; i++) {
+        *(void **)(q + 0x33B0 + 0x178) = p + 0x188 + ((i + 1) % 6) * 0x33B0;
+        *(void **)(q + 0x33B0 + 0x17C) = p + 0x188 + ((i + 5) % 6) * 0x33B0;
+        q += 0x33B0;
+    }
+    func_81307D08(arg0);
+    for (i = 15; i >= 0; i--) {
+        if (func_81307600(arg0, i) > 0) {
+            ((struct State *)arg0)->fF4 = i;
+            ((struct State *)arg0)->fD8 |= 1 << i;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_81308014.s")
 
@@ -268,13 +339,109 @@ void func_813098B0(void *arg0) {
     func_800226C0(0x12);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_81309928.s")
+extern void func_81308F54(void *);
+extern void func_8130924C(void *);
+extern void func_81309394(void *);
+extern void func_81309820(void *);
+extern void func_81309740(void *, s32, s32);
+extern void func_8130911C(void *arg0);
+extern void func_813091E0(void *arg0);
+extern void func_813094E0(void *arg0);
+extern void func_81309550(void *arg0);
+extern void func_813095C4(void *, s32, s32);
+extern void func_813096B4(void *arg0);
+extern void func_813098B0(void *arg0);
+extern u8 D_800CE060[];
+void func_81309928(struct State *arg0) {
+    struct State { u8 pad[0x137D0]; f32 value; u8 gap[0x10]; s32 dirty; u8 gap2[0xF]; u8 idx; };
+    u8 *record;
+    u16 a1;
+    s32 v1;
+    record = D_800CE060 + arg0->idx * 0x28;
+    a1 = *(u16 *)(record + 0xC);
+    arg0->value = 16.0f;
+    v1 = *(u16 *)(record + 0xC);
+    if (v1 & 0x8000) { func_81308F54(arg0); }
+    else if (v1 & 0x4000) { func_8130911C(arg0); }
+    else if (v1 & 0x1000) { func_813091E0(arg0); }
+    else if (a1 & 0x10) { func_8130924C(arg0); }
+    else if (a1 & 0x20) { func_81309394(arg0); }
+    else if (v1 & 0x200) { func_813094E0(arg0); }
+    else if (v1 & 0x100) { func_81309550(arg0); }
+    else if (v1 & 0x800) { func_813096B4(arg0); }
+    else if (v1 & 0x400) { func_81309820(arg0); }
+    else if (v1 & 0x8) { func_813095C4(arg0, 2, 0); }
+    else if (v1 & 0x4) { func_81309740(arg0, 2, 0); }
+    else if (a1 & 0x1) { func_813098B0(arg0); }
+    arg0->dirty = 1;
+}
 
 void func_81309ACC(u8 *arg0) {
     *(f32 *)(arg0 + 0x137D0) = 0.0f;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_81309AE0.s")
+extern void func_8130924C(void *);
+extern void func_81309394(void *);
+extern void func_813095C4(void *, s32, s32);
+extern void func_81309740(void *, s32, s32);
+extern f32 func_816092FC(void);
+extern u8 D_800CE060[];
+void func_81309AE0(void *arg0) {
+    struct State {
+        u8 pad0[0x137D4];
+        s16 current;
+        s16 target;
+        u8 padD8[0xC];
+        s32 dirty;
+        u8 padE8[0xD];
+        u8 mode;
+        u8 padF6;
+        u8 index;
+    };
+    u8 *record;
+    s32 mode;
+
+    record = D_800CE060 + ((struct State *)arg0)->index * 0x28;
+    mode = ((struct State *)arg0)->mode;
+    if (((struct State *)arg0)->target > 0) {
+        ((struct State *)arg0)->current += func_816092FC();
+        if (((struct State *)arg0)->current >= ((struct State *)arg0)->target) {
+            ((struct State *)arg0)->mode = 3;
+            if (mode == 8) {
+                
+                if ((*(u16 *)(record + 0xC)) & 4) {
+                    func_81309740(arg0, 2, 1);
+                } else if ((*(u16 *)(record + 0xC)) & 0x400) {
+                    func_81309740(arg0, 8, 1);
+                }
+            }
+            if (mode == 7) {
+                if (*(u16 *)(record + 6) & 0x10) {
+                    func_8130924C(arg0);
+                }
+            }
+        }
+    } else {
+        ((struct State *)arg0)->current = ((struct State *)arg0)->current - func_816092FC();
+        if (((struct State *)arg0)->current <= ((struct State *)arg0)->target) {
+            ((struct State *)arg0)->mode = 3;
+            if (mode == 8) {
+                
+                if ((*(u16 *)(record + 0xC)) & 8) {
+                    func_813095C4(arg0, 2, 1);
+                } else if ((*(u16 *)(record + 0xC)) & 0x800) {
+                    func_813095C4(arg0, 8, 1);
+                }
+            }
+            if (mode == 7) {
+                if (*(u16 *)(record + 6) & 0x20) {
+                    func_81309394(arg0);
+                }
+            }
+        }
+    }
+    ((struct State *)arg0)->dirty = 1;
+}
 
 void func_81309D00(u32 arg0)
 {
