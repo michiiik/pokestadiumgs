@@ -385,11 +385,31 @@ void func_8AB00BC4(s16 arg0, s16 arg1, s16 arg2, u8 arg3, u8 arg4, u8 arg5) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB00FF8.s")
+extern s32 func_8004C990(s32, s32);
+extern Gfx * D_800D0510;
+extern Gfx D_8AB11168[];
+void func_8AB00FF8(s16 arg0, s16 arg1) {
+    u8 color[8];
+    *(u32 *)color = 0xFF500080;
+    gSPDisplayList(D_800D0510++, D_8AB11168);
+    gDPSetEnvColor(D_800D0510++, ((struct {u8 r,g,b,a;} *)color)->r, ((struct {u8 r,g,b,a;} *)color)->g, ((struct {u8 r,g,b,a;} *)color)->b, ((struct {u8 r,g,b,a;} *)color)->a);
+    func_8004D1FC(func_8004C990(0x115, 0));
+    gSPTextureRectangle(D_800D0510++, arg0 << 2, arg1 << 2, (arg0 + 0x30) << 2, (arg1 + 0x30) << 2, G_TX_RENDERTILE, 0, 0, 0x400, 0x400);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB01140.s")
+extern s32 func_8004C990(s32, s32);
+extern Gfx * D_800D0510;
+extern Gfx D_8AB11168[];
+void func_8AB01140(s16 arg0, s16 arg1) {
+    u8 color[8];
+    *(u32 *)color = 0x1E82FF80;
+    gSPDisplayList(D_800D0510++, D_8AB11168);
+    gDPSetEnvColor(D_800D0510++, ((struct {u8 r,g,b,a;} *)color)->r, ((struct {u8 r,g,b,a;} *)color)->g, ((struct {u8 r,g,b,a;} *)color)->b, ((struct {u8 r,g,b,a;} *)color)->a);
+    func_8004D1FC(func_8004C990(0x115, 1));
+    gSPTextureRectangle(D_800D0510++, arg0 << 2, arg1 << 2, (arg0 + 0x30) << 2, (arg1 + 0x30) << 2, G_TX_RENDERTILE, 0, 0, 0x400, 0x400);
+}
 #endif
 
 #ifdef VERSION_US
@@ -852,7 +872,26 @@ extern void func_8AB01288(void); extern void func_8AB02D14(void); void func_8AB0
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB04AE4.s")
+extern u8 D_8AB141C8[];
+extern u8 D_8AB14458[];
+extern u8 D_8AB14268[];
+extern u8 D_8AB12668[];
+extern u8 D_8AB12678[];
+extern u8 D_8AB12CB0[];
+extern u8 D_8AB12F00[];
+void func_8AB04AE4(void) {
+    s32 i = 0;
+    s32 mask = -2;
+    do {
+        if (((void **)D_8AB12668)[i]) { ((u16 *)((void **)D_8AB12668)[i])[1] &= mask; }
+        if (((void **)D_8AB141C8)[i]) { ((u16 *)((void **)D_8AB141C8)[i])[1] &= mask; }
+        if (((void **)D_8AB12678)[i]) { ((u16 *)((void **)D_8AB12678)[i])[1] &= mask; }
+        if (((void **)D_8AB14458)[i]) { ((u16 *)((void **)D_8AB14458)[i])[1] &= mask; }
+        if (((void **)D_8AB14268)[i]) { ((u16 *)((void **)D_8AB14268)[i])[1] &= mask; }
+        if (*(void **)(D_8AB12CB0 + i * 0x94 + 0x14)) { ((u16 *)*(void **)(D_8AB12CB0 + i * 0x94 + 0x14))[1] &= mask; }
+        i++;
+    } while (D_8AB12F00 != D_8AB12CB0 + i * 0x94);
+}
 #endif
 
 #ifdef VERSION_US
