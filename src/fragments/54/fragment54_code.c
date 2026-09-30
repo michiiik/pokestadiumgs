@@ -72,7 +72,20 @@ void func_86600C70(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/54/fragment54_code/func_86601398.s")
+extern s32 D_86606730;
+extern u8 D_8660A990[];
+void func_86601398(s32 arg0) {
+    u8 *record = D_8660A990 + arg0 * 0x58;
+    *(s32 *)(record + 0xC) += 1;
+    *(s32 *)(record + 0x10) = 1;
+    *(s32 *)(record + 0x18) += 1;
+    if (*(s32 *)(record + 0x18) >= 0x20) {
+        *(s32 *)(record + 0x18) = 0x20;
+        if (D_86606730 != 0) {
+            *(s32 *)(record + 0xC) += 1;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
