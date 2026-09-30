@@ -169,7 +169,23 @@ void func_864018B0(u8 *arg0, u8 *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/52/fragment52_27E4E0/func_86401D1C.s")
+void func_86401920(void *, void *);
+extern u8 * D_86416C00;
+void func_86401D1C(void) {
+    u8 *base = D_86416C00 + 0x7D0;
+    int i, j;
+    u8 *p2;
+    int n = 4;
+    int m = 3;
+    for (i = 0; i != m; i++) {
+        p2 = base + 0x18C;
+        for (j = i + 1; j < n; j++) {
+            func_86401920(base, p2);
+            p2 += 0x18C;
+        }
+        base += 0x18C;
+    }
+}
 #endif
 
 #ifdef VERSION_US
