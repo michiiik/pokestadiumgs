@@ -2,7 +2,26 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82200600.s")
+extern u8 D_8220D79C[];
+extern u8 D_8220D7A0[];
+extern u8 D_8220D7A4[];
+extern u8 D_8220D7A8[];
+s32 func_82200600(u8 *arg0, u16 arg1) {
+    typedef struct { u8 a, b, c; } Color;
+    u8 *src = NULL;
+    s32 result = 0;
+    switch (arg1) {
+    case 1: src = D_8220D79C; break;
+    case 2: src = D_8220D7A0; break;
+    case 3: src = D_8220D7A4; break;
+    case 4: src = D_8220D7A8; break;
+    }
+    if (src != NULL) {
+        *(Color *)arg0 = *(Color *)src;
+        result = 1;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82200694.s")
 
@@ -141,7 +160,20 @@ s32 func_8220158C(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82201960.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82201AE0.s")
+extern f32 D_80087E50[];
+void func_82201AE0(u8 *arg0) {
+    s16 deltaX;
+    s16 deltaY;
+    s16 y;
+
+    deltaX = *(s16 *)(arg0 + 0x14) - *(s16 *)(arg0 + 0x10);
+    deltaY = *(s16 *)(arg0 + 0x16) - *(s16 *)(arg0 + 0x12);
+    *(s16 *)(arg0 + 2) += 0x400;
+    y = *(s16 *)(arg0 + 0x12);
+    *(s16 *)(arg0 + 0x1E) = (s16)(s32)(D_80087E50[(u16)*(s16 *)(arg0 + 2) >> 4] * 10.0f + (f32)y);
+    *(s16 *)(arg0 + 0x20) = *(s16 *)(arg0 + 0x1C) + deltaX;
+    *(s16 *)(arg0 + 0x22) = *(s16 *)(arg0 + 0x1E) + deltaY;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82201B70.s")
 
