@@ -6355,7 +6355,17 @@ s32 func_8004239C(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800427B8.s")
+extern s32 func_800425C0(s32, void *);
+
+s32 func_800427B8(s32 arg0) {
+    void *sp1C;
+    s32 sp18 = 0;
+
+    if (osRecvMesg((OSMesgQueue *)(u32)(arg0 + 0x50), &sp1C, 0) != -1) {
+        sp18 = func_800425C0(arg0, sp1C);
+    }
+    return sp18;
+}
 #endif
 
 #ifdef VERSION_US
@@ -6371,7 +6381,7 @@ s32 func_8004239C(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_800425C0(s32, void *);
+extern s32 func_800425C0(s32, void *);
 
 void func_800428F8(s32 arg0) {
     void *sp1C;
