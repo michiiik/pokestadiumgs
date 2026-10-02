@@ -6369,15 +6369,39 @@ s32 func_800427B8(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80042808.s")
+s32 func_80042808(s32 arg0) {
+    void *sp1C;
+    s32 sp18 = 0;
+
+    if (osRecvMesg((OSMesgQueue *)(u32)(arg0 + 0x70), &sp1C, 0) != -1) {
+        sp18 = func_800425C0(arg0, sp1C);
+    }
+    return sp18;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80042858.s")
+s32 func_80042858(s32 arg0) {
+    void *sp1C;
+    s32 sp18 = 0;
+
+    if (osRecvMesg((OSMesgQueue *)(u32)(arg0 + 0x90), &sp1C, 0) != -1) {
+        sp18 = func_800425C0(arg0, sp1C);
+    }
+    return sp18;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800428A8.s")
+s32 func_800428A8(s32 arg0) {
+    void *sp1C;
+    s32 sp18 = 0;
+
+    if (osRecvMesg((OSMesgQueue *)(u32)(arg0 + 0xB0), &sp1C, 0) != -1) {
+        sp18 = func_800425C0(arg0, sp1C);
+    }
+    return sp18;
+}
 #endif
 
 #ifdef VERSION_US
