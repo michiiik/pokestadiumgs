@@ -75,7 +75,44 @@ s32 func_816021E8(u8 *arg0, u8 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81602940.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81602AEC.s")
+extern f32 D_8160C208;
+extern f32 func_816092FC(void);
+s32 func_81602AEC(u8 *arg0, u8 *arg1) {
+    s32 changed = (arg0 == 0) * 0;
+    s32 step = (s32)(func_816092FC() * D_8160C208);
+    if (step <= 0) step = 1;
+    if (arg1[0] != arg0[0]) {
+        changed = 1;
+        if ((arg0[0] - arg1[0] > 0 ? arg0[0] - arg1[0] : -(arg0[0] - arg1[0])) <= step) {
+            arg0[0] = arg1[0];
+        } else if (arg0[0] < arg1[0]) {
+            arg0[0] = arg0[0] + step;
+        } else if (arg1[0] < arg0[0]) {
+            arg0[0] = arg0[0] - step;
+        }
+    }
+    if (arg1[1] != arg0[1]) {
+        changed = 1;
+        if ((arg0[1] - arg1[1] > 0 ? arg0[1] - arg1[1] : -(arg0[1] - arg1[1])) <= step) {
+            arg0[1] = arg1[1];
+        } else if (arg0[1] < arg1[1]) {
+            arg0[1] = arg0[1] + step;
+        } else if (arg1[1] < arg0[1]) {
+            arg0[1] = arg0[1] - step;
+        }
+    }
+    if (arg1[2] != arg0[2]) {
+        changed = 1;
+        if ((arg0[2] - arg1[2] > 0 ? arg0[2] - arg1[2] : -(arg0[2] - arg1[2])) <= step) {
+            arg0[2] = arg1[2];
+        } else if (arg0[2] < arg1[2]) {
+            arg0[2] = arg0[2] + step;
+        } else if (arg1[2] < arg0[2]) {
+            arg0[2] = arg0[2] - step;
+        }
+    }
+    return changed;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81602C68.s")
 
@@ -251,7 +288,23 @@ void func_81605CDC(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) { func_8160
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81605D24.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81605F94.s")
+extern void *D_8160BD78[];
+extern void func_81602240(f32, f32, f32, f32, s32, s32, f32, f32);
+extern void func_8004D1FC(void *);
+extern u8 D_80094E38[];
+extern u8 D_80094F50[];
+extern u32 D_800D0510;
+void func_81605F94(s32 arg0, s32 arg1, s32 arg2, u8 *arg3, f32 arg4) {
+    Gfx *gfx;
+    gSPDisplayList((*(Gfx **)&D_800D0510)++, D_80094E38);
+    func_8004D1FC(D_8160BD78[arg2]);
+    gDPSetCombine((*(Gfx **)&D_800D0510)++, 0x119623, 0xFF2FFFFF);
+    gfx = (*(Gfx **)&D_800D0510)++;
+    gfx->words.w0 = 0xFA00FFFF;
+    gfx->words.w1 = _SHIFTL(arg3[1], 16, 8) | _SHIFTL(arg3[2], 8, 8) | _SHIFTL(arg3[0], 24, 8) | _SHIFTL((u32)(255.0f * arg4), 0, 8);
+    func_81602240((f32)arg0, (f32)arg1, 48.0f, 24.0f, 0, 0, 1.0f, 1.0f);
+    gSPDisplayList((*(Gfx **)&D_800D0510)++, D_80094F50);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_8160615C.s")
 
@@ -379,7 +432,25 @@ void *func_8160771C(u16 arg0, u16 arg1, u16 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81608044.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_816083A4.s")
+extern s32 func_8000731C(void);
+extern void *Gfx_AllocDisplayList(s32);
+extern void Gfx_SetViewportDimensions(void *, s16, s16);
+extern Mtx D_80094890;
+extern u32 D_800D0510;
+void func_816083A4(void) {
+    s16 *dims;
+    Mtx *matrix;
+    Vp *viewport;
+    dims = (s16 *)func_8000731C();
+    matrix = Gfx_AllocDisplayList(0x40);
+    viewport = Gfx_AllocDisplayList(0x10);
+    Gfx_SetViewportDimensions(viewport, dims[2], dims[3]);
+    gSPViewport((*(Gfx **)&D_800D0510)++, (u32)viewport & 0x1FFFFFFF);
+    guOrtho(matrix, 0.5f, (f32)(u16)dims[2] - 0.5f, (f32)(u16)dims[3] - 0.5f, 0.5f, -2.0f, 2.0f, 1.0f);
+    gSPPerspNormalize((*(Gfx **)&D_800D0510)++, 0xFFFF);
+    gSPMatrix((*(Gfx **)&D_800D0510)++, (u32)matrix & 0x1FFFFFFF, G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
+    gSPMatrix((*(Gfx **)&D_800D0510)++, (u32)&D_80094890 & 0x1FFFFFFF, G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+}
 
 extern void *D_8160BDB4;
 void func_8160852C(void) {
@@ -504,7 +575,25 @@ void *func_81609530(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_8160955C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_816098B0.s")
+struct Color098 { u8 r, g, b; };
+extern s32 func_8004CA10(void *);
+extern s32 func_8004CA24(void *);
+extern void func_8004D19C(s32, s32, void *, s32, s32);
+extern u8 D_80094E38[];
+extern u8 D_80094F50[];
+void func_816098B0(void *arg0, struct Color098 *arg1) {
+    s32 x;
+    s32 y;
+    gSPDisplayList(GFX_DL++, D_80094E38);
+    gDPSetRenderMode(GFX_DL++, 0x0F0A4000, 0);
+    gDPSetEnvColor(GFX_DL++, arg1->r, arg1->g, arg1->b, 0xFF);
+    for (x = 0; x < 640; x += func_8004CA10(arg0)) {
+        for (y = 0; y < 480; y += func_8004CA24(arg0)) {
+            func_8004D19C(x, y, arg0, 0, 0);
+        }
+    }
+    gSPDisplayList(GFX_DL++, D_80094F50);
+}
 
 extern f32 D_8160C2D4;
 extern f32 D_8160C2D8;
