@@ -339,7 +339,38 @@ void func_86B05484(f32 arg0, f32 arg1, f32 arg2, s32 arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/61/fragment61_code/func_86B05610.s")
+extern f64 D_86B0DDF0;
+extern u8 D_86B17A88[];
+extern f32 __cosf(f32);
+extern f32 __sinf(f32);
+extern u8 D_86B17A78[];
+s32 func_86B05610(f32 arg0) {
+    u8 *ptr;
+    u8 *end;
+    f32 x;
+    f32 y;
+    f64 threshold;
+    f32 dx;
+    f32 dy;
+    f32 cx;
+    f32 sy;
+    x = __cosf(arg0) * 180.0f;
+    y = __sinf(arg0) * 180.0f;
+    ptr = D_86B17A78; threshold = D_86B0DDF0; end = D_86B17A88;
+    do {
+        if (*(s32 *)(ptr + 0x34) == 0x10 || *(s32 *)(ptr + 0x34) == 0x11 || *(s32 *)(ptr + 0x34) == 0x12 || *(s32 *)(ptr + 0x34) == 0) {
+            cx = __cosf(*(f32 *)(ptr + 0x58)) * 180.0f;
+            sy = __sinf(*(f32 *)(ptr + 0x58)) * 180.0f;
+            dx = x - cx;
+            dy = y - sy;
+            if ((f64)((dx * dx) + (dy * dy)) < threshold) {
+                return 1;
+            }
+        }
+        ptr += 4;
+    } while (ptr != end);
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -452,7 +483,39 @@ void func_86B08CEC(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/61/fragment61_code/func_86B08CF4.s")
+extern f64 D_86B0DFC0;
+extern f32 D_86B0DFC8;
+extern void func_86B057B0(void);
+extern void func_86B081B4(void);
+extern void func_87F02684(void *);
+extern u8 D_86B0E9A0;
+extern u8 D_86B0EE60;
+extern u8 D_86B17A78[];
+extern u8 * D_86B181C0;
+void func_86B08CF4(void) {
+    s32 state;
+    *(f32 *)(D_86B17A78 + 0xF8) = (f32)((f64)*(f32 *)(D_86B17A78 + 0xF8) - D_86B0DFC0);
+    if (*(f32 *)(D_86B17A78 + 0xF8) < 0.0f) {
+        *(f32 *)(D_86B17A78 + 0xF8) += D_86B0DFC8;
+    }
+    func_86B057B0();
+    func_86B081B4();
+    state = *(s32 *)(D_86B17A78 + 0x44);
+    if (state == 1) {
+        if ((*(s32 *)(D_86B17A78 + 0x34) == 2 || *(s32 *)(D_86B17A78 + 0x34) == 0) &&
+            (*(s32 *)(D_86B17A78 + 0x38) == 2 || *(s32 *)(D_86B17A78 + 0x38) == 0) &&
+            (*(s32 *)(D_86B17A78 + 0x3C) == 2 || *(s32 *)(D_86B17A78 + 0x3C) == 0) &&
+            (*(s32 *)(D_86B17A78 + 0x40) == 2 || *(s32 *)(D_86B17A78 + 0x40) == 0)) {
+            *(s32 *)(D_86B17A78 + 0x44) = 2;
+            state = 2;
+        }
+    }
+    if (state == 0) {
+        func_87F02684(&D_86B0E9A0);
+        func_87F02684(&D_86B0EE60);
+        *(s32 *)D_86B181C0 = 6;
+    }
+}
 #endif
 
 void func_86B08E08(void) {
