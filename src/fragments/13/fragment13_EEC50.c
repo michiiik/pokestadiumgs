@@ -415,7 +415,21 @@ void func_82405494(void *arg0, void *arg1, void *arg2, f32 arg3)
  do { temp_fv0 = *((f32 *) (((u8 *) arg1) + 0)); *((f32 *) (((u8 *) arg0) + 0)) = (f32) ((((*((f32 *) (((u8 *) arg2) + 0))) - temp_fv0) * arg3) + temp_fv0); temp_fv1 = *((f32 *) (((u8 *) arg1) + 4)); new_var = arg3; *((f32 *) (((u8 *) arg0) + 4)) = (f32) ((((*((f32 *) (((u8 *) arg2) + 4))) - temp_fv1) * new_var) + temp_fv1); temp_fa1 = *((f32 *) (((u8 *) arg1) + 8)); *((f32 *) (((u8 *) arg0) + 8)) = (f32) ((((*((f32 *) (((u8 *) arg2) + 8))) - temp_fa1) * new_var) + temp_fa1); } while (0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_824054E4.s")
+extern void func_82405244(void *, void *, void *, f32);
+extern void func_82405494(void *arg0, void *arg1, void *arg2, f32 arg3);
+void func_824054E4(u8 *arg0, u8 *arg1, u8 *arg2, f32 arg3) {
+    s32 i;
+    for (i = 0; i < 0x20; i += 0x10) {
+        func_82405244(arg0 + i, arg1 + i, arg2 + i, arg3);
+        func_82405494(arg0 + i + 4, arg1 + i + 4, arg2 + i + 4, arg3);
+    }
+    func_82405244(arg0 + 0x20, arg1 + 0x20, arg2 + 0x20, arg3);
+    func_82405244(arg0 + 0x23, arg1 + 0x23, arg2 + 0x23, arg3);
+    func_82405244(arg0 + 0x26, arg1 + 0x26, arg2 + 0x26, arg3);
+    func_82405244(arg0 + 0x29, arg1 + 0x29, arg2 + 0x29, arg3);
+    func_82405244(arg0 + 0x2C, arg1 + 0x2C, arg2 + 0x2C, arg3);
+    arg0[0x2F] = (u32)((f32)(u32)arg1[0x2F] + (f32)((s32)arg2[0x2F] - (s32)arg1[0x2F]) * arg3);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82405718.s")
 
