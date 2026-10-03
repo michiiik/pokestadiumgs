@@ -232,7 +232,25 @@ void func_86302404(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/51/fragment51_275E40/func_86302634.s")
+extern f32 D_863074D0;
+extern f32 D_863074D4;
+extern f32 D_863074D8;
+extern void func_87F06240(s32, s32, f32, f32, s32);
+void func_86302634(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6) {
+    s32 x;
+    s32 y;
+
+    if (arg0 < 10) {
+        x = arg1 + arg3;
+        y = arg2 + arg4;
+        func_87F06240(x, y, D_863074D0, D_863074D0, arg0 % 10);
+    } else {
+        x = arg1 + arg5;
+        y = arg2 + arg6;
+        func_87F06240(x, y, D_863074D4, D_863074D4, arg0 / 10);
+        func_87F06240(x + 13, y, D_863074D8, D_863074D8, arg0 % 10);
+    }
+}
 #endif
 
 #ifdef VERSION_US
