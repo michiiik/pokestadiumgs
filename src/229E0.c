@@ -966,7 +966,23 @@ void func_8002A9CC(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002A9D8.s")
+extern u8 *D_800D1B78[];
+extern u8 *D_800D1B80[];
+extern char D_800A3A60[];
+extern char D_800A3A6C[];
+extern char D_800A3A84[];
+extern char D_800A3A94[];
+extern char D_800A3AA4[];
+void func_8002A9D8(void) {
+    s32 i;
+    for (i = 0; i < 2; i++) {
+        osSyncPrintf(D_800A3A60, i);
+        osSyncPrintf(D_800A3A6C, D_800D1B78[i][1]);
+        osSyncPrintf(D_800A3A84, D_800D1B80[i][0]);
+        osSyncPrintf(D_800A3A94, D_800D1B80[i][3]);
+        osSyncPrintf(D_800A3AA4, D_800D1B80[i][4]);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -5123,7 +5139,36 @@ extern s32 D_801263E0; void ModelAnim_ResetCurveContext(void) { D_801263E0 = -1;
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003E7B0.s")
+extern void * func_80003240();
+void func_8003E7B0(S1_unk_D_86002F58_004_000_040_raw *arg0, u16 arg1, s32 arg2) {
+    extern S1_unk_D_800ABCC0 D_801263B0[2];
+    S1_unk_D_800ABCC0 *ctx;
+    S1_unk_D_86002F58_004_000_040_004 *data;
+    data = arg0->unk_04;
+    ++D_801263E0;
+    if (D_801263E0 < 2) {
+        ctx = &D_801263B0[D_801263E0];
+        if (arg0->unk_04 != 0) {
+            if (arg2 != 0) {
+                arg0->unk_08.raw = ModelAnim_AdvanceCurveFrame(arg0, arg1);
+            }
+            arg0->unk_12 = arg1;
+            ctx->isActive = 1;
+            ctx->flags = arg0->unk_04->unk_00;
+            ctx->currentFrame = arg0->unk_08.raw >> 16;
+            ctx->curveData = data;
+            ctx->channels = func_80003240(data->unk_0C);
+            ctx->translationValues = func_80003240(data->unk_10);
+            ctx->rotationValues = func_80003240(data->unk_14);
+            ctx->scaleValues = func_80003240(data->unk_18);
+            if (ctx->currentFrame < 0) {
+                ctx->currentFrame = 0;
+            }
+        } else {
+            ctx->isActive = 0;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -5516,7 +5561,20 @@ void geo_layout_cmd_2A(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FB2C.s")
+extern s16 D_80126518;
+extern s16 D_8012651A;
+extern s16 D_8012651E;
+void func_8003FB2C(void) {
+    s16 temp_v0;
+    D_8012651A = D_8012651E;
+    temp_v0 = D_8012651A - 1;
+    D_8012651A = temp_v0;
+    D_8012651E = D_80126458[temp_v0] & 0xFFFF;
+    D_80126518 = (u32)D_80126458[D_8012651A] >> 16;
+    temp_v0 = D_8012651A - 1;
+    D_8012651A = temp_v0;
+    D_80126520 = D_80126458[temp_v0];
+}
 #endif
 
 #ifdef VERSION_US
