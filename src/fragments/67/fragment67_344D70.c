@@ -852,7 +852,41 @@ void func_8290BC84(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290CFD8.s")
+extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
+extern void func_80037120(void *, void *, s16 *, s16 *, s16 *);
+extern void func_8003F2C4(s32, s32, s32);
+extern void func_8290A208(s32);
+extern void func_8290B264(void);
+extern u8 D_8291A7C0;
+void func_8290CFD8(void) {
+    f32 sp6C[3];
+    s16 pad6A;
+    s16 sp68;
+    s16 sp66;
+    s16 sp64;
+    s32 i;
+
+    for (i = 0; i < 2; i++) {
+        if ((&D_8291A7C0)[i * 0x1A4 + 0x1A2] == 1) {
+            Vec3f_SetComponentsDuplicate(sp6C, *(f32 *)(&D_8291A7C0 + i * 0x1A4 + 0x16C), *(f32 *)(&D_8291A7C0 + i * 0x1A4 + 0x170), *(f32 *)(&D_8291A7C0 + i * 0x1A4 + 0x174));
+            func_8290E438((f32 *)(&D_8291A7C0 + i * 0x1A4 + 0x16C), i);
+            (*(u16 *)(&D_8291A7C0 + i * 0x1A4 + 0x1A0))++;
+            if (*(u16 *)(&D_8291A7C0 + i * 0x1A4 + 0x1A0) < 0x97) {
+                func_80037120(sp6C, &D_8291A7C0 + i * 0x1A4 + 0x16C, &sp68, &sp66, &sp64);
+                *(s16 *)(&D_8291A7C0 + i * 0x1A4 + 0x192) = sp64;
+                func_8290A208(i);
+            }
+            if (*(u16 *)(&D_8291A7C0 + i * 0x1A4 + 0x1A0) == 0) {
+                func_8003F2C4(*(s32 *)(&D_8291A7C0 + i * 0x1A4), (s32)(&D_8291A7C0 + i * 0x1A4 + 4), 2);
+            }
+            (*(u16 *)(&D_8291A7C0 + i * 0x1A4 + 0x1A0))++;
+            if (ModelAnim_IsFinished(&D_8291A7C0 + i * 0x1A4 + 4)) {
+                func_8003F2C4(*(s32 *)(&D_8291A7C0 + i * 0x1A4), (s32)(&D_8291A7C0 + i * 0x1A4 + 4), 0);
+            }
+        }
+    }
+    func_8290B264();
+}
 #endif
 
 #ifdef VERSION_US
