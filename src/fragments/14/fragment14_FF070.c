@@ -1008,7 +1008,42 @@ void func_8130BA48(void *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130BADC.s")
+extern void func_800226C0(s32);
+extern void func_8130B91C(void *arg0);
+extern void func_8130B95C(void *arg0);
+extern void func_8130B9A0(void *arg0);
+extern void func_8130B9F4(void *arg0);
+extern void func_8130BA48(void *arg0);
+extern u8 D_800CE060[];
+s32 func_8130BADC(void *arg0) {
+    struct S { u8 pad[0xE8F0]; f32 f0; f32 f1; f32 f2; f32 f3; u8 pad1[0xC]; s32 word; u8 pad2[2]; u8 state; };
+    u8 *p = (u8 *)arg0;
+    u8 *base = p + 0x8000;
+    u8 *record;
+    u16 flags;
+    record = D_800CE060 + base[0x6910] * 0x28;
+    ((struct S *)arg0)->f0 = 16.0f;
+    ((struct S *)arg0)->f3 = 0.0f;
+    ((struct S *)arg0)->f2 = (f32)base[0x6915];
+    ((struct S *)arg0)->f1 = (f32)base[0x6914];
+    flags = *(u16 *)(record + 0xC);
+    if (flags & 0x8000) {
+        func_8130BA48(arg0);
+    } else if (flags & 0x800) {
+        func_8130B9A0(arg0);
+    } else if (flags & 0x400) {
+        func_8130B9F4(arg0);
+    } else if (flags & 8) {
+        func_8130B91C(arg0);
+    } else if (flags & 4) {
+        func_8130B95C(arg0);
+    } else if (flags & 0x4000) {
+        func_800226C0(3);
+        ((struct S *)arg0)->word = 1;
+        ((struct S *)arg0)->state = 12;
+    }
+    return 1;
+}
 
 extern u8 D_800CE060[];
 extern s32 func_8160B6E4(s32 arg0);
