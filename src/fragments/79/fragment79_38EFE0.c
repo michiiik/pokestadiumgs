@@ -853,7 +853,8 @@ void func_84123CD8(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84123CF4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84123E74.s")
+extern f32 D_84189D34;
+void func_84123E74(u8 *arg0) { f32 v = *(f32 *)(arg0 + 0x34); f32 s = D_84189D34; *(f32 *)(arg0 + 0x5E8) = v + v; *(f32 *)(arg0 + 0x5EC) = *(f32 *)(arg0 + 0x38) * s;*(f32 *)(arg0 + 0x5E4) = *(f32 *)(arg0 + 0x30) * s;*(u8 *)(arg0 + 0x623) = 0; *(f32 *)(arg0 + 0x60C) = 0.0f; }
 
 extern f32 Math_StepToF(f32, f32, f32, f32);
 extern f32 D_84189D38;
