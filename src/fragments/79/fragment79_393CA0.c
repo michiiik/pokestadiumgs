@@ -1442,7 +1442,79 @@ void BattleAnim_Table_84185F10_004(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412A454.s")
+extern void BattleAnim_Table_84186004_070(void);
+extern s32 func_84125080();
+extern void func_84125484(u8 arg0);
+extern void func_841254E0(void);
+extern void func_84134CBC(u8 arg0, u8 arg1);
+extern void func_84134DD8(u8 arg0);
+extern void func_84135068(u8 arg0, u8 arg1);
+extern void func_841350AC(u8 arg0, u8 arg1, u8 arg2);
+extern void func_84136CA8(void);
+extern u8 D_841951BC;
+extern u8 D_841951BF;
+extern u8 D_841951C3;
+extern void * D_841951F8[];
+extern u8 * D_84195208[];
+void func_8412A454(void) {
+    u8 choice;
+    u8 timer;
+    if (D_84195208[D_841951BC][0xF] & 4) {
+        D_84195208[D_841951BC][0x12]--;
+        if (D_84195208[D_841951BC][0x12] != 0) goto update;
+        D_84195208[D_841951BC][0xF] &= ~4;
+        *(s32 *)(D_84195208[D_841951BC] + 0x4C) = 0;
+        if (D_841951BF == 0xFB) {
+            func_84135068(0, 0);
+            func_84134CBC(D_841951BC, 0x28);
+            func_84134DD8(D_841951BF);
+            func_84136CA8();
+        }
+        return;
+    }
+    D_84195208[D_841951BC][0xF] |= 4;
+    switch (D_841951C3) {
+    case 0x2C:
+    case 0x4D:
+        D_84195208[D_841951BC][0x12] = 1;
+        *(s32 *)(D_84195208[D_841951BC] + 0x4C) = 2;
+        break;
+    case 0x68:
+        do { choice = func_84125080() & 3; } while (choice == 0);
+        choice = (u8)(choice - 1);
+        if (choice > 0) {
+            D_84195208[D_841951BC][0x12] = choice;
+            choice = (u8)(choice + 1);
+            *(s32 *)(D_84195208[D_841951BC] + 0x4C) = choice;
+        } else {
+            D_84195208[D_841951BC][0xF] &= ~4;
+            *(s32 *)(D_84195208[D_841951BC] + 0x4C) = 1;
+            func_841350AC(1, 0, 0);
+            return;
+        }
+        break;
+    case 0x9A:
+        if (((u8 *)D_841951F8[D_841951BC])[8] < 2) {
+            D_84195208[D_841951BC][0xF] &= ~4;
+            func_84135068(0, 0);
+            BattleAnim_Table_84186004_070();
+            func_841254E0();
+            return;
+        }
+        D_84195208[D_841951BC][0x12] = ((u8 *)D_841951F8[D_841951BC])[8] - 1;
+        *(s32 *)(D_84195208[D_841951BC] + 0x4C) = ((u8 *)D_841951F8[D_841951BC])[9];
+        break;
+    default:
+        choice = func_84125080() & 3;
+        if (choice >= 2) choice = func_84125080() & 3;
+        choice += 1;
+        D_84195208[D_841951BC][0x12] = choice;
+        choice = (u8)(choice + 1);
+        *(s32 *)(D_84195208[D_841951BC] + 0x4C) = choice;
+    }
+update:
+    func_84125484(3);
+}
 #endif
 
 #ifdef VERSION_US
@@ -4509,7 +4581,60 @@ void func_84137D04(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84137ED4.s")
+extern void func_84147228(s32, u8, s32, s32, s32);
+extern u8 D_8419521C[];
+extern u8 D_84195248[];
+void func_84137ED4(u8 arg0) {
+    func_84147228(0, arg0, 0, 1, 0);
+    func_84147228(1, arg0, 0, 1, 0);
+    func_84147228(2, arg0, 0, 1, 0);
+    func_84147228(3, arg0, 0, 1, 0);
+    func_84147228(4, arg0, 0, 1, 0);
+    func_84147228(5, arg0, 0, 1, 0);
+    func_84147228(6, arg0, 0, 1, 0);
+    func_84147228(7, arg0, 0, 1, 0);
+    func_84147228(8, arg0, 0, 1, D_84195248[(arg0 * 24) + 0xE] != 1);
+    func_84147228(0, arg0, 0, 0xF, 0);
+    func_84147228(1, arg0, 0, 0xF, 0);
+    func_84147228(2, arg0, 0, 0xF, 0);
+    func_84147228(3, arg0, 0, 0xF, 0);
+    func_84147228(4, arg0, 0, 0xF, 0);
+    func_84147228(5, arg0, 0, 0xF, 0);
+    func_84147228(6, arg0, 0, 0xF, 0);
+    func_84147228(7, arg0, 0, 0xF, 0);
+    func_84147228(8, arg0, 0, 0xF, 0);
+    func_84147228(0, arg0, 0, 0xA, 0);
+    func_84147228(1, arg0, 0, 0xA, 1);
+    func_84147228(2, arg0, 0, 0xA, 2);
+    func_84147228(3, arg0, 0, 0xA, 3);
+    func_84147228(0, arg0, 0, 4, 4);
+    func_84147228(1, arg0, 0, 4, 4);
+    func_84147228(2, arg0, 0, 4, 4);
+    func_84147228(3, arg0, 0, 4, 4);
+    switch (D_84195248[(arg0 * 24) + 0xE]) {
+    case 1:
+        func_84147228(4, arg0, 0, 0xA, 0);
+        func_84147228(5, arg0, 0, 0xA, 0);
+        func_84147228(6, arg0, 0, 0xA, 0);
+        func_84147228(4, arg0, 0, 4, 4);
+        func_84147228(5, arg0, 0, 4, 4);
+        func_84147228(6, arg0, 0, 4, 4);
+        break;
+    case 2:
+    case 5:
+        func_84147228(7, arg0, 0, 0xB, 0);
+        func_84147228(8, arg0, 0, 0xA, 0);
+        func_84147228(8, arg0, 0, 4, 4);
+        break;
+    }
+    if (*(f32 *)(D_8419521C + (arg0 * 24)) > 0.0f) {
+        func_84147228(1, arg0, 0, 5, 0x10);
+        func_84147228(2, arg0, 0, 5, 0x10);
+    } else {
+        func_84147228(1, arg0, 0, 4, 0x10);
+        func_84147228(2, arg0, 0, 4, 0x10);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -4912,7 +5037,46 @@ void func_8413A53C(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8413AD98.s")
+extern void func_800226C0(s32);
+extern void func_84147228(s32, u8, s32, s32, s32);
+extern void * D_841951F8[];
+extern u8 D_84195248[];
+void func_8413AD98(u8 arg0, u8 arg1, s8 arg2) {
+    if (((u8 *)D_841951F8[arg0])[((u8)arg2) * 0x58 + 0x18] != 0) {
+        switch (D_84195248[arg0 * 24 + 0xD]) {
+        case 5:
+            func_84147228(7, arg0, 0, 11, 0);
+            func_84147228(8, arg0, 0, 11, 0);
+            func_84147228(7, arg0, 0, 4, 4);
+            func_84147228(8, arg0, 0, 4, 4);
+            func_84147228(13, arg0, 0, 8, arg1);
+            func_84147228(13, arg0, 0, 3, 0);
+            func_84147228(13, arg0, 0, 10, 0);
+            func_84147228(13, arg0, 0, 4, 6);
+            func_800226C0(8);
+            break;
+        case 6:
+            func_84147228(11, arg0, 0, 4, 1);
+            func_84147228(11, arg0, 1, 4, 1);
+            func_84147228(11, arg0, 0, 9, 0);
+            func_84147228(11, arg0, 1, 9, 0);
+            func_84147228(20, arg0, 0, 4, 3);
+            func_84147228(20, arg0, 0, 9, 0);
+            func_84147228(13, arg0, 0, 8, arg1);
+            func_84147228(13, arg0, 0, 1, 0);
+            func_84147228(13, arg0, 0, 3, 0);
+            func_84147228(13, arg0, 0, 5, 3);
+            func_800226C0(8);
+            break;
+        case 7:
+            func_84147228(13, arg0, 0, 8, arg1);
+            func_84147228(13, arg0, 0, 3, 0);
+            break;
+        }
+        D_84195248[arg0 * 24 + 0xD] = 7;
+        func_84147228(13, arg0, 0, 7, *(u8 *)&arg2);
+    }
+}
 #endif
 
 #ifdef VERSION_US
