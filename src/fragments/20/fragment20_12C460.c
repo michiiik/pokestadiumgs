@@ -821,7 +821,53 @@ void func_8260C7D4(void *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260C988.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260CC24.s")
+extern u8 *func_8004CA60(u8 *);
+extern void func_800459AC();
+extern void func_80044270(s16, s16, s16, s16, s32, s32, s32, s32, s32);
+extern s32 func_8004C990(s32, s32);
+extern void func_82607BF4(s16, u8 *, u8 *, s16, s32);
+extern u8 D_80094E78[];
+extern Gfx * D_800D0510;
+void func_8260CC24(u8 *arg0, s32 arg1, s32 arg2) {
+    u8 *base;
+    u8 *tex;
+    s32 i;
+    s32 value;
+    struct Color { u8 r,g,b,a; } prim;
+    struct Color2 { u8 r,g,b,a; } env;
+    s32 clipped;
+    s32 amount;
+    s16 x;
+    s16 y;
+    s32 unused[2];
+    base = arg0 + 0x30;
+    tex = (u8 *)func_8004C990(0x51, 2);
+    if (tex == NULL) return;
+    if (arg1 == 0 && arg2 != 0) {
+        gSPDisplayList(D_800D0510++, D_80094E78);
+        gDPSetRenderMode(D_800D0510++, 0x0F0A4000, 0);
+    }
+    if (arg2 != 0) {
+        u8 *pixels = func_8004CA60(tex);
+        func_800459AC(pixels + ((*(u16 *)tex * 0x3E * arg1) / 2), tex[4], tex[5], *(u16 *)tex, 62U, 1, 0, 2, 2, 0, 0, 0, 0);
+    }
+    if (arg1 == 0) {
+        func_82607BF4(*(s16 *)arg0, (u8 *)&prim, (u8 *)&env, *(s16 *)(arg0 + 0xC), (*(u16 *)(arg0 + 4) & 8) != 0);
+        gDPPipeSync(D_800D0510++);
+        gDPSetEnvColor(D_800D0510++, prim.r, prim.g, prim.b, 255);
+        gDPSetPrimColor(D_800D0510++, 0, 0, env.r, env.g, env.b, 255);
+    }
+    x = *(s16 *)(arg0 + 0x14) + *(s16 *)(arg0 + 0x10);
+    y = *(s16 *)(arg0 + 0x16) + *(s16 *)(arg0 + 0x12);
+    for (i = 0; i < *(s16 *)(base + 4); i++) {
+        value = (*(u16 *)(tex + 2) * *(s16 *)(base + 0xA + i * 2)) / 255;
+        clipped = value >= 0x3E ? 0x3E : value;
+        amount = arg1 == 0 ? value - clipped : clipped;
+        if (amount > 0) {
+            func_80044270((s16)(x + i * 0x86 + 0xB), (s16)(y + (value - clipped) * arg1 + 9), *(s16 *)tex, (s16)amount, 0, (0x3E - amount) << 5, 0x400, 0x400, 0);
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260CF84.s")
 
