@@ -93,7 +93,26 @@ void func_86601398(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/54/fragment54_code/func_866016D0.s")
+extern s32 D_86606B40[][2];
+extern u8 D_866079B0[];
+extern u8 D_866072E8[];
+extern void func_87F03884(void *, s32, void *, f32, f32, f32, s32, f32, s32);
+extern u32 func_8003570C(void);
+void func_866016D0(s32 arg0) {
+    volatile s32 pad[3];
+    u32 rand1;
+    u32 rand0;
+    u32 rand2;
+    s32 *coords;
+    void *ptr;
+
+    rand0 = func_8003570C();
+    rand1 = func_8003570C();
+    rand2 = func_8003570C();
+    coords = D_86606B40[arg0];
+    ptr = D_866079B0 + arg0 * 0x168;
+    func_87F03884(D_866072E8, 0, ptr, (f32)coords[0], (f32)coords[1], 0.0f, (rand0 % 31) * 0x200, ((f32)rand1 / 4294967296.0f) * 0.5f * (f32)2, rand2 & 3);
+}
 #endif
 
 #ifdef VERSION_US
@@ -101,7 +120,32 @@ void func_86601398(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/54/fragment54_code/func_86601910.s")
+extern s32 D_866066F0;
+extern s32 D_86606B60;
+extern s32 D_8660AB00[];
+extern void ModelAnim_SetSpeed(void *, s32);
+extern void ModelAnim_SetEventFrame(void *, s32);
+extern void func_8003F3BC(void *, s32);
+extern s32 D_8660678C;
+s32 func_86601910(s32 arg0, void *arg1) {
+  if ((((arg0 == 0) || (arg0 != 2)) || (D_8660678C != 1)) || (D_866066F0 == 2)) {
+    return;
+  }
+  D_86606B60 += 1;
+  if (D_86606B60 < 6) {
+    return;
+  }
+  ModelAnim_SetSpeed(arg1, 0x10000);
+  ModelAnim_SetEventFrame(arg1, 0);
+  if ((D_8660AB00[0] != 0) && (D_8660AB00[1] != 0)) {
+    func_8003F3BC(arg1, 2);
+  } else if (D_8660AB00[0] != 0) {
+    func_8003F3BC(arg1, 0);
+  } else if (D_8660AB00[1] != 0) {
+    func_8003F3BC(arg1, 1);
+  }
+  D_86606B60 = 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -305,7 +349,59 @@ void func_86604084(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/54/fragment54_code/func_86604370.s")
+extern u8 D_86608220[];
+extern u8 D_866073E8[];
+extern u8 D_86609E40[];
+extern u8 D_8660A3E0[];
+extern void func_8003F114(void *, s32, s32, s32);
+extern void func_8003F1DC(void *);
+extern void func_8003EF70(void *);
+extern void ModelAnim_SetFrame(void *, s32);
+extern void func_86600EEC(void);
+extern void ModelAnim_SetEventFrame(void *, s32);
+extern void ModelAnim_SetSpeed(void *, s32);
+extern void StageContext_SetClearColor(s32);
+extern s32 StageFade_StartFromTransparent(s32);
+extern void func_8003F210(void *, s32);
+extern void func_8003F3BC(void *, s32);
+extern u8 D_86606788;
+extern u8 D_86607410[];
+extern u8 D_866079B0[];
+extern u8 D_866098A0[];
+void func_86604370(void) {
+    s32 j;
+    u8 *anim;
+    u8 *inner;
+    u8 *source;
+    u8 *a;
+    u8 *b;
+    u8 *c;
+    anim = D_866079B0; inner = D_86608220; source = D_866073E8; a = D_86609E40; b = D_86607410; c = D_8660A3E0;
+    do {
+        func_8003F114(anim, 0, -1, *(s32 *)source);
+        func_8003F210(anim, 5);
+        ModelAnim_SetFrame(anim, (s16)(guRandom() % 25));
+        ModelAnim_SetSpeed(anim, 0x10000);
+        ModelAnim_SetEventFrame(anim, 0);
+        func_8003F3BC(anim, 0);
+        func_8003F1DC(a);
+        func_8003F1DC(b);
+        func_8003F1DC(c);
+        for (j = 0; j < 0x5A0; j += 0x168) {
+            func_8003EF70(inner + j);
+        }
+        anim += 0x168;
+        source += 4;
+        a += 0x168;
+        b += 0x168;
+        c += 0x168;
+    } while ((inner += 0x5A0) != D_866098A0);
+    *(s32 *)(&D_86606788 + 0x78) = 2;
+    *(s32 *)(&D_86606788 + 4) = 13;
+    StageContext_SetClearColor(1);
+    StageFade_StartFromTransparent(10);
+    func_86600EEC();
+}
 #endif
 
 #ifdef VERSION_US
