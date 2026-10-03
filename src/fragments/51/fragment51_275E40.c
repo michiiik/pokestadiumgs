@@ -176,7 +176,33 @@ void func_86301E14(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/51/fragment51_275E40/func_86301E54.s")
+extern void func_87F02684(void *);
+extern void func_8630470C(void);
+extern void func_86300494(void);
+extern void * D_863075D8;
+void func_86301E54(void) {
+    typedef struct {
+        u8 pad[0x8F24];
+        f32 angle;
+        s32 one;
+        s32 zero;
+        s32 copy;
+        u8 pad2[0x18];
+        s32 source;
+    } State;
+
+    func_87F02684((u8 *)D_863075D8 + 0xDB4);
+    func_87F02684((u8 *)D_863075D8 + 0x12C);
+    func_87F02684((u8 *)D_863075D8 + 0x770);
+    func_87F02684((u8 *)D_863075D8 + 0x8298);
+    func_87F02684((u8 *)D_863075D8 + 0x1F84);
+    ((State *)D_863075D8)->angle = 180.0f;
+    func_86300494();
+    ((State *)D_863075D8)->zero = 0;
+    ((State *)D_863075D8)->one = 1;
+    ((State *)D_863075D8)->copy = ((State *)D_863075D8)->source;
+    func_8630470C();
+}
 #endif
 
 #ifdef VERSION_US
