@@ -1276,7 +1276,41 @@ void func_86108BE0(s32 arg0, u32 arg1)
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86108C90.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86108EE4.s")
+extern s32 D_8610A0B0[];
+extern s32 *func_86102630(s32);
+extern s32 func_86108A50(s32 *arg0);
+extern void func_86108B28(u8 *arg0, s32 arg1);
+extern void func_86108BE0(s32 arg0, u32 arg1);
+void func_86108EE4(void) {
+    typedef struct { s32 pad; s32 rank; u32 flags; } Record;
+    s32 count;
+    s32 i;
+    Record *slots[4];
+    Record **p;
+    s32 *active;
+
+    count = func_86108A50((s32 *)slots);
+    func_86108BE0((s32)slots, count);
+    func_86108B28((u8 *)slots, count);
+    p = slots;
+    for (i = 0; i < count; i++, p++) {
+        (*p)->flags = D_8610A0B0[i];
+        if ((*p)->rank >= 9) {
+            (*p)->flags |= 0x1000;
+            (*p)->flags &= ~0x2006;
+        }
+    }
+    active = func_86102630(0);
+    if (active != 0 && count >= 2 && active[1] >= 6 && slots[0]->rank < active[1]) {
+        if (slots[0]->rank * 2 < active[1]) {
+            slots[count - 1]->flags |= 4;
+            slots[count - 1]->flags &= ~2;
+        } else {
+            slots[count - 1]->flags |= 2;
+            slots[count - 1]->flags &= ~4;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_8610916C.s")
 
