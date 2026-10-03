@@ -93,7 +93,26 @@ void func_86601398(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/54/fragment54_code/func_866016D0.s")
+extern s32 D_86606B40[][2];
+extern u8 D_866079B0[];
+extern u8 D_866072E8[];
+extern void func_87F03884(void *, s32, void *, f32, f32, f32, s32, f32, s32);
+extern u32 func_8003570C(void);
+void func_866016D0(s32 arg0) {
+    volatile s32 pad[3];
+    u32 rand1;
+    u32 rand0;
+    u32 rand2;
+    s32 *coords;
+    void *ptr;
+
+    rand0 = func_8003570C();
+    rand1 = func_8003570C();
+    rand2 = func_8003570C();
+    coords = D_86606B40[arg0];
+    ptr = D_866079B0 + arg0 * 0x168;
+    func_87F03884(D_866072E8, 0, ptr, (f32)coords[0], (f32)coords[1], 0.0f, (rand0 % 31) * 0x200, ((f32)rand1 / 4294967296.0f) * 0.5f * (f32)2, rand2 & 3);
+}
 #endif
 
 #ifdef VERSION_US
