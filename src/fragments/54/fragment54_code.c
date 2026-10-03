@@ -120,7 +120,32 @@ void func_866016D0(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/54/fragment54_code/func_86601910.s")
+extern s32 D_866066F0;
+extern s32 D_86606B60;
+extern s32 D_8660AB00[];
+extern void ModelAnim_SetSpeed(void *, s32);
+extern void ModelAnim_SetEventFrame(void *, s32);
+extern void func_8003F3BC(void *, s32);
+extern s32 D_8660678C;
+s32 func_86601910(s32 arg0, void *arg1) {
+  if ((((arg0 == 0) || (arg0 != 2)) || (D_8660678C != 1)) || (D_866066F0 == 2)) {
+    return;
+  }
+  D_86606B60 += 1;
+  if (D_86606B60 < 6) {
+    return;
+  }
+  ModelAnim_SetSpeed(arg1, 0x10000);
+  ModelAnim_SetEventFrame(arg1, 0);
+  if ((D_8660AB00[0] != 0) && (D_8660AB00[1] != 0)) {
+    func_8003F3BC(arg1, 2);
+  } else if (D_8660AB00[0] != 0) {
+    func_8003F3BC(arg1, 0);
+  } else if (D_8660AB00[1] != 0) {
+    func_8003F3BC(arg1, 1);
+  }
+  D_86606B60 = 0;
+}
 #endif
 
 #ifdef VERSION_US
