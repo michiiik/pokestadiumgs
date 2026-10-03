@@ -846,7 +846,29 @@ void Save_ResetBank(s32 arg0, u32 arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800550E8.s")
+extern s32 main_pool_alloc_with_func(s32, s32, s32, s32);
+extern s32 func_80003E84(s32, s32, s32, s32);
+extern void _bzero(void *, s32);
+extern s32 D_800972B0[];
+extern u8 D_801281C0;
+s32 func_800550E8(s32 arg0) {
+    s32 result = 0;
+    s32 size;
+    void *data;
+    size = D_800972B0[arg0];
+    if (((struct Func80050CACEntry *)((u8 *)&D_801281C0 + arg0 * 0xC))->unk4 == 0) {
+        data = (void *)main_pool_alloc_with_func(size * 2, 0, arg0 + 0x424E4B30, (s32)Save_ResetBank);
+        if (data != 0) {
+            _bzero(data, size * 2);
+            ((struct Func80050CACEntry *)((u8 *)&D_801281C0 + arg0 * 0xC))->unk4 = (s32)data;
+            ((struct Func80050CACEntry *)((u8 *)&D_801281C0 + arg0 * 0xC))->unk8 = (s32)data + size;
+            func_80003E84((s32)data, arg0 << 7, (u32)size >> 7, 0);
+            func_80003E84(((struct Func80050CACEntry *)((u8 *)&D_801281C0 + arg0 * 0xC))->unk8, (arg0 << 7) + 0x200, (u32)size >> 7, 0);
+            result = 1;
+        }
+    }
+    return result;
+}
 
 s32 func_800551EC(u8 *arg0, s32 arg1) {
     struct Footer {
@@ -872,7 +894,43 @@ s32 func_800551EC(u8 *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800555B4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_8005565C.s")
+extern void Save_ResetAndCommitTypedRecord(s32 a0,s32 a1);
+extern void func_80055260(s32, s32);
+void func_8005565C(s32 arg0) {
+    extern void func_80055260(s32, s32);
+    extern s32 D_800972C0;
+    s32 j;
+    s32 old;
+    old = D_800972C0;
+    for (D_800972C0 = 4; D_800972C0 < 6; D_800972C0++) {
+        j = 0;
+        do {
+            if (arg0 == 0) {
+                func_80055260(0x10, j);
+            } else {
+                Save_ResetAndCommitTypedRecord(0x10, j);
+            }
+            j++;
+        } while (j != 10);
+    }
+    D_800972C0 = old;
+    j = 0;
+    do {
+        if (arg0 == 0) {
+            func_80055260(0x11, j);
+        } else {
+            Save_ResetAndCommitTypedRecord(0x11, j);
+        }
+        j++;
+    } while (j != 1);
+    if (arg0 == 0) {
+        func_80055260(0x16, 0);
+        func_80055260(0x17, 0);
+    } else {
+        Save_ResetAndCommitTypedRecord(0x16, 0);
+        Save_ResetAndCommitTypedRecord(0x17, 0);
+    }
+}
 
 extern void func_80055260(s32, s32);
 void func_8005577C(s32 arg0) {
@@ -926,9 +984,36 @@ void func_800557E4(s32 arg0) {
     } while (var_s0 != 2);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055948.s")
+extern void func_800555B4(s32);
+extern void func_8005565C(s32);
+extern void func_8005577C(s32 arg0);
+extern void func_800557E4(s32 arg0);
+extern u8 D_801281C0;
+s32 func_80055948(s32 arg0) {
+    s32 var_v1 = 0;
+    s32 *temp_v0;
+    if (arg0 >= 0 && arg0 < 4) {
+        temp_v0 = (s32 *)((u8 *)&D_801281C0 + arg0 * 0xC);
+        if ((*temp_v0 & 1) == 0) {
+            var_v1 = 0;
+            if (func_800550E8(arg0) != 0) {
+                switch (arg0) {
+                case 0: func_800555B4(0); break;
+                case 1: func_8005565C(0); break;
+                case 2: func_8005577C(0); break;
+                case 3: func_800557E4(0); break;
+                }
+                *temp_v0 |= 1;
+                var_v1 = 1;
+            }
+        } else {
+            var_v1 = 1;
+        }
+    }
+    return var_v1;
+}
 
-extern void func_80055948(s32);
+extern s32 func_80055948(s32);
 
 void func_80055A34(void) {
     s32 var_s0;
@@ -956,7 +1041,26 @@ s32 Deck_FindFirstFreeTeamSlot(void) {
     return i;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055BF8.s")
+extern s32 func_80055A9C(void *, s32);
+extern s32 func_80055B14(void *, s32);
+extern s32 Deck_IsSaveEntryPresent(void *arg0, void *arg1);
+extern void Save_ResetAndCommitTypedRecord(s32 a0,s32 a1);
+extern void func_80051D64(s32,s32);
+void func_80055BF8(void) {
+s32 i; s32 j; s32 scan; u8 buf[0x180];
+for (scan = 9; scan >= 0; scan--) { if (Deck_IsSaveEntryPresent((void *)0x10, (void *)scan)) break; }
+for (j = scan - 1; j >= 0; j--) {
+if (!Deck_IsSaveEntryPresent((void *)0x10, (void *)j)) {
+for (i = j; i < 9; i++) {
+
+func_80055A9C(buf + 12, i + 1);
+func_80055B14(buf + 12, i);
+func_80051D64(0x10, i);
+}
+Save_ResetAndCommitTypedRecord(0x10, 9);
+}
+}
+}
 
 extern void func_80053B38(s32, s32, s32, u8 *);
 u8 func_80055CCC(s32 arg0) {
@@ -1059,7 +1163,33 @@ s32 func_80056184(void *arg0) {
     return var_v1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800561E4.s")
+extern s32 func_80050D20(s32 arg0, s32 arg1);
+extern void func_80055EF0(void *arg0, s32 arg1);
+extern s32 func_80056184(void *arg0);
+extern u8 D_801281C0;
+s32 func_800561E4(void) {
+    s32 result = 0;
+    s32 index;
+    s32 slot;
+    s32 score;
+    u8 record[0x14];
+    slot = func_80050D20(0x14, -1);
+    index = 0;
+    if ((*(s32 *)((u8 *)&D_801281C0 + slot * 0xC) & 1) != 0) {
+        do {
+            func_80055EF0(record, index);
+            score = 0;
+            if (func_80056184(record) != 0) score = 1;
+            if ((*(u16 *)(record + 2) & 0x100) != 0) score++;
+            if (score > 0) {
+                if (index == 0) result = score;
+                else result = score + 2;
+            }
+            index++;
+        } while (index != 2);
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800562B8.s")
 
