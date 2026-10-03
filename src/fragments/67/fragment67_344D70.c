@@ -451,7 +451,42 @@ void func_8290A358(s32 arg0, u16 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290A5B0.s")
+extern void func_82908B60(void);
+extern void func_8290A3C4();
+extern void func_800428F8(s32);
+extern void func_8290A208(s32);
+extern void func_8290A358(s32 arg0, u16 arg1);
+extern u8 D_82913210[];
+extern u8 D_8291A7C0;
+extern u8 D_8291AE50;
+extern s16 D_8291B862;
+void func_8290A5B0(s32 arg0) {
+    s32 i;
+    u8 *actor;
+
+    D_8291B862 = 0;
+    (&D_8291A7C0)[0x1071] = 0;
+    i = 0;
+    do {
+        (&D_8291A7C0)[i * 0x1A4 + 0x1A2] = 0;
+        i++;
+    } while (&D_8291A7C0 + i * 0x1A4 < &D_8291AE50);
+    func_82908B60();
+    for (i = 0; i < arg0; i++) {
+        actor = &D_8291A7C0 + i * 0x1A4;
+        if (((u16 (*)[17])D_82913210)[*(s16 *)(&D_8291A7C0 + 0x1068)][i] != 0) {
+            actor[0x1A2] = 1;
+            func_8290A358(i, ((u16 (*)[17])D_82913210)[*(s16 *)(&D_8291A7C0 + 0x1068)][i]);
+            func_800428F8(*(s32 *)actor);
+            func_8290A3C4(i, i);
+            func_8290A208(i);
+            actor[6] |= 0x10;
+            (&D_8291A7C0)[0x1071]++;
+        } else {
+            actor[0x1A2] = 0;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
