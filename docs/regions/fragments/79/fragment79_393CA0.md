@@ -285,3 +285,39 @@ func_84132E40: matched (call_sequence:direct_index:signed_inequality_loop), 1 it
 ## 2026-09-30
 
 func_841350F4: plateau at 0.9841 (raw 0.619), mismatch operand_or_scheduling_drift; tried families: aggregate_address_binding, aggregate_destination_bias, aggregate_destination_view, aggregate_member_projection, aggregate_representation, aggregate_result, aggregate_source_bias, aggregate_source_view, aggregate_storage, binding_definition_point, binding_lexical_home, branch_home_representation, call_sequence, local_layout, permuter_address_form, permuter_aggregate_kind, permuter_aggregate_representation, permuter_cleanup, permuter_declaration_order, permuter_home_allocation, permuter_lifetime, permuter_output, permuter_representation, permuter_result, permuter_scope, permuter_source_address, permuter_storage, permuter_transfer_lvalue, permuter_unused_home, result_home_representation, result_home_width, scalar_transfer, scalar_union, source_home_representation, transfer_member_selection, unused_binding_alignment, unused_binding_storage_class; tie-pool yes
+
+## 2026-10-04
+
+func_84133304: matched (call_sequence:direct_index:narrow_signature_baseline), 1 iterations, agent unbiased
+
+## 2026-10-04
+
+func_84139C54: matched (stride_signedness:destination:unsigned_index), 2 iterations, agent unbiased
+
+## 2026-10-04
+
+func_84124798: plateau at 0.0 (raw None), mismatch unknown; tried families: call_sequence; tie-pool no
+
+## 2026-10-04
+
+func_84129180: matched (call_sequence:direct_index:u16_compound_baseline), 1 iterations, agent unbiased
+
+## 2026-10-04
+
+func_84135E4C: matched (record_base_lifetime:embedded_matrix:eliminate_record_local), 3 iterations, agent unbiased
+
+## 2026-10-04
+
+func_8412A028: matched (store_signedness:first_flag:unsigned_byte_alias), 2 iterations, agent unbiased
+
+## 2026-10-04
+
+func_8413293C: matched (call_sequence:indexed_loop:narrow_argument_local), 1 iterations, agent unbiased
+
+## 2026-10-04
+
+func_84139618: plateau at 0.8384 (raw 0.404), mismatch operand_or_scheduling_drift; tried families: call_lowering, call_scope, call_sequence, callee_designator, callee_type_erasure, dispatch_alias, dispatch_argument_width, erased_dispatch_address, erased_dispatch_control, erased_dispatch_index, erased_dispatch_record, erased_dispatch_table, guard_topology, index_dataflow, index_storage, owner_base, owner_index, record_addressing, record_dispatch, record_layout, record_materialization, record_representation, restriction_load, restriction_materialization, restriction_topology, selection_allocation, selection_lifetime, selection_phi, selection_scope, state_lifetime, validation_branch, validation_dataflow, validation_operand, variadic_dispatch; tie-pool yes
+
+## 2026-10-04
+
+TYPE CONFLICT: D_841951F8 is extern u8 *D_841951F8[], not extern void *D_841951F8[]
