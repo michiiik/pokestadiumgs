@@ -37,3 +37,15 @@ func_8AE01B88: matched (call_sequence:parameter_for_control:reset_in_increment_c
 ## 2026-09-27
 
 func_8AE02568: time cap at 0.8295 (raw 0.5114) after 2418s, mismatch instruction_drift; tried families: access_qualification, call_sequence, conversion_spelling, global_dataflow, global_storage, global_value_flow, local_representation; tie-pool no
+
+## 2026-10-04
+
+func_8AE018C4: time cap at 0.0 (raw None) after 2401s, mismatch unknown; tried families: (none); tie-pool no
+
+## 2026-10-04
+
+func_8AE01DC0: matched (call_sequence:loop:matched_sibling_shape), 6 iterations, agent codex
+
+## 2026-10-04
+
+func_8AE026C8: time cap at 0.8814 (raw 0.4407) after 2414s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
