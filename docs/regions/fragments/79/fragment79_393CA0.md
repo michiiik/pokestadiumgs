@@ -321,3 +321,19 @@ func_84139618: plateau at 0.8384 (raw 0.404), mismatch operand_or_scheduling_dri
 ## 2026-10-04
 
 TYPE CONFLICT: D_841951F8 is extern u8 *D_841951F8[], not extern void *D_841951F8[]
+
+## 2026-10-04
+
+func_84126440: matched (call_sequence:switch:direct_callee_individual_returns), 5 iterations, agent antigravity
+
+## 2026-10-04
+
+func_84126C3C: matched (call_sequence:byte_offset_arithmetic:shift_neg_cast_and_masked_sub), 1 iterations, agent antigravity
+
+## 2026-10-04
+
+func_84128204: time cap at 0.9459 (raw 0.7297) after 2400s, mismatch unaligned_data_drift; tried families: call_sequence; tie-pool no
+
+## 2026-10-04
+
+func_8412D4A8: plateau at 0.0 (raw None), mismatch unknown; tried families: call_sequence; tie-pool no; 6 iteration(s) with a suspicious identical batch-wide failure
