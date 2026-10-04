@@ -53,3 +53,27 @@ func_84151B8C: matched (call_sequence:guard:exact_stack_homes), 1 iterations, ag
 ## 2026-10-04
 
 func_84152764: time cap at 0.9432 (raw 0.8864) after 2421s, mismatch instruction_drift; tried families: call_sequence; tie-pool no
+
+## 2026-10-04
+
+func_84153D94: matched (call_sequence:exact:accepted-stack-home-order), 1 iterations, agent codex
+
+## 2026-10-04
+
+func_84151A5C: matched (call_sequence:guard:zero-left), 1 iterations, agent codex
+
+## 2026-10-04
+
+func_84151AF4: matched (call_sequence:predicate:zero-first), 1 iterations, agent codex
+
+## 2026-10-04
+
+func_841526CC: matched (call_sequence:canonical:parenthesized-guard), 1 iterations, agent codex
+
+## 2026-10-04
+
+func_8415178C: matched (call_sequence:decl-order:sbpta), 1 iterations, agent codex
+
+## 2026-10-04
+
+func_84152308: matched (call_sequence:carrier_reuse:signed_amount_compound_multiply), 2 iterations, agent codex
