@@ -45,3 +45,11 @@ func_84152408: matched (call_sequence:spill_layout:scratch_table_base_multiplier
 ## 2026-09-29
 
 func_84153A64: matched (call_sequence:constant_offset:permuter_exact), 3 iterations, agent unbiased
+
+## 2026-10-04
+
+func_84151B8C: matched (call_sequence:guard:exact_stack_homes), 1 iterations, agent codex
+
+## 2026-10-04
+
+func_84152764: time cap at 0.9432 (raw 0.8864) after 2421s, mismatch instruction_drift; tried families: call_sequence; tie-pool no
