@@ -374,7 +374,19 @@ s32 func_86B05610(f32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/61/fragment61_code/func_86B05738.s")
+extern f32 D_86B0DDF8;
+extern f64 D_86B0DE00;
+extern s32 func_86B05610(f32 arg0);
+f32 func_86B05738(f32 arg0) { f32 angle = arg0;
+    f32 limit = D_86B0DDF8;
+    f64 step = D_86B0DE00;
+    do {
+        if (!func_86B05610(angle)) break;
+        angle = (f32)((f64)angle + step);
+        if (limit < angle) angle -= limit;
+    } while (1);
+    return angle;
+}
 #endif
 
 #ifdef VERSION_US
