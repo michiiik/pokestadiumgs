@@ -167,7 +167,12 @@ void func_81801B7C(u8 *arg0, u8 *arg1, u8 *arg2) {
     func_81801854(arg0 + 4, arg1 + 4, arg2 + 4);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81801BC0.s")
+s32 func_81801BC0(u8 *arg0, u8 *arg1) {
+    return (*(s16 *)(arg1 + 0) >= *(s16 *)(arg0 + 0)) &&
+           (*(s16 *)(arg0 + 0) + *(s16 *)(arg0 + 4) >= *(s16 *)(arg1 + 4) + *(s16 *)(arg1 + 0)) &&
+           (*(s16 *)(arg1 + 2) >= *(s16 *)(arg0 + 2)) &&
+           (*(s16 *)(arg0 + 2) + *(s16 *)(arg0 + 6) >= *(s16 *)(arg1 + 6) + *(s16 *)(arg1 + 2));
+}
 
 s32 func_81801C30(u8 *arg0, u8 *arg1) {
     return (*(s16 *)(arg0 + 0) + *(s16 *)(arg0 + 4) < *(s16 *)(arg1 + 0))
