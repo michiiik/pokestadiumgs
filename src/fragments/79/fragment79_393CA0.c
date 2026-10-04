@@ -4361,7 +4361,36 @@ s32 func_84135DD8(u8 arg0, u8 arg1, u8 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84135E4C.s")
+extern s32 func_84135D3C(u8 *arg0, u8 *arg1);
+extern s32 func_84135DD8(u8 arg0, u8 arg1, u8 arg2);
+extern u32 D_8419A020[];
+u8 *func_84135E4C(u8 arg0, u8 arg1, u8 arg2) {
+    typedef struct {
+        u32 unk00;
+        u32 flags;
+        u8 count;
+        u8 entries[13][4];
+        u8 padding[3];
+    } Record;
+    s32 i = 0;
+    u8 *best = 0;
+    u8 *entry;
+
+    if (((Record *)D_8419A020)[arg0].flags & (1 << arg1)) {
+        for (; i < 13 && i < ((Record *)D_8419A020)[arg0].count; i++) {
+            entry = ((Record *)D_8419A020)[arg0].entries[i];
+            if (entry[0] == arg1 && entry[1] != 0 && func_84135DD8(arg1, entry[2], arg2)) {
+                if (best == 0) {
+                    best = entry;
+                } else if (func_84135D3C(best, entry) > 0) {
+                    best = entry;
+                }
+            }
+        }
+        ((Record *)D_8419A020)[arg0].flags &= ~(1 << arg1);
+    }
+    return best;
+}
 #endif
 
 #ifdef VERSION_US
