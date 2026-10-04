@@ -2,7 +2,43 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_818014C0.s")
+f64 func_818014C0(f64 arg0, f64 arg1) {
+    extern f64 D_81805D08, D_81805D10, D_81805D18, D_81805D20, D_81805D28, D_81805D30;
+    f64 ratio;
+    f64 reduced;
+    f64 fraction;
+    s32 i;
+
+    if ((arg1 == 0.0) && (arg0 == 0.0)) {
+        return 0.0;
+    }
+    if (arg1 == 0.0) {
+        if (arg0 > 0.0) {
+            return D_81805D08;
+        }
+        return D_81805D10;
+    }
+    ratio = arg0 / arg1;
+    reduced = ((ratio > 0.0 ? ratio : -ratio) <= 1.0) ? ratio : 1.0 / ratio;
+    fraction = 0.0;
+    for (i = 14; i > 0; i--) {
+        fraction = (i * i) * reduced * reduced / ((2 * i + 1) + fraction);
+    }
+    reduced = reduced / (1.0 + fraction);
+    if (ratio > 1.0) {
+        reduced = D_81805D18 - reduced;
+    }
+    if (ratio < -1.0) {
+        reduced = D_81805D20 - reduced;
+    }
+    if (arg1 > 0.0) {
+        return reduced;
+    }
+    if (arg0 > 0.0) {
+        return reduced + D_81805D28;
+    }
+    return reduced - D_81805D30;
+}
 
 f64 func_818014C0(f64, f64);
 
