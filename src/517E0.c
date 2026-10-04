@@ -378,7 +378,48 @@ void func_800519AC(u8 *arg0, u8 *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80052928.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80052ECC.s")
+extern void func_80051D64(s32,s32);
+extern s32 D_800972C0;
+extern u8 D_801281C0;
+void func_80052ECC(s32 arg0) {
+    s32 i;
+    s32 saved;
+    if ((*(s32 *)((u8 *)&D_801281C0 + arg0 * 0xC) & 1) != 0) {
+        saved = D_800972C0;
+        switch (arg0) {
+        case 0:
+            for (D_800972C0 = 0; D_800972C0 < 4; D_800972C0++) {
+                for (i = 0; i != 10; i++) func_80051D64(0x10, i);
+            }
+            break;
+        case 1:
+            for (D_800972C0 = 4; D_800972C0 < 6; D_800972C0++) {
+                for (i = 0; i != 10; i++) func_80051D64(0x10, i);
+            }
+            for (i = 0; i != 1; i++) func_80051D64(0x11, i);
+            func_80051D64(0x16, 0);
+            func_80051D64(0x17, 0);
+            break;
+        case 2:
+            for (i = 1; i != 14; i++) func_80051D64(0x11, i);
+            break;
+        case 3:
+            func_80051D64(0x14, 0);
+            func_80051D64(0x15, 0);
+            func_80051D64(0x18, 0);
+            func_80051D64(0x19, 0);
+            func_80051D64(0x1A, 0);
+            func_80051D64(0x1B, 0);
+            func_80051D64(0x1C, 0);
+            func_80051D64(0x1D, 0);
+            func_80051D64(0x1E, 0);
+            for (i = 0; i != 2; i++) func_80051D64(0x12, i);
+            func_80051D64(0x13, 0);
+            break;
+        }
+        D_800972C0 = saved;
+    }
+}
 
 extern void func_80052ECC(s32);
 
