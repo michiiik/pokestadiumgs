@@ -116,7 +116,34 @@ void func_863007B8(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/51/fragment51_275E40/func_86300C74.s")
+extern u32 func_8003570C();
+extern void * D_87F119DC;
+void func_86300C74(s32 *arg0) {
+    struct LocalRange {
+        u8 pad00[0x10];
+        f32 lower;
+        f32 upper;
+        u8 pad18[0x18];
+        f32 target;
+    } *p;
+
+    p = *(struct LocalRange **)((u8 *)D_87F119DC + 0x20);
+    if (*(u32 *)((u8 *)D_87F119DC + 0xC) & 0x80000000) {
+        p->target = (func_8003570C() / 4294967296.0f) * (p->upper - p->lower) + p->lower;
+        *(u32 *)((u8 *)D_87F119DC + 0xC) &= 0x7FFFFFFF;
+    } else {
+        *arg0 = p->target - *(f32 *)((u8 *)D_87F119DC + 0x48);
+        if (((*arg0 > 0.0f) ? *arg0 : -*arg0) < 5.0f) {
+            if ((func_8003570C() % 101) < 5) {
+                *(u32 *)((u8 *)D_87F119DC + 0xC) |= 0x80000000;
+            }
+        } else if (*arg0 > 0.0f) {
+            *arg0 = 0x10;
+        } else {
+            *arg0 = -0x10;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
