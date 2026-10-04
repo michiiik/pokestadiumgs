@@ -403,7 +403,24 @@ void func_81607408(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81607440.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_8160762C.s")
+f32 func_8160762C(s32 arg0, s32 arg1, s32 *arg2, s32 *arg3) {
+    f32 result;
+    s32 first;
+    s32 next;
+    if (arg1 < 2) {
+        result = 0.0f;
+        *arg3 = 0;
+        *arg2 = 0;
+    } else {
+        result = (f32)arg0 / (f32)(arg1 - 1);
+        first = arg0 != 0;
+        next = arg0;
+        next++;
+        *arg2 = first;
+        *arg3 = arg1 != next;
+    }
+    return result;
+}
 
 extern u32 D_8160BE60;
 extern u32 D_8160BE64;
