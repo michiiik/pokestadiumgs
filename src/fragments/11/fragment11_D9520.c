@@ -462,7 +462,14 @@ void func_816077B8(u16 arg0, u16 arg1, u16 arg2) {
     gfx->words.w1 = _SHIFTL(color[1], 16, 8) | _SHIFTL(color[2], 8, 8) | _SHIFTL(color[0], 24, 8) | 255;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81607834.s")
+extern void * func_81607680(u16 arg0, u16 arg1, u16 arg2);
+extern u32 D_800D0510;
+void func_81607834(u16 arg0, u16 arg1, u16 arg2) {
+    struct Color07834RGB { u8 r; u8 g; u8 b; } *color;
+    color = func_81607680(arg0, arg1, arg2);
+    gDPPipeSync((*(Gfx **)&D_800D0510)++);
+    gDPSetEnvColor((*(Gfx **)&D_800D0510)++, color->r, color->g, color->b, 255);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_816078C4.s")
 
