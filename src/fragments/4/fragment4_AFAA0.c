@@ -2,7 +2,43 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_818014C0.s")
+f64 func_818014C0(f64 arg0, f64 arg1) {
+    extern f64 D_81805D08, D_81805D10, D_81805D18, D_81805D20, D_81805D28, D_81805D30;
+    f64 ratio;
+    f64 reduced;
+    f64 fraction;
+    s32 i;
+
+    if ((arg1 == 0.0) && (arg0 == 0.0)) {
+        return 0.0;
+    }
+    if (arg1 == 0.0) {
+        if (arg0 > 0.0) {
+            return D_81805D08;
+        }
+        return D_81805D10;
+    }
+    ratio = arg0 / arg1;
+    reduced = ((ratio > 0.0 ? ratio : -ratio) <= 1.0) ? ratio : 1.0 / ratio;
+    fraction = 0.0;
+    for (i = 14; i > 0; i--) {
+        fraction = (i * i) * reduced * reduced / ((2 * i + 1) + fraction);
+    }
+    reduced = reduced / (1.0 + fraction);
+    if (ratio > 1.0) {
+        reduced = D_81805D18 - reduced;
+    }
+    if (ratio < -1.0) {
+        reduced = D_81805D20 - reduced;
+    }
+    if (arg1 > 0.0) {
+        return reduced;
+    }
+    if (arg0 > 0.0) {
+        return reduced + D_81805D28;
+    }
+    return reduced - D_81805D30;
+}
 
 f64 func_818014C0(f64, f64);
 
@@ -21,7 +57,17 @@ void func_81801794(void) {
     D_81805930 = D_81805CE0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_818017A8.s")
+typedef struct { s16 x; s16 y; s16 w; s16 h; } Rect818017A8;
+typedef struct { u8 bytes[8]; } Bytes818017A8;
+typedef struct { u32 words[2]; } Words818017A8;
+extern Rect818017A8 D_81805FE0;
+extern void func_80006F70(Gfx **, s32, s32, s32, s32);
+extern Gfx * D_800D0510;
+extern u8 * D_81805930;
+void func_818017A8(void) {
+    func_80006F70(&D_800D0510, *(s16 *)(D_81805930 + 0), *(s16 *)(D_81805930 + 2), *(s16 *)(D_81805930 + 4), *(s16 *)(D_81805930 + 6));
+    D_81805FE0 = *(Rect818017A8 *)D_81805930;
+}
 
 void func_81801810(u8 *arg0, s32 arg1, s32 arg2) {
     *(u16 *)arg0 = (u16)arg1;
@@ -121,7 +167,12 @@ void func_81801B7C(u8 *arg0, u8 *arg1, u8 *arg2) {
     func_81801854(arg0 + 4, arg1 + 4, arg2 + 4);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81801BC0.s")
+s32 func_81801BC0(u8 *arg0, u8 *arg1) {
+    return (*(s16 *)(arg1 + 0) >= *(s16 *)(arg0 + 0)) &&
+           (*(s16 *)(arg0 + 0) + *(s16 *)(arg0 + 4) >= *(s16 *)(arg1 + 4) + *(s16 *)(arg1 + 0)) &&
+           (*(s16 *)(arg1 + 2) >= *(s16 *)(arg0 + 2)) &&
+           (*(s16 *)(arg0 + 2) + *(s16 *)(arg0 + 6) >= *(s16 *)(arg1 + 6) + *(s16 *)(arg1 + 2));
+}
 
 s32 func_81801C30(u8 *arg0, u8 *arg1) {
     return (*(s16 *)(arg0 + 0) + *(s16 *)(arg0 + 4) < *(s16 *)(arg1 + 0))
@@ -151,7 +202,10 @@ s32 func_81801E70(u8 *arg0, u8 *arg1) {
 
 void func_81801EB8(u8 *arg0) {}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81801EC0.s")
+void func_81801EC0(u8 *arg0, u8 *arg1) {
+    *(s16 *)(arg1 + 0) = *(s16 *)(arg0 + 4) / 2 + *(s16 *)(arg0 + 0);
+    *(s16 *)(arg1 + 2) = *(s16 *)(arg0 + 6) / 2 + *(s16 *)(arg0 + 2);
+}
 
 void func_81801F04(u8 *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) { *(u16 *)(arg0 + 0) = arg1; *(u16 *)(arg0 + 2) = arg2; *(u16 *)(arg0 + 4) = arg3; *(u16 *)(arg0 + 6) = arg4; }
 
@@ -427,7 +481,29 @@ void func_81803C9C(void *arg0)
   }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81803CD4.s")
+extern f32 D_81805F68;
+extern f32 D_81805F6C;
+extern f32 D_81805F70;
+extern f32 D_81805F74;
+f32 func_81803CD4(f32 arg0) {
+    f32 bound;
+    f32 step;
+    bound = D_81805F68;
+    if (arg0 >= bound) {
+        step = D_81805F6C;
+        do {
+            arg0 -= step;
+        } while (arg0 >= bound);
+    }
+    bound = D_81805F70;
+    step = D_81805F74;
+    if (arg0 <= bound) {
+        do {
+            arg0 += step;
+        } while (arg0 <= bound);
+    }
+    return arg0;
+}
 
 extern f32 func_81803CD4(f32);
 
