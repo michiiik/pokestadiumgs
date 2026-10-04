@@ -336,7 +336,14 @@ f32 func_81606E14(f32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81606E84.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81606F88.s")
+extern void func_81606E84(s16 *, s32, s32, f32, s32);
+extern void func_816039B0();
+void func_81606F88(s32 arg0, s32 arg1, f32 arg2, s32 arg3) {
+    s16 sp20[4];
+
+    func_81606E84(sp20, arg0, arg1, arg2, arg3);
+    func_816039B0(sp20[0], sp20[1], sp20[2], sp20[3]);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81606FE0.s")
 
