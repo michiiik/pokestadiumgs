@@ -69,3 +69,11 @@ func_830073F8: matched (call_sequence:aggregate_copy:struct_state_buffer_array),
 ## 2026-10-04
 
 func_83008F84: matched (call_sequence:array_pointer_cast:void_ptr_local_alias), 4 iterations, agent antigravity
+
+## 2026-10-04
+
+func_83003320: matched (call_sequence:aggregate_copy:named_state_carrier), 6 iterations, agent unbiased
+
+## 2026-10-04
+
+func_83007D40: plateau at 1.0 (raw 0.9798), mismatch immediate_drift; tried families: call_sequence; tie-pool yes
