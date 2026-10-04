@@ -73,3 +73,15 @@ func_86102C08: plateau at 0.0 (raw None), mismatch unknown; tried families: call
 ## 2026-09-30
 
 func_8610109C: matched (large_mixed:collision:flexible-record-index), 1 iterations, agent codex
+
+## 2026-10-04
+
+func_86102FF0: plateau at 1.0 (raw 0.981), mismatch register_allocation_only; tried families: call_chain; tie-pool yes
+
+## 2026-10-04
+
+func_8610916C: matched (call_chain:cursor-rebase:reuse-cursor-after-lookup), 2 iterations, agent unbiased
+
+## 2026-10-04
+
+func_86105508: plateau at 1.0 (raw 0.9727), mismatch immediate_drift; tried families: call_chain; tie-pool yes
