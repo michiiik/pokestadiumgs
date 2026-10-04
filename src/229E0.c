@@ -701,7 +701,10 @@ void func_80027F4C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80027F7C.s")
+typedef struct { s32 w0; s32 w4; s32 w8; } Candidate27F7CRecord;
+extern Candidate27F7CRecord D_80090BB8[];
+extern Candidate27F7CRecord D_80090C78;
+void func_80027F7C(void) { u8 i; u8 j; for (i = 0; i < 15; i++) { D_80090C84[i] = D_80090CFC; } for (j = 0; j < 16; j++) { D_80090BB8[j] = D_80090C78; } }
 #endif
 
 #ifdef VERSION_US
