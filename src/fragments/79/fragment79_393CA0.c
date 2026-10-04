@@ -663,11 +663,28 @@ s32 func_841263D8(u8 arg0, u8 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84126440.s")
+extern u8 func_80062D20(u8);
+s32 func_84126440(u8 arg0) {
+    switch (func_80062D20(arg0)) {
+    case 0x91:
+        return 1;
+    case 0x27:
+        return 1;
+    case 0x4B:
+        return 1;
+    case 0x97:
+        return 1;
+    case 0x9B:
+        return 1;
+    case 0x1A:
+        return 1;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
-extern void func_84126440(u8);
+extern s32 func_84126440(u8);
 void BattleAnim_StopOwnerCategoryParticles(u8 arg0) {
     func_84126440(arg0);
 }
