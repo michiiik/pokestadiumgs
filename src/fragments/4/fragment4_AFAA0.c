@@ -481,7 +481,29 @@ void func_81803C9C(void *arg0)
   }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81803CD4.s")
+extern f32 D_81805F68;
+extern f32 D_81805F6C;
+extern f32 D_81805F70;
+extern f32 D_81805F74;
+f32 func_81803CD4(f32 arg0) {
+    f32 bound;
+    f32 step;
+    bound = D_81805F68;
+    if (arg0 >= bound) {
+        step = D_81805F6C;
+        do {
+            arg0 -= step;
+        } while (arg0 >= bound);
+    }
+    bound = D_81805F70;
+    step = D_81805F74;
+    if (arg0 <= bound) {
+        do {
+            arg0 += step;
+        } while (arg0 <= bound);
+    }
+    return arg0;
+}
 
 extern f32 func_81803CD4(f32);
 
