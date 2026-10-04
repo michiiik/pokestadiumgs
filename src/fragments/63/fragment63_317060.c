@@ -244,7 +244,18 @@ void func_87E155DC(u8 *arg0) {
     *(s32 *)(arg0 + 0x168) = 4;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E155E8.s")
+extern void func_87F0ACDC(void *, s32, void *, s32);
+typedef struct { u8 high : 1; u8 next : 1; u8 rest : 6; } F155E8I7Flags;
+typedef struct { u32 color; u32 data; F155E8I7Flags flags; u8 pad[3]; } F155E8I7Record;
+typedef struct { void *head; u8 pad[0x84]; F155E8I7Record records[1]; } F155E8I7Owner;
+typedef struct { void *head; u8 pad[0x84]; u32 color; u32 data; F155E8I7Flags flags; u8 tail[3]; } F155E8I7Overlay;
+typedef struct { u8 r; u8 g; u8 b; u8 a; } F155E8I7Color;
+void func_87E155E8(F155E8I7Owner *arg0, s32 arg1, s32 arg2, f32 arg3, s32 arg4, s32 arg5) {
+    arg0->records[arg2].color = *(u32 *)&arg3;
+    func_87F0ACDC(&arg0->records[arg2].data, arg2, arg0->head, arg1);
+    arg0->records[arg2].flags.high = arg4;
+    arg0->records[arg2].flags.next = arg5;
+}
 
 extern void func_8003C6B8(s32);
 void WidgetTree_OpenMessagePanel_fragment63(u8 *arg0) {
