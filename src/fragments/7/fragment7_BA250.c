@@ -631,7 +631,38 @@ void func_83007318(void *arg0, s32 arg1) { switch (arg1) { case -1: if (_bcmp((u
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_830073F8.s")
+extern void func_83001000(void *);
+extern void func_800226C0(s32);
+void func_830073F8(void *arg0, s32 arg1) {
+    struct Buffer {
+        s32 data[0x5D18 / 4];
+    };
+    struct State {
+        u8 pad0[0x1E];
+        u8 unk1E;
+        u8 pad1F[0x34130 - 0x1F];
+        struct Buffer buf[2];
+    };
+    struct State *state = (struct State *)arg0;
+
+    switch (arg1) {
+    case -1:
+    case 3:
+        state->unk1E = 4;
+        func_800226C0(3);
+        break;
+    case 1:
+        func_800226C0(0x11);
+        func_83001000(state);
+        state->unk1E = 8;
+        break;
+    case 2:
+        func_800226C0(0x14);
+        state->buf[1] = state->buf[0];
+        state->unk1E = 1;
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -858,7 +889,31 @@ void func_83008D18(s32 arg0, void *arg1, void *arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83008F84.s")
+extern void func_800226C0(s32);
+void func_83008F84(void *arg0, s32 arg1)
+{
+  u8 *p = arg0;
+
+  switch (arg1)
+  {
+    case -1:
+      p[0x1E] = 2;
+      func_800226C0(3);
+      return;
+    case 1:
+    case 2:
+    case 3:
+      if ((arg1 + p[0x59]) < (((u8 (*)[0x1B64])(p + 0x3872D))[p[0x3E]][0] + 1))
+      {
+        func_800226C0(0x90);
+        p[0x1E] = 0xB;
+        func_83000E40((((p + (((s32) p[0x3E]) * 0x1B64)) + (((s32) p[0x40]) * 0x490)) + (((u32) p[0x59]) * 0x490)) + ((0, 0x382A0)), arg0);
+        return;
+      }
+      func_800226C0(5);
+      return;
+  }
+}
 #endif
 
 #ifdef VERSION_US
