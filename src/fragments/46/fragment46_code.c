@@ -396,7 +396,32 @@ void func_8AE01B88(s16 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE01DC0.s")
+extern s16 D_8AE08504;
+extern s16 D_8AE0A15C;
+void func_8AE01DC0(s16 arg0, s32 arg1) {
+    s16 changed;
+    Fragment46LookupEntry *entry;
+    if (arg1 != 0) {
+        for (changed = 0; ; changed = 0) {
+            if (((u8 *)arg1)[0] == 0xFF) {
+                break;
+            }
+            if (D_8AE0A15C == ((u8 *)arg1)[0]) {
+                entry = func_8AE00E54(arg0);
+                if (entry != NULL) {
+                    if (entry->value == 0) {
+                        changed = 1;
+                    }
+                    entry->value |= 0x87;
+                }
+            }
+            arg1 += 4;
+            if (changed == 1) {
+                D_8AE08504++;
+            }
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
