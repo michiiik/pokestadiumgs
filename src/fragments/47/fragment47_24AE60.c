@@ -6,7 +6,45 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_86004968.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_860049B8.s")
+typedef struct {
+    u8 pad0[1];
+    u8 flags;
+    u8 pad2[0x166];
+} Func860049B8Node;
+typedef struct {
+    u8 pad_0000[0x81D0];
+    Func860049B8Node nodes[2][4][4];
+    f32 values[2][4][4];
+} Func860049B8Context;
+extern void func_8003F210(void *, s32);
+extern void ModelAnim_SetSpeed(void *, s32);
+extern void ModelAnim_SetFrame(void *, s16);
+extern u8 D_8600DE30[];
+void func_860049B8(Func860049B8Context *arg0, f64 arg1) {
+    s32 i;
+    s32 j;
+    s32 k;
+    s32 frame;
+    Func860049B8Node *node;
+
+    for (i = 0; i < 2; i++) {
+        for (j = 0; j < 4; j++) {
+            for (k = j + 1; k < 4; k++) {
+                node = &arg0->nodes[i][j][k];
+                if (arg0->values[i][j][k] > 0.0f) {
+                    frame = 16.0 - ((f64)(arg0->values[i][j][k] * 16.0f) / *(f64 *)(D_8600DE30 + 0x2D0));
+                    func_8003F210(node, 0);
+                    ModelAnim_SetSpeed(node, 0);
+                    ModelAnim_SetFrame(node, frame);
+                    node->flags |= 1;
+                    arg0->values[i][j][k] -= arg1;
+                } else {
+                    node->flags &= ~1;
+                }
+            }
+        }
+    }
+}
 
 void func_86004BC4(void) {}
 void func_86004BC4_padding(void) {}
