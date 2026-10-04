@@ -1234,5 +1234,6 @@ s32 func_800561E4(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_800562B8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_8005633C.s")
+extern s32 func_800562B8(s32);
+s32 func_8005633C(void) { s32 var_v1 = 0; if (func_800562B8(0) != 0) { var_v1 = 1; } if (func_800562B8(1) != 0) { var_v1 = 2; } return var_v1; }
 #endif
