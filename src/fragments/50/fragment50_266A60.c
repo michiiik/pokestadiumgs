@@ -532,7 +532,91 @@ void func_86203F50(s32 n, s32 x, s32 y, u8 r1, u8 g1, u8 b1, u8 r2, u8 g2, u8 b2
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_266A60/func_862040AC.s")
+extern void func_8004D1FC(void *);
+extern void func_80044270(s32, s32, s16, s16, s32, s32, s32, s32, s32);
+extern void func_87F0D600(void *, s32, s32, s32, f32, f32);
+extern void func_87F061F0(void);
+extern s32 func_80001FF0(void);
+extern f32 D_8620E0C4;
+extern f32 D_8620E0C8;
+extern f32 D_8620E0CC;
+extern f32 D_8620E0D0;
+extern Gfx D_80094E38[];
+extern Gfx D_80094F50[];
+extern s32 func_8004C990(s32, s32);
+extern void func_86203F50(s32 n, s32 x, s32 y, u8 r1, u8 g1, u8 b1, u8 r2, u8 g2, u8 b2);
+extern void func_87F06240(s32, s32, f32, f32, s32);
+extern Gfx * D_800D0510;
+extern void * D_8620E198;
+void func_862040AC(void) {
+    s32 amount;
+    u16 *p;
+    f32 scale;
+    f32 xa, ya;
+    f32 bx, by;
+    s32 second, first;
+    Gfx *g;
+    if (*(u8 *)((u8 *)*(void **)((u8 *)D_8620E198 + 0xF4) + 0x2180) != 4) {
+    gSPDisplayList(D_800D0510++, D_80094E38);
+        p = (u16 *)func_8004C990(0x1B2, *((u8 *)D_8620E198 + 0x73CB8));
+        func_8004D1FC(p);
+        scale = D_8620E0C4;
+        xa = (f32)p[0] * scale;
+        if (xa > 0.0f) { bx = 0.5f; } else { bx = -0.5f; }
+        ya = (f32)p[1] * scale;
+        if (ya > 0.0f) { by = 0.5f; } else { by = -0.5f; }
+
+        func_80044270(0x1C, 0x10, (s16)(s32)(bx + xa), (s16)(s32)(by + ya), 0, 0, 0x500, 0x500, 0);
+        p = (u16 *)func_8004C990(0x1B2, *((u8 *)D_8620E198 + 0x73CB9));
+        func_8004D1FC(p);
+
+        xa = (f32)p[0] * scale;
+        if (xa > 0.0f) { bx = 0.5f; } else { bx = -0.5f; }
+        ya = (f32)p[1] * scale;
+        if (ya > 0.0f) { by = 0.5f; } else { by = -0.5f; }
+
+        func_80044270(0x61, 0x10, (s16)(s32)(bx + xa), (s16)(s32)(by + ya), 0, 0, 0x500, 0x500, 0);
+        p = (u16 *)func_8004C990(0x1B2, *((u8 *)D_8620E198 + 0x73CBA));
+        func_8004D1FC(p);
+
+        xa = (f32)p[0] * scale;
+        if (xa > 0.0f) { bx = 0.5f; } else { bx = -0.5f; }
+        ya = (f32)p[1] * scale;
+        if (ya > 0.0f) { by = 0.5f; } else { by = -0.5f; }
+
+        func_80044270(0xA6, 0x10, (s16)(s32)(bx + xa), (s16)(s32)(by + ya), 0, 0, 0x500, 0x500, 0);
+        p = (u16 *)func_8004C990(0x1B2, *((u8 *)D_8620E198 + 0x73CBB));
+        func_8004D1FC(p);
+
+        xa = (f32)p[0] * scale;
+        if (xa > 0.0f) { bx = 0.5f; } else { bx = -0.5f; }
+        ya = (f32)p[1] * scale;
+        if (ya > 0.0f) { by = 0.5f; } else { by = -0.5f; }
+
+        func_80044270(0xEB, 0x10, (s16)(s32)(bx + xa), (s16)(s32)(by + ya), 0, 0, 0x500, 0x500, 0);
+    gSPDisplayList(D_800D0510++, D_80094F50);
+    func_87F0D600((u8 *)D_8620E198 + 0xF8, 0, 0x1C, 0x10, scale, scale);
+    func_87F0D600((u8 *)D_8620E198 + 0xF8, 1, 0x61, 0x10, scale, scale);
+    func_87F0D600((u8 *)D_8620E198 + 0xF8, 2, 0xA6, 0x10, scale, scale);
+    func_87F0D600((u8 *)D_8620E198 + 0xF8, 3, 0xEB, 0x10, scale, scale);
+    func_87F061F0();
+    func_86203F50(*(s32 *)((u8 *)D_8620E198 + 0x73BC0), 0x1C, 0x10, 0x0, 0x0, 0x9B, 0xAA, 0xF5, 0xFF);
+    func_86203F50(*(s32 *)((u8 *)D_8620E198 + 0x73BD8), 0x61, 0x10, 0x0, 0x64, 0x0, 0xC8, 0xFF, 0x9B);
+    func_86203F50(*(s32 *)((u8 *)D_8620E198 + 0x73BF0), 0xA6, 0x10, 0x78, 0x0, 0x0, 0xFF, 0xA0, 0xBE);
+    func_86203F50(*(s32 *)((u8 *)D_8620E198 + 0x73C08), 0xEB, 0x10, 0xD2, 0x5A, 0x0, 0xFF, 0xFF, 0x8C);
+    first = func_80001FF0();
+    second = func_80001FF0();
+    amount = (*(s32 *)((u8 *)D_8620E198 + 0x73BAC) + (first >> 1) - 1) / (second >> 1);
+    gDPSetPrimColor(D_800D0510++, 0, 0, 0xC8, 0xFF, 0x73, 0xFF);
+    gDPSetEnvColor(D_800D0510++, 0, 0x46, 0, 0xFF);
+    if (amount < 10) {
+        func_87F06240(0xF4, 0xC0, D_8620E0C8, D_8620E0C8, amount % 10);
+        return;
+    }
+    func_87F06240(0xEB, 0xC0, D_8620E0CC, D_8620E0CC, amount / 10);
+    func_87F06240(0xFD, 0xC0, D_8620E0D0, D_8620E0D0, amount % 10);
+    }
+}
 #endif
 
 #ifdef VERSION_US
