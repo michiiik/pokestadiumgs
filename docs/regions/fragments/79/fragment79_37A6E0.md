@@ -201,3 +201,35 @@ func_84111EC4: time cap at 0.0 (raw None) after 2429s, mismatch operand_or_sched
 ## 2026-10-04
 
 func_8411C1D4: time cap at 0.8621 (raw 0.5) after 2412s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-10-04
+
+func_84116248: matched (call_sequence:direct:baseline), 1 iterations, agent unbiased
+
+## 2026-10-04
+
+func_8411B5A8: matched (call_sequence:switch:typed-sixteen-byte-rows), 2 iterations, agent unbiased
+
+## 2026-10-04
+
+func_8410E8E4: plateau at 0.0 (raw None), mismatch unknown; tried families: call_sequence; tie-pool no; 5 iteration(s) with a suspicious identical batch-wide failure
+
+## 2026-10-04
+
+func_8410E8E4: plateau at 0.0 (raw None), mismatch unknown; tried families: call_sequence; tie-pool no; 6 iteration(s) with a suspicious identical batch-wide failure
+
+## 2026-10-04
+
+func_84117AA0: plateau at 0.0 (raw None), mismatch unknown; tried families: (none); tie-pool no
+
+## 2026-10-04
+
+func_8410B704: matched (call_sequence:duplicated:inline-float-product), 1 iterations, agent codex
+
+## 2026-10-04
+
+TYPE CONFLICT: func_800371B4 is extern void func_800371B4(u8 *, u8 *, f32, s16, s32), not extern void func_800371B4(u8 *, u8 *, s32, s16, s32)
+
+## 2026-10-04
+
+func_84114804: matched (call_sequence:ladder:post-lookup-byte-reloads-exact), 1 iterations, agent codex
