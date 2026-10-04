@@ -1312,7 +1312,38 @@ void func_86108EE4(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_8610916C.s")
+extern s32 D_8610A0C0[];
+extern f32 D_8610ACBC;
+extern s32 * func_86102630(s32);
+extern s32 func_86108A50(s32 *arg0);
+extern void func_86108B28(u8 *arg0, s32 arg1);
+extern void func_86108BE0(s32 arg0, u32 arg1);
+void func_8610916C(void) {
+    s32 count;
+    s32 i;
+    s32 *entries[4];
+    s32 **cursor;
+    s32 *selected;
+
+    count = func_86108A50((s32 *)entries);
+    func_86108BE0((s32)entries, count);
+    func_86108B28((u8 *)entries, count);
+    cursor = entries;
+    for (i = 0; i < count; i++, cursor++) {
+        (*cursor)[2] = D_8610A0C0[i];
+    }
+    selected = func_86102630(0);
+    cursor = entries;
+    if ((selected != 0) && (count >= 2) && (selected[1] >= 4) && (cursor[0][1] < selected[1])) {
+        if ((f32)cursor[0][1] * D_8610ACBC < (f32)selected[1]) {
+            cursor[count - 1][2] |= 4;
+            cursor[count - 1][2] &= ~2;
+        } else {
+            cursor[count - 1][2] |= 2;
+            cursor[count - 1][2] &= ~4;
+        }
+    }
+}
 
 extern void func_86108C90(void);
 extern void func_86108EE4(void);
