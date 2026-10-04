@@ -361,7 +361,18 @@ void func_80016748(s32 arg0, s32 arg1) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80016890.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80016A24.s")
+const char D_800A1DD0[8] = "BGCOPY";
+extern void func_80015584(void *, s32, s32, s32, s32, s32, void *, s32, void *);
+extern void func_80019540(void *arg0, s32 arg1);
+void func_80016A24(u8 *arg0, s32 arg1) {
+    void *queue[1];
+    arg1 += 0xF;
+    arg1 &= ~0xF;
+    func_80019540(*(void **)(arg0 + 0xC), arg1);
+    queue[0] = arg0 + 0x24;
+    osCreateMesgQueue(queue[0], arg0 + 0x3C, 1);
+    func_80015584(arg0 + 0x40, 0, 0, *(s32 *)(arg0 + 8), *(s32 *)(arg0 + 0xC), arg1, queue[0], *(s8 *)(arg0 + 2), (void *)D_800A1DD0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80016AB4.s")
 
