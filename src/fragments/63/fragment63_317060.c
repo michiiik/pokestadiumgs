@@ -490,7 +490,40 @@ s32 func_87E172F0(f32 arg0, f32 arg1, s32 arg2) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E1733C.s")
+extern s32 func_87E172F0(f32 arg0, f32 arg1, s32 arg2);
+s32 func_87E1733C(u8 *arg0) {
+    u8 pad[8];
+    f32 value;
+    s32 result = -1;
+
+    value = func_87E172F0(*(f32 *)(arg0 + 0), *(f32 *)(arg0 + 4), *(s32 *)(arg0 + 8));
+    if (value != 0.0f) {
+        if (value == 1.0f) {
+            result = 3;
+        } else {
+            result = 2;
+        }
+    } else {
+        value = func_87E172F0(*(f32 *)(arg0 + 0x10), *(f32 *)(arg0 + 0x14), *(s32 *)(arg0 + 0x18));
+        if (value != 0.0f) {
+            if (value == 1.0f) {
+                result = 0;
+            } else {
+                result = 5;
+            }
+        } else {
+            value = func_87E172F0(*(f32 *)(arg0 + 0x20), *(f32 *)(arg0 + 0x24), *(s32 *)(arg0 + 0x28));
+            if (value != 0.0f) {
+                if (value == 1.0f) {
+                    result = 1;
+                } else {
+                    result = 4;
+                }
+            }
+        }
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E17484.s")
 
