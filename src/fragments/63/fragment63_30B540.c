@@ -77,7 +77,19 @@ void func_87E07F18(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E080F8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E08168.s")
+void func_87E08168(void *arg0) {
+    typedef struct {
+        u8 pad[0x16];
+        u8 flags;
+        u8 tail;
+    } Record;
+    Record *ptr = (Record *)((u8 *)arg0 + 0x2190);
+    s32 i;
+
+    for (i = 0; i < 4; i++, ptr++) {
+        ptr->flags &= ~0x20;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E081A0.s")
 
@@ -244,7 +256,22 @@ void func_87E08CD8(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E08EF0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E094C0.s")
+extern s32 func_87E078DC(void *);
+void func_87E094C0(void *arg0) {
+    s32 result;
+
+    result = func_87E078DC((u8 *)arg0 + 0x498);
+    if (result == 2) {
+        return;
+    }
+    switch (result) {
+        case 0:
+            *(s32 *)((u8 *)arg0 + 4) = 9;
+            break;
+        case 1:
+            break;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E09514.s")
 
