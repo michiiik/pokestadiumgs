@@ -396,7 +396,24 @@ void func_84152408(void *arg0, u8 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84152600.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_841526CC.s")
+extern u8 func_8414A2AC(void);
+extern void * func_8414A3A0(u8);
+extern void * func_84154B64(s32);
+void func_841526CC(void *arg0, u8 arg1) {
+    s32 base;
+    void *state;
+    void *table;
+    u8 amount;
+    base = (s32)(u32)arg0 + 4;
+    state = func_84154B64(arg1);
+    if (((*(u16 *)((u8 *)state + 0x26) & 7) != 0)) {
+        *(u8 *)((u8 *)(u32)base + (u32)arg1 + 8) = 0xFF;
+        amount = func_8414A2AC();
+        table = func_8414A3A0(arg1);
+        *(u32 *)((u8 *)(u32)base + ((u32)arg1 << 2) + 0x34) += *(u8 *)((u8 *)table + 0x36) * amount;
+        *(u8 *)(u32)base |= 2;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84152764.s")
 
