@@ -336,7 +336,28 @@ void func_8415220C(void *arg0, u8 arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84152308.s")
+extern u8 func_8414A2AC(void);
+extern void * func_8414A3A0(u8);
+extern void * func_84154B64(s32);
+void func_84152308(void *arg0, u8 arg1) {
+    void *state;
+    s32 base;
+    s32 amount;
+    void *table;
+    
+    state = func_84154B64((1 - (u32)arg1) & 0xFF);
+    if (*(u8 *)((u8 *)state + 0x18) & 0x10) return;
+    base = (s32)(u32)arg0 + 4;
+    if (*(u8 *)((u8 *)state + 0x19) & 0x20) return;
+    
+    *(u8 *)((u8 *)(u32)base + (u32)arg1 + 8) = 0xFF;
+    table = func_8414A3A0(arg1);
+    amount = func_8414A2AC();
+    amount *= *(u8 *)((u8 *)table + 0x32);
+    *(u32 *)((u8 *)(u32)base + ((u32)arg1 << 2) + 0x34) += amount;
+    *(u8 *)(u32)base |= 2;
+    
+}
 
 extern void *D_841951F8[];
 void func_841523BC(void *arg0, u8 arg1) {
