@@ -61,3 +61,11 @@ func_83001000: time cap at 0.9067 (raw 0.6933) after 2420s, mismatch instruction
 ## 2026-09-27
 
 func_830022F0: plateau at 1.0 (raw 0.987), mismatch immediate_drift; tried families: call_sequence; tie-pool yes
+
+## 2026-10-04
+
+func_830073F8: matched (call_sequence:aggregate_copy:struct_state_buffer_array), 4 iterations, agent antigravity
+
+## 2026-10-04
+
+func_83008F84: matched (call_sequence:array_pointer_cast:void_ptr_local_alias), 4 iterations, agent antigravity
