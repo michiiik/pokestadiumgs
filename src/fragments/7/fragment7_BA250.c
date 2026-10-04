@@ -363,7 +363,51 @@ void func_83002F50(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83003320.s")
+extern s32 func_81804A20(void *);
+extern void func_81805524(void *, void *);
+extern void func_800226C0(s32);
+void func_83003320(void *arg0, void *arg1) {
+    struct Record { s32 words[17]; };
+    struct State {
+        u8 pad0[0x14];
+        u16 flags;
+        u8 pad16[0x51 - 0x16];
+        u8 selection;
+        u8 pad52[0x3A06D - 0x52];
+        u8 count;
+        u8 pad3A06E[2];
+        struct Record records[1];
+        u8 pad3A0B4[0x3FD74 - 0x3A0B4];
+        struct Record fixed[4];
+        struct Record selected;
+        s32 state;
+        u8 active;
+    };
+    struct State *p = arg1;
+    s32 index = p->selection - 1;
+    if (func_81804A20(p) != 0) {
+        if (p->flags & 0x10) {
+            if (index < 4) {
+                p->selected = p->fixed[index];
+                p->state = 0x700;
+                p->active = 1;
+                func_800226C0(0xD2);
+                return;
+            }
+            index -= 4;
+            if (index < p->count) {
+                p->selected = p->records[index];
+                p->state = 0x700;
+                p->active = 1;
+                func_800226C0(0xD2);
+                return;
+            }
+            func_800226C0(5);
+            return;
+        }
+        func_81805524(arg0, p);
+    }
+}
 #endif
 
 #ifdef VERSION_US
