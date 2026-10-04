@@ -1213,7 +1213,48 @@ void func_84128CB8(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84129180.s")
+extern void func_84134CBC(u8 arg0, u8 arg1);
+extern void func_84135B00(u8);
+extern void func_84136678(u8 arg0, s16 arg1);
+extern void func_84136A9C(u8 arg0, s16 arg1, s16 arg2, u8 arg3);
+extern void func_84136CA8(void);
+extern u8 D_841951BC;
+extern u8 D_841951BF;
+extern s32 D_841951C8;
+extern u8 * D_84195200[];
+void func_84129180(void) {
+    u16 amount;
+
+    amount = D_841951C8 >> 1;
+    if (amount == 0) {
+        amount++;
+    }
+    if (*(u16 *)(D_84195200[D_841951BC] + 0x26) + amount > *(u16 *)(D_84195200[D_841951BC] + 0x28)) {
+        amount = *(u16 *)(D_84195200[D_841951BC] + 0x28) - *(u16 *)(D_84195200[D_841951BC] + 0x26);
+    }
+    *(u16 *)(D_84195200[D_841951BC] + 0x26) += amount;
+    func_84136A9C(D_841951BC, -1, amount, 1);
+    func_84136678(D_841951BC, -1);
+    func_84135B00(0xAF);
+    switch (D_841951BF) {
+        case 0x8D:
+            func_84134CBC(D_841951BC, 0x51);
+            break;
+        case 0x47:
+            func_84134CBC(D_841951BC, 0x54);
+            break;
+        case 0x48:
+            func_84134CBC(D_841951BC, 0x52);
+            break;
+        case 0xCA:
+            func_84134CBC(D_841951BC, 0x53);
+            break;
+        default:
+            func_84134CBC(D_841951BC, 0x4A);
+            break;
+    }
+    func_84136CA8();
+}
 #endif
 
 #ifdef VERSION_US
