@@ -177,3 +177,27 @@ func_8411A310: matched (call_sequence:two-carriers:v0-v1-limit-order), 1 iterati
 ## 2026-09-30
 
 func_8411AEA8: matched (call_sequence:guard:index-first-pointer-add-exact), 1 iterations, agent codex
+
+## 2026-10-04
+
+func_84117DC4: time cap at 0.0 (raw None) after 2400s, mismatch unknown; tried families: call_sequence; tie-pool no; 1 iteration(s) with a suspicious identical batch-wide failure
+
+## 2026-10-04
+
+TYPE CONFLICT: func_8411E164 is extern s32 func_8411E164(s32), not extern s32 func_8411E164()
+
+## 2026-10-04
+
+func_84117CEC: time cap at 0.0 (raw None) after 2413s, mismatch unknown; tried families: call_sequence; tie-pool no; 1 iteration(s) with a suspicious identical batch-wide failure
+
+## 2026-10-04
+
+func_8411A964: matched (call_sequence:baseline:exact-sequence), 1 iterations, agent openrouter
+
+## 2026-10-04
+
+func_84111EC4: time cap at 0.0 (raw None) after 2429s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool yes
+
+## 2026-10-04
+
+func_8411C1D4: time cap at 0.8621 (raw 0.5) after 2412s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
