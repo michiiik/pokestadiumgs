@@ -631,7 +631,38 @@ void func_83007318(void *arg0, s32 arg1) { switch (arg1) { case -1: if (_bcmp((u
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_830073F8.s")
+extern void func_83001000(void *);
+extern void func_800226C0(s32);
+void func_830073F8(void *arg0, s32 arg1) {
+    struct Buffer {
+        s32 data[0x5D18 / 4];
+    };
+    struct State {
+        u8 pad0[0x1E];
+        u8 unk1E;
+        u8 pad1F[0x34130 - 0x1F];
+        struct Buffer buf[2];
+    };
+    struct State *state = (struct State *)arg0;
+
+    switch (arg1) {
+    case -1:
+    case 3:
+        state->unk1E = 4;
+        func_800226C0(3);
+        break;
+    case 1:
+        func_800226C0(0x11);
+        func_83001000(state);
+        state->unk1E = 8;
+        break;
+    case 2:
+        func_800226C0(0x14);
+        state->buf[1] = state->buf[0];
+        state->unk1E = 1;
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
