@@ -202,7 +202,10 @@ s32 func_81801E70(u8 *arg0, u8 *arg1) {
 
 void func_81801EB8(u8 *arg0) {}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81801EC0.s")
+void func_81801EC0(u8 *arg0, u8 *arg1) {
+    *(s16 *)(arg1 + 0) = *(s16 *)(arg0 + 4) / 2 + *(s16 *)(arg0 + 0);
+    *(s16 *)(arg1 + 2) = *(s16 *)(arg0 + 6) / 2 + *(s16 *)(arg0 + 2);
+}
 
 void func_81801F04(u8 *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) { *(u16 *)(arg0 + 0) = arg1; *(u16 *)(arg0 + 2) = arg2; *(u16 *)(arg0 + 4) = arg3; *(u16 *)(arg0 + 6) = arg4; }
 
