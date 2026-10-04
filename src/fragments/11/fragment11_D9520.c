@@ -534,7 +534,18 @@ void func_81608890(s32 arg0, s32 arg1, u8 *arg2) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81608918.s")
+extern f32 func_8160BCB0(f32, f32);
+extern void func_8004AF18(s32, s32);
+extern f32 func_816092FC(void);
+void func_81608918(s32 arg0, s32 arg1, f32 *arg2) {
+    *arg2 = func_8160BCB0(*arg2 + func_816092FC(), 24.0f);
+    if (*arg2 < 12.0f) {
+        arg0 += *arg2 / 2;
+    } else {
+        arg0 += (24.0f - *arg2) / 2;
+    }
+    func_8004AF18(arg0, arg1);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_816089E0.s")
 
