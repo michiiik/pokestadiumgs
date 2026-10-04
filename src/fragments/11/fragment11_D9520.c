@@ -6,7 +6,13 @@ s32 func_81601980(s32 *arg0, s32 arg1) {
     return arg0[arg1 / 32] & (1 << (arg1 % 32));
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_816019C0.s")
+void func_816019C0(s32 *arg0, s32 arg1, s32 arg2)
+{
+    s32 mask;
+    s32 value;
+    ;
+    arg0[arg1 / 32] = (arg0[arg1 / 32] & (~mask)) | ((arg2) ? (mask = 1 << (arg1 % 32)) : ((mask = 1 << (arg1 % 32), 0)));
+}
 
 void func_81601A38(s32 *arg0, s32 arg1) {
     s32 value;
