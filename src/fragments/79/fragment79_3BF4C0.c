@@ -90,7 +90,26 @@ s32 func_84151498(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_8415169C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_8415178C.s")
+extern s32 func_8414A2DC(void);
+extern void * func_8414A3A0(u8);
+extern void * func_84154B64(s32);
+void func_8415178C(void *arg0, u8 arg1, u8 arg2) {
+    void *state;
+    s32 base;
+    u8 pad;
+    void *table;
+    s32 amount;
+    state=func_84154B64((s32)arg1);
+    if (*(u16 *)((u8 *)state+0x2A)!=*(u16 *)((u8 *)state+0x28)) {
+        base=(s32)(u32)arg0+4;
+        table=func_8414A3A0(arg1);
+        amount=*(u8 *)((u8 *)table+0x3D) * func_8414A2DC();
+        *(u8 *)((u8 *)(u32)base+(u32)arg1+8)=0xFF;
+        if (*(u8 *)((u8 *)arg0+1)&2) amount>>=2;
+        *(s32 *)((u8 *)(u32)base+((u32)arg1<<2)+0x34)+=amount;
+        *(u8 *)(u32)base|=2;
+    }
+}
 
 extern u8 func_8414A2AC(void);
 extern void * func_8414A3A0(u8);
