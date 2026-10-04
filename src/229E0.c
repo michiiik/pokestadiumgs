@@ -1176,7 +1176,17 @@ u8 GbAudio_GetRegisterValue(char arg0)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80031E6C.s")
+typedef struct { u8 *ptr; u8 value; u8 pad; u16 limit; } Func31Entry;
+extern Func31Entry D_800D27C0[];
+extern s32 D_800D2AE0;
+void func_80031E6C(u16 arg0) {
+    while (D_800D27C0[D_800D2AE0].limit >= arg0) {
+        D_800D27C0[D_800D2AE0].ptr[0] = D_800D27C0[D_800D2AE0].value;
+        D_800D27C0[D_800D2AE0].ptr[1] = 1;
+        D_800D2AE0++;
+        if ((u32)D_800D2AE0 >= 100U) D_800D2AE0 -= 100;
+    }
+}
 #endif
 
 #ifdef VERSION_US
