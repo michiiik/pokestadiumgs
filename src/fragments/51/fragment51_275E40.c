@@ -116,7 +116,34 @@ void func_863007B8(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/51/fragment51_275E40/func_86300C74.s")
+extern u32 func_8003570C();
+extern void * D_87F119DC;
+void func_86300C74(s32 *arg0) {
+    struct LocalRange {
+        u8 pad00[0x10];
+        f32 lower;
+        f32 upper;
+        u8 pad18[0x18];
+        f32 target;
+    } *p;
+
+    p = *(struct LocalRange **)((u8 *)D_87F119DC + 0x20);
+    if (*(u32 *)((u8 *)D_87F119DC + 0xC) & 0x80000000) {
+        p->target = (func_8003570C() / 4294967296.0f) * (p->upper - p->lower) + p->lower;
+        *(u32 *)((u8 *)D_87F119DC + 0xC) &= 0x7FFFFFFF;
+    } else {
+        *arg0 = p->target - *(f32 *)((u8 *)D_87F119DC + 0x48);
+        if (((*arg0 > 0.0f) ? *arg0 : -*arg0) < 5.0f) {
+            if ((func_8003570C() % 101) < 5) {
+                *(u32 *)((u8 *)D_87F119DC + 0xC) |= 0x80000000;
+            }
+        } else if (*arg0 > 0.0f) {
+            *arg0 = 0x10;
+        } else {
+            *arg0 = -0x10;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -146,7 +173,49 @@ void func_86300FB4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/51/fragment51_275E40/func_86301250.s")
+extern s32 func_86300074(s32 *);
+extern s32 ModelAnim_IsFinished();
+extern void func_8003F1DC();
+extern void func_8003F114();
+extern void func_8003F210();
+extern void func_8003F3BC();
+extern u8 D_86307334[];
+extern u8 D_86307460[];
+extern u8 D_86307462[];
+typedef struct Func86301250ResourceGrid { u8 pad[0xE0]; void *resources[4][2]; } Func86301250ResourceGrid;
+typedef struct Func86301250ResourceRow { void *slots[2]; } Func86301250ResourceRow;
+typedef struct Func86301250ResourceRows { u8 pad[0xE0]; Func86301250ResourceRow rows[4]; } Func86301250ResourceRows;
+extern void * D_863075D8;
+extern void * D_87F119DC;
+void func_86301250(void *arg0) {
+    u8 *selection;
+    s32 animation;
+    s32 speed;
+    s32 value;
+    s32 padding0;
+    s32 padding1;
+
+    if ((*(s16 *)((u8 *)D_87F119DC + 0x64) == 0) ||
+        ((*(s16 *)((u8 *)D_87F119DC + 0x64) == 1) && ModelAnim_IsFinished((void *)((u8 *)D_87F119DC + 0x24)))) {
+        if ((func_86300074(&value) < 4) && (value == ((s32 (*)[19])D_86307334)[*(s32 *)arg0][0])) {
+            selection = D_86307460;
+            animation = 3;
+            speed = 0x40;
+        } else {
+            selection = D_86307462;
+            animation = 4;
+            speed = 0x28;
+        }
+        func_8003F1DC((void *)((u8 *)D_87F119DC + 0x24));
+        func_8003F114((void *)((u8 *)D_87F119DC + 0x24), 0, -1,
+                     ((Func86301250ResourceGrid *)D_863075D8)->resources[*(s32 *)arg0][selection[0]]);
+        func_8003F210((void *)((u8 *)D_87F119DC + 0x24), selection[1]);
+        func_8003F3BC((void *)((u8 *)D_87F119DC + 0x24), 0);
+        *(s16 *)((u8 *)*(void **)((u8 *)D_87F119DC + 0x68) + 6) = speed;
+        func_8003F210((void *)((u8 *)*(void **)((u8 *)arg0 + 0x40) + 0x24), animation);
+        *(s16 *)((u8 *)*(void **)((u8 *)*(void **)((u8 *)arg0 + 0x40) + 0x68) + 6) = speed;
+    }
+}
 #endif
 
 #ifdef VERSION_US
