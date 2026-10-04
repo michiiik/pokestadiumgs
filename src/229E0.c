@@ -701,7 +701,10 @@ void func_80027F4C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80027F7C.s")
+typedef struct { s32 w0; s32 w4; s32 w8; } Candidate27F7CRecord;
+extern Candidate27F7CRecord D_80090BB8[];
+extern Candidate27F7CRecord D_80090C78;
+void func_80027F7C(void) { u8 i; u8 j; for (i = 0; i < 15; i++) { D_80090C84[i] = D_80090CFC; } for (j = 0; j < 16; j++) { D_80090BB8[j] = D_80090C78; } }
 #endif
 
 #ifdef VERSION_US
@@ -1173,7 +1176,17 @@ u8 GbAudio_GetRegisterValue(char arg0)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80031E6C.s")
+typedef struct { u8 *ptr; u8 value; u8 pad; u16 limit; } Func31Entry;
+extern Func31Entry D_800D27C0[];
+extern s32 D_800D2AE0;
+void func_80031E6C(u16 arg0) {
+    while (D_800D27C0[D_800D2AE0].limit >= arg0) {
+        D_800D27C0[D_800D2AE0].ptr[0] = D_800D27C0[D_800D2AE0].value;
+        D_800D27C0[D_800D2AE0].ptr[1] = 1;
+        D_800D2AE0++;
+        if ((u32)D_800D2AE0 >= 100U) D_800D2AE0 -= 100;
+    }
+}
 #endif
 
 #ifdef VERSION_US
