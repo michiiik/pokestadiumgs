@@ -641,7 +641,13 @@ void func_82608054(u8 *arg0, u8 *arg1, s32 arg2) {
     arg1[2] = (((D_8261563E - D_82615636) * arg2) / 255) + D_82615636;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82608270.s")
+typedef struct { u8 r; u8 g; u8 b; } Color82608270;
+extern Color82608270 D_82615640;
+extern Color82608270 D_82615644[];
+void func_82608270(Color82608270 *arg0, Color82608270 *arg1, s32 arg2) {
+    *arg0 = D_82615640;
+    *arg1 = D_82615644[arg2];
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_826082C0.s")
 
