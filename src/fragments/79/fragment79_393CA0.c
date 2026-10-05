@@ -811,7 +811,28 @@ u16 func_84126850(u8 arg0, u16 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841268A0.s")
+extern u16 D_841951CA;
+extern void func_8412EE5C(void);
+extern void func_841265EC(void);
+extern s32 func_84126804(u8, u16);
+extern void func_84134CBC(u8 arg0, u8 arg1);
+extern void func_84135B00(u8);
+extern void func_84136678(u8 arg0, s16 arg1);
+extern void func_84136A9C(u8 arg0, s16 arg1, s16 arg2, u8 arg3);
+extern void func_84136CA8(void);
+extern u8 D_841951BC;
+extern s32 D_841951C8;
+void func_841268A0(void) {
+    func_84136678(D_841951BC, -1);
+    func_84135B00(0x5C);
+    func_84134CBC(D_841951BC, 1);
+    func_84136CA8();
+    D_841951D1 = 0;
+    func_841265EC();
+    func_8412EE5C();
+    D_841951C8 = func_84126804(D_841951BC, D_841951CA);
+    func_84136A9C(D_841951BC, -1, -D_841951C8, 1);
+}
 #endif
 
 #ifdef VERSION_US
