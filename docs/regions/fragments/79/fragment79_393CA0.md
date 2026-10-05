@@ -357,3 +357,23 @@ func_84124E44: matched (call_input_materialization:second_lookup:byte_local), 2 
 ## 2026-10-05
 
 func_8412E680: plateau at 0.9455 (raw 0.9273), mismatch operand_or_scheduling_drift; tried families: argument_materialization, call_sequence, callee_return_contract, definition_contract_repair, duration_lifetime, initial_dispatch, mode_reuse, outgoing_stack_argument, permuter_repair, permuter_seed, result_dataflow, state_base_bias, state_representation, state_store, state_store_sequence, state_value_lifetime, tail_control, tail_expression, tail_short_circuit; tie-pool yes
+
+## 2026-10-05
+
+func_84139F44: matched (call_sequence:switch:direct_global_index), 1 iterations, agent unbiased
+
+## 2026-10-05
+
+func_8412EC70: plateau at 0.0 (raw None), mismatch unknown; tried families: call_sequence; tie-pool no; 6 iteration(s) with a suspicious identical batch-wide failure
+
+## 2026-10-05
+
+func_8412EC70: plateau at 0.0 (raw None), mismatch unknown; tried families: call_sequence; tie-pool no; 7 iteration(s) with a suspicious identical batch-wide failure
+
+## 2026-10-05
+
+func_841318C0: time cap at 0.9841 (raw 0.9683) after 2400s, mismatch instruction_drift; tried families: call_sequence; tie-pool yes
+
+## 2026-10-05
+
+func_8413A6CC: time cap at 0.8819 (raw 0.8583) after 2400s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
