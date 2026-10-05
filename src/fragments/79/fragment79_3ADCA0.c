@@ -1056,7 +1056,37 @@ void func_841440B4(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_841442BC.s")
+extern s32 func_80062CE0(u8);
+extern s32 func_8413E490(u8);
+extern void func_800496A4(s32, s32);
+extern s16 D_84186CB8;
+extern s16 D_84186CBC;
+extern s16 D_84186CC8;
+extern s16 D_84186CCC;
+extern u16 D_84186CD0;
+extern void func_80048E30(void *, s32, s32, s32, s32);
+extern void func_8004972C(s32, s32, s32, s32);
+extern void func_8004989C(s32);
+extern u8 * D_84195208[];
+extern void * D_8419A0B0;
+void func_841442BC(void *arg0)
+{
+    u8 id;
+    s32 text;
+    u8 index;
+
+    index = ((u8 *)arg0)[1];
+    id = (*(s32 *)((u8 *)arg0 + 4) + D_84195208[index])[5];
+    func_80048E30(D_8419A0B0, *(s16 *)((u8 *)arg0 + 0xA) + D_84186CB8, *(s16 *)((u8 *)arg0 + 0xC) + D_84186CBC, func_80062CE0(id), 1);
+    func_800496A4(1, 0);
+    text = func_8413E490(id);
+    func_8004989C(D_84186CD0);
+    func_8004972C(20, 20, 20, 255);
+    func_80048E30(D_8419A0B0, *(s16 *)((u8 *)arg0 + 0xA) + D_84186CC8 + 1, *(s16 *)((u8 *)arg0 + 0xC) + D_84186CCC + 1, text, 1);
+    func_8004972C(255, 255, 255, 255);
+    func_80048E30(D_8419A0B0, *(s16 *)((u8 *)arg0 + 0xA) + D_84186CC8, *(s16 *)((u8 *)arg0 + 0xC) + D_84186CCC, text, 1);
+    func_800496A4(2, -1);
+}
 #endif
 
 #ifdef VERSION_US
@@ -1822,7 +1852,35 @@ void func_84147270(u8 *arg0, u8 arg1, s16 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_8414735C.s")
+extern u8 D_84186F13[];
+extern u8 D_84186F14[];
+extern void func_84147270(u8 *arg0, u8 arg1, s16 arg2);
+void func_8414735C(u8 *arg0, s16 arg1, s16 arg2, u8 arg3, s16 arg4)
+{
+    s32 direction;
+    s32 sign;
+    s32 value;
+
+    value = arg0[1];
+    direction = value ? -1 : 1;
+    if (arg1 > 0) {
+        sign = 1;
+    } else {
+        sign = -1;
+    }
+    value = arg3;
+    if (value >= arg0[9]) {
+        arg0[8] &= ~1;
+        if (arg2 < 0) {
+            *(s16 *)(arg0 + 0xA) += sign * direction * D_84186F13[arg0[9]];
+        } else if (arg2 > 0) {
+            *(s16 *)(arg0 + 0xA) += sign * direction * D_84186F14[value + arg0[9] * -1];
+        } else {
+            *(s16 *)(arg0 + 0xA) += arg1 * direction / value;
+        }
+        func_84147270(arg0, arg3, arg4);
+    }
+}
 #endif
 
 #ifdef VERSION_US
