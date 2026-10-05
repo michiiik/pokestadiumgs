@@ -246,7 +246,21 @@ s32 func_81404334(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81404724.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_814047C0.s")
+extern s16 D_81407A2C[][2];
+void func_814047C0(void *arg0, void *arg1)
+{
+  f32 t;
+  f32 inv;
+  s16 *pos;
+  s16 *out = arg1;
+  t = (*((f32 *) arg0)) / 16;
+  inv = 1.0f - t;
+  pos = D_81407A2C[*((s8 *) (((u8 *) arg0) + 9))];
+  out[0] = pos[0] + (63.5f * inv);
+  out[1] = pos[1] + (25.5f * inv);
+  out[2] = 127.0f * t;
+  out[3] = 51.0f * t;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_8140487C.s")
 
