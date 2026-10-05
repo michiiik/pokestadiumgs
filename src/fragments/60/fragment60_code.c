@@ -305,7 +305,27 @@ void func_86A06400(s32 arg0, f32 arg1, f32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/60/fragment60_code/func_86A06650.s")
+extern s32 func_86A066F4(s16 arg0, s16 arg1);
+s32 func_86A06650(s16 arg0, s16 arg1, s16 arg2) {
+    s16 pad;
+    s16 distance;
+    s16 plus;
+    s16 minus;
+    s32 secondDistance;
+
+    if (arg2 < func_86A066F4(arg0, arg1)) {
+        plus = arg1 + arg2;
+        distance = func_86A066F4(arg0, plus);
+        minus = arg1 - arg2;
+        secondDistance = func_86A066F4(arg0, minus);
+        if (distance < secondDistance) {
+            return plus;
+        } else {
+            return minus;
+        }
+    }
+    return arg0;
+}
 #endif
 
 #ifdef VERSION_US
