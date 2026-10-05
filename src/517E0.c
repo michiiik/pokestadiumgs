@@ -1068,7 +1068,17 @@ void func_80055A34(void) {
 
 s32 func_80055A74(s32 arg0) { extern s32 D_800972C0; s32 old = D_800972C0; if (arg0 >= 0 && arg0 < 6) D_800972C0 = arg0; return old; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055A9C.s")
+extern s32 func_80050E88(s32 arg0, s32 arg1, s32 arg2);
+extern s32 D_800972C0;
+s32 func_80055A9C(void *arg0, s32 arg1) {
+    typedef struct { s32 words[96]; } Copy80055A9C;
+    s32 result = 0;
+    if ((arg1 >= 0) && (arg1 < 10)) {
+        *(Copy80055A9C *)arg0 = *(Copy80055A9C *)func_80050E88(0, D_800972C0, arg1);
+        result = 1;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055B14.s")
 
