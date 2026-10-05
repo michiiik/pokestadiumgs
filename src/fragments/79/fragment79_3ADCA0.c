@@ -1852,7 +1852,35 @@ void func_84147270(u8 *arg0, u8 arg1, s16 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_8414735C.s")
+extern u8 D_84186F13[];
+extern u8 D_84186F14[];
+extern void func_84147270(u8 *arg0, u8 arg1, s16 arg2);
+void func_8414735C(u8 *arg0, s16 arg1, s16 arg2, u8 arg3, s16 arg4)
+{
+    s32 direction;
+    s32 sign;
+    s32 value;
+
+    value = arg0[1];
+    direction = value ? -1 : 1;
+    if (arg1 > 0) {
+        sign = 1;
+    } else {
+        sign = -1;
+    }
+    value = arg3;
+    if (value >= arg0[9]) {
+        arg0[8] &= ~1;
+        if (arg2 < 0) {
+            *(s16 *)(arg0 + 0xA) += sign * direction * D_84186F13[arg0[9]];
+        } else if (arg2 > 0) {
+            *(s16 *)(arg0 + 0xA) += sign * direction * D_84186F14[value + arg0[9] * -1];
+        } else {
+            *(s16 *)(arg0 + 0xA) += arg1 * direction / value;
+        }
+        func_84147270(arg0, arg3, arg4);
+    }
+}
 #endif
 
 #ifdef VERSION_US
