@@ -214,7 +214,60 @@ s32 func_81603368(s32 arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81603404.s")
+extern s32 func_8005D8CC(s32);
+extern s32 func_80057A80(s32);
+extern s32 func_8005F37C(u8, u16 *, u8 *, u8 *, u8 *);
+extern s32 func_8005DE68(s32);
+extern s32 func_8005DE8C(s32);
+extern s32 func_8005DDF8(s32);
+extern s32 func_8005DDD4(s32);
+extern u8 func_8005D92C(s32);
+s32 func_81603404(s32 arg0, s32 arg1)
+{
+    s32 status;
+    s32 new_var;
+    u16 out0;
+    u8 out1;
+    u8 out2;
+    u8 out3;
+    s32 pad1;
+
+    status = func_8005D8CC(arg0);
+    if ((status == 1) || (status == 4)) {
+        return 2;
+    }
+    new_var = status;
+    if ((arg1 & 2) && (func_8005D92C(arg0) != 7)) {
+        return 5;
+    }
+    if ((arg1 & 1) && func_80057A80(arg0)) {
+        return 4;
+    }
+    if ((arg1 & 4) && ((new_var == 3) || (new_var == 5))) {
+        return 6;
+    }
+    if (new_var == 2) {
+        return 3;
+    }
+    if ((arg1 & 0x80) && func_8005F37C((u8)arg0, &out0, &out1, &out2, &out3)) {
+        return 1;
+    }
+    if ((arg1 & 8) && !func_8005DE68(arg0)) {
+        return 7;
+    }
+    if ((arg1 & 0x10) && !func_8005DE8C(arg0)) {
+        return 8;
+    }
+    if ((arg1 & 0x20) && !func_8005DDF8(arg0)) {
+        if ((arg1 && arg1) && arg1) {
+        }
+        return 9;
+    }
+    if ((arg1 & 0x40) && !func_8005DDD4(arg0)) {
+        return 10;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81603598.s")
 
