@@ -337,3 +337,23 @@ func_84128204: time cap at 0.9459 (raw 0.7297) after 2400s, mismatch unaligned_d
 ## 2026-10-04
 
 func_8412D4A8: plateau at 0.0 (raw None), mismatch unknown; tried families: call_sequence; tie-pool no; 6 iteration(s) with a suspicious identical batch-wide failure
+
+## 2026-10-05
+
+func_8412F170: matched (comparison_dataflow:record_pointer:two_byte_array_stride), 2 iterations, agent unbiased
+
+## 2026-10-05
+
+func_841268A0: matched (call_sequence:direct_global:baseline), 1 iterations, agent unbiased
+
+## 2026-10-05
+
+func_84131F80: plateau at 0.7209 (raw 0.3023), mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool yes; 2 iteration(s) with a suspicious identical batch-wide failure
+
+## 2026-10-05
+
+func_84124E44: matched (call_input_materialization:second_lookup:byte_local), 2 iterations, agent unbiased
+
+## 2026-10-05
+
+func_8412E680: plateau at 0.9455 (raw 0.9273), mismatch operand_or_scheduling_drift; tried families: argument_materialization, call_sequence, callee_return_contract, definition_contract_repair, duration_lifetime, initial_dispatch, mode_reuse, outgoing_stack_argument, permuter_repair, permuter_seed, result_dataflow, state_base_bias, state_representation, state_store, state_store_sequence, state_value_lifetime, tail_control, tail_expression, tail_short_circuit; tie-pool yes
