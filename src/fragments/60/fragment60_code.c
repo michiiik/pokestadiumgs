@@ -612,7 +612,34 @@ void func_86A0B98C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/60/fragment60_code/func_86A0BA80.s")
+extern s32 D_86A11180;
+extern void func_8003F114(void *, s32, s32, s32);
+extern void func_8003F1DC(void *);
+extern void func_86A0B98C(void);
+extern void * func_87F025B8(void *, void *);
+extern u8 D_86A10B38;
+extern u8 D_86A443F0[];
+void func_86A0BA80(s32 arg0) {
+    u8 *obj;
+    u8 *pos;
+
+    obj = func_87F025B8(&D_86A10B38, func_86A0B98C);
+    if (obj != NULL) {
+        pos = D_86A443F0 + arg0 * 8;
+        *(f32 *)(obj + 0x48) = *(f32 *)(pos + 4);
+        *(f32 *)(obj + 0x4C) = 82.0f;
+        *(f32 *)(obj + 0x50) = *(f32 *)(pos + 8);
+        *(s32 *)(obj + 0x1C) = 0;
+        *(s32 *)(obj + 0x38) = arg0;
+        *(s32 *)(obj + 0x20) = arg0;
+        *(f32 *)(obj + 0x54) = 0.0f;
+        *(f32 *)(obj + 0x58) = 0.0f;
+        *(f32 *)(obj + 0x5C) = 0.0f;
+        func_8003F1DC(obj + 0x24);
+        func_8003F114(obj + 0x24, 0, -1, D_86A11180);
+        obj[0x26] |= 8;
+    }
+}
 #endif
 
 #ifdef VERSION_US
