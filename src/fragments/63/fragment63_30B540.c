@@ -250,7 +250,32 @@ void func_87E08CD8(s32 arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E08D70.s")
+extern s32 func_87E07F4C(void *);
+extern void func_87E0CDDC(void *, s32, s32);
+extern void func_87E0CE60(void *, s32, s32);
+void func_87E08D70(void *arg0) {
+    s32 i;
+    s8 *state;
+    s32 selected;
+    s8 *entry;
+
+    state = (s8 *)*(void **)((u8 *)arg0 + 0x20) + 0x2188;
+    selected = func_87E07F4C(*(void **)((u8 *)arg0 + 0x20));
+    entry = *(s32 *)((u8 *)arg0 + 0x1C) * 3 + *(s8 **)((u8 *)arg0 + 0x84);
+    state[4] = *(s32 *)((u8 *)arg0 + 0x1C);
+    state[5] = entry[0];
+    state[6] = entry[1];
+    state[7] = entry[2];
+    for (i = 0; i < 4; i++) {
+        if (selected != *(s32 *)((u8 *)*(void **)((u8 *)arg0 + 0x20) + 0x2190 + i * 0x18)) {
+            func_87E0CDDC((u8 *)arg0 + 0x8C, i, state[5]);
+        } else if (state[6] == 1) {
+            func_87E0CE60((u8 *)arg0 + 0x8C, i, state[5]);
+        } else if (state[6] != 2) {
+            func_87E0CDDC((u8 *)arg0 + 0x8C, i, state[5]);
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E08E8C.s")
 
