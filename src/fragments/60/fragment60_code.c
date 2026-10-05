@@ -246,7 +246,26 @@ s32 func_86A0585C(f32 arg0, f32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/60/fragment60_code/func_86A05AAC.s")
+extern s32 MathUtil_Atan2s(f32, f32);
+extern u8 D_86A443F0[];
+extern s16 D_86A45254[];
+s32 func_86A05AAC(s32 arg0, f32 arg1, f32 arg2) {
+    u8 *pos;
+    s16 angle;
+    s16 current;
+    f32 x;
+    f32 z;
+
+    pos = D_86A443F0 + arg0 * 8;
+    x = *(f32 *)(pos + 4);
+    z = *(f32 *)(pos + 8);
+    angle = (MathUtil_Atan2s(arg1 - x, -(arg2 - z)) + 0x3FFF) % 0xFFFF;
+    current = D_86A45254[arg0];
+    if ((current - angle >= 0x2000) || (angle - current < -0x1FFF)) {
+        return 0;
+    }
+    return 1;
+}
 #endif
 
 #ifdef VERSION_US
