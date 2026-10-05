@@ -37,7 +37,24 @@ void func_81601D24(s32 arg0, s32 arg1) {
 
 s32 func_81601DE8(u8 arg0, u8 arg1) { if ((arg1 == 0x19) && (arg0 == 0xA3)) return 1; if ((arg1 == 0x71) && (arg0 == 0x1E)) return 1; if ((arg1 == 0x68) && (arg0 == 0x76)) return 1; if ((arg1 == 0x69) && (arg0 == 0x76)) return 1; if ((arg1 == 0x53) && (arg0 == 0x69)) return 1; if ((arg1 == 0x84) && (arg0 == 0x23)) return 1; return 0; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81601EAC.s")
+extern s32 func_81601FA0(u8);
+s32 func_81601EAC(u8 arg0, u8 arg1)
+{
+    s32 value;
+    u8 new_var;
+    value = func_81601FA0((u8)arg0);
+    new_var = (u8)value;
+    if (value < 5) {
+        return new_var != 0;
+    }
+    if ((arg1 == (u8)0x19) && (arg0 == (u8)0xA3)) return 1;
+    if ((arg1 == (u8)0x71) && (arg0 == (u8)0x1E)) return 1;
+    if ((arg1 == (u8)0x68) && (arg0 == (u8)0x76)) return 1;
+    if ((arg1 == (u8)0x69) && (arg0 == (u8)0x76)) return 1 & 0xFFFFFFFFFFFFFFFFu;
+    if ((arg1 == (u8)0x53) && (arg0 == (u8)0x69)) return 1;
+    if ((arg1 == (u8)0x84) && (arg0 == (u8)0x23)) return 1;
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81601FA0.s")
 
@@ -345,7 +362,28 @@ extern void func_81605950(s32, s32, s32, s32);
 extern void func_816059CC(s32, s32, s32, s32, s32);
 void func_81605CDC(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) { func_81605950(arg0, arg1, arg2, arg3); func_816059CC(arg0, arg1, arg2, arg3, arg4); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81605D24.s")
+extern void *D_8160BD6C;
+extern void func_81602240(f32, f32, f32, f32, s32, s32, f32, f32);
+extern u8 D_80094E38[];
+extern u8 D_80094F50[];
+extern u32 D_800D0510;
+extern void func_8004D1FC(void *);
+void func_81605D24(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u8 *arg4) {
+    Gfx *gfx;
+    gSPDisplayList((*(Gfx **)&D_800D0510)++, D_80094E38);
+    func_8004D1FC(D_8160BD6C);
+    gDPSetCombine((*(Gfx **)&D_800D0510)++, 0x119623, 0xFF2FFFFF);
+    gDPSetRenderMode((*(Gfx **)&D_800D0510)++, 0x0F0A7008, 0);
+    gfx = (*(Gfx **)&D_800D0510)++;
+    gfx->words.w0 = 0xFA00FFFF;
+    gfx->words.w1 = _SHIFTL(arg4[1], 16, 8) | _SHIFTL(arg4[2], 8, 8) | _SHIFTL(arg4[0], 24, 8) | 0xFF;
+    func_81602240((f32)arg0, (f32)arg1, 16.0f, 16.0f, 0, 0, 1.0f, 1.0f);
+    func_81602240((f32)arg0, (f32)(arg1 + arg3 - 16), 16.0f, 16.0f, 0, 32, 1.0f, 1.0f);
+    func_81602240((f32)(arg0 + arg2 - 16), (f32)arg1, 16.0f, 16.0f, 0, 16, 1.0f, 1.0f);
+    func_81602240((f32)arg0, (f32)(arg1 + 16), 16.0f, (f32)(arg3 - 32), 0, 32, 1.0f, 0.0f);
+    func_81602240((f32)(arg0 + 16), (f32)arg1, (f32)(arg2 - 32), 16.0f, 0, 16, 0.0f, 1.0f);
+    gSPDisplayList((*(Gfx **)&D_800D0510)++, D_80094F50);
+}
 
 extern void *D_8160BD78[];
 extern void func_81602240(f32, f32, f32, f32, s32, s32, f32, f32);
@@ -557,7 +595,23 @@ void func_8160852C(void) {
     func_8004D1FC(D_8160BDB4);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81608550.s")
+extern void func_81602240(f32, f32, f32, f32, s32, s32, f32, f32);
+extern u8 D_80094E38[];
+extern u8 D_80094F50[];
+extern u32 D_800D0510;
+void func_81608550(s32 arg0, s32 arg1, s32 arg2, s32 arg3, f32 arg4) {
+    Gfx *gfx;
+    if (arg2 != 0) {
+        gSPDisplayList((*(Gfx **)&D_800D0510)++, D_80094E38);
+        if (arg3 != 0) {
+            gDPSetEnvColor((*(Gfx **)&D_800D0510)++, 0xFF, 0xAA, 0, (u32)(255.0f * arg4));
+        } else {
+            gDPSetEnvColor((*(Gfx **)&D_800D0510)++, 0x82, 0x82, 0x82, (u32)(255.0f * arg4));
+        }
+        func_81602240((f32)arg0, (f32)arg1, 16.0f, 16.0f, 0, 0, 1.0f, 1.0f);
+        gSPDisplayList((*(Gfx **)&D_800D0510)++, D_80094F50);
+    }
+}
 
 extern void func_81608550(s32, s32, s32, s32, f32);
 void func_8160877C(s32 arg0, s32 arg1, s32 arg2, s32 arg3, f32 arg4) {
