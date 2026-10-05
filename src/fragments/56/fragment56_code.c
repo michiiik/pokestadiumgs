@@ -369,5 +369,64 @@ void func_868066B8(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/56/fragment56_code/func_86807120.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/56/fragment56_code/func_8680729C.s")
+extern s32 func_80001FF0(void);
+extern void func_80027EE0(u16);
+extern void main_pool_push_state(s32);
+extern void Gfx_InitDisplayListBuffers(s32, s32);
+extern s32 func_800082E0(s32,s32,s32,s32,s32,s32);
+extern void func_8004C09C(s32);
+extern void func_8004C8C0(s32);
+extern s32 func_87F08E3C(s32,s32);
+extern s32 func_8004D690(s32);
+extern void func_87F06EAC(s32,s32 *,void *);
+extern void func_80047588(s32,s32);
+extern u8 *Asset_LoadToSegment(s32,u8 *,u8 *,s32);
+extern void func_87F00030(void);
+extern void func_87F01F34(void *);
+extern void func_86802740(void);
+extern void func_80008514(s32);
+extern void func_86807120(void);
+extern void func_80008574(void);
+extern void func_80047610(void);
+extern void func_8004C398(void);
+extern void Gfx_FreeDisplayListBuffers(void);
+extern void main_pool_pop_state(s32);
+extern void func_87F0F480(void *);
+extern s32 D_86807CC4;
+extern f32 D_86807CC8;
+extern f32 D_868084C4;
+extern s32 D_86808640;
+extern s32 D_8680863C;
+extern s32 D_86808560;
+extern s32 D_86808510;
+extern s32 D_8682F2B0;
+extern u8 D_1000000;
+extern u8 D_446E30[];
+extern u8 D_447D00[];
+extern s32 func_8004C990(s32, s32);
+extern s32 D_86808558;
+extern void * D_86808590;
+extern s32 D_868086C0[];
+s32 func_8680729C(s32 arg0, void *arg1) {
+    s32 sp24;
+    if (func_80001FF0() == 0x3C) { D_86807CC4 = 0x1E; D_86807CC8 = 1.0f; }
+    else { D_86807CC4 = 0x19; D_86807CC8 = D_868084C4; }
+    D_86808590 = arg1;
+    if (*(u8 *)((u8 *)D_86808590 + 0x2180) == 4) func_80027EE0(0xFFF);
+    main_pool_push_state(0x4D523034);
+    Gfx_InitDisplayListBuffers(0x20000, 0);
+    sp24 = func_800082E0(0, 1, 3, 1, 2, 1);
+    func_8004C09C(0x127);
+    func_8004C8C0(0xE3); func_8004C8C0(0x1B2); func_8004C8C0(0x1AD); func_8004C8C0(0x194); func_8004C8C0(0x98);
+    D_86808640 = func_87F08E3C(func_8004C990(0xE3, 0), 0xF000000);
+    D_8680863C = func_87F08E3C(func_8004C990(0x98, 0), 0xF000000);
+    D_868086C0[0] = func_8004D690(0x13);
+    func_87F06EAC(0x6E, &D_86808558, D_86808590);
+    func_80047588((D_86808560 | 5) | D_86808510, 0);
+    Asset_LoadToSegment((((u32)&D_1000000 & 0x0F000000) >> 24), &D_446E30, D_447D00, 0);
+    func_87F00030(); func_87F01F34(D_86808590); func_86802740(); func_80008514(sp24); func_86807120();
+    func_80008574(); func_80047610(); func_8004C398(); Gfx_FreeDisplayListBuffers();
+    main_pool_pop_state(0x4D523034); func_87F0F480(D_86808590); func_80027EE0(0xFFE);
+    return D_8682F2B0;
+}
 #endif
