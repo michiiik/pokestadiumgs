@@ -185,7 +185,74 @@ s32 func_82501244(s32 arg0, void *arg1) { s32 index; u8 *entry; index = *(s32 *)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_13FFA0/func_825015D8.s")
+extern u16 D_82508F8A;
+extern void func_825085E4(void);
+extern void func_800355E4(s32);
+extern u8 D_82508F68[];
+void func_825015D8(u16 arg0)
+{
+    u16 *new_var;
+    u16 *state = (u16 *)D_82508F68;
+    u16 flags;
+    state[0x10] = arg0;
+    state[0x11] = 0;
+    state[0x12] = 1;
+    state[0x13] = 0;
+    state[0x14] = 0;
+    state[0x15] = 0;
+    state[0x16] = 0;
+    new_var = &flags;
+    state[0x17] = 0x30;
+    state[0x18] = 0x30;
+    state[0x11] &= 0xFFFE;
+    func_825085E4();
+    switch (arg0) {
+        case 0x100:
+            func_800355E4(0x45);
+            flags = D_82508F8A;
+            flags |= 2;
+            D_82508F8A = *new_var;
+            break;
+        case 0x101:
+            func_800355E4(0x55);
+            flags = D_82508F8A;
+            flags &= 0xFFFD;
+            flags |= 8;
+            D_82508F8A = *new_var;
+            break;
+        case 0x200:
+            func_800355E4(0x5B);
+            flags = D_82508F8A;
+            flags |= 2;
+            flags |= 4;
+            D_82508F8A = *new_var;
+            break;
+        case 0x201:
+            func_800355E4(0x5C);
+            flags = D_82508F8A;
+            flags |= 2;
+            D_82508F8A = *new_var;
+            break;
+        case 0x300:
+            func_800355E4(0x54);
+            flags = D_82508F8A;
+            flags |= 2;
+            flags |= 8;
+            flags |= 0x10;
+            D_82508F8A = *new_var;
+            break;
+        case 0x301:
+            func_800355E4(0x5D);
+            flags = D_82508F8A;
+            flags |= 2;
+            flags |= 4;
+            D_82508F8A = *new_var;
+            break;
+        default:
+            func_800355E4(0x45);
+            break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
