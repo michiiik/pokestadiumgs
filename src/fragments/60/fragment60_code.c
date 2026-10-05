@@ -388,7 +388,18 @@ void func_86A06C3C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/60/fragment60_code/func_86A06D04.s")
+extern s32 D_86A0F8E4;
+extern void func_86A03234();
+extern void func_86A046A4();
+extern u8 D_86A443F0[];
+void func_86A06D04(void) {
+    if (D_86A0F8E4 * 3 < *(s32 *)D_86A443F0) {
+        func_86A03234();
+    }
+    if ((D_86A0F8E4 * 3 < *(s32 *)D_86A443F0) && (*(s32 *)D_86A443F0 < D_86A0F8E4 * 59)) {
+        func_86A046A4();
+    }
+}
 #endif
 
 #ifdef VERSION_US
