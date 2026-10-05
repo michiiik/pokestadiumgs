@@ -239,7 +239,21 @@ void func_84124DEC(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84124E44.s")
+extern s32 func_8004B7A4(s32);
+extern void func_8004C54C(u8, s32);
+extern u8 * D_84195200[];
+extern u8 * D_84195208[];
+void func_84124E44(u8 arg0) {
+    u8 other;
+    u8 id;
+
+    func_8004C54C(0x19, func_8004B7A4(D_84195208[arg0][0]));
+    func_8004C54C(0x1A, (s32)(D_84195200[arg0] + 0x34));
+    other = 1 - arg0;
+    id = D_84195208[other][0];
+    func_8004C54C(0x1B, func_8004B7A4(id));
+    func_8004C54C(0x1C, (s32)(D_84195200[other] + 0x34));
+}
 #endif
 
 #ifdef VERSION_US
@@ -797,7 +811,28 @@ u16 func_84126850(u8 arg0, u16 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841268A0.s")
+extern u16 D_841951CA;
+extern void func_8412EE5C(void);
+extern void func_841265EC(void);
+extern s32 func_84126804(u8, u16);
+extern void func_84134CBC(u8 arg0, u8 arg1);
+extern void func_84135B00(u8);
+extern void func_84136678(u8 arg0, s16 arg1);
+extern void func_84136A9C(u8 arg0, s16 arg1, s16 arg2, u8 arg3);
+extern void func_84136CA8(void);
+extern u8 D_841951BC;
+extern s32 D_841951C8;
+void func_841268A0(void) {
+    func_84136678(D_841951BC, -1);
+    func_84135B00(0x5C);
+    func_84134CBC(D_841951BC, 1);
+    func_84136CA8();
+    D_841951D1 = 0;
+    func_841265EC();
+    func_8412EE5C();
+    D_841951C8 = func_84126804(D_841951BC, D_841951CA);
+    func_84136A9C(D_841951BC, -1, -D_841951C8, 1);
+}
 #endif
 
 #ifdef VERSION_US
@@ -2543,7 +2578,36 @@ void BattleAnim_Table_84186004_007(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412F170.s")
+extern u8 D_8418546C[];
+void func_84135034(u8, u8);
+extern void func_8004C594(s32, s32);
+extern s32 func_84125080();
+extern void func_84135B00(u8);
+extern void func_84136678(u8 arg0, s16 arg1);
+extern u8 D_841951BC;
+extern s8 D_841951C2;
+void func_8412F170(void) {
+    u8 value;
+    u8 count;
+    u8 (*p)[2];
+    s32 raw;
+
+    raw = func_84125080();
+    value = raw;
+    p = (u8 (*)[2])D_8418546C;
+    count = 4;
+    if ((*p)[0] < raw) {
+        do {
+            count++;
+            p++;
+        } while ((*p)[0] < value);
+    }
+    D_841951C2 = (*p)[1];
+    func_84136678(D_841951BC, -1);
+    func_8004C594(1, count);
+    func_84135B00(0x6B);
+    func_84135034(count, count);
+}
 #endif
 
 #ifdef VERSION_US
