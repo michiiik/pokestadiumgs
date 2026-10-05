@@ -169,7 +169,27 @@ void func_81403E2C(void *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81403E7C.s")
+extern s16 D_81407968[2][5][4][2];
+extern s16 D_81407A08[5][2];
+void func_81403E7C(void *arg0, s16 *arg1) {
+    typedef struct { s16 width; s16 height; } Extent;
+    s32 mode;
+    f32 scale;
+    f32 inv;
+    f32 divisor = 16.0f;
+    s16 *p;
+    Extent *q;
+
+    mode = *(s32 *)((u8 *)arg0 + 0x14) ? 1 : 0;
+    scale = *(f32 *)((u8 *)arg0 + 4) / divisor;
+    p = D_81407968[mode][*(s8 *)((u8 *)arg0 + 0xE)][*(u8 *)((u8 *)arg0 + 0xD)];
+    q = (Extent *)D_81407A08[*(s8 *)((u8 *)arg0 + 0xE)];
+    inv = 1.0f - scale;
+    arg1[0] = p[0] + q->width * 0.5f * inv;
+    arg1[1] = p[1] + q->height * 0.5f * inv;
+    arg1[2] = q->width * scale;
+    arg1[3] = q->height * scale;
+}
 
 extern u8 D_800CE060;
 
