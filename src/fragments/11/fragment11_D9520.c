@@ -37,7 +37,24 @@ void func_81601D24(s32 arg0, s32 arg1) {
 
 s32 func_81601DE8(u8 arg0, u8 arg1) { if ((arg1 == 0x19) && (arg0 == 0xA3)) return 1; if ((arg1 == 0x71) && (arg0 == 0x1E)) return 1; if ((arg1 == 0x68) && (arg0 == 0x76)) return 1; if ((arg1 == 0x69) && (arg0 == 0x76)) return 1; if ((arg1 == 0x53) && (arg0 == 0x69)) return 1; if ((arg1 == 0x84) && (arg0 == 0x23)) return 1; return 0; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81601EAC.s")
+extern s32 func_81601FA0(u8);
+s32 func_81601EAC(u8 arg0, u8 arg1)
+{
+    s32 value;
+    u8 new_var;
+    value = func_81601FA0((u8)arg0);
+    new_var = (u8)value;
+    if (value < 5) {
+        return new_var != 0;
+    }
+    if ((arg1 == (u8)0x19) && (arg0 == (u8)0xA3)) return 1;
+    if ((arg1 == (u8)0x71) && (arg0 == (u8)0x1E)) return 1;
+    if ((arg1 == (u8)0x68) && (arg0 == (u8)0x76)) return 1;
+    if ((arg1 == (u8)0x69) && (arg0 == (u8)0x76)) return 1 & 0xFFFFFFFFFFFFFFFFu;
+    if ((arg1 == (u8)0x53) && (arg0 == (u8)0x69)) return 1;
+    if ((arg1 == (u8)0x84) && (arg0 == (u8)0x23)) return 1;
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81601FA0.s")
 
