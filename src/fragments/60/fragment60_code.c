@@ -138,7 +138,26 @@ void func_86A01C5C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/60/fragment60_code/func_86A03D0C.s")
+extern f64 D_86A0F5B8;
+extern void func_87F026E8(s32, void *);
+extern s32 D_87F119D8;
+extern void * D_87F119DC;
+void func_86A03D0C(void) {
+    s32 flag;
+
+    flag = 0;
+    *(f32 *)((u8 *)D_87F119DC + 0x48) += *(f32 *)((u8 *)D_87F119DC + 0x10);
+    *(f32 *)((u8 *)D_87F119DC + 0x4C) += *(f32 *)((u8 *)D_87F119DC + 0x14);
+    *(f32 *)((u8 *)D_87F119DC + 0x50) += *(f32 *)((u8 *)D_87F119DC + 0x18);
+    *(f32 *)((u8 *)D_87F119DC + 0x14) -= 1.0;
+    *((u8 *)D_87F119DC + 0x41) -= 7;
+    if (*(f32 *)((u8 *)D_87F119DC + 0x4C) < D_86A0F5B8) {
+        flag = 1;
+    }
+    if (flag != 0) {
+        func_87F026E8(D_87F119D8, D_87F119DC);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -227,7 +246,26 @@ s32 func_86A0585C(f32 arg0, f32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/60/fragment60_code/func_86A05AAC.s")
+extern s32 MathUtil_Atan2s(f32, f32);
+extern u8 D_86A443F0[];
+extern s16 D_86A45254[];
+s32 func_86A05AAC(s32 arg0, f32 arg1, f32 arg2) {
+    u8 *pos;
+    s16 angle;
+    s16 current;
+    f32 x;
+    f32 z;
+
+    pos = D_86A443F0 + arg0 * 8;
+    x = *(f32 *)(pos + 4);
+    z = *(f32 *)(pos + 8);
+    angle = (MathUtil_Atan2s(arg1 - x, -(arg2 - z)) + 0x3FFF) % 0xFFFF;
+    current = D_86A45254[arg0];
+    if ((current - angle >= 0x2000) || (angle - current < -0x1FFF)) {
+        return 0;
+    }
+    return 1;
+}
 #endif
 
 #ifdef VERSION_US
@@ -267,7 +305,27 @@ void func_86A06400(s32 arg0, f32 arg1, f32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/60/fragment60_code/func_86A06650.s")
+extern s32 func_86A066F4(s16 arg0, s16 arg1);
+s32 func_86A06650(s16 arg0, s16 arg1, s16 arg2) {
+    s16 pad;
+    s16 distance;
+    s16 plus;
+    s16 minus;
+    s32 secondDistance;
+
+    if (arg2 < func_86A066F4(arg0, arg1)) {
+        plus = arg1 + arg2;
+        distance = func_86A066F4(arg0, plus);
+        minus = arg1 - arg2;
+        secondDistance = func_86A066F4(arg0, minus);
+        if (distance < secondDistance) {
+            return plus;
+        } else {
+            return minus;
+        }
+    }
+    return arg0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -307,11 +365,41 @@ void func_86A06BDC(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/60/fragment60_code/func_86A06C3C.s")
+extern s32 func_86A0585C(f32 arg0, f32 arg1);
+extern u8 D_86A443F0[];
+void func_86A06C3C(void) {
+    s32 i;
+    u8 *q;
+    s32 x;
+    s32 y;
+
+    for (i = 0; i < 4; i++) {
+        x = *(f32 *)(D_86A443F0 + i * 8 + 4);
+        y = *(f32 *)(D_86A443F0 + i * 8 + 8);
+        if (func_86A0585C((f32)x, (f32)y) != 0) {
+            q = D_86A443F0 + i * 4;
+            if ((*(s32 *)(q + 0x24) != 9) && (*(s32 *)(q + 0xE8) != 0)) {
+                *(s32 *)(q + 0x24) = 9;
+                *(s32 *)(q + 0x188) = 0x28;
+            }
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/60/fragment60_code/func_86A06D04.s")
+extern s32 D_86A0F8E4;
+extern void func_86A03234();
+extern void func_86A046A4();
+extern u8 D_86A443F0[];
+void func_86A06D04(void) {
+    if (D_86A0F8E4 * 3 < *(s32 *)D_86A443F0) {
+        func_86A03234();
+    }
+    if ((D_86A0F8E4 * 3 < *(s32 *)D_86A443F0) && (*(s32 *)D_86A443F0 < D_86A0F8E4 * 59)) {
+        func_86A046A4();
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -524,7 +612,34 @@ void func_86A0B98C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/60/fragment60_code/func_86A0BA80.s")
+extern s32 D_86A11180;
+extern void func_8003F114(void *, s32, s32, s32);
+extern void func_8003F1DC(void *);
+extern void func_86A0B98C(void);
+extern void * func_87F025B8(void *, void *);
+extern u8 D_86A10B38;
+extern u8 D_86A443F0[];
+void func_86A0BA80(s32 arg0) {
+    u8 *obj;
+    u8 *pos;
+
+    obj = func_87F025B8(&D_86A10B38, func_86A0B98C);
+    if (obj != NULL) {
+        pos = D_86A443F0 + arg0 * 8;
+        *(f32 *)(obj + 0x48) = *(f32 *)(pos + 4);
+        *(f32 *)(obj + 0x4C) = 82.0f;
+        *(f32 *)(obj + 0x50) = *(f32 *)(pos + 8);
+        *(s32 *)(obj + 0x1C) = 0;
+        *(s32 *)(obj + 0x38) = arg0;
+        *(s32 *)(obj + 0x20) = arg0;
+        *(f32 *)(obj + 0x54) = 0.0f;
+        *(f32 *)(obj + 0x58) = 0.0f;
+        *(f32 *)(obj + 0x5C) = 0.0f;
+        func_8003F1DC(obj + 0x24);
+        func_8003F114(obj + 0x24, 0, -1, D_86A11180);
+        obj[0x26] |= 8;
+    }
+}
 #endif
 
 #ifdef VERSION_US
