@@ -239,7 +239,21 @@ void func_84124DEC(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84124E44.s")
+extern s32 func_8004B7A4(s32);
+extern void func_8004C54C(u8, s32);
+extern u8 * D_84195200[];
+extern u8 * D_84195208[];
+void func_84124E44(u8 arg0) {
+    u8 other;
+    u8 id;
+
+    func_8004C54C(0x19, func_8004B7A4(D_84195208[arg0][0]));
+    func_8004C54C(0x1A, (s32)(D_84195200[arg0] + 0x34));
+    other = 1 - arg0;
+    id = D_84195208[other][0];
+    func_8004C54C(0x1B, func_8004B7A4(id));
+    func_8004C54C(0x1C, (s32)(D_84195200[other] + 0x34));
+}
 #endif
 
 #ifdef VERSION_US
