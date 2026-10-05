@@ -169,7 +169,27 @@ void func_81403E2C(void *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81403E7C.s")
+extern s16 D_81407968[2][5][4][2];
+extern s16 D_81407A08[5][2];
+void func_81403E7C(void *arg0, s16 *arg1) {
+    typedef struct { s16 width; s16 height; } Extent;
+    s32 mode;
+    f32 scale;
+    f32 inv;
+    f32 divisor = 16.0f;
+    s16 *p;
+    Extent *q;
+
+    mode = *(s32 *)((u8 *)arg0 + 0x14) ? 1 : 0;
+    scale = *(f32 *)((u8 *)arg0 + 4) / divisor;
+    p = D_81407968[mode][*(s8 *)((u8 *)arg0 + 0xE)][*(u8 *)((u8 *)arg0 + 0xD)];
+    q = (Extent *)D_81407A08[*(s8 *)((u8 *)arg0 + 0xE)];
+    inv = 1.0f - scale;
+    arg1[0] = p[0] + q->width * 0.5f * inv;
+    arg1[1] = p[1] + q->height * 0.5f * inv;
+    arg1[2] = q->width * scale;
+    arg1[3] = q->height * scale;
+}
 
 extern u8 D_800CE060;
 
@@ -226,7 +246,21 @@ s32 func_81404334(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81404724.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_814047C0.s")
+extern s16 D_81407A2C[][2];
+void func_814047C0(void *arg0, void *arg1)
+{
+  f32 t;
+  f32 inv;
+  s16 *pos;
+  s16 *out = arg1;
+  t = (*((f32 *) arg0)) / 16;
+  inv = 1.0f - t;
+  pos = D_81407A2C[*((s8 *) (((u8 *) arg0) + 9))];
+  out[0] = pos[0] + (63.5f * inv);
+  out[1] = pos[1] + (25.5f * inv);
+  out[2] = 127.0f * t;
+  out[3] = 51.0f * t;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_8140487C.s")
 
@@ -620,7 +654,53 @@ void func_81406EA8(void *arg0) {
     func_81403A18((u8 *)arg0 + 0xCC8);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81406F44.s")
+typedef struct { u8 padding[0x18F58]; s32 finished; s32 activated; } F81406F44StoreView;
+typedef struct { u8 padding[0xF48]; s32 active[4]; s32 finished; s32 activated; } F81406F44TailView;
+extern void func_814071C4(void *arg0);
+extern void func_81405514(void *arg0, void *arg1);
+extern void func_81403B7C(void *arg0, void *arg1);
+extern void func_800225C4(s32 arg0);
+extern void func_81406A30(void *arg0);
+extern s32 func_81406A74(u8 *arg0);
+void func_81406F44(void *arg0, void *arg1) {
+    s32 i;
+    s32 done = 1;
+
+    if (((F81406F44TailView *)((u8 *)arg0 + 0x18000))->finished != 0) {
+        func_814071C4(arg0);
+    }
+    if (((F81406F44TailView *)((u8 *)arg0 + 0x18000))->activated == 0) {
+        for (i = 0; i < 4; i++) {
+            if (*(s32 *)((u8 *)arg0 + 0x18F48 + i * 4) != 0) {
+                if (*(s32 *)((u8 *)arg0 + i * 0x4D68 + 0x19B0) != 0) {
+                    ((F81406F44StoreView *)arg0)->activated = 1;
+                    break;
+                }
+            }
+        }
+        if (((F81406F44TailView *)((u8 *)arg0 + 0x18000))->activated != 0) {
+            for (i = 0; i != 4; i++) {
+                if (*(s32 *)((u8 *)arg0 + 0x18F48 + i * 4) != 0) {
+                    func_81406A30((u8 *)arg0 + i * 0x4D68 + 0x1990);
+                }
+            }
+        }
+    }
+    for (i = 0; i != 4; i++) {
+        if (*(s32 *)((u8 *)arg0 + 0x18F48 + i * 4) != 0) {
+            func_81405514((u8 *)arg0 + i * 0x4D68 + 0x1990, arg1);
+            if (func_81406A74((u8 *)arg0 + i * 0x4D68 + 0x1990) == 0) {
+                done = 0;
+            }
+        }
+    }
+    if (done != 0 && ((F81406F44TailView *)((u8 *)arg0 + 0x18000))->finished == 0) {
+        func_800225C4(0x10);
+        ((F81406F44StoreView *)arg0)->finished = 1;
+    }
+    func_81403B7C(arg0, arg1);
+    func_81403B7C((u8 *)arg0 + 0xCC8, arg1);
+}
 
 extern void func_81406700(void *arg0, void *arg1);
 extern void func_81403CD0(void *arg0, void *arg1);
