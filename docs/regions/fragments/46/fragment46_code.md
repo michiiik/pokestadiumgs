@@ -49,3 +49,7 @@ func_8AE01DC0: matched (call_sequence:loop:matched_sibling_shape), 6 iterations,
 ## 2026-10-04
 
 func_8AE026C8: time cap at 0.8814 (raw 0.4407) after 2414s, mismatch operand_or_scheduling_drift; tried families: call_sequence; tie-pool no
+
+## 2026-10-08
+
+func_8AE035BC: matched (call_sequence:matched:signed_buffer_and_reversed_equality), 1 iterations, agent codex
