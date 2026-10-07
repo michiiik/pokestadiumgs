@@ -339,7 +339,7 @@ s32 func_81404CA4(void *arg0)
   return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81404D00.s")
+s32 func_81404D00(void *arg0) { s32 i=0; s32 count=*(s8 *)((u8 *)arg0+0x12); u8 *p=arg0; if(count<=0) goto done; loop: if(*(s8 *)((u8 *)p+0xA)<0) return i; ++i; p=(u8 *)p+1; if(i<count) goto loop; done: return count; }
 
 s32 func_81404D44(void *arg0)
 {
@@ -428,7 +428,7 @@ void func_81404DE4_padding(void) {
 extern s32 func_81403938(s32 arg0);
 extern s32 func_8140463C(void *arg0, s32 arg1, s32 arg2);
 extern void func_814046C4(void *arg0);
-extern s32 func_81404D00(void);
+extern s32 func_81404D00(void *arg0);
 s32 func_814050EC(void *arg0) {
     typedef struct {
         u8 pad0[4];
@@ -454,7 +454,7 @@ s32 func_814050EC(void *arg0) {
     s32 mode;
 
     state = arg0;
-    sp28 = func_81404D00();
+    sp28 = func_81404D00(arg0);
     sp24 = state->unk18;
     temp_v0 = func_814049CC(state);
     if (sp28 < state->unk12) {
@@ -490,7 +490,7 @@ s32 func_814050EC(void *arg0) {
 extern s32 func_81403938(s32 arg0);
 extern s32 func_8140463C(void *arg0, s32 arg1, s32 arg2);
 extern void func_814046C4(void *arg0);
-extern s32 func_81404D00(void);
+extern s32 func_81404D00(void *arg0);
 
 s32 func_81405208(void *arg0) {
     typedef struct {
@@ -506,7 +506,7 @@ s32 func_81405208(void *arg0) {
     s32 var_v1;
 
     state = arg0;
-    sp28 = func_81404D00();
+    sp28 = func_81404D00(arg0);
     sp24 = state->unk18;
     temp_v0 = func_814049CC(state);
     if (sp28 < state->unk12) {
@@ -534,7 +534,7 @@ s32 func_81405208(void *arg0) {
 
 extern s32 func_81403938(s32 arg0);
 extern void func_814046C4(void *arg0);
-extern s32 func_81404D00(void);
+extern s32 func_81404D00(void *arg0);
 extern s32 func_8140463C(void *arg0, s32 arg1, s32 arg2);
 s32 func_814052F4(void *arg0) {
     typedef struct {
@@ -561,7 +561,7 @@ s32 func_814052F4(void *arg0) {
     s32 mode;
 
     state = arg0;
-    sp28 = func_81404D00();
+    sp28 = func_81404D00(arg0);
     sp24 = state->unk18;
     temp_v0 = func_814049CC(state);
     if (sp28 < state->unk12) {
