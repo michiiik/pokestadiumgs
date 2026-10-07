@@ -39,7 +39,22 @@ void func_81402CD8(void *arg0, f32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81403400.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81403710.s")
+s32 func_81403710(void *arg0) {
+    s8 *entry;
+    u8 result = 0;
+    s32 bit;
+    s32 i;
+    for (i = 0; i < 2; i++) {
+        entry = ((s8 **)arg0)[i];
+        if (entry) {
+            bit = entry[8];
+            if (bit >= 0) {
+                result |= 1 << bit;
+            }
+        }
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81403758.s")
 
