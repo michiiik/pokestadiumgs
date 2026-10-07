@@ -617,7 +617,94 @@ s32 func_8AE03214(s16 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE035BC.s")
+extern char *D_8AE09AF0;
+extern char *D_8AE09AF4;
+extern char *D_8AE09AF8;
+extern char *D_8AE09ABC;
+extern char *D_8AE09AC4;
+extern char *D_8AE09ACC;
+extern char D_8AE083D4[];
+extern char D_8AE083DC[];
+extern char D_8AE083E4[];
+extern void func_800495BC();
+extern s32 func_8AE032C8(u8, s32);
+extern void func_8004C54C(s32, s32);
+extern void func_8004C8A0(void *, s32, s32, s32);
+extern void _bzero(void *, s32);
+extern s16 func_80049148(s32, s32, s32);
+extern s32 func_8AE03214(s16 arg0);
+extern s16 D_8AE098B0;
+extern s32 D_8AE09B5C;
+extern s32 D_8AE09E60;
+extern s32 D_8AE09E64;
+void func_8AE035BC(s32 arg0, s32 arg1, u8 *arg2) {
+    char sp120[0x100];
+    char sp20[0x100];
+    s32 temp;
+    s32 selector;
+    _bzero((sp120 - 8), 0x100);
+    _bzero((sp20 - 8), 0x100);
+    selector = arg2[0];
+    switch (selector) {
+    case 1:
+        sprintf((sp20 - 8), D_8AE09AF0);
+        break;
+    case 2:
+        sprintf((sp20 - 8), D_8AE09AF4);
+        break;
+    case 3:
+        sprintf((sp20 - 8), D_8AE09AF8);
+        break;
+    }
+    if (D_8AE098B0 != 2) {
+        if (arg2[3] & 1) {
+            if ((s8)sp20[-8] == 0) {
+                sprintf((sp20 - 8), D_8AE09ABC);
+            } else {
+                sprintf((sp20 - 8), D_8AE083D4, (sp20 - 8), D_8AE09ABC);
+            }
+        }
+        if (arg2[3] & 2) {
+            if ((s8)sp20[-8] == 0) {
+                sprintf((sp20 - 8), D_8AE09AC4);
+            } else {
+                sprintf((sp20 - 8), D_8AE083DC, (sp20 - 8), D_8AE09AC4);
+            }
+        }
+        if (arg2[3] & 4) {
+            if ((s8)sp20[-8] == 0) {
+                sprintf((sp20 - 8), D_8AE09ACC);
+            } else {
+                sprintf((sp20 - 8), D_8AE083E4, (sp20 - 8), D_8AE09ACC);
+            }
+        }
+    }
+    if (D_8AE09E64 >= 4) {
+        func_800495BC(arg0, arg1, (sp20 - 8));
+    }
+    temp = func_80049148(0, 0, (s32)(sp20 - 8)) + 0xA;
+    if (D_8AE09B5C < temp) {
+        D_8AE09B5C = temp;
+    }
+    if (arg2[2] == arg2[1]) {
+        func_8004C54C(0x33, func_8AE032C8(arg2[1], 0));
+        func_8004C8A0((sp120 - 8), 0x100, 0x2B, 9);
+    } else {
+        func_8004C54C(0x34, func_8AE032C8(arg2[1], 0));
+        func_8004C54C(0x35, func_8AE032C8(arg2[2], 1));
+        func_8004C8A0((sp120 - 8), 0x100, 0x2B, 10);
+    }
+    if (D_8AE09E64 >= 4) {
+        func_800495BC(arg0 + D_8AE09B5C, arg1, (sp120 - 8));
+    }
+    temp = func_80049148(0, 0, (s32)(sp120 - 8)) + 0xA;
+    if (D_8AE09E60 < temp) {
+        D_8AE09E60 = temp;
+    }
+    if (D_8AE09E64 >= 4) {
+        func_800495BC(arg0 + D_8AE09B5C + D_8AE09E60, arg1, func_8AE03214(arg2[5]));
+    }
+}
 #endif
 
 #ifdef VERSION_US
