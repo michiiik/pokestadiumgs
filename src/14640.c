@@ -351,7 +351,26 @@ void *func_8001647C(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, 
     return sp2C;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80016500.s")
+extern u8 D_8011C990[];
+extern u8 D_8011BE90[];
+void *func_80016500(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6) {
+u8 *slot,*p=D_8011BE90,*limit; do { limit=D_8011C990; if (*(s8 *)(p+0x14C0)==0) { slot=p+0x14C0; break; } p+=0x58; } while(p!=limit); if(p==D_8011C990) return NULL;
+*(s8 *)(slot + 0) = 1;
+*(s32 *)(slot + 8) = arg0;
+*(s32 *)(slot + 4) = arg1;
+*(s32 *)(slot + 0xC) = arg1;
+*(s32 *)(slot + 0x10) = arg2;
+if (arg4 == 0) *(s32 *)(slot + 0x14) = 0x1000;
+else if (arg4 == 1) *(s32 *)(slot + 0x14) = arg2;
+else { s32 n = ((arg2 / arg4) + 0xFF) & ~0xFF; *(s32 *)(slot + 0x14) = n; if ((u32)n < 0x100) *(s32 *)(slot + 0x14) = 0x100; }
+*(s32 *)(slot + 0x20) = arg5;
+*(s8 *)(slot + 1) = 3;
+*(s8 *)(slot + 2) = arg3;
+*(s32 *)(slot + 0x1C) = arg6;
+osCreateMesgQueue((OSMesgQueue *)(slot + 0x24), (OSMesg *)(slot + 0x3C), 1);
+return slot;
+
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80016624.s")
 
