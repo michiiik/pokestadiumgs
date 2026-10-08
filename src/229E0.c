@@ -4152,7 +4152,17 @@ void GeoCamera_SetPerspective(S1_unk_D_86002F34_00C* arg0, f32 arg1, f32 arg2, f
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80038E14.s")
+extern f32 D_80087E50[];
+extern f32 D_80088E50[0x1000];
+void func_80038E14(void *arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6, u16 arg7) {
+    f32 inv = (f32)(-1.0 / sqrtf((arg4 - arg1) * (arg4 - arg1) + (arg6 - arg3) * (arg6 - arg3)));
+    f32 sx = (arg4 - arg1) * inv;
+    f32 sz = (arg6 - arg3) * inv;
+    u8 *ptr = (u8 *)arg0 + 0x60;
+    Vec3f_SetComponentsDuplicate((void *)((u8 *)arg0 + 0xA8), arg1, arg2, arg3);
+    Vec3f_SetComponentsDuplicate((void *)(ptr + 0x54), arg4, arg5, arg6);
+    Vec3f_SetComponentsDuplicate((void *)(ptr + 0x60), D_80087E50[arg7 >> 4] * sz, D_80088E50[arg7 >> 4], -D_80087E50[arg7 >> 4] * sx);
+}
 #endif
 
 #ifdef VERSION_US
@@ -6097,7 +6107,33 @@ void geo_layout_cmd_create_group(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80041130.s")
+typedef struct { s32 unused0; s32 unused1; s32 offset; s32 size; } CandidateJpegHeader;
+extern s32 Jpeg_DecodeImage(u32, s32, u8 *);
+extern void MainPool_ResetStateToOffset(void *, s32);
+void *func_80041130(void *arg0, void *arg1, s32 arg2, CandidateJpegHeader *arg3) {
+    void *sp1C;
+    s32 sp18;
+    s32 result;
+    sp18 = 0;
+    if (arg1 == NULL) {
+        sp18 = ((s32 *)arg0)[1];
+        sp1C = MainPool_AllocAligned(arg0, arg3->size + 0x100, 0x10);
+    } else {
+        sp1C = arg1;
+    }
+    if (sp1C != NULL) {
+            result = Jpeg_DecodeImage((u32)sp1C, arg3->size + 0x100, (u8 *)arg3 + arg3->offset);
+        if (arg1 == NULL) {
+            if (result == 0) {
+                MainPool_ResetStateToOffset(arg0, sp18);
+                sp1C = NULL;
+            } else {
+                MainPool_ResetStateToOffset(arg0, sp18 + result);
+            }
+        }
+    }
+    return sp1C;
+}
 #endif
 
 #ifdef VERSION_US
