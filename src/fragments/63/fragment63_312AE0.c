@@ -159,7 +159,30 @@ void func_87E10154(s32 arg0, void *arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E10214.s")
+extern s32 D_87E1A9A0[];
+extern s32 D_87E1A9BC[];
+extern void func_87E0FFA0(void *arg0, s32 arg1);
+extern u32 D_87E1EBB8;
+void func_87E10214(s32 arg0, void *arg1) {
+    s32 value = -1;
+    switch (arg0) {
+      case 0: *(u16 *)((u8 *)arg1 + 2) &= ~2; break;
+      case 1:
+        switch (*(u32 *)((u8 *)arg1 + 0x20)) {
+            case 0:
+                value = D_87E1A9A0[*(s32 *)((u8 *)(u32)D_87E1EBB8 + 0x21C)];
+                break;
+            case 1:
+                value = D_87E1A9BC[*(s32 *)((u8 *)(u32)D_87E1EBB8 + 0x21C)];
+                break;
+            case 2:
+                value = *(s32 *)((u8 *)(u32)D_87E1EBB8 + 0x224);
+                break;
+        }
+        func_87E0FFA0(arg1, value);
+        break;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E102D4.s")
 
