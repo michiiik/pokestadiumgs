@@ -6107,7 +6107,33 @@ void geo_layout_cmd_create_group(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80041130.s")
+typedef struct { s32 unused0; s32 unused1; s32 offset; s32 size; } CandidateJpegHeader;
+extern s32 Jpeg_DecodeImage(u32, s32, u8 *);
+extern void MainPool_ResetStateToOffset(void *, s32);
+void *func_80041130(void *arg0, void *arg1, s32 arg2, CandidateJpegHeader *arg3) {
+    void *sp1C;
+    s32 sp18;
+    s32 result;
+    sp18 = 0;
+    if (arg1 == NULL) {
+        sp18 = ((s32 *)arg0)[1];
+        sp1C = MainPool_AllocAligned(arg0, arg3->size + 0x100, 0x10);
+    } else {
+        sp1C = arg1;
+    }
+    if (sp1C != NULL) {
+            result = Jpeg_DecodeImage((u32)sp1C, arg3->size + 0x100, (u8 *)arg3 + arg3->offset);
+        if (arg1 == NULL) {
+            if (result == 0) {
+                MainPool_ResetStateToOffset(arg0, sp18);
+                sp1C = NULL;
+            } else {
+                MainPool_ResetStateToOffset(arg0, sp18 + result);
+            }
+        }
+    }
+    return sp1C;
+}
 #endif
 
 #ifdef VERSION_US
