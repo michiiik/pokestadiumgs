@@ -146,7 +146,49 @@ void func_87E0D73C(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_310270/func_87E0D75C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_310270/func_87E0D7D8.s")
+extern u32 func_8003570C(void);
+extern void func_87E0D18C(void);
+s32 func_87E0D7D8(u8 *arg0) {
+    s32 i;
+    s32 selected;
+    s32 max;
+    s32 count;
+    s32 ret;
+    u8 *entry;
+
+    max = 0;
+    count = 0;
+    func_87E0D18C();
+    entry = arg0 + 0x28;
+    for (i = 0; i < 4; i++, entry += 0xEC) {
+        if (i == 0 || max < *(s32 *)*(void **)(entry + 0x88)) {
+            max = *(s32 *)*(void **)(entry + 0x88);
+        }
+    }
+    selected = max;
+    ((s8 *)arg0)[0x408] = -1;
+    entry = arg0 + 0x28;
+    for (i = 0; i != 4; i++, entry += 0xEC) {
+        if (selected - *(s32 *)*(void **)(entry + 0x88) == 0) {
+            entry[0xE9] |= 0x80;
+            count++;
+            if ((s8)((s8 *)arg0)[0x408] == -1) {
+                ((s8 *)arg0)[0x408] = i;
+            }
+        }
+    }
+    if (count == 1) {
+        *(s32 *)(arg0 + 0x3F4) = 1;
+        ret = 0;
+    } else {
+        *(s32 *)(arg0 + 0x3F4) = 0;
+        ret = 1;
+    }
+    *(s32 *)(arg0 + 0x400) = 0;
+    *(s32 *)(arg0 + 0x3FC) = 0;
+    *(s32 *)(arg0 + 0x404) = (func_8003570C() % 9) + 8;
+    return ret;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_310270/func_87E0D8EC.s")
 
