@@ -65,7 +65,22 @@ void func_87E0F740(u8 *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E0F74C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E0FBB4.s")
+extern u32 func_8003570C(void);
+void func_87E0FBB4(s32 arg0, u8 *arg1, u32 arg2, u32 arg3) {
+    if (arg0 != 0 && (*(u32 *)(arg1 + 0x14) & 1)) {
+        *(u32 *)(arg1 + 8) = (++*(u32 *)(arg1 + 4) % (arg3 * arg2)) / arg3;
+        if (arg2 == *(u32 *)(arg1 + 8) + 1) {
+            *(u32 *)(arg1 + 0x14) &= ~1;
+        }
+    } else {
+        *(u32 *)(arg1 + 8) = 0;
+        *(u32 *)(arg1 + 0x14) &= ~1;
+        if (func_8003570C() % 61 == 0) {
+            *(u32 *)(arg1 + 4) = 0;
+            *(u32 *)(arg1 + 0x14) |= 1;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E0FC90.s")
 
