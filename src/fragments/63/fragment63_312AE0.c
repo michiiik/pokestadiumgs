@@ -82,7 +82,26 @@ void func_87E0FBB4(s32 arg0, u8 *arg1, u32 arg2, u32 arg3) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E0FC90.s")
+extern u32 func_8003570C(void);
+void func_87E0FC90(s32 arg0, u8 *arg1, void *arg2, u32 arg3, u32 arg4) {
+    struct Pair { u32 *data; u32 count; } *entry;
+    u32 frame;
+    if (arg0 != 0 && (*(u32 *)(arg1 + 0x14) & 2)) {
+        entry = (struct Pair *)arg2 + *(u32 *)(arg1 + 0xC);
+        frame = ++*(u32 *)arg1 % (arg4 * entry->count) / arg4;
+        *(u32 *)(arg1 + 0x10) = entry->data[frame];
+        if (entry->count == frame + 1) {
+            *(u32 *)(arg1 + 0x14) &= ~2;
+        }
+    } else {
+        *(s32 *)(arg1 + 0x10) = -1;
+        if (func_8003570C() % 21 == 0) {
+            *(u32 *)arg1 = 0;
+            *(u32 *)(arg1 + 0x14) |= 2;
+            *(u32 *)(arg1 + 0xC) = func_8003570C() % arg3;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E0FDB4.s")
 
