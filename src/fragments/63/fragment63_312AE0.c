@@ -65,9 +65,43 @@ void func_87E0F740(u8 *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E0F74C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E0FBB4.s")
+extern u32 func_8003570C(void);
+void func_87E0FBB4(s32 arg0, u8 *arg1, u32 arg2, u32 arg3) {
+    if (arg0 != 0 && (*(u32 *)(arg1 + 0x14) & 1)) {
+        *(u32 *)(arg1 + 8) = (++*(u32 *)(arg1 + 4) % (arg3 * arg2)) / arg3;
+        if (arg2 == *(u32 *)(arg1 + 8) + 1) {
+            *(u32 *)(arg1 + 0x14) &= ~1;
+        }
+    } else {
+        *(u32 *)(arg1 + 8) = 0;
+        *(u32 *)(arg1 + 0x14) &= ~1;
+        if (func_8003570C() % 61 == 0) {
+            *(u32 *)(arg1 + 4) = 0;
+            *(u32 *)(arg1 + 0x14) |= 1;
+        }
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E0FC90.s")
+extern u32 func_8003570C(void);
+void func_87E0FC90(s32 arg0, u8 *arg1, void *arg2, u32 arg3, u32 arg4) {
+    struct Pair { u32 *data; u32 count; } *entry;
+    u32 frame;
+    if (arg0 != 0 && (*(u32 *)(arg1 + 0x14) & 2)) {
+        entry = (struct Pair *)arg2 + *(u32 *)(arg1 + 0xC);
+        frame = ++*(u32 *)arg1 % (arg4 * entry->count) / arg4;
+        *(u32 *)(arg1 + 0x10) = entry->data[frame];
+        if (entry->count == frame + 1) {
+            *(u32 *)(arg1 + 0x14) &= ~2;
+        }
+    } else {
+        *(s32 *)(arg1 + 0x10) = -1;
+        if (func_8003570C() % 21 == 0) {
+            *(u32 *)arg1 = 0;
+            *(u32 *)(arg1 + 0x14) |= 2;
+            *(u32 *)(arg1 + 0xC) = func_8003570C() % arg3;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E0FDB4.s")
 
@@ -100,9 +134,55 @@ void func_87E0FFA0(void *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E10094.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E10154.s")
+extern s32 D_87E1A8A0[];
+extern s32 D_87E1A8BC[];
+extern void func_87E0FFA0(void *arg0, s32 arg1);
+extern u32 D_87E1EBB8;
+void func_87E10154(s32 arg0, void *arg1) {
+    s32 value = -1;
+    switch (arg0) {
+      case 0: *(u16 *)((u8 *)arg1 + 2) &= ~2; break;
+      case 1:
+        switch (*(u32 *)((u8 *)arg1 + 0x20)) {
+            case 0:
+                value = D_87E1A8A0[*(s32 *)((u8 *)(u32)D_87E1EBB8 + 0x204)];
+                break;
+            case 1:
+                value = D_87E1A8BC[*(s32 *)((u8 *)(u32)D_87E1EBB8 + 0x204)];
+                break;
+            case 2:
+                value = *(s32 *)((u8 *)(u32)D_87E1EBB8 + 0x20C);
+                break;
+        }
+        func_87E0FFA0(arg1, value);
+        break;
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E10214.s")
+extern s32 D_87E1A9A0[];
+extern s32 D_87E1A9BC[];
+extern void func_87E0FFA0(void *arg0, s32 arg1);
+extern u32 D_87E1EBB8;
+void func_87E10214(s32 arg0, void *arg1) {
+    s32 value = -1;
+    switch (arg0) {
+      case 0: *(u16 *)((u8 *)arg1 + 2) &= ~2; break;
+      case 1:
+        switch (*(u32 *)((u8 *)arg1 + 0x20)) {
+            case 0:
+                value = D_87E1A9A0[*(s32 *)((u8 *)(u32)D_87E1EBB8 + 0x21C)];
+                break;
+            case 1:
+                value = D_87E1A9BC[*(s32 *)((u8 *)(u32)D_87E1EBB8 + 0x21C)];
+                break;
+            case 2:
+                value = *(s32 *)((u8 *)(u32)D_87E1EBB8 + 0x224);
+                break;
+        }
+        func_87E0FFA0(arg1, value);
+        break;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E102D4.s")
 
@@ -247,7 +327,27 @@ extern s32 func_8004C990(s32, s32);
 extern u32 D_87E1EBB8;
 void func_87E110E4(void *arg0, s32 arg1) { u8 *base = (u8 *)(u32)D_87E1EBB8; s32 index = (s32)*(s8 *)(base + 0x938); s32 result = (((*(u8 **)(base + 0x2C4))[0x2182] & (1 << index)) != 0) ? 4 : 0; *(s32 *)((u8 *)arg0 + 4) = func_8004C990(0x1B5, result + index); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E11148.s")
+extern u8 D_87E1AA40[];
+extern s32 func_8004C990(s32, s32);
+extern u32 D_87E1EBB8;
+void func_87E11148(void *arg0, s32 arg1) {
+    u8 digit;
+    u16 value;
+    switch (*(s32 *)((u8 *)arg0 + 0xC)) {
+    case 0:
+        digit = (*(u16 *)((u8 *)(u32)D_87E1EBB8 + 0x93A) % 1000) / 100;
+        if (digit == 0) digit = 10;
+        break;
+    case 1:
+        digit = (*(u16 *)((u8 *)(u32)D_87E1EBB8 + 0x93A) % 100) / 10;
+        if (digit == 0 && *(u16 *)((u8 *)(u32)D_87E1EBB8 + 0x93A) < 100) digit = 10;
+        break;
+    case 2:
+        digit = *(u16 *)((u8 *)(u32)D_87E1EBB8 + 0x93A) % 10;
+        break;
+    }
+    *(s32 *)((u8 *)arg0 + 4) = func_8004C990(0x1B8, D_87E1AA40[(u8)digit]);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E11248.s")
 
@@ -270,16 +370,79 @@ void func_87E1142C(void) {
     func_8004C4B0(50);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E1144C.s")
+extern void func_87E10B30(void);
+extern void func_87E0F170(void);
+extern void func_87E10628(void);
+extern void func_87E113C8(void);
+extern void func_87E1142C(void);
+extern u32 D_87E1EBB8;
+void func_87E1144C(s32 arg0, s32 arg1) {
+    D_87E1EBB8 = (u32)arg0;
+    *(s32 *)((u8 *)(u32)D_87E1EBB8 + 0x8) = -1;
+    *(s32 *)((u8 *)(u32)D_87E1EBB8 + 0xC) = -1;
+    *(s32 *)((u8 *)(u32)D_87E1EBB8 + 0x10) = -1;
+    *(s32 *)((u8 *)(u32)D_87E1EBB8 + 0x14) = -1;
+    *(s32 *)((u8 *)(u32)D_87E1EBB8 + 0x18) = 0;
+    *(s32 *)((u8 *)(u32)D_87E1EBB8 + 0x2C4) = arg1;
+    *(s32 *)((u8 *)(u32)D_87E1EBB8 + 0x1E4) = 0;
+    *(s32 *)((u8 *)(u32)D_87E1EBB8 + 0x1E8) = 0;
+    *(s32 *)((u8 *)(u32)D_87E1EBB8 + 0x1EC) = 0;
+    *(s32 *)((u8 *)(u32)D_87E1EBB8 + 0x1F8) = 0;
+    *(s32 *)((u8 *)(u32)D_87E1EBB8 + 0x1FC) = 0;
+    *(s32 *)((u8 *)(u32)D_87E1EBB8 + 0x200) = 0;
+    *(s32 *)((u8 *)(u32)D_87E1EBB8 + 0x204) = 0;
+    *(s32 *)((u8 *)(u32)D_87E1EBB8 + 0x210) = 0;
+    *(s32 *)((u8 *)(u32)D_87E1EBB8 + 0x214) = 0;
+    *(s32 *)((u8 *)(u32)D_87E1EBB8 + 0x218) = 0;
+    *(s32 *)((u8 *)(u32)D_87E1EBB8 + 0x21C) = 0;
+    *(s32 *)((u8 *)(u32)D_87E1EBB8 + 0x228) = 0;
+    *(u8 *)((u8 *)(u32)D_87E1EBB8 + 0x938) = 0;
+    *(s16 *)((u8 *)(u32)D_87E1EBB8 + 0x93A) = 0;
+    func_87E113C8();
+    func_87E10628();
+    func_87E10B30();
+    func_87E1142C();
+    func_87E0F170();
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E11534.s")
+extern void func_87E105FC(void *arg0, u8 arg1);
+s32 func_87E11534(s32 count, s32 selected, u8 *entry, u8 inc, u8 dec) {
+    s32 done = 0;
+    s32 i = 0;
+    s32 maximum = 0xFF;
+    u8 saturation = 0xFF;
+    if (count > 0) {
+        do {
+            if (i == selected) {
+                s32 value = entry[4];
+                if (value < maximum - inc) {
+                    entry[4] = (s32)value + inc;
+                } else {
+                    entry[4] = saturation;
+                    done = 1;
+                }
+            } else {
+                s32 value = entry[4];
+                if (dec < value) {
+                    entry[4] = value - dec;
+                } else {
+                    entry[4] = 0;
+                }
+            }
+            func_87E105FC(*(void **)entry, entry[4]);
+            i++;
+            entry += 8;
+        } while (i != count);
+    }
+    return done;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E1162C.s")
 
 extern void *func_8005049C(void *, s32);
 extern s32 func_8004C874(s32, s32);
 extern void func_87E0F188(s32);
-extern void func_87E11534(s32, s32, s32, s32, s32);
+extern s32 func_87E11534(s32, s32, u8 *, u8, u8);
 void func_87E11850(s32 arg0) {
     volatile u32 *base;
     u8 *entry;
@@ -309,7 +472,7 @@ void func_87E11850(s32 arg0) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E11924.s")
 
 extern void func_87E1162C(s32 *, s32 *, s32 *);
-extern void func_87E11534(s32, s32, s32, s32, s32);
+extern s32 func_87E11534(s32, s32, u8 *, u8, u8);
 extern void func_87E11850(s32);
 extern void func_87E11924(s32);
 extern void func_87F0277C();
