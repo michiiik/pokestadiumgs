@@ -411,7 +411,8 @@ void func_81803868_padding(void) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81803964.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81803A74.s")
+extern void func_81803964(u8 *, u8 *, f32, s32);
+void func_81803A74(u8 *arg0, u8 *arg1, f32 arg2, s32 arg3) { while (*(s16 *)arg0 >= 0) { func_81803964(arg0, arg1, arg2, arg3); arg0 += 0x20; } }
 
 s32 func_81803AE4(u16 arg0) {
     if (arg0 & 0x8000)
