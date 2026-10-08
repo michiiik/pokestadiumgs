@@ -405,14 +405,44 @@ void func_87E1144C(s32 arg0, s32 arg1) {
     func_87E0F170();
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E11534.s")
+extern void func_87E105FC(void *arg0, u8 arg1);
+s32 func_87E11534(s32 count, s32 selected, u8 *entry, u8 inc, u8 dec) {
+    s32 done = 0;
+    s32 i = 0;
+    s32 maximum = 0xFF;
+    u8 saturation = 0xFF;
+    if (count > 0) {
+        do {
+            if (i == selected) {
+                s32 value = entry[4];
+                if (value < maximum - inc) {
+                    entry[4] = (s32)value + inc;
+                } else {
+                    entry[4] = saturation;
+                    done = 1;
+                }
+            } else {
+                s32 value = entry[4];
+                if (dec < value) {
+                    entry[4] = value - dec;
+                } else {
+                    entry[4] = 0;
+                }
+            }
+            func_87E105FC(*(void **)entry, entry[4]);
+            i++;
+            entry += 8;
+        } while (i != count);
+    }
+    return done;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E1162C.s")
 
 extern void *func_8005049C(void *, s32);
 extern s32 func_8004C874(s32, s32);
 extern void func_87E0F188(s32);
-extern void func_87E11534(s32, s32, s32, s32, s32);
+extern s32 func_87E11534(s32, s32, u8 *, u8, u8);
 void func_87E11850(s32 arg0) {
     volatile u32 *base;
     u8 *entry;
@@ -442,7 +472,7 @@ void func_87E11850(s32 arg0) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E11924.s")
 
 extern void func_87E1162C(s32 *, s32 *, s32 *);
-extern void func_87E11534(s32, s32, s32, s32, s32);
+extern s32 func_87E11534(s32, s32, u8 *, u8, u8);
 extern void func_87E11850(s32);
 extern void func_87E11924(s32);
 extern void func_87F0277C();
