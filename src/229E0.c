@@ -4152,7 +4152,17 @@ void GeoCamera_SetPerspective(S1_unk_D_86002F34_00C* arg0, f32 arg1, f32 arg2, f
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80038E14.s")
+extern f32 D_80087E50[];
+extern f32 D_80088E50[0x1000];
+void func_80038E14(void *arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6, u16 arg7) {
+    f32 inv = (f32)(-1.0 / sqrtf((arg4 - arg1) * (arg4 - arg1) + (arg6 - arg3) * (arg6 - arg3)));
+    f32 sx = (arg4 - arg1) * inv;
+    f32 sz = (arg6 - arg3) * inv;
+    u8 *ptr = (u8 *)arg0 + 0x60;
+    Vec3f_SetComponentsDuplicate((void *)((u8 *)arg0 + 0xA8), arg1, arg2, arg3);
+    Vec3f_SetComponentsDuplicate((void *)(ptr + 0x54), arg4, arg5, arg6);
+    Vec3f_SetComponentsDuplicate((void *)(ptr + 0x60), D_80087E50[arg7 >> 4] * sz, D_80088E50[arg7 >> 4], -D_80087E50[arg7 >> 4] * sx);
+}
 #endif
 
 #ifdef VERSION_US
