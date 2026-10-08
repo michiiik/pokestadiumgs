@@ -327,7 +327,27 @@ extern s32 func_8004C990(s32, s32);
 extern u32 D_87E1EBB8;
 void func_87E110E4(void *arg0, s32 arg1) { u8 *base = (u8 *)(u32)D_87E1EBB8; s32 index = (s32)*(s8 *)(base + 0x938); s32 result = (((*(u8 **)(base + 0x2C4))[0x2182] & (1 << index)) != 0) ? 4 : 0; *(s32 *)((u8 *)arg0 + 4) = func_8004C990(0x1B5, result + index); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E11148.s")
+extern u8 D_87E1AA40[];
+extern s32 func_8004C990(s32, s32);
+extern u32 D_87E1EBB8;
+void func_87E11148(void *arg0, s32 arg1) {
+    u8 digit;
+    u16 value;
+    switch (*(s32 *)((u8 *)arg0 + 0xC)) {
+    case 0:
+        digit = (*(u16 *)((u8 *)(u32)D_87E1EBB8 + 0x93A) % 1000) / 100;
+        if (digit == 0) digit = 10;
+        break;
+    case 1:
+        digit = (*(u16 *)((u8 *)(u32)D_87E1EBB8 + 0x93A) % 100) / 10;
+        if (digit == 0 && *(u16 *)((u8 *)(u32)D_87E1EBB8 + 0x93A) < 100) digit = 10;
+        break;
+    case 2:
+        digit = *(u16 *)((u8 *)(u32)D_87E1EBB8 + 0x93A) % 10;
+        break;
+    }
+    *(s32 *)((u8 *)arg0 + 4) = func_8004C990(0x1B8, D_87E1AA40[(u8)digit]);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E11248.s")
 
