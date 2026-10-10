@@ -2,7 +2,18 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_3422F0/func_829057F0.s")
+extern s16 D_82919D2E;
+extern s16 D_82919D30;
+s32 func_829057F0(s32 arg0, u8 *arg1) {
+    if (arg0 == 2) {
+        arg1[0x18] = 0xFF;
+        arg1[0x19] = 0xFF;
+        arg1[0x1A] = 0xFF;
+        *(s16 *)(arg1 + 0x1C) = D_82919D2E + 0x2000;
+        *(s16 *)(arg1 + 0x1E) = D_82919D30 + 0x2000;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_3422F0/func_82905830.s")
 
