@@ -10,13 +10,18 @@ s32 func_88306D6C(u16 *arg0, u16 *arg1) {
     return first - second;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/32/fragment32_1B8010/func_88306DAC.s")
+extern u8 func_80073450(u8);
+s32 func_88306DAC(u16 *arg0, u16 *arg1) {
+    struct { u8 pad[3]; u8 first; u32 unused; } result;
+    s32 normalized = (*arg0 >= 0xFE) ? 0xC9 : *arg0;
+    result.first = func_80073450(normalized);
+    return result.first - func_80073450((*arg1 >= 0xFE) ? 0xC9 : *arg1);
+}
 
 extern void func_88004B60(s32, u8, s32 *);
 extern u8 D_88601896;
 extern s32 D_88601898;
 extern u8 func_88306D00;
-extern u8 func_88306DAC;
 void func_88306E18(s32 arg0) {
     s32 *sp1C;
 
