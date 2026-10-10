@@ -16,7 +16,18 @@ loop_1:
     return var_v1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D8160/func_88902BA0.s")
+s32 func_88902BA0(void *arg0, u8 arg1) {
+    s32 index = 0;
+loop:
+    if (arg1 == ((u8 *)arg0)[index + 2]) {
+        return 1;
+    }
+    index = (index + 1) & 0xFF;
+    if (index < 4) {
+        goto loop;
+    }
+    return 0;
+}
 
 extern s32 func_88902B70(u8 *); extern u8 D_889041A0; extern u8 func_80062E10(u8); void func_88902BE0(u8 *arg0, u8 arg1) { s32 i = func_88902B70(arg0); if (i < 4) i &= 0xff; else i = D_889041A0; *(u8 *)(arg0 + i + 2) = arg1; *(u8 *)(arg0 + i + 0x18) = func_80062E10(arg1); }
 
