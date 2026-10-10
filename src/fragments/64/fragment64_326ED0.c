@@ -30,15 +30,21 @@ s32 func_87F042D0(s32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_326ED0/func_87F057EC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_326ED0/func_87F05930.s")
+extern Gfx D_87F0FBC8[];
+
+void func_87F05930(Gfx **arg0) {
+    Gfx *gfx = *arg0;
+
+    gSPDisplayList(gfx++, D_87F0FBC8);
+    *arg0 = gfx;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_326ED0/func_87F05954.s")
 
-extern void func_87F05930();
 extern void func_87F05954(s32, s32, s32, s32);
 
 void func_87F05B88(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
-    func_87F05930();
+    func_87F05930((Gfx **)arg0);
     func_87F05954(arg0, arg1, arg2, arg3);
 }
 
