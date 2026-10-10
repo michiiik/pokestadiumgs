@@ -66,7 +66,22 @@ void func_87E01EB0(void *arg0) {
 
 void func_87E01F04(u8 *arg0) {}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_305090/func_87E01F0C.s")
+s32 func_87E01F0C(u32 arg0) {
+    u8 *entry = (u8 *)arg0 + 0x1C;
+    s32 result = 1;
+    s32 index;
+    arg0 = 4;
+    index = 0;
+    do {
+        index++;
+        if (*(s32 *)(entry + 0x94) != 0) {
+            result = 0;
+            break;
+        }
+        entry += 0x98;
+    } while (index != arg0);
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_305090/func_87E01F44.s")
 
