@@ -6,7 +6,19 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_32DC40/func_87F0B0FC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_32DC40/func_87F0B154.s")
+void func_87F0B154(void *arg0) {
+    struct State {
+        u8 pad[0x68];
+        u32 bit31 : 1;
+        u32 bit30 : 1;
+        u32 rest : 30;
+    };
+    struct State *state = arg0;
+    if ((state->bit30 == 0) && (state->bit31 == 1)) {
+        state->bit31 = 0;
+        state->bit30 = 1;
+    }
+}
 
 void func_87F0B18C(u8 *arg0) {
     arg0[0x68] &= 0xFF7F;
