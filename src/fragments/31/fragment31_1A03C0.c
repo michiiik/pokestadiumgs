@@ -2,7 +2,12 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A03C0/func_8822D140.s")
+typedef struct { u8 first, second; } Func8822D140Pair;
+void func_8822D140(Func8822D140Pair *arg0, Func8822D140Pair *arg1) {
+    Func8822D140Pair temp = *arg0;
+    *arg0 = *arg1;
+    *arg1 = temp;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A03C0/func_8822D180.s")
 
