@@ -17,7 +17,11 @@ void func_84400090(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/86/fragment86_code/func_84400098.s")
+void func_84400098(u8 *arg0, u8 arg1) {
+    if (arg0 != NULL) {
+        arg0[++arg0[0]] = arg1;
+    }
+}
 #endif
 
 #ifdef VERSION_US
