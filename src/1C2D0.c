@@ -24,7 +24,12 @@ f32 func_8001BA28(void *arg0) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/1C2D0/func_8001BA84.s")
+s32 func_8001BA84(u8 *arg0) {
+    u32 index;
+    *(u32 *)(arg0 + 4) += (s32)*(f32 *)(arg0 + 0x10);
+    index = (*(u32 *)(arg0 + 4) >> 10) & 0x3F;
+    return (*(s16 **)(arg0 + 8))[index];
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1C2D0/func_8001BABC.s")
 
