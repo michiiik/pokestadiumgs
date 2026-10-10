@@ -43,7 +43,13 @@ void func_8001BCA4(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1C2D0/func_8001BD00.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/1C2D0/func_8001BDF0.s")
+void func_8001BDF0(u8 *arg0) {
+    struct Vector { s32 x, y, z; };
+
+    *(f32 *)(arg0 + 0x38) = 1.0f;
+    *(struct Vector *)(arg0 + 0x80) =
+        *(struct Vector *)(*(u8 **)(arg0 + 0x44) + 0x30);
+}
 
 void func_8001BE1C(void *arg0, s32 arg1, s32 arg2) {
     (*(s8 *)((u8 *)(arg0) + (0))) = 0;
