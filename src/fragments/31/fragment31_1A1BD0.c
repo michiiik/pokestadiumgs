@@ -78,7 +78,11 @@ void func_8822FFA8(void) {
     Util_Free((void *) D_88234980);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A1BD0/func_88230010.s")
+extern void func_88004990(u8 arg0, s32 arg1);
+void func_88230010(void) {
+    func_88004990(**(u8 **)D_88234980, 0);
+    D_880068B8 = 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A1BD0/func_88230048.s")
 
