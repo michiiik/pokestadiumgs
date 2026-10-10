@@ -48,7 +48,21 @@ void *func_82700E70(s32 arg0, s32 arg1, void *arg2, s32 arg3) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14B090/func_82700EC8.s")
+void func_82700EC8(void *arg0) {
+    struct Pair { s16 x, y; };
+    struct State {
+        u8 pad[0xA];
+        s16 width;
+        s16 unused;
+        struct Pair current;
+        struct Pair previous;
+    };
+    struct State *state = arg0;
+    state->width = 0xC0;
+    state->current.x = 0x280 - state->width;
+    state->current.y = 0x52;
+    state->previous = state->current;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14B090/func_82700EFC.s")
 
