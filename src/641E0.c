@@ -122,7 +122,10 @@ void func_80063F18(u8 arg0, s32 arg1)
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80063F4C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80064070.s")
+extern s32 func_80063F4C(u8, u8, u8, s32, s32);
+s32 func_80064070(u8 arg0, u8 arg1, u8 arg2) {
+    return func_80063F4C(arg0, arg1, arg2, 0xF, 1) != 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_800640B4.s")
 
