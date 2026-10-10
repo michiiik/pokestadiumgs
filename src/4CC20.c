@@ -495,7 +495,11 @@ void WidgetTree_RunMessagePanelSilent(s32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004DF38.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004DFEC.s")
+typedef struct { void *value; } Func8004DFECArg;
+extern void *func_8004E018(s32 arg0, s32 arg1, s32 arg2, Func8004DFECArg arg3);
+void *func_8004DFEC(s32 arg0, s32 arg1, Func8004DFECArg arg2) {
+    return func_8004E018(arg0, arg1, 0, arg2);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004E018.s")
 
