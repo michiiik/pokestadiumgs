@@ -20,7 +20,16 @@ void func_88700288(void *arg0, s16 arg1, s16 arg2, s16 arg3, u8 arg4, u8 arg5, u
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/36/fragment36_code/func_887002F4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/36/fragment36_code/func_8870032C.s")
+extern u8 *D_88701E00;
+s32 func_8870032C(void) {
+    s32 result;
+    switch (*(s32 *)D_88701E00) {
+        case 0: result = 0x6B; break;
+        case 3: result = 0x60; break;
+        default: result = 0x5A; break;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/36/fragment36_code/func_88700364.s")
 
