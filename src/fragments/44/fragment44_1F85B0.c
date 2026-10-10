@@ -21,7 +21,14 @@ s32 func_8AF0A800(void *arg0) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F85B0/func_8AF0A850.s")
+extern void func_800504BC(s16 *arg0);
+s32 func_8AF0A850(s32 arg0, void *arg1) {
+    struct { s32 pad[2]; s16 angles[2]; } scratch;
+    if ((arg0 != 0) && (arg0 == 1)) {
+        func_800504BC(scratch.angles);
+    }
+    return 0;
+}
 
 s32 func_8004C990(s32, s32);
 extern s32 D_8AF2D428;
