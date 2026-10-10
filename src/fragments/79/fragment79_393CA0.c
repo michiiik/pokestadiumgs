@@ -83,7 +83,7 @@ void func_84124768(u8 arg0) {
 #ifdef VERSION_US
 extern u8 D_841951E4, D_841951E5;
 extern void func_84136678(u8, s16);
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 void func_841248DC(u8 arg0) {
     if (D_841951E4 != 2) {
         if (D_841951E5 >= 0xB) {
@@ -816,7 +816,7 @@ extern void func_8412EE5C(void);
 extern void func_841265EC(void);
 extern s32 func_84126804(u8, u16);
 extern void func_84134CBC(u8 arg0, u8 arg1);
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 extern void func_84136678(u8 arg0, s16 arg1);
 extern void func_84136A9C(u8 arg0, s16 arg1, s16 arg2, u8 arg3);
 extern void func_84136CA8(void);
@@ -866,7 +866,7 @@ extern void func_841246AC(u8, u8);
 extern u8 D_841951BF;
 extern u8 *D_84195208[];
 extern void func_84136678(u8, s16);
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 extern void func_84136CA8(void);
 void func_84126A90(u8 arg0, u8 arg1, u8 arg2) {
     func_84136678(arg0, -1);
@@ -914,7 +914,7 @@ void func_84126BFC(u8 arg0) {
 
 #ifdef VERSION_US
 extern void func_841246AC(u8 arg0, u8 arg1);
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 extern void func_84136678(u8 arg0, s16 arg1);
 extern void func_84136CA8(void);
 extern u8 D_841951BF;
@@ -1212,7 +1212,7 @@ extern void func_84124768(u8 arg0);
 extern void func_841254E0(void);
 extern void func_84134CBC(u8 arg0, u8 arg1);
 extern void func_84134DD8(u8 arg0);
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 extern void func_84136678(u8, s16);
 extern void func_84136A9C(u8 arg0, s16 arg1, s16 arg2, u8 arg3);
 extern void func_84136CA8(void);
@@ -1249,7 +1249,7 @@ void func_84128B4C(void) {
 
 #ifdef VERSION_US
 extern void func_84134CBC(u8 arg0, u8 arg1);
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 extern void func_84136678(u8, s16);
 extern void func_84136CA8(void);
 extern u8 D_841951BD;
@@ -1281,7 +1281,7 @@ void func_84128CB8(void) {
 
 #ifdef VERSION_US
 extern void func_84134CBC(u8 arg0, u8 arg1);
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 extern void func_84136678(u8 arg0, s16 arg1);
 extern void func_84136A9C(u8 arg0, s16 arg1, s16 arg2, u8 arg3);
 extern void func_84136CA8(void);
@@ -1326,7 +1326,7 @@ void func_84129180(void) {
 
 #ifdef VERSION_US
 extern void func_84134CBC(u8 arg0, u8 arg1);
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 extern void func_84136678(u8, s16);
 extern void func_84136A9C(u8 arg0, s16 arg1, s16 arg2, u8 arg3);
 extern void func_84136CA8(void);
@@ -1380,7 +1380,7 @@ extern void func_841252D0(u8);
 extern void func_84124594(u8 arg0);
 extern void func_841253F4(void);
 extern void func_841254E0(void);
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 extern void func_84136678(u8, s16);
 extern void func_84136CA8(void);
 extern u8 D_841951BC;
@@ -1485,7 +1485,7 @@ void BattleAnim_Table_84185F10_000(void) {
 extern void func_84124594(u8 arg0);
 extern void func_84125424(u8 arg0);
 extern void func_841254E0(void);
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 extern void func_84136678(u8 arg0, s16 arg1);
 extern void func_84136CA8(void);
 extern u8 D_841951BC;
@@ -1566,7 +1566,7 @@ extern s32 func_8412A200(u8 arg0);
 extern void func_84131EAC(u8 arg0);
 extern void func_84133984(u8 arg0, u8 arg1);
 extern void func_84134CBC(u8 arg0, u8 arg1);
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 extern void func_84136678(u8, s16);
 extern void func_84136CA8(void);
 extern u8 D_841951BC;
@@ -1685,7 +1685,7 @@ void BattleAnim_Table_84185F10_006(void) {
 #ifdef VERSION_US
 extern s32 func_84126320(u8 arg0);
 extern void func_84134CBC(u8 arg0, u8 arg1);
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 extern void func_84136678(u8, s16);
 extern void func_84136A9C(u8 arg0, s16 arg1, s16 arg2, u8 arg3);
 extern void func_84136CA8(void);
@@ -1731,7 +1731,7 @@ void BattleAnim_Table_84185F10_009(void) {
 
 #ifdef VERSION_US
 extern void func_84124594(u8 arg0);
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 extern void func_84136678(u8, s16);
 extern void func_84136CA8(void);
 void BattleAnim_Table_84185F10_010(void) {
@@ -1766,7 +1766,7 @@ void BattleAnim_Table_84185F10_010(void) {
 
 #ifdef VERSION_US
 extern void func_84124594(u8 arg0);
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 extern void func_84136678(u8, s16);
 extern void func_84136CA8(void);
 extern u8 D_841951BC;
@@ -1819,7 +1819,7 @@ extern s32 func_8412676C(u8 arg0, u8 arg1);
 extern s32 func_84126804(u8, u16);
 extern void func_84134CBC(u8 arg0, u8 arg1);
 extern void func_84134DD8(u8 arg0);
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 extern void func_84136678(u8, s16);
 extern void func_84136A9C(u8 arg0, s16 arg1, s16 arg2, u8 arg3);
 extern void func_84136CA8(void);
@@ -1934,7 +1934,7 @@ extern void func_841254E0(void);
 extern void func_84126BA8(u8 arg0);
 extern void func_84134CBC(u8 arg0, u8 arg1);
 extern void func_84134DD8(u8 arg0);
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 extern void func_84136678(u8, s16);
 extern void func_84136CA8(void);
 extern u8 D_841951BC;
@@ -2119,7 +2119,7 @@ void BattleAnim_Table_84185F10_035(void) {
 #ifdef VERSION_US
 extern void func_84124604(u8 arg0, u8 arg1);
 extern void func_84126A90(u8 arg0, u8 arg1, u8 arg2);
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 extern void func_84136678(u8, s16);
 extern void func_84136CA8(void);
 extern u8 D_841951BC;
@@ -2313,7 +2313,7 @@ void func_8412DC20(void) {
 #ifdef VERSION_US
 extern void func_84124604(u8 arg0, u8 arg1);
 extern void func_84126BA8(u8 arg0);
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 extern void func_84136678(u8, s16);
 extern void func_84136CA8(void);
 extern u8 D_841951BC;
@@ -2390,7 +2390,7 @@ void BattleAnim_Table_84185FDC_001(void) {
 #ifdef VERSION_US
 extern void func_84124604(u8 arg0, u8 arg1);
 extern void func_84134E30(s32 arg0);
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 extern void func_84136678(u8, s16);
 extern void func_84136CA8(void);
 extern u8 D_841951BC;
@@ -2419,7 +2419,7 @@ extern void func_84126C3C(u8);
 extern void func_84134CBC(u8 arg0, u8 arg1);
 extern void func_84134DD8(u8 arg0);
 extern void func_84134E30(s32 arg0);
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 extern void func_84136678(u8, s16);
 extern void func_84136CA8(void);
 extern u8 D_841951BC;
@@ -2546,7 +2546,7 @@ void BattleAnim_Table_84186004_005(void) {
 #ifdef VERSION_US
 extern void func_84134CBC(u8 arg0, u8 arg1);
 extern void func_84134DD8(u8 arg0);
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 extern void func_84136678(u8, s16);
 extern void func_84136CA8(void);
 extern u8 D_841951BC;
@@ -2562,7 +2562,7 @@ void BattleAnim_Table_84186004_006(void) {
 
 #ifdef VERSION_US
 extern void func_841254E0(void);
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 extern void func_84136678(u8, s16);
 extern void func_84136CA8(void);
 void BattleAnim_Table_84186004_007(void) {
@@ -2582,7 +2582,7 @@ extern u8 D_8418546C[];
 void func_84135034(u8, u8);
 extern void func_8004C594(s32, s32);
 extern s32 func_84125080();
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 extern void func_84136678(u8 arg0, s16 arg1);
 extern u8 D_841951BC;
 extern s8 D_841951C2;
@@ -2887,7 +2887,7 @@ extern void func_84126FA0(s32);
 extern void func_84134CBC(u8 arg0, u8 arg1);
 extern void func_84134E00(u8 arg0);
 extern void func_84134E30(s32 arg0);
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 extern void func_84136678(u8 arg0, s16 arg1);
 extern void func_84136CA8(void);
 extern u8 D_841951BD;
@@ -2967,7 +2967,7 @@ void BattleAnim_Table_84186004_048(void) {
 #ifdef VERSION_US
 extern void func_84126BA8(u8 arg0);
 extern void func_84126FA0(s32);
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 extern void func_84136678(u8, s16);
 extern void func_84136CA8(void);
 extern u8 D_841951BC;
@@ -3056,7 +3056,7 @@ extern s32 func_84125B88(u8, u8, u8);
 extern s32 func_8412676C(u8 arg0, u8 arg1);
 extern s32 func_84126804(u8, u16);
 extern void func_84134CBC(u8 arg0, u8 arg1);
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 extern void func_84136678(u8, s16);
 extern void func_84136A9C(u8 arg0, s16 arg1, s16 arg2, u8 arg3);
 extern void func_84136CA8(void);
@@ -3172,7 +3172,7 @@ void BattleAnim_Table_84186004_059(void) {
 extern void BattleAnim_Table_84186004_076(void);
 extern void func_841254E0(void);
 extern void func_84126BA8(u8 arg0);
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 extern void func_84136678(u8, s16);
 extern u8 D_841951BC;
 extern u8 D_841951BF;
@@ -3279,7 +3279,7 @@ void BattleAnim_Table_84186004_067(void) {
 #ifdef VERSION_US
 extern void func_84126FA0(s32);
 extern void func_84134CBC(u8 arg0, u8 arg1);
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 extern void func_84136678(u8, s16);
 extern void func_84136CA8(void);
 extern u8 D_841951BC;
@@ -3433,7 +3433,7 @@ extern void func_841248DC(u8 arg0);
 extern void func_84124954(u8 arg0);
 extern void func_841249D8(u8 arg0);
 extern void func_84124A14(u8 arg0);
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 extern void func_84136678(u8, s16);
 extern void func_84136A9C(u8 arg0, s16 arg1, s16 arg2, u8 arg3);
 extern void func_84136CA8(void);
@@ -3452,7 +3452,7 @@ void BattleAnim_Table_84186004_080(void) { func_84124798(D_841951BD); func_84124
 #ifdef VERSION_US
 extern void func_84126FA0(s32);
 extern void func_84134CBC(u8 arg0, u8 arg1);
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 extern void func_84136678(u8, s16);
 extern void func_84136CA8(void);
 extern u8 D_841951BD;
@@ -3511,7 +3511,7 @@ extern s32 func_8412676C(u8, u8);
 extern s32 func_84126804(u8, u16);
 extern void func_8004C54C(u8, s32);
 extern void func_84134CBC(u8 arg0, u8 arg1);
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 extern void func_84136678(u8, s16);
 extern void func_84136A9C(u8 arg0, s16 arg1, s16 arg2, u8 arg3);
 extern void func_84136CA8(void);
@@ -3602,7 +3602,7 @@ extern s32 func_8412676C(u8, u8);
 extern s32 func_84126804(u8, u16);
 extern void func_8004C54C(u8, s32);
 extern void func_84134CBC(u8 arg0, u8 arg1);
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 extern void func_84136678(u8, s16);
 extern void func_84136A9C(u8 arg0, s16 arg1, s16 arg2, u8 arg3);
 extern void func_84136CA8(void);
@@ -3652,7 +3652,7 @@ void func_841324EC(void) {
 extern void func_8004C594(s32, s32);
 extern void func_8004C54C(u8, s32);
 extern void func_84134CBC(u8 arg0, u8 arg1);
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 extern void func_84136678(u8 arg0, s16 arg1);
 extern void func_84136A9C(u8 arg0, s16 arg1, s16 arg2, u8 arg3);
 extern void func_84136CA8(void);
@@ -3698,7 +3698,7 @@ void func_8413293C(void) {
 extern void func_8004C54C(u8, s32);
 extern s32 func_84125080();
 extern void func_84134CBC(u8 arg0, u8 arg1);
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 extern void func_84136678(u8, s16);
 extern void func_84136B9C(u8 arg0, s16 arg1, u16 arg2);
 extern void func_84136CA8(void);
@@ -3729,7 +3729,7 @@ void func_84132D44(void) {
 #ifdef VERSION_US
 extern void func_8004C54C(u8, s32);
 extern void func_84124594(u8 arg0);
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 extern void func_84136678(u8 arg0, s16 arg1);
 extern void func_84136CA8(void);
 extern void * D_841951F8[];
@@ -3774,7 +3774,7 @@ extern void func_841270D8(u8, u8);
 extern void func_84131664(u8);
 extern u8 func_80062D20(u8);
 extern void func_84134CBC(u8 arg0, u8 arg1);
-extern void func_84135B00(u8);
+extern void func_84135B00(u16);
 extern void func_841360C0(u8 arg0, s16 arg1, u16 arg2, u8 arg3, u8 arg4);
 extern void func_84136678(u8 arg0, s16 arg1);
 extern void func_84136CA8(void);
@@ -4365,7 +4365,10 @@ void func_841359D0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84135B00.s")
+extern void func_84135A2C(u8 *, u16);
+void func_84135B00(u16 arg0) {
+    func_84135A2C(&D_84195280[D_84195280[0x4D81] * 0x280], arg0);
+}
 #endif
 
 #ifdef VERSION_US
