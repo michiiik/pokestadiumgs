@@ -200,7 +200,15 @@ s32 func_87E03FF0(void *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_306150/func_87E04030.s")
+s32 func_87E04030(void *arg0, void *arg1) {
+    struct Item { u8 pad[0x94]; s32 value; };
+    struct Sub { u8 pad[0x20]; struct Item *item; };
+    struct State { u8 pad[0x18C]; struct Sub sub; };
+    struct Root { u8 pad[0x10]; struct State *state; };
+    struct Sub *sub = &((struct Root *)arg0)->state->sub;
+    arg1 = sub->item;
+    return ((struct Item *)arg1)->value == 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_306150/func_87E04048.s")
 
