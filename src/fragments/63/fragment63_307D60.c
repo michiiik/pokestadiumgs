@@ -23,7 +23,22 @@ void func_87E04AA4(s32 arg0) {
     func_87F02684(arg0 + 8);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_307D60/func_87E04AC4.s")
+s32 func_87E04AC4(u32 arg0) {
+    u8 *entry = (u8 *)arg0 + 0x1C;
+    s32 result = 1;
+    s32 index;
+    arg0 = 4;
+    index = 0;
+    do {
+        index++;
+        if (*(s32 *)(entry + 0x90) != 0) {
+            result = 0;
+            break;
+        }
+        entry += 0x94;
+    } while (index != arg0);
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_307D60/func_87E04AFC.s")
 
