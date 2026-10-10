@@ -149,7 +149,13 @@ s32 func_81B006EC(u8 arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/87/fragment87_code/func_81B00728.s")
+s32 func_81B00728(u8 arg0) {
+    switch (arg0) {
+        case 0x33: return 3;
+        case 0x34: return 5;
+        default: return 0;
+    }
+}
 
 s32 func_81B00764(u8 arg0) {
     switch (arg0) {
