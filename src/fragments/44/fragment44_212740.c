@@ -44,7 +44,20 @@ void func_8AF2458C(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_212740/func_8AF24628.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_212740/func_8AF24A7C.s")
+typedef struct {
+    u16 unused;
+    u16 flags;
+} Flags_8AF24A7C;
+
+extern Flags_8AF24A7C *D_8AF3A3D8[12];
+
+void func_8AF24A7C(void) {
+    s32 index;
+
+    for (index = 0; index < 12; index++) {
+        D_8AF3A3D8[index]->flags &= ~1;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_212740/func_8AF24AE0.s")
 
