@@ -14,7 +14,24 @@ u8 *func_87C01730(void **arg0) {
     return NULL;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_257730/func_87C0177C.s")
+s32 func_87C0177C(s16 *arg0) {
+    s32 count;
+    s16 *entry;
+    s32 valid;
+
+    if (arg0 == NULL) {
+        return 0;
+    }
+    count = 1;
+    valid = *arg0 >= 0;
+    entry = arg0 + 1;
+    while (valid) {
+        valid = *entry >= 0;
+        count++;
+        entry++;
+    }
+    return count - 1;
+}
 
 u8 *func_87C017D0(void **arg0, s32 arg1) {
     u8 *state = func_87C01730(arg0);
