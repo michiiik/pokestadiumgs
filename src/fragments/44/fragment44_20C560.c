@@ -16,7 +16,17 @@ s32 func_8AF1E2F0(u8 arg0, u8 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20C560/func_8AF1E45C.s")
+typedef struct Snapshot_8AF1E45C {
+    u32 words[0x52C / 4];
+} Snapshot_8AF1E45C;
+extern Snapshot_8AF1E45C D_8AF38208;
+extern Snapshot_8AF1E45C *D_8AF27940;
+extern s16 D_8AF38206;
+extern s16 D_8AF3779C;
+void func_8AF1E45C(void) {
+    *D_8AF27940 = D_8AF38208;
+    D_8AF3779C = D_8AF38206;
+}
 #endif
 
 void func_8AF1E4B0(void) {
