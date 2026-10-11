@@ -14,7 +14,18 @@ void func_88200134(u8 arg0, u8 arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1732A0/func_88200180.s")
+extern void func_88003FBC(void *);
+extern void func_88002CB8(s16, s16, u16, u16);
+
+void func_88200180(u8 arg0) {
+    u8 *entry = D_88234564 + arg0 * 0x44;
+
+    if (*(s32 *)(entry + 0x1C) != 0) {
+        func_88003FBC(entry);
+        func_88002CB8(*(s16 *)entry, *(s16 *)(entry + 2),
+                      *(u16 *)(entry + 4), *(u16 *)(entry + 6));
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1732A0/func_882001E8.s")
 
