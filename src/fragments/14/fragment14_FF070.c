@@ -805,7 +805,43 @@ s32 func_8130B1F4(u8 *arg0) {
     return func_8160A33C(*(s32 *)(base + 0x68E8), base[0x6914]);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130B220.s")
+typedef struct { u8 pad[0xE8EC]; void *owner; } B220J4Owner;
+typedef struct { u8 pad[0xE8F0]; f32 f0, f1, f2, f3; } B220J4Floats;
+typedef struct { u8 pad[0xE908]; s32 word0, word1; u8 mode, count, state, flag, enabled, last; } B220J4Tail;
+typedef struct { u8 bytes[8]; } B220J4Bytes;
+typedef struct { u8 a, b, c, d, e, f, g, h; } B220J4Fields;
+typedef struct { u8 bytes[4]; } B220J4Half;
+typedef struct { B220J4Half first, second; } B220J4Nested;
+typedef struct { u16 halves[4]; } B220J4Halves;
+typedef struct { u8 first[2]; u16 middle; u8 last[4]; } B220J4Mixed;
+extern void func_8130AF94(void *arg0);
+void func_8130B220(void *arg0, void *arg1, s32 arg2, s32 arg3) {
+    extern B220J4Bytes D_81312638;
+    s32 unused;
+    s32 count = arg3 - 1;
+    s32 enabled = 1;
+
+    if (count < 0) {
+        count = 0;
+        enabled = 0;
+    }
+    _bzero(arg0, 0xE918);
+    ((B220J4Tail *)arg0)->state = 0;
+    ((B220J4Owner *)arg0)->owner = arg1;
+    ((B220J4Tail *)arg0)->count = count;
+    ((B220J4Tail *)arg0)->mode = arg2;
+    func_8130AF94(arg0);
+    ((B220J4Floats *)arg0)->f0 = 0.0f;
+    ((B220J4Tail *)arg0)->last = count;
+    ((B220J4Floats *)arg0)->f2 = count;
+    ((B220J4Tail *)arg0)->enabled = enabled;
+    ((B220J4Floats *)arg0)->f1 = enabled;
+    ((B220J4Floats *)arg0)->f3 = 0.0f;
+    *(B220J4Bytes *)arg0 = D_81312638;
+    ((B220J4Tail *)arg0)->word0 = 0;
+    ((B220J4Tail *)arg0)->flag = 0;
+    ((B220J4Tail *)arg0)->word1 = 0;
+}
 
 extern void func_8130A8E0(void *, s32);
 
@@ -1142,7 +1178,60 @@ s32 func_8130C0BC(void *arg0) {
     return 1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_8130C14C.s")
+extern u8 D_81312054[];
+extern u8 D_81311FA0[];
+extern s32 func_8160A8DC(s32);
+typedef struct { u8 bytes[0x24]; } C14CEntry;
+typedef struct {
+    u8 pad0[0xE8EC];
+    u8 *object;
+    u8 pad1[0x10];
+    f32 value;
+    u8 pad2[8];
+    s32 counter;
+    u8 selection;
+    u8 pad3;
+    u8 state;
+    u8 mode;
+    u8 index;
+} C14CState;
+extern void func_8130A8E0(void *arg0, s32 arg1);
+extern s32 func_8130B1F4(u8 *arg0);
+extern s32 func_81311C70();
+s32 func_8130C14C(void *arg0) {
+    s32 id;
+    void *entry;
+    s32 result;
+    C14CState *p = arg0;
+
+    id = func_8130B1F4((u8 *)p);
+    if (p->mode == 0) {
+        entry = D_81312054 + p->index * 0x24;
+    } else {
+        entry = D_81311FA0 + p->index * 0x24;
+    }
+    result = func_81311C70(p->object + 0x74, entry, p->selection, -1);
+    switch (result) {
+        case 2:
+            p->value = 0.0f;
+            p->state = 10;
+            break;
+        case 3:
+            if (func_8160A8DC(id) > 0) {
+                p->state = 12;
+                p->counter = 0;
+                func_8130A8E0(arg0, 0);
+            }
+            break;
+        case 4:
+            p->state = 6;
+            break;
+        case -1:
+            p->state = 2;
+            break;
+    }
+    return 1;
+}
 
 extern f32 func_816092FC(void);
 extern void func_8130B12C(void *arg0);
