@@ -53,3 +53,15 @@ func_8AE026C8: time cap at 0.8814 (raw 0.4407) after 2414s, mismatch operand_or_
 ## 2026-10-08
 
 func_8AE035BC: matched (call_sequence:matched:signed_buffer_and_reversed_equality), 1 iterations, agent codex
+
+## 2026-10-11
+
+func_8AE00C1C: plateau at 0.0 (raw None), mismatch unknown; tried families: call_sequence; tie-pool yes
+
+## 2026-10-11
+
+func_8AE05B24: matched (call_sequence:stack_record:renamed_snapshot), 1 iterations, agent codex
+
+## 2026-10-11
+
+func_8AE02398: time cap at 0.963 (raw 0.8704) after 2449s, mismatch operand_or_scheduling_drift; tried families: access_qualification, access_representation, argument_representation, arithmetic_form, arithmetic_lifetime, arithmetic_temporaries, arithmetic_temporary, assignment_expression, assignment_nesting, call_sequence, case_layout, comparison_spelling, conditional_form, control_flow, control_layout, control_region, conversion_form, conversion_lifetime, conversion_representation, conversion_source, conversion_spelling, declaration_order, dispatch_lifetime, dispatch_shape, global_dataflow, global_storage, initial_conversion, initial_store, lifetime, live_range_coalescing, live_range_partition, load_scheduling, loads, local_lifetime, local_representation, local_width, masking_form, narrowing, permuter_seed, pointer_form, read_qualification, record_access, record_representation, sequence_point, sequencing, stage_lifetime, statement_order, storage, storage_indirection, store_alias_type, store_expression, store_partition, store_qualification, store_schedule, store_scheduling, store_shape, tail, tail_conversion, tail_expression, tail_loop_form, temporary_representation, temporary_width, value_flow, writeback_control, writeback_partition, writeback_qualification; tie-pool yes
