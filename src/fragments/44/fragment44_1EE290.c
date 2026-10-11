@@ -181,15 +181,24 @@ s32 func_8AF013D8(s32 mode, void *record) {
 extern s16 D_8AF263F0[];
 s16 Trade_GetSelectedBox(s16 arg0) { return D_8AF263F0[arg0]; }
 
-s32 func_8AF01618(s32 arg0, s32 arg1) {
-    s32 *home0 = &arg0;
-    s32 *home1 = &arg1;
-    *home0 &= 0xFF;
-    if ((*home1 & 0xF) == (*home0 & 0xF) || (*home1 & 0xF) == ((*home0 & 0xF0) >> 4)) return 1;
+s32 func_8AF01618(u8 arg0, u8 arg1) {
+    s32 nibble = arg1 & 0xF;
+    if ((nibble == (arg0 & 0xF)) || (nibble == ((arg0 & 0xF0) >> 4))) return 1;
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1EE290/func_8AF01654.s")
+extern u8 func_80063A48(u8);
+extern s32 func_80064474(u8, u16);
+u8 func_8AF01654(u8 arg0) {
+    u8 result = func_80063A48(arg0);
+
+    if ((func_80064474(arg0, 0x80) == 0) &&
+        (func_8AF01618(result, 0xD) == 0) &&
+        (func_8AF01618(result, 0xF) == 0)) {
+        result = 0;
+    }
+    return result;
+}
 
 extern u8 D_8AF28760[];
 extern Gfx *D_800D0510;
