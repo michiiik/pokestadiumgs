@@ -39,7 +39,23 @@ void func_87F0A6C8(TreeNode_80050428 *arg0, s32 arg1, u32 *arg2, u32 *arg3) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_32D260/func_87F0A714.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_32D260/func_87F0A91C.s")
+extern void func_800504BC(s16 *);
+
+void func_87F0A91C(s32 arg0, u8 *arg1) {
+    struct { s16 position[2]; u32 unused; } scratch;
+    u8 *entry;
+
+    switch (arg0) {
+        case 0:
+            entry = *(u8 **)(arg1 + 0x20);
+            func_800504BC(scratch.position);
+            *(s16 *)(entry + 4) = *(s16 *)(arg1 + 8) + scratch.position[0];
+            *(s16 *)(entry + 6) = *(s16 *)(arg1 + 0xA) + scratch.position[1];
+            break;
+        case 1:
+            break;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_32D260/func_87F0A988.s")
 
