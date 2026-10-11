@@ -92,7 +92,18 @@ s32 func_8AF220E8(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20F140/func_8AF2228C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20F140/func_8AF22384.s")
+s32 func_8AF22384(void) {
+    u8 *entry = *(u8 **)(D_8AF2BDD8 + 4);
+    s32 first = *(u16 *)(entry + 0x3E);
+    s32 second = *(u16 *)(entry + 0x96);
+    s32 third;
+    entry += 0xC8;
+    third = *(u16 *)(entry + 0x26);
+    if ((first > 0) && (second > 0) && (third > 0)) {
+        return 1;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20F140/func_8AF223C8.s")
 
