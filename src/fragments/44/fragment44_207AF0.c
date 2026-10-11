@@ -2,14 +2,14 @@
 
 
 #ifdef VERSION_US
-s32 *func_8004C874(s32, s32, ...);
+void *func_8004C874(s32, s32);
 extern u8 D_8AF29BB0;
 
 s32 *func_8AF19880(s16 arg0) {
     s32 *temp_v0;
     s32 *var_v1;
 
-    temp_v0 = func_8004C874(8, arg0 - 1, arg0);
+    temp_v0 = func_8004C874(8, arg0 - 1);
     var_v1 = temp_v0;
     if (temp_v0 == NULL) {
         var_v1 = &D_8AF29BB0;
@@ -17,14 +17,14 @@ s32 *func_8AF19880(s16 arg0) {
     return var_v1;
 }
 
-s32 *func_8004C874(s32, s32, ...);
+void *func_8004C874(s32, s32);
 extern u8 D_8AF29BC0;
 
 s32 *func_8AF198C4(s16 arg0) {
     s32 *temp_v0;
     s32 *var_v1;
 
-    temp_v0 = func_8004C874(0xA, arg0 - 1, arg0);
+    temp_v0 = func_8004C874(0xA, arg0 - 1);
     var_v1 = temp_v0;
     if (temp_v0 == NULL) {
         var_v1 = &D_8AF29BC0;
@@ -32,18 +32,33 @@ s32 *func_8AF198C4(s16 arg0) {
     return var_v1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_207AF0/func_8AF19908.s")
+extern u8 D_8AF29BD4[];
+u8 *func_8AF19908(u8 *arg0) {
+    u8 *result;
+    s32 value;
+
+    value = arg0[0];
+    if ((value < 0xBE) || (value == 0xFF)) {
+        result = (u8 *)func_8004C874(9, value - 1);
+    } else {
+        result = (u8 *)func_8004C874(7, arg0[1] - 1);
+    }
+    if (result == NULL) {
+        result = D_8AF29BD4;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_207AF0/func_8AF19970.s")
 
-s32 *func_8004C874(s32, s32, ...);
+void *func_8004C874(s32, s32);
 extern u8 D_8AF29BF8;
 
 s32 *func_8AF199D8(s16 arg0) {
     s32 *temp_v0;
     s32 *var_v1;
 
-    temp_v0 = func_8004C874(7, arg0 - 1, arg0);
+    temp_v0 = func_8004C874(7, arg0 - 1);
     var_v1 = temp_v0;
     if (temp_v0 == NULL) {
         var_v1 = &D_8AF29BF8;
@@ -106,7 +121,7 @@ extern s16 D_8AF35050;
 extern s8 D_8AF354A8;
 extern s32 D_8AF357D0;
 extern void _bzero(s32 *, s32);
-extern s32 * func_8004C874(s32, s32, ...);
+extern void *func_8004C874(s32, s32);
 void func_8AF1A0DC(s16 arg0) {
     s16 *p = &arg0;
     s32 padding[4];
@@ -135,7 +150,7 @@ void func_8AF1A0DC(s16 arg0) {
 extern u8 *func_8AF19FAC(u8 *, s32, s32, s16);
 extern s8 D_8AF29DA0;
 extern s32 D_8AF2BAC4;
-extern s32 * func_8004C874(s32, s32, ...);
+extern void *func_8004C874(s32, s32);
 void func_8AF1A1B8(s16 arg0, s16 arg1) {
     s16 *p0 = &arg0;
     s32 padding[4];
