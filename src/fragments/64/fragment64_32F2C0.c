@@ -20,7 +20,20 @@ void func_87F0C650(void *arg0) {
     func_8004C4B0(0x16);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_32F2C0/func_87F0C694.s")
+extern s32 func_80001FF0(void);
+void func_87F0C694(void *arg0, s32 arg1) {
+    struct State {
+        s32 first, second;
+        u8 active : 1;
+        u8 pending : 1;
+        u8 other : 6;
+    };
+    struct State *state = arg0;
+    state->first = 0;
+    state->second = (func_80001FF0() * arg1) / 2;
+    state->active = 1;
+    state->pending = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_32F2C0/func_87F0C6F4.s")
 
