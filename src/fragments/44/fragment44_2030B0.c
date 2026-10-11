@@ -58,5 +58,18 @@ void func_8AF15EF0(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_2030B0/func_8AF16064.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_2030B0/func_8AF1666C.s")
+extern s16 D_8AF33C80;
+extern u8 D_8AF33CB8[];
+extern u8 D_8AF33D30[];
+extern void func_8AC05F00(void *);
+void func_8AF1666C(void) {
+    if (D_8AF33C78 == 3) {
+        if (D_8AF33C72 > 0) {
+            func_8AC05F00(D_8AF33CB8);
+        }
+        if (D_8AF33C72 + 7 < D_8AF33C80) {
+            func_8AC05F00(D_8AF33D30);
+        }
+    }
+}
 #endif
