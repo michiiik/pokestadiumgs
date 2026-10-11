@@ -420,11 +420,11 @@ void func_83003320(void *arg0, void *arg1) {
 
 #ifdef VERSION_US
 extern void func_81801CB8(u8 *, u8 *, u8 *, s32);
-void func_83004218(s32 a,u8 *b,u8 *c){extern u8 *func_818054D0(s32,u8);extern void func_81801CB8(u8 *,u8 *,u8 *,s32);extern u8 D_8300CD00[];extern u8 D_8300F8C0[];struct L{s32 x;s32 y;};struct L l;u8 *p;u8 *q;l.x=0;p=func_818054D0(a,b[0x1C])+0x10;q=func_818054D0(a,b[0x1D])+0x10;if(((a-(s32)D_8300CD00)/0x34)+1==b[0x43]){switch(b[0x1C]){case 0x11:case 0x12:case 0x13:p=D_8300F8C0;break;}switch(b[0x1D]){case 0x11:case 0x12:case 0x13:q=D_8300F8C0;break;}}func_81801CB8(c,p,q,*(s32 *)(b+0x2C));}
+void func_83004218(s32 a,u8 *b,u8 *c){extern u8 *func_818054D0(void *,u8);extern void func_81801CB8(u8 *,u8 *,u8 *,s32);extern u8 D_8300CD00[];extern u8 D_8300F8C0[];struct L{s32 x;s32 y;};struct L l;u8 *p;u8 *q;l.x=0;p=func_818054D0((void *)a,b[0x1C])+0x10;q=func_818054D0((void *)a,b[0x1D])+0x10;if(((a-(s32)D_8300CD00)/0x34)+1==b[0x43]){switch(b[0x1C]){case 0x11:case 0x12:case 0x13:p=D_8300F8C0;break;}switch(b[0x1D]){case 0x11:case 0x12:case 0x13:q=D_8300F8C0;break;}}func_81801CB8(c,p,q,*(s32 *)(b+0x2C));}
 #endif
 
 #ifdef VERSION_US
-extern u8 *func_818054D0(s32, u8);
+extern u8 *func_818054D0(void *, u8);
 extern void func_81801CB8(u8 *, u8 *, u8 *, s32);
 extern u8 D_8300D164[];
 extern u8 D_8300F8C8[];
@@ -434,9 +434,9 @@ void func_830042F0(s32 arg0, void *arg1, u8 *arg2) {
     u8 *sp24;
     u8 *var_a1;
     u8 *var_a2;
-    sp24 = func_818054D0(arg0, *(u8 *)((u8 *)arg1 + 0x1C)) + 0x10;
+    sp24 = func_818054D0((void *)arg0, *(u8 *)((u8 *)arg1 + 0x1C)) + 0x10;
     var_a1 = sp24;
-    var_a2 = func_818054D0(arg0, *(u8 *)((u8 *)arg1 + 0x1D)) + 0x10;
+    var_a2 = func_818054D0((void *)arg0, *(u8 *)((u8 *)arg1 + 0x1D)) + 0x10;
     if ((((arg0 - (s32)D_8300D164) / 0x34) + 1) == *(u8 *)((u8 *)arg1 + 0x40)) {
         switch (*(u8 *)((u8 *)arg1 + 0x1C)) {
         case 0x0B:
@@ -543,7 +543,7 @@ void func_83006EB0(void *arg0, s32 arg1) {
 typedef struct { s32 x; s32 y; } Pair;
 extern Pair D_8300F918;
 extern void func_81801CB8(u8 *, u8 *, u8 *, s32);
-extern u8 * func_818054D0(s32,u8);
+extern u8 * func_818054D0(void *,u8);
 void func_83006F30(s32 arg0, void *arg1, u8 *arg2) {
     struct Arg { u8 pad[0x1C]; u8 a; u8 b; u8 pad2[0xE]; s32 c; u8 pad3[0xE]; u8 flag; };
     u8 *sp28;
@@ -551,9 +551,9 @@ void func_83006F30(s32 arg0, void *arg1, u8 *arg2) {
     u8 *var_a1; u8 *var_a2;
     struct Arg *p = arg1;
     sp2C = D_8300F918;
-    sp28 = func_818054D0(arg0, p->a) + 0x10;
+    sp28 = func_818054D0((void *)arg0, p->a) + 0x10;
     var_a1 = sp28;
-    var_a2 = func_818054D0(arg0, p->b) + 0x10;
+    var_a2 = func_818054D0((void *)arg0, p->b) + 0x10;
     if (p->flag == 1) { if (p->a == 10) var_a1 = (u8 *)&sp2C; if (p->b == 10) var_a2 = (u8 *)&sp2C; }
     func_81801CB8(arg2, var_a1, var_a2, p->c);
 }
