@@ -130,10 +130,19 @@ s32 func_8006A5AC(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006A73C.s")
 
-extern void func_8006A73C(s32);
-void func_8006AB68(s32 arg0) { s32 *p = &arg0; func_8006A73C(arg0 & 0xFFFF); }
+extern s32 func_8006A73C(u16, s32, s32);
+void func_8006AB68(s32 arg0, s32 arg1, s32 arg2) { s32 *p = &arg0; func_8006A73C(arg0 & 0xFFFF, arg1, arg2); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006AB8C.s")
+s32 func_8006AB8C(u16 arg0, s32 arg1, s32 arg2) {
+    s32 result = 0;
+    s32 value;
+    if (D_8009DF70 != 0) {
+        value = func_8006A73C(arg0, arg1, arg2);
+        *(s16 *)((u8 *)(u32)D_8009DF70 + 0x10) = value;
+        result = 1;
+    }
+    return result;
+}
 
 s32 func_8006ABD8(void *arg0) {
     s32 var_v1;
