@@ -11,7 +11,26 @@ void func_8822C2FC(void) {
     D_880068B8 = 1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_19F570/func_8822C30C.s")
+extern u8 *fragment38_main(void);
+extern s8 *HAL_Strcpy(s8 *, s8 *);
+extern void func_88900494(void);
+extern s32 func_8821C0B0(void);
+extern void func_8822AF00(s8 *);
+extern void func_88001900(void);
+extern s32 D_880068B4;
+
+void func_8822C30C(void) {
+    s8 text[0x20];
+
+    HAL_Strcpy(text, (s8 *)fragment38_main());
+    func_88900494();
+    if (func_8821C0B0() == 0) {
+        func_8822AF00(text);
+    } else {
+        func_88001900();
+        D_880068B4 = 1;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_19F570/func_8822C374.s")
 
