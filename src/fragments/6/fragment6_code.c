@@ -90,7 +90,7 @@ void func_83100B2C(void *arg0, u8 *arg1, void *arg2) {
     func_81700908();
 }
 
-extern void *func_818054D0(void *, s32);
+extern u8 *func_818054D0(void *, u8);
 s32 func_83100B8C(void *arg0, u8 *arg1) {
     struct { s32 unused; s32 value; f64 tail; } result;
     s32 value;
@@ -191,7 +191,7 @@ void func_83100E98(u8 *arg0, s32 arg1)
   arg0[0x40] = ((arg1 - result) & 0xFFu) + 1;
 }
 
-extern void *func_818054D0(void *, s32);
+extern u8 *func_818054D0(void *, u8);
 extern s32 func_81804A20(void *);
 extern s32 MathUtil_Random16(void);
 extern void func_83100E98(u8 *, s32);
@@ -215,7 +215,7 @@ s32 func_83100ED4(void *arg0, u8 *arg1) {
     return 1;
 }
 
-extern void *func_818054D0(void *, s32);
+extern u8 *func_818054D0(void *, u8);
 extern s32 func_81804A20(void *);
 extern s32 func_81805524(void *, u8 *);
 extern s32 func_800718B8(s32);
@@ -333,7 +333,7 @@ void func_83101714(void *arg0, s32 arg1) {
     }
 }
 
-extern void *func_818054D0(void *, s32);
+extern u8 *func_818054D0(void *, u8);
 extern s32 func_81804A20(void *);
 extern s32 func_81805524(void *, u8 *);
 extern void func_831005F0(void *, void *);
@@ -357,7 +357,7 @@ s32 func_83101764(void *arg0, u8 *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/6/fragment6_code/func_83101804.s")
 
-extern void *func_818054D0(void *arg0, s32 arg1);
+extern u8 *func_818054D0(void *arg0, u8 arg1);
 extern void func_81801CB8(void *arg0, void *arg1, void *arg2, s32 arg3);
 void func_83101B04(void *arg0, u8 *arg1, void *arg2) {
     void *first_offset;
@@ -399,7 +399,7 @@ void func_83101BD4(void *arg0, s32 arg1) {
     }
 }
 
-extern void *func_818054D0(void *arg0, s32 arg1);
+extern u8 *func_818054D0(void *arg0, u8 arg1);
 extern void func_81801CB8(void *arg0, void *arg1, void *arg2, s32 arg3);
 void func_83101C24(void *arg0, u8 *arg1, void *arg2) {
     void *first_offset;
