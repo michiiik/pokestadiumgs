@@ -2,7 +2,22 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F7DD0/func_8AF09B60.s")
+typedef struct {
+    u32 words[0x52C / 4];
+} Snapshot_8AF09B60;
+
+extern Snapshot_8AF09B60 D_8AF2CC38;
+extern Snapshot_8AF09B60 *D_8AF26930;
+extern s16 D_8AF2CC34;
+extern s16 D_8AF2CC36;
+extern s16 D_8AF2C9E0;
+extern s16 D_8AF2C9E2;
+
+void func_8AF09B60(void) {
+    *D_8AF26930 = D_8AF2CC38;
+    D_8AF2C9E0 = D_8AF2CC34;
+    D_8AF2C9E2 = D_8AF2CC36;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F7DD0/func_8AF09BC4.s")
 
