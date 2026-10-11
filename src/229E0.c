@@ -4626,7 +4626,18 @@ void func_8003B03C(s32 arg0) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003B5AC.s")
+extern s32 func_80039204(s32, s32);
+void func_8003B5AC(u8 *arg0) {
+    struct {
+        u8 unused[8];
+        f32 matrix[4][4];
+    } scratch;
+
+    func_8003614C(scratch.matrix, (s32)(arg0 + 0x18), (s32)(arg0 + 0x24));
+    func_80039204((s32)scratch.matrix, 0);
+    func_8003A2C8(arg0);
+    *(s32 *)((u8 *)&D_80124F68 + 0x10A0) -= 1;
+}
 #endif
 
 #ifdef VERSION_US
