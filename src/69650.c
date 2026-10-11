@@ -2,7 +2,17 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/69650/func_80068A50.s")
+#pragma pack(1)
+typedef struct { s32 a; s32 b; u8 c; } Copy9Layout;
+#pragma pack(0)
+extern void _bzero(void *, s32);
+void func_80068A50(void *arg0, void *arg1) {
+    if (arg0 != NULL) {
+        _bzero(arg0, 0x5C);
+        *(u8 *)arg0 = 0;
+        *(Copy9Layout *)((u8 *)arg0 + 4) = *(Copy9Layout *)arg1;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/69650/func_80068AB0.s")
 
@@ -25,9 +35,6 @@ extern void func_80068A50(void *, void *);
 extern void Fragment_Load(s32, void *, void *);
 extern s32 Fragment_LoadAndCall(s32, void *, void *, s32, void *);
 extern void func_80068B78(void *);
-#pragma pack(1)
-typedef struct { s32 a; s32 b; u8 c; } Copy9Layout;
-#pragma pack(0)
 s32 func_80068CBC(void *arg0) {
     s32 var_v1;
     s32 sp2C;
