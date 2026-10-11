@@ -282,7 +282,28 @@ void func_8AF04CC8(void *arg0, s32 arg1, u8 *arg2) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F1850/func_8AF04D68.s")
+extern u8 D_8AF264A0[];
+extern u8 D_8AF264D4[];
+extern u8 D_8AF264F8[];
+u8 *func_8AF04D68(void) {
+    u8 *result;
+
+    switch (D_8AF2BA6C) {
+    case 3:
+        result = D_8AF264A0;
+        break;
+    case 4:
+        result = D_8AF264D4;
+        break;
+    case 5:
+        result = D_8AF264F8;
+        break;
+    default:
+        result = NULL;
+        break;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F1850/func_8AF04DB8.s")
 
