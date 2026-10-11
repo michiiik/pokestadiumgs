@@ -61,5 +61,17 @@ void func_87F0A91C(s32 arg0, u8 *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_32D260/func_87F0AA80.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_32D260/func_87F0AB08.s")
+typedef struct TargetGraphNode TargetGraphNode;
+typedef s32 (*TargetGraphCallback)(s32, TargetGraphNode *);
+extern void func_8004E308(TargetGraphNode *, TargetGraphCallback, void *);
+void *func_87F0AB08(TreeNode_80050428 *arg0, s32 arg1, void (*arg2)(s32, u8 *), void *arg3) {
+    void *entry = func_8005049C(arg0, arg1);
+
+    if (entry == NULL) {
+        func_87F0A5F0(arg1);
+    } else {
+        func_8004E308(entry, (TargetGraphCallback)arg2, arg3);
+    }
+    return entry;
+}
 #endif
