@@ -43,7 +43,29 @@ void func_882244F8(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_197640/func_88224554.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_197640/func_88224688.s")
+extern u8 D_88234758[];
+extern u8 D_88234761[];
+
+s32 func_88224688(void) {
+    u8 *output;
+    s32 result;
+    s32 index;
+    u8 value;
+
+    result = 0;
+    output = D_88234761;
+    for (index = 0; index < 4; index = (index + 1) & 0xFF) {
+        D_88234758[index + 9] = 0;
+    }
+    for (index = 0; index < 4; index = (index + 1) & 0xFF) {
+        value = ((u8 *)(u32)D_88234860)[index + 0x36];
+        if (value != 0) {
+            result = 1;
+            *output++ = value;
+        }
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_197640/func_882246FC.s")
 
