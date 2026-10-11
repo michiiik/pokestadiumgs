@@ -89,7 +89,16 @@ s8 *func_80060C98(s8 *arg0, u8 *arg1, s32 arg2) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060D1C.s")
+extern void *func_8004C874(s32, s32);
+extern s8 *HAL_Strcpy(s8 *, s8 *);
+s8 *func_80060D1C(s8 *arg0, u8 *arg1) {
+    if (arg1[0] == 0x5D) {
+        HAL_Strcpy(arg0, (s8 *)func_8004C874(0x41, 2));
+        return arg0;
+    } else {
+        return func_80060C08(arg0, arg1);
+    }
+}
 
 u8 *func_80060D70(u8 *arg0, s8 *arg1) {
     u8 *result;
@@ -105,7 +114,7 @@ u8 *func_80060D70(u8 *arg0, s8 *arg1) {
 
 extern void _bcopy(const void *, void *, s32);
 extern s8 *func_80060C08(s8 *, u8 *);
-extern void func_80060D1C(void *, void *);
+extern s8 *func_80060D1C(s8 *, u8 *);
 extern void func_80060EC8(void *, void *);
 extern s32 func_8004B7A4(s32);
 extern void func_80062808(void *, s32);
@@ -144,7 +153,7 @@ void func_80060F38(void *arg0, void *arg1) {
     func_80060D70(arg0, func_80060F68(sp1C, arg1));
 }
 
-extern char *HAL_Strcpy(char *, char *); char *func_80060F68(char *arg0, char *arg1) { return HAL_Strcpy(arg0, arg1); }
+extern s8 *HAL_Strcpy(s8 *, s8 *); char *func_80060F68(char *arg0, char *arg1) { return (char *)HAL_Strcpy((s8 *)arg0, (s8 *)arg1); }
 
 s32 func_80060F88(void) { return 0x46; }
 
