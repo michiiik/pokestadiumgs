@@ -111,7 +111,21 @@ s16 func_87C01E28(u8 *arg0) {
     return *(s16 *)(arg0 + 0x14);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_257730/func_87C01E30.s")
+void func_87C01E30(void *arg0, void *arg1, s32 arg2) {
+    s16 *entry = arg1;
+
+    if ((arg2 == 0) && (arg1 == *(void **)((u8 *)arg0 + 4))) {
+        return;
+    }
+    *(void **)((u8 *)arg0 + 4) = entry;
+    if (entry != NULL) {
+        *(s16 *)((u8 *)arg0 + 0x16) = 0;
+        func_87C019B0(arg0, entry[*(s16 *)((u8 *)arg0 + 0x16)]);
+        *(f32 *)((u8 *)arg0 + 8) = 0.0f;
+    } else {
+        func_87C019B0(arg0, -1);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_257730/func_87C01E98.s")
 
