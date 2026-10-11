@@ -601,7 +601,19 @@ void func_82904D78(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33FAE0/func_82905078.s")
+extern void func_829043B4(u8 *);
+void func_82905078(u8 *arg0) {
+    s32 active;
+
+    if (arg0[0x1070] < 6) {
+        func_829043B4(arg0);
+    }
+    active = arg0[0x1072]-- != 0;
+    if (active == 0) {
+        arg0[0x1072] = 0;
+        *(s16 *)(arg0 + 0x1068) = 0;
+    }
+}
 #endif
 
 #ifdef VERSION_US
