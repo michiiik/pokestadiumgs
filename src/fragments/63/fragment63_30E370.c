@@ -23,7 +23,16 @@ void func_87E0AA00(void *arg0) {
     func_87E10F2C(entry[2]);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30E370/func_87E0AA8C.s")
+extern u8 *D_87F119DC;
+extern void func_87F0B4AC(void *, void *, void *, void *);
+extern void func_87E13558(void *, f32, f32, f32, s32);
+void func_87E0AA8C(void) {
+    u8 *state = D_87F119DC;
+
+    func_87F0B4AC(*(void **)(*(u8 **)(state + 0x38) + 0xC),
+                 state + 0x48, state + 0x54, state + 0x42);
+    func_87E13558(D_87F119DC, -34.0f, 11.0f, 0.0f, 6);
+}
 
 extern Gfx *D_800D0510;
 extern void *D_8009491C;
