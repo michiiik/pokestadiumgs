@@ -205,8 +205,8 @@ s32 arg1;
 #endif
 
 #ifdef VERSION_US
-void func_8005049C(void) {
-    func_80050428();
+void *func_8005049C(TreeNode_80050428 *arg0, s32 arg1) {
+    return func_80050428(arg0, arg1);
 }
 #endif
 
