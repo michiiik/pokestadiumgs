@@ -1452,7 +1452,7 @@ s32 func_80063270(u8);
 extern void func_8004C54C(u8, s32);
 extern s32 func_84125080();
 extern s32 func_84129C8C(u8);
-extern void func_84135B40(s32);
+extern void func_84135B40(u16);
 extern void func_841366C4(u8, s32);
 extern u8 D_841951BC;
 extern u8 * D_84195208[];
@@ -1712,7 +1712,7 @@ void BattleAnim_Table_84185F10_008(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_84135B40(s32);
+extern void func_84135B40(u16);
 extern void func_841366C4(u8, s32);
 extern u8 D_841951BC;
 extern u8 * D_84195208[];
@@ -2081,7 +2081,7 @@ extern s32 func_80063270(u8);
 extern void func_8004C54C(u8, s32);
 extern s32 func_84125080();
 extern s32 func_8412CFE4(u8 arg0, u8 arg1);
-extern void func_84135B40(s32);
+extern void func_84135B40(u16);
 extern void func_841366C4(u8, s32);
 extern u8 D_841951BC;
 extern u8 D_841951BD;
@@ -2203,7 +2203,7 @@ void func_8412D53C(void) {
 
 #ifdef VERSION_US
 s32 func_84126320(u8);
-extern void func_84135B40(s32);
+extern void func_84135B40(u16);
 extern void func_841366C4(u8, s32);
 void BattleAnim_Table_84185F10_040(void) {
     u8 *temp_v0;
@@ -2288,7 +2288,7 @@ void BattleAnim_Table_84185F10_046(void) {
 #ifdef VERSION_US
 extern s32 func_80063754(s32);
 extern void func_84134EC8(u8 arg0);
-extern void func_84135B40(s32);
+extern void func_84135B40(u16);
 extern void func_841366C4(u8, s32);
 extern u8 D_841951BC;
 extern u8 D_841951BD;
@@ -2726,7 +2726,7 @@ extern void *D_841951F0;
 extern u8 D_841951BC;
 extern void func_84136218(u8, u8);
 extern void func_841366C4(u8, s32);
-extern void func_84135B40(s32);
+extern void func_84135B40(u16);
 extern void func_84136124(u8, s16, u16, u8, u8);
 void BattleAnim_Table_84186004_016(void) {
     (*(u8 *)((u8 *)D_841951F0 + 0x9C4)) = 1;
@@ -4372,7 +4372,13 @@ void func_84135B00(u16 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84135B40.s")
+void func_84135B40(u16 arg0) {
+    s32 index = D_84195280[0x4D81] - 1;
+    if (index < 0) {
+        index = 0x1D;
+    }
+    func_84135A2C(D_84195280 + index * 0x280, arg0);
+}
 #endif
 
 #ifdef VERSION_US
