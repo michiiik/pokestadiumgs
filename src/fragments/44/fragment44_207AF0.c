@@ -49,7 +49,22 @@ u8 *func_8AF19908(u8 *arg0) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_207AF0/func_8AF19970.s")
+extern u8 D_8AF29BE4[];
+u8 *func_8AF19970(u8 *arg0) {
+    u8 *result;
+    s32 value;
+
+    value = arg0[0];
+    if ((value < 0xBE) || (value == 0xFF)) {
+        result = (u8 *)func_8004C874(0xB, value - 1);
+    } else {
+        result = (u8 *)func_8004C874(7, arg0[1] - 1);
+    }
+    if (result == NULL) {
+        result = D_8AF29BE4;
+    }
+    return result;
+}
 
 void *func_8004C874(s32, s32);
 extern u8 D_8AF29BF8;
