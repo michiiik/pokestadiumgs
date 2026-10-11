@@ -717,7 +717,7 @@ extern char D_8AE083D4[];
 extern char D_8AE083DC[];
 extern char D_8AE083E4[];
 extern void func_800495BC();
-extern s32 func_8AE032C8(u8, s32);
+extern s32 func_8AE032C8();
 extern void func_8004C54C(s32, s32);
 extern void func_8004C8A0(void *, s32, s32, s32);
 extern void _bzero(void *, s32);
@@ -799,7 +799,7 @@ void func_8AE035BC(s32 arg0, s32 arg1, u8 *arg2) {
 
 #ifdef VERSION_US
 extern void _bzero(void *, s32);
-extern s32 func_8AE032C8(u8, s32);
+extern s32 func_8AE032C8();
 extern void func_8004C54C(s32, s32);
 extern void func_8004C8A0(void *, s32, s32, s32);
 extern void func_800495BC(s32, s32, s32, s32, void *);
