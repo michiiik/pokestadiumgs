@@ -55,7 +55,16 @@ void func_8430042C(u8 *arg0, u8 *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_843005B8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_84300648.s")
+extern u8 func_80063838(u8, u8);
+s32 func_84300648(u8 arg0) {
+    u16 result = 0;
+    s32 index;
+
+    for (index = 0; index < 6; index++) {
+        result += func_80063838(arg0, index);
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_843006B0.s")
 
