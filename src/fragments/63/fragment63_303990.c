@@ -24,7 +24,12 @@ void func_87E000D4(void) {
     main_pool_pop_state(0x4D464D53);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_303990/func_87E00100.s")
+extern void func_87E17F74(void *, void *);
+void func_87E00100(s32 arg0) {
+    *(s32 *)(*(u8 **)D_87E1BA20 + 0x21F8) = arg0;
+    *(s32 *)(D_87E1BA20 + 0x24) = 6;
+    func_87E17F74(D_87E1BA20 + 0x2260, *(void **)D_87E1BA20);
+}
 
 extern void func_87E015C0(s32);
 extern void func_87E01EB0(u8 *);
