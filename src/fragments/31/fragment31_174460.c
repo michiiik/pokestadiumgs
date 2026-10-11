@@ -24,7 +24,25 @@ loop:
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_174460/func_88201330.s")
+s8 func_88201330(void *arg0) {
+    u8 *state = *(u8 **)arg0;
+    void **entry = *(void ***)(state + 0xC);
+    s32 index = 0;
+    u32 count = state[0x11];
+    s32 result = -1;
+    if (count != 0) {
+loop:
+        if (*entry == arg0) {
+            return index;
+        }
+        index++;
+        entry++;
+        if (index < count) {
+            goto loop;
+        }
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_174460/func_8820137C.s")
 
