@@ -104,7 +104,32 @@ done:
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_197640/func_88225EEC.s")
+s32 func_88225EEC(void) {
+    u32 index;
+    s32 result;
+    u8 *state;
+    u32 count;
+    u8 *entry;
+    result = 0;
+    index = 0;
+    state = D_88234870;
+    count = *(u16 *)(state + 0x28);
+    if (count != 0) {
+        entry = *(u8 **)(state + 0x9C);
+loop:
+        if (*entry != 0) {
+            result = 1;
+            goto done;
+        }
+        index++;
+        entry++;
+        if (index < count) {
+            goto loop;
+        }
+    }
+done:
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_197640/func_88225F38.s")
 
