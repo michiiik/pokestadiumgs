@@ -123,7 +123,22 @@ s32 func_8004B98C(s32 arg0) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4C2E0/func_8004B9E0.s")
+typedef struct Result_8004B9E0 {
+    s32 value;
+} Result_8004B9E0;
+Result_8004B9E0 func_8004B9E0(s32 arg0) {
+    struct {
+        s32 unused;
+        Result_8004B9E0 result;
+    } local;
+    s32 index = func_8004B754(arg0);
+
+    local.result.value = 0;
+    if (index >= 0) {
+        local.result.value = *(s32 *)(D_801270B4 + (index << 4));
+    }
+    return local.result;
+}
 
 extern u8 D_801270B3[];
 s32 func_8004BA34(s32 arg0) {
