@@ -33,7 +33,21 @@ void func_8AF180F4(void) {
     D_8AF3500A = 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_205C30/func_8AF1812C.s")
+extern u8 *D_8AF34F70;
+extern u8 *D_8AF34F74;
+extern f32 D_8AF29B24;
+extern f32 D_8AF29B28;
+
+void func_8AF1812C(void) {
+    f32 first = D_8AF29B24;
+    f32 second = D_8AF29B28;
+    *(f32 *)(D_8AF34F70 + 0x40) = first;
+    *(f32 *)(D_8AF34F70 + 0x44) = first;
+    *(f32 *)(D_8AF34F74 + 0x40) = second;
+    *(f32 *)(D_8AF34F74 + 0x44) = second;
+    *(f32 *)(D_8AF34F70 + 0x48) = 120.0f;
+    *(f32 *)(D_8AF34F70 + 0x4C) = 180.0f;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_205C30/func_8AF18190.s")
 
