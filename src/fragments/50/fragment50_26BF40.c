@@ -21,7 +21,18 @@ void func_8620572C(u8 *arg0, s32 arg1, s32 arg2) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_26BF40/func_8620573C.s")
+extern s32 D_8620E198;
+
+void func_8620573C(f32 *arg0, f32 *arg1) {
+    f32 first;
+    f32 third;
+
+    first = *(f32 *)((u8 *)(u32)D_8620E198 + 0x18) * arg1[0];
+    arg0[0] += first + first;
+    arg0[1] += *(f32 *)((u8 *)(u32)D_8620E198 + 0x18) * 4.25f;
+    third = *(f32 *)((u8 *)(u32)D_8620E198 + 0x18) * arg1[2];
+    arg0[2] += third + third;
+}
 #endif
 
 #ifdef VERSION_US
