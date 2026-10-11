@@ -528,7 +528,28 @@ s32 func_80026298(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80026938.s")
+typedef struct Color_80026938 {
+    u8 first;
+    u8 second;
+    u8 third;
+} Color_80026938;
+extern u8 D_80090B3C[];
+extern Color_80026938 D_80090AD0[];
+extern u16 D_80090B6C;
+extern u16 D_80090B70;
+void func_80026938(u16 arg0) {
+    s32 index;
+    Color_80026938 *entry;
+
+    if (arg0 >= 0x1E) {
+        arg0 = 0xE;
+    }
+    index = D_80090B3C[arg0];
+    entry = &D_80090AD0[index];
+    D_80090B6C = entry->second;
+    D_80090B70 = entry->first;
+}
+#pragma C_FUNCTION_PADDING(4)
 #endif
 
 #ifdef VERSION_US
