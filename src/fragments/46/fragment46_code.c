@@ -972,7 +972,39 @@ void func_8AE05B1C(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE05B24.s")
+extern s32 D_8AE084E8;
+extern s16 func_8AE017A4(s16);
+extern void func_8AE01738(void);
+extern s32 func_8AE00F24(void);
+extern s16 D_8AE084E0;
+extern s16 D_8AE084E2;
+Fragment46LookupEntry *func_8AE05B24(void) {
+    volatile struct {
+        u8 pad0[2];
+        s16 previous;
+        u8 pad4[4];
+        Fragment46LookupEntry *result;
+        u8 tail[4];
+    } locals;
+    Fragment46LookupEntry *entry;
+    s32 old = D_8AE084E0;
+    locals.previous = old;
+    while (1) {
+        D_8AE084E0++;
+        if (D_8AE084E0 >= ((0, 57))) D_8AE084E0 = 1;
+        entry = func_8AE0559C(D_8AE084E0);
+        if (entry == 0) D_8AE084E0 = 56;
+        else if (((s32 *)entry)[1] != 0) break;
+    }
+    if (locals.previous != D_8AE084E0) {
+        locals.result = entry;
+        D_8AE084E2 = func_8AE017A4(D_8AE084E0);
+        func_8AE01738();
+        D_8AE084E8 = func_8AE00F24();
+        entry = locals.result;
+    }
+    return entry;
+}
 #endif
 
 #ifdef VERSION_US
