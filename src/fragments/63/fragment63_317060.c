@@ -209,7 +209,50 @@ void func_87E14984(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E14A60.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E14BA8.s")
+extern s32 ModelAnim_IsFinished(void *);
+extern void ModelAnim_SetFrame(void *, s32);
+extern void * D_87F119DC;
+void func_87E14BA8(void) {
+    extern void func_8003F210(void *, s32);
+    s32 state;
+    u8 *ctx;
+    void *ptr;
+    f32 value;
+    ctx = D_87F119DC;
+    ptr = *((void **) (ctx + 0x20));
+    do { state = *((s32 *) (((u8 *) (*((void **) ptr))) + 0x164)); } while (0);
+    switch (state) {
+    case 1:
+    case 2:
+        if ((*((s32 *) (((u8 *) D_87F119DC) + 0xC))) & 0x10000000) {
+            ModelAnim_SetSpeed(((u8 *) D_87F119DC) + 0x24, 0x10000);
+            ModelAnim_SetFrame(((u8 *) D_87F119DC) + 0x24, 0);
+            *((u32 *) (((u8 *) D_87F119DC) + 0xC)) &= ~0x10000000;
+        }
+        if (ModelAnim_HasCrossedFrame(((u8 *) D_87F119DC) + 0x24, 30)) {
+            ModelAnim_SetSpeed(((u8 *) D_87F119DC) + 0x24, 0);
+        }
+        break;
+    case 3:
+        ModelAnim_SetSpeed(((u8 *) D_87F119DC) + 0x24, 0x10000);
+        if (ModelAnim_IsFinished(((u8 *) D_87F119DC) + 0x24)) {
+            func_8003F210(((u8 *) D_87F119DC) + 0x24, -1);
+            func_8003F210(((u8 *) D_87F119DC) + 0x24, 0);
+            ModelAnim_SetSpeed(((u8 *) D_87F119DC) + 0x24, 0);
+            *((u32 *) (((u8 *) D_87F119DC) + 0xC)) |= 0x10000000;
+        }
+        break;
+    case 4:
+        ModelAnim_SetSpeed(((u8 *) D_87F119DC) + 0x24, 0x30000);
+        if (ModelAnim_IsFinished(((u8 *) D_87F119DC) + 0x24)) {
+            *((f32 *) (((u8 *) D_87F119DC) + 0x5C)) = 0.0f;
+            value = *((f32 *) (((u8 *) D_87F119DC) + 0x5C));
+            *((f32 *) (((u8 *) D_87F119DC) + 0x58)) = value;
+            *((f32 *) (((u8 *) D_87F119DC) + 0x54)) = value;
+        }
+        break;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E14D24.s")
 
