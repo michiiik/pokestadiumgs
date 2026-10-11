@@ -175,7 +175,21 @@ void func_82201AE0(u8 *arg0) {
     *(s16 *)(arg0 + 0x22) = *(s16 *)(arg0 + 0x1E) + deltaY;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82201B70.s")
+extern s16 D_8220E378;
+extern u8 D_8220E468[];
+extern void func_822017B0(u8 *);
+extern void func_82201960(u8 *);
+extern void func_82201AE0(u8 *arg0);
+void func_82201B70(void) {
+    u8 *p = (u8 *)&D_8220E378; do {
+        switch (*(s16 *)p) {
+        case 0: func_822017B0(p); break;
+        case 1: func_82201960(p); break;
+        case 2: func_82201AE0(p); break;
+        }
+        p += 0x3C;
+    } while (p != D_8220E468);
+}
 
 extern s16 D_8220E378;
 extern s16 D_8220E3B4;
@@ -282,7 +296,73 @@ s32 func_82201EB4(s32 arg0, u8 *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82201FBC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_822023D8.s")
+extern u8 D_8220E310[];
+extern u8 D_8220E338[];
+extern void func_82201FBC(s32, s32, s32, s32);
+extern s16 D_8220D788;
+extern s16 D_8220E378;
+s32 func_822023D8(s32 arg0, u8 *arg1)
+{
+  typedef struct
+  {
+    s16 x;
+    s16 y;
+  } Pair;
+  s32 index = *((s32 *) (arg1 + 0x20));
+  u8 *p;
+  u8 *q;
+  s32 offset;
+  switch (arg0)
+  {
+    case 0:
+    {
+      p = ((u8 *) (&D_8220E378)) + (index * 0x3C);
+      *((s16 *) (p + 0x10)) = *((s16 *) (arg1 + 8));
+      *((s16 *) (p + 0x12)) = *((s16 *) (arg1 + 0xA));
+      *((s16 *) (p + 0x34)) = 0;
+      *((s16 *) (p + 0x36)) = 0;
+      *((Pair *) (p + 0x1C)) = *((Pair *) (p + 0x10));
+    }
+ do { } while (0);
+      break;
+
+    case 1:
+    {
+      q = D_8220E310 + (index * 0x14);
+      if (q[5] != 2)
+      {
+        p = ((u8 *) (&D_8220E378)) + (index * 0x3C);
+        if (D_8220D788 < (*((s16 *) (p + 0x36))))
+        {
+          *((s16 *) (arg1 + 8)) = (*((s16 *) (p + 0x1C))) + (*((s16 *) (p + 0x34)));
+          *((s16 *) (arg1 + 0xA)) = (*((s16 *) (p + 0x1E))) + (*((s16 *) (p + 0x36)));
+          if (q >= D_8220E338)
+          {
+            offset = 0x24;
+          }
+          else
+          {
+            offset = 0x42;
+          }
+          *((u16 *) (arg1 + 2)) |= 2;
+          func_82201FBC((*((s16 *) (arg1 + 8))) + offset, (*((s16 *) (arg1 + 0xA))) + 8, *((s16 *) (p + 0x30)), *((s16 *) (p + 0x32)));
+        }
+        else
+        {
+          *((u16 *) (arg1 + 2)) &= 0xFFFD;
+        }
+      }
+      else
+      {
+        *((u16 *) (arg1 + 2)) &= 0xFFFD;
+      }
+    }
+      break;
+
+  }
+
+  return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_82202534.s")
 
@@ -419,7 +499,50 @@ s32 func_82202FC8(s32 arg0, u8 *arg1) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_822030BC.s")
+extern u8 D_8220EB60[];
+extern char D_8220E0C0[];
+int sprintf(char *, const char *, ...);
+extern void func_8004C54C(s32, void *);
+extern u8 * func_8004C874(s32, s32);
+extern u8 D_8220E310[];
+extern u16 D_8220E4C0;
+s32 func_822030BC(s32 arg0, u8 *arg1) {
+    s32 index = *(s32 *)(arg1 + 0x20);
+    u8 *data = NULL;
+    u8 *record;
+    s32 type;
+
+    switch (arg0) {
+        case 0:
+            break;
+        case 1:
+            record = D_8220E310 + index * 0x14;
+            type = record[5];
+            switch (type) {
+                case 0:
+                case 3:
+                    sprintf(D_8220EB60, D_8220E0C0, *(u16 *)(record + 6));
+                    data = D_8220EB60;
+                    break;
+                case 4:
+                case 5:
+                    data = func_8004C874(0x17, 0x41);
+                    break;
+            }
+            if (data != NULL) {
+                func_8004C54C(0x16, data);
+                if (D_8220E4C0 & 8) {
+                    *(u16 *)(arg1 + 2) |= 2;
+                } else {
+                    *(u16 *)(arg1 + 2) &= 0xFFFD;
+                }
+            } else {
+                *(u16 *)(arg1 + 2) &= 0xFFFD;
+            }
+            break;
+    }
+    return 0;
+}
 
 extern u8 *D_8220E4D0[];
 s32 func_822031D0(s32 arg0, u8 *arg1) {
