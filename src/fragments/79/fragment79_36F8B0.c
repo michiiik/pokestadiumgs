@@ -67,9 +67,9 @@ void func_84100134(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_84100260.s")
 
-extern void func_84100260(void);
-void func_84100328(void) {
-    func_84100260();
+extern u8 *func_84100260(void);
+u8 *func_84100328(void) {
+    return func_84100260();
 }
 
 void func_84100348(u8 *arg0) {
