@@ -14,7 +14,18 @@ void func_87E00030(void) {
 extern void func_8004C8C0();
 void func_87E00044(void) { func_8004C8C0(260); func_8004C8C0(424); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_303990/func_87E0006C.s")
+extern s32 main_pool_push_state(s32);
+extern void func_87E02794(void *, s32);
+extern void func_87E03594(void *, s32);
+extern void func_87E0520C(void *, s32);
+
+void func_87E0006C(void) {
+    main_pool_push_state(0x4D464D53);
+    func_87E00044();
+    func_87E02794(D_87E1BA20 + 0x28, *(s32 *)D_87E1BA20);
+    func_87E03594(D_87E1BA20 + 0x2B0, *(s32 *)D_87E1BA20);
+    func_87E0520C(D_87E1BA20 + 0x4B8, *(s32 *)D_87E1BA20);
+}
 
 extern void func_87E01628();
 extern void main_pool_pop_state(s32);
