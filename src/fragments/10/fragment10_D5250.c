@@ -65,7 +65,18 @@ void func_82801144(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/10/fragment10_D5250/func_82801278.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/10/fragment10_D5250/func_828014AC.s")
+extern s32 func_800606E8(s32);
+
+u8 func_828014AC(void) {
+    u8 result = 0;
+    s32 index = 0;
+
+loop:
+    if (func_800606E8(index) != 0) result |= 1 << index;
+    index++;
+    if (index != 4) goto loop;
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/10/fragment10_D5250/func_82801510.s")
 
