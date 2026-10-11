@@ -229,7 +229,16 @@ u8 func_843013A4(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_843016CC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_84301838.s")
+extern s32 D_84302C8C;
+extern s32 func_8006443C(u8, u8, u8);
+extern s32 func_80064404(u8, u8, u8);
+s32 func_84301838(u8 arg0, u8 arg1, u8 arg2) {
+    if (D_84302C8C != 0) {
+        return func_8006443C(arg0, arg1, arg2);
+    } else {
+        return func_80064404(arg0, arg1, arg2);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_8430188C.s")
 
