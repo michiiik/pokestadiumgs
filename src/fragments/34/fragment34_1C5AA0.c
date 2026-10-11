@@ -54,7 +54,35 @@ void func_88508BEC(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C5AA0/func_88508F78.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C5AA0/func_88509290.s")
+extern void func_80006F70(Gfx **, s32, s32, s32, s32);
+extern void func_88508F78(s32, s32, s32, s16);
+extern Gfx *D_800D0510;
+extern u8 D_88523148;
+extern u8 D_88523100[];
+void func_88509290(void) {
+    s32 changed = 0;
+    s32 limit = 2;
+    u8 *p; s32 i = 0; p = D_88523100; do {
+        if (*(s32 *)(p + 0) != 0) {
+            if ((*(s16 *)(p + 0xE) != 0) && (*(s16 *)(p + 0x10) != 0)) {
+                *(s16 *)(p + 0xA) = *(s16 *)(p + 6) - 0x40;
+                changed = 1;
+                if (*(s16 *)(p + 0xA) < 0) {
+                    *(s16 *)(p + 0xA) = 0;
+                }
+                func_80006F70(&D_800D0510, *(s16 *)(p + 0xA), *(s16 *)(p + 0xC), *(s16 *)(p + 0xE), *(s16 *)(p + 0x10));
+            }
+            func_88508F78(*(s16 *)(p + 6), *(s16 *)(p + 8), *(s32 *)(p + 0x18), (s16)(*(f32 *)(p + 0x1C) + ((0.0f < *(f32 *)(p + 0x1C)) ? 0.5f : -0.5f)));
+        }
+        i++;
+        p += 0x24;
+        if (i == limit) break;
+    } while (1);
+    if (changed != 0) {
+        u8 *q = &D_88523148;
+        func_80006F70(&D_800D0510, *(s16 *)(q + 0), *(s16 *)(q + 2), *(s16 *)(q + 4), *(s16 *)(q + 6));
+    }
+}
 
 extern u8 D_88523050[];
 void func_885093F0(void) { s32 i = 0; u8 *ptr = D_88523050; do { i += 1; ptr += 0x50; *(s32 *)(ptr - 0x50) = 0; } while (i != 2); }
