@@ -137,20 +137,20 @@ s32 func_800640B4(u8 arg0, u8 arg1, u8 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80064248.s")
 
-extern void func_80064248(s32, s32, s32, s32);
+extern s32 func_80064248(u8, u8, u8, u8);
 
-void func_800643CC(s32 arg0, s32 arg1, s32 arg2) {
-    func_80064248(arg0 & 0xFF, arg1 & 0xFF, arg2 & 0xFF, 0xFF);
+s32 func_800643CC(s32 arg0, s32 arg1, s32 arg2) {
+    return func_80064248(arg0 & 0xFF, arg1 & 0xFF, arg2 & 0xFF, 0xFF);
 }
 
 
-void func_80064404(s32 arg0, s32 arg1, s32 arg2) {
-    func_80064248(arg0 & 0xFF, arg1 & 0xFF, arg2 & 0xFF, 4);
+s32 func_80064404(u8 arg0, u8 arg1, u8 arg2) {
+    return func_80064248(arg0, arg1, arg2, 4);
 }
 
 
-void func_8006443C(s32 arg0, s32 arg1, s32 arg2) {
-    func_80064248(arg0 & 0xFF, arg1 & 0xFF, arg2 & 0xFF, 0x7F);
+s32 func_8006443C(u8 arg0, u8 arg1, u8 arg2) {
+    return func_80064248(arg0, arg1, arg2, 0x7F);
 }
 
 extern u8 D_80098313[];
