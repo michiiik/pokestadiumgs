@@ -2,7 +2,17 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/65820/func_80064C20.s")
+s32 func_80064C20(s32 arg0) {
+    OSIntMask mask = osSetIntMask(OS_IM_NONE);
+
+    if ((*(volatile u32 *)0xA4600010 & 3) == 0) {
+        if ((*(volatile u32 *)0xB0000E38 & 0xFFFF) != 0x828A) {
+            arg0 = -16;
+        }
+    }
+    osSetIntMask(mask);
+    return arg0;
+}
 #endif
 
 #ifdef VERSION_US
