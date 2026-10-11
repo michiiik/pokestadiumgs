@@ -4,7 +4,7 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_193D50/func_88220AD0.s")
 
-extern void func_88004990(u8, s32);
+extern void func_88004990(u8, u8);
 extern u8 **D_88234800;
 extern s32 D_880068B8;
 void func_88220B80(void) {
@@ -45,7 +45,12 @@ void func_88220F4C(void) {
     Util_Free((s32) D_88234810);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_193D50/func_88220FB8.s")
+void func_88220FB8(void) {
+    if (*(u16 *)((u8 *)D_80087200 + 8) & 0xC000) {
+        func_88004990(**(u8 **)D_88234810, 0);
+        D_880068B8 = 1;
+    }
+}
 
 extern void func_889033A0(s32);
 void func_8822100C(void) {
