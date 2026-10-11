@@ -14,7 +14,12 @@ void func_88600020(u8 *arg0) {
     *(s16 *)(D_88601890 + 0x14) = *(s16 *)(arg0 + 0xC);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/35/fragment35_1CCC20/func_88600074.s")
+void func_88600074(u8 *arg0) {
+    *(s32 *)(*(u8 **)(arg0 + 0x1C) + 0x48) = *(s32 *)(D_88601890 + 8);
+    *(Value_88600020 *)(*(u8 **)(arg0 + 0x1C) + 0x1E) = *(Value_88600020 *)(D_88601890 + 0xC);
+    *(s16 *)(arg0 + 0xE) = *(s16 *)(D_88601890 + 0x12);
+    *(s16 *)(arg0 + 0xC) = *(s16 *)(D_88601890 + 0x14);
+}
 
 s32 func_886000C8(s32 arg0) {
     s32 *ptr = &arg0;
