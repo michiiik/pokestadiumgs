@@ -1714,7 +1714,7 @@ void func_80033F68(s32 arg0, s32 arg1) {}
 #endif
 
 #ifdef VERSION_US
-s8 func_800347E8(u8);
+u8 func_800347E8(u8);
 extern u8 D_800D2B8D;
 
 void func_80034058(u8 arg0, s32 arg1) {
@@ -1738,7 +1738,7 @@ void func_800340B0(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern s8 func_800347E8(u8);
+extern u8 func_800347E8(u8);
 extern u8 D_800D2B78;
 void func_800340C8(u8 arg0, s32 arg1) {
     s32 result;
@@ -1764,7 +1764,7 @@ void func_800341BC(s32 arg0, s32 arg1) {}
 #endif
 
 #ifdef VERSION_US
-extern s8 func_800347E8(u8);
+extern u8 func_800347E8(u8);
 extern u8 D_800D2B78;
 void func_80034238(unsigned char arg0, s32 arg1)
 {
@@ -1779,7 +1779,7 @@ void func_80034238(unsigned char arg0, s32 arg1)
 #endif
 
 #ifdef VERSION_US
-extern s8 func_800347E8(u8);
+extern u8 func_800347E8(u8);
 extern u8 D_800D2B78;
 void func_800342F4(char arg0, s32 arg1)
 {
@@ -1866,13 +1866,13 @@ extern u8 D_800D2B8E;
 void func_80034518(u8 arg0, s32 arg1)
 {
   unsigned char new_var;
-  new_var = func_800347E8(arg0);
+  new_var = (s8)func_800347E8(arg0);
   (&D_800D2B8E)[0x3C * arg0] = (new_var << 1) << 5;
 }
 #endif
 
 #ifdef VERSION_US
-s8 func_800347E8(u8);
+u8 func_800347E8(u8);
 extern u8 D_800D2B8F;
 
 void func_8003455C(u8 arg0, s32 arg1) {
@@ -1902,7 +1902,7 @@ void func_800345E8(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-s8 func_800347E8(u8);
+u8 func_800347E8(u8);
 extern u8 D_800D2B94;
 
 void func_80034614(u8 arg0, s32 arg1) {
@@ -1958,7 +1958,13 @@ void func_800347DC(s32 arg0, s32 arg1) { }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800347E8.s")
+extern u8 func_80034D98(const u8 *);
+u8 func_800347E8(u8 arg0) {
+    u8 *entry = &D_800D2B78 + arg0 * 0x3C;
+    u8 result = func_80034D98(*(const u8 **)(entry + 8));
+    *(u8 **)(entry + 8) += 1;
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
