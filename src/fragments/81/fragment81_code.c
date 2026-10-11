@@ -301,7 +301,20 @@ void func_84301C58(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_84301DEC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_843020F0.s")
+extern s32 func_8006A388(void);
+extern s32 func_8006A3E0(void);
+s32 func_843020F0(void) {
+    s32 mode;
+
+    if (func_8006A388() != 0) {
+        return 1;
+    }
+    mode = func_8006A3E0() & 0xFF00;
+    if ((mode == 0x100) || (mode == 0x200)) {
+        return 1;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_84302148.s")
 #endif
