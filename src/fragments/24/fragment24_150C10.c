@@ -36,7 +36,42 @@ s32 func_82B00E34(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B00F68.s")
+extern void *func_82B00F14(s32);
+extern void func_80006F70();
+extern Gfx * D_800D0510;
+s32 func_82B00F68(s32 arg0)
+{
+    s32 result;
+    s32 x0;
+    s32 x1;
+    s32 x2;
+    s32 x3;
+    void *p;
+    s16 *base;
+    result = 0;
+    p = func_82B00F14(arg0);
+    if (p != NULL) {
+        if (*(s16 *)((u8 *)p + 4) > 0) {
+            (*(s16 *)((u8 *)p + 4))--;
+        }
+        if (*(s16 *)((u8 *)p + 4) != 0) {
+            x0 = *(s16 *)((u8 *)p + 8);
+            x2 = *(s16 *)((u8 *)p + 10);
+            x1 = *(s16 *)((u8 *)p + 14);
+            x3 = *(s16 *)((u8 *)p + 12);
+            result = 1;
+            base = (s16 *)((u8 *)p + 8);
+            if (x0 < 0) x0 = 0;
+            if (base[1] >= 0x280) x2 = 0x27F;
+            if (base[3] < 0) x1 = 0;
+            if (base[2] >= 0x1E0) x3 = 0x1DF;
+            if ((x2 >= x0) && (x3 >= x1)) {
+                func_80006F70(&D_800D0510, (s16)x0, (s16)x1, (s16)(x2 - x0 + 1), x3 - x1 + 1);
+            }
+        }
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
@@ -236,7 +271,60 @@ void func_82B01CE0(void *arg0)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B02198.s")
+extern s16 D_82B12470;
+extern u8 D_82B12472[];
+extern u8 D_82B12672[];
+extern s32 func_80049148(s32, s32, void *);
+typedef struct Pair02198 { s16 x; s16 y; } Pair02198;
+typedef struct State02198 {
+    u8 pad00[4];
+    u16 flags;
+    u8 pad06[6];
+    Pair02198 delta;
+    Pair02198 pos;
+    Pair02198 a;
+    Pair02198 b;
+    Pair02198 a0[4];
+    Pair02198 b0[4];
+    Pair02198 poscopy;
+    u8 pad40[8];
+    s16 width;
+    s16 height;
+} State02198;
+void func_82B02198(void *arg0)
+{
+  u8 *cursor;
+  State02198 *p;
+  s32 maximum;
+  s32 value;
+  s32 i;
+  p = arg0;
+  maximum = 0;
+ if (D_82B12470 <= 0) { p->flags &= ~2; } cursor = D_82B12472; do { value = func_80049148(8, 0, cursor); if (maximum < value) {
+      maximum = value;
+    }
+    cursor += 0x40;
+  }
+  while (cursor < D_82B12672);
+  p->width = maximum + 0x16;
+  p->height = 0xE4;
+  p->delta.x = 0;
+  p->delta.y = -0x1E0;
+  p->pos.x = 0xFF;
+  p->pos.y = 0xD8 - (p->height / 2);
+  p->poscopy = p->pos;
+  p->a = p->delta;
+  p->b.x = -p->a.x;
+  p->b.y = -p->a.y;
+  for (i = 0; i < 4; i++)
+  {
+    p->a0[i] = p->a;
+    p->b0[i] = p->b;
+  }
+
+  p->b0[1].x = 0;
+  p->b0[1].y = -0x1E0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -387,7 +475,34 @@ void func_82B02ABC(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B02BA4.s")
+extern s32 D_82B085E4;
+void func_82B02BA4(void *arg0) {
+    s32 result;
+    s32 counter;
+    s32 x;
+    s32 y;
+    s32 limit;
+    result = 0;
+    counter = *(s16 *)((u8 *)arg0 + 8);
+    limit = D_82B085E4;
+    *(s16 *)((u8 *)arg0 + 8) = *(s16 *)((u8 *)arg0 + 8) + 1;
+    if (0) { }
+    counter = *(s16 *)((u8 *)arg0 + 8);
+    if (counter < limit) {
+        x = *(s16 *)((u8 *)arg0 + 0x40);
+        y = *(s16 *)((u8 *)arg0 + 0x42);
+        *(s16 *)((u8 *)arg0 + 0x10) = ((*(s16 *)((u8 *)arg0 + 0x44) - *(s16 *)((u8 *)arg0 + 0x40)) * counter) / limit + *(s16 *)((u8 *)arg0 + 0x40);
+        *(s16 *)((u8 *)arg0 + 0x12) = ((*(s16 *)((u8 *)arg0 + 0x46) - *(s16 *)((u8 *)arg0 + 0x42)) * counter) / limit + *(s16 *)((u8 *)arg0 + 0x42);
+    } else {
+        result = 1;
+    }
+    if (result != 0) {
+        *(s16 *)((u8 *)arg0 + 6) = 2;
+        *(s16 *)((u8 *)arg0 + 8) = 0;
+        *(s16 *)((u8 *)arg0 + 0x10) = *(s16 *)((u8 *)arg0 + 0x44);
+        *(s16 *)((u8 *)arg0 + 0x12) = *(s16 *)((u8 *)arg0 + 0x46);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -661,7 +776,30 @@ void func_82B04558(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B04624.s")
+extern Gfx D_80094DB8[];
+extern void Gfx_FillRectRgba(s16, s16, s16, s16, s32, s32, s32, s32);
+extern void func_8004989C(s32);
+extern void func_800495F8(s32, s32, s32, s32);
+extern void func_800496A4(s32, s32);
+extern void func_8004972C(s32, s32, s32, s32);
+extern void func_800498C4(void);
+extern void func_800499EC(void);
+extern void func_8004C594(s32, s32);
+extern s32 func_8004C8A0(void *, s32, s32, s32);
+extern Gfx * D_800D0510;
+void func_82B04624(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4)
+{
+    u8 b[0x88];
+    gSPDisplayList(D_800D0510++, D_80094DB8);
+    Gfx_FillRectRgba((s16)a0, (s16)a1, 0x17F, 0x60, 0xFF, 0, 0x32, a3);
+    func_800498C4();
+    func_800496A4(0x10, 0);
+    func_8004972C(0xFF, 0xFF, 0, a4);
+    func_8004989C(0x20);
+    func_8004C594(3, a2);
+    func_800495F8(a0 + 0xBF, a1 + 0x14, 1, func_8004C8A0(b, 0x80, 0x1B, 0x38));
+    func_800499EC();
+}
 #endif
 
 #ifdef VERSION_US
