@@ -1928,15 +1928,23 @@ void func_80034614(u8 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80034654.s")
+extern u8 D_80092520;
+extern void func_800346A4(u8, u8);
+void func_80034654(u8 arg0, u8 arg1) {
+    if (D_80092520 & 0x20) {
+        func_800346A4(arg0, arg1);
+    } else {
+        func_800347E8(arg0);
+    }
+}
 #endif
 
 #ifdef VERSION_US
 extern u8 D_800D2B78;
-void func_800346A4(s32 arg0, s32 arg1) {
+void func_800346A4(u8 arg0, u8 arg1) {
     extern void func_80034A50(u8);
-    func_80034A50(((u8 *)&arg0)[3]);
-    (&D_800D2B78 + ((u8 *)&arg0)[3] * 0x3C)[0x24] &= func_800347E8(((u8 *)&arg0)[3]);
+    func_80034A50(arg0);
+    (&D_800D2B78 + arg0 * 0x3C)[0x24] &= func_800347E8(arg0);
 }
 #endif
 
