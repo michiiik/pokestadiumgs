@@ -17,7 +17,16 @@ void func_87F0A66C(u8 *arg0, u32 *arg1, u32 *arg2) {
     *(u32 *)(arg0 + 0x30) = *arg2;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_32D260/func_87F0A688.s")
+typedef struct TreeNode_80050428 TreeNode_80050428;
+extern void *func_8005049C(TreeNode_80050428 *, s32);
+void func_87F0A688(TreeNode_80050428 *arg0, s32 arg1, s32 arg2) {
+    u8 *entry = func_8005049C(arg0, arg1);
+    if (entry == NULL) {
+        func_87F0A5F0(arg1);
+    } else {
+        *(s16 *)(entry + 0x26) = arg2;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_32D260/func_87F0A6C8.s")
 
