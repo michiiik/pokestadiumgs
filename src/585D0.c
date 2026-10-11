@@ -1142,15 +1142,45 @@ void func_8005C060(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005C0B0.s")
+extern s32 func_8005CF20(s32, s32, s32);
+extern u8 D_801285D0[];
+void func_8005C0B0(s32 arg0, s32 arg1, s32 arg2) {
+    typedef struct {u8 first; u8 second;} Pair;
+    s32 base = *(s32 *)(D_801285D0 + arg1 * 112);
+    if (arg2 >= 0) {
+        if (func_8005CF20(0x22, arg1, 0) >= arg2) {
+            *(Pair *)arg0 = ((Pair *)(base + 0x267))[arg2];
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005C12C.s")
+extern s32 func_8005CF20(s32 arg0, s32 arg1, s32 arg2);
+extern u8 D_801285D0[];
+void func_8005C12C(s32 arg0, s32 arg1, s32 arg2) {
+    s32 base = *(s32 *)(D_801285D0 + arg1 * 112);
+    base += 9;
+    if (arg2 >= 0) {
+        if (func_8005CF20(0x22, arg1, 0) >= arg2) {
+            typedef struct {u8 a; u8 b;} Pair; *(Pair *)arg0 = ((Pair *)(base + 0x476))[arg2];
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005C1AC.s")
+extern s32 func_8005CF20(s32 arg0, s32 arg1, s32 arg2);
+extern u8 D_801285D0[];
+void func_8005C1AC(s32 arg0, s32 arg1, s32 arg2) {
+    s32 base = *(s32 *)(D_801285D0 + arg1 * 112);
+    base += 9;
+    if (arg2 >= 0) {
+        if (func_8005CF20(0x22, arg1, 0) >= arg2) {
+            typedef struct {u8 a; u8 b;} Pair; *(Pair *)arg0 = ((Pair *)(base + 0x477))[arg2];
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
