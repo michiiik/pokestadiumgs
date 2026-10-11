@@ -20,7 +20,28 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20F140/func_8AF219B4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20F140/func_8AF21C04.s")
+extern u8 *D_8AF2BDD8;
+s16 func_8AF21C04(void) {
+    u8 *entry = D_8AF2BDD8;
+    s16 result;
+
+    switch (entry[0]) {
+        case 0:
+            result = 0;
+            break;
+        case 1:
+            result = 7;
+            break;
+        case 2:
+            result = 0xC;
+            break;
+        default:
+            result = 0;
+            break;
+    }
+    result += entry[1];
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20F140/func_8AF21C58.s")
 
