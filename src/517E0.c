@@ -1297,7 +1297,22 @@ u8 func_80055CCC(s32 arg0) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80055D44.s")
+extern s32 func_80050D20(s32 arg0, s32 arg1);
+extern void func_80053B38(s32, s32, s32, u8 *);
+extern u8 D_801281C0;
+u8 func_80055D44(s32 arg0)
+{
+    u8 result;
+    s32 check;
+    s32 idx;
+    result = 0;
+    check = arg0 + 0x22;
+    idx = func_80050D20(0x1E, -1);
+    if ((*(s32 *)((u8 *)&D_801281C0 + idx * 0xC) & 1) && (arg0 + 0x22) >= 0x22 && (arg0 + 0x22) < 0x46) {
+        func_80053B38(0x1E, 0, check, &result);
+    }
+    return result;
+}
 
 extern void func_80053B38(s32, s32, s32, u8 *);
 extern void func_80053F04(s32, s32, s32, u8 *);
