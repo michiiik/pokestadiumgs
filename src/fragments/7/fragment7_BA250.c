@@ -802,7 +802,44 @@ void func_83007D10(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83007ECC.s")
+extern f32 func_818006B4(void);
+extern u16 D_8300F7BE[][2];
+extern void func_800226C0(s32);
+extern s32 func_81804A20(void *);
+extern void func_81805524(void *, void *);
+s32 func_83007ECC(s32 arg0, void *arg1) {
+    struct State { u8 pad[0x4E038]; u8 current; u8 target; u8 pad2[2]; f32 progress; };
+    s32 limit;
+    func_81805524((void *)arg0, arg1);
+    if (((struct State *)arg1)->current != ((struct State *)arg1)->target) {
+        ((struct State *)arg1)->progress += func_818006B4() * 0.0625f;
+        if (((struct State *)arg1)->progress > 1.0f) {
+            ((struct State *)arg1)->current = ((struct State *)arg1)->target;
+            ((struct State *)arg1)->progress = 0.0f;
+        }
+    } else if (func_81804A20(arg1) != 0) {
+        arg0 = ((struct State *)arg1)->current;
+        if ((arg0 > 0) && ((*(u16 *)((u8 *)arg1 + 0x18) & 0x800) != 0)) {
+            ((struct State *)arg1)->target = ((struct State *)arg1)->target - 1;
+            func_800226C0(1);
+            goto done;
+        }
+        limit = D_8300F7BE[*(u8 *)((u8 *)arg1 + 0x4F)][0] - 1;
+        if (arg0 < limit) {
+            if (((*(u16 *)((u8 *)arg1 + 0x18) & 0x400) != 0) || ((*(u16 *)((u8 *)arg1 + 0x14) & 0x8000) != 0)) {
+                ((struct State *)arg1)->target = ((struct State *)arg1)->target + 1;
+                func_800226C0(1);
+                goto done;
+            }
+        }
+        if ((arg0 == limit) && ((*(u16 *)((u8 *)arg1 + 0x14) & 0x8000) != 0)) {
+            *(u8 *)((u8 *)arg1 + 0x1E) = 5;
+            func_800226C0(3);
+        }
+    }
+done:
+    return 1;
+}
 #endif
 
 #ifdef VERSION_US
