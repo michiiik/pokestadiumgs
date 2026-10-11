@@ -2,7 +2,26 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/32/fragment32_1B6E40/func_88305B30.s")
+typedef struct {
+    s16 x;
+    s16 y;
+    u16 width;
+    u16 height;
+} Bounds_88305B30;
+
+typedef struct {
+    u8 unused[6];
+    Bounds_88305B30 current;
+    Bounds_88305B30 initial;
+} State_88305B30;
+
+void func_88305B30(State_88305B30 *arg0, s16 arg1, s16 arg2, u16 arg3, u16 arg4) {
+    arg0->current.x = arg1;
+    arg0->current.y = arg2;
+    arg0->current.width = arg3;
+    arg0->current.height = arg4;
+    arg0->initial = arg0->current;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/32/fragment32_1B6E40/func_88305B84.s")
 
