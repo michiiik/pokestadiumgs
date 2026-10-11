@@ -46,7 +46,19 @@ s32 func_88B0449C(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/40/fragment40_1E0550/func_88B044D0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/40/fragment40_1E0550/func_88B04698.s")
+extern u8 D_88B05868[];
+extern u16 D_88B05F6E;
+extern s32 func_88B04380(u8);
+s32 func_88B04698(void) {
+    u16 value = D_88B05F6E;
+    s32 index = value;
+
+    if (value >= 0x100) {
+        return D_88B05868[index * 4];
+    } else {
+        return D_88B05BE0[func_88B04380(value) * 4];
+    }
+}
 
 extern s32 func_88B04698(void);
 s32 func_88B046F0(void) {
