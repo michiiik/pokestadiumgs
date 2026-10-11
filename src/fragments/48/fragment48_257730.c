@@ -16,7 +16,14 @@ u8 *func_87C01730(void **arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_257730/func_87C0177C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_257730/func_87C017D0.s")
+u8 *func_87C017D0(void **arg0, s32 arg1) {
+    u8 *state = func_87C01730(arg0);
+
+    if (arg1 < 0 || state == NULL || arg1 >= state[4]) {
+        return NULL;
+    }
+    return (*(u8 ***)(state + 0xC))[arg1];
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_257730/func_87C0182C.s")
 
@@ -115,9 +122,9 @@ s32 func_87C01FB0(void **arg0) {
     return result;
 }
 
-extern u8 *func_87C017D0(void);
-s32 func_87C01FE0(void) {
-    u8 *state = func_87C017D0();
+extern u8 *func_87C017D0(void **, s32);
+s32 func_87C01FE0(void **arg0, s32 arg1) {
+    u8 *state = func_87C017D0(arg0, arg1);
     s32 result;
     if (state != NULL) {
         result = *(u16 *)(state + 0xA);
@@ -139,8 +146,8 @@ s32 func_87C02010(void) {
     return result;
 }
 
-s32 func_87C02040(void) {
-    u8 *state = func_87C017D0();
+s32 func_87C02040(void **arg0, s32 arg1) {
+    u8 *state = func_87C017D0(arg0, arg1);
     return state ? ((*(s16 *)state) & 1) : 0;
 }
 #endif
