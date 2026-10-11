@@ -58,7 +58,20 @@ void func_87E0ABBC(u8 *arg0) {
     MainPool_FinalizeAllocation(temp);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30E370/func_87E0AC0C.s")
+extern void func_87F024CC(void);
+extern void func_87F0ADE0(void *, u32);
+extern void *main_pool_alloc(s32, s32);
+
+void func_87E0AC0C(u8 *arg0) {
+    s32 offset;
+
+    func_87F024CC();
+    func_87F0ADE0(arg0 + 0x1C, 1);
+    *(void **)(arg0 + 0x34) = main_pool_alloc(0x8C, 0);
+    for (offset = 0; offset < 0x8C; offset += 0x8C) {
+        *(u8 **)((u8 *)*(void **)(arg0 + 0x34) + offset + 0x88) = arg0;
+    }
+}
 
 extern void func_87F02684(s32);
 void func_87E0AC6C(s32 arg0) {
