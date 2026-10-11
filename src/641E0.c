@@ -127,7 +127,9 @@ s32 func_80064070(u8 arg0, u8 arg1, u8 arg2) {
     return func_80063F4C(arg0, arg1, arg2, 0xF, 1) != 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_800640B4.s")
+s32 func_800640B4(u8 arg0, u8 arg1, u8 arg2) {
+    return func_80063F4C(arg0, arg1, arg2, 4, 1) != 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_800640F8.s")
 
