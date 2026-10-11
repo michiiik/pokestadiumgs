@@ -61,7 +61,7 @@ extern u8 D_8AF27D20[];
 extern u8 *D_8AF3A198;
 extern s16 D_8AF3A19C;
 extern void func_8AF00504(s32);
-extern s32 func_8AF003A8(s32);
+extern s32 func_8AF003A8(s16);
 s32 func_8AF220E8(void) {
     s32 sp1C;
     u8 temp_v0 = *D_8AF2BDD8;

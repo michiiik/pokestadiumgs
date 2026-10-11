@@ -66,7 +66,28 @@ void func_8AF00304(s16 arg0, s32 arg1)
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1EE290/func_8AF00360.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1EE290/func_8AF003A8.s")
+typedef struct Lookup_8AF003A8 {
+    s16 unused;
+    s16 id;
+    s32 state;
+    s32 value;
+} Lookup_8AF003A8;
+s32 func_8AF003A8(s16 arg0) {
+    struct { Lookup_8AF003A8 *entry; s32 unused; } local;
+    s32 index;
+
+    local.entry = (Lookup_8AF003A8 *)D_8AF2BE98;
+    index = 0;
+    do {
+        if (arg0 == local.entry->id) {
+            func_8AF00304(arg0, local.entry->value);
+            return local.entry->value;
+        }
+        index++;
+        local.entry++;
+    } while (index != 10);
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1EE290/func_8AF00410.s")
 
