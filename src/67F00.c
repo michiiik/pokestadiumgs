@@ -129,7 +129,7 @@ loop:
 #pragma GLOBAL_ASM("asm/us/nonmatchings/67F00/func_80067930.s")
 
 void func_80067930(s32, s32 *, s32 *);
-void func_8006AB8C(s32, s32, s32);
+s32 func_8006AB8C(u16, s32, s32);
 void func_80067AE0(s32 arg0, s32 *arg1, s32 *arg2) {
     volatile u8 pad[8];
     s32 sp1C;
@@ -144,7 +144,7 @@ void func_80067AE0(s32 arg0, s32 *arg1, s32 *arg2) {
 
 s32 func_80067800();
 void func_80067930();
-void func_8006AB8C();
+s32 func_8006AB8C(u16, s32, s32);
 s32 func_80067B48(s32 arg0) {
     s32 result;
 
