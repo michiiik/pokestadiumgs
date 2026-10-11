@@ -2,7 +2,24 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_209BD0/func_8AF1B960.s")
+extern void func_800504BC(s16 *);
+extern s16 D_8AF37560;
+extern s16 D_8AF37562;
+
+s32 func_8AF1B960(s32 arg0, u8 *arg1) {
+    s16 position[2];
+
+    switch (arg0) {
+        case 0:
+            break;
+        case 1:
+            func_800504BC(position);
+            D_8AF37560 = *(s16 *)(arg1 + 8) + position[0];
+            D_8AF37562 = *(s16 *)(arg1 + 0xA) + position[1];
+            break;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_209BD0/func_8AF1B9C0.s")
 
