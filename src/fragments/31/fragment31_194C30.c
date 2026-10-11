@@ -24,7 +24,7 @@ void func_882219D8(void) {
     Util_Free(D_88234830);
 }
 
-extern void func_88004990(u8, s32);
+extern void func_88004990(u8, u8);
 void func_88221A34(s32 (*arg0)()) {
     func_88004990(*(*(u8 **)((u8 *)(D_88234830) + (0))), 0);
     D_880068B8 = 1;
@@ -32,7 +32,18 @@ void func_88221A34(s32 (*arg0)()) {
     arg0();
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_194C30/func_88221A8C.s")
+extern void func_8821C2F4(void);
+extern void func_8821B714(s32, s32);
+extern void func_8800225C(void *, s16, s16);
+extern u8 D_88006880[];
+
+void func_88221A8C(s32 arg0, s32 arg1) {
+    func_8821C2F4();
+    func_8821B714(arg0, arg1);
+    func_8800225C(D_88006880, 0, 0);
+    func_88004990(**(u8 **)D_88234830, 0);
+    D_880068B8 = 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_194C30/func_88221AF0.s")
 
