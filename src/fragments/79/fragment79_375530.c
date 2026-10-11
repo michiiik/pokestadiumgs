@@ -155,7 +155,20 @@ void func_84105E3C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_375530/func_841077E8.s")
+extern u8 *func_84100328(void);
+s32 func_841077E8(u8 *arg0) {
+    u8 *obj;
+
+    if (*(s32 *)arg0 != 0) {
+        obj = func_84100328();
+        if (obj == NULL) {
+            return 0;
+        }
+        obj[0x7C] = arg0[9];
+        *(s32 *)(obj + 0x10) = *(s32 *)arg0;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
