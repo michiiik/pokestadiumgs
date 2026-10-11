@@ -266,7 +266,21 @@ s32 func_8004D43C(s32 arg0, s32 arg1)
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D488.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D570.s")
+extern s16 D_8009712C[];
+s32 func_8004D570(s32 arg0, s32 arg1, u8 *arg2) {
+    s32 result = 0;
+    s32 width = D_8009712C[arg0];
+    u8 value = *arg2;
+    u8 *cursor = arg2 + 1;
+    while (value != 0) {
+        value = *cursor++;
+        result += width + arg1;
+    }
+    if (result != 0) {
+        result -= arg1;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D5B8.s")
 
