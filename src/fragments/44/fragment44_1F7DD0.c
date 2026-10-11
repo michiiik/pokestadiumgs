@@ -19,7 +19,14 @@ void func_8AF09B60(void) {
     D_8AF2C9E2 = D_8AF2CC36;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F7DD0/func_8AF09BC4.s")
+extern s16 D_8AF26934;
+
+void func_8AF09BC4(void) {
+    D_8AF2CC38 = *D_8AF26930;
+    D_8AF2CC34 = D_8AF2C9E0;
+    D_8AF2CC36 = D_8AF2C9E2;
+    D_8AF26934 = 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F7DD0/func_8AF09C34.s")
 
