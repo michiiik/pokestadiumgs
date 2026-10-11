@@ -104,7 +104,31 @@ s32 func_80043AA0(void *arg0, s32 arg1, s16 arg2) {
     return var_v1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/44300/func_80043AEC.s")
+typedef struct { u32 words[3]; } CopyValue_80043AEC;
+typedef struct {
+    u8 unused[8];
+    CopyValue_80043AEC value;
+    u8 tail[0x10];
+} CopyRow_80043AEC;
+typedef struct {
+    u8 unused[2];
+    s16 count;
+    u8 pad[8];
+    CopyRow_80043AEC *rows;
+} CopyState_80043AEC;
+
+s32 func_80043AEC(CopyState_80043AEC *arg0, s32 arg1, void *arg2) {
+    s32 result = 0;
+
+    if (arg0 != NULL && arg1 < arg0->count) {
+        if (arg0->rows != NULL && arg2 != NULL) {
+            arg0 = (CopyState_80043AEC *)&arg0->rows[arg1];
+            ((CopyRow_80043AEC *)arg0)->value = *(CopyValue_80043AEC *)arg2;
+            result = 1;
+        }
+    }
+    return result;
+}
 
 s32 func_80043B48(void *arg0, s32 arg1, f32 arg2) {
     s32 temp_v0;
@@ -162,7 +186,7 @@ extern s32 func_8004BB58(s32, s32);
 extern s32 func_8004BC6C(s32, s32);
 extern f32 func_8004BAE8(s32, s32);
 extern void func_8004BBA8(s32, s32, void *);
-extern s32 func_80043AEC(void *, s32, void *);
+extern s32 func_80043AEC(CopyState_80043AEC *, s32, void *);
 s32 func_8004418C(void *arg0, s32 arg1, s32 arg2, s32 arg3) {
     s32 var_v1;
     u8 sp28[0xC];
