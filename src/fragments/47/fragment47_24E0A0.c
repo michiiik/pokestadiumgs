@@ -384,9 +384,59 @@ void func_8600AAD4(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_8600AB6C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_8600ACC4.s")
+extern void func_87F06240(s32, s32, f32, f32, s32);
+extern Gfx * D_800D0510;
+void func_8600ACC4(void *arg0, s32 arg1, s32 arg2, void *arg3, void *arg4) {
+    struct ACC4Color { u8 r, g, b, a; };
+    gDPSetPrimColor(D_800D0510++, 0, 0, ((struct ACC4Color *)arg3)->r, ((struct ACC4Color *)arg3)->g, ((struct ACC4Color *)arg3)->b, ((struct ACC4Color *)arg3)->a);
+    gDPSetEnvColor(D_800D0510++, ((struct ACC4Color *)arg4)->r, ((struct ACC4Color *)arg4)->g, ((struct ACC4Color *)arg4)->b, 0xFF);
+    if ((s32)arg0 >= 100) {
+        func_87F06240(arg1 + 9, arg2 + 4, 0.7f, 0.61f, (s32)arg0 / 10);
+        func_87F06240(arg1 + 25, arg2 + 4, 0.7f, 0.61f, (s32)arg0);
+    } else if ((s32)arg0 >= 10) {
+        func_87F06240(arg1 + 9, arg2 + 4, 0.7f, 0.61f, (s32)arg0 / 10);
+        func_87F06240(arg1 + 25, arg2 + 4, 0.7f, 0.61f, (s32)arg0);
+    } else if ((s32)arg0 >= 0) {
+        func_87F06240(arg1 + 17, arg2 + 4, 0.7f, 0.61f, (s32)arg0);
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_8600AE6C.s")
+extern s16 D_8600D9B0[][2];
+extern s16 D_8600D9C0[][2];
+extern u8 D_80094E38[];
+extern void func_8004D1FC(void *);
+extern s32 func_8004CA10(void *);
+extern s32 func_8004CA24(void *);
+extern void func_8600A650(f32, f32, f32, f32, s32, s32, f32, f32);
+extern Gfx * D_800D0510;
+extern s32 D_8600DE10;
+void func_8600AE6C(u8 *arg0) {
+    s32 i;
+
+    gSPDisplayList(D_800D0510++, D_80094E38);
+    gDPSetEnvColor(D_800D0510++, 255, 255, 255, 255);
+    for (i = 0; i < *(s32 *)(arg0 + 0x1814); i++) {
+        const s32 texture = (&D_8600DE10)[(s8)arg0[0x1990 + i] + 1];
+        func_8004D1FC((void *)texture);
+        func_8600A650(
+            (f32)(D_8600D9B0[*(s32 *)(arg0 + 0x1810)][0] + D_8600D9C0[*(s32 *)(arg0 + 0x1810)][0] * i),
+            (f32)(D_8600D9B0[*(s32 *)(arg0 + 0x1810)][1] + D_8600D9C0[*(s32 *)(arg0 + 0x1810)][1] * i),
+            (f32)func_8004CA10((void *)texture),
+            (f32)func_8004CA24((void *)texture),
+            0, 0, 1.0f, 1.0f);
+    }
+    gDPPipeSync(D_800D0510++);
+    gDPSetEnvColor(D_800D0510++, 255, 255, 255, 100);
+    func_8004D1FC((void *)D_8600DE10);
+    for (; i < 5; i++) {
+        func_8600A650(
+            (f32)(D_8600D9B0[*(s32 *)(arg0 + 0x1810)][0] + D_8600D9C0[*(s32 *)(arg0 + 0x1810)][0] * i),
+            (f32)(D_8600D9B0[*(s32 *)(arg0 + 0x1810)][1] + D_8600D9C0[*(s32 *)(arg0 + 0x1810)][1] * i),
+            (f32)func_8004CA10((void *)D_8600DE10),
+            (f32)func_8004CA24((void *)D_8600DE10),
+            0, 0, 1.0f, 1.0f);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_8600B100.s")
 
