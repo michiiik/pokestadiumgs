@@ -67,7 +67,16 @@ void func_88201608(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_174460/func_88201E28.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_174460/func_88201ED0.s")
+typedef struct {
+    u8 pad[0xC];
+    void **entries;
+    u32 unused;
+} EntryRow_88201ED0;
+extern s32 D_88A01C30;
+void *func_88201ED0(u8 arg0, u8 arg1) {
+    void **entries = ((EntryRow_88201ED0 *)D_88A01C30)[arg0].entries;
+    return entries[arg1];
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_174460/func_88201F0C.s")
 
