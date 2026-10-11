@@ -625,7 +625,24 @@ s32 func_800275E8(u8 arg0, Candidate275E8Bits *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80027774.s")
+typedef struct ResourceContext_80027774 {
+    u8 pad00[5];
+    u8 mode;
+    u8 pad06[6];
+    void *resource;
+    f32 scale;
+    u8 pad14[4];
+} ResourceContext_80027774;
+extern void func_80027BD4(u16, s32, ResourceContext_80027774 *);
+extern u8 D_80090D04[];
+void func_80027774(u16 arg0, u8 arg1) {
+    ResourceContext_80027774 context;
+
+    context.resource = D_80090D04;
+    context.mode = arg1;
+    context.scale = 1.0f;
+    func_80027BD4(arg0, 0, &context);
+}
 #endif
 
 #ifdef VERSION_US
