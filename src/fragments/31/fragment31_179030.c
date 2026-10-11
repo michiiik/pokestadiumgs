@@ -28,7 +28,19 @@ void func_88206460(void) {
     func_88003A00(D_88234564);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_179030/func_882064B4.s")
+extern void func_880022B4(void *, s16, s32);
+void func_882064B4(s32 arg0, s32 *arg1, void *arg2, void *arg3) {
+    s32 mode;
+
+    *arg1 = arg0;
+    if (arg0 != 0) {
+        mode = 0;
+    } else {
+        mode = 1;
+    }
+    func_880022B4(arg2, 0xF00, mode);
+    func_880022B4(arg3, 0xF00, mode);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_179030/func_88206508.s")
 
