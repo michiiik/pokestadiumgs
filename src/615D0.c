@@ -110,12 +110,25 @@ u8 *func_80060D70(u8 *arg0, s8 *arg1) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060DDC.s")
+extern s32 HAL_Strcmp(const s8 *, const s8 *);
+extern u8 *func_80060EC8(void *, void *);
+u8 *func_80060DDC(u8 *arg0, s8 *arg1) {
+    u8 *result;
+
+    if (HAL_Strcmp(arg1, (s8 *)func_8004C874(0x41, 2)) == 0) {
+        result = arg0;
+        *arg0++ = 0x5D;
+        *arg0 = 0x50;
+        return result;
+    } else {
+        return func_80060EC8(arg0, arg1);
+    }
+}
 
 extern void _bcopy(const void *, void *, s32);
 extern s8 *func_80060C08(s8 *, u8 *);
 extern s8 *func_80060D1C(s8 *, u8 *);
-extern void func_80060EC8(void *, void *);
+extern u8 *func_80060EC8(void *, void *);
 extern s32 func_8004B7A4(s32);
 extern void func_80062808(void *, s32);
 extern void func_80062884(void *, s32);
@@ -135,9 +148,9 @@ void func_80060E88(void *arg0, void *arg1) {
 }
 
 extern char * func_80060F68(char *arg0, char *arg1);
-void func_80060EC8(void *arg0, void *arg1) {
+u8 *func_80060EC8(void *arg0, void *arg1) {
     char sp1C[11];
-    func_80060D70(arg0, func_80060F68(sp1C, arg1));
+    return func_80060D70(arg0, (s8 *)func_80060F68(sp1C, arg1));
 }
 
 void func_80060EF8(void *arg0, void *arg1) {
