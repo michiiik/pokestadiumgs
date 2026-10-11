@@ -303,7 +303,65 @@ void *func_814049CC(void *arg0) {
     return NULL;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81404A08.s")
+typedef struct Candidate81404A08Record { s32 words[22]; } Candidate81404A08Record;
+extern s32 func_814028F0(void);
+extern void func_814038D4(void *arg0, void *arg1);
+extern void func_81403FDC(void *arg0, s32 arg1, s32 arg2, s32 arg3);
+void func_81404A08(u8 *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, void *arg5, void *arg6, s32 arg7, s32 arg8, s32 arg9, char *arg10, s32 arg11, s32 arg12)
+{
+    u8 *parentSlot;
+    s32 i;
+    Candidate81404A08Record *dst;
+    u8 *guard;
+    int timerOffset;
+    Candidate81404A08Record *src;
+    u8 *timerSlot;
+    s32 count = 0;
+    s32 mode;
+    arg0[7] = arg3;
+    *(s32 *)(arg0 + 0x4D60) = arg12;
+    *(s32 *)(arg0 + 0x1C) = arg8;
+    *(s32 *)(arg0 + 0x20) = 0;
+    timerOffset = 4;
+    arg0[8] = arg1;
+    parentSlot = arg0 + 0x3C;
+    for (i = 0; i < 6; i++) {
+        *(s8 *)((arg0 + 0xA) + i) = -1;
+    }
+    *(void **)parentSlot = arg6;
+    i = 0;
+    timerSlot = arg0 + timerOffset;
+    guard = arg0;
+    src = arg5;
+    dst = (Candidate81404A08Record *)(arg0 + 0x4B40);
+    for (; i != 6; i++, guard += 0x58, dst++, src++) {
+        *dst = *src;
+        if (guard[0x4B40] > 0) {
+            func_8004D878((void *)((arg0 + 0x40) + (i * 0xC80)), 0, (void *)dst);
+            count++;
+        }
+    }
+    if (count < arg4) {
+        arg4 = count;
+    }
+    if (arg9 <= 0) {
+        *(s16 *)timerSlot = 600;
+    } else {
+        *(s16 *)timerSlot = arg9;
+    }
+    arg0[0x12] = arg4;
+    func_814038D4(arg6, arg0);
+    mode = (arg0[9] = arg2);
+    *(s32 *)(arg0 + 0x14) = arg7;
+    *(s8 *)(arg0 + 0x10) = -1;
+    arg0[6] = 0;
+    *(f32 *)arg0 = 0.0f;
+    arg0[0x11] = func_814028F0();
+    *(s32 *)(arg0 + 0x18) = 0;
+    *(s32 *)(arg0 + 0x4D5C) = arg11;
+    func_81403FDC(arg0 + 0x24, (*(s32 *)(arg0 + 0x4D60)) ? -1 : arg1, arg2, arg7 == 0);
+    HAL_Strcpy((char *)(arg0 + 0x4D50), arg10);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81404BEC.s")
 
