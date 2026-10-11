@@ -97,5 +97,12 @@ void func_87C02594(u8 *arg0, s32 arg1, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_258080/func_87C02C30.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_258080/func_87C02D1C.s")
+extern void func_87C013CC(void *, void *);
+void func_87C02D1C(u8 *arg0, u8 *arg1) {
+    func_87C013CC(arg0 + 0x38, arg1);
+    *(f32 *)(arg1 + 0x30) = *(f64 *)(arg0 + 8);
+    *(f32 *)(arg1 + 0x34) = *(f64 *)(arg0 + 0x10);
+    *(f32 *)(arg1 + 0x38) = *(f64 *)(arg0 + 0x18);
+}
+#pragma C_FUNCTION_PADDING(12)
 #endif
