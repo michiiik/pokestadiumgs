@@ -371,7 +371,25 @@ s32 func_8004DA8C(u8 *arg0) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004DAF0.s")
+extern s32 func_8004EB1C(s32);
+
+s32 func_8004DAF0(void *arg0, s32 *arg1) {
+    struct {
+        s32 unused;
+        s32 value;
+    } result;
+    s32 flags;
+
+    result.value = 1;
+    flags = func_8004EB1C(*(s32 *)((u8 *)arg0 + 0x10));
+    if (func_8004C4B0(*(u16 *)((u8 *)arg0 + 0x20)) == 0) {
+        result.value = 0;
+    }
+    if (arg1 != NULL) {
+        *arg1 |= flags;
+    }
+    return result.value;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004DB5C.s")
 
