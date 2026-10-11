@@ -2,7 +2,17 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_257730/func_87C01730.s")
+typedef u8 *(*Func87C01730Callback)(s32, s32);
+u8 *func_87C01730(void **arg0) {
+    u8 *entry = *(u8 **)((u8 *)*arg0 + 0xC);
+    if (entry != NULL) {
+        Func87C01730Callback callback = *(Func87C01730Callback *)(entry + 0x2C);
+        if (callback != NULL) {
+            return callback(0, 0);
+        }
+    }
+    return NULL;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_257730/func_87C0177C.s")
 
@@ -82,9 +92,9 @@ f32 func_87C01F78(u8 *arg0) {
     return *(f32 *)(arg0 + 0xC);
 }
 
-extern u8 *func_87C01730(void);
-s32 func_87C01F80(void) {
-    u8 *state = func_87C01730();
+extern u8 *func_87C01730(void **);
+s32 func_87C01F80(void **arg0) {
+    u8 *state = func_87C01730(arg0);
     s32 result;
     if (state != NULL) {
         result = state[4];
@@ -94,8 +104,8 @@ s32 func_87C01F80(void) {
     return result;
 }
 
-s32 func_87C01FB0(void) {
-    u8 *state = func_87C01730();
+s32 func_87C01FB0(void **arg0) {
+    u8 *state = func_87C01730(arg0);
     s32 result;
     if (state != NULL) {
         result = state[5];
