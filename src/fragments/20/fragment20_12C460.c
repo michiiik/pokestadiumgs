@@ -653,7 +653,54 @@ void func_82608270(Color82608270 *arg0, Color82608270 *arg1, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260850C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260899C.s")
+extern Gfx *D_800D0510;
+extern u8 D_80094E78[];
+extern s32 func_8004D1FC(u8 *);
+extern void func_82607BF4(s16, u8 *, u8 *, s16, s32);
+extern void func_80044270(s16, s16, s16, s16, s32, s32, s32, s32, s32);
+extern s32 func_8004C990(s32, s32);
+void func_8260899C(u8 *arg0, s32 arg1) {
+    u8 *tex;
+    s32 unused[2];
+    f32 step;
+    f32 bias;
+    s16 x;
+    s16 y;
+    struct Color { u8 r, g, b, a; } prim;
+    struct Color2 { u8 r, g, b, a; } env;
+    s32 w;
+    s32 h;
+    f32 scale;
+
+    tex = (u8 *)func_8004C990(0x52, 1);
+    if (tex == NULL) {
+        return;
+    }
+
+    w = *(s16 *)(arg0 + 0x24) - 10;
+    h = *(s16 *)(arg0 + 0x26) - 10;
+    scale = (f32)w / (f32)(u32)*(u16 *)tex;
+    if (scale > 0.0f && w > 0 && h > 0) {
+        if (arg1 != 0) {
+            gSPDisplayList(D_800D0510++, D_80094E78);
+            gDPSetRenderMode(D_800D0510++, 0x0F0A4000, 0);
+            func_8004D1FC(tex);
+        }
+
+        func_82607BF4(*(s16 *)arg0, (u8 *)&prim, (u8 *)&env, *(s16 *)(arg0 + 0xC), (*(u16 *)(arg0 + 4) & 8) != 0);
+        gDPPipeSync(D_800D0510++);
+        gDPSetEnvColor(D_800D0510++, prim.r, prim.g, prim.b, 255);
+        step = 1024.0f / scale;
+        gDPSetPrimColor(D_800D0510++, 0, 0, env.r, env.g, env.b, 255);
+
+        x = *(s16 *)(arg0 + 0x14) + *(s16 *)(arg0 + 0x10);
+        y = *(s16 *)(arg0 + 0x16) + *(s16 *)(arg0 + 0x12);
+
+        bias = (step > 0.0f) ? 0.5f : -0.5f;
+
+        func_80044270((s16)(x + 5), (s16)(y + 5), *(s16 *)(arg0 + 0x24) - 10, *(s16 *)(arg0 + 0x26) - 10, 0, 0, (s32)(bias + step), 0x400, 0);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82608C1C.s")
 
