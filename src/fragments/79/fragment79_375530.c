@@ -194,7 +194,24 @@ s32 func_84107838(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_375530/func_841078B8.s")
+s32 func_841078B8(u8 *arg0) {
+    u8 *obj;
+
+    if (*(s32 *)arg0 != 0) {
+        obj = func_84100328();
+        if (obj == NULL) {
+            return -1;
+        }
+        fragment27_main((u32 *)(obj + 0x14), 0x7028);
+        *(s32 *)(obj + 0x10) = *(s32 *)arg0;
+        obj[0x7C] = arg0[9];
+        *(f32 *)(obj + 0x44) = 160.0f;
+        *(f32 *)(obj + 0x48) = 120.0f;
+        *(f32 *)(obj + 0x20) = 160.0f;
+        *(f32 *)(obj + 0x24) = 120.0f;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
