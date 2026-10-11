@@ -6,7 +6,18 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_32D7D0/func_87F0ABA4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_32D7D0/func_87F0ACDC.s")
+extern void func_87F0ABA4(s32, s32, s32);
+
+void func_87F0ACDC(void *arg0, s32 arg1, void *arg2, s32 arg3) {
+    u8 *entry;
+
+    if (arg1 < 0 || arg1 >= 0x12) {
+        entry = NULL;
+    } else {
+        entry = (u8 *)arg2 + arg3 * 0x6C0 + arg1 * 0x5C + 0x30;
+    }
+    func_87F0ABA4((s32)arg0, (s32)entry, arg3);
+}
 
 s32 func_87F0AB60(s32, s32, s32);
 extern void func_87F0ABA4(s32, s32, s32);
