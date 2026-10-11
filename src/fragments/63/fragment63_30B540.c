@@ -51,7 +51,14 @@ void func_87E07CB0(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E07DD0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E07E08.s")
+s32 func_87E07E08(void *arg0) {
+    s32 count = 0;
+    s32 offset;
+    for (offset = 0; offset < 0x60; offset += 0x18) {
+        count += (u32)*(u16 *)((u8 *)arg0 + 0x21A6 + offset) >> 15;
+    }
+    return count;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E07E38.s")
 
@@ -71,7 +78,31 @@ void func_87E07F18(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E07F4C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E07F98.s")
+s32 func_87E07F4C(void *);
+typedef struct { s32 id; u8 pad[0x12]; u8 flags; u8 tail; } F98UnsignedRecord;
+void func_87E07F98(void *arg0) {
+    typedef struct {
+        s32 id;
+        u32 pad[4];
+        u32 pad14: 16;
+        u32 marked: 1;
+        u32 tested: 1;
+        u32 pad_rest: 14;
+    } Record;
+    Record *ptr;
+    s32 value;
+    s32 i;
+
+    value = func_87E07F4C(arg0);
+    ptr = (Record *)((u8 *)arg0 + 0x2190);
+    for (i = 0; i < 4; i++, ptr++) {
+        if (ptr->id > 0 && value == ptr->id) {
+            ptr->tested = 1;
+        } else {
+            ptr->tested = 0;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E0808C.s")
 
@@ -188,7 +219,123 @@ void func_87E08810(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E08844.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E088E0.s")
+typedef struct {
+    u8 pad[0x14];
+    u32 pad14: 16;
+    u32 marked: 1;
+    u32 tested: 1;
+    u32 pad_rest: 14;
+} F63_Record;
+typedef struct {
+    u8 pad[0x14];
+    s16 unk14;
+    u8 pad16[0x218C - 0x16];
+    s8 value218C;
+    s8 value218D;
+    s8 value218E;
+    u8 pad218F[0x2190 - 0x218F];
+    F63_Record records[4];
+} F63_OwnerData;
+typedef struct {
+    u8 pad[4];
+    s32 state;
+    s32 pad8;
+    s32 mode;
+    s32 submode;
+    u8 pad14[0x20 - 0x14];
+    F63_OwnerData *data;
+    u8 pad24[0x60 - 0x24];
+    u8 widget60[0x8C - 0x60];
+    u8 widget8C[0x628 - 0x8C];
+    u8 widget628[0x1998 - 0x628];
+    s32 selection;
+} F63_088E0_Owner;
+extern s32 func_87E07DD0(F63_OwnerData *);
+extern void func_87E11B30(s32);
+extern void func_87E10E64(s32);
+extern void func_87E10EA8(s32);
+extern void func_87E10F2C(s32);
+extern void func_87E00020(void);
+extern void func_87E0C390(void *);
+extern void func_87E0C454(void *, s8);
+extern void func_87E0DA4C(void *);
+extern void func_87E0D3A0(void *);
+extern void func_87E127FC(void *);
+extern void func_87E12830(void *);
+extern s32 func_87E0808C(F63_OwnerData *);
+extern void func_87E12900(void *);
+extern void func_87E129D0(void *);
+extern void func_87E0168C(s32, s32, s32);
+extern void func_87E07F18(s32 arg0);
+void func_87E088E0(F63_088E0_Owner *p) {
+    s32 i;
+
+    p->selection = func_87E07DD0(p->data);
+    if (p->selection == -1) {
+        p->selection = 0;
+    }
+    func_87E11B30(p->selection);
+    func_87E07F18((s32)p->data);
+    func_87E10E64(0);
+    func_87E10EA8(-1);
+    func_87E10F2C(-1);
+    func_87E00020();
+
+    func_87E0C390(p->widget60);
+    func_87E0C454(p->widget60, p->data->value218C);
+
+    func_87E0DA4C(p->widget8C);
+    func_87E0D3A0(p->widget8C);
+
+    func_87E127FC(p->widget628);
+
+    p->state = 3;
+
+    switch (p->data->value218E) {
+        case 0:
+            p->mode = 4;
+            p->submode = 3;
+            func_87E12830(p->widget628);
+            func_87E10EA8(p->data->value218D + 0x18);
+            func_87E10F2C(2);
+            break;
+        case 1:
+            if (func_87E0808C(p->data)) {
+                p->mode = 4;
+                p->submode = 2;
+                func_87E12900(p->widget628);
+                func_87E10EA8(0x1F);
+                func_87E10F2C(2);
+            } else {
+                p->mode = 4;
+                p->submode = 0;
+                func_87E129D0(p->widget628);
+                func_87E10EA8(p->data->value218D + 0x1B);
+                func_87E10F2C(2);
+            }
+            break;
+        case 2:
+            p->mode = 4;
+            p->submode = 3;
+            if (func_87E0808C(p->data)) {
+                p->submode = 2;
+                func_87E12900(p->widget628);
+                func_87E10EA8(0x22);
+                func_87E10F2C(2);
+            } else {
+                for (i = 0; i < 4; i++) {
+                    if (!p->data->records[i].tested) {
+                        p->data->records[i].marked = 1;
+                    }
+                }
+                func_87E12830(p->widget628);
+                func_87E10EA8(p->data->value218D + 0x1F);
+                func_87E10F2C(2);
+            }
+            break;
+    }
+    func_87E0168C(3, 0xC8, 0x28);
+}
 
 extern void func_87E0C628(s32, s32);
 extern void func_87E0DAE0(s32, s32);
