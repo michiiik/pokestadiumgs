@@ -55,7 +55,12 @@ void func_8822B24C(void) {
     Util_Free(D_88234900);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_19DFC0/func_8822B284.s")
+void func_8822B284(void) {
+    if (*(u16 *)((u8 *)D_80087200 + 8) & 0xC000) {
+        func_88004990(**(u8 **)D_88234900, 0);
+        D_880068B8 = 1;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_19DFC0/func_8822B2D8.s")
 
