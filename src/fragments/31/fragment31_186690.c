@@ -27,13 +27,13 @@ u8 *func_88213A3C(s32 arg0) { switch (arg0) { case 3: return D_88234730 + 0xC4; 
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_88213E9C.s")
 
-extern void func_882064B4(s32, u8 *, u8 *, u8 *);
+extern void func_882064B4(s32, s32 *, void *, void *);
 extern void func_88213A94(u8, s32);
 extern s32 D_882346F0;
 extern u8 *D_88234730;
 void func_882142DC(void) {
     D_882346F0 = 4;
-    func_882064B4(0, D_88234730 + 4, D_88234730 + 0xC, D_88234730 + 0x38);
+    func_882064B4(0, (s32 *)(D_88234730 + 4), D_88234730 + 0xC, D_88234730 + 0x38);
     func_88213A94(*D_88234730, 1);
 }
 
