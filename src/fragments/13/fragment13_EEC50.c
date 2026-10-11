@@ -50,7 +50,40 @@ void func_82401000(void) {
     D_82407860 = func_8004C990(0xEB, 3);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82401198.s")
+extern Gfx *D_800D0510;
+extern u8 D_80094E38[];
+extern u8 D_80094F50[];
+extern u8 D_80094DB8[];
+extern void func_8004D1FC(u8 *);
+extern void func_82400BD0(f32, f32, f32, f32, s32, s32, f32, f32);
+extern void Gfx_FillRectRgba(s16, s16, s16, s16, u8, u8, u8, u8);
+extern s32 D_82407840;
+void func_82401198(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    if (arg2 < 4 || arg3 < 4) {
+        return;
+    }
+    func_8004D1FC((void *)D_82407840);
+    gSPDisplayList(D_800D0510++, D_80094E38);
+    arg0 -= 2;
+    arg1 -= 2;
+    arg2 += 2;
+    arg3 += 2;
+    func_82400BD0(arg0, arg1, 4.0f, 4.0f, 0, 0, 1.0f, 1.0f);
+    func_82400BD0((arg0 + arg2) - 4, arg1, 4.0f, 4.0f, 4, 0, 1.0f, 1.0f);
+    func_82400BD0(arg0, (arg1 + arg3) - 4, 4.0f, 4.0f, 8, 0, 1.0f, 1.0f);
+    func_82400BD0((arg0 + arg2) - 4, (arg1 + arg3) - 4, 4.0f, 4.0f, 0xC, 0, 1.0f, 1.0f);
+    func_82400BD0(arg0, arg1 + 4, 4.0f, arg3 - 8, 0, 4, 1.0f, 0.0f);
+    func_82400BD0(arg0 + 4, arg1, arg2 - 8, 4.0f, 4, 0, 0.0f, 1.0f);
+    func_82400BD0((arg0 + arg2) - 4, arg1 + 4, 4.0f, arg3 - 8, 0xC, 0, 1.0f, 0.0f);
+    func_82400BD0(arg0 + 4, (arg1 + arg3) - 4, arg2 - 8, 4.0f, 0xC, 0, 0.0f, 1.0f);
+    gSPDisplayList(D_800D0510++, D_80094F50);
+    gSPDisplayList(D_800D0510++, D_80094DB8);
+    gDPSetRenderMode(D_800D0510++, 0x00504240, 0);
+    Gfx_FillRectRgba(arg0 - 1, arg1 - 1, arg2 + 2, 6, 0, 0, 0, 0);
+    Gfx_FillRectRgba(arg0 - 1, (arg1 + arg3) - 6, arg2 + 2, 6, 0, 0, 0, 0);
+    Gfx_FillRectRgba(arg0 - 1, arg1 + 4, 6, arg3 - 8, 0, 0, 0, 0);
+    Gfx_FillRectRgba((arg0 + arg2) - 5, arg1 + 4, 6, arg3 - 8, 0, 0, 0, 0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82401570.s")
 
