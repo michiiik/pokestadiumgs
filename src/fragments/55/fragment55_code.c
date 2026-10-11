@@ -148,7 +148,13 @@ void func_867006C4(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/55/fragment55_code/func_86703D98.s")
+extern s16 MathUtil_Atan2s(f32, f32);
+s16 func_86703D98(s8 arg0, s8 arg1) {
+    if (arg1 > 0) {
+        arg1 = 0;
+    }
+    return MathUtil_Atan2s(arg0, arg1) - 0xC000;
+}
 #endif
 
 #ifdef VERSION_US
