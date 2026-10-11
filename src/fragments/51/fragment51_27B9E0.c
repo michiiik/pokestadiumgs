@@ -13,7 +13,17 @@ void func_86305C48(void *arg0, void *arg1, f32 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/51/fragment51_27B9E0/func_86305D88.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/51/fragment51_27B9E0/func_86305E20.s")
+extern u8 *D_863075D8;
+extern void func_87C03B60(void *, void *, void *);
+extern void func_800277F0(u16, void *);
+void func_86305E20(u8 *arg0) {
+    s8 position[2];
+
+    if (*(s32 *)D_863075D8 == 4) {
+        func_87C03B60(D_863075D8 + 0x8F5C, arg0 + 0x48, position);
+        func_800277F0(0x6F04, position);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/51/fragment51_27B9E0/func_86305E70.s")
 
