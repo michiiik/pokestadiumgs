@@ -8,7 +8,24 @@ s32 fragment80_main(const u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_4194A0/func_84200038.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_4194A0/func_84200094.s")
+extern u8 func_8006397C(u8);
+extern u8 func_800639C0(u8);
+extern u8 func_80063454(u8, u8, u8, s32);
+u8 func_84200094(u8 *arg0, u8 arg1) {
+    struct {
+        u8 padding[2];
+        u8 first;
+        u8 unused;
+    } scratch;
+    u8 second;
+
+    scratch.first = func_8006397C(arg0[0]);
+    second = func_800639C0(arg0[0]);
+    if (func_80063454(arg1, scratch.first, second, 0) != 0) {
+        return 1;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_4194A0/func_842000EC.s")
 
