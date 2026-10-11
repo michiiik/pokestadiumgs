@@ -26,7 +26,13 @@ void func_8822AD4C(void) {
     Util_Free((s32) D_882348F0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_19DFC0/func_8822ADB0.s")
+extern void func_88004990(u8, u8);
+void func_8822ADB0(void) {
+    if (*(u16 *)((u8 *)D_80087200 + 8) & 0xC000) {
+        func_88004990(**(u8 **)D_882348F0, 0);
+        D_880068B8 = 1;
+    }
+}
 
 extern void func_889033A0(s32);
 void func_8822AE04(void) {
