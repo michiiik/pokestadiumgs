@@ -84,13 +84,13 @@ extern s32 D_80097120; s32 func_8004C594(s32 index,s32 value){s32 result=0; s32 
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C7A0.s")
 
-extern void func_8004C7A0();
-void func_8004C874(s32 arg0, s32 arg1) {
-    func_8004C7A0(0, 0, arg0, arg1);
+extern void *func_8004C7A0(void *, s32, s32, s32);
+void *func_8004C874(s32 arg0, s32 arg1) {
+    return func_8004C7A0(NULL, 0, arg0, arg1);
 }
 
-void func_8004C8A0(void) {
-    func_8004C7A0();
+void *func_8004C8A0(void *arg0, s32 arg1, s32 arg2, s32 arg3) {
+    return func_8004C7A0(arg0, arg1, arg2, arg3);
 }
 
 extern s32 func_8004C3EC(s32 arg0, s32 arg1, s32 arg2);
