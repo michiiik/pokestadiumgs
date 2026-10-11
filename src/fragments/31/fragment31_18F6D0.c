@@ -91,7 +91,17 @@ void func_8821CADC(s32 arg0, s32 arg1) {
     func_8821C47C(arg0, arg1, 13);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_18F6D0/func_8821CAFC.s")
+extern s32 func_80073828(s8 *, s8 *);
+s32 func_8821CAFC(S1_unk_func_88316128 *arg0, S1_unk_func_88316128 *arg1) {
+    s32 value = func_80073828((s8 *)arg0 + 0x3C, (s8 *)arg1 + 0x3C);
+    s32 result;
+    if (value != 0) {
+        result = value;
+    } else {
+        result = LabPCList_CompareByPointer(arg0, arg1);
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_18F6D0/func_8821CB48.s")
 
