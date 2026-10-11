@@ -128,7 +128,13 @@ void *func_87C00308(void *arg0, void *arg1, void *arg2, f64 arg3) {
     return arg0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C0035C.s")
+void *func_87C0035C(void *arg0, void *arg1, void *arg2) {
+    f64 scale = func_87C00208(arg1, arg2);
+    *(f64 *)((u8 *)arg0 + 0) = *(f64 *)((u8 *)arg2 + 0) * scale;
+    *(f64 *)((u8 *)arg0 + 8) = *(f64 *)((u8 *)arg2 + 8) * scale;
+    *(f64 *)((u8 *)arg0 + 0x10) = *(f64 *)((u8 *)arg2 + 0x10) * scale;
+    return arg0;
+}
 
 void func_87C003BC(void *arg0, void *arg1, void *arg2) {
     typedef struct { f64 x; f64 y; f64 z; } V;
