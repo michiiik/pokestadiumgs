@@ -979,7 +979,7 @@ s32 func_8005B6F0(s32 arg0, s32 arg1, s32 arg2) {
 
 #ifdef VERSION_US
 extern void func_800616BC(u8 *, u8 *);
-extern void func_80060EC8(void *, void *);
+extern u8 *func_80060EC8(void *, void *);
 extern void _bcopy(s32, s32, s32);
 extern u8 D_801285D0[];
 void func_8005B848(u8 *arg0, s32 arg1, s32 arg2) {
@@ -997,7 +997,7 @@ void func_8005B848(u8 *arg0, s32 arg1, s32 arg2) {
 
 #ifdef VERSION_US
 extern void _bcopy(s32, s32, s32);
-extern void func_80060EC8(void *, void *);
+extern u8 *func_80060EC8(void *, void *);
 extern void func_800616BC(u8 *arg0, u8 *arg1);
 extern u8 D_801285D0[];
 void func_8005B924(u8 *arg0, s32 arg1, s32 arg2) {
@@ -1810,7 +1810,7 @@ s32 func_8005DC48(s32 arg0, s32 arg1) {
 
 #ifdef VERSION_US
 extern u8 func_8005D92C(s32 index);
-extern void func_80060EC8(void *, void *);
+extern u8 *func_80060EC8(void *, void *);
 extern u8 D_80128570[];
 
 #ifdef CC_CHECK
