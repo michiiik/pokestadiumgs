@@ -76,7 +76,33 @@ void func_88225C20(void) { Input_SetRepeatController(D_80087200); D_880068B8 = 0
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_197640/func_88225D80.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_197640/func_88225EA0.s")
+extern u8 *D_88234870;
+s32 func_88225EA0(void) {
+    u32 index;
+    s32 result;
+    u8 *state;
+    u32 count;
+    u8 *entry;
+    result = 0;
+    index = 0;
+    state = D_88234870;
+    count = *(u16 *)(state + 0x18);
+    if (count != 0) {
+        entry = *(u8 **)(state + 0x98);
+loop:
+        if (*entry != 0) {
+            result = 1;
+            goto done;
+        }
+        index++;
+        entry++;
+        if (index < count) {
+            goto loop;
+        }
+    }
+done:
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_197640/func_88225EEC.s")
 
