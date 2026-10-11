@@ -345,7 +345,26 @@ void func_8AE015C4(s16 arg0, s16 arg1) { s32 pad; u8 sp1C[0x50]; _bzero(sp1C, 0x
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE018C4.s")
+extern s16 D_8AE08504;
+extern u8 * func_8AE00F84(u8 *arg0, u8 arg1);
+extern s16 D_8AE0A15C;
+void func_8AE018C4(s16 arg0, s32 arg1) {
+    s16 changed;
+    Fragment46LookupEntry *entry;
+    if (arg1 != 0) {
+        for (changed = 0; ; changed = 0) {
+            arg1 = (s32)func_8AE00F84((u8 *)arg1, ((u8 *)&D_8AE0A15C)[1]);
+            if (arg1 == 0) break;
+            entry = func_8AE00E54(arg0);
+            if (entry != NULL) {
+                if (entry->value == 0) changed = 1;
+                entry->value |= ((u8 *)arg1)[0];
+            }
+            arg1 += 5;
+            if (changed == 1) D_8AE08504++;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -353,7 +372,33 @@ void func_8AE015C4(s16 arg0, s16 arg1) { s32 pad; u8 sp1C[0x50]; _bzero(sp1C, 0x
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE01A90.s")
+extern s16 D_8AE08504;
+extern s16 D_8AE0A15C;
+void func_8AE01A90(s16 arg0, s32 arg1) {
+    s16 changed;
+    u32 *entry;
+
+    if (arg1 != 0) {
+        for (changed = 0; ; changed = 0) {
+            if (((u8 *)arg1)[0] == 0xFF) {
+                break;
+            }
+            if (D_8AE0A15C == ((u8 *)arg1)[4]) {
+                entry = (u32 *)func_8AE00E54(arg0);
+                if (entry != 0) {
+                    if (entry[1] == 0) {
+                        changed = 1;
+                    }
+                    entry[1] |= (((u8 *)arg1)[3] << 8) | 0x10;
+                }
+            }
+            arg1 += 6;
+            if (changed == 1) {
+                D_8AE08504++;
+            }
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -392,7 +437,40 @@ void func_8AE01B88(s16 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE01CCC.s")
+extern s16 D_8AE08504;
+extern s16 D_8AE0A15C;
+void func_8AE01CCC(s16 arg0, s32 arg1)
+{
+    s16 changed;
+    Fragment46LookupEntry *entry;
+    if (arg1 != 0)
+    {
+        for (changed = 0;; changed = 0)
+        {
+            if (((u8 *) arg1)[1] == 0xFF)
+            {
+                break;
+            }
+            if (D_8AE0A15C == ((u8 *) arg1)[1])
+            {
+                entry = func_8AE00E54(arg0);
+                if (entry != 0)
+                {
+                    if (entry->value == 0)
+                    {
+                        changed = 1;
+                    }
+                    entry->value |= ((((u8 *) arg1)[0] << 11) | 0x40) ^ 0;
+                }
+            }
+            arg1 += 4;
+            if (changed == 1)
+            {
+                D_8AE08504++;
+            }
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -609,7 +687,19 @@ s32 func_8AE03214(s16 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/46/fragment46_code/func_8AE032C8.s")
+extern char D_8AE09B60[];
+extern char D_8AE083D0[];
+extern void _bzero(void *, s32);
+s32 func_8AE032C8(arg0, arg1)
+volatile int arg0;
+s32 arg1;
+{
+    char *result;
+    result = ((arg1 % 3) << 8) + D_8AE09B60;
+    _bzero(result, 0x100);
+    sprintf(result, D_8AE083D0, arg0);
+    return (s32) result;
+}
 #endif
 
 #ifdef VERSION_US
@@ -627,7 +717,7 @@ extern char D_8AE083D4[];
 extern char D_8AE083DC[];
 extern char D_8AE083E4[];
 extern void func_800495BC();
-extern s32 func_8AE032C8(u8, s32);
+extern s32 func_8AE032C8();
 extern void func_8004C54C(s32, s32);
 extern void func_8004C8A0(void *, s32, s32, s32);
 extern void _bzero(void *, s32);
@@ -709,7 +799,7 @@ void func_8AE035BC(s32 arg0, s32 arg1, u8 *arg2) {
 
 #ifdef VERSION_US
 extern void _bzero(void *, s32);
-extern s32 func_8AE032C8(u8, s32);
+extern s32 func_8AE032C8();
 extern void func_8004C54C(s32, s32);
 extern void func_8004C8A0(void *, s32, s32, s32);
 extern void func_800495BC(s32, s32, s32, s32, void *);
