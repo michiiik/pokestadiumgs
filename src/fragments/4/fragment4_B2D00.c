@@ -80,7 +80,7 @@ void func_81804AE8_padding(void) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_B2D00/func_81805428.s")
 
-extern void *func_818054D0(void *arg0, s32 arg1);
+extern u8 *func_818054D0(void *arg0, u8 arg1);
 extern void func_81801CB8(void *arg0, void *arg1, void *arg2, s32 arg3);
 void func_81805474(void *arg0, u8 *arg1, void *arg2) {
     void *first_offset;
@@ -93,7 +93,27 @@ void func_81805474(void *arg0, u8 *arg1, void *arg2) {
     func_81801CB8(arg2, first_offset, (u8 *)second + 0x10, *(s32 *)(arg1 + 0x2C));
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_B2D00/func_818054D0.s")
+u8 *func_818054D0(void *arg0, u8 arg1) {
+    struct Entry {
+        s16 id;
+        s16 unused;
+        void *value;
+    } *entries = *(struct Entry **)((u8 *)arg0 + 0x30);
+
+    if (entries != NULL) {
+        struct Entry *entry = entries;
+        s32 value = entry->id;
+        s32 needle = arg1;
+        while (value >= 0) {
+            if (needle == value) {
+                return entry->value;
+            }
+            value = entry[1].id;
+            entry++;
+        }
+    }
+    return (u8 *)arg0 + 4;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_B2D00/func_81805524.s")
 
@@ -112,7 +132,7 @@ s32 func_818055A4(void) {
     return var_a0;
 }
 
-extern void *func_818054D0(void *arg0, s32 arg1);
+extern u8 *func_818054D0(void *arg0, u8 arg1);
 extern s32 func_81804B74(void *arg0, void *arg1);
 f32 func_818055E0(void *arg0, u8 *arg1) {
     void *first;
