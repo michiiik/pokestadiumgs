@@ -90,7 +90,24 @@ void func_83100B2C(void *arg0, u8 *arg1, void *arg2) {
     func_81700908();
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/6/fragment6_code/func_83100B8C.s")
+extern void *func_818054D0(void *, s32);
+s32 func_83100B8C(void *arg0, u8 *arg1) {
+    struct { s32 unused; s32 value; f64 tail; } result;
+    s32 value;
+
+    func_818054D0(arg0, arg1[0x1F]);
+    result.value = 0;
+    *(u16 *)(arg1 + 0x60) -= 1;
+    value = *(u16 *)(arg1 + 0x60);
+    if (value == 0) {
+        *(u16 *)(arg1 + 0x60) = func_83100020();
+        value = *(u16 *)(arg1 + 0x60);
+    }
+    if (value < 8) {
+        result.value = 1;
+    }
+    return result.value;
+}
 
 extern f32 func_818055E0(void *, u8 *);
 extern void func_818057D0(void *, void *, void *);
