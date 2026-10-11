@@ -21,18 +21,36 @@ void func_8AB0FE08(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8AB1007C(s32);
+extern s32 func_8AB1007C(s32);
 void func_8AB1005C(void) {
     func_8AB1007C(0);
 }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2348E0/func_8AB1007C.s")
+extern void func_8AB04AE4(void);
+extern u8 StageContext_GetFadeMode(void);
+extern s32 func_8AB10144(s32);
+
+s32 func_8AB1007C(s32 arg0) {
+    s32 result = 0x3D;
+
+    switch (arg0) {
+    case 0:
+        func_8AB04AE4();
+        break;
+    case 1:
+        if (StageContext_GetFadeMode() == 0) {
+            result = func_8AB10144(0);
+        }
+        break;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
-extern s32 StageContext_GetFadeMode(void);
+extern u8 StageContext_GetFadeMode(void);
 extern void StageFade_StartFromTransparent(s32);
 s32 func_8AB100E0(s32 arg0) {
     s32 result = 0x3E;
