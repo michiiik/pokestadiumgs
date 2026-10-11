@@ -132,7 +132,23 @@ void func_83100BF8(void *arg0, u8 *arg1, void *arg2) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/6/fragment6_code/func_83100CA4.s")
+s32 func_83100CA4(void *arg0, u8 *arg1) {
+    struct { s32 unused; s32 value; f64 tail; } result;
+    s32 value;
+
+    func_818054D0(arg0, arg1[0x1F]);
+    result.value = 0;
+    *(u16 *)(arg1 + 0x62) -= 1;
+    value = *(u16 *)(arg1 + 0x62);
+    if (value == 0) {
+        *(u16 *)(arg1 + 0x62) = func_83100020();
+        value = *(u16 *)(arg1 + 0x62);
+    }
+    if (value < 8) {
+        result.value = 1;
+    }
+    return result.value;
+}
 
 extern f32 func_818055E0(void *, u8 *);
 extern void func_818057D0(void *, void *, void *);
