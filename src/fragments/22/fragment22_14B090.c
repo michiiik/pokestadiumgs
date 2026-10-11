@@ -336,7 +336,40 @@ s32 arg1;
     func_800499EC();
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14B090/func_82702CD8.s")
+extern struct IDs { s16 a, b, c; } D_827032E8;
+extern void func_800495F8(s32, s32, s32, s32);
+extern void func_800496A4(s32, s32);
+extern void func_8004972C(s32, s32, s32, s32);
+extern void func_800498C4(void);
+extern void func_800499EC(void);
+extern s32 func_8004C874(s32, s32);
+extern u8 D_827032D0[];
+extern u8 D_827032D4[];
+void func_82702CD8(arg0, arg1) void *arg0; s32 arg1; {
+    volatile s32 reserve[2];
+    struct IDs sp30;
+    s32 sp2C;
+    u8 *sp28;
+
+    sp30 = D_827032E8;
+    sp2C = (*(s16 *)((u8 *)arg0 + 0xC) * 0xFF) / 255;
+    if (arg1 == 0) {
+        sp28 = D_827032D0;
+    } else {
+        sp28 = D_827032D4;
+    }
+    func_800498C4();
+    func_8004972C(sp28[0], sp28[1], sp28[2], sp2C);
+    if (((s16 *)&sp30)[*(s16 *)((u8 *)arg0 + 2)] >= 0) {
+        func_800496A4(0x10, 0);
+        func_800495F8(
+            *(s16 *)((u8 *)arg0 + 0x12) + 0x40,
+            *(s16 *)((u8 *)arg0 + 0x14) + 4,
+            0,
+            func_8004C874(0x1A, ((s16 *)&sp30)[*(s16 *)((u8 *)arg0 + 2)]));
+    }
+    func_800499EC();
+}
 
 #ifdef CC_CHECK
 extern void func_82702954(void *, s32);
