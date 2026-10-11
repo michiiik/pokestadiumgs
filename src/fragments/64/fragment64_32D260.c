@@ -28,7 +28,14 @@ void func_87F0A688(TreeNode_80050428 *arg0, s32 arg1, s32 arg2) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_32D260/func_87F0A6C8.s")
+void func_87F0A6C8(TreeNode_80050428 *arg0, s32 arg1, u32 *arg2, u32 *arg3) {
+    u8 *entry = func_8005049C(arg0, arg1);
+    if (entry == NULL) {
+        func_87F0A5F0(arg1);
+    } else {
+        func_87F0A66C(entry, arg2, arg3);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_32D260/func_87F0A714.s")
 
