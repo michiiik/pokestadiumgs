@@ -283,7 +283,8 @@ void func_87E107B4(void *arg0) {
 
 extern void func_87F0A6C8(s32, s32, s32 *, s32 *);
 extern void func_87F0AA80(s32, s32, s32 *);
-s32 func_87F0AB08(s32, s32, void (*)(s32, u8 *), s32);
+typedef struct TreeNode_80050428 TreeNode_80050428;
+void *func_87F0AB08(TreeNode_80050428 *, s32, void (*)(s32, u8 *), void *);
 extern u8 D_87E1A5D0;
 extern u8 D_87E1A5D4;
 extern u8 D_87E1A5E4;
@@ -291,7 +292,7 @@ void func_87E1097C(s32 *arg0, s32 arg1) {
     if (arg1 == 0xE3) {
         func_87F0A6C8(*arg0, 0x44425F43, &D_87E1A5D0, &D_87E1A5D4);
         func_87F0AA80(*arg0, 0x44425F4D, &D_87E1A5E4);
-        func_87F0AB08(*arg0, 0x44425F50, func_87E10500, 0);
+        func_87F0AB08((TreeNode_80050428 *)*arg0, 0x44425F50, func_87E10500, NULL);
     }
 }
 
