@@ -1881,7 +1881,14 @@ void func_8003455C(u8 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003459C.s")
+extern void func_8003492C(u8, u16);
+void func_8003459C(u8 arg0, s32 arg1) {
+    struct { u8 pad[7]; u8 hi; } temp;
+    s32 low;
+    temp.hi = func_800347E8(arg0);
+    low = func_800347E8(arg0);
+    func_8003492C(arg0, (u16)((temp.hi << 8) + low));
+}
 #endif
 
 #ifdef VERSION_US
