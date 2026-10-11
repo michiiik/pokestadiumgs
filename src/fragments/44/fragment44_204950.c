@@ -40,7 +40,20 @@ s16 func_8AF16D2C(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_204950/func_8AF16E60.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_204950/func_8AF16EB0.s")
+extern u16 *D_8AF2BAA4;
+s32 func_8AF16EB0(u8 arg0) {
+    u16 *entry;
+    u16 value;
+    s32 result;
+    entry = D_8AF2BAA4;
+    entry += arg0;
+    value = *--entry;
+    result = 0;
+    if (value & 1) {
+        return 1;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_204950/func_8AF16EF0.s")
 
