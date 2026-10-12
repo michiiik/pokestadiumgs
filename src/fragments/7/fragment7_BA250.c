@@ -303,7 +303,35 @@ void func_83001FA4(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_830020CC.s")
+extern void func_800498C4();
+extern void func_800499EC();
+extern void func_8180351C(void *);
+extern char *func_81802168(void *);
+extern void func_800495F8(s32, s32, s32, void *);
+extern s32 D_8300F86C[];
+extern s32 D_8300F874[];
+extern s32 D_8300F87C[];
+extern s32 D_8300F884[];
+extern u8 D_8300F88C[];
+void func_830020CC(void *arg0, f32 arg1, s32 arg2, s32 arg3, f32 arg4) {
+    s32 start = (s32)arg1;
+    s32 i;
+    u8 *record;
+    func_800498C4();
+    for (i = start; i < start + 4; i++) {
+        if (i >= ((u8 *)arg0)[1]) break;
+        record = (u8 *)arg0 + i * 0x490 + 4;
+        func_8180351C(D_8300F86C);
+        func_800495F8(arg2 + 0x7E, (s32)((f32)(arg3 + 0x32) + 71.0f * (i - arg1)), D_8300F86C[0], record + 0x468);
+        func_8180351C(D_8300F874);
+        func_800495F8(arg2 + 0x13, (s32)((f32)(arg3 + 0x48) + 71.0f * (i - arg1)), D_8300F874[0], record + 0xD);
+        func_8180351C(D_8300F87C);
+        func_800495F8(arg2 + 0xE9, (s32)((f32)(arg3 + 0x48) + 71.0f * (i - arg1)), D_8300F87C[0], record + 0x1E9);
+        func_8180351C(D_8300F884);
+        func_800495F8(arg2 + 0x7E, (s32)((f32)(arg3 + 0x50) + 71.0f * (i - arg1)), D_8300F884[0], func_81802168(D_8300F88C));
+    }
+    func_800499EC();
+}
 #endif
 
 #ifdef VERSION_US
