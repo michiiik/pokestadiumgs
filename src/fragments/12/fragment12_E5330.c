@@ -111,7 +111,7 @@ extern void func_81400020(s32);
 extern void func_81400194();
 s32 func_81400218(s32);
 extern void func_81406F44(u8 *, s32);
-extern void func_81600954(s32);
+extern void func_81600954(void *);
 extern void func_81600B30(s32);
 extern void func_816018CC(s32);
 void func_814002E8(void) {
@@ -125,7 +125,7 @@ void func_814002E8(void) {
     do {
         func_80064D28();
         func_816018CC(1);
-        func_81600954(D_814077A0);
+        func_81600954((void *)D_814077A0);
         func_81400020(D_814077A0);
         func_81406F44(&D_81407BB8, D_814077A0);
         func_81600B30(D_814077A0);
