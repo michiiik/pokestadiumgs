@@ -21,7 +21,15 @@ void func_88229F08(void) {
     Util_Free(D_882348D0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_19D160/func_88229F44.s")
+extern void func_88004990(u8, u8);
+void func_88229F44(void) {
+    s32 offset;
+
+    for (offset = 0; offset < 0xC; offset += 4) {
+        func_88004990(**(u8 **)((u8 *)D_882348D0 + offset), 0);
+    }
+    D_880068B8 = 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_19D160/func_88229FB0.s")
 
