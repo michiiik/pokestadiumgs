@@ -1077,7 +1077,25 @@ void func_83008F84(void *arg0, s32 arg1)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_830094C8.s")
+extern void func_800226C0(s32);
+extern void func_830009D8(s32 arg0, void *arg1, void *arg2);
+void func_830094C8(void *arg0, s32 arg1) {
+    u8 *p = arg0;
+    u8 *q;
+    switch (arg1) {
+        case -1:
+            p[0x1E] = 0xB;
+            func_800226C0(3);
+            return;
+        case 1:
+        case 2:
+            q = (((p + ((s32)p[0x3E] * 0x1B64)) + ((s32)p[0x40] * 0x490)) + ((u32)p[0x59] * 0x490)) + (0, 0x382A0);
+            func_830009D8((s32)arg0, q + 0x424, 0);
+            p[0x1E] = 0xD;
+            func_800226C0(2);
+            return;
+    }
+}
 #endif
 
 #ifdef VERSION_US
