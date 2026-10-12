@@ -91,7 +91,19 @@ void *func_88211084(void *arg0, void *arg1) {
     return arg1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_183700/func_882110FC.s")
+extern s32 HAL_Strcmp(const s8 *, const s8 *);
+extern s8 **D_8823466C[];
+s32 func_882110FC(void *arg0) {
+    s32 result = 0;
+    s8 text[0x20];
+    s8 *value;
+
+    value = func_88211084(arg0, text);
+    if (HAL_Strcmp(D_8823466C[(*(u8 **)arg0)[8]][*(u8 *)((u8 *)arg0 + 4)], value) != 0) {
+        result = 1;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_183700/func_88211168.s")
 
