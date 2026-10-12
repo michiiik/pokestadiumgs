@@ -81,7 +81,20 @@ void func_8F100218(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/69/fragment69_code/func_8F100220.s")
+s32 func_8F100220(s32 arg0) {
+    s16 *entry = (s16 *)(D_8F1DF270 + arg0 * 6);
+    s32 result = -2;
+
+    switch (*entry) {
+        case 3:
+            result = entry[2];
+            break;
+        case 4:
+            result = -1;
+            break;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
