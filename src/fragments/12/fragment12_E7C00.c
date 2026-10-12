@@ -106,7 +106,52 @@ void func_81403918(s32 arg0) {
     func_81403244((arg0 + 8));
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81403938.s")
+extern s32 func_81403304(s32);
+s32 func_81403938(s32 arg0)
+{
+    f64 alignmentPad;
+    s32 found = 0;
+    s32 offset = 0;
+    u8 *scan = (u8 *) arg0;
+    s8 **slot;
+    s32 j;
+    s32 slotOffset;
+    if (!scan)
+    {
+    }
+    j = 0xC60;
+    do
+    {
+        offset += 0x210;
+        if ((*((s16 *) (scan + 0x210))) >= 0)
+        {
+            found = 1;
+            break;
+        }
+        scan += 0x210;
+    }
+    while (offset != j);
+    func_81403304(arg0 + 8);
+    slotOffset = 0;
+    slot = (s8 **) arg0;
+    do
+    {
+        slotOffset += 4;
+        if ((*slot) != 0)
+        {
+            for (j = 0; j < 6; j++)
+            {
+                (*slot)[0xA + j] = -1;
+            }
+        }
+        slot++;
+    }
+    while (slotOffset != 8);
+    if (found)
+    {
+        func_80023110(1, *((s32 *) (arg0 + 0xCC4)), 0);
+    }
+}
 
 void func_81403A18(void *arg0) {
     u8 temp_v0;
@@ -163,9 +208,82 @@ s32 func_81403B18(void *arg0) {
     return 1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81403B7C.s")
+extern void func_81403828(void *arg0, void *arg1);
+extern s32 func_81403A64(u8 *arg0);
+extern s32 func_81403A74(void *arg0);
+extern s32 func_81403AE0(void *arg0);
+extern s32 func_81403B18(void *arg0);
+extern void func_81600A34(void *arg0, void *arg1, void *arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6);
+void func_81403B7C(u8 *arg0, void *arg1)
+{
+    s16 out[4];
+    void *result;
+    f32 value;
+    *((f32 *) (arg0 + 0xCB0)) = 0.0f;
+    switch (arg0[0xCC0]) {
+        case 0: result = (void *) func_81403A64(arg0); break;
+        case 3: result = (void *) func_81403B18(arg0); break;
+        case 1: result = (void *) func_81403A74(arg0); break;
+        case 2: result = (void *) func_81403AE0(arg0); break;
+    }
+    ;
+    if ((*((f32 *) (arg0 + 0xCB0))) > 410.0f) {
+        func_80023110(0, *((s32 *) (arg0 + 0xCC4)), 0);
+    } else if ((*((f32 *) (arg0 + 0xCB0))) > 150.0f) {
+        func_80023110(0, *((s32 *) (arg0 + 0xCC4)), 1);
+    } else if ((*((f32 *) (arg0 + 0xCB0))) > 20.0f) {
+        func_80023110(0, *((s32 *) (arg0 + 0xCC4)), 2);
+    }
+    func_81403828(arg0, out);
+    func_81600A34(arg1, arg0, result, out[0], out[1], out[2], out[3]);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81403CD0.s")
+extern s32 func_81600DA8(void *, void *);
+extern s32 func_81602D70(s32);
+extern void func_80006F70(Gfx **, s32, s32, s32, s32);
+extern void func_81607360(void *);
+extern void func_81607408(void);
+extern void func_814018F4(s32, s32, s32, s32, s32, s32);
+extern void func_81401DB0(s32, s32, s32, s32, s32, s32);
+extern void func_81403400(void *, s32, s32, s32);
+extern Gfx *D_800D0510;
+extern s32 func_81403710(void *arg0);
+extern s16 func_81403758();
+extern void func_81403828(void *arg0, void *arg1);
+void func_81403CD0(void *arg0, void *arg1) {
+    u8 bits;
+    s32 value;
+    s32 second;
+    s16 rect[4];
+    s32 first;
+    u8 *entry;
+    if (func_81600DA8(arg1, arg0) != 0) {
+        bits = func_81403710(arg0);
+        entry = *(u8 **)arg0;
+        if (entry != 0) {
+            value = func_81602D70(entry[7]);
+        } else {
+            value = func_81602D70(entry[7]);
+        }
+        first = value;
+        entry = *(u8 **)((u8 *)arg0 + 4);
+        if (entry != 0) {
+            second = func_81602D70(entry[7]);
+        } else {
+            second = value;
+        }
+        func_80006F70(&D_800D0510, 0, 0, 0x280, 0x1E0);
+        func_81403828(arg0, rect);
+        func_81607360(rect);
+        if (*(s32 *)((u8 *)arg0 + 0xCC4) != 0) {
+            func_81401DB0(rect[0], rect[1], bits, first, second, *(u8 *)((u8 *)arg0 + 0xCC2));
+        } else {
+            func_814018F4(rect[0], rect[3] + rect[1], bits, first, second, *(u8 *)((u8 *)arg0 + 0xCC2));
+        }
+        func_81403400((u8 *)arg0 + 8, rect[2] / 2 + rect[0], func_81403758(arg0), *(s32 *)((u8 *)arg0 + 0xCC4));
+        func_81607408();
+    }
+}
 
 void func_81403E2C(void *arg0) {
     u8 temp_v0;
@@ -744,7 +862,7 @@ typedef struct { u8 padding[0x18F58]; s32 finished; s32 activated; } F81406F44St
 typedef struct { u8 padding[0xF48]; s32 active[4]; s32 finished; s32 activated; } F81406F44TailView;
 extern void func_814071C4(void *arg0);
 extern void func_81405514(void *arg0, void *arg1);
-extern void func_81403B7C(void *arg0, void *arg1);
+extern void func_81403B7C(u8 *arg0, void *arg1);
 extern void func_800225C4(s32 arg0);
 extern void func_81406A30(void *arg0);
 extern s32 func_81406A74(u8 *arg0);
