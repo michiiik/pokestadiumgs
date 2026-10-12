@@ -297,7 +297,14 @@ void func_80047670(void) {
 
 void Font_EnableLineBreak(void) { D_80126F50[0x7A] = (u8)(D_80126F50[0x7A] & ~4); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800476A0.s")
+extern void _bzero(void *, s32);
+void func_800476A0(u8 *arg0, s32 arg1) {
+    s32 index;
+
+    for (index = 0; index < arg1; index++) {
+        _bzero(arg0 + index * 0x10, 0x10);
+    }
+}
 
 s32 func_800476FC(s32 arg0, s32 arg1) { s32 result = 0; if (arg1 > 0 && arg1 < 0x100 && D_80126F50 != NULL) { *(s32 *)(D_80126F50 + 0x50) = arg0; D_80126F50[0x7F] = arg1; result = 1; } return result; }
 
