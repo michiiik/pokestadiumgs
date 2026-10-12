@@ -77,3 +77,43 @@ func_83003320: matched (call_sequence:aggregate_copy:named_state_carrier), 6 ite
 ## 2026-10-04
 
 func_83007D40: plateau at 1.0 (raw 0.9798), mismatch immediate_drift; tried families: call_sequence; tie-pool yes
+
+## 2026-10-12
+
+func_830094C8: matched (call_sequence:pointer_temp:unsigned_last_comma_constant_exact), 1 iterations, agent codex
+
+## 2026-10-12
+
+func_83000BC0: matched (call_sequence:guard_returns:byte_arguments_signed_result), 1 iterations, agent codex
+
+## 2026-10-12
+
+func_8300A5B4: matched (call_sequence:aggregate_copy:matched_direct_global_byte), 1 iterations, agent codex
+
+## 2026-10-12
+
+func_830020CC: matched (call_chain:row_render:inline_common_expressions_exact), 1 iterations, agent codex
+
+## 2026-10-12
+
+func_83009EC4: matched (call_chain:iteration_scope:iteration_local_indexed_pointers), 2 iterations, agent codex
+
+## 2026-10-12
+
+func_83000F04: matched (call_sequence:permuter:instruction_exact_result), 1 iterations, agent codex
+
+## 2026-10-12
+
+func_8300A50C: matched (call_chain:initialization:direct_unsigned_segment), 1 iterations, agent codex
+
+## 2026-10-12
+
+func_830088A0: matched (call_sequence:aggregate_copy:later_first_pointer_with_word_home), 1 iterations, agent codex
+
+## 2026-10-12
+
+func_83000E40: matched (call_sequence:parameter_counters:reuse_both_integer_arguments), 4 iterations, agent codex
+
+## 2026-10-12
+
+func_8300A208: matched (call_chain:state_reload:integer_cast_named_fields), 1 iterations, agent codex
