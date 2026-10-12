@@ -71,7 +71,24 @@ void func_87F02684(F2684State *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_324FB0/func_87F0277C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_324FB0/func_87F02800.s")
+s32 func_87F02800(s32 arg0, u8 *arg1) {
+    u8 *resource;
+    u8 *position;
+
+    if (arg0 == 2) {
+        resource = *(u8 **)(arg1 + 0x14);
+        position = *(u8 **)(resource + 0x20);
+        *(f32 *)(arg1 + 0x24) = *(f32 *)(position + 4);
+        *(f32 *)(arg1 + 0x28) = *(f32 *)(position + 8);
+        *(f32 *)(arg1 + 0x2C) = *(f32 *)(position + 0xC);
+        if (*(u8 **)position != NULL) {
+            *(f32 *)(arg1 + 0x24) += *(f32 *)(*(u8 **)position + 0x24);
+            *(f32 *)(arg1 + 0x28) += *(f32 *)(*(u8 **)position + 0x28);
+            *(f32 *)(arg1 + 0x2C) += *(f32 *)(*(u8 **)position + 0x2C);
+        }
+    }
+    return 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_324FB0/func_87F02878.s")
 
