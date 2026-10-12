@@ -14,7 +14,23 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/66/fragment66_code/func_82E007F0.s")
+extern s32 D_82E075E4;
+extern s32 D_82E05650;
+extern s32 D_82E07130;
+s32 func_82E007F0(s32 arg0, u8 *arg1) {
+    switch (arg0) {
+    case 0:
+        D_82E075E4 = arg1[0x2B] + (arg1[0x2A] << 8);
+        if (D_82E05650 == 0) {
+            *(s32 *)((u8 *)&D_82E07130 + 0x4B4) = (*(s32 *)((u8 *)&D_82E07130 + 0x4B4) * 5) / 6;
+        }
+        *(u16 *)(arg1 + 2) &= ~1;
+        break;
+    case 1:
+        break;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -63,7 +79,24 @@ s32 func_82E019B0(s32 arg0, u8 *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/66/fragment66_code/func_82E0248C.s")
+extern s16 D_82E06158;
+extern s32 D_82E05650;
+s32 func_82E0248C(s32 arg0, u8 *arg1) {
+    s32 mode;
+    switch (arg0) {
+    case 0:
+        mode = 6;
+        D_82E06158 = arg1[0x29] + (arg1[0x28] << 8);
+        if (D_82E05650 == 0) {
+            D_82E06158 = ((arg1[0x29] + (arg1[0x28] << 8)) * 5) / mode;
+        }
+        *(u16 *)(arg1 + 2) &= ~1;
+        break;
+    case 1:
+        break;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
