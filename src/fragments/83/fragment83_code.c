@@ -33,11 +33,25 @@ void func_82C0012C(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C00164.s")
+extern Gfx* D_800D0510;
+void func_82C00164(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
+    s16 right;
+    s16 bottom;
+
+    if ((right = arg0 + arg2 - 1) >= 640) right = 639;
+    if (right < 0) right = 0;
+    if ((bottom = arg1 + arg3 - 1) >= 480) bottom = 479;
+    if (bottom < 0) bottom = 0;
+    if (arg0 < 0) arg0 = 0;
+    if (arg0 >= 640) arg0 = 639;
+    if (arg1 < 0) arg1 = 0;
+    if (arg1 >= 480) arg1 = 479;
+    gDPSetScissor(D_800D0510++, G_SC_NON_INTERLACE, arg0, arg1, right, bottom);
+}
 #endif
 
 #ifdef VERSION_US
-extern void func_82C00164(s32, s32, s32, s32);
+extern void func_82C00164(s16, s16, u16, u16);
 void func_82C002B8(u8 *arg0) {
     func_82C00164(*(s16 *)(arg0 + 0), *(s16 *)(arg0 + 2), *(u16 *)(arg0 + 4), *(u16 *)(arg0 + 6));
 }
@@ -561,7 +575,38 @@ s32 func_82C03D50(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C03DC0.s")
+extern s8 * HAL_Strcpy(s8 *, s8 *);
+extern s8 * func_8004C874(s32, s32);
+s32 func_82C03DC0(s32 arg0, s32 arg1, void *arg2) {
+    s32 var_v1;
+
+    var_v1 = 0;
+    switch (*(s16 *)((u8 *)arg2 + 0x34)) {
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+        break;
+    default:
+        if (((*(u32 *)((u8 *)arg2 + 0x40) << 5) >> 31) != 0) {
+            if (((*(u32 *)((u8 *)arg2 + 0x40) << 2) >> 31) != 0) {
+            HAL_Strcpy(arg0 + 4, func_8004C874(0x15, 0xE));
+            HAL_Strcpy(arg0 + 0x54, func_8004C874(0x15, 0x29));
+            var_v1 = 1;
+            } else {
+            HAL_Strcpy(arg0 + 4, func_8004C874(0x15, 0xD));
+            HAL_Strcpy(arg0 + 0x54, func_8004C874(0x15, 0x28));
+            var_v1 = 1;
+            }
+        } else {
+            HAL_Strcpy(arg0 + 4, func_8004C874(0x15, 0xF));
+            HAL_Strcpy(arg0 + 0x54, func_8004C874(0x15, 0x2A));
+            var_v1 = 1;
+        }
+        break;
+    }
+    return var_v1;
+}
 #endif
 
 #ifdef VERSION_US
