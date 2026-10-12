@@ -208,7 +208,35 @@ s32 func_81403B18(void *arg0) {
     return 1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81403B7C.s")
+extern void func_81403828(void *arg0, void *arg1);
+extern s32 func_81403A64(u8 *arg0);
+extern s32 func_81403A74(void *arg0);
+extern s32 func_81403AE0(void *arg0);
+extern s32 func_81403B18(void *arg0);
+extern void func_81600A34(void *arg0, void *arg1, void *arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6);
+void func_81403B7C(u8 *arg0, void *arg1)
+{
+    s16 out[4];
+    void *result;
+    f32 value;
+    *((f32 *) (arg0 + 0xCB0)) = 0.0f;
+    switch (arg0[0xCC0]) {
+        case 0: result = (void *) func_81403A64(arg0); break;
+        case 3: result = (void *) func_81403B18(arg0); break;
+        case 1: result = (void *) func_81403A74(arg0); break;
+        case 2: result = (void *) func_81403AE0(arg0); break;
+    }
+    ;
+    if ((*((f32 *) (arg0 + 0xCB0))) > 410.0f) {
+        func_80023110(0, *((s32 *) (arg0 + 0xCC4)), 0);
+    } else if ((*((f32 *) (arg0 + 0xCB0))) > 150.0f) {
+        func_80023110(0, *((s32 *) (arg0 + 0xCC4)), 1);
+    } else if ((*((f32 *) (arg0 + 0xCB0))) > 20.0f) {
+        func_80023110(0, *((s32 *) (arg0 + 0xCC4)), 2);
+    }
+    func_81403828(arg0, out);
+    func_81600A34(arg1, arg0, result, out[0], out[1], out[2], out[3]);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81403CD0.s")
 
@@ -789,7 +817,7 @@ typedef struct { u8 padding[0x18F58]; s32 finished; s32 activated; } F81406F44St
 typedef struct { u8 padding[0xF48]; s32 active[4]; s32 finished; s32 activated; } F81406F44TailView;
 extern void func_814071C4(void *arg0);
 extern void func_81405514(void *arg0, void *arg1);
-extern void func_81403B7C(void *arg0, void *arg1);
+extern void func_81403B7C(u8 *arg0, void *arg1);
 extern void func_800225C4(s32 arg0);
 extern void func_81406A30(void *arg0);
 extern s32 func_81406A74(u8 *arg0);
