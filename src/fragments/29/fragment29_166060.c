@@ -54,7 +54,23 @@ void func_88000488(s32 *arg0, s32 arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_166060/func_88000510.s")
+typedef struct {
+    u8 red;
+    u8 green;
+    u8 blue;
+} Color_88000510;
+extern s8 D_88005FE8[];
+extern Color_88000510 D_88005FAC[];
+Color_88000510 func_88000510(s8 arg0) {
+    s32 index;
+
+    for (index = 0; index < 0x12; index++) {
+        if (arg0 == D_88005FE8[index]) {
+            break;
+        }
+    }
+    return D_88005FAC[index];
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_166060/func_88000578.s")
 
