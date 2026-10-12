@@ -117,3 +117,7 @@ func_83000E40: matched (call_sequence:parameter_counters:reuse_both_integer_argu
 ## 2026-10-12
 
 func_8300A208: matched (call_chain:state_reload:integer_cast_named_fields), 1 iterations, agent codex
+
+## 2026-10-12
+
+func_83000F04: matched (call_sequence:permuter_exact:compact_struct_spelling), 1 iterations, agent codex
