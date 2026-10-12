@@ -171,7 +171,44 @@ void func_88225C20(void) { Input_SetRepeatController(D_80087200); D_880068B8 = 0
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_197640/func_88225C48.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_197640/func_88225D80.s")
+extern u8 *D_88A01C30;
+extern u8 *D_88A01C34;
+extern u8 *D_88234870;
+void func_88225D80(s32 direction) {
+    u8 *groups;
+    u8 *entries;
+    s32 i;
+    u32 j;
+    for (i = 0, groups = D_88A01C30, entries = D_88A01C34; i < 3; i++) {
+        for (j = 0; j < groups[0x10]; j++) {
+            switch (i) {
+            case 0:
+                if (direction == 0) {
+                    D_88234870[0x94] = *(s32 *)(entries + 8);
+                } else {
+                    *(s32 *)(entries + 8) = D_88234870[0x94];
+                }
+                break;
+            case 1:
+                if (direction == 0) {
+                    (*(u8 **)(D_88234870 + 0x98))[j] = *(s32 *)(entries + 8);
+                } else {
+                    *(s32 *)(entries + 8) = (*(u8 **)(D_88234870 + 0x98))[j];
+                }
+                break;
+            case 2:
+                if (direction == 0) {
+                    (*(u8 **)(D_88234870 + 0x9C))[j] = *(s32 *)(entries + 8);
+                } else {
+                    *(s32 *)(entries + 8) = (*(u8 **)(D_88234870 + 0x9C))[j];
+                }
+                break;
+            }
+            entries += 0x18;
+        }
+        groups += 0x14;
+    }
+}
 
 extern u8 *D_88234870;
 s32 func_88225EA0(void) {
