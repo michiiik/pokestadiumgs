@@ -1173,7 +1173,50 @@ void func_83009EC4(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_8300A208.s")
+extern u8 D_8303FD00[];
+extern u8 D_8304FB84[];
+extern u8 D_82C00000[];
+extern u8 fragment83_ROM_START[];
+extern u8 fragment84_ROM_START[];
+extern void StageLoader_WaitForRetrace();
+s32 Fragment_LoadAndCall(s32, void *, void *, s32, void *);
+extern s32 Fragment_LoadAndCall(s32, void *, void *, s32, void *);
+extern void StageLoader_WaitForRetrace();
+extern void func_80008648();
+extern void func_800088DC();
+extern void func_818017A8();
+extern void func_81805308(s32 *);
+extern void func_83009BD0(void *, s32);
+extern void main_pool_pop_state(s32);
+extern u8 D_8300FD00;
+extern u8 D_8304FBCC;
+void func_8300A208(void) {
+    extern void func_800088DC();
+    extern void func_818017A8();
+    extern void func_81805308(s32 *);
+    extern void func_80008648();
+    extern void func_8004C398(void);
+    extern void main_pool_pop_state(s32);
+    extern void func_83009BD0(void *, s32);
+    extern void func_80008624(void);
+    extern u8 D_8300FD00;
+    extern u8 D_8304FBCC;
+    struct State { u8 pad[0xFEC8]; s32 argument; u8 gap[0x64]; s32 clear; };
+    struct State *p;
+    func_800088DC();
+    func_818017A8();
+    func_81805308((s32 *)&D_8300FD00);
+    func_80008648();
+    StageLoader_WaitForRetrace();
+    func_8004C398();
+    main_pool_pop_state(0x4D535243);
+    p = (struct State *)(u32)D_8303FD00;
+    p->clear = 0;
+    Fragment_LoadAndCall((((u32)D_82C00000 & 0x0FF00000) >> 20) - 0x10, fragment83_ROM_START, fragment84_ROM_START, p->argument, D_8304FB84);
+    func_83009BD0(&D_8300FD00, 0xC7);
+    func_80008624();
+    D_8304FBCC = 0;
+}
 #endif
 
 #ifdef VERSION_US
