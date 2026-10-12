@@ -1291,7 +1291,26 @@ s32 arg2;
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_8300A5B4.s")
+extern u8 D_8300FD3C[];
+extern void func_8004C398(void);
+extern void func_80047610(void);
+extern void main_pool_pop_state(s32);
+extern u8 D_8300FD00;
+void func_8300A5B4(s32 arg0, s32 arg1) {
+    struct Payload { u8 bytes[31]; };
+    struct Object { u8 pad[0x10]; s32 active; u8 pad2[8]; struct Payload payload; };
+    struct State { u8 pad[0x1D]; u8 value; u8 pad2[0x1A]; struct Object *object; };
+    volatile struct State *state = (struct State *)&D_8300FD00;
+    struct Object *object = state->object;
+    if (object->active != 0) {
+        object->payload = *(struct Payload *)D_8300FD3C;
+        state->object->payload.bytes[0x1A] = (&D_8300FD00)[0x1D];
+    }
+    func_8004C398();
+    main_pool_pop_state(0x4D535243);
+    func_80047610();
+    main_pool_pop_state(0x4D535F32);
+}
 #endif
 
 #ifdef VERSION_US
