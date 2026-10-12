@@ -1261,7 +1261,33 @@ void func_8300A4BC(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_8300A50C.s")
+extern void main_pool_push_state(s32);
+extern u8 D_1000000[];
+extern u8 D_446E30[];
+extern u8 D_447D00[];
+extern u8 *Asset_LoadToSegment(s32, u8 *, u8 *, s32);
+extern void func_80055948(s32);
+extern void func_80047588(s32, s32);
+extern void func_830098A0(void *, s32, s32, s32);
+extern void func_80008624(void);
+extern void func_81801794(void);
+extern void func_83009BD0(void *, s32);
+extern void main_pool_push_state(s32);
+extern u8 D_8300FD00;
+void func_8300A50C(arg0, arg1, arg2)
+s32 arg0;
+s32 arg1;
+s32 arg2;
+{
+    main_pool_push_state(0x4D535F32);
+    Asset_LoadToSegment(((u32)D_1000000 & 0x0F000000) >> 24, D_446E30, D_447D00, 0);
+    func_80055948(3);
+    func_80047588(0x1C, 0);
+    func_830098A0(&D_8300FD00, 0, arg1, arg2);
+    func_83009BD0(&D_8300FD00, 0xC7);
+    func_80008624();
+    func_81801794();
+}
 #endif
 
 #ifdef VERSION_US
