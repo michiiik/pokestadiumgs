@@ -106,7 +106,52 @@ void func_81403918(s32 arg0) {
     func_81403244((arg0 + 8));
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81403938.s")
+extern s32 func_81403304(s32);
+s32 func_81403938(s32 arg0)
+{
+    f64 alignmentPad;
+    s32 found = 0;
+    s32 offset = 0;
+    u8 *scan = (u8 *) arg0;
+    s8 **slot;
+    s32 j;
+    s32 slotOffset;
+    if (!scan)
+    {
+    }
+    j = 0xC60;
+    do
+    {
+        offset += 0x210;
+        if ((*((s16 *) (scan + 0x210))) >= 0)
+        {
+            found = 1;
+            break;
+        }
+        scan += 0x210;
+    }
+    while (offset != j);
+    func_81403304(arg0 + 8);
+    slotOffset = 0;
+    slot = (s8 **) arg0;
+    do
+    {
+        slotOffset += 4;
+        if ((*slot) != 0)
+        {
+            for (j = 0; j < 6; j++)
+            {
+                (*slot)[0xA + j] = -1;
+            }
+        }
+        slot++;
+    }
+    while (slotOffset != 8);
+    if (found)
+    {
+        func_80023110(1, *((s32 *) (arg0 + 0xCC4)), 0);
+    }
+}
 
 void func_81403A18(void *arg0) {
     u8 temp_v0;
