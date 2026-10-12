@@ -1115,7 +1115,61 @@ void func_830094C8(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83009EC4.s")
+extern void func_8300B1CC(void *);
+extern void func_8300ADA4(void *);
+extern void func_8300B818(void *);
+extern void func_80051D64(s32, s32);
+extern void func_80055028(void);
+extern s32 func_81A00074(void *, s32);
+extern s32 _bcmp(void *, void *, s32);
+void func_83009EC4(void *arg0) {
+    typedef struct { u32 words[0x1B64 / 4]; } Large;
+    typedef struct { u32 words[0x224 / 4]; } Small;
+    typedef struct { u32 words[0x1104 / 4]; } Medium;
+    s32 i;
+    s32 changed;
+    s32 slot = *((u8 *)arg0 + 0x3C);
+    for (i = 0; i < 2; i++) {
+    Large *a = &((Large *)((u8 *)arg0 + 0x3A290))[i];
+    Large *b = &((Large *)((u8 *)arg0 + 0x34578))[i];
+    Small *c = &((Small *)((u8 *)arg0 + 0x39E48))[i];
+    Small *d = &((Small *)((u8 *)arg0 + 0x34130))[i];
+    Medium *e = &((Medium *)((u8 *)arg0 + 0x3D958))[i];
+    Medium *f = &((Medium *)((u8 *)arg0 + 0x37C40))[i];
+
+        changed = 0;
+        if (_bcmp(a, b, 0x1B64) != 0) {
+            func_8300B1CC(a);
+            changed = 1;
+            if (i == 1) func_80051D64(0x19, 0);
+        }
+        if (_bcmp(c, d, 0x224) != 0) {
+            func_8300ADA4(c);
+            changed = 1;
+            if (i == 1) func_80051D64(0x18, 0);
+        }
+        if (_bcmp(e, f, 0x1104) != 0) {
+            func_8300B818(e);
+            changed = 1;
+            if (i == 1) func_80051D64(0x1B, 0);
+        }
+        if (changed) {
+            if (i == 1) {
+                func_80055028();
+                *d = *c;
+                *f = *e;
+                *b = *a;
+            } else if ((slot >= 0) && (slot < 4)) {
+                if (!func_81A00074((u8 *)arg0 + 0x4E044, slot)) break;
+                *d = *c;
+                *f = *e;
+                *b = *a;
+            }
+        }
+    }
+    if (_bcmp((u8 *)arg0 + 0x39E48, (u8 *)arg0 + 0x34130, 0x5D18) == 0)
+        *(s32 *)((u8 *)arg0 + 0x3FF2C) = 0;
+}
 #endif
 
 #ifdef VERSION_US
