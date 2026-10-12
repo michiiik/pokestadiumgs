@@ -955,7 +955,20 @@ s32 func_83008844(s32 arg0, u8 arg1) { s32 selector; s32 result = 0; selector = 
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_830088A0.s")
+typedef struct { u8 data[5][8]; } Table088A0;
+extern Table088A0 D_8300F928;
+extern void func_81801CB8(u8 *, u8 *, u8 *, s32);
+extern s32 func_83008844(s32 arg0, u8 arg1);
+void func_830088A0(s32 arg0, void *arg1, u8 *arg2) {
+    Table088A0 table = D_8300F928;
+    u8 *second;
+    u8 *state = arg1;
+    u8 *first;
+    s32 unused;
+    first = table.data[func_83008844(state[0x1C], state[0x3FF1C])];
+    second = table.data[func_83008844(state[0x1D], state[0x3FF1C])];
+    func_81801CB8(arg2, first, second, *(s32 *)(state + 0x2C));
+}
 #endif
 
 #ifdef VERSION_US
