@@ -75,7 +75,48 @@ s32 func_82E019B0(s32 arg0, u8 *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/66/fragment66_code/func_82E02378.s")
+extern u8 *D_82E075E8;
+extern u8 *D_82E075EC;
+extern u8 *D_82E075F0;
+extern s32 D_82E07614;
+extern s32 D_82E07618;
+s32 func_82E02378(s32 arg0, u8 *arg1) {
+    switch (arg0) {
+    case 0:
+        switch (*(u32 *)(arg1 + 0x20)) {
+        case 0:
+            break;
+        case 1:
+            D_82E075E8 = arg1;
+            *(u16 *)(arg1 + 2) &= ~1;
+            break;
+        case 2:
+            D_82E075EC = arg1;
+            *(u16 *)(arg1 + 2) &= ~1;
+            break;
+        case 3:
+            D_82E075F0 = arg1;
+            *(u16 *)(arg1 + 2) &= ~1;
+            break;
+        }
+        break;
+    case 1:
+        if (arg1[0] == 3) {
+            switch (*(u32 *)(arg1 + 0x20)) {
+            case 0:
+                *(s32 *)(arg1 + 0x2C) = D_82E07614 | 0xFFFFFF00;
+                break;
+            case 1:
+            case 2:
+            case 3:
+                *(s32 *)(arg1 + 0x2C) = D_82E07618 | 0xFFFFFF00;
+                break;
+            }
+        }
+        break;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
