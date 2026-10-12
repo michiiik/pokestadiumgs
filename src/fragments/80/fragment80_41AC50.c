@@ -83,7 +83,42 @@ void func_842029A8(u8 arg0) {
     D_84203AD0.active = 1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_84202A20.s")
+extern u8 D_84203B5C;
+s32 func_842022F0(void *);
+void func_842024CC(void *);
+void func_84202798(void *);
+extern u32 func_8003570C(void);
+extern void func_84202294(void *arg0, u8 arg1, u8 arg2, u8 arg3, u8 arg4);
+extern u32 D_84203A40;
+void func_84202A20(u8 arg0) {
+    s32 i;
+    s32 j;
+    s32 k;
+    u8 limit;
+    u8 first, second;
+    F84202744State state;
+
+    D_84203B5C = (func_8003570C() & 1) + 1;
+    if (D_84203A40 & 0x80) {
+        limit = 1;
+    } else {
+        limit = 4;
+    }
+    for (i = 0; i < limit; i++) {
+        for (j = i + 1; j < 5; j++) {
+            first = i;
+            second = j;
+            for (k = j + 1; k < 6; k++) {
+                func_84202294(&state, arg0, first, second, k);
+                if (func_842022F0(&state)) {
+                    func_84202744(&state);
+                    func_842024CC(&state);
+                    func_84202798(&state);
+                }
+            }
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_84202B58.s")
 
