@@ -34,7 +34,20 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/66/fragment66_code/func_82E019B0.s")
+extern s32 D_82E07128;
+extern s32 D_82E0615C;
+s32 func_82E019B0(s32 arg0, u8 *arg1) {
+    switch (arg0) {
+        case 0:
+            D_82E07128 = arg1[0x28];
+            D_82E0615C = arg1[0x2B] + (arg1[0x2A] << 8);
+            *(u16 *)(arg1 + 2) &= 0xFFFE;
+            break;
+        case 1:
+            break;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
