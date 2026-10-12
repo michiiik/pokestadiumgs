@@ -64,7 +64,19 @@ void func_830009D8(s32 arg0, void *arg1, void *arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83000BC0.s")
+extern s32 func_83000AA4(u8);
+s32 func_83000BC0(u8 arg0, u8 arg1) {
+    s32 result = func_83000AA4(arg0);
+    u8 value = result;
+    if (result < 5) return value != 0;
+    if (arg1 == 0x19 && arg0 == 0xA3) return 1;
+    if (arg1 == 0x71 && arg0 == 0x1E) return 1;
+    if (arg1 == 0x68 && arg0 == 0x76) return 1;
+    if (arg1 == 0x69 && arg0 == 0x76) return 1;
+    if (arg1 == 0x53 && arg0 == 0x69) return 1;
+    if (arg1 == 0x84 && arg0 == 0x23) return 1;
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
