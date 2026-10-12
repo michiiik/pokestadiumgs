@@ -314,7 +314,40 @@ void func_816008EC(void *arg0, u8 *arg1) {
     func_81600408(arg1);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D7BC0/func_81600954.s")
+typedef struct ResetNode_81600954 ResetNode_81600954;
+struct ResetNode_81600954 {
+    u8 unused[0x10];
+    ResetNode_81600954 *next;
+    u8 padding[4];
+    s32 reset;
+};
+typedef struct {
+    ResetNode_81600954 *first;
+    ResetNode_81600954 *head;
+    ResetNode_81600954 *tail;
+} Buffer_81600954;
+typedef struct {
+    s32 count;
+    s32 active;
+    u8 unused[8];
+    Buffer_81600954 buffers[2];
+    Buffer_81600954 *current;
+    Buffer_81600954 *previous;
+} State_81600954;
+void func_81600954(void *arg0) {
+    State_81600954 *state = arg0;
+    ResetNode_81600954 *node;
+
+    state->previous = &state->buffers[state->active];
+    state->active = 1 - state->active;
+    state->current = &state->buffers[state->active];
+    state->current->tail = state->current->head;
+    node = state->current->head;
+    while (node != NULL) {
+        node->reset = 0;
+        node = node->next;
+    }
+}
 
 extern void * func_81600780(void *arg0, s32 arg1);
 extern s32 func_816007F8(void *arg0, s32 arg1);
