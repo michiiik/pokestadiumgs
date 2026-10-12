@@ -2,7 +2,16 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411DC80.s")
+s32 func_8411DC80(u16 arg0, s32 *arg1, s32 arg2) {
+    arg2 >>= 1;
+    while (arg2--) {
+        if (arg0 == *(u16 *)arg1) {
+            return 1;
+        }
+        arg1 = (s32 *)((u8 *)arg1 + 2);
+    }
+    return 0;
+}
 
 extern u8 *D_84193DD0;
 extern s32 func_8411E1F8(s32);
