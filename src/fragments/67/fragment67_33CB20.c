@@ -41,7 +41,10 @@ void func_829000CC(void) { Gfx *temp_v1 = D_800D0510++; temp_v1->words.w0 = 0xDE
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33CB20/func_829000F8.s")
+void func_829000F8(u8 arg0, u8 arg1, u8 arg2, u8 arg3) {
+    gDPPipeSync(D_800D0510++);
+    gDPSetPrimColor(D_800D0510++, 0, 0, arg0, arg1, arg2, arg3);
+}
 #endif
 
 #ifdef VERSION_US
