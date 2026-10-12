@@ -104,7 +104,29 @@ void func_87E07F98(void *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E0808C.s")
+extern void func_87E07F98(void *arg0);
+s32 func_87E0808C(void *arg0) {
+    typedef struct {
+        s32 pad[5];
+        u32 pad14: 16;
+        u32 marked: 1;
+        u32 tested: 1;
+        u32 pad_rest: 14;
+    } Record;
+    Record *ptr;
+    s32 result = 0;
+    s32 i;
+
+    func_87E07F98(arg0);
+    ptr = (Record *)((u8 *)arg0 + 0x2190);
+    for (i = 0; i < 4; i++, ptr++) {
+        if (ptr->tested && ptr->marked) {
+            result = 1;
+            break;
+        }
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E080F8.s")
 
@@ -262,7 +284,7 @@ extern void func_87E0DA4C(void *);
 extern void func_87E0D3A0(void *);
 extern void func_87E127FC(void *);
 extern void func_87E12830(void *);
-extern s32 func_87E0808C(F63_OwnerData *);
+extern s32 func_87E0808C(void *);
 extern void func_87E12900(void *);
 extern void func_87E129D0(void *);
 extern void func_87E0168C(s32, s32, s32);
