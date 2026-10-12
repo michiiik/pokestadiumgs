@@ -109,7 +109,21 @@ void func_83000E40(s32 arg0, s32 arg1)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83000F04.s")
+void func_83000F04(s32 arg0, s32 arg1, s32 arg2)
+{
+    struct Source { u8 pad[0x10]; u8 data[0x48]; };
+    struct Slot { u8 data[0xC80]; };
+    struct State { u8 pad[0x3FF38]; struct Slot slots[6]; };
+    struct Source *p;
+    struct State *q;
+    q = (struct State *)((u32)arg1); arg2 = 0; p = (struct Source *)((u32)arg0); do {
+        if (p->data[0] > 0) {
+            func_8004D878(&q->slots[arg2], 0, p->data);
+        }
+        arg2++;
+        p++;
+    } while (arg2 < 6);
+}
 #endif
 
 #ifdef VERSION_US
