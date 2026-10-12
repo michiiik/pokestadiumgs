@@ -87,7 +87,25 @@ void func_83000E38(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83000E40.s")
+extern void func_80051830();
+void func_83000E40(s32 arg0, s32 arg1)
+{
+  struct Record { u8 data[0x3C]; };
+  struct Group { u8 pad[0x28]; struct Record records[6]; u8 tail[0x4C]; };
+  struct Slot { u8 data[0xC80]; };
+  struct State { u8 pad[0x3FF38]; struct Slot slots[6]; };
+  u8 buffer[0x64];
+  struct Group *a;
+  struct State *b;
+ a = (struct Group *)(u32)arg0; b = (struct State *)(u32)arg1; arg0 = 0; do { arg1 = 0; do { func_80051830(buffer, &a->records[arg1]);
+      func_8004D878(&b->slots[arg1], 0, buffer);
+      arg1++;
+    } while (arg1 < 6);
+    arg0++;
+    a++;
+    b = (struct State *)((u8 *)b + 0x4B00);
+  } while (arg0 != 2);
+}
 #endif
 
 #ifdef VERSION_US
