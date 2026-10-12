@@ -48,7 +48,11 @@ void func_829000F8(u8 arg0, u8 arg1, u8 arg2, u8 arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33CB20/func_82900168.s")
+void func_82900168(u8 arg0, u8 arg1, u8 arg2, u8 arg3) {
+    gDPPipeSync(D_800D0510++);
+    gDPSetFillColor(D_800D0510++, (GPACK_RGBA5551(arg0, arg1, arg2, arg3) << 16) |
+                                     GPACK_RGBA5551(arg0, arg1, arg2, arg3));
+}
 #endif
 
 #ifdef VERSION_US
