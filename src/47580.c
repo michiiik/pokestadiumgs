@@ -890,7 +890,72 @@ extern Gfx *D_800D0510;
 extern u8 D_80095098[];
 void Font_EndTexturedTextRendering(void) { Gfx *temp_v1 = D_800D0510++; temp_v1->words.w0 = 0xDE000000; temp_v1->words.w1 = (u32)D_80095098; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80049C70.s")
+extern u8 *func_80048390(u8 *, u8 *, s32 *, s32, s32);
+void func_80049C70(s32 *first, s32 *second, u8 *text) {
+    u8 *cursor;
+    s32 character;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80049D9C.s")
+    if (first != NULL) {
+        *first = 0;
+    }
+    if (second != NULL) {
+        *second = 0;
+    }
+    character = *text;
+    cursor = text + 1;
+    if (character != 0) {
+        do {
+            switch (character) {
+            case '<':
+                cursor = func_80048390(NULL, cursor, NULL, 0, 0);
+                if (first != NULL && D_80094FA0 != -1) {
+                    *first = D_80094FA0;
+                    D_80094FA0 = -1;
+                }
+                if (second != NULL && D_80094FA4 != -1) {
+                    *second = D_80094FA4;
+                    D_80094FA4 = -1;
+                }
+                break;
+            default:
+                if (D_80126F58 == 0 && character >= 0x80 && *cursor != 0) {
+                    cursor += 1;
+                }
+                break;
+            }
+        } while ((character = *cursor++) != 0);
+    }
+}
+
+extern s16 D_80094FA8;
+void func_80049D9C(u8 *first, u8 *second, u8 *third, u8 *text) {
+    u8 *cursor;
+    s32 character;
+
+    *first = 0;
+    *second = 0;
+    *third = 0;
+    D_80094FA8 = 0;
+    D_80094FAC = 0;
+    D_80094FB0 = 0;
+    character = *text;
+    cursor = text + 1;
+    if (character != 0) {
+        do {
+            switch (character) {
+            case '<':
+                cursor = func_80048390(NULL, cursor, NULL, 0, 0);
+                *first = D_80094FA8;
+                *second = D_80094FAC;
+                *third = D_80094FB0;
+                break;
+            default:
+                if (D_80126F58 == 0 && character >= 0x80 && *cursor != 0) {
+                    cursor++;
+                }
+                break;
+            }
+        } while ((character = *cursor++) != 0);
+    }
+}
 #endif
