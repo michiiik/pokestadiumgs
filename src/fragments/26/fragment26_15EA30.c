@@ -119,7 +119,44 @@ u8 *func_81000894(u8 *dest, void *settings, u32 frame) {
     return dest;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_15EA30/func_810009C0.s")
+u8 func_810009C0(s32 count, u8 *times, u8 *values, u8 frame) {
+    f32 coefficients[50];
+    s32 i;
+    s32 j;
+    f32 product;
+    f32 total;
+    f32 time;
+    f32 value;
+
+    for (i = 0; i < count; i++) {
+        time = (f32)(u32)times[i];
+        value = (f32)(u32)values[i];
+        product = 1;
+        for (j = 0; j < count; j++) {
+            if (j != i) {
+                product *= time - (f32)(u32)times[j];
+            }
+        }
+        coefficients[i] = value / product;
+    }
+    total = 0;
+    for (i = 0; i < count; i++) {
+        product = 1;
+        for (j = 0; j < count; j++) {
+            if (j != i) {
+                product *= (f32)(u32)frame - (f32)(u32)times[j];
+            }
+        }
+        total += coefficients[i] * product;
+    }
+    if (total > 255.0f) {
+        total = 255.0f;
+    }
+    if (total < 0.0f) {
+        total = 0.0f;
+    }
+    return (u8)(u32)total;
+}
 
 typedef struct {
     u8 pad[4];
@@ -130,7 +167,6 @@ typedef struct {
 } ParticleSplineFive26;
 extern void *Util_Malloc(s32);
 extern void Util_Free(void *);
-extern u8 func_810009C0(s32, u8 *, u8 *, u8);
 
 u8 *func_81000E54(u8 *dest, ParticleSplineFive26 *settings, u32 frame) {
     u8 *times;
