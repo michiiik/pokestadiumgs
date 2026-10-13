@@ -66,7 +66,20 @@ void func_8F8013FC(u8 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/77/fragment77_code/func_8F8021E8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/77/fragment77_code/func_8F8022B4.s")
+extern u16 D_8F809FC0[];
+extern s32 D_8F809FB4;
+extern u16 D_8F8034D6[][17];
+extern void func_8F8015A8(void);
+void func_8F8022B4(void) {
+    D_8F809FC0[0] = 230;
+    D_8F809FC0[1] = 150;
+    D_8F809FC0[2] = 180;
+    D_8F809FC0[3] = 170;
+    D_8F809FC0[16] = D_8F8034D6[D_8F809FB4][0];
+    D_8F809FC0[4] = 0;
+    D_8F809FC0[5] = 0;
+    func_8F8015A8();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/77/fragment77_code/func_8F802324.s")
 
