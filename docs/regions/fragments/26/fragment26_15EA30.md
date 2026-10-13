@@ -1,5 +1,13 @@
 # Fragment 26 particle callbacks
 
+## 2026-10-14: func_8100124C accepted
+
+- Loads a full texture rectangle through seven-command `gDPLoadMultiTile` sequences for RGBA16/RGBA32, IA8/IA16, and I4/I8. Intensity4 uses `gDPLoadMultiTile_4b`, preserving its 8-bit image/load tile and 4-bit render tile, half-width load coordinates, and full-width render coordinates. Unsupported format/size combinations leave the display-list pointer unchanged.
+- Descriptor bytes are format,size,cms,cmt,masks,maskt,shifts,shiftt at offsets 0..7; signed width/height halfwords at +8/+0xA. Preserve signed dimensions. RGBA paths use the descriptor format in the macros; IA and I paths use their literal SDK format. RGBA32 changes TMEM 0x100 to 0x80 before loading. The existing u32 metadata ABI is retained and explicitly cast to the descriptor pointer.
+- Two eight-candidate batches compared outer/inner switch versus if spelling and per-format inner-case order. The first canonical switch seed reached normalized 0.9915/raw 0.9854, 3280 rather than 3272 bytes, with the RGBA16/32 blocks reversed. Reversing every format also damaged the already-correct IA/intensity paths. The second batch reverses only RGBA: 32-bit case before 16-bit, while retaining IA8 before IA16 and I4 before I8.
+- Winner `particle-texture-tile:per-format-order:mask1` was link-verified and automatically full-ROM gated at retail MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`. Original 818 instructions /3272 bytes; no jump table, layout subsegment, padding, compiler patch, or manual command-word expansion is needed. One historical duplicate was caught by preflight and replaced with a genuine local-return hypothesis; it consumed no probe budget.
+- Formatting, SDK case constants, and removal of the redundant later prototype independently passed the final full-ROM re-gate with default host syntax checks. Naming verification found no evidence-backed function name. This is same-file evidence only; do not promote the case-order spelling to a global rule until another file confirms it.
+
 ## 2026-10-14: func_810009C0 accepted
 
 - Computes Lagrange polynomial interpolation on byte keyframe times and values. First form each coefficient `value[i] / product(time[i] - time[j])` for j != i, then sum its frame-evaluated basis terms. Clamp above 255, then below zero, and use the original unsigned float-to-integer conversion and low-byte result. Preserve duplicate-time, oversized-count, and nonpositive-count behavior rather than adding new guards.
