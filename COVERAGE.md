@@ -3,8 +3,8 @@
 # Decompilation coverage
 
 <!-- AUTO_COVERAGE:START -->
-- US functions with C implementations: **6,019 / 10,532 (57.1%)**
-- Remaining `GLOBAL_ASM` owners: **4,513**
+- US functions with C implementations: **6,023 / 10,532 (57.2%)**
+- Remaining `GLOBAL_ASM` owners: **4,509**
 - Baseline: **10,532** US `GLOBAL_ASM` owners in the original pragma snapshot
 <!-- AUTO_COVERAGE:END -->
 
@@ -42,7 +42,6 @@
 | `src/585D0.c` | 72 | 229 | 68.6% |
 | `src/615D0.c` | 14 | 70 | 80.0% |
 | `src/62E0.c` | 1 | 5 | 80.0% |
-| `src/638E0.c` | 1 | 14 | 92.9% |
 | `src/63CF0.c` | 3 | 6 | 50.0% |
 | `src/641E0.c` | 8 | 44 | 81.8% |
 | `src/654A0.c` | 6 | 11 | 45.5% |
@@ -122,7 +121,7 @@
 | `src/fragments/23/fragment23_code.c` | 11 | 20 | 45.0% |
 | `src/fragments/24/fragment24_14FE20.c` | 8 | 10 | 20.0% |
 | `src/fragments/24/fragment24_150C10.c` | 50 | 92 | 45.7% |
-| `src/fragments/25/fragment25_15A060.c` | 13 | 30 | 56.7% |
+| `src/fragments/25/fragment25_15A060.c` | 12 | 30 | 60.0% |
 | `src/fragments/25/fragment25_15BBC0.c` | 8 | 10 | 20.0% |
 | `src/fragments/25/fragment25_15C920.c` | 1 | 1 | 0.0% |
 | `src/fragments/26/fragment26_15EA30.c` | 14 | 29 | 51.7% |
@@ -292,7 +291,7 @@
 | `src/fragments/62/fragment62_code.c` | 3 | 6 | 50.0% |
 | `src/fragments/63/fragment63_303990.c` | 14 | 40 | 65.0% |
 | `src/fragments/63/fragment63_305090.c` | 8 | 21 | 61.9% |
-| `src/fragments/63/fragment63_306150.c` | 15 | 28 | 46.4% |
+| `src/fragments/63/fragment63_306150.c` | 14 | 28 | 50.0% |
 | `src/fragments/63/fragment63_307D60.c` | 11 | 17 | 35.3% |
 | `src/fragments/63/fragment63_308D70.c` | 18 | 39 | 53.8% |
 | `src/fragments/63/fragment63_30B540.c` | 18 | 51 | 64.7% |
@@ -394,7 +393,7 @@
 | `src/fragments/80/fragment80_41A5F0.c` | 8 | 10 | 20.0% |
 | `src/fragments/80/fragment80_41AC50.c` | 16 | 34 | 52.9% |
 | `src/fragments/81/fragment81_code.c` | 18 | 36 | 50.0% |
-| `src/fragments/82/fragment82_420EA0.c` | 22 | 39 | 43.6% |
+| `src/fragments/82/fragment82_420EA0.c` | 21 | 39 | 46.2% |
 | `src/fragments/82/fragment82_4238F0.c` | 24 | 58 | 58.6% |
 | `src/fragments/83/fragment83_code.c` | 18 | 64 | 71.9% |
 | `src/fragments/84/fragment84_code.c` | 14 | 42 | 66.7% |
