@@ -406,7 +406,12 @@ void func_82702DF8(s16 *arg0) {
 #endif
         return;
     case 4:
+#ifdef CC_CHECK
+        /* Match the other legacy register-forwarding calls above. */
+        ((void (*)())func_82702CD8)();
+#else
         func_82702CD8();
+#endif
         return;
     }
 }

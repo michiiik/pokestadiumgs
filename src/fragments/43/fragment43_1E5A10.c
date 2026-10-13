@@ -1559,7 +1559,12 @@ u32 arg1;
 #ifdef VERSION_US
 extern void func_8AC06EC0();
 void func_8AC06F28(void) {
+#ifdef CC_CHECK
+    /* IDO preserves the incoming registers for this unprototyped call. */
+    ((void (*)())func_8AC06EC0)();
+#else
     func_8AC06EC0();
+#endif
 }
 #endif
 
