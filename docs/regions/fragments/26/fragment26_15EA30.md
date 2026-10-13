@@ -1,5 +1,13 @@
 # Fragment 26 particle callbacks
 
+## 2026-10-14: func_810009C0 accepted
+
+- Computes Lagrange polynomial interpolation on byte keyframe times and values. First form each coefficient `value[i] / product(time[i] - time[j])` for j != i, then sum its frame-evaluated basis terms. Clamp above 255, then below zero, and use the original unsigned float-to-integer conversion and low-byte result. Preserve duplicate-time, oversized-count, and nonpositive-count behavior rather than adding new guards.
+- The context-free m2c draft includes compiler-generated four-way inner-loop unrolling. Natural nested for loops reproduce it; no manual unrolling is needed. First eight-candidate batch varied coefficient-array lengths and declaration placement. A first-declared `f32 coefficients[50]` reproduces the original 0x108 frame and scratch buffer at sp+0x40, with the first 116 instruction words exact. Its float-zero spelling retained zero in f2 across the summation loop and clamp, yielding 1168 rather than 1172 bytes (normalized 0.9863, raw 0.9727).
+- Second eight-candidate batch tested initialization/clamp literal categories. Winner `particle-lagrange:zero-liveness:init0-clamp0.0f-one1` uses integer `1` for both product initializations, integer `0` for total initialization, and float literals for the clamps. It was link-verified and automatically full-ROM gated at retail MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`, preserving all 293 instructions /1172 bytes without padding or compiler changes.
+- Keep the unsigned u32 conversions of byte inputs: the original contains unsigned-to-float correction paths even though the byte range never takes them. The u8 frame formal preserves the original entry spill and low-byte mask. Do not replace the unsigned final conversion with a signed truncation solely because the clamped finite range looks equivalent.
+- Formatting and removal of the now-redundant later helper prototype independently passed the final full-ROM re-gate with default host syntax checks. Naming verification found no evidence-backed function name. This is same-file evidence only, not a global literal rule.
+
 ## 2026-10-14: func_810020E0 accepted
 
 - Continuation of the documented requeue below: `pragma_targets.py draft --no-context` recovers a usable m2c draft. Context-enabled m2c fails on the malformed preprocessed declaration `void func_8414491C(struct R;` at context line 8291. m2c prints this failure on stdout; the wrapper reads only stderr and therefore shows an empty error. This is a drafting/context gap, not a compiler or runner rejection.
