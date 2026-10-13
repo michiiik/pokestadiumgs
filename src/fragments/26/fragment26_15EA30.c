@@ -499,7 +499,186 @@ s32 func_810023AC(Func810023ACRangeA *arg0, u8 *arg1, Func810023ACContextA *arg2
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_15EA30/func_810024E0.s")
+typedef struct { u8 r; u8 g; u8 b; u8 a; } DispatchEnv26;
+
+typedef struct { u8 r; u8 g; u8 b; u8 a; u8 lod; } DispatchPrim26;
+typedef struct { ParticleCombineFields26 *combine; DispatchPrim26 *prim; DispatchEnv26 *env; } DispatchColor26;
+typedef struct { s16 type; s16 count; s16 keys; s16 pad; s16 *times; DispatchPrim26 *prim; DispatchEnv26 *env; } DispatchTrack26;
+typedef struct { s16 selector; s16 mode; void *tile; DispatchTrack26 *track; void *sequence; } DispatchAnimation26;
+typedef struct { u32 geometry; u16 s; u16 t; } DispatchGeometry26;
+typedef struct { ParticleTextureBase26 *base; DispatchAnimation26 *animation; DispatchColor26 *color; DispatchGeometry26 *geometry; } DispatchLayer26;
+typedef struct { DispatchLayer26 *primary; DispatchLayer26 *secondary; } DispatchLayers26;
+typedef struct { u8 pad[0x14]; u8 *object; u8 pad18[2]; s16 kind; u8 pad1C; u8 opacity; } DispatchContext26;
+
+typedef struct { u8 pad[0x84]; u8 pr; u8 pg; u8 pb; u8 pa; u8 pad88[3]; u8 er; u8 eg; u8 eb; u8 ea; } DispatchObject26;
+
+
+s32 func_810024E0(s32 address, void *layerData, s32 mode, u8 *explicitObject, u8 selector) {
+    DispatchContext26 *context;
+    Gfx *gfx;
+    DispatchObject26 *object;
+    DispatchLayer26 *secondary;
+    u32 frame;
+    DispatchLayer26 *primary;
+    u8 alpha;
+
+    context = NULL;
+    primary = ((DispatchLayers26 *)layerData)->primary;
+    secondary = ((DispatchLayers26 *)layerData)->secondary;
+    gfx = (Gfx *)address;
+    object = NULL;
+    frame = 0;
+    if (explicitObject == NULL) { context = (DispatchContext26 *)D_8009491C; }
+    if (mode == 0) {
+        if (explicitObject != NULL) { object = (DispatchObject26 *)explicitObject; }
+        else { object = (DispatchObject26 *)context->object; }
+    }
+    if (primary != NULL) {
+        if (primary->color != NULL) {
+            address = (s32)primary->color->combine; /* Reuse the incoming carrier to preserve call scheduling. */
+            func_810020E0(gfx++, (ParticleCombineFields26 *)address, mode, selector);
+            if (primary->animation == NULL || primary->animation->track == NULL) {
+                if (primary->color->prim != NULL) {
+                    gDPPipeSync(gfx++);
+                    if (mode == 2) {
+                        gDPSetPrimColor(gfx++, 0, primary->color->prim->lod, primary->color->prim->r, primary->color->prim->g, primary->color->prim->b, primary->color->prim->a);
+                    } else if (mode == 1) {
+                        gDPSetPrimColor(gfx++, 0, context->opacity, primary->color->prim->r, primary->color->prim->g, primary->color->prim->b, primary->color->prim->a);
+                    } else if (object == NULL) {
+                        if (context->opacity < 255) {
+                            gDPSetPrimColor(gfx++, 0, primary->color->prim->lod, primary->color->prim->r, primary->color->prim->g, primary->color->prim->b, context->opacity);
+                        } else {
+                            gDPSetPrimColor(gfx++, 0, primary->color->prim->lod, primary->color->prim->r, primary->color->prim->g, primary->color->prim->b, primary->color->prim->a);
+                        }
+                    } else if (func_84100054((u8 *)object, 4)) {
+                        if (func_84100054((u8 *)object, 0x10)) {
+                            gDPSetPrimColor(gfx++, 0, primary->color->prim->lod, object->pr, object->pg, object->pb, object->pa);
+                        } else {
+                            gDPSetPrimColor(gfx++, 0, primary->color->prim->lod, object->pr, object->pg, object->pb, primary->color->prim->a);
+                        }
+                    } else if (func_84100054((u8 *)object, 0x10)) {
+                        gDPSetPrimColor(gfx++, 0, primary->color->prim->lod, primary->color->prim->r, primary->color->prim->g, primary->color->prim->b, object->pa);
+                    } else {
+                        gDPSetPrimColor(gfx++, 0, primary->color->prim->lod, primary->color->prim->r, primary->color->prim->g, primary->color->prim->b, primary->color->prim->a);
+                    }
+                }
+                if (primary->color->env != NULL) {
+                    if (object == NULL) {
+                        gDPSetEnvColor(gfx++, primary->color->env->r, primary->color->env->g, primary->color->env->b, primary->color->env->a);
+                    } else if (func_84100054((u8 *)object, 8)) {
+                        if (func_84100054((u8 *)object, 0x20)) {
+                            gDPSetEnvColor(gfx++, object->er, object->eg, object->eb, object->ea);
+                        } else {
+                            gDPSetEnvColor(gfx++, object->er, object->eg, object->eb, primary->color->env->a);
+                        }
+                    } else if (func_84100054((u8 *)object, 0x20)) {
+                        gDPSetEnvColor(gfx++, primary->color->env->r, primary->color->env->g, primary->color->env->b, object->ea);
+                    } else {
+                        gDPSetEnvColor(gfx++, primary->color->env->r, primary->color->env->g, primary->color->env->b, primary->color->env->a);
+                    }
+                }
+            }
+        }
+        if (primary->geometry != NULL) {
+            gSPSetGeometryMode(gfx++, primary->geometry->geometry);
+            gSPTexture(gfx++, primary->geometry->s, primary->geometry->t, 0, 0, G_ON);
+        }
+        if (primary->animation != NULL) {
+            DispatchTrack26 *track;
+            s32 type;
+            u32 index;
+            u8 primBuffer[5];
+            DispatchPrim26 *prim;
+            frame = func_810023AC((Func810023ACRangeA *)primary, (u8 *)object, (Func810023ACContextA *)context);
+            if (primary->animation->track != NULL) {
+                track = primary->animation->track;
+                type = track->type;
+                if (primary->animation->mode == 1) {
+                    if (frame >= track->count) { index = track->count - 1; }
+                    else { index = frame % track->count; }
+                } else { index = frame % track->count; }
+                if (track->prim != NULL) {
+                    if (type == 0) { prim = &track->prim[index]; }
+                    else if (track->type == 1) { prim = (DispatchPrim26 *)func_8100072C(primBuffer, track, index); }
+                    else if (track->type == 2) { prim = (DispatchPrim26 *)func_81000E54(primBuffer, (ParticleSplineFive26 *)track, index); }
+                    gDPPipeSync(gfx++);
+                    if (mode == 2) {
+                        gDPSetPrimColor(gfx++, 0, prim->lod, prim->r, prim->g, prim->b, prim->a);
+                    } else if (mode == 1) {
+                        if (context->kind == 0xDB) {
+                            alpha = (context->opacity * prim->a) / 255;
+                            gDPSetPrimColor(gfx++, 0, alpha, prim->r, prim->g, prim->b, alpha);
+                        } else {
+                            gDPSetPrimColor(gfx++, 0, context->opacity, prim->r, prim->g, prim->b, prim->a);
+                        }
+                    } else if (object == NULL) {
+                        if (context->opacity < 255) {
+                            gDPSetPrimColor(gfx++, 0, prim->lod, prim->r, prim->g, prim->b, context->opacity);
+                        } else {
+                            gDPSetPrimColor(gfx++, 0, prim->lod, prim->r, prim->g, prim->b, prim->a);
+                        }
+                    } else if (func_84100054((u8 *)object, 4)) {
+                        if (func_84100054((u8 *)object, 0x10)) {
+                            gDPSetPrimColor(gfx++, 0, prim->lod, object->pr, object->pg, object->pb, object->pa);
+                        } else {
+                            gDPSetPrimColor(gfx++, 0, prim->lod, object->pr, object->pg, object->pb, prim->a);
+                        }
+                    } else if (func_84100054((u8 *)object, 0x10)) {
+                        if (func_84100054((u8 *)object, 0x40)) {
+                            alpha = (object->pa * prim->a) / 255;
+                            gDPSetPrimColor(gfx++, 0, prim->lod, prim->r, prim->g, prim->b, alpha);
+                        } else {
+                            gDPSetPrimColor(gfx++, 0, prim->lod, prim->r, prim->g, prim->b, object->pa);
+                        }
+                    } else {
+                        gDPSetPrimColor(gfx++, 0, prim->lod, prim->r, prim->g, prim->b, prim->a);
+                    }
+                }
+                if (track->env != NULL) {
+                    u8 envBuffer[4];
+                    DispatchEnv26 *env;
+                    if (type == 0) { env = &track->env[index]; }
+                    else if (track->type == 1) { env = (DispatchEnv26 *)func_81000894(envBuffer, track, index); }
+                    else if (track->type == 2) { env = (DispatchEnv26 *)func_8100107C(envBuffer, (ParticleSplineColors26 *)track, index); }
+                    if (object == NULL) {
+                        gDPSetEnvColor(gfx++, env->r, env->g, env->b, env->a);
+                    } else if (func_84100054((u8 *)object, 8)) {
+                        if (func_84100054((u8 *)object, 0x20)) {
+                            gDPSetEnvColor(gfx++, object->er, object->eg, object->eb, object->ea);
+                        } else {
+                            gDPSetEnvColor(gfx++, object->er, object->eg, object->eb, env->a);
+                        }
+                    } else if (func_84100054((u8 *)object, 0x20)) {
+                        if (func_84100054((u8 *)object, 0x40)) {
+                            alpha = (object->ea * env->a) / 255;
+                            gDPSetEnvColor(gfx++, env->r, env->g, env->b, alpha);
+                        } else {
+                            gDPSetEnvColor(gfx++, env->r, env->g, env->b, object->ea);
+                        }
+                    } else {
+                        gDPSetEnvColor(gfx++, env->r, env->g, env->b, env->a);
+                    }
+                }
+            }
+        }
+        if (primary->base != NULL) {
+            if (primary->base->texture != NULL && primary->geometry == NULL) {
+                gSPTexture(gfx++, 0xFFFF, 0xFFFF, 0, 0, G_ON);
+            }
+            if (primary->base->unused4 == 0) { gDPSetTextureLUT(gfx++, G_TT_NONE); }
+            else { gDPSetTextureLUT(gfx++, G_TT_RGBA16); }
+        }
+        gfx = func_81001F14(gfx, (ParticleTextureSettings26 *)((DispatchLayers26 *)layerData)->primary, 0, 0, frame);
+    }
+    if (secondary != NULL) {
+        s32 tmem;
+        tmem = 0;
+        frame = func_810023AC((Func810023ACRangeA *)secondary, (u8 *)object, (Func810023ACContextA *)context);
+        if (((DispatchLayer26 **)layerData)[0]->base->texture != ((DispatchLayer26 **)layerData)[1]->base->texture) { tmem = 0x100; }
+        gfx = func_81001F14(gfx, (ParticleTextureSettings26 *)((DispatchLayers26 *)layerData)->secondary, tmem, 1, frame);
+    }
+    return (s32)gfx;
+}
 
 typedef struct {
     unsigned char pad_00[3];
@@ -508,7 +687,6 @@ typedef struct {
     void *unk_14;
 } Func8100338CStateK;
 extern s32 D_800D0510;
-extern s32 func_810024E0();
 void func_8100338C(s32 arg0, Func8100338CStateK *state) {
     if (arg0 == 5) {
         D_800D0510 = func_810024E0(D_800D0510, state->unk_14, 0, 0, state->unk_03);
