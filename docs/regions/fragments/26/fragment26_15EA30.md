@@ -1,5 +1,11 @@
 # Fragment 26 particle callbacks
 
+## 2026-10-13: func_8100072C accepted
+
+- Select the signed-halfword keyframe index, interpolate five adjacent unsigned-byte values from five-byte records, and return the supplied output buffer. Times are at settings+8; value records are at settings+0xC, unlike the four-channel helper's settings+0x10 pointer.
+- One eight-candidate batch transferred the accepted four-channel helper's ABI and varied index width, position-cache timing, and pointer initialization. Every s16-index variant was an object/link hit; s32 variants changed the original halfword spill at sp+0x42 into a word spill at sp+0x40.
+- Winner `particle-five-channel:layout:s16-earlyFalse-splitFalse` was link-verified and auto-gated with retail MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`. The original 90-instruction / 360-byte size and 0x48 frame need no padding. Formatting and removal of redundant interpolation-helper prototypes independently passed the final full-ROM re-gate with default host syntax checks. The naming tool found no evidence-backed name.
+
 ## 2026-10-13: func_81000550 accepted
 
 - Interpolate one unsigned-byte channel between two unsigned-byte keyframe times. Return the first value when the position equals the first time; otherwise compute the floating-point slope, multiply by the position offset, add the first value, and truncate to an unsigned byte.

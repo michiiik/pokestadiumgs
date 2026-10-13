@@ -67,7 +67,31 @@ s16 func_810006C4(Func810006C4Table *arg0, u32 arg1) {
     return arg0->count - 2;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_15EA30/func_8100072C.s")
+typedef struct {
+    u8 pad[8];
+    s16 *times;
+    u8 *values;
+} ParticleFiveChannelTrack26;
+
+u8 *func_8100072C(u8 *dest, void *settings, u32 frame) {
+    ParticleFiveChannelTrack26 *track = (ParticleFiveChannelTrack26 *)settings;
+    s16 index;
+    u8 position;
+
+    index = func_810006C4((Func810006C4Table *)settings, frame);
+    position = (u8)frame;
+    dest[0] = func_81000550((u8)track->times[index], (u8)track->times[index + 1],
+                           track->values[index * 5 + 0], track->values[index * 5 + 5], position);
+    dest[1] = func_81000550((u8)track->times[index], (u8)track->times[index + 1],
+                           track->values[index * 5 + 1], track->values[index * 5 + 6], position);
+    dest[2] = func_81000550((u8)track->times[index], (u8)track->times[index + 1],
+                           track->values[index * 5 + 2], track->values[index * 5 + 7], position);
+    dest[3] = func_81000550((u8)track->times[index], (u8)track->times[index + 1],
+                           track->values[index * 5 + 3], track->values[index * 5 + 8], position);
+    dest[4] = func_81000550((u8)track->times[index], (u8)track->times[index + 1],
+                           track->values[index * 5 + 4], track->values[index * 5 + 9], position);
+    return dest;
+}
 
 typedef struct {
     u8 pad[8];
@@ -75,7 +99,6 @@ typedef struct {
     u8 padC[4];
     u8 *colors;
 } ParticleColorTrack26;
-extern u8 func_81000550(u8, u8, u8, u8, u8);
 
 u8 *func_81000894(u8 *dest, void *settings, u32 frame) {
     ParticleColorTrack26 *track;
