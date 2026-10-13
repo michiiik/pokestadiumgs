@@ -17,7 +17,18 @@ u32 func_87F00930(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_3235A0/func_87F01870.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_3235A0/func_87F01934.s")
+extern u8 D_800CE060[];
+extern void func_80006148(u8 *);
+void func_87F01934(void) {
+    u8 *entry = D_800CE060;
+    s32 offset;
+
+    for (offset = 0; offset < 8; offset += 2) {
+        *(u16 *)(D_87F0F610 + offset + 0x34) = *(u16 *)(entry + 0x10);
+        func_80006148(entry);
+        entry += 0x28;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_3235A0/func_87F019A4.s")
 
