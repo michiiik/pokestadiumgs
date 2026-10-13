@@ -2,7 +2,13 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_305090/func_87E01720.s")
+extern s32 func_8004C990(s32, s32);
+void func_87E01720(s32 arg0, s32 arg1, s32 arg2, s32 arg3, void *arg4) {
+    u32 index;
+
+    index = ((u32)arg0 % ((u32)arg1 * (u32)arg2)) / (u32)arg1;
+    func_8004C990(arg3, ((u8 *)arg4)[index]);
+}
 
 extern u8 D_87E19720[];
 extern void func_87E01720(s32, s32, s32, s32, void *);
