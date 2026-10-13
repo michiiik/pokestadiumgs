@@ -195,7 +195,59 @@ void func_82602A0C(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_128B10/func_82602CF4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_128B10/func_82602E14.s")
+extern s32 D_82615390[];
+extern s32 D_82615384[];
+extern s32 D_82615378[];
+extern void *func_8004C874(s32, s32);
+extern void func_80049C70(s32 *, s32 *, void *);
+void func_82602E14(void *arg0) {
+    s32 selection;
+    u8 *record;
+    s32 i;
+    s32 mode;
+    s32 width;
+    s32 height;
+    u8 *base;
+    void *resource;
+    u8 *root;
+
+    root = *(u8 **)arg0;
+    base = *(u8 **)((u8 *)arg0 + 0xC);
+    mode = root[7];
+    for (i = 0; i < *(s16 *)((u8 *)arg0 + 0x14); i++) {
+        record = base;
+        record += *(s16 *)((u8 *)arg0 + 0x18 + i * 2) * 0x98;
+        record += 4;
+        if (i == *(s16 *)(*(u8 **)arg0 + 0x88)) {
+            switch (mode) {
+                case 0:
+                case 4:
+                    selection = D_82615390[guRandom() % 3U];
+                    break;
+                case 3:
+                    selection = 0x20;
+                    break;
+                case 1:
+                    selection = D_82615384[guRandom() % 3U];
+                    break;
+                default:
+                    selection = 0x1F;
+                    break;
+            }
+        } else if (i < *(s16 *)(*(u8 **)arg0 + 0x88)) {
+            selection = 0x27;
+        } else {
+            selection = D_82615378[guRandom() % 3U];
+        }
+        resource = func_8004C874(record[3] + 0x4C, selection);
+        if (resource != 0) {
+            *(s16 *)((u8 *)arg0 + 0x38 + i * 2) = selection;
+            func_80049C70(&width, &height, resource);
+            *(s16 *)((u8 *)arg0 + 0x58 + i * 4) = width;
+            *(s16 *)((u8 *)arg0 + 0x5A + i * 4) = height;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_128B10/func_82602FE8.s")
 
