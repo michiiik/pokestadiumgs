@@ -21,14 +21,34 @@ void func_87F02340(F2340State *arg0) {
     }
 }
 
+typedef struct {
+    s32 count;
+    u8 pad_04[4];
+    u8 *items;
+} F2684State;
+extern void func_87F026E8(F2684State *, u8 *);
+
+
 extern u8 D_80126420[];
-extern void func_87F023B0(void *, void *);
+extern void func_87F023B0(void *, F2684State *);
 
 void func_87F02388(void *arg0) {
     func_87F023B0(D_80126420, arg0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_324FB0/func_87F023B0.s")
+void func_87F023B0(void *arg0, F2684State *arg1) {
+    u8 *item;
+    s32 i;
+
+    item = arg1->items;
+    i = 0;
+    while (i < arg1->count) {
+        func_87F026E8(arg1, item);
+        GraphNode_RemoveChild(arg0, (F2340Node *)(item + 0x24));
+        i += 1;
+        item += 0x18C;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_324FB0/func_87F0242C.s")
 
@@ -48,12 +68,6 @@ void func_87F024F4(void *arg0, s32 arg1, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_324FB0/func_87F025B8.s")
 
-typedef struct {
-    s32 count;
-    u8 pad_04[4];
-    u8 *items;
-} F2684State;
-extern void func_87F026E8(F2684State *, u8 *);
 
 void func_87F02684(F2684State *arg0) {
     u8 *item;
