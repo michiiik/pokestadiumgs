@@ -121,9 +121,116 @@ u8 *func_81000894(u8 *dest, void *settings, u32 frame) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_15EA30/func_810009C0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_15EA30/func_81000E54.s")
+typedef struct {
+    u8 pad[4];
+    s16 count;
+    u8 pad6[2];
+    s16 *times;
+    u8 *values;
+} ParticleSplineFive26;
+extern void *Util_Malloc(s32);
+extern void Util_Free(void *);
+extern u8 func_810009C0(s32, u8 *, u8 *, u8);
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_15EA30/func_8100107C.s")
+u8 *func_81000E54(u8 *dest, ParticleSplineFive26 *settings, u32 frame) {
+    u8 *times;
+    s32 i;
+    u8 *timesCursor;
+    u8 *channel0;
+    u8 *channel1;
+    u8 *channel2;
+    u8 *channel3;
+    u8 *channel4;
+    u8 *channel0Cursor;
+    u8 *channel1Cursor;
+    u8 *channel2Cursor;
+    u8 *channel3Cursor;
+    u8 *channel4Cursor;
+
+    times = Util_Malloc(settings->count * 4);
+    timesCursor = times;
+    channel0 = Util_Malloc(settings->count * 4);
+    channel0Cursor = channel0;
+    channel1 = Util_Malloc(settings->count * 4);
+    channel1Cursor = channel1;
+    channel2 = Util_Malloc(settings->count * 4);
+    channel2Cursor = channel2;
+    channel3 = Util_Malloc(settings->count * 4);
+    channel3Cursor = channel3;
+    channel4 = Util_Malloc(settings->count * 4);
+    channel4Cursor = channel4;
+    for (i = 0; i < settings->count; i++) {
+        *timesCursor++ = settings->times[i];
+        *channel0Cursor++ = settings->values[i * 5 + 0];
+        *channel1Cursor++ = settings->values[i * 5 + 1];
+        *channel2Cursor++ = settings->values[i * 5 + 2];
+        *channel3Cursor++ = settings->values[i * 5 + 3];
+        *channel4Cursor++ = settings->values[i * 5 + 4];
+    }
+    dest[0] = func_810009C0(settings->count, times, channel0, (u8)frame);
+    dest[1] = func_810009C0(settings->count, times, channel1, (u8)frame);
+    dest[2] = func_810009C0(settings->count, times, channel2, (u8)frame);
+    dest[3] = func_810009C0(settings->count, times, channel3, (u8)frame);
+    dest[4] = func_810009C0(settings->count, times, channel4, (u8)frame);
+    Util_Free(times);
+    Util_Free(channel0);
+    Util_Free(channel1);
+    Util_Free(channel2);
+    Util_Free(channel3);
+    Util_Free(channel4);
+    return dest;
+}
+
+typedef struct {
+    u8 pad[4];
+    s16 count;
+    u8 pad6[2];
+    s16 *times;
+    u8 padC[4];
+    u8 *values;
+} ParticleSplineColors26;
+
+u8 *func_8100107C(u8 *dest, ParticleSplineColors26 *settings, u32 frame) {
+    u8 *times;
+    s32 i;
+    u8 *timesCursor;
+    u8 *red;
+    u8 *green;
+    u8 *blue;
+    u8 *alpha;
+    u8 *redCursor;
+    u8 *greenCursor;
+    u8 *blueCursor;
+    u8 *alphaCursor;
+
+    times = Util_Malloc(settings->count);
+    timesCursor = times;
+    red = Util_Malloc(settings->count);
+    redCursor = red;
+    green = Util_Malloc(settings->count);
+    greenCursor = green;
+    blue = Util_Malloc(settings->count);
+    blueCursor = blue;
+    alpha = Util_Malloc(settings->count);
+    alphaCursor = alpha;
+    for (i = 0; i < settings->count; i++) {
+        *timesCursor++ = settings->times[i];
+        *redCursor++ = settings->values[i * 4 + 0];
+        *greenCursor++ = settings->values[i * 4 + 1];
+        *blueCursor++ = settings->values[i * 4 + 2];
+        *alphaCursor++ = settings->values[i * 4 + 3];
+    }
+    dest[0] = func_810009C0(settings->count, times, red, (u8)frame);
+    dest[1] = func_810009C0(settings->count, times, green, (u8)frame);
+    dest[2] = func_810009C0(settings->count, times, blue, (u8)frame);
+    dest[3] = func_810009C0(settings->count, times, alpha, (u8)frame);
+    Util_Free(times);
+    Util_Free(red);
+    Util_Free(green);
+    Util_Free(blue);
+    Util_Free(alpha);
+    return dest;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_15EA30/func_8100124C.s")
 

@@ -1,5 +1,17 @@
 # Fragment 26 particle callbacks
 
+## 2026-10-13: func_81000E54 accepted
+
+- Allocate six buffers, each with the original count*4 allocation size; truncate signed-halfword times to bytes and separate five-byte records into five channel buffers. Interpolate all five channels with the low byte of the frame, free all six buffers, and return the output buffer. Do not shrink the allocations merely because the packed writes occupy fewer bytes.
+- One eight-candidate batch transferred the immediately preceding RGBA spline wrapper's paired-allocation and declaration-layout spelling. First candidate `particle-five-spline:layout:0` is link-verified and auto-gated at retail MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`; all six prefix-order variants were object/link hits. The original0x60 frame and138 instructions /552bytes need no padding. Keep times and its cursor separate: they occupy s3 and s2 in the original loop.
+- This confirms a same-file family transfer, not the two-different-files evidence required for a global source-shape rule. The formatted two-owner batch and deduplicated local allocator/helper prototypes are independently full-ROM re-gated before publication.
+
+## 2026-10-13: func_8100107C accepted
+
+- Allocate five count-byte buffers, truncate signed-halfword keyframe times to bytes, separate packed RGBA into four byte buffers, interpolate each channel with the low byte of the frame, free all five buffers, and return the output buffer. Preserve the original allocation/error behavior rather than adding speculative guards.
+- Three eight-candidate batches explored pointer/index loops, allocation-to-cursor timing, and measured stack layout. Initialize each cursor immediately after its corresponding allocation: delaying those assignments changes spills and loop register choices. Declare times, i, timesCursor, red/green/blue/alpha, then red/green/blue/alpha cursors. This reproduces the original0x60 frame and saved-buffer/cursor offsets without explicit padding.
+- Winner `particle-color-spline:spill-layout:times-i-timesCursor0`: link-verified, auto-gated, byte-identical retail ROM MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`. The function has116 instructions /464bytes. Formatted source passed naming verification (zero known names) and the full-ROM re-gate. Local allocator prototypes are added as post-acceptance cleanup to remove new implicit-declaration warnings, then independently re-gated.
+
 ## 2026-10-13: func_81001F14 accepted
 
 - Select a texture from an animation sequence, clamping to the last entry when mode==1 and frame reaches the count, otherwise using unsigned remainder. If no sequence is present, use the base texture when available. Load the selected texture, reload animation settings after the call, and emit tile-size commands for tile0 or1. Return the advanced display-list pointer.
