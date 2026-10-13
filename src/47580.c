@@ -892,7 +892,163 @@ void func_80048344(u8 *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80048390.s")
+extern s16 D_80094FA8;
+u8 *func_80048390(u8 *state, u8 *input, s32 *x, s32 y, s32 draw) {
+    u8 token[32];
+    u8 buffer[128];
+    u8 *output;
+    s32 finished;
+    s32 character;
+
+    output = buffer;
+    finished = 0;
+    while (finished == 0) {
+        character = *input;
+        switch (character) {
+        case 0:
+            finished = -1;
+            break;
+        case '>':
+            finished = 1;
+            break;
+        }
+        if (finished == 0) {
+            *output++ = character;
+            input++;
+        }
+    }
+    *output = 0;
+    output = func_800477C4(token, buffer);
+    if (draw != 0) {
+        switch (func_80047864((const s8 *)token)) {
+        case 0:
+            func_80047D24(state, output);
+            break;
+        case 1:
+            func_80047DC4(state, output);
+            break;
+        case 2:
+            func_80047EC4(state, output);
+            break;
+        case 3:
+            func_8004803C(state, output, x, y, draw);
+            break;
+        case 4:
+            func_80048188(state, output);
+            break;
+        case 6:
+            func_800481FC(state, output);
+            break;
+        }
+    } else {
+        switch (func_80047864((const s8 *)token)) {
+        case 0:
+            func_80047D24(state, output);
+            break;
+        case 3:
+            func_8004803C(state, output, x, y, draw);
+            break;
+        case 5:
+            func_80048234(output);
+            break;
+        case 6:
+            func_800481FC(state, output);
+            break;
+        case 7:
+            D_80094FA8 = 8;
+            func_800482C0(output);
+            break;
+        case 8:
+            D_80094FA8 = 12;
+            func_800482C0(output);
+            break;
+        case 9:
+            D_80094FA8 = 6;
+            D_80094FB0 = 1;
+            func_80048344(output);
+            break;
+        case 10:
+            D_80094FA8 = 6;
+            D_80094FB0 = 2;
+            func_80048344(output);
+            break;
+        case 11:
+            D_80094FA8 = 6;
+            D_80094FB0 = 3;
+            func_80048344(output);
+            break;
+        case 12:
+            D_80094FA8 = 6;
+            D_80094FB0 = 4;
+            func_80048344(output);
+            break;
+        case 13:
+            D_80094FA8 = 6;
+            D_80094FB0 = 5;
+            func_80048344(output);
+            break;
+        case 14:
+            D_80094FA8 = 6;
+            D_80094FB0 = 6;
+            func_80048344(output);
+            break;
+        case 15:
+            D_80094FA8 = 6;
+            D_80094FB0 = 7;
+            func_80048344(output);
+            break;
+        case 16:
+            D_80094FA8 = 6;
+            D_80094FB0 = 8;
+            func_80048344(output);
+            break;
+        case 17:
+            D_80094FA8 = 6;
+            D_80094FB0 = 9;
+            func_80048344(output);
+            break;
+        case 18:
+            D_80094FA8 = 6;
+            D_80094FB0 = 10;
+            func_80048344(output);
+            break;
+        case 19:
+            D_80094FA8 = 6;
+            D_80094FB0 = 11;
+            func_80048344(output);
+            break;
+        case 20:
+            D_80094FA8 = 6;
+            D_80094FB0 = 12;
+            func_80048344(output);
+            break;
+        case 21:
+            D_80094FA8 = 6;
+            D_80094FB0 = 13;
+            func_80048344(output);
+            break;
+        case 22:
+            D_80094FA8 = 6;
+            D_80094FB0 = 14;
+            func_80048344(output);
+            break;
+        case 23:
+            D_80094FA8 = 6;
+            D_80094FB0 = 15;
+            func_80048344(output);
+            break;
+        case 24:
+            D_80094FA8 = 6;
+            D_80094FB0 = 16;
+            func_80048344(output);
+            break;
+        }
+    }
+    if (finished == 1) {
+        input++;
+    }
+    return input;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80048830.s")
 
