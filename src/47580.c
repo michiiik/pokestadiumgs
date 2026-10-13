@@ -798,7 +798,35 @@ void func_8004989C(s32 arg0) {
     func_80046F2C(D_80126F50, arg0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800498C4.s")
+extern Gfx D_80094FB8[];
+void func_800498C4(void) {
+    s32 color;
+    s32 i;
+    s32 offset;
+    u8 flags;
+
+    flags = D_80126F50[0x7A];
+    D_80126F50[0x7A] = 0;
+    if (flags & 4) {
+        func_80047670();
+    }
+    D_80126F50[0x79] = 0x28;
+    *(s32 *)(D_80126F50 + 0x4C) = 0;
+    D_80126F50[0x7B] = 0;
+    func_80046AC0(D_80126F50, 0, D_80126F50[0x7E]);
+    D_80126F50[0x7C] = 0;
+    color = -1;
+    func_80046BB4(D_80126F50, 0, (u8 *)&color);
+    D_80126F50[0x7D] = 0;
+    color = -1;
+    func_80046D70(D_80126F50, 0, (u8 *)&color);
+    if (*(u8 **)(D_80126F50 + 0x50) != NULL) {
+        for (i = 0, offset = 0; i < D_80126F50[0x7F]; i++, offset += 0x10) {
+            *(s32 *)(*(u8 **)(D_80126F50 + 0x50) + offset) = 0;
+        }
+    }
+    gSPDisplayList(D_800D0510++, D_80094FB8);
+}
 
 extern u8 D_80094E38[];
 extern u8 D_80095000[];
