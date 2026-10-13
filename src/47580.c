@@ -731,7 +731,15 @@ void Font_EnableTwoCycleTexturing(void) {
 extern u8 D_80095040[]; extern Gfx *D_800D0510;
 void Font_DisableTwoCycleTexturing(void) { D_80126F50[0x7A] &= 0xFFFC; gSPDisplayList(D_800D0510++, D_80095040); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80049BDC.s")
+extern u8 D_80095068[];
+void func_80049BDC(void) {
+    s32 color;
+
+    D_80126F50[0x7D] = 0;
+    color = -1;
+    func_80046D70(D_80126F50, 0, (u8 *)&color);
+    gSPDisplayList(D_800D0510++, D_80095068);
+}
 
 extern Gfx *D_800D0510;
 extern u8 D_80095098[];
