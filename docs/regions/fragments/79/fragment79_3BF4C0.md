@@ -77,3 +77,7 @@ func_8415178C: matched (call_sequence:decl-order:sbpta), 1 iterations, agent cod
 ## 2026-10-04
 
 func_84152308: matched (call_sequence:carrier_reuse:signed_amount_compound_multiply), 2 iterations, agent codex
+
+## 2026-10-13
+
+func_84152764: matched (call_sequence:carrier_address:signed_scaled_byte_displacement), 3 iterations, agent codex
