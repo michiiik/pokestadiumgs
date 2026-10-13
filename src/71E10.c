@@ -12,14 +12,26 @@ s32 func_80071250(u8 *arg0) {
     return value > 0 && value < 5;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/71E10/func_8007126C.s")
+extern s32 func_80071CD0(s32, s32);
 
-extern s32 func_8007126C(s32, s32, u8, void *);
+s32 func_8007126C(s32 arg0, s32 arg1, s32 arg2) {
+    if (arg1 >= 0xFB) {
+        return 0;
+    }
+    if (arg0 != 0) {
+        return arg2 >= *(u8 *)((u8 *)arg0 + 0x36) &&
+               arg2 <= *(u8 *)((u8 *)arg0 + 0x37) &&
+               func_80071CD0(arg0 + 0x14, arg1) != 0;
+    } else {
+        return 1;
+    }
+}
+
 s32 func_800712DC(s32 arg0, void *arg1) {
     u8 value = *(u8 *)arg1;
     s32 result = 0;
     if (value <= 0) goto empty;
-    result = func_8007126C(arg0, value - 1, *(u8 *)((u8 *)arg1 + 0x1D), arg1);
+    result = func_8007126C(arg0, value - 1, *(u8 *)((u8 *)arg1 + 0x1D));
     goto finish;
 empty:
     result = 0;
