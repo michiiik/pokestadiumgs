@@ -41,7 +41,19 @@ void ParticleGfx_LoadTextureI4ToList(Gfx *gfx, u8 *texture, s32 width, s32 heigh
         G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_15EA30/func_81000550.s")
+u8 func_81000550(u8 firstTime, u8 secondTime, u8 firstValue, u8 secondValue, u8 position) {
+    f32 color;
+    f32 first;
+    f32 current;
+
+    color = firstValue;
+    first = firstTime;
+    current = position;
+    if (current == first) {
+        return firstValue;
+    }
+    return (((f32)secondValue - color) / ((f32)secondTime - first)) * (current - first) + color;
+}
 
 
 typedef struct { u8 pad_00[4]; s16 count; u8 pad_06[2]; s16 *values; } Func810006C4Table;

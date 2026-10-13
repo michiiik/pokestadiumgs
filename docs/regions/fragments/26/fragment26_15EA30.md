@@ -1,5 +1,13 @@
 # Fragment 26 particle callbacks
 
+## 2026-10-13: func_81000550 accepted
+
+- Interpolate one unsigned-byte channel between two unsigned-byte keyframe times. Return the first value when the position equals the first time; otherwise compute the floating-point slope, multiply by the position offset, add the first value, and truncate to an unsigned byte.
+- Four eight-candidate batches tested cached float expressions, comparison/conversion order, float lifetimes, and initialization topology. Reversing the comparison restored the instruction sequence. Initializing color before first time and current position resolved the remaining coherent float-register swaps. Declaration order is color, first, current; initialization order is the same; compare current against first.
+- Winner: `particle-interpolation:init-topology:color-first-currentFalse`. The 93-instruction / 372-byte object is link-verified; the runner auto-gated and accepted the byte-identical full ROM at retail MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`. No explicit padding, compiler patch, or permuter mutation was needed.
+- Formatting was independently rebuilt with `make rom COMPARE=1 -j2`, default host syntax checks enabled, and the same retail checksum. The naming tool found no evidence-backed name. Probe statistics retain the accepted row; the internal provenance-check script is absent from this public/container tool subset, so its hook was not claimed as run.
+- The runner's register-tie warning after 24 prior attempts was advisory: the next materially different source family matched. Do not treat a normalized score of 1.0 as raw equality or a futility warning as proof that ordinary C cannot match.
+
 ## 2026-10-13: func_81003768 accepted
 
 - On event 2, set the vector at node + 0x30 to the default scale in all three components, then apply the default RGBA bytes. Return zero for all events.
