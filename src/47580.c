@@ -317,8 +317,8 @@ s32 func_80047244(u8 *state, s32 font) {
 
 extern u8 *D_80126F50;
 extern s32 func_80047244(u8 *, s32);
-void func_800472B8(s32 arg0) {
-    func_80047244(D_80126F50, arg0);
+s32 func_800472B8(s32 arg0) {
+    return func_80047244(D_80126F50, arg0);
 }
 
 s32 func_800472E0(u8 *arg0) {
@@ -1086,7 +1086,7 @@ void func_800495F8(s32 x, s32 y, s32 mode, const char *format, ...) {
     }
 }
 
-extern void func_80048830(u8 *, s32, s32, s32, s32);
+extern s32 func_80048830(u8 *, s32, s32, s32, s32);
 
 void func_80049628(s32 arg0, s32 arg1, s32 arg2) {
     func_80048830(D_80126F50, arg0, arg1, arg2, 1);
