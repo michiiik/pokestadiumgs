@@ -44,6 +44,12 @@ class CandidateIdentityTests(unittest.TestCase):
     def test_token_changes_are_significant(self):
         self.assertNotEqual(identity('x=1;'), identity('x=2;'))
 
+    def test_macro_definition_adjacency_is_significant(self):
+        self.assertNotEqual(identity('#define F(x) x\n'), identity('#define F (x) x\n'))
+
+    def test_directive_header_whitespace_is_significant(self):
+        self.assertNotEqual(identity('#include <a.h>\n'), identity('#include <a .h>\n'))
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -12,14 +12,15 @@ import json
 import re
 
 _LEXEME = re.compile(
-    r'(?P<comment>/\*.*?\*/|//[^\n]*)'
+    r'(?P<directive>^[ \t]*\#[^\n]*)'
+    r'|(?P<comment>/\*.*?\*/|//[^\n]*)'
     r'|(?P<space>\s+)'
     r'|(?P<token>"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\''
     r'|[A-Za-z_$][A-Za-z0-9_$]*'
     r'|(?:0[xX][0-9A-Fa-f]+|(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?)[uUlLfF]*'
     r'|>>=|<<=|->|\+\+|--|&&|\|\||<=|>=|==|!=|\*=|/=|%=|\+=|-=|<<|>>|&=|\^=|\|=|##|\.\.\.'
     r'|\S)',
-    re.DOTALL,
+    re.DOTALL | re.MULTILINE,
 )
 
 
@@ -37,11 +38,14 @@ def candidate_identity(candidate: str) -> str:
     group = -1
     tokens = []
     for match in _LEXEME.finditer(text):
-        if match.lastgroup == 'token':
+        if match.lastgroup in ('token', 'directive'):
             if line != previous_token_line:
                 group += 1
                 previous_token_line = line
-            tokens.append((group, match.group()))
+            # Macro-name / '(' adjacency and header-name whitespace have
+            # meaning inside directives. Conservatively retain their text.
+            token = match.group().strip() if match.lastgroup == 'directive' else match.group()
+            tokens.append((group, token))
         line += match.group().count('\n')
     encoded = json.dumps(tokens, ensure_ascii=True, separators=(',', ':'))
     return hashlib.sha256(encoded.encode('utf-8')).hexdigest()
