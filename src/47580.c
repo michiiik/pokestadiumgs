@@ -1,4 +1,5 @@
 #include "global.h"
+#include <stdarg.h>
 
 
 #ifdef VERSION_US
@@ -623,10 +624,44 @@ void func_80048344(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80049148.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80049290.s")
+extern void *Util_Malloc(s32);
+extern void Util_Free(void *);
+extern s32 func_80048E30(u8 *, s32, s32, s32, s32);
+s32 func_80049290(s32 font, s32 flags, const char *text) {
+    u8 *state;
+    s32 result;
+    struct FontStateView {
+        struct { s32 unk00, unk04, unk08; } fonts[6];
+        u8 unk48[0x2C];
+        u8 fontStack[4];
+        u8 attributes[8];
+    };
+
+    result = 0;
+    if (D_80126F58 != 0) {
+        flags = 0;
+    }
+    state = Util_Malloc(0x80);
+    if (state == 0) {
+        return 0;
+    }
+    *(struct FontStateView *)state = *(struct FontStateView *)D_80126F50;
+    if (font == 0) {
+        font = ((struct FontStateView *)state)->fontStack[state[0x7B]];
+    } else {
+        func_80046AC0(state, 0, (s32)font);
+    }
+    state[0x78] = (u8)flags;
+    if (((struct FontStateView *)state)->fonts[func_80047104((s32)font)].unk04 != 0) {
+        result = func_80048E30(state, 0, 0, (s32)text, 0);
+    }
+    Util_Free(state);
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800493B0.s")
 
+extern void func_800493B0(s32, s32, s32, const char *, va_list);
 void func_800495BC(s32 arg0, s32 arg1, const char *arg2, ...) {
     void *args;
     if (arg2 != 0) {
@@ -635,7 +670,14 @@ void func_800495BC(s32 arg0, s32 arg1, const char *arg2, ...) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800495F8.s")
+void func_800495F8(s32 x, s32 y, s32 mode, const char *format, ...) {
+    va_list args;
+    if (format != 0) {
+        va_start(args, format);
+        func_800493B0(x, y, mode, format, args);
+        va_end(args);
+    }
+}
 
 extern void func_80048830(u8 *, s32, s32, s32, s32);
 
