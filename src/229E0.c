@@ -5711,7 +5711,14 @@ void geo_layout_cmd_jump(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003FBE0.s")
+extern void * func_80003240();
+extern s16 D_8012651A;
+void func_8003FBE0(void) {
+    s32 (*command)[2] = (s32 (*)[2])D_80126520;
+    D_80126458[D_8012651A] = D_80126520 + 8;
+    D_8012651A++;
+    D_80126520 = (s32)func_80003240((*command)[1]);
+}
 #endif
 
 #ifdef VERSION_US
