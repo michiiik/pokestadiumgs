@@ -625,8 +625,8 @@ s32 file_number;
     return result;
 }
 
-void func_80004B4C(s32 arg0, s32 arg1) {
-    func_80004A40(0, arg0, arg1);
+void *func_80004B4C(s32 arg0, s32 arg1) {
+    return func_80004A40(NULL, (S1_BinArchive *)arg0, arg1);
 }
 
 void func_80004B78(void) {

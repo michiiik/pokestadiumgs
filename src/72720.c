@@ -2,12 +2,12 @@
 
 
 #ifdef VERSION_US
-s32 func_80004B4C(s32, s32);
+void *func_80004B4C(s32, s32);
 s32 func_80071B20(s32 arg0, s32 arg1) {
     if ((arg1 < 0) || (arg1 >= 5)) {
         return 0;
     }
-    return func_80004B4C(arg0, arg1);
+    return (s32)func_80004B4C(arg0, arg1);
 }
 
 s32 func_80071B58(s32 arg0, s32 arg1, s32 arg2) {
@@ -16,7 +16,7 @@ s32 func_80071B58(s32 arg0, s32 arg1, s32 arg2) {
     if (arg0 == 0) {
         return 0;
     }
-    base = func_80004B4C(arg0, arg1);
+    base = (s32)func_80004B4C(arg0, arg1);
     if (base == 0) {
         return 0;
     }
