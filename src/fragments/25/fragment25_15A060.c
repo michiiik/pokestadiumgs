@@ -201,7 +201,30 @@ s32 func_821016F0(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15A060/func_82101728.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15A060/func_821019AC.s")
+extern u16 D_82104104[];
+extern void func_800226C0(s32);
+void *func_821019AC(void *arg0, void *arg1) {
+    void *result;
+    u8 *entry;
+    void *next;
+    u16 buttons;
+    s32 index;
+
+    result = *(void **)((u8 *)arg0 + 4);
+    buttons = *(u16 *)((u8 *)arg1 + 8);
+    entry = result;
+    for (index = 0; index < 4; index++) {
+        next = *(void **)(entry + 0xC);
+        if (next != NULL && (D_82104104[index] & buttons) != 0) {
+            *(void **)((u8 *)arg0 + 4) = next;
+            func_800226C0(0x3C);
+            result = *(void **)((u8 *)arg0 + 4);
+            break;
+        }
+        entry += 4;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15A060/func_82101A30.s")
 
