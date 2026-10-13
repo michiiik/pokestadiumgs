@@ -127,7 +127,71 @@ u8 *func_81000894(u8 *dest, void *settings, u32 frame) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_15EA30/func_8100124C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_15EA30/func_81001F14.s")
+typedef struct {
+    u32 count;
+    void **textures;
+} ParticleTextureSequence26;
+typedef struct {
+    s16 values[6];
+} ParticleTileSettings26;
+typedef struct {
+    s16 unused;
+    s16 mode;
+    ParticleTileSettings26 *tile;
+    u32 unused8;
+    ParticleTextureSequence26 *sequence;
+} ParticleTextureAnimation26;
+typedef struct {
+    void *texture;
+    u32 unused4;
+    u32 format;
+} ParticleTextureBase26;
+typedef struct {
+    ParticleTextureBase26 *base;
+    ParticleTextureAnimation26 *animation;
+} ParticleTextureSettings26;
+extern Gfx *func_8100124C(Gfx *, void *, u32, s32, s32);
+
+Gfx *func_81001F14(Gfx *gfx, ParticleTextureSettings26 *settings, s32 format, s32 tile, u32 frame) {
+    void *texture = 0;
+    ParticleTextureAnimation26 *animation;
+    u32 index;
+
+    animation = settings->animation;
+    if ((animation != 0) && (animation->sequence != 0)) {
+        if (animation->mode == 1) {
+            if (frame >= animation->sequence->count) {
+                index = animation->sequence->count - 1;
+            } else {
+                index = frame % animation->sequence->count;
+            }
+        } else {
+            index = frame % animation->sequence->count;
+        }
+        texture = animation->sequence->textures[index];
+    } else if ((settings->base != 0) && (settings->base->texture != 0)) {
+        texture = settings->base->texture;
+    }
+    if (texture != 0) {
+        gfx = func_8100124C(gfx, texture, settings->base->format, format, tile);
+        animation = settings->animation;
+    }
+    if ((animation != 0) && (animation->tile != 0)) {
+        switch (tile) {
+            case 0:
+                func_810001D4(gfx++, animation->tile->values[0], animation->tile->values[1],
+                              animation->tile->values[2], animation->tile->values[3],
+                              animation->tile->values[4], animation->tile->values[5], frame);
+                break;
+            case 1:
+                func_81000248(gfx++, animation->tile->values[0], animation->tile->values[1],
+                              animation->tile->values[2], animation->tile->values[3],
+                              animation->tile->values[4], animation->tile->values[5], frame);
+                break;
+        }
+    }
+    return gfx;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_15EA30/func_810020E0.s")
 
