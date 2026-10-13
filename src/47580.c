@@ -3,6 +3,13 @@
 
 
 #ifdef VERSION_US
+struct FontHeightRecord {
+    s16 unk00;
+    s16 height;
+    u8 *data;
+    s32 unk08;
+};
+
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80046980.s")
 
 s32 func_80046AC0(u8 *arg0, s32 arg1, s32 arg2) {
@@ -33,7 +40,20 @@ void func_80046B14(u8 *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80046B2C.s")
+extern s32 func_80047104(s32);
+s32 func_80046B2C(u8 *state, s32 mode, s32 font) {
+    s32 result;
+    s32 index;
+    result = 0;
+    if (state != NULL) {
+        index = func_80047104(font);
+        if (((struct FontHeightRecord *)state)[index].data != 0) {
+            result = func_80046AC0(state, mode, font);
+            state[0x7A] &= ~2;
+        }
+    }
+    return result;
+}
 
 #pragma pack(1)
 struct PackedWord { s32 value; };
@@ -221,12 +241,6 @@ s32 func_800471D8(u8 *font, s32 unused, u16 glyph) {
     return width;
 }
 
-struct FontHeightRecord {
-    s16 unk00;
-    s16 height;
-    u8 *data;
-    s32 unk08;
-};
 struct FontHeightState {
     struct FontHeightRecord fonts[6];
     u8 unk48[0x2C];
@@ -560,7 +574,7 @@ s32 func_80047BD4(u8 *arg0) {
 
 extern s32 func_80047158(s32);
 extern void func_80046B14(u8 *arg0);
-extern void func_80046B2C(u8 *, s32, s32);
+extern s32 func_80046B2C(u8 *, s32, s32);
 extern u8 * func_800477C4(u8 *, u8 *);
 extern s32 func_80047B4C(const s8 *arg0);
 extern s32 func_80047BD4(u8 *arg0);
@@ -744,7 +758,24 @@ void func_80048344(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80048E30.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80049064.s")
+extern s32 func_80049290(s32, s32, const char *);
+extern s32 func_80048E30(u8 *, s32, s32, s32, s32);
+void func_80049064(s32 x, s32 y, s32 mode, const char *text) {
+    u8 *state;
+    state = D_80126F50;
+    func_800472B8(((struct FontHeightState *)state)->fontStack[state[0x7B]]);
+    switch (mode) {
+    case 1:
+    case 3:
+        x -= func_80049290(((struct FontHeightState *)state)->fontStack[state[0x7B]], (s8)state[0x78], text) / 2;
+        break;
+    case 2:
+    case 4:
+        x -= func_80049290(((struct FontHeightState *)state)->fontStack[state[0x7B]], (s8)state[0x78], text);
+        break;
+    }
+    func_80048E30(state, x, y, (s32)text, 1);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80049148.s")
 
@@ -815,7 +846,7 @@ extern void func_800496D8(s32, s32);
 extern s32 func_80049668(s32);
 void func_800496A4(s32 a0, s32 a1) { func_800496D8(0, a0); func_80049668(a1); }
 
-extern void func_80046B2C(u8 *, s32, s32);
+extern s32 func_80046B2C(u8 *, s32, s32);
 
 void func_800496D8(s32 arg0, s32 arg1) {
     func_80046B2C(D_80126F50, arg0, arg1);
