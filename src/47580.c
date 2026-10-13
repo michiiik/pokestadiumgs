@@ -892,7 +892,163 @@ void func_80048344(u8 *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80048390.s")
+extern s16 D_80094FA8;
+u8 *func_80048390(u8 *state, u8 *input, s32 *x, s32 y, s32 draw) {
+    u8 token[32];
+    u8 buffer[128];
+    u8 *output;
+    s32 finished;
+    s32 character;
+
+    output = buffer;
+    finished = 0;
+    while (finished == 0) {
+        character = *input;
+        switch (character) {
+        case 0:
+            finished = -1;
+            break;
+        case '>':
+            finished = 1;
+            break;
+        }
+        if (finished == 0) {
+            *output++ = character;
+            input++;
+        }
+    }
+    *output = 0;
+    output = func_800477C4(token, buffer);
+    if (draw != 0) {
+        switch (func_80047864((const s8 *)token)) {
+        case 0:
+            func_80047D24(state, output);
+            break;
+        case 1:
+            func_80047DC4(state, output);
+            break;
+        case 2:
+            func_80047EC4(state, output);
+            break;
+        case 3:
+            func_8004803C(state, output, x, y, draw);
+            break;
+        case 4:
+            func_80048188(state, output);
+            break;
+        case 6:
+            func_800481FC(state, output);
+            break;
+        }
+    } else {
+        switch (func_80047864((const s8 *)token)) {
+        case 0:
+            func_80047D24(state, output);
+            break;
+        case 3:
+            func_8004803C(state, output, x, y, draw);
+            break;
+        case 5:
+            func_80048234(output);
+            break;
+        case 6:
+            func_800481FC(state, output);
+            break;
+        case 7:
+            D_80094FA8 = 8;
+            func_800482C0(output);
+            break;
+        case 8:
+            D_80094FA8 = 12;
+            func_800482C0(output);
+            break;
+        case 9:
+            D_80094FA8 = 6;
+            D_80094FB0 = 1;
+            func_80048344(output);
+            break;
+        case 10:
+            D_80094FA8 = 6;
+            D_80094FB0 = 2;
+            func_80048344(output);
+            break;
+        case 11:
+            D_80094FA8 = 6;
+            D_80094FB0 = 3;
+            func_80048344(output);
+            break;
+        case 12:
+            D_80094FA8 = 6;
+            D_80094FB0 = 4;
+            func_80048344(output);
+            break;
+        case 13:
+            D_80094FA8 = 6;
+            D_80094FB0 = 5;
+            func_80048344(output);
+            break;
+        case 14:
+            D_80094FA8 = 6;
+            D_80094FB0 = 6;
+            func_80048344(output);
+            break;
+        case 15:
+            D_80094FA8 = 6;
+            D_80094FB0 = 7;
+            func_80048344(output);
+            break;
+        case 16:
+            D_80094FA8 = 6;
+            D_80094FB0 = 8;
+            func_80048344(output);
+            break;
+        case 17:
+            D_80094FA8 = 6;
+            D_80094FB0 = 9;
+            func_80048344(output);
+            break;
+        case 18:
+            D_80094FA8 = 6;
+            D_80094FB0 = 10;
+            func_80048344(output);
+            break;
+        case 19:
+            D_80094FA8 = 6;
+            D_80094FB0 = 11;
+            func_80048344(output);
+            break;
+        case 20:
+            D_80094FA8 = 6;
+            D_80094FB0 = 12;
+            func_80048344(output);
+            break;
+        case 21:
+            D_80094FA8 = 6;
+            D_80094FB0 = 13;
+            func_80048344(output);
+            break;
+        case 22:
+            D_80094FA8 = 6;
+            D_80094FB0 = 14;
+            func_80048344(output);
+            break;
+        case 23:
+            D_80094FA8 = 6;
+            D_80094FB0 = 15;
+            func_80048344(output);
+            break;
+        case 24:
+            D_80094FA8 = 6;
+            D_80094FB0 = 16;
+            func_80048344(output);
+            break;
+        }
+    }
+    if (finished == 1) {
+        input++;
+    }
+    return input;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80048830.s")
 
@@ -1000,9 +1156,75 @@ s32 func_80049290(s32 font, s32 flags, const char *text) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800493B0.s")
+void func_800493B0(s32 x, s32 y, s32 mode, const char *format, va_list args) {
+    s8 formatted[512];
+    char line[512];
+    s32 length;
+    const s32 renderFlag = 1;
+    s32 offset;
+    s32 output;
+    s32 finished;
+    s32 font;
+    s32 width;
+    s32 drawX;
+    s32 drawY;
+    struct FontHeightState *state;
 
-extern void func_800493B0(s32, s32, s32, const char *, va_list);
+    offset = 0;
+    drawX = x;
+    drawY = y;
+    length = _Printf(func_800471B4, formatted, format, args);
+    if (length > 0) {
+        formatted[length] = 0;
+        do {
+            output = 0;
+            if (mode == 3 || mode == 4) {
+                while (1) {
+                    finished = 0;
+                    switch ((s8)formatted[offset]) {
+                    case 0:
+                    case 10:
+                        finished = 1;
+                        line[output] = 0;
+                        output++;
+                        offset++;
+                        break;
+                    default:
+                        line[output] = (s8)formatted[offset];
+                        output++;
+                        offset++;
+                        break;
+                    }
+                    state = (struct FontHeightState *)D_80126F50;
+                    if (finished) {
+                        break;
+                    }
+                }
+            } else {
+                _bcopy(formatted, line, length + 1);
+                state = (struct FontHeightState *)D_80126F50;
+            }
+            switch (mode) {
+            case 1:
+            case 3:
+                font = state->fontStack[state->attributes[3]];
+                width = func_80049148(font, (s8)state->attributes[0], line);
+                drawX = x - width / 2;
+                break;
+            case 2:
+            case 4:
+                font = state->fontStack[state->attributes[3]];
+                width = func_80049148(font, (s8)state->attributes[0], line);
+                drawX = x - width;
+                break;
+            }
+            state = (struct FontHeightState *)D_80126F50;
+            func_80048E30((u8 *)state, drawX, drawY, line, renderFlag);
+            drawY += (s8)D_80126F50[0x79];
+        } while ((mode == 3 || mode == 4) && offset < length);
+    }
+}
+
 void func_800495BC(s32 arg0, s32 arg1, const char *arg2, ...) {
     void *args;
     if (arg2 != 0) {
