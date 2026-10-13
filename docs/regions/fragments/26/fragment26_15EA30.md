@@ -1,5 +1,14 @@
 # Fragment 26 particle callbacks
 
+## 2026-10-14: func_8100352C accepted natively
+
+- The 85-instruction / 340-byte mesh callback is accepted through the normal runner and linked full-ROM gate. Winner: `particle-mesh:native-shape-cleanup:void *:plain:sdk`; `link_verified=true`, one combined gate, retail MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`. Timing: 5.549 seconds probing, 59.003 seconds gating, 64.557 seconds total. The other seven candidates were skipped after acceptance. All work in this continuation ran directly on macOS, without agents or Docker.
+- Event 5 allocates count * 16 bytes, preserves the original overlapping vertex copies, scales unsigned alpha by object opacity using signed integer division by 255, and emits the SDK segment-15 command. Keep the short local record, event-block allocated pointer, explicit copy backedge, inline quotient, and original 0x38 frame.
+- The decisive compiler-shape constraint is the documented, side-effect-free `if (allocated != NULL) { }` after the copy loop. It keeps the allocation pointer live for IDO's register reservation but emits no instructions. This is matching scaffolding, not evidence of the original source spelling. Useful source/destination pointer-selection alternatives added instructions and failed to match. No compiler patch, forced register, modified object, or acceptance bypass was used.
+- Formal/pointer/return categories and loop predicates were inert or regressed the inline-quotient seed. The late allocation check supplied the missing allocation reservation while leaving the quotient uncolored. Eight cleanup variants all had verified link shapes; the first plain-record SDK version was installed and gated. Earlier normalized-only seeds and phase-input experiments remain diagnostic evidence, not accepted definitions.
+- Removal of unused type/declaration debris and stray empty statements was independently rebuilt with default host syntax checks and the full-ROM gate. No evidence-backed function name exists in the available naming metadata; retain the address name. Historical probe counts below are snapshots, not a current cross-backend total.
+- Only `func_81003510` remains assembly-owned in this file. Its branch-to-next / duplicate-return boundary needs code-generator evidence; do not replay the exhausted empty frontend condition variants.
+
 ## 2026-10-14: func_810024E0 accepted
 
 - The939-instruction /3756-byte particle graphics dispatcher now matches, including its0x110 frame, all primary/secondary texture paths, static/animated primitive and environment colors, context/object opacity overrides, geometry, and texture-LUT commands. No padding, jump-table migration, or compiler patch is needed.
