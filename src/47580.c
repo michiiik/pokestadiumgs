@@ -1000,9 +1000,75 @@ s32 func_80049290(s32 font, s32 flags, const char *text) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800493B0.s")
+void func_800493B0(s32 x, s32 y, s32 mode, const char *format, va_list args) {
+    s8 formatted[512];
+    char line[512];
+    s32 length;
+    const s32 renderFlag = 1;
+    s32 offset;
+    s32 output;
+    s32 finished;
+    s32 font;
+    s32 width;
+    s32 drawX;
+    s32 drawY;
+    struct FontHeightState *state;
 
-extern void func_800493B0(s32, s32, s32, const char *, va_list);
+    offset = 0;
+    drawX = x;
+    drawY = y;
+    length = _Printf(func_800471B4, formatted, format, args);
+    if (length > 0) {
+        formatted[length] = 0;
+        do {
+            output = 0;
+            if (mode == 3 || mode == 4) {
+                while (1) {
+                    finished = 0;
+                    switch ((s8)formatted[offset]) {
+                    case 0:
+                    case 10:
+                        finished = 1;
+                        line[output] = 0;
+                        output++;
+                        offset++;
+                        break;
+                    default:
+                        line[output] = (s8)formatted[offset];
+                        output++;
+                        offset++;
+                        break;
+                    }
+                    state = (struct FontHeightState *)D_80126F50;
+                    if (finished) {
+                        break;
+                    }
+                }
+            } else {
+                _bcopy(formatted, line, length + 1);
+                state = (struct FontHeightState *)D_80126F50;
+            }
+            switch (mode) {
+            case 1:
+            case 3:
+                font = state->fontStack[state->attributes[3]];
+                width = func_80049148(font, (s8)state->attributes[0], line);
+                drawX = x - width / 2;
+                break;
+            case 2:
+            case 4:
+                font = state->fontStack[state->attributes[3]];
+                width = func_80049148(font, (s8)state->attributes[0], line);
+                drawX = x - width;
+                break;
+            }
+            state = (struct FontHeightState *)D_80126F50;
+            func_80048E30((u8 *)state, drawX, drawY, line, renderFlag);
+            drawY += (s8)D_80126F50[0x79];
+        } while ((mode == 3 || mode == 4) && offset < length);
+    }
+}
+
 void func_800495BC(s32 arg0, s32 arg1, const char *arg2, ...) {
     void *args;
     if (arg2 != 0) {
