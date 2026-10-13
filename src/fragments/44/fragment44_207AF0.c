@@ -83,7 +83,23 @@ s32 *func_8AF199D8(s16 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_207AF0/func_8AF19A1C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_207AF0/func_8AF19AC4.s")
+extern u8 func_80062F68(u8);
+s32 func_8AF19AC4(u8 arg0) {
+    u8 value;
+    s32 result = 0;
+
+    if (arg0 >= 0xDD) {
+        value = func_80062F68(arg0 - 0xC0);
+        result = value & 0xFF;
+    } else if (arg0 >= 0xC4) {
+        value = func_80062F68(arg0 - 0xBF);
+        result = value & 0xFF;
+    } else if (arg0 >= 0xBF) {
+        value = func_80062F68(arg0 - 0xBE);
+        result = value & 0xFF;
+    }
+    return result;
+}
 
 extern u8 func_80063014(u8);
 s32 func_8AF19B40(u8 arg0) {
