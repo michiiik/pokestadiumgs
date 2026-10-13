@@ -3,7 +3,65 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80046980.s")
+struct FontHeightRecord {
+    s16 unk00;
+    s16 height;
+    u8 *data;
+    s32 unk08;
+};
+
+extern s32 main_pool_push_state(s32);
+extern s32 main_pool_pop_state(s32);
+extern u8 *func_800042C0(u8 *, u8 *, s32, s32);
+extern void _bcopy(const void *, void *, s32);
+extern u32 D_437670;
+extern u32 D_437750;
+extern u8 *D_80126F50;
+struct FontTableHeader {
+    u8 mode;
+    u8 extraCount;
+    u16 bitmapOffset;
+    u32 tables[3];
+};
+extern u8 D_80126F58[];
+extern u8 D_80126F68[0x60];
+extern u8 D_80126FC8[0x80];
+extern u8 D_80127048[0x53];
+
+/* Byte-array view of the variable-sized ROM image, including its header. */
+struct FontTableBlob { u8 bytes[1]; };
+u8 *func_80046980(void) {
+    u8 *blob;
+    s32 count;
+
+    main_pool_push_state(0x414E4B50);
+    D_80126F50 = NULL;
+    D_80126F58[0] = 0xFF;
+    blob = func_800042C0((u8 *)&D_437670, (u8 *)&D_437750, 0, 0);
+    if (blob != NULL) {
+        *(struct FontTableHeader *)D_80126F58 = *(struct FontTableHeader *)blob;
+        if (((struct FontTableHeader *)blob)->tables[0] != 0) {
+            _bcopy(&((struct FontTableBlob *)blob)->bytes[((struct FontTableHeader *)blob)->tables[0]], D_80126F68, 0x60);
+            ((struct FontTableHeader *)D_80126F58)->tables[0] = (u32)D_80126F68;
+        }
+        if (((struct FontTableHeader *)blob)->tables[1] != 0) {
+            u8 *copySource;
+            count = 0x60;
+            copySource = &((struct FontTableBlob *)blob)->bytes[((struct FontTableHeader *)blob)->tables[1]];
+            if (D_80126F58[1] < 0x21) {
+                count = D_80126F58[1] + 0x60;
+            }
+            _bcopy(copySource, D_80126FC8, count);
+            ((struct FontTableHeader *)D_80126F58)->tables[1] = (u32)D_80126FC8;
+        }
+        if (((struct FontTableHeader *)blob)->tables[2] != 0) {
+            _bcopy(&((struct FontTableBlob *)blob)->bytes[((struct FontTableHeader *)blob)->tables[2]], D_80127048, 0x53);
+            ((struct FontTableHeader *)D_80126F58)->tables[2] = (u32)D_80127048;
+        }
+    }
+    main_pool_pop_state(0x414E4B50);
+    return D_80126F58;
+}
 
 s32 func_80046AC0(u8 *arg0, s32 arg1, s32 arg2) {
     s32 result;
@@ -33,7 +91,20 @@ void func_80046B14(u8 *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80046B2C.s")
+extern s32 func_80047104(s32);
+s32 func_80046B2C(u8 *state, s32 mode, s32 font) {
+    s32 result;
+    s32 index;
+    result = 0;
+    if (state != NULL) {
+        index = func_80047104(font);
+        if (((struct FontHeightRecord *)state)[index].data != 0) {
+            result = func_80046AC0(state, mode, font);
+            state[0x7A] &= ~2;
+        }
+    }
+    return result;
+}
 
 #pragma pack(1)
 struct PackedWord { s32 value; };
@@ -71,7 +142,25 @@ void func_80046C18(u8 *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80046CA8.s")
+s32 func_80046CA8(u8 *state, s32 mode, s32 r, s32 g, s32 b, s32 a) {
+    s32 result;
+    struct { u8 r, g, b, a; } color;
+    result = 0;
+    if (state != NULL) {
+        color.r = r;
+        color.g = g;
+        color.b = b;
+        color.a = a;
+        if (*(u32 *)&color != ((u32 *)(state + 0x54))[state[0x7C]]) {
+            result = func_80046BB4(state, mode, (u8 *)&color);
+            if (result != 0) {
+                gDPPipeSync(D_800D0510++);
+                gDPSetEnvColor(D_800D0510++, color.r, color.g, color.b, color.a);
+            }
+        }
+    }
+    return result;
+}
 
 s32 func_80046D70(u8 *arg0, s32 arg1, u8 *arg2) {
     s32 result;
@@ -106,7 +195,25 @@ void func_80046DD4(u8 *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80046E64.s")
+s32 func_80046E64(u8 *state, s32 mode, s32 r, s32 g, s32 b, s32 a) {
+    s32 result;
+    struct { u8 r, g, b, a; } color;
+    result = 0;
+    if (state != NULL) {
+        color.r = r;
+        color.g = g;
+        color.b = b;
+        color.a = a;
+        if (*(u32 *)&color != ((u32 *)(state + 0x64))[state[0x7D]]) {
+            result = func_80046D70(state, mode, (u8 *)&color);
+            if (result != 0) {
+                gDPPipeSync(D_800D0510++);
+                gDPSetPrimColor(D_800D0510++, 0, 0, color.r, color.g, color.b, color.a);
+            }
+        }
+    }
+    return result;
+}
 
 void func_80046F2C(u8 *arg0, s32 arg1) {
     arg0[0x79] = (u8)arg1;
@@ -151,12 +258,11 @@ done:
     return result;
 }
 
-extern u8 D_80126F58;
 extern s32 func_80047058(u16);
 extern s32 func_80046F34(u16 arg0);
 s32 func_800470B8(u16 arg0) {
     s32 result;
-    if (D_80126F58 == 0) {
+    if (D_80126F58[0] == 0) {
         result = func_80046F34(arg0);
     } else {
         result = func_80047058(arg0);
@@ -185,12 +291,6 @@ s32 func_800471D8(u8 *font, s32 unused, u16 glyph) {
     return width;
 }
 
-struct FontHeightRecord {
-    s16 unk00;
-    s16 height;
-    u8 *data;
-    s32 unk08;
-};
 struct FontHeightState {
     struct FontHeightRecord fonts[6];
     u8 unk48[0x2C];
@@ -282,7 +382,26 @@ void Font_FreeSetAsset(s32 arg0, s32 arg1)
   }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047398.s")
+extern u8 *func_80047558(s32, s32);
+extern u16 D_80126F5A;
+extern u8 *main_pool_set_func(u8 *, s32, s32);
+void func_80047398(s32 font, s32 width, s32 height) {
+    s32 index;
+    struct FontHeightRecord *record;
+    u8 *data;
+
+    index = func_80047104(font);
+    record = &((struct FontHeightState *)D_80126F50)->fonts[index];
+    if (record->data == NULL) {
+        data = func_80047558(*(s32 *)(D_80126F50 + 0x48), font);
+        record->unk00 = width;
+        record->height = height;
+        record->data = data;
+        record->unk08 = D_80126F5A + (s32)data;
+        main_pool_set_func(data, index, (s32)Font_FreeSetAsset);
+        D_80126F50[0x7E] = font;
+    }
+}
 
 extern void func_80047398(s32, s32, s32);
 extern u8 * D_80126F50;
@@ -309,21 +428,33 @@ void func_80047444(s32 arg0) {
     }
 }
 
-extern u32 D_437750;
 extern u32 D_446E30;
-extern void BinArchive_Open(void *, void *, s32, s32);
-void func_80047524(void) {
-    BinArchive_Open(&D_437750, &D_446E30, 1, 1);
+extern void *BinArchive_Open(void *, void *, s32, s32);
+void *func_80047524(void) {
+    return BinArchive_Open(&D_437750, &D_446E30, 1, 1);
 }
 
-extern void func_80004B4C(s32, s32);
+extern void *func_80004B4C(s32, s32);
 s32 func_80047104(s32);
 
-void func_80047558(s32 arg0, s32 arg1) {
-    func_80004B4C(arg0, func_80047104(arg1));
+u8 *func_80047558(s32 arg0, s32 arg1) {
+    return func_80004B4C(arg0, func_80047104(arg1));
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047588.s")
+void func_80047670(void);
+extern void _bzero(void *, s32);
+extern s32 main_pool_alloc_with_func(s32, s32, s32, s32);
+u8 *func_80047588(s32 flags, s32 side) {
+    D_80126F50 = (u8 *)main_pool_alloc_with_func(0x80, side, 0x50524E54, (s32)func_80047348);
+    if (D_80126F50 != NULL) {
+        _bzero(D_80126F50, 0x80);
+        func_80047670();
+        *(void **)(D_80126F50 + 0x48) = func_80047524();
+        func_80047444(flags);
+        D_80094FB4 = 0;
+    }
+    return D_80126F50;
+}
 
 extern u8 *D_80126F50; void func_80047610(void) { main_pool_try_free(D_80126F50); }
 
@@ -384,7 +515,34 @@ s32 func_80047790(s32 arg0) {
     return var_v1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800477C4.s")
+u8 *func_800477C4(u8 *dest, u8 *input) {
+    s32 character;
+    u8 *output;
+    u8 *cursor;
+    s32 started;
+
+    character = *input;
+    output = dest;
+    started = 0;
+    cursor = input + 1;
+    if (character != 0) {
+        do {
+            if (started == 0) {
+                if (func_80047790(character) == 0) {
+                    *output++ = character;
+                    started = 1;
+                }
+            } else {
+                if (func_80047790(character) != 0) {
+                    break;
+                }
+                *output++ = character;
+            }
+        } while ((character = *cursor++) != 0);
+    }
+    *output = 0;
+    return cursor;
+}
 
 extern s32 HAL_Strcmp(const s8 *, const s8 *);
 s32 func_80047864(const s8 * arg0) {
@@ -511,7 +669,7 @@ s32 func_80047BD4(u8 *arg0) {
 
 extern s32 func_80047158(s32);
 extern void func_80046B14(u8 *arg0);
-extern void func_80046B2C(u8 *, s32, s32);
+extern s32 func_80046B2C(u8 *, s32, s32);
 extern u8 * func_800477C4(u8 *, u8 *);
 extern s32 func_80047B4C(const s8 *arg0);
 extern s32 func_80047BD4(u8 *arg0);
@@ -540,7 +698,7 @@ void func_80047D24(u8 *arg0, u8 *arg1) {
 }
 
 extern u8 *func_800477C4(u8 *, u8 *);
-extern void func_80046CA8(u8 *, s32, s32, s32, s32, s32);
+extern s32 func_80046CA8(u8 *, s32, s32, s32, s32, s32);
 extern void func_80046C18(u8 *);
 
 void func_80047DC4(u8 *arg0, u8 *arg1) {
@@ -695,13 +853,76 @@ void func_80048344(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80048E30.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80049064.s")
-
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80049148.s")
+extern s32 func_80049290(s32, s32, const char *);
+extern s32 func_80048E30(u8 *, s32, s32, const char *, s32);
+void func_80049064(s32 x, s32 y, s32 mode, const char *text) {
+    u8 *state;
+    state = D_80126F50;
+    func_800472B8(((struct FontHeightState *)state)->fontStack[state[0x7B]]);
+    switch (mode) {
+    case 1:
+    case 3:
+        x -= func_80049290(((struct FontHeightState *)state)->fontStack[state[0x7B]], (s8)state[0x78], text) / 2;
+        break;
+    case 2:
+    case 4:
+        x -= func_80049290(((struct FontHeightState *)state)->fontStack[state[0x7B]], (s8)state[0x78], text);
+        break;
+    }
+    func_80048E30(state, x, y, text, 1);
+}
 
 extern void *Util_Malloc(s32);
 extern void Util_Free(void *);
-extern s32 func_80048E30(u8 *, s32, s32, s32, s32);
+extern s32 _Printf(void *(*)(void *, const void *, s32), void *, const char *, va_list);
+extern s32 func_80048E30(u8 *, s32, s32, const char *, s32);
+s32 func_80049148(s32 font, s32 flags, const char *format, ...) {
+    const s32 renderFlag = 0;
+    struct {
+        char text[513];
+        s32 width;
+    } work;
+    u8 *state;
+    s32 length;
+    s32 index;
+    struct FontHeightRecord *record;
+    char *text;
+    va_list args;
+
+    work.width = 0;
+    if (D_80126F58[0] != 0) {
+        flags = 0;
+    }
+    state = Util_Malloc(0x80);
+    if (state == NULL) {
+        return 0;
+    }
+    *(struct FontHeightState *)state = *(struct FontHeightState *)D_80126F50;
+    if (font == 0) {
+        font = ((struct FontHeightState *)state)->fontStack[state[0x7B]];
+    } else {
+        func_80046AC0(state, 0, font);
+    }
+    state[0x78] = flags;
+    index = func_80047104(font);
+    record = &((struct FontHeightState *)state)->fonts[index];
+    if (record->data != NULL) {
+        text = work.text;
+        va_start(args, format);
+        length = _Printf(func_800471B4, text, format, args);
+        va_end(args);
+        if (length > 0) {
+            text[length] = 0;
+            work.width = func_80048E30(state, 0, 0, text, renderFlag);
+        }
+    }
+    Util_Free(state);
+    return work.width;
+}
+
+extern void *Util_Malloc(s32);
+extern void Util_Free(void *);
+extern s32 func_80048E30(u8 *, s32, s32, const char *, s32);
 s32 func_80049290(s32 font, s32 flags, const char *text) {
     u8 *state;
     s32 result;
@@ -713,7 +934,7 @@ s32 func_80049290(s32 font, s32 flags, const char *text) {
     };
 
     result = 0;
-    if (D_80126F58 != 0) {
+    if (D_80126F58[0] != 0) {
         flags = 0;
     }
     state = Util_Malloc(0x80);
@@ -728,7 +949,7 @@ s32 func_80049290(s32 font, s32 flags, const char *text) {
     }
     state[0x78] = (u8)flags;
     if (((struct FontStateView *)state)->fonts[func_80047104((s32)font)].unk04 != 0) {
-        result = func_80048E30(state, 0, 0, (s32)text, 0);
+        result = func_80048E30(state, 0, 0, text, 0);
     }
     Util_Free(state);
     return result;
@@ -766,7 +987,7 @@ extern void func_800496D8(s32, s32);
 extern s32 func_80049668(s32);
 void func_800496A4(s32 a0, s32 a1) { func_800496D8(0, a0); func_80049668(a1); }
 
-extern void func_80046B2C(u8 *, s32, s32);
+extern s32 func_80046B2C(u8 *, s32, s32);
 
 void func_800496D8(s32 arg0, s32 arg1) {
     func_80046B2C(D_80126F50, arg0, arg1);
@@ -918,7 +1139,7 @@ void func_80049C70(s32 *first, s32 *second, u8 *text) {
                 }
                 break;
             default:
-                if (D_80126F58 == 0 && character >= 0x80 && *cursor != 0) {
+                if (D_80126F58[0] == 0 && character >= 0x80 && *cursor != 0) {
                     cursor += 1;
                 }
                 break;
@@ -950,7 +1171,7 @@ void func_80049D9C(u8 *first, u8 *second, u8 *third, u8 *text) {
                 *third = D_80094FB0;
                 break;
             default:
-                if (D_80126F58 == 0 && character >= 0x80 && *cursor != 0) {
+                if (D_80126F58[0] == 0 && character >= 0x80 && *cursor != 0) {
                     cursor++;
                 }
                 break;
