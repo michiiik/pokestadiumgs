@@ -366,11 +366,11 @@ void Save_ClearRecord(u8 *arg0, s32 arg1, s32 arg2) {
     *temp_v0 |= 2;
 }
 
-extern void func_80061248();
+extern void func_80061248(u8 *, u8 *);
 extern void func_800619E8(void *);
 
-void func_80051830(void *arg0) {
-    func_80061248();
+void func_80051830(void *arg0, void *arg1) {
+    func_80061248((u8 *)arg0, (u8 *)arg1);
     func_800619E8(arg0);
     (*(u16 *)((u8 *)(arg0) + (0x26))) = (u16) (*(u16 *)((u8 *)(arg0) + (0x28)));
 }
@@ -577,7 +577,7 @@ s32 func_800533A4(s32 arg0, s32 arg1) {
     return result;
 }
 
-extern s32 func_80060C08();
+extern s8 *func_80060C08(s8 *, u8 *);
 extern s32 Deck_IsSaveEntryPresent(void *arg0, void *arg1);
 extern s32 func_80050E88(s32 arg0, s32 arg1, s32 arg2);
 extern void * func_80051028(s32 arg0, s32 arg1);
@@ -593,7 +593,7 @@ s32 func_80053440(s32 arg0, s32 arg1, u8 *arg2) {
         case 0x11: next = (u8 *)func_80050F60(0, arg1) + 4; break;
         case 0x12: next = (u8 *)func_80051028(0, arg1) + 4; break;
         }
-        if (next != 0) result = (s32)func_80060C08(arg2, next);
+        if (next != 0) result = (s32)func_80060C08((s8 *)arg2, next);
     }
     return result;
 }
@@ -608,7 +608,7 @@ s32 func_80053524(s32 arg0, u8 *arg1) {
         next = func_80050F60(0, arg0);
         if (next != -0x10) {
             next += 0x10;
-            result = func_80060C08((u16 *)arg1, (u16 *)next);
+            result = (s32)func_80060C08((s8 *)arg1, (u8 *)next);
         }
     }
     return result;
@@ -668,11 +668,27 @@ void func_80053A30(void) {
     func_80062614();
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80053A50.s")
+void func_80053A50(u8 *arg0, u8 *arg1) {
+    u8 *destination;
+    u8 *source;
+    s32 offset;
 
-void func_80053AC8(u16 *a0,u16 *a1){a0[0]=a1[0];a0[1]=a1[1];a0[2]=a1[2];func_80060C08(a0+4,a1+4);}
+    func_80060C08((s8 *)arg0, arg1);
+    destination = arg0 + 0x10;
+    offset = 0;
+    *(u16 *)(arg0 + 0xC) = *(u16 *)(arg1 + 0xC);
+    source = arg1 + 0x10;
+    do {
+        func_80051830(destination, source);
+        offset += 0x3C;
+        destination += 0x58;
+        source += 0x3C;
+    } while (offset != 0x168);
+}
 
-void func_80053B04(u16 *a0,u16 *a1){a0[0]=a1[0];a0[1]=a1[1];func_80060C08(a0+2,a1+2);}
+void func_80053AC8(u16 *a0,u16 *a1){a0[0]=a1[0];a0[1]=a1[1];a0[2]=a1[2];func_80060C08((s8 *)(a0+4),(u8 *)(a1+4));}
+
+void func_80053B04(u16 *a0,u16 *a1){a0[0]=a1[0];a0[1]=a1[1];func_80060C08((s8 *)(a0+2),(u8 *)(a1+2));}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/517E0/func_80053B38.s")
 
