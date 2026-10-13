@@ -739,7 +739,59 @@ void func_810034C0(s32 arg0, Func810034C0StateD *state) {
 
 void func_81003524(s32 arg0, s32 arg1) { if (arg0 == 5) { arg1 = arg1; } }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_15EA30/func_8100352C.s")
+typedef union { s16 packed; struct { s8 red, green, blue; u8 alpha; } color; } ParticleVertexTail26;
+typedef struct { s16 xyz[3]; u16 flag; s16 uv[2]; ParticleVertexTail26 tail; } ParticleVertex26;
+typedef struct { u8 pad[0x20]; void *vertices; u8 pad24[2]; s16 count; } ParticleMeshCopy26;
+typedef struct { u8 pad[0x87]; u8 opacity; } ParticleOpacityCopy26;
+typedef struct { u8 pad[0x14]; ParticleOpacityCopy26 *object; } ParticleMeshContextCopy26;
+typedef struct { s16 pad; s16 count; ParticleVertex26 *source; ParticleOpacityCopy26 *object; } ParticleCopyShort26;
+extern ParticleMeshCopy26 *D_80094920;
+extern void *Gfx_AllocDisplayList(s32);
+void func_8100352C(s32 event, void *node)
+{
+  s32 i;
+  ParticleVertex26 *src;
+  ParticleVertex26 *dst;
+  if (event == 5)
+  {
+    ParticleCopyShort26 locals;
+    ParticleVertex26 *allocated;
+    src = (ParticleVertex26 *)D_8009491C;
+    locals.object = ((ParticleMeshContextCopy26 *)src)->object;
+    locals.source = (ParticleVertex26 *)D_80094920->vertices;
+    locals.count = D_80094920->count;
+    allocated = (ParticleVertex26 *)Gfx_AllocDisplayList(locals.count * 16);
+    i = 0;
+    if (locals.count > 0)
+    {
+      src = locals.source;
+      dst = allocated;
+      copy_vertex:
+      dst->xyz[0] = src->xyz[0];
+      dst->xyz[1] = src->xyz[1];
+      dst->xyz[2] = src->xyz[2];
+      dst->flag = src->flag;
+      dst->uv[0] = src->uv[0];
+      dst->uv[1] = src->uv[1];
+      dst->tail.packed = src->tail.packed;
+      dst->tail.color.red = src->tail.color.red;
+      dst->tail.color.green = src->tail.color.green;
+      dst->tail.color.blue = src->tail.color.blue;
+      dst->tail.color.alpha = (src->tail.color.alpha * locals.object->opacity) / 255;
+      i++;
+      src++;
+      dst++;
+      if (i < locals.count)
+      {
+        goto copy_vertex;
+      }
+    }
+    /* Keep the allocation result live here for the original IDO register
+     * reservation. This side-effect-free check emits no instructions. */
+    if (allocated != NULL) { }
+    gSPSegment((*((Gfx **)(&D_800D0510)))++, 15, osVirtualToPhysical(allocated));
+  }
+}
 
 typedef struct { s16 mode; s16 period; } ParticleSettings26;
 typedef struct { u8 pad[0x14]; ParticleSettings26 *settings; u8 color[3]; u8 pad1b; s16 x; s16 y; } ParticleNode26;
