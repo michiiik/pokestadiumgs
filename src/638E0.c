@@ -47,7 +47,20 @@ u8 func_80062E4C(u8 arg0) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/638E0/func_80062EB0.s")
+u8 func_80062EB0(u8 arg0, u8 arg1) {
+    u8 base;
+    u32 step;
+    s32 flags;
+
+    if (arg0 > 0 && arg0 < 0xFC) {
+        base = D_8009782E[arg0 * 6];
+        step = func_80062E4C(arg0);
+        flags = arg1 & 0xC0;
+        base += step * (flags >> 6);
+        return base | flags;
+    }
+    return 0;
+}
 
 u8 func_80062F2C(u8 arg0) { extern u8 D_8009782F[]; if (arg0 > 0 && arg0 < 0xFC) return D_8009782F[arg0 * 6]; return 0; }
 
