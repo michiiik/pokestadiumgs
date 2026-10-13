@@ -66,8 +66,8 @@ void func_81800E30(void) {
 
 #ifdef VERSION_US
 extern s32 func_8004CA4C(u8 *);
-extern u16 func_8004CA10(u16 *);
-extern u16 func_8004CA24(u16 *);
+extern s32 func_8004CA10(u16 *);
+extern s32 func_8004CA24(u16 *);
 s32 func_8180128C(u8 *arg0) {
     s32 scale;
     s32 value;
