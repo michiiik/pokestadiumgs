@@ -908,7 +908,7 @@ extern s16 D_84186C64[];
 extern s16 D_84186C6C[];
 extern s16 D_84186C74[];
 extern u8 D_84186F94[];
-extern s32 func_80062EB0(u8, u8);
+extern u8 func_80062EB0(u8, u8);
 extern void ParticleGfx_SetPrimColor_fragment79(u8 r, u8 g, u8 b, u8 a);
 extern void func_8413F32C(s16 arg0, s16 arg1, u8 arg2);
 extern void func_8413F390(s16, s16, s32, u16);
