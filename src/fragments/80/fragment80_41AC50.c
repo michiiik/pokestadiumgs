@@ -120,7 +120,23 @@ void func_84202A20(u8 arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_84202B58.s")
+extern void func_842029A8(u8 arg0);
+extern void func_84202A20(u8 arg0);
+void func_84202B58(u8 arg0) {
+    u8 *record = (u8 *)D_84203B54 + arg0 * 0x4E0;
+
+    if (record[7] == 6) {
+        if (record[8] == 3) {
+            goto special;
+        }
+    }
+    func_842029A8(arg0);
+    goto done;
+special:
+    func_84202A20(arg0);
+done:
+    ;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_84202BD0.s")
 
