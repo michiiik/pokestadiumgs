@@ -268,7 +268,83 @@ u8 *func_8100107C(u8 *dest, ParticleSplineColors26 *settings, u32 frame) {
     return dest;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_15EA30/func_8100124C.s")
+typedef struct {
+    u8 format;
+    u8 size;
+    u8 cms;
+    u8 cmt;
+    u8 masks;
+    u8 maskt;
+    u8 shifts;
+    u8 shiftt;
+    s16 width;
+    s16 height;
+} ParticleTextureTile26;
+
+Gfx *func_8100124C(Gfx *gfx, void *texture, u32 metadata, s32 tmem, s32 tile) {
+    ParticleTextureTile26 *settings = (ParticleTextureTile26 *)metadata;
+
+    switch (settings->format) {
+        case G_IM_FMT_RGBA:
+            switch (settings->size) {
+                case G_IM_SIZ_32b:
+                    if (tmem == 0x100) {
+                        tmem = 0x80;
+                    }
+                    gDPLoadMultiTile(gfx++, texture, tmem, tile, settings->format, G_IM_SIZ_32b,
+                                     settings->width, settings->height, 0, 0,
+                                     settings->width - 1, settings->height - 1, 0,
+                                     settings->cms, settings->cmt, settings->masks, settings->maskt,
+                                     settings->shifts, settings->shiftt);
+                    break;
+                case G_IM_SIZ_16b:
+                    gDPLoadMultiTile(gfx++, texture, tmem, tile, settings->format, G_IM_SIZ_16b,
+                                     settings->width, settings->height, 0, 0,
+                                     settings->width - 1, settings->height - 1, 0,
+                                     settings->cms, settings->cmt, settings->masks, settings->maskt,
+                                     settings->shifts, settings->shiftt);
+                    break;
+            }
+            break;
+        case G_IM_FMT_IA:
+            switch (settings->size) {
+                case G_IM_SIZ_8b:
+                    gDPLoadMultiTile(gfx++, texture, tmem, tile, G_IM_FMT_IA, G_IM_SIZ_8b,
+                                     settings->width, settings->height, 0, 0,
+                                     settings->width - 1, settings->height - 1, 0,
+                                     settings->cms, settings->cmt, settings->masks, settings->maskt,
+                                     settings->shifts, settings->shiftt);
+                    break;
+                case G_IM_SIZ_16b:
+                    gDPLoadMultiTile(gfx++, texture, tmem, tile, G_IM_FMT_IA, G_IM_SIZ_16b,
+                                     settings->width, settings->height, 0, 0,
+                                     settings->width - 1, settings->height - 1, 0,
+                                     settings->cms, settings->cmt, settings->masks, settings->maskt,
+                                     settings->shifts, settings->shiftt);
+                    break;
+            }
+            break;
+        case G_IM_FMT_I:
+            switch (settings->size) {
+                case G_IM_SIZ_4b:
+                    gDPLoadMultiTile_4b(gfx++, texture, tmem, tile, G_IM_FMT_I,
+                                        settings->width, settings->height, 0, 0,
+                                        settings->width - 1, settings->height - 1, 0,
+                                        settings->cms, settings->cmt, settings->masks, settings->maskt,
+                                        settings->shifts, settings->shiftt);
+                    break;
+                case G_IM_SIZ_8b:
+                    gDPLoadMultiTile(gfx++, texture, tmem, tile, G_IM_FMT_I, G_IM_SIZ_8b,
+                                     settings->width, settings->height, 0, 0,
+                                     settings->width - 1, settings->height - 1, 0,
+                                     settings->cms, settings->cmt, settings->masks, settings->maskt,
+                                     settings->shifts, settings->shiftt);
+                    break;
+            }
+            break;
+    }
+    return gfx;
+}
 
 typedef struct {
     u32 count;
@@ -293,7 +369,6 @@ typedef struct {
     ParticleTextureBase26 *base;
     ParticleTextureAnimation26 *animation;
 } ParticleTextureSettings26;
-extern Gfx *func_8100124C(Gfx *, void *, u32, s32, s32);
 
 Gfx *func_81001F14(Gfx *gfx, ParticleTextureSettings26 *settings, s32 format, s32 tile, u32 frame) {
     void *texture = 0;
