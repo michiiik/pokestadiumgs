@@ -128,7 +128,28 @@ s32 func_87E0808C(void *arg0) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30B540/func_87E080F8.s")
+typedef struct {
+    u8 high : 1;
+    u8 second : 1;
+    u8 third : 1;
+    u8 low : 5;
+} ResetRecordFlags;
+void func_87E080F8(s32 arg0) {
+    u8 *entry = (u8 *)arg0 + 8;
+    s32 i;
+    s32 j;
+
+    for (i = 0; i < 4; i++) {
+        *(s32 *)entry = 0;
+        for (j = 0; j < 18; j++) {
+            entry[j + 4] = 0;
+        }
+        entry[0x16] &= 0xFF7F;
+        ((ResetRecordFlags *)(entry + 0x16))->second = 0;
+        ((ResetRecordFlags *)(entry + 0x16))->third = 0;
+        entry += 0x18;
+    }
+}
 
 void func_87E08168(void *arg0) {
     typedef struct {
