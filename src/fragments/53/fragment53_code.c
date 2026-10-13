@@ -138,7 +138,19 @@ void func_86502620(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/53/fragment53_code/func_865046A8.s")
+extern Gfx *D_800D0510;
+extern Vtx D_8650C640[];
+extern Gfx D_8650D430[];
+extern void func_8003CD84();
+s32 func_865046A8(s32 arg0, s32 arg1) {
+    if (arg0 == 5) {
+        gDPSetEnvColor(D_800D0510++, 255, 100, 100, 255);
+        gSPVertex(D_800D0510++, D_8650C640, 4, 0);
+        gSPDisplayList(D_800D0510++, D_8650D430);
+        func_8003CD84();
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
