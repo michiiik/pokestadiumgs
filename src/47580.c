@@ -1,4 +1,5 @@
 #include "global.h"
+#include <stdarg.h>
 
 
 #ifdef VERSION_US
@@ -169,12 +170,53 @@ s32 func_800470B8(u16 arg0) {
 
 extern void *memcpy(void *, const void *, s32); void *func_800471B4(void *dest, const void *src, s32 size) { return (u8 *)memcpy(dest, src, size) + size; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800471D8.s")
+extern u16 D_80094FB4;
+extern s32 func_8003514C(void);
+s32 func_800471D8(u8 *font, s32 unused, u16 glyph) {
+    s32 index;
+    s32 width;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047244.s")
+    index = func_800470B8(glyph);
+    /* The font record stores its byte-width table pointer at +4. */
+    width = *(u8 *)(index + *(s32 *)(font + 4));
+    if (func_8003514C() == 0 && (D_80094FB4 & 1)) {
+        width = *(s16 *)(font + 2);
+    }
+    return width;
+}
+
+struct FontHeightRecord {
+    s16 unk00;
+    s16 height;
+    u8 *data;
+    s32 unk08;
+};
+struct FontHeightState {
+    struct FontHeightRecord fonts[6];
+    u8 unk48[0x2C];
+    u8 fontStack[4];
+    u8 attributes[8];
+};
+extern s32 func_80047104(s32);
+s32 func_80047244(u8 *state, s32 font) {
+    s32 index;
+    struct FontHeightRecord *record;
+    s32 result;
+    result = 0;
+    if (font == 0) {
+        index = func_80047104(((struct FontHeightState *)state)->fontStack[state[0x7B]]);
+    } else {
+        index = func_80047104(font);
+    }
+    record = &((struct FontHeightState *)state)->fonts[index];
+    if (record->data != 0) {
+        result = record->height;
+    }
+    return result;
+}
 
 extern u8 *D_80126F50;
-extern void func_80047244(u8 *, s32);
+extern s32 func_80047244(u8 *, s32);
 void func_800472B8(s32 arg0) {
     func_80047244(D_80126F50, arg0);
 }
@@ -595,9 +637,43 @@ s32 func_800481C0(u8 *arg0, s32 value) { if (func_8003514C() != 0) value = 0; ar
 extern s32 func_800481C0(u8 *, s32);
 s32 func_800481FC(u8 *arg0, u8 *arg1) { u8 temp[0x20]; func_800477C4(temp, arg1); return func_800481C0(arg0, func_80047BD4(temp)); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80048234.s")
+extern s16 D_80094FA0;
+extern s16 D_80094FA4;
+void func_80048234(u8 *text) {
+    u8 buffer[0x20];
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800482C0.s")
+    text = func_800477C4(buffer, text);
+    if (buffer[0] != 0) {
+        D_80094FA0 = func_80047BD4(buffer);
+    } else {
+        D_80094FA0 = -1;
+    }
+    func_800477C4(buffer, text);
+    if (buffer[0] != 0) {
+        D_80094FA4 = func_80047BD4(buffer);
+    } else {
+        D_80094FA4 = -1;
+    }
+}
+
+extern s16 D_80094FAC;
+extern s16 D_80094FB0;
+void func_800482C0(u8 *text) {
+    u8 buffer[0x40];
+
+    text = func_800477C4(buffer, text);
+    if (buffer[0] != 0) {
+        D_80094FB0 = func_80047BD4(buffer);
+    } else {
+        D_80094FB0 = 0;
+    }
+    func_800477C4(buffer, text);
+    if (buffer[0] != 0) {
+        D_80094FAC = func_80047BD4(buffer);
+    } else {
+        D_80094FAC = 0;
+    }
+}
 
 extern s16 D_80094FAC;
 extern u8 * func_800477C4(u8 *, u8 *);
@@ -623,10 +699,44 @@ void func_80048344(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80049148.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80049290.s")
+extern void *Util_Malloc(s32);
+extern void Util_Free(void *);
+extern s32 func_80048E30(u8 *, s32, s32, s32, s32);
+s32 func_80049290(s32 font, s32 flags, const char *text) {
+    u8 *state;
+    s32 result;
+    struct FontStateView {
+        struct { s32 unk00, unk04, unk08; } fonts[6];
+        u8 unk48[0x2C];
+        u8 fontStack[4];
+        u8 attributes[8];
+    };
+
+    result = 0;
+    if (D_80126F58 != 0) {
+        flags = 0;
+    }
+    state = Util_Malloc(0x80);
+    if (state == 0) {
+        return 0;
+    }
+    *(struct FontStateView *)state = *(struct FontStateView *)D_80126F50;
+    if (font == 0) {
+        font = ((struct FontStateView *)state)->fontStack[state[0x7B]];
+    } else {
+        func_80046AC0(state, 0, (s32)font);
+    }
+    state[0x78] = (u8)flags;
+    if (((struct FontStateView *)state)->fonts[func_80047104((s32)font)].unk04 != 0) {
+        result = func_80048E30(state, 0, 0, (s32)text, 0);
+    }
+    Util_Free(state);
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800493B0.s")
 
+extern void func_800493B0(s32, s32, s32, const char *, va_list);
 void func_800495BC(s32 arg0, s32 arg1, const char *arg2, ...) {
     void *args;
     if (arg2 != 0) {
@@ -635,7 +745,14 @@ void func_800495BC(s32 arg0, s32 arg1, const char *arg2, ...) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800495F8.s")
+void func_800495F8(s32 x, s32 y, s32 mode, const char *format, ...) {
+    va_list args;
+    if (format != 0) {
+        va_start(args, format);
+        func_800493B0(x, y, mode, format, args);
+        va_end(args);
+    }
+}
 
 extern void func_80048830(u8 *, s32, s32, s32, s32);
 
@@ -681,7 +798,35 @@ void func_8004989C(s32 arg0) {
     func_80046F2C(D_80126F50, arg0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800498C4.s")
+extern Gfx D_80094FB8[];
+void func_800498C4(void) {
+    s32 color;
+    s32 i;
+    s32 offset;
+    u8 flags;
+
+    flags = D_80126F50[0x7A];
+    D_80126F50[0x7A] = 0;
+    if (flags & 4) {
+        func_80047670();
+    }
+    D_80126F50[0x79] = 0x28;
+    *(s32 *)(D_80126F50 + 0x4C) = 0;
+    D_80126F50[0x7B] = 0;
+    func_80046AC0(D_80126F50, 0, D_80126F50[0x7E]);
+    D_80126F50[0x7C] = 0;
+    color = -1;
+    func_80046BB4(D_80126F50, 0, (u8 *)&color);
+    D_80126F50[0x7D] = 0;
+    color = -1;
+    func_80046D70(D_80126F50, 0, (u8 *)&color);
+    if (*(u8 **)(D_80126F50 + 0x50) != NULL) {
+        for (i = 0, offset = 0; i < D_80126F50[0x7F]; i++, offset += 0x10) {
+            *(s32 *)(*(u8 **)(D_80126F50 + 0x50) + offset) = 0;
+        }
+    }
+    gSPDisplayList(D_800D0510++, D_80094FB8);
+}
 
 extern u8 D_80094E38[];
 extern u8 D_80095000[];
@@ -731,13 +876,86 @@ void Font_EnableTwoCycleTexturing(void) {
 extern u8 D_80095040[]; extern Gfx *D_800D0510;
 void Font_DisableTwoCycleTexturing(void) { D_80126F50[0x7A] &= 0xFFFC; gSPDisplayList(D_800D0510++, D_80095040); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80049BDC.s")
+extern u8 D_80095068[];
+void func_80049BDC(void) {
+    s32 color;
+
+    D_80126F50[0x7D] = 0;
+    color = -1;
+    func_80046D70(D_80126F50, 0, (u8 *)&color);
+    gSPDisplayList(D_800D0510++, D_80095068);
+}
 
 extern Gfx *D_800D0510;
 extern u8 D_80095098[];
 void Font_EndTexturedTextRendering(void) { Gfx *temp_v1 = D_800D0510++; temp_v1->words.w0 = 0xDE000000; temp_v1->words.w1 = (u32)D_80095098; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80049C70.s")
+extern u8 *func_80048390(u8 *, u8 *, s32 *, s32, s32);
+void func_80049C70(s32 *first, s32 *second, u8 *text) {
+    u8 *cursor;
+    s32 character;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80049D9C.s")
+    if (first != NULL) {
+        *first = 0;
+    }
+    if (second != NULL) {
+        *second = 0;
+    }
+    character = *text;
+    cursor = text + 1;
+    if (character != 0) {
+        do {
+            switch (character) {
+            case '<':
+                cursor = func_80048390(NULL, cursor, NULL, 0, 0);
+                if (first != NULL && D_80094FA0 != -1) {
+                    *first = D_80094FA0;
+                    D_80094FA0 = -1;
+                }
+                if (second != NULL && D_80094FA4 != -1) {
+                    *second = D_80094FA4;
+                    D_80094FA4 = -1;
+                }
+                break;
+            default:
+                if (D_80126F58 == 0 && character >= 0x80 && *cursor != 0) {
+                    cursor += 1;
+                }
+                break;
+            }
+        } while ((character = *cursor++) != 0);
+    }
+}
+
+extern s16 D_80094FA8;
+void func_80049D9C(u8 *first, u8 *second, u8 *third, u8 *text) {
+    u8 *cursor;
+    s32 character;
+
+    *first = 0;
+    *second = 0;
+    *third = 0;
+    D_80094FA8 = 0;
+    D_80094FAC = 0;
+    D_80094FB0 = 0;
+    character = *text;
+    cursor = text + 1;
+    if (character != 0) {
+        do {
+            switch (character) {
+            case '<':
+                cursor = func_80048390(NULL, cursor, NULL, 0, 0);
+                *first = D_80094FA8;
+                *second = D_80094FAC;
+                *third = D_80094FB0;
+                break;
+            default:
+                if (D_80126F58 == 0 && character >= 0x80 && *cursor != 0) {
+                    cursor++;
+                }
+                break;
+            }
+        } while ((character = *cursor++) != 0);
+    }
+}
 #endif

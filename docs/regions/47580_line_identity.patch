@@ -1,0 +1,13 @@
+diff --git a/tools/try_pragma_compare.py b/tools/try_pragma_compare.py
+--- a/tools/try_pragma_compare.py
++++ b/tools/try_pragma_compare.py
+@@ -3645,5 +3645,8 @@
+ def _candidate_identity(candidate: str) -> str:
+-    return hashlib.sha256(_normalize_candidate_body(candidate).encode("utf-8")).hexdigest()
++    # IDO as1 consumes .loc tags: splitting a statement line can change its
++    # schedule even with identical tokens. Keep those groups in the key.
++    from candidate_identity import candidate_identity
++    return candidate_identity(candidate)
+
+
+ # Statuses whose verdict a re-send provably cannot change, given the same

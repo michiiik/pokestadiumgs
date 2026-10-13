@@ -1,0 +1,14 @@
+diff --git a/tools/try_pragma_compare.py b/tools/try_pragma_compare.py
+--- a/tools/try_pragma_compare.py
++++ b/tools/try_pragma_compare.py
+@@ -4750,8 +4750,8 @@ def _install_incrementally(
+         # first, then apply the paired edits once to the complete candidate
+         # set so edits may safely refer to any winner in the batch.
+         combined = baseline
+-        for function, candidate in winners.items():
++        for install_index, (function, candidate) in enumerate(winners.items()):
+             text = candidate
+-            if prefix and text.startswith(prefix):
++            if prefix and install_index and text.startswith(prefix):
+                 text = text[len(prefix):]
+             pragma = re.compile(
