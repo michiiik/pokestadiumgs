@@ -76,3 +76,7 @@ D_800D2771_load = D_800D2771;
 D_800D2771_store = D_800D2771;
 D_800D2773_load = D_800D2773;
 D_800D2773_store = D_800D2773;
+
+/* Particle callback defaults: scale and RGBA fields in the shared block. */
+D_80128C58 = D_80128C54 + 0x4;
+D_80128C5C = D_80128C54 + 0x8;

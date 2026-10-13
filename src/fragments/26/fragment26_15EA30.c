@@ -161,11 +161,48 @@ void func_81003524(s32 arg0, s32 arg1) { if (arg0 == 5) { arg1 = arg1; } }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_15EA30/func_8100352C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_15EA30/func_81003680.s")
+typedef struct { s16 mode; s16 period; } ParticleSettings26;
+typedef struct { u8 pad[0x14]; ParticleSettings26 *settings; u8 color[3]; u8 pad1b; s16 x; s16 y; } ParticleNode26;
+typedef struct { u8 pad[0x1e]; s16 x; s16 y; } ParticleCoords26;
+extern u8 *func_81000894(u8 *, ParticleSettings26 *, u32);
+void func_81003680(s32 event, ParticleNode26 *node) {
+    u8 frame_padding[12]; /* Preserve the original 0x38-byte frame. */
+    ParticleCoords26 *global;
+    ParticleSettings26 *settings;
+    u8 *color;
+    u8 buffer[4];
+
+    if (event == 2) {
+        global = (ParticleCoords26 *)D_8009491C;
+        settings = node->settings;
+        event = ParticleGfx_GetFrameDivisor(1) % settings->period;
+        if (settings->mode == 0) {
+            node->x = global->x - 0x1800;
+            node->y = global->y - 0x2000;
+        } else {
+            node->x = global->x - 0x1800;
+            node->y = global->y + 0x2000;
+        }
+        color = func_81000894(buffer, settings, (u32)event);
+        node->color[0] = color[0];
+        node->color[1] = color[1];
+        node->color[2] = color[2];
+    }
+}
 
 void func_81003750(u8 *arg0, s32 arg1) {}
 
 void func_8100375C(u8 *arg0, s32 arg1) {}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_15EA30/func_81003768.s")
+extern f32 D_80128C58;
+extern u8 D_80128C5C[4];
+extern void *Vec3f_SetComponentsDuplicate(void *, f32, f32, f32);
+extern void func_8003F498(s32, s32, s32, s32, u8);
+s32 func_81003768(s32 event, u8 *node) {
+    if (event == 2) {
+        Vec3f_SetComponentsDuplicate(node + 0x30, D_80128C58, D_80128C58, D_80128C58);
+        func_8003F498((s32)node, D_80128C5C[0], D_80128C5C[1], D_80128C5C[2], D_80128C5C[3]);
+    }
+    return 0;
+}
 #endif
