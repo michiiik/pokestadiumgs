@@ -167,5 +167,15 @@ void func_81003750(u8 *arg0, s32 arg1) {}
 
 void func_8100375C(u8 *arg0, s32 arg1) {}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_15EA30/func_81003768.s")
+extern f32 D_80128C58;
+extern u8 D_80128C5C[4];
+extern void *Vec3f_SetComponentsDuplicate(void *, f32, f32, f32);
+extern void func_8003F498(s32, s32, s32, s32, u8);
+s32 func_81003768(s32 event, u8 *node) {
+    if (event == 2) {
+        Vec3f_SetComponentsDuplicate(node + 0x30, D_80128C58, D_80128C58, D_80128C58);
+        func_8003F498((s32)node, D_80128C5C[0], D_80128C5C[1], D_80128C5C[2], D_80128C5C[3]);
+    }
+    return 0;
+}
 #endif
