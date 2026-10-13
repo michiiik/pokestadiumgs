@@ -92,6 +92,71 @@
 
 ### 2026-10-14: regional residual and stock-driver controls
 
+#### Phase-boundary continuation: quotient mechanism proven, source still unaccepted
+
+- `requeue` / `register-tie`: 336 mesh attempts after three new eight-candidate
+  batches (mesh-root carrier, quotient byte view, destination-alpha address).
+  None accepted. Root/address carriers alter earlier colored webs; byte-view
+  carriers add instructions, and pointer byte views enlarge the frame. Preserve
+  the existing55-word exact-prefix seed rather than these dominated spellings.
+- Correction: workbench is installed at
+  `/work/tools/decomp-venv/bin/decomp-workbench`. Earlier PATH-only availability
+  checks missed the repository-local virtual environment. Its Ucode/Binasm
+  decoders are usable; the missing stock debug-listing output is not a reason
+  to stop phase-boundary research. Use `commands --json` and command-specific
+  help before invoking the installed version.
+- Capture controls execute untouched stock passes. A link-based capture root
+  must contain a real copy of the cc driver: a symlinked driver resolves back
+  to the original compiler root and bypasses phase wrappers. Copy only the
+  driver, not directory symlink targets. The default copy-based capture helper
+  follows the compiler root's `build -> /work/build` link; putting its output
+  under that build tree causes recursive copying. That failed diagnostic copy
+  reached about26GB and was removed from its exact generated scratch directory;
+  originals were preserved. Use `capture make ... --link` in a separate scratch,
+  then copy the driver to `toolchain/cc-copy` and explicitly set
+  `COALESCE_REAL_CC` for diagnostic compiles only. Never modify production flags.
+- The normal and captured mesh controls compare
+  `instruction-words-identical`:85 instructions, frame0x38. The untouched
+  ugen/as1 replay of the retained optimizer output is also exact against the
+  normally compiled seed. Against the original assembly target the seed has
+  exactly7 register differences, no opcode/size/frame or relocation-symbol
+  difference. Workbench's register-population interpretation was explicitly
+  `unverified`, and its allocation ownership verdict was heuristic.
+- **Measured mechanism:** optimizer record150 is `Udiv`;151 stores the quotient
+  in Rmt register2 (`v0`);153 loads destination register4;154 reloads quotient
+  register2. Move destination load153 before expression start142 and remove
+  records151/153/154. Stock ugen/as1 then reproduce all85 target instruction
+  words and known relocation-kind layout, with frame0x38. This one class change
+  repairs quotient extraction/store AND all five later packet temporary words.
+  It is not a three-independent-web spelling problem.
+- [The guarded diagnostic transformation](mesh_quotient_phase_patch.py)
+  validates every changed anchor, preserves input, refuses overwrite, decodes
+  the result back, and reports `source_reachability=unproven`, `rom_gate=NOT RUN`.
+  Its tested output is byte-identical to the replayed exact diagnostic stream:
+  221->219 records, input SHA256
+  `d719be5bbd60c2c8cb517f49d482f22d055a7a31759190581e1d1a39dfc3d373`,
+  output `2c198b0565748cc2723134eeaade2c034fde0d2b493b238a0a94cabb1a81380b`.
+  These hashes bind local research artifacts, not accepted source. Do not install
+  this stream, object, or a production compiler patch. Compiler/target objects
+  remain private. Four synthetic transformation tests plus the four fingerprint
+  tests pass with `python3 -m unittest discover -s docs/regions/fragments/26
+  -p 'test_*.py'`.
+- Actual one-formal `func_81003510(s32 event) { if (event == 5) {} }` was captured
+  separately. Its comparison/load/conditional records survive both cfe and
+  uopt; ugen's Binasm output contains no conditional, leaving2 instructions.
+  The untouched replay control matches this normal candidate. Fresh-label,
+  jump/label, and label-flags barriers remain2 instructions. Diagnostic-g3 also
+  remains2. With both downstream phases set-O0, the target's first5 words appear
+  but a duplicate `jr ra; nop` remains:7 words, NOT a match. An initial mixed
+  ugen-O0/as1-O2 diagnostic asserted; compatible downstream flags resolve that
+  infrastructure failure. Scope these negatives to the tested stock7.1 route.
+- Next source task for mesh: reproduce an **uncolored expression quotient while
+  retaining the seed's earlier reservation/home topology**. The phase replay is
+  the differential oracle for that exact question; simple formal root/address
+  reuse does not retain it. For the no-op, investigate the code-generator's
+  branch-to-next elimination/return-tail boundary, not another frontend-only
+  empty-control batch. Neither owner is a proven compiler-impossibility case.
+
 - `requeue` / `register-tie`: 312 authoritative mesh attempts after four new
   eight-candidate batches in this continuation (quotient reuse, packet/physical
   carrier reuse, SDK union access, index scope/category), plus the preceding
