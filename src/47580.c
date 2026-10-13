@@ -783,7 +783,52 @@ void func_80047EC4(u8 *arg0, u8 *arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_8004803C.s")
+struct FontQueuedItem {
+    s16 x;
+    s16 y;
+    u16 flags;
+    struct FontQueuedItem *next;
+};
+struct FontItemGroup {
+    struct FontQueuedItem *head;
+    u16 *asset;
+    u8 unk08[8];
+};
+extern void *Util_Malloc(s32);
+extern void _bzero(void *, s32);
+extern s32 func_8004CA10(u16 *);
+extern s32 func_8004CA24(u16 *);
+void func_8004803C(u8 *state, u8 *input, s32 *x, s32 y, s32 append) {
+    u8 buffer[32];
+    s32 index;
+    struct FontItemGroup *group;
+    u16 *asset;
+    struct FontQueuedItem *node;
+    struct FontQueuedItem **link;
+    func_800477C4(buffer, input);
+    index = func_80047BD4(buffer);
+    if (state != NULL && x != NULL && *(struct FontItemGroup **)(state + 0x50) != NULL && index < state[0x7F]) {
+        group = &(*(struct FontItemGroup **)(state + 0x50))[index];
+        asset = group->asset;
+        if (asset != NULL) {
+            if (append != 0) {
+                node = Util_Malloc(sizeof(*node));
+                link = &group->head;
+                while (*link != NULL) {
+                    link = &(*link)->next;
+                }
+                _bzero(node, sizeof(*node));
+                *link = node;
+                node->x = *x;
+                node->y = y - func_8004CA24(asset) / 2;
+                node->flags |= 1;
+                node->flags |= 2;
+                node->next = NULL;
+            }
+            *x += func_8004CA10(asset) + (s8)state[0x78];
+        }
+    }
+}
 
 extern s32 func_80047BD4(u8 *);
 extern void func_80046F2C(u8 *, s32);
