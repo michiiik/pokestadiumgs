@@ -447,7 +447,34 @@ s32 func_80047790(s32 arg0) {
     return var_v1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800477C4.s")
+u8 *func_800477C4(u8 *dest, u8 *input) {
+    s32 character;
+    u8 *output;
+    u8 *cursor;
+    s32 started;
+
+    character = *input;
+    output = dest;
+    started = 0;
+    cursor = input + 1;
+    if (character != 0) {
+        do {
+            if (started == 0) {
+                if (func_80047790(character) == 0) {
+                    *output++ = character;
+                    started = 1;
+                }
+            } else {
+                if (func_80047790(character) != 0) {
+                    break;
+                }
+                *output++ = character;
+            }
+        } while ((character = *cursor++) != 0);
+    }
+    *output = 0;
+    return cursor;
+}
 
 extern s32 HAL_Strcmp(const s8 *, const s8 *);
 s32 func_80047864(const s8 * arg0) {
@@ -759,7 +786,7 @@ void func_80048344(u8 *arg0) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80048E30.s")
 
 extern s32 func_80049290(s32, s32, const char *);
-extern s32 func_80048E30(u8 *, s32, s32, s32, s32);
+extern s32 func_80048E30(u8 *, s32, s32, const char *, s32);
 void func_80049064(s32 x, s32 y, s32 mode, const char *text) {
     u8 *state;
     state = D_80126F50;
@@ -774,14 +801,60 @@ void func_80049064(s32 x, s32 y, s32 mode, const char *text) {
         x -= func_80049290(((struct FontHeightState *)state)->fontStack[state[0x7B]], (s8)state[0x78], text);
         break;
     }
-    func_80048E30(state, x, y, (s32)text, 1);
+    func_80048E30(state, x, y, text, 1);
 }
-
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80049148.s")
 
 extern void *Util_Malloc(s32);
 extern void Util_Free(void *);
-extern s32 func_80048E30(u8 *, s32, s32, s32, s32);
+extern s32 _Printf(void *(*)(void *, const void *, s32), void *, const char *, va_list);
+extern s32 func_80048E30(u8 *, s32, s32, const char *, s32);
+s32 func_80049148(s32 font, s32 flags, const char *format, ...) {
+    const s32 renderFlag = 0;
+    struct {
+        char text[513];
+        s32 width;
+    } work;
+    u8 *state;
+    s32 length;
+    s32 index;
+    struct FontHeightRecord *record;
+    char *text;
+    va_list args;
+
+    work.width = 0;
+    if (D_80126F58 != 0) {
+        flags = 0;
+    }
+    state = Util_Malloc(0x80);
+    if (state == NULL) {
+        return 0;
+    }
+    *(struct FontHeightState *)state = *(struct FontHeightState *)D_80126F50;
+    if (font == 0) {
+        font = ((struct FontHeightState *)state)->fontStack[state[0x7B]];
+    } else {
+        func_80046AC0(state, 0, font);
+    }
+    state[0x78] = flags;
+    index = func_80047104(font);
+    record = &((struct FontHeightState *)state)->fonts[index];
+    if (record->data != NULL) {
+        text = work.text;
+        va_start(args, format);
+        length = _Printf(func_800471B4, text, format, args);
+        va_end(args);
+        if (length > 0) {
+            text[length] = 0;
+            work.width = func_80048E30(state, 0, 0, text, renderFlag);
+        }
+    }
+    Util_Free(state);
+    return work.width;
+}
+
+extern void *Util_Malloc(s32);
+extern void Util_Free(void *);
+extern s32 func_80048E30(u8 *, s32, s32, const char *, s32);
 s32 func_80049290(s32 font, s32 flags, const char *text) {
     u8 *state;
     s32 result;
@@ -808,7 +881,7 @@ s32 func_80049290(s32 font, s32 flags, const char *text) {
     }
     state[0x78] = (u8)flags;
     if (((struct FontStateView *)state)->fonts[func_80047104((s32)font)].unk04 != 0) {
-        result = func_80048E30(state, 0, 0, (s32)text, 0);
+        result = func_80048E30(state, 0, 0, text, 0);
     }
     Util_Free(state);
     return result;
