@@ -300,7 +300,68 @@ Gfx *func_81001F14(Gfx *gfx, ParticleTextureSettings26 *settings, s32 format, s3
     return gfx;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_15EA30/func_810020E0.s")
+typedef struct {
+    u8 pad[0x1A];
+    s16 kind;
+    u8 pad1C;
+    u8 opacity;
+} ParticleCombineContext26;
+typedef struct { unsigned char pad_00[0x1C]; u8 unk_1C; } Func810033DCGlobalG2;
+extern Func810033DCGlobalG2 *D_8009491C;
+typedef struct {
+    u8 colorA0;
+    u8 colorB0;
+    u8 colorC0;
+    u8 colorD0;
+    u8 alphaA0;
+    u8 alphaB0;
+    u8 alphaC0;
+    u8 alphaD0;
+    u8 colorA1;
+    u8 colorB1;
+    u8 colorC1;
+    u8 colorD1;
+    u8 alphaA1;
+    u8 alphaB1;
+    u8 alphaC1;
+    u8 alphaD1;
+} ParticleCombineFields26;
+
+void func_810020E0(Gfx *gfx, ParticleCombineFields26 *values, s32 mode, u8 selector) {
+    ParticleCombineContext26 *context;
+
+    gfx->words.w0 = ((((values->colorA0 & 15) << 20) | ((values->colorC0 & 31) << 15) |
+                      ((values->alphaA0 & 7) << 12) | ((values->alphaC0 & 7) << 9) |
+                      ((values->colorA1 & 15) << 5) | (values->colorC1 & 31)) & 0xFFFFFF) | 0xFC000000;
+    if (mode == 1) {
+        context = (ParticleCombineContext26 *)D_8009491C;
+        if (context->kind == 0xDB && selector == 4) {
+            gfx->words.w1 = _SHIFTL(values->colorB0, 28, 4) | _SHIFTL(values->colorD0, 15, 3) |
+                            _SHIFTL(values->alphaB0, 12, 3) | _SHIFTL(values->alphaD0, 9, 3) |
+                            _SHIFTL(values->colorB1, 24, 4) | _SHIFTL(values->alphaA1, 21, 3) |
+                            _SHIFTL(values->alphaC1, 18, 3) | _SHIFTL(values->colorD1, 6, 3) |
+                            _SHIFTL(values->alphaB1, 3, 3) | _SHIFTL(values->alphaD1, 0, 3);
+            return;
+        }
+        if (context->opacity == 0xFF) {
+            gfx->words.w1 = _SHIFTL(values->colorB0, 28, 4) | _SHIFTL(values->colorD0, 15, 3) |
+                            _SHIFTL(values->alphaB0, 12, 3) | _SHIFTL(values->alphaD0, 9, 3) |
+                            _SHIFTL(values->colorB1, 24, 4) | _SHIFTL(7, 21, 3) | _SHIFTL(7, 18, 3) |
+                            _SHIFTL(values->colorD1, 6, 3) | _SHIFTL(7, 3, 3) | _SHIFTL(0, 0, 3);
+            return;
+        }
+        gfx->words.w1 = _SHIFTL(values->colorB0, 28, 4) | _SHIFTL(values->colorD0, 15, 3) |
+                        _SHIFTL(values->alphaB0, 12, 3) | _SHIFTL(values->alphaD0, 9, 3) |
+                        _SHIFTL(values->colorB1, 24, 4) | _SHIFTL(0, 21, 3) | _SHIFTL(6, 18, 3) |
+                        _SHIFTL(values->colorD1, 6, 3) | _SHIFTL(7, 3, 3) | _SHIFTL(7, 0, 3);
+        return;
+    }
+    gfx->words.w1 = _SHIFTL(values->colorB0, 28, 4) | _SHIFTL(values->colorD0, 15, 3) |
+                    _SHIFTL(values->alphaB0, 12, 3) | _SHIFTL(values->alphaD0, 9, 3) |
+                    _SHIFTL(values->colorB1, 24, 4) | _SHIFTL(values->alphaA1, 21, 3) |
+                    _SHIFTL(values->alphaC1, 18, 3) | _SHIFTL(values->colorD1, 6, 3) |
+                    _SHIFTL(values->alphaB1, 3, 3) | _SHIFTL(values->alphaD1, 0, 3);
+}
 
 typedef struct { s16 first; s16 second; } Func810023ACRangeA;
 typedef struct { u8 pad[0x44]; void *flag; s32 value; } Func810023ACContextA;
@@ -344,7 +405,6 @@ void func_8100338C(s32 arg0, Func8100338CStateK *state) {
 }
 
 typedef struct { unsigned char pad_00[3]; u8 unk_03; unsigned char pad_04[0x10]; void *unk_14; } Func810033DCStateG2;
-typedef struct { unsigned char pad_00[0x1C]; u8 unk_1C; } Func810033DCGlobalG2;
 extern Func810033DCGlobalG2 *D_8009491C;
 void func_810033DC(s32 arg0, Func810033DCStateG2 *state) {
     if (arg0 == 5) {
