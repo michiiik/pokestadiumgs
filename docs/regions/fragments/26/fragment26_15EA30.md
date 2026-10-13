@@ -1,5 +1,19 @@
 # Fragment 26 particle callbacks
 
+## 2026-10-13: func_8100072C accepted
+
+- Select the signed-halfword keyframe index, interpolate five adjacent unsigned-byte values from five-byte records, and return the supplied output buffer. Times are at settings+8; value records are at settings+0xC, unlike the four-channel helper's settings+0x10 pointer.
+- One eight-candidate batch transferred the accepted four-channel helper's ABI and varied index width, position-cache timing, and pointer initialization. Every s16-index variant was an object/link hit; s32 variants changed the original halfword spill at sp+0x42 into a word spill at sp+0x40.
+- Winner `particle-five-channel:layout:s16-earlyFalse-splitFalse` was link-verified and auto-gated with retail MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`. The original 90-instruction / 360-byte size and 0x48 frame need no padding. Formatting and removal of redundant interpolation-helper prototypes independently passed the final full-ROM re-gate with default host syntax checks. The naming tool found no evidence-backed name.
+
+## 2026-10-13: func_81000550 accepted
+
+- Interpolate one unsigned-byte channel between two unsigned-byte keyframe times. Return the first value when the position equals the first time; otherwise compute the floating-point slope, multiply by the position offset, add the first value, and truncate to an unsigned byte.
+- Four eight-candidate batches tested cached float expressions, comparison/conversion order, float lifetimes, and initialization topology. Reversing the comparison restored the instruction sequence. Initializing color before first time and current position resolved the remaining coherent float-register swaps. Declaration order is color, first, current; initialization order is the same; compare current against first.
+- Winner: `particle-interpolation:init-topology:color-first-currentFalse`. The 93-instruction / 372-byte object is link-verified; the runner auto-gated and accepted the byte-identical full ROM at retail MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`. No explicit padding, compiler patch, or permuter mutation was needed.
+- Formatting was independently rebuilt with `make rom COMPARE=1 -j2`, default host syntax checks enabled, and the same retail checksum. The naming tool found no evidence-backed name. Probe statistics retain the accepted row; the internal provenance-check script is absent from this public/container tool subset, so its hook was not claimed as run.
+- The runner's register-tie warning after 24 prior attempts was advisory: the next materially different source family matched. Do not treat a normalized score of 1.0 as raw equality or a futility warning as proof that ordinary C cannot match.
+
 ## 2026-10-13: func_81003768 accepted
 
 - On event 2, set the vector at node + 0x30 to the default scale in all three components, then apply the default RGBA bytes. Return zero for all events.
