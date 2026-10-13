@@ -170,12 +170,53 @@ s32 func_800470B8(u16 arg0) {
 
 extern void *memcpy(void *, const void *, s32); void *func_800471B4(void *dest, const void *src, s32 size) { return (u8 *)memcpy(dest, src, size) + size; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800471D8.s")
+extern u16 D_80094FB4;
+extern s32 func_8003514C(void);
+s32 func_800471D8(u8 *font, s32 unused, u16 glyph) {
+    s32 index;
+    s32 width;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047244.s")
+    index = func_800470B8(glyph);
+    /* The font record stores its byte-width table pointer at +4. */
+    width = *(u8 *)(index + *(s32 *)(font + 4));
+    if (func_8003514C() == 0 && (D_80094FB4 & 1)) {
+        width = *(s16 *)(font + 2);
+    }
+    return width;
+}
+
+struct FontHeightRecord {
+    s16 unk00;
+    s16 height;
+    u8 *data;
+    s32 unk08;
+};
+struct FontHeightState {
+    struct FontHeightRecord fonts[6];
+    u8 unk48[0x2C];
+    u8 fontStack[4];
+    u8 attributes[8];
+};
+extern s32 func_80047104(s32);
+s32 func_80047244(u8 *state, s32 font) {
+    s32 index;
+    struct FontHeightRecord *record;
+    s32 result;
+    result = 0;
+    if (font == 0) {
+        index = func_80047104(((struct FontHeightState *)state)->fontStack[state[0x7B]]);
+    } else {
+        index = func_80047104(font);
+    }
+    record = &((struct FontHeightState *)state)->fonts[index];
+    if (record->data != 0) {
+        result = record->height;
+    }
+    return result;
+}
 
 extern u8 *D_80126F50;
-extern void func_80047244(u8 *, s32);
+extern s32 func_80047244(u8 *, s32);
 void func_800472B8(s32 arg0) {
     func_80047244(D_80126F50, arg0);
 }
