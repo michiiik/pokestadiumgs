@@ -3,8 +3,8 @@
 # Decompilation coverage
 
 <!-- AUTO_COVERAGE:START -->
-- US functions with C implementations: **6,038 / 10,532 (57.3%)**
-- Remaining `GLOBAL_ASM` owners: **4,494**
+- US functions with C implementations: **6,039 / 10,532 (57.3%)**
+- Remaining `GLOBAL_ASM` owners: **4,493**
 - Baseline: **10,532** US `GLOBAL_ASM` owners in the original pragma snapshot
 <!-- AUTO_COVERAGE:END -->
 
@@ -351,7 +351,7 @@
 | `src/fragments/74/fragment74_code.c` | 7 | 11 | 36.4% |
 | `src/fragments/75/fragment75_code.c` | 13 | 16 | 18.8% |
 | `src/fragments/76/fragment76_code.c` | 11 | 22 | 50.0% |
-| `src/fragments/77/fragment77_code.c` | 26 | 30 | 13.3% |
+| `src/fragments/77/fragment77_code.c` | 25 | 30 | 16.7% |
 | `src/fragments/78/fragment78_code.c` | 10 | 18 | 44.4% |
 | `src/fragments/79/fragment79_36F8B0.c` | 24 | 42 | 42.9% |
 | `src/fragments/79/fragment79_372DE0.c` | 10 | 27 | 63.0% |
