@@ -127,7 +127,14 @@ extern void ModelAnim_SetSpeed(void *, s32);
 extern void ModelAnim_SetEventFrame(void *, s32);
 extern void func_8003F3BC(void *, s32);
 extern s32 D_8660678C;
-s32 func_86601910(s32 arg0, void *arg1) {
+#ifdef CC_CHECK
+/* No path returns a value. Preserve IDO's original return category below,
+ * which affects allocation even though callers consume no defined result. */
+void
+#else
+s32
+#endif
+func_86601910(s32 arg0, void *arg1) {
   if ((((arg0 == 0) || (arg0 != 2)) || (D_8660678C != 1)) || (D_866066F0 == 2)) {
     return;
   }

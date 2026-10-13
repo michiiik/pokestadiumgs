@@ -1392,7 +1392,13 @@ extern void func_8300A50C();
 extern void func_8300A5B4(s32, s32);
 
 void func_8300A81C(s32 arg0, s32 arg1) {
+#ifdef CC_CHECK
+    /* The original call forwards existing argument registers without setup.
+     * Keep that call for IDO; expose its unprototyped ABI to the host checker. */
+    ((void (*)())func_8300A50C)();
+#else
     func_8300A50C();
+#endif
     func_8300A4BC(arg0, arg1);
     func_8300A5B4(arg0, arg1);
 }
