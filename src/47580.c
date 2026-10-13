@@ -366,11 +366,11 @@ void *func_80047524(void) {
     return BinArchive_Open(&D_437750, &D_446E30, 1, 1);
 }
 
-extern void func_80004B4C(s32, s32);
+extern void *func_80004B4C(s32, s32);
 s32 func_80047104(s32);
 
-void func_80047558(s32 arg0, s32 arg1) {
-    func_80004B4C(arg0, func_80047104(arg1));
+u8 *func_80047558(s32 arg0, s32 arg1) {
+    return func_80004B4C(arg0, func_80047104(arg1));
 }
 
 void func_80047670(void);
