@@ -115,17 +115,32 @@ u8 *func_818054D0(void *arg0, u8 arg1) {
     return (u8 *)arg0 + 4;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_B2D00/func_81805524.s")
+extern s32 func_81804088(void *, u8 *);
+s32 func_81805524(void *arg0, u8 *arg1) {
+    u8 *entry;
+    s32 result;
+
+    entry = func_818054D0(arg0, arg1[0x1F]);
+    result = 0;
+    if (*(void **)(entry + 0x20) != NULL && *(s32 *)(entry + 0x18) != -2) {
+        func_81804088(*(void **)(entry + 0x20), arg1);
+        result = 1;
+    }
+    if (func_81804A20(arg1) == 0) {
+        result = 1;
+    }
+    return result;
+}
 
 s32 func_81805594(u8 *arg0, u8 *arg1) { return 1; }
 
 s32 StageContext_GetFadeMode(s32);
-s32 func_81805524();
+s32 func_81805524(void *, u8 *);
 
-s32 func_818055A4(void) {
+s32 func_818055A4(void *arg0, u8 *arg1) {
     s32 var_a0;
 
-    var_a0 = func_81805524() != 0;
+    var_a0 = func_81805524(arg0, arg1) != 0;
     if (var_a0 == 0) {
         var_a0 = StageContext_GetFadeMode(var_a0) != 0;
     }
