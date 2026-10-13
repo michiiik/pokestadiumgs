@@ -57,7 +57,32 @@ s16 func_810006C4(Func810006C4Table *arg0, u32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_15EA30/func_8100072C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_15EA30/func_81000894.s")
+typedef struct {
+    u8 pad[8];
+    s16 *times;
+    u8 padC[4];
+    u8 *colors;
+} ParticleColorTrack26;
+extern u8 func_81000550(u8, u8, u8, u8, u8);
+
+u8 *func_81000894(u8 *dest, void *settings, u32 frame) {
+    ParticleColorTrack26 *track;
+    s16 index;
+    u8 position;
+
+    track = (ParticleColorTrack26 *)settings;
+    index = func_810006C4((Func810006C4Table *)settings, frame);
+    position = (u8)frame;
+    dest[0] = func_81000550((u8)track->times[index], (u8)track->times[index + 1],
+                           track->colors[index * 4 + 0], track->colors[index * 4 + 4], position);
+    dest[1] = func_81000550((u8)track->times[index], (u8)track->times[index + 1],
+                           track->colors[index * 4 + 1], track->colors[index * 4 + 5], position);
+    dest[2] = func_81000550((u8)track->times[index], (u8)track->times[index + 1],
+                           track->colors[index * 4 + 2], track->colors[index * 4 + 6], position);
+    dest[3] = func_81000550((u8)track->times[index], (u8)track->times[index + 1],
+                           track->colors[index * 4 + 3], track->colors[index * 4 + 7], position);
+    return dest;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_15EA30/func_810009C0.s")
 
@@ -164,7 +189,6 @@ void func_81003524(s32 arg0, s32 arg1) { if (arg0 == 5) { arg1 = arg1; } }
 typedef struct { s16 mode; s16 period; } ParticleSettings26;
 typedef struct { u8 pad[0x14]; ParticleSettings26 *settings; u8 color[3]; u8 pad1b; s16 x; s16 y; } ParticleNode26;
 typedef struct { u8 pad[0x1e]; s16 x; s16 y; } ParticleCoords26;
-extern u8 *func_81000894(u8 *, ParticleSettings26 *, u32);
 void func_81003680(s32 event, ParticleNode26 *node) {
     u8 frame_padding[12]; /* Preserve the original 0x38-byte frame. */
     ParticleCoords26 *global;

@@ -1,0 +1,35 @@
+{
+  "status": "requeue-not-accepted",
+  "source": "src/fragments/26/fragment26_15EA30.c",
+  "function": "func_8100352C",
+  "baseline": "51177b67774e517a04786c963db53dbae38b1dd0",
+  "expected_size": 340,
+  "expected_frame": 56,
+  "required_gate": "make rom COMPARE=1",
+  "seeds": [
+    {
+      "label": "particle-mesh:scope-loop:goto-less",
+      "declarations": "typedef union { s16 packed; struct { s8 red, green, blue; u8 alpha; } color; } ParticleVertexTail26;\ntypedef struct { s16 xyz[3]; u16 flag; s16 uv[2]; ParticleVertexTail26 tail; } ParticleVertex26;\ntypedef struct { u8 pad[0x20]; void *vertices; u8 pad24[2]; s16 count; } ParticleMeshCopy26;\ntypedef struct { u8 pad[0x87]; u8 opacity; } ParticleOpacityCopy26;\ntypedef struct { u8 pad[0x14]; ParticleOpacityCopy26 *object; } ParticleMeshContextCopy26;\ntypedef struct { s16 pad; s16 count; ParticleVertex26 *source; ParticleOpacityCopy26 *object; } ParticleCopyShort26;\ntypedef struct { s16 count; s16 pad; ParticleVertex26 *source; ParticleOpacityCopy26 *object; } ParticleCopyShortCount26;\nextern ParticleMeshCopy26 *D_80094920;\nextern void *Gfx_AllocDisplayList(s32);\n",
+      "body": "void func_8100352C(s32 event, void *node)\n{\n  s32 i;\n  ParticleVertex26 *src;\n  ParticleVertex26 *dst;\n  if (event == 5)\n  {\n    ParticleCopyShort26 locals;\n    ParticleVertex26 *allocated;\n    locals.object = ((ParticleMeshContextCopy26 *) D_8009491C)->object;\n    locals.source = (ParticleVertex26 *) D_80094920->vertices;\n    locals.count = D_80094920->count;\n    allocated = (ParticleVertex26 *) Gfx_AllocDisplayList(locals.count * 16);\n    i = 0;\n    if (locals.count > 0)\n    {\n      src = locals.source;\n      dst = allocated;\n      copy_vertex:\n      locals.pad = src->xyz[0];\n      dst->xyz[0] = locals.pad;\n\n      dst->xyz[1] = src->xyz[1];\n      dst->xyz[2] = src->xyz[2];\n      dst->flag = src->flag;\n      dst->uv[0] = src->uv[0];\n      dst->uv[1] = src->uv[1];\n      dst->tail.packed = src->tail.packed;\n      dst->tail.color.red = src->tail.color.red;\n      dst->tail.color.green = src->tail.color.green;\n      dst->tail.color.blue = src->tail.color.blue;\n      dst->tail.color.alpha = (src->tail.color.alpha * locals.object->opacity) / 255;\n      i++;\n      src++;\n      dst++;\n      if (i < locals.count)\n      {\n        goto copy_vertex;\n      }\n    }\n    {\n      Gfx *_g = (Gfx *) ((*((Gfx **) (&D_800D0510)))++);\n      _g->words.w0 = (((unsigned int) ((((unsigned int) 0xdb) & ((0x01 << 8) - 1)) << 24)) | ((unsigned int) ((((unsigned int) 0x06) & ((0x01 << 8) - 1)) << 16))) | ((unsigned int) ((((unsigned int) (15 * 4)) & ((0x01 << 16) - 1)) << 0));\n      _g->words.w1 = (unsigned int) osVirtualToPhysical(allocated);\n    }\n    ;\n  }\n}",
+      "exact_instruction_matches": 77,
+      "total_instructions": 85,
+      "first_diff_instruction": 7,
+      "mismatch_kind": "register_allocation_only"
+    },
+    {
+      "label": "particle-mesh:fullwidth-product:node",
+      "declarations": "typedef union { s16 packed; struct { s8 red, green, blue; u8 alpha; } color; } ParticleVertexTail26;\ntypedef struct { s16 xyz[3]; u16 flag; s16 uv[2]; ParticleVertexTail26 tail; } ParticleVertex26;\ntypedef struct { u8 pad[0x20]; void *vertices; u8 pad24[2]; s16 count; } ParticleMeshCopy26;\ntypedef struct { u8 pad[0x87]; u8 opacity; } ParticleOpacityCopy26;\ntypedef struct { u8 pad[0x14]; ParticleOpacityCopy26 *object; } ParticleMeshContextCopy26;\ntypedef struct { union { s16 pad; u16 unsignedPad; }; s16 count; union { ParticleVertex26 *source; s32 product; u32 unsignedProduct; }; ParticleOpacityCopy26 *object; } ParticleCopyShort26;\ntypedef struct { s16 count; s16 pad; ParticleVertex26 *source; ParticleOpacityCopy26 *object; } ParticleCopyShortCount26;\nextern ParticleMeshCopy26 *D_80094920;\nextern void *Gfx_AllocDisplayList(s32);\n",
+      "body": "void func_8100352C(s32 event, void *node)\n{\n  s32 i;\n  ParticleVertex26 *src;\n  ParticleVertex26 *dst;\n  if (event == 5)\n  {\n    ParticleCopyShort26 locals;\n    ParticleVertex26 *allocated;\n    src = (ParticleVertex26 *)D_8009491C;\n    locals.object = ((ParticleMeshContextCopy26 *)src)->object;\n    locals.source = (ParticleVertex26 *) D_80094920->vertices;\n    locals.count = D_80094920->count;\n    allocated = (ParticleVertex26 *) Gfx_AllocDisplayList(locals.count * 16);\n    i = 0;\n    if (locals.count > 0)\n    {\n      src = locals.source;\n      dst = allocated;\n      copy_vertex:\n      dst->xyz[0] = src->xyz[0];\n\n      dst->xyz[1] = src->xyz[1];\n      dst->xyz[2] = src->xyz[2];\n      dst->flag = src->flag;\n      dst->uv[0] = src->uv[0];\n      dst->uv[1] = src->uv[1];\n      dst->tail.packed = src->tail.packed;\n      dst->tail.color.red = src->tail.color.red;\n      dst->tail.color.green = src->tail.color.green;\n      dst->tail.color.blue = src->tail.color.blue;\n      node = (void *)(src->tail.color.alpha * locals.object->opacity);\n      dst->tail.color.alpha = (s32)node / 255;\n      i++;\n      src++;\n      dst++;\n      if (i < locals.count)\n      {\n        goto copy_vertex;\n      }\n    }\n    {\n      Gfx *_g = (Gfx *) ((*((Gfx **) (&D_800D0510)))++);\n      _g->words.w0 = (((unsigned int) ((((unsigned int) 0xdb) & ((0x01 << 8) - 1)) << 24)) | ((unsigned int) ((((unsigned int) 0x06) & ((0x01 << 8) - 1)) << 16))) | ((unsigned int) ((((unsigned int) (15 * 4)) & ((0x01 << 16) - 1)) << 0));\n      _g->words.w1 = (unsigned int) osVirtualToPhysical(allocated);\n    }\n    ;\n  }\n}",
+      "exact_instruction_matches": 75,
+      "total_instructions": 85,
+      "first_diff_instruction": 51,
+      "mismatch_kind": "register_allocation_only"
+    }
+  ],
+  "notes": [
+    "These are diagnostic inputs, not matched C replacements.",
+    "Generate at least eight distinct new hypotheses for a runner batch; do not replay rejected seed bodies.",
+    "Every hit still requires link-shape validation and the full-ROM gate.",
+    "The node-formal integer/pointer casts in the second seed need semantic cleanup if it ever becomes exact."
+  ]
+}
