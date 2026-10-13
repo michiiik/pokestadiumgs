@@ -90,6 +90,60 @@
 
 ## 2026-10-13: func_8100352C requeue
 
+### 2026-10-14: regional residual and stock-driver controls
+
+- `requeue` / `register-tie`: 312 authoritative mesh attempts after four new
+  eight-candidate batches in this continuation (quotient reuse, packet/physical
+  carrier reuse, SDK union access, index scope/category), plus the preceding
+  eight-candidate quotient-boundary batch. None accepted or installed. The
+  existing quotient seed remains 78/85 exact words, 340 bytes, frame0x38, with
+  the first55 words exact. Do not replay these covered families on this seed.
+- Reusing event for the quotient changes the divisor to v0 and quotient to a2,
+  with a source-load scheduling change; it does not repair the t2 quotient.
+  Reusing the local source/product union adds an instruction and changes early
+  coloring. Signed-halfword quotient storage adds narrowing. Packet-formal
+  reuse changes early coloring/scheduling; carrying the final physical result
+  through node is object-equivalent to the current best residual.
+- SDK `Vtx` geometry via `.v`/`.n`, alpha via `.v.cn[3]`/`.n.a`, signed RGB via
+  `.n.n[]`, and the overlapping halfword via short-index/tail-overlay spellings
+  all retain exactly the same seven residual words on the quotient seed. This
+  is measured on the improved seed, not inferred from an older SDK campaign.
+- Moving i into the event-first declaration block is inert; event-last and
+  loop-local scope shift meaningful homes by4 and worsen raw agreement despite
+  normalized1.0. A nested index block also changes scheduling. Signed versus
+  unsigned full-width quotient formals do not resolve this tested family.
+- Stock optimizer listings at levels1/4/6 terminate before useful allocation
+  evidence (8191/8191/4096-byte partial artifacts). They do not establish pass
+  ownership. The u16 byte-store cast tested immediately before this continuation
+  inserts an `andi` temporary and fixes the downstream packet temporary sequence,
+  but has86 instructions rather than85. Preserve this partial mechanism; never
+  remove its extra instruction by an object patch and call that matched C.
+- The unusual `func_81003510` still requires words
+  `24010005 14810001 00000000 03e00008 00000000`. The synthetic
+  [fingerprint fixture](frontend_fingerprint.c) and
+  [driver](frontend_fingerprint.py) run stock7.1 cc/NCC and5.3 cc at-O2, plus
+  stock7.1 cc at-O1, with a mandatory three-word sibling control. All four
+  controls are exact. All tested if/switch/goto self-assignment no-ops emit
+  `03e00008 afa50004`, not the target. This excludes these constructs/routes
+  only; it is not a compiler-impossibility proof.
+- Dense-four is a chain on all four cells. Dense-five is a table on both C
+  generations (including7.1-O1), but a chain on7.1 NCC. The driver basename
+  matters even when cc and NCC binary hashes agree. Retained results record
+  argv, working directory, source/compiler/object hashes and control verdicts.
+  The fixture flags are a reduced fingerprint envelope, not the full production
+  recipe. C++ names are mangled and no production compiler route was changed.
+- Diagnostic compilation of the retained mesh scratch through stockNCC succeeds
+  but keeps `mflo v0` for the quotient and produces frame0x40. It is not a
+  candidate acceptance or evidence that NCC built this owner historically.
+- Next actions: keep both pragmas. For mesh, obtain a calibrated uopt/ugen
+  phase-boundary trace to distinguish colored quotient from temporary demand,
+  using the extra-andi variant as a differential witness. For the no-op,
+  locate elimination at the frontend/optimizer/assembler boundary before another
+  spelling campaign. Do not repeat stock listing levels or flat permuter seeds.
+  Run the fixture with `--repo /work --output /work/build/<new scratch>`; only
+  synthetic artifacts are emitted. Four parser/control tests pass via
+  `python3 -m unittest discover -s docs/regions/fragments/26 -p 'test_frontend_fingerprint.py'`.
+
 - The two preceding callbacks landed through PR #816 after the public full-ROM gate succeeded. This owner remains an active assembly pragma; no speculative C was installed.
 - Event 5 allocates `count * 16` bytes, copies vertex records, scales alpha by the object byte at +0x87 using signed division by 255, and appends segment 15 via `gSPSegment`. The source mesh pointer is `D_80094920` (vertices +0x20, signed count +0x26); the context is `D_8009491C` (object pointer +0x14).
 - Preserve the seemingly redundant signed halfword copy at vertex +0x0C followed by signed byte copies at +0x0C/+0x0D/+0x0E. Original alpha is unsigned. These overlaps are proven assembly, not removable cleanup.
