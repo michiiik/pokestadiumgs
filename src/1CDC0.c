@@ -169,7 +169,16 @@ s16 func_8001CC50(u8 **arg0) {
     return value;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/1CDC0/func_8001CC88.s")
+u32 func_8001CC88(u8 **arg0) {
+    struct { u16 value; } result;
+    result.value = *(*arg0)++;
+    if (result.value & 0x80) {
+        result.value <<= 8;
+        result.value &= 0x7F00;
+        result.value = *(*arg0)++ | result.value;
+    }
+    return result.value;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1CDC0/func_8001CCC8.s")
 
