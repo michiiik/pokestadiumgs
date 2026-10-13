@@ -62,7 +62,7 @@ void func_829033DC(f32 *arg0, f32 arg1, f32 arg2) {
 s32 main_pool_get_available();
 s32 MainPool_AllocState(s32, s32);
 extern void MainPool_FinalizeAllocation(s32);
-s32 func_80004B4C(s32, s32);
+void *func_80004B4C(s32, s32);
 extern void func_829061CC(s32, s32, s32);
 extern void main_pool_push_state(s32);
 extern s32 D_82919D14;
@@ -73,7 +73,7 @@ void func_82903444(void) {
     s32 temp_v0;
 
     main_pool_push_state(0x53544144);
-    sp18 = func_80004B4C(D_82919D14, D_82919D24);
+    sp18 = (s32)func_80004B4C(D_82919D14, D_82919D24);
     temp_v0 = MainPool_AllocState(main_pool_get_available(), 0);
     sp1C = temp_v0;
     func_829061CC(D_82919D24, temp_v0, sp18);

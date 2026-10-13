@@ -4,7 +4,7 @@
 #ifdef VERSION_US
 s32 BinArchive_Open(s32, s32, s32, s32);
 extern void func_800049B8(s32);
-s32 func_80004B4C(s32, s32);
+void *func_80004B4C(s32, s32);
 s32 func_800356CC(s32);
 extern s32 D_80097124;
 extern s32 D_80097128;
@@ -14,8 +14,8 @@ void func_8004C020(void) {
 
     temp_v0 = BinArchive_Open(func_800356CC(2), 0, 2, 1);
     sp1C = temp_v0;
-    D_80097124 = func_80004B4C(temp_v0, 0x41);
-    D_80097128 = func_80004B4C(sp1C, 0);
+    D_80097124 = (s32)func_80004B4C(temp_v0, 0x41);
+    D_80097128 = (s32)func_80004B4C(sp1C, 0);
     func_800049B8(sp1C);
 }
 
@@ -48,7 +48,7 @@ s32 func_8004C3EC(s32 arg0, s32 arg1, s32 arg2) {
     s32 result;
     result = func_8004C3B0(arg0, arg1);
     if (result == 0 || arg2 == 0) {
-        result = func_80004B4C(arg0, arg1);
+        result = (s32)func_80004B4C(arg0, arg1);
         if (result != 0) {
             main_pool_set_func(result, arg0 + 0x18 + arg1 * 0x10, func_8004C3A4);
         }
