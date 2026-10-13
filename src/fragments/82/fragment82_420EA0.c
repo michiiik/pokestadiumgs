@@ -43,7 +43,28 @@ s32 func_82D00158(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_420EA0/func_82D001C0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_420EA0/func_82D002CC.s")
+extern u16 D_82D23D8A;
+extern void func_800226C0(s32);
+s32 func_82D002CC(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    s32 flags = D_82D23D8A;
+    s32 original = arg0;
+
+    if ((flags & 0x800) != 0) {
+        arg0 += arg1;
+        if (arg0 > arg3) {
+            arg0 = arg3;
+        }
+    } else if ((flags & 0x400) != 0) {
+        arg0 -= arg1;
+        if (arg0 < arg2) {
+            arg0 = arg2;
+        }
+    }
+    if (original != arg0) {
+        func_800226C0(0x13);
+    }
+    return arg0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_420EA0/func_82D0034C.s")
 
