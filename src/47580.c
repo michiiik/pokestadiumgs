@@ -637,9 +637,43 @@ s32 func_800481C0(u8 *arg0, s32 value) { if (func_8003514C() != 0) value = 0; ar
 extern s32 func_800481C0(u8 *, s32);
 s32 func_800481FC(u8 *arg0, u8 *arg1) { u8 temp[0x20]; func_800477C4(temp, arg1); return func_800481C0(arg0, func_80047BD4(temp)); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80048234.s")
+extern s16 D_80094FA0;
+extern s16 D_80094FA4;
+void func_80048234(u8 *text) {
+    u8 buffer[0x20];
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_800482C0.s")
+    text = func_800477C4(buffer, text);
+    if (buffer[0] != 0) {
+        D_80094FA0 = func_80047BD4(buffer);
+    } else {
+        D_80094FA0 = -1;
+    }
+    func_800477C4(buffer, text);
+    if (buffer[0] != 0) {
+        D_80094FA4 = func_80047BD4(buffer);
+    } else {
+        D_80094FA4 = -1;
+    }
+}
+
+extern s16 D_80094FAC;
+extern s16 D_80094FB0;
+void func_800482C0(u8 *text) {
+    u8 buffer[0x40];
+
+    text = func_800477C4(buffer, text);
+    if (buffer[0] != 0) {
+        D_80094FB0 = func_80047BD4(buffer);
+    } else {
+        D_80094FB0 = 0;
+    }
+    func_800477C4(buffer, text);
+    if (buffer[0] != 0) {
+        D_80094FAC = func_80047BD4(buffer);
+    } else {
+        D_80094FAC = 0;
+    }
+}
 
 extern s16 D_80094FAC;
 extern u8 * func_800477C4(u8 *, u8 *);
