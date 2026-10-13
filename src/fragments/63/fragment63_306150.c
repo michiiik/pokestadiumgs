@@ -92,7 +92,21 @@ void func_87E03448(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_306150/func_87E03470.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_306150/func_87E03518.s")
+extern s32 func_87F08E3C(void *, s32);
+void func_87E03518(void *arg0) {
+    u8 *entry;
+    s32 resource;
+    s32 i;
+
+    resource = func_87F08E3C((void *)func_8004C990(0x1A3, 0), 0x0F000000);
+    entry = (u8 *)arg0 + 0x1C4;
+    for (i = 0; i < 4; i++) {
+        entry[8] = i;
+        *(s32 *)entry = resource;
+        func_87E03020(entry);
+        entry += 0xC;
+    }
+}
 
 extern void func_87E028D8(void *);
 extern void func_87E02A70(void *);
