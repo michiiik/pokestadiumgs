@@ -6,6 +6,30 @@
   "expected_size": 340,
   "expected_frame": 56,
   "required_gate": "make rom COMPARE=1",
+  "quotient_carrier_follow_up": {
+    "status": "requeue-not-accepted",
+    "base_seed_label": "particle-mesh:fullwidth-product:node",
+    "label": "particle-mesh:product-topology:quotient-carrier",
+    "replacements": [
+      {
+        "old": "void func_8100352C(s32 event, void *node)",
+        "new": "void func_8100352C(s32 event, s32 node)"
+      },
+      {
+        "old": "      node = (void *)(src->tail.color.alpha * locals.object->opacity);\n      dst->tail.color.alpha = (s32)node / 255;",
+        "new": "      node = (src->tail.color.alpha * locals.object->opacity) / 255;\n      dst->tail.color.alpha = node;"
+      }
+    ],
+    "exact_instruction_matches": 78,
+    "total_instructions": 85,
+    "first_diff_instruction": 55,
+    "mismatch_kind": "register_allocation_only",
+    "permuter_seconds": 300,
+    "permuter_threads": 4,
+    "permuter_base_score": 40,
+    "permuter_best_score": 40,
+    "next_action": "Calibrated allocator or temporary trace; do not repeat the flat seed search."
+  },
   "seeds": [
     {
       "label": "particle-mesh:scope-loop:goto-less",

@@ -1,5 +1,11 @@
 # Fragment 26 particle callbacks
 
+## 2026-10-13: func_81001F14 accepted
+
+- Select a texture from an animation sequence, clamping to the last entry when mode==1 and frame reaches the count, otherwise using unsigned remainder. If no sequence is present, use the base texture when available. Load the selected texture, reload animation settings after the call, and emit tile-size commands for tile0 or1. Return the advanced display-list pointer.
+- Two eight-candidate batches explored sequence caching/index widths and tile-dispatch topology. The uncached sequence form matched the first70 instruction words but an if/else chain emitted114 instead of115 instructions. A two-case switch in ascending order, with gfx++ in each call's argument, reproduces the original branch shape. No jump table is emitted, so no rodata prerequisite was required.
+- Winner `particle-texture-settings:dispatch:reverseFalse-defaultFalse-separateFalse`: link-verified, auto-gated, byte-identical retail ROM MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`. The460-byte function and0x38 frame need no padding. Naming found no evidence-backed name; the formatted source separately passed `make rom COMPARE=1` with default host syntax checks enabled.
+
 ## 2026-10-13: func_8100072C accepted
 
 - Select the signed-halfword keyframe index, interpolate five adjacent unsigned-byte values from five-byte records, and return the supplied output buffer. Times are at settings+8; value records are at settings+0xC, unlike the four-channel helper's settings+0x10 pointer.
@@ -50,6 +56,14 @@
 - Next priority is stack-local placement and initial context-pointer liveness on this new seed, not another run of the original declaration-order family. Try separating the allocated pointer from the record while actually removing that field from the record declaration, and inspect the resulting offsets before permuting. Earlier standalone-pointer variants retained the unused record field and are not evidence against a correctly shortened record. No candidate in this continuation was accepted or installed.
 
 ### Continuation: exact stack layout and late temporary registers
+
+#### Quotient-carrier continuation
+
+- `requeue` / `register-tie`: after PR #822's public ROM gate succeeded and the two interpolation helpers merged, three eight-candidate batches resumed this owner with allocator eligibility, full-width formal types, and assignment topology. There are now 264 runner probes; no candidate from this continuation was accepted or installed.
+- Address-eligibility probes were diagnostic-only (`--no-auto-gate`). Taking the node formal's address changed early object/count coloring; most other carriers enlarged the frame or inserted memory operations. Taking allocated's address retained 340 bytes but changed the frame from 0x38 to 0x40. These do not validate natural source spellings.
+- New best seed: `particle-mesh:product-topology:quotient-carrier`, 78/85 exact words (raw0.9176), normalized1.0, 340 bytes, original0x38 frame and spills. On the previous exact-prefix seed, spell the unused second formal as s32 and assign the entire `(src->tail.color.alpha * locals.object->opacity) / 255` result to it, then store that quotient to destination alpha. Product extraction now matches; the first mismatch moves from instruction51 to55 (`mflo v0` versus expected `mflo t2`). Seven residual words are quotient and subsequent temporary-register choices. This is not an instruction-byte match.
+- A permuter import initially failed because shared declarations were embedded in the candidate instead of passed through `--declarations`; synthesis introduced an unrelated unknown typedef. Separating body and declarations fixes the import. The five-minute/four-thread search on this genuinely new seed completed flat at40->40, with no outputs. Do not repeat that seed's search. No allocator trace was captured: stock optimizer binaries are stripped and this container has no installed debugger/workbench trace harness.
+- A fourth eight-candidate batch varied quotient formal widths (u8/s8/u16/s16, with/without register): unsigned variants add a narrowing instruction (344bytes); signed variants add two (348bytes). Total272 runner probes, still zero acceptance. Keep the s32 quotient seed's exact55-word prefix. Next research action is a calibrated allocator/temporary trace or a genuinely new lifetime mechanism; the existing eligibility/type/assignment families are exhausted for this box, not proof of compiler impossibility. Preserve this requeue while continuing the same file's independent texture-settings owner.
 
 - `requeue` / `register-tie`: 240 recorded runner probes, no acceptance. This solo continuation preserves the assembly pragma. A refreshed public-master baseline and subsequent baseline rebuild both passed the full ROM gate with default host syntax checks enabled.
 - Shorten the local record to `{ s16 pad; s16 count; vertex *source; object *object; }`. Keep i/src/dst in function scope, but declare this record followed by the separate allocated pointer inside the event-5 block. This reproduces every original spill and the 0x38 frame; moving only one declaration inward does not. Use an explicit goto backedge on `i < count` (the compiler emits the original `bnel i,count`). Natural do/while/for forms still unroll to 676/684 bytes.
