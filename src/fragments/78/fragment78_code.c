@@ -89,7 +89,24 @@ s32 func_8F900968(s32 arg0) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/78/fragment78_code/func_8F9009E8.s")
+extern s32 D_8F911644;
+extern u16 D_8F901534[][17];
+s32 func_8F9009E8(void) {
+    s32 result = 1;
+
+    switch (D_8F901534[D_8F911644][0]) {
+        case 0:
+            result = 0;
+            break;
+        case 3:
+            D_8F911648 = 1;
+            break;
+        case 2:
+            func_8F900968(0);
+            break;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/78/fragment78_code/func_8F900A6C.s")
 
