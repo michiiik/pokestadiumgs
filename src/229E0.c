@@ -2027,7 +2027,19 @@ u8 func_800347E8(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800348C4.s")
+extern u8 D_800D2B78;
+void func_800348C4(u8 arg0, u8 arg1)
+{
+  u8 product;
+  u32 value;
+  u8 *entry;
+  arg1++;
+  product = (*(((&D_800D2B78) + (arg0 * 0x3C)) + 0x36)) * arg1;
+  entry = (&D_800D2B78) + (arg0 * 0x3C);
+  value = (product * (*((u16 *) (entry + 0x22)))) + entry[0x1E];
+  entry[0x1E] = value;
+  entry[0x1D] = (((unsigned short) value) & 0xFF00) >> 8;
+}
 #endif
 
 #ifdef VERSION_US
