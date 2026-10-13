@@ -71,7 +71,25 @@ void func_80046C18(u8 *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80046CA8.s")
+s32 func_80046CA8(u8 *state, s32 mode, s32 r, s32 g, s32 b, s32 a) {
+    s32 result;
+    struct { u8 r, g, b, a; } color;
+    result = 0;
+    if (state != NULL) {
+        color.r = r;
+        color.g = g;
+        color.b = b;
+        color.a = a;
+        if (*(u32 *)&color != ((u32 *)(state + 0x54))[state[0x7C]]) {
+            result = func_80046BB4(state, mode, (u8 *)&color);
+            if (result != 0) {
+                gDPPipeSync(D_800D0510++);
+                gDPSetEnvColor(D_800D0510++, color.r, color.g, color.b, color.a);
+            }
+        }
+    }
+    return result;
+}
 
 s32 func_80046D70(u8 *arg0, s32 arg1, u8 *arg2) {
     s32 result;
@@ -106,7 +124,25 @@ void func_80046DD4(u8 *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80046E64.s")
+s32 func_80046E64(u8 *state, s32 mode, s32 r, s32 g, s32 b, s32 a) {
+    s32 result;
+    struct { u8 r, g, b, a; } color;
+    result = 0;
+    if (state != NULL) {
+        color.r = r;
+        color.g = g;
+        color.b = b;
+        color.a = a;
+        if (*(u32 *)&color != ((u32 *)(state + 0x64))[state[0x7D]]) {
+            result = func_80046D70(state, mode, (u8 *)&color);
+            if (result != 0) {
+                gDPPipeSync(D_800D0510++);
+                gDPSetPrimColor(D_800D0510++, 0, 0, color.r, color.g, color.b, color.a);
+            }
+        }
+    }
+    return result;
+}
 
 void func_80046F2C(u8 *arg0, s32 arg1) {
     arg0[0x79] = (u8)arg1;
@@ -311,9 +347,9 @@ void func_80047444(s32 arg0) {
 
 extern u32 D_437750;
 extern u32 D_446E30;
-extern void BinArchive_Open(void *, void *, s32, s32);
-void func_80047524(void) {
-    BinArchive_Open(&D_437750, &D_446E30, 1, 1);
+extern void *BinArchive_Open(void *, void *, s32, s32);
+void *func_80047524(void) {
+    return BinArchive_Open(&D_437750, &D_446E30, 1, 1);
 }
 
 extern void func_80004B4C(s32, s32);
@@ -323,7 +359,20 @@ void func_80047558(s32 arg0, s32 arg1) {
     func_80004B4C(arg0, func_80047104(arg1));
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047588.s")
+void func_80047670(void);
+extern void _bzero(void *, s32);
+extern s32 main_pool_alloc_with_func(s32, s32, s32, s32);
+u8 *func_80047588(s32 flags, s32 side) {
+    D_80126F50 = (u8 *)main_pool_alloc_with_func(0x80, side, 0x50524E54, (s32)func_80047348);
+    if (D_80126F50 != NULL) {
+        _bzero(D_80126F50, 0x80);
+        func_80047670();
+        *(void **)(D_80126F50 + 0x48) = func_80047524();
+        func_80047444(flags);
+        D_80094FB4 = 0;
+    }
+    return D_80126F50;
+}
 
 extern u8 *D_80126F50; void func_80047610(void) { main_pool_try_free(D_80126F50); }
 
@@ -540,7 +589,7 @@ void func_80047D24(u8 *arg0, u8 *arg1) {
 }
 
 extern u8 *func_800477C4(u8 *, u8 *);
-extern void func_80046CA8(u8 *, s32, s32, s32, s32, s32);
+extern s32 func_80046CA8(u8 *, s32, s32, s32, s32, s32);
 extern void func_80046C18(u8 *);
 
 void func_80047DC4(u8 *arg0, u8 *arg1) {
