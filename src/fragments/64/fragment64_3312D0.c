@@ -112,7 +112,27 @@ void func_87F0F1C0(void *arg0, s32 arg1) {
     func_87F0F390(arg0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_3312D0/func_87F0F234.s")
+extern s32 func_8006236C(u8 *, s32);
+extern void func_8006249C(void *, s32, u8 *);
+void func_87F0F234(s32 arg0, s8 *arg1) {
+    struct { u8 *handle; u32 unused[2]; } scratch;
+    s32 type;
+    s32 slot;
+
+    if (arg1[1] == -1) {
+        type = 0x20;
+        slot = 0;
+    } else {
+        type = 0x21;
+        slot = arg1[1];
+    }
+    scratch.handle = func_8006218C(type, arg0, slot, 2);
+    if (scratch.handle != NULL) {
+        func_8006236C(scratch.handle, arg1[0] - 1);
+        func_8006249C(arg1 + 4, 1, scratch.handle);
+        func_80062304(scratch.handle);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_3312D0/func_87F0F2B8.s")
 
