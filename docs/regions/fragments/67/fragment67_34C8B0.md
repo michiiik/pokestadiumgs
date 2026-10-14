@@ -575,3 +575,61 @@ All earlier search artifacts stay local. Published changes are the matching
 renderer and these durable diagnostics only; no scratch helper, proprietary
 compiler artifact or ROM is included. Remaining owners in this file still
 require their own full-ROM acceptance.
+
+### Background RGB follow-up after atlas acceptance, 2026-10-15
+
+Requeue `func_82910510` remains assembly. Transfer the accepted atlas's actual
+SDK packed-color tree, not its source geometry or function name. Eight normal
+packing cells improve the scalar background parent from 117/140 raw words
+(0.8357) to 129/140 (0.9214). All RGB loads, shifts and packing words now match;
+the eleven remaining words are exclusively the frame and argument homes:
+0x40 instead of 0x58, with the affected incoming-home displacements all -0x18.
+Owner length remains 560 bytes. This is not acceptance or increased C coverage.
+
+Keep the actual loader s32(u8*) declaration and explicit pointer cast introduced
+by accepted-source cleanup, the real rectangle signature, original scale guard
+order and signed +/-0.5 rounding. The candidate's companion transaction retypes
+only its existing forward declaration in the already accepted caller block,
+and is rebuilt from the current source rather than replaying a stale block.
+No transaction remains installed after the rejected batches.
+
+Eight real final-call-carrier variants cache the rounded coefficient, output
+coordinates and output dimensions, singly and together; every value is used.
+They reproduce the same 0x40 frame and all 129 exact words. Do not replay that
+family or add unused locals to pad the missing 24 bytes. Next action is a
+different, compiler-faithful representation of the real floating/rectangle
+working state, preserving the now-exact RGB tree and the accepted atlas sibling
+as controls. All generators and probe outputs stay local.
+
+### Accepted background renderer, 2026-10-15
+
+`func_82910510` now has full-ROM-accepted matching C. This closes the preceding
+background requeues; do not resume their rejected scalar or padding hypotheses
+once the pragma is gone.
+
+The winning source groups only real values into a local eight-field work record:
+the texture pointer, scale, derivative, signed rounding bias, interior width,
+the height-check/inset carrier, and the two output coordinates. Each field is
+written and consumed. The output coordinates are computed from the original
+signed inputs plus five and passed to the real rectangle helper. This is actual
+working storage, not an unused field or frame-padding device.
+
+Eight working-state cells vary the presence of the real rounded-result,
+coordinate and dimension carriers. The coordinate pair, without a separate
+rounded-result or final-dimension pair, gives 140/140 raw words, 560 bytes and
+the original 0x58 frame. The normal runner accepts
+`f67:background:real-working-state-2`, link_verified true, auto_gated true, one
+combined full-ROM gate. The scalar parent and seven other cells are not adopted.
+
+Preserve the original null/scale/width/height guard ordering, unsigned texture
+width conversion, +/-0.5 float rounding and actual SDK packed-color tree. The
+paired transaction corrects the existing forward declaration to the accepted
+signed-coordinate interface; the already accepted caller remains byte-identical.
+Post-acceptance cleanup removes duplicate externs and the now-redundant forward
+declaration. A fresh default-check native full-ROM comparison passes after that
+cleanup, MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`.
+
+The naming-tool plan has no evidence-backed mapping for this owner, so its
+address-keyed name remains. No helper function, scratch script, proprietary
+compiler artifact, ROM, forced register, padding, or object rewrite is published.
+Four assembly owners remain in this file and still need separate acceptance.

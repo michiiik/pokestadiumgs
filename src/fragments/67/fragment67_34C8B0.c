@@ -97,13 +97,48 @@ void func_8290FF14(F67DisplayRecord* state) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_34C8B0/func_82910258.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_34C8B0/func_82910510.s")
-
 extern Gfx D_80094E78[];
 extern Gfx* D_800D0510;
 extern s32 func_8004C990(s32, s32);
 extern s32 func_8004D1FC(u8*);
 extern void func_80044270(s16, s16, s16, s16, s16, s16, s16, s16, s32);
+void func_82910510(F67DisplayRecord* state, s16 x, s16 y, s32 width, s32 height) {
+    struct {
+        u16* texture;
+        f32 scale;
+        f32 derivative;
+        f32 bias;
+        s32 interiorWidth;
+        s32 heightWork;
+        s32 drawX;
+        s32 drawY;
+    } work;
+    work.texture = (u16*)(u32)func_8004C990(0x52, 1);
+    if (work.texture != NULL) {
+        work.interiorWidth = width - 10;
+        work.heightWork = height - 10;
+        work.scale = (f32)work.interiorWidth / (f32)(u32)work.texture[0];
+        if ((work.scale > 0.0f) && (work.interiorWidth > 0) && (work.heightWork > 0)) {
+            gSPDisplayList(D_800D0510++, D_80094E78);
+            gDPSetRenderMode(D_800D0510++, G_RM_OPA_SURF, G_RM_OPA_SURF2);
+            func_8004D1FC((u8*)work.texture);
+            gDPPipeSync(D_800D0510++);
+            work.heightWork = 10;
+            work.derivative = 1024.0f / work.scale;
+            gDPSetColor(D_800D0510++, G_SETPRIMCOLOR, (_SHIFTL(state->foreground[1], 16, 8) | _SHIFTL(state->foreground[2], 8, 8) | _SHIFTL(state->foreground[0], 24, 8) | _SHIFTL(255, 0, 8)));
+            gDPSetColor(D_800D0510++, G_SETENVCOLOR, (_SHIFTL(state->background[1], 16, 8) | _SHIFTL(state->background[2], 8, 8) | _SHIFTL(state->background[0], 24, 8) | _SHIFTL(255, 0, 8)));
+            if (work.derivative > 0.0f) {
+                work.bias = 0.5f;
+            } else {
+                work.bias = -0.5f;
+            }
+            work.drawX = x + 5;
+            work.drawY = y + 5;
+            func_80044270((s16)work.drawX, (s16)work.drawY, (s16)(width - work.heightWork), (s16)(height - work.heightWork), 0, 0, (s32)(work.bias + work.derivative), 1024, 0);
+        }
+    }
+}
+
 void func_82910740(F67DisplayRecord* state, s32 x, s32 y, s32 width, s32 height) {
     s16 originX, originY;
     s32 stripWidth;
@@ -174,7 +209,6 @@ extern Gfx D_80094E38[];
 extern s32 D_8291BE74;
 extern void func_800468A0(s32);
 extern s32 func_8004D19C(s32, s32, s32, s32, s32);
-extern void func_82910510(F67DisplayRecord*, s32, s32, s32, s32);
 extern void func_82910B30(void);
 extern void func_82910FC8(void);
 void func_829115E0(void) {
