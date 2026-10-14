@@ -633,3 +633,43 @@ The naming-tool plan has no evidence-backed mapping for this owner, so its
 address-keyed name remains. No helper function, scratch script, proprietary
 compiler artifact, ROM, forced register, padding, or object rewrite is published.
 Four assembly owners remain in this file and still need separate acceptance.
+
+### Accepted selected-row panel renderers, 2026-10-15
+
+`func_82910B30` and `func_82910FC8` now have full-ROM-accepted C: respectively
+294 words/1176 bytes with the original 0xA8 frame, and 276 words/1104 bytes
+with the original 0x98 frame. Both use the accepted atlas renderer's natural
+eight-rectangle geometry and real SDK color commands; no cached fake geometry,
+unused local, forced register, compiler modification, or object patch is used.
+
+The first eight selected-panel cells vary state aliasing, header/geometry
+ordering and packed-color trees. The direct-global/header-first/GBR tree
+matches all positional opcodes and registers, but 17 words have wrong stack
+offsets. A second eight-cell family moves real width/height declarations and
+eliminates the optional table-base carrier. Dimensions after the texture local,
+with direct row access, closes every word. Normal runner batch
+`749ac9640a354062a1499e3ff7e9052f` accepts
+`f67:selected-panel:real-homes:0:direct-True`, link_verified true, one combined
+full-ROM gate. The sibling's first eight-cell family accepts
+`f67:second-panel:natural:homes-0:color-(1, 2, 0)` in batch
+`c468b222dced4f88a135948eacfac7fa`, also link_verified with one combined gate.
+Both calls self-gate; no winner is resent or probed after acceptance.
+
+Preserve signed origins, cached dimensions across the panel call, texture
+header reads before the original null check, and selection reload after the
+primary panel call before the icon lookup. The second panel does not draw an
+icon. Both infer real fields in the existing 0x44-byte row: primary dimensions
+and offsets at 0x04..0x0A, second-panel dimensions and offsets at 0x0C..0x12,
+and icon archive/entry at 0x18/0x1C. Existing accepted field offsets remain
+unchanged. Post-acceptance cleanup consolidates these fields into F67UiRow,
+removes temporary type overlays and redundant externs, and passes a fresh
+native full-ROM gate with default host syntax checks. MD5 remains
+`1561c75d11cedf356a8ddb1a4a5f9d5d`.
+
+Fresh source and 20-leading-blank controls reproduce the complete 0x1D50-byte
+text and owned 0x30-byte rodata; linked windows and the entire ROM are retail
+identical. The naming plan has no evidence-backed mapping for either owner,
+so address-keyed names remain. Scratch generators and build artifacts stay
+local. Only initializer `func_8290FE04` and dispatcher `func_82910258` remain
+assembly in this file; their earlier requeues remain active, not resolved by
+these renderer matches.

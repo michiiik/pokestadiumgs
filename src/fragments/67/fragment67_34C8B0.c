@@ -15,9 +15,11 @@ extern F67DisplayRecord D_8291BE80, D_8291BE98;
 
 typedef struct F67UiRow {
     /* 0x00 */ s16 width, height;
-    /* 0x04 */ u8 unused04[0x10];
+    /* 0x04 */ s16 panelWidth, panelHeight, offsetX, offsetY;
+    /* 0x0C */ s16 secondPanelWidth, secondPanelHeight, secondOffsetX, secondOffsetY;
     /* 0x14 */ s16 secondaryWidth, secondaryHeight;
-    /* 0x18 */ u8 unused18[0x14];
+    /* 0x18 */ s32 iconArchive, iconEntry;
+    /* 0x20 */ u8 unused20[0x0C];
     /* 0x2C */ s32 archive, entry, alternateArchive, alternateEntry;
     /* 0x3C */ u8* foreground;
     /* 0x40 */ u8* background;
@@ -167,9 +169,73 @@ void func_82910740(F67DisplayRecord* state, s32 x, s32 y, s32 width, s32 height)
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_34C8B0/func_82910B30.s")
+extern void Ui_DrawBorderedPanel(s32, s32, s32, s32, u16);
+extern Gfx D_80094E38[];
+extern s32 func_8004D19C(s32, s32, s32, s32, s32);
+void func_82910B30(void) {
+    s16 originX, originY;
+    s32 stripWidth, textureHeight;
+    u16* texture;
+    s32 width, height;
+    texture = (u16*)(u32)func_8004C990(0x51, 0);
+    stripWidth = (s32)texture[0] / 4;
+    textureHeight = texture[1];
+    originX = D_829172D8[D_8291BE80.selection].offsetX + D_8291BE80.x;
+    originY = D_829172D8[D_8291BE80.selection].offsetY + D_8291BE80.y;
+    width = D_829172D8[D_8291BE80.selection].panelWidth;
+    height = D_829172D8[D_8291BE80.selection].panelHeight;
+    Ui_DrawBorderedPanel(originX, originY, width, height, 0);
+    gSPDisplayList(D_800D0510++, D_80094E38);
+    func_8004D19C(D_8291BE80.x + 0x20, D_8291BE80.y + 0x26,
+        func_8004C990(D_829172D8[D_8291BE80.selection].iconArchive, D_829172D8[D_8291BE80.selection].iconEntry), 0, 0);
+    if (texture != NULL) {
+        gSPDisplayList(D_800D0510++, D_80094E78);
+        gDPSetRenderMode(D_800D0510++, G_RM_OPA_SURF, G_RM_OPA_SURF2);
+        func_8004D1FC((u8*)texture);
+        gDPPipeSync(D_800D0510++);
+        gDPSetColor(D_800D0510++, G_SETPRIMCOLOR, (_SHIFTL(D_8291BE80.foreground[1], 16, 8) | _SHIFTL(D_8291BE80.foreground[2], 8, 8) | _SHIFTL(D_8291BE80.foreground[0], 24, 8) | _SHIFTL(255, 0, 8)));
+        gDPSetColor(D_800D0510++, G_SETENVCOLOR, (_SHIFTL(D_8291BE80.background[1], 16, 8) | _SHIFTL(D_8291BE80.background[2], 8, 8) | _SHIFTL(D_8291BE80.background[0], 24, 8) | _SHIFTL(255, 0, 8)));
+        func_80044270((s16)originX, (s16)originY, (s16)stripWidth, (s16)textureHeight, 0, 0, 1024, 1024, 0);
+        func_80044270((s16)(originX + stripWidth), (s16)originY, (s16)(width - stripWidth * 2), (s16)textureHeight, (s16)(stripWidth << 5), 0, 0, 1024, 0);
+        func_80044270((s16)(originX + width - stripWidth), (s16)originY, (s16)stripWidth, (s16)textureHeight, (s16)(stripWidth << 5), 0, 1024, 1024, 0);
+        func_80044270((s16)originX, (s16)(originY + textureHeight), (s16)stripWidth, (s16)(height - textureHeight * 2), (s16)((stripWidth * 2) << 5), 0, 1024, 0, 0);
+        func_80044270((s16)originX, (s16)(originY + height - textureHeight), (s16)stripWidth, (s16)textureHeight, (s16)((stripWidth * 2) << 5), 0, 1024, 1024, 0);
+        func_80044270((s16)(originX + stripWidth), (s16)(originY + height - textureHeight), (s16)(width - stripWidth * 2), (s16)textureHeight, (s16)((stripWidth * 3) << 5), 0, 0, 1024, 0);
+        func_80044270((s16)(originX + width - stripWidth), (s16)(originY + height - textureHeight), (s16)stripWidth, (s16)textureHeight, (s16)((stripWidth * 3) << 5), 0, 1024, 1024, 0);
+        func_80044270((s16)(originX + width - stripWidth), (s16)(originY + textureHeight), (s16)stripWidth, (s16)(height - textureHeight * 2), (s16)((stripWidth * 3) << 5), 0, 1024, 0, 0);
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_34C8B0/func_82910FC8.s")
+void func_82910FC8(void) {
+    s16 originX, originY;
+    s32 stripWidth, textureHeight;
+    u16* texture;
+    s32 width, height;
+    texture = (u16*)(u32)func_8004C990(0x51, 0);
+    stripWidth = (s32)texture[0] / 4;
+    textureHeight = texture[1];
+    originX = D_829172D8[D_8291BE80.selection].secondOffsetX + D_8291BE80.x;
+    originY = D_829172D8[D_8291BE80.selection].secondOffsetY + D_8291BE80.y;
+    width = D_829172D8[D_8291BE80.selection].secondPanelWidth;
+    height = D_829172D8[D_8291BE80.selection].secondPanelHeight;
+    Ui_DrawBorderedPanel(originX, originY, width, height, 0);
+    if (texture != NULL) {
+        gSPDisplayList(D_800D0510++, D_80094E78);
+        gDPSetRenderMode(D_800D0510++, G_RM_OPA_SURF, G_RM_OPA_SURF2);
+        func_8004D1FC((u8*)texture);
+        gDPPipeSync(D_800D0510++);
+        gDPSetColor(D_800D0510++, G_SETPRIMCOLOR, (_SHIFTL(D_8291BE80.foreground[1], 16, 8) | _SHIFTL(D_8291BE80.foreground[2], 8, 8) | _SHIFTL(D_8291BE80.foreground[0], 24, 8) | _SHIFTL(255, 0, 8)));
+        gDPSetColor(D_800D0510++, G_SETENVCOLOR, (_SHIFTL(D_8291BE80.background[1], 16, 8) | _SHIFTL(D_8291BE80.background[2], 8, 8) | _SHIFTL(D_8291BE80.background[0], 24, 8) | _SHIFTL(255, 0, 8)));
+        func_80044270((s16)originX, (s16)originY, (s16)stripWidth, (s16)textureHeight, 0, 0, 1024, 1024, 0);
+        func_80044270((s16)(originX + stripWidth), (s16)originY, (s16)(width - stripWidth * 2), (s16)textureHeight, (s16)(stripWidth << 5), 0, 0, 1024, 0);
+        func_80044270((s16)(originX + width - stripWidth), (s16)originY, (s16)stripWidth, (s16)textureHeight, (s16)(stripWidth << 5), 0, 1024, 1024, 0);
+        func_80044270((s16)originX, (s16)(originY + textureHeight), (s16)stripWidth, (s16)(height - textureHeight * 2), (s16)((stripWidth * 2) << 5), 0, 1024, 0, 0);
+        func_80044270((s16)originX, (s16)(originY + height - textureHeight), (s16)stripWidth, (s16)textureHeight, (s16)((stripWidth * 2) << 5), 0, 1024, 1024, 0);
+        func_80044270((s16)(originX + stripWidth), (s16)(originY + height - textureHeight), (s16)(width - stripWidth * 2), (s16)textureHeight, (s16)((stripWidth * 3) << 5), 0, 0, 1024, 0);
+        func_80044270((s16)(originX + width - stripWidth), (s16)(originY + height - textureHeight), (s16)stripWidth, (s16)textureHeight, (s16)((stripWidth * 3) << 5), 0, 1024, 1024, 0);
+        func_80044270((s16)(originX + width - stripWidth), (s16)(originY + textureHeight), (s16)stripWidth, (s16)(height - textureHeight * 2), (s16)((stripWidth * 3) << 5), 0, 1024, 0, 0);
+    }
+}
 
 typedef struct F67TextRow {
     s32 id;
@@ -205,12 +271,8 @@ void func_82911418(void) {
 }
 
 extern s16 D_8291BE7A;
-extern Gfx D_80094E38[];
 extern s32 D_8291BE74;
 extern void func_800468A0(s32);
-extern s32 func_8004D19C(s32, s32, s32, s32, s32);
-extern void func_82910B30(void);
-extern void func_82910FC8(void);
 void func_829115E0(void) {
     func_800468A0(D_8291BE74);
     gSPDisplayList(D_800D0510++, D_80094E38);
@@ -298,7 +360,6 @@ extern void func_80008514(s32);
 extern void func_80008574(void);
 extern void func_80047610(void);
 extern void func_8004C398(void);
-extern s32 D_8291BE74;
 extern u8 D_1000000[], D_446E30[], D_447D00[];
 
 s32 func_8291199C(s32 arg0, s32 selection) {
