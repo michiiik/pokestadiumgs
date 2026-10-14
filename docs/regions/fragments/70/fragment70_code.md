@@ -102,11 +102,35 @@ from #943. The only merge conflict was the two appended entry-point aliases;
 both are retained. The integrated tree passes a fresh full-ROM comparison and
 the same controls, preserving the fragment 68 accepted C as well.
 
-`func_8F200258` is the only remaining assembly owner in this file and has not
-been probed in this batch. It is the next text-rendering target, with three
+At the end of the lifecycle batch, `func_8F200258` was the only remaining
+assembly owner in this file and had not been probed. It was the next
+text-rendering target, with three
 mode-dependent coordinate pairs and repeated language queries. No jump-table
 or data-layout prerequisite is identified from its current assembly. This is
 remaining work, not an accepted match or a terminal skip.
 
 Only source, compatibility alias and these notes are published. No scratch
 generator, diagnostic helper, object, compiler binary or ROM is included.
+
+## Text renderer accepted, 2026-10-15
+
+`func_8F200258` is accepted by normal runner batch
+`98a4cfaf37ea44cabfb4c356062e4127`, label
+`f70:text:y-first-False:font-init-False:reset-in-branch-False`:
+115 instructions / 460 bytes, frame 0x28, `link_verified: true`, one combined
+full-ROM gate with default host syntax checking. The first natural candidate
+matches; initializing the font before the setup call instead grows the frame
+and body, and is not the accepted spelling.
+
+Reuse the real X/Y locals for the three text rows. Preserve three independent
+language queries and the mode reloads after calls, both language string sets,
+font/color setup, the selected index format argument and signed node X/Y
+halfwords. Strings remain owned by their existing assembly data; no new
+literal, data layout or artificial local is introduced. Cleanup expands
+branches and removes duplicate declarations. Naming has no known mapping.
+
+Fresh-source and 20-leading-blank controls reproduce complete object sections
+and all ten accepted C functions. A fresh post-cleanup native full-ROM build
+is retail-identical, MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`. This source file
+now has **no remaining GLOBAL_ASM function owners**. That is file completion,
+not a claim that the repository-wide matching-C goal is complete.

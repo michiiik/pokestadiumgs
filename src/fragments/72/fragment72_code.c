@@ -21,7 +21,23 @@ void func_8F400198(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/72/fragment72_code/func_8F400A8C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/72/fragment72_code/func_8F400B88.s")
+extern u16 func_8F400A8C(u16*, u16);
+
+void func_8F400B88(u16* dest, u16* image) {
+    u16 x;
+    u16 y;
+    u16* workingImage = image;
+    u16* workingDest = dest;
+
+    /* Sample each 4x4 block of the 160x160 source into a 40x40 thumbnail. */
+    for (y = 0; y < 40; y++) {
+        for (x = 0; x < 40; x++) {
+            *workingDest++ = func_8F400A8C(workingImage, 160);
+            workingImage += 4;
+        }
+        workingImage += 480; /* Remaining three source rows. */
+    }
+}
 
 void func_8F400C08(s32 arg0, s32 arg1) {
     s32 temp_a1;
