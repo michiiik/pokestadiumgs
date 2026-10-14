@@ -359,3 +359,35 @@ Five owners remain assembly: entry renderer `func_8F8000D0`, text renderer
 `func_8F8006B0`, range renderer `func_8F800924`, range input
 `func_8F801FC4`, and text input `func_8F8023B8`. Scratch experiments and
 diagnostic scripts remain local and are not part of the published pair.
+
+## Follow-up native diagnostics (2026-10-15)
+
+No additional owner is installed. The five unresolved functions remain
+assembly, and fresh baseline controls still reproduce all 25 C bodies,
+all thirty offsets and the retail ROM.
+
+- Range input `func_8F801FC4`: **requeue**, now 104 rejected cells total.
+  Comma/assignment guards, a single narrow carrier, ordinary register
+  storage hints and reuse of the selected-value carrier do not combine the
+  correct frame with the correct pre-sound conversion. The single-carrier
+  form has frame 0x20 but two extra sign-extension instructions and wrong
+  stack homes. Retain the earlier raw-0.7007 548-byte baseline and the
+  separate correct-frame guard-conversion diagnostic. Further ordinary
+  declaration/operand permutations are not a new hypothesis.
+- Text/range renderer geometry views: **requeue**. A probe-only experiment
+  separates the first halfword from the typed state. It changes address
+  lifetimes but does not match: text reaches normalized 0.8571 / raw
+  0.4658 (644 bytes); range reaches normalized 0.7976 / raw 0.5378
+  (1256 bytes), compared with retail 628 and 1324 bytes. This does not
+  justify adding the proposed alias; no alias or preprocessor scaffold is
+  installed. Earlier s8/u16 view declaration conflicts and stale caller
+  prototypes are compile setup failures, not scored source hypotheses.
+- Text input `func_8F8023B8`: **requeue**, first eight compiling cells
+  reject. Best normalized 0.8678 / raw 0.3276, 696 bytes, but frame 0x28
+  versus retail 0x30. Preserve the real mode, character, cursor, shift-loop
+  and controller behavior before investigating stack homes. Similar total
+  size is not acceptance evidence.
+
+The read-only repository ranking and region notes were checked before
+moving to a fresh fragment-31 selection batch. Do not describe these
+bounded negatives as an impossibility result or a broken compiler.

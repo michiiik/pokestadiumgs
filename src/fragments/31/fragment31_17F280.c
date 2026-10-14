@@ -15,7 +15,29 @@ void func_8820C000(void) {
     D_88234560 = 5;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820C040.s")
+extern void* D_88234710;
+extern u8* func_88A00710(s32, s16);
+u8* func_8820C040(s32 mode, u8 slot) {
+    s16 position;
+    u32 index = slot;
+
+    /* Only modes 0 through 3 define a selection position. */
+    switch (mode) {
+    case 0:
+        position = *(s16*)((u8*)D_88234710 + index * 44 + 30);
+        break;
+    case 1:
+        position = *(s16*)((u8*)D_88234710 + index * 44 + 28);
+        break;
+    case 2:
+        position = 0;
+        break;
+    case 3:
+        position = *(s16*)((u8*)D_88234710 + 0xB8);
+        break;
+    }
+    return func_88A00710(*(s32*)((u8*)D_88234710 + index * 4 + 12), position);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820C114.s")
 
@@ -23,11 +45,56 @@ void func_8820C000(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820C65C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820C798.s")
+extern u8* D_88A01C64;
+extern s32 func_88202158(u8*, s32);
+extern u8 func_88A007BC(s32);
+extern u8 func_8006378C(u8);
+extern s32 func_8800005C(void);
+s32 func_8820C798(void) {
+    u8* state = D_88234710;
+    u8 slot = state[0];
+    s32 result = 0;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820C800.s")
+    if (((s32*)state)[4 - slot] == 2 || ((s32*)state)[4 - slot] == 3) {
+        result = func_88202158(func_8820C040(1, slot), 1);
+    }
+    return result;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820C8A0.s")
+s32 func_8820C800(u8 slot, u8 type) {
+    u8 count = func_88A007BC(*(s32*)((u8*)D_88234710 + slot * 4 + 12));
+    u8* record = func_8820C040(2, slot);
+    u32 index;
+
+    for (index = 0; index < count; index++, record += 2) {
+        if (type == func_8006378C(record[0])) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+u8 func_8820C8A0(u8 type, u8 slot) {
+    u8 result = 0;
+    u8* table;
+    u8* record;
+    u32 count;
+    u32 index;
+
+    if (func_8800005C() == 0 && *(s32*)((u8*)D_88234710 + slot * 4 + 12) == 0 && func_8006378C(type) == 4) {
+        table = D_88A01C64;
+        count = table[3];
+        record = table;
+        record += record[7] * 2 + 9;
+        for (index = 0; index < count; index++, record += 2) {
+            if (type == record[0]) {
+                result = record[1];
+                break;
+            }
+        }
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820C94C.s")
 
@@ -53,7 +120,6 @@ void func_8820C000(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820EB14.s")
 
-extern u8 func_8006378C(u8);
 extern void *Color_SetRGB(void *, u8, u8, u8);
 extern void func_880006E0(void *);
 extern u8 D_88005FA0[];
@@ -69,7 +135,6 @@ void func_8820ECE8(u8 arg0, u8 *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820ED44.s")
 
-extern s32 func_88202158(u8 *, s32);
 extern void func_800496A4(s32, s32);
 extern void func_800495F8(s32, s32, s32, void *, s32);
 extern u8 D_88233F50[];
@@ -93,9 +158,7 @@ extern void func_8820FC78();
 void func_8820FD58(void) { func_8820FC78(0); func_8820FC78(1); }
 
 extern void func_80049064(s32, s32, s32, s32);
-extern void func_800496A4(s32, s32);
 s32 func_8004C874(s32, s16);
-extern void *D_88234710;
 
 void func_8820FD80(void) {
     func_800496A4(4, 2);
