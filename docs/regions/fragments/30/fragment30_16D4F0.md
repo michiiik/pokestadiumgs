@@ -1,0 +1,13 @@
+# Fragment 30 16D4F0 matching notes
+
+## func_881000B8
+
+Accepted recipe: view the existing byte pointer `D_88104E80` through `unk_func_881000B8` with signed halfwords at offsets 0 and 2 and bytes at 4, 5 and 6. If the first halfword is 3 and the second is 0, copy byte 6 to byte 5 and clear byte 6. Otherwise, if those halfwords are 3 and 1, clear byte 6; all other paths clear byte 4. Finally call the existing `func_8810009C(3, 2)`. Preserve the original global declaration, unknown names, repeated guards and real byte-pointer reload after the first store. The typed field view describes actual accesses and introduces no fake, arbitrary argument or semantic rename.
+
+The compiled caller in `fragment30_170430.c` already declares this owner as `void(void)`, and original `func_88103A64` supplies no arguments or consumed result. The canonical compiled `func_8810009C` takes two real words and stores their halfwords. The owner has 33 instructions and a 24-byte frame, no trailing padding, jump table or shared switch tail. All original branch paths and byte-write ordering are retained.
+
+History audit: live fleet main `afee707ab78d3f63f2f9deeadc7551ec0080eeed` has no exact owner attempt, owner reference or `30_16D4F0` regional document in the consulted catalog. No normalized or raw similarity score is available. Current master has no regional document at this path. All open PR scopes were inspected: process PR #949 covers the separate rectangle owner, and drafts #922, #932 and #940 cover only session documentation.
+
+Independent validation against master `09ed36b421c6d4217ed030f1e29e4313381ce198`: the first typed-guard recipe passed the full US `make rom COMPARE=1 -j2` with default host syntax checks. The separate unmerged #949 implementation was excluded for that independent build and restored immediately afterward. Its independent MD5 and the combined build both equal retail `1561c75d11cedf356a8ddb1a4a5f9d5d`; `md5sum -c baseroms/us/checksum.md5` passed after the combined build. All 202 already merged process owners, including strictly verified #947, and current foreign master matches remain present. No CI, verification, compiler or layout changes are authored. The Public PR ROM Gate must actually run its checksum build for the current head and merge result before merging; skipped draft checks do not count.
+
+Current-master integration: after #949 was strictly verified as merged at `0b954039fd0a8d23c50204394bae8fd574ac1e0b`, the unchanged typed-guard owner passed the full US build and explicit retail checksum again with all 203 merged process owners present. The draft branch was refreshed onto that master before ready validation.

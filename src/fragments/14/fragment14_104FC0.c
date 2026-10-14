@@ -51,7 +51,29 @@ s32 func_8130CEAC(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_104FC0/func_8130D340.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_104FC0/func_8130D45C.s")
+typedef struct unk_func_8130D45C {
+    s16 unk_00;
+    s16 unk_02;
+    s16 unk_04;
+    s16 unk_06;
+} unk_func_8130D45C;
+
+extern void func_8160732C(void* arg0, void* arg1);
+extern void func_8160724C(s16* arg0, s16* arg1);
+extern void func_816072FC(void* arg0);
+
+void func_8130D45C(u8* arg0, unk_func_8130D45C* arg1, unk_func_8130D45C* arg2) {
+    unk_func_8130D45C var_sp18;
+
+    var_sp18 = *arg2;
+    func_8160732C(&var_sp18, arg2);
+    arg1->unk_00 = *(s16*)(arg0 + 8) + 157;
+    arg1->unk_02 = *(s16*)(arg0 + 10) + 112;
+    arg1->unk_04 = 72;
+    arg1->unk_06 = 72;
+    func_8160724C((s16*)arg1, (s16*)&var_sp18);
+    func_816072FC(arg1);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_104FC0/func_8130D4E0.s")
 
