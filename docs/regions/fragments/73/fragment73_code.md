@@ -137,3 +137,55 @@ This confirms that the current contiguous-only coalescer is not applicable;
 no new confirming source campaign or object rewriting was attempted. A
 future source/alias representation hypothesis must account for that measured
 instruction shape rather than repeating the aggregate trials above.
+
+## 2026-10-15: text renderer and frame-wrapper requeues resolved
+
+The clean mode-pointer spelling accepted in fragment 74 (#953) is confirmed
+in a second source file. Both owners below now pass the normal native runner
+with `accepted`, `link_verified: true`, one combined full-ROM gate each,
+default host syntax checking and statistics enabled:
+
+| Owner | Instructions / bytes | Frame | Accepted batch |
+| --- | ---: | ---: | --- |
+| `func_8F500130` | 113 / 452 | 0x88 | `555aaa8ae37f4c16b524378a4d0655c8` |
+| `func_8F500414` | 76 / 304 | 0x20 | `3e29457e0df440f6ba4b761ee9887232` |
+
+`func_8F500414` winner:
+`f73:frame:field-pointers:first-True:inside-guard-False:alternate-False`.
+A genuine s16 pointer to the animation field, declared before the actual
+node pointer and initialized before the animation-finished guard, closes both
+the global-address and node-home residual. No snapshot substitutes for a
+global reload: both animation calls remain, and the second reads the current
+animation field after the first call. The image query, display setup, text
+and marker calls are unchanged. No extra marker local or alternate-field
+pointer is needed.
+
+`func_8F500130` winner: `f73:text:buffer-layout:before-mask-0110`.
+Use one initialized, consumed field cursor for the row selection, then reuse
+it for the alternate-entry metadata after the loop. Initialize the real row
+table cursor before Y, and keep a consumed word-sized footer-entry local.
+This closes the address webs and final conditional-expression schedule.
+The resulting parent differs in only the buffer-address immediate. Moving
+the existing Y and item declarations before the genuine 64-byte buffer
+restores its exact 0x3C home without changing the already correct 0x88 frame.
+No buffer resizing, third coordinate, padding or unused local is introduced.
+
+The earlier first-family void declaration of `func_8004C594` is not retained;
+the accepted source uses the actual s32 return type. All pointer locals are
+initialized and dereferenced; mode values are not cached across helper calls.
+The field-cursor spelling is now evidenced in both fragment 73 and fragment
+74, but is a hypothesis to test on siblings, not permission to skip a gate.
+
+Post-cleanup fresh and 20-leading-blank controls reproduce full
+text/data/rodata/bss and all five C functions, including the previously
+accepted state handler, loop and entry. Fresh native full-ROM comparison
+passes retail MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`. No tooling, compiler,
+linker, data or object rewrite is included, and naming has no known mapping.
+Only redundant declarations after accepted definitions are removed.
+
+Three assembly owners remain: initializer `func_8F500020`, striped renderer
+`func_8F5002F4`, and input handler `func_8F500544`. Preserve their scoped
+handoffs above. The initializer's interleaved sites are not re-probed here;
+the new pointer spelling is not proof that its layout prerequisite is solved.
+For the input/background requeues, the next source-family hypothesis can now
+use real field-cursor lifetimes rather than replaying old scalar spellings.
