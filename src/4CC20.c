@@ -1,4 +1,5 @@
 #include "global.h"
+#include <stdarg.h>
 
 
 #ifdef VERSION_US
@@ -29,7 +30,12 @@ extern u8* main_pool_set_func(u8*, s32, s32);
 extern s32 D_80097120;
 extern void Fragment_Load(s32, void *, void *);
 extern u8 D_81000000[];
-extern u8 D_80128080[];
+typedef struct TextureSelectionState {
+    /* 0x00 */ s16 index;
+    /* 0x02 */ s16 spacing;
+    /* 0x04 */ u8* texture;
+} TextureSelectionState;
+extern TextureSelectionState D_80128080;
 extern u8 fragment26_ROM_START[];
 extern u8 fragment27_ROM_START[];
 typedef union ResourceInitFlags {
@@ -99,9 +105,9 @@ s32 func_8004C09C(ResourceInitFlags flags) {
                 *(s32 *)((u8 *)(u32)state + 0x28) = 0;
             }
             D_80097120 = state;
-            *(s16 *)D_80128080 = -1;
-            *(s16 *)(D_80128080 + 2) = 0;
-            *(s32 *)(D_80128080 + 4) = 0;
+            D_80128080.index = -1;
+            D_80128080.spacing = 0;
+            D_80128080.texture = NULL;
         }
     } else {
         state = cachedState;
@@ -346,6 +352,7 @@ s32 func_8004D27C(u8 *arg0, s32 arg1, s32 arg2) {
 
 s32 func_8004D314(s32 arg0, s32 arg1) { s32 result = -1; if (arg0 == 0xEF && arg1 == 0) result = 0; return result; }
 
+
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D334.s")
 
 extern s16 D_80128082;
@@ -395,7 +402,30 @@ s32 func_8004D570(s32 arg0, s32 arg1, u8 *arg2) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D5B8.s")
+extern s32 _Printf(void* (*)(void*, const void*, s32), void*, const char*, va_list);
+extern void func_8004D488(s32, s32, u8*);
+void func_8004D5B8(s32 x, s32 y, s32 alignment, const char* format, ...) {
+    char text[256];
+    va_list args;
+    s32 length;
+    if (D_80128080.index >= 0) {
+        va_start(args, format);
+        length = _Printf(func_8004D418, text, format, args);
+        va_end(args);
+        if (length > 0) {
+            text[length] = 0;
+            switch (alignment) {
+            case 1:
+                x -= func_8004D570(D_80128080.index, D_80128080.spacing, (u8*)text) / 2;
+                break;
+            case 2:
+                x -= func_8004D570(D_80128080.index, D_80128080.spacing, (u8*)text);
+                break;
+            }
+            func_8004D488(x, y, (u8*)text);
+        }
+    }
+}
 
 extern s32 D_80097120;
 extern s32 func_8004C3EC(s32, s32, s32);
@@ -404,7 +434,36 @@ s32 func_8004D690(s32 value) { s32 result = 0; s32 ptr = D_80097120; if (ptr != 
 extern s32 func_8004C468(s32, s32);
 s32 func_8004D6D8(s32 value) { s32 result = 0; s32 ptr = D_80097120; if (ptr != 0 && *(s32 *)((u8 *)(u32)ptr + 0xC) != 0) result = func_8004C468(*(s32 *)((u8 *)(u32)ptr + 0xC), value); return result; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D720.s")
+extern void func_80003F74(u8*, u8*, u8*, s32);
+u8* func_8004D720(u8* destination, s32 id, s32 alternate, s32 variant) {
+    u8* result = NULL;
+    u8* normalArchive = *(u8**)((u8*)(u32)D_80097120 + 0x10);
+    u8* alternateArchive = *(u8**)((u8*)(u32)D_80097120 + 0x14);
+    u8* specialArchive = *(u8**)((u8*)(u32)D_80097120 + 0x18);
+    u8* entry;
+    u8* start;
+    u8* end;
+    if (normalArchive != NULL && alternateArchive != NULL && specialArchive != NULL) {
+        if (id > 0 && id < 0x118) {
+            if (id == 0xEB) {
+                entry = (u8*)((u32)specialArchive + (u32)variant * 0x10);
+                start = (u8*)(*(u32*)(specialArchive + 4) + *(u32*)(entry + 0x10));
+                end = *(u32*)(entry + 0x14) + start;
+            } else if (alternate != 0) {
+                entry = (u8*)((u32)alternateArchive + (u32)id * 0x10);
+                start = (u8*)(*(u32*)(alternateArchive + 4) + *(u32*)entry);
+                end = *(u32*)(entry + 4) + start;
+            } else {
+                entry = (u8*)((u32)normalArchive + (u32)id * 0x10);
+                start = (u8*)(*(u32*)(normalArchive + 4) + *(u32*)entry);
+                end = *(u32*)(entry + 4) + start;
+            }
+            func_80003F74(destination, start, end, 0);
+            result = destination;
+        }
+    }
+    return result;
+}
 
 typedef union S1_arg1_func_80010CA8 {
     struct {
