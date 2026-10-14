@@ -8,6 +8,8 @@
  * undefined_syms.ld, and the other hand-written scripts are.
  */
 Audio_ThreadEntry = func_80035174;
+/* Original data name aliases the counter's C-owned data slot. */
+D_87F112A0 = fragments_64_fragment64_32F2C0;
 Audio_RequestEvent = func_800355E4;
 func_8005805C = GbSave_IdentifyFormat;
 func_8005A228 = GbTower_PollPortState;
