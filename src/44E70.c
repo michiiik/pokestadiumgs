@@ -128,11 +128,161 @@ void Gfx_DrawTextureRgba16Ia8(s16 arg0, s16 arg1, s16 arg2, s16 arg3, u8* arg4, 
     func_80044270(arg0, arg1, arg2, arg3, 0, 0, 0x400, 0x400, arg7);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_800459AC.s")
+void func_800459AC(s32 image, s32 format, s32 size, u32 width, u32 height, s32 swapped, s32 palette,
+                   s32 cms, s32 cmt, s32 masks, s32 maskt, s32 shifts, s32 shiftt) {
+    u32 loadSize;
+    u32 increment;
+    u32 shift;
+    u32 dxt;
+    u32 rowBytes;
+    s32 renderTile;
+    u32 renderLine;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_80045DB4.s")
+    switch (size) {
+    case 0:
+        loadSize = 2;
+        increment = 3;
+        shift = 2;
+        dxt = CALC_DXT_4b((u32)width);
+        renderLine = (((u32)width >> 1) + 7) >> 3;
+        break;
+    case 1:
+        loadSize = 2;
+        increment = 1;
+        shift = 1;
+        rowBytes = (u32)width * G_IM_SIZ_8b_BYTES;
+        dxt = CALC_DXT((u32)width, 1);
+        renderLine = (rowBytes + 7) >> 3;
+        break;
+    case 2:
+        loadSize = 2;
+        increment = 0;
+        shift = 0;
+        rowBytes = (u32)width * 2;
+        dxt = CALC_DXT((u32)width, 2);
+        renderLine = (rowBytes + 7) >> 3;
+        break;
+    case 3:
+        loadSize = 3;
+        increment = 0;
+        shift = 0;
+        dxt = CALC_DXT((u32)width, 4);
+        renderLine = ((u32)width * 2 + 7) >> 3;
+        break;
+    default:
+        return;
+    }
+    if (swapped != 0) {
+        dxt = 0;
+    }
+    gDPSetTextureImage(D_800D0510++, format, loadSize, 1, (u8 *)image);
+    gDPSetTile(D_800D0510++, format, loadSize, 0, 0, G_TX_LOADTILE, 0,
+               cmt, maskt, shiftt, cms, masks, shifts);
+    gDPLoadSync(D_800D0510++);
+    gDPLoadBlock(D_800D0510++, G_TX_LOADTILE, 0, 0, ((((u32)width * height + increment) >> shift) - 1), dxt);
+    gDPPipeSync(D_800D0510++);
+    renderTile = G_TX_RENDERTILE;
+    gDPSetTile(D_800D0510++, format, size, renderLine, 0, renderTile, palette,
+               cmt, maskt, shiftt, cms, masks, shifts);
+    gDPSetTileSize(D_800D0510++, renderTile, 0, 0, (width - 1) << 2, (height - 1) << 2);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_80046204.s")
+void func_80045DB4(s32 image, s32 tmem, s32 tile, s32 format, s32 size, u32 width, u32 height,
+                   s32 swapped, s32 palette, s32 cms, s32 cmt, s32 masks, s32 maskt, s32 shifts, s32 shiftt) {
+    u32 loadSize;
+    u32 increment;
+    u32 shift;
+    u32 dxt;
+    u32 rowBytes;
+    s32 renderTile;
+    u32 renderLine;
+
+    switch (size) {
+    case 0:
+        loadSize = 2;
+        increment = 3;
+        shift = 2;
+        dxt = CALC_DXT_4b((u32)width);
+        renderLine = (((u32)width >> 1) + 7) >> 3;
+        break;
+    case 1:
+        loadSize = 2;
+        increment = 1;
+        shift = 1;
+        rowBytes = (u32)width * G_IM_SIZ_8b_BYTES;
+        dxt = CALC_DXT((u32)width, 1);
+        renderLine = (rowBytes + 7) >> 3;
+        break;
+    case 2:
+        loadSize = 2;
+        increment = 0;
+        shift = 0;
+        rowBytes = (u32)width * 2;
+        dxt = CALC_DXT((u32)width, 2);
+        renderLine = (rowBytes + 7) >> 3;
+        break;
+    case 3:
+        loadSize = 3;
+        increment = 0;
+        shift = 0;
+        dxt = CALC_DXT((u32)width, 4);
+        renderLine = ((u32)width * 2 + 7) >> 3;
+        break;
+    default:
+        return;
+    }
+    if (swapped != 0) {
+        dxt = 0;
+    }
+    gDPSetTextureImage(D_800D0510++, format, loadSize, 1, (u8 *)image);
+    gDPSetTile(D_800D0510++, format, loadSize, 0, tmem, G_TX_LOADTILE, 0,
+               cmt, maskt, shiftt, cms, masks, shifts);
+    gDPLoadSync(D_800D0510++);
+    gDPLoadBlock(D_800D0510++, G_TX_LOADTILE, 0, 0, ((((u32)width * height + increment) >> shift) - 1), dxt);
+    gDPPipeSync(D_800D0510++);
+    renderTile = tile;
+    gDPSetTile(D_800D0510++, format, size, renderLine, tmem, renderTile, palette,
+               cmt, maskt, shiftt, cms, masks, shifts);
+    gDPSetTileSize(D_800D0510++, renderTile, 0, 0, (width - 1) << 2, (height - 1) << 2);
+}
+
+void func_80046204(s32 image, s32 format, s32 size, u32 width, u32 height, u32 uls, u32 ult, u32 lrs,
+                   u32 lrt, s32 palette, s32 cms, s32 cmt, s32 masks, s32 maskt, s32 shifts, s32 shiftt) {
+    Gfx *loadCommand;
+    u32 renderLine;
+    u32 loadLine;
+    s32 renderTile;
+
+    switch (size) {
+    case 0:
+        width >>= 1;
+        renderLine = loadLine = ((((lrs - uls + 1) >> 1) + 7) >> 3);
+        size = G_IM_SIZ_8b;
+        break;
+    case 1:
+        renderLine = loadLine = ((lrs - uls + 1 + 7) >> 3);
+        break;
+    case 2:
+        renderLine = loadLine = (((lrs - uls + 1) * 2 + 7) >> 3);
+        break;
+    case 3:
+        renderLine = loadLine = (((lrs - uls + 1) * 2 + 7) >> 3);
+        break;
+    default:
+        return;
+    }
+    gDPSetTextureImage(D_800D0510++, format, size, width, (u8 *)image);
+    loadCommand = D_800D0510++;
+    gDPSetTile(loadCommand, format, size, loadLine, 0, G_TX_LOADTILE, 0,
+              cmt, maskt, shiftt, cms, masks, shifts);
+    gDPLoadSync(D_800D0510++);
+    gDPLoadTile(D_800D0510++, G_TX_LOADTILE, uls << 2, ult << 2, lrs << 2, lrt << 2);
+    gDPPipeSync(D_800D0510++);
+    renderTile = G_TX_RENDERTILE;
+    gDPSetTile(D_800D0510++, format, size, renderLine, 0, renderTile, palette,
+              cmt, maskt, shiftt, cms, masks, shifts);
+    gDPSetTileSize(D_800D0510++, renderTile, uls << 2, ult << 2, lrs << 2, lrt << 2);
+}
 
 s32 func_800464F8(s32 arg0, s32 arg1) {
     s32 temp_lo;
@@ -150,9 +300,52 @@ s32 func_80046540(s32 arg0, s32 arg1) {
     return (arg1 / arg0) & ~1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_8004657C.s")
+extern s32 StageContext_IsHighResolution(void);
+extern Gfx D_80094F70[];
+void func_8004657C(void) {
+    s32 width;
+    s32 height;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_80046634.s")
+    if (StageContext_IsHighResolution() != 0) {
+        width = 640;
+        height = 480;
+    } else {
+        width = 320;
+        height = 240;
+    }
+    gSPDisplayList(D_800D0510++, D_80094F70);
+    gDPSetScissor(D_800D0510++, G_SC_NON_INTERLACE, 0, 0, width, height);
+}
+
+void func_80046634(s32 image) {
+    s32 y;
+    s32 x;
+    s32 width;
+    s32 height;
+    s32 scale;
+    s32 step;
+
+    if (StageContext_IsHighResolution() != 0) {
+        width = 640;
+        height = 480;
+        scale = 512;
+        step = 32;
+    } else {
+        width = 320;
+        height = 240;
+        scale = 1024;
+        step = 16;
+    }
+    for (y = 0; y < height; y += step) {
+        for (x = 0; x < width; x += step) {
+            gDPLoadTextureBlock(D_800D0510++, (u8 *)image, G_IM_FMT_RGBA, G_IM_SIZ_16b, 16, 16, 0,
+                               G_TX_CLAMP, G_TX_CLAMP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
+            image += 0x200;
+            gSPTextureRectangle(D_800D0510++, x << 2, y << 2, (x + step) << 2, (y + step) << 2,
+                               G_TX_RENDERTILE, 0, 0, scale, scale);
+        }
+    }
+}
 
 extern void func_8004657C(void);
 extern void func_80046634(s32);
