@@ -96,7 +96,26 @@ u8 func_8820C8A0(u8 type, u8 slot) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820C94C.s")
+s32 func_8820C94C(void) {
+    u32 index;
+    s32 result = 0;
+    u8* other;
+
+    for (index = 0; index != 2; index++) {
+        if (func_8800005C() == 0 && *(s32*)((u8*)D_88234710 + index * 4 + 12) == 0) {
+            other = func_8820C040(1, 1 - index);
+            if (func_8006378C(other[0]) == 4) {
+                if (other[0] != func_8820C040(1, index)[0]) {
+                    if (other[1] + func_8820C8A0(other[0], index) >= 100) {
+                        result = 1;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820CA50.s")
 
@@ -152,9 +171,33 @@ void func_8820F74C(s16 arg0, s16 arg1, u8 *arg2, u8 arg3) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820F7EC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820FC78.s")
+extern char D_88233F54[];
+extern s32 func_8005CAA4(s32);
+extern s32 func_80053230(s32);
+extern void func_8004D5B8(s32, s32, s32, const char*, ...);
+void func_8820FC78(u8 slot) {
+    s32 x;
+    u16 limit;
 
-extern void func_8820FC78();
+    x = !slot ? 269 : 580;
+    switch (*(s32*)((u8*)D_88234710 + slot * 4 + 12)) {
+    case 0:
+        if (func_8800005C() == 0) {
+            return;
+        }
+        limit = 20;
+        break;
+    case 1:
+        limit = func_8005CAA4(0x22);
+        break;
+    default:
+        limit = func_80053230(0x12);
+        break;
+    }
+    func_8004D5B8(x, 341, 2, D_88233F54,
+                 func_88A007BC(*(s32*)((u8*)D_88234710 + slot * 4 + 12)), limit);
+}
+
 void func_8820FD58(void) { func_8820FC78(0); func_8820FC78(1); }
 
 extern void func_80049064(s32, s32, s32, s32);

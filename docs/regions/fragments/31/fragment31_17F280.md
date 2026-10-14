@@ -83,3 +83,57 @@ change to manufacture a score. Next action: inspect why the slot's
 narrowed value becomes a live web across the call, or obtain a source
 shape that naturally reloads the real incoming parameter. Preserve the
 fresh global-state read and full-ROM acceptance requirement.
+
+## Count display and selection-limit check: accepted native batch
+
+`func_8820FC78`: 56 words / 224 bytes, frame 0x38. Normal native batch
+`f347500572f24460ac547034a824bd40`, winner
+`f31:display-conditional:!slot:initializer-False`, is link-verified and
+passes its combined full-ROM gate. Preserve `x = !slot ? 269 : 580`, the
+mode switch and real u16 limit kept across the fresh count query. An
+equality-test ternary or if/else spelling changes the parameter carrier;
+the reversed ternary has the wrong case order. Keep the true variadic
+draw signature and u8 count helper. Retyping the old no-prototype forward
+declaration to u8 is part of the accepted transaction; the now-redundant
+forward declaration can then be removed after acceptance. This owner is
+separate from the four functions already merged in PR #967.
+
+`func_8820C94C`: 65 words / 260 bytes, frame 0x40. Native batch
+`4b4c0518c00147228036fd6b61a23d66`, winner
+`f31:selection-limit-homes:irp:deferred-False`, is link-verified and
+passes its combined full-ROM gate. Iterate the two slots with a u32
+index, preserving the mode/list/type guards and fetching the other slot's
+record before comparing types and the combined limit. Keep the natural
+declaration order `index`, initialized s32 `result`, then `other`: the
+result lives at 0x38, not 0x3C. Keep `other[1] + func_8820C8A0(...)` to
+preserve the target add's operand order. No fake locals, empty branches,
+padding or compiler changes are needed.
+
+After formatting and removing redundant generated externs, fresh and
+20-leading-blank builds preserve every accepted object section, all nine
+previous C bodies and all 28 original function offsets. All eleven linked
+C spans and the entire ROM match retail, MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. Exactly these two removed pragmas
+have accepted link-verified gate provenance. Naming plan has no established
+mappings. Seventeen assembly owners remain in this source file.
+
+## Requeue: scroll update and initializer
+
+`func_8820C65C`: **requeue**, direct global-state reads recover the retail
+316-byte opcode sequence and 0x20 frame, but registers differ (normalised
+1.0, raw 0.6203). A calibrated 45-second permuter improves its own score
+195 -> 65; its retained proposal includes an empty constant-false branch,
+so it is diagnostic only, not installed or claimed as matching C. Eight
+explicit s32/u32 index and flag-pointer cells do not improve the raw match;
+K&R formals were also unhelpful. Next action: isolate the global-address
+and status-pointer allocation (retail a3/a2, baseline t0/a3), not repeat
+the same guard or index spellings.
+
+`func_8820C114`: **requeue**, ordinary source cells keep 328 bytes and a
+0x50 frame instead of retail 324 bytes / 0x48. Global reads, K&R formals
+and eight float-lifetime/declaration cells do not change that output.
+Eight address-exposure/real parameter-pointer and local-width cells are
+also rejected, at 332 bytes. No experimental API or address-test scaffold
+is installed. Next action: inspect the narrowed slot web kept across the
+two real TV-rate calls; retail reloads the incoming byte. The quotient
+and rounding-lifetime hypothesis did not explain the frame difference.
