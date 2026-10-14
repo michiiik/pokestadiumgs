@@ -478,3 +478,55 @@ as controls. Reopen storage/lifetime levers only with measured changes on that
 parent, not another RGB permutation or replay of the inert scope/register
 families. Function-level probe evidence is still insufficient for removal of
 the pragma: the authoritative full-ROM gate must accept the final candidate.
+
+### Atlas stock-phase controls and trace limitation, 2026-10-15
+
+Requeue remains the 1008-byte five-halfword-field parent: 241/252 raw words
+exact, frame 0xB8 instead of 0xA0, uniform incoming-home displacement +0x18.
+Forty further scored probes do not accept a function. Moving the real record
+through all declaration positions is inert, as are explicit discards of the
+actual texture-loader status, redundant narrow-conversion removal, and register
+storage classes on the actual expanded SDK packet pointers. Keep SDK macros
+and the known helper definitions; do not invent return values or argument counts.
+
+An unspecified-parameter declaration for the rectangle helper still passes all
+nine actual arguments, but changes narrow argument conversion code and shrinks
+the owner to 928 bytes while leaving the 0xB8 frame. It is a diagnostic negative,
+not an adopted declaration. Retain the real eight-s16-plus-s32 prototype.
+
+Overlaying the early texture pointer with the later geometry record is a valid
+lifetime experiment: the pointer's final read precedes every geometry write.
+Eight corrected cells reduce frame to 0xB0 but grow the owner to 1012 bytes and
+disrupt allocation (normalized 0.9684, raw 0.4783). Keep the frame-only parent,
+not the smaller but otherwise worse union. An initial generator removed the
+union's pointer declaration as well as the outer declaration; its eight compile
+failures are process evidence, not hypothesis evidence. The corrected generator
+anchors the removal to a complete outer declaration line and asserts that the
+union retains exactly one pointer member.
+
+Stock native `-K` retention reproduces the normal probe's instruction words and
+exposes a real `.frame $sp,184,$31` in the generated assembly. The preserved
+optimizer input shows nominal local homes through -60; the texture pointer
+appears at -40 and the five SDK packet temporaries at -44/-48/-52/-56/-60.
+These are partial trace observations, not proof that those homes own the final
+24-byte frame excess. Final coloring/retained-frame ownership is not available.
+
+Tooling-blocked (detailed optimizer trace only): native IDO 7.1 debug levels
+1 and 3 abort in `wrapper_ecvt`, whose runtime implementation is an assertion
+stub. Preserve the partial listings and failure logs, but do not describe either
+run as a successful trace or promote its failed output. Normal compilation is
+unaffected and remains available; the project goal is not blocked by this alone.
+
+The failed retained-phase run also exposes a calibration-file collision: the
+driver uses `base.o` as an intermediate beside `base.c`, overwriting a same-named
+calibration ELF before it aborts. The apparent repeat-control difference was
+that clobbered reference, not different generated instructions. Compare against
+the normal probe object outside the retained-phase directory instead. With that
+immutable reference, the changed-working-directory control reproduces all 1008
+bytes exactly. Do not repeat a search based on the overwritten non-ELF file.
+
+Next action: recover detailed native trace capability in an isolated tool copy,
+or use a materially different source-level discriminator for the measured frame
+reservation. No trace-owned allocation claim has yet been earned. Preserve the
+five-field parent and exact RGB tree while doing so; no new helper, proprietary
+artifact or unmatched C body is published from this block.
