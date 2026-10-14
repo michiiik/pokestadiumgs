@@ -116,3 +116,68 @@ The permuter's scalar improvement therefore does not improve the normal
 translation-unit oracle. Preserve real macros and do not promote expanded
 stores or unused mask locals. Next hypothesis must target the selection web
 or its authentic call/lifetime context, not more first-macro reflow alone.
+
+## Native renderer/fade closure, 2026-10-14
+
+PR #930 is merged and its Public PR ROM Gate succeeded. Integrate current
+master `3bea111`, retaining the complete renderer research above.
+
+### Accepted: func_829115E0 (prior register-tie resolved)
+
+The underlying draw routine `func_8004CB7C` explicitly returns 0/1 in `$v0`.
+Its existing `func_8004D150` and `func_8004D19C` wrappers preserve that status.
+Their old void C declarations hid this return contract. Before installation,
+an eight-cell no-auto-gate diagnostic with the word-return declaration produces
+an instruction-exact, link-verified renderer. Independent resource-object
+controls prove explicit status returns through both existing wrappers preserve
+the entire `.text`, all selected sibling words and the full retail ROM.
+See `docs/regions/4CC20.md` for the underlying ABI evidence.
+
+After that separately verified postacceptance wrapper cleanup, the ordinary
+renderer gate accepts the original direct-fields/real-GBI-macro body. All 156
+words, 624 bytes and frame 0x40 match. Preserve both conditional image paths,
+the four existing border draws, final graphic routines and text renderer.
+No forced colors, artificial reads, helper functions or expanded macro stores.
+Gate timing: 5.003s probes / 1.098s gate / 6.104s total, link_verified=true.
+
+### Accepted: func_8290FF14
+
+209 words / 836 bytes, original 0x20 frame. Preserve flag states 1/2 as a
+two-case switch. State 1 moves all six RGB bytes toward the selected palette;
+after all match, set flag 0. State 2 moves them toward the two existing static
+triplets; after all match, set flag 1. Every step uses the original 50/50 rates.
+Other flags are unchanged. Reload the selected index for each step because the
+callee can alter globals. Retain background-before-foreground call order.
+
+The first eight reproduce every opcode with the switch, but comparison operand
+order differs between states. State 1 needs record-before-table comparisons;
+state 2 needs table-before-record. Separate these hypotheses. Explicit scalar
+or array aliases for the three interior target bytes produce a worse 832-byte
+body and are discarded; they are not published. The closing eight include
+mixed comparison polarity and genuine guard/pointer alternatives. Candidate 2
+has only equivalent relocated load fields left, and candidate 3 also probes.
+
+The hit is not link-verified because the three interior byte targets use base
+array plus offsets rather than separate symbol relocations. The normal
+sequential full-ROM gate is authoritative and accepts the mixed-polarity body.
+Timing: 4.834s probes / 1.606s gate / 6.442s total, gate_mode=sequential.
+No layout changes, extra storage, aliases, padding or helper functions.
+
+### Remaining initializer requeue and verification
+
+`func_8290FE04` remains assembly. Eight new word-parameter cells update the
+existing accepted caller declaration in a companion transaction, varying real
+short conversion, input carrier and indexed/raw row access. All yield 264 bytes
+(instead of 272), normalized 0.8971/raw 0.7206, with the incoming argument-home
+load/prologue shape lost. Nothing installs; the companion caller and its s16
+callee declaration remain unchanged. The prior s16 272-byte parent is still
+best. Do not replay word-width variants without a new mechanism.
+
+After cleanup, full native ROM comparison passes with default syntax checks;
+retail MD5 is `1561c75d11cedf356a8ddb1a4a5f9d5d`. All 427 sources pass separate
+host cc-check. Fresh full-source/build and 20-leading-blank controls reproduce
+the entire fragment source `.text` and all ten accepted owners. The entire
+linked source interval `0x34C8B0..0x34E600` matches retail. Accepted provenance
+rows exist for both new owners; statistics stay enabled. Naming plan finds no
+independent existing mappings. Only existing game source and durable notes are
+published; every scratch generator, probe, compiler object and ROM stays local.
