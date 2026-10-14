@@ -3,7 +3,7 @@
 
 #ifdef VERSION_US
 typedef struct F65Vec2 { f32 x; f32 y; } F65Vec2;
-extern f32 D_87D007D0, D_87D007D4;
+extern f32 D_87D007D0, D_87D007D4, D_87D007E0;
 extern void MtxF_Identity(f32*);
 extern void MtxF_Copy(void*, void*);
 extern void MtxF_Multiply(void*, void*, void*);
@@ -99,7 +99,37 @@ void func_87D00354(f32* m, f32* vector) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/65/fragment65_code/func_87D00438.s")
+s32 func_87D00438(f32* m, f32 nx, f32 ny, f32 nz, f32 px, f32 py, f32 pz, f32 dx, f32 dy, f32 dz) {
+    f32 dot;
+    f32 translation;
+    dot = (nx * dx) + (ny * dy) + (nz * dz);
+    if ((dot * dot) < D_87D007E0) {
+        MtxF_Identity(m);
+        return 1;
+    }
+    dot = -1.0f / dot;
+    translation = (((-dx * px) - (dy * py)) - (dz * pz)) * dot;
+    dx = dx * dot;
+    dy = dy * dot;
+    dz = dz * dot;
+    m[0] = (dx * nx) + 1.0f;
+    m[1] = dx * ny;
+    m[2] = dx * nz;
+    m[4] = dy * nx;
+    m[5] = (dy * ny) + 1.0f;
+    m[6] = dy * nz;
+    m[8] = dz * nx;
+    m[9] = dz * ny;
+    m[10] = (dz * nz) + 1.0f;
+    m[12] = translation * nx;
+    m[13] = translation * ny;
+    m[14] = translation * nz;
+    m[11] = 0.0f;
+    m[7] = 0.0f;
+    m[3] = 0.0f;
+    m[15] = 1.0f;
+    return 0;
+}
 
 f32 func_87D0059C(f32 *arg0, f32 *arg1) {
     f32 temp_fa0;
@@ -150,5 +180,28 @@ s32 func_87D00670(f32 *a, f32 *b, f32 *second, f32 *c, F65Vec2 *d, f32 *first)
   return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/65/fragment65_code/func_87D00720.s")
+void func_87D00720(f32* a, f32* b, F65Vec2* direction, f32* out, f32* length)
+{
+    f32 dx;
+    f32 dy;
+    f32 squared;
+    f32 projection;
+    dx = b[0] - a[0];
+    dy = b[1] - a[1];
+    squared = (direction->x * direction->x) + (direction->y * direction->y);
+    if (squared == 0.0f)
+    {
+        out[0] = dx;
+        out[1] = dy;
+    }
+    else
+    {
+        projection = (-((direction->x * dx) + (dy * direction->y))) / squared;
+        out[0] = (direction->x * projection) + dx;
+        out[1] = (direction->y * projection) + dy;
+    }
+    *length = sqrtf((out[1] * out[1]) + (out[0] * out[0]));
+}
+
+#pragma C_FUNCTION_PADDING(8)
 #endif

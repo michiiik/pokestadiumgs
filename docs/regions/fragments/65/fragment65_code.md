@@ -50,7 +50,7 @@ The three previously accepted routines and two remaining assembly owners are
 unchanged. No data subsegment, compiler patch, new helper function or header is
 needed. Only source, the compatibility alias and these notes are published.
 
-## Remaining requeues
+## Requeues before completion
 
 - `func_87D00438`:32 normal probes across scalar-role reuse, record views,
   threshold operand direction and output topology. Best normal candidate has
@@ -71,3 +71,38 @@ needed. Only source, the compatibility alias and these notes are published.
 
 Local ignored evidence lives in scratch/native-vector-*.json/log and bounded
 permuter directories. These are local diagnostics, not public prerequisites.
+
+## 2026-10-14: both requeues accepted, fragment 65 complete
+
+Fresh source/build/blank controls reverify all nine functions before follow-up.
+Normal batches exercise materially new source topology rather than replaying
+rejected variants. Both remaining owners now pass the full-ROM gate:
+
+- `func_87D00438`:89 instructions /356 bytes, original0x38 frame. Row-order
+  nonzero entries plus reversed zero stores11/7/3 recover the original schedule;
+  put the homogeneous1 at the end. Preserve the squared dot threshold, identity
+  fallback/return1, reciprocal, translation, all16 matrix fields and success0.
+  Accepted after32 prior normal attempts, link_verified=true. Timing5.251s
+  probes /0.998s combined gate /6.252s total.
+- `func_87D00720`:42 executable instructions /168 bytes plus8 verified alignment
+  bytes, leaf. Direct accesses to the existing two-float record's x/y members
+  eliminate the temporary-component color swap; preserve the post-first-store
+  direction-y reload. Retain displacement, degenerate-direction copy, projection,
+  both output fields and final length, with original multiplication/addition order.
+  Accepted after48 prior normal attempts, link_verified=true. Timing5.211s
+  probes /0.886s combined gate /6.100s total. No register forcing or fake locals.
+
+The discarded record-only and lifetime-carrier cells did not close projection;
+actual record-member expressions did. Never generalize this to replacing all
+array accesses with records without probing. Likewise, zero-store ordering and
+row ordering need each other's context in00438: the former column-order baseline
+was not an exact program. The two earlier requeues above are historical, not
+current blockers or exclusions.
+
+After declaration cleanup and indentation-only cleanup, full-ROM compare retains
+MD51561c75d11cedf356a8ddb1a4a5f9d5d; all427 host syntax checks pass. Fresh final
+source/build/20-leading-blank controls match all nine complete function spans and
+their linked retail bytes, including the full176-byte padded projection owner.
+The other seven functions are unchanged. Naming plan has no evidence-backed
+existing names for these two; retain their address names. No data or linker
+changes are needed. This file now has zero GLOBAL_ASM owners.
