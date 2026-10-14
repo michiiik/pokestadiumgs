@@ -13,6 +13,17 @@ typedef struct F67DisplayRecord {
 } F67DisplayRecord;
 extern F67DisplayRecord D_8291BE80, D_8291BE98;
 
+typedef struct F67UiRow {
+    /* 0x00 */ s16 width, height;
+    /* 0x04 */ u8 unused04[0x10];
+    /* 0x14 */ s16 secondaryWidth, secondaryHeight;
+    /* 0x18 */ u8 unused18[0x14];
+    /* 0x2C */ s32 archive, entry, alternateArchive, alternateEntry;
+    /* 0x3C */ u8* foreground;
+    /* 0x40 */ u8* background;
+} F67UiRow;
+extern F67UiRow D_829172D8[];
+
 typedef struct unk_func_8290FDB0 {
     u8 unk_00;
     u8 unk_01[3];
@@ -38,7 +49,51 @@ void func_8290FDB0(s16 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_34C8B0/func_8290FE04.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_34C8B0/func_8290FF14.s")
+typedef struct F67ColorRow {
+    u8* color;
+    u8 unused[0x40];
+} F67ColorRow;
+extern F67ColorRow D_82917318[], D_82917314[];
+extern s16 D_8291BE8C;
+extern u8 D_829172D0[3], D_829172D4[3];
+extern s32 Math_StepToS32(s32, s32, s32, s32);
+
+void func_8290FF14(F67DisplayRecord* state) {
+    switch (state->flags) {
+        case 1:
+            state->background[0] = Math_StepToS32(state->background[0], D_82917318[D_8291BE8C].color[0], 50, 50);
+            state->background[1] = Math_StepToS32(state->background[1], D_82917318[D_8291BE8C].color[1], 50, 50);
+            state->background[2] = Math_StepToS32(state->background[2], D_82917318[D_8291BE8C].color[2], 50, 50);
+            state->foreground[0] = Math_StepToS32(state->foreground[0], D_82917314[D_8291BE8C].color[0], 50, 50);
+            state->foreground[1] = Math_StepToS32(state->foreground[1], D_82917314[D_8291BE8C].color[1], 50, 50);
+            state->foreground[2] = Math_StepToS32(state->foreground[2], D_82917314[D_8291BE8C].color[2], 50, 50);
+            if (state->background[0] == D_829172D8[D_8291BE8C].background[0] &&
+                state->background[1] == D_829172D8[D_8291BE8C].background[1] &&
+                state->background[2] == D_829172D8[D_8291BE8C].background[2] &&
+                state->foreground[0] == D_829172D8[D_8291BE8C].foreground[0] &&
+                state->foreground[1] == D_829172D8[D_8291BE8C].foreground[1] &&
+                state->foreground[2] == D_829172D8[D_8291BE8C].foreground[2]) {
+                state->flags = 0;
+            }
+            break;
+        case 2:
+            state->background[0] = Math_StepToS32(state->background[0], D_829172D0[0], 50, 50);
+            state->background[1] = Math_StepToS32(state->background[1], D_829172D0[1], 50, 50);
+            state->background[2] = Math_StepToS32(state->background[2], D_829172D0[2], 50, 50);
+            state->foreground[0] = Math_StepToS32(state->foreground[0], D_829172D4[0], 50, 50);
+            state->foreground[1] = Math_StepToS32(state->foreground[1], D_829172D4[1], 50, 50);
+            state->foreground[2] = Math_StepToS32(state->foreground[2], D_829172D4[2], 50, 50);
+            if (D_829172D0[0] == state->background[0] &&
+                D_829172D0[1] == state->background[1] &&
+                D_829172D0[2] == state->background[2] &&
+                D_829172D4[0] == state->foreground[0] &&
+                D_829172D4[1] == state->foreground[1] &&
+                D_829172D4[2] == state->foreground[2]) {
+                state->flags = 1;
+            }
+            break;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_34C8B0/func_82910258.s")
 
@@ -82,10 +137,37 @@ void func_82911418(void) {
     func_800499EC();
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_34C8B0/func_829115E0.s")
+extern s16 D_8291BE7A;
+extern Gfx D_80094E38[];
+extern Gfx* D_800D0510;
+extern s32 D_8291BE74;
+extern void func_800468A0(s32);
+extern s32 func_8004D19C(s32, s32, s32, s32, s32);
+extern void func_82910510(F67DisplayRecord*, s32, s32, s32, s32);
+extern void func_82910740(F67DisplayRecord*, s32, s32, s32, s32);
+extern void func_82910B30(void);
+extern void func_82910FC8(void);
+void func_829115E0(void) {
+    func_800468A0(D_8291BE74);
+    gSPDisplayList(D_800D0510++, D_80094E38);
+    func_8004D19C(0x191, 0x111, func_8004C990(0x12F, 0), 0, 0);
+    if (D_8291BE7A != 0) {
+        gSPDisplayList(D_800D0510++, D_80094E38);
+        func_8004D19C(0x13D, 0xEF, func_8004C990(D_829172D8[D_8291BE80.selection].alternateArchive, D_829172D8[D_8291BE80.selection].alternateEntry), 0, 0);
+    } else if (D_8291BE80.selection == 1) {
+        gSPDisplayList(D_800D0510++, D_80094E38);
+        func_8004D19C(0x13D, 0xEF, func_8004C990(D_829172D8[D_8291BE80.selection].archive, D_829172D8[D_8291BE80.selection].entry), 0, 0);
+    }
+    func_82910510(&D_8291BE98, D_8291BE98.x, D_8291BE98.y, D_829172D8[D_8291BE80.selection].secondaryWidth, D_829172D8[D_8291BE80.selection].secondaryHeight);
+    func_82910740(&D_8291BE98, D_8291BE98.x, D_8291BE98.y, D_829172D8[D_8291BE80.selection].secondaryWidth, D_829172D8[D_8291BE80.selection].secondaryHeight);
+    func_82910510(&D_8291BE80, D_8291BE80.x, D_8291BE80.y, D_829172D8[D_8291BE80.selection].width, D_829172D8[D_8291BE80.selection].height);
+    func_82910740(&D_8291BE80, D_8291BE80.x, D_8291BE80.y, D_829172D8[D_8291BE80.selection].width, D_829172D8[D_8291BE80.selection].height);
+    func_82910B30();
+    func_82910FC8();
+    func_82911418();
+}
 
 extern void func_800088DC(void);
-extern void func_829115E0(void);
 extern void func_80008648(void);
 void func_82911850(void) {
     func_800088DC();
