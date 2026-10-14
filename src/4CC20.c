@@ -873,11 +873,34 @@ void func_8004DEF8(s32 arg0) {
     func_8004DE84(arg0, 0);
 }
 
+extern u8* func_8004DF38(s32, s32, s32);
 void WidgetTree_RunMessagePanelSilent(s32 arg0, s32 arg1) {
     func_8004DF38(arg0, arg1, 0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004DF38.s")
+extern u8* func_80040E80(s32, void*);
+u8* func_8004DF38(s32 pool, s32 id, s32 index) {
+    u8* result = NULL;
+    HandlerResult_DE84D* descriptor;
+    s32 archive;
+    s32 callback;
+    s32 entry;
+
+    entry = func_8004DE84(id, index);
+    if (entry != 0) {
+        archive = *(s32*)((u8*)(u32)D_80097120 + 0x24);
+        result = func_80040E80(pool, (void*)(u32)entry);
+        if (result != NULL) {
+            callback = func_8004C3B0(archive, id);
+            descriptor = ((HandlerResult_DE84D* (*)(s32,s32))(u32)callback)(0, 0);
+            *(s32*)(result + 0x2C) = callback;
+            if (index < ((u8*)descriptor)[3]) {
+                descriptor->table[index] = (s32)result;
+            }
+        }
+    }
+    return result;
+}
 
 typedef struct { void *value; } Func8004DFECArg;
 extern void *func_8004E018(s32 arg0, s32 arg1, s32 arg2, Func8004DFECArg arg3);
