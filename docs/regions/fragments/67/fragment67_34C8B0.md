@@ -575,3 +575,28 @@ All earlier search artifacts stay local. Published changes are the matching
 renderer and these durable diagnostics only; no scratch helper, proprietary
 compiler artifact or ROM is included. Remaining owners in this file still
 require their own full-ROM acceptance.
+
+### Background RGB follow-up after atlas acceptance, 2026-10-15
+
+Requeue `func_82910510` remains assembly. Transfer the accepted atlas's actual
+SDK packed-color tree, not its source geometry or function name. Eight normal
+packing cells improve the scalar background parent from 117/140 raw words
+(0.8357) to 129/140 (0.9214). All RGB loads, shifts and packing words now match;
+the eleven remaining words are exclusively the frame and argument homes:
+0x40 instead of 0x58, with the affected incoming-home displacements all -0x18.
+Owner length remains 560 bytes. This is not acceptance or increased C coverage.
+
+Keep the actual loader s32(u8*) declaration and explicit pointer cast introduced
+by accepted-source cleanup, the real rectangle signature, original scale guard
+order and signed +/-0.5 rounding. The candidate's companion transaction retypes
+only its existing forward declaration in the already accepted caller block,
+and is rebuilt from the current source rather than replaying a stale block.
+No transaction remains installed after the rejected batches.
+
+Eight real final-call-carrier variants cache the rounded coefficient, output
+coordinates and output dimensions, singly and together; every value is used.
+They reproduce the same 0x40 frame and all 129 exact words. Do not replay that
+family or add unused locals to pad the missing 24 bytes. Next action is a
+different, compiler-faithful representation of the real floating/rectangle
+working state, preserving the now-exact RGB tree and the accepted atlas sibling
+as controls. All generators and probe outputs stay local.
