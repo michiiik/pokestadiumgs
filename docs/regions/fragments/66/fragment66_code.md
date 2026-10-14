@@ -117,3 +117,107 @@ across the entire file's .text, both new functions and all selected siblings.
 Both new linked retail spans match; git diff --check passes. The two alias
 symbols resolve to the same linked address. No generated tools or artifacts
 are part of the change; project-wide decompilation remains unfinished.
+
+## 2026-10-14: renderer requeue discriminators
+
+The final source/build/20-leading-blank baseline still reproduces the entire
+file's .text and all selected accepted siblings before new work.
+
+`func_82E02AA4` requeue:the original complete macro body,20-leading-blank
+control, two macro invocations on one line, plain block grouping, do/while(0)
+grouping, and both grouping forms on one line all retain512 bytes and the
+normalized1.0/raw0.9141 residual. Putting the entire function on one line is
+worse:0.9219/0.8203. This falsifies simple call-line/grouping as the source of
+the earlier flattened permuter score gain; it does not exhaust arbitrary
+statement layouts or compiler pass behavior. The flattened winner is still
+diagnostic-only. Eight new unsigned-corner/multiply spellings retain the best
+residual or worsen allocation, and eight narrow-counter variants add real
+instructions or enlarge the frame. Do not requeue these same families.
+Next action:inspect the exact expanded-parent/winner expression-tree and
+compiler-context difference, or capture narrow row-web allocation evidence;
+keep the ordinary macro spelling as the maintainable baseline.
+
+`func_82E02CCC` requeue:eight explicit loop-limit/right-edge carrier and
+formal-counter variants do not improve the previous1.0/0.9091 full body.
+The best of that new family is0.9835/0.8017. A stock-native90-second search
+is first calibrated with identical base/probe and target/oracle instruction
+words at484 bytes, then improves permuter score350 ->190 without zero.
+All output is retained locally and remains uninstalled. Next action:review
+the best mutation for valid source changes and separate expression topology
+from mere flattened source layout before composing a new ordinary-macro
+family. Both renderer owners remain GLOBAL_ASM, and tracked game source is
+unchanged throughout these negative experiments.
+
+Next file-local layout work:`func_82E017E0` and `func_82E04040` use five- and
+eleven-entry jump tables respectively; `func_82E0424C` shares the same nearby
+read-only region. The YAML still places those tables in fragment66_data.data.
+Before probing C switches, derive the per-file .rodata range, re-split with
+the pinned toolchain and gate all three still-assembly owners. This is a
+layout prerequisite, not permission to try switches against the current blob.
+The current for-jtbl planner is overbroad here:it proposes33B4A0..33C760,
+including the display lists, mutable callback data and an unreferenced widened
+tail, and explicitly warns of dropped bytes. Do not apply that proposal.
+Inspection rejects33BB50 as well:it cuts the display list D_82E05550 in
+the middle (there is no independent D_82E05560 label). Inspect the narrower
+aligned string/constant/table interval33BB90..33BC40
+(D_82E055A0 through padding after jtbl_82E0561C, before D_82E05650), confirm
+reference ownership and every boundary byte, then prove the still-assembly
+layout with a full-ROM gate before using it. This range is a proposed next
+hypothesis, not an accepted layout change.
+
+## 2026-10-14: bounded rodata layout and two dispatcher accepts
+
+The proposed33BB90..33BC40 interval is now verified:it starts at the actual
+D_82E055A0 string label, covers the three strings, their interleaved constants
+and all three jump tables, and stops before mutable D_82E05650. Both boundaries
+are16-aligned. Add the paired fragment66_code .rodata subsegment and a separate
+rodata-typed fragment66_tail; retain the display lists and earlier data in
+fragment66_data. The pinned full split migrates each table into its actual
+owner's .late_rodata. The generated linker change adds only the tail input.
+No source owner is removed during this prerequisite step. The assembly baseline
+retains the full retail MD5,0x4E90 text size and exactly0xB0 owner rodata bytes.
+Fresh-source/blank controls preserve all selected accepted siblings.
+
+- `func_82E017E0`:46 instructions /184 bytes, leaf. Outer kind0/1 switch,
+  inner selector0..4 switch, original signed coordinate and byte-field writes,
+  return0. The direct selector and ordinary break spelling hits; guard-only
+  dispatch, a selector local and per-case returns are diagnostic controls.
+  Normal sequential full-ROM acceptance after eight prior probes,
+  link_verified=false (relocation identity),4.925s probe /43.395s gate /
+  48.323s total. The initial gate rebuilds the split's assembly dependencies;
+  this is not a compiler search taking43 seconds.
+- `func_82E04040`:131 instructions /524 bytes, original0x20 frame. Preserve
+  data-pool reset, both graph resets, all eleven resource mappings, bitmap
+  selection for cases0..9 but not10, script validation/allocation/loading,
+  allocation finalization, callback setup and record reset. Actual matched
+  callee prototypes are used; pointer/scalar local representations are tested
+  with both declaration orders. Allocation declared before resource matches
+  the original scalar stack slots. Typed pointer winner accepts sequentially
+  after eight prior probes, link_verified=false;4.970s probe /1.645s gate /
+  6.618s total. The input domain remains scene0..10; outside it the original
+  switch leaves the script resource undefined. Do not add a made-up default.
+
+`func_82E0424C` requeue, not layout-blocked now:314 instructions /1256 bytes,
+0x60 frame. Assembly proves a0x4B8 aggregate-state copy,100 paired group/color
+bindings for ordinary scenes,100 single group bindings for scene7, their
+additional specific tags/callbacks and the six bindings for scene10. Twenty-four
+new complete bodies test byte/word aggregate copy, for/do grids, ordinal
+carriers/post-increments, tag-base locals and named bounds. Best normalized
+0.9716/raw0.8644 has1268 bytes and0x48 frame; no candidate gates. Diagnostics
+show IDO strength-reducing tag addresses into extra induction increments where
+the oracle adds the column at each lookup, alongside stack/spill differences.
+Named bounds do not close it. Preserve the whole body and actual callback ABI
+evidence; next action is a calibrated loop-strength-reduction discriminator or
+a bounded search from the best complete body, not arbitrary frame padding.
+
+Only fully gated owners replace assembly. No helper functions, new headers,
+compiler changes, scratch artifacts or ROMs are included.
+Final cleanup removes eight redundant declarations injected beside the loader.
+The naming plan has no independent existing mappings for either new owner.
+Native COMPARE=1 retains MD51561c75d11cedf356a8ddb1a4a5f9d5d; all427 host
+syntax checks pass. Fresh final-source/build/20-leading-blank controls agree
+across the whole .text and0xB0 .rodata sections, both new owners and all selected
+siblings, including the unchanged1256-byte binding setup. Both new linked
+retail spans and the entire moved rodata interval match. Normal accepted
+probe-stat provenance and git diff --check pass. Overall decompilation is
+unfinished; the remaining owners are not counted as accepted.
