@@ -2,6 +2,9 @@
 
 
 #ifdef VERSION_US
+typedef struct { u8 pad0[4]; s16 mode; u8 pad6[2]; s32 status; u8 padC[4]; u16 x; u16 alt; s16 out; } Fragment29Node;
+typedef struct { u8 pad0[8]; u16 flags; } Fragment29Input;
+
 typedef struct {
     s32 enabled;
     u8 *flags;
@@ -33,23 +36,90 @@ extern s32 func_80049290(s32, s32, const char *);
 extern u8 D_8800ED40; extern u8 D_8800ED41;
 void func_880022F0(void) { D_8800ED40 = 10; D_8800ED41 = 1; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_8800230C.s")
+extern Fragment29Input *D_80087200;
+extern void func_800226C0(s32);
+s16 func_8800230C(Fragment29Node *node) {
+    s16 selected = 0;
+    s16 enabled = *(s16 *)((u8 *)node + 0x18);
+
+    if ((enabled & 0x200) && (D_80087200->flags & 0x200)) {
+        selected = 0x200;
+    } else if ((enabled & 0x100) && (D_80087200->flags & 0x100)) {
+        selected = 0x100;
+    } else if ((enabled & 0x20) && (D_80087200->flags & 0x20)) {
+        selected = 0x20;
+    } else if ((enabled & 0x10) && (D_80087200->flags & 0x10)) {
+        selected = 0x10;
+    }
+    if (selected != 0) {
+        func_880022F0();
+        func_800226C0(*(s32 *)((u8 *)node + 0x1C));
+    } else if (node->alt != 0) {
+        (*(s8 *)&D_8800ED40)--;
+        if (*(s8 *)&D_8800ED40 <= 0) {
+            D_8800ED40 = 0;
+            if ((enabled & 0x200) && (*(u16 *)((u8 *)D_80087200 + 6) & 0x200)) {
+                selected = 0x200;
+            } else if ((enabled & 0x100) && (*(u16 *)((u8 *)D_80087200 + 6) & 0x100)) {
+                selected = 0x100;
+            } else if ((enabled & 0x20) && (*(u16 *)((u8 *)D_80087200 + 6) & 0x20)) {
+                selected = 0x20;
+            } else if ((enabled & 0x10) && (*(u16 *)((u8 *)D_80087200 + 6) & 0x10)) {
+                selected = 0x10;
+            }
+            if (selected != 0) {
+                D_8800ED40 = 1;
+                (*(s8 *)&D_8800ED41)--;
+                if (*(s8 *)&D_8800ED41 <= 0) {
+                    D_8800ED41 = *(s8 *)((u8 *)node + 0x1A);
+                    func_800226C0(*(s32 *)((u8 *)node + 0x1C));
+                }
+            }
+        }
+    }
+    return selected;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_880024FC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_8800254C.s")
+void func_8800254C(Fragment29Node *node) {
+    s32 changed;
 
-typedef struct { u8 pad0[4]; s16 mode; u8 pad6[2]; s32 status; u8 padC[4]; u16 x; u16 alt; s16 out; } Fragment29Node;
-typedef struct { u8 pad0[8]; u16 flags; } Fragment29Input;
-extern s16 func_8800230C(void);
-extern void func_8800254C(Fragment29Node *);
-extern Fragment29Input *D_80087200;
+    if (node->mode != 0) {
+        changed = 0;
+        *(s16 *)((u8 *)node + 0x16) += node->out;
+        if (*(s16 *)((u8 *)node + 0x16) < 0) {
+            *(s16 *)((u8 *)node + 0x16) += *(u16 *)((u8 *)node + 0xE);
+            if (node->status == 0 || *(s16 *)((u8 *)node + 0x16) == 0) {
+                --**(s8 **)node;
+                if (**(s8 **)node < 0) {
+                    **(s8 **)node = *(u8 *)((u8 *)node + 0xC) - 1;
+                }
+            }
+            changed = 1;
+        } else if (*(s16 *)((u8 *)node + 0x16) >= *(u16 *)((u8 *)node + 0xE)) {
+            *(s16 *)((u8 *)node + 0x16) -= *(u16 *)((u8 *)node + 0xE);
+            ++**(s8 **)node;
+            if (**(s8 **)node >= *(u8 *)((u8 *)node + 0xC)) {
+                **(s8 **)node = 0;
+            }
+            changed = 1;
+        }
+        if (changed && node->status) {
+            *(s16 *)((u8 *)node + 0x16) = 0;
+            node->out = 0;
+            node->status = 0;
+            node->mode = 0;
+        }
+    }
+}
+
 void func_88002640(Fragment29Node *arg0) {
     s16 mode;
     s16 current;
 
     if (arg0->status != 0) goto done;
-    mode = func_8800230C();
+    mode = func_8800230C(arg0);
     current = arg0->mode;
     if (mode == current) goto done;
     if (current != 0) goto set_status;
@@ -126,7 +196,40 @@ s32 func_88002A08(u8 **arg0, u16 arg1, s32 arg2, s16 arg3) {
     return (result * var_s2 + (arg3 * (var_s2 - 1))) & 0xFFFF;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88002AA8.s")
+extern s32 func_8003514C(void);
+u8 *func_88002AA8(u8 *node, s32 align, u8 **strings, u16 count,
+                  s32 font, s16 spacingX, s16 spacingY, s16 left, s16 right,
+                  s16 top, s16 bottom, s32 constrain, s16 selection, void *mask) {
+    *(s32 *)(node + 4) = align;
+    *(u8 ***)(node + 8) = strings;
+    *(u16 *)(node + 12) = count;
+    *(s32 *)(node + 16) = font;
+    if (func_8003514C() == 0) {
+        *(s16 *)(node + 20) = spacingX;
+    } else {
+        *(s16 *)(node + 20) = 0;
+    }
+    *(s16 *)(node + 22) = spacingY;
+    *(s16 *)(node + 24) = left;
+    *(s16 *)(node + 26) = right;
+    *(s16 *)(node + 28) = top;
+    *(s16 *)(node + 30) = bottom;
+    *(s32 *)(node + 32) = constrain;
+    *(s32 *)(node + 36) = 1;
+    *(s16 *)(node + 40) = selection;
+    *(F29TextMask *)(node + 44) = *(F29TextMask *)mask;
+    if (*(s32 *)mask) {
+again:
+        if (*(*(s16 *)(node + 40) + *(u8 **)((u8 *)mask + 4))) {
+            ++*(s16 *)(node + 40);
+            if (*(s16 *)(node + 40) >= count) {
+                *(s16 *)(node + 40) = 0;
+            }
+            goto again;
+        }
+    }
+    return node;
+}
 
 extern Gfx *D_800D0510;
 void func_88002BA0(u8 arg0, u8 arg1, u8 arg2) {
@@ -147,7 +250,19 @@ void func_88002C2C(u8 arg0, u8 arg1, u8 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_880032C4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_8800335C.s")
+extern u8 D_8800ED50[];
+u8 func_8800335C(void) {
+    u8 count = 0;
+    s32 i;
+    u8 *node = (u8 *)D_8800ED50;
+
+    for (i = 0; i < 6; i++, node += 0x4C) {
+        if (*(s32 *)(node + 0x20) == 1 || *(s32 *)(node + 0x20) == 3) {
+            count++;
+        }
+    }
+    return count;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88003430.s")
 
@@ -283,7 +398,6 @@ void func_880040D4(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88004804.s")
 
-extern u8 D_8800ED50[];
 extern void func_880046EC(s32, s32, s16, s16, s32, s32, u8, u8, u8,
                           s32 *, s32 *, s32 *, s32 *, u8, u8, void *);
 
