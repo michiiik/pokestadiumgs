@@ -66,7 +66,12 @@ fi
 # `git pull` would merge; this checkout only ever mirrors upstream, so hard
 # reset to whatever ref triggered this build.
 git -C "$ci_checkout" fetch --quiet origin "$target_sha"
-git -C "$ci_checkout" checkout --quiet --detach "$target_sha"
+# --force: this checkout only mirrors upstream, but a build run in it leaves
+# tracked generated files modified (linker_scripts/us/pokestadiumgs.ld), and a
+# plain checkout then aborts with "local changes would be overwritten". That
+# failed every image rebuild from 2026-09-16 on, leaving a stale image whose
+# gate runs each re-extracted and rebuilt everything.
+git -C "$ci_checkout" checkout --quiet --force --detach "$target_sha"
 
 # Re-extract only when yamls/ actually changed since the last extraction --
 # splat's output depends on it, nothing else does. A plain `git diff
