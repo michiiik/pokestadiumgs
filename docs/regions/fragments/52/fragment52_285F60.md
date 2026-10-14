@@ -87,3 +87,19 @@ topology or a calibrated narrow allocator/frame trace explaining the extra
 live-home space. Avoid replaying the same scoped layout families. This bounded
 search does not establish that the function cannot match. Full matching-C
 decompilation remains unfinished; descriptive names await independent evidence.
+
+## 2026-10-14: attachment follow-up, no source acceptance
+
+Fresh controls reverify all four accepted siblings and the unchanged attachment
+against current source/build objects, blank-line recompiles and linked retail.
+Forty additional normal candidates test materially different hypotheses:
+declaration initialization and parameter reuse, standard C register hints on
+real carriers, the allocator's 32-bit address boundary with assembly-verified
+narrow node-operation formals, fixed-literal const views, and scalar member
+versus array-field lowering. None fixes the0x28 versus0x20 frame. Const views
+are justified by the consulted source/assembly having only literal definitions
+and this owner's loads, no writes; even that cell is negative. No variant or
+new type/prototype from these probes is installed or published. Do not replay
+these families under unchanged context. The next useful discriminator remains
+a calibrated compiler/frame trace explaining the reserved space, rather than
+further surface-level scope hints. This is bounded evidence, not impossibility.
