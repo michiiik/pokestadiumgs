@@ -2,17 +2,60 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_80044270.s")
-
-#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_80044424.s")
-
 typedef struct S1_unk_D_800A7440 {
-	/* 0x00 */ s16 x1;
-	/* 0x02 */ s16 y1;
-	/* 0x04 */ s16 x2;
-	/* 0x06 */ s16 y2;
+    /* 0x00: left   */ s16 x1;
+    /* 0x02: right  */ s16 y1;
+    /* 0x04: bottom */ s16 x2;
+    /* 0x06: top    */ s16 y2;
 } S1_unk_D_800A7440;
-extern Gfx* D_800D0510;
+extern S1_unk_D_800A7440 *GfxRect_SetBounds(S1_unk_D_800A7440 *, s16, s16, s16, s16);
+extern s32 GfxRect_ClipToScissor(S1_unk_D_800A7440 *);
+extern Gfx *D_800D0510;
+
+void func_80044270(s16 x, s16 y, s16 width, s16 height, s16 s, s16 t, s16 dsdx, s16 dtdy, s32 cycle) {
+    S1_unk_D_800A7440 rect;
+
+    GfxRect_SetBounds(&rect, x, y, x + width - 1, y + height - 1);
+    if (GfxRect_ClipToScissor(&rect) != 0) {
+        if (dsdx != 0) {
+            s = s + (((rect.x1 - x) * dsdx) >> 5);
+        }
+        if (dtdy != 0) {
+            t = t + (((rect.y2 - y) * dtdy) >> 5);
+        }
+        if (cycle == G_CYC_COPY) {
+            dsdx <<= 2;
+        } else {
+            rect.y1++;
+            rect.x2++;
+        }
+        gSPTextureRectangle(D_800D0510++, rect.x1 << 2, rect.y2 << 2, rect.y1 << 2, rect.x2 << 2,
+                           G_TX_RENDERTILE, s, t, dsdx, dtdy);
+    }
+}
+
+void func_80044424(s16 x, s16 y, s16 width, s16 height, s16 s, s16 t, s16 dsdx, s16 dtdy, s32 cycle, s32 tile) {
+    S1_unk_D_800A7440 rect;
+
+    GfxRect_SetBounds(&rect, x, y, x + width - 1, y + height - 1);
+    if (GfxRect_ClipToScissor(&rect) != 0) {
+        if (dsdx != 0) {
+            s = s + (((rect.x1 - x) * dsdx) >> 5);
+        }
+        if (dtdy != 0) {
+            t = t + (((rect.y2 - y) * dtdy) >> 5);
+        }
+        if (cycle == G_CYC_COPY) {
+            dsdx <<= 2;
+        } else {
+            rect.y1++;
+            rect.x2++;
+        }
+        gSPTextureRectangle(D_800D0510++, rect.x1 << 2, rect.y2 << 2, rect.y1 << 2, rect.x2 << 2,
+                           tile, s, t, dsdx, dtdy);
+    }
+}
+
 void Gfx_FillRectRgb(s16 arg0, s16 arg1, s16 arg2, s16 arg3, u8 arg4, u8 arg5, u8 arg6) {
     gDPSetPrimColor(D_800D0510++, 0, 0, arg4, arg5, arg6, 0xFF);
 
