@@ -27,6 +27,11 @@ typedef struct {
     s32 constrain;
 } F29TextLayout;
 
+extern u8 D_8800ED50[];
+extern void func_880046EC(s32,s32,s16,s16,s32,s32,u8,u8,u8,s32*,s32*,s32*,s32*,u8,u8,void*);
+extern void func_880036CC(F29Rect*,u8*);
+extern void func_80044424(s16,s16,s16,s16,s16,s16,s16,s16,s32,s32);
+
 extern s32 func_88002958(u8 **, u16, s32, s16);
 extern void func_88003480(s32, u16, u16, s16 *, s16 *);
 extern void func_8004972C(s32, s32, s32, s32);
@@ -244,13 +249,22 @@ void func_88002C2C(u8 arg0, u8 arg1, u8 arg2) {
     gDPSetRenderMode(D_800D0510++, 0x0F0A4000, 0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88002CB8.s")
+void func_88002CB8(s16 x,s16 y,u16 width,u16 height) {
+    if (width < 14 || height < 12) {
+        return;
+    }
+    func_80044424(x + 5, y, width - 13, 5, 224, 0, 0, 1024, 0, 1);
+    func_80044424(x, y, 5, height - 8, 0, 0, 1024, 1024, 0, 1);
+    func_80044424(x + width - 8, y, 8, height - 8, 256, 0, 1024, 1024, 0, 1);
+    func_80044424(x, y + height - 8, 5, 8, 512, 0, 1024, 1024, 0, 1);
+    func_80044424(x + width - 8, y + height - 8, 8, 8, 768, 0, 1024, 1024, 0, 1);
+    func_80044424(x + 5, y + height - 8, width - 13, 8, 736, 0, 0, 1024, 0, 1);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88002EC0.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_880032C4.s")
 
-extern u8 D_8800ED50[];
 u8 func_8800335C(void) {
     u8 count = 0;
     s32 i;
@@ -394,9 +408,53 @@ void func_880040D4(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88004180.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_880046EC.s")
+void func_880046EC(s32 payload, s32 mode, s16 x, s16 y, s32 a, s32 b,
+                   u8 r, u8 g, u8 blue, s32 *p0, s32 *p1, s32 *p2, s32 *p3,
+                   u8 delay, u8 kind, void *storage) {
+    u8 *node = storage;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88004804.s")
+    node[1] = kind;
+    *(s32 *)(node + 0x48) = payload;
+    *(s32 *)(node + 0x28) = mode;
+    *(s16 *)(node + 0xC) = x;
+    *(s16 *)(node + 0xE) = y;
+    *(s32 *)(node + 0x14) = a;
+    *(s32 *)(node + 0x18) = b;
+    node[0x1C] = r; node[0x1D] = g; node[0x1E] = blue;
+    *(s32 *)(node + 0x2C) = *(s32 *)(node + 0x30) = *(s32 *)(node + 0x34) = 1;
+    *(s32 **)(node + 0x38) = p0;
+    *(s32 **)(node + 0x3C) = p1;
+    *(s32 **)(node + 0x40) = p2;
+    *(s32 **)(node + 0x44) = p3;
+    *(s16 *)(node + 6) = 0; *(s16 *)(node + 4) = 0;
+    *(s16 *)(node + 10) = 0; *(s16 *)(node + 8) = 0;
+    *(s32 *)(node + 0x20) = 1;
+    node[0x24] = -delay;
+    switch (mode) {
+    case 0:
+        func_88003534((F29Rect *)(node + 4), (F29TextLayout *)(u32)*(s32 *)(node + 0x48));
+        break;
+    case 1:
+        func_880036CC((F29Rect *)(node + 4), (u8 *)(u32)*(s32 *)(node + 0x48));
+        break;
+    case 2:
+        func_88003858((F29Rect *)(node + 4), (u8 *)(u32)*(s32 *)(node + 0x48));
+        break;
+    }
+}
+
+u8 func_88004804(s32 payload, s32 mode, s16 x, s16 y, s32 a, s32 b,
+                 u8 r, u8 g, u8 blue, s32 *p0, s32 *p1, s32 *p2, s32 *p3,
+                 u8 delay, u8 kind) {
+    s32 i;
+    u8 *node;
+    for (i = 0, node = D_8800ED50; i != 6; i++, node += 0x4C) {
+        if (*(s32 *)(node + 0x20) == 0) {
+            func_880046EC(payload, mode, x, y, a, b, r, g, blue, p0, p1, p2, p3, delay, kind, node);
+            return i;
+        }
+    }
+}
 
 extern void func_880046EC(s32, s32, s16, s16, s32, s32, u8, u8, u8,
                           s32 *, s32 *, s32 *, s32 *, u8, u8, void *);
@@ -414,5 +472,12 @@ void func_880048D4(s32 arg0, s32 arg1, s16 arg2, s16 arg3, s32 arg4, s32 arg5,
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88004990.s")
+void func_88004990(u8 slot, u8 amount) {
+    u8 *node = D_8800ED50 + slot * 0x4C;
+    u8 *inner = node + 4;
+
+    if (*(s32 *)(node + 0x20) != 0) {
+        *(s8 *)(inner + 0x20) += amount + 1;
+    }
+}
 #endif
