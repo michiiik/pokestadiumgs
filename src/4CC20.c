@@ -58,7 +58,7 @@ s32 func_8004C3EC(s32 arg0, s32 arg1, s32 arg2) {
 }
 
 extern s32 func_8004C3B0(s32, s32);
-extern void main_pool_try_free(s32);
+extern s32 main_pool_try_free(s32);
 s32 func_8004C468(s32 arg0, s32 arg1) {
     s32 result;
     s32 value;
@@ -451,7 +451,41 @@ s32 func_8004DAF0(void *arg0, s32 *arg1) {
     return result.value;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004DB5C.s")
+extern u16 func_8004EB38(u16*);
+extern s32 func_8004EB40(u16*);
+s32 func_8004DB5C(u8* cursor, s32* errors) {
+    s32 result = 1;
+    u8* scan = cursor;
+    u16 kind;
+    if (errors != NULL) {
+        *errors = 0;
+    }
+    kind = func_8004EB38((u16*)cursor);
+    if (kind != 0) {
+        do {
+            switch (kind) {
+            case 0x11:
+                if (func_8004DA18(scan) == 0 && result != 0) {
+                    result = 0;
+                }
+                break;
+            case 0x12:
+                if (func_8004DA8C(scan) == 0 && result != 0) {
+                    result = 0;
+                }
+                break;
+            case 0x13:
+                if (func_8004DAF0(scan, errors) == 0 && result != 0) {
+                    result = 0;
+                }
+                break;
+            }
+            scan += func_8004EB40((u16*)scan);
+            kind = func_8004EB38((u16*)scan);
+        } while (kind != 0);
+    }
+    return result;
+}
 
 s32 func_8004DC6C(s32 arg0) {
     s32 temp_a0;
@@ -481,8 +515,8 @@ s32 func_8004DCB4(s32 arg0) {
     return var_v1;
 }
 
-void func_8004DCFC(void) {
-    func_8004DB5C();
+void func_8004DCFC(u8* cursor, s32* errors) {
+    func_8004DB5C(cursor, errors);
 }
 
 s32 func_8004DD1C(s32 arg0) {
@@ -595,5 +629,50 @@ void *func_8004DFEC(s32 arg0, s32 arg1, Func8004DFECArg arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004E018.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004E0F0.s")
+extern s32 main_pool_alloc(s32, s32);
+u8* func_8004E0F0(u8* destination, s32 id, s32 index) {
+    s32 allocated = 0;
+    s32 loaded = 0;
+    u32 archiveAddress;
+    s32 lookup;
+    u8* chunk;
+    u8* end;
+    s32* header;
+    if (D_80097120 != 0) {
+        lookup = *(s32*)((u8*)(u32)D_80097120 + 0x28);
+        if (lookup != 0) {
+            archiveAddress = (u32)lookup;
+            lookup = (u32)id;
+            if (destination == NULL) {
+                destination = (u8*)(u32)main_pool_alloc(0x2008, 0);
+                allocated = 1;
+            }
+            if (destination != NULL && id >= 0 && (u32)lookup < (u32)*(s32*)((u8*)(u32)archiveAddress + 0xC)) {
+                chunk = (u8*)(u32)(*(s32*)((u32)archiveAddress + (u32)id * 0x10 + 0x10) + *(s32*)((u8*)(u32)archiveAddress + 4));
+                header = (s32*)(u32)main_pool_alloc(0x10, 1);
+                if (header != NULL) {
+                    end = chunk + 0x10;
+                    func_80003F74((u8*)header, chunk, end, 0);
+                    if (index >= 0 && index < header[0]) {
+                        u8* start = *(s32*)((u8*)header + index * 4 + 4) + chunk - 8;
+                        end = start;
+                        end = end + 0x2008;
+                        func_80003F74(destination, start, end, 0);
+                        loaded = 1;
+                    }
+                    main_pool_try_free((s32)header);
+                }
+            }
+            if (loaded == 0) {
+                if (allocated != 0) {
+                    main_pool_try_free((s32)destination);
+                }
+                destination = NULL;
+            }
+        }
+    }
+    return destination;
+}
+/* Original owner ends with three alignment NOPs after the return delay slot. */
+#pragma C_FUNCTION_PADDING(12)
 #endif
