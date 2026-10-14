@@ -673,3 +673,131 @@ so address-keyed names remain. Scratch generators and build artifacts stay
 local. Only initializer `func_8290FE04` and dispatcher `func_82910258` remain
 assembly in this file; their earlier requeues remain active, not resolved by
 these renderer matches.
+
+### Initializer follow-up after panel acceptance, 2026-10-15
+
+Requeue `func_8290FE04` remains assembly. With both panel renderers accepted,
+eight token-identical natural statement-grouping cells test the initial
+selection/pointer statements, timer reset triples, channel copy triples and
+coordinate pairs. Seven retain 272 bytes, normalized 1.0/raw 0.8382 and the
+same first `lh t6` versus required `lh t7`; the coordinate-pair cell falls to
+raw 0.8235. This is evidence only for these grouping cells, not a proof that
+all source layouts are inert.
+
+Eight additional cells use real primary/secondary display-state base aliases
+and a two-field record holding the foreground/background pointers, separately
+and in combination, with one reversed field-order control. Every field and
+alias is initialized and consumed; all eight retain exactly the same 272-byte
+0.8382 register residual. No body installs. Do not replay these two families
+or interpret normalized 1.0 as a match. Next action remains an independently
+measured allocator class-crossing/live-range mechanism; the prior calibrated
+permuter-flat result and native detailed-debug bridge limitation still apply.
+Source and full-ROM acceptance of the two panel renderers are unaffected;
+the initializer's evidence is a requeue, not additional matching C coverage.
+
+### Trace-confirmed initializer lifetime and schedule requeue, 2026-10-15
+
+`func_8290FE04` remains assembly, but the previous broad register-tie diagnosis
+is now narrowed. Detailed native uopt listings previously aborted in the host
+bridge's unimplemented ecvt/fcvt. A temporary diagnostic copy, generated from
+the archived IDO static-recomp source and using the already available host
+bridge implementations, completes levels 3 and 5. Stock, diagnostic-off and
+both listing-enabled cells reproduce identical complete text and rodata, with
+accepted renderer siblings as controls. No repository compiler is replaced.
+
+Read-only UGEN logging wraps integer allocation/free and register-pool setup,
+and records source lines and emitter ordinals. Logging off, on and a
+20-leading-blank control reproduce the same complete text/rodata as stock.
+Emitter ordinals are not claimed to be final object rows: as1 folds and
+schedules emitted records. The measured parent starts its free pool at t6,
+and its first incoming-halfword temporary takes that register. The initial
+selection, index/stride and table-base temporaries account for the persistent
+register rotation; later color-copy registers already match.
+
+Eight ordinary source-store-position cells test the real initial y=0x230
+assignment. Moving it before the selection store repairs the entire register
+sequence. The normal runner retains 272 bytes and frame 0x18, normalized 1.0
+and aligned raw similarity 0.9853, but does not accept: the y halfword store is
+early, ahead of the timer resets and x initialization. An independent stock
+object comparison finds five positional word differences from that moved
+store, versus eleven in the old parent. This is a concrete lifetime/schedule
+lead, not a match or permission to install the body.
+
+Eight natural statement-grouping cells preserve the repaired register basin
+but do not move the store. Real signed coordinate carriers, reused coordinate
+values and two-field work records revert to the old 0.8382 register residual;
+two-element coordinate arrays instead add literal data and larger frames, and
+are rejected for section-layout drift. Eight actual incoming-word/low-halfword
+address cells restore the original 272-byte argument-home shape but reproduce
+the old register residual; their paired caller declaration edits are restored.
+Do not replay these families against the same parent.
+
+Calibrated stock debug-mode discrimination shows normal and explicit -g0 are
+identical for both parents; -g3 worsens both. Therefore a debug-mode collapse
+does not explain this tested residual and no build flag is adopted. A fresh
+120-second/four-worker native permuter search validates base/probe and
+target/oracle words before starting, and descends 50 to 35 without zero. The
+35 proposal initializes and consumes all three added channel-value carriers,
+but eight normal-runner width cells reproduce only 0.9706 aligned raw and a
+worse store order. It is not adopted; a lower search score is not acceptance.
+
+Next action: retain the simple early-y parent as the lifetime witness and
+inspect the actual uopt-to-UGEN store-placement boundary, seeking a real early
+constant lifetime with the original later field-store order. Do not add dummy
+locals, masks, forced registers or object patches. This is a schedule requeue,
+not a proof that all C sources are unreachable. Scratch sources, diagnostic
+compiler binaries and logs stay local; authoritative installation still needs
+the normal unmodified runner and full-ROM gate.
+
+### Accepted signed-storage state dispatcher, 2026-10-15
+
+`func_82910258` now has full-ROM-accepted matching C: 174 instructions,
+696 bytes, original 0x18 frame. This closes all preceding dispatcher requeues;
+do not resume their rejected unsigned-storage, carrier or shared-store bodies
+after the pragma is gone.
+
+The decisive representation is a signed s16 phase field at flow offset 4,
+with the switch reading its bits through the corresponding u16 lvalue view.
+A value cast from a signed load had emitted LH/ANDI and failed earlier; the
+actual unsigned halfword memory view emits the required LHU. Signed transition
+storage shares the literal 2 with the signed display flags, recovering the
+original v0 constant, branch-likely sequence and later temporary-register phase.
+The winner needs ordinary independent field stores, no chained assignment,
+transition carrier, forced register, dummy local, helper function or patch.
+
+Eight correctly initialized guard/entry transition cells reproduce 712 bytes
+and are rejected. Eight corresponding unsigned store-view cells remove the
+old extra reload and reach 696 bytes, but rotate the constant into t2 and
+disturb later temporaries. They are useful mechanism evidence, not accepts.
+Eight signed-storage/unsigned-memory-selector cells find a relocation-masked
+probe hit with independent stores. Raw relocation names differ (for example,
+`D_8291BE82` versus `D_8291BE80 + 2`), so link-shape verification remains false.
+The unverified hit is promoted explicitly to the authoritative sequential ROM
+gate rather than claimed as a link-verified or raw object-word match.
+
+Normal runner acceptance: batch `f3ac0f18a52043a3be4e30dd2ad153a3`, label
+`f67:state:signed-storage:unsigned-selector-direct:tree-0`, accepted,
+relocation_masked true, link_verified false, one sequential full-ROM gate.
+Default host syntax checks remain enabled. The entire linked ROM is retail
+identical, MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`. The single-hit gate call
+is promotion of an unverified probe, not a duplicate link-verified auto-gate.
+
+Post-acceptance cleanup moves the actual flow type ahead of the initializer,
+documents field offsets and the selector view, expands timer/event statements,
+and removes unused/duplicate declarations. A fresh native full-ROM comparison
+passes again; full-source/20-leading-blank controls reproduce complete text
+and owned rodata, every accepted sibling and the newly accepted dispatcher.
+The naming plan has no evidence-backed mapping, so the address-keyed name
+remains. Existing layout metadata and format strings need no new changes.
+
+Preserve both Y/X movement calls even when the first coordinate is not at its
+destination, duplicate A9 audio calls, signed old-timer postincrements, timer
+bounds/events, unconditional done=1 in state 4, and unsigned unknown-phase
+default behavior. Only initializer `func_8290FE04` remains assembly in this
+file. Its new expression-order and ordinary C register-hint cells fail to
+improve the retained lifetime witness. Calibrated stock 5.3 and 7.1 C-driver
+controls reproduce the same initializer residual for both retained parents;
+return-zero fixtures and uniform blank-line controls pass, so no compiler
+switch is justified by these tests. Initializer requeue remains unresolved.
+No diagnostic helper, compiler binary, object, ROM or scratch generator is
+included in the published change.

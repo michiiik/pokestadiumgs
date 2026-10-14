@@ -13,6 +13,13 @@ typedef struct F67DisplayRecord {
 } F67DisplayRecord;
 extern F67DisplayRecord D_8291BE80, D_8291BE98;
 
+typedef struct F67Flow {
+    /* 0x00 */ s16 timer;
+    /* 0x02 */ s16 done;
+    /* 0x04 */ s16 phase;
+} F67Flow;
+extern F67Flow D_8291BE78;
+
 typedef struct F67UiRow {
     /* 0x00 */ s16 width, height;
     /* 0x04 */ s16 panelWidth, panelHeight, offsetX, offsetY;
@@ -97,7 +104,73 @@ void func_8290FF14(F67DisplayRecord* state) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_34C8B0/func_82910258.s")
+extern void* D_80087200;
+extern void func_800226C0(s32);
+extern void func_80021ED8(s32);
+extern s32 D_8291BE70;
+void func_82910258(void) {
+    /* Dispatch reads unsigned phase bits; transitions use signed halfwords. */
+    switch (*(u16*)&D_8291BE78.phase) {
+        case 0:
+            if (D_8291BE78.timer++ == 15) {
+                D_8291BE78.phase = 1;
+                func_800226C0(0xA9);
+                func_800226C0(0xA9);
+                func_80021ED8(0x4F);
+            }
+            break;
+        case 1:
+            D_8291BE80.y = Math_StepToS32(D_8291BE80.y, 155, 50, 50);
+            D_8291BE98.y = Math_StepToS32(D_8291BE98.y, 87, 50, 50);
+            if (D_8291BE80.y == 155 && D_8291BE98.y == 87) {
+                D_8291BE78.phase = 2;
+                D_8291BE80.flags = 2;
+                D_8291BE98.flags = 2;
+                func_8290FF14(&D_8291BE80);
+                func_8290FF14(&D_8291BE98);
+                func_800226C0(0x66);
+                D_8291BE78.timer = 0;
+            }
+            break;
+        case 2:
+            func_8290FF14(&D_8291BE80);
+            func_8290FF14(&D_8291BE98);
+            if (D_8291BE78.timer < 101) {
+                D_8291BE78.timer++;
+            }
+            if (D_8291BE78.timer == 85) {
+                func_80021ED8(0x25);
+            }
+            if (D_8291BE80.flags == 0 && D_8291BE98.flags == 0 && D_8291BE78.timer >= 86) {
+                D_8291BE78.phase = 3;
+                D_8291BE78.timer = 0;
+            }
+            break;
+        case 3:
+            if (D_8291BE78.timer < 60) {
+                D_8291BE78.timer++;
+            } else if (*(u16*)((u8*)D_80087200 + 8) & 0x8000) {
+                D_8291BE78.phase = 4;
+                func_800226C0(0xA7);
+                func_800226C0(0xA8);
+            }
+            break;
+        case 4:
+            D_8291BE80.x = Math_StepToS32(D_8291BE80.x, 650, 70, 70);
+            D_8291BE98.x = Math_StepToS32(D_8291BE98.x, -420, 70, 70);
+            D_8291BE78.done = 1;
+            if (D_8291BE80.x == 650 && D_8291BE98.x == -420) {
+                D_8291BE78.phase = 5;
+                D_8291BE78.timer = 0;
+            }
+            break;
+        case 5:
+            if (D_8291BE78.timer++ == 12) {
+                D_8291BE70 = 0;
+            }
+            break;
+    }
+}
 
 extern Gfx D_80094E78[];
 extern Gfx* D_800D0510;
@@ -302,7 +375,6 @@ void func_82911850(void) {
 }
 
 extern void StageFade_StartFromOpaque(s32);
-extern s32 D_8291BE70;
 void func_82911880(void) {
     s32 var_s0;
 
