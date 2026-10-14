@@ -25,7 +25,95 @@ void func_8004C088(s32 arg0, s32 arg1) {
     D_80097120 = 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C09C.s")
+extern s32 main_pool_alloc(s32, s32);
+extern u8* main_pool_set_func(u8*, s32, s32);
+extern s32 D_80097120;
+extern void Fragment_Load(s32, void *, void *);
+extern u8 D_81000000[];
+typedef struct TextureSelectionState {
+    /* 0x00 */ s16 index;
+    /* 0x02 */ s16 spacing;
+    /* 0x04 */ u8* texture;
+} TextureSelectionState;
+extern TextureSelectionState D_80128080;
+extern u8 fragment26_ROM_START[];
+extern u8 fragment27_ROM_START[];
+typedef union ResourceInitFlags {
+    u32 raw;
+    struct {
+        /* 0x00 */ u16 upper;
+        /* 0x02 */ u16 bits;
+    } half;
+} ResourceInitFlags;
+s32 func_8004C09C(ResourceInitFlags flags) {
+    s32 cachedState;
+    s32 state;
+    s32 i;
+
+    cachedState = D_80097120;
+    if (cachedState == 0) {
+        if ((state = main_pool_alloc(0x22C, 0)) != 0) {
+            main_pool_set_func((u8*)(u32)state, 0, (s32)func_8004C088);
+            if ((*(u16*)(u32)state = flags.half.bits) & 1) {
+                *(s32 *)((u8 *)(u32)state + 4) = BinArchive_Open(func_800356CC(1), 0, 1, 0);
+            } else {
+                *(s32 *)((u8 *)(u32)state + 4) = 0;
+            }
+            if (*(u16 *)(u32)state & 2) {
+                *(s32 *)((u8 *)(u32)state + 8) = BinArchive_Open(func_800356CC(2), 0, 1, 0);
+                *(s32 *)((u8 *)(u32)*(s32 *)((u8 *)(u32)state + 8) + 0x428) = D_80097124;
+                *(s32 *)((u8 *)(u32)*(s32 *)((u8 *)(u32)state + 8) + 0x18) = D_80097128;
+            } else {
+                *(s32 *)((u8 *)(u32)state + 8) = 0;
+            }
+            for (i = 0; i < 128; i++) {
+                *(s32*)((u8*)(u32)state + 0x2C + i * 4) = 0;
+            }
+            if (*(u16 *)(u32)state & 4) {
+                *(s32 *)((u8 *)(u32)state + 0xC) = BinArchive_Open(func_800356CC(8), 0, 1, 0);
+            } else {
+                *(s32 *)((u8 *)(u32)state + 0xC) = 0;
+            }
+            if (*(u16 *)(u32)state & 8) {
+                *(s32 *)((u8 *)(u32)state + 0x10) = BinArchive_Open(func_800356CC(4), 0, 1, 0);
+                *(s32 *)((u8 *)(u32)state + 0x14) = BinArchive_Open(func_800356CC(0x11), 0, 1, 0);
+                *(s32 *)((u8 *)(u32)state + 0x18) = BinArchive_Open(func_800356CC(0x12), 0, 1, 0);
+            } else {
+                *(s32 *)((u8 *)(u32)state + 0x10) = 0;
+                *(s32 *)((u8 *)(u32)state + 0x14) = 0;
+                *(s32 *)((u8 *)(u32)state + 0x18) = 0;
+            }
+            if (*(u16 *)(u32)state & 0x100) {
+                *(s32 *)((u8 *)(u32)state + 0x1C) = BinArchive_Open(func_800356CC(3), 0, 1, 0);
+            } else {
+                *(s32 *)((u8 *)(u32)state + 0x1C) = 0;
+            }
+            if (*(u16 *)(u32)state & 0x10) {
+                *(s32 *)((u8 *)(u32)state + 0x20) = BinArchive_Open(func_800356CC(0xD), 0, 1, 0);
+            } else {
+                *(s32 *)((u8 *)(u32)state + 0x20) = 0;
+            }
+            if (*(u16 *)(u32)state & 0x20) {
+                *(s32 *)((u8 *)(u32)state + 0x24) = BinArchive_Open(func_800356CC(0xC), 0, 1, 1);
+                Fragment_Load(((((u32)&D_81000000 & 0x0FF00000) >> 20) - 0x10), &fragment26_ROM_START, &fragment27_ROM_START);
+            } else {
+                *(s32 *)((u8 *)(u32)state + 0x24) = 0;
+            }
+            if (*(u16 *)(u32)state & 0x40) {
+                *(s32 *)((u8 *)(u32)state + 0x28) = BinArchive_Open(func_800356CC(0xF), 0, 1, 0);
+            } else {
+                *(s32 *)((u8 *)(u32)state + 0x28) = 0;
+            }
+            D_80097120 = state;
+            D_80128080.index = -1;
+            D_80128080.spacing = 0;
+            D_80128080.texture = NULL;
+        }
+    } else {
+        state = cachedState;
+    }
+    return state;
+}
 
 extern s32 D_80097120; void func_8004C398(void) { D_80097120 = 0; }
 
@@ -44,14 +132,13 @@ s32 func_8004C3B0(s32 arg0, s32 arg1) {
     return result;
 }
 
-extern void main_pool_set_func(s32, s32, void (*)(s32, u8 *));
 s32 func_8004C3EC(s32 arg0, s32 arg1, s32 arg2) {
     s32 result;
     result = func_8004C3B0(arg0, arg1);
     if (result == 0 || arg2 == 0) {
         result = (s32)func_80004B4C(arg0, arg1);
         if (result != 0) {
-            main_pool_set_func(result, arg0 + 0x18 + arg1 * 0x10, func_8004C3A4);
+            main_pool_set_func((u8*)(u32)result, arg0 + 0x18 + arg1 * 0x10, (s32)func_8004C3A4);
         }
     }
     return result;
@@ -83,7 +170,38 @@ extern s32 D_80097120; s32 func_8004C594(s32 index,s32 value){s32 result=0; s32 
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C5E0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C7A0.s")
+extern void func_8004C5E0(void*, s32, u8*);
+void* func_8004C7A0(void* destination, s32 capacity, s32 archiveId, s32 entryId) {
+    void* result = NULL;
+    s32 table;
+    u8* text;
+    if (archiveId >= 0) {
+        table = 0;
+        switch (archiveId) {
+        case 0x41:
+            table = D_80097124;
+            break;
+        case 0:
+            table = D_80097128;
+            break;
+        default:
+            if (D_80097120 != 0) {
+                table = func_8004C3B0(*(s32*)((u8*)(u32)D_80097120 + 8), archiveId);
+            }
+            break;
+        }
+        if (table != 0 && entryId >= 0 && (u32)entryId < *(u32*)(u32)table) {
+            text = (u8*)(*(u32*)((u8*)(u32)table + entryId * 4 + 4) + (u32)table);
+            if (destination == NULL) {
+                result = text;
+            } else {
+                result = destination;
+                func_8004C5E0(destination, capacity, text);
+            }
+        }
+    }
+    return result;
+}
 
 extern void *func_8004C7A0(void *, s32, s32, s32);
 void *func_8004C874(s32 arg0, s32 arg1) {
@@ -234,12 +352,6 @@ s32 func_8004D27C(u8 *arg0, s32 arg1, s32 arg2) {
 
 s32 func_8004D314(s32 arg0, s32 arg1) { s32 result = -1; if (arg0 == 0xEF && arg1 == 0) result = 0; return result; }
 
-typedef struct TextureSelectionState {
-    /* 0x00 */ s16 index;
-    /* 0x02 */ s16 spacing;
-    /* 0x04 */ u8* texture;
-} TextureSelectionState;
-extern TextureSelectionState D_80128080;
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D334.s")
 
