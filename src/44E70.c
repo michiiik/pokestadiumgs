@@ -150,9 +150,52 @@ s32 func_80046540(s32 arg0, s32 arg1) {
     return (arg1 / arg0) & ~1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_8004657C.s")
+extern s32 StageContext_IsHighResolution(void);
+extern Gfx D_80094F70[];
+void func_8004657C(void) {
+    s32 width;
+    s32 height;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_80046634.s")
+    if (StageContext_IsHighResolution() != 0) {
+        width = 640;
+        height = 480;
+    } else {
+        width = 320;
+        height = 240;
+    }
+    gSPDisplayList(D_800D0510++, D_80094F70);
+    gDPSetScissor(D_800D0510++, G_SC_NON_INTERLACE, 0, 0, width, height);
+}
+
+void func_80046634(s32 image) {
+    s32 y;
+    s32 x;
+    s32 width;
+    s32 height;
+    s32 scale;
+    s32 step;
+
+    if (StageContext_IsHighResolution() != 0) {
+        width = 640;
+        height = 480;
+        scale = 512;
+        step = 32;
+    } else {
+        width = 320;
+        height = 240;
+        scale = 1024;
+        step = 16;
+    }
+    for (y = 0; y < height; y += step) {
+        for (x = 0; x < width; x += step) {
+            gDPLoadTextureBlock(D_800D0510++, (u8 *)image, G_IM_FMT_RGBA, G_IM_SIZ_16b, 16, 16, 0,
+                               G_TX_CLAMP, G_TX_CLAMP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
+            image += 0x200;
+            gSPTextureRectangle(D_800D0510++, x << 2, y << 2, (x + step) << 2, (y + step) << 2,
+                               G_TX_RENDERTILE, 0, 0, scale, scale);
+        }
+    }
+}
 
 extern void func_8004657C(void);
 extern void func_80046634(s32);
