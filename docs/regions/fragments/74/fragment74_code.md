@@ -85,3 +85,16 @@ compiler binaries, objects and ROMs stay local; none is published. The
 decomp-workbench executable is unavailable, so repository runner diagnostics
 and explicit controls are used instead; unavailable commands are not claimed
 as run. Generated coverage remains with the repository workflow.
+
+## Follow-up while PR #952 validates
+
+`func_8F6009F0` remains a requeue. Eight additional cells introduce an
+initialized, consumed configuration handle between creation and activation,
+vary the real next-state local, move repeat initialization to the outer
+loop, and put the switch default before the named cases. The handle local
+does not remove the extra mode-address register: best remains normalized
+0.9420 / raw 0.7681, 276 versus 264 bytes. Outer repeat initialization makes
+the dispatch worse (0.8551 / 0.5652). No source/declaration is installed.
+These are now 32 recorded loop cells. Next remains calibrated address-web
+diagnosis; do not replay the handle/default/repeat family. The two display
+owners published in #952 are unaffected by this rejected follow-up.
