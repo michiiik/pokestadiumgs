@@ -22,7 +22,41 @@ void func_8004E250(void *arg0, void *arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4EE50/func_8004E298.s")
+void func_8004E298(s32 arg0, u8 arg1, s32 arg2, s16 arg3, s16 arg4, s16 arg5, s16 arg6) {
+    typedef struct {
+        /* 0x00 */ u8 type;
+        /* 0x01 */ u8 flags;
+        /* 0x02 */ u16 status;
+        /* 0x04 */ s32 value;
+        /* 0x08 */ s16 a;
+        /* 0x0A */ s16 b;
+        /* 0x0C */ s16 c;
+        /* 0x0E */ s16 d;
+        /* 0x10 */ s32 next;
+        /* 0x14 */ s32 prev;
+        /* 0x18 */ s32 unk18;
+        /* 0x1C */ s32 unk1C;
+        /* 0x20 */ s32 unk20;
+    } TargetNodeInit;
+    TargetNodeInit *node = (TargetNodeInit *)(u32)arg0;
+    if (node != NULL) {
+        node->type = arg1;
+        node->flags = 0;
+        node->status = 0;
+        node->value = arg2;
+        node->a = arg3;
+        node->b = arg4;
+        node->c = arg5;
+        node->d = arg6;
+        node->status |= 1;
+        node->next = arg0;
+        node->prev = arg0;
+        node->unk18 = 0;
+        node->unk1C = 0;
+        node->unk20 = 0;
+        node->status |= 2;
+    }
+}
 
 typedef struct TargetGraphNode TargetGraphNode;
 typedef s32 (*TargetGraphCallback)(s32, struct TargetGraphNode*);
@@ -46,7 +80,7 @@ void func_8004E308(TargetGraphNode* arg0, TargetGraphCallback arg1, void* arg2) 
 }
 
 extern s32 MainPool_AllocAligned(s32, s32, s32);
-void func_8004E298(s32, s32, s32, s16, s16, s16, s16);
+void func_8004E298(s32, u8, s32, s16, s16, s16, s16);
 s32 func_8004E368(s32 arg0, s32 arg1) {
     if (arg0 != 0) {
         arg1 = MainPool_AllocAligned(arg0, 0x24, 4);
