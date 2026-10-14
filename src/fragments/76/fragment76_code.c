@@ -136,29 +136,198 @@ s32 func_8F700858(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/76/fragment76_code/func_8F700A54.s")
-#endif
-
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/76/fragment76_code/func_8F700B78.s")
-#endif
-
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/76/fragment76_code/func_8F700CA4.s")
-#endif
-
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/76/fragment76_code/func_8F700DC8.s")
-#endif
-
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/76/fragment76_code/func_8F700EF4.s")
-#endif
-
-#ifdef VERSION_US
-extern void func_800226C0(s32);
-extern void func_8F700EF4(void);
+typedef struct F76MenuEntry {
+    u8 kind, bank, column, row;
+    s32 minimum, maximum;
+    char label[32];
+    void* value;
+} F76MenuEntry;
+extern u8 D_8F702295, D_8F702291;
 extern s32 D_8F7023B0;
+void func_8F700A54(void) {
+    s32 index;
+    u8 column;
+    u8 row;
+    u8 bestIndex;
+    u8 wrapIndex;
+    u8 bestCoordinate;
+    u8 wrapCoordinate;
+    u8 coordinate;
+    bestIndex = D_8F7023B4;
+    wrapIndex = D_8F7023B4;
+    column = ((F76MenuEntry*)D_8F701358)[(u32)D_8F7023B4].column;
+    row = ((F76MenuEntry*)D_8F701358)[(u32)D_8F7023B4].row;
+    bestCoordinate = 0;
+    wrapCoordinate = row;
+    func_800226C0(1);
+    index = 0;
+    if (D_8F701358[0] != 8) {
+        do {
+            if (((F76MenuEntry*)D_8F701358)[index].bank == D_8F7023B0 &&
+                ((F76MenuEntry*)D_8F701358)[index].column == column) {
+                coordinate = ((F76MenuEntry*)D_8F701358)[index].row;
+                if (coordinate < row && coordinate >= bestCoordinate) {
+                    bestCoordinate = coordinate;
+                    bestIndex = index;
+                }
+                if (coordinate > wrapCoordinate) {
+                    wrapCoordinate = coordinate;
+                    wrapIndex = index;
+                }
+            }
+            index++;
+        } while (((F76MenuEntry*)D_8F701358)[index].kind != 8);
+    }
+    if (D_8F7023B4 == bestIndex) {
+        bestIndex = wrapIndex;
+    }
+    D_8F7023B4 = bestIndex;
+}
+#endif
+
+#ifdef VERSION_US
+void func_8F700B78(void) {
+    s32 index;
+    u8 column;
+    u8 row;
+    u8 bestIndex;
+    u8 wrapIndex;
+    u8 bestCoordinate;
+    u8 wrapCoordinate;
+    u8 coordinate;
+    bestIndex = D_8F7023B4;
+    wrapIndex = D_8F7023B4;
+    column = ((F76MenuEntry*)D_8F701358)[(u32)D_8F7023B4].column;
+    row = ((F76MenuEntry*)D_8F701358)[(u32)D_8F7023B4].row;
+    bestCoordinate = D_8F702295;
+    wrapCoordinate = row;
+    func_800226C0(1);
+    index = 0;
+    if (D_8F701358[0] != 8) {
+        do {
+            if (((F76MenuEntry*)D_8F701358)[index].bank == D_8F7023B0 &&
+                ((F76MenuEntry*)D_8F701358)[index].column == column) {
+                coordinate = ((F76MenuEntry*)D_8F701358)[index].row;
+                if (coordinate > row && coordinate <= bestCoordinate) {
+                    bestCoordinate = coordinate;
+                    bestIndex = index;
+                }
+                if (coordinate < wrapCoordinate) {
+                    wrapCoordinate = coordinate;
+                    wrapIndex = index;
+                }
+            }
+            index++;
+        } while (((F76MenuEntry*)D_8F701358)[index].kind != 8);
+    }
+    if (D_8F7023B4 == bestIndex) {
+        bestIndex = wrapIndex;
+    }
+    D_8F7023B4 = bestIndex;
+}
+#endif
+
+#ifdef VERSION_US
+void func_8F700CA4(void) {
+    s32 index;
+    u8 column;
+    u8 row;
+    u8 bestIndex;
+    u8 wrapIndex;
+    u8 bestCoordinate;
+    u8 wrapCoordinate;
+    u8 coordinate;
+    bestIndex = D_8F7023B4;
+    wrapIndex = D_8F7023B4;
+    column = ((F76MenuEntry*)D_8F701358)[(u32)D_8F7023B4].column;
+    row = ((F76MenuEntry*)D_8F701358)[(u32)D_8F7023B4].row;
+    bestCoordinate = 0;
+    wrapCoordinate = column;
+    func_800226C0(1);
+    index = 0;
+    if (D_8F701358[0] != 8) {
+        do {
+            if (((F76MenuEntry*)D_8F701358)[index].bank == D_8F7023B0 &&
+                ((F76MenuEntry*)D_8F701358)[index].row == row) {
+                coordinate = ((F76MenuEntry*)D_8F701358)[index].column;
+                if (coordinate < column && coordinate >= bestCoordinate) {
+                    bestCoordinate = coordinate;
+                    bestIndex = index;
+                }
+                if (coordinate > wrapCoordinate) {
+                    wrapCoordinate = coordinate;
+                    wrapIndex = index;
+                }
+            }
+            index++;
+        } while (((F76MenuEntry*)D_8F701358)[index].kind != 8);
+    }
+    if (D_8F7023B4 == bestIndex) {
+        bestIndex = wrapIndex;
+    }
+    D_8F7023B4 = bestIndex;
+}
+#endif
+
+#ifdef VERSION_US
+void func_8F700DC8(void) {
+    s32 index;
+    u8 column;
+    u8 row;
+    u8 bestIndex;
+    u8 wrapIndex;
+    u8 bestCoordinate;
+    u8 wrapCoordinate;
+    u8 coordinate;
+    bestIndex = D_8F7023B4;
+    wrapIndex = D_8F7023B4;
+    column = ((F76MenuEntry*)D_8F701358)[(u32)D_8F7023B4].column;
+    row = ((F76MenuEntry*)D_8F701358)[(u32)D_8F7023B4].row;
+    bestCoordinate = D_8F702291;
+    wrapCoordinate = column;
+    func_800226C0(1);
+    index = 0;
+    if (D_8F701358[0] != 8) {
+        do {
+            if (((F76MenuEntry*)D_8F701358)[index].bank == D_8F7023B0 &&
+                ((F76MenuEntry*)D_8F701358)[index].row == row) {
+                coordinate = ((F76MenuEntry*)D_8F701358)[index].column;
+                if (coordinate > column && coordinate <= bestCoordinate) {
+                    bestCoordinate = coordinate;
+                    bestIndex = index;
+                }
+                if (coordinate < wrapCoordinate) {
+                    wrapCoordinate = coordinate;
+                    wrapIndex = index;
+                }
+            }
+            index++;
+        } while (((F76MenuEntry*)D_8F701358)[index].kind != 8);
+    }
+    if (D_8F7023B4 == bestIndex) {
+        bestIndex = wrapIndex;
+    }
+    D_8F7023B4 = bestIndex;
+}
+#endif
+
+#ifdef VERSION_US
+void func_8F700EF4(void) {
+    s32 index = 0;
+    if (D_8F701358[0] != 8) {
+        do {
+            if (D_8F701358[index * 0x30 + 1] == D_8F7023B0) {
+                D_8F7023B4 = index;
+                return;
+            }
+            index++;
+        } while (D_8F701358[index * 0x30] != 8);
+    }
+}
+#endif
+
+#ifdef VERSION_US
+extern void func_8F700EF4(void);
 void func_8F700F48(void) {
     func_800226C0(1);
     D_8F7023B0 = D_8F7023B0 + 1;
@@ -181,11 +350,8 @@ void func_8F700F90(void) {
 #endif
 
 #ifdef VERSION_US
-extern u8 D_8F701358[];
 extern u8 D_8F702361;
-extern s32 D_8F7023B4;
 extern s32 D_8F7023B8;
-extern void func_800226C0(s32);
 extern void func_8F70058C(u8);
 void func_8F700FD8(void) {
     s32 temp_v0;
@@ -203,7 +369,6 @@ void func_8F700FD8(void) {
 #endif
 
 #ifdef VERSION_US
-extern s32 D_8F7023B4;
 
 void func_8F70104C(void) {
     func_800226C0(3);
@@ -297,7 +462,6 @@ extern void func_800088DC();
 extern void func_80064D28();
 extern void func_8F700420();
 extern void func_8F70107C();
-extern s32 D_8F7023B8;
 void func_8F7011C8(void) {
     do {
         func_80064D28();
@@ -312,11 +476,7 @@ void func_8F7011C8(void) {
 #ifdef VERSION_US
 extern void func_8F700538(u8);
 extern u8 D_8F702360;
-extern u8 D_8F702361;
 extern u8 D_8F7023AC;
-extern s32 D_8F7023B0;
-extern s32 D_8F7023B4;
-extern s32 D_8F7023B8;
 void func_8F701224(void) {
     u8 value;
     D_8F7023B0 = 0;
