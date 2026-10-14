@@ -600,3 +600,36 @@ family or add unused locals to pad the missing 24 bytes. Next action is a
 different, compiler-faithful representation of the real floating/rectangle
 working state, preserving the now-exact RGB tree and the accepted atlas sibling
 as controls. All generators and probe outputs stay local.
+
+### Accepted background renderer, 2026-10-15
+
+`func_82910510` now has full-ROM-accepted matching C. This closes the preceding
+background requeues; do not resume their rejected scalar or padding hypotheses
+once the pragma is gone.
+
+The winning source groups only real values into a local eight-field work record:
+the texture pointer, scale, derivative, signed rounding bias, interior width,
+the height-check/inset carrier, and the two output coordinates. Each field is
+written and consumed. The output coordinates are computed from the original
+signed inputs plus five and passed to the real rectangle helper. This is actual
+working storage, not an unused field or frame-padding device.
+
+Eight working-state cells vary the presence of the real rounded-result,
+coordinate and dimension carriers. The coordinate pair, without a separate
+rounded-result or final-dimension pair, gives 140/140 raw words, 560 bytes and
+the original 0x58 frame. The normal runner accepts
+`f67:background:real-working-state-2`, link_verified true, auto_gated true, one
+combined full-ROM gate. The scalar parent and seven other cells are not adopted.
+
+Preserve the original null/scale/width/height guard ordering, unsigned texture
+width conversion, +/-0.5 float rounding and actual SDK packed-color tree. The
+paired transaction corrects the existing forward declaration to the accepted
+signed-coordinate interface; the already accepted caller remains byte-identical.
+Post-acceptance cleanup removes duplicate externs and the now-redundant forward
+declaration. A fresh default-check native full-ROM comparison passes after that
+cleanup, MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`.
+
+The naming-tool plan has no evidence-backed mapping for this owner, so its
+address-keyed name remains. No helper function, scratch script, proprietary
+compiler artifact, ROM, forced register, padding, or object rewrite is published.
+Four assembly owners remain in this file and still need separate acceptance.
