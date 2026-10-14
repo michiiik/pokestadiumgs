@@ -131,7 +131,8 @@ K&R formals were also unhelpful. Next action: isolate the global-address
 and status-pointer allocation (retail a3/a2, baseline t0/a3), not repeat
 the same guard or index spellings.
 
-`func_8820C114`: **requeue**, ordinary source cells keep 328 bytes and a
+`func_8820C114`: prior **requeue**, now resolved by the local initializer
+acceptance below. Ordinary source cells kept 328 bytes and a
 0x50 frame instead of retail 324 bytes / 0x48. Global reads, K&R formals
 and eight float-lifetime/declaration cells do not change that output.
 Eight address-exposure/real parameter-pointer and local-width cells are
@@ -294,3 +295,77 @@ entire ROM match retail, MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`.
 Exactly five removed pragmas have accepted link-verified gate provenance.
 Naming plan has no established mappings. Eight assembly owners remain in
 this file. No scratch helpers, tooling, compiler, linker or layout changes.
+
+## Scroll initializer: accepted
+
+`func_8820C114`: 81 words / 324 bytes, frame 0x48. Batch
+`f2871972bbf14c67b5f73d47a3300fbc`, winner
+`f31:init-inline-count:lt:ternary-False:zero-False`, is link-verified and
+passes its normal combined full-ROM gate. This is separate from the five
+functions merged in PR #970 and is part of the following batch.
+
+Typed state list/record fields first recover the retail opcode sequence,
+including the incoming-byte reload, but explicit count/TV-rate/float
+locals put flags in the wrong frame. Changing their declaration order
+does not explain the original spills. The target comes from call-bearing
+arguments: keep the count query inline and round with
+`600.0f / func_80001FF0() + (0.0f < (600.0f / func_80001FF0()) ? 0.5f : -0.5f)`.
+Only the real s16 flags remains a named local. The compiler spills the
+count at 0x3B and first TV-rate return at 0x3C, with flags at 0x46; no
+padding, dummy locals or prototype experiments are required. Both real
+TV-rate calls are preserved. The flags if/else form matters; a ternary
+changes the branch words.
+
+Formatting, scoped duplicate cleanup, fresh and 20-leading-blank native
+controls preserve every accepted object section, all twenty previous C
+bodies and all original function offsets. The entire ROM remains retail
+MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`. Naming plan has no established
+mapping. Seven assembly owners remain locally in this file.
+
+## Accepted setup, initializer and texture renderer batch
+
+Three larger owners, 536 instructions / 2144 bytes, are accepted with
+`link_verified: true` and normal combined full-ROM gates:
+
+| Owner | Words / bytes | Frame | Accepted batch |
+| --- | ---: | ---: | --- |
+| `func_8820C114` | 81 / 324 | 0x48 | `f2871972bbf14c67b5f73d47a3300fbc` |
+| `func_8820C258` | 257 / 1028 | 0x158 | `bcd55ba6f3034151bd525fa1946b4ee9` |
+| `func_8820E6A4` | 198 / 792 | 0x38 | `cde54bb886394292adc76f50f7504660` |
+
+- Initializer: winner and call-expression explanation above. No fake stack
+  padding or float temporaries are needed.
+- Setup: `f31:setup-callback-symbol:enable-chain:clear-plain`. Keep the u32
+  loop index before the pool pointer and the real chained enable assignment
+  `D_880068B4 = D_880068B8 = 1`. Separate literal assignments omit the address
+  materialization and change the following constant scheduling. Keep the two
+  zero assignments separate. All 79 constructor arguments were recovered
+  from the straight-line register/stack stores and independently checked
+  against the callee: 76 signed halfwords, two bytes, then the teardown
+  callback. Use its complete fixed prototype, not the exploratory varargs
+  declaration. Preserve the original `D_88000E4C` callback symbol. The first
+  instruction hits failed link/gate because the draft had incorrectly
+  spelled it `func_88000E4C`; no alias or guessed symbol was installed.
+  The corrected source independently passes object, link and full-ROM gates.
+- Texture renderer: `f31:category-textures:typed-False:category-first-True:early-False`.
+  Keep category before texture, the typed current-list guard, signed first
+  dimensions and unsigned second texture-coordinate calculation. Normal SDK
+  pipe-sync/environment-colour macros and the existing narrow rectangle
+  helper signature match directly; no raw display-list writes or API
+  experiment is needed. Reversing the two local declarations swaps their
+  stack homes. The unused exploratory texture typedef is removed afterward.
+
+After formatting and scoped extern cleanup, fresh and 20-leading-blank
+builds reproduce every accepted object section, all twenty previous C
+bodies and all 28 original function offsets. All twenty-three linked C spans
+and the entire ROM match retail, MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`.
+Exactly three removed pragmas have accepted link-verified gate provenance.
+Naming plan has no established mappings. Five assembly owners remain in
+this source. No compiler, tooling, linker, YAML or data-layout changes.
+
+The row predicate received eight real loaded-selection-local cells (u8,
+s32, u32, s16, both comparison orders). All reject at 304 bytes, raw 0.3421;
+they change allocation/control ordering instead of closing the prior
+three-operand residual. No local or rejected predicate source is installed.
+Next action remains comparison-lowering forensics on the preserved near-match,
+not another local-width or textual operand-order sweep.

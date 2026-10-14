@@ -69,11 +69,102 @@ u8* func_8820C040(s32 mode, u8 slot) {
     return func_88A00710(*(s32*)((u8*)D_88234710 + index * 4 + 12), position);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820C114.s")
-
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820C258.s")
-
 extern u8 func_88A007BC(s32);
+extern s32 func_80001FF0(void);
+extern void func_88001C6C(void*, u16, u8, s16, u8, s16, s16, s16, s16, s16, s32);
+void func_8820C114(u8 slot, s32 list) {
+    s16 flags;
+
+    if (*(s32*)((u8*)D_88234710 + 4)) {
+        flags = 12;
+    } else {
+        flags = 0xF0C;
+    }
+    ((F31SelectionState*)D_88234710)->list[slot] = list;
+    /* Keep the count query and two-call rounding expression inline. */
+    func_88001C6C(&((F31SelectionState*)D_88234710)->records[slot],
+                 func_88A007BC(((F31SelectionState*)D_88234710)->list[slot]), 8, 125, 27, 14,
+                 (s32)(600.0f / func_80001FF0() + (0.0f < (600.0f / func_80001FF0()) ? 0.5f : -0.5f)),
+                 43, 43, flags, 70);
+}
+
+extern s32 main_pool_push_state(s32);
+extern s32 mem_pool_try_init(s32, s32);
+extern void* mem_pool_alloc(void*, s32);
+extern s32 func_8004C4B0(s32);
+extern s32 func_8004C8C0(u16);
+extern s32 func_8004C990(s32, s32);
+extern s32 D_882345D0;
+extern s8 D_88006868;
+extern s32 func_800606F4(s32);
+extern void func_88A00D0C(void*);
+extern s32 D_80087200;
+extern void Input_SetRepeatController(s32);
+extern s32 D_880068B8;
+extern s32 D_880068B4;
+extern s32 D_88234714;
+extern void func_88205EB0(
+    s16, s16, s16, s16, s16, s16, s16, s16, s16, s16,
+    s16, s16, s16, s16, s16, s16, s16, s16, s16, s16,
+    s16, s16, s16, s16, s16, s16, s16, s16, s16, s16,
+    s16, s16, s16, s16, s16, s16, s16, s16, s16, s16,
+    s16, s16, s16, s16, s16, s16, s16, s16, s16, s16,
+    s16, s16, s16, s16, s16, s16, s16, s16, s16, s16,
+    s16, s16, s16, s16, s16, s16, s16, s16, s16, s16,
+    s16, s16, s16, s16, s16, s16, u8, u8, void (*)(void));
+extern s32 func_8004C54C(s32, s32);
+extern u8 D_8800686D;
+extern void* func_8004C8A0(void*, s32, s32, s32);
+extern void func_88005B60(s32, void (*)(void), void (*)(void), void (*)(void));
+extern void D_88000E4C(void);
+extern s32 D_882346F0;
+extern s32 D_88234718;
+void func_8820C258(void) {
+    u32 index;
+    void* pool;
+
+    main_pool_push_state(0x41525249);
+    pool = (void*)(u32)mem_pool_try_init(0x14000, 0);
+    D_88234710 = mem_pool_alloc(pool, 0xC8);
+    func_8004C4B0(0x21);
+    func_8004C4B0(9);
+    func_8004C4B0(11);
+    func_8004C8C0(28);
+    D_882345D0 = func_8004C990(28, 0);
+    if (func_800606F4(D_88006868)) {
+        *(u16*)((u8*)D_88234710 + 0xC4) = 20;
+    } else {
+        *(u16*)((u8*)D_88234710 + 0xC4) = 19;
+    }
+    func_8004C8C0(*(u16*)((u8*)D_88234710 + 0xC4));
+    func_88A00D0C(pool);
+    *(u8*)D_88234710 = 0;
+    *(s32*)((u8*)D_88234710 + 4) = 1;
+    *(s16*)((u8*)D_88234710 + 8) = 0;
+    *(u8*)((u8*)D_88234710 + 0xAC) = 0;
+    func_8820C114(0, 0);
+    func_8820C114(1, 1);
+    for (index = 0; index != 2; index++) {
+        *(s32*)((u8*)D_88234710 + index * 4 + 0xB0) = 0;
+    }
+    Input_SetRepeatController(D_80087200);
+    D_882346F0 = 0;
+    D_880068B4 = D_880068B8 = 1;
+    D_88234714 = 0;
+    D_88234718 = 0;
+    func_88205EB0(44, 373, 553, 76, 44, 72, 242, 296, 49, 105,
+        229, 255, 355, 72, 242, 296, 360, 105, 229, 255,
+        52, 108, 223, 17, 52, 340, 223, 17, 363, 108,
+        223, 17, 363, 340, 223, 17, 289, 72, 63, 38,
+        52, 125, 223, 26, 363, 125, 223, 26, 251, 79,
+        363, 79, 61, 112, 256, 112, 372, 112, 567, 112,
+        136, 112, 154, 112, 154, 344, 174, 344, 447, 112,
+        465, 112, 465, 344, 485, 344, 5, 34, func_8820C000);
+    func_8004C54C(21, (s32)&D_8800686D);
+    func_8004C8A0((u8*)D_88234710 + 0x6C, 64, 33, 19);
+    func_88005B60(0, D_88000E4C, D_88000E4C, D_88000E4C);
+}
+
 extern void func_88001C24(void*, u16, u8);
 extern void func_88001D0C(void*);
 void func_8820C65C(u8 slot, s32 enabled) {
@@ -201,7 +292,6 @@ void func_8820CAE4(u8 slot, u8 type) {
 
 extern void* Util_Malloc(s32);
 extern void* D_8800EF54;
-extern s32 D_88234718;
 extern void func_800226C0(s32);
 extern void func_88231AE8(void);
 extern void func_88004990(u8, u8);
@@ -234,7 +324,6 @@ void func_8820CB74(void) {
     }
 }
 
-extern s32 D_882346F0;
 void func_8820CCA8(void) {
     s32 playSound = 1;
     s32 guarded;
@@ -335,9 +424,50 @@ s32 func_8820E580(void) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820E6A4.s")
-
 extern s16 D_8800EF58;
+extern Gfx* D_800D0510;
+extern s32 func_8004D1FC(u8*);
+extern s32 func_8004D19C(s32, s32, s32, s32, s32);
+extern void func_80044270(s16, s16, s16, s16, s16, s16, s16, s16, s32);
+void func_8820E6A4(void) {
+    s32 category;
+    u8* texture;
+
+    if (D_8800EF58 == 0 && func_8800005C() == 0 && ((F31SelectionState*)D_88234710)->list[((F31SelectionState*)D_88234710)->slot] == 0 && func_88A007BC(((F31SelectionState*)D_88234710)->list[((F31SelectionState*)D_88234710)->slot]) != 0) {
+        category = func_8820E580();
+        texture = (u8*)(u32)func_8004C990(*(u16*)((u8*)D_88234710 + 0xC4), 0);
+        func_8004D1FC((u8*)texture);
+        gDPPipeSync(D_800D0510++);
+        if (category == 0) {
+            gDPSetEnvColor(D_800D0510++, 40, 130, 255, 255);
+        } else {
+            gDPSetEnvColor(D_800D0510++, 255, 255, 255, 255);
+        }
+        func_80044270(63, 402, *(s16*)texture, *(s16*)(texture + 2), -16, -16, 1024, 1024, 0);
+        gDPPipeSync(D_800D0510++);
+        if (category == 2) {
+            gDPSetEnvColor(D_800D0510++, 240, 130, 10, 255);
+        } else {
+            gDPSetEnvColor(D_800D0510++, 255, 255, 255, 255);
+        }
+        func_80044270(89, 402, (s16)(*(u16*)texture), *(s16*)(texture + 2), (*(u16*)texture) * 32 - 16, -16, -1024, 1024, 0);
+        gDPPipeSync(D_800D0510++);
+        if (category == 3) {
+            gDPSetEnvColor(D_800D0510++, 255, 70, 140, 255);
+        } else {
+            gDPSetEnvColor(D_800D0510++, 255, 255, 255, 255);
+        }
+        func_8004D19C(70, 392, func_8004C990(*(u16*)((u8*)D_88234710 + 0xC4), 1), 0, 0);
+        gDPPipeSync(D_800D0510++);
+        if (category == 1) {
+            gDPSetEnvColor(D_800D0510++, 100, 255, 100, 255);
+        } else {
+            gDPSetEnvColor(D_800D0510++, 255, 255, 255, 255);
+        }
+        func_8004D19C(74, 409, func_8004C990(*(u16*)((u8*)D_88234710 + 0xC4), 2), 0, 0);
+    }
+}
+
 extern void* Color_SetRGB(void*, u8, u8, u8);
 extern void func_880006E0(void*);
 extern void func_800496A4(s32, s32);
@@ -369,7 +499,6 @@ void func_8820E9BC(void) {
     }
 }
 
-extern Gfx* D_800D0510;
 void func_8820EB14(u8 selected, u8* record) {
     s32 type = func_8006378C(record[0]);
 
