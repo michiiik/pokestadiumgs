@@ -584,7 +584,61 @@ void PokeIcon_AdjustImageColors(u16* arg0, s32 a1, S1_arg1_func_80010CA8 arg2) {
     // clang-format on
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D878.s")
+typedef struct Result_8004B9E0 {
+    s32 value;
+} Result_8004B9E0;
+typedef union ResourceIconTint {
+    S1_arg1_func_80010CA8 tint;
+    Result_8004B9E0 result;
+} ResourceIconTint;
+extern S1_arg1_func_80010CA8 func_8003F5AC(u8*);
+extern s32 func_80064728(u8*);
+extern s32 func_8003F954(u16);
+extern s32 func_8006456C(s32);
+extern s32 func_8004B98C(s32);
+extern Result_8004B9E0 func_8004B9E0(s32);
+typedef struct ResourceIconWork {
+    s32 mode;
+    ResourceIconTint color;
+    s32 variant;
+} ResourceIconWork;
+u8* func_8004D878(u8* destination, s32 id, u8* mon) {
+    u8* result = NULL;
+    ResourceIconWork* selected;
+    ResourceIconWork work;
+    u8* record;
+    work.variant = 0;
+    if (D_80097120 != 0) {
+        if (mon == NULL) {
+            result = func_8004D720(destination, id, 0, 0);
+        } else {
+            work.color.tint = func_8003F5AC(mon);
+            work.mode = 0;
+            id = func_80064728(mon);
+            if (id == 0xEB) {
+                work.variant = func_8003F954(*(u16*)(mon + 0x16));
+            }
+            if (func_8006456C(*(u16*)(mon + 0x16)) != 0) {
+                work.mode = func_8004B98C(id);
+                switch (work.mode) {
+                case 1:
+                    work.color.tint.raw = 0;
+                    break;
+                case 2:
+                    work.color.result = func_8004B9E0(id);
+                    break;
+                }
+            }
+            selected = &work;
+            record = mon;
+            result = func_8004D720(destination, func_80064728(record), selected->mode == 1, selected->variant);
+            if (result != NULL && selected->color.tint.raw != 0) {
+                PokeIcon_AdjustImageColors((u16*)destination, 0x640, selected->color.tint);
+            }
+        }
+    }
+    return result;
+}
 
 extern void Gfx_DrawTextureRgba16(s16, s16, s16, s16, u8 *, s16, s32);
 void func_8004D998(s32 arg0, s32 arg1, u8 *arg2, s32 arg3, s32 arg4) {
@@ -797,7 +851,32 @@ void *func_8004DFEC(s32 arg0, s32 arg1, Func8004DFECArg arg2) {
     return func_8004E018(arg0, arg1, 0, arg2);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004E018.s")
+extern u8* func_80040E80(s32, void*);
+extern void func_80040F60(u8*, Func8004DFECArg);
+void* func_8004E018(s32 pool, s32 id, s32 index, Func8004DFECArg tint) {
+    s32 entry;
+    u8* result = NULL;
+    s32 archive;
+    s32 callback;
+    HandlerResult_DE84D* descriptor;
+    entry = func_8004DE84(id, index);
+    if (entry != 0) {
+        archive = *(s32*)((u8*)(u32)D_80097120 + 0x24);
+        result = func_80040E80(pool, (void*)(u32)entry);
+        if (result != NULL) {
+            callback = func_8004C3B0(archive, id);
+            descriptor = ((HandlerResult_DE84D* (*)(s32,s32))(u32)callback)(0, 0);
+            *(s32*)(result + 0x2C) = callback;
+            if (tint.value != NULL) {
+                func_80040F60(result, tint);
+            }
+            if (index < ((u8*)descriptor)[3]) {
+                descriptor->table[index] = (s32)result;
+            }
+        }
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004E0F0.s")
 #endif
