@@ -17,8 +17,8 @@ s32 fragment29_main(u8 arg0) {
     return result;
 }
 
-void func_8800005C(void) {
-    fragment29_main(D_8800686C);
+s32 func_8800005C(void) {
+    return fragment29_main(D_8800686C);
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_166060/func_88000080.s")
