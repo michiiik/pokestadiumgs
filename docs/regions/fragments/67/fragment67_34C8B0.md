@@ -312,3 +312,68 @@ Owner `.text` remains exactly `0x1D50` bytes; owned `.rodata` is exactly `0x30`
 bytes. The linked map places the three strings and table at their original
 retail addresses and the tail at `0x829177F0`. This is a verified layout
 prerequisite, not dispatcher acceptance or increased matching-C coverage.
+
+### Requeue: layout-ready func_82910258
+
+The six entries map states 0..5 to the physical case order in assembly. The
+signed timer is at flow offset 0, completion flag at 2 and unsigned phase at 4.
+Preserve postincrement comparisons against old timer values 15 and 12, both
+duplicate 0xA9 audio calls, the two independent 50/50 Y steps, flag/fade setup,
+the bounded 101 timer, the event at 85, fade completion plus timer >=86, the
+60-frame input wait with button bit 0x8000 at input offset 8, both final X steps
+at 70/70, and the unconditional completion flag in state 4. Unknown phase
+values leave state unchanged. No input-null or range guards are added.
+
+Forty-eight normal probes, all statistics enabled, yield no acceptance. Best
+uses direct record coordinates, unsigned phase and the original postincrement
+tests: normalized 0.9885/raw 0.7816, correct 696-byte owner and 0x18 frame.
+The first reported difference is the table's relocated LO16 field (0 versus
+0xC), not proof of a semantic table error. Genuine mismatches remain at the
+case-1 branch/constant scheduling and case-2 flag-check/load scheduling.
+The jump-table case mapping and owned 0x30-byte section are independently known.
+
+Bounded negatives cover direct versus existing coordinate aliases, actual
+Boolean/transition carriers and scopes, compound conditions versus guards,
+chained flag stores, signed phase plus a u16 dispatch cast, cached unsigned
+phase, de Morgan predicate trees, multiline conditions and real comma-sequenced
+assignments/calls. Signed phase adds LH/ANDI instead of the required LHU;
+cached phase shifts the selector from t6 to v0; chained stores grow to 700
+bytes. The unsigned transition and predicate variants do not repair the two
+scheduling sites. No draft or declaration transaction is installed.
+
+Next action: a calibrated schedule/allocator discriminator on the retained
+696-byte parent, not another broad scalar/guard replay. Account for table and
+interior-field relocation spelling before interpreting a permuter floor.
+Keep all six table entries and all three existing strings in the calibration;
+a standalone target omitting the 12-byte string prefix is not the full object's
+rodata context. Authoritative acceptance still requires the full linked ROM.
+
+### Atlas storage follow-up
+
+Eight record/union cells separate actual top-row texture S, side texture S and
+bottom texture S. The optional union overlays top S with interior height only
+after top S's final read. All fields are written/read with real geometry roles;
+there is no filler. None improves the parent: 1008 bytes remain but frame is
+0xC8, raw 0.9087 for the ordinary record and 0.8413 for the overlap. Keep the
+original late-coordinate scalar parent; this is a bounded storage negative.
+
+A calibrated 180-second stock native search on that scalar parent verifies
+base/probe and assembly-target/current-build words, then descends 528 to 358
+without zero. The 358 output is token-identical physical-line grouping over
+the first render setup; it is semantically valid but not normal-runner or ROM
+acceptance. The 508 pipe-sync grouping is also a valid retained layout witness.
+Other outputs contain mask scaffolding or an unused renderer-word assignment
+and are rejected. Next follow-up must test reviewed layouts through the normal
+oracle and recover a readable macro spelling, not promote mutation scores.
+
+### Final prerequisite controls
+
+Fresh final-source/build/20-leading-blank controls reproduce both complete
+`.text` and `.rodata`, all ten accepted C siblings and the unchanged assembly
+dispatcher. The string prefix is exactly three copies of `25 73 00 00`; the
+owned section preserves its final 12 zero bytes. Complete linked text and
+`0x3542C0..0x3542F0` rodata match retail. Final native full-ROM comparison passes
+with default syntax checks and MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`.
+Separate cc-check passes all 427 C sources. No tools, generated matching asm,
+objects, proprietary compiler artifacts or ROMs are published. This prerequisite
+does not claim any new function is decompiled or alter generated coverage.
