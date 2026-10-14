@@ -54,3 +54,66 @@ updates, conditional scaling and flag clearing. Do not invent eight padding
 bytes: the oracle has real duplicated/scheduled case loads and control transfers.
 Next action is a calibrated control-flow/statement-line discriminator on the
 closest complete body, not more record-field typing or arbitrary guards.
+
+## 2026-10-14: coordinate requeue resolved and scissored overlay accepted
+
+`func_82E00700` now has a normal sequential full-ROM acceptance:60 instructions
+/240 bytes, leaf. Fresh instruction inspection disproves padding as the missing
+size:the original first stores the byte-pair width through the direct label,
+materializes the coordinate base later, and reloads width before scaling.
+One unified typed view lets IDO cache width and hoist its address. Eight address
+variants and a calibrated scalar-declaration control retain that mismatch.
+Eight explicit volatile-access diagnostic variants recover the reload but not
+the separate address setup; they are not installed.
+
+An explicit structured linker alias, `D_82E06138_view = D_82E06138`, expresses
+the overlapping access view without allocating storage. Direct first-store
+access plus this view for coordinate stores and the conditional width reload
+reproduces all60 instruction words apart from equivalent relocation spelling.
+No volatile access, invented padding, extra function, guard or compiler patch.
+The alias-only baseline first passes COMPARE=1; the existing unverified probe
+hit then passes the normal sequential gate. link_verified=false due solely to
+the alias relocation target, so the full ROM is the acceptance oracle, not the
+object comparison. Gate after40 prior probes:4.840s probe /1.745s gate /
+6.588s total. This resolves the prior coordinate requeue above; it does not
+claim the original source used these particular names.
+
+`func_82E02F00`:108 instructions /432 bytes, leaf. Existing prototype requires
+u8 opacity; the initial s32 draft's compile failure is declaration evidence,
+not a scored hypothesis. Use gSPDisplayList, gDPSetEnvColor with255-opacity,
+and gSPScisTextureRectangle for the shifted320x240 rectangle and clipped
+texture coordinates. The ordinary literal/shift spelling accepts with
+link_verified=true and a combined full-ROM gate:6.251s probe /1.394s gate /
+7.648s total. No manual command-word stores or helper functions.
+
+The adjacent renderers remain GLOBAL_ASM, with durable requeues:
+
+- `func_82E02AA4`:128 instructions /512 bytes,0x40 frame. Correct RGBA16
+  load-block macros and16x16 rectangles cover the320x240 image, advancing
+  its pointer by512 bytes. Literal-only bounds spill heavily; named width /
+  height plus y-before-x locals gives normalized1.0/raw0.9141 at exact size
+  and frame. Remaining differences rotate the row-coordinate s1/s2 webs and
+  inner x counter t3/t4. Explicit row temporaries, next-X reuse and eight
+  declaration orders do not close it. A stock-native90-second permuter is
+  calibrated with base/probe and target/oracle instruction identity; score
+ 455 ->75, no zero. Its best expanded source wraps commands in a do/while(0)
+  group; do not publish that diagnostic scaffold or flattened command words.
+  Next action:measure the row-web demand/scope mechanism and translate any
+  useful result back to ordinary GBI macro source, then re-probe and gate.
+- `func_82E02CCC`:121 instructions /484 bytes,0x30 frame. RGBA16 load-tile
+  macros draw320x6 strips across240 rows, advancing3840 bytes per strip.
+  Named bounds and explicit next-row reuse reach normalized1.0/raw0.9091 at
+  exact size/frame. Signed/unsigned narrow coordinate carriers and operand
+  order do not improve it. Next action:calibrate a bounded search from the
+  complete best body, focusing on horizontal-coordinate and counter webs,
+  not more literal-vs-local or narrow-coordinate variants.
+
+Scratch generators, permuter output and diagnostic objects remain local.
+Final cleanup removes the new redundant display-list-pointer declaration.
+The naming plan has no independent existing mappings for either new owner.
+Native COMPARE=1 retains MD51561c75d11cedf356a8ddb1a4a5f9d5d; all427 host
+syntax checks pass. Fresh final-source/build/20-leading-blank controls agree
+across the entire file's .text, both new functions and all selected siblings.
+Both new linked retail spans match; git diff --check passes. The two alias
+symbols resolve to the same linked address. No generated tools or artifacts
+are part of the change; project-wide decompilation remains unfinished.

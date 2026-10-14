@@ -20,7 +20,35 @@ extern s32 D_82E0713C;
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/66/fragment66_code/func_82E00700.s")
+/* Same storage as D_82E06138 (aliases.ld), with the callback's coordinate view.
+ * Keep the direct scalar store separate from the following structured accesses. */
+extern F66ViewState D_82E06138_view;
+extern s32 D_82E05650;
+s32 func_82E00700(s32 kind, u8* event) {
+    switch (kind) {
+    case 0:
+        switch (*(u32*)(event + 0x20)) {
+        case 0:
+            D_82E06138.value = event[0x2B] + (event[0x2A] << 8);
+            D_82E06138_view.x = *(s16*)(event + 8) - 160;
+            D_82E06138_view.y = 120 - *(s16*)(event + 0xA);
+            if (D_82E05650 == 0) {
+                D_82E06138_view.value = (D_82E06138_view.value * 5) / 6;
+            }
+            *(u16*)(event + 2) &= 0xFFFE;
+            break;
+        case 1:
+            D_82E06138_view.secondX = *(s16*)(event + 8) - 160;
+            D_82E06138_view.secondY = 120 - *(s16*)(event + 0xA);
+            *(u16*)(event + 2) &= 0xFFFE;
+            break;
+        }
+        break;
+    case 1:
+        break;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -370,7 +398,14 @@ void func_82E02EB0_padding3(void) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/66/fragment66_code/func_82E02F00.s")
+extern Gfx D_82E05500[];
+void func_82E02F00(s32 x, s32 y, u8 opacity) {
+    gSPDisplayList(D_800D0510++, D_82E05500);
+    gDPSetEnvColor(D_800D0510++, 0, 0, 0, 255 - opacity);
+    gSPScisTextureRectangle(D_800D0510++, x << 2, y << 2,
+                           (x + 320) << 2, (y + 240) << 2,
+                           G_TX_RENDERTILE, 0, 0, 0x400, 0x400);
+}
 #endif
 
 #ifdef VERSION_US
