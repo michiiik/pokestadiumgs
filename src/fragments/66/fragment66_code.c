@@ -2,6 +2,16 @@
 
 
 #ifdef VERSION_US
+typedef struct F66ViewState {
+    s32 value;
+    s32 x;
+    s32 y;
+    s32 unused0C;
+    s32 secondX;
+    s32 secondY;
+} F66ViewState;
+extern F66ViewState D_82E06138;
+extern s32 D_82E0713C;
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/66/fragment66_code/func_82E00020.s")
 #endif
 
@@ -46,7 +56,25 @@ s32 func_82E007F0(s32 arg0, u8 *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/66/fragment66_code/func_82E01898.s")
+extern s32 D_82E05650;
+s32 func_82E01898(s32 kind, u8* event) {
+    s32 numerator = 5;
+    s32 denominator = 6;
+    switch (kind) {
+    case 0:
+        D_82E06138.value = event[0x29] + (event[0x28] << 8);
+        D_82E0713C = event[0x2B] + (event[0x2A] << 8);
+        if (D_82E05650 == 0) {
+            D_82E06138.value = ((event[0x29] + (event[0x28] << 8)) * numerator) / denominator;
+            D_82E0713C = ((event[0x2B] * numerator) / denominator) + (event[0x2A] << 8);
+        }
+        *(u16*)(event + 2) &= 0xFFFE;
+        break;
+    case 1:
+        break;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -141,7 +169,46 @@ s32 func_82E0248C(s32 arg0, u8 *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/66/fragment66_code/func_82E02508.s")
+extern s32 func_80001FF0(void);
+extern s32 main_pool_get_available(void);
+extern void* MainPool_AllocState(s32, s32);
+extern void MainPool_FinalizeAllocation(void*);
+extern s32 func_80040E80(void*, void*);
+extern void* func_800071A4(s32, s32, s32, s32, s32);
+extern void ModelRenderer_InitDisplayRoots(void);
+extern void func_8003F018(void*);
+extern s32 main_pool_push_state(s32);
+extern void func_82E04040(s32);
+extern void func_80021ED8(s32);
+extern u8 D_82E04EB0[], D_82E04F1C[], D_82E04F50[];
+extern u8 D_82E05660[], D_82E057C8[];
+extern s32 D_82E05650, D_82E05654, D_82E05658, D_82E0565C;
+extern s32 D_82E0543C;
+extern void* D_82E07600;
+extern void* D_82E07604;
+extern void* D_82E07608;
+void func_82E02508(void) {
+    void* pool;
+    if (func_80001FF0() == 60) {
+        D_82E05650 = 1;
+    } else {
+        D_82E05650 = 0;
+    }
+    pool = MainPool_AllocState(main_pool_get_available(), 0);
+    D_82E05654 = func_80040E80(pool, D_82E04EB0);
+    D_82E05658 = func_80040E80(pool, D_82E04F1C);
+    D_82E0565C = func_80040E80(pool, D_82E04F50);
+    MainPool_FinalizeAllocation(pool);
+    D_82E07600 = func_800071A4(0, 2, 320, 240, 0);
+    D_82E07604 = func_800071A4(0, 2, 320, 240, 0);
+    D_82E07608 = func_800071A4(0, 2, 320, 240, 0);
+    ModelRenderer_InitDisplayRoots();
+    func_8003F018(D_82E05660);
+    func_8003F018(D_82E057C8);
+    main_pool_push_state(0x64617461);
+    func_82E04040(D_82E0543C++);
+    func_80021ED8(0x52);
+}
 #endif
 
 #ifdef VERSION_US
@@ -151,7 +218,7 @@ extern void func_80007444(Gfx **, s32, s32, s32, s32, s32);
 extern void func_80007328(Gfx **, void *);
 extern void func_82E02CA4(s32);
 extern s32 func_8004D690(s32);
-extern void main_pool_push_state(s32);
+extern s32 main_pool_push_state(s32);
 extern void main_pool_pop_state(s32);
 extern void GeoRender_AdvanceFrameCounter(void);
 extern void func_8003C6B8(s32);
@@ -323,7 +390,24 @@ void func_82E02EB0_padding3(void) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/66/fragment66_code/func_82E04734.s")
+typedef struct F66Record {
+    s32 state;
+    s32 x;
+    s32 adjusted;
+    s32 old;
+    s32 source;
+} F66Record;
+extern F66Record D_82E05968[100];
+extern s32 D_82E05948, D_82E0594C;
+void func_82E04734(void) {
+    s32 i;
+    for (i = 0; i < 100; i++) {
+        D_82E05968[i].state = 0;
+        D_82E05968[i].x = D_82E05948;
+        D_82E05968[i].adjusted = D_82E05968[i].source - D_82E0594C;
+        D_82E05968[i].old = D_82E05968[i].source;
+    }
+}
 #endif
 
 #ifdef VERSION_US
