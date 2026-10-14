@@ -93,7 +93,32 @@ void func_885010EC(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1BE300/func_885011EC.s")
+typedef struct unk_func_885011EC {
+    u8 unk_00[44];
+    s32 unk_2C;
+    s32 unk_30;
+    s32 unk_34;
+} unk_func_885011EC;
+
+typedef struct unk_D_8850D6D0 {
+    void* unk_00;
+    unk_func_885011EC* unk_04;
+    u8 unk_08;
+    u8 unk_09[91];
+    s32 unk_64;
+} unk_D_8850D6D0;
+
+extern void func_88500F08(void);
+extern s32 func_88802DCC(s32 arg0, u8* arg1, void (*arg2)(void), void (*arg3)(void),
+                        void (*arg4)(void), void* arg5, u8 arg6, u8 arg7);
+
+void func_885011EC(u8* arg0) {
+    func_88802DCC(3, arg0, func_88500EF4, func_885010EC, func_88500F08, NULL, 0, 2);
+    ((unk_D_8850D6D0*)D_8850D6D0)->unk_04->unk_2C = 0;
+    ((unk_D_8850D6D0*)D_8850D6D0)->unk_04->unk_34 = 1;
+    ((unk_D_8850D6D0*)D_8850D6D0)->unk_08 = 2;
+    ((unk_D_8850D6D0*)D_8850D6D0)->unk_64 = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1BE300/func_88501274.s")
 
