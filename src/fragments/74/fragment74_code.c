@@ -51,11 +51,70 @@ void func_8F6001FC(void) {
     func_8004D19C(coordinates[0], coordinates[1], (s32)D_8F600C08, 0, 0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/74/fragment74_code/func_8F60028C.s")
+extern void func_800498C4(void);
+extern void func_800496A4(s32,s32);
+extern void Font_EnableTwoCycleTexturing(void);
+extern void Font_DisableTwoCycleTexturing(void);
+extern void func_8004972C(s32,s32,s32,s32);
+extern void func_800497E4(s32,s32,s32,s32);
+extern void* func_8004C874(s32,s32);
+extern void func_800495F8(s32,s32,s32,const char*,...);
+extern void func_800499EC(void);
+extern s16 D_8F600BC0[];
+extern s16 D_8F600BC8[];
+extern s16 D_8F600BF4;
+extern s16 D_8F600BF6;
+extern s16 D_8F600BFA;
+extern s16 D_8F600BFC;
+extern s16 D_8F600C04;
+extern s16 D_8F600C06;
+extern char D_8F600BD0[];
+extern char D_8F600BDC[];
+void func_8F60028C(void) {
+    s32 i;
+    s32 y;
+    s16* label;
+    s16 coordinates[2];
+    s16* mode;
+    s32 font;
+
+    func_800498C4();
+    mode = &D_8F600BFE;
+    font = *mode == 1 ? 16 : 2;
+    func_800496A4(font, 0);
+    Font_EnableTwoCycleTexturing();
+    func_8004972C(255, 255, 255, 255);
+    func_800497E4(0, 0, 255, 255);
+    func_8F60009C(coordinates, 320, 40);
+    func_800495F8(coordinates[0], coordinates[1], 1, func_8004C874(0x42, 10));
+    Font_DisableTwoCycleTexturing();
+    font = *mode == 1 ? 8 : 1;
+    func_800496A4(font, 0);
+    for (i = 0, y = 70, label = D_8F600BC0; i < 3; i++, y += 22, label++) {
+        if (i != D_8F600BF6) {
+            func_8004972C(255, 255, 255, 255);
+        } else {
+            func_8004972C(255, 255, 0, 255);
+        }
+        func_8F60009C(coordinates, 320, y);
+        func_800495F8(coordinates[0], coordinates[1], 2, func_8004C874(0x42, *label));
+        switch (i) {
+        case 0:
+            func_800495F8(coordinates[0], coordinates[1], 0, func_8004C874(0x42, D_8F600BC8[D_8F600BF4]));
+            break;
+        case 1:
+            func_800495F8(coordinates[0], coordinates[1], 0, D_8F600BD0, D_8F600BFA, D_8F600C04 - 1);
+            break;
+        case 2:
+            func_800495F8(coordinates[0], coordinates[1], 0, D_8F600BDC, D_8F600BFC, D_8F600C06 - 1);
+            break;
+        }
+    }
+    func_800499EC();
+}
 
 extern void func_800088DC(void);
 extern void GfxImage_FillCurrent(void *, s32);
-extern void func_8F60028C(void);
 extern void func_80008648(void);
 void func_8F6004D4(void) {
     func_800088DC();
@@ -103,17 +162,51 @@ s32 func_8F600948(s32 arg0) {
     return sp1C;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/74/fragment74_code/func_8F6009F0.s")
-
-extern s32 main_pool_push_state(s32);
+extern s32 func_800082E0(s8, s8, s8, s8, s8, s32);
+extern void func_80008514(s32);
+extern void func_80008574(void);
+extern void func_800086A4(s32);
+extern void StageFade_StartFromOpaque(s32);
+extern void func_80064D28(void);
+extern void func_8F60051C(void);
+extern s8 D_8F600BFF;
 extern void main_pool_pop_state(s32);
+extern s32 main_pool_push_state(s32);
+void func_8F6009F0(void) {
+    s32 state = 0;
+    s32 repeat;
+    s32 running;
+    s8* mode;
+
+    mode = &D_8F600BFF;
+    do {
+        main_pool_push_state(0x64697370);
+        func_80008514(func_800082E0(*mode, 0, 2, 0, 2, 1));
+        func_800086A4(2);
+        StageFade_StartFromOpaque(5);
+        do {
+            func_80064D28();
+            func_8F60051C();
+            func_8F6004D4();
+            state = func_8F600948(state);
+
+            switch (state) {
+            case 3: running = 0; repeat = 1; state = 0; break;
+            case 4: running = 0; repeat = 0; break;
+            default: running = 1; repeat = 1; break;
+            }
+        } while (running);
+        func_80008574();
+        main_pool_pop_state(0x64697370);
+    } while (repeat);
+}
+
 extern void Gfx_InitDisplayListBuffers(s32, s32);
 extern s32 func_8004C09C(s32);
 extern void func_8004C4B0(s32);
 extern void func_80047588(s32, s32);
 extern void Asset_LoadToSegment(s32, u8 *, u8 *, s32);
 extern void func_8F600020(s32);
-extern void func_8F6009F0(void);
 extern void func_80047610(void);
 extern void func_8004C398(void);
 extern void Gfx_FreeDisplayListBuffers(void);
