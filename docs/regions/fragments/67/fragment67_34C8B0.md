@@ -817,3 +817,46 @@ late-y cells retain the old 0.8382 register residual. Nothing installs. This
 confirms the accepted dispatcher context does not itself close the initializer.
 Retain the refreshed direct-field early-y parent for the store-placement
 investigation, not an obsolete array-based context or a normalized-only match.
+
+### Calibrated assembler scheduling graph for initializer, 2026-10-15
+
+Requeue remains active; no new C is installed. The archived stock as1 ELF
+symbol table identifies `tracereorder` at 0x10030D58. Its generated source
+reads a byte there. A temporary native diagnostic copy enables only that
+builtin listing at `reorganize_bb`, leaving the repository compiler untouched.
+Both refreshed early/late parents pass stock-versus-diagnostic-off/on and
+20-leading-blank controls for the complete text and owned rodata. The actual
+listing contains initial DAG nodes and successor edges; merely enabling a
+flag or obtaining an empty log is not treated as a successful trace.
+
+The early-y parent's initializer block identifies the Y store by actual word
+0xA44E0002 and its source line, not an assumed final-object ordinal. Its DAG
+node 50 has two predecessors, critical-path cost 50 and maxhazard 0. The flow
+phase/timer/done stores (nodes 38/37/36) and X store (35) also have cost 50 and
+maxhazard 0. The Y node has no successor path forcing it before these four
+stores. Thus the tested early placement is not explained by a hard alias
+dependency among those stores. The actual ready-set tie-break decision has
+not yet been instrumented; do not claim the printed costs alone prove its
+selection rule or original source spelling.
+
+Eight real-setup destination-expression cells move required setup effects
+into the Y assignment's lvalue computation. They do not retain the repaired
+register basin: most revert to 0.8382, one is 0.9412 and a pointer-load split
+grows to 288 bytes. Eight working records contain only consumed Y/color
+pointers, optionally shared X and second Y, with s16/s32 coordinates; all
+collapse to the old 272-byte 0.8382 residual. No filler field is introduced.
+Eight corresponding signed/unsigned coordinate-store views retain either
+the early 0.9853 moved-store parent or the late 0.8382 parent; an unsigned
+negative-second-Y store additionally changes literal materialization and
+worsens them. The dispatcher's signedness mechanism does not close this owner.
+Eight exactly representable f32/f64 working-coordinate cells instead grow
+to 284..312 bytes; several add non-text data and are layout-rejected. No
+floating representation, data layout change or candidate transaction remains.
+
+Keep the simple refreshed early-y parent as the lifetime witness. Next action
+is the UGEN value-materialization/store-tree boundary and the measured as1
+ready-set choice, not another replay of destination comma expressions,
+working records, coordinate storage views or float-fold cells. This is a
+bounded negative for these parents and flags, not proof that matching C is
+impossible. All compiler copies, helper scripts, object files and large trace
+logs remain local, outside the published change.
