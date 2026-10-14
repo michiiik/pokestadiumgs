@@ -102,3 +102,17 @@ normal runner, then find a natural macro-source layout carrying any measured
 gain. Also measure the selection web lifetime around the conditional resource
 draw, preserving real callee return categories; do not invent dummy reads or
 retype a void callee solely to occupy `$v0`.
+
+#### Normal-runner follow-up after PR #930
+
+On the separate follow-up branch, eight cells combine the reviewed 75/95-score
+retained spellings, restoration of the two conditional `gSPDisplayList` macros,
+and an actual row-pointer carrier used by the first secondary draw. No cell
+accepts. Expanded 75-score source preserves 624 bytes but its normal raw score
+is 0.9423, with a conditional command-store ordering difference first at byte
+157. Restoring the conditional macros returns exactly the earlier 1.0/0.9551
+seven-word selection tie; row carriers produce 620 bytes and swap saved roles.
+The permuter's scalar improvement therefore does not improve the normal
+translation-unit oracle. Preserve real macros and do not promote expanded
+stores or unused mask locals. Next hypothesis must target the selection web
+or its authentic call/lifetime context, not more first-macro reflow alone.
