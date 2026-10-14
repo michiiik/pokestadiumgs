@@ -4,11 +4,104 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/73/fragment73_code/func_8F500020.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/73/fragment73_code/func_8F500130.s")
+extern void func_800498C4(void);
+extern void func_800496A4(s32, s32);
+extern void Font_EnableTwoCycleTexturing(void);
+extern void Font_DisableTwoCycleTexturing(void);
+extern void func_8004972C(s32, s32, s32, s32);
+extern void func_800497E4(s32, s32, s32, s32);
+extern void* func_8004C874(s32, s32);
+extern void func_800495F8(s32, s32, s32, const char*, ...);
+extern s32 func_8004C594(s32, s32);
+extern void* func_8004C8A0(void*, s32, s32, s32);
+extern void func_800495BC(s32, s32, const char*, ...);
+extern void func_8004989C(s32);
+extern void func_800499EC(void);
+extern s16 D_8F500980[];
+extern s16 D_8F5009A8;
+extern s16 D_8F5009AA;
+extern s16 D_8F5009AC;
+void func_8F500130(void) {
+    s16* selected;
+    s32 y;
+    s16* item;
+    char buffer[64];
+    s32 i;
+    s32 footerEntry;
+
+    func_800498C4();
+    selected = &D_8F5009A8;
+    func_800496A4(16, 0);
+    Font_EnableTwoCycleTexturing();
+    func_8004972C(0, 0, 255, 255);
+    func_800497E4(255, 255, 255, 255);
+    func_800495F8(320, 120, 1, func_8004C874(0x42, 9));
+    Font_DisableTwoCycleTexturing();
+    func_800496A4(8, 0);
+    func_8004C594(3, D_8F5009AC);
+    for (i = 0, item = D_8F500980, y = 190; i < 2; i++, item++) {
+        if (i == *selected) {
+            func_8004972C(255, 255, 0, 255);
+        } else {
+            func_8004972C(255, 255, 255, 255);
+        }
+        func_800495BC(160, y, func_8004C8A0(buffer, 64, 0x42, *item));
+        y += 24;
+    }
+    func_800496A4(8, 0);
+    func_8004972C(255, 255, 255, 255);
+    selected = &D_8F5009AA;
+    func_8004C594(3, *selected);
+    func_8004989C(22);
+    footerEntry = *selected != 0 ? 0x2A : 0x2B;
+    func_800495F8(320, 280, 3, func_8004C8A0(buffer, 64, 0x42, footerEntry));
+    func_800499EC();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/73/fragment73_code/func_8F5002F4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/73/fragment73_code/func_8F500414.s")
+extern u8* D_8F5009B8;
+extern void* D_8F5009B4;
+extern s16 D_8F5009B0;
+extern s32 D_8F5009BC;
+extern s32 ModelAnim_IsFinished(void*);
+extern void func_8003F2C4(void*, void*, s32);
+extern s32 func_80043678(void*);
+extern void func_800088DC(void);
+extern void func_800468A0(s32);
+extern void func_8F5002F4(void);
+extern Gfx* D_800D0510;
+extern Gfx D_80094E38[];
+extern void Ui_DrawAnimatedTextureMarker(s16, s16);
+extern void func_80008648(void);
+extern s32 D_8F5009A0;
+void func_8F500414(void) {
+    s16* animation;
+    u8* node = *(u8**)(D_8F5009B8 + 0x1C);
+
+    animation = &D_8F5009B0;
+    if (ModelAnim_IsFinished(node)) {
+        if (*animation == 0) {
+            if (D_8F5009AA != 0) {
+                *animation = 7;
+            }
+        } else {
+            if (D_8F5009AA == 0) {
+                *animation = 0;
+            }
+        }
+        func_8003F2C4(D_8F5009B4, node, -1);
+        func_8003F2C4(D_8F5009B4, node, *animation);
+    }
+    D_8F5009BC = func_80043678(D_8F5009B8);
+    func_800088DC();
+    func_800468A0(D_8F5009A0);
+    func_8F5002F4();
+    func_8F500130();
+    gSPDisplayList(D_800D0510++, D_80094E38);
+    Ui_DrawAnimatedTextureMarker(120, D_8F5009A8 * 24 + 194);
+    func_80008648();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/73/fragment73_code/func_8F500544.s")
 
@@ -43,7 +136,6 @@ s32 func_8F500774(s32 incoming) {
 extern void StageFade_StartFromOpaque(s32);
 extern void func_800086A4(s32);
 extern void func_80064D28();
-extern void func_8F500414();
 void func_8F500810(void) {
     s32 temp_v0;
     s32 var_s0;
