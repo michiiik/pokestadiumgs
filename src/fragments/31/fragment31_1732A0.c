@@ -4,7 +4,22 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1732A0/func_88200020.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1732A0/func_882000AC.s")
+extern u8 *D_88234564;
+void func_882000AC(u8 arg0, s16 arg1, s16 arg2, u16 arg3, u16 arg4, s32 arg5, s32 arg6, u8 arg7) {
+    u8 *entry = D_88234564 + arg0 * 0x44;
+    *(s16 *)(entry + 0) = 0;
+    *(s16 *)(entry + 2) = 0;
+    *(u16 *)(entry + 4) = 0;
+    *(u16 *)(entry + 6) = 0;
+    *(s16 *)(entry + 8) = arg1;
+    *(s16 *)(entry + 0xA) = arg2;
+    *(u16 *)(entry + 0xC) = arg3;
+    *(u16 *)(entry + 0xE) = arg4;
+    *(s32 *)(entry + 0x3C) = arg5;
+    *(s32 *)(entry + 0x40) = arg6;
+    *(s32 *)(entry + 0x1C) = 1;
+    *(s8 *)(entry + 0x20) = -arg7;
+}
 
 extern u8 *D_88234564;
 void func_88200134(u8 arg0, u8 arg1) {

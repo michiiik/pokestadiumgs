@@ -16,7 +16,23 @@ s32 func_87E043F0(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_307D60/func_87E049A4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_307D60/func_87E04A14.s")
+extern void func_87E04790(u8 *);
+extern void func_87E134C0(void);
+extern void func_87E13490(void);
+extern void func_87E13480(u8 *);
+void func_87E04A14(u8 *arg0) {
+    switch (*(s8 *)(*(u8 **)(arg0 + 0x270) + 0x2181)) {
+        case 0: *(s32 *)(arg0 + 4) = 3; break;
+        case 1: *(s32 *)(arg0 + 4) = 2; break;
+        case 2: *(s32 *)(arg0 + 4) = 1; break;
+        case 3: *(s32 *)(arg0 + 4) = 0; break;
+    }
+    *(s32 *)arg0 = 0;
+    func_87E04790(arg0);
+    func_87E134C0();
+    func_87E13490();
+    func_87E13480(NULL);
+}
 
 extern void func_87F02684(s32);
 void func_87E04AA4(s32 arg0) {
