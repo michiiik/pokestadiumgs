@@ -2,6 +2,34 @@
 
 
 #ifdef VERSION_US
+typedef struct {
+    s32 enabled;
+    u8 *flags;
+} F29TextMask;
+
+typedef struct {
+    u8 reserved[8];
+    s16 x, y;
+    u16 width, height;
+    s32 anchor;
+} F29Rect;
+
+typedef struct {
+    s16 x, y;
+    s32 align;
+    u8 **strings;
+    u16 count, width;
+    s32 font;
+    s16 spacingX, spacingY, left, right, top, bottom;
+    s32 constrain;
+} F29TextLayout;
+
+extern s32 func_88002958(u8 **, u16, s32, s16);
+extern void func_88003480(s32, u16, u16, s16 *, s16 *);
+extern void func_8004972C(s32, s32, s32, s32);
+extern void func_80049064(s32, s32, s32, const char *);
+extern s32 func_80049290(s32, s32, const char *);
+
 extern u8 D_8800ED40; extern u8 D_8800ED41;
 void func_880022F0(void) { D_8800ED40 = 10; D_8800ED41 = 1; }
 
@@ -46,7 +74,29 @@ done:
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88002720.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88002820.s")
+extern s32 func_800472B8(s32);
+void func_88002820(s16 x, s16 y, s8 style, u8 **text, u16 count,
+                   s16 spacing, F29TextMask *mask) {
+    s32 row;
+    u8 **cursor;
+    s16 step = func_800472B8(0) + spacing;
+    row = 0;
+    if (count != 0) {
+        cursor = text;
+        do {
+            if (mask->enabled && mask->flags[row]) {
+                func_8004972C(255, 255, 255, 100);
+            }
+            func_80049064(x, y, style, *cursor);
+            y += step;
+            if (mask->enabled && mask->flags[row]) {
+                func_8004972C(255, 255, 255, 255);
+            }
+            row++;
+            cursor++;
+        } while (row != count);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88002958.s")
 
@@ -103,11 +153,74 @@ void func_88002C2C(u8 arg0, u8 arg1, u8 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88003480.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88003534.s")
+extern s32 func_88002A08(u8 **arg0, u16 arg1, s32 arg2, s16 arg3);
+void func_88003534(F29Rect *rect, F29TextLayout *text) {
+    s16 excessX, excessY;
+
+    text->width = func_88002958(text->strings, text->count, text->font, text->spacingX);
+    rect->width = text->width + text->left + text->right;
+    rect->height = func_88002A08(text->strings, text->count, text->font, text->spacingY) + text->top + text->bottom;
+    func_88003480(rect->anchor, rect->width, rect->height, &rect->x, &rect->y);
+    switch (text->constrain) {
+    case 1:
+        excessX = rect->x + rect->width - 592;
+        if (excessX > 0) {
+            rect->x = rect->x - excessX;
+        }
+        break;
+    case 2:
+        excessY = rect->y + rect->height - 427;
+        if (excessY > 0) {
+            rect->y = rect->y - excessY;
+        }
+        break;
+    }
+    switch (text->align) {
+    case 0:
+        text->x = rect->x + text->left;
+        break;
+    case 1:
+        text->x = rect->x + text->left + (text->width >> 1);
+        break;
+    case 2:
+        text->x = rect->x + text->left + text->width - 1;
+        break;
+    }
+    text->y = rect->y + text->top;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_880036CC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88003858.s")
+void func_88003858(F29Rect *rect, u8 *data) {
+    u16 headingHeight;
+    F29TextLayout *text;
+
+    headingHeight = func_88002A08((u8 **)(data + 8), 1, *(s32 *)(data + 12), *(s16 *)(data + 18));
+    text = (F29TextLayout *)(data + 0x1C);
+    text->width = func_88002958(text->strings, text->count, text->font, text->spacingX);
+    rect->width = (func_80049290(*(s32 *)(data + 12), *(s16 *)(data + 16), *(u8 **)(data + 8)) < text->width + 8
+                       ? text->width + 8
+                       : func_80049290(*(s32 *)(data + 12), *(s16 *)(data + 16), *(u8 **)(data + 8))) + 25;
+    rect->height = func_88002A08(text->strings, text->count, text->font, text->spacingY) + headingHeight + 43;
+    func_88003480(rect->anchor, rect->width, rect->height, &rect->x, &rect->y);
+    *(s16 *)data = rect->x + 11;
+    *(s16 *)(data + 2) = rect->y + 11;
+    switch (text->align) {
+    case 0:
+        text->x = rect->x + 15;
+        break;
+    case 1:
+        text->x = rect->x + (text->width >> 1) + 15;
+        break;
+    case 2:
+        text->x = rect->x + text->width + 14;
+        break;
+    }
+    text->y = rect->y + headingHeight + 27;
+    *(s16 *)(data + 0x14) = *(s16 *)data;
+    *(s16 *)(data + 0x16) = text->y - 10;
+    *(s16 *)(data + 0x18) = rect->width - 25;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88003A00.s")
 
