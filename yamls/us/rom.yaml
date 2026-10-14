@@ -1173,6 +1173,8 @@
     - [0x2870A0, c,       fragments/52/fragment52_2870A0]
     - [0x2871C0, c,       fragments/52/fragment52_2871C0]
     - [0x287A90, data,    fragments/52/fragment52_data]
+    - [0x288100, .data,   fragments/52/fragment52_285F60]
+    - [0x288120, data,    fragments/52/fragment52_data_tail]
 
   - name: fragment53
     type: code

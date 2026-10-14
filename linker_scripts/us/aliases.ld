@@ -82,3 +82,7 @@ D_800D2773_store = D_800D2773;
 /* Particle callback defaults: scale and RGBA fields in the shared block. */
 D_80128C58 = D_80128C54 + 0x4;
 D_80128C5C = D_80128C54 + 0x8;
+
+/* Attachment scales retain their original addresses inside this C data block. */
+D_86409C4C = fragments_52_fragment52_285F60 + 0xC;
+D_86409C50 = fragments_52_fragment52_285F60 + 0x10;

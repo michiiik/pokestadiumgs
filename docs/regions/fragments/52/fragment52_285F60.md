@@ -103,3 +103,73 @@ new type/prototype from these probes is installed or published. Do not replay
 these families under unchanged context. The next useful discriminator remains
 a calibrated compiler/frame trace explaining the reserved space, rather than
 further surface-level scope hints. This is bounded evidence, not impossibility.
+
+## 2026-10-14: attachment source shape resolved; data-layout prerequisite
+
+Forty-eight fresh normal candidates and a calibrated native permuter follow-up
+change the next action. The original inline-node candidates retained an unused
+node declaration. Removing it gives the original 0x20 frame and stack homes;
+adding a float temporary restores the unwanted 0x28 frame. Independent accesses
+to private scale constants avoid the external-data alias/reload issue.
+
+The native search on exact float literals starts at score200 and reaches zero
+after51 seconds. Both base/probe and target/oracle calibrations pass. The zero
+source contains no artificial locals, loops, guards, uninitialized reads or
+deleted behavior: it groups allocation, null guard, callback setup and the next
+call on one physical line, then binds the graph and writes x/y/z scales followed
+by the angle. Eight reviewed normal storage-provenance variants confirm that
+both the literal and function-local-static versions reach the same shape.
+
+Fresh comparisons over the complete168-byte span, including the verified eight
+alignment bytes, leave only the relocation-controlled low field of the second
+float load: baseline0 versus compiled4. The compiler function symbol remains
+160 bytes; a symbol-only diagnostic omits the separate padding block and reports
+normalized0.9524 rather than complete-span instruction agreement. The raw
+complete-span score is0.9762, not exact bytes and not acceptance. File-scope
+static storage does not preserve this shape.
+
+Use exact initialized words: scaleYZ5.28f is0x40A8F5C3; scaleX2.534400225f is
+0x4022339D. The shorter2.5344f is0x4022339C, one ULP wrong. The initial private
+storage cells used that shorter literal, so they establish code-shape evidence
+only, not data correctness. Subsequent literal and reviewed-zero cells use the
+correct bits, independently verified in emitted data.
+
+Next action, layout-prerequisite: give this C file the original32-byte data block
+at ROM0x288100..0x288120. Its first three floats are the existing CE0 symbols
+D_86409C40/44/48, followed by D58's private y/z and x scales at offsets12/16.
+Preserve old address aliases for D_86409C4C/50, split the original assembly data
+before and after that block, and gate the still-assembly D58 before the runner
+transaction transfers its actual scale storage into the accepted candidate.
+
+An off-tree prerequisite preflight defines the three existing CE0 globals and
+temporarily gives CE0 the two initialized scales consumed by the original D58
+assembly. All five function words remain identical to the current build and
+the emitted32-byte data block is exactly retail, including its12 trailing zero
+bytes. This is object evidence only; no tracked layout/source edit or full-ROM
+gate for that prerequisite has occurred yet. Temporary storage must be removed
+atomically when D58 takes ownership; never publish duplicate/fallback scales.
+
+Local artifacts: scratch/native-attachment-zero-batch.json candidates0 and2,
+native-attachment-zero-diagnose.log, native-attachment-data-preflight.log, and
+permuter/func_86407D58-ekk41y71/output-0-1/source.c. Normal runner provenance has
+no accepted D58 row yet; its GLOBAL_ASM remains untouched. Baseline full ROM,
+all427 host syntax checks, fresh/blank controls and diff checks pass.
+
+## 2026-10-14: attachment accepted, file complete
+
+The layout prerequisite above now passes the full retail-ROM gate with D58
+still in assembly. The normal runner then accepts the K&R scalar-storage
+candidate after120 prior attempts and atomically removes the temporary CE0
+scale initializers. Gate timing:9.462s probes /53.260s sequential gate /
+62.726s total, one gate run. link_verified=false due to relocation identity
+changes; acceptance comes from the complete-ROM comparison, not normalized
+object similarity. No duplicate, unused or fallback scale storage remains.
+
+Post-acceptance cleanup restores the modern void-pointer signature, exact
+f32 initializer literals and ordinary indentation while retaining the measured
+statement grouping. The cleaned source freshly passes the retail-ROM compare
+(MD51561c75d11cedf356a8ddb1a4a5f9d5d), all427 host syntax checks, and independent
+source/build/20-leading-blank controls for all five functions. The complete
+32-byte initialized data block and corresponding linked retail spans match.
+The four previously accepted functions are unchanged; this file now has zero
+GLOBAL_ASM owners. Names remain address-based without independent evidence.
