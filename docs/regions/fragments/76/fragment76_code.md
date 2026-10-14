@@ -102,3 +102,84 @@ candidates, statistics, objects and ROMs remain local. No tooling helper is
 published. Tracked hooks and decomp-workbench are absent in this clone;
 explicit native runner/object/provenance checks are the fallback, not a claim
 that unavailable checks ran. No exhaustion or compiler-impossibility claim.
+
+## 2026-10-15: narrow rodata split and three switch owners accepted
+
+The layout prerequisite above is now resolved. Native work is performed in
+an isolated owned snapshot of the public checkout. The initial snapshot
+matches retail before any layout edits. Do not apply the planner's whole-file
+run (`0x367B40..0x368B60`): that includes mutable menu records and pointers.
+The verified tight window is `0x368AD0..0x368B50` (128 bytes), followed by a
+`rodata`-typed tail subsegment so the original output order is retained.
+
+The window starts in the final eight bytes of the title at `D_8F7022D4`.
+Splat drops those bytes because they lack an independently referenced symbol;
+leaving them out produces a checksum failure even with every switch still
+assembly. `const u32 D_8F7022E0[2] = {0xA1C1A4EB, 0}` explicitly represents
+the real suffix at the original address before the jump tables. This is
+actual read-only string data, not an executable padding helper or invented
+stack slot. No mutable data moves into the code object's rodata window.
+
+With pinned spimdisasm 1.35.0-dev0, the split migrates all four tables into
+their assembly owners. Before any C switch is installed, a normal full-ROM
+gate passes. Fresh/blank controls reproduce the 128-byte object rodata,
+including the title suffix, and preserve all seventeen existing C functions'
+instruction words and offsets. The generated linker-script change is one
+line for the trailing rodata object. All compatibility aliases are retained.
+
+### Accepted switch functions
+
+| Owner | Instructions / bytes | Frame | Accepted batch |
+| --- | ---: | ---: | --- |
+| `func_8F7005D8` | 19 / 76 | leaf | `5de9d629f5484e7a906a1afdeac76a81` |
+| `func_8F700624` | 51 / 204 | leaf | `6078a63753f842fa971a7547504bfaf6` |
+| `func_8F7006F0` | 50 / 200 | 0x18 | `6078a63753f842fa971a7547504bfaf6` |
+
+Each result is `accepted`, `relocation_masked: true`, `link_verified: false`.
+The object differences are recognized relocation fields; they are permission
+to run the sequential full-ROM gate, never acceptance proof by themselves.
+The authoritative gates pass retail MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`.
+Do not rewrite these results as link-verified. Normal host syntax checking
+and statistics stay enabled.
+
+Winners:
+
+- `f76:switch-read:typed-True:temporary-False:return-True`: kinds 1-4 read
+  the value pointer as an unsigned byte, kinds 5-7 as a signed word.
+- `f76:switch-adjust:typed-True:case-scope-True:return-True`: kinds 1-4 use
+  the four-action nested switch, including the original unsigned divide by
+  ten for the large step; kinds 5-7 XOR with the maximum word.
+- `f76:switch-write:typed-True:bounds-temporaries-False:return-True`: preserve
+  source case order 3, then 2/4, then 5/6/7. Kind three clamps, writes the
+  byte and selected resource and calls the existing loader. Kinds 2/4 clamp
+  and write a byte; kinds 5-7 write the word unchanged.
+
+All use the existing record layout and original void-pointer interfaces.
+After acceptance the duplicate draft typedef is consolidated into the one
+`F76MenuEntry` definition, hoisted above its first use. No fake temporary,
+volatile view, extra argument, forced register or compiler/object patch is
+introduced. The naming plan has no known mappings for these three owners.
+
+### Build-state trap observed during sequential gates
+
+The first authoritative gate noticed the changed YAML extraction marker and
+regenerated the assembly tree while its candidate was installed. That
+successfully accepted `func_8F7005D8`, but the later attempts in the same batch
+reinserted the pre-batch assembly pragma after its `.s` file had been removed
+by fresh extraction. They failed compilation with `Cannot open file
+GLOBAL_ASM:.../func_8F7005D8.s`, not with a C-code mismatch. A new batch based
+on the installed winner, reusing its real shared type instead of redeclaring
+it, accepted the remaining two owners. Preserve these diagnostics as tooling
+evidence; do not charge them as failed source-shape hypotheses. Future layout
+campaigns should establish extraction currency before beginning a multi-owner
+sequential gate transaction.
+
+After cleanup, fresh/20-leading-blank controls reproduce all object sections
+against the accepted baseline, all twenty current C definitions are stable,
+and the seventeen pre-existing definitions retain their pre-layout words.
+The linked spans of all three new C owners match retail. A fresh split with
+the final C source and a normal full-ROM rebuild both pass, as does the
+post-deduplication full-ROM verification. Neither scratch recipes nor
+generated ASM/assets belong in the PR. The remaining owners are
+`func_8F700028`, `func_8F700420` and
+`func_8F700538`. The first is now layout-ready, not blocked on rodata.

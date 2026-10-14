@@ -1,5 +1,16 @@
 #include "global.h"
 
+#ifdef VERSION_US
+/* The title ends across the aligned data/rodata boundary. Preserve its
+ * final eight bytes before this file's jump tables. */
+const u32 D_8F7022E0[2] = { 0xA1C1A4EB, 0 };
+typedef struct F76MenuEntry {
+    u8 kind, bank, column, row;
+    s32 minimum, maximum;
+    char label[32];
+    void* value;
+} F76MenuEntry;
+#endif
 
 void func_8F700020(void) {
 }
@@ -31,24 +42,69 @@ void func_8F70058C(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/76/fragment76_code/func_8F7005D8.s")
+extern u8 D_8F702361;
+extern void func_8F700538(u8);
+void func_8F7005D8(void* opaque, s32* result) {
+    F76MenuEntry* entry = opaque;
+    switch (entry->kind) {
+    case 1: case 2: case 3: case 4:
+        *result = *(u8*)entry->value;
+        return;
+    case 5: case 6: case 7:
+        *result = *(s32*)entry->value;
+        return;
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/76/fragment76_code/func_8F700624.s")
+void func_8F700624(void* opaque, s32* value, u8 action) {
+    F76MenuEntry* entry = opaque;
+    switch (entry->kind) {
+    case 1: case 2: case 3: case 4: {
+        u32 step = (entry->maximum - entry->minimum) / 10U;
+        switch (action) {
+        case 4: *value += 1; break;
+        case 5: *value -= 1; break;
+        case 6: *value += step; break;
+        case 7: *value -= step; break;
+        }
+        return;
+    }
+    case 5: case 6: case 7:
+        *value ^= entry->maximum;
+        return;
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/76/fragment76_code/func_8F7006F0.s")
+void func_8F7006F0(void* opaque, s32 value) {
+    F76MenuEntry* entry = opaque;
+    switch (entry->kind) {
+    case 3:
+        if (value < entry->minimum) value = entry->minimum;
+        if (value > entry->maximum) value = entry->maximum;
+        *(u8*)entry->value = value;
+        D_8F702361 = value;
+        func_8F700538((u8)value);
+        return;
+    case 2: case 4:
+        if (value < entry->minimum) value = entry->minimum;
+        if (value > entry->maximum) value = entry->maximum;
+        *(u8*)entry->value = value;
+        return;
+    case 5: case 6: case 7:
+        *(s32*)entry->value = value;
+        return;
+    }
+}
 #endif
 
 #ifdef VERSION_US
 extern u8 D_8F701358[];
 extern s32 D_8F7023B4;
 extern void func_800226C0(s32);
-extern void func_8F7005D8(void *, s32 *);
-extern void func_8F700624(void *, s32 *, u8);
-extern void func_8F7006F0(void *, s32);
 
 void func_8F7007B8(u8 arg0) {
     s32 sp1C;
@@ -136,12 +192,6 @@ s32 func_8F700858(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-typedef struct F76MenuEntry {
-    u8 kind, bank, column, row;
-    s32 minimum, maximum;
-    char label[32];
-    void* value;
-} F76MenuEntry;
 extern u8 D_8F702295, D_8F702291;
 extern s32 D_8F7023B0;
 void func_8F700A54(void) {
@@ -350,7 +400,6 @@ void func_8F700F90(void) {
 #endif
 
 #ifdef VERSION_US
-extern u8 D_8F702361;
 extern s32 D_8F7023B8;
 extern void func_8F70058C(u8);
 void func_8F700FD8(void) {
@@ -474,7 +523,6 @@ void func_8F7011C8(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8F700538(u8);
 extern u8 D_8F702360;
 extern u8 D_8F7023AC;
 void func_8F701224(void) {
