@@ -16,5 +16,25 @@ void func_88231170(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A43F0/func_882311B8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A43F0/func_882313A4.s")
+typedef struct {
+    s8 unk_00;
+    s8 unk_01;
+    u16 unk_02;
+} unk_func_882313A4;
+extern unk_func_882313A4 *D_882349D0;
+extern void *D_8800EF54;
+extern void D_88000E4C(void);
+extern void func_882311B8(void);
+extern void func_88005B60(s32, void (*)(void), void (*)(void), void (*)(void));
+extern void *Util_Malloc(s32);
+
+void func_882313A4(s8 arg0, s8 arg1, u16 arg2) {
+    func_88005B60(2, D_88000E4C, func_882311B8, func_88231170);
+    D_882349D0 = Util_Malloc(4);
+    D_882349D0->unk_00 = arg0;
+    D_882349D0->unk_01 = arg1;
+    D_882349D0->unk_02 = arg2;
+    D_8800EF54 = D_882349D0;
+}
+#pragma C_FUNCTION_PADDING(12)
 #endif
