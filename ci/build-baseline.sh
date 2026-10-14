@@ -66,7 +66,12 @@ fi
 # `git pull` would merge; this checkout only ever mirrors upstream, so hard
 # reset to whatever ref triggered this build.
 git -C "$ci_checkout" fetch --quiet origin "$target_sha"
-git -C "$ci_checkout" checkout --quiet --detach "$target_sha"
+# --force: this checkout only mirrors upstream, but a build run in it leaves
+# tracked generated files modified (linker_scripts/us/pokestadiumgs.ld), and a
+# plain checkout then aborts with "local changes would be overwritten". That
+# failed every image rebuild from 2026-09-16 on, leaving a stale image whose
+# gate runs each re-extracted and rebuilt everything.
+git -C "$ci_checkout" checkout --quiet --force --detach "$target_sha"
 
 # Re-extract only when yamls/ actually changed since the last extraction --
 # splat's output depends on it, nothing else does. A plain `git diff
@@ -101,6 +106,20 @@ trap cleanup EXIT
 for path in src include tools linker_scripts lib yamls Makefile requirements.txt ci; do
     cp -a "$ci_checkout/$path" "$staging_dir/$path"
 done
+
+# Leave out anything git does not track under tools/ (local venvs, permuter and
+# m2c checkouts, scratch scripts the persistent checkout accumulated). gate-pr.sh
+# syncs tools/ from the PR checkout, sees those as "only in the image", deletes
+# them, and treats that as a tools change -- which forces a full -B rebuild on
+# every run even when the PR touches only src/. Verified 2026-10-14: five such
+# entries (decomp-permuter, decomp-venv, m2c, probe_one.py, setup_decomp_tools.sh).
+( cd "$ci_checkout" && git ls-files --others --directory -z -- tools ) \
+    | while IFS= read -r -d '' extra; do
+        # gate-pr.sh already ignores these two when it syncs tools/, and vtxdis
+        # is a built helper the image needs.
+        case "$extra" in */__pycache__/|tools/vtxdis) continue ;; esac
+        rm -rf "$staging_dir/${extra%/}"
+    done
 mkdir -p "$staging_dir/prebuilt"
 cp -a "$ci_checkout/asm" "$staging_dir/prebuilt/asm"
 cp -a "$ci_checkout/assets" "$staging_dir/prebuilt/assets"
