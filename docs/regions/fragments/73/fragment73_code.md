@@ -96,3 +96,44 @@ and genuine 64-byte text buffer. Do not replay the 24 cells, invent stack
 padding, force registers or call this compiler shape impossible. The input
 handler remains unprobed. PR #948's two accepted owners have independently
 passed public ROM-validation CI and merged; this follow-up adds no C match.
+
+### Calibrated follow-up and input-handler handoff
+
+Fresh stock, temporary diagnostic-off/on and 20-leading-blank builds reproduce
+all object sections and all three accepted C siblings for the retained
+correct-prototype text parent. The emitted optimizer listing is present:
+the selected-state address web spans the loop and has adjusted save about
+3.3333; the alternate-state address has adjusted save 0.5 across later calls.
+Those constants are register-allocated, not merely different UGEN temporary
+names. No diagnostic compiler or forced result is installed or accepted.
+
+`func_8F500544`: requeue. Forty cells cover the actual first-four-halfword
+state, record/array/separate-symbol views, snapshot widths, case order,
+preincrement versus separate stores, initialized consumed signed delta
+temporaries, and a mixed initial record snapshot with later independent
+symbols plus a typed controller view. The plain aggregate/array families
+reach normalized 0.6143 / raw 0.2071; separate scalars 0.5143 / 0.1214.
+Explicit signed deltas improve the shape to 0.7071 / 0.2643, while the mixed
+snapshot family reaches 0.7143 / 0.2286. These best deltas are 528 versus
+target 560 bytes. None is a match and no failed declarations remain.
+
+The assembly-derived draft independently confirms that clamp tests consume
+signed halfword temporaries, not a stored-then-reloaded global; its inferred
+three-argument sound calls and self-comparison are decompiler artifacts, not
+adopted source. The existing one-word sound ABI and the genuine previous
+selection snapshot are retained in the real trials. Current failures still
+cache controller/state addresses and values differently from the target's
+repeated direct-symbol reloads. Next: use the calibrated optimizer to
+distinguish alias invalidation from address-code-motion ownership; do not
+replay the forty cells or replace real prototypes with invented arguments.
+
+The initializer/frame/background handoffs above remain active. No fragment
+73 function is newly accepted in this follow-up; the next fresh batch moves
+to fragment 74 while retaining these specific requeues.
+
+The existing shared-LUI scanner now resolves both initializer groups and
+classifies each as interleaved (`contiguous: false`): A8/AA/AC and B0/B4.
+This confirms that the current contiguous-only coalescer is not applicable;
+no new confirming source campaign or object rewriting was attempted. A
+future source/alias representation hypothesis must account for that measured
+instruction shape rather than repeating the aggregate trials above.
