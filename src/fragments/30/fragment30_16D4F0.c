@@ -32,7 +32,27 @@ void func_8810009C(s32 arg0, s32 arg1) {
     *(u16 *)(D_88104E80 + 2) = arg1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/30/fragment30_16D4F0/func_881000B8.s")
+typedef struct unk_func_881000B8 {
+    s16 unk_00;
+    s16 unk_02;
+    u8 unk_04;
+    u8 unk_05;
+    u8 unk_06;
+} unk_func_881000B8;
+
+void func_881000B8(void) {
+    if ((((unk_func_881000B8*)D_88104E80)->unk_00 == 3) &&
+        (((unk_func_881000B8*)D_88104E80)->unk_02 == 0)) {
+        ((unk_func_881000B8*)D_88104E80)->unk_05 = ((unk_func_881000B8*)D_88104E80)->unk_06;
+        ((unk_func_881000B8*)D_88104E80)->unk_06 = 0;
+    } else if ((((unk_func_881000B8*)D_88104E80)->unk_00 == 3) &&
+               (((unk_func_881000B8*)D_88104E80)->unk_02 == 1)) {
+        ((unk_func_881000B8*)D_88104E80)->unk_06 = 0;
+    } else {
+        ((unk_func_881000B8*)D_88104E80)->unk_04 = 0;
+    }
+    func_8810009C(3, 2);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/30/fragment30_16D4F0/func_8810013C.s")
 
