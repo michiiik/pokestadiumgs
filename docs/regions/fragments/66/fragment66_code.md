@@ -117,3 +117,40 @@ across the entire file's .text, both new functions and all selected siblings.
 Both new linked retail spans match; git diff --check passes. The two alias
 symbols resolve to the same linked address. No generated tools or artifacts
 are part of the change; project-wide decompilation remains unfinished.
+
+## 2026-10-14: renderer requeue discriminators
+
+The final source/build/20-leading-blank baseline still reproduces the entire
+file's .text and all selected accepted siblings before new work.
+
+`func_82E02AA4` requeue:the original complete macro body,20-leading-blank
+control, two macro invocations on one line, plain block grouping, do/while(0)
+grouping, and both grouping forms on one line all retain512 bytes and the
+normalized1.0/raw0.9141 residual. Putting the entire function on one line is
+worse:0.9219/0.8203. This falsifies simple call-line/grouping as the source of
+the earlier flattened permuter score gain; it does not exhaust arbitrary
+statement layouts or compiler pass behavior. The flattened winner is still
+diagnostic-only. Eight new unsigned-corner/multiply spellings retain the best
+residual or worsen allocation, and eight narrow-counter variants add real
+instructions or enlarge the frame. Do not requeue these same families.
+Next action:inspect the exact expanded-parent/winner expression-tree and
+compiler-context difference, or capture narrow row-web allocation evidence;
+keep the ordinary macro spelling as the maintainable baseline.
+
+`func_82E02CCC` requeue:eight explicit loop-limit/right-edge carrier and
+formal-counter variants do not improve the previous1.0/0.9091 full body.
+The best of that new family is0.9835/0.8017. A stock-native90-second search
+is first calibrated with identical base/probe and target/oracle instruction
+words at484 bytes, then improves permuter score350 ->190 without zero.
+All output is retained locally and remains uninstalled. Next action:review
+the best mutation for valid source changes and separate expression topology
+from mere flattened source layout before composing a new ordinary-macro
+family. Both renderer owners remain GLOBAL_ASM, and tracked game source is
+unchanged throughout these negative experiments.
+
+Next file-local layout work:`func_82E017E0` and `func_82E04040` use five- and
+eleven-entry jump tables respectively; `func_82E0424C` shares the same nearby
+read-only region. The YAML still places those tables in fragment66_data.data.
+Before probing C switches, derive the per-file .rodata range, re-split with
+the pinned toolchain and gate all three still-assembly owners. This is a
+layout prerequisite, not permission to try switches against the current blob.
