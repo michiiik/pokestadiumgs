@@ -1358,6 +1358,8 @@
     - [0x3365F0, textbin, fragments/66/fragment66_header]
     - [0x336610, c,       fragments/66/fragment66_code]
     - [0x33B4A0, data,    fragments/66/fragment66_data]
+    - [0x33BB90, .rodata, fragments/66/fragment66_code]
+    - [0x33BC40, rodata,  fragments/66/fragment66_tail]
   
   - name: fragment67
     type: code

@@ -80,7 +80,35 @@ s32 func_82E007F0(s32 arg0, u8 *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/66/fragment66_code/func_82E017E0.s")
+extern s32 D_82E0710C, D_82E07110, D_82E07114, D_82E07118, D_82E0711C, D_82E07120, D_82E07124;
+s32 func_82E017E0(s32 kind, u8* event) {
+    switch (kind) {
+    case 0:
+        switch (*(u32*)(event + 0x20)) {
+        case 0:
+            D_82E0710C = *(s16*)(event + 8);
+            D_82E07118 = event[0x28];
+            break;
+        case 1:
+            D_82E07110 = *(s16*)(event + 8);
+            D_82E0711C = event[0x28];
+            break;
+        case 2:
+            D_82E07114 = *(s16*)(event + 8);
+            break;
+        case 3:
+            D_82E07120 = event[0x28];
+            break;
+        case 4:
+            D_82E07124 = event[0x28];
+            break;
+        }
+        break;
+    case 1:
+        break;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -417,7 +445,72 @@ void func_82E02F00(s32 x, s32 y, u8 opacity) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/66/fragment66_code/func_82E04040.s")
+extern void func_8003F1DC(void*);
+extern s32 func_8004DC6C(s32);
+extern void func_8004DCFC(u8*, s32*);
+extern s32 func_8004EB58(s32, s32);
+extern void func_82E0424C(s32);
+extern void func_82E04734(void);
+void func_82E04040(s32 scene) {
+    void* allocation;
+    u8* resource;
+    /* Valid scene indices are 0..10, as in the original switch. */
+    main_pool_pop_state(0x64617461);
+    main_pool_push_state(0x64617461);
+    func_8003F1DC(D_82E05660);
+    func_8003F1DC(D_82E057C8);
+    switch (scene) {
+    case 0:
+        D_82E075F4 = func_8004D690(0x22);
+        resource = (u8*)(u32)func_8004DC6C(0xE4);
+        break;
+    case 1:
+        D_82E075F4 = func_8004D690(0x23);
+        resource = (u8*)(u32)func_8004DC6C(0xE8);
+        break;
+    case 2:
+        D_82E075F4 = func_8004D690(0x24);
+        resource = (u8*)(u32)func_8004DC6C(0xCD);
+        break;
+    case 3:
+        D_82E075F4 = func_8004D690(0x25);
+        resource = (u8*)(u32)func_8004DC6C(0xD0);
+        break;
+    case 4:
+        D_82E075F4 = func_8004D690(0x26);
+        resource = (u8*)(u32)func_8004DC6C(0xCF);
+        break;
+    case 5:
+        D_82E075F4 = func_8004D690(0x27);
+        resource = (u8*)(u32)func_8004DC6C(0xE9);
+        break;
+    case 6:
+        D_82E075F4 = func_8004D690(0x28);
+        resource = (u8*)(u32)func_8004DC6C(0x90);
+        break;
+    case 7:
+        D_82E075F4 = func_8004D690(0x29);
+        resource = (u8*)(u32)func_8004DC6C(0x97);
+        break;
+    case 8:
+        D_82E075F4 = func_8004D690(0x2A);
+        resource = (u8*)(u32)func_8004DC6C(0xCC);
+        break;
+    case 9:
+        D_82E075F4 = func_8004D690(0x2B);
+        resource = (u8*)(u32)func_8004DC6C(0x9E);
+        break;
+    case 10:
+        resource = (u8*)(u32)func_8004DC6C(0x8F);
+        break;
+    }
+    func_8004DCFC(resource, 0);
+    allocation = MainPool_AllocState(main_pool_get_available(), 0);
+    D_82E0760C = (u8*)(u32)func_8004EB58((s32)(u32)allocation, (s32)(u32)resource);
+    MainPool_FinalizeAllocation(allocation);
+    func_82E0424C(scene);
+    func_82E04734();
+}
 #endif
 
 #ifdef VERSION_US
