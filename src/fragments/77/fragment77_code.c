@@ -84,6 +84,19 @@ typedef union {
     u16 halfwords[18];
     s32 words[9];
     s8 bytes[36];
+    struct {
+        u16 geometry[4];
+        s16 selected;
+        u16 last;
+        s8 digits[8];
+        s32 value;
+    } numeric;
+    struct {
+        u16 fields[6];
+        s16 cursor;
+        s8 buffer[18];
+        u16 capacity;
+    } text;
 } F77EditorState;
 extern F77EditorState D_8F809FC0;
 extern u8 D_8F809FE4, D_8F809FE8, D_8F809FE9, D_8F809FEA;
@@ -163,7 +176,18 @@ void func_8F8022B4(void) {
     func_8F8015A8();
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/77/fragment77_code/func_8F802324.s")
+void func_8F802324(u8 character) {
+    s32 index;
+    F77EditorState* state = &D_8F809FC0;
+
+    if (state->text.cursor < state->text.capacity - 1) {
+        for (index = state->text.capacity - 2; index > state->text.cursor; index--) {
+            state->text.buffer[index] = state->text.buffer[index - 1];
+        }
+        state->text.buffer[state->text.cursor] = character;
+        state->text.cursor++;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/77/fragment77_code/func_8F8023B8.s")
 
@@ -207,7 +231,61 @@ void func_8F8026DC(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/77/fragment77_code/func_8F8027C4.s")
+extern s32 D_80087200;
+extern s32 Input_GetRepeatedDPad(void);
+s32 func_8F8027C4(void) {
+    s32 raw;
+    s32 result = 0;
+    s16 input;
+    s32 buttons;
+    u32 value;
+    s32 index;
+    F77EditorState* state = &D_8F809FC0;
+
+    /* IDO schedules this conversion with the input call on the same source line. */
+    raw = Input_GetRepeatedDPad(); input = raw;
+    if (raw) {
+        func_800226C0(1);
+        switch (input) {
+        case 0x200:
+            state->numeric.selected++;
+            if (state->numeric.selected > state->numeric.last) {
+                state->numeric.selected = state->numeric.last;
+            }
+            break;
+        case 0x100:
+            state->numeric.selected--;
+            if (state->numeric.selected < 0) {
+                state->numeric.selected = 0;
+            }
+            break;
+        case 0x800:
+            state->numeric.digits[state->numeric.selected]++;
+            if (state->numeric.digits[state->numeric.selected] >= 10) {
+                state->numeric.digits[state->numeric.selected] = 0;
+            }
+            break;
+        case 0x400:
+            state->numeric.digits[state->numeric.selected]--;
+            if (state->numeric.digits[state->numeric.selected] < 0) {
+                state->numeric.digits[state->numeric.selected] = 9;
+            }
+            break;
+        }
+    }
+    buttons = *(u16*)((u8*)(u32)D_80087200 + 8);
+    if (buttons & 0x8000) {
+        value = 0;
+        for (index = state->numeric.last; index >= 0; index--) {
+            value = value * 10 + state->numeric.digits[index];
+        }
+        state->numeric.value = value;
+        result = 1;
+    } else if (buttons & 0x4000) {
+        result = 2;
+    }
+    return result;
+}
 
 extern s32 func_8F8027C4(void);
 extern s32 func_8F802B40(void);
@@ -257,7 +335,59 @@ void func_8F802A68(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/77/fragment77_code/func_8F802B40.s")
+s32 func_8F802B40(void) {
+    s32 raw;
+    s32 result = 0;
+    s16 input;
+    s32 buttons;
+    u32 value;
+    s32 index;
+    F77EditorState* state = &D_8F809FC0;
+
+    /* IDO schedules this conversion with the input call on the same source line. */
+    raw = Input_GetRepeatedDPad(); input = raw;
+    if (raw) {
+        func_800226C0(1);
+        switch (input) {
+        case 0x200:
+            state->numeric.selected++;
+            if (state->numeric.selected > state->numeric.last) {
+                state->numeric.selected = state->numeric.last;
+            }
+            break;
+        case 0x100:
+            state->numeric.selected--;
+            if (state->numeric.selected < 0) {
+                state->numeric.selected = 0;
+            }
+            break;
+        case 0x800:
+            state->numeric.digits[state->numeric.selected]++;
+            if (state->numeric.digits[state->numeric.selected] >= 16) {
+                state->numeric.digits[state->numeric.selected] = 0;
+            }
+            break;
+        case 0x400:
+            state->numeric.digits[state->numeric.selected]--;
+            if (state->numeric.digits[state->numeric.selected] < 0) {
+                state->numeric.digits[state->numeric.selected] = 15;
+            }
+            break;
+        }
+    }
+    buttons = *(u16*)((u8*)(u32)D_80087200 + 8);
+    if (buttons & 0x8000) {
+        value = 0;
+        for (index = state->numeric.last; index >= 0; index--) {
+            value = value * 16 + state->numeric.digits[index];
+        }
+        state->numeric.value = value;
+        result = 1;
+    } else if (buttons & 0x4000) {
+        result = 2;
+    }
+    return result;
+}
 
 s32 func_8F802D0C(void) {
     s32 event;
@@ -283,12 +413,60 @@ s32 func_8F802D0C(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/77/fragment77_code/func_8F802DD8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/77/fragment77_code/func_8F802ECC.s")
+extern s32 D_8F809FB4, D_8F809FA0, D_8F809FA4;
+extern s32 func_8F802DD8(void);
+s32 func_8F802ECC(void) {
+    s32 result = 1;
+    s32 input;
+    s32 buttons;
+
+    input = Input_GetRepeatedDPad();
+    buttons = *(u16*)((u8*)(u32)D_80087200 + 8);
+    if (buttons & 0x8000) {
+        func_800226C0(2);
+        result = func_8F802DD8();
+    } else if (buttons & 0x4000) {
+        func_800226C0(3);
+        D_8F809FB4 = 0;
+    } else if (input == 0x800) {
+        func_800226C0(1);
+        D_8F809FB4 = ((u8*)D_8F8034CC[D_8F809FB4])[12];
+    } else if (input == 0x400) {
+        func_800226C0(1);
+        D_8F809FB4 = ((u8*)D_8F8034CC[D_8F809FB4])[13];
+    } else if (input == 0x200) {
+        func_800226C0(1);
+        D_8F809FB4 = ((u8*)D_8F8034CC[D_8F809FB4])[14];
+    } else if (input == 0x100) {
+        func_800226C0(1);
+        D_8F809FB4 = ((u8*)D_8F8034CC[D_8F809FB4])[15];
+    } else {
+        if (buttons & 8) {
+            func_800226C0(1);
+            D_8F809FA4--;
+            if (D_8F809FA4 < 0) {
+                if (D_8F809FA0 - 1 > 0) {
+                    D_8F809FA4 = D_8F809FA0 - 1;
+                } else {
+                    D_8F809FA4 = 0;
+                }
+            }
+            D_8F809FB0 = D_8F809FA8 + D_8F809FA4 * 0x58;
+        } else if (buttons & 4) {
+            func_800226C0(1);
+            D_8F809FA4++;
+            if (D_8F809FA4 >= D_8F809FA0) {
+                D_8F809FA4 = 0;
+            }
+            D_8F809FB0 = D_8F809FA8 + D_8F809FA4 * 0x58;
+        }
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/77/fragment77_code/func_8F803130.s")
 
 extern u8 D_8F8044EC[];
-extern s32 D_80087200;
 extern u16 D_8F809FE6, D_8F809FF0;
 extern void Input_SetRepeatController(s32);
 extern s32 func_8005A134(s32);

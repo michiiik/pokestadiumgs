@@ -137,3 +137,63 @@ owners. A fresh normal full-ROM gate passes MD5
 `1561c75d11cedf356a8ddb1a4a5f9d5d`. Naming plan has no known mappings.
 Exactly sixteen assembly owners remain in this file, including the text
 insertion requeue; no unready jump-table owner was replaced here.
+
+## 2026-10-15: text insertion and editor/menu input accepted
+
+Four more owners are accepted. These are all explicitly
+`relocation_masked: true`, `link_verified: false`; the normal authoritative
+sequential full-ROM gates pass. Do not describe them as raw instruction-exact
+or link-verified object probes:
+
+- `func_8F802324`: 37 words / 148 bytes, leaf. Batch
+  `a50bf3f1814947e9b6898c8d343f3fc5`, winner
+  `f77:text-view:pointer-loop-False:while-False:state-pointer-True`.
+- `func_8F8027C4`: 118 words / 472 bytes, frame 0x28. Batch
+  `5c8009014e4b41c7aee1070b3777b06a`, winner
+  `f77:numeric-buttons:10:s32:inner-buttons-False:inner-index-False`.
+- `func_8F802B40`: 115 words / 460 bytes, frame 0x28. Same batch,
+  `f77:numeric-buttons:16:s32:inner-buttons-False:inner-index-False`.
+- `func_8F802ECC`: 153 words / 612 bytes, frame 0x20. Batch
+  `3d48646afc184ed3806aca0cad12127d`, winner
+  `f77:menu-input:alias-table-False:ternary-wrap-False:switch-False`.
+
+Add named text and numeric views to the existing state union, rather than
+independent scalar aliases. Text has its signed cursor at 12, byte buffer
+at 14 and unsigned capacity at 32. Numeric state has signed selection at
+8, unsigned last index at 10, signed digits at 12 and word value at 20.
+The explicit state pointer and named text fields preserve cursor reloads
+while shifting bytes; separate scalar declarations let IDO treat the
+overlapping addresses as independent. The original text-insertion requeue is
+resolved. No data is allocated or moved by the type additions.
+
+Both numeric handlers use a real word-wide D-pad result and a signed-halfword
+switch input. Keep `raw = Input_GetRepeatedDPad(); input = raw;` on one
+physical source line: the measured IDO source-line tie fixes the initial
+schedule. Declare the real raw result before the return-status local to
+preserve its 0x20 stack home, and keep button flags word-wide. A u16 button
+local produces the final v0/v1 difference. Removing the full-width D-pad
+result changes the nonzero test and frame; these are not dummy locals.
+Digit changes wrap modulo 10/16 and confirmation folds signed digit bytes
+into the unsigned word accumulator in reverse index order.
+
+The menu handler needs the descending directional if/else chain and direct
+byte views of the existing 34-byte table rows. The alias-table switch
+variants have the wrong branch order. Preserve confirm/cancel priority,
+sound-before-data reads, separate decrement/negative-wrap stores, and the
+0x58-byte selected-record update. No helper factoring is required.
+
+Post-formatting and scoped extern deduplication, fresh/20-leading-blank
+builds reproduce every section and all eighteen C definitions against the
+accepted-object baseline. The fourteen pre-existing definitions retain
+their original assembly-baseline words, and all original offsets remain
+unchanged. All four newly linked retail spans and the full ROM pass MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. The 23 table rows and the existing
+dispatcher table bound configured numeric/text sizes to 5/11, within the
+8/18-byte view arrays. Naming plan has no known mappings.
+
+Twelve assembly owners remain. Next local lanes are the text keyboard
+handler `func_8F8023B8` and range handler `func_8F801FC4`, whose assembly has
+been read but no candidates submitted in this block. Establish any
+jump-table or shared-lui prerequisites before replacing their dispatcher
+siblings. Preserve all prior probe statistics and do not confuse advisory
+stuck warnings with terminal source or compiler evidence.
