@@ -280,3 +280,82 @@ Seven assembly owners remain: entry renderer `func_8F8000D0`, text
 renderer `func_8F8006B0`, range renderer `func_8F800924`, editor initializer
 `func_8F8015A8`, editor writer `func_8F801988`, range input `func_8F801FC4`
 and text input `func_8F8023B8`.
+
+## Native editor read/write pair (2026-10-15)
+
+Two additional owners are accepted, bringing this file to 25 C definitions
+and five assembly owners. Both use the existing per-file readonly layout;
+no YAML, linker, alias, data-allocation or compiler changes are needed.
+
+- `func_8F8015A8`: editor initialization/read, 248 words / 992 bytes,
+  frame 0x18. Accepted batch `51abf3bf78894c0c9edccaabe7aa479d`, label
+  `f77:editor-index:*(D_8F809FB0+kind-3):text-alias-True`.
+- `func_8F801988`: editor writes and derived-stat refresh, 367 words /
+  1468 bytes, frame 0x30. Accepted batch
+  `f35accbab31d4d11aeb8247b668fb879`, label
+  `f77:editor-write-compose:narrow-False:cache-value-False:hp-first-False`.
+
+Both are `relocation_masked: true`, `link_verified: false`; each passed
+its authoritative sequential full-ROM gate with statistics and the normal
+host syntax check enabled. Do not describe these as raw instruction-exact
+or link-verified probes. The writer's overlapping text-buffer view changes
+relocation spelling, but the linked ROM is byte-identical.
+
+The initializer's three clamp paths need one real `s32 step` value kept
+across the signed-origin stores. Without that local, each path reloads
+the unsigned halfword and adds one instruction. Preserve the initial
+selection-before-origin-zero store order and the pointer expression
+`*(D_8F809FB0 + kind - 3)`; the indexed subtraction spelling reverses an
+address-add operand. Helper signatures are verified as `u8(u8)` in
+`src/74020.c`; the initial `s32(s32)` draft was incorrect, although fixing
+it alone did not change the generated words. Cases 31/32 copy twelve
+bytes into the actual first-character alias and reset the text cursor.
+
+The writer preserves the switch body order, fresh post-call record reads,
+species/move restrictions, HP clamping, six independent stat-update cases,
+and nickname/OT-name behavior. Its HP bound needs its own `s32 hp`, not
+reuse of the mapped-value local. The first-character guard uses scalar
+`D_8F809FCE`, while the nickname copy uses the overlapping typed buffer;
+sharing one address expression hoists a common base and loses the retail
+guard/copy shape. Reading that scalar and taking its address for the
+initializer copies is a storage-free alias spelling. Fresh/blank controls
+prove that change leaves all sections unchanged. No dummy locals, extra
+arguments, volatile accesses, helper factoring, forced registers or padding.
+
+Post-formatting and scoped removal of nine duplicate extern lines, fresh
+and 20-leading-blank builds reproduce all accepted object sections and all
+25 C definitions. All 23 prior C definitions retain their raw relocatable
+words; all thirty original function offsets are preserved. All 25 linked
+C spans, the readonly/relocation window and compatibility aliases remain
+unchanged. Normal full-ROM comparison passes with retail MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. Naming plan has no known mappings.
+
+### Unresolved owner handoffs
+
+- `func_8F801FC4`: **requeue**. The earlier case-local, narrow-flags,
+  guard-conversion, physical-line composition and word/halfword-union
+  experiments bring the pre-pair history to 64 rejections. Guard-conversion
+  reaches the correct 0x20 frame but spills the full input at 0x1C and the
+  result at 0x18; retail converts before sound and uses SH/LH at 0x1A and
+  result at 0x1C. Eight independent field-alias cells also reject, best
+  normalized 0.5401 / raw 0.1168, 516 bytes; they do not improve the
+  previous 548-byte raw-0.7007 / normalized-0.9781 candidate. Total 72
+  rejected cells; none installed. Do not repeat declaration/line variants.
+  Next action: inspect the input/result lifetime and spill-home mechanism
+  against a matching input sibling before another candidate family.
+- `func_8F8006B0`: **requeue**. Eight initial cells hit a stale accepted
+  caller's `s32` prototype; paired retyping to `void` resolves that setup
+  error without installing it on rejection. Sixteen real cells then reject.
+  Best raw 0.5032 / normalized 0.7771, 588 bytes; field-alias/guard-state
+  cells reach normalized 0.8153 / raw 0.4713, 624 bytes. Retail is 628
+  bytes, frame 0x40; these cells retain frame 0x48. Full-object inspection
+  shows extra persistent geometry-base registers across the loops, unlike
+  retail's fresh absolute field accesses. Keep the signed text glyphs,
+  7-by-15 unsigned keyboard table, divide-by-five grouping and two cursors.
+  Next action: investigate geometry/address lifetimes rather than more
+  loop-counter or declaration-order permutations. No candidate is installed.
+
+Five owners remain assembly: entry renderer `func_8F8000D0`, text renderer
+`func_8F8006B0`, range renderer `func_8F800924`, range input
+`func_8F801FC4`, and text input `func_8F8023B8`. Scratch experiments and
+diagnostic scripts remain local and are not part of the published pair.
