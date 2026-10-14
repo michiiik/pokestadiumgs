@@ -97,6 +97,11 @@ with default host syntax checking, retail MD5
 tracked hooks are absent in this public checkout, so no hook execution is
 claimed. Naming supplies only the entry-point name; other address names stay.
 
+Before publication, master `e6618a6` brought in the accepted fragment 68 batch
+from #943. The only merge conflict was the two appended entry-point aliases;
+both are retained. The integrated tree passes a fresh full-ROM comparison and
+the same controls, preserving the fragment 68 accepted C as well.
+
 `func_8F200258` is the only remaining assembly owner in this file and has not
 been probed in this batch. It is the next text-rendering target, with three
 mode-dependent coordinate pairs and repeated language queries. No jump-table
