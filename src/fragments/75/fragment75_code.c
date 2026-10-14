@@ -46,7 +46,17 @@ s32 func_8FA00534(s32 arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/75/fragment75_code/func_8FA0069C.s")
+extern s32 main_pool_alloc(s32, s32);
+extern u8* func_8004D878(u8*, s32, u8*);
+extern u8* D_8FA020A0;
+extern s32 D_8FA01950[], D_8FA01958[];
+void func_8FA0069C(void) {
+    s32* asset;
+    s32 offset;
+    D_8FA020A0 = (u8*)main_pool_alloc(0x1900, 0);
+    /* Keep this loop and its initialization on one physical line: IDO's
+     * source-line scheduling otherwise delays the end-table address load. */
+    asset = D_8FA01950; offset = 0; do { func_8004D878(offset + D_8FA020A0, *asset, 0); asset++; offset += 0xC80; } while (asset != D_8FA01958); }
 #endif
 
 void func_8FA0071C(void) {
@@ -102,9 +112,67 @@ void func_8FA010B0(s16 arg0, s16 arg1, u8 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/75/fragment75_code/func_8FA017B8.s")
+extern s32 main_pool_push_state(s32);
+extern s32 main_pool_pop_state(s32);
+extern void func_800086A4(s32);
+extern void StageFade_StartFromOpaque(s32);
+extern void func_80064D28(void);
+extern void func_8FA00F4C(void);
+extern void func_8FA00E2C(void);
+extern s32 func_8FA01718(s32);
+extern void func_8FA00724(void);
+extern s32 func_80055948(s32);
+extern s32 func_80054E48(s32);
+extern void Gfx_InitDisplayListBuffers(s32,s32);
+extern void Gfx_FreeDisplayListBuffers(void);
+extern s32 func_800082E0(s8,s8,s8,s8,s8,s32);
+extern s32 func_8004C09C(s32);
+extern s32 func_8004C8C0(u16);
+extern s32 func_8004C990(s32,s32);
+extern u8* func_80047588(s32,s32);
+extern u8* Asset_LoadToSegment(s32,u8*,u8*,s32);
+extern u8 D_1000000[],D_446E30[],D_447D00[];
+extern s32 D_8FA02028;
+extern void func_80008514(s32);
+extern void func_80008574(void);
+extern void func_80051D64(s32,s32);
+extern void func_80047610(void);
+void func_8FA017B8(void) {
+    s32 state = 0;
+    func_800086A4(2);
+    StageFade_StartFromOpaque(5);
+    do {
+        func_80064D28();
+        if (state == 1) {
+            func_8FA00F4C();
+        }
+        func_8FA00E2C();
+        state = func_8FA01718(state);
+    } while (state != 3);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/75/fragment75_code/func_8FA01830.s")
+s32 fragment75_main(s32 arg0, s32 arg1) {
+    s32 configuration;
+    main_pool_push_state(0x4D444C56);
+    func_80055948(3);
+    Gfx_InitDisplayListBuffers(0x10000, 0);
+    configuration = func_800082E0(0, 1, 3, 1, 3, 1);
+    func_8004C09C(9);
+    func_8004C8C0(0x99);
+    D_8FA02028 = func_8004C990(0x99, 2);
+    func_80047588(3, 0);
+    Asset_LoadToSegment(((u32)D_1000000 & 0x0F000000) >> 24, D_446E30, D_447D00, 0);
+    func_8FA00724();
+    func_80008514(configuration);
+    func_8FA017B8();
+    func_80008574();
+    func_80051D64(0x13, 0);
+    func_80054E48(3);
+    func_80047610();
+    Gfx_FreeDisplayListBuffers();
+    main_pool_pop_state(0x4D444C56);
+    return 0;
+}
 #endif
