@@ -81,3 +81,59 @@ and byte loads, unsigned capacity, backward shift, and scalar cursor/capacity
 aliases. Do not infer exactness from its best normalized score (~0.81);
 read the complete diff before the next family. These are ordinary rejected
 source experiments, not tool failures or a demonstrated compiler limitation.
+
+## 2026-10-15: resource initialization and both digit requeues resolved
+
+Four more owners are accepted, all `link_verified: true`, normal runner
+statistics/host syntax checks enabled, with combined full-ROM gates:
+
+- `func_8F8031F8`: 78 words / 312 bytes, frame 0x30. Batch
+  `b2c99a4bb2584a04a816086d45d4d485`, winner
+  `f77:init-global-base:pointer-loop-False:index-first-False:unsigned-False`.
+- `func_8F8012C0`: 79 words / 316 bytes, frame 0x30. Batch
+  `8cb1ac1d7a974e66b6c4106944749bc1`, winner
+  `f77:resource-real-release-return:address-locals-False:count-False:unsigned-stride-False`.
+- `func_8F8026DC`: 58 words / 232 bytes, frame 0x18. Batch
+  `25d9de48759742538904675f3a6ce6be`, winner
+  `f77:editor-union:10:word-field-False:cursor-False:post-loop-True`.
+- `func_8F802A68`: 54 words / 216 bytes, frame 0x18. Same batch, winner
+  `f77:editor-union:16:word-field-False:cursor-False:post-loop-True`.
+
+The initializer must derive the selected-record pointer from the already
+assigned `D_8F809FA8` global, not repeat the literal `D_8F803BF4` address.
+The latter was one instruction short and changed the initial scheduling /
+temporary allocation. Preserve the separate zero assignments, clock-output
+addresses, fourteen 0x6F8-byte resource entries and final halfword return.
+
+The resource reader initially had 76/79 exact words, with only v0/v1 for
+the post-release `D_8F809FA4` address differing. The actual
+`func_80062304` definition in `src/615D0.c` returns s32, not void. Retyping
+its stale extern transactionally closes the mismatch and preserves the
+existing writer. Keep the real byte count stores before their word-sized
+copies, slot-dependent 6/30 capacities, 0x6F8 stride and 0x58 selection stride.
+No unused-return fake or extra local is needed.
+
+The digit initializer requeues above are resolved by declaring the shared
+editor state as a union of halfword, word and byte storage views. This
+models the existing overlapping accesses, allocates no storage, and leaves
+all fixed addresses unchanged. Index the union byte view at `index+12`;
+an explicit byte cursor still shares the initial address and misses one
+instruction. Preserve the guarded do/while, signed remainder/division,
+fresh post-call value read, and unsigned last-digit bound. The transaction
+updates five accepted callers to their same halfword view and all retain
+their exact words. The word-read cast remains as accepted; merely selecting
+the union word member is a distinct compiler-shape experiment.
+
+One initial union batch could not run: synthesized old externs made a
+companion edit ambiguous. Explicitly declaring the intended union symbol
+in the batch preamble resolved that setup failure. These pre-compiler
+diagnostics are process evidence, not failed source hypotheses. Do not
+change runner deduplication or replay rejected bodies to work around them.
+
+Post-formatting and scoped extern deduplication, fresh/20-leading-blank
+controls match all sections and all fourteen C definitions against the
+original assembly baseline, including the old callers and all four new
+owners. A fresh normal full-ROM gate passes MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. Naming plan has no known mappings.
+Exactly sixteen assembly owners remain in this file, including the text
+insertion requeue; no unready jump-table owner was replaced here.
