@@ -2,7 +2,28 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_34C8B0/func_8290FDB0.s")
+typedef struct unk_func_8290FDB0 {
+    u8 unk_00;
+    u8 unk_01[3];
+    s32 unk_04;
+} unk_func_8290FDB0;
+
+extern s32 func_80055948(s32 arg0);
+extern void func_80054210(unk_func_8290FDB0* arg0);
+extern void func_80054248(unk_func_8290FDB0* arg0);
+extern void func_80051D64(s32 arg0, s32 arg1);
+extern s32 func_80055028(void);
+
+void func_8290FDB0(s16 arg0) {
+    unk_func_8290FDB0 var_sp18;
+
+    func_80055948(3);
+    func_80054210(&var_sp18);
+    var_sp18.unk_00 = arg0 + 1;
+    func_80054248(&var_sp18);
+    func_80051D64(20, 0);
+    func_80055028();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_34C8B0/func_8290FE04.s")
 
