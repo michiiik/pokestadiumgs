@@ -8,6 +8,9 @@
  * undefined_syms.ld, and the other hand-written scripts are.
  */
 Audio_ThreadEntry = func_80035174;
+/* Coordinate callback: structured access view of the existing scalar/data label.
+ * This alias allocates no storage and preserves the original overlapping view. */
+D_82E06138_view = D_82E06138;
 /* Original data name aliases the counter's C-owned data slot. */
 D_87F112A0 = fragments_64_fragment64_32F2C0;
 Audio_RequestEvent = func_800355E4;
