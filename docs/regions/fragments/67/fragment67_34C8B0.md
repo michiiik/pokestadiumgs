@@ -377,3 +377,40 @@ with default syntax checks and MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`.
 Separate cc-check passes all 427 C sources. No tools, generated matching asm,
 objects, proprietary compiler artifacts or ROMs are published. This prerequisite
 does not claim any new function is decompiled or alter generated coverage.
+
+### Dispatcher schedule discriminator, 2026-10-14
+
+Requeue remains active. Forty additional normal probes (88 total for this
+layout-ready owner) reject five bounded families: per-case return exits,
+nested condition trees, pair/triple shared transition assignments, initialized
+case-local transition carriers before the coordinate tests, and signed-compatible
+phase store lvalues while retaining the unsigned selector. Statistics remain
+enabled and no candidate is installed. Return and nested-condition variants
+reproduce the 696-byte parent; they do not change its genuine schedule residual.
+
+A 180-second, four-worker native stock permuter run first reproduces the
+normal parent's instruction words and the assembly oracle's instruction words.
+Its target includes the actual three named formats before all six table
+entries and the twelve zero tail bytes: the full 48-byte rodata context, not
+an omitted-prefix target or patched text oracle. Search descends from 645 to
+260 but never reaches zero. The 260 output is invalid: its transition
+initialization sits before the first switch case label and cannot execute,
+leaving the later reads uninitialized. Reject it regardless of score.
+
+The valid 365/370 proposals combine two real transition stores. Normal-runner
+reproduction fixes the case-1 branch-likely/constant shape but introduces an
+extra halfword reload when propagating an assignment value, growing the owner
+to 700 bytes (normalized 0.9943, raw 0.7543). Three-field trees can grow to
+704. Signed-compatible store access does not remove the reload. Legitimately
+initialized precondition carriers grow to 712 bytes instead; do not adopt the
+uninitialized mutation to avoid that cost. Keep the original 696-byte parent
+as the whole-function baseline and retain these partial mechanism witnesses
+locally rather than claiming a closer normalized score proves a match.
+
+Fresh whole-object and twenty-leading-blank controls again reproduce both
+sections, all ten accepted siblings and the assembly dispatcher. The linked
+text, owned rodata and complete ROM remain retail-identical. Next action is
+to isolate the actual transition-value lifetime and case-2 flag-read scheduling
+under the calibrated stock frontend, not repeat the exit/condition or signedness
+families above. All generators and search output remain local scratch; no new
+helper, compiler artifact, ROM, or unmatched C body is published.
