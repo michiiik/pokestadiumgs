@@ -153,7 +153,8 @@ its mutations are not installed. Next action: isolate why that expression
 changes comparison lowering before another bounded search, retaining the
 u32 address index. Do not count normalised 1.0 as instruction exactness.
 
-`func_8820E580`: **requeue**, eight normal rejected cells, no replacement
+`func_8820E580`: prior **requeue**, now resolved by the accepted batch below.
+At this handoff, eight normal cells were rejected and no replacement was
 installed. A natural category resolver uses the current record, the other
 slot's type, the selected record's last-entry flag, and the inclusive
 0xC0/0xC2 position bounds. Real `func_88A00FD4(u8)` returns s32, as its
@@ -164,3 +165,61 @@ but only 0.9452 normalised / 0.6438 raw. Inline last-entry tests and early
 returns shorten the shape further and are not improvements. Next action:
 inspect the missing control-flow instruction and pointer reload lifetime
 in the direct-global, explicit-flag baseline before further spelling cells.
+
+## Accepted native transfer and category batch
+
+Four more owners, 335 instructions / 1340 bytes, are accepted with
+`link_verified: true` and normal combined full-ROM gates:
+
+| Owner | Words / bytes | Frame | Accepted batch |
+| --- | ---: | ---: | --- |
+| `func_8820CB74` | 77 / 308 | 0x28 | `4dd906a7e8154ed29d085ffa7d5468dd` |
+| `func_8820CCA8` | 97 / 388 | 0x38 | `1ec621a14444450792fd84c1d5f04729` |
+| `func_8820CE2C` | 88 / 352 | 0x40 | `29720e31bf0d47ff98e15f42702d48e6` |
+| `func_8820E580` | 73 / 292 | 0x20 | `19a8d0fa45d140d2817c385f7bb4431b` |
+
+- Transfer initializer: `f31:transfer-homes:u32:separate-False:sizeof-False`.
+  The real transfer record has a pointer at zero, two delta bytes, a slot,
+  and two count bytes. Declare the u32 index before the allocation pointer
+  to retain its stack home at 0x20. Raw-byte record access lost one word;
+  typed fields recover the target shape without padding or dummy locals.
+- Selection switch: `f31:switch-bound-fields:stores-False:reverse-False:unsigned-False`.
+  Retain the short-circuit guarded flag, current/other byte types, two-argument
+  bound setters, and conditional sound. Typed list, table and lower-bound
+  fields recover the real load and operand order. Adding a cached table
+  pointer or a width temporary changes allocation and does not help.
+- Completion path: `f31:complete-four-homes:iorp`. Keep the real local order
+  u32 index, other-record pointer, s16 position, then two-byte item pair.
+  The position is sampled before filling the pair. Typed list/record fields
+  repair two address operands; the declaration order gives frame 0x40 and
+  the pair at 0x34, not frame 0x48 / pair 0x38. Four earlier typed cells
+  failed because their typedef was below the owner; those are setup errors,
+  not failed source hypotheses. Moving accepted types before consumers was
+  separately checked to preserve every object section.
+- Category resolver: `f31:category-record-fields:wide-False:count-True:local-False`.
+  A real u32 selected-slot temporary fixes the first address add. Keep the
+  word-width other type with explicit byte mask, then the ternary last-entry
+  flag. Both position and count must use the same typed record path; typing
+  only one loses CSE. The last address add then matches, with no comma or
+  empty-branch mutation. A calibrated 45-second permuter had improved its
+  own score 20 -> 10; its nonmatching scaffolding is not installed.
+
+Native state offsets used here are slot 0, list IDs 0x0C, 44-byte records
+0x14, enabled flags 0xB0 and lower bound 0xC0. Unknown fields stay reserved;
+the global pointer is not retyped across translation units. The limits
+table has four count bytes at +1 and lower bytes at +5. Category helper C
+returns only 0 through 3. The existing display/lookup source remains intact.
+
+Post-acceptance formatting, duplicate-extern cleanup and correction of
+`func_88004990`'s second parameter to its actual u8 ABI preserve all accepted
+object sections. Its only new call passes zero. Fresh and 20-leading-blank
+controls preserve all eleven previous C bodies and all 28 original offsets.
+All fifteen linked C spans and the entire ROM match retail, MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. Exactly these four removed pragmas have
+accepted link-verified gate provenance. Scoped dedupe finds zero remaining
+duplicates; naming plan has no established mappings. Thirteen assembly
+owners remain. No compiler, tooling, linker, YAML or data-layout changes.
+
+The remaining row predicate received eight typed-slot/field cells; all are
+rejected and the previous three-operand residual is unchanged. Do not
+repeat that field-spelling family as the next hypothesis.
