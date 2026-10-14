@@ -130,7 +130,24 @@ s32 func_8414BF10(u8 arg0, u8 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B9B80/func_8414C4AC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B9B80/func_8414C7D4.s")
+s32 func_8414C7D4(u8 arg0) {
+    switch (func_80062D20(arg0)) {
+        case 111:
+        case 116:
+            return 3;
+        case 103:
+            return 2;
+        case 28:
+        case 89:
+        case 144:
+            return 0;
+        default:
+            if (arg0 == 233) {
+                return 0;
+            }
+            return 1;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B9B80/func_8414C858.s")
 
