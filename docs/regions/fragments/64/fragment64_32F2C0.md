@@ -101,3 +101,9 @@ No helpers, headers, compiler patches, scratch adapters, ROMs or target objects.
 For future exclusive initialized-data owners, investigate local static binding
 early rather than spending another allocation-only campaign on an extern view.
 This is evidence from this file, not a general source-shape guarantee.
+
+Next requeue discriminator: fragment52_285F60's unresolved func_86407D58 also
+loads initialized data referenced only by that owner in the consulted assembly,
+D_86409C4C/50. Test genuine function-local scale statics before more frame-home
+variants; require a raw match and separately verified data ownership. No claim
+is made that those statics or their layout have matched yet.
