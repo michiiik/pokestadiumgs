@@ -4674,7 +4674,22 @@ void func_8003B5AC(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003B600.s")
+extern u8 *D_80094920;
+extern s32 D_8009499C;
+extern s32 func_800392B8(s32, s32);
+void func_8003B600(u8 *arg0) {
+    s32 status = 0;
+    if (D_80094920 != NULL && (*(u16 *)(D_80094920 + 0x28) & 1) != 0) {
+        status = 1;
+    }
+    if (status != 0) {
+        func_800392B8((s32)(arg0 + 0x18), D_8009499C);
+    } else {
+        D_8009499C = func_800392B8((s32)(arg0 + 0x18), 0);
+    }
+    func_8003A2C8(arg0);
+    (*(s32 *)((u8 *)&D_80124F68 + 0x10A0))--;
+}
 #endif
 
 #ifdef VERSION_US
