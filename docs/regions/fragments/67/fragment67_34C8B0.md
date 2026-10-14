@@ -748,3 +748,56 @@ locals, masks, forced registers or object patches. This is a schedule requeue,
 not a proof that all C sources are unreachable. Scratch sources, diagnostic
 compiler binaries and logs stay local; authoritative installation still needs
 the normal unmodified runner and full-ROM gate.
+
+### Accepted signed-storage state dispatcher, 2026-10-15
+
+`func_82910258` now has full-ROM-accepted matching C: 174 instructions,
+696 bytes, original 0x18 frame. This closes all preceding dispatcher requeues;
+do not resume their rejected unsigned-storage, carrier or shared-store bodies
+after the pragma is gone.
+
+The decisive representation is a signed s16 phase field at flow offset 4,
+with the switch reading its bits through the corresponding u16 lvalue view.
+A value cast from a signed load had emitted LH/ANDI and failed earlier; the
+actual unsigned halfword memory view emits the required LHU. Signed transition
+storage shares the literal 2 with the signed display flags, recovering the
+original v0 constant, branch-likely sequence and later temporary-register phase.
+The winner needs ordinary independent field stores, no chained assignment,
+transition carrier, forced register, dummy local, helper function or patch.
+
+Eight correctly initialized guard/entry transition cells reproduce 712 bytes
+and are rejected. Eight corresponding unsigned store-view cells remove the
+old extra reload and reach 696 bytes, but rotate the constant into t2 and
+disturb later temporaries. They are useful mechanism evidence, not accepts.
+Eight signed-storage/unsigned-memory-selector cells find a relocation-masked
+probe hit with independent stores. Raw relocation names differ (for example,
+`D_8291BE82` versus `D_8291BE80 + 2`), so link-shape verification remains false.
+The unverified hit is promoted explicitly to the authoritative sequential ROM
+gate rather than claimed as a link-verified or raw object-word match.
+
+Normal runner acceptance: batch `f3ac0f18a52043a3be4e30dd2ad153a3`, label
+`f67:state:signed-storage:unsigned-selector-direct:tree-0`, accepted,
+relocation_masked true, link_verified false, one sequential full-ROM gate.
+Default host syntax checks remain enabled. The entire linked ROM is retail
+identical, MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`. The single-hit gate call
+is promotion of an unverified probe, not a duplicate link-verified auto-gate.
+
+Post-acceptance cleanup moves the actual flow type ahead of the initializer,
+documents field offsets and the selector view, expands timer/event statements,
+and removes unused/duplicate declarations. A fresh native full-ROM comparison
+passes again; full-source/20-leading-blank controls reproduce complete text
+and owned rodata, every accepted sibling and the newly accepted dispatcher.
+The naming plan has no evidence-backed mapping, so the address-keyed name
+remains. Existing layout metadata and format strings need no new changes.
+
+Preserve both Y/X movement calls even when the first coordinate is not at its
+destination, duplicate A9 audio calls, signed old-timer postincrements, timer
+bounds/events, unconditional done=1 in state 4, and unsigned unknown-phase
+default behavior. Only initializer `func_8290FE04` remains assembly in this
+file. Its new expression-order and ordinary C register-hint cells fail to
+improve the retained lifetime witness. Calibrated stock 5.3 and 7.1 C-driver
+controls reproduce the same initializer residual for both retained parents;
+return-zero fixtures and uniform blank-line controls pass, so no compiler
+switch is justified by these tests. Initializer requeue remains unresolved.
+No diagnostic helper, compiler binary, object, ROM or scratch generator is
+included in the published change.
