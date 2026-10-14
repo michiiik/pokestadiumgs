@@ -197,3 +197,86 @@ been read but no candidates submitted in this block. Establish any
 jump-table or shared-lui prerequisites before replacing their dispatcher
 siblings. Preserve all prior probe statistics and do not confuse advisory
 stuck warnings with terminal source or compiler evidence.
+
+## 2026-10-15: tight jump-table layout and five render/dispatch matches
+
+The six dispatch-table owners are now layout-ready. Use the narrow ROM
+window `0x36CA50..0x36CCA0` (0x250 bytes), not the planner's broad
+`0x36C530..0x36D5B0` interval. The fragment header identifies relocation
+offset 0x3BE0, ROM size 0x4CD0 and RAM size 0xA000. At ROM 0x36CCA0 the
+1081-entry relocation table starts; its padded tail ends at the next
+fragment, 0x36DD90. Preserve that tail as a separate rodata-typed subsegment.
+The generated linker script gains exactly one tail-object line; the
+handwritten compatibility aliases do not change.
+
+A first window beginning at 0x36C960 failed because splat silently dropped
+non-migratable format strings inside it. The tighter start crosses the
+last four bytes of the existing `D_8F80397C` format string: `32 64 00 00`.
+`const u32 D_8F803990[1]` represents those exact bytes, not code padding.
+IDO puts a scalar const in data here; the const array is required for its
+actual readonly section. The original data head now ends at that boundary.
+Pinned spimdisasm 1.35.0-dev0 re-split and a normal full-ROM gate with all
+six dispatchers still assembly passed. Fresh/20-leading-blank controls
+preserved all eighteen C functions and all thirty original function offsets;
+the owner object's rodata is exactly 0x250 bytes with the real suffix first.
+
+Five owners are accepted after that prerequisite:
+
+- `func_8F803130`: 50 words / 200 bytes, frame 0x20. Batch
+  `86981cf3f1f44bcab22fa871ff9b8853`, winner
+  `f77:dispatch-loop:sorted-False:state-pointer-False:break-loop-False`.
+- `func_8F802DD8`: 61 words / 244 bytes, frame 0x20. Batch
+  `46fe3ff2a1ec4a5db63ad71e4c8f4d16`, winner
+  `f77:action-byte-slot:kind-local-False:early-return-False:decimal-first-False`.
+- `func_8F8010E4`: 119 words / 476 bytes, frame 0x38. Batch
+  `165c0f96e22c47eea6227d21bccf751f`, winner
+  `f77:frame-render:pointer-loop-False:label-local-False:array-rows-False`.
+- `func_8F800E50`: 75 words / 300 bytes, frame 0x30. Batch
+  `49179cbe7953452cace4b6f383d4294f`, winner
+  `f77:number-render:False:state-pointer-True:pointer-loop-False:glyph-local-False`.
+- `func_8F800F7C`: 90 words / 360 bytes, frame 0x30. Same batch,
+  `f77:number-render:True:state-pointer-True:pointer-loop-False:glyph-local-False`.
+
+The frame renderer is link-verified and passes its combined ROM gate.
+The other four are explicitly relocation-masked, not link-verified, and
+pass authoritative sequential full-ROM gates. Statistics and normal host
+syntax checking remain enabled. Keep loop case-body order 0,4,1,2,3;
+action-switch hex/decimal/text body order and the actual byte slot alias
+`D_8F809F9F`; and fresh field reads in the backwards numeric glyph loops.
+The frame renderer retains its conditional slot label, device/day table
+strides, optional clock, and 23-entry menu loop. Do not factor helpers or
+format-pointer/glyph temporaries into the matched bodies.
+
+The first runner gate refreshed extraction despite the preceding manual
+split/build. It accepted the loop, then a later candidate's old snapshot
+reinserted that loop's now-missing ASM include. That is a setup failure,
+not evidence against the action-switch C. Before new candidate transactions
+after layout changes, establish the runner's own extraction prerequisites
+with all affected owners still assembly, not merely the Makefile build.
+A fresh action batch based on the installed loop closes normally. No
+runner modification or duplicate-rejection bypass was used.
+
+Post-formatting, shared-type relocation and scoped extern cleanup, fresh/
+20-leading-blank controls reproduce every accepted section and all 23 C
+definitions. The original eighteen C definitions' words and all thirty
+offsets remain unchanged. Five newly linked spans, the rodata window,
+relocation tail and full ROM match retail MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. Naming plan has no known mappings.
+
+`func_8F801FC4`: **requeue**. Twenty-four new range-view, local-value,
+input-reuse and coupled-field cells reject; no range view is installed.
+Best raw 0.7007 / normalized 0.9781, size 548 bytes, is in the input-reuse
+batch, label
+`f77:range-reuse-input:left-local-True:right-local-False:status-after-half-True`.
+Its first residual is the wrong frame, 0x28 versus retail 0x20; matching
+total byte size is not enough. Coupled stores did not improve the whole
+allocation. Next action: narrow the real selected-value temporary's scope
+to the directional cases and recheck the 0x1A input / 0x1C return-status
+homes before more field-order experiments. Preserve the signed selection /
+origin, unsigned step/maximum and actual field writes; no dummy locals,
+volatile qualifiers, padding or forced-register fixes.
+
+Seven assembly owners remain: entry renderer `func_8F8000D0`, text
+renderer `func_8F8006B0`, range renderer `func_8F800924`, editor initializer
+`func_8F8015A8`, editor writer `func_8F801988`, range input `func_8F801FC4`
+and text input `func_8F8023B8`.

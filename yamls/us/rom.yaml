@@ -1490,6 +1490,8 @@
     - [0x3690C0, textbin, fragments/77/fragment77_header]
     - [0x3690E0, c,       fragments/77/fragment77_code]
     - [0x36C530, data,    fragments/77/fragment77_data]
+    - [0x36CA50, .rodata, fragments/77/fragment77_code]
+    - [0x36CCA0, rodata,  fragments/77/fragment77_tail]
   
   - name: fragment78
     type: code
