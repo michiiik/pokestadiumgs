@@ -377,3 +377,201 @@ with default syntax checks and MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`.
 Separate cc-check passes all 427 C sources. No tools, generated matching asm,
 objects, proprietary compiler artifacts or ROMs are published. This prerequisite
 does not claim any new function is decompiled or alter generated coverage.
+
+### Dispatcher schedule discriminator, 2026-10-14
+
+Requeue remains active. Forty additional normal probes (88 total for this
+layout-ready owner) reject five bounded families: per-case return exits,
+nested condition trees, pair/triple shared transition assignments, initialized
+case-local transition carriers before the coordinate tests, and signed-compatible
+phase store lvalues while retaining the unsigned selector. Statistics remain
+enabled and no candidate is installed. Return and nested-condition variants
+reproduce the 696-byte parent; they do not change its genuine schedule residual.
+
+A 180-second, four-worker native stock permuter run first reproduces the
+normal parent's instruction words and the assembly oracle's instruction words.
+Its target includes the actual three named formats before all six table
+entries and the twelve zero tail bytes: the full 48-byte rodata context, not
+an omitted-prefix target or patched text oracle. Search descends from 645 to
+260 but never reaches zero. The 260 output is invalid: its transition
+initialization sits before the first switch case label and cannot execute,
+leaving the later reads uninitialized. Reject it regardless of score.
+
+The valid 365/370 proposals combine two real transition stores. Normal-runner
+reproduction fixes the case-1 branch-likely/constant shape but introduces an
+extra halfword reload when propagating an assignment value, growing the owner
+to 700 bytes (normalized 0.9943, raw 0.7543). Three-field trees can grow to
+704. Signed-compatible store access does not remove the reload. Legitimately
+initialized precondition carriers grow to 712 bytes instead; do not adopt the
+uninitialized mutation to avoid that cost. Keep the original 696-byte parent
+as the whole-function baseline and retain these partial mechanism witnesses
+locally rather than claiming a closer normalized score proves a match.
+
+Fresh whole-object and twenty-leading-blank controls again reproduce both
+sections, all ten accepted siblings and the assembly dispatcher. The linked
+text, owned rodata and complete ROM remain retail-identical. Next action is
+to isolate the actual transition-value lifetime and case-2 flag-read scheduling
+under the calibrated stock frontend, not repeat the exit/condition or signedness
+families above. All generators and search output remain local scratch; no new
+helper, compiler artifact, ROM, or unmatched C body is published.
+
+### Atlas RGB closure and smaller-frame parent, 2026-10-14
+
+Requeue `func_82910740` remains assembly. Eighty additional native object
+probes and a calibrated 180-second stock search produce no acceptance, but
+the normal runner now isolates a frame-only residual. No hypothesis is
+installed and no helper or scratch script is published.
+
+Use the real SDK `gDPSetColor` command for both primitive and environment
+color. Primitive min-level and LOD fraction were both zero, so its command
+word is unchanged. Preserve RGBA bit positions while expressing the packed
+word as green, then blue, then red, then alpha:
+
+```c
+_SHIFTL(color[1], 16, 8) | _SHIFTL(color[2], 8, 8) |
+_SHIFTL(color[0], 24, 8) | _SHIFTL(255, 0, 8)
+```
+
+Of eight packing cells, this spelling matches every original RGB load, shift
+and packing instruction. The resulting 1008-byte/252-word parent has 241 raw
+words exact (0.9563), rather than 229 (0.9087). Its only eleven differences
+are the prologue/epilogue frame and incoming argument-home accesses: frame
+0xC0 instead of 0xA0, with every affected home displaced by the same 0x20.
+These are raw normal-oracle measurements, not normalized acceptance.
+
+A second controlled family groups only the five spilled geometry values into
+a local record with signed-halfword fields `middleX`, `rightX`, `middleY`,
+`innerWidth`, and `innerHeight`. Keep `bottomY` and `textureS` as separate
+word carriers, the original signed origins and corner copies, and all original
+rectangle-argument conversions. This reduces the frame to 0xB8 and the
+uniform argument-home displacement to 0x18, without disturbing any of the
+other 241 instruction words. Both logical and measured spill-slot field orders
+reproduce this result. This smaller-frame record is the next parent.
+
+Bounded negatives on the new RGB parent: removing corner aliases is inert;
+reusing input/origin values reduces some frames but changes opcode/register
+shape; moving geometry declarations into render-phase scopes and C89 register
+storage classes is inert. Ordinary seven-field word records preserve the
+0xC0 frame; halfword records rotate remaining geometry registers. Arrays
+change actual spill loads/stores and can overshoot below the target frame.
+Packing additional origins/corners into the five-field record leaves 0xB8;
+making the two remaining word carriers halfword fields rotates registers.
+
+Diagnostic-only sharing of the five expanded SDK command pointers can reduce
+frame size but changes allocation. It is not an accepted replacement for the
+SDK-macro spelling and was never installed. Keep it only as a storage-mechanism
+witness. No filler, uninitialized value, changed helper arity or object rewrite
+is used to force the missing bytes.
+
+The old 358 line-grouping search witness, reproduced in the normal runner,
+does not improve the old 0.9087 parent. The new RGB-parent search calibrates
+base/probe and target/oracle words, then descends from 468 to 298 without zero;
+its retained proposals are token-identical setup line grouping, not a smaller
+frame or ROM acceptance. Do not rank their search scores above the freshly
+measured normal-oracle record parent. Fresh/blank whole-object controls again
+confirm both sections, all ten accepted siblings, the assembly dispatcher and
+the linked retail layout.
+
+Next action: isolate the remaining 24-byte frame reservation on the five-field
+record parent, keeping the now-exact RGB tree and all other instruction words
+as controls. Reopen storage/lifetime levers only with measured changes on that
+parent, not another RGB permutation or replay of the inert scope/register
+families. Function-level probe evidence is still insufficient for removal of
+the pragma: the authoritative full-ROM gate must accept the final candidate.
+
+### Atlas stock-phase controls and trace limitation, 2026-10-15
+
+Requeue remains the 1008-byte five-halfword-field parent: 241/252 raw words
+exact, frame 0xB8 instead of 0xA0, uniform incoming-home displacement +0x18.
+Forty further scored probes do not accept a function. Moving the real record
+through all declaration positions is inert, as are explicit discards of the
+actual texture-loader status, redundant narrow-conversion removal, and register
+storage classes on the actual expanded SDK packet pointers. Keep SDK macros
+and the known helper definitions; do not invent return values or argument counts.
+
+An unspecified-parameter declaration for the rectangle helper still passes all
+nine actual arguments, but changes narrow argument conversion code and shrinks
+the owner to 928 bytes while leaving the 0xB8 frame. It is a diagnostic negative,
+not an adopted declaration. Retain the real eight-s16-plus-s32 prototype.
+
+Overlaying the early texture pointer with the later geometry record is a valid
+lifetime experiment: the pointer's final read precedes every geometry write.
+Eight corrected cells reduce frame to 0xB0 but grow the owner to 1012 bytes and
+disrupt allocation (normalized 0.9684, raw 0.4783). Keep the frame-only parent,
+not the smaller but otherwise worse union. An initial generator removed the
+union's pointer declaration as well as the outer declaration; its eight compile
+failures are process evidence, not hypothesis evidence. The corrected generator
+anchors the removal to a complete outer declaration line and asserts that the
+union retains exactly one pointer member.
+
+Stock native `-K` retention reproduces the normal probe's instruction words and
+exposes a real `.frame $sp,184,$31` in the generated assembly. The preserved
+optimizer input shows nominal local homes through -60; the texture pointer
+appears at -40 and the five SDK packet temporaries at -44/-48/-52/-56/-60.
+These are partial trace observations, not proof that those homes own the final
+24-byte frame excess. Final coloring/retained-frame ownership is not available.
+
+Tooling-blocked (detailed optimizer trace only): native IDO 7.1 debug levels
+1 and 3 abort in `wrapper_ecvt`, whose runtime implementation is an assertion
+stub. Preserve the partial listings and failure logs, but do not describe either
+run as a successful trace or promote its failed output. Normal compilation is
+unaffected and remains available; the project goal is not blocked by this alone.
+
+The failed retained-phase run also exposes a calibration-file collision: the
+driver uses `base.o` as an intermediate beside `base.c`, overwriting a same-named
+calibration ELF before it aborts. The apparent repeat-control difference was
+that clobbered reference, not different generated instructions. Compare against
+the normal probe object outside the retained-phase directory instead. With that
+immutable reference, the changed-working-directory control reproduces all 1008
+bytes exactly. Do not repeat a search based on the overwritten non-ELF file.
+
+Next action: recover detailed native trace capability in an isolated tool copy,
+or use a materially different source-level discriminator for the measured frame
+reservation. No trace-owned allocation claim has yet been earned. Preserve the
+five-field parent and exact RGB tree while doing so; no new helper, proprietary
+artifact or unmatched C body is published from this block.
+
+### Accepted atlas renderer, 2026-10-15
+
+`func_82910740` is now accepted matching C. This closes the earlier atlas
+requeues and supersedes their proposed next parents. Do not resume a historical
+atlas attempt unless a fresh active pragma and a genuine regression exist.
+
+The decisive source change is to express the six cached rectangle geometry
+values and all three texture-S phases directly at the eight real draw calls.
+Let stock IDO perform common-expression reuse across calls. Retain only the
+two signed-halfword origin locals, word strip width and texture height, and
+the actual texture pointer. No corner aliases, geometry work record, union,
+padding, register forcing, helper-arity change or compiled-object patch remains.
+The exact RGB packing tree established above remains in the real SDK color
+commands. Header reads still precede the original texture-null guard, and all
+eight rectangle argument combinations and derivative values remain unchanged.
+
+An eight-cell normal runner batch accepts the origins-only inline spelling:
+252 words/1008 bytes, original 0xA0 frame, raw object match, link_verified true,
+auto_gated true, one combined full-ROM gate. The native ROM is byte-identical
+with MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`, default host syntax checks enabled.
+Post-acceptance cleanup gives the loader its known s32(u8*) signature and an
+explicit byte-pointer cast, and removes redundant externs. A fresh full-ROM
+gate verifies that cleanup. Naming-tool plan finds no evidence-backed mapping
+for this owner, so the address-keyed name is retained rather than guessed.
+
+Calibrated native compiler controls do not justify a compiler switch: the
+7.1 parent and its blank-line control reproduce 241/252 words, while stock 5.3
+produces 274 words with only 17 positional words exact and the same 0xB8 frame.
+Both return-zero instruction controls pass; known accepted siblings reproduce
+under the normal 7.1 wrapper. These findings apply to the tested parent, not
+every possible source or historical compiler point release.
+
+The cross-ROM search uses current public GS metadata and independently verifies
+the complete retail extraction of both border owners before comparison. Its
+positional searches find no >=0.50 donor. Broader opcode-only hints are not name
+or matching evidence. Reading Stadium 1's actual filled-panel C provides the
+useful natural-expression hypothesis; no foreign source or checkout is edited
+or imported as an accepted result. The native debug limitation remains real,
+but it was not a prerequisite for closing this owner.
+
+All earlier search artifacts stay local. Published changes are the matching
+renderer and these durable diagnostics only; no scratch helper, proprietary
+compiler artifact or ROM is included. Remaining owners in this file still
+require their own full-ROM acceptance.
