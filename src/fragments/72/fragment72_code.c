@@ -19,9 +19,32 @@ void func_8F400198(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/72/fragment72_code/func_8F4009A4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/72/fragment72_code/func_8F400A8C.s")
+u16 func_8F400A8C(u16* image, u16 stride) {
+    u32 alpha = 0;
+    u32 blue = 0;
+    u32 green = 0;
+    u32 red = 0;
+    s32 row;
+    s32 col;
+    s32 pitch = stride;
 
-extern u16 func_8F400A8C(u16*, u16);
+    /* Keep the masks on the loads: a pixel temporary changes IDO allocation. */
+    for (row = 0; row < 4; row++) {
+        for (col = 0; col < 4; col++) {
+            red += *image & 0xF800;
+            green += *image & 0x7C0;
+            blue += *image & 0x3E;
+            alpha += *image & 1;
+            image++;
+        }
+        image += pitch - 4;
+    }
+    red = (red >> 4) & 0xF800;
+    green = (green >> 4) & 0x7C0;
+    blue = (blue >> 4) & 0x3E;
+    alpha = alpha >= 5; /* At least five covered texels out of sixteen. */
+    return red | green | blue | alpha;
+}
 
 void func_8F400B88(u16* dest, u16* image) {
     u16 x;
