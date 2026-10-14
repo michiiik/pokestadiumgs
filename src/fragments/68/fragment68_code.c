@@ -2,7 +2,26 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/68/fragment68_code/func_8F000020.s")
+extern void* func_80041C98(s32 arg0);
+extern void func_80041E2C(void);
+extern u16* func_80042C68(void* arg0, s32 arg1, s32 arg2);
+extern u16* D_8F000924;
+extern s32 D_8F00092C;
+extern s32 D_8F000920;
+
+void func_8F000020(s32 arg0) {
+    void* var_v0;
+
+    var_v0 = func_80041C98(5);
+    func_80041E2C();
+    D_8F000924 = func_80042C68(var_v0, 128, 128);
+    *D_8F000924 &= 0xFEFF;
+    D_8F00092C = 0;
+    D_8F000920 = 0;
+    if (arg0 != 0) {
+        D_8F000920 = arg0 - 1;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/68/fragment68_code/func_8F000098.s")
 
