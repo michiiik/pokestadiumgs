@@ -145,7 +145,7 @@ s32 func_8004C3EC(s32 arg0, s32 arg1, s32 arg2) {
 }
 
 extern s32 func_8004C3B0(s32, s32);
-extern void main_pool_try_free(s32);
+extern s32 main_pool_try_free(s32);
 s32 func_8004C468(s32 arg0, s32 arg1) {
     s32 result;
     s32 value;
@@ -168,9 +168,63 @@ extern s32 D_80097120; s32 func_8004C54C(s32 index,s32 value){s32 result=0; s32 
 
 extern s32 D_80097120; s32 func_8004C594(s32 index,s32 value){s32 result=0; s32 ptr=D_80097120; if(ptr!=0&&*(s32*)((u8*)(u32)ptr+8)!=0&&index>0&&index<10&&value>=0){*(s32*)((u8*)(u32)ptr+index*4+0x2C)=value; result=1;} return result;}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C5E0.s")
+extern char D_800A4520[];
+extern s32 D_80097120;
+void func_8004C5E0(s8* output, s32 capacity, s8* input) {
+    s8* number;
+    s8* start;
+    s8* cursor;
+    s32 character;
+    s32 code;
+    s8 formatted[12];
+    character = *input;
+    start = output;
+    cursor = input + 1;
+    if (character != 0) {
+        do {
+            if (character == '#') {
+                code = cursor[0] - '0';
+                code = cursor[1] + code * 10 - '0';
+                cursor += 2;
+                if (code > 0 && (number = formatted, code < 10)) {
+                    sprintf((char*)formatted, D_800A4520, *(s32*)((u8*)(u32)D_80097120 + code * 4 + 0x2C));
+                    if (*number != 0) {
+                        do {
+                            if (output - start < capacity - 1) {
+                                *output++ = *number;
+                            }
+                            number++;
+                        } while (*number != 0);
+                    }
+                } else if (code >= 10 && code < 128) {
+                    s8* replacement = *(s8**)((u8*)(u32)D_80097120 + code * 4 + 0x2C);
+                    if (replacement != NULL) {
+                        s8* scan;
+                        s32 value = *replacement;
+                        do {
+                            scan = replacement;
+                            if (value == 0) {
+                                break;
+                            }
+                            do {
+                                if (output - start < capacity - 1) {
+                                    *output++ = value;
+                                }
+                                value = scan[1];
+                                scan++;
+                            } while (value != 0);
+                        } while (0);
+                    }
+                }
+            } else if (output - start < capacity - 1) {
+                *output++ = character;
+            }
+            character = *cursor++;
+        } while (character != 0);
+    }
+    *output = 0;
+}
 
-extern void func_8004C5E0(void*, s32, u8*);
 void* func_8004C7A0(void* destination, s32 capacity, s32 archiveId, s32 entryId) {
     void* result = NULL;
     s32 table;
@@ -196,7 +250,7 @@ void* func_8004C7A0(void* destination, s32 capacity, s32 archiveId, s32 entryId)
                 result = text;
             } else {
                 result = destination;
-                func_8004C5E0(destination, capacity, text);
+                func_8004C5E0(destination, capacity, (s8*)text);
             }
         }
     }
@@ -325,6 +379,7 @@ void func_8004D1C4(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6) {
     func_8004CB7C(a0, a1, a2, a3, a4, a5, 0, a6);
 }
 
+extern void func_800459AC(u8*, u8, u8, u16, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 s32 func_8004D1FC(u8 *arg0) {
     s32 sp4C;
 
@@ -352,8 +407,21 @@ s32 func_8004D27C(u8 *arg0, s32 arg1, s32 arg2) {
 
 s32 func_8004D314(s32 arg0, s32 arg1) { s32 result = -1; if (arg0 == 0xEF && arg1 == 0) result = 0; return result; }
 
-
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D334.s")
+s32 func_8004D334(s32 archive, s32 entry) {
+    s32 result;
+    result = 0;
+    D_80128080.texture = (u8*)func_8004C990(archive, entry);
+    if (D_80128080.texture != NULL && *(s32*)((u8*)(u32)D_80097120 + 4) != 0) {
+        D_80128080.index = func_8004D314(archive, entry);
+        if (D_80128080.index >= 0) {
+            result = 1;
+            func_800459AC(func_8004CA60(D_80128080.texture),
+                           D_80128080.texture[4], D_80128080.texture[5], *(u16*)D_80128080.texture,
+                           (s32)*(u16*)(D_80128080.texture + 2), 1, 0, 2, 2, 0, 0, 0, 0);
+        }
+    }
+    return result;
+}
 
 extern s16 D_80128082;
 
@@ -384,9 +452,33 @@ s32 func_8004D43C(s32 arg0, s32 arg1)
   return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D488.s")
-
 extern s16 D_8009712C[];
+extern void func_80044270();
+void func_8004D488(s32 x, s32 y, u8* text) {
+    s32 width = D_8009712C[D_80128080.index];
+    u32 character = *text;
+    u8* cursor = text + 1;
+    s32 glyph;
+    u32 nextCharacter;
+    if (character != 0) {
+        do {
+            glyph = func_8004D43C(D_80128080.index, character);
+            if (glyph >= 0) {
+                func_80044270((s16)x, (s16)y, (s16)width,
+                              *(s16*)(D_80128080.texture + 2),
+                              (width * glyph) << 5, 0, 0x400, 0x400, 0);
+            }
+            nextCharacter = *cursor;
+            x += width;
+            if (nextCharacter != 0) {
+                x += D_80128080.spacing;
+            }
+            character = nextCharacter;
+            cursor++;
+        } while (character != 0);
+    }
+}
+
 s32 func_8004D570(s32 arg0, s32 arg1, u8 *arg2) {
     s32 result = 0;
     s32 width = D_8009712C[arg0];
@@ -492,7 +584,61 @@ void PokeIcon_AdjustImageColors(u16* arg0, s32 a1, S1_arg1_func_80010CA8 arg2) {
     // clang-format on
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D878.s")
+typedef struct Result_8004B9E0 {
+    s32 value;
+} Result_8004B9E0;
+typedef union ResourceIconTint {
+    S1_arg1_func_80010CA8 tint;
+    Result_8004B9E0 result;
+} ResourceIconTint;
+extern S1_arg1_func_80010CA8 func_8003F5AC(u8*);
+extern s32 func_80064728(u8*);
+extern s32 func_8003F954(u16);
+extern s32 func_8006456C(s32);
+extern s32 func_8004B98C(s32);
+extern Result_8004B9E0 func_8004B9E0(s32);
+typedef struct ResourceIconWork {
+    s32 mode;
+    ResourceIconTint color;
+    s32 variant;
+} ResourceIconWork;
+u8* func_8004D878(u8* destination, s32 id, u8* mon) {
+    u8* result = NULL;
+    ResourceIconWork* selected;
+    ResourceIconWork work;
+    u8* record;
+    work.variant = 0;
+    if (D_80097120 != 0) {
+        if (mon == NULL) {
+            result = func_8004D720(destination, id, 0, 0);
+        } else {
+            work.color.tint = func_8003F5AC(mon);
+            work.mode = 0;
+            id = func_80064728(mon);
+            if (id == 0xEB) {
+                work.variant = func_8003F954(*(u16*)(mon + 0x16));
+            }
+            if (func_8006456C(*(u16*)(mon + 0x16)) != 0) {
+                work.mode = func_8004B98C(id);
+                switch (work.mode) {
+                case 1:
+                    work.color.tint.raw = 0;
+                    break;
+                case 2:
+                    work.color.result = func_8004B9E0(id);
+                    break;
+                }
+            }
+            selected = &work;
+            record = mon;
+            result = func_8004D720(destination, func_80064728(record), selected->mode == 1, selected->variant);
+            if (result != NULL && selected->color.tint.raw != 0) {
+                PokeIcon_AdjustImageColors((u16*)destination, 0x640, selected->color.tint);
+            }
+        }
+    }
+    return result;
+}
 
 extern void Gfx_DrawTextureRgba16(s16, s16, s16, s16, u8 *, s16, s32);
 void func_8004D998(s32 arg0, s32 arg1, u8 *arg2, s32 arg3, s32 arg4) {
@@ -563,7 +709,41 @@ s32 func_8004DAF0(void *arg0, s32 *arg1) {
     return result.value;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004DB5C.s")
+extern u16 func_8004EB38(u16*);
+extern s32 func_8004EB40(u16*);
+s32 func_8004DB5C(u8* cursor, s32* errors) {
+    s32 result = 1;
+    u8* scan = cursor;
+    u16 kind;
+    if (errors != NULL) {
+        *errors = 0;
+    }
+    kind = func_8004EB38((u16*)cursor);
+    if (kind != 0) {
+        do {
+            switch (kind) {
+            case 0x11:
+                if (func_8004DA18(scan) == 0 && result != 0) {
+                    result = 0;
+                }
+                break;
+            case 0x12:
+                if (func_8004DA8C(scan) == 0 && result != 0) {
+                    result = 0;
+                }
+                break;
+            case 0x13:
+                if (func_8004DAF0(scan, errors) == 0 && result != 0) {
+                    result = 0;
+                }
+                break;
+            }
+            scan += func_8004EB40((u16*)scan);
+            kind = func_8004EB38((u16*)scan);
+        } while (kind != 0);
+    }
+    return result;
+}
 
 s32 func_8004DC6C(s32 arg0) {
     s32 temp_a0;
@@ -593,8 +773,8 @@ s32 func_8004DCB4(s32 arg0) {
     return var_v1;
 }
 
-void func_8004DCFC(void) {
-    func_8004DB5C();
+void func_8004DCFC(u8* cursor, s32* errors) {
+    func_8004DB5C(cursor, errors);
 }
 
 s32 func_8004DD1C(s32 arg0) {
@@ -705,7 +885,76 @@ void *func_8004DFEC(s32 arg0, s32 arg1, Func8004DFECArg arg2) {
     return func_8004E018(arg0, arg1, 0, arg2);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004E018.s")
+extern u8* func_80040E80(s32, void*);
+extern void func_80040F60(u8*, Func8004DFECArg);
+void* func_8004E018(s32 pool, s32 id, s32 index, Func8004DFECArg tint) {
+    s32 entry;
+    u8* result = NULL;
+    s32 archive;
+    s32 callback;
+    HandlerResult_DE84D* descriptor;
+    entry = func_8004DE84(id, index);
+    if (entry != 0) {
+        archive = *(s32*)((u8*)(u32)D_80097120 + 0x24);
+        result = func_80040E80(pool, (void*)(u32)entry);
+        if (result != NULL) {
+            callback = func_8004C3B0(archive, id);
+            descriptor = ((HandlerResult_DE84D* (*)(s32,s32))(u32)callback)(0, 0);
+            *(s32*)(result + 0x2C) = callback;
+            if (tint.value != NULL) {
+                func_80040F60(result, tint);
+            }
+            if (index < ((u8*)descriptor)[3]) {
+                descriptor->table[index] = (s32)result;
+            }
+        }
+    }
+    return result;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004E0F0.s")
+u8* func_8004E0F0(u8* destination, s32 id, s32 index) {
+    s32 allocated = 0;
+    s32 loaded = 0;
+    u32 archiveAddress;
+    s32 lookup;
+    u8* chunk;
+    u8* end;
+    s32* header;
+    if (D_80097120 != 0) {
+        lookup = *(s32*)((u8*)(u32)D_80097120 + 0x28);
+        if (lookup != 0) {
+            archiveAddress = (u32)lookup;
+            lookup = (u32)id;
+            if (destination == NULL) {
+                destination = (u8*)(u32)main_pool_alloc(0x2008, 0);
+                allocated = 1;
+            }
+            if (destination != NULL && id >= 0 && (u32)lookup < (u32)*(s32*)((u8*)(u32)archiveAddress + 0xC)) {
+                chunk = (u8*)(u32)(*(s32*)((u32)archiveAddress + (u32)id * 0x10 + 0x10) + *(s32*)((u8*)(u32)archiveAddress + 4));
+                header = (s32*)(u32)main_pool_alloc(0x10, 1);
+                if (header != NULL) {
+                    end = chunk + 0x10;
+                    func_80003F74((u8*)header, chunk, end, 0);
+                    if (index >= 0 && index < header[0]) {
+                        u8* start = *(s32*)((u8*)header + index * 4 + 4) + chunk - 8;
+                        end = start;
+                        end = end + 0x2008;
+                        func_80003F74(destination, start, end, 0);
+                        loaded = 1;
+                    }
+                    main_pool_try_free((s32)header);
+                }
+            }
+            if (loaded == 0) {
+                if (allocated != 0) {
+                    main_pool_try_free((s32)destination);
+                }
+                destination = NULL;
+            }
+        }
+    }
+    return destination;
+}
+/* Original owner ends with three alignment NOPs after the return delay slot. */
+#pragma C_FUNCTION_PADDING(12)
 #endif
