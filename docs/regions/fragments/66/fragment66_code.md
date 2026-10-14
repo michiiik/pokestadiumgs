@@ -154,3 +154,13 @@ read-only region. The YAML still places those tables in fragment66_data.data.
 Before probing C switches, derive the per-file .rodata range, re-split with
 the pinned toolchain and gate all three still-assembly owners. This is a
 layout prerequisite, not permission to try switches against the current blob.
+The current for-jtbl planner is overbroad here:it proposes33B4A0..33C760,
+including the display lists, mutable callback data and an unreferenced widened
+tail, and explicitly warns of dropped bytes. Do not apply that proposal.
+Inspection rejects33BB50 as well:it cuts the display list D_82E05550 in
+the middle (there is no independent D_82E05560 label). Inspect the narrower
+aligned string/constant/table interval33BB90..33BC40
+(D_82E055A0 through padding after jtbl_82E0561C, before D_82E05650), confirm
+reference ownership and every boundary byte, then prove the still-assembly
+layout with a full-ROM gate before using it. This range is a proposed next
+hypothesis, not an accepted layout change.
