@@ -137,3 +137,30 @@ also rejected, at 332 bytes. No experimental API or address-test scaffold
 is installed. Next action: inspect the narrowed slot web kept across the
 two real TV-rate calls; retail reloads the incoming byte. The quotient
 and rounding-lifetime hypothesis did not explain the frame difference.
+
+## Requeue: row-selection predicate and category resolver
+
+`func_8820E450`: **requeue**, 32 normal rejected cells, no replacement
+installed. The u32 index initialized from the u8 slot recovers the exact
+304-byte opcode sequence and frameless shape; raw similarity is 0.9605.
+Only comparisons at instruction rows 29, 46 and 63 reverse their two
+register operands. Switching guard nesting, result width, comparison text
+order, comparison use of the unchanged index, or explicit integer casts
+does not fix those three words. The s16 cast family worsens the shape.
+A separately calibrated 45-second permuter reaches score 30 -> 20 by
+introducing a comma expression at one slot comparison, but never matches;
+its mutations are not installed. Next action: isolate why that expression
+changes comparison lowering before another bounded search, retaining the
+u32 address index. Do not count normalised 1.0 as instruction exactness.
+
+`func_8820E580`: **requeue**, eight normal rejected cells, no replacement
+installed. A natural category resolver uses the current record, the other
+slot's type, the selected record's last-entry flag, and the inclusive
+0xC0/0xC2 position bounds. Real `func_88A00FD4(u8)` returns s32, as its
+existing C definition confirms. The best normalised score is 0.9589,
+288 bytes versus retail 292, from an explicit last-entry flag, direct
+global-state accesses and a merged return. Cached state reaches 292 bytes
+but only 0.9452 normalised / 0.6438 raw. Inline last-entry tests and early
+returns shorten the shape further and are not improvements. Next action:
+inspect the missing control-flow instruction and pointer reload lifetime
+in the direct-global, explicit-flag baseline before further spelling cells.
