@@ -4358,6 +4358,8 @@ SECTIONS
         build/src/fragments/64/fragment64_32DC40.o(.data);
         fragments_64_fragment64_32EC70 = .;
         build/src/fragments/64/fragment64_32EC70.o(.data);
+        fragments_64_fragment64_data_data = .;
+        build/asm/us/data/fragments/64/fragment64_data.data.o(.data);
         fragments_64_fragment64_32F2C0 = .;
         build/src/fragments/64/fragment64_32F2C0.o(.data);
         fragments_64_fragment64_32F5F0 = .;
@@ -4372,8 +4374,8 @@ SECTIONS
         build/src/fragments/64/fragment64_3312D0.o(.data);
         fragments_64_fragment64_3320F0 = .;
         build/src/fragments/64/fragment64_3320F0.o(.data);
-        fragments_64_fragment64_data_data = .;
-        build/asm/us/data/fragments/64/fragment64_data.data.o(.data);
+        fragments_64_fragment64_data_tail_data = .;
+        build/asm/us/data/fragments/64/fragment64_data_tail.data.o(.data);
         fragment64_DATA_END = .;
         fragment64_DATA_SIZE = ABSOLUTE(fragment64_DATA_END - fragment64_DATA_START);
         fragment64_RODATA_START = .;
