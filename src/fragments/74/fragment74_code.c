@@ -14,18 +14,49 @@ void func_8F60009C(s16 *arg0, s32 arg1, s32 arg2) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/74/fragment74_code/func_8F6000EC.s")
+extern u8* func_8004CA60(u8*);
+extern void func_800459AC(u8*, u8, u8, u16, s32, s32, s32, s32, s32, s32, s32, s32, s32);
+extern void func_80044270(s16, s16, s16, s16, s16, s16, s16, s16, s32);
+void func_8F6000EC(s32 x, s32 y, u8* image) {
+    u8* pixels;
+    s32 offset;
+    s32 currentY;
+    s32 currentX;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/74/fragment74_code/func_8F6001FC.s")
+    if (image != NULL) {
+        /* This setup grouping preserves IDO's matched prologue schedule. */
+        currentX = (s16)x; pixels = func_8004CA60(image); for (offset = 0, currentY = y; offset < 128; offset += 64) {
+            func_800459AC(pixels, image[4], image[5], *(u16*)image, 32, 1, 0, 2, 2, 0, 0, 0, 0);
+            func_80044270((s16)currentX, (s16)currentY, (s16)(*(u16*)image * 2), 64, 0, 0, 512, 512, 0);
+            pixels += 0x1000;
+            currentY += 64;
+        }
+    }
+}
+
+extern Gfx D_80094E38[];
+extern u8 D_8F600C08[];
+extern s32 func_8004D19C(s32, s32, s32, s32, s32);
+extern u8 D_800D0510[];
+void func_8F6001FC(void) {
+    Gfx* packet;
+    s16 coordinates[2];
+
+    packet = (*((Gfx**)&D_800D0510))++;
+    gSPDisplayList(packet, D_80094E38);
+    if (D_8F600BFE == 1) {
+        func_8F6000EC(172, 240, D_8F600C08);
+    }
+    func_8F60009C(coordinates, 340, 240);
+    func_8004D19C(coordinates[0], coordinates[1], (s32)D_8F600C08, 0, 0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/74/fragment74_code/func_8F60028C.s")
 
 extern void func_800088DC(void);
 extern void GfxImage_FillCurrent(void *, s32);
-extern void func_8F6001FC(void);
 extern void func_8F60028C(void);
 extern void func_80008648(void);
-extern u8 D_800D0510[];
 void func_8F6004D4(void) {
     func_800088DC();
     GfxImage_FillCurrent(&D_800D0510, 0x5295);

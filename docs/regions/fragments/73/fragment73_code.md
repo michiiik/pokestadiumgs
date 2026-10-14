@@ -66,3 +66,74 @@ claim that workbench diagnostics ran.
 The remaining renderer and input handler have not been probed in this batch.
 All five unresolved owners remain assembly. These are bounded negative
 results, not exhaustion or impossibility claims.
+
+## 2026-10-15: text-renderer follow-up after PR #948
+
+`func_8F500130`: requeue. Twenty-four cells cover indexed/advancing label
+tables, char/u8 buffer views, loop initialization, final conditional-expression
+orientation, a real final string selector, the known state record and
+initialized consumed text-result locals at each of three call sites. All
+failed source and declarations are restored. The first family incorrectly
+declared the unused result of `func_8004C594` as void; later families use its
+actual s32 result. Do not interpret the first family as exhausting the
+correct-prototype space.
+
+The correct-prototype record/selector parent reaches normalized 0.9478 /
+raw 0.7130, 460 bytes versus retail 452. A different loop-init parent reaches
+normalized 0.9483 / raw 0.7069 but remains 464 bytes; it is not closer by
+exact size or raw words. Frame size is already the correct 0x88. Direct
+inspection of the retained parent shows six saved registers s0-s5 versus
+retail five s0-s4, an extra saved base for the selected-row global across
+the loop, another saved base for the alternate-row global after the loop,
+and buffer offset 0x48 instead of 0x3C. Merely introducing real returned-text
+locals does not remove those address webs. A final explicit selector local
+also changes the target's short branch shape, so that separate topology
+residual must not be mistaken for a register-only tie.
+
+Next: capture calibrated optimizer address-web ownership/priority evidence
+for the selected and alternate globals, preserving the natural two-row loop
+and genuine 64-byte text buffer. Do not replay the 24 cells, invent stack
+padding, force registers or call this compiler shape impossible. The input
+handler remains unprobed. PR #948's two accepted owners have independently
+passed public ROM-validation CI and merged; this follow-up adds no C match.
+
+### Calibrated follow-up and input-handler handoff
+
+Fresh stock, temporary diagnostic-off/on and 20-leading-blank builds reproduce
+all object sections and all three accepted C siblings for the retained
+correct-prototype text parent. The emitted optimizer listing is present:
+the selected-state address web spans the loop and has adjusted save about
+3.3333; the alternate-state address has adjusted save 0.5 across later calls.
+Those constants are register-allocated, not merely different UGEN temporary
+names. No diagnostic compiler or forced result is installed or accepted.
+
+`func_8F500544`: requeue. Forty cells cover the actual first-four-halfword
+state, record/array/separate-symbol views, snapshot widths, case order,
+preincrement versus separate stores, initialized consumed signed delta
+temporaries, and a mixed initial record snapshot with later independent
+symbols plus a typed controller view. The plain aggregate/array families
+reach normalized 0.6143 / raw 0.2071; separate scalars 0.5143 / 0.1214.
+Explicit signed deltas improve the shape to 0.7071 / 0.2643, while the mixed
+snapshot family reaches 0.7143 / 0.2286. These best deltas are 528 versus
+target 560 bytes. None is a match and no failed declarations remain.
+
+The assembly-derived draft independently confirms that clamp tests consume
+signed halfword temporaries, not a stored-then-reloaded global; its inferred
+three-argument sound calls and self-comparison are decompiler artifacts, not
+adopted source. The existing one-word sound ABI and the genuine previous
+selection snapshot are retained in the real trials. Current failures still
+cache controller/state addresses and values differently from the target's
+repeated direct-symbol reloads. Next: use the calibrated optimizer to
+distinguish alias invalidation from address-code-motion ownership; do not
+replay the forty cells or replace real prototypes with invented arguments.
+
+The initializer/frame/background handoffs above remain active. No fragment
+73 function is newly accepted in this follow-up; the next fresh batch moves
+to fragment 74 while retaining these specific requeues.
+
+The existing shared-LUI scanner now resolves both initializer groups and
+classifies each as interleaved (`contiguous: false`): A8/AA/AC and B0/B4.
+This confirms that the current contiguous-only coalescer is not applicable;
+no new confirming source campaign or object rewriting was attempted. A
+future source/alias representation hypothesis must account for that measured
+instruction shape rather than repeating the aggregate trials above.
