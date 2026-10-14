@@ -12,7 +12,23 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41A5F0/func_8420151C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41A5F0/func_84201620.s")
+typedef struct unk_func_84201620 {
+    u8 unk_00;
+    u8 unk_01;
+    u8 unk_02[18];
+    u32* unk_14;
+} unk_func_84201620;
+
+extern void func_8420138C(void* arg0);
+
+void func_84201620(unk_func_84201620* arg0) {
+    if ((*arg0->unk_14 & 1) == 0) {
+        if ((arg0->unk_01 != 38) && (arg0->unk_01 != 40) && (arg0->unk_01 != 41) &&
+            (arg0->unk_01 != 87) && (arg0->unk_01 != 88) && (arg0->unk_01 != 148)) {
+            func_8420138C(arg0);
+        }
+    }
+}
 
 void func_8420168C(void *arg0) { func_84201408(arg0); func_8420151C(arg0); func_84201620(arg0); }
 
