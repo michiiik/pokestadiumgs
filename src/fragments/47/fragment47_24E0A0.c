@@ -259,7 +259,16 @@ s32 func_86009EF8(void *arg0, f64 arg1) {
     return (arg1 < *(f64 *)((u8 *)arg0 + 0x18)) ^ *(s32 *)((u8 *)arg0 + 0x48);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_86009F28.s")
+typedef struct { f64 x; f64 y; f64 z; } F86009F28Vector;
+extern f64 func_86009C98(void *, f64, f64);
+s32 func_86009F28(void *arg0, F86009F28Vector *arg1, F86009F28Vector *arg2) {
+    if (func_86009C08(arg0, arg1) != 0) {
+        *arg2 = *arg1;
+        arg2->y = func_86009C98(arg0, arg1->x, arg1->z);
+        return 1;
+    }
+    return 0;
+}
 
 extern void func_87C00718(void *, void *, f64);
 extern s32 func_86009C08(void *arg0, void *arg1);
