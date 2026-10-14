@@ -1453,7 +1453,7 @@ extern void func_8004C54C(u8, s32);
 extern s32 func_84125080();
 extern s32 func_84129C8C(u8);
 extern void func_84135B40(u16);
-extern void func_841366C4(u8, s32);
+extern void func_841366C4(u8, s16);
 extern u8 D_841951BC;
 extern u8 * D_84195208[];
 void BattleAnim_Table_84185F10_000(void) {
@@ -1713,7 +1713,7 @@ void BattleAnim_Table_84185F10_008(void) {
 
 #ifdef VERSION_US
 extern void func_84135B40(u16);
-extern void func_841366C4(u8, s32);
+extern void func_841366C4(u8, s16);
 extern u8 D_841951BC;
 extern u8 * D_84195208[];
 void BattleAnim_Table_84185F10_009(void) {
@@ -2082,7 +2082,7 @@ extern void func_8004C54C(u8, s32);
 extern s32 func_84125080();
 extern s32 func_8412CFE4(u8 arg0, u8 arg1);
 extern void func_84135B40(u16);
-extern void func_841366C4(u8, s32);
+extern void func_841366C4(u8, s16);
 extern u8 D_841951BC;
 extern u8 D_841951BD;
 extern u8 D_841951D2;
@@ -2204,7 +2204,7 @@ void func_8412D53C(void) {
 #ifdef VERSION_US
 s32 func_84126320(u8);
 extern void func_84135B40(u16);
-extern void func_841366C4(u8, s32);
+extern void func_841366C4(u8, s16);
 void BattleAnim_Table_84185F10_040(void) {
     u8 *temp_v0;
 
@@ -2289,7 +2289,7 @@ void BattleAnim_Table_84185F10_046(void) {
 extern s32 func_80063754(s32);
 extern void func_84134EC8(u8 arg0);
 extern void func_84135B40(u16);
-extern void func_841366C4(u8, s32);
+extern void func_841366C4(u8, s16);
 extern u8 D_841951BC;
 extern u8 D_841951BD;
 extern u8 D_841951D3;
@@ -2725,7 +2725,7 @@ void BattleAnim_Table_84186004_015(void) {
 extern void *D_841951F0;
 extern u8 D_841951BC;
 extern void func_84136218(u8, u8);
-extern void func_841366C4(u8, s32);
+extern void func_841366C4(u8, s16);
 extern void func_84135B40(u16);
 extern void func_84136124(u8, s16, u16, u8, u8);
 void BattleAnim_Table_84186004_016(void) {
@@ -4670,7 +4670,15 @@ void func_84136678(u8 arg0, s16 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841366C4.s")
+void func_841366C4(u8 arg0, s16 arg1) {
+    s32 var_v0;
+
+    var_v0 = D_84195280[19841] - 1;
+    if (var_v0 < 0) {
+        var_v0 = 29;
+    }
+    func_841365F4(D_84195280 + (var_v0 * 640), arg0, arg1);
+}
 #endif
 
 #ifdef VERSION_US
