@@ -3721,6 +3721,8 @@ SECTIONS
         build/src/fragments/52/fragment52_2853B0.o(.data);
         fragments_52_fragment52_285750 = .;
         build/src/fragments/52/fragment52_285750.o(.data);
+        fragments_52_fragment52_data_data = .;
+        build/asm/us/data/fragments/52/fragment52_data.data.o(.data);
         fragments_52_fragment52_285F60 = .;
         build/src/fragments/52/fragment52_285F60.o(.data);
         fragments_52_fragment52_2862C0 = .;
@@ -3729,8 +3731,8 @@ SECTIONS
         build/src/fragments/52/fragment52_2870A0.o(.data);
         fragments_52_fragment52_2871C0 = .;
         build/src/fragments/52/fragment52_2871C0.o(.data);
-        fragments_52_fragment52_data_data = .;
-        build/asm/us/data/fragments/52/fragment52_data.data.o(.data);
+        fragments_52_fragment52_data_tail_data = .;
+        build/asm/us/data/fragments/52/fragment52_data_tail.data.o(.data);
         fragment52_DATA_END = .;
         fragment52_DATA_SIZE = ABSOLUTE(fragment52_DATA_END - fragment52_DATA_START);
         fragment52_RODATA_START = .;

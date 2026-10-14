@@ -154,3 +154,22 @@ native-attachment-zero-diagnose.log, native-attachment-data-preflight.log, and
 permuter/func_86407D58-ekk41y71/output-0-1/source.c. Normal runner provenance has
 no accepted D58 row yet; its GLOBAL_ASM remains untouched. Baseline full ROM,
 all427 host syntax checks, fresh/blank controls and diff checks pass.
+
+## 2026-10-14: attachment accepted, file complete
+
+The layout prerequisite above now passes the full retail-ROM gate with D58
+still in assembly. The normal runner then accepts the K&R scalar-storage
+candidate after120 prior attempts and atomically removes the temporary CE0
+scale initializers. Gate timing:9.462s probes /53.260s sequential gate /
+62.726s total, one gate run. link_verified=false due to relocation identity
+changes; acceptance comes from the complete-ROM comparison, not normalized
+object similarity. No duplicate, unused or fallback scale storage remains.
+
+Post-acceptance cleanup restores the modern void-pointer signature, exact
+f32 initializer literals and ordinary indentation while retaining the measured
+statement grouping. The cleaned source freshly passes the retail-ROM compare
+(MD51561c75d11cedf356a8ddb1a4a5f9d5d), all427 host syntax checks, and independent
+source/build/20-leading-blank controls for all five functions. The complete
+32-byte initialized data block and corresponding linked retail spans match.
+The four previously accepted functions are unchanged; this file now has zero
+GLOBAL_ASM owners. Names remain address-based without independent evidence.

@@ -39,7 +39,9 @@ typedef struct F52Node {
 } F52Node;
 extern F52State* D_86416C00;
 extern u8 D_86409800[], D_86409C70[];
-extern f32 D_86409C40, D_86409C44, D_86409C48;
+f32 D_86409C40 = 2.534400225f;
+f32 D_86409C44 = 2.534400225f;
+f32 D_86409C48 = 5.28f;
 extern Gfx* D_800D0510;
 extern s32 main_pool_get_available(void);
 extern void* MainPool_AllocState(s32, s32);
@@ -115,5 +117,24 @@ void func_86407CE0(s32 kind, F52Node* node) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/52/fragment52_285F60/func_86407D58.s")
+extern F52Item* func_87F025B8(F52Group*, void*);
+extern void func_80037E3C(void*, void (*)(s32, F52Node*), void*);
+extern void func_8003F1DC(void*);
+extern void func_8003F114(void*, s16, s16, void*);
+
+void func_86407D58(void* argument) {
+    static f32 scaleYZ = 5.28f;
+    static f32 scaleX = 2.534400225f;
+    F52Item* item;
+    /* Keep these statements grouped: their line relationship affects IDO scheduling. */
+    item = func_87F025B8(&D_86416C00->group, 0); if (item != 0) { func_80037E3C((u8*)item + 0x24, func_86407CE0, argument); func_8003F1DC((u8*)item + 0x24);
+        func_8003F114((u8*)item + 0x24, 0, -1, D_86416C00->graph);
+        item->scale[0] = scaleX;
+        item->scale[1] = scaleYZ;
+        item->scale[2] = scaleYZ;
+        item->angles[1] = -0x4000;
+    }
+}
+
+#pragma C_FUNCTION_PADDING(8)
 #endif
