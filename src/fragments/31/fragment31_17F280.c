@@ -41,6 +41,11 @@ typedef struct {
     s16 lower;
     s16 upper;
 } F31SelectionState;
+typedef struct {
+    u8 reserved;
+    u8 count[4];
+    u8 lower[4];
+} F31Limits;
 extern u8* func_88A00710(s32, s16);
 u8* func_8820C040(s32 mode, u8 slot) {
     s16 position;
@@ -68,11 +73,40 @@ u8* func_8820C040(s32 mode, u8 slot) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820C258.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820C65C.s")
+extern u8 func_88A007BC(s32);
+extern void func_88001C24(void*, u16, u8);
+extern void func_88001D0C(void*);
+void func_8820C65C(u8 slot, s32 enabled) {
+    F31SelectionScroll* record;
+
+    if (enabled != ((F31SelectionState*)D_88234710)->enabled[slot]) {
+        record = &((F31SelectionState*)D_88234710)->records[slot];
+        ((F31SelectionState*)D_88234710)->enabled[slot] = enabled;
+        if (enabled) {
+            if (func_88A007BC(((F31SelectionState*)D_88234710)->list[slot])) {
+                func_88001C24(record, (u16)(record->count + 1), 8);
+                if (record->position - record->start == 7) {
+                    record->start++;
+                } else {
+                    record->scroll += record->stride;
+                }
+            }
+        } else {
+            if (func_88A007BC(((F31SelectionState*)D_88234710)->list[slot])) {
+                func_88001C24(record, (u16)(record->count - 1), 8);
+                if (record->position - record->start == 7) {
+                    record->start--;
+                } else {
+                    record->scroll -= record->stride;
+                }
+            }
+        }
+        func_88001D0C(record);
+    }
+}
 
 extern u8* D_88A01C64;
 extern s32 func_88202158(u8*, s32);
-extern u8 func_88A007BC(s32);
 extern u8 func_8006378C(u8);
 extern s32 func_8800005C(void);
 s32 func_8820C798(void) {
@@ -142,9 +176,28 @@ s32 func_8820C94C(void) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820CA50.s")
+extern void func_8800225C(void*, s16, s16);
+extern s32 func_88A00FD4(u8);
+void func_8820CA50(u8 slot, u8 type) {
+    s32 category;
+    s16 bound;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820CAE4.s")
+    if (func_8800005C() == 0 && ((F31SelectionState*)D_88234710)->list[slot] == 0) {
+        category = func_88A00FD4(type);
+        bound = ((F31Limits*)D_88A01C64)->lower[category];
+        func_8800225C(&((F31SelectionState*)D_88234710)->records[slot], bound, (s16)bound);
+    }
+}
+
+extern s32 func_88A01018(u8);
+void func_8820CAE4(u8 slot, u8 type) {
+    s32 value;
+
+    if (func_8800005C() == 0 && ((F31SelectionState*)D_88234710)->list[slot] == 0) {
+        value = func_88A01018(type);
+        func_8800225C(&((F31SelectionState*)D_88234710)->records[slot], (s16)(value - 4), (s16)value);
+    }
+}
 
 extern void* Util_Malloc(s32);
 extern void* D_8800EF54;
@@ -182,15 +235,6 @@ void func_8820CB74(void) {
 }
 
 extern s32 D_882346F0;
-extern s32 func_88A00FD4(u8);
-extern void func_8820C65C(u8, s32);
-extern void func_8820CAE4(u8, u8);
-extern void func_8820CA50(u8, u8);
-typedef struct {
-    u8 reserved;
-    u8 count[4];
-    u8 lower[4];
-} F31Limits;
 void func_8820CCA8(void) {
     s32 playSound = 1;
     s32 guarded;
@@ -228,8 +272,6 @@ void func_8820CCA8(void) {
 extern u8 D_88234934;
 extern void func_88A016F0(s32, u8*, s16);
 extern void func_88202AA0(s32, s16);
-extern void func_88001C24(void*, u16, u8);
-extern void func_88001D0C(void*);
 extern void func_88001900(void);
 typedef struct {
     u8 type;
@@ -295,12 +337,74 @@ s32 func_8820E580(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820E6A4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820E9BC.s")
+extern s16 D_8800EF58;
+extern void* Color_SetRGB(void*, u8, u8, u8);
+extern void func_880006E0(void*);
+extern void func_800496A4(s32, s32);
+extern void* func_8004C874(s32, s32);
+extern void* D_8800687C;
+extern void func_80048E30(void*, s16, s16, void*, s32);
+void func_8820E9BC(void) {
+    u8 color[4];
+    s32 category;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820EB14.s")
+    if (D_8800EF58 == 0 && func_8800005C() == 0 && ((F31SelectionState*)D_88234710)->list[((F31SelectionState*)D_88234710)->slot] == 0 && func_88A007BC(((F31SelectionState*)D_88234710)->list[((F31SelectionState*)D_88234710)->slot]) != 0) {
+        category = func_8820E580();
+        switch (category) {
+        case 0:
+            func_880006E0(Color_SetRGB(color, 160, 190, 255));
+            break;
+        case 1:
+            func_880006E0(Color_SetRGB(color, 150, 255, 100));
+            break;
+        case 2:
+            func_880006E0(Color_SetRGB(color, 255, 200, 100));
+            break;
+        case 3:
+            func_880006E0(Color_SetRGB(color, 255, 140, 210));
+            break;
+        }
+        func_800496A4(4, 1);
+        func_80048E30(D_8800687C, 111, 402, func_8004C874(0x21, category + 0x20), 1);
+    }
+}
 
-extern void *Color_SetRGB(void *, u8, u8, u8);
-extern void func_880006E0(void *);
+extern Gfx* D_800D0510;
+void func_8820EB14(u8 selected, u8* record) {
+    s32 type = func_8006378C(record[0]);
+
+    switch (type) {
+    case 1:
+        if (selected == 1) {
+            gDPSetFillColor(D_800D0510++, 0x09A909A9);
+        } else {
+            gDPSetFillColor(D_800D0510++, 0x39CF39CF);
+        }
+        break;
+    case 3:
+        if (selected == 3) {
+            gDPSetFillColor(D_800D0510++, 0x03550355);
+        } else {
+            gDPSetFillColor(D_800D0510++, 0x02950295);
+        }
+        break;
+    case 4:
+        if (selected == 4) {
+            gDPSetFillColor(D_800D0510++, 0x8AD18AD1);
+        } else {
+            gDPSetFillColor(D_800D0510++, 0x5A0D5A0D);
+        }
+        break;
+    case 2:
+        if (selected == 2) {
+            gDPSetFillColor(D_800D0510++, 0x91579157);
+        } else {
+            gDPSetFillColor(D_800D0510++, 0x618F618F);
+        }
+        break;
+    }
+}
+
 extern u8 D_88005FA0[];
 void func_8820ECE8(u8 arg0, u8 *arg1) {
     u8 sp1C[4];
@@ -314,12 +418,9 @@ void func_8820ECE8(u8 arg0, u8 *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820ED44.s")
 
-extern void func_800496A4(s32, s32);
 extern void func_800495F8(s32, s32, s32, void *, s32);
 extern u8 D_88233F50[];
-extern void *D_8800687C;
 extern void *func_88A00938(u8 *);
-extern void func_80048E30(void *, s16, s16, void *, s32);
 void func_8820F74C(s16 arg0, s16 arg1, u8 *arg2, u8 arg3) {
     if (func_88202158(arg2, 1) == 0) {
         func_800496A4(4, 1);
@@ -360,8 +461,7 @@ void func_8820FC78(u8 slot) {
 
 void func_8820FD58(void) { func_8820FC78(0); func_8820FC78(1); }
 
-extern void func_80049064(s32, s32, s32, s32);
-s32 func_8004C874(s32, s16);
+extern void func_80049064(s32, s32, s32, const char*);
 
 void func_8820FD80(void) {
     func_800496A4(4, 2);

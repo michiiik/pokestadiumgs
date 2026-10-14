@@ -70,8 +70,9 @@ changes. Naming plan has no established mappings.
 
 ## Requeue: bounds setters
 
-`func_8820CA50` and `func_8820CAE4`: **requeue**, 36 rejected cells each;
-neither source replacement nor experimental prototype is installed.
+`func_8820CA50` and `func_8820CAE4`: prior **requeue**, now resolved by
+the five-owner batch below. At this handoff there were 36 rejected cells
+each; neither replacement nor experimental prototype was installed.
 The best normalised scores are 0.8947 and 0.8919, respectively. Retail
 uses frame 0x18; the current source families keep frame 0x20. Object
 inspection shows a narrowed slot carrier spilled at 0x18 across the bound
@@ -119,7 +120,8 @@ mappings. Seventeen assembly owners remain in this source file.
 
 ## Requeue: scroll update and initializer
 
-`func_8820C65C`: **requeue**, direct global-state reads recover the retail
+`func_8820C65C`: prior **requeue**, now resolved by the five-owner batch
+below. Direct global-state reads recovered the retail
 316-byte opcode sequence and 0x20 frame, but registers differ (normalised
 1.0, raw 0.6203). A calibrated 45-second permuter improves its own score
 195 -> 65; its retained proposal includes an empty constant-false branch,
@@ -223,3 +225,72 @@ owners remain. No compiler, tooling, linker, YAML or data-layout changes.
 The remaining row predicate received eight typed-slot/field cells; all are
 rejected and the previous three-operand residual is unchanged. Do not
 repeat that field-spelling family as the next hypothesis.
+
+## Category renderer: accepted
+
+`func_8820E9BC`: 86 words / 344 bytes, frame 0x38. Batch
+`e50ff4b2062746909e93448738973cb1`, winner
+`f31:category-renderer:color-first-True:early-False:typed-True`, is
+link-verified and passes its normal combined full-ROM gate. Preserve the
+four-byte color buffer before the s32 category, typed current-list guard,
+four color cases and actual text lookup/draw calls. There is no jump table.
+
+The same accepted transaction corrects the stale text-lookup declaration
+to `void* func_8004C874(s32, s32)`, matching its existing C definition.
+Fresh and 20-leading-blank native builds reproduce every accepted object
+section, all fifteen previous C bodies and the original owner offsets;
+the previous `func_8820FD80` caller's words are unchanged. Scoped duplicate
+cleanup and final normal full-ROM build pass with retail MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. Naming plan has no established mapping.
+This renderer is separate from the four functions merged in PR #969 and
+is not counted as published there. It is included in the following batch.
+
+## Accepted scroll, bounds and renderer batch
+
+Five owners, 355 instructions / 1420 bytes, are accepted with
+`link_verified: true` and normal combined full-ROM gates:
+
+| Owner | Words / bytes | Frame | Accepted batch |
+| --- | ---: | ---: | --- |
+| `func_8820C65C` | 79 / 316 | 0x20 | `63f3f2d4bed94068b877bf93b304f612` |
+| `func_8820CA50` | 37 / 148 | 0x18 | `74aa762a204a4a85989d1a9b9fb4e053` |
+| `func_8820CAE4` | 36 / 144 | 0x18 | `94d4d5ec14944c0383aaca9606054345` |
+| `func_8820E9BC` | 86 / 344 | 0x38 | `e50ff4b2062746909e93448738973cb1` |
+| `func_8820EB14` | 117 / 468 | 0x18 | `acb522facca74cc2afa44efde92b675f` |
+
+- Scroll update: `f31:scroll-state-fields:early-False:index-False:typed-True`.
+  Use the existing typed enabled/list arrays and 44-byte record, with the
+  byte slot parameter directly. This resolves the old a3/a2 allocation
+  residual without the permuter's empty branch. Both enabled/disabled
+  paths preserve their fresh count query, count adjustment, scrolling
+  branch and final refresh.
+- Moving bounds: `f31:bounds-state-fields:func_8820CAE4:s32:early-False:parameter-True`.
+  The typed state paths recover the incoming-byte reload and retail 0x18
+  frame. Keep the s32 lookup result and explicit signed-halfword bounds.
+- Fixed bounds: `f31:bound-distinct-values:s16:table-True`.
+  Keep category as s32 and the separate table-derived bound as s16. Reusing
+  one value for category and bound, or using u8/u16/s32 for that bound,
+  gives two extra narrowing instructions. Typed table access fixes the
+  last address operand. The real existing signed-halfword callee prototype
+  is retained; no word-width API experiment is installed.
+- Category renderer: winner and source explanation above. Its corrected
+  pointer-returning text-lookup declaration matches the actual existing
+  C definition and preserves the prior caller's words. Correct the related
+  `func_80049064` text argument to `const char*`, as its existing definition
+  in `src/47580.c` declares, removing the pointer-to-integer warnings in
+  that prior caller without changing its instructions.
+- Type fill colour: `f31:type-fill:s32:ternary-False:sorted-False`.
+  Use SDK `gDPSetFillColor` in each explicit conditional arm. Preserve case
+  block order 1, 3, 4, 2; sorting changes the raw words despite the same
+  opcode shape. Ternary colour selection merges branches and is 112 bytes
+  too short. Four cases require no jump-table/rodata prerequisite.
+
+The limits-table type was moved before its new consumers, separately
+verified section-identical. Post-acceptance formatting, redundant-forward
+removal and scoped extern dedupe preserve every accepted object section.
+Fresh and 20-leading-blank controls preserve all fifteen previous C bodies
+and all 28 original function offsets. All twenty linked C spans and the
+entire ROM match retail, MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`.
+Exactly five removed pragmas have accepted link-verified gate provenance.
+Naming plan has no established mappings. Eight assembly owners remain in
+this file. No scratch helpers, tooling, compiler, linker or layout changes.
