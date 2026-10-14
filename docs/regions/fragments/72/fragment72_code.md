@@ -42,7 +42,8 @@ compiler changes are included.
 
 Bounded handoffs, not impossibility claims:
 
-- `func_8F400A8C`: requeue at this batch boundary, resolved below. Twenty-four normal cells cover initialized channel
+- `func_8F400A8C`: requeue at this batch boundary, resolved below. Twenty-four
+  normal cells cover initialized channel
   sums, inline/separate result packing, indexed/advancing input, real stride
   preservation with sample-parameter reuse, signed/unsigned counters and loop
   topology. Ordinary pixel locals introduce an 8-byte frame; reusing the
