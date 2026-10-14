@@ -673,3 +673,24 @@ so address-keyed names remain. Scratch generators and build artifacts stay
 local. Only initializer `func_8290FE04` and dispatcher `func_82910258` remain
 assembly in this file; their earlier requeues remain active, not resolved by
 these renderer matches.
+
+### Initializer follow-up after panel acceptance, 2026-10-15
+
+Requeue `func_8290FE04` remains assembly. With both panel renderers accepted,
+eight token-identical natural statement-grouping cells test the initial
+selection/pointer statements, timer reset triples, channel copy triples and
+coordinate pairs. Seven retain 272 bytes, normalized 1.0/raw 0.8382 and the
+same first `lh t6` versus required `lh t7`; the coordinate-pair cell falls to
+raw 0.8235. This is evidence only for these grouping cells, not a proof that
+all source layouts are inert.
+
+Eight additional cells use real primary/secondary display-state base aliases
+and a two-field record holding the foreground/background pointers, separately
+and in combination, with one reversed field-order control. Every field and
+alias is initialized and consumed; all eight retain exactly the same 272-byte
+0.8382 register residual. No body installs. Do not replay these two families
+or interpret normalized 1.0 as a match. Next action remains an independently
+measured allocator class-crossing/live-range mechanism; the prior calibrated
+permuter-flat result and native detailed-debug bridge limitation still apply.
+Source and full-ROM acceptance of the two panel renderers are unaffected;
+the initializer's evidence is a requeue, not additional matching C coverage.
