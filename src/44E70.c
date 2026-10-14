@@ -89,7 +89,43 @@ void Gfx_DrawTextureRgba16Ia8(s16 arg0, s16 arg1, s16 arg2, s16 arg3, u8* arg4, 
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_80045DB4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/44E70/func_80046204.s")
+void func_80046204(s32 image, s32 format, s32 size, u32 width, u32 height, u32 uls, u32 ult, u32 lrs,
+                   u32 lrt, s32 palette, s32 cms, s32 cmt, s32 masks, s32 maskt, s32 shifts, s32 shiftt) {
+    Gfx *loadCommand;
+    u32 renderLine;
+    u32 loadLine;
+    s32 renderTile;
+
+    switch (size) {
+    case 0:
+        width >>= 1;
+        renderLine = loadLine = ((((lrs - uls + 1) >> 1) + 7) >> 3);
+        size = G_IM_SIZ_8b;
+        break;
+    case 1:
+        renderLine = loadLine = ((lrs - uls + 1 + 7) >> 3);
+        break;
+    case 2:
+        renderLine = loadLine = (((lrs - uls + 1) * 2 + 7) >> 3);
+        break;
+    case 3:
+        renderLine = loadLine = (((lrs - uls + 1) * 2 + 7) >> 3);
+        break;
+    default:
+        return;
+    }
+    gDPSetTextureImage(D_800D0510++, format, size, width, (u8 *)image);
+    loadCommand = D_800D0510++;
+    gDPSetTile(loadCommand, format, size, loadLine, 0, G_TX_LOADTILE, 0,
+              cmt, maskt, shiftt, cms, masks, shifts);
+    gDPLoadSync(D_800D0510++);
+    gDPLoadTile(D_800D0510++, G_TX_LOADTILE, uls << 2, ult << 2, lrs << 2, lrt << 2);
+    gDPPipeSync(D_800D0510++);
+    renderTile = G_TX_RENDERTILE;
+    gDPSetTile(D_800D0510++, format, size, renderLine, 0, renderTile, palette,
+              cmt, maskt, shiftt, cms, masks, shifts);
+    gDPSetTileSize(D_800D0510++, renderTile, uls << 2, ult << 2, lrs << 2, lrt << 2);
+}
 
 s32 func_800464F8(s32 arg0, s32 arg1) {
     s32 temp_lo;
