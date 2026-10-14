@@ -86,3 +86,4 @@ D_80128C5C = D_80128C54 + 0x8;
 /* Attachment scales retain their original addresses inside this C data block. */
 D_86409C4C = fragments_52_fragment52_285F60 + 0xC;
 D_86409C50 = fragments_52_fragment52_285F60 + 0x10;
+func_87D00020 = fragment65_main;
