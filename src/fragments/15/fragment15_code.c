@@ -9,7 +9,17 @@ void func_83F00020(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/15/fragment15_code/func_83F0002C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/15/fragment15_code/func_83F0012C.s")
+extern OSTime D_83F00400;
+
+s32 func_83F0012C(void) {
+    s32 var_v0;
+
+    var_v0 = 0;
+    if ((u32)OS_CYCLES_TO_USEC(osGetTime() - D_83F00400) >= 1000000) {
+        var_v0 = 1;
+    }
+    return var_v0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/15/fragment15_code/func_83F001A8.s")
 
