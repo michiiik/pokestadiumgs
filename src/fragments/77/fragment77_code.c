@@ -54,7 +54,36 @@ void func_8F8013FC(u8 arg0) {
     func_80062304(sp1C);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/77/fragment77_code/func_8F8014E4.s")
+extern u16 D_8F8034CC[][17];
+extern s32 D_8F809FB4, D_8F809FB8;
+extern u16 D_8F809FC0[];
+extern u8 D_8F809FE4, D_8F809FE8, D_8F809FE9, D_8F809FEA;
+extern u16 D_8F809FE6;
+extern void func_8F8015A8(void);
+extern s32 func_8F801FC4(void);
+extern void func_8F800924(void);
+extern void func_8F801988(void);
+extern void func_800226C0(s32);
+void func_8F8014E4(void) {
+    D_8F809FE4++;
+    if (D_8F809FE4 >= 30) {
+        D_8F809FE4 -= 30;
+        D_8F809FEA++;
+        if (D_8F809FEA >= 60) {
+            D_8F809FEA -= 60;
+            D_8F809FE9++;
+            if (D_8F809FE9 >= 60) {
+                D_8F809FE9 -= 60;
+                D_8F809FE8++;
+                if (D_8F809FE8 >= 24) {
+                    D_8F809FE8 -= 24;
+                    D_8F809FE6++;
+                    D_8F809FE6 &= 0xFF;
+                }
+            }
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/77/fragment77_code/func_8F8015A8.s")
 
@@ -64,12 +93,30 @@ void func_8F8013FC(u8 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/77/fragment77_code/func_8F801FC4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/77/fragment77_code/func_8F8021E8.s")
+s32 func_8F8021E8(void) {
+    s32 event;
 
-extern u16 D_8F809FC0[];
+    event = func_8F801FC4();
+    func_8F800924();
+    if (event == 1) {
+        func_800226C0(2);
+        if (((s16*)D_8F809FC0)[4] < D_8F8034CC[D_8F809FB4][3]) {
+            ((s16*)D_8F809FC0)[4] = D_8F8034CC[D_8F809FB4][3];
+        }
+        if (((s16*)D_8F809FC0)[4] > D_8F8034CC[D_8F809FB4][4]) {
+            ((s16*)D_8F809FC0)[4] = D_8F8034CC[D_8F809FB4][4];
+        }
+        func_8F801988();
+        D_8F809FB8 = 0;
+    } else if (event == 2) {
+        func_800226C0(3);
+        D_8F809FB8 = 0;
+    }
+    return 1;
+}
+
 extern s32 D_8F809FB4;
 extern u16 D_8F8034D6[][17];
-extern void func_8F8015A8(void);
 void func_8F8022B4(void) {
     D_8F809FC0[0] = 230;
     D_8F809FC0[1] = 150;
@@ -87,8 +134,6 @@ void func_8F8022B4(void) {
 
 extern s32 func_8F8023B8(void);
 extern s32 func_8F8006B0(void);
-extern void func_8F801988(void);
-extern void func_800226C0(s32);
 extern s32 D_8F809FB8;
 s32 func_8F802670(void) {
     s32 sp1C;

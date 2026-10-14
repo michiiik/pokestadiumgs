@@ -183,3 +183,69 @@ post-deduplication full-ROM verification. Neither scratch recipes nor
 generated ASM/assets belong in the PR. The remaining owners are
 `func_8F700028`, `func_8F700420` and
 `func_8F700538`. The first is now layout-ready, not blocked on rodata.
+
+## 2026-10-15: entry renderer accepted for the next batch
+
+PR #959 merges the three setting switches and layout prerequisite. While
+its CI runs, `func_8F700028` is also accepted locally: batch
+`b49c120c97424bb69b75b2d25d9a1425`, winner
+`f76:entry-render:early-guard-False:return-False:unsigned-mask-False`.
+Its original owner is 254 words / 1016 bytes, frame 0x20. The result is
+`accepted`, `relocation_masked: true`, `link_verified: false`, with one
+authoritative sequential full-ROM gate. It is held for the next batch,
+not included in PR #959.
+
+Preserve the bank guard and switch case order 0, 1-4, 5, 6, 7. Each kind
+draws its label at `(column-1)*horizontalSpacing` and uses fresh coordinate
+and unsigned-halfword spacing reads after calls. Kinds 1-4 print the byte
+value. The three mask cases select their own on/off strings, with the final
+case's polarity reversed. Keep the separate branch calls rather than
+factoring them into a helper or precomputing a format pointer. No artificial
+locals or code-generation workarounds are needed.
+
+Post-cleanup fresh/20-leading-blank controls reproduce all object sections
+and all twenty-one C functions. The pre-existing seventeen definitions'
+words and all original function offsets are preserved. All four new linked
+function spans match retail, and a fresh post-formatting normal ROM gate
+passes MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`. Only `func_8F700420` and
+`func_8F700538` remain assembly in the working branch.
+
+The loader's further eight real parameter-pointer cells still reject.
+They were intended to address the original's stack-byte reload without
+inventing a volatile qualifier; they do not close it. Preserve those
+negative results, do not replay them, and do not count the renderer's local
+acceptance as already published.
+
+## 2026-10-15: list renderer accepted; loader one-opcode requeue
+
+`func_8F700420` is accepted in batch `82546e31d32e47a28ed2596716b100f2`,
+winner `f76:text:direct-first-kind:pointer-False:byte-view-False:decl-init-False`:
+70 words / 280 bytes, frame 0x30, `link_verified: true`, with the normal
+combined full-ROM gate. It accompanies `func_8F700028` in the next PR.
+
+Declare the actual `D_8F701358` table as `F76MenuEntry[]`, not as bytes
+cast to records at each use. The direct first-record kind guard then emits
+the independent absolute byte load retail uses before loop setup. A real
+kind snapshot produces a different temporary-register allocation. The
+transaction includes byte views in seven existing callers so the table
+retype does not change their instruction words. It adds no allocated data.
+
+After formatting and scoped extern deduplication, fresh/20-leading-blank
+controls reproduce all sections and all 22 C definitions. All seventeen
+pre-switch C definitions' words and original offsets are preserved. The
+five linked spans added since the layout baseline match retail, and the
+normal full-ROM gate passes MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`.
+The naming plan has no known mappings for either renderer.
+
+Only `func_8F700538` remains assembly: **requeue**, not an impossibility
+claim. Signed memory guards `*(s8*)&asset != 0` with an ordinary unsigned
+parameter index produce exactly 84 bytes and 20/21 identical words. The
+sole residual at offset 8 is `lb t6,27(sp)` versus retail
+`lbu t6,27(sp)` (batch `05394be466674059ae4c9b204eaa9fb3`, candidate 6/7).
+Unsigned cast normalization re-commons the byte read into an 80-byte body;
+explicit masks yield 88 bytes. Further plain-char guards, u32 parameter
+ABI/low-byte views, and K&R u8 forms reject. The generated s32 ABI family
+was not run. Do not replay these rejected body/declaration pairs or invent
+volatile qualifiers, padding, dummy locals, or object patches. Next action:
+targeted optimizer investigation of formal-byte versus signed-memory read
+commoning, using the measured single-opcode residual and calibrated controls.

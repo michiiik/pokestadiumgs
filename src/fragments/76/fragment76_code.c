@@ -16,11 +16,84 @@ void func_8F700020(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/76/fragment76_code/func_8F700028.s")
+extern s32 D_8F7023B0;
+extern u16 D_8F702288, D_8F70228C;
+extern char D_8F7022A0[], D_8F7022A4[], D_8F7022AC[], D_8F7022B4[], D_8F7022BC[], D_8F7022C4[], D_8F7022CC[];
+extern void func_800495F8(s32, s32, s32, const char*, ...);
+extern void func_800495BC(s32, s32, const char*, ...);
+void func_8F700028(void* opaque) {
+    F76MenuEntry* entry = opaque;
+    if (D_8F7023B0 == entry->bank) {
+        switch (entry->kind) {
+        case 0:
+            func_800495F8((entry->column - 1) * D_8F702288, entry->row * D_8F70228C, 2, entry->label);
+            break;
+        case 1: case 2: case 3: case 4:
+            func_800495F8((entry->column - 1) * D_8F702288, entry->row * D_8F70228C, 2, entry->label);
+            func_800495BC(entry->column * D_8F702288, entry->row * D_8F70228C, D_8F7022A0, *(u8*)entry->value);
+            break;
+        case 5:
+            func_800495F8((entry->column - 1) * D_8F702288, entry->row * D_8F70228C, 2, entry->label);
+            if ((*(s32*)entry->value & entry->maximum) != 0) {
+                func_800495BC(entry->column * D_8F702288, entry->row * D_8F70228C, D_8F7022A4);
+            } else {
+                func_800495BC(entry->column * D_8F702288, entry->row * D_8F70228C, D_8F7022AC);
+            }
+            break;
+        case 6:
+            func_800495F8((entry->column - 1) * D_8F702288, entry->row * D_8F70228C, 2, entry->label);
+            if ((*(s32*)entry->value & entry->maximum) != 0) {
+                func_800495BC(entry->column * D_8F702288, entry->row * D_8F70228C, D_8F7022B4);
+            } else {
+                func_800495BC(entry->column * D_8F702288, entry->row * D_8F70228C, D_8F7022BC);
+            }
+            break;
+        case 7:
+            func_800495F8((entry->column - 1) * D_8F702288, entry->row * D_8F70228C, 2, entry->label);
+            if ((*(s32*)entry->value & entry->maximum) == 0) {
+                func_800495BC(entry->column * D_8F702288, entry->row * D_8F70228C, D_8F7022C4);
+            } else {
+                func_800495BC(entry->column * D_8F702288, entry->row * D_8F70228C, D_8F7022CC);
+            }
+            break;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/76/fragment76_code/func_8F700420.s")
+extern F76MenuEntry D_8F701358[];
+extern void Ui_DrawGradientPanel(s32, s32, s32, s32, s32, s32);
+extern s32 D_8F701350, D_8F701354;
+extern char D_8F7022D4[];
+extern void func_800498C4(void);
+extern void func_800496A4(s32, s32);
+extern void func_8004972C(s32, s32, s32, s32);
+extern void func_800499EC(void);
+extern void func_8F700028(void* opaque);
+extern s32 D_8F7023B4;
+void func_8F700420(void) {
+    s32 index;
+
+    Ui_DrawGradientPanel(0, 0, 640, 480, (s32)&D_8F701350, (s32)&D_8F701354);
+    func_800498C4();
+    func_800496A4(16, 0);
+    func_800495F8(320, 40, 1, D_8F7022D4);
+    func_800496A4(4, 0);
+    index = 0;
+    if (D_8F701358->kind != 8) {
+        do {
+            if (index == D_8F7023B4) {
+                func_8004972C(255, 255, 200, 255);
+            } else {
+                func_8004972C(128, 128, 100, 255);
+            }
+            func_8F700028(&D_8F701358[index]);
+            index++;
+        } while (D_8F701358[index].kind != 8);
+    }
+    func_800499EC();
+}
 #endif
 
 #ifdef VERSION_US
@@ -102,17 +175,15 @@ void func_8F7006F0(void* opaque, s32 value) {
 #endif
 
 #ifdef VERSION_US
-extern u8 D_8F701358[];
-extern s32 D_8F7023B4;
 extern void func_800226C0(s32);
 
 void func_8F7007B8(u8 arg0) {
     s32 sp1C;
 
     func_800226C0(1);
-    func_8F7005D8((D_8F7023B4 * 0x30) + D_8F701358, &sp1C);
-    func_8F700624((D_8F7023B4 * 0x30) + D_8F701358, &sp1C, arg0);
-    func_8F7006F0((D_8F7023B4 * 0x30) + D_8F701358, sp1C);
+    func_8F7005D8((D_8F7023B4 * 0x30) + ((u8*)D_8F701358), &sp1C);
+    func_8F700624((D_8F7023B4 * 0x30) + ((u8*)D_8F701358), &sp1C, arg0);
+    func_8F7006F0((D_8F7023B4 * 0x30) + ((u8*)D_8F701358), sp1C);
 }
 #endif
 
@@ -193,7 +264,6 @@ s32 func_8F700858(void *arg0) {
 
 #ifdef VERSION_US
 extern u8 D_8F702295, D_8F702291;
-extern s32 D_8F7023B0;
 void func_8F700A54(void) {
     s32 index;
     u8 column;
@@ -211,7 +281,7 @@ void func_8F700A54(void) {
     wrapCoordinate = row;
     func_800226C0(1);
     index = 0;
-    if (D_8F701358[0] != 8) {
+    if (((u8*)D_8F701358)[0] != 8) {
         do {
             if (((F76MenuEntry*)D_8F701358)[index].bank == D_8F7023B0 &&
                 ((F76MenuEntry*)D_8F701358)[index].column == column) {
@@ -253,7 +323,7 @@ void func_8F700B78(void) {
     wrapCoordinate = row;
     func_800226C0(1);
     index = 0;
-    if (D_8F701358[0] != 8) {
+    if (((u8*)D_8F701358)[0] != 8) {
         do {
             if (((F76MenuEntry*)D_8F701358)[index].bank == D_8F7023B0 &&
                 ((F76MenuEntry*)D_8F701358)[index].column == column) {
@@ -295,7 +365,7 @@ void func_8F700CA4(void) {
     wrapCoordinate = column;
     func_800226C0(1);
     index = 0;
-    if (D_8F701358[0] != 8) {
+    if (((u8*)D_8F701358)[0] != 8) {
         do {
             if (((F76MenuEntry*)D_8F701358)[index].bank == D_8F7023B0 &&
                 ((F76MenuEntry*)D_8F701358)[index].row == row) {
@@ -337,7 +407,7 @@ void func_8F700DC8(void) {
     wrapCoordinate = column;
     func_800226C0(1);
     index = 0;
-    if (D_8F701358[0] != 8) {
+    if (((u8*)D_8F701358)[0] != 8) {
         do {
             if (((F76MenuEntry*)D_8F701358)[index].bank == D_8F7023B0 &&
                 ((F76MenuEntry*)D_8F701358)[index].row == row) {
@@ -364,14 +434,14 @@ void func_8F700DC8(void) {
 #ifdef VERSION_US
 void func_8F700EF4(void) {
     s32 index = 0;
-    if (D_8F701358[0] != 8) {
+    if (((u8*)D_8F701358)[0] != 8) {
         do {
-            if (D_8F701358[index * 0x30 + 1] == D_8F7023B0) {
+            if (((u8*)D_8F701358)[index * 0x30 + 1] == D_8F7023B0) {
                 D_8F7023B4 = index;
                 return;
             }
             index++;
-        } while (D_8F701358[index * 0x30] != 8);
+        } while (((u8*)D_8F701358)[index * 0x30] != 8);
     }
 }
 #endif
@@ -404,7 +474,7 @@ extern s32 D_8F7023B8;
 extern void func_8F70058C(u8);
 void func_8F700FD8(void) {
     s32 temp_v0;
-    temp_v0 = D_8F701358[D_8F7023B4 * 0x30];
+    temp_v0 = ((u8*)D_8F701358)[D_8F7023B4 * 0x30];
     switch (temp_v0) {
     case 0:
         D_8F7023B8 = 0;
