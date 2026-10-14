@@ -58,13 +58,29 @@ void func_87F024CC(void) {
     GeoNode_CreateContainer(0, &D_87F119C0);
 }
 
-extern void func_87F0252C(void *, void *, s32, s32);
+extern void func_87F0252C(void *, F2684State *, u8 *, s32);
 
-void func_87F024F4(void *arg0, s32 arg1, s32 arg2) {
+void func_87F024F4(F2684State *arg0, u8 *arg1, s32 arg2) {
     func_87F0252C(D_80126420, arg0, arg1, arg2);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_324FB0/func_87F0252C.s")
+extern void func_8003F03C(s32, void *);
+void func_87F0252C(void *arg0, F2684State *arg1, u8 *arg2, s32 arg3) {
+    s32 i;
+
+    arg1->count = arg3;
+    *(s32 *)((u8 *)arg1 + 4) = 0;
+    arg1->items = arg2;
+    *(s32 *)((u8 *)arg1 + 0xC) = 0;
+    *(s32 *)((u8 *)arg1 + 0x10) = 0;
+    for (i = 0; i < arg1->count; i++) {
+        *(s32 *)(arg2 + 0xC) = 0;
+        *(s32 *)arg2 = 0;
+        *(s32 *)(arg2 + 4) = 0;
+        func_8003F03C((s32)(arg2 + 0x24), arg0);
+        arg2 += 0x18C;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_324FB0/func_87F025B8.s")
 

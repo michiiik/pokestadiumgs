@@ -70,14 +70,14 @@ typedef struct {
     u8 third;
     u8 fourth;
 } Func87F08E7C_Record;
-void func_87F08E7C(u16 arg0, u16 arg1, u8 arg2, u8 arg3, s32 arg4) {
+s32 func_87F08E7C(u16 arg0, u16 arg1, u8 arg2, u8 arg3, s32 arg4) {
     Func87F08E7C_Record record;
 
     record.first = arg0;
     record.second = arg1;
     record.third = arg2;
     record.fourth = arg3;
-    func_87F08D6C(&record, 1, 0.0f, 0.0f, arg4, 1);
+    return func_87F08D6C(&record, 1, 0.0f, 0.0f, arg4, 1);
 }
 
 typedef struct {
