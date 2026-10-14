@@ -801,3 +801,19 @@ return-zero fixtures and uniform blank-line controls pass, so no compiler
 switch is justified by these tests. Initializer requeue remains unresolved.
 No diagnostic helper, compiler binary, object, ROM or scratch generator is
 included in the published change.
+
+### Initializer context after dispatcher acceptance
+
+Requeue `func_8290FE04` remains active. The file now declares canonical
+`F67Flow D_8291BE78` before this owner. Old scratch initializer declarations
+of `extern s16 D_8291BE78[3]` are stale and conflict with that accepted type;
+do not replay them. Use the actual flow fields in reset order phase, timer,
+done, with no companion edit to the accepted dispatcher or flow definition.
+
+Eight refreshed normal candidates test early/late real y initialization and
+optional initialized flow/primary-state pointers. All four early-y cells
+retain 272 bytes and aligned raw 0.9853 with the one moved store; all four
+late-y cells retain the old 0.8382 register residual. Nothing installs. This
+confirms the accepted dispatcher context does not itself close the initializer.
+Retain the refreshed direct-field early-y parent for the store-placement
+investigation, not an obsolete array-based context or a normalized-only match.
