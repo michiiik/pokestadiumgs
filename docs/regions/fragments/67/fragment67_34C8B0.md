@@ -181,3 +181,199 @@ linked source interval `0x34C8B0..0x34E600` matches retail. Accepted provenance
 rows exist for both new owners; statistics stay enabled. Naming plan finds no
 independent existing mappings. Only existing game source and durable notes are
 published; every scratch generator, probe, compiler object and ROM stays local.
+
+## Native border campaign, 2026-10-14
+
+PR #933's Public PR ROM Gate succeeded and the PR merged into public master
+`834ec35`. Integrate that baseline, preserving all prior accepted source and
+notes. Work remains solo/native; no agents, Docker or compiler modifications.
+The tracked game source remains unchanged throughout this bounded campaign:
+neither owner below has an acceptance or an installed companion edit.
+
+### Requeue: func_82910510 (geometry/frame and RGB ordering)
+
+Target: 140 words / 560 bytes, frame 0x58. Lookup `(0x52,1)`, validate texture,
+compute `(width-10)/unsigned_texture_width`, require positive scale and both
+interior dimensions, install the existing display list/render mode, load the
+texture, pipe sync and both colors, then draw the inset rectangle. Texture
+derivative is 1024/scale, rounded by selecting +0.5 or -0.5 then adding before
+integer truncation. Preserve the helper's real one-pointer argument, not m2c's
+speculative three-argument guess from ambient live registers.
+
+Eight-cell families cover natural texture/float declaration order, guard
+shape, float carrier reuse, genuine interior-width/height locals, signed
+coordinate formals with a transactional existing-caller declaration, inline
+rounding and the separately selected bias. Initial cells have 556 bytes,
+frames 0x60/0x68 instead of 0x58, normalized 0.8929/raw about 0.40. Bias plus
+explicit guard geometry improves normalized 0.9085/raw 0.4648, but has 568
+bytes and frame 0x70. Direct u16-to-float versus an explicit u32 cast does not
+close this parent. Do not read a high normalized score as frame acceptance.
+
+A calibrated 90-second stock native search verifies base/probe words and
+assembly-target/current-build words, then descends score 2714 to 456 without
+zero. Reject the best output: it contains artificial mask locals and a
+written-but-unread assignment. Reject the 2593 output because it moves the
+height assignment after its first guard read. The 1897 output's reuse of the
+already-consumed geometry carrier as the actual inset 10 is semantically
+valid; so is the 1978 output's initialized, consumed reference to the real
+width parameter. No mutation is adopted solely on its score.
+
+Project only reviewed changes into an ordinary eight-cell family. Reusing
+height work for the final width and height subtractions restores all 140
+positional opcodes and 560 bytes: normalized 1.0/raw 0.8357. However, the frame
+shrinks to 0x40, all incoming homes move by -0x18, and the prim/env RGB load
+and shift order still differs. This is the best scalar parent, not a match.
+Using a real six-field working record (all fields read, no filler) keeps the
+opcode shape and gives frames 0x48/0x50 depending on field layout, still below
+0x58. A pointer to that record worsens the sequence. Explicit unsigned RGB
+packing through the real `gDPSetColor` macro does not improve it; retain the
+ordinary prim/env macros rather than expanded stores or artificial masks.
+
+The rectangle helper's actual signature in `src/44E70.c` is eight signed
+halfwords plus a word cycle. An installation-disabled eight-cell diagnostic
+using that signature leaves the scalar-parent result unchanged. Existing
+caller declarations remain unmodified after all rejected transactions.
+
+Next action: start from the reviewed geometry-reuse parent or its all-live
+working record. Isolate one real storage/lifetime change needed for the 0x58
+frame, and separately discriminate the RGB expression/load topology. Do not
+repeat the original three-float/guard/coordinate-width families, add dummy
+padding, or promote the mask-containing permuter winner. The negative is
+bounded to these families, not a claim that natural source is impossible.
+
+### Requeue: func_82910740 (atlas frame and operand layout)
+
+Target: 252 words / 1008 bytes, frame 0xA0. Lookup `(0x51,1)`, read texture
+width/height before the existing null branch, derive signed width/4, and
+retain the exact eight border rectangles in order: top-left/center/right,
+left-center, bottom-left/center/right, right-center. Texture S advances through
+the original width*32, twice-width*32 and three-width*32 regions. Preserve
+all 0/1024 derivative combinations, signed-halfword rectangle/texture fields,
+render commands and both RGB triplets. Do not invent a pre-read null guard.
+
+Initial eight with an old-style rectangle declaration produce 940 bytes,
+normalized 0.6349/raw up to 0.5556. Using the independently verified nine-
+argument signature restores the repeated signed conversions: 1024 bytes,
+normalized 0.9531/raw 0.6328, frame 0xA8/0xB8. The remaining early prologue
+mismatch is decisive: s16 coordinate formals shift incoming a1/a2 into saved
+registers immediately; target stores word homes and loads signed coordinates
+only after the texture/render setup. Do not rotate scalar temp declarations
+around that wrong input lifetime.
+
+Eight new cells retain the actual word-coordinate interface and assign real
+signed origin locals only after colors. The ordinary, unstaged forms reproduce
+all 252 positional opcodes and 1008 bytes. Word-coordinate temporaries give
+normalized 1.0/raw 0.9087, frame 0xC0 instead of 0xA0; short temporaries give
+1.0/0.8413, frame 0xB8. Pointer declaration placement is inert on this family.
+No body or caller edit is installed. Next action: preserve this late-origin,
+typed-rectangle parent and isolate actual local storage/field layout and RGB
+operand scheduling. Do not restore the speculative short input formals or
+old-style rectangle interface that produced the measured 940-byte sequence.
+
+### Calibration and publication
+
+The native baseline full-ROM build passes with default syntax checks and MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. Fresh source/build/20-leading-blank controls
+match complete fragment `.text`, all ten accepted siblings and the full linked
+retail interval `0x34C8B0..0x34E600`. The search's base/probe and target/oracle
+controls pass independently. Statistics remain enabled for every ordinary
+probe. `decomp-workbench` is not installed; use the calibrated repository
+object diagnostics and stock native permuter, not an unrun trace claim.
+Only durable notes are published for this zero-accept working block. All
+generators, mutation output, objects and ROMs remain local. Coverage is not
+claimed to increase from research or a normalized opcode match.
+
+## Native dispatcher layout prerequisite, 2026-10-14
+
+The table planner identifies the aligned 48-byte window
+`0x3542C0..0x3542F0`: three distinct four-byte "%s" format objects, the six
+words of `jtbl_829177CC` and its existing twelve trailing zero bytes. Stop
+before `D_829177F0`, which starts the fragment relocation data. The preceding
+table belongs to another source file and remains in the shared rodata head.
+
+Pair this window with `fragment67_34C8B0.c`, keep a separate rodata-typed tail,
+and run the native pinned splitter (splat 0.25.0, spimdisasm 1.35.0-dev0).
+The already-accepted text renderer owns the three string addresses: retain
+them as three distinct named const char array definitions, not pooled literal
+arguments and not a dropped unmigrated assembly stub. Their addresses stay
+`0x829177C0`, `0x829177C4`, `0x829177C8`; no new bytes or symbols are allocated.
+
+The fresh split migrates the table into the still-assembly dispatcher and
+generates the two-entry linker adjustment. Normalize only the generated local
+libultra archive path prefix back to its existing relative form. No unrelated
+linker edits remain. The split also emits unused matching assembly under a
+directory the public Makefile scans as raw assembler input; preserve that
+generated directory in local scratch, outside the build scan, rather than
+changing the Makefile or retaining duplicate source objects.
+
+Before replacing any dispatcher pragma, native full-ROM COMPARE=1 passes with
+default host syntax checks and MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`.
+Owner `.text` remains exactly `0x1D50` bytes; owned `.rodata` is exactly `0x30`
+bytes. The linked map places the three strings and table at their original
+retail addresses and the tail at `0x829177F0`. This is a verified layout
+prerequisite, not dispatcher acceptance or increased matching-C coverage.
+
+### Requeue: layout-ready func_82910258
+
+The six entries map states 0..5 to the physical case order in assembly. The
+signed timer is at flow offset 0, completion flag at 2 and unsigned phase at 4.
+Preserve postincrement comparisons against old timer values 15 and 12, both
+duplicate 0xA9 audio calls, the two independent 50/50 Y steps, flag/fade setup,
+the bounded 101 timer, the event at 85, fade completion plus timer >=86, the
+60-frame input wait with button bit 0x8000 at input offset 8, both final X steps
+at 70/70, and the unconditional completion flag in state 4. Unknown phase
+values leave state unchanged. No input-null or range guards are added.
+
+Forty-eight normal probes, all statistics enabled, yield no acceptance. Best
+uses direct record coordinates, unsigned phase and the original postincrement
+tests: normalized 0.9885/raw 0.7816, correct 696-byte owner and 0x18 frame.
+The first reported difference is the table's relocated LO16 field (0 versus
+0xC), not proof of a semantic table error. Genuine mismatches remain at the
+case-1 branch/constant scheduling and case-2 flag-check/load scheduling.
+The jump-table case mapping and owned 0x30-byte section are independently known.
+
+Bounded negatives cover direct versus existing coordinate aliases, actual
+Boolean/transition carriers and scopes, compound conditions versus guards,
+chained flag stores, signed phase plus a u16 dispatch cast, cached unsigned
+phase, de Morgan predicate trees, multiline conditions and real comma-sequenced
+assignments/calls. Signed phase adds LH/ANDI instead of the required LHU;
+cached phase shifts the selector from t6 to v0; chained stores grow to 700
+bytes. The unsigned transition and predicate variants do not repair the two
+scheduling sites. No draft or declaration transaction is installed.
+
+Next action: a calibrated schedule/allocator discriminator on the retained
+696-byte parent, not another broad scalar/guard replay. Account for table and
+interior-field relocation spelling before interpreting a permuter floor.
+Keep all six table entries and all three existing strings in the calibration;
+a standalone target omitting the 12-byte string prefix is not the full object's
+rodata context. Authoritative acceptance still requires the full linked ROM.
+
+### Atlas storage follow-up
+
+Eight record/union cells separate actual top-row texture S, side texture S and
+bottom texture S. The optional union overlays top S with interior height only
+after top S's final read. All fields are written/read with real geometry roles;
+there is no filler. None improves the parent: 1008 bytes remain but frame is
+0xC8, raw 0.9087 for the ordinary record and 0.8413 for the overlap. Keep the
+original late-coordinate scalar parent; this is a bounded storage negative.
+
+A calibrated 180-second stock native search on that scalar parent verifies
+base/probe and assembly-target/current-build words, then descends 528 to 358
+without zero. The 358 output is token-identical physical-line grouping over
+the first render setup; it is semantically valid but not normal-runner or ROM
+acceptance. The 508 pipe-sync grouping is also a valid retained layout witness.
+Other outputs contain mask scaffolding or an unused renderer-word assignment
+and are rejected. Next follow-up must test reviewed layouts through the normal
+oracle and recover a readable macro spelling, not promote mutation scores.
+
+### Final prerequisite controls
+
+Fresh final-source/build/20-leading-blank controls reproduce both complete
+`.text` and `.rodata`, all ten accepted C siblings and the unchanged assembly
+dispatcher. The string prefix is exactly three copies of `25 73 00 00`; the
+owned section preserves its final 12 zero bytes. Complete linked text and
+`0x3542C0..0x3542F0` rodata match retail. Final native full-ROM comparison passes
+with default syntax checks and MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`.
+Separate cc-check passes all 427 C sources. No tools, generated matching asm,
+objects, proprietary compiler artifacts or ROMs are published. This prerequisite
+does not claim any new function is decompiled or alter generated coverage.

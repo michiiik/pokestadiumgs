@@ -111,7 +111,9 @@ typedef struct F67TextRow {
 } F67TextRow;
 extern F67TextRow D_829172F8[], D_829172FC[], D_82917300[];
 extern u8 D_8291BEB0[];
-extern char D_829177C0[], D_829177C4[], D_829177C8[];
+const char D_829177C0[] = "%s";
+const char D_829177C4[] = "%s";
+const char D_829177C8[] = "%s";
 extern s32 func_800476FC(s32, s32);
 extern s32 func_8004C990(s32, s32);
 extern s32 func_80047738(s32, s32, s32, s32);
