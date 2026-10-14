@@ -99,7 +99,38 @@ void func_8290FF14(F67DisplayRecord* state) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_34C8B0/func_82910510.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_34C8B0/func_82910740.s")
+extern Gfx D_80094E78[];
+extern Gfx* D_800D0510;
+extern s32 func_8004C990(s32, s32);
+extern s32 func_8004D1FC(u8*);
+extern void func_80044270(s16, s16, s16, s16, s16, s16, s16, s16, s32);
+void func_82910740(F67DisplayRecord* state, s32 x, s32 y, s32 width, s32 height) {
+    s16 originX, originY;
+    s32 stripWidth;
+    s32 textureHeight;
+    u16* texture;
+    texture = (u16*)(u32)func_8004C990(0x51, 1);
+    stripWidth = (s32)texture[0] / 4;
+    textureHeight = texture[1];
+    if (texture != NULL) {
+        gSPDisplayList(D_800D0510++, D_80094E78);
+        gDPSetRenderMode(D_800D0510++, G_RM_OPA_SURF, G_RM_OPA_SURF2);
+        func_8004D1FC((u8*)texture);
+        gDPPipeSync(D_800D0510++);
+        gDPSetColor(D_800D0510++, G_SETPRIMCOLOR, (_SHIFTL(state->foreground[1], 16, 8) | _SHIFTL(state->foreground[2], 8, 8) | _SHIFTL(state->foreground[0], 24, 8) | _SHIFTL(255, 0, 8)));
+        gDPSetColor(D_800D0510++, G_SETENVCOLOR, (_SHIFTL(state->background[1], 16, 8) | _SHIFTL(state->background[2], 8, 8) | _SHIFTL(state->background[0], 24, 8) | _SHIFTL(255, 0, 8)));
+        originX = (s16)x;
+        originY = (s16)y;
+        func_80044270((s16)originX, (s16)originY, (s16)stripWidth, (s16)textureHeight, 0, 0, 1024, 1024, 0);
+        func_80044270((s16)(originX + stripWidth), (s16)originY, (s16)(width - stripWidth * 2), (s16)textureHeight, (s16)(stripWidth << 5), 0, 0, 1024, 0);
+        func_80044270((s16)(originX + width - stripWidth), (s16)originY, (s16)stripWidth, (s16)textureHeight, (s16)(stripWidth << 5), 0, 1024, 1024, 0);
+        func_80044270((s16)originX, (s16)(originY + textureHeight), (s16)stripWidth, (s16)(height - textureHeight * 2), (s16)((stripWidth * 2) << 5), 0, 1024, 0, 0);
+        func_80044270((s16)originX, (s16)(originY + height - textureHeight), (s16)stripWidth, (s16)textureHeight, (s16)((stripWidth * 2) << 5), 0, 1024, 1024, 0);
+        func_80044270((s16)(originX + stripWidth), (s16)(originY + height - textureHeight), (s16)(width - stripWidth * 2), (s16)textureHeight, (s16)((stripWidth * 3) << 5), 0, 0, 1024, 0);
+        func_80044270((s16)(originX + width - stripWidth), (s16)(originY + height - textureHeight), (s16)stripWidth, (s16)textureHeight, (s16)((stripWidth * 3) << 5), 0, 1024, 1024, 0);
+        func_80044270((s16)(originX + width - stripWidth), (s16)(originY + textureHeight), (s16)stripWidth, (s16)(height - textureHeight * 2), (s16)((stripWidth * 3) << 5), 0, 1024, 0, 0);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_34C8B0/func_82910B30.s")
 
@@ -115,7 +146,6 @@ const char D_829177C0[] = "%s";
 const char D_829177C4[] = "%s";
 const char D_829177C8[] = "%s";
 extern s32 func_800476FC(s32, s32);
-extern s32 func_8004C990(s32, s32);
 extern s32 func_80047738(s32, s32, s32, s32);
 extern void func_800498C4(void);
 extern void func_800496A4(s32, s32);
@@ -141,12 +171,10 @@ void func_82911418(void) {
 
 extern s16 D_8291BE7A;
 extern Gfx D_80094E38[];
-extern Gfx* D_800D0510;
 extern s32 D_8291BE74;
 extern void func_800468A0(s32);
 extern s32 func_8004D19C(s32, s32, s32, s32, s32);
 extern void func_82910510(F67DisplayRecord*, s32, s32, s32, s32);
-extern void func_82910740(F67DisplayRecord*, s32, s32, s32, s32);
 extern void func_82910B30(void);
 extern void func_82910FC8(void);
 void func_829115E0(void) {

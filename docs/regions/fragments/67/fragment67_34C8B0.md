@@ -530,3 +530,48 @@ or use a materially different source-level discriminator for the measured frame
 reservation. No trace-owned allocation claim has yet been earned. Preserve the
 five-field parent and exact RGB tree while doing so; no new helper, proprietary
 artifact or unmatched C body is published from this block.
+
+### Accepted atlas renderer, 2026-10-15
+
+`func_82910740` is now accepted matching C. This closes the earlier atlas
+requeues and supersedes their proposed next parents. Do not resume a historical
+atlas attempt unless a fresh active pragma and a genuine regression exist.
+
+The decisive source change is to express the six cached rectangle geometry
+values and all three texture-S phases directly at the eight real draw calls.
+Let stock IDO perform common-expression reuse across calls. Retain only the
+two signed-halfword origin locals, word strip width and texture height, and
+the actual texture pointer. No corner aliases, geometry work record, union,
+padding, register forcing, helper-arity change or compiled-object patch remains.
+The exact RGB packing tree established above remains in the real SDK color
+commands. Header reads still precede the original texture-null guard, and all
+eight rectangle argument combinations and derivative values remain unchanged.
+
+An eight-cell normal runner batch accepts the origins-only inline spelling:
+252 words/1008 bytes, original 0xA0 frame, raw object match, link_verified true,
+auto_gated true, one combined full-ROM gate. The native ROM is byte-identical
+with MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`, default host syntax checks enabled.
+Post-acceptance cleanup gives the loader its known s32(u8*) signature and an
+explicit byte-pointer cast, and removes redundant externs. A fresh full-ROM
+gate verifies that cleanup. Naming-tool plan finds no evidence-backed mapping
+for this owner, so the address-keyed name is retained rather than guessed.
+
+Calibrated native compiler controls do not justify a compiler switch: the
+7.1 parent and its blank-line control reproduce 241/252 words, while stock 5.3
+produces 274 words with only 17 positional words exact and the same 0xB8 frame.
+Both return-zero instruction controls pass; known accepted siblings reproduce
+under the normal 7.1 wrapper. These findings apply to the tested parent, not
+every possible source or historical compiler point release.
+
+The cross-ROM search uses current public GS metadata and independently verifies
+the complete retail extraction of both border owners before comparison. Its
+positional searches find no >=0.50 donor. Broader opcode-only hints are not name
+or matching evidence. Reading Stadium 1's actual filled-panel C provides the
+useful natural-expression hypothesis; no foreign source or checkout is edited
+or imported as an accepted result. The native debug limitation remains real,
+but it was not a prerequisite for closing this owner.
+
+All earlier search artifacts stay local. Published changes are the matching
+renderer and these durable diagnostics only; no scratch helper, proprietary
+compiler artifact or ROM is included. Remaining owners in this file still
+require their own full-ROM acceptance.
