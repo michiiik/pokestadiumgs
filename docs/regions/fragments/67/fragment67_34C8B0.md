@@ -282,3 +282,33 @@ object diagnostics and stock native permuter, not an unrun trace claim.
 Only durable notes are published for this zero-accept working block. All
 generators, mutation output, objects and ROMs remain local. Coverage is not
 claimed to increase from research or a normalized opcode match.
+
+## Native dispatcher layout prerequisite, 2026-10-14
+
+The table planner identifies the aligned 48-byte window
+`0x3542C0..0x3542F0`: three distinct four-byte "%s" format objects, the six
+words of `jtbl_829177CC` and its existing twelve trailing zero bytes. Stop
+before `D_829177F0`, which starts the fragment relocation data. The preceding
+table belongs to another source file and remains in the shared rodata head.
+
+Pair this window with `fragment67_34C8B0.c`, keep a separate rodata-typed tail,
+and run the native pinned splitter (splat 0.25.0, spimdisasm 1.35.0-dev0).
+The already-accepted text renderer owns the three string addresses: retain
+them as three distinct named const char array definitions, not pooled literal
+arguments and not a dropped unmigrated assembly stub. Their addresses stay
+`0x829177C0`, `0x829177C4`, `0x829177C8`; no new bytes or symbols are allocated.
+
+The fresh split migrates the table into the still-assembly dispatcher and
+generates the two-entry linker adjustment. Normalize only the generated local
+libultra archive path prefix back to its existing relative form. No unrelated
+linker edits remain. The split also emits unused matching assembly under a
+directory the public Makefile scans as raw assembler input; preserve that
+generated directory in local scratch, outside the build scan, rather than
+changing the Makefile or retaining duplicate source objects.
+
+Before replacing any dispatcher pragma, native full-ROM COMPARE=1 passes with
+default host syntax checks and MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`.
+Owner `.text` remains exactly `0x1D50` bytes; owned `.rodata` is exactly `0x30`
+bytes. The linked map places the three strings and table at their original
+retail addresses and the tail at `0x829177F0`. This is a verified layout
+prerequisite, not dispatcher acceptance or increased matching-C coverage.

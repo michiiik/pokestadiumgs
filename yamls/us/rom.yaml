@@ -1386,6 +1386,8 @@
     - [0x353F30, rodata] # D_82917430 through D_82917438
     - [0x353F40, .rodata, fragments/67/fragment67_33FAE0] # D_82917440 through jtbl_8291744C and D_82917478
     - [0x353F80, rodata]
+    - [0x3542C0, .rodata, fragments/67/fragment67_34C8B0] # format strings and jtbl_829177CC
+    - [0x3542F0, rodata]
 
   - name: fragment68
     type: code
