@@ -694,3 +694,57 @@ measured allocator class-crossing/live-range mechanism; the prior calibrated
 permuter-flat result and native detailed-debug bridge limitation still apply.
 Source and full-ROM acceptance of the two panel renderers are unaffected;
 the initializer's evidence is a requeue, not additional matching C coverage.
+
+### Trace-confirmed initializer lifetime and schedule requeue, 2026-10-15
+
+`func_8290FE04` remains assembly, but the previous broad register-tie diagnosis
+is now narrowed. Detailed native uopt listings previously aborted in the host
+bridge's unimplemented ecvt/fcvt. A temporary diagnostic copy, generated from
+the archived IDO static-recomp source and using the already available host
+bridge implementations, completes levels 3 and 5. Stock, diagnostic-off and
+both listing-enabled cells reproduce identical complete text and rodata, with
+accepted renderer siblings as controls. No repository compiler is replaced.
+
+Read-only UGEN logging wraps integer allocation/free and register-pool setup,
+and records source lines and emitter ordinals. Logging off, on and a
+20-leading-blank control reproduce the same complete text/rodata as stock.
+Emitter ordinals are not claimed to be final object rows: as1 folds and
+schedules emitted records. The measured parent starts its free pool at t6,
+and its first incoming-halfword temporary takes that register. The initial
+selection, index/stride and table-base temporaries account for the persistent
+register rotation; later color-copy registers already match.
+
+Eight ordinary source-store-position cells test the real initial y=0x230
+assignment. Moving it before the selection store repairs the entire register
+sequence. The normal runner retains 272 bytes and frame 0x18, normalized 1.0
+and aligned raw similarity 0.9853, but does not accept: the y halfword store is
+early, ahead of the timer resets and x initialization. An independent stock
+object comparison finds five positional word differences from that moved
+store, versus eleven in the old parent. This is a concrete lifetime/schedule
+lead, not a match or permission to install the body.
+
+Eight natural statement-grouping cells preserve the repaired register basin
+but do not move the store. Real signed coordinate carriers, reused coordinate
+values and two-field work records revert to the old 0.8382 register residual;
+two-element coordinate arrays instead add literal data and larger frames, and
+are rejected for section-layout drift. Eight actual incoming-word/low-halfword
+address cells restore the original 272-byte argument-home shape but reproduce
+the old register residual; their paired caller declaration edits are restored.
+Do not replay these families against the same parent.
+
+Calibrated stock debug-mode discrimination shows normal and explicit -g0 are
+identical for both parents; -g3 worsens both. Therefore a debug-mode collapse
+does not explain this tested residual and no build flag is adopted. A fresh
+120-second/four-worker native permuter search validates base/probe and
+target/oracle words before starting, and descends 50 to 35 without zero. The
+35 proposal initializes and consumes all three added channel-value carriers,
+but eight normal-runner width cells reproduce only 0.9706 aligned raw and a
+worse store order. It is not adopted; a lower search score is not acceptance.
+
+Next action: retain the simple early-y parent as the lifetime witness and
+inspect the actual uopt-to-UGEN store-placement boundary, seeking a real early
+constant lifetime with the original later field-store order. Do not add dummy
+locals, masks, forced registers or object patches. This is a schedule requeue,
+not a proof that all C sources are unreachable. Scratch sources, diagnostic
+compiler binaries and logs stay local; authoritative installation still needs
+the normal unmodified runner and full-ROM gate.
