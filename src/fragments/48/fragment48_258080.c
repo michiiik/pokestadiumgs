@@ -2,13 +2,13 @@
 
 
 #ifdef VERSION_US
-extern void func_87C00144(s32);
+extern void* func_87C00144(void* arg0);
 void func_87C02080(u8 *arg0, f64 arg3, u8 *arg4) {
     f64 *out = (f64 *)arg0;
     f64 *in = (f64 *)arg4;
 
     out[0] = arg3;
-    func_87C00144((s32)(arg0 + 0x20));
+    func_87C00144(arg0 + 32);
     out[1] = (((in[1] * in[1]) + (in[2] * in[2])) * out[0]) / 12.0;
     out[2] = (((in[2] * in[2]) + (in[0] * in[0])) * out[0]) / 12.0;
     out[3] = (((in[0] * in[0]) + (in[1] * in[1])) * out[0]) / 12.0;
@@ -19,7 +19,7 @@ void func_87C02138(u8 *arg0, f64 arg3, f64 arg4) {
     f64 temp_fv0;
 
     *(f64 *)arg0 = arg3;
-    func_87C00144((s32)(arg0 + 0x20));
+    func_87C00144(arg0 + 32);
     temp_fv0 = (*(f64 *)arg0) * arg4 * arg4 * D_87C03DF0;
     *(f64 *)(arg0 + 8) = temp_fv0;
     *(f64 *)(arg0 + 0x10) = temp_fv0;
@@ -55,12 +55,28 @@ f64 func_87C021FC(u8 *arg0, u8 *arg1, u8 *arg2, f64 arg4, f64 arg6, f64 arg8) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_258080/func_87C022A0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_258080/func_87C02488.s")
+typedef struct unk_func_87C02488 {
+    f64 unk_00[3];
+} unk_func_87C02488;
+
+extern void* func_87C008B0(void* arg0);
+extern void func_87C02508(s32 arg0);
+extern void func_87C02538(u8* arg0);
+
+void func_87C02488(void* arg0, s32 arg1, void* arg2) {
+    *(s32*)arg0 = arg1;
+    *(unk_func_87C02488*)((u8*)arg0 + 8) = *(unk_func_87C02488*)arg2;
+    func_87C00144((u8*)arg0 + 32);
+    func_87C00144((u8*)arg0 + 88);
+    func_87C008B0((u8*)arg0 + 56);
+    func_87C02508((s32)arg0);
+    func_87C02538(arg0);
+}
 
 
 void func_87C02508(s32 arg0) {
-    func_87C00144(arg0 + 0x70);
-    func_87C00144(arg0 + 0x88);
+    func_87C00144((void*)(arg0 + 112));
+    func_87C00144((void*)(arg0 + 136));
 }
 
 extern void func_87C00AE4(void *, void *);
