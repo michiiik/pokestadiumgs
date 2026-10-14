@@ -317,8 +317,8 @@ s32 func_80047244(u8 *state, s32 font) {
 
 extern u8 *D_80126F50;
 extern s32 func_80047244(u8 *, s32);
-void func_800472B8(s32 arg0) {
-    func_80047244(D_80126F50, arg0);
+s32 func_800472B8(s32 arg0) {
+    return func_80047244(D_80126F50, arg0);
 }
 
 s32 func_800472E0(u8 *arg0) {
@@ -1052,7 +1052,63 @@ u8 *func_80048390(u8 *state, u8 *input, s32 *x, s32 y, s32 draw) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80048830.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80048E30.s")
+extern u8 *func_80048390(u8 *, u8 *, s32 *, s32, s32);
+extern s32 func_80048830(u8 *, s32, s32, s32, s32);
+s32 func_80048E30(u8 *state, s32 x, s32 y, const char *text, s32 draw) {
+    s32 maximum;
+    s32 character;
+    struct {
+        s32 start;
+        s32 baseline;
+    } metrics;
+    const u8 *cursor;
+
+    maximum = 0;
+    metrics.baseline = func_800472B8(((struct FontHeightState *)state)->fontStack[state[0x7B]]);
+    metrics.baseline = y + metrics.baseline;
+    x--;
+    metrics.start = x;
+    cursor = (const u8 *)text;
+    while ((character = *cursor++) != 0) {
+        switch (character) {
+        case 10:
+            x = metrics.start;
+            y += (s8)state[0x79];
+            metrics.baseline = func_800472B8(((struct FontHeightState *)state)->fontStack[state[0x7B]]);
+            metrics.baseline = y + metrics.baseline;
+            break;
+        case 60:
+            cursor = func_80048390(state, (u8 *)cursor, &x, metrics.baseline - func_800472B8(((struct FontHeightState *)state)->fontStack[state[0x7B]]) / 2, draw);
+            break;
+        default:
+            if (D_80126F58[0] == 0 && character >= 0x80 && *cursor != 0) {
+                character = (character << 8) | *cursor++;
+            }
+            x = func_80048830(state, x, metrics.baseline - func_800472B8(((struct FontHeightState *)state)->fontStack[state[0x7B]]), character, draw);
+            if (draw == 0 && *cursor == 0) {
+                x -= (s8)state[0x78];
+            }
+            if (D_80126F58[0] == 0) {
+                if (func_80047104(((struct FontHeightState *)state)->fontStack[state[0x7B]]) >= 2) {
+                    x -= 2;
+                } else {
+                    x--;
+                }
+            } else {
+                if (func_80047104(((struct FontHeightState *)state)->fontStack[state[0x7B]]) > 0) {
+                    x -= 2;
+                } else {
+                    x--;
+                }
+            }
+            break;
+        }
+        if (maximum < x - metrics.start) {
+            maximum = x - metrics.start;
+        }
+    }
+    return maximum;
+}
 
 extern s32 func_80049290(s32, s32, const char *);
 extern s32 func_80048E30(u8 *, s32, s32, const char *, s32);
@@ -1242,7 +1298,7 @@ void func_800495F8(s32 x, s32 y, s32 mode, const char *format, ...) {
     }
 }
 
-extern void func_80048830(u8 *, s32, s32, s32, s32);
+extern s32 func_80048830(u8 *, s32, s32, s32, s32);
 
 void func_80049628(s32 arg0, s32 arg1, s32 arg2) {
     func_80048830(D_80126F50, arg0, arg1, arg2, 1);
