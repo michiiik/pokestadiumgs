@@ -325,6 +325,7 @@ void func_8004D1C4(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6) {
     func_8004CB7C(a0, a1, a2, a3, a4, a5, 0, a6);
 }
 
+extern void func_800459AC(u8*, u8, u8, u16, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 s32 func_8004D1FC(u8 *arg0) {
     s32 sp4C;
 
@@ -352,8 +353,21 @@ s32 func_8004D27C(u8 *arg0, s32 arg1, s32 arg2) {
 
 s32 func_8004D314(s32 arg0, s32 arg1) { s32 result = -1; if (arg0 == 0xEF && arg1 == 0) result = 0; return result; }
 
-
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D334.s")
+s32 func_8004D334(s32 archive, s32 entry) {
+    s32 result;
+    result = 0;
+    D_80128080.texture = (u8*)func_8004C990(archive, entry);
+    if (D_80128080.texture != NULL && *(s32*)((u8*)(u32)D_80097120 + 4) != 0) {
+        D_80128080.index = func_8004D314(archive, entry);
+        if (D_80128080.index >= 0) {
+            result = 1;
+            func_800459AC(func_8004CA60(D_80128080.texture),
+                           D_80128080.texture[4], D_80128080.texture[5], *(u16*)D_80128080.texture,
+                           (s32)*(u16*)(D_80128080.texture + 2), 1, 0, 2, 2, 0, 0, 0, 0);
+        }
+    }
+    return result;
+}
 
 extern s16 D_80128082;
 
@@ -384,9 +398,33 @@ s32 func_8004D43C(s32 arg0, s32 arg1)
   return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004D488.s")
-
 extern s16 D_8009712C[];
+extern void func_80044270();
+void func_8004D488(s32 x, s32 y, u8* text) {
+    s32 width = D_8009712C[D_80128080.index];
+    u32 character = *text;
+    u8* cursor = text + 1;
+    s32 glyph;
+    u32 nextCharacter;
+    if (character != 0) {
+        do {
+            glyph = func_8004D43C(D_80128080.index, character);
+            if (glyph >= 0) {
+                func_80044270((s16)x, (s16)y, (s16)width,
+                              *(s16*)(D_80128080.texture + 2),
+                              (width * glyph) << 5, 0, 0x400, 0x400, 0);
+            }
+            nextCharacter = *cursor;
+            x += width;
+            if (nextCharacter != 0) {
+                x += D_80128080.spacing;
+            }
+            character = nextCharacter;
+            cursor++;
+        } while (character != 0);
+    }
+}
+
 s32 func_8004D570(s32 arg0, s32 arg1, u8 *arg2) {
     s32 result = 0;
     s32 width = D_8009712C[arg0];
