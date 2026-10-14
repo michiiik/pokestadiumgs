@@ -2,6 +2,28 @@
 
 
 #ifdef VERSION_US
+typedef union {
+    u16 halfwords[18];
+    s32 words[9];
+    s8 bytes[36];
+    struct {
+        u16 geometry[4];
+        s16 selected;
+        u16 last;
+        s8 digits[8];
+        s32 value;
+    } numeric;
+    struct {
+        u16 fields[6];
+        s16 cursor;
+        s8 buffer[18];
+        u16 capacity;
+    } text;
+} F77EditorState;
+
+/* Existing suffix of D_8F80397C, across the aligned rodata boundary. */
+const u32 D_8F803990[1] = { 0x32640000 };
+
 extern Gfx *D_800D0510;
 extern u8 D_80094DE0[];
 void func_8F800020(s32 arg0, s32 arg1, s32 arg2) {
@@ -17,11 +39,91 @@ void func_8F800020(s32 arg0, s32 arg1, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/77/fragment77_code/func_8F800924.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/77/fragment77_code/func_8F800E50.s")
+extern F77EditorState D_8F809FC0;
+extern s32 D_8F803470, D_8F803474;
+extern void Ui_DrawGradientPanel(s32, s32, s32, s32, s32, s32);
+extern void func_800498C4(void);
+extern void func_800496A4(s32, s32);
+extern void func_80049628(s32, s32, s32);
+extern void func_800499EC(void);
+extern void func_8F800020(s32, s32, s32);
+void func_8F800E50(void) {
+    s32 index;
+    F77EditorState* state = &D_8F809FC0;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/77/fragment77_code/func_8F800F7C.s")
+    Ui_DrawGradientPanel(state->numeric.geometry[0] - 10, state->numeric.geometry[1] - 10,
+                         state->numeric.geometry[2] + 20, state->numeric.geometry[3] + 20,
+                         (s32)&D_8F803470, (s32)&D_8F803474);
+    func_800498C4();
+    func_800496A4(4, 0);
+    for (index = state->numeric.last; index >= 0; index--) {
+        func_80049628(state->numeric.geometry[0] + (state->numeric.last - index) * 20,
+                      state->numeric.geometry[1], state->numeric.digits[index] + 0x30);
+    }
+    func_800499EC();
+    func_8F800020(state->numeric.geometry[0] + (state->numeric.last - state->numeric.selected) * 20,
+                  state->numeric.geometry[1] + 18, 20);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/77/fragment77_code/func_8F8010E4.s")
+void func_8F800F7C(void) {
+    s32 index;
+    F77EditorState* state = &D_8F809FC0;
+
+    Ui_DrawGradientPanel(state->numeric.geometry[0] - 10, state->numeric.geometry[1] - 10,
+                         state->numeric.geometry[2] + 20, state->numeric.geometry[3] + 20,
+                         (s32)&D_8F803470, (s32)&D_8F803474);
+    func_800498C4();
+    func_800496A4(4, 0);
+    for (index = state->numeric.last; index >= 0; index--) {
+        if (state->numeric.digits[index] < 10) {
+            func_80049628(state->numeric.geometry[0] + (state->numeric.last - index) * 20,
+                          state->numeric.geometry[1], state->numeric.digits[index] + 0x30);
+        } else {
+            func_80049628(state->numeric.geometry[0] + (state->numeric.last - index) * 20,
+                          state->numeric.geometry[1], state->numeric.digits[index] + 0x37);
+        }
+    }
+    func_800499EC();
+    func_8F800020(state->numeric.geometry[0] + (state->numeric.last - state->numeric.selected) * 20,
+                  state->numeric.geometry[1] + 18, 20);
+}
+
+extern s32 D_8F809F98, D_8F809F9C, D_8F809FA4, D_8F809FB4;
+extern u8 D_8F803E08;
+extern u16 D_8F8034CC[][17];
+extern char D_8F803478[][12], D_8F803848[][12];
+extern char D_8F803954[], D_8F803964[], D_8F80396C[], D_8F803974[], D_8F80397C[];
+extern u16 D_8F809FE6;
+extern u8 D_8F809FE4, D_8F809FE8, D_8F809FE9, D_8F809FEA;
+extern void func_800088DC(void);
+extern void GfxImage_FillCurrent(Gfx**, u32);
+extern void func_800495F8(s32, s32, s32, const char*, ...);
+extern void func_800495BC(s32, s32, const char*, ...);
+extern s32 func_8005D92C(s32);
+extern s32 func_80057A80(s32);
+extern void func_8F8000D0(void*, s32);
+void func_8F8010E4(void) {
+    s32 index;
+
+    func_800088DC();
+    GfxImage_FillCurrent(&D_800D0510, 0x89);
+    func_800498C4();
+    func_800496A4(16, 0);
+    func_800495F8(320, 30, 1, D_8F803954);
+    func_800496A4(8, 0);
+    func_800495BC(100, 400, D_8F803964,
+                  D_8F809F9C ? (char*)&D_8F803E08 + D_8F809F9C * 0x6F8 - 0x14 : D_8F80396C,
+                  D_8F809FA4 + 1);
+    func_800495BC(100, 375, D_8F803974, (char*)D_8F803478 + func_8005D92C(D_8F809F98) * 12 - 12);
+    if (!func_80057A80(D_8F809F98)) {
+        func_800495BC(100, 350, D_8F80397C, (char*)D_8F803848 + (D_8F809FE6 % 7) * 12,
+                      D_8F809FE8, D_8F809FE9, D_8F809FEA, D_8F809FE4 * 2);
+    }
+    for (index = 0; index < 23; index++) {
+        func_8F8000D0(D_8F8034CC[index], index == D_8F809FB4);
+    }
+    func_800499EC();
+}
 
 extern s32 D_8F809F98, D_8F809F9C, D_8F809FA0, D_8F809FA4;
 extern u8 *D_8F809FA8, *D_8F809FB0;
@@ -54,7 +156,6 @@ extern s32 D_8F809F98;
 extern u16 D_8F809FF0;
 extern u8 D_8F803BF0;
 extern u8 D_8F803BF4;
-extern u8 D_8F803E08;
 extern void func_8005DAC8(s32, u16);
 extern void func_8006249C(void *, s32, u8 *);
 extern void func_8005B058(s32);
@@ -78,29 +179,7 @@ void func_8F8013FC(u8 arg0) {
     func_80062304(sp1C);
 }
 
-extern u16 D_8F8034CC[][17];
 extern s32 D_8F809FB4, D_8F809FB8;
-typedef union {
-    u16 halfwords[18];
-    s32 words[9];
-    s8 bytes[36];
-    struct {
-        u16 geometry[4];
-        s16 selected;
-        u16 last;
-        s8 digits[8];
-        s32 value;
-    } numeric;
-    struct {
-        u16 fields[6];
-        s16 cursor;
-        s8 buffer[18];
-        u16 capacity;
-    } text;
-} F77EditorState;
-extern F77EditorState D_8F809FC0;
-extern u8 D_8F809FE4, D_8F809FE8, D_8F809FE9, D_8F809FEA;
-extern u16 D_8F809FE6;
 extern void func_8F8015A8(void);
 extern s32 func_8F801FC4(void);
 extern void func_8F800924(void);
@@ -411,7 +490,55 @@ s32 func_8F802D0C(void) {
     return 1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/77/fragment77_code/func_8F802DD8.s")
+extern s32 D_8F809FB8, D_8F809FB4, D_8F809F9C;
+extern void func_80064D28(void);
+extern void func_80008648(void);
+extern void func_8F8014E4(void);
+extern void func_8F8010E4(void);
+extern s32 func_8F802ECC(void);
+extern s32 func_8F8021E8(void);
+extern s32 func_8F80299C(void);
+extern s32 func_8F802D0C(void);
+extern s32 func_8F802670(void);
+extern void func_8F801F44(void);
+extern void func_8F8013FC(u8);
+extern void func_8F802A68(void);
+extern void func_8F8026DC(void);
+extern void func_8F8022B4(void);
+extern u8 D_8F809F9F;
+s32 func_8F802DD8(void) {
+    s32 result = 1;
+
+    switch (D_8F8034CC[D_8F809FB4][0]) {
+    case 0:
+        result = 0;
+        break;
+    case 1:
+        func_8F801F44();
+        D_8F809FB8 = 4;
+        break;
+    case 2:
+        func_8F8013FC(D_8F809F9F);
+        break;
+    case 3: case 4: case 5: case 6: case 7: case 8:
+        func_8F801F44();
+        D_8F809FB8 = 4;
+        break;
+    case 16:
+        func_8F802A68();
+        D_8F809FB8 = 2;
+        break;
+    case 9: case 21: case 22: case 24: case 25: case 26: case 27: case 28: case 29: case 30: case 33:
+        func_8F8026DC();
+        D_8F809FB8 = 1;
+        break;
+    case 31: case 32:
+        func_8F8022B4();
+        D_8F809FB8 = 3;
+        break;
+    }
+    return result;
+}
 
 extern s32 D_8F809FB4, D_8F809FA0, D_8F809FA4;
 extern s32 func_8F802DD8(void);
@@ -464,7 +591,23 @@ s32 func_8F802ECC(void) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/77/fragment77_code/func_8F803130.s")
+void func_8F803130(void) {
+    s32 running = 0;
+
+    do {
+        func_80064D28();
+        func_8F8014E4();
+        func_8F8010E4();
+        switch (D_8F809FB8) {
+        case 0: running = func_8F802ECC(); break;
+        case 4: running = func_8F8021E8(); break;
+        case 1: running = func_8F80299C(); break;
+        case 2: running = func_8F802D0C(); break;
+        case 3: running = func_8F802670(); break;
+        }
+        func_80008648();
+    } while (running);
+}
 
 extern u8 D_8F8044EC[];
 extern u16 D_8F809FE6, D_8F809FF0;

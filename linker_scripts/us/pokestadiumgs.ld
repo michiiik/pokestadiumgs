@@ -5020,6 +5020,7 @@ SECTIONS
         fragment77_RODATA_START = .;
         build/asm/us/data/fragments/77/fragment77_header.o(.rodata);
         build/src/fragments/77/fragment77_code.o(.rodata);
+        build/asm/us/data/fragments/77/fragment77_tail.rodata.o(.rodata);
         fragment77_RODATA_END = .;
         fragment77_RODATA_SIZE = ABSOLUTE(fragment77_RODATA_END - fragment77_RODATA_START);
     }
