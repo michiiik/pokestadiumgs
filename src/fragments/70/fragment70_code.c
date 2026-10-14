@@ -95,14 +95,72 @@ void func_8F200250(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/70/fragment70_code/func_8F200258.s")
+extern void func_800498C4(void);
+extern void func_800496A4(s32, s32);
+extern void Font_EnableTwoCycleTexturing(void);
+extern void Font_DisableTwoCycleTexturing(void);
+extern void func_8004972C(s32, s32, s32, s32);
+extern void func_800497E4(s32, s32, s32, s32);
+extern s32 func_8003514C(void);
+extern void func_800495F8(s32, s32, s32, const char*);
+extern void func_800495BC(s32, s32, const char*, ...);
+extern void func_800499EC(void);
+extern char D_8F200880[], D_8F200898[], D_8F2008A8[], D_8F2008C0[], D_8F2008D0[], D_8F2008E4[];
+
+void func_8F200258(void) {
+    s32 x;
+    s32 y;
+    s32 font;
+
+    func_800498C4();
+    font = 16;
+    x = 320;
+    y = 40;
+    if (D_8F200870 == 0) {
+        font = 2;
+        x = 160;
+        y = 20;
+    }
+    func_800496A4(font, 0);
+    Font_EnableTwoCycleTexturing();
+    func_8004972C(255, 255, 255, 255);
+    func_800497E4(0, 0, 255, 255);
+    if (func_8003514C() == 0) {
+        func_800495F8(x, y, 1, D_8F200880);
+    } else {
+        func_800495F8(x, y, 1, D_8F200898);
+    }
+    Font_DisableTwoCycleTexturing();
+    x = 40;
+    y = 400;
+    if (D_8F200870 == 0) {
+        x = 20;
+        y = 200;
+    }
+    if (func_8003514C() == 0) {
+        func_800495BC(x, y, D_8F2008A8, D_8F200904);
+    } else {
+        func_800495BC(x, y, D_8F2008C0, D_8F200904);
+    }
+    x = 40;
+    y = 430;
+    if (D_8F200870 == 0) {
+        x = 20;
+        y = 215;
+    }
+    if (func_8003514C() == 0) {
+        func_800495BC(x, y, D_8F2008D0, *(s16*)((u8*)(u32)D_8F20090C + 8), *(s16*)((u8*)(u32)D_8F20090C + 0xA));
+    } else {
+        func_800495BC(x, y, D_8F2008E4, *(s16*)((u8*)(u32)D_8F20090C + 8), *(s16*)((u8*)(u32)D_8F20090C + 0xA));
+    }
+    func_800499EC();
+}
 #endif
 
 #ifdef VERSION_US
 extern void func_800088DC(void);
 extern void GfxImage_FillCurrent(void *, u16);
 extern void func_800503A4(u8 *);
-extern void func_8F200258(void);
 extern void func_80008648(void);
 extern u8 D_800D0510[];
 void func_8F200424(void) {
