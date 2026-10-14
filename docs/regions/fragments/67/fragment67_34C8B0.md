@@ -414,3 +414,67 @@ to isolate the actual transition-value lifetime and case-2 flag-read scheduling
 under the calibrated stock frontend, not repeat the exit/condition or signedness
 families above. All generators and search output remain local scratch; no new
 helper, compiler artifact, ROM, or unmatched C body is published.
+
+### Atlas RGB closure and smaller-frame parent, 2026-10-14
+
+Requeue `func_82910740` remains assembly. Eighty additional native object
+probes and a calibrated 180-second stock search produce no acceptance, but
+the normal runner now isolates a frame-only residual. No hypothesis is
+installed and no helper or scratch script is published.
+
+Use the real SDK `gDPSetColor` command for both primitive and environment
+color. Primitive min-level and LOD fraction were both zero, so its command
+word is unchanged. Preserve RGBA bit positions while expressing the packed
+word as green, then blue, then red, then alpha:
+
+```c
+_SHIFTL(color[1], 16, 8) | _SHIFTL(color[2], 8, 8) |
+_SHIFTL(color[0], 24, 8) | _SHIFTL(255, 0, 8)
+```
+
+Of eight packing cells, this spelling matches every original RGB load, shift
+and packing instruction. The resulting 1008-byte/252-word parent has 241 raw
+words exact (0.9563), rather than 229 (0.9087). Its only eleven differences
+are the prologue/epilogue frame and incoming argument-home accesses: frame
+0xC0 instead of 0xA0, with every affected home displaced by the same 0x20.
+These are raw normal-oracle measurements, not normalized acceptance.
+
+A second controlled family groups only the five spilled geometry values into
+a local record with signed-halfword fields `middleX`, `rightX`, `middleY`,
+`innerWidth`, and `innerHeight`. Keep `bottomY` and `textureS` as separate
+word carriers, the original signed origins and corner copies, and all original
+rectangle-argument conversions. This reduces the frame to 0xB8 and the
+uniform argument-home displacement to 0x18, without disturbing any of the
+other 241 instruction words. Both logical and measured spill-slot field orders
+reproduce this result. This smaller-frame record is the next parent.
+
+Bounded negatives on the new RGB parent: removing corner aliases is inert;
+reusing input/origin values reduces some frames but changes opcode/register
+shape; moving geometry declarations into render-phase scopes and C89 register
+storage classes is inert. Ordinary seven-field word records preserve the
+0xC0 frame; halfword records rotate remaining geometry registers. Arrays
+change actual spill loads/stores and can overshoot below the target frame.
+Packing additional origins/corners into the five-field record leaves 0xB8;
+making the two remaining word carriers halfword fields rotates registers.
+
+Diagnostic-only sharing of the five expanded SDK command pointers can reduce
+frame size but changes allocation. It is not an accepted replacement for the
+SDK-macro spelling and was never installed. Keep it only as a storage-mechanism
+witness. No filler, uninitialized value, changed helper arity or object rewrite
+is used to force the missing bytes.
+
+The old 358 line-grouping search witness, reproduced in the normal runner,
+does not improve the old 0.9087 parent. The new RGB-parent search calibrates
+base/probe and target/oracle words, then descends from 468 to 298 without zero;
+its retained proposals are token-identical setup line grouping, not a smaller
+frame or ROM acceptance. Do not rank their search scores above the freshly
+measured normal-oracle record parent. Fresh/blank whole-object controls again
+confirm both sections, all ten accepted siblings, the assembly dispatcher and
+the linked retail layout.
+
+Next action: isolate the remaining 24-byte frame reservation on the five-field
+record parent, keeping the now-exact RGB tree and all other instruction words
+as controls. Reopen storage/lifetime levers only with measured changes on that
+parent, not another RGB permutation or replay of the inert scope/register
+families. Function-level probe evidence is still insufficient for removal of
+the pragma: the authoritative full-ROM gate must accept the final candidate.
