@@ -80,7 +80,62 @@ extern s32 D_80097120; s32 func_8004C54C(s32 index,s32 value){s32 result=0; s32 
 
 extern s32 D_80097120; s32 func_8004C594(s32 index,s32 value){s32 result=0; s32 ptr=D_80097120; if(ptr!=0&&*(s32*)((u8*)(u32)ptr+8)!=0&&index>0&&index<10&&value>=0){*(s32*)((u8*)(u32)ptr+index*4+0x2C)=value; result=1;} return result;}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C5E0.s")
+extern char D_800A4520[];
+extern s32 D_80097120;
+void func_8004C5E0(s8* output, s32 capacity, s8* input) {
+    s8* number;
+    s8* start;
+    s8* cursor;
+    s32 character;
+    s32 code;
+    s8 formatted[12];
+    character = *input;
+    start = output;
+    cursor = input + 1;
+    if (character != 0) {
+        do {
+            if (character == '#') {
+                code = cursor[0] - '0';
+                code = cursor[1] + code * 10 - '0';
+                cursor += 2;
+                if (code > 0 && (number = formatted, code < 10)) {
+                    sprintf((char*)formatted, D_800A4520, *(s32*)((u8*)(u32)D_80097120 + code * 4 + 0x2C));
+                    if (*number != 0) {
+                        do {
+                            if (output - start < capacity - 1) {
+                                *output++ = *number;
+                            }
+                            number++;
+                        } while (*number != 0);
+                    }
+                } else if (code >= 10 && code < 128) {
+                    s8* replacement = *(s8**)((u8*)(u32)D_80097120 + code * 4 + 0x2C);
+                    if (replacement != NULL) {
+                        s8* scan;
+                        s32 value = *replacement;
+                        do {
+                            scan = replacement;
+                            if (value == 0) {
+                                break;
+                            }
+                            do {
+                                if (output - start < capacity - 1) {
+                                    *output++ = value;
+                                }
+                                value = scan[1];
+                                scan++;
+                            } while (value != 0);
+                        } while (0);
+                    }
+                }
+            } else if (output - start < capacity - 1) {
+                *output++ = character;
+            }
+            character = *cursor++;
+        } while (character != 0);
+    }
+    *output = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004C7A0.s")
 
