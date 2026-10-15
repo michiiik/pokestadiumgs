@@ -194,3 +194,6 @@ func_865038A8 = Fragment53_ApplyPendingPrimaryAnimation;
 func_86501FA0 = Fragment53_UpdateTrajectoryPosition;
 func_8650A278 = Fragment53_RunSceneTransition;
 func_86501D6C = Fragment53_CountTrajectorySamplesInRange;
+func_8650863C = Fragment53_UpdateTimedSecondaryAnimation;
+func_86508780 = Fragment53_UpdateSecondaryAnimation;
+func_8650455C = Fragment53_UpdateActorModelHeights;

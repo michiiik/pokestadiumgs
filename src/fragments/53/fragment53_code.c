@@ -192,7 +192,38 @@ void Fragment53_ApplyPendingPrimaryAnimation(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/53/fragment53_code/func_8650455C.s")
+extern s32 D_8650C494;
+extern s32 D_8650C5E8;
+extern s32 D_8650C49C[];
+extern f32 D_8650DBA8[];
+extern f32 D_8650F7C8[];
+extern void func_865040E4(s32);
+void Fragment53_UpdateActorModelHeights(s32 arg0, void *arg1) {
+    s32 index;
+    s32 height;
+    s32 offset;
+
+    index = *(s32 *)((u8 *)arg1 + 0x14);
+    if (arg0 == 0) { return; }
+    if (arg0 == 2) {
+        if (D_8650C5EC == 1) {
+            if (D_8650C494 == 0) {
+                *(s32 *)((u8 *)&D_86511698[index] + 0x58) += 1;
+                if (*(s32 *)((u8 *)&D_86511698[index] + 0x58) >= 24) { *(s32 *)((u8 *)&D_86511698[index] + 0x58) = 0; }
+                func_865040E4(index);
+            }
+            offset = index * 0x168;
+            if (D_8650C5E8 == -2) {
+                height = D_8650C49C[index];
+                *(f32 *)((u8 *)D_8650DBA8 + offset) = (f32)(height - 5);
+                *(f32 *)((u8 *)D_8650F7C8 + offset) = (f32)(height + 60);
+            } else {
+                *(f32 *)((u8 *)D_8650DBA8 + offset) = (f32)D_8650C49C[index];
+                *(f32 *)((u8 *)D_8650F7C8 + offset) = (f32)D_8650C49C[index];
+            }
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -318,14 +349,61 @@ void func_86508294(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/53/fragment53_code/func_8650863C.s")
+extern struct Fragment53Model D_8650E6C0[];
+extern s32 ModelAnim_SetSpeed(u8 *, s32);
+extern s32 ModelAnim_IsFinished(void *);
+extern void func_80027A28(u16, u8);
+void Fragment53_UpdateTimedSecondaryAnimation(s32 arg0) {
+    s32 index;
+    u8 *model;
+
+    index = arg0;
+    switch (D_86511698[index].animation) {
+    case 0:
+        model = (u8 *)&D_8650E6C0[index];
+        if ((*(s32 *)(model + 0x48) >> 16) >= 6) {
+            func_8003F210(model, 2);
+            ModelAnim_SetFrame(model, 0);
+            ModelAnim_SetSpeed(model, 0x30000);
+            D_86511698[index].animation = 2;
+        }
+        break;
+    case 2:
+        model = (u8 *)&D_8650E6C0[index];
+        if (ModelAnim_IsFinished(model) == 1) {
+            func_80027A28(0x1F04, (u8)index);
+            func_8003F210(model, 1);
+            ModelAnim_SetSpeed(model, 0x20000);
+            D_86511698[index].animation = 1;
+        }
+        break;
+    }
+}
 #endif
 
 void func_86508778(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/53/fragment53_code/func_86508780.s")
+void Fragment53_UpdateSecondaryAnimation(s32 arg0) {
+    s32 index;
+
+    index = arg0;
+    switch (D_86511698[index].animation) {
+    case 0:
+        func_8003F210((u8 *)&D_8650E6C0[index], 2);
+        ModelAnim_SetSpeed((u8 *)&D_8650E6C0[index], 0x30000);
+        D_86511698[index].animation = 2;
+        D_86511698[index].pending = 1;
+        break;
+    case 2:
+        if (ModelAnim_IsFinished((u8 *)&D_8650E6C0[index]) == 1) {
+            func_8003F210((u8 *)&D_8650E6C0[index], 1);
+            D_86511698[index].pending = 0;
+        }
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
