@@ -301,5 +301,13 @@ void Fragment14_DrawSelectionPanel(u8 *arg0, void *arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FCD40/func_8130559C.s")
+s32 Fragment14_GetPanelResult(u8 *arg0) {
+    s32 index;
+
+    if (arg0[0x1A] != 5) {
+        return 0;
+    }
+    index = arg0[0x18];
+    return index >= 3 ? -1 : index + 1;
+}
 #endif
