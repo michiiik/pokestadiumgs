@@ -204,3 +204,4 @@ func_86502958 = Fragment53_InitActorStateAndOrder;
 func_86508B20 = Fragment53_UpdateStartState;
 func_86502720 = Fragment53_InitRoundState;
 func_86503938 = Fragment53_UpdatePrimaryAnimationState;
+func_86501EA0 = Fragment53_SelectDifficultyOffset;

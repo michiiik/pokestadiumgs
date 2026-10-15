@@ -84,7 +84,39 @@ void Fragment53_CountTrajectorySamplesInRange(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/53/fragment53_code/func_86501EA0.s")
+extern s32 D_8650C634;
+extern s32 D_8650C4D4;
+extern s32 D_8650C4DC;
+extern u32 func_8003570C(void);
+void Fragment53_SelectDifficultyOffset(void) {
+    s32 maximum;
+    s32 minimum;
+
+    /* Difficulty is 0..4; preserve the original lack of an invalid-mode fallback. */
+    switch (D_8650C634) {
+    case 0:
+        minimum = 2;
+        maximum = D_8650C4D4 - 4;
+        break;
+    case 1:
+        minimum = 1;
+        maximum = D_8650C4D4 - 3;
+        break;
+    case 2:
+        minimum = 2;
+        maximum = D_8650C4D4 - 4;
+        break;
+    case 3:
+        minimum = 4;
+        maximum = D_8650C4D4 - 6;
+        break;
+    case 4:
+        minimum = 4;
+        maximum = D_8650C4D4 - 7;
+        break;
+    }
+    D_8650C4DC = func_8003570C() % (maximum + 1) + minimum;
+}
 #endif
 
 void func_86501F98(void) {
@@ -98,8 +130,7 @@ extern s32 D_8650C5EC;
 extern f32 D_8650C4D8;
 extern s32 D_8650C4DC;
 extern s32 D_8650C620;
-extern f64 D_8650D698;
-extern void func_86501EA0(void);
+extern void Fragment53_SelectDifficultyOffset(void);
 void Fragment53_UpdateTrajectoryPosition(void) {
     if (D_8650C5EC == 10) {
         D_8650C4DC++;
@@ -110,9 +141,9 @@ void Fragment53_UpdateTrajectoryPosition(void) {
             D_8650C4DC = 2;
         }
     } else {
-        func_86501EA0();
+        Fragment53_SelectDifficultyOffset();
     }
-    D_8650C4D8 = (f32)(92.0 - ((f64)D_8650C4AC - D_8650D698 * (f64)D_8650C4B8 * (f64)D_8650C4B8 * (f64)(D_8650D9D4 + D_8650C4DC + 2) * (f64)(D_8650D9D4 + D_8650C4DC + 2)));
+    D_8650C4D8 = (f32)(92.0 - ((f64)D_8650C4AC - 4.9 * (f64)D_8650C4B8 * (f64)D_8650C4B8 * (f64)(D_8650D9D4 + D_8650C4DC + 2) * (f64)(D_8650D9D4 + D_8650C4DC + 2)));
     D_8650C620 = (s32)(D_8650C4D8 / (f32)D_8650C4CC * 2000.0f + -1000.0f);
 }
 #endif
@@ -130,9 +161,6 @@ extern f32 D_8650C4B8;
 extern f32 D_8650C508;
 extern s32 D_8650C634;
 extern s32 D_8650D0A4;
-extern f64 D_8650D6B8;
-extern f64 D_8650D6C0;
-extern f64 D_8650D6C8;
 void func_86502620(void) {
     if (D_8650C634 == 0) {
         D_8650D0A4 = 2;
@@ -141,13 +169,13 @@ void func_86502620(void) {
     }
     switch (D_8650D0A4) {                           /* irregular */
     case 1:
-        D_8650C4B8 = (f32) ((f64) D_8650C508 * D_8650D6B8);
+        D_8650C4B8 = (f32) ((f64) D_8650C508 * 0.45);
         return;
     case 2:
-        D_8650C4B8 = (f32) ((f64) D_8650C508 * D_8650D6C0);
+        D_8650C4B8 = (f32) ((f64) D_8650C508 * 0.4);
         return;
     case 3:
-        D_8650C4B8 = (f32) ((f64) D_8650C508 * D_8650D6C8);
+        D_8650C4B8 = (f32) ((f64) D_8650C508 * 0.35);
         return;
     case 4:
         D_8650C4B8 = (f32) ((f64) D_8650C508 * 0.3);
