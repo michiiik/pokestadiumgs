@@ -222,10 +222,68 @@ void Fragment14_UpdatePanelState(u8 *arg0, void *arg1) {
     func_81600A34(arg1, arg0, active, rectangle[0], rectangle[1], rectangle[2], rectangle[3]);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FCD40/func_813051B8.s")
+typedef struct {
+    s16 x;
+    s16 y;
+    s16 width;
+    s16 height;
+} Fragment14PanelRect;
+extern void func_816048E0(s32, s32, s32, s32, f32);
+extern void func_816073A0(void *);
+extern void func_816054FC(s32, s32, s32, s32);
+extern Gfx *D_800D0510;
+extern u8 D_80094D90[];
+extern void Gfx_FillRectRgb(s16, s16, s16, s16, u8, u8, u8);
+extern void func_81603598(s32, s32, s32, s32, f32);
+extern void func_800498C4(void);
+extern void func_800496A4(s32, s32);
+extern void func_8004989C(s32);
+extern void func_8004972C(s32, s32, s32, s32);
+extern void *func_8004C874(s32, s32);
+extern void func_800495BC(s32, s32, const char *, ...);
+extern void func_800495F8(s32, s32, s32, const char *, ...);
+extern void func_800499EC(void);
+extern void func_81608918(s32, s32, f32 *);
+extern void func_81607408(void);
+void Fragment14_DrawPanelContents(Fragment14PanelRect *rectangle, f32 arg1, s32 arg2, f32 *arg3, void *arg4) {
+    s32 lower_height;
+    s32 lower_y;
+    s32 header_height;
+    s32 text_x;
+    s32 index;
+
+    lower_height = (s32)(122.0f * arg1);
+    lower_y = rectangle->y + rectangle->height - lower_height - 12;
+    text_x = (s32)(rectangle->x + rectangle->width - 323.0f);
+    func_816048E0(rectangle->x, rectangle->y, rectangle->width, rectangle->height, 0.0f);
+    func_816073A0(rectangle);
+    header_height = (s32)(34.0f * arg1);
+    func_816054FC(rectangle->x + 7, rectangle->y + 7, rectangle->width - 17, header_height);
+    gSPDisplayList(D_800D0510++, D_80094D90);
+    Gfx_FillRectRgb(rectangle->x + 7, lower_y, rectangle->width - 17, lower_height, 120, 160, 255);
+    func_81603598(106, 185, 9, -1, arg1);
+    func_800498C4();
+    func_800496A4(8, 1);
+    func_8004989C(28);
+    func_8004972C(255, 255, 255, (s32)(255.0f * arg1));
+    if (header_height >= 4) {
+        func_800495BC(rectangle->x + 20, (s32)(rectangle->y + 14 - ((1.0f - arg1) * 34.0f)), func_8004C874(15, 0x4B));
+        func_800495F8(rectangle->x + rectangle->width - 24, (s32)(rectangle->y + 14 - ((1.0f - arg1) * 34.0f)), 2,
+            func_8004C874(15, *(s16 *)((u8 *)arg4 + 0x3E)));
+        func_800495BC(rectangle->x + 53, lower_y + 12, func_8004C874(15, 0x4A));
+    }
+    func_800496A4(16, 1);
+    for (index = 0; index < 4; index++) {
+        func_800495BC(text_x, rectangle->y + index * 32 + 53, func_8004C874(15, index + 0x46));
+    }
+    func_800499EC();
+    if (arg1 > 0.99f && arg2 >= 0 && arg2 < 4) {
+        func_81608918(text_x - 40, rectangle->y + arg2 * 32 + 53, arg3);
+    }
+    func_81607408();
+}
 
 extern s32 func_81600DA8(void *, void *);
-extern void func_813051B8(u8 *, f32, s32, f32 *, void *);
 void Fragment14_DrawSelectionPanel(u8 *arg0, void *arg1) {
     u8 rectangle[8];
     f32 progress;
@@ -238,7 +296,7 @@ void Fragment14_DrawSelectionPanel(u8 *arg0, void *arg1) {
         } else {
             opacity = 0.0f;
         }
-        func_813051B8((u8 *)rectangle, opacity, arg0[0x18], (f32 *)(arg0 + 0x10),
+        Fragment14_DrawPanelContents((Fragment14PanelRect *)rectangle, opacity, arg0[0x18], (f32 *)(arg0 + 0x10),
             *(void **)(*(u8 **)(*(u8 **)arg0 + 0x1A148) + 0x940));
     }
 }

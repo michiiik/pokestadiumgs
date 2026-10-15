@@ -413,7 +413,7 @@ void func_81603C84(s32 arg0, s32 arg1, s32 arg2) {
 extern void func_816039B0();
 extern void func_81608044(s32, s32, s32, s32, f32, s32 *);
 extern u8 D_8160BE50;
-void func_816048E0(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+void func_816048E0(s32 arg0, s32 arg1, s32 arg2, s32 arg3, f32 arg4) {
     func_816039B0();
     func_81608044(arg0 + 8, arg1 + 8, arg2 - 0x13, arg3 - 0x13, 0.0f, &D_8160BE50);
 }

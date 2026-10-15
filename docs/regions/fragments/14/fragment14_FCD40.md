@@ -1,5 +1,44 @@
 # Fragment 14 selection panel
 
+## 2026-10-15 — contents renderer accepted
+
+The current file is **13 C / 1 ASM**. `func_813051B8` is now
+`Fragment14_DrawPanelContents`: **207 instructions / 828 bytes**, frame 0x60,
+normal acceptance batch `c2869a8631a64ae18983e94f1016731c`, label
+`f14-panel:renderer-direct:record-True:separate-offset-False:shared-slide-False`.
+It is a relocation-masked, sequential full-ROM accept, **not** an
+object-link-verified result. Stock IDO 7.1 / `-O2`; no compiler override.
+
+- Sixteen probes tested array/record rectangle views, optional explicit
+  loop-offset carrier, shared/inline text slide, and direct argument access
+  versus an extra rectangle-pointer local. The direct record view with
+  inline slide and a single loop index reproduces all target instructions.
+  Other leaders have the same opcode structure but frames 0x68/0x70 instead
+  of 0x60. Do not reintroduce those redundant locals.
+- Cleanup gives the argument its real four-short rectangle type, removing
+  repeated casts without adding an alias local. Fresh and twenty-leading-
+  blank whole-TU builds preserve every accepted byte, all 14 function offsets/
+  sizes, the renderer and all 13 untouched spans. The unchanged wrapper casts
+  its existing eight-byte stack rectangle to that type. A US compatibility
+  alias retains the original address-keyed symbol; JP remains untouched.
+- Preserve the background/header/lower box, display-list call, icon, two
+  font settings, opacity color, clipped sliding headings, four entry labels,
+  valid-selection cursor guard and final scissor restoration. The existing
+  0x60-byte rodata layout and both float literals remain exact.
+- Reconcile the background helper's signature with both existing C callers
+  and this target: `func_816048E0` now names its unused fifth f32 parameter.
+  It is an existing function, not a new helper. Fresh and twenty-leading-blank
+  builds preserve its **entire object's bytes/layout and all 97 function
+  offsets/sizes**, followed by a normal full-ROM gate. No body or caller
+  behavior changes, speculative casts or assembly patches are needed.
+- Normal sequential acceptance and final-source full-ROM builds are retail-
+  identical, MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`. Only source, the US alias
+  and region notes are published; compiler artifacts, scratch generators,
+  assembly, objects and ROMs remain local. Solo/native, no agents/containers.
+
+The status getter remains ASM with its branch-to-next requeue below. The
+renderer is accepted, but this is still not file or repository completion.
+
 ## 2026-10-15 — four panel functions accepted
 
 The file advances from **8 C / 6 ASM** to **12 C / 2 ASM**. Four normal
@@ -103,3 +142,45 @@ The 207-instruction renderer `func_813051B8` remains unattempted in this block;
 its literal layout is now ready. Its assembly takes rectangle, float opacity,
 word selection, field pointer and metadata. Those two owners are the remaining
 file work; do not report the panel file as complete.
+
+## Follow-up after the four-function PR
+
+At entry this follow-up had **12 C / 2 ASM**. Eight common-result
+status-getter probes (outer result initialized to zero versus assigned in
+else, narrow/word index, conditional versus explicit result) are all worse.
+Total status history is now 40 candidates; do not repeat that family. The
+branch-to-next residual above remains the best next diagnostic target.
+
+### Renderer preparation — requeue, ABI and geometry inventory
+
+The initial renderer inventory was 207 instructions,
+828 bytes, frame 0x60; locals retain a sliding text offset at stack+0x40.
+Its argument mask is rectangle pointer, f32 opacity, s32 selection, f32 cursor
+pointer and metadata pointer. Its two local float literals are 323.0f and
+0.99f, already migrated with the file layout.
+
+- Geometry: fading lower height is `(s32)(122.0f * opacity)`; lower y is
+  rectangle y+height minus that height minus 12. Header height is
+  `(s32)(34.0f * opacity)`. Text x is `(s32)(x+width-323.0f)`.
+- Preserve calls to frame background setup, panel scissor begin, header box,
+  the `D_80094D90` display list, lower RGB rectangle (120,160,255), icon
+  `(106,185,9,-1,opacity)`, text begin/font/spacing and white opacity color.
+- If header height >=4, draw resource 0x4B, metadata-selected resource at
+  signed metadata+0x3E, and resource 0x4A. The first two share the actual
+  local text slide `(1.0f-opacity)*34.0f`; the third uses lower y+12.
+- Draw four resources 0x46..0x49 with y stride 32, end text, then draw the
+  cursor only for opacity>0.99f and signed selection 0..3. Restore scissor.
+- `func_81603598` consumes its fifth f32 argument (load from original
+  stack+0x10). `Gfx_FillRectRgb` has four s16 geometry arguments and three u8
+  colors. Use the real variadic prototypes of the two text draw functions.
+- **ABI evidence, now reconciled by the byte-preserving cleanup above:** this renderer and the already-C neighboring
+  file `fragment14_FD770.c` pass five arguments to `func_816048E0`, including
+  a float. Its earlier accepted definition in `fragment11_D9520.c` named
+  only four integer parameters and consumed no fifth parameter. This was
+  existing cross-file prototype debt, not evidence to delete the target's
+  fifth stack store. Inspect all callers and freeze/prove the helper object
+  before deliberate signature cleanup; do not modify the shared private
+  checkout or disguise the discrepancy with a guessed incompatible cast.
+
+The next batch should work from this inventory and normal runner controls,
+not repeat the already-closed interpolation/input experiments.

@@ -147,3 +147,4 @@ func_81304CE0 = Fragment14_InterpolatePanelRectangle;
 func_81304E80 = Fragment14_UpdatePanelInput;
 func_813050D0 = Fragment14_UpdatePanelState;
 func_813054F4 = Fragment14_DrawSelectionPanel;
+func_813051B8 = Fragment14_DrawPanelContents;
