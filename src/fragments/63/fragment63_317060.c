@@ -686,13 +686,13 @@ void func_87E179F4(u8 *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E17B34.s")
 
-extern void func_8000766C(Gfx **, s32, s32, s32, s32);
+extern void GfxImage_ClearDepthRectangle(Gfx **, s32, s32, s32, s32);
 extern void func_8003C6B8(s32);
 extern Gfx * D_800D0510;
 extern void * D_87E1EC88;
 void func_87E17D40(u8 *arg0) {
     D_87E1EC88 = arg0;
-    func_8000766C(&D_800D0510, 0, 0, 320, 240);
+    GfxImage_ClearDepthRectangle(&D_800D0510, 0, 0, 320, 240);
     func_8003C6B8(*(s32 *)(arg0 + 0xC));
     switch (*(s8 *)((u8 *)D_87E1EC88 + 1)) {
     case 1:

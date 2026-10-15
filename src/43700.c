@@ -172,7 +172,7 @@ void func_80043500(u8 *arg0) {
 
 extern Gfx *D_800D0510;
 extern void GfxImage_FillCurrent();
-extern void func_8000766C();
+extern void GfxImage_ClearDepthRectangle();
 void func_800435D4(u8 *arg0) {
     void (*callback)();
     callback = *(void (**)())(arg0 + 8);
@@ -182,7 +182,7 @@ void func_800435D4(u8 *arg0) {
         callback(arg0);
         gDPPipeSync(D_800D0510++);
         gDPSetTexturePersp(D_800D0510++, G_TP_PERSP);
-        func_8000766C(&D_800D0510, 0, 0, *(s16 *)(arg0 + 4), *(s16 *)(arg0 + 6));
+        GfxImage_ClearDepthRectangle(&D_800D0510, 0, 0, *(s16 *)(arg0 + 4), *(s16 *)(arg0 + 6));
     }
 }
 

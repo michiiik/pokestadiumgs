@@ -4612,11 +4612,11 @@ void Geo_NodeBackground(u8 *arg0) { u8 *state = (u8 *)D_80094908 + 0x18; GfxImag
 
 #ifdef VERSION_US
 extern void *D_80094908;
-extern void func_8000766C(void *, s32, s32, s32, s32);
+extern void GfxImage_ClearDepthRectangle(void *, s32, s32, s32, s32);
 extern Gfx* D_800D0510;
 void Geo_NodeClearDepth(s32 arg0) {
     void *state = (u8 *)D_80094908 + 0x18;
-    func_8000766C(&D_800D0510, *(s16 *)((u8 *)state + 4), *(s16 *)((u8 *)state + 6), *(s16 *)((u8 *)state + 8), *(s16 *)((u8 *)state + 10));
+    GfxImage_ClearDepthRectangle(&D_800D0510, *(s16 *)((u8 *)state + 4), *(s16 *)((u8 *)state + 6), *(s16 *)((u8 *)state + 8), *(s16 *)((u8 *)state + 10));
     gDPPipeSync(D_800D0510++);
     gDPSetCycleType(D_800D0510++, G_CYC_2CYCLE);
 }

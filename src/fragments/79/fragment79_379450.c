@@ -33,13 +33,13 @@ s32 func_8410A2A8(s32 arg0, s32 arg1) {
 
 extern s32 D_84190204;
 extern u8 D_800D0510[];
-extern void func_8000766C(u8 *, s32, s32, s32, s32);
+extern void GfxImage_ClearDepthRectangle(u8 *, s32, s32, s32, s32);
 extern void GfxImage_FillCurrent(u8 *, s32);
 extern s32 func_8410A2C8(s32);
 void func_8410A444(void) {
     s32 value = D_84190204;
     if (value == 0) {
-        func_8000766C(D_800D0510, 0, 0, 0x140, 0xF0);
+        GfxImage_ClearDepthRectangle(D_800D0510, 0, 0, 0x140, 0xF0);
     } else if (value == -1) {
         GfxImage_FillCurrent(D_800D0510, 1);
     } else if ((u32)value < 0x10000) {
