@@ -37,9 +37,42 @@ void func_8800528C(s32 mode) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_16B030/func_88005390.s")
-
-extern void func_88005390(s32, s16, s16, void *);
+extern Gfx D_80094DE0[];
+extern s32 func_8004D1FC(u8 *);
+extern void func_80044270(s16, s16, s16, s16, s16, s16, s16, s16, s32);
+/* The legacy wrapper forwards an opaque fourth argument that retail ignores. */
+#ifdef CC_CHECK
+void func_88005390(s32 mode, s16 width, s16 height, void *unused) {
+#else
+void func_88005390(mode, width, height)
+s32 mode;
+s16 width;
+s16 height;
+{
+#endif
+    s16 textureWidth = *(s16 *)(u32)D_8800EF3C;
+    s16 textureHeight = *(s16 *)((u8 *)(u32)D_8800EF3C + 2);
+    s16 halfWidth = width >> 1;
+    s16 halfHeight = height >> 1;
+    s32 stepX = (s32)((((f32)textureWidth * 1024.0f / (f32)halfWidth > 0.0f) ? 0.5f : -0.5f) +
+                     ((f32)textureWidth * 1024.0f / (f32)halfWidth));
+    s32 stepY;
+    stepY = (s32)((((f32)textureHeight * 1024.0f / (f32)halfHeight > 0.0f) ? 0.5f : -0.5f) +
+                 ((f32)textureHeight * 1024.0f / (f32)halfHeight));
+    func_8800528C(mode);
+    func_8004D1FC((u8 *)(u32)D_8800EF3C);
+    func_80044270(0, 0, halfWidth, halfHeight, -16, -16, stepX, stepY, 0);
+    func_80044270(halfWidth, 0, halfWidth, halfHeight, ((textureWidth - 1) << 5) + 16, -16, -stepX, stepY, 0);
+    func_80044270(0, halfHeight, halfWidth, halfHeight, -16, ((textureHeight - 1) << 5) + 16, stepX, -stepY, 0);
+    func_80044270(halfWidth, halfHeight, halfWidth, halfHeight, ((textureWidth - 1) << 5) + 16,
+                  ((textureHeight - 1) << 5) + 16, -stepX, -stepY, 0);
+    if ((width & 1) || (height & 1)) {
+        gSPDisplayList(D_800D0510++, D_80094DE0);
+        gDPSetFillColor(D_800D0510++, 0x00010001);
+        if (width & 1) gDPFillRectangle(D_800D0510++, width - 1, 0, width - 1, height - 1);
+        if (height & 1) gDPFillRectangle(D_800D0510++, 0, height - 1, width - 1, height - 1);
+    }
+}
 
 void func_88005714(void *arg0) {
     func_88005390(0, (*(s16 *)((u8 *)(arg0) + (4))), (*(s16 *)((u8 *)(arg0) + (6))), arg0);

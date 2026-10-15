@@ -814,7 +814,8 @@
     - [0x16BBA0, c,       fragments/29/fragment29_16BBA0]
     - [0x16BFE0, data,    fragments/29/fragment29_data]
     - [0x16C800, .rodata, fragments/29/fragment29_168330] # jtbl_880067C0 / jtbl_880067E0
-    - [0x16C840, rodata]
+    - [0x16C840, .rodata, fragments/29/fragment29_16BBA0] # jtbl_88006800
+    - [0x16C8A0, rodata]
   
   - name: fragment30
     type: code
