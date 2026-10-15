@@ -529,7 +529,7 @@ void func_864064DC(void) {
 #ifdef VERSION_US
 extern void BgStage_DrawFrame(void);
 extern void GfxImage_FillCurrent(void *, u16);
-extern void func_8000766C(void *, s32, s32, s32, s32);
+extern void GfxImage_ClearDepthRectangle(void *, s32, s32, s32, s32);
 extern s32 func_87F00930(void);
 extern void GeoRender_AdvanceFrameCounter(void);
 extern u8 D_800D0510;
@@ -547,7 +547,7 @@ void func_86406544(void) {
 
     BgStage_DrawFrame();
     GfxImage_FillCurrent(&D_800D0510, 0x401);
-    func_8000766C(&D_800D0510, 0, 0, 0x140, 0xF0);
+    GfxImage_ClearDepthRectangle(&D_800D0510, 0, 0, 0x140, 0xF0);
     if (func_87F00930() == 0) {
         GeoRender_AdvanceFrameCounter();
     }

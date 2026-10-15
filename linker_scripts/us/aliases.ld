@@ -105,3 +105,4 @@ func_80007E6C = StageLoader_SetupFrame;
 func_80006F70 = Gfx_SetScissorRect;
 func_80007328 = GfxImage_SetRenderTarget;
 func_80007444 = GfxImage_FillRectangle;
+func_8000766C = GfxImage_ClearDepthRectangle;
