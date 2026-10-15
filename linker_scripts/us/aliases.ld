@@ -108,3 +108,7 @@ func_80007444 = GfxImage_FillRectangle;
 func_8000766C = GfxImage_ClearDepthRectangle;
 func_80008E30 = TextRenderer_DrawString;
 func_80009138 = TextRenderer_QueuePersistentString;
+func_80009384 = crash_screen_draw_rect;
+func_8000948C = crash_screen_draw_glyph;
+func_80009940 = crash_screen_draw;
+func_80009F80 = crash_screen_printf_with_bg;
