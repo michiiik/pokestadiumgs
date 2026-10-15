@@ -1,6 +1,63 @@
 # Fragment 29 archive and render state
 
-## Accepted native batch
+## Accepted quadrant renderer
+
+`func_88005390`: 225 instructions / 900 bytes, frame 0x80, accepted batch
+`429d15a3887b45aa9a350afa59ffe09b`, label
+`f29:quadrant-quotients:inline-x-True:inline-y-True:no-pointer-True`.
+Normal native probe, `link_verified: true`, automatic combined full-ROM gate.
+
+Preserve signed texture dimensions and half-size locals, sign-aware floating
+rounding, all four texture quadrants, the negative edge/step values and the
+SDK fill-rectangle handling of odd width/height. Inline the scale quotients
+inside their rounded step expressions and read the texture header directly.
+Named quotient/pointer locals reproduce all opcode shapes but change frame
+or spill homes; inlining the final rounded steps instead duplicates work.
+
+The native renderer consumes three arguments. The existing accepted wrapper
+forwards an unused opaque fourth argument, whose bits must remain in its
+original instructions. A three-argument K&R definition avoids an extra
+incoming-a3 save. The host-only `CC_CHECK` signature represents the wrapper's
+four-argument call, following the project's compatibility-shim convention;
+the whole body is still syntax checked and no check is disabled. Remove the
+redundant later forward declaration. Both renderer and wrapper instructions
+are independently preserved.
+
+A fresh re-split/rebuild exposed this caller-arity issue after the incremental
+runner gate had accepted a cached object. Do not rely on that incremental
+gate alone for host syntax acceptance: explicitly run the existing Makefile
+`cc-check` target over the complete changed translation units, independent
+of object timestamps, and force their ordinary object rebuild at handoff.
+Both checks pass after the compatibility correction.
+
+After formatting and duplicate cleanup, fresh and twenty-leading-blank
+controls preserve every accepted object section, all three previous C bodies
+and all six offsets. All four linked C spans and the full ROM match retail,
+MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`. Naming has no established mapping.
+Two assembly owners remain in this source; no speculative body is installed.
+
+### Requeue: full window/text rendering
+
+`func_88005740`: requeue, sixteen scored source-shape cells, no accepted body.
+Initial arrays, dimensions, SDK calls and staged double texture-size query
+reach 1020 bytes versus a 1056-byte owner span, normalized 0.8598 / raw 0.5644,
+frame 0x118 versus 0x110. The target's first row-height calculation has
+separate `rows * 20` and `rows * 6` terms; collapsing it to `rows * 26`
+changes the multiplication lowering. A named maximum-row value and those
+separate terms raise normalized similarity to 0.9018 but yield 1100 bytes,
+raw 0.5455. A named Y-array endpoint provokes loop versioning/unrolling,
+unlike the target's simple three-element pointer loop; narrower declaration
+scopes alone do not resolve it.
+
+Preserve the 128-byte formatted-string buffer, four string pointers, four
+byte row counts, three shared row Y positions plus the footer Y, the duplicate
+texture-width queries, resource/setup calls and state-dependent text draws.
+No trial arrays, globals or rounding helpers are installed. Next action:
+recover the local aggregate/footer-Y boundary and loop topology, then inspect
+the first allocation/layout divergence; do not repeat declaration-scope-only
+or literal-26 variants.
+
+## Previous accepted native batch
 
 | Owner | Role | Instructions / bytes | Frame | Accepted batch |
 | --- | --- | ---: | ---: | --- |
@@ -33,7 +90,8 @@ all accepted object sections, all six original offsets and the previous
 44-byte accepted C wrapper. All three linked C spans and the entire ROM match
 retail, MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`. Exactly two removed pragmas
 have accepted, link-verified gate provenance. Naming has no established
-mapping. Three assembly owners remain; no layout/tool changes are installed.
+mapping. Three assembly owners remained at that batch; no layout/tool changes
+were installed.
 
 ## Requeue: animation envelope initialization
 
