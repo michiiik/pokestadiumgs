@@ -1193,7 +1193,7 @@
     - [0x2894B0, textbin, fragments/53/fragment53_header]
     - [0x2894D0, c,       fragments/53/fragment53_code]
     - [0x293A90, data,    fragments/53/fragment53_data]
-    - [0x296D30, .rodata, fragments/53/fragment53_code]
+    - [0x296B80, .rodata, fragments/53/fragment53_code]
     - [0x296D70, rodata]
 
   - name: fragment54
