@@ -85,7 +85,21 @@ s16 func_8800230C(Fragment29Node *node) {
     return selected;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_880024FC.s")
+void func_880024FC(Fragment29Node *node, s8 *selection, u8 count, u16 period,
+                   u16 step, u16 alternate, s16 enabled, s8 repeat, s32 sound) {
+    *(s8 **)node = selection;
+    *(s16 *)((u8 *)node + 4) = 0;
+    *(s32 *)((u8 *)node + 8) = 0;
+    *(u8 *)((u8 *)node + 0xC) = count;
+    *(u16 *)((u8 *)node + 0xE) = period;
+    *(u16 *)((u8 *)node + 0x10) = step;
+    *(u16 *)((u8 *)node + 0x12) = alternate;
+    *(s16 *)((u8 *)node + 0x14) = 0;
+    *(s16 *)((u8 *)node + 0x16) = 0;
+    *(s16 *)((u8 *)node + 0x18) = enabled;
+    *(s8 *)((u8 *)node + 0x1A) = repeat;
+    *(s32 *)((u8 *)node + 0x1C) = sound;
+}
 
 void func_8800254C(Fragment29Node *node) {
     s32 changed;
@@ -173,7 +187,23 @@ void func_88002820(s16 x, s16 y, s8 style, u8 **text, u16 count,
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88002958.s")
+s32 func_88002958(u8 **strings, u16 count, s32 font, s16 style) {
+    u16 width = 0;
+    s32 i = 0;
+    u8 **text;
+
+    if (count != 0) {
+        text = strings;
+        do {
+            width = (func_80049290(font, style, (const char *)*text) < width
+                         ? width
+                         : func_80049290(font, style, (const char *)*text));
+            i++;
+            text++;
+        } while (i != count);
+    }
+    return width;
+}
 
 extern s32 func_800472E0(u8 *); extern s32 func_800472B8(s32);
 s32 func_88002A08(u8 **arg0, u16 arg1, s32 arg2, s16 arg3) {
@@ -263,7 +293,22 @@ void func_88002CB8(s16 x,s16 y,u16 width,u16 height) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88002EC0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_880032C4.s")
+extern s32 func_80001FF0(void);
+extern s8 D_8800EF18;
+extern s8 D_8800EF40, D_8800EF41;
+extern s16 D_8800EF42, D_8800EF44;
+u8 func_880032C4(void) {
+    u8 count = 0;
+    s32 i;
+    u8 *node = D_8800ED50;
+
+    for (i = 0; i < 6; i++, node += 0x4C) {
+        if (*(s32 *)(node + 0x20) != 0) {
+            count++;
+        }
+    }
+    return count;
+}
 
 u8 func_8800335C(void) {
     u8 count = 0;
@@ -354,7 +399,6 @@ void func_88003858(F29Rect *rect, u8 *data) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88003A00.s")
 
 extern void func_88003A00();
-extern s8 D_8800EF18;
 void func_88003FBC(void *arg0) {
     s8 var_v0;
 
@@ -370,7 +414,20 @@ void func_88003FBC(void *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88004014.s")
+void func_88004014(void) {
+    s32 i;
+    u8 *node = D_8800ED50;
+
+    for (i = 0; i < 6; i++, node += 0x4C) {
+        node[0] = i;
+        *(s32 *)(node + 0x20) = 0;
+    }
+    if (func_80001FF0() == 60) D_8800EF18 = 8; else D_8800EF18 = 6;
+    D_8800EF40 = -1;
+    D_8800EF41 = 0;
+    D_8800EF42 = 320;
+    D_8800EF44 = 240;
+}
 
 extern u8 D_8800ED50[]; extern void func_88003A00(u8 *);
 void func_880040D4(void) {
