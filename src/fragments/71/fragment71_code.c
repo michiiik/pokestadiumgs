@@ -77,7 +77,7 @@ void func_8F300CAC(void) {
 extern void main_pool_push_state(s32);
 extern void main_pool_pop_state(s32);
 extern void Gfx_InitDisplayListBuffers(s32, s32);
-extern s32 func_800082E0(s32, s32, s32, s32, s32, s32);
+extern s32 StageContext_Allocate(s32, s32, s32, s32, s32, s32);
 extern void func_8004C09C(s32);
 extern void func_8004C4B0(s32);
 extern void func_8004C8C0(s32);
@@ -99,7 +99,7 @@ s32 fragment71_main(s32 arg0, s32 arg1) {
     s32 sp24;
     main_pool_push_state(0x424B4544);
     Gfx_InitDisplayListBuffers(0x10000, 0);
-    sp24 = func_800082E0(1, 0, 2, 0, 2, 1);
+    sp24 = StageContext_Allocate(1, 0, 2, 0, 2, 1);
     func_8004C09C(3);
     func_8004C4B0(0x42);
     func_8004C8C0(0x33);

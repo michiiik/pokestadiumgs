@@ -126,7 +126,7 @@ void func_8320092C(s32 arg0, s32 arg1) {
 #ifdef VERSION_US
 extern void Asset_LoadToSegment(s32, u8 *, u8 *, s32);
 extern void Gfx_InitDisplayListBuffers(s32, s32);
-extern s32 func_800082E0(s32, s32, s32, s32, s32, s32);
+extern s32 StageContext_Allocate(s32, s32, s32, s32, s32, s32);
 extern void func_8004C09C(s32);
 extern void func_8004C4B0(s32);
 extern void func_8004C8C0(s32);
@@ -148,7 +148,7 @@ void func_8320097C(s32 arg0, s32 arg1) {
     Asset_LoadToSegment((s32) ((u32) ((s32) D_1000000 & 0x0F000000) >> 0x18), &D_446E30, D_447D00, 0);
     D_83200DF8 = 0;
     Gfx_InitDisplayListBuffers(0x10000, 0);
-    sp24 = func_800082E0(1, 0, 2, 0, 2, 1);
+    sp24 = StageContext_Allocate(1, 0, 2, 0, 2, 1);
     func_8004C09C(0x10F);
     func_8004C4B0(0x3D);
     func_8004C4B0(0x3C);

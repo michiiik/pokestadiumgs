@@ -182,7 +182,7 @@ void func_88401200(void) {
 extern void main_pool_push_state(s32);
 extern void main_pool_pop_state(s32);
 extern void Gfx_InitDisplayListBuffers(s32, s32);
-extern s32 func_800082E0(s32, s32, s32, s32, s32, s32);
+extern s32 StageContext_Allocate(s32, s32, s32, s32, s32, s32);
 extern void func_8004C09C(s32);
 extern s32 func_80047588(s32, s32);
 extern s32 D_8800687C;
@@ -203,7 +203,7 @@ s32 fragment33_main(s32 arg0, s32 arg1) {
 
     main_pool_push_state(0x5A4F4F4D);
     Gfx_InitDisplayListBuffers(0x14000, 0);
-    sp24 = func_800082E0(0, 1, 3, 1, 2, 1);
+    sp24 = StageContext_Allocate(0, 1, 3, 1, 2, 1);
     func_8004C09C(3);
     D_8800687C = func_80047588(1, 0);
     Font_EnableLineBreak();

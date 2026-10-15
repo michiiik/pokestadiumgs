@@ -125,7 +125,7 @@ extern s32 func_80055948(s32);
 extern s32 func_80054E48(s32);
 extern void Gfx_InitDisplayListBuffers(s32,s32);
 extern void Gfx_FreeDisplayListBuffers(void);
-extern s32 func_800082E0(s8,s8,s8,s8,s8,s32);
+extern s32 StageContext_Allocate(s8,s8,s8,s8,s8,s32);
 extern s32 func_8004C09C(s32);
 extern s32 func_8004C8C0(u16);
 extern s32 func_8004C990(s32,s32);
@@ -158,7 +158,7 @@ s32 fragment75_main(s32 arg0, s32 arg1) {
     main_pool_push_state(0x4D444C56);
     func_80055948(3);
     Gfx_InitDisplayListBuffers(0x10000, 0);
-    configuration = func_800082E0(0, 1, 3, 1, 3, 1);
+    configuration = StageContext_Allocate(0, 1, 3, 1, 3, 1);
     func_8004C09C(9);
     func_8004C8C0(0x99);
     D_8FA02028 = func_8004C990(0x99, 2);

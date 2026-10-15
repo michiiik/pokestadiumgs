@@ -547,7 +547,7 @@ if (D_8660A9B8 == 8) { D_8660746C = value; } if (D_8660AA10 == 8) { D_866075D4 =
 
 #ifdef VERSION_US
 extern void Gfx_InitDisplayListBuffers(s32, s32);
-s32 func_800082E0(s32, s32, s32, s32, s32, s32);
+s32 StageContext_Allocate(s32, s32, s32, s32, s32, s32);
 extern void func_80008514(s32);
 extern void func_80008574();
 extern void func_8004C8C0(s32);
@@ -574,7 +574,7 @@ void func_87F0C980(void);
 void func_80047610(void);
 void func_8004C398(void);
 void Gfx_FreeDisplayListBuffers(void);
-s32 func_800082E0(s32, s32, s32, s32, s32, s32);
+s32 StageContext_Allocate(s32, s32, s32, s32, s32, s32);
 u8 *Asset_LoadToSegment(s32 id, u8 *rom_start, u8 *rom_end, s32 arg3);
 void func_87F0C980(void);
 void func_80047610(void);
@@ -589,7 +589,7 @@ s32 fragment54_main(s32 arg0, void *arg1) {
     }
     main_pool_push_state(0x4D523032);
     Gfx_InitDisplayListBuffers(0x20000, 0);
-    sp24 = func_800082E0(0, 1, 3, 1, 2, 1);
+    sp24 = StageContext_Allocate(0, 1, 3, 1, 2, 1);
     func_8004C09C(0x123);
     func_87F06EAC(0x6A, &D_86607320, D_86607230);
     func_8004C8C0(0xE0);

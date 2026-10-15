@@ -246,7 +246,7 @@ s32 func_8F200588(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-extern s32 func_800082E0(s32, s32, s32, s32, s32, s32);
+extern s32 StageContext_Allocate(s32, s32, s32, s32, s32, s32);
 extern void func_80008514(s32);
 extern void func_80008574(void);
 extern void func_800086A4(s32);
@@ -261,7 +261,7 @@ void func_8F20063C(void) {
     do {
         main_pool_push_state(0x7265736F);
         /* The original configuration reads the signed low byte of this halfword. */
-        func_80008514(func_800082E0(*((s8*)&D_8F200870 + 1), 0, 2, 0, 2, 1));
+        func_80008514(StageContext_Allocate(*((s8*)&D_8F200870 + 1), 0, 2, 0, 2, 1));
         func_800086A4(2);
         StageFade_StartFromOpaque(5);
         main_pool_push_state(0x73636C64);

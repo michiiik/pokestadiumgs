@@ -241,7 +241,7 @@ void func_8FB032C4(s32 arg0, s32 arg1) {
 
 extern void func_800060F4(s32, s32);
 extern void Gfx_InitDisplayListBuffers(s32, s32);
-extern s32 func_800082E0(s32, s32, s32, s32, s32, s32);
+extern s32 StageContext_Allocate(s32, s32, s32, s32, s32, s32);
 extern void func_8004C09C(s32);
 extern void func_8004C4B0(s32);
 extern s32 func_80047588(s32, s32);
@@ -254,7 +254,7 @@ void func_8FB03328(s32 arg0, s32 arg1) {
     s32 sp24;
     func_800060F4(0xF, 2);
     Gfx_InitDisplayListBuffers(0x10000, 0);
-    sp24 = func_800082E0(1, 0, 2, 0, 2, 1);
+    sp24 = StageContext_Allocate(1, 0, 2, 0, 2, 1);
     func_8004C09C(0x107);
     func_8004C4B0(6);
     func_8004C4B0(8);

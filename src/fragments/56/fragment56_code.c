@@ -373,7 +373,7 @@ extern s32 func_80001FF0(void);
 extern void func_80027EE0(u16);
 extern void main_pool_push_state(s32);
 extern void Gfx_InitDisplayListBuffers(s32, s32);
-extern s32 func_800082E0(s32,s32,s32,s32,s32,s32);
+extern s32 StageContext_Allocate(s32,s32,s32,s32,s32,s32);
 extern void func_8004C09C(s32);
 extern void func_8004C8C0(s32);
 extern s32 func_87F08E3C(s32,s32);
@@ -415,7 +415,7 @@ s32 func_8680729C(s32 arg0, void *arg1) {
     if (*(u8 *)((u8 *)D_86808590 + 0x2180) == 4) func_80027EE0(0xFFF);
     main_pool_push_state(0x4D523034);
     Gfx_InitDisplayListBuffers(0x20000, 0);
-    sp24 = func_800082E0(0, 1, 3, 1, 2, 1);
+    sp24 = StageContext_Allocate(0, 1, 3, 1, 2, 1);
     func_8004C09C(0x127);
     func_8004C8C0(0xE3); func_8004C8C0(0x1B2); func_8004C8C0(0x1AD); func_8004C8C0(0x194); func_8004C8C0(0x98);
     D_86808640 = func_87F08E3C(func_8004C990(0xE3, 0), 0xF000000);

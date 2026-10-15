@@ -171,7 +171,7 @@ void func_8F9013E4(s32 arg0) {
 extern s32 main_pool_push_state(s32);
 extern void main_pool_pop_state(s32);
 extern void Gfx_InitDisplayListBuffers(s32, s32);
-extern s32 func_800082E0(s32, s32, s32, s32, s32, s32);
+extern s32 StageContext_Allocate(s32, s32, s32, s32, s32, s32);
 extern void func_80047588(s32, s32);
 extern void Asset_LoadToSegment(s32, u8 *, u8 *, s32);
 extern void func_8F9013E4(s32);
@@ -190,7 +190,7 @@ s32 fragment78_main(s32 arg0, s32 arg1) {
 
     main_pool_push_state(0x53524544);
     Gfx_InitDisplayListBuffers(0x10000, 0);
-    var_v0 = func_800082E0(1, 0, 2, 0, 2, 1);
+    var_v0 = StageContext_Allocate(1, 0, 2, 0, 2, 1);
     func_80047588(0x1C, 0);
     Asset_LoadToSegment((((u32)&D_1000000) & 0x0F000000) >> 24, &D_446E30, &D_447D00, 0);
     func_8F9013E4(0);
