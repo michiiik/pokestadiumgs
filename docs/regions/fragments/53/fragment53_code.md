@@ -1,5 +1,78 @@
 # Fragment 53 animation family
 
+## 2026-10-16 — round initializer accepted; earlier rodata ownership resolved
+
+`func_86502720` → `Fragment53_InitRoundState`, **142 words / 568 bytes**, frame
+**0x50**, batch `25e2c509ff8c4dfa8dd58252d284d00c`. This is a relocation-masked
+**sequential full-ROM accept, not link-verified**. The two raw address addends
+use equivalent one-past-array bounds; the linked retail ROM is exact. Progress:
+**25 C / 31 function ASM → 26 C / 30 function ASM**.
+
+Extend the existing canonical rodata window to **0x296B80..0x296D70**: 496 bytes
+instead of 64, adding 432 bytes at the front. Both ends are 16-aligned. The
+extension has 56 referenced symbols, all belonging to this TU; its first bytes
+are the 0.3 double, 10000 float and 3.1 float. Do not use the coarse planner's
+0x296350 start, which includes an unreferenced prefix. Do not create duplicate
+same-file rodata subsegments or duplicate the constants.
+
+Accepted `func_86502620`'s last scale case now uses its genuine **double 0.3**
+literal instead of external D8650D6D0. A scratch build verifies identical raw
+helper instructions and the expected leading eight rodata bytes. The other
+accepted C's external doubles remain in the shared head. Re-split with pinned
+SPLAT/spimdisasm, then pass a normal retail-ROM gate with the round and result
+owners **still assembly** before installing any candidate. This baseline gate
+proves the complete intervening pools, tables and alignment bytes are retained.
+
+The round initializer preserves four actor records' clears, bounds, floating
+fields, unsigned RNG remainders, signed random direction, trajectory setup,
+scene resets and nested four-by-two model resets. Its actual **10000.0f**
+literal closes the former entry-load schedule residual. Read the scene counter
+before the other context clears, as in the oracle. Natural indexed `for` loops
+match; no pointer scaffold or hand-unrolled loop remains.
+
+After readable cleanup and naming, fresh and twenty-leading-blank object builds
+preserve all frozen section bytes/layout, all 56 pre-layout function spans,
+all **55 untouched post-layout raw spans**, and the complete **496-byte rodata**
+against the assembly-only baseline. Forced normal ROM comparison is retail-
+identical, MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`; host syntax check and all
+25 tooling tests pass. Only source, YAML, one compatibility alias and these
+notes are committed. Generated assembly/YAML, scratch scripts/proofs, compiler
+copies, objects and ROMs stay local. No agents, containers, padding or bypasses.
+
+### Newly ready dispatchers and measured requeues
+
+The extension gives **jtbl_8650D70C / func_86503938**,
+**jtbl_8650D72C / func_865040E4**, and **jtbl_8650D808 / func_8650515C** canonical
+ownership. jtbl_8650D680 is before the new cut and remains a separate prerequisite.
+
+`func_86503938`: **requeue / frame residual**, 33 compared cells. Best natural
+source is 152 words / 608 bytes, normalized/raw 1.0/0.9803: only an eight-byte
+frame excess (0x38 versus 0x30) and the jump table's object relocation offset
+differ. A genuine index-copy local and branch-assigned model pointer reproduce
+the instruction roles. Removing the explicit offset local does not reduce the
+frame; a state-pointer carrier, narrow/register formals, branch-local model
+scope and parameter reuse do not close it. A calibrated 45-second permuter
+improves 30→10 via a valid comparison-operand swap, but the full-TU replay
+retains the same frame mismatch. Do not treat the standalone score as acceptance.
+
+The standalone import has table offset zero versus full-TU offset 0x3C. Before
+search, link both at their actual text/rodata addresses using canonical symbol
+addresses: all 608 linked instruction bytes and 32 table bytes are identical.
+This is import calibration, not a ROM gate. Next inspect CFE local homes and
+uopt/UGEN spill ownership; do not repeat the source families above or patch the
+frame. The dispatcher remains assembly.
+
+`func_86502B88`: **requeue**, now 64 compared cells. Eight genuine 3.1f literal
+cells improve best raw similarity to 0.7937 at normalized 0.9762, but the
+result-store constant sharing/stack layout still differs (492 versus 504
+bytes). Canonical placement alone does not solve it. Retain the previous
+constant/alias-ownership next hypothesis; do not re-send the literal family.
+
+`func_86500020`: **requeue**, now 16 compared cells. Readonly template/index-table
+declarations leave the prior unroll residual unchanged (best 0.4927/0.1171,
+580 versus 820 bytes). The additional known template consumer copies it too;
+the const hypothesis is not an unroll fix. All unresolved pragmas stay installed.
+
 ## 2026-10-16 — actor state/order and start-state transition accepted
 
 Two solo native accepts, **207 words / 828 bytes**, progressing the file from
