@@ -2,6 +2,9 @@
 
 
 #ifdef VERSION_US
+/* Keep the original named rodata ahead of this file's seven switch tables. */
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/D_81312180.s")
+
 typedef struct {
     u8 pad00000[0x1A138];
     s32 mode;
@@ -27,6 +30,7 @@ extern s32 func_8131109C(void *);
 extern void func_8130F7B8(s32, s32);
 extern void func_81300E34(void *);
 extern void func_813010B0(void *);
+extern void _bzero(void *, s32);
 
 extern void main_pool_pop_state(s32);
 extern void main_pool_push_state(s32);
@@ -159,7 +163,7 @@ extern void func_81302EE4(void *, void *, void *, s32, void *, void *);
 extern s32 func_8130A460(void *, s32, s32, void *);
 extern s32 func_81304178(u8 *, s32, s32, s32);
 extern s32 func_8160A844(void *, void *, s32, s32);
-extern void func_81300730(void *, s32);
+extern void Fragment14_AdvanceSelectionSlot(void *, s32);
 extern void func_81300020(s32 arg0);
 extern s32 func_81300064(s32 arg0);
 extern void func_81300244(s32 arg0, s32 arg1, s32 arg2);
@@ -206,13 +210,56 @@ void Fragment14_ConfigureControllerSelection(void *arg0, s32 arg1, s32 arg2, s32
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_81300570.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_81300730.s")
+extern void func_813000BC(void *arg0, s32 arg1);
+extern s32 func_81300314(void *arg0, s32 arg1, s32 arg2);
+void Fragment14_AdvanceSelectionSlot(void *arg0, s32 arg1) {
+    s32 next;
+
+    next = func_81300314(arg0, ((Fragment14SetupState *)arg0)->slot, arg1);
+    if (next < 0) {
+        func_813000BC(arg0, 8);
+    } else if (next >= 4) {
+        func_813000BC(arg0, 9);
+    } else {
+        ((Fragment14SetupState *)arg0)->slot = next;
+        switch (*(u8 *)(((Fragment14SetupState *)arg0)->data + ((Fragment14SetupState *)arg0)->slot + 0x93C)) {
+        case 4:
+            _bzero(((Fragment14SetupState *)arg0)->data + ((Fragment14SetupState *)arg0)->slot * 0x240, 0x240);
+            func_813000BC(arg0, 5);
+            break;
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+        case 6:
+            func_813000BC(arg0, 1);
+            break;
+        default:
+            func_813000BC(arg0, 0);
+            break;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_81300830.s")
 
 void func_81300B48(u8 *arg0) {}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_81300B50.s")
+s32 Fragment14_GetSelectionExitStatus(void *arg0) {
+    switch (((Fragment14SetupState *)arg0)->active) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+    case 5:
+        return 0;
+    case 8:
+        return -1;
+    case 9:
+        return 1;
+    }
+    return 0;
+}
 
 extern void func_8130A570(s32, s32);
 extern void func_81304208(s32);
@@ -341,7 +388,43 @@ void func_8130150C(void *arg0) {
     *(s32 *)((u8 *)temp_a0 + 0x1A168) = 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_81301548.s")
+extern void func_813000BC(void *arg0, s32 arg1);
+extern void Fragment14_AdvanceSelectionSlot(void *arg0, s32 arg1);
+extern void func_8130F7B8(s32, s32);
+extern void func_81310894(void *, s32);
+extern s32 func_8131109C(void *);
+void Fragment14_UpdateSlotDialog(void *arg0, s32 arg1) {
+    s32 result;
+
+    func_81310894(((u8 *)arg0 + 0xF64C), arg1);
+    result = func_8131109C(((u8 *)arg0 + 0xF64C));
+    func_8130F7B8((s32)((u8 *)arg0 + 0xF64C), (s32)((u8 *)arg0 + 0x1A154));
+    switch (result) {
+    case 4:
+        func_813000BC(arg0, 5);
+        break;
+    case 5:
+        func_813000BC(arg0, 2);
+        break;
+    case -1:
+        *(s8 *)(*(u8 **)(((u8 *)arg0 + 0x18000) + 0x2148) +
+                *(s8 *)(((u8 *)arg0 + 0x18000) + 0x2142) + 0x93C) = -1;
+        Fragment14_AdvanceSelectionSlot(arg0, -1);
+        break;
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+    case 6:
+        *(s8 *)(*(u8 **)(((u8 *)arg0 + 0x18000) + 0x2148) +
+                *(s8 *)(((u8 *)arg0 + 0x18000) + 0x2142) + 0x93C) = result;
+        func_813000BC(arg0, 1);
+        break;
+    case -2:
+    default:
+        break;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_81301648.s")
 
@@ -458,7 +541,7 @@ void Fragment14_UpdateSelectionCommit(void *arg0, s32 arg1) {
                        func_8004C874(0xF, *(s8 *)(((Fragment14SetupState *)arg0)->data + ((Fragment14SetupState *)arg0)->slot + 0x900) + 0x62));
         }
         ((Fragment14SetupState *)arg0)->data[((Fragment14SetupState *)arg0)->slot + 0x93C] = 4;
-        func_81300730(arg0, 1);
+        Fragment14_AdvanceSelectionSlot(arg0, 1);
         ((Fragment14SetupState *)arg0)->mode = 1;
     }
 }

@@ -613,7 +613,7 @@
     - [0x1077C0, c,       fragments/14/fragment14_1077C0]
     - [0x109280, c,       fragments/14/fragment14_109280]
     - [0x109EC0, data,    fragments/14/fragment14_data]
-    - [0x10A390, .rodata, fragments/14/fragment14_F81B0] # jtbl_81312200 through jtbl_81312274
+    - [0x10A310, .rodata, fragments/14/fragment14_F81B0] # D_81312180 and all seven jump tables
     - [0x10A430, rodata]
     - [0x10A600, .rodata, fragments/14/fragment14_FCD40] # D_81312470 (tail) + jtbl_81312478
     - [0x10A620, rodata]
