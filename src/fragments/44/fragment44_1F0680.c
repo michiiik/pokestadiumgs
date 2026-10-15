@@ -140,12 +140,63 @@ void Fragment44_ShiftActiveScrollRecords(void *arg0, s16 delta) {
     } while (i < 36);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F0680/func_8AF02C28.s")
+extern void *func_800071A4(s32, s32, s32, s32, s32);
+extern void func_8AF02AE0(void *, void *, s32);
+void Fragment44_InitializeScrollList(s32 arg0, s32 arg1, void *job, s32 tag) {
+    s32 config;
+    u8 *saved_config;
+    u8 *record;
+    s16 value;
+    s32 step;
+    s32 stride;
+    s16 visible;
+    s32 last_row;
+    s32 i;
 
-extern void func_8AF02C28(s32, s32, void *, s32);
+    config = (s32)(saved_config = (u8 *)arg0 + 0x44);
+    step = *(s32 *)(config + 0xC);
+    stride = *(s32 *)(config + 0x10);
+    visible = *(s16 *)(config + 0x20);
+    record = (u8 *)arg0 + 0x74;
+    *(s16 *)((u8 *)arg0 + 0x40) = 0;
+    *(s16 **)config = (s16 *)arg1;
+    *(s32 *)(config + 4) = 0;
+    while (1) {
+        value = *(s16 *)arg1;
+        if (value < 0) { break; }
+        (*(s32 *)(config + 4))++;
+        arg1 += 2;
+    }
+    last_row = *(s32 *)(config + 4) / stride - 1;
+    if (*(s32 *)(config + 4) % stride > 0) { last_row++; }
+    *(s32 *)(config + 0x14) = last_row;
+    *(s16 *)(config + 0x24) = last_row;
+    *(s16 *)(config + 0x26) = (last_row - visible) * step;
+    *(s16 *)(config + 0x2A) = visible + 1;
+    if (*(s32 *)(config + 4) > 0) {
+        *(s16 *)(config + 0x2C) = (visible + 2) * stride;
+        if (*(s16 *)(config + 0x2C) > 36) { *(s16 *)(config + 0x2C) = 36; }
+        i = 0;
+        if (*(s16 *)(config + 0x2C) > 0) {
+            do {
+                *(s16 *)(record + 0) = 0;
+                *(s16 *)(record + 2) = 0;
+                *(s16 *)(record + 4) = 0;
+                *(s16 *)(record + 6) = 0;
+                *(s16 *)(record + 8) = 0;
+                *(void **)(record + 0xC) = func_800071A4(0, 2, 0x50, 0x3C, 0);
+                record += 0x10;
+                i++;
+            } while (i < *(s16 *)(saved_config + 0x2C));
+        }
+        func_8AF02AE0((void *)arg0, job, tag);
+    }
+}
+
+extern void Fragment44_InitializeScrollList(s32, s32, void *, s32);
 extern s32 D_8AF2BE10;
 void func_8AF02DA4(s32 arg0, s32 arg1) {
-    func_8AF02C28(arg0, arg1, &D_8AF2BE10, 0x4943414C);
+    Fragment44_InitializeScrollList(arg0, arg1, &D_8AF2BE10, 0x4943414C);
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F0680/func_8AF02DD0.s")

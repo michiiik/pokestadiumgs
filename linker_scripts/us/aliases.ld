@@ -214,3 +214,4 @@ func_8AF02684 = Fragment44_CullScrollRecordsAbove;
 func_8AF02750 = Fragment44_CullScrollRecordsBelow;
 func_8AF02A34 = Fragment44_PrepareTrailingScrollRow;
 func_8AF02410 = Fragment44_RenderScrollRecord;
+func_8AF02C28 = Fragment44_InitializeScrollList;
