@@ -388,3 +388,49 @@ the separately emitted 12-byte alignment tail. Normal forced retail-ROM
 comparison and host checks for both touched sources pass; all 22 tooling
 tests pass. Update existing callers and add two US compatibility aliases.
 No tools, binaries, storage objects or invented helper functions committed.
+
+## Native grouped-item labels — 2026-10-15
+
+`func_82402A14` → `Fragment13_GetGroupedItemLabel`: **66 words / 264 bytes**,
+frame 0x20; file **53 C / 26 ASM → 54 C / 25 ASM**. Link-verified combined
+full-ROM acceptance, batch `0ba55387746f447d88092a85b9dea292`.
+
+Move the existing item, pointer-span and grouped-list declarations before
+their first use; split the item record's opaque prefix to expose the signed
+label index at +6 while preserving id/value at +8/+10 and the 12-byte stride.
+Fresh/twenty-blank controls prove these declaration refinements leave the
+whole object unchanged before probing.
+
+Preserve the empty-label return for an out-of-range entry, negative-group
+category labels, final-entry label and descriptor-indexed label lookup.
+The original full-width group argument remains live for indexing; narrow it
+only at the existing count helper's s16 boundary. An extra named narrow local
+puts its home at sp+0x18 instead of the original sp+0x1C. Eight candidates;
+the first inline-cast form accepts. Add the behavior-backed US alias without
+changing address-keyed symbols, prototypes elsewhere, compiler or layout.
+
+After naming, fresh/twenty-blank controls preserve all section bytes/layout,
+all 79 original starts/full spans, the frozen accepted body and 78 untouched
+spans. Forced normal retail-ROM comparison, host syntax check and all 22
+tooling tests pass. No scratch tools or binaries published; solo native.
+
+### `func_82402B1C` — requeue, scrolling indicators and stack/value roles
+
+195-word / 780-byte owner remains ASM. Sixteen compared candidates preserve
+the outer sliding-frame call and both direction-dependent indicator branches,
+including repeated count calls, triangle-wave fraction and separate final
+constants. First family best normalized/raw **0.9487/0.5077**, correct size,
+frame 0x50 rather than 0x60. Named right-indicator X improves raw to **0.5282**
+with frame 0x58, still 780 bytes. A named selection alias produces 804 bytes;
+splitting the negative starting X from final X produces 832/856 bytes and
+does not fix the target. Cached icon Y and guard-return/ternary spellings do
+not improve the first basin. One duplicate-parent batch was refused before
+compilation; it consumed no hypothesis budget.
+
+Next: investigate the genuine fraction/triangle/result lifetimes. Target
+keeps the incoming selection in f14, fraction in f12, and copies the triangle
+result from f0 to f2. The first candidate instead uses f12 for input/triangle
+and f2 for fraction, with different spill homes. Diagnose those value roles
+before more scalar aliases; do not pad the frame, invent unused locals or
+alter the established helper interfaces. The missing optional draft CLI in
+the public clone is not a compiler failure; all candidates used read assembly.
