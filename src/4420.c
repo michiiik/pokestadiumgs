@@ -190,7 +190,7 @@ s32 Jpeg_DecodeImage(u32 addr, s32 arg1, u8 *arg2)
       {
         return 0;
       }
-      if (func_8000BC90(&sp74, addr, 1, var_s4 & 0xFF, &sp60) != 0)
+      if (Jpeg_DecodeMcus(&sp74, addr, 1, var_s4 & 0xFF, &sp60) != 0)
       {
         return 0;
       }
