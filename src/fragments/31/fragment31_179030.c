@@ -46,7 +46,26 @@ void func_882064B4(s32 arg0, s32 *arg1, void *arg2, void *arg3) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_179030/func_8820659C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_179030/func_88206668.s")
+extern Gfx *D_800D0510;
+extern Gfx D_80094E38[];
+extern Gfx D_80094F50[];
+extern u8 *D_8800ECC0;
+extern void func_882001E8(void);
+extern void func_882052F8(void);
+extern s32 func_8004D27C(u8 *, s32, s32);
+extern void func_88002BA0(u8, u8, u8);
+extern void func_88200180(u8);
+
+void func_88206668(void) {
+    func_882001E8();
+    func_882052F8();
+    gSPDisplayList(D_800D0510++, D_80094E38);
+    func_8004D27C(D_8800ECC0, 128, 1);
+    func_88002BA0(220, 220, 180);
+    func_88200180(0);
+    func_88200180(1);
+    gSPDisplayList(D_800D0510++, D_80094F50);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_179030/func_88206714.s")
 
@@ -54,10 +73,10 @@ void func_882064B4(s32 arg0, s32 *arg1, void *arg2, void *arg3) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_179030/func_88206CC0.s")
 
-extern void Gfx_SetScissorRect(s32 *, s32, s32, s32, s32);
+extern void Gfx_SetScissorRect(Gfx **, s16, s16, s16, s16);
 s32 func_880032C4();
 extern void func_882001E8();
-extern u8 D_800D0510;
+extern Gfx *D_800D0510;
 
 void func_88207D14(u8 *arg0) {
     if (*arg0 != 0) {
