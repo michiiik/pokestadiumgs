@@ -1084,7 +1084,7 @@ s32 Fragment13_StepVectorToward(struct Fragment13MotionVector *arg0, struct Frag
 extern void func_82402B1C(void *, void *, f32, s16, f32, s32, s32, s32);
 extern void func_8240330C(void *, s32, f32, s32, s32, f32);
 extern f32 func_82407088(void *arg0);
-extern f32 func_824070E4(void *);
+extern f32 Fragment13_GetInterpolatedListPosition(void *);
 void Fragment13_UpdateGroupListTransition(void *arg0, void *arg1) {
     f32 factor;
 
@@ -1116,7 +1116,7 @@ void Fragment13_UpdateGroupListTransition(void *arg0, void *arg1) {
     case 2:
         func_8240330C(arg1, *(s32 *)((u8 *)arg0 + 0x1DC), factor, *(s32 *)((u8 *)arg0 + 0x1D4),
                       *(s32 *)((u8 *)arg0 + 0x1D8), *(f32 *)((u8 *)arg0 + 0x208) / 6.0f);
-        func_82402B1C(arg1, (u8 *)arg0 + 0x54, func_824070E4(arg0), (s16)(*(s32 *)((u8 *)arg0 + 0x1DC)),
+        func_82402B1C(arg1, (u8 *)arg0 + 0x54, Fragment13_GetInterpolatedListPosition(arg0), (s16)(*(s32 *)((u8 *)arg0 + 0x1DC)),
                       factor, 154, 0, *(s32 *)((u8 *)arg0 + 0x1E0) < *(s32 *)((u8 *)arg0 + 0x1DC));
         return;
     }
@@ -1181,7 +1181,7 @@ s32 func_82406CCC(u8 *arg0) {
 
 extern void func_82402E28(s32, void *, f32, s32, f32, s32, s32, s32);
 extern void func_82403624(s32, void *, s32, f32, s32, s32, f32);
-void func_82406CDC(void *arg0, s32 arg1) { f32 scale; s32 state; scale = D_8160BD08(*(f32 *)((u8 *)arg0 + 0x204) / 10.0f); state = *(s32 *)((u8 *)arg0 + 0x1EC); switch (state) { case 0: return; case 1: func_82402E28(arg1, (u8 *)arg0 + 0x54, func_82407088(arg0), -1, scale, 0xB8, 1, *(s32 *)((u8 *)arg0 + 0x1E0) < *(s32 *)((u8 *)arg0 + 0x1DC)); return; case 2: func_82403624(arg1, arg0, *(s32 *)((u8 *)arg0 + 0x1DC), scale, *(s32 *)((u8 *)arg0 + 0x1D4), *(s32 *)((u8 *)arg0 + 0x1D8), *(f32 *)((u8 *)arg0 + 0x208) / 6.0f); func_82402E28(arg1, (u8 *)arg0 + 0x54, func_824070E4(arg0), (s16)*(s32 *)((u8 *)arg0 + 0x1DC), scale, 0x9A, 0, *(s32 *)((u8 *)arg0 + 0x1E0) < *(s32 *)((u8 *)arg0 + 0x1DC)); return; } }
+void func_82406CDC(void *arg0, s32 arg1) { f32 scale; s32 state; scale = D_8160BD08(*(f32 *)((u8 *)arg0 + 0x204) / 10.0f); state = *(s32 *)((u8 *)arg0 + 0x1EC); switch (state) { case 0: return; case 1: func_82402E28(arg1, (u8 *)arg0 + 0x54, func_82407088(arg0), -1, scale, 0xB8, 1, *(s32 *)((u8 *)arg0 + 0x1E0) < *(s32 *)((u8 *)arg0 + 0x1DC)); return; case 2: func_82403624(arg1, arg0, *(s32 *)((u8 *)arg0 + 0x1DC), scale, *(s32 *)((u8 *)arg0 + 0x1D4), *(s32 *)((u8 *)arg0 + 0x1D8), *(f32 *)((u8 *)arg0 + 0x208) / 6.0f); func_82402E28(arg1, (u8 *)arg0 + 0x54, Fragment13_GetInterpolatedListPosition(arg0), (s16)*(s32 *)((u8 *)arg0 + 0x1DC), scale, 0x9A, 0, *(s32 *)((u8 *)arg0 + 0x1E0) < *(s32 *)((u8 *)arg0 + 0x1DC)); return; } }
 
 extern void func_824020B4(s32, s32);
 extern void func_82402904(s32, s32);
@@ -1253,7 +1253,29 @@ f32 func_82407088(void *arg0) {
     return ((f32)*(s32 *)((u8 *)arg0 + 0x1DC) - start) * factor + start;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_824070E4.s")
+extern f32 (*D_8160BD00)(f32);
+f32 Fragment13_GetInterpolatedListPosition(void *arg0) {
+    f32 factor;
+    f32 base;
+    s32 start;
+    s32 end;
+    s32 limit;
+    struct Fragment13GroupState *state;
+
+    state = arg0;
+    factor = D_8160BD00(state->selectionTimer / 6.0f);
+    end = state->end;
+    start = state->start;
+    limit = state->list.counts[state->group];
+    if (start >= limit) {
+        start = limit;
+    }
+    base = (f32)start;
+    if (end >= limit) {
+        end = limit;
+    }
+    return ((f32)end - base) * factor + base;
+}
 
 s32 Fragment13_FindNearestGroup(struct Fragment13MotionVector *arg0) {
     s32 best = 100000000;

@@ -191,3 +191,4 @@ func_8650A278 = Fragment53_RunSceneTransition;
 func_86501D6C = Fragment53_CountTrajectorySamplesInRange;
 func_82406880 = Fragment13_UpdateGroupListTransition;
 func_82406E14 = Fragment13_DrawGroupScene;
+func_824070E4 = Fragment13_GetInterpolatedListPosition;

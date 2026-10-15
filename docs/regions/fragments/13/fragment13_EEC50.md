@@ -984,3 +984,74 @@ loop-constant allocation/hoisting trace on this residual before tuning frame
 layout. The literal-hoist observation is not proof of an impossible frontend
 or a reason to install patched compiler output. Candidate bodies and logs
 remain local; no rejected source is installed.
+
+## 2026-10-16 — clamped list interpolation accepted
+
+`func_824070E4` becomes `Fragment13_GetInterpolatedListPosition`: **35 words /
+140 bytes**, original frame 0x18. The historical register-role requeue above
+is closed. File advances **64 C / 15 function ASM to 65 C / 14 function ASM**.
+Current pending partial batch now contains three functions, **318 words /
+1,272 bytes**, not a claim that all remaining owners are solved.
+
+Runner batch `ec2962c5579f45dba8503cd24ac6ec95` is **link-verified**, combined
+full-ROM accepted, MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`. No compiler, layout,
+padding or verification change is needed. The callback retains its real
+`f32 (*)(f32)` signature; the root retains its public `void *` ABI and uses
+the existing group-state type through a genuine local pointer.
+
+The first eight new lifetime candidates still have the wrong word-value
+registers. A fresh stock/off/on/twenty-leading-blank trace calibration preserves
+complete section bytes/layout, symbols and relocations for the known source
+and candidate. It identifies two equal-cost word webs: cost 2, two uses and
+three interference neighbors each, assigned `$v1`/`$a1` in the wrong roles.
+The successful combination defines **end before start**, keeps both loads
+after the callback, clamps start, converts start to a float base, then clamps
+end and interpolates. The actual typed `list.counts[group]` view also restores
+the original base/index addition order. Earlier reverse-load tests used a
+named index, while inline-index tests inherited the other load order; they
+had not tested this combination. The third candidate of the eight-cell
+web-order batch accepts. There were 32 earlier submitted candidates, eight
+new lifetime candidates and eight web-order candidates; the runner stops
+installation after the first accepted owner.
+
+The untyped counterpart in the final batch agrees in 34 of 35 raw words but
+reverses the address-add operands. It is not an acceptance. The runner again
+prints its advisory "source-shape variants will not close this" even on the
+accepted result; actual diagnostics/gates take precedence over that warning.
+
+After formatting and naming with a US compatibility alias, fresh and
+twenty-leading-blank builds preserve all frozen text/rodata/data/bss bytes,
+all 79 original starts/sizes/full spans and **76 untouched** pre-batch raw
+function spans. The existing renamed scene caller also retains identical
+complete section bytes/layout. All scratch drivers, traces, compiler copies,
+objects, generated assembly and ROMs remain local.
+Forced normal full-ROM verification after cleanup/naming matches retail;
+host syntax checking passes with the existing unrelated warning only. All
+25 tooling tests and whitespace checks pass.
+
+### Panel requeue follow-up: calibrated negative, not a compiler workaround
+
+`func_82403C84` now has **48 compared candidates**. Fresh known/candidate
+stock/off/on/twenty-leading-blank controls preserve every section byte/layout,
+symbol and relocation. The logging-only optimizer trace locates constants
+1 and 3 in webs 140/142 of procedure 34, with cost 2, five recorded uses and
+nine interference neighbors, colored to physical registers 22/23 (`$s6/$s7`).
+These are allocator webs, not instruction offsets.
+
+Twenty-four new candidates test unsigned offset division versus shifting,
+strict viewport bounds and loop form; format/index/offset signedness; pointer,
+countdown and index endpoints with explicit/default eight-bit formats. None
+removes the extra saved constants or improves the retained best
+0.9527/0.5621, 676-byte/frame-0x88 leader. One old-body preflight is not a
+compiler attempt and is replaced with an actual new counter-width hypothesis,
+not a whitespace replay.
+
+Flag diagnostics on scratch objects are separate from runner acceptance:
+`-g0` is byte-identical to normal; `-g3` changes 52 already-C functions and
+grows the candidate to 680 bytes; `-O1` changes 58 and grows it to 836 bytes.
+Stock IDO 5.3 changes eleven already-C functions and still yields a 676-byte
+nonmatching candidate. The known-source target remains ASM in those controls,
+so its unchanged bytes are not evidence of a C match. No alternate flag,
+compiler or patched artifact is installed. Keep the normal compiler and this
+bounded negative; next useful work requires a new constant-lifetime mechanism,
+not another spelling of these tested families.
