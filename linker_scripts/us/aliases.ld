@@ -100,3 +100,5 @@ func_800087E8 = BgStage_WaitForCondition;
 func_800088DC = BgStage_DrawFrame;
 func_800080E0 = StageLoader_BeginFrame;
 func_800082E0 = StageContext_Allocate;
+func_80007870 = StageFade_Update;
+func_80007E6C = StageLoader_SetupFrame;

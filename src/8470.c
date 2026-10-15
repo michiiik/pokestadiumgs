@@ -2,9 +2,36 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80007870.s")
-
 extern s32 D_800D0554;
+extern Gfx *D_800D0510;
+extern Gfx D_800872D8[];
+void StageFade_Update(void) {
+    u8 alpha, red, green, blue;
+    if (((u8 *)(u32)D_800D0554)[0x11] != 0) {
+        red = (*(u16 *)(((u8 *)(u32)D_800D0554) + 0x14) & 0xF800) >> 11;
+        green = (*(u16 *)(((u8 *)(u32)D_800D0554) + 0x14) & 0x7C0) >> 6;
+        blue = (*(u16 *)(((u8 *)(u32)D_800D0554) + 0x14) & 0x3E) >> 1;
+        red = (red << 3) | (red >> 2);
+        green = (green << 3) | (green >> 2);
+        blue = (blue << 3) | (blue >> 2);
+        switch (((u8 *)(u32)D_800D0554)[0x11]) {
+            case 1: alpha = 255; break;
+            case 2: alpha = 255 - (((u8 *)(u32)D_800D0554)[0x13] * 255) / ((u8 *)(u32)D_800D0554)[0x12]; break;
+            case 3: alpha = (((u8 *)(u32)D_800D0554)[0x13] * 255) / ((u8 *)(u32)D_800D0554)[0x12]; break;
+        }
+        if (alpha != 0) {
+            gDPSetEnvColor(D_800D0510++, red, green, blue, alpha);
+            gSPDisplayList(D_800D0510++, D_800872D8);
+        }
+        if (((u8 *)(u32)D_800D0554)[0x11] != 1) {
+            ((u8 *)(u32)D_800D0554)[0x13]++;
+            if (((u8 *)(u32)D_800D0554)[0x12] == ((u8 *)(u32)D_800D0554)[0x13]) {
+                if (((u8 *)(u32)D_800D0554)[0x11] == 2) { ((u8 *)(u32)D_800D0554)[0x11] = 0; } else { ((u8 *)(u32)D_800D0554)[0x11] = 1; }
+            }
+        }
+    }
+}
+
 s32 StageFade_Start(s32 duration) {
     s32 result = 0;
     s32 one = 1;
@@ -50,7 +77,6 @@ void StageFade_SetMode(s32 arg0) {
 
 void Profiler_SetDisplayModes(s32 arg0, s32 arg1) { extern s32 D_80087230; extern s32 D_80087234; if ((u32)arg0 < 3) D_80087230 = arg0; if ((u32)arg1 < 2) D_80087234 = arg1; }
 
-extern Gfx *D_800D0510;
 void Gfx_SetDefaultRenderState(void) {
     gDPPipeSync(D_800D0510++);
     gDPPipelineMode(D_800D0510++, G_PM_1PRIMITIVE);
@@ -70,7 +96,6 @@ void Gfx_SetDefaultRenderState(void) {
     gDPPipeSync(D_800D0510++);
   }
 
-extern Gfx *D_800D0510;
 void Gfx_SetDefaultGeometryState(void) {
     gSPClearGeometryMode(D_800D0510++, 0x3F0604);
     gSPSetGeometryMode(D_800D0510++, G_SHADE | G_SHADING_SMOOTH | G_CULL_BACK);
@@ -83,7 +108,6 @@ extern void Memmap_SetSegmentMap(s32, s32, s32);
 extern void func_80002178(void *);
 extern void Gfx_SetDefaultRenderState(void);
 extern void Gfx_SetDefaultGeometryState(void);
-extern Gfx *D_800D0510;
 void func_80007E18(void) {
     GfxImage_ResetCurrent();
     Memmap_SetSegmentMap(0, 0x80000000, func_8000339C());
@@ -92,19 +116,56 @@ void func_80007E18(void) {
     Gfx_SetDefaultGeometryState();
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80007E6C.s")
+extern Mtx D_800D0558;
+extern Mtx D_80087238;
+extern Vp D_80087278;
+extern Vp D_80087288;
+extern s32 D_80087230;
+extern s32 D_80087234;
+extern void func_80007328(Gfx **, s32);
+extern void func_80006F70(Gfx **, s32, s32, s32, s32);
+extern void StageFade_Update(void);
+extern void func_8000B0F0(void);
+extern void TextRenderer_FlushQueuedStrings(Gfx **, s32);
+extern void draw_profiler(s32);
+extern void func_800034E4(Gfx **);
+extern u32 Gfx_AllocDisplayList(s32);
+extern s32 StageContext_IsHighResolution(void);
+void StageLoader_SetupFrame(void) {
+    func_80007328(&D_800D0510, ((s32 *)((u8 *)(u32)D_800D0554 + 0x18))[*(s8 *)((u8 *)(u32)D_800D0554 + 0x16)]);
+    guOrtho(&D_800D0558, 0.0f, 320.0f, 0.0f, 240.0f, -2.0f, 2.0f, 1.0f);
+    Gfx_SetDefaultRenderState();
+    Gfx_SetDefaultGeometryState();
+    gSPMatrix(D_800D0510++, (u32)&D_80087238 & 0x1FFFFFFF, G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+    gSPMatrix(D_800D0510++, (u32)&D_800D0558 & 0x1FFFFFFF, G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
+    gSPPerspNormalize(D_800D0510++, 0xFFFF);
+    if (*(s8 *)((u8 *)(u32)D_800D0554 + 0xC) == 1) {
+        gSPViewport(D_800D0510++, (u32)&D_80087288 & 0x1FFFFFFF);
+    } else {
+        gSPViewport(D_800D0510++, (u32)&D_80087278 & 0x1FFFFFFF);
+    }
+    func_80006F70(&D_800D0510, 0, 0, *(s16 *)((u8 *)(u32)D_800D0554), *(s16 *)((u8 *)(u32)D_800D0554 + 2));
+    StageFade_Update();
+    if (D_80087230 != 0) { func_8000B0F0(); }
+    TextRenderer_FlushQueuedStrings(&D_800D0510, StageContext_IsHighResolution());
+    if (D_80087230 != 0) { draw_profiler(D_80087230 - 1); }
+    if (D_80087230 != 0) { if (D_80087234 != 0) { func_800034E4(&D_800D0510); } }
+    gDPFullSync(D_800D0510++);
+    gSPEndDisplayList(D_800D0510++);
+    Gfx_AllocDisplayList(0);
+}
 
 void StageLoader_SwapDisplayListAndReset(void) { Gfx_SwapDisplayListBuffer(); func_80007E18(); }
 
 extern s32 D_800D0540;
 extern s32 D_800D0544;
 extern s32 D_800D0548;
-extern void func_80007E6C(void);
+extern void StageLoader_SetupFrame(void);
 extern void Gfx_GetDisplayListRange(void **, s32 *);
 void StageLoader_BeginFrame(void) {
     u8 *context;
     u8 *request;
-    func_80007E6C();
+    StageLoader_SetupFrame();
     context = (u8 *)(u32)D_800D0554;
     request = (u8 *)&D_800D0540;
     request[0] = *(s8 *)(context + 0x10);
@@ -119,7 +180,19 @@ void StageLoader_BeginFrame(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80008188.s")
+extern void BgStage_DrawFrame(void);
+void func_80008188(void) {
+    typedef struct { s16 width, height; s16 left, right, top, bottom; } ClearFrameRect;
+    BgStage_DrawFrame();
+    gDPPipeSync(D_800D0510++);
+    gDPSetCycleType(D_800D0510++, G_CYC_FILL);
+    gDPSetRenderMode(D_800D0510++, G_RM_NOOP, G_RM_NOOP2);
+    gDPSetAlphaCompare(D_800D0510++, G_AC_NONE);
+    gDPSetFillColor(D_800D0510++, *(u16 *)((u8 *)(u32)D_800D0554 + 0x14) | (*(u16 *)((u8 *)(u32)D_800D0554 + 0x14) << 16));
+    gDPFillRectangle(D_800D0510++, ((ClearFrameRect *)(u32)D_800D0554)->left, ((ClearFrameRect *)(u32)D_800D0554)->top, ((ClearFrameRect *)(u32)D_800D0554)->right, ((ClearFrameRect *)(u32)D_800D0554)->bottom);
+    gDPPipeSync(D_800D0510++);
+    gDPSetCycleType(D_800D0510++, G_CYC_1CYCLE);
+}
 
 typedef struct {
     s16 width, height, left, right, top, bottom;
@@ -202,7 +275,6 @@ void StageContext_SaveAndSwitch(void *arg0) {
     D_800D0554 = (s32) arg0;
 }
 
-extern s32 D_800D0554;
 extern void func_8003539C(void);
 extern void Display_QueueFramebufferRequest(s32);
 extern void Display_WaitForCompletion(void);
@@ -218,14 +290,8 @@ void func_80008514(s32 arg0) {
     StageLoader_SwapDisplayListAndReset();
 }
 
-extern s32 D_800D0554;
-extern s32 D_800D0540;
 extern void func_80008188(void);
 extern void StageLoader_BeginFrame(void);
-extern void func_8003539C(void);
-extern void Display_QueueFramebufferRequest(s32);
-extern void Display_WaitForCompletion(void);
-extern u8 func_80002014(void);
 extern void Display_WaitForFrames(s32);
 void func_80008574(void) {
     if (D_800D0554 != 0) {
@@ -252,12 +318,6 @@ void StageLoader_WaitForRetrace(void) {
 
 extern Gfx *D_800D0510; void func_80008624(void) { func_80002178(&D_800D0510); }
 
-extern s32 D_800D0540;
-extern void StageLoader_BeginFrame(void);
-extern void func_8003539C(void);
-extern void Display_QueueFramebufferRequest(s32);
-extern void Display_WaitForCompletion(void);
-extern u8 func_80002014(void);
 s32 func_80008648(void) {
     StageLoader_BeginFrame();
     func_8003539C();
@@ -268,9 +328,21 @@ s32 func_80008648(void) {
     return *(s8 *)((u8 *)(u32)D_800D0554 + 0x17);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_800086A4.s")
+extern void StageLoader_SwapDisplayListAndReset(void);
+void func_800086A4(s32 frames) {
+    s32 *request;
+    while (frames-- > 0) {
+        request = &D_800D0540;
+        func_80008188();
+        StageLoader_BeginFrame();
+        func_8003539C();
+        Display_QueueFramebufferRequest((s32)request);
+        Display_WaitForCompletion();
+        ((u8 *)(u32)D_800D0554)[0x17] = func_80002014();
+        StageLoader_SwapDisplayListAndReset();
+    }
+}
 
-extern void func_80007328(Gfx **, s32);
 s32 BgStage_RunUntilCondition(u32 frames, s32 (*callback)(s32)) {
     s32 result = 0;
     if (frames == 0) {
@@ -308,8 +380,6 @@ s32 BgStage_WaitForCondition(s32 (*callback)(s32), s32 opaqueFrames, s32 transpa
     return result;
 }
 
-extern s32 D_800D0554;
-extern void Display_ClearFramebufferLine(u16);
 void StageContext_SetClearColor(u16 arg0) {
     if (D_800D0554 != 0) {
         *(u16 *)((u8 *)(u32)D_800D0554 + 0x14) = arg0 | 1;
