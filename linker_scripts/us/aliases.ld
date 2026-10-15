@@ -176,3 +176,4 @@ func_82405244 = Fragment13_LerpRgb;
 func_82407228 = Fragment13_SyncSceneSelections;
 func_82402A14 = Fragment13_GetGroupedItemLabel;
 func_8240182C = Fragment13_DrawPanelCorners;
+func_82401570 = Fragment13_DrawTexturedPanelBorder;

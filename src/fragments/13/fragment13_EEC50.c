@@ -105,7 +105,22 @@ void func_82401198(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     Gfx_FillRectRgba((arg0 + arg2) - 5, arg1 + 4, 6, arg3 - 8, 0, 0, 0, 0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82401570.s")
+void Fragment13_DrawTexturedPanelBorder(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    if (arg2 >= 4 && arg3 >= 4) {
+        func_8004D1FC((void *)(u32)D_82407844);
+        gSPDisplayList(D_800D0510++, D_80094E38);
+        gDPSetRenderMode(D_800D0510++, 0, 0x0F0A7008);
+        func_82400BD0(arg0, arg1, 4.0f, 4.0f, 0, 0, 1.0f, 1.0f);
+        func_82400BD0((arg0 + arg2) - 4, arg1, 4.0f, 4.0f, 4, 0, 1.0f, 1.0f);
+        func_82400BD0(arg0, (arg1 + arg3) - 4, 4.0f, 4.0f, 0, 4, 1.0f, 1.0f);
+        func_82400BD0((arg0 + arg2) - 4, (arg1 + arg3) - 4, 4.0f, 4.0f, 4, 4, 1.0f, 1.0f);
+        func_82400BD0(arg0, arg1 + 4, 4.0f, arg3 - 8, 0, 4, 1.0f, 0.0f);
+        func_82400BD0(arg0 + 4, arg1, arg2 - 8, 4.0f, 4, 0, 0.0f, 1.0f);
+        func_82400BD0((arg0 + arg2) - 4, arg1 + 4, 4.0f, arg3 - 8, 4, 4, 1.0f, 0.0f);
+        func_82400BD0(arg0 + 4, (arg1 + arg3) - 4, arg2 - 8, 4.0f, 4, 4, 0.0f, 1.0f);
+        gSPDisplayList(D_800D0510++, D_80094F50);
+    }
+}
 
 void Fragment13_DrawPanelCorners(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     if (arg2 >= 4 && arg3 >= 4) {
