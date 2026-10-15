@@ -2,19 +2,87 @@
 
 
 #ifdef VERSION_US
+struct Fragment44RowJob {
+    s32 tag;
+    void *owner;
+    u16 *pixels;
+    s16 width;
+    s16 rows;
+    s16 position;
+    s16 step;
+    s32 active;
+};
+extern struct Fragment44RowJob D_8AF2BDF8;
+
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F0680/func_8AF02410.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F0680/func_8AF02584.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F0680/func_8AF02684.s")
+void Fragment44_CullScrollRecordsAbove(void *arg0) {
+    s32 i;
+    u8 *entry;
+    s16 limit;
+    s16 step;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F0680/func_8AF02750.s")
+    step = *(s16 *)((u8 *)arg0 + 0x52);
+    entry = (u8 *)arg0 + 0x74;
+    limit = *(s16 *)((u8 *)arg0 + 0x72) + *(s32 *)((u8 *)arg0 + 0xC) - step;
+    for (i = 0; i < 36; i++) {
+        if (*(s16 *)entry == 1 && *(s16 *)(entry + 6) < limit) {
+            *(s16 *)entry = 0;
+        }
+        entry += 0x10;
+    }
+}
+
+void Fragment44_CullScrollRecordsBelow(void *arg0) {
+    s32 i;
+    u8 *entry;
+    s16 limit;
+    s16 step;
+
+    step = *(s16 *)((u8 *)arg0 + 0x52);
+    entry = (u8 *)arg0 + 0x74;
+    limit = step * (*(s16 *)((u8 *)arg0 + 0x64) - 1) + (*(s16 *)((u8 *)arg0 + 0x72) + *(s32 *)((u8 *)arg0 + 0xC));
+    for (i = 0; i < 36; i++) {
+        if (*(s16 *)entry == 1 && *(s16 *)(entry + 6) > limit) {
+            *(s16 *)entry = 0;
+        }
+        entry += 0x10;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F0680/func_8AF0282C.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F0680/func_8AF0299C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F0680/func_8AF02A34.s")
+void Fragment44_PrepareTrailingScrollRow(void *arg0) {
+    s16 count;
+    s16 row;
+    s16 step;
+    s16 width;
+    s16 *config;
+    u16 *pixels;
+    s16 position;
+
+    config = (s16 *)((u8 *)arg0 + 0x44);
+    step = *(s16 *)(config + 0x7);
+    width = *(s16 *)(config + 0x9);
+    count = *(s16 *)(config + 0x11) + *(s16 *)(config + 0x10);
+    row = *(s16 *)(config + 0x14) + count;
+    if (*(s32 *)(config + 0xa) >= row) {
+        position = (s16)(*(s32 *)(config + 0xe) + *(s32 *)((u8 *)arg0 + 0xc) + step * count);
+        pixels = *(u16 **)config + row * width;
+        D_8AF2BDF8.tag = 0x4F474942;
+        D_8AF2BDF8.owner = arg0;
+        D_8AF2BDF8.width = width;
+        D_8AF2BDF8.rows = 1;
+        D_8AF2BDF8.position = position;
+        D_8AF2BDF8.step = step;
+        D_8AF2BDF8.active = 1;
+        D_8AF2BDF8.pixels = pixels;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F0680/func_8AF02AE0.s")
 
@@ -68,7 +136,7 @@ void func_8AF02F18(void *arg0) {
 }
 
 extern void func_8AF0299C(void *);
-extern void func_8AF02A34(void *);
+extern void Fragment44_PrepareTrailingScrollRow(void *);
 extern void func_8AF00130(s32);
 
 void Fragment44_StepScrollUp(void *arg0) {
@@ -107,7 +175,7 @@ void Fragment44_StepScrollDown(void *arg0) {
             *(s32 *)(state + 8) -= *(s32 *)(config + 0xC);
             if (*(s32 *)(state + 8) < -*(s16 *)(config + 0x26)) { *(s32 *)(state + 8) = -*(s16 *)(config + 0x26); }
             *(s16 *)(state + 0x12) = 1;
-            func_8AF02A34(arg0);
+            Fragment44_PrepareTrailingScrollRow(arg0);
         }
     }
     (*(s16 *)(state + 0x10))++;
@@ -149,7 +217,7 @@ void Fragment44_AlignAndStepScrollDown(void *arg0) {
         *(s32 *)(state + 8) -= *(s32 *)(config + 0xC);
         if (*(s32 *)(state + 8) < -*(s16 *)(config + 0x26)) { *(s32 *)(state + 8) = -*(s16 *)(config + 0x26); }
         *(s16 *)(state + 0x12) = 1;
-        func_8AF02A34(arg0);
+        Fragment44_PrepareTrailingScrollRow(arg0);
     }
     (*(s16 *)(state + 0x10))++;
     func_8AF00130(0xC4);

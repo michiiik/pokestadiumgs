@@ -94,3 +94,68 @@ builder remains assembly too and has an unprobed m2c draft for this session.
 An initial callback-generator increment-parenthesis error produced compile
 failures only; those records are retained as process evidence, not counted
 as source-shape trials or accepted owners.
+
+## 2026-10-16 — record culling and trailing-row batch accepted
+
+Solo native macOS, no agents or containers. **Three functions / 149 words /
+596 bytes**, taking this file from **7 C / 11 function ASM to 10 C / 8
+function ASM**. All are leaf functions with no allocated frame.
+
+| Original owner | Accepted name | Bytes | Full-ROM acceptance batch |
+| --- | --- | ---: | --- |
+| func_8AF02684 | Fragment44_CullScrollRecordsAbove | 204 | 7ac74937c0de4682a5d8e165d9e1dedc |
+| func_8AF02750 | Fragment44_CullScrollRecordsBelow | 220 | 717cc7208e9044b49763f4633ed8bf2b |
+| func_8AF02A34 | Fragment44_PrepareTrailingScrollRow | 172 | f9a4a132f6ad46f0941489aee57e5372 |
+
+Each winner is link-verified and passed its authoritative full-ROM gate.
+The culling routines scan all 36 records at parent +0x74, stride 0x10, and
+clear only an active record whose signed coordinate crosses the appropriate
+signed-halfword threshold. A natural pointer-based `for` loop reproduces
+IDO's four-at-a-time unroll; the otherwise equivalent `do` form differs in
+constant/counter scheduling. Keep the step as a real scalar. Swapping the
+base-coordinate sum's source operands fixes its input-load ordering.
+
+The trailing builder retains a configuration pointer at parent +0x44 and
+loads step/width before computing the narrowed count and row. Declaration
+permutations alone were inert; changing these independent load assignments
+resolved the four-variable register rotation. Cache the completed pixel
+address, not just its base. Preserve the capacity guard, tag 0x4F474942,
+signed-halfword position/step and one-row/active fields in the existing
+24-byte descriptor. No new callable helper is introduced.
+
+Known C controls pass fresh/twenty-leading-blank compilation before probing.
+After cleanup and naming, both builds retain complete frozen section bytes
+and layout, all 18 original spans and all 15 untouched function bodies.
+A forced native `gmake rom COMPARE=1` passes with retail MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`; the edited TU's host syntax check,
+all 25 tooling tests and whitespace checks pass. Three aliases retain the
+address-keyed US symbols. No JP assembly, generated assembly, scratch helper,
+compiler, object or ROM is included in the change.
+
+### Updated unresolved owner handoffs
+
+- `func_8AF0299C`: **requeue**, now 88 source cells plus one calibrated
+  45-second native permuter run. Using configuration-relative prefix inputs
+  preserves the missing base; distinct row computations and a narrowed
+  negative extent recover the 152-byte target length. The useful 152-byte
+  leader has normalized similarity 0.9474 (raw 0.3947); a different 156-byte
+  form scores 0.9487 but has an extra instruction and is not a better shape.
+  Remaining differences include row-web allocation and scheduling. Explicit
+  early versus late unsigned data-row snapshots were inert in that basin.
+  Replaying the permuter's inline decrement, carrier reuse and a 32-bit offset
+  did not close it; its unexplained 64-bit offset mutation was not adopted.
+  Next inspect the row/configuration web lifetimes with the stock compiler,
+  then test a genuine typed configuration view against that measured trace.
+- `func_8AF02AE0`: **requeue**, 16 source cells. Best normalized similarity
+  0.8095, raw 0.3333, 164 versus 168 bytes, correct 8-byte frame. A wide current
+  snapshot preserves the separate narrowed address input. Configuration vs
+  parent-relative input loads and pixel/position snapshot order were tested;
+  widening/reusing the total and moving its assignment earlier did not help.
+  Target keeps capacity/step/total in different registers and has a
+  branch-likely return with restore. Next inspect the configuration/total
+  lifetimes and original record ABI before changing control-flow shape.
+
+Neither unresolved body is installed. A runner warning that source variants
+"will not close" a register tie was contradicted by the trailing builder's
+accepted load-order change; treat that wording as advisory, not proof of a
+compiler limitation. No tool or compiler behavior was changed in this batch.
