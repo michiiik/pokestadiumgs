@@ -35,3 +35,11 @@ the US ROM rebuilt with default host syntax checks and `COMPARE=1`, then
 excluded, preserving the already merged #880 source and current foreign
 rendering matches. The combined 187-owner workspace also passed. The Public
 PR ROM Gate must still validate each current PR head and actual merge result.
+
+## 2026-10-15: func_8AF1F514
+
+Matched the independent 31-instruction sparse-switch owner with a real s16 argument and word boolean result. Both original func_8AF1F5F0 call sites explicitly sign-extend the selected value into a0 and branch on v0. The case set is 29, 30, 31, 113, 115, 124, 238, 241 and 242; initialize var_v1 to zero, set it to one for the shared cases, then return it. IDO emits the original binary decision tree and shared result tail. There is no jump table, padding, additional formal or independent switch-tail owner.
+
+The first source recipe passes the full US build with default host syntax checks and COMPARE=1, followed by explicit md5sum -c baseroms/us/checksum.md5: retail 1561c75d11cedf356a8ddb1a4a5f9d5d. The local combined build also retains the independently verified func_8F102A20 source. Both owners are in separate translation units and separate narrow PRs. No global, helper, data, tooling, layout or verification changes.
+
+Fleet main afee707ab78d3f63f2f9deeadc7551ec0080eeed contains no exact/solved owner attempt, owner reference or 20D3A0 region note; historical normalized/raw scores are unavailable. The complete current-master region note above was read. Earlier failed func_8AF1F40C and func_8AF208D0 families remain untouched. All open scopes were inspected; the only source PR was this process's separate func_8F102A20. Unknown names, decimal case constants and var_register locals follow the contributing guide. Source/object/build evidence is retained in work/session-54.

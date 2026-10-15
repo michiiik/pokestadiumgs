@@ -72,7 +72,24 @@ void func_8AF1F378(u8 *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4,
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20D3A0/func_8AF1F490.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20D3A0/func_8AF1F514.s")
+s32 func_8AF1F514(s16 arg0) {
+    s32 var_v1 = 0;
+
+    switch (arg0) {
+        case 29:
+        case 30:
+        case 31:
+        case 113:
+        case 115:
+        case 124:
+        case 238:
+        case 241:
+        case 242:
+            var_v1 = 1;
+            break;
+    }
+    return var_v1;
+}
 
 s32 func_8AF1F590(s16 arg0) {
     s32 var_v1;
