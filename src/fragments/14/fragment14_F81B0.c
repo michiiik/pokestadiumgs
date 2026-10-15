@@ -2,6 +2,18 @@
 
 
 #ifdef VERSION_US
+typedef struct {
+    u8 pad00000[0x1A138];
+    s32 mode;
+    u8 pad1A13C[6];
+    s8 slot;
+    s8 selected;
+    u8 pad1A144[4];
+    u8 *data;
+    u8 pad1A14C[0x1C];
+    s32 status;
+} Fragment14SetupState;
+
 extern void main_pool_pop_state(s32);
 extern void main_pool_push_state(s32);
 extern void func_80057908(u8);
@@ -118,11 +130,38 @@ void func_81300BA0(s32 arg0) { func_8130A570(arg0 + 0xDA8, 0); func_81304208(arg
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_81300F7C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_81301030.s")
+extern s32 func_813002D0(void *);
+extern void func_81304C3C(u8 *, s32, s32);
+extern void func_81304C58(u8 *, u8 *);
+extern void func_8130B220(void *, void *, s32, s32);
+extern void func_8130B320(void *, void *, s32, s32);
+extern void func_81300390(void *, s32, s32, s32, s32, s32, s32);
+extern void func_8130015C(void *, s32);
+extern void func_81300350(void);
+void Fragment14_InitSelectionPreview(void *arg0) {
+    func_8130015C(arg0, 1);
+    func_81300350();
+    ((Fragment14SetupState *)arg0)->status = 0;
+    func_81304C3C(((u8 *)arg0 + 0xF630), (s32)arg0, func_813002D0(arg0));
+    func_81304C58(((u8 *)arg0 + 0xF630), ((u8 *)arg0 + 0x1A15C));
+    ((Fragment14SetupState *)arg0)->mode = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_813010B0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_813011B8.s")
+void Fragment14_InitSelectedController(void *arg0) {
+    Fragment14SetupState *state = arg0;
+    s32 selected = state->selected;
+
+    func_8130015C(arg0, 1);
+    func_81300350();
+    state->status = 0;
+    if (selected >= 0 && selected < 4) {
+        func_80057908(selected);
+    }
+    func_81300390(arg0, func_813002D0(arg0), selected, 1, 0, 1, 0);
+    state->mode = 1;
+}
 
 extern s32 func_813000E4(void *arg0);
 extern s32 func_81302290(void *);
@@ -141,11 +180,24 @@ s8 func_8130125C(void *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_813012C0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_813013C0.s")
+void Fragment14_InitSelectionPanelMode2(void *arg0) {
+    func_81300350();
+    ((Fragment14SetupState *)arg0)->status = 0;
+    func_8130015C(arg0, 1);
+    func_8130B220(((u8 *)arg0 + 0xD18), arg0, func_813002D0(arg0), 0);
+    func_8130B320(((u8 *)arg0 + 0xD18), ((u8 *)arg0 + 0x1A154), 2, 0);
+    ((Fragment14SetupState *)arg0)->mode = 0;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_81301448.s")
+void Fragment14_InitSelectionPanelMode1(void *arg0) {
+    func_8130015C(arg0, 1);
+    func_81300350();
+    ((Fragment14SetupState *)arg0)->status = 0;
+    func_8130B220(((u8 *)arg0 + 0xD18), arg0, func_813002D0(arg0), 0);
+    func_8130B320(((u8 *)arg0 + 0xD18), ((u8 *)arg0 + 0x1A154), 1, 0);
+    ((Fragment14SetupState *)arg0)->mode = 0;
+}
 
-extern void func_8130015C(void *, s32);
 void func_813014D0(void *arg0) {
     s32 temp_a0;
     temp_a0 = (s32)arg0;
@@ -154,7 +206,6 @@ void func_813014D0(void *arg0) {
     *(s32 *)((u8 *)temp_a0 + 0x1A168) = 0;
 }
 
-extern void func_81300350(void);
 void func_8130150C(void *arg0) {
     s32 temp_a0;
     temp_a0 = (s32)arg0;
@@ -304,7 +355,6 @@ s32 func_813022D8(void *arg0) {
 }
 
 extern s32 func_813022D8(void *);
-extern s32 func_81302290(void *);
 extern void func_8160A270(void *);
 extern void func_8160A384(void *, s32, s32, s32);
 extern void func_80055028(void);

@@ -125,3 +125,7 @@ func_820011D8 = Fragment16_DrawSelectionPopup;
 func_82001590 = Fragment16_HandleSelectionInput;
 func_820016EC = Fragment16_HandleListInput;
 func_82001ADC = fragment16_main;
+func_81301030 = Fragment14_InitSelectionPreview;
+func_813011B8 = Fragment14_InitSelectedController;
+func_813013C0 = Fragment14_InitSelectionPanelMode2;
+func_81301448 = Fragment14_InitSelectionPanelMode1;
