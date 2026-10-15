@@ -143,3 +143,7 @@ func_81300730 = Fragment14_AdvanceSelectionSlot;
 func_81300B50 = Fragment14_GetSelectionExitStatus;
 func_81301548 = Fragment14_UpdateSlotDialog;
 func_81302920 = Fragment14_PreloadSelectionResource;
+func_81304CE0 = Fragment14_InterpolatePanelRectangle;
+func_81304E80 = Fragment14_UpdatePanelInput;
+func_813050D0 = Fragment14_UpdatePanelState;
+func_813054F4 = Fragment14_DrawSelectionPanel;
