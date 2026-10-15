@@ -35,7 +35,7 @@ extern s32 func_80040E80(s32, void *);
 extern void *func_81600E28(s32, s32, s32);
 extern s32 func_82400020(void *);
 extern void func_82400108(void *);
-extern void func_82405D38(u8 *, s32, s32, s32);
+extern void Fragment13_InitGroupState(u8 *, s32, s32, s32);
 extern void func_82407228(u8 *, void *, void *);
 extern s32 main_pool_get_available(void);
 extern s32 MainPool_AllocState(s32, s32);
@@ -82,7 +82,7 @@ void func_82400704(s32 arg0) {
     MainPool_FinalizeAllocation(sp20);
     ModelRenderer_InitDisplayRoots();
     func_82400108(&D_82409308);
-    func_82405D38(D_824090A0, arg0, D_82409FBC, D_82409FB8);
+    Fragment13_InitGroupState(D_824090A0, arg0, D_82409FBC, D_82409FB8);
     func_82407228(D_824090A0, &D_82409308, s0);
 }
 
