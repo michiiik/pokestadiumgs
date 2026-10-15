@@ -133,7 +133,6 @@ extern s32 D_8650D0A4;
 extern f64 D_8650D6B8;
 extern f64 D_8650D6C0;
 extern f64 D_8650D6C8;
-extern f64 D_8650D6D0;
 void func_86502620(void) {
     if (D_8650C634 == 0) {
         D_8650D0A4 = 2;
@@ -151,14 +150,94 @@ void func_86502620(void) {
         D_8650C4B8 = (f32) ((f64) D_8650C508 * D_8650D6C8);
         return;
     case 4:
-        D_8650C4B8 = (f32) ((f64) D_8650C508 * D_8650D6D0);
+        D_8650C4B8 = (f32) ((f64) D_8650C508 * 0.3);
         return;
     }
 }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/53/fragment53_code/func_86502720.s")
+extern f32 D_8650D0A0;
+extern f32 D_8650D09C;
+extern f32 D_8650D094;
+extern f32 D_8650D098;
+extern s32 D_8650C4CC;
+extern s32 D_8650C4AC;
+extern s32 D_8650C5E0;
+extern s32 D_8650D0A8;
+extern s32 D_8650D9D8;
+extern u8 D_8650D9F8[];
+extern u8 D_8650F200[];
+extern u8 D_865105B0[];
+extern u8 D_865110F0[];
+extern u8 D_865118F8[];
+extern u32 func_8003570C(void);
+extern void func_87F034CC(void *);
+extern void func_86502524(void);
+extern s32 func_86501280(void);
+extern void func_8003F1DC(void *);
+void Fragment53_InitRoundState(void) {
+    s32 i;
+    s32 j;
+    f32 initial;
+    f32 zero;
+
+    func_86502620();
+    initial = 10000.0f;
+    zero = 0.0f;
+    for (i = 0; i < 4; i++) {
+        *(s32 *)((u8 *)&D_86511698[i] + 4) = 0;
+        *(s32 *)((u8 *)&D_86511698[i] + 8) = 0;
+        *(s32 *)((u8 *)&D_86511698[i] + 0x3C) = 0;
+        *(f32 *)((u8 *)&D_86511698[i] + 0x14) = initial;
+        *(s32 *)((u8 *)&D_86511698[i] + 0x1C) = 0;
+        *(s32 *)((u8 *)&D_86511698[i] + 0x20) = 0;
+        *(s32 *)((u8 *)&D_86511698[i] + 0) = -1;
+        *(s32 *)((u8 *)&D_86511698[i] + 0x2C) = 10000;
+        *(s32 *)((u8 *)&D_86511698[i] + 0x38) = D_8650C4CC + 20;
+        *(s32 *)((u8 *)&D_86511698[i] + 0x40) = 0;
+        *(s32 *)((u8 *)&D_86511698[i] + 0x44) = 0;
+        *(s32 *)((u8 *)&D_86511698[i] + 0x50) = func_8003570C() % 4;
+        *(s32 *)((u8 *)&D_86511698[i] + 0x54) = 0;
+        *(s32 *)((u8 *)&D_86511698[i] + 0x58) = func_8003570C() % 24;
+        *(s32 *)((u8 *)&D_86511698[i] + 0x60) = 0;
+        *(s32 *)((u8 *)&D_86511698[i] + 0x5C) = 0;
+        *(f32 *)((u8 *)&D_86511698[i] + 0x64) = zero;
+        *(f32 *)((u8 *)&D_86511698[i] + 0x68) = D_8650D0A0;
+        *(f32 *)((u8 *)&D_86511698[i] + 0x6C) = D_8650D09C;
+        *(f32 *)((u8 *)&D_86511698[i] + 0x70) = D_8650D094;
+        *(f32 *)((u8 *)&D_86511698[i] + 0x74) = D_8650D098;
+        if ((guRandom() & 1) == 0) {
+            *(s32 *)((u8 *)&D_86511698[i] + 0x78) = -1;
+        } else {
+            *(s32 *)((u8 *)&D_86511698[i] + 0x78) = 1;
+        }
+        *(s32 *)((u8 *)&D_86511698[i] + 0x80) = 0;
+        *(s32 *)((u8 *)&D_86511698[i] + 0x84) = 0;
+    }
+    *(s32 *)((u8 *)&D_8650C5E0 + 4) = 0;
+    *(s32 *)((u8 *)&D_8650C5E0 + 0x14) = D_8650C4AC;
+    *(s32 *)((u8 *)&D_8650C5E0 + 0x10) = 0;
+    *(s32 *)((u8 *)&D_8650C5E0 + 0x30) = 0;
+    *(s32 *)((u8 *)&D_8650C5E0 + 0x38) = 0;
+    *(s32 *)((u8 *)&D_8650C5E0 + 0x3C) = 0;
+    *(s32 *)((u8 *)&D_8650C5E0 + 0x40) = 0;
+    *(s32 *)((u8 *)&D_8650C5E0 + 0x44) = 5;
+    *(s32 *)((u8 *)&D_8650C5E0 + 0x48) = 5;
+    func_87F034CC(D_8650D9F8);
+    func_86502524();
+    *(s32 *)((u8 *)&D_8650C5E0 + 0x50) = 0;
+    D_8650D0A8 = 0;
+    func_86501280();
+    for (i = 0; i < 4; i++) {
+        *(s16 *)(D_8650F200 + i * 0x168 + 0x1E) = -512;
+        func_8003F1DC(D_8650F200 + i * 0x168);
+        for (j = 0; j < 2; j++) {
+            func_8003F1DC(D_865105B0 + i * 0x2D0 + j * 0x168);
+        }
+    }
+    D_8650D9D8 = -70;
+}
 #endif
 
 #ifdef VERSION_US
@@ -169,7 +248,7 @@ extern u8 D_8650D9F8[];
 extern s32 D_8650C5E0;
 extern u32 func_8003570C(void);
 extern void func_87F034CC(void *);
-extern void func_86502720(void);
+extern void Fragment53_InitRoundState(void);
 void Fragment53_InitActorStateAndOrder(void) {
     s32 i;
     s32 first;
@@ -212,7 +291,7 @@ void Fragment53_InitActorStateAndOrder(void) {
     *(s32 *)((u8 *)&D_8650C5E0 + 0x20) = 0;
     *(s32 *)((u8 *)&D_8650C5E0 + 0x4C) = 0;
     *(s32 *)((u8 *)&D_8650C5E0 + 0x58) = 0;
-    func_86502720();
+    Fragment53_InitRoundState();
 }
 #endif
 
