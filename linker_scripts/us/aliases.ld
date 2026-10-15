@@ -8,6 +8,8 @@
  * undefined_syms.ld, and the other hand-written scripts are.
  */
 Audio_ThreadEntry = func_80035174;
+/* JPEG byte-stuffing state occupies the second byte of the existing flag slot. */
+Jpeg_LastByteWasFF = D_800D1218 + 1;
 /* Coordinate callback: structured access view of the existing scalar/data label.
  * This alias allocates no storage and preserves the original overlapping view. */
 D_82E06138_view = D_82E06138;
@@ -112,3 +114,4 @@ func_80009384 = crash_screen_draw_rect;
 func_8000948C = crash_screen_draw_glyph;
 func_80009940 = crash_screen_draw;
 func_80009F80 = crash_screen_printf_with_bg;
+func_8000BC90 = Jpeg_DecodeMcus;

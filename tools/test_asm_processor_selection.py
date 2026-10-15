@@ -20,11 +20,11 @@ class AsmProcessorSelectionTests(unittest.TestCase):
             root = Path(directory)
             (root / 'src').mkdir()
             source = root / 'src' / 'fixture.c'
-            rules = ('SRC_DIRS := src\nCC := compiler\nASM_PROC := processor\n'
+            rules = ('SRC_DIRS := src\nCC := compiler\nCC_OLD := old-compiler\nASM_PROC := processor\n'
                      'ASM_PROC_FLAGS :=\nAS := assembler\nASFLAGS :=\n'
                      + selection
-                     + '\n.PHONY: build/src/fixture.o\n'
-                     + 'build/src/fixture.o:\n\t@echo $(CC)\n')
+                     + '\n.PHONY: build/src/fixture.o build/src/C890.o\n'
+                     + 'build/src/fixture.o build/src/C890.o:\n\t@echo $(CC)\n')
             cases = [
                 ('#pragma GLOBAL_ASM("fixture.s")\n', True),
                 ('void f(void) {}\n#pragma C_FUNCTION_PADDING(28)\n', True),
@@ -44,6 +44,20 @@ class AsmProcessorSelectionTests(unittest.TestCase):
                     )
                     expected = 'processor compiler -- assembler --' if processed else 'compiler'
                     self.assertEqual(result.stdout.strip(), expected)
+            # The source-specific JPEG compiler rule must work for both mixed
+            # ASM/C and completed all-C files, without changing other sources.
+            jpeg_source = root / 'src' / 'C890.c'
+            for contents in ['#pragma GLOBAL_ASM("fixture.s")\n', 'void f(void) {}\n']:
+                with self.subTest(jpeg_source=contents):
+                    jpeg_source.write_text(contents)
+                    result = subprocess.run(
+                        [make, '--no-print-directory', '-f', '-', 'build/src/C890.o'],
+                        input=rules, cwd=root, text=True, capture_output=True,
+                        env={k: v for k, v in os.environ.items()
+                             if not k.startswith(('GIT_', 'MAKE'))},
+                        check=True,
+                    )
+                    self.assertEqual(result.stdout.strip(), 'processor old-compiler -- assembler --')
 
 
 if __name__ == '__main__':

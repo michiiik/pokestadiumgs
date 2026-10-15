@@ -283,6 +283,10 @@ DECOMP_POKESTADIUMGS_FILTERED := $(patsubst %.c,%.o,$(addprefix build/,$(shell g
 # Padding still needs asm-processor after a file's final GLOBAL_ASM is removed.
 $(DECOMP_POKESTADIUMGS_FILTERED): CC := $(ASM_PROC) $(ASM_PROC_FLAGS) $(CC) -- $(AS) $(ASFLAGS) --
 
+# The JPEG entropy decoder's original lowering is reproduced by stock IDO 5.3.
+# Keep this source-specific; the rest of the game continues to use IDO 7.1.
+build/src/C890.o: CC := $(ASM_PROC) $(ASM_PROC_FLAGS) $(CC_OLD) -- $(AS) $(ASFLAGS) --
+
 rom: $(ROM)
 	@$(PRINT) "$(RED)Building ROM...\n$(NO_COL)"
 ifneq ($(COMPARE),0)
