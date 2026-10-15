@@ -228,3 +228,80 @@ retail MD5 is `1561c75d11cedf356a8ddb1a4a5f9d5d`. Public tooling tests remain
 bypass. Publish only C, the alias and these notes; all search/proof artifacts
 stay local. Solo/native work continued while PR #1007's ROM CI ran; that
 three-function PR passed and merged before this next-batch commit.
+
+## 2026-10-15 residual follow-up — renderer and reopening requeues
+
+Neither owner is installed; the file remains **24 C / 7 ASM**. These are
+bounded negative investigations, not matches or proof of an impossible shape.
+
+### `func_81305C54` — requeue, final cursor-call allocation
+
+Forty scored variants plus eight initial compile failures. Correct the existing
+same-file prototype with the candidate transaction (`u8 *` grid context); the
+initial void-pointer prototype conflict is not a compiler-shape result.
+Keep the real helper signatures, original referenced empty-string word,
+negated `0.1f` comparison, 0.35 smoothing, clipped rectangles and all twelve
+grid cells. A word item/category carrier preserves conversion timing; a byte
+category moves the mask from the later palette call into the helper result.
+
+Declaring the two real loop counters before the page/scroll outputs fixes the
+eight-byte stack-home shift. Keep the integer-address item lookup to reproduce
+the target's base/index operand order. Best body has **216/216 words**, frame
+**0xB0**, normalized/raw **1.0/0.9630**. Two raw differences are normal float
+pool relocations; the six actual instruction differences are confined to the
+final cursor draw call: the rectangle pointer loads into t7 instead of v0 and
+the following coordinate temporaries/operand order change. The preceding 190
+instruction positions agree apart from those two literal relocation words.
+
+Cursor point versus array views, typed rectangle formals, early guards,
+explicit coordinate locals and final pointer aliases do not close that tail.
+New coordinate/pointer locals enlarge the frame to 0xB8; reusing the consumed
+palette pointer preserves the old residual. A calibrated four-worker native
+45-second permuter stays **45 -> 45**. No proposal is adopted.
+
+Import calibration verifies both anonymous float literal values independently
+while retaining the named empty-string object's actual identity and unmasked
+address, plus all non-relocation instructions. The target reproduces the
+native ASM baseline. This is not permission to install relocation-only hits
+without the authoritative ROM gate.
+
+### `func_81306C18` — requeue, index/page allocation and one extra word
+
+Forty scored variants cover cached/direct mask copies, switch order, flag
+homes, raw/record fields, consumed-variable page caches, a separate real page
+value, and eight reorderings of real page/row/count calculations. Preserve
+the 32-byte exclusion copy, bounded next-item search, original state-case
+order **1/2/3,0,4/5**, signed division/remainder and final progress call.
+
+The initial body is **628 versus 632 bytes**, normalized/raw
+**0.9747/0.8861**. Placing last-flag before first-flag and delta fixes both
+output homes. A separate word page carrier produces **636 versus 632 bytes**,
+normalized/raw **0.9937/0.9308**; another consumed-item cache reaches
+**0.9811/0.9623** but is not opcode-exact. Retain both leaders. Narrowing the
+page carrier adds another word; reusing the search cursor for the position
+shrinks the frame to 0x40 instead of the target 0x48.
+
+A calibrated native 45-second permuter improves **145 -> 110** only by adding
+a redundant position increment/decrement after the page-count store. It is
+diagnostic lifetime evidence, not adopted C. Eight natural calculation-order
+variants do not reproduce that gain. All six relative table destinations are
+checked in the stripped-source import control; no table/body edit is installed.
+
+### Logging-only compiler controls and next action
+
+For the unchanged accepted file and both retained leaders, stock IDO 7.1,
+logging compiler with tracing off/on, and a twenty-leading-blank tracing build
+all reproduce section bytes/layout, function/object symbols and relocation
+topology: **12/12 controls pass**. The logging tools and output stay local;
+normal runner/gate compilers are unchanged. No forced allocation is tested or
+published. `decomp-workbench` is unavailable; these are native fallback checks.
+
+For the reopening leader, the trace assigns the position local at slot -12
+to a1, while an earlier load web receives a0; the desired position is a0.
+Attributing that competing load to the page-field promotion is a working
+interpretation of the source/diff, not a forced-pass proof. Next: align the
+specific load web and its two uses, then test a genuine alias/lifetime change
+that splits it around the packed coordinate copy. For the renderer, map the
+argument-pointer web's final fragment and UGEN allocations at the cursor
+call before more source guesses. Do not replay the completed families or
+interpret the normalized 1.0/first-difference literal relocation as acceptance.

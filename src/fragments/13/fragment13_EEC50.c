@@ -466,9 +466,48 @@ void func_824054E4(u8 *arg0, u8 *arg1, u8 *arg2, f32 arg3) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82405718.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82405934.s")
+extern void *Vec3s_FromVec3f(void *, void *);
+extern void func_80038390(void *, void *, u8, u8, u8);
+extern void func_800383DC(void *, s16, s16);
+void Fragment13_UpdateSceneLightNode(s32 arg0, void *arg1) {
+    u8 *data = *(u8 **)((u8 *)arg1 + 0x14);
+    s32 kind;
+    s16 vector[3];
+    s16 pitch;
+    s16 yaw;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_824059E4.s")
+    if (arg0 == 2) {
+        *(u8 *)((u8 *)arg1 + 0x1B) = 0;
+        *(u8 *)((u8 *)arg1 + 0x18) = data[0x24];
+        *(u8 *)((u8 *)arg1 + 0x19) = data[0x25];
+        *(u8 *)((u8 *)arg1 + 0x1A) = data[0x26];
+        kind = data[6];
+        if (kind >= 19 && kind < 22) {
+            Vec3s_FromVec3f(vector, data + 0x28);
+            func_80038390(arg1, vector, 18, 0, 0);
+        } else {
+            func_82404FE8(&pitch, &yaw, data + 0x28);
+            func_800383DC(arg1, pitch, yaw);
+        }
+    }
+}
+
+void Fragment13_UpdateSceneDirectionalLightNode(s32 arg0, void *arg1) {
+    u8 *node = (u8 *)arg1;
+    u8 *data = *(u8 **)(node + 0x14);
+    s16 pitch;
+    s16 yaw;
+
+    if (arg0 == 2) {
+        func_82404FE8(&pitch, &yaw, data + 0x38);
+        *(s16 *)(node + 0x1C) = pitch;
+        *(s16 *)(node + 0x1E) = yaw;
+        node[0x1B] = 0;
+        node[0x18] = data[0x34];
+        node[0x19] = data[0x35];
+        node[0x1A] = data[0x36];
+    }
+}
 
 void func_82405A58(s32 arg0, void *arg1) {
     void *temp_v0;
@@ -481,9 +520,29 @@ void func_82405A58(s32 arg0, void *arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82405A84.s")
+extern f32 D_8240906C;
+void Fragment13_UpdateClockHourHand(s32 arg0, void *arg1) {
+    u8 *data = *(u8 **)((u8 *)arg1 + 0x14);
+    s32 angle;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82405B24.s")
+    if (arg0 == 2) {
+        /* Preserve the integer angle and truncate before negating. */
+        angle = (s32)((((f32)data[7] + *(f32 *)data / 60.0f) / 60.0f + (f32)data[6]) / 12.0f * D_8240906C);
+        *(s16 *)((u8 *)arg1 + 0x22) = -angle;
+    }
+}
+
+extern f32 D_82409070;
+void Fragment13_UpdateClockMinuteHand(s32 arg0, void *arg1) {
+    u8 *data = *(u8 **)((u8 *)arg1 + 0x14);
+    f32 value;
+
+    if (arg0 == 2) {
+        /* The fractional term comes first in the original IDO expression. */
+        value = (f32)data[8] / 60.0f + (f32)data[7];
+        *(s16 *)((u8 *)arg1 + 0x22) = (s16)(-(value * D_82409070 / 60.0f));
+    }
+}
 
 extern f32 D_82409074;
 void func_82405BAC(s32 arg0, void *arg1) {
