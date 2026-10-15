@@ -137,7 +137,59 @@ void func_81300350(void) {
     } while (var_s0 != 4);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_81300390.s")
+extern u8 D_81312180;
+extern void *func_81609530(s32);
+extern s8 *HAL_Strcpy(s8 *, s8 *);
+extern void func_81307DC0(void *, s32, s32, s32, void *);
+extern void func_8005D9E0(s32, s32 *);
+extern void func_81302EE4(void *, void *, void *, s32, void *, void *);
+extern s32 func_8130A460(void *, s32, s32, void *);
+extern s32 func_81304178(u8 *, s32, s32, s32);
+extern s32 func_8160A844(void *, void *, s32, s32);
+extern void func_81300730(void *, s32);
+extern void func_81300020(s32 arg0);
+extern s32 func_81300064(s32 arg0);
+extern void func_81300244(s32 arg0, s32 arg1, s32 arg2);
+extern s32 func_81302290(void *arg0);
+void Fragment14_ConfigureControllerSelection(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6) {
+    char name[16];
+    s32 id;
+    s64 info[2];
+
+    if (arg2 < 4 && arg2 >= 0) {
+        func_81300020(arg2);
+        ((Fragment14SetupState *)arg0)->status = func_81300064(arg2);
+    }
+    func_81300244((s32)arg0, arg2, arg1);
+    func_81307DC0((u8 *)arg0 + 0xDA8, (s32)arg0, arg1, arg2,
+                  *(void **)((u8 *)arg0 + 0x1A14C));
+    id = 0;
+    name[0] = D_81312180;
+    if (arg2 < 4 && arg2 >= 0) {
+        func_8005D9E0(arg2, (s32 *)info);
+        HAL_Strcpy((s8 *)name, (s8 *)info + 2);
+        id = *(u16 *)info;
+        if (func_81300064(arg2) != 0) {
+            ((Fragment14SetupState *)arg0)->data[0x955] |= 1 << ((Fragment14SetupState *)arg0)->slot;
+        } else {
+            ((Fragment14SetupState *)arg0)->data[0x955] &= ~(1 << ((Fragment14SetupState *)arg0)->slot);
+        }
+    }
+    if (arg3 != 0) {
+        arg2 = 0;
+    } else {
+        arg2 = (s32)(((Fragment14SetupState *)arg0)->data +
+                     ((Fragment14SetupState *)arg0)->slot * 0x240);
+    }
+    func_81302EE4((u8 *)arg0 + 0x15370, arg0, name, id, (void *)arg2, (u8 *)arg0 + 0x1A144);
+    func_8130A460((u8 *)arg0 + 0xDA8, arg4, arg6, func_81609530(3));
+    if (arg3 != 0) {
+        arg2 = func_81302290(arg0);
+    } else {
+        arg2 = -1;
+    }
+    func_81304178((u8 *)arg0 + 0x15370, arg2, arg5, arg6);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_81300570.s")
 
@@ -162,7 +214,7 @@ extern void Fragment14_UpdateTitleText(void *, s32);
 extern s32 func_813002D0(void *);
 extern s32 func_81300314(void *arg0, s32 arg1, s32 arg2);
 extern void func_81300350(void);
-extern void func_81300390(void *, s32, s32, s32, s32, s32, s32);
+extern void Fragment14_ConfigureControllerSelection(void *, s32, s32, s32, s32, s32, s32);
 void Fragment14_InitSelectionAdvance(void *arg0) {
     s32 selected;
     s32 exhausted;
@@ -173,7 +225,7 @@ void Fragment14_InitSelectionAdvance(void *arg0) {
     Fragment14_UpdateTitleText(arg0, 0);
     func_81300350();
     ((Fragment14SetupState *)arg0)->status = 0;
-    func_81300390(arg0, func_813002D0(arg0), selected, 0, 0, exhausted, exhausted);
+    Fragment14_ConfigureControllerSelection(arg0, func_813002D0(arg0), selected, 0, 0, exhausted, exhausted);
     ((Fragment14SetupState *)arg0)->mode = 1;
 }
 
@@ -202,7 +254,7 @@ void Fragment14_InitSelectedController(void *arg0) {
     if (selected >= 0 && selected < 4) {
         func_80057908(selected);
     }
-    func_81300390(arg0, func_813002D0(arg0), selected, 1, 0, 1, 0);
+    Fragment14_ConfigureControllerSelection(arg0, func_813002D0(arg0), selected, 1, 0, 1, 0);
     state->mode = 1;
 }
 
@@ -334,7 +386,44 @@ void Fragment14_UpdateSelectionPage(void *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_813018FC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_813019C8.s")
+extern void func_8130B3B8(void *, void *);
+extern void func_8130C334(void *);
+extern s32 func_8130CDD4(void *);
+void Fragment14_UpdateSelectionCommit(void *arg0, s32 arg1) {
+    s32 result;
+    u8 *panel;
+
+    panel = (u8 *)arg0 + 0xD18;
+    func_8130C334(panel);
+    func_81311AAC((u8 *)arg0 + 0x74, arg1);
+    func_8130F2C4(arg0, arg1);
+    func_8130B3B8(panel, (u8 *)arg0 + 0x1A154);
+    result = func_8130CDD4(panel);
+    if (result < 0) {
+        if (func_813000E4(arg0) != 0 && ((Fragment14SetupState *)arg0)->slot == 0) {
+            ((Fragment14SetupState *)arg0)->data[0x954] = 0;
+        }
+        func_813000BC(arg0, 0);
+    } else if (result > 0) {
+        if (func_813000E4(arg0) != 0 && ((Fragment14SetupState *)arg0)->slot == 0) {
+            ((Fragment14SetupState *)arg0)->data[0x954] = result - 1;
+        }
+        if (func_8160A844(((Fragment14SetupState *)arg0)->data + ((Fragment14SetupState *)arg0)->slot * 0x240,
+                         ((Fragment14SetupState *)arg0)->data + ((Fragment14SetupState *)arg0)->slot * 12 + 0x904,
+                         *(s8 *)(((Fragment14SetupState *)arg0)->data + 0x944), result - 1) != 0) {
+            ((Fragment14SetupState *)arg0)->data[0x955] |= 1 << ((Fragment14SetupState *)arg0)->slot;
+        } else {
+            ((Fragment14SetupState *)arg0)->data[0x955] &= ~(1 << ((Fragment14SetupState *)arg0)->slot);
+        }
+        if (*(s8 *)(((Fragment14SetupState *)arg0)->data + ((Fragment14SetupState *)arg0)->slot * 12 + 0x904) == 0) {
+            HAL_Strcpy((s8 *)((Fragment14SetupState *)arg0)->data + ((Fragment14SetupState *)arg0)->slot * 12 + 0x904,
+                       func_8004C874(0xF, *(s8 *)(((Fragment14SetupState *)arg0)->data + ((Fragment14SetupState *)arg0)->slot + 0x900) + 0x62));
+        }
+        ((Fragment14SetupState *)arg0)->data[((Fragment14SetupState *)arg0)->slot + 0x93C] = 4;
+        func_81300730(arg0, 1);
+        ((Fragment14SetupState *)arg0)->mode = 1;
+    }
+}
 
 void func_8130C334(void *);
 void func_81311AAC(void *, s32);

@@ -134,3 +134,5 @@ func_813012C0 = Fragment14_InitSelectionPanelMode0;
 func_8130015C = Fragment14_UpdateTitleText;
 func_8130176C = Fragment14_UpdateSelectionPreview;
 func_8130183C = Fragment14_UpdateSelectionPage;
+func_81300390 = Fragment14_ConfigureControllerSelection;
+func_813019C8 = Fragment14_UpdateSelectionCommit;

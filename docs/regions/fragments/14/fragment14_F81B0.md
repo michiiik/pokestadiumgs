@@ -1,5 +1,89 @@
 # Fragment 14 selection setup
 
+## 2026-10-15 follow-up — controller setup and commit handler accepted
+
+Two of four larger related state/setup owners passed one normal link-verified
+combined full-ROM gate. The file advances to **41 C / 14 ASM** owners.
+
+| Owner | Name | Instructions / bytes | Frame | Accepted batch |
+| --- | --- | ---: | ---: | --- |
+| `func_81300390` | `Fragment14_ConfigureControllerSelection` | 120 / 480 | 0x60 | `3668257f461042ad80508e0eb8ce092d` |
+| `func_813019C8` | `Fragment14_UpdateSelectionCommit` | 133 / 532 | 0x30 | `3668257f461042ad80508e0eb8ce092d` |
+
+Total: 253 instructions / 1,012 bytes, stock IDO 7.1, solo/native.
+
+### Source mechanisms
+
+- Controller setup preserves the bounded port checks, status store, slot
+  panel setup, identity/name read, per-slot validity mask, page data bindings,
+  resource lookup, transition arguments and conditional count.
+- `func_8005D9E0`'s existing C definition copies two 64-bit words. Represent
+  that actual 16-byte output buffer as `s64 info[2]`, keep the 16-byte name
+  buffer, and declare the ID before the info buffer. This restores the
+  original aligned info at stack+0x38, ID at +0x4C and name at +0x50, plus
+  the pointer spill homes. Initialize the ID near the name/port block rather
+  than before the initial calls. No dummy alignment member or padding.
+- An explicit final if/else, rather than initializing -1 before a one-sided
+  if, restores the target's ordinary branch and return-value delay slot.
+  The consumed controller word is reused for the data pointer and count;
+  each value is assigned before use and retains the original 32-bit ABI.
+- Commit update preserves the signed panel-result branches, first-slot
+  saved selection, 0x240/12-byte record strides, conversion helper, validity
+  mask, optional default name, type-4 byte, advance call and mode store.
+  Declaring result before the panel pointer restores its spill/reload at
+  stack+0x2C instead of +0x28. All other instruction words already matched.
+- Use `HAL_Strcpy`'s real signed-byte prototype with explicit pointer views.
+  Verify formatting/extern cleanup, remove unused probe-only colors/types
+  and declarations, name both owners and preserve address-keyed US symbols.
+  Revert the naming tool's unrelated JP symbol rewrite.
+
+### Verification
+
+- Native baseline and known-matching whole-TU controls before candidates: PASS.
+- Both normal runner `accepted`, `link_verified: true` and combined ROM gate:
+  PASS, statistics and host checks enabled.
+- After cleanup/prototypes/naming: fresh and twenty-leading-blank builds
+  preserve all section byte views and allocatable layouts, all 55 original
+  offsets/sizes, both accepted full spans and 53 untouched C/ASM spans.
+- Forced normal build: byte-identical retail ROM, MD5
+  `1561c75d11cedf356a8ddb1a4a5f9d5d`. Explicit host syntax check: PASS with the
+  same 17 warnings as baseline. Public tooling tests: 22 PASS. Diff check: PASS.
+- Only C, two US aliases and region notes are published. No scratch helpers,
+  compiler changes, alternate probe types, generated assembly, objects, ROMs
+  or JP changes. This is progress, not file/repository completion.
+
+### `func_81300E34` — requeue, dialog setup address/value lifetimes
+
+Best leader `f14-state:dialog:record-True:local-False:reverse-False` has
+316/328 bytes, 0.9268 normalized / 0.5488 raw. It swaps the state/base saved
+register roles, chooses different selected/idle/position homes and omits the
+target's default-coordinate rematerialization around resource lookup 5.
+Cached/direct dialog addresses, raw/record field views, local permutations
+and three-field selection snapshots do not close it. The source call sequence
+and signed metadata tests are understood, but this is not a near-exact match.
+Next: inspect the default/conditional coordinate carriers and resource-helper
+ABI with assembly evidence before more stack-local permutations.
+
+### `func_81300570` — requeue, description coloring and text-box frame
+
+Best leader `f14-state:textboxes:record-False:colors-False:int-False` has
+440/448 bytes, 0.9018 normalized / 0.5982 raw. The target spills description
+at stack+0x34 with no saved s0; the candidate colors it into s0, inflating
+the frame from 0x40 to 0x48. Raw/record data views, byte/triple color indexing,
+int/long kind, array/record text pairs and word/pointer text carriers do not
+improve it. Next: inspect the description web's colorability and call-use
+accounting against a known-matching control. No forced color or dummy read.
+
+### Older residuals
+
+The narrow-return dialog experiment was refused at preflight: its companion
+target `func_813002D0` remains ASM-owned. No compiler attempt or metadata edit
+occurred. Eight genuine address/return-carrier lookup probes then failed to
+improve that owner. The earlier lookup, dialog and page-address requeues stay
+active. Initial raw-array commit probes had a pointer-expression grouping
+error and are not valid negative evidence; the reviewed record-field source
+alone was accepted. Publish the two verified larger owners independently.
+
 ## 2026-10-15 follow-up — title, preview and page updates accepted
 
 Three of five selected/resumed owners now have normal link-verified combined
