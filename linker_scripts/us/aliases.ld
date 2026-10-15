@@ -198,3 +198,5 @@ func_8650863C = Fragment53_UpdateTimedSecondaryAnimation;
 func_86508780 = Fragment53_UpdateSecondaryAnimation;
 func_8650455C = Fragment53_UpdateActorModelHeights;
 func_86508484 = Fragment53_InitActorModels;
+func_865082C8 = Fragment53_DrawSceneFrame;
+func_8650A3E4 = Fragment53_RunScene;
