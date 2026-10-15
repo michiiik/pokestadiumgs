@@ -1,5 +1,102 @@
 # Fragment 53 animation family
 
+## 2026-10-16 — actor state/order and start-state transition accepted
+
+Two solo native accepts, **207 words / 828 bytes**, progressing the file from
+**23 C / 33 function ASM to 25 C / 31 function ASM**:
+
+- `func_86502958` → `Fragment53_InitActorStateAndOrder`, 140 words / 560 bytes,
+  frame 0x40, batch `cc483c232a20441fa9647b8f5f35e6e2`.
+- `func_86508B20` → `Fragment53_UpdateStartState`, 67 words / 268 bytes,
+  frame 0x30, batch `386740e7d44c4fae9df585111232d736`.
+
+Both have relocation-masked probe evidence and **sequential full-ROM acceptance,
+not link verification**. The compiler uses equivalent one-past-array addresses
+for the actor height loop and the secondary model loop. The authoritative
+linked retail-ROM gate validates their resolved addresses, not their object
+relocation spellings.
+
+The initializer preserves unsigned `func_8003570C` remainders, the original
+negated-subtraction height expression, and signed `guRandom()` remainders.
+It initializes four actor records, fills the five-entry order table, then makes
+ten swap attempts. Retry until the two indices differ, but do not swap slot
+zero. Saving the **first** entry as the swap temporary, then replacing first
+from second, closes the eight load/store register differences. Direct indexed
+actor/height arrays and ordinary `for` loops need no pointer scaffold.
+
+Move the existing 0x98-byte actor type and 0x168-byte model type before their
+first C use; expose verified score/result fields at +0x18/+0x84 while retaining
+animation +0x0C, pending +0x10, kind +0x88 and all record strides. The assembly-
+only owners and all existing C remain byte-identical after this type cleanup.
+
+The start handler polls shared status twice, preserves both sounds, enters
+state one/phase minus two and initializes four primary/secondary model pairs.
+Its sole call in `func_86509E54` discards the return and later reloads the scene
+state. Preserve the original early zero return and other paths' fallthrough;
+do not manufacture a return value or read an uninitialized temporary. Correct
+the accessor prototype to its real `u32` result and compare explicit `s32`
+casts: leaving comparisons unsigned introduces an extra literal-one load.
+The host's missing-return warning is expected for this legacy discarded-result
+contract. Put the real void sound prototype before its earlier caller through
+the accepted companion edit; that caller's raw bytes remain unchanged.
+
+After readable cleanup and naming, fresh and twenty-leading-blank objects
+preserve all frozen section bytes/layout, all 56 original function spans and
+all **54 untouched raw spans**. Forced normal ROM comparison remains retail-
+identical, MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`; host syntax check and all
+25 tooling tests pass. No padding, helpers, storage, compiler edits or bypasses
+are included. Scratch tools, traces, generated assembly, objects and ROMs stay
+local. No agents or containers are used.
+
+### Round initializer: concrete layout prerequisite
+
+`func_86502720`: **layout-prerequisite**, 40 compared cells plus eight initial
+prototype compile failures (fixed without changing the existing callee return
+contract). The external-float leader has the original 142 words / 568 bytes
+and 0x50 frame, normalized/raw 0.9930/0.9718. Reading the scene counter before
+the other context clears fixes the later setup schedule. Actor-base lifetime,
+cached/inline zero, loop-init and first-store line ties do not fix the remaining
+entry float-load schedule; a calibrated 45-second permuter stays at 100.
+
+Using the actual **10000.0f** literal closes the scheduling residual: normalized
+1.0, raw 0.9859, with only the two one-past-array relocation addends differing.
+The runner rejects **section_layout_drift** because D8650D6D8 is still in the
+shared head at ROM **0x296B88**. Stop source variants here. The file's current
+canonical rodata starts at 0x296D30/D8650D880, too late for this float. Next:
+plan an earlier canonical ownership range, preserving already-accepted C's
+external doubles/constants and original rodata order, then gate the still-ASM
+owner before retrying the retained literal candidate. Do not emit a second
+copy of this float, introduce padding, or bypass the non-text layout rejection.
+
+### Other bounded unresolved work
+
+`func_86500D5C`: **register-tie / requeue**, now 48 compared cells. Eight genuine
+vertex/packet pointer-reuse cells and eight index/stride width cells retain
+normalized/raw 1.0/0.9515. The calibrated logging-only trace identifies literal
+360 in uopt global coloring, not UGEN temp rotation. The captured leader uses
+physical register three for this stride; the original uses six. Next inspect
+interference/lifetime legality, not another declaration/cast/reuse spelling.
+
+`func_86502B88`: **requeue**, 56 compared cells and a calibrated 45-second
+permuter (725→487; its constant-one carrier leader is not adopted). Explicitly
+cache the shared 3.1 float: `const` on its extern alone is inert. A real 26.0f
+height local before the flags array reproduces the stack-array placement and
+saved float roles. Joining the initial best-score assignment to the loop header
+and re-reading the non-overlapping score improves the source to 0.9762/0.7540
+(492 versus 504 bytes, 0x90 versus 0x88 frame). The shorter exact-frame leader
+is 0.9762/0.6746. Four all-tie result stores still share constants differently.
+Pointer/index loops, typed fields, flag-store statement groups/chains, float
+local order and the two valid permuter replays have been measured. Next examine
+the constant-sharing and alias ownership; do not replay those families.
+
+`func_86500020`: **requeue**, eight first-source cells; best normalized/raw
+0.4927/0.1171, 580 versus 820 bytes. The oracle copies fourteen Vtx records
+with a peeled/unrolled loop and fully expands seven paired Y-coordinate edits.
+Natural indexed/pointer copy loops, direct/local context and for/do adjustment
+loops do not reproduce that expansion. Next verify template/index-table
+immutability and the compiler's unroll decision; do not hand-unroll just to
+improve a score. All unresolved pragmas remain installed.
+
 ## 2026-10-16 — scene rendering and lifecycle entry accepted
 
 Two native, solo full-ROM accepts after the actor/model batch:
