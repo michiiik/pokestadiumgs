@@ -57,6 +57,87 @@ recover the local aggregate/footer-Y boundary and loop topology, then inspect
 the first allocation/layout divergence; do not repeat declaration-scope-only
 or literal-26 variants.
 
+### Native follow-up after PR #980
+
+`func_88005740`: requeue, 48 additional scored cells (64 total), no C body
+installed. The strongest complete-size candidate has normalized 0.9583,
+raw 0.7652, 1056 bytes and the correct 0x110 frame. Its winning-family label
+is `f29:window-height:late-False:cast-True:footer-False`; source-body SHA256
+`8967c45ff11cc1e3f6eb1e1ecb1c3ee7fcddb1f1a8772c133526d5dee47d98fb`.
+This is not acceptance: the size includes extra loop instructions instead
+of the target's natural eight trailing zero bytes.
+
+Reusing a word-sized local for the maximum-row calculation and the later
+texture query reproduces the target's saved-register roles and avoids
+keeping top in that register. A word-sized height assigned the explicitly
+signed-halfword expression, plus a byte cursor for the Y loop, reproduces
+the original string-array, row-array, formatted-buffer and Y-array offsets.
+All original resource/font calls and both texture queries remain present.
+The first mismatch moves past setup into the row cursor spill: expected
+`sw v1,0x44(sp)`, actual `sw v1,0x5C(sp)`. Rectangle scalar homes still differ,
+the Y endpoint is recomputed inside the loop, and temporary allocation /
+scheduling differs in geometry and texture rounding. Do not pad this body
+or call its same-size object a match.
+
+Measured alternatives: separate footer and rectangle-array/struct spelling
+alone do not repair the frame; merely splitting top into a draw-top local
+does not close it. Reusing the row or string iterator removes a source
+pointer but can introduce alias/copy instructions. A union or integer
+carrier shared with the string iterator reaches no better raw score than
+0.6932. Explicit state caching does not improve the best candidate. These
+are negative findings for those measured source families, not a compiler
+impossibility claim. No alternate callee ABI, speculative extra arguments,
+forced compiler output or trial local aggregate is retained.
+
+Next action: start with the complete-size candidate above and recover the
+natural typed Y-loop/end boundary and declaration/carrier ownership of its
+0x44 cursor spill and rectangle scalars. Inspect that narrow residual before
+another source family; do not replay array/struct, scope-only or shared-scan
+grids. Keep the still-assembly owner and all accepted siblings intact.
+
+### Requeue: line-sensitive schedule and fixed scalar homes
+
+The next native block adds 56 scored cells (120 total), still with no
+accepted replacement. A natural source order, left assignment before top,
+reaches normalized 0.9811. Declaring word-sized height before the three
+signed-halfword geometry locals restores width/top/left at sp+0x106/0x108/
+0x10A while retaining the 0x110 frame and the original arrays/buffer.
+
+Token-identical line-group controls through the normal runner prove this
+compiler's schedule is line-sensitive: joining the render phase or pairing
+source lines reaches normalized 0.9886, raw 0.7614, 1052 bytes. The label is
+`f29:window-line-groups:render-region-joined`, source-body SHA256
+`77af84bcf265159d26e6123f89bb020f222aa703efd727a44de97da2b81adf05`.
+This is a diagnostic schedule basin, not publishable exact C. The runner's
+existing candidate-identity implementation already preserves logical line
+groups, so no duplicate-filter bypass or tooling change is needed.
+
+The cursor still spills at sp+0x5C rather than sp+0x44. The Y loop retains a
+base copy and computes its endpoint inside the loop, unlike retail. It has
+an extra real instruction and lacks the original natural alignment tail;
+do not repair that with padding. Typed/void/union cursors and a three-row
+plus-footer local record leave this basin unchanged. Naming the endpoint
+through a separate pointer, the query word or the earlier string pointer
+provokes loop versioning and a larger frame. Narrower cursor scopes combined
+with a named footer-row count regress to 0x118, normalized at most 0.9886 /
+raw 0.6970. Those are scoped negatives in this source/schedule basin.
+
+Both 45-second stack-aware permuter imports reproduce the actual native
+candidate and assembly target before searching. The first score improves
+2829 to 1659 through a redundant top assignment; the natural reordered
+source above keeps the useful scheduling insight without that duplicate.
+The second improves 1678 to 788 through joined source lines and a one-shot
+loop wrapper. No mutation is adopted. Another result narrows a display-list
+opcode to a byte, which changes the program and is rejected regardless of
+its score. The only tracked changes in this source campaign are these notes;
+all four already-accepted sibling C bodies still reproduce their accepted
+instruction words under a fresh normal compile.
+
+At block expiry, resume with a materially different induction-variable /
+allocation-web hypothesis for the cursor spill and Y endpoint. Preserve
+the fixed scalar homes and line-sensitive schedule controls; do not replay
+the cursor-type, local-record, endpoint-carrier or scope grids unchanged.
+
 ## Previous accepted native batch
 
 | Owner | Role | Instructions / bytes | Frame | Accepted batch |
