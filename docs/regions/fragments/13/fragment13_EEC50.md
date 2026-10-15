@@ -389,6 +389,35 @@ lifetimes before allocation-only permutations. Preserve signed division and
 remainder, the inclusive terminal item slot, the two-argument predicate, and
 SDK packet macros. No failed body or scratch helper is installed or committed.
 
+Follow-up: 64 compared candidates total, plus the eight original declaration
+compile failures. A transactional integer-address ABI probe improves the
+instruction shape to 0.9804 and 1,632 bytes, but initially has frame 0xF8.
+It retypes the existing prototype and explicitly casts the accepted caller
+only inside the probe transaction; neither edit is installed. Root/list/count
+lifetime changes, visible-path snapshots, and a fuller draft-style variable
+inventory do not close the match. The fuller inventory worsens it.
+
+Removing redundant source carriers yields a frame-correct leader: 1,632
+bytes, frame 0xE0, normalized/raw 0.9804/0.5956 (phase-result carrier with
+literal count loads). A register-erased aligned comparison localizes the
+instruction-shape residual to the count clamps, entry pointer preservation,
+and triangle-result merge/store, rather than the body of the rendering loop.
+The two clamp paths do not yet reproduce the oracle's reload/reuse asymmetry.
+This is not an instruction-exact or accepted result.
+
+Stock/off/on/twenty-leading-blank controls for both the known source and the
+1,632-byte integer-address leader preserve every section byte/layout, symbol
+and relocation. In this calibrated trace, spill-plan procedure 28 corresponds
+to coloring procedure 29. The 44-pixel stride constant (web 285) receives
+physical register 23 at cost 25; the group parameter (web 4, parameter slot 8)
+receives physical register 30 at cost about 22.33. This confirms the observed
+group/stride register ordering for this candidate, not the original compiler's
+internal decisions. The spill pool grows from 108 to 148 bytes across ten
+temporary slots in this uncompact leader. Requeue: map the frame-correct
+leader through the same trace and work on the measured clamp/merge and
+group-versus-stride lifetime differences. Do not repeat the rejected carrier,
+or declaration-only families without new evidence.
+
 ## Native RGB interpolation / scene synchronization — 2026-10-15
 
 Two accepted owners, **222 words / 888 bytes**, file **51 C / 28 ASM →
