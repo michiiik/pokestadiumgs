@@ -58,3 +58,13 @@ regional note at fleet main afee707ab78d3f63f2f9deeadc7551ec0080eeed, so no
 historical raw similarity score is available. All open PR scopes were inspected
 before source edits. Unknown names remain address/argument/register based.
 
+
+## 2026-10-15: func_8130FF70 matched
+
+The original func_813102A4 callers pass f12 and consume f0; the existing compiled func_8130FFE0 also declares the actual f32(f32) ABI. This is an independent 28-instruction leaf with no padding. Its four existing symbols D_81312988/8C/90/94 reside in the shared 10AA10 rodata block and contain single-precision 3.141592741, 6.283185482, -3.141592741 and 6.283185482 respectively. Retain those existing symbol references; no new pool, data, mapping or layout is needed.
+
+The first two direct while loops using those globals failed full-ROM comparison with MD5 801eec6ec917735a54182b9233c8af7b. All 28 words and the first loop match; the second increment constant loads only inside the loop guard rather than unconditionally before its comparison, shifting the guard displacement. Capturing both existing second-loop threshold and increment in f32 locals before the loop reproduces the original unconditional loads and passes. The first-loop increment remains conditional as in retail. All arithmetic, strict first comparison and inclusive second comparison remain unchanged.
+
+Fleet main afee707ab78d3f63f2f9deeadc7551ec0080eeed has no exact/solved owner attempt, owner reference or 1077C0 regional file, so no historical normalized/raw scores exist. The earlier func_8131109C rejection above remains unchanged and was not retried. All open source PRs were this process's separate matching owners.
+
+Based on master 224774092bdc686b39361e5308a59d6567d7ed75. Full US rebuild with default host syntax checks and COMPARE=1, then explicit md5sum -c baseroms/us/checksum.md5 passes retail 1561c75d11cedf356a8ddb1a4a5f9d5d. Source/object/build evidence for both variants remains in work/session-53. No new semantic names, tokens, fakes, helper edits or verification changes.

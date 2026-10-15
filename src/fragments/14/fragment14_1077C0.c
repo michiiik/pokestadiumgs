@@ -188,7 +188,25 @@ s32 func_8130FF18(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_1077C0/func_8130FF70.s")
+extern f32 D_81312988;
+extern f32 D_8131298C;
+extern f32 D_81312990;
+extern f32 D_81312994;
+
+f32 func_8130FF70(f32 arg0) {
+    f32 var_f0;
+    f32 var_f2;
+
+    while (D_81312988 < arg0) {
+        arg0 -= D_8131298C;
+    }
+    var_f0 = D_81312990;
+    var_f2 = D_81312994;
+    while (arg0 <= var_f0) {
+        arg0 += var_f2;
+    }
+    return arg0;
+}
 #endif
 
 #ifdef VERSION_US
