@@ -554,7 +554,21 @@ void func_8F1029CC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/69/fragment69_code/func_8F102A20.s")
+void func_8F102A20(void) {
+    if (*(u16*)((u8*)D_80087200 + 12) & 0x200) {
+        ((u8*)&D_8F1DECA8)[28]--;
+        //!bug The byte is unsigned, so this lower clamp never executes.
+        if (((u8*)&D_8F1DECA8)[28] < 0) {
+            ((u8*)&D_8F1DECA8)[28] = 0;
+        }
+    }
+    if (*(u16*)((u8*)D_80087200 + 12) & 0x100) {
+        ((u8*)&D_8F1DECA8)[28]++;
+        if (((u8*)&D_8F1DECA8)[28] >= 3) {
+            ((u8*)&D_8F1DECA8)[28] = 2;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
