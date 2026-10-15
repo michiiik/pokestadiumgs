@@ -25,7 +25,22 @@ void TextRenderer_DrawGlyphLarge(s16 arg0, s16 arg1, s16 arg2) {
                         ((arg2 % 16) * 6) << 5, (u16)(arg2 / 16) << 8, 0x0200, 0x0200);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/95C0/func_80008E30.s")
+void TextRenderer_DrawString(s16 x, s16 y, s8 *text, s32 mode) {
+    s32 glyph;
+
+    while (*text != 0) {
+        glyph = (*text++ & 0x7F) - 0x20;
+        if (glyph != 0) {
+            if (mode == 0) {
+                TextRenderer_DrawGlyphSmall(x, y, glyph);
+            }
+            if (mode == 1) {
+                TextRenderer_DrawGlyphLarge(x, y, glyph);
+            }
+        }
+        x += 6;
+    }
+}
 
 typedef struct {
     s32 next;
@@ -39,7 +54,7 @@ extern Gfx *D_800D05A0;
 extern s32 D_80087318;
 extern void Util_Free(s32);
 extern void TextRenderer_SetupGlyphState(void);
-extern void func_80008E30(s16, s16, s8 *, s32);
+extern void TextRenderer_DrawString(s16, s16, s8 *, s32);
 extern void TextRenderer_RestoreState(void);
 extern void TextRenderer_ClearQueuedStrings(void);
 void TextRenderer_FlushQueuedStrings(Gfx **arg0, s32 arg1) {
@@ -54,14 +69,14 @@ void TextRenderer_FlushQueuedStrings(Gfx **arg0, s32 arg1) {
         if (var_s0 != NULL) {
             do {
                 temp_s1 = (FlushTextQueueNode *)var_s0->next;
-                func_80008E30(var_s0->x, var_s0->y, var_s0->text, arg1);
+                TextRenderer_DrawString(var_s0->x, var_s0->y, var_s0->text, arg1);
                 Util_Free((s32)var_s0);
                 var_s0 = temp_s1;
             } while (temp_s1 != NULL);
         }
         if (var_s2 != NULL) {
             do {
-                func_80008E30(var_s2->x, var_s2->y, var_s2->text, arg1);
+                TextRenderer_DrawString(var_s2->x, var_s2->y, var_s2->text, arg1);
                 var_s2 = (FlushTextQueueNode *)var_s2->next;
             } while (var_s2 != NULL);
         }
@@ -129,5 +144,27 @@ s32 HAL_Printf(s16 arg0, s16 arg1, const char *fmt, ...) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/95C0/func_80009138.s")
+s32 TextRenderer_QueuePersistentString(s16 x, s16 y, const char *fmt, ...) {
+    s32 result;
+    char buffer[0x104];
+    TextQueueNode *node;
+    va_list args;
+    D_80087318 = 0;
+    va_start(args, fmt);
+    result = _Printf(TextRenderer_FormatCopy, buffer, fmt, args);
+    if (result > 0) {
+        node = Util_Malloc(result + 0xC);
+        if (node != 0) {
+            node->x = x;
+            node->y = y;
+            memcpy(node->text, buffer, result);
+            node->text[result] = 0;
+            node->next = (s32)D_80087314;
+            D_80087314 = (s32 *)node;
+        }
+    }
+    va_end(args);
+    return result;
+}
+#pragma C_FUNCTION_PADDING(28)
 #endif
