@@ -1415,6 +1415,7 @@ SECTIONS
         build/src/fragments/14/fragment14_F81B0.o(.rodata);
         build/src/fragments/14/fragment14_FA520.o(.rodata);
         build/src/fragments/14/fragment14_FAD40.o(.rodata);
+        build/asm/us/data/10A430.rodata.o(.rodata);
         build/src/fragments/14/fragment14_FCD40.o(.rodata);
         build/src/fragments/14/fragment14_FD770.o(.rodata);
         build/asm/us/data/10A620.rodata.o(.rodata);

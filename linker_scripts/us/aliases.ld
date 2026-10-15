@@ -136,3 +136,6 @@ func_8130176C = Fragment14_UpdateSelectionPreview;
 func_8130183C = Fragment14_UpdateSelectionPage;
 func_81300390 = Fragment14_ConfigureControllerSelection;
 func_813019C8 = Fragment14_UpdateSelectionCommit;
+func_813018FC = Fragment14_UpdateControllerDialog;
+func_81301F64 = Fragment14_EnterSelectionState;
+func_813021B4 = Fragment14_DrawSelectionState;

@@ -1,5 +1,86 @@
 # Fragment 14 selection setup
 
+## 2026-10-15 follow-up — jump-table layout and three dispatchers accepted
+
+The file advances to **44 C / 11 ASM** owners. Three of four newly unblocked
+dispatchers are accepted: **184 instructions / 736 bytes**, stock IDO 7.1,
+solo/native. The update dispatcher remains ASM, not an accepted normalized hit.
+
+| Owner | Name | Instructions / bytes | Frame | Accepted batch |
+| --- | --- | ---: | ---: | --- |
+| `func_813018FC` | `Fragment14_UpdateControllerDialog` | 51 / 204 | 0x28 | `37af195cce1a4123adbb1c4d1b8b7329` |
+| `func_81301F64` | `Fragment14_EnterSelectionState` | 78 / 312 | 0x18 | `ac44ada94428451e861ac20107404546` |
+| `func_813021B4` | `Fragment14_DrawSelectionState` | 55 / 220 | 0x18 | `37af195cce1a4123adbb1c4d1b8b7329` |
+
+### Layout prerequisite and source mechanisms
+
+- Add the 160-byte owner `.rodata` window at ROM `0x10A390..0x10A430`,
+  containing `jtbl_81312200`, `jtbl_81312224`, `jtbl_8131224C` and
+  `jtbl_81312274`. Preserve the existing `SUBALIGN(16)` and split the
+  remaining rodata tail at `0x10A430`. Re-extract with pinned splat64 0.25.0
+  and spimdisasm 1.35.0.dev0. No generated assembly is published.
+- The earlier planner window starting `0x10A310` also includes data referenced
+  by already-decompiled title/controller setup. Do not migrate that whole
+  window blindly: splat does not automatically preserve such data for an
+  existing C definition. The first three tables remain outside this cut.
+- Gate the layout with every owner still ASM before testing C. All 55
+  function offsets/sizes remain unchanged and the full retail ROM matches.
+- Dialog update: retain the two-argument `func_81310894` call. Its callee
+  consumes incoming a1 even without an explicit caller move. Keep only the
+  result local, express the dialog address inline, and retain the explicit
+  no-op -2 case. A cached dialog or reuse of the consumed context word moves
+  the frame/spill homes. Preserve result -1, controller 0..3 and sentinel 6.
+- State entry: clear the transition flag, store requested then active state,
+  copy the real eight-byte position record, and dispatch ten initializers.
+  The byte-aligned opaque position record reproduces the unaligned word
+  copy; an aligned word-array assumption would change its instructions.
+- Draw: dispatch the active unsigned byte and preserve context on the eight
+  two-argument paths. The two dialog paths consume only the state pointer.
+- Consolidate accepted fields into `Fragment14SetupState`; remove unused
+  alternate probe types/prototypes. Keep required helper declarations before
+  the earliest new definition. The first mixed batch exposed a declaration
+  placement failure during integration, not a source-shape rejection; moving
+  the installed declarations and re-gating resolves it. Do not count its
+  compile failures as evidence against the isolated matching bodies.
+- Apply three behavior-backed names and safe US aliases. The one cross-file
+  draw caller is renamed with no section-byte/layout change. JP and the
+  address-keyed symbol table are untouched.
+
+### Acceptance and verification
+
+- All three have normal runner `accepted` and full-ROM gate provenance.
+  Dialog update is object-link-verified. Entry and draw have
+  `relocation_masked: true`, so their authoritative evidence is the successful
+  sequential full-ROM gate, not object link verification. Do not describe
+  those two as `link_verified: true`.
+- Fresh and twenty-leading-blank whole-TU builds after cleanup/naming preserve
+  all allocatable section bytes/layouts, all 55 original function offsets and
+  sizes, the three accepted spans and 52 untouched spans. The renamed caller's
+  whole-object section bytes/layout are unchanged as well.
+- Forced normal ROM rebuild: byte-identical retail ROM, MD5
+  `1561c75d11cedf356a8ddb1a4a5f9d5d`. Host syntax check of both affected C
+  files passes, with the same 17 warnings as the main-file baseline. Public
+  tooling tests: 22 PASS. Diff check PASS.
+- Publish only two C files, YAML/linker layout, aliases and this note. No
+  scratch helpers, alternate compiler, generated assembly, objects or ROMs.
+
+### `func_8130209C` — requeue, upper-state pointer spill home
+
+Best leader `f14-dispatch:update:typed-False:alias-False:selector-False` has
+280/280 bytes, 1.0000 normalized / 0.9571 raw. The instruction count/opcode
+sequence and frame 0x20 agree. The upper-state pointer's save/reload is at
+stack+0x18 instead of the target's +0x1C; the other raw difference is the
+relocatable jump-table address. Preserve context as the second argument on
+all ten update paths and the final no-argument `func_81609CB8` flush.
+
+Twenty-four probes covered raw/typed upper views, explicit context and
+selector locals, context declaration/initialization order, and signed-byte
+versus word requested-state locals. Added locals inflate the frame to 0x28
+without fixing the desired home; do not repeat these families. No fake local,
+padding, forced register or failed body is installed. Next: calibrate a
+bounded stack-difference permuter on the leader with the current named callee
+prototypes; if flat, inspect the pointer's actual allocation/home mechanism.
+
 ## 2026-10-15 follow-up — controller setup and commit handler accepted
 
 Two of four larger related state/setup owners passed one normal link-verified

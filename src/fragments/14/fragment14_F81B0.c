@@ -5,7 +5,9 @@
 typedef struct {
     u8 pad00000[0x1A138];
     s32 mode;
-    u8 pad1A13C[6];
+    u8 pad1A13C[4];
+    u8 active;
+    s8 requested;
     s8 slot;
     s8 selected;
     u8 pad1A144[4];
@@ -13,7 +15,18 @@ typedef struct {
     u8 pad1A14C[0x18];
     char *title;
     s32 status;
+    s32 pending;
 } Fragment14SetupState;
+
+typedef struct {
+    u8 bytes[8];
+} Fragment14Position;
+
+extern void func_81310894(void *, s32);
+extern s32 func_8131109C(void *);
+extern void func_8130F7B8(s32, s32);
+extern void func_81300E34(void *);
+extern void func_813010B0(void *);
 
 extern void main_pool_pop_state(s32);
 extern void main_pool_push_state(s32);
@@ -384,7 +397,32 @@ void Fragment14_UpdateSelectionPage(void *arg0, s32 arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_813018FC.s")
+void Fragment14_UpdateControllerDialog(void *arg0, s32 arg1) {
+    s32 result;
+
+    func_81310894(((u8 *)arg0 + 0xF64C), arg1);
+    result = func_8131109C(((u8 *)arg0 + 0xF64C));
+    func_8130F7B8((s32)((u8 *)arg0 + 0xF64C), (s32)((u8 *)arg0 + 0x1A154));
+    switch (result) {
+    case -1:
+        func_813000BC(arg0, 2);
+        break;
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+        ((Fragment14SetupState *)arg0)->selected = result;
+        func_813000BC(arg0, 4);
+        break;
+    case 6:
+        ((Fragment14SetupState *)arg0)->selected = -1;
+        func_813000BC(arg0, 4);
+        break;
+    case -2:
+    default:
+        break;
+    }
+}
 
 extern void func_8130B3B8(void *, void *);
 extern void func_8130C334(void *);
@@ -531,11 +569,43 @@ void func_81301F4C(u8 *arg0, s32 arg1) {}
 
 void func_81301F58(u8 *arg0, s32 arg1) {}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_81301F64.s")
+void Fragment14_EnterSelectionState(void *arg0, s32 arg1) {
+    ((Fragment14SetupState *)arg0)->pending = 0;
+    ((Fragment14SetupState *)arg0)->requested = arg1;
+    ((Fragment14SetupState *)arg0)->active = arg1;
+    *(Fragment14Position *)((u8 *)arg0 + 0x1A15C) = *(Fragment14Position *)((u8 *)arg0 + 0x1A154);
+    switch (((Fragment14SetupState *)arg0)->active) {
+    case 0: func_81300E34(arg0); break;
+    case 1: Fragment14_InitSelectionAdvance(arg0); break;
+    case 2: Fragment14_InitSelectionPreview(arg0); break;
+    case 3: func_813010B0(arg0); break;
+    case 4: Fragment14_InitSelectedController(arg0); break;
+    case 5: Fragment14_InitSelectionPanelMode0(arg0); break;
+    case 6: Fragment14_InitSelectionPanelMode2(arg0); break;
+    case 7: Fragment14_InitSelectionPanelMode1(arg0); break;
+    case 8: func_813014D0(arg0); break;
+    case 9: func_8130150C(arg0); break;
+    default: break;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_8130209C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_813021B4.s")
+void Fragment14_DrawSelectionState(void *arg0, s32 arg1) {
+    switch (((Fragment14SetupState *)arg0)->active) {
+    case 0: func_81301CE4((s32)arg0); break;
+    case 1: func_81301D28((s32)arg0, arg1); break;
+    case 2: func_81301DD8((s32)arg0, arg1); break;
+    case 3: func_81301D94((s32)arg0); break;
+    case 4: func_81301E14((s32)arg0, arg1); break;
+    case 5: func_81301E80((s32)arg0, arg1); break;
+    case 6: func_81301EC4((s32)arg0, arg1); break;
+    case 7: func_81301F08((s32)arg0, arg1); break;
+    case 8: func_81301F4C((u8 *)arg0, arg1); break;
+    case 9: func_81301F58((u8 *)arg0, arg1); break;
+    default: break;
+    }
+}
 
 extern s32 func_80055A74(s32);
 extern s32 Deck_FindFirstFreeTeamSlot(void);
