@@ -369,7 +369,40 @@ s32 func_824048A0(void *arg0, s32 arg1) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_824048F0.s")
+struct Fragment13GroupAnchor {
+    f32 x, y, z;
+    u8 rest[48];
+};
+extern struct Fragment13GroupAnchor D_82407370[];
+
+struct Fragment13GroupedList {
+    s16 entries[128];
+    s16 counts[8];
+    s16 starts[8];
+};
+
+void Fragment13_InitGroupedList(struct Fragment13GroupedList *arg0) {
+    s32 index;
+    s32 group;
+    s32 item;
+
+    /* Keep the body on its own source line for the original IDO schedule. */
+    for (index = 0; index < 128; index++) {
+        arg0->entries[index] = -1;
+    }
+    index = 0;
+    for (group = 0; group < 8; group++) {
+        arg0->counts[group] = 0;
+        arg0->starts[group] = index;
+        for (item = 0; item < *(u16 *)((u8 *)&D_82407370[group] + 0x3A); item++) {
+            arg0->entries[index] = item;
+            index++;
+            arg0->counts[group]++;
+        }
+        arg0->entries[index] = -1;
+        index++;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82404990.s")
 
@@ -576,7 +609,27 @@ s32 func_82405EE0(s32 arg0, void *arg1) {
     return 1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82405F8C.s")
+struct Fragment13MotionVector {
+    f32 x, y, z;
+};
+
+s32 Fragment13_StepVectorToward(struct Fragment13MotionVector *arg0, struct Fragment13MotionVector *arg1, f32 step) {
+    f32 dx, dy, dz;
+    f32 distance;
+
+    dx = arg1->x - arg0->x;
+    dy = arg1->y - arg0->y;
+    dz = arg1->z - arg0->z;
+    distance = sqrtf(dx * dx + dy * dy + dz * dz);
+    if (step < 0.0f || distance < step) {
+        *arg0 = *arg1;
+        return 0;
+    }
+    arg0->x = arg0->x + dx / distance * step;
+    arg0->y = arg0->y + dy / distance * step;
+    arg0->z = arg0->z + dz / distance * step;
+    return 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82406060.s")
 
@@ -611,7 +664,22 @@ f32 func_82407088(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_824070E4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82407170.s")
+s32 Fragment13_FindNearestGroup(struct Fragment13MotionVector *arg0) {
+    s32 best = 100000000;
+    s32 nearest = 0;
+    s32 i;
+    s32 distance;
+
+    for (i = 0; i < 8; i++) {
+        /* Inline terms retain the original two-at-a-time IDO loop. */
+        distance = (s32)((arg0->x - D_82407370[i].x) * (arg0->x - D_82407370[i].x) + (arg0->z - D_82407370[i].z) * (arg0->z - D_82407370[i].z));
+        if (distance < best) {
+            best = distance;
+            nearest = i;
+        }
+    }
+    return nearest;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82407228.s")
 #endif
