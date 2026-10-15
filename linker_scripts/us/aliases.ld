@@ -190,3 +190,4 @@ func_82406E14 = Fragment13_DrawGroupScene;
 func_824070E4 = Fragment13_GetInterpolatedListPosition;
 func_824020B4 = Fragment13_DrawSelectionFooter;
 func_82402904 = Fragment13_DrawSelectionHeader;
+func_865038A8 = Fragment53_ApplyPendingPrimaryAnimation;

@@ -118,7 +118,22 @@ void func_86502620(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/53/fragment53_code/func_865038A8.s")
+struct Fragment53ActorState {
+    u8 prefix[0xC]; s32 animation; s32 pending;
+    u8 middle[0x74]; s32 kind; u8 tail[0xC];
+};
+struct Fragment53Model { u8 opaque[0x168]; };
+extern struct Fragment53ActorState D_86511698[];
+extern struct Fragment53Model D_8650E120[];
+extern void func_8003F210(void *, s32);
+extern void ModelAnim_SetFrame(u8 *, s16);
+void Fragment53_ApplyPendingPrimaryAnimation(s32 arg0) {
+    if (D_86511698[arg0].pending == 1) {
+        func_8003F210((u8 *)&D_8650E120[arg0], D_86511698[arg0].animation);
+        ModelAnim_SetFrame((u8 *)&D_8650E120[arg0], 0);
+        D_86511698[arg0].pending = 0;
+    }
+}
 #endif
 
 #ifdef VERSION_US
