@@ -2,12 +2,40 @@
 
 
 #ifdef VERSION_US
+/* Shared named constants precede this file's compiler-owned switch tables. */
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/D_82408F00.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/D_82408F04.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/D_82408F08.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/D_82408F0C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/D_82408F10.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/D_82408F14.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/D_82408F20.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/D_82408F2C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/D_82408F38.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/D_82408F40.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/D_82408F78.s")
+
 struct Fragment13GroupItem {
     u8 opaque[6];
     s16 labelIndex;
     s16 id;
     s16 value;
 };
+
+struct Fragment13MotionVector {
+    f32 x, y, z;
+};
+
+struct Fragment13GroupAnchor {
+    f32 x, y, z;
+    u8 opaque[16];
+    struct Fragment13MotionVector eye;
+    struct Fragment13MotionVector target;
+    struct Fragment13GroupItem *items;
+    s16 defaultValue;
+    u16 count;
+};
+extern struct Fragment13GroupAnchor D_82407370[];
 
 /* The item-pointer field repeats at the anchor record's 0x3C-byte stride. */
 struct Fragment13GroupItemSpan {
@@ -222,7 +250,31 @@ void func_82401FE0(s32 arg0, s32 arg1) {
     Fragment13_DrawClippedTextureRect((f32)arg0, (f32)arg1, (f32)*(u16 *)(u8 *)(u32)D_82407830, (f32)*(u16 *)((u8 *)(u32)D_82407830 + 2), 0, 0, 1.0f, 1.0f);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_824020B4.s")
+extern void func_800498C4(void);
+extern void func_800499EC(void);
+extern s32 func_8004C874(s32, s32);
+extern void func_800495BC(s32, s32, s32);
+void Fragment13_DrawSelectionFooter(s32 arg0, s32 arg1) {
+    Gfx *packet;
+
+    if (arg0) {
+        func_800498C4();
+        func_82401DD4(arg1);
+        func_800499EC();
+        return;
+    }
+    packet = D_800D0510++;
+    gSPDisplayList(packet, D_80094E38);
+    func_82401E30(28, 207);
+    func_82401F08(240, 207);
+    packet = D_800D0510++;
+    gSPDisplayList(packet, D_80094F50);
+    func_800498C4();
+    func_800496A4(2, 1);
+    func_800495BC(44, 209, func_8004C874(60, 3));
+    func_800495BC(256, 209, func_8004C874(60, 5));
+    func_800499EC();
+}
 
 extern void func_800498C4(void);
 extern void func_82401DD4(s32);
@@ -286,7 +338,25 @@ void func_8240227C(s32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_824027F4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82402904.s")
+void Fragment13_DrawSelectionHeader(s32 arg0, s32 arg1) {
+    Gfx *packet;
+
+    if (!arg0) {
+        return;
+    }
+    packet = D_800D0510++;
+    gSPDisplayList(packet, D_80094E38);
+    func_82401E30(31, 20);
+    func_82401F08(241, 20);
+    packet = D_800D0510++;
+    gSPDisplayList(packet, D_80094F50);
+    func_800498C4();
+    func_82401DD4(arg1);
+    func_800496A4(2, 1);
+    func_800495BC(47, 22, func_8004C874(60, 4));
+    func_800495BC(257, 22, func_8004C874(60, 5));
+    func_800499EC();
+}
 
 s32 func_824029E4(s32 arg0, s16 arg1) {
     if (arg1 < 0) {
@@ -438,8 +508,8 @@ s32 func_82404430(u8 *arg0) {
 }
 
 extern u8 *D_80087200;
-/* Preserve the original one-word sound requests; later contextual calls keep their prototype. */
-extern void func_800226C0();
+/* Sound requests carry a sound word and, for contextual requests, a context. */
+extern void func_800226C0(s32, ...);
 s32 Fragment13_HandleConfirmationInput(u8 *arg0) {
     s32 buttons;
 
@@ -474,7 +544,6 @@ s32 Fragment13_HandleConfirmationInput(u8 *arg0) {
     return 1;
 }
 
-extern void func_800226C0(s32, void *);
 s8 func_82404564(void *arg0) {
     u8 temp_v0;
 
@@ -492,7 +561,32 @@ block_4:
     return -1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_824045B4.s")
+extern void func_81600A34(void *, void *, s32, s32, s32, s32, s32);
+void Fragment13_UpdateConfirmationDialog(u8 *arg0, void *arg1) {
+    s32 result = 0;
+
+    switch (arg0[0x21]) {
+    case 1:
+        result = func_82404378(arg0);
+        break;
+    case 2:
+        result = Fragment13_HandleConfirmationInput(arg0);
+        break;
+    case 3:
+        result = func_824043D8(arg0);
+        break;
+    case 0:
+        result = func_82404360(arg0);
+        break;
+    case 4:
+        result = func_82404430(arg0);
+        break;
+    }
+    if (arg0[0x21] != 0 && arg0[0x21] != 4) {
+        func_81600A34(arg1, arg0, result, *(s16 *)arg0, func_82404230(arg0),
+                      *(s16 *)(arg0 + 4), *(s16 *)(arg0 + 6));
+    }
+}
 
 struct Fragment13DialogView {
     s16 x, y, width, height;
@@ -549,21 +643,6 @@ s32 func_824048A0(void *arg0, s32 arg1) {
     }
     return 0;
 }
-
-struct Fragment13MotionVector {
-    f32 x, y, z;
-};
-
-struct Fragment13GroupAnchor {
-    f32 x, y, z;
-    u8 opaque[16];
-    struct Fragment13MotionVector eye;
-    struct Fragment13MotionVector target;
-    struct Fragment13GroupItem *items;
-    s16 defaultValue;
-    u16 count;
-};
-extern struct Fragment13GroupAnchor D_82407370[];
 
 void Fragment13_InitGroupedList(struct Fragment13GroupedList *arg0) {
     s32 index;
@@ -853,19 +932,17 @@ void func_82405A58(s32 arg0, void *arg1) {
     }
 }
 
-extern f32 D_8240906C;
 void Fragment13_UpdateClockHourHand(s32 arg0, void *arg1) {
     u8 *data = *(u8 **)((u8 *)arg1 + 0x14);
     s32 angle;
 
     if (arg0 == 2) {
         /* Preserve the integer angle and truncate before negating. */
-        angle = (s32)((((f32)data[7] + *(f32 *)data / 60.0f) / 60.0f + (f32)data[6]) / 12.0f * D_8240906C);
+        angle = (s32)((((f32)data[7] + *(f32 *)data / 60.0f) / 60.0f + (f32)data[6]) / 12.0f * 65535.0f);
         *(s16 *)((u8 *)arg1 + 0x22) = -angle;
     }
 }
 
-extern f32 D_82409070;
 void Fragment13_UpdateClockMinuteHand(s32 arg0, void *arg1) {
     u8 *data = *(u8 **)((u8 *)arg1 + 0x14);
     f32 value;
@@ -873,16 +950,15 @@ void Fragment13_UpdateClockMinuteHand(s32 arg0, void *arg1) {
     if (arg0 == 2) {
         /* The fractional term comes first in the original IDO expression. */
         value = (f32)data[8] / 60.0f + (f32)data[7];
-        *(s16 *)((u8 *)arg1 + 0x22) = (s16)(-(value * D_82409070 / 60.0f));
+        *(s16 *)((u8 *)arg1 + 0x22) = (s16)(-(value * 65535.0f / 60.0f));
     }
 }
 
-extern f32 D_82409074;
 void func_82405BAC(s32 arg0, void *arg1) {
     u8 *ptr = *(u8 **)((u8 *)arg1 + 0x14);
     if (arg0 == 2) {
         f32 value = (f32)ptr[8];
-        *(s16 *)((u8 *)arg1 + 0x22) = (s16)(-(value * D_82409074 / 60.0f));
+        *(s16 *)((u8 *)arg1 + 0x22) = (s16)(-(value * 65535.0f / 60.0f));
     }
 }
 
@@ -1047,9 +1123,99 @@ s32 Fragment13_StepVectorToward(struct Fragment13MotionVector *arg0, struct Frag
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82406560.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82406880.s")
+extern void func_82402B1C(void *, void *, f32, s16, f32, s32, s32, s32);
+extern void func_8240330C(void *, s32, f32, s32, s32, f32);
+extern f32 func_82407088(void *arg0);
+extern f32 Fragment13_GetInterpolatedListPosition(void *);
+void Fragment13_UpdateGroupListTransition(void *arg0, void *arg1) {
+    f32 factor;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82406A78.s")
+    factor = D_8160BD08(*(f32 *)((u8 *)arg0 + 0x204) / 10.0f);
+    if (*(s32 *)((u8 *)arg0 + 0x1E4) == *(s32 *)((u8 *)arg0 + 0x1EC)) {
+        *(f32 *)((u8 *)arg0 + 0x204) = func_82403F10() + *(f32 *)((u8 *)arg0 + 0x204);
+        if (*(f32 *)((u8 *)arg0 + 0x204) >= 10.0f) {
+            *(f32 *)((u8 *)arg0 + 0x204) = 10.0f;
+        }
+    } else {
+        *(f32 *)((u8 *)arg0 + 0x204) = *(f32 *)((u8 *)arg0 + 0x204) - func_82403F10();
+        if (*(f32 *)((u8 *)arg0 + 0x204) <= 0.0f) {
+            *(f32 *)((u8 *)arg0 + 0x204) = 0.0f;
+            if (*(s32 *)((u8 *)arg0 + 0x1EC) == 2 && *(s32 *)((u8 *)arg0 + 0x1E4) == 1) {
+                func_800226C0(0xAA);
+            } else if (*(s32 *)((u8 *)arg0 + 0x1E4) == 2) {
+                func_800226C0(0xA9);
+            }
+            *(s32 *)((u8 *)arg0 + 0x1EC) = *(s32 *)((u8 *)arg0 + 0x1E4);
+        }
+    }
+    switch (*(s32 *)((u8 *)arg0 + 0x1EC)) {
+    case 0:
+        return;
+    case 1:
+        func_82402B1C(arg1, (u8 *)arg0 + 0x54, func_82407088(arg0), -1, factor, 184, 1,
+                      *(s32 *)((u8 *)arg0 + 0x1E0) < *(s32 *)((u8 *)arg0 + 0x1DC));
+        return;
+    case 2:
+        func_8240330C(arg1, *(s32 *)((u8 *)arg0 + 0x1DC), factor, *(s32 *)((u8 *)arg0 + 0x1D4),
+                      *(s32 *)((u8 *)arg0 + 0x1D8), *(f32 *)((u8 *)arg0 + 0x208) / 6.0f);
+        func_82402B1C(arg1, (u8 *)arg0 + 0x54, Fragment13_GetInterpolatedListPosition(arg0), (s16)(*(s32 *)((u8 *)arg0 + 0x1DC)),
+                      factor, 154, 0, *(s32 *)((u8 *)arg0 + 0x1E0) < *(s32 *)((u8 *)arg0 + 0x1DC));
+        return;
+    }
+}
+
+extern s32 D_82408BB8;
+extern void func_824050A8(void *, f32);
+extern void func_82406060(void *);
+extern void func_8240641C(void *);
+extern void func_82406560(void *);
+void Fragment13_UpdateGroupScene(u8 *arg0, void *arg1) {
+    s32 changed;
+    u8 *dialog;
+
+    changed = *(s32 *)(arg0 + 0x1E4) != *(s32 *)(arg0 + 0x1E8);
+    func_824050A8(arg0, D_82408BB8 != 0 ? 1.0f : 3000.0f);
+    func_82404F64(arg0);
+    func_82405718(arg0 + 0x24, arg0);
+    func_81600A34(arg1, (void *)1, 0, 0, 0, 320, 240);
+    func_81600A34(arg1, (void *)4, changed, 0, 0, 320, 38);
+    func_81600A34(arg1, (void *)5, changed, 0, 202, 320, 38);
+    func_81600A34(arg1, (void *)7, changed, 0, 38, 12, 164);
+    func_81600A34(arg1, (void *)6, changed, 308, 38, 12, 164);
+    func_81600A34(arg1, (void *)(u32)*(s32 *)(arg0 + 0x214), 1, 11, 37, 300, 167);
+    switch (*(u32 *)(arg0 + 0x1E8) = *(u32 *)(arg0 + 0x1E4)) {
+    case 0:
+        func_82406060(arg0);
+        break;
+    case 1:
+        func_8240641C(arg0);
+        break;
+    case 2:
+        func_82406560(arg0);
+        break;
+    case 3:
+        switch (func_82404564(arg0 + 0x228)) {
+        case 0:
+            Fragment13_ApplyGroupSelections((struct Fragment13GroupSelection *)arg0);
+            *(u32 *)(arg0 + 0x1E4) = 4;
+            func_800226C0(0x14A);
+            break;
+        case 1:
+            *(s32 *)(arg0 + 0x210) = 0;
+            *(u32 *)(arg0 + 0x1E4) = 4;
+            break;
+        case 2:
+            *(u32 *)(arg0 + 0x1E4) = 0;
+            break;
+        }
+        break;
+    case 4:
+        return;
+    }
+    dialog = arg0 + 0x228;
+    Fragment13_UpdateGroupListTransition(arg0, arg1);
+    Fragment13_UpdateConfirmationDialog(dialog, arg1);
+}
 
 s32 func_82406CCC(u8 *arg0) {
     return *(s32 *)(arg0 + 0x1E4) == 4;
@@ -1057,11 +1223,66 @@ s32 func_82406CCC(u8 *arg0) {
 
 extern void func_82402E28(s32, void *, f32, s32, f32, s32, s32, s32);
 extern void func_82403624(s32, void *, s32, f32, s32, s32, f32);
-extern f32 func_824070E4(void *);
-extern f32 func_82407088(void *arg0);
-void func_82406CDC(void *arg0, s32 arg1) { f32 scale; s32 state; scale = D_8160BD08(*(f32 *)((u8 *)arg0 + 0x204) / 10.0f); state = *(s32 *)((u8 *)arg0 + 0x1EC); switch (state) { case 0: return; case 1: func_82402E28(arg1, (u8 *)arg0 + 0x54, func_82407088(arg0), -1, scale, 0xB8, 1, *(s32 *)((u8 *)arg0 + 0x1E0) < *(s32 *)((u8 *)arg0 + 0x1DC)); return; case 2: func_82403624(arg1, arg0, *(s32 *)((u8 *)arg0 + 0x1DC), scale, *(s32 *)((u8 *)arg0 + 0x1D4), *(s32 *)((u8 *)arg0 + 0x1D8), *(f32 *)((u8 *)arg0 + 0x208) / 6.0f); func_82402E28(arg1, (u8 *)arg0 + 0x54, func_824070E4(arg0), (s16)*(s32 *)((u8 *)arg0 + 0x1DC), scale, 0x9A, 0, *(s32 *)((u8 *)arg0 + 0x1E0) < *(s32 *)((u8 *)arg0 + 0x1DC)); return; } }
+void func_82406CDC(void *arg0, s32 arg1) { f32 scale; s32 state; scale = D_8160BD08(*(f32 *)((u8 *)arg0 + 0x204) / 10.0f); state = *(s32 *)((u8 *)arg0 + 0x1EC); switch (state) { case 0: return; case 1: func_82402E28(arg1, (u8 *)arg0 + 0x54, func_82407088(arg0), -1, scale, 0xB8, 1, *(s32 *)((u8 *)arg0 + 0x1E0) < *(s32 *)((u8 *)arg0 + 0x1DC)); return; case 2: func_82403624(arg1, arg0, *(s32 *)((u8 *)arg0 + 0x1DC), scale, *(s32 *)((u8 *)arg0 + 0x1D4), *(s32 *)((u8 *)arg0 + 0x1D8), *(f32 *)((u8 *)arg0 + 0x208) / 6.0f); func_82402E28(arg1, (u8 *)arg0 + 0x54, Fragment13_GetInterpolatedListPosition(arg0), (s16)*(s32 *)((u8 *)arg0 + 0x1DC), scale, 0x9A, 0, *(s32 *)((u8 *)arg0 + 0x1E0) < *(s32 *)((u8 *)arg0 + 0x1DC)); return; } }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82406E14.s")
+extern void func_8000766C(Gfx **, s32, s32, s32, s32);
+extern void func_8003C6B8(s32);
+extern void func_81A0022C(void *);
+void Fragment13_DrawGroupScene(u8 *arg0, void *arg1) {
+    s32 full;
+
+    full = func_81600DA8(arg1, (void *)1);
+    if (full || func_81600DA8(arg1, (void *)4)) {
+        func_82403F58();
+        switch (*(s32 *)(arg0 + 0x1E4)) {
+        case 0:
+            func_8240227C(1, (s32)(arg0 + 0x218));
+            break;
+        case 1:
+            Fragment13_DrawSelectionFooter(1, (s32)(arg0 + 0x218));
+            break;
+        case 2:
+            Fragment13_DrawSelectionHeader(1, (s32)(arg0 + 0x218));
+            break;
+        case 3:
+            func_824021AC(1, (s32)(arg0 + 0x218));
+            break;
+        }
+    }
+    if (full || func_81600DA8(arg1, (void *)5)) {
+        func_82404000();
+        switch (*(s32 *)(arg0 + 0x1E4)) {
+        case 0:
+            func_8240227C(0, (s32)(arg0 + 0x218));
+            break;
+        case 1:
+            Fragment13_DrawSelectionFooter(0, (s32)(arg0 + 0x218));
+            break;
+        case 2:
+            Fragment13_DrawSelectionHeader(0, (s32)(arg0 + 0x218));
+            break;
+        case 3:
+            func_824021AC(0, (s32)(arg0 + 0x218));
+            break;
+        }
+    }
+    if (full || func_81600DA8(arg1, (void *)7)) {
+        func_824040A8();
+    }
+    if (full || func_81600DA8(arg1, (void *)6)) {
+        func_82404150();
+    }
+    if (func_81600DA8(arg1, *(void **)(arg0 + 0x214))) {
+        func_8000766C(&D_800D0510, 13, 39, 294, 161);
+        func_80006F70(&D_800D0510, 13, 39, 294, 161);
+        func_8003C6B8(*(s32 *)(arg0 + 0x214));
+        func_80006F70(&D_800D0510, 0, 0, 320, 240);
+        func_82401198(11, 37, 300, 167);
+    }
+    func_82406CDC(arg0, (s32)arg1);
+    Fragment13_DrawConfirmationDialog((void *)(arg0 + 0x228), arg1);
+    func_81A0022C(arg0 + 0x24C);
+}
 
 extern f32 (*D_8160BD1C)(f32);
 f32 func_82407088(void *arg0) {
@@ -1072,7 +1293,29 @@ f32 func_82407088(void *arg0) {
     return ((f32)*(s32 *)((u8 *)arg0 + 0x1DC) - start) * factor + start;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_824070E4.s")
+extern f32 (*D_8160BD00)(f32);
+f32 Fragment13_GetInterpolatedListPosition(void *arg0) {
+    f32 factor;
+    f32 base;
+    s32 start;
+    s32 end;
+    s32 limit;
+    struct Fragment13GroupState *state;
+
+    state = arg0;
+    factor = D_8160BD00(state->selectionTimer / 6.0f);
+    end = state->end;
+    start = state->start;
+    limit = state->list.counts[state->group];
+    if (start >= limit) {
+        start = limit;
+    }
+    base = (f32)start;
+    if (end >= limit) {
+        end = limit;
+    }
+    return ((f32)end - base) * factor + base;
+}
 
 s32 Fragment13_FindNearestGroup(struct Fragment13MotionVector *arg0) {
     s32 best = 100000000;
