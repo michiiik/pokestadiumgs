@@ -1,5 +1,30 @@
 # Fragment 53 animation family
 
+## 2026-10-16 — four-function batch complete
+
+`func_86501D6C` is now `Fragment53_CountTrajectorySamplesInRange`, **77 words /
+308 bytes**, no stack frame. Batch `3b6c0332772d477a98da174091ad3236`
+accepted the second candidate with `link_verified: true` and one combined
+full-ROM gate. It resets the count, calculates the lower vertical boundary,
+and evaluates 100 parabolic samples at successive trajectory times.
+
+Use the direct double-precision expression, round each position to `f32`, and
+count when neither `position < lower` nor `upper < position` holds. The
+negated less-than spelling preserves the oracle's unordered/NaN behavior;
+replacing it with two positive ordered comparisons changes instructions and
+semantics. The normal compiler unrolls the natural 100-iteration loop by two:
+no hand-unrolling, local cached scale, or local time is needed. Naming,
+indentation, and duplicate-extern cleanup preserve all accepted object bytes.
+
+The four accepted functions total **282 words / 1128 bytes**. Final fresh and
+twenty-leading-blank builds preserve full text/rodata/data/bss bytes and
+layout, all 56 original function spans, and all **52 untouched raw spans**.
+Forced normal `COMPARE=1`, host syntax check, and all 25 tooling tests pass.
+The ROM is byte-identical to retail, MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. Overall file progress is
+**13 C / 43 function ASM to 17 C / 39 function ASM**. Only source,
+compatibility aliases, and these evidence notes belong in the PR.
+
 ## 2026-10-16 — trajectory and scene transition accepted
 
 `func_86501FA0` is now `Fragment53_UpdateTrajectoryPosition`, **78 words /

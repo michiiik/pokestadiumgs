@@ -43,7 +43,27 @@ s32 func_8650123C(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/53/fragment53_code/func_86501D6C.s")
+extern s32 D_8650C498;
+extern s32 D_8650C4B4;
+extern f64 D_8650D678;
+extern s32 D_8650C4AC;
+extern f32 D_8650C4B8;
+extern s32 D_8650C4CC;
+extern s32 D_8650C4D4;
+extern s32 D_8650D9D4;
+void Fragment53_CountTrajectorySamplesInRange(void) {
+    s32 i;
+    f32 position;
+
+    D_8650C4D4 = 0;
+    D_8650C4B4 = D_8650C498 - D_8650C4CC - 10;
+    for (i = 0; i < 100; i++) {
+        position = (f32)((f64)D_8650C4AC - D_8650D678 * (f64)D_8650C4B8 * (f64)D_8650C4B8 * (f64)(D_8650D9D4 + i + 2) * (f64)(D_8650D9D4 + i + 2));
+        if (!(position < (f32)D_8650C4B4) && !((f32)D_8650C498 < position)) {
+            D_8650C4D4++;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -58,15 +78,10 @@ extern s32 StageContext_GetFadeMode(void);
 extern s32 StageFade_StartFromOpaque(s32);
 extern void func_87F00688(void);
 extern s32 D_8650C5EC;
-extern s32 D_8650C4AC;
-extern f32 D_8650C4B8;
-extern s32 D_8650C4CC;
-extern s32 D_8650C4D4;
 extern f32 D_8650C4D8;
 extern s32 D_8650C4DC;
 extern s32 D_8650C620;
 extern f64 D_8650D698;
-extern s32 D_8650D9D4;
 extern void func_86501EA0(void);
 void Fragment53_UpdateTrajectoryPosition(void) {
     if (D_8650C5EC == 10) {
