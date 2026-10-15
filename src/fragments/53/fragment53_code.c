@@ -341,7 +341,80 @@ void func_86508294(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/53/fragment53_code/func_865082C8.s")
+extern Gfx *D_800D0510;
+extern void *D_8650DB1C;
+extern void *D_8650DB20;
+extern u8 D_8650DA70[];
+extern u8 D_8650DA60[];
+extern s32 D_8650C62C;
+extern s32 D_8650DAD8;
+extern s32 D_8650C5E0;
+extern void *D_8650DB10;
+extern void func_800088DC(void);
+extern void func_8000766C(Gfx **, s32, s32, s32, s32);
+extern void func_800468A0(void *);
+extern void GeoRender_AdvanceFrameCounter(void);
+extern void func_8003C6B8(void *);
+extern void func_87F07FE8(void *);
+extern void func_86507AFC(void);
+extern void func_87F022F0(void);
+extern void func_865064B0(void);
+extern void func_87F0A5BC(void *);
+extern void func_87F0C88C(void *);
+extern void func_80008648(void);
+void Fragment53_DrawSceneFrame(void) {
+    func_800088DC();
+    func_8000766C(&D_800D0510, 0, 0, 320, 240);
+    func_800468A0(D_8650DB1C);
+    if (D_8650C494 == 0) {
+        GeoRender_AdvanceFrameCounter();
+    }
+    func_8003C6B8(D_8650DB20);
+    switch (*(s32 *)((u8 *)&D_8650C5E0 + 0xC)) {
+        case 2:
+        case 12:
+            if (*(s32 *)((u8 *)&D_8650C5E0 + 0x4C) == 1) {
+                func_87F07FE8(&D_8650DAD8);
+            } else {
+                func_86507AFC();
+            }
+            if (D_8650C62C == 2) {
+                func_86507AFC();
+                func_87F022F0();
+            }
+            if (D_8650C62C == 3) {
+                func_86507AFC();
+                func_86508294();
+            }
+            break;
+        case 0:
+        case 4:
+        case 5:
+            if (*(u8 *)((u8 *)D_8650DB10 + 0x2180) != 4) {
+                func_87F07FE8(&D_8650DAD8);
+            }
+            break;
+        case 10:
+            func_865064B0(); /* fall through */
+        case 1:
+        case 6:
+            func_86507AFC();
+            func_86508294();
+            break;
+        case 9:
+            func_86507AFC();
+            func_87F0A5BC(D_8650DA70);
+            break;
+        case 8:
+            func_86507AFC();
+            func_87F022F0();
+            break;
+    }
+    if (*(u8 *)((u8 *)D_8650DB10 + 0x2180) == 4) {
+        func_87F0C88C(D_8650DA60);
+    }
+    func_80008648();
+}
 #endif
 
 #ifdef VERSION_US
@@ -588,7 +661,7 @@ void func_86509D8C(void) {
 extern void func_800086A4(s32);
 extern void func_80064D28(void);
 extern void func_8650A074(void);
-extern void func_865082C8(void);
+extern void Fragment53_DrawSceneFrame(void);
 extern s32 func_86509E54(s32);
 void Fragment53_RunSceneTransition(void) {
     u8 *model;
@@ -618,7 +691,7 @@ void Fragment53_RunSceneTransition(void) {
     do {
         func_8650A074();
         func_80064D28();
-        func_865082C8();
+        Fragment53_DrawSceneFrame();
         result = func_86509E54(*(s32 *)((u8 *)&D_8650C5E0 + 0xC));
         *(s32 *)((u8 *)&D_8650C5E0 + 0xC) = result;
     } while (*(s32 *)((u8 *)&D_8650C5E0 + 0xC) != 3);
@@ -626,5 +699,79 @@ void Fragment53_RunSceneTransition(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/53/fragment53_code/func_8650A3E4.s")
+extern f32 D_8650D99C;
+extern s32 D_8650DB18;
+extern u32 D_8650DAE0;
+extern u32 D_8650DA90;
+extern s32 D_8650C638;
+extern u8 D_1000000[];
+extern u8 D_446E30[];
+extern u8 D_447D00[];
+extern s32 func_80001FF0(void);
+extern void func_80027EE0(s32);
+extern void main_pool_push_state(s32);
+extern void Gfx_InitDisplayListBuffers(s32, s32);
+extern s32 func_800082E0(s32, s32, s32, s32, s32, s32);
+extern void func_8004C09C(s32);
+extern void func_87F06EAC(s32, void *, void *);
+extern s32 func_8004DDF4(s32);
+extern void func_8004C8C0(s32);
+extern s32 func_8004DEF8(s32);
+extern s32 func_8004D690(s32);
+extern void func_80047588(u32, s32);
+extern u8 *Asset_LoadToSegment(s32, u8 *, u8 *, s32);
+extern void func_87F00030(void);
+extern void func_87F01F34(void *);
+extern void func_86505EA8(void);
+extern void func_80008514(s32);
+extern void func_80008574(void);
+extern void func_80047610(void);
+extern void func_8004C398(void);
+extern void Gfx_FreeDisplayListBuffers(void);
+extern void main_pool_pop_state(s32);
+extern void func_87F0F480(void *);
+s32 Fragment53_RunScene(s32 arg0, void *context) {
+    s32 handle;
+
+    if (func_80001FF0() == 60) {
+        D_8650C508 = 1.0f;
+    } else {
+        D_8650C508 = D_8650D99C;
+    }
+    D_8650DB10 = context;
+    if (*(u8 *)((u8 *)D_8650DB10 + 0x2180) == 4) {
+        func_80027EE0(0xFFF);
+    }
+    main_pool_push_state(0x4D523031);
+    Gfx_InitDisplayListBuffers(0x20000, 0);
+    handle = func_800082E0(0, 1, 3, 1, 2, 1);
+    func_8004C09C(0x127);
+    func_87F06EAC(0x6B, &D_8650DAD8, D_8650DB10);
+    func_8004DDF4(0x51);
+    func_8004DDF4(0x6F);
+    func_8004DDF4(0x70);
+    func_8004DDF4(0x3B);
+    func_8004C8C0(0x1B2);
+    func_8004C8C0(0x1AD);
+    func_8004C8C0(0x18D);
+    func_8004C8C0(0x18F);
+    func_8004C8C0(0x18E);
+    D_8650DB18 = func_8004DEF8(0x3B);
+    D_8650DB1C = (void *)func_8004D690(15);
+    func_80047588(D_8650DAE0 | 5 | D_8650DA90, 0);
+    Asset_LoadToSegment(((u32)D_1000000 & 0x0F000000) >> 24, D_446E30, D_447D00, 0);
+    func_87F00030();
+    func_87F01F34(D_8650DB10);
+    func_86505EA8();
+    func_80008514(handle);
+    Fragment53_RunSceneTransition();
+    func_80008574();
+    func_80047610();
+    func_8004C398();
+    Gfx_FreeDisplayListBuffers();
+    main_pool_pop_state(0x4D523031);
+    func_87F0F480(D_8650DB10);
+    func_80027EE0(0xFFE);
+    return D_8650C638;
+}
 #endif
