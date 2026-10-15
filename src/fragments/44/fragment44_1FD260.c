@@ -15,9 +15,59 @@ s32 func_8AF0EFF0(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF0F040.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF0F1A0.s")
+extern void func_800504BC(s16 *);
+extern s16 D_8AF2F9E0[][3];
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF0F220.s")
+void func_8AF0F1A0(s32 mode, void *record) {
+    s16 index;
+    s16 values[2];
+    s16 *entry;
+
+    index = *(s16 *)((u8 *)record + 0x22);
+    if (mode != 0 && mode == 1) {
+        func_800504BC(values);
+        entry = D_8AF2F9E0[index];
+        entry[0] = index + 1;
+        entry[1] = *(s16 *)((u8 *)record + 8) + values[0];
+        entry[2] = *(s16 *)((u8 *)record + 0xA) + values[1];
+    }
+}
+
+extern s32 func_80063BB8(u8);
+extern s16 D_8AF2F9DE;
+extern s16 D_8AF2F9D0[];
+extern u8 D_8AF2FA70[][3];
+extern u8 D_8AF31D42;
+extern u8 func_80062D98(u8);
+extern s16 func_8AF01530(s16);
+extern u8 *func_8AF12410(u8 *, s16);
+
+void func_8AF0F220(u8 code) {
+    struct EvolutionEntry {
+        u8 method;
+        u8 requirement;
+        u8 species;
+    };
+    u8 *entry;
+    u8 *copy;
+    s16 index;
+
+    entry = (u8 *)func_80063BB8(code);
+    if (entry != NULL) {
+        for (;;) {
+            if (entry[0] == 0) {
+                break;
+            }
+            D_8AF2F9DE++;
+            index = D_8AF2F9DE;
+            D_8AF2F9D0[index] = entry[2];
+            copy = D_8AF2FA70[index];
+            *(struct EvolutionEntry *)copy = *(struct EvolutionEntry *)entry;
+            func_8AF0F220(entry[2]);
+            entry += 3;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF0F2EC.s")
 
@@ -148,7 +198,28 @@ void func_8AF123C0(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF125D0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF1271C.s")
+/* Preserve this logical source line for IDO's instruction scheduling. */
+u8 *func_8AF1271C(u8 *output, s16 *table, u16 mask) { \
+    u8 *entry; \
+    u8 *end; \
+    u8 *destination; \
+    s32 id; \
+    s16 count; \
+    destination = output;
+    count = 0;
+    entry = &D_8AF31C48; end = &D_8AF31D42;
+    do {
+        id = *entry;
+        if (table[id - 1] & mask) {
+            destination[0] = id;
+            destination[1] = func_8AF01530(func_80062D98(id));
+            destination += 4;
+            count++;
+        }
+        entry++;
+    } while (entry != end);
+    return func_8AF12410(destination, count);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF127E8.s")
 
