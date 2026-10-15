@@ -27,7 +27,33 @@ void func_86C00070(void) {
     func_80008648();
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/62/fragment62_code/func_86C000B4.s")
+extern u8 StageContext_GetFadeMode(void);
+extern s32 StageFade_StartFromTransparent(s32 arg0);
+s32 func_86C002C4(void);
+
+s32 func_86C000B4(s32 arg0) {
+    s32 var_s0 = arg0;
+
+    switch (arg0) {
+        case 0:
+            if (StageContext_GetFadeMode() == 0) {
+                var_s0 = 1;
+            }
+            break;
+        case 1:
+            if (func_86C002C4() != 0) {
+                var_s0 = 2;
+                StageFade_StartFromTransparent(5);
+            }
+            break;
+        case 2:
+            if (StageContext_GetFadeMode() == 1) {
+                var_s0 = 3;
+            }
+            break;
+    }
+    return var_s0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/62/fragment62_code/func_86C00148.s")
 
