@@ -69,7 +69,17 @@ void func_81305A10(void *arg0, void *arg1, f32 arg2) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FD770/func_81305AD0.s")
+void Fragment14_ComputeGridCursorPosition(u8 *arg0, s16 *arg1) {
+    f32 ratio;
+    f32 x;
+    f32 y;
+
+    ratio = (f32)arg0[0x83] / (f32)arg0[0x85];
+    x = (f32)*(s16 *)(arg0 + 0xC) + ((f32)*(s16 *)(arg0 + 8) - (f32)*(s16 *)(arg0 + 0xC)) * ratio;
+    y = (f32)*(s16 *)(arg0 + 0xE) + ((f32)*(s16 *)(arg0 + 0xA) - (f32)*(s16 *)(arg0 + 0xE)) * ratio;
+    arg1[0] = (s16)(172.0f * x + 38.0f);
+    arg1[1] = (s16)(28.0f * y + 18.0f);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FD770/func_81305BA8.s")
 
@@ -225,7 +235,30 @@ void func_813062C0(void *arg0)
   }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FD770/func_813063CC.s")
+void Fragment14_ScrollGridForward(u8 *arg0) {
+    s32 limit;
+    s32 delta;
+    s32 distance;
+
+    limit = arg0[0x84] - 4;
+    if (*(s16 *)(arg0 + 0x7C) < limit) {
+        arg0[0x8A] = *(s16 *)(arg0 + 0x7C);
+        *(s16 *)(arg0 + 0x7C) += 4;
+        if (*(s16 *)(arg0 + 0x7C) > limit) {
+            *(s16 *)(arg0 + 0x7C) = limit;
+        }
+        arg0[0x87] = 3;
+        delta = *(s16 *)(arg0 + 0x7C) - arg0[0x8A];
+        arg0[0x82] = 0;
+        if (delta > 0) {
+            distance = delta;
+        } else {
+            distance = -delta;
+        }
+        arg0[0x86] = (u32)((f32)distance * D_81311F70);
+        func_800226C0(1);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FD770/func_813064E8.s")
 
@@ -322,7 +355,28 @@ s16 func_81306B0C(void *arg0) {
     return -1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FD770/func_81306B64.s")
+extern void func_81601A38(s32 *, s32);
+extern void func_81602134(void *, void *);
+void Fragment14_ResetGrid(u8 *arg0, s32 arg1, s32 arg2, s32 arg3, void *arg4) {
+    func_81601A38((s32 *)(arg0 + 0x54), 0);
+    if (arg4 != 0) {
+        func_81602134(arg0 + 0x10, arg4);
+    }
+    *(s16 *)(arg0 + 8) = 0;
+    *(s16 *)(arg0 + 0xA) = 0;
+    *(s32 *)arg0 = 0;
+    *(s16 *)(arg0 + 0x7C) = 0;
+    *(struct Fragment14PackedWord *)(arg0 + 0xC) = *(struct Fragment14PackedWord *)(arg0 + 8);
+    *(s16 *)(arg0 + 4) = arg1;
+    *(s16 *)(arg0 + 6) = arg2;
+    arg0[0x87] = 0;
+    arg0[0x85] = 4;
+    arg0[0x84] = 4;
+    *(f32 *)(arg0 + 0x78) = 0.0f;
+    *(f32 *)(arg0 + 0x74) = 0.5f;
+    arg0[0x89] = arg3;
+    *(s16 *)(arg0 + 0x80) = 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FD770/func_81306C18.s")
 

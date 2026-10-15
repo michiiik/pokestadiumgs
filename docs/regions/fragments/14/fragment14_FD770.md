@@ -91,8 +91,9 @@ a demonstrated physical-register allocation bug. The generic diagnostic's
 
 Reverse the two real float declarations to put the whole output at stack+0x20,
 not +0x24. Negate the fractional remainder before multiplying by 28. Additional
-explicit float temporaries would grow the frame; compound assignments worsen
-register choices. Swapping just the multiply operands is normalized back to
+explicit float temporaries were previously expected to grow the frame; the
+distinct-carrier follow-up below corrects that assumption. Compound assignments
+worsen register choices. Swapping just the multiply operands is normalized back to
 the same result by this pipeline and does not fix the emitted word.
 
 A calibrated 45-second native permuter, four compiler workers and stack
@@ -105,3 +106,84 @@ the frame, force a register or treat this bounded negative as impossibility.
 The remaining four-table owners are now layout-ready. In particular the
 float getter and the later state/input switch can be investigated against the
 real object layout; do not requeue already-accepted C owners.
+
+## 2026-10-15 follow-up — cursor position, reset and page-forward accepted
+
+The file advances from **20 C / 11 ASM** to **23 C / 8 ASM**. Three normal
+native-runner accepts cover **170 instruction words / 680 ROM bytes** under
+stock IDO 7.1 / `-O2`. All three have `link_verified: true` and successful
+combined full-ROM gates, with statistics and host checks enabled.
+
+| Owner | Name | Words / bytes | Frame | Accepted batch |
+| --- | --- | ---: | ---: | --- |
+| `func_81305AD0` | `Fragment14_ComputeGridCursorPosition` | 54 / 216 | none | `342f8d0cb7d0454e99c531dcd65ad666` |
+| `func_813063CC` | `Fragment14_ScrollGridForward` | 71 / 284 | 0x18 | `a9a91b14e8cc4fbfa711d37b96c308de` |
+| `func_81306B64` | `Fragment14_ResetGrid` | 45 / 180 | 0x20 | `38e13db27e4045ecb5914ad27324b79f` |
+
+### Source mechanisms and verification
+
+- Cursor position: keep ratio and the two interpolated float coordinates as
+  separate real values, then apply the 172/28 spacing and 38/18 screen origin.
+  Inlining both coordinates changes scheduling and adds an instruction.
+- Page forward: preserve the word-sized last-page limit, four-row advance,
+  signed-halfword clamp and unsigned old-page byte. Keep signed delta and
+  absolute distance separate before the original float-to-unsigned-byte
+  duration conversion. Reusing delta removes target instructions.
+- Reset: retain the actual word-sized coordinate formals and optional list
+  pointer, the existing packed four-byte selection copy, all state/timer
+  stores and original helper calls. Halfword formals change incoming loads.
+- Name with three US compatibility aliases. Correct the existing caller's
+  reset prototype to pointer/context types and explicitly cast its integer
+  address; no behavioral or ABI change. Remove duplicate externs introduced
+  by runner synthesis and format only newly accepted bodies.
+- Fresh and twenty-leading-blank builds after cleanup/naming preserve all
+  section byte views/layout against the frozen accepted object, all 31
+  function offsets/sizes/full spans, three accepted and 28 untouched spans,
+  all 23 table destinations, the leading zero word and four float cells.
+  Both caller controls preserve its entire 55-function object.
+- Forced normal ROM rebuild after cleanup/naming matches retail MD5
+  `1561c75d11cedf356a8ddb1a4a5f9d5d`. Explicit host syntax check passes;
+  public tooling tests: 22 PASS. No padding pragma, forced register,
+  speculative body or compiler modification is installed.
+- Publish only game C, US aliases and these notes. All search/proof artifacts
+  stay local. Work remains solo/native; no agents or containers.
+
+### Requeues — navigation and input
+
+`func_813064E8` (left): eight initial candidates preserve the 324-byte size
+and 0x18 frame; best normalized/raw **0.9877/0.9259**. The second branch's
+sound argument is materialized later, allowing delta to occupy a0 rather than
+the original v1. Changing flag-store order is worse. Next: examine the second
+branch's constant-argument lifetime, not repeated operand/declaration swaps.
+
+`func_8130662C` (right): eight initial candidates reach 340/340 bytes and
+normalized/raw **1.0/0.9529**, with delta in a0 instead of v1. A calibrated
+45-second-bounded, four-worker native permuter reaches score **20 -> 0**,
+but its proposal moves the saved-page declaration into the outer else and
+introduces a redundant `if (1)` around the transition update. Semantic review
+finds no changed live values, but it is not accepted source. Eight natural
+scope/block compositions without `if (1)` all retain the register residual.
+No zero-score scaffold is installed or counted as a match. Next: identify
+the frontend/optimization boundary introduced by that conditional, then seek
+a natural source topology; preserve the proposal as diagnostic evidence.
+
+`func_81306780` (button handler): 24 candidates test integer versus pointer
+address expressions, cached/typed controller pointers, word/halfword button
+values, early returns and directional-value scopes. A cached integer-derived
+controller pointer restores the target addiu, improving the best to
+normalized/raw **0.9365/0.8413**, 244 versus 252 bytes, frame 0x18. Remaining
+differences begin at the pressed-button load (v0 versus a1); the target has
+two subsequent value copies not retained by these sources. Do not invent
+extra formals or repeat the same snapshot assignments. Next: inspect the
+button-value ownership/branch topology against a solved input sibling.
+
+### Scroll distinct-carrier follow-up
+
+Eight new candidates split ratio/progress and returned fraction into genuine
+separate float locals, testing six declaration orders and two advisory
+`register` spellings. They **do not necessarily grow the frame**: the best
+retains 172 bytes and the original one-word multiply-operand residual at
+normalized/raw **1.0/0.9767**. Other orders move the whole-value slot to
+stack+0x24 or +0x1C. There are now 40 recorded candidates. This rejects the
+distinct-carrier family as tested, not all possible C spellings. Next remains
+the CFE/uopt multiply-operand ownership boundary; do not repeat these orders.

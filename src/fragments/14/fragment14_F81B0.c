@@ -124,7 +124,7 @@ void Fragment14_UpdateTitleText(void *arg0, s32 arg1) {
     }
 }
 
-extern void func_81306B64(s32, s32, s32, s32, s32 *);
+extern void Fragment14_ResetGrid(u8 *, s32, s32, s32, void *);
 extern void func_81601A38(s32 *, s32);
 extern void func_81601A78(s32 *, s32);
 extern void func_81601B00(s32 *, s32, s32);
@@ -135,7 +135,7 @@ void func_81300244(s32 arg0, s32 arg1, s32 arg2) {
     if ((arg1 < 4) && (arg1 >= 0)) {
         func_81601B00(&D_81312A40, arg1, 1);
     }
-    func_81306B64(arg0 + 0xD18, 0x9B, 0xE1, arg2, &D_81312A40);
+    Fragment14_ResetGrid((u8 *)(arg0 + 0xD18), 0x9B, 0xE1, arg2, &D_81312A40);
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_813002D0.s")
