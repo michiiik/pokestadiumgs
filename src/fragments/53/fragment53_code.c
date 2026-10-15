@@ -43,7 +43,27 @@ s32 func_8650123C(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/53/fragment53_code/func_86501D6C.s")
+extern s32 D_8650C498;
+extern s32 D_8650C4B4;
+extern f64 D_8650D678;
+extern s32 D_8650C4AC;
+extern f32 D_8650C4B8;
+extern s32 D_8650C4CC;
+extern s32 D_8650C4D4;
+extern s32 D_8650D9D4;
+void Fragment53_CountTrajectorySamplesInRange(void) {
+    s32 i;
+    f32 position;
+
+    D_8650C4D4 = 0;
+    D_8650C4B4 = D_8650C498 - D_8650C4CC - 10;
+    for (i = 0; i < 100; i++) {
+        position = (f32)((f64)D_8650C4AC - D_8650D678 * (f64)D_8650C4B8 * (f64)D_8650C4B8 * (f64)(D_8650D9D4 + i + 2) * (f64)(D_8650D9D4 + i + 2));
+        if (!(position < (f32)D_8650C4B4) && !((f32)D_8650C498 < position)) {
+            D_8650C4D4++;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -54,7 +74,30 @@ void func_86501F98(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/53/fragment53_code/func_86501FA0.s")
+extern s32 StageContext_GetFadeMode(void);
+extern s32 StageFade_StartFromOpaque(s32);
+extern void func_87F00688(void);
+extern s32 D_8650C5EC;
+extern f32 D_8650C4D8;
+extern s32 D_8650C4DC;
+extern s32 D_8650C620;
+extern f64 D_8650D698;
+extern void func_86501EA0(void);
+void Fragment53_UpdateTrajectoryPosition(void) {
+    if (D_8650C5EC == 10) {
+        D_8650C4DC++;
+        if (D_8650C4DC >= D_8650C4D4 - 2) {
+            D_8650C4DC = 2;
+        }
+        if (D_8650C4DC < 2) {
+            D_8650C4DC = 2;
+        }
+    } else {
+        func_86501EA0();
+    }
+    D_8650C4D8 = (f32)(92.0 - ((f64)D_8650C4AC - D_8650D698 * (f64)D_8650C4B8 * (f64)D_8650C4B8 * (f64)(D_8650D9D4 + D_8650C4DC + 2) * (f64)(D_8650D9D4 + D_8650C4DC + 2)));
+    D_8650C620 = (s32)(D_8650C4D8 / (f32)D_8650C4CC * 2000.0f + -1000.0f);
+}
 #endif
 
 #ifdef VERSION_US
@@ -118,7 +161,22 @@ void func_86502620(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/53/fragment53_code/func_865038A8.s")
+struct Fragment53ActorState {
+    u8 prefix[0xC]; s32 animation; s32 pending;
+    u8 middle[0x74]; s32 kind; u8 tail[0xC];
+};
+struct Fragment53Model { u8 opaque[0x168]; };
+extern struct Fragment53ActorState D_86511698[];
+extern struct Fragment53Model D_8650E120[];
+extern void func_8003F210(void *, s32);
+extern void ModelAnim_SetFrame(u8 *, s16);
+void Fragment53_ApplyPendingPrimaryAnimation(s32 arg0) {
+    if (D_86511698[arg0].pending == 1) {
+        func_8003F210((u8 *)&D_8650E120[arg0], D_86511698[arg0].animation);
+        ModelAnim_SetFrame((u8 *)&D_8650E120[arg0], 0);
+        D_86511698[arg0].pending = 0;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -134,7 +192,38 @@ void func_86502620(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/53/fragment53_code/func_8650455C.s")
+extern s32 D_8650C494;
+extern s32 D_8650C5E8;
+extern s32 D_8650C49C[];
+extern f32 D_8650DBA8[];
+extern f32 D_8650F7C8[];
+extern void func_865040E4(s32);
+void Fragment53_UpdateActorModelHeights(s32 arg0, void *arg1) {
+    s32 index;
+    s32 height;
+    s32 offset;
+
+    index = *(s32 *)((u8 *)arg1 + 0x14);
+    if (arg0 == 0) { return; }
+    if (arg0 == 2) {
+        if (D_8650C5EC == 1) {
+            if (D_8650C494 == 0) {
+                *(s32 *)((u8 *)&D_86511698[index] + 0x58) += 1;
+                if (*(s32 *)((u8 *)&D_86511698[index] + 0x58) >= 24) { *(s32 *)((u8 *)&D_86511698[index] + 0x58) = 0; }
+                func_865040E4(index);
+            }
+            offset = index * 0x168;
+            if (D_8650C5E8 == -2) {
+                height = D_8650C49C[index];
+                *(f32 *)((u8 *)D_8650DBA8 + offset) = (f32)(height - 5);
+                *(f32 *)((u8 *)D_8650F7C8 + offset) = (f32)(height + 60);
+            } else {
+                *(f32 *)((u8 *)D_8650DBA8 + offset) = (f32)D_8650C49C[index];
+                *(f32 *)((u8 *)D_8650F7C8 + offset) = (f32)D_8650C49C[index];
+            }
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -252,22 +341,181 @@ void func_86508294(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/53/fragment53_code/func_865082C8.s")
+extern Gfx *D_800D0510;
+extern void *D_8650DB1C;
+extern void *D_8650DB20;
+extern u8 D_8650DA70[];
+extern u8 D_8650DA60[];
+extern s32 D_8650C62C;
+extern s32 D_8650DAD8;
+extern s32 D_8650C5E0;
+extern void *D_8650DB10;
+extern void func_800088DC(void);
+extern void func_8000766C(Gfx **, s32, s32, s32, s32);
+extern void func_800468A0(void *);
+extern void GeoRender_AdvanceFrameCounter(void);
+extern void func_8003C6B8(void *);
+extern void func_87F07FE8(void *);
+extern void func_86507AFC(void);
+extern void func_87F022F0(void);
+extern void func_865064B0(void);
+extern void func_87F0A5BC(void *);
+extern void func_87F0C88C(void *);
+extern void func_80008648(void);
+void Fragment53_DrawSceneFrame(void) {
+    func_800088DC();
+    func_8000766C(&D_800D0510, 0, 0, 320, 240);
+    func_800468A0(D_8650DB1C);
+    if (D_8650C494 == 0) {
+        GeoRender_AdvanceFrameCounter();
+    }
+    func_8003C6B8(D_8650DB20);
+    switch (*(s32 *)((u8 *)&D_8650C5E0 + 0xC)) {
+        case 2:
+        case 12:
+            if (*(s32 *)((u8 *)&D_8650C5E0 + 0x4C) == 1) {
+                func_87F07FE8(&D_8650DAD8);
+            } else {
+                func_86507AFC();
+            }
+            if (D_8650C62C == 2) {
+                func_86507AFC();
+                func_87F022F0();
+            }
+            if (D_8650C62C == 3) {
+                func_86507AFC();
+                func_86508294();
+            }
+            break;
+        case 0:
+        case 4:
+        case 5:
+            if (*(u8 *)((u8 *)D_8650DB10 + 0x2180) != 4) {
+                func_87F07FE8(&D_8650DAD8);
+            }
+            break;
+        case 10:
+            func_865064B0(); /* fall through */
+        case 1:
+        case 6:
+            func_86507AFC();
+            func_86508294();
+            break;
+        case 9:
+            func_86507AFC();
+            func_87F0A5BC(D_8650DA70);
+            break;
+        case 8:
+            func_86507AFC();
+            func_87F022F0();
+            break;
+    }
+    if (*(u8 *)((u8 *)D_8650DB10 + 0x2180) == 4) {
+        func_87F0C88C(D_8650DA60);
+    }
+    func_80008648();
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/53/fragment53_code/func_86508484.s")
+extern struct Fragment53Model D_8650E6C0[];
+extern s32 D_8650DB28[];
+extern u8 D_8650E6E4[];
+extern u8 D_8650EC60[];
+extern u8 D_8650DB80[];
+extern u8 D_8650F7A0[];
+extern u8 D_865118F8[];
+extern void func_8003F114(void *, s32, s32, s32);
+extern void ModelAnim_SetEventFrame(u8 *, s16);
+extern void func_8003F3BC(void *, s32);
+extern void func_87F06430(void *, s32);
+extern void func_8003F1DC(void *);
+extern s32 ModelAnim_SetSpeed(u8 *, s32);
+extern void func_819006A0(void *);
+extern void func_86502958(void);
+void Fragment53_InitActorModels(void) {
+    s32 index;
+
+    for (index = 0; index < 4; index++) {
+        func_8003F114((u8 *)&D_8650E6C0[index], 0, -1, D_8650DB28[index]);
+        func_8003F210((u8 *)&D_8650E6C0[index], 0);
+        ModelAnim_SetSpeed((u8 *)&D_8650E6C0[index], 0x20000);
+        ModelAnim_SetFrame((u8 *)&D_8650E6C0[index], (s16)(guRandom() % 15 + 15));
+        ModelAnim_SetEventFrame((u8 *)&D_8650E6C0[index], 0);
+        func_8003F3BC((u8 *)&D_8650E6C0[index], 0);
+        func_87F06430(D_8650E6E4 + index * 0x168, index);
+        *(f32 *)((u8 *)&D_8650E6C0[index] + 0x38) = 0.095f;
+        *(f32 *)((u8 *)&D_8650E6C0[index] + 0x34) = 0.095f;
+        *(f32 *)((u8 *)&D_8650E6C0[index] + 0x30) = 0.095f;
+        *(f32 *)((u8 *)&D_8650E6C0[index] + 0x28) = 55.0f;
+        *(s16 *)((u8 *)&D_8650E6C0[index] + 0x1E) = 0;
+        D_86511698[index].animation = 0;
+        D_86511698[index].pending = 0;
+        func_8003F1DC(D_8650EC60 + index * 0x168);
+        func_8003F1DC((u8 *)&D_8650E120[index]);
+        *(s16 *)((u8 *)&D_8650E6C0[index] + 0x20) = 0;
+        func_8003F1DC(D_8650DB80 + index * 0x168);
+        func_8003F1DC(D_8650F7A0 + index * 0x168);
+    }
+    func_819006A0(*(void **)D_865118F8);
+    func_86502958();
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/53/fragment53_code/func_8650863C.s")
+extern s32 ModelAnim_IsFinished(void *);
+extern void func_80027A28(u16, u8);
+void Fragment53_UpdateTimedSecondaryAnimation(s32 arg0) {
+    s32 index;
+    u8 *model;
+
+    index = arg0;
+    switch (D_86511698[index].animation) {
+    case 0:
+        model = (u8 *)&D_8650E6C0[index];
+        if ((*(s32 *)(model + 0x48) >> 16) >= 6) {
+            func_8003F210(model, 2);
+            ModelAnim_SetFrame(model, 0);
+            ModelAnim_SetSpeed(model, 0x30000);
+            D_86511698[index].animation = 2;
+        }
+        break;
+    case 2:
+        model = (u8 *)&D_8650E6C0[index];
+        if (ModelAnim_IsFinished(model) == 1) {
+            func_80027A28(0x1F04, (u8)index);
+            func_8003F210(model, 1);
+            ModelAnim_SetSpeed(model, 0x20000);
+            D_86511698[index].animation = 1;
+        }
+        break;
+    }
+}
 #endif
 
 void func_86508778(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/53/fragment53_code/func_86508780.s")
+void Fragment53_UpdateSecondaryAnimation(s32 arg0) {
+    s32 index;
+
+    index = arg0;
+    switch (D_86511698[index].animation) {
+    case 0:
+        func_8003F210((u8 *)&D_8650E6C0[index], 2);
+        ModelAnim_SetSpeed((u8 *)&D_8650E6C0[index], 0x30000);
+        D_86511698[index].animation = 2;
+        D_86511698[index].pending = 1;
+        break;
+    case 2:
+        if (ModelAnim_IsFinished((u8 *)&D_8650E6C0[index]) == 1) {
+            func_8003F210((u8 *)&D_8650E6C0[index], 1);
+            D_86511698[index].pending = 0;
+        }
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -410,9 +658,120 @@ void func_86509D8C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/53/fragment53_code/func_8650A278.s")
+extern void func_800086A4(s32);
+extern void func_80064D28(void);
+extern void func_8650A074(void);
+extern void Fragment53_DrawSceneFrame(void);
+extern s32 func_86509E54(s32);
+void Fragment53_RunSceneTransition(void) {
+    u8 *model;
+    struct Fragment53ActorState *state;
+    u8 *secondary;
+    s32 *resource;
+    s32 result;
+
+    func_800086A4(2);
+    if (*(u8 *)((u8 *)D_8650DB10 + 0x2180) == 4) {
+        secondary = (u8 *)D_8650E6C0; model = (u8 *)D_8650E120;
+        resource = D_8650DB28; state = D_86511698; do {
+            func_8003F1DC(secondary);
+            func_8003F114(model, 0, -1, *resource);
+            ModelAnim_SetEventFrame(model, 0);
+            func_8003F3BC(model, 0);
+            func_8003F210(model, 0);
+            ModelAnim_SetFrame(model, (s16)(guRandom() % 15 + 15));
+            state++;
+            secondary += 0x168;
+            model += 0x168;
+            resource++;
+            state[-1].animation = 0;
+        } while ((struct Fragment53ActorState *)D_865118F8 != state);
+    }
+    StageFade_StartFromOpaque(10);
+    do {
+        func_8650A074();
+        func_80064D28();
+        Fragment53_DrawSceneFrame();
+        result = func_86509E54(*(s32 *)((u8 *)&D_8650C5E0 + 0xC));
+        *(s32 *)((u8 *)&D_8650C5E0 + 0xC) = result;
+    } while (*(s32 *)((u8 *)&D_8650C5E0 + 0xC) != 3);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/53/fragment53_code/func_8650A3E4.s")
+extern f32 D_8650D99C;
+extern s32 D_8650DB18;
+extern u32 D_8650DAE0;
+extern u32 D_8650DA90;
+extern s32 D_8650C638;
+extern u8 D_1000000[];
+extern u8 D_446E30[];
+extern u8 D_447D00[];
+extern s32 func_80001FF0(void);
+extern void func_80027EE0(s32);
+extern void main_pool_push_state(s32);
+extern void Gfx_InitDisplayListBuffers(s32, s32);
+extern s32 func_800082E0(s32, s32, s32, s32, s32, s32);
+extern void func_8004C09C(s32);
+extern void func_87F06EAC(s32, void *, void *);
+extern s32 func_8004DDF4(s32);
+extern void func_8004C8C0(s32);
+extern s32 func_8004DEF8(s32);
+extern s32 func_8004D690(s32);
+extern void func_80047588(u32, s32);
+extern u8 *Asset_LoadToSegment(s32, u8 *, u8 *, s32);
+extern void func_87F00030(void);
+extern void func_87F01F34(void *);
+extern void func_86505EA8(void);
+extern void func_80008514(s32);
+extern void func_80008574(void);
+extern void func_80047610(void);
+extern void func_8004C398(void);
+extern void Gfx_FreeDisplayListBuffers(void);
+extern void main_pool_pop_state(s32);
+extern void func_87F0F480(void *);
+s32 Fragment53_RunScene(s32 arg0, void *context) {
+    s32 handle;
+
+    if (func_80001FF0() == 60) {
+        D_8650C508 = 1.0f;
+    } else {
+        D_8650C508 = D_8650D99C;
+    }
+    D_8650DB10 = context;
+    if (*(u8 *)((u8 *)D_8650DB10 + 0x2180) == 4) {
+        func_80027EE0(0xFFF);
+    }
+    main_pool_push_state(0x4D523031);
+    Gfx_InitDisplayListBuffers(0x20000, 0);
+    handle = func_800082E0(0, 1, 3, 1, 2, 1);
+    func_8004C09C(0x127);
+    func_87F06EAC(0x6B, &D_8650DAD8, D_8650DB10);
+    func_8004DDF4(0x51);
+    func_8004DDF4(0x6F);
+    func_8004DDF4(0x70);
+    func_8004DDF4(0x3B);
+    func_8004C8C0(0x1B2);
+    func_8004C8C0(0x1AD);
+    func_8004C8C0(0x18D);
+    func_8004C8C0(0x18F);
+    func_8004C8C0(0x18E);
+    D_8650DB18 = func_8004DEF8(0x3B);
+    D_8650DB1C = (void *)func_8004D690(15);
+    func_80047588(D_8650DAE0 | 5 | D_8650DA90, 0);
+    Asset_LoadToSegment(((u32)D_1000000 & 0x0F000000) >> 24, D_446E30, D_447D00, 0);
+    func_87F00030();
+    func_87F01F34(D_8650DB10);
+    func_86505EA8();
+    func_80008514(handle);
+    Fragment53_RunSceneTransition();
+    func_80008574();
+    func_80047610();
+    func_8004C398();
+    Gfx_FreeDisplayListBuffers();
+    main_pool_pop_state(0x4D523031);
+    func_87F0F480(D_8650DB10);
+    func_80027EE0(0xFFE);
+    return D_8650C638;
+}
 #endif

@@ -595,6 +595,8 @@
     - [0xEE5B0, c,       fragments/13/fragment13_EE5B0]
     - [0xEEC50, c,       fragments/13/fragment13_EEC50]
     - [0xF53D0, data,    fragments/13/fragment13_data]
+    - [0xF6F80, .rodata, fragments/13/fragment13_EEC50] # Both jump tables and their surrounding constants
+    - [0xF7120, rodata]
   
   - name: fragment14
     type: code
@@ -1191,6 +1193,8 @@
     - [0x2894B0, textbin, fragments/53/fragment53_header]
     - [0x2894D0, c,       fragments/53/fragment53_code]
     - [0x293A90, data,    fragments/53/fragment53_data]
+    - [0x296D30, .rodata, fragments/53/fragment53_code]
+    - [0x296D70, rodata]
 
   - name: fragment54
     type: code

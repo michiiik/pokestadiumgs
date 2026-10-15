@@ -90,12 +90,12 @@ extern u8 D_824090A0[];
 extern void *D_8240AA68;
 extern void BgStage_DrawFrame(void);
 extern void GeoRender_AdvanceFrameCounter(void);
-extern void func_82406E14(void *, void *);
+extern void Fragment13_DrawGroupScene(void *, void *);
 extern void func_80008648(void);
 void func_82400880(void) {
     BgStage_DrawFrame();
     GeoRender_AdvanceFrameCounter();
-    func_82406E14(D_824090A0, D_8240AA68);
+    Fragment13_DrawGroupScene(D_824090A0, D_8240AA68);
     func_80008648();
 }
 
