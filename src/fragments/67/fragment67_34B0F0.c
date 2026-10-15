@@ -41,11 +41,11 @@ void func_8290F36C(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_800088DC(void);
+extern void BgStage_DrawFrame(void);
 extern void func_8290F42C(void);
 extern void func_80008648(void);
 void func_8290FA00(void) {
-    func_800088DC();
+    BgStage_DrawFrame();
     func_8290F42C();
     func_80008648();
 }

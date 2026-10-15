@@ -58,7 +58,7 @@ extern u8 D_8330A288[];
 extern s32 D_8330A2C4;
 extern s32 D_8330A2EC;
 extern s32 D_8330A4C8;
-extern void func_800088DC(void);
+extern void BgStage_DrawFrame(void);
 extern void GfxImage_FillCurrent(void *, u16);
 extern void GeoRender_AdvanceFrameCounter(void);
 extern void func_8003C6B8(s32);
@@ -69,7 +69,7 @@ extern void func_83303220(void);
 extern void func_81A0022C(void *);
 extern void func_80008648(void);
 void func_83303564(void) {
-    func_800088DC();
+    BgStage_DrawFrame();
     GfxImage_FillCurrent(&D_800D0510, 1);
     if (D_8330A2EC == 1) {
         func_83303220();

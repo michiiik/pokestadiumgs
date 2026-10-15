@@ -568,7 +568,7 @@ s32 func_8220336C(s32 arg0, s32 arg1) { gDPPipeSync(D_800D0510++); gDPSetEnvColo
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_10FFC0/func_822037E4.s")
 
 extern void *StageContext_GetCurrentImage(void);
-extern void func_800088DC(void);
+extern void BgStage_DrawFrame(void);
 extern void func_81600F0C(s32, s16, s16, s16, s32);
 extern void func_80006F70(Gfx **, s32, s32, s16, s32);
 extern void func_800503A4(u8 *);
@@ -587,7 +587,7 @@ void func_822039C8(void) {
     u8 *image;
 
     image = StageContext_GetCurrentImage();
-    func_800088DC();
+    BgStage_DrawFrame();
     func_81600F0C(((s32 *)D_8220E360)[1], *(s16 *)D_8220E4C8, D_8220E4CA, D_8220E4CC, D_8220E4CE);
     func_80006F70(&D_800D0510, 0, 0, *(s16 *)(image + 4), *(u16 *)(image + 6));
     func_800503A4(D_8220E364);

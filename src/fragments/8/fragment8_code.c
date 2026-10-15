@@ -237,12 +237,12 @@ s32 func_82F01C34(s32 arg0) {
 }
 
 extern void func_80008648();
-extern void func_800088DC();
+extern void BgStage_DrawFrame();
 extern void func_818017A8();
 extern void func_81805308(s32 *);
 
 void func_82F01D38(s32 arg0) {
-    func_800088DC();
+    BgStage_DrawFrame();
     func_818017A8();
     func_81805308(&D_82F032C0);
     func_80008648();

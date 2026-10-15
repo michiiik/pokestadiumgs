@@ -1322,7 +1322,7 @@ void func_86107EBC(s32 arg0, s32 arg1, s32 arg2, char arg3, u8 arg4, u8 arg5, u8
 
 extern Gfx *D_800D0510;
 extern s32 D_8610AD20;
-extern void func_800088DC(void);
+extern void BgStage_DrawFrame(void);
 extern void GfxImage_FillCurrent(void *, u16);
 extern void func_8000766C(void *, s32, s32, s32, s32);
 extern s32 func_87F00930(void);
@@ -1337,7 +1337,7 @@ extern void func_87F0C88C(u8 *);
 extern void func_80008648(void);
 void func_861086AC(void) {
     s32 flags;
-    func_800088DC();
+    BgStage_DrawFrame();
     GfxImage_FillCurrent(&D_800D0510, 1);
     func_8000766C(&D_800D0510, 0, 0, 0x140, 0xF0);
     if (func_87F00930() == 0) {

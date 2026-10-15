@@ -226,7 +226,7 @@ void func_82901A6C(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_800088DC(void);
+extern void BgStage_DrawFrame(void);
 extern void GfxImage_FillCurrent(void *, u16);
 extern void func_80007444(void *, s32, s32, s32, s32, s32);
 extern s32 func_800061EC(void);
@@ -239,7 +239,7 @@ extern Gfx *D_800D0510;
 extern u8 D_82918868[];
 extern s16 D_829188B0[];
 void func_82901BA8(void) {
-    func_800088DC();
+    BgStage_DrawFrame();
     if (D_82918868[0x31] == 3 || D_82918868[0x32] == 0 || D_82918868[0x32] == 6) {
         GfxImage_FillCurrent(&D_800D0510, 1);
     } else {

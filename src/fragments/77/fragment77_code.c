@@ -95,7 +95,7 @@ extern char D_8F803478[][12], D_8F803848[][12];
 extern char D_8F803954[], D_8F803964[], D_8F80396C[], D_8F803974[], D_8F80397C[];
 extern u16 D_8F809FE6;
 extern u8 D_8F809FE4, D_8F809FE8, D_8F809FE9, D_8F809FEA;
-extern void func_800088DC(void);
+extern void BgStage_DrawFrame(void);
 extern void GfxImage_FillCurrent(Gfx**, u32);
 extern void func_800495F8(s32, s32, s32, const char*, ...);
 extern void func_800495BC(s32, s32, const char*, ...);
@@ -105,7 +105,7 @@ extern void func_8F8000D0(void*, s32);
 void func_8F8010E4(void) {
     s32 index;
 
-    func_800088DC();
+    BgStage_DrawFrame();
     GfxImage_FillCurrent(&D_800D0510, 0x89);
     func_800498C4();
     func_800496A4(16, 0);

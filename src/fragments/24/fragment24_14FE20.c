@@ -8,11 +8,11 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_14FE20/func_82B002B8.s")
 
-extern void func_800088DC();
+extern void BgStage_DrawFrame();
 extern void func_82B080D0();
 extern void func_80008648();
 void func_82B004FC(s32 arg0) {
-    func_800088DC();
+    BgStage_DrawFrame();
     func_82B080D0();
     func_80008648();
 }

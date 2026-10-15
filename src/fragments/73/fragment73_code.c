@@ -67,7 +67,7 @@ extern s32 D_8F5009BC;
 extern s32 ModelAnim_IsFinished(void*);
 extern void func_8003F2C4(void*, void*, s32);
 extern s32 func_80043678(void*);
-extern void func_800088DC(void);
+extern void BgStage_DrawFrame(void);
 extern void func_800468A0(s32);
 extern void func_8F5002F4(void);
 extern Gfx* D_800D0510;
@@ -94,7 +94,7 @@ void func_8F500414(void) {
         func_8003F2C4(D_8F5009B4, node, *animation);
     }
     D_8F5009BC = func_80043678(D_8F5009B8);
-    func_800088DC();
+    BgStage_DrawFrame();
     func_800468A0(D_8F5009A0);
     func_8F5002F4();
     func_8F500130();

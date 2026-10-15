@@ -366,10 +366,10 @@ void func_829115E0(void) {
     func_82911418();
 }
 
-extern void func_800088DC(void);
+extern void BgStage_DrawFrame(void);
 extern void func_80008648(void);
 void func_82911850(void) {
-    func_800088DC();
+    BgStage_DrawFrame();
     func_829115E0();
     func_80008648();
 }

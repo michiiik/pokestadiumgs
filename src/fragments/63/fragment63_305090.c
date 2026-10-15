@@ -123,10 +123,10 @@ void func_87E02438(void) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_305090/func_87E02538.s")
 
 extern void func_87E02538(void);
-extern void func_800088DC(void);
+extern void BgStage_DrawFrame(void);
 void func_87E0276C(void) {
     func_87E02538();
-    func_800088DC();
+    BgStage_DrawFrame();
 }
 
 extern void func_87E02438();

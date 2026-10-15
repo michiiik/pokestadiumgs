@@ -4,25 +4,38 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80007870.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80007A84.s")
-
 extern s32 D_800D0554;
-s32 func_80007A84();
-s32 StageFade_StartFromOpaque(void) {
+s32 StageFade_Start(s32 duration) {
     s32 result = 0;
-    if ((D_800D0554 != 0) && (*(u8 *)((u8 *)(u32)D_800D0554 + 0x11) == 1)) {
-        result = func_80007A84();
+    s32 one = 1;
+    u8 *fade = (u8 *)(u32)D_800D0554;
+    s32 mode;
+    if (fade != 0) {
+        mode = fade[0x11];
+        if (one == mode || mode == 0) {
+            if (one == mode) { fade[0x11] = 2; } else { fade[0x11] = 3; }
+            ((u8 *)(u32)D_800D0554)[0x13] = 0;
+            ((u8 *)(u32)D_800D0554)[0x12] = duration;
+            result = 1;
+        }
     }
     return result;
 }
 
-s32 func_80007A84();
-s32 StageFade_StartFromTransparent(void) {
+s32 StageFade_StartFromOpaque(s32 duration) {
+    s32 result = 0;
+    if ((D_800D0554 != 0) && (*(u8 *)((u8 *)(u32)D_800D0554 + 0x11) == 1)) {
+        result = StageFade_Start(duration);
+    }
+    return result;
+}
+
+s32 StageFade_StartFromTransparent(s32 duration) {
     s32 var_v1;
 
     var_v1 = 0;
     if ((D_800D0554 != 0) && ((*(u8 *)((u8 *)(D_800D0554) + (0x11))) == 0)) {
-        var_v1 = func_80007A84();
+        var_v1 = StageFade_Start(duration);
     }
     return var_v1;
 }
@@ -183,9 +196,43 @@ s32 func_80008648(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_800086A4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80008734.s")
+extern void func_80007328(Gfx **, s32);
+s32 BgStage_RunUntilCondition(u32 frames, s32 (*callback)(s32)) {
+    s32 result = 0;
+    if (frames == 0) {
+        do {
+            result = callback(((u8 *)(u32)D_800D0554)[0x11]);
+            func_80008648();
+        } while (result == 0);
+    } else {
+        while (frames-- > 0) {
+            result = callback(((u8 *)(u32)D_800D0554)[0x11]);
+            func_80008648();
+            if (result != 0) break;
+        }
+    }
+    return result;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_800087E8.s")
+s32 BgStage_WaitForCondition(s32 (*callback)(s32), s32 opaqueFrames, s32 transparentFrames) {
+    s32 result = 0;
+    s32 active = 1;
+    s32 value;
+    StageFade_StartFromOpaque(opaqueFrames);
+    while (active) {
+        value = callback(((u8 *)(u32)D_800D0554)[0x11]);
+        if (result == 0) {
+            if (value != 0) {
+                result = value;
+                StageFade_StartFromTransparent(transparentFrames);
+            }
+        } else {
+            if (((u8 *)(u32)D_800D0554)[0x11] == 1) active = 0;
+        }
+        func_80008648();
+    }
+    return result;
+}
 
 extern s32 D_800D0554;
 extern void Display_ClearFramebufferLine(u16);
@@ -196,7 +243,13 @@ void StageContext_SetClearColor(u16 arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_800088DC.s")
+void BgStage_DrawFrame(void) {
+    u8 *context = (u8 *)(u32)D_800D0554;
+    if (context != 0) {
+        func_80007328(&D_800D0510, ((s32 *)(context + 0x18))[*(s8 *)(context + 0x16)]);
+        gDPSetCycleType(D_800D0510++, G_CYC_1CYCLE);
+    }
+}
 
 typedef struct {
     u8 pad16[0x16];

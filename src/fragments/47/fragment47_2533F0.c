@@ -20,13 +20,13 @@ void func_8600CDD0(s32 arg0) {
     func_8600520C(D_8600E110);
 }
 
-extern void func_800088DC(void);
+extern void BgStage_DrawFrame(void);
 extern void func_8000766C(void *, s32, s32, s32, s32);
 extern void func_86006F20(void *);
 extern void func_80008648(void);
 extern u8 D_800D0510[];
 void func_8600CE2C(s32 arg0) {
-    func_800088DC();
+    BgStage_DrawFrame();
     func_8000766C(D_800D0510, 0, 0, 0x140, 0xF0);
     func_86006F20(D_8600E110);
     func_80008648();

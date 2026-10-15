@@ -345,14 +345,14 @@ s32 func_87E078DC(s32 arg0) {
     return sp20;
 }
 
-extern void func_800088DC();
+extern void BgStage_DrawFrame();
 extern void func_87E0664C();
 extern void func_87E06808(s32);
 
 void func_87E079FC(s32 arg0) {
     func_87E0664C();
     func_87E06808(arg0);
-    func_800088DC();
+    BgStage_DrawFrame();
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E07A2C.s")

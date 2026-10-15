@@ -250,7 +250,7 @@ void func_82C01FE4(void) {
 
 #ifdef VERSION_US
 extern void func_80008648(void);
-extern void func_800088DC();
+extern void BgStage_DrawFrame();
 extern void func_82C00C78();
 extern void func_82C00F20();
 extern void func_82C019B4();
@@ -260,7 +260,7 @@ extern void func_82C01E98();
 extern void func_82C01FE4();
 extern void func_82C02078();
 void func_82C02328(void) {
-    func_800088DC();
+    BgStage_DrawFrame();
     func_82C00C78();
     func_82C00F20();
     func_82C019B4();

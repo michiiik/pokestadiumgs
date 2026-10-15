@@ -113,11 +113,11 @@ void func_8F60028C(void) {
     func_800499EC();
 }
 
-extern void func_800088DC(void);
+extern void BgStage_DrawFrame(void);
 extern void GfxImage_FillCurrent(void *, s32);
 extern void func_80008648(void);
 void func_8F6004D4(void) {
-    func_800088DC();
+    BgStage_DrawFrame();
     GfxImage_FillCurrent(&D_800D0510, 0x5295);
     func_8F6001FC();
     func_8F60028C();

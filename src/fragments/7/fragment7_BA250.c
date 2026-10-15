@@ -1197,7 +1197,7 @@ s32 Fragment_LoadAndCall(s32, void *, void *, s32, void *);
 extern s32 Fragment_LoadAndCall(s32, void *, void *, s32, void *);
 extern void StageLoader_WaitForRetrace();
 extern void func_80008648();
-extern void func_800088DC();
+extern void BgStage_DrawFrame();
 extern void func_818017A8();
 extern void func_81805308(s32 *);
 extern void func_83009BD0(void *, s32);
@@ -1205,7 +1205,7 @@ extern void main_pool_pop_state(s32);
 extern u8 D_8300FD00;
 extern u8 D_8304FBCC;
 void func_8300A208(void) {
-    extern void func_800088DC();
+    extern void BgStage_DrawFrame();
     extern void func_818017A8();
     extern void func_81805308(s32 *);
     extern void func_80008648();
@@ -1217,7 +1217,7 @@ void func_8300A208(void) {
     extern u8 D_8304FBCC;
     struct State { u8 pad[0xFEC8]; s32 argument; u8 gap[0x64]; s32 clear; };
     struct State *p;
-    func_800088DC();
+    BgStage_DrawFrame();
     func_818017A8();
     func_81805308((s32 *)&D_8300FD00);
     func_80008648();
@@ -1239,7 +1239,7 @@ void func_8300A208(void) {
 
 #ifdef VERSION_US
 extern void func_80008648();
-extern void func_800088DC();
+extern void BgStage_DrawFrame();
 extern void func_818017A8();
 extern void func_81805308(s32 *);
 extern void func_8300A208();
@@ -1247,7 +1247,7 @@ extern u8 D_8300FD00;
 extern u8 D_8304FBCC;
 extern u8 D_8305DD44;
 void func_8300A45C(s32 arg0) {
-    func_800088DC();
+    BgStage_DrawFrame();
     func_818017A8();
     func_81805308(&D_8300FD00);
     func_81A0022C(&D_8305DD44);

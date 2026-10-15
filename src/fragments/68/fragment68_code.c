@@ -28,12 +28,12 @@ void func_8F000020(s32 arg0) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/68/fragment68_code/func_8F000284.s")
 
 extern void func_80008648();
-extern void func_800088DC();
+extern void BgStage_DrawFrame();
 extern void func_8F000098();
 extern void func_8F000284();
 
 void func_8F0004EC(void) {
-    func_800088DC();
+    BgStage_DrawFrame();
     func_8F000284();
     func_8F000098();
     func_80008648();
