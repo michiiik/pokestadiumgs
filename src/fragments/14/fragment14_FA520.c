@@ -18,12 +18,12 @@ extern void *D_81331974;
 extern u8 D_81317800[];
 extern void BgStage_DrawFrame(void);
 extern void func_81302438(void *);
-extern void func_813021B4(void *, void *);
+extern void Fragment14_DrawSelectionState(void *, void *);
 extern void func_80008648(void);
 void func_81302634(void) {
     BgStage_DrawFrame();
     func_81302438(D_81331974);
-    func_813021B4(D_81317800, D_81331974);
+    Fragment14_DrawSelectionState(D_81317800, D_81331974);
     func_80008648();
 }
 
