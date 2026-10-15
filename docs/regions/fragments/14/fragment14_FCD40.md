@@ -1,5 +1,43 @@
 # Fragment 14 selection panel
 
+## 2026-10-15 — panel file complete, final getter accepted
+
+The current file has **14 C / 0 ASM functions**. All 14 original owners have
+C definitions and retain their original text offsets and full ROM spans. There are
+no `GLOBAL_ASM` or padding pragmas and no inline assembly. This completes this
+file's functions, **not** the repository-wide decompilation goal.
+
+`func_8130559C` is now `Fragment14_GetPanelResult`, **17 instructions / 68
+bytes**, no frame. Normal link-verified, combined full-ROM acceptance batch
+`433e00477fb84c70ae16f6146db5a8e8`, label
+`f14-panel:status-inverse:narrow-False:guard-True:local-result-False`.
+
+The final C symbol is 60 bytes (15 instructions), followed naturally by eight
+zero alignment bytes. The old ASM symbol included those two nops in its
+68-byte size. All 68 bytes of the original span and the whole text-section
+size are identical; do not confuse this symbol-metadata difference with a
+code/layout mismatch or add a padding pragma to manufacture the old size.
+
+The source is a negative state guard followed by
+`return index >= 3 ? -1 : index + 1;`. Reversing the ternary arms, rather
+than adding a goto, dummy local or padding, reproduces the target's branch-
+to-next and natural tail exactly. The equivalent `< 3 ? index + 1 : -1`
+spelling does not. Keep the loaded index as a word and return the expression
+directly; byte carriers and the positive outer conditional change codegen.
+The preceding 48 probes did not reach that spelling; eight inverse-arm
+variants close the owner. Futility warnings did not imply impossibility.
+
+After normal acceptance, clean up the guard formatting, add its behavior-backed
+US name/alias and align the neighboring prototype's pointer type. Fresh and
+twenty-leading-blank builds verify all 14 source C definitions, zero assembly
+owners, all section bytes/layout, the getter and all 13 untouched spans.
+The neighboring 55-function object's bytes/layout also remain unchanged.
+Normal final-source ROM builds match retail MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`.
+
+Historical requeues below are resolved by these later accepts. Do not send
+already-C owners back to the runner or treat the older ASM counts as current.
+
 ## 2026-10-15 — contents renderer accepted
 
 The current file is **13 C / 1 ASM**. `func_813051B8` is now

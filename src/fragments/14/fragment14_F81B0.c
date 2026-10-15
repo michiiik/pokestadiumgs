@@ -97,7 +97,7 @@ extern s32 func_81700B8C(s32, char *);
 extern s32 func_81700CDC(s32);
 extern void *func_8004C874(s32, s32);
 extern void Fragment14_UpdatePanelState(u8 *, void *);
-extern s32 func_8130559C(void *);
+extern s32 Fragment14_GetPanelResult(u8 *);
 extern f32 Fragment14_InterpolatePanelRectangle(u8 *, u8 *);
 void Fragment14_UpdateTitleText(void *arg0, s32 arg1) {
     char *text;
@@ -434,7 +434,7 @@ void Fragment14_UpdateSelectionPreview(void *arg0, s32 arg1) {
     s32 result;
 
     Fragment14_UpdatePanelState((u8 *)arg0 + 0xF630, (void *)arg1);
-    result = func_8130559C(((u8 *)arg0 + 0xF630));
+    result = Fragment14_GetPanelResult(((u8 *)arg0 + 0xF630));
     if (result < 0) {
         func_813000BC(arg0, 0);
     } else if (result > 0) {
