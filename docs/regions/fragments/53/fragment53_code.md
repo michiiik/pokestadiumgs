@@ -1,5 +1,70 @@
 # Fragment 53 animation family
 
+## 2026-10-16 — scene rendering and lifecycle entry accepted
+
+Two native, solo full-ROM accepts after the actor/model batch:
+
+- `func_865082C8` → `Fragment53_DrawSceneFrame`, 111 words / 444 bytes,
+  frame 0x20, batch `684ff48c27a14142a6470311f142d3b4`.
+- `func_8650A3E4` → `Fragment53_RunScene`, 127 words / 508 bytes,
+  frame 0x28, batch `23f574cc468d4e0d99a56579f3f03618`.
+
+Both use a sequential authoritative retail-ROM gate, **not link verification**.
+The dispatcher has relocation-masked probe evidence. The entry's local call to
+the already-decompiled transition changes object relocation representation
+(`UND:func_8650A278` versus a section-relative call); the linked ROM is exact.
+
+The canonical 13-entry jump table added with the previous batch makes the
+dispatcher ready. Keep the switch directly on context +0x0C, with no explicit
+default arm or shared context-pointer local. Cases 2/12 share one path;
+10 falls through to 1/6. All independent overlay conditions and the final
+mode-four overlay are preserved. Adding an explicit default grows the owner.
+
+The entry initializes display/resources/assets, invokes the transition loop,
+releases resources, and returns the scene result. Read the mode byte through
+the stored global context after assigning it, not directly through the formal;
+the latter loses the expected load/schedule. The existing shared 1.2 float
+remains external. No extra rodata split, padding, helper, storage or compiler
+change is needed. `func_8004DEF8` is called with its observed return-value ABI:
+this caller and `func_80071984` both consume its forwarded return, although its
+current C definition in another translation unit is spelled `void`.
+
+Readable cleanup, behavior-backed names and address-compatible aliases retain
+all frozen text/rodata/data/bss bytes and layout in fresh and twenty-leading-
+blank object builds. All 56 original function spans and 54 untouched raw spans
+are preserved. Forced normal `gmake rom COMPARE=1` is retail-identical, MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`; host syntax check and all 25 tooling tests
+pass. Progress: **21 C / 35 ASM → 23 C / 33 ASM**, 238 words / 952 bytes.
+Scratch proofs, generators, extracted assembly, compiler copies, objects and
+ROMs stay local; no agents or containers are used.
+
+### Unresolved handoffs from this block
+
+`func_86500D5C`: **register-tie / requeue**, 32 compared source cells and a
+calibrated 45-second permuter. Vtx union copies give exact 103-word opcode
+shape and 0x18 frame, normalized/raw 1.0/0.9515. The remaining five raw words
+are the shared model stride's `$a2` versus `$v1` and one address operand order.
+Vtx_t field copies grow the owner to 540 bytes. Typed model access, a real
+stride local, element/pointer copy forms, guard return, callback-node typing,
+the allocator's actual u32 return ABI, and copy/display-list line grouping
+do not close it. The permuter's 150→30 line-only improvement does not reproduce
+when replayed through the full translation-unit runner; it is not a match.
+Next: inspect whole-TU reservation/lifetime evidence for the stride and packet
+carriers, not another spelling-only loop. Leave the pragma installed.
+
+`func_8650A074`: **requeue**, 40 compared source cells plus eight initial
+compile failures (postincrement precedence, fixed; not hypothesis evidence).
+Best normalized/raw 0.9023/0.4586, 532 bytes versus 516; the shorter natural
+baseline is 520 bytes at 0.8923/0.4769. Context pointer/direct/typed views,
+phase cache, random-delay carrier reuse, signedness, timer temporaries, split
+pause guards, pointer/index animation scans, and genuine stage-pointer
+lifetimes have been tested. A calibrated 45-second permuter improves 3005→1725,
+but its leader introduces a synthetic constant-zero carrier and is not adopted.
+Other outputs suggest a real stage pointer; the bounded replay above improves
+shape but not size or raw bytes. Next: inspect initial phase/delay pointer
+ownership and the extra global-address materialization before random callbacks;
+do not repeat declaration order or those source families. Keep ASM.
+
 ## 2026-10-16 — actor initializer accepted; four-function follow-up complete
 
 `func_86508484` is now `Fragment53_InitActorModels`, **110 words / 440 bytes**,
