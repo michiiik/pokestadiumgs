@@ -2,6 +2,26 @@
 
 
 #ifdef VERSION_US
+struct Fragment13GroupItem {
+    u8 opaque[6];
+    s16 labelIndex;
+    s16 id;
+    s16 value;
+};
+
+/* The item-pointer field repeats at the anchor record's 0x3C-byte stride. */
+struct Fragment13GroupItemSpan {
+    struct Fragment13GroupItem *items;
+    u8 rest[56];
+};
+extern struct Fragment13GroupItemSpan D_824073A4[];
+
+struct Fragment13GroupedList {
+    s16 entries[128];
+    s16 counts[8];
+    s16 starts[8];
+};
+
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82400BD0.s")
 
 extern void func_8004C8C0(s32);
@@ -201,7 +221,18 @@ s32 func_824029E4(s32 arg0, s16 arg1) {
     return *(s16 *)((u8 *)(u32)arg0 + ((s32)arg1 << 1) + 0x100) + 1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82402A14.s")
+extern u8 D_82408F00[];
+s32 Fragment13_GetGroupedItemLabel(struct Fragment13GroupedList *arg0, s32 arg1, s16 arg2) {
+    if (arg2 >= func_824029E4((s32)arg0, (s16)arg1)) {
+        return (s32)D_82408F00;
+    } else if (arg1 < 0) {
+        return func_8004C874(0x3C, arg2 + 6);
+    } else if (func_824029E4((s32)arg0, (s16)arg1) == arg2 + 1) {
+        return func_8004C874(0x3C, 0x3D);
+    } else {
+        return func_8004C874(0x3C, D_824073A4[arg1].items[(arg0->entries + arg0->starts[arg1])[arg2]].labelIndex);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82402B1C.s")
 
@@ -373,12 +404,6 @@ struct Fragment13MotionVector {
     f32 x, y, z;
 };
 
-struct Fragment13GroupItem {
-    u8 opaque[8];
-    s16 id;
-    s16 value;
-};
-
 struct Fragment13GroupAnchor {
     f32 x, y, z;
     u8 opaque[16];
@@ -389,12 +414,6 @@ struct Fragment13GroupAnchor {
     u16 count;
 };
 extern struct Fragment13GroupAnchor D_82407370[];
-
-struct Fragment13GroupedList {
-    s16 entries[128];
-    s16 counts[8];
-    s16 starts[8];
-};
 
 void Fragment13_InitGroupedList(struct Fragment13GroupedList *arg0) {
     s32 index;
@@ -470,13 +489,6 @@ s32 Fragment13_HasSelectionChanges(struct Fragment13GroupSelection *arg0) {
     return 0;
 }
 
-/* The item-pointer field repeats at the anchor record's 0x3C-byte stride. */
-struct Fragment13GroupItemSpan {
-    struct Fragment13GroupItem *items;
-    u8 rest[56];
-};
-
-extern struct Fragment13GroupItemSpan D_824073A4[];
 extern u8 D_82408F38[];
 extern u8 func_8005FFB4(s32, u8);
 
