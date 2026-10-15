@@ -900,3 +900,87 @@ forced normal native full-ROM build after naming/cleanup matches retail MD5
 objects, compiler binaries and ROM outputs remain local.
 Both changed C files pass the host syntax check with only their existing
 warnings; all 25 tooling tests and whitespace checks pass.
+
+## 2026-10-15 — camera/list/panel requeues, no new acceptance
+
+The following investigations leave all three owners ASM. They do not change
+the file's **64 C / 15 function ASM** count. Each scored family uses the
+native runner with statistics enabled; there is no compiler/provenance bypass.
+Fresh and twenty-leading-blank controls still reproduce the frozen accepted
+object, all 79 function spans, the 77 untouched pre-batch spans, the separate
+caller object and the retail ROM before these investigations.
+
+### `func_82406060`: camera-input requeue
+
+Twenty-four compared candidates plus eight initial compile failures. The
+initial failure is a stale later `void *` owner declaration versus the typed
+group-state definition. Consistent prototype and existing-caller cast edits
+are tested transactionally, never installed alone. Two malformed companion
+preflights are corrected before compilation and are not source hypotheses.
+
+Best shape is normalized/raw **0.9749/0.6192**, 948 rather than 956 bytes,
+frame 0x60. A distinct same-size basin is **0.9707/0.7238**, 956 bytes/frame
+0x60. Preserve both rather than ranking their scalar scores as equivalent.
+Families: real axis/magnitude locals, target-vector pointer, vector and
+handled-local placement; typed versus byte-addressed input fields; shared
+handled join versus structured B/A chain; arithmetic operand ordering and
+the actual previous/current-group store order.
+
+The first differing raw word consistently uses `$v1` instead of `$t6` for
+the pressed-button load. These candidates reuse that load for A after the B
+guard, whereas the original reloads it. Analog fields also materialize one
+shared base instead of the original independent `$at` accesses. A magnitude
+local restores vector/axis stack homes but changes the absolute-threshold
+branch merge and target-pointer spill. No evidence justifies adding volatile
+accesses or a fake call to force reloads. Next: trace the controller-value CSE
+and constant-address materialization before another declaration family; keep
+that distinct from the stack-home/absolute-branch residual.
+
+### `func_82402E28`: list-rendering requeue
+
+Sixteen compared candidates, best normalized/raw **0.8474/0.5016**,
+1284 rather than 1252 bytes. One leader has the original frame 0x70 but its
+three-byte color copy is at +0x6C rather than +0x5C. Preserve the RGB copy,
+header/label clipping, both directional icon paths and original negative
+blend cells. The candidate narrows the real fourth formal to `s16`, with its
+stale later declaration corrected in the same transaction; no edit is installed.
+
+Families: RGB/local placement, named versus inline blend and label results,
+and separate versus reused header/arrow index and fraction lifetimes. The
+second family does not change the opcode-shape result. The original computes
+the left-arrow geometry before the directional branch; these candidates sink
+and duplicate it into the branches, while caching width/offset/display-list
+bases differently. Next: diagnose that geometry/address lifetime, not more
+scalar-order permutations. The original named blend cells are preserved;
+no fresh rodata layout issue has been established.
+
+### `func_82403C84`: textured-panel requeue
+
+Live source verification corrects a stale handoff assumption: the current
+`src/4CC20.c` definition is **`s32 func_8004D27C(u8 *, s32, s32)`**, exactly
+three arguments, not five. Its body uses all three to load texture metadata.
+Use that declaration and the real dimension/format getter signatures. Do not
+invent trailing arguments or an indirect-call/old-style workaround.
+
+Move the existing motion-vector/group-anchor definitions and their existing
+extern earlier in the same source so this earlier owner can use those types.
+This creates no new type/storage/helper: fresh/twenty-leading-blank controls
+preserve every complete section byte/layout and all original function spans,
+and the normal full-ROM build passes while the owner remains ASM.
+
+Twenty-four compared candidates. Best normalized/raw **0.9527/0.5621**,
+676 rather than 652 bytes, frame 0x88 rather than 0x70. Families: pointer versus
+indexed asset loop, array position, separate width role; named format result,
+halfword bit count and for/do shape; if-chain versus switch, real stride/
+dimension temporary reuse and default-value placement. The current best
+keeps the switch and reuses the actual stride/dimension temporary; earlier
+best-size-equivalent bodies are 0.9408/0.5385.
+
+The decisive extra six words include hoisting format constants 1 and 3 into
+`$s6/$s7`, their saves/restores, and the two initializers. The original uses
+local `$at` immediates and only saves through `$s5`. If-chains remove two words
+but lose the original four-case shape and remain wrong. Next: calibrate a
+loop-constant allocation/hoisting trace on this residual before tuning frame
+layout. The literal-hoist observation is not proof of an impossible frontend
+or a reason to install patched compiler output. Candidate bodies and logs
+remain local; no rejected source is installed.
