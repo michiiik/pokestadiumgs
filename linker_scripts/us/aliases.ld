@@ -210,3 +210,6 @@ func_8AF02FC8 = Fragment44_StepScrollUp;
 func_8AF0304C = Fragment44_StepScrollDown;
 func_8AF03104 = Fragment44_AlignAndStepScrollUp;
 func_8AF03198 = Fragment44_AlignAndStepScrollDown;
+func_8AF02684 = Fragment44_CullScrollRecordsAbove;
+func_8AF02750 = Fragment44_CullScrollRecordsBelow;
+func_8AF02A34 = Fragment44_PrepareTrailingScrollRow;
