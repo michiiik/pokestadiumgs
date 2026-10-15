@@ -349,6 +349,46 @@ correction is simplified away. Inspect those mechanisms before another batch.
 Its preset-table end uses jtbl_82409058 only as a sentinel, not a local
 switch: no rodata-subsegment change is justified by this owner.
 
+Follow-up: 24 compared candidates total. Eight new pointer/sentinel traversal
+variants (for/do, remainder if/switch, inline/staged fractional hour) do not
+improve the original leader. The for-loop basin is 532 bytes, normalized/raw
+0.7481/0.3333; do-loop is 528 bytes, 0.6963/0.2963. Inspecting the compiled
+staged for-loop confirms that all unsigned float conversions still sink to
+the interpolation path, and the signed remainder becomes an `andi` without
+the original negative correction. A switch on the remainder does not prevent
+that simplification. Requeue: find a genuine fractional-hour lifetime or
+signed-remainder consumer before testing more traversal/expression spellings;
+do not add artificial uses or change the rodata layout.
+
+### Grid renderer requeue: first controlled source families
+
+`func_82403624` remains ASM after 16 compared candidates and eight initial
+compile failures. Its oracle is 408 words / 1,632 bytes, frame 0xE0.
+The initial compile control exposed a missing forward declaration for the
+already-named `Fragment13_GetGroupedListItem`; explicitly supplying its real
+signature resolves it. This is a declaration-context failure, not a source
+shape measurement. The redraw predicate takes two actual arguments, not the
+five ghost arguments in the context-free m2c draft.
+
+Eight initial candidates vary named/literal five-column divisor, for/do column
+loop, and branch/ternary arrow fade selection. Best normalized/raw is
+0.9583/0.5049, 1,620 bytes with frame 0xF8. A named divisor grows the frame to
+0x100. Eight subsequent candidates vary raw/typed count views, explicit count
+loads and triangle-result merging. Best normalized/raw is 0.9583/0.5270,
+1,624 bytes with frame 0x100; no candidate is exact. A duplicate-body preflight
+was replaced with a genuine in-place triangle carrier before compilation.
+
+The current typed-view leader keeps the root in `$fp` and spills the group,
+whereas the original keeps the group in `$s7`, the root on the stack, and
+reserves `$fp` for the 44-pixel column stride. The original first count clamp
+reloads on its taken branch; the second clamp reuses its loaded halfword.
+The candidate's count-load behavior differs, and its triangle branches store
+directly to memory instead of merging a float result before the store.
+Requeue: investigate these whole-function root/list/count and geometry
+lifetimes before allocation-only permutations. Preserve signed division and
+remainder, the inclusive terminal item slot, the two-argument predicate, and
+SDK packet macros. No failed body or scratch helper is installed or committed.
+
 ## Native RGB interpolation / scene synchronization — 2026-10-15
 
 Two accepted owners, **222 words / 888 bytes**, file **51 C / 28 ASM →
