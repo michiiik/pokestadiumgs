@@ -325,7 +325,32 @@ u8 func_8800335C(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88003430.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88003480.s")
+void func_88003480(s32 mode, u16 width, u16 height, s16 *x, s16 *y) {
+    switch (mode) {
+        case 1:
+        case 4:
+        case 7:
+            *x = *x - (width >> 1);
+            break;
+        case 2:
+        case 5:
+        case 8:
+            *x = *x - width + 1;
+            break;
+    }
+    switch (mode) {
+        case 3:
+        case 4:
+        case 5:
+            *y = *y - (height >> 1);
+            break;
+        case 6:
+        case 7:
+        case 8:
+            *y = *y - height + 1;
+            break;
+    }
+}
 
 extern s32 func_88002A08(u8 **arg0, u16 arg1, s32 arg2, s16 arg3);
 void func_88003534(F29Rect *rect, F29TextLayout *text) {
