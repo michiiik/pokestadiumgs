@@ -591,3 +591,33 @@ normalized/raw 1.0/0.9685 and `register_allocation_only`, first difference at
 frame to 0x58 and are worse. Next: inspect the four differing words around
 the text helper's argument setup, preserving real helper signatures and the
 original scissor height. Do not replay the x-width/guard/Y-cache family.
+
+### Confirmation dialog renderer accepted: real callee result
+
+The requeue above is resolved. `func_824046A4` is now
+`Fragment13_DrawConfirmationDialog`, 127 words / 508 bytes, frame 0x50.
+Batch `7e03f750b87145e9a4c05b13d88df96e` accepts the first corrected
+candidate with link verification and a combined full-ROM gate (7.732 seconds
+probe, 1.448 seconds gate). File advances 58 C / 21 ASM to 59 C / 20 ASM.
+
+Before that success, eight display-head lifetime forms (separate increment,
+local packet, head alias, pre-advance; second list alone or both lists) all
+failed and worsened size/frame or allocation. They are not the next family.
+The decisive evidence is the existing definition in `src/4CC20.c`:
+`func_8004D19C` returns `s32`, but this file's two forward declarations said
+`void`. Retyping both declarations consistently to the real five-word-argument
+signature repairs the four display-head register words. This is a declaration
+correction supported by the callee, not an invented result or argument used to
+steer allocation. The actual signed-halfword scissor signature and the sound
+helper declaration remain unchanged. The new dialog view names only the
+observed offsets; the original scissor height, selected-image ordering and
+text coordinates are preserved.
+
+Fresh and twenty-leading-blank builds match every byte and layout of the
+frozen accepted object's text/rodata/data/bss and all 79 original spans.
+The 78 untouched spans, including all existing callers of the retyped image
+helper, also match the pre-dialog object. Formatting, duplicate-extern cleanup,
+an explicit actual `func_8004989C(s32)` declaration and behavior-backed naming
+are object-neutral. Forced normal retail-ROM comparison passes with MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. Scratch generators, objects, compiler
+copies and ROMs remain local and unpublished.

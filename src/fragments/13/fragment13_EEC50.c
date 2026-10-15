@@ -331,7 +331,7 @@ f32 func_82403F10(void) {
 extern Gfx *D_800D0510;
 extern u8 D_80094E38[];
 extern u8 D_80094F50[];
-extern void func_8004D19C(s32, s32, s32, s32, s32);
+extern s32 func_8004D19C(s32, s32, s32, s32, s32);
 void func_82403F58(void) {
     gSPDisplayList(D_800D0510++, D_80094E38);
     gDPSetRenderMode(D_800D0510++, 0x0F0A4000, 0);
@@ -342,7 +342,7 @@ void func_82403F58(void) {
 extern Gfx *D_800D0510;
 extern u8 D_80094E38[];
 extern u8 D_80094F50[];
-extern void func_8004D19C(s32, s32, s32, s32, s32);
+extern s32 func_8004D19C(s32, s32, s32, s32, s32);
 void func_82404000(void) {
     gSPDisplayList(D_800D0510++, D_80094E38);
     gDPSetRenderMode(D_800D0510++, 0x0F0A4000, 0);
@@ -459,7 +459,48 @@ block_4:
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_824045B4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_824046A4.s")
+struct Fragment13DialogView {
+    s16 x, y, width, height;
+    s32 title, leftLabel, rightLabel;
+    s32 leftImage, rightImage;
+    f32 phase;
+    s8 selected;
+    u8 state;
+};
+extern u8 D_82408BB0[];
+extern s32 func_81600DA8(void *, void *);
+extern void func_80006F70(Gfx **, s16, s16, s16, s16);
+extern void func_8004989C(s32);
+void Fragment13_DrawConfirmationDialog(struct Fragment13DialogView *arg0, void *arg1) {
+    s32 x;
+    s32 y;
+    s32 width;
+    s32 height;
+
+    x = arg0->x;
+    y = func_82404230(arg0);
+    width = arg0->width;
+    height = arg0->height;
+    if (arg0->state != 0 && arg0->state != 4) {
+        if (func_81600DA8(arg1, arg0)) {
+            func_82401198(x, y, width, height);
+            Fragment13_DrawColoredPanelFill(x + 2, y + 2, width - 6, height - 6, D_82408BB0);
+            func_80006F70(&D_800D0510, x + 2, y + 2, width - 6, height);
+            gSPDisplayList(D_800D0510++, D_80094E38);
+            func_8004D19C(x + 25, y + 54, arg0->selected == 0 ? arg0->leftImage : arg0->rightImage, 0, 0);
+            func_8004D19C(x + 102, y + 54, arg0->selected == 0 ? arg0->rightImage : arg0->leftImage, 0, 0);
+            gSPDisplayList(D_800D0510++, D_80094F50);
+            func_800498C4();
+            func_800496A4(2, 0);
+            func_8004989C(14);
+            func_800495BC(x + 10, y + 8, arg0->title);
+            func_800495BC(x + 43, y + 56, arg0->leftLabel);
+            func_800495BC(x + 120, y + 56, arg0->rightLabel);
+            func_800499EC();
+            func_80006F70(&D_800D0510, 0, 0, 320, 240);
+        }
+    }
+}
 
 s32 func_824048A0(void *arg0, s32 arg1) {
     s32 temp_v0;
