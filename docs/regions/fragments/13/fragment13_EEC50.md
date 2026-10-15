@@ -488,3 +488,56 @@ not another register permutation. A real named count-call result is an
 untested source-level hypothesis; a compiler spill-allocation trace is the
 stronger diagnostic. Do not insert a dummy slot, change interfaces or pad
 the frame. All sources, objects and calibrated search results remain local.
+
+## Native textured panel border — 2026-10-15
+
+`func_82401570` → `Fragment13_DrawTexturedPanelBorder`: **175 words / 700
+bytes**, frame 0x68; file **55 C / 24 ASM → 56 C / 23 ASM**. Link-verified
+combined full-ROM acceptance, batch `61fcbec4789d475b9ff5a95058d7af8c`.
+
+Preserve the four-pixel size guard, texture setup, original render-mode bits,
+four corners followed by four stretched edges, all original UV offsets and
+stretch factors, and the final display-list restore. Ordinary integer
+coordinate expressions and the existing float draw interface match on the
+first of eight submitted candidates. Keep `(origin + extent) - 4`; grouping
+the extent subtraction first retains all opcodes but changes load/spill
+offsets. No named coordinate aliases, artificial local or manual assembly.
+
+Format the new C, remove only duplicate injected externs and add one US
+compatibility alias. Fresh/twenty-leading-blank controls preserve all section
+bytes/layout, 79 original starts/full spans, the frozen accepted body and 78
+untouched spans. Forced normal retail-ROM comparison, host syntax check,
+22 public tooling tests and diff whitespace checks pass. No new helper,
+storage, padding, signature/layout/compiler change or gate bypass committed.
+
+### Scrolling-indicator spill-plan follow-up
+
+`func_82402B1C` remains ASM after **112 compared candidates** total: this
+continuation adds eight named count-result masks, eight address-conversion
+forms, eight grouped phase-record forms and eight typed-texture forms. None
+improves the retained exact-opcode/register leader's 16 differing spill-offset
+words (normalized/raw 1.0/0.9179). Do not replay these families unchanged.
+
+Logging-only optimizer/code-generator copies were calibrated on the current
+known object, the retained leader and the named-count control. All twelve
+stock/logging-off/logging-on/twenty-blank builds preserve complete section
+bytes/layout, FUNC/OBJECT symbols and relocation topology. The ordinary
+`gettemp` and UGEN dynamic-spill hooks do not allocate these slots. The
+optimizer's separate `spilltemps` path does; a source-line/web-ID association
+links its pre-globalcolor ordinal 25 to this owner's globalcolor ordinal 26.
+
+Measured leader plan: webs 10 and 23 share temp 0 at -40; web 39 uses temp 1
+at -44; web 44 uses temp 2 at -48; web 67 uses temp 3 at -52. The count local
+shifts the whole temporary area by four bytes, not just the two offending
+slots. This is why it cannot repair the residual. Correctly typed texture
+pointer declarations also preserve the complete known object but do not
+change the leader's two slots; that optional metadata experiment is reverted
+and is not part of the border change. No interface mutation was installed.
+
+Next: inspect the spill-slot interference/reuse decisions for webs 23/39/44
+and the provenance of their expressions, not declaration order or frame
+padding. The useful question is why the retained leader cannot reuse temp 0
+for the index, while the target's index/fraction offsets are four bytes
+higher and its final icon-Y spill already agrees. Do not call this a stock
+compiler impossibility. All diagnostic drivers, compiler copies, generated
+code, objects and traces stay local and unpublished.
