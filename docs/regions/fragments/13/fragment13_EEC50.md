@@ -349,6 +349,75 @@ correction is simplified away. Inspect those mechanisms before another batch.
 Its preset-table end uses jtbl_82409058 only as a sentinel, not a local
 switch: no rodata-subsegment change is justified by this owner.
 
+Follow-up: 24 compared candidates total. Eight new pointer/sentinel traversal
+variants (for/do, remainder if/switch, inline/staged fractional hour) do not
+improve the original leader. The for-loop basin is 532 bytes, normalized/raw
+0.7481/0.3333; do-loop is 528 bytes, 0.6963/0.2963. Inspecting the compiled
+staged for-loop confirms that all unsigned float conversions still sink to
+the interpolation path, and the signed remainder becomes an `andi` without
+the original negative correction. A switch on the remainder does not prevent
+that simplification. Requeue: find a genuine fractional-hour lifetime or
+signed-remainder consumer before testing more traversal/expression spellings;
+do not add artificial uses or change the rodata layout.
+
+### Grid renderer requeue: first controlled source families
+
+`func_82403624` remains ASM after 16 compared candidates and eight initial
+compile failures. Its oracle is 408 words / 1,632 bytes, frame 0xE0.
+The initial compile control exposed a missing forward declaration for the
+already-named `Fragment13_GetGroupedListItem`; explicitly supplying its real
+signature resolves it. This is a declaration-context failure, not a source
+shape measurement. The redraw predicate takes two actual arguments, not the
+five ghost arguments in the context-free m2c draft.
+
+Eight initial candidates vary named/literal five-column divisor, for/do column
+loop, and branch/ternary arrow fade selection. Best normalized/raw is
+0.9583/0.5049, 1,620 bytes with frame 0xF8. A named divisor grows the frame to
+0x100. Eight subsequent candidates vary raw/typed count views, explicit count
+loads and triangle-result merging. Best normalized/raw is 0.9583/0.5270,
+1,624 bytes with frame 0x100; no candidate is exact. A duplicate-body preflight
+was replaced with a genuine in-place triangle carrier before compilation.
+
+The current typed-view leader keeps the root in `$fp` and spills the group,
+whereas the original keeps the group in `$s7`, the root on the stack, and
+reserves `$fp` for the 44-pixel column stride. The original first count clamp
+reloads on its taken branch; the second clamp reuses its loaded halfword.
+The candidate's count-load behavior differs, and its triangle branches store
+directly to memory instead of merging a float result before the store.
+Requeue: investigate these whole-function root/list/count and geometry
+lifetimes before allocation-only permutations. Preserve signed division and
+remainder, the inclusive terminal item slot, the two-argument predicate, and
+SDK packet macros. No failed body or scratch helper is installed or committed.
+
+Follow-up: 64 compared candidates total, plus the eight original declaration
+compile failures. A transactional integer-address ABI probe improves the
+instruction shape to 0.9804 and 1,632 bytes, but initially has frame 0xF8.
+It retypes the existing prototype and explicitly casts the accepted caller
+only inside the probe transaction; neither edit is installed. Root/list/count
+lifetime changes, visible-path snapshots, and a fuller draft-style variable
+inventory do not close the match. The fuller inventory worsens it.
+
+Removing redundant source carriers yields a frame-correct leader: 1,632
+bytes, frame 0xE0, normalized/raw 0.9804/0.5956 (phase-result carrier with
+literal count loads). A register-erased aligned comparison localizes the
+instruction-shape residual to the count clamps, entry pointer preservation,
+and triangle-result merge/store, rather than the body of the rendering loop.
+The two clamp paths do not yet reproduce the oracle's reload/reuse asymmetry.
+This is not an instruction-exact or accepted result.
+
+Stock/off/on/twenty-leading-blank controls for both the known source and the
+1,632-byte integer-address leader preserve every section byte/layout, symbol
+and relocation. In this calibrated trace, spill-plan procedure 28 corresponds
+to coloring procedure 29. The 44-pixel stride constant (web 285) receives
+physical register 23 at cost 25; the group parameter (web 4, parameter slot 8)
+receives physical register 30 at cost about 22.33. This confirms the observed
+group/stride register ordering for this candidate, not the original compiler's
+internal decisions. The spill pool grows from 108 to 148 bytes across ten
+temporary slots in this uncompact leader. Requeue: map the frame-correct
+leader through the same trace and work on the measured clamp/merge and
+group-versus-stride lifetime differences. Do not repeat the rejected carrier,
+or declaration-only families without new evidence.
+
 ## Native RGB interpolation / scene synchronization — 2026-10-15
 
 Two accepted owners, **222 words / 888 bytes**, file **51 C / 28 ASM →
@@ -811,3 +880,317 @@ ordinary and named functions. Three regression tests cover mixed owners,
 data-only files and staged input. The function gain in this batch is two,
 not eleven data includes or an unrelated historical counting correction.
 Generated COVERAGE.md remains managed by CI.
+
+## 2026-10-15 — group-list transition accepted
+
+`func_82406880` becomes `Fragment13_UpdateGroupListTransition`: 126 instruction
+words / 504 bytes, original frame 0x38. File advances **62 C / 17 function ASM
+to 63 C / 16 function ASM**, from 79 original functions. The eleven preserved
+data includes are not functions. Solo native macOS; no agents or containers.
+Runner batch `028ad84224614d91b7fa30ef2403e00c` is link-verified and accepted
+by the combined full-ROM gate, with statistics and host checks enabled.
+
+The routine eases the current phase, advances/clamps the visibility timer,
+synchronizes rendered mode with requested mode at zero, preserves transition
+sounds 0xAA/0xA9, then dispatches group-list/page-arrow rendering with original
+positions, selection interpolation and direction. The first eight variants
+agree in size/frame and 125 of 126 words; the sole residual is the timer
+addition's floating operands. Write `func_82403F10() + phase`, not the reverse.
+The first of the corrected eight variants accepts. Do not cache the group
+before a callback that can change the root state.
+
+The runner's advisory register-tie warning appears even in this accepted
+result. It is not proof of an impossible source shape and must not overrule
+the actual link verification and retail-ROM acceptance.
+
+After formatting, removal of newly redundant prototypes and naming with a
+compatibility alias, fresh/twenty-leading-blank controls preserve complete
+frozen text/rodata/data/bss bytes and layout, all 79 original function starts,
+sizes and spans, and all 78 untouched raw instruction spans. No helper,
+padding, storage, compiler patch or verification bypass is installed.
+
+Forced normal `gmake rom COMPARE=1` after cleanup/naming matches retail MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`; the host syntax check passes with only
+the pre-existing unrelated implicit call warning. All 25 tooling tests and
+whitespace checks pass. Scratch generators/proofs and binary outputs stay local.
+
+### List-input requeue, not accepted
+
+`func_82406560`: sixteen candidates, best normalized/raw 0.8100/0.6450,
+expected 800 bytes versus 792, correct frame 0x20. Two families tested:
+word/halfword button local, literal/local five-column divisor and row/count
+initialization order; then shared handled-tail control flow, halfword count,
+row reuse for the left-limit value, base/index expression order and captured
+post-predicate selection/count. Shared-tail versions are 784 bytes and do not
+improve the result. No candidate is installed.
+
+The decisive mechanism is division placement: original computes both signed
+divisions before directional guards, while these candidates sink row division
+into the up/down path and page division after the left guard. Address additions
+also reverse base/index operands, and the timer addition is reversed. Keep the
+real two-argument `func_824048A0(root, oldSelection)` signature, signed random
+modulo four and sound protocol; draft extra call arguments are not evidence of
+real additional formals. Next hypothesis: model the actual grouped-state
+subobjects and semantic quotient lifetimes before another source family;
+do not replay scalar declaration permutations or add unused call arguments.
+
+## 2026-10-15 — group-scene rendering accepted
+
+`func_82406E14` becomes `Fragment13_DrawGroupScene`: **157 instruction words /
+628 bytes**, original frame 0x28. File advances **63 C / 16 function ASM to
+64 C / 15 function ASM**. Together with the transition routine above this is
+283 words / 1,132 bytes in the current partial batch.
+
+Runner batch `8f9d89e855b54fe58f04f952b2885bf0` accepts the first of eight
+submitted candidates through the normal sequential full-ROM gate. This is
+**not link-verified**: the object check reports relocation drift for the
+already-named same-translation-unit confirmation callee. The authoritative
+linked ROM is byte-identical; no relocation mask, provenance override or
+verification bypass is claimed for this record.
+
+Preserve the initial full-redraw result, short-circuit selector checks in
+order 4, 5, 7, 6, both four-case state dispatches with original panel passes,
+selected-content clipping/restoration and frame, and the final list,
+confirmation and auxiliary-panel calls. Use ordinary switches: spelling
+both dispatches as if-chains produces 596 bytes, frame 0x30 and raw 0.4076,
+not the original 628 bytes/frame 0x28. No new jump table/layout work is needed.
+Keep the existing integer panel-handle ABI views and pointer selector view;
+no extra call arguments are invented.
+
+Remove runner-injected duplicate declarations after acceptance. Name the
+existing frame caller's reference and retain the old symbol via a US
+compatibility alias; JP and address-keyed symbol entries stay unchanged.
+Fresh/twenty-leading-blank controls preserve all complete frozen sections,
+all 79 original starts/sizes/full spans and the 77 untouched raw function
+spans against the pre-batch object. A separate fresh caller build preserves
+its complete section bytes/layout after the call/prototype rename. The
+forced normal native full-ROM build after naming/cleanup matches retail MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. Scratch scripts, generated assembly,
+objects, compiler binaries and ROM outputs remain local.
+Both changed C files pass the host syntax check with only their existing
+warnings; all 25 tooling tests and whitespace checks pass.
+
+## 2026-10-15 — camera/list/panel requeues, no new acceptance
+
+The following investigations leave all three owners ASM. They do not change
+the file's **64 C / 15 function ASM** count. Each scored family uses the
+native runner with statistics enabled; there is no compiler/provenance bypass.
+Fresh and twenty-leading-blank controls still reproduce the frozen accepted
+object, all 79 function spans, the 77 untouched pre-batch spans, the separate
+caller object and the retail ROM before these investigations.
+
+### `func_82406060`: camera-input requeue
+
+Twenty-four compared candidates plus eight initial compile failures. The
+initial failure is a stale later `void *` owner declaration versus the typed
+group-state definition. Consistent prototype and existing-caller cast edits
+are tested transactionally, never installed alone. Two malformed companion
+preflights are corrected before compilation and are not source hypotheses.
+
+Best shape is normalized/raw **0.9749/0.6192**, 948 rather than 956 bytes,
+frame 0x60. A distinct same-size basin is **0.9707/0.7238**, 956 bytes/frame
+0x60. Preserve both rather than ranking their scalar scores as equivalent.
+Families: real axis/magnitude locals, target-vector pointer, vector and
+handled-local placement; typed versus byte-addressed input fields; shared
+handled join versus structured B/A chain; arithmetic operand ordering and
+the actual previous/current-group store order.
+
+The first differing raw word consistently uses `$v1` instead of `$t6` for
+the pressed-button load. These candidates reuse that load for A after the B
+guard, whereas the original reloads it. Analog fields also materialize one
+shared base instead of the original independent `$at` accesses. A magnitude
+local restores vector/axis stack homes but changes the absolute-threshold
+branch merge and target-pointer spill. No evidence justifies adding volatile
+accesses or a fake call to force reloads. Next: trace the controller-value CSE
+and constant-address materialization before another declaration family; keep
+that distinct from the stack-home/absolute-branch residual.
+
+### `func_82402E28`: list-rendering requeue
+
+Sixteen compared candidates, best normalized/raw **0.8474/0.5016**,
+1284 rather than 1252 bytes. One leader has the original frame 0x70 but its
+three-byte color copy is at +0x6C rather than +0x5C. Preserve the RGB copy,
+header/label clipping, both directional icon paths and original negative
+blend cells. The candidate narrows the real fourth formal to `s16`, with its
+stale later declaration corrected in the same transaction; no edit is installed.
+
+Families: RGB/local placement, named versus inline blend and label results,
+and separate versus reused header/arrow index and fraction lifetimes. The
+second family does not change the opcode-shape result. The original computes
+the left-arrow geometry before the directional branch; these candidates sink
+and duplicate it into the branches, while caching width/offset/display-list
+bases differently. Next: diagnose that geometry/address lifetime, not more
+scalar-order permutations. The original named blend cells are preserved;
+no fresh rodata layout issue has been established.
+
+### `func_82403C84`: textured-panel requeue
+
+Live source verification corrects a stale handoff assumption: the current
+`src/4CC20.c` definition is **`s32 func_8004D27C(u8 *, s32, s32)`**, exactly
+three arguments, not five. Its body uses all three to load texture metadata.
+Use that declaration and the real dimension/format getter signatures. Do not
+invent trailing arguments or an indirect-call/old-style workaround.
+
+Move the existing motion-vector/group-anchor definitions and their existing
+extern earlier in the same source so this earlier owner can use those types.
+This creates no new type/storage/helper: fresh/twenty-leading-blank controls
+preserve every complete section byte/layout and all original function spans,
+and the normal full-ROM build passes while the owner remains ASM.
+
+Twenty-four compared candidates. Best normalized/raw **0.9527/0.5621**,
+676 rather than 652 bytes, frame 0x88 rather than 0x70. Families: pointer versus
+indexed asset loop, array position, separate width role; named format result,
+halfword bit count and for/do shape; if-chain versus switch, real stride/
+dimension temporary reuse and default-value placement. The current best
+keeps the switch and reuses the actual stride/dimension temporary; earlier
+best-size-equivalent bodies are 0.9408/0.5385.
+
+The decisive extra six words include hoisting format constants 1 and 3 into
+`$s6/$s7`, their saves/restores, and the two initializers. The original uses
+local `$at` immediates and only saves through `$s5`. If-chains remove two words
+but lose the original four-case shape and remain wrong. Next: calibrate a
+loop-constant allocation/hoisting trace on this residual before tuning frame
+layout. The literal-hoist observation is not proof of an impossible frontend
+or a reason to install patched compiler output. Candidate bodies and logs
+remain local; no rejected source is installed.
+
+## 2026-10-16 — clamped list interpolation accepted
+
+`func_824070E4` becomes `Fragment13_GetInterpolatedListPosition`: **35 words /
+140 bytes**, original frame 0x18. The historical register-role requeue above
+is closed. File advances **64 C / 15 function ASM to 65 C / 14 function ASM**.
+Current pending partial batch now contains three functions, **318 words /
+1,272 bytes**, not a claim that all remaining owners are solved.
+
+Runner batch `ec2962c5579f45dba8503cd24ac6ec95` is **link-verified**, combined
+full-ROM accepted, MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`. No compiler, layout,
+padding or verification change is needed. The callback retains its real
+`f32 (*)(f32)` signature; the root retains its public `void *` ABI and uses
+the existing group-state type through a genuine local pointer.
+
+The first eight new lifetime candidates still have the wrong word-value
+registers. A fresh stock/off/on/twenty-leading-blank trace calibration preserves
+complete section bytes/layout, symbols and relocations for the known source
+and candidate. It identifies two equal-cost word webs: cost 2, two uses and
+three interference neighbors each, assigned `$v1`/`$a1` in the wrong roles.
+The successful combination defines **end before start**, keeps both loads
+after the callback, clamps start, converts start to a float base, then clamps
+end and interpolates. The actual typed `list.counts[group]` view also restores
+the original base/index addition order. Earlier reverse-load tests used a
+named index, while inline-index tests inherited the other load order; they
+had not tested this combination. The third candidate of the eight-cell
+web-order batch accepts. There were 32 earlier submitted candidates, eight
+new lifetime candidates and eight web-order candidates; the runner stops
+installation after the first accepted owner.
+
+The untyped counterpart in the final batch agrees in 34 of 35 raw words but
+reverses the address-add operands. It is not an acceptance. The runner again
+prints its advisory "source-shape variants will not close this" even on the
+accepted result; actual diagnostics/gates take precedence over that warning.
+
+After formatting and naming with a US compatibility alias, fresh and
+twenty-leading-blank builds preserve all frozen text/rodata/data/bss bytes,
+all 79 original starts/sizes/full spans and **76 untouched** pre-batch raw
+function spans. The existing renamed scene caller also retains identical
+complete section bytes/layout. All scratch drivers, traces, compiler copies,
+objects, generated assembly and ROMs remain local.
+Forced normal full-ROM verification after cleanup/naming matches retail;
+host syntax checking passes with the existing unrelated warning only. All
+25 tooling tests and whitespace checks pass.
+
+### Panel requeue follow-up: calibrated negative, not a compiler workaround
+
+`func_82403C84` now has **48 compared candidates**. Fresh known/candidate
+stock/off/on/twenty-leading-blank controls preserve every section byte/layout,
+symbol and relocation. The logging-only optimizer trace locates constants
+1 and 3 in webs 140/142 of procedure 34, with cost 2, five recorded uses and
+nine interference neighbors, colored to physical registers 22/23 (`$s6/$s7`).
+These are allocator webs, not instruction offsets.
+
+Twenty-four new candidates test unsigned offset division versus shifting,
+strict viewport bounds and loop form; format/index/offset signedness; pointer,
+countdown and index endpoints with explicit/default eight-bit formats. None
+removes the extra saved constants or improves the retained best
+0.9527/0.5621, 676-byte/frame-0x88 leader. One old-body preflight is not a
+compiler attempt and is replaced with an actual new counter-width hypothesis,
+not a whitespace replay.
+
+Flag diagnostics on scratch objects are separate from runner acceptance:
+`-g0` is byte-identical to normal; `-g3` changes 52 already-C functions and
+grows the candidate to 680 bytes; `-O1` changes 58 and grows it to 836 bytes.
+Stock IDO 5.3 changes eleven already-C functions and still yields a 676-byte
+nonmatching candidate. The known-source target remains ASM in those controls,
+so its unchanged bytes are not evidence of a C match. No alternate flag,
+compiler or patched artifact is installed. Keep the normal compiler and this
+bounded negative; next useful work requires a new constant-lifetime mechanism,
+not another spelling of these tested families.
+
+## 2026-10-16 — selection panels accepted, five-function partial batch
+
+Two more owners accepted together by native runner batch
+`ca70ddad365c4e8d86cb4ff03327a56d`, both **link-verified**, with one combined
+full-ROM gate. File advances **65 C / 14 function ASM to 67 C / 12 function
+ASM**, from 79 original functions. The pending batch is now five functions,
+**436 instruction words / 1,744 bytes**. This is not a complete-file claim.
+
+| Owner | Name | Words / bytes | Frame |
+| --- | --- | ---: | ---: |
+| `func_824020B4` | `Fragment13_DrawSelectionFooter` | 62 / 248 | 0x18 |
+| `func_82402904` | `Fragment13_DrawSelectionHeader` | 56 / 224 | 0x18 |
+
+Preserve the footer's separate text-description pass versus lower icons and
+labels at y207/209, and the header's enabled upper controls/description/labels
+at y20/22. Both winning bodies use a real shared `Gfx *packet`, advance the
+existing display-list pointer once per packet and use `gSPDisplayList`.
+No new helper function or data object is added. Sixteen candidates cover the
+two owners: explicit/shared packet versus the SDK macro's own packet local,
+SDK macro versus equivalent raw-word stores, and guard-return versus nested
+control flow. The third candidate per owner accepts. The raw-word versions
+have four words of instruction-order differences. Other SDK spellings also
+produce link-verified probes, but are skipped after the first accepted owner;
+the named packet is an accepted spelling, not claimed to be uniquely required.
+
+Remove only newly redundant declarations, format the new bodies, name them
+and retain both US compatibility aliases; JP/address-keyed symbols remain
+unchanged. Fresh/twenty-leading-blank controls reproduce complete frozen
+text/rodata/data/bss bytes/layout, all 79 original starts/sizes/full spans and
+all **74 untouched** pre-batch raw instruction spans. The existing renamed
+scene caller also keeps its full section bytes/layout. Scratch generators,
+instrumented compiler copies, ASM, objects and ROMs remain local.
+Forced normal full-ROM verification after cleanup/naming is byte-identical
+to retail MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`. Both changed C files pass
+the host syntax check with their existing warnings only; all 25 tooling tests
+and whitespace checks pass.
+
+### Page-arrow requeue: fresh context and actual spill interference
+
+`func_8240330C` remains ASM after **88 compared candidates**. Refreshing its
+old cached context initially fails: the old integer selector declaration for
+`func_81600A34` conflicts with the opaque selector declaration in the accepted
+scene code. Stop at that compile control, use the current declaration and
+explicit `(void *)2` key, then recalibrate. The refreshed leader still has
+exactly 792 bytes and six raw differences, at word indices
+98/100/123/126/141/145: spill/reload +0x30 instead of +0x28. It is not a hit.
+
+Logging-only spill-interference and temporary-choice hooks are compiled in an
+isolated ignored tool copy. Stock/off/on/twenty-leading-blank controls pass
+for both known source and candidate: every section byte/layout, symbol and
+relocation agrees. No emulated-memory writes or forced allocation are added.
+For this owner, pre-globalcolor ordinal 26 corresponds to globalcolor ordinal
+27. The trace records initial-expression web 28 in temporary 0 / -40, web 34
+in temporary 1 / -44, integer web 54 sharing temporary 1, then floating web 85
+in temporary 2 / -48. Webs 28/85 have overlapping live-block sets; the choice
+trace explicitly reports both temporary 0 and temporary 1 blocked for web 85.
+These are allocator identities, not instruction offsets or proof that the
+original source is unreachable.
+
+Twenty-four new candidates test a single position carrier with genuine whole-
+page/count/fraction intermediates; clip guard-return, positive guard, break
+and goto forms with render-local scope; and reuse of the real progress
+parameter. No rejected body is installed. The best unchanged leader remains
+1.0 normalized / 0.9697 raw, frame 0x58. Single-position/whole-page syntax also
+produces an eight-word residual by moving page-count homes; scoped locals add
+home drift, and progress-parameter reuse shrinks the frame incorrectly.
+Next: map the overlapping live-block membership of webs 28/85 to their source
+uses, or bring a new real lifetime boundary. Do not repeat these source
+families, add padding/unused locals or rename the spill offset by hand.
