@@ -541,3 +541,53 @@ for the index, while the target's index/fraction offsets are four bytes
 higher and its final icon-Y spill already agrees. Do not call this a stock
 compiler impossibility. All diagnostic drivers, compiler copies, generated
 code, objects and traces stay local and unpublished.
+
+### Colored panel fill and shared clipped texture primitive
+
+Accepted `func_82401A28` as `Fragment13_DrawColoredPanelFill` (235 words,
+940 bytes, frame 0x18) and `func_82400BD0` as
+`Fragment13_DrawClippedTextureRect` (268 words, 1072 bytes, leaf). The file
+advances from 56 C / 23 ASM to 58 C / 21 ASM. Runner batches
+`5f75140481a043f19818377a913666ba` and
+`860c3a8c88c840ef9f4b45098d783e52` each report accepted, link-verified and
+a successful combined full-ROM gate.
+
+The fill needs the SDK's masked color-pack expression tree in G/B/R order,
+without changing the RGB bit positions. Raw unmasked shift/OR spellings
+change scheduling. Twenty-four submitted candidates identify the masked-tree
+winner (later candidates are skipped after acceptance). The texture primitive preserves the original floating clipping,
+integer-before-quarter-pixel coordinate conversion and SDK scissored texture
+rectangle expansion. Its UV formals are signed halfwords, as the original
+stack loads/stores show. Narrowing both 1024-scaled steps to signed halfwords
+restores four sign-extension instructions missing from the initial eight
+candidates; the first corrected candidate accepts. Sixteen candidates were
+submitted across these two texture batches. No artificial frame or padding.
+The existing forward declaration was corrected consistently; redundant
+declarations were removed after acceptance. All compiled callers are neutral.
+
+The texture-step batch accidentally logged to the local claims file. Its
+single appended JSONL row was recovered verbatim into normal probe statistics,
+verified equal and unique by batch ID, and the original claims JSON restored
+from its preserved prefix. Candidate, link, gate and timing evidence remain
+unchanged; no provenance bypass was used. This was a logging-path error, not
+a successful probe being promoted without its gate.
+
+After formatting and behavior-backed naming, fresh and twenty-leading-blank
+controls preserve all section bytes/layout and all 79 original function
+starts/sizes/full spans: two accepted spans and 77 untouched spans. Forced
+normal native `gmake rom COMPARE=1`, host syntax checking and all 22 tooling
+tests pass; ROM MD5 remains `1561c75d11cedf356a8ddb1a4a5f9d5d`. Only C,
+compatibility aliases and these notes belong in the publication.
+
+### Confirmation dialog renderer: requeue
+
+`func_824046A4` remains ASM. Eight initial candidates failed compilation due
+to a synthesized wide-argument `Gfx_SetScissorRect` declaration conflicting
+with the real signed-halfword prototype. Calling its original compatibility
+symbol with the actual prototype avoids that synthesis conflict. Eight
+corrected candidates compile; the best has 508 bytes, frame 0x50,
+normalized/raw 1.0/0.9685 and `register_allocation_only`, first difference at
+325 (`lui a1` expected, `lui a0` actual). Cached text-Y variants grow the
+frame to 0x58 and are worse. Next: inspect the four differing words around
+the text helper's argument setup, preserving real helper signatures and the
+original scissor height. Do not replay the x-width/guard/Y-cache family.
