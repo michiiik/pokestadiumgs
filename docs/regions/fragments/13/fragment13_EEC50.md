@@ -811,3 +811,56 @@ ordinary and named functions. Three regression tests cover mixed owners,
 data-only files and staged input. The function gain in this batch is two,
 not eleven data includes or an unrelated historical counting correction.
 Generated COVERAGE.md remains managed by CI.
+
+## 2026-10-15 — group-list transition accepted
+
+`func_82406880` becomes `Fragment13_UpdateGroupListTransition`: 126 instruction
+words / 504 bytes, original frame 0x38. File advances **62 C / 17 function ASM
+to 63 C / 16 function ASM**, from 79 original functions. The eleven preserved
+data includes are not functions. Solo native macOS; no agents or containers.
+Runner batch `028ad84224614d91b7fa30ef2403e00c` is link-verified and accepted
+by the combined full-ROM gate, with statistics and host checks enabled.
+
+The routine eases the current phase, advances/clamps the visibility timer,
+synchronizes rendered mode with requested mode at zero, preserves transition
+sounds 0xAA/0xA9, then dispatches group-list/page-arrow rendering with original
+positions, selection interpolation and direction. The first eight variants
+agree in size/frame and 125 of 126 words; the sole residual is the timer
+addition's floating operands. Write `func_82403F10() + phase`, not the reverse.
+The first of the corrected eight variants accepts. Do not cache the group
+before a callback that can change the root state.
+
+The runner's advisory register-tie warning appears even in this accepted
+result. It is not proof of an impossible source shape and must not overrule
+the actual link verification and retail-ROM acceptance.
+
+After formatting, removal of newly redundant prototypes and naming with a
+compatibility alias, fresh/twenty-leading-blank controls preserve complete
+frozen text/rodata/data/bss bytes and layout, all 79 original function starts,
+sizes and spans, and all 78 untouched raw instruction spans. No helper,
+padding, storage, compiler patch or verification bypass is installed.
+
+Forced normal `gmake rom COMPARE=1` after cleanup/naming matches retail MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`; the host syntax check passes with only
+the pre-existing unrelated implicit call warning. All 25 tooling tests and
+whitespace checks pass. Scratch generators/proofs and binary outputs stay local.
+
+### List-input requeue, not accepted
+
+`func_82406560`: sixteen candidates, best normalized/raw 0.8100/0.6450,
+expected 800 bytes versus 792, correct frame 0x20. Two families tested:
+word/halfword button local, literal/local five-column divisor and row/count
+initialization order; then shared handled-tail control flow, halfword count,
+row reuse for the left-limit value, base/index expression order and captured
+post-predicate selection/count. Shared-tail versions are 784 bytes and do not
+improve the result. No candidate is installed.
+
+The decisive mechanism is division placement: original computes both signed
+divisions before directional guards, while these candidates sink row division
+into the up/down path and page division after the left guard. Address additions
+also reverse base/index operands, and the timer addition is reversed. Keep the
+real two-argument `func_824048A0(root, oldSelection)` signature, signed random
+modulo four and sound protocol; draft extra call arguments are not evidence of
+real additional formals. Next hypothesis: model the actual grouped-state
+subobjects and semantic quotient lifetimes before another source family;
+do not replay scalar declaration permutations or add unused call arguments.

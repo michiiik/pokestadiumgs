@@ -1081,14 +1081,52 @@ s32 Fragment13_StepVectorToward(struct Fragment13MotionVector *arg0, struct Frag
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82406560.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82406880.s")
+extern void func_82402B1C(void *, void *, f32, s16, f32, s32, s32, s32);
+extern void func_8240330C(void *, s32, f32, s32, s32, f32);
+extern f32 func_82407088(void *arg0);
+extern f32 func_824070E4(void *);
+void Fragment13_UpdateGroupListTransition(void *arg0, void *arg1) {
+    f32 factor;
+
+    factor = D_8160BD08(*(f32 *)((u8 *)arg0 + 0x204) / 10.0f);
+    if (*(s32 *)((u8 *)arg0 + 0x1E4) == *(s32 *)((u8 *)arg0 + 0x1EC)) {
+        *(f32 *)((u8 *)arg0 + 0x204) = func_82403F10() + *(f32 *)((u8 *)arg0 + 0x204);
+        if (*(f32 *)((u8 *)arg0 + 0x204) >= 10.0f) {
+            *(f32 *)((u8 *)arg0 + 0x204) = 10.0f;
+        }
+    } else {
+        *(f32 *)((u8 *)arg0 + 0x204) = *(f32 *)((u8 *)arg0 + 0x204) - func_82403F10();
+        if (*(f32 *)((u8 *)arg0 + 0x204) <= 0.0f) {
+            *(f32 *)((u8 *)arg0 + 0x204) = 0.0f;
+            if (*(s32 *)((u8 *)arg0 + 0x1EC) == 2 && *(s32 *)((u8 *)arg0 + 0x1E4) == 1) {
+                func_800226C0(0xAA);
+            } else if (*(s32 *)((u8 *)arg0 + 0x1E4) == 2) {
+                func_800226C0(0xA9);
+            }
+            *(s32 *)((u8 *)arg0 + 0x1EC) = *(s32 *)((u8 *)arg0 + 0x1E4);
+        }
+    }
+    switch (*(s32 *)((u8 *)arg0 + 0x1EC)) {
+    case 0:
+        return;
+    case 1:
+        func_82402B1C(arg1, (u8 *)arg0 + 0x54, func_82407088(arg0), -1, factor, 184, 1,
+                      *(s32 *)((u8 *)arg0 + 0x1E0) < *(s32 *)((u8 *)arg0 + 0x1DC));
+        return;
+    case 2:
+        func_8240330C(arg1, *(s32 *)((u8 *)arg0 + 0x1DC), factor, *(s32 *)((u8 *)arg0 + 0x1D4),
+                      *(s32 *)((u8 *)arg0 + 0x1D8), *(f32 *)((u8 *)arg0 + 0x208) / 6.0f);
+        func_82402B1C(arg1, (u8 *)arg0 + 0x54, func_824070E4(arg0), (s16)(*(s32 *)((u8 *)arg0 + 0x1DC)),
+                      factor, 154, 0, *(s32 *)((u8 *)arg0 + 0x1E0) < *(s32 *)((u8 *)arg0 + 0x1DC));
+        return;
+    }
+}
 
 extern s32 D_82408BB8;
 extern void func_824050A8(void *, f32);
 extern void func_82406060(void *);
 extern void func_8240641C(void *);
 extern void func_82406560(void *);
-extern void func_82406880(void *, void *);
 void Fragment13_UpdateGroupScene(u8 *arg0, void *arg1) {
     s32 changed;
     u8 *dialog;
@@ -1133,7 +1171,7 @@ void Fragment13_UpdateGroupScene(u8 *arg0, void *arg1) {
         return;
     }
     dialog = arg0 + 0x228;
-    func_82406880(arg0, arg1);
+    Fragment13_UpdateGroupListTransition(arg0, arg1);
     Fragment13_UpdateConfirmationDialog(dialog, arg1);
 }
 
@@ -1143,8 +1181,6 @@ s32 func_82406CCC(u8 *arg0) {
 
 extern void func_82402E28(s32, void *, f32, s32, f32, s32, s32, s32);
 extern void func_82403624(s32, void *, s32, f32, s32, s32, f32);
-extern f32 func_824070E4(void *);
-extern f32 func_82407088(void *arg0);
 void func_82406CDC(void *arg0, s32 arg1) { f32 scale; s32 state; scale = D_8160BD08(*(f32 *)((u8 *)arg0 + 0x204) / 10.0f); state = *(s32 *)((u8 *)arg0 + 0x1EC); switch (state) { case 0: return; case 1: func_82402E28(arg1, (u8 *)arg0 + 0x54, func_82407088(arg0), -1, scale, 0xB8, 1, *(s32 *)((u8 *)arg0 + 0x1E0) < *(s32 *)((u8 *)arg0 + 0x1DC)); return; case 2: func_82403624(arg1, arg0, *(s32 *)((u8 *)arg0 + 0x1DC), scale, *(s32 *)((u8 *)arg0 + 0x1D4), *(s32 *)((u8 *)arg0 + 0x1D8), *(f32 *)((u8 *)arg0 + 0x208) / 6.0f); func_82402E28(arg1, (u8 *)arg0 + 0x54, func_824070E4(arg0), (s16)*(s32 *)((u8 *)arg0 + 0x1DC), scale, 0x9A, 0, *(s32 *)((u8 *)arg0 + 0x1E0) < *(s32 *)((u8 *)arg0 + 0x1DC)); return; } }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82406E14.s")

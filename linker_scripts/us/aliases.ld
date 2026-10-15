@@ -189,3 +189,4 @@ func_865038A8 = Fragment53_ApplyPendingPrimaryAnimation;
 func_86501FA0 = Fragment53_UpdateTrajectoryPosition;
 func_8650A278 = Fragment53_RunSceneTransition;
 func_86501D6C = Fragment53_CountTrajectorySamplesInRange;
+func_82406880 = Fragment13_UpdateGroupListTransition;
