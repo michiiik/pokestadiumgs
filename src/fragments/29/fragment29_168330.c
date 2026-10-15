@@ -291,7 +291,28 @@ void func_88002CB8(s16 x,s16 y,u16 width,u16 height) {
     func_80044424(x + 5, y + height - 8, width - 13, 8, 736, 0, 0, 1024, 0, 1);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_168330/func_88002EC0.s")
+void func_88002EC0(s16 x, s16 y, u16 width, u16 height, u8 mode) {
+    switch (mode) {
+        case 2: {
+            func_80044424(x, y, 2, height - 2, 384, 0, 1024, 0, 0, 2);
+            func_80044424(x + 2, y, width - 4, 2, 384, 0, 0, 1024, 0, 2);
+            func_80044424(x + width - 2, y, 2, 2, 448, 0, 1024, 1024, 0, 2);
+            func_80044424(x, y + height - 2, 2, 2, 384, 64, 1024, 1024, 0, 2);
+            func_80044424(x + width - 2, y + 2, 2, height - 2, 448, 64, 1024, 0, 0, 2);
+            func_80044424(x + 2, y + height - 2, width - 4, 2, 448, 64, 0, 1024, 0, 2);
+            break;
+        }
+        case 3: {
+            func_80044424(x, y, 3, height - 3, 0, 0, 1024, 0, 0, 2);
+            func_80044424(x + 3, y, width - 6, 3, 0, 0, 0, 1024, 0, 2);
+            func_80044424(x + width - 3, y, 3, 3, 96, 0, 1024, 1024, 0, 2);
+            func_80044424(x, y + height - 3, 3, 3, 192, 0, 1024, 1024, 0, 2);
+            func_80044424(x + width - 3, y + 3, 3, height - 3, 288, 0, 1024, 0, 0, 2);
+            func_80044424(x + 3, y + height - 3, width - 6, 3, 288, 0, 0, 1024, 0, 2);
+            break;
+        }
+    }
+}
 
 extern s32 func_80001FF0(void);
 extern s8 D_8800EF18;
