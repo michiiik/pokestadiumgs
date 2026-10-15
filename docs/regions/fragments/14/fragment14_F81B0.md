@@ -1,5 +1,92 @@
 # Fragment 14 selection setup
 
+## 2026-10-15 follow-up — title, preview and page updates accepted
+
+Three of five selected/resumed owners now have normal link-verified combined
+full-ROM acceptance. The file advances to **39 C / 16 ASM** owners.
+`func_8130183C`'s earlier frame requeue is resolved; its historical evidence
+below is retained. The dialog and slot-editing page update remain ASM.
+
+| Owner | Name | Instructions / bytes | Frame | Accepted batch |
+| --- | --- | ---: | ---: | --- |
+| `func_8130015C` | `Fragment14_UpdateTitleText` | 58 / 232 | 0x20 | `234f4728e13647aca80367285ba0b909` |
+| `func_8130176C` | `Fragment14_UpdateSelectionPreview` | 52 / 208 | 0x30 | `64897d9bbc2941feb5fb3c3c0b60b2b5` |
+| `func_8130183C` | `Fragment14_UpdateSelectionPage` | 48 / 192 | 0x30 | `7e5fe024b8fd4960933bec29bb629e9a` |
+
+Total: 158 instructions / 632 bytes, stock IDO 7.1. Solo/native, no agents
+or containers. No helper function, compiler override, padding or fake branch.
+
+### Source mechanisms
+
+- Title: preserve the flag-selected localized text, 0x0200 metadata test,
+  signed localized-name index at info+0x3E, embedded-name fallback and default
+  resource 0x2B. Compare the cached pointer before updating text slot 1 and
+  its scrolling state. Callee assembly proves `func_81700B8C` takes the text
+  pointer as a second argument and returns a word result. The existing C
+  definition proves `func_81700CDC` also returns a word. The accepted runner
+  transaction corrects both declarations together with the candidate.
+- Reuse the consumed flag argument for the signed name index. Keep the text
+  as the sole explicit local; repeated split-address expressions let IDO
+  spill the base at 0x18 and text at 0x1C without extra local homes. An
+  explicit base local inflated the frame to 0x28. The title store uses the
+  observed state field so its address rematerializes after the text calls.
+- Merge that field into the existing record at **0x1A164**, retaining status
+  at 0x1A168; remove the temporary alternate view. This is existing storage,
+  not a new object. Add the text-lookup prototype from its real C definition.
+- Preview: preserve the negative-result state 0, the positive 1/2/3 to
+  states 3/6/7 mapping, position copy and context update. The three-case
+  switch compiles as the observed branch chain, not a jump table.
+- Page: retain the corrected two-argument first helper call, all view updates,
+  position output and signed result branches to states 2/3. Use a direct
+  expression for the page address, keep the panel local, and reuse the now
+  consumed context word for the result. These mechanisms compose to restore
+  both the 0x30 frame and original pointer homes; neither alone was enough.
+- Apply conservative behavior names with US compatibility aliases, preserving
+  address-keyed symbols. The naming tool's unrelated JP rename was reverted.
+
+### Verification
+
+- Native baseline / known-matching whole-TU controls before probes: PASS.
+- All three normal runner `accepted`, `link_verified: true` combined ROM
+  acceptance gates: PASS, statistics and host checks enabled.
+- After record-view consolidation, formatting, prototype cleanup and naming:
+  fresh and twenty-leading-blank builds preserve all section byte views /
+  allocatable layouts, all 55 original function offsets and sizes, all three
+  accepted full spans and 52 untouched C/ASM spans.
+- Forced normal ROM rebuild: byte-identical retail ROM, MD5
+  `1561c75d11cedf356a8ddb1a4a5f9d5d`. Host syntax check: PASS, same 17 warnings
+  as the baseline. Public tooling tests: 22 PASS. Diff check: PASS.
+- Publish only game C, three US aliases and region notes. No scratch helpers,
+  compiler instrumentation, generated assembly, objects, ROMs or JP changes.
+
+### `func_813010B0` — requeue, selected-result stack home
+
+Best clean source: 264/264 bytes, 1.0000 normalized / 0.9697 raw. All words
+except the selected-result spill/reload offset match: target stack+0x3C,
+candidate stack+0x44. Frame 0x48 and the idle flag at stack+0x40 already match.
+Leader: `f14-family:dialog:record-True:local-False:reverse-False`.
+
+Eight initial variants tested record/raw views, cached/direct dialog address
+and local order. Follow-ups tested inline result/flag expressions, small
+record/array snapshots, scoped declarations/initializers and register hints.
+Inlining the lookup result fixes its home but moves the idle read before
+the lookup; it is not exact. A calibrated 45-second native permuter with
+stack scoring reproduces source and target, then stays flat at **16 -> 16**.
+No mutated candidate is adopted. Do not add dummy locals or use unsequenced
+argument writes to manufacture the desired stack layout.
+
+Next: inspect named-local versus temporary spill-home ownership on the two
+leaders, preserving lookup-before-idle-read-before-count-query order. Future
+probes need the real five-argument `func_8130FC80` and ten-argument
+`func_8130FD10` declarations; unused probe declarations were removed here.
+
+### Remaining page/lookup requeues
+
+Six corrected-ABI inline-address compositions do not improve `func_81301648`;
+its previous page-address coloring requeue remains active. The selected-slot
+lookup is unchanged. Ship the three verified owners without holding them
+behind these residuals; do not count the file or repository as complete.
+
 ## 2026-10-15 follow-up — advancement and mode-zero panel accepted
 
 Two of the next four related owners passed one normal link-verified combined

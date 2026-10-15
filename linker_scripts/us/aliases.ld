@@ -131,3 +131,6 @@ func_813013C0 = Fragment14_InitSelectionPanelMode2;
 func_81301448 = Fragment14_InitSelectionPanelMode1;
 func_81300F7C = Fragment14_InitSelectionAdvance;
 func_813012C0 = Fragment14_InitSelectionPanelMode0;
+func_8130015C = Fragment14_UpdateTitleText;
+func_8130176C = Fragment14_UpdateSelectionPreview;
+func_8130183C = Fragment14_UpdateSelectionPage;
