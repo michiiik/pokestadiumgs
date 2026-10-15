@@ -270,8 +270,8 @@ void func_82E02508(void) {
 #ifdef VERSION_US
 extern void BgStage_DrawFrame(void);
 extern void GfxImage_FillCurrent(Gfx **, s32);
-extern void func_80007444(Gfx **, s32, s32, s32, s32, s32);
-extern void func_80007328(Gfx **, void *);
+extern void GfxImage_FillRectangle(Gfx **, s32, s32, s32, s32, s32);
+extern void GfxImage_SetRenderTarget(Gfx **, void *);
 extern void func_82E02CA4(s32);
 extern s32 func_8004D690(s32);
 extern s32 main_pool_push_state(s32);
@@ -298,23 +298,23 @@ void func_82E02658(void) {
     if (D_82E0543C != 8) {
         GfxImage_FillCurrent(&D_800D0510, 1);
     } else {
-        func_80007444(&D_800D0510, 0x28, 0, 0x230, 0x1E0, 1);
+        GfxImage_FillRectangle(&D_800D0510, 0x28, 0, 0x230, 0x1E0, 1);
     }
     if (D_82E07130 == 0) {
-        func_80007328(&D_800D0510, D_82E07600);
+        GfxImage_SetRenderTarget(&D_800D0510, D_82E07600);
         func_82E02CA4(D_82E075F4);
     }
     if (D_82E0543C == 8) {
         if (D_82E07130 == 1) {
             main_pool_push_state(0x6A706567);
             D_82E075F4 = func_8004D690(0x21);
-            func_80007328(&D_800D0510, D_82E07604);
+            GfxImage_SetRenderTarget(&D_800D0510, D_82E07604);
             func_82E02CA4(D_82E075F4);
             main_pool_pop_state(0x6A706567);
         } else if (D_82E07130 == 2) {
             main_pool_push_state(0x6A706567);
             D_82E075F4 = func_8004D690(0x1F);
-            func_80007328(&D_800D0510, D_82E07608);
+            GfxImage_SetRenderTarget(&D_800D0510, D_82E07608);
             func_82E02CA4(D_82E075F4);
             main_pool_pop_state(0x6A706567);
         }

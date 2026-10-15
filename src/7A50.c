@@ -50,7 +50,16 @@ s32 GfxRect_ClipToScissor(S1_unk_D_800A7440 *arg0) {
     return ret;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/7A50/func_80006F70.s")
+void Gfx_SetScissorRect(Gfx **displayList, s16 x, s16 y, s16 width, s16 height) {
+    Gfx *list;
+    if (D_80087220 != 0) {
+        list = *displayList;
+        gDPPipeSync(list++);
+        gDPSetScissor(list++, G_SC_NON_INTERLACE, x, y, x + width, y + height);
+        *displayList = list;
+        GfxRect_SetBounds(&D_800D0530, x, y, (x + width) - 1, (y + height) - 1);
+    }
+}
 
 extern s32 D_80087220;
 void Gfx_ApplyScissorRect(void **arg0) { Gfx *cmd; if (D_80087220 != 0) { cmd = *(Gfx **)arg0; gDPPipeSync(cmd++); gDPSetScissor(cmd++, G_SC_NON_INTERLACE, D_800D0530.x1, D_800D0530.y2, D_800D0530.y1 + 1, D_800D0530.x2 + 1); *arg0 = cmd; } }
@@ -72,13 +81,44 @@ s32 func_8000731C(void) {
     return D_80087220;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/7A50/func_80007328.s")
+void GfxImage_SetRenderTarget(Gfx **displayList, GfxImage *image) {
+    Gfx *list;
+    list = *displayList;
+    gDPPipeSync(list++);
+    if (image->depth_p != 0) {
+        gDPSetDepthSource(list++, G_ZS_PIXEL);
+        gDPSetDepthImage(list++, (u32)(((GfxImage *)image->depth_p))->img_p & 0x1FFFFFFF);
+    }
+    gDPSetColorImage(list++, image->fmt, image->size, image->width, (u32)image->img_p & 0x1FFFFFFF);
+    D_80087220 = (s32)image;
+    Gfx_SetScissorRect(&list, 0, 0, image->width, image->height);
+    *displayList = list;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/7A50/func_80007444.s")
+void GfxImage_FillRectangle(Gfx **displayList, s32 x, s32 y, s32 width, s32 height, u16 color) {
+    if (D_80087220 != 0) {
+        Gfx *list = *displayList;
+        gDPPipeSync(list++);
+        gDPSetCycleType(list++, G_CYC_FILL);
+        gDPSetRenderMode(list++, G_RM_NOOP, G_RM_NOOP2);
+        if (((S1_unk_D_80068BB0 *)(u32)D_80087220)->depth_p != 0) {
+            S1_unk_D_80068BB0 *depth = (S1_unk_D_80068BB0 *)((S1_unk_D_80068BB0 *)(u32)D_80087220)->depth_p;
+            gDPSetColorImage(list++, depth->fmt, depth->size, depth->width, (u32)depth->img_p & 0x1FFFFFFF);
+            gDPSetFillColor(list++, 0xFFFCFFFC);
+            gDPFillRectangle(list++, x, y, x + width - 1, y + height - 1);
+            gDPPipeSync(list++);
+            gDPSetColorImage(list++, ((S1_unk_D_80068BB0 *)(u32)D_80087220)->fmt, ((S1_unk_D_80068BB0 *)(u32)D_80087220)->size, ((S1_unk_D_80068BB0 *)(u32)D_80087220)->width, (u32)((S1_unk_D_80068BB0 *)(u32)D_80087220)->img_p & 0x1FFFFFFF);
+        }
+        gDPPipeSync(list++);
+        gDPSetFillColor(list++, (color << 16) | color);
+        gDPFillRectangle(list++, x, y, x + width - 1, y + height - 1);
+        *displayList = list;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/7A50/func_8000766C.s")
 
 void GfxImage_FillCurrent(void *arg0, u16 arg1) {
-    func_80007444(arg0, 0, 0, (s32) (*(u16 *)((u8 *)(D_80087220) + (4))), (s32) (*(u16 *)((u8 *)(D_80087220) + (6))), (arg1 << 0x10) | arg1);
+    GfxImage_FillRectangle(arg0, 0, 0, (s32) (*(u16 *)((u8 *)(D_80087220) + (4))), (s32) (*(u16 *)((u8 *)(D_80087220) + (6))), (arg1 << 0x10) | arg1);
 }
 #endif

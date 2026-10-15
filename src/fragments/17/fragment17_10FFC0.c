@@ -570,7 +570,7 @@ s32 func_8220336C(s32 arg0, s32 arg1) { gDPPipeSync(D_800D0510++); gDPSetEnvColo
 extern void *StageContext_GetCurrentImage(void);
 extern void BgStage_DrawFrame(void);
 extern void func_81600F0C(s32, s16, s16, s16, s32);
-extern void func_80006F70(Gfx **, s32, s32, s16, s32);
+extern void Gfx_SetScissorRect(Gfx **, s32, s32, s16, s32);
 extern void func_800503A4(u8 *);
 extern void func_822037E4(void);
 extern s32 func_80008648(void);
@@ -589,7 +589,7 @@ void func_822039C8(void) {
     image = StageContext_GetCurrentImage();
     BgStage_DrawFrame();
     func_81600F0C(((s32 *)D_8220E360)[1], *(s16 *)D_8220E4C8, D_8220E4CA, D_8220E4CC, D_8220E4CE);
-    func_80006F70(&D_800D0510, 0, 0, *(s16 *)(image + 4), *(u16 *)(image + 6));
+    Gfx_SetScissorRect(&D_800D0510, 0, 0, *(s16 *)(image + 4), *(u16 *)(image + 6));
     func_800503A4(D_8220E364);
     func_800503A4(*(u8 **)((u8 *)D_8220E360 + 0x1C));
     func_822037E4();

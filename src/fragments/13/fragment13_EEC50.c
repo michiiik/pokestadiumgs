@@ -501,7 +501,7 @@ void func_82405BAC(s32 arg0, void *arg1) {
 extern Gfx *D_800D0510;
 extern void func_80038E14(void *, s32, s32, s32, f32, f32, f32, s32);
 extern void GeoCamera_SetPerspective(void *, f32, f32, f32);
-extern void func_80006F70(Gfx **, s32, s32, s32, s32);
+extern void Gfx_SetScissorRect(Gfx **, s32, s32, s32, s32);
 s32 func_82405EE0(s32 arg0, void *arg1) {
     void *record;
 
@@ -512,7 +512,7 @@ s32 func_82405EE0(s32 arg0, void *arg1) {
     func_80038E14(arg1, *(s32 *)((u8 *)record + 0x174), *(s32 *)((u8 *)record + 0x178), *(s32 *)((u8 *)record + 0x17C), *(f32 *)((u8 *)record + 0x180), *(f32 *)((u8 *)record + 0x184), *(f32 *)((u8 *)record + 0x188), 0);
     GeoCamera_SetPerspective(arg1, 23.1f, 64.0f, 10000.0f);
     if (arg0 == 5) {
-        func_80006F70(&D_800D0510, 0xD, 0x27, 0x126, 0xA1);
+        Gfx_SetScissorRect(&D_800D0510, 0xD, 0x27, 0x126, 0xA1);
     }
     return 1;
 }

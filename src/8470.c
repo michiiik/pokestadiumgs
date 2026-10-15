@@ -122,8 +122,8 @@ extern Vp D_80087278;
 extern Vp D_80087288;
 extern s32 D_80087230;
 extern s32 D_80087234;
-extern void func_80007328(Gfx **, s32);
-extern void func_80006F70(Gfx **, s32, s32, s32, s32);
+extern void GfxImage_SetRenderTarget(Gfx **, s32);
+extern void Gfx_SetScissorRect(Gfx **, s32, s32, s32, s32);
 extern void StageFade_Update(void);
 extern void func_8000B0F0(void);
 extern void TextRenderer_FlushQueuedStrings(Gfx **, s32);
@@ -132,7 +132,7 @@ extern void func_800034E4(Gfx **);
 extern u32 Gfx_AllocDisplayList(s32);
 extern s32 StageContext_IsHighResolution(void);
 void StageLoader_SetupFrame(void) {
-    func_80007328(&D_800D0510, ((s32 *)((u8 *)(u32)D_800D0554 + 0x18))[*(s8 *)((u8 *)(u32)D_800D0554 + 0x16)]);
+    GfxImage_SetRenderTarget(&D_800D0510, ((s32 *)((u8 *)(u32)D_800D0554 + 0x18))[*(s8 *)((u8 *)(u32)D_800D0554 + 0x16)]);
     guOrtho(&D_800D0558, 0.0f, 320.0f, 0.0f, 240.0f, -2.0f, 2.0f, 1.0f);
     Gfx_SetDefaultRenderState();
     Gfx_SetDefaultGeometryState();
@@ -144,7 +144,7 @@ void StageLoader_SetupFrame(void) {
     } else {
         gSPViewport(D_800D0510++, (u32)&D_80087278 & 0x1FFFFFFF);
     }
-    func_80006F70(&D_800D0510, 0, 0, *(s16 *)((u8 *)(u32)D_800D0554), *(s16 *)((u8 *)(u32)D_800D0554 + 2));
+    Gfx_SetScissorRect(&D_800D0510, 0, 0, *(s16 *)((u8 *)(u32)D_800D0554), *(s16 *)((u8 *)(u32)D_800D0554 + 2));
     StageFade_Update();
     if (D_80087230 != 0) { func_8000B0F0(); }
     TextRenderer_FlushQueuedStrings(&D_800D0510, StageContext_IsHighResolution());
@@ -390,7 +390,7 @@ void StageContext_SetClearColor(u16 arg0) {
 void BgStage_DrawFrame(void) {
     u8 *context = (u8 *)(u32)D_800D0554;
     if (context != 0) {
-        func_80007328(&D_800D0510, ((s32 *)(context + 0x18))[*(s8 *)(context + 0x16)]);
+        GfxImage_SetRenderTarget(&D_800D0510, ((s32 *)(context + 0x18))[*(s8 *)(context + 0x16)]);
         gDPSetCycleType(D_800D0510++, G_CYC_1CYCLE);
     }
 }
