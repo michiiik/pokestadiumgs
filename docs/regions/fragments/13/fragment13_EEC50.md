@@ -1055,3 +1055,73 @@ so its unchanged bytes are not evidence of a C match. No alternate flag,
 compiler or patched artifact is installed. Keep the normal compiler and this
 bounded negative; next useful work requires a new constant-lifetime mechanism,
 not another spelling of these tested families.
+
+## 2026-10-16 — selection panels accepted, five-function partial batch
+
+Two more owners accepted together by native runner batch
+`ca70ddad365c4e8d86cb4ff03327a56d`, both **link-verified**, with one combined
+full-ROM gate. File advances **65 C / 14 function ASM to 67 C / 12 function
+ASM**, from 79 original functions. The pending batch is now five functions,
+**436 instruction words / 1,744 bytes**. This is not a complete-file claim.
+
+| Owner | Name | Words / bytes | Frame |
+| --- | --- | ---: | ---: |
+| `func_824020B4` | `Fragment13_DrawSelectionFooter` | 62 / 248 | 0x18 |
+| `func_82402904` | `Fragment13_DrawSelectionHeader` | 56 / 224 | 0x18 |
+
+Preserve the footer's separate text-description pass versus lower icons and
+labels at y207/209, and the header's enabled upper controls/description/labels
+at y20/22. Both winning bodies use a real shared `Gfx *packet`, advance the
+existing display-list pointer once per packet and use `gSPDisplayList`.
+No new helper function or data object is added. Sixteen candidates cover the
+two owners: explicit/shared packet versus the SDK macro's own packet local,
+SDK macro versus equivalent raw-word stores, and guard-return versus nested
+control flow. The third candidate per owner accepts. The raw-word versions
+have four words of instruction-order differences. Other SDK spellings also
+produce link-verified probes, but are skipped after the first accepted owner;
+the named packet is an accepted spelling, not claimed to be uniquely required.
+
+Remove only newly redundant declarations, format the new bodies, name them
+and retain both US compatibility aliases; JP/address-keyed symbols remain
+unchanged. Fresh/twenty-leading-blank controls reproduce complete frozen
+text/rodata/data/bss bytes/layout, all 79 original starts/sizes/full spans and
+all **74 untouched** pre-batch raw instruction spans. The existing renamed
+scene caller also keeps its full section bytes/layout. Scratch generators,
+instrumented compiler copies, ASM, objects and ROMs remain local.
+Forced normal full-ROM verification after cleanup/naming is byte-identical
+to retail MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`. Both changed C files pass
+the host syntax check with their existing warnings only; all 25 tooling tests
+and whitespace checks pass.
+
+### Page-arrow requeue: fresh context and actual spill interference
+
+`func_8240330C` remains ASM after **88 compared candidates**. Refreshing its
+old cached context initially fails: the old integer selector declaration for
+`func_81600A34` conflicts with the opaque selector declaration in the accepted
+scene code. Stop at that compile control, use the current declaration and
+explicit `(void *)2` key, then recalibrate. The refreshed leader still has
+exactly 792 bytes and six raw differences, at word indices
+98/100/123/126/141/145: spill/reload +0x30 instead of +0x28. It is not a hit.
+
+Logging-only spill-interference and temporary-choice hooks are compiled in an
+isolated ignored tool copy. Stock/off/on/twenty-leading-blank controls pass
+for both known source and candidate: every section byte/layout, symbol and
+relocation agrees. No emulated-memory writes or forced allocation are added.
+For this owner, pre-globalcolor ordinal 26 corresponds to globalcolor ordinal
+27. The trace records initial-expression web 28 in temporary 0 / -40, web 34
+in temporary 1 / -44, integer web 54 sharing temporary 1, then floating web 85
+in temporary 2 / -48. Webs 28/85 have overlapping live-block sets; the choice
+trace explicitly reports both temporary 0 and temporary 1 blocked for web 85.
+These are allocator identities, not instruction offsets or proof that the
+original source is unreachable.
+
+Twenty-four new candidates test a single position carrier with genuine whole-
+page/count/fraction intermediates; clip guard-return, positive guard, break
+and goto forms with render-local scope; and reuse of the real progress
+parameter. No rejected body is installed. The best unchanged leader remains
+1.0 normalized / 0.9697 raw, frame 0x58. Single-position/whole-page syntax also
+produces an eight-word residual by moving page-count homes; scoped locals add
+home drift, and progress-parameter reuse shrinks the frame incorrectly.
+Next: map the overlapping live-block membership of webs 28/85 to their source
+uses, or bring a new real lifetime boundary. Do not repeat these source
+families, add padding/unused locals or rename the spill offset by hand.

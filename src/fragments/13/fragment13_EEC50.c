@@ -250,7 +250,31 @@ void func_82401FE0(s32 arg0, s32 arg1) {
     Fragment13_DrawClippedTextureRect((f32)arg0, (f32)arg1, (f32)*(u16 *)(u8 *)(u32)D_82407830, (f32)*(u16 *)((u8 *)(u32)D_82407830 + 2), 0, 0, 1.0f, 1.0f);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_824020B4.s")
+extern void func_800498C4(void);
+extern void func_800499EC(void);
+extern s32 func_8004C874(s32, s32);
+extern void func_800495BC(s32, s32, s32);
+void Fragment13_DrawSelectionFooter(s32 arg0, s32 arg1) {
+    Gfx *packet;
+
+    if (arg0) {
+        func_800498C4();
+        func_82401DD4(arg1);
+        func_800499EC();
+        return;
+    }
+    packet = D_800D0510++;
+    gSPDisplayList(packet, D_80094E38);
+    func_82401E30(28, 207);
+    func_82401F08(240, 207);
+    packet = D_800D0510++;
+    gSPDisplayList(packet, D_80094F50);
+    func_800498C4();
+    func_800496A4(2, 1);
+    func_800495BC(44, 209, func_8004C874(60, 3));
+    func_800495BC(256, 209, func_8004C874(60, 5));
+    func_800499EC();
+}
 
 extern void func_800498C4(void);
 extern void func_82401DD4(s32);
@@ -314,7 +338,25 @@ void func_8240227C(s32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_824027F4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82402904.s")
+void Fragment13_DrawSelectionHeader(s32 arg0, s32 arg1) {
+    Gfx *packet;
+
+    if (!arg0) {
+        return;
+    }
+    packet = D_800D0510++;
+    gSPDisplayList(packet, D_80094E38);
+    func_82401E30(31, 20);
+    func_82401F08(241, 20);
+    packet = D_800D0510++;
+    gSPDisplayList(packet, D_80094F50);
+    func_800498C4();
+    func_82401DD4(arg1);
+    func_800496A4(2, 1);
+    func_800495BC(47, 22, func_8004C874(60, 4));
+    func_800495BC(257, 22, func_8004C874(60, 5));
+    func_800499EC();
+}
 
 s32 func_824029E4(s32 arg0, s16 arg1) {
     if (arg1 < 0) {
@@ -1183,8 +1225,6 @@ extern void func_82402E28(s32, void *, f32, s32, f32, s32, s32, s32);
 extern void func_82403624(s32, void *, s32, f32, s32, s32, f32);
 void func_82406CDC(void *arg0, s32 arg1) { f32 scale; s32 state; scale = D_8160BD08(*(f32 *)((u8 *)arg0 + 0x204) / 10.0f); state = *(s32 *)((u8 *)arg0 + 0x1EC); switch (state) { case 0: return; case 1: func_82402E28(arg1, (u8 *)arg0 + 0x54, func_82407088(arg0), -1, scale, 0xB8, 1, *(s32 *)((u8 *)arg0 + 0x1E0) < *(s32 *)((u8 *)arg0 + 0x1DC)); return; case 2: func_82403624(arg1, arg0, *(s32 *)((u8 *)arg0 + 0x1DC), scale, *(s32 *)((u8 *)arg0 + 0x1D4), *(s32 *)((u8 *)arg0 + 0x1D8), *(f32 *)((u8 *)arg0 + 0x208) / 6.0f); func_82402E28(arg1, (u8 *)arg0 + 0x54, Fragment13_GetInterpolatedListPosition(arg0), (s16)*(s32 *)((u8 *)arg0 + 0x1DC), scale, 0x9A, 0, *(s32 *)((u8 *)arg0 + 0x1E0) < *(s32 *)((u8 *)arg0 + 0x1DC)); return; } }
 
-extern void func_824020B4(s32, s32);
-extern void func_82402904(s32, s32);
 extern void func_8000766C(Gfx **, s32, s32, s32, s32);
 extern void func_8003C6B8(s32);
 extern void func_81A0022C(void *);
@@ -1199,10 +1239,10 @@ void Fragment13_DrawGroupScene(u8 *arg0, void *arg1) {
             func_8240227C(1, (s32)(arg0 + 0x218));
             break;
         case 1:
-            func_824020B4(1, (s32)(arg0 + 0x218));
+            Fragment13_DrawSelectionFooter(1, (s32)(arg0 + 0x218));
             break;
         case 2:
-            func_82402904(1, (s32)(arg0 + 0x218));
+            Fragment13_DrawSelectionHeader(1, (s32)(arg0 + 0x218));
             break;
         case 3:
             func_824021AC(1, (s32)(arg0 + 0x218));
@@ -1216,10 +1256,10 @@ void Fragment13_DrawGroupScene(u8 *arg0, void *arg1) {
             func_8240227C(0, (s32)(arg0 + 0x218));
             break;
         case 1:
-            func_824020B4(0, (s32)(arg0 + 0x218));
+            Fragment13_DrawSelectionFooter(0, (s32)(arg0 + 0x218));
             break;
         case 2:
-            func_82402904(0, (s32)(arg0 + 0x218));
+            Fragment13_DrawSelectionHeader(0, (s32)(arg0 + 0x218));
             break;
         case 3:
             func_824021AC(0, (s32)(arg0 + 0x218));
