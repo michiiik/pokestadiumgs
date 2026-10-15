@@ -22,7 +22,46 @@ struct Fragment13GroupedList {
     s16 starts[8];
 };
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82400BD0.s")
+extern Gfx *D_800D0510;
+void Fragment13_DrawClippedTextureRect(f32 arg0, f32 arg1, f32 arg2, f32 arg3, s16 arg4, s16 arg5, f32 arg6, f32 arg7) {
+    f32 right;
+    f32 bottom;
+    if (arg2 < 0.0f || arg3 < 0.0f || arg0 > 320.0f || arg1 > 240.0f) {
+        return;
+    }
+    right = arg0 + arg2;
+    if (right < 0.0f) {
+        return;
+    }
+    bottom = arg1 + arg3;
+    if (bottom < 0.0f) {
+        return;
+    }
+    if (arg0 < 0.0f) {
+        arg2 += arg0;
+        arg4 -= arg0 * arg6;
+        arg0 = 0.0f;
+    }
+    if (arg1 < 0.0f) {
+        arg3 += arg1;
+        arg5 -= arg1 * arg7;
+        arg1 = 0.0f;
+    }
+    right = arg0 + arg2;
+    if (right > 320.0f) {
+        arg2 -= 320.0f - arg0;
+        right = arg0 + arg2;
+    }
+    bottom = arg1 + arg3;
+    if (bottom > 240.0f) {
+        arg3 -= 240.0f - arg1;
+        bottom = arg1 + arg3;
+    }
+    gSPScisTextureRectangle(D_800D0510++, ((s32)arg0) * 4, ((s32)arg1) * 4,
+                           ((s32)right) * 4, ((s32)bottom) * 4, G_TX_RENDERTILE,
+                           arg4 * 32, arg5 * 32, (s16)(s32)(arg6 * 1024.0f),
+                           (s16)(s32)(arg7 * 1024.0f));
+}
 
 extern void func_8004C8C0(s32);
 s32 func_8004C990(s32, s32);
@@ -75,7 +114,6 @@ extern u8 D_80094E38[];
 extern u8 D_80094F50[];
 extern u8 D_80094DB8[];
 extern void func_8004D1FC(u8 *);
-extern void func_82400BD0(f32, f32, f32, f32, s32, s32, f32, f32);
 extern void Gfx_FillRectRgba(s16, s16, s16, s16, u8, u8, u8, u8);
 extern s32 D_82407840;
 void func_82401198(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
@@ -88,14 +126,14 @@ void func_82401198(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     arg1 -= 2;
     arg2 += 2;
     arg3 += 2;
-    func_82400BD0(arg0, arg1, 4.0f, 4.0f, 0, 0, 1.0f, 1.0f);
-    func_82400BD0((arg0 + arg2) - 4, arg1, 4.0f, 4.0f, 4, 0, 1.0f, 1.0f);
-    func_82400BD0(arg0, (arg1 + arg3) - 4, 4.0f, 4.0f, 8, 0, 1.0f, 1.0f);
-    func_82400BD0((arg0 + arg2) - 4, (arg1 + arg3) - 4, 4.0f, 4.0f, 0xC, 0, 1.0f, 1.0f);
-    func_82400BD0(arg0, arg1 + 4, 4.0f, arg3 - 8, 0, 4, 1.0f, 0.0f);
-    func_82400BD0(arg0 + 4, arg1, arg2 - 8, 4.0f, 4, 0, 0.0f, 1.0f);
-    func_82400BD0((arg0 + arg2) - 4, arg1 + 4, 4.0f, arg3 - 8, 0xC, 0, 1.0f, 0.0f);
-    func_82400BD0(arg0 + 4, (arg1 + arg3) - 4, arg2 - 8, 4.0f, 0xC, 0, 0.0f, 1.0f);
+    Fragment13_DrawClippedTextureRect(arg0, arg1, 4.0f, 4.0f, 0, 0, 1.0f, 1.0f);
+    Fragment13_DrawClippedTextureRect((arg0 + arg2) - 4, arg1, 4.0f, 4.0f, 4, 0, 1.0f, 1.0f);
+    Fragment13_DrawClippedTextureRect(arg0, (arg1 + arg3) - 4, 4.0f, 4.0f, 8, 0, 1.0f, 1.0f);
+    Fragment13_DrawClippedTextureRect((arg0 + arg2) - 4, (arg1 + arg3) - 4, 4.0f, 4.0f, 0xC, 0, 1.0f, 1.0f);
+    Fragment13_DrawClippedTextureRect(arg0, arg1 + 4, 4.0f, arg3 - 8, 0, 4, 1.0f, 0.0f);
+    Fragment13_DrawClippedTextureRect(arg0 + 4, arg1, arg2 - 8, 4.0f, 4, 0, 0.0f, 1.0f);
+    Fragment13_DrawClippedTextureRect((arg0 + arg2) - 4, arg1 + 4, 4.0f, arg3 - 8, 0xC, 0, 1.0f, 0.0f);
+    Fragment13_DrawClippedTextureRect(arg0 + 4, (arg1 + arg3) - 4, arg2 - 8, 4.0f, 0xC, 0, 0.0f, 1.0f);
     gSPDisplayList(D_800D0510++, D_80094F50);
     gSPDisplayList(D_800D0510++, D_80094DB8);
     gDPSetRenderMode(D_800D0510++, 0x00504240, 0);
@@ -110,14 +148,14 @@ void Fragment13_DrawTexturedPanelBorder(s32 arg0, s32 arg1, s32 arg2, s32 arg3) 
         func_8004D1FC((void *)(u32)D_82407844);
         gSPDisplayList(D_800D0510++, D_80094E38);
         gDPSetRenderMode(D_800D0510++, 0, 0x0F0A7008);
-        func_82400BD0(arg0, arg1, 4.0f, 4.0f, 0, 0, 1.0f, 1.0f);
-        func_82400BD0((arg0 + arg2) - 4, arg1, 4.0f, 4.0f, 4, 0, 1.0f, 1.0f);
-        func_82400BD0(arg0, (arg1 + arg3) - 4, 4.0f, 4.0f, 0, 4, 1.0f, 1.0f);
-        func_82400BD0((arg0 + arg2) - 4, (arg1 + arg3) - 4, 4.0f, 4.0f, 4, 4, 1.0f, 1.0f);
-        func_82400BD0(arg0, arg1 + 4, 4.0f, arg3 - 8, 0, 4, 1.0f, 0.0f);
-        func_82400BD0(arg0 + 4, arg1, arg2 - 8, 4.0f, 4, 0, 0.0f, 1.0f);
-        func_82400BD0((arg0 + arg2) - 4, arg1 + 4, 4.0f, arg3 - 8, 4, 4, 1.0f, 0.0f);
-        func_82400BD0(arg0 + 4, (arg1 + arg3) - 4, arg2 - 8, 4.0f, 4, 4, 0.0f, 1.0f);
+        Fragment13_DrawClippedTextureRect(arg0, arg1, 4.0f, 4.0f, 0, 0, 1.0f, 1.0f);
+        Fragment13_DrawClippedTextureRect((arg0 + arg2) - 4, arg1, 4.0f, 4.0f, 4, 0, 1.0f, 1.0f);
+        Fragment13_DrawClippedTextureRect(arg0, (arg1 + arg3) - 4, 4.0f, 4.0f, 0, 4, 1.0f, 1.0f);
+        Fragment13_DrawClippedTextureRect((arg0 + arg2) - 4, (arg1 + arg3) - 4, 4.0f, 4.0f, 4, 4, 1.0f, 1.0f);
+        Fragment13_DrawClippedTextureRect(arg0, arg1 + 4, 4.0f, arg3 - 8, 0, 4, 1.0f, 0.0f);
+        Fragment13_DrawClippedTextureRect(arg0 + 4, arg1, arg2 - 8, 4.0f, 4, 0, 0.0f, 1.0f);
+        Fragment13_DrawClippedTextureRect((arg0 + arg2) - 4, arg1 + 4, 4.0f, arg3 - 8, 4, 4, 1.0f, 0.0f);
+        Fragment13_DrawClippedTextureRect(arg0 + 4, (arg1 + arg3) - 4, arg2 - 8, 4.0f, 4, 4, 0.0f, 1.0f);
         gSPDisplayList(D_800D0510++, D_80094F50);
     }
 }
@@ -131,15 +169,23 @@ void Fragment13_DrawPanelCorners(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
         gDPSetRenderMode(D_800D0510++, 0, 0x0F0A7008);
         gDPSetEnvColor(D_800D0510++, 0xF8, 0xFF, 0x7C, 0xFF);
         gDPPipeSync(D_800D0510++);
-        func_82400BD0((f32)arg0, (f32)arg1, 8.0f, 8.0f, 0, 0, 1.0f, 1.0f);
-        func_82400BD0((f32)(arg0 + arg2 - 8), (f32)arg1, 8.0f, 8.0f, 8, 0, 1.0f, 1.0f);
-        func_82400BD0((f32)arg0, (f32)(arg1 + arg3 - 8), 8.0f, 8.0f, 0, 8, 1.0f, 1.0f);
-        func_82400BD0((f32)(arg0 + arg2 - 8), (f32)(arg1 + arg3 - 8), 8.0f, 8.0f, 8, 8, 1.0f, 1.0f);
+        Fragment13_DrawClippedTextureRect((f32)arg0, (f32)arg1, 8.0f, 8.0f, 0, 0, 1.0f, 1.0f);
+        Fragment13_DrawClippedTextureRect((f32)(arg0 + arg2 - 8), (f32)arg1, 8.0f, 8.0f, 8, 0, 1.0f, 1.0f);
+        Fragment13_DrawClippedTextureRect((f32)arg0, (f32)(arg1 + arg3 - 8), 8.0f, 8.0f, 0, 8, 1.0f, 1.0f);
+        Fragment13_DrawClippedTextureRect((f32)(arg0 + arg2 - 8), (f32)(arg1 + arg3 - 8), 8.0f, 8.0f, 8, 8, 1.0f, 1.0f);
         gSPDisplayList(D_800D0510++, D_80094F50);
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82401A28.s")
+void Fragment13_DrawColoredPanelFill(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u8 *arg4) {
+    func_8004D1FC((void *)(u32)D_82407848);
+    gSPDisplayList(D_800D0510++, D_80094E38);
+    /* Preserve RGB bit positions and the original color-pack evaluation tree. */
+    gDPSetColor(D_800D0510++, G_SETENVCOLOR, (_SHIFTL(arg4[1], 16, 8) | _SHIFTL(arg4[2], 8, 8) | _SHIFTL(arg4[0], 24, 8) | _SHIFTL(0xFF, 0, 8)));
+    gDPSetRenderMode(D_800D0510++, 0, 0x0F0A4000);
+    gSPScisTextureRectangle(D_800D0510++, arg0 * 4, arg1 * 4, (arg0 + arg2) * 4, (arg1 + arg3) * 4, G_TX_RENDERTILE, 0, 0, (u32)(65536.0f / (f32)arg2), 0);
+    gSPDisplayList(D_800D0510++, D_80094F50);
+}
 
 extern void func_800496A4(s32, s32);
 extern void func_8004C54C(s32, s32);
@@ -156,26 +202,24 @@ void func_82401DD4(s32 arg0) {
 
 extern Gfx *D_800D0510;
 extern void func_8004D1FC(u8 *);
-extern void func_82400BD0(f32, f32, f32, f32, s32, s32, f32, f32);
 void func_82401E30(s32 arg0, s32 arg1) {
     gDPSetEnvColor(D_800D0510++, 0xAA, 0xAA, 0xFF, 0xFF);
     func_8004D1FC((u8 *)(u32)D_82407838);
-    func_82400BD0((f32)arg0, (f32)arg1, (f32)*(u16 *)(u8 *)(u32)D_82407838, (f32)*(u16 *)((u8 *)(u32)D_82407838 + 2), 0, 0, 1.0f, 1.0f);
+    Fragment13_DrawClippedTextureRect((f32)arg0, (f32)arg1, (f32)*(u16 *)(u8 *)(u32)D_82407838, (f32)*(u16 *)((u8 *)(u32)D_82407838 + 2), 0, 0, 1.0f, 1.0f);
 }
 
 void func_82401F08(s32 arg0, s32 arg1) {
     gDPSetEnvColor(D_800D0510++, 0xAA, 0xFF, 0xAA, 0xFF);
     func_8004D1FC((u8 *)(u32)D_8240783C);
-    func_82400BD0((f32)arg0, (f32)arg1, (f32)*(u16 *)(u8 *)(u32)D_8240783C, (f32)*(u16 *)((u8 *)(u32)D_8240783C + 2), 0, 0, 1.0f, 1.0f);
+    Fragment13_DrawClippedTextureRect((f32)arg0, (f32)arg1, (f32)*(u16 *)(u8 *)(u32)D_8240783C, (f32)*(u16 *)((u8 *)(u32)D_8240783C + 2), 0, 0, 1.0f, 1.0f);
 }
 
 extern Gfx *D_800D0510;
 extern void func_8004D1FC(u8 *);
-extern void func_82400BD0(f32, f32, f32, f32, s32, s32, f32, f32);
 void func_82401FE0(s32 arg0, s32 arg1) {
     gDPSetEnvColor(D_800D0510++, 0xFF, 0xFF, 0xFF, 0xFF);
     func_8004D1FC((u8 *)(u32)D_82407830);
-    func_82400BD0((f32)arg0, (f32)arg1, (f32)*(u16 *)(u8 *)(u32)D_82407830, (f32)*(u16 *)((u8 *)(u32)D_82407830 + 2), 0, 0, 1.0f, 1.0f);
+    Fragment13_DrawClippedTextureRect((f32)arg0, (f32)arg1, (f32)*(u16 *)(u8 *)(u32)D_82407830, (f32)*(u16 *)((u8 *)(u32)D_82407830 + 2), 0, 0, 1.0f, 1.0f);
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_824020B4.s")
