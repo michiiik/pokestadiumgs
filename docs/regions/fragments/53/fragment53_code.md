@@ -1,5 +1,65 @@
 # Fragment 53 animation family
 
+## 2026-10-16 — trajectory and scene transition accepted
+
+`func_86501FA0` is now `Fragment53_UpdateTrajectoryPosition`, **78 words /
+312 bytes**, frame **0x18**. Batch `5b2f65f77dc843949684fe4024295802`
+accepted the direct-global spelling with `link_verified: true` and one combined
+full-ROM gate. Advance/wrap/clamp the trajectory step in mode ten; otherwise
+invoke its selector. Preserve the double-precision parabolic expression and
+the subsequent single-precision normalized integer output. No local time,
+scale, or counter carrier is needed. Unused declarations from the exploratory
+batch are removed after acceptance.
+
+`func_8650A278` is now `Fragment53_RunSceneTransition`, **91 words / 364 bytes**,
+frame **0x30**. Batch `3fcf5edadb0a40bfae7cfc5084e79743` accepted it with
+`link_verified: true` and one combined full-ROM gate. In mode four, reset four
+primary/secondary actor models and choose signed random animation frames;
+then fade from opaque and update the scene until its stored result is three.
+
+The calibrated 45-second permuter improved a 110-point seed to 95 without a
+match; reviewed source variants then closed the residual. Initialize secondary
+and primary model pointers on one line, then resource/state pointers and the
+`do` on one line. This schedules the entry address construction correctly.
+An explicit end-pointer local changes allocation and does not help. The last
+one-word residual is the final `bne` operand order: test the stored scene result,
+not its local return-value carrier. This is an actual source-level distinction,
+not a patched branch. Eight-cell exit batch accepted its fourth candidate.
+
+The accepted giant-line loop was replaced with a readable multiline body after
+a fresh scratch build proved every text/rodata/data/bss byte and the complete
+object link shape identical. Only the two short initialization groups need
+to stay paired. Redundant casts/declarations are removed; no fake conditions,
+uninitialized reads, padding, compiler modifications, or helper functions land.
+
+After naming, fresh and twenty-leading-blank object builds preserve all 56
+original function offsets/sizes/spans and all **53 untouched raw spans**.
+Full section bytes/layout match the frozen accepted object. Forced normal ROM
+build is retail-identical, MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`. Progress
+from the original batch baseline is **13 C / 43 ASM to 16 C / 40 ASM**.
+
+### Updated unresolved handoffs
+
+`func_86508890`: **48 compared** plus the earlier calibrated permuter. Eight
+real-end-pointer placements/reused-span variants and eight typed byte/word
+state views retain best normalized/raw **1.0/0.7320**, 388 bytes, frame 0x30.
+A fresh logging-only IDO calibration passes stock/off/on/blank controls for a
+known match and this leader, including section bytes, symbols and relocations.
+Its measured colors are model/index `$s0` (disjoint), state `$s1`, resource
+`$s2`, secondary `$s3`, end `$s4`, literal fifteen `$s5`; original roles differ.
+Requeue: change a genuine pointer/constant cost or live-range relationship,
+not declaration permutations, span widths, end placement, or typed views alone.
+This trace describes the candidate, not the unknown original compiler IR.
+
+`func_86509318`: **24 compared**, plus eight declaration-order compile failures
+that are not source-shape evidence. Best normalized/raw **0.8222/0.6778**,
+356 bytes against 360 expected. Typed effect views, loop form, shared stride,
+entry/per-iteration scale caching, and geometry snapshots are tested. Original
+caches the scale across actors but reloads after initialization callbacks,
+loads geometry before stores, and uses a different alpha-saturation branch.
+Requeue: inspect alias-sensitive scale ownership and the alpha clamp before
+further carrier permutations. Leave the owner in assembly.
+
 ## 2026-10-16 — pending primary animation accepted
 
 `func_865038A8` is now `Fragment53_ApplyPendingPrimaryAnimation`, **36 words /

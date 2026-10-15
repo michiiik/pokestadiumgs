@@ -182,3 +182,5 @@ func_82400BD0 = Fragment13_DrawClippedTextureRect;
 func_824046A4 = Fragment13_DrawConfirmationDialog;
 func_82404440 = Fragment13_HandleConfirmationInput;
 func_865038A8 = Fragment53_ApplyPendingPrimaryAnimation;
+func_86501FA0 = Fragment53_UpdateTrajectoryPosition;
+func_8650A278 = Fragment53_RunSceneTransition;
