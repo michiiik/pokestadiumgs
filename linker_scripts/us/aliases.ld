@@ -180,3 +180,4 @@ func_82401570 = Fragment13_DrawTexturedPanelBorder;
 func_82401A28 = Fragment13_DrawColoredPanelFill;
 func_82400BD0 = Fragment13_DrawClippedTextureRect;
 func_824046A4 = Fragment13_DrawConfirmationDialog;
+func_82404440 = Fragment13_HandleConfirmationInput;

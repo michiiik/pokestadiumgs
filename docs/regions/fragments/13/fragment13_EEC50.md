@@ -621,3 +621,110 @@ an explicit actual `func_8004989C(s32)` declaration and behavior-backed naming
 are object-neutral. Forced normal retail-ROM comparison passes with MD5
 `1561c75d11cedf356a8ddb1a4a5f9d5d`. Scratch generators, objects, compiler
 copies and ROMs remain local and unpublished.
+
+### Page-transition arrows: requeue, six-word float spill residual
+
+`func_8240330C` remains ASM after 64 compared native candidates. Best retained
+source is local `native-f13-page-arrows-homes.json`, candidate 0:
+`f13-page-arrows:observed-homes:prefix-pulse-y-animatedY:early-stage-False`.
+It has all 198 words / 792 bytes, frame 0x58, and the exact opcode/register
+sequence (normalized/raw 1.0/0.9697). Exactly six instructions use the
+position float spill at stack+0x30 instead of the original stack+0x28;
+the y spill +0x2C, retained triangle +0x34 and page count +0x3C agree.
+Differing instruction indices are 98, 100, 123, 126, 141 and 145.
+
+Useful progression: a shared pulse carrier for the initial triangular phase
+and subsequent arrow arguments removes four extra instructions. Separating
+the initial interpolated position from its post-call use and retaining the
+actual float y calculation restores the frame. Placing the real count and
+triangle locals in the observed home order repairs their stack offsets.
+No dummy variable, artificial frame padding or signature mutation is used.
+Do not replay literal/local divisor, count/guard order, in-place triangle,
+upper-page local, conversion local, early/late stage copy or input-factor
+reuse families unchanged. Input-factor reuse is substantially worse.
+Eight subsequent two-field phase-record variants (initial/working position,
+fraction or animated y, both field orders) also preserve the same six-word
+spill residual. They do not justify another aggregate-layout sweep.
+
+Logging-only compiler controls were revalidated on this current known object
+and the leader: stock, logging-off, logging-on and twenty-leading-blank
+objects preserve complete section bytes/layout, function/object symbols and
+relocation topology. The leader's pre-globalcolor spill-plan ordinal 26
+corresponds to globalcolor ordinal 27 (line 334 and common web IDs); UGEN
+procedure 26 starts at this owner's source line 320. Measured plan: web 28
+uses temp 0 at -40; web 34 uses temp 1 at -44; integer web 54 reuses temp 1;
+float web 85 uses temp 2 at -48. These offsets identify the candidate's slot
+assignment, not a proof of the target's internal compiler decisions.
+
+A separately calibrated, fixed-interface, stack-scored 45-second native
+permuter reproduces both its base and target instruction words, but does not
+reach exact (48 -> 24). The best mutant adds an empty `if (arg1)` and is
+rejected as scaffolding, not installed or treated as source evidence. Next:
+inspect interference/reuse between web 28 and float web 85 to find a real
+expression/lifetime change that lets the retained position reuse temp 0.
+This is not evidence that the stock compiler cannot emit the target.
+
+### Scaled/tinted icon renderer: requeue, channel topology established
+
+`func_8240239C` remains ASM after 40 native candidates. Best opcode-shape
+candidate is local `native-f13-scaled-icon-channel.json`, candidate 1,
+`f13-scaled-icon:channel-update:all-reads-False:explicit-False:inline-inverse-True`:
+278 words / 1112 bytes, frame 0x50, normalized/raw 0.9748/0.5863. All-read-first
+channels are worse. Do not mistake the normalized score for a near-exact
+register result: many operands and some scheduling still differ.
+
+Recover scale `1 + amount`, blend clamped to [0,1], original texture height
+minus three, integer center positioning, the original minimum-scale cell,
+RGB interpolation toward 220, and reciprocal texture stepping. Inline the
+original dimension expressions rather than preloading two dimension locals.
+Each byte channel must be loaded and updated sequentially before emitting
+the environment-color command; direct expressions inside that macro are
+evaluated in a different order. Byte channel carriers and an inline reciprocal
+produce the original size/frame. Remaining opcode differences are around
+display-head materialization, FPU conversion restore scheduling, color-pack
+mask ordering and stack-argument stores. Next: follow the display-head value
+lifetime through the first channel conversion, rather than permuting the
+already-established clamp/dimension forms.
+
+The original visibility call supplies context, id and two dimensions. Its
+probe uses an old-style declaration at that call site, consistent with the
+later two-argument view; it does not change the actual helper definition or
+invent dimensions. A separate consistent correction to the texture-bind
+helper's real `s32` return was also tested through companion edits. It does
+not close the owner (best opcode/raw 0.9676/0.6043 for the channel candidate),
+and no declaration correction or candidate body was installed. No gate was
+bypassed and no failed source edit remains.
+
+### Dialog input accepted, native partial batch
+
+`func_82404440` is now `Fragment13_HandleConfirmationInput`: 73 words /
+292 bytes, frame 0x18. File advances 59 C / 20 ASM to 60 C / 19 ASM.
+Eight submitted candidates identify the word-sized button local, two-case
+switch and common navigation/cancel return. The byte-sized button local has
+the same opcode sequence but uses v1 instead of the original v0; explicit
+early returns and if/else sound dispatch do not match. Winning batch
+`4e5058597a2d40cdbabf1cb2425f4bec` reports accepted, link-verified and a
+successful combined full-ROM gate (5.701 seconds probe, 1.182 seconds gate).
+
+Preserve phase 8.0, signed selection checks, right/left priority over confirm
+and cancel, selection values 0/1/2, state 3 and the original sound requests.
+These original call sites pass only the sound word. A C89 old-style sound
+declaration at this owner preserves those calls, while the existing later
+`extern void func_800226C0(s32, void *);` and contextual caller are unchanged.
+No callee definition, invented optional argument or verification setting is
+changed. Host syntax checking passes, but now reports eight additional
+deprecated-non-prototype warnings, besides the existing unrelated implicit-call
+warning. This is deliberate historical call compatibility, not C23 support;
+do not describe all nine warnings as pre-existing or silence the check.
+
+After formatting and behavior-backed naming, fresh/twenty-leading-blank
+whole-object controls preserve text/rodata/data/bss bytes/layout and every
+original function start/size/full span. The 78 untouched spans, including the
+contextual sound caller, match the pre-input object. Normal forced native
+retail-ROM comparison passes (MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`),
+as do all 22 tooling tests and whitespace checking. No new helper, data,
+padding, compiler or layout change is part of the source acceptance.
+
+The state-dispatch sibling `func_824045B4` has a real five-entry jump table.
+Its file currently lacks an explicit per-file `.rodata` subsegment in the
+YAML, so no switch probe was attempted before that layout prerequisite.

@@ -437,7 +437,42 @@ s32 func_82404430(u8 *arg0) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82404440.s")
+extern u8 *D_80087200;
+/* Preserve the original one-word sound requests; later contextual calls keep their prototype. */
+extern void func_800226C0();
+s32 Fragment13_HandleConfirmationInput(u8 *arg0) {
+    s32 buttons;
+
+    *(f32 *)(arg0 + 0x1C) = 8.0f;
+    buttons = *(u16 *)(D_80087200 + 8);
+    if ((buttons & 0x100) && *(s8 *)(arg0 + 0x20) <= 0) {
+        func_800226C0(1);
+        *(s8 *)(arg0 + 0x20) = 1;
+    } else if ((buttons & 0x200) && *(s8 *)(arg0 + 0x20) > 0) {
+        func_800226C0(1);
+        *(s8 *)(arg0 + 0x20) = 0;
+    } else if (buttons & 0x8000) {
+        *(u8 *)(arg0 + 0x21) = 3;
+        switch (*(s8 *)(arg0 + 0x20)) {
+        case 0:
+            func_800226C0(0x14A);
+            break;
+        case 1:
+            func_800226C0(0x14);
+            break;
+        }
+        func_800226C0(0xAA);
+        return 1;
+    } else if (buttons & 0x4000) {
+        *(s8 *)(arg0 + 0x20) = 2;
+        func_800226C0(3);
+        func_800226C0(0xAA);
+        *(u8 *)(arg0 + 0x21) = 3;
+    } else {
+        return 0;
+    }
+    return 1;
+}
 
 extern void func_800226C0(s32, void *);
 s8 func_82404564(void *arg0) {
