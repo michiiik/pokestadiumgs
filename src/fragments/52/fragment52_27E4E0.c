@@ -527,7 +527,7 @@ void func_864064DC(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_800088DC(void);
+extern void BgStage_DrawFrame(void);
 extern void GfxImage_FillCurrent(void *, u16);
 extern void func_8000766C(void *, s32, s32, s32, s32);
 extern s32 func_87F00930(void);
@@ -545,7 +545,7 @@ extern void func_80008648(void);
 void func_86406544(void) {
     s32 flags;
 
-    func_800088DC();
+    BgStage_DrawFrame();
     GfxImage_FillCurrent(&D_800D0510, 0x401);
     func_8000766C(&D_800D0510, 0, 0, 0x140, 0xF0);
     if (func_87F00930() == 0) {

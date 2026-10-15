@@ -99,12 +99,12 @@ s32 func_832007D4(s32 arg0) {
 
 #ifdef VERSION_US
 extern u8 D_83200DB0[];
-extern void func_800088DC(void);
+extern void BgStage_DrawFrame(void);
 extern void func_818017A8(void);
 extern void func_81805308(void *);
 extern void func_80008648(void);
 void func_832008F0(s32 arg0) {
-    func_800088DC();
+    BgStage_DrawFrame();
     func_818017A8();
     func_81805308(D_83200DB0);
     func_80008648();

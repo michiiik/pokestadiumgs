@@ -158,14 +158,14 @@ void func_8F200258(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_800088DC(void);
+extern void BgStage_DrawFrame(void);
 extern void GfxImage_FillCurrent(void *, u16);
 extern void func_800503A4(u8 *);
 extern void func_80008648(void);
 extern u8 D_800D0510[];
 void func_8F200424(void) {
     u8 *value;
-    func_800088DC();
+    BgStage_DrawFrame();
     GfxImage_FillCurrent(&D_800D0510, 0x5295);
     value = (u8 *)D_8F20090C;
     if (value != NULL) {

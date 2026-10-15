@@ -159,7 +159,7 @@ void func_8FD00B28(void) {
 #ifdef VERSION_US
 extern void GfxImage_FillCurrent(s32 *, s32);
 extern void func_80008648();
-extern void func_800088DC();
+extern void BgStage_DrawFrame();
 extern void func_8FD009B4();
 extern void func_8FD00A5C();
 extern void func_8FD00B28();
@@ -167,7 +167,7 @@ extern void func_8FD00BA4();
 extern void func_8FD00CD0();
 extern Gfx *D_800D0510;
 void func_8FD01120(void) {
-    func_800088DC();
+    BgStage_DrawFrame();
     GfxImage_FillCurrent(&D_800D0510, 1);
     func_8FD009B4();
     func_8FD00A5C();

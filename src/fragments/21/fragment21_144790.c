@@ -38,7 +38,7 @@ void func_8250483C(void) {
 }
 
 extern void func_80008648();
-extern void func_800088DC();
+extern void BgStage_DrawFrame();
 extern void func_800468A0(s32);
 extern void func_800503A4(s32);
 extern void func_8250483C();
@@ -46,7 +46,7 @@ void func_8250498C(void) {
     s32 *sp1C;
 
     sp1C = D_825087F0;
-    func_800088DC();
+    BgStage_DrawFrame();
     func_800468A0((*(s32 *)((u8 *)(sp1C) + (0))));
     func_800503A4((*(s32 *)((u8 *)(sp1C) + (4))));
     func_8250483C();

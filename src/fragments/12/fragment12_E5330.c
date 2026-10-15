@@ -46,7 +46,7 @@ void func_81400124(void) {
 }
 
 extern void func_80008648();
-extern void func_800088DC();
+extern void BgStage_DrawFrame();
 extern void func_81400098(s32);
 extern void func_81407118(u8 *, s32);
 extern s32 D_814077B4;
@@ -54,7 +54,7 @@ extern s32 D_814077B8;
 void func_81400194(void) {
     s32 temp_v0;
 
-    func_800088DC();
+    BgStage_DrawFrame();
     temp_v0 = func_8000731C();
     D_814077B4 = D_814077B8;
     if (temp_v0 != 0) {

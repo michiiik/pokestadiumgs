@@ -40,12 +40,12 @@ void func_8F300020_padding(void) {}
 
 extern void GfxImage_FillCurrent(s32 *, s32);
 extern void func_80008648();
-extern void func_800088DC();
+extern void BgStage_DrawFrame();
 extern void func_8F3000E8();
 extern u8 D_800D0510;
 
 void func_8F300770(void) {
-    func_800088DC();
+    BgStage_DrawFrame();
     GfxImage_FillCurrent(&D_800D0510, 1);
     func_8F3000E8();
     func_80008648();

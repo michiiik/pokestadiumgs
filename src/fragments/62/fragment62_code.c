@@ -16,12 +16,12 @@ void func_86C00020(void) {
 }
 
 extern u8 D_800D0510[];
-extern void func_800088DC(void);
+extern void BgStage_DrawFrame(void);
 extern void GfxImage_FillCurrent(void *, s32);
 extern void func_81A0022C(void *);
 extern void func_80008648(void);
 void func_86C00070(void) {
-    func_800088DC();
+    BgStage_DrawFrame();
     GfxImage_FillCurrent(&D_800D0510, 0x8421);
     func_81A0022C(&D_86C00350);
     func_80008648();

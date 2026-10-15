@@ -384,7 +384,7 @@ void func_8F10128C(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_800088DC(void);
+extern void BgStage_DrawFrame(void);
 extern void GfxImage_FillCurrent(void *, u16);
 extern void GeoRender_AdvanceFrameCounter(void);
 extern void func_8003C6B8(s32);
@@ -397,7 +397,7 @@ extern s32 D_8F103988;
 extern s32 D_8F1DECA4;
 extern s32 D_8F103984;
 void func_8F101CDC(void) {
-    func_800088DC();
+    BgStage_DrawFrame();
     GfxImage_FillCurrent(&D_800D0510, 0x5295);
     if (D_8F103988 != 0) {
         if (D_8F103988 > 0) {

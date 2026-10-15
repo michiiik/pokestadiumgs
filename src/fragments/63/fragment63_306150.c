@@ -84,10 +84,10 @@ void func_87E030F0(s32 arg0, s32 arg1) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_306150/func_87E031C0.s")
 
 extern void func_87E031C0(void);
-extern void func_800088DC(void);
+extern void BgStage_DrawFrame(void);
 void func_87E03448(void) {
     func_87E031C0();
-    func_800088DC();
+    BgStage_DrawFrame();
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_306150/func_87E03470.s")

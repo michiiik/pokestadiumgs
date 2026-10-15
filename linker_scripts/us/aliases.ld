@@ -94,3 +94,7 @@ func_8F2007B4 = fragment70_main;
 func_8F0007E8 = fragment68_main;
 func_8F50086C = fragment73_main;
 func_8FA01830 = fragment75_main;
+func_80007A84 = StageFade_Start;
+func_80008734 = BgStage_RunUntilCondition;
+func_800087E8 = BgStage_WaitForCondition;
+func_800088DC = BgStage_DrawFrame;

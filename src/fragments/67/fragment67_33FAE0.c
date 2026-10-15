@@ -294,7 +294,7 @@ void func_82904160(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_800088DC(void);
+extern void BgStage_DrawFrame(void);
 extern void func_829060BC(void);
 extern void GeoRender_AdvanceFrameCounter(void);
 extern void func_8003C6B8(s32);
@@ -303,7 +303,7 @@ extern void func_82904160(void);
 extern void func_80008648(void);
 extern s16 D_829199FC;
 void func_82904208(void) {
-    func_800088DC();
+    BgStage_DrawFrame();
     func_829060BC();
     GeoRender_AdvanceFrameCounter();
     switch (D_829199F8) {

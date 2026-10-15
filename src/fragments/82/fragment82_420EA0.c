@@ -314,7 +314,7 @@ void func_82D027D4(void) {
 }
 
 extern void func_80008648();
-extern void func_800088DC();
+extern void BgStage_DrawFrame();
 extern void func_82D026C4();
 extern void func_82D027D4();
 extern void func_82D05C90();
@@ -324,7 +324,7 @@ void func_82D0284C(void) {
         func_82D027D4();
         func_82D026C4();
         func_82D068A0();
-        func_800088DC();
+        BgStage_DrawFrame();
         func_82D05C90();
         func_80008648();
     } while (D_82D23D84 != 0xD);

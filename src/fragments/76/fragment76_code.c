@@ -577,14 +577,14 @@ common_tail:
 
 #ifdef VERSION_US
 extern void func_80008648();
-extern void func_800088DC();
+extern void BgStage_DrawFrame();
 extern void func_80064D28();
 extern void func_8F700420();
 extern void func_8F70107C();
 void func_8F7011C8(void) {
     do {
         func_80064D28();
-        func_800088DC();
+        BgStage_DrawFrame();
         func_8F70107C();
         func_8F700420();
         func_80008648();

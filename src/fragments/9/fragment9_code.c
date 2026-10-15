@@ -196,7 +196,7 @@ void func_8FB03164(void *arg0) {
 }
 
 extern u8 D_8FB03B2C[];
-extern void func_800088DC(void);
+extern void BgStage_DrawFrame(void);
 extern void GfxImage_FillCurrent(Gfx **, s32);
 extern void func_800495F8(s32, s32, s32, s32);
 extern void func_80008648(void);
@@ -206,7 +206,7 @@ void func_8FB031E0(void *arg0) {
     s32 var_s0;
     s32 var_s1;
     struct { u8 pad[0x34]; s32 index; } *state = arg0;
-    func_800088DC();
+    BgStage_DrawFrame();
     GfxImage_FillCurrent(&D_800D0510, 0x89);
     func_800498C4();
     func_800496A4(0x10, 0);

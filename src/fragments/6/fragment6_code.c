@@ -454,7 +454,7 @@ void func_83101D74(void *arg0) {
     }
 }
 
-extern void func_800088DC(void);
+extern void BgStage_DrawFrame(void);
 extern void func_818017A8(void);
 extern void func_81805308(void *);
 extern void func_80008648(void);
@@ -471,7 +471,7 @@ extern u8 fragment83_ROM_START[];
 extern u8 fragment84_ROM_START[];
 extern u8 D_82C00000[];
 void func_83101EB0(void) {
-    func_800088DC();
+    BgStage_DrawFrame();
     func_818017A8();
     func_81805308(D_831039B0);
     func_80008648();
@@ -513,7 +513,7 @@ s32 func_83101F5C(s32 arg0) {
     return var_v1;
 }
 
-extern void func_800088DC(void);
+extern void BgStage_DrawFrame(void);
 extern void func_818017A8(void);
 extern void func_8004C594(s32, s32);
 extern void func_81805308(void *);
@@ -523,7 +523,7 @@ extern u8 D_831039B0[];
 extern u8 D_83103A14;
 extern u8 D_83103A7B;
 void func_83101FFC(s32 arg0) {
-    func_800088DC();
+    BgStage_DrawFrame();
     func_818017A8();
     func_8004C594(1, D_831039B0[0x40] + D_831039B0[0x43] - 1);
     func_8004C594(2, D_83103A7B);

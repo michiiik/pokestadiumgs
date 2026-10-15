@@ -148,7 +148,7 @@ extern s32 D_82001EC4;
 extern s32 D_82001EC8;
 extern void *D_80087200;
 extern s32 func_8006D268(s32);
-extern void func_800088DC(void);
+extern void BgStage_DrawFrame(void);
 extern void func_800503A4(void *);
 extern void func_82000C00(void);
 extern void func_82001344(void);
@@ -158,7 +158,7 @@ extern void func_82001304(void);
 extern void func_80008648(void);
 extern void func_820006B8(void);
 void func_820014C4(void) {
-    func_800088DC();
+    BgStage_DrawFrame();
     if (func_8006D268(0x202) != 0 && ((*(u16 *)((u8 *)(u32)D_80087200 + 8)) & 4) != 0) {
         (*(s16 *)((u8 *)&D_82001D58 + 4)) =
             (s16)((*(s16 *)((u8 *)&D_82001D58 + 4) + 1) % 3);

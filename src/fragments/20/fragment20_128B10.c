@@ -90,14 +90,14 @@ void func_82602708(u8 *arg0) {
 typedef struct { u8 pad_00[4]; void *unk_04; } Func82615340StateX;
 extern Func82615340StateX *D_82615340;
 extern void func_82602710(u8 *);
-extern void func_800088DC(void);
+extern void BgStage_DrawFrame(void);
 extern void func_826042A0(void);
 extern void func_82614BD0(void);
 extern void func_80008648(void);
 
 void func_82602888(void) {
     func_80043E70(D_82615340->unk_04, 0);
-    func_800088DC();
+    BgStage_DrawFrame();
     func_82602710(D_82615340);
     func_826042A0();
     func_82614BD0();
@@ -255,13 +255,13 @@ void func_82602E14(void *arg0) {
 
 extern Func82615340StateX *D_82615370;
 extern void func_80008648(void);
-extern void func_800088DC(void);
+extern void BgStage_DrawFrame(void);
 extern void func_82602710(u8 *);
 extern void func_826042A0(void);
 extern void func_82614BD0(void);
 void func_82603684(void) {
     func_80043E70(D_82615370->unk_04, 0);
-    func_800088DC();
+    BgStage_DrawFrame();
     func_82602710(D_82615370);
     func_826042A0();
     func_82614BD0();

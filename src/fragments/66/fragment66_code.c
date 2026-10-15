@@ -268,7 +268,7 @@ void func_82E02508(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_800088DC(void);
+extern void BgStage_DrawFrame(void);
 extern void GfxImage_FillCurrent(Gfx **, s32);
 extern void func_80007444(Gfx **, s32, s32, s32, s32, s32);
 extern void func_80007328(Gfx **, void *);
@@ -294,7 +294,7 @@ extern void *D_82E07600;
 extern void *D_82E07604;
 extern void *D_82E07608;
 void func_82E02658(void) {
-    func_800088DC();
+    BgStage_DrawFrame();
     if (D_82E0543C != 8) {
         GfxImage_FillCurrent(&D_800D0510, 1);
     } else {
@@ -318,7 +318,7 @@ void func_82E02658(void) {
             func_82E02CA4(D_82E075F4);
             main_pool_pop_state(0x6A706567);
         }
-        func_800088DC();
+        BgStage_DrawFrame();
         func_82E02EB0(0xA0, 0x78, (*(s32 **)((u8 *)&D_82E07600 + (D_82E06164 * 4)))[2]);
         func_82E02F00(0xA0, 0x78, D_82E06163);
     }

@@ -268,7 +268,7 @@ void func_82302B44(void) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82302D2C.s")
 
 extern void func_80008648();
-extern void func_800088DC();
+extern void BgStage_DrawFrame();
 extern void func_8003C6B8(s32);
 extern void func_800503A4(s32);
 extern void func_81700908();
@@ -278,7 +278,7 @@ extern s32 D_82305EA0;
 extern s32 D_82305EAC;
 
 void func_82303038(void) {
-    func_800088DC();
+    BgStage_DrawFrame();
     if (func_823008CC(0) == 0) {
         func_800503A4(D_82305EA0);
         func_81700908();

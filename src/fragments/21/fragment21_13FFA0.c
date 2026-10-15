@@ -528,7 +528,7 @@ void func_82503750(void) {
 
 #ifdef VERSION_US
 extern void func_80008648();
-extern void func_800088DC();
+extern void BgStage_DrawFrame();
 extern void func_800503A4(s32);
 extern void func_81700908();
 extern void func_825020A8();
@@ -538,7 +538,7 @@ s32 func_8250865C();
 extern s32 D_82508D04;
 
 void func_82503840(void) {
-    func_800088DC();
+    BgStage_DrawFrame();
     if (func_8250865C() == 0) {
         func_82503750();
         func_800503A4(D_82508D04);

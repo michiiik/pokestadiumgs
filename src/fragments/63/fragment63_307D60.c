@@ -85,10 +85,10 @@ void func_87E0520C(void *arg0, s32 arg1) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_307D60/func_87E05258.s")
 
 extern void func_87E05258(void);
-extern void func_800088DC(void);
+extern void BgStage_DrawFrame(void);
 void func_87E053D0(void) {
     func_87E05258();
-    func_800088DC();
+    BgStage_DrawFrame();
 }
 #pragma C_FUNCTION_PADDING(8)
 #endif
