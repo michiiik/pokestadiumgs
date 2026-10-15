@@ -54,5 +54,26 @@ s32 func_8AF1BF00(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_209BD0/func_8AF1BF38.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_209BD0/func_8AF1C31C.s")
+extern void func_800498C4(void);
+extern void func_800496A4(s32, s32);
+extern void func_8004972C(s32, s32, s32, s32);
+extern void func_800499EC(void);
+extern void func_8AC05F00(void *);
+extern u8 D_8AF37278[];
+extern u8 D_8AF372F0[];
+
+void func_8AF1C31C(void) {
+    func_800498C4();
+    func_800496A4(16, 0);
+    func_8004972C(255, 255, 255, 255);
+    func_800499EC();
+    if (func_8AF1BED8() != 0) {
+        func_8AC05F00(D_8AF37278);
+    }
+    if (func_8AF1BF00() != 0) {
+        func_8AC05F00(D_8AF372F0);
+    }
+}
+/* Preserve the original three alignment NOPs after this owner. */
+#pragma C_FUNCTION_PADDING(12)
 #endif
