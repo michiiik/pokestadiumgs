@@ -122,7 +122,20 @@ void func_87E00590(void) {
     func_8003C6B8((*(s32 *)((u8 *)(D_87E1BA20) + (0x20))));
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_303990/func_87E005C0.s")
+extern s32 func_8004C990(s32 arg0, s32 arg1);
+extern s32 func_8004D19C(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
+extern s32 func_8004D150(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5);
+extern Gfx* D_800D0510;
+extern Gfx D_80094F50[];
+
+void func_87E005C0(void) {
+    s32 var_sp24;
+
+    var_sp24 = func_8004C990(418, 0);
+    func_8004D19C(0, 0, var_sp24, 0, 0);
+    func_8004D150(160, 0, var_sp24, 0, 1, 0);
+    gSPDisplayList(D_800D0510++, D_80094F50);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_303990/func_87E00648.s")
 
