@@ -161,3 +161,6 @@ func_82405934 = Fragment13_UpdateSceneLightNode;
 func_824059E4 = Fragment13_UpdateSceneDirectionalLightNode;
 func_82405A84 = Fragment13_UpdateClockHourHand;
 func_82405B24 = Fragment13_UpdateClockMinuteHand;
+func_824048F0 = Fragment13_InitGroupedList;
+func_82405F8C = Fragment13_StepVectorToward;
+func_82407170 = Fragment13_FindNearestGroup;

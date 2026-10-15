@@ -98,3 +98,75 @@ callback requeue recorded in the shared region notes. Those notes were read
 before probing; it was retried only after the new light-node layout evidence.
 Do not treat missing structured history as proof that an owner is fresh.
 The larger `func_82405D38` historical handoff remains unchanged and untried.
+
+## Native motion/group batch — 2026-10-15
+
+Three owners accepted: **139 words / 556 bytes**. File advances from 40 C /
+39 ASM to **43 C / 36 ASM** (79 total). Solo/native; no agents or containers.
+
+| Original owner | Behavior-backed name | Words | Frame | Acceptance |
+| --- | --- | ---: | ---: | --- |
+| `func_82405F8C` | `Fragment13_StepVectorToward` | 53 | 0x30 | link-verified, combined ROM gate; `8b6953b80f9b458a9a7a5347817b09e8` |
+| `func_82407170` | `Fragment13_FindNearestGroup` | 46 | none | link-verified, combined ROM gate; `2d474116d89048e4b3945eeba14925a1` |
+| `func_824048F0` | `Fragment13_InitGroupedList` | 40 | none | relocation-masked, sequential ROM gate; `f8a33b83d997435d899dee0285f93b9a` |
+
+### Measured source shapes
+
+- Vector stepping: compute the three differences before the distance, then
+  use explicit `position = position + delta / distance * step` assignments.
+  Negative step or **strictly** shorter distance copies the destination and
+  returns zero; otherwise return one. Preserve original equality/zero-distance
+  behavior rather than adding a divide-by-zero guard. No saved origin locals.
+- Nearest group: eight 0x3C-byte records; inline the repeated **X square before
+  Z square**, cast the sum to signed integer before comparing, and retain the
+  strict comparison/first-on-tie behavior. IDO unrolls the ordinary loop by two.
+  Named differences produce the wrong unroll; Z-first inline terms reproduce
+  the opcode sequence but swap six X/Z load offsets. Twenty-four candidates
+  across these families; no manual unroll or padding.
+- Grouped-list initialization: clear 128 halfwords to -1, then write eight
+  groups' counts, starts, item indices and separators. The record count is an
+  unsigned halfword at offset 0x3A; the uncharacterized tail stays opaque.
+  A controlled, token-identical clear-loop reflow proves statement source-line
+  grouping controls its branch-delay schedule: single-line body has three
+  differing words; a normal multiline body has only the end-address relocation.
+  Twenty leading blank lines do not change either result. Pointer-clear and
+  loop-shape families did not fix this schedule. No runner change was required:
+  the existing candidate identity already preserves token-bearing line groups.
+- The initializer materializes `D_82407370 + 480` instead of the assembly's
+  equivalent `D_82407550`. It is **not object-link-verified**: the normal
+  relocation-masked sequential full-ROM gate establishes acceptance. No symbol
+  address, section layout, compiler flag or linker-layout change is needed.
+
+### Cleanup and verification
+
+Three US compatibility aliases; no new helper function or storage object.
+Move the shared anchor type before its first use, remove duplicate/unused
+externs and format only newly accepted C. Fresh and twenty-leading-blank
+whole-object controls preserve every section's bytes/layout, all **79 original
+function offsets/sizes/full spans**, all three accepted bodies against the
+frozen accepted object, and all **76 untouched** spans against the baseline.
+Forced normal native ROM build passes retail MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`; explicit host syntax check passes with the
+existing unrelated line-25 implicit-call warning; 22 public tooling tests pass.
+No bypass, forced-register scaffold or compiler mutation. Scratch generators,
+proof scripts, compiler files, objects and ROMs remain local and unpublished.
+
+### `func_8240641C` — requeue, input-load CSE and lifetime
+
+Eighty-one-word / 324-byte target, frame 0x20. Forty submitted candidates
+(four compile failures) across record/raw views, byte/word handled flags,
+nested/goto tails, controller-field/halfword-array accesses, volatile samples
+and an explicit navigation snapshot. Best ordinary family: 316 bytes,
+normalized/raw **0.9753/0.7407**. The compiler shares an initial controller load
+that the target repeats. Volatile sampling overcorrects to 340 bytes; explicit
+navigation snapshots do not close the residual. None is installed.
+
+Preserve B-before-A precedence, independent right/left navigation tests,
+post-sound reload behavior and the unconditional final update call. Do not
+invent a return value or extra formal to steer allocation. The sound helper's
+one-argument call conflicts with this file's existing two-argument prototype;
+an old-style unspecified-arity declaration was tested only as a transactional
+companion edit, not adopted. The accepted caller and original prototype remain
+unchanged. Next: trace controller-load value ownership across the initial B/A
+split before another source family; distinguish load CSE from base-address
+promotion. These measured failures are not a proof that legal C is impossible.
