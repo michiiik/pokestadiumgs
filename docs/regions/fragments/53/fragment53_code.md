@@ -1,5 +1,74 @@
 # Fragment 53 animation family
 
+## 2026-10-16 — difficulty offset selector accepted; canonical range extended
+
+`func_86501EA0` → `Fragment53_SelectDifficultyOffset`, **62 words / 248
+bytes**, frame **0x20**, batch `c8572b74b377490897b008701b7a9038`.
+The winner is **link-verified** and passes the combined full-ROM gate.
+File progress: **27 C / 29 function ASM → 28 C / 28 function ASM**.
+
+Extend the same per-file canonical rodata subsegment from **0x296B80** to
+**0x296B30**, keeping its 0x296D70 end: **576 bytes**, an 80-byte extension.
+All nine referenced symbols in the extension belong to this TU. This gives
+jtbl_8650D680 to the selector; the previous 496-byte suffix remains byte-for-
+byte unchanged. Other earlier tables are not implicitly declared ready.
+
+Two already-accepted functions emit the newly owned constant bytes with their
+genuine double literals: `Fragment53_UpdateTrajectoryPosition` uses **4.9**;
+`func_86502620` uses **0.45, 0.4, 0.35**, retaining its existing 0.3 case.
+No duplicate constants or generated assembly are committed. Re-split with the
+pinned tools and pass the retail-ROM gate **with the selector still assembly**
+before probing C. The tracked linker script does not change.
+
+Declare the maximum before the minimum, then assign the minimum before the
+maximum in each switch case. This gives the original stack homes and stores.
+Keep all five difficulty ranges and unsigned RNG remainder arithmetic. The
+original requires difficulty 0..4 and has no invalid-mode fallback; document
+that precondition instead of inventing initial values or a default case.
+Name the accepted definition and callers with a compatibility alias while
+retaining the address-keyed symbol and JP assembly.
+
+Fresh and twenty-leading-blank builds after cleanup/naming preserve complete
+frozen text/rodata/data/bss bytes and layout, **all 56 pre-layout function
+spans**, all **55 post-layout untouched functions**, and all **576 canonical
+rodata bytes** against the assembly-only layout gate. Six old C functions have
+expected raw relocation-addend changes versus the pre-layout object; do not
+claim their raw object bytes are unchanged. Their resolved bytes are covered
+by the byte-identical retail-ROM gate, MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`.
+Forced normal ROM comparison, the host syntax check (twelve existing warnings),
+all 25 tooling tests and whitespace checks pass after cleanup and naming.
+
+### Measured requeues
+
+`func_865040E4`: **requeue**, now **48 compared**. The next-progress value /
+store / cached-value form improves the leader to normalized/raw
+**0.8671/0.4825**, **1144 bytes**, frame 0x28. Early-return/default placement,
+explicit progress pointer and a typed scene word view are inert. Splitting
+the reset loop's pointer locals adds frame/size drift; local value splitting,
+case scopes and conditional rounding do not close the address residual.
+Stock/off/on/twenty-blank controls for the known baseline and leader pass all
+sections, symbol spans and complete relocation rows (eight builds, before
+this 80-byte extension). Color proc 50 / first statement line 445 belongs to
+this owner; spill plans use proc 49. Retain the global-address ownership
+investigation; do not infer a compiler defect or static/volatile globals from
+the candidate trace. Refresh controls on the expanded layout before forcing
+or comparing a new import. The table's object offset is now 0xAC, not 0x5C;
+that first raw relocation difference is not the structural residual.
+
+`func_86509318`: **requeue**, now **48 compared** (plus the older eight
+declaration-order compile failures). Preloading the integer height adjustment
+as float **before** the alpha write improves best normalized/raw to
+**0.9333/0.8000**, **352 versus 360 bytes**, frame 0x40. Keep the three geometry
+snapshots; array bounds alone are inert. Explicit scale caching at entry,
+direct/chained scale stores, reused height carrier, unsigned alpha, explicit
+resource pointer and typed effect view do not close the remaining two-word /
+global-scale ownership residual. Target caches the scale before the loop and
+reloads it after the initialization callbacks without holding its address in
+a saved integer register. Next trace that address/value ownership against the
+early-height leader, rather than repeating clamp or declaration families.
+Both owners remain assembly. No probe-only result is promoted.
+
 ## 2026-10-16 — primary animation dispatcher accepted
 
 `func_86503938` → `Fragment53_UpdatePrimaryAnimationState`, **152 words /
