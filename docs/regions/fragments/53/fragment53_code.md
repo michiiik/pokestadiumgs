@@ -1,5 +1,92 @@
 # Fragment 53 animation family
 
+## 2026-10-16 — actor initializer accepted; four-function follow-up complete
+
+`func_86508484` is now `Fragment53_InitActorModels`, **110 words / 440 bytes**,
+frame **0x50**. Batch `f5faea2051ed41278f66725c1f5024c0` accepts the natural
+four-actor `for` loop with the actual `0.095f` scale literal, signed random
+animation frames, model resets, placement, flags, and final scene setup.
+This is a **relocation-masked sequential full-ROM acceptance, not link-verified**.
+The three other accepts below are link-verified combined-gate results.
+
+The prerequisite is now resolved: add the tight **64-byte** canonical `.rodata`
+window at ROM **0x296D30..0x296D70**, re-split with splat 0.25.0 / pinned
+spimdisasm 1.35.0-dev0, and gate the still-ASM initializer before replacing it.
+The window contains D8650D880, D8650D884, all 13 entries of jtbl_8650D888, then
+D8650D8BC, in source order. Both boundaries are aligned and no unreferenced
+prefix/tail is dropped. The rest remains in the shared head and rodata tail.
+The assembly-only ROM gate passes before the candidate is installed.
+
+The layout move preserves all 56 original function starts/sizes. It changes
+one untouched object's representation: exporting `.L8650A054` for the rodata
+tail creates **15 R_MIPS_PC16 branch relocations** in `func_86509E54`, instead
+of in-object resolved displacements. Every differing raw word is accounted
+for by one of those relocations; both linked ROMs remain retail-identical.
+Do not describe this as an unchanged raw object or a code change.
+
+Final fresh/twenty-leading-blank builds preserve complete frozen section bytes
+and layout, all 56 original function spans, all 52 untouched post-layout raw
+spans, and 51 untouched pre-batch raw spans plus the measured relocation owner.
+The four functions total **340 words / 1360 bytes**, progressing this file
+from **17 C / 39 ASM to 21 C / 35 ASM**. Forced normal ROM comparison,
+host syntax checks and all 25 tooling tests pass after cleanup/naming.
+
+The local runner's duplicate guard previously fingerprinted the Makefile and
+compiler override but not canonical layout, incorrectly blocking the proven
+candidate after this split. A local layout-context fingerprint and historical
+fallback fix that stale rejection; changed-layout replay, unchanged-layout
+rejection, compiler identity and conservative legacy behavior are checked.
+No guard/statistics bypass or compiler patch is used. Runner copies and scratch
+proofs are not part of the public decompilation PR.
+
+## 2026-10-16 — secondary handlers and model-height callback accepted
+
+Three additional native matches, all `link_verified: true` and accepted through
+one combined full-ROM gate each:
+
+- `func_86508780` → `Fragment53_UpdateSecondaryAnimation`: 68 words / 272 bytes,
+  frame 0x30, batch `0fcf54d4a8114533acb1b69aee41d5f8`.
+- `func_8650863C` → `Fragment53_UpdateTimedSecondaryAnimation`: 79 words /
+  316 bytes, frame 0x30, batch `a05bf1b620b84a09a333b96aacfab972`.
+- `func_8650455C` → `Fragment53_UpdateActorModelHeights`: 83 words / 332 bytes,
+  frame 0x20, batch `6c0cdf774eb641af937f59a0cc14c1c8`.
+
+Both animation handlers need a genuine `index = arg0` local followed by direct
+state-array references. For the ordinary handler, use direct model-array
+expressions too: a model-pointer local grows the frame. For the timed handler,
+keep its branch-assigned model-pointer local: direct model expressions instead
+move the saved state address from stack +0x20 to +0x24. Signed/unsigned and
+`register` formal variations alone were inert. The index local is actively
+used, not padding or an unused register-forcing variable.
+
+The timed handler preserves the signed fixed-point frame-six threshold,
+zero-frame restart, triple/double animation speeds, and actor-indexed completion
+sound. The ordinary handler preserves the pending-primary-animation flag.
+The callback cycles the 24-step pose counter and updates paired model heights;
+one shared `index * 0x168` offset closes its register-role mismatch.
+
+After naming/cleanup, fresh and twenty-leading-blank builds preserve complete
+section bytes/layout, all 56 original function spans and all 53 untouched spans.
+Normal forced ROM comparison, host syntax check and 25 tooling tests pass.
+No new helpers, storage, padding, compiler changes, or provenance bypasses.
+Progress is 17 C / 39 ASM to 20 C / 36 ASM (230 words / 920 bytes accepted).
+
+### Initializer layout prerequisite
+
+`func_86508484`: 32 compared plus a calibrated 45-second permuter. Best external-
+scale spelling has the exact loop body/size/frame but a different entry load
+schedule; explicit cached-height initialization and eight logical-line cells
+do not repair it. The permuter is flat at 491, with no retained improvements.
+
+Using the actual `0.095f` literal instead yields **raw/normalized 1.0/1.0**,
+110 words / 440 bytes, but `section_layout_drift`: the literal still lives in
+shared fragment data. This is `layout-prerequisite`, not a register tie. Do not
+repeat source spellings until canonical rodata ownership is installed and the
+still-ASM initializer is gated. A tight aligned window is ROM 0x296D30..0x296D70
+(VRAM D8650D880 through D8650D8BC): earlier two float owners, the complete
+13-entry `jtbl_8650D888`, then this initializer's float, in source order. The
+coarse planner's much larger widened run is not the correct cut point.
+
 ## 2026-10-16 — four-function batch complete
 
 `func_86501D6C` is now `Fragment53_CountTrajectorySamplesInRange`, **77 words /
