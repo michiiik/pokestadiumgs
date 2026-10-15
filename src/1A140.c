@@ -30,7 +30,24 @@ void func_80019634(s32 arg0) {
     D_8008FC1C = (arg0 * 0x10) + &D_8008FAB8;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/1A140/func_80019670.s")
+extern s16 D_8008FAA4[];
+
+s32 func_80019670(s32 arg0) {
+    s32 var_v1 = 0;
+    s32 var_a1;
+
+    for (var_a1 = 1; var_a1 < 16; var_a1++) {
+        if (arg0 < ((s16*)D_8008FC18)[var_a1]) {
+            break;
+        }
+        var_v1++;
+    }
+    if (var_a1 == 16) {
+        return 0;
+    }
+    var_v1 = ((s8*)D_8008FC1C)[var_v1];
+    return D_8008FAA4[var_v1];
+}
 
 s32 func_800196E0(s32 *arg0, s32 *arg1) {
     s32 temp_v0;
