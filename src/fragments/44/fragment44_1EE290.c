@@ -18,10 +18,10 @@ s32 func_8AF00020(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1EE290/func_8AF0007C.s")
 
-extern void func_800226C0(void);
-void func_8AF00130(void) {
-    func_800226C0();
-  }
+extern void func_800226C0(s32);
+void func_8AF00130(s32 code) {
+    func_800226C0(code);
+}
 
 extern u8 D_8AF2BE98[]; extern s32 D_8AF2BF10; void func_8AF00150(void) { _bzero(D_8AF2BE98, 0x78); D_8AF2BF10 = 0; }
 
