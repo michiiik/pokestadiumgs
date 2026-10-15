@@ -168,7 +168,7 @@ void func_8AF12398(void) {
 }
 
 extern s16 *D_8AF2BA94;
-extern u8 D_8AF31C48;
+extern u8 D_8AF31C48[250];
 void func_8AF123C0(void) {
     s16 *source;
     s16 index;
@@ -196,7 +196,52 @@ void func_8AF123C0(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF124A8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF125D0.s")
+extern void *func_8004C874(s32, s32);
+extern s32 func_8004C54C(s32, s32);
+extern void _bzero(s32 *, s32);
+extern s16 D_8AF31024;
+extern char D_8AF315A0[];
+extern char D_8AF296C8[];
+extern s16 D_8AF263C4[];
+extern u8 D_8AF316C8[];
+
+u8 *func_8AF125D0(s16 category) {
+    u8 *output;
+    u8 *destination;
+    s32 index;
+    s16 count;
+    s16 selected;
+    s16 mapped;
+    s16 id;
+    u16 saved;
+
+    count = 0;
+    D_8AF31024 = 1;
+    *(s16 *)&D_8AF31D42 = -1;
+    selected = (s16)category;
+    sprintf(D_8AF315A0, D_8AF296C8);
+    func_8004C54C(0x2F, (s32)func_8004C874(0xC, D_8AF263C4[selected]));
+    func_8AF123C0();
+    output = D_8AF316C8;
+    _bzero((s32 *)output, 1000);
+    destination = output;
+    for (index = 0; index != 250; index++) {
+        id = D_8AF31C48[index];
+        saved = id;
+        mapped = func_8AF01530(func_80062D98(id));
+        if (id == 0xA5) {
+            continue;
+        }
+        if (mapped != selected) {
+            continue;
+        }
+        destination[0] = saved;
+        destination[1] = mapped;
+        destination += 4;
+        count++;
+    }
+    return func_8AF12410(destination, count);
+}
 
 /* Preserve this logical source line for IDO's instruction scheduling. */
 u8 *func_8AF1271C(u8 *output, s16 *table, u16 mask) { \
@@ -207,7 +252,7 @@ u8 *func_8AF1271C(u8 *output, s16 *table, u16 mask) { \
     s16 count; \
     destination = output;
     count = 0;
-    entry = &D_8AF31C48; end = &D_8AF31D42;
+    entry = D_8AF31C48; end = &D_8AF31D42;
     do {
         id = *entry;
         if (table[id - 1] & mask) {
@@ -245,7 +290,6 @@ s32 func_8AF129F8(u8 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF12E30.s")
 
-extern void _bzero(s32 *, s32);
 extern s32 D_8AF26F30;
 extern s16 D_8AF316A4;
 extern s16 D_8AF316A6;
