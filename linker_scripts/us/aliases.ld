@@ -191,3 +191,5 @@ func_824070E4 = Fragment13_GetInterpolatedListPosition;
 func_824020B4 = Fragment13_DrawSelectionFooter;
 func_82402904 = Fragment13_DrawSelectionHeader;
 func_865038A8 = Fragment53_ApplyPendingPrimaryAnimation;
+func_86501FA0 = Fragment53_UpdateTrajectoryPosition;
+func_8650A278 = Fragment53_RunSceneTransition;

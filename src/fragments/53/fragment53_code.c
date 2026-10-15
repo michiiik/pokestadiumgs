@@ -54,7 +54,35 @@ void func_86501F98(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/53/fragment53_code/func_86501FA0.s")
+extern s32 StageContext_GetFadeMode(void);
+extern s32 StageFade_StartFromOpaque(s32);
+extern void func_87F00688(void);
+extern s32 D_8650C5EC;
+extern s32 D_8650C4AC;
+extern f32 D_8650C4B8;
+extern s32 D_8650C4CC;
+extern s32 D_8650C4D4;
+extern f32 D_8650C4D8;
+extern s32 D_8650C4DC;
+extern s32 D_8650C620;
+extern f64 D_8650D698;
+extern s32 D_8650D9D4;
+extern void func_86501EA0(void);
+void Fragment53_UpdateTrajectoryPosition(void) {
+    if (D_8650C5EC == 10) {
+        D_8650C4DC++;
+        if (D_8650C4DC >= D_8650C4D4 - 2) {
+            D_8650C4DC = 2;
+        }
+        if (D_8650C4DC < 2) {
+            D_8650C4DC = 2;
+        }
+    } else {
+        func_86501EA0();
+    }
+    D_8650C4D8 = (f32)(92.0 - ((f64)D_8650C4AC - D_8650D698 * (f64)D_8650C4B8 * (f64)D_8650C4B8 * (f64)(D_8650D9D4 + D_8650C4DC + 2) * (f64)(D_8650D9D4 + D_8650C4DC + 2)));
+    D_8650C620 = (s32)(D_8650C4D8 / (f32)D_8650C4CC * 2000.0f + -1000.0f);
+}
 #endif
 
 #ifdef VERSION_US
@@ -425,7 +453,51 @@ void func_86509D8C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/53/fragment53_code/func_8650A278.s")
+extern u8 D_865118F8[];
+extern struct Fragment53Model D_8650E6C0[];
+extern s32 D_8650DB28[];
+extern void ModelAnim_SetEventFrame(u8 *, s16);
+extern void func_8003F1DC(void *);
+extern void func_8003F114(void *, s32, s32, s32);
+extern void func_8003F3BC(void *, s32);
+extern void func_800086A4(s32);
+extern void func_80064D28(void);
+extern void func_8650A074(void);
+extern void func_865082C8(void);
+extern s32 func_86509E54(s32);
+void Fragment53_RunSceneTransition(void) {
+    u8 *model;
+    struct Fragment53ActorState *state;
+    u8 *secondary;
+    s32 *resource;
+    s32 result;
+
+    func_800086A4(2);
+    if (*(u8 *)((u8 *)D_8650DB10 + 0x2180) == 4) {
+        secondary = (u8 *)D_8650E6C0; model = (u8 *)D_8650E120;
+        resource = D_8650DB28; state = D_86511698; do {
+            func_8003F1DC(secondary);
+            func_8003F114(model, 0, -1, *resource);
+            ModelAnim_SetEventFrame(model, 0);
+            func_8003F3BC(model, 0);
+            func_8003F210(model, 0);
+            ModelAnim_SetFrame(model, (s16)(guRandom() % 15 + 15));
+            state++;
+            secondary += 0x168;
+            model += 0x168;
+            resource++;
+            state[-1].animation = 0;
+        } while ((struct Fragment53ActorState *)D_865118F8 != state);
+    }
+    StageFade_StartFromOpaque(10);
+    do {
+        func_8650A074();
+        func_80064D28();
+        func_865082C8();
+        result = func_86509E54(*(s32 *)((u8 *)&D_8650C5E0 + 0xC));
+        *(s32 *)((u8 *)&D_8650C5E0 + 0xC) = result;
+    } while (*(s32 *)((u8 *)&D_8650C5E0 + 0xC) != 3);
+}
 #endif
 
 #ifdef VERSION_US
