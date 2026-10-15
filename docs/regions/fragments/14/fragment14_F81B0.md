@@ -1,5 +1,113 @@
 # Fragment 14 selection setup
 
+## 2026-10-15 follow-up — slot advance, exit status and slot dialog accepted
+
+Three more functions are accepted: **148 instructions / 592 bytes**. The file
+now has **47 C / 8 ASM functions**, plus one preserved data-only ASM include.
+All seven jump tables now belong to the file's `.rodata`; none is blocked on
+the previous missing subsegment. This is not file or repository completion.
+
+| Owner | Name | Instructions / bytes | Frame | Accepted batch |
+| --- | --- | ---: | ---: | --- |
+| `func_81300730` | `Fragment14_AdvanceSelectionSlot` | 64 / 256 | 0x20 | `89d496d52dd649a18bd60dd068edacd4` |
+| `func_81300B50` | `Fragment14_GetSelectionExitStatus` | 20 / 80 | none | `efc29d5100604cf6bbe7effc1e4abe27` |
+| `func_81301548` | `Fragment14_UpdateSlotDialog` | 64 / 256 | 0x28 | `694732e33a564d5ea9fae720cf65f3eb` |
+
+### Preserve leading data while completing the layout
+
+- Expand the existing `.rodata` window from ROM `0x10A390` back to
+  `0x10A310`, still ending at `0x10A430`: 0x120 bytes total. Keep the original
+  `SUBALIGN(16)` and linker order; no linker-script rewrite is necessary.
+- Explicitly declare the original 24-byte `D_81312180` symbol with
+  `force_not_migration:true`. Include its generated data-only assembly before
+  the functions so splat preserves it even though its referencing function is
+  already C. This is the original named data, not a new helper function.
+- Re-extract using pinned splat/spimdisasm. Gate all three owners still in
+  assembly first. All 55 function offsets/sizes remain unchanged, the owner
+  rodata is exactly 0x120 bytes, and the retail ROM matches. Verify the first
+  24 bytes separately against ROM `0x10A310..0x10A328`.
+- The data-only include is derived by extraction; do not publish generated
+  assembly. Its explicit metadata and source pragma make it reproducible.
+
+### Source mechanisms and acceptance
+
+- Advance: retain the next-slot call, both exhausted-end states, signed slot
+  store, seven-case unsigned kind dispatch and 0x240-byte clear on kind 4.
+  Existing full-record slot/data views produce the required load order; a
+  separate raw upper pointer reverses two loads. Keep a local result rather
+  than reusing the consumed direction argument, which moves its spill home.
+- Exit status: explicit continuing cases 0/1/2/3/5 return zero, state 8
+  returns -1, state 9 returns +1, and the default returns zero after the
+  switch. This preserves the two distinct zero-return tails.
+- Slot dialog: reuse the accepted controller-dialog call shape with the real
+  second context argument and inline dialog addresses. Preserve commit and
+  preview branches, cancellation's -1 kind store/backward advance, controller
+  result stores, and explicit no-op -2. The upper-address expressions retain
+  the original pointer materialization in each branch.
+- All three are normal runner `accepted`, `relocation_masked: true` hits
+  verified by authoritative sequential full-ROM gates. They are **not**
+  object-link-verified hits. Statistics and host checks remain enabled.
+- Clean up formatting and duplicate prototypes, add the real `_bzero`
+  prototype, and apply three behavior-backed names with US aliases. Fresh
+  and twenty-leading-blank builds preserve every allocatable section byte
+  and layout, all 55 function offsets/sizes, three accepted and 52 untouched
+  spans, and all 24 original leading data bytes.
+- Forced normal build matches retail MD5
+  `1561c75d11cedf356a8ddb1a4a5f9d5d`. Host syntax check passes with the same
+  17 warnings as baseline. Public tooling tests: 22 PASS. Diff check PASS.
+- Re-extraction from the final C/YAML/metadata and a normal native rebuild
+  also match retail, demonstrating that the leading data include does not
+  depend on stale generated assembly.
+
+### Integration tooling failure — preserve original oracles between gates
+
+The first mixed batch accepted advance, then re-extracted assembly without
+that now-C owner's `.s`. Subsequent sequential candidate transactions restored
+the original source baseline, including advance's old pragma, but not its
+assembly file. The compiler reported `Cannot open file GLOBAL_ASM:...` for
+the missing **earlier** owner. All eight exit-status bodies and two matching
+slot-dialog bodies were affected; those gate failures are not source-shape
+rejections. The isolated probes had already matched.
+
+Safe fallback: gate the remaining owners in separate calls against the
+cumulatively installed source. Exit status and slot dialog both accept in
+about seven seconds per call. Retry only the two already-matching slot-dialog
+bodies, not its six genuine rejected variants; the duplicate preflight
+correctly rejects a whole-batch replay. No ledger bypass or manual C install.
+
+Tooling follow-up: retain the batch's original assembly dependencies across
+extraction and source restoration, and classify missing baseline oracles as
+environment/integration failures rather than candidate compile failures. A
+regression fixture should accept owner A, remove A's extracted oracle, then
+test B against a restored A/B baseline. The public PR contains no runner copy.
+
+### Active requeues
+
+- `func_813002D0`: all 32 previous native candidates returned a word. Eight
+  new signed-byte-return variants use the supported candidate-own forward
+  prototype transaction (unlike retyping an unrelated still-ASM callee).
+  They do not improve the leader: the best new shape is 72/68 bytes,
+  0.7778 normalized / 0.3889 raw. The source and word-return prototype are
+  restored; do not use the speculative narrow-return declaration to try
+  to improve the neighboring dialog's spill homes.
+- `func_8130209C`: eight new integer/pointer address-carrier probes do not
+  improve the existing 280-byte leader or its +0x18 versus +0x1C pointer
+  spill. Integer state-pointer form adds another instruction. The earlier
+  bounded 45-second permuter yielded no saved improvement (score 23 to 23);
+  its source control explicitly validates all ten jump-table destinations
+  before ignoring section-relative relocation fields. This is bounded
+  negative evidence, not an impossibility claim. Next: inspect allocation
+  and stack-home ownership before further source permutations.
+- `func_81300BE8`: sixteen new probes establish six 0x60-byte team records,
+  0x58-byte payload copies from source stride 0xCE8, metadata flag bit 26,
+  conditional per-record flag clearing, trainer name and ID handling. The
+  closest structural leader is 584/588 bytes, 0.9932 normalized / 0.4558 raw;
+  it is not a near-exact byte match. Two explicit source-pointer carriers
+  restore 588 bytes but inflate frame 0x28 to 0x30 and perturb allocation
+  (0.9796 normalized / 0.2993 raw). Separate clear-loop locals are worse.
+  Next: recover the two induction addresses without adding two independent
+  stack locals. No probe-only payload/source/data types are installed.
+
 ## 2026-10-15 follow-up — jump-table layout and three dispatchers accepted
 
 The file advances to **44 C / 11 ASM** owners. Three of four newly unblocked

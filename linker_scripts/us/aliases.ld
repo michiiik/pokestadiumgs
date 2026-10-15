@@ -139,3 +139,6 @@ func_813019C8 = Fragment14_UpdateSelectionCommit;
 func_813018FC = Fragment14_UpdateControllerDialog;
 func_81301F64 = Fragment14_EnterSelectionState;
 func_813021B4 = Fragment14_DrawSelectionState;
+func_81300730 = Fragment14_AdvanceSelectionSlot;
+func_81300B50 = Fragment14_GetSelectionExitStatus;
+func_81301548 = Fragment14_UpdateSlotDialog;
