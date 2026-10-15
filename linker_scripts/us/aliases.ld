@@ -117,3 +117,4 @@ func_80009F80 = crash_screen_printf_with_bg;
 func_8000BC90 = Jpeg_DecodeMcus;
 func_8000BEB8 = Jpeg_DecodeBlock;
 func_8000C054 = Jpeg_DecodeHuffmanSymbol;
+func_8000C190 = Jpeg_ReadBits;

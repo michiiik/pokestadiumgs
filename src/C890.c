@@ -34,7 +34,7 @@ extern u8 Jpeg_LastByteWasFF;
 extern u32 D_800D121C;
 extern s32 Jpeg_DecodeBlock(JpegHuffmanTable *, JpegHuffmanTable *, s16 *, s16 *);
 extern s32 Jpeg_DecodeHuffmanSymbol(JpegHuffmanTable *, s16 *, s8 *);
-extern u16 func_8000C190(u8);
+extern u16 Jpeg_ReadBits(u8);
 s32 Jpeg_DecodeMcus(JpegMcuConfig* config, s16* output, u32 mcuCount, u8 resume, JpegMcuState* state) {
     u16 lumaBlocks;
     s16 lumaDcPred;
@@ -159,7 +159,7 @@ s32 Jpeg_DecodeHuffmanSymbol(JpegHuffmanTable* hTable, s16* outCoeff, s8* outZer
     u8 codeIdx;
     u8 sym;
     u16 codeOff = 0;
-    u16 buff = func_8000C190(16);
+    u16 buff = Jpeg_ReadBits(16);
 
     for (codeIdx = 0; codeIdx < 16; codeIdx++) {
         if (hTable->codesB[codeIdx] == 0xFFFF) {
@@ -183,7 +183,7 @@ s32 Jpeg_DecodeHuffmanSymbol(JpegHuffmanTable* hTable, s16* outCoeff, s8* outZer
     D_800D1218 += codeIdx - 15;
     *outCoeff = 0;
     if (sym) {
-        *outCoeff = func_8000C190(sym);
+        *outCoeff = Jpeg_ReadBits(sym);
         if (*outCoeff < (1 << (sym - 1))) {
             *outCoeff += (-1U << sym) + 1;
         }
@@ -192,5 +192,32 @@ s32 Jpeg_DecodeHuffmanSymbol(JpegHuffmanTable* hTable, s16* outCoeff, s8* outZer
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/C890/func_8000C190.s")
+u16 Jpeg_ReadBits(u8 len) {
+    u8 byteCount;
+    u8 data;
+    s32 ret;
+
+    ret = D_800D1218;
+    byteCount = ret >> 3;
+    ret = 0;
+    for (; byteCount > 0; byteCount--) {
+        data = D_800D1210[D_800D1214++];
+        if (Jpeg_LastByteWasFF) {
+            if (data == 0) {
+                data = D_800D1210[D_800D1214++];
+            }
+        }
+
+        Jpeg_LastByteWasFF = (data == 0xFF) ? 1 : 0;
+
+        D_800D121C <<= 8;
+        D_800D121C |= data;
+        D_800D1218 -= 8;
+    }
+
+    ret |= D_800D121C << D_800D1218;
+    ret = (u32)ret >> -len;
+    D_800D1218 += len;
+    return ret;
+}
 #endif
