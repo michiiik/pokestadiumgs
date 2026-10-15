@@ -434,3 +434,57 @@ and f2 for fraction, with different spill homes. Diagnose those value roles
 before more scalar aliases; do not pad the frame, invent unused locals or
 alter the established helper interfaces. The missing optional draft CLI in
 the public clone is not a compiler failure; all candidates used read assembly.
+
+## Native panel corners — 2026-10-15
+
+`func_8240182C` → `Fragment13_DrawPanelCorners`: **127 words / 508 bytes**,
+frame 0x60; file **54 C / 25 ASM → 55 C / 24 ASM**. Link-verified combined
+full-ROM acceptance, batch `9f3c581ef96842209c96d511107e7eff`.
+
+Preserve the four-pixel minimum guard, incremented extents, texture setup,
+original render-mode bits, F8/FF/7C/FF environment tint, pipe sync, four
+eight-pixel corner draws and final display-list restore. Repeated integer
+coordinate casts in the calls let Uopt retain the three actual float spills;
+named coordinate aliases additionally reserve source homes and enlarge the
+frame to 0x68/0x70 without changing instruction count. Eight corrected initial
+variants and eight named-coordinate masks; the no-alias mask accepts first.
+Eight earlier declaration failures came from overriding existing prototypes
+and symbol types; remove the overrides, not the established interfaces.
+
+After formatting, duplicate-extern removal and US compatibility naming,
+fresh/twenty-leading-blank whole-object controls preserve every section's
+bytes/layout, all 79 original starts/full spans, the frozen accepted body and
+78 untouched spans. Normal forced full-ROM comparison, host syntax check,
+22 public tooling tests and diff whitespace checks pass. No new helper,
+storage, padding, compiler/layout mutation, gate bypass or scratch artifact.
+
+### Scrolling-indicator requeue update
+
+`func_82402B1C` now has **80 compared candidates** in this campaign (16
+previously recorded plus 64 this continuation). It remains ASM. The best
+source reproduces **all 195 instruction opcodes and registers**, frame 0x60
+and 780-byte length; normalized/raw **1.0/0.9179**. Direct byte comparison
+isolates exactly 16 differing instruction words: only index spills at sp+0x34
+instead of +0x38 and fraction spills at sp+0x30 instead of +0x34. Triangle
+spill +0x44 and the rest of the function agree. This is not acceptance.
+
+Measured advances: keep right-arrow scales as nested conditional expressions
+inside the draw call to preserve the original result moves. Reuse a genuinely
+read integer temporary for the starting X before converting the selection
+index, retain a real context alias, and reuse a float pulse for triangle
+construction and the first-arrow output. The pulse-to-triangle copy restores
+the original f0/f2 roles; input selection/fraction stay f14/f12. Every stored
+temporary is read: no dead initial assignment is installed.
+
+A calibrated fixed-interface 45-second permuter improved 839→287 but was
+not exact. Its best source contains an unread initial index write; reject
+that scaffold. Test its legitimate context/value-lifetime hints separately.
+Eight scalar declaration orders leave the same two spill slots unchanged.
+Named icon-Y carriers introduce wrong homes/scheduling; split negative-X
+locals produce 832-byte bodies. Do not replay these families unchanged.
+
+Next: identify the spill-allocation event before the index/fraction homes,
+not another register permutation. A real named count-call result is an
+untested source-level hypothesis; a compiler spill-allocation trace is the
+stronger diagnostic. Do not insert a dummy slot, change interfaces or pad
+the frame. All sources, objects and calibrated search results remain local.
