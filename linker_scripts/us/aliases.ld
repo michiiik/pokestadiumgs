@@ -175,3 +175,4 @@ func_82405D38 = Fragment13_InitGroupState;
 func_82405244 = Fragment13_LerpRgb;
 func_82407228 = Fragment13_SyncSceneSelections;
 func_82402A14 = Fragment13_GetGroupedItemLabel;
+func_8240182C = Fragment13_DrawPanelCorners;

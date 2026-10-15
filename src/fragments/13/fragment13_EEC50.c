@@ -107,7 +107,22 @@ void func_82401198(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82401570.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_8240182C.s")
+void Fragment13_DrawPanelCorners(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    if (arg2 >= 4 && arg3 >= 4) {
+        arg2++;
+        arg3++;
+        func_8004D1FC((void *)(u32)D_82407834);
+        gSPDisplayList(D_800D0510++, D_80094E38);
+        gDPSetRenderMode(D_800D0510++, 0, 0x0F0A7008);
+        gDPSetEnvColor(D_800D0510++, 0xF8, 0xFF, 0x7C, 0xFF);
+        gDPPipeSync(D_800D0510++);
+        func_82400BD0((f32)arg0, (f32)arg1, 8.0f, 8.0f, 0, 0, 1.0f, 1.0f);
+        func_82400BD0((f32)(arg0 + arg2 - 8), (f32)arg1, 8.0f, 8.0f, 8, 0, 1.0f, 1.0f);
+        func_82400BD0((f32)arg0, (f32)(arg1 + arg3 - 8), 8.0f, 8.0f, 0, 8, 1.0f, 1.0f);
+        func_82400BD0((f32)(arg0 + arg2 - 8), (f32)(arg1 + arg3 - 8), 8.0f, 8.0f, 8, 8, 1.0f, 1.0f);
+        gSPDisplayList(D_800D0510++, D_80094F50);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82401A28.s")
 
