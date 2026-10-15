@@ -1,5 +1,58 @@
 # Fragment 44 record collection and menu callbacks
 
+## 2026-10-16 — category-filtered collection accepted
+
+Solo native macOS, without agents or containers. `func_8AF125D0` becomes
+matching C: **83 words / 332 bytes**, with its original **0x38-byte frame**.
+This file advances from **14 C / 24 function ASM to 15 C / 23 function ASM**,
+out of 38 originals. No new callable helper or data allocation.
+
+Acceptance batch: `523529ea9b704e62a730680d10f4312d`, candidate
+`f44-menu-kind-filter-indexed:narrow-False:less-False:global-True`.
+The normal runner accepted it after **one successful sequential full-ROM
+gate**. The isolated probe was relocation-masked, not `link_verified`:
+the compiler expresses the input endpoint as the input-array symbol plus
+250 instead of the separately named marker. A separate strict canonical
+link resolves every undefined name from the normal ELF and proves the
+complete containing text, including **all 38 original functions**, identical
+to the assembly-backed baseline. No unresolved-symbol suppression is used.
+
+### Source mechanism
+
+Use a real `s32` index into the global 250-byte input array, with
+`index != 250`. IDO strength-reduces this into the original pointer walk;
+keeping an explicit input/end pointer pair produced the same operations but
+the wrong saved-register allocation and pointer-add order. Preserve the two
+real early-continue guards after mapping the ID: first exclude ID 0xA5,
+then reject nonmatching categories. Moving those tests before the mapping
+calls would change the original call behavior.
+
+The signed halfword ID and separate unsigned halfword snapshot retain the
+original call-argument and stored-ID carriers. All locals have real uses;
+there are no empty conditions, artificial arrays or forced registers.
+
+The input's extern becomes `u8[250]`, supported by the accepted collector's
+250-entry limit and the original endpoint-address difference of 0xFA.
+The existing mask filter now takes its start pointer directly from that
+array. These are declarations of existing storage, not additional data.
+The candidate, array declaration and accepted-caller adjustment were probed
+and installed in the same transaction.
+
+After formatting and removing redundant externs, fresh and twenty-leading-
+blank builds reproduce the frozen accepted object's complete sections,
+layout and every relocation row. All 38 original spans and the 37 untouched
+function bodies are preserved. Forced normal ROM comparison passes, MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`; edited-TU host syntax passes with four
+pre-existing pointer warnings; all 46 native tooling tests pass. The naming
+tool finds no evidence-backed public mapping, so the address name stays.
+
+The adjacent section builder remains a **requeue**: its 296-byte leader has
+the original 74-operation sequence but swapped input/output saved registers.
+A real scan/emission cursor split fixes its first 33 words but adds a move
+and grows it to 300 bytes. Neither is accepted. The renderer and callback
+residuals below also remain unresolved. Scratch generators, traces, compiler
+binaries, objects and ROMs remain local and are not part of the PR.
+
 ## 2026-10-16 — three native matching routines accepted
 
 Solo native macOS, without agents or containers. Three existing assembly
