@@ -757,7 +757,84 @@ void Fragment13_ResetGroupCamera(struct Fragment13CameraState *arg0) {
     arg0->eye.z += arg0->offsetZ;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82405D38.s")
+extern void func_8005D9E0(s32, s32 *);
+extern s32 Fragment13_FindNearestGroup(struct Fragment13MotionVector *);
+extern s8 *HAL_Strcpy(s8 *, s8 *);
+extern void func_80006158(void);
+extern void func_82405718(void *, void *);
+struct Fragment13GroupState {
+    u8 prefix[0x54];
+    struct Fragment13GroupedList list;
+    struct Fragment13MotionVector eye;
+    struct Fragment13MotionVector target;
+    s32 field18C;
+    s32 handle;
+    s32 current[8];
+    s32 previous[8];
+    s32 end;
+    s32 start;
+    s32 group;
+    s32 previousGroup;
+    s32 state;
+    s32 targetState;
+    s32 previousState;
+    s32 selected;
+    s32 field1F4;
+    f32 offsetX;
+    f32 offsetZ;
+    f32 timer;
+    f32 transition;
+    f32 selectionTimer;
+    s32 idle;
+    s32 dirty;
+    s32 field214;
+    s8 name[16];
+    u8 panel[0x24];
+};
+extern void func_8240429C(u8 *arg0);
+extern void func_8240504C(void *arg0, s32 arg1);
+extern f32 D_82408BAC;
+void Fragment13_InitGroupState(struct Fragment13GroupState *arg0, s32 handle, s32 arg2, s32 arg3) {
+    s32 i;
+    struct Fragment13MotionVector *target;
+    s32 info[4];
+    struct Fragment13MotionVector position;
+    arg0->handle = handle;
+    Fragment13_InitGroupedList(&arg0->list);
+    Fragment13_InitAvailableGroupedList(&arg0->list, handle);
+    arg0->eye = D_82408F20;
+    target = &arg0->target;
+    *target = D_82408F2C;
+    func_8005D9E0(handle, (s32 *)info);
+    HAL_Strcpy(arg0->name, (s8 *)info + 2);
+    position = *target;
+    arg0->group = arg0->previousGroup = Fragment13_FindNearestGroup(&position);
+    arg0->offsetX = 0.0f;
+    arg0->offsetZ = D_82408BAC;
+    arg0->idle = 1;
+    arg0->dirty = 0;
+    arg0->state = 0;
+    arg0->previousState = 0;
+    arg0->timer = 0.0f;
+    arg0->transition = 0.0f;
+    arg0->selectionTimer = 0.0f;
+    arg0->field18C = arg3;
+    arg0->targetState = arg0->idle;
+    arg0->field214 = arg2;
+    arg0->selected = -1;
+    arg0->field1F4 = 0;
+    /* The original counter-only loop is present at 0x82405E54-0x82405E60. */
+    for (i = 0; i < 8; i++) {
+    }
+    Fragment13_LoadGroupSelections((struct Fragment13GroupSelection *)arg0);
+    func_80006158();
+    func_8240504C(arg0, handle);
+    func_82405718((u8 *)arg0 + 0x24, arg0);
+    func_8240429C(arg0->panel);
+    for (i = 0; i < 8; i++) {
+        arg0->previous[i] = arg0->current[i];
+    }
+}
 
 extern Gfx *D_800D0510;
 extern void func_80038E14(void *, s32, s32, s32, f32, f32, f32, s32);

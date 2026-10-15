@@ -309,3 +309,42 @@ the fragment retains its existing line-25 warning. All 22 public tooling
 tests and diff whitespace checks pass. No bypass, compiler/layout mutation,
 padding or new dead-variable scaffold. All search/proof tools and binary
 artifacts stay local; the unresolved flag accessor remains ASM.
+
+## Native group-state initializer — 2026-10-15
+
+`func_82405D38` → `Fragment13_InitGroupState`: **106 words / 424 bytes**,
+frame 0x50; file **50 C / 29 ASM → 51 C / 28 ASM**. Runner acceptance
+`9ae7bce569c14e969806f2460ed34fd5`, link-verified combined full-ROM gate.
+Solo native execution, no agents or containers.
+
+The typed root view connects the existing grouped list (+0x54), camera
+vectors (+0x174/+0x180), handle (+0x190), selection arrays and transition
+fields. Preserve the metadata copy/name extraction and natural struct copies.
+Declare the real counter and target pointer before the two local buffers:
+metadata at sp+0x38 and position at sp+0x2C then agree with the original.
+Initialize offsetZ early and copy targetState from idle after field18C.
+The counter-only loop is present in the original at 0x82405E54–0x82405E60;
+it is not newly introduced padding. Let IDO unroll the final array copy.
+
+Forty submitted candidates: eight initial declaration failures, then 32
+compared candidates across pointer lifetimes, buffer homes and scalar store
+order. No fake locals, register forcing, signature mutation or gate bypass.
+Remove the unused rejected-only trainer-info type during cleanup. Rename
+the existing caller and add the US compatibility alias.
+
+Fresh and twenty-leading-blank controls preserve all section bytes/layout,
+all 79 original offsets/sizes/full spans, the frozen accepted initializer
+and 78 untouched spans. Forced normal ROM comparison passes MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`; host checks pass for both touched C files
+with existing warnings; all 22 tooling tests pass.
+
+### Lighting selector requeue
+
+`func_82405718`: 16 compared candidates, best normalized/raw 0.7704/0.3407,
+532 bytes versus 540 expected, frame 0x18. Eight expression-staging/blink
+variants all reproduce the first batch's best output. Do not replay these
+equivalent families. The fractional-hour calculation is sunk into the
+interpolation path rather than emitted at entry; the signed blink remainder
+correction is simplified away. Inspect those mechanisms before another batch.
+Its preset-table end uses jtbl_82409058 only as a sentinel, not a local
+switch: no rodata-subsegment change is justified by this owner.
