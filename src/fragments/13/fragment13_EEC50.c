@@ -369,9 +369,24 @@ s32 func_824048A0(void *arg0, s32 arg1) {
     return 0;
 }
 
+struct Fragment13MotionVector {
+    f32 x, y, z;
+};
+
+struct Fragment13GroupItem {
+    u8 opaque[8];
+    s16 id;
+    s16 value;
+};
+
 struct Fragment13GroupAnchor {
     f32 x, y, z;
-    u8 rest[48];
+    u8 opaque[16];
+    struct Fragment13MotionVector eye;
+    struct Fragment13MotionVector target;
+    struct Fragment13GroupItem *items;
+    s16 defaultValue;
+    u16 count;
 };
 extern struct Fragment13GroupAnchor D_82407370[];
 
@@ -411,7 +426,29 @@ s32 Fragment13_GetGroupedListItem(struct Fragment13GroupedList *arg0, s32 group,
     return (arg0->entries + arg0->starts[group])[index];
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_824049D0.s")
+extern s32 func_8005F9A4(s32, s32);
+
+void Fragment13_InitAvailableGroupedList(struct Fragment13GroupedList *arg0, s32 handle) {
+    s32 cursor = 0;
+    s32 group;
+    s32 item;
+    struct Fragment13GroupItem *entry;
+
+    for (group = 0; group < 8; group++) {
+        arg0->counts[group] = 0;
+        arg0->starts[group] = cursor;
+        for (item = 0; item < D_82407370[group].count; item++) {
+            entry = &D_82407370[group].items[item];
+            if (entry->id == 0x2A4 || entry->id == 0x2AF || func_8005F9A4(handle, (u16)entry->id)) {
+                arg0->entries[cursor] = item;
+                cursor++;
+                arg0->counts[group]++;
+            }
+        }
+        arg0->entries[cursor] = -1;
+        cursor++;
+    }
+}
 
 struct Fragment13GroupSelection {
     u8 prefix[0x54];
@@ -432,12 +469,6 @@ s32 Fragment13_HasSelectionChanges(struct Fragment13GroupSelection *arg0) {
     }
     return 0;
 }
-
-struct Fragment13GroupItem {
-    u8 opaque[8];
-    u16 id;
-    s16 value;
-};
 
 /* The item-pointer field repeats at the anchor record's 0x3C-byte stride. */
 struct Fragment13GroupItemSpan {
@@ -466,7 +497,39 @@ void Fragment13_LoadGroupSelections(struct Fragment13GroupSelection *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82404C78.s")
+extern void func_80057908(u8);
+extern void func_80057944(u8);
+extern void func_81B00E58(u8, u8, u8);
+extern void func_81B00F78(u8);
+
+void Fragment13_ApplyGroupSelections(struct Fragment13GroupSelection *arg0) {
+    s32 group;
+    s32 itemIndex;
+    struct Fragment13GroupItem *entry;
+    s32 key;
+    s32 value;
+
+    func_80057908(*((u8 *)arg0 + 0x193));
+    for (group = 0; group < 8; group++) {
+        value = D_82407370[group].defaultValue;
+        key = D_82408F38[group];
+        if (arg0->current[group] >= 0) {
+            itemIndex = (arg0->list.entries + arg0->current[group])[arg0->list.starts[group]];
+            entry = &D_82407370[group].items[itemIndex];
+            if (func_8005F9A4(arg0->handle, (u16)entry->id)) {
+                value = entry->value;
+            } else if (key == 0 && entry->value == 2) {
+                value = entry->value;
+            } else if (key == 3 && entry->value == 16) {
+                value = entry->value;
+            }
+        }
+        func_81B00E58(*((u8 *)arg0 + 0x193), (u8)key, (u8)value);
+    }
+    func_81B00F78(*((u8 *)arg0 + 0x193));
+    func_80057944(*((u8 *)arg0 + 0x193));
+    *(s32 *)((u8 *)arg0 + 0x210) = 1;
+}
 
 extern void func_81A00074(s32, s32);
 void func_82404DD8(s32 arg0) {
@@ -655,7 +718,44 @@ void func_82405BAC(s32 arg0, void *arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82405C0C.s")
+struct Fragment13CameraState {
+    u8 prefix[0x174];
+    struct Fragment13MotionVector eye;
+    struct Fragment13MotionVector target;
+    u8 gap[0x50];
+    s32 group;
+    u8 gap1[0x18];
+    f32 offsetX;
+    f32 offsetZ;
+};
+extern struct Fragment13MotionVector D_82408F20;
+extern struct Fragment13MotionVector D_82408F2C;
+extern f32 D_82408BAC;
+extern f32 D_82408BA4;
+extern f32 D_82408BA8;
+extern f32 D_82408BA0;
+
+void Fragment13_ResetGroupCamera(struct Fragment13CameraState *arg0) {
+    arg0->target = D_82407370[arg0->group].target;
+    arg0->target.y = D_82408F2C.y;
+    arg0->offsetX = arg0->target.x - D_82408F2C.x;
+    arg0->offsetZ = arg0->target.z - D_82408F2C.z;
+    if (arg0->offsetZ < D_82408BAC) {
+        arg0->offsetZ = D_82408BAC;
+    }
+    if (arg0->offsetX < D_82408BA4) {
+        arg0->offsetX = D_82408BA4;
+    }
+    if (D_82408BA8 < arg0->offsetZ) {
+        arg0->offsetZ = D_82408BA8;
+    }
+    if (D_82408BA0 < arg0->offsetX) {
+        arg0->offsetX = D_82408BA0;
+    }
+    arg0->eye = D_82408F20;
+    arg0->eye.x += arg0->offsetX;
+    arg0->eye.z += arg0->offsetZ;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82405D38.s")
 
@@ -677,10 +777,6 @@ s32 func_82405EE0(s32 arg0, void *arg1) {
     }
     return 1;
 }
-
-struct Fragment13MotionVector {
-    f32 x, y, z;
-};
 
 s32 Fragment13_StepVectorToward(struct Fragment13MotionVector *arg0, struct Fragment13MotionVector *arg1, f32 step) {
     f32 dx, dy, dz;
