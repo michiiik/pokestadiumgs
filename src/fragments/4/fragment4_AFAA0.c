@@ -285,7 +285,18 @@ void func_81802308(s32 arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81802438.s")
+extern Gfx D_81805940[];
+extern Gfx D_81805960[];
+void func_81802438(s32 arg0) {
+    switch (*(s8 *)((u8 *)arg0 + 9)) {
+        case 1:
+            gSPDisplayList(D_800D0510++, D_81805940);
+            break;
+        case 2:
+            gSPDisplayList(D_800D0510++, D_81805960);
+            break;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_818024B0.s")
 
@@ -302,11 +313,11 @@ void func_81802690(u8 *arg0, f32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81802754.s")
 
-extern void func_81802438();
+extern void func_81802438(s32);
 extern void func_81802208(s32, f32);
 extern void func_81802308(s32);
 extern void func_818024B0(s32, s32);
-void func_81802BAC(s32 arg0, s32 arg1) { func_81802438(arg0, arg1); func_81802208(arg0, *(f32 *)&arg1); func_81802308(arg0); func_818024B0(arg0, arg1); }
+void func_81802BAC(s32 arg0, s32 arg1) { func_81802438(arg0); func_81802208(arg0, *(f32 *)&arg1); func_81802308(arg0); func_818024B0(arg0, arg1); }
 
 s32 func_81802BF0(s32 arg0) {
     s32 count = 0;
