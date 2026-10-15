@@ -159,3 +159,55 @@ Neither unresolved body is installed. A runner warning that source variants
 "will not close" a register tie was contradicted by the trailing builder's
 accepted load-order change; treat that wording as advisory, not proof of a
 compiler limitation. No tool or compiler behavior was changed in this batch.
+
+## 2026-10-16 — initializer and draw follow-up, no new C acceptance
+
+All work remains solo/native. The source still has **10 C / 8 function ASM**;
+the normal retail-ROM comparison passes after the diagnostic work. No
+compiler setting, partial C body, padding or register patch is installed.
+
+- `func_8AF02C28`: **requeue**, 80 recorded source attempts and a calibrated
+  45-second permuter search. The 380-byte / 95-instruction leader has the
+  correct 0x30 frame and differs in only two raw words: offset 0x20 expects
+  `addiu v1,a0,0x44` instead of `addiu s2,a0,0x44`; offset 0x28 expects
+  `move s2,v1` instead of `move v1,s2`. An explicit endless entry scan with
+  a negative-sentinel break fixes the rotated-loop shape. Distinguish the raw
+  configuration address from its saved allocation-loop view. Taking a typed
+  bound-field pointer inside the loop condition closes the instruction shape;
+  removing that view loses one real copy, while caching it earlier changes
+  scheduling. Pointer/integer view combinations and a paired pointer-ABI
+  correction did not close the remaining copy direction; none was installed.
+  The permuter's sole useful mutation was a fully initialized pointer used
+  for the bound read, not a fake constant or an uninitialized carrier.
+- `func_8AF02DD0`: **requeue**, 56 recorded source attempts. The 328-byte /
+  82-instruction leader has the correct 0x50 frame, exact positional opcode
+  sequence and eight raw differences, all stack offsets. Its normalized
+  width is at sp+0x30 rather than 0x38, normalized third-height at 0x2C rather
+  than 0x30, and byte advance at 0x28 rather than 0x2C. Inlining the temporary
+  image-header view removes an extra frame slot; moving the byte-offset
+  declaration after the signed x/y snapshots fixes their homes. Shared extent
+  expressions, explicit width lifetime changes and an all-used local drawing
+  state were tested without closing the remaining temporary homes. Preserve
+  signed division by three, two equal buffer advances, and third-row y as
+  `y + height * 2 / 3`, not `y + (height / 3) * 2`.
+
+Twelve stock/diagnostic optimizer-listing controls preserve complete sections,
+layout, symbols and every relocation row. They distinguish the leading-row
+builder's copied row from the modified value in the `current` source slot;
+a source slot is not one semantic value through the whole function.
+`func_8AF0299C` now has 176 recorded attempts; the final eight-row manifest
+contained six distinct bodies, a generator defect retained as process
+evidence rather than claimed as eight independent hypotheses. Its generator
+now asserts uniqueness. `func_8AF02AE0` has 32 attempts; an early-return guard
+was inert on the previously recorded forms.
+
+The alternate stock 5.3 driver leaves the initializer's two-word residual
+unchanged, worsens the draw leader to 336 bytes / 69 raw differing words, and
+changes four of the ten accepted siblings. The configured 7.1 driver retains
+all ten siblings. This rules out that proposed whole-file compiler switch,
+not every historical frontend. For the initializer, forced g0 does not alter
+the residual; g3 changes other instructions and is not a fix. Calibrated AS1
+listings already contain the reversed pair before instruction scheduling.
+Next isolate its producer before that boundary rather than blame scheduling
+or declare a compiler impossibility. For drawing, inspect the real/synthetic
+temporary-home allocation rather than add unused locals to move the frame.
