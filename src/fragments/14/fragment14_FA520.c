@@ -41,7 +41,39 @@ void func_8130267C(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FA520/func_81302854.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FA520/func_81302920.s")
+extern s32 func_8004D690(s32);
+void Fragment14_PreloadSelectionResource(u8 *arg0) {
+    u16 message;
+    u8 *metadata = *(u8 **)(arg0 + 0x940);
+    message = *(u16 *)(metadata + 0x3A);
+    switch (*(s16 *)(metadata + 0x34)) {
+    case 6:
+        switch (func_8006CBB8(*(u16 *)(arg0 + 0x952))) {
+        case 0:
+            message = 0x1A;
+            break;
+        case 1:
+            message = 0x1B;
+            break;
+        case 2:
+            message = 0xD;
+            break;
+        }
+        break;
+    case 0xE:
+        message = 0x17;
+        break;
+    }
+    switch (*(u16 *)(arg0 + 0x950) & 0xFF00) {
+    case 0x400:
+        message = 0xE;
+        break;
+    case 0x500:
+        message = 0x2E;
+        break;
+    }
+    func_8004D690(message);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FA520/func_813029F0.s")
 #endif
