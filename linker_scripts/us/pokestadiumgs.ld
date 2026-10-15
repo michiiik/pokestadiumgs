@@ -1346,6 +1346,7 @@ SECTIONS
         build/src/fragments/13/fragment13_EE0A0.o(.rodata);
         build/src/fragments/13/fragment13_EE5B0.o(.rodata);
         build/src/fragments/13/fragment13_EEC50.o(.rodata);
+        build/asm/us/data/F7120.rodata.o(.rodata);
         fragment13_RODATA_END = .;
         fragment13_RODATA_SIZE = ABSOLUTE(fragment13_RODATA_END - fragment13_RODATA_START);
     }

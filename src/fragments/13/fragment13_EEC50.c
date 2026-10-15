@@ -2,6 +2,19 @@
 
 
 #ifdef VERSION_US
+/* Shared named constants precede this file's compiler-owned switch tables. */
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/D_82408F00.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/D_82408F04.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/D_82408F08.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/D_82408F0C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/D_82408F10.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/D_82408F14.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/D_82408F20.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/D_82408F2C.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/D_82408F38.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/D_82408F40.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/D_82408F78.s")
+
 struct Fragment13GroupItem {
     u8 opaque[6];
     s16 labelIndex;
@@ -438,8 +451,8 @@ s32 func_82404430(u8 *arg0) {
 }
 
 extern u8 *D_80087200;
-/* Preserve the original one-word sound requests; later contextual calls keep their prototype. */
-extern void func_800226C0();
+/* Sound requests carry a sound word and, for contextual requests, a context. */
+extern void func_800226C0(s32, ...);
 s32 Fragment13_HandleConfirmationInput(u8 *arg0) {
     s32 buttons;
 
@@ -474,7 +487,6 @@ s32 Fragment13_HandleConfirmationInput(u8 *arg0) {
     return 1;
 }
 
-extern void func_800226C0(s32, void *);
 s8 func_82404564(void *arg0) {
     u8 temp_v0;
 
@@ -492,7 +504,32 @@ block_4:
     return -1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_824045B4.s")
+extern void func_81600A34(void *, void *, s32, s32, s32, s32, s32);
+void Fragment13_UpdateConfirmationDialog(u8 *arg0, void *arg1) {
+    s32 result = 0;
+
+    switch (arg0[0x21]) {
+    case 1:
+        result = func_82404378(arg0);
+        break;
+    case 2:
+        result = Fragment13_HandleConfirmationInput(arg0);
+        break;
+    case 3:
+        result = func_824043D8(arg0);
+        break;
+    case 0:
+        result = func_82404360(arg0);
+        break;
+    case 4:
+        result = func_82404430(arg0);
+        break;
+    }
+    if (arg0[0x21] != 0 && arg0[0x21] != 4) {
+        func_81600A34(arg1, arg0, result, *(s16 *)arg0, func_82404230(arg0),
+                      *(s16 *)(arg0 + 4), *(s16 *)(arg0 + 6));
+    }
+}
 
 struct Fragment13DialogView {
     s16 x, y, width, height;
@@ -853,19 +890,17 @@ void func_82405A58(s32 arg0, void *arg1) {
     }
 }
 
-extern f32 D_8240906C;
 void Fragment13_UpdateClockHourHand(s32 arg0, void *arg1) {
     u8 *data = *(u8 **)((u8 *)arg1 + 0x14);
     s32 angle;
 
     if (arg0 == 2) {
         /* Preserve the integer angle and truncate before negating. */
-        angle = (s32)((((f32)data[7] + *(f32 *)data / 60.0f) / 60.0f + (f32)data[6]) / 12.0f * D_8240906C);
+        angle = (s32)((((f32)data[7] + *(f32 *)data / 60.0f) / 60.0f + (f32)data[6]) / 12.0f * 65535.0f);
         *(s16 *)((u8 *)arg1 + 0x22) = -angle;
     }
 }
 
-extern f32 D_82409070;
 void Fragment13_UpdateClockMinuteHand(s32 arg0, void *arg1) {
     u8 *data = *(u8 **)((u8 *)arg1 + 0x14);
     f32 value;
@@ -873,16 +908,15 @@ void Fragment13_UpdateClockMinuteHand(s32 arg0, void *arg1) {
     if (arg0 == 2) {
         /* The fractional term comes first in the original IDO expression. */
         value = (f32)data[8] / 60.0f + (f32)data[7];
-        *(s16 *)((u8 *)arg1 + 0x22) = (s16)(-(value * D_82409070 / 60.0f));
+        *(s16 *)((u8 *)arg1 + 0x22) = (s16)(-(value * 65535.0f / 60.0f));
     }
 }
 
-extern f32 D_82409074;
 void func_82405BAC(s32 arg0, void *arg1) {
     u8 *ptr = *(u8 **)((u8 *)arg1 + 0x14);
     if (arg0 == 2) {
         f32 value = (f32)ptr[8];
-        *(s16 *)((u8 *)arg1 + 0x22) = (s16)(-(value * D_82409074 / 60.0f));
+        *(s16 *)((u8 *)arg1 + 0x22) = (s16)(-(value * 65535.0f / 60.0f));
     }
 }
 
@@ -1049,7 +1083,59 @@ s32 Fragment13_StepVectorToward(struct Fragment13MotionVector *arg0, struct Frag
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82406880.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82406A78.s")
+extern s32 D_82408BB8;
+extern void func_824050A8(void *, f32);
+extern void func_82406060(void *);
+extern void func_8240641C(void *);
+extern void func_82406560(void *);
+extern void func_82406880(void *, void *);
+void Fragment13_UpdateGroupScene(u8 *arg0, void *arg1) {
+    s32 changed;
+    u8 *dialog;
+
+    changed = *(s32 *)(arg0 + 0x1E4) != *(s32 *)(arg0 + 0x1E8);
+    func_824050A8(arg0, D_82408BB8 != 0 ? 1.0f : 3000.0f);
+    func_82404F64(arg0);
+    func_82405718(arg0 + 0x24, arg0);
+    func_81600A34(arg1, (void *)1, 0, 0, 0, 320, 240);
+    func_81600A34(arg1, (void *)4, changed, 0, 0, 320, 38);
+    func_81600A34(arg1, (void *)5, changed, 0, 202, 320, 38);
+    func_81600A34(arg1, (void *)7, changed, 0, 38, 12, 164);
+    func_81600A34(arg1, (void *)6, changed, 308, 38, 12, 164);
+    func_81600A34(arg1, (void *)(u32)*(s32 *)(arg0 + 0x214), 1, 11, 37, 300, 167);
+    switch (*(u32 *)(arg0 + 0x1E8) = *(u32 *)(arg0 + 0x1E4)) {
+    case 0:
+        func_82406060(arg0);
+        break;
+    case 1:
+        func_8240641C(arg0);
+        break;
+    case 2:
+        func_82406560(arg0);
+        break;
+    case 3:
+        switch (func_82404564(arg0 + 0x228)) {
+        case 0:
+            Fragment13_ApplyGroupSelections((struct Fragment13GroupSelection *)arg0);
+            *(u32 *)(arg0 + 0x1E4) = 4;
+            func_800226C0(0x14A);
+            break;
+        case 1:
+            *(s32 *)(arg0 + 0x210) = 0;
+            *(u32 *)(arg0 + 0x1E4) = 4;
+            break;
+        case 2:
+            *(u32 *)(arg0 + 0x1E4) = 0;
+            break;
+        }
+        break;
+    case 4:
+        return;
+    }
+    dialog = arg0 + 0x228;
+    func_82406880(arg0, arg1);
+    Fragment13_UpdateConfirmationDialog(dialog, arg1);
+}
 
 s32 func_82406CCC(u8 *arg0) {
     return *(s32 *)(arg0 + 0x1E4) == 4;

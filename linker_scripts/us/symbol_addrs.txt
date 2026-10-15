@@ -1,5 +1,17 @@
 entry_bss = 0x800A7E80; // size:0x400
 D_81312180 = 0x81312180; // type:u8 size:0x18 force_not_migration:true
+D_82408F00 = 0x82408F00; // size:0x4 force_not_migration:true
+D_82408F04 = 0x82408F04; // type:f32 size:0x4 force_not_migration:true
+D_82408F08 = 0x82408F08; // type:f32 size:0x4 force_not_migration:true
+D_82408F0C = 0x82408F0C; // type:f32 size:0x4 force_not_migration:true
+D_82408F10 = 0x82408F10; // type:f32 size:0x4 force_not_migration:true
+D_82408F14 = 0x82408F14; // type:f32 size:0xC force_not_migration:true
+D_82408F20 = 0x82408F20; // size:0xC force_not_migration:true
+D_82408F2C = 0x82408F2C; // type:f32 size:0xC force_not_migration:true
+D_82408F38 = 0x82408F38; // type:u8 size:0x8 force_not_migration:true
+D_82408F40 = 0x82408F40; // size:0x38 force_not_migration:true
+D_82408F78 = 0x82408F78; // size:0xE0 force_not_migration:true
+jtbl_82409058 = 0x82409058; // type:jtbl size:0x14 force_migration:true
 gIdleThread = 0x800A8280; // size:0x1B0
 pThreads = 0x800A8830; // size:0x1B0
 leoDiskID = 0x800AA9E0; // size:0x20
