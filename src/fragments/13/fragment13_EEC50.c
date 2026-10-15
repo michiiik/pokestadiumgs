@@ -22,6 +22,21 @@ struct Fragment13GroupItem {
     s16 value;
 };
 
+struct Fragment13MotionVector {
+    f32 x, y, z;
+};
+
+struct Fragment13GroupAnchor {
+    f32 x, y, z;
+    u8 opaque[16];
+    struct Fragment13MotionVector eye;
+    struct Fragment13MotionVector target;
+    struct Fragment13GroupItem *items;
+    s16 defaultValue;
+    u16 count;
+};
+extern struct Fragment13GroupAnchor D_82407370[];
+
 /* The item-pointer field repeats at the anchor record's 0x3C-byte stride. */
 struct Fragment13GroupItemSpan {
     struct Fragment13GroupItem *items;
@@ -586,21 +601,6 @@ s32 func_824048A0(void *arg0, s32 arg1) {
     }
     return 0;
 }
-
-struct Fragment13MotionVector {
-    f32 x, y, z;
-};
-
-struct Fragment13GroupAnchor {
-    f32 x, y, z;
-    u8 opaque[16];
-    struct Fragment13MotionVector eye;
-    struct Fragment13MotionVector target;
-    struct Fragment13GroupItem *items;
-    s16 defaultValue;
-    u16 count;
-};
-extern struct Fragment13GroupAnchor D_82407370[];
 
 void Fragment13_InitGroupedList(struct Fragment13GroupedList *arg0) {
     s32 index;
