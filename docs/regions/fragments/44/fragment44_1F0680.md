@@ -1,5 +1,57 @@
 # Fragment 44 scroll-list updates
 
+## 2026-10-16 — scheduled shared-page coalescing prerequisite narrowed
+
+`func_8AF0282C` remains **requeue**, not accepted C. Its original shared-$at
+sequence addresses `D_8AF2BF34` and `D_8AF2BF30` on the same rounded page,
+with an intervening register copy and a final store in a branch delay slot.
+The native C object's scheduler also interleaves the callback argument's
+sign-extension shifts. The old object coalescer could not recognize those
+pairs; this was a tooling prerequisite, not a reason to grind C spellings.
+
+`tools/coalesce_object.py` now recognizes **up to four** OR/ADDU register
+copies or constant SLL/SRL/SRA shifts within or between otherwise consecutive
+address pairs. This is not general interleaving support. A gap may not read
+or write `$at`, carry a relocation, or contain an unrecognized instruction.
+The extended run rejects branch entries that bypass the first `lui`, a first
+`lui` in a delay slot, loads into `$at`, and calls/returns before the final
+delay-slot memory operation. Unresolved branch targets, computed jumps,
+non-call absolute jumps, section-relative calls and call addends remain
+outside the new extension. Existing function opt-in, symbol filters, address
+proof, literal-low rewrite, relocation removal and branch repair remain in
+force; unmarked functions are untouched.
+
+Validation includes **46 tooling tests**, with 21 new synthetic positive and
+negative controls for this extension. A real-object round trip inserts one
+redundant `lui` into this assembly callback, folds it out, preserves every
+function span and the other allocatable sections, and changes only the
+expected resolved low word/removes its obsolete relocation. Linking that
+object passes the full retail-ROM comparison. Restoring the normal object
+and rebuilding this TU plus **all existing coalescer-opted-in source files**
+passes again: MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`. No synthetic object,
+ROM, compiler copy or diagnostic generator belongs in the repository.
+
+The callback now has 32 recorded probe rows: the first eight fail the
+initially narrower copy-only guard, eight deliberately unfolded diagnostic
+cells compare at 372 bytes, and eight ordinary folded cells include
+original-sized **368-byte** candidates (normalized .9783 / raw .9348). Eight descriptor
+snapshot variants correctly refuse folding because their schedules exceed
+the supported gap shape. These compile failures are process evidence, not
+32 scored source hypotheses. The best real folded candidate still has a
+**0x60 frame versus 0x70** and different parameter-normalization/global-store
+ordering. Width changes do not repair that frame. Do not invent unused
+locals, a fake array or forced stack padding to close it.
+
+`func_8AF0326C` remains assembly after 88 recorded source cells. Eighteen
+fresh stock/off/listing/leading-blank controls preserve full sections,
+symbols and relocation rows for the known TU and both retained leaders.
+The separate movement flag receives the expected `$a1`, while reusing an old
+offset fixes the frame but gives that flag `$a3`. Typed views, switch layout
+and block scopes do not close the combined residual. A calibrated 45-second
+permuter search does not reach zero; its best score introduces an unreachable
+return and is rejected. Keep the valid state-base hoist as a separate lead,
+not the dead-code mutation. No partial callback or updater is installed.
+
 ## 2026-10-16 — scroll-list initializer accepted
 
 Solo native macOS, no agents or containers. `func_8AF02C28` is now

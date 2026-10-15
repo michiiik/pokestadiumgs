@@ -29,8 +29,11 @@ machine code; it is only carrying redundant ``lui $at`` instructions. So fold
 
 1. Find the function's words in ``.text`` and its own ``.rel.text`` entries.
 2. Recognise the macro pairs the assembler expanded -- ``lui $at, %hi(S)``
-   carrying an ``R_MIPS_HI16`` for ``S``, immediately followed by a memory op
-   based on ``$at`` carrying an ``R_MIPS_LO16`` for the same ``S``.
+   carrying an ``R_MIPS_HI16`` for ``S``, followed by a memory op based on
+   ``$at`` carrying an ``R_MIPS_LO16`` for the same ``S``. Up to four plain
+   register copies or immediate shifts may separate them or adjacent pairs
+   when no control-flow entry bypasses the ``lui``; arbitrary interleaving
+   is still unsupported.
 3. Group maximal runs of consecutive such pairs whose symbols all resolve,
    via the same address map, to one ``%hi`` page (and, when the pragma named
    a symbol list, are all in it -- an op outside the list both refuses to
@@ -67,6 +70,7 @@ R_MIPS_LO16 = 6
 R_MIPS_26 = 4
 
 _AT = 1
+_MAX_SCHEDULED_GAP = 4
 
 # Memory-op primary opcodes whose base register field this fold understands.
 # Deliberately the same instruction set ``coalesce_lui._MACRO_MEM_OP`` matches
@@ -193,6 +197,76 @@ def _is_control_transfer(word: int) -> bool:
     return False
 
 
+def _is_safe_register_gap(word: int) -> bool:
+    """Non-trapping moves/immediate shifts, neither reading nor writing $at."""
+    if word == 0 or (word >> 26) != 0:
+        return False
+    rs, rt, rd = (word >> 21) & 31, (word >> 16) & 31, (word >> 11) & 31
+    if _AT in (rs, rt, rd):
+        return False
+    function = word & 63
+    if function in (0, 2, 3):  # sll/srl/sra with a constant shift amount
+        return rs == 0
+    return (
+        function in (0x21, 0x25)
+        and not ((word >> 6) & 31)
+        and (rs == 0 or rt == 0)
+    )
+
+
+def _copy_gap_entry_targets(words, by_offset):
+    """Known local entries, or None when a new scheduled pair is unprovable.
+
+    The narrow scheduled-gap extension does not attempt computed/non-call
+    absolute jumps, section-relative calls or nonzero call addends. Existing
+    adjacent pairs keep their established behavior; these extra guards apply
+    to scheduled gaps.
+    """
+    targets = set()
+    for index, word in enumerate(words):
+        opcode = word >> 26
+        if _is_pc_relative_branch(word):
+            if by_offset.get(index * 4):
+                return None  # The final target is not known until link time.
+            target = index + 1 + _sign_extend16(word)
+            if not 0 <= target <= len(words):
+                return None
+            targets.add(target)
+        elif opcode == 2:
+            return None
+        elif opcode == 3:
+            symbol = _single_reloc(by_offset, index * 4, R_MIPS_26)
+            if not symbol or symbol.startswith('.') or word & 0x3FFFFFF:
+                return None
+        elif opcode == 0 and (word & 0x3F) in (8, 9):
+            if (word & 0x3F) != 8 or ((word >> 21) & 31) != 31:
+                return None
+    return targets
+
+
+def _copy_gap_run_is_safe(words, run, entry_targets):
+    start, end = run[0][0], run[-1][1]
+    if entry_targets is None or any(start < target <= end for target in entry_targets):
+        return False
+    if start and _is_control_transfer(words[start - 1]):
+        return False
+    for _, op_index, _ in run:
+        word = words[op_index]
+        if (
+            (word >> 26) in (0x20, 0x21, 0x23, 0x24, 0x25)
+            and ((word >> 16) & 31) == _AT
+        ):
+            return False  # A load into $at kills the surviving page base.
+    for index in range(start, end - 1):
+        word = words[index]
+        opcode = word >> 26
+        if opcode == 3 or (opcode == 0 and (word & 63) in (8, 9)):
+            return False  # The next callee/return path need not preserve $at.
+        if opcode == 1 and ((word >> 16) & 31) in (16, 17, 18, 19):
+            return False  # Conditional branch-and-link is also a call.
+    return True
+
+
 def _macro_pairs(words, by_offset):
     """``{lui index: (mem-op index, symbol)}`` for every macro pair in the function.
 
@@ -205,8 +279,16 @@ def _macro_pairs(words, by_offset):
     control transfer is allowed: its delay slot executes before the jump
     takes effect, and neither a branch nor a jump writes ``$at``, so the
     surviving ``lui``'s value is still live at the store.
+
+    Scheduled gaps are narrower than a general scheduler analysis: at most
+    four OR/ADDU moves or immediate shifts, no relocation on an intervening
+    instruction and no entry into the gap or memory operation. A final
+    control transfer may place the memory operation in its delay slot, just
+    as in the existing adjacent-pair case. Run-level checks reject entries
+    through later pairs and a call/return before the last delay-slot operation.
     """
     pairs: dict[int, tuple[int, str]] = {}
+    entry_targets = _copy_gap_entry_targets(words, by_offset)
     for index in range(len(words) - 1):
         if not _is_lui_at(words[index]):
             continue
@@ -216,6 +298,22 @@ def _macro_pairs(words, by_offset):
         candidates = [index + 1]
         if _is_control_transfer(words[index + 1]):
             candidates.append(index + 2)
+        if entry_targets is not None and not (
+            index and _is_control_transfer(words[index - 1])
+        ):
+            cursor = index + 1
+            while cursor < min(index + 1 + _MAX_SCHEDULED_GAP, len(words)) and (
+                _is_safe_register_gap(words[cursor])
+            ):
+                if by_offset.get(cursor * 4):
+                    break
+                cursor += 1
+            if cursor > index + 1:
+                op_index = cursor
+                if cursor < len(words) and _is_control_transfer(words[cursor]):
+                    op_index += 1
+                if not any(index < target <= op_index for target in entry_targets):
+                    candidates.append(op_index)
         for op_index in candidates:
             if op_index >= len(words):
                 continue
@@ -238,6 +336,7 @@ def plan_runs(words, by_offset, address_map, symbol_filter=None):
     since a single pair has no redundant ``lui`` to drop.
     """
     pairs = _macro_pairs(words, by_offset)
+    entry_targets = _copy_gap_entry_targets(words, by_offset)
     runs = []
     index = 0
     while index < len(words):
@@ -260,6 +359,21 @@ def plan_runs(words, by_offset, address_map, symbol_filter=None):
                 break
             run.append((cursor, op_index, symbol))
             cursor = op_index + 1
+            gap_end = cursor
+            while gap_end < min(cursor + _MAX_SCHEDULED_GAP, len(words)) and (
+                _is_safe_register_gap(words[gap_end])
+            ):
+                if by_offset.get(gap_end * 4):
+                    break
+                gap_end += 1
+            if gap_end in pairs:
+                cursor = gap_end
+        has_scheduled_gap = any(
+            op > hi + 1 and _is_safe_register_gap(words[hi + 1])
+            for hi, op, _ in run
+        ) or any(run[i][0] > run[i - 1][1] + 1 for i in range(1, len(run)))
+        if has_scheduled_gap and not _copy_gap_run_is_safe(words, run, entry_targets):
+            run = []
         if len(run) >= 2:
             runs.append(run)
             index = cursor
