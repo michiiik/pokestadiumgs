@@ -1634,7 +1634,7 @@ extern u8 D_800CE060[];
 extern u8 D_800CE100[];
 extern void func_80006148(void *);
 extern void Gfx_InitDisplayListBuffers(s32, s32);
-extern s32 func_800082E0(s32, s32, s32, s32, s32, s32);
+extern s32 StageContext_Allocate(s32, s32, s32, s32, s32, s32);
 extern void func_8004C09C(s32);
 extern void func_87F09EBC(void *, s32);
 extern void func_87F06EAC(s32, void *, s32);
@@ -1681,7 +1681,7 @@ s32 fragment49_main(s32 arg0, s32 arg1) {
     } while (ptr != end);
 
     Gfx_InitDisplayListBuffers(0x20000, 0);
-    stage = func_800082E0(0, 0, 2, 1, 2, 1);
+    stage = StageContext_Allocate(0, 0, 2, 1, 2, 1);
     func_8004C09C(0x123);
     func_87F09EBC((u8 *)D_8610AD20 + 0x9704, *(s32 *)D_8610AD20);
     func_87F06EAC(0x61, (u8 *)D_8610AD20 + 0x44, *(s32 *)D_8610AD20);

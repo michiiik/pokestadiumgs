@@ -98,3 +98,5 @@ func_80007A84 = StageFade_Start;
 func_80008734 = BgStage_RunUntilCondition;
 func_800087E8 = BgStage_WaitForCondition;
 func_800088DC = BgStage_DrawFrame;
+func_800080E0 = StageLoader_BeginFrame;
+func_800082E0 = StageContext_Allocate;

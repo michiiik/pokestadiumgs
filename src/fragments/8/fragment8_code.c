@@ -189,7 +189,7 @@ void func_80064D28(void);
 extern u8 D_82F032C0;
 void func_81600AF0(s32 arg0, s32 arg1, s32 arg2);
 extern void Gfx_InitDisplayListBuffers(s32, s32);
-s32 func_800082E0(s32, s32, s32, s32, s32, s32);
+s32 StageContext_Allocate(s32, s32, s32, s32, s32, s32);
 extern void func_80008514(s32);
 extern void func_8004C8C0(s32);
 extern u8 D_446E30;
@@ -261,7 +261,7 @@ void func_82F01D74(s32 arg0, s32 arg1) {
     } while (var_s0 != 1);
 }
 
-s32 func_800082E0(s32, s32, s32, s32, s32, s32);
+s32 StageContext_Allocate(s32, s32, s32, s32, s32, s32);
 u8 *Asset_LoadToSegment(s32 id, u8 *rom_start, u8 *rom_end, s32 arg3);
 s32 func_8004C4B0(s32 value);
 void WidgetTree_OpenMessagePanel_fragment4(u8 *arg0);
@@ -272,7 +272,7 @@ void func_82F01DC4(s32 arg0, s32 arg1) {
 
     Asset_LoadToSegment((s32) ((u32) ((s32) D_1000000 & 0x0F000000) >> 0x18), &D_446E30, D_447D00, 0);
     Gfx_InitDisplayListBuffers(0x10000, 0);
-    sp24 = func_800082E0(1, 0, 2, 0, 2, 1);
+    sp24 = StageContext_Allocate(1, 0, 2, 0, 2, 1);
     func_8004C09C(0x10F);
     func_8004C8C0(0x14C);
     func_8004C4B0(0x49);

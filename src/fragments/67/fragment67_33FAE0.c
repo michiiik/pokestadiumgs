@@ -669,7 +669,7 @@ void func_82905488(void) {
 
 #ifdef VERSION_US
 extern void Gfx_InitDisplayListBuffers(s32, s32);
-extern s32 func_800082E0(s32, s32, s32, s32, s32, s32);
+extern s32 StageContext_Allocate(s32, s32, s32, s32, s32, s32);
 extern void func_80008514(s32);
 extern void func_80008574(void);
 extern void func_80047588(s32, s32);
@@ -695,7 +695,7 @@ s32 func_829056A4(void *arg0, void *arg1) {
     s32 sp24;
     main_pool_push_state(0x434150);
     Gfx_InitDisplayListBuffers(0x18000, 0);
-    sp24 = func_800082E0(0, 1, 3, 1, 2, 1);
+    sp24 = StageContext_Allocate(0, 1, 3, 1, 2, 1);
     func_80047588(0x13, 0);
     D_82919D14 = BinArchive_Open(func_800356CC(0x10), 0, 1, 1);
     D_82919C14 = (void *)arg1;

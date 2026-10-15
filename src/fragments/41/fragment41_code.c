@@ -122,7 +122,7 @@ void func_88C014D8(void) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/41/fragment41_code/func_88C015DC.s")
 
 extern void Gfx_InitDisplayListBuffers(s32, s32);
-s32 func_800082E0(s32, s32, s32, s32, s32, s32);
+s32 StageContext_Allocate(s32, s32, s32, s32, s32, s32);
 extern void func_80008514(s32);
 extern void func_80008574();
 extern void func_88C015DC();
@@ -133,7 +133,7 @@ s32 fragment41_main(s32 arg0, s32 arg1) {
 
     main_pool_push_state(0x434C4544);
     Gfx_InitDisplayListBuffers(0x10000, 0);
-    sp24 = func_800082E0(1, 0, 2, 0, 2, 1);
+    sp24 = StageContext_Allocate(1, 0, 2, 0, 2, 1);
     func_8004C09C(3);
     func_80047588(0x18, 0);
     func_88C015DC();

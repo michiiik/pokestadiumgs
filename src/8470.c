@@ -96,11 +96,85 @@ void func_80007E18(void) {
 
 void StageLoader_SwapDisplayListAndReset(void) { Gfx_SwapDisplayListBuffer(); func_80007E18(); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_800080E0.s")
+extern s32 D_800D0540;
+extern s32 D_800D0544;
+extern s32 D_800D0548;
+extern void func_80007E6C(void);
+extern void Gfx_GetDisplayListRange(void **, s32 *);
+void StageLoader_BeginFrame(void) {
+    u8 *context;
+    u8 *request;
+    func_80007E6C();
+    context = (u8 *)(u32)D_800D0554;
+    request = (u8 *)&D_800D0540;
+    request[0] = *(s8 *)(context + 0x10);
+    request[1] = *(s8 *)(context + 0xC);
+    request[2] = *(s8 *)(context + 0xD);
+    request[3] = *(s8 *)(context + 0x16);
+    *(s32 *)((u8 *)&D_800D0540 + 0xC) = ((s32 *)(context + 0x18))[*(s8 *)(context + 0x16)];
+    Gfx_GetDisplayListRange((void **)&D_800D0544, &D_800D0548);
+    (*(s8 *)((u8 *)(u32)D_800D0554 + 0x16))++;
+    if (*(s8 *)((u8 *)(u32)D_800D0554 + 0xE) == *(s8 *)((u8 *)(u32)D_800D0554 + 0x16)) {
+        *(s8 *)((u8 *)(u32)D_800D0554 + 0x16) = 0;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_80008188.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/8470/func_800082E0.s")
+typedef struct {
+    s16 width, height, left, right, top, bottom;
+    s8 resolution, mode, imageCount, depthFlag, type;
+    u8 fadeMode, duration, progress;
+    u16 clearColor;
+    s8 currentImage, status;
+    s32 images[3];
+} StageContextRecord;
+extern s32 main_pool_alloc(s32, s32);
+extern s32 Display_GetFramebufferClearColor(void);
+extern s32 func_800071A4(s32, s32, s32, s32, s32);
+extern void GfxImage_AttachDepthBuffer(u8 *, u8 *);
+StageContextRecord *StageContext_Allocate(s8 resolution, s8 mode, s8 imageCount, s8 depthFlag, s8 type, s32 allocate) {
+    StageContextRecord *context;
+    s32 index;
+    s32 depth;
+    context = (StageContextRecord *)(u32)main_pool_alloc(0x24, 0);
+    if (context != 0) {
+        if (resolution == 1) { context->width = 640; context->height = 480; }
+        else { context->width = 320; context->height = 240; }
+        context->fadeMode = 1;
+        context->resolution = resolution;
+        context->mode = mode;
+        context->imageCount = imageCount;
+        context->depthFlag = depthFlag;
+        context->type = type;
+        context->clearColor = Display_GetFramebufferClearColor();
+        context->currentImage = 0;
+        context->status = type;
+        context->left = 0;
+        context->right = context->width - 1;
+        context->top = 0;
+        context->bottom = context->height - 1;
+        context->images[0] = 0;
+        context->images[1] = 0;
+        context->images[2] = 0;
+        if (allocate != 0) {
+            index = 0;
+            while (index < context->imageCount) {
+                context->images[index] = func_800071A4(0, 2, context->width, context->height, 1);
+                index++;
+            }
+            if (context->depthFlag == 1) {
+                depth = func_800071A4(0, 2, context->width, context->height, 0);
+                index = 0;
+                while (index < context->imageCount) {
+                    GfxImage_AttachDepthBuffer((u8 *)(u32)context->images[index], (u8 *)(u32)depth);
+                    index++;
+                }
+            }
+        }
+    }
+    return context;
+}
 
 
 s32 func_80008494(void) {
@@ -147,7 +221,7 @@ void func_80008514(s32 arg0) {
 extern s32 D_800D0554;
 extern s32 D_800D0540;
 extern void func_80008188(void);
-extern void func_800080E0(void);
+extern void StageLoader_BeginFrame(void);
 extern void func_8003539C(void);
 extern void Display_QueueFramebufferRequest(s32);
 extern void Display_WaitForCompletion(void);
@@ -156,7 +230,7 @@ extern void Display_WaitForFrames(s32);
 void func_80008574(void) {
     if (D_800D0554 != 0) {
         func_80008188();
-        func_800080E0();
+        StageLoader_BeginFrame();
         func_8003539C();
         Display_QueueFramebufferRequest((s32)&D_800D0540);
         Display_WaitForCompletion();
@@ -179,13 +253,13 @@ void StageLoader_WaitForRetrace(void) {
 extern Gfx *D_800D0510; void func_80008624(void) { func_80002178(&D_800D0510); }
 
 extern s32 D_800D0540;
-extern void func_800080E0(void);
+extern void StageLoader_BeginFrame(void);
 extern void func_8003539C(void);
 extern void Display_QueueFramebufferRequest(s32);
 extern void Display_WaitForCompletion(void);
 extern u8 func_80002014(void);
 s32 func_80008648(void) {
-    func_800080E0();
+    StageLoader_BeginFrame();
     func_8003539C();
     Display_QueueFramebufferRequest((s32)&D_800D0540);
     Display_WaitForCompletion();

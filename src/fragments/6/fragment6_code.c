@@ -554,7 +554,7 @@ extern s32 main_pool_get_available(void);
 extern u8 *MainPool_AllocState(s32, s32);
 extern void MainPool_FinalizeAllocation(void *);
 extern void Gfx_InitDisplayListBuffers(s32, s32);
-extern s32 func_800082E0(s32, s32, s32, s32, s32, s32);
+extern s32 StageContext_Allocate(s32, s32, s32, s32, s32, s32);
 extern void func_80047588(s32, s32);
 extern void func_83101C80(void *, void *, s32);
 extern void func_83101D74(void *);
@@ -578,7 +578,7 @@ void func_831020D0(s32 arg0, s32 arg1) {
     D_83103CA4 = func_81600E28(sp20, 1, 0xA);
     MainPool_FinalizeAllocation(sp20);
     Gfx_InitDisplayListBuffers(0x10000, 0);
-    sp24 = func_800082E0(1, 0, 2, 0, 2, 1);
+    sp24 = StageContext_Allocate(1, 0, 2, 0, 2, 1);
     func_80047588(0x1C, 0);
     func_83101C80(D_831039B0, D_83103CA4, arg1);
     func_83101D74(D_831039B0);

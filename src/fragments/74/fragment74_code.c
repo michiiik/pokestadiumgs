@@ -162,7 +162,7 @@ s32 func_8F600948(s32 arg0) {
     return sp1C;
 }
 
-extern s32 func_800082E0(s8, s8, s8, s8, s8, s32);
+extern s32 StageContext_Allocate(s8, s8, s8, s8, s8, s32);
 extern void func_80008514(s32);
 extern void func_80008574(void);
 extern void func_800086A4(s32);
@@ -181,7 +181,7 @@ void func_8F6009F0(void) {
     mode = &D_8F600BFF;
     do {
         main_pool_push_state(0x64697370);
-        func_80008514(func_800082E0(*mode, 0, 2, 0, 2, 1));
+        func_80008514(StageContext_Allocate(*mode, 0, 2, 0, 2, 1));
         func_800086A4(2);
         StageFade_StartFromOpaque(5);
         do {
