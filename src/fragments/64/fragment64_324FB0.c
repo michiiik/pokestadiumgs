@@ -99,7 +99,30 @@ void func_87F02684(F2684State *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_324FB0/func_87F026E8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_324FB0/func_87F0277C.s")
+typedef struct unk_func_87F0277C {
+    struct unk_func_87F0277C *unk_00;
+    struct unk_func_87F0277C *unk_04;
+    void (*unk_08)(void);
+    u32 unk_0C;
+    u8 unk_10[12];
+    s32 unk_1C;
+} unk_func_87F0277C;
+
+extern void *D_87F119D8;
+extern unk_func_87F0277C *D_87F119DC;
+void func_87F0277C(void *arg0) {
+    D_87F119D8 = arg0;
+    D_87F119DC = *(unk_func_87F0277C **)((u8 *)arg0 + 12);
+    while (D_87F119DC != NULL) {
+        if (D_87F119DC->unk_0C & 1) {
+            if (D_87F119DC->unk_08 != NULL) {
+                D_87F119DC->unk_08();
+            }
+            D_87F119DC->unk_1C++;
+        }
+        D_87F119DC = D_87F119DC->unk_04;
+    }
+}
 
 s32 func_87F02800(s32 arg0, u8 *arg1) {
     u8 *resource;

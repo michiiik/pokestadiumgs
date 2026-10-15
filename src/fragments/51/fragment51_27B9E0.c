@@ -55,7 +55,16 @@ void func_8630665C(void *arg0) {
     (*(f32 *)((u8 *)(arg0) + (0xC))) = (f32) ((*(f32 *)((u8 *)(D_87F119DC) + (0x4C))) - (*(f32 *)((u8 *)(arg0) + (4))));
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/51/fragment51_27B9E0/func_86306690.s")
+extern s32 func_86304920(f32, f32, f32, f32, f32, f32, f32, f32, f32, f32);
+void func_86306690(u8 *arg0, s8 *arg1) {
+    if (arg1[33] != -1) {
+        if (func_86304920(*(f32 *)(arg0 + 72), *(f32 *)(arg0 + 76),
+                         0.0f, 180.0f, -180.0f, 0.0f, 0.0f, -180.0f, 180.0f, 0.0f) != 0) {
+            arg1[32] = arg1[33];
+            arg1[33] = -1;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/51/fragment51_27B9E0/func_86306710.s")
 
