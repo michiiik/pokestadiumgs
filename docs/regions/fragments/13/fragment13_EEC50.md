@@ -348,3 +348,43 @@ interpolation path rather than emitted at entry; the signed blink remainder
 correction is simplified away. Inspect those mechanisms before another batch.
 Its preset-table end uses jtbl_82409058 only as a sentinel, not a local
 switch: no rodata-subsegment change is justified by this owner.
+
+## Native RGB interpolation / scene synchronization — 2026-10-15
+
+Two accepted owners, **222 words / 888 bytes**, file **51 C / 28 ASM →
+53 C / 26 ASM**. Both link-verified combined full-ROM gates; solo native.
+
+| Owner | Name | Original span / frame | Runner batch |
+| --- | --- | --- | --- |
+| `func_82405244` | `Fragment13_LerpRgb` | 592 bytes / no frame | `b5f62de5a6f345c8bc8f12cf3b77121c` |
+| `func_82407228` | `Fragment13_SyncSceneSelections` | 296 bytes / 0x60 | `d9b1822d176a4207a864a4b323ec8089` |
+
+RGB: read each base byte as an unsigned word before converting to float;
+keep the channel difference signed and the final conversion unsigned.
+The ordinary three assignments match on the first of eight submitted
+candidates. Reversing the floating sum changes the emitted schedule.
+
+Scene sync: resolve eight current selections using the existing grouped-list
+entries/starts, then forward them with group, daylight (hours 6 through 22)
+and visible-state (1 or 2) flags. A natural eight-iteration loop is unrolled
+by IDO. Use the actual typed parameter, not a redundant root-pointer local;
+declare the real counter after the local eight-word array. This gives the
+original array home sp+0x40 and frame 0x60. The 284-byte C body plus the
+existing 12-byte padding directive preserves the original 296-byte span:
+three trailing NOPs at 0x82407344–0x8240734C. No fake local or manual unroll.
+
+Twenty-four candidates submitted. The first eight isolate address-tree
+shape; current-selection-first is the original pointer-add order. The next
+eight remove the pointer alias and compare flag forms; a padding directive
+placed before the function does not test its tail and is not evidence of a
+tail fix. The final eight vary real scalar homes/flags with padding after
+the function; array-before-counter and inline flags accept. Do not replay
+the folded unsigned-range flag forms or the redundant pointer local.
+
+Fresh and twenty-leading-blank whole-object controls preserve section
+bytes/layout, all 79 original starts/full spans, both frozen accepted spans
+and 77 untouched spans. The scene-sync ELF function size is 284 bytes plus
+the separately emitted 12-byte alignment tail. Normal forced retail-ROM
+comparison and host checks for both touched sources pass; all 22 tooling
+tests pass. Update existing callers and add two US compatibility aliases.
+No tools, binaries, storage objects or invented helper functions committed.
