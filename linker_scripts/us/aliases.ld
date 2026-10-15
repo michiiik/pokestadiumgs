@@ -129,3 +129,5 @@ func_81301030 = Fragment14_InitSelectionPreview;
 func_813011B8 = Fragment14_InitSelectedController;
 func_813013C0 = Fragment14_InitSelectionPanelMode2;
 func_81301448 = Fragment14_InitSelectionPanelMode1;
+func_81300F7C = Fragment14_InitSelectionAdvance;
+func_813012C0 = Fragment14_InitSelectionPanelMode0;

@@ -128,16 +128,29 @@ void func_81300BA0(s32 arg0) { func_8130A570(arg0 + 0xDA8, 0); func_81304208(arg
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_81300E34.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_81300F7C.s")
-
+extern void func_8130015C(void *, s32);
 extern s32 func_813002D0(void *);
+extern s32 func_81300314(void *arg0, s32 arg1, s32 arg2);
+extern void func_81300350(void);
+extern void func_81300390(void *, s32, s32, s32, s32, s32, s32);
+void Fragment14_InitSelectionAdvance(void *arg0) {
+    s32 selected;
+    s32 exhausted;
+
+    selected = *(s8 *)(((Fragment14SetupState *)arg0)->data +
+                      ((Fragment14SetupState *)arg0)->slot + 0x93C);
+    exhausted = func_81300314(arg0, ((Fragment14SetupState *)arg0)->slot, 1) >= 4;
+    func_8130015C(arg0, 0);
+    func_81300350();
+    ((Fragment14SetupState *)arg0)->status = 0;
+    func_81300390(arg0, func_813002D0(arg0), selected, 0, 0, exhausted, exhausted);
+    ((Fragment14SetupState *)arg0)->mode = 1;
+}
+
 extern void func_81304C3C(u8 *, s32, s32);
 extern void func_81304C58(u8 *, u8 *);
 extern void func_8130B220(void *, void *, s32, s32);
 extern void func_8130B320(void *, void *, s32, s32);
-extern void func_81300390(void *, s32, s32, s32, s32, s32, s32);
-extern void func_8130015C(void *, s32);
-extern void func_81300350(void);
 void Fragment14_InitSelectionPreview(void *arg0) {
     func_8130015C(arg0, 1);
     func_81300350();
@@ -178,7 +191,26 @@ s8 func_8130125C(void *arg0, s32 arg1) {
     return -1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_813012C0.s")
+extern s8 func_8130125C(void *arg0, s32 arg1);
+void Fragment14_InitSelectionPanelMode0(void *arg0) {
+    s32 selected = 0;
+
+    func_8130015C(arg0, 0);
+    func_81300350();
+    ((Fragment14SetupState *)arg0)->status = 0;
+    if (((Fragment14SetupState *)arg0)->slot == 0 &&
+        *(s8 *)(((Fragment14SetupState *)arg0)->data + ((Fragment14SetupState *)arg0)->slot + 0x93C) == 4) {
+        selected = func_8130125C(arg0, (s32)(((Fragment14SetupState *)arg0)->data +
+                                          ((Fragment14SetupState *)arg0)->slot * 0x240));
+        if (selected < 0) {
+            selected = 0;
+        }
+    }
+    func_8130B220(((u8 *)arg0 + 0xD18), arg0, func_813002D0(arg0), selected);
+    func_8130B320(((u8 *)arg0 + 0xD18), (u8 *)arg0 + 0x1A154, 0,
+                 func_81300314(arg0, ((Fragment14SetupState *)arg0)->slot, 1) >= 4);
+    ((Fragment14SetupState *)arg0)->mode = 0;
+}
 
 void Fragment14_InitSelectionPanelMode2(void *arg0) {
     func_81300350();
