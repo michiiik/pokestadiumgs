@@ -864,3 +864,39 @@ modulo four and sound protocol; draft extra call arguments are not evidence of
 real additional formals. Next hypothesis: model the actual grouped-state
 subobjects and semantic quotient lifetimes before another source family;
 do not replay scalar declaration permutations or add unused call arguments.
+
+## 2026-10-15 — group-scene rendering accepted
+
+`func_82406E14` becomes `Fragment13_DrawGroupScene`: **157 instruction words /
+628 bytes**, original frame 0x28. File advances **63 C / 16 function ASM to
+64 C / 15 function ASM**. Together with the transition routine above this is
+283 words / 1,132 bytes in the current partial batch.
+
+Runner batch `8f9d89e855b54fe58f04f952b2885bf0` accepts the first of eight
+submitted candidates through the normal sequential full-ROM gate. This is
+**not link-verified**: the object check reports relocation drift for the
+already-named same-translation-unit confirmation callee. The authoritative
+linked ROM is byte-identical; no relocation mask, provenance override or
+verification bypass is claimed for this record.
+
+Preserve the initial full-redraw result, short-circuit selector checks in
+order 4, 5, 7, 6, both four-case state dispatches with original panel passes,
+selected-content clipping/restoration and frame, and the final list,
+confirmation and auxiliary-panel calls. Use ordinary switches: spelling
+both dispatches as if-chains produces 596 bytes, frame 0x30 and raw 0.4076,
+not the original 628 bytes/frame 0x28. No new jump table/layout work is needed.
+Keep the existing integer panel-handle ABI views and pointer selector view;
+no extra call arguments are invented.
+
+Remove runner-injected duplicate declarations after acceptance. Name the
+existing frame caller's reference and retain the old symbol via a US
+compatibility alias; JP and address-keyed symbol entries stay unchanged.
+Fresh/twenty-leading-blank controls preserve all complete frozen sections,
+all 79 original starts/sizes/full spans and the 77 untouched raw function
+spans against the pre-batch object. A separate fresh caller build preserves
+its complete section bytes/layout after the call/prototype rename. The
+forced normal native full-ROM build after naming/cleanup matches retail MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. Scratch scripts, generated assembly,
+objects, compiler binaries and ROM outputs remain local.
+Both changed C files pass the host syntax check with only their existing
+warnings; all 25 tooling tests and whitespace checks pass.

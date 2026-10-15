@@ -1183,7 +1183,66 @@ extern void func_82402E28(s32, void *, f32, s32, f32, s32, s32, s32);
 extern void func_82403624(s32, void *, s32, f32, s32, s32, f32);
 void func_82406CDC(void *arg0, s32 arg1) { f32 scale; s32 state; scale = D_8160BD08(*(f32 *)((u8 *)arg0 + 0x204) / 10.0f); state = *(s32 *)((u8 *)arg0 + 0x1EC); switch (state) { case 0: return; case 1: func_82402E28(arg1, (u8 *)arg0 + 0x54, func_82407088(arg0), -1, scale, 0xB8, 1, *(s32 *)((u8 *)arg0 + 0x1E0) < *(s32 *)((u8 *)arg0 + 0x1DC)); return; case 2: func_82403624(arg1, arg0, *(s32 *)((u8 *)arg0 + 0x1DC), scale, *(s32 *)((u8 *)arg0 + 0x1D4), *(s32 *)((u8 *)arg0 + 0x1D8), *(f32 *)((u8 *)arg0 + 0x208) / 6.0f); func_82402E28(arg1, (u8 *)arg0 + 0x54, func_824070E4(arg0), (s16)*(s32 *)((u8 *)arg0 + 0x1DC), scale, 0x9A, 0, *(s32 *)((u8 *)arg0 + 0x1E0) < *(s32 *)((u8 *)arg0 + 0x1DC)); return; } }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82406E14.s")
+extern void func_824020B4(s32, s32);
+extern void func_82402904(s32, s32);
+extern void func_8000766C(Gfx **, s32, s32, s32, s32);
+extern void func_8003C6B8(s32);
+extern void func_81A0022C(void *);
+void Fragment13_DrawGroupScene(u8 *arg0, void *arg1) {
+    s32 full;
+
+    full = func_81600DA8(arg1, (void *)1);
+    if (full || func_81600DA8(arg1, (void *)4)) {
+        func_82403F58();
+        switch (*(s32 *)(arg0 + 0x1E4)) {
+        case 0:
+            func_8240227C(1, (s32)(arg0 + 0x218));
+            break;
+        case 1:
+            func_824020B4(1, (s32)(arg0 + 0x218));
+            break;
+        case 2:
+            func_82402904(1, (s32)(arg0 + 0x218));
+            break;
+        case 3:
+            func_824021AC(1, (s32)(arg0 + 0x218));
+            break;
+        }
+    }
+    if (full || func_81600DA8(arg1, (void *)5)) {
+        func_82404000();
+        switch (*(s32 *)(arg0 + 0x1E4)) {
+        case 0:
+            func_8240227C(0, (s32)(arg0 + 0x218));
+            break;
+        case 1:
+            func_824020B4(0, (s32)(arg0 + 0x218));
+            break;
+        case 2:
+            func_82402904(0, (s32)(arg0 + 0x218));
+            break;
+        case 3:
+            func_824021AC(0, (s32)(arg0 + 0x218));
+            break;
+        }
+    }
+    if (full || func_81600DA8(arg1, (void *)7)) {
+        func_824040A8();
+    }
+    if (full || func_81600DA8(arg1, (void *)6)) {
+        func_82404150();
+    }
+    if (func_81600DA8(arg1, *(void **)(arg0 + 0x214))) {
+        func_8000766C(&D_800D0510, 13, 39, 294, 161);
+        func_80006F70(&D_800D0510, 13, 39, 294, 161);
+        func_8003C6B8(*(s32 *)(arg0 + 0x214));
+        func_80006F70(&D_800D0510, 0, 0, 320, 240);
+        func_82401198(11, 37, 300, 167);
+    }
+    func_82406CDC(arg0, (s32)arg1);
+    Fragment13_DrawConfirmationDialog((void *)(arg0 + 0x228), arg1);
+    func_81A0022C(arg0 + 0x24C);
+}
 
 extern f32 (*D_8160BD1C)(f32);
 f32 func_82407088(void *arg0) {

@@ -186,3 +186,4 @@ PROVIDE(jtbl_82409058 = fragment13_RODATA_START + 0x158);
 func_824045B4 = Fragment13_UpdateConfirmationDialog;
 func_82406A78 = Fragment13_UpdateGroupScene;
 func_82406880 = Fragment13_UpdateGroupListTransition;
+func_82406E14 = Fragment13_DrawGroupScene;
