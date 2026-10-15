@@ -2,6 +2,9 @@
 
 
 #ifdef VERSION_US
+/* Preserve the original named zero word in this file's readonly data. */
+const u32 D_813124D0[1] = {0};
+
 s32 func_813055E0(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     s32 result = (((arg3 + arg1) * 2) + arg2) - 1;
     return result >= 0 ? result : 0;
@@ -32,7 +35,6 @@ f32 func_8130571C(void *arg0) { u8 *base = (u8 *)arg0; f32 result = 1.0f; if (ba
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FD770/func_81305780.s")
 
 extern void func_816048E0(s32, s32, s32, s32, f32);
-extern f32 D_813124E8;
 extern void func_816073A0(void *);
 extern void func_800498C4(void);
 extern void func_800496A4(s32, s32);
@@ -52,7 +54,7 @@ void func_81305A10(void *arg0, void *arg1, f32 arg2) {
             *(s16 *)((u8 *)arg1 + 4),
             temp_a3,
             arg2);
-        if (!(D_813124E8 < arg2)) {
+        if (!(0.1f < arg2)) {
             func_816073A0(arg1);
             func_800498C4();
             func_800496A4(4, 1);
@@ -75,7 +77,6 @@ void func_81305A10(void *arg0, void *arg1, f32 arg2) {
 
 extern s32 func_81305634(void *);
 extern Gfx *D_800D0510;
-extern f32 D_813124F4;
 extern void func_8004989C(s32);
 extern s32 func_816020BC(u8);
 void func_81305FB4(void *arg0, void *arg1, f32 arg2) {
@@ -90,7 +91,7 @@ void func_81305FB4(void *arg0, void *arg1, f32 arg2) {
             *(s16 *)((u8 *)arg1 + 4),
             *(s16 *)((u8 *)arg1 + 6),
             arg2);
-        if (!(D_813124F4 < arg2) && (result > 0)) {
+        if (!(0.1f < arg2) && (result > 0)) {
             gDPPipeSync(D_800D0510++);
             func_816073A0(arg1);
             func_800498C4();
@@ -131,7 +132,19 @@ void func_813060C8(void *arg0, void *arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FD770/func_81306178.s")
+extern s32 func_81601980(s32 *, s32);
+extern void func_800226C0(s32);
+void Fragment14_ConfirmGridSelection(u8 *arg0) {
+    s32 selected = func_81305634(arg0);
+
+    if (selected < 0 || func_81601980((s32 *)(arg0 + 0x54), selected) != 0) {
+        func_800226C0(5);
+    } else {
+        arg0[0x87] = 5;
+        *(s16 *)(arg0 + 0x7E) = selected;
+        *(f32 *)(arg0 + 0x78) = 4.0f;
+    }
+}
 
 void func_813061E8(u8 *arg0) {
     arg0[0x87] = 5;
@@ -220,7 +233,16 @@ void func_813062C0(void *arg0)
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FD770/func_81306780.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FD770/func_8130687C.s")
+void Fragment14_UpdateGridCursorStep(u8 *arg0) {
+    s32 count = arg0[0x83];
+    if (count >= arg0[0x85]) {
+        arg0[0x83] = 0;
+        arg0[0x87] = 1;
+        *(struct Fragment14PackedWord *)(arg0 + 0xC) = *(struct Fragment14PackedWord *)(arg0 + 8);
+    } else {
+        arg0[0x83] = count + 1;
+    }
+}
 
 void func_813068C0(void *arg0)
 {
@@ -254,7 +276,40 @@ void func_813069B0(u8 *arg0) {
     *(f32 *)(arg0 + 0x78) = 0.0f;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FD770/func_813069BC.s")
+extern void func_81306780(u8 *);
+extern void func_81600A34(void *, void *, s32, s32, s32, s32, s32);
+void Fragment14_UpdateGridState(u8 *arg0, void *arg1) {
+    s32 active = 0;
+    s16 first[4], second[4], third[4];
+
+    switch (arg0[0x87]) {
+    case 0:
+        func_813069B0(arg0);
+        return;
+    case 1:
+        active = 1;
+        func_81306780(arg0);
+        break;
+    case 3:
+        active = 1;
+        func_813068C0(arg0);
+        break;
+    case 2:
+        active = 1;
+        Fragment14_UpdateGridCursorStep(arg0);
+        break;
+    case 4:
+        func_813068FC(arg0);
+        break;
+    case 5:
+        func_81306954(arg0);
+        break;
+    }
+    func_81305780(arg0, &first, &second, &third);
+    func_81600A34(arg1, arg0 + 1, 0, first[0], first[1], first[2], first[3]);
+    func_81600A34(arg1, arg0 + 2, active, second[0], second[1], second[2], second[3]);
+    func_81600A34(arg1, arg0 + 3, active, third[0], third[1], third[2], third[3]);
+}
 
 s16 func_81306B0C(void *arg0) {
     u8 temp_v0;
@@ -271,5 +326,20 @@ s16 func_81306B0C(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FD770/func_81306C18.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FD770/func_81306E90.s")
+void Fragment14_BeginGridClose(u8 *arg0) {
+    switch (arg0[0x87]) {
+    case 0:
+        break;
+    case 1:
+    case 2:
+    case 3:
+        *(f32 *)(arg0 + 0x78) = 4.0f;
+        /* fall through */
+    case 4:
+    case 5:
+        arg0[0x87] = 5;
+        break;
+    }
+    *(s32 *)arg0 = 0;
+}
 #endif

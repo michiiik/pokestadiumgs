@@ -456,7 +456,7 @@ void Fragment14_UpdateSelectionPreview(void *arg0, s32 arg1) {
 
 extern void func_8130A044(void *, s32);
 extern void func_81303EF4(void *, s32);
-extern void func_813069BC(void *, s32);
+extern void Fragment14_UpdateGridState(u8 *, void *);
 extern void func_81306F74(void *, void *);
 extern s32 func_81304AD0(void *);
 extern void func_8130F2C4(void *, s32);
@@ -467,7 +467,7 @@ void Fragment14_UpdateSelectionPage(void *arg0, s32 arg1) {
     func_8130A044(panel, arg1);
     func_81303EF4(((u8 *)arg0 + 0x15370), arg1);
     func_8130F2C4(arg0, arg1);
-    func_813069BC((u8 *)arg0 + 0xD18, arg1);
+    Fragment14_UpdateGridState((u8 *)arg0 + 0xD18, (void *)arg1);
     func_81311AAC((u8 *)arg0 + 0x74, arg1);
     func_81306F74(panel, (u8 *)arg0 + 0x1A154);
     arg1 = func_81304AD0(((u8 *)arg0 + 0x15370));
