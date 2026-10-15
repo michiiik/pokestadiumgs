@@ -2307,7 +2307,7 @@ s32 func_8005F668(s32 arg0, u8 arg1, u8 arg2)
 
 #ifdef VERSION_US
 extern s32 func_8005F668(s32, u8, u8);
-extern void func_8005F808(s32, s32, s32);
+extern s32 func_8005F808(s32, s32, s32);
 void func_8005F790(s32 arg0, s32 arg1) {
     s32 *p = &arg1;
     func_8005F668(arg0, arg1 & 0xFF, 0);
@@ -2333,9 +2333,9 @@ void func_8005F7E0(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-void func_8005F9A4(s32 arg0, s32 arg1) {
+s32 func_8005F9A4(s32 arg0, s32 arg1) {
     s32 *p = &arg1;
-    func_8005F808(arg0, arg1 & 0xFFFF, 0);
+    return func_8005F808(arg0, arg1 & 0xFFFF, 0);
 }
 #endif
 

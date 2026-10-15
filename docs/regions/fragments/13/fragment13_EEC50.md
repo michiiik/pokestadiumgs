@@ -250,3 +250,62 @@ Next: isolate the first temporary-demand/load-hoisting divergence around the
 fraction product versus old-seconds load. The leader also preloads hours/day
 earlier than the target. Scope the negative to these tested source families;
 do not infer that stock C is impossible or restart the same permutations.
+
+## Native persistence/camera batch — 2026-10-15
+
+Three owners accepted: **233 words / 932 bytes**, file **47 C / 32 ASM →
+50 C / 29 ASM**. Solo native execution; no agents or containers.
+
+| Original owner | Name | Words / bytes | Frame | Acceptance / batch |
+| --- | --- | ---: | ---: | --- |
+| `func_824049D0` | `Fragment13_InitAvailableGroupedList` | 70 / 280 | 0x40 | relocation-masked sequential ROM gate; `efb6992b82ce48ea90377b312092c2dd` |
+| `func_82404C78` | `Fragment13_ApplyGroupSelections` | 88 / 352 | 0x40 | link-verified combined gate; `cf8870681a744f59ad4e188507e8d3e3` |
+| `func_82405C0C` | `Fragment13_ResetGroupCamera` | 75 / 300 | none | link-verified combined gate; `595df897dd6645dbbe6997f5ccd1be97` |
+
+### Source mechanisms
+
+- Correct the already-C `func_8005F9A4` predicate and `func_8005F808`
+  declaration to return `s32`; the original assembly callers branch on v0.
+  This is independently verified metadata cleanup, not a fabricated signature
+  for scoring. All 237 original functions in `585D0.c` retain their complete
+  bytes/spans, section layout and relocation topology in fresh/twenty-blank
+  controls. Keep the two mode-1/mode-2 command wrappers void and preserve the
+  existing argument-home spelling. See `docs/regions/585D0.md`.
+- List builder: retain IDs 0x2A4/0x2AF unconditionally, otherwise test the
+  stored flag; preserve item order, group starts/counts and -1 separators.
+  The typed anchor/item views improve the old 69-attempt requeue. A real
+  item-pointer local plus inline ID accesses closes the remaining allocation
+  difference; a separately cached ID keeps the pointer in the wrong register.
+  Sixteen candidates. Its table+480 end address differs from the assembly's
+  equivalent end-symbol relocation: **not object-link-verified**, accepted by
+  the normal sequential retail-ROM gate without aliases/layout patches.
+- Apply: keep default values for absent selections, the flag predicate and
+  both original key/value exceptions, byte-valued apply calls, lock/update/
+  unlock order, and final dirty word. Twenty-four candidates. Inline the
+  current-selection field and name the actual list item index: the word local
+  for the selection monopolizes v0, while an unnamed item index stays a temp.
+  The accepted form reproduces the original v1/v0 roles without forced colors.
+- Camera reset: a natural typed struct copy plus typed root/vector fields
+  closes the historical 62-attempt requeue immediately (eight submitted
+  candidates, first accepts). Preserve default Y, four original X/Z bounds,
+  clamp order, default eye copy and final X/Z offsets. Do not repeat the old
+  manually expanded word-copy family or its incorrect eye-X source expression.
+
+### Cleanup and verification
+
+Consolidate the three anchor views into one 0x3C-byte record: original xyz,
+16 opaque bytes, eye/target vectors at +0x1C/+0x28, item pointer +0x34,
+signed default +0x38 and unsigned count +0x3A. Reuse the existing motion vector
+and item types, remove rejected-only views/duplicate externs and add three US
+compatibility aliases. No new helper function or storage object.
+
+Fresh and twenty-leading-blank whole-object controls preserve all section
+bytes/layout, all **79 original function offsets/sizes/full spans**, the three
+frozen accepted bodies and **76 untouched** spans after cleanup/naming.
+Forced normal ROM build passes retail MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. Explicit host checks pass for both source
+files; `585D0.c` has the same 82 warnings before/after metadata correction and
+the fragment retains its existing line-25 warning. All 22 public tooling
+tests and diff whitespace checks pass. No bypass, compiler/layout mutation,
+padding or new dead-variable scaffold. All search/proof tools and binary
+artifacts stay local; the unresolved flag accessor remains ASM.

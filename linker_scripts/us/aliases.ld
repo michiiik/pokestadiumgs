@@ -168,3 +168,6 @@ func_82404990 = Fragment13_GetGroupedListItem;
 func_82404AE8 = Fragment13_HasSelectionChanges;
 func_82404B6C = Fragment13_LoadGroupSelections;
 func_82404E50 = Fragment13_UpdateGroupTransition;
+func_824049D0 = Fragment13_InitAvailableGroupedList;
+func_82404C78 = Fragment13_ApplyGroupSelections;
+func_82405C0C = Fragment13_ResetGroupCamera;
