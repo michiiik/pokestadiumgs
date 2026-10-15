@@ -728,3 +728,86 @@ padding, compiler or layout change is part of the source acceptance.
 The state-dispatch sibling `func_824045B4` has a real five-entry jump table.
 Its file currently lacks an explicit per-file `.rodata` subsegment in the
 YAML, so no switch probe was attempted before that layout prerequisite.
+
+### Dialog and scene dispatchers accepted after layout prerequisite
+
+Two owners now have matching C: **209 words / 836 bytes**, advancing this
+file from **60 C / 19 ASM to 62 C / 17 ASM** (79 original functions).
+The eleven data-only GLOBAL_ASM includes described below are not functions.
+
+| Owner | Name | Words / bytes | Frame | Accepted batch |
+| --- | --- | --- | --- | --- |
+| `func_824045B4` | `Fragment13_UpdateConfirmationDialog` | 60 / 240 | 0x38 | `df985b59995942f68bbd4a6b9487b71c` |
+| `func_82406A78` | `Fragment13_UpdateGroupScene` | 149 / 596 | 0x48 | `09338ac6fb7a4b7c938d1131dc1f4d8b` |
+
+Both runner records are **relocation-masked, sequential full-ROM accepts**,
+not link-verified accepts. The regenerated ASM baseline calls old compatibility
+names as UND symbols, while C calls a definition in this translation unit.
+The masked comparison permits the normal sequential gate; only its byte-exact
+retail-ROM result establishes acceptance. No check or provenance bypass.
+
+#### Layout and preserved data
+
+The read-only planner identifies `0xF6F80..0xF7120` for this file. Add its
+per-file `.rodata` subsegment and a bare `rodata` tail for the original
+relocation data. The pinned splitter is splat 0.25.0 / spimdisasm 1.35.0-dev0.
+A first split correctly exposed undefined shared cells rather than silently
+providing a working layout. Preserve the original eleven named cells at
+`D_82408F00..D_82408F78` as generated data-only GLOBAL_ASM includes, with exact
+sizes and force-not-migration metadata, following the fragment 14 convention.
+Their combined 0x158-byte prefix equals the original ROM bytes. This is
+existing data, not new storage or authored replacement assembly.
+
+The first jump table also serves as the lighting iterator's end marker.
+Force its migration to its original earlier dispatcher; preserve the marker
+after C emits an anonymous table with a conditional linker alias relative to
+`fragment13_RODATA_START + 0x158`. Restore the three clock scale cells as the
+ordinary `65535.0f` literals that regenerate the original three distinct
+four-byte pool cells after that table. The later 0.95 and 3000.0 cells and
+second jump table retain their order. The owner object has exactly 0x1A0
+read-only bytes. With both dispatchers still ASM, the full retail-ROM gate
+passes and all 79 function starts/sizes are unchanged; the known input sibling
+also retains identical instruction words before any switch candidate.
+
+#### Source mechanisms and compatibility
+
+Dialog: source case order 1/2/3/0/4, status initialized to zero, state reload
+after each handler and original visibility/rectangle queue. First of eight
+submitted candidates accepts. Caching state makes an extra instruction.
+
+Scene: preserve camera/lighting updates, all six queued rectangles, previous
+mode assignment, the 0/1/2 confirmation outcomes and case 4's early return.
+The draft omitted that case, so the assembly was the oracle. Keep mode
+assignment in the switch expression and confirmation result as a nested
+switch expression rather than two named locals; this restores frame 0x48,
+change flag +0x44 and dialog spill +0x34. Twenty-four candidates submitted.
+
+The original sound protocol supplies a sound word and optional context.
+Consistent `void func_800226C0(s32, ...)` declarations support both actual
+call shapes without a fabricated argument. A one-argument function-pointer
+cast instead emits an indirect call and two extra words, so it is rejected.
+The variadic correction is installed with the scene candidate through runner
+companion edits. All existing callers' raw instruction spans remain identical;
+the eight old-style-declaration warnings from the preceding input PR disappear.
+Keep the actual group-selection pointer view at its call site. No new helper,
+fake local, padding, compiler change or warning suppression is installed.
+
+#### Final controls and coverage accounting
+
+After formatting, deduplication and naming, fresh/twenty-leading-blank builds
+preserve every text/rodata/data/bss byte and section layout against the frozen
+accepted object, all 79 original starts/sizes/full spans, both accepted bodies
+and all 77 untouched raw spans against the post-layout assembly baseline.
+Removing the eleven generated data includes into recoverable scratch storage
+and re-running the canonical split regenerates all eleven byte-identically;
+the normal full ROM still equals retail MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. Host syntax checking passes with only the
+existing unrelated implicit-call warning; all 25 tooling tests pass.
+
+The coverage counter previously counted data-only D_/jtbl_ includes as code
+owners, making preserved constants look like lost function matches. The
+existing counter now excludes only address-keyed data/table names, retaining
+ordinary and named functions. Three regression tests cover mixed owners,
+data-only files and staged input. The function gain in this batch is two,
+not eleven data includes or an unrelated historical counting correction.
+Generated COVERAGE.md remains managed by CI.

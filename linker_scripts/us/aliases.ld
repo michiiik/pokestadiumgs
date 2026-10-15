@@ -181,6 +181,10 @@ func_82401A28 = Fragment13_DrawColoredPanelFill;
 func_82400BD0 = Fragment13_DrawClippedTextureRect;
 func_824046A4 = Fragment13_DrawConfirmationDialog;
 func_82404440 = Fragment13_HandleConfirmationInput;
+/* Lighting iteration also uses this switch table as an end marker. */
+PROVIDE(jtbl_82409058 = fragment13_RODATA_START + 0x158);
+func_824045B4 = Fragment13_UpdateConfirmationDialog;
+func_82406A78 = Fragment13_UpdateGroupScene;
 func_865038A8 = Fragment53_ApplyPendingPrimaryAnimation;
 func_86501FA0 = Fragment53_UpdateTrajectoryPosition;
 func_8650A278 = Fragment53_RunSceneTransition;
