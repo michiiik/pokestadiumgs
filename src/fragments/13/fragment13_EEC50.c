@@ -404,13 +404,67 @@ void Fragment13_InitGroupedList(struct Fragment13GroupedList *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82404990.s")
+s32 Fragment13_GetGroupedListItem(struct Fragment13GroupedList *arg0, s32 group, s32 index) {
+    if (arg0->counts[group] <= index) {
+        return -1;
+    }
+    return (arg0->entries + arg0->starts[group])[index];
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_824049D0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82404AE8.s")
+struct Fragment13GroupSelection {
+    u8 prefix[0x54];
+    struct Fragment13GroupedList list;
+    u8 gap[0x1C];
+    s32 handle;
+    s32 current[8];
+    s32 previous[8];
+};
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82404B6C.s")
+s32 Fragment13_HasSelectionChanges(struct Fragment13GroupSelection *arg0) {
+    s32 i;
+
+    for (i = 0; i < 8; i++) {
+        if (arg0->current[i] != arg0->previous[i]) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+struct Fragment13GroupItem {
+    u8 opaque[8];
+    u16 id;
+    s16 value;
+};
+
+/* The item-pointer field repeats at the anchor record's 0x3C-byte stride. */
+struct Fragment13GroupItemSpan {
+    struct Fragment13GroupItem *items;
+    u8 rest[56];
+};
+
+extern struct Fragment13GroupItemSpan D_824073A4[];
+extern u8 D_82408F38[];
+extern u8 func_8005FFB4(s32, u8);
+
+void Fragment13_LoadGroupSelections(struct Fragment13GroupSelection *arg0) {
+    s32 group;
+    s32 item;
+    u8 value;
+
+    for (group = 0; group < 8; group++) {
+        value = func_8005FFB4(arg0->handle, D_82408F38[group]);
+        arg0->current[group] = -1;
+        for (item = 0; item < arg0->list.counts[group]; item++) {
+            if (D_824073A4[group].items[arg0->list.entries[arg0->list.starts[group] + item]].value == value) {
+                arg0->current[group] = item;
+                break;
+            }
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82404C78.s")
 
@@ -428,7 +482,22 @@ void func_82404E00(void *arg0, void *arg1, void *arg2, f32 arg3)
  do { temp_fv0 = *((f32 *) (((u8 *) arg1) + 0)); *((f32 *) (((u8 *) arg0) + 0)) = (f32) ((((*((f32 *) (((u8 *) arg2) + 0))) - temp_fv0) * arg3) + temp_fv0); temp_fv1 = *((f32 *) (((u8 *) arg1) + 4)); new_var = arg3; *((f32 *) (((u8 *) arg0) + 4)) = (f32) ((((*((f32 *) (((u8 *) arg2) + 4))) - temp_fv1) * new_var) + temp_fv1); temp_fa1 = *((f32 *) (((u8 *) arg1) + 8)); *((f32 *) (((u8 *) arg0) + 8)) = (f32) ((((*((f32 *) (((u8 *) arg2) + 8))) - temp_fa1) * new_var) + temp_fa1); } while (0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82404E50.s")
+extern f32 (*D_8160BD1C)(f32);
+
+void Fragment13_UpdateGroupTransition(void *arg0) {
+    f32 factor;
+
+    if ((*(s32 *)((u8 *)arg0 + 0x1DC)) != (*(s32 *)((u8 *)arg0 + 0x1E0))) {
+        (*(f32 *)((u8 *)arg0 + 0x200)) += func_82403F10();
+        if ((*(f32 *)((u8 *)arg0 + 0x200)) >= 20.0f) {
+            (*(s32 *)((u8 *)arg0 + 0x1E0)) = (*(s32 *)((u8 *)arg0 + 0x1DC));
+            (*(f32 *)((u8 *)arg0 + 0x200)) = 0.0f;
+        }
+    }
+    factor = D_8160BD1C((*(f32 *)((u8 *)arg0 + 0x200)) / 20.0f);
+    func_82404E00((u8 *)arg0 + 0x174, (u8 *)&D_82407370[(*(s32 *)((u8 *)arg0 + 0x1E0))] + 0x1C, (u8 *)&D_82407370[(*(s32 *)((u8 *)arg0 + 0x1DC))] + 0x1C, factor);
+    func_82404E00((u8 *)arg0 + 0x180, (u8 *)&D_82407370[(*(s32 *)((u8 *)arg0 + 0x1E0))] + 0x28, (u8 *)&D_82407370[(*(s32 *)((u8 *)arg0 + 0x1DC))] + 0x28, factor);
+}
 
 extern u8 D_82407DE8;
 extern u8 D_82407DF0;

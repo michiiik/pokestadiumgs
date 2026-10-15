@@ -164,3 +164,7 @@ func_82405B24 = Fragment13_UpdateClockMinuteHand;
 func_824048F0 = Fragment13_InitGroupedList;
 func_82405F8C = Fragment13_StepVectorToward;
 func_82407170 = Fragment13_FindNearestGroup;
+func_82404990 = Fragment13_GetGroupedListItem;
+func_82404AE8 = Fragment13_HasSelectionChanges;
+func_82404B6C = Fragment13_LoadGroupSelections;
+func_82404E50 = Fragment13_UpdateGroupTransition;

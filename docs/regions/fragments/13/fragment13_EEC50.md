@@ -170,3 +170,83 @@ companion edit, not adopted. The accepted caller and original prototype remain
 unchanged. Next: trace controller-load value ownership across the initial B/A
 split before another source family; distinguish load CSE from base-address
 promotion. These measured failures are not a proof that legal C is impossible.
+
+## Native group-selection batch — 2026-10-15
+
+Four more owners accepted: **185 words / 740 bytes**, file **43 C / 36 ASM →
+47 C / 32 ASM**. All four are **link-verified** with successful combined
+full-ROM gates. Solo native macOS work; no agents or containers.
+
+| Original owner | Behavior-backed name | Words / bytes | Frame | Accepted batch |
+| --- | --- | ---: | ---: | --- |
+| `func_82404990` | `Fragment13_GetGroupedListItem` | 16 / 64 | none | `97b1db6a39bb48a682922b21291935cd` |
+| `func_82404AE8` | `Fragment13_HasSelectionChanges` | 33 / 132 | none | `0f8b5376fdc74737a946ca7c359624cc` |
+| `func_82404B6C` | `Fragment13_LoadGroupSelections` | 67 / 268 | 0x40 | `9ea32b145c2141619eeb1127a44e57dc` |
+| `func_82404E50` | `Fragment13_UpdateGroupTransition` | 69 / 276 | 0x28 | `0f84cbb2db434051a8b4afe56a440f38` |
+
+### Source mechanisms and historical retries
+
+- The lookup closes a 79-attempt historical requeue using the grouped-list
+  type verified in the preceding batch. Keep the two-stage pointer expression
+  `(entries + starts[group])[index]`, not a combined integer index or cached
+  base pointer. Eight new candidates; the first natural typed form accepts.
+- The change predicate closes 46 historical attempts with a natural eight-word
+  array comparison and early return. IDO supplies the four-at-a-time unroll;
+  no manual unroll is needed. Current selections start at 0x194, previous ones
+  at 0x1B4. Eight candidates; the first direct-array form accepts.
+- The restore loop uses the grouped list embedded at root+0x54, handle at
+  0x190, and current selections at 0x194. Item descriptors are 12 bytes with
+  ID/value halfwords at +8/+10. The pointer field at `D_824073A4` repeats at
+  the anchor's 0x3C-byte stride; it is not a contiguous array of pointers.
+  Preserve -1 for absent values and the first matching item index.
+- The first eight restore candidates improve the historical best but miss
+  one instruction (264 vs 268 bytes): a word-sized returned value remains in
+  v0 instead of moving to a2. Reading `func_8005FFB4`'s assembly establishes
+  byte-valued results on every return path, including zero paths. Declaring
+  that interface and the local value as `u8` closes the residual without a
+  fake use or callee edit. Eight return/value-lifetime candidates; first accepts.
+- The transition preserves the twenty-tick clamp, easing-function pointer,
+  both original anchor-vector offsets (+0x1C/+0x28), and reloads across the
+  first interpolation call. Retain `timer += tick`: the explicit-add form
+  misses one floating operand assignment. Eight candidates; the second accepts.
+
+### Cleanup and verification
+
+Four US compatibility aliases, unchanged address-keyed symbols and JP.
+Consolidate the two new selection-state views into one verified type, format
+the new C, and remove rejected-only transition types and duplicate prototypes.
+Fresh and twenty-leading-blank whole-object controls preserve all section
+bytes/layout, all **79 original function offsets/sizes/full spans**, all four
+frozen accepted bodies and **75 untouched** spans. No new helper function or
+storage object, compiler change, layout change, padding or bypass.
+
+Forced normal native ROM comparison passes retail MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. Explicit host syntax check passes with the
+existing unrelated line-25 warning; all 22 public tooling tests pass; diff
+whitespace check passes. Scratch generators, traces, proof scripts, objects,
+compiler files and ROMs remain local and unpublished.
+
+### `func_824050A8` — requeue, time carry/load scheduling
+
+Owner stays ASM: 103 words / 412 bytes, frame 0x18. Fifty-six native-runner
+candidates tested natural carry/subtract versus remainder, named/literal
+divisors, field views, value carriers, eight legal carry-before-reduction
+orders, eight fixed-order adjacent statement-line ties, explicit carry
+expressions, and remainder-before-carry/separate-lifetime families. Best
+normalized/raw is **0.9709/0.7379**, correct size. The final sixteen remainder
+and lifetime trials do not improve it. A duplicate candidate caught before
+compilation did not consume an attempt. No candidate is installed.
+
+Calibrated 45-second permuter: **645 → 640**, not exact; its retained change
+is only a commutative hours-addition swap. Logging-only compiler stock/off/on/
+twenty-blank controls reproduce complete known and leader objects (8/8),
+including all bytes/layout, symbols and relocations. Carry quotients already
+receive the expected v1/a1/a2/a3 roles in the leader; do not force colors.
+Normal and diagnostic `-g0` retain 53 differing words; `-g3` changes the size
+to 408 bytes and still differs, so debug flags are not a fix. No diagnostic
+compiler or flag is installed in the normal build.
+
+Next: isolate the first temporary-demand/load-hoisting divergence around the
+fraction product versus old-seconds load. The leader also preloads hours/day
+earlier than the target. Scope the negative to these tested source families;
+do not infer that stock C is impossible or restart the same permutations.
