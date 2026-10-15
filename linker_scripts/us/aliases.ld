@@ -194,3 +194,6 @@ func_82406E14 = Fragment13_DrawGroupScene;
 func_824070E4 = Fragment13_GetInterpolatedListPosition;
 func_824020B4 = Fragment13_DrawSelectionFooter;
 func_82402904 = Fragment13_DrawSelectionHeader;
+func_8650863C = Fragment53_UpdateTimedSecondaryAnimation;
+func_86508780 = Fragment53_UpdateSecondaryAnimation;
+func_8650455C = Fragment53_UpdateActorModelHeights;
