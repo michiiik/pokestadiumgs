@@ -149,3 +149,7 @@ func_813050D0 = Fragment14_UpdatePanelState;
 func_813054F4 = Fragment14_DrawSelectionPanel;
 func_813051B8 = Fragment14_DrawPanelContents;
 func_8130559C = Fragment14_GetPanelResult;
+func_81306178 = Fragment14_ConfirmGridSelection;
+func_8130687C = Fragment14_UpdateGridCursorStep;
+func_813069BC = Fragment14_UpdateGridState;
+func_81306E90 = Fragment14_BeginGridClose;

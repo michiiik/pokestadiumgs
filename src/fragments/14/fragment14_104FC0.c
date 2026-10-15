@@ -222,14 +222,14 @@ s16 func_8130F578(u8 *arg0, s32 *arg1) {
     return result;
 }
 
-extern void func_81306E90(u8 *arg0);
+extern void Fragment14_BeginGridClose(u8 *arg0);
 void func_8130F5AC(u8 *arg0) {
     u8 *target;
     switch (arg0[0x34]) {
         case 4:
             target = *(u8 **)(arg0 + 0x5C);
             if (target != NULL) {
-                func_81306E90(target);
+                Fragment14_BeginGridClose(target);
             }
         case 5:
         case 6:
