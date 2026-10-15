@@ -14,7 +14,45 @@ struct Fragment44RowJob {
 };
 extern struct Fragment44RowJob D_8AF2BDF8;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F0680/func_8AF02410.s")
+extern Gfx *D_800D0510;
+extern u8 D_80094E38[];
+extern u8 D_8AF26450;
+extern u8 D_8AF26454;
+extern char D_8AF28940[];
+extern u8 *func_8004D878(u8 *, s32, u8 *);
+extern void GfxImage_SetRenderTarget(Gfx **, void *);
+extern s32 func_8004A858(s32, s32, s32, s32, void *, void *);
+extern void func_8004D998(s32, s32, u8 *, s32, s32);
+extern void func_800498C4(void);
+extern void func_800496A4(s32, s32);
+extern void func_8004972C(s32, s32, s32, s32);
+extern s32 func_800472B8(s32);
+extern s32 func_8004B7A4(s32);
+extern void func_800495F8(s32, s32, s32, const char *, ...);
+extern void func_800499EC(void);
+void Fragment44_RenderScrollRecord(u8 *buffer, void *record, s16 code, s16 index, s16 x, s16 y) {
+    Gfx *cursor;
+    u8 *image;
+    s32 font_height;
+    *(s16 *)record = 1;
+    *(s16 *)((u8 *)record + 2) = index;
+    *(s16 *)((u8 *)record + 4) = x;
+    *(s16 *)((u8 *)record + 6) = y;
+    *(s16 *)((u8 *)record + 8) = (s16)code;
+    image = *(u8 **)((u8 *)record + 0xC);
+    func_8004D878(buffer, (s16)code, NULL);
+    GfxImage_SetRenderTarget(&D_800D0510, image);
+    func_8004A858(0, 0, *(u16 *)(image + 4), *(u16 *)(image + 6), &D_8AF26450, &D_8AF26454);
+    cursor = D_800D0510++;
+    gSPDisplayList(cursor, D_80094E38);
+    func_8004D998((s32)*(u16 *)(image + 4) / 2, 4, buffer, 1, 0);
+    func_800498C4();
+    func_800496A4(4, 0);
+    func_8004972C(255, 255, 255, 200);
+    font_height = func_800472B8(4);
+    func_800495F8((s32)*(u16 *)(image + 4) / 2, *(u16 *)(image + 6) - font_height, 1, D_8AF28940, (char *)func_8004B7A4((s16)code));
+    func_800499EC();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F0680/func_8AF02584.s")
 

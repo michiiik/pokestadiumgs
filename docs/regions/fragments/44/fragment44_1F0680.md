@@ -1,5 +1,49 @@
 # Fragment 44 scroll-list updates
 
+## 2026-10-16 — record-image renderer accepted, next batch in progress
+
+Solo native macOS; no agents or containers. `func_8AF02410` is now
+`Fragment44_RenderScrollRecord`: **372 bytes / 93 words**, frame **0x28**.
+This activates a record, stores its index, signed coordinates and species
+code, selects the record image as render target, and draws its background,
+thumbnail and name. The file now has **11 C / 7 function ASM** owners.
+
+The first sixteen source cells already reproduced all 93 instruction shapes
+but differed in temporary registers after the background call. Eight
+explicitly non-installing ABI controls isolated the cause to `func_8004A858`,
+not `GfxImage_SetRenderTarget`: the former is still assembly and needs a
+legacy word-return declaration in this caller. Its epilogue leaves the last
+emitted display-list address in `$v0`; this caller discards it. Other C
+callers currently declare that assembly function void, so do not infer a
+repository-wide return contract from this local acceptance. No existing C
+definition or foreign caller was changed. The render-target declaration
+remains void, consistent with its existing C definition.
+
+The normal runner accepted the next eight-cell family through one sequential
+full-ROM gate. Its probe link verifier reported **relocation_drift**, not
+`link_verified`: `func_80007328` versus its existing canonical alias
+`GfxImage_SetRenderTarget`. Do not describe this as probe link-verified. The
+authoritative ROM comparison passes, including after cleanup and naming,
+MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`.
+
+Fresh and twenty-leading-blank controls preserve the frozen accepted object's
+complete text/rodata/data/bss, section layout and all relocation rows, all
+18 function spans, and all 17 untouched function bodies. The initial proof
+harness assertion used pre-#1048 address names for three already-renamed
+siblings; correcting those explicit name mappings makes both controls pass.
+Host syntax check, all 25 tooling tests and whitespace checks pass. Only
+source, the compatibility alias and these notes belong in a publication;
+all generators, controls, objects and ROMs stay local.
+
+`func_8AF02584`: **requeue**, 56 compared source cells before replay with
+the newly accepted callee. A calibrated native permuter found an object-score
+zero by adding an unnecessary local initialized to the constant 0x74.
+That scaffold is not installed. Eight replacements using real x/code locals
+or reusing actual loop/flag variables do not preserve that score; the best
+readable original remains 256 bytes, normalized .9844 / raw .9375. Next use
+the actual renderer's ABI and trace the table-base allocation rather than
+publish the artificial constant carrier. There is no insertion acceptance.
+
 ## 2026-10-16 — five-function scroll batch accepted
 
 Solo native macOS, no agents or containers. **Five functions / 209 words /
