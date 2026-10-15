@@ -123,3 +123,5 @@ func_82000FB0 = Fragment16_DrawVersionStamp;
 func_820010BC = Fragment16_DrawSelectionList;
 func_820011D8 = Fragment16_DrawSelectionPopup;
 func_82001590 = Fragment16_HandleSelectionInput;
+func_820016EC = Fragment16_HandleListInput;
+func_82001ADC = fragment16_main;

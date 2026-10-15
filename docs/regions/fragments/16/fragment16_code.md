@@ -1,5 +1,115 @@
 # Fragment 16 drawing and selection input
 
+## 2026-10-15 follow-up — lifecycle and list input accepted; two active requeues
+
+Two of the next four selected owners passed normal **link-verified combined
+full-ROM gates** under stock IDO 7.1. The file now has 18 C + 12 ASM owners.
+The other two selected owners remain ASM and active, not counted as solved.
+
+| Owner | Name | Body instructions / bytes | Frame | Accepted batch |
+| --- | --- | ---: | ---: | --- |
+| `func_820016EC` | `Fragment16_HandleListInput` | 72 / 288 | 0x20 | `6829f6d7957c4ca3940d3a3975ce7294` |
+| `func_82001ADC` | `fragment16_main` | 75 / 300 + 8 alignment | 0x28 | `66e68878f4b048d5a78411418d9d5b2d` |
+
+The list handler keeps the flags-first short circuit, independent vertical
+repeat tests, 19-row wraparound, change sound 1, confirmation mask 0x9000 /
+sound 0x32 and the existing cancellation predicate. Assign the local result
+before storing -1 to the global selection on cancellation; reversing these
+statements produces the sole original two-instruction ordering difference.
+Winning label:
+`f16-flow:list-input:flags-first-True:prefix-True:nested-cancel-True:result-before-store`.
+
+The fragment entry preserves its incoming argument stores, TITL pool-state
+scope, graphics/stage setup, resource loads, segment load, frame loop,
+teardown and packed-result call. Apply the segment mask **before** shifting
+the symbol address; shift-first source loses target instructions. Winning
+label: `f16-flow:main:pointer-False:mask-first-True:return-local-False`.
+Its C body is 300 bytes; the original 308-byte ASM span includes the eight
+zero alignment bytes at ROM 0x10F078..0x10F080. Natural compiler alignment
+supplies them. No padding directive or padding helper is needed.
+The entry's canonical name comes from the existing naming database and
+fragment-header trampoline; the input name describes its observed behavior.
+Original address symbols and compatibility aliases remain.
+
+### Verification and publication
+
+- Fresh baseline and twenty-leading-blank controls reproduce the previous
+  five matches and the remaining original object before the next batch.
+- Both normal link-verified acceptance gates: PASS. Persistent statistics
+  and host checking remain enabled. No manual candidate installation.
+- After naming, verified extern cleanup and removal of unused probe-only
+  declarations: fresh and twenty-leading-blank whole-TU controls preserve
+  every linked section byte view and allocatable layout, all thirty original
+  function offsets, both accepted full spans, and all twenty-eight untouched
+  C/ASM spans. The only symbol-size change is the entry's C body versus its
+  original alignment-inclusive ASM size; its complete span stays identical.
+- Forced normal build without compiler override, repeated after rebase:
+  full retail ROM equality, MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`.
+- Explicit whole-TU host syntax check: PASS. Four implicit-declaration
+  warnings predate this batch; the entry additionally has two unused-argument
+  warnings, with those arguments retained to reproduce the original stores.
+  Public tooling discovery: 22 tests PASS. Diff check: PASS.
+- Only source, two compatibility aliases and these region notes are
+  published. No scratch helpers, compiler changes, generated assembly,
+  objects, ROMs or unverified C. Solo/native; no agents or containers.
+
+### `func_82001A78` — requeue, inactive return-tail coalescing
+
+Best clean source has 100/100 bytes, 0.9600 normalized / 0.9200 raw. The
+active result packing is exact after using a compound OR and an immediate
+return. In the inactive path, target initializes `v1` to zero then returns
+it with `or v0,v1,zero`; the candidate initializes `v0` directly and ends in
+`jr ra` / `nop`. These are two real word differences, not acceptance.
+Leader label: `f16-flow:pack:return-topology-compound:unsigned-False`.
+
+The source shape is: if the list is visible, build the low-byte list index
+in bits 8..15, set bit 1, OR the low-byte selection in bits 16..23 and return
+it; otherwise initialize the result to zero, return 1 when the index is -1,
+and return the initialized result on the other path.
+
+Negative families: common versus immediate returns, OR expression versus
+compound assignment, signed/unsigned locals, `int` versus `s32` locals,
+register hints, status assignment/increment, old-style declarations and a
+properly paired `int` return/prototype transaction. `s32` is `long` in these
+headers: plain-int definitions initially conflict with the long prototype;
+correcting that transaction compiles but does not close the residual.
+A calibrated 45-second permuter remains flat at score 105; no fake source
+is adopted. Stock controls for this same clean body give two differing words
+with 7.1 versus thirteen with 5.3; do not switch the file's compiler.
+
+Next: trace or inspect the stock 7.1 return/coalescing decision on this clean
+leader, with a known exact sibling control. Distinguish source-level return
+shape from allocator behavior before generating another family. No claim
+of unreachable C or general compiler defect is established.
+
+### `func_82001344` — requeue, scroll-coordinate load/store shape
+
+Best signed-coordinate source is 0.9583 normalized / 0.6771 raw, 380 versus
+384 bytes. The oracle loads the scrolling word into `v1` and rematerializes
+store addresses; the candidate retains its address in `v1`, loads its value
+through temporaries and has one fewer instruction. This is an internal
+load/store-shape residual, not a missing tail nop. Leader label:
+`f16-flow:scroll:early-return-False:point-False:local-scroll-False`.
+Future batches need `extern s32 D_82001D00;` plus the established rectangle /
+scissor prototypes; unused declarations from these failed probes were removed
+from the published file. The leader uses the existing two-halfword coordinate
+view at `D_82001EB8`, signed width/height and the existing text helpers.
+
+Negative families: early return versus outer guard, point/array coordinate
+views, local versus direct scroll updates, compound conditions, expanded and
+associated assignments, reuse of the drawing-X carrier, and `int`/long local
+combinations. Reusing X changes frame 0x30 to 0x38 and is not retained. A
+paired unsigned-global diagnostic reaches 384 bytes and 0.6875 raw but adds
+an unwanted width reload; it neither matches nor installs, and the global
+type transaction is rolled back. Stock 5.3 gives the same 380-byte size and
+forty differing positional words as 7.1 for the signed leader.
+
+Next: inspect the address-versus-value commoning at the 7.1 compiler boundary
+or test an evidence-backed data-record view. Do not repeat the failed tail
+families, force registers or add padding to hide the internal mismatch.
+Both requeues remain ahead of fresh-owner rotation; this publication merely
+ships verified progress without holding it behind the remaining work.
+
 ## 2026-10-15 — five-owner native batch accepted
 
 All five selected owners are matching C: 319 instructions / 1,276 bytes.

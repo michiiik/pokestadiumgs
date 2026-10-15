@@ -138,7 +138,6 @@ typedef struct {
     u8 g;
     u8 b;
 } Fragment16Color;
-extern Gfx *D_800D0510;
 extern s32 D_82001EB0, D_82001EB4;
 extern s32 D_82001EAC;
 extern s32 D_82001CD4;
@@ -332,7 +331,41 @@ s32 func_82001688(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/16/fragment16_code/func_820016EC.s")
+extern u16 D_82001EA2;
+s32 Fragment16_HandleListInput(void) {
+    s32 result = 0;
+    s32 previousSelection;
+
+    if ((D_82001EA2 & 2) || D_82001EC4 != 0) {
+        if (D_82001EC4 != 0) {
+            previousSelection = D_82001EAC;
+            if ((*(u16 *)((u8 *)D_80087200 + 0xC)) & 0x800) {
+                if (--D_82001EAC < 0) {
+                    D_82001EAC = 18;
+                }
+            }
+            if ((*(u16 *)((u8 *)D_80087200 + 0xC)) & 0x400) {
+                if (++D_82001EAC >= 19) {
+                    D_82001EAC = 0;
+                }
+            }
+            if (previousSelection != D_82001EAC) {
+                func_800226C0(1);
+            }
+        }
+        if ((*(u16 *)((u8 *)D_80087200 + 8)) & 0x9000) {
+            result = 1;
+            func_800226C0(0x32);
+        }
+    }
+    if (result == 0) {
+        if (func_82001688() != 0) {
+            result = -1;
+            D_82001EAC = -1;
+        }
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
@@ -379,5 +412,52 @@ void func_820019EC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/16/fragment16_code/func_82001ADC.s")
+extern u8 D_82001ED0[];
+extern u8 D_1000000[];
+extern u8 D_446E30[], D_447D00[];
+extern s32 func_82001A78(void);
+extern void func_82000DE8(void);
+extern s32 main_pool_push_state(s32);
+extern s32 main_pool_pop_state(s32);
+extern s32 func_80055948(s32);
+extern void func_8005487C(void *);
+extern void Gfx_InitDisplayListBuffers(s32, s32);
+extern void Gfx_FreeDisplayListBuffers(void);
+extern void *StageContext_Allocate(s8, s8, s8, s8, s8, s32);
+extern s32 func_8004C09C(s32);
+extern void func_8004C4B0(s32);
+extern s32 func_8004C8C0(u16);
+extern u8 *func_80047588(s32, s32);
+extern u8 *Asset_LoadToSegment(s32, u8 *, u8 *, s32);
+extern void func_80008514(s32);
+extern void func_80008574(void);
+extern void func_80047610(void);
+extern void func_80051D64(s32, s32);
+extern s32 func_80055028(void);
+s32 fragment16_main(s32 arg0, s32 arg1) {
+    s32 context;
+
+    main_pool_push_state(0x5449544C);
+    func_80055948(3);
+    func_8005487C(D_82001ED0);
+    Gfx_InitDisplayListBuffers(0x10000, 0);
+    context = (s32)StageContext_Allocate(1, 0, 2, 0, 2, 1);
+    func_8004C09C(0x107);
+    func_8004C4B0(0x16);
+    func_8004C4B0(0x41);
+    func_8004C4B0(0x42);
+    func_8004C8C0(0x13D);
+    func_80047588(0x18, 0);
+    Asset_LoadToSegment(((u32)D_1000000 & 0x0F000000) >> 24, D_446E30, D_447D00, 0);
+    func_82000DE8();
+    func_80008514(context);
+    func_820019EC();
+    func_80008574();
+    func_80047610();
+    Gfx_FreeDisplayListBuffers();
+    func_80051D64(0x14, 0);
+    func_80055028();
+    main_pool_pop_state(0x5449544C);
+    return func_82001A78();
+}
 #endif
