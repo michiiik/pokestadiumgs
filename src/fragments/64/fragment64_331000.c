@@ -7,7 +7,26 @@ void func_87F0E390(u8 *arg0, s32 arg1) {
     *(s32 *)(arg0 + 4) = arg1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_331000/func_87F0E39C.s")
+extern u8 D_800CE060[];
+u16 func_87F0E39C(u8 *arg0, s32 arg1, s32 arg2) {
+    s32 var_v1 = 0;
+
+    switch (arg2) {
+        case 0:
+            var_v1 = *(u16 *)(D_800CE060 + arg1 * 40 + 6);
+            break;
+        case 1:
+            var_v1 = *(u16 *)(D_800CE060 + arg1 * 40 + 8);
+            break;
+        case 2:
+            var_v1 = *(u16 *)(D_800CE060 + arg1 * 40 + 12);
+            break;
+    }
+    if (var_v1 != 0) {
+        arg0[8] = arg1;
+    }
+    return var_v1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_331000/func_87F0E420.s")
 
