@@ -1,5 +1,66 @@
 # Fragment 44 scroll-list updates
 
+## 2026-10-16 — scroll-list initializer accepted
+
+Solo native macOS, no agents or containers. `func_8AF02C28` is now
+`Fragment44_InitializeScrollList`: **380 bytes / 95 words**, frame **0x30**.
+The file advances from **11 C / 7 ASM to 12 C / 6 ASM**. Normal runner batch
+`f49baab3399741858443425665918230` is **link-verified** and passes one combined
+full-ROM gate. There are 104 recorded initializer source cells including the
+winning family; the register-tie warning was advisory, not a stopping rule.
+
+The routine counts the nonnegative entries of a negative-sentinel list,
+computes the last row with signed quotient/remainder, initializes visible
+limits and a record count clamped to 36, clears each 16-byte record and
+allocates its 80-by-60 image. It prepares the initial row job only when the
+list is nonempty. Preserve the field widths and signed arithmetic, including
+the signed-halfword capacity read before entering the allocation loop.
+
+### Closing the two-word residual
+
+The saved configuration view must be the inner definition:
+`config = (s32)(saved_config = (u8 *)arg0 + 0x44)`. This closes the old
+`addiu s2` / `move v1,s2` direction to the original `addiu v1` / `move s2,v1`.
+Initializing both views early exposes a separate initial-bound reload if a
+single `for` condition uses the saved view throughout. Read the initial
+bound through the working `config` and the post-allocation bound through
+`saved_config`. A guarded `do` loop expresses those actual lifetimes.
+Initialize `i = 0` **before** the guard: putting it inside allows a different
+branch-likely layout and an extra duplicated call-argument move. No artificial
+local, padding, forced register or compiler change is needed. Both views and
+the loop counter have real uses.
+
+Fresh and twenty-leading-blank builds after cleanup/naming preserve frozen
+text/rodata/data/bss, section layout, every relocation row after name
+normalization, all 18 original function spans and all 17 untouched bodies.
+The forced native retail-ROM comparison passes with MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`; host syntax, all 25 tooling tests and
+whitespace checks pass. One compatibility alias preserves the original US
+address symbol; no JP assembly or generated artifacts are published.
+
+### Adjacent owner requeues
+
+`func_8AF02AE0`: **requeue**, 56 compared cells. Eight input-load/row-copy
+forms remain 164 bytes versus the 168-byte target (best normalized .8095 /
+raw .3333). Eight in-place current-to-span forms remain 164 bytes, normalized
+.7857 / raw .4048. Eight scalar-parent/typed-job-view forms lose the required
+8-byte frame and worsen length to 148/152. Their prototype/caller companion
+edits are not installed. The next useful question is the descriptor-input
+ABI and the optimizer's current/row/span webs, not another load-order sweep.
+The initial companion preflight required the caller's full function text;
+that corrected diagnostic consumed no compiler hypothesis budget.
+
+`func_8AF0326C`: **requeue**, 32 initial cells for the 884-byte input updater.
+The switch-4/6 spelling gives a real 56-byte-frame candidate, 864 bytes,
+normalized .9321. Explicit movement-flag snapshots, signed/raw state views
+and scalar parent parameters do not close it. Deriving configuration from
+the state prefix changes pointer retention and can improve raw agreement to
+.6290, but introduces opcode gaps: it is a partial-mechanism witness, not a
+better exact candidate. Retain the original and prefix-cost leaders. Next
+trace the state-base/flag lifetime across the cull/shift calls and preserve
+the two branch-local previous offsets; do not pad the short body. This owner
+and the full-row builder remain assembly; no partial match is installed.
+
 ## 2026-10-16 — record-image renderer accepted, next batch in progress
 
 Solo native macOS; no agents or containers. `func_8AF02410` is now
