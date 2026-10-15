@@ -602,7 +602,14 @@ void func_8240504C(void *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_824050A8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82405244.s")
+void Fragment13_LerpRgb(void *arg0, void *arg1, void *arg2, f32 arg3) {
+    u8 *dst = arg0;
+    u8 *a = arg1;
+    u8 *b = arg2;
+    dst[0] = (u32)((f32)(u32)a[0] + (f32)(b[0] - a[0]) * arg3);
+    dst[1] = (u32)((f32)(u32)a[1] + (f32)(b[1] - a[1]) * arg3);
+    dst[2] = (u32)((f32)(u32)a[2] + (f32)(b[2] - a[2]) * arg3);
+}
 
 void func_82405494(void *arg0, void *arg1, void *arg2, f32 arg3)
 {
@@ -613,19 +620,18 @@ void func_82405494(void *arg0, void *arg1, void *arg2, f32 arg3)
  do { temp_fv0 = *((f32 *) (((u8 *) arg1) + 0)); *((f32 *) (((u8 *) arg0) + 0)) = (f32) ((((*((f32 *) (((u8 *) arg2) + 0))) - temp_fv0) * arg3) + temp_fv0); temp_fv1 = *((f32 *) (((u8 *) arg1) + 4)); new_var = arg3; *((f32 *) (((u8 *) arg0) + 4)) = (f32) ((((*((f32 *) (((u8 *) arg2) + 4))) - temp_fv1) * new_var) + temp_fv1); temp_fa1 = *((f32 *) (((u8 *) arg1) + 8)); *((f32 *) (((u8 *) arg0) + 8)) = (f32) ((((*((f32 *) (((u8 *) arg2) + 8))) - temp_fa1) * new_var) + temp_fa1); } while (0);
 }
 
-extern void func_82405244(void *, void *, void *, f32);
 extern void func_82405494(void *arg0, void *arg1, void *arg2, f32 arg3);
 void func_824054E4(u8 *arg0, u8 *arg1, u8 *arg2, f32 arg3) {
     s32 i;
     for (i = 0; i < 0x20; i += 0x10) {
-        func_82405244(arg0 + i, arg1 + i, arg2 + i, arg3);
+        Fragment13_LerpRgb(arg0 + i, arg1 + i, arg2 + i, arg3);
         func_82405494(arg0 + i + 4, arg1 + i + 4, arg2 + i + 4, arg3);
     }
-    func_82405244(arg0 + 0x20, arg1 + 0x20, arg2 + 0x20, arg3);
-    func_82405244(arg0 + 0x23, arg1 + 0x23, arg2 + 0x23, arg3);
-    func_82405244(arg0 + 0x26, arg1 + 0x26, arg2 + 0x26, arg3);
-    func_82405244(arg0 + 0x29, arg1 + 0x29, arg2 + 0x29, arg3);
-    func_82405244(arg0 + 0x2C, arg1 + 0x2C, arg2 + 0x2C, arg3);
+    Fragment13_LerpRgb(arg0 + 0x20, arg1 + 0x20, arg2 + 0x20, arg3);
+    Fragment13_LerpRgb(arg0 + 0x23, arg1 + 0x23, arg2 + 0x23, arg3);
+    Fragment13_LerpRgb(arg0 + 0x26, arg1 + 0x26, arg2 + 0x26, arg3);
+    Fragment13_LerpRgb(arg0 + 0x29, arg1 + 0x29, arg2 + 0x29, arg3);
+    Fragment13_LerpRgb(arg0 + 0x2C, arg1 + 0x2C, arg2 + 0x2C, arg3);
     arg0[0x2F] = (u32)((f32)(u32)arg1[0x2F] + (f32)((s32)arg2[0x2F] - (s32)arg1[0x2F]) * arg3);
 }
 
@@ -923,5 +929,17 @@ s32 Fragment13_FindNearestGroup(struct Fragment13MotionVector *arg0) {
     return nearest;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/13/fragment13_EEC50/func_82407228.s")
+extern void func_824001C0(void *, s32 *, s32, s32, s32, void *);
+void Fragment13_SyncSceneSelections(struct Fragment13GroupState *arg0, void *arg1, void *arg2) {
+    s32 values[8];
+    s32 i;
+
+    for (i = 0; i < 8; i++) {
+        values[i] = (arg0->list.entries + arg0->current[i])[arg0->list.starts[i]];
+    }
+    func_824001C0(arg1, values, arg0->group, (*(u8 *)((u8 *)arg0 + 6) >= 6 && *(u8 *)((u8 *)arg0 + 6) < 23), (arg0->state == 1 || arg0->state == 2), arg2);
+}
+
+/* Preserve the original trailing alignment NOPs at 0x82407344-0x8240734C. */
+#pragma C_FUNCTION_PADDING(12)
 #endif

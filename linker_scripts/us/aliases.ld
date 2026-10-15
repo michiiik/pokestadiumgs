@@ -172,3 +172,5 @@ func_824049D0 = Fragment13_InitAvailableGroupedList;
 func_82404C78 = Fragment13_ApplyGroupSelections;
 func_82405C0C = Fragment13_ResetGroupCamera;
 func_82405D38 = Fragment13_InitGroupState;
+func_82405244 = Fragment13_LerpRgb;
+func_82407228 = Fragment13_SyncSceneSelections;

@@ -36,7 +36,7 @@ extern void *func_81600E28(s32, s32, s32);
 extern s32 func_82400020(void *);
 extern void func_82400108(void *);
 extern void Fragment13_InitGroupState(u8 *, s32, s32, s32);
-extern void func_82407228(u8 *, void *, void *);
+extern void Fragment13_SyncSceneSelections(u8 *, void *, void *);
 extern s32 main_pool_get_available(void);
 extern s32 MainPool_AllocState(s32, s32);
 extern void MainPool_FinalizeAllocation(s32);
@@ -83,7 +83,7 @@ void func_82400704(s32 arg0) {
     ModelRenderer_InitDisplayRoots();
     func_82400108(&D_82409308);
     Fragment13_InitGroupState(D_824090A0, arg0, D_82409FBC, D_82409FB8);
-    func_82407228(D_824090A0, &D_82409308, s0);
+    Fragment13_SyncSceneSelections(D_824090A0, &D_82409308, s0);
 }
 
 extern u8 D_824090A0[];
