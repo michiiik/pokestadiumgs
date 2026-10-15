@@ -1,5 +1,73 @@
 # Fragment 14 selection setup
 
+## 2026-10-15 requeue — initializer reduced to one instruction word
+
+No new function is accepted in this box; counts remain **47 C / 8 ASM**,
+plus the preserved data-only include. All failed bodies and probe-only types
+stay outside tracked source. Keep this near-hit active for a materially
+different stack-temporary investigation, not another general rewrite.
+
+### `func_81300830` — requeue, implicit rectangle-copy temporary
+
+Best native source is **792/792 bytes**, frame **0x58**, 1.0000 normalized /
+0.9949 raw. Independent direct comparison of all 198 instruction words finds
+one difference: instruction 73 computes the temporary address with
+`addiu v1,sp,0x3C` instead of retail's `addiu v1,sp,0x44`. All other words,
+including register choices, agree. No candidate is installed or ROM-accepted.
+
+The candidate labelled `f14-init:flag-extraction:unsigned-bitfield:real-pool-return`
+retains the argument-aware initial clear, settings clamp, rendering-context
+allocation, controller/save setup, both position stores, sentinels and flags,
+conditional panel binding, descending four-slot cleanup, selection advance,
+UI/text setup and pool marker. Concrete source mechanisms:
+
+- Use separate scalar fields for the three adjacent flag bytes. A byte array
+  lets IDO reuse an upper address and drops six required instructions.
+- Chain the two eight-byte position assignments. The implicit struct-copy
+  temporary restores the original unaligned copy sequence; named position
+  locals or extra source-pointer locals change copies/frame size.
+- The resource is an actual four-short rectangle: the existing interpolation
+  helper consumes four `s16` values, and resource 7 is `(640,165,527,283)`.
+  Aligned word-copy views incorrectly replace `lwl/lwr` and `swl/swr`.
+- Express metadata flag bit 26 as an unsigned one-bit field. A signed-shift
+  test leaves a temporary-register ring rotation; the natural bitfield or
+  `((flags << 5) >> 31) != 0` removes it. A permuter's split-left-shift control
+  was reviewed as unsigned-equivalent, then replaced by the natural bitfield.
+- Use an inline conditional panel pointer. An explicit local changes the
+  temporary address and argument setup; a one-sided if also drops a branch.
+- The probe transaction corrects `main_pool_push_state` to its actual `s32`
+  return type, verified from its C definition. This is not speculative callee
+  metadata. The initializer remains ASM, so no prototype experiment is
+  installed as if it were a matching body.
+
+Eighty-nine native variants covered address/record stores, flag extraction,
+position alignment/copy topology/scopes, real metadata/data/kind snapshots,
+context-pointer and bound-view argument types. The last families do not move
+the single residual without worsening copies or frame size. One opaque-type
+candidate failed to compile and is not negative instruction evidence.
+
+Two calibrated 45-second stack-scored native permuters ran: the first improved
+110 to 20 and exposed the flag-extraction mechanism; the natural-bitfield
+leader stayed 10 to 10, with no saved improvement. Both source and target
+controls reproduce through the stock recipe before searching. This is a
+bounded negative, not an impossibility claim.
+
+Next: inspect ownership/allocation of the implicit struct-copy temporary at
+the CFE/uopt boundary; do not add padding, unused locals, dummy reads or a
+physical-register override to manufacture stack+0x44. Preserve the 197 exact
+words while testing the stack mechanism. The source leader and normal probe
+ledger retain the full reconstruction.
+
+### Other bounded follow-ups
+
+- `func_8130209C`: eight C89 advisory-register-storage probes preserve the
+  same pointer spill mismatch (+0x18 versus +0x1C); no improvement and no
+  physical register assignment. Do not repeat that family.
+- `func_813010B0`: eight narrow boolean-local probes (`s8/u8/s16/u16`,
+  equality versus logical-not) worsen its instruction/operand agreement.
+  The getter keeps its real word-return signature; the old word-local
+  leader remains best. No candidate is installed.
+
 ## 2026-10-15 follow-up — slot advance, exit status and slot dialog accepted
 
 Three more functions are accepted: **148 instructions / 592 bytes**. The file
