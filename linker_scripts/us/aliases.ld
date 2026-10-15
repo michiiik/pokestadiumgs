@@ -157,3 +157,7 @@ func_81305AD0 = Fragment14_ComputeGridCursorPosition;
 func_813063CC = Fragment14_ScrollGridForward;
 func_81306B64 = Fragment14_ResetGrid;
 func_81305780 = Fragment14_ComputeGridRectangles;
+func_82405934 = Fragment13_UpdateSceneLightNode;
+func_824059E4 = Fragment13_UpdateSceneDirectionalLightNode;
+func_82405A84 = Fragment13_UpdateClockHourHand;
+func_82405B24 = Fragment13_UpdateClockMinuteHand;
