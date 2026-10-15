@@ -1,5 +1,49 @@
 # Fragment 44 scroll-list updates
 
+## 2026-10-16 — record-image renderer accepted, next batch in progress
+
+Solo native macOS; no agents or containers. `func_8AF02410` is now
+`Fragment44_RenderScrollRecord`: **372 bytes / 93 words**, frame **0x28**.
+This activates a record, stores its index, signed coordinates and species
+code, selects the record image as render target, and draws its background,
+thumbnail and name. The file now has **11 C / 7 function ASM** owners.
+
+The first sixteen source cells already reproduced all 93 instruction shapes
+but differed in temporary registers after the background call. Eight
+explicitly non-installing ABI controls isolated the cause to `func_8004A858`,
+not `GfxImage_SetRenderTarget`: the former is still assembly and needs a
+legacy word-return declaration in this caller. Its epilogue leaves the last
+emitted display-list address in `$v0`; this caller discards it. Other C
+callers currently declare that assembly function void, so do not infer a
+repository-wide return contract from this local acceptance. No existing C
+definition or foreign caller was changed. The render-target declaration
+remains void, consistent with its existing C definition.
+
+The normal runner accepted the next eight-cell family through one sequential
+full-ROM gate. Its probe link verifier reported **relocation_drift**, not
+`link_verified`: `func_80007328` versus its existing canonical alias
+`GfxImage_SetRenderTarget`. Do not describe this as probe link-verified. The
+authoritative ROM comparison passes, including after cleanup and naming,
+MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`.
+
+Fresh and twenty-leading-blank controls preserve the frozen accepted object's
+complete text/rodata/data/bss, section layout and all relocation rows, all
+18 function spans, and all 17 untouched function bodies. The initial proof
+harness assertion used pre-#1048 address names for three already-renamed
+siblings; correcting those explicit name mappings makes both controls pass.
+Host syntax check, all 25 tooling tests and whitespace checks pass. Only
+source, the compatibility alias and these notes belong in a publication;
+all generators, controls, objects and ROMs stay local.
+
+`func_8AF02584`: **requeue**, 56 compared source cells before replay with
+the newly accepted callee. A calibrated native permuter found an object-score
+zero by adding an unnecessary local initialized to the constant 0x74.
+That scaffold is not installed. Eight replacements using real x/code locals
+or reusing actual loop/flag variables do not preserve that score; the best
+readable original remains 256 bytes, normalized .9844 / raw .9375. Next use
+the actual renderer's ABI and trace the table-base allocation rather than
+publish the artificial constant carrier. There is no insertion acceptance.
+
 ## 2026-10-16 — five-function scroll batch accepted
 
 Solo native macOS, no agents or containers. **Five functions / 209 words /
@@ -159,3 +203,55 @@ Neither unresolved body is installed. A runner warning that source variants
 "will not close" a register tie was contradicted by the trailing builder's
 accepted load-order change; treat that wording as advisory, not proof of a
 compiler limitation. No tool or compiler behavior was changed in this batch.
+
+## 2026-10-16 — initializer and draw follow-up, no new C acceptance
+
+All work remains solo/native. The source still has **10 C / 8 function ASM**;
+the normal retail-ROM comparison passes after the diagnostic work. No
+compiler setting, partial C body, padding or register patch is installed.
+
+- `func_8AF02C28`: **requeue**, 80 recorded source attempts and a calibrated
+  45-second permuter search. The 380-byte / 95-instruction leader has the
+  correct 0x30 frame and differs in only two raw words: offset 0x20 expects
+  `addiu v1,a0,0x44` instead of `addiu s2,a0,0x44`; offset 0x28 expects
+  `move s2,v1` instead of `move v1,s2`. An explicit endless entry scan with
+  a negative-sentinel break fixes the rotated-loop shape. Distinguish the raw
+  configuration address from its saved allocation-loop view. Taking a typed
+  bound-field pointer inside the loop condition closes the instruction shape;
+  removing that view loses one real copy, while caching it earlier changes
+  scheduling. Pointer/integer view combinations and a paired pointer-ABI
+  correction did not close the remaining copy direction; none was installed.
+  The permuter's sole useful mutation was a fully initialized pointer used
+  for the bound read, not a fake constant or an uninitialized carrier.
+- `func_8AF02DD0`: **requeue**, 56 recorded source attempts. The 328-byte /
+  82-instruction leader has the correct 0x50 frame, exact positional opcode
+  sequence and eight raw differences, all stack offsets. Its normalized
+  width is at sp+0x30 rather than 0x38, normalized third-height at 0x2C rather
+  than 0x30, and byte advance at 0x28 rather than 0x2C. Inlining the temporary
+  image-header view removes an extra frame slot; moving the byte-offset
+  declaration after the signed x/y snapshots fixes their homes. Shared extent
+  expressions, explicit width lifetime changes and an all-used local drawing
+  state were tested without closing the remaining temporary homes. Preserve
+  signed division by three, two equal buffer advances, and third-row y as
+  `y + height * 2 / 3`, not `y + (height / 3) * 2`.
+
+Twelve stock/diagnostic optimizer-listing controls preserve complete sections,
+layout, symbols and every relocation row. They distinguish the leading-row
+builder's copied row from the modified value in the `current` source slot;
+a source slot is not one semantic value through the whole function.
+`func_8AF0299C` now has 176 recorded attempts; the final eight-row manifest
+contained six distinct bodies, a generator defect retained as process
+evidence rather than claimed as eight independent hypotheses. Its generator
+now asserts uniqueness. `func_8AF02AE0` has 32 attempts; an early-return guard
+was inert on the previously recorded forms.
+
+The alternate stock 5.3 driver leaves the initializer's two-word residual
+unchanged, worsens the draw leader to 336 bytes / 69 raw differing words, and
+changes four of the ten accepted siblings. The configured 7.1 driver retains
+all ten siblings. This rules out that proposed whole-file compiler switch,
+not every historical frontend. For the initializer, forced g0 does not alter
+the residual; g3 changes other instructions and is not a fix. Calibrated AS1
+listings already contain the reversed pair before instruction scheduling.
+Next isolate its producer before that boundary rather than blame scheduling
+or declare a compiler impossibility. For drawing, inspect the real/synthetic
+temporary-home allocation rather than add unused locals to move the frame.
