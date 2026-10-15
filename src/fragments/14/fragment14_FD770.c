@@ -32,7 +32,39 @@ s32 func_81305634(void *arg0) {
 
 f32 func_8130571C(void *arg0) { u8 *base = (u8 *)arg0; f32 result = 1.0f; if (base[0x87] == 3) { result = (f32)base[0x82] / (f32)base[0x86]; } return result; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FD770/func_81305780.s")
+extern f32 func_813056A0(void *);
+extern f32 (*D_8160BD18)(f32);
+extern f32 (*D_8160BD1C)(f32);
+struct Fragment14GridRectangle {
+    s16 x, y, width, height;
+};
+struct Fragment14GridOrigin {
+    u32 header;
+    s16 x, y;
+};
+
+f32 Fragment14_ComputeGridRectangles(void *arg0, void *arg1, void *arg2, void *arg3) {
+    f32 progress;
+    f32 width;
+    f32 height;
+
+    progress = func_813056A0(arg0);
+    width = D_8160BD18(progress);
+    height = D_8160BD1C(progress);
+    ((struct Fragment14GridRectangle *)arg1)->width = (s16)(148.0f * width);
+    ((struct Fragment14GridRectangle *)arg1)->height = (s16)(41.0f * height);
+    ((struct Fragment14GridRectangle *)arg1)->x = (s16)(((struct Fragment14GridOrigin *)arg0)->x + (148 - ((struct Fragment14GridRectangle *)arg1)->width) / 2);
+    ((struct Fragment14GridRectangle *)arg1)->y = (s16)(((struct Fragment14GridOrigin *)arg0)->y + (41 - ((struct Fragment14GridRectangle *)arg1)->height) / 2);
+    ((struct Fragment14GridRectangle *)arg2)->width = (s16)(440.0f * width);
+    ((struct Fragment14GridRectangle *)arg2)->height = (s16)(143.0f * height);
+    ((struct Fragment14GridRectangle *)arg2)->x = (s16)((f32)((struct Fragment14GridOrigin *)arg0)->x + (440 - ((struct Fragment14GridRectangle *)arg2)->width) / 2);
+    ((struct Fragment14GridRectangle *)arg2)->y = (s16)((f32)((struct Fragment14GridOrigin *)arg0)->y + 30.0f + (143 - ((struct Fragment14GridRectangle *)arg2)->height) / 2);
+    ((struct Fragment14GridRectangle *)arg3)->width = (s16)(302.0f * width);
+    ((struct Fragment14GridRectangle *)arg3)->height = (s16)(67.0f * height);
+    ((struct Fragment14GridRectangle *)arg3)->x = (s16)((f32)((struct Fragment14GridOrigin *)arg0)->x + (302 - ((struct Fragment14GridRectangle *)arg3)->width) / 2);
+    ((struct Fragment14GridRectangle *)arg3)->y = (s16)((f32)((struct Fragment14GridOrigin *)arg0)->y + 162.0f + (67 - ((struct Fragment14GridRectangle *)arg3)->height) / 2);
+    return progress;
+}
 
 extern void func_816048E0(s32, s32, s32, s32, f32);
 extern void func_816073A0(void *);
@@ -117,7 +149,7 @@ void func_81305FB4(void *arg0, void *arg1, f32 arg2) {
     }
 }
 
-extern f32 func_81305780(void *, void *, void *, void *);
+extern f32 Fragment14_ComputeGridRectangles(void *, void *, void *, void *);
 extern void func_81305A10(void *, void *, f32);
 extern void func_81305C54(void *, void *, f32);
 extern void func_81305FB4(void *, void *, f32);
@@ -129,7 +161,7 @@ void func_813060C8(void *arg0, void *arg1) {
     f32 sp24;
 
     if (*(u8 *)((u8 *)arg0 + 0x87) != 0) {
-        sp24 = 1.0f - func_81305780(arg0, sp38, sp30, sp28);
+        sp24 = 1.0f - Fragment14_ComputeGridRectangles(arg0, sp38, sp30, sp28);
         if (func_81600DA8(arg1, (u8 *)arg0 + 1) != 0) {
             func_81305A10(arg0, sp38, sp24);
         }
@@ -338,7 +370,7 @@ void Fragment14_UpdateGridState(u8 *arg0, void *arg1) {
         func_81306954(arg0);
         break;
     }
-    func_81305780(arg0, &first, &second, &third);
+    Fragment14_ComputeGridRectangles(arg0, &first, &second, &third);
     func_81600A34(arg1, arg0 + 1, 0, first[0], first[1], first[2], first[3]);
     func_81600A34(arg1, arg0 + 2, active, second[0], second[1], second[2], second[3]);
     func_81600A34(arg1, arg0 + 3, active, third[0], third[1], third[2], third[3]);

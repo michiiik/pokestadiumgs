@@ -187,3 +187,44 @@ normalized/raw **1.0/0.9767**. Other orders move the whole-value slot to
 stack+0x24 or +0x1C. There are now 40 recorded candidates. This rejects the
 distinct-carrier family as tested, not all possible C spellings. Next remains
 the CFE/uopt multiply-operand ownership boundary; do not repeat these orders.
+
+## 2026-10-15 — rectangle animation accepted for the next batch
+
+`func_81305780` becomes **`Fragment14_ComputeGridRectangles`**, 164 words /
+656 bytes, frame 0x20. The file is now **24 C / 7 ASM**. Normal native batch
+`0318a1098fd94583ba4e95ccc05fce8c`, label
+`f14-grid:rectangles-shape:records-True:origin-last-False:offset-group-False`,
+is `accepted`, `link_verified: true`, with a successful combined full-ROM gate.
+Stock IDO 7.1 / `-O2`, statistics and host checks remain enabled.
+
+The function gets the grid phase progress, calls the real width/height easing
+callbacks, computes three centered rectangles and returns the original
+progress. Preserve the dimensions 148x41, 440x143 and 302x67, integer division
+by two, and the original integer first-origin versus float later-origin
+expressions, including vertical offsets 30 and 162.
+
+Eight initial raw-offset drafts top out at normalized/raw **0.8841/0.4878**,
+652 versus 656 bytes, with the correct frame in the leading declaration order.
+Eight follow-ups test output/origin record views and addition grouping. The
+record view with the original addition order matches immediately. This is
+measured translation-unit/type/expression context evidence, not proof that
+every difference is owned by a particular compiler pass. Explicitly grouped
+later y origins have the wrong shape; commuting origins reaches another
+register residual. Do not replace the accepted typed view with raw casts.
+
+Use partial records only for observed storage: root word at zero and position
+halfwords at 4/6; output rectangle x/y/width/height at 0/2/4/6. These define
+existing data views, not new storage or helper functions. Preserve the real
+float-returning callback declarations and the existing four-pointer ABI.
+Add one US compatibility alias; retain address-keyed symbols and JP.
+
+After formatting/naming, fresh and twenty-leading-blank controls preserve
+whole-object section bytes/layout, all 31 original function offsets/sizes/
+full spans, the accepted body and all 30 untouched C/ASM spans. Independently
+verify all 23 jump-table destinations, the leading zero word and four float
+cells. Forced normal ROM rebuild and explicit host syntax check pass;
+retail MD5 is `1561c75d11cedf356a8ddb1a4a5f9d5d`. Public tooling tests remain
+22 PASS. No scaffold, padding, forced register, compiler patch or provenance
+bypass. Publish only C, the alias and these notes; all search/proof artifacts
+stay local. Solo/native work continued while PR #1007's ROM CI ran; that
+three-function PR passed and merged before this next-batch commit.
