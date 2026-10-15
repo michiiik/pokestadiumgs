@@ -111,7 +111,7 @@ u32 func_87E067F0(s32 arg0, s32 arg1) {
 
 extern Gfx *D_800D0510;
 extern u8 D_80094E38[];
-extern void func_80007328(Gfx **, s32);
+extern void GfxImage_SetRenderTarget(Gfx **, s32);
 extern void GfxImage_FillCurrent(Gfx **, u16);
 extern s32 func_8004C990(s32, s32);
 extern void func_8004D19C(s32, s32, s32, s32, s32);
@@ -121,7 +121,7 @@ void func_87E06808(s32 arg0) {
 
     var_s1 = *(u8 **)((u8 *)arg0 + 0x150);
     for (var_s2 = 0; var_s2 != 0xC; var_s2 += 1, var_s1 += 0x9C) {
-        func_80007328(&D_800D0510, *(s32 *)(var_s1 + 0x90));
+        GfxImage_SetRenderTarget(&D_800D0510, *(s32 *)(var_s1 + 0x90));
         GfxImage_FillCurrent(&D_800D0510, 0xFFFE);
         gSPDisplayList(D_800D0510++, D_80094E38);
         gDPSetRenderMode(D_800D0510++, 0x0F0A7008, 0);

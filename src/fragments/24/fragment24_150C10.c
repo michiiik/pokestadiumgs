@@ -37,7 +37,7 @@ s32 func_82B00E34(s32 arg0) {
 
 #ifdef VERSION_US
 extern void *func_82B00F14(s32);
-extern void func_80006F70();
+extern void Gfx_SetScissorRect();
 extern Gfx * D_800D0510;
 s32 func_82B00F68(s32 arg0)
 {
@@ -66,7 +66,7 @@ s32 func_82B00F68(s32 arg0)
             if (base[3] < 0) x1 = 0;
             if (base[2] >= 0x1E0) x3 = 0x1DF;
             if ((x2 >= x0) && (x3 >= x1)) {
-                func_80006F70(&D_800D0510, (s16)x0, (s16)x1, (s16)(x2 - x0 + 1), x3 - x1 + 1);
+                Gfx_SetScissorRect(&D_800D0510, (s16)x0, (s16)x1, (s16)(x2 - x0 + 1), x3 - x1 + 1);
             }
         }
     }

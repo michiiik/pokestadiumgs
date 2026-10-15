@@ -228,7 +228,7 @@ void func_82901A6C(void) {
 #ifdef VERSION_US
 extern void BgStage_DrawFrame(void);
 extern void GfxImage_FillCurrent(void *, u16);
-extern void func_80007444(void *, s32, s32, s32, s32, s32);
+extern void GfxImage_FillRectangle(void *, s32, s32, s32, s32, s32);
 extern s32 func_800061EC(void);
 extern void GeoRender_AdvanceFrameCounter(void);
 extern void func_82901A6C(void);
@@ -243,10 +243,10 @@ void func_82901BA8(void) {
     if (D_82918868[0x31] == 3 || D_82918868[0x32] == 0 || D_82918868[0x32] == 6) {
         GfxImage_FillCurrent(&D_800D0510, 1);
     } else {
-        func_80007444(&D_800D0510, D_829188B0[3], D_829188B0[4], D_829188B0[1], D_829188B0[2], 1);
+        GfxImage_FillRectangle(&D_800D0510, D_829188B0[3], D_829188B0[4], D_829188B0[1], D_829188B0[2], 1);
     }
     if ((func_800061EC() & 1) == 0) {
-        func_80007444(&D_800D0510, 0, 0x190, 0x280, 0x1C, 1);
+        GfxImage_FillRectangle(&D_800D0510, 0, 0x190, 0x280, 0x1C, 1);
     }
     GeoRender_AdvanceFrameCounter();
     func_82901A6C();

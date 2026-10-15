@@ -61,11 +61,11 @@ typedef struct { s16 x; s16 y; s16 w; s16 h; } Rect818017A8;
 typedef struct { u8 bytes[8]; } Bytes818017A8;
 typedef struct { u32 words[2]; } Words818017A8;
 extern Rect818017A8 D_81805FE0;
-extern void func_80006F70(Gfx **, s32, s32, s32, s32);
+extern void Gfx_SetScissorRect(Gfx **, s32, s32, s32, s32);
 extern Gfx * D_800D0510;
 extern u8 * D_81805930;
 void func_818017A8(void) {
-    func_80006F70(&D_800D0510, *(s16 *)(D_81805930 + 0), *(s16 *)(D_81805930 + 2), *(s16 *)(D_81805930 + 4), *(s16 *)(D_81805930 + 6));
+    Gfx_SetScissorRect(&D_800D0510, *(s16 *)(D_81805930 + 0), *(s16 *)(D_81805930 + 2), *(s16 *)(D_81805930 + 4), *(s16 *)(D_81805930 + 6));
     D_81805FE0 = *(Rect818017A8 *)D_81805930;
 }
 
@@ -191,7 +191,7 @@ void func_81801CB8(u8 *arg0, u8 *arg1, u8 *arg2, f32 arg3) {
     func_8180194C(arg0 + 4, arg1 + 4, arg2 + 4, arg3);
 }
 
-extern void func_80006F70(Gfx **, s32, s32, s32, s32);
+extern void Gfx_SetScissorRect(Gfx **, s32, s32, s32, s32);
 extern void func_81801A10(u8 *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
 extern Gfx * D_800D0510;
 extern u8 * D_81805930;
@@ -209,10 +209,10 @@ void func_81801D04(u8 *arg0) {
     if ((x + w) >= max_x) { w = max_x - x; }
     if ((y + h) >= max_y) { h = max_y - y; }
     if (w <= 0 || h <= 0 || x >= max_x || y >= max_y || (x + w) <= 0 || (y + h) <= 0) {
-        func_80006F70(&D_800D0510, 0, 0, 0, 0);
+        Gfx_SetScissorRect(&D_800D0510, 0, 0, 0, 0);
         func_81801A10((u8 *)&D_81805FE0, 0, 0, 0, 0);
     } else {
-        func_80006F70(&D_800D0510, (s16)x, (s16)y, (s16)w, h);
+        Gfx_SetScissorRect(&D_800D0510, (s16)x, (s16)y, (s16)w, h);
         func_81801A10((u8 *)&D_81805FE0, x, y, w, h);
     }
 }

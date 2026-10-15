@@ -240,7 +240,7 @@ void func_81403B7C(u8 *arg0, void *arg1)
 
 extern s32 func_81600DA8(void *, void *);
 extern s32 func_81602D70(s32);
-extern void func_80006F70(Gfx **, s32, s32, s32, s32);
+extern void Gfx_SetScissorRect(Gfx **, s32, s32, s32, s32);
 extern void func_81607360(void *);
 extern void func_81607408(void);
 extern void func_814018F4(s32, s32, s32, s32, s32, s32);
@@ -272,7 +272,7 @@ void func_81403CD0(void *arg0, void *arg1) {
         } else {
             second = value;
         }
-        func_80006F70(&D_800D0510, 0, 0, 0x280, 0x1E0);
+        Gfx_SetScissorRect(&D_800D0510, 0, 0, 0x280, 0x1E0);
         func_81403828(arg0, rect);
         func_81607360(rect);
         if (*(s32 *)((u8 *)arg0 + 0xCC4) != 0) {

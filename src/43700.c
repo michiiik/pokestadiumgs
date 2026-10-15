@@ -187,13 +187,13 @@ void func_800435D4(u8 *arg0) {
 }
 
 extern void func_80043500();
-extern void func_80007328();
+extern void GfxImage_SetRenderTarget();
 extern void func_800435D4();
 extern void GeoRender_AdvanceFrameCounter();
 extern void func_8003C6B8();
 s32 func_80043678(u8 *arg0) {
     func_80043500(arg0);
-    func_80007328(&D_800D0510, *(s32 *)(arg0 + 0x20));
+    GfxImage_SetRenderTarget(&D_800D0510, *(s32 *)(arg0 + 0x20));
     func_800435D4(arg0);
     GeoRender_AdvanceFrameCounter();
     func_8003C6B8(*(s32 *)(arg0 + 0x18));

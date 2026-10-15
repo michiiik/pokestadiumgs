@@ -54,14 +54,14 @@ void func_882064B4(s32 arg0, s32 *arg1, void *arg2, void *arg3) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_179030/func_88206CC0.s")
 
-extern void func_80006F70(s32 *, s32, s32, s32, s32);
+extern void Gfx_SetScissorRect(s32 *, s32, s32, s32, s32);
 s32 func_880032C4();
 extern void func_882001E8();
 extern u8 D_800D0510;
 
 void func_88207D14(u8 *arg0) {
     if (*arg0 != 0) {
-        func_80006F70(&D_800D0510, 0x2C, 0x48, 0x229, 0x17F);
+        Gfx_SetScissorRect(&D_800D0510, 0x2C, 0x48, 0x229, 0x17F);
         func_882001E8();
         if (func_880032C4() == 0) {
             *arg0 -= 1;

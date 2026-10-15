@@ -102,3 +102,6 @@ func_800080E0 = StageLoader_BeginFrame;
 func_800082E0 = StageContext_Allocate;
 func_80007870 = StageFade_Update;
 func_80007E6C = StageLoader_SetupFrame;
+func_80006F70 = Gfx_SetScissorRect;
+func_80007328 = GfxImage_SetRenderTarget;
+func_80007444 = GfxImage_FillRectangle;
