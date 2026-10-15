@@ -1,5 +1,59 @@
 # Fragment 53 animation family
 
+## 2026-10-16 — primary animation dispatcher accepted
+
+`func_86503938` → `Fragment53_UpdatePrimaryAnimationState`, **152 words /
+608 bytes**, frame **0x30**, batch `cf4a9340ca1c49da81678c1f997424fc`.
+This is a relocation-masked **sequential full-ROM accept, not link-verified**.
+File progress: **26 C / 30 function ASM → 27 C / 29 function ASM**.
+
+The earlier frame residual was two interacting source mechanisms, not padding:
+keep the genuine actor-index copy, but remove **both** the explicit byte-offset
+and branch-assigned model-pointer locals. Repeat the byte-offset expressions
+at their actual uses and let IDO share them. Removing either local alone did
+not close the frame; removing both reaches 0x30. Reverse the symmetric integer
+comparison to `D_8650C5E0 != D_8650C4B0`: this closes the remaining global-load
+relocation order. Four un-swapped expression cells reached the ROM gate and
+were rejected; the first swapped cell passed. Do not call the raw object-table
+addend difference proof of a match without the linked retail-ROM gate.
+
+All eight animation cases preserve field writes, conditional sound calls,
+pending flags, primary result-animation changes and frame resets. After
+readable cleanup and naming, fresh and twenty-leading-blank object builds
+preserve complete frozen section bytes/layout, all **56 function spans**,
+all **55 untouched functions**, and the canonical **496-byte rodata** pool.
+No padding, synthetic locals, helper functions, compiler edits or bypasses.
+Forced native ROM comparison passes, MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`; host syntax check passes with the twelve
+existing warnings, all 25 tooling tests pass, and the diff is whitespace-clean.
+
+The logging-only stock/off/on/blank controls for the earlier frame pair pass
+all sections, symbol spans and complete relocation rows (twelve builds).
+Trace identifiers need care: spill-plan records are emitted before the
+global-color procedure counter increments. The target's plans are tagged
+proc 44, its color records proc 45, and UGEN begins at proc 44 / source line
+331. No target `f_gettemp` record does **not** mean no target spill plan.
+The calibrated plans end at local/spill areas 24 versus 20 for index-copy
+versus formal-only forms; source-level expression composition resolves the
+actual mismatch without changing the compiler.
+
+### Round-motion dispatcher requeue
+
+`func_865040E4`: **requeue**, 24 compared cells, 286-word / 1144-byte target,
+frame 0x28. Natural switch draft preserves descent, pause, per-actor landing
+and completion checks, signed rounding, mode-specific progress and randomized
+model reset. Best normalized similarity **0.8497**, raw **0.4965**, 1140 bytes.
+Separate scalar sibling checks and early pointer-loop initialization improve
+the initial 0.7937 / 1132-byte indexed form. Explicit versus compound scalar
+assignments and cached versus repeated time reads are inert in the tested
+envelope. Scalar/one-element-array and volatile clock/counter diagnostics do
+not close it; no volatile declaration is adopted. Remaining differences include
+global address materialization/load ownership, loop setup and case-two cached
+array-pointer roles. Next compare those ranges against the retained full-TU
+object, then test a coherent typed scene/array ownership hypothesis. Do not
+repeat the initializer/volatile families or hand-unroll the loops. Owner stays
+assembly; its canonical jump table is already available, not a layout blocker.
+
 ## 2026-10-16 — round initializer accepted; earlier rodata ownership resolved
 
 `func_86502720` → `Fragment53_InitRoundState`, **142 words / 568 bytes**, frame

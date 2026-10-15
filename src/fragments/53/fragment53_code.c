@@ -320,7 +320,82 @@ void Fragment53_ApplyPendingPrimaryAnimation(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/53/fragment53_code/func_86503938.s")
+extern f32 D_86511690;
+extern f32 D_8650F228[];
+extern s32 D_8650C624;
+extern s32 D_8650C4B0;
+extern s32 D_8650C5E0;
+extern void func_80027A28(u16,u8);
+extern void ModelAnim_SetFrame(u8 *, s16);
+extern void func_8003F210(void *, s32);
+void Fragment53_UpdatePrimaryAnimationState(s32 arg0) {
+    s32 index;
+
+    index = arg0;
+    switch (D_86511698[index].animation) {
+    case 2:
+        D_86511698[index].pending = 1;
+        D_86511698[index].animation = 1;
+        break;
+    case 4:
+        D_86511698[index].pending = 1;
+        D_86511698[index].animation = 1;
+        *(s32 *)((u8 *)&D_86511698[index] + 4) = 0;
+        *(s32 *)((u8 *)&D_86511698[index] + 0) = 0;
+        if (D_86511690 < 100.0f) {
+            D_86511698[index].animation = 7;
+            func_80027A28(0x1F0A, (u8)index);
+        }
+        break;
+    case 3:
+        D_86511698[index].animation = 1;
+        D_86511698[index].pending = 1;
+        *(s32 *)((u8 *)&D_86511698[index] + 4) = 0;
+        *(s32 *)((u8 *)&D_86511698[index] + 0) = -1;
+        break;
+    case 5:
+        D_86511698[index].pending = 1;
+        D_86511698[index].result = 0;
+        D_86511698[index].animation = 0;
+        break;
+    case 6:
+        if (D_8650C5E0 != D_8650C4B0) {
+            D_86511698[index].pending = 1;
+            D_86511698[index].animation = 0;
+        }
+        break;
+    case 7:
+        D_86511698[index].animation = 0;
+        D_86511698[index].pending = 1;
+        break;
+    case 0:
+        if (0.0f < *(f32 *)((u8 *)D_8650F228 + index * 0x168)) {
+            if (D_8650C624 == 2) {
+                D_86511698[index].animation = 2;
+                D_86511698[index].pending = 1;
+                func_80027A28(0x1F0A, (u8)index);
+            }
+        }
+        if (D_86511698[index].result == 1) {
+            D_86511698[index].animation = 6;
+            func_8003F210((u8 *)D_8650E120 + index * 0x168, 6);
+            ModelAnim_SetFrame((u8 *)D_8650E120 + index * 0x168, 0);
+        }
+        if (D_86511698[index].result == 2) {
+            D_86511698[index].animation = 5;
+            func_8003F210((u8 *)D_8650E120 + index * 0x168, 5);
+            ModelAnim_SetFrame((u8 *)D_8650E120 + index * 0x168, 0);
+        }
+        break;
+    case 1:
+        if (D_86511690 < 100.0f) {
+            D_86511698[index].pending = 1;
+            D_86511698[index].animation = 7;
+            func_80027A28(0x1F0A, (u8)index);
+        }
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
