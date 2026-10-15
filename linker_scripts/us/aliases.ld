@@ -185,3 +185,7 @@ func_82404440 = Fragment13_HandleConfirmationInput;
 PROVIDE(jtbl_82409058 = fragment13_RODATA_START + 0x158);
 func_824045B4 = Fragment13_UpdateConfirmationDialog;
 func_82406A78 = Fragment13_UpdateGroupScene;
+func_865038A8 = Fragment53_ApplyPendingPrimaryAnimation;
+func_86501FA0 = Fragment53_UpdateTrajectoryPosition;
+func_8650A278 = Fragment53_RunSceneTransition;
+func_86501D6C = Fragment53_CountTrajectorySamplesInRange;
