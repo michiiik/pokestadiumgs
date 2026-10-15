@@ -345,12 +345,51 @@ void func_86508294(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/53/fragment53_code/func_86508484.s")
+extern struct Fragment53Model D_8650E6C0[];
+extern s32 D_8650DB28[];
+extern u8 D_8650E6E4[];
+extern u8 D_8650EC60[];
+extern u8 D_8650DB80[];
+extern u8 D_8650F7A0[];
+extern u8 D_865118F8[];
+extern void func_8003F114(void *, s32, s32, s32);
+extern void ModelAnim_SetEventFrame(u8 *, s16);
+extern void func_8003F3BC(void *, s32);
+extern void func_87F06430(void *, s32);
+extern void func_8003F1DC(void *);
+extern s32 ModelAnim_SetSpeed(u8 *, s32);
+extern void func_819006A0(void *);
+extern void func_86502958(void);
+void Fragment53_InitActorModels(void) {
+    s32 index;
+
+    for (index = 0; index < 4; index++) {
+        func_8003F114((u8 *)&D_8650E6C0[index], 0, -1, D_8650DB28[index]);
+        func_8003F210((u8 *)&D_8650E6C0[index], 0);
+        ModelAnim_SetSpeed((u8 *)&D_8650E6C0[index], 0x20000);
+        ModelAnim_SetFrame((u8 *)&D_8650E6C0[index], (s16)(guRandom() % 15 + 15));
+        ModelAnim_SetEventFrame((u8 *)&D_8650E6C0[index], 0);
+        func_8003F3BC((u8 *)&D_8650E6C0[index], 0);
+        func_87F06430(D_8650E6E4 + index * 0x168, index);
+        *(f32 *)((u8 *)&D_8650E6C0[index] + 0x38) = 0.095f;
+        *(f32 *)((u8 *)&D_8650E6C0[index] + 0x34) = 0.095f;
+        *(f32 *)((u8 *)&D_8650E6C0[index] + 0x30) = 0.095f;
+        *(f32 *)((u8 *)&D_8650E6C0[index] + 0x28) = 55.0f;
+        *(s16 *)((u8 *)&D_8650E6C0[index] + 0x1E) = 0;
+        D_86511698[index].animation = 0;
+        D_86511698[index].pending = 0;
+        func_8003F1DC(D_8650EC60 + index * 0x168);
+        func_8003F1DC((u8 *)&D_8650E120[index]);
+        *(s16 *)((u8 *)&D_8650E6C0[index] + 0x20) = 0;
+        func_8003F1DC(D_8650DB80 + index * 0x168);
+        func_8003F1DC(D_8650F7A0 + index * 0x168);
+    }
+    func_819006A0(*(void **)D_865118F8);
+    func_86502958();
+}
 #endif
 
 #ifdef VERSION_US
-extern struct Fragment53Model D_8650E6C0[];
-extern s32 ModelAnim_SetSpeed(u8 *, s32);
 extern s32 ModelAnim_IsFinished(void *);
 extern void func_80027A28(u16, u8);
 void Fragment53_UpdateTimedSecondaryAnimation(s32 arg0) {
@@ -546,13 +585,6 @@ void func_86509D8C(void) {
 #endif
 
 #ifdef VERSION_US
-extern u8 D_865118F8[];
-extern struct Fragment53Model D_8650E6C0[];
-extern s32 D_8650DB28[];
-extern void ModelAnim_SetEventFrame(u8 *, s16);
-extern void func_8003F1DC(void *);
-extern void func_8003F114(void *, s32, s32, s32);
-extern void func_8003F3BC(void *, s32);
 extern void func_800086A4(s32);
 extern void func_80064D28(void);
 extern void func_8650A074(void);

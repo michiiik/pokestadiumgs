@@ -1,5 +1,44 @@
 # Fragment 53 animation family
 
+## 2026-10-16 — actor initializer accepted; four-function follow-up complete
+
+`func_86508484` is now `Fragment53_InitActorModels`, **110 words / 440 bytes**,
+frame **0x50**. Batch `f5faea2051ed41278f66725c1f5024c0` accepts the natural
+four-actor `for` loop with the actual `0.095f` scale literal, signed random
+animation frames, model resets, placement, flags, and final scene setup.
+This is a **relocation-masked sequential full-ROM acceptance, not link-verified**.
+The three other accepts below are link-verified combined-gate results.
+
+The prerequisite is now resolved: add the tight **64-byte** canonical `.rodata`
+window at ROM **0x296D30..0x296D70**, re-split with splat 0.25.0 / pinned
+spimdisasm 1.35.0-dev0, and gate the still-ASM initializer before replacing it.
+The window contains D8650D880, D8650D884, all 13 entries of jtbl_8650D888, then
+D8650D8BC, in source order. Both boundaries are aligned and no unreferenced
+prefix/tail is dropped. The rest remains in the shared head and rodata tail.
+The assembly-only ROM gate passes before the candidate is installed.
+
+The layout move preserves all 56 original function starts/sizes. It changes
+one untouched object's representation: exporting `.L8650A054` for the rodata
+tail creates **15 R_MIPS_PC16 branch relocations** in `func_86509E54`, instead
+of in-object resolved displacements. Every differing raw word is accounted
+for by one of those relocations; both linked ROMs remain retail-identical.
+Do not describe this as an unchanged raw object or a code change.
+
+Final fresh/twenty-leading-blank builds preserve complete frozen section bytes
+and layout, all 56 original function spans, all 52 untouched post-layout raw
+spans, and 51 untouched pre-batch raw spans plus the measured relocation owner.
+The four functions total **340 words / 1360 bytes**, progressing this file
+from **17 C / 39 ASM to 21 C / 35 ASM**. Forced normal ROM comparison,
+host syntax checks and all 25 tooling tests pass after cleanup/naming.
+
+The local runner's duplicate guard previously fingerprinted the Makefile and
+compiler override but not canonical layout, incorrectly blocking the proven
+candidate after this split. A local layout-context fingerprint and historical
+fallback fix that stale rejection; changed-layout replay, unchanged-layout
+rejection, compiler identity and conservative legacy behavior are checked.
+No guard/statistics bypass or compiler patch is used. Runner copies and scratch
+proofs are not part of the public decompilation PR.
+
 ## 2026-10-16 — secondary handlers and model-height callback accepted
 
 Three additional native matches, all `link_verified: true` and accepted through
