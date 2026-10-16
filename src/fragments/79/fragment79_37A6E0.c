@@ -202,7 +202,7 @@ void func_8410B594(u8 *arg0) {
 #ifdef VERSION_US
 extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
 extern void func_80037120(s32, s32, s32 *, s16 *, s16 *);
-extern void func_800371B4(u8 *, u8 *, f32, s16, s32);
+extern void Camera_ComputeEyeFromAngles(u8 *, u8 *, f32, s16, s32);
 extern s32 func_8411DC80(u16, s32 *, s32);
 extern void func_841203B4(u8 *, f32, f32);
 void func_8410B704(u8 *arg0, void *arg1, u8 *arg2, u8 *arg3) {
@@ -215,19 +215,19 @@ void func_8410B704(u8 *arg0, void *arg1, u8 *arg2, u8 *arg3) {
     f32 padding[2];
     f32 scaled;
     if (func_8411DC80(*(u16 *)(arg2 + 0x98), D_84183930, 12) != 0) {
-        func_800371B4(arg3, (u8 *)target, *(f32 *)(arg2 + 0x40), *(s16 *)(arg2 + 0x3C), *(s16 *)(arg2 + 0x3E));
+        Camera_ComputeEyeFromAngles(arg3, (u8 *)target, *(f32 *)(arg2 + 0x40), *(s16 *)(arg2 + 0x3C), *(s16 *)(arg2 + 0x3E));
         Vec3f_SetComponentsDuplicate(pos, *(f32 *)(arg0 + 0xA8), *(f32 *)(arg0 + 0xAC), *(f32 *)(arg0 + 0xB0));
         func_80037120((s32)pos, (s32)target, (s32 *)&distance, &angle0, &angle1);
-        func_800371B4((u8 *)pos, arg0 + 0xA8, distance, angle0, angle1);
+        Camera_ComputeEyeFromAngles((u8 *)pos, arg0 + 0xA8, distance, angle0, angle1);
         if (*(f32 *)(arg0 + 0xAC) <= 10.0f) {
             *(f32 *)(arg0 + 0xAC) = 10.0f;
         }
     } else {
         func_841203B4(arg2 + 0x44, *(f32 *)(arg2 + 0x4C), *(f32 *)(arg2 + 0x48));
-        func_800371B4(arg3, (u8 *)target, *(f32 *)(arg2 + 0x40), *(s16 *)(arg2 + 0x3C), *(s16 *)(arg2 + 0x3E));
+        Camera_ComputeEyeFromAngles(arg3, (u8 *)target, *(f32 *)(arg2 + 0x40), *(s16 *)(arg2 + 0x3C), *(s16 *)(arg2 + 0x3E));
         Vec3f_SetComponentsDuplicate(pos, *(f32 *)(arg0 + 0xA8), *(f32 *)(arg0 + 0xAC), *(f32 *)(arg0 + 0xB0));
         func_80037120((s32)pos, (s32)target, (s32 *)&distance, &angle0, &angle1);
-        func_800371B4((u8 *)pos, arg0 + 0xA8, *(f32 *)(arg2 + 0x44) * distance, angle0, angle1);
+        Camera_ComputeEyeFromAngles((u8 *)pos, arg0 + 0xA8, *(f32 *)(arg2 + 0x44) * distance, angle0, angle1);
         if (*(f32 *)(arg0 + 0xAC) <= 10.0f) {
             *(f32 *)(arg0 + 0xAC) = 10.0f;
         }
@@ -315,7 +315,7 @@ extern u8 *func_8410B330(u8 *);
 extern s32 func_8411DC80(u16, s32 *, s32);
 extern s32 func_8411E140(s32);
 extern void func_8410B974(u8 *, void *, s16, s32, s32);
-extern void func_800371B4(u8 *, u8 *, f32, s16, s32);
+extern void Camera_ComputeEyeFromAngles(u8 *, u8 *, f32, s16, s32);
 extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
 void func_8410C934(u8 *arg0, s32 arg1, s16 arg2) {
     s16 var_a2;
@@ -346,13 +346,13 @@ void func_8410C934(u8 *arg0, s32 arg1, s16 arg2) {
         *(f32 *)(arg0 + 0x2C) = 45.0f;
         *(f32 *)(D_841911E8 + 0x88) = 45.0f;
     }
-    func_800371B4(D_841911E8 + 0x50, arg0 + 0xA8, *(f32 *)(D_841911E8 + 0x74), *(s16 *)(D_841911E8 + 0x90), (s32)*(s16 *)(D_841911E8 + 0x92));
+    Camera_ComputeEyeFromAngles(D_841911E8 + 0x50, arg0 + 0xA8, *(f32 *)(D_841911E8 + 0x74), *(s16 *)(D_841911E8 + 0x90), (s32)*(s16 *)(D_841911E8 + 0x92));
     Vec3f_SetComponentsDuplicate((f32 *)(D_841911E8 + 0x68), *(f32 *)(arg0 + 0xA8), *(f32 *)(arg0 + 0xAC), *(f32 *)(arg0 + 0xB0));
 }
 #endif
 
 #ifdef VERSION_US
-extern void func_800371B4(u8 *, u8 *, f32, s16, s32);
+extern void Camera_ComputeEyeFromAngles(u8 *, u8 *, f32, s16, s32);
 extern u8 * func_8410B330(u8 *);
 extern void func_8410B974(u8 *, void *, s16, s32, s32);
 extern s32 func_8411DC80(u16, s32 *, s32);
@@ -386,7 +386,7 @@ void func_8410CAE4(u8 *arg0, s32 arg1, s16 arg2) {
         *(f32 *)(arg0 + 0x2C) = 45.0f;
         *(f32 *)(D_841911E8 + 0x88) = 45.0f;
     }
-    func_800371B4(D_841911E8 + 0x50, arg0 + 0xA8, *(f32 *)(D_841911E8 + 0x74), *(s16 *)(D_841911E8 + 0x90), (s32)*(s16 *)(D_841911E8 + 0x92));
+    Camera_ComputeEyeFromAngles(D_841911E8 + 0x50, arg0 + 0xA8, *(f32 *)(D_841911E8 + 0x74), *(s16 *)(D_841911E8 + 0x90), (s32)*(s16 *)(D_841911E8 + 0x92));
     Vec3f_SetComponentsDuplicate((f32 *)(D_841911E8 + 0x68), *(f32 *)(arg0 + 0xA8), *(f32 *)(arg0 + 0xAC), *(f32 *)(arg0 + 0xB0));
 }
 #endif
@@ -620,14 +620,14 @@ void BattleAnim_ModelDispatch_148(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_800371B4(u8 *, u8 *, f32, s16, s32);
+extern void Camera_ComputeEyeFromAngles(u8 *, u8 *, f32, s16, s32);
 extern u8 * func_8410B330(u8 *);
 void BattleAnim_ModelDispatch_149(u8 *arg0, s32 arg1) {
     extern s32 BattleAnim_StepToS16(s16 *, s16, s16);
-    extern void func_800371B4(u8 *, u8 *, f32, s16, s32);
+    extern void Camera_ComputeEyeFromAngles(u8 *, u8 *, f32, s16, s32);
     D_841911E8 = func_8410B330(arg0);
     BattleAnim_StepToS16((s16 *)(D_841911E8 + 0x92), -0x8000, 0x71C);
-    func_800371B4(arg0 + 0xA8, arg0 + 0xB4,
+    Camera_ComputeEyeFromAngles(arg0 + 0xA8, arg0 + 0xB4,
         *(f32 *)(D_841911E8 + 0x74),
         *(s16 *)(D_841911E8 + 0x90),
         (s32)*(s16 *)(D_841911E8 + 0x92));
@@ -635,7 +635,7 @@ void BattleAnim_ModelDispatch_149(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_800371B4(u8 *, u8 *, f32, s16, s32);
+extern void Camera_ComputeEyeFromAngles(u8 *, u8 *, f32, s16, s32);
 extern u8 * func_8410B330(u8 *);
 extern s32 D_84184148;
 extern u8 * D_841911E8;
@@ -644,20 +644,20 @@ void func_8410F78C(u8 *arg0, s32 arg1) {
     D_841911E8 = func_8410B330(arg0);
     func_80037120((s32)(arg0 + 0xA8), (s32)(arg0 + 0xB4), (s32 *)(D_841911E8 + 0x74), (s16 *)(D_841911E8 + 0x90), (s16 *)(D_841911E8 + 0x92));
     *(s16 *)(D_841911E8 + 0x92) += 0x5555;
-    func_800371B4(arg0 + 0xA8, arg0 + 0xB4, *(f32 *)(D_841911E8 + 0x74), *(s16 *)(D_841911E8 + 0x90), (s32)*(s16 *)(D_841911E8 + 0x92));
+    Camera_ComputeEyeFromAngles(arg0 + 0xA8, arg0 + 0xB4, *(f32 *)(D_841911E8 + 0x74), *(s16 *)(D_841911E8 + 0x90), (s32)*(s16 *)(D_841911E8 + 0x92));
     *(s32 *)(D_841911E8 + (D_841911EC * 8) + 8) = D_84184148;
 }
 #endif
 
 #ifdef VERSION_US
-extern void func_800371B4(u8 *, u8 *, f32, s16, s32);
+extern void Camera_ComputeEyeFromAngles(u8 *, u8 *, f32, s16, s32);
 extern u8 * func_8410B330(u8 *);
 void BattleAnim_ModelDispatch_156(u8 *arg0, s32 arg1) {
     extern s32 BattleAnim_StepToS16(s16 *, s16, s16);
-    extern void func_800371B4(u8 *, u8 *, f32, s16, s32);
+    extern void Camera_ComputeEyeFromAngles(u8 *, u8 *, f32, s16, s32);
     D_841911E8 = func_8410B330(arg0);
     BattleAnim_StepToS16((s16 *)(D_841911E8 + 0x92), 0x4000, 0x71C);
-    func_800371B4(arg0 + 0xA8, arg0 + 0xB4,
+    Camera_ComputeEyeFromAngles(arg0 + 0xA8, arg0 + 0xB4,
         *(f32 *)(D_841911E8 + 0x74),
         *(s16 *)(D_841911E8 + 0x90),
         (s32)*(s16 *)(D_841911E8 + 0x92));
@@ -759,7 +759,7 @@ extern s32 D_84184148;
 extern u8 *func_8410B330(u8 *);
 extern void func_84120960(u8 *, s32);
 extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
-extern void func_800371B4(u8 *, u8 *, f32, s16, s32);
+extern void Camera_ComputeEyeFromAngles(u8 *, u8 *, f32, s16, s32);
 void BattleAnim_ModelDispatch_029(u8 *arg0, s32 arg1) {
     D_841911E8 = func_8410B330(arg0);
     *(f32 *)(arg0 + 0x2C) = 45.0f;
@@ -773,7 +773,7 @@ void BattleAnim_ModelDispatch_029(u8 *arg0, s32 arg1) {
     } else {
         Vec3f_SetComponentsDuplicate((f32 *)(arg0 + 0xB4), 0.0f, 40.0f, 0.0f);
     }
-    func_800371B4(arg0 + 0xB4, arg0 + 0xA8,
+    Camera_ComputeEyeFromAngles(arg0 + 0xB4, arg0 + 0xA8,
         *(f32 *)((u8 *)D_841911E8 + 0x74),
         *(s16 *)((u8 *)D_841911E8 + 0x90),
         (s32)*(s16 *)((u8 *)D_841911E8 + 0x92));
@@ -782,14 +782,14 @@ void BattleAnim_ModelDispatch_029(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_800371B4(u8 *, u8 *, f32, s16, s32);
+extern void Camera_ComputeEyeFromAngles(u8 *, u8 *, f32, s16, s32);
 void BattleAnim_ModelDispatch_030(u8 *arg0, s32 arg1) {
     u8 *temp_v0;
 
     temp_v0 = func_8410B330(arg0);
     D_841911E8 = temp_v0;
     (*(s16 *)((u8 *)(temp_v0) + (0x92))) = (s16) ((*(s16 *)((u8 *)(temp_v0) + (0x92))) + 0xE8);
-    func_800371B4(arg0 + 0xB4, arg0 + 0xA8, (*(f32 *)((u8 *)(D_841911E8) + (0x74))), (*(s16 *)((u8 *)(D_841911E8) + (0x90))), (s32) (*(s16 *)((u8 *)(D_841911E8) + (0x92))));
+    Camera_ComputeEyeFromAngles(arg0 + 0xB4, arg0 + 0xA8, (*(f32 *)((u8 *)(D_841911E8) + (0x74))), (*(s16 *)((u8 *)(D_841911E8) + (0x90))), (s32) (*(s16 *)((u8 *)(D_841911E8) + (0x92))));
     if ((f64) (*(f32 *)((u8 *)(arg0) + (0xAC))) <= 10.0) {
         (*(f32 *)((u8 *)(arg0) + (0xAC))) = 10.0f;
     }
@@ -809,7 +809,7 @@ void BattleAnim_ModelDispatch_057(u8 *arg0, s32 arg1) {
     } else {
         Vec3f_SetComponentsDuplicate((f32 *)(arg0 + 0xB4), 0.0f, 40.0f, 0.0f);
     }
-    func_800371B4(arg0 + 0xB4, arg0 + 0xA8,
+    Camera_ComputeEyeFromAngles(arg0 + 0xB4, arg0 + 0xA8,
         *(f32 *)((u8 *)D_841911E8 + 0x74),
         *(s16 *)((u8 *)D_841911E8 + 0x90),
         (s32)*(s16 *)((u8 *)D_841911E8 + 0x92));
@@ -824,7 +824,7 @@ void BattleAnim_ModelDispatch_058(u8 *arg0, s32 arg1) {
     temp_v0 = func_8410B330(arg0);
     D_841911E8 = temp_v0;
     (*(s16 *)((u8 *)(temp_v0) + (0x92))) = (s16) ((*(s16 *)((u8 *)(temp_v0) + (0x92))) + 0xE8);
-    func_800371B4(arg0 + 0xB4, arg0 + 0xA8, (*(f32 *)((u8 *)(D_841911E8) + (0x74))), (*(s16 *)((u8 *)(D_841911E8) + (0x90))), (s32) (*(s16 *)((u8 *)(D_841911E8) + (0x92))));
+    Camera_ComputeEyeFromAngles(arg0 + 0xB4, arg0 + 0xA8, (*(f32 *)((u8 *)(D_841911E8) + (0x74))), (*(s16 *)((u8 *)(D_841911E8) + (0x90))), (s32) (*(s16 *)((u8 *)(D_841911E8) + (0x92))));
 }
 #endif
 
@@ -842,7 +842,7 @@ void BattleAnim_ModelDispatch_064(u8 *arg0, s32 arg1) {
     } else {
         Vec3f_SetComponentsDuplicate((f32 *)(arg0 + 0xB4), 0.0f, 40.0f, 0.0f);
     }
-    func_800371B4(arg0 + 0xB4, arg0 + 0xA8,
+    Camera_ComputeEyeFromAngles(arg0 + 0xB4, arg0 + 0xA8,
         *(f32 *)((u8 *)D_841911E8 + 0x74),
         *(s16 *)((u8 *)D_841911E8 + 0x90),
         (s32)*(s16 *)((u8 *)D_841911E8 + 0x92));
@@ -857,7 +857,7 @@ void BattleAnim_ModelDispatch_065(u8 *arg0, s32 arg1) {
     temp_v0 = func_8410B330(arg0);
     D_841911E8 = temp_v0;
     (*(s16 *)((u8 *)(temp_v0) + (0x92))) = (s16) ((*(s16 *)((u8 *)(temp_v0) + (0x92))) + 0xE8);
-    func_800371B4(arg0 + 0xB4, arg0 + 0xA8, (*(f32 *)((u8 *)(D_841911E8) + (0x74))), (*(s16 *)((u8 *)(D_841911E8) + (0x90))), (s32) (*(s16 *)((u8 *)(D_841911E8) + (0x92))));
+    Camera_ComputeEyeFromAngles(arg0 + 0xB4, arg0 + 0xA8, (*(f32 *)((u8 *)(D_841911E8) + (0x74))), (*(s16 *)((u8 *)(D_841911E8) + (0x90))), (s32) (*(s16 *)((u8 *)(D_841911E8) + (0x92))));
     (*(f32 *)((u8 *)(arg0) + (0xB0))) = (f32) ((f64) (*(f32 *)((u8 *)(arg0) + (0xB0))) * 0.599999999999999978);
 }
 #endif
@@ -867,7 +867,7 @@ void BattleAnim_ModelDispatch_065(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_800371B4(u8 *, u8 *, f32, s16, s32);
+extern void Camera_ComputeEyeFromAngles(u8 *, u8 *, f32, s16, s32);
 extern u8 * func_8410B330(u8 *arg0);
 extern void func_8410B884(u8 *arg0, void *arg1, u8 *arg2, s16 arg3);
 extern void func_8410C934(u8 *arg0, s32 arg1, s16 arg2);
@@ -878,7 +878,7 @@ void func_84110264(u8 *arg0, s32 arg1)
 {
     func_8410C934(arg0, arg1, *(s16 *)((D_841911E8 = func_8410B330(arg0)) + 0x98));
     func_8410B884(arg0, (void *)(u32)arg1, D_841911E8, *(s16 *)((u8 *)(u32)arg1 + 0x20));
-    func_800371B4(D_841911E8 + 0x50, arg0 + 0xA8, *(f32 *)(D_841911E8 + 0x74) / (f32)2, 0, *(s16 *)(D_841911E8 + 0x92));
+    Camera_ComputeEyeFromAngles(D_841911E8 + 0x50, arg0 + 0xA8, *(f32 *)(D_841911E8 + 0x74) / (f32)2, 0, *(s16 *)(D_841911E8 + 0x92));
     *(s16 *)(D_841911E8 + 0x3C) = 0;
     *(s32 *)(D_841911E8 + D_841911EC * 8 + 8) = D_84184148;
 }
@@ -4382,7 +4382,7 @@ void BattleAnim_Dispatch_211(u8 *arg0) {
 extern u8 D_841904DC[];
 extern u8 D_841904D0[];
 extern void func_80037120(s32, s32, s32 *, s16 *, s16 *);
-extern void func_800371B4(u8 *, u8 *, f32, s16, s32);
+extern void Camera_ComputeEyeFromAngles(u8 *, u8 *, f32, s16, s32);
 extern void func_84111348(s32 arg0, s32 arg1);
 extern void func_8411FEE8(s32);
 extern u8 * D_841911E0;
@@ -4394,7 +4394,7 @@ void func_8411D388(u8 *arg0) {
 
     switch (*(s8 *)(arg0 + 0x7F6)) {
     case 0:
-        func_800371B4(D_841904DC, (u8 *)position, *(f32 *)(D_841911E0 + 0x40), *(s16 *)(D_841911E0 + 0x3C), *(s16 *)(D_841911E0 + 0x3E));
+        Camera_ComputeEyeFromAngles(D_841904DC, (u8 *)position, *(f32 *)(D_841911E0 + 0x40), *(s16 *)(D_841911E0 + 0x3C), *(s16 *)(D_841911E0 + 0x3E));
         func_80037120((s32)D_841904D0, (s32)position, (s32 *)&distance, &angleY, &angleX);
         if ((distance <= 1.75f) && (*(s16 *)(arg0 + 0x7E8) >= 6)) {
             *(s16 *)(arg0 + 0x7E8) = 0;
