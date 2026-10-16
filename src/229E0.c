@@ -6573,7 +6573,40 @@ extern s32 D_80126410; void ModelAnim_ResetEventContext(void) { D_80126410 = -1;
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003ED18.s")
+extern u8 D_801263F0[];
+typedef struct {
+    u8 active;
+    u8 unknown01;
+    s16 frame;
+    S1_unk_D_86002F58_004_000_054_004 *data;
+    EventIndex *indices;
+    u8 *values;
+} SceneEventContext;
+void ModelAnim_BeginEventContext(S1_unk_D_86002F58_004_000_054 *state, u16 renderFrame, s32 advance) {
+    S1_unk_D_86002F58_004_000_054_004 *data;
+    SceneEventContext *context;
+    data = state->unk_04;
+    D_80126410++;
+    if (D_80126410 < 2) {
+        context = &((SceneEventContext *)D_801263F0)[D_80126410];
+        if (state->unk_04 != NULL) {
+            if (advance != 0 && (*(u16 *)((u8 *)state + 2) & 1) == 0) {
+                state->unk_08 = ModelAnim_AdvanceEventFrame(state, renderFrame);
+            }
+            state->unk_0A = renderFrame;
+            context->active = 1;
+            context->frame = state->unk_08;
+            context->data = data;
+            context->indices = func_80003240(data->unk_0C);
+            context->values = func_80003240(data->unk_10);
+            if (context->frame < 0) {
+                context->frame = 0;
+            }
+        } else {
+            context->active = 0;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -6714,11 +6747,74 @@ void func_8003F1DC(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003F210.s")
+typedef struct {
+    u32 unknown00;
+    u8 transformCount;
+    u8 eventCount;
+    u8 unknown06[6];
+    void **transformTracks;
+    void **eventTracks;
+} SceneAnimationBank;
+typedef SceneAnimationBank *(*SceneAnimationBankGetter)(s32, s32);
+typedef struct {
+    S1_GraphNode node;
+    u8 unknown18[0x14];
+    SceneAnimationBankGetter getAnimationBank;
+} SceneAnimationAsset;
+s32 ModelAnim_SetAnimation(S1_unk_D_86002F58_004_000 *object, s32 animation) {
+    s32 result = 0;
+    SceneAnimationBank *bank;
+    if (object->unk_000.unk_0C != NULL) {
+        if (((SceneAnimationAsset *)object->unk_000.unk_0C)->getAnimationBank != NULL) {
+            bank = ((SceneAnimationAsset *)object->unk_000.unk_0C)->getAnimationBank(0, 0);
+            if (bank != NULL) {
+                if (animation == -1) {
+                    ModelAnim_ClearTransformChannel((u8 *)object);
+                } else if (animation < bank->transformCount) {
+                    ModelAnim_BindTransformCurve(object, (s16)animation, bank->transformTracks[animation], 0x10000);
+                    result = 1;
+                }
+            }
+        }
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003F2C4.s")
+extern s32 func_80042ADC(u8 *);
+extern s32 func_800422B4(u8 *, s32, u16, u16);
+extern void func_80042968(s32);
+typedef struct {
+    u16 first;
+    u16 second;
+} SceneAnimationTransfer;
+
+typedef struct { u8 unknown00[0x40]; void *loadedCurve; } SceneAnimationResource;
+s32 ModelAnim_SetResourceAnimation(SceneAnimationResource *resource, u8 *object, s32 animation) {
+    s32 result = 0;
+    SceneAnimationAsset *asset;
+    SceneAnimationBank *bank;
+    S1_unk_D_86002F58_004_000_040 *channel;
+    asset = (SceneAnimationAsset *)((S1_unk_D_86002F58_004_000 *)object)->unk_000.unk_0C;
+    bank = asset->getAnimationBank(0, 0);
+    channel = &((S1_unk_D_86002F58_004_000 *)object)->unk_040;
+    if (animation == -1) {
+        ModelAnim_ClearTransformChannel((u8 *)object);
+    } else if (animation < bank->transformCount) {
+        if (channel->unk_04 != resource->loadedCurve || animation != channel->unk_00) {
+            s32 format;
+            format = func_80042ADC((u8 *)bank);
+            if (format >= 0) {
+                func_800422B4((u8 *)resource, format, *(u16 *)bank, ((SceneAnimationTransfer *)bank->transformTracks)[animation].second);
+                func_80042968((s32)resource);
+            }
+        }
+        ModelAnim_BindTransformCurve(object, (s16)animation, resource->loadedCurve, 0x10000);
+        result = 1;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
@@ -6802,7 +6898,27 @@ void func_8003F864(u8 *arg0) { arg0[4] = (u8)(arg0[4] & ~0x10); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003F874.s")
+extern s32 func_800421E0(u8 *, s32, s32);
+extern void PokeIcon_WaitBackgroundLoad(s32);
+typedef struct {
+    u8 *context;
+    u8 flags;
+    u8 unknown05[3];
+    s32 source;
+    s32 background;
+} SceneBackgroundRequest;
+void PokeIcon_RequestBackgroundForObject(SceneBackgroundRequest *request) {
+    if (!(request->flags & 0x40) && (request->flags & 0x80)) {
+        func_800421E0(request->context, request->source, request->background);
+        request->flags |= 0x40;
+        request->flags &= ~0x10;
+        if (request->flags & 0x20) {
+            PokeIcon_WaitBackgroundLoad((s32)request->context);
+            request->background = *(s32 *)(request->context + 0x3C);
+            request->flags &= ~0xE0;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US

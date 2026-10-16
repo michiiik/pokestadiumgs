@@ -52,7 +52,7 @@ extern u8 D_869195E0;
 extern u8 *D_8691AD58;
 extern s32 D_8690E11C;
 extern s32 func_87F08208(void *);
-extern void func_8003F210(void *, s32);
+extern void ModelAnim_SetAnimation(void *, s32);
 extern void ModelAnim_SetFrame(u8 *, s16);
 extern void StageContext_SetClearColor(s32);
 extern void StageFade_StartFromTransparent(s32);
@@ -70,7 +70,7 @@ void func_869003C8(void) {
     case 1:
         var_s0 = &D_86919040;
         do {
-            func_8003F210(var_s0, 2);
+            ModelAnim_SetAnimation(var_s0, 2);
             ModelAnim_SetFrame(var_s0, 0xB);
             var_s0 += 0x168;
         } while (var_s0 != &D_869195E0);

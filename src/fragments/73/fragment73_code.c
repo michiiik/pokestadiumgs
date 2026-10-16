@@ -65,7 +65,7 @@ extern void* D_8F5009B4;
 extern s16 D_8F5009B0;
 extern s32 D_8F5009BC;
 extern s32 ModelAnim_IsFinished(void*);
-extern void func_8003F2C4(void*, void*, s32);
+extern void ModelAnim_SetResourceAnimation(void*, void*, s32);
 extern s32 func_80043678(void*);
 extern void BgStage_DrawFrame(void);
 extern void func_800468A0(s32);
@@ -90,8 +90,8 @@ void func_8F500414(void) {
                 *animation = 0;
             }
         }
-        func_8003F2C4(D_8F5009B4, node, -1);
-        func_8003F2C4(D_8F5009B4, node, *animation);
+        ModelAnim_SetResourceAnimation(D_8F5009B4, node, -1);
+        ModelAnim_SetResourceAnimation(D_8F5009B4, node, *animation);
     }
     D_8F5009BC = func_80043678(D_8F5009B8);
     BgStage_DrawFrame();

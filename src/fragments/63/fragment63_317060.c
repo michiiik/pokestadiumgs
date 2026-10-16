@@ -152,7 +152,7 @@ void func_87E14458(void) {
 
 extern s32 ModelAnim_IsFinished(void *);
 extern void ModelAnim_SetFrame(void *, s32);
-extern void func_8003F2C4(s32, void *, s32);
+extern void ModelAnim_SetResourceAnimation(s32, void *, s32);
 extern void func_8003F3BC(void *, s32);
 extern void * D_87F119DC;
 void func_87E14898(void *arg0) {
@@ -164,12 +164,12 @@ void func_87E14898(void *arg0) {
             entry = *(u8 **)((u8 *)arg0 + 0xC);
             anim = *(s32 *)(entry + 4);
             if (anim == *(s16 *)((u8 *)D_87F119DC + 0x64)) {
-                func_8003F2C4(*(s32 *)arg0, (u8 *)D_87F119DC + 0x24, *(s32 *)(entry + 0x10));
+                ModelAnim_SetResourceAnimation(*(s32 *)arg0, (u8 *)D_87F119DC + 0x24, *(s32 *)(entry + 0x10));
                 func_8003F3BC((u8 *)D_87F119DC + 0x24, -1);
                 func_8003F3BC((u8 *)D_87F119DC + 0x24, *(s32 *)(*(u8 **)((u8 *)arg0 + 0xC) + 0x14));
                 return;
             }
-            func_8003F2C4(*(s32 *)arg0, (u8 *)D_87F119DC + 0x24, anim);
+            ModelAnim_SetResourceAnimation(*(s32 *)arg0, (u8 *)D_87F119DC + 0x24, anim);
             return;
         }
         ModelAnim_SetFrame((u8 *)D_87F119DC + 0x24, 0);
@@ -213,7 +213,7 @@ extern s32 ModelAnim_IsFinished(void *);
 extern void ModelAnim_SetFrame(void *, s32);
 extern void * D_87F119DC;
 void func_87E14BA8(void) {
-    extern void func_8003F210(void *, s32);
+    extern void ModelAnim_SetAnimation(void *, s32);
     s32 state;
     u8 *ctx;
     void *ptr;
@@ -236,8 +236,8 @@ void func_87E14BA8(void) {
     case 3:
         ModelAnim_SetSpeed(((u8 *) D_87F119DC) + 0x24, 0x10000);
         if (ModelAnim_IsFinished(((u8 *) D_87F119DC) + 0x24)) {
-            func_8003F210(((u8 *) D_87F119DC) + 0x24, -1);
-            func_8003F210(((u8 *) D_87F119DC) + 0x24, 0);
+            ModelAnim_SetAnimation(((u8 *) D_87F119DC) + 0x24, -1);
+            ModelAnim_SetAnimation(((u8 *) D_87F119DC) + 0x24, 0);
             ModelAnim_SetSpeed(((u8 *) D_87F119DC) + 0x24, 0);
             *((u32 *) (((u8 *) D_87F119DC) + 0xC)) |= 0x10000000;
         }
@@ -281,7 +281,7 @@ void func_87E1532C(u8 *arg0) {}
 
 extern void func_87E14D24(void);
 extern void func_87E14BA8(void);
-extern void func_8003F210(void *, s32);
+extern void ModelAnim_SetAnimation(void *, s32);
 extern f32 D_87E1B8C0;
 extern f32 D_87E1B8C4;
 typedef struct { u8 pad0[0x24]; u8 anim[0x1D]; u8 alpha; u8 pad42[0xA]; f32 height; u8 pad50[4]; f32 scale[3]; u8 pad60[0x64]; s32 opacity; } F15334StackChild;
@@ -291,7 +291,7 @@ void func_87E15334(u8 *arg0)
     F15334StackChild *child;
     u8 *pool[2];
     f32 scale;
-     do {         pool[0] = arg0 + 0x2C;         child = func_87F025B8(pool[0], func_87E14D24);         if (child != 0) {             func_8003F1DC(child->anim);             func_8003F114(child->anim, 0, -1, *(s32 *)(arg0 + 0x60));             scale = D_87E1B8C0;             child->scale[0] = scale;             child->scale[1] = scale;             child->scale[2] = scale;             child->opacity = 0xFF;             *(F15334StackChild **)(arg0 + 0x40) = child;         }         child = func_87F025B8(pool[0], func_87E14BA8);         if (child != 0) {             func_8003F1DC(child->anim);             func_8003F114(child->anim, 0, -1, *(s32 *)(arg0 + 0x5C));             func_8003F210(child->anim, 0);             scale = D_87E1B8C4;             child->scale[2] = scale;             child->scale[1] = scale;             child->scale[0] = scale;             child->height = 5.0f;             child->alpha = 0xC8;         }     } while (0);
+     do {         pool[0] = arg0 + 0x2C;         child = func_87F025B8(pool[0], func_87E14D24);         if (child != 0) {             func_8003F1DC(child->anim);             func_8003F114(child->anim, 0, -1, *(s32 *)(arg0 + 0x60));             scale = D_87E1B8C0;             child->scale[0] = scale;             child->scale[1] = scale;             child->scale[2] = scale;             child->opacity = 0xFF;             *(F15334StackChild **)(arg0 + 0x40) = child;         }         child = func_87F025B8(pool[0], func_87E14BA8);         if (child != 0) {             func_8003F1DC(child->anim);             func_8003F114(child->anim, 0, -1, *(s32 *)(arg0 + 0x5C));             ModelAnim_SetAnimation(child->anim, 0);             scale = D_87E1B8C4;             child->scale[2] = scale;             child->scale[1] = scale;             child->scale[0] = scale;             child->height = 5.0f;             child->alpha = 0xC8;         }     } while (0);
 }
 
 extern void *func_87F025B8(void *, void *);

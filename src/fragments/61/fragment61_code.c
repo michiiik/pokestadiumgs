@@ -234,7 +234,7 @@ extern void func_86B05194(void);
 extern u8 *func_87F025B8(u8 *, void (*)(void));
 extern void func_8003F1DC(u8 *);
 extern void func_8003F114(u8 *, s32, s32, s32);
-extern void func_8003F210(u8 *, s32);
+extern void ModelAnim_SetAnimation(u8 *, s32);
 extern u8 D_86B12AD0;
 extern f32 D_80087E50[];
 extern f32 D_80088E50[];
@@ -266,7 +266,7 @@ void func_86B052BC(s32 arg0) {
         switch (arg0) {
         case 0:
             func_8003F114(base, 0, -1, D_86B0E19C);
-            func_8003F210(base, 0);
+            ModelAnim_SetAnimation(base, 0);
             break;
         case 1:
             index = ((guRandom() % 65535) & 0xFFFF) >> 4;
@@ -275,7 +275,7 @@ void func_86B052BC(s32 arg0) {
             *(f32 *)(object + 0x4C) = D_80087E50[index] * factor;
             *(f32 *)(object + 0x50) = 0.0f;
             func_8003F114(base, 0, -1, D_86B0E1A0);
-            func_8003F210(base, 0);
+            ModelAnim_SetAnimation(base, 0);
             break;
         }
     }
@@ -304,7 +304,7 @@ void func_86B05428(void) {
 extern u8 *func_87F025B8(u8 *, void (*)(void));
 extern void func_8003F1DC(u8 *);
 extern void func_8003F114(u8 *, s32, s32, s32);
-extern void func_8003F210(u8 *, s32);
+extern void ModelAnim_SetAnimation(u8 *, s32);
 extern f32 D_86B0D178;
 extern f64 D_86B0DDE8;
 extern s32 D_86B0E1A4;
@@ -329,7 +329,7 @@ void func_86B05484(f32 arg0, f32 arg1, f32 arg2, s32 arg3) {
         *(f32 *)(object + 0x50) = arg2;
         *(s32 *)(object + 0x20) = arg3;
         func_8003F114(base, 0, -1, D_86B0E1A4);
-        func_8003F210(base, 0);
+        ModelAnim_SetAnimation(base, 0);
     }
 }
 #endif

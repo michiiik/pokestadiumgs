@@ -258,3 +258,7 @@ func_8003CD84 = GeoRender_ApplyMaterialState;
 func_8003D270 = GeoRender_BindTexture;
 func_8003D70C = GeoRender_SelectMaterialSlot;
 func_8003DB38 = GeoRender_InitMaterialState;
+func_8003ED18 = ModelAnim_BeginEventContext;
+func_8003F210 = ModelAnim_SetAnimation;
+func_8003F2C4 = ModelAnim_SetResourceAnimation;
+func_8003F874 = PokeIcon_RequestBackgroundForObject;
