@@ -664,7 +664,7 @@ void func_80026068(u32 arg0) {
 #endif
 
 #ifdef VERSION_US
-extern void func_80034F30(void); void func_80026098(void) { func_80034F30(); }
+extern u8 GbAudio_GetActiveChannelMask(void); void func_80026098(void) { GbAudio_GetActiveChannelMask(); }
 #pragma C_FUNCTION_PADDING(8)
 #endif
 
@@ -796,7 +796,23 @@ s32 func_8002738C(u8 channel) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800273B4.s")
+typedef struct { s32 w0; s32 w4; s32 w8; } Candidate27F7CRecord;
+extern Candidate27F7CRecord D_80090BB8[];
+extern Candidate27F7CRecord D_80090C78;
+typedef struct { AudioChannelMask channels; u8 count; } AudioChannelGroup;
+u8 Audio_FindLowestPriorityChannel(AudioChannelGroup *state, u8 channel) {
+    u8 best = channel;
+    u8 i;
+    for (i = 1; i < state->count; i++) {
+        Candidate27F7CRecord *bestRecord = &D_80090BB8[best];
+        s32 next = Audio_FindEnabledChannel(&state->channels, channel, 1);
+        channel = next;
+        if (((u8 *)&D_80090BB8[next])[9] < ((u8 *)bestRecord)[9]) {
+            best = next;
+        }
+    }
+    return best;
+}
 #endif
 
 #ifdef VERSION_US
@@ -934,9 +950,6 @@ void func_80027F4C(void) {
 #endif
 
 #ifdef VERSION_US
-typedef struct { s32 w0; s32 w4; s32 w8; } Candidate27F7CRecord;
-extern Candidate27F7CRecord D_80090BB8[];
-extern Candidate27F7CRecord D_80090C78;
 void func_80027F7C(void) { u8 i; u8 j; for (i = 0; i < 15; i++) { D_80090C84[i] = D_80090CFC; } for (j = 0; j < 16; j++) { D_80090BB8[j] = D_80090C78; } }
 #endif
 
@@ -1972,7 +1985,20 @@ void func_80033C58(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80033E34.s")
+extern void func_800348C4(u8, u8);
+extern u8 func_800347E8(u8 arg0);
+void GbAudio_ReadChannelParameters(u8 channel, u8 value) {
+    u8 high;
+    u8 *record = &D_800D2B78 + channel * 0x3C;
+    record[0x14] |= 0x10;
+    func_800348C4(channel, value);
+    record[0x17] = func_800347E8(channel);
+    *(u16 *)(record + 0x18) = func_800347E8(channel);
+    if (((u32)channel & 3) != 3) {
+        high = func_800347E8(channel);
+        *(u16 *)(record + 0x18) = *(u16 *)(record + 0x18) + (high << 8);
+    }
+}
 #endif
 
 void func_80033ED0(void) {
@@ -2392,7 +2418,25 @@ void func_80034C50(s32 arg0) { }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80034C58.s")
+extern u8 D_800D2B4E;
+extern u8 func_80034CF8(const u8 *arg0);
+u8 GbAudio_StartSequenceChannel(const u8 *command) {
+    u8 value;
+    u8 channel;
+    u8 *record;
+    value = func_80034CF8(command);
+    channel = value & 7;
+    record = &D_800D2B78 + channel * 0x3C;
+    record[3] &= ~1;
+    func_80032E40(channel);
+    record = &D_800D2B78 + channel * 0x3C;
+    *(u16 *)(record + 0x22) = 0x100;
+    record[0x36] = 1;
+    *(u32 *)(record + 8) = *(const u32 *)(command + 4);
+    *(u16 *)record = D_800D2B4C;
+    record[2] = D_800D2B4E;
+    return channel;
+}
 #endif
 
 #ifdef VERSION_US
@@ -2496,7 +2540,17 @@ void func_80034EF0(s32 arg0)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80034F30.s")
+u8 GbAudio_GetActiveChannelMask(void) {
+    u8 mask = 0;
+    s32 channel;
+    for (channel = 0; channel < 8; channel++) {
+        if ((&D_800D2B78 + channel * 0x3C)[3] & 1) {
+            mask |= 1 << channel;
+        }
+    }
+    return mask;
+}
+#pragma C_FUNCTION_PADDING(12)
 #endif
 
 #ifdef VERSION_US
