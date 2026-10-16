@@ -395,7 +395,51 @@ void func_8820CE2C(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820CF8C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_17F280/func_8820E450.s")
+s32 func_8820E450(u8 arg0, u8 arg1) {
+    u32 index = arg0;
+    F31SelectionState *state;
+    s32 result = 0;
+
+    switch (D_882346F0) {
+    default:
+        goto done;
+    case 0:
+        if (D_88234718 != 1) {
+            goto done;
+        }
+        state = D_88234710;
+        if (arg0 != state->slot) {
+            goto done;
+        }
+        if (arg1 == state->records[index].position - state->records[index].start) {
+            result = 1;
+            goto done;
+        }
+        goto done;
+    case 1:
+    case 3:
+        state = D_88234710;
+        if (arg0 == state->slot) {
+            goto done;
+        }
+        if (arg1 == state->records[index].position - state->records[index].start) {
+            result = 1;
+            goto done;
+        }
+        goto done;
+    case 2:
+        state = D_88234710;
+        if (arg0 != state->slot) {
+            goto done;
+        }
+        if ((s16)arg1 == *(s16 *)((u8 *)state + 0xB8) - state->records[index].start) {
+            result = 1;
+        }
+        goto done;
+    }
+done:
+    return result;
+}
 
 s32 func_8820E580(void) {
     u32 otherType;
