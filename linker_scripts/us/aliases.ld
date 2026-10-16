@@ -283,3 +283,6 @@ func_800273B4 = Audio_FindLowestPriorityChannel;
 func_80033E34 = GbAudio_ReadChannelParameters;
 func_80034C58 = GbAudio_StartSequenceChannel;
 func_80034F30 = GbAudio_GetActiveChannelMask;
+func_800319D0 = GbAudio_QueueRegisterWrite;
+func_80033890 = GbAudio_UpdateNoiseRegisters;
+func_80034D00 = GbAudio_QueueChannelReset;

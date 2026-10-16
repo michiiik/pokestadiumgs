@@ -1458,12 +1458,26 @@ s32 func_800318C8(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800319D0.s")
+typedef struct { u8 *ptr; u8 value; u8 pad; u16 limit; } Func31Entry;
+extern Func31Entry D_800D27C0[];
+typedef struct { u8 pad0[0xC]; u8 unkC; u8 unkD; u8 unkE; u8 unkF; u8 unk10; u8 unk11; u8 unk12; u8 unk13; u8 pad14[0x18]; u8 unk2C; } AudioConfig;
+extern AudioConfig D_800D2760;
+extern u32 D_800D2AE4;
+extern u8 D_800D2AD8[];
+void GbAudio_QueueRegisterWrite(u16 address, u8 value, u16 delay) {
+    u8 index = address;
+    D_800D27C0[D_800D2AE4].ptr = (u8 *)&D_800D2760 + index * 2 - 0x20;
+    D_800D27C0[D_800D2AE4].value = value;
+    D_800D27C0[D_800D2AE4].limit = delay + 1;
+    D_800D2AD8[index] = value;
+    D_800D2AE4++;
+    D_800D2AE4 %= 100;
+    D_800D27C0[D_800D2AE4].limit = 0;
+}
 #endif
 
 #ifdef VERSION_US
-extern u8 D_800D2AD8[];
-u8 GbAudio_GetRegisterValue(char arg0)
+u8 GbAudio_GetRegisterValue(u16 arg0)
 {
   return D_800D2AD8[arg0 & 0xFF];
 }
@@ -1478,8 +1492,6 @@ u8 GbAudio_GetRegisterValue(char arg0)
 #endif
 
 #ifdef VERSION_US
-typedef struct { u8 *ptr; u8 value; u8 pad; u16 limit; } Func31Entry;
-extern Func31Entry D_800D27C0[];
 extern s32 D_800D2AE0;
 void func_80031E6C(u16 arg0) {
     while (D_800D27C0[D_800D2AE0].limit >= arg0) {
@@ -1498,10 +1510,8 @@ void func_80031E6C(u16 arg0) {
 #ifdef VERSION_US
 extern s32 D_80032600_probe_hint_3;
 typedef struct { u32 unk0; s16 unk4; s16 unk6; u32 unk8; u32 unkC; u16 unk10; u16 unk12; u8 unk14; u8 unk15; u8 unk16; u8 unk17; u32 unk18; u32 unk1C; u32 unk20; u8 unk24; } AudioState;
-typedef struct { u8 pad0[0xC]; u8 unkC; u8 unkD; u8 unkE; u8 unkF; u8 unk10; u8 unk11; u8 unk12; u8 unk13; u8 pad14[0x18]; u8 unk2C; } AudioConfig;
 extern AudioState D_800D26E8;
 extern s32 D_800D275C;
-extern AudioConfig D_800D2760;
 extern u8 D_800D276D_load; extern u8 D_800D276D_store;
 extern u8 D_800D276E;
 extern u8 D_800D276F_load; extern u8 D_800D276F_store;
@@ -1857,7 +1867,7 @@ void GbAudio_UpdateChannelIfEnabled(u8 channel) {
 #ifdef VERSION_US
 extern void func_80033670(s32);
 extern void func_80033864(s32);
-extern void func_80033890(s32);
+extern void GbAudio_UpdateNoiseRegisters(u8);
 void func_8003364C(s32 arg0) { s32 *p = &arg0; func_80033670(arg0 & 0xFF); }
 #endif
 
@@ -1870,17 +1880,17 @@ void func_800337D8(s32 arg0) { s32 *p = &arg0; func_80033864(arg0 & 0xFF); }
 #endif
 
 #ifdef VERSION_US
-extern void func_800319D0(s32, s32, s32);
+extern void GbAudio_QueueRegisterWrite(u16, u8, u16);
 extern u8 D_800D2B43;
 void func_800337FC(void) {
     s32 var_s0;
 
     var_s0 = 0x20;
     do {
-        func_800319D0(var_s0 & 0xFFFF, 0, 0);
+        GbAudio_QueueRegisterWrite(var_s0, 0, 0);
         var_s0 += 1;
     } while (var_s0 != 0x30);
-    func_800319D0(0xFF1C, ((D_800D2B43 & 0xF0) * 2) & 0xFF, 0);
+    GbAudio_QueueRegisterWrite(0xFF1C, ((D_800D2B43 & 0xF0) * 2) & 0xFF, 0);
 }
 #endif
 
@@ -1889,11 +1899,27 @@ void func_80033864(s32 arg0) {}
 #endif
 
 #ifdef VERSION_US
-void func_8003386C(s32 arg0) { s32 *p = &arg0; func_80033890(arg0 & 0xFF); }
+void func_8003386C(s32 arg0) { s32 *p = &arg0; GbAudio_UpdateNoiseRegisters(arg0 & 0xFF); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80033890.s")
+extern u8 D_800D2B8C;
+extern void GbAudio_QueueChannelReset(u16);
+void GbAudio_UpdateNoiseRegisters(u8 channel) {
+    s32 flags = (&D_800D2B8C)[channel * 0x3C];
+    if (flags & 0x20) {
+        s32 value;
+        value = GbAudio_GetRegisterValue(0xFF26);
+        value &= 0x87;
+        GbAudio_QueueRegisterWrite(0xFF26, value, 0);
+        GbAudio_QueueChannelReset(0xFF1F);
+    } else if (flags & 0x10) {
+        GbAudio_QueueRegisterWrite(0xFF20, 0x3F, 0);
+        GbAudio_QueueRegisterWrite(0xFF21, D_800D2B43, 0);
+        GbAudio_QueueRegisterWrite(0xFF22, D_800D2B44 & 0xFF, 0);
+        GbAudio_QueueRegisterWrite(0xFF23, 0x80, 0);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -2444,7 +2470,13 @@ u8 func_80034CF8(const u8 *arg0) { return arg0[0]; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80034D00.s")
+void GbAudio_QueueChannelReset(u16 address) {
+    GbAudio_QueueRegisterWrite(address++, 0, 0);
+    GbAudio_QueueRegisterWrite(address++, 0, 0);
+    GbAudio_QueueRegisterWrite(address++, 8, 0);
+    GbAudio_QueueRegisterWrite(address++, 0, 0);
+    GbAudio_QueueRegisterWrite(address, 128, 0);
+}
 #endif
 
 #ifdef VERSION_US
