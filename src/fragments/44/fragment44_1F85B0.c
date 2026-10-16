@@ -55,7 +55,13 @@ void func_8AF0A888(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F85B0/func_8AF0B544.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F85B0/func_8AF0B724.s")
+extern Gfx *D_800D0510;
+
+void func_8AF0B724(s32 arg0, s32 arg1) {
+    gSPTextureRectangle(D_800D0510++, arg0 << 2, arg1 << 2,
+                        (arg0 + 20) << 2, (arg1 + 20) << 2,
+                        G_TX_RENDERTILE, 0, 0, 1024, 1024);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F85B0/func_8AF0B7BC.s")
 
