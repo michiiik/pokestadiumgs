@@ -10,6 +10,9 @@ from io import StringIO
 
 MAX_FN_SIZE = 100
 SLOW_CHECKS = False
+# Keep the compiler/assembler's placement phase through 256-byte boundaries
+# when a single-word marker needs a larger, removable C placeholder.
+SHORT_PADDING_RESERVE = 256
 
 EI_NIDENT     = 16
 EI_CLASS      = 4
@@ -499,7 +502,7 @@ class GlobalState:
         address = (8 * self.valuectr) & 0x7FFF
         return 'v{} := p{}({}); v{}^ := {};'.format(tp, tp, address, tp, val)
 
-Function = namedtuple('Function', ['text_glabels', 'asm_conts', 'late_rodata_dummy_bytes', 'jtbl_rodata_size', 'late_rodata_asm_conts', 'fn_desc', 'data'])
+Function = namedtuple('Function', ['text_glabels', 'asm_conts', 'late_rodata_dummy_bytes', 'jtbl_rodata_size', 'late_rodata_asm_conts', 'fn_desc', 'data', 'padding_size'], defaults=[None])
 
 
 class GlobalAsmBlock:
@@ -979,9 +982,14 @@ def parse_source(f, opts, out_dependencies, print_source=None):
             block = GlobalAsmBlock("C_FUNCTION_PADDING at line " + str(line_no))
             block.allow_short_text = True
             block.process_line('glabel ' + state.make_name('padding'), output_enc)
-            for _ in range(padding // 4):
+            placeholder_size = padding + (SHORT_PADDING_RESERVE if padding == 4 else 0)
+            for _ in range(placeholder_size // 4):
                 block.process_line('nop', output_enc)
             src, fn = block.finish(state)
+            payload_sizes = dict(fn.data)
+            payload_sizes['.text'] = (fn.data['.text'][0], padding)
+            fn = fn._replace(padding_size=padding, data=payload_sizes,
+                             asm_conts=fn.asm_conts[:1 + padding // 4])
             output_lines[-1] = '\n'.join(src)
             asm_functions.append(fn)
         elif (
@@ -1074,11 +1082,90 @@ def parse_source(f, opts, out_dependencies, print_source=None):
 
     return asm_functions
 
+def normalize_padding_placeholders(object_bytes, functions):
+    """Make an explicit four-byte padding marker occupy exactly four bytes.
+
+    IDO's smallest ordinary C function is an eight-byte jr/nop. Shrinking that
+    by four would change the placement phase seen by the assembler: a later
+    infinite-loop function can gain alignment nops before this pass even runs.
+    Reserve 256 extra bytes instead, preserving all alignment phases through
+    that boundary, then remove only the verified synthetic placeholder body.
+    Other GLOBAL_ASM blocks keep their ordinary exact-size dummy functions.
+    Reuse the project's ELF splicer to repair symbols, relocation sites,
+    section-relative addends and trailing section alignment before the usual
+    assembly insertion. Do not reassemble or rewrite any functional C body.
+    """
+    short = [fn for fn in functions if fn.padding_size == 4]
+    if not short:
+        return object_bytes
+    # These project extensions live alongside this vendored tool. Ordinary
+    # asm-processor use without short padding does not acquire a dependency.
+    tools_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+    if tools_dir not in sys.path:
+        sys.path.insert(0, tools_dir)
+    import coalesce_splice
+    import elf32
+
+    for function in short:
+        temp_name, requested = function.data['.text']
+        if requested != 4 or not temp_name or not is_temp_name(temp_name):
+            raise Failure('invalid four-byte padding placeholder metadata')
+        obj = elf32.parse(object_bytes)
+        text_index = obj.section_index('.text')
+        matches = [s for s in obj.symbols() if s.name == temp_name and s.shndx != SHN_UNDEF]
+        if not matches:
+            # The marker may be inside a C #if that the compiler discarded,
+            # just like any other GLOBAL_ASM block handled below.
+            continue
+        if len(matches) != 1 or matches[0].shndx != text_index or matches[0].info & 15 != STT_FUNC:
+            raise Failure('ambiguous four-byte padding placeholder: ' + temp_name)
+        sym = matches[0]
+        lo, hi = sym.value, sym.value + sym.size
+        expected_size = SHORT_PADDING_RESERVE + 4
+        # The standard O2 generator emits one volatile zero store per word,
+        # except for jr ra; its final store occupies the return delay slot.
+        expected = bytes.fromhex('ac000000') * (expected_size // 4 - 2) + bytes.fromhex('03e00008ac000000')
+        if sym.size != expected_size or obj.section('.text').data[lo:hi] != expected:
+            raise Failure('four-byte padding requires the verified alignment-preserving IDO placeholder: ' + temp_name)
+        for section in obj.sections:
+            if section.type == SHT_REL and section.info == text_index:
+                if any(lo <= rel.offset < hi for rel in obj.relocations(section.name)):
+                    raise Failure('four-byte padding placeholder has relocations: ' + temp_name)
+
+        # Downstream static-symbol conversion reads code addresses from
+        # ECOFF SYMR entries, rather than the ELF symbol table. Move those
+        # addresses too. Compiler line/end records still describe dummy C,
+        # as they already do for ordinary GLOBAL_ASM substitutions.
+        debug = obj.section('.mdebug')
+        if debug is not None:
+            if len(debug.data) < 0x60:
+                raise Failure('truncated .mdebug header in four-byte padding unit')
+            count, absolute = struct.unpack_from('>II', debug.data, 8 * 4)
+            start = absolute - debug.file_offset
+            if count and (start < 0x60 or start + count * 12 > len(debug.data)):
+                raise Failure('invalid .mdebug symbol table in four-byte padding unit')
+            data = bytearray(debug.data)
+            for index in range(count):
+                position = start + index * 12
+                _, value, flags = struct.unpack_from('>III', data, position)
+                st, sc = flags >> 26, (flags >> 21) & 31
+                if sc == 1 and st in (MIPS_DEBUG_ST_STATIC, MIPS_DEBUG_ST_PROC, MIPS_DEBUG_ST_STATIC_PROC) and value >= hi:
+                    struct.pack_into('>I', data, position + 4, value + 4 - sym.size)
+            obj.set_section_data('.mdebug', bytes(data))
+        try:
+            object_bytes = coalesce_splice.replace_function_bytes(
+                elf32.build(obj), temp_name, b'\0' * 4, []
+            )
+        except coalesce_splice.SpliceError as error:
+            raise Failure('cannot normalize four-byte padding: ' + str(error))
+    return object_bytes
+
+
 def fixup_objfile(objfile_name, functions, asm_prelude, assembler, output_enc, drop_mdebug_gptab, convert_statics):
     SECTIONS = ['.data', '.text', '.rodata', '.bss']
 
     with open(objfile_name, 'rb') as f:
-        objfile = ElfFile(f.read())
+        objfile = ElfFile(normalize_padding_placeholders(f.read(), functions))
     fmt = objfile.fmt
 
     prev_locs = {

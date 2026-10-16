@@ -56,6 +56,38 @@ For compatibility with common GCC macros, `INCLUDE_ASM("folder", functionname);`
 
 C `#ifdef`s only work outside of `GLOBAL_ASM` calls, but is otherwise able to replace `.ifdef`.
 
+### Verified C-function padding (project extension)
+
+`#pragma C_FUNCTION_PADDING(n)` requests exactly `n` zero bytes after a C
+function, where `n` is a positive multiple of four. Use it only for padding
+observed in the original owner; it is not permission to change executable
+instructions. The normal full-ROM comparison remains the acceptance gate.
+
+For four bytes, IDO's smallest C placeholder occupies eight bytes. Shrinking
+that by four changes the assembler's placement phase and can add alignment
+nops inside a later C function. Instead, the ordinary dummy generator reserves
+260 bytes, preserving placement modulo 256 relative to the requested size.
+Before ordinary assembly insertion, the processor verifies the complete
+synthetic O2 store/return sequence and uses the existing project ELF splicer to
+remove the extra 256 bytes, leaving one zero word. Later symbols, relocation
+sites, section-relative addends, converted static-procedure addresses and trailing section alignment are
+adjusted. No neighboring C function is reassembled. Temporary placeholder
+symbols are removed by the usual postprocessor.
+
+This short-marker path requires this repository's `tools/coalesce_splice.py`
+and `tools/elf32.py`, and fails closed for a nonempty, relocated or unexpected
+placeholder (including unsupported compiler modes). This preserves alignment
+phases through 256 bytes, not an unlimited alignment guarantee: whole-unit
+controls and the normal ROM gate are still required. Units without four-byte
+markers follow the original path unchanged.
+
+Historically, a four-byte marker accidentally occupied eight bytes. Existing
+markers must therefore be audited when adopting this fix: the legacy marker
+after `func_80026938` explicitly requests eight bytes now, preserving its
+verified original layout. Do not silently retain an incorrect requested size
+or shrink a previously accepted owner. Synthetic tests and the optional native
+IDO/linker fixture live in `tools/test_asm_processor_padding.py`.
+
 ### What's up with "late rodata"?
 
 The IDO compiler emits rodata in two passes: first array/string contents, then large literals/switch jump tables.
