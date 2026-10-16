@@ -4766,7 +4766,24 @@ void GraphNode_RemoveChild(GraphNode38FD4 *root, GraphNodeLink *node) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80039018.s")
+typedef struct unk_func_80039018 {
+    u32 unk_00[2];
+    struct unk_func_80039018 *unk_08;
+    struct unk_func_80039018 *unk_0C;
+} unk_func_80039018;
+
+unk_func_80039018 *func_80039018(unk_func_80039018 *arg0, s32 arg1) {
+    unk_func_80039018 *var_v1 = arg0->unk_0C;
+    s32 var_v0;
+
+    if (var_v1 != NULL) {
+        for (var_v0 = 0; var_v0 < arg1; var_v0++) {
+            var_v1 = var_v1->unk_08;
+        }
+    }
+    return var_v1;
+}
+#pragma C_FUNCTION_PADDING(4)
 #endif
 
 #ifdef VERSION_US
