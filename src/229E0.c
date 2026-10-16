@@ -3,7 +3,7 @@
 #ifdef VERSION_US
 extern void func_80021ED8(s32);
 extern u8 D_800D2B58;
-extern void func_800334C0(u8);
+extern void GbAudio_UpdateSquare1Registers(u8);
 /* Stadium 1 transfer helper: allocates a typed block from the supplied pool. */
 extern void *MainPool_AllocAligned(void *, size_t, s32);
 extern Vtx *func_800398F8();
@@ -1855,13 +1855,50 @@ extern u8 D_800D2B41; void func_800331C8(void) { D_800D2B41 = 0; }
 #ifdef VERSION_US
 void GbAudio_UpdateChannelIfEnabled(u8 channel) {
     if (!(D_800D2B58 & 0x80)) {
-        func_800334C0(channel);
+        GbAudio_UpdateSquare1Registers(channel);
     }
 }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800334C0.s")
+extern void GbAudio_QueueRegisterWrite(u16, u8, u16);
+extern u8 GbAudio_GetRegisterValue(u16);
+extern void GbAudio_QueueChannelReset(u16);
+extern s8 D_800D2B42;
+extern u8 D_800D2B43;
+extern u16 D_800D2B44;
+extern s8 D_800D2B4B;
+extern u8 D_800D2B78;
+void GbAudio_UpdateSquare1Registers(u8 channel) {
+    if ((&D_800D2B78 + channel * 0x3C)[0x14] & 8) {
+        GbAudio_QueueRegisterWrite(0xFF10, (u8)D_800D2B4B, 0);
+    }
+    if ((&D_800D2B78 + channel * 0x3C)[0x14] & 0x20) {
+        u8 value;
+        value = GbAudio_GetRegisterValue(0xFF26);
+        value &= 0x8E;
+        GbAudio_QueueRegisterWrite(0xFF26, value, 0);
+        GbAudio_QueueChannelReset(0xFF10);
+    } else if ((&D_800D2B78 + channel * 0x3C)[0x14] & 0x10) {
+        GbAudio_QueueRegisterWrite(0xFF11, ((u8)D_800D2B42 | 0x3F) & 0xFF, 0);
+        GbAudio_QueueRegisterWrite(0xFF12, D_800D2B43, 0);
+        GbAudio_QueueRegisterWrite(0xFF13, D_800D2B44 & 0xFF, 0);
+        GbAudio_QueueRegisterWrite(0xFF14, ((D_800D2B44 >> 8) | 0x80) & 0xFF, 0);
+    } else {
+        if ((&D_800D2B78 + channel * 0x3C)[0x14] & 2) {
+            u8 lowByte = D_800D2B44 & 0xFF;
+            GbAudio_QueueRegisterWrite(0xFF13, lowByte, 0);
+            GbAudio_QueueRegisterWrite(0xFF14, (D_800D2B44 >> 8) & 0xFF, 0);
+        }
+        if ((&D_800D2B78 + channel * 0x3C)[0x14] & 1) {
+            u8 value;
+            value = GbAudio_GetRegisterValue(0xFF11);
+            value &= 0x3F;
+            value |= (u8)D_800D2B42;
+            GbAudio_QueueRegisterWrite(0xFF11, value & 0xFF, 0);
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
