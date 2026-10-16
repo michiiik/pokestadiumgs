@@ -920,7 +920,20 @@ void func_86104948(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_861049C0.s")
+extern s32 func_861044EC();
+
+void func_861049C0(void) {
+    void **sp1C;
+
+    if (!(*(s32 *)((u8 *)D_87F119DC + 0xC) & 0x02000000)) {
+        sp1C = (void **)((*(u8 (**)[0x2C])&D_8610AD20)[*(s32 *)((u8 *)D_87F119DC + 0x20)] + 0x8DE0);
+        if (func_861044EC(sp1C) != 0) {
+            func_861048FC(sp1C);
+        }
+    }
+}
+
+void func_861049C0_padding(void) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86104A3C.s")
 

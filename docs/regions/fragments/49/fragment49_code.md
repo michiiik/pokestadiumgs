@@ -86,6 +86,10 @@ func_8610916C: matched (call_chain:cursor-rebase:reuse-cursor-after-lookup), 2 i
 
 func_86105508: plateau at 1.0 (raw 0.9727), mismatch immediate_drift; tried families: call_chain; tie-pool yes
 
+## 2026-10-16 guarded record dispatch
+
+func_861049C0: accepted by the normal native candidate runner with link verification and a full-ROM match (MD5 1561c75d11cedf356a8ddb1a4a5f9d5d). Indexing (*(u8 (**)[0x2C])&D_8610AD20) before adding 0x8DE0 reproduces the context/index register order; direct integer sums did not. A void ** local retains the pointer at sp+0x1C across both calls. The empty padding helper reproduces the verified duplicate jr/nop tail. Accepted-only redundant declaration cleanup passed another full-ROM gate. No evidence-backed name was available.
+
 ## 2026-10-16
 
 func_861000B8: matched (stack-buffer:s8-record:padding-tail), native runner accept on the private baseline; IDO frame 0x28, s8[4] buffer at sp+0x24, callee passes (&data, 0x7F, *(f32*)((u8*)arg0+0x48), -364.4109191894531f, D_8610AA84), data[1]=0, then func_800277C4(arg1, arg0->[0x23], &data); duplicate jr/nop tail via empty func_861000B8_padding(). Callers' void (void*, u16) prototype retained (2 call sites in this file). No evidence-backed name.
