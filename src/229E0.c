@@ -4449,25 +4449,70 @@ void GraphNode_RemoveChild(GraphNode38FD4 *root, GraphNodeLink *node) {
 
 #ifdef VERSION_US
 extern Gfx *Gfx_AllocDisplayList(s32);
-extern void func_80036F0C(void *);
+extern void func_80036F0C(void *, S1_MtxF *);
 extern u8 D_80124F68;
-void func_80039070(s32 arg0) { *(s32 *)((u8 *)&D_80124F68 + 0x10A0) = 0; *((u8 *)&D_80124F68 + 0x1080) = 0; MtxF_Identity((f32 *)&D_80124F68); if (arg0 == 0) { *(s32 *)((u8 *)&D_80124F68 + 0x1000) = (s32)Gfx_AllocDisplayList(0x40); } else { *(s32 *)((u8 *)&D_80124F68 + 0x1000) = arg0; } func_80036F0C((void *)*(s32 *)((u8 *)&D_80124F68 + 0x1000)); }
+typedef struct {
+    S1_MtxF matrices[64];
+    Mtx *stack[32];
+    s8 flags[32];
+    s32 top;
+} SceneTransformPool;
+void func_80039070(s32 arg0) { *(s32 *)((u8 *)&D_80124F68 + 0x10A0) = 0; *((u8 *)&D_80124F68 + 0x1080) = 0; MtxF_Identity((f32 *)&D_80124F68); if (arg0 == 0) { *(s32 *)((u8 *)&D_80124F68 + 0x1000) = (s32)Gfx_AllocDisplayList(0x40); } else { *(s32 *)((u8 *)&D_80124F68 + 0x1000) = arg0; } func_80036F0C((void *)*(s32 *)((u8 *)&D_80124F68 + 0x1000), (S1_MtxF *)&D_80124F68); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800390D8.s")
+void GeoRender_CommitMatrix(Mtx *fixed) {
+    ((SceneTransformPool *)&D_80124F68)->flags[((SceneTransformPool *)&D_80124F68)->top] = 0;
+    if (fixed == NULL) {
+        ((SceneTransformPool *)&D_80124F68)->stack[((SceneTransformPool *)&D_80124F68)->top] = (Mtx *)Gfx_AllocDisplayList(0x40);
+    } else {
+        ((SceneTransformPool *)&D_80124F68)->stack[((SceneTransformPool *)&D_80124F68)->top] = fixed;
+    }
+    func_80036F0C(((SceneTransformPool *)&D_80124F68)->stack[((SceneTransformPool *)&D_80124F68)->top], &((SceneTransformPool *)&D_80124F68)->matrices[((SceneTransformPool *)&D_80124F68)->top]);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80039158.s")
+Mtx *GeoRender_SetMatrix(S1_MtxF *matrix, Mtx *fixed) {
+    MtxF_Copy((u32 *)(&((SceneTransformPool *)&D_80124F68)->matrices[((SceneTransformPool *)&D_80124F68)->top]), (u32 *)matrix);
+    ((SceneTransformPool *)&D_80124F68)->flags[((SceneTransformPool *)&D_80124F68)->top] = 0;
+    if (fixed == NULL) {
+        ((SceneTransformPool *)&D_80124F68)->stack[((SceneTransformPool *)&D_80124F68)->top] = (Mtx *)Gfx_AllocDisplayList(0x40);
+    } else {
+        ((SceneTransformPool *)&D_80124F68)->stack[((SceneTransformPool *)&D_80124F68)->top] = fixed;
+    }
+    func_80036F0C(((SceneTransformPool *)&D_80124F68)->stack[((SceneTransformPool *)&D_80124F68)->top], &((SceneTransformPool *)&D_80124F68)->matrices[((SceneTransformPool *)&D_80124F68)->top]);
+    return ((SceneTransformPool *)&D_80124F68)->stack[((SceneTransformPool *)&D_80124F68)->top];
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80039204.s")
+void GeoRender_PushMultipliedMatrix(S1_MtxF *matrix, Mtx *fixed) {
+    ((SceneTransformPool *)&D_80124F68)->top++;
+    MtxF_Multiply(&((SceneTransformPool *)&D_80124F68)->matrices[((SceneTransformPool *)&D_80124F68)->top], matrix, &((SceneTransformPool *)&D_80124F68)->matrices[((SceneTransformPool *)&D_80124F68)->top - 1]);
+    ((SceneTransformPool *)&D_80124F68)->flags[((SceneTransformPool *)&D_80124F68)->top] = 0;
+    if (fixed == NULL) {
+        ((SceneTransformPool *)&D_80124F68)->stack[((SceneTransformPool *)&D_80124F68)->top] = (Mtx *)Gfx_AllocDisplayList(0x40);
+    } else {
+        ((SceneTransformPool *)&D_80124F68)->stack[((SceneTransformPool *)&D_80124F68)->top] = fixed;
+    }
+    func_80036F0C(((SceneTransformPool *)&D_80124F68)->stack[((SceneTransformPool *)&D_80124F68)->top], &((SceneTransformPool *)&D_80124F68)->matrices[((SceneTransformPool *)&D_80124F68)->top]);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800392B8.s")
+Mtx *GeoRender_PushScaledMatrix(S1_Vec3f *scale, Mtx *fixed) {
+    ((SceneTransformPool *)&D_80124F68)->top++;
+    MtxF_ScaleRows(&((SceneTransformPool *)&D_80124F68)->matrices[((SceneTransformPool *)&D_80124F68)->top], &((SceneTransformPool *)&D_80124F68)->matrices[((SceneTransformPool *)&D_80124F68)->top - 1], scale);
+    ((SceneTransformPool *)&D_80124F68)->flags[((SceneTransformPool *)&D_80124F68)->top] = 0;
+    if (fixed == NULL) {
+        ((SceneTransformPool *)&D_80124F68)->stack[((SceneTransformPool *)&D_80124F68)->top] = (Mtx *)Gfx_AllocDisplayList(0x40);
+    } else {
+        ((SceneTransformPool *)&D_80124F68)->stack[((SceneTransformPool *)&D_80124F68)->top] = fixed;
+    }
+    func_80036F0C(((SceneTransformPool *)&D_80124F68)->stack[((SceneTransformPool *)&D_80124F68)->top], &((SceneTransformPool *)&D_80124F68)->matrices[((SceneTransformPool *)&D_80124F68)->top]);
+    return ((SceneTransformPool *)&D_80124F68)->stack[((SceneTransformPool *)&D_80124F68)->top];
+}
 #endif
 
 #ifdef VERSION_US
@@ -4840,7 +4885,7 @@ void func_8003B03C(s32 arg0) {}
 #endif
 
 #ifdef VERSION_US
-extern s32 func_80039204(s32, s32);
+extern void GeoRender_PushMultipliedMatrix(S1_MtxF *, Mtx *);
 void func_8003B5AC(u8 *arg0) {
     struct {
         u8 unused[8];
@@ -4848,7 +4893,7 @@ void func_8003B5AC(u8 *arg0) {
     } scratch;
 
     func_8003614C(scratch.matrix, (s32)(arg0 + 0x18), (s32)(arg0 + 0x24));
-    func_80039204((s32)scratch.matrix, 0);
+    GeoRender_PushMultipliedMatrix((S1_MtxF *)scratch.matrix, NULL);
     Geo_ProcessNodeChildren(arg0);
     *(s32 *)((u8 *)&D_80124F68 + 0x10A0) -= 1;
 }
@@ -4857,16 +4902,16 @@ void func_8003B5AC(u8 *arg0) {
 #ifdef VERSION_US
 extern u8 *D_80094920;
 extern s32 D_8009499C;
-extern s32 func_800392B8(s32, s32);
+extern Mtx *GeoRender_PushScaledMatrix(S1_Vec3f *, Mtx *);
 void func_8003B600(u8 *arg0) {
     s32 status = 0;
     if (D_80094920 != NULL && (*(u16 *)(D_80094920 + 0x28) & 1) != 0) {
         status = 1;
     }
     if (status != 0) {
-        func_800392B8((s32)(arg0 + 0x18), D_8009499C);
+        GeoRender_PushScaledMatrix((S1_Vec3f *)(arg0 + 0x18), (Mtx *)D_8009499C);
     } else {
-        D_8009499C = func_800392B8((s32)(arg0 + 0x18), 0);
+        D_8009499C = (s32)GeoRender_PushScaledMatrix((S1_Vec3f *)(arg0 + 0x18), NULL);
     }
     Geo_ProcessNodeChildren(arg0);
     (*(s32 *)((u8 *)&D_80124F68 + 0x10A0))--;
@@ -4874,12 +4919,12 @@ void func_8003B600(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-s32 func_800392B8(s32, s32);
+Mtx *GeoRender_PushScaledMatrix(S1_Vec3f *, Mtx *);
 extern void func_8003A370(s32);
 extern s32 D_8009499C;
 
 void func_8003B690(s32 arg0) {
-    D_8009499C = func_800392B8(arg0 + 0x18, 0);
+    D_8009499C = (s32)GeoRender_PushScaledMatrix((S1_Vec3f *)(arg0 + 0x18), NULL);
     func_8003A370(arg0);
     (*(s32 *)((u8 *)(&D_80124F68) + (0x10A0))) = (s32) ((*(s32 *)((u8 *)(&D_80124F68) + (0x10A0))) - 1);
 }
@@ -4912,17 +4957,17 @@ void func_8003BC48(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-extern s32 func_80039204(s32, s32);
+extern void GeoRender_PushMultipliedMatrix(S1_MtxF *, Mtx *);
 extern void func_8003D888(s32, s32);
 extern void func_8003DA20(s32, s32);
 extern s32 D_80126008;
 extern void Geo_ProcessNodeChildren(void *);
 extern u8 D_80124F68;
-void func_8003BEF0(void *arg0) { s32 *counter = &D_80126008; func_80039204((u8 *)arg0 + 0x1C, 0); if (*(s32 *)((u8 *)arg0 + 0x18) != 0 || *(s32 *)((u8 *)arg0 + 0x10) != 0) { func_8003D888(*((u8 *)arg0 + 3), ((s32 *)&D_80124F68)[*(s32 *)((u8 *)&D_80124F68 + 0x10A0) + 0x400]); if (*(void **)((u8 *)arg0 + 0x10) != 0) ((void (*)(s32, void *))(*(void **)((u8 *)arg0 + 0x10)))(5, arg0); func_8003DA20(*(s32 *)((u8 *)arg0 + 0x18), (*((u8 *)arg0 + 2) & 4) != 0); } Geo_ProcessNodeChildren(arg0); *counter = *counter - 1; }
+void func_8003BEF0(void *arg0) { s32 *counter = &D_80126008; GeoRender_PushMultipliedMatrix((u8 *)arg0 + 0x1C, 0); if (*(s32 *)((u8 *)arg0 + 0x18) != 0 || *(s32 *)((u8 *)arg0 + 0x10) != 0) { func_8003D888(*((u8 *)arg0 + 3), ((s32 *)&D_80124F68)[*(s32 *)((u8 *)&D_80124F68 + 0x10A0) + 0x400]); if (*(void **)((u8 *)arg0 + 0x10) != 0) ((void (*)(s32, void *))(*(void **)((u8 *)arg0 + 0x10)))(5, arg0); func_8003DA20(*(s32 *)((u8 *)arg0 + 0x18), (*((u8 *)arg0 + 2) & 4) != 0); } Geo_ProcessNodeChildren(arg0); *counter = *counter - 1; }
 #endif
 
 #ifdef VERSION_US
-extern void func_80039158(void *, s32);
+extern Mtx *GeoRender_SetMatrix(S1_MtxF *, Mtx *);
 extern void Geo_ProcessNodeChildren(void *);
 extern void * D_80094908;
 extern u8 D_80124F68;
@@ -4931,7 +4976,7 @@ void func_8003BF9C(void *arg0) {
     u8 (*pool)[0x40] = (u8 (*)[0x40])(void *)&D_80124F68;
     func_80036714(&sp30, (s32)((u8 *)D_80094908 + 0x64), (s32)pool[*(s32 *)((u8 *)&D_80124F68 + 0x10A0)], (s32)((u8 *)arg0 + 0x1C), *(f32 *)((u8 *)arg0 + 0x28));
     (*(s32 *)((u8 *)&D_80124F68 + 0x10A0))++;
-    func_80039158(&sp30, 0);
+    GeoRender_SetMatrix(&sp30, 0);
     if (*(s32 *)((u8 *)arg0 + 0x18) != 0 || *(s32 *)((u8 *)arg0 + 0x10) != 0) {
         func_8003D888(*((u8 *)arg0 + 3), ((s32 *)&D_80124F68)[*(s32 *)((u8 *)&D_80124F68 + 0x10A0) + 0x400]);
         if (*(void **)((u8 *)arg0 + 0x10) != 0) ((void (*)(s32, void *))(*(void **)((u8 *)arg0 + 0x10)))(5, arg0);
@@ -4989,12 +5034,6 @@ typedef struct {
     u8 anchorCount;
     SceneAnchorPosition anchors[12];
 } SceneDisplayObjectAnchors;
-typedef struct {
-    S1_MtxF matrices[64];
-    S1_MtxF *stack[32];
-    s8 flags[32];
-    s32 top;
-} SceneTransformPool;
 void func_8003C2D8(s32 id) {
     S1_MtxF *matrix;
     SceneAnchorPosition *anchor;
