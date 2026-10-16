@@ -117,17 +117,17 @@ void func_8340295C(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/58/fragment58_code/func_83402B10.s")
 
-s32 func_8003C9B8(s32 *, s32, f32 *);
+s32 GeoRender_FindAnchorPosition(s32 *, s32, f32 *);
 extern f32 D_834041D4;
 extern u8 D_83404250;
 extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
 void func_83402C80(void) {
     Vec3f_SetComponentsDuplicate(&D_834041D4, (*(f32 *)((u8 *)(&D_83404250) + (0x24))), (*(f32 *)((u8 *)(&D_83404250) + (0x28))), (*(f32 *)((u8 *)(&D_83404250) + (0x2C))));
-    if (func_8003C9B8(&D_83404250, 0x64, &D_834041D4) == 0) {
-        func_8003C9B8(&D_83404250, 9, &D_834041D4);
+    if (GeoRender_FindAnchorPosition(&D_83404250, 0x64, &D_834041D4) == 0) {
+        GeoRender_FindAnchorPosition(&D_83404250, 9, &D_834041D4);
         return;
     }
-    func_8003C9B8(&D_83404250, 0x64, &D_834041D4);
+    GeoRender_FindAnchorPosition(&D_83404250, 0x64, &D_834041D4);
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/58/fragment58_code/func_83402D00.s")

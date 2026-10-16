@@ -189,7 +189,7 @@ void func_84101A08(f32 *arg0, u8 *arg1, u8 arg2) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_84101D54.s")
 
 extern u8 D_8418C958;
-extern s32 func_8003C9B8(s32, s16, s32);
+extern s32 GeoRender_FindAnchorPosition(s32, s16, s32);
 void func_84102750(s32 arg0, void *arg1) {
     void *temp_v0;
     void *temp_v1;
@@ -199,7 +199,7 @@ void func_84102750(s32 arg0, void *arg1) {
         if (temp_v1 != NULL) {
             temp_v0 = *(void **)((u8 *)temp_v1 + 0x10);
             if ((temp_v0 != NULL) && (*(s16 *)temp_v0 == 0)) {
-                func_8003C9B8(arg0, 1, (s32)(u32)((u8 *)&D_8418C958 + *(s16 *)((u8 *)temp_v0 + 2) * 0xC));
+                GeoRender_FindAnchorPosition(arg0, 1, (s32)(u32)((u8 *)&D_8418C958 + *(s16 *)((u8 *)temp_v0 + 2) * 0xC));
             }
         }
     }
