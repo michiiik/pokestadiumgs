@@ -16,14 +16,14 @@ extern void func_80028140(void);
 extern void func_80035020(s32);
 extern void func_800248A0(void);
 extern void func_80018728(u32, ...);
-extern void func_80025EB0(s32, s32, s32, s32);
+extern void Audio_RenderNextBuffer(s32, s32, s32, s32);
 
 void Audio_InitializeTaskState(void) {
     func_80021AC0(0, 0);
     func_80028140();
     func_80035020(2);
     func_800248A0();
-    func_80018728(0xE40000FF, func_80025EB0);
+    func_80018728(0xE40000FF, Audio_RenderNextBuffer);
 }
 
 void func_80021B50(void) {

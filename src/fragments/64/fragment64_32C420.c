@@ -7,7 +7,7 @@
 extern void _bzero(void *, s32);
 void func_87F09870(s32 *arg0) { _bzero(arg0, 0x1C); *arg0 = 0; }
 
-extern void func_800279C4(s32);
+extern void Audio_PlayDefaultSound(s32);
 void func_87F0989C(void *arg0) {
     (*(s32 *)((u8 *)(arg0) + (0))) = 1;
     (*(s32 *)((u8 *)(arg0) + (0x18))) = 0;
@@ -16,7 +16,7 @@ void func_87F0989C(void *arg0) {
     (*(f32 *)((u8 *)(arg0) + (0xC))) = 0.0f;
     (*(f32 *)((u8 *)(arg0) + (0x10))) = 0.0f;
     (*(f32 *)((u8 *)(arg0) + (8))) = 240.0f;
-    func_800279C4(0xCF11);
+    Audio_PlayDefaultSound(0xCF11);
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_32C420/func_87F098F4.s")
