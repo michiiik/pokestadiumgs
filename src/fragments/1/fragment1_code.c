@@ -6,7 +6,7 @@
 extern Gfx *D_800D0510;
 extern s32 func_8004C990(s32, s32);
 extern u8 *func_8004CA60(u8 *);
-extern void func_8003CD84(void);
+extern void GeoRender_ApplyMaterialState(void);
 extern s32 D_835040D8;
 extern s32 D_835040DC;
 void func_83500020(s32 arg0, s32 arg1) {
@@ -20,7 +20,7 @@ void func_83500020(s32 arg0, s32 arg1) {
         gDPSetCombine(D_800D0510++, 0xFFB3FF, 0xFFFCFE38);
         gSPSegment(D_800D0510++, 0xF, func_8004CA60((u8 *)D_835040DC));
         gSPDisplayList(D_800D0510++, D_835040D8);
-        func_8003CD84();
+        GeoRender_ApplyMaterialState();
     }
 }
 

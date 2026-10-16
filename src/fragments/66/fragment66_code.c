@@ -543,13 +543,13 @@ void func_82E04734(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8003CD84();
+extern void GeoRender_ApplyMaterialState();
 extern void func_82E047C4(s32);
 extern void *D_82E07600;
 s32 func_82E04AE4(s32 arg0, s32 arg1) {
     if ((arg0 != 0) && (arg0 == 5)) {
         func_82E047C4((*(s32 *)((u8 *)(D_82E07600) + (8))));
-        func_8003CD84();
+        GeoRender_ApplyMaterialState();
     }
     return 0;
 }
@@ -564,7 +564,7 @@ extern void func_82E04B28(s32);
 s32 func_82E04E60(s32 arg0, s32 arg1) {
     if ((arg0 != 0) && (arg0 == 5)) {
         func_82E04B28((*(s32 *)((u8 *)(D_82E07600) + (8))));
-        func_8003CD84();
+        GeoRender_ApplyMaterialState();
     }
     return 0;
 }

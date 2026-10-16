@@ -476,13 +476,13 @@ s32 func_8220A154(s32 arg0, void *arg1) { s32 flag = *(s32 *)((u8 *)arg1 + 0x14)
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_8220A1C4.s")
 
-extern void func_8003CD84();
+extern void GeoRender_ApplyMaterialState();
 extern void func_8220A1C4(s32);
 extern s32 D_82210844;
 s32 func_8220A5BC(s32 arg0, s32 arg1) {
     if ((arg0 != 0) && (arg0 == 5) && (D_82210844 != 0)) {
         func_8220A1C4(D_82210844);
-        func_8003CD84();
+        GeoRender_ApplyMaterialState();
     }
     return 0;
 }
@@ -494,7 +494,7 @@ extern s32 D_822109B4;
 s32 func_8220AA08(s32 arg0, s32 arg1) {
     if ((arg0 != 0) && (arg0 == 5) && (D_822109B4 != 0)) {
         func_8220A608(D_822109B4);
-        func_8003CD84();
+        GeoRender_ApplyMaterialState();
     }
     return 0;
 }

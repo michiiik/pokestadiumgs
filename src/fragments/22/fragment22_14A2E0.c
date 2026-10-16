@@ -12,7 +12,7 @@ extern s32 D_827031C8;
 s32 func_82700598(s32 arg0, s32 arg1) {
     if ((arg0 != 0) && (arg0 == 5) && (D_827031C8 != 0)) {
         func_8270030C(D_827031C8);
-        func_8003CD84();
+        GeoRender_ApplyMaterialState();
     }
     return 0;
 }

@@ -53,7 +53,7 @@ extern void* func_8004CA60(void*);
 extern Gfx* func_87F08E3C(void*, s32);
 extern void func_87F0252C(void*, F52Group*, F52Item*, s32);
 extern void func_87F026E8(F52Group*, F52Item*);
-extern void func_8003CD84(void);
+extern void GeoRender_ApplyMaterialState(void);
 void func_86407AA0(void) {
     void* pool;
     pool = MainPool_AllocState(main_pool_get_available(), 0);
@@ -86,7 +86,7 @@ void func_86407BF0(s32 kind, s32 unused) {
         segment->words.w0 = 0xDB06003C;
         segment->words.w1 = (u32)func_8004CA60(func_8004C990(0x133, 0)); }
         gSPDisplayList(D_800D0510++, D_86416C00->displayList);
-        func_8003CD84();
+        GeoRender_ApplyMaterialState();
     }
 }
 

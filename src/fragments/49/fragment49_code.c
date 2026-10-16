@@ -1003,7 +1003,7 @@ void func_86105928(f32 *arg0) { f32 zero; f32 value; zero = 0.0f; value = D_8610
 
 extern u8 D_8610A0D0[];
 extern Gfx D_8610A970[];
-extern void func_8003CD84(void);
+extern void GeoRender_ApplyMaterialState(void);
 extern s32 func_8004C990(s32, s32);
 extern u8 * func_8004CA60(u8 *);
 extern void * D_8009491C;
@@ -1029,7 +1029,7 @@ void func_86105AD8(s32 arg0, s32 arg1) {
         gDPSetEnvColor(D_800D0510++, 0xFF, 0xFF, 0xFF, 0xFF);
         gSPSegment(D_800D0510++, 0xF, func_8004CA60((u8 *)func_8004C990(0x45, D_8610A0D0[idx])));
         gSPDisplayList(D_800D0510++, D_8610A970);
-        func_8003CD84();
+        GeoRender_ApplyMaterialState();
     }
 }
 
@@ -1041,7 +1041,7 @@ extern Gfx *D_800D0510;
 extern void *D_8009491C;
 extern s32 func_8004C990(s32, s32);
 extern u8 *func_8004CA60(u8 *);
-extern void func_8003CD84(void);
+extern void GeoRender_ApplyMaterialState(void);
 void func_86105F68(s32 arg0, s32 arg1) {
     void *context;
     void *temp_v0;
@@ -1052,7 +1052,7 @@ void func_86105F68(s32 arg0, s32 arg1) {
         gSPSegment(D_800D0510++, 0xF, func_8004CA60((u8 *)func_8004C990(0xDD, *(s32 *)temp_v0)));
         gDPSetCombine(D_800D0510++, 0xFFFFFF, 0xFFFCF238);
         gSPDisplayList(D_800D0510++, *(void **)((u8 *)(u32)D_8610AD20 + 0x6E0));
-        func_8003CD84();
+        GeoRender_ApplyMaterialState();
     }
 }
 
@@ -1145,7 +1145,7 @@ void func_86106C28(void) { func_86106688(); func_86106504(D_87F119DC); }
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86106C54.s")
 
 extern u8 D_8610A890[];
-extern void func_8003CD84(void);
+extern void GeoRender_ApplyMaterialState(void);
 extern s32 func_8004C990(s32, s32);
 extern u8 * func_8004CA60(u8 *);
 extern void * D_8009491C;
@@ -1190,7 +1190,7 @@ void func_86106E7C(s32 arg0, s32 arg1) {
     gDPSetEnvColor(D_800D0510++, 255, 255, 255, alpha);
     gSPSegment(D_800D0510++, 0xF, func_8004CA60(func_8004C990(0xDE, temp)));
     gSPDisplayList(D_800D0510++, D_8610A890);
-    func_8003CD84();
+    GeoRender_ApplyMaterialState();
 }
 
 extern void func_86106C54(void);
@@ -1710,7 +1710,7 @@ s32 fragment49_main(s32 arg0, s32 arg1) {
 extern Gfx *D_800D0510;
 extern void *D_8009491C;
 extern u8 D_8610A224[];
-extern void func_8003CD84(void);
+extern void GeoRender_ApplyMaterialState(void);
 typedef struct {
     u8 prim_r;
     u8 prim_g;
@@ -1735,7 +1735,7 @@ void func_86109D64(s32 arg0, s32 arg1) {
         gDPSetEnvColor(D_800D0510++, color->env_r, color->env_g, color->env_b, color->env_a);
         gSPSegment(D_800D0510++, 0xF, *(void **)((u8 *)record + 4));
         gSPDisplayList(D_800D0510++, *(void **)record);
-        func_8003CD84();
+        GeoRender_ApplyMaterialState();
     }
 }
 
