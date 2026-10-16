@@ -7810,7 +7810,48 @@ done:
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80041548.s")
+typedef struct SceneProcessedModel SceneProcessedModel;
+typedef SceneProcessedModel *(*SceneModelEntry)(s32, s32);
+struct SceneProcessedModel {
+    u16 species;
+    u8 format;
+    u8 geometryCount;
+    u8 transformCount;
+    u8 eventCount;
+    u8 unknown06[2];
+    void **geometry;
+    void *transformTracks;
+    void *eventTracks;
+    SceneModelEntry entry;
+};
+typedef struct {
+    S1_GraphNode node;
+    u8 unknown18[0x14];
+    SceneModelEntry entry;
+} SceneGeometryNode;
+extern void *process_geo_layout(S1_MemoryBlock *, void *);
+SceneProcessedModel *Fragment_ProcessGeoLayout(S1_MemoryBlock *pool, SceneModelEntry entry, S1_arg1_func_80010CA8 adjustment, u8 format, s32 special) {
+    SceneProcessedModel *model;
+    s32 i;
+    model = entry(0, 0);
+    model->entry = entry;
+    for (i = 0; i < model->geometryCount; i++) {
+        SceneGeometryNode *node;
+        node = process_geo_layout(pool, model->geometry[i]);
+        if (node->node.unk_00 == 14) {
+            node->entry = entry;
+            if (adjustment.raw != 0) {
+                Model_AdjustTextureColors((SceneTextureModel *)node, adjustment);
+            }
+        }
+        model->geometry[i] = node;
+    }
+    model->format = format & 0xF;
+    if (special != 0) {
+        model->format |= 0x80;
+    }
+    return model;
+}
 #endif
 
 #ifdef VERSION_US
@@ -7908,9 +7949,10 @@ typedef struct {
     void *animationBuffers[2];
     void *imageBuffers[2];
     s32 modelBufferSize;
-    s32 unknown24;
-    s32 unknown28;
-    u8 unknown2C[0xC];
+    s32 animationBufferSizes[2];
+    s32 modelSize;
+    s32 backgroundSize;
+    s32 curveSize;
     SceneAnimationBank *loadedModel;
     void *loadedBackground;
     void *loadedCurve;
@@ -7932,8 +7974,8 @@ void PokeIcon_InitLoadContext(SceneLoadContext *context, s32 flags, s32 modelBuf
     context->animationBuffers[0] = NULL;
     context->animationBuffers[1] = NULL;
     context->modelBufferSize = modelBufferSize;
-    context->unknown24 = 0;
-    context->unknown28 = 0;
+    context->animationBufferSizes[0] = 0;
+    context->animationBufferSizes[1] = 0;
     context->colorAdjust.raw = 0;
     context->species = 0;
     osCreateMesgQueue(&context->queues[0].queue, context->queues[0].messages, 2);
@@ -7996,7 +8038,22 @@ SceneLoadContext *PokeIcon_AllocSpecialModelContext(u16 modelId) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80041E2C.s")
+extern s32 BinArchive_Open(s32, s32, s32, s32);
+typedef void (*SceneFragmentEntry)(void);
+extern SceneFragmentEntry Fragment_Load(s32, u8 *, u8 *);
+extern u8 D_81000000[];
+extern u8 fragment26_ROM_START[];
+extern u8 fragment27_ROM_START[];
+extern OSThread D_80126530;
+void PokeIcon_InitResourceArchives(void) {
+    *(s32 *)((u8 *)&D_80126530 + 0x9e8) = BinArchive_Open(func_800356CC(6), 0, 1, 1);
+    *(s32 *)((u8 *)&D_80126530 + 0x9f4) = BinArchive_Open(func_800356CC(5), 0, 1, 1);
+    *(s32 *)((u8 *)&D_80126530 + 0x9ec) = BinArchive_Open(func_800356CC(7), 0, 1, 1);
+    *(s32 *)((u8 *)&D_80126530 + 0x9f0) = BinArchive_Open(func_800356CC(14), 0, 1, 1);
+    *(s32 *)((u8 *)&D_80126530 + 0x9F8) = 0;
+    *(s32 *)((u8 *)&D_80126530 + 0x9FC) = main_pool_alloc(0xF000, 1);
+    Fragment_Load(((((u32)D_81000000 & 0x0FF00000) >> 20) - 0x10), fragment26_ROM_START, fragment27_ROM_START);
+}
 #endif
 
 #ifdef VERSION_US
@@ -8125,22 +8182,120 @@ s32 func_8004239C(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80042484.s")
+u32 Model_FindLowestTextureAddress(SceneTextureModel *model) {
+    u32 result = 0;
+    s32 count;
+    u32 minimum;
+    s32 i;
+    SceneTextureData *entry;
+    if (model->node.unk_00 == 14) {
+        count = model->textureCount;
+        minimum = 0xFFFFFFFF;
+        for (i = 0; i < count; i++) {
+            entry = &model->textures[i];
+            if (entry->texture != NULL) {
+                if ((u32)entry->texture < minimum) {
+                    minimum = (u32)entry->texture;
+                }
+            }
+        }
+        if (minimum != 0xFFFFFFFF) {
+            result = minimum;
+        }
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800425C0.s")
+typedef struct {
+    s16 kind;
+    s16 id;
+    s16 buffer;
+    s8 variant;
+    u8 unknown07;
+    OSMesgQueue *reply;
+    void *data;
+    s32 source;
+    void *destination;
+    s32 size;
+    S1_arg1_func_80010CA8 adjustment;
+} SceneLoadResult;
+extern void Util_Free(void *);
+s32 PokeIcon_ApplyResourceLoadResult(SceneLoadContext *context, SceneLoadResult *message) {
+    s32 result = 0;
+    switch (message->kind) {
+    case 1:
+        context->pending &= ~1;
+        if (message->data != NULL) {
+            s32 buffer;
+            buffer = message->buffer;
+            if (context->flags & 4) {
+                context->variant ^= 1;
+            }
+            context->loadedModel = message->data;
+            context->modelSize = message->size;
+            context->colorAdjust = message->adjustment;
+            context->species = message->variant;
+            if (message->variant == 1) {
+                u32 address;
+                address = Model_FindLowestTextureAddress(((SceneProcessedModel *)context->loadedModel)->geometry[0]);
+                if (address != 0) {
+                    func_80041430(0, address, *(s32 *)((u8 *)&D_80126530 + 0x9F0), message->id,
+                                  *(s32 *)((u8 *)&D_80126530 + 0x9FC), 0xF000);
+                }
+            }
+            context->animationBuffers[buffer] = (u8 *)context->modelBuffers[buffer] + context->modelSize;
+            if ((u32)context->animationBuffers[buffer] < (u32)context->modelBuffers[buffer] + context->modelBufferSize) {
+                context->animationBufferSizes[buffer] = context->modelBufferSize - context->modelSize;
+                result = 1;
+                break;
+            } else {
+                context->animationBuffers[buffer] = NULL;
+                context->animationBufferSizes[buffer] = 0;
+            }
+        }
+        result = 1;
+        break;
+    case 2:
+        context->pending &= ~2;
+        context->loadedBackground = message->data;
+        context->backgroundSize = message->size;
+        result = 1;
+        break;
+    case 4:
+        context->pending &= ~4;
+        if (message->data != NULL) {
+            context->loadedCurve = message->data;
+            context->curveSize = message->size;
+        }
+        result = 1;
+        break;
+    case 8:
+        context->pending &= ~8;
+        if (message->data != NULL) {
+            if (context->flags & 4) {
+                context->variant ^= 1;
+            }
+            context->unknown44 = (u32)message->data;
+        }
+        result = 1;
+        break;
+    }
+    Util_Free(message);
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
-extern s32 func_800425C0(s32, void *);
+extern s32 PokeIcon_ApplyResourceLoadResult(SceneLoadContext *, SceneLoadResult *);
 
 s32 func_800427B8(s32 arg0) {
     void *sp1C;
     s32 sp18 = 0;
 
     if (osRecvMesg((OSMesgQueue *)(u32)(arg0 + 0x50), &sp1C, 0) != -1) {
-        sp18 = func_800425C0(arg0, sp1C);
+        sp18 = PokeIcon_ApplyResourceLoadResult(arg0, sp1C);
     }
     return sp18;
 }
@@ -8152,7 +8307,7 @@ s32 func_80042808(s32 arg0) {
     s32 sp18 = 0;
 
     if (osRecvMesg((OSMesgQueue *)(u32)(arg0 + 0x70), &sp1C, 0) != -1) {
-        sp18 = func_800425C0(arg0, sp1C);
+        sp18 = PokeIcon_ApplyResourceLoadResult(arg0, sp1C);
     }
     return sp18;
 }
@@ -8164,7 +8319,7 @@ s32 func_80042858(s32 arg0) {
     s32 sp18 = 0;
 
     if (osRecvMesg((OSMesgQueue *)(u32)(arg0 + 0x90), &sp1C, 0) != -1) {
-        sp18 = func_800425C0(arg0, sp1C);
+        sp18 = PokeIcon_ApplyResourceLoadResult(arg0, sp1C);
     }
     return sp18;
 }
@@ -8176,20 +8331,20 @@ s32 func_800428A8(s32 arg0) {
     s32 sp18 = 0;
 
     if (osRecvMesg((OSMesgQueue *)(u32)(arg0 + 0xB0), &sp1C, 0) != -1) {
-        sp18 = func_800425C0(arg0, sp1C);
+        sp18 = PokeIcon_ApplyResourceLoadResult(arg0, sp1C);
     }
     return sp18;
 }
 #endif
 
 #ifdef VERSION_US
-extern s32 func_800425C0(s32, void *);
+extern s32 PokeIcon_ApplyResourceLoadResult(SceneLoadContext *, SceneLoadResult *);
 
 void func_800428F8(s32 arg0) {
     void *sp1C;
 
     osRecvMesg((OSMesgQueue *)(u32)(arg0 + 0x50), &sp1C, 1);
-    func_800425C0(arg0, sp1C);
+    PokeIcon_ApplyResourceLoadResult(arg0, sp1C);
 }
 #endif
 
@@ -8199,7 +8354,7 @@ void PokeIcon_WaitBackgroundLoad(s32 arg0) {
     void *sp1C;
 
     osRecvMesg((OSMesgQueue *)(u32)(arg0 + 0x70), &sp1C, 1);
-    func_800425C0(arg0, sp1C);
+    PokeIcon_ApplyResourceLoadResult(arg0, sp1C);
 }
 #endif
 
@@ -8209,7 +8364,7 @@ void func_80042968(s32 arg0) {
     void *sp1C;
 
     osRecvMesg((OSMesgQueue *)(u32)(arg0 + 0x90), &sp1C, 1);
-    func_800425C0(arg0, sp1C);
+    PokeIcon_ApplyResourceLoadResult(arg0, sp1C);
 }
 #endif
 
@@ -8219,7 +8374,7 @@ void func_800429A0(s32 arg0) {
     void *sp1C;
 
     osRecvMesg((OSMesgQueue *)(u32)(arg0 + 0xB0), &sp1C, 1);
-    func_800425C0(arg0, sp1C);
+    PokeIcon_ApplyResourceLoadResult(arg0, sp1C);
 }
 #endif
 
