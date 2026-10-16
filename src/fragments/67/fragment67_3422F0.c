@@ -43,7 +43,22 @@ void func_82906164(f32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_3422F0/func_82906170.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_3422F0/func_829061CC.s")
+extern s32 D_82919D24;
+extern s32 D_82919DC0;
+extern void *D_82919DC4;
+extern s32 D_82919DC8;
+extern u8 D_82912228[];
+extern void func_82906170(u8, u8, u8, u8);
+extern void *process_geo_layout(void *, void *);
+
+void func_829061CC(s32 arg0, void *arg1, s32 (*arg2)(s32, s32)) {
+    D_82919D24 = arg0;
+    func_82906170(255, 255, 255, 0);
+    func_82906164(1.0f);
+    D_82919DC0 = arg2(0, 0);
+    D_82919DC4 = process_geo_layout(arg1, D_82912228);
+    D_82919DC8 = arg2(1, 0);
+}
 
 extern s32 D_82919DC0;
 extern s32 D_82919DC8;
