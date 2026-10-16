@@ -230,3 +230,7 @@ func_80024D6C = Audio_GetOrCacheResourceId;
 func_80025EB0 = Audio_RenderNextBuffer;
 func_800279C4 = Audio_PlayDefaultSound;
 func_8002A1FC = Audio_ResetQueueAndBitmap;
+func_800390D8 = GeoRender_CommitMatrix;
+func_80039158 = GeoRender_SetMatrix;
+func_80039204 = GeoRender_PushMultipliedMatrix;
+func_800392B8 = GeoRender_PushScaledMatrix;
