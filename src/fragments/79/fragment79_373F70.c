@@ -2,14 +2,14 @@
 
 
 #ifdef VERSION_US
-extern void func_80038894(s32, u8 *, s32, u8 *, u8 *, u8 *);
+extern void GeoNode_CreateModelPart(s32, u8 *, s32, u8 *, u8 *, u8 *);
 extern void func_80038F8C(u8 *, u8 *);
 extern u8 D_800948DC[];
 extern u8 D_800948E4[];
 extern u8 D_800948D0[];
 extern u8 D_84190030[];
 void func_841046E0(u8 *arg0) {
-    func_80038894(0, arg0, -1, D_800948D0, D_800948DC, D_800948E4);
+    GeoNode_CreateModelPart(0, arg0, -1, D_800948D0, D_800948DC, D_800948E4);
     func_80038F8C(D_84190030, arg0);
     arg0[1] &= 0xFFFE;
 }

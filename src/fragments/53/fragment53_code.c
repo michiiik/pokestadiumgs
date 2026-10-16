@@ -597,7 +597,7 @@ extern void func_800088DC(void);
 extern void func_8000766C(Gfx **, s32, s32, s32, s32);
 extern void func_800468A0(void *);
 extern void GeoRender_AdvanceFrameCounter(void);
-extern void func_8003C6B8(void *);
+extern void Geo_RenderRootNode(void *);
 extern void func_87F07FE8(void *);
 extern void func_86507AFC(void);
 extern void func_87F022F0(void);
@@ -612,7 +612,7 @@ void Fragment53_DrawSceneFrame(void) {
     if (D_8650C494 == 0) {
         GeoRender_AdvanceFrameCounter();
     }
-    func_8003C6B8(D_8650DB20);
+    Geo_RenderRootNode(D_8650DB20);
     switch (*(s32 *)((u8 *)&D_8650C5E0 + 0xC)) {
         case 2:
         case 12:

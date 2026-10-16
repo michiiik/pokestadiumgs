@@ -297,7 +297,7 @@ void func_82904160(void) {
 extern void BgStage_DrawFrame(void);
 extern void func_829060BC(void);
 extern void GeoRender_AdvanceFrameCounter(void);
-extern void func_8003C6B8(s32);
+extern void Geo_RenderRootNode(s32);
 extern void func_82907274(s32);
 extern void func_82904160(void);
 extern void func_80008648(void);
@@ -310,7 +310,7 @@ void func_82904208(void) {
         case 0:
         case 1:
         case 2:
-            func_8003C6B8((s32)D_82919DC4);
+            Geo_RenderRootNode((s32)D_82919DC4);
             func_82907274(D_829199FC);
             func_82903BA4();
             break;
@@ -318,7 +318,7 @@ void func_82904208(void) {
         case 8:
         case 9:
         case 10:
-            func_8003C6B8((s32)D_82919DC4);
+            Geo_RenderRootNode((s32)D_82919DC4);
             func_82904160();
             break;
     }

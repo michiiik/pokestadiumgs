@@ -3232,7 +3232,7 @@ struct S1_unk_D_800ABE00_cmd1E {
 typedef struct S1_unk_D_800ABE00_cmd1F S1_unk_D_800ABE00_cmd1F;
 struct S1_unk_D_800ABE00_cmd1F {
     /* 0x00 */ u8 cmd;
-    /* 0x02 */ s16 modelIndex; // func_80038894's arg2
+    /* 0x02 */ s16 modelIndex; // GeoNode_CreateModelPart's arg2
     /* 0x04 */ s16 rotX; // degrees, scaled (val<<0xF)/180
     /* 0x06 */ s16 rotY;
     /* 0x08 */ s16 rotZ;
@@ -4089,7 +4089,35 @@ S1_unk_D_86002F34_alt7* GeoNode_CreateDisplayListPart(S1_MainPoolState* arg0, S1
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80038894.s")
+S1_unk_D_86002F58_004_000 *GeoNode_CreateModelPart(S1_MainPoolState *pool, void *storage, s16 model, S1_Vec3f *position, S1_Vec3s *rotation, S1_Vec3f *scale) {
+    if (pool != NULL) storage = MainPool_AllocAligned(pool, 0x168, 4);
+    if (storage != NULL) {
+        S1_unk_D_86002F58_004_000 *node = storage;
+        node->animType = 0;
+        node->modelId = model;
+        node->unk_024 = *position;
+        node->unk_030 = *scale;
+        node->unk_01E = *rotation;
+        node->materialAlpha = 0xFF;
+        node->textureMode = 0;
+        node->unk_0A0.rgba = 0xFFFFFF00U;
+        node->unk_03C.rgba = 0xFFFFFF00U;
+        node->poolIndex = 0;
+        node->unk_040.unk_00 = 0;
+        node->unk_040.unk_04 = NULL;
+        node->unk_040.unk_08 = 0;
+        node->unk_040.unk_0C = 0x10000;
+        node->unk_040.unk_12 = 0;
+        node->unk_054.unk_00 = 0;
+        *(s16 *)((u8 *)node + 0x56) = 0;
+        node->unk_054.unk_04 = NULL;
+        node->unk_054.unk_08 = 0;
+        node->unk_054.unk_0A = 0;
+        GeoNode_Init((S1_GraphNode *)node, 0x16);
+        node->unk_000.unk_02 |= 0x60;
+    }
+    return storage;
+}
 #endif
 
 #ifdef VERSION_US
@@ -4815,7 +4843,28 @@ extern void func_8003A2C8(void *, ...); void Geo_NodeGroup(void *arg0) { func_80
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003C6B8.s")
+extern s32 D_80094900;
+extern void func_8006D2C0(void);
+void Geo_RenderRootNode(u8 *node) {
+    if (node[1] & 1) {
+        gDPPipeSync(D_800D0510++);
+        gDPSetTextureLOD(D_800D0510++, G_TL_TILE);
+        gDPSetTextureLUT(D_800D0510++, G_TT_NONE);
+        gDPSetTextureDetail(D_800D0510++, G_TD_CLAMP);
+        gDPSetTexturePersp(D_800D0510++, G_TP_PERSP);
+        gDPSetTextureFilter(D_800D0510++, G_TF_BILERP);
+        gDPSetTextureConvert(D_800D0510++, G_TC_FILT);
+        gDPSetCombineKey(D_800D0510++, G_CK_NONE);
+        gDPSetAlphaCompare(D_800D0510++, G_AC_NONE);
+        gDPSetColorDither(D_800D0510++, G_CD_MAGICSQ);
+        gDPSetAlphaDither(D_800D0510++, G_AD_PATTERN);
+        func_8006D2C0();
+        D_8009490C = (s32)node;
+        func_8003A2C8(node);
+        D_8009490C = 0;
+    }
+    D_80094900 = 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -4938,7 +4987,38 @@ void GeoRender_RestoreRenderMode(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003D0C8.s")
+typedef struct {
+    u8 mode;
+    u8 level;
+    u8 unknown02;
+    u8 unknown03;
+    S1_Color_RGBA8_u32 color;
+} ScenePrimitiveColor;
+typedef struct SceneMaterialState {
+    s32 unknown00;
+    void *unknown04;
+    void *unknown08;
+    void *unknown0C;
+    S1_Color_RGBA8_u32 primitiveColor;
+    S1_Color_RGBA8_u32 fogColor;
+    void *unknown18;
+    void *unknown1C;
+    void *unknown20;
+    u8 unknown24;
+    u8 combineMode;
+    u8 primitiveLevel;
+    u8 unknown27;
+} SceneMaterialState;
+void GeoRender_SetPrimitiveColor(ScenePrimitiveColor *node) {
+    if (node->color.rgba != ((SceneMaterialState *)D_801263A8)->primitiveColor.rgba ||
+        node->level != ((SceneMaterialState *)D_801263A8)->primitiveLevel) {
+        func_8003CBD4();
+        gDPSetPrimColor(D_800D0510++, 0, node->level, node->color.r, node->color.g,
+                       node->color.b, node->color.a);
+        ((SceneMaterialState *)D_801263A8)->primitiveColor.rgba = node->color.rgba;
+        ((SceneMaterialState *)D_801263A8)->primitiveLevel = node->level;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -5544,10 +5624,10 @@ void func_8003F018(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-extern S1_unk_D_86002F58_004_000 *func_80038894(S1_MainPoolState *, void *, s16, S1_Vec3f *, S1_Vec3s *, S1_Vec3f *);
+extern S1_unk_D_86002F58_004_000 *GeoNode_CreateModelPart(S1_MainPoolState *, void *, s16, S1_Vec3f *, S1_Vec3s *, S1_Vec3f *);
 extern u8 D_800948DC[];
 void func_8003F03C(s32 arg0, void *arg1) {
-    func_80038894(NULL, (void *) arg0, -1, &D_800948D0, (S1_Vec3s *) D_800948DC, (S1_Vec3f *) D_800948E4);
+    GeoNode_CreateModelPart(NULL, (void *) arg0, -1, &D_800948D0, (S1_Vec3s *) D_800948DC, (S1_Vec3f *) D_800948E4);
     func_80038F8C(arg1, (void *) arg0);
     (*(u8 *)((u8 *)(arg0) + (1))) = (u8) ((*(u8 *)((u8 *)(arg0) + (1))) & 0xFFFE);
 }
@@ -5555,14 +5635,38 @@ void func_8003F03C(s32 arg0, void *arg1) {
 
 #ifdef VERSION_US
 void ModelRenderer_AttachSecondaryDisplayObject(void *arg0) {
-    func_80038894(NULL, arg0, 0, &D_800948D0, (S1_Vec3s *) D_800948DC, (S1_Vec3f *) D_800948E4);
+    GeoNode_CreateModelPart(NULL, arg0, 0, &D_800948D0, (S1_Vec3s *) D_800948DC, (S1_Vec3f *) D_800948E4);
     func_80038F8C(D_80126438, arg0);
     (*(u8 *)((u8 *)(arg0) + (1))) = (u8) ((*(u8 *)((u8 *)(arg0) + (1))) & 0xFFFE);
 }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003F114.s")
+extern void func_8007074C(void *);
+extern void func_8006D430(s32);
+void func_8003F114(u8 *node, s16 animation, s16 model, void *data) {
+    func_80038F8C(node, data);
+    MtxF_Identity((f32 *)(node + 0x60));
+    *(s16 *)(node + 0x18) = animation;
+    *(s16 *)(node + 0x1A) = model;
+    node[0x1D] = 0xFF;
+    node[0x1C] = 0;
+    node[1] |= 1;
+    node[2] &= ~4;
+    node[2] |= 0x20;
+    node[2] |= 0x40;
+    node[2] &= ~2;
+    *(u32 *)(node + 0xA0) = 0xFFFFFF00U;
+    *(u32 *)(node + 0x3C) = 0xFFFFFF00U;
+    node[0xA6] = 0;
+    *(s16 *)(node + 0x40) = -1;
+    *(void **)(node + 0x44) = NULL;
+    *(s16 *)(node + 0x54) = -1;
+    *(void **)(node + 0x58) = NULL;
+    node[2] &= ~8;
+    if (model >= 0) func_8007074C(node);
+    func_8006D430((s32)node);
+}
 #endif
 
 #ifdef VERSION_US
@@ -6164,7 +6268,7 @@ void geo_layout_cmd_create_model_part(void) {
     sp28.z = cmd->scaleZ / 100.0f;
 
     Vec3s_SetComponents(&sp40, (cmd->rotX << 0xF) / 180, (cmd->rotY << 0xF) / 180, (cmd->rotZ << 0xF) / 180);
-    tmp = func_80038894(D_80126450, NULL, cmd->modelIndex, &sp34, &sp40, &sp28);
+    tmp = GeoNode_CreateModelPart(D_80126450, NULL, cmd->modelIndex, &sp34, &sp40, &sp28);
     func_8003FD34(tmp);
 
     D_80126520 += sizeof(S1_unk_D_800ABE00_cmd1F);

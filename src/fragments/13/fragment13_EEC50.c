@@ -1226,7 +1226,7 @@ extern void func_82403624(s32, void *, s32, f32, s32, s32, f32);
 void func_82406CDC(void *arg0, s32 arg1) { f32 scale; s32 state; scale = D_8160BD08(*(f32 *)((u8 *)arg0 + 0x204) / 10.0f); state = *(s32 *)((u8 *)arg0 + 0x1EC); switch (state) { case 0: return; case 1: func_82402E28(arg1, (u8 *)arg0 + 0x54, func_82407088(arg0), -1, scale, 0xB8, 1, *(s32 *)((u8 *)arg0 + 0x1E0) < *(s32 *)((u8 *)arg0 + 0x1DC)); return; case 2: func_82403624(arg1, arg0, *(s32 *)((u8 *)arg0 + 0x1DC), scale, *(s32 *)((u8 *)arg0 + 0x1D4), *(s32 *)((u8 *)arg0 + 0x1D8), *(f32 *)((u8 *)arg0 + 0x208) / 6.0f); func_82402E28(arg1, (u8 *)arg0 + 0x54, Fragment13_GetInterpolatedListPosition(arg0), (s16)*(s32 *)((u8 *)arg0 + 0x1DC), scale, 0x9A, 0, *(s32 *)((u8 *)arg0 + 0x1E0) < *(s32 *)((u8 *)arg0 + 0x1DC)); return; } }
 
 extern void func_8000766C(Gfx **, s32, s32, s32, s32);
-extern void func_8003C6B8(s32);
+extern void Geo_RenderRootNode(s32);
 extern void func_81A0022C(void *);
 void Fragment13_DrawGroupScene(u8 *arg0, void *arg1) {
     s32 full;
@@ -1275,7 +1275,7 @@ void Fragment13_DrawGroupScene(u8 *arg0, void *arg1) {
     if (func_81600DA8(arg1, *(void **)(arg0 + 0x214))) {
         func_8000766C(&D_800D0510, 13, 39, 294, 161);
         func_80006F70(&D_800D0510, 13, 39, 294, 161);
-        func_8003C6B8(*(s32 *)(arg0 + 0x214));
+        Geo_RenderRootNode(*(s32 *)(arg0 + 0x214));
         func_80006F70(&D_800D0510, 0, 0, 320, 240);
         func_82401198(11, 37, 300, 167);
     }

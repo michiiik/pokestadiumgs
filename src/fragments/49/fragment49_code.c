@@ -1327,7 +1327,7 @@ extern void GfxImage_FillCurrent(void *, u16);
 extern void GfxImage_ClearDepthRectangle(void *, s32, s32, s32, s32);
 extern s32 func_87F00930(void);
 extern void GeoRender_AdvanceFrameCounter(void);
-extern void func_8003C6B8(s32);
+extern void Geo_RenderRootNode(s32);
 extern void func_86108018(void);
 extern void func_87F0A5BC(u8 *);
 extern void func_87F07FE8(u8 *);
@@ -1343,7 +1343,7 @@ void func_861086AC(void) {
     if (func_87F00930() == 0) {
         GeoRender_AdvanceFrameCounter();
     }
-    func_8003C6B8(*(s32 *)((u8 *)D_8610AD20 + 0x38));
+    Geo_RenderRootNode(*(s32 *)((u8 *)D_8610AD20 + 0x38));
     if (*(s32 *)((u8 *)D_8610AD20 + 0x3C) == 5) {
         func_86108018();
         if (*(s32 *)((u8 *)D_8610AD20 + 0x97DC) != 0) {

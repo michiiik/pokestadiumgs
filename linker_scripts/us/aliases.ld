@@ -216,3 +216,6 @@ func_8AF02A34 = Fragment44_PrepareTrailingScrollRow;
 func_8AF02410 = Fragment44_RenderScrollRecord;
 func_8AF02C28 = Fragment44_InitializeScrollList;
 func_8003C9B8 = GeoRender_FindAnchorPosition;
+func_80038894 = GeoNode_CreateModelPart;
+func_8003C6B8 = Geo_RenderRootNode;
+func_8003D0C8 = GeoRender_SetPrimitiveColor;

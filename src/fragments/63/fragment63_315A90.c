@@ -352,9 +352,9 @@ void func_87E133F0(void) {
     }
 }
 
-extern void func_8003C6B8(s32);
+extern void Geo_RenderRootNode(s32);
 void func_87E13458(void) {
-    func_8003C6B8(*(s32*)(D_87E1EBD8 + 0x28));
+    Geo_RenderRootNode(*(s32*)(D_87E1EBD8 + 0x28));
 }
 
 void func_87E13480(u8 *arg0) { extern u8 *D_87E1EBD8; *(u8 **)(D_87E1EBD8 + 4) = arg0; }
