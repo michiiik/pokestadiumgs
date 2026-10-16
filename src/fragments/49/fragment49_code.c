@@ -19,7 +19,16 @@ void func_86100020(s8 *arg0, u8 arg1, f32 arg2, f32 arg3, f32 arg4) {
     *arg0 = value;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_861000B8.s")
+extern f32 D_8610AA84;
+extern void func_800277C4(u16, u8, void *);
+void func_861000B8(void *arg0, u16 arg1) {
+    s8 data[4];
+
+    func_86100020(data, 0x7F, *(f32 *)((u8 *)arg0 + 0x48), -364.4109191894531f, D_8610AA84);
+    data[1] = 0;
+    func_800277C4(arg1, *((u8 *)arg0 + 0x23), data);
+}
+void func_861000B8_padding(void) {}
 
 extern s32 D_8610AD20;
 void func_86100120(void) {
@@ -277,7 +286,7 @@ extern f32 D_8610AAC0;
 extern f32 D_8610AAC4;
 extern f32 D_8610AAC8;
 extern f32 D_8610AACC;
-extern void func_861000B8(void *, s32);
+extern void func_861000B8(void *, u16);
 typedef union { f32 f; s32 i; } Coord86100F1C;
 typedef struct { u8 pad[0x48]; Coord86100F1C x; Coord86100F1C y; Coord86100F1C z; } Object86100F1C;
 extern u32 func_8003570C(void);
@@ -303,7 +312,7 @@ extern f32 D_8610AAD4;
 extern f32 D_8610AAD8;
 extern void *Vec3f_Subtract(void *, void *, void *);
 extern void func_86100BE0(void *);
-extern void func_861000B8(void *, s32);
+extern void func_861000B8(void *, u16);
 extern void func_86100E20(void *arg0, s32 arg1);
 extern f32 func_87D005E8(f32 *, f32 *, f32 *);
 extern s32 D_8610AD20;
