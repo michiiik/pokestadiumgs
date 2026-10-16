@@ -1,6 +1,5 @@
 #include "global.h"
 
-
 #ifdef VERSION_US
 extern u8 D_800CC5B0[]; void Memmap_SetSegmentMap(s32 index, s32 value1, s32 value2) { *(s32 *)(D_800CC5B0 + index * 8) = value1; *(s32 *)(D_800CC5B0 + index * 8 + 4) = value2; }
 
@@ -27,7 +26,36 @@ s32 Memmap_GetSegmentVaddrMask(s32 arg0, s32 arg1) {
 
 extern u8 D_800CC5B0[]; void Memmap_ClearSegmentMemmap(s32 index) { *(s32 *)(D_800CC5B0 + index * 8) = 0; *(s32 *)(D_800CC5B0 + index * 8 + 4) = 0; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/2CA0/func_80002178.s")
+#pragma REWRITE_FUNCTION_WORD(func_80002178, 0x4C, 0xAE380000, 0xAE780000)
+
+extern u8 D_800CC5B0[];
+extern u8 D_800CC630[];
+typedef struct SegmentEntry2CA0 {
+    void *base;
+    u32 size;
+} SegmentEntry2CA0;
+
+void func_80002178(Gfx **gdl_p)
+{
+  SegmentEntry2CA0 *ptr;
+  Gfx *gdl;
+  s32 seg;
+  gdl = *gdl_p;
+ ptr = (SegmentEntry2CA0 *) D_800CC5B0; seg = 0; do { Gfx *cmd = gdl; void *base; u32 paddr;
+    cmd->words.w0 = 0xDB060000 | (seg & 0xFFFF);
+    base = ptr->base;
+    gdl++;
+    paddr = osVirtualToPhysical(base);
+    ptr++;
+    seg = seg + 4;
+    if (!gdl)
+    {
+    }
+    cmd->words.w1 = paddr;
+  }
+  while (ptr != ((SegmentEntry2CA0 *) D_800CC630));
+  *gdl_p = gdl;
+}
 
 extern u32 Memmap_GetFragmentVaddr(u32);
 extern void Memmap_SetFragmentMap(s32, s32, s32);
