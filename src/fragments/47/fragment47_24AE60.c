@@ -276,7 +276,7 @@ typedef struct Func8600734CContext {
 extern void func_86001BFC();
 extern void StageContext_SetClearColor(s32);
 extern void StageFade_StartFromTransparent(s32);
-extern void func_800279C4(s32);
+extern void Audio_PlayDefaultSound(s32);
 void func_8600734C(s32 arg0) {
     s32 i;
     Func8600734CRecord *selected;
@@ -289,7 +289,7 @@ void func_8600734C(s32 arg0) {
     }
     selected->value2D0 = selected->value2B8 < selected->value198;
     func_800225C4(40);
-    func_800279C4(0xCF0B);
+    Audio_PlayDefaultSound(0xCF0B);
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_86007428.s")

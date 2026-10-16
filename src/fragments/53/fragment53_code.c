@@ -772,7 +772,7 @@ extern s32 func_86501280();
 s32 func_87F08208(s32 *);
 extern s32 D_8650C5E0;
 extern s32 D_8650DAD8;
-extern void func_800279C4(s32);
+extern void Audio_PlayDefaultSound(s32);
 void func_86508A14(void) {
     s32 temp_v0;
 
@@ -784,7 +784,7 @@ void func_86508A14(void) {
         func_86501280();
         (*(s32 *)((u8 *)(&D_8650C5E0) + (0xC))) = 5;
         func_800225C4(0x28);
-        func_800279C4(0xCF0B);
+        Audio_PlayDefaultSound(0xCF0B);
         return;
     case 2:
         (*(s32 *)((u8 *)(&D_8650C5E0) + (0xC))) = 2;
@@ -827,10 +827,10 @@ s32 Fragment53_UpdateStartState(void) {
         return 0;
     }
     if ((s32)func_87F006AC() == 1) {
-        func_800279C4(0x1F0D);
+        Audio_PlayDefaultSound(0x1F0D);
     }
     if ((s32)func_87F006AC() == 2) {
-        func_800279C4(0x1F0E);
+        Audio_PlayDefaultSound(0x1F0E);
         *(s32 *)((u8 *)&D_8650C5E0 + 0xC) = 1;
         *(s32 *)((u8 *)&D_8650C5E0 + 8) = -2;
         func_80027774(0x1B06, 140);

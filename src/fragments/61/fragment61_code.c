@@ -67,7 +67,7 @@ s32 func_86B00158(s32 arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-extern s32 D_86B0D160; extern s32 D_86B0D164; extern void *D_86B0E0A8; extern u8 *D_86B181C0; extern s32 func_87F08208(void *); extern void StageContext_SetClearColor(s32); extern void StageFade_StartFromTransparent(s32); extern void func_800225C4(s32); extern void func_800279C4(s32); extern void func_800226C0(s32); extern void func_86B01720(s32);
+extern s32 D_86B0D160; extern s32 D_86B0D164; extern void *D_86B0E0A8; extern u8 *D_86B181C0; extern s32 func_87F08208(void *); extern void StageContext_SetClearColor(s32); extern void StageFade_StartFromTransparent(s32); extern void func_800225C4(s32); extern void Audio_PlayDefaultSound(s32); extern void func_800226C0(s32); extern void func_86B01720(s32);
 void func_86B00994(void) {
     s32 temp_v0;
     D_86B0D164 = 0;
@@ -78,7 +78,7 @@ void func_86B00994(void) {
         StageFade_StartFromTransparent(0x14);
         *(s32 *)D_86B181C0 = 2;
         func_800225C4(0x28);
-        func_800279C4(0xCF0B);
+        Audio_PlayDefaultSound(0xCF0B);
         D_86B0D160 = 0;
         return;
     case 2:

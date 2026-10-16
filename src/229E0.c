@@ -209,7 +209,7 @@ void func_80024D10(s32 arg0) {
 
 #ifdef VERSION_US
 extern s32 D_80090A50;
-extern u8 D_80090A74;
+extern u8 D_80090A74[2];
 extern s8 D_80090A78;
 
 void func_80024D44(void) {
@@ -221,7 +221,39 @@ void func_80024D44(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80024D6C.s")
+extern s32 func_80024E30(u32);
+extern u8 D_80090A7C;
+typedef struct {
+    u8 ids[2];
+    u8 unknown02[2];
+    s8 active;
+    u8 unknown05[3];
+    u8 lastSlot;
+    u8 unknown09[3];
+} AudioResourceCacheView;
+s32 Audio_GetOrCacheResourceId(u32 id) {
+    s32 found;
+    s32 slot;
+    u8 replacement;
+    AudioResourceCacheView *cache;
+    if ((id == 0 || id >= 0xFC) && id != 0x12C) { return -1; }
+    found = func_80024E30(id);
+    if (found == 0 || found == 1) { return found; }
+    cache = (AudioResourceCacheView *)D_80090A74;
+    for (slot = 0; slot < 2; slot++) {
+        if (cache->ids[slot] == 0) {
+            cache->ids[slot] = id;
+            return slot;
+        }
+    }
+    replacement = cache->lastSlot ^ 1;
+    cache->ids[replacement] = id;
+    cache->lastSlot = replacement;
+    return replacement;
+}
+
+/* Original unreachable jr/nop tail at 0x80024E28. */
+void func_80024D6C_padding(void) {}
 #endif
 
 #ifdef VERSION_US
@@ -232,7 +264,7 @@ s32 func_80024E30(u32 arg0) {
     if (((arg0 == 0) || (arg0 >= 0xFCU)) && (arg0 != 0x12C)) {
         return -1;
     }
-    var_v0 = &D_80090A74;
+    var_v0 = D_80090A74;
     var_v1 = 0;
 loop_5:
     if (arg0 == *var_v0) {
@@ -463,7 +495,27 @@ void func_80025E7C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025EB0.s")
+extern u8 D_80090B8C;
+extern u32 D_80090AC0;
+extern s16 *D_800D1990[3];
+extern void *D_800D198C;
+extern void func_80031A6C(s32, void *);
+extern s32 func_80031C84(s16 *, s32);
+s32 Audio_RenderNextBuffer(s32 arg0, s32 samples, s32 initialize, s32 arg3) {
+    s32 result;
+    s16 *buffer;
+    if ((s8)D_80090B8C == 0) { return 0; }
+    buffer = D_800D1990[D_80090AC0];
+    if (initialize == 1) {
+        func_80031A6C(32000, D_800D198C);
+    }
+    result = func_80031C84(buffer, samples);
+    D_80090AC0++;
+    D_80090AC0 %= 3;
+    if ((s8)D_80090B8C == 0) { return 0; }
+    if (result == -1) { return result; }
+    return (s32)buffer;
+}
 #endif
 
 #ifdef VERSION_US
@@ -689,7 +741,16 @@ void func_800277F0(u16 resource_id, void *context) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800279C4.s")
+void Audio_PlayDefaultSound(u16 id) {
+    ResourceContext_80027774 context;
+    context.resource = D_80090D04;
+    context.mode = 0;
+    context.scale = 1.0f;
+    if (id == 0x5F0A) {
+        func_800225C4(5);
+    }
+    func_80027BD4(id, 0, &context);
+}
 #endif
 
 #ifdef VERSION_US
@@ -748,11 +809,11 @@ void func_80027F7C(void) { u8 i; u8 j; for (i = 0; i < 15; i++) { D_80090C84[i] 
 #ifdef VERSION_US
 extern u8 D_8011F300;
 extern void func_80027EE0(u16);
-extern void func_800279C4(s32);
+extern void Audio_PlayDefaultSound(u16);
 
 void func_80028014(void) {
     func_80027EE0(0xFFD);
-    func_800279C4(0xCF07);
+    Audio_PlayDefaultSound(0xCF07);
     if (D_8011F300 == 0x5C) {
         func_80018728(0x83000000U, 0x1E);
         return;
@@ -949,7 +1010,21 @@ void func_80028EA8(void) { extern u8 D_80091B90[]; func_80028D9C(D_80091B90); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002A1FC.s")
+extern s32 D_800D1A90[10];
+extern u8 D_800D2660[32];
+extern u32 D_80091A24;
+extern u32 D_80091A28;
+void Audio_ResetQueueAndBitmap(void) {
+    s32 i;
+    for (i = 0; i < 10; i++) {
+        D_800D1A90[i] = 0;
+    }
+    D_80091A24 = 0;
+    D_80091A28 = 0;
+    for (i = 0; i < 32; i++) {
+        D_800D2660[i] = 0;
+    }
+}
 #endif
 
 #ifdef VERSION_US
