@@ -828,11 +828,15 @@ u8 Audio_SetupEventVoice(AudioChannelEvent *arg0, u8 request) {
 #endif
 
 #ifdef VERSION_US
+typedef struct { u8 unknown00[6]; u16 mask; } AudioChannelMask;
+typedef struct { s32 w0; s32 w4; s32 w8; } Candidate27F7CRecord;
+extern Candidate27F7CRecord D_80090BB8[];
+extern Candidate27F7CRecord D_80090C78;
+typedef struct { AudioChannelMask channels; u8 count; } AudioChannelGroup;
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800271DC.s")
 #endif
 
 #ifdef VERSION_US
-typedef struct { u8 unknown00[6]; u16 mask; } AudioChannelMask;
 extern s32 func_8002738C(u8);
 u8 Audio_FindEnabledChannel(AudioChannelMask *state, u8 channel, u8 advance) {
     if (advance) {
@@ -861,10 +865,6 @@ s32 func_8002738C(u8 channel) {
 #endif
 
 #ifdef VERSION_US
-typedef struct { s32 w0; s32 w4; s32 w8; } Candidate27F7CRecord;
-extern Candidate27F7CRecord D_80090BB8[];
-extern Candidate27F7CRecord D_80090C78;
-typedef struct { AudioChannelMask channels; u8 count; } AudioChannelGroup;
 u8 Audio_FindLowestPriorityChannel(AudioChannelGroup *state, u8 channel) {
     u8 best = channel;
     u8 i;
