@@ -332,9 +332,9 @@ void func_87E155E8(F155E8I7Owner *arg0, s32 arg1, s32 arg2, f32 arg3, s32 arg4, 
     arg0->records[arg2].flags.next = arg5;
 }
 
-extern void func_8003C6B8(s32);
+extern void Geo_RenderRootNode(s32);
 void WidgetTree_OpenMessagePanel_fragment63(u8 *arg0) {
-    func_8003C6B8(*(s32 *)(arg0 + 0x170));
+    Geo_RenderRootNode(*(s32 *)(arg0 + 0x170));
 }
 
 s32 func_87E15698(u8 *arg0) {
@@ -687,13 +687,13 @@ void func_87E179F4(u8 *arg0, s32 arg1) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_317060/func_87E17B34.s")
 
 extern void GfxImage_ClearDepthRectangle(Gfx **, s32, s32, s32, s32);
-extern void func_8003C6B8(s32);
+extern void Geo_RenderRootNode(s32);
 extern Gfx * D_800D0510;
 extern void * D_87E1EC88;
 void func_87E17D40(u8 *arg0) {
     D_87E1EC88 = arg0;
     GfxImage_ClearDepthRectangle(&D_800D0510, 0, 0, 320, 240);
-    func_8003C6B8(*(s32 *)(arg0 + 0xC));
+    Geo_RenderRootNode(*(s32 *)(arg0 + 0xC));
     switch (*(s8 *)((u8 *)D_87E1EC88 + 1)) {
     case 1:
         break;

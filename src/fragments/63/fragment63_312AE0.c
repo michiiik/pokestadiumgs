@@ -520,14 +520,14 @@ void func_87E11A5C(s32 arg0, s32 arg1) {
     }
 }
 
-extern void func_8003C6B8(s32);
+extern void Geo_RenderRootNode(s32);
 extern void func_87E11A5C(s32, s32);
 void func_87E11AB8(void) {
     func_87E11A5C(2, D_87E1EBB8 + 0x1C);
     func_87E11A5C(4, D_87E1EBB8 + 0x1BC);
     func_87E11A5C(0x32, D_87E1EBB8 + 0x2C);
     func_87E11A5C(1, D_87E1EBB8 + 0x1DC);
-    func_8003C6B8((*(s32 *)((u8 *)(D_87E1EBB8) + (0x934))));
+    Geo_RenderRootNode((*(s32 *)((u8 *)(D_87E1EBB8) + (0x934))));
 }
 
 extern u8 D_87E1A4B0[];

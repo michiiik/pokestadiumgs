@@ -224,7 +224,7 @@ void func_82901628_padding(void) {}
 #endif
 
 #ifdef VERSION_US
-extern void func_8003C6B8(s32);
+extern void Geo_RenderRootNode(s32);
 extern void func_82902EC0(u8, s16, s16, s16, s32);
 extern u8 D_82918868[];
 extern s16 D_829188B0[];
@@ -233,7 +233,7 @@ extern u8 D_82918859;
 void func_82901A6C(void) {
     if (D_82918868[0x31] != 3 && D_82918868[0x32] != 0 && D_82918868[0x32] != 6) {
         func_82902EC0(D_82918859, D_829188B0[3], D_829188B0[4], D_829188B0[1], D_829188B0[2]);
-        func_8003C6B8(D_829188A4);
+        Geo_RenderRootNode(D_829188A4);
     }
 }
 #endif

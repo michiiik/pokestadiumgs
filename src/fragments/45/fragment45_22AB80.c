@@ -55,7 +55,7 @@ extern u32 func_87F006AC(void);
 extern void func_8AB00BA4();
 extern void func_80021ED8(s32);
 extern s32 func_8AB0699C(s32);
-extern void func_8003C6B8(s32);
+extern void Geo_RenderRootNode(s32);
 extern void func_800225C4(s32);
 s32 func_8AB0683C(s32 arg0) {
     s32 result = 5;
@@ -86,7 +86,7 @@ s32 func_8AB0683C(s32 arg0) {
         }
         break;
     case 2:
-        func_8003C6B8(D_8AB16A14);
+        Geo_RenderRootNode(D_8AB16A14);
         break;
     }
     return result;
@@ -249,7 +249,7 @@ extern s32 D_8AB16CC4;
 extern s32 func_8AB090B8(s32);
 extern void func_80021ED8(s32);
 extern void func_800225C4(s32);
-extern void func_8003C6B8(s32);
+extern void Geo_RenderRootNode(s32);
 extern void func_8004C8A0(void *, s32, s32, s32);
 extern void func_87F005F0(f32, f32);
 extern u32 func_87F006AC(void);
@@ -285,7 +285,7 @@ s32 func_8AB08F58(s32 arg0) {
         }
         break;
     case 2:
-        func_8003C6B8(D_8AB16CC4);
+        Geo_RenderRootNode(D_8AB16CC4);
         break;
     }
     return result;

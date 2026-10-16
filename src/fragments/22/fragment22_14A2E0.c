@@ -32,14 +32,14 @@ extern void *D_82703358;
 extern s32 func_80043678(void *);
 extern void BgStage_DrawFrame(void);
 extern void func_82700788(void);
-extern void func_8003C6B8(void *);
+extern void Geo_RenderRootNode(void *);
 extern void func_82702F70(void);
 extern void func_80008648(void);
 void func_82700924(void) {
     D_827031C8 = func_80043678(D_827031C4);
     BgStage_DrawFrame();
     func_82700788();
-    func_8003C6B8(D_82703358);
+    Geo_RenderRootNode(D_82703358);
     func_82702F70();
     func_80008648();
 }

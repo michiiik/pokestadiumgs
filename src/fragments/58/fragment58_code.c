@@ -82,7 +82,7 @@ extern u8 D_83404170;
 extern void BgStage_DrawFrame(void);
 extern void GfxImage_FillCurrent(void *, u16);
 extern void GeoRender_AdvanceFrameCounter(void);
-extern void func_8003C6B8(s32);
+extern void Geo_RenderRootNode(s32);
 extern void func_834022F8(void);
 extern void func_8340156C(void);
 extern void func_83401AAC(void);
@@ -96,7 +96,7 @@ void func_8340295C(void) {
     if (D_834041A4 == 0) {
         GeoRender_AdvanceFrameCounter();
     }
-    func_8003C6B8(D_83404248);
+    Geo_RenderRootNode(D_83404248);
     switch (D_83404188) {
     case 2:
         func_834022F8();
