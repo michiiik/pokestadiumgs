@@ -144,7 +144,7 @@ void func_82900FDC(void) {
 #ifdef VERSION_US
 extern s16 D_829188AC;
 extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
-extern void func_800371B4(u8 *, u8 *, f32, s16, s32);
+extern void Camera_ComputeEyeFromAngles(u8 *, u8 *, f32, s16, s32);
 extern void func_82900E54(void);
 extern void func_82900E98(void);
 extern void func_82900F80(void);
@@ -155,7 +155,7 @@ void func_829013F8(void) {
     D_829188AA = 0;
     D_829188AC = 0x96;
     Vec3f_SetComponentsDuplicate((f32 *)((u8 *)D_829188A0 + 0xB4), 0.0f, 50.0f, 0.0f);
-    func_800371B4((u8 *)D_829188A0 + 0xB4, (u8 *)D_829188A0 + 0xA8, (f32)D_829188AC, D_829188A8, (s32)D_829188AA);
+    Camera_ComputeEyeFromAngles((u8 *)D_829188A0 + 0xB4, (u8 *)D_829188A0 + 0xA8, (f32)D_829188AC, D_829188A8, (s32)D_829188AA);
     *(f32 *)((u8 *)D_829188A0 + 0x34) = 40.0f;
     *(f32 *)((u8 *)D_829188A0 + 0x38) = 6400.0f;
     *(f32 *)((u8 *)D_829188A0 + 0x2C) = 45.0f;

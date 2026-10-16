@@ -143,7 +143,7 @@ void func_829086F0(void) {
 
 #ifdef VERSION_US
 extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
-extern void func_800371B4(s32, s32, f32, s16, s32);
+extern void Camera_ComputeEyeFromAngles(s32, s32, f32, s16, s32);
 extern s32 D_8291A380;
 extern s16 D_8291B85C;
 extern s16 D_8291B85E;
@@ -158,7 +158,7 @@ void func_829086F8(void) {
     D_8291B85C = 0;
     D_8291B85E = 0;
     D_8291B860 = 0x96;
-    func_800371B4(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E);
+    Camera_ComputeEyeFromAngles(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E);
     *(f32 *)(D_8291A380 + 0x34) = 10.0f;
     *(f32 *)(D_8291A380 + 0x38) = 6400.0f;
 }
@@ -910,134 +910,134 @@ extern s16 D_8291B85C;
 extern s16 D_8291B85E;
 extern s16 D_8291B860;
 extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
-extern void func_800371B4(s32, s32, f32, s16, s32);
+extern void Camera_ComputeEyeFromAngles(s32, s32, f32, s16, s32);
 void BattleAnim_Fragment67Dispatch_045(void) {
     Vec3f_SetComponentsDuplicate((f32 *)(D_8291A380 + 0xB4), 0.0f, 30.0f, 0.0f);
     D_8291B85C = 0;
     D_8291B85E = 0;
     D_8291B860 = 0xBE;
-    func_800371B4(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E);
+    Camera_ComputeEyeFromAngles(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E);
 }
 #endif
 
 #ifdef VERSION_US
-extern void func_800371B4(s32, s32, f32, s16, s32);
+extern void Camera_ComputeEyeFromAngles(s32, s32, f32, s16, s32);
 void BattleAnim_Fragment67Dispatch_001(void) {
     Vec3f_SetComponentsDuplicate((f32 *)(D_8291A380 + 0xB4), 0.0f, 15.0f, 0.0f);
     D_8291B85C = 0;
     D_8291B85E = 0;
     D_8291B860 = 0x96;
-    func_800371B4(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E);
+    Camera_ComputeEyeFromAngles(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E);
 }
 #endif
 
 #ifdef VERSION_US
-extern void func_800371B4(s32, s32, f32, s16, s32);
+extern void Camera_ComputeEyeFromAngles(s32, s32, f32, s16, s32);
 void BattleAnim_Fragment67Dispatch_005(void) {
     Vec3f_SetComponentsDuplicate((f32 *)(D_8291A380 + 0xB4), 0.0f, 15.0f, 0.0f);
     D_8291B85C = 0;
     D_8291B85E = 0x1A00;
     D_8291B860 = 0x5A;
-    func_800371B4(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E);
+    Camera_ComputeEyeFromAngles(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E);
 }
 #endif
 
 #ifdef VERSION_US
-extern void func_800371B4(s32, s32, f32, s16, s32);
+extern void Camera_ComputeEyeFromAngles(s32, s32, f32, s16, s32);
 void BattleAnim_Fragment67Dispatch_009(void) {
     Vec3f_SetComponentsDuplicate((f32 *)(D_8291A380 + 0xB4), 0.0f, 15.0f, 0.0f);
     D_8291B85C = 0;
     D_8291B85E = -0x1A00;
     D_8291B860 = 0x5A;
-    func_800371B4(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E);
+    Camera_ComputeEyeFromAngles(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E);
 }
 #endif
 
 #ifdef VERSION_US
-extern void func_800371B4(s32, s32, f32, s16, s32);
+extern void Camera_ComputeEyeFromAngles(s32, s32, f32, s16, s32);
 void BattleAnim_Fragment67Dispatch_013(void) {
     Vec3f_SetComponentsDuplicate((f32 *)(D_8291A380 + 0xB4), 0.0f, 15.0f, 0.0f);
     D_8291B85C = 0;
     D_8291B85E = 0;
     D_8291B860 = 0x8C;
-    func_800371B4(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E);
+    Camera_ComputeEyeFromAngles(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E);
 }
 #endif
 
 #ifdef VERSION_US
-extern void func_800371B4(s32, s32, f32, s16, s32);
+extern void Camera_ComputeEyeFromAngles(s32, s32, f32, s16, s32);
 void BattleAnim_Fragment67Dispatch_017(void) {
     Vec3f_SetComponentsDuplicate((f32 *)(D_8291A380 + 0xB4), 0.0f, 15.0f, 0.0f);
     D_8291B85C = 0x1900;
     D_8291B85E = 0x1900;
     D_8291B860 = 0x82;
-    func_800371B4(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E);
+    Camera_ComputeEyeFromAngles(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E);
 }
 #endif
 
 #ifdef VERSION_US
-extern void func_800371B4(s32, s32, f32, s16, s32);
+extern void Camera_ComputeEyeFromAngles(s32, s32, f32, s16, s32);
 void BattleAnim_Fragment67Dispatch_021(void) {
     Vec3f_SetComponentsDuplicate((f32 *)(D_8291A380 + 0xB4), 0.0f, 15.0f, 0.0f);
     D_8291B85C = -0x1700;
     D_8291B85E = -0x1400;
     D_8291B860 = 0x96;
-    func_800371B4(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E);
+    Camera_ComputeEyeFromAngles(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E);
 }
 #endif
 
 #ifdef VERSION_US
-extern void func_800371B4(s32, s32, f32, s16, s32);
+extern void Camera_ComputeEyeFromAngles(s32, s32, f32, s16, s32);
 void BattleAnim_Fragment67Dispatch_025(void) {
     Vec3f_SetComponentsDuplicate((f32 *)(D_8291A380 + 0xB4), 0.0f, 15.0f, 0.0f);
     D_8291B85C = 0x1900;
     D_8291B85E = 0;
     D_8291B860 = 0x8C;
-    func_800371B4(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E);
+    Camera_ComputeEyeFromAngles(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E);
 }
 #endif
 
 #ifdef VERSION_US
-extern void func_800371B4(s32, s32, f32, s16, s32);
+extern void Camera_ComputeEyeFromAngles(s32, s32, f32, s16, s32);
 void BattleAnim_Fragment67Dispatch_029(void) {
     Vec3f_SetComponentsDuplicate((f32 *)(D_8291A380 + 0xB4), 0.0f, 15.0f, 0.0f);
     D_8291B85C = 0;
     D_8291B85E = 0;
     D_8291B860 = 0x96;
-    func_800371B4(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E);
+    Camera_ComputeEyeFromAngles(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E);
 }
 #endif
 
 #ifdef VERSION_US
-extern void func_800371B4(s32, s32, f32, s16, s32);
+extern void Camera_ComputeEyeFromAngles(s32, s32, f32, s16, s32);
 void BattleAnim_Fragment67Dispatch_033(void) {
     Vec3f_SetComponentsDuplicate((f32 *)(D_8291A380 + 0xB4), 0.0f, 15.0f, 0.0f);
     D_8291B85C = 0;
     D_8291B85E = 0;
     D_8291B860 = 0xB4;
-    func_800371B4(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E);
+    Camera_ComputeEyeFromAngles(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E);
 }
 #endif
 
 #ifdef VERSION_US
-extern void func_800371B4(s32, s32, f32, s16, s32);
+extern void Camera_ComputeEyeFromAngles(s32, s32, f32, s16, s32);
 void BattleAnim_Fragment67Dispatch_037(void) {
     Vec3f_SetComponentsDuplicate((f32 *)(D_8291A380 + 0xB4), 0.0f, 15.0f, 0.0f);
     D_8291B85C = 0;
     D_8291B85E = 0;
     D_8291B860 = 0x78;
-    func_800371B4(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E);
+    Camera_ComputeEyeFromAngles(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E);
 }
 #endif
 
 #ifdef VERSION_US
-extern s16 D_8291B828; extern s32 D_8291A380; extern s16 D_8291B85C; extern s16 D_8291B85E; extern s16 D_8291B860; extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32); extern void func_800371B4(s32, s32, f32, s16, s32);
-void BattleAnim_Fragment67Dispatch_041(void) { s16 mode; mode = D_8291B828; switch (mode) { case 0x24: Vec3f_SetComponentsDuplicate(D_8291A380 + 0xB4, 0.0f, 30.0f, 0.0f); D_8291B85C = -0x400; D_8291B85E = 0x3A00; D_8291B860 = 0x78; break; case 0x25: Vec3f_SetComponentsDuplicate(D_8291A380 + 0xB4, 0.0f, 30.0f, 0.0f); D_8291B85C = -0x800; D_8291B85E = 0x4500; D_8291B860 = 0x96; break; case 0x26: Vec3f_SetComponentsDuplicate(D_8291A380 + 0xB4, 0.0f, 30.0f, 0.0f); D_8291B85C = -0x400; D_8291B85E = 0x3700; D_8291B860 = 0x96; break; } func_800371B4(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E); }
+extern s16 D_8291B828; extern s32 D_8291A380; extern s16 D_8291B85C; extern s16 D_8291B85E; extern s16 D_8291B860; extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32); extern void Camera_ComputeEyeFromAngles(s32, s32, f32, s16, s32);
+void BattleAnim_Fragment67Dispatch_041(void) { s16 mode; mode = D_8291B828; switch (mode) { case 0x24: Vec3f_SetComponentsDuplicate(D_8291A380 + 0xB4, 0.0f, 30.0f, 0.0f); D_8291B85C = -0x400; D_8291B85E = 0x3A00; D_8291B860 = 0x78; break; case 0x25: Vec3f_SetComponentsDuplicate(D_8291A380 + 0xB4, 0.0f, 30.0f, 0.0f); D_8291B85C = -0x800; D_8291B85E = 0x4500; D_8291B860 = 0x96; break; case 0x26: Vec3f_SetComponentsDuplicate(D_8291A380 + 0xB4, 0.0f, 30.0f, 0.0f); D_8291B85C = -0x400; D_8291B85E = 0x3700; D_8291B860 = 0x96; break; } Camera_ComputeEyeFromAngles(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E); }
 #endif
 
 #ifdef VERSION_US
 extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
-extern void func_800371B4(s32, s32, f32, s16, s32);
+extern void Camera_ComputeEyeFromAngles(s32, s32, f32, s16, s32);
 extern s32 D_8291A380;
 extern s16 D_8291B85C;
 extern s16 D_8291B85E;
@@ -1047,7 +1047,7 @@ void func_8290DED4(void) {
     D_8291B85C = 0;
     D_8291B85E = 0;
     D_8291B860 = 0x10E;
-    func_800371B4(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E);
+    Camera_ComputeEyeFromAngles(D_8291A380 + 0xB4, D_8291A380 + 0xA8, (f32)D_8291B860, D_8291B85C, (s32)D_8291B85E);
 }
 void func_8290DED4_padding(void) {}
 #endif

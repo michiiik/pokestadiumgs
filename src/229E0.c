@@ -391,7 +391,66 @@ void func_80025848(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002596C.s")
+void Audio_ApplyCommandPreset(s32 preset) {
+    s32 first;
+    s32 second = 0;
+    s32 third = 0;
+    s32 fourth = 0;
+    switch (preset) {
+    case 10:
+        first = 22;
+        break;
+    case 1:
+        first = 1;
+        second = 4;
+        fourth = 3;
+        func_8001874C(0x06020400, 21);
+        break;
+    case 2:
+        first = 1;
+        second = 6;
+        third = 7;
+        fourth = 5;
+        break;
+    case 3:
+        first = 1;
+        second = 9;
+        fourth = 8;
+        break;
+    case 4:
+        first = 1;
+        second = 11;
+        fourth = 10;
+        break;
+    case 5:
+        first = 1;
+        second = 13;
+        third = 14;
+        fourth = 12;
+        break;
+    case 6:
+        first = 1;
+        fourth = 15;
+        break;
+    case 7:
+        first = 1;
+        second = 17;
+        third = 18;
+        fourth = 16;
+        break;
+    case 8:
+        first = 1;
+        second = 20;
+        fourth = 19;
+        break;
+    default:
+        return;
+    }
+    func_8001874C(0x06020000, (s8)first);
+    func_8001874C(0x06020100, (s8)second);
+    func_8001874C(0x06020200, (s8)third);
+    func_8001874C(0x06020300, (s8)fourth);
+}
 #endif
 
 #ifdef VERSION_US
@@ -1970,7 +2029,21 @@ void func_800341BC(s32 arg0, s32 arg1) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800341C8.s")
+typedef struct {
+    u8 prefix[4];
+    u8 flags;
+    u8 unknown05[0x2B];
+    u16 value;
+    u8 unknown32[0xA];
+} ChannelWordRecord;
+void AudioSeq_ReadWordParameter(u8 channel, s32 unused) {
+    u8 high;
+    u8 low;
+    ((ChannelWordRecord *)(&D_800D2B78 + channel * 0x3C))->flags |= 0x10;
+    high = func_800347E8(channel);
+    low = func_800347E8(channel);
+    ((ChannelWordRecord *)(&D_800D2B78 + channel * 0x3C))->value = (high << 8) + low;
+}
 #endif
 
 #ifdef VERSION_US
@@ -2439,15 +2512,70 @@ s32 func_80035160(s32 index) { return D_80094870[index]; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035174.s")
+typedef struct {
+    OSMesg message;
+    OSMesgQueue queue;
+    u16 unknown1C;
+    u16 unknown1E;
+    OSTask task;
+    u8 unknown60[8];
+} AudioThreadTaskBuffer;
+extern AudioThreadTaskBuffer D_80122A48[2];
+extern OSThread D_80122B20;
+extern s32 D_80122A40;
+extern s32 D_80122B18;
+extern u32 D_800CD020[];
+extern s32 D_8009486C;
+extern void __osSetFpcCsr(s32);
+extern void Sched_InitClientQueue(void *, s32, s32);
+extern void func_80005568(void *);
+extern OSMesg func_80004F34(u8 *);
+extern void profiler_log_thread4_time(void);
+extern void Audio_InitializeTaskState(void);
+extern s32 Audio_BuildSchedulerTask(void);
+extern void Sched_SubmitTask(void *, s32);
+extern OSMesgQueue D_80122A4C;
+extern OSMesgQueue D_80122AB4;
+extern OSMesg D_80122AB0;
+
+void Audio_ThreadMain(void *unused) {
+    OSTask *task;
+    s32 tick;
+    __osSetFpcCsr(0x01000C01);
+    Sched_InitClientQueue(&D_80122B20, 1, 1);
+    func_80005568(&D_80122B20);
+    D_80122A40 = 1;
+    D_80122B18 = 0;
+    osCreateMesgQueue(&D_80122A4C, &D_80122A48[0].message, 1);
+    osCreateMesgQueue(&D_80122AB4, &D_80122AB0, 1);
+    osSendMesg(&D_80122A4C, (OSMesg)0x444F4E45, OS_MESG_NOBLOCK);
+    osSendMesg(&D_80122AB4, (OSMesg)0x444F4E45, OS_MESG_NOBLOCK);
+    Audio_InitializeTaskState();
+    func_80025C50(2);
+    while (1) {
+        func_80004F34((u8 *)&D_80122B20);
+        profiler_log_thread4_time();
+        if (D_80122A40 != 0 && *(s16 *)((u8 *)D_800CD020 + 0xA38) < 21) {
+            task = (OSTask *)Audio_BuildSchedulerTask();
+            if (task != NULL) {
+                D_80122A48[D_80122B18].task = *task;
+                Sched_SubmitTask(&D_80122A48[D_80122B18], 0);
+            }
+        }
+        D_80122B18 ^= 1;
+        profiler_log_thread4_time();
+        tick = D_8009486C;
+        D_8009486C = tick + 1;
+    }
+}
 #endif
 
 #ifdef VERSION_US
-extern void func_80035174(void *);
+extern void Audio_ThreadMain(void *);
 extern OSThread D_80122B20;
 extern u8 D_80124D00[];
 void Thread4_CreateThread(void) {
-    osCreateThread(&D_80122B20, 4, func_80035174, NULL, D_80124D00, 0x50);
+    osCreateThread(&D_80122B20, 4, Audio_ThreadMain, NULL, D_80124D00, 0x50);
     osStartThread(&D_80122B20);
 }
 #endif
@@ -3579,7 +3707,11 @@ void func_80037120(S1_Vec3f *arg0, S1_Vec3f *arg1, f32 *arg2, s16 *arg3, s16 *ar
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800371B4.s")
+void Camera_ComputeEyeFromAngles(S1_Vec3f *from, S1_Vec3f *to, f32 dist, s16 pitch, s16 yaw) {
+    to->x = from->x + (dist * D_80088E50[((u16)pitch >> 4)] * D_80087E50[((u16)yaw >> 4)]);
+    to->y = from->y + (dist * D_80087E50[((u16)pitch >> 4)]);
+    to->z = from->z + (dist * D_80088E50[((u16)pitch >> 4)] * D_80088E50[((u16)yaw >> 4)]);
+}
 #endif
 
 #ifdef VERSION_US
@@ -6425,7 +6557,7 @@ void geo_layout_cmd_create_reference(void) {
 
 #ifdef VERSION_US
 extern S1_unk_D_86002F34_00C *GeoNode_CreateCamera(S1_MainPoolState *, S1_unk_D_86002F34_00C *, s16, s16, s16, s16);
-extern void func_800371B4(S1_Vec3f *, S1_Vec3f *, f32, s16, s16);
+extern void Camera_ComputeEyeFromAngles(S1_Vec3f *, S1_Vec3f *, f32, s16, s16);
 extern void func_8003FD34(void *);
 void func_8003FEB8(void) {
     S1_unk_D_800ABE00_cmdB *cmd = (S1_unk_D_800ABE00_cmdB *)(u32)D_80126520;
@@ -6433,7 +6565,7 @@ void func_8003FEB8(void) {
     if (node != NULL) {
         node->unk_24.fovy = (f32)cmd->fovy;
         Vec3f_FromVec3s(&node->unk_60.at, &cmd->lookAt);
-        func_800371B4(&node->unk_60.at, &node->unk_60.eye, (f32)cmd->eyeDistance, (cmd->yaw << 15) / 180, (cmd->pitch << 15) / 180);
+        Camera_ComputeEyeFromAngles(&node->unk_60.at, &node->unk_60.eye, (f32)cmd->eyeDistance, (cmd->yaw << 15) / 180, (cmd->pitch << 15) / 180);
     }
     func_8003FD34(node);
     D_80126520 += 0x18;
