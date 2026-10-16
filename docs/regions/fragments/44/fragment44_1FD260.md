@@ -495,6 +495,48 @@ under 7.1. Stock 5.3 changes two of them and worsens both the callback and
 padding leaders; this does not justify changing this file's compiler.
 Leading-blank controls are stable. This is a bounded negative, not proof
 of an impossible source shape or a broken compiler.
+## 2026-10-16 — remaining conditional drawing callback accepted
+
+`func_8AF106A8` now replaces **55 original instruction words / 220 bytes**,
+frame `0x30`. Solo native macOS, no agents or containers. File **31 C / 7
+function ASM to 32 C / 6 function ASM**, out of 38 originals. Acceptance
+batch `76f5d3f781fd4f5ab0bf02cd7c2991ca`, candidate
+`f44-menu-callback-branch-operands:pointer-first-True:reverse-x-True:negative-False`,
+is link-verified with one combined full-ROM gate. This supersedes the fourth
+callback's requeue below; all four position-drawing callbacks are accepted.
+
+Keep the consumed record pointer before the two consumed halfword coordinates
+and the real two-halfword position array. Both coordinate additions put the
+record field before its corresponding position element. Together with the
+real pointer lifetime established by the preceding family, this preserves
+the original `sp+0x24` array, both temporary-load sequences, the signed Y
+snapshot at `sp+0x28`, and the branch-specific taken-path normalization.
+Keep the positive `D_8AF31000 == 3` branch and the two actual drawing callees.
+No separate word-Y local, extra snapshot, artificial storage or type change
+is needed. Operand order alone in the earlier wrong-home context was not a
+solution; reopen it after the measured storage/lifetime change.
+
+A calibrated 60-second local permuter search improved score 320 to 10 with a
+semantically valid Y operand swap. Two other proposals read newly introduced
+locals without initialization on the selected switch path; reject them,
+regardless of their improved scores. An eight-cell reviewed normal-runner
+batch composed the valid swap with X order, record declaration order and
+branch orientation; the first exact positive-branch proposal gated normally.
+The permuter never installed source and its scratch outputs are not published.
+
+After declaration cleanup, fresh and twenty-leading-blank builds reproduce
+the frozen accepted object's complete loadable sections/layout and every
+relocation row. All 38 original starts/sizes and 37 untouched raw bodies
+match the verified 31-C baseline. A strict canonical link reproduces all
+19,264 text bytes and 240 rodata bytes directly against both the normal ELF
+and retail ROM. Forced native `gmake rom COMPARE=1` passes, MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. Host syntax passes with the same three
+pre-existing warnings; all 46 native tooling tests pass. Naming plan/apply
+finds no mapped name. No helper script, compiler copy, object, assembly or
+ROM is published. The six remaining larger dispatcher/drawing and
+section/padding/flag owners remain assembly, with their previous scoped
+requeues and layout evidence intact.
+
 ## 2026-10-16 — three position-drawing callbacks accepted
 
 Solo native macOS, no agents or containers. Three existing owners replace
