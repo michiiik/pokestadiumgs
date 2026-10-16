@@ -98,12 +98,12 @@ void func_829084E4(s32 arg0) {
 #ifdef VERSION_US
 extern void func_80041E2C(void);
 extern void func_8003F018(s32);
-extern s32 func_80041C98(s32);
+extern s32 PokeIcon_AllocLoadContext(s32);
 extern u8 D_8291B82C;
 extern u8 D_8291AE50;
 extern u8 D_8291A7C0;
 extern u8 D_8291A7C4;
-void func_82908594(void) { u8 *temp_s0; u8 *temp_s1; func_80041E2C(); temp_s0 = &D_8291A7C4; temp_s1 = &D_8291B82C; do { func_8003F018((s32)temp_s0); temp_s0 += 0x1A4; } while (temp_s0 < temp_s1); temp_s0 = &D_8291A7C0; temp_s1 = &D_8291AE50; do { *(s32 *)temp_s0 = func_80041C98(5); temp_s0 += 0x1A4; } while (temp_s0 != temp_s1); }
+void func_82908594(void) { u8 *temp_s0; u8 *temp_s1; func_80041E2C(); temp_s0 = &D_8291A7C4; temp_s1 = &D_8291B82C; do { func_8003F018((s32)temp_s0); temp_s0 += 0x1A4; } while (temp_s0 < temp_s1); temp_s0 = &D_8291A7C0; temp_s1 = &D_8291AE50; do { *(s32 *)temp_s0 = PokeIcon_AllocLoadContext(5); temp_s0 += 0x1A4; } while (temp_s0 != temp_s1); }
 #endif
 
 #ifdef VERSION_US

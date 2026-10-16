@@ -2,7 +2,7 @@
 
 
 #ifdef VERSION_US
-extern void* func_80041C98(s32 arg0);
+extern void* PokeIcon_AllocLoadContext(s32 arg0);
 extern void func_80041E2C(void);
 extern u16* func_80042C68(void* arg0, s32 arg1, s32 arg2);
 extern u16* D_8F000924;
@@ -12,7 +12,7 @@ extern s32 D_8F000920;
 void func_8F000020(s32 arg0) {
     void* var_v0;
 
-    var_v0 = func_80041C98(5);
+    var_v0 = PokeIcon_AllocLoadContext(5);
     func_80041E2C();
     D_8F000924 = func_80042C68(var_v0, 128, 128);
     *D_8F000924 &= 0xFEFF;
