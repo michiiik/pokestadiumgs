@@ -280,3 +280,6 @@ func_80033488 = GbAudio_UpdateChannelIfEnabled;
 func_800355E4 = Audio_RequestIfChanged;
 func_8002730C = Audio_FindEnabledChannel;
 func_800273B4 = Audio_FindLowestPriorityChannel;
+func_80033E34 = GbAudio_ReadChannelParameters;
+func_80034C58 = GbAudio_StartSequenceChannel;
+func_80034F30 = GbAudio_GetActiveChannelMask;
