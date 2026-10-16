@@ -201,7 +201,36 @@ void func_87E06CB4(void *arg0) {
 
 void func_87E06D84(u8 *arg0) {}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E06D8C.s")
+extern s32 main_pool_push_state(s32);
+extern void func_87F0BD10(void);
+extern void func_80041E2C(void);
+extern void func_87E069A4(u8 *);
+extern void func_87E06BCC(u8 *);
+extern void func_87E10E64(s32);
+extern void func_87E10EA8(s32);
+extern void func_87E10F2C(s32);
+
+void func_87E06D8C(u8 *arg0, s32 arg1) {
+    main_pool_push_state(1296516947);
+    *(s32 *)(arg0 + 368) = arg1;
+    *(s32 *)(arg0 + 8) = *(s8 *)((u8 *)(u32)arg1 + 8579);
+    *(s32 *)(arg0 + 4) = 0;
+    *(s32 *)(arg0 + 0) = 0;
+    arg0[396] &= ~0x80;
+    func_87F0BD10();
+    func_80041E2C();
+    func_87E06D84(arg0);
+    func_87E06908((s32)arg0);
+    func_87E069A4(arg0);
+    func_87E06BCC(arg0);
+    func_87E06B54((s32)arg0);
+    func_87E06CB4(arg0);
+    func_87E06B18(arg0);
+    func_87E06068((s32)arg0);
+    func_87E10E64(-1);
+    func_87E10EA8(-1);
+    func_87E10F2C(-1);
+}
 
 s32 func_87E06E48(void *arg0) {
     s32 result;
