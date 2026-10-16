@@ -495,6 +495,48 @@ under 7.1. Stock 5.3 changes two of them and worsens both the callback and
 padding leaders; this does not justify changing this file's compiler.
 Leading-blank controls are stable. This is a bounded negative, not proof
 of an impossible source shape or a broken compiler.
+## 2026-10-16 — six-entry menu renderer accepted
+
+Solo native macOS, no agents or containers. `func_8AF1043C` replaces
+**65 original instruction words / 260 bytes**, frame `0x30`. The file
+advances from **27 C / 11 function ASM to 28 C / 10 function ASM**, out of
+38 originals. Acceptance batch `cee8467ac10a420dadbf5d1bc2412250`, candidate
+`f44-menu-renderer-guards:early-False:record-False:id-True`, is link-verified
+with one combined full-ROM gate; no companion edits were installed.
+
+- Preserve the six position records, species-ID guard, texture lookup and
+  the original `gSPDisplayList` / opaque-surface `gDPSetRenderMode` macros.
+  An explicit zero-ID `continue` within the positive record guard closes
+  the nine remaining saved-register differences. A combined positive guard
+  had the same 65 opcode positions but the wrong saved-register allocation.
+- Keep the current contracts: the bank mode is `u16` with an explicit `s16`
+  call conversion; the texture lookup returns an integer handle converted
+  to the renderer's existing `u8 *` image argument. The production resource
+  handle remains `s32`; exploratory opaque-pointer global retyping did not
+  help and was not installed. No fake storage or return-category change.
+- After removing duplicate injected declarations and cleaning formatting,
+  fresh and twenty-leading-blank builds reproduce all frozen loadable
+  section bytes/layout and every relocation row. All 38 original starts and
+  sizes stay fixed, and all 37 untouched raw instruction spans match the
+  27-C baseline. Strict canonical linking reproduces the entire 19,264-byte
+  text and 240-byte rodata window against both the normal ELF and retail ROM.
+- Forced native `gmake rom COMPARE=1` passes, MD5
+  `1561c75d11cedf356a8ddb1a4a5f9d5d`. Host syntax passes with the same three
+  pre-existing pointer warnings. All 46 native tooling tests pass. Naming
+  plan/apply finds no evidence-backed mapped name; retain the address name.
+  No scratch helpers, compiler copies, objects, assembly or ROM are published.
+
+Remaining **requeues**: eight drawing cutoff/carrier variants still leave
+the row-bound in `$v0`; none is accepted. Seven earlier drawing guard shapes
+were inspected for component wins, without finding the missing row-bound or
+retained-top-store mechanism. Eight positive/negative section-loop variants
+likewise fail to close the saved-register swap; its companion-only complete
+grid-type control was revalidated against the accepted 28-C renderer object.
+An old-style padding-parameter experiment stopped at companion preflight
+because its target remains an assembly owner; no compiler result or padding
+acceptance is claimed. Resume only through a valid runner transaction with
+consistent prototypes and independently verified existing callers.
+
 ## 2026-10-16 — grid-page initialization accepted
 
 Solo native macOS, without agents or containers. `func_8AF12EB8` replaces
