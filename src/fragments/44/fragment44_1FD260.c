@@ -658,7 +658,19 @@ void func_8AF123C0(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF12410.s")
+u8 *func_8AF12410(u8 *pixels, s16 count) {
+    s32 remainder;
+    s32 i;
+    remainder = count % 4;
+    if (remainder > 0) {
+        for (i = 0; i < 4 - (count % 4); i++) {
+            pixels[0] = 0xFF;
+            pixels[1] = 0xFF;
+            pixels += 4;
+        }
+    }
+    return pixels;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF124A8.s")
 

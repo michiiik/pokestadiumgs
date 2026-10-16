@@ -813,3 +813,43 @@ This is a link-verified acceptance with one combined full-ROM gate.
   compile failures are context setup failures, not evidence against typed
   field access. Rebaseline the control to the current 27-C source before
   resuming that transaction. Existing section and padding handoffs remain.
+
+## 2026-10-16 — four-byte-stride padding routine accepted
+
+`func_8AF12410` is now C: **38 instruction words / 152 bytes**, frame zero.
+This advances the original file from **32 C / 6 ASM to 33 C / 5 ASM**.
+Runner batch `81621dc9ca8745a9816d258500eaf43f`, label
+`f44-padding-parameter-bound:alias-False:directguard-False:neq-False`,
+accepted with `link_verified: true` and one combined full-ROM gate.
+This supersedes the older padding requeue; it does not resolve another owner.
+
+The routine preserves `u8 *(u8 *, s16)`. For a positive signed remainder
+`count % 4`, it advances by four bytes per iteration, writes `0xFF` only to
+the first two bytes of each record, and returns the advanced pointer. Bytes
+two and three remain untouched. The winning loop tests
+`i < 4 - (count % 4)` directly, while the outer guard uses the actual local
+remainder. Keeping a separate padding-bound local or overwriting the
+remainder changes IDO's induction recognition and allocation. An ordinary
+`<` loop over the separate local remains rolled; a `!=` spelling can unroll
+but still has the wrong guard/registers. Repeating the immutable parameter
+expression lets stock IDO produce the original unrolling and allocation.
+No manual unrolling, fake local, padding pragma, or prototype change is used.
+
+Verification after acceptance:
+
+- Fresh and twenty-leading-blank builds match the immediately frozen accepted
+  object in all loadable sections, section layout and every relocation row.
+- All 38 original function starts, sizes and raw instruction bodies match the
+  preceding 32-C baseline, including both existing callers of this routine.
+- A strict canonical link resolves every undefined symbol and reproduces all
+  19,264 text bytes and all 240 literal/table bytes against both the normal
+  ELF and retail ROM.
+- Forced native `gmake rom COMPARE=1` passes, retail MD5
+  `1561c75d11cedf356a8ddb1a4a5f9d5d`. Host syntax and all 46 native tests pass.
+- The naming plan has no mapped name for this owner; retain its address name.
+  Private compiler observers, search drivers, rejected candidates, generated
+  assembly, objects and ROMs are not published.
+
+The remaining owners are `func_8AF0F2EC`, `func_8AF113D8`, `func_8AF124A8`,
+`func_8AF12E30`, and `func_8AF13718`. They remain assembly with their existing
+requeues. In particular, the four-word linked renderer draft is not accepted.
