@@ -254,3 +254,7 @@ func_8003B6D8 = Geo_NodeAnimatedPart;
 func_8003B9F0 = Geo_PrepareAnimatedPart;
 func_8003CC14 = GeoRender_SetRenderMode;
 func_8003CFB8 = GeoRender_SetFogColor;
+func_8003CD84 = GeoRender_ApplyMaterialState;
+func_8003D270 = GeoRender_BindTexture;
+func_8003D70C = GeoRender_SelectMaterialSlot;
+func_8003DB38 = GeoRender_InitMaterialState;

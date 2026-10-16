@@ -258,7 +258,7 @@ void func_8620148C(void) {
 extern Gfx *D_800D0510;
 extern s32 func_8004C990(s32, s32);
 extern u8 *func_8004CA60(u8 *);
-extern void func_8003CD84(void);
+extern void GeoRender_ApplyMaterialState(void);
 extern u8 D_86209350[];
 void func_862014B8(s32 arg0, s32 arg1) {
     if (arg0 == 5) {
@@ -267,7 +267,7 @@ void func_862014B8(s32 arg0, s32 arg1) {
                    func_8004CA60((u8 *)func_8004C990(0x133, 0)));
         gDPSetEnvColor(D_800D0510++, 0, 0, 0, 0x80);
         gSPDisplayList(D_800D0510++, D_86209350);
-        func_8003CD84();
+        GeoRender_ApplyMaterialState();
     }
 }
 #endif
@@ -340,13 +340,13 @@ void func_86201620(void) {
 #ifdef VERSION_US
 extern Gfx *D_800D0510;
 extern u8 D_86209270[];
-extern void func_8003CD84(void);
+extern void GeoRender_ApplyMaterialState(void);
 void func_86201DE4(s32 arg0, s32 arg1) {
     if (arg0 == 5) {
         gDPPipeSync(D_800D0510++);
         gDPSetCombine(D_800D0510++, 0xFFFFFF, 0xFFFCF238);
         gSPDisplayList(D_800D0510++, D_86209270);
-        func_8003CD84();
+        GeoRender_ApplyMaterialState();
     }
 }
 #endif

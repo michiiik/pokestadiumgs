@@ -16,7 +16,7 @@ void func_87E0B700(void) {
 
 extern Gfx *D_800D0510;
 extern void *D_8009491C;
-extern void func_8003CD84();
+extern void GeoRender_ApplyMaterialState();
 void func_87E0B73C(s32 arg0, s32 arg1) {
     void *context;
 
@@ -27,7 +27,7 @@ void func_87E0B73C(s32 arg0, s32 arg1) {
         gSPSegment(D_800D0510++, 0xF,
                    *(void **)((u8 *)*(void **)((u8 *)context + 4) + 8));
         gSPDisplayList(D_800D0510++, *(void **)context);
-        func_8003CD84();
+        GeoRender_ApplyMaterialState();
     }
 }
 
