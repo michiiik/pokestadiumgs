@@ -97,13 +97,17 @@ void func_8F700420(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/76/fragment76_code/func_8F700538.s")
-#endif
-
-#ifdef VERSION_US
 extern u8 D_15833A0[];
 extern u8 D_8F702368;
 extern void Dma_CopyChunks(u8 *, u8 *, u8 *);
+extern void func_80003F74(u8 *, u8 *, u8 *, s32);
+
+void func_8F700538(volatile u8 arg0) {
+    if (arg0 != 0) {
+        u8 *temp_a2;
+        func_80003F74(&D_8F702368, (temp_a2 = D_15833A0 + arg0 * 0x44) - 0x44, temp_a2, 0);
+    }
+}
 void func_8F70058C(u8 arg0) {
     u8 *temp_a2;
     u8 temp_a3 = arg0;
@@ -116,7 +120,6 @@ void func_8F70058C(u8 arg0) {
 
 #ifdef VERSION_US
 extern u8 D_8F702361;
-extern void func_8F700538(u8);
 void func_8F7005D8(void* opaque, s32* result) {
     F76MenuEntry* entry = opaque;
     switch (entry->kind) {
