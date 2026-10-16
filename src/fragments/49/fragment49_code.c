@@ -1055,7 +1055,39 @@ void func_86105AD8(s32 arg0, s32 arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86105C30.s")
+extern void *func_87F025B8(void *, void *);
+extern u8 func_86105950[];
+extern f32 D_8610AC5C;
+extern void func_8003F114(void *, s32, s32, s32);
+extern void func_8003F1DC(void *);
+void func_86105C30(f32 arg0) {
+    struct NodeC30 {
+        u8 pad0[0x20];
+        void *data;
+        u8 model[0x14];
+        void *self;
+        u8 pad3C[0xC];
+        f32 x;
+        f32 y;
+        f32 z;
+    };
+    struct NodeC30 *obj;
+    u8 *data;
+
+    obj = func_87F025B8((u8 *)(u32)D_8610AD20 + 0xD2C, (void *)func_86105950);
+    if (obj != NULL) {
+        data = obj->data;
+        obj->self = obj;
+        func_86105928((f32 *)obj);
+        obj->x = D_8610AC5C;
+        obj->y = arg0;
+        obj->z = 0.0f;
+        *(u32 *)data = 0;
+        *(f32 *)(data + 4) = arg0;
+        func_8003F1DC(obj->model);
+        func_8003F114(obj->model, 0, -1, *(s32 *)((u8 *)(u32)D_8610AD20 + 0x6C4));
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86105CD8.s")
 
