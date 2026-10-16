@@ -249,3 +249,20 @@ was not run. Do not replay these rejected body/declaration pairs or invent
 volatile qualifiers, padding, dummy locals, or object patches. Next action:
 targeted optimizer investigation of formal-byte versus signed-memory read
 commoning, using the measured single-opcode residual and calibrated controls.
+
+## 2026-10-17: chunk loader func_8F700538 accepted; fragment 76 complete
+
+`func_8F700538` is accepted: 21 words / 84 bytes, frame 0x18, matching retail
+byte-for-byte. ROM gate passes retail MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`.
+With this function, `fragment76_code.c` has 0 remaining `GLOBAL_ASM` pragmas.
+
+Winner: `void func_8F700538(volatile u8 arg0)`.
+The original assembly stores `$a0` to `0x18($sp)` and reloads it twice from its
+LSB stack home `0x1B($sp)`: first for the non-zero branch condition into `$t6`,
+and second for index scaling into `$t7`. A `volatile u8` formal parameter
+models this exact stack home reload sequence without register caching across the
+condition. Evaluating `&D_8F702368` first for argument 0 alongside an inline
+temporary assignment for the source offset `(temp_a2 = D_15833A0 + arg0 * 0x44)`
+recovers the branch delay slot fill (`addiu $a0, $a0, %lo(D_8F702368)`) and exact
+register allocation (`$t9` for `D_15833A0`, `$t8` for scaled index, `$a2`/`$a1`
+for buffer bounds). Removed redundant local prototype `extern void func_8F700538(u8)`.
