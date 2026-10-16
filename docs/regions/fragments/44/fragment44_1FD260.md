@@ -1,5 +1,65 @@
 # Fragment 44 record collection and menu callbacks
 
+## 2026-10-16 — four menu-detail, flag and text-bank routines accepted
+
+Solo native macOS, without agents or containers. Four original assembly
+owners become C: **347 words / 1,388 bytes**. This file advances from
+**15 C / 23 function ASM to 19 C / 19 function ASM**, out of 38 originals.
+No new callable helper, data allocation or compiler change.
+
+| Owner | Behavior | Bytes | Frame | Acceptance batch |
+| --- | --- | ---: | ---: | --- |
+| `func_8AF0F040` | Update record-detail text and category labels | 352 | 0x30 | `e73cb423e36f4fdb8e930632de863194` |
+| `func_8AF10840` | Clear the visibility flag on six existing records | 124 | 0 | `32906cce1ad24f8ebc3297ebed4f68e6` |
+| `func_8AF10944` | Reset colors and highlight the selected record | 372 | 0x18 | `e5ee4394f4d643debf75ddd02ff8ec17` |
+| `func_8AF10AB8` | Initialize nine banks of text records and colors | 540 | 0x38 | `1b8bf191ebb44866845839fbb10e5adb` |
+
+Each normal-runner acceptance passed one full-ROM gate. The first three
+are object link-verified combined-gate accepts. The initializer is a
+relocation-masked sequential-gate accept: IDO represents the bank endpoint
+as `D_8AF30158 + 0xEA0`, exactly the original `D_8AF30FF8` address. A separate
+strict canonical link resolves every undefined name from the normal ELF
+and proves the complete containing text, all **38 original functions**,
+byte-identical to the assembly-backed baseline. No unresolved symbols are
+suppressed, and no probe-only result is counted as acceptance.
+
+### Source mechanisms
+
+- Preserve the detail callback's signed record-index snapshot and real
+  word-wide `index - 1` lookup shared by three string-table calls. Its two
+  mapped category bytes and saved first string pointer reproduce the original
+  stack homes without artificial locals. Keep the original mapping-call order.
+- Clear flags with full-width complements `~1` and `~2`, not truncated
+  `0xFFFE`/`0xFFFD` literals. The final halfword bits are equivalent, but the
+  intermediate expression width changes IDO's temporary allocation. This
+  mechanism matched two routines in this file; it is not a cross-file rule.
+- Declare the existing color objects as four actual RGBA bytes and copy the
+  aggregate directly. Alignment-losing pointer casts generated ten extra
+  unaligned source-load instructions. The destination fields remain genuinely
+  unaligned and retain their original paired stores.
+- The text initializer uses a real descriptor cursor plus indexed bank loop.
+  The signed inner `i < count` test already skips nonpositive counts; an
+  additional positive guard emitted a redundant branch. Let IDO perform the
+  original four-way unrolling rather than spelling it by hand. Initializing
+  the descriptor before the outer loop preserves address setup order.
+
+After formatting and duplicate-extern cleanup, fresh and twenty-leading-blank
+builds reproduce frozen sections, layout and every relocation row. All **38
+original spans** and **34 untouched bodies** are preserved. Forced native
+`gmake rom COMPARE=1` passes, retail MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. Edited-TU host syntax passes with four
+pre-existing pointer warnings; all 46 native tooling tests pass. The naming
+tool finds no existing evidence-backed mappings, so address names remain.
+The RGBA type describes existing storage; it defines no additional data.
+No fake condition, padding, volatile, forced register or provenance bypass.
+
+The section builder remains a **requeue** after eight new early-continue
+variants: no full match. The padding helper also remains a **requeue** after
+eight real output-alias variants; its closest new body is 156 bytes versus
+the original 152, with different bound/register choices. Neither replaces
+its assembly. Scratch generators, traces, objects, compilers and ROMs stay
+local and are not included in the PR.
+
 ## 2026-10-16 — category-filtered collection accepted
 
 Solo native macOS, without agents or containers. `func_8AF125D0` becomes
