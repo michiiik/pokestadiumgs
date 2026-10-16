@@ -297,3 +297,5 @@ func_80026E08 = Audio_ConfigureEventChannel;
 func_80026F44 = Audio_SetupEventVoice;
 func_800271DC = Audio_SelectEventChannel;
 func_8002702C = Audio_UpdateEventVoiceParameters;
+func_8002397C = Audio_GetSpeciesMaskBit;
+func_800354B4 = Audio_SetModeBlocking;
