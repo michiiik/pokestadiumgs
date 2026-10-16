@@ -269,9 +269,41 @@ void DisplayWorker_DrainEvents(void) {
 }
 #endif
 
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/dp_intro/func_80001B20.s")
-#endif
+extern void __osSetFpcCsr(u32);
+extern void func_80001FA8(u8 *, u8, u8, u8, u8, s32, s32, s32);
+extern void Sched_InitClientQueue(void *, s32, s32);
+extern void func_80005568(void *);
+extern u8 D_800CD020[];
+extern OSMesgQueue D_800AB3CC;
+extern OSMesgQueue D_800AB3E4;
+extern void func_8000A080(s32);
+
+void func_80001B20(UNUSED void *arg0) {
+    OSMesg msg;
+
+    __osSetFpcCsr(0x1000C01);
+    func_80001FA8((u8 *)&D_800AB490, 0, 1, 2, 0xFF, 0, 0, 0);
+    func_80001FA8((u8 *)&D_800AB480, 0, 1, 2, 0xFF, 0, 0, 0);
+    Sched_InitClientQueue(leoDiskID, 0, 4);
+    func_80005568(leoDiskID);
+    DisplayTask_Initialize((S1_UnkStruct80001380 *)&D_800AB400);
+
+    while (1) {
+        if (*(s16 *)(D_800CD020 + 0xA38) > 0) {
+            DisplayWorker_DrainEvents();
+        } else {
+            func_8000A080(0);
+            leoDiskID[0xA8A] = 1;
+            osRecvMesg(&D_800AB3CC, &msg, 1);
+            leoDiskID[0xA8A] = 0;
+            func_8000A080(1);
+            func_8000A080(2);
+            func_8000177C(msg);
+            leoDiskID[0xA8B] = func_800017F8();
+            osSendMesg(&D_800AB3E4, (OSMesg)0x444F4E45, 0);
+        }
+    }
+}
 
 void func_80001CA8(void) {
 }
