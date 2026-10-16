@@ -769,15 +769,38 @@ void Audio_DebugSampleHistogram(u8 mode) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80026E08.s")
-#endif
-
-#ifdef VERSION_US
 #pragma pack(1)
 typedef struct { s32 w0; s32 w4; } PackedRecord;
 #pragma pack(0)
 extern PackedRecord D_80090C84[];
 extern PackedRecord D_80090CFC;
+typedef struct AudioChannelEvent {
+    u8 unknown00[2];
+    u16 sound;
+    u8 slot;
+    u8 kind;
+} AudioChannelEvent;
+extern void func_80026ED8(u8);
+extern u8 Audio_SetupEventVoice(AudioChannelEvent *, u8);
+extern s32 func_8002738C(u8);
+s32 Audio_ConfigureEventChannel(AudioChannelEvent *event, u8 request) {
+    u8 channel;
+    func_80026ED8(event->slot);
+    channel = Audio_SetupEventVoice(event, request);
+    ((u8 *)&D_80090C84[event->slot])[1] = channel;
+    *(u16 *)((u8 *)&D_80090C84[event->slot] + 4) = event->sound;
+    ((u8 *)&D_80090C84[event->slot])[3] = event->kind;
+    if (event->kind == 0) {
+        ((u8 *)&D_80090C84[event->slot])[0] = 1;
+    } else {
+        ((u8 *)&D_80090C84[event->slot])[0] = 4;
+    }
+    ((u8 *)&D_80090C84[event->slot])[6] = 1;
+    return func_8002738C(channel);
+}
+#endif
+
+#ifdef VERSION_US
 void func_80026ED8(u8 arg0) {
     func_8001874C(0x06020000 | (((u8 *) &D_80090C84[arg0])[1] << 8), 0);
     D_80090C84[arg0] = D_80090CFC;
@@ -785,7 +808,19 @@ void func_80026ED8(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80026F44.s")
+extern s32 func_800271DC(void *, u8);
+extern void func_8002702C(void *, u8, u8);
+extern u8 D_80090BC1[];
+extern u8 D_80090D28[];
+u8 Audio_SetupEventVoice(AudioChannelEvent *arg0, u8 request) {
+    request = (u8)func_800271DC(arg0, request);
+    func_8002702C(arg0, request, 1);
+    D_80090BC1[request * 12] = D_80090D28[arg0->sound * 16 + 12];
+    func_8001874C(((0x06020000 | (((u32)request & 0xFF) << 8)) | 1), (s8)D_80090D28[arg0->sound * 16]);
+    func_8001874C((0x06020000 | (((u32)request & 0xFF) << 8)), 1);
+    func_8001874C(((0x06020000 | (((u32)request & 0xFF) << 8)) | 3), (s8)((D_80090D28[arg0->sound * 16] & 0x80) >> 7));
+    return request;
+}
 #endif
 
 #ifdef VERSION_US
