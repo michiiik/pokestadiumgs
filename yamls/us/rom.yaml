@@ -1065,6 +1065,8 @@
     - [0x20F140, c,       fragments/44/fragment44_20F140]
     - [0x212740, c,       fragments/44/fragment44_212740]
     - [0x214630, data,    fragments/44/fragment44_data]
+    - [0x217840, .rodata, fragments/44/fragment44_1FD260]
+    - [0x217930, rodata,  fragments/44/fragment44_rodata_tail]
   
   - name: fragment45
     type: code
