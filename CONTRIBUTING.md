@@ -61,27 +61,7 @@ Consequently: Do not include é in Pokémon for variable names as IDO does not a
 
 Use English names for Pokemon and Characters.
 
-Never use the name Poke cup, all versions of the game still contain duplicate internal strings for Poke Cup as in the Japanese Version, Poke cup was five different versions called Nintendo Cup.
-
 The adopted term term for the creature in Kanghakhan's pouch is Kangaskid
-
-##### Area Names 
-
-Because the areas in Stadium are rather poorly named (and even have contradictory names between the game's dialogue and their label) this repo uses the more common names regardless of what the selection label is:
-
-|Area Label|Repo/Common Name|
-|---|---|
-|Victory Palace|Hall of Fame|
-|Pokemon Lab|Professor Oak's Lab|
-|Kid's Club|Minigames|
-
-
-#### Sensitive Language
-Using the term "blackface" and "purpleface" to describe Jynx's coloration in the Jp and US 1.0 versions is discouraged. Use the term "original color" and "purple color"/"new color". 
-
-Nidoqueen's animation did change between JP and US 1.0 so potentially we do in fact have to refer to Nidoqueen's breasts to document this change. Use the word breasts, not slang terms like boobs and not whatever the technical animal husbandry name for the breasts of whatever animal Nidoqueen is supposed to be is.
-
-That said: out of code use of these sensitives terms is none of our business.
 
 ## Comments 
 ### Fakes: Decomp Slop and Karodo 
