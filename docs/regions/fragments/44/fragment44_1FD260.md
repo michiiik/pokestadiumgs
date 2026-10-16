@@ -1,5 +1,72 @@
 # Fragment 44 record collection and menu callbacks
 
+## 2026-10-16 — narrow switch-table layout and three menu routines accepted
+
+Solo native macOS, without agents or containers. Three original assembly
+owners become matching C: **268 words / 1,072 bytes**. This file advances
+from **21 C / 17 function ASM to 24 C / 14 function ASM**, out of 38 originals.
+No new callable helper, data allocation, compiler patch or artificial padding.
+
+| Owner | Behavior | Bytes | Frame | Acceptance batch |
+| --- | --- | ---: | ---: | --- |
+| `func_8AF1000C` | Update page colors and handle the page transition | 592 | 0x28 | `eb3d28b93e21432399f3eae3f296c128` |
+| `func_8AF1025C` | Map the page mode to its texture width | 80 | 0 | `043f41b88f9d44b88db81a69940b69ad` |
+| `func_8AF102AC` | Draw the page texture in its original slice sizes | 400 | 0x40 | `fc4aaf51a55540a8accd5132d9c7d8b4` |
+
+### Layout prerequisite, verified before replacing assembly
+
+Add only **ROM 0x217840..0x217930**, a 240-byte, 16-aligned `.rodata`
+subsegment for this file, followed by a `rodata`-typed shared tail. An audit
+found 16 symbols in this window, each exclusively referenced by one of five
+still-assembly owners in this TU. They are jump tables and floating literals,
+in function order; no existing accepted C or debug string must be migrated.
+The assembly-only full-ROM comparison passed before the first C probe.
+
+Do **not** use the planner's broader 0x217750..0x217A20 proposal: it contains
+debug strings and existing C's externally named strings on both sides of
+the late tables. Earlier `jtbl_8AF29598`/`jtbl_8AF295B4`, used by
+`func_8AF0F2EC`, remain outside this window. The new layout also prepares
+`func_8AF10D08` and `func_8AF113D8`; neither is decompiled by this batch.
+
+### Source mechanisms and acceptance
+
+- Preserve the page dispatcher's full 13-call color-update inventory and
+  original case/body order. Its signed halfword result starts at 12 after
+  the initial call and becomes 10 on the successful transition. The normal
+  runner reports a link-verified, combined-gate acceptance. The first eight
+  incomplete drafts omitted one call and are not compiler-family negatives.
+- For the width map, use a signed halfword parameter and assign `-1` in
+  the explicit default arm, returning the shared result. Initializing the
+  result before the switch changes scheduling. Recover grouped case values
+  from the original table, not from a plausible mode numbering.
+- The texture renderer keeps real word-wide row and byte-count cursors plus
+  a separate advancing texture pointer. After 32 ordinary cells, their best
+  residual was constant-limit setup order. Eight token-identical line-layout
+  probes isolated source-line-sensitive scheduling: grouping the complete
+  function on one logical line closed it. The final readable spelling uses
+  standard backslash continuations to preserve that same logical line, and
+  was rebuilt against the frozen accepted object. No fake statements, unused
+  locals, forced registers or manually unrolled loops are involved.
+
+The width map and texture renderer are relocation-masked sequential-gate
+accepts, **not** raw probe link-verified results. Each passed one full-ROM
+gate. A separate strict canonical link resolves every undefined symbol from
+the normal ROM ELF with `--no-undefined`; all **19,264 containing text bytes**,
+all **38 original function spans**, and all **240 table/literal bytes** agree
+both with that ELF and directly with the immutable retail ROM. No unresolved
+symbols are suppressed. Fresh and twenty-leading-blank rebuilds preserve the
+frozen object's loadable sections, layout and every relocation row after
+formatting and duplicate-extern cleanup. All three owners have accepted
+probe-statistics provenance and exactly these three pragmas are removed.
+
+Forced normal `gmake rom COMPARE=1` passes, retail MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. Edited-TU host syntax passes with four
+pre-existing pointer warnings; all 46 native tooling tests pass. Naming
+plan/apply finds no evidence-backed mappings. Only source, layout, findings
+and generated coverage are published; scratch helpers, extraction artifacts,
+objects, compiler binaries and ROMs remain local. Older callback, section
+builder and padding requeues below remain unresolved, not silently skipped.
+
 ## 2026-10-16 — grouped-list builder and record-information panel accepted
 
 Solo native macOS, without agents or containers. Two larger original owners

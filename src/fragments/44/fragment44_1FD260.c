@@ -105,16 +105,128 @@ void func_8AF0F220(u8 code) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF0F2EC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF1000C.s")
+extern void func_8AC007FC(void);
+extern s32 func_80044144(s32);
+extern void func_8AF00130(s32);
+extern void func_8AC06D70(void *, u32, u32, s32);
+extern void *D_8AF263C0;
+extern void *D_8AF2FA8C;
+extern void *D_8AF2FA90;
+extern u8 D_8AF2FA98[];
+extern u8 D_8AF2FAC8[];
+extern u8 D_8AF2FAF8[];
+extern u8 D_8AF2FB28[];
+extern u8 D_8AF2FB88[];
+extern u8 D_8AF2FB58[];
+extern u8 D_8AF2FBB8[];
+extern u8 D_8AF2FBE8[];
+extern s16 D_8AF2F9CC;
+extern u16 D_8AF2F9CE;
+extern s32 D_8AF26A44;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF1025C.s")
+s32 func_8AF1000C(void) {
+    s16 result;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF102AC.s")
+    func_8AC007FC();
+    result = 12;
+    if ((*(u16 *)((u8 *)D_8AF263C0 + 8) & 0x4000) && func_80044144(D_8AF26A44)) {
+        func_8AF00130(3);
+        result = 10;
+        D_8AF26A44 = 0;
+    }
+    if (D_8AF2FA8C != NULL && *(s32 *)((u8 *)D_8AF2FA8C + 0x1C) != 0) {
+        func_8AC06D70(D_8AF2FA98, (u32)0xB93732FF, (u32)0xC39B6EFF, 3);
+    }
+    if (D_8AF2FA90 != NULL && *(s32 *)((u8 *)D_8AF2FA90 + 0x1C) != 0) {
+        func_8AC06D70(D_8AF2FAC8, (u32)0xB93732FF, (u32)0xC39B6EFF, 5);
+    }
+    switch ((s16)D_8AF2F9CE) {
+    case 1:
+        func_8AC06D70(D_8AF2FB28, (u32)0xB93732FF, (u32)0xC39B6EFF, 5);
+        break;
+    case 2: case 6:
+        func_8AC06D70(D_8AF2FB28, (u32)0xB93732FF, (u32)0xC39B6EFF, 0);
+        break;
+    case 3: case 4:
+        if (D_8AF2F9CC == 0xEC) {
+            func_8AC06D70(D_8AF2FAF8, (u32)0xB93732FF, (u32)0xC39B6EFF, 3);
+        } else {
+            func_8AC06D70(D_8AF2FAF8, (u32)0xB93732FF, (u32)0xC39B6EFF, 0);
+        }
+        func_8AC06D70(D_8AF2FB58, (u32)0xB93732FF, (u32)0xC39B6EFF, 0);
+        func_8AC06D70(D_8AF2FB88, (u32)0xB93732FF, (u32)0xC39B6EFF, 5);
+        break;
+    case 5:
+        func_8AC06D70(D_8AF2FB28, (u32)0xB93732FF, (u32)0xC39B6EFF, 3);
+        func_8AC06D70(D_8AF2FB58, (u32)0xB93732FF, (u32)0xC39B6EFF, 3);
+        func_8AC06D70(D_8AF2FB88, (u32)0xB93732FF, (u32)0xC39B6EFF, 0);
+        func_8AC06D70(D_8AF2FBB8, (u32)0xB93732FF, (u32)0xC39B6EFF, 5);
+        func_8AC06D70(D_8AF2FBE8, (u32)0xB93732FF, (u32)0xC39B6EFF, 5);
+        break;
+    }
+    return result;
+}
+
+s32 func_8AF1025C(s16 code) {
+    s32 result;
+
+    switch (code) {
+    case 0: case 1:
+        result = 0x80;
+        break;
+    case 2: case 6:
+        result = 0x54;
+        break;
+    case 3: case 4: case 5:
+        result = 0x40;
+        break;
+    default:
+        result = -1;
+        break;
+    }
+    return result;
+}
+
+extern void Gfx_DrawTextureRgba16(s16, s16, s16, s16, u8 *, s16, s32);
+
+/* Preserve one logical source line for IDO's instruction scheduling. */
+void func_8AF102AC(s16 x, s16 y, u8 *image) { \
+    s32 row; \
+    s32 i; \
+    u8 *texture; \
+    switch (D_8AF2F9CE) { \
+    case 0: case 1: \
+        row = y; \
+        i = 0; \
+        texture = image; \
+        do { \
+            Gfx_DrawTextureRgba16(x, row, 128, 16, texture, 128, 0); \
+            i += 4096; \
+            row += 16; \
+            texture += 4096; \
+        } while (i != 32768); \
+        break; \
+    case 2: case 6: \
+        row = y; \
+        i = 0; \
+        texture = image; \
+        do { \
+            Gfx_DrawTextureRgba16(x, row, 84, 21, texture, 84, 0); \
+            i += 3528; \
+            row += 21; \
+            texture += 3528; \
+        } while (i != 14112); \
+        break; \
+    case 3: case 4: case 5: \
+        Gfx_DrawTextureRgba16(x, y, 64, 32, image, 64, 0); \
+        Gfx_DrawTextureRgba16(x, y + 32, 64, 32, image + 0x1000, 64, 0); \
+        break; \
+    } \
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF1043C.s")
 
 extern void func_80043E70(s32, s32);
-extern s32 D_8AF26A44;
 
 void func_8AF10540(void) {
     if (D_8AF26A44 != 0) {
