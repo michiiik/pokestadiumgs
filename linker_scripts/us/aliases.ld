@@ -279,3 +279,4 @@ func_800284C0 = Audio_LookupScaledRatio;
 func_80033488 = GbAudio_UpdateChannelIfEnabled;
 func_800355E4 = Audio_RequestIfChanged;
 func_8002730C = Audio_FindEnabledChannel;
+func_800273B4 = Audio_FindLowestPriorityChannel;
