@@ -3460,8 +3460,8 @@ typedef struct S1_unk_D_800ABE00_cmd14 S1_unk_D_800ABE00_cmd14;
 struct S1_unk_D_800ABE00_cmd14 {
     /* 0x00 */ u8 cmd;
     /* 0x01 */ char pad[0x3];
-    /* 0x04 */ s16 pitch; // func_800382E4's arg2, scaled (val<<0xF)/180
-    /* 0x06 */ s16 yaw; // func_800382E4's arg3, scaled (val<<0xF)/180
+    /* 0x04 */ s16 pitch; // GeoNode_CreateLight's arg2, scaled (val<<0xF)/180
+    /* 0x06 */ s16 yaw; // GeoNode_CreateLight's arg3, scaled (val<<0xF)/180
     /* 0x08 */ u8 r;
     /* 0x09 */ u8 g;
     /* 0x0A */ u8 b;
@@ -4184,7 +4184,41 @@ S1_unk_D_8690A610* GeoNode_CreateFog(s32 arg0, S1_unk_D_8690A610* arg1, s16 arg2
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800382E4.s")
+extern S1_Vec3s D_800948DC;
+typedef struct {
+    S1_GraphNode node;
+    S1_Color_RGBA8_u32 color;
+    s16 pitch;
+    s16 yaw;
+    S1_Vec3s direction;
+    u16 pad26;
+    u8 red;
+    u8 green;
+    u8 blue;
+    u8 overrideDirection;
+} SceneDirectionalLight;
+void *GeoNode_CreateLight(S1_MainPoolState *pool, void *storage, s16 pitch, s16 yaw, u8 red, u8 green, u8 blue, u8 alpha) {
+    SceneDirectionalLight *light;
+    if (pool != NULL) {
+        storage = MainPool_AllocAligned(pool, sizeof(SceneDirectionalLight), 4);
+    }
+    light = storage;
+    if (light != NULL) {
+        light->color.r = red;
+        light->color.g = green;
+        light->color.b = blue;
+        light->color.a = alpha;
+        light->pitch = pitch;
+        light->yaw = yaw;
+        light->direction = D_800948DC;
+        light->red = 0;
+        light->green = 0;
+        light->blue = 0;
+        light->overrideDirection = 0;
+        GeoNode_Init((S1_GraphNode *)light, 0xB);
+    }
+    return light;
+}
 #endif
 
 #ifdef VERSION_US
@@ -4964,7 +4998,35 @@ void Geo_ProcessNodeChildren(void *root) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003A370.s")
+extern s32 D_80124D60;
+extern void func_8003B690(s32);
+extern void func_8003B9F0(s32);
+void Geo_PrepareShadowChildren(s32 root) {
+    S1_GraphNode *first = (S1_GraphNode *)((S1_GraphNode *)root)->unk_0C;
+    S1_GraphNode *node = first;
+    if (first != NULL) {
+        do {
+            if (node->unk_01 & 1) {
+                D_80124D60 = 0;
+                if (node->unk_10 != NULL) {
+                    D_80124D60 = node->unk_10(6, node);
+                }
+                switch (node->unk_00) {
+                default:
+                    Geo_PrepareShadowChildren((s32)node);
+                    break;
+                case 0x13:
+                    func_8003B690((s32)node);
+                    break;
+                case 0x14:
+                    func_8003B9F0((s32)node);
+                    break;
+                }
+            }
+            node = node->unk_08;
+        } while (node != first);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -5077,19 +5139,6 @@ void func_8003AC84(s32 arg0) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003AC8C.s")
-#endif
-
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003ADA4.s")
-#endif
-
-#ifdef VERSION_US
-void func_8003B03C(s32 arg0) {}
-#endif
-
-#ifdef VERSION_US
-extern Gfx *D_800D0510;
 typedef struct {
     u8 pad[0x1A];
     u16 unk_1A;
@@ -5101,6 +5150,74 @@ typedef struct {
     Lights7 *lights;
 } ModelFrame;
 extern ModelFrame *D_80094910;
+extern Gfx* D_800D0510;
+void Geo_NodeFog(S1_GraphNode *root) {
+    S1_unk_D_86002F34_alt3 *node = (S1_unk_D_86002F34_alt3 *)root;
+    D_80094910->unknown1D = 1;
+    D_80094910->unknown20 = node->unk_1C;
+    gSPFogPosition(D_800D0510++, node->unk_18, node->unk_1A);
+    gSPSetGeometryMode(D_800D0510++, G_FOG);
+    gDPSetColor(D_800D0510++, G_SETFOGCOLOR, node->unk_1C);
+}
+#endif
+
+#ifdef VERSION_US
+typedef union {
+    Light directional;
+    struct {
+        u32 color;
+        u32 colorCopy;
+        S1_Vec3s position;
+        u8 quadratic;
+        u8 padF;
+    } point;
+} SceneLightRecord;
+extern f32 D_80087E50[];
+extern f32 D_80088E50[0x1000];
+extern Gfx* D_800D0510;
+void Geo_NodeLight(S1_GraphNode *root) {
+    SceneDirectionalLight *node = (SceneDirectionalLight *)root;
+    SceneLightRecord *light;
+    s32 index;
+    if (D_80094910->lightCount >= 7) {
+        return;
+    }
+    light = (SceneLightRecord *)&D_80094910->lights->l[D_80094910->lightCount];
+    if (node->overrideDirection == 0) {
+        light->directional.l.pad1 = 0;
+        *(u32 *)light->directional.l.col = node->color.rgba;
+        *(u32 *)light->directional.l.colc = node->color.rgba;
+        light->directional.l.dir[0] = (120.0f * D_80088E50[((u16)node->pitch >> 4)]) * D_80087E50[((u16)node->yaw >> 4)];
+        light->directional.l.dir[1] = 120.0f * D_80087E50[((u16)node->pitch >> 4)];
+        light->directional.l.dir[2] = (120.0f * D_80088E50[((u16)node->pitch >> 4)]) * D_80088E50[((u16)node->yaw >> 4)];
+    } else {
+        light->point.color = node->color.rgba;
+        light->point.colorCopy = node->color.rgba;
+        light->point.position.x = node->direction.x;
+        light->point.position.y = node->direction.y;
+        light->point.position.z = node->direction.z;
+        light->directional.l.pad1 = node->red;
+        light->directional.l.pad2 = node->green;
+        light->point.quadratic = node->blue;
+        D_80094910->extraGeometryMode++;
+    }
+    D_80094910->lightCount++;
+    if (node->node.unk_02 & 1) {
+        gMoveWd(D_800D0510++, G_MW_NUMLIGHT, 0, D_80094910->lightCount * 0x18);
+        for (index = D_80094910->activeLights; index < D_80094910->lightCount; index++) {
+            gSPLight(D_800D0510++, &D_80094910->lights->l[index], index + 1);
+        }
+        gSPLight(D_800D0510++, D_80094910->lights, index + 1);
+    }
+}
+#endif
+
+#ifdef VERSION_US
+void func_8003B03C(s32 arg0) {}
+#endif
+
+#ifdef VERSION_US
+extern Gfx *D_800D0510;
 typedef struct {
     S1_GraphNode node;
     S1_Color_RGBA8_u32 color;
@@ -5221,12 +5338,12 @@ void func_8003B600(u8 *arg0) {
 
 #ifdef VERSION_US
 Mtx *GeoRender_PushScaledMatrix(S1_Vec3f *, Mtx *);
-extern void func_8003A370(s32);
+extern void Geo_PrepareShadowChildren(s32);
 extern s32 D_8009499C;
 
 void func_8003B690(s32 arg0) {
     D_8009499C = (s32)GeoRender_PushScaledMatrix((S1_Vec3f *)(arg0 + 0x18), NULL);
-    func_8003A370(arg0);
+    Geo_PrepareShadowChildren(arg0);
     (*(s32 *)((u8 *)(&D_80124F68) + (0x10A0))) = (s32) ((*(s32 *)((u8 *)(&D_80124F68) + (0x10A0))) - 1);
 }
 #endif
@@ -6262,9 +6379,9 @@ void func_8003F018(s32 arg0) {
 
 #ifdef VERSION_US
 extern S1_unk_D_86002F58_004_000 *GeoNode_CreateModelPart(S1_MainPoolState *, void *, s16, S1_Vec3f *, S1_Vec3s *, S1_Vec3f *);
-extern u8 D_800948DC[];
+extern S1_Vec3s D_800948DC;
 void func_8003F03C(s32 arg0, void *arg1) {
-    GeoNode_CreateModelPart(NULL, (void *) arg0, -1, &D_800948D0, (S1_Vec3s *) D_800948DC, (S1_Vec3f *) D_800948E4);
+    GeoNode_CreateModelPart(NULL, (void *) arg0, -1, &D_800948D0, &D_800948DC, (S1_Vec3f *) D_800948E4);
     func_80038F8C(arg1, (void *) arg0);
     (*(u8 *)((u8 *)(arg0) + (1))) = (u8) ((*(u8 *)((u8 *)(arg0) + (1))) & 0xFFFE);
 }
@@ -6272,7 +6389,7 @@ void func_8003F03C(s32 arg0, void *arg1) {
 
 #ifdef VERSION_US
 void ModelRenderer_AttachSecondaryDisplayObject(void *arg0) {
-    GeoNode_CreateModelPart(NULL, arg0, 0, &D_800948D0, (S1_Vec3s *) D_800948DC, (S1_Vec3f *) D_800948E4);
+    GeoNode_CreateModelPart(NULL, arg0, 0, &D_800948D0, &D_800948DC, (S1_Vec3f *) D_800948E4);
     func_80038F8C(D_80126438, arg0);
     (*(u8 *)((u8 *)(arg0) + (1))) = (u8) ((*(u8 *)((u8 *)(arg0) + (1))) & 0xFFFE);
 }
@@ -6734,11 +6851,11 @@ void geo_layout_cmd_create_fog(void) {
 #endif
 
 #ifdef VERSION_US
-extern void *func_800382E4(S1_MainPoolState *, void *, s16, s16, u8, u8, u8, u8);
+extern void *GeoNode_CreateLight(S1_MainPoolState *, void *, s16, s16, u8, u8, u8, u8);
 extern void func_8003FD34(void *);
 void geo_layout_cmd_create_light(void) {
     S1_unk_D_800ABE00_cmd14 *cmd = (S1_unk_D_800ABE00_cmd14 *)(u32)D_80126520;
-    func_8003FD34(func_800382E4(D_80126450, NULL, (cmd->pitch << 15) / 180, (cmd->yaw << 15) / 180, cmd->r, cmd->g, cmd->b, cmd->a));
+    func_8003FD34(GeoNode_CreateLight(D_80126450, NULL, (cmd->pitch << 15) / 180, (cmd->yaw << 15) / 180, cmd->r, cmd->g, cmd->b, cmd->a));
     D_80126520 += 12;
 }
 #endif
