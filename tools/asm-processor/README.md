@@ -2,6 +2,28 @@
 
 Pre-process .c files and post-process .o files to enable embedding MIPS assembly into IDO-compiled C.
 
+## Explicit assembly late-rodata alignment
+
+When extraction omits a required alignment hint, the C source can supply the
+same metadata without editing generated assembly:
+
+```c
+#pragma asmproc late_rodata_alignment("owner", 8)
+#pragma GLOBAL_ASM("asm/us/nonmatchings/file/owner.s")
+```
+
+Only 4 and 8 are supported, matching `.late_rodata_alignment` in assembly.
+The annotation must precede its named assembly owner, which must contain
+late rodata; duplicate, conflicting, and unused annotations are errors.
+It selects the existing aligned placeholder mechanism, not instruction
+rewrites or additional source data. Require ROM/section evidence for the
+alignment and verify the whole ROM after changing it.
+
+This describes an assembly owner's data, not an alignment directive for a
+C definition. Replacing that owner by C also requires removing the annotation
+and proving the C object's data layout. Later assembly owners in the same
+translation unit do not inherit the hint.
+
 ## Usage
 
 Let's say you have a file compiled with `-g` on the IDO compiler, that looks like this:
