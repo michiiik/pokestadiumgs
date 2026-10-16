@@ -295,3 +295,5 @@ func_80034118 = GbAudio_ReadPackedChannelParameters;
 func_80025F84 = Audio_InitializeBufferMemory;
 func_80026E08 = Audio_ConfigureEventChannel;
 func_80026F44 = Audio_SetupEventVoice;
+func_800271DC = Audio_SelectEventChannel;
+func_8002702C = Audio_UpdateEventVoiceParameters;
