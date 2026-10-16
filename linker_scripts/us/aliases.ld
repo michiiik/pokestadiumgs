@@ -250,3 +250,7 @@ func_800382E4 = GeoNode_CreateLight;
 func_8003A370 = Geo_PrepareShadowChildren;
 func_8003AC8C = Geo_NodeFog;
 func_8003ADA4 = Geo_NodeLight;
+func_8003B6D8 = Geo_NodeAnimatedPart;
+func_8003B9F0 = Geo_PrepareAnimatedPart;
+func_8003CC14 = GeoRender_SetRenderMode;
+func_8003CFB8 = GeoRender_SetFogColor;
