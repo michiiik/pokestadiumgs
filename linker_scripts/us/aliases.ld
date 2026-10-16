@@ -292,3 +292,4 @@ func_800334C0 = GbAudio_UpdateSquare1Registers;
 func_80033670 = GbAudio_UpdateSquare2Registers;
 func_80026BB4 = Audio_DebugSampleHistogram;
 func_80034118 = GbAudio_ReadPackedChannelParameters;
+func_80025F84 = Audio_InitializeBufferMemory;
