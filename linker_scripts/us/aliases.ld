@@ -262,3 +262,7 @@ func_8003ED18 = ModelAnim_BeginEventContext;
 func_8003F210 = ModelAnim_SetAnimation;
 func_8003F2C4 = ModelAnim_SetResourceAnimation;
 func_8003F874 = PokeIcon_RequestBackgroundForObject;
+func_80037B08 = Color_AdjustRGB5551;
+func_80041BF0 = PokeIcon_InitLoadContext;
+func_80041C98 = PokeIcon_AllocLoadContext;
+func_80041D84 = PokeIcon_AllocSpecialModelContext;

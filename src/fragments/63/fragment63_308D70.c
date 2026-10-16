@@ -157,7 +157,7 @@ void func_87E06B18(void *arg0) {
     (*(s32 *)((u8 *)(arg0) + (0x5C))) = func_800071A4(0, 2, 0x102, 0x17, 0);
 }
 
-extern s32 func_80041C98(s32);
+extern s32 PokeIcon_AllocLoadContext(s32);
 void func_87E06B54(s32 arg0) {
     s32 i;
     void *entry;
@@ -167,7 +167,7 @@ void func_87E06B54(s32 arg0) {
     for (i = 0; i != 2; i += 1, entry = (void *)((u8 *)entry + 0x94)) {
         *(s32 *)((u8 *)entry + 0) = -1;
         *(s32 *)((u8 *)entry + 4) = i;
-        *(s32 *)((u8 *)entry + 0x90) = func_80041C98(5);
+        *(s32 *)((u8 *)entry + 0x90) = PokeIcon_AllocLoadContext(5);
     }
 }
 
