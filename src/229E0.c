@@ -574,7 +574,7 @@ s32 func_80025C9C(void) {
 
 #ifdef VERSION_US
 extern void func_800315E8();
-extern s8 D_80090B9C;
+extern u8 D_80090B9C;
 void func_8002B1A0(void);
 extern void func_80028140(void);
 
@@ -719,7 +719,108 @@ s32 func_80026298(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800262F0.s")
+extern s32 D_80090B60;
+extern u8 D_80090B68;
+extern s16 D_80090B6C;
+extern s16 D_80090B70;
+void Audio_ResetCategoryState(void) {
+    D_80090B64 = 0;
+    D_80090B6C = -1;
+    D_80090B70 = -1;
+    func_80018728(0x82010000U, 0);
+    func_80018704(0x41010000, 0x3F2147AE);
+    D_80090B80 = 1;
+    switch (D_80090B60) {
+    case 2:
+    case 3:
+    case 5:
+    case 7:
+    case 9:
+    case 10:
+        func_80018728(0x82040500U, 0);
+        func_80018704(0x41040000, 0x3F2147AE);
+    case 1:
+    case 4:
+        if (D_80090B9C == 0) {
+            func_80018728(0x82020400U, 0);
+            func_80018704(0x41020000, 0x3F2147AE);
+            D_80090B9C = 1;
+        }
+        break;
+    case 12:
+        func_80018728(0x82030800U, 0);
+        func_80018704(0x41030000, 0x3F3851EC);
+        break;
+    case 0:
+        func_80018728(0x82020600U, 0);
+        func_80018704(0x41020000, 0x3F25E354);
+        break;
+    }
+    if (D_80090B60 == 3 || D_80090B60 == 4 || D_80090B60 == 6) {
+        func_80018728(0x82030300U, 0);
+        func_80018704(0x41030000, 0x3F43D70A);
+        func_800187AC();
+        func_80025E7C();
+    }
+    if (D_80090B68 != 0) {
+        D_80090B68 = 0;
+        switch (D_80090B60) {
+        case 0:
+            func_80018728(0x82020600U, 0);
+            break;
+        case 12:
+            func_80018728(0x82040200U, 0);
+            func_80018704(0x41020000, 0x3F800000);
+            break;
+        case 8:
+            func_80018728(0x82040200U, 0);
+            func_80018704(0x41020000, 0x3F800000);
+            func_80018728(0x82020100U, 0);
+            func_80018704(0x41020000, 0x3F2147AE);
+            func_80018728(0x82010A00U, 0);
+            func_80018728(0x82010000U, 0);
+            func_80018704(0x41010000, 0x3F2147AE);
+            D_80090B80 = 1;
+            func_80024D44();
+            func_80018728(0x82032300U, 0);
+            D_80090A50 = 35;
+            break;
+        case 30:
+            func_80024D44();
+            func_80018728(0x82032300U, 0);
+            D_80090A50 = 35;
+            break;
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+        case 9:
+        case 10:
+        case 11:
+        case 13:
+        case 14:
+        case 15:
+        case 16:
+        case 17:
+        case 18:
+        case 19:
+        case 20:
+        case 21:
+        case 22:
+        case 23:
+        case 24:
+        case 25:
+        case 26:
+        case 27:
+        case 28:
+        case 29:
+            break;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -786,8 +887,6 @@ typedef struct Color_80026938 {
 } Color_80026938;
 extern u8 D_80090B3C[];
 extern Color_80026938 D_80090AD0[];
-extern u16 D_80090B6C;
-extern u16 D_80090B70;
 void func_80026938(u16 arg0) {
     s32 index;
     Color_80026938 *entry;

@@ -300,3 +300,4 @@ func_8002702C = Audio_UpdateEventVoiceParameters;
 func_8002397C = Audio_GetSpeciesMaskBit;
 func_800354B4 = Audio_SetModeBlocking;
 func_800266F8 = Audio_GetEventConfigIndex;
+func_800262F0 = Audio_ResetCategoryState;
