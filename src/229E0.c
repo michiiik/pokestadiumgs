@@ -5071,14 +5071,14 @@ void Geo_NodeType3Pass(s32 arg0) {
 #ifdef VERSION_US
 extern S1_unk_D_86002F34_00C *D_80094914;
 extern s32 D_80094900;
-extern void func_8003DB38(s32, s32);
+extern void GeoRender_InitMaterialState(s32, s32);
 extern void func_8003DD2C(void);
 void Geo_NodeModelPartRoot(void *root) {
     void *node;
     node = root;
     if (D_80094914 == NULL && ((S1_GraphNode *)node)->unk_0C != NULL) {
         D_80094914 = (S1_unk_D_86002F34_00C *)node;
-        func_8003DB38(((S1_GraphNode *)node)->unk_02 & 7, D_80094900);
+        GeoRender_InitMaterialState(((S1_GraphNode *)node)->unk_02 & 7, D_80094900);
         Geo_ProcessNodeChildren(root);
         func_8003DD2C();
         D_80094914 = NULL;
@@ -5798,7 +5798,34 @@ s32 func_8003CD58(s32 arg0) { s32 var_v1; if ((arg0 != 0) && (arg0 != 5) && (arg
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003CD84.s")
+extern void func_8003CB3C(Gfx *arg0, u8 arg1, u8 arg2);
+extern void * D_80094908;
+extern Gfx* D_800D0510;
+extern void * D_801263A8;
+void GeoRender_ApplyMaterialState(void) {
+    S1_Color_RGBA8_u32 color;
+    color.rgba = ((SceneMaterialState *)D_801263A8)->primitiveColor.rgba;
+    ((SceneMaterialState *)D_801263A8)->unknown18 = NULL;
+    ((SceneMaterialState *)D_801263A8)->unknown1C = NULL;
+    ((SceneMaterialState *)D_801263A8)->unknown0C = NULL;
+    ((SceneMaterialState *)D_801263A8)->unknown27 = 0;
+    D_801261A8 = 1;
+    gDPPipeSync(D_800D0510++);
+    gDPSetPrimColor(D_800D0510++, 0, ((SceneMaterialState *)D_801263A8)->primitiveLevel, color.r, color.g, color.b, color.a);
+    gDPSetTextureLUT(D_800D0510++, G_TT_NONE);
+    if (func_8003CD58(((SceneMaterialState *)D_801263A8)->combineMode) != 0) {
+        gSPTexture(D_800D0510++, 0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF);
+    } else {
+        gSPTexture(D_800D0510++, 0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON);
+    }
+    func_8003CB3C(D_800D0510++, ((SceneMaterialState *)D_801263A8)->combineMode, ((SceneMaterialState *)D_801263A8)->primitiveLevel);
+    gSPSetGeometryMode(D_800D0510++, G_SHADE | G_CULL_BACK | G_SHADING_SMOOTH);
+    gSPClearGeometryMode(D_800D0510++, G_FOG | G_TEXTURE_GEN | G_TEXTURE_GEN_LINEAR);
+    gSPLookAt(D_800D0510++, (u32)((S1_unk_D_86002F34_00C *)D_80094908)->unk_60.lookat & 0x1FFFFFFF);
+    if (D_80094910->unknown1D != 0) {
+        gSPSetGeometryMode(D_800D0510++, G_FOG);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -5879,7 +5906,58 @@ void func_8003D1F8(s32 arg0) { if (func_8003CD58(((u8 *)D_801263A8)[0x25]) == 0)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003D270.s")
+typedef struct {
+    u8 format;
+    u8 size;
+    s16 width;
+    s16 height;
+    s16 numTexels;
+    void *image;
+} SceneBoundTexture;
+typedef struct {
+    u8 unknown00[8];
+    Gfx *displayList;
+} SceneBoundPalette;
+extern s16 D_80094B9C[];
+extern Gfx* D_800D0510;
+extern void * D_801263A8;
+void GeoRender_BindTexture(SceneMaterialParameters *node) {
+    SceneBoundTexture *texture;
+    s32 imageSize;
+    if (func_8003CD58(((SceneMaterialState *)D_801263A8)->combineMode)) {
+        gSPTexture(D_800D0510++, 0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON);
+    }
+    if (node->texture != NULL && node->displayList != NULL) {
+        if (node->texture != ((SceneMaterialState *)D_801263A8)->unknown18 || node->displayList != ((SceneMaterialState *)D_801263A8)->unknown20) {
+            texture = node->texture;
+            if (node->material != NULL) {
+                gSPDisplayList(D_800D0510++, ((SceneBoundPalette *)node->material)->displayList);
+            } else {
+                gDPSetTextureLUT(D_800D0510++, G_TT_NONE);
+            }
+            if (texture->size == 0) {
+                if ((texture->width % D_80094B9C[0]) == 0) {
+                    gDPSetTextureImage(D_800D0510++, texture->format, G_IM_SIZ_16b, 1, texture->image);
+                } else {
+                    gDPSetTextureImage(D_800D0510++, texture->format, G_IM_SIZ_8b, texture->width >> 1, texture->image);
+                }
+            } else if ((texture->width % D_80094B9C[texture->size]) == 0) {
+                if (texture->size == 3) {
+                    imageSize = 3;
+                } else {
+                    imageSize = 2;
+                }
+                gDPSetTextureImage(D_800D0510++, texture->format, imageSize, 1, texture->image);
+            } else {
+                gDPSetTextureImage(D_800D0510++, texture->format, texture->size, texture->width, texture->image);
+            }
+            gSPDisplayList(D_800D0510++, node->displayList);
+        }
+        ((SceneMaterialState *)D_801263A8)->unknown18 = node->texture;
+        ((SceneMaterialState *)D_801263A8)->unknown1C = node->material;
+        ((SceneMaterialState *)D_801263A8)->unknown20 = node->displayList;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -5908,7 +5986,24 @@ void GeoRender_EnableTextureGeneration(SceneMaterialParameters *node) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003D70C.s")
+extern s32 D_801263AC;
+extern SceneMaterialState D_801261C8[];
+extern Gfx* D_800D0510;
+extern void * D_801263A8;
+void GeoRender_SelectMaterialSlot(s16 slot) {
+    if (slot == D_801263AC) {
+        return;
+    }
+    ((SceneMaterialState *)D_801263A8)->unknown08 = D_800D0510;
+    gSPBranchList(D_800D0510++, NULL);
+    D_801263AC = slot;
+    D_801263A8 = &D_801261C8[D_801263AC];
+    if (((SceneMaterialState *)D_801263A8)->unknown04 == NULL) {
+        ((SceneMaterialState *)D_801263A8)->unknown04 = D_800D0510;
+    } else if (((SceneMaterialState *)D_801263A8)->unknown08 != NULL) {
+        gSPBranchList((Gfx *)((SceneMaterialState *)D_801263A8)->unknown08, D_800D0510);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -5942,18 +6037,18 @@ s16 func_8003D808(s16 arg0) {
 #ifdef VERSION_US
 extern s32 D_800949A0;
 extern s32 D_801261A4;
-extern void func_8003D70C(s16);
+extern void GeoRender_SelectMaterialSlot(s16);
 extern void GeoRender_SetFogColor(SceneMaterialParameters *);
-extern void func_8003D270(SceneMaterialParameters *);
-extern void func_8003CD84(void);
+extern void GeoRender_BindTexture(SceneMaterialParameters *);
+extern void GeoRender_ApplyMaterialState(void);
 void GeoRender_SubmitMaterial(s16 format, Mtx *matrix) {
     if (D_800949A0 != 0 && !(D_801261A4 & 2) && D_801261B0.level > 0) {
         func_8003D7B8(format);
-        func_8003D70C(func_8003D808(format));
+        GeoRender_SelectMaterialSlot(func_8003D808(format));
         D_801261A8 = 0;
         if (((SceneMaterialState *)D_801263A8)->unknown00 == 0) {
             GeoRender_SetRenderMode();
-            func_8003CD84();
+            GeoRender_ApplyMaterialState();
             ((SceneMaterialState *)D_801263A8)->unknown00 = 1;
         }
         if (D_801261B0.fogColor.rgba & 0xFF) {
@@ -5965,12 +6060,12 @@ void GeoRender_SubmitMaterial(s16 format, Mtx *matrix) {
             GeoRender_EnableTextureGeneration((&D_801261B0));
         } else {
             if (((SceneMaterialState *)D_801263A8)->unknown27 == 1) {
-                func_8003CD84();
+                GeoRender_ApplyMaterialState();
             }
             if (func_8003CD58(D_801261B0.mode)) {
                 func_8003D1F8((s32)(&D_801261B0));
             } else {
-                func_8003D270((&D_801261B0));
+                GeoRender_BindTexture((&D_801261B0));
             }
             GeoRender_SetPrimitiveColor((ScenePrimitiveColor *)(&D_801261B0));
             func_8003D188((u8 *)(&D_801261B0));
@@ -5985,7 +6080,7 @@ void GeoRender_SubmitMaterial(s16 format, Mtx *matrix) {
 
 #ifdef VERSION_US
 extern u32 Memmap_GetFragmentVaddr(Gfx **);
-extern void func_8003CD84(void);
+extern void GeoRender_ApplyMaterialState(void);
 extern s32 D_800949A0;
 extern s32 D_801261A4;
 extern Gfx* D_800D0510;
@@ -6003,7 +6098,7 @@ void func_8003DA20(s32 arg0, s32 arg1) {
                 command->words.w0 = 0xDE000000;
             }
         }
-        if (arg1 != 0) func_8003CD84();
+        if (arg1 != 0) GeoRender_ApplyMaterialState();
     }
 }
 #endif
@@ -6033,7 +6128,49 @@ void GeoRender_SetMaterialTexture(s32 arg0, CandidateColor arg1, void *arg2, voi
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003DB38.s")
+extern Gfx* D_800D0510;
+extern void * D_801263A8;
+void GeoRender_InitMaterialState(s32 mode, s32 flags) {
+    s32 index;
+    SceneMaterialState *entry = D_801261C8;
+    gDPPipeSync(D_800D0510++);
+    gDPSetCycleType(D_800D0510++, G_CYC_2CYCLE);
+    if (mode & 1) {
+        gSPSetGeometryMode(D_800D0510++, G_ZBUFFER);
+    } else {
+        gSPClearGeometryMode(D_800D0510++, G_ZBUFFER);
+    }
+    for (index = 0; index < 12; index++, entry++) {
+        entry->unknown04 = NULL;
+        entry->unknown08 = NULL;
+        entry->unknown00 = 0;
+        entry->unknown0C = NULL;
+        entry->primitiveColor.rgba = 0xFFFFFFFF;
+        entry->fogColor.rgba = 0xFFFFFF00;
+        entry->unknown18 = NULL;
+        entry->unknown1C = NULL;
+        entry->unknown20 = NULL;
+        entry->unknown24 = index;
+        entry->combineMode = 0;
+        entry->unknown27 = 0;
+        entry->primitiveLevel = 0xFF;
+    }
+    D_801261B0.mode = 0;
+    D_801261B0.level = 0xFF;
+    D_801261B0.unknown02 = 0;
+    D_801261B0.textureVariant = 0;
+    D_801261B0.primitiveColor.rgba = 0xFFFFFFFF;
+    D_801261B0.fogColor.rgba = 0xFFFFFF00;
+    D_801261B0.texture = NULL;
+    D_801261B0.material = NULL;
+    D_801261B0.displayList = NULL;
+    D_801261A0 = mode;
+    D_801261A4 = flags;
+    D_801261C8[0].unknown04 = D_800D0510;
+    D_801263AC = 0;
+    D_801263A8 = D_801261C8;
+    D_800949A0 = 1;
+}
 #endif
 
 #ifdef VERSION_US

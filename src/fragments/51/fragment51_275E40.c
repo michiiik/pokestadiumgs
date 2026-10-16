@@ -83,7 +83,7 @@ void func_863004E8(void) {
 extern Gfx *D_800D0510;
 extern s32 func_8004C990(s32, s32);
 extern u8 *func_8004CA60(u8 *);
-extern void func_8003CD84(void);
+extern void GeoRender_ApplyMaterialState(void);
 extern u8 D_863070F0[];
 void func_863004F0(s32 arg0, s32 arg1) {
     if (arg0 == 5) {
@@ -91,7 +91,7 @@ void func_863004F0(s32 arg0, s32 arg1) {
         gSPSegment(D_800D0510++, 0xF, func_8004CA60((u8 *)func_8004C990(0x93, 0)));
         gDPSetEnvColor(D_800D0510++, 0x7F, 0x7F, 0x7F, 0xFF);
         gSPDisplayList(D_800D0510++, D_863070F0);
-        func_8003CD84();
+        GeoRender_ApplyMaterialState();
     }
 }
 #endif

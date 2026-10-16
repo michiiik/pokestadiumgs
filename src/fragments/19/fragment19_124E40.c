@@ -44,7 +44,7 @@ s32 func_82304520(s32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_124E40/func_82304F5C.s")
 
-extern void func_8003CD84(void);
+extern void GeoRender_ApplyMaterialState(void);
 extern s32 func_82303D84(u16);
 extern void func_82304F5C(s32, s32, void *, void *, void *, s32);
 extern u8 D_82305BD0[];
@@ -66,7 +66,7 @@ s32 func_823052FC(s32 arg0, s32 arg1) {
         }
         coords = (u16 *)D_82306AE8;
         func_82304F5C(-((s32)coords[0] / 2), (s32)coords[1] / 2, coords, var_a3, var_a3 + 3, temp_v1);
-        func_8003CD84();
+        GeoRender_ApplyMaterialState();
     }
     return 0;
 }

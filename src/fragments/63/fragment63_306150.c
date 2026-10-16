@@ -15,7 +15,7 @@ void func_87E02A28(void) { func_8004C8C0(0x1A8); func_8004C8C0(0x1B2); func_8004
 
 extern Gfx *D_800D0510;
 extern void *D_8009491C;
-extern void func_8003CD84(void);
+extern void GeoRender_ApplyMaterialState(void);
 void func_87E02F40(s32 arg0, s32 arg1) {
     u8 *context;
     void *temp_v0;
@@ -29,7 +29,7 @@ void func_87E02F40(s32 arg0, s32 arg1) {
         gDPSetCombine(D_800D0510++, 0xFFFFFF, 0xFFFCF238);
         gSPSegment(D_800D0510++, 0xF, *(void **)((u8 *)temp_a0 + 8));
         gSPDisplayList(D_800D0510++, *(void **)((u8 *)temp_a0 + 4));
-        func_8003CD84();
+        GeoRender_ApplyMaterialState();
     }
 }
 
@@ -61,7 +61,7 @@ void func_87E03020(void *arg0) {
 extern Gfx *D_800D0510;
 extern void *D_8009491C;
 extern void func_87E03020(void *);
-extern void func_8003CD84(void);
+extern void GeoRender_ApplyMaterialState(void);
 void func_87E030F0(s32 arg0, s32 arg1) {
     u8 *context;
     void *temp_v0;
@@ -76,7 +76,7 @@ void func_87E030F0(s32 arg0, s32 arg1) {
             gDPSetCombine(D_800D0510++, 0xFFFFFF, 0xFFFCF238);
             gSPSegment(D_800D0510++, 0xF, *(void **)((u8 *)temp_s0 + 4));
             gSPDisplayList(D_800D0510++, *(void **)((u8 *)temp_s0 + 0));
-            func_8003CD84();
+            GeoRender_ApplyMaterialState();
         }
     }
 }
@@ -126,7 +126,7 @@ void func_87E03594(void *arg0, s32 arg1) {
 
 extern Gfx *D_800D0510;
 extern void *D_8009491C;
-extern void func_8003CD84(void);
+extern void GeoRender_ApplyMaterialState(void);
 typedef struct {
     u8 pad_60[0x60];
     u8 red;
@@ -148,7 +148,7 @@ void func_87E0375C(s32 arg0, s32 arg1) {
         gSPSegment(D_800D0510++, 0xF,
                    *(void **)((u8 *)(*(void **)((u8 *)temp_a1 + 0xC)) + 8));
         gSPDisplayList(D_800D0510++, *(void **)((u8 *)temp_a1 + 8));
-        func_8003CD84();
+        GeoRender_ApplyMaterialState();
     }}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_306150/func_87E03850.s")

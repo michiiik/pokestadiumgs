@@ -669,7 +669,7 @@ void func_86B0B608(s32 arg0) {
 extern Gfx *D_800D0510;
 extern s32 func_8004C990(s32, s32);
 extern u8 *func_8004CA60(u8 *);
-extern void func_8003CD84(void);
+extern void GeoRender_ApplyMaterialState(void);
 extern s32 D_86B0E7F4;
 void func_86B0B6CC(s32 arg0, s32 arg1) {
     s32 pad[2];
@@ -681,7 +681,7 @@ void func_86B0B6CC(s32 arg0, s32 arg1) {
         gDPSetCombine(D_800D0510++, 0xFCFFD3FF, 0xFFFEFE38);
         gSPSegment(D_800D0510++, 0xF, func_8004CA60((u8 *)temp_v0));
         gSPDisplayList(D_800D0510++, D_86B0E7F4);
-        func_8003CD84();
+        GeoRender_ApplyMaterialState();
     }
 }
 #endif
@@ -719,7 +719,7 @@ void func_86B0B9A0(void) {
 
 #ifdef VERSION_US
 extern u8 *D_8009491C;
-extern void func_8003CD84(void);
+extern void GeoRender_ApplyMaterialState(void);
 extern s32 func_8004C990(s32, s32);
 extern u8 * func_8004CA60(u8 *);
 extern Gfx * D_800D0510;
@@ -740,7 +740,7 @@ void func_86B0BA28(s32 arg0, s32 arg1) {
         pkt = D_800D0510++;
         gSPSegment(pkt, 0xF, func_8004CA60((u8 *)temp_v0));
         gSPDisplayList(D_800D0510++, D_86B0E7F4);
-        func_8003CD84();
+        GeoRender_ApplyMaterialState();
     }
 }
 #endif

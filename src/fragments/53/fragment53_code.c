@@ -473,13 +473,13 @@ void Fragment53_UpdateActorModelHeights(s32 arg0, void *arg1) {
 extern Gfx *D_800D0510;
 extern Vtx D_8650C640[];
 extern Gfx D_8650D430[];
-extern void func_8003CD84();
+extern void GeoRender_ApplyMaterialState();
 s32 func_865046A8(s32 arg0, s32 arg1) {
     if (arg0 == 5) {
         gDPSetEnvColor(D_800D0510++, 255, 100, 100, 255);
         gSPVertex(D_800D0510++, D_8650C640, 4, 0);
         gSPDisplayList(D_800D0510++, D_8650D430);
-        func_8003CD84();
+        GeoRender_ApplyMaterialState();
     }
     return 0;
 }
