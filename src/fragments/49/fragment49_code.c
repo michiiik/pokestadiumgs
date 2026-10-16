@@ -1188,9 +1188,17 @@ void func_86106688(void) {
     }
 }
 
-#pragma GLOBAL_ASM("hand_asm/fragments/49/func_86106710_rodata_manual.s")
+extern f32 D_8610AC7C;
+void func_86106710(void) {
+    f32 scale = D_8610AC7C;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86106784.s")
+    *(f32 *)((u8 *)D_87F119DC + 0x10) *= scale;
+    *(f32 *)((u8 *)D_87F119DC + 0x14) *= scale;
+    *(f32 *)((u8 *)D_87F119DC + 0x48) += *(f32 *)((u8 *)D_87F119DC + 0x10) + *(f32 *)((u8 *)(u32)D_8610AD20 + 0x9774);
+    *(f32 *)((u8 *)D_87F119DC + 0x4C) += *(f32 *)((u8 *)D_87F119DC + 0x14);
+}
+
+#pragma GLOBAL_ASM("hand_asm/fragments/49/func_86106784_rodata_manual.s")
 
 extern void func_86106688();
 extern void func_86106504();
