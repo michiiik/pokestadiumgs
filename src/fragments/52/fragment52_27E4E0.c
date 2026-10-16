@@ -448,7 +448,7 @@ extern s32 func_87F08208(u8 *);
 extern void StageContext_SetClearColor(s32);
 extern void StageFade_StartFromTransparent(s32);
 extern void func_800225C4(s32);
-extern void func_800279C4(s32);
+extern void Audio_PlayDefaultSound(s32);
 extern void func_86406660(s32);
 extern void func_800226C0(s32);
 void func_86405E08(void) {
@@ -462,7 +462,7 @@ void func_86405E08(void) {
         StageFade_StartFromTransparent(0x14);
         *(s32 *)(D_86416C00 + 0x10) = 2;
         func_800225C4(0x28);
-        func_800279C4(0xCF0B);
+        Audio_PlayDefaultSound(0xCF0B);
         break;
     case 2:
         func_86406660(0);
@@ -609,7 +609,7 @@ extern s32 func_87F006AC(void);
 extern void func_86408CA0(s32, s32);
 extern void func_87F0CA30(void);
 extern void func_86408148(void);
-extern void func_800279C4(s32);
+extern void Audio_PlayDefaultSound(s32);
 extern void func_86406660(s32 arg0);
 extern void func_864066B4(void);
 extern u8 * D_86416C00;
@@ -635,11 +635,11 @@ void func_864068A4(void) {
             }
         }
         if (func_87F006AC() == 1) {
-            func_800279C4(0x5F07);
+            Audio_PlayDefaultSound(0x5F07);
         }
         if (func_87F006AC() == 2) {
             *(s32 *)(D_86416C00 + 0x10) = 4;
-            func_800279C4(0x5F08);
+            Audio_PlayDefaultSound(0x5F08);
             func_86408CA0(0x22, 0x1E);
             func_87F0CA30();
             func_86408148();

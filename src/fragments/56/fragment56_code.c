@@ -286,7 +286,7 @@ extern void func_800225C4(s32);
 extern void func_800226C0(s32);
 extern void StageContext_SetClearColor(s32);
 extern void StageFade_StartFromTransparent(s32);
-extern void func_800279C4(s32);
+extern void Audio_PlayDefaultSound(s32);
 extern s32 D_8682F2A8;
 void func_868063CC(void) {
     s32 temp_v0;
@@ -301,7 +301,7 @@ void func_868063CC(void) {
         func_86805DB8();
         D_8682F2A8 = 4;
         func_800225C4(0x28);
-        func_800279C4(0xCF0B);
+        Audio_PlayDefaultSound(0xCF0B);
         return;
     case 2:
         D_8682F2A8 = 9;
@@ -350,11 +350,11 @@ extern s32 D_8682F2B4;
 void func_868066B8(void) {
     if (D_8682F2B4 != 1) {
         if (func_87F006AC() == 1) {
-            func_800279C4(0x7F03);
+            Audio_PlayDefaultSound(0x7F03);
         }
         if (func_87F006AC() == 2) {
             D_8682F2A8 = 2;
-            func_800279C4(0x7F04);
+            Audio_PlayDefaultSound(0x7F04);
         }
     }
 }

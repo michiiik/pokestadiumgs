@@ -226,3 +226,7 @@ func_8003A2C8 = Geo_ProcessNodeChildren;
 func_8003A960 = Geo_NodeModelPartRoot;
 func_8003AA58 = Geo_NodePerspective;
 func_80040F60 = Model_AdjustTextureColors;
+func_80024D6C = Audio_GetOrCacheResourceId;
+func_80025EB0 = Audio_RenderNextBuffer;
+func_800279C4 = Audio_PlayDefaultSound;
+func_8002A1FC = Audio_ResetQueueAndBitmap;

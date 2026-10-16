@@ -8,7 +8,7 @@ void func_87E191B0(u8 *arg0, s32 arg1) {
 }
 
 extern u8 *D_80087200;
-extern void func_800279C4(s32);
+extern void Audio_PlayDefaultSound(s32);
 void func_87E191C4(void *arg0) {
     struct State {
         u32 unused;
@@ -19,7 +19,7 @@ void func_87E191C4(void *arg0) {
 
     if (*(u16 *)(D_80087200 + 8) & 0x1000) {
         state->enabled ^= 1;
-        func_800279C4(0xCF02);
+        Audio_PlayDefaultSound(0xCF02);
     }
 }
 

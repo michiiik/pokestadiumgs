@@ -304,7 +304,7 @@ void func_86709040(void) {
 
 #ifdef VERSION_US
 extern s32 func_87F006AC(void);
-extern void func_800279C4(s32);
+extern void Audio_PlayDefaultSound(s32);
 extern void func_80021ED8(s32);
 extern void func_87F0CA30(void);
 extern s32 D_8670B394;
@@ -314,11 +314,11 @@ s32 func_867090A8(void) {
         return 0;
     }
     if (func_87F006AC() == 1) {
-        func_800279C4(0x5F07);
+        Audio_PlayDefaultSound(0x5F07);
     }
     if (func_87F006AC() == 2) {
         D_8670BB48 = 1;
-        func_800279C4(0x5F08);
+        Audio_PlayDefaultSound(0x5F08);
         func_80021ED8(0x2E);
         func_87F0CA30();
     }

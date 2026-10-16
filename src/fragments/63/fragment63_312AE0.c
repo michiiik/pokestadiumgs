@@ -15,20 +15,20 @@ void func_87E0F188(s32 arg0) { u8 *base = (u8 *)(u32)D_87E1EBB8; if ((*(s32 *)ba
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E0F1C4.s")
 
-extern void func_800279C4(s32);
+extern void Audio_PlayDefaultSound(s32);
 void func_87E0F288(void *arg0, s32 arg1) {
     void *state = arg0;
     s32 value = *(s32 *)((u8 *)state + 0xC);
     if (((value << 3) >= 0) && ((arg1 << 3) < 0)) {
-        func_800279C4(0xCF01);
+        Audio_PlayDefaultSound(0xCF01);
         value = *(s32 *)((u8 *)state + 0xC);
     }
     if (((value << 2) >= 0) && ((arg1 << 2) < 0)) {
-        func_800279C4(0xCF02);
+        Audio_PlayDefaultSound(0xCF02);
         value = *(s32 *)((u8 *)state + 0xC);
     }
     if (((value << 1) >= 0) && ((arg1 << 1) < 0)) {
-        func_800279C4(0xCF01);
+        Audio_PlayDefaultSound(0xCF01);
         value = *(s32 *)((u8 *)state + 0xC);
     }
     *(s32 *)((u8 *)state + 0xC) = value | arg1;

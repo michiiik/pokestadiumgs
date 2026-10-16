@@ -32,15 +32,15 @@ void func_87F01934(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_3235A0/func_87F019A4.s")
 
-extern void func_800279C4(s32);
+extern void Audio_PlayDefaultSound(s32);
 extern void func_8002809C();
 void func_87F019F0(void) {
     func_8002809C();
     if ((*(s32 *)((u8 *)(D_87F0F610) + (0x30))) == 2) {
-        func_800279C4(0xCF08);
+        Audio_PlayDefaultSound(0xCF08);
         return;
     }
-    func_800279C4(0xCF02);
+    Audio_PlayDefaultSound(0xCF02);
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_3235A0/func_87F01A40.s")
