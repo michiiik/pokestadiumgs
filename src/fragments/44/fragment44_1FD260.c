@@ -310,7 +310,35 @@ s32 func_8AF1060C(s32 mode, void *record) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF106A8.s")
+extern void func_8AC01574(s16, s16, s32, s32, s16);
+extern u8 D_8AF26DD8[];
+extern s16 D_8AF26F20;
+extern s16 D_8AF31000;
+
+s32 func_8AF106A8(s32 mode, void *record) {
+    void *preserved;
+    s16 x;
+    s16 y;
+    s16 values[2];
+
+    preserved = record;
+    switch (mode) {
+    case 0:
+        *(u16 *)((u8 *)preserved + 2) &= 0xFFFD;
+        break;
+    case 1:
+        func_800504BC(values);
+        x = *(s16 *)((u8 *)preserved + 8) + values[0];
+        y = *(s16 *)((u8 *)preserved + 0xA) + values[1];
+        if (D_8AF31000 == 3) {
+            func_8AC01574(x, y, (s32)D_8AF26DD8, D_8AF26F20, D_8AF30FFA);
+        } else {
+            func_8AC015B0(x, y, (s32)D_8AF26DD8, D_8AF26F20, D_8AF30FFA);
+        }
+        break;
+    }
+    return 0;
+}
 
 s32 func_8AF10784(s32 mode, void *record) {
     s16 x;
@@ -367,7 +395,6 @@ extern void *D_8AF300C8;
 extern void *D_8AF300CC;
 extern void *D_8AF300D0;
 extern s16 D_8AF300C4;
-extern s16 D_8AF31000;
 
 void func_8AF10944(void) {
     *(u16 *)((u8 *)D_8AF300C8 + 2) &= ~1;
@@ -462,8 +489,6 @@ extern u8 D_8AF2FF40[];
 extern u8 D_8AF2FFB8[];
 extern u8 D_8AF30030[];
 extern u8 D_8AF300E8[];
-extern u8 D_8AF26DD8[];
-extern s16 D_8AF26F20;
 extern void *D_8AF300A8;
 extern void *D_8AF300AC;
 extern void *D_8AF300B0;
