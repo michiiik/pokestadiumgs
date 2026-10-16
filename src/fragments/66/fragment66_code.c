@@ -229,7 +229,7 @@ extern s32 func_80001FF0(void);
 extern s32 main_pool_get_available(void);
 extern void* MainPool_AllocState(s32, s32);
 extern void MainPool_FinalizeAllocation(void*);
-extern s32 func_80040E80(void*, void*);
+extern s32 process_geo_layout(void*, void*);
 extern void* func_800071A4(s32, s32, s32, s32, s32);
 extern void ModelRenderer_InitDisplayRoots(void);
 extern void func_8003F018(void*);
@@ -251,9 +251,9 @@ void func_82E02508(void) {
         D_82E05650 = 0;
     }
     pool = MainPool_AllocState(main_pool_get_available(), 0);
-    D_82E05654 = func_80040E80(pool, D_82E04EB0);
-    D_82E05658 = func_80040E80(pool, D_82E04F1C);
-    D_82E0565C = func_80040E80(pool, D_82E04F50);
+    D_82E05654 = process_geo_layout(pool, D_82E04EB0);
+    D_82E05658 = process_geo_layout(pool, D_82E04F1C);
+    D_82E0565C = process_geo_layout(pool, D_82E04F50);
     MainPool_FinalizeAllocation(pool);
     D_82E07600 = func_800071A4(0, 2, 320, 240, 0);
     D_82E07604 = func_800071A4(0, 2, 320, 240, 0);

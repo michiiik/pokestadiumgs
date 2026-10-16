@@ -3757,7 +3757,23 @@ S1_unk_D_86002F34_alt2* GeoNode_CreateWithReference(S1_MainPoolState* arg0, S1_u
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80037F40.s")
+extern void GeoCamera_SetViewport(S1_unk_D_86002F34_00C *, s16, s16, s16, s16);
+extern void GeoCamera_SetPerspective(S1_unk_D_86002F34_00C *, f32, f32, f32);
+extern void func_80038E14(void *, f32, f32, f32, f32, f32, f32, u16);
+extern void GeoCamera_SetBackground(S1_unk_D_86002F34_00C *, s16, s16, u8, u8, u8);
+S1_unk_D_86002F34_00C *GeoNode_CreateCamera(S1_MainPoolState *pool, S1_unk_D_86002F34_00C *node, s16 x, s16 y, s16 width, s16 height) {
+    if (pool != NULL) {
+        node = MainPool_AllocAligned(pool, sizeof(S1_unk_D_86002F34_00C), 4);
+    }
+    if (node != NULL) {
+        GeoCamera_SetViewport(node, x, y, width, height);
+        GeoCamera_SetPerspective(node, 30.0f, 100.0f, 12800.0f);
+        func_80038E14(node, 0.0f, 512.0f, 4096.0f, 0.0f, 0.0f, 0.0f, 0);
+        GeoCamera_SetBackground(node, 2, 0, 0, 0, 0);
+        GeoNode_Init((void *)node, 2);
+    }
+    return node;
+}
 #endif
 
 #ifdef VERSION_US
@@ -4822,11 +4838,58 @@ void Geo_NodeDisplayList(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003C2D8.s")
+extern void *D_8009491C;
+extern u8 D_80124F68;
+typedef struct {
+    u16 id;
+    u8 unknown02;
+    S1_Vec3f position;
+} SceneAnchorPosition;
+typedef struct {
+    S1_unk_D_86002F58_004_000_000 header;
+    s16 animation;
+    s16 model;
+    u8 textureMode;
+    u8 materialAlpha;
+    S1_Vec3s rotation;
+    S1_Vec3f position;
+    S1_Vec3f scale;
+    S1_Color_RGBA8_u32 tint;
+    S1_unk_D_86002F58_004_000_040 transform;
+    S1_unk_D_86002F58_004_000_054 events;
+    S1_MtxF matrix;
+    S1_Color_RGBA8_u32 color;
+    u16 unknownA4;
+    u8 poolIndex;
+    u8 anchorCount;
+    SceneAnchorPosition anchors[12];
+} SceneDisplayObjectAnchors;
+typedef struct {
+    S1_MtxF matrices[64];
+    S1_MtxF *stack[32];
+    s8 flags[32];
+    s32 top;
+} SceneTransformPool;
+void func_8003C2D8(s32 id) {
+    S1_MtxF *matrix;
+    SceneAnchorPosition *anchor;
+    if (((SceneDisplayObjectAnchors *)D_8009491C) != NULL) {
+        if (((SceneDisplayObjectAnchors *)D_8009491C)->anchorCount < 12) {
+            anchor = &((SceneDisplayObjectAnchors *)D_8009491C)->anchors[
+                ((SceneDisplayObjectAnchors *)D_8009491C)->anchorCount++];
+            matrix = &((SceneTransformPool *)&D_80124F68)->matrices[
+                ((SceneTransformPool *)&D_80124F68)->top];
+            anchor->id = id;
+            anchor->position.x = matrix->mf[3][0];
+            anchor->position.y = matrix->mf[3][1];
+            anchor->position.z = matrix->mf[3][2];
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
-extern void func_8003C2D8(s16);
+extern void func_8003C2D8(s32);
 extern void func_8003A2C8(void *, ...);
 void Geo_NodeAnchor(void *arg0) {
     func_8003C2D8(*(s16 *)((u8 *)arg0 + 0x18));
@@ -5047,7 +5110,39 @@ void func_8003D1F8(s32 arg0) { if (func_8003CD58(((u8 *)D_801263A8)[0x25]) == 0)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003D55C.s")
+extern u8 D_1000000[];
+extern u8 D_10019D0[];
+typedef struct {
+    u8 mode;
+    u8 level;
+    u8 unknown02;
+    u8 textureVariant;
+    S1_Color_RGBA8_u32 primitiveColor;
+    S1_Color_RGBA8_u32 fogColor;
+    void *texture;
+    void *material;
+    Gfx *displayList;
+} SceneMaterialParameters;
+void GeoRender_EnableTextureGeneration(SceneMaterialParameters *node) {
+    void *texture;
+    if (((SceneMaterialState *)D_801263A8)->unknown27 == 0) {
+        texture = D_1000000;
+        switch (node->textureVariant) {
+        case 1:
+            break;
+        case 2:
+            texture = D_10019D0;
+            break;
+        }
+        gDPLoadTextureBlock(D_800D0510++, texture, G_IM_FMT_RGBA, G_IM_SIZ_16b, 32, 32, 0,
+                           G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, 5, 5, 1, 1);
+        gSPTexture(D_800D0510++, 0x1194, 0x1194, 0, G_TX_RENDERTILE, G_ON);
+        gSPSetGeometryMode(D_800D0510++, G_TEXTURE_GEN);
+        gSPClearGeometryMode(D_800D0510++, G_TEXTURE_GEN_LINEAR);
+        gDPSetCombineMode(D_800D0510++, G_CC_MODULATEIDECALA, G_CC_PASS2);
+        ((SceneMaterialState *)D_801263A8)->unknown27 = 1;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -5994,12 +6089,12 @@ void geo_layout_cmd_create_reference(void) {
 #endif
 
 #ifdef VERSION_US
-extern S1_unk_D_86002F34_00C *func_80037F40(S1_MainPoolState *, S1_unk_D_86002F34_00C *, s16, s16, s16, s16);
+extern S1_unk_D_86002F34_00C *GeoNode_CreateCamera(S1_MainPoolState *, S1_unk_D_86002F34_00C *, s16, s16, s16, s16);
 extern void func_800371B4(S1_Vec3f *, S1_Vec3f *, f32, s16, s16);
 extern void func_8003FD34(void *);
 void func_8003FEB8(void) {
     S1_unk_D_800ABE00_cmdB *cmd = (S1_unk_D_800ABE00_cmdB *)(u32)D_80126520;
-    S1_unk_D_86002F34_00C *node = func_80037F40(D_80126450, NULL, (s16)cmd->viewportX, (s16)cmd->viewportY, cmd->viewportWidth, cmd->viewportHeight);
+    S1_unk_D_86002F34_00C *node = GeoNode_CreateCamera(D_80126450, NULL, (s16)cmd->viewportX, (s16)cmd->viewportY, cmd->viewportWidth, cmd->viewportHeight);
     if (node != NULL) {
         node->unk_24.fovy = (f32)cmd->fovy;
         Vec3f_FromVec3s(&node->unk_60.at, &cmd->lookAt);
@@ -6356,7 +6451,25 @@ void geo_layout_cmd_create_group(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80040E80.s")
+extern s32 D_80094BB0;
+extern void (*D_80094BB4[])(void);
+void *process_geo_layout(S1_MemoryBlock *pool, void *script) {
+    D_80126454 = NULL;
+    D_80126518 = 0;
+    D_8012651A = 2;
+    D_8012651E = 2;
+    D_80126520 = (s32)func_80003240(script);
+    D_80126450 = (S1_MainPoolState *)pool;
+    D_80094BB0 = 0;
+    D_80126498[0] = 0;
+    D_80126458[0] = 0;
+    D_80126458[1] = 0;
+    while (D_80126520 != 0) {
+        D_80094BB4[*((u8 *)(u32)D_80126520)]();
+    }
+    return D_80126454;
+}
+#pragma C_FUNCTION_PADDING(20)
 #endif
 
 #ifdef VERSION_US
@@ -6498,11 +6611,11 @@ done:
 #endif
 
 #ifdef VERSION_US
-extern void *func_80040E80(S1_MemoryBlock *, void *);
+extern void *process_geo_layout(S1_MemoryBlock *, void *);
 void Fragment_ProcessGeoLayoutList(S1_MemoryBlock* arg0, S1_arg1_func_80019420* arg1) {
     while (arg1->unk_00) {
         if (arg1->unk_00 == 3) {
-            arg1->unk_04 = func_80040E80(arg0, arg1->unk_04);
+            arg1->unk_04 = process_geo_layout(arg0, arg1->unk_04);
         }
 
         arg1++;
