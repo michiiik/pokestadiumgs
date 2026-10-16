@@ -1678,7 +1678,12 @@ void func_80033ACC(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80033BF4.s")
+extern void func_80033C40(s32);
+void func_80033BF4(u8 index) {
+    if ((&D_800D2B78 + index * 0x3C)[4] & 2) {
+        func_80033C40(index);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1813,7 +1818,14 @@ void func_80034238(unsigned char arg0, s32 arg1)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003428C.s")
+void func_8003428C(u8 index, s32 unused) {
+    u8 result;
+    (&D_800D2B78 + index * 0x3C)[4] |= 4;
+    result = func_800347E8(index);
+    result = (u8)((u32)result >> 2) | (u8)((result << 1) << 5);
+    (&D_800D2B78 + index * 0x3C)[0x25] = result;
+    (&D_800D2B78 + index * 0x3C)[0x16] = result & 0xC0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -4827,7 +4839,20 @@ s32 GeoRender_IsModelFrameCurrent(void) { s32 var_v1 = 1; if (D_80094910 != NULL
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003C9B8.s")
+S1_Vec3f *GeoRender_FindAnchorPosition(u8 *object, s16 id, S1_Vec3f *out) {
+    s32 i;
+    for (i = 0; i < object[0xA7]; i++) {
+        if (id == *(u16 *)(object + i * 0x10 + 0xA8)) {
+            if (out != NULL) {
+                *out = *(S1_Vec3f *)(object + i * 0x10 + 0xAC);
+            }
+            return (S1_Vec3f *)(object + i * 0x10 + 0xAC);
+        }
+    }
+    return NULL;
+}
+/* Preserve the two zero words at the end of the original assembly owner. */
+#pragma C_FUNCTION_PADDING(8)
 #endif
 
 #ifdef VERSION_US

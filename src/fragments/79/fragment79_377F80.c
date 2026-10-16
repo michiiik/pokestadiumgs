@@ -215,19 +215,19 @@ f32 func_841095DC(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_84109630.s")
 
-s32 func_8003C9B8(s32, s16, s32);
+s32 GeoRender_FindAnchorPosition(s32, s16, s32);
 s32 func_8411E21C(u8 *arg0);
 extern void func_8411DCCC(s32, s32);
 extern void func_84109630(s32, s32);
 void func_8410971C(s32 arg0) {
-    if (func_8003C9B8(D_84190194, func_8411E21C((u8 *) D_84190194), arg0) == 0) {
+    if (GeoRender_FindAnchorPosition(D_84190194, func_8411E21C((u8 *) D_84190194), arg0) == 0) {
         func_8411DCCC(D_84190194, arg0);
     }
     func_84109630(D_84190194, arg0);
 }
 
 void func_84109780(s32 arg0) {
-    if (func_8003C9B8(D_84190198, func_8411E21C(D_84190198), arg0) == 0) {
+    if (GeoRender_FindAnchorPosition(D_84190198, func_8411E21C(D_84190198), arg0) == 0) {
         func_8411DCCC((s32) D_84190198, arg0);
     }
     func_84109630((s32) D_84190198, arg0);
@@ -235,7 +235,7 @@ void func_84109780(s32 arg0) {
 
 extern s32 func_8411E22C(u8 *);
 s32 func_841097E4(s32 arg0) {
-    if (func_8003C9B8((s32) D_8419019C, func_8411E22C(D_8419019C), arg0) == 0) {
+    if (GeoRender_FindAnchorPosition((s32) D_8419019C, func_8411E22C(D_8419019C), arg0) == 0) {
         func_8411DCCC((s32) D_8419019C, arg0);
     }
     func_84109630((s32) D_8419019C, arg0);
@@ -261,7 +261,7 @@ void func_841098C0(s32 arg0) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_84109A18.s")
 
 void func_84109B1C(s32 arg0) {
-    if (func_8003C9B8(D_84190194, func_8411E244(D_84190194, D_8419018C), arg0) == 0) {
+    if (GeoRender_FindAnchorPosition(D_84190194, func_8411E244(D_84190194, D_8419018C), arg0) == 0) {
         func_8411DCCC(D_84190194, arg0);
     }
     func_84109A18(D_84190194, arg0);
