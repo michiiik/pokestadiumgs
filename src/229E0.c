@@ -2432,7 +2432,58 @@ void func_80034A94(u16 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80034ABC.s")
+extern const u8 *D_80094454[];
+extern u8 GbAudio_StartSequenceChannel(const u8 *command);
+extern u8 func_80034CF8(const u8 *arg0);
+extern u8 D_800D2B49;
+extern u8 D_800D2B68;
+extern u8 D_800D2B6A;
+extern u8 D_800D2B78;
+void GbAudio_StartSequence(u16 sequence, u16 parameter, u16 volume)
+{
+  OSIntMask saved;
+  const u8 *header;
+  const u8 *entry;
+  u8 count;
+  u32 i;
+  saved = osSetIntMask(0x00000001);
+  func_800331C8();
+  osSetIntMask(saved);
+  GbAudio_QueueRegisterWrite(0xFF26, 0x8F, 0);
+  header = D_80094454[sequence];
+  count = ((func_80034CF8(header) >> 6) & 3) + 1;
+  i = 0;
+  if (count != 0)
+  {
+    entry = header;
+    do
+    {
+      u8 channel = GbAudio_StartSequenceChannel(entry);
+      u8 *record = (&D_800D2B78) + (channel * 0x3C);
+      *((u16 *) (record + 0x30)) = parameter;
+      saved = channel;
+      record[3] |= 0x20;
+      record[4] |= 0x10;
+      if ((s32)(saved & 3) < 3)
+      {
+        *((u16 *) (((&D_800D2B78) + (channel * 0x3C)) + 0x22)) = volume;
+      }
+      func_80034A08(channel);
+      entry += 8;
+      i++;
+    }
+    while (i < count);
+  }
+  if (D_800D2B68 == 0)
+  {
+    D_800D2B68 = D_800D2B49;
+    D_800D2B49 = 0x77;
+  }
+  D_800D2B6A = 1;
+  saved = osSetIntMask(0x00000001);
+  func_800331B8();
+  osSetIntMask(saved);
+}
 #endif
 
 #ifdef VERSION_US
@@ -2519,7 +2570,7 @@ typedef struct Func80034E5CRecord {
     u16 unk4;
 } Func80034E5CRecord;
 extern Func80034E5CRecord D_80092620[];
-extern void func_80034ABC(u8, u16, u16, s32);
+extern void GbAudio_StartSequence(u16, u16, u16);
 void func_80034E5C(s32 arg0, s32 arg1)
 {
     s32 *input;
@@ -2527,7 +2578,7 @@ void func_80034E5C(s32 arg0, s32 arg1)
     input = &arg0;
     arg1 = *input & 0xFFFF;
     record = &D_80092620[arg1];
-    func_80034ABC(record->unk0, record->unk2, record->unk4, arg1);
+    GbAudio_StartSequence(record->unk0, record->unk2, record->unk4);
 }
 #endif
 
@@ -2609,7 +2660,30 @@ void func_80035020(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035068.s")
+extern OSMesgQueue D_800D2D60;
+extern OSPiHandle *D_800D2D78;
+void Audio_ReadRomBlocking(u32 rom, u8 *destination, u32 remaining) {
+    OSIoMesg message;
+    u32 currentRom = rom;
+    u8 *currentDestination = destination;
+    u32 chunk;
+    while (remaining != 0) {
+        if (remaining > 0x4000) chunk = 0x4000;
+        else chunk = remaining;
+        message.hdr.pri = OS_MESG_PRI_NORMAL;
+        message.hdr.retQueue = &D_800D2D60;
+        message.dramAddr = currentDestination;
+        message.devAddr = currentRom;
+        message.size = chunk;
+        osInvalDCache(currentDestination, chunk);
+        osEPiStartDma(D_800D2D78, &message, OS_READ);
+        osRecvMesg(&D_800D2D60, NULL, OS_MESG_BLOCK);
+        remaining -= chunk;
+        currentRom += chunk;
+        currentDestination += chunk;
+    }
+}
+#pragma C_FUNCTION_PADDING(4)
 #endif
 
 #ifdef VERSION_US
