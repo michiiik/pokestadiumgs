@@ -171,7 +171,7 @@ extern s32 D_86606BC0[][4];
 extern s32 D_86606B84[];
 extern s32 D_86606BC4[];
 extern f32 D_86606718;
-extern void func_8003F210(void *, s32);
+extern void ModelAnim_SetAnimation(void *, s32);
 extern void ModelAnim_SetEventFrame(void *, s32);
 extern void func_8003F3BC(void *, s32);
 extern void func_80027A28(u16, u8);
@@ -193,7 +193,7 @@ void func_86601F70(void *arg0, s32 arg1) {
             break;
         }
         *(s32 *)(record + 0x28) = 1;
-        func_8003F210(D_86607410 + arg1 * 0x168, 3);
+        ModelAnim_SetAnimation(D_86607410 + arg1 * 0x168, 3);
         ModelAnim_SetEventFrame(arg0, 0);
         func_8003F3BC(arg0, 3);
         *(f32 *)(position + 0x24) = (f32)*(s32 *)((u8 *)D_86606B84 + arg1 * 0x10);
@@ -205,7 +205,7 @@ void func_86601F70(void *arg0, s32 arg1) {
             break;
         }
         *(s32 *)(record + 0x28) = 2;
-        func_8003F210(D_86607410 + arg1 * 0x168, 4);
+        ModelAnim_SetAnimation(D_86607410 + arg1 * 0x168, 4);
         ModelAnim_SetEventFrame(arg0, 0);
         func_8003F3BC(arg0, 4);
         func_80027A28((u16)(arg1 + 0x2F04), (u8)arg1);
@@ -215,7 +215,7 @@ void func_86601F70(void *arg0, s32 arg1) {
             break;
         }
         *(s32 *)(record + 0x28) = 3;
-        func_8003F210(D_86607410 + arg1 * 0x168, 1);
+        ModelAnim_SetAnimation(D_86607410 + arg1 * 0x168, 1);
         ModelAnim_SetEventFrame(arg0, 0);
         func_8003F3BC(arg0, 1);
         func_80027A28((u16)(arg1 + 0x2F04), (u8)arg1);
@@ -225,7 +225,7 @@ void func_86601F70(void *arg0, s32 arg1) {
             break;
         }
         *(s32 *)(record + 0x28) = 4;
-        func_8003F210(D_86607410 + arg1 * 0x168, 2);
+        ModelAnim_SetAnimation(D_86607410 + arg1 * 0x168, 2);
         ModelAnim_SetEventFrame(arg0, 0);
         func_8003F3BC(arg0, 2);
         func_80027A28((u16)(arg1 + 0x2F04), (u8)arg1);
@@ -369,7 +369,7 @@ extern void ModelAnim_SetEventFrame(void *, s32);
 extern void ModelAnim_SetSpeed(void *, s32);
 extern void StageContext_SetClearColor(s32);
 extern s32 StageFade_StartFromTransparent(s32);
-extern void func_8003F210(void *, s32);
+extern void ModelAnim_SetAnimation(void *, s32);
 extern void func_8003F3BC(void *, s32);
 extern u8 D_86606788;
 extern u8 D_86607410[];
@@ -386,7 +386,7 @@ void func_86604370(void) {
     anim = D_866079B0; inner = D_86608220; source = D_866073E8; a = D_86609E40; b = D_86607410; c = D_8660A3E0;
     do {
         func_8003F114(anim, 0, -1, *(s32 *)source);
-        func_8003F210(anim, 5);
+        ModelAnim_SetAnimation(anim, 5);
         ModelAnim_SetFrame(anim, (s16)(guRandom() % 25));
         ModelAnim_SetSpeed(anim, 0x10000);
         ModelAnim_SetEventFrame(anim, 0);

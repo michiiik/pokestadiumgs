@@ -16,7 +16,7 @@ typedef struct {
     Func860049B8Node nodes[2][4][4];
     f32 values[2][4][4];
 } Func860049B8Context;
-extern void func_8003F210(void *, s32);
+extern void ModelAnim_SetAnimation(void *, s32);
 extern void ModelAnim_SetSpeed(void *, s32);
 extern void ModelAnim_SetFrame(void *, s16);
 extern u8 D_8600DE30[];
@@ -33,7 +33,7 @@ void func_860049B8(Func860049B8Context *arg0, f64 arg1) {
                 node = &arg0->nodes[i][j][k];
                 if (arg0->values[i][j][k] > 0.0f) {
                     frame = 16.0 - ((f64)(arg0->values[i][j][k] * 16.0f) / *(f64 *)(D_8600DE30 + 0x2D0));
-                    func_8003F210(node, 0);
+                    ModelAnim_SetAnimation(node, 0);
                     ModelAnim_SetSpeed(node, 0);
                     ModelAnim_SetFrame(node, frame);
                     node->flags |= 1;

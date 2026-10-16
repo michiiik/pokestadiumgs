@@ -648,7 +648,7 @@ extern s32 D_8291B858;
 extern s32 D_82912F80;
 extern void StageFade_StartFromOpaque(s32);
 extern void func_8290A5B0(s32);
-extern void func_8003F2C4(s32, s32, s32);
+extern void ModelAnim_SetResourceAnimation(s32, s32, s32);
 extern void ModelAnim_SetFrame(u8 *, s16);
 extern void func_8290AB10(s32);
 void func_8290B098(void) {
@@ -667,7 +667,7 @@ void func_8290B098(void) {
     }
     StageFade_StartFromOpaque(8);
     func_8290A5B0(1);
-    func_8003F2C4(*(s32 *)&D_8291A7C0, (s32)&D_8291A7C4, config[0]);
+    ModelAnim_SetResourceAnimation(*(s32 *)&D_8291A7C0, (s32)&D_8291A7C4, config[0]);
     ModelAnim_SetFrame(&D_8291A7C4, config[1]);
     *(s16 *)&D_8291A960 = 0;
     func_8290AB10(6);
@@ -854,7 +854,7 @@ void func_8290BC84(u8 *arg0, s32 arg1) {
 #ifdef VERSION_US
 extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
 extern void func_80037120(void *, void *, s16 *, s16 *, s16 *);
-extern void func_8003F2C4(s32, s32, s32);
+extern void ModelAnim_SetResourceAnimation(s32, s32, s32);
 extern void func_8290A208(s32);
 extern void func_8290B264(void);
 extern u8 D_8291A7C0;
@@ -877,11 +877,11 @@ void func_8290CFD8(void) {
                 func_8290A208(i);
             }
             if (*(u16 *)(&D_8291A7C0 + i * 0x1A4 + 0x1A0) == 0) {
-                func_8003F2C4(*(s32 *)(&D_8291A7C0 + i * 0x1A4), (s32)(&D_8291A7C0 + i * 0x1A4 + 4), 2);
+                ModelAnim_SetResourceAnimation(*(s32 *)(&D_8291A7C0 + i * 0x1A4), (s32)(&D_8291A7C0 + i * 0x1A4 + 4), 2);
             }
             (*(u16 *)(&D_8291A7C0 + i * 0x1A4 + 0x1A0))++;
             if (ModelAnim_IsFinished(&D_8291A7C0 + i * 0x1A4 + 4)) {
-                func_8003F2C4(*(s32 *)(&D_8291A7C0 + i * 0x1A4), (s32)(&D_8291A7C0 + i * 0x1A4 + 4), 0);
+                ModelAnim_SetResourceAnimation(*(s32 *)(&D_8291A7C0 + i * 0x1A4), (s32)(&D_8291A7C0 + i * 0x1A4 + 4), 0);
             }
         }
     }

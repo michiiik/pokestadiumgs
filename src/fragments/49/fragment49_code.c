@@ -266,10 +266,10 @@ void func_86100DA8(void *arg0) {
     }
 }
 
-extern void func_8003F210(void *, s32);
+extern void ModelAnim_SetAnimation(void *, s32);
 extern void ModelAnim_SetFrame(u8 *, s16);
 extern u32 func_8003570C(void);
-void func_86100E20(void *arg0, s32 arg1) { if ((arg1 & 0x80000000) != 0) { if ((*(s32 *)((u8 *)arg0+12)<<1)>=0) { *(s32 *)((u8 *)arg0+12)|=arg1; *(s32 *)((u8 *)arg0+28)=0; } } else if ((arg1 & 0x40000000) != 0) { *(s32 *)((u8 *)arg0+12)&=0x7EFFFFFF; *(s32 *)((u8 *)arg0+12)|=arg1; *(s32 *)((u8 *)arg0+28)=0; } else if ((arg1 & 0x00400000) != 0) { *(s32 *)((u8 *)arg0+28)=0; *(s32 *)((u8 *)arg0+12)|=arg1; func_8003F210((u8 *)arg0+36,5); ModelAnim_SetFrame((u8 *)arg0+36,(s16)(func_8003570C()%12)); } else if ((arg1 & 0x01000000) != 0) { *(s32 *)((u8 *)arg0+196)=0xFF0000AF; *(s32 *)((u8 *)arg0+12)|=arg1; *(s32 *)((u8 *)arg0+28)=0; } else { *(s32 *)((u8 *)arg0+28)=0; *(s32 *)((u8 *)arg0+12)|=arg1; } }
+void func_86100E20(void *arg0, s32 arg1) { if ((arg1 & 0x80000000) != 0) { if ((*(s32 *)((u8 *)arg0+12)<<1)>=0) { *(s32 *)((u8 *)arg0+12)|=arg1; *(s32 *)((u8 *)arg0+28)=0; } } else if ((arg1 & 0x40000000) != 0) { *(s32 *)((u8 *)arg0+12)&=0x7EFFFFFF; *(s32 *)((u8 *)arg0+12)|=arg1; *(s32 *)((u8 *)arg0+28)=0; } else if ((arg1 & 0x00400000) != 0) { *(s32 *)((u8 *)arg0+28)=0; *(s32 *)((u8 *)arg0+12)|=arg1; ModelAnim_SetAnimation((u8 *)arg0+36,5); ModelAnim_SetFrame((u8 *)arg0+36,(s16)(func_8003570C()%12)); } else if ((arg1 & 0x01000000) != 0) { *(s32 *)((u8 *)arg0+196)=0xFF0000AF; *(s32 *)((u8 *)arg0+12)|=arg1; *(s32 *)((u8 *)arg0+28)=0; } else { *(s32 *)((u8 *)arg0+28)=0; *(s32 *)((u8 *)arg0+12)|=arg1; } }
 
 extern f32 D_8610AAB8;
 extern f32 D_8610AABC;
@@ -1256,7 +1256,7 @@ extern f32 D_8610AC94;
 extern f32 D_8610AC98;
 extern void func_8003F114(void *, s32, s32, s32);
 extern void func_8003F1DC(void *);
-extern void func_8003F210(void *, s32);
+extern void ModelAnim_SetAnimation(void *, s32);
 extern void func_86107208(void);
 extern void * func_87F025B8(void *, void *);
 extern s32 D_8610AD20;
@@ -1270,7 +1270,7 @@ void func_861072AC(f32 arg0) {
         node = obj + 0x24;
         func_8003F1DC(node);
         func_8003F114(node, 0, -1, *(s32 *)((u8 *)(u32)D_8610AD20 + 0x6DC));
-        scale = (func_8003F210(node, 0), D_8610AC94);
+        scale = (ModelAnim_SetAnimation(node, 0), D_8610AC94);
         *(f32 *)(obj + 0x5C) = scale;
         *(f32 *)(obj + 0x58) = scale;
         *(f32 *)(obj + 0x54) = scale;

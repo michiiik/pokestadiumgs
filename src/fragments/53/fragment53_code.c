@@ -336,11 +336,11 @@ void Fragment53_InitActorStateAndOrder(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8003F210(void *, s32);
+extern void ModelAnim_SetAnimation(void *, s32);
 extern void ModelAnim_SetFrame(u8 *, s16);
 void Fragment53_ApplyPendingPrimaryAnimation(s32 arg0) {
     if (D_86511698[arg0].pending == 1) {
-        func_8003F210((u8 *)&D_8650E120[arg0], D_86511698[arg0].animation);
+        ModelAnim_SetAnimation((u8 *)&D_8650E120[arg0], D_86511698[arg0].animation);
         ModelAnim_SetFrame((u8 *)&D_8650E120[arg0], 0);
         D_86511698[arg0].pending = 0;
     }
@@ -355,7 +355,7 @@ extern s32 D_8650C4B0;
 extern s32 D_8650C5E0;
 extern void func_80027A28(u16,u8);
 extern void ModelAnim_SetFrame(u8 *, s16);
-extern void func_8003F210(void *, s32);
+extern void ModelAnim_SetAnimation(void *, s32);
 void Fragment53_UpdatePrimaryAnimationState(s32 arg0) {
     s32 index;
 
@@ -406,12 +406,12 @@ void Fragment53_UpdatePrimaryAnimationState(s32 arg0) {
         }
         if (D_86511698[index].result == 1) {
             D_86511698[index].animation = 6;
-            func_8003F210((u8 *)D_8650E120 + index * 0x168, 6);
+            ModelAnim_SetAnimation((u8 *)D_8650E120 + index * 0x168, 6);
             ModelAnim_SetFrame((u8 *)D_8650E120 + index * 0x168, 0);
         }
         if (D_86511698[index].result == 2) {
             D_86511698[index].animation = 5;
-            func_8003F210((u8 *)D_8650E120 + index * 0x168, 5);
+            ModelAnim_SetAnimation((u8 *)D_8650E120 + index * 0x168, 5);
             ModelAnim_SetFrame((u8 *)D_8650E120 + index * 0x168, 0);
         }
         break;
@@ -681,7 +681,7 @@ void Fragment53_InitActorModels(void) {
 
     for (index = 0; index < 4; index++) {
         func_8003F114((u8 *)&D_8650E6C0[index], 0, -1, D_8650DB28[index]);
-        func_8003F210((u8 *)&D_8650E6C0[index], 0);
+        ModelAnim_SetAnimation((u8 *)&D_8650E6C0[index], 0);
         ModelAnim_SetSpeed((u8 *)&D_8650E6C0[index], 0x20000);
         ModelAnim_SetFrame((u8 *)&D_8650E6C0[index], (s16)(guRandom() % 15 + 15));
         ModelAnim_SetEventFrame((u8 *)&D_8650E6C0[index], 0);
@@ -717,7 +717,7 @@ void Fragment53_UpdateTimedSecondaryAnimation(s32 arg0) {
     case 0:
         model = (u8 *)&D_8650E6C0[index];
         if ((*(s32 *)(model + 0x48) >> 16) >= 6) {
-            func_8003F210(model, 2);
+            ModelAnim_SetAnimation(model, 2);
             ModelAnim_SetFrame(model, 0);
             ModelAnim_SetSpeed(model, 0x30000);
             D_86511698[index].animation = 2;
@@ -727,7 +727,7 @@ void Fragment53_UpdateTimedSecondaryAnimation(s32 arg0) {
         model = (u8 *)&D_8650E6C0[index];
         if (ModelAnim_IsFinished(model) == 1) {
             func_80027A28(0x1F04, (u8)index);
-            func_8003F210(model, 1);
+            ModelAnim_SetAnimation(model, 1);
             ModelAnim_SetSpeed(model, 0x20000);
             D_86511698[index].animation = 1;
         }
@@ -746,14 +746,14 @@ void Fragment53_UpdateSecondaryAnimation(s32 arg0) {
     index = arg0;
     switch (D_86511698[index].animation) {
     case 0:
-        func_8003F210((u8 *)&D_8650E6C0[index], 2);
+        ModelAnim_SetAnimation((u8 *)&D_8650E6C0[index], 2);
         ModelAnim_SetSpeed((u8 *)&D_8650E6C0[index], 0x30000);
         D_86511698[index].animation = 2;
         D_86511698[index].pending = 1;
         break;
     case 2:
         if (ModelAnim_IsFinished((u8 *)&D_8650E6C0[index]) == 1) {
-            func_8003F210((u8 *)&D_8650E6C0[index], 1);
+            ModelAnim_SetAnimation((u8 *)&D_8650E6C0[index], 1);
             D_86511698[index].pending = 0;
         }
         break;
@@ -947,7 +947,7 @@ void Fragment53_RunSceneTransition(void) {
             func_8003F114(model, 0, -1, *resource);
             ModelAnim_SetEventFrame(model, 0);
             func_8003F3BC(model, 0);
-            func_8003F210(model, 0);
+            ModelAnim_SetAnimation(model, 0);
             ModelAnim_SetFrame(model, (s16)(guRandom() % 15 + 15));
             state++;
             secondary += 0x168;
