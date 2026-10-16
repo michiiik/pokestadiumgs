@@ -878,7 +878,7 @@ void WidgetTree_RunMessagePanelSilent(s32 arg0, s32 arg1) {
     func_8004DF38(arg0, arg1, 0);
 }
 
-extern u8* func_80040E80(s32, void*);
+extern u8* process_geo_layout(s32, void*);
 u8* func_8004DF38(s32 pool, s32 id, s32 index) {
     u8* result = NULL;
     HandlerResult_DE84D* descriptor;
@@ -889,7 +889,7 @@ u8* func_8004DF38(s32 pool, s32 id, s32 index) {
     entry = func_8004DE84(id, index);
     if (entry != 0) {
         archive = *(s32*)((u8*)(u32)D_80097120 + 0x24);
-        result = func_80040E80(pool, (void*)(u32)entry);
+        result = process_geo_layout(pool, (void*)(u32)entry);
         if (result != NULL) {
             callback = func_8004C3B0(archive, id);
             descriptor = ((HandlerResult_DE84D* (*)(s32,s32))(u32)callback)(0, 0);
@@ -908,7 +908,7 @@ void *func_8004DFEC(s32 arg0, s32 arg1, Func8004DFECArg arg2) {
     return func_8004E018(arg0, arg1, 0, arg2);
 }
 
-extern u8* func_80040E80(s32, void*);
+extern u8* process_geo_layout(s32, void*);
 extern void func_80040F60(u8*, Func8004DFECArg);
 void* func_8004E018(s32 pool, s32 id, s32 index, Func8004DFECArg tint) {
     s32 entry;
@@ -919,7 +919,7 @@ void* func_8004E018(s32 pool, s32 id, s32 index, Func8004DFECArg tint) {
     entry = func_8004DE84(id, index);
     if (entry != 0) {
         archive = *(s32*)((u8*)(u32)D_80097120 + 0x24);
-        result = func_80040E80(pool, (void*)(u32)entry);
+        result = process_geo_layout(pool, (void*)(u32)entry);
         if (result != NULL) {
             callback = func_8004C3B0(archive, id);
             descriptor = ((HandlerResult_DE84D* (*)(s32,s32))(u32)callback)(0, 0);

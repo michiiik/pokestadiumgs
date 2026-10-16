@@ -219,3 +219,6 @@ func_8003C9B8 = GeoRender_FindAnchorPosition;
 func_80038894 = GeoNode_CreateModelPart;
 func_8003C6B8 = Geo_RenderRootNode;
 func_8003D0C8 = GeoRender_SetPrimitiveColor;
+func_80037F40 = GeoNode_CreateCamera;
+func_8003D55C = GeoRender_EnableTextureGeneration;
+func_80040E80 = process_geo_layout;

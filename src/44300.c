@@ -7,7 +7,7 @@ extern s32 D_80094CF0; s32 func_80043700(s32 arg0, s32 arg1) { if (!arg0) { D_80
 extern u8 D_80094CF8;
 extern s32 main_pool_get_available(void);
 extern s32 MainPool_AllocState(s32, s32);
-extern s32 func_80040E80(s32, void *);
+extern s32 process_geo_layout(s32, void *);
 extern void MainPool_FinalizeAllocation(s32);
 extern void GeoCamera_SetViewport(void *, s16, s16, s16, s32);
 extern void GeoCamera_SetPerspective(void *, f32, f32, f32);
@@ -15,7 +15,7 @@ void func_80043714(void *arg0, s16 arg1, s32 arg2) {
     s32 camera;
     s32 state;
     state = MainPool_AllocState(main_pool_get_available(), 0);
-    *((s32 *)(((u8 *)arg0) + 0x14)) = func_80040E80(state, &D_80094CF8);
+    *((s32 *)(((u8 *)arg0) + 0x14)) = process_geo_layout(state, &D_80094CF8);
     *((s32 *)(((u8 *)arg0) + 0x18)) = D_80094CF0;
     MainPool_FinalizeAllocation(state);
     camera = *((s32 *)((u8 *)(u32)(*((u32 *)(((u8 *)arg0) + 0x14))) + 0xC));

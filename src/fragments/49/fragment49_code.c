@@ -1770,7 +1770,7 @@ void func_86109F58(void) {
 
 extern s32 main_pool_get_available(void);
 extern void *MainPool_AllocState(s32, s32);
-extern void *func_80040E80(void *, void *);
+extern void *process_geo_layout(void *, void *);
 extern void MainPool_FinalizeAllocation(void *);
 extern void *func_87F08DF8(void *, f32, f32, s32);
 extern void func_87F0252C(void *, void *, void *, s32);
@@ -1788,7 +1788,7 @@ void func_86109F78(void *arg0, void *arg1) {
 
     func_8004C8C0(0x157);
     pool = MainPool_AllocState(main_pool_get_available(), 0);
-    *(void **)((u8 *)arg0 + 0x694) = func_80040E80(pool, D_8610A1F0);
+    *(void **)((u8 *)arg0 + 0x694) = process_geo_layout(pool, D_8610A1F0);
     MainPool_FinalizeAllocation(pool);
     obj = func_8004C990(0x157, 0);
     model = func_87F08DF8(obj, 0.0f, 0.0f, 0x0F000000);
