@@ -495,3 +495,65 @@ under 7.1. Stock 5.3 changes two of them and worsens both the callback and
 padding leaders; this does not justify changing this file's compiler.
 Leading-blank controls are stable. This is a bounded negative, not proof
 of an impossible source shape or a broken compiler.
+## 2026-10-16 — grid-page initialization accepted
+
+Solo native macOS, without agents or containers. `func_8AF12EB8` replaces
+**322 original instruction words / 1,288 bytes**, with frame `0x60`.
+The file advances from **26 C / 12 function ASM to 27 C / 11 function ASM**,
+out of 38 originals. Acceptance batch:
+`e576e2a87a6949d99de275e347a744b2`, candidate
+`f44-menu-grid-init-loops:positive-False:skip-True:unsigned-False`.
+This is a link-verified acceptance with one combined full-ROM gate.
+
+### Source mechanisms and verification
+
+- Walk the real four-byte `MenuGridEntry` records, bounded at 250 entries.
+  A nonpositive-byte sentinel ends the scan. Count the `0xFF` placeholders
+  in the total, but use a `continue` before counting and annotating ordinary
+  entries. This removes the last eight-word `$s2`/`$s3` allocation swap;
+  the equivalent enclosing positive guard did not match.
+- Keep six distinct, consumed resource handles for `ers1` through `ers6`.
+  Declaring the real late-use `node` local before these handles restores
+  all three original spill homes, without padding or unused storage.
+- Preserve all font/page setup, node callbacks and field updates, the `abtn`
+  resource ID `0x6162746E`, selector setup, and the fourteen-byte saved-scroll
+  aggregate restoration. Existing engine parameter contracts are retained.
+- Fresh and twenty-leading-blank builds of the cleaned source reproduce
+  the frozen accepted object's complete loadable sections, layout and all
+  relocation rows. All 38 original starts/sizes stay fixed, and all 37
+  untouched raw instruction spans remain identical to the 26-C baseline.
+- A strict canonical link, resolving every undefined symbol from the normal
+  ELF, reproduces the entire 19,264-byte text and 240-byte literal/table
+  window directly against both the ELF and retail ROM. Forced normal native
+  `gmake rom COMPARE=1` also passes, MD5
+  `1561c75d11cedf356a8ddb1a4a5f9d5d`.
+- Host syntax passes with the same three pre-existing pointer warnings;
+  all 46 native tooling tests pass. The naming plan/apply finds no mapped
+  name for this owner, so its address name remains. No scratch script,
+  compiler observer, object, generated assembly or ROM is published.
+
+### Remaining requeues
+
+- `func_8AF13718`: **requeue**. The current 1,044-byte drawing draft has the
+  correct `0x80` frame and RGBA homes at `sp+0x54`/`sp+0x57`. Computing the
+  bottom bound from the viewport field saves the retained top early, but
+  the store is still one instruction too early. Normalized `.9885` / raw
+  `.6489` is not a match. A calibrated stock/off/on/blank trace establishes
+  the current row-bound value in `$v0`, followed by a different temporary
+  sequence. Real carrier reuse, bounded counter widths and continue-guard
+  shapes did not close it. A calibrated 180-second permuter search improved
+  its score only with canceled-offset scaffolding or an uninitialized
+  local; no proposal was adopted. Resume with a materially new lifetime or
+  expression-tree hypothesis, not another storage-spelling sweep.
+- The four small drawing callbacks remain **requeue**. Two new eight-cell
+  families per owner test exactly four position bytes in a word and real
+  resource/index/flag argument snapshots. Word storage still has the wrong
+  position home; argument snapshots grow the frame. No artificial buffer
+  enlargement or unused fields are justified.
+- `func_8AF124A8`: **requeue**. The accepted grid type is defined after this
+  owner. A companion-only declaration move was independently byte-verified
+  in the 26-C context, then eight complete-type output views were tested.
+  They do not repair the saved-register swap. Four earlier incomplete-type
+  compile failures are context setup failures, not evidence against typed
+  field access. Rebaseline the control to the current 27-C source before
+  resuming that transaction. Existing section and padding handoffs remain.
