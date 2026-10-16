@@ -188,7 +188,24 @@ void func_82901510(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33D6A0/func_82901554.s")
+extern s32 func_8004C990(s32, s32);
+extern void func_829000A0(void);
+extern void func_829000F8(u8, u8, u8, u8);
+extern void func_82900AFC(s16, s16, u16, u16, s32);
+extern void func_82900254(s16, s16, u16, u16, s16, s16, s16, s16);
+extern Gfx *D_800D0510;
+
+void func_82901554(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
+    s32 var_v0;
+
+    var_v0 = func_8004C990(344, 0);
+    func_829000A0();
+    gDPSetCombineLERP(D_800D0510++, 0, 0, 0, PRIMITIVE, 0, 0, 0, TEXEL0,
+                     0, 0, 0, PRIMITIVE, 0, 0, 0, TEXEL0);
+    func_829000F8(0, 0, 0, 255);
+    func_82900AFC(arg0, arg1, arg2, arg3, var_v0);
+    func_82900254(arg0, arg1, arg2, arg3, D_829188B0[3], D_829188B0[4], D_829188B0[1], D_829188B0[2]);
+}
 #endif
 
 #ifdef VERSION_US
