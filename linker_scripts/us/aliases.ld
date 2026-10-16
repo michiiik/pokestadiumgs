@@ -7,7 +7,7 @@
  * extra `-T` script from the Makefile, the same way hardware_regs.ld,
  * undefined_syms.ld, and the other hand-written scripts are.
  */
-Audio_ThreadEntry = func_80035174;
+Audio_ThreadEntry = Audio_ThreadMain;
 /* JPEG byte-stuffing state occupies the second byte of the existing flag slot. */
 Jpeg_LastByteWasFF = D_800D1218 + 1;
 /* Coordinate callback: structured access view of the existing scalar/data label.
@@ -238,3 +238,7 @@ func_80025B54 = Audio_SetPreset;
 func_8002B490 = Audio_RequestSlot;
 func_8003B044 = Geo_NodeAmbientLight;
 func_8003D888 = GeoRender_SubmitMaterial;
+func_8002596C = Audio_ApplyCommandPreset;
+func_800341C8 = AudioSeq_ReadWordParameter;
+func_80035174 = Audio_ThreadMain;
+func_800371B4 = Camera_ComputeEyeFromAngles;
