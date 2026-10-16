@@ -1,5 +1,67 @@
 # Fragment 44 record collection and menu callbacks
 
+## 2026-10-16 — page initializer accepted
+
+Solo native macOS, without agents or containers. The larger original
+`func_8AF10D08` initializer becomes matching C: **404 words / 1,616 bytes**,
+with its original **0x28-byte frame**. The file advances from **24 C / 14
+function ASM to 25 C / 13 function ASM**, out of 38 original functions.
+The prior batch's 240-byte readonly window is reused without another layout
+change. No new callable helper, allocated data or compiler change.
+
+Acceptance batch: `7c474251e4ec49ec85838005abc61e28`, candidate
+`f44-page-init-exits:grouped-False:goto-True:early-False`. The normal runner
+accepted it after **one successful sequential full-ROM gate**. Its isolated
+probe was relocation-masked, **not** `link_verified`: the table and literal
+references are expressed as section-relative addends in the containing object.
+
+### Source mechanisms
+
+- Preserve all **48 original calls**, including the 22 keyed record lookups,
+  seven callback attachments, four text-record initializations and three
+  visibility resets. The private candidate generator checks the complete
+  call inventory against assembly before probing. Existing C definitions
+  and remaining callee assembly establish the parameter/return contracts;
+  no unused-call return category is changed to influence allocation.
+- Reuse the consumed page handle for the title page. Separate handle and
+  callback temporaries enlarge the frame. Direct repeated `0.01f`/`0.6f`
+  expressions reproduce the original literal pools without the source homes
+  charged to two real floating temporaries.
+- Keep each mode's original global-store order. The selected record is not
+  always the first global written. Correcting that order preserves the
+  original address setup and improves the switch residual independently of
+  the frame fix.
+- Use three genuine `goto scale` exits from the updating cases to the shared
+  scale-update block, plus an explicit default. An ordinary break-only exit
+  emits a 1,612-byte function with a different shared-address setup; the
+  explicit shared exits restore the original 1,616-byte control-flow shape.
+  Combining the no-op mode-zero/default labels after acceptance preserves
+  the frozen object exactly. There are no fake conditions, artificial locals,
+  forced registers, padding or manually unrolled loops.
+
+Fresh and twenty-leading-blank full-TU rebuilds preserve the frozen accepted
+object's loadable sections, layout and every relocation row after formatting
+and duplicate-extern cleanup. All **38 original spans** and **37 untouched
+raw function bodies** remain unchanged. Separate strict canonical linkage,
+with every undefined name resolved and no unresolved-symbol suppression,
+proves all **19,264 containing text bytes** and all **240 table/literal bytes**
+identical to both the normal ROM ELF and immutable retail ROM. Exactly this
+one function pragma is removed, with accepted statistics provenance.
+
+Forced normal `gmake rom COMPARE=1` passes, retail MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. Edited-TU host syntax passes with the
+same four pre-existing pointer warnings; all 46 native tooling tests pass.
+Naming plan/apply finds no evidence-backed mapping, so the address name stays.
+Scratch generators, controls, objects, compiler binaries and ROMs remain local.
+
+Process evidence: a proposed unchanged leading-blank runner control was
+refused at preflight before compilation. It consumed no hypothesis budget
+and was not disguised for replay. A separate non-installing fresh/blank
+object calibration verified deterministic sections and relocation rows before
+the distinct line-layout probes; those probes did not close the exit-path
+residual. The renderer, drawing callbacks, section-builder and padding
+requeues below remain unresolved and in assembly.
+
 ## 2026-10-16 — narrow switch-table layout and three menu routines accepted
 
 Solo native macOS, without agents or containers. Three original assembly
