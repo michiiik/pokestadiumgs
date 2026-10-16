@@ -808,13 +808,13 @@ void func_80026ED8(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-extern s32 func_800271DC(void *, u8);
-extern void func_8002702C(void *, u8, u8);
+extern s32 Audio_SelectEventChannel(void *, u8);
+extern void Audio_UpdateEventVoiceParameters(void *, u8, u8);
 extern u8 D_80090BC1[];
 extern u8 D_80090D28[];
 u8 Audio_SetupEventVoice(AudioChannelEvent *arg0, u8 request) {
-    request = (u8)func_800271DC(arg0, request);
-    func_8002702C(arg0, request, 1);
+    request = (u8)Audio_SelectEventChannel(arg0, request);
+    Audio_UpdateEventVoiceParameters(arg0, request, 1);
     D_80090BC1[request * 12] = D_80090D28[arg0->sound * 16 + 12];
     func_8001874C(((0x06020000 | (((u32)request & 0xFF) << 8)) | 1), (s8)D_80090D28[arg0->sound * 16]);
     func_8001874C((0x06020000 | (((u32)request & 0xFF) << 8)), 1);
@@ -824,16 +824,73 @@ u8 Audio_SetupEventVoice(AudioChannelEvent *arg0, u8 request) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002702C.s")
-#endif
-
-#ifdef VERSION_US
 typedef struct { u8 unknown00[6]; u16 mask; } AudioChannelMask;
 typedef struct { s32 w0; s32 w4; s32 w8; } Candidate27F7CRecord;
 extern Candidate27F7CRecord D_80090BB8[];
 extern Candidate27F7CRecord D_80090C78;
 typedef struct { AudioChannelMask channels; u8 count; } AudioChannelGroup;
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800271DC.s")
+typedef struct AudioVoiceParameters {
+    u8 unknown00[2];
+    u16 sound;
+    u8 unknown04[8];
+    s8 *pan;
+    f32 pitch;
+    u8 balance;
+} AudioVoiceParameters;
+extern f64 D_800A39B0;
+extern f32 D_800A39B8;
+void Audio_UpdateEventVoiceParameters(void *arg0, u8 channel, u8 reset) {
+    if (reset) {
+        ((u8 *)(&D_80090BB8[channel]))[0] = D_80090D28[((AudioVoiceParameters *)arg0)->sound * 16 + 1];
+        ((s8 *)(&D_80090BB8[channel]))[1] = ((s8 *)D_80090D28)[((AudioVoiceParameters *)arg0)->sound * 16 + 8];
+    }
+    *(f32 *)((u8 *)(&D_80090BB8[channel]) + 4) = *(f32 *)(D_80090D28 + ((AudioVoiceParameters *)arg0)->sound * 16 + 4) * ((AudioVoiceParameters *)arg0)->pitch;
+    if (*(f32 *)((u8 *)(&D_80090BB8[channel]) + 4) > 4.0) {
+        *(f32 *)((u8 *)(&D_80090BB8[channel]) + 4) = 4.0f;
+    } else if (*(f32 *)((u8 *)(&D_80090BB8[channel]) + 4) < D_800A39B0) {
+        *(f32 *)((u8 *)(&D_80090BB8[channel]) + 4) = D_800A39B8;
+    }
+    if (D_80090D28[((AudioVoiceParameters *)arg0)->sound * 16 + 13] & 0xF0) {
+        *(f32 *)((u8 *)(&D_80090BB8[channel]) + 4) *= func_80026990(D_80090D28[((AudioVoiceParameters *)arg0)->sound * 16 + 13] >> 4);
+    }
+    if (D_80090D28[((AudioVoiceParameters *)arg0)->sound * 16 + 13] & 1) {
+        if (*((AudioVoiceParameters *)arg0)->pan >= 64) {
+            ((u8 *)(&D_80090BB8[channel]))[2] = 127;
+        } else if (*((AudioVoiceParameters *)arg0)->pan < -64) {
+            ((u8 *)(&D_80090BB8[channel]))[2] = 0;
+        } else {
+            ((u8 *)(&D_80090BB8[channel]))[2] = *((AudioVoiceParameters *)arg0)->pan + 64;
+        }
+    } else {
+        ((u8 *)(&D_80090BB8[channel]))[2] = ((AudioVoiceParameters *)arg0)->balance;
+    }
+}
+#endif
+
+#ifdef VERSION_US
+extern s8 func_80018C60(s32, s32, s32);
+extern u8 Audio_FindEnabledChannel(AudioChannelMask *, u8, u8);
+extern u8 Audio_FindLowestPriorityChannel(AudioChannelGroup *, u8);
+s32 Audio_SelectEventChannel(void *arg0, u8 request) {
+    u8 i;
+    u8 scanned;
+    u32 next;
+    for (i = 0; i < 16; i++) {
+        ((u8 *)&D_80090BB8[(u32)i])[8] = func_80018C60(2, i, 2);
+    }
+    next = Audio_FindEnabledChannel((AudioChannelMask *)arg0, request, 0);
+    request = next;
+    scanned = 0;
+    while (((u8 *)&D_80090BB8[(u32)next])[8] == 1 && scanned < ((AudioChannelGroup *)arg0)->count) {
+        next = Audio_FindEnabledChannel((AudioChannelMask *)arg0, request, 1);
+        request = next;
+        scanned++;
+    }
+    if (((u8 *)&D_80090BB8[(u32)next])[8] == 1) {
+        request = Audio_FindLowestPriorityChannel((AudioChannelGroup *)arg0, request);
+    }
+    return request;
+}
 #endif
 
 #ifdef VERSION_US
