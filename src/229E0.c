@@ -3997,7 +3997,37 @@ S1_Color_RGBA8_u32* Color_HSVToRGBA8(S1_Color_RGBA8_u32* arg0, S1_Vec3f* arg1, s
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80037B08.s")
+extern u16 D_80095120[16][256];
+extern const f32 D_800A42B0;
+u16 Color_AdjustRGB5551(u16 color, S1_arg1_func_80010CA8 adjustment) {
+    S1_Vec3f hsv;
+    s32 column;
+    s32 row;
+    if (color & 1) {
+        Color_RGB5551ToHSV(color, &hsv);
+        if (adjustment.unk_00 != 0) {
+            hsv.x += adjustment.unk_00 * 0.015625f;
+        }
+        if (adjustment.unk_02 != 0) {
+            if (adjustment.unk_02 > 0) {
+                hsv.y += (1.0f - hsv.y) * adjustment.unk_02 * 0.125f;
+            } else {
+                hsv.y += hsv.y * adjustment.unk_02 * 0.125f;
+            }
+        }
+        if (adjustment.unk_03 != 0) {
+            column = (hsv.z + 1.0f) * 0.5f * 255.0f;
+            if (adjustment.unk_03 > 0) {
+                row = adjustment.unk_03 + 7;
+            } else {
+                row = adjustment.unk_03 + 8;
+            }
+            hsv.z = (2.0f * (D_80095120[row][column] / D_800A42B0)) - 1.0f;
+        }
+        color = Color_HSVToRGB5551(&hsv);
+    }
+    return color;
+}
 #endif
 
 #ifdef VERSION_US
@@ -7551,7 +7581,7 @@ typedef struct {
     s16 unknown26;
     void *callback;
 } SceneTextureModel;
-extern u16 func_80037B08(u16, S1_arg1_func_80010CA8);
+extern u16 Color_AdjustRGB5551(u16, S1_arg1_func_80010CA8);
 extern u32 func_80037C80(u32, S1_arg1_func_80010CA8);
 void Model_AdjustTextureColors(SceneTextureModel *model, S1_arg1_func_80010CA8 adjustment) {
     s32 i;
@@ -7563,7 +7593,7 @@ void Model_AdjustTextureColors(SceneTextureModel *model, S1_arg1_func_80010CA8 a
             if (texture->type == 2) {
                 u16 *pixel = texture->texture;
                 for (j = 0; j < texture->numTexels; j++, pixel++) {
-                    *pixel = func_80037B08(*pixel, adjustment);
+                    *pixel = Color_AdjustRGB5551(*pixel, adjustment);
                 }
             } else if (texture->type == 3) {
                 u32 *pixel = texture->texture;
@@ -7577,7 +7607,7 @@ void Model_AdjustTextureColors(SceneTextureModel *model, S1_arg1_func_80010CA8 a
         if (palette != NULL && palette->colors != NULL) {
             u16 *pixel = palette->colors;
             for (j = 0; j < palette->count; j++, pixel++) {
-                *pixel = func_80037B08(*pixel, adjustment);
+                *pixel = Color_AdjustRGB5551(*pixel, adjustment);
             }
         }
     }
@@ -7799,15 +7829,105 @@ void func_80041B84(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80041BF0.s")
+typedef struct {
+    OSMesgQueue queue;
+    OSMesg messages[2];
+} SceneLoadQueue;
+typedef struct {
+    u8 flags;
+    u8 pending;
+    u8 variant;
+    u8 bufferCount;
+    void *modelBuffers[2];
+    void *backgroundBuffer;
+    void *animationBuffers[2];
+    void *imageBuffers[2];
+    s32 modelBufferSize;
+    s32 unknown24;
+    s32 unknown28;
+    u8 unknown2C[0xC];
+    SceneAnimationBank *loadedModel;
+    void *loadedBackground;
+    void *loadedCurve;
+    u32 unknown44;
+    S1_arg1_func_80010CA8 colorAdjust;
+    u16 species;
+    u16 unknown4E;
+    SceneLoadQueue queues[4];
+} SceneLoadContext;
+void PokeIcon_InitLoadContext(SceneLoadContext *context, s32 flags, s32 modelBufferSize) {
+    context->flags = flags;
+    context->pending = 0;
+    context->variant = 0;
+    context->bufferCount = 0;
+    context->loadedModel = NULL;
+    context->modelBuffers[0] = NULL;
+    context->modelBuffers[1] = NULL;
+    context->backgroundBuffer = NULL;
+    context->animationBuffers[0] = NULL;
+    context->animationBuffers[1] = NULL;
+    context->modelBufferSize = modelBufferSize;
+    context->unknown24 = 0;
+    context->unknown28 = 0;
+    context->colorAdjust.raw = 0;
+    context->species = 0;
+    osCreateMesgQueue(&context->queues[0].queue, context->queues[0].messages, 2);
+    osCreateMesgQueue(&context->queues[1].queue, context->queues[1].messages, 2);
+    osCreateMesgQueue(&context->queues[2].queue, context->queues[2].messages, 2);
+    osCreateMesgQueue(&context->queues[3].queue, context->queues[3].messages, 2);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80041C98.s")
+extern s32 main_pool_alloc(s32, s32);
+SceneLoadContext *PokeIcon_AllocLoadContext(u32 flags) {
+    SceneLoadContext *context = (SceneLoadContext *)main_pool_alloc(sizeof(SceneLoadContext), 1);
+    s32 doubleBuffered;
+    if (context != NULL) {
+        PokeIcon_InitLoadContext(context, flags, 0x26000);
+        if (flags & 1) {
+            context->modelBuffers[0] = (void *)main_pool_alloc(0x26000, 1);
+            if (flags & 4) {
+                context->modelBuffers[1] = (void *)main_pool_alloc(0x26000, 1);
+            }
+        }
+        if (flags & 2) {
+            context->backgroundBuffer = (void *)main_pool_alloc(0x18000, 1);
+        }
+        if (flags & 0x10) {
+            doubleBuffered = flags & 4;
+            context->imageBuffers[0] = (void *)main_pool_alloc(0x25C00, 1);
+            if (doubleBuffered) {
+                context->imageBuffers[1] = (void *)main_pool_alloc(0x25C00, 1);
+            }
+        }
+    }
+    return context;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80041D84.s")
+SceneLoadContext *PokeIcon_AllocSpecialModelContext(u16 modelId) {
+    SceneLoadContext *context = NULL;
+    s32 capacity = 0;
+    switch (modelId) {
+    case 0xFC:
+        capacity = 0xF000;
+        break;
+    case 0x118:
+        capacity = 0x4C00;
+        break;
+    }
+    if (capacity != 0) {
+        context = (SceneLoadContext *)main_pool_alloc(sizeof(SceneLoadContext), 1);
+    }
+    if (context != NULL) {
+        PokeIcon_InitLoadContext(context, 1, capacity);
+        context->bufferCount = 1;
+        context->modelBuffers[0] = (void *)main_pool_alloc(capacity, 1);
+    }
+    return context;
+}
 #endif
 
 #ifdef VERSION_US
