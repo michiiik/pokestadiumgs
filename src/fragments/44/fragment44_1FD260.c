@@ -224,7 +224,29 @@ void func_8AF102AC(s16 x, s16 y, u8 *image) { \
     } \
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF1043C.s")
+struct B4410State;
+extern s32 func_8004410C(struct B4410State *, s32);
+extern Gfx *D_800D0510;
+extern Gfx D_80094E38[];
+
+void func_8AF1043C(void) {
+    s32 i;
+
+    func_8AF1025C((s16)D_8AF2F9CE);
+    if (D_8AF26A44 != 0) {
+        gSPDisplayList(D_800D0510++, D_80094E38);
+        gDPSetRenderMode(D_800D0510++, G_RM_AA_OPA_SURF, G_RM_AA_OPA_SURF2);
+        for (i = 0; i < 6UL; i++) {
+            if (D_8AF2F9E0[i][0] != 0) {
+                if (D_8AF2F9D0[i] == 0) {
+                    continue;
+                }
+
+                func_8AF102AC(D_8AF2F9E0[i][1], D_8AF2F9E0[i][2], (u8 *)func_8004410C((struct B4410State *)D_8AF26A44, i));
+            }
+        }
+    }
+}
 
 extern void func_80043E70(s32, s32);
 
