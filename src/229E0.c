@@ -1902,14 +1902,61 @@ void GbAudio_UpdateSquare1Registers(u8 channel) {
 #endif
 
 #ifdef VERSION_US
-extern void func_80033670(s32);
+extern void GbAudio_UpdateSquare2Registers(u8);
 extern void func_80033864(s32);
 extern void GbAudio_UpdateNoiseRegisters(u8);
-void func_8003364C(s32 arg0) { s32 *p = &arg0; func_80033670(arg0 & 0xFF); }
+void func_8003364C(s32 arg0) { s32 *p = &arg0; GbAudio_UpdateSquare2Registers(arg0 & 0xFF); }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80033670.s")
+extern void GbAudio_QueueRegisterWrite(u16, u8, u16);
+extern u8 GbAudio_GetRegisterValue(u16);
+extern void GbAudio_QueueChannelReset(u16);
+extern s8 D_800D2B42;
+extern u8 D_800D2B43;
+extern u16 D_800D2B44;
+extern u8 D_800D2B8C;
+void GbAudio_UpdateSquare2Registers(u8 channel)
+{
+  s32 flags = (&D_800D2B8C)[channel * 0x3C];
+  if (flags & 0x20)
+  {
+    s32 value;
+    value = GbAudio_GetRegisterValue(0xFF26);
+    value &= 0x8D;
+    GbAudio_QueueRegisterWrite(0xFF26, value, 0);
+    GbAudio_QueueChannelReset(0xFF15);
+  }
+  else
+    if (flags & 0x10)
+  {
+    GbAudio_QueueRegisterWrite(0xFF16, (((u8) D_800D2B42) | 0x3F) & 0xFF, 0);
+    GbAudio_QueueRegisterWrite(0xFF17, D_800D2B43, 0);
+    GbAudio_QueueRegisterWrite(0xFF18, D_800D2B44 & 0xFF, 0);
+    GbAudio_QueueRegisterWrite(0xFF19, ((D_800D2B44 >> 8) | 0x80) & 0xFF, 0);
+  }
+  else
+    if (flags & 0x40)
+  {
+    u8 lowByte;
+    u8 value;
+    value = GbAudio_GetRegisterValue(0xFF16);
+    value = value & 0x3F;
+    value = value | ((u8) D_800D2B42);
+    GbAudio_QueueRegisterWrite(0xFF16, value & 0xFF, 0);
+    lowByte = D_800D2B44 & 0xFF;
+    GbAudio_QueueRegisterWrite(0xFF18, lowByte, 0);
+  }
+  else
+    if (flags & 1)
+  {
+    u8 value;
+    value = GbAudio_GetRegisterValue(0xFF16);
+    value &= 0x3F;
+    value |= (u8)D_800D2B42;
+    GbAudio_QueueRegisterWrite(0xFF16, value & 0xFF, 0);
+  }
+}
 #endif
 
 #ifdef VERSION_US
