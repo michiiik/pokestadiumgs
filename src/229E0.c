@@ -102,7 +102,18 @@ void func_80023954(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002397C.s")
+extern u8 D_80090200[];
+/* Returns the selected mask bit, not a normalized boolean. */
+u8 Audio_GetSpeciesMaskBit(u32 species) {
+    u8 value;
+    u8 bit;
+    u8 mask;
+    value = D_80090200[(u8)((species - 1) >> 3)];
+    bit = (species - 1) & 7;
+    mask = 1 << (7 - bit);
+    value &= mask;
+    return value;
+}
 #endif
 
 #ifdef VERSION_US
@@ -3059,7 +3070,40 @@ void Audio_EnableModeFlag(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800354B4.s")
+extern void func_800260C0(s32, s32, s32);
+extern void func_800262F0(void);
+s32 Audio_SetModeBlocking(s32 mode, s32 arg1, s32 arg2) {
+    s32 changed = 0;
+    s32 tick;
+    s32 readyTick;
+    if (mode == 2) {
+        if (D_80094868 != 0) {
+            D_80094868 = 0;
+            mode = 11;
+        }
+    }
+    if (mode != D_80094860) {
+        D_80094860 = mode;
+        changed = 1;
+        do {
+            tick = *(volatile s32 *)&D_8009486C;
+            func_8003539C();
+            while (tick == *(volatile s32 *)&D_8009486C) {
+            }
+        } while (func_80025D44() != 0);
+        func_800260C0(mode, arg1, arg2);
+        while (func_80026298() == 0) {
+            readyTick = *(volatile s32 *)&D_8009486C;
+            while (readyTick == *(volatile s32 *)&D_8009486C) {
+            }
+        }
+        func_800262F0();
+        if (D_80094860 == 11) {
+            D_80094860 = 2;
+        }
+    }
+    return changed;
+}
 #endif
 
 #ifdef VERSION_US
