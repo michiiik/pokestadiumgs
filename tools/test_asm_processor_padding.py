@@ -1,4 +1,4 @@
-"""Redistributable ELF controls for exact single-word declarative padding."""
+"""Redistributable controls for declarative padding and rodata alignment."""
 import importlib.util
 import io
 import os
@@ -77,6 +77,72 @@ def fixture(count=1, prefix=0):
     struct.pack_into('>II', debug, 8 * 4, 3, obj.section('.mdebug').file_offset + 0x60)
     obj.set_section_data('.mdebug', bytes(debug))
     return elf32.build(obj), markers
+
+
+class LateRodataAlignmentTests(unittest.TestCase):
+    def parse(self, annotation='', asm_hint='', late=True, second=False, words='1, 2', inline=False):
+        opts = processor.Opts('O2', False, False, False, False, 'latin1', 'latin1', False)
+        with tempfile.TemporaryDirectory(prefix='gs-rodata-alignment-') as directory:
+            root = Path(directory)
+            def owner(name):
+                path = root / (name + '.s')
+                data = ('.section .late_rodata\n' + asm_hint + 'dlabel table_' + name + '\n.word ' + words + '\n') if late else ''
+                assembly = data + '.section .text\nglabel ' + name + '\n' + 'nop\n' * 10 + 'jr $ra\nnop\n'
+                if inline:
+                    return '#pragma GLOBAL_ASM(\n' + assembly + ')\n'
+                path.write_text(assembly)
+                return '#pragma GLOBAL_ASM("' + str(path) + '")\n'
+            text = annotation + owner('fixture')
+            if second:
+                text += owner('other')
+            source = io.StringIO(text)
+            source.name = 'rodata-alignment-fixture.c'
+            output = io.StringIO()
+            functions = processor.parse_source(source, opts, [], output)
+            return functions, output.getvalue()
+
+    def test_named_alignment_matches_existing_assembly_directive(self):
+        annotated, source = self.parse('#pragma asmproc late_rodata_alignment("fixture", 8)\n')
+        explicit, explicit_source = self.parse('\n', asm_hint='.late_rodata_alignment 8\n')
+        plain, plain_source = self.parse()
+        self.assertIn('volatile double', source)
+        self.assertNotIn('volatile double', plain_source)
+        self.assertEqual(source, explicit_source)
+        self.assertEqual(annotated[0].data, explicit[0].data)
+        self.assertEqual(annotated[0].data['.text'][1], plain[0].data['.text'][1])
+        self.assertEqual(annotated[0].late_rodata_dummy_bytes, explicit[0].late_rodata_dummy_bytes)
+
+    def test_annotation_does_not_leak_to_another_owner(self):
+        functions, source = self.parse('#pragma asmproc late_rodata_alignment("fixture", 8)\n', second=True)
+        self.assertEqual(len(functions), 2)
+        self.assertEqual(source.count('volatile double'), 1)
+
+    def test_four_byte_offset_and_inline_annotations(self):
+        annotation = '#pragma asmproc late_rodata_alignment("fixture", 4)\n'
+        annotated, source = self.parse(annotation, words='1, 2, 3')
+        explicit, explicit_source = self.parse('\n', asm_hint='.late_rodata_alignment 4\n', words='1, 2, 3')
+        self.assertEqual(source, explicit_source)
+        self.assertEqual(annotated[0].data, explicit[0].data)
+        self.assertIn('volatile float', source)
+        self.assertIn('volatile double', source)
+        inline, _ = self.parse(annotation, words='1, 2, 3', inline=True)
+        self.assertEqual(inline[0].data, annotated[0].data)
+
+    def test_annotation_rejects_invalid_or_unconsumed_metadata(self):
+        for annotation in (
+            '#pragma asmproc late_rodata_alignment("fixture", 16)\n',
+            '#pragma asmproc late_rodata_alignment("missing", 8)\n',
+            '#pragma asmproc late_rodata_alignment("fixture", 8)\n' * 2,
+        ):
+            with self.subTest(annotation=annotation), self.assertRaises(processor.Failure):
+                self.parse(annotation)
+
+    def test_annotation_rejects_missing_data_and_conflicting_metadata(self):
+        annotation = '#pragma asmproc late_rodata_alignment("fixture", 8)\n'
+        with self.assertRaises(processor.Failure):
+            self.parse(annotation, late=False)
+        with self.assertRaises(processor.Failure):
+            self.parse(annotation, asm_hint='.late_rodata_alignment 4\n')
 
 
 class PaddingTests(unittest.TestCase):
