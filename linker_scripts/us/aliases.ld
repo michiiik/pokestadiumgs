@@ -246,3 +246,7 @@ func_8003B218 = Geo_NodeUpdateLights;
 func_8003C848 = Geo_ProcessCallbacks;
 func_8003B48C = Geo_NodeCullDistance;
 func_8003B534 = Geo_NodeSwitchCase;
+func_800382E4 = GeoNode_CreateLight;
+func_8003A370 = Geo_PrepareShadowChildren;
+func_8003AC8C = Geo_NodeFog;
+func_8003ADA4 = Geo_NodeLight;
