@@ -1,6 +1,6 @@
 --- a/tools/try_pragma_compare.py
 +++ b/tools/try_pragma_compare.py
-@@ -2737,6 +2737,33 @@
+@@ -2737,5 +2737,32 @@
              details["mismatch_kind"] = "register_allocation_only"
          elif normalized_expected == normalized_actual:
              details["mismatch_kind"] = "immediate_drift"
@@ -33,7 +33,6 @@
 +                details["operand_order_offsets"] = swapped
      _annotate_normalized_only_match(details)
      return details
- 
 @@ -3606,6 +3633,10 @@
          best_prior = _best_prior_attempt(prior)
          repeated_drift = _repeated_drift_verdict(prior)
