@@ -720,7 +720,7 @@ void func_80026938(u16 arg0) {
     D_80090B6C = entry->second;
     D_80090B70 = entry->first;
 }
-#pragma C_FUNCTION_PADDING(4)
+#pragma C_FUNCTION_PADDING(8)
 #endif
 
 #ifdef VERSION_US
@@ -4031,7 +4031,41 @@ u16 Color_AdjustRGB5551(u16 color, S1_arg1_func_80010CA8 adjustment) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80037C80.s")
+extern const f32 D_800A42B4;
+u32 Color_AdjustRGBA8(u32 word, S1_arg1_func_80010CA8 adjustment) {
+    S1_Vec3f hsv;
+    S1_Color_RGBA8_u32 color;
+    s32 column;
+    s32 row;
+    u16 *brightness;
+    color.rgba = word;
+    if (color.a > 0) {
+        Color_RGBA8ToHSV(color, &hsv);
+        if (adjustment.unk_00 != 0) {
+            hsv.x += adjustment.unk_00 * 0.015625f;
+        }
+        if (adjustment.unk_02 != 0) {
+            if (adjustment.unk_02 > 0) {
+                hsv.y += (1.0f - hsv.y) * adjustment.unk_02 * 0.125f;
+            } else {
+                hsv.y += hsv.y * adjustment.unk_02 * 0.125f;
+            }
+        }
+        if (adjustment.unk_03 != 0) {
+            column = (hsv.z + 1.0f) * 0.5f * 255.0f;
+            if (adjustment.unk_03 > 0) {
+                row = adjustment.unk_03 + 7;
+            } else {
+                row = adjustment.unk_03 + 8;
+            }
+            brightness = D_80095120[row];
+            hsv.z = (2.0f * (brightness[column] / D_800A42B4)) - 1.0f;
+        }
+        Color_HSVToRGBA8(&color, &hsv, color.a);
+    }
+    return color.rgba;
+}
+#pragma C_FUNCTION_PADDING(4)
 #endif
 
 #ifdef VERSION_US
@@ -5102,7 +5136,7 @@ void Geo_NodeType3Pass(s32 arg0) {
 extern S1_unk_D_86002F34_00C *D_80094914;
 extern s32 D_80094900;
 extern void GeoRender_InitMaterialState(s32, s32);
-extern void func_8003DD2C(void);
+extern void GeoRender_FlushMaterialSlots(void);
 void Geo_NodeModelPartRoot(void *root) {
     void *node;
     node = root;
@@ -5110,7 +5144,7 @@ void Geo_NodeModelPartRoot(void *root) {
         D_80094914 = (S1_unk_D_86002F34_00C *)node;
         GeoRender_InitMaterialState(((S1_GraphNode *)node)->unk_02 & 7, D_80094900);
         Geo_ProcessNodeChildren(root);
-        func_8003DD2C();
+        GeoRender_FlushMaterialSlots();
         D_80094914 = NULL;
     }
 }
@@ -6204,7 +6238,30 @@ void GeoRender_InitMaterialState(s32 mode, s32 flags) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003DD2C.s")
+void GeoRender_FlushMaterialSlots(void) {
+    s32 slot = 0;
+    Gfx *branch;
+    s32 next;
+    GeoRender_SelectMaterialSlot(11);
+    if (D_801261C8[0].unknown08 != NULL) {
+        while (slot < 11) {
+            next = slot + 1;
+            branch = D_801261C8[slot].unknown08;
+            slot++;
+            while (D_801261C8[next].unknown04 == NULL) {
+                next = slot + 1;
+                slot++;
+            }
+            gSPBranchList(branch, D_801261C8[slot].unknown04);
+        }
+    }
+    GeoRender_ApplyMaterialState();
+    if (D_801261A0 & 1) {
+        gSPClearGeometryMode(D_800D0510++, G_ZBUFFER);
+    }
+    D_800949A0 = 0;
+}
+#pragma C_FUNCTION_PADDING(4)
 #endif
 
 #ifdef VERSION_US
@@ -6975,7 +7032,15 @@ s32 func_8003F970(s32 arg0, u16 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003F9AC.s")
+s32 SceneObject_SetModelVariant(u8 *object, s32 kind, u16 value) {
+    s32 result = 0;
+    if (object != NULL) {
+        object[0xA6] = func_8003F970(kind, value);
+        result = 1;
+    }
+    return result;
+}
+#pragma C_FUNCTION_PADDING(4)
 #endif
 
 #ifdef VERSION_US
@@ -7582,7 +7647,7 @@ typedef struct {
     void *callback;
 } SceneTextureModel;
 extern u16 Color_AdjustRGB5551(u16, S1_arg1_func_80010CA8);
-extern u32 func_80037C80(u32, S1_arg1_func_80010CA8);
+extern u32 Color_AdjustRGBA8(u32, S1_arg1_func_80010CA8);
 void Model_AdjustTextureColors(SceneTextureModel *model, S1_arg1_func_80010CA8 adjustment) {
     s32 i;
     s32 j;
@@ -7598,7 +7663,7 @@ void Model_AdjustTextureColors(SceneTextureModel *model, S1_arg1_func_80010CA8 a
             } else if (texture->type == 3) {
                 u32 *pixel = texture->texture;
                 for (j = 0; j < texture->numTexels; j++, pixel++) {
-                    *pixel = func_80037C80(*pixel, adjustment);
+                    *pixel = Color_AdjustRGBA8(*pixel, adjustment);
                 }
             }
         }

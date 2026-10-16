@@ -1631,7 +1631,7 @@ extern void func_8003F3BC(void *, u8);
 extern void func_8003F114(u8 *, s32, s16, s32);
 extern void func_8003F1DC(u8 *);
 extern void ModelAnim_SetResourceAnimation(s32, s32, s32);
-extern void func_8003F9AC(u8 *, s16, u16);
+extern void SceneObject_SetModelVariant(u8 *, s16, u16);
 extern u8 * D_84193DD0;
 void func_8411293C(u8 *arg0, u8 *arg1, s16 arg2) {
     s32 index;
@@ -1639,7 +1639,7 @@ void func_8411293C(u8 *arg0, u8 *arg1, s16 arg2) {
     func_8003F1DC(arg1);
     func_8003F114(arg1, arg2, *(s16 *)(arg0 + 0x658), **(s32 **)(*(s32 *)(*(s32 *)(arg0 + 0x5C0) + 0x38) + 8));
     index = func_8411E1F8((s32)arg0);
-    func_8003F9AC(arg1, *(s16 *)(arg1 + 0x1A), *(u16 *)((u8 *)D_84193DD0 + (index << 4) + 0x14));
+    SceneObject_SetModelVariant(arg1, *(s16 *)(arg1 + 0x1A), *(u16 *)((u8 *)D_84193DD0 + (index << 4) + 0x14));
     ModelAnim_SetResourceAnimation(*(void **)(arg0 + 0x5C0), arg1, *(u8 *)(*(u8 **)(arg0 + 0x2D4) + 0x139C));
     func_8003F3BC(arg1, *(u8 *)(*(u8 **)(arg0 + 0x2D4) + 0x139D));
 }
@@ -1648,12 +1648,12 @@ void func_8411293C(u8 *arg0, u8 *arg1, s16 arg2) {
 #ifdef VERSION_US
 void func_841129E8(u8 *arg0, s16 arg1, s32 arg2) {
     extern void func_8003F114(u8 *, s32, s16, s32);
-    extern void func_8003F9AC(u8 *, s16, u16);
+    extern void SceneObject_SetModelVariant(u8 *, s16, u16);
     s32 index;
 
     func_8003F114(arg0, 0, arg1, arg2);
     index = func_8411E1F8((s32)arg0);
-    func_8003F9AC(arg0, arg1,
+    SceneObject_SetModelVariant(arg0, arg1,
         *(u16 *)((u8 *)(u32)D_84193DD0 + (index << 4) + 0x14));
 }
 #endif

@@ -266,3 +266,6 @@ func_80037B08 = Color_AdjustRGB5551;
 func_80041BF0 = PokeIcon_InitLoadContext;
 func_80041C98 = PokeIcon_AllocLoadContext;
 func_80041D84 = PokeIcon_AllocSpecialModelContext;
+func_80037C80 = Color_AdjustRGBA8;
+func_8003DD2C = GeoRender_FlushMaterialSlots;
+func_8003F9AC = SceneObject_SetModelVariant;
