@@ -82,7 +82,16 @@ void func_88206668(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_179030/func_88206714.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_179030/func_88206C2C.s")
+extern s32 D_882346F0;
+
+void func_88206C2C(u16 arg0) {
+    gDPPipeSync(D_800D0510++);
+    if (D_882346F0 == 1 || D_882346F0 == 3 || arg0 != 0) {
+        gDPSetEnvColor(D_800D0510++, 220, 220, 180, 255);
+    } else {
+        gDPSetEnvColor(D_800D0510++, 150, 150, 130, 255);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_179030/func_88206CC0.s")
 
