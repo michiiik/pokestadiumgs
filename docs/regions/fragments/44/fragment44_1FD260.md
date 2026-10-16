@@ -1,5 +1,53 @@
 # Fragment 44 record collection and menu callbacks
 
+## 2026-10-16 — input and grid drawing requeues
+
+Solo native macOS; neither owner is accepted or installed. The source remains
+25 C / 13 ASM. These findings use the post-PR1066 translation-unit context.
+
+- `func_8AF133C0`: **requeue / register-tie**, 856 bytes, frame 0x38.
+  The best candidate has all 214 opcode positions correct and 209/214 raw
+  instruction words identical. The first 188 words are exact; the only five
+  differences are register operands in the final selected-entry address
+  calculation, beginning at word 188. Matching size and normalized 1.0 are
+  not acceptance. Preserve the original assembly owner.
+- The input candidate needs a genuinely typed 14-byte scroll-state aggregate
+  (seven shorts): casting an existing byte declaration causes unaligned
+  copies. A non-installing whole-file companion-declaration control preserves
+  all 38 original spans, frozen loadable sections and relocations, all 19,264
+  linked text bytes and 240 readonly bytes against the retail ROM, including
+  twenty-leading-blank recompilation. It does not authorize installing the
+  unmatched input body or the companion edit on its own.
+- For input, use a mutually exclusive button chain, a word-sized pressed
+  carrier, and measured local ordering. Model entries as four-byte records
+  with byte fields `kind`, `palette`, an unknown byte, and `blink`. The two
+  selection loads use `entries[column + row * 4].kind`, but the refresh
+  argument must remain a byte-address expression. Row-first record indexing
+  and two-dimensional indexing are not interchangeable compiler shapes.
+  Preserve rereads after the sound call and all original calls.
+- There are 88 cumulative normal rejected input probes, plus eight failed
+  companion transactions that compiled nothing. Native declaration synthesis
+  duplicates the old byte declaration unless the new declaration is included
+  in shared declarations. Two independently calibrated 60-second no-fake
+  permuter searches measured 625 to 435 and then, after the real type-context
+  improvement, 40 to 40. The first search's narrowing cast and the second's
+  equal-score wide cast are not validated fixes. Simple final-expression
+  regrouping and reusing dead pressed/changed words did not close the five
+  operands. Next: examine the final expression's allocator reservation and
+  real consumed index lifetimes; do not replay earlier body spellings.
+- `func_8AF13718`: **requeue**, 40 normal rejected probes. All original calls
+  are present. Best normalized similarity is 0.9771 (raw 0.5611): the word-row
+  candidate is 1,040 bytes with frame 0x78, versus 1,048 / 0x80 in the ROM.
+  Narrowing the row happens to restore total size but adds instructions and
+  does not establish the original shape. Separate clipping snapshots,
+  byte-sized blink alpha, real clip bounds, packed-word versus RGBA copies,
+  union color access, typed node fields and x/y statement order have been
+  tested, not accepted. Next: resolve the genuine color aggregate alignment
+  and viewport-bound lifetimes. The original copies palette RGBA through
+  unaligned word operations into a four-byte local, changes alpha to 255,
+  then makes three aligned word stores to the selection nodes. Do not add
+  dummy locals, padding, fake branches or compiler changes to obtain 0x80.
+
 ## 2026-10-16 — page initializer accepted
 
 Solo native macOS, without agents or containers. The larger original
