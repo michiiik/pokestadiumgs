@@ -3479,14 +3479,14 @@ typedef struct S1_unk_D_800ABE00_cmd19 S1_unk_D_800ABE00_cmd19;
 struct S1_unk_D_800ABE00_cmd19 {
     /* 0x00 */ u8 cmd;
     /* 0x01 */ char pad[0x3];
-    /* 0x04 */ s16 nearDistance; // Geo_NodeCullDistance: children render only when nearDistance <= depth < farDistance
+    /* 0x04 */ s16 nearDistance; // Distance-cull node: children render only when nearDistance <= depth < farDistance
     /* 0x06 */ s16 farDistance;
 };
 typedef struct S1_unk_D_800ABE00_cmd1A S1_unk_D_800ABE00_cmd1A;
 struct S1_unk_D_800ABE00_cmd1A {
     /* 0x00 */ u8 cmd;
     /* 0x01 */ u8 unk_01;
-    /* 0x02 */ s16 caseIndex; // Geo_NodeSwitchCase: walks this many siblings from the first child before dispatching
+    /* 0x02 */ s16 caseIndex; // Switch-case node: walks this many siblings from the first child before dispatching
 };
 typedef struct S1_unk_D_800ABE00_cmd1B S1_unk_D_800ABE00_cmd1B;
 struct S1_unk_D_800ABE00_cmd1B {
@@ -5133,7 +5133,18 @@ void Geo_NodeAmbientLight(void *root) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003B218.s")
+extern Gfx* D_800D0510;
+void Geo_NodeUpdateLights(S1_GraphNode *root) {
+    s32 index;
+    if (D_80094910->activeLights != D_80094910->lightCount) {
+        D_80094910->lightCount = D_80094910->activeLights;
+        gMoveWd(D_800D0510++, G_MW_NUMLIGHT, 0, D_80094910->lightCount * 0x18);
+        for (index = 0; index < D_80094910->lightCount; index++) {
+            gSPLight(D_800D0510++, &D_80094910->lights->l[index], index + 1);
+        }
+        gSPLight(D_800D0510++, D_80094910->lights, index + 1);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -5141,11 +5152,37 @@ void Geo_NodeAmbientLight(void *root) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003B48C.s")
+extern void Geo_ProcessNodeChildren(void *root);
+extern void * D_80094908;
+extern u8 D_80124F68;
+void Geo_NodeCullDistance(S1_GraphNode *root) {
+    S1_unk_D_86002F34_alt3 *range = (S1_unk_D_86002F34_alt3 *)root;
+    S1_MtxF *view = &((S1_unk_D_86002F34_00C *)D_80094908)->unk_60.mtxf;
+    f32 x = ((SceneTransformPool *)&D_80124F68)->matrices[((SceneTransformPool *)&D_80124F68)->top].mf[3][0];
+    f32 y = ((SceneTransformPool *)&D_80124F68)->matrices[((SceneTransformPool *)&D_80124F68)->top].mf[3][1];
+    f32 z = ((SceneTransformPool *)&D_80124F68)->matrices[((SceneTransformPool *)&D_80124F68)->top].mf[3][2];
+    s16 depth = ((x * view->mf[0][2]) + (y * view->mf[1][2]) + (z * view->mf[2][2])) + view->mf[3][2];
+    if ((depth >= range->unk_18) && (depth < range->unk_1A)) {
+        Geo_ProcessNodeChildren(root);
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003B534.s")
+extern void * D_80094924[];
+void Geo_NodeSwitchCase(S1_GraphNode *root) {
+    S1_unk_D_86002F34_alt3 *selection = (S1_unk_D_86002F34_alt3 *)root;
+    s32 index;
+    S1_GraphNode *child = (S1_GraphNode *)selection->unk_00.unk_0C;
+    if (child != NULL) {
+        for (index = 0; index < selection->unk_1A; index++) {
+            child = child->unk_08;
+        }
+    }
+    if (child->unk_01 & 1) {
+        ((void (*)(S1_GraphNode *))D_80094924[child->unk_00])(child);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -5359,7 +5396,45 @@ void Geo_RenderRootNode(u8 *node) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003C848.s")
+extern void *D_80094918;
+extern void * D_80094908;
+extern void * D_8009491C;
+void Geo_ProcessCallbacks(S1_GraphNode *root, s32 event) {
+    S1_GraphNode *node = root;
+    S1_GraphNode **slot;
+    do {
+        if (node->unk_10 != NULL) {
+            node->unk_10(event, node);
+        }
+        if (node->unk_0C != NULL) {
+            switch (node->unk_00) {
+            default:
+                slot = NULL;
+                break;
+            case 2:
+                slot = (S1_GraphNode **)&D_80094908;
+                break;
+            case 4:
+                slot = (S1_GraphNode **)&D_80094910;
+                break;
+            case 6:
+                slot = (S1_GraphNode **)&D_80094918;
+                break;
+            case 22:
+                slot = (S1_GraphNode **)&D_8009491C;
+                break;
+            }
+            if (slot != NULL) {
+                *slot = node;
+            }
+            Geo_ProcessCallbacks((S1_GraphNode *)node->unk_0C, event);
+            if (slot != NULL) {
+                *slot = NULL;
+            }
+        }
+        node = node->unk_08;
+    } while (node != root);
+}
 #endif
 
 #ifdef VERSION_US

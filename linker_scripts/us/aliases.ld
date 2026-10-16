@@ -242,3 +242,7 @@ func_8002596C = Audio_ApplyCommandPreset;
 func_800341C8 = AudioSeq_ReadWordParameter;
 func_80035174 = Audio_ThreadMain;
 func_800371B4 = Camera_ComputeEyeFromAngles;
+func_8003B218 = Geo_NodeUpdateLights;
+func_8003C848 = Geo_ProcessCallbacks;
+func_8003B48C = Geo_NodeCullDistance;
+func_8003B534 = Geo_NodeSwitchCase;
