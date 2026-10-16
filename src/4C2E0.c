@@ -187,7 +187,23 @@ s16 func_8004BB58(s32 arg0, s32 arg1) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4C2E0/func_8004BBA8.s")
+s32 func_8004BBA8(s32 arg0, s32 arg1, FleetVec3f4C2E0 *arg2) {
+    s32 result = 0;
+    s32 value;
+    u32 packed;
+    FleetVec3s4C2E0 vec;
+
+    value = func_8004B754(arg1);
+    *arg2 = D_800948D0;
+    if ((arg0 != 0) && (value >= 0)) {
+        vec.x = (s16)(*(u32 *)((value * 12) + (u8 *)arg0 + 4) >> 16) >> 6;
+        vec.y = (s16)(*(u32 *)((value * 12) + (u8 *)arg0 + 4) >> 6) >> 4;
+        vec.z = (s16)(*(u32 *)((value * 12) + (u8 *)arg0 + 4) << 6) >> 6;
+        Vec3f_FromVec3s(arg2, &vec);
+        result = 1;
+    }
+    return result;
+}
 
 s32 func_8004BC6C(s32 arg0, s32 arg1) {
     s16 result = 0;
