@@ -559,7 +559,13 @@ void func_8AF123C0(void) {
 extern s16 D_8AF31024;
 extern char D_8AF315A0[];
 extern char D_8AF296C8[];
-extern u8 D_8AF316C8[];
+struct MenuGridEntry {
+    u8 kind;
+    u8 palette;
+    u8 unknown;
+    u8 blink;
+};
+extern struct MenuGridEntry D_8AF316C8[];
 
 u8 *func_8AF125D0(s16 category) {
     u8 *output;
@@ -578,7 +584,7 @@ u8 *func_8AF125D0(s16 category) {
     sprintf(D_8AF315A0, D_8AF296C8);
     func_8004C54C(0x2F, (s32)func_8004C874(0xC, D_8AF263C4[selected]));
     func_8AF123C0();
-    output = D_8AF316C8;
+    output = (u8 *)D_8AF316C8;
     _bzero((s32 *)output, 1000);
     destination = output;
     for (index = 0; index != 250; index++) {
@@ -655,7 +661,7 @@ void func_8AF127E8(s16 group, s16 selected) {
         sprintf(D_8AF315A0, D_8AF2973C);
     }
     func_8AF123C0();
-    output = D_8AF316C8;
+    output = (u8 *)D_8AF316C8;
     _bzero((s32 *)output, 1000);
     destination = output;
     switch (group) {
@@ -788,18 +794,113 @@ void func_8AF12A4C(u8 *record) {
 extern s32 D_8AF26F30;
 extern s16 D_8AF316A4;
 extern s16 D_8AF316A6;
-extern u8 D_8AF316B8;
+struct MenuScrollState {
+    s16 fields[7];
+};
+extern struct MenuScrollState D_8AF316B8;
 
 void func_8AF12E7C(void) {
     D_8AF316A4 = 0;
     D_8AF316A6 = 0;
-    _bzero(&D_8AF316B8, 0xE);
+    _bzero((s32 *)&D_8AF316B8, 0xE);
     D_8AF26F30 = 0;
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF12EB8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF133C0.s")
+extern void func_8AC0686C(void *, s16);
+extern s32 func_8AC0660C(s16);
+extern s32 func_8AC06630(s16, void *);
+extern void func_8AC0619C(void *, u16);
+extern void func_8AC06220(void *, u16);
+extern void func_8AC063AC(void *, u16);
+extern s16 D_8AF31198;
+extern void *D_8AF31194;
+extern s16 D_8AF316BC;
+extern u8 D_8AF31E40;
+extern struct MenuScrollState D_8AF31DF8;
+extern u8 D_8AF31088[];
+extern u8 D_8AF31100[];
+extern u8 D_8AF31D80[];
+extern u16 D_8AF2BDC6;
+struct MenuInputState {
+    u8 header[6];
+    u16 held;
+    u16 pressed;
+    u16 unknown;
+    u16 repeat;
+};
+
+s32 func_8AF133C0(void) {
+    s16 result;
+    s32 pressed;
+    s16 old_column;
+    s16 old_row;
+    s32 was_scrolling;
+    s32 changed;
+    u16 repeat;
+    u16 buttons;
+
+    was_scrolling = 0;
+    old_column = D_8AF316A4;
+    old_row = D_8AF316A6;
+    func_8AC007FC();
+    if (D_8AF31198 < 4) {
+        *(u16 *)((u8 *)D_8AF31194 + 2) |= 2;
+    } else {
+        *(u16 *)((u8 *)D_8AF31194 + 2) &= 0xFFFD;
+    }
+    result = 14;
+    if (D_8AF316BC != 0) {
+        was_scrolling = 1;
+    }
+    func_8AC0686C(&D_8AF316B8, D_8AF316A6);
+    pressed = ((struct MenuInputState *)D_8AF263C0)->pressed;
+    if ((pressed & 0x8000) && D_8AF316C8[D_8AF316A4 + D_8AF316A6 * 4].kind != 0xFF) {
+        func_8AF00130(0xC2);
+        result = 15;
+        D_8AF31E40 = D_8AF316C8[D_8AF316A4 + D_8AF316A6 * 4].kind;
+        D_8AF31DF8 = D_8AF316B8;
+        D_8AF26F30 = 1;
+    } else if (pressed & 0x4000) {
+        func_8AF00130(3);
+        result = 13;
+    } else {
+        repeat = ((struct MenuInputState *)D_8AF263C0)->repeat;
+        if ((repeat & 0x100) && D_8AF316A4 < 3) {
+            func_8AF00130(1);
+            D_8AF316A4++;
+        } else if ((repeat & 0x200) && D_8AF316A4 > 0) {
+            func_8AF00130(1);
+            D_8AF316A4--;
+        } else if (D_8AF316BC == 0) {
+            changed = 0;
+            buttons = repeat;
+            if (was_scrolling != 0) {
+                buttons = ((struct MenuInputState *)D_8AF263C0)->held;
+            }
+            if ((buttons & 0x800) && func_8AC0660C(D_8AF316A6)) {
+                func_8AF00130(1);
+                D_8AF316A6--;
+                changed = 1;
+            } else if ((buttons & 0x400) && func_8AC06630(D_8AF316A6, &D_8AF316B8)) {
+                func_8AF00130(1);
+                D_8AF316A6++;
+                changed = 1;
+            }
+            if (changed != 0) {
+                func_8AC0686C(&D_8AF316B8, D_8AF316A6);
+            }
+        }
+    }
+    if (old_column != D_8AF316A4 || old_row != D_8AF316A6) {
+        func_8AF12A4C(&D_8AF316C8[D_8AF316A4 + D_8AF316A6 * 4].kind);
+    }
+    func_8AC0619C(D_8AF31088, D_8AF2BDC6);
+    func_8AC06220(D_8AF31100, D_8AF2BDC6);
+    func_8AC063AC(D_8AF31D80, D_8AF2BDC6);
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF13718.s")
 #endif

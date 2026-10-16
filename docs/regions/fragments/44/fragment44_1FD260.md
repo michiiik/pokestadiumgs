@@ -1,9 +1,80 @@
 # Fragment 44 record collection and menu callbacks
 
+## 2026-10-16 — input navigation accepted
+
+`func_8AF133C0` is now matching C: **214 instruction words / 856 bytes**,
+with its original **0x38-byte frame**. The file advances to **26 C / 12 ASM**
+from 38 original functions. Solo native macOS, without agents or containers.
+
+Acceptance: batch `c66f297a5de544f798132f1da5dd37b0`, candidate
+`f44-menu-input-grid-declaration:form-3`: **link-verified**, one successful
+combined full-ROM gate, 1.218 seconds. Earlier five-operand register ties are
+closed, not accepted by normalized similarity or a permuter score.
+
+### Source mechanisms
+
+- Give the existing grid its real four-byte entry declaration (`kind`,
+  palette index, unknown byte, blink flag). Keep the two accepted byte-stream
+  builders using explicit byte views of that same storage. No new allocated
+  data or callable helper is introduced.
+- Read the selected entry as `entries[column + row * 4].kind`, and pass its
+  actual field address to the refresh routine. The real global record type
+  plus `&entries[column + row * 4].kind` closes the final five operands.
+  Casting a byte-array declaration to a record pointer was not equivalent
+  compiler context; flat byte-address forms retained the register mismatch.
+- Model the existing scroll state as seven shorts (14 bytes), consistent
+  with the original initializer and scroll callees. Direct aggregate copy
+  preserves the aligned three-word plus halfword copy; casts from a byte
+  declaration instead caused unaligned operations. The initializer's bzero
+  gets its required word-pointer view without changing any instruction.
+- Preserve the mutually exclusive A/B/horizontal/vertical input branches,
+  repeat versus held-button selection, rereads after the sound call, and
+  row/column-change refresh. No fake locals, padding, dead reads, return-type
+  trick, compiler patch, or verification bypass.
+
+### Verification and the failed hypotheses
+
+Fresh and twenty-leading-blank complete-TU recompilations preserve the frozen
+accepted object, loadable section layout and all relocation rows. All 38
+original starts/sizes are unchanged; all 37 untouched raw function bodies
+match the 25-C baseline, including both builders and the scroll initializer.
+A strict canonical link resolves every external from the normal ROM ELF and
+checks the complete 19,264-byte text and 240-byte readonly windows against
+both that ELF and immutable retail bytes. No additional data/bss storage.
+
+After cleanup, forced normal native `gmake rom COMPARE=1` passes retail MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. All 46 native tests pass; host syntax
+passes with three unrelated pre-existing warnings (one initializer pointer
+warning removed). Evidence-backed naming has no mapping for this owner.
+
+IDO 7.1 stock/diagnostic-off/on/leading-blank full-object calibration passed
+for the baseline and five-operand parent. Its residual values were allocated
+by UGEN's temporary free list, not colored global-register webs. Unsigned byte
+offsets, equivalent refresh predicates, natural logical-line regrouping and
+explicit coordinate snapshots did not close the tie. The diagnostic compiler
+and scratch campaigns are not publication artifacts. A data-companion
+preflight limitation required applying the two byte-view edits before the
+struct retype; the resulting whole-file transaction was independently proved
+unchanged before testing the input body. No guard was bypassed.
+
+### Remaining drawing owner
+
+`func_8AF13718` remains **requeue**, not installed. Four-byte color-array or
+separate RGBA/packed-word views reproduce its unaligned palette copy and three
+aligned selection-node stores. Right-bound-before-bottom-bound source order
+restores the original width/height temporary ordering; an explicit nested
+blink test restores the original branch polarity. Real clip snapshots and
+coordinate widths affect frame and saved-register roles but have not matched.
+The best opcode-shaped proposal is 1,044 bytes, versus 1,048 including the
+original trailing alignment nop; it still has genuine frame/operand/schedule
+differences. Do not pad those away. Its earlier raw-byte-grid candidates need
+revalidation after the now-accepted global entry type before another search.
+
 ## 2026-10-16 — input and grid drawing requeues
 
-Solo native macOS; neither owner is accepted or installed. The source remains
-25 C / 13 ASM. These findings use the post-PR1066 translation-unit context.
+Historical pre-acceptance handoff, superseded for input navigation above.
+At this point neither owner was installed (25 C / 13 ASM). These measurements
+use the post-PR1066 context before the accepted global grid declaration.
 
 - `func_8AF133C0`: **requeue / register-tie**, 856 bytes, frame 0x38.
   The best candidate has all 214 opcode positions correct and 209/214 raw
