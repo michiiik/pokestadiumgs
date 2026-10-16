@@ -63,11 +63,54 @@ void func_800057DC(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/62E0/func_800058B4.s")
+typedef struct {
+    u8 pad0[4];
+    u16 width;
+    u16 *buf;
+} struct_80001FE4;
 
+extern u8 D_800CD020[];
 extern u8 D_800CDA60[];
-extern void Sched_InitClientQueue();
-extern void func_800058B4(void *);
+extern void __osSetFpcCsr(s32);
+extern void func_80005568(void *);
+extern void func_80004F34(void *);
+extern struct_80001FE4 *func_80001FE4(void);
+extern s32 Display_IsCurrentFramebuffer(void);
+
+void func_800058B4(UNUSED void *arg0) {
+    f32 scale;
+    struct_80001FE4 *temp_v0;
+
+    __osSetFpcCsr(0x1000C01);
+    func_80005568(D_800CDA60);
+    scale = 1.0f;
+    while (1) {
+        func_80004F34(D_800CDA60);
+        if (*(s16 *)((u8 *)D_800CD020 + 0xA38) != 0) {
+            if ((u32)*(s32 *)(D_800CDA60 + 0x5E0) < 16) {
+                temp_v0 = func_80001FE4();
+                if (temp_v0 != NULL) {
+                    if (temp_v0->width == 320) {
+                        SoftReset_ClearLines320(temp_v0->buf);
+                    } else {
+                        SoftReset_ClearLines640(temp_v0->buf);
+                    }
+                } else if (Display_IsCurrentFramebuffer()) {
+                    func_800057DC();
+                } else {
+                    SoftReset_ClearLines320(osViGetCurrentFramebuffer());
+                }
+                (*(s32 *)(D_800CDA60 + 0x5E0))++;
+            } else if (*(s32 *)(D_800CDA60 + 0x5E0) == 16) {
+                osViBlack(1);
+                osViSetYScale(scale);
+                (*(s32 *)(D_800CDA60 + 0x5E0))++;
+            }
+        }
+    }
+}
+
+extern void Sched_InitClientQueue(void *, s32, s32);
 void SoftReset_CreateThread(void) {
     Sched_InitClientQueue(D_800CDA60, 2, 1);
     *(s32 *)(D_800CDA60 + 0x5E0) = 0;
