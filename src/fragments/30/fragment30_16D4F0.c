@@ -60,7 +60,20 @@ void func_881000B8(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/30/fragment30_16D4F0/func_88100C80.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/30/fragment30_16D4F0/func_8810106C.s")
+extern s32 func_8004D1FC(u8 *);
+extern s32 func_8004D27C(u8 *, s32, s32);
+extern void func_80044270(s16, s16, s16, s16, s16, s16, s16, s16, s32);
+extern Gfx *D_800D0510;
+
+void func_8810106C(u8 *arg0, u8 *arg1, s16 arg2, s16 arg3, u8 arg4, u8 arg5, u8 arg6, u8 arg7,
+                   u8 arg8, u8 arg9, u8 arg10) {
+    func_8004D1FC(arg0);
+    func_8004D27C(arg1, 256, 1);
+    gDPPipeSync(D_800D0510++);
+    gDPSetPrimColor(D_800D0510++, 0, 0, arg4, arg5, arg6, arg7);
+    gDPSetEnvColor(D_800D0510++, arg8, arg9, arg10, 255);
+    func_80044270(arg2, arg3, *(s16 *)arg0, *(s16 *)(arg0 + 2), -16, -16, 1024, 1024, G_CYC_2CYCLE);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/30/fragment30_16D4F0/func_88101184.s")
 
