@@ -269,3 +269,7 @@ func_80041D84 = PokeIcon_AllocSpecialModelContext;
 func_80037C80 = Color_AdjustRGBA8;
 func_8003DD2C = GeoRender_FlushMaterialSlots;
 func_8003F9AC = SceneObject_SetModelVariant;
+func_80041548 = Fragment_ProcessGeoLayout;
+func_80041E2C = PokeIcon_InitResourceArchives;
+func_80042484 = Model_FindLowestTextureAddress;
+func_800425C0 = PokeIcon_ApplyResourceLoadResult;

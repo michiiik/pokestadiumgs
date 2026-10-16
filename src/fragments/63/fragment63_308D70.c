@@ -203,7 +203,7 @@ void func_87E06D84(u8 *arg0) {}
 
 extern s32 main_pool_push_state(s32);
 extern void func_87F0BD10(void);
-extern void func_80041E2C(void);
+extern void PokeIcon_InitResourceArchives(void);
 extern void func_87E069A4(u8 *);
 extern void func_87E06BCC(u8 *);
 extern void func_87E10E64(s32);
@@ -218,7 +218,7 @@ void func_87E06D8C(u8 *arg0, s32 arg1) {
     *(s32 *)(arg0 + 0) = 0;
     arg0[396] &= ~0x80;
     func_87F0BD10();
-    func_80041E2C();
+    PokeIcon_InitResourceArchives();
     func_87E06D84(arg0);
     func_87E06908((s32)arg0);
     func_87E069A4(arg0);
