@@ -222,3 +222,7 @@ func_8003D0C8 = GeoRender_SetPrimitiveColor;
 func_80037F40 = GeoNode_CreateCamera;
 func_8003D55C = GeoRender_EnableTextureGeneration;
 func_80040E80 = process_geo_layout;
+func_8003A2C8 = Geo_ProcessNodeChildren;
+func_8003A960 = Geo_NodeModelPartRoot;
+func_8003AA58 = Geo_NodePerspective;
+func_80040F60 = Model_AdjustTextureColors;
