@@ -177,7 +177,7 @@ extern s32 func_86300074(s32 *);
 extern s32 ModelAnim_IsFinished();
 extern void func_8003F1DC();
 extern void func_8003F114();
-extern void func_8003F210();
+extern void ModelAnim_SetAnimation();
 extern void func_8003F3BC();
 extern u8 D_86307334[];
 extern u8 D_86307460[];
@@ -209,10 +209,10 @@ void func_86301250(void *arg0) {
         func_8003F1DC((void *)((u8 *)D_87F119DC + 0x24));
         func_8003F114((void *)((u8 *)D_87F119DC + 0x24), 0, -1,
                      ((Func86301250ResourceGrid *)D_863075D8)->resources[*(s32 *)arg0][selection[0]]);
-        func_8003F210((void *)((u8 *)D_87F119DC + 0x24), selection[1]);
+        ModelAnim_SetAnimation((void *)((u8 *)D_87F119DC + 0x24), selection[1]);
         func_8003F3BC((void *)((u8 *)D_87F119DC + 0x24), 0);
         *(s16 *)((u8 *)*(void **)((u8 *)D_87F119DC + 0x68) + 6) = speed;
-        func_8003F210((void *)((u8 *)*(void **)((u8 *)arg0 + 0x40) + 0x24), animation);
+        ModelAnim_SetAnimation((void *)((u8 *)*(void **)((u8 *)arg0 + 0x40) + 0x24), animation);
         *(s16 *)((u8 *)*(void **)((u8 *)*(void **)((u8 *)arg0 + 0x40) + 0x68) + 6) = speed;
     }
 }
