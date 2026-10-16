@@ -1,5 +1,60 @@
 # Fragment 44 record collection and menu callbacks
 
+## 2026-10-16 — grouped-list builder and record-information panel accepted
+
+Solo native macOS, without agents or containers. Two larger original owners
+become matching C: **381 words / 1,524 bytes**. The file advances from
+**19 C / 19 function ASM to 21 C / 17 function ASM**, out of 38 originals.
+No new callable helper, allocated data, compiler patch or artificial padding.
+
+| Owner | Behavior | Bytes | Frame | Acceptance batch |
+| --- | --- | ---: | ---: | --- |
+| `func_8AF127E8` | Build grouped menu records and heading text | 528 | 0x28 | `0f59f764598349ab80dc0d59493de0f0` |
+| `func_8AF12A4C` | Update record information, rates and detail controls | 996 | 0x28 | `db91922329bd4dd49877b7c26e6e4317` |
+
+Both normal-runner accepts are `link_verified`, each with one successful
+combined full-ROM gate. Fresh and twenty-leading-blank full-TU rebuilds
+preserve the frozen accepted object's loadable sections, section layout and
+every relocation row. All **38 original function spans** and **36 untouched
+bodies** agree with the prior 19-C baseline. Exactly these two function
+pragmas are removed; both have accepted probe-statistics provenance.
+
+### Source mechanisms
+
+- The grouped-list builder needs the original two-case `switch`, not an
+  equivalent `if` chain: the chain loses one address-setup instruction and
+  changes branch layout. A real signed 32-bit counter with `i != 9` and
+  `i != 7` reproduces both mask loops. Preserve separate heading/detail
+  lookups, the negative-selection fallback and the existing table strides.
+- The information panel shares a real word-wide `texture_index = id - 1`
+  across the two texture controls. Recomputing the expression at each store
+  emits the same operation sequence but allocates a 0x20 frame rather than
+  the original 0x28. A halfword carrier does not fix that layout. The saved
+  rate remains an actual byte; widening it emits the wrong store/load width.
+- Preserve both original rate-getter calls and multiply-before-divide
+  single-precision rounding. Changing to divide-before-multiply is not an
+  instruction match. The redundant scratch casts were removed, duplicate
+  externs cleaned up, and the final source re-proved against the frozen hit.
+- Existing getter definitions in `src/638E0.c` establish their `u8(u8)`
+  contracts. Keep full-width flag complements; the original stored bits and
+  repeated global pointer loads remain intact.
+
+Forced normal `gmake rom COMPARE=1` passes with retail MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. Edited-TU host syntax passes with the
+same four pre-existing pointer warnings; all 46 native tooling tests pass.
+The naming tool finds no existing evidence-backed mapping for either owner.
+Scratch generators, objects, traces, proprietary compilers and ROMs stay local.
+
+Callback **requeue**: a bounded two-field point-aggregate experiment adds
+eight distinct cells each for `func_8AF10570`, `func_8AF1060C`,
+`func_8AF106A8` and `func_8AF10784`. None matches. The three straight draw
+callbacks still place their coordinate pair at stack +0x2C rather than
++0x24; narrow point fields do not repair it, and widening coordinate
+carriers changes scheduling/registers. Retain the earlier array-form
+leaders and investigate actual local-home/lifetime evidence next, rather
+than repeating declaration permutations or adding fake storage. Section and
+padding requeues documented below remain unchanged and in assembly.
+
 ## 2026-10-16 — four menu-detail, flag and text-bank routines accepted
 
 Solo native macOS, without agents or containers. Four original assembly
