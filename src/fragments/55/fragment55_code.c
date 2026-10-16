@@ -381,7 +381,40 @@ void func_8670972C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/55/fragment55_code/func_8670A404.s")
+extern f32 D_8670C684;
+extern f32 D_8670C688;
+extern f32 D_8670BE7C;
+extern s16 D_8670BE80;
+extern s16 D_8670BE84;
+extern u8 D_86726A48[];
+extern u8 D_86726BB0[];
+extern u8 D_86726D18[];
+extern u8 D_86726E80[];
+extern u8 D_86726FE8[];
+extern u8 D_86727150[];
+extern u8 D_867272B8[];
+extern void func_8003F1DC(void *);
+
+void func_8670A404(void) {
+    f32 *var_v0 = (f32 *)&D_8670BB48;
+
+    var_v0[5] = 0.0f;
+    var_v0[6] = -140.0f;
+    var_v0[7] = D_8670C684;
+    var_v0[8] = 0.0f;
+    var_v0[9] = 40.0f;
+    var_v0[10] = 0.0f;
+    D_8670BE7C = D_8670C688;
+    D_8670BE80 = 16388;
+    D_8670BE84 = 6400;
+    func_8003F1DC(D_86726A48);
+    func_8003F1DC(D_86726BB0);
+    func_8003F1DC(D_86726D18);
+    func_8003F1DC(D_86726E80);
+    func_8003F1DC(D_86726FE8);
+    func_8003F1DC(D_86727150);
+    func_8003F1DC(D_867272B8);
+}
 #endif
 
 #ifdef VERSION_US
