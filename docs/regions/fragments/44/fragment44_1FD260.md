@@ -495,6 +495,123 @@ under 7.1. Stock 5.3 changes two of them and worsens both the callback and
 padding leaders; this does not justify changing this file's compiler.
 Leading-blank controls are stable. This is a bounded negative, not proof
 of an impossible source shape or a broken compiler.
+## 2026-10-16 — grid drawing four-word requeue, not acceptance
+
+`func_8AF13718` remains **requeue** and assembly. This continuation accepts
+**zero** new functions. The unchanged production source remains 32 C / 6
+function ASM out of 38 originals; its SHA256 is
+`57402c73c73f6b998ad67da13fc698a529f91229e4f0aee7f62bee351d93d7f6`.
+The improvement below is a measured partial source reconstruction, not a
+normalized-score match, linked byte match, or full-ROM acceptance.
+
+### Three real source mechanisms
+
+1. Declare a consumed `s16 *limit` after the existing RGBA object and its
+   two consumed pointer views. Initialize it to `&D_8AF316BA` before the
+   row loop; use `*limit` in both row cutoffs. This reproduces the original
+   `$t8` load and its two comparison temporaries. Reading the field directly
+   through the seven-short scroll structure first demonstrated this gain,
+   but the pointer to the actual halfword also preserves the original
+   relocation reference. Moving the pointer declaration later restores the
+   original frame `0x80`, color at `sp+0x54`, alpha byte at `sp+0x57`, row
+   count at `sp+0x62`, bottom at `sp+0x64` and top at `sp+0x68`.
+2. Represent each of the three actual packed-color transfers as a copy of
+   a four-byte word aggregate, retaining the existing RGBA copy and alpha
+   update. `struct MenuGridWordCopy { u32 value; };` is only a type view,
+   not additional allocated storage. For example:
+
+   ```c
+   *(struct MenuGridWordCopy *)((u8 *)D_8AF3118C + 0x28) =
+       *(struct MenuGridWordCopy *)color_word;
+   ```
+
+   Use the same view for that node's `+0x2C` and the other node's `+0x2C`.
+   This restores the original temporary-register sequence through all
+   three loads/stores, the flag updates, and the rest of the drawing body.
+3. A typed clip-panel view, without retyping the production global, fixes
+   one more clip-add operand order:
+
+   ```c
+   struct MenuGridPanelView {
+       u16 type, flags;
+       u8 header[4];
+       s16 x, y, width, height;
+   };
+   ```
+
+   A reviewed clip-only search then finds a useful, semantically valid
+   reuse of the existing signed-short X before its later per-entry drawing
+   definition:
+
+   ```c
+   x = ((struct MenuGridPanelView *)D_8AF31184)->x;
+   row = ((struct MenuGridPanelView *)D_8AF31184)->y;
+   left = x;
+   x = left - 3;
+   top = row;
+   right = left + ((struct MenuGridPanelView *)D_8AF31184)->width;
+   bottom = row + ((struct MenuGridPanelView *)D_8AF31184)->height;
+   func_8AC0077C((s16)x, row, right, bottom);
+   ```
+
+   Keep the actual callee contract `void(s32, s32, s32, s32)`. Do not
+   manufacture a narrow callee prototype to change caller code generation.
+   No extra local, dummy read, oversized array, return-type change or forced
+   register is used. This is evidence in this file, not a general heuristic
+   validated across two different source files.
+
+### Exact remaining words and section scope
+
+Fresh and twenty-leading-blank builds of that uninstalled draft have the
+same complete loadable sections, layout and relocation rows. A strict
+canonical link resolves every undefined symbol from the normal ELF and
+compares the entire 19,264-byte text and 240-byte rodata windows directly
+against both the ELF and retail ROM. All 37 untouched raw bodies and their
+original starts/sizes stay identical. The linked text differs only here:
+
+| Address | Retail instruction | Draft instruction |
+| --- | --- | --- |
+| `0x8AF137A0` | `addiu a0, v1, -3` | `addiu s7, v1, -3` |
+| `0x8AF137A4` | `addu a3, a1, t2` | `addu a3, t2, a1` |
+| `0x8AF137B0` | `sll a0, a0, 16` | `sll s7, s7, 16` |
+| `0x8AF137BC` | `sra a0, a0, 16` | `sra a0, s7, 16` |
+
+The C symbol is 1,044 bytes, but its original 1,048-byte owner span is
+already preserved by the text section's implicit terminal zero alignment
+word. **Do not add `C_FUNCTION_PADDING(4)` to this draft.** That redundant
+marker increases this object's text from 19,264 to 19,280 bytes after
+alignment. A function-size difference alone did not prove missing bytes;
+the whole-section control caught the mistaken padding hypothesis. Earlier
+padding-bearing variants are not evidence of a new layout prerequisite.
+
+### Controls, scoped negatives, and next action
+
+Stock normal and `-g0` diagnostic builds retain the same six-word residual
+on the pre-X-carrier lead; natural line grouping does not close it. A
+calibrated 180-second clip-only permuter search improves score 240 to 30.
+Its expanded region markers and a leading-blank control reproduce the full
+stripped object, symbol layout and every relocation row before searching.
+Only six real clip statements are randomized. Search scores are not
+acceptance evidence; each proposed source edit is independently reviewed.
+
+This continuation records 224 normal drawing rejections, plus eight each
+for a section phase-union family, flag-helper return blocks, and padding
+store/stride shapes. Those neighbors also stay assembly. The section's
+declaration-move control was revalidated against the current 32-C object;
+no ABI or companion change was installed. Additional clip snapshots,
+literal widths, real phase carriers, bounds records and lexical scopes do
+not close the measured residual in their tested contexts. Preserve the
+four-word lead instead of restarting from the older broad register drift.
+
+Next investigate why the clip-margin definition inherits the later draw-X
+`$s7` web instead of `$a0`, together with the single bottom-add operand
+ordering. Separate real lifetimes without adding fake storage, then rerun
+the normal runner and full ROM gate before removing the pragma. The
+unchanged production ROM still compares byte-identically, MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`, and all 46 native tooling tests pass.
+No unaccepted C, scratch driver, compiler observer, object, assembly or ROM
+is published with this handoff.
+
 ## 2026-10-16 — remaining conditional drawing callback accepted
 
 `func_8AF106A8` now replaces **55 original instruction words / 220 bytes**,
