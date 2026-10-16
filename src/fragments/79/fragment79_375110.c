@@ -73,5 +73,27 @@ void func_84105B7C(u8 *arg0) {
     *(s16 *)arg0 = *(s16 *)(D_84190114 + 0x72);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_375110/func_84105B90.s")
+extern u8 D_84190098[];
+extern void MtxF_Copy(u32 *, u32 *);
+extern void ParticleMath_CopyVec3f(f32 *, f32 *);
+
+void func_84105B90(u8 *arg0) {
+    u8 *var_s0;
+
+    D_84190090 = arg0;
+    D_84190114 = D_84190098;
+    MtxF_Copy((u32 *)D_84190114, (u32 *)(arg0 + 100));
+    ParticleMath_CopyVec3f((f32 *)(D_84190114 + 64), (f32 *)(arg0 + 168));
+    ParticleMath_CopyVec3f((f32 *)(D_84190114 + 76), (f32 *)(arg0 + 180));
+    var_s0 = D_84190114;
+    func_84105A54(var_s0 + 112, var_s0 + 114);
+    var_s0 = D_84190114;
+    func_84105988(var_s0 + 118, var_s0 + 120);
+    var_s0 = D_84190114;
+    func_84105880((Vec3f84105880 *)(var_s0 + 88),
+                  *(Vec3f84105880 *)(var_s0 + 64), *(Vec3f84105880 *)(var_s0 + 76));
+    var_s0 = D_84190114;
+    func_84105880((Vec3f84105880 *)(var_s0 + 100),
+                  *(Vec3f84105880 *)(var_s0 + 76), *(Vec3f84105880 *)(var_s0 + 64));
+}
 #endif
