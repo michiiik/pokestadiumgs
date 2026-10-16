@@ -1458,6 +1458,10 @@ s32 func_800318C8(void) {
 #endif
 
 #ifdef VERSION_US
+typedef struct { u8 *ptr; u8 value; u8 pad; u16 limit; } Func31Entry;
+extern Func31Entry D_800D27C0[];
+typedef struct { u8 pad0[0xC]; u8 unkC; u8 unkD; u8 unkE; u8 unkF; u8 unk10; u8 unk11; u8 unk12; u8 unk13; u8 pad14[0x18]; u8 unk2C; } AudioConfig;
+extern AudioConfig D_800D2760;
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800319D0.s")
 #endif
 
@@ -1478,8 +1482,6 @@ u8 GbAudio_GetRegisterValue(char arg0)
 #endif
 
 #ifdef VERSION_US
-typedef struct { u8 *ptr; u8 value; u8 pad; u16 limit; } Func31Entry;
-extern Func31Entry D_800D27C0[];
 extern s32 D_800D2AE0;
 void func_80031E6C(u16 arg0) {
     while (D_800D27C0[D_800D2AE0].limit >= arg0) {
@@ -1498,10 +1500,8 @@ void func_80031E6C(u16 arg0) {
 #ifdef VERSION_US
 extern s32 D_80032600_probe_hint_3;
 typedef struct { u32 unk0; s16 unk4; s16 unk6; u32 unk8; u32 unkC; u16 unk10; u16 unk12; u8 unk14; u8 unk15; u8 unk16; u8 unk17; u32 unk18; u32 unk1C; u32 unk20; u8 unk24; } AudioState;
-typedef struct { u8 pad0[0xC]; u8 unkC; u8 unkD; u8 unkE; u8 unkF; u8 unk10; u8 unk11; u8 unk12; u8 unk13; u8 pad14[0x18]; u8 unk2C; } AudioConfig;
 extern AudioState D_800D26E8;
 extern s32 D_800D275C;
-extern AudioConfig D_800D2760;
 extern u8 D_800D276D_load; extern u8 D_800D276D_store;
 extern u8 D_800D276E;
 extern u8 D_800D276F_load; extern u8 D_800D276F_store;
