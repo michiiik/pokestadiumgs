@@ -11,7 +11,18 @@ void func_86408BE0(void) {
     D_86416C00->d = 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/52/fragment52_2870A0/func_86408C1C.s")
+extern void func_80021ED8(s32);
+void func_86408C1C(void) {
+    if (D_86416C00->a == D_86416C00->b) {
+        return;
+    }
+    D_86416C00->c++;
+    if (D_86416C00->c <= D_86416C00->d) {
+        return;
+    }
+    D_86416C00->a = D_86416C00->b;
+    func_80021ED8(D_86416C00->a);
+}
 
 extern void func_800225C4(s32);
 void func_86408CA0(s32 arg0, s32 arg1) {
