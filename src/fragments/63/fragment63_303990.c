@@ -114,12 +114,12 @@ void func_87E00360(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_303990/func_87E00394.s")
 
-extern void func_8003C6B8(s32);
+extern void Geo_RenderRootNode(s32);
 extern void GeoRender_AdvanceFrameCounter();
 
 void func_87E00590(void) {
     GeoRender_AdvanceFrameCounter();
-    func_8003C6B8((*(s32 *)((u8 *)(D_87E1BA20) + (0x20))));
+    Geo_RenderRootNode((*(s32 *)((u8 *)(D_87E1BA20) + (0x20))));
 }
 
 extern s32 func_8004C990(s32 arg0, s32 arg1);

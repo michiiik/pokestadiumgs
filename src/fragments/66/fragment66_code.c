@@ -277,7 +277,7 @@ extern s32 func_8004D690(s32);
 extern s32 main_pool_push_state(s32);
 extern void main_pool_pop_state(s32);
 extern void GeoRender_AdvanceFrameCounter(void);
-extern void func_8003C6B8(s32);
+extern void Geo_RenderRootNode(s32);
 extern void func_800503A4(void *);
 extern void func_80008648(void);
 extern void func_82E02EB0(s32, s32, s32);
@@ -323,7 +323,7 @@ void func_82E02658(void) {
         func_82E02F00(0xA0, 0x78, D_82E06163);
     }
     GeoRender_AdvanceFrameCounter();
-    func_8003C6B8(D_82E05654);
+    Geo_RenderRootNode(D_82E05654);
     func_800503A4(D_82E0760C);
     func_80008648();
 }

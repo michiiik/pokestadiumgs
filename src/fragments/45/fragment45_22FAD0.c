@@ -114,7 +114,7 @@ extern void func_800225C4(s32);
 extern void func_8AB00BA4();
 extern void func_80021ED8(s32);
 extern s32 func_8AB0BACC(s32);
-extern void func_8003C6B8(s32);
+extern void Geo_RenderRootNode(s32);
 s32 func_8AB0B96C(s32 arg0) {
     s32 result = 0x32;
     s16 temp_v0;
@@ -146,7 +146,7 @@ s32 func_8AB0B96C(s32 arg0) {
         }
         break;
     case 2:
-        func_8003C6B8(D_8AB16F78);
+        Geo_RenderRootNode(D_8AB16F78);
         break;
     }
     return result;

@@ -22,7 +22,7 @@ void func_87C02DF0(u8 *arg0, s32 arg1, void *arg2, f32 arg3) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_258D80/func_87C03370.s")
 
-extern void func_8003C6B8(s32); void WidgetTree_OpenMessagePanel_fragment48(u8 *arg0) { func_8003C6B8(*(s32 *)(arg0 + 0)); }
+extern void Geo_RenderRootNode(s32); void WidgetTree_OpenMessagePanel_fragment48(u8 *arg0) { Geo_RenderRootNode(*(s32 *)(arg0 + 0)); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_258D80/func_87C03574.s")
 
