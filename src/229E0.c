@@ -4597,7 +4597,26 @@ void GeoOverlay_Draw(S1_unk_D_86002F34_00C_0CC* arg0, S1_unk_D_86002F34_00C_040*
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003A2C8.s")
+extern s32 D_80124D60;
+extern void *D_80094924[];
+void Geo_ProcessNodeChildren(void *root) {
+    S1_GraphNode *first;
+    S1_GraphNode *child;
+    first = (S1_GraphNode *)((S1_GraphNode *)root)->unk_0C;
+    child = first;
+    if (first != NULL) {
+        do {
+            if (child->unk_01 & 1) {
+                D_80124D60 = 0;
+                if (child->unk_10 != NULL) {
+                    D_80124D60 = child->unk_10(2, child);
+                }
+                ((void (*)(S1_GraphNode *))D_80094924[child->unk_00])(child);
+            }
+            child = child->unk_08;
+        } while (child != first);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -4607,7 +4626,7 @@ void GeoOverlay_Draw(S1_unk_D_86002F34_00C_0CC* arg0, S1_unk_D_86002F34_00C_040*
 #ifdef VERSION_US
 extern s32 D_80124D60;
 extern void *D_80094924[];
-extern void func_8003A2C8(void *, ...);
+extern void Geo_ProcessNodeChildren(void *);
 void Geo_NodeReference(void *arg0) {
     s32 (*callback)(s32, void *);
     void *child;
@@ -4621,7 +4640,7 @@ void Geo_NodeReference(void *arg0) {
         }
         ((void (*)(void *))((void **)D_80094924)[*(u8 *)child])(child);
     }
-    func_8003A2C8(arg0);
+    Geo_ProcessNodeChildren(arg0);
 }
 #endif
 
@@ -4631,10 +4650,10 @@ void Geo_NodeReference(void *arg0) {
 
 #ifdef VERSION_US
 extern s32 D_8009490C;
-extern void func_8003A2C8(void *, ...);
+extern void Geo_ProcessNodeChildren(void *);
 void Geo_NodeType3Pass(s32 arg0) {
     D_8009490C = arg0;
-    func_8003A2C8((void *)arg0);
+    Geo_ProcessNodeChildren((void *)arg0);
     D_8009490C = 0;
 }
 #endif
@@ -4644,19 +4663,50 @@ void Geo_NodeType3Pass(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003A960.s")
+extern S1_unk_D_86002F34_00C *D_80094914;
+extern s32 D_80094900;
+extern void func_8003DB38(s32, s32);
+extern void func_8003DD2C(void);
+void Geo_NodeModelPartRoot(void *root) {
+    void *node;
+    node = root;
+    if (D_80094914 == NULL && ((S1_GraphNode *)node)->unk_0C != NULL) {
+        D_80094914 = (S1_unk_D_86002F34_00C *)node;
+        func_8003DB38(((S1_GraphNode *)node)->unk_02 & 7, D_80094900);
+        Geo_ProcessNodeChildren(root);
+        func_8003DD2C();
+        D_80094914 = NULL;
+    }
+}
 #endif
 
 #ifdef VERSION_US
-extern s32 D_80094914;
-extern void func_8003A960(void *, void *, Gfx **);
+extern S1_unk_D_86002F34_00C *D_80094914;
+extern void Geo_NodeModelPartRoot(void *);
 extern void * D_80094908;
 extern Gfx* D_800D0510;
-void Geo_NodeOrtho(void *arg0, void *arg1) { Gfx *cmd; if (D_80094914 == 0 && *((s32 *)((u8 *)arg0 + 0xC)) != 0) { cmd = D_800D0510; D_800D0510 = cmd + 1; cmd->words.w0 = 0xDB0E0000; cmd->words.w1 = 0xFFFF; cmd = D_800D0510; D_800D0510 = cmd + 1; cmd->words.w0 = 0xDA380007; cmd->words.w1 = *((u32 *)((u8 *)D_80094908 + 0x40)) & 0x1FFFFFFF; func_8003A960(arg0, arg1, &D_800D0510); } }
+void Geo_NodeOrtho(void *root) {
+    if (D_80094914 == NULL && ((S1_GraphNode *)root)->unk_0C != NULL) {
+        gSPPerspNormalize(D_800D0510++, 0xFFFF);
+        gSPMatrix(D_800D0510++, (u32)((S1_unk_D_86002F34_00C *)D_80094908)->unk_40.mtx & 0x1FFFFFFF,
+                  G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
+        Geo_NodeModelPartRoot(root);
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003AA58.s")
+void Geo_NodePerspective(void *root) {
+    if (D_80094914 == NULL && ((S1_GraphNode *)root)->unk_0C != NULL) {
+        gSPLookAt(D_800D0510++, (u32)(((S1_unk_D_86002F34_00C *)D_80094908)->unk_60.lookat) & 0x1FFFFFFF);
+        gSPPerspNormalize(D_800D0510++, ((S1_unk_D_86002F34_00C *)D_80094908)->unk_24.perspNorm);
+        gSPMatrix(D_800D0510++, (u32)((S1_unk_D_86002F34_00C *)D_80094908)->unk_24.mtx & 0x1FFFFFFF,
+                  G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
+        gSPMatrix(D_800D0510++, (u32)((S1_unk_D_86002F34_00C *)D_80094908)->unk_60.p_mtxf & 0x1FFFFFFF,
+                  G_MTX_NOPUSH | G_MTX_MUL | G_MTX_PROJECTION);
+        Geo_NodeModelPartRoot(root);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -4724,7 +4774,7 @@ void func_8003B5AC(u8 *arg0) {
 
     func_8003614C(scratch.matrix, (s32)(arg0 + 0x18), (s32)(arg0 + 0x24));
     func_80039204((s32)scratch.matrix, 0);
-    func_8003A2C8(arg0);
+    Geo_ProcessNodeChildren(arg0);
     *(s32 *)((u8 *)&D_80124F68 + 0x10A0) -= 1;
 }
 #endif
@@ -4743,7 +4793,7 @@ void func_8003B600(u8 *arg0) {
     } else {
         D_8009499C = func_800392B8((s32)(arg0 + 0x18), 0);
     }
-    func_8003A2C8(arg0);
+    Geo_ProcessNodeChildren(arg0);
     (*(s32 *)((u8 *)&D_80124F68 + 0x10A0))--;
 }
 #endif
@@ -4772,13 +4822,13 @@ void func_8003B690(s32 arg0) {
 extern s32 D_80124D68[];
 extern void func_8003D888(s32, s32);
 extern void func_8003DA20(s32, s32);
-extern void func_8003A2C8(void *, ...);
+extern void Geo_ProcessNodeChildren(void *);
 void func_8003BC48(void *arg0) {
     if (*(s32 *)((u8 *)arg0 + 0x18) != 0) {
         func_8003D888(*((u8 *)arg0 + 3), D_80124D68[*(s16 *)((u8 *)arg0 + 0x1C)]);
         func_8003DA20(*(s32 *)((u8 *)arg0 + 0x18), (*((u8 *)arg0 + 2) & 4) != 0);
     }
-    func_8003A2C8(arg0);
+    Geo_ProcessNodeChildren(arg0);
 }
 #endif
 
@@ -4791,14 +4841,14 @@ extern s32 func_80039204(s32, s32);
 extern void func_8003D888(s32, s32);
 extern void func_8003DA20(s32, s32);
 extern s32 D_80126008;
-extern void func_8003A2C8(void *, ...);
+extern void Geo_ProcessNodeChildren(void *);
 extern u8 D_80124F68;
-void func_8003BEF0(void *arg0) { s32 *counter = &D_80126008; func_80039204((u8 *)arg0 + 0x1C, 0); if (*(s32 *)((u8 *)arg0 + 0x18) != 0 || *(s32 *)((u8 *)arg0 + 0x10) != 0) { func_8003D888(*((u8 *)arg0 + 3), ((s32 *)&D_80124F68)[*(s32 *)((u8 *)&D_80124F68 + 0x10A0) + 0x400]); if (*(void **)((u8 *)arg0 + 0x10) != 0) ((void (*)(s32, void *))(*(void **)((u8 *)arg0 + 0x10)))(5, arg0); func_8003DA20(*(s32 *)((u8 *)arg0 + 0x18), (*((u8 *)arg0 + 2) & 4) != 0); } func_8003A2C8(arg0); *counter = *counter - 1; }
+void func_8003BEF0(void *arg0) { s32 *counter = &D_80126008; func_80039204((u8 *)arg0 + 0x1C, 0); if (*(s32 *)((u8 *)arg0 + 0x18) != 0 || *(s32 *)((u8 *)arg0 + 0x10) != 0) { func_8003D888(*((u8 *)arg0 + 3), ((s32 *)&D_80124F68)[*(s32 *)((u8 *)&D_80124F68 + 0x10A0) + 0x400]); if (*(void **)((u8 *)arg0 + 0x10) != 0) ((void (*)(s32, void *))(*(void **)((u8 *)arg0 + 0x10)))(5, arg0); func_8003DA20(*(s32 *)((u8 *)arg0 + 0x18), (*((u8 *)arg0 + 2) & 4) != 0); } Geo_ProcessNodeChildren(arg0); *counter = *counter - 1; }
 #endif
 
 #ifdef VERSION_US
 extern void func_80039158(void *, s32);
-extern void func_8003A2C8(void *, ...);
+extern void Geo_ProcessNodeChildren(void *);
 extern void * D_80094908;
 extern u8 D_80124F68;
 void func_8003BF9C(void *arg0) {
@@ -4812,13 +4862,13 @@ void func_8003BF9C(void *arg0) {
         if (*(void **)((u8 *)arg0 + 0x10) != 0) ((void (*)(s32, void *))(*(void **)((u8 *)arg0 + 0x10)))(5, arg0);
         func_8003DA20(*(s32 *)((u8 *)arg0 + 0x18), (*((u8 *)arg0 + 2) & 4) != 0);
     }
-    func_8003A2C8(arg0);
+    Geo_ProcessNodeChildren(arg0);
     (*(s32 *)((u8 *)&D_80124F68 + 0x10A0))--;
 }
 #endif
 
 #ifdef VERSION_US
-extern void func_8003A2C8(void *, ...);
+extern void Geo_ProcessNodeChildren(void *);
 extern u8 D_80124F68;
 void Geo_NodeDisplayList(void *arg0) {
     void *root = arg0;
@@ -4829,7 +4879,7 @@ void Geo_NodeDisplayList(void *arg0) {
         if (callback != 0) ((void (*)(s32, void *))callback)(5, root);
         func_8003DA20(*(s32 *)((u8 *)root + 0x18), (*(u8 *)((u8 *)root + 2) & 4) != 0);
     }
-    func_8003A2C8(root);
+    Geo_ProcessNodeChildren(root);
 }
 #endif
 
@@ -4890,15 +4940,15 @@ void func_8003C2D8(s32 id) {
 
 #ifdef VERSION_US
 extern void func_8003C2D8(s32);
-extern void func_8003A2C8(void *, ...);
+extern void Geo_ProcessNodeChildren(void *);
 void Geo_NodeAnchor(void *arg0) {
     func_8003C2D8(*(s16 *)((u8 *)arg0 + 0x18));
-    func_8003A2C8(arg0);
+    Geo_ProcessNodeChildren(arg0);
 }
 #endif
 
 #ifdef VERSION_US
-extern void func_8003A2C8(void *, ...); void Geo_NodeGroup(void *arg0) { func_8003A2C8(arg0); }
+extern void Geo_ProcessNodeChildren(void *); void Geo_NodeGroup(void *arg0) { Geo_ProcessNodeChildren(arg0); }
 #endif
 
 #ifdef VERSION_US
@@ -4923,7 +4973,7 @@ void Geo_RenderRootNode(u8 *node) {
         gDPSetAlphaDither(D_800D0510++, G_AD_PATTERN);
         func_8006D2C0();
         D_8009490C = (s32)node;
-        func_8003A2C8(node);
+        Geo_ProcessNodeChildren(node);
         D_8009490C = 0;
     }
     D_80094900 = 0;
@@ -6473,7 +6523,60 @@ void *process_geo_layout(S1_MemoryBlock *pool, void *script) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80040F60.s")
+typedef struct {
+    u8 mode;
+    u8 type;
+    s16 width;
+    s16 height;
+    s16 numTexels;
+    void *texture;
+} SceneTextureData;
+typedef struct {
+    s32 count;
+    u16 *colors;
+    u32 unknown08;
+} ScenePaletteData;
+typedef struct {
+    S1_GraphNode node;
+    SceneTextureData *textures;
+    ScenePaletteData *palettes;
+    Vtx *vertices;
+    u8 textureCount;
+    u8 paletteCount;
+    s16 unknown26;
+    void *callback;
+} SceneTextureModel;
+extern u16 func_80037B08(u16, S1_arg1_func_80010CA8);
+extern u32 func_80037C80(u32, S1_arg1_func_80010CA8);
+void Model_AdjustTextureColors(SceneTextureModel *model, S1_arg1_func_80010CA8 adjustment) {
+    s32 i;
+    s32 j;
+    SceneTextureData *texture = model->textures;
+    ScenePaletteData *palette = model->palettes;
+    for (i = 0; i < model->textureCount; i++, texture++) {
+        if (texture != NULL && texture->texture != NULL && texture->mode == 0) {
+            if (texture->type == 2) {
+                u16 *pixel = texture->texture;
+                for (j = 0; j < texture->numTexels; j++, pixel++) {
+                    *pixel = func_80037B08(*pixel, adjustment);
+                }
+            } else if (texture->type == 3) {
+                u32 *pixel = texture->texture;
+                for (j = 0; j < texture->numTexels; j++, pixel++) {
+                    *pixel = func_80037C80(*pixel, adjustment);
+                }
+            }
+        }
+    }
+    for (i = 0; i < model->paletteCount; i++, palette++) {
+        if (palette != NULL && palette->colors != NULL) {
+            u16 *pixel = palette->colors;
+            for (j = 0; j < palette->count; j++, pixel++) {
+                *pixel = func_80037B08(*pixel, adjustment);
+            }
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
