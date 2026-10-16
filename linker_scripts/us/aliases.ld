@@ -273,3 +273,5 @@ func_80041548 = Fragment_ProcessGeoLayout;
 func_80041E2C = PokeIcon_InitResourceArchives;
 func_80042484 = Model_FindLowestTextureAddress;
 func_800425C0 = PokeIcon_ApplyResourceLoadResult;
+func_800412B0 = Fragment_LoadResourceFromRomRange;
+func_80041780 = PokeIcon_LoadResourceList;

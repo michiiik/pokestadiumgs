@@ -7749,7 +7749,24 @@ void *func_8004124C(void *arg0, void *arg1, s32 arg2, s32 arg3, u32 arg4) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800412B0.s")
+extern void func_80003F74(u8 *, u8 *, u8 *, s32);
+s32 Fragment_LoadResourceFromRomRange(s32 pool, s32 destination, s32 start, s32 end, s32 buffer, s32 capacity) {
+    u32 size = (end - start + 0xF) & ~0xF;
+    s32 result = 0;
+    u32 *header;
+    if ((u32)capacity >= size) {
+        header = (u32 *)buffer;
+        func_80003F74((u8 *)buffer, (u8 *)start, (u8 *)end, 0);
+        if (header[0] == 0x50455253 && header[1] == 0x2D535A50) {
+            result = (s32)func_800411F0((void *)pool, (u8 *)destination, buffer, (u8 *)buffer);
+        } else if (header[0] == 0x50524553 && header[1] == 0x4A504547) {
+            result = (s32)func_80041130((void *)pool, (void *)destination, buffer, (CandidateJpegHeader *)buffer);
+        } else {
+            result = (s32)func_8004124C((void *)pool, (void *)destination, buffer, 0, size);
+        }
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
@@ -7771,11 +7788,11 @@ void func_800413A0(S1_MainPoolState* arg0, u32 arg1, S1_Fragment* arg2) {
 #endif
 
 #ifdef VERSION_US
-extern s32 func_800412B0(s32, s32, s32, s32, s32, s32);
+extern s32 Fragment_LoadResourceFromRomRange(s32, s32, s32, s32, s32, s32);
 s32 func_800413E8(s32 arg0, s32 arg1, s32 *arg2, s32 *arg3, s32 arg4, s32 arg5) {
     s32 sum1 = arg3[0] + arg2[1];
     s32 sum2 = sum1 + arg3[1];
-    return func_800412B0(arg0, arg1, sum1, sum2, arg4, arg5);
+    return Fragment_LoadResourceFromRomRange(arg0, arg1, sum1, sum2, arg4, arg5);
 }
 #endif
 
@@ -7872,7 +7889,44 @@ void Fragment_ProcessGeoLayoutList(S1_MemoryBlock* arg0, S1_arg1_func_80019420* 
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80041780.s")
+typedef struct {
+    s16 kind;
+    s16 id;
+    s16 buffer;
+    s8 variant;
+    u8 unknown07;
+    OSMesgQueue *reply;
+    void *data;
+    s32 source;
+    u8 *destination;
+    s32 size;
+    S1_arg1_func_80010CA8 adjustment;
+} SceneWorkerMessage;
+extern u8 *MainPool_InitState(u8 *, s32);
+extern void MainPool_FinalizeAllocation(S1_MemoryBlock *);
+extern OSThread D_80126530;
+void PokeIcon_LoadResourceList(SceneWorkerMessage *message) {
+    s32 fragment;
+    S1_MemoryBlock *pool;
+    s32 count = 0;
+    S1_arg1_func_80019420 **output = message->data;
+    s16 *ids;
+    pool = (S1_MemoryBlock *)MainPool_InitState(message->destination, message->size);
+    ids = (s16 *)message->source;
+    while (*ids != -1) {
+        fragment = func_80041430((s32)pool, 0, *(s32 *)((u8 *)&D_80126530 + 0x9F4), *ids,
+                                 *(s32 *)((u8 *)&D_80126530 + 0x9FC), 0xF000);
+        if (fragment == 0) {
+            break;
+        }
+        output[count] = (S1_arg1_func_80019420 *)(fragment + 0x20);
+        Fragment_ProcessGeoLayoutList(pool, (S1_arg1_func_80019420 *)(fragment + 0x20));
+        ids++;
+        count++;
+    }
+    output[count] = NULL;
+    message->size = pool->size + 0x10;
+}
 #endif
 
 #ifdef VERSION_US
@@ -7899,7 +7953,7 @@ void func_80041A18(void *arg0) {
 #ifdef VERSION_US
 extern void __osSetFpcCsr(s32);
 extern void func_800416C8(void *);
-extern void func_80041780(void *);
+extern void PokeIcon_LoadResourceList(SceneWorkerMessage *);
 extern void func_8004186C(void *);
 extern void func_80041A18(void *arg0);
 extern OSMesgQueue D_80126F00;
@@ -7912,7 +7966,7 @@ void func_80041A78(void *arg0) {
         osRecvMesg(queue, &msg, 1);
         switch (*(s16 *)msg) {
         case 1: func_800416C8(msg); break;
-        case 2: func_80041780(msg); break;
+        case 2: PokeIcon_LoadResourceList(msg); break;
         case 4: func_8004186C(msg); break;
         case 8: func_80041A18(msg); break;
         }
