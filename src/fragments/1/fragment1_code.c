@@ -57,7 +57,7 @@ s32 func_83500200(s32 arg0, void *arg1) {
 }
 
 s32 process_geo_layout(s32, s32 *);
-extern void func_80041E2C();
+extern void PokeIcon_InitResourceArchives();
 extern u8 D_83503BEC;
 extern u8 D_83503C24;
 extern u8 D_83503F30;
@@ -79,7 +79,7 @@ void func_8350026C(void) {
     D_83503F6C = process_geo_layout(sp1C[0], &D_83503BEC);
     MainPool_FinalizeAllocation(sp1C[0]);
     ModelRenderer_InitDisplayRoots();
-    func_80041E2C();
+    PokeIcon_InitResourceArchives();
     func_87F02CB0((s32) &D_83503F30, 0x64);
     func_8003F018((s32) &D_83503F70);
 }

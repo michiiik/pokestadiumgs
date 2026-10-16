@@ -3,7 +3,7 @@
 
 #ifdef VERSION_US
 extern void* PokeIcon_AllocLoadContext(s32 arg0);
-extern void func_80041E2C(void);
+extern void PokeIcon_InitResourceArchives(void);
 extern u16* func_80042C68(void* arg0, s32 arg1, s32 arg2);
 extern u16* D_8F000924;
 extern s32 D_8F00092C;
@@ -13,7 +13,7 @@ void func_8F000020(s32 arg0) {
     void* var_v0;
 
     var_v0 = PokeIcon_AllocLoadContext(5);
-    func_80041E2C();
+    PokeIcon_InitResourceArchives();
     D_8F000924 = func_80042C68(var_v0, 128, 128);
     *D_8F000924 &= 0xFEFF;
     D_8F00092C = 0;

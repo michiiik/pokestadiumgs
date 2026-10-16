@@ -26,11 +26,11 @@ s32 func_82900BD0(s32 arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_80041E2C(void);
+extern void PokeIcon_InitResourceArchives(void);
 extern void func_8003F018(s32);
 extern s32 PokeIcon_AllocLoadContext(s32);
 void func_82900C04(s32 arg0) {
-    func_80041E2C();
+    PokeIcon_InitResourceArchives();
     func_8003F018((s32)((u8 *)(u32)arg0 + 4));
     *(s32 *)(u32)arg0 = PokeIcon_AllocLoadContext(5);
 }
