@@ -1,6 +1,9 @@
 #include "global.h"
 
 #ifdef VERSION_US
+extern void func_80021ED8(s32);
+extern u8 D_800D2B58;
+extern void func_800334C0(u8);
 /* Stadium 1 transfer helper: allocates a typed block from the supplied pool. */
 extern void *MainPool_AllocAligned(void *, size_t, s32);
 extern Vtx *func_800398F8();
@@ -764,19 +767,31 @@ void func_80026ED8(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002730C.s")
+typedef struct { u8 unknown00[6]; u16 mask; } AudioChannelMask;
+extern s32 func_8002738C(u8);
+u8 Audio_FindEnabledChannel(AudioChannelMask *state, u8 channel, u8 advance) {
+    if (advance) {
+        channel = func_8002738C(channel);
+    }
+    if (!((state->mask >> channel) & 1)) {
+        s32 next;
+        do {
+            next = func_8002738C(channel);
+            channel = next;
+        } while (!((state->mask >> next) & 1));
+    }
+    return channel;
+}
 #endif
 
 #ifdef VERSION_US
-s32 func_8002738C(s32 arg0) {
-    s32 *ptr = &arg0;
-    arg0 = *ptr & 0xFF;
-    if (arg0 < 0xF) {
-        arg0 = (arg0 + 1) & 0xFF;
+s32 func_8002738C(u8 channel) {
+    if (channel < 0xF) {
+        channel++;
     } else {
-        arg0 = 0;
+        channel = 0;
     }
-    return arg0;
+    return channel;
 }
 #endif
 
@@ -1023,7 +1038,17 @@ void func_80028300(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800284C0.s")
+extern u8 D_8009210C[];
+u8 Audio_LookupScaledRatio(u16 numerator, u16 denominator) {
+    s32 scaled = (numerator * 48) / denominator;
+    s32 index = 0;
+    for (; index < 6; index++) {
+        if (D_8009210C[index * 2] >= scaled) {
+            break;
+        }
+    }
+    return D_8009210C[index * 2 + 1];
+}
 #endif
 
 #ifdef VERSION_US
@@ -1805,7 +1830,11 @@ extern u8 D_800D2B41; void func_800331C8(void) { D_800D2B41 = 0; }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80033488.s")
+void GbAudio_UpdateChannelIfEnabled(u8 channel) {
+    if (!(D_800D2B58 & 0x80)) {
+        func_800334C0(channel);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -2652,7 +2681,14 @@ void Audio_ResetRequestId(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800355E4.s")
+s32 Audio_RequestIfChanged(s32 requestId) {
+    if (requestId != D_80094864) {
+        D_80094864 = requestId;
+        func_80021ED8(requestId);
+    }
+    return 0;
+}
+#pragma C_FUNCTION_PADDING(4)
 #endif
 
 #ifdef VERSION_US

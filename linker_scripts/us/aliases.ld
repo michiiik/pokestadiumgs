@@ -15,7 +15,7 @@ Jpeg_LastByteWasFF = D_800D1218 + 1;
 D_82E06138_view = D_82E06138;
 /* Original data name aliases the counter's C-owned data slot. */
 D_87F112A0 = fragments_64_fragment64_32F2C0;
-Audio_RequestEvent = func_800355E4;
+Audio_RequestEvent = Audio_RequestIfChanged;
 func_8005805C = GbSave_IdentifyFormat;
 func_8005A228 = GbTower_PollPortState;
 func_8005ADD8 = GbTower_StartPortSession;
@@ -275,3 +275,7 @@ func_80042484 = Model_FindLowestTextureAddress;
 func_800425C0 = PokeIcon_ApplyResourceLoadResult;
 func_800412B0 = Fragment_LoadResourceFromRomRange;
 func_80041780 = PokeIcon_LoadResourceList;
+func_800284C0 = Audio_LookupScaledRatio;
+func_80033488 = GbAudio_UpdateChannelIfEnabled;
+func_800355E4 = Audio_RequestIfChanged;
+func_8002730C = Audio_FindEnabledChannel;
