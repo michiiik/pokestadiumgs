@@ -287,3 +287,4 @@ func_800319D0 = GbAudio_QueueRegisterWrite;
 func_80033890 = GbAudio_UpdateNoiseRegisters;
 func_80034D00 = GbAudio_QueueChannelReset;
 func_80034ABC = GbAudio_StartSequence;
+func_80035068 = Audio_ReadRomBlocking;
