@@ -256,13 +256,82 @@ void func_8AF10540(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF10570.s")
+extern void func_8AC015B0(s16, s16, s32, s32, s16);
+extern u8 D_8AF26A58[];
+extern u8 D_8AF26B98[];
+extern u8 D_8AF30158[];
+extern s16 D_8AF26F1C;
+extern s16 D_8AF26F24;
+extern s16 D_8AF26F28;
+extern s16 D_8AF30FF8;
+extern s16 D_8AF30FFA;
+extern s16 D_8AF30FFC;
+extern s16 D_8AF30FFE;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF1060C.s")
+s32 func_8AF10570(s32 mode, void *record) {
+    s16 x;
+    s16 y;
+    void *preserved;
+    s16 values[2];
+
+    preserved = record;
+    switch (mode) {
+    case 0:
+        *(u16 *)((u8 *)preserved + 2) &= 0xFFFD;
+        break;
+    case 1:
+        func_800504BC(values);
+        x = *(s16 *)((u8 *)preserved + 8) + values[0];
+        y = *(s16 *)((u8 *)preserved + 0xA) + values[1];
+        func_8AC015B0(x, y, (s32)(D_8AF26A58), D_8AF26F1C, D_8AF30FF8);
+        break;
+    }
+    return 0;
+}
+
+s32 func_8AF1060C(s32 mode, void *record) {
+    s16 x;
+    s16 y;
+    void *preserved;
+    s16 values[2];
+
+    preserved = record;
+    switch (mode) {
+    case 0:
+        *(u16 *)((u8 *)preserved + 2) &= 0xFFFD;
+        break;
+    case 1:
+        func_800504BC(values);
+        x = *(s16 *)((u8 *)preserved + 8) + values[0];
+        y = *(s16 *)((u8 *)preserved + 0xA) + values[1];
+        func_8AC015B0(x, y, (s32)(D_8AF26B98), D_8AF26F24, D_8AF30FFC);
+        break;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF106A8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF10784.s")
+s32 func_8AF10784(s32 mode, void *record) {
+    s16 x;
+    s16 y;
+    void *preserved;
+    s16 values[2];
+
+    preserved = record;
+    switch (mode) {
+    case 0:
+        *(u16 *)((u8 *)preserved + 2) &= 0xFFFD;
+        break;
+    case 1:
+        func_800504BC(values);
+        x = *(s16 *)((u8 *)preserved + 8) + values[0];
+        y = *(s16 *)((u8 *)preserved + 0xA) + values[1];
+        func_8AC015B0(x, y, (s32)(D_8AF30158 + D_8AF30FFA * 0x1A0), D_8AF26F28, D_8AF30FFE);
+        break;
+    }
+    return 0;
+}
 
 extern void *D_8AF3011C;
 extern void *D_8AF30120;
@@ -326,7 +395,6 @@ void func_8AF10944(void) {
 }
 
 extern void _bzero(s32 *, s32);
-extern u8 D_8AF30158[];
 extern s16 D_8AF26EF8[][2];
 struct MenuRGBA {
     u8 r;
@@ -336,7 +404,6 @@ struct MenuRGBA {
 };
 extern struct MenuRGBA D_8AF26A50;
 extern struct MenuRGBA D_8AF26A54;
-extern s16 D_8AF30FF8;
 
 void func_8AF10AB8(void) {
     u8 *bank;
@@ -368,10 +435,6 @@ void func_8AF10AB8(void) {
     }
 }
 
-extern s16 D_8AF30FFA;
-extern s16 D_8AF30FFC;
-extern s16 D_8AF30FFE;
-
 void func_8AF10CD4(void) {
     D_8AF31000 = 0;
     D_8AF30FF8 = 0;
@@ -399,12 +462,8 @@ extern u8 D_8AF2FF40[];
 extern u8 D_8AF2FFB8[];
 extern u8 D_8AF30030[];
 extern u8 D_8AF300E8[];
-extern u8 D_8AF26A58[];
 extern u8 D_8AF26DD8[];
-extern u8 D_8AF26B98[];
-extern s16 D_8AF26F1C;
 extern s16 D_8AF26F20;
-extern s16 D_8AF26F24;
 extern void *D_8AF300A8;
 extern void *D_8AF300AC;
 extern void *D_8AF300B0;

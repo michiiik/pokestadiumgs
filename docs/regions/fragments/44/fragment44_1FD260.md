@@ -495,6 +495,61 @@ under 7.1. Stock 5.3 changes two of them and worsens both the callback and
 padding leaders; this does not justify changing this file's compiler.
 Leading-blank controls are stable. This is a bounded negative, not proof
 of an impossible source shape or a broken compiler.
+## 2026-10-16 — three position-drawing callbacks accepted
+
+Solo native macOS, no agents or containers. Three existing owners replace
+**125 original instruction words / 500 bytes**, each with frame `0x30`:
+`func_8AF10570` (156 bytes), `func_8AF1060C` (156 bytes), and
+`func_8AF10784` (188 bytes). The file advances from **28 C / 10 function ASM
+to 31 C / 7 function ASM**, out of 38 originals. All three are link-verified
+acceptances in batch `d758c5bf0be84a5ca463a6aa029e2577`, each labeled
+`f44-menu-callback-record-order:byte-False:first-False:case-False`.
+One combined byte-identical full-ROM gate accepts them together.
+
+### Actual storage/lifetime mechanism
+
+Keep two consumed signed-halfword coordinates, then the consumed local
+record pointer, then the real two-halfword position array. The local pointer
+is initialized from the callback's record argument and used for both the
+flag update and drawing-coordinate fields. This restores the position array
+at `sp+0x24` without changing the original parameter home or argument
+registers. No unused local, enlarged array, padding member or forced register.
+
+Earlier width and declaration-order families were tested separately. Their
+composition with two standalone word coordinates restores the array home,
+but incorrectly reallocates the draw arguments; the consumed record-pointer
+form with halfword coordinates closes both mechanisms. A calibrated native
+logging-only stock/off/on/twenty-blank experiment preserves the complete
+control and candidate objects, including symbols and relocation rows. Its
+UGEN callback is procedure 18, while the corresponding UOPT entry is 19;
+identify passes by source/function evidence, not a shared numeric procedure
+assumption. The observer and all scratch artifacts remain private.
+
+### Verification and remaining callback
+
+After declaration deduplication and formatting, fresh and twenty-leading-
+blank builds match the frozen accepted object's complete loadable sections,
+layout and every relocation row. All 38 original starts/sizes stay fixed;
+all 35 untouched raw instruction spans match the verified 28-C baseline.
+Strict canonical linking reproduces all 19,264 text bytes and 240 rodata
+bytes directly against the normal ELF and retail ROM. Forced native
+`gmake rom COMPARE=1` passes with MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`; host syntax passes with the same three
+pre-existing warnings; all 46 native tooling tests pass. Naming plan/apply
+finds no evidence-backed mapped names, so address names remain.
+
+`func_8AF106A8` remains **requeue**, not accepted. The same real record-pointer
+mechanism repairs its position home, but the best 216-byte body is four
+bytes short: the original taken branch normalizes Y from its live word
+while the other branch reloads its signed-halfword snapshot at `sp+0x28`.
+Eight distinct word/signed-snapshot carrier proposals do not close that
+branch-dependent lifetime and scheduling. Next test that actual lifetime
+with preserved load operand order, not artificial storage. Thirty-two mode
+guard/lifetime variants and thirty-two standalone wide-coordinate/order
+variants were also measured before the accepted record-pointer family;
+their negatives are scoped to those source families. Other larger drawing,
+section, padding and dispatcher requeues remain assembly.
+
 ## 2026-10-16 — six-entry menu renderer accepted
 
 Solo native macOS, no agents or containers. `func_8AF1043C` replaces
