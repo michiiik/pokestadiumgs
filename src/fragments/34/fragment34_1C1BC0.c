@@ -12,7 +12,7 @@
 
 extern s32 main_pool_get_available(void);
 extern s32 MainPool_AllocState(s32 arg0, s32 arg1);
-extern s32 func_80040E80(s32 arg0, void *arg1);
+extern s32 process_geo_layout(s32 arg0, void *arg1);
 extern void MainPool_FinalizeAllocation(s32 arg0);
 extern s32 func_80064C88(void);
 extern void func_88504828(void);
@@ -26,8 +26,8 @@ extern s8 D_88523009;
 void func_88504A54(void) {
     s32 state;
     state = MainPool_AllocState(main_pool_get_available(), 0);
-    D_88523000 = func_80040E80(state, &D_8850D25C);
-    D_88523004 = func_80040E80(state, &D_8850D228);
+    D_88523000 = process_geo_layout(state, &D_8850D25C);
+    D_88523004 = process_geo_layout(state, &D_8850D228);
     MainPool_FinalizeAllocation(state);
     *(s32 *)((u8 *)&D_885229A8 + 0) = 0;
     *(s16 *)((u8 *)&D_885229A8 + 4) = 0;

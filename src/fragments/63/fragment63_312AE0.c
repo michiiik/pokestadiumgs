@@ -251,7 +251,7 @@ extern u8 D_87E1EBA0;
 extern s32 main_pool_get_available(void);
 extern s32 MainPool_AllocState(s32, s32);
 extern void MainPool_FinalizeAllocation(s32);
-extern s32 func_80040E80(s32, s32 *);
+extern s32 process_geo_layout(s32, s32 *);
 extern s32 func_8004C990(s32, s32);
 extern s32 func_87F08DF8(void *, f32, f32, s32);
 extern void func_87F0252C(void *, void *, void *, s32);
@@ -260,7 +260,7 @@ void func_87E107B4(void *arg0) {
     s32 sp28;
 
     sp28 = MainPool_AllocState(main_pool_get_available(), 0);
-    *(s32 *)((u8 *)arg0 + 0x90c) = func_80040E80(sp28, &D_87E1AA4C);
+    *(s32 *)((u8 *)arg0 + 0x90c) = process_geo_layout(sp28, &D_87E1AA4C);
     MainPool_FinalizeAllocation(sp28);
     *(s32 *)((u8 *)arg0 + 0x910) = func_87F08DF8((void *)func_8004C990(0x170, 0), 0.0f, 25.0f, 0x0f000000);
     sp20 = (u8 *)arg0 + 0x2c8;
@@ -371,7 +371,7 @@ void func_87E11148(void *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_312AE0/func_87E11248.s")
 
-s32 func_80040E80(s32, s32 *);
+s32 process_geo_layout(s32, s32 *);
 extern u8 D_87E1AA80;
 extern u8 D_87E1EBA0;
 void func_87E113C8(void) {
@@ -381,7 +381,7 @@ void func_87E113C8(void) {
     GeoNode_CreateContainer(0, &D_87E1EBA0);
     temp_v0 = MainPool_AllocState(main_pool_get_available(), 0);
     sp1C = temp_v0;
-    (*(s32 *)((u8 *)(D_87E1EBB8) + (0x934))) = func_80040E80(temp_v0, &D_87E1AA80);
+    (*(s32 *)((u8 *)(D_87E1EBB8) + (0x934))) = process_geo_layout(temp_v0, &D_87E1AA80);
     MainPool_FinalizeAllocation(sp1C);
 }
 

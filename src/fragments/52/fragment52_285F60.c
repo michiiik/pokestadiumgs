@@ -46,7 +46,7 @@ extern Gfx* D_800D0510;
 extern s32 main_pool_get_available(void);
 extern void* MainPool_AllocState(s32, s32);
 extern void MainPool_FinalizeAllocation(void*);
-extern void* func_80040E80(void*, void*);
+extern void* process_geo_layout(void*, void*);
 extern void func_8004C8C0(s32);
 extern void* func_8004C990(s32, s32);
 extern void* func_8004CA60(void*);
@@ -57,7 +57,7 @@ extern void func_8003CD84(void);
 void func_86407AA0(void) {
     void* pool;
     pool = MainPool_AllocState(main_pool_get_available(), 0);
-    D_86416C00->graph = func_80040E80(pool, D_86409800);
+    D_86416C00->graph = process_geo_layout(pool, D_86409800);
     MainPool_FinalizeAllocation(pool);
     func_8004C8C0(0x157);
     func_8004C8C0(0x133);

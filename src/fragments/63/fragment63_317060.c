@@ -401,7 +401,7 @@ void func_87E15920(s32 arg0, s32 arg1) {
 }
 void func_87E15920_padding(void) {}
 
-s32 func_80040E80(s32, s32 *);
+s32 process_geo_layout(s32, s32 *);
 s32 func_8004C990(s32, s32);
 s32 func_87F08E3C(s32, s32);
 extern u8 D_87E1B310;
@@ -411,7 +411,7 @@ void func_87E15A08(void *arg0) {
 
     temp_v0 = MainPool_AllocState(main_pool_get_available(), 0);
     sp1C = temp_v0;
-    (*(s32 *)((u8 *)(arg0) + (0x104))) = func_80040E80(temp_v0, &D_87E1B310);
+    (*(s32 *)((u8 *)(arg0) + (0x104))) = process_geo_layout(temp_v0, &D_87E1B310);
     MainPool_FinalizeAllocation(sp1C);
     (*(s32 *)((u8 *)(arg0) + (0x108))) = func_87F08E3C(func_8004C990(0x1B2, 6), 0x0F000000);
 }
@@ -655,7 +655,7 @@ extern f32 D_87E1B960;
 extern u8 D_87E1EC70;
 extern void func_87F0C094(void *, f32, f32, f32, f32, s32, s32);
 extern void func_87F0252C(void *, void *, void *, s32);
-extern s32 func_80040E80(s32, s32 *);
+extern s32 process_geo_layout(s32, s32 *);
 extern s32 func_8004C990(s32, s32);
 extern void func_87E156A0(void *arg0);
 extern void func_87E15A08(void *arg0);
@@ -673,9 +673,9 @@ void func_87E179F4(u8 *arg0, s32 arg1) {
     func_8004C8C0(0x1B2);
     func_8004DDF4(0x98);
     pool = (void *)MainPool_AllocState(main_pool_get_available(), 0);
-    *(void **)(arg0 + 0xC) = (void *)func_80040E80(pool, &D_87E1B270);
+    *(void **)(arg0 + 0xC) = (void *)process_geo_layout(pool, &D_87E1B270);
     *(void **)(arg0 + 0x10) = (void *)WidgetTree_RunMessagePanelSilent(pool, 0x98);
-    *(void **)(arg0 + 0x14) = (void *)func_80040E80(pool, &D_87E1B2DC);
+    *(void **)(arg0 + 0x14) = (void *)process_geo_layout(pool, &D_87E1B2DC);
     MainPool_FinalizeAllocation(pool);
     *(void **)(arg0 + 0x18) = (void *)func_87F08E3C(func_8004C990(0x1B2, 6), 0x0F000000);
     func_80037E9C(0, &D_87E1EC70);

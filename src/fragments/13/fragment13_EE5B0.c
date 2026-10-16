@@ -31,7 +31,7 @@ void func_824006C8(s32 arg0, s32 arg1) {
 }
 
 extern s32 func_8005A134(s32);
-extern s32 func_80040E80(s32, void *);
+extern s32 process_geo_layout(s32, void *);
 extern void *func_81600E28(s32, s32, s32);
 extern s32 func_82400020(void *);
 extern void func_82400108(void *);
@@ -77,7 +77,7 @@ void func_82400704(s32 arg0) {
     D_82407560 = func_80071AA0(s0, 0);
     temp_v0 = MainPool_AllocState(main_pool_get_available(), 0);
     sp20 = temp_v0;
-    D_82409FBC = func_80040E80(sp20, &D_82407570);
+    D_82409FBC = process_geo_layout(sp20, &D_82407570);
     D_8240AA68 = func_81600E28(sp20, 0, 0x10);
     MainPool_FinalizeAllocation(sp20);
     ModelRenderer_InitDisplayRoots();
