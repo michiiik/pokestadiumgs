@@ -806,7 +806,118 @@ void func_8AF12E7C(void) {
     D_8AF26F30 = 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF12EB8.s")
+extern void func_8004C4B0(s32);
+extern s32 func_8AF12E30(s16);
+extern s32 func_8AC039A4(s32, void *);
+extern void func_8AC06400(void *, void *);
+extern void func_8AC0651C(void *, s16, s16, s16, s16);
+extern void func_8AC05ED4(s32, s32, s32);
+extern s16 D_8AF31198;
+extern s16 D_8AF31C40;
+extern void *D_8AF31184;
+extern void *D_8AF31194;
+extern void *D_8AF31D7C;
+extern u8 D_8AF31D80[];
+extern s16 D_8AF316A0;
+extern s16 D_8AF316A2;
+extern s32 D_8AF316A8;
+extern u8 D_8AF31088[];
+extern u8 D_8AF31100[];
+extern u8 D_8AF31028[];
+extern u8 D_8AF31058[];
+extern struct MenuScrollState D_8AF31DF8;
+
+void func_8AF12EB8(void) {
+    s32 page;
+    struct MenuGridEntry *entry;
+    s32 i;
+    void *node;
+    s32 first;
+    s32 second;
+    s32 third;
+    s32 fourth;
+    s32 fifth;
+    s32 sixth;
+    s16 visible_rows;
+
+    D_8AF31198 = 0;
+    func_8004C4B0(6);
+    func_8004C4B0(7);
+    func_8004C4B0(0x3B);
+    func_8AF00504(0x65);
+    page = func_8AF003A8(0x65);
+    func_8AC06E98((void *)page);
+    D_8AF316B0 = 0;
+    D_8AF31C40 = 0;
+    entry = D_8AF316C8;
+    for (i = 0; i != 250; i++, entry++) {
+        if (entry->kind <= 0) {
+            break;
+        }
+        D_8AF31C40++;
+        if (entry->kind == 0xFF) {
+            continue;
+        }
+        D_8AF316B0++;
+        if (func_8AF12E30(entry->kind)) {
+            entry->unknown = 1;
+        }
+        if (func_8AF129F8(entry->kind) >= 0) {
+            entry->blink = 1;
+        }
+    }
+    first = func_8AC06D8C(page, 0x65727331);
+    second = func_8AC06D8C(page, 0x65727332);
+    third = func_8AC06D8C(page, 0x65727333);
+    fourth = func_8AC06D8C(page, 0x65727334);
+    fifth = func_8AC06D8C(page, 0x65727335);
+    sixth = func_8AC06D8C(page, 0x65727336);
+    func_8004E308(first, (s32 *)func_8AC039A4, (s32 *)0xFFF1);
+    func_8004E308(second, (s32 *)func_8AC039A4, (s32 *)0xFFF1);
+    func_8004E308(third, (s32 *)func_8AC039A4, (s32 *)0xFFF1);
+    func_8004E308(fourth, (s32 *)func_8AC039A4, (s32 *)0xFFF1);
+    func_8004E308(fifth, (s32 *)func_8AC039A4, (s32 *)0xFFF1);
+    func_8004E308(sixth, (s32 *)func_8AC039A4, (s32 *)0xFFF1);
+    D_8AF31188 = (void *)func_8AC06D8C(page, 0x7469746C);
+    *(s16 *)((u8 *)D_8AF31188 + 0x30) = 0x3B;
+    *(s16 *)((u8 *)D_8AF31188 + 0x32) = 0x9F;
+    D_8AF3118C = (void *)func_8AC06D8C(page, 0x62756E32);
+    *(s16 *)((u8 *)D_8AF3118C + 0x30) = 0x3B;
+    *(s16 *)((u8 *)D_8AF3118C + 0x32) = 0xA8;
+    D_8AF31180 = (void *)func_8AC06D8C(page, 0x736C6966);
+    *(s16 *)((u8 *)D_8AF31180 + 0x30) = 0x3B;
+    *(s16 *)((u8 *)D_8AF31180 + 0x32) = 0xA2;
+    D_8AF31178 = (void *)func_8AC06D8C(page, 0x77617A61);
+    D_8AF3117C = (void *)func_8AC06D8C(page, 0x62756E5F);
+    D_8AF31190 = (void *)func_8AC06D8C(page, 0x6D61726B);
+    D_8AF31194 = (void *)func_8AC06D8C(page, 0x626F6F6B);
+    D_8AF31D7C = (void *)func_8AC06D8C(page, 0x6162746E);
+    func_8AC05E40(page, 0x6162746E, (s32)D_8AF31D80);
+    func_8AC06400(D_8AF31D80, D_8AF31D7C);
+    D_8AF31184 = (void *)func_8AC06D8C(page, 0x77615F31);
+    D_8AF316A0 = *(s16 *)((u8 *)D_8AF31184 + 8);
+    D_8AF316A2 = *(s16 *)((u8 *)D_8AF31184 + 0xA);
+    visible_rows = *(s16 *)((u8 *)D_8AF31184 + 0xE) / 20 - 1;
+    D_8AF316A8 = (s32)func_8004C874(0x3B, 0x3D);
+    D_8AF316AC = (s32)func_8004C874(0x3B, 0x46);
+    func_8AC05ED4(page, 0x79615F75, (s32)D_8AF31088);
+    func_8AC05ED4(page, 0x79615F73, (s32)D_8AF31100);
+    func_8AC02C80(page, 0x725F6C5F, 0x725F725F, D_8AF31028);
+    if (*(s16 *)&D_8AF31D42 >= 0) {
+        func_8AC02C80(page, 0x725F6C32, 0x725F7232, D_8AF31058);
+    } else {
+        node = (void *)func_8AC06D8C(page, 0x725F6C32);
+        *(u16 *)((u8 *)node + 2) &= ~1;
+        node = (void *)func_8AC06D8C(page, 0x725F7232);
+        *(u16 *)((u8 *)node + 2) &= ~1;
+    }
+    func_8AF12A4C(&D_8AF316C8[D_8AF316A4 + D_8AF316A6 * 4].kind);
+    func_8AC0651C(&D_8AF316B8, (D_8AF31C40 - 1) / 4, 20, visible_rows, 10);
+    if (D_8AF26F30 != 0) {
+        D_8AF316B8 = D_8AF31DF8;
+        D_8AF26F30 = 0;
+    }
+}
 
 extern void func_8AC0686C(void *, s16);
 extern s32 func_8AC0660C(s16);
@@ -814,14 +925,8 @@ extern s32 func_8AC06630(s16, void *);
 extern void func_8AC0619C(void *, u16);
 extern void func_8AC06220(void *, u16);
 extern void func_8AC063AC(void *, u16);
-extern s16 D_8AF31198;
-extern void *D_8AF31194;
 extern s16 D_8AF316BC;
 extern u8 D_8AF31E40;
-extern struct MenuScrollState D_8AF31DF8;
-extern u8 D_8AF31088[];
-extern u8 D_8AF31100[];
-extern u8 D_8AF31D80[];
 extern u16 D_8AF2BDC6;
 struct MenuInputState {
     u8 header[6];
