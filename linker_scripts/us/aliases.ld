@@ -234,3 +234,7 @@ func_800390D8 = GeoRender_CommitMatrix;
 func_80039158 = GeoRender_SetMatrix;
 func_80039204 = GeoRender_PushMultipliedMatrix;
 func_800392B8 = GeoRender_PushScaledMatrix;
+func_80025B54 = Audio_SetPreset;
+func_8002B490 = Audio_RequestSlot;
+func_8003B044 = Geo_NodeAmbientLight;
+func_8003D888 = GeoRender_SubmitMaterial;

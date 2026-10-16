@@ -92,6 +92,7 @@ void func_8002390C(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
+extern void func_8001874C(s32, s8);
 void func_80023954(void) {
     func_8001874C(0x06010005, 1);
 }
@@ -415,7 +416,66 @@ void func_80025ACC(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025B54.s")
+extern u8 D_80090BA4;
+void Audio_SetPreset(s32 preset) {
+    u32 bank;
+    s32 sound;
+    switch (preset) {
+    case 1:
+        D_80090BA4 = 1;
+        bank = 0;
+        sound = 1;
+        break;
+    case 2:
+        bank = 1;
+        sound = 2;
+        break;
+    case 3:
+        bank = 1;
+        sound = 3;
+        break;
+    case 4:
+        bank = 2;
+        sound = 4;
+        break;
+    case 5:
+        bank = 2;
+        sound = 5;
+        break;
+    case 6:
+        bank = 0;
+        sound = 6;
+        break;
+    case 7:
+        bank = 1;
+        sound = 7;
+        break;
+    case 8:
+        bank = 1;
+        sound = 8;
+        break;
+    case 9:
+        bank = 2;
+        sound = 9;
+        break;
+    case 10:
+        bank = 2;
+        sound = 10;
+        break;
+    case 11:
+        bank = 2;
+        sound = 11;
+        break;
+    case 12:
+        bank = 1;
+        sound = 12;
+        break;
+    default:
+        return;
+    }
+    func_8001874C(0x06030000 | ((u8)bank << 8), (s8)sound);
+}
+#pragma C_FUNCTION_PADDING(12)
 #endif
 
 #ifdef VERSION_US
@@ -945,7 +1005,8 @@ void Audio_RemoveRecentSoundAt(u16 arg0) {
 #ifdef VERSION_US
 extern void func_800314D4(s32);
 extern s32 func_80028ADC(void);
-void func_80028CA8(void) {
+/* Existing callers pass an ignored address; preserve the no-argument body. */
+void func_80028CA8() {
     s32 v0;
     s32 masked;
 
@@ -1152,7 +1213,38 @@ void func_8002B47C(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002B490.s")
+extern u8 D_80091AC8;
+extern u8 D_800D1B3B;
+extern u32 D_800D2640[];
+extern u8 D_800D269E[];
+extern u8 D_80091F00[];
+extern u8 D_80091EF8[];
+extern u8 D_80091EEC[];
+void Audio_RequestSlot(u8 slot) {
+    if (D_80091AC8 != 0) {
+        if (D_800D1B3B == 0)
+        {
+            func_800314D4(0x2028);
+        }
+        if (D_800D2640[slot] < 2U) {
+            D_800D269E[slot] = 1;
+        }
+    } else {
+        if (D_800D2640[slot] < 2U) {
+            if (*(D_800D269E + slot) != 0) {
+                if (D_800D1B3B == 0) {
+                    func_80028CA8(D_80091F00);
+                }
+            } else if (D_800D1B3B == 0) {
+                func_80028CA8(D_80091EF8);
+            }
+            *(D_800D269E + slot) = 1;
+        } else if (D_800D1B3B == 0) {
+            func_80028CA8(D_80091EEC);
+        }
+    }
+    D_80091AC8 = 1;
+}
 #endif
 
 #ifdef VERSION_US
@@ -4865,7 +4957,47 @@ void func_8003B03C(s32 arg0) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003B044.s")
+extern Gfx *D_800D0510;
+typedef struct {
+    u8 pad[0x1A];
+    u16 unk_1A;
+    s8 lightCount;
+    s8 unknown1D;
+    s8 activeLights;
+    s8 extraGeometryMode;
+    u32 unknown20;
+    Lights7 *lights;
+} ModelFrame;
+extern ModelFrame *D_80094910;
+typedef struct {
+    S1_GraphNode node;
+    S1_Color_RGBA8_u32 color;
+} SceneAmbientLightNode;
+void Geo_NodeAmbientLight(void *root) {
+    SceneAmbientLightNode *node = root;
+    s32 i;
+    Lights7 *lights;
+    lights = D_80094910->lights;
+    if (node->color.r == 0xFF && node->color.g == 0xFF && node->color.b == 0xFF) {
+        lights->a.l.colc[0] = lights->a.l.col[0];
+        lights->a.l.colc[1] = lights->a.l.col[1];
+        lights->a.l.colc[2] = lights->a.l.col[2];
+    } else {
+        lights->a.l.colc[0] = lights->a.l.col[0] = node->color.r;
+        lights->a.l.colc[1] = lights->a.l.col[1] = node->color.g;
+        lights->a.l.colc[2] = lights->a.l.col[2] = node->color.b;
+    }
+    D_80094910->activeLights = D_80094910->lightCount;
+    gSPSetGeometryMode(D_800D0510++, G_LIGHTING);
+    if (D_80094910->extraGeometryMode > 0) {
+        gSPSetGeometryMode(D_800D0510++, 0x00400000);
+    }
+    gMoveWd(D_800D0510++, G_MW_NUMLIGHT, 0, D_80094910->lightCount * 0x18);
+    for (i = 0; i < D_80094910->lightCount; i++) {
+        gSPLight(D_800D0510++, &D_80094910->lights->l[i], i + 1);
+    }
+    gSPLight(D_800D0510++, D_80094910->lights, i + 1);
+}
 #endif
 
 #ifdef VERSION_US
@@ -4940,12 +5072,12 @@ void func_8003B690(s32 arg0) {
 
 #ifdef VERSION_US
 extern s32 D_80124D68[];
-extern void func_8003D888(s32, s32);
+extern void GeoRender_SubmitMaterial(s16, Mtx *);
 extern void func_8003DA20(s32, s32);
 extern void Geo_ProcessNodeChildren(void *);
 void func_8003BC48(void *arg0) {
     if (*(s32 *)((u8 *)arg0 + 0x18) != 0) {
-        func_8003D888(*((u8 *)arg0 + 3), D_80124D68[*(s16 *)((u8 *)arg0 + 0x1C)]);
+        GeoRender_SubmitMaterial(*((u8 *)arg0 + 3), D_80124D68[*(s16 *)((u8 *)arg0 + 0x1C)]);
         func_8003DA20(*(s32 *)((u8 *)arg0 + 0x18), (*((u8 *)arg0 + 2) & 4) != 0);
     }
     Geo_ProcessNodeChildren(arg0);
@@ -4958,12 +5090,12 @@ void func_8003BC48(void *arg0) {
 
 #ifdef VERSION_US
 extern void GeoRender_PushMultipliedMatrix(S1_MtxF *, Mtx *);
-extern void func_8003D888(s32, s32);
+extern void GeoRender_SubmitMaterial(s16, Mtx *);
 extern void func_8003DA20(s32, s32);
 extern s32 D_80126008;
 extern void Geo_ProcessNodeChildren(void *);
 extern u8 D_80124F68;
-void func_8003BEF0(void *arg0) { s32 *counter = &D_80126008; GeoRender_PushMultipliedMatrix((u8 *)arg0 + 0x1C, 0); if (*(s32 *)((u8 *)arg0 + 0x18) != 0 || *(s32 *)((u8 *)arg0 + 0x10) != 0) { func_8003D888(*((u8 *)arg0 + 3), ((s32 *)&D_80124F68)[*(s32 *)((u8 *)&D_80124F68 + 0x10A0) + 0x400]); if (*(void **)((u8 *)arg0 + 0x10) != 0) ((void (*)(s32, void *))(*(void **)((u8 *)arg0 + 0x10)))(5, arg0); func_8003DA20(*(s32 *)((u8 *)arg0 + 0x18), (*((u8 *)arg0 + 2) & 4) != 0); } Geo_ProcessNodeChildren(arg0); *counter = *counter - 1; }
+void func_8003BEF0(void *arg0) { s32 *counter = &D_80126008; GeoRender_PushMultipliedMatrix((u8 *)arg0 + 0x1C, 0); if (*(s32 *)((u8 *)arg0 + 0x18) != 0 || *(s32 *)((u8 *)arg0 + 0x10) != 0) { GeoRender_SubmitMaterial(*((u8 *)arg0 + 3), ((s32 *)&D_80124F68)[*(s32 *)((u8 *)&D_80124F68 + 0x10A0) + 0x400]); if (*(void **)((u8 *)arg0 + 0x10) != 0) ((void (*)(s32, void *))(*(void **)((u8 *)arg0 + 0x10)))(5, arg0); func_8003DA20(*(s32 *)((u8 *)arg0 + 0x18), (*((u8 *)arg0 + 2) & 4) != 0); } Geo_ProcessNodeChildren(arg0); *counter = *counter - 1; }
 #endif
 
 #ifdef VERSION_US
@@ -4978,7 +5110,7 @@ void func_8003BF9C(void *arg0) {
     (*(s32 *)((u8 *)&D_80124F68 + 0x10A0))++;
     GeoRender_SetMatrix(&sp30, 0);
     if (*(s32 *)((u8 *)arg0 + 0x18) != 0 || *(s32 *)((u8 *)arg0 + 0x10) != 0) {
-        func_8003D888(*((u8 *)arg0 + 3), ((s32 *)&D_80124F68)[*(s32 *)((u8 *)&D_80124F68 + 0x10A0) + 0x400]);
+        GeoRender_SubmitMaterial(*((u8 *)arg0 + 3), ((s32 *)&D_80124F68)[*(s32 *)((u8 *)&D_80124F68 + 0x10A0) + 0x400]);
         if (*(void **)((u8 *)arg0 + 0x10) != 0) ((void (*)(s32, void *))(*(void **)((u8 *)arg0 + 0x10)))(5, arg0);
         func_8003DA20(*(s32 *)((u8 *)arg0 + 0x18), (*((u8 *)arg0 + 2) & 4) != 0);
     }
@@ -4994,7 +5126,7 @@ void Geo_NodeDisplayList(void *arg0) {
     void *root = arg0;
     s32 callback;
     if (*(s32 *)((u8 *)root + 0x18) != 0 || *(s32 *)((u8 *)root + 0x10) != 0) {
-        func_8003D888(*(u8 *)((u8 *)root + 3), ((s32 *)((u8 *)&D_80124F68 + 0x1000))[*(s32 *)((u8 *)&D_80124F68 + 0x10A0)]);
+        GeoRender_SubmitMaterial(*(u8 *)((u8 *)root + 3), ((s32 *)((u8 *)&D_80124F68 + 0x1000))[*(s32 *)((u8 *)&D_80124F68 + 0x10A0)]);
         callback = *(s32 *)((u8 *)root + 0x10);
         if (callback != 0) ((void (*)(s32, void *))callback)(5, root);
         func_8003DA20(*(s32 *)((u8 *)root + 0x18), (*(u8 *)((u8 *)root + 2) & 4) != 0);
@@ -5109,7 +5241,6 @@ void GeoRender_AdvanceFrameCounter(void) { D_80094904++; }
 #endif
 
 #ifdef VERSION_US
-typedef struct { char pad[0x1A]; u16 unk_1A; } ModelFrame;
 extern ModelFrame *D_80094910; extern u16 D_80094904;
 s32 GeoRender_IsModelFrameCurrent(void) { s32 var_v1 = 1; if (D_80094910 != NULL) { var_v1 = D_80094910->unk_1A == D_80094904; } return var_v1; }
 #endif
@@ -5314,13 +5445,13 @@ void GeoRender_EnableTextureGeneration(SceneMaterialParameters *node) {
 #endif
 
 #ifdef VERSION_US
-extern u8 D_801261B0[];
+extern SceneMaterialParameters D_801261B0;
 void func_8003D7B8(s16 arg0) {
     if (((arg0 > 0) && (arg0 < 4)) || (arg0 == 0x84) || (arg0 == 7)) {
-        D_801261B0[3] = D_801261B0[2];
+        D_801261B0.textureVariant = D_801261B0.unknown02;
         return;
     }
-    D_801261B0[3] = 0;
+    D_801261B0.textureVariant = 0;
 }
 #endif
 
@@ -5342,7 +5473,47 @@ s16 func_8003D808(s16 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003D888.s")
+extern s32 D_800949A0;
+extern s32 D_801261A4;
+extern void func_8003D70C(s16);
+extern void func_8003CFB8(SceneMaterialParameters *);
+extern void func_8003D270(SceneMaterialParameters *);
+extern void func_8003CD84(void);
+void GeoRender_SubmitMaterial(s16 format, Mtx *matrix) {
+    if (D_800949A0 != 0 && !(D_801261A4 & 2) && D_801261B0.level > 0) {
+        func_8003D7B8(format);
+        func_8003D70C(func_8003D808(format));
+        D_801261A8 = 0;
+        if (((SceneMaterialState *)D_801263A8)->unknown00 == 0) {
+            func_8003CC14();
+            func_8003CD84();
+            ((SceneMaterialState *)D_801263A8)->unknown00 = 1;
+        }
+        if (D_801261B0.fogColor.rgba & 0xFF) {
+            func_8003CFB8((&D_801261B0));
+        } else {
+            GeoRender_RestoreRenderMode((s32)(&D_801261B0));
+        }
+        if (D_801261B0.textureVariant != 0) {
+            GeoRender_EnableTextureGeneration((&D_801261B0));
+        } else {
+            if (((SceneMaterialState *)D_801263A8)->unknown27 == 1) {
+                func_8003CD84();
+            }
+            if (func_8003CD58(D_801261B0.mode)) {
+                func_8003D1F8((s32)(&D_801261B0));
+            } else {
+                func_8003D270((&D_801261B0));
+            }
+            GeoRender_SetPrimitiveColor((ScenePrimitiveColor *)(&D_801261B0));
+            func_8003D188((u8 *)(&D_801261B0));
+        }
+        if (matrix != ((SceneMaterialState *)D_801263A8)->unknown0C) {
+            ((SceneMaterialState *)D_801263A8)->unknown0C = matrix;
+            gSPMatrix(D_800D0510++, (u32)matrix & 0x1FFFFFFF, G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -5374,9 +5545,9 @@ void func_8003DA20(s32 arg0, s32 arg1) {
 void GeoRender_SetMaterialParams(s32 arg0, s32 arg1, s32 arg2) {
     s32 *p0 = &arg0;
     s32 *p1 = &arg1;
-    *(s32 *)(D_801261B0 + 8) = *p0;
-    D_801261B0[1] = (u8)*p1;
-    D_801261B0[2] = (u8)arg2;
+    D_801261B0.fogColor.rgba = *p0;
+    D_801261B0.level = (u8)*p1;
+    D_801261B0.unknown02 = (u8)arg2;
 }
 #endif
 
@@ -5386,11 +5557,11 @@ typedef union CandidateColor {
     u32 rgba;
 } CandidateColor;
 void GeoRender_SetMaterialTexture(s32 arg0, CandidateColor arg1, void *arg2, void *arg3, s32 arg4) {
-    D_801261B0[0] = arg0;
-    *(s32 *)(D_801261B0 + 4) = arg1.rgba;
-    *(void **)(D_801261B0 + 0xC) = arg2;
-    *(void **)(D_801261B0 + 0x10) = arg3;
-    *(s32 *)(D_801261B0 + 0x14) = arg4;
+    D_801261B0.mode = arg0;
+    D_801261B0.primitiveColor.rgba = arg1.rgba;
+    D_801261B0.texture = arg2;
+    D_801261B0.material = arg3;
+    D_801261B0.displayList = arg4;
 }
 #endif
 
