@@ -2660,7 +2660,30 @@ void func_80035020(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035068.s")
+extern OSMesgQueue D_800D2D60;
+extern OSPiHandle *D_800D2D78;
+void Audio_ReadRomBlocking(u32 rom, u8 *destination, u32 remaining) {
+    OSIoMesg message;
+    u32 currentRom = rom;
+    u8 *currentDestination = destination;
+    u32 chunk;
+    while (remaining != 0) {
+        if (remaining > 0x4000) chunk = 0x4000;
+        else chunk = remaining;
+        message.hdr.pri = OS_MESG_PRI_NORMAL;
+        message.hdr.retQueue = &D_800D2D60;
+        message.dramAddr = currentDestination;
+        message.devAddr = currentRom;
+        message.size = chunk;
+        osInvalDCache(currentDestination, chunk);
+        osEPiStartDma(D_800D2D78, &message, OS_READ);
+        osRecvMesg(&D_800D2D60, NULL, OS_MESG_BLOCK);
+        remaining -= chunk;
+        currentRom += chunk;
+        currentDestination += chunk;
+    }
+}
+#pragma C_FUNCTION_PADDING(4)
 #endif
 
 #ifdef VERSION_US
