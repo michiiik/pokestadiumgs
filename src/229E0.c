@@ -731,7 +731,20 @@ void func_80026938(u16 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80026BB4.s")
+extern u16 D_800D19A0[];
+extern char D_800A39A0[];
+extern char D_800A39A4[];
+extern f32 func_80026990(u8);
+void Audio_DebugSampleHistogram(u8 mode) {
+    s32 i;
+    for (i = 0; i < 100; i++) D_800D19A0[i] = 0;
+    for (i = 0; i < 1000; i++) {
+        osSyncPrintf(D_800A39A0, (f64)func_80026990(mode));
+    }
+    for (i = 0; i < 100; i++) {
+        osSyncPrintf(D_800A39A4, i, D_800D19A0[i]);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -2186,7 +2199,30 @@ void func_800340C8(u8 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80034118.s")
+extern u8 func_800347E8(u8);
+extern u8 D_800D2B78;
+void GbAudio_ReadPackedChannelParameters(u8 channel, u8 high) {
+    u8 value;
+    (&D_800D2B78 + channel * 0x3C)[4] |= 1;
+    (&D_800D2B78 + channel * 0x3C)[5] &= ~1;
+    value = func_800347E8(channel);
+    (&D_800D2B78 + channel * 0x3C)[0x27] = value;
+    (&D_800D2B78 + channel * 0x3C)[0x26] = value;
+    value = func_800347E8(channel);
+    high = (u8)((value & 0xF0U) >> 4);
+    value &= 0xF;
+    {
+        u8 shifted = (u32)high >> 1;
+        u8 wrapped = high & 1;
+        wrapped <<= 4;
+        (&D_800D2B78 + channel * 0x3C)[0x28] = shifted | wrapped;
+    }
+    {
+        u8 repeated;
+        repeated = value << 4;
+        (&D_800D2B78 + channel * 0x3C)[0x29] = value | repeated;
+    }
+}
 #endif
 
 #ifdef VERSION_US
