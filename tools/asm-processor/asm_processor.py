@@ -940,6 +940,24 @@ def parse_source(f, opts, out_dependencies, print_source=None):
 
     global_asm = None
     asm_functions = []
+    late_rodata_alignments = {}
+    used_late_rodata_alignments = set()
+
+    def finish_asm(block):
+        for name in block.text_glabels:
+            if name not in late_rodata_alignments:
+                continue
+            if name in used_late_rodata_alignments:
+                raise Failure("late_rodata_alignment owner appears more than once: " + name)
+            alignment = late_rodata_alignments[name]
+            if not block.fn_section_sizes['.late_rodata']:
+                raise Failure("late_rodata_alignment owner has no .late_rodata: " + name)
+            if block.late_rodata_alignment not in (0, alignment):
+                raise Failure("late_rodata_alignment conflicts with assembly metadata: " + name)
+            block.late_rodata_alignment = alignment
+            used_late_rodata_alignments.add(name)
+        return block.finish(state)
+
     output_lines = [
         '#line 1 "' + f.name + '"'
     ]
@@ -958,7 +976,7 @@ def parse_source(f, opts, out_dependencies, print_source=None):
 
         if global_asm is not None:
             if line.startswith(')'):
-                src, fn = global_asm.finish(state)
+                src, fn = finish_asm(global_asm)
                 for i, line2 in enumerate(src):
                     output_lines[start_index + i] = line2
                 asm_functions.append(fn)
@@ -968,6 +986,14 @@ def parse_source(f, opts, out_dependencies, print_source=None):
         elif line in ("GLOBAL_ASM(", "#pragma GLOBAL_ASM("):
             global_asm = GlobalAsmBlock("GLOBAL_ASM block at line " + str(line_no))
             start_index = len(output_lines)
+        elif line.startswith('#pragma asmproc late_rodata_alignment'):
+            match = re.fullmatch(r'#pragma asmproc late_rodata_alignment\("([A-Za-z_]\w*)",\s*(4|8)\)', line)
+            if match is None:
+                raise Failure('expected #pragma asmproc late_rodata_alignment("owner", 4|8): ' + raw_line)
+            name, alignment = match.groups()
+            if name in late_rodata_alignments:
+                raise Failure("duplicate late_rodata_alignment annotation: " + name)
+            late_rodata_alignments[name] = int(alignment)
         elif line.startswith('#pragma C_FUNCTION_PADDING(') and line.endswith(')'):
             # CFE does not emit the alignment nops that are present at the
             # end of some original assembly owners.  Keep those bytes as a
@@ -1026,7 +1052,7 @@ def parse_source(f, opts, out_dependencies, print_source=None):
             with f:
                 for line2 in f:
                     ext_global_asm.process_line(line2.rstrip(), output_enc)
-            src, fn = ext_global_asm.finish(state)
+            src, fn = finish_asm(ext_global_asm)
             output_lines[-1] = ''.join(src)
             asm_functions.append(fn)
             out_dependencies.append(fname)
@@ -1061,6 +1087,10 @@ def parse_source(f, opts, out_dependencies, print_source=None):
                 if is_cutscene_data:
                     raw_line = re.sub(float_regexpr, repl_float_hex, raw_line)
             output_lines[-1] = raw_line
+
+    unused_alignments = set(late_rodata_alignments) - used_late_rodata_alignments
+    if unused_alignments:
+        raise Failure("late_rodata_alignment requires a following assembly owner: " + ', '.join(sorted(unused_alignments)))
 
     if print_source:
         if isinstance(print_source, StringIO):

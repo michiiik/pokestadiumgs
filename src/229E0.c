@@ -697,6 +697,7 @@ extern u8 GbAudio_GetActiveChannelMask(void); void func_80026098(void) { GbAudio
 #endif
 
 #ifdef VERSION_US
+#pragma asmproc late_rodata_alignment("func_800260C0", 8)
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800260C0.s")
 #endif
 

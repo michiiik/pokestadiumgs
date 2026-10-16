@@ -353,7 +353,7 @@
                                 # jtbl_800A374C + jtbl_800A376C. Combined into one subsegment
                                 # (not split) because ld can only consume an object's .rodata
                                 # section once.
-    - [0xA43A0, rodata]
+    - [0xA4590, rodata] # Include six tables from the next four audio owners.
     - [0xA4EC0, .rodata, 43700] # jtbl_800A42C0
     - [0xA4EE0, .rodata, 47580] # jtbl_800A43C0 (+2 more)
     - [0xA5120, rodata]
