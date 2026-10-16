@@ -641,7 +641,24 @@ s32 Audio_RenderNextBuffer(s32 arg0, s32 samples, s32 initialize, s32 arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80025F84.s")
+extern void func_80034DD0(void);
+void Audio_InitializeBufferMemory(void *buffer) {
+    u32 aligned = ((u32)buffer + 0xF) & ~0xF;
+    u32 mask;
+    D_800D198C = (void *)aligned;
+    D_800D1990[0] = (s16 *)((u8 *)D_800D198C + 0x2380);
+    D_800D1990[1] = (s16 *)((u8 *)D_800D1990[0] + 0x2000);
+    D_800D1990[2] = (s16 *)((u8 *)D_800D1990[1] + 0x2000);
+    func_80031A6C(32000, D_800D198C);
+    func_80018728(0x82030300, 0);
+    func_800187AC();
+    func_80025E7C();
+    func_8001874C(0x06030000, 0);
+    func_80034DD0();
+    mask = osSetIntMask(1);
+    D_80090B8C = 1;
+    osSetIntMask(mask);
+}
 #endif
 
 #ifdef VERSION_US
