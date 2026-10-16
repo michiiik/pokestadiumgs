@@ -573,7 +573,7 @@ SECTIONS
         build/src/226C0.o(.rodata);
         build/asm/us/data/A3260.rodata.o(.rodata);
         build/src/229E0.o(.rodata);
-        build/asm/us/data/A43A0.rodata.o(.rodata);
+        build/asm/us/data/A4590.rodata.o(.rodata);
         build/src/43700.o(.rodata);
         build/src/44300.o(.rodata);
         build/src/44E70.o(.rodata);
