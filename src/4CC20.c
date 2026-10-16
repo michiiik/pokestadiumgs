@@ -909,7 +909,7 @@ void *func_8004DFEC(s32 arg0, s32 arg1, Func8004DFECArg arg2) {
 }
 
 extern u8* process_geo_layout(s32, void*);
-extern void func_80040F60(u8*, Func8004DFECArg);
+extern void Model_AdjustTextureColors(u8*, Func8004DFECArg);
 void* func_8004E018(s32 pool, s32 id, s32 index, Func8004DFECArg tint) {
     s32 entry;
     u8* result = NULL;
@@ -925,7 +925,7 @@ void* func_8004E018(s32 pool, s32 id, s32 index, Func8004DFECArg tint) {
             descriptor = ((HandlerResult_DE84D* (*)(s32,s32))(u32)callback)(0, 0);
             *(s32*)(result + 0x2C) = callback;
             if (tint.value != NULL) {
-                func_80040F60(result, tint);
+                Model_AdjustTextureColors(result, tint);
             }
             if (index < ((u8*)descriptor)[3]) {
                 descriptor->table[index] = (s32)result;
