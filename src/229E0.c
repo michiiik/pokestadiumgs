@@ -3531,12 +3531,109 @@ void MtxF_SetTranslation(f32 *dest, f32 *source) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035D14.s")
+typedef struct S1_Vec3s S1_Vec3s;
+struct S1_Vec3s {
+    /* 0x0 */ s16 x;
+    /* 0x2 */ s16 y;
+    /* 0x4 */ s16 z;
+};
+typedef float S1_MtxF_t[4][4];
+typedef union {
+    S1_MtxF_t mf;
+    struct {
+        float xx, yx, zx, wx,
+              xy, yy, zy, wy,
+              xz, yz, zz, wz,
+              xw, yw, zw, ww;
+    };
+} S1_MtxF;
+typedef struct S1_Vec3f S1_Vec3f;
+struct S1_Vec3f {
+    /* 0x0 */ f32 x;
+    /* 0x4 */ f32 y;
+    /* 0x8 */ f32 z;
+};
 #endif
 
 #ifdef VERSION_US
 extern f32 D_80087E50[];
 extern f32 D_80088E50[0x1000];
+void MtxF_SetLookAt(S1_MtxF *matrix, S1_Vec3f *from, S1_Vec3f *to, s16 view_angle) {
+    f32 inverse_length;
+    f32 dx;
+    f32 dz;
+    f32 x_col_y;
+    f32 y_col_y;
+    f32 z_col_y;
+    f32 x_col_z;
+    f32 y_col_z;
+    f32 z_col_z;
+    f32 x_col_x;
+    f32 y_col_x;
+    f32 z_col_x;
+
+    dx = to->x - from->x;
+    dz = to->z - from->z;
+
+    inverse_length = -1.0 / sqrtf(dx * dx + dz * dz);
+    dx *= inverse_length;
+    dz *= inverse_length;
+
+    y_col_y = D_80088E50[(u16)(view_angle) >> 4];
+    x_col_y = D_80087E50[(u16)(view_angle) >> 4] * dz;
+    z_col_y = -D_80087E50[(u16)(view_angle) >> 4] * dx;
+
+    x_col_z = to->x - from->x;
+    y_col_z = to->y - from->y;
+    z_col_z = to->z - from->z;
+
+    inverse_length = -1.0 / sqrtf(x_col_z * x_col_z + y_col_z * y_col_z + z_col_z * z_col_z);
+    x_col_z *= inverse_length;
+    y_col_z *= inverse_length;
+    z_col_z *= inverse_length;
+
+    x_col_x = y_col_y * z_col_z - z_col_y * y_col_z;
+    y_col_x = z_col_y * x_col_z - x_col_y * z_col_z;
+    z_col_x = x_col_y * y_col_z - y_col_y * x_col_z;
+
+    inverse_length = 1.0 / sqrtf(x_col_x * x_col_x + y_col_x * y_col_x + z_col_x * z_col_x);
+
+    x_col_x *= inverse_length;
+    y_col_x *= inverse_length;
+    z_col_x *= inverse_length;
+
+    x_col_y = y_col_z * z_col_x - z_col_z * y_col_x;
+    y_col_y = z_col_z * x_col_x - x_col_z * z_col_x;
+    z_col_y = x_col_z * y_col_x - y_col_z * x_col_x;
+
+    inverse_length = 1.0 / sqrtf(x_col_y * x_col_y + y_col_y * y_col_y + z_col_y * z_col_y);
+    x_col_y *= inverse_length;
+    y_col_y *= inverse_length;
+    z_col_y *= inverse_length;
+
+    matrix->mf[0][0] = x_col_x;
+    matrix->mf[1][0] = y_col_x;
+    matrix->mf[2][0] = z_col_x;
+    matrix->mf[3][0] = -(from->x * x_col_x + from->y * y_col_x + from->z * z_col_x);
+
+    matrix->mf[0][1] = x_col_y;
+    matrix->mf[1][1] = y_col_y;
+    matrix->mf[2][1] = z_col_y;
+    matrix->mf[3][1] = -(from->x * x_col_y + from->y * y_col_y + from->z * z_col_y);
+
+    matrix->mf[0][2] = x_col_z;
+    matrix->mf[1][2] = y_col_z;
+    matrix->mf[2][2] = z_col_z;
+    matrix->mf[3][2] = -(from->x * x_col_z + from->y * y_col_z + from->z * z_col_z);
+
+    matrix->mf[0][3] = 0.0f;
+    matrix->mf[1][3] = 0.0f;
+    matrix->mf[2][3] = 0.0f;
+    matrix->mf[3][3] = 1.0f;
+}
+#endif
+
+#ifdef VERSION_US
 void MtxF_SetRotationTranslation(f32 matrix[4][4], Vec3s35AA0 *position, Vec3s35AA0 *rotation) {
     f32 sin_x;
     f32 cos_x;
@@ -3657,11 +3754,83 @@ void MtxF_SetRotationAndTransformTranslation(f32 matrix[4][4], Vec3f35784 *posit
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80036430.s")
+void MtxF_SetRotationScaleTranslation(S1_MtxF *matrix, S1_Vec3f *position, S1_Vec3s *rotation, S1_Vec3f *scale) {
+    f32 sin_x;
+    f32 cos_x;
+    f32 sin_y;
+    f32 cos_y;
+    f32 sin_z;
+    f32 cos_z;
+
+    sin_x = D_80087E50[(u16)(rotation->x) >> 4];
+    cos_x = D_80088E50[(u16)(rotation->x) >> 4];
+
+    sin_y = D_80087E50[(u16)(rotation->y) >> 4];
+    cos_y = D_80088E50[(u16)(rotation->y) >> 4];
+
+    sin_z = D_80087E50[(u16)(rotation->z) >> 4];
+    cos_z = D_80088E50[(u16)(rotation->z) >> 4];
+
+    matrix->mf[0][0] = (cos_y * cos_z) * scale->x;
+    matrix->mf[0][1] = (cos_y * sin_z) * scale->x;
+    matrix->mf[0][2] = (-sin_y) * scale->x;
+    matrix->mf[0][3] = 0.0f;
+
+    matrix->mf[1][0] = (sin_x * sin_y * cos_z - cos_x * sin_z) * scale->y;
+    matrix->mf[1][1] = (sin_x * sin_y * sin_z + cos_x * cos_z) * scale->y;
+    matrix->mf[1][2] = (sin_x * cos_y) * scale->y;
+    matrix->mf[1][3] = 0.0f;
+
+    matrix->mf[2][0] = (cos_x * sin_y * cos_z + sin_x * sin_z) * scale->z;
+    matrix->mf[2][1] = (cos_x * sin_y * sin_z - sin_x * cos_z) * scale->z;
+    matrix->mf[2][2] = (cos_x * cos_y) * scale->z;
+    matrix->mf[2][3] = 0.0f;
+
+    matrix->mf[3][0] = position->x;
+    matrix->mf[3][1] = position->y;
+    matrix->mf[3][2] = position->z;
+    matrix->mf[3][3] = 1.0f;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800365B8.s")
+void MtxF_SetRotationAndScaledTranslation(S1_MtxF *matrix, S1_Vec3f *position, S1_Vec3s *rotation, S1_Vec3f *scale) {
+    f32 sin_x;
+    f32 cos_x;
+    f32 sin_y;
+    f32 cos_y;
+    f32 sin_z;
+    f32 cos_z;
+
+    sin_x = D_80087E50[(u16)(rotation->x) >> 4];
+    cos_x = D_80088E50[(u16)(rotation->x) >> 4];
+
+    sin_y = D_80087E50[(u16)(rotation->y) >> 4];
+    cos_y = D_80088E50[(u16)(rotation->y) >> 4];
+
+    sin_z = D_80087E50[(u16)(rotation->z) >> 4];
+    cos_z = D_80088E50[(u16)(rotation->z) >> 4];
+
+    matrix->mf[0][0] = cos_y * cos_z;
+    matrix->mf[0][1] = cos_y * sin_z;
+    matrix->mf[0][2] = -sin_y;
+    matrix->mf[0][3] = 0.0f;
+
+    matrix->mf[1][0] = sin_x * sin_y * cos_z - cos_x * sin_z;
+    matrix->mf[1][1] = sin_x * sin_y * sin_z + cos_x * cos_z;
+    matrix->mf[1][2] = sin_x * cos_y;
+    matrix->mf[1][3] = 0.0f;
+
+    matrix->mf[2][0] = cos_x * sin_y * cos_z + sin_x * sin_z;
+    matrix->mf[2][1] = cos_x * sin_y * sin_z - sin_x * cos_z;
+    matrix->mf[2][2] = cos_x * cos_y;
+    matrix->mf[2][3] = 0.0f;
+
+    matrix->mf[3][0] = position->x * scale->x;
+    matrix->mf[3][1] = position->y * scale->y;
+    matrix->mf[3][2] = position->z * scale->z;
+    matrix->mf[3][3] = 1.0f;
+}
 #endif
 
 #ifdef VERSION_US
@@ -3699,30 +3868,8 @@ void MtxF_SetOrthonormalBasis(f32 matrix[4][4], Vec3f35784 *up_direction, Vec3f3
 #endif
 
 #ifdef VERSION_US
-typedef struct S1_Vec3s S1_Vec3s;
-struct S1_Vec3s {
-    /* 0x0 */ s16 x;
-    /* 0x2 */ s16 y;
-    /* 0x4 */ s16 z;
-};
-typedef float S1_MtxF_t[4][4];
-typedef union {
-    S1_MtxF_t mf;
-    struct {
-        float xx, yx, zx, wx,
-              xy, yy, zy, wy,
-              xz, yz, zz, wz,
-              xw, yw, zw, ww;
-    };
-} S1_MtxF;
 extern f32 D_80087E50[];
 extern f32 D_80088E50[0x1000];
-typedef struct S1_Vec3f S1_Vec3f;
-struct S1_Vec3f {
-    /* 0x0 */ f32 x;
-    /* 0x4 */ f32 y;
-    /* 0x8 */ f32 z;
-};
 extern S1_Vec3f D_800948D0;
 typedef union S1_Vec2s_s32 S1_Vec2s_s32;
 union S1_Vec2s_s32 {
@@ -4469,7 +4616,19 @@ void MtxF_TransformVec3s(S1_MtxF* arg0, S1_Vec3s* arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80036F0C.s")
+void MtxF_ToFixed(void *destination, S1_MtxF *source) {
+    s32 converted;
+    s32 i;
+    // N64 matrices store integer halves before fractional halves.
+    s16 *integer = destination;
+    s16 *fraction = (s16 *)destination + 16;
+    f32 *input = (f32 *)source;
+    for (i = 0; i < 16; i++) {
+        converted = *input++ * 65536.0f;
+        *integer++ = ((s16 *)&converted)[0];
+        *fraction++ = ((s16 *)&converted)[1];
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -5579,7 +5738,7 @@ unk_func_80039018 *func_80039018(unk_func_80039018 *arg0, s32 arg1) {
 
 #ifdef VERSION_US
 extern Gfx *Gfx_AllocDisplayList(s32);
-extern void func_80036F0C(void *, S1_MtxF *);
+extern void MtxF_ToFixed(void *, S1_MtxF *);
 extern u8 D_80124F68;
 typedef struct {
     S1_MtxF matrices[64];
@@ -5587,7 +5746,7 @@ typedef struct {
     s8 flags[32];
     s32 top;
 } SceneTransformPool;
-void func_80039070(s32 arg0) { *(s32 *)((u8 *)&D_80124F68 + 0x10A0) = 0; *((u8 *)&D_80124F68 + 0x1080) = 0; MtxF_Identity((f32 *)&D_80124F68); if (arg0 == 0) { *(s32 *)((u8 *)&D_80124F68 + 0x1000) = (s32)Gfx_AllocDisplayList(0x40); } else { *(s32 *)((u8 *)&D_80124F68 + 0x1000) = arg0; } func_80036F0C((void *)*(s32 *)((u8 *)&D_80124F68 + 0x1000), (S1_MtxF *)&D_80124F68); }
+void func_80039070(s32 arg0) { *(s32 *)((u8 *)&D_80124F68 + 0x10A0) = 0; *((u8 *)&D_80124F68 + 0x1080) = 0; MtxF_Identity((f32 *)&D_80124F68); if (arg0 == 0) { *(s32 *)((u8 *)&D_80124F68 + 0x1000) = (s32)Gfx_AllocDisplayList(0x40); } else { *(s32 *)((u8 *)&D_80124F68 + 0x1000) = arg0; } MtxF_ToFixed((void *)*(s32 *)((u8 *)&D_80124F68 + 0x1000), (S1_MtxF *)&D_80124F68); }
 #endif
 
 #ifdef VERSION_US
@@ -5598,7 +5757,7 @@ void GeoRender_CommitMatrix(Mtx *fixed) {
     } else {
         ((SceneTransformPool *)&D_80124F68)->stack[((SceneTransformPool *)&D_80124F68)->top] = fixed;
     }
-    func_80036F0C(((SceneTransformPool *)&D_80124F68)->stack[((SceneTransformPool *)&D_80124F68)->top], &((SceneTransformPool *)&D_80124F68)->matrices[((SceneTransformPool *)&D_80124F68)->top]);
+    MtxF_ToFixed(((SceneTransformPool *)&D_80124F68)->stack[((SceneTransformPool *)&D_80124F68)->top], &((SceneTransformPool *)&D_80124F68)->matrices[((SceneTransformPool *)&D_80124F68)->top]);
 }
 #endif
 
@@ -5611,7 +5770,7 @@ Mtx *GeoRender_SetMatrix(S1_MtxF *matrix, Mtx *fixed) {
     } else {
         ((SceneTransformPool *)&D_80124F68)->stack[((SceneTransformPool *)&D_80124F68)->top] = fixed;
     }
-    func_80036F0C(((SceneTransformPool *)&D_80124F68)->stack[((SceneTransformPool *)&D_80124F68)->top], &((SceneTransformPool *)&D_80124F68)->matrices[((SceneTransformPool *)&D_80124F68)->top]);
+    MtxF_ToFixed(((SceneTransformPool *)&D_80124F68)->stack[((SceneTransformPool *)&D_80124F68)->top], &((SceneTransformPool *)&D_80124F68)->matrices[((SceneTransformPool *)&D_80124F68)->top]);
     return ((SceneTransformPool *)&D_80124F68)->stack[((SceneTransformPool *)&D_80124F68)->top];
 }
 #endif
@@ -5626,7 +5785,7 @@ void GeoRender_PushMultipliedMatrix(S1_MtxF *matrix, Mtx *fixed) {
     } else {
         ((SceneTransformPool *)&D_80124F68)->stack[((SceneTransformPool *)&D_80124F68)->top] = fixed;
     }
-    func_80036F0C(((SceneTransformPool *)&D_80124F68)->stack[((SceneTransformPool *)&D_80124F68)->top], &((SceneTransformPool *)&D_80124F68)->matrices[((SceneTransformPool *)&D_80124F68)->top]);
+    MtxF_ToFixed(((SceneTransformPool *)&D_80124F68)->stack[((SceneTransformPool *)&D_80124F68)->top], &((SceneTransformPool *)&D_80124F68)->matrices[((SceneTransformPool *)&D_80124F68)->top]);
 }
 #endif
 
@@ -5640,7 +5799,7 @@ Mtx *GeoRender_PushScaledMatrix(S1_Vec3f *scale, Mtx *fixed) {
     } else {
         ((SceneTransformPool *)&D_80124F68)->stack[((SceneTransformPool *)&D_80124F68)->top] = fixed;
     }
-    func_80036F0C(((SceneTransformPool *)&D_80124F68)->stack[((SceneTransformPool *)&D_80124F68)->top], &((SceneTransformPool *)&D_80124F68)->matrices[((SceneTransformPool *)&D_80124F68)->top]);
+    MtxF_ToFixed(((SceneTransformPool *)&D_80124F68)->stack[((SceneTransformPool *)&D_80124F68)->top], &((SceneTransformPool *)&D_80124F68)->matrices[((SceneTransformPool *)&D_80124F68)->top]);
     return ((SceneTransformPool *)&D_80124F68)->stack[((SceneTransformPool *)&D_80124F68)->top];
 }
 #endif
@@ -6222,8 +6381,8 @@ void func_8003B690(s32 arg0) {
 
 #ifdef VERSION_US
 extern void func_8003E8C8(S1_Vec3f *, S1_Vec3s *, S1_Vec3f *, s32);
-extern void func_80036430(S1_MtxF *, S1_Vec3f *, S1_Vec3s *, S1_Vec3f *);
-extern void func_800365B8(S1_MtxF *, S1_Vec3f *, S1_Vec3s *, S1_Vec3f *);
+extern void MtxF_SetRotationScaleTranslation(S1_MtxF *, S1_Vec3f *, S1_Vec3s *, S1_Vec3f *);
+extern void MtxF_SetRotationAndScaledTranslation(S1_MtxF *, S1_Vec3f *, S1_Vec3s *, S1_Vec3f *);
 extern void func_800393F0(S1_Vec3f *);
 extern s32 D_80124D68[];
 extern s32 D_80126190;
@@ -6263,14 +6422,14 @@ void Geo_NodeAnimatedPart(s32 root) {
             GeoRender_SetMatrix(&matrix, NULL);
         }
     } else if (node->unk_31 & 1) {
-        func_80036430(&matrix, &position, &rotation, &scaling);
+        MtxF_SetRotationScaleTranslation(&matrix, &position, &rotation, &scaling);
         if (reuse != 0) {
             GeoRender_PushMultipliedMatrix(&matrix, (Mtx *)D_80124D68[node->unk_30]);
         } else {
             GeoRender_PushMultipliedMatrix(&matrix, NULL);
         }
     } else {
-        func_800365B8(&matrix, &position, &rotation, &((SceneScaleStack *)&D_80126010)->vectors[((SceneScaleStack *)&D_80126010)->top]);
+        MtxF_SetRotationAndScaledTranslation(&matrix, &position, &rotation, &((SceneScaleStack *)&D_80126010)->vectors[((SceneScaleStack *)&D_80126010)->top]);
         ((SceneTransformPool *)&D_80124F68)->top++;
         func_800393F0(&scaling);
         if (((SceneTransformPool *)&D_80124F68)->flags[((SceneTransformPool *)&D_80124F68)->top - 1] == 1) {
@@ -6316,10 +6475,10 @@ void Geo_PrepareAnimatedPart(s32 root) {
         ((SceneTransformPool *)&D_80124F68)->top++;
         GeoRender_SetMatrix(&matrix, NULL);
     } else if (node->unk_31 & 1) {
-        func_80036430(&matrix, &position, &rotation, &scaling);
+        MtxF_SetRotationScaleTranslation(&matrix, &position, &rotation, &scaling);
         GeoRender_PushMultipliedMatrix(&matrix, NULL);
     } else {
-        func_800365B8(&matrix, &position, &rotation, &((SceneScaleStack *)&D_80126010)->vectors[((SceneScaleStack *)&D_80126010)->top]);
+        MtxF_SetRotationAndScaledTranslation(&matrix, &position, &rotation, &((SceneScaleStack *)&D_80126010)->vectors[((SceneScaleStack *)&D_80126010)->top]);
         ((SceneTransformPool *)&D_80124F68)->top++;
         func_800393F0(&scaling);
         if (((SceneTransformPool *)&D_80124F68)->flags[((SceneTransformPool *)&D_80124F68)->top - 1] == 1) {

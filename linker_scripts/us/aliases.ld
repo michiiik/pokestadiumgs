@@ -306,3 +306,7 @@ func_8003691C = MtxF_SetOrthonormalBasis;
 func_80035FFC = MtxF_SetRotationTranslation;
 func_8003614C = MtxF_SetRotationTranslationF;
 func_80036284 = MtxF_SetRotationAndTransformTranslation;
+func_80036430 = MtxF_SetRotationScaleTranslation;
+func_800365B8 = MtxF_SetRotationAndScaledTranslation;
+func_80035D14 = MtxF_SetLookAt;
+func_80036F0C = MtxF_ToFixed;
