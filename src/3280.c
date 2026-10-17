@@ -62,42 +62,34 @@ s32 main_pool_alloc_from_pool(s32 arg0, s32 arg1) {
 }
 
 extern s32 main_pool_get_available(void);
-
-#pragma REWRITE_FUNCTION_HEX(func_800027F0, 935f01243dc8d7153c477b72c88922bb322f4431ff112c70862792b4a29718cd, 27bdffd8afb100183c11800d2631cdb08e2200282483fff0afb30020afb2001c0062082b00a09825afbf0024afb0001410200016006090258c4e000012600007ae2e00288dc3000825c40010506000048e2200280060f8098dc5000c8e2200288e2f001c8c58000401f8c82103224023ae28001cac4000048e2200285642ffef8c4e00001000001c000000008e30002c0070082b142000180070082b1420001600000000526000098e0900048e02000826040010504000058e0900040040f8098e05000c8e30002c8e0900048e2a001cae29002c8d2c000001495821016c6823ae2d001cad2000008e30002c0250082b1020ffec000000000c000000000000008fbf00248fb000148fb100188fb2001c8fb3002003e0000827bd0028)
-#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800027F0, 0xF8, 4, main_pool_get_available)
 s32 func_800027F0(s32 arg0, s32 arg1) {
-    PoolBlock3280 *target = (PoolBlock3280 *)((u8 *)arg0 - 0x10);
+    PoolBlock3280 *target;
     PoolBlock3280 *block;
-
-    if ((u32)target < (u32)POOL3280.listHeadL) {
-        block = POOL3280.listHeadL->prev;
+    // Callbacks may change the live heads; retain the requested header endpoint.
+    target = (PoolBlock3280 *)((u32)arg0 - 16U);
+    if ((u8 *)((u32)arg0 - 16U) < (u8 *)POOL3280.listHeadL) {
         do {
-            if (arg1 != 0) {
-                POOL3280.listHeadL = block;
-                if (block->func != NULL) {
-                    block->func((u8 *)block + 0x10, block->arg);
-                }
+            POOL3280.listHeadL = POOL3280.listHeadL->prev;
+            if (arg1 != 0 && POOL3280.listHeadL->func != NULL) {
+                POOL3280.listHeadL->func((u8 *)POOL3280.listHeadL + 16, POOL3280.listHeadL->arg);
             }
-            POOL3280.available += (s32)POOL3280.listHeadL->next - (s32)POOL3280.listHeadL;
+            POOL3280.available = POOL3280.available + (s32)POOL3280.listHeadL->next - (s32)POOL3280.listHeadL;
             POOL3280.listHeadL->next = NULL;
-            block = POOL3280.listHeadL->prev;
         } while (target != POOL3280.listHeadL);
     } else {
         block = POOL3280.listHeadR;
         if ((u32)target >= (u32)block) {
-            while (1) {
+            while ((u32)target >= (u32)block) {
                 if (arg1 != 0) {
                     if (block->func != NULL) {
-                        block->func((u8 *)block + 0x10, block->arg);
+                        block->func((u8 *)block + 16, block->arg);
                     }
+                    block = POOL3280.listHeadR;
                 }
                 POOL3280.listHeadR = block->next;
-                POOL3280.available += (s32)POOL3280.listHeadR - (s32)POOL3280.listHeadR->prev;
+                POOL3280.available = POOL3280.available + (s32)POOL3280.listHeadR - (s32)POOL3280.listHeadR->prev;
                 POOL3280.listHeadR->prev = NULL;
                 block = POOL3280.listHeadR;
-                if ((u32)target < (u32)block) {
-                    break;
-                }
             }
         }
     }
