@@ -924,10 +924,6 @@ void Audio_DebugSampleHistogram(u8 mode) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80026C80.s")
-#endif
-
-#ifdef VERSION_US
 #pragma pack(1)
 typedef struct { s32 w0; s32 w4; } PackedRecord;
 #pragma pack(0)
@@ -942,6 +938,50 @@ typedef struct AudioChannelEvent {
 extern void func_80026ED8(u8);
 extern u8 Audio_SetupEventVoice(AudioChannelEvent *, u8);
 extern s32 func_8002738C(u8);
+#endif
+
+#ifdef VERSION_US
+extern u8 D_800918E8;
+extern s32 Audio_ConfigureEventChannel(AudioChannelEvent *, u8);
+extern void Audio_UpdateEventVoiceParameters(void *, u8, u8);
+void Audio_ProcessChannelEvent(AudioChannelEvent *event, s32 arg1) {
+    PackedRecord *entry;
+    if (event->slot == 15) {
+        D_800918E8 = func_8002738C(Audio_SetupEventVoice(event, D_800918E8));
+        return;
+    }
+    entry = &D_80090C84[event->slot];
+    if (((u8 *)entry)[6] == 1) {
+        switch (((u8 *)entry)[0]) {
+        case 1:
+            func_80026ED8(event->slot);
+            break;
+        case 3:
+            ((u8 *)entry)[0] = 2;
+            break;
+        case 4:
+            return;
+        }
+        entry = &D_80090C84[event->slot];
+    }
+    if (event->sound != *(u16 *)((u8 *)entry + 4)) {
+        D_800918E8 = Audio_ConfigureEventChannel(event, D_800918E8);
+        return;
+    }
+    switch (((u8 *)entry)[0]) {
+    case 2:
+        ((u8 *)entry)[0] = 3;
+        Audio_UpdateEventVoiceParameters(event, ((u8 *)&D_80090C84[event->slot])[1], 0);
+        ((u8 *)&D_80090C84[event->slot])[6] = 1;
+        return;
+    case 4:
+        return;
+    }
+    *entry = D_80090CFC;
+}
+#endif
+
+#ifdef VERSION_US
 s32 Audio_ConfigureEventChannel(AudioChannelEvent *event, u8 request) {
     u8 channel;
     func_80026ED8(event->slot);
