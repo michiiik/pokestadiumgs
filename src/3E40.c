@@ -81,7 +81,80 @@ void Util_DrawRect(Gfx** dlist, s32 ulx, s32 lrx, u16 color) {
     *dlist = gfx;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/3E40/func_800034E4.s")
+typedef struct PoolBlock3280 PoolBlock3280;
+typedef struct PoolState3280 PoolState3280;
+typedef struct Pool3280 {
+    OSMesg msgs[1];
+    OSMesgQueue queue;
+    s32 available;
+    PoolBlock3280 *start;
+    PoolBlock3280 *end;
+    PoolBlock3280 *listHeadL;
+    PoolBlock3280 *listHeadR;
+    PoolState3280 *mainState;
+} Pool3280;
+
+extern Pool3280 *func_80002DF0(void);
+extern s32 main_pool_get_available(void);
+extern s32 HAL_Printf(s16, s16, const char *, ...);
+extern char D_800A1800[];
+extern char D_800A1818[];
+extern char D_800A1830[];
+extern char D_800A1848[];
+
+void func_800034E4(Gfx **dlist) {
+    Pool3280 *pool;
+    s32 sp58;
+    s32 sp54;
+
+    pool = func_80002DF0();
+    sp58 = main_pool_get_available() - D_800871F0;
+    sp54 = main_pool_get_available();
+
+    if (sp58 >= 0) {
+        s32 pad;
+        s32 start;
+        s32 listHeadL;
+        s32 listHeadR;
+        s32 end;
+
+        start = (((u32)pool->start & 0x1FFFFFFF) >> 15) + 30;
+        listHeadL = (((u32)pool->listHeadL & 0x1FFFFFFF) >> 15) + 30;
+        listHeadR = ((((u32)pool->listHeadR & 0x1FFFFFFF) - D_800871F0) >> 15) + 30;
+        end = ((((u32)pool->end & 0x1FFFFFFF) - D_800871F0) >> 15) + 30;
+
+        Util_DrawRect(dlist, 30, start, 0xFBCB);
+        Util_DrawRect(dlist, start, listHeadL, 0xFFCB);
+        Util_DrawRect(dlist, listHeadL, listHeadR, 0x2ABF);
+        Util_DrawRect(dlist, listHeadR, end, 0xFFCB);
+        HAL_Printf(30, 20, D_800A1800, sp58, sp58 / 1024);
+    } else {
+        s32 pad;
+        s32 start;
+        s32 listHeadL;
+        s32 listHeadR;
+        s32 end;
+
+        start = (((u32)pool->start & 0x1FFFFFFF) >> 15) + 30;
+        listHeadL = (((u32)pool->listHeadL & 0x1FFFFFFF) >> 15) + 30;
+        listHeadR = ((((u32)pool->listHeadR & 0x1FFFFFFF) - D_800871F0) >> 15) + 30;
+        end = ((((u32)pool->end & 0x1FFFFFFF) - D_800871F0) >> 15) + 30;
+
+        Util_DrawRect(dlist, 30, start, 0xFBCB);
+        Util_DrawRect(dlist, start, listHeadR, 0xFFCB);
+        Util_DrawRect(dlist, listHeadR, listHeadL, 0xF94B);
+        Util_DrawRect(dlist, listHeadL, end, 0xFFCB);
+        HAL_Printf(30, 20, D_800A1818, -sp58, -sp58 / 1024);
+    }
+
+    if (D_800871F0 != 0) {
+        if (sp54 >= 0) {
+            HAL_Printf(30, 30, D_800A1830, sp54, sp54 / 1024);
+        } else {
+            HAL_Printf(30, 30, D_800A1848, -sp54, -sp54 / 1024);
+        }
+    }
+}
 
 void Util_Memclear(u64 *dest, u32 size) {
     while (size-- > 0) {
