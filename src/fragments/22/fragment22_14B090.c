@@ -222,8 +222,6 @@ void func_8270174C(void *arg0) {
     do { entry=func_82700E70(2,i,table,0x10); switch(i) { case 0: (*(u8 **)((u8 *)arg0+0x20))[0]=*(s16 *)((u8 *)entry+0x20); break; case 1: if(*(s16 *)((u8 *)entry+0x20)==0) (*(u8 **)((u8 *)arg0+0x20))[1]|=1; else (*(u8 **)((u8 *)arg0+0x20))[1]&=mask; break; } i++; } while(i!=5);
 }
 
-extern u16 D_827034EC;
-extern u8 D_82703514[];
 s32 func_82701820(s32 arg0, s32 arg1) {
     s32 result;
     void *entry;
@@ -577,27 +575,69 @@ void func_827025F0(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14B090/func_82702658.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14B090/func_82702810.s")
-
+typedef struct Fragment22TextureHeader {
+    u16 width;
+    u16 height;
+    u8 format;
+    u8 size;
+    u16 unk_06;
+} Fragment22TextureHeader;
+extern u8 D_827032C0[];
+extern u8 D_827032D0[];
+extern u8 D_827032D4[];
+extern Gfx *D_800D0510;
+extern Gfx D_80094E38[];
+extern s32 func_8004C990(s32, s32);
+extern s32 func_8004D19C(s32, s32, s32, s32, s32);
+extern void func_80044270(s16, s16, s16, s16, s16, s16, s16, s16, s32);
+extern void *func_8004C874(s32, s32);
+extern void func_800495F8(s32, s32, s32, const char *, ...);
 extern void func_800498C4(void);
 extern void func_8004972C(s32, s32, s32, s32);
 extern void func_800496A4(s32, s32);
-extern s32 func_8004C874(s32, s32);
-extern void func_800495F8(s32, s32, s32, s32);
 extern void func_800499EC(void);
-void func_82702954(arg0, arg1) void *arg0; s32 arg1; { s32 result; s32 value; result = func_8004C874(0x1A, 4); value = (*(s16 *)((u8 *)arg0 + 0xC) * 0xFF) / 255; func_800498C4(); func_8004972C(0xFF, 0xFF, 0xFF, value); if (result != 0) { func_800496A4(8, 0); func_800495F8(*(s16 *)((u8 *)arg0 + 0x12) + 0x1E, *(s16 *)((u8 *)arg0 + 0x14) + 6, 0, result); } func_800499EC(); }
+
+void func_82702810(Fragment22RowEntry *entry) {
+    Fragment22TextureHeader *texture;
+    struct RowColor {
+        u8 red;
+        u8 green;
+        u8 blue;
+    } *color;
+    s32 alpha;
+
+    texture = (Fragment22TextureHeader *)func_8004C990(247, 0);
+    alpha = entry->alpha * 160 / 255;
+    color = (struct RowColor *)&D_827032C0[entry->kind * 3];
+    if (texture != NULL) {
+        gSPDisplayList(D_800D0510++, D_80094E38);
+        gDPSetEnvColor(D_800D0510++, color->red, color->green, color->blue, alpha);
+        func_8004D19C(entry->position.x, entry->position.y, (s32)texture, 0, 0);
+        func_80044270(entry->position.x + texture->width, entry->position.y,
+                     entry->width - texture->width, (s16)texture->height,
+                     (texture->width - 1) << 5, 0, 0, 1024, 0);
+    }
+}
+
+void func_82702954(void *record, s32 selected) {
+    const char *text;
+    s32 alpha;
+
+    text = func_8004C874(26, 4);
+    alpha = (*(s16 *)((u8 *)record + 12) * 255) / 255;
+    func_800498C4();
+    func_8004972C(255, 255, 255, alpha);
+    if (text != NULL) {
+        func_800496A4(8, 0);
+        func_800495F8(*(s16 *)((u8 *)record + 18) + 30,
+                     *(s16 *)((u8 *)record + 20) + 6, 0, text);
+    }
+    func_800499EC();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14B090/func_82702A2C.s")
 
 extern s32 D_827032E4;
-extern u8 D_827032D0[];
-extern u8 D_827032D4[];
-extern void func_800498C4(void);
-extern void func_8004972C(s32, s32, s32, s32);
-extern void func_800496A4(s32, s32);
-extern s32 func_8004C874(s32, s32);
-extern void func_800495F8(s32, s32, s32, s32);
-extern void func_800499EC(void);
 
 void func_82702BC8(arg0, arg1)
 void *arg0;
@@ -629,14 +669,6 @@ s32 arg1;
 }
 
 extern struct IDs { s16 a, b, c; } D_827032E8;
-extern void func_800495F8(s32, s32, s32, s32);
-extern void func_800496A4(s32, s32);
-extern void func_8004972C(s32, s32, s32, s32);
-extern void func_800498C4(void);
-extern void func_800499EC(void);
-extern s32 func_8004C874(s32, s32);
-extern u8 D_827032D0[];
-extern u8 D_827032D4[];
 void func_82702CD8(arg0, arg1) void *arg0; s32 arg1; {
     volatile s32 reserve[2];
     struct IDs sp30;
@@ -663,58 +695,61 @@ void func_82702CD8(arg0, arg1) void *arg0; s32 arg1; {
     func_800499EC();
 }
 
-#ifdef CC_CHECK
 extern void func_82702954(void *, s32);
-#else
-extern void func_82702954();
-#endif
-extern void func_82702A2C();
-#ifdef CC_CHECK
+extern void func_82702A2C(void *, s32);
 extern void func_82702BC8(void *, s32);
-#else
-extern void func_82702BC8();
-#endif
-extern void func_82702CD8();
-void func_82702DF8(s16 *arg0) {
-    s16 temp_v0;
+extern void func_82702CD8(void *, s32);
 
-    temp_v0 = *arg0;
-    switch (temp_v0) {                              /* irregular */
+void func_82702DF8(void *record, s32 selected) {
+    s16 kind;
+
+    kind = *(s16 *)record;
+    switch (kind) {
     case 1:
-#ifdef CC_CHECK
-        func_82702954((void *)0, 0);
-#else
-        func_82702954();
-#endif
+        func_82702954(record, selected);
         return;
     case 2:
-        func_82702A2C();
+        func_82702A2C(record, selected);
         return;
     case 3:
-#ifdef CC_CHECK
-        func_82702BC8((void *)0, 0);
-#else
-        func_82702BC8();
-#endif
+        func_82702BC8(record, selected);
         return;
     case 4:
-#ifdef CC_CHECK
-        /* Match the other legacy register-forwarding calls above. */
-        ((void (*)())func_82702CD8)();
-#else
-        func_82702CD8();
-#endif
+        func_82702CD8(record, selected);
         return;
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14B090/func_82702E78.s")
+extern void func_8004989C(s32);
+
+void func_82702E78(void *record) {
+    Fragment22Menu *menu = record;
+    s32 alpha;
+
+    func_800498C4();
+    func_800496A4(8, 0);
+    alpha = menu->unk_12;
+    if (alpha > 0) {
+        func_8004972C(255, 255, 0, alpha);
+        func_8004989C(26);
+        if (menu->unk_10 == 1) {
+            func_800495F8(581, 300, 2, func_8004C874(26, 18));
+        } else {
+            func_800495F8(581, 300, 2, func_8004C874(26, 9));
+        }
+    }
+    alpha = menu->alpha;
+    if (alpha > 0) {
+        func_8004972C(255, 255, 0, alpha);
+        func_800495F8(581, 282, 2, func_8004C874(26, 19));
+    }
+    func_800499EC();
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14B090/func_82702F70.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14B090/func_827030D0.s")
 
-extern u16 D_827034EC;
 extern s16 D_827034EA;
 s32 func_82703188(void) {
     s32 result = -2;
