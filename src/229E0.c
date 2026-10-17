@@ -930,10 +930,17 @@ typedef struct { s32 w0; s32 w4; } PackedRecord;
 extern PackedRecord D_80090C84[];
 extern PackedRecord D_80090CFC;
 typedef struct AudioChannelEvent {
-    u8 unknown00[2];
+    u8 bank;
+    u8 unknown01;
     u16 sound;
     u8 slot;
     u8 kind;
+    u16 mask;
+    u8 count;
+    u8 unknown09[3];
+    void *resource;
+    f32 scale;
+    u8 unknown14[4];
 } AudioChannelEvent;
 extern void func_80026ED8(u8);
 extern u8 Audio_SetupEventVoice(AudioChannelEvent *, u8);
@@ -1010,14 +1017,14 @@ void func_80026ED8(u8 arg0) {
 extern s32 Audio_SelectEventChannel(void *, u8);
 extern void Audio_UpdateEventVoiceParameters(void *, u8, u8);
 extern u8 D_80090BC1[];
-extern u8 D_80090D28[];
+extern u8 D_80090D28[][16];
 u8 Audio_SetupEventVoice(AudioChannelEvent *arg0, u8 request) {
     request = (u8)Audio_SelectEventChannel(arg0, request);
     Audio_UpdateEventVoiceParameters(arg0, request, 1);
-    D_80090BC1[request * 12] = D_80090D28[arg0->sound * 16 + 12];
-    func_8001874C(((0x06020000 | (((u32)request & 0xFF) << 8)) | 1), (s8)D_80090D28[arg0->sound * 16]);
+    D_80090BC1[request * 12] = ((u8 *)D_80090D28)[arg0->sound * 16 + 12];
+    func_8001874C(((0x06020000 | (((u32)request & 0xFF) << 8)) | 1), (s8)((u8 *)D_80090D28)[arg0->sound * 16]);
     func_8001874C((0x06020000 | (((u32)request & 0xFF) << 8)), 1);
-    func_8001874C(((0x06020000 | (((u32)request & 0xFF) << 8)) | 3), (s8)((D_80090D28[arg0->sound * 16] & 0x80) >> 7));
+    func_8001874C(((0x06020000 | (((u32)request & 0xFF) << 8)) | 3), (s8)((((u8 *)D_80090D28)[arg0->sound * 16] & 0x80) >> 7));
     return request;
 }
 #endif
@@ -1040,19 +1047,19 @@ extern f64 D_800A39B0;
 extern f32 D_800A39B8;
 void Audio_UpdateEventVoiceParameters(void *arg0, u8 channel, u8 reset) {
     if (reset) {
-        ((u8 *)(&D_80090BB8[channel]))[0] = D_80090D28[((AudioVoiceParameters *)arg0)->sound * 16 + 1];
+        ((u8 *)(&D_80090BB8[channel]))[0] = ((u8 *)D_80090D28)[((AudioVoiceParameters *)arg0)->sound * 16 + 1];
         ((s8 *)(&D_80090BB8[channel]))[1] = ((s8 *)D_80090D28)[((AudioVoiceParameters *)arg0)->sound * 16 + 8];
     }
-    *(f32 *)((u8 *)(&D_80090BB8[channel]) + 4) = *(f32 *)(D_80090D28 + ((AudioVoiceParameters *)arg0)->sound * 16 + 4) * ((AudioVoiceParameters *)arg0)->pitch;
+    *(f32 *)((u8 *)(&D_80090BB8[channel]) + 4) = *(f32 *)((u8 *)D_80090D28 + ((AudioVoiceParameters *)arg0)->sound * 16 + 4) * ((AudioVoiceParameters *)arg0)->pitch;
     if (*(f32 *)((u8 *)(&D_80090BB8[channel]) + 4) > 4.0) {
         *(f32 *)((u8 *)(&D_80090BB8[channel]) + 4) = 4.0f;
     } else if (*(f32 *)((u8 *)(&D_80090BB8[channel]) + 4) < D_800A39B0) {
         *(f32 *)((u8 *)(&D_80090BB8[channel]) + 4) = D_800A39B8;
     }
-    if (D_80090D28[((AudioVoiceParameters *)arg0)->sound * 16 + 13] & 0xF0) {
-        *(f32 *)((u8 *)(&D_80090BB8[channel]) + 4) *= func_80026990(D_80090D28[((AudioVoiceParameters *)arg0)->sound * 16 + 13] >> 4);
+    if (((u8 *)D_80090D28)[((AudioVoiceParameters *)arg0)->sound * 16 + 13] & 0xF0) {
+        *(f32 *)((u8 *)(&D_80090BB8[channel]) + 4) *= func_80026990(((u8 *)D_80090D28)[((AudioVoiceParameters *)arg0)->sound * 16 + 13] >> 4);
     }
-    if (D_80090D28[((AudioVoiceParameters *)arg0)->sound * 16 + 13] & 1) {
+    if (((u8 *)D_80090D28)[((AudioVoiceParameters *)arg0)->sound * 16 + 13] & 1) {
         if (*((AudioVoiceParameters *)arg0)->pan >= 64) {
             ((u8 *)(&D_80090BB8[channel]))[2] = 127;
         } else if (*((AudioVoiceParameters *)arg0)->pan < -64) {
@@ -1169,23 +1176,16 @@ s32 func_800275E8(u8 arg0, Candidate275E8Bits *arg1) {
 #endif
 
 #ifdef VERSION_US
-typedef struct ResourceContext_80027774 {
-    u8 pad00[5];
-    u8 mode;
-    u8 pad06[6];
-    void *resource;
-    f32 scale;
-    u8 pad14[4];
-} ResourceContext_80027774;
-extern void func_80027BD4(u16, s32, ResourceContext_80027774 *);
+typedef AudioChannelEvent ResourceContext_80027774;
+extern void Audio_BuildAndDispatchSoundEvent(u16, s32, ResourceContext_80027774 *);
 extern u8 D_80090D04[];
 void func_80027774(u16 arg0, u8 arg1) {
     ResourceContext_80027774 context;
 
     context.resource = D_80090D04;
-    context.mode = arg1;
+    context.kind = arg1;
     context.scale = 1.0f;
-    func_80027BD4(arg0, 0, &context);
+    Audio_BuildAndDispatchSoundEvent(arg0, 0, &context);
 }
 #endif
 
@@ -1215,12 +1215,12 @@ void func_800277F0(u16 resource_id, void *context) {
 void Audio_PlayDefaultSound(u16 id) {
     ResourceContext_80027774 context;
     context.resource = D_80090D04;
-    context.mode = 0;
+    context.kind = 0;
     context.scale = 1.0f;
     if (id == 0x5F0A) {
         func_800225C4(5);
     }
-    func_80027BD4(id, 0, &context);
+    Audio_BuildAndDispatchSoundEvent(id, 0, &context);
 }
 #endif
 
@@ -1229,7 +1229,50 @@ void Audio_PlayDefaultSound(u16 id) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80027BD4.s")
+extern u8 D_800A3990[];
+extern u8 D_80090D31[];
+// Decode the request, adjust its channel mask, and dispatch nonempty events.
+void Audio_BuildAndDispatchSoundEvent(u16 encoded, s32 offset, ResourceContext_80027774 *event) {
+    u8 i;
+    u8 j;
+    u8 total = 0;
+
+    event->slot = (encoded & 0xF00) >> 8;
+    event->bank = (encoded & 0xF000) >> 12;
+    event->sound = encoded & 0xFF;
+    for (i = 0; i < event->bank; i++) event->sound += D_800A3990[i];
+    event->unknown14[0] = D_80090D31[event->sound * 16];
+    for (i = 0; i < 13; i++) total += D_800A3990[i];
+    if (event->sound >= total) event->sound = total - 1;
+    event->count = 0;
+    for (i = 0; i < 16; i++) {
+        if ((*(u16 *)(D_80090D28[event->sound] + 10) >> i) & 1) {
+            event->count++;
+        }
+    }
+    event->mask = *(u16 *)(D_80090D28[event->sound] + 10);
+    if (event->bank != 6 && ((D_80090D28[event->sound][13] >> 1) & 1)) {
+        if ((u8)offset * event->count >= 49) return;
+        for (i = 0; i < (u8)offset * event->count; i++) {
+            event->mask <<= 1;
+            total = 0;
+            for (j = 0; j < 16; j++) {
+                if ((event->mask >> j) & 1) total++;
+            }
+            if (total == event->count - 1) {
+                if (event->mask & 1) return;
+                event->mask |= 1;
+            } else if (total < event->count - 1) {
+                return;
+            }
+        }
+        if (event->slot != 15) {
+            event->slot += offset;
+            if (event->slot >= 15) event->slot -= 15;
+        }
+    }
+    if (event->count) Audio_ProcessChannelEvent(event, offset);
+}
 #endif
 
 #ifdef VERSION_US
@@ -1339,10 +1382,10 @@ void func_80028118(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-extern u8 D_800D1A70;
-extern u8 D_800D1A78;
-extern u8 D_800D1A80;
-extern u8 D_800D1A82;
+extern s32 D_800D1A70[2];
+extern s32 D_800D1A78[2];
+extern s8 D_800D1A80[2];
+extern s8 D_800D1A82[2];
 void func_80028140(void) {
     (*(s32 *)((u8 *)(&D_800D1A70) + (0))) = -1;
     (*(s32 *)((u8 *)(&D_800D1A70) + (4))) = -1;
@@ -1356,7 +1399,35 @@ void func_80028140(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8002818C.s")
+// Select a request channel and leave its state for Audio_UpdateDeferredSounds.
+void Audio_QueueDeferredSound(s32 sound, s32 delay, u8 parameter) {
+    u16 channel;
+    u8 mode = 0;
+
+    channel = (sound >= 266) ? 1 : 0;
+    if (channel == 1) {
+        mode = ((sound & 0xF000) == 0x3000) ? 2 : 1;
+        sound &= 0xFFF;
+    }
+    func_8001874C((0x06040000 | ((u8)channel << 8)) | 3, 1);
+    //!bug Zero delay becomes two before the immediate-play branch tests for zero.
+    if (delay == 0) {
+        delay = 2;
+    }
+    if (delay == 0) {
+        func_8001874C((0x06040000 | ((u8)channel << 8)), sound % 64);
+        func_8001874C((0x06040000 | ((u8)channel << 8)) | 1, sound / 64);
+        func_8001874C((0x06040000 | ((u8)channel << 8)) | 2, parameter);
+        if (channel == 1) {
+            func_8001874C((0x06040000 | ((u8)channel << 8)) | 4, mode);
+        }
+    } else {
+        D_800D1A70[channel] = sound;
+        D_800D1A78[channel] = delay;
+        D_800D1A80[channel] = parameter;
+        D_800D1A82[channel] = mode;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1368,7 +1439,36 @@ void func_80028300(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80028340.s")
+// Count down two pending requests and submit their channel commands when due.
+void Audio_UpdateDeferredSounds(void) {
+    u32 channel;
+    s32 command;
+
+    for (channel = 0; channel < 2; channel++) {
+        if (D_800D1A70[channel] != -1) {
+            if (D_800D1A78[channel] == 1) {
+                func_8001874C((0x06040000 | ((u8)channel << 8)) | 3, 1);
+            }
+            if (D_800D1A78[channel] == 0) {
+                command = 0x06040000 | ((u8)channel << 8);
+                func_8001874C(command, D_800D1A70[channel] % 64);
+                func_8001874C(command | 1, D_800D1A70[channel] / 64);
+                func_8001874C(command | 2, D_800D1A80[channel]);
+                if (channel == 1) {
+                    func_8001874C(command | 4, D_800D1A82[channel]);
+                }
+                D_800D1A70[channel] = -1;
+                D_800D1A78[channel] = -1;
+                D_800D1A80[channel] = 127;
+                D_800D1A82[channel] = 0;
+            } else {
+                D_800D1A78[channel]--;
+            }
+        }
+    }
+}
+// Preserve the original two zero words of inter-function alignment.
+#pragma C_FUNCTION_PADDING(8)
 #endif
 
 #ifdef VERSION_US
@@ -1737,7 +1837,55 @@ void func_80031530_padding(void) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80031638.s")
+extern u8 D_80091A1C;
+extern u32 D_80091A20;
+extern u32 D_80091A30;
+extern u8 D_80091A34;
+extern u8 D_80091A44;
+typedef struct { u8 unk00[38]; u16 unk26; } unk_D_800D1B88;
+extern unk_D_800D1B88 *D_800D1B88[2];
+extern s32 func_80019230(s32, s32, s32);
+// Service queued sound/wait commands and the enabled timed command sequence.
+void Audio_UpdateCommandQueue(void) {
+    u32 command;
+
+    if ((u8)D_80091A0C && (u8)D_80091A10 && D_80091A28 < D_80091A24) {
+        if (D_80091A30 != 0) {
+            D_80091A30--;
+        } else if (func_80019230(4, 1, 0) == 0) {
+            command = D_800D1A90[D_80091A28 % 10];
+            if (command >= 0x10000) {
+                switch (command & 0xFFFF0000) {
+                    case 0x10000000:
+                        D_80091A30 = command & 0xFFFF;
+                        break;
+                    case 0x20000000:
+                        D_80091A34 = 1;
+                        break;
+                }
+            } else if (command != 0) {
+                Audio_QueueDeferredSound(command, 0, 127);
+            }
+            D_80091A28++;
+        }
+    }
+    if (D_80091A1C && D_80091A34) {
+        if (D_80091A20 == 0) {
+            if (D_800D1B88[0]->unk26 == 0 || D_800D1B88[1]->unk26 == 0 || D_80091A44 != 0) {
+                D_80091A20 = 598;
+            }
+        }
+        if (D_80091A20 == 1) {
+            func_800314D4(0x20E2);
+        } else if (D_80091A20 == 600) {
+            func_800314D4(0x20E3);
+        } else if (D_80091A20 == 1200) {
+            func_800314D4(0x20E4);
+            D_80091A20 = 2;
+        }
+        D_80091A20++;
+    }
+}
 #endif
 
 #ifdef VERSION_US
