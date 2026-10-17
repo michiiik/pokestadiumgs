@@ -135,7 +135,38 @@ s32 func_82301434(s32 arg0, u8 *arg1) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82301494.s")
+s32 func_82301494(s32 value) {
+    s32 result = 0;
+    switch (value) {
+    case 0:
+        result = 0;
+        break;
+    case 1:
+        result = 0;
+        break;
+    case 2:
+        result = 1;
+        break;
+    case 3:
+        result = 1;
+        break;
+    case 4:
+        result = 2;
+        break;
+    case 5:
+        result = 2;
+        break;
+    case 6:
+        result = 3;
+        break;
+    case 7:
+        result = 3;
+        break;
+    default:
+        break;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_823014EC.s")
 
@@ -290,8 +321,8 @@ void func_82303038(void) {
     func_80008648();
 }
 
-void func_823030A4(void) {
-    func_823000E8();
+s32 func_823030A4(void) {
+    return func_823000E8();
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_823030C4.s")
