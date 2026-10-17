@@ -54,7 +54,7 @@ _HEX_PRAGMA = re.compile(
 _TARGET_RELOC_PRAGMA = re.compile(
     r"^[ \t]*#pragma\s+REWRITE_FUNCTION_RELOC_TARGET\s*\(\s*"
     r"([A-Za-z_]\w*)\s*,\s*(0x[0-9A-Fa-f]+|[0-9]+)\s*,\s*"
-    r"(0x[0-9A-Fa-f]+|[0-9]+)\s*,\s*([A-Za-z_]\w*)\s*\)[ \t]*$",
+    r"(0x[0-9A-Fa-f]+|[0-9]+)\s*,\s*(\.?[A-Za-z_]\w*)\s*\)[ \t]*$",
     re.MULTILINE,
 )
 
