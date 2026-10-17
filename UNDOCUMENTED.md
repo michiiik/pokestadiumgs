@@ -3,9 +3,9 @@
 # Undocumented code
 
 <!-- AUTO_UNDOCUMENTED:START -->
-- Functions defined in `src/` with a `/* ... */` comment: **11 / 6,554 (0.2%)**
+- Functions defined in `src/` with a `/* ... */` comment: **11 / 6,562 (0.2%)**
 - Functions with a real name: **1,082 / 10,901 (9.9%)** (9,819 still `func_XXXXXXXX`)
-- Variables with a real name: **248 / 3,748 (6.6%)** (3,500 still `D_XXXXXXXX` / `jtbl_XXXXXXXX`)
+- Variables with a real name: **248 / 3,761 (6.6%)** (3,513 still `D_XXXXXXXX` / `jtbl_XXXXXXXX`)
 - Functions still using m2c `temp_*` / `var_*` locals: **785**
 <!-- AUTO_UNDOCUMENTED:END -->
 
@@ -34,10 +34,10 @@ In the table, `func_` and `D_/jtbl_` count the distinct placeholder names that f
 | `src/fragments/79/fragment79_38EFE0.c` | 78 | 78 | 121 | 36 | 5 |
 | `src/fragments/46/fragment46_code.c` | 53 | 53 | 97 | 85 | 4 |
 | `src/14640.c` | 67 | 67 | 125 | 25 | 7 |
+| `src/fragments/17/fragment17_113A60.c` | 43 | 43 | 104 | 63 | 8 |
 | `src/fragments/67/fragment67_344D70.c` | 59 | 59 | 105 | 45 | 5 |
 | `src/fragments/45/fragment45_2251A0.c` | 43 | 43 | 102 | 53 | 8 |
 | `src/fragments/13/fragment13_EEC50.c` | 67 | 67 | 86 | 46 | 6 |
-| `src/fragments/17/fragment17_113A60.c` | 40 | 40 | 101 | 56 | 8 |
 | `src/fragments/79/fragment79_3C60B0.c` | 88 | 88 | 98 | 16 | 0 |
 | `src/fragments/24/fragment24_150C10.c` | 43 | 42 | 114 | 30 | 13 |
 | `src/fragments/63/fragment63_317060.c` | 53 | 53 | 104 | 32 | 7 |
@@ -148,6 +148,7 @@ In the table, `func_` and `D_/jtbl_` count the distinct placeholder names that f
 | `src/fragments/10/fragment10_D5250.c` | 10 | 10 | 42 | 2 | 0 |
 | `src/fragments/23/fragment23_code.c` | 9 | 9 | 31 | 10 | 4 |
 | `src/fragments/14/fragment14_104FC0.c` | 13 | 13 | 36 | 3 | 1 |
+| `src/fragments/17/fragment17_11B210.c` | 13 | 13 | 31 | 7 | 2 |
 | `src/fragments/78/fragment78_code.c` | 9 | 9 | 28 | 12 | 4 |
 | `src/fragments/67/fragment67_343510.c` | 9 | 9 | 13 | 30 | 0 |
 | `src/fragments/64/fragment64_3312D0.c` | 13 | 13 | 33 | 3 | 2 |
@@ -167,7 +168,6 @@ In the table, `func_` and `D_/jtbl_` count the distinct placeholder names that f
 | `src/fragments/79/fragment79_372DE0.c` | 17 | 17 | 22 | 6 | 2 |
 | `src/fragments/79/fragment79_3B9B80.c` | 12 | 12 | 30 | 2 | 3 |
 | `src/4EE50.c` | 16 | 16 | 22 | 7 | 1 |
-| `src/fragments/17/fragment17_11B210.c` | 9 | 9 | 30 | 5 | 2 |
 | `src/fragments/31/fragment31_179030.c` | 9 | 9 | 27 | 10 | 0 |
 | `src/fragments/38/fragment38_1D5610.c` | 12 | 12 | 30 | 4 | 0 |
 | `src/9E00.c` | 13 | 13 | 4 | 28 | 0 |
@@ -210,6 +210,7 @@ In the table, `func_` and `D_/jtbl_` count the distinct placeholder names that f
 | `src/fragments/25/fragment25_15CBC0.c` | 13 | 13 | 14 | 4 | 0 |
 | `src/fragments/67/fragment67_33CB20.c` | 8 | 8 | 16 | 4 | 3 |
 | `src/fragments/79/fragment79_3D4DA0.c` | 6 | 6 | 17 | 8 | 0 |
+| `src/226C0.c` | 5 | 5 | 16 | 9 | 0 |
 | `src/4AC10.c` | 13 | 13 | 10 | 7 | 0 |
 | `src/67F00.c` | 6 | 6 | 17 | 6 | 1 |
 | `src/fragments/31/fragment31_18F6D0.c` | 11 | 11 | 19 | 0 | 0 |
@@ -297,7 +298,6 @@ In the table, `func_` and `D_/jtbl_` count the distinct placeholder names that f
 | `src/fragments/63/fragment63_31BD80.c` | 3 | 3 | 13 | 0 | 1 |
 | `src/fragments/64/fragment64_331000.c` | 7 | 7 | 8 | 1 | 1 |
 | `src/1C2D0.c` | 5 | 5 | 10 | 1 | 0 |
-| `src/226C0.c` | 4 | 4 | 11 | 1 | 0 |
 | `src/95C0.c` | 9 | 9 | 0 | 5 | 2 |
 | `src/fragments/10/fragment10_D4C50.c` | 2 | 2 | 13 | 0 | 1 |
 | `src/fragments/24/fragment24_14FE20.c` | 2 | 2 | 12 | 2 | 0 |
