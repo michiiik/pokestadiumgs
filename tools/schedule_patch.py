@@ -331,7 +331,8 @@ def rewrite_function_hex_in_object(
             f"{function_name}: target relocation symbols are absent from the "
             f"translation unit: {', '.join(missing_symbols)}"
         )
-    relocations = obj.relocations(".rel.text")
+    has_rel_text = obj.section_index(".rel.text") is not None
+    relocations = obj.relocations(".rel.text") if has_rel_text else []
     kept = []
     for relocation in relocations:
         if start <= relocation.offset < end:
@@ -362,7 +363,8 @@ def rewrite_function_hex_in_object(
             has_subsequent_symbols = True
     updated_symbols[function_index].size = len(replacement)
     obj.set_symbols(updated_symbols)
-    obj.set_relocations(".rel.text", kept)
+    if has_rel_text:
+        obj.set_relocations(".rel.text", kept)
     if has_subsequent_symbols:
         new_text = text_section.data[:start] + replacement + text_section.data[end:]
     else:
