@@ -15,7 +15,7 @@ struct S1_unk_D_800FCED8_0000 {
     /* 0x18E */ s16 unk18E;
 };
 struct S1_unk_D_800FCED8_01598 {
-    /* 0x00 */ char unk00[0x4];
+    /* 0x00 */ u32 unk_00;
     /* 0x04 */ u32 unk_04;
 };
 struct S1_unk_D_800FCED8_0198 {
@@ -27,9 +27,7 @@ struct S1_unk_D_800FCED8 {
     /* 0x0190 */ S1_unk_D_800FCED8_190 dmaReadFunc; // AudioStream_OpenChannel's arg2 (e.g. AudioStream_DmaReadChunk)
     /* 0x0194 */ s32 dmaBaseAddr; // AudioStream_OpenChannel's arg1; base ROM offset for DMA reads
     /* 0x0198 */ S1_unk_D_800FCED8_0198 pcmBuffer; // decoded PCM ring buffer; func_80045FF0's decode destination, aliased via D_800FCEE0[i] = this+0x198
-    /* 0x1598 */ S1_unk_D_800FCED8_01598 unk_1598[1]; // compressed source-data ring, DMA'd via dmaReadFunc; declared size undersells - indexed by (dmaBytesRequested & 0xFFF) >> 3
-    /* 0x15A0 */ u32 unk_15A0;
-    /* 0x15A4 */ char unk_15A4[0xFF4];
+    /* 0x1598 */ S1_unk_D_800FCED8_01598 unk_1598[512]; // 4,096-byte compressed ring; DMA index is (dmaBytesRequested & 0xFFF) >> 3
     /* 0x2598 */ u16 chunksRemaining; // AudioStream_RefillAndDecode: decremented per decoded frame
     /* 0x259A */ u16 unk_259A; // set from unk_1598[0]'s header once per chunk; never read afterward
     /* 0x259C */ u32 chunkDwordsRemaining; // AudioStream_RefillAndDecode: decremented by 0x100 as compressed data is DMA'd
@@ -70,90 +68,58 @@ void AudioStream_OpenChannel(S1_unk_D_800FCED8* arg0, s32 arg1, S1_unk_D_800FCED
     arg0->decodeBudget = 2;
 }
 
-extern void func_800205C0(void *, void *);
+extern s32 func_800205C0(void *, void *);
+void func_8001FD50(S1_unk_D_800FCED8* channel) {
+    s32 request_bytes;
+    s32 budget;
+    u32 buffered;
 
-#pragma REWRITE_FUNCTION_HEX(func_8001FD50, 238f73e0aadf6f6c8a20d6da9fabc762316927ba0b5a522f002cada8a44992c2, 27bdffd8afbf0024afb30020afb2001cafb10018afb00014808e25d000808025809225d211c0001e248425a0000028250c000000000030250442001a820d25d08e0325c43c0100ff3421ffff1460000a240a00608e19159c8e0815a0ae0a25bc0019c40201014824a6182598ae09259c8e0325c4a619259a8e02259c246b0400ae0b25c42c41010114200003244cff0010000002ae0c259cae00259ca20025d0820d25d055a000268e1125cc820225d12413000124010002526200068e0325c410410003240100035441001d8e1125cc8e0325c48e0e25c0006e78232de10c01502000178e1125cc1460000330790fff10000007240604008e02259c2c4101011420000300023080100000012406040018c0000a001940c28e1901908e180194000848c002092821a21325d024a51598260725a00320f809030320218e1125cc8e0a25c824130001022a18232c61096050200036820c25d1820b25d1526b00058e0d25c4960c259859800030820c25d18e0d25c48e0e25c001ae78232de100255420002a820c25d11a40002724010a000221001b0000c01000184082000848c00209282124a501980c000000020020258e1925bc8e0c25cc8e1825c8960e25982401fffc001950c2259100a001415824023818232c61096025cfffffae0b25c0ae1125cca60f25981020000f2652ffff820825d131e9ffff526800048e1925c45920000a820c25d18e1925c48e0a25c0032a58232d61002554200004820c25d15e40ffdb24010a00820c25d12c6108c0566c00058fbf002414200002240d0002a20d25d18fbf00248fb000148fb100188fb2001c8fb3002003e0000827bd0028)
-#pragma REWRITE_FUNCTION_RELOC_TARGET(func_8001FD50, 0x30, 4, osRecvMesg)
-#pragma REWRITE_FUNCTION_RELOC_TARGET(func_8001FD50, 0x1a8, 4, func_800205C0)
-void func_8001FD50(S1_unk_D_800FCED8 *arg0) {
-    s32 var_a2;
-    s8 var_s2;
-    u32 var_s1;
-    u32 var_v1;
-    s8 state;
-
-    var_s2 = arg0->decodeBudget;
-    if ((arg0->dmaPending != 0) && (osRecvMesg(&arg0->dmaMsgQueue, NULL, OS_MESG_NOBLOCK) >= 0)) {
-        if (arg0->dmaBytesRequested == 0) {
-            u32 temp_t9 = *(u32 *)((u8 *)arg0 + 0x159C);
-            arg0->lastChunkOffset = 0x60;
-            arg0->chunksRemaining = temp_t9 >> 16;
-            arg0->chunkDwordsRemaining = *(u32 *)((u8 *)arg0 + 0x15A0) & 0xFFFFFF;
-            arg0->unk_259A = temp_t9;
+    // Snapshot the signed-byte limit; decrement the budget as a word.
+    budget = channel->decodeBudget;
+    if (channel->dmaPending != 0 && osRecvMesg(&channel->dmaMsgQueue, NULL, OS_MESG_NOBLOCK) >= 0) {
+        if (channel->dmaBytesRequested == 0) {
+            channel->chunksRemaining = (channel->unk_1598[0].unk_04 >> 16) & 0xFFFF;
+            channel->unk_259A = channel->unk_1598[0].unk_04 & 0xFFFF;
+            channel->chunkDwordsRemaining = channel->unk_1598[1].unk_00 & 0xFFFFFF;
+            channel->lastChunkOffset = 96;
         }
-        if (arg0->chunkDwordsRemaining >= 0x101) {
-            arg0->chunkDwordsRemaining -= 0x100;
+        channel->dmaBytesRequested += 0x400;
+        if (channel->chunkDwordsRemaining >= 257) {
+            channel->chunkDwordsRemaining -= 0x100;
         } else {
-            arg0->chunkDwordsRemaining = 0;
+            channel->chunkDwordsRemaining = 0;
         }
-        arg0->dmaBytesRequested += 0x400;
-        arg0->dmaPending = 0;
+        channel->dmaPending = 0;
     }
-
-    if (arg0->dmaPending == 0) {
-        state = arg0->state;
-        if ((state == 1) || (state == 2) || (state == 3)) {
-            u32 diff = arg0->dmaBytesRequested - arg0->dmaBytesConsumed;
-            if (diff < 0xC01) {
-                if (arg0->dmaBytesRequested == 0) {
-                    var_a2 = 0x400;
-                } else {
-                    u32 dwords = arg0->chunkDwordsRemaining;
-                    if (dwords >= 0x101) {
-                        var_a2 = 0x400;
-                    } else {
-                        var_a2 = dwords * 4;
-                    }
-                }
-                if (var_a2 > 0) {
-                    arg0->dmaPending = 1;
-                    arg0->dmaReadFunc(
-                        arg0->dmaBaseAddr + arg0->dmaBytesRequested,
-                        (S1_unk_D_800FCED8_01598 *)((u8 *)arg0 + 0x1598 + (((arg0->dmaBytesRequested & 0xFFF) >> 3) * 8)),
-                        var_a2,
-                        &arg0->dmaMsgQueue
-                    );
-                }
+    if (channel->dmaPending == 0 && (channel->state == 1 || channel->state == 2 || channel->state == 3)) {
+        if (channel->dmaBytesRequested - channel->dmaBytesConsumed < 3073) {
+            if (channel->dmaBytesRequested == 0) {
+                request_bytes = 0x400;
+            } else if (channel->chunkDwordsRemaining >= 257) {
+                request_bytes = 0x400;
+            } else {
+                request_bytes = channel->chunkDwordsRemaining * 4;
+            }
+            if (request_bytes > 0) {
+                channel->dmaPending = 1;
+                channel->dmaReadFunc(channel->dmaBaseAddr + channel->dmaBytesRequested,
+                    &channel->unk_1598[(channel->dmaBytesRequested & 0xFFF) >> 3],
+                    request_bytes, &channel->dmaMsgQueue);
             }
         }
     }
-
-    var_s1 = arg0->samplesDecoded;
-    var_v1 = var_s1 - arg0->samplesConsumed;
-    if ((var_v1 < 0x960) && ((arg0->state == 1) || (arg0->chunksRemaining > 0)) &&
-        ((arg0->dmaBytesRequested - arg0->dmaBytesConsumed) >= 0x25) && (var_s2 > 0)) {
-        do {
-            func_800205C0(arg0, (u8 *)arg0 + 0x198 + (((var_s1 % 2560) >> 2) * 8));
-            var_s1 = arg0->samplesDecoded + 0xA0;
-            var_v1 = var_s1 - arg0->samplesConsumed;
-            arg0->dmaBytesConsumed = (arg0->lastChunkOffset >> 3) & ~3;
-            arg0->samplesDecoded = var_s1;
-            arg0->chunksRemaining--;
-            var_s2--;
-            if (var_v1 >= 0x960) {
-                break;
-            }
-            if ((arg0->state != 1) && ((s16)arg0->chunksRemaining <= 0)) {
-                break;
-            }
-            if ((arg0->dmaBytesRequested - arg0->dmaBytesConsumed) < 0x25) {
-                break;
-            }
-        } while (var_s2 > 0);
+    buffered = channel->samplesDecoded - channel->samplesConsumed;
+    while (buffered < 2400 && (channel->state == 1 || channel->chunksRemaining > 0) &&
+           channel->dmaBytesRequested - channel->dmaBytesConsumed >= 37 && budget > 0) {
+        func_800205C0(channel, channel->pcmBuffer.unk_0000 + (((channel->samplesDecoded % 2560) >> 2) * 8));
+        channel->dmaBytesConsumed = (channel->lastChunkOffset >> 3) & ~3;
+        channel->samplesDecoded += 160;
+        channel->chunksRemaining--;
+        buffered = channel->samplesDecoded - channel->samplesConsumed;
+        budget--;
     }
-
-    if ((arg0->state == 1) && (var_v1 >= 0x8C0)) {
-        arg0->state = 2;
+    if (channel->state == 1 && buffered >= 2240) {
+        channel->state = 2;
     }
 }
 
