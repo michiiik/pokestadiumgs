@@ -453,7 +453,24 @@ u32 Pokemon_CalculateStat(s32 stat, s32 species, u16 stat_exp, u16 level, u16 dv
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80061940.s")
+u16 Pokemon_ClampCurrentStat(s32 stat, s32 species, u16 stat_exp, u16 level, u16 dvs, u16 current) {
+    struct {
+        u16 minimum;
+        s32 maximum;
+    } limits;
+
+    func_80063838((u8)species, (u8)stat);
+    Pokemon_GetDVForStat(stat, dvs);
+    limits.minimum = Pokemon_CalculateStat(stat, species, 0, level, dvs);
+    limits.maximum = Pokemon_CalculateStat(stat, species, stat_exp, level, dvs);
+    if (limits.maximum < current) {
+        current = limits.maximum;
+    }
+    if (current < limits.minimum) {
+        current = limits.minimum;
+    }
+    return current;
+}
 
 extern u16 Pokemon_LevelFromExp(s32, s32);
 void func_800619E8(u8 *arg0) {

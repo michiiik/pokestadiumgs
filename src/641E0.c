@@ -75,7 +75,40 @@ u8 func_80063A04(u8 arg0) { s32 index = arg0; if ((arg0 > 0) && (arg0 < 0xFC)) r
 extern u8 D_80098317[];
 u8 func_80063A48(u8 arg0) { s32 index = arg0; if ((arg0 > 0) && (arg0 < 0xFC)) return D_80098317[index * 22]; return 0; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80063A8C.s")
+extern u8 D_8009D27C[];
+u8 Pokemon_FindEvolutionMethod(u8 species, u8 target, u8 level) {
+    s32 species_index = species;
+    s32 target_index = target;
+    s32 current_level = level;
+    u8 *record;
+
+    if (species <= 0 || species >= 252) {
+        return 0;
+    }
+    if (target <= 0 || target >= 252) {
+        return 0;
+    }
+    if (level <= 0 || level >= 101) {
+        return 0;
+    }
+    record = *(u8 **)(D_8009D27C + species_index * 12);
+    if (record == NULL) {
+        return 0;
+    }
+    while (record[0] != 0) {
+        if (target_index == record[2]) {
+            if (record[0] == 1) {
+                if (current_level >= record[1]) {
+                    return 1;
+                }
+            } else {
+                return record[0];
+            }
+        }
+        record += 3;
+    }
+    return 0;
+}
 
 extern u8 D_8009D278[];
 u8 func_80063B7C(u8 arg0) { s32 index = arg0; if ((arg0 > 0) && (arg0 < 0xFC)) return D_8009D278[index * 12]; return 0; }
@@ -184,7 +217,35 @@ s32 func_80064700(s32 arg0) {
     return value & 0xFFFF;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80064728.s")
+// ModelPreview_RefreshSelection and func_8004D878 use this ID for models and icons.
+//@src/43700.c
+//@src/4CC20.c
+u16 Pokemon_GetDisplaySpecies(u8 *mon) {
+    u16 result = 252;
+
+    if (mon[0x1E] & 1) {
+        result = 253;
+    } else {
+        switch (mon[0]) {
+        case 201:
+            result = func_80064700(func_80064520(*(u16 *)(mon + 0x16)) & 0xFF);
+            break;
+        case 25:
+            if (mon[0x1E] & 2) {
+                result = 279;
+            } else {
+                result = 25;
+            }
+            break;
+        default:
+            if (mon[0] > 0 && mon[0] < 252) {
+                result = mon[0];
+            }
+            break;
+        }
+    }
+    return result;
+}
 
 extern void *D_800A5160;
 extern void *func_8004B7A4(s32);

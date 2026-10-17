@@ -339,3 +339,6 @@ func_8006249C = Deck_WriteEntries;
 func_80062808 = Pokemon_ValidateSpeciesForGbPort;
 func_80062884 = Pokemon_ValidateMovesForGbPort;
 func_80062614 = GbMail_ImportRecord;
+func_80061940 = Pokemon_ClampCurrentStat;
+func_80064728 = Pokemon_GetDisplaySpecies;
+func_80063A8C = Pokemon_FindEvolutionMethod;
