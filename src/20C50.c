@@ -35,12 +35,7 @@ typedef struct S1_AnimBlock19 {
     s16 unkD;
 } S1_AnimBlock19;
 typedef struct S1_unk_arg1_func_80045A80 {
-    s16 unk0;
-    s16 unk2;
-    s16 unk4;
-    s16 unk6;
-    s16 unk8;
-    s16 unkE;
+    s16 unk0, unk2, unk4, unk6, unk8, unkA, unkC, unkE;
 } S1_unk_arg1_func_80045A80;
 typedef struct S1_unk_arg0_func_80045A80 {
     char pad0[0x168];
@@ -78,7 +73,45 @@ void Anim_BuildTransformCurves(S1_unk_arg0_func_80045A80* arg0, S1_unk_arg1_func
 #endif
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/20C50/func_80020330.s")
+s32 func_80020330(S1_unk_arg0_func_80045A80 *arg0, S1_unk_arg1_func_80045D60 *arg1, s32 arg2) {
+    S1_unk_arg1_func_80045A80 header;
+    s16 spC8[4];
+    s16 spC0[4];
+    s16 spB8[4];
+    s16 spB0[4];
+    S1_AnimBlock19 sp48[4];
+    s32 i;
+
+    header.unk0 = ((arg1[0].unk0 & 0xF) << 2) | ((arg1[0].unk1 >> 6) & 3);
+    header.unk2 = arg1[0].unk1 & 0x3F;
+    header.unk4 = (arg1[0].unk2 >> 3) & 0x1F;
+    header.unk6 = ((arg1[0].unk2 & 7) << 2) | ((arg1[0].unk3 >> 6) & 3);
+    header.unk8 = (arg1[0].unk3 >> 2) & 0xF;
+    header.unkA = ((arg1[0].unk3 & 3) << 2) | ((arg1[0].unk4 >> 6) & 3);
+    header.unkC = (arg1[0].unk4 >> 3) & 7;
+    header.unkE = arg1[0].unk4 & 7;
+    for (i = 0; i < 4; i++) {
+        spC8[i] = (arg1[i].unk5 >> 1) & 0x7F;
+        spB8[i] = ((arg1[i].unk5 & 1) << 1) | ((arg1[i].unk6 >> 7) & 1);
+        spC0[i] = (arg1[i].unk6 >> 5) & 3;
+        spB0[i] = ((arg1[i].unk6 & 0x1F) << 1) | ((arg1[i + 1].unk0 >> 7) & 1);
+        sp48[i].xRotA = (arg1[i + 1].unk0 >> 4) & 7;
+        sp48[i].xRotB = (arg1[i + 1].unk0 >> 1) & 7;
+        sp48[i].flag0 = ((arg1[i + 1].unk0 & 1) << 2) | ((arg1[i + 1].unk1 >> 6) & 3);
+        sp48[i].yRotA = (arg1[i + 1].unk1 >> 3) & 7;
+        sp48[i].yRotB = arg1[i + 1].unk1 & 7;
+        sp48[i].flag1 = (arg1[i + 1].unk2 >> 5) & 7;
+        sp48[i].zRotA = (arg1[i + 1].unk2 >> 2) & 7;
+        sp48[i].zRotB = ((arg1[i + 1].unk2 & 3) << 1) | ((arg1[i + 1].unk3 >> 7) & 1);
+        sp48[i].flag2 = (arg1[i + 1].unk3 >> 4) & 7;
+        sp48[i].unkA = (arg1[i + 1].unk3 >> 1) & 7;
+        sp48[i].unkB = ((arg1[i + 1].unk3 & 1) << 2) | ((arg1[i + 1].unk4 >> 6) & 3);
+        sp48[i].unkC = (arg1[i + 1].unk4 >> 3) & 7;
+        sp48[i].unkD = arg1[i + 1].unk4 & 7;
+    }
+    Anim_BuildTransformCurves(arg0, &header, spC8, spB8, spC0, spB0, sp48, arg2);
+    return 0;
+}
 
 typedef struct { char pad[0x18A]; s16 unk_18A; s16 unk_18C; s16 unk_18E; } GS_DecodeInner;
 typedef struct { GS_DecodeInner unk_0000; char pad_190[0x1408]; u32 unk_1598[0x400]; char pad_2598[0x24]; u32 unk_25BC; } GS_DecodeState;
