@@ -263,11 +263,89 @@ s32 func_822071E8(s32 arg0, void *arg1)
   return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_822072D0.s")
+typedef struct Fragment17TextureHeader {
+    u16 width;
+    u16 height;
+    u8 format;
+    u8 size;
+    u8 unk_06[2];
+} Fragment17TextureHeader;
+typedef struct Fragment17TextureRecord {
+    u8 unk_00[364];
+    Fragment17TextureHeader *texture;
+    s16 tile_count;
+    s16 tile_height;
+} Fragment17TextureRecord;
+extern Fragment17TextureRecord D_8220F9D8[];
+extern Fragment17TextureRecord D_8220FFA8[];
+extern s16 D_8220DAAA[];
+extern s16 D_8220DAEE[];
+extern s16 D_8220DAC8[][2];
+extern s16 D_8220DB0C[][2];
+extern s32 func_8004C990(s32, s32);
+extern u8 *func_8004CA60(u8 *);
+extern void func_82206BA4(s32, s32, s32, s32, u8 *, s32, s32, s32, s32, s32);
+extern void func_8003CD84(void);
+
+s32 func_822072D0(s32 mode, void *node) {
+    s32 index = *(s32 *)((u8 *)node + 20);
+    s32 offset = index * 4;
+    s32 asset = *(s16 *)((u8 *)D_8220DAAA + offset);
+    Fragment17TextureRecord *record;
+    Fragment17TextureHeader *texture;
+    u8 *pixels;
+
+    switch (mode) {
+    case 0:
+        record = &D_8220F9D8[index];
+        record->texture = (Fragment17TextureHeader *)func_8004C990(1, asset);
+        record->tile_height = func_82206B64(record->texture->width);
+        record->tile_count = func_822047BC(record->texture->height, record->tile_height);
+        break;
+    case 5:
+        record = &D_8220F9D8[index];
+        texture = record->texture;
+        pixels = func_8004CA60((u8 *)texture);
+        func_82206BA4(((s16 *)((s32)D_8220DAC8 + offset))[0],
+                     ((s16 *)((s32)D_8220DAC8 + offset))[1],
+                     texture->width, texture->height, pixels, texture->format,
+                     texture->size, record->tile_height, record->tile_count, 1);
+        func_8003CD84();
+        break;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82207414.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_822075D0.s")
+s32 func_822075D0(s32 mode, void *node) {
+    s32 index = *(s32 *)((u8 *)node + 20);
+    s32 offset = index * 4;
+    s32 asset = *(s16 *)((u8 *)D_8220DAEE + offset);
+    Fragment17TextureRecord *record;
+    Fragment17TextureHeader *texture;
+    u8 *pixels;
+
+    switch (mode) {
+    case 0:
+        record = &D_8220FFA8[index];
+        record->texture = (Fragment17TextureHeader *)func_8004C990(1, asset);
+        record->tile_height = func_82206B64(record->texture->width);
+        record->tile_count = func_822047BC(record->texture->height, record->tile_height);
+        break;
+    case 5:
+        record = &D_8220FFA8[index];
+        texture = record->texture;
+        pixels = func_8004CA60((u8 *)texture);
+        func_82206BA4(((s16 *)((s32)D_8220DB0C + offset))[0],
+                     ((s16 *)((s32)D_8220DB0C + offset))[1],
+                     texture->width, texture->height, pixels, texture->format,
+                     texture->size, record->tile_height, record->tile_count, 1);
+        func_8003CD84();
+        break;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82207714.s")
 
