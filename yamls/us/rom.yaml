@@ -686,6 +686,8 @@
     - [0x121100, c,       fragments/19/fragment19_121100]
     - [0x124E40, c,       fragments/19/fragment19_124E40]
     - [0x126B50, data,    fragments/19/fragment19_data]
+    - [0x126DF0, .rodata, fragments/19/fragment19_121100] # jtbl_82305D10 and jtbl_82305D30
+    - [0x126E30, rodata,  fragments/19/fragment19_tail]
   
   - name: fragment20
     type: code

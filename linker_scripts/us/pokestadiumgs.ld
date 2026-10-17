@@ -1666,6 +1666,7 @@ SECTIONS
         build/asm/us/data/fragments/19/fragment19_header.o(.rodata);
         build/src/fragments/19/fragment19_121100.o(.rodata);
         build/src/fragments/19/fragment19_124E40.o(.rodata);
+        build/asm/us/data/fragments/19/fragment19_tail.rodata.o(.rodata);
         fragment19_RODATA_END = .;
         fragment19_RODATA_SIZE = ABSOLUTE(fragment19_RODATA_END - fragment19_RODATA_START);
     }
