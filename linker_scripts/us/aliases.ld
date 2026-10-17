@@ -302,3 +302,7 @@ func_800354B4 = Audio_SetModeBlocking;
 func_800266F8 = Audio_GetEventConfigIndex;
 func_800262F0 = Audio_ResetCategoryState;
 func_80026C80 = Audio_ProcessChannelEvent;
+func_8003691C = MtxF_SetOrthonormalBasis;
+func_80035FFC = MtxF_SetRotationTranslation;
+func_8003614C = MtxF_SetRotationTranslationF;
+func_80036284 = MtxF_SetRotationAndTransformTranslation;
