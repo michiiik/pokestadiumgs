@@ -327,3 +327,7 @@ func_80042C68 = ModelPreview_Create;
 func_80042D8C = ModelPreview_RefreshSelection;
 func_80042EB8 = ModelPreview_SetSelection;
 func_800430B4 = ModelPreview_ApplyEditControls;
+func_8006179C = Pokemon_GetDVForStat;
+func_8006183C = Pokemon_CalculateStat;
+func_80061ADC = Pokemon_StatExpForTarget;
+func_80061ED0 = Pokemon_LevelFromExp;
