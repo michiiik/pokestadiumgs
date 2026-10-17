@@ -266,7 +266,7 @@ void func_80061248(u8 *arg0, u8 *arg1) {
     arg0[0x24] = 0;
 }
 
-extern s16 func_8006183C(s32, s32, s32, s32, s32);
+extern u32 Pokemon_CalculateStat(s32, s32, u16, u16, u16);
 void func_800612B8(u8 *arg0, u8 *arg1) {
     func_80060FF8(arg0, arg1);
     arg0[0x1D] = arg1[0x21];
@@ -275,8 +275,8 @@ void func_800612B8(u8 *arg0, u8 *arg1) {
     *(u16 *)(arg0 + 0x2A) = func_80060A4C(arg1 + 0x24);
     *(u16 *)(arg0 + 0x2C) = func_80060A4C(arg1 + 0x26);
     *(u16 *)(arg0 + 0x2E) = func_80060A4C(arg1 + 0x28);
-    *(u16 *)(arg0 + 0x30) = func_8006183C(4, arg0[0], *(u16 *)(arg0 + 0x14), arg0[0x1D], *(u16 *)(arg0 + 0x16));
-    *(u16 *)(arg0 + 0x32) = func_8006183C(5, arg0[0], *(u16 *)(arg0 + 0x14), arg0[0x1D], *(u16 *)(arg0 + 0x16));
+    *(u16 *)(arg0 + 0x30) = Pokemon_CalculateStat(4, arg0[0], *(u16 *)(arg0 + 0x14), arg0[0x1D], *(u16 *)(arg0 + 0x16));
+    *(u16 *)(arg0 + 0x32) = Pokemon_CalculateStat(5, arg0[0], *(u16 *)(arg0 + 0x14), arg0[0x1D], *(u16 *)(arg0 + 0x16));
 }
 
 void func_8006136C(u8 *arg0, u8 *arg1) {
@@ -347,7 +347,7 @@ void func_8006162C(u8 *arg0, u8 *arg1) {
     func_80060A84(arg0 + 0x24, *(u16 *)(arg1 + 0x2A));
     func_80060A84(arg0 + 0x26, *(u16 *)(arg1 + 0x2C));
     func_80060A84(arg0 + 0x28, *(u16 *)(arg1 + 0x2E));
-    func_80060A84(arg0 + 0x2A, func_8006183C(6, arg1[0], *(u16 *)(arg1 + 0x14), arg1[0x1D], *(u16 *)(arg1 + 0x16)));
+    func_80060A84(arg0 + 0x2A, Pokemon_CalculateStat(6, arg1[0], *(u16 *)(arg1 + 0x14), arg1[0x1D], *(u16 *)(arg1 + 0x16)));
 }
 
 void func_800616BC(u8 *arg0, u8 *arg1) {
@@ -367,26 +367,76 @@ void func_800616BC(u8 *arg0, u8 *arg1) {
 
 u16 StatExpSqrt(u16 arg0) { u16 i; for (i = 1; i < 255; i++) { if ((i * i) >= arg0) break; } return i; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_8006179C.s")
+u16 Pokemon_GetDVForStat(s32 stat, u16 dvs) {
+    //!bug: stat values outside 0..6 leave result uninitialized.
+    u16 result;
+    switch (stat) {
+    case 0:
+        result = ((dvs & 0x1000) >> 9) | ((dvs & 0x100) >> 6) | ((dvs & 0x10) >> 3) | (dvs & 1);
+        break;
+    case 1:
+        result = (dvs >> 12) & 0xF;
+        break;
+    case 2:
+        result = (dvs >> 8) & 0xF;
+        break;
+    case 3:
+        result = (dvs >> 4) & 0xF;
+        break;
+    case 4:
+    case 5:
+    case 6:
+        result = dvs & 0xF;
+        break;
+    }
+    return result;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_8006183C.s")
+extern u8 func_80063838(u8, u8);
+u32 Pokemon_CalculateStat(s32 stat, s32 species, u16 stat_exp, u16 level, u16 dvs) {
+    u16 result;
+    u16 base;
+    u16 dv;
+    s32 effort;
+    base = func_80063838((u8)species, (u8)stat);
+    dv = Pokemon_GetDVForStat(stat, dvs);
+    effort = StatExpSqrt(stat_exp);
+    if (stat == 0) {
+        result = (((effort / 4) + (base + dv) * 2) * level) / 100;
+        result += level + 10;
+    } else {
+        result = ((((effort / 4) + (base + dv) * 2) * level) / 100) + 5;
+    }
+    if (result >= 1000) {
+        result = 999;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80061940.s")
 
-extern u8 func_80061ED0(u8, s32);
+extern u16 Pokemon_LevelFromExp(s32, s32);
 void func_800619E8(u8 *arg0) {
-    u8 value;
-    value = func_80061ED0(arg0[0], *(s32 *)(arg0 + 8));
-    arg0[0x1D] = value;
-    *(u16 *)(arg0 + 0x28) = func_8006183C(0, (s32)arg0[0], (s32)*(u16 *)(arg0 + 0xC), value & 0xFF, (s32)*(u16 *)(arg0 + 0x16));
-    *(u16 *)(arg0 + 0x2A) = func_8006183C(1, (s32)arg0[0], (s32)*(u16 *)(arg0 + 0xE), (s32)arg0[0x1D], (s32)*(u16 *)(arg0 + 0x16));
-    *(u16 *)(arg0 + 0x2C) = func_8006183C(2, (s32)arg0[0], (s32)*(u16 *)(arg0 + 0x10), (s32)arg0[0x1D], (s32)*(u16 *)(arg0 + 0x16));
-    *(u16 *)(arg0 + 0x2E) = func_8006183C(3, (s32)arg0[0], (s32)*(u16 *)(arg0 + 0x12), (s32)arg0[0x1D], (s32)*(u16 *)(arg0 + 0x16));
-    *(u16 *)(arg0 + 0x30) = func_8006183C(4, (s32)arg0[0], (s32)*(u16 *)(arg0 + 0x14), (s32)arg0[0x1D], (s32)*(u16 *)(arg0 + 0x16));
-    *(u16 *)(arg0 + 0x32) = func_8006183C(5, (s32)arg0[0], (s32)*(u16 *)(arg0 + 0x14), (s32)arg0[0x1D], (s32)*(u16 *)(arg0 + 0x16));
+    arg0[0x1D] = Pokemon_LevelFromExp(arg0[0], *(s32 *)(arg0 + 8));
+    *(u16 *)(arg0 + 0x28) = Pokemon_CalculateStat(0, (s32)arg0[0], (s32)*(u16 *)(arg0 + 0xC), arg0[0x1D], (s32)*(u16 *)(arg0 + 0x16));
+    *(u16 *)(arg0 + 0x2A) = Pokemon_CalculateStat(1, (s32)arg0[0], (s32)*(u16 *)(arg0 + 0xE), (s32)arg0[0x1D], (s32)*(u16 *)(arg0 + 0x16));
+    *(u16 *)(arg0 + 0x2C) = Pokemon_CalculateStat(2, (s32)arg0[0], (s32)*(u16 *)(arg0 + 0x10), (s32)arg0[0x1D], (s32)*(u16 *)(arg0 + 0x16));
+    *(u16 *)(arg0 + 0x2E) = Pokemon_CalculateStat(3, (s32)arg0[0], (s32)*(u16 *)(arg0 + 0x12), (s32)arg0[0x1D], (s32)*(u16 *)(arg0 + 0x16));
+    *(u16 *)(arg0 + 0x30) = Pokemon_CalculateStat(4, (s32)arg0[0], (s32)*(u16 *)(arg0 + 0x14), (s32)arg0[0x1D], (s32)*(u16 *)(arg0 + 0x16));
+    *(u16 *)(arg0 + 0x32) = Pokemon_CalculateStat(5, (s32)arg0[0], (s32)*(u16 *)(arg0 + 0x14), (s32)arg0[0x1D], (s32)*(u16 *)(arg0 + 0x16));
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80061ADC.s")
+u16 Pokemon_StatExpForTarget(s32 stat, s32 species, u16 target, u16 level, u16 dvs) {
+    s32 i;
+    s32 value;
+    for (i = 1; i < 0xFFFF; i += 2) {
+        value = Pokemon_CalculateStat(stat, species, (u16)(i + 2), level, dvs);
+        if (target < value) {
+            break;
+        }
+    }
+    return i;
+}
 
 extern u8 func_80063A04(u8);
 s32 func_80061B88(s32 arg0, u16 arg1) {
@@ -406,7 +456,15 @@ s32 func_80061B88(s32 arg0, u16 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80061D8C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80061ED0.s")
+u16 Pokemon_LevelFromExp(s32 species, s32 experience) {
+    s32 i;
+    for (i = 2; i < 100; i++) {
+        if ((u32)experience < (u32)func_80061B88(species, (u16)(i + 1))) {
+            break;
+        }
+    }
+    return i;
+}
 
 extern u8 func_80062EB0(u8, u8);
 void func_80061F44(u8 *arg0) {
