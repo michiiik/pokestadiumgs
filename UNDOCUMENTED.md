@@ -3,9 +3,9 @@
 # Undocumented code
 
 <!-- AUTO_UNDOCUMENTED:START -->
-- Functions defined in `src/` with a `/* ... */` comment: **11 / 6,552 (0.2%)**
+- Functions defined in `src/` with a `/* ... */` comment: **11 / 6,554 (0.2%)**
 - Functions with a real name: **1,082 / 10,901 (9.9%)** (9,819 still `func_XXXXXXXX`)
-- Variables with a real name: **248 / 3,742 (6.6%)** (3,494 still `D_XXXXXXXX` / `jtbl_XXXXXXXX`)
+- Variables with a real name: **248 / 3,748 (6.6%)** (3,500 still `D_XXXXXXXX` / `jtbl_XXXXXXXX`)
 - Functions still using m2c `temp_*` / `var_*` locals: **785**
 <!-- AUTO_UNDOCUMENTED:END -->
 
@@ -37,10 +37,10 @@ In the table, `func_` and `D_/jtbl_` count the distinct placeholder names that f
 | `src/fragments/67/fragment67_344D70.c` | 59 | 59 | 105 | 45 | 5 |
 | `src/fragments/45/fragment45_2251A0.c` | 43 | 43 | 102 | 53 | 8 |
 | `src/fragments/13/fragment13_EEC50.c` | 67 | 67 | 86 | 46 | 6 |
+| `src/fragments/17/fragment17_113A60.c` | 40 | 40 | 101 | 56 | 8 |
 | `src/fragments/79/fragment79_3C60B0.c` | 88 | 88 | 98 | 16 | 0 |
 | `src/fragments/24/fragment24_150C10.c` | 43 | 42 | 114 | 30 | 13 |
 | `src/fragments/63/fragment63_317060.c` | 53 | 53 | 104 | 32 | 7 |
-| `src/fragments/17/fragment17_113A60.c` | 38 | 38 | 98 | 50 | 8 |
 | `src/fragments/14/fragment14_FF070.c` | 59 | 58 | 113 | 11 | 9 |
 | `src/fragments/47/fragment47_246640.c` | 46 | 46 | 103 | 32 | 5 |
 | `src/fragments/53/fragment53_code.c` | 28 | 27 | 88 | 65 | 4 |
