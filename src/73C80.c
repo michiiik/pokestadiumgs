@@ -59,63 +59,48 @@ void func_800730BC(WholeCopyDestination1128 *arg0, WholeCopySource2200 *arg1) {
     arg0->config = *arg1->config;
 }
 
-extern void func_80051830(u8 *, u8 *);
-extern void func_80060E48(u8 *, u8 *);
+extern void func_80051830(void *, void *);
+extern void func_80060E48(void *, void *);
+void func_80073208(u8 *arg0, u8 *arg1) {
+    s32 side;
+    s32 filled;
+    u32 selected;
+    // Selected pass: destination address. Fill pass: source slot index.
+    s32 address_or_index;
+    u8 mask;
+    for (side = 0; side != 2; side++) {
+        mask = 0;
+        (arg0 + side * 1248)[2] = 1;
+        (arg0 + side * 1248)[3] = 3;
+        (arg0 + side * 1248)[7] = 6;
+        (arg0 + side * 1248)[8] = 3;
+        (arg0 + side * 1248)[10] = 0;
+        (arg0 + side * 1248)[4] = side;
+        (arg0 + side * 1248)[5] = side;
+        filled = 0;
+        for (; filled != 3; filled++) {
+            address_or_index = (s32)((arg0 + side * 1248) + 24 + filled * 88);
+            selected = (arg1 + side * 476)[0x1D4 + filled];
+            func_80051830((void *)address_or_index, (u32 *)(arg1 + side * 476) + selected * 15 + 10);
+            mask |= 1 << selected;
+        }
+        while (filled < 6) {
+            for (address_or_index = 0; address_or_index != 6; address_or_index++) {
+                if (!(mask & (1U << address_or_index))) {
+                    func_80051830((arg0 + side * 1248) + 24 + filled * 88, (u32 *)(arg1 + side * 476) + address_or_index * 15 + 10);
+                    mask |= (1U << address_or_index);
+                    break;
+                }
+            }
+            filled++;
+        }
+        func_80060E48(arg0 + side * 1248 + 0x48C, (arg1 + side * 476));
+    }
+}
 
 typedef struct Copy73394 {
     s32 words[17];
 } Copy73394;
-
-#pragma REWRITE_FUNCTION_HEX(func_80073208, 83819aedca1413d52b9987cc85681de530dc7ec58764ab4db12a0a17efe12ead, 27bdff90afbe0038afb70034afb60030afb20020248e048cafbf003cafb5002cafb40028afb30024afb1001cafb00018afae00402412000600a0b0250080b825241e003cafa0006c8fa2006c24060003240f0001241800060000a825a2ef0002a2e60003a2f80007a2e60008a2e0000a0000982526f4001802c08025a2e20004a2e20005921101d402802025023e00190000c81202d928210c00000024a500282408000102284804267300582401010802a9a82526940058261000011661fff132b500ff2a610210102000170000102502a08825240a0001004a8004023058241560000a0002610001826023000c608002cc282124a500280c000000028020250230a8251000000432b500ff244200015452fff1240a0001267300582a6102101420ffea269400588fa400400c00000002c028258fad006c8faf00402401000225ae000125f804e0afb80040afae006c26f704e015c1ffbc26d601dc8fbf003c8fb000188fb1001c8fb200208fb300248fb400288fb5002c8fb600308fb700348fbe003803e0000827bd0070)
-#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80073208, 0x98, 4, func_80051830)
-#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80073208, 0xf8, 4, func_80051830)
-#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80073208, 0x12c, 4, func_80060E48)
-void func_80073208(u8 *arg0, u8 *arg1) {
-    s32 side;
-    s32 i;
-    u8 *dst;
-    u8 *src;
-    u8 *entry;
-    u8 mask;
-    s32 slot;
-
-    dst = arg0;
-    src = arg1;
-
-    for (side = 0; side < 2; side++) {
-        dst[2] = 1;
-        dst[3] = 3;
-        dst[7] = 6;
-        dst[8] = 3;
-        dst[0xA] = 0;
-        dst[4] = side;
-        dst[5] = side;
-
-        mask = 0;
-        entry = dst + 0x18;
-        for (i = 0; i < 3; i++) {
-            u8 pokemonIndex = src[0x1D4 + i];
-            func_80051830(entry, src + pokemonIndex * 0x3C + 0x28);
-            mask |= (1 << pokemonIndex);
-            entry += 0x58;
-        }
-
-        for (slot = 0; slot < 6; slot++) {
-            if (!(mask & (1 << slot))) {
-                func_80051830(entry, src + slot * 0x3C + 0x28);
-                mask |= (1 << slot);
-                entry += 0x58;
-                if (entry >= dst + 0x18 + 6 * 0x58) {
-                    break;
-                }
-            }
-        }
-
-        func_80060E48(dst + 0x48C, src);
-        dst += 0x4E0;
-        src += 0x1DC;
-    }
-}
 
 void func_80073394(u8 *arg0, u8 *arg1, u8 arg2, u8 arg3) {
     u8 *src;
