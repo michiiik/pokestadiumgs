@@ -11,47 +11,60 @@ void func_80073080(u8 *arg0, u8 arg1, u8 arg2, u8 arg3, u8 arg4) {
     temp_v0[0x1D6] = arg4;
 }
 
-extern void func_80060EC8(u8 *, u8 *);
-extern void func_80051864(u8 *, u8 *);
+extern u8 *func_80060EC8(void *, void *);
+extern void func_80051864(s32, s32);
+typedef struct RosterCopy730BC { s32 words[17]; } RosterCopy730BC;
+typedef struct { u32 words[22]; } WholeCopySource88;
+typedef struct { u32 words[15]; } WholeCopyDestination60;
+typedef struct {
+    u8 unk_00[11];
+    u8 unk_0B;
+    u8 unk_0C;
+    u8 unk_0D[23];
+    u16 unk_24;
+    u8 unk_26[2];
+    WholeCopyDestination60 entries[6];
+    u8 unk_190[76];
+} WholeCopyDestination476;
+typedef struct {
+    WholeCopyDestination476 sides[2];
+    u8 unk_3B8[108];
+    RosterCopy730BC config;
+} WholeCopyDestination1128;
+typedef struct {
+    WholeCopySource88 entries[2][6];
+    u8 unk_420[1060];
+    RosterCopy730BC *config;
+    u8 unk_848[8];
+    u8 names[2][12];
+    u8 unk_868[24];
+    s16 signed_fields[2][2];
+    u8 unk_888[12];
+    u16 side_fields[2];
+} WholeCopySource2200;
+typedef char WholeCopySourceSizeCheck[sizeof(WholeCopySource2200)==2200?1:-1];
+typedef char WholeCopyDestinationSizeCheck[sizeof(WholeCopyDestination1128)==1128?1:-1];
+void func_800730BC(WholeCopyDestination1128 *arg0, WholeCopySource2200 *arg1) {
+    s32 side;
+    s32 slot;
+    for (side = 0; side != 2; side++) {
+        func_80060EC8(&arg0->sides[side], arg1->names[side]);
+        for (slot = 0; slot != 6; slot++) {
+            func_80051864((s32)&arg1->entries[side][slot], (s32)&arg0->sides[side].entries[slot]);
+        }
+        arg0->sides[side].unk_0B = arg1->signed_fields[side][0];
+        arg0->sides[side].unk_0C = arg1->signed_fields[side][1];
+        arg0->sides[side].unk_24 = arg1->side_fields[side];
+    }
+    arg0->config = *arg1->config;
+}
+
 extern void func_80051830(u8 *, u8 *);
 extern void func_80060E48(u8 *, u8 *);
 
 typedef struct Copy73394 {
     s32 words[17];
 } Copy73394;
-
-#pragma REWRITE_FUNCTION_HEX(func_800730BC, cf29fdedc98f1f9dccf687921859eb3733604d6e3275004efc46e7cfcf40e3a3, 27bdff90afbe0038afb70034afb60030afb5002cafb40028afb30024afbf003cafb20020afb1001cafb00018241301680080a02500a0a8250000b02524b7085000a0f025afa40050afa50040afa50074afa40070028020250c00000002e028258fb2005003c080250000882526520028020020250c000000024028252631003c261000581633fffa2652003c86ae08808fa2004026d6000ca28e000b86af08822401001824420002a28f000c94580892269401dc26f7000ca698fe488fb90050afa2004027de0210272801dcafa8005016c1ffe026b500048faa00748fa900708d4b0844256e003c8d6d0000256b000c2529000cad2d04188d6cfff8ad2c041c8d6dfffc156efff8ad2d04208d6d0000ad2d04248d6c0004ad2c04288fbf003c8fbe00388fb700348fb600308fb5002c8fb400288fb300248fb200208fb1001c8fb0001803e0000827bd0070)
-#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800730BC, 0x58, 4, func_80060EC8)
-#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800730BC, 0x74, 4, func_80051864)
-void func_800730BC(u8 *arg0, u8 *arg1) {
-    s32 i;
-    s32 j;
-    u8 *dst;
-    u8 *src;
-    u8 *s7;
-    u8 *fp;
-
-    dst = arg0;
-    src = arg1;
-    s7 = arg1 + 0x850;
-    fp = arg1;
-
-    for (i = 0; i < 2; i++) {
-        func_80060EC8(dst, s7);
-        for (j = 0; j < 6; j++) {
-            func_80051864(fp + j * 0x58, dst + 0x28 + j * 0x3C);
-        }
-        dst[0xB] = *(s16 *)(src + 0x880);
-        dst[0xC] = *(s16 *)(src + 0x882);
-        *(u16 *)(dst + 0x24) = *(u16 *)(src + 0x894);
-        dst += 0x1DC;
-        s7 += 0xC;
-        fp += 0x210;
-        src += 4;
-    }
-
-    *(Copy73394 *)(arg0 + 0x424) = **(Copy73394 **)(arg1 + 0x844);
-}
 
 #pragma REWRITE_FUNCTION_HEX(func_80073208, 83819aedca1413d52b9987cc85681de530dc7ec58764ab4db12a0a17efe12ead, 27bdff90afbe0038afb70034afb60030afb20020248e048cafbf003cafb5002cafb40028afb30024afb1001cafb00018afae00402412000600a0b0250080b825241e003cafa0006c8fa2006c24060003240f0001241800060000a825a2ef0002a2e60003a2f80007a2e60008a2e0000a0000982526f4001802c08025a2e20004a2e20005921101d402802025023e00190000c81202d928210c00000024a500282408000102284804267300582401010802a9a82526940058261000011661fff132b500ff2a610210102000170000102502a08825240a0001004a8004023058241560000a0002610001826023000c608002cc282124a500280c000000028020250230a8251000000432b500ff244200015452fff1240a0001267300582a6102101420ffea269400588fa400400c00000002c028258fad006c8faf00402401000225ae000125f804e0afb80040afae006c26f704e015c1ffbc26d601dc8fbf003c8fb000188fb1001c8fb200208fb300248fb400288fb5002c8fb600308fb700348fbe003803e0000827bd0070)
 #pragma REWRITE_FUNCTION_RELOC_TARGET(func_80073208, 0x98, 4, func_80051830)
