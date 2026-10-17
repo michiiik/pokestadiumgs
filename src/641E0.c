@@ -3,8 +3,10 @@
 
 #ifdef VERSION_US
 extern s32 func_8004C874(s32, s32);
-extern void *D_800A5150;
-extern void *D_800A5154;
+/* Original read-only fallback records, including their measured zero words. */
+const u32 D_800A5150[] = { 0 };
+const u32 D_800A5154[] = { 0, 0, 0 };
+const u32 D_800A5160[] = { 0 };
 s32 *func_800635E0(u8 arg0) {
     s32 *temp_v0;
     s32 *var_v1;
@@ -61,7 +63,38 @@ u8 func_800637C0(u8 arg0) { s32 index = arg0; if ((arg0 > 0) && (arg0 < 0xFC)) r
 extern u8 D_80099E03[];
 u8 func_80063804(u8 arg0) { s32 index = arg0; if ((arg0 > 0) || (arg0 < 0xFC)) return D_80099E03[index]; return 0; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80063838.s")
+extern u8 D_8009830B[];
+extern u8 D_8009830C[];
+extern u8 D_8009830D[];
+extern u8 D_8009830E[];
+extern u8 D_8009830F[];
+extern u8 D_80098310[];
+extern u8 D_800998AB[];
+u8 Pokemon_GetBaseStat(u8 species, u8 stat) {
+    s32 index = species;
+    if (species > 0 && species < 252) {
+        switch (stat) {
+        case 0:
+            return D_8009830B[index * 22];
+        case 1:
+            return D_8009830C[index * 22];
+        case 2:
+            return D_8009830D[index * 22];
+        case 3:
+            return D_8009830E[index * 22];
+        case 4:
+            return D_8009830F[index * 22];
+        case 5:
+            return D_80098310[index * 22];
+        case 6:
+            if (index < 152) {
+                return D_800998AB[index * 9];
+            }
+            break;
+        }
+    }
+    return 0;
+}
 
 extern u8 D_80098311[];
 u8 func_8006397C(u8 arg0) { s32 index = arg0; if ((arg0 > 0) && (arg0 < 0xFC)) return D_80098311[index * 22]; return 0; }
@@ -231,7 +264,23 @@ s32 func_800640B4(u8 arg0, u8 arg1, u8 arg2) {
     return func_80063F4C(arg0, arg1, arg2, 4, 1) != 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_800640F8.s")
+s32 Pokemon_GetMoveLearnLevelForVersion(u8 version, u8 species, u8 move, u8 level) {
+    switch (version) {
+    case 1:
+    case 2:
+    case 3:
+        return func_80063F4C(species, move, level, 1, 0);
+    case 4:
+        return func_80063F4C(species, move, level, 2, 0);
+    case 5:
+    case 6:
+        return func_80063F4C(species, move, level, 4, 0);
+    case 7:
+        return func_80063F4C(species, move, level, 8, 0);
+    default:
+        return 0;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_800641CC.s")
 
@@ -314,7 +363,6 @@ u16 Pokemon_GetDisplaySpecies(u8 *mon) {
     return result;
 }
 
-extern void *D_800A5160;
 extern void *func_8004B7A4(s32);
 s32 func_800647C8(u8 arg0) {
     void *v;
