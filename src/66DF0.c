@@ -2,5 +2,311 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/66DF0/func_800661F0.s")
+extern u32 D_8009DED0[];
+extern void _bzero(void *, s32);
+extern void main_pool_push_state(u32);
+extern void *BattleScene_ResetParticipantModelFlags(s32);
+extern void func_8006A1FC(void *);
+extern void func_8006A3B8(s32);
+extern void func_8006ACCC(s32);
+extern void Audio_SetModeBlocking(s32, s32, s32);
+extern void func_800355E4(s32);
+extern void Fragment_Load(s32, void *, void *);
+extern s32 Fragment_LoadAndCall(s32, void *, void *, s32, void *);
+extern void func_8006A444(s32);
+extern void func_8006A400(s32);
+extern void func_8006A3E0(void);
+extern s32 func_8006A424(void);
+extern s32 func_8006A388(void);
+extern void func_8006AB8C(s32, s32, s32);
+extern void func_8006AC4C(s32);
+extern void func_8006ABD8(void *);
+extern void func_8006AC28(s32);
+extern void func_8006AE90(s32);
+extern s32 func_8006C58C(void);
+extern void func_8006B0B8(void);
+extern s32 func_8006BAC4(void);
+extern void func_8006AEB4(void);
+extern s32 func_80026938(s32);
+extern s32 func_8006C664(void);
+extern s32 func_8006C644(void);
+extern void main_pool_pop_state(u32);
+extern void Game_SetState(s32);
+
+extern u8 D_8AC00000[];
+extern u8 D_8AF00000[];
+extern u8 D_82600000[];
+extern u8 D_84200000[];
+extern u8 D_81600000[];
+extern u8 D_81400000[];
+extern u8 D_81100000[];
+extern u8 D_84100000[];
+extern u8 D_87F00000[];
+extern u8 D_8AB00000[];
+
+extern u8 fragment43_ROM_START[];
+extern u8 fragment44_ROM_START[];
+extern u8 fragment45_ROM_START[];
+extern u8 fragment46_ROM_START[];
+extern u8 fragment20_ROM_START[];
+extern u8 fragment21_ROM_START[];
+extern u8 fragment80_ROM_START[];
+extern u8 fragment81_ROM_START[];
+extern u8 fragment11_ROM_START[];
+extern u8 fragment12_ROM_START[];
+extern u8 fragment13_ROM_START[];
+extern u8 fragment27_ROM_START[];
+extern u8 fragment28_ROM_START[];
+extern u8 fragment79_ROM_START[];
+extern u8 fragment64_ROM_START[];
+extern u8 fragment65_ROM_START[];
+
+#pragma REWRITE_SECTION_WORD(.rodata, 0x0, 0xe4, 0xe0)
+#pragma REWRITE_SECTION_WORD(.rodata, 0xc, 0x31c, 0x318)
+#pragma REWRITE_SECTION_WORD(.rodata, 0x10, 0x3bc, 0x3b8)
+#pragma REWRITE_SECTION_WORD(.rodata, 0x14, 0x418, 0x414)
+
+#pragma REWRITE_FUNCTION_HEX(func_800661F0, 4389a4bb568edc0852443d4c8f016b652b9a415cd8ea4bc514bca4abc3d6acb8, 27bdff503c0f0000afbf0044afbe0040afb7003cafb60038afb50034afb40030afb3002cafb20028afb10024afb0002025ef00008df900008df8000427ae0060add90000add800048df8000c8df9000827b00070241300010000b0250200202524050024add8000c0c000000add900083c04706d0c000000348470630c000000000020250040a0250c000000020020250c000000240404000c000000240400013c1e706d37de6c70241700013c150ff003c020250c000000026080252608ffff2d010006102000f7000840803c010000002808218c28000001000008000000003c0900003c0a0000254a000025290000013580240155882400118d02001085022610fff02631fff024040004000028250c000000000030250c000000240400073c0500003c06000024c6000024a500000c000000020020258e8b00303c0500003c06000024c6000024a500000220202502c038250c000000afab0010105700072413000224010002104100202413000600009825100000cb0000b025241600010c0000002404000c8e8c0030918400000c000000248400190c000000000000000c0000003051ffff0c000000004080253224ffff020028250c000000004030258e8d00300c00000091a400010c00000027a400600c000000000020250c0000002404001b100000af00000000100000ad2416000224040009000028250c000000000030250c00000000000000104000a53c0e000025ce00008e8f002c01d52024000425023c0500003c06000024c6000024a500002484fff024070001241300030c000000afaf00100c0000000000000010000094000000000c0000000000000010400090004080253c1800003c1900003c0800002508000027390000271800000315202403358824011590240012950200118d02000425023c0500003c06000024c6000024a500002484fff02631fff00c0000002652fff03c0500003c06000024c6000024a500000c000000022020253c0500003c06000024c6000024a5000002402025000038250c000000afb00010505700068e8a00308e8900302413000110000068a13700028e8a00302413000410000064a14000023c0b00003c0c0000258c0000256b0000017580240195882400118d02001085022610fff02631fff00c000000241300050c0000003044ffff24040008240500120c000000000030250c0000002404005a3c0500003c06000024c6000024a500000c000000020020250c000000000000000c000000004080253c0500003c06000024c6000024a5000002202025020038250c000000afa200101000003c000000002404000a000028250c000000000030250c00000000000000104000343c0d000025ad00008e8e002c01b52024000425023c0500003c06000024c6000024a500002484fff024070002241300010c000000afae001010000025000000003c0f00003c1800003c190000273900002718000025ef000001f52024031580240335882400118d0200108502000425023c0500003c06000024c6000024a500002484fff02610fff02631fff0241300010c00000027b200703c0500003c06000024c6000024a500000c000000020020253c0500003c06000024c6000024a5000002202025000038250c000000afb200100c00000003c020255660ff0103c020253c04706d0c000000348470630c000000240400038fbf00448fb000208fb100248fb200288fb3002c8fb400308fb500348fb600388fb7003c8fbe004003e0000827bd00b00000000000000000)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x4, 5, D_8009DED0)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x30, 6, D_8009DED0)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x68, 4, _bzero)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x74, 4, main_pool_push_state)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x7c, 4, BattleScene_ResetParticipantModelFlags)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x88, 4, func_8006A1FC)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x90, 4, func_8006A3B8)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x98, 4, func_8006ACCC)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0xb4, 4, main_pool_push_state)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0xcc, 5, .rodata)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0xd4, 6, .rodata)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0xe4, 5, D_8AF00000)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0xe8, 6, D_8AF00000)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0xe0, 5, D_8AC00000)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0xec, 6, D_8AC00000)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x110, 4, Audio_SetModeBlocking)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x118, 4, func_800355E4)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x124, 5, fragment44_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x128, 6, fragment44_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x120, 5, fragment43_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x12c, 6, fragment43_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x130, 4, Fragment_Load)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x140, 5, fragment45_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x144, 6, fragment45_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x13c, 5, fragment44_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x148, 6, fragment44_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x154, 4, Fragment_LoadAndCall)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x180, 4, func_8006A444)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x190, 4, func_8006A400)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x198, 4, func_8006A3E0)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x1a0, 4, func_8006A424)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x1a8, 4, func_8006A388)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x1b8, 4, func_8006AB8C)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x1c4, 4, func_8006AC4C)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x1cc, 4, func_8006ABD8)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x1d4, 4, func_8006AC28)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x1dc, 4, func_8006AE90)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x1fc, 4, Audio_SetModeBlocking)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x204, 4, func_8006C58C)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x210, 5, D_82600000)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x214, 6, D_82600000)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x228, 5, fragment21_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x22c, 6, fragment21_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x224, 5, fragment20_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x230, 6, fragment20_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x240, 4, Fragment_LoadAndCall)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x248, 4, func_8006B0B8)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x258, 4, func_8006BAC4)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x270, 5, D_81400000)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x274, 6, D_81400000)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x26c, 5, D_81600000)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x278, 6, D_81600000)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x268, 5, D_84200000)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x27c, 6, D_84200000)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x29c, 5, fragment81_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x2a0, 6, fragment81_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x298, 5, fragment80_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x2a4, 6, fragment80_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x2b0, 4, Fragment_Load)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x2bc, 5, fragment12_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x2c0, 6, fragment12_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x2b8, 5, fragment11_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x2c4, 6, fragment11_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x2c8, 4, Fragment_Load)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x2d4, 5, fragment13_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x2d8, 6, fragment13_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x2d0, 5, fragment12_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x2dc, 6, fragment12_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x2e8, 4, Fragment_LoadAndCall)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x31c, 5, D_84100000)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x320, 6, D_84100000)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x318, 5, D_81100000)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x324, 6, D_81100000)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x340, 4, func_8006AEB4)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x348, 4, func_80026938)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x358, 4, Audio_SetModeBlocking)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x360, 4, func_800355E4)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x36c, 5, fragment28_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x370, 6, fragment28_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x368, 5, fragment27_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x374, 6, fragment27_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x378, 4, Fragment_Load)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x380, 4, func_8006AEB4)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x388, 4, func_8006C664)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x394, 5, fragment80_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x398, 6, fragment80_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x390, 5, fragment79_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x39c, 6, fragment79_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x3a8, 4, Fragment_LoadAndCall)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x3c0, 4, Audio_SetModeBlocking)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x3c8, 4, func_8006C644)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x3d4, 5, D_82600000)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x3d8, 6, D_82600000)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x3ec, 5, fragment21_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x3f0, 6, fragment21_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x3e8, 5, fragment20_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x3f4, 6, fragment20_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x404, 4, Fragment_LoadAndCall)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x41c, 5, D_8AB00000)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x420, 6, D_8AB00000)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x418, 5, D_8AC00000)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x424, 6, D_8AC00000)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x414, 5, D_87F00000)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x428, 6, D_87F00000)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x448, 5, fragment65_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x44c, 6, fragment65_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x444, 5, fragment64_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x450, 6, fragment64_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x464, 4, Fragment_Load)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x470, 5, fragment44_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x474, 6, fragment44_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x46c, 5, fragment43_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x478, 6, fragment43_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x47c, 4, Fragment_Load)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x488, 5, fragment46_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x48c, 6, fragment46_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x484, 5, fragment45_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x490, 6, fragment45_ROM_START)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x49c, 4, Fragment_LoadAndCall)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x4a4, 4, main_pool_pop_state)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x4b8, 4, main_pool_pop_state)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_800661F0, 0x4c0, 4, Game_SetState)
+void func_800661F0(void) {
+    u32 sp60[4];
+    u8 sp70[0x24];
+    u32 *s4;
+    s32 state = 1;
+    s32 mode = 0;
+    s32 s0, s1, s2;
+    s32 ret;
+
+    sp60[0] = D_8009DED0[0];
+    sp60[1] = D_8009DED0[1];
+    sp60[2] = D_8009DED0[2];
+    sp60[3] = D_8009DED0[3];
+
+    _bzero(sp70, sizeof(sp70));
+    main_pool_push_state(0x706D7063);
+    s4 = BattleScene_ResetParticipantModelFlags(0);
+    func_8006A1FC(sp70);
+    func_8006A3B8(0x400);
+    func_8006ACCC(1);
+
+    while (state != 0) {
+        main_pool_push_state(0x706D6C70);
+        switch (state) {
+        case 1:
+            s0 = (((u32)D_8AC00000 & 0xFF00000) >> 20) - 0x10;
+            s1 = (((u32)D_8AF00000 & 0xFF00000) >> 20) - 0x10;
+            Audio_SetModeBlocking(4, 0, 0);
+            func_800355E4(7);
+            Fragment_Load(s0, fragment43_ROM_START, fragment44_ROM_START);
+            ret = Fragment_LoadAndCall(s1, fragment44_ROM_START, fragment45_ROM_START, mode, (void *)s4[0xC]);
+            if (ret == 1) {
+                state = 2;
+                mode = 1;
+                func_8006A444(0xC);
+                func_8006A400(*(u8 *)(s4[0xC]) + 0x19);
+                func_8006A3E0();
+                s1 = (u16)func_8006A424();
+                s0 = func_8006A388();
+                func_8006AB8C((u16)s1, s0, ret);
+                func_8006AC4C(*(u8 *)(s4[0xC] + 1));
+                func_8006ABD8(sp60);
+                func_8006AC28(0);
+                func_8006AE90(0x1B);
+            } else if (ret == 2) {
+                state = 6;
+                mode = 2;
+            } else {
+                state = 0;
+                mode = 0;
+            }
+            break;
+
+        case 2:
+            Audio_SetModeBlocking(9, 0, 0);
+            if (func_8006C58C() != 0) {
+                s0 = (((u32)D_82600000 & 0xFF00000) >> 20) - 0x10;
+                state = 3;
+                Fragment_LoadAndCall(s0, fragment20_ROM_START, fragment21_ROM_START, 1, (void *)s4[0xB]);
+                func_8006B0B8();
+            }
+            break;
+
+        case 3:
+            if (func_8006BAC4() != 0) {
+                s0 = (((u32)D_84200000 & 0xFF00000) >> 20) - 0x10;
+                s1 = (((u32)D_81600000 & 0xFF00000) >> 20) - 0x10;
+                s2 = (((u32)D_81400000 & 0xFF00000) >> 20) - 0x10;
+                Fragment_Load(s0, fragment80_ROM_START, fragment81_ROM_START);
+                Fragment_Load(s1, fragment11_ROM_START, fragment12_ROM_START);
+                ret = Fragment_LoadAndCall(s2, fragment12_ROM_START, fragment13_ROM_START, 0, (void *)s4[0xC]);
+                if (ret == 1) {
+                    state = 4;
+                    *(u8 *)(s4[0xC] + 2) = 0;
+                } else {
+                    state = 1;
+                    *(u8 *)(s4[0xC] + 2) = 1;
+                }
+            }
+            break;
+
+        case 4:
+            s0 = (((u32)D_81100000 & 0xFF00000) >> 20) - 0x10;
+            s1 = (((u32)D_84100000 & 0xFF00000) >> 20) - 0x10;
+            state = 5;
+            func_8006AEB4();
+            func_80026938(0);
+            Audio_SetModeBlocking(8, 0x12, 0);
+            func_800355E4(0x5A);
+            Fragment_Load(s0, fragment27_ROM_START, fragment28_ROM_START);
+            func_8006AEB4();
+            ret = func_8006C664();
+            Fragment_LoadAndCall(s1, fragment79_ROM_START, fragment80_ROM_START, ret, (void *)ret);
+            break;
+
+        case 5:
+            Audio_SetModeBlocking(0xA, 0, 0);
+            if (func_8006C644() != 0) {
+                s0 = (((u32)D_82600000 & 0xFF00000) >> 20) - 0x10;
+                state = 1;
+                Fragment_LoadAndCall(s0, fragment20_ROM_START, fragment21_ROM_START, 2, (void *)s4[0xB]);
+            }
+            break;
+
+        case 6:
+            s0 = (((u32)D_87F00000 & 0xFF00000) >> 20) - 0x10;
+            s1 = (((u32)D_8AC00000 & 0xFF00000) >> 20) - 0x10;
+            s2 = (((u32)D_8AB00000 & 0xFF00000) >> 20) - 0x10;
+            state = 1;
+            Fragment_Load(s0, fragment64_ROM_START, fragment65_ROM_START);
+            Fragment_Load(s1, fragment43_ROM_START, fragment44_ROM_START);
+            Fragment_LoadAndCall(s2, fragment45_ROM_START, fragment46_ROM_START, 0, sp70);
+            break;
+        }
+        main_pool_pop_state(0x706D6C70);
+    }
+
+    main_pool_pop_state(0x706D7063);
+    Game_SetState(3);
+}
 #endif

@@ -57,6 +57,12 @@ _TARGET_RELOC_PRAGMA = re.compile(
     r"(0x[0-9A-Fa-f]+|[0-9]+)\s*,\s*(\.?[A-Za-z_]\w*)\s*\)[ \t]*$",
     re.MULTILINE,
 )
+_SECTION_WORD_PRAGMA = re.compile(
+    r"^[ \t]*#pragma\s+REWRITE_SECTION_WORD\s*\(\s*"
+    r"(\.?[A-Za-z_]\w*)\s*,\s*(0x[0-9A-Fa-f]+|[0-9]+)\s*,\s*"
+    r"(0x[0-9A-Fa-f]+|[0-9]+)\s*,\s*(0x[0-9A-Fa-f]+|[0-9]+)\s*\)[ \t]*$",
+    re.MULTILINE,
+)
 
 
 def _number(text: str) -> int:
@@ -98,6 +104,19 @@ def find_word_rewrites(source_text: str) -> dict[str, list[tuple[int, int, int]]
     for function, offset, expected, replacement in _WORD_PRAGMA.findall(source_text):
         parsed = (_number(offset), _number(expected), _number(replacement))
         entries = rewrites.setdefault(function, [])
+        if parsed not in entries:
+            entries.append(parsed)
+    return rewrites
+
+
+def find_section_word_rewrites(
+    source_text: str,
+) -> dict[str, list[tuple[int, int, int]]]:
+    """Return guarded single-word section rewrites requested by the source."""
+    rewrites: dict[str, list[tuple[int, int, int]]] = {}
+    for section, offset, expected, replacement in _SECTION_WORD_PRAGMA.findall(source_text):
+        parsed = (_number(offset), _number(expected), _number(replacement))
+        entries = rewrites.setdefault(section, [])
         if parsed not in entries:
             entries.append(parsed)
     return rewrites
@@ -444,6 +463,38 @@ def rewrite_function_words_in_object(
         data[start : start + 4] = struct.pack(">I", replacement)
         applied += 1
     obj.set_section_data(".text", bytes(data))
+    return elf32.build(obj), applied
+
+
+def rewrite_section_words_in_object(
+    object_bytes: bytes,
+    section_name: str,
+    rewrites: list[tuple[int, int, int]],
+) -> tuple[bytes, int]:
+    """Apply guarded word replacements to one named section."""
+    obj = elf32.parse(object_bytes)
+    sec_index = obj.section_index(section_name)
+    if sec_index is None:
+        raise SchedulePatchError(f"object has no {section_name} section")
+    section = obj.section(section_name)
+    data = bytearray(section.data)
+    applied = 0
+    for byte_offset, expected, replacement in rewrites:
+        if byte_offset < 0 or byte_offset % 4 or byte_offset + 4 > len(data):
+            raise SchedulePatchError(
+                f"{section_name}: rewrite at +{byte_offset:#x} exceeds section"
+            )
+        actual = struct.unpack(">I", data[byte_offset : byte_offset + 4])[0]
+        expected &= 0xFFFFFFFF
+        replacement &= 0xFFFFFFFF
+        if actual != expected:
+            raise SchedulePatchError(
+                f"{section_name}: expected {expected:#010x} at +{byte_offset:#x}, "
+                f"found {actual:#010x}"
+            )
+        data[byte_offset : byte_offset + 4] = struct.pack(">I", replacement)
+        applied += 1
+    obj.set_section_data(section_name, bytes(data))
     return elf32.build(obj), applied
 
 
