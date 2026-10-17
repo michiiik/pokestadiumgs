@@ -107,3 +107,47 @@ class ObjectTest(unittest.TestCase):
                     object_path.read_bytes(), "func_a", 0, 0xAAAAAAAA, 0xBBBBBBBB
                 )
 
+    def test_rewrite_function_hex_realigns_trailing_padding(self):
+        import shutil
+        import subprocess
+        import tempfile
+
+        if shutil.which("mips-linux-gnu-as") is None:
+            self.skipTest("mips-linux-gnu-as is unavailable")
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "fixture.s"
+            object_path = Path(directory) / "fixture.o"
+            source.write_text(
+                ".text\n"
+                ".globl func_a\n"
+                "func_a:\n"
+                ".word 0x11111111\n"
+                ".word 0x22222222\n"
+                ".size func_a, .-func_a\n"
+                ".globl func_b\n"
+                "func_b:\n"
+                ".word 0x33333333\n"
+                ".size func_b, .-func_b\n"
+            )
+            subprocess.run(
+                ["mips-linux-gnu-as", "-mips2", "-o", str(object_path), str(source)],
+                check=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+            original = object_path.read_bytes()
+            import hashlib
+            import elf32
+            obj = elf32.parse(original)
+            func_a = next(s for s in obj.symbols() if s.name == "func_a")
+            func_a_bytes = obj.section(".text").data[func_a.value : func_a.value + func_a.size]
+            expected_hash = hashlib.sha256(func_a_bytes).hexdigest()
+            # Replacement is 12 bytes instead of 8 bytes (delta = +4)
+            replacement = b"\xaa\xaa\xaa\xaa\xbb\xbb\xbb\xbb\xcc\xcc\xcc\xcc"
+            patched, count = schedule_patch.rewrite_function_hex_in_object(
+                original, "func_a", expected_hash, replacement, []
+            )
+            self.assertEqual(count, 1)
+            patched_obj = elf32.parse(patched)
+            self.assertEqual(len(patched_obj.section(".text").data) % 16, 0)
+

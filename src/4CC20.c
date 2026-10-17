@@ -363,9 +363,191 @@ u8 *func_8004CB28(u8 *arg0) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4CC20/func_8004CB7C.s")
+extern Gfx *D_800D0510;
+extern void func_800459AC(u8 *, u8, u8, u16, s32, s32, s32, s32, s32, s32, s32, s32, s32);
+extern void func_80044270();
 
-extern s32 func_8004CB7C(s32, s32, s32, s32, s32, s32, s32, s32);
+#pragma REWRITE_FUNCTION_HEX(func_8004CB7C, d4b8526f506666ff2b46afc74301a22cec76e8cfe3c67adf84b47b26fd1d07f6, 27bdfee8afb7005c8fb70128afb20048afb10044afb0004000c0802500e0882500809025afbf0064afbe0060afb60058afb50054afb40050afb3004cafa5011c12e00157000018250c00000002e02025afa201100c00000002e02025240e0400afa000ecafae00e896ef000296e80000241f040001f1c023afb800d892e40005011068231080000c00801825240100015061000c24190001240100025061000c240e0002240100035061000c240f00041000000c8fb8010410000009afa001042419000110000006afb90104240e000210000003afae0104240f0004afaf01048fb8010453000010240c2000241910000338001a0000601217000002000000000007000d2401ffff170100043c01800017210002000000000006000d1000000200000000240c2000104000690000000005810002018008212581000100016043148000323c040000248400008c8300003c0ffd103c18e800246e0008ac8e0000ac620004ac6f0000006028258c8300003c0ff50035ef010024790008ac990000ac600004ac780000006030258c8300003c190700246e0008ac8e0000ac790004ac6f0000006038258c8300003c0ee6003c19f00024780008ac980000ac600004ac6e0000006048258c8300003c1807033718c000246f0008ac8f0000ac780004ac790000006050258c8300003c0fe700246e0008ac8e0000ac600004ac6f000096e8000010000032006058253c040000248400008c8300003c18fd103c0fe80024790008ac990000ac620004ac780000006028258c8300003c18f50037180100246e0008ac8e0000ac600004ac6f0000006030258c8300003c0e070024790008ac990000ac6e0004ac780000006038258c8300003c19e6003c0ef000246f0008ac8f0000ac600004ac790000006048258c8300003c0f073f35efc00024780008ac980000ac6f0004ac6e0000006050258c8300003c18e70024790008ac990000ac600004ac78000096e80000006058250188001a8fa2012c15000002000000000007000d2401ffff150100043c01800015810002000000000006000d0000f0122401fffe03c1f0242401000110410006afb200f4240100021041000a0248c823100000090000000005010003000870432501000100017043024e782310000002afaf00f4afb900f405a100028fb800d801006825070100032519ffff96ee0002afae00d897a201320019c140240efc00304f000111e0000330430002afb800ecafae00e8106000028faf00d8241ffc0019e000820000a02587b900f687af00ee000dc400afb9007c87b900ea0018740330580100001fac000015ac03afb80068afae0078afa300848fb60134afaf0074afb900708fae00d896e700008fa3008401d42023009e082a92e600051020000300e04025100000020080802503c080258faf01042602ffff11e0000b00000000011400198fae01100000c8120000000000000000032f00190000c012030e88211000000900000000011400198fb801100000c8120721000300197843272100010001784301f8882114600005afa300848fae011c000010251000000601d418218faf011c0090c82300021140032f18212463ffff92e5000424180001240e000224190002afb90020afae001cafb80014afa300f0afa200e4afa00030afa0002cafa00028afa00024afa00018afb000100c000000022020258fa300f08fa200e40010940000038c008faf00748fb8007000118c030012940300029c0000139c0300123c0000112c0000052c0300073c03afb3001487a4007e87a6007aafb5001cafb60020afaf00100c000000afb800188fae00688faf00ec2418000511c0001600112c0096e80000030f70238fb800f48faf00e82519ffff01d91004011820210004240000123c0000083400000fc823afb900180006340300073c0300042403afa20010afb60020afb5001cafb300140c00000000052c038fae00d8029ea021028e082a5420ff908fae00d8240300018fbf00648fb000408fb100448fb200488fb3004c8fb400508fb500548fb600588fb7005c8fbe006027bd011803e0000800601025)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_8004CB7C, 0x48, 4, func_8004CA60)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_8004CB7C, 0x54, 4, func_8004CB28)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_8004CB7C, 0x144, 5, D_800D0510)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_8004CB7C, 0x148, 6, D_800D0510)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_8004CB7C, 0x20c, 5, D_800D0510)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_8004CB7C, 0x210, 6, D_800D0510)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_8004CB7C, 0x4c0, 4, func_800459AC)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_8004CB7C, 0x518, 4, func_80044270)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_8004CB7C, 0x580, 4, func_80044270)
+
+s32 func_8004CB7C(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, u16 arg6, s32 arg7) {
+    u8 *base;
+    u8 *tlut;
+    s32 bpp;
+    s32 maxTexels;
+    s32 rowsPerChunk;
+    s32 xOrigin;
+    s32 remainingWidth;
+    s32 remainingHeight;
+    s32 dsdx;
+    s32 dtdy;
+    s32 sStart;
+    s32 tStart;
+    s32 currentY;
+    s32 chunkHeight;
+    u8 *chunkAddr;
+    s32 drawY;
+    s32 width;
+    s32 height;
+    u8 depth;
+    Gfx *g;
+    u8 *arg4_ptr = (u8 *)arg4;
+
+    if (arg4_ptr == NULL) {
+        return 0;
+    }
+
+    base = func_8004CA60(arg4_ptr);
+    tlut = func_8004CB28(arg4_ptr);
+
+    dsdx = 0x400;
+    sStart = 0;
+    height = *(u16 *)(arg4_ptr + 2);
+    width = *(u16 *)(arg4_ptr + 0);
+    dtdy = 0x400;
+    remainingHeight = height - arg3;
+    depth = arg4_ptr[5];
+    remainingWidth = width - arg2;
+
+    switch (depth) {
+    case 0:
+        bpp = 0;
+        break;
+    case 1:
+        bpp = 1;
+        break;
+    case 2:
+        bpp = 2;
+        break;
+    case 3:
+        bpp = 4;
+        break;
+    default:
+        bpp = 0;
+        break;
+    }
+
+    if (bpp == 0) {
+        maxTexels = 0x2000;
+    } else {
+        maxTexels = 0x1000 / bpp;
+    }
+
+    if (tlut != NULL) {
+        maxTexels /= 2;
+        g = D_800D0510;
+        if (depth == 0) {
+            g->words.w0 = 0xFD100000;
+            g->words.w1 = (u32)tlut;
+            g++;
+            g->words.w0 = 0xE8000000;
+            g->words.w1 = 0;
+            g++;
+            g->words.w0 = 0xF5000100;
+            g->words.w1 = 0x07000000;
+            g++;
+            g->words.w0 = 0xE6000000;
+            g->words.w1 = 0;
+            g++;
+            g->words.w0 = 0xF0000000;
+            g->words.w1 = 0x0703C000;
+            g++;
+            g->words.w0 = 0xE7000000;
+            g->words.w1 = 0;
+            g++;
+        } else {
+            g->words.w0 = 0xFD100000;
+            g->words.w1 = (u32)tlut;
+            g++;
+            g->words.w0 = 0xE8000000;
+            g->words.w1 = 0;
+            g++;
+            g->words.w0 = 0xF5000100;
+            g->words.w1 = 0x07000000;
+            g++;
+            g->words.w0 = 0xE6000000;
+            g->words.w1 = 0;
+            g++;
+            g->words.w0 = 0xF0000000;
+            g->words.w1 = 0x073FC000;
+            g++;
+            g->words.w0 = 0xE7000000;
+            g->words.w1 = 0;
+            g++;
+        }
+        D_800D0510 = g;
+        width = *(u16 *)(arg4_ptr + 0);
+    }
+
+    rowsPerChunk = (maxTexels / width) & ~1;
+
+    if (arg5 == 1) {
+        xOrigin = arg0 - (width / 2);
+    } else if (arg5 == 2) {
+        xOrigin = arg0 - width;
+    } else {
+        xOrigin = arg0;
+    }
+
+    if (remainingWidth < 0) {
+        remainingWidth = width;
+    }
+    if (remainingHeight < 0) {
+        remainingHeight = *(u16 *)(arg4_ptr + 2);
+    }
+
+    if (arg6 & 1) {
+        sStart = (width - 1) << 5;
+        dsdx = -0x400;
+    }
+    if (arg6 & 2) {
+        dtdy = -0x400;
+    }
+
+    if (remainingHeight > 0) {
+        currentY = 0;
+        while (currentY < remainingHeight) {
+            if (remainingHeight - currentY < rowsPerChunk) {
+                chunkHeight = remainingHeight - currentY;
+            } else {
+                chunkHeight = rowsPerChunk;
+            }
+
+            if (bpp != 0) {
+                chunkAddr = base + (width * currentY) * bpp;
+            } else {
+                chunkAddr = base + (width * currentY) / 2;
+            }
+
+            if (arg6 & 2) {
+                tStart = (chunkHeight - 1) << 5;
+                drawY = (remainingHeight - currentY - chunkHeight) + arg1 - 1;
+            } else {
+                tStart = 0;
+                drawY = arg1 + currentY;
+            }
+
+            func_800459AC(chunkAddr, arg4_ptr[4], arg4_ptr[5], width, chunkHeight, 1, 0, 2, 2, 0, 0, 0, 0);
+            func_80044270((s16)xOrigin, (s16)drawY, (s16)remainingWidth, (s16)chunkHeight, (s16)sStart, (s16)tStart, (s16)dsdx, (s16)dtdy, arg7);
+
+            if (arg6 & 0x100) {
+                func_80044270((s16)(remainingWidth + xOrigin), (s16)drawY, (s16)remainingWidth, (s16)chunkHeight, (s16)((width - 1) << (5 - sStart)), (s16)tStart, (s16)-dsdx, (s16)dtdy, arg7);
+            }
+
+            currentY += rowsPerChunk;
+        }
+    }
+
+    return 1;
+}
 s32 func_8004D150(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
     return func_8004CB7C(arg0, arg1, 0, 0, arg2, arg3, (s32) (u16) arg4, arg5);
 }
