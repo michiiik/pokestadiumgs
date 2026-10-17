@@ -18,7 +18,34 @@ void func_80019580(void *arg0, s32 arg1) {
     osSetIntMask(sp1C);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/1A140/func_800195C0.s")
+
+extern u8 D_8008FAA0;
+extern u8 Audio_AiHdwrBugFlag;
+
+s32 func_800195C0(void *bufPtr, s32 size) {
+    char *bptr = bufPtr;
+    register s32 status;
+
+    if (D_8008FAA0 != 0) {
+        bptr = (char *)bufPtr - 0x2000;
+    }
+
+    if ((((u32)bufPtr + size) & 0x1FFF) == 0) {
+        Audio_AiHdwrBugFlag = 1;
+    } else {
+        Audio_AiHdwrBugFlag = 0;
+    }
+
+    status = IO_READ(AI_STATUS_REG);
+    if (status & AI_STATUS_FIFO_FULL) {
+        return -1;
+    }
+
+    IO_WRITE(AI_DRAM_ADDR_REG, OS_K0_TO_PHYSICAL(bptr));
+    IO_WRITE(AI_LEN_REG, size);
+    return 0;
+}
+
 
 extern u8 D_8008FAB8;
 extern u8 D_8008FB28;

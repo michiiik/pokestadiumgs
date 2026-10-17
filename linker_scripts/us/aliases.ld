@@ -342,3 +342,5 @@ func_80062614 = GbMail_ImportRecord;
 func_80061940 = Pokemon_ClampCurrentStat;
 func_80064728 = Pokemon_GetDisplaySpecies;
 func_80063A8C = Pokemon_FindEvolutionMethod;
+/* Audio interface hardware bug flag alias to prevent address CSE */
+Audio_AiHdwrBugFlag = D_8008FAA0;
