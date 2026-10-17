@@ -3367,7 +3367,7 @@ Vec3f35784 *Vec3f_SetComponents(Vec3f35784 *arg0, f32 x, f32 y, f32 z) {
 #endif
 
 #ifdef VERSION_US
-typedef struct { f32 x, y, z; } Vec3f357A8;
+typedef Vec3f35784 Vec3f357A8;
 Vec3f357A8 *Vec3f_SetComponentsDuplicate(Vec3f357A8 *arg0, f32 x, f32 y, f32 z) {
     arg0->x = x;
     arg0->y = y;
@@ -3438,9 +3438,7 @@ Vec3f358F0 *Vec3f_CrossProductFromPoints(Vec3f358F0 *arg0, Vec3f358F0 *arg1, Vec
 #endif
 
 #ifdef VERSION_US
-typedef struct {
-    f32 x, y, z;
-} Vec3f359A0;
+typedef Vec3f35784 Vec3f359A0;
 
 Vec3f359A0 *Vec3f_CrossProduct(Vec3f359A0 *out, Vec3f359A0 *a, Vec3f359A0 *b) {
     out->x = (a->y * b->z) - (b->y * a->z);
@@ -3451,7 +3449,7 @@ Vec3f359A0 *Vec3f_CrossProduct(Vec3f359A0 *out, Vec3f359A0 *a, Vec3f359A0 *b) {
 #endif
 
 #ifdef VERSION_US
-typedef struct { f32 x, y, z; } Vec3f35A10;
+typedef Vec3f35784 Vec3f35A10;
 Vec3f35A10 *func_80035A10(Vec3f35A10 *arg0) {
     f32 scale = 1.0f / sqrtf((arg0->x * arg0->x) + (arg0->y * arg0->y) + (arg0->z * arg0->z));
     arg0->x *= scale; arg0->y *= scale; arg0->z *= scale; return arg0;
@@ -3537,15 +3535,125 @@ void MtxF_SetTranslation(f32 *dest, f32 *source) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80035FFC.s")
+extern f32 D_80087E50[];
+extern f32 D_80088E50[0x1000];
+void MtxF_SetRotationTranslation(f32 matrix[4][4], Vec3s35AA0 *position, Vec3s35AA0 *rotation) {
+    f32 sin_x;
+    f32 cos_x;
+    f32 sin_y;
+    f32 cos_y;
+    f32 sin_z;
+    f32 cos_z;
+
+    sin_x = D_80087E50[(u16)(rotation->x) >> 4];
+    cos_x = D_80088E50[(u16)(rotation->x) >> 4];
+
+    sin_y = D_80087E50[(u16)(rotation->y) >> 4];
+    cos_y = D_80088E50[(u16)(rotation->y) >> 4];
+
+    sin_z = D_80087E50[(u16)(rotation->z) >> 4];
+    cos_z = D_80088E50[(u16)(rotation->z) >> 4];
+
+    matrix[0][0] = cos_y * cos_z + (sin_x * sin_y) * sin_z;
+    matrix[0][1] = -cos_y * sin_z + (sin_x * sin_y) * cos_z;
+    matrix[0][2] = cos_x * sin_y;
+    matrix[0][3] = position->x;
+
+    matrix[1][0] = cos_x * sin_z;
+    matrix[1][1] = cos_x * cos_z;
+    matrix[1][2] = -sin_x;
+    matrix[1][3] = position->y;
+
+    matrix[2][0] = -sin_y * cos_z + (sin_x * cos_y) * sin_z;
+    matrix[2][1] = sin_y * sin_z + (sin_x * cos_y) * cos_z;
+    matrix[2][2] = cos_x * cos_y;
+    matrix[2][3] = position->z;
+
+    matrix[3][0] = 0.0f;
+    matrix[3][1] = 0.0f;
+    matrix[3][2] = 0.0f;
+    matrix[3][3] = 1.0f;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003614C.s")
+void MtxF_SetRotationTranslationF(f32 matrix[4][4], Vec3f35784 *position, Vec3s35AA0 *rotation) {
+    f32 sin_y;
+    f32 cos_y;
+    f32 sin_z;
+    f32 cos_z;
+    f32 sin_x;
+    f32 cos_x;
+    f32 product;
+
+    sin_x = D_80087E50[(u16)(rotation->x) >> 4];
+    cos_x = D_80088E50[(u16)(rotation->x) >> 4];
+
+    sin_y = D_80087E50[(u16)(rotation->y) >> 4];
+    cos_y = D_80088E50[(u16)(rotation->y) >> 4];
+
+    sin_z = D_80087E50[(u16)(rotation->z) >> 4];
+    cos_z = D_80088E50[(u16)(rotation->z) >> 4];
+
+    product = sin_x * sin_y;
+    matrix[0][0] = (cos_y * cos_z) + (product * sin_z);
+    matrix[1][0] = (-cos_y * sin_z) + (product * cos_z);
+    matrix[2][0] = cos_x * sin_y;
+    matrix[3][0] = position->x;
+
+    matrix[0][1] = cos_x * sin_z;
+    matrix[1][1] = cos_x * cos_z;
+    matrix[2][1] = -sin_x;
+    matrix[3][1] = position->y;
+
+    product = sin_x * cos_y;
+    matrix[0][2] = (-sin_y * cos_z) + (product * sin_z);
+    matrix[1][2] = (sin_y * sin_z) + (product * cos_z);
+    matrix[2][2] = cos_x * cos_y;
+    matrix[3][2] = position->z;
+
+    matrix[0][3] = 0.0f;
+    matrix[1][3] = 0.0f;
+    matrix[2][3] = 0.0f;
+    matrix[3][3] = 1.0f;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80036284.s")
+void MtxF_SetRotationAndTransformTranslation(f32 matrix[4][4], Vec3f35784 *position, Vec3s35AA0 *rotation) {
+    f32 sin_x;
+    f32 cos_x;
+    f32 sin_y;
+    f32 cos_y;
+    f32 sin_z;
+    f32 cos_z;
+
+    sin_x = D_80087E50[(u16)(rotation->x) >> 4];
+    cos_x = D_80088E50[(u16)(rotation->x) >> 4];
+    sin_y = D_80087E50[(u16)(rotation->y) >> 4];
+    cos_y = D_80088E50[(u16)(rotation->y) >> 4];
+    sin_z = D_80087E50[(u16)(rotation->z) >> 4];
+    cos_z = D_80088E50[(u16)(rotation->z) >> 4];
+
+    matrix[0][0] = (cos_y * cos_z) + ((sin_x * sin_y) * sin_z);
+    matrix[0][1] = (-cos_y * sin_z) + ((sin_x * sin_y) * cos_z);
+    matrix[0][2] = cos_x * sin_y;
+
+    matrix[1][0] = cos_x * sin_z;
+    matrix[1][1] = cos_x * cos_z;
+    matrix[1][2] = -sin_x;
+
+    matrix[2][0] = (-sin_y * cos_z) + ((sin_x * cos_y) * sin_z);
+    matrix[2][1] = (sin_y * sin_z) + ((sin_x * cos_y) * cos_z);
+    matrix[2][2] = cos_x * cos_y;
+
+    matrix[3][0] = (matrix[0][0] * position->x) + (matrix[1][0] * position->y) + (matrix[2][0] * position->z);
+    matrix[3][1] = (matrix[0][1] * position->x) + (matrix[1][1] * position->y) + (matrix[2][1] * position->z);
+    matrix[3][2] = (matrix[0][2] * position->x) + (matrix[1][2] * position->y) + (matrix[2][2] * position->z);
+
+    matrix[0][3] = matrix[1][3] = matrix[2][3] = 0.0f;
+    matrix[3][3] = 1.0f;
+}
 #endif
 
 #ifdef VERSION_US
@@ -3561,7 +3669,33 @@ void func_80036714(void *a0,s32 a1,s32 a2,s32 a3,f32 a4){f32 r0,r1,r2; r0=sqrtf(
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003691C.s")
+void MtxF_SetOrthonormalBasis(f32 matrix[4][4], Vec3f35784 *up_direction, Vec3f35784 *position, u16 rotation_y) {
+    Vec3f35784 reference;
+    Vec3f35784 lateral;
+    Vec3f35784 forward;
+    Vec3f_SetComponentsDuplicate(&reference, D_80087E50[rotation_y >> 4], 0.0f, D_80088E50[rotation_y >> 4]);
+    func_80035A10(up_direction);
+    Vec3f_CrossProduct(&lateral, up_direction, &reference);
+    func_80035A10(&lateral);
+    Vec3f_CrossProduct(&forward, &lateral, up_direction);
+    func_80035A10(&forward);
+    matrix[0][0] = lateral.x;
+    matrix[0][1] = lateral.y;
+    matrix[0][2] = lateral.z;
+    matrix[3][0] = position->x;
+    matrix[1][0] = up_direction->x;
+    matrix[1][1] = up_direction->y;
+    matrix[1][2] = up_direction->z;
+    matrix[3][1] = position->y;
+    matrix[2][0] = forward.x;
+    matrix[2][1] = forward.y;
+    matrix[2][2] = forward.z;
+    matrix[3][2] = position->z;
+    matrix[0][3] = 0.0f;
+    matrix[1][3] = 0.0f;
+    matrix[2][3] = 0.0f;
+    matrix[3][3] = 1.0f;
+}
 #endif
 
 #ifdef VERSION_US
@@ -4340,13 +4474,13 @@ void MtxF_TransformVec3s(S1_MtxF* arg0, S1_Vec3s* arg1) {
 
 #ifdef VERSION_US
 extern void func_80036714(void *, s32, s32, s32, f32);
-extern void func_8003614C(void *, s32, s32);
+extern void MtxF_SetRotationTranslationF(f32 matrix[4][4], Vec3f35784 *position, Vec3s35AA0 *rotation);
 void MtxF_BuildTransform(S1_MtxF *arg0, S1_Vec3f *arg1, S1_Vec3s *arg2, S1_Vec3f *arg3, S1_MtxF *arg4, S1_MtxF *arg5) {
     S1_MtxF sp60;
     S1_MtxF sp20;
 
     func_80036714(&sp60, (s32)arg4, (s32)arg5, (s32)arg1, 1.0f);
-    func_8003614C(&sp20, (s32) &D_800948D0, (s32)arg2);
+    MtxF_SetRotationTranslationF(sp20.mf, (void *)&D_800948D0, (void *)arg2);
     MtxF_Multiply(&sp20, &sp20, &sp60);
     MtxF_ScaleRows(arg0, &sp20, arg3);
 }
@@ -5213,8 +5347,8 @@ void *func_8003899C(s32 arg0, s32 arg1, s32 arg2, s32 arg3, void *arg4) {
 #ifdef VERSION_US
 extern void *func_8003899C(s32, s32, s32, s32, void *);
 void *GeoNode_CreateDisplayListMatrixFromTransform(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
-    s32 temp[16];
-    func_8003614C(temp, arg4, arg5);
+    f32 temp[4][4];
+    MtxF_SetRotationTranslationF(temp, (Vec3f35784 *)arg4, (Vec3s35AA0 *)arg5);
     func_8003899C(arg0, arg1, arg2, arg3, temp);
 }
 #endif
@@ -6048,7 +6182,7 @@ void func_8003B5AC(u8 *arg0) {
         f32 matrix[4][4];
     } scratch;
 
-    func_8003614C(scratch.matrix, (s32)(arg0 + 0x18), (s32)(arg0 + 0x24));
+    MtxF_SetRotationTranslationF(scratch.matrix, (Vec3f35784 *)(arg0 + 0x18), (Vec3s35AA0 *)(arg0 + 0x24));
     GeoRender_PushMultipliedMatrix((S1_MtxF *)scratch.matrix, NULL);
     Geo_ProcessNodeChildren(arg0);
     *(s32 *)((u8 *)&D_80124F68 + 0x10A0) -= 1;
