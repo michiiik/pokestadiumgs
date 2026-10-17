@@ -195,48 +195,43 @@ s32 main_pool_push_state(s32 arg0) {
     return main_pool_get_available();
 }
 
-#pragma REWRITE_FUNCTION_HEX(main_pool_pop_state, ad3ae1a1d884278e82ae13193144e6edf7e01b6ef2f09198118d0c7acd9dd855, 27bdffd8afb0001400808025afbf00243c04800dafb30020afb2001cafb100182484cdb4000028250c000000240600013c03800d3c11800d2631cdb08c63cde08c6e00008c7200048c730008ae2e001c8c6f000c2462fff012000006ae2f00308c58000c521800048e30002c15e0fff401e018258e30002c0213082b5020000c8e3900288e02000826040010504000048e1000040040f8098e05000c8e1000040213082b5420fff88e0200088e3900288f3000000212082b1420000b000000008e02000826040010504000048e1000000040f8098e05000c8e1000000212082b5020fff88e0200083c04800dae320028ae33002c2484cdb4000028250c000000000030250c000000000000008fbf00248fb000148fb100188fb2001c8fb3002003e0000827bd0028)
-#pragma REWRITE_FUNCTION_RELOC_TARGET(main_pool_pop_state, 0x28, 4, osRecvMesg)
-#pragma REWRITE_FUNCTION_RELOC_TARGET(main_pool_pop_state, 0xFC, 4, osSendMesg)
-#pragma REWRITE_FUNCTION_RELOC_TARGET(main_pool_pop_state, 0x104, 4, main_pool_get_available)
+/* Restore through the requested checkpoint tag; zero pops one checkpoint. */
 s32 main_pool_pop_state(s32 arg0) {
     PoolState3280 *state;
-    PoolBlock3280 *listHeadL;
-    PoolBlock3280 *listHeadR;
-    PoolBlock3280 *curr;
-
+    PoolBlock3280 *list_head_l;
+    PoolBlock3280 *list_head_r;
+    PoolBlock3280 *block;
     osRecvMesg(&D_800CCDB4, NULL, 1);
-
-    state = D_800CCDE0;
     do {
+        state = POOL3280.mainState;
+        list_head_l = state->listHeadL;
+        list_head_r = state->listHeadR;
         POOL3280.available = state->freeSpace;
-        listHeadL = state->listHeadL;
-        listHeadR = state->listHeadR;
         POOL3280.mainState = state->prev;
-        if (arg0 != 0 && arg0 == ((PoolBlock3280 *)((u8 *)state - 0x10))->arg) {
+        if (arg0 == 0) {
             break;
         }
-        state = state->prev;
-    } while (state != NULL);
-
-    curr = POOL3280.listHeadR;
-    while ((u32)curr < (u32)listHeadR) {
-        if (curr->func != NULL) {
-            curr->func((u8 *)curr + 0x10, curr->arg);
+        state = (PoolState3280 *)((u8 *)state - 16); /* Inspect the allocation header's tag. */
+        if (arg0 == ((PoolBlock3280 *)state)->arg) {
+            break;
         }
-        curr = curr->next;
-    }
-
-    curr = POOL3280.listHeadL->prev;
-    while ((u32)curr >= (u32)listHeadL) {
-        if (curr->func != NULL) {
-            curr->func((u8 *)curr + 0x10, curr->arg);
+    } while (POOL3280.mainState != NULL);
+    block = POOL3280.listHeadR;
+    while ((u32)block < (u32)list_head_r) {
+        if (block->func != NULL) {
+            block->func((u8 *)block + 16, block->arg);
         }
-        curr = curr->prev;
+        block = block->next;
     }
-
-    POOL3280.listHeadL = listHeadL;
-    POOL3280.listHeadR = listHeadR;
+    block = POOL3280.listHeadL->prev;
+    while ((u32)block >= (u32)list_head_l) {
+        if (block->func != NULL) {
+            block->func((u8 *)block + 16, block->arg);
+        }
+        block = block->prev;
+    }
+    POOL3280.listHeadL = list_head_l;
+    POOL3280.listHeadR = list_head_r;
     osSendMesg(&D_800CCDB4, NULL, 0);
     return main_pool_get_available();
 }
