@@ -1,5 +1,171 @@
 # Region notes: fragment17_113A60
 
+## 2026-10-18: packed-color mask callback frame requeue
+
+061A8 remains `requeue` after 24 ordinary native runner attempts. Mode zero
+caches the node's packed colors at offsets 40/44 in 10678/10680. Mode one
+sets visibility from EC38 == 1, independently of the mask returned by
+800060E8. A set bit chooses the saved colors or yellow for the selected
+index; an unset bit chooses gray. Both special colors copy the complete
+primary word to the secondary word. Other modes leave the node unchanged.
+
+Four-byte aggregate assignments preserve the original word-copy operations.
+Materializing a separate word-sized presence predicate from the byte mask
+restores the byte mask and boolean normalization instructions that direct
+branch spelling removes. The best source preserves all 87 instructions,
+348 bytes and register roles, with reported normalized/raw 1.0/0.9080.
+Exactly eight word differences remain at offsets 0/8/20/28/32/36/40/332:
+frame 32 instead of 40, shifted argument homes, and index spill 24 instead
+of 32. The visible flag retains the original slot 28. This is not acceptance.
+
+The completed grids cover scalar versus aggregate copies, flag declaration
+order, byte/word mask types, byte/word presence predicates, explicit byte
+normalization, predicate evaluation inside/outside the EC38 guard, and
+ordinary C register hints. The latter do not change the best object.
+Known/type-size/twenty-blank complete-TU controls pass. The real byte-return
+getter prototype remains unchanged. Stock 5.3 changes the known TU and
+introduces more instruction differences in this callback; its blank controls
+pass, but no compiler switch or diagnostic output is adopted.
+
+Next investigate the index/flag storage lifetime that distinguishes the
+original slots. Do not add artificial homes, dummy locals, fixed registers
+or output patches. No candidate, type declaration or runtime helper from
+this investigation is installed, and private probes remain unpublished.
+
+## 2026-10-18: strict-stack search calibration for node scale
+
+The default decomp-permuter score ignores stack offsets: the rejected
+09F50 seed scores zero despite the five strict-linked frame/home differences
+documented below. With the existing --stack-diffs option, the same seed
+scores 58. Strict links prove the standalone AST import equals the complete
+TU candidate and that the isolated assembly target equals retail, placing
+the selected constant at its measured real address rather than dummy rodata.
+
+A 60-second, four-worker conservative source search with stack scoring
+enabled remains at 58 with no improved output. Its enabled transformations
+exclude dummy declarations, new temporaries, type/prototype mutations and
+artificial operations. This is a bounded flat result, not exhaustion of all
+legal C forms and not a zero-score match. Stock 7.1/5.3 diagnostics preserve
+the same six raw differences for the scalar seed, including the equivalent
+constant relocation; 5.3 changes the known TU, and its blank controls pass.
+No compiler configuration or output transformation is adopted.
+
+## 2026-10-18: node scale/translation frame-only requeue
+
+09F50 remains `requeue` after 24 ordinary native runner attempts, with no
+accepted or installed candidate. It updates translation at node offset 36
+and scale at offset 48 through Vec3f_SetComponentsDuplicate. Its fraction
+is 1 - (320 - D_822106CE) / 360, clamped to zero below 0.001 and to one
+above one. X/Y scale multiplies C4/C8 by that fraction; B6 bit zero reverses
+X scale. Translation is (CC - 320, 240 - (D2 + 350), -579), with scale Z one.
+
+The best scalar spelling preserves all 82 instructions and their register
+roles, but has frame 40 rather than 56. Explicit 0.0f - scale_x preserves
+the original subtraction, while unary negation changes its instruction
+shape. Independent versus else-if clamping, scale declaration order,
+two-/three-component scale structs/arrays and named translation temporaries
+do not close the frame residual. The tuple components and temporaries are
+all consumed by the real helper calls; no dead local or fake padding is used.
+
+The initial raw comparison also reports a constant relocation difference:
+the C object's .rodata+40 and original D_8220E1A8 denote the same constant.
+A strict link at the real text and rodata bases resolves every undefined
+symbol, proves the original function equals the retail-gated image, and
+leaves exactly five candidate word differences at offsets 48/60/220/288/316.
+Those are the frame adjustment, three node-argument home references, and
+frame restoration. All 328 bytes otherwise match, including the constant;
+all rodata bytes match. This is not ROM acceptance.
+
+Known/raw/keep/final and twenty-blank complete-TU controls pass. The stale
+s32 return declaration can be corrected to void without changing any
+existing game bytes, extents, defined symbols or normalized relocations;
+the accepted caller ignores its result and the assembly has no result
+definition. That correction is only a companion edit in the rejected
+transaction, not installed by itself. Next inspect authentic local
+storage/lifetime lowering for the five-word frame residual. Do not force
+the frame with dummy locals, padding, compiler flags or output rewriting,
+and do not treat the resolved relocation spelling as the remaining cause.
+
+## 2026-10-18: text renderer pointer-folding requeue
+
+083C4 remains `requeue` after 24 ordinary native runner attempts; no
+candidate is accepted or installed. The original has 85 instructions,
+340 bytes and frame 72. The best tested spelling has 80 instructions,
+320 bytes, frame 48 and reported normalized/raw similarity 0.9176/0.6353.
+These scores describe a non-match, not an allocation-only tie.
+
+The renderer resolves the node's bank/text ID through 8004C874, starts
+font rendering, selects its font, and sets the primary RGBA color. It
+compares packed secondary/primary colors after that call and enables
+two-cycle texturing when they differ, including when the text is null.
+For non-null text, alignment mode 2 calls 800495BC, while modes 0/1 call
+800495F8 with alignment arguments 1/2. It disables two-cycle texturing
+when enabled and restores font 8 and RGBA (0,255,255,255) before finishing.
+The existing font helper definitions in src/47580.c establish the actual
+prototypes, including both variadic draw interfaces; no prototype is loosened.
+
+Typed union and raw byte color views, text/flag declaration order,
+numeric versus 2/0/1 case-body order, signed/unsigned integer address
+expressions, initialization placement, scalar root views and reversed
+word comparisons do not preserve the original pointer lifetime. The
+compiler folds primary byte loads into node-relative offsets, eliminates
+the primary pointer spill across 8004972C, and rematerializes the secondary
+pointer after Font_EnableTwoCycleTexturing instead of preserving its spill.
+Original text/flag stack slots are 52/48; the best source uses 40/36.
+
+Unchanged-stock raw/keep/final and twenty-blank complete-TU controls pass.
+Retained frontend and optimized Ucode streams are calibrated to the exact
+function name, procedure 65; the stock assembly listing confirms the folded
+address expressions before final instruction scheduling. The proposed
+52-byte node view and color offsets 40/44 pass target-compiler assertions
+without changing any existing game bytes, extents or normalized relocations;
+this proves the accessed prefix only, not the full allocation size.
+
+Next investigate authentic source-level pointer escape/alias topology or
+frontend lowering that retains these two pointer values. Do not repeat
+the completed constant-address/type grid, infer a register tie from the
+normalized score, or add dead locals, volatile accesses, fake stack homes,
+padding or compiler/output patches to reproduce the larger frame. All
+private capture/probe artifacts stay outside publication and coverage stays
+CI-owned.
+
+## 2026-10-18: five-model transform follow-up accepted locally, 260 bytes
+
+06EB8 is accepted by normal runner batch
+`7b79bd5a1ce948759657808a5d5f3794`, with link verification and a successful
+combined full-ROM gate. It preserves all 65 instructions and frame 24.
+This is a local follow-up to the two-owner transform/initializer PR #1186,
+not an additional function in that published batch. The native file now
+has 43 C functions and 39 assembly owners among its 82 original functions.
+
+07714 registers this callback for the five F290 model records, storing
+indices 0..4 as node callback data. Mode zero initializes scene translation
+from DA6C: (x - 320, 240 - y, -579). Mode two writes the rotation halfword
+at node offset 34 from the DA40-indexed table wave. Indices 0/3/4 select
+amplitude 4096; other indices select 2048. Other modes return zero without
+those updates. The accepted spelling uses grouped switch cases to select
+the float amplitude, then multiplies it by the indexed table value. The
+four tested logical-OR forms retain 260 bytes but report normalized/raw
+0.9846/0.9231; do not generalize that bounded result to every conditional
+spelling. No dead angle read or unused neighboring local is introduced.
+
+The first accepted object is frozen at SHA256
+`c0159c3f88d499ffb2136c8cc562a613b7617e04c33a855007d0748928bf2d8b`.
+After removing redundant braces/prototypes and whitespace, fresh/twenty-blank
+complete-TU controls reproduce its game bytes/layouts, defined symbols and
+normalized relocations. All 82 extents, outside-owner text bytes/relocations
+and other allocatable sections equal the preceding frozen object, including
+the model initializer's callback references. Independent strict links prove
+all 260 original/frozen/retail-gated bytes equal, with no unresolved symbols.
+Record-layout assertions still pass. No accepted owner is re-probed.
+
+The cleaned source passes the ROM gate again, retail MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`, all 427 host syntax checks, 76 native
+tooling tests, accepted provenance and whitespace checks. The naming plan
+has no established mapping, so the address name remains. This verified
+follow-up is prepared as a separate partial batch after #1186 merged;
+coverage remains CI-owned and no private helper artifacts are published.
+
 ## 2026-10-17: model-group initializer accepted, 536 original bytes
 
 07714 is accepted in normal runner batch

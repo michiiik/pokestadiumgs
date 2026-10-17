@@ -224,7 +224,37 @@ s32 func_82206B64(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82206BA4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82206EB8.s")
+extern u8 D_8220DA6C[];
+extern s16 D_8220DA40;
+extern f32 D_80087E50[];
+
+s32 func_82206EB8(s32 mode, void *node) {
+    s32 index = *(s32 *)((u8 *)node + 20);
+    f32 amplitude;
+
+    switch (mode) {
+    case 0: {
+        s16 *entry = (s16 *)((u8 *)D_8220DA6C + (index << 2));
+        Vec3f_SetComponentsDuplicate((f32 *)((u8 *)node + 36),
+            (f32)entry[0] - 320.0f, 240.0f - (f32)entry[1], -579.0f);
+        break;
+    }
+    case 2:
+        switch (index) {
+        case 0:
+        case 3:
+        case 4:
+            amplitude = 4096.0f;
+            break;
+        default:
+            amplitude = 2048.0f;
+            break;
+        }
+        *(s16 *)((u8 *)node + 34) = amplitude * D_80087E50[((u16)D_8220DA40) >> 4];
+        break;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82206FBC.s")
 
@@ -393,7 +423,6 @@ extern void *process_geo_layout(struct S1_MemoryBlock *, void *);
 extern void func_8003F018(s32);
 extern void func_80037E3C(void *, Fragment17NodeCallback, void *);
 extern void func_8003F114(u8 *, s16, s16, void *);
-extern s32 func_82206EB8(s32, void *);
 extern Fragment17TextureRecord D_8220F290[];
 extern void *D_8220DA44[];
 extern void *D_8220DA98[];
