@@ -41,7 +41,24 @@ void GbData_WriteU24BE(u8 *arg0, s32 arg1) {
 
 u8 func_80060AAC(u8 arg0) { extern u8 *D_80097680; return D_80097680[arg0]; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060AC8.s")
+u8 GbText_DecodeCharForMode(u8 value, s32 mode) {
+    u8 *table;
+    table = D_80097680;
+    switch (mode) {
+    case 1:
+        table = D_80097380;
+        break;
+    case 2:
+    case 3:
+        table = D_80097480;
+        break;
+    case 4:
+    case 5:
+        table = D_80097580;
+        break;
+    }
+    return table[value];
+}
 
 s32 func_80060B28(u8 arg0) {
     u8 i;
@@ -53,7 +70,31 @@ s32 func_80060B28(u8 arg0) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80060B74.s")
+s32 GbText_EncodeCharForMode(u8 value, s32 mode) {
+    u8 *table;
+    //!bug: the byte index wraps forever if value is absent from the table.
+    u8 i;
+    table = D_80097680;
+    switch (mode) {
+    case 1:
+        table = D_80097380;
+        break;
+    case 2:
+    case 3:
+        table = D_80097480;
+        break;
+    case 4:
+    case 5:
+        table = D_80097580;
+        break;
+    }
+    for (i = 0; i < 0x100; i++) {
+        if (value == table[i]) {
+            return i;
+        }
+    }
+    return 0;
+}
 
 extern u8 * D_80097680;
 s8 *func_80060C08(s8 *arg0, u8 *arg1) {
@@ -78,12 +119,11 @@ s8 *func_80060C50(s8 *arg0, u8 *arg1) {
     return result;
 }
 
-extern u8 func_80060AC8(u8, s32);
 s8 *func_80060C98(s8 *arg0, u8 *arg1, s32 arg2) {
     s8 *result;
     result = arg0;
     while (*arg1 != 0x50) {
-        *arg0++ = func_80060AC8(*arg1++, arg2);
+        *arg0++ = GbText_DecodeCharForMode(*arg1++, arg2);
     }
     *arg0 = 0;
     return result;
@@ -454,7 +494,46 @@ s32 func_80061B88(s32 arg0, u16 arg1) {
     return sp1C;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80061D8C.s")
+u8 Pokemon_LevelFromExpWithHint(s32 species, u32 experience, u8 level) {
+    u8 lower = 2;
+    u8 upper = 101;
+    u32 current_exp;
+    u32 next_exp;
+    if (level < 2) {
+        level = 2;
+    }
+    if (level > 100) {
+        level = 100;
+    }
+    while (1) {
+        current_exp = func_80061B88(species, level);
+        next_exp = func_80061B88(species, level + 1);
+        if (experience < current_exp) {
+            upper = level;
+            level = (level + lower) / 2;
+            if (level < 3) {
+                level = 2;
+                break;
+            }
+        } else if (next_exp < experience) {
+            lower = level;
+            level = (upper + level) / 2;
+            if (level >= 100) {
+                level = 100;
+                break;
+            }
+        } else {
+            if (experience == next_exp) {
+                level++;
+                if (level > 100) {
+                    level = 100;
+                }
+            }
+            break;
+        }
+    }
+    return level;
+}
 
 u16 Pokemon_LevelFromExp(s32 species, s32 experience) {
     s32 i;
@@ -603,9 +682,62 @@ s32 func_80062304(u8 *arg0) { s32 result = 0; if ((arg0[1] & 0x10) && (arg0[4] &
 
 s32 func_8006236C(u8 *arg0, s32 arg1) { s32 result = 0; if (arg0[5] >= arg1) { *(u16 *)(arg0 + 10) = arg1; result = 1; } return result; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80062390.s")
+extern s32 func_80053B38(s32, s32, s32, u8 *);
+extern s32 func_8005D698(s32, s32, s32, s32, u8 *);
+s32 Deck_ReadEntries(u8 *buffer, s32 remaining, u8 *handle) {
+    s32 cursor;
+    s32 success;
+    s32 transferred = 0;
+    while (remaining-- > 0 && ((cursor = *(s16 *)(handle + 10)) < handle[5])) {
+        success = 0;
+        switch (handle[1] & 0xF0) {
+        case 0x10:
+            success = func_80053B38(handle[1], handle[3], cursor, buffer);
+            break;
+        case 0x20:
+            success = func_8005D698(handle[1], handle[2], handle[3], cursor, buffer);
+            break;
+        }
+        if (success == 0) {
+            break;
+        }
+        (*(s16 *)(handle + 10))++;
+        transferred++;
+        buffer += *(s16 *)(handle + 8);
+    }
+    return transferred;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_8006249C.s")
+extern s32 func_80053F04(s32, s32, s32, u8 *);
+extern s32 func_8005D778(s32, s32, s32, s32, u8 *);
+extern s32 func_8005370C(s32, s32);
+extern s32 func_8005CF20(s32, s32, s32);
+s32 Deck_WriteEntries(u8 *buffer, s32 remaining, u8 *handle) {
+    s32 cursor;
+    s32 success;
+    s32 transferred = 0;
+    while (remaining-- > 0 && ((cursor = *(s16 *)(handle + 10)) < *(s16 *)(handle + 6))) {
+        success = 0;
+        switch (handle[1] & 0xF0) {
+        case 0x10:
+            success = func_80053F04(handle[1], handle[3], cursor, buffer);
+            handle[5] = func_8005370C(handle[1], handle[3]);
+            break;
+        case 0x20:
+            success = func_8005D778(handle[1], handle[2], handle[3], cursor, buffer);
+            handle[5] = func_8005CF20(handle[1], handle[2], handle[3]);
+            break;
+        }
+        if (success == 0) {
+            break;
+        }
+        (*(s16 *)(handle + 10))++;
+        transferred++;
+        buffer += *(s16 *)(handle + 8);
+        handle[4] |= 1;
+    }
+    return transferred;
+}
 
 s32 func_800625E0(s32 arg0, s32 arg1) {
     extern char *func_80060F68(char *, char *);
