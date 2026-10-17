@@ -66,7 +66,51 @@ void func_8220B930(void) {
     } while (cursor != end);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_11B210/func_8220B984.s")
+extern Gfx *D_800D0510;
+extern u8 D_80094E38[];
+extern s32 func_8004D1FC(u8 *);
+extern void func_80044270(s16, s16, s16, s16, s16, s16, s16, s16, s32);
+
+void func_8220B984(void) {
+    f32 bias;
+    f32 width;
+    f32 height;
+    f32 scale_x;
+    f32 scale_y;
+    s32 draw_width;
+    u16 *texture;
+    Fragment17Slot *slot;
+    u8 *cursor;
+
+    gSPDisplayList(D_800D0510++, D_80094E38);
+    for (cursor = &D_82210B60; ; ) {
+        slot = (Fragment17Slot *)(cursor + 4);
+        if (*(s16 *)(cursor + 4) != 0) {
+            texture = (u16 *)slot->resource;
+            if (texture != 0 && slot->unk_04 > 0 &&
+                slot->unk_10 > 0.0f && slot->unk_14 > 0.0f) {
+                scale_x = slot->unk_10 * 2.0f;
+                scale_y = slot->unk_14 * 2.0f;
+                width = (f32)(u32)texture[0] * scale_x;
+                height = (f32)(u32)texture[1] * scale_y;
+                bias = width > 0.0f ? 0.5f : -0.5f;
+                draw_width = (s32)(bias + width);
+                bias = height > 0.0f ? 0.5f : -0.5f;
+                func_8004D1FC((u8 *)texture);
+                gDPPipeSync(D_800D0510++);
+                gDPSetEnvColor(D_800D0510++, 255, 255, 255, slot->unk_04);
+                func_80044270((s16)(s32)((f32)slot->unk_0C - width / 2),
+                              (s16)(s32)((f32)slot->unk_0E - height / 2),
+                              draw_width, (s32)(bias + height), 0, 0,
+                              (s32)(1024.0f / scale_x), (s32)(1024.0f / scale_y), 0);
+            }
+        }
+        cursor += 24;
+        if (cursor == &D_82210C20) {
+            break;
+        }
+    }
+}
 
 s32 func_8220BC40(void) {
     Fragment17SlotPool *pool = (Fragment17SlotPool *)&D_82210B60;
@@ -306,9 +350,60 @@ void func_8220C42C(u8 *arg0, u8 *arg1, s16 *arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_11B210/func_8220C6C4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_11B210/func_8220CB34.s")
+void func_8220CB34(s32 x, s32 y, s32 width, s32 height) {
+    s32 resource;
+    s32 tile_width;
+    s32 tile_height;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_11B210/func_8220CE10.s")
+    resource = func_8004C990(81, 0);
+    tile_width = ((u16 *)resource)[0];
+    tile_height = ((u16 *)resource)[1];
+    tile_width /= 4;
+    func_80044270(x, y, tile_width, tile_height, 0, 0, 1024, 1024, 0);
+    func_80044270(x + tile_width, y, width - tile_width * 2, tile_height,
+                  tile_width << 5, 0, 0, 1024, 0);
+    func_80044270(x + width - tile_width, y, tile_width, tile_height,
+                  tile_width << 5, 0, 1024, 1024, 0);
+    func_80044270(x, y + tile_height, tile_width, height - tile_height * 2,
+                  (tile_width * 2) << 5, 0, 1024, 0, 0);
+    func_80044270(x, y + height - tile_height, tile_width, tile_height,
+                  (tile_width * 2) << 5, 0, 1024, 1024, 0);
+    func_80044270(x + tile_width, y + height - tile_height,
+                  width - tile_width * 2, tile_height,
+                  (tile_width * 3) << 5, 0, 0, 1024, 0);
+    func_80044270(x + width - tile_width, y + height - tile_height,
+                  tile_width, tile_height, (tile_width * 3) << 5, 0, 1024, 1024, 0);
+    func_80044270(x + width - tile_width, y + tile_height,
+                  tile_width, height - tile_height * 2,
+                  (tile_width * 3) << 5, 0, 1024, 0, 0);
+}
+
+extern u8 D_80094E78[];
+
+void func_8220CE10(Fragment17Panel *panel) {
+    s32 resource;
+    Fragment17HalfPair position;
+    struct {
+        u8 r;
+        u8 g;
+        u8 b;
+    } environment, primitive;
+
+    resource = func_8004C990(81, 0);
+    if (resource != 0) {
+        position.x = panel->pair_0A.x + panel->pair_12.x;
+        position.y = panel->pair_0A.y + panel->pair_12.y;
+        gSPDisplayList(D_800D0510++, D_80094E78);
+        gDPSetRenderMode(D_800D0510++, 0x0F0A4000, 0);
+        func_8004D1FC((u8 *)resource);
+        func_8220C42C((u8 *)&environment, (u8 *)&primitive, (s16 *)panel);
+        gDPPipeSync(D_800D0510++);
+        gDPSetEnvColor(D_800D0510++, environment.r, environment.g, environment.b, 255);
+        gDPSetPrimColor(D_800D0510++, 0, 0, primitive.r, primitive.g, primitive.b, 255);
+        func_8220CB34(position.x + 54, position.y + 36, 300, 97);
+        func_8220CB34(position.x + 54, position.y + 172, 300, 82);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_11B210/func_8220CF9C.s")
 

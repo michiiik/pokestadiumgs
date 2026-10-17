@@ -1,5 +1,157 @@
 # Region notes: fragment17_11B210
 
+## 2026-10-18: rendering batch complete, 1828 original bytes
+
+The pending batch comprises CE10 (396 bytes), CB34 (732 bytes), and B984
+(700 bytes), all accepted with link verification and full-ROM gates. The
+file advances from 15 C / 13 assembly owners after #1191 to 18 C / 10 ASM.
+No new runtime function is introduced.
+
+B984 traverses the eight active slots, checking resource, opacity, and both
+positive scales. It doubles each scale, computes pixel extents from the
+unsigned texture dimensions, rounds them with signed half-unit bias, selects
+the slot's texture, emits the white/opacity environment color, and draws the
+centered rectangle with reciprocal texture steps. The exact source retains
+integer literal division by 2 for the half extents: 2.0f instead strength-
+reduces to multiplication, while 2.0 introduces double arithmetic.
+
+After 32 ordinary candidates, a direct symbolic endpoint resolves the saved
+register rotation among the loop bound and graphics constants. Initializing
+the cursor in a for-loop header resolves the final address scheduling pair.
+Neither advisory register-tie warnings nor normalized scores are terminal
+proof. The accepted batch is `848eb2208f49401bb0896b6e1098bbba`; first accepted
+complete-object SHA256, frozen before further compilation:
+`8112466873cf19f12cc84d7215fc6511299f40b5cf78216e94c826697ade56c4`.
+
+Post-accept declaration deduplication, RGB formatting, and loop-endpoint-test
+formatting preserve all frozen game bytes, section layouts, defined symbols,
+and normalized relocations, including a twenty-blank control. Accepted owners
+are not resubmitted as candidates. The three source bodies contain no dummy
+locals, artificial homes, fixed registers, loose prototypes, manual unrolling,
+or compiler/output modifications. Coverage remains CI-owned and all scratch
+generators, compiler diagnostics, objects, and ROMs stay private.
+
+The final cleaned source passes the full-ROM gate, MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`, all 427 host syntax checks, 76 native
+tooling tests, accepted provenance and whitespace checks. Independent strict
+links resolve every undefined symbol at its game address; all 28 original
+function extents and complete text including padding agree across the original
+and frozen accepted objects. Naming lookup has no established mappings.
+The clean publication clone runs 76 tests, with 62 passing and 14 explicit
+backend-dependent skips.
+
+## 2026-10-18: panel frame register requeue and search import fault
+
+C6C4 remains assembly after 24 ordinary candidates. The original and the best
+candidate both have 1136 bytes and frame 152. Moving the real texture dimension
+locals before the RGB buffers restores the original stack offsets 128/132.
+The remaining raw score is 0.9014 with the same opcode sequence: full tile width
+is saved in s5 rather than s3, its short draw width in s3 rather than s4, and
+short draw height in s4 rather than s5. One adjacent instruction pair also
+changes order. Explicit short draw dimensions add stack-offset differences.
+Pointer/word resource views, coordinate pairs, combined/staged width division,
+and initialized/assigned short dimensions do not close this basin.
+
+Known-source, declaration-layout, and twenty-blank whole-object controls pass.
+Standalone AST import does not: expanding five graphics macros changes three
+instruction-order pairs (offsets 100/112, 144/148, 248/252) relative to the
+complete-TU candidate. A private attempt to preserve macro line groups through
+permuter annotations also fails the complete-TU fingerprint control. No search
+is run after either failure, and neither is evidence of a source/compiler wall.
+Next repair and calibrate the macro-aware search import or trace the original
+full-TU candidate's three dimension webs. Preserve the original header reads
+before the texture-null guard when resuming; moving them changes the program.
+
+## 2026-10-18: eight-piece border accepted, 732 original bytes
+
+CB34 is accepted through the normal native runner with link verification and
+a successful combined full-ROM gate, batch `057bc250934e4017999f0c630f85dc32`.
+The first accepted complete object was frozen before another compilation:
+SHA256 `d637dfb5766075bdc733f6c51dac2e6203e0f4cd90d960264edaf5ca931cfb44`.
+The file now has 17 C / 11 assembly owners.
+
+It reads archive 81 entry 0's unsigned texture dimensions, divides its width
+into four cells, and draws eight distinct perimeter pieces. Corners use
+1024 texture steps; horizontal and vertical edges hold one texture coordinate
+fixed to stretch their sampled column/row. The eight calls are separate
+corner/edge operations, not an unrolled source-loop workaround. The actual
+rectangle helper takes eight signed-short arguments followed by a word cycle
+selector; the destination x/y/width/height parameters remain full words.
+
+The initial source has the correct 732-byte opcode sequence and 120-byte
+frame, but swaps the full-width tile dimensions' saved registers s0/s1.
+Loading both dimensions before the separate width division restores every
+word without a forced register, unused local, padding, or prototype change.
+Sixteen ordinary candidates cover resource carriers, dimension widths,
+texture-coordinate temporaries, and initialization lifetimes. Accepted owners
+are never submitted as candidates again; proof and cleanup use whole-TU
+controls against the immutable complete object.
+
+## 2026-10-18: scaled interior frame requeue
+
+C470 remains assembly after 24 ordinary candidates. A typed panel parameter,
+three-byte RGB aggregates, actual callee prototypes, unsigned texture-width
+conversion, and SDK display-list macros reproduce all 596 instruction bytes
+except the prologue/epilogue frame adjustments: candidate frame 120, target
+128 (normalized/raw 1.0/0.9866). Every used stack offset and other instruction
+agrees in the best source. Coordinate pairs versus separate shorts and
+pointer versus word resource carriers preserve that basin. A real local panel
+alias or explicit float/integer rounded-step value changes used stack offsets
+without restoring the target frame. No candidate is link-verified or accepted.
+
+Known-source, prototype-layout, and twenty-blank complete-object controls pass.
+The solved fragment20_12C460 renderer provides a useful SDK/source-shape
+sibling, but contains an unused two-word array that is deliberately excluded
+from this campaign. Adding that array or any artificial frame padding would
+not explain this function's real data flow. Next investigate authentic
+conversion/expression staging or compiler frame-allocation provenance; preserve
+the exact two-word residual rather than accepting a normalized score.
+
+## 2026-10-18: confirmation text address-lifetime requeue
+
+D3C4 remains assembly after 24 ordinary candidates: coordinate pair versus
+separate shorts, table cursor versus indexed lookup, for/do loops, and scalar,
+record, or menu-header views of the secondary selection. The original is 412
+bytes with a 56-byte frame and five saved registers. The best candidate is
+424 bytes with the same frame and six saved registers, normalized/raw
+0.9528/0.7736. Its selected-field address survives in saved s5 instead of
+being rematerialized for the marker and each text row; the short y home moves
+from stack offset 50 to 52. Record and menu-header views do not improve it.
+
+Known-source, declaration-layout, and twenty-blank whole-object controls pass.
+Strict standalone AST/full-TU linked controls and the imported assembly/retail
+control also pass, with every undefined symbol resolved. A 60-second search
+with stack differences enabled reports base 782 and lower scores 682/602,
+but both improved outputs move font setup across the selected-panel guard
+or make the marker unconditional. They are behavior changes and are rejected;
+the valid output only changes declaration/line layout and retains score 782.
+No search output is installed or credited as progress toward a byte match.
+
+Next measure the address web's allocation cost and investigate authentic
+whole-function lifetime or expression lowering. This bounded negative covers
+only the listed source families and search; it does not establish a compiler
+wall. Do not replay the same bodies, loosen call prototypes, cache the mutable
+selection across calls, or add artificial stack homes.
+
+## 2026-10-18: panel background accepted locally, 396 original bytes
+
+CE10 is accepted with link verification and the normal combined full-ROM
+gate, batch `effebf5510014b8d9da55817ea25f16f`. First accepted complete
+object SHA256: `de88be2469f80dbcd5be3971db45d76dbdd6e73ef162b14adfb9e0c1bde7c9e1`.
+It draws the archive-81 resource, derives coordinates from the panel's two
+halfword pairs, sets environment/primitive RGB through the SDK macros, and
+draws two 300-wide rectangles at vertical offsets 36/172, heights 97/82.
+C42C supplies the colors based on the panel's mode field.
+
+The 24-candidate progression isolates genuine local layout: a panel alias
+adds eight frame bytes; using the typed panel parameter restores frame 64.
+The remaining 13 differing words are stack offsets. Declaring the resource
+before the coordinate pair and two three-byte RGB aggregates restores every
+word. No artificial padding or stack homes are added. The accepted source
+uses Fragment17HalfPair for the coordinates and ordinary SDK graphics macros.
+The file advances to 16 C / 12 assembly owners at this acceptance. This owner
+belongs to the rendering batch above, separate from the input-handler PR #1191.
+
 ## 2026-10-18: menu input family accepted, 692 original bytes
 
 The normal native runner accepts C08C (312 bytes, frame 24), batch
