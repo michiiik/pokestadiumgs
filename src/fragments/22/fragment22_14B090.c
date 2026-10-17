@@ -2,7 +2,48 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14B090/func_82700DD0.s")
+typedef struct Fragment22RowPoint {
+    s16 x;
+    s16 y;
+} Fragment22RowPoint;
+
+typedef struct Fragment22RowEntry {
+    s16 kind;
+    s16 row_index;
+    s16 unk_04;
+    s16 state;
+    s16 counter;
+    s16 width;
+    s16 alpha;
+    Fragment22RowPoint layout_position;
+    Fragment22RowPoint position;
+    Fragment22RowPoint animation_start;
+    Fragment22RowPoint animation_target;
+    s16 unk_1e;
+    s16 selection;
+    s16 option_count;
+    u32 payload;
+} Fragment22RowEntry;
+
+typedef struct Fragment22RowOptionCounts {
+    s16 values[5];
+} Fragment22RowOptionCounts;
+
+typedef char Fragment22RowEntrySizeCheck[sizeof(Fragment22RowEntry) == 40 ? 1 : -1];
+typedef char Fragment22RowOptionCountsSizeCheck[sizeof(Fragment22RowOptionCounts) == 10 ? 1 : -1];
+extern Fragment22RowOptionCounts D_82703280;
+extern u32 D_8270329C[];
+
+s32 func_82700DD0(s32 value) {
+    OSIntMask old_mask;
+
+    old_mask = osSetIntMask(OS_IM_NONE);
+    if (!(IO_READ(PI_STATUS_REG) & 3) && (IO_READ(PI_DOM1_ADDR2 + 0xD10) & 0xFFFF) != 1024) {
+        value = -64;
+    }
+    osSetIntMask(old_mask);
+    return value;
+}
 
 void *func_82700E38(void *arg0, s32 arg1) {
     s32 i;
@@ -64,11 +105,31 @@ void func_82700EC8(void *arg0) {
     state->previous = state->current;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14B090/func_82700EFC.s")
+void func_82700EFC(Fragment22RowEntry *entry, s32 unused) {
+    Fragment22RowOptionCounts option_counts = D_82703280;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14B090/func_82700FA4.s")
+    entry->width = 369;
+    entry->layout_position.x = 640 - entry->width;
+    entry->layout_position.y = entry->row_index * 44 + 126;
+    entry->position = entry->layout_position;
+    entry->selection = 0;
+    entry->option_count = option_counts.values[entry->row_index];
+    entry->payload = D_8270329C[entry->row_index];
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14B090/func_82700FF0.s")
+void func_82700FA4(Fragment22RowEntry *entry) {
+    entry->width = 208;
+    entry->layout_position.x = 640 - entry->width;
+    entry->layout_position.y = entry->row_index * 44 + 354;
+    entry->position = entry->layout_position;
+}
+
+void func_82700FF0(Fragment22RowEntry *entry) {
+    entry->width = 369;
+    entry->layout_position.x = 640 - entry->width;
+    entry->layout_position.y = entry->row_index * 44 + 310;
+    entry->position = entry->layout_position;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14B090/func_8270103C.s")
 
