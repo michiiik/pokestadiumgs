@@ -75,7 +75,27 @@ void func_80042FE4(void* arg0, void* arg1) {
     func_80042EB8(arg0, 0, arg1, 0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_8004300C.s")
+typedef struct PreviewSelectionPair {
+    u32 first, second;
+} PreviewSelectionPair;
+typedef struct PreviewSelectionView {
+    u8 unknown00[20];
+    void *resource;
+    u8 unknown18[16];
+    PreviewSelectionPair selection;
+} PreviewSelectionView;
+extern void func_80042D8C(void *);
+// Reuse a selection only when both preview states share the same resource.
+s32 ModelPreview_TryCopySelection(PreviewSelectionView *dest, PreviewSelectionView *source) {
+    s32 result = 0;
+    if (dest->resource == source->resource) {
+        dest->selection = source->selection;
+        dest->resource = source->resource;
+        result = 1;
+        func_80042D8C(dest);
+    }
+    return result;
+}
 
 extern s32 func_800427B8();
 extern void func_80042D8C();
@@ -131,12 +151,31 @@ s32 func_8004335C(s32 arg0, u8 *arg1) {
 
 s32 func_80043444(u8 *arg0) { return 0; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/43700/func_80043450.s")
+extern s16 Math_StepToS(s16, s16, s16);
+// Advance rotationY while damping rotationX back to zero.
+void ModelPreview_UpdateAutoRotation(u8 *state) {
+    s16 step;
+    s16 increment;
+    s16 *rotation = (s16 *)(*(u8 **)(state + 0x1C) + 0x1E);
+
+    if (*(s16 *)(state + 0xE) < 256) {
+        *(s16 *)(state + 0xE) += 16;
+    }
+    rotation[1] += *(s16 *)(state + 0xE);
+    increment = *(s16 *)(state + 0xE);
+    step = (rotation[0] < 0 ? -rotation[0] : rotation[0]) / 12;
+    if (step < 8) {
+        step = 8;
+    }
+    if (step < increment) {
+        increment = step;
+    }
+    rotation[0] = Math_StepToS(rotation[0], 0, increment);
+}
 
 extern s32 D_80094C60;
 extern void func_800430B4();
 extern s32 func_8004335C();
-extern void func_80043450();
 extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
 void func_80043500(u8 *arg0) {
     s32 result;
@@ -163,7 +202,7 @@ void func_80043500(u8 *arg0) {
         if (countdown > 0) {
             *(s16 *)(arg0 + 0xC) = countdown - 1;
         } else {
-            func_80043450(arg0);
+            ModelPreview_UpdateAutoRotation(arg0);
         }
     }
     scale = *(f32 *)(arg0 + 0x10);

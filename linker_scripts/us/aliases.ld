@@ -319,3 +319,7 @@ func_80028340 = Audio_UpdateDeferredSounds;
 func_8002818C = Audio_QueueDeferredSound;
 func_80031638 = Audio_UpdateCommandQueue;
 func_80027BD4 = Audio_BuildAndDispatchSoundEvent;
+func_8003946C = GeoOverlay_BuildFadeQuad;
+func_8003C390 = Geo_NodeShadow;
+func_8004300C = ModelPreview_TryCopySelection;
+func_80043450 = ModelPreview_UpdateAutoRotation;
