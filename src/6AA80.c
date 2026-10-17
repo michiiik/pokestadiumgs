@@ -25,12 +25,12 @@ void func_80069E80(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_80069F20.s")
 
-extern void func_80069F20();
-void BattleScene_ResetParticipantModelFlags(s32 arg0) {
-    func_80069F20(arg0, 0, 0);
+extern void *func_80069F20();
+void *BattleScene_ResetParticipantModelFlags(s32 arg0) {
+    return func_80069F20(arg0, 0, 0);
 }
 
-extern void func_80069F20(void); void func_8006A160(void) { func_80069F20(); }
+extern void *func_80069F20(void); void func_8006A160(void) { func_80069F20(); }
 
 extern s32 D_8009DF70;
 extern void _bzero(void *, s32);
@@ -360,7 +360,7 @@ void func_8006BA74(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006BF78.s")
 
-extern void func_8006BF78(s32); void func_8006C58C(void) { func_8006BF78(0); }
+extern void *func_8006BF78(s32); void *func_8006C58C(void) { return func_8006BF78(0); }
 
 extern void _bcopy(void *, void *, s32);
 void func_8006C5AC(s32 arg0, void *arg1, s32 arg2, s32 arg3)
@@ -384,7 +384,7 @@ void func_8006C5AC(s32 arg0, void *arg1, s32 arg2, s32 arg3)
   }
 }
 
-extern void func_8006BF78(s32); void func_8006C644(void) { func_8006BF78(1); }
+extern void *func_8006BF78(s32); void *func_8006C644(void) { return func_8006BF78(1); }
 
 extern s32 func_800718B8(s32);
 extern void func_80073208(void *, s32);
