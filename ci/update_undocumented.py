@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
-"""Render UNDOCUMENTED.md: symbols that still carry auto-generated names.
+"""Render UNDOCUMENTED.md: what still needs naming or documenting.
 
-Companion to ci/update_coverage.py. A symbol counts as undocumented while its
-name is the splat placeholder (func_8xxxxxxx, D_8xxxxxxx, jtbl_8xxxxxxx). It
-becomes documented once it is renamed in linker_scripts/us/symbol_addrs*.txt.
+Companion to ci/update_coverage.py. Four kinds of work are tracked:
+  * functions defined in src/ with no /* ... */ comment directly above them;
+  * func_XXXXXXXX placeholder function names;
+  * D_XXXXXXXX / jtbl_XXXXXXXX placeholder variables;
+  * m2c temp_*/var_* placeholder locals (counted as functions that still use
+    them, since the same name repeats across many functions).
+A global placeholder becomes documented once it is renamed in
+linker_scripts/us/symbol_addrs*.txt.
 Functions come from the symbol tables (entries with type:func or a func_
 placeholder). Variables are the tables' non-function entries plus every
 D_/jtbl_ placeholder that src/ references but the tables do not list.
@@ -52,6 +57,36 @@ def read_tables(repo_root: Path) -> tuple[dict[str, bool], list[str]]:
     return symbols, missing
 
 
+DEF_RE = re.compile(
+    r"^(?!(?:if|for|while|switch|else|return|do|typedef)\b)[A-Za-z_][\w \t\*]*?\b([A-Za-z_]\w*)\s*\([^;{}()]*(?:\([^;{}()]*\)[^;{}()]*)*\)\s*\{",
+    re.M)
+LOCAL_RE = re.compile(r"\b(?:temp|var|phi)_[a-z][a-z0-9_]*\b")
+
+
+def strip_literals(text: str) -> str:
+    """Blank out strings and comments (keeping newlines) so braces count right."""
+    def blank(m):
+        return re.sub(r"[^\n]", " ", m.group(0))
+    return re.sub(r'/\*.*?\*/|//[^\n]*|"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'', blank, text, flags=re.S)
+
+
+def function_defs(text: str) -> list[tuple[str, bool, bool]]:
+    """Return (name, has_doc_comment, uses_placeholder_locals) per definition."""
+    clean = strip_literals(text)
+    result = []
+    for m in DEF_RE.finditer(clean):
+        depth, i = 1, m.end()
+        while i < len(clean) and depth:
+            depth += (clean[i] == "{") - (clean[i] == "}")
+            i += 1
+        before = text[: m.start()].rstrip(" \t")
+        before = before[:-1] if before.endswith("\n") else before
+        before = before.rstrip(" \t")
+        documented = before.endswith("*/")
+        result.append((m.group(1), documented, bool(LOCAL_RE.search(clean[m.end(): i]))))
+    return result
+
+
 def source_references(repo_root: Path) -> dict[str, set[str]]:
     refs: dict[str, set[str]] = {}
     src = repo_root / "src"
@@ -77,10 +112,20 @@ class Report:
         self.func_undoc = sum(1 for n in funcs if is_placeholder(n))
         self.var_total = len(variables)
         self.var_undoc = sum(1 for n in variables if is_placeholder(n))
-        self.by_file: dict[str, tuple[int, int]] = {}
-        for path, names in self.refs.items():
+        self.defs = self.doc = self.local_funcs = 0
+        self.by_file: dict[str, tuple[int, int, int, int, int]] = {}
+        src = repo_root / "src"
+        for path in sorted(src.rglob("*.c")) if src.exists() else []:
+            rel = path.relative_to(repo_root).as_posix()
+            defs = function_defs(path.read_text(encoding="utf-8", errors="replace"))
+            names = self.refs.get(rel, set())
             f = sum(1 for n in names if n.startswith("func_"))
-            self.by_file[path] = (f, len(names) - f)
+            row = (len(defs), sum(d for _, d, _ in defs), f, len(names) - f, sum(l for _, _, l in defs))
+            self.defs += row[0]
+            self.doc += row[1]
+            self.local_funcs += row[4]
+            if row[0] - row[1] or row[2] or row[3] or row[4]:
+                self.by_file[rel] = row
 
 
 def pct(done: int, total: int) -> str:
@@ -92,28 +137,31 @@ def render(report: Report) -> str:
     lines = [
         GENERATED_HEADER,
         "",
-        "# Undocumented symbols",
+        "# Undocumented code",
         "",
         START_MARKER,
+        f"- Functions defined in `src/` with a `/* ... */` comment: **{report.doc:,} / {report.defs:,} ({pct(report.doc, report.defs)})**",
         f"- Functions with a real name: **{fd:,} / {report.func_total:,} ({pct(fd, report.func_total)})**"
         f" ({report.func_undoc:,} still `func_XXXXXXXX`)",
         f"- Variables with a real name: **{vd:,} / {report.var_total:,} ({pct(vd, report.var_total)})**"
         f" ({report.var_undoc:,} still `D_XXXXXXXX` / `jtbl_XXXXXXXX`)",
+        f"- Functions still using m2c `temp_*` / `var_*` locals: **{report.local_funcs:,}**",
         END_MARKER,
         "",
-        "A symbol is documented once it is renamed in `linker_scripts/us/symbol_addrs*.txt`.",
-        "The table counts distinct placeholder names that each `src/` file references.",
+        "A function counts as commented when a `/* ... */` block ends on the line directly above its definition.",
+        "A global is named once it is renamed in `linker_scripts/us/symbol_addrs*.txt`.",
+        "In the table, `func_` and `D_/jtbl_` count the distinct placeholder names that file references.",
         "",
-        "## Placeholders referenced by source file",
+        "## By source file",
         "",
-        "| File | Functions | Variables |",
-        "| --- | ---: | ---: |",
+        "| File | Defined | No comment | `func_` | `D_/jtbl_` | `temp_/var_` locals |",
+        "| --- | ---: | ---: | ---: | ---: | ---: |",
     ]
-    ranked = sorted(report.by_file.items(), key=lambda kv: (-(kv[1][0] + kv[1][1]), kv[0]))
-    for path, (f, v) in ranked:
-        lines.append(f"| `{path}` | {f:,} | {v:,} |")
+    ranked = sorted(report.by_file.items(), key=lambda kv: (-(kv[1][0] - kv[1][1] + kv[1][2] + kv[1][3] + kv[1][4]), kv[0]))
+    for path, (n, doc, f, v, loc) in ranked:
+        lines.append(f"| `{path}` | {n:,} | {n - doc:,} | {f:,} | {v:,} | {loc:,} |")
     if not ranked:
-        lines.append("_No placeholder names referenced from `src/`._")
+        lines.append("_Nothing left to document._")
     return "\n".join(lines) + "\n"
 
 

@@ -18,7 +18,11 @@ def make_repo(root: Path) -> None:
     (root / "src").mkdir()
     (root / "src/a.c").write_text(
         "extern u8 D_80000020; extern u8 D_80000030; extern u8 jtbl_80000040[];\n"
-        "void f(void) { func_80001600(); func_80001600(); Main(); }\n")
+        "/* Does the thing. */\n"
+        "void f(void) { func_80001600(); func_80001600(); Main(); }\n"
+        "\n"
+        "s32 g(s32 a)\n{\n    s32 temp_v0 = a; /* } */\n    return temp_v0;\n}\n"
+        "void h(void)\n{\n    if (1) { }\n}\n")
 
 
 class UndocumentedTest(unittest.TestCase):
@@ -30,7 +34,9 @@ class UndocumentedTest(unittest.TestCase):
             self.assertEqual((r.func_total, r.func_undoc), (3, 2))
             # gThing, D_80000020 from tables; D_80000030, jtbl_80000040 from src only.
             self.assertEqual((r.var_total, r.var_undoc), (4, 3))
-            self.assertEqual(r.by_file["src/a.c"], (1, 3))
+            # 3 defs (f documented, g and h not); 1 func_, 3 D_/jtbl_; g uses temp_v0.
+            self.assertEqual((r.defs, r.doc, r.local_funcs), (3, 1, 1))
+            self.assertEqual(r.by_file["src/a.c"], (3, 1, 1, 3, 1))
 
     def test_render_and_check(self):
         with tempfile.TemporaryDirectory() as d:
@@ -38,7 +44,8 @@ class UndocumentedTest(unittest.TestCase):
             make_repo(root)
             text = u.render(u.Report(root))
             self.assertIn("**1 / 3 (33.3%)**", text)
-            self.assertIn("| `src/a.c` | 1 | 3 |", text)
+            self.assertIn("| `src/a.c` | 3 | 2 | 1 | 3 | 1 |", text)
+            self.assertIn("**1 / 3 (33.3%)**", text)
 
     def test_placeholder(self):
         self.assertTrue(u.is_placeholder("func_8012ABCD"))
