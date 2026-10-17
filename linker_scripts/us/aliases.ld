@@ -345,3 +345,5 @@ func_80063A8C = Pokemon_FindEvolutionMethod;
 /* Audio interface hardware bug flag alias to prevent address CSE */
 Audio_AiHdwrBugFlag = D_8008FAA0;
 func_80063D54 = Pokemon_CanLearnGen1Machine;
+func_80063838 = Pokemon_GetBaseStat;
+func_800640F8 = Pokemon_GetMoveLearnLevelForVersion;

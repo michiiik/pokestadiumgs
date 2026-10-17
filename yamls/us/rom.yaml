@@ -363,6 +363,7 @@
     - [0xA5610, .rodata, 585D0] # jtbl_800A4AB4 (+44 more)
     - [0xA5BF0, .rodata, 615D0] # jtbl_800A4FF0 (+2 more)
     - [0xA5C80, rodata]
+    - [0xA5D50, .rodata, 641E0] # Fallback records and all three species/move jump tables.
     - [0xA5EA0, rodata] # 654A0 jtbl_800A52A0 (+2 more): mixed 4/8 late_rodata alignment skews asm-processor text by +4; keep in the blob
     - [0xA5FD0, .rodata, 65820] # jtbl_800A53D0
     - [0xA6020, .rodata, 65E20] # jtbl_800A5420
