@@ -133,9 +133,76 @@ void func_80063C90(u8 arg0, unsigned short arg1)
 }
 
 extern u8 D_800998AC[];
-s32 func_80063CC4(arg0, arg1) u8 arg0; u8 arg1; { s32 index = arg0; s32 bit_index; if ((arg0 > 0) && (arg0 < 0x98) && (arg1 > 0) && (arg1 < 0x38)) { bit_index = arg1 - 1; return (D_800998AC[index * 9 + (bit_index / 8)] & (1 << (bit_index % 8))) != 0; } return 0; }
+s32 func_80063CC4(u8 arg0, u8 arg1) { s32 index = arg0; s32 bit_index; if ((arg0 > 0) && (arg0 < 0x98) && (arg1 > 0) && (arg1 < 0x38)) { bit_index = arg1 - 1; return (D_800998AC[index * 9 + (bit_index / 8)] & (1 << (bit_index % 8))) != 0; } return 0; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80063D54.s")
+s32 Pokemon_CanLearnGen1Machine(species, machine)
+u8 species;
+u8 machine;
+{
+    if (species > 0 && species < 152) {
+        switch (species) {
+        case 6: {
+            s32 compatible;
+            compatible = machine == 52;
+            if (compatible == 0) {
+                compatible = func_80063CC4(species, machine) != 0;
+            }
+            return compatible;
+        }
+        case 12: {
+            s32 compatible;
+            compatible = machine == 55;
+            if (compatible == 0) {
+                compatible = func_80063CC4(species, machine) != 0;
+            }
+            return compatible;
+        }
+        case 48: {
+            s32 compatible;
+            compatible = machine == 55;
+            if (compatible == 0) {
+                compatible = func_80063CC4(species, machine) != 0;
+            }
+            return compatible;
+        }
+        case 49: {
+            s32 compatible;
+            compatible = machine == 55;
+            if (compatible == 0) {
+                compatible = func_80063CC4(species, machine) != 0;
+            }
+            return compatible;
+        }
+        case 50: {
+            s32 compatible;
+            compatible = machine == 51;
+            if (compatible == 0) {
+                compatible = func_80063CC4(species, machine) != 0;
+            }
+            return compatible;
+        }
+        case 51: {
+            s32 compatible;
+            compatible = machine == 51;
+            if (compatible == 0) {
+                compatible = func_80063CC4(species, machine) != 0;
+            }
+            return compatible;
+        }
+        case 141: {
+            s32 compatible;
+            compatible = machine == 51;
+            if (compatible == 0) {
+                compatible = func_80063CC4(species, machine) != 0;
+            }
+            return compatible;
+        }
+        default:
+            return func_80063CC4(species, machine);
+        }
+    }
+    return 0;
+}
 
 void func_80063EE4(u8 arg0, s32 arg1)
 {
@@ -143,14 +210,14 @@ void func_80063EE4(u8 arg0, s32 arg1)
   s32 new_var;
   new_var2 = &arg1;
   new_var = *new_var2;
-  func_80063CC4(arg0, func_80063044(new_var & 0xFF) & 0xFF);
+  func_80063CC4(arg0, func_80063044(new_var & 0xFF));
 }
 
 void func_80063F18(u8 arg0, s32 arg1)
 {
   s32 *new_var;
   new_var = &arg1;
-  func_80063D54(arg0, func_80063044((*new_var) & 0xFF) & (0xFF & 0xFFFFu));
+  Pokemon_CanLearnGen1Machine(arg0, func_80063044((*new_var) & 0xFF) & (0xFF & 0xFFFFu));
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80063F4C.s")
