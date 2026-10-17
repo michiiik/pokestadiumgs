@@ -6096,7 +6096,51 @@ void Geo_NodeType3Pass(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003A7F4.s")
+typedef struct {
+    u8 pad[0x1A];
+    u16 unk_1A;
+    s8 lightCount;
+    s8 unknown1D;
+    s8 activeLights;
+    s8 extraGeometryMode;
+    u32 unknown20;
+    Lights7 *lights;
+} ModelFrame;
+extern ModelFrame *D_80094910;
+extern u16 D_80094904;
+extern void ModelAnim_ResetCurveContext(void);
+extern void ModelAnim_ResetEventContext(void);
+extern void Geo_ProcessNodeChildren(void *);
+extern Gfx* D_800D0510;
+extern u8 D_80124F68;
+void Geo_NodeModelRoot(void *root) {
+    ModelFrame *node = (ModelFrame *)root;
+    if (((S1_GraphNode *)root)->unk_0C != NULL) {
+        node->unknown1D = 0;
+        node->unknown20 = -1;
+        node->lights = (Lights7 *)Gfx_AllocDisplayList(sizeof(Lights7));
+        node->lightCount = 0;
+        node->activeLights = 0;
+        node->extraGeometryMode = 0;
+        node->lights->a.l.col[0] = 0;
+        node->lights->a.l.col[1] = 0;
+        node->lights->a.l.col[2] = 0;
+        // Geo_NodeAmbientLight conditionally enables the unnamed 0x00400000 bit.
+        gSPClearGeometryMode(D_800D0510++, G_ZBUFFER | G_SHADE | G_CULL_BOTH | G_FOG | G_LIGHTING | G_TEXTURE_GEN | G_TEXTURE_GEN_LINEAR | G_LOD | G_SHADING_SMOOTH | 0x00400000);
+        gSPSetGeometryMode(D_800D0510++, G_SHADE | G_CULL_BACK | G_SHADING_SMOOTH);
+        gSPTexture(D_800D0510++, 0, 0, 0, G_TX_RENDERTILE, G_OFF);
+        gDPSetCycleType(D_800D0510++, G_CYC_2CYCLE);
+        ModelAnim_ResetCurveContext();
+        ModelAnim_ResetEventContext();
+        func_80039070(0);
+        GeoRender_ResetTransformStack();
+        gSPMatrix(D_800D0510++, (u32)((SceneTransformPool *)&D_80124F68)->stack[((SceneTransformPool *)&D_80124F68)->top] & 0x1FFFFFFF, G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+        D_80094910 = node;
+        Geo_ProcessNodeChildren(root);
+        D_80094910 = NULL;
+    }
+    node->unk_1A = D_80094904;
+}
 #endif
 
 #ifdef VERSION_US
@@ -6170,16 +6214,6 @@ void func_8003AC84(s32 arg0) {}
 #endif
 
 #ifdef VERSION_US
-typedef struct {
-    u8 pad[0x1A];
-    u16 unk_1A;
-    s8 lightCount;
-    s8 unknown1D;
-    s8 activeLights;
-    s8 extraGeometryMode;
-    u32 unknown20;
-    Lights7 *lights;
-} ModelFrame;
 extern ModelFrame *D_80094910;
 extern Gfx* D_800D0510;
 void Geo_NodeFog(S1_GraphNode *root) {
@@ -6515,7 +6549,60 @@ void func_8003BC48(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003BCB4.s")
+extern ModelFrame *D_80094910;
+extern void *D_8009491C;
+extern void *D_80094908;
+extern u16 D_80094904;
+extern void func_8003E7B0(S1_unk_D_86002F58_004_000_040_raw *, u16, s32);
+extern void ModelAnim_BeginEventContext(S1_unk_D_86002F58_004_000_054 *, u16, s32);
+extern void ModelAnim_EndCurveContext(void);
+extern void ModelAnim_EndEventContext(void);
+extern void GeoRender_SetMaterialParams(S1_Color_RGBA8_u32, u8, u32);
+extern void func_800707D0(void *);
+extern void func_80070860(s32);
+extern void Geo_ProcessNodeChildren(void *);
+extern u8 D_80124F68;
+void Geo_NodeModelPart(void *root) {
+    S1_MtxF matrix;
+    S1_Color_RGBA8_u32 reset_color;
+    S1_unk_D_86002F58_004_000 *node = (S1_unk_D_86002F58_004_000 *)root;
+    if (node->animType == *(s16 *)((u8 *)D_80094910 + 0x18) || node->animType == 10) {
+        node->anchorCount = 0;
+        func_8003E7B0((S1_unk_D_86002F58_004_000_040_raw *)&node->unk_040, D_80094904, (node->unk_000.unk_02 & 0x20) != 0);
+        ModelAnim_BeginEventContext(&node->unk_054, D_80094904, (node->unk_000.unk_02 & 0x20) != 0);
+        if (node->unk_000.unk_02 & 0x10) {
+            MtxF_Multiply(&matrix, &node->unk_060, &((SceneTransformPool *)&D_80124F68)->matrices[((SceneTransformPool *)&D_80124F68)->top]);
+        } else if (node->unk_000.unk_02 & 8) {
+            func_80036714(&matrix, (s32)&((S1_unk_D_86002F34_00C *)D_80094908)->unk_60.mtxf, (s32)&((SceneTransformPool *)&D_80124F68)->matrices[((SceneTransformPool *)&D_80124F68)->top], (s32)&node->unk_024, 1.0f);
+        } else if (node->unk_000.unk_02 & 0x80) {
+            MtxF_SetRotationAndTransformTranslation(matrix.mf, (Vec3f35784 *)&node->unk_024, (Vec3s35AA0 *)&node->unk_01E);
+            MtxF_Multiply(&matrix, &matrix, &((SceneTransformPool *)&D_80124F68)->matrices[((SceneTransformPool *)&D_80124F68)->top]);
+        } else {
+            MtxF_SetRotationTranslationF(matrix.mf, (Vec3f35784 *)&node->unk_024, (Vec3s35AA0 *)&node->unk_01E);
+            MtxF_Multiply(&matrix, &matrix, &((SceneTransformPool *)&D_80124F68)->matrices[((SceneTransformPool *)&D_80124F68)->top]);
+        }
+        MtxF_ScaleRows(&((SceneTransformPool *)&D_80124F68)->matrices[((SceneTransformPool *)&D_80124F68)->top + 1], &matrix, &node->unk_030);
+        if (!(node->unk_000.unk_02 & 4)) {
+            ((SceneTransformPool *)&D_80124F68)->top++;
+            GeoRender_CommitMatrix(NULL);
+            D_8009491C = node;
+            GeoRender_SetMaterialParams(node->unk_0A0, node->materialAlpha, node->textureMode);
+            if (node->modelId >= 0) {
+                func_800707D0(node);
+            }
+            Geo_ProcessNodeChildren(root);
+            if (node->modelId >= 0) {
+                func_80070860((s32)node);
+            }
+            reset_color.rgba = 0xFFFFFF00;
+            GeoRender_SetMaterialParams(reset_color, 0xFF, 0);
+            D_8009491C = NULL;
+        }
+        ModelAnim_EndCurveContext();
+        ModelAnim_EndEventContext();
+        ((SceneTransformPool *)&D_80124F68)->top--;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -6566,7 +6653,44 @@ void Geo_NodeDisplayList(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003C10C.s")
+typedef union CandidateColor {
+    struct { u8 r, g, b, a; };
+    u32 rgba;
+} CandidateColor;
+extern u8 *D_80094920;
+extern void *D_8009491C;
+extern void func_8003EE20(s32 *, s32, s32);
+extern void GeoRender_SetMaterialTexture(s32, CandidateColor, void *, void *, s32);
+extern void Geo_ProcessNodeChildren(void *);
+void Geo_NodeShadowTexture(void *root) {
+    CandidateColor color;
+    S1_unk_D_86002F34_alt10 *node = (S1_unk_D_86002F34_alt10 *)root;
+    s32 texture;
+    s32 material;
+    s32 display_list;
+    texture = 0;
+    material = 0;
+    display_list = (s32)node->unk_18;
+    if (node->unk_22 == 1) {
+        color.rgba = 0xFFFFFFFF;
+    } else {
+        color.rgba = node->unk_24.rgba;
+    }
+    if (node->unk_1C >= 0) {
+        texture = *(s32 *)(D_80094920 + 0x18) + node->unk_1C * 12;
+    }
+    if (node->unk_1E >= 0) {
+        material = *(s32 *)(D_80094920 + 0x1C) + node->unk_1E * 12;
+    }
+    if (D_8009491C != NULL) {
+        color.r = (color.r * ((S1_unk_D_86002F58_004_000 *)D_8009491C)->unk_03C.r) / 255;
+        color.g = (color.g * ((S1_unk_D_86002F58_004_000 *)D_8009491C)->unk_03C.g) / 255;
+        color.b = (color.b * ((S1_unk_D_86002F58_004_000 *)D_8009491C)->unk_03C.b) / 255;
+    }
+    func_8003EE20(&texture, *(s32 *)(D_80094920 + 0x18), node->unk_20);
+    GeoRender_SetMaterialTexture(node->unk_22, color, (void *)texture, (void *)material, display_list);
+    Geo_ProcessNodeChildren(root);
+}
 #endif
 
 #ifdef VERSION_US
@@ -7135,20 +7259,14 @@ void func_8003DA20(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-void GeoRender_SetMaterialParams(s32 arg0, s32 arg1, s32 arg2) {
-    s32 *p0 = &arg0;
-    s32 *p1 = &arg1;
-    D_801261B0.fogColor.rgba = *p0;
-    D_801261B0.level = (u8)*p1;
-    D_801261B0.unknown02 = (u8)arg2;
+void GeoRender_SetMaterialParams(S1_Color_RGBA8_u32 color, u8 level, u32 flags) {
+    D_801261B0.fogColor.rgba = color.rgba;
+    D_801261B0.level = level;
+    D_801261B0.unknown02 = flags;
 }
 #endif
 
 #ifdef VERSION_US
-typedef union CandidateColor {
-    struct { u8 r, g, b, a; };
-    u32 rgba;
-} CandidateColor;
 void GeoRender_SetMaterialTexture(s32 arg0, CandidateColor arg1, void *arg2, void *arg3, s32 arg4) {
     D_801261B0.mode = arg0;
     D_801261B0.primitiveColor.rgba = arg1.rgba;
