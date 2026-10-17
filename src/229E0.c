@@ -4184,11 +4184,11 @@ void func_80036714(void *a0,s32 a1,s32 a2,s32 a3,f32 a4){f32 r0,r1,r2; r0=sqrtf(
 #endif
 
 #ifdef VERSION_US
-void MtxF_SetOrthonormalBasis(f32 matrix[4][4], Vec3f35784 *up_direction, Vec3f35784 *position, u16 rotation_y) {
+void MtxF_SetOrthonormalBasis(f32 matrix[4][4], Vec3f35784 *up_direction, Vec3f35784 *position, s32 rotation_y) {
     Vec3f35784 reference;
     Vec3f35784 lateral;
     Vec3f35784 forward;
-    Vec3f_SetComponentsDuplicate(&reference, D_80087E50[rotation_y >> 4], 0.0f, D_80088E50[rotation_y >> 4]);
+    Vec3f_SetComponentsDuplicate(&reference, D_80087E50[(u16)rotation_y >> 4], 0.0f, D_80088E50[(u16)rotation_y >> 4]);
     func_80035A10(up_direction);
     Vec3f_CrossProduct(&lateral, up_direction, &reference);
     func_80035A10(&lateral);
@@ -4311,7 +4311,7 @@ struct S1_unk_D_86002F34_00C {
     /* 0xCC */ S1_unk_D_86002F34_00C_0CC unk_CC;
     /* 0xEC */ char unkEC[0x4];
 };
-extern Vtx *func_8003946C(S1_unk_D_86002F34_00C_0CC *, S1_unk_D_86002F34_00C_040 *);
+extern Vtx *GeoOverlay_BuildFadeQuad(S1_unk_D_86002F34_00C_0CC *, S1_unk_D_86002F34_00C_040 *);
 typedef struct S1_MainPoolState S1_MainPoolState;
 typedef struct S1_MainPoolBlock S1_MainPoolBlock;
 struct S1_MainPoolState {
@@ -6214,12 +6214,37 @@ void func_800393F0(S1_Vec3f *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003946C.s")
+extern void Gfx_SetVertexAttributes(Vtx *, s16, s16, s16, s16, s16, u8, u8, u8, u8);
+// Allocate the four projection-plane corners used by GeoOverlay_DrawFadeQuad.
+Vtx *GeoOverlay_BuildFadeQuad(S1_unk_D_86002F34_00C_0CC *overlay, S1_unk_D_86002F34_00C_040 *projection) {
+    u8 alpha;
+    Vtx *vertices;
+
+    vertices = Gfx_AllocDisplayList(4 * sizeof(Vtx));
+    if (vertices != NULL) {
+        switch (overlay->unk_00) {
+        case 1:
+            alpha = 255;
+            break;
+        case 2:
+            alpha = 255 - (overlay->unk_0A * 255) / overlay->unk_08;
+            break;
+        case 3:
+            alpha = (overlay->unk_0A * 255) / overlay->unk_08;
+            break;
+        }
+        Gfx_SetVertexAttributes(&vertices[0], (s16)projection->l, (s16)projection->t, -1, 0, 0, overlay->color.r, overlay->color.g, overlay->color.b, alpha);
+        Gfx_SetVertexAttributes(&vertices[1], (s16)projection->l, (s16)projection->b, -1, 0, 0, overlay->color.r, overlay->color.g, overlay->color.b, alpha);
+        Gfx_SetVertexAttributes(&vertices[2], (s16)projection->r, (s16)projection->b, -1, 0, 0, overlay->color.r, overlay->color.g, overlay->color.b, alpha);
+        Gfx_SetVertexAttributes(&vertices[3], (s16)projection->r, (s16)projection->t, -1, 0, 0, overlay->color.r, overlay->color.g, overlay->color.b, alpha);
+    }
+    return vertices;
+}
 #endif
 
 #ifdef VERSION_US
 void GeoOverlay_DrawFadeQuad(S1_unk_D_86002F34_00C_0CC* arg0, S1_unk_D_86002F34_00C_040* arg1) {
-    Vtx* temp_v0 = func_8003946C(arg0, arg1);
+    Vtx* temp_v0 = GeoOverlay_BuildFadeQuad(arg0, arg1);
 
     if (temp_v0 != NULL) {
         gDPSetCombineMode(D_800D0510++, G_CC_SHADE, G_CC_SHADE);
@@ -7098,7 +7123,62 @@ extern void Geo_ProcessNodeChildren(void *); void Geo_NodeGroup(void *arg0) { Ge
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003C390.s")
+extern S1_Vec3f *GeoRender_FindAnchorPosition(u8 *, s16, S1_Vec3f *);
+extern u8 D_1000C80[];
+extern u8 D_1000D08[];
+extern Gfx* D_800D0510;
+extern u8 D_80124F68;
+// Project the model shadow onto y = 0 and fade it with height.
+void Geo_NodeShadow(S1_unk_D_86002F34_alt12 *node) {
+    Vec3f35784 position;
+    Vec3f35784 up;
+    S1_Vec3f scale;
+    f32 height_scale;
+    S1_MtxF basis;
+    S1_MtxF *current;
+    Gfx *commands;
+
+    current = &((SceneTransformPool *)&D_80124F68)->matrices[((SceneTransformPool *)&D_80124F68)->top];
+    commands = Gfx_AllocDisplayList(2 * sizeof(Gfx));
+    if (GeoRender_FindAnchorPosition(D_8009491C, 100, NULL) == NULL) {
+        func_8003C2D8(100);
+    }
+    Vec3f_SetComponentsDuplicate(&position, current->mf[3][0], current->mf[3][1] + node->unk_1E, current->mf[3][2]);
+    position.y = 0.0f;
+    if (((S1_unk_D_86002F58_004_000 *)D_8009491C)->unk_000.unk_02 & 0x40) {
+        Vec3f_SetComponentsDuplicate(&up, 0.0f, 1.0f, 0.0f);
+        func_80036D8C(&current->mf[0][0], &scale.x);
+        height_scale = 1.0f - ((current->mf[3][1] - position.y) / 1000.0f);
+        if (height_scale < 0.5f) {
+            height_scale = 0.5f;
+        }
+        if (height_scale > 1.0f) {
+            height_scale = 1.0f;
+        }
+        scale.x *= (node->unk_1A / 100.0f) * height_scale;
+        scale.z *= (node->unk_1C / 100.0f) * height_scale;
+        MtxF_SetOrthonormalBasis(basis.mf, &up, &position, ((S1_unk_D_86002F58_004_000 *)D_8009491C)->unk_01E.y);
+        MtxF_ScaleRows(&((SceneTransformPool *)&D_80124F68)->matrices[((SceneTransformPool *)&D_80124F68)->top + 1], &basis, &scale);
+        ((SceneTransformPool *)&D_80124F68)->top++;
+        GeoRender_CommitMatrix(NULL);
+        if (node->unk_18 == 0) {
+            gSPBranchList(&commands[1], func_80003240(D_1000C80));
+        } else {
+            gSPBranchList(&commands[1], func_80003240(D_1000D08));
+        }
+        gDPSetEnvColor(&commands[0], 0, 0, 0, (s32)(120.0f * height_scale));
+        if (((S1_unk_D_86002F58_004_000 *)D_8009491C)->unk_000.unk_02 & 2) {
+            GeoRender_SubmitMaterial(7, ((SceneTransformPool *)&D_80124F68)->stack[((SceneTransformPool *)&D_80124F68)->top]);
+        } else {
+            GeoRender_SubmitMaterial(6, ((SceneTransformPool *)&D_80124F68)->stack[((SceneTransformPool *)&D_80124F68)->top]);
+        }
+        gDPSetFogColor(D_800D0510++, 255, 255, 255, 0);
+        gDPSetPrimColor(D_800D0510++, 0, ((S1_unk_D_86002F58_004_000 *)D_8009491C)->materialAlpha, 255, 255, 255, 255);
+        func_8003DA20((u32)commands & 0x1FFFFFFF, 1);
+        Geo_ProcessNodeChildren(node);
+        ((SceneTransformPool *)&D_80124F68)->top--;
+    }
+}
 #endif
 
 #ifdef VERSION_US
