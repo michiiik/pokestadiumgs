@@ -29,6 +29,38 @@ typedef struct Fragment22RowOptionCounts {
     s16 values[5];
 } Fragment22RowOptionCounts;
 
+typedef struct {
+    s32 a;
+    s32 b;
+    s32 c;
+    s32 d;
+} Quad800548C4;
+
+typedef struct Fragment22Menu {
+    s16 unk_00;
+    s16 state;
+    s16 unk_04;
+    s16 selection;
+    s16 unk_08;
+    s16 unk_0a;
+    u16 flags;
+    s16 row_counter;
+    s16 unk_10;
+    s16 unk_12;
+    s16 alpha;
+    s16 unk_16;
+    void *unk_18;
+    void *unk_1c;
+    Quad800548C4 *settings;
+    Quad800548C4 settings_backup;
+    Fragment22RowEntry rows[16];
+} Fragment22Menu;
+extern void *D_80087200;
+extern void func_800226C0(s32);
+extern void func_800548C4(Quad800548C4 *);
+extern void func_80051D64(s32, s32);
+extern void func_82701300(void *, u8 *, s32);
+
 typedef char Fragment22RowEntrySizeCheck[sizeof(Fragment22RowEntry) == 40 ? 1 : -1];
 typedef char Fragment22RowOptionCountsSizeCheck[sizeof(Fragment22RowOptionCounts) == 10 ? 1 : -1];
 extern Fragment22RowOptionCounts D_82703280;
@@ -293,9 +325,112 @@ void func_82701CB8(void *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14B090/func_82701DF4.s")
+void func_82701DF4(Fragment22Menu *menu) {
+    s32 previous;
+    s32 confirmed;
+    s32 i;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14B090/func_82701F7C.s")
+    previous = menu->selection;
+    confirmed = 0;
+    if (*(u16 *)((u8 *)D_80087200 + 0xC) & 0x800) {
+        menu->selection--;
+        if (menu->selection < 0) {
+            menu->selection = 0;
+        }
+    }
+    if (*(u16 *)((u8 *)D_80087200 + 0xC) & 0x400) {
+        menu->selection++;
+        if (menu->selection >= 2) {
+            menu->selection = 1;
+        }
+    }
+    if (previous != menu->selection) {
+        func_800226C0(1);
+    }
+    if (*(u16 *)((u8 *)D_80087200 + 8) & 0x8000) {
+        confirmed = 1;
+        if (menu->selection == 0) {
+            func_800226C0(16);
+        } else {
+            func_800226C0(3);
+        }
+    } else if (*(u16 *)((u8 *)D_80087200 + 8) & 0x4000) {
+        menu->selection = 1;
+        confirmed = 1;
+        func_800226C0(3);
+    }
+    if (confirmed) {
+        if (menu->selection == 0) {
+            menu->state = 5;
+            menu->row_counter = 0;
+            menu->selection = 1;
+            menu->unk_10 = 1;
+        } else {
+            menu->state = 7;
+            menu->row_counter = 0;
+            menu->flags &= ~2;
+            i = 0;
+            do {
+                func_82701820(3, i);
+                i++;
+            } while (i != 2);
+            func_827015A4(2, 4);
+        }
+    }
+}
+
+
+void func_82701F7C(Fragment22Menu *menu) {
+    s32 previous;
+    s32 confirmed;
+    s32 i;
+
+    previous = menu->selection;
+    confirmed = 0;
+    if (*(u16 *)((u8 *)D_80087200 + 0xC) & 0x800) {
+        menu->selection--;
+        if (menu->selection < 0) {
+            menu->selection = 0;
+        }
+    }
+    if (*(u16 *)((u8 *)D_80087200 + 0xC) & 0x400) {
+        menu->selection++;
+        if (menu->selection >= 2) {
+            menu->selection = 1;
+        }
+    }
+    if (previous != menu->selection) {
+        func_800226C0(1);
+    }
+    if (*(u16 *)((u8 *)D_80087200 + 8) & 0x8000) {
+        confirmed = 1;
+        if (menu->selection == 0) {
+            func_800226C0(67);
+        } else {
+            func_800226C0(3);
+        }
+    } else if (*(u16 *)((u8 *)D_80087200 + 8) & 0x4000) {
+        menu->selection = 1;
+        confirmed = 1;
+        func_800226C0(3);
+    }
+    if (confirmed) {
+        if (menu->selection == 0) {
+            menu->state = 6;
+            menu->row_counter = 0;
+        } else {
+            menu->state = 7;
+            menu->row_counter = 0;
+            menu->flags &= ~2;
+            i = 0;
+            do {
+                func_82701820(3, i);
+                i++;
+            } while (i != 2);
+            func_827015A4(2, 4);
+        }
+    }
+}
 
 void func_827020F4(void *arg0)
 {
@@ -341,7 +476,66 @@ void func_8270216C(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14B090/func_82702220.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14B090/func_82702364.s")
+
+void func_82702364(Fragment22Menu *menu) {
+    s32 previous;
+    s32 confirmed;
+    s32 i;
+
+    previous = menu->unk_08;
+    confirmed = 0;
+    if (*(u16 *)((u8 *)D_80087200 + 0xC) & 0x800) {
+        menu->unk_08--;
+        if (menu->unk_08 < 0) {
+            menu->unk_08 = 0;
+        }
+    }
+    if (*(u16 *)((u8 *)D_80087200 + 0xC) & 0x400) {
+        menu->unk_08++;
+        if (menu->unk_08 >= 3) {
+            menu->unk_08 = 2;
+        }
+    }
+    if (previous != menu->unk_08) {
+        func_800226C0(1);
+    }
+    if (*(u16 *)((u8 *)D_80087200 + 8) & 0x8000) {
+        confirmed = 1;
+    } else if (*(u16 *)((u8 *)D_80087200 + 8) & 0x4000) {
+        confirmed = 1;
+        menu->unk_08 = 2;
+    }
+    if (confirmed) {
+        switch (menu->unk_08) {
+        case 0:
+            menu->state = 12;
+            menu->row_counter = 0;
+            menu->unk_0a = 100;
+            func_800548C4(menu->settings);
+            func_80051D64(20, 0);
+            func_800226C0(17);
+            break;
+        case 1:
+            menu->state = 12;
+            menu->row_counter = 0;
+            menu->unk_0a = 4;
+            func_800226C0(20);
+            func_82701300(menu, (u8 *)&menu->settings_backup, 1);
+            break;
+        default:
+            menu->state = 11;
+            menu->row_counter = 0;
+            menu->flags &= ~2;
+            for (i = 0; i != 3; i++) {
+                func_82701820(4, i);
+            }
+            func_827015A4(2, 3);
+            func_827015A4(2, 4);
+            func_800226C0(3);
+            break;
+        }
+    }
+}
 
 void func_82702528(void *arg0) {
     void *sp3C;
