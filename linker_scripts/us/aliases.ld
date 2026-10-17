@@ -313,3 +313,5 @@ func_80036F0C = MtxF_ToFixed;
 func_8003A7F4 = Geo_NodeModelRoot;
 func_8003C10C = Geo_NodeShadowTexture;
 func_8003BCB4 = Geo_NodeModelPart;
+func_80033CA0 = GbAudio_ProcessChannelStream;
+func_80032F0C = GbAudio_ResetState;
