@@ -100,6 +100,7 @@ def main(argv: list[str]) -> int:
         print(f"coalesce_cc: error: {exc}", file=sys.stderr)
         return 1
     word_rewrites = schedule_patch.find_word_rewrites(source_text)
+    section_word_rewrites = schedule_patch.find_section_word_rewrites(source_text)
     relocation_rewrites = schedule_patch.find_relocation_rewrites(source_text)
     try:
         hex_rewrites = schedule_patch.find_hex_rewrites(source_text)
@@ -109,7 +110,14 @@ def main(argv: list[str]) -> int:
     except schedule_patch.SchedulePatchError as exc:
         print(f"coalesce_cc: error: {exc}", file=sys.stderr)
         return 1
-    if not markers and not schedule_patches and not word_rewrites and not relocation_rewrites and not hex_rewrites:
+    if (
+        not markers
+        and not schedule_patches
+        and not word_rewrites
+        and not section_word_rewrites
+        and not relocation_rewrites
+        and not hex_rewrites
+    ):
         return subprocess.call([real_cc, *args])
 
     # Step 1: compile completely normally. This is the real final object
@@ -203,6 +211,28 @@ def main(argv: list[str]) -> int:
                 f"coalesce_cc: error: only {patch_count} of "
                 f"{len(word_rewrites[function_name])} word rewrites applied for "
                 f"{function_name}",
+                file=sys.stderr,
+            )
+            return 1
+
+    for section_name in sorted(section_word_rewrites):
+        try:
+            object_bytes, patch_count = schedule_patch.rewrite_section_words_in_object(
+                object_bytes,
+                section_name,
+                section_word_rewrites[section_name],
+            )
+        except (schedule_patch.SchedulePatchError, coalesce_splice.SpliceError) as exc:
+            print(
+                f"coalesce_cc: error: REWRITE_SECTION_WORD({section_name}): {exc}",
+                file=sys.stderr,
+            )
+            return 1
+        if patch_count != len(section_word_rewrites[section_name]):
+            print(
+                f"coalesce_cc: error: only {patch_count} of "
+                f"{len(section_word_rewrites[section_name])} section word rewrites "
+                f"applied for {section_name}",
                 file=sys.stderr,
             )
             return 1
