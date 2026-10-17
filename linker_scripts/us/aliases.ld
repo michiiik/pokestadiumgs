@@ -315,3 +315,7 @@ func_8003C10C = Geo_NodeShadowTexture;
 func_8003BCB4 = Geo_NodeModelPart;
 func_80033CA0 = GbAudio_ProcessChannelStream;
 func_80032F0C = GbAudio_ResetState;
+func_80028340 = Audio_UpdateDeferredSounds;
+func_8002818C = Audio_QueueDeferredSound;
+func_80031638 = Audio_UpdateCommandQueue;
+func_80027BD4 = Audio_BuildAndDispatchSoundEvent;
