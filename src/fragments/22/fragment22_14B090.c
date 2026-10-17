@@ -131,7 +131,27 @@ void func_82700FF0(Fragment22RowEntry *entry) {
     entry->position = entry->layout_position;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14B090/func_8270103C.s")
+void func_8270103C(Fragment22RowEntry *entry, s32 kind_value, s32 row_index) {
+    _bzero(entry, sizeof(*entry));
+    entry->kind = kind_value;
+    entry->row_index = row_index;
+    entry->state = 0;
+    entry->alpha = 255;
+    switch (entry->kind) {
+    case 1:
+        func_82700EC8(entry);
+        break;
+    case 2:
+        func_82700EFC(entry, 1);
+        break;
+    case 3:
+        func_82700FA4(entry);
+        break;
+    case 4:
+        func_82700FF0(entry);
+        break;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14B090/func_827010F0.s")
 
@@ -188,7 +208,24 @@ s32 func_82701820(s32 arg0, s32 arg1) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14B090/func_8270188C.s")
+s32 func_8270188C(s32 kind, s32 row_index, s16 x, s16 y) {
+    s32 result;
+    Fragment22RowEntry *entry;
+
+    result = 0;
+    if (D_827034EC & 1) {
+        entry = func_82700E70(kind, row_index, D_82703514, 16);
+        if (entry != NULL && entry->state == 2) {
+            entry->state = 3;
+            entry->counter = 0;
+            entry->animation_start = entry->position;
+            entry->animation_target.x = x;
+            entry->animation_target.y = y;
+            result = 1;
+        }
+    }
+    return result;
+}
 
 s32 func_82701920(void *arg0) {
     u8 *state;
