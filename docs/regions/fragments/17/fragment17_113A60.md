@@ -1,5 +1,130 @@
 # Region notes: fragment17_113A60
 
+## 2026-10-17: model-group initializer accepted, 536 original bytes
+
+07714 is accepted in normal runner batch
+`d25c0ed9369b47f599137fc9dde65946`, preserving 134 instructions and frame
+48. It is a relocation-masked match with preliminary `link_verified: false`:
+the existing geometry decoder's old func_80040E80 reference and its accepted
+process_geo_layout name differ, as do equivalent script-end expressions.
+The authoritative sequential full-ROM gate passes. This is not presented
+as direct link verification. Together with 07414, the next batch replaces
+980 bytes; the native file now has 42 C functions and 40 assembly owners.
+
+The initializer decodes a root and three layout groups of 5/4/4 entries in
+a temporary main-pool allocation, finalizes that allocation, then creates
+13 model nodes. Each node receives its group's transform callback and its
+index as callback data before its decoded layout is attached. The accepted
+source uses indexed loops throughout, with an `entry` pointer for layout
+stores and a separate `record` pointer for model setup. Sharing those roles
+retains all operations but rotates the saved registers. Explicit pointer
+walks instead lose the original induction shape. The unused word argument
+is part of the original caller interface and prologue, not an invented home.
+
+The shared 372-byte record now exposes the real 360-byte model prefix and
+layout pointer at offset 360; texture/tile fields stay at 364/368/370.
+Known/refined/twenty-blank whole-TU controls prove this refinement preserves
+all previously accepted functions before any candidate runs. It is installed
+only transactionally with the accepted initializer. The callback prototype
+keeps its word-result, mode-word and node-pointer contract; no function-pointer
+casts, omitted arguments, unused locals or compiler/output transformations
+are used. The naming plan has no established mapping for this owner.
+
+The first accepted object is frozen at SHA256
+`387cd8beb079e8d217fbb2f8f32ad1d2e530198adb826ac9055bdd478a0a59c5`.
+All 82 original extents, every outside-owner text byte/normalized relocation
+and all other allocatable sections equal the preceding frozen object.
+Independent strict links resolve every symbol and prove the original,
+accepted and retail-gated 536-byte function images equal. After extern
+cleanup, fresh/twenty-blank whole-TU builds reproduce the frozen object's
+complete game bytes/layouts, defined symbols and normalized relocations.
+Target-compiler assertions verify the model size, record size and layout/
+texture offsets. No accepted owner is re-probed.
+
+The cleaned source passes the full-ROM gate again, retail MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`, all 427 host syntax checks, 76 native
+tooling tests, accepted provenance and whitespace checks. Coverage remains
+CI-owned; private generators, diagnostic copies, objects and ROMs stay local.
+
+## 2026-10-17: clip renderer calibrated address-web frontier
+
+06A2C remains `requeue` after 32 native normal-runner probes. Unchanged-stock
+keep/raw/final and stock/logging-off/logging-on/twenty-blank controls pass
+for the canonical 312-byte parent. Exact-name calibration identifies global
+color procedure 47 and UGEN procedure 46. The context-address web 48 has
+saving 4.33333349 and receives physical register 21, creating the sixth
+saved register. A separate timer-address web receives register 3. This is
+measured constant-address reuse, not a generic register permutation.
+
+Raw header views retain that address web. Explicit first/second cursors
+repair their saved-register roles and improve the reported raw score to
+0.6282 at 312 bytes. Hoisting the second cursor gives reported normalized
+0.9231/raw 0.6282 but leaves the context-address mismatch. Stock 5.3 emits
+304 bytes, changes the known TU and does not rescue either parent; its blank
+controls pass. No compiler switch is adopted.
+
+A calibrated 60-second conservative search starts at weighted score 1070.
+The apparent 955 output is invalid: it moves the clip reset outside its
+guard and reads the timer before initializing it. Reject it regardless of
+score. A valid cursor-hoist output scores 1050 and informed the bounded
+normal-runner follow-up above; no searched output is installed. Its work
+directory ends `func_82206A2C-_j6abjll`, with strict linked AST/TU and original
+assembly/retail controls. Next separate context-address reuse across the
+prelude/root-call path while retaining both cursor roles. Do not replay the
+completed pointer/decrement/compiler-version grids or treat these negatives
+as exhaustion of all legal source forms.
+
+## 2026-10-17: transform follow-up accepted locally, 444 original bytes
+
+07414 is accepted by normal runner batch
+`5829b3d9b6b444b5a5b0eecb72cad89e`, with link verification and a successful
+combined full-ROM gate. It preserves all 111 instructions and frame 32.
+This native follow-up was completed while the two-owner texture PR #1185
+was validating; it is not part of that published two-owner batch.
+The native file now has 41 C functions and 41 assembly owners.
+
+Mode zero converts the indexed DAFC position pair into scene coordinates
+(x - 320, 240 - y, -579). Mode two updates indices 0/2 horizontally using
+the DAD8-indexed table wave, or indices 1/3 through the signed rotation
+halfword at node offset 34. The horizontal expression retains double
+precision for `(wave + 1.0) * 10.0 * 0.5`, then narrows to a signed halfword
+before the index-2 negation. The rotation path retains float multiplication
+by 6144 and negates the stored halfword for index 3. Other modes/indices
+leave those fields unchanged and return zero. No unused neighbor locals,
+angle reads or empty statements were copied from the older 071E8 source.
+
+The first 444-byte accepted whole object is frozen at SHA256
+`5c6f34179b58ca08e0ea2665252b9c3cc6182d6cf667d62a0ccca545aa6040ce`.
+After duplicate-extern cleanup, fresh/twenty-blank complete-TU controls
+preserve that object's game bytes/layouts, all defined symbols and normalized
+relocations. These also equal the original still-assembly baseline, including
+both previously accepted texture callbacks and all 82 original extents.
+The cleaned source passes the full-ROM gate again with retail MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. The accepted owner is never re-probed.
+The naming plan has no established mapping, so its address name remains.
+
+## 2026-10-17: clip rendering state/allocator requeue
+
+06A2C remains `requeue` after 16 native probes. Its 068E0 producer clears
+1616 bytes; the renderer selects one of two 802-byte lists following a
+12-byte header. Each list has a count halfword and space for 100 four-short
+rectangles. When the timer at offset 8 is zero, it submits every rectangle
+to 80006F70 and 81600F0C, reloading count after calls, then restores the
+640-by-480 clip rectangle. Otherwise it invokes 800468A0. A positive signed
+timer is decremented afterward.
+
+Eight typed-context, byte/row-pointer and decrement forms produce 304/312
+bytes; the local signed-halfword timer gives the full 312-byte extent but
+reported normalized/raw 0.9103/0.5000. A further eight forms exposing the
+root as its scalar pointer with a typed context view emit the same basin.
+The compiler retains a sixth saved register for the context address, where
+retail uses a temporary base only in the prelude and rematerializes the root
+for calls. The two rectangle cursors also reverse saved-register roles.
+Next inspect optimized address-expression reuse/web cost across the prelude
+and call path, rather than repeating row-pointer/decrement type grids.
+No clip-context declaration or rejected body is installed. The three accepted
+callback objects remain frozen independently of this investigation.
+
 ## 2026-10-17: paired texture callbacks accepted, 648 original bytes
 
 072D0 and 075D0 are accepted C, superseding their scheduling requeue below.
