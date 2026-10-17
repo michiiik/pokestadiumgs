@@ -41,7 +41,36 @@ s32 func_82A0083C(s32 arg0, void *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/23/fragment23_code/func_82A0089C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/23/fragment23_code/func_82A009A0.s")
+s32 func_82A009A0(s32 arg0) {
+    s32 var_v1;
+
+    var_v1 = 5;
+    switch (arg0) {
+        case 1:
+            var_v1 = 11;
+            break;
+        case 2:
+            var_v1 = 7;
+            break;
+        case 3:
+            var_v1 = 1;
+            break;
+        case 4:
+            var_v1 = 15;
+            break;
+        case 5:
+            var_v1 = 9;
+            break;
+        case 6:
+            var_v1 = 13;
+            break;
+        case 7:
+            var_v1 = 3;
+            break;
+    }
+
+    return var_v1;
+}
 
 extern s32 func_82A009A0(s32);
 
