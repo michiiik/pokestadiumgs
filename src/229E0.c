@@ -1781,7 +1781,23 @@ s32 func_800318C8(void) {
 #ifdef VERSION_US
 typedef struct { u8 *ptr; u8 value; u8 pad; u16 limit; } Func31Entry;
 extern Func31Entry D_800D27C0[];
-typedef struct { u8 pad0[0xC]; u8 unkC; u8 unkD; u8 unkE; u8 unkF; u8 unk10; u8 unk11; u8 unk12; u8 unk13; u8 pad14[0x18]; u8 unk2C; } AudioConfig;
+// Registers 0xFF10 through 0xFF3F alternate value and write-flag bytes.
+// GbAudio_QueueRegisterWrite marks the byte following each written value.
+typedef struct {
+    u8 unk00; u8 unk01; u8 unk02; u8 unk03;
+    u8 unk04; u8 unk05; u8 unk06; u8 unk07;
+    u8 unk08; u8 unk09; u8 unk0A; u8 unk0B;
+    u8 unkC; u8 unkD; u8 unkE; u8 unkF;
+    u8 unk10; u8 unk11; u8 unk12; u8 unk13;
+    u8 unk14; u8 unk15; u8 unk16; u8 unk17;
+    u8 unk18; u8 unk19; u8 unk1A; u8 unk1B;
+    u8 unk1C; u8 unk1D; u8 unk1E; u8 unk1F;
+    u8 unk20; u8 unk21; u8 unk22; u8 unk23;
+    u8 unk24; u8 unk25; u8 unk26; u8 unk27;
+    u8 unk28; u8 unk29; u8 unk2A; u8 unk2B;
+    u8 unk2C; u8 unk2D;
+    u8 unk2E[50];
+} AudioConfig;
 extern AudioConfig D_800D2760;
 extern u32 D_800D2AE4;
 extern u8 D_800D2AD8[];
@@ -1805,6 +1821,9 @@ u8 GbAudio_GetRegisterValue(u16 arg0)
 #endif
 
 #ifdef VERSION_US
+typedef struct { u32 unk0; s16 unk4; s16 unk6; u32 unk8; u32 unkC; u16 unk10; u16 unk12; u8 unk14; u8 unk15; u8 unk16; u8 unk17; u32 unk18; u32 unk1C; u32 unk20; u8 unk24; } AudioState;
+extern AudioState D_800D26E8;
+extern u32 D_800D275C;
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80031A6C.s")
 #endif
 
@@ -1830,9 +1849,6 @@ void func_80031E6C(u16 arg0) {
 
 #ifdef VERSION_US
 extern s32 D_80032600_probe_hint_3;
-typedef struct { u32 unk0; s16 unk4; s16 unk6; u32 unk8; u32 unkC; u16 unk10; u16 unk12; u8 unk14; u8 unk15; u8 unk16; u8 unk17; u32 unk18; u32 unk1C; u32 unk20; u8 unk24; } AudioState;
-extern AudioState D_800D26E8;
-extern s32 D_800D275C;
 extern u8 D_800D276D_load; extern u8 D_800D276D_store;
 extern u8 D_800D276E;
 extern u8 D_800D276F_load; extern u8 D_800D276F_store;
@@ -2142,17 +2158,120 @@ void func_80032E40(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80032F0C.s")
+extern u8 D_800D2B40;
+extern u8 D_800D2B46;
+extern u8 D_800D2B47;
+extern u8 D_800D2B48;
+extern u8 D_800D2B4A;
+extern u8 D_800D2B4E;
+extern u8 D_800D2B54;
+extern u8 D_800D2B55;
+extern u8 D_800D2B56;
+extern u8 D_800D2B57;
+extern u8 D_800D2B58;
+extern u8 D_800D2B59;
+extern u8 D_800D2B5A;
+extern u8 D_800D2B5E;
+extern u8 D_800D2B5F;
+extern u8 D_800D2B62;
+extern u8 D_800D2B68;
+extern u8 D_800D2B69;
+extern u8 D_800D2B6A;
+extern u8 D_800D2B6B;
+extern u8 D_800D2B6C;
+extern u8 D_800D2B6D;
+extern u8 D_800D2B6E;
+extern u8 D_800D2B6F;
+extern u8 D_800D2B73;
+extern u16 D_800D2B44;
+extern u16 D_800D2B4C;
+extern u16 D_800D2B5C;
+extern u16 D_800D2B60;
+extern u16 D_800D2B64;
+extern u16 D_800D2B66;
+extern s8 D_800D2B42;
+extern u8 D_800D2B43;
+extern s8 D_800D2B4B;
+extern u32 D_800D2B50;
+extern u8 D_800D2B70[3];
+extern u8 D_800D2B49;
+extern void func_800331C8(void);
+extern void func_800331B8(void);
+extern void func_80032E40(u8);
+// Reset hardware registers and software channels while frame updates are disabled.
+void GbAudio_ResetState(void) {
+    OSIntMask saved_mask;
+    u32 index;
+
+    saved_mask = osSetIntMask(OS_IM_NONE);
+    func_800331C8();
+    osSetIntMask(saved_mask);
+    for (index = 0; index < 4; index++) {
+        GbAudio_QueueRegisterWrite(index * 5 + 0xFF10, 0, 0);
+        GbAudio_QueueRegisterWrite(index * 5 + 0xFF11, 0, 0);
+        GbAudio_QueueRegisterWrite(index * 5 + 0xFF12, 8, 0);
+        GbAudio_QueueRegisterWrite(index * 5 + 0xFF13, 0, 0);
+        GbAudio_QueueRegisterWrite(index * 5 + 0xFF14, 0x80, 0);
+    }
+    GbAudio_QueueRegisterWrite(0xFF24, 0, 0);
+    GbAudio_QueueRegisterWrite(0xFF25, 0, 0);
+    GbAudio_QueueRegisterWrite(0xFF26, 0x80, 0);
+    for (index = 0; index != 8; index++) {
+        func_80032E40(index);
+    }
+    D_800D2B40 = 0;
+    D_800D2B42 = 0;
+    D_800D2B43 = 0;
+    D_800D2B44 = 0;
+    D_800D2B46 = 0;
+    D_800D2B47 = 0;
+    D_800D2B48 = 0;
+    D_800D2B4A = 0;
+    D_800D2B4B = 0;
+    D_800D2B4C = 0;
+    D_800D2B4E = 0;
+    D_800D2B50 = 0;
+    D_800D2B54 = 0;
+    D_800D2B55 = 0;
+    D_800D2B56 = 0;
+    D_800D2B57 = 0;
+    D_800D2B58 = 0;
+    D_800D2B59 = 0;
+    D_800D2B5A = 0;
+    D_800D2B5C = 0;
+    D_800D2B5E = 0;
+    D_800D2B5F = 0;
+    D_800D2B60 = 0;
+    D_800D2B62 = 0;
+    D_800D2B64 = 0;
+    D_800D2B66 = 0;
+    D_800D2B68 = 0;
+    D_800D2B69 = 0;
+    D_800D2B6A = 0;
+    D_800D2B6B = 0;
+    D_800D2B6C = 0;
+    D_800D2B6D = 0;
+    D_800D2B6E = 0;
+    D_800D2B6F = 0;
+    D_800D2B70[0] = 0;
+    D_800D2B70[1] = 0;
+    D_800D2B70[2] = 0;
+    D_800D2B73 = 0;
+    D_800D2B49 = 0x77;
+    saved_mask = osSetIntMask(OS_IM_NONE);
+    func_800331B8();
+    osSetIntMask(saved_mask);
+}
 #endif
 
 #ifdef VERSION_US
 extern u16 D_800D2B5C;
-extern void func_80032F0C(void);
+extern void GbAudio_ResetState(void);
 void func_80033188(void) {
     u16 sp1E;
 
     sp1E = D_800D2B5C;
-    func_80032F0C();
+    GbAudio_ResetState();
     D_800D2B5C = sp1E;
 }
 #endif
@@ -2166,6 +2285,28 @@ extern u8 D_800D2B41; void func_800331C8(void) { D_800D2B41 = 0; }
 #endif
 
 #ifdef VERSION_US
+typedef struct GbAudioStreamRecord {
+    s16 unk_00;
+    u8 unk_02;
+    u8 flags_03;
+    u8 flags_04;
+    u8 unk_05[15];
+    u8 flags_14;
+    u8 unk_15;
+    u8 unk_16;
+    u8 unk_17;
+    u16 unk_18;
+    u8 unk_1A;
+    u8 unk_1B;
+    u8 unk_1C;
+    u8 unk_1D;
+    u8 unk_1E[6];
+    u8 unk_24;
+    u8 unk_25;
+    u8 unk_26;
+    u8 unk_27;
+    u8 unk_28[20];
+} GbAudioStreamRecord;
 #pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800331D4.s")
 #endif
 
@@ -2332,7 +2473,7 @@ void GbAudio_UpdateNoiseRegisters(u8 channel) {
 #endif
 
 #ifdef VERSION_US
-void func_800339DC(s32 arg0) {}
+void func_800339DC(u8 arg0) {}
 #endif
 
 void func_800339E4(void) {
@@ -2412,7 +2553,64 @@ void func_80033C58(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_80033CA0.s")
+extern u8 D_800D2B78;
+extern u8 D_800D2C6B;
+extern u8 func_800347E8(u8);
+extern void func_80033ED8(u8, u8);
+extern void GbAudio_ReadChannelParameters(u8, u8);
+extern void func_80033ED0(void);
+extern void func_800348C4(u8, u8);
+extern s32 func_80034838(u8, u8, u8);
+extern void func_800339DC(u8);
+void GbAudio_ProcessChannelStream(u8 channel) {
+    GbAudioStreamRecord *record = (GbAudioStreamRecord *)&D_800D2B78 + channel;
+    s32 value;
+    u8 command;
+    u8 high;
+    while (1) {
+        value = (command = func_800347E8(channel));
+        if (value == 0xFF) {
+            if (record->flags_03 & 2) {
+                goto dispatch_command;
+            }
+            if (!(channel < 4 && (D_800D2C6B & 1))) {
+                if (record->flags_03 & 0x20) {
+                    func_80033C58(channel);
+                }
+                if (channel == 4) {
+                    GbAudio_QueueRegisterWrite(0xFF10, 0, 0);
+                }
+            }
+            record->flags_03 &= 0xFFFE;
+            record->flags_14 |= 0x20;
+            record->unk_00 = 0;
+            record->unk_02 = 0;
+            return;
+        }
+        if (value >= 208) {
+        dispatch_command:
+            func_80033ED8(channel, command);
+            continue;
+        }
+        if ((record->flags_03 & 8) || (record->flags_03 & 0x20)) {
+            GbAudio_ReadChannelParameters(channel, command);
+        } else if (record->flags_03 & 0x10) {
+            func_80033ED0();
+        } else {
+            func_800348C4(channel, command & 0xF);
+            high = (command >> 4) & 0xF;
+            if (high == 0) {
+                record->flags_14 |= 0x20;
+            } else {
+                record->unk_1A = high;
+                record->unk_18 = func_80034838(channel, high, record->unk_1B);
+                record->flags_14 |= 0x10;
+                func_800339DC(channel);
+            }
+        }
+        return;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -2967,7 +3165,7 @@ extern u8 D_80092520; extern u8 D_800925E4[]; extern u8 D_800925E8[]; u8 *func_8
 #endif
 
 #ifdef VERSION_US
-extern void func_80032F0C(void); void func_80034DD0(void) { func_80032F0C(); }
+extern void GbAudio_ResetState(void); void func_80034DD0(void) { GbAudio_ResetState(); }
 #endif
 
 #ifdef VERSION_US
@@ -2979,13 +3177,13 @@ u8 func_80034E10(const u8 *arg0, s32 unused) { return arg0[0]; }
 #endif
 
 #ifdef VERSION_US
-extern void func_80032F0C(void);
+extern void GbAudio_ResetState(void);
 extern void func_80034A94(u16 arg0);
 void func_80034E1C(u16 arg0) {
     if (arg0 & 0xFF) {
         func_80034A94(arg0);
     } else {
-        func_80032F0C();
+        GbAudio_ResetState();
     }
 }
 #endif
