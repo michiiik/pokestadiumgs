@@ -230,13 +230,7 @@ def main(argv: list[str]) -> int:
             return 1
 
     for function_name in sorted(hex_rewrites):
-        if function_name not in target_relocation_rewrites:
-            print(
-                f"coalesce_cc: error: REWRITE_FUNCTION_HEX({function_name}) "
-                "has no target relocation set",
-                file=sys.stderr,
-            )
-            return 1
+        target_relocations = target_relocation_rewrites.get(function_name, [])
         expected_hash, replacement = hex_rewrites[function_name]
         try:
             object_bytes, patch_count = schedule_patch.rewrite_function_hex_in_object(
@@ -244,7 +238,7 @@ def main(argv: list[str]) -> int:
                 function_name,
                 expected_hash,
                 replacement,
-                target_relocation_rewrites[function_name],
+                target_relocations,
             )
         except (schedule_patch.SchedulePatchError, coalesce_splice.SpliceError) as exc:
             print(
