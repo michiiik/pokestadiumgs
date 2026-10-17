@@ -282,7 +282,21 @@ s32 Pokemon_GetMoveLearnLevelForVersion(u8 version, u8 species, u8 move, u8 leve
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_800641CC.s")
+s32 Pokemon_IsSmeargleMoveAllowed(u8 move) {
+    switch (move) {
+    case 102:
+    case 118:
+    case 119:
+    case 144:
+    case 165:
+    case 166:
+    case 214:
+    case 226:
+        return 0;
+    default:
+        return 1;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/641E0/func_80064248.s")
 
