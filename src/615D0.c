@@ -170,8 +170,8 @@ extern s8 *func_80060C08(s8 *, u8 *);
 extern s8 *func_80060D1C(s8 *, u8 *);
 extern u8 *func_80060EC8(void *, void *);
 extern s32 func_8004B7A4(s32);
-extern void func_80062808(void *, s32);
-extern void func_80062884(void *, s32);
+extern void Pokemon_ValidateSpeciesForGbPort(void *, u8);
+extern void Pokemon_ValidateMovesForGbPort(void *, u8);
 extern void func_80062978(void *, s32);
 void func_80060E48(void *arg0, void *arg1) {
     u8 sp1C[11];
@@ -745,7 +745,51 @@ s32 func_800625E0(s32 arg0, s32 arg1) {
     return arg0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80062614.s")
+extern s32 func_80062C24(s32);
+extern s32 func_80063754(s32);
+extern s8 * HAL_Strcpy(s8 *, s8 *);
+extern void _bcopy(const void *, void *, s32);
+extern void * func_8004C874(s32, s32);
+extern u16 func_80060A4C(const u8* arg0);
+extern s8 * func_80060C98(s8 *arg0, u8 *arg1, s32 arg2);
+extern void func_80060E48(void *arg0, void *arg1);
+void GbMail_ImportRecord(u8 *dest, u8 *src) {
+    s32 language = 1;
+    _bcopy(src, dest + 0x44, 33);
+    dest[0x65] = 0x50;
+    _bcopy(src + 0x29, dest + 0x42, 2);
+    if (src[0x29] == 0x84) {
+        switch (src[0x2A]) {
+        case 0x85:
+            language = 2;
+            break;
+        case 0x86:
+            language = 3;
+            break;
+        case 0x88:
+            language = 4;
+            break;
+        case 0x92:
+            language = 5;
+            break;
+        }
+    }
+    if (func_80062C24((s32)(dest + 0x44))) {
+        func_80060C98((s8 *)dest, dest + 0x44, language);
+    } else {
+        HAL_Strcpy((s8 *)dest, (s8 *)func_8004C874(0x41, 5));
+    }
+    func_80060E48(dest + 0x66, src + 0x21);
+    *(u16 *)(dest + 0x72) = func_80060A4C(src + 0x2B);
+    dest[0x74] = src[0x2D];
+    if (dest[0x74] == 0 || dest[0x74] >= 252) {
+        dest[0x74] = 132;
+    }
+    dest[0x75] = src[0x2E];
+    if (!func_80063754(dest[0x75])) {
+        dest[0x75] = 186;
+    }
+}
 
 void func_8006276C(s32 arg0, s32 arg1) {
     s32 pad_frame[2];
@@ -764,18 +808,68 @@ void func_800627F0(s32 arg0, s32 arg1) {}
 
 void func_800627FC(s32 arg0, s32 arg1) {}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80062808.s")
+extern s32 func_80057A80(s32);
+void Pokemon_ValidateSpeciesForGbPort(void *record, u8 port) {
+    u8 *mon = record;
+    s32 limit;
+    s32 species;
+    s32 i;
+    if (func_80057A80(port)) {
+        limit = 151;
+    } else {
+        limit = 251;
+    }
+    species = mon[0];
+    if (species <= 0 || limit < species) {
+        mon[0] = 132;
+        for (i = 0; i < 4; i++) {
+            mon[2 + i] = 0;
+            mon[0x18 + i] = 0;
+        }
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80062884.s")
+extern s32 func_80064800(u8);
+extern u8 func_80062E10(u8);
+void Pokemon_ValidateMovesForGbPort(void *record, u8 port) {
+    u8 *mon = record;
+    u8 *p;
+    s32 i;
+    s32 limit;
+    u8 old_pp;
+    u8 max_pp;
+    if (func_80057A80(port)) {
+        limit = 165;
+    } else {
+        limit = 251;
+    }
+    i = 0;
+    p = mon;
+    for (; i < 4; i++, p++) {
+        if (p[2] == 0 || limit < p[2]) {
+            break;
+        }
+        old_pp = p[0x18];
+        max_pp = func_80062EB0(p[2], old_pp);
+        if ((max_pp & 0x3F) < (old_pp & 0x3F)) {
+            p[0x18] = max_pp;
+        }
+    }
+    for (; i < 4; i++, p++) {
+        p[2] = 0;
+    }
+    if (mon[2] == 0) {
+        mon[2] = ((u8 *)func_80064800(mon[0]))[1];
+        mon[0x18] = func_80062E10(mon[2]);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80062978.s")
 
-extern void func_80062808(void *, s32);
-extern void func_80062884(void *, s32);
 extern void func_80062978(void *, s32);
 void func_80062BD4(void *arg0, s32 arg1, void *arg2) {
-    func_80062808(arg0, arg1 & 0xFF);
-    func_80062884(arg0, arg1 & 0xFF);
+    Pokemon_ValidateSpeciesForGbPort(arg0, arg1);
+    Pokemon_ValidateMovesForGbPort(arg0, arg1);
     func_80062978(arg0, arg2);
 }
 

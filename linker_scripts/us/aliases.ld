@@ -336,3 +336,6 @@ func_80060B74 = GbText_EncodeCharForMode;
 func_80061D8C = Pokemon_LevelFromExpWithHint;
 func_80062390 = Deck_ReadEntries;
 func_8006249C = Deck_WriteEntries;
+func_80062808 = Pokemon_ValidateSpeciesForGbPort;
+func_80062884 = Pokemon_ValidateMovesForGbPort;
+func_80062614 = GbMail_ImportRecord;
