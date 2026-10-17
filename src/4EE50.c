@@ -196,11 +196,6 @@ u8 arg12;
     return arg1;
 }
 
-#pragma REWRITE_FUNCTION_HEX(func_8004E610, f8324b12e4fefbf34e8c6ab37667f15632a8563158bcd3ec108bba936396cbf5, 27bdffd0afb0002800a08025afbf002cafa6003810800005afa7003c240500340c00000024060004004080251200003d97a2004e244effff2dc1002010200019a6020024000e70803c010000002e08218c2e000001c0000800000000240f000a10000012a20f00262418000c1000000fa2180026241900101000000ca21900262408001410000009a20800262409001810000006a2090026240a002010000003a20a0026240bfffea20b0026820c00260200202524050004258d0002a20d002693a8005b93ae005f3109000f000ec90003295025a20a00278fab00508d6c0000ae0c00288fad00548dae0000ae0e002c97af0062a60f003097b80066a618003287a9004a87b9004687a8004287a7003e8fa60038afa90018afb900140c000000afa800108fbf002c020010258fb0002803e0000827bd0030)
-#pragma REWRITE_FUNCTION_RELOC_TARGET(func_8004E610, 0x20, 4, MainPool_AllocAligned)
-#pragma REWRITE_FUNCTION_RELOC_TARGET(func_8004E610, 0x48, 5, .rodata)
-#pragma REWRITE_FUNCTION_RELOC_TARGET(func_8004E610, 0x50, 6, .rodata)
-#pragma REWRITE_FUNCTION_RELOC_TARGET(func_8004E610, 0x11c, 4, func_8004E298)
 s32 func_8004E610(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13)
 s32 arg0;
 s32 arg1;
@@ -217,10 +212,8 @@ u8 arg11;
 u16 arg12;
 u16 arg13;
 {
-    u8 a;
-    u8 b;
     if (arg0 != 0) {
-        arg1 = MainPool_AllocAligned(arg0, 0x34, 4);
+        arg1 = MainPool_AllocAligned(arg0, 52, 4);
     }
 
     if (arg1 != 0) {
@@ -250,9 +243,10 @@ u16 arg13;
         }
 
         *(s8 *)(arg1 + 0x26) += 2;
-        a = arg10 & 0xF;
-        b = arg11 << 4;
-        *(u8 *)(arg1 + 0x27) = b | a;
+        {
+            s16 shifted_high = arg11 << 4;
+            *(u8 *)(arg1 + 0x27) = shifted_high | (arg10 & 0xF);
+        }
         *(s32 *)(arg1 + 0x28) = *arg8;
         *(s32 *)(arg1 + 0x2C) = *arg9;
         *(u16 *)(arg1 + 0x30) = arg12;
