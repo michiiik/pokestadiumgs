@@ -310,3 +310,6 @@ func_80036430 = MtxF_SetRotationScaleTranslation;
 func_800365B8 = MtxF_SetRotationAndScaledTranslation;
 func_80035D14 = MtxF_SetLookAt;
 func_80036F0C = MtxF_ToFixed;
+func_8003A7F4 = Geo_NodeModelRoot;
+func_8003C10C = Geo_NodeShadowTexture;
+func_8003BCB4 = Geo_NodeModelPart;
