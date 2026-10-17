@@ -49,6 +49,11 @@ A two-halfword aggregate copy reproduces the original lwl/lwr/swl/swr
 sequence; independent component assignments do not. Keep the two-case switch
 and offset-based pair names while their complete interpretation is unknown.
 
+BD90 and BE84 set the panel halfword at offset 2 to states 1 and 3;
+BDAC and BE94 increment the separate short tick counter at offset 4.
+The typed view distinguishes these fields as state and counter. Correcting
+their names preserves the frozen complete-object game fingerprint.
+
 ### Acceptance controls
 
 Each first accepted complete object was frozen before further compilation:

@@ -110,8 +110,8 @@ typedef struct Fragment17HalfPair {
 
 typedef struct Fragment17Panel {
     s16 mode;
+    s16 state;
     s16 counter;
-    s16 unk_04;
     Fragment17HalfPair pair_06;
     Fragment17HalfPair pair_0A;
     Fragment17HalfPair pair_0E;
@@ -122,8 +122,8 @@ void func_8220BD00(void *arg0, s32 mode) {
     Fragment17Panel *panel = (Fragment17Panel *)arg0;
 
     panel->mode = mode;
+    panel->state = 0;
     panel->counter = 0;
-    panel->unk_04 = 0;
     switch (mode) {
     case 0:
         panel->pair_06.x = 407;
