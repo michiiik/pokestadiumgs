@@ -2,7 +2,47 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_11B210/func_8220B850.s")
+typedef struct Fragment17Slot {
+    s16 state;
+    s16 counter;
+    s16 unk_04;
+    s16 unk_06;
+    s32 resource;
+    s16 unk_0C;
+    s16 unk_0E;
+    f32 unk_10;
+    f32 unk_14;
+} Fragment17Slot;
+
+typedef struct Fragment17SlotPool {
+    u32 unk_00;
+    Fragment17Slot slots[8];
+} Fragment17SlotPool;
+
+typedef struct Fragment17SlotFrame {
+    s16 resource_id;
+    s16 unk_02;
+    f32 unk_04;
+    f32 unk_08;
+} Fragment17SlotFrame;
+
+extern Fragment17SlotFrame D_8220E1D0[];
+extern s32 func_8004C990(s32, s32);
+
+void func_8220B850(Fragment17Slot *slot) {
+    Fragment17SlotFrame *entry;
+
+    slot->counter++;
+    if (slot->counter < 21) {
+        entry = &D_8220E1D0[slot->counter];
+        slot->unk_04 = 155 - (slot->counter * 155) / 20;
+        slot->resource = func_8004C990(159, entry->resource_id);
+        slot->unk_10 = entry->unk_04;
+        slot->unk_14 = entry->unk_08;
+    } else {
+        slot->state = 0;
+    }
+}
 
 extern void _bzero(s32 *, s32);
 extern void func_8004C8C0(s32);
@@ -13,13 +53,35 @@ void func_8220B900(void) {
     _bzero(&D_82210B60, 0xC4);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_11B210/func_8220B930.s")
+extern u8 D_82210C20;
+
+void func_8220B930(void) {
+    u8 *cursor = &D_82210B60, *end = &D_82210C20;
+
+    do {
+        if (*(s16 *)(cursor + 4) != 0) {
+            func_8220B850((Fragment17Slot *)(cursor + 4));
+        }
+        cursor += 24;
+    } while (cursor != end);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_11B210/func_8220B984.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_11B210/func_8220BC40.s")
+s32 func_8220BC40(void) {
+    Fragment17SlotPool *pool = (Fragment17SlotPool *)&D_82210B60;
+    s32 result = -1;
+    s32 index;
 
-extern s32 func_8220BC40(void);
+    for (index = 0; index < 8; index++) {
+        if (pool->slots[index].state == 0) {
+            result = index;
+            break;
+        }
+    }
+    return result;
+}
+
 s32 func_8220BC7C(s32 arg0, s32 arg1) {
     s32 result;
     s32 temp_v0;
@@ -41,7 +103,47 @@ s32 func_8220BC7C(s32 arg0, s32 arg1) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_11B210/func_8220BD00.s")
+typedef struct Fragment17HalfPair {
+    s16 x;
+    s16 y;
+} Fragment17HalfPair;
+
+typedef struct Fragment17Panel {
+    s16 mode;
+    s16 state;
+    s16 counter;
+    Fragment17HalfPair pair_06;
+    Fragment17HalfPair pair_0A;
+    Fragment17HalfPair pair_0E;
+    Fragment17HalfPair pair_12;
+} Fragment17Panel;
+
+void func_8220BD00(void *arg0, s32 mode) {
+    Fragment17Panel *panel = (Fragment17Panel *)arg0;
+
+    panel->mode = mode;
+    panel->state = 0;
+    panel->counter = 0;
+    switch (mode) {
+    case 0:
+        panel->pair_06.x = 407;
+        panel->pair_06.y = 321;
+        panel->pair_0A.x = 0;
+        panel->pair_0A.y = -480;
+        panel->pair_12.x = 116;
+        panel->pair_12.y = 75;
+        break;
+    case 1:
+        panel->pair_06.x = 407;
+        panel->pair_06.y = 134;
+        panel->pair_0A.x = 640;
+        panel->pair_0A.y = 0;
+        panel->pair_12.x = 116;
+        panel->pair_12.y = 173;
+        break;
+    }
+    panel->pair_0E = panel->pair_0A;
+}
 
 extern s16 D_82210C36;
 void func_8220BD90(s16 *arg0) {

@@ -224,7 +224,37 @@ s32 func_82206B64(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82206BA4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82206EB8.s")
+extern u8 D_8220DA6C[];
+extern s16 D_8220DA40;
+extern f32 D_80087E50[];
+
+s32 func_82206EB8(s32 mode, void *node) {
+    s32 index = *(s32 *)((u8 *)node + 20);
+    f32 amplitude;
+
+    switch (mode) {
+    case 0: {
+        s16 *entry = (s16 *)((u8 *)D_8220DA6C + (index << 2));
+        Vec3f_SetComponentsDuplicate((f32 *)((u8 *)node + 36),
+            (f32)entry[0] - 320.0f, 240.0f - (f32)entry[1], -579.0f);
+        break;
+    }
+    case 2:
+        switch (index) {
+        case 0:
+        case 3:
+        case 4:
+            amplitude = 4096.0f;
+            break;
+        default:
+            amplitude = 2048.0f;
+            break;
+        }
+        *(s16 *)((u8 *)node + 34) = amplitude * D_80087E50[((u16)D_8220DA40) >> 4];
+        break;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82206FBC.s")
 
@@ -271,7 +301,8 @@ typedef struct Fragment17TextureHeader {
     u8 unk_06[2];
 } Fragment17TextureHeader;
 typedef struct Fragment17TextureRecord {
-    u8 unk_00[364];
+    u8 model[360];
+    void *layout;
     Fragment17TextureHeader *texture;
     s16 tile_count;
     s16 tile_height;
@@ -316,7 +347,43 @@ s32 func_822072D0(s32 mode, void *node) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82207414.s")
+extern u8 D_8220DAFC[];
+extern s16 D_8220DAD8;
+
+s32 func_82207414(s32 mode, void *node) {
+    s32 index = *(s32 *)((u8 *)node + 20);
+    s16 offset;
+
+    switch (mode) {
+    case 0: {
+        s16 *entry = (s16 *)((u8 *)D_8220DAFC + (index << 2));
+        Vec3f_SetComponentsDuplicate((f32 *)((u8 *)node + 36),
+            (f32)entry[0] - 320.0f, 240.0f - (f32)entry[1], -579.0f);
+        break;
+    }
+    case 2:
+        switch (index) {
+        case 0:
+        case 2:
+            offset = ((D_80087E50[((u16)D_8220DAD8) >> 4] + 1.0) * 10.0) * 0.5;
+            if (index >= 2) {
+                offset = -offset;
+            }
+            *(f32 *)((u8 *)node + 36) =
+                (*(s16 *)((u8 *)D_8220DAFC + index * 4) + offset) - 320.0f;
+            break;
+        case 1:
+        case 3:
+            *(s16 *)((u8 *)node + 34) = D_80087E50[((u16)D_8220DAD8) >> 4] * 6144.0f;
+            if (index >= 2) {
+                *(s16 *)((u8 *)node + 34) = -*(s16 *)((u8 *)node + 34);
+            }
+            break;
+        }
+        break;
+    }
+    return 0;
+}
 
 s32 func_822075D0(s32 mode, void *node) {
     s32 index = *(s32 *)((u8 *)node + 20);
@@ -347,7 +414,62 @@ s32 func_822075D0(s32 mode, void *node) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82207714.s")
+struct S1_MemoryBlock;
+typedef s32 (*Fragment17NodeCallback)(s32, void *);
+extern s32 main_pool_get_available(void);
+extern u8 *MainPool_AllocState(s32, s32);
+extern void MainPool_FinalizeAllocation(struct S1_MemoryBlock *);
+extern void *process_geo_layout(struct S1_MemoryBlock *, void *);
+extern void func_8003F018(s32);
+extern void func_80037E3C(void *, Fragment17NodeCallback, void *);
+extern void func_8003F114(u8 *, s16, s16, void *);
+extern Fragment17TextureRecord D_8220F290[];
+extern void *D_8220DA44[];
+extern void *D_8220DA98[];
+extern void *D_8220DADC[];
+extern u8 D_8220DB1C[];
+extern s32 D_82210578;
+
+void func_82207714(s32 arg0) {
+    struct S1_MemoryBlock *pool;
+    Fragment17TextureRecord *record;
+    Fragment17TextureRecord *entry;
+    s32 index;
+
+    pool = (struct S1_MemoryBlock *)MainPool_AllocState(main_pool_get_available(), 0);
+    D_82210578 = (s32)process_geo_layout(pool, D_8220DB1C);
+    for (index = 0; index < 5; index++) {
+        entry = &D_8220F290[index];
+        entry->layout = process_geo_layout(pool, D_8220DA44[index]);
+    }
+    for (index = 0; index < 4; index++) {
+        entry = &D_8220F9D8[index];
+        entry->layout = process_geo_layout(pool, D_8220DA98[index]);
+    }
+    for (index = 0; index < 4; index++) {
+        entry = &D_8220FFA8[index];
+        entry->layout = process_geo_layout(pool, D_8220DADC[index]);
+    }
+    MainPool_FinalizeAllocation(pool);
+    for (index = 0; index < 5; index++) {
+        record = &D_8220F290[index];
+        func_8003F018((s32)record->model);
+        func_80037E3C(record->model, func_82206EB8, (void *)index);
+        func_8003F114(record->model, 0, -1, record->layout);
+    }
+    for (index = 0; index < 4; index++) {
+        record = &D_8220F9D8[index];
+        func_8003F018((s32)record->model);
+        func_80037E3C(record->model, func_822071E8, (void *)index);
+        func_8003F114(record->model, 0, -1, record->layout);
+    }
+    for (index = 0; index < 4; index++) {
+        record = &D_8220FFA8[index];
+        func_8003F018((s32)record->model);
+        func_80037E3C(record->model, func_82207414, (void *)index);
+        func_8003F114(record->model, 0, -1, record->layout);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_8220792C.s")
 
