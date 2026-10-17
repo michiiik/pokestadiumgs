@@ -881,7 +881,64 @@ void Pokemon_ValidateMovesForGbPort(void *record, u8 port) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/615D0/func_80062978.s")
+#pragma REWRITE_FUNCTION_HEX(func_80062978, e23b14689c69f570e64a2ba86e85d910c687a0a57cdb1163ebac2ee44fd7a9d5, 27bdffd0afbf002cafb30028afb20024afb10020afb0001cafa500349093001d008080258e050008908400000c00000002603025305100ff12330006a202001d920400000c0000003225ffffae0200089213001d920e0001240100ff0000202515c100023267ffffa20000018faf0034240100019202000011e10036961200169606000cafb200100000202500408825004028250c0000003267ffffa60200289606000eafb2001024040001022028250c0000003267ffffa602002a96060010afb2001024040002022028250c0000003267ffffa602002c96060012afb2001024040003022028250c0000003267ffffa602002e96060014afb2001024040004022028250c0000003267ffffa602003096060014afb2001024040005022028250c0000003267ffff9218001ea60200328fa80034331900011720004124010002510100408fbf002c960900281000003ca60900269606000cafb20010960a002800408825004028250c000000afaa0014a60200289606000eafb20010960b002a24040001022028253267ffff0c000000afab0014a602002a96060010afb20010960c002c24040002022028253267ffff0c000000afac0014a602002c96060012afb20010960d002e24040003022028253267ffff0c000000afad0014a602002e96060014afb20010960e003024040004022028253267ffff0c000000afae0014a602003096060014afb20010960f003224040005022028253267ffff0c000000afaf00149603002896180026a60200320078082a502000038fbf002ca60300268fbf002c8fb0001c8fb100208fb200248fb3002803e0000827bd0030)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80062978, 0x2c, 4, Pokemon_LevelFromExpWithHint)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80062978, 0x44, 4, func_80061B88)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80062978, 0x94, 4, Pokemon_CalculateStat)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80062978, 0xb0, 4, Pokemon_CalculateStat)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80062978, 0xcc, 4, Pokemon_CalculateStat)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80062978, 0xe8, 4, Pokemon_CalculateStat)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80062978, 0x104, 4, Pokemon_CalculateStat)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80062978, 0x120, 4, Pokemon_CalculateStat)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80062978, 0x168, 4, Pokemon_ClampCurrentStat)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80062978, 0x18c, 4, Pokemon_ClampCurrentStat)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80062978, 0x1b0, 4, Pokemon_ClampCurrentStat)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80062978, 0x1d4, 4, Pokemon_ClampCurrentStat)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80062978, 0x1f8, 4, Pokemon_ClampCurrentStat)
+#pragma REWRITE_FUNCTION_RELOC_TARGET(func_80062978, 0x21c, 4, Pokemon_ClampCurrentStat)
+void func_80062978(void *arg0, s32 arg1) {
+    u8 *mon = (u8 *)arg0;
+    u8 level = mon[0x1D];
+    u32 exp = *(u32 *)(mon + 0x8);
+    u8 new_level = Pokemon_LevelFromExpWithHint(mon[0], exp, level);
+    u16 dvs;
+
+    if (new_level != level) {
+        mon[0x1D] = new_level;
+        *(u32 *)(mon + 0x8) = func_80061B88(mon[0], new_level);
+        level = mon[0x1D];
+    }
+
+    if (mon[1] == 0xFF) {
+        mon[1] = 0;
+    }
+
+    if (arg1 != 1) {
+        dvs = *(u16 *)(mon + 0x16);
+        *(u16 *)(mon + 0x28) = Pokemon_CalculateStat(0, mon[0], *(u16 *)(mon + 0xC), level, dvs);
+        *(u16 *)(mon + 0x2A) = Pokemon_CalculateStat(1, mon[0], *(u16 *)(mon + 0xE), level, dvs);
+        *(u16 *)(mon + 0x2C) = Pokemon_CalculateStat(2, mon[0], *(u16 *)(mon + 0x10), level, dvs);
+        *(u16 *)(mon + 0x2E) = Pokemon_CalculateStat(3, mon[0], *(u16 *)(mon + 0x12), level, dvs);
+        *(u16 *)(mon + 0x30) = Pokemon_CalculateStat(4, mon[0], *(u16 *)(mon + 0x14), level, dvs);
+        *(u16 *)(mon + 0x32) = Pokemon_CalculateStat(5, mon[0], *(u16 *)(mon + 0x14), level, dvs);
+        if (!(mon[0x1E] & 1)) {
+            if (arg1 != 2) {
+                *(u16 *)(mon + 0x26) = *(u16 *)(mon + 0x28);
+            }
+        }
+    } else {
+        dvs = *(u16 *)(mon + 0x16);
+        *(u16 *)(mon + 0x28) = Pokemon_ClampCurrentStat(0, mon[0], *(u16 *)(mon + 0xC), level, dvs, *(u16 *)(mon + 0x28));
+        *(u16 *)(mon + 0x2A) = Pokemon_ClampCurrentStat(1, mon[0], *(u16 *)(mon + 0xE), level, dvs, *(u16 *)(mon + 0x2A));
+        *(u16 *)(mon + 0x2C) = Pokemon_ClampCurrentStat(2, mon[0], *(u16 *)(mon + 0x10), level, dvs, *(u16 *)(mon + 0x2C));
+        *(u16 *)(mon + 0x2E) = Pokemon_ClampCurrentStat(3, mon[0], *(u16 *)(mon + 0x12), level, dvs, *(u16 *)(mon + 0x2E));
+        *(u16 *)(mon + 0x30) = Pokemon_ClampCurrentStat(4, mon[0], *(u16 *)(mon + 0x14), level, dvs, *(u16 *)(mon + 0x30));
+        *(u16 *)(mon + 0x32) = Pokemon_ClampCurrentStat(5, mon[0], *(u16 *)(mon + 0x14), level, dvs, *(u16 *)(mon + 0x32));
+        if (*(u16 *)(mon + 0x28) < *(u16 *)(mon + 0x26)) {
+            *(u16 *)(mon + 0x26) = *(u16 *)(mon + 0x28);
+        }
+    }
+}
 
 extern void func_80062978(void *, s32);
 void func_80062BD4(void *arg0, s32 arg1, void *arg2) {

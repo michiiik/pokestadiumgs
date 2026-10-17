@@ -373,6 +373,22 @@ def rewrite_function_hex_in_object(
         if pad:
             new_text += b"\x00" * pad
     obj.set_section_data(".text", new_text)
+    if delta != 0:
+        for sec in obj.sections:
+            rel_name = f".rel{sec.name}"
+            if obj.section_index(rel_name) is None:
+                continue
+            sec_data = bytearray(sec.data)
+            modified = False
+            for r in obj.relocations(rel_name):
+                sym = obj.symbols()[r.sym_index]
+                if sym.shndx == text_index and sym.name in ("", ".text"):
+                    addend = struct.unpack(">I", sec_data[r.offset : r.offset + 4])[0]
+                    if addend >= end:
+                        struct.pack_into(">I", sec_data, r.offset, addend + delta)
+                        modified = True
+            if modified:
+                obj.set_section_data(sec.name, bytes(sec_data))
     return elf32.build(obj), 1
 
 
