@@ -384,13 +384,22 @@ def rewrite_function_hex_in_object(
     obj.set_symbols(updated_symbols)
     if has_rel_text:
         obj.set_relocations(".rel.text", kept)
+    old_end_of_code = max(
+        (
+            s.value + (s.size if s.size > 0 else 0)
+            for s in symbols
+            if s.shndx == text_index and (s.info & 0xF) != 3 and s.name not in ("", ".text")
+        ),
+        default=len(text_section.data),
+    )
+    old_end_of_code = max(old_end_of_code, end)
     if has_subsequent_symbols:
-        new_text = text_section.data[:start] + replacement + text_section.data[end:]
+        new_text = text_section.data[:start] + replacement + text_section.data[end:old_end_of_code]
     else:
         new_text = text_section.data[:start] + replacement
-        pad = (-len(new_text)) % 16
-        if pad:
-            new_text += b"\x00" * pad
+    pad = (-len(new_text)) % 16
+    if pad:
+        new_text += b"\x00" * pad
     obj.set_section_data(".text", new_text)
     if delta != 0:
         for sec in obj.sections:
