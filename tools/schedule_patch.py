@@ -355,13 +355,21 @@ def rewrite_function_hex_in_object(
 
     delta = len(replacement) - function.size
     updated_symbols = obj.symbols()
+    has_subsequent_symbols = False
     for index, symbol in enumerate(updated_symbols):
         if symbol.shndx == text_index and index != function_index and symbol.value >= end:
             symbol.value += delta
+            has_subsequent_symbols = True
     updated_symbols[function_index].size = len(replacement)
     obj.set_symbols(updated_symbols)
     obj.set_relocations(".rel.text", kept)
-    new_text = text_section.data[:start] + replacement + text_section.data[end:]
+    if has_subsequent_symbols:
+        new_text = text_section.data[:start] + replacement + text_section.data[end:]
+    else:
+        new_text = text_section.data[:start] + replacement
+        pad = (-len(new_text)) % 16
+        if pad:
+            new_text += b"\x00" * pad
     obj.set_section_data(".text", new_text)
     return elf32.build(obj), 1
 
