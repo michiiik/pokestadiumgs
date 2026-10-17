@@ -180,9 +180,110 @@ void func_8220C030(void *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_11B210/func_8220C08C.s")
+typedef struct Fragment17MenuPrefix {
+    s16 enabled;
+    s16 state;
+    s16 counter;
+    s16 selected_panel;
+    s16 result;
+    s16 selection;
+    s16 secondary_selection;
+} Fragment17MenuPrefix;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_11B210/func_8220C1C4.s")
+extern void *D_80087200;
+
+void func_8220C08C(void *arg0) {
+    Fragment17MenuPrefix *menu = (Fragment17MenuPrefix *)arg0;
+    s32 previous_selection = menu->selection;
+
+    if ((*(u16 *)((u8 *)D_80087200 + 8) & 0x800) != 0) {
+        menu->selection--;
+        if (menu->selection < 0) {
+            menu->selection = 0;
+        }
+    }
+    if ((*(u16 *)((u8 *)D_80087200 + 8) & 0x400) != 0) {
+        menu->selection++;
+        if (menu->selection >= 3) {
+            menu->selection = 2;
+        }
+    }
+    if (previous_selection != menu->selection) {
+        func_800226C0(1);
+    }
+    if ((*(u16 *)((u8 *)D_80087200 + 8) & 0x8000) != 0) {
+        switch (menu->selection) {
+        case 0:
+            menu->state = 4;
+            menu->result = 1;
+            func_800226C0(147);
+            break;
+        case 1:
+            menu->state = 4;
+            menu->result = 0;
+            func_800226C0(163);
+            break;
+        case 2:
+            menu->state = 3;
+            menu->counter = 0;
+            menu->secondary_selection = 1;
+            func_800226C0(16);
+            break;
+        }
+    }
+}
+
+extern void Save_ResetAndCommitTypedRecord(s32, s32);
+
+void func_8220C1C4(void *arg0) {
+    Fragment17MenuPrefix *menu = (Fragment17MenuPrefix *)arg0;
+    s32 previous_selection = menu->secondary_selection;
+    s32 return_to_menu = 0;
+
+    switch (*(s16 *)((u8 *)arg0 + 44)) {
+    case 0:
+        func_8220BD90((s16 *)((u8 *)arg0 + 42));
+        func_800226C0(166);
+        break;
+    case 2:
+        if ((*(u16 *)((u8 *)D_80087200 + 8) & 0x800) != 0) {
+            menu->secondary_selection--;
+            if (menu->secondary_selection < 0) {
+                menu->secondary_selection = 0;
+            }
+        }
+        if ((*(u16 *)((u8 *)D_80087200 + 8) & 0x400) != 0) {
+            menu->secondary_selection++;
+            if (menu->secondary_selection >= 2) {
+                menu->secondary_selection = 1;
+            }
+        }
+        if (previous_selection != menu->secondary_selection) {
+            func_800226C0(1);
+        }
+        if ((*(u16 *)((u8 *)D_80087200 + 8) & 0x8000) != 0) {
+            if (menu->secondary_selection == 0) {
+                menu->state = 4;
+                menu->result = 0;
+                Save_ResetAndCommitTypedRecord(21, 0);
+                func_800226C0(67);
+            } else {
+                return_to_menu = 1;
+            }
+        } else if ((*(u16 *)((u8 *)D_80087200 + 8) & 0x4000) != 0) {
+            return_to_menu = 1;
+        }
+        break;
+    }
+    if (return_to_menu) {
+        menu->state = 2;
+        menu->counter = 0;
+        func_8220BE84((s16 *)((u8 *)arg0 + 42));
+        func_800226C0(3);
+        func_800226C0(168);
+        menu->selected_panel = 0;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_11B210/func_8220C340.s")
 
