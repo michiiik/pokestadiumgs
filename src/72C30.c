@@ -13,7 +13,51 @@ void Minigame_UpdateControllerState(s32 arg0, u8 arg1) {
     ((void (*)(s32, u8))(void *)func_80003240(&func_87F0EDDC))(arg0, arg1);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/72C30/func_800720A8.s")
+typedef union unk_func_800720A8_1 {
+    u8 unk_00;
+    struct {
+        u8 unk_00 : 1;
+        u8 unk_01 : 1;
+        u8 unk_02 : 1;
+        u8 unk_03 : 5;
+    } unk_01;
+} unk_func_800720A8_1;
+
+typedef struct unk_func_800720A8_2 {
+    s32 unk_00;
+    u8 unk_04[18];
+    unk_func_800720A8_1 unk_16;
+    u8 unk_17;
+} unk_func_800720A8_2;
+
+typedef struct unk_func_800720A8 {
+    s32 unk_00;
+    u8 unk_04;
+    u8 unk_05;
+    u8 unk_06;
+    u8 unk_07;
+    unk_func_800720A8_2 unk_08[4];
+    s32 unk_68;
+    u8 unk_6C[2];
+    u8 unk_6E;
+} unk_func_800720A8;
+
+void func_800720A8(unk_func_800720A8 *arg0) {
+    s32 var_v0;
+
+    arg0->unk_00 = 7;
+    arg0->unk_68 = 0;
+    arg0->unk_05 = 0;
+    arg0->unk_06 = 0;
+    arg0->unk_07 = 1;
+    arg0->unk_6E = 0;
+    for (var_v0 = 0; var_v0 < 4; var_v0++) {
+        arg0->unk_08[var_v0].unk_00 = 0;
+        arg0->unk_08[var_v0].unk_16.unk_00 &= 0xFF7F;
+        arg0->unk_08[var_v0].unk_16.unk_01.unk_01 = 0;
+        arg0->unk_08[var_v0].unk_16.unk_01.unk_02 = 0;
+    }
+}
 
 extern u8 D_8012B3F6;
 void Minigame_SetPlayerMask(s8 arg0) {
