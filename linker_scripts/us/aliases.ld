@@ -323,3 +323,7 @@ func_8003946C = GeoOverlay_BuildFadeQuad;
 func_8003C390 = Geo_NodeShadow;
 func_8004300C = ModelPreview_TryCopySelection;
 func_80043450 = ModelPreview_UpdateAutoRotation;
+func_80042C68 = ModelPreview_Create;
+func_80042D8C = ModelPreview_RefreshSelection;
+func_80042EB8 = ModelPreview_SetSelection;
+func_800430B4 = ModelPreview_ApplyEditControls;
