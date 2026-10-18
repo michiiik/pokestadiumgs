@@ -2,6 +2,32 @@
 
 
 #ifdef VERSION_US
+/* Shared clipping rectangle, loaded as four halfwords by the draw traversal. */
+typedef struct Fragment82GlobalState {
+    s16 x, y;
+    u16 width, height;
+} Fragment82GlobalState;
+extern Fragment82GlobalState D_82D07198;
+
+typedef struct Fragment82MenuColor { u8 r, g, b, a; } Fragment82MenuColor;
+typedef struct Fragment82MenuRow {
+    u8 kind, index;
+    s16 start_x, start_y, delta_x, delta_y;
+    u8 flags, phase, timer, unk_0D[3];
+    void *data;
+    s16 x, y;
+    u16 width, height;
+    u8 unk_1C[4];
+    Fragment82MenuColor primary, secondary;
+} Fragment82MenuRow;
+extern void func_82D00020(u8);
+extern void func_82D067A0(u8 *);
+extern void func_82D05BD8(u8 *);
+extern void func_82D02B44(s16, s16, u16, u16);
+extern u8 D_82D06FB4[], D_82D0716C[];
+extern u8 D_82D07184, D_82D07188, D_82D0718C, D_82D07194;
+extern Fragment82MenuColor D_82D06F90, D_82D06F94, D_82D06F98, D_82D06F9C;
+
 extern Gfx* D_800D0510;
 void ParticleGfx_SetPrimColor_fragment82(u8 r, u8 g, u8 b, u8 a) {
     gDPSetPrimColor(D_800D0510++, 0, 0, r, g, b, a);
@@ -207,7 +233,17 @@ void func_82D04C44(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D05BD8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D05C90.s")
+void func_82D05C90(void) {
+    u8 *row;
+    u8 *end;
+    Fragment82GlobalState *viewport = &D_82D07198;
+    func_82D02B44(viewport->x, viewport->y, viewport->width, viewport->height);
+    row = D_82D06FB4; end = D_82D0716C;
+    do {
+        func_82D05BD8(row);
+        row += sizeof(Fragment82MenuRow);
+    } while (row != end);
+}
 
 extern u8 D_82D07184;
 typedef struct { u8 pad0[2]; s16 value2; u8 pad4[2]; s16 value6; u8 pad8[2]; u8 flagsA; u8 valueB; u8 countC; u8 padD[7]; s16 output14; } Fragment82BaseRateState;
@@ -275,17 +311,15 @@ extern u8 D_82D0717C[]; extern u8 D_82D07174[]; extern u8 D_82D07190; void func_
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D0639C.s")
 
 extern u8 D_82D07194;
-typedef struct { s16 field0; u8 pad2[2]; s16 field4; } Fragment82GlobalState;
-extern Fragment82GlobalState D_82D07198;
 typedef struct { u8 pad0[2]; s16 value2; u8 pad4[2]; s16 value6; u8 pad8[2]; u8 flagsA; u8 valueB; u8 countC; u8 padD[7]; s16 output14; u8 pad16[2]; s16 value18; } Fragment82OffsetState;
 void func_82D06488(Fragment82OffsetState *arg0) {
     if (D_82D07194 >= arg0->countC) {
         arg0->flagsA |= 1;
         arg0->output14 = arg0->value2 - ((D_82D07194 - arg0->countC) * 0x2D);
-        D_82D07198.field0 = arg0->output14 + arg0->value18;
+        D_82D07198.x = arg0->output14 + arg0->value18;
         if (arg0->countC == 0) {
-            D_82D07198.field0 = 0;
-            D_82D07198.field4 = 0x280;
+            D_82D07198.x = 0;
+            D_82D07198.width = 0x280;
         }
     }
 }
@@ -319,11 +353,8 @@ void func_82D06514(u8 *arg0) {
     }
     arg0[0xC] = count - 1;
 }
-extern void func_82D02B44(s16, s16, u16, u16);
-extern void func_82D05BD8(u8 *);
 extern void func_82D05D74(u8 *);
 extern void func_82D06040(u8 *);
-extern u8 D_82D06FB4[];
 extern void func_82D05EB4(Fragment82RateState *arg0);
 extern void func_82D06488(Fragment82OffsetState *arg0);
 void func_82D065C0(u8 *arg0) {
@@ -416,9 +447,28 @@ void func_82D06754(u8 *arg0)
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D067A0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D068A0.s")
+void func_82D068A0(void) {
+    u8 *row;
+    u8 *end;
+    func_82D00020(1);
+    row = D_82D06FB4; end = D_82D0716C;
+    do {
+        func_82D067A0(row);
+        row += sizeof(Fragment82MenuRow);
+    } while (row != end);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D068F0.s")
+void func_82D068F0(Fragment82MenuRow *row, s32 delay) {
+    switch (row->kind) {
+    case 2: row->timer = D_82D07184 + delay; break;
+    case 3: row->timer = D_82D07188 + delay; break;
+    case 4:
+    case 6: row->timer = D_82D0718C + delay; break;
+    case 5: row->timer = D_82D07194 + delay; break;
+    }
+    row->flags |= 2;
+    row->phase = 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D0697C.s")
 
@@ -467,7 +517,18 @@ void func_82D06AFC(void *arg0, s32 arg1)
 extern u8 D_82D06FC4[];
 void func_82D06C9C(u8 arg0, s32 arg1) { *(s32 *)(D_82D06FC4 + (arg0 * 0x28)) = arg1; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D06CC0.s")
+void func_82D06CC0(Fragment82MenuRow *row) {
+    switch (row->kind) {
+    case 0: row->primary = D_82D06F90; break;
+    case 4: row->primary = D_82D06F9C; break;
+    case 1:
+    case 3: row->primary = D_82D06F94; break;
+    case 2:
+        row->primary = D_82D06F98;
+        row->secondary.a = 255;
+        break;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D06D50.s")
 #endif
