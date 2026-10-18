@@ -99,7 +99,7 @@ extern s32 D_8F000910;
 extern s32 D_8F000928;
 extern void func_800086A4(s32);
 extern void StageFade_StartFromOpaque(s32);
-extern void func_80042FBC(void*, s32);
+extern s32 func_80042FBC(void *, s32);
 extern void func_80064D28(void);
 extern s32 func_80043064(void*);
 extern s32 func_80043678(void*);

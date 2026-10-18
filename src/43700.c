@@ -177,8 +177,10 @@ void func_80042F94(void* arg0, void* arg1) {
     ModelPreview_SetSelection(arg0, 1, arg1, 1);
 }
 
-void func_80042FBC(void* arg0, void* arg1) {
-    ModelPreview_SetSelection(arg0, 0, arg1, 1);
+// Return the model-selection load status consumed by the preview browser.
+//@src/fragments/32/fragment32_1B1330.c
+s32 func_80042FBC(void *state, s32 species) {
+    return ModelPreview_SetSelection(state, 0, species, 1);
 }
 
 void func_80042FE4(void* arg0, void* arg1) {
