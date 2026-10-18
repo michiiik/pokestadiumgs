@@ -8,6 +8,8 @@
  * undefined_syms.ld, and the other hand-written scripts are.
  */
 Audio_ThreadEntry = Audio_ThreadMain;
+/* func_800195C0 reads and writes this same byte in the original assembly. */
+Audio_AiHdwrBugFlag = D_8008FAA0;
 /* Preserve address-keyed rectangle calls alongside the verified narrow API. */
 func_80044270 = GfxRect_DrawTextured;
 /* JPEG byte-stuffing state occupies the second byte of the existing flag slot. */
@@ -344,8 +346,6 @@ func_80062614 = GbMail_ImportRecord;
 func_80061940 = Pokemon_ClampCurrentStat;
 func_80064728 = Pokemon_GetDisplaySpecies;
 func_80063A8C = Pokemon_FindEvolutionMethod;
-/* Audio interface hardware bug flag alias to prevent address CSE */
-Audio_AiHdwrBugFlag = D_8008FAA0;
 func_80063D54 = Pokemon_CanLearnGen1Machine;
 func_80063838 = Pokemon_GetBaseStat;
 func_800640F8 = Pokemon_GetMoveLearnLevelForVersion;
@@ -388,7 +388,10 @@ func_84300350 = ByteList_RemoveFirst_fragment81;
 func_843005B8 = MoveRules_MatchesEffect_fragment81;
 func_84301AEC = Pokemon_ShuffleMoves_fragment81;
 func_8430022C = ByteList_ChooseRandom_fragment81;
-func_8430049C = MoveLists_ApplySpeciesWeights_fragment81;
+func_8430049C = MoveLists_ApplySelectionWeights_fragment81;
+MoveLists_ApplySpeciesWeights_fragment81 = MoveLists_ApplySelectionWeights_fragment81;
+func_84300CC0 = MoveSelection_ChooseFirst_fragment81;
+func_8430188C = MovePools_ClassifyLearnable_fragment81;
 func_843006B0 = HeldItem_IsRedundantForType_fragment81;
 func_84300A54 = SpeciesCandidates_AddType_fragment81;
 func_84300B30 = SpeciesCandidates_PopulateTypes_fragment81;
