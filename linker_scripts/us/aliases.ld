@@ -8,6 +8,8 @@
  * undefined_syms.ld, and the other hand-written scripts are.
  */
 Audio_ThreadEntry = Audio_ThreadMain;
+/* func_800195C0 reads and writes this same byte in the original assembly. */
+Audio_AiHdwrBugFlag = D_8008FAA0;
 /* Preserve address-keyed rectangle calls alongside the verified narrow API. */
 func_80044270 = GfxRect_DrawTextured;
 /* JPEG byte-stuffing state occupies the second byte of the existing flag slot. */
