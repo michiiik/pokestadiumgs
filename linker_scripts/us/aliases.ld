@@ -384,3 +384,6 @@ func_842017D0 = TeamParameters_Load_fragment80;
 func_84203090 = TeamRoster_ApplyCandidateOrder_fragment80;
 func_84201AEC = TeamMember_ComputeMatchupValue_fragment80;
 func_842022F0 = TeamCandidate_PassesRules_fragment80;
+func_84300350 = ByteList_RemoveFirst_fragment81;
+func_843005B8 = MoveRules_MatchesEffect_fragment81;
+func_84301AEC = Pokemon_ShuffleMoves_fragment81;

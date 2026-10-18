@@ -2,6 +2,7 @@
 
 
 #ifdef VERSION_US
+extern u32 func_8003570C(void);
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_84300020.s")
 
 extern u8 D_843023A8[]; u8 func_8430009C(void) { return D_843023A8[(func_8003570C() & 3)]; }
@@ -22,7 +23,23 @@ u8 func_84300348(u8 *arg0) {
     return *arg0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_84300350.s")
+void ByteList_RemoveFirst_fragment81(u8 *list, u8 value) {
+    s32 i;
+    s32 j;
+
+    if (list[0] > 0) {
+        for (i = 1; i <= list[0]; i++) {
+            if (list[i] == value) {
+                list[i] = 0;
+                list[0]--;
+                break;
+            }
+        }
+        for (j = i; j <= list[0]; j++) {
+            list[j] = list[j + 1];
+        }
+    }
+}
 
 s32 func_843003E0(u8 *arg0, u8 arg1) {
     s32 i;
@@ -53,7 +70,27 @@ void func_8430042C(u8 *arg0, u8 *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_8430049C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_843005B8.s")
+typedef struct Fragment81RulePrefix {
+    u8 *types;
+    u8 *effects;
+} Fragment81RulePrefix;
+
+extern Fragment81RulePrefix *D_84302C9C;
+extern u8 func_80062D20(u8);
+s32 MoveRules_MatchesEffect_fragment81(u8 move) {
+    u8 *effects = D_84302C9C->effects;
+
+    if (effects == NULL) {
+        return 0;
+    }
+    while (*effects != 0xFF) {
+        if (*effects == func_80062D20(move)) {
+            return 1;
+        }
+        effects++;
+    }
+    return 0;
+}
 
 extern u8 func_80063838(u8, u8);
 s32 func_84300648(u8 arg0) {
@@ -205,7 +242,7 @@ u8 func_84300BE8(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_84301094.s")
 
-extern u8 func_84300350(u8 *, u8);
+extern void ByteList_RemoveFirst_fragment81(u8 *, u8);
 extern s32 func_8430049C(u8);
 extern u8 D_84302CA2[];
 extern u8 D_84302FAE[];
@@ -219,16 +256,16 @@ u8 func_843013A4(u8 *arg0) {
     result = 0;
     if (func_84300348(D_84302CA2) > 0) {
         result = func_8430022C(D_84302CA2);
-        func_84300350(D_84302CA2, result);
+        ByteList_RemoveFirst_fragment81(D_84302CA2, result);
     } else if (func_84300348(D_84302FAE) > 0) {
         result = func_8430022C(D_84302FAE);
         if (func_84300928(result) == 0) {
             result = func_8430022C(D_84302FAE);
         }
-        func_84300350(D_84302FAE, result);
+        ByteList_RemoveFirst_fragment81(D_84302FAE, result);
     } else if (func_84300348(D_84302FD2) > 0) {
         result = func_8430022C(D_84302FD2);
-        func_84300350(D_84302FD2, result);
+        ByteList_RemoveFirst_fragment81(D_84302FD2, result);
     }
     func_8430049C(result);
     return result;
@@ -251,7 +288,25 @@ s32 func_84301838(u8 arg0, u8 arg1, u8 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_8430188C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_84301AEC.s")
+void Pokemon_ShuffleMoves_fragment81(u8 *mon) {
+    u8 count = 0;
+    s32 i;
+    u8 index;
+    u8 temp;
+
+    //!bug The move byte is read before the bound, including mon[6] at count 4.
+    while ((mon + 2)[count] != 0 && count < 4) {
+        count++;
+    }
+    if (count >= 2) {
+        for (i = 0; i < 3; i++) {
+            index = func_8003570C() % count;
+            temp = (mon + 2)[index];
+            (mon + 2)[index] = mon[2];
+            mon[2] = temp;
+        }
+    }
+}
 
 extern void func_8430188C(u8);
 extern u8 func_84300CC0(void);
