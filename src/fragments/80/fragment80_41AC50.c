@@ -114,18 +114,96 @@ s32 MoveEffect_UsesDamageSimulation_fragment80(u8 effect) {
     }
 }
 
+typedef struct unk_func_842016BC {
+    u8 move_id, effect, power, type, accuracy;
+    u8 level;
+    u8 unk06[6];
+    s32 damage, score;
+} unk_func_842016BC;
+typedef struct F80BattleParameters {
+    u32 flags;
+    u8 unk04[4];
+    u8 damage_weight, threat_weight, special_weight;
+    u8 unk0B[0x39];
+} F80BattleParameters;
+typedef char F80BattleParametersSize[sizeof(F80BattleParameters)==0x44 ? 1 : -1];
+typedef struct Fragment80DamageContext {
+    unk_func_842016BC move;
+    F80BattleParameters *parameters;
+    u8 *attacker, *defender;
+} Fragment80DamageContext;
+typedef char Fragment80DamageContextSize[sizeof(Fragment80DamageContext)==32 ? 1 : -1];
+extern void func_842016BC(u8, unk_func_842016BC *);
+extern void func_8420168C(void *);
+
+extern u16 func_8420199C(u8 *, u8 *);
+extern u8 Ratio_ScaleToByte_fragment80(u16, u16);
+extern void func_84200970(void *);
+extern u8 func_84203440(void);
+extern u8 func_8420344C(void);
+extern u8 func_80062D20(u8);
+extern s32 *func_80062CE0(u8);
+typedef struct Fragment80MatchupRecord { u32 words[22]; } Fragment80MatchupRecord;
+typedef struct Fragment80MatchupTeam {
+    u8 unk00[0x18];
+    Fragment80MatchupRecord members[6];
+    u8 unk228[0x2B8];
+} Fragment80MatchupTeam;
+typedef char Fragment80MatchupTeamSize[sizeof(Fragment80MatchupTeam)==0x4E0 ? 1 : -1];
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_8420199C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_84201AEC.s")
+s32 TeamMember_ComputeMatchupValue_fragment80(u8 arg0, u8 arg1, u8 arg2, u8 arg3) {
+    u8 *attacker = (u8 *)&((Fragment80MatchupTeam *)D_84203B54)[arg0].members[arg2];
+    u8 move;
+    u8 retaliation;
+    s32 i;
+    u8 ratio;
+    u8 threat;
+    s32 special;
+    s32 total = 0;
+    s32 damage;
+    s32 value;
+    {
+        u8 *defender = (u8 *)&((Fragment80MatchupTeam *)D_84203B54)[arg1].members[arg3];
+        Fragment80DamageContext context;
+        retaliation = Ratio_ScaleToByte_fragment80(func_8420199C(defender, attacker), *(u16 *)(attacker + 0x26));
+        context.attacker = attacker;
+        context.parameters = (F80BattleParameters *)&D_84203A40;
+        context.defender = defender;
+        for (i = 0; i != 4; i++) {
+            move = attacker[i + 2];
+            func_842016BC(move, &context.move);
+            if (context.move.power) {
+                func_8420168C(&context);
+                damage = context.move.damage;
+            } else {
+                damage = 0;
+            }
+            ratio = Ratio_ScaleToByte_fragment80(damage, *(u16 *)(defender + 0x26));
+            func_84200970(&context);
+            special = context.move.score;
+            value = func_84203440() * context.move.accuracy * ratio * ((F80BattleParameters *)&D_84203A40)->damage_weight / 255;
+            value += context.move.accuracy * special * ((F80BattleParameters *)&D_84203A40)->special_weight / 255;
+            if (func_80062D20(move) == 7) {
+                threat = 255;
+            } else {
+                threat = retaliation;
+            }
+            value -= threat * 255 * ((F80BattleParameters *)&D_84203A40)->threat_weight * func_8420344C() / 255;
+            func_842034B0((u8 *)func_80062CE0(context.move.move_id), 0);
+            total += value;
+        }
+    }
+    return total;
+}
 
-extern s32 func_84201AEC(u8, u8, u8, u8);
 s32 TeamMember_SumMatchupValues_fragment80(u8 arg0, u8 arg1, u8 arg2) {
     s32 i;
     s32 total = 0;
     for (i = 0; i < D_84203B54[arg1].roster_count; i++) {
         func_842034B0(D_84203B54[arg0].mons[arg2], 0);
         func_842034B0(D_84203B54[arg1].mons[i], 0);
-        total += func_84201AEC(arg0, arg1, arg2, i);
+        total += TeamMember_ComputeMatchupValue_fragment80(arg0, arg1, arg2, i);
     }
     return total;
 }
